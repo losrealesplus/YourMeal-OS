@@ -1,0 +1,18 @@
+export default {
+  welcome: "Welcome",
+  welcomeSub: "Sign in to your operation",
+  tabs: { email: "Email", phone: "Phone" },
+  withGoogle: "Continue with Google",
+  withApple: "Continue with Apple",
+  fullName: "Full name",
+  forgotPassword: "Forgot your password?",
+  sendCode: "Send code",
+  verifyCode: "Verify code",
+  codeSent: "Code sent",
+  resetPassword: "Reset password",
+  newPassword: "New password",
+  updatePassword: "Update password",
+  checkEmail: "Check your inbox",
+  resetSent: "We've sent you a password reset link.",
+  passwordUpdated: "Password updated",
+} as const;
