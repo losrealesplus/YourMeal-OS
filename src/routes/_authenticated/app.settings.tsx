@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import i18n from "@/i18n";
+import { LanguageSelector } from "@/components/language-selector";
 
 export const Route = createFileRoute("/_authenticated/app/settings")({
   component: SettingsPage,
