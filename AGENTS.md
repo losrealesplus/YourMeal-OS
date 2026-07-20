@@ -11,7 +11,11 @@
 
 # YourMeal OS — Reglas para agentes
 
-Priorizar mantenibilidad, arquitectura, código limpio y documentación.
+**Cursor actúa como CTO del proyecto.** Lovable acelera UI.  
+**La documentación es la fuente de verdad; el código la sigue.**  
+Contexto permanente: [`docs/05-architecture/CONTEXTO_CTO.md`](./docs/05-architecture/CONTEXTO_CTO.md) (ADR 0012).
+
+Priorizar mantenibilidad, arquitectura, código limpio y documentación sobre velocidad.
 
 ## Idioma (ADR 0010)
 
@@ -21,18 +25,18 @@ Documentación y razonamiento en **español**. Código y BD en **inglés**.
 
 > Todo elemento debe justificar su existencia **antes** de implementarse.
 
-Responder: ¿Qué es? ¿Cómo es? ¿Por qué existe? ¿Para qué sirve? ¿Qué problema resuelve? ¿Qué impacto tiene?
-
 Registrar en el **Diario de Desarrollo** al terminar (antes de Done).
 
 ## Antes de escribir código
 
-1. Constitución y ADRs  
-2. Modelo de dominio / lenguaje ubicuo  
-3. Docs Module 01 si aplica (`docs/12-domain-model/module-01/`)  
-4. Servicios/módulos existentes  
-5. Inconsistencias  
+1. [`CONTEXTO_CTO.md`](./docs/05-architecture/CONTEXTO_CTO.md)  
+2. ADRs y docs del módulo  
+3. Modelo de dominio (`docs/12-domain-model/module-01/` si Module 01)  
+4. Código existente de Services/módulos  
+5. Detectar inconsistencias docs ↔ código  
 6. Solo entonces implementar  
+
+**No rehacer Architecture Review ni Foundation** salvo ADR nuevo. Ya están cerrados (`v0.1.0`).
 
 ## Fase actual
 
@@ -44,27 +48,32 @@ Orden: Dish → Ingredient → Recipe → Repos → Services → Rules → Tests
 
 ## Gobierno
 
-| Tema | SoT |
-|------|-----|
-| Arquitectura / dominio | `docs/` + ADRs + Cursor |
-| UI visual | Lovable (bajo constitución) |
-| Memoria del porqué | `docs/99-internal/development-journal/` |
+| Quién | Rol |
+|-------|-----|
+| **Cursor** | CTO — arquitectura, dominio, implementación |
+| **`docs/` + ADRs** | Fuente de verdad |
+| **Lovable** | UI / pantallas (no redefine arquitectura) |
+| **Código** | Sigue a la documentación |
+
+Conflictos con `.lovable/plan.md` → **gana `docs/`**.
 
 ## Reglas permanentes (extracto)
 
 - Canónico: g, ml, km, °C, UTC, decimal  
 - `useFmt()` — no `toLocaleString` en UI de producto  
 - Multi-tenant + RLS  
-- Capabilities, no roles crudos  
+- Capabilities (`useCan` / `requireCapability`)  
 - UI → Service → Repository → Supabase  
 - `archive` / `restore` / `purge` — nunca `delete()` de negocio  
 - `DomainError` + `ServiceContext`  
 - Tras v0.1.0: cambio arquitectónico = ADR  
-- Cierre de jornada: incluir Diario  
+- AI / offline: no implementar aún  
+- Cierre de jornada incluye Diario  
 
 ## Enlaces
 
+- [Contexto CTO](./docs/05-architecture/CONTEXTO_CTO.md)
 - [Diario](./docs/99-internal/development-journal/README.md)
 - [DoD](./docs/00-status/DEFINITION_OF_DONE.md)
-- [Cierre](./docs/05-architecture/CIERRE_DE_JORNADA.md)
 - [Dish](./docs/12-domain-model/module-01/Dish.md)
+- [Architecture Review](./docs/05-architecture/architecture-review.md) (histórico — ya aprobado)

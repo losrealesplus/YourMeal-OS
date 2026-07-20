@@ -15,3 +15,4 @@ Permanent decisions for YourMeal OS. New ADRs are additive; do not silently reve
 | [0009](./0009-foundation-lock.md) | Foundation Lock |
 | [0010](./0010-idioma-oficial-desarrollo.md) | Idioma oficial del desarrollo (español) |
 | [0011](./0011-diario-desarrollo-intencionalidad.md) | Diario de Desarrollo + Principio de Intencionalidad |
+| [0012](./0012-cursor-cto-lovable-ui.md) | Cursor CTO · Lovable UI · Docs como fuente de verdad |

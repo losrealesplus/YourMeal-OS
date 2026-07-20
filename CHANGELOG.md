@@ -47,7 +47,9 @@ La arquitectura de YourMeal OS se considera **estable**.
 ### Gobierno
 
 - ADR 0011: Diario de Desarrollo + Principio de Intencionalidad
+- ADR 0012: Cursor = CTO · Lovable = UI · Docs = fuente de verdad
 - Diario en `docs/99-internal/development-journal/`
+- Contexto permanente: `docs/05-architecture/CONTEXTO_CTO.md`
 - Docs de dominio Module 01: Dish / Ingredient / Recipe
 - Definition of Done ampliada (Diario + intencionalidad)
 - Cierre de jornada: paso de actualización del Diario

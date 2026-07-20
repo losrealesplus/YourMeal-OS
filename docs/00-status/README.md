@@ -23,11 +23,12 @@ Dish Library           🚧
 
 | Pilar | Principio |
 |-------|-----------|
-| Arquitectura | Docs + ADRs son la fuente de verdad; Lovable no redefine arquitectura |
+| Arquitectura | Docs + ADRs son la fuente de verdad; **Cursor = CTO**; Lovable = UI |
 | Desarrollo | Español en docs/razonamiento; inglés en código/BD |
 | Calidad | Intencionalidad + Definition of Done + no estado amarillo |
 | Memoria | Diario de Desarrollo del Proyecto |
 | Cierre diario | Protocolo de 7 pasos (incluye Diario) |
+| Contexto sesiones | [CONTEXTO_CTO.md](../05-architecture/CONTEXTO_CTO.md) |
 
 ## Module 01 — ahora
 
