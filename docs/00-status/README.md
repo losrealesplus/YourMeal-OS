@@ -6,54 +6,42 @@
 ## Fase oficial
 
 ```text
-Phase 0 Blueprint     ✅
-Foundation            ✅
-Foundation Lock       ✅
-────────────────────────────────
-Current Phase
-Module 01 — Dish Library
+Blueprint              ✅
+Foundation             ✅
+Foundation Lock        ✅
+────────────────────────
+Module 01
+Dish Library           🚧
 ```
 
-> **La arquitectura ya no se diseña; se aplica.**  
-> Cualquier cambio estructural requiere un ADR.
+> Las fases anteriores construyeron la plataforma.  
+> **Module 01** inicia la historia de desarrollo de negocio (Domain Driven).
 
-## Checklist de validación (cerrado)
+> **La arquitectura ya no se diseña; se aplica.**
 
-| Área | Estado |
-|------|--------|
-| Multi-tenant | ✅ |
-| RBAC en runtime | ✅ |
-| Soft Delete | ✅ |
-| Repository Pattern | ✅ |
-| Service Layer | ✅ |
-| Domain Errors | ✅ |
-| ServiceContext | ✅ |
-| Feature Flags | ✅ |
-| Localization | ✅ |
-| ADRs | ✅ |
-| Domain Model | ✅ |
-| Events preparado | ✅ |
+## Constitución (resumen)
 
-No hay bloqueo arquitectónico para comenzar el dominio funcional.
+| Pilar | Principio |
+|-------|-----------|
+| Arquitectura | Docs + ADRs son la fuente de verdad; Lovable no redefine arquitectura |
+| Desarrollo | Español en docs/razonamiento; inglés en código/BD |
+| Calidad | Intencionalidad + Definition of Done + no estado amarillo |
+| Memoria | Diario de Desarrollo del Proyecto |
+| Cierre diario | Protocolo de 7 pasos (incluye Diario) |
 
-## Documentos de gobierno
+## Module 01 — ahora
 
-| Documento | Uso |
-|-----------|-----|
-| [DEFINITION_OF_DONE.md](./DEFINITION_OF_DONE.md) | Lista de verificación de cada módulo |
-| [Foundation Lock](../05-architecture/FOUNDATION_LOCK.md) | Cierre de plataforma |
-| [Cierre de jornada](../05-architecture/CIERRE_DE_JORNADA.md) | Protocolo al terminar el día |
-| [ADR 0010 Idioma](../adr/0010-idioma-oficial-desarrollo.md) | Español = idioma oficial de desarrollo |
-| [Roadmap](../roadmap/README.md) | Secuencia oficial |
-| [CHANGELOG](../../CHANGELOG.md) | Hitos de versión |
+Dominio primero (sin UI):
 
-## Próximo objetivo
+- [Dish.md](../12-domain-model/module-01/Dish.md)
+- [Ingredient.md](../12-domain-model/module-01/Ingredient.md)
+- [Recipe.md](../12-domain-model/module-01/Recipe.md)
 
-**Module 01 — Dish Library**, en modo Domain Driven:
+**Próximo paso de implementación:** refinar/cerrar invariantes de **Dish** en código de dominio (`src/modules/dish-library/domain/`) — aún sin pantalla.
 
-```text
-Dish → Ingredient → Recipe → Repositories → Services
-  → Business Rules → Tests → UI → CRUD
-```
+## Enlaces
 
-Primer paso de la próxima sesión: definir/refinar la entidad **Dish** en dominio (estados, invariantes) según el lenguaje ubicuo — **sin pantalla**.
+- [Diario](../99-internal/development-journal/README.md)
+- [Definition of Done](./DEFINITION_OF_DONE.md)
+- [Cierre de jornada](../05-architecture/CIERRE_DE_JORNADA.md)
+- [Roadmap](../roadmap/README.md)

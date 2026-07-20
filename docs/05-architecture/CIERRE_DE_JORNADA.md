@@ -23,75 +23,39 @@ Cuando el equipo diga **"Ya casi terminamos por hoy"**, se sigue siempre este pr
 
 ## 2. Revisión técnica
 
-Comprobar:
-
-- Arquitectura
-- Errores
-- Código duplicado
-- TODOs
-- Deuda técnica
-- Consistencia con ADRs
-- Consistencia con el modelo de dominio
+Comprobar: arquitectura, errores, duplicados, TODOs, deuda técnica, ADRs, modelo de dominio.
 
 ## 3. Git
 
-Verificar:
-
-- Que todo compile
-- Que no existan archivos temporales
-- Commits organizados
-- Pull Request revisado
-- Merge realizado (si procede)
-- Rama principal estable
+Verificar: compilación, sin temporales, commits claros, PR revisado, merge si procede, `main` estable.
 
 ## 4. Documentación
 
-Actualizar solo lo necesario:
+Actualizar solo lo necesario: roadmap, estado, ADRs, docs de módulo.
 
-- Roadmap
-- Estado del proyecto
-- ADRs (si hubo decisiones de arquitectura)
-- Documentación del módulo (si aplica)
+## 5. Actualización del Diario de Desarrollo
 
-## 5. Resumen del día
+Registrar funcionalidades, decisiones y cambios relevantes del día en:
 
-Informe con este formato:
+`docs/99-internal/development-journal/YYYY-MM-DD-<tema>.md`
+
+Siguiendo la plantilla del [Diario](../99-internal/development-journal/README.md).
+
+## 6. Resumen del día
 
 ### Avance del día
-
-- Funcionalidades implementadas
-- Arquitectura añadida
-- Documentación creada
-
 ### Errores encontrados
+### Checklist del roadmap (hecho / en progreso / pendiente)
+### Estado general (fase, próximo objetivo, riesgos)
 
-- Lista de errores
-- Causa
-- Solución aplicada
+## 7. Preparación de la siguiente sesión
 
-### Checklist del roadmap
-
-- Completado
-- En progreso
-- Pendiente
-
-### Estado general del proyecto
-
-- Fase actual
-- Próximo objetivo
-- Riesgos detectados (si existen)
-
-## 6. Preparación de la siguiente sesión
-
-Dejar definido:
-
-- El siguiente objetivo
-- El primer paso de la próxima sesión
-- El contexto necesario para retomar sin perder tiempo
+Dejar definido: siguiente objetivo, primer paso, contexto para retomar.
 
 ---
 
 ## Relacionado
 
+- [Diario de Desarrollo](../99-internal/development-journal/README.md)
 - [Definition of Done](../00-status/DEFINITION_OF_DONE.md)
-- [ADR 0010 — Idioma](../adr/0010-idioma-oficial-desarrollo.md)
+- [ADR 0011](../adr/0011-diario-desarrollo-intencionalidad.md)

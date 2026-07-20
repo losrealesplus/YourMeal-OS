@@ -39,3 +39,15 @@ La arquitectura de YourMeal OS se considera **estable**.
 ### Siguiente fase
 
 **Module 01 — Dish Library** (dominio primero; UI al final).
+
+---
+
+## [Unreleased] — 2026-07-20
+
+### Gobierno
+
+- ADR 0011: Diario de Desarrollo + Principio de Intencionalidad
+- Diario en `docs/99-internal/development-journal/`
+- Docs de dominio Module 01: Dish / Ingredient / Recipe
+- Definition of Done ampliada (Diario + intencionalidad)
+- Cierre de jornada: paso de actualización del Diario
