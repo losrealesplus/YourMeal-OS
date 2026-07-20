@@ -15,17 +15,29 @@
 
 Prioritize **maintainability, architecture, clean code, and documentation** over development speed.
 
+## Governance (new stage)
+
+We are past “create the product in prompts.” We are building a **software company around the product**.
+
+| Concern | Source of truth |
+|---------|-----------------|
+| Architecture, domain, schema, RBAC, roadmap | **`docs/` + ADRs + this file (Cursor)** |
+| UI components, visual flows, speed | Lovable may accelerate — **must follow docs** |
+| Conflicts with `.lovable/plan.md` | **`docs/` and ADRs win** |
+
+Do **not** invent architecture inside Lovable. Read the Architecture Review before Module 01.
+
 - Constitution: [`docs/`](./docs/README.md)
-- ADRs (permanent): [`docs/adr/`](./docs/adr/README.md)
-- Status: [`docs/00-status/README.md`](./docs/00-status/README.md)
-- Roadmap: [`docs/roadmap/README.md`](./docs/roadmap/README.md)
+- **Architecture Review (gate):** [`docs/05-architecture/architecture-review.md`](./docs/05-architecture/architecture-review.md)
+- ADRs: [`docs/adr/`](./docs/adr/README.md)
+- Roadmap v1: [`docs/roadmap/README.md`](./docs/roadmap/README.md)
 
 ## Permanent rules (never violate)
 
 1. **Canonical storage** — grams, milliliters, kilometers, Celsius, UTC, decimal + ISO currency. Localize only at presentation.
-2. **Localization** — Never `toLocaleString()` in components. Always `useFmt()`.
+2. **Localization** — Never `toLocaleString()` in product components. Always `useFmt()`.
 3. **Multi-tenant** — All business data is tenant-scoped. New tables: `tenant_id` + RLS.
-4. **Auth / RBAC** — Supabase Auth, profiles, tenant-aware roles. Do not hardcode permissions in UI; use `src/permissions`.
+4. **Auth / RBAC** — Supabase Auth, profiles, tenant-aware roles. Do not hardcode permissions in UI; use `src/permissions` / `useCan`.
 5. **Services** — No business rules in React components. Logic lives in `src/services/`.
 6. **Soft delete** — Never hard-delete business records in app flows; set `deleted_at`.
 7. **Audit** — Record who/what/when/old/new/tenant/IP on mutations.
@@ -36,6 +48,6 @@ Prioritize **maintainability, architecture, clean code, and documentation** over
 
 One app, one login. After login → Home. UI changes by department/permissions — not by switching apps.
 
-## First module
+## Module order
 
-**Dish Library** (`DishService` + `/admin/dishes`) before menus, orders, kitchen, etc.
+Follow official roadmap v1. **Do not start Dish Library implementation until the Architecture Review is approved** and P0 gaps (route gates, soft-delete enforcement, ServiceContext) are addressed.

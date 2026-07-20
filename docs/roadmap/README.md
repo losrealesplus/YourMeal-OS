@@ -1,48 +1,61 @@
-# Roadmap
+# Roadmap — Official v1
 
-## Now — Foundation (in progress)
+```text
+FOUNDATION ✅
+    ↓
+DOMAIN MODEL          ← architecture review gate
+    ↓
+Dish Library          ← Module 01 (do not start until review approved)
+    ↓
+Ingredients
+    ↓
+Weekly Menus
+    ↓
+Customers
+    ↓
+Orders
+    ↓
+Production
+    ↓
+Kitchen
+    ↓
+Inventory
+    ↓
+Purchasing
+    ↓
+Logistics
+    ↓
+Accounting
+    ↓
+Customer Support
+    ↓
+Reports
+    ↓
+AI                    ← deferred (ADR 0008)
+```
 
-- [x] Multi-tenant schema + RLS
-- [x] Auth shell + profiles + roles enum
-- [x] Localization + `useFmt`
-- [x] Design tokens + app/admin shells
-- [x] Docs constitution + ADRs
-- [x] Soft delete / audit / feature flag schema
-- [x] Services scaffolding (`DishService` + audit + flags)
-- [x] Permissions capability map
-- [x] Department + SaaS placeholder routes
-- [x] Role-based post-login redirect
-- [ ] RBAC `beforeLoad` gates for departments
-- [ ] Permission-filtered navigation
+Full gate criteria: [Architecture Review](../05-architecture/architecture-review.md).
 
-## Next — Dish Library (first business module)
+## Now
 
-- DishService (create, update, archive/soft-delete, list, get)
-- Admin `/admin/dishes` UI
-- Ingredient linking
-- Audit writes on mutations
-- Permission capabilities for dishes
+| Item | Status |
+|------|--------|
+| Foundation (auth, tenants, shells, i18n, schema, ADRs) | ✅ |
+| Architecture Review documentation | ✅ (awaiting approval) |
+| P0: route RBAC gates | Pending |
+| P0: soft-delete enforcement (no hard DELETE) | Pending |
+| P0: ServiceContext builder | Pending |
+| Module 01 Dish Library UI | **Blocked** on review + P0 |
 
-## Then — Dependent modules
+## Governance
 
-1. Weekly menus
-2. Orders (customer)
-3. Kitchen / Production
-4. Purchasing / Inventory
-5. Logistics / Routes
-6. Accounting
-7. Support tooling
-8. SaaS admin (companies, licenses, branding, domains)
-
-## Later — Platform integrations
-
-- PostHog
-- Resend
-- Google Maps
-- Push notifications
+- Architecture source of truth: `docs/` + ADRs + Cursor
+- Lovable: UI / components / visual flows only, following docs
+- Do not skip modules without an ADR exception
 
 ## Explicitly deferred
 
-- AI (demand prediction, auto purchasing, route optimization, …) — architecture ready only
-- Offline sync — architecture ready only
-- Full monorepo split — when Lovable-safe
+- AI features
+- Offline sync
+- Full monorepo (`apps/`, `packages/`)
+- PostHog / Resend / Maps / Push (platform integrations later)
