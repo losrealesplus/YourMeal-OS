@@ -1,6 +1,9 @@
 
 # YourMeal OS — Foundation Plan
 
+> **Constitution (source of truth):** see [`docs/`](../docs/README.md) and permanent ADRs in [`docs/adr/`](../docs/adr/).
+> This plan remains the original foundation checklist; architecture rules in `docs/` supersede when they differ.
+
 Ship the skeleton, not the features. After you approve this, feature modules (Weekly Menu ordering, Production, Routes, Accounting, etc.) become their own follow-up plans.
 
 ## 1. Backend: Lovable Cloud (Supabase)

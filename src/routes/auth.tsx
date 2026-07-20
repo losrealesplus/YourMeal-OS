@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { LanguageSelector } from "@/components/language-selector";
+import { resolveHomePath } from "@/lib/resolve-home-path";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
@@ -19,14 +20,24 @@ export const Route = createFileRoute("/auth")({
 
 type Tab = "email" | "phone";
 
+async function goHome(
+  navigate: ReturnType<typeof useNavigate>,
+  userId: string,
+) {
+  const path = await resolveHomePath(userId);
+  navigate({ to: path as "/app", replace: true });
+}
+
 function AuthPage() {
   const { t } = useTranslation(["auth", "common"]);
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("email");
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/app", replace: true });
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (data.session?.user) {
+        await goHome(navigate, data.session.user.id);
+      }
     });
   }, [navigate]);
 
@@ -121,7 +132,10 @@ function EmailForm() {
           password,
         });
         if (error) throw error;
-        navigate({ to: "/app", replace: true });
+        const { data: sessionData } = await supabase.auth.getSession();
+        const uid = sessionData.session?.user?.id;
+        if (uid) await goHome(navigate, uid);
+        else navigate({ to: "/app", replace: true });
       } else {
         const { error } = await supabase.auth.signUp({
           email,
@@ -234,7 +248,12 @@ function PhoneForm() {
     });
     setBusy(false);
     if (error) toast.error(error.message);
-    else navigate({ to: "/app", replace: true });
+    else {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const uid = sessionData.session?.user?.id;
+      if (uid) await goHome(navigate, uid);
+      else navigate({ to: "/app", replace: true });
+    }
   }
 
   return (
