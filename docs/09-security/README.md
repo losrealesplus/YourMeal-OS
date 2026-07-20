@@ -1,45 +1,37 @@
 # Security
 
+## Capability matrix
+
+**Authoritative table:** [CAPABILITY_MATRIX.md](./CAPABILITY_MATRIX.md)
+
+Code: `src/permissions` must stay aligned. Route guards: `src/permissions/route-guards.ts`.
+
+```text
+Route → Permission Guard → Service → Repository → Database (RLS)
+```
+
 ## Authentication
 
 - Supabase Authentication
-- Profiles table (`profiles.id = auth.uid()`)
-- Tenant membership via `tenant_members`
-- Roles via `user_roles` (per-tenant; `saas_admin` may have null tenant)
+- `profiles` (`id = auth.uid()`)
+- `tenant_members`, `user_roles` (tenant-aware; `saas_admin` platform-scoped)
 
 ## Authorization
 
-- Permissions must never be hardcoded as role string checks scattered in UI.
-- Prefer capability checks: `can("dishes.write")` backed by PermissionService.
-- RLS is the last line of defense; Services still enforce business authorization.
+- Never hardcode role strings in feature UI.
+- Use `useCan` / `can` / `requireCapability`.
+- Services re-check capabilities; RLS is last line of defense.
+
+## Soft delete / purge
+
+- Staff: `archive` / `restore` only.
+- Hard DELETE policies limited to `is_saas_admin` on locked tables.
+- Service API: `archive`, `restore`, `purge` — never `delete()`.
 
 ## Roles (`app_role`)
 
-| Role | Scope |
-|------|-------|
-| `customer` | Tenant customer app |
-| `employee` | Generic staff |
-| `company_admin` | Tenant administration |
-| `support` | Customer support |
-| `kitchen` | Kitchen |
-| `production` | Production |
-| `purchasing` | Purchasing |
-| `inventory` | Inventory |
-| `accounting` | Accounting |
-| `logistics` | Logistics |
-| `driver` | Delivery |
-| `saas_admin` | Platform (cross-tenant) |
-
-## Tenant isolation
-
-- No shared business data.
-- RLS: `tenant_id` must match membership (or saas_admin bypass).
-- Storage, reports, notifications: always tenant-scoped.
+See capability matrix columns. Labels: Customer, Employee, Driver, Kitchen, Production, Purchasing, Inventory, Support, Accounting, Logistics, Company Admin, SaaS Admin.
 
 ## Audit
 
-Sensitive mutations should write `audit_log` with actor, tenant, entity, old/new, IP when available.
-
-## Soft delete
-
-Prevents accidental permanent loss; retain history for compliance and ops.
+Mutations write `audit_log` (who/what/when/old/new/tenant/IP).
