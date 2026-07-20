@@ -29,5 +29,11 @@ if (!i18n.isInitialized) {
 }
 
 export default i18n;
-export { LANGUAGES, SUPPORTED_LNGS, DEFAULT_LNG } from "./languages";
+export {
+  LANGUAGES,
+  SUPPORTED_LNGS,
+  DEFAULT_LNG,
+  isSupportedLanguage,
+  getLanguage,
+} from "./languages";
 export type { LanguageCode, Language } from "./languages";
