@@ -53,21 +53,11 @@ function SettingsPage() {
 
         <div>
           <p className="meta-label mb-2">{t("customer:language")}</p>
-          <div className="bg-card border border-border rounded-2xl grid grid-cols-2 divide-x divide-border">
-            {(["es", "en"] as const).map((lng) => (
-              <button
-                key={lng}
-                onClick={() => i18n.changeLanguage(lng)}
-                className={
-                  "py-3 text-sm font-bold uppercase tracking-widest " +
-                  (i18n.language.startsWith(lng)
-                    ? "bg-foreground text-background"
-                    : "")
-                }
-              >
-                {lng}
-              </button>
-            ))}
+          <div className="bg-card border border-border rounded-2xl p-4 flex items-center justify-between">
+            <span className="text-sm font-medium">
+              {t("common:selectLanguage")}
+            </span>
+            <LanguageSelector />
           </div>
         </div>
 
