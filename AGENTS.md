@@ -11,58 +11,69 @@
 
 # YourMeal OS — Reglas para agentes
 
-Priorizar **mantenibilidad, arquitectura, código limpio y documentación** sobre la velocidad.
+**Cursor actúa como CTO del proyecto.** Lovable acelera UI.  
+**La documentación es la fuente de verdad; el código la sigue.**  
+Contexto permanente: [`docs/05-architecture/CONTEXTO_CTO.md`](./docs/05-architecture/CONTEXTO_CTO.md) (ADR 0012).
+
+Priorizar mantenibilidad, arquitectura, código limpio y documentación sobre velocidad.
 
 ## Idioma (ADR 0010)
 
-- **Documentación y razonamiento:** español.
-- **Código y base de datos:** inglés (`DishService`, `dishes`).
-- **i18n de la app:** independiente (producto multilenguaje).
+Documentación y razonamiento en **español**. Código y BD en **inglés**.
+
+## Principio de Intencionalidad (ADR 0011)
+
+> Todo elemento debe justificar su existencia **antes** de implementarse.
+
+Registrar en el **Diario de Desarrollo** al terminar (antes de Done).
 
 ## Antes de escribir código
 
-Actuar como arquitecto:
+1. [`CONTEXTO_CTO.md`](./docs/05-architecture/CONTEXTO_CTO.md)  
+2. ADRs y docs del módulo  
+3. Modelo de dominio (`docs/12-domain-model/module-01/` si Module 01)  
+4. Código existente de Services/módulos  
+5. Detectar inconsistencias docs ↔ código  
+6. Solo entonces implementar  
 
-1. Revisar constitución (`docs/`)
-2. Revisar ADRs
-3. Revisar modelo de dominio y lenguaje ubicuo
-4. Revisar servicios / módulos existentes
-5. Detectar inconsistencias
-6. Solo entonces implementar
-
-## Gobierno
-
-| Tema | Fuente de verdad |
-|------|------------------|
-| Arquitectura, dominio, schema, RBAC, roadmap | **`docs/` + ADRs + Cursor** |
-| UI / flujos visuales | Lovable puede acelerar — debe seguir docs |
-| Conflictos con `.lovable/plan.md` | **Gana `docs/`** |
+**No rehacer Architecture Review ni Foundation** salvo ADR nuevo. Ya están cerrados (`v0.1.0`).
 
 ## Fase actual
 
-**`v0.1.0` FOUNDATION LOCKED** → **Module 01 — Dish Library**
+```text
+Foundation Lock ✅  →  Module 01 Dish Library 🚧
+```
 
-La arquitectura ya no se diseña; **se aplica**. Todo cambio estructural → ADR.
+Orden: Dish → Ingredient → Recipe → Repos → Services → Rules → Tests → **UI** → CRUD.
 
-Orden Module 01: Dish → Ingredient → Recipe → Repos → Services → Rules → Tests → **UI** → CRUD.
+## Gobierno
 
-## Reglas permanentes
+| Quién | Rol |
+|-------|-----|
+| **Cursor** | CTO — arquitectura, dominio, implementación |
+| **`docs/` + ADRs** | Fuente de verdad |
+| **Lovable** | UI / pantallas (no redefine arquitectura) |
+| **Código** | Sigue a la documentación |
 
-1. Almacenamiento canónico (g, ml, km, °C, UTC, decimal + ISO currency).
-2. Nunca `toLocaleString()` en UI de producto — usar `useFmt()`.
-3. Multi-tenant: `tenant_id` + RLS.
-4. Capabilities (`useCan` / `requireCapability`), no roles crudos en features.
-5. `UI → Service → Repository → Supabase`.
-6. Soft delete: `archive` / `restore` / `purge` — nunca `delete()` de negocio.
-7. `DomainError` tipado.
-8. Un solo `ServiceContext`.
-9. Módulos en `src/modules/<nombre>/{domain,application,infrastructure,presentation}`.
-10. Tras `v0.1.0`, sin cambio arquitectónico sin ADR.
-11. IA / offline: no implementar aún.
+Conflictos con `.lovable/plan.md` → **gana `docs/`**.
 
-## Protocolos
+## Reglas permanentes (extracto)
 
-- [Definition of Done](./docs/00-status/DEFINITION_OF_DONE.md)
-- [Cierre de jornada](./docs/05-architecture/CIERRE_DE_JORNADA.md)
-- [Foundation Lock](./docs/05-architecture/FOUNDATION_LOCK.md)
-- [Module 01](./docs/12-domain-model/MODULE_01_DISH_LIBRARY.md)
+- Canónico: g, ml, km, °C, UTC, decimal  
+- `useFmt()` — no `toLocaleString` en UI de producto  
+- Multi-tenant + RLS  
+- Capabilities (`useCan` / `requireCapability`)  
+- UI → Service → Repository → Supabase  
+- `archive` / `restore` / `purge` — nunca `delete()` de negocio  
+- `DomainError` + `ServiceContext`  
+- Tras v0.1.0: cambio arquitectónico = ADR  
+- AI / offline: no implementar aún  
+- Cierre de jornada incluye Diario  
+
+## Enlaces
+
+- [Contexto CTO](./docs/05-architecture/CONTEXTO_CTO.md)
+- [Diario](./docs/99-internal/development-journal/README.md)
+- [DoD](./docs/00-status/DEFINITION_OF_DONE.md)
+- [Dish](./docs/12-domain-model/module-01/Dish.md)
+- [Architecture Review](./docs/05-architecture/architecture-review.md) (histórico — ya aprobado)

@@ -1,37 +1,28 @@
-# Module 01 — Dish Library (arranque)
+# Module 01 — Dish Library
 
-**Fase actual.** Domain Driven. Sin pantallas hasta que el dominio esté listo.
+**Fase actual.** Domain Driven. Sin pantallas hasta cerrar dominio.
 
 ## Orden congelado
 
 ```text
-1. Dish          (entidad + estados + invariantes)
-2. Ingredient
-3. Recipe
-4. Repositories
-5. Services
-6. Business Rules
-7. Tests
-8. UI
-9. CRUD
+Dish → Ingredient → Recipe
+  → Repositories → Services → Business Rules
+  → Tests → UI → CRUD
 ```
 
-## Tres conceptos distintos
+## Documentos de dominio (antes de implementar UI)
 
-| Concepto | Ejemplo | Módulo |
-|----------|---------|--------|
-| **Dish** | Chicken Teriyaki | Dish Library |
-| **Ingredient** | Pechuga, soja, arroz | Ingredient Library (sigue a Dish) |
-| **Recipe** | 200 g + 15 ml + 150 g | Recipe Builder |
+| Doc | Concepto |
+|-----|----------|
+| [Dish.md](./module-01/Dish.md) | Plato comercializable |
+| [Ingredient.md](./module-01/Ingredient.md) | Materia prima |
+| [Recipe.md](./module-01/Recipe.md) | Composición Dish ← Ingredients |
 
-En esta fase Module 01 el foco inicial es **Dish**; Ingredient y Recipe se modelan en secuencia dentro de la misma línea de catálogo antes de UI.
+## Primer paso de código
 
-## Primer paso (próxima sesión)
+Cerrar invariantes de **Dish** en `src/modules/dish-library/domain/` alineados con `Dish.md`.  
+No abrir CRUD ni UI.
 
-1. Revisar constitución, ADRs, lenguaje ubicuo y `DEFINITION_OF_DONE`.
-2. Completar definición de dominio de **Dish** en `src/modules/dish-library/domain/` (entidad, estados, reglas).
-3. No abrir CRUD ni UI.
+## Diario
 
-## Definition of Done
-
-Ver [DEFINITION_OF_DONE.md](../00-status/DEFINITION_OF_DONE.md).
+Al terminar cada pieza Done → entrada en [Diario de Desarrollo](../99-internal/development-journal/README.md).

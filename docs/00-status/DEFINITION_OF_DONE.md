@@ -5,52 +5,37 @@ Un módulo se considera **DONE** solo si se cumple todo lo siguiente:
 | # | Criterio |
 |---|----------|
 | ✓ | Dominio definido (entidad, estados, lenguaje ubicuo) |
+| ✓ | **Intencionalidad respondida** (qué / cómo / por qué / para qué) |
+| ✓ | **Entrada en el Diario de Desarrollo** (al terminar / antes de Done) |
 | ✓ | ADR actualizado (si hubo decisión de arquitectura) |
 | ✓ | Esquema de base de datos terminado |
 | ✓ | Repositorio implementado |
 | ✓ | Servicio implementado |
 | ✓ | Permisos / capabilities implementados |
-| ✓ | Auditoría implementada en mutaciones |
+| ✓ | Auditoría en mutaciones |
 | ✓ | Soft delete respetado (`archive` / `restore` / `purge`) |
-| ✓ | Localización respetada (`useFmt`, sin `toLocaleString` en UI de producto) |
+| ✓ | Localización respetada (`useFmt`) |
 | ✓ | Feature flags respetados (si aplica) |
-| ✓ | Documentación actualizada (en español) |
-| ✓ | Tests pasando (cuando existan en el flujo de trabajo) |
+| ✓ | Documentación actualizada (español) |
+| ✓ | Tests pasando (cuando existan en el flujo) |
 | ✓ | Pull Request fusionado |
-| ✓ | Roadmap y estado del proyecto actualizados |
+| ✓ | Roadmap y estado actualizados |
 
-## Regla transversal a todos los módulos
+## Principio de Intencionalidad
 
-Antes de crear una pantalla deben existir:
+> Todo elemento del sistema debe justificar su existencia **antes** de ser implementado.
 
-1. Entidad  
-2. Estados  
-3. Reglas de negocio  
-4. Servicio  
-5. Repositorio  
-6. Permisos  
-7. Tests básicos (cuando entren en el flujo)
+Preguntas obligatorias: ¿Qué es? ¿Cómo es? ¿Por qué existe? ¿Para qué sirve? ¿Qué problema resuelve? ¿Qué impacto tiene en el sistema?
 
-**Solo entonces** se construye la interfaz.
+## Antes de cualquier pantalla
 
-## Orden oficial Module 01 (congelado)
+1. Entidad · 2. Estados · 3. Reglas · 4. Servicio · 5. Repositorio · 6. Permisos · 7. Tests básicos (cuando apliquen)
+
+## Orden Module 01 (congelado)
 
 ```text
-Dish
-  → Ingredient
-  → Recipe
-  → Repositories
-  → Services
-  → Business Rules
-  → Tests
-  → UI
-  → CRUD
+Dish → Ingredient → Recipe → Repositories → Services
+  → Business Rules → Tests → UI → CRUD
 ```
 
-La UI es la última pieza.
-
-## Relacionado
-
-- [Estado](./README.md)
-- [Foundation Lock](../05-architecture/FOUNDATION_LOCK.md)
-- [Roadmap](../roadmap/README.md)
+Docs de dominio: [module-01/](../12-domain-model/module-01/).
