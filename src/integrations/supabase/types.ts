@@ -757,29 +757,53 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          country: string | null
           created_at: string
+          currency: string | null
           full_name: string | null
           id: string
           locale: string
           phone: string | null
+          time_format: string | null
+          timezone: string | null
+          unit_distance: string | null
+          unit_temperature: string | null
+          unit_volume: string | null
+          unit_weight: string | null
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
+          country?: string | null
           created_at?: string
+          currency?: string | null
           full_name?: string | null
           id: string
           locale?: string
           phone?: string | null
+          time_format?: string | null
+          timezone?: string | null
+          unit_distance?: string | null
+          unit_temperature?: string | null
+          unit_volume?: string | null
+          unit_weight?: string | null
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
+          country?: string | null
           created_at?: string
+          currency?: string | null
           full_name?: string | null
           id?: string
           locale?: string
           phone?: string | null
+          time_format?: string | null
+          timezone?: string | null
+          unit_distance?: string | null
+          unit_temperature?: string | null
+          unit_volume?: string | null
+          unit_weight?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -1053,30 +1077,54 @@ export type Database = {
       tenants: {
         Row: {
           brand: Json
+          country: string | null
           created_at: string
+          currency: string | null
           id: string
           locale_default: string
           name: string
           slug: string
           status: Database["public"]["Enums"]["tenant_status"]
+          time_format: string | null
+          timezone: string | null
+          unit_distance: string | null
+          unit_temperature: string | null
+          unit_volume: string | null
+          unit_weight: string | null
         }
         Insert: {
           brand?: Json
+          country?: string | null
           created_at?: string
+          currency?: string | null
           id?: string
           locale_default?: string
           name: string
           slug: string
           status?: Database["public"]["Enums"]["tenant_status"]
+          time_format?: string | null
+          timezone?: string | null
+          unit_distance?: string | null
+          unit_temperature?: string | null
+          unit_volume?: string | null
+          unit_weight?: string | null
         }
         Update: {
           brand?: Json
+          country?: string | null
           created_at?: string
+          currency?: string | null
           id?: string
           locale_default?: string
           name?: string
           slug?: string
           status?: Database["public"]["Enums"]["tenant_status"]
+          time_format?: string | null
+          timezone?: string | null
+          unit_distance?: string | null
+          unit_temperature?: string | null
+          unit_volume?: string | null
+          unit_weight?: string | null
         }
         Relationships: []
       }
