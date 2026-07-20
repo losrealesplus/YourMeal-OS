@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import "@/i18n";
 import { useLanguageSync } from "@/hooks/use-language-sync";
+import { LocalizationProvider } from "@/i18n/localization-provider";
 
 function NotFoundComponent() {
   return (
@@ -158,7 +159,9 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <LocalizationProvider>
+        <Outlet />
+      </LocalizationProvider>
     </QueryClientProvider>
   );
 }
