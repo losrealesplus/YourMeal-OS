@@ -1,20 +1,40 @@
-# API
+# API philosophy (permanent)
 
-## Current approach
+```text
+Component / Route
+       ↓
+   Service          (business rules, capabilities, audit, state machine)
+       ↓
+   Repository       (persistence mapping only)
+       ↓
+   Supabase         (PostgREST + RLS)
+```
 
-TanStack Start server functions + Supabase client (browser and server). Supabase PostgREST is the primary data API, constrained by RLS.
+## Rules
 
-## Conventions
+1. **No component talks directly to Supabase** for business data.
+2. Auth/session bootstrap may use the Supabase auth client in hooks; **business tables** go through Service → Repository.
+3. Services never expose raw SQL strings to UI.
+4. Repositories never contain business rules (no “if order cancelled then…”).
+5. RLS is mandatory — Repositories still filter by `tenant_id` and `deleted_at`.
+6. All Service entry points receive a single **`ServiceContext`** (tenant, user, capabilities, localization, audit, flags, supabase client) — not loose parameters.
 
-1. UI → Service → Supabase (never UI → ad-hoc business SQL).
-2. Server functions that need identity use Supabase auth middleware (`requireSupabaseAuth` / auth attacher).
-3. Inputs validated with Zod at the Service boundary.
-4. Canonical units in payloads; localization only in clients via `useFmt()`.
+## Soft delete API shape
 
-## Future
+```text
+archive(id)    // sets deleted_at (+ status archived when applicable)
+restore(id)    // clears deleted_at
+purge(id)      // hard delete — SaaS Admin + records.purge only
+```
 
-Documented OpenAPI / RPC surface may grow for mobile and integrations. Keep Services as the stable domain boundary so transports can change without rewriting rules.
+Never `delete()` on business Services.
 
-## Out of scope now
+## Events (future)
 
-Public third-party API, webhooks, Stripe billing endpoints.
+Domain events live under `packages/events` (scaffold). Services may emit events later for notifications, AI, automation — do not couple UI to side effects.
+
+## Related
+
+- [Module convention](../05-architecture/MODULE_CONVENTION.md)
+- [Foundation Lock](../05-architecture/FOUNDATION_LOCK.md)
+- [ADR 0005](../adr/0005-services-layer.md)

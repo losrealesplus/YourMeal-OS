@@ -488,6 +488,7 @@ export type Database = {
           cost: number
           created_at: string
           deleted_at: string | null
+          deleted_by: string | null
           description: string | null
           id: string
           kcal: number | null
@@ -507,6 +508,7 @@ export type Database = {
           cost?: number
           created_at?: string
           deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           id?: string
           kcal?: number | null
@@ -526,6 +528,7 @@ export type Database = {
           cost?: number
           created_at?: string
           deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           id?: string
           kcal?: number | null

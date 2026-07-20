@@ -11,43 +11,50 @@
 
 # YourMeal OS — Agent rules
 
-**YourMeal OS** is the operating system for meal prep & catering. First tenant: EatClean Tenerife.
-
 Prioritize **maintainability, architecture, clean code, and documentation** over development speed.
 
-## Governance (new stage)
+## Before writing code
 
-We are past “create the product in prompts.” We are building a **software company around the product**.
+Act as an architect first:
+
+1. Review the constitution (`docs/`)
+2. Review ADRs (`docs/adr/`)
+3. Review domain model + ubiquitous language
+4. Review existing Services / modules
+5. Identify inconsistencies
+6. Only then implement
+
+## Governance
 
 | Concern | Source of truth |
 |---------|-----------------|
-| Architecture, domain, schema, RBAC, roadmap | **`docs/` + ADRs + this file (Cursor)** |
-| UI components, visual flows, speed | Lovable may accelerate — **must follow docs** |
-| Conflicts with `.lovable/plan.md` | **`docs/` and ADRs win** |
+| Architecture, domain, schema, RBAC, roadmap | **`docs/` + ADRs + Cursor** |
+| UI / visual flows | Lovable may accelerate — must follow docs |
+| Conflicts with `.lovable/plan.md` | **docs win** |
 
-Do **not** invent architecture inside Lovable. Read the Architecture Review before Module 01.
+- [Foundation Lock](./docs/05-architecture/FOUNDATION_LOCK.md) — gate before Module 01
+- [Capability Matrix](./docs/09-security/CAPABILITY_MATRIX.md)
+- [Ubiquitous Language](./docs/12-domain-model/UBIQUITOUS_LANGUAGE.md)
+- [Roadmap v1](./docs/roadmap/README.md)
 
-- Constitution: [`docs/`](./docs/README.md)
-- **Architecture Review (gate):** [`docs/05-architecture/architecture-review.md`](./docs/05-architecture/architecture-review.md)
-- ADRs: [`docs/adr/`](./docs/adr/README.md)
-- Roadmap v1: [`docs/roadmap/README.md`](./docs/roadmap/README.md)
+## Permanent rules
 
-## Permanent rules (never violate)
-
-1. **Canonical storage** — grams, milliliters, kilometers, Celsius, UTC, decimal + ISO currency. Localize only at presentation.
-2. **Localization** — Never `toLocaleString()` in product components. Always `useFmt()`.
-3. **Multi-tenant** — All business data is tenant-scoped. New tables: `tenant_id` + RLS.
-4. **Auth / RBAC** — Supabase Auth, profiles, tenant-aware roles. Do not hardcode permissions in UI; use `src/permissions` / `useCan`.
-5. **Services** — No business rules in React components. Logic lives in `src/services/`.
-6. **Soft delete** — Never hard-delete business records in app flows; set `deleted_at`.
-7. **Audit** — Record who/what/when/old/new/tenant/IP on mutations.
-8. **Feature flags** — Evaluate via FeatureFlagService for beta/plan/tenant rollout.
-9. **AI / offline** — Do not implement yet; keep architecture compatible.
-
-## Navigation
-
-One app, one login. After login → Home. UI changes by department/permissions — not by switching apps.
+1. Canonical storage (grams, ml, km, °C, UTC, decimal currency).
+2. Never `toLocaleString()` in product UI — use `useFmt()`.
+3. Multi-tenant: `tenant_id` + RLS on business data.
+4. Capabilities via `useCan` / `requireCapability` — not raw role checks in features.
+5. `UI → Service → Repository → Supabase` — no business `supabase.from` in components.
+6. Soft delete: `archive` / `restore` / `purge` — never Service `delete()`.
+7. Typed `DomainError` — not bare `throw new Error` for expected cases.
+8. Single `ServiceContext` into every Service.
+9. Modules under `src/modules/<name>/{domain,application,infrastructure,presentation}`.
+10. No architectural change after `v0.1.0` without a new ADR.
+11. AI / offline — do not implement yet.
 
 ## Module order
 
-Follow official roadmap v1. **Do not start Dish Library implementation until the Architecture Review is approved** and P0 gaps (route gates, soft-delete enforcement, ServiceContext) are addressed.
+```text
+Foundation Lock → Dish Library → Ingredient Library → Recipe Builder → …
+```
+
+Module 01 starts with **domain entities**, not CRUD UI.

@@ -3,11 +3,15 @@
 ```text
 FOUNDATION ✅
     ↓
-DOMAIN MODEL          ← architecture review gate
+FOUNDATION LOCK 🚧     ← close platform (RBAC, soft-delete, ServiceContext, Repository, domain errors)
     ↓
-Dish Library          ← Module 01 (do not start until review approved)
+v0.1.0 FOUNDATION LOCKED
     ↓
-Ingredients
+Module 01 — Dish Library     (domain → services → repos → CRUD → UI)
+    ↓
+Ingredient Library
+    ↓
+Recipe Builder
     ↓
 Weekly Menus
     ↓
@@ -31,31 +35,27 @@ Customer Support
     ↓
 Reports
     ↓
-AI                    ← deferred (ADR 0008)
+AI                         ← deferred (ADR 0008)
 ```
 
-Full gate criteria: [Architecture Review](../05-architecture/architecture-review.md).
+## Foundation Lock
 
-## Now
+See [FOUNDATION_LOCK.md](../05-architecture/FOUNDATION_LOCK.md) and [ADR 0009](../adr/0009-foundation-lock.md).
 
-| Item | Status |
-|------|--------|
-| Foundation (auth, tenants, shells, i18n, schema, ADRs) | ✅ |
-| Architecture Review documentation | ✅ (awaiting approval) |
-| P0: route RBAC gates | Pending |
-| P0: soft-delete enforcement (no hard DELETE) | Pending |
-| P0: ServiceContext builder | Pending |
-| Module 01 Dish Library UI | **Blocked** on review + P0 |
+After lock: **No architectural changes without ADR.**
+
+## Module 01 sequence (when unlocked)
+
+```text
+Dish Entity → Ingredient Entity → Recipe Entity
+  → Services / Repositories → CRUD → UI
+```
+
+Domain first. Screens last.
 
 ## Governance
 
-- Architecture source of truth: `docs/` + ADRs + Cursor
-- Lovable: UI / components / visual flows only, following docs
-- Do not skip modules without an ADR exception
-
-## Explicitly deferred
-
-- AI features
-- Offline sync
-- Full monorepo (`apps/`, `packages/`)
-- PostHog / Resend / Maps / Push (platform integrations later)
+- Architecture SoT: `docs/` + ADRs + Cursor
+- Lovable: UI acceleration only
+- Capability matrix: `docs/09-security/CAPABILITY_MATRIX.md`
+- Ubiquitous language: `docs/12-domain-model/UBIQUITOUS_LANGUAGE.md`

@@ -3,8 +3,15 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
+import { assertSaasRoute } from "@/permissions/route-guards";
 
 export const Route = createFileRoute("/_authenticated/saas")({
+  beforeLoad: async ({ context }) => {
+    const user = (context as { user?: { id: string } }).user;
+    if (!user?.id) throw new Error("Missing auth context");
+    const roles = await assertSaasRoute(user.id);
+    return { roles };
+  },
   component: SaasShell,
   head: () => ({
     meta: [

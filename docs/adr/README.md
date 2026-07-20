@@ -12,3 +12,4 @@ Permanent decisions for YourMeal OS. New ADRs are additive; do not silently reve
 | [0006](./0006-soft-delete-audit.md) | Soft delete and audit logging |
 | [0007](./0007-feature-flags.md) | Feature flags |
 | [0008](./0008-ai-offline-ready.md) | AI and offline readiness |
+| [0009](./0009-foundation-lock.md) | Foundation Lock |

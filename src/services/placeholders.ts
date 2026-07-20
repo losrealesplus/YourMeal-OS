@@ -1,28 +1,24 @@
 /**
- * Placeholder service stubs for upcoming modules.
- * Implement when the corresponding roadmap item starts — keep rules out of React.
+ * Placeholder stubs — call throws until the module is implemented.
+ * @see docs/08-business-rules/README.md
  */
 
-export const InventoryService = {
-  // Stock adjustments, min-stock checks — TBD
-} as const;
+import { unimplemented } from "@/domain/errors";
 
-export const AccountingService = {
-  // Invoices, payments — TBD
-} as const;
+function stub(name: string) {
+  return new Proxy(
+    {},
+    {
+      get() {
+        throw unimplemented(name);
+      },
+    },
+  );
+}
 
-export const RouteService = {
-  // Routes, stops — TBD
-} as const;
-
-export const NotificationService = {
-  // Resend / push — TBD (do not implement channels yet)
-} as const;
-
-export const ProductionService = {
-  // Production planning from orders/menus — TBD
-} as const;
-
-export const PurchasingService = {
-  // Purchase needs from recipes + stock — TBD
-} as const;
+export const InventoryService = stub("InventoryService");
+export const AccountingService = stub("AccountingService");
+export const RouteService = stub("RouteService");
+export const NotificationService = stub("NotificationService");
+export const ProductionService = stub("ProductionService");
+export const PurchasingService = stub("PurchasingService");

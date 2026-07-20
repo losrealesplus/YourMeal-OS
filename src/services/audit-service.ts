@@ -1,5 +1,6 @@
 import type { Json } from "@/integrations/supabase/types";
 import type { AuditWriteInput, ServiceContext } from "./types";
+import { DomainError } from "@/domain/errors";
 
 /**
  * Global audit logging — who, what, when, old/new, tenant, IP.
@@ -27,8 +28,10 @@ export const AuditService = {
 
     const { error } = await ctx.supabase.from("audit_log").insert(row);
     if (error) {
-      // Audit failure must be visible to callers; do not silently drop.
-      throw new Error(`AuditService.write failed: ${error.message}`);
+      throw new DomainError(
+        "INVALID_STATE",
+        `AuditService.write failed: ${error.message}`,
+      );
     }
   },
 };
