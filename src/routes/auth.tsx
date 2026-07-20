@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
+import { LanguageSelector } from "@/components/language-selector";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
@@ -30,7 +31,10 @@ function AuthPage() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen grid place-items-center bg-secondary/40 p-4">
+    <div className="min-h-screen grid place-items-center bg-secondary/40 p-4 relative">
+      <div className="absolute top-4 right-4 md:top-6 md:right-6">
+        <LanguageSelector />
+      </div>
       <div className="w-full max-w-md bg-card ring-1 ring-black/[0.03] border border-border rounded-3xl p-8 shadow-sm">
         <Link to="/" className="meta-label">
           ← YourMeal OS

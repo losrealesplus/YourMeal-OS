@@ -1,0 +1,18 @@
+export default {
+  welcome: "Benvenuto",
+  welcomeSub: "Accedi alla tua operazione",
+  tabs: { email: "Email", phone: "Telefono" },
+  withGoogle: "Continua con Google",
+  withApple: "Continua con Apple",
+  fullName: "Nome completo",
+  forgotPassword: "Hai dimenticato la password?",
+  sendCode: "Invia codice",
+  verifyCode: "Verifica codice",
+  codeSent: "Codice inviato",
+  resetPassword: "Reimposta password",
+  newPassword: "Nuova password",
+  updatePassword: "Aggiorna password",
+  checkEmail: "Controlla la tua casella",
+  resetSent: "Ti abbiamo inviato un link di reimpostazione.",
+  passwordUpdated: "Password aggiornata",
+} as const;

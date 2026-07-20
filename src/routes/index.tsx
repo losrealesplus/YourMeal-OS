@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { LanguageSelector } from "@/components/language-selector";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -24,12 +25,15 @@ function Landing() {
           <div className="size-6 bg-foreground rounded" />
           <span className="font-extrabold tracking-tighter">YourMeal OS</span>
         </div>
-        <Link
-          to="/auth"
-          className="text-xs font-bold uppercase tracking-widest bg-foreground text-background px-4 py-2 rounded-lg"
-        >
-          {t("signIn")}
-        </Link>
+        <div className="flex items-center gap-3">
+          <LanguageSelector />
+          <Link
+            to="/auth"
+            className="text-xs font-bold uppercase tracking-widest bg-foreground text-background px-4 py-2 rounded-lg"
+          >
+            {t("signIn")}
+          </Link>
+        </div>
       </header>
 
       <main className="max-w-5xl mx-auto px-6 lg:px-12 pt-16 pb-24">
@@ -55,7 +59,7 @@ function Landing() {
             href="#modules"
             className="border border-border bg-card text-sm font-bold px-6 py-3 rounded-lg"
           >
-            Explore modules
+            {t("exploreModules")}
           </a>
         </div>
 
