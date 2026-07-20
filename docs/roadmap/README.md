@@ -1,61 +1,45 @@
-# Roadmap — Official v1
+# Roadmap oficial v1
 
 ```text
-FOUNDATION ✅
-    ↓
-FOUNDATION LOCK 🚧     ← close platform (RBAC, soft-delete, ServiceContext, Repository, domain errors)
-    ↓
-v0.1.0 FOUNDATION LOCKED
-    ↓
-Module 01 — Dish Library     (domain → services → repos → CRUD → UI)
-    ↓
+Phase 0 Blueprint          ✅
+Foundation                 ✅
+Foundation Lock            ✅
+v0.1.0 FOUNDATION LOCKED   ✅
+────────────────────────────────
+Module 01 — Dish Library   ← actual
+    Dish → Ingredient → Recipe
+    → Repositories → Services → Rules → Tests → UI → CRUD
+────────────────────────────────
 Ingredient Library
-    ↓
 Recipe Builder
-    ↓
 Weekly Menus
-    ↓
 Customers
-    ↓
 Orders
-    ↓
 Production
-    ↓
 Kitchen
-    ↓
 Inventory
-    ↓
 Purchasing
-    ↓
 Logistics
-    ↓
 Accounting
-    ↓
 Customer Support
-    ↓
 Reports
-    ↓
-AI                         ← deferred (ADR 0008)
+AI                         (diferido — ADR 0008)
 ```
 
-## Foundation Lock
+## Regla desde v0.1.0
 
-See [FOUNDATION_LOCK.md](../05-architecture/FOUNDATION_LOCK.md) and [ADR 0009](../adr/0009-foundation-lock.md).
+La arquitectura es estable. No se rediseña la base: se construye sobre ella. Todo cambio estructural → **nuevo ADR**.
 
-After lock: **No architectural changes without ADR.**
+## Mentalidad
 
-## Module 01 sequence (when unlocked)
+| Antes | Ahora |
+|-------|--------|
+| Infrastructure Driven | **Domain Driven** |
+| Pensar en pantallas | Pensar en entidades |
+| Pensar en CRUD | Pensar en negocio |
 
-```text
-Dish Entity → Ingredient Entity → Recipe Entity
-  → Services / Repositories → CRUD → UI
-```
+## Relacionado
 
-Domain first. Screens last.
-
-## Governance
-
-- Architecture SoT: `docs/` + ADRs + Cursor
-- Lovable: UI acceleration only
-- Capability matrix: `docs/09-security/CAPABILITY_MATRIX.md`
-- Ubiquitous language: `docs/12-domain-model/UBIQUITOUS_LANGUAGE.md`
+- [Definition of Done](../00-status/DEFINITION_OF_DONE.md)
+- [Estado](../00-status/README.md)
+- [Foundation Lock](../05-architecture/FOUNDATION_LOCK.md)

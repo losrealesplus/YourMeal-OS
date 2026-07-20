@@ -1,30 +1,59 @@
-# Status
+# Estado del proyecto
 
-**Last updated:** 2026-07-20
+**Última actualización:** 2026-07-20  
+**Versión:** `v0.1.0` — FOUNDATION LOCKED
 
-## Phase
+## Fase oficial
 
-**FOUNDATION ✅** → **FOUNDATION LOCK 🚧** → tag `v0.1.0` → Module 01 Dish Library
+```text
+Phase 0 Blueprint     ✅
+Foundation            ✅
+Foundation Lock       ✅
+────────────────────────────────
+Current Phase
+Module 01 — Dish Library
+```
 
-## Product checklist
+> **La arquitectura ya no se diseña; se aplica.**  
+> Cualquier cambio estructural requiere un ADR.
 
-| Capability | Status |
-|------------|--------|
-| GitHub / Supabase / Auth / Landing / Login | ✅ |
-| Mobile + Desktop shells | ✅ |
-| Multi-tenant + Localization + Profiles | ✅ |
-| RBAC prepared + **runtime route guards** | ✅ (nav filter still polish) |
-| Soft-delete Services (`archive`/`restore`/`purge`) | ✅ |
-| Soft-delete RLS (staff cannot DELETE catalog) | ✅ migration |
-| ServiceContext + Repository layer (Dish) | ✅ |
-| Domain errors | ✅ |
-| Capability matrix + Ubiquitous language | ✅ |
-| Module convention + events scaffold | ✅ |
-| Dish Library UI / CRUD | Blocked until Foundation Lock tagged |
+## Checklist de validación (cerrado)
 
-## Gate documents
+| Área | Estado |
+|------|--------|
+| Multi-tenant | ✅ |
+| RBAC en runtime | ✅ |
+| Soft Delete | ✅ |
+| Repository Pattern | ✅ |
+| Service Layer | ✅ |
+| Domain Errors | ✅ |
+| ServiceContext | ✅ |
+| Feature Flags | ✅ |
+| Localization | ✅ |
+| ADRs | ✅ |
+| Domain Model | ✅ |
+| Events preparado | ✅ |
 
-- [Foundation Lock](../05-architecture/FOUNDATION_LOCK.md)
-- [Architecture Review](../05-architecture/architecture-review.md)
-- [Capability Matrix](../09-security/CAPABILITY_MATRIX.md)
-- [Ubiquitous Language](../12-domain-model/UBIQUITOUS_LANGUAGE.md)
+No hay bloqueo arquitectónico para comenzar el dominio funcional.
+
+## Documentos de gobierno
+
+| Documento | Uso |
+|-----------|-----|
+| [DEFINITION_OF_DONE.md](./DEFINITION_OF_DONE.md) | Lista de verificación de cada módulo |
+| [Foundation Lock](../05-architecture/FOUNDATION_LOCK.md) | Cierre de plataforma |
+| [Cierre de jornada](../05-architecture/CIERRE_DE_JORNADA.md) | Protocolo al terminar el día |
+| [ADR 0010 Idioma](../adr/0010-idioma-oficial-desarrollo.md) | Español = idioma oficial de desarrollo |
+| [Roadmap](../roadmap/README.md) | Secuencia oficial |
+| [CHANGELOG](../../CHANGELOG.md) | Hitos de versión |
+
+## Próximo objetivo
+
+**Module 01 — Dish Library**, en modo Domain Driven:
+
+```text
+Dish → Ingredient → Recipe → Repositories → Services
+  → Business Rules → Tests → UI → CRUD
+```
+
+Primer paso de la próxima sesión: definir/refinar la entidad **Dish** en dominio (estados, invariantes) según el lenguaje ubicuo — **sin pantalla**.

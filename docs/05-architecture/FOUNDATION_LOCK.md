@@ -1,76 +1,54 @@
 # Foundation Lock
 
-**Status:** In progress → must complete before Module 01 (Dish Library)  
-**Target tag:** `v0.1.0` — `FOUNDATION LOCKED`  
-**Rule after lock:** *No architectural changes without ADR.*
+**Estado:** ✅ **CERRADO** — 2026-07-20  
+**Tag:** `v0.1.0` — `FOUNDATION LOCKED`  
+**Regla:** *Ningún cambio arquitectónico sin ADR.*
 
-This is not feature work. It **closes the platform** so documented rules cannot be bypassed by accident.
+La plataforma queda cerrada. La infraestructura y la arquitectura base se consideran estables. El foco pasa al dominio de negocio (Module 01).
+
+Ver [CHANGELOG](../../CHANGELOG.md) y [estado del proyecto](../00-status/README.md).
 
 ---
 
-## Why
+## Por qué existió
 
 > Foundation is real. The risk is false readiness.
 
-Foundation Lock removes false readiness: runtime RBAC, soft-delete enforcement, unified ServiceContext, Repository layer, and domain errors.
+Foundation Lock eliminó la falsa madurez: RBAC en runtime, soft delete, ServiceContext, repositorios y errores de dominio.
 
----
+## Checklist (completado)
 
-## Checklist
-
-### Lock 1 — Runtime RBAC
+### Lock 1 — Runtime RBAC ✅
 
 ```text
 Route → Permission Guard → Service → Repository → Database (RLS)
 ```
 
-- [x] Capability matrix documented (`docs/09-security/CAPABILITY_MATRIX.md`)
-- [x] `src/permissions` aligned to granular capabilities
-- [x] `/admin` requires staff
-- [x] `/saas` requires `saas.manage`
-- [x] `/driver` requires logistics/driver
-- [x] `/admin/dishes` requires `dishes.read`
-- [ ] Permission-filtered admin nav (polish — ok after tag)
-- [x] DishService methods re-check capabilities
+### Lock 2 — Soft delete ✅
 
-### Lock 2 — Soft delete enforcement
+`archive` / `restore` / `purge` — nunca `delete()` en Services de negocio.
 
-- [x] Services expose `archive` / `restore` / `purge` — **no `delete()`**
-- [x] Migration: staff DELETE policies removed; saas_admin purge only (catalog + companies + weekly_menus)
-- [x] `deleted_by` on dishes / ingredients / suppliers
-- [ ] Junction-table strategy ADR (cascade vs soft-delete)
+### Lock 3 — ServiceContext ✅
 
-### Lock 3 — ServiceContext
+Contexto único: tenant, user, capabilities, localization, audit, flags, cliente Supabase, IP.
 
-- [x] Expanded `ServiceContext` + `createServiceContext()`
-
-### Lock 4 — Repository layer
-
-- [x] `DishRepository` + DishService uses it
-- [x] Module folder `src/modules/dish-library/...`
-
-### Lock 5 — Domain errors
-
-- [x] Typed errors in `src/domain/errors.ts`
-- [x] DishService / AuditService / stubs use domain errors
-
----
-
-## After lock
-
-1. Git tag `v0.1.0` with message `FOUNDATION LOCKED` (human/CI when merged to main).
-2. Any structural change requires a new ADR.
-3. Start Module 01: **domain entities first**, then Services/Repos, then CRUD, then UI.
+### Lock 4 — Repository layer ✅
 
 ```text
-Dish Entity → Ingredient Entity → Recipe Entity
-  → DishService / Repositories → CRUD → UI
+UI → Service → Repository → Supabase
 ```
 
-## Roadmap adjustment
+### Lock 5 — Domain errors ✅
 
-```text
-Dish Library → Ingredient Library → Recipe Builder → …
-```
+Errores tipados (`PermissionDenied`, `DishNotFound`, …).
 
-See [roadmap](../roadmap/README.md).
+## Pulido pendiente (no bloquea Module 01)
+
+- Filtrado de navegación admin por capabilities
+- ADR de tablas junction (cascade vs soft-delete)
+
+## Después del lock
+
+1. Tag `v0.1.0` aplicado / documentado.
+2. Module 01: **entidades de dominio primero**; UI al final.
+3. Orden congelado: Dish → Ingredient → Recipe → … → UI → CRUD.
