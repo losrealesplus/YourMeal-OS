@@ -1,8 +1,9 @@
 
 # YourMeal OS — Foundation Plan
 
-> **Constitution (source of truth):** see [`docs/`](../docs/README.md) and permanent ADRs in [`docs/adr/`](../docs/adr/).
-> This plan remains the original foundation checklist; architecture rules in `docs/` supersede when they differ.
+> **Architecture source of truth:** [`docs/`](../docs/README.md), especially the [Architecture Review](../docs/05-architecture/architecture-review.md) and [ADRs](../docs/adr/).
+> This Lovable plan is historical foundation context. When it conflicts with `docs/` or ADRs, **documentation wins**.
+> Lovable should accelerate UI/components only — not redefine architecture, schema, or module order.
 
 Ship the skeleton, not the features. After you approve this, feature modules (Weekly Menu ordering, Production, Routes, Accounting, etc.) become their own follow-up plans.
 

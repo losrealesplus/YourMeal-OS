@@ -1,66 +1,96 @@
 # Architecture
 
-## Overview
+**Source of truth for architecture decisions.** Lovable accelerates UI; it does not own architecture. See [Architecture Review](./architecture-review.md) and [ADRs](../adr/).
 
-Single PostgreSQL database. Multi-tenant via `tenant_id` + Row Level Security. One React application; UI surfaces change by role and department. Domain logic lives in Services, never in React components.
+## Phase
+
+**FOUNDATION ✅** — gate: [Architecture Review](./architecture-review.md) must be approved before Module 01 (Dish Library).
+
+## As-built overview
+
+Single PostgreSQL database (Supabase). Multi-tenant via `tenant_id` + RLS. One React application (TanStack Start); surfaces change by role. Domain logic belongs in Services.
 
 ```text
-┌─────────────────────────────────────────────────────────┐
-│  React (TanStack Start) — presentation only             │
-│  routes / components / hooks → call Services            │
-└───────────────────────────┬─────────────────────────────┘
-                            │
-┌───────────────────────────▼─────────────────────────────┐
-│  Services (src/services)                                │
-│  DishService · InventoryService · AccountingService …   │
-└───────────────────────────┬─────────────────────────────┘
-                            │
-┌───────────────────────────▼─────────────────────────────┐
-│  Supabase (Auth + Postgres + RLS)                       │
-│  tenants · profiles · user_roles · dishes · …           │
-│  audit_log · feature_flags · soft deletes               │
-└─────────────────────────────────────────────────────────┘
+Browser
+  └─ TanStack Start (src/routes)
+       ├─ Auth gate only today (_authenticated)  ⚠ RBAC gates = P0
+       ├─ Shells: AdminShell / MobileShell / SaaS shell
+       ├─ Department + SaaS placeholders
+       └─ hooks → Auth, permissions (unused), localization
+                │
+                ▼  intended path (DishService ready, UI unwired)
+         src/services
+                │
+                ▼
+         Supabase Auth + Postgres + RLS
 ```
 
 ## Layers
 
-| Layer | Responsibility | Must not |
-|-------|----------------|----------|
-| Routes / UI | Layout, forms, navigation, formatting via `useFmt` | Business rules, permission hardcoding |
-| Hooks | Session, queries, UI state | Domain invariants |
-| Services | Validation, workflows, audit hooks | JSX / UI concerns |
-| Permissions | Role → capability checks | Scattered `if (role === …)` in components |
-| Localization | Canonical → display | Direct `Intl` / `toLocaleString` in UI |
-| Database | Canonical storage, RLS, constraints | Presentation formats |
+| Layer | Location | Responsibility | Must not |
+|-------|----------|----------------|----------|
+| Routes / UI | `src/routes`, `src/components` | Layout, forms, nav, `useFmt` | Business rules, hardcoded roles |
+| Hooks | `src/hooks` | Session, capabilities, UI state | Domain invariants |
+| Permissions | `src/permissions` | Role → capability | Scattered `if (role === …)` |
+| Services | `src/services` | Validation, workflows, soft delete, audit | JSX |
+| Localization | `src/lib/localization.ts` | Canonical → display | `toLocaleString` in product UI |
+| Database | `supabase/migrations` | Canonical storage, RLS | Presentation formats |
 
 ## Navigation model
 
-Everyone enters the same application. After login → **Home**. Interface changes by permissions.
+One login. After login → home by role (`homePathForRoles` / `resolveHomePath`).
 
-| Path | Audience |
-|------|----------|
-| `/` | Public marketing |
-| `/auth`, `/reset-password` | Unauthenticated |
-| `/app/*` | Customers |
-| `/admin/*` | Staff departments |
-| `/saas/*` | SaaS administrators (planned) |
-| `/driver/*` | Drivers (deferred) |
+| Path | Audience | Gate today |
+|------|----------|------------|
+| `/` | Marketing | Public |
+| `/auth`, `/reset-password` | Auth | Public |
+| `/app/*` | Customers | Session only |
+| `/admin/*` | Staff departments | Session only ⚠ |
+| `/saas/*` | SaaS admin | Session only ⚠ |
+| `/driver` | Drivers | Session only ⚠ |
 
-Post-login routing should use `useAuth().homePath` (not hardcode `/app`).
+## Cross-cutting map
 
-## Cross-cutting
+| Concern | Implementation | ADR |
+|---------|----------------|-----|
+| Canonical units | Schema conventions | 0001 |
+| Localization | `useFmt` / Localization service | 0002 |
+| Multi-tenant | `tenant_id` + RLS | 0003 |
+| Auth / RBAC | Supabase + `user_roles` + capabilities | 0004 |
+| Services | `src/services` | 0005 |
+| Soft delete / audit | `deleted_at`, `audit_log` | 0006 |
+| Feature flags | `feature_flags` | 0007 |
+| AI / offline | Deferred | 0008 |
 
-| Concern | Location |
-|---------|----------|
-| Canonical units | ADR 0001 |
-| Localization | `src/lib/localization.ts`, `useFmt()` |
-| Multi-tenant | `tenant_id` + RLS helpers |
-| Auth / roles | Supabase Auth, `profiles`, `user_roles` |
-| Soft delete | `deleted_at` on business tables |
-| Audit | `audit_log` |
-| Feature flags | `feature_flags` |
-| Services | `src/services/*` |
+## Folder structure (as-built)
 
-## Evolution
+```text
+src/
+  routes/           # File-based TanStack Router
+  components/       # Shells + shadcn ui/
+  services/         # Domain services (Dish/Audit/Flags real)
+  permissions/      # Capability map
+  hooks/            # useAuth, useCan, language sync
+  i18n/             # Locales + LocalizationProvider
+  lib/              # localization, home-path, soft-delete
+  integrations/     # Supabase, Lovable auth broker
+supabase/migrations/
+docs/               # Constitution + this architecture
+```
 
-Target monorepo (`apps/`, `packages/`) is documented in [02-vision](../02-vision/README.md). Stay in the single app until extraction can be done without rewriting Lovable history or breaking sync.
+Target monorepo (`apps/`, `packages/`) is deferred until Services + Dish Library prove boundaries without breaking Lovable sync.
+
+## Governance
+
+| Decision type | Owner |
+|---------------|--------|
+| Architecture, domain, schema, RBAC | Repository docs + Cursor |
+| Visual UI, components, flows | Lovable allowed (must follow docs) |
+| Feature order | [Roadmap v1](../roadmap/README.md) |
+
+## Related
+
+- [Architecture Review (full)](./architecture-review.md)
+- [Database](../06-database/README.md)
+- [Business rules](../08-business-rules/README.md)
+- [Domain model](../12-domain-model/README.md)
