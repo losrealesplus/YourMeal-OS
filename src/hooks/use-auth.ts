@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { homePathForRoles } from "@/lib/home-path";
 
 export type AppRole =
   | "saas_admin"
@@ -80,14 +81,6 @@ export function useAuth(): AuthState {
   const isCustomer =
     roles.includes("customer") || (!isSaasAdmin && !isStaff && !isDriver);
 
-  const homePath = isSaasAdmin
-    ? "/saas"
-    : isStaff
-      ? "/admin"
-      : isDriver
-        ? "/driver"
-        : "/app";
-
   return {
     session,
     user: session?.user ?? null,
@@ -97,6 +90,6 @@ export function useAuth(): AuthState {
     isStaff,
     isDriver,
     isCustomer,
-    homePath,
+    homePath: homePathForRoles(roles),
   };
 }

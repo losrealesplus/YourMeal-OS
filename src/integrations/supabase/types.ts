@@ -435,11 +435,59 @@ export type Database = {
           },
         ]
       }
+      audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          ip: string | null
+          new_data: Json | null
+          old_data: Json | null
+          tenant_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          ip?: string | null
+          new_data?: Json | null
+          old_data?: Json | null
+          tenant_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          ip?: string | null
+          new_data?: Json | null
+          old_data?: Json | null
+          tenant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_log_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dishes: {
         Row: {
           allergens: string[]
           cost: number
           created_at: string
+          deleted_at: string | null
           description: string | null
           id: string
           kcal: number | null
@@ -451,12 +499,14 @@ export type Database = {
           price: number
           status: Database["public"]["Enums"]["dish_status"]
           tenant_id: string
+          updated_at: string
           weight_g: number | null
         }
         Insert: {
           allergens?: string[]
           cost?: number
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           id?: string
           kcal?: number | null
@@ -468,12 +518,14 @@ export type Database = {
           price?: number
           status?: Database["public"]["Enums"]["dish_status"]
           tenant_id: string
+          updated_at?: string
           weight_g?: number | null
         }
         Update: {
           allergens?: string[]
           cost?: number
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           id?: string
           kcal?: number | null
@@ -485,6 +537,7 @@ export type Database = {
           price?: number
           status?: Database["public"]["Enums"]["dish_status"]
           tenant_id?: string
+          updated_at?: string
           weight_g?: number | null
         }
         Relationships: [
@@ -497,10 +550,52 @@ export type Database = {
           },
         ]
       }
+      feature_flags: {
+        Row: {
+          created_at: string
+          description: string | null
+          enabled: boolean
+          id: string
+          key: string
+          metadata: Json
+          tenant_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          key: string
+          metadata?: Json
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          key?: string
+          metadata?: Json
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feature_flags_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ingredients: {
         Row: {
           allergens: string[]
           cost: number
+          deleted_at: string | null
           expiration: string | null
           id: string
           min_stock: number
@@ -513,6 +608,7 @@ export type Database = {
         Insert: {
           allergens?: string[]
           cost?: number
+          deleted_at?: string | null
           expiration?: string | null
           id?: string
           min_stock?: number
@@ -525,6 +621,7 @@ export type Database = {
         Update: {
           allergens?: string[]
           cost?: number
+          deleted_at?: string | null
           expiration?: string | null
           id?: string
           min_stock?: number

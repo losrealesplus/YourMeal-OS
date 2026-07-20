@@ -9,20 +9,45 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
-import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
+import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
+import { Route as AuthenticatedDriverRouteImport } from './routes/_authenticated/driver'
+import { Route as AuthenticatedSaasRouteImport } from './routes/_authenticated/saas'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
-import { Route as AuthenticatedAppSettingsRouteImport } from './routes/_authenticated/app.settings'
+import { Route as AuthenticatedAdminAccountingRouteImport } from './routes/_authenticated/admin.accounting'
+import { Route as AuthenticatedAdminCustomersRouteImport } from './routes/_authenticated/admin.customers'
+import { Route as AuthenticatedAdminDishesRouteImport } from './routes/_authenticated/admin.dishes'
+import { Route as AuthenticatedAdminInventoryRouteImport } from './routes/_authenticated/admin.inventory'
+import { Route as AuthenticatedAdminKitchenRouteImport } from './routes/_authenticated/admin.kitchen'
+import { Route as AuthenticatedAdminMenusRouteImport } from './routes/_authenticated/admin.menus'
+import { Route as AuthenticatedAdminProductionRouteImport } from './routes/_authenticated/admin.production'
+import { Route as AuthenticatedAdminPromotionsRouteImport } from './routes/_authenticated/admin.promotions'
+import { Route as AuthenticatedAdminPurchasingRouteImport } from './routes/_authenticated/admin.purchasing'
+import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
+import { Route as AuthenticatedAdminRoutesRouteImport } from './routes/_authenticated/admin.routes'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
+import { Route as AuthenticatedAdminSupportRouteImport } from './routes/_authenticated/admin.support'
+import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as AuthenticatedAppMenuRouteImport } from './routes/_authenticated/app.menu'
+import { Route as AuthenticatedAppSettingsRouteImport } from './routes/_authenticated/app.settings'
+import { Route as AuthenticatedSaasIndexRouteImport } from './routes/_authenticated/saas.index'
+import { Route as AuthenticatedSaasAnalyticsRouteImport } from './routes/_authenticated/saas.analytics'
+import { Route as AuthenticatedSaasBrandingRouteImport } from './routes/_authenticated/saas.branding'
+import { Route as AuthenticatedSaasDomainsRouteImport } from './routes/_authenticated/saas.domains'
+import { Route as AuthenticatedSaasLicensesRouteImport } from './routes/_authenticated/saas.licenses'
+import { Route as AuthenticatedSaasSettingsRouteImport } from './routes/_authenticated/saas.settings'
 
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -30,34 +55,122 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
-  id: '/app',
-  path: '/app',
-  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthenticatedAppRoute,
+const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDriverRoute = AuthenticatedDriverRouteImport.update({
+  id: '/driver',
+  path: '/driver',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSaasRoute = AuthenticatedSaasRouteImport.update({
+  id: '/saas',
+  path: '/saas',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminAccountingRoute =
+  AuthenticatedAdminAccountingRouteImport.update({
+    id: '/accounting',
+    path: '/accounting',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminCustomersRoute =
+  AuthenticatedAdminCustomersRouteImport.update({
+    id: '/customers',
+    path: '/customers',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminDishesRoute =
+  AuthenticatedAdminDishesRouteImport.update({
+    id: '/dishes',
+    path: '/dishes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminInventoryRoute =
+  AuthenticatedAdminInventoryRouteImport.update({
+    id: '/inventory',
+    path: '/inventory',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminKitchenRoute =
+  AuthenticatedAdminKitchenRouteImport.update({
+    id: '/kitchen',
+    path: '/kitchen',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminMenusRoute = AuthenticatedAdminMenusRouteImport.update({
+  id: '/menus',
+  path: '/menus',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminProductionRoute =
+  AuthenticatedAdminProductionRouteImport.update({
+    id: '/production',
+    path: '/production',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminPromotionsRoute =
+  AuthenticatedAdminPromotionsRouteImport.update({
+    id: '/promotions',
+    path: '/promotions',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminPurchasingRoute =
+  AuthenticatedAdminPurchasingRouteImport.update({
+    id: '/purchasing',
+    path: '/purchasing',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminReportsRoute =
+  AuthenticatedAdminReportsRouteImport.update({
+    id: '/reports',
+    path: '/reports',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminRoutesRoute =
+  AuthenticatedAdminRoutesRouteImport.update({
+    id: '/routes',
+    path: '/routes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminSupportRoute =
+  AuthenticatedAdminSupportRouteImport.update({
+    id: '/support',
+    path: '/support',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppMenuRoute = AuthenticatedAppMenuRouteImport.update({
+  id: '/menu',
+  path: '/menu',
+  getParentRoute: () => AuthenticatedAppRoute,
 } as any)
 const AuthenticatedAppSettingsRoute =
   AuthenticatedAppSettingsRouteImport.update({
@@ -65,11 +178,41 @@ const AuthenticatedAppSettingsRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedAppMenuRoute = AuthenticatedAppMenuRouteImport.update({
-  id: '/menu',
-  path: '/menu',
-  getParentRoute: () => AuthenticatedAppRoute,
+const AuthenticatedSaasIndexRoute = AuthenticatedSaasIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedSaasRoute,
 } as any)
+const AuthenticatedSaasAnalyticsRoute =
+  AuthenticatedSaasAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthenticatedSaasRoute,
+  } as any)
+const AuthenticatedSaasBrandingRoute =
+  AuthenticatedSaasBrandingRouteImport.update({
+    id: '/branding',
+    path: '/branding',
+    getParentRoute: () => AuthenticatedSaasRoute,
+  } as any)
+const AuthenticatedSaasDomainsRoute =
+  AuthenticatedSaasDomainsRouteImport.update({
+    id: '/domains',
+    path: '/domains',
+    getParentRoute: () => AuthenticatedSaasRoute,
+  } as any)
+const AuthenticatedSaasLicensesRoute =
+  AuthenticatedSaasLicensesRouteImport.update({
+    id: '/licenses',
+    path: '/licenses',
+    getParentRoute: () => AuthenticatedSaasRoute,
+  } as any)
+const AuthenticatedSaasSettingsRoute =
+  AuthenticatedSaasSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedSaasRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -77,19 +220,60 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/app': typeof AuthenticatedAppRouteWithChildren
+  '/driver': typeof AuthenticatedDriverRoute
+  '/saas': typeof AuthenticatedSaasRouteWithChildren
+  '/admin/accounting': typeof AuthenticatedAdminAccountingRoute
+  '/admin/customers': typeof AuthenticatedAdminCustomersRoute
+  '/admin/dishes': typeof AuthenticatedAdminDishesRoute
+  '/admin/inventory': typeof AuthenticatedAdminInventoryRoute
+  '/admin/kitchen': typeof AuthenticatedAdminKitchenRoute
+  '/admin/menus': typeof AuthenticatedAdminMenusRoute
+  '/admin/production': typeof AuthenticatedAdminProductionRoute
+  '/admin/promotions': typeof AuthenticatedAdminPromotionsRoute
+  '/admin/purchasing': typeof AuthenticatedAdminPurchasingRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/admin/routes': typeof AuthenticatedAdminRoutesRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/admin/support': typeof AuthenticatedAdminSupportRoute
   '/app/menu': typeof AuthenticatedAppMenuRoute
   '/app/settings': typeof AuthenticatedAppSettingsRoute
+  '/saas/analytics': typeof AuthenticatedSaasAnalyticsRoute
+  '/saas/branding': typeof AuthenticatedSaasBrandingRoute
+  '/saas/domains': typeof AuthenticatedSaasDomainsRoute
+  '/saas/licenses': typeof AuthenticatedSaasLicensesRoute
+  '/saas/settings': typeof AuthenticatedSaasSettingsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
+  '/saas/': typeof AuthenticatedSaasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/driver': typeof AuthenticatedDriverRoute
+  '/admin/accounting': typeof AuthenticatedAdminAccountingRoute
+  '/admin/customers': typeof AuthenticatedAdminCustomersRoute
+  '/admin/dishes': typeof AuthenticatedAdminDishesRoute
+  '/admin/inventory': typeof AuthenticatedAdminInventoryRoute
+  '/admin/kitchen': typeof AuthenticatedAdminKitchenRoute
+  '/admin/menus': typeof AuthenticatedAdminMenusRoute
+  '/admin/production': typeof AuthenticatedAdminProductionRoute
+  '/admin/promotions': typeof AuthenticatedAdminPromotionsRoute
+  '/admin/purchasing': typeof AuthenticatedAdminPurchasingRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/admin/routes': typeof AuthenticatedAdminRoutesRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/admin/support': typeof AuthenticatedAdminSupportRoute
   '/app/menu': typeof AuthenticatedAppMenuRoute
   '/app/settings': typeof AuthenticatedAppSettingsRoute
+  '/saas/analytics': typeof AuthenticatedSaasAnalyticsRoute
+  '/saas/branding': typeof AuthenticatedSaasBrandingRoute
+  '/saas/domains': typeof AuthenticatedSaasDomainsRoute
+  '/saas/licenses': typeof AuthenticatedSaasLicensesRoute
+  '/saas/settings': typeof AuthenticatedSaasSettingsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
+  '/saas': typeof AuthenticatedSaasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -99,10 +283,31 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
+  '/_authenticated/driver': typeof AuthenticatedDriverRoute
+  '/_authenticated/saas': typeof AuthenticatedSaasRouteWithChildren
+  '/_authenticated/admin/accounting': typeof AuthenticatedAdminAccountingRoute
+  '/_authenticated/admin/customers': typeof AuthenticatedAdminCustomersRoute
+  '/_authenticated/admin/dishes': typeof AuthenticatedAdminDishesRoute
+  '/_authenticated/admin/inventory': typeof AuthenticatedAdminInventoryRoute
+  '/_authenticated/admin/kitchen': typeof AuthenticatedAdminKitchenRoute
+  '/_authenticated/admin/menus': typeof AuthenticatedAdminMenusRoute
+  '/_authenticated/admin/production': typeof AuthenticatedAdminProductionRoute
+  '/_authenticated/admin/promotions': typeof AuthenticatedAdminPromotionsRoute
+  '/_authenticated/admin/purchasing': typeof AuthenticatedAdminPurchasingRoute
+  '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
+  '/_authenticated/admin/routes': typeof AuthenticatedAdminRoutesRoute
+  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/_authenticated/admin/support': typeof AuthenticatedAdminSupportRoute
   '/_authenticated/app/menu': typeof AuthenticatedAppMenuRoute
   '/_authenticated/app/settings': typeof AuthenticatedAppSettingsRoute
+  '/_authenticated/saas/analytics': typeof AuthenticatedSaasAnalyticsRoute
+  '/_authenticated/saas/branding': typeof AuthenticatedSaasBrandingRoute
+  '/_authenticated/saas/domains': typeof AuthenticatedSaasDomainsRoute
+  '/_authenticated/saas/licenses': typeof AuthenticatedSaasLicensesRoute
+  '/_authenticated/saas/settings': typeof AuthenticatedSaasSettingsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
+  '/_authenticated/saas/': typeof AuthenticatedSaasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -112,19 +317,60 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/admin'
     | '/app'
+    | '/driver'
+    | '/saas'
+    | '/admin/accounting'
+    | '/admin/customers'
+    | '/admin/dishes'
+    | '/admin/inventory'
+    | '/admin/kitchen'
+    | '/admin/menus'
+    | '/admin/production'
+    | '/admin/promotions'
+    | '/admin/purchasing'
+    | '/admin/reports'
+    | '/admin/routes'
+    | '/admin/settings'
+    | '/admin/support'
     | '/app/menu'
     | '/app/settings'
+    | '/saas/analytics'
+    | '/saas/branding'
+    | '/saas/domains'
+    | '/saas/licenses'
+    | '/saas/settings'
     | '/admin/'
     | '/app/'
+    | '/saas/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/driver'
+    | '/admin/accounting'
+    | '/admin/customers'
+    | '/admin/dishes'
+    | '/admin/inventory'
+    | '/admin/kitchen'
+    | '/admin/menus'
+    | '/admin/production'
+    | '/admin/promotions'
+    | '/admin/purchasing'
+    | '/admin/reports'
+    | '/admin/routes'
+    | '/admin/settings'
+    | '/admin/support'
     | '/app/menu'
     | '/app/settings'
+    | '/saas/analytics'
+    | '/saas/branding'
+    | '/saas/domains'
+    | '/saas/licenses'
+    | '/saas/settings'
     | '/admin'
     | '/app'
+    | '/saas'
   id:
     | '__root__'
     | '/'
@@ -133,10 +379,31 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/admin'
     | '/_authenticated/app'
+    | '/_authenticated/driver'
+    | '/_authenticated/saas'
+    | '/_authenticated/admin/accounting'
+    | '/_authenticated/admin/customers'
+    | '/_authenticated/admin/dishes'
+    | '/_authenticated/admin/inventory'
+    | '/_authenticated/admin/kitchen'
+    | '/_authenticated/admin/menus'
+    | '/_authenticated/admin/production'
+    | '/_authenticated/admin/promotions'
+    | '/_authenticated/admin/purchasing'
+    | '/_authenticated/admin/reports'
+    | '/_authenticated/admin/routes'
+    | '/_authenticated/admin/settings'
+    | '/_authenticated/admin/support'
     | '/_authenticated/app/menu'
     | '/_authenticated/app/settings'
+    | '/_authenticated/saas/analytics'
+    | '/_authenticated/saas/branding'
+    | '/_authenticated/saas/domains'
+    | '/_authenticated/saas/licenses'
+    | '/_authenticated/saas/settings'
     | '/_authenticated/admin/'
     | '/_authenticated/app/'
+    | '/_authenticated/saas/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -148,18 +415,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -169,19 +429,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/app': {
-      id: '/_authenticated/app'
-      path: '/app'
-      fullPath: '/app'
-      preLoaderRoute: typeof AuthenticatedAppRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
@@ -190,12 +450,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/app/': {
-      id: '/_authenticated/app/'
-      path: '/'
-      fullPath: '/app/'
-      preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
+    '/_authenticated/app': {
+      id: '/_authenticated/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AuthenticatedAppRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/driver': {
+      id: '/_authenticated/driver'
+      path: '/driver'
+      fullPath: '/driver'
+      preLoaderRoute: typeof AuthenticatedDriverRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/saas': {
+      id: '/_authenticated/saas'
+      path: '/saas'
+      fullPath: '/saas'
+      preLoaderRoute: typeof AuthenticatedSaasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
@@ -204,11 +478,102 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/_authenticated/app/settings': {
-      id: '/_authenticated/app/settings'
+    '/_authenticated/admin/accounting': {
+      id: '/_authenticated/admin/accounting'
+      path: '/accounting'
+      fullPath: '/admin/accounting'
+      preLoaderRoute: typeof AuthenticatedAdminAccountingRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/customers': {
+      id: '/_authenticated/admin/customers'
+      path: '/customers'
+      fullPath: '/admin/customers'
+      preLoaderRoute: typeof AuthenticatedAdminCustomersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/dishes': {
+      id: '/_authenticated/admin/dishes'
+      path: '/dishes'
+      fullPath: '/admin/dishes'
+      preLoaderRoute: typeof AuthenticatedAdminDishesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/inventory': {
+      id: '/_authenticated/admin/inventory'
+      path: '/inventory'
+      fullPath: '/admin/inventory'
+      preLoaderRoute: typeof AuthenticatedAdminInventoryRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/kitchen': {
+      id: '/_authenticated/admin/kitchen'
+      path: '/kitchen'
+      fullPath: '/admin/kitchen'
+      preLoaderRoute: typeof AuthenticatedAdminKitchenRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/menus': {
+      id: '/_authenticated/admin/menus'
+      path: '/menus'
+      fullPath: '/admin/menus'
+      preLoaderRoute: typeof AuthenticatedAdminMenusRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/production': {
+      id: '/_authenticated/admin/production'
+      path: '/production'
+      fullPath: '/admin/production'
+      preLoaderRoute: typeof AuthenticatedAdminProductionRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/promotions': {
+      id: '/_authenticated/admin/promotions'
+      path: '/promotions'
+      fullPath: '/admin/promotions'
+      preLoaderRoute: typeof AuthenticatedAdminPromotionsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/purchasing': {
+      id: '/_authenticated/admin/purchasing'
+      path: '/purchasing'
+      fullPath: '/admin/purchasing'
+      preLoaderRoute: typeof AuthenticatedAdminPurchasingRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/reports': {
+      id: '/_authenticated/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AuthenticatedAdminReportsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/routes': {
+      id: '/_authenticated/admin/routes'
+      path: '/routes'
+      fullPath: '/admin/routes'
+      preLoaderRoute: typeof AuthenticatedAdminRoutesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
       path: '/settings'
-      fullPath: '/app/settings'
-      preLoaderRoute: typeof AuthenticatedAppSettingsRouteImport
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/support': {
+      id: '/_authenticated/admin/support'
+      path: '/support'
+      fullPath: '/admin/support'
+      preLoaderRoute: typeof AuthenticatedAdminSupportRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/app/': {
+      id: '/_authenticated/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/app/menu': {
@@ -218,14 +583,89 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppMenuRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/settings': {
+      id: '/_authenticated/app/settings'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AuthenticatedAppSettingsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/saas/': {
+      id: '/_authenticated/saas/'
+      path: '/'
+      fullPath: '/saas/'
+      preLoaderRoute: typeof AuthenticatedSaasIndexRouteImport
+      parentRoute: typeof AuthenticatedSaasRoute
+    }
+    '/_authenticated/saas/analytics': {
+      id: '/_authenticated/saas/analytics'
+      path: '/analytics'
+      fullPath: '/saas/analytics'
+      preLoaderRoute: typeof AuthenticatedSaasAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedSaasRoute
+    }
+    '/_authenticated/saas/branding': {
+      id: '/_authenticated/saas/branding'
+      path: '/branding'
+      fullPath: '/saas/branding'
+      preLoaderRoute: typeof AuthenticatedSaasBrandingRouteImport
+      parentRoute: typeof AuthenticatedSaasRoute
+    }
+    '/_authenticated/saas/domains': {
+      id: '/_authenticated/saas/domains'
+      path: '/domains'
+      fullPath: '/saas/domains'
+      preLoaderRoute: typeof AuthenticatedSaasDomainsRouteImport
+      parentRoute: typeof AuthenticatedSaasRoute
+    }
+    '/_authenticated/saas/licenses': {
+      id: '/_authenticated/saas/licenses'
+      path: '/licenses'
+      fullPath: '/saas/licenses'
+      preLoaderRoute: typeof AuthenticatedSaasLicensesRouteImport
+      parentRoute: typeof AuthenticatedSaasRoute
+    }
+    '/_authenticated/saas/settings': {
+      id: '/_authenticated/saas/settings'
+      path: '/settings'
+      fullPath: '/saas/settings'
+      preLoaderRoute: typeof AuthenticatedSaasSettingsRouteImport
+      parentRoute: typeof AuthenticatedSaasRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAccountingRoute: typeof AuthenticatedAdminAccountingRoute
+  AuthenticatedAdminCustomersRoute: typeof AuthenticatedAdminCustomersRoute
+  AuthenticatedAdminDishesRoute: typeof AuthenticatedAdminDishesRoute
+  AuthenticatedAdminInventoryRoute: typeof AuthenticatedAdminInventoryRoute
+  AuthenticatedAdminKitchenRoute: typeof AuthenticatedAdminKitchenRoute
+  AuthenticatedAdminMenusRoute: typeof AuthenticatedAdminMenusRoute
+  AuthenticatedAdminProductionRoute: typeof AuthenticatedAdminProductionRoute
+  AuthenticatedAdminPromotionsRoute: typeof AuthenticatedAdminPromotionsRoute
+  AuthenticatedAdminPurchasingRoute: typeof AuthenticatedAdminPurchasingRoute
+  AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
+  AuthenticatedAdminRoutesRoute: typeof AuthenticatedAdminRoutesRoute
+  AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
+  AuthenticatedAdminSupportRoute: typeof AuthenticatedAdminSupportRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAccountingRoute: AuthenticatedAdminAccountingRoute,
+  AuthenticatedAdminCustomersRoute: AuthenticatedAdminCustomersRoute,
+  AuthenticatedAdminDishesRoute: AuthenticatedAdminDishesRoute,
+  AuthenticatedAdminInventoryRoute: AuthenticatedAdminInventoryRoute,
+  AuthenticatedAdminKitchenRoute: AuthenticatedAdminKitchenRoute,
+  AuthenticatedAdminMenusRoute: AuthenticatedAdminMenusRoute,
+  AuthenticatedAdminProductionRoute: AuthenticatedAdminProductionRoute,
+  AuthenticatedAdminPromotionsRoute: AuthenticatedAdminPromotionsRoute,
+  AuthenticatedAdminPurchasingRoute: AuthenticatedAdminPurchasingRoute,
+  AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
+  AuthenticatedAdminRoutesRoute: AuthenticatedAdminRoutesRoute,
+  AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
+  AuthenticatedAdminSupportRoute: AuthenticatedAdminSupportRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
@@ -247,14 +687,39 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
 const AuthenticatedAppRouteWithChildren =
   AuthenticatedAppRoute._addFileChildren(AuthenticatedAppRouteChildren)
 
+interface AuthenticatedSaasRouteChildren {
+  AuthenticatedSaasAnalyticsRoute: typeof AuthenticatedSaasAnalyticsRoute
+  AuthenticatedSaasBrandingRoute: typeof AuthenticatedSaasBrandingRoute
+  AuthenticatedSaasDomainsRoute: typeof AuthenticatedSaasDomainsRoute
+  AuthenticatedSaasLicensesRoute: typeof AuthenticatedSaasLicensesRoute
+  AuthenticatedSaasSettingsRoute: typeof AuthenticatedSaasSettingsRoute
+  AuthenticatedSaasIndexRoute: typeof AuthenticatedSaasIndexRoute
+}
+
+const AuthenticatedSaasRouteChildren: AuthenticatedSaasRouteChildren = {
+  AuthenticatedSaasAnalyticsRoute: AuthenticatedSaasAnalyticsRoute,
+  AuthenticatedSaasBrandingRoute: AuthenticatedSaasBrandingRoute,
+  AuthenticatedSaasDomainsRoute: AuthenticatedSaasDomainsRoute,
+  AuthenticatedSaasLicensesRoute: AuthenticatedSaasLicensesRoute,
+  AuthenticatedSaasSettingsRoute: AuthenticatedSaasSettingsRoute,
+  AuthenticatedSaasIndexRoute: AuthenticatedSaasIndexRoute,
+}
+
+const AuthenticatedSaasRouteWithChildren =
+  AuthenticatedSaasRoute._addFileChildren(AuthenticatedSaasRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedAppRoute: typeof AuthenticatedAppRouteWithChildren
+  AuthenticatedDriverRoute: typeof AuthenticatedDriverRoute
+  AuthenticatedSaasRoute: typeof AuthenticatedSaasRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedAppRoute: AuthenticatedAppRouteWithChildren,
+  AuthenticatedDriverRoute: AuthenticatedDriverRoute,
+  AuthenticatedSaasRoute: AuthenticatedSaasRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =
