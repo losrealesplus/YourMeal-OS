@@ -81,10 +81,12 @@ PRODUCT ERA ⏳
 ```
 
 > La arquitectura ya no es el foco diario. El producto y la operación lo son.  
-> EatClean = primer profesor del Core.
+> EatClean = primer profesor del Core.  
+> Orden: EatClean → ¿qué necesita? → ¿cómo evoluciona YourMeal OS?  
+> Mapa: [EATCLEAN_DIA_OPERATIVO.md](../15-product/EATCLEAN_DIA_OPERATIVO.md)
 
 > Planificación: Platform → Capabilities → Use Cases → Domain → Infrastructure.  
-> Primero evidencia; después abstracción.
+> Primero evidencia; después abstracción. **No pantallas: eliminamos preguntas.**
 
 **Siguiente Capability** solo cuando el piloto (u otra evidencia operativa) lo demuestre.
 
