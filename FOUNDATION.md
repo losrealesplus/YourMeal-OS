@@ -122,6 +122,12 @@ Not inside the entity. Keep entities small and easy to understand.
 
 **Detailed standard (YourMeal OS):** [`docs/12-domain-model/ENTITY_GUIDELINES.md`](./docs/12-domain-model/ENTITY_GUIDELINES.md)
 
+### Repository Minimalism
+
+> A Repository exists only so the domain can retrieve and persist aggregates. It does not implement business rules, interpret data, or coordinate processes. The smaller the contract, the more independent the Core.
+
+**Detailed standard (YourMeal OS):** [`docs/13-repositories/REPOSITORY_GUIDELINES.md`](./docs/13-repositories/REPOSITORY_GUIDELINES.md)
+
 ---
 
 ## Cambios

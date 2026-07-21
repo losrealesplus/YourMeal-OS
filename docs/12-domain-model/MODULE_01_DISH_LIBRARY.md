@@ -38,7 +38,9 @@ Luego: **Ingredient** → **Recipe** con la misma disciplina y el mismo [DOMAIN_
 | Entidad `Dish` | ✅ Domain Done |
 | Tests de dominio | ✅ |
 | Validación metodológica | ✅ |
-| Repository Interface | ⏳ siguiente |
+| Repository Guidelines | ✅ |
+| DishRepository.md | ✅ |
+| DishRepository.ts | ⏳ siguiente |
 | Application / Infra / UI | ⏳ pendiente |
 
 Acta: [MILESTONE_VALIDACION_DOMINIO_DISH.md](../00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md)

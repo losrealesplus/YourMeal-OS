@@ -31,7 +31,9 @@ FASE 0 — FUNDACIÓN                 ✅ validada
 FASE 1 — Core v0.1 (EatClean)      🚧
 Module 01 · Dish Library
   Domain Done (Dish)               ✅
-  Repository Interface             ⏳  ← siguiente
+  Repository Guidelines            ✅
+  DishRepository.md                ✅
+  DishRepository.ts                ⏳  ← siguiente
   Application / Infra / UI         ⏳
 ```
 
@@ -43,7 +45,9 @@ Module 01 · Dish Library
 | ¿Qué reglas tendrá el Core? | ¿Cómo modelamos producción, inventario, pedidos? |
 | ¿Cómo modelamos una entidad? | Materializar negocio con metodología ya demostrada |
 
-Foco: del **metamodelo** al **dominio del negocio**.
+**Segunda etapa (en curso):** demostrar que la **infraestructura se adapta al dominio** — empezando por el contrato `DishRepository` (docs primero, luego interface, luego adaptador).
+
+Foco: del **metamodelo** al **dominio del negocio**, con fronteras de persistencia puras.
 
 ## Constitución (resumen)
 
@@ -61,8 +65,9 @@ Foco: del **metamodelo** al **dominio del negocio**.
 
 **Dish:** Domain Done — no ampliar comportamiento (evitar superentidad).
 
-**Próximo paso:** Repository Interface  
-Documentar contrato → interface → sin reglas de negocio → independiente de Supabase/ORM.
+**Hecho (capa Repository docs):** [REPOSITORY_GUIDELINES.md](../13-repositories/REPOSITORY_GUIDELINES.md) · [DishRepository.md](../13-repositories/DishRepository.md)
+
+**Próximo paso:** `DishRepository.ts` (interface del dominio) — sin Supabase todavía.
 
 ## Misión v0.1
 

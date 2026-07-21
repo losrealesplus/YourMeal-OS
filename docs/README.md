@@ -21,6 +21,8 @@
 | [Actores](./12-domain-model/ACTORS.md) | Roles oficiales del dominio |
 | [Entity Guidelines](./12-domain-model/ENTITY_GUIDELINES.md) | Estándar de modelado de entidades |
 | [Domain Done](./12-domain-model/DOMAIN_DONE.md) | DoD del dominio (sin infra/UI) |
+| [Repository Guidelines](./13-repositories/REPOSITORY_GUIDELINES.md) | Estándar de repositorios del Core |
+| [DishRepository](./13-repositories/DishRepository.md) | Contrato de dominio Dish (docs) |
 | [Capability Matrix](./09-security/CAPABILITY_MATRIX.md) | AuthZ |
 | [ADRs](./adr/README.md) | Decisiones |
 | [Roadmap](./roadmap/README.md) | Secuencia |

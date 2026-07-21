@@ -50,14 +50,16 @@ A partir de aquí no rediseñamos la forma de construir salvo ADR. Foundation si
 1. Dominio (documentado)          ✅
 2. Lenguaje del dominio           ✅
 3. Entidad Dish (Domain Done)     ✅
-4. Repository Interface           ⏳  ← siguiente
-5. Application Service / Use Cases
-6. Infrastructure Adapter
-7. Persistence
-8. Integration Tests
-9. Ingredient Library
-10. Recipe Builder
-11. UI
+4. Repository Guidelines          ✅
+5. DishRepository.md (contrato)   ✅
+6. DishRepository.ts (interface)  ⏳  ← siguiente
+7. Application Service / Use Cases
+8. Infrastructure Adapter (Supabase…)
+9. Persistence
+10. Integration Tests
+11. Ingredient Library
+12. Recipe Builder
+13. UI
 ```
 
 **Meta de la fase:** terminar un catálogo de platos sólido, no una pantalla bonita.
@@ -65,9 +67,11 @@ A partir de aquí no rediseñamos la forma de construir salvo ADR. Foundation si
 **Orden Repository (misma disciplina que Dish):**
 
 ```text
-Documentar contrato → Interface → sin reglas de negocio → sin Supabase/ORM
+REPOSITORY_GUIDELINES → DishRepository.md → DishRepository.ts
+  → Application → SupabaseDishRepository → … → UI
 ```
 
+**Segundo gran principio a validar:** el Core permanece estable; la infraestructura se adapta al dominio.
 Luego, con la misma disciplina: **Ingredient** → **Recipe**.
 
 ### Module 02 · Weekly Planning

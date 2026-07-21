@@ -49,7 +49,8 @@ La arquitectura de YourMeal OS se considera **estable**.
 - **Foundation Validation ✅** — primera validación metodológica cerrada (`Dish` Domain Done)
 - Acta: `docs/00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md`
 - `DOMAIN_DONE.md` adoptado como DoD del dominio
-
+- `REPOSITORY_GUIDELINES.md` + `DishRepository.md` — contrato de persistencia modelado (sin TS aún)
+- Principio Repository Minimalism en `FOUNDATION.md`
 ### Gobierno
 
 - ADR 0011: Diario de Desarrollo + Principio de Intencionalidad

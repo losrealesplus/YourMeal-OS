@@ -94,19 +94,20 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-Foundation Lock ✅  →  Foundation Validation ✅  →  Module 01 (Repository Interface ⏳)
+Foundation Lock ✅  →  Foundation Validation ✅  →  Module 01 (DishRepository.ts ⏳)
 ```
 
 **Objetivo de Module 01:** materializar el catálogo de platos para EatClean **heredando** el patrón ya validado.
 
-Orden de implementación (Dish Domain Done ✅):
+Orden Repository (docs → código):
 
 ```text
-Repository Interface → Application Service → Use Cases
+REPOSITORY_GUIDELINES ✅ → DishRepository.md ✅ → DishRepository.ts ⏳
+  → Application Service → Use Cases
   → Infrastructure Adapter → Persistence → Integration Tests → UI
 ```
 
-Ingredient / Recipe: misma disciplina (DOMAIN_DONE + ENTITY_GUIDELINES).
+Ingredient / Recipe: misma disciplina (DOMAIN_DONE + ENTITY_GUIDELINES + REPOSITORY_GUIDELINES).
 
 > Modelar antes de implementar. El CRUD es consecuencia, no punto de partida.
 
@@ -149,4 +150,6 @@ Conflictos con `.lovable/plan.md` → **gana `docs/`**.
 - [Actores](./docs/12-domain-model/ACTORS.md)
 - [Entity Guidelines](./docs/12-domain-model/ENTITY_GUIDELINES.md)
 - [Domain Done](./docs/12-domain-model/DOMAIN_DONE.md)
+- [Repository Guidelines](./docs/13-repositories/REPOSITORY_GUIDELINES.md)
+- [DishRepository (contrato)](./docs/13-repositories/DishRepository.md)
 - [Architecture Review](./docs/05-architecture/architecture-review.md) (histórico — ya aprobado)
