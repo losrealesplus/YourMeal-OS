@@ -86,16 +86,21 @@ EatClean Pilot              ⏳
 Operational Feedback        ⏳
 ```
 
-**Próximo paso:** Integration + UI MVP para que EatClean pueda usar Dish Management.
+**Próximo paso:** Integration + UI MVP de Dish Management **y** validar en cocina el [día operativo de EatClean](../15-product/EATCLEAN_DIA_OPERATIVO.md).
 
-**Preguntas guía a partir de ahora:**
+**Orden de pensamiento:**
+
+```text
+EatClean → ¿qué necesita? → ¿cómo evoluciona YourMeal OS?
+```
+
+**Preguntas guía:**
 
 - ¿Qué tarda demasiado un cocinero en hacer?
 - ¿Qué tarea genera más desperdicio?
 - ¿Qué información falta durante el servicio?
 - ¿Qué capacidad necesita realmente EatClean?
 
-El Core deja de ser el protagonista.  
-La **operación** lo es. El Core solo evoluciona cuando la operación demuestra que debe hacerlo.
+No construimos pantallas: **eliminamos preguntas**.
 
 > EatClean no es solo el primer cliente. Es el **primer profesor** del Core.

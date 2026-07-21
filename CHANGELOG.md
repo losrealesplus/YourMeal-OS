@@ -70,6 +70,8 @@ La arquitectura de YourMeal OS se considera **estable**.
 - Migración de esquema alineada al dominio (`inactive`, `category_id`, `recipe_id`, `tags`)
 - **Product Era** — fin de Validación Arquitectónica; el producto y la operación pasan a ser el foco
 - Tres exámenes afirmados: Domain · Repository · Infrastructure
+- Orden de pensamiento: EatClean → necesidad → evolución de YourMeal OS
+- `docs/15-product/EATCLEAN_DIA_OPERATIVO.md` — día operativo + Capabilities «nunca preguntes…»
 - Secuencia definitiva en FOUNDATION: Guidelines → Spec → Implementation → Tests → Validation
 ### Gobierno
 

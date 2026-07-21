@@ -109,12 +109,11 @@ El cliente compra **capacidades operativas**, no entidades ni repositorios.
 
 **Etapa:** Product Era — la arquitectura deja de ser el foco; el producto lo ocupa.
 
-**Objetivo actual:** Integration + UI MVP + piloto EatClean (primer profesor del Core).
+**Objetivo actual:** Integration + UI MVP de Dish Management + validar el [día operativo EatClean](./docs/15-product/EATCLEAN_DIA_OPERATIVO.md) en cocina.
 
-> **Metodología estable.** Preferir: *«Foundation ya responde»* / *«¿el producto lo necesita?»*.
+> **Orden:** EatClean → ¿qué necesita? → ¿cómo evoluciona YourMeal OS?
 
-> **Primero evidencia. Después abstracción.**  
-> Modificaciones estructurales: evidencia de múltiples Capabilities u organizaciones.
+> No construimos pantallas. **Eliminamos preguntas.**
 
 > Preguntas guía: ¿qué tarda el cocinero? ¿qué desperdicia? ¿qué falta en el servicio? ¿qué necesita EatClean?
 
@@ -122,10 +121,12 @@ Orden:
 
 ```text
 Infrastructure Validation ✅
-  → Integration → UI MVP → EatClean Pilot → feedback → Capability 2
+  → Integration + UI MVP (Dish)
+  → Validar día operativo en cocina
+  → EatClean Pilot → Capability priorizada por minutos / preguntas
 ```
 
-Actas: [Infrastructure Validation](./docs/00-status/MILESTONE_INFRASTRUCTURE_VALIDATION.md) · [Product Era](./docs/99-internal/development-journal/2026-07-21-product-era.md)
+Actas: [Infrastructure Validation](./docs/00-status/MILESTONE_INFRASTRUCTURE_VALIDATION.md) · [Product Era](./docs/99-internal/development-journal/2026-07-21-product-era.md) · [Día operativo](./docs/99-internal/development-journal/2026-07-21-eatclean-dia-operativo.md)
 
 La unidad de diseño sigue siendo el **caso de uso**.
 
