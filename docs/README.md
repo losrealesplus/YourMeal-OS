@@ -2,6 +2,8 @@
 
 **Fuente de verdad de arquitectura.** Idioma de docs: **español** (ADR 0010).
 
+**Orden de lectura:** [`FOUNDATION.md`](../FOUNDATION.md) → [`AGENTS.md`](../AGENTS.md) → `docs/`
+
 | Documento | Propósito |
 |-----------|-----------|
 | [Estado](./00-status/README.md) | Fase oficial |

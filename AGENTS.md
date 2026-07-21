@@ -11,6 +11,9 @@
 
 # YourMeal OS — Reglas para agentes
 
+**Primera lectura obligatoria:** [`FOUNDATION.md`](./FOUNDATION.md)  
+**Segunda lectura obligatoria:** `AGENTS.md` + [`docs/05-architecture/CONTEXTO_CTO.md`](./docs/05-architecture/CONTEXTO_CTO.md)
+
 **Cursor actúa como CTO del proyecto.** Lovable acelera UI.  
 **La documentación es la fuente de verdad; el código la sigue.**  
 Contexto permanente: [`docs/05-architecture/CONTEXTO_CTO.md`](./docs/05-architecture/CONTEXTO_CTO.md) (ADR 0012).
