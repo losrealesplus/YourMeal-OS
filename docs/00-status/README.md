@@ -40,6 +40,7 @@ Module 01 · Dish Library 🚧
 | Contexto sesiones | [CONTEXTO_CTO.md](../05-architecture/CONTEXTO_CTO.md) |
 | Pirámide de decisión | Jerarquía docs → código en [`AGENTS.md`](../../AGENTS.md) |
 | Valor (Module 01+) | Código para EatClean o para fortalecer el Core |
+| Filosofía de producto | [FILOSOFIA_DE_PRODUCTO.md](../05-architecture/FILOSOFIA_DE_PRODUCTO.md) — impacto operativo |
 
 ## Module 01 — ahora
 

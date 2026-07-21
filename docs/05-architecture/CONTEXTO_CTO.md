@@ -10,7 +10,7 @@ Se apoya en el [Contexto Estratégico Permanente](./CONTEXTO_ESTRATEGICO_PERMANE
 
 ## Posición en la constitución
 
-Este documento resume cómo arrancar una sesión. La dirección empresarial y del Core vive en [`CONTEXTO_ESTRATEGICO_PERMANENTE.md`](./CONTEXTO_ESTRATEGICO_PERMANENTE.md).
+Este documento resume cómo arrancar una sesión. La dirección empresarial y del Core vive en [`CONTEXTO_ESTRATEGICO_PERMANENTE.md`](./CONTEXTO_ESTRATEGICO_PERMANENTE.md). El criterio de propósito y éxito del producto vive en [`FILOSOFIA_DE_PRODUCTO.md`](./FILOSOFIA_DE_PRODUCTO.md).
 
 ## Visión (resumen)
 
@@ -99,11 +99,12 @@ Dish Library → Ingredient Library → Recipe Builder → Weekly Menus → Cust
 
 ## Cómo debe trabajar Cursor en cada tarea
 
-1. Leer constitución / ADRs / docs de dominio del módulo  
+1. Leer constitución / [Filosofía de Producto](./FILOSOFIA_DE_PRODUCTO.md) / ADRs / docs de dominio del módulo  
 2. Principio de Intencionalidad (qué / cómo / por qué / para qué)  
-3. Implementar alineado a docs  
-4. Actualizar Diario si el hito queda Done  
-5. Priorizar mantenibilidad y documentación sobre velocidad  
+3. Pregunta obligatoria: ¿hace que una cocina funcione mejor desde el primer día?  
+4. Implementar alineado a docs  
+5. Actualizar Diario si el hito queda Done  
+6. Priorizar mantenibilidad y documentación sobre velocidad  
 
 Cierre de jornada: [CIERRE_DE_JORNADA.md](./CIERRE_DE_JORNADA.md)  
 Diario: [99-internal/development-journal](../99-internal/development-journal/README.md)  

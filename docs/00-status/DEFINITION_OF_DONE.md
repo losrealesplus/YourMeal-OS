@@ -6,6 +6,7 @@ Un módulo se considera **DONE** solo si se cumple todo lo siguiente:
 |---|----------|
 | ✓ | Dominio definido (entidad, estados, lenguaje ubicuo) |
 | ✓ | **Intencionalidad respondida** (qué / cómo / por qué / para qué) |
+| ✓ | **Pregunta de producto respondida** ([Filosofía de Producto](../05-architecture/FILOSOFIA_DE_PRODUCTO.md)): ¿hace que una cocina funcione mejor desde el primer día? |
 | ✓ | **Entrada en el Diario de Desarrollo** (al terminar / antes de Done) |
 | ✓ | ADR actualizado (si hubo decisión de arquitectura) |
 | ✓ | Esquema de base de datos terminado |
@@ -34,8 +35,12 @@ Preguntas obligatorias: ¿Qué es? ¿Cómo es? ¿Por qué existe? ¿Para qué si
 ## Orden Module 01 (congelado)
 
 ```text
-Dish → Ingredient → Recipe → Repositories → Services
-  → Business Rules → Tests → UI → CRUD
+Language → Value Objects → Errors → State Machine → Entity
+  → Repository Interface → Domain Service → Application Service
+  → Tests → Infrastructure → UI
 ```
 
-Docs de dominio: [module-01/](../12-domain-model/module-01/).
+Luego: Ingredient → Recipe con la misma disciplina.
+
+Docs de dominio: [module-01/](../12-domain-model/module-01/).  
+Filosofía: [FILOSOFIA_DE_PRODUCTO.md](../05-architecture/FILOSOFIA_DE_PRODUCTO.md).

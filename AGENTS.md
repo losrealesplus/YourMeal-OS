@@ -12,7 +12,7 @@
 # YourMeal OS — Reglas para agentes
 
 **Primera lectura obligatoria:** [`FOUNDATION.md`](./FOUNDATION.md)  
-**Segunda lectura obligatoria:** `AGENTS.md` + [`docs/05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md`](./docs/05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md) + [`docs/05-architecture/CONTEXTO_CTO.md`](./docs/05-architecture/CONTEXTO_CTO.md)
+**Segunda lectura obligatoria:** `AGENTS.md` + [`docs/05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md`](./docs/05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md) + [`docs/05-architecture/FILOSOFIA_DE_PRODUCTO.md`](./docs/05-architecture/FILOSOFIA_DE_PRODUCTO.md) + [`docs/05-architecture/CONTEXTO_CTO.md`](./docs/05-architecture/CONTEXTO_CTO.md)
 
 **Cursor actúa como CTO del proyecto.** Lovable acelera UI.  
 **La documentación es la fuente de verdad; el código la sigue.**  
@@ -34,12 +34,13 @@ Registrar en el **Diario de Desarrollo** al terminar (antes de Done).
 
 1. [`FOUNDATION.md`](./FOUNDATION.md)  
 2. [`CONTEXTO_ESTRATEGICO_PERMANENTE.md`](./docs/05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md)  
-3. [`CONTEXTO_CTO.md`](./docs/05-architecture/CONTEXTO_CTO.md)  
-4. ADRs y docs del módulo  
-5. Modelo de dominio (`docs/12-domain-model/module-01/` si Module 01)  
-6. Código existente de Services/módulos  
-7. Detectar inconsistencias docs ↔ código  
-8. Solo entonces implementar  
+3. [`FILOSOFIA_DE_PRODUCTO.md`](./docs/05-architecture/FILOSOFIA_DE_PRODUCTO.md)  
+4. [`CONTEXTO_CTO.md`](./docs/05-architecture/CONTEXTO_CTO.md)  
+5. ADRs y docs del módulo  
+6. Modelo de dominio (`docs/12-domain-model/module-01/` si Module 01)  
+7. Código existente de Services/módulos  
+8. Detectar inconsistencias docs ↔ código  
+9. Solo entonces implementar  
 
 **No rehacer Architecture Review ni Foundation** salvo ADR nuevo. Ya están cerrados (`v0.1.0`).
 
@@ -51,6 +52,7 @@ Cada nivel responde una pregunta distinta. **Nunca discutir una decisión en un 
 FOUNDATION.md              → ¿Cómo pensamos?
 AGENTS.md                  → ¿Cómo trabajamos en este proyecto?
 CONTEXTO_ESTRATEGICO…      → ¿Qué empresa estamos construyendo?
+FILOSOFIA_DE_PRODUCTO.md   → ¿Para qué existe el producto y cómo medimos el éxito?
 CONTEXTO_CTO.md            → ¿Cómo debe evolucionar técnicamente?
 ADRs                       → ¿Por qué tomamos esta decisión?
 Domain Model               → ¿Cómo funciona el negocio?
@@ -58,6 +60,14 @@ Código                     → ¿Cómo lo implementamos?
 ```
 
 Si la implementación contradice el dominio, gana el dominio. Si el dominio contradice un ADR, primero el ADR. Y así hacia arriba.
+
+### Pregunta obligatoria (producto)
+
+Antes de aprobar un PR, ADR o feature:
+
+> **¿Hace que una cocina funcione mejor desde el primer día de uso?**
+
+Si no, justificar como inversión para una mejora operativa futura claramente identificada. Ver [Filosofía de Producto](./docs/05-architecture/FILOSOFIA_DE_PRODUCTO.md).
 
 ## Fase actual
 
@@ -108,6 +118,7 @@ Conflictos con `.lovable/plan.md` → **gana `docs/`**.
 ## Enlaces
 
 - [Contexto estratégico](./docs/05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md)
+- [Filosofía de producto](./docs/05-architecture/FILOSOFIA_DE_PRODUCTO.md)
 - [Contexto CTO](./docs/05-architecture/CONTEXTO_CTO.md)
 - [Diario](./docs/99-internal/development-journal/README.md)
 - [DoD](./docs/00-status/DEFINITION_OF_DONE.md)
