@@ -163,17 +163,18 @@ Digitalizar → Validar → Recomendar → Optimizar (IA solo con evidencia).
 
 ---
 
-## 12. Diseño estratégico cerrado (hasta nueva evidencia)
+## 12. Diseño estratégico del Blueprint: cerrado
 
-La fase de diseño estratégico está **cerrada** hasta que la realidad de campo obligue a reabrirla.
+La fase de visión / Asistentes / Checks del Blueprint está **cerrada** como diseño especulativo.
 
-No abrir nuevos documentos de estrategia «por si acaso».
+Siguiente construcción documental (no es reabrir brainstorming de features):
 
-Siguiente trabajo: **observar** ([FIRST_OBSERVATION_DAY](../16-operational-discovery/FIRST_OBSERVATION_DAY.md)).
+> **Operational Model** — lenguaje permanente de objetos ([docs/17-operational-model/](../17-operational-model/README.md)).
 
-Rol en campo: etnógrafo de operaciones — no confirmar ideas; descubrir en qué se equivoca el modelo.
+Observation en EatClean **valida** ese lenguaje.  
+No pantallas ni Capabilities inventadas en esta fase.
 
-Los PRs grandes deberían contar **valor operativo**, no solo evolución técnica.
+Los PRs grandes deberían contar **valor operativo** (modelo · jornada · findings · Checks).
 
 ---
 
@@ -181,6 +182,7 @@ Los PRs grandes deberían contar **valor operativo**, no solo evolución técnic
 
 - [PRODUCT_VISION.md](./PRODUCT_VISION.md)
 - [OPERATIONAL_CHECKS.md](./OPERATIONAL_CHECKS.md)
+- [Operational Model](../17-operational-model/README.md)
 - [OPERATIONS_DASHBOARD.md](./OPERATIONS_DASHBOARD.md) — Centro de Control
 - [Operational Discovery](../16-operational-discovery/README.md)
 - [Filosofía de Producto](../05-architecture/FILOSOFIA_DE_PRODUCTO.md)

@@ -54,7 +54,8 @@ CAPABILITY_ROADMAP
 
 - **Operational Checks** — cómo el producto transforma datos en atención operativa.  
 - **Centro de Control** — superficie principal (no un dashboard de vanity).  
-- **Etapas de adopción** — Digitalizar → Validar → Recomendar → Optimizar.
+- **Etapas de adopción** — Digitalizar → Validar → Recomendar → Optimizar.  
+- **Operational Model** — lenguaje / objetos permanentes ([docs/17-operational-model/](../17-operational-model/README.md)).
 
 Solo tres pilares: FOUNDATION · PRODUCT BLUEPRINT · OPERATIONAL DISCOVERY.
 

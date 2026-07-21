@@ -94,20 +94,23 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-Diseño estratégico ✅ CERRADO  →  Observación EatClean ⏳
+Diseño estratégico Blueprint ✅ CERRADO
+        ↓
+Operational Model (Core Operativo) ⏳
+        ↓
+Observation EatClean (valida el lenguaje)
 ```
 
-> **Dejar de diseñar** hasta que la realidad obligue a reabrir.  
-> Siguiente arquitecto: **EatClean**. Rol en campo: etnógrafo de operaciones.  
-> Misión de la jornada: ¿qué Checks ya existen solo en la cabeza de las personas?  
-> Éxito del día: N Checks implícitos — no «hay que desarrollar X».  
-> Unidad mínima operativa: **Operational Check**.  
+> **FASE 4 — YourMeal Operational Model:** ¿qué objetos existen en cualquier negocio de comida preparada?  
+> No es Core DDD ni cuarto pilar: es el diccionario operativo ([docs/17-operational-model/](./docs/17-operational-model/README.md)).  
+> Observation sigue siendo el juez: valida / ajusta / amplía — no reinventar en brainstorming.  
+> Unidad mínima de valor: **Operational Check**.  
 > Lemas: evidencia → abstracción · ¿qué pregunta elimina? · no mostramos datos, confirmamos que la operación puede continuar.  
-> **No hay cuarto pilar.** No abrir docs de estrategia sin evidencia que lo fuerce.
+> Sin pantallas / APIs / código en esta fase de modelo.
 
-**Objetivo:** [FIRST_OBSERVATION_DAY](./docs/16-operational-discovery/FIRST_OBSERVATION_DAY.md) · Integration/UI Dish solo en paralelo (Capability ya validada).
+**Objetivo:** completar y endurecer el Operational Model v0.1 · [FIRST_OBSERVATION_DAY](./docs/16-operational-discovery/FIRST_OBSERVATION_DAY.md) en paralelo.
 
-Índices: [Discovery](./docs/16-operational-discovery/README.md) · [Checks](./docs/15-product/OPERATIONAL_CHECKS.md) · [Estado](./docs/00-status/README.md)
+Índices: [Operational Model](./docs/17-operational-model/README.md) · [Checks](./docs/15-product/OPERATIONAL_CHECKS.md) · [Discovery](./docs/16-operational-discovery/README.md) · [Estado](./docs/00-status/README.md)
 
 ### Principio de valor (Capabilities)
 
