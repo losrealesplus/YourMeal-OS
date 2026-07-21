@@ -152,4 +152,5 @@ Conflictos con `.lovable/plan.md` → **gana `docs/`**.
 - [Domain Done](./docs/12-domain-model/DOMAIN_DONE.md)
 - [Repository Guidelines](./docs/13-repositories/REPOSITORY_GUIDELINES.md)
 - [DishRepository (contrato)](./docs/13-repositories/DishRepository.md)
+- [Application Guidelines](./docs/14-application/APPLICATION_GUIDELINES.md)
 - [Architecture Review](./docs/05-architecture/architecture-review.md) (histórico — ya aprobado)

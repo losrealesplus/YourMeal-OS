@@ -53,23 +53,23 @@ A partir de aquí no rediseñamos la forma de construir salvo ADR. Foundation si
 4. Repository Guidelines          ✅
 5. DishRepository.md (contrato)   ✅
 6. DishRepository.ts (interface)  ✅
-7. Application Layer Guidelines   ⏳  ← siguiente
-8. Application Service / Use Cases
-9. Infrastructure Adapter (Supabase…)
-10. Persistence
-11. Integration Tests
-12. Ingredient Library
-13. Recipe Builder
-14. UI
+7. Application Layer Guidelines   ✅
+8. DishApplication.md / Service   ⏳  ← siguiente
+9. Use Cases
+10. Infrastructure Adapter (Supabase…)
+11. Persistence
+12. Integration Tests
+13. Ingredient Library
+14. Recipe Builder
+15. UI
 ```
 
 **Meta de la fase:** terminar un catálogo de platos sólido, no una pantalla bonita.
 
-**Orden Repository (misma disciplina que Dish):**
+**Orden Application (misma disciplina):**
 
 ```text
-REPOSITORY_GUIDELINES → DishRepository.md → DishRepository.ts ✅
-  → Application Guidelines → Service → SupabaseDishRepository → … → UI
+APPLICATION_GUIDELINES ✅ → DishApplication.md ⏳ → Application Service → …
 ```
 **Segundo gran principio a validar:** el Core permanece estable; la infraestructura se adapta al dominio.
 Luego, con la misma disciplina: **Ingredient** → **Recipe**.

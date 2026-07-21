@@ -128,6 +128,12 @@ Not inside the entity. Keep entities small and easy to understand.
 
 **Detailed standard (YourMeal OS):** [`docs/13-repositories/REPOSITORY_GUIDELINES.md`](./docs/13-repositories/REPOSITORY_GUIDELINES.md)
 
+### Application Orchestration
+
+> The Application layer does not make business decisions. It coordinates decisions made by the domain. The less business knowledge lives in Application, the stronger the Core.
+
+**Detailed standard (YourMeal OS):** [`docs/14-application/APPLICATION_GUIDELINES.md`](./docs/14-application/APPLICATION_GUIDELINES.md)
+
 ---
 
 ## Cambios

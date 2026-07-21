@@ -23,6 +23,7 @@
 | [Domain Done](./12-domain-model/DOMAIN_DONE.md) | DoD del dominio (sin infra/UI) |
 | [Repository Guidelines](./13-repositories/REPOSITORY_GUIDELINES.md) | Estándar de repositorios del Core |
 | [DishRepository](./13-repositories/DishRepository.md) | Contrato de dominio Dish (docs) |
+| [Application Guidelines](./14-application/APPLICATION_GUIDELINES.md) | Estándar de la capa de Aplicación |
 | [Capability Matrix](./09-security/CAPABILITY_MATRIX.md) | AuthZ |
 | [ADRs](./adr/README.md) | Decisiones |
 | [Roadmap](./roadmap/README.md) | Secuencia |

@@ -66,10 +66,10 @@ Foco: del **metamodelo** al **dominio del negocio**, con fronteras de persistenc
 
 **Dish:** Domain Done — no ampliar comportamiento (evitar superentidad).
 
-**Hecho (capa Repository):** Guidelines · `DishRepository.md` · `DishRepository.ts` (contrato puro).
+**Hecho (Application):** [APPLICATION_GUIDELINES.md](../14-application/APPLICATION_GUIDELINES.md) — orquestación, no negocio.
 
-**Próximo paso:** Application Layer Guidelines → DishApplicationService — sin UI todavía.  
-No reinventar metodología: la secuencia ya está fijada.
+**Próximo paso:** documentar casos de uso de Dish (`DishApplication.md`) → Application Service — sin UI.  
+El `DishService` legado deberá alinearse al estándar; no lo redefine.
 
 ## Misión v0.1
 
