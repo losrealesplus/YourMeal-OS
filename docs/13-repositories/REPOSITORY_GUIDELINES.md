@@ -59,6 +59,62 @@ El contrato se **modela** antes de implementarse.
 
 ---
 
+## Repository Contract Pattern
+
+Antes de tipar un repositorio concreto, distinguir:
+
+### Operaciones comunes (patrón implícito del Core)
+
+La mayoría de agregados compartirán, en espíritu, operaciones como:
+
+| Operación (ubicua) | Intención |
+|--------------------|-----------|
+| `save` | Persistir el agregado |
+| `findById` | Recuperar por identidad (ámbito Organización) |
+| `exists…` | Comprobar existencia cuando el dominio lo necesite |
+| `listNotArchived` / equivalente | Listar no archivados para flujos normales |
+| `findByIdIncludingArchived` | Recuperar también archivados (restore / trazabilidad) |
+
+Esto es un **contrato común implícito**: una guía de consistencia entre módulos.
+
+### Operaciones específicas del agregado
+
+Cada repositorio añade **solo** lo que su dominio exige. Ejemplos:
+
+- `existsByName(tenant, DishName)` → Dish
+- `findByRecipe(...)` → quizá Recipe
+- `findPendingProduction(...)` → Production
+
+### Qué no hacemos (aún)
+
+No introducir una interfaz base obligatoria del tipo:
+
+```text
+BaseRepository<T>
+```
+
+ni genéricos «por si acaso».
+
+Si en el futuro un genérico aporta valor real medible, se justificará con ADR. Hasta entonces: **patrón documentado, contratos explícitos por agregado**.
+
+---
+
+## Archive vs Purge
+
+| Concepto | Dónde vive | Qué es |
+|----------|------------|--------|
+| **Archive** | **Dominio** (`dish.archive()` + luego `save`) | Soft delete / retiro de negocio. Operación habitual. |
+| **Restore** | **Dominio** (`dish.restore()` + luego `save`) | Reversión del archive. |
+| **Purge** | **Contrato de repositorio + Application** | Borrado físico excepcional (cumplimiento, limpieza controlada, SaaS Admin). |
+
+Reglas:
+
+- Nadie debe usar `purge` como sustituto de `archive`.
+- El repositorio **no** decide archivar: persiste el estado que el dominio ya cambió, o ejecuta `purge` solo cuando Application lo ordena tras autorización.
+- Si un contrato incluye `purge`, debe etiquetarse explícitamente como **excepción**.
+
+---
+
 ## Responsabilidades
 
 ### Qué puede hacer
@@ -193,9 +249,12 @@ La infraestructura depende del Core.
 
 ## Soft Delete y persistencia
 
-- El dominio habla de `archive` / `restore` / `purge`.
-- El repositorio persiste el estado del agregado; no inventa semántica de borrado.
-- `purge` (hard delete) solo existe si el contrato de dominio lo exige y Application lo autoriza (SaaS Admin).
+Ver sección **Archive vs Purge** más arriba.
+
+Resumen:
+
+- Archive / restore = dominio + `save`.
+- Purge = excepción operativa; nunca el camino por defecto.
 
 ---
 

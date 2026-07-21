@@ -33,7 +33,8 @@ Module 01 · Dish Library
   Domain Done (Dish)               ✅
   Repository Guidelines            ✅
   DishRepository.md                ✅
-  DishRepository.ts                ⏳  ← siguiente
+  DishRepository.ts                ✅
+  Application Guidelines           ⏳  ← siguiente
   Application / Infra / UI         ⏳
 ```
 
@@ -65,9 +66,10 @@ Foco: del **metamodelo** al **dominio del negocio**, con fronteras de persistenc
 
 **Dish:** Domain Done — no ampliar comportamiento (evitar superentidad).
 
-**Hecho (capa Repository docs):** [REPOSITORY_GUIDELINES.md](../13-repositories/REPOSITORY_GUIDELINES.md) · [DishRepository.md](../13-repositories/DishRepository.md)
+**Hecho (capa Repository):** Guidelines · `DishRepository.md` · `DishRepository.ts` (contrato puro).
 
-**Próximo paso:** `DishRepository.ts` (interface del dominio) — sin Supabase todavía.
+**Próximo paso:** Application Layer Guidelines → DishApplicationService — sin UI todavía.  
+No reinventar metodología: la secuencia ya está fijada.
 
 ## Misión v0.1
 

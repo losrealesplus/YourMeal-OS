@@ -2,7 +2,7 @@
 
 **Agregado:** Dish  
 **Módulo:** Dish Library (Module 01)  
-**Estado del documento:** 🚧 Contrato modelado — pendiente de interface TypeScript  
+**Estado del documento:** ✅ Contrato tipado — `DishRepository.ts` existe; adaptador pendiente  
 **Código:** inglés · **Docs:** español
 
 Estándar: [REPOSITORY_GUIDELINES.md](./REPOSITORY_GUIDELINES.md)  
@@ -28,63 +28,100 @@ No define Supabase.
 
 ---
 
-## Operaciones del contrato (lenguaje ubicuo)
+## Patrón vs específico
 
-### Guardar
+| Origen | Operaciones en este contrato |
+|--------|------------------------------|
+| **Común (patrón Core)** | `save`, `findById`, `listNotArchived`, `findByIdIncludingArchived`, `purge` (excepción) |
+| **Específico de Dish** | `existsByName` |
 
-Persistir un `Dish` (alta o actualización del agregado completo según política de Application).
+---
 
-- Entrada: `Dish`
-- Salida: void (o el mismo `Dish` si el dominio lo exige más adelante — por defecto void)
+## Checklist previo al TypeScript
 
-### Obtener por identidad
+| Pregunta | Respuesta |
+|----------|-----------|
+| ¿Qué necesita el dominio? | Persistir Dish; recuperar por id; unicidad de nombre; listar no archivados; recuperar archivados para restore; purge excepcional |
+| ¿Qué nunca hará el repositorio? | Validar negocio, RBAC, transiciones, transacciones, SQL, DTOs |
+| ¿Qué devuelve cada operación? | Ver tabla de operaciones |
+| ¿Qué errores puede producir? | Fallos de infraestructura (propagados por la implementación). El contrato de dominio no define Domain Errors de negocio — esos viven en entidad / Application |
+| ¿Qué es obligatorio para este agregado? | Las operaciones listadas abajo |
+| ¿Qué pertenece a otros niveles? | Archive/restore (dominio); autorización purge (Application); mapping filas (Infrastructure) |
 
-Recuperar un `Dish` por `DishId` dentro de la Organización.
+---
 
-- Entrada: `TenantId`, `DishId`
-- Salida: `Dish | null`
+## Operaciones del contrato
 
-### Comprobar existencia por nombre
+### `save` — Guardar *(común)*
 
-Saber si ya existe un Dish con un `DishName` en la Organización (soporta la invariante de unicidad **fuera** de la entidad).
+Persistir un `Dish` (alta o actualización del agregado).
 
-- Entrada: `TenantId`, `DishName`
-- Salida: `boolean`
+| | |
+|--|--|
+| Entrada | `Dish` |
+| Salida | `Promise<void>` |
+| Errores | Fallos de persistencia (infra). No valida invariantes del Dish. |
+| Notas | Tras `archive` / `restore` / `activate` en dominio, Application llama `save`. |
 
-> La regla de unicidad vive en Domain / Application Service. El repositorio solo responde al hecho de existencia.
+### `findById` — Obtener por identidad *(común)*
 
-### Listar operativos / no archivados
+Recuperar un `Dish` no archivado por `DishId` dentro de la Organización.
 
-Obtener los Dish de la Organización disponibles para flujos normales (no archivados), ordenados de forma estable por nombre.
+| | |
+|--|--|
+| Entrada | `TenantId`, `DishId` |
+| Salida | `Promise<Dish \| null>` |
+| Errores | Infra. `null` = no encontrado o archivado (según política de listado activo). |
 
-- Entrada: `TenantId`
-- Salida: `Dish[]`
+### `existsByName` — Existencia por nombre *(específico Dish)*
 
-### Buscar incluyendo archivados (por identidad)
+¿Existe ya un Dish con ese `DishName` en la Organización?
 
-Recuperar un Dish aunque esté archivado (necesario para `restore` y auditoría operativa).
+| | |
+|--|--|
+| Entrada | `TenantId`, `DishName` |
+| Salida | `Promise<boolean>` |
+| Errores | Infra. |
+| Notas | La **regla** de unicidad la aplica Application/Domain Service. El repo solo responde el hecho. |
 
-- Entrada: `TenantId`, `DishId`
-- Salida: `Dish | null`
+### `listNotArchived` — Listar no archivados *(común)*
 
-### Purge (excepción)
+Dish de la Organización disponibles para flujos normales, orden estable por nombre.
 
-Eliminar físicamente un Dish. Solo cuando Application lo ordene tras capabilities de SaaS Admin.
+| | |
+|--|--|
+| Entrada | `TenantId` |
+| Salida | `Promise<Dish[]>` |
+| Errores | Infra. Lista vacía si no hay resultados. |
 
-- Entrada: `TenantId`, `DishId`
-- Salida: void
+### `findByIdIncludingArchived` — Incluyendo archivados *(común)*
 
-> No es la operación habitual. El dominio preferirá `archive`.
+Necesario para `restore` y operaciones sobre historial.
+
+| | |
+|--|--|
+| Entrada | `TenantId`, `DishId` |
+| Salida | `Promise<Dish \| null>` |
+| Errores | Infra. |
+
+### `purge` — Borrado físico *(común como excepción; no habitual)*
+
+Eliminar físicamente un Dish.
+
+| | |
+|--|--|
+| Entrada | `TenantId`, `DishId` |
+| Salida | `Promise<void>` |
+| Errores | Infra. Application debe haber comprobado capabilities (SaaS Admin). |
+| **Prohibido** | Usar como sustituto de `archive`. Archive = dominio + `save`. |
 
 ---
 
 ## Qué no incluye este contrato (aún)
 
-Diferido conscientemente (no inventar por pantalla):
-
-- Búsqueda full-text / filtros de UI (categoría, tags, precio) — se añadirán cuando un caso de uso de dominio lo exija.
-- Paginación genérica de infraestructura — solo si el dominio/Application lo modela.
-- «Eliminar» como sinónimo de archive — no existe; archive es operación de dominio sobre la entidad, luego `save`.
+- Filtros de UI (categoría, tags, precio, full-text).
+- Paginación genérica de infraestructura.
+- Método `delete` / `archive` en el repositorio — archive es del dominio.
 
 ---
 
@@ -108,7 +145,7 @@ Nunca: DTO, JSON, `Tables<"dishes">`, filas SQL.
 | Persistir / reconstituir `Dish` | Validar `DishName`, precios, etc. |
 | Responder existencia por nombre | Decidir activate / archive |
 | Filtrar por tenant | Comprobar RBAC |
-| | Abrir transacciones |
+| Ejecutar `purge` cuando Application lo ordene | Abrir transacciones |
 | | Conocer Supabase |
 
 ---
@@ -127,22 +164,28 @@ El contrato se llamará siempre `DishRepository`.
 ## Definition of Done de este documento
 
 - [x] Necesidades del dominio expresadas en lenguaje ubicuo
+- [x] Patrón común vs operaciones específicas documentado
+- [x] Archive vs purge clarificado
 - [x] Alineado con REPOSITORY_GUIDELINES
 - [x] Sin SQL ni proveedor
-- [ ] Interface TypeScript `DishRepository.ts` (siguiente paso)
+- [x] Checklist previo al TS respondido
+- [x] Interface TypeScript `DishRepository.ts`
 - [ ] Adaptador Supabase (posterior)
-- [ ] Tests del adaptador / integración (posterior)
 
 ---
 
 ## Siguiente paso
 
 ```text
-DishRepository.md     ✅ (este documento)
+DishRepository.md     ✅
         ↓
-DishRepository.ts     ⏳  interface del dominio
+DishRepository.ts     ✅
         ↓
-Application Service
+Application Layer Guidelines
+        ↓
+DishApplicationService
+        ↓
+Use Cases
         ↓
 SupabaseDishRepository
 ```

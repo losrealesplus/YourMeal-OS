@@ -52,14 +52,15 @@ A partir de aquí no rediseñamos la forma de construir salvo ADR. Foundation si
 3. Entidad Dish (Domain Done)     ✅
 4. Repository Guidelines          ✅
 5. DishRepository.md (contrato)   ✅
-6. DishRepository.ts (interface)  ⏳  ← siguiente
-7. Application Service / Use Cases
-8. Infrastructure Adapter (Supabase…)
-9. Persistence
-10. Integration Tests
-11. Ingredient Library
-12. Recipe Builder
-13. UI
+6. DishRepository.ts (interface)  ✅
+7. Application Layer Guidelines   ⏳  ← siguiente
+8. Application Service / Use Cases
+9. Infrastructure Adapter (Supabase…)
+10. Persistence
+11. Integration Tests
+12. Ingredient Library
+13. Recipe Builder
+14. UI
 ```
 
 **Meta de la fase:** terminar un catálogo de platos sólido, no una pantalla bonita.
@@ -67,10 +68,9 @@ A partir de aquí no rediseñamos la forma de construir salvo ADR. Foundation si
 **Orden Repository (misma disciplina que Dish):**
 
 ```text
-REPOSITORY_GUIDELINES → DishRepository.md → DishRepository.ts
-  → Application → SupabaseDishRepository → … → UI
+REPOSITORY_GUIDELINES → DishRepository.md → DishRepository.ts ✅
+  → Application Guidelines → Service → SupabaseDishRepository → … → UI
 ```
-
 **Segundo gran principio a validar:** el Core permanece estable; la infraestructura se adapta al dominio.
 Luego, con la misma disciplina: **Ingredient** → **Recipe**.
 

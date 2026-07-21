@@ -33,8 +33,8 @@ Luego: **Ingredient** → **Recipe** con la misma disciplina y el mismo [DOMAIN_
 | Validación metodológica | ✅ |
 | Repository Guidelines | ✅ |
 | DishRepository.md | ✅ |
-| DishRepository.ts | ⏳ siguiente |
-| Application / Infra / UI | ⏳ pendiente |
+| DishRepository.ts | ✅ |
+| Application Guidelines | ⏳ siguiente |
 
 Acta: [MILESTONE_VALIDACION_DOMINIO_DISH.md](../00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md)
 
