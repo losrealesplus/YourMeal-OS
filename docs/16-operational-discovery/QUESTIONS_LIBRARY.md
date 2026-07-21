@@ -1,44 +1,44 @@
-# QUESTIONS_LIBRARY — Preguntas recurrentes
+# QUESTIONS_LIBRARY — El backlog real del producto
 
-**Tipo:** Operational Discovery  
-**Fuente:** Operational Findings + observación en EatClean  
-**Uso:** cada pregunta es candidata a ser eliminada por un Asistente
+## Propósito
 
-> El producto no se mide por pantallas.  
-> Se mide por **preguntas que dejan de hacerse**.
+Contener **preguntas**, no funcionalidades.
 
----
+Cada Capability futura debería eliminar al menos una pregunta de esta biblioteca.
 
-## Cómo usar esta biblioteca
+## Alcance
 
-| Campo | Significado |
-|-------|-------------|
-| Pregunta | Exactamente como la formula la gente en cocina |
-| Frecuencia | Estimada o contada (p. ej. 17× / semana) |
-| Momento | Ver [MOMENTOS_DE_DECISION.md](../15-product/MOMENTOS_DE_DECISION.md) |
-| Findings | OF-xxx que la sustentan |
-| Asistente | Quién debería eliminarla |
-| Estado | Hipótesis · Observada · Recurrente · Cubierta |
+Preguntas oídas o inferidas de Findings en operación real.
 
----
+## Estructura
 
-## Catálogo (semilla — validar en campo)
+| Pregunta | Quién la hace | Frecuencia | Momento | Findings | Estado |
+|----------|---------------|------------|---------|----------|--------|
+| … | … | Muy alta / Alta / Diaria / … | … | OF-… | Hipótesis / Validada / Cubierta |
 
-| Pregunta | Momento | Asistente | Findings | Estado |
-|----------|---------|-----------|----------|--------|
-| ¿Qué toca ahora? | Producción | Production Assistant | — | Hipótesis |
-| ¿Qué lleva esta bolsa? | Packaging | Packaging Assistant | OF-001 | Ejemplo |
-| ¿Cuál es mi siguiente entrega? | Reparto | Delivery Assistant | — | Hipótesis |
-| ¿Qué debo dejar preparado antes de irme? | Cierre | Closing Assistant | — | Hipótesis |
-| ¿Qué debo comprar hoy? | Cierre / compras | Purchasing Assistant | — | Hipótesis |
-| ¿Este pedido está pagado? | Reparto / admin | Delivery / Admin | — | Hipótesis |
-| ¿Qué platos ya usamos? | Menú | Menu Assistant | — | Hipótesis |
-| ¿Cómo vamos? | Todo el día | Operations Dashboard | — | Hipótesis |
+**Estados**
 
-Tras una semana de observación, las filas deben llevar **frecuencia** y OF enlazados. Sin eso, siguen siendo hipótesis.
+- **Hipótesis** — intuición o Blueprint; sin OF suficientes  
+- **Validada** — evidencia repetida  
+- **Cubierta** — un Asistente / Capability en producción la elimina (marcar cuándo)
 
----
+## Reglas
 
-## Regla
+- No escribir «módulo de X». Escribir la pregunta tal como la formula la gente.  
+- Sin frecuencia + Findings → no priorizar desarrollo.
 
-Si una pregunta aparece muchas veces y no tiene Asistente claro → actualizar Product Blueprint primero, no inventar Capability.
+## Criterios de actualización
+
+Cada vez que un OF aporte o refuerce una pregunta.
+
+## Ejemplos (semilla — validar en campo)
+
+| Pregunta | Quién la hace | Frecuencia | Estado |
+|----------|---------------|------------|--------|
+| ¿Qué cocino ahora? | Cocina | Muy alta (hipótesis) | Hipótesis |
+| ¿Qué debo descongelar? | Cocina | Alta (hipótesis) | Hipótesis |
+| ¿Está pagado? | Repartidor | Alta (hipótesis) | Hipótesis |
+| ¿Qué falta comprar? | Compras | Diaria (hipótesis) | Hipótesis |
+| ¿Qué lleva esta bolsa? | Packaging | Alta | Ejemplo (OF-001) |
+
+Cuando la evidencia lo permita, cambiar «Hipótesis» → «Validada» y rellenar Findings.

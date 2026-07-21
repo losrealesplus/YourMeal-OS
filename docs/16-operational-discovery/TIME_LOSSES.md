@@ -1,45 +1,38 @@
-# TIME_LOSSES — Dónde se pierden minutos
+# TIME_LOSSES — Minutos perdidos
 
-**Tipo:** Operational Discovery  
-**Métrica principal del producto:** tiempo (ver [PRODUCT_PRINCIPLES.md](../15-product/PRODUCT_PRINCIPLES.md))
+## Propósito
 
-No es un timesheet de RR. HH.
+Medir **tiempo**, no solo errores.  
+Aquí empieza el ROI del producto.
 
-Es el mapa de **minutos operativos** que YourMeal OS debería recuperar.
+## Alcance
 
----
+Minutos operativos recuperables (buscar, preguntar, rehacer, esperar, memoria fallida).
 
-## Categorías
+## Estructura
 
-| Categoría | Ejemplos |
-|-----------|----------|
-| Preguntar / buscar a alguien | Llamar al gerente, preguntar al compañero |
-| Buscar información | Abrir bolsas, revisar papel, WhatsApp |
-| Rehacer | Etiqueta mal, bolsa incompleta, ruta equivocada |
-| Esperar | Bloqueo por descongelado, por pago, por pedido sin cerrar |
-| Memoria fallida | Olvidar descongelar, olvidar cobro |
+| Situación | Minutos | Veces/día | Impacto | OF | Área |
+|-----------|---------|-----------|---------|-----|------|
+| … | … | … | Alto/Medio/Bajo | … | … |
 
----
+Opcional semanal: total estimado de minutos × personas afectadas.
 
-## Registro (plantilla)
+## Reglas
 
-| Fecha | Lugar | Qué pasó | Minutos (est.) | Categoría | OF | Notas |
-|-------|-------|----------|----------------|-----------|-----|-------|
-| — | — | — | — | — | — | Primera jornada real pendiente |
+- Estimaciones honestas; si es duda, rangos.  
+- No inventar filas «para llenar».  
+- Vincular a Findings cuando sea posible.
 
----
+## Criterios de actualización
 
-## Agregados (llenar con evidencia)
+Tras jornadas de observación o muestreos cronometrados.
 
-| Semana | Preguntas / búsqueda | Rehacer | Esperas | Total estimado |
-|--------|----------------------|---------|---------|----------------|
-| — | — | — | — | — |
+## Ejemplos (plantilla — sustituir con datos reales)
 
-Cuando un patrón acumula minutos de forma clara, alimenta priorización del Asistente correspondiente — no al revés.
+| Situación | Minutos | Veces/día | Impacto |
+|-----------|---------|-----------|---------|
+| Buscar pedidos | 12 | 8 | Alto *(ejemplo)* |
+| Confirmar pagos | 3 | 15 | Alto *(ejemplo)* |
+| Rehacer etiquetas | 6 | 5 | Medio *(ejemplo)* |
 
----
-
-## Relacionado
-
-- [OPERATIONAL_FINDINGS.md](./OPERATIONAL_FINDINGS.md)
-- [OPERATIONS_DASHBOARD.md](../15-product/OPERATIONS_DASHBOARD.md)
+Marcar filas de ejemplo hasta la primera medición real.

@@ -1,26 +1,53 @@
 # Operational Discovery
 
-**Etapa:** observar antes de desarrollar  
-**Puente:** realidad operativa (EatClean) → Product Blueprint → Capabilities  
-**No es:** Foundation · Product Blueprint · código
+**Tercer pilar documental de YourMeal OS**
 
 | Pilar | Pregunta |
 |-------|----------|
-| FOUNDATION | ¿Cómo construimos? |
-| PRODUCT BLUEPRINT | ¿Qué construimos y por qué? |
-| **OPERATIONAL DISCOVERY** | **¿Qué demuestra la cocina que debemos construir?** |
+| [FOUNDATION](../../FOUNDATION.md) | ¿Cómo construimos? |
+| [PRODUCT BLUEPRINT](../15-product/README.md) | ¿Qué construimos y por qué? |
+| **OPERATIONAL DISCOVERY** | **¿Por qué evolucionar el producto?** *(qué hemos aprendido observando)* |
 
 ---
 
-## Objetivo
+## Misión
 
-No desarrollar.
+Capturar evidencia objetiva de cómo trabajan las Organizaciones para que la evolución de YourMeal OS esté guiada por la **realidad operativa** y no por hipótesis.
 
-**Observar.**
+---
 
-Regla:
+## Qué es / qué no es
 
-> **Ninguna Capability nueva entra en desarrollo hasta que exista evidencia operativa suficiente de que elimina una pregunta recurrente o una decisión repetitiva.**
+Operational Discovery **no** diseña el producto.
+
+**Observa** la operación.
+
+Cada documento recoge evidencia obtenida durante el trabajo diario de clientes reales.
+
+La evolución de YourMeal OS deberá justificarse mediante evidencia documentada en esta carpeta.
+
+### Principio rector
+
+```text
+Primero observar.
+Después comprender.
+Después diseñar.
+Después implementar.
+```
+
+### Regla de oro
+
+> **Operational Discovery nunca contiene soluciones. Solo evidencia.**
+
+Las soluciones viven en Product Blueprint o en las Capabilities.
+
+Este espacio responde una sola pregunta:
+
+> **¿Qué hemos aprendido observando la operación?**
+
+### Disciplina de producto
+
+> **En YourMeal OS no implementamos ideas. Implementamos conocimiento validado.**
 
 ---
 
@@ -28,54 +55,60 @@ Regla:
 
 | Documento | Propósito |
 |-----------|-----------|
-| [OPERATIONAL_FINDINGS.md](./OPERATIONAL_FINDINGS.md) | Observaciones numeradas (OF-xxx) |
-| [QUESTIONS_LIBRARY.md](./QUESTIONS_LIBRARY.md) | Preguntas recurrentes detectadas en campo |
-| [TIME_LOSSES.md](./TIME_LOSSES.md) | Dónde se pierden minutos |
-| [REPEATED_DECISIONS.md](./REPEATED_DECISIONS.md) | Decisiones que hoy dependen de memoria / papel / llamadas |
+| [OPERATIONAL_FINDINGS.md](./OPERATIONAL_FINDINGS.md) | Diario de campo (OF-xxx) |
+| [QUESTIONS_LIBRARY.md](./QUESTIONS_LIBRARY.md) | Backlog real: preguntas recurrentes |
+| [TIME_LOSSES.md](./TIME_LOSSES.md) | Minutos perdidos (base del ROI) |
+| [REPEATED_DECISIONS.md](./REPEATED_DECISIONS.md) | Decisiones diarias por memoria / papel |
+| [WORKAROUNDS.md](./WORKAROUNDS.md) | Trucos manuales = oportunidades latentes |
+| [INCIDENTS.md](./INCIDENTS.md) | Errores de operación (no bugs de software) |
+| [VALIDATED_PATTERNS.md](./VALIDATED_PATTERNS.md) | Observaciones repetidas → listos para diseñar |
+| [CAPABILITY_CANDIDATES.md](./CAPABILITY_CANDIDATES.md) | Puente Discovery → Blueprint (sin diseño técnico) |
 
 ---
 
-## Cómo se genera el backlog
+## Flujo
 
 ```text
-Observación en cocina
+Observación
         ↓
-Operational Finding (OF-xxx)
+Operational Finding
         ↓
-Pregunta detectada
+Pregunta / Tiempo / Decisión / Workaround / Incidente
         ↓
-Asistente implicado (Product Blueprint)
+Patrón validado (repetición)
         ↓
-Capability candidata (solo si hay evidencia repetida)
+Capability Candidate
+        ↓
+Product Blueprint / Capability (fuera de esta carpeta)
 ```
-
-Ejemplo:
-
-| Evidencia | Pregunta | Asistente | Capability candidata |
-|-----------|----------|-----------|----------------------|
-| Se olvidó descongelar pollo | ¿Qué debo dejar preparado antes de irme? | Closing Assistant | Production Preparation |
-| Repartidor llamó tres veces | ¿Cuál es mi siguiente entrega? | Delivery Assistant | Route Execution |
-| Se buscó una etiqueta varias veces | ¿Qué lleva esta bolsa? | Packaging Assistant | Packaging Verification |
-
-El roadmap **sale de la cocina**, no de la pizarra.
 
 ---
 
-## Umbral de evidencia (disciplina)
+## Reglas permanentes
 
-| Nivel | Significado | Acción |
-|-------|-------------|--------|
-| 1 observación | Hipótesis | Registrar OF · estado `pendiente` |
-| Varias jornadas / repetición | Señal | Validar · enlazar Asistente |
-| Evidencia suficiente (p. ej. patrón claro en ≥5 hallazgos o consenso de campo) | Necesidad demostrada | Puede entrar a priorización de Capability |
+1. **No registrar opiniones.** Solo observaciones.  
+2. **No diseñar soluciones** aquí.  
+3. **No crear Capabilities desde ideas.**  
+4. **Toda Capability debe estar respaldada por evidencia** en esta carpeta.  
+5. **Una observación aislada no cambia el producto.** Los patrones sí.  
+6. **El cliente siempre tiene razón sobre su problema.** No necesariamente sobre la solución.
 
-El número exacto puede afinarse; lo que no se negocia es: **sin evidencia, no hay desarrollo de Capability nueva**.
+---
+
+## Umbral
+
+| Nivel | Acción |
+|-------|--------|
+| Observación aislada | Finding · estado pendiente |
+| Repetición en varias jornadas | Subir a Questions / Time / Patterns |
+| Patrón validado | Capability Candidate |
+| Candidato priorizado | Diseño en Blueprint · luego implementación |
+
+Ninguna Capability nueva entra en desarrollo sin evidencia operativa suficiente.
 
 ---
 
 ## Relacionado
 
 - [Product Blueprint](../15-product/README.md)
-- [PRODUCT_VISION](../15-product/PRODUCT_VISION.md)
-- [CAPABILITY_ROADMAP](../15-product/CAPABILITY_ROADMAP.md)
 - [Estado](../00-status/README.md)

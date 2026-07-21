@@ -1,38 +1,38 @@
-# REPEATED_DECISIONS — Decisiones que hoy dependen de memoria
+# REPEATED_DECISIONS — Decisiones diarias repetitivas
 
-**Tipo:** Operational Discovery  
-**Idea:** cada decisión repetitiva es una oportunidad de Asistente
+## Propósito
 
-YourMeal OS no sustituye el criterio humano.
+Identificar decisiones que una persona toma **todos los días** y que hoy dependen de memoria, papel o llamadas.
 
-Sustituye la necesidad de **recordar cien cosas** o de **preguntar siempre lo mismo**.
+Si se repiten, el sistema debería **ayudar** (diseño fuera de esta carpeta).
 
----
+## Alcance
 
-## Qué registrar
+Decisiones operativas recurrentes; no decisiones estratégicas de negocio únicas.
 
-Decisiones que hoy se toman con:
+## Estructura
 
-- memoria;
-- papel;
-- WhatsApp / llamadas;
-- «siempre lo hacemos así» sin dato.
+| Decisión | Responsable | Momento | Cómo se decide hoy | Riesgo si falla | OF |
+|----------|-------------|---------|--------------------|-----------------|-----|
+| … | … | … | Memoria / papel / WhatsApp / … | … | … |
 
-| Decisión | Quién | Cuándo (momento) | Cómo se decide hoy | Riesgo si falla | Asistente candidato | OF |
-|----------|-------|------------------|--------------------|-----------------|---------------------|-----|
-| Qué descongelar para mañana | Cocina / gerente | Antes de cerrar | Memoria / costumbre | Retraso producción 04:00 | Closing | — |
-| Orden de cocción del día | Cocina | Antes de empezar | Preguntar / papel | Cuellos de botella | Production | — |
-| Contenido de cada bolsa | Packaging | Packaging | Abrir / recordar | Error de cliente | Packaging | OF-001 |
-| Asignación de rutas | Logística | Antes del reparto | Experiencia | Ruta larga / retraso | Route | — |
-| Cobrar o no en entrega | Repartidor | Durante reparto | Llamar a oficina | Conflicto / pérdida | Delivery | — |
+## Reglas
 
-*(Filas = hipótesis de Product Blueprint. Sustituir «cómo se decide hoy» con evidencia de campo.)*
+- Registrar el **cómo se decide hoy**, no cómo debería decidir el software.  
+- Sin OF o sin repetición → no promover a patrón.
 
----
+## Criterios de actualización
 
-## Umbral
+Cuando se observe la misma decisión en ≥2 jornadas o quede claro que es rutinaria.
 
-Una decisión repetitiva + evidencia en Findings + minutos en Time Losses  
-→ candidata fuerte a Asistente / Capability.
+## Ejemplos (semilla)
 
-Sin esa tripleta, sigue siendo intuición.
+| Decisión | Responsable | Momento |
+|----------|-------------|---------|
+| Qué cocinar primero | Cocina | ~04:00 |
+| Qué comprar | Compras | ~16:00 |
+| Qué ruta dividir | Logística | ~08:00 |
+| Qué descongelar | Cocina / gerente | Antes de cerrar |
+| Qué lleva cada bolsa | Packaging | Packaging |
+
+Completar «cómo se decide hoy» con evidencia de campo.

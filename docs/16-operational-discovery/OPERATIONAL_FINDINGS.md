@@ -1,66 +1,73 @@
-# OPERATIONAL_FINDINGS — Observaciones de campo
+# OPERATIONAL_FINDINGS — Diario de campo
 
-**Tipo:** Operational Discovery  
-**No son:** bugs · ideas de brainstorming · tickets de desarrollo  
-**Sí son:** hechos observados en la operación
+## Propósito
 
-Plantilla por hallazgo:
+Registrar hechos observados en la operación.  
+No ideas. No soluciones. No diseños.
+
+## Alcance
+
+Empresas reales (primera: EatClean). Áreas: producción, packaging, reparto, compras, cierre, admin, etc.
+
+## Estructura (plantilla fija)
 
 ```text
 OF-XXX
+
 Fecha:
-Lugar:          (Packaging | Producción | Reparto | Cierre | …)
-Observación:
+Empresa:
+Área:
+Persona:          (rol; sin datos personales innecesarios)
+
+Observación:      (solo hechos)
+
 Pregunta detectada:
-Tiempo perdido: (estimado)
-Errores / interrupciones: (si aplica)
-Asistente implicado:   (del Product Blueprint; o «por determinar»)
-Capability candidata:  (solo hipótesis)
-Estado:         Pendiente de validar | Validado en más jornadas | Promovido a backlog
+Tiempo aproximado perdido:
+Frecuencia:       (esa jornada / estimada)
+Impacto:          (Alto | Medio | Bajo)
+Evidencia:        (qué se vio / oyó / midió)
+
+Estado:
+  Pendiente | Validada | Descartada
 ```
 
----
+## Reglas
 
-## Catálogo
+- Prohibido proponer pantallas, tablas o Capabilities en este archivo.  
+- Una observación = un OF.  
+- Si reaparece → enlazar en [VALIDATED_PATTERNS.md](./VALIDATED_PATTERNS.md) y actualizar frecuencia en [QUESTIONS_LIBRARY.md](./QUESTIONS_LIBRARY.md).
 
-### OF-001 — Ejemplo de formato (sustituir / archivar tras primera jornada real)
+## Criterios de actualización
+
+Tras cada jornada de observación (o al cierre del día de campo).
+
+## Ejemplos
+
+### OF-001 — Formato (ejemplo ilustrativo hasta evidencia real)
 
 ```text
 OF-001
+
 Fecha: 2026-07-21
-Lugar: Packaging
+Empresa: EatClean (ejemplo de plantilla)
+Área: Packaging
+Persona: Operario de packaging
+
 Observación:
 El operario tuvo que abrir tres bolsas para comprobar qué cliente correspondía.
-Pregunta detectada:
-¿Qué lleva esta bolsa?
-Tiempo perdido:
-~4 minutos
-Asistente implicado:
-Packaging Assistant
-Capability candidata:
-Packaging Verification (hipótesis)
-Estado:
-Pendiente de validar en más jornadas.
-Nota:
-Ejemplo ilustrativo del Product Blueprint. Reemplazar con evidencia real de EatClean.
+
+Pregunta detectada: ¿Qué lleva esta bolsa?
+Tiempo aproximado perdido: ~4 minutos
+Frecuencia: esa secuencia, 1 vez observada (ejemplo)
+Impacto: Medio
+Evidencia: Observación directa (plantilla)
+
+Estado: Pendiente
+Nota: Sustituir / archivar con jornadas reales.
 ```
 
----
+## Índice
 
-## Cómo añadir un finding
-
-1. Observar sin proponer solución de software.  
-2. Escribir solo hechos (qué pasó, cuánto tardó, quién preguntó a quién).  
-3. Extraer la **pregunta** (una).  
-4. Enlazar Asistente del [OPERATIVE_ASSISTANTS.md](../15-product/OPERATIVE_ASSISTANTS.md) si encaja.  
-5. No abrir Capability hasta umbral de evidencia ([README](./README.md)).
-
----
-
-## Índice rápido
-
-| ID | Lugar | Pregunta | Estado |
-|----|-------|----------|--------|
-| OF-001 | Packaging | ¿Qué lleva esta bolsa? | Ejemplo / pendiente |
-
-*(Ampliar conforme avancen las jornadas de observación.)*
+| ID | Empresa | Área | Pregunta | Estado |
+|----|---------|------|----------|--------|
+| OF-001 | EatClean | Packaging | ¿Qué lleva esta bolsa? | Ejemplo / Pendiente |
