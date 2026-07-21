@@ -1,12 +1,14 @@
 # FIRST_OBSERVATION_DAY — Primera jornada observada
 
 **Tipo:** Operational Discovery (checklist de campo)  
-**Fase:** diseño estratégico **cerrado** → observación  
+**Fase:** Blueprint cerrado · Operational Model v0.1 · observación  
 **Rol ese día:** **etnógrafo de operaciones** — no arquitecto · no vendedor · no demos
 
 El siguiente arquitecto es **EatClean**.
 
-No validamos YourMeal OS. No vendemos. No demostramos nada.
+También valida el [Operational Model](../17-operational-model/README.md): ¿faltan objetos? ¿sobran? ¿los nombres coinciden con la cocina?
+
+No validamos pantallas. No vendemos. No demostramos nada.
 
 ---
 
@@ -135,5 +137,6 @@ Además: lista informal de **Checks implícitos oídos** (cita + quién + moment
 ## Relacionado
 
 - [OPERATIONAL_CHECKS.md](../15-product/OPERATIONAL_CHECKS.md) — unidad mínima de valor (diseñar **después**)
+- [Operational Model](../17-operational-model/README.md) — lenguaje a validar / ajustar
 - [README.md](./README.md) — regla de oro: solo evidencia
-- [Estado](../00-status/README.md) — fase de diseño estratégico cerrada
+- [Estado](../00-status/README.md) — FASE 4 Operational Model
