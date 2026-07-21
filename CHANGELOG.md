@@ -67,3 +67,4 @@ La arquitectura de YourMeal OS se considera **estable**.
 - Fundación del dominio: primera validación completada (Foundation permanece vivo)
 - Entidad de dominio `Dish` + tests (`vitest`) — primera validación real de Foundation
 - Acta oficial: `docs/00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md`
+- `DOMAIN_DONE.md` — Definition of Done del dominio (Dish cerrado a nivel de dominio)

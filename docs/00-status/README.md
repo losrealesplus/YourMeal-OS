@@ -60,9 +60,10 @@ Dominio primero (sin UI):
 - [Ingredient.md](../12-domain-model/module-01/Ingredient.md)
 - [Recipe.md](../12-domain-model/module-01/Recipe.md)
 
-**Hecho:** primera validación del dominio mediante entidad `Dish` + tests.
+**Hecho:** Domain Done de `Dish` ([DOMAIN_DONE.md](../12-domain-model/DOMAIN_DONE.md)) + primera validación metodológica.
 
-**Próximo paso:** Repository Interface → Application Service → Infrastructure → UI.
+**Próximo paso:** Repository Interface → Application Service → Infrastructure → UI.  
+No ampliar comportamiento de `Dish` ahora (evitar superentidad).
 
 ## Misión v0.1
 
