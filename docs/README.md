@@ -9,7 +9,8 @@
 | [Estado](./00-status/README.md) | Fase oficial |
 | [Definition of Done](./00-status/DEFINITION_OF_DONE.md) | Checklist de módulo |
 | [Foundation Lock](./05-architecture/FOUNDATION_LOCK.md) | ✅ Cerrado v0.1.0 |
-| [Contexto CTO](./05-architecture/CONTEXTO_CTO.md) | Arranque de sesión Cursor (CTO) |
+| [Contexto estratégico](./05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md) | Dirección empresarial y del Core |
+| [Contexto CTO](./05-architecture/CONTEXTO_CTO.md) | Arranque operativo de sesión Cursor (CTO) |
 | [Cierre de jornada](./05-architecture/CIERRE_DE_JORNADA.md) | Protocolo diario |
 | [Diario de Desarrollo](./99-internal/development-journal/README.md) | Historial del *porqué* |
 | [Module 01 — Dish](./12-domain-model/module-01/Dish.md) | Dominio Dish |

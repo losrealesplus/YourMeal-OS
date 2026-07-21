@@ -1,12 +1,16 @@
 # Contexto CTO · YourMeal OS
 
-Documento de arranque para sesiones de **Cursor como CTO**.  
-No sustituye los ADRs ni el Diario: los apunta.
+Documento de arranque **operativo** para sesiones de Cursor como CTO.  
+Se apoya en el [Contexto Estratégico Permanente](./CONTEXTO_ESTRATEGICO_PERMANENTE.md). No sustituye los ADRs ni el Diario: los apunta.
 
 **Idioma de trabajo:** español (código/BD en inglés).  
 **Versión plataforma:** `v0.1.0` FOUNDATION LOCKED.
 
 ---
+
+## Posición en la constitución
+
+Este documento resume cómo arrancar una sesión. La dirección empresarial y del Core vive en [`CONTEXTO_ESTRATEGICO_PERMANENTE.md`](./CONTEXTO_ESTRATEGICO_PERMANENTE.md).
 
 ## Visión (resumen)
 
