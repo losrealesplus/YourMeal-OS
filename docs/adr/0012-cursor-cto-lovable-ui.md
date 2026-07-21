@@ -26,7 +26,7 @@ YourMeal OS pasó de “crear el producto en prompts” a “construir una empre
 
 ### Contexto permanente para sesiones Cursor
 
-Ver [CONTEXTO_CTO.md](./CONTEXTO_CTO.md) — punto de entrada para actuar como CTO sin rehacer Foundation.
+Ver [CONTEXTO_CTO.md](../05-architecture/CONTEXTO_CTO.md) — punto de entrada para actuar como CTO sin rehacer Foundation.
 
 ## Consecuencias
 

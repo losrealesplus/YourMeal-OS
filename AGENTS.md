@@ -11,6 +11,9 @@
 
 # YourMeal OS — Reglas para agentes
 
+**Primera lectura obligatoria:** [`FOUNDATION.md`](./FOUNDATION.md)  
+**Segunda lectura obligatoria:** `AGENTS.md` + [`docs/05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md`](./docs/05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md) + [`docs/05-architecture/CONTEXTO_CTO.md`](./docs/05-architecture/CONTEXTO_CTO.md)
+
 **Cursor actúa como CTO del proyecto.** Lovable acelera UI.  
 **La documentación es la fuente de verdad; el código la sigue.**  
 Contexto permanente: [`docs/05-architecture/CONTEXTO_CTO.md`](./docs/05-architecture/CONTEXTO_CTO.md) (ADR 0012).
@@ -29,12 +32,14 @@ Registrar en el **Diario de Desarrollo** al terminar (antes de Done).
 
 ## Antes de escribir código
 
-1. [`CONTEXTO_CTO.md`](./docs/05-architecture/CONTEXTO_CTO.md)  
-2. ADRs y docs del módulo  
-3. Modelo de dominio (`docs/12-domain-model/module-01/` si Module 01)  
-4. Código existente de Services/módulos  
-5. Detectar inconsistencias docs ↔ código  
-6. Solo entonces implementar  
+1. [`FOUNDATION.md`](./FOUNDATION.md)  
+2. [`CONTEXTO_ESTRATEGICO_PERMANENTE.md`](./docs/05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md)  
+3. [`CONTEXTO_CTO.md`](./docs/05-architecture/CONTEXTO_CTO.md)  
+4. ADRs y docs del módulo  
+5. Modelo de dominio (`docs/12-domain-model/module-01/` si Module 01)  
+6. Código existente de Services/módulos  
+7. Detectar inconsistencias docs ↔ código  
+8. Solo entonces implementar  
 
 **No rehacer Architecture Review ni Foundation** salvo ADR nuevo. Ya están cerrados (`v0.1.0`).
 
@@ -72,6 +77,7 @@ Conflictos con `.lovable/plan.md` → **gana `docs/`**.
 
 ## Enlaces
 
+- [Contexto estratégico](./docs/05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md)
 - [Contexto CTO](./docs/05-architecture/CONTEXTO_CTO.md)
 - [Diario](./docs/99-internal/development-journal/README.md)
 - [DoD](./docs/00-status/DEFINITION_OF_DONE.md)
