@@ -94,7 +94,7 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-APPLICATION_GUIDELINES ✅ → DishApplication.md ✅ → Use Cases (código) ⏳
+APPLICATION_GUIDELINES ✅ → DISH_USE_CASES.md ✅ → CreateDishUseCase … ⏳
 ```
 
 **Objetivo de Module 01:** materializar el catálogo de platos para EatClean **heredando** el patrón ya validado.
@@ -102,12 +102,12 @@ APPLICATION_GUIDELINES ✅ → DishApplication.md ✅ → Use Cases (código) �
 Orden:
 
 ```text
-DishApplication.md ✅
-  → CreateDish / UpdateDish / ActivateDish / … (código)
-  → Application Tests → SupabaseDishRepository → UI MVP
+DISH_USE_CASES.md ✅
+  → CreateDishUseCase / Update / Activate / … (una clase por UC)
+  → Application Tests → (fachada opcional) → SupabaseDishRepository → UI MVP
 ```
 
-Pensar en **vertical slices** (`CreateDishUseCase`, …), aunque la primera agrupación viva en un servicio.
+La unidad de diseño es el **caso de uso**. Una fachada `DishApplicationService` es opcional y posterior.
 
 > Cada caso de uso = acción que un usuario real comprende. Sin clases ni SQL en la descripción.
 
@@ -153,4 +153,5 @@ Conflictos con `.lovable/plan.md` → **gana `docs/`**.
 - [Repository Guidelines](./docs/13-repositories/REPOSITORY_GUIDELINES.md)
 - [DishRepository (contrato)](./docs/13-repositories/DishRepository.md)
 - [Application Guidelines](./docs/14-application/APPLICATION_GUIDELINES.md)
+- [DISH_USE_CASES](./docs/14-application/DISH_USE_CASES.md)
 - [Architecture Review](./docs/05-architecture/architecture-review.md) (histórico — ya aprobado)

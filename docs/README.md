@@ -24,7 +24,7 @@
 | [Repository Guidelines](./13-repositories/REPOSITORY_GUIDELINES.md) | Estándar de repositorios del Core |
 | [DishRepository](./13-repositories/DishRepository.md) | Contrato de dominio Dish (docs) |
 | [Application Guidelines](./14-application/APPLICATION_GUIDELINES.md) | Estándar de la capa de Aplicación |
-| [DishApplication](./14-application/DishApplication.md) | Casos de uso Dish (cocina) |
+| [DISH_USE_CASES](./14-application/DISH_USE_CASES.md) | Qué puede hacer la cocina con un Dish |
 | [Capability Matrix](./09-security/CAPABILITY_MATRIX.md) | AuthZ |
 | [ADRs](./adr/README.md) | Decisiones |
 | [Roadmap](./roadmap/README.md) | Secuencia |

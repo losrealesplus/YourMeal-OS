@@ -35,42 +35,14 @@ Module 01 · Dish Library
   DishRepository.md                ✅
   DishRepository.ts                ✅
   Application Guidelines           ✅
-  DishApplication.md (casos uso)   ✅
-  Application Service / Use Cases  ⏳  ← siguiente
+  DISH_USE_CASES.md                ✅
+  Use Cases (código)               ⏳  ← siguiente (CreateDishUseCase…)
   Infra / UI                       ⏳
 ```
 
-### Cambio de naturaleza del proyecto
+**Hecho:** [DISH_USE_CASES.md](../14-application/DISH_USE_CASES.md) — comportamientos de cocina, no capas técnicas.
 
-| Hasta Foundation Validation | A partir de ahora |
-|-----------------------------|-------------------|
-| ¿Cómo queremos construir? | ¿Qué necesita realmente una cocina? |
-| ¿Qué reglas tendrá el Core? | ¿Cómo modelamos producción, inventario, pedidos? |
-| ¿Cómo modelamos una entidad? | Materializar negocio con metodología ya demostrada |
-
-**Segunda etapa:** infra se adapta al dominio.  
-**Ahora:** casos de uso de Dish documentados — el producto empieza a hablar el lenguaje de la cocina.
-
-## Constitución (resumen)
-
-| Pilar | Principio |
-|-------|-----------|
-| Arquitectura | Docs + ADRs son la fuente de verdad; **Cursor = CTO**; Lovable = UI |
-| Desarrollo | Español en docs/razonamiento; inglés en código/BD |
-| Calidad | Intencionalidad + Definition of Done + Domain Done |
-| Memoria | Diario de Desarrollo del Proyecto |
-| Foundation | Documento **vivo**; validado, no «cerrado para siempre» |
-| Domain Done | [DOMAIN_DONE.md](../12-domain-model/DOMAIN_DONE.md) |
-| Entity Guidelines | [ENTITY_GUIDELINES.md](../12-domain-model/ENTITY_GUIDELINES.md) |
-
-## Module 01 — ahora
-
-**Dish:** Domain Done — no ampliar comportamiento (evitar superentidad).
-
-**Hecho (Application):** [APPLICATION_GUIDELINES.md](../14-application/APPLICATION_GUIDELINES.md) — orquestación, no negocio.
-
-**Próximo paso:** documentar casos de uso de Dish (`DishApplication.md`) → Application Service — sin UI.  
-El `DishService` legado deberá alinearse al estándar; no lo redefine.
+**Próximo paso:** implementar **UC-001 Crear Dish** como `CreateDishUseCase` (y el resto de UCs). Sin UI. Sin diseñar desde el servicio.
 
 ## Misión v0.1
 

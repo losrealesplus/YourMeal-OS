@@ -46,9 +46,11 @@ Este principio es a Application lo que **Entity Simplicity** es al dominio.
 
 ## Responsabilidad
 
-Un Application Service existe para ejecutar un **caso de uso** del negocio.
+La unidad de diseño es el **caso de uso** (`CreateDishUseCase`, …).
 
-Puede:
+Un Application Service, si existe, es una **fachada opcional** que agrupa casos de uso — no el centro del diseño.
+
+Cada caso de uso puede:
 
 - recuperar entidades mediante Repositories;
 - coordinar varias entidades;
@@ -292,14 +294,15 @@ Un Application Service se considera terminado cuando:
 ```text
 APPLICATION_GUIDELINES
         ↓
-DishApplication.md   (casos de uso — docs)
+DISH_USE_CASES.md   (casos de uso — negocio)
         ↓
-DishApplicationService / use cases (código)
+CreateDishUseCase / … (código — un UC por clase)
         ↓
 SupabaseDishRepository (infra)
 ```
 
-No empezar por código de Application sin el estándar y sin los casos de uso documentados cuando el caso lo merezca.
+No empezar por código de Application sin casos de uso documentados.
+Una fachada `DishApplicationService` es **opcional**; la unidad de diseño es el caso de uso.
 
 ---
 

@@ -38,6 +38,8 @@ Application no existe por sí mismo: existe para ejecutar casos de uso. Diseñar
 
 ```text
 DishApplication.md ✅ → Use Cases / Service → Tests → Supabase → UI MVP
+
+> **Actualización (misma jornada):** supersedido por [DISH_USE_CASES.md](../../14-application/DISH_USE_CASES.md) y la ficha [2026-07-21-dish-use-cases-comportamiento.md](./2026-07-21-dish-use-cases-comportamiento.md). Unidad de diseño = un UC por clase; Application Service solo fachada opcional.
 ```
 
 ## Decisiones tomadas

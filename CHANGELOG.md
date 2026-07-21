@@ -54,7 +54,8 @@ La arquitectura de YourMeal OS se considera **estable**.
 - Repository Contract Pattern (común implícito vs específico; sin BaseRepository genérico)
 - Interface `DishRepository.ts` — primer contrato tipado del Core
 - `APPLICATION_GUIDELINES.md` — estándar de orquestación (Application Orchestration)
-- `DishApplication.md` — casos de uso de Dish (cocina) antes del Application Service
+- `DISH_USE_CASES.md` — catálogo UC-001…UC-008 (comportamiento de negocio + trazabilidad)
+- Un caso de uso por clase (`CreateDishUseCase`, …); fachada Application Service opcional
 - Principio Use Case Clarity en FOUNDATION / Application Guidelines
 ### Gobierno
 

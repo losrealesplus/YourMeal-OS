@@ -70,10 +70,12 @@ A partir de aquí no rediseñamos la forma de construir salvo ADR. Foundation si
 **Orden Application (misma disciplina):**
 
 ```text
-APPLICATION_GUIDELINES ✅ → DishApplication.md ✅ → Use Cases (código) ⏳
+APPLICATION_GUIDELINES ✅ → DISH_USE_CASES.md ✅ → CreateDishUseCase … → Tests → (fachada opcional)
 ```
 
-> Application no existe por sí mismo: existe para ejecutar casos de uso. Primero el negocio; después el servicio.**Segundo gran principio a validar:** el Core permanece estable; la infraestructura se adapta al dominio.
+> Un caso de uso por clase. Application Service solo como fachada opcional. El código implementa el UC, no “un servicio”.
+
+**Segundo gran principio a validar:** el Core permanece estable; la infraestructura se adapta al dominio.
 Luego, con la misma disciplina: **Ingredient** → **Recipe**.
 
 ### Module 02 · Weekly Planning
