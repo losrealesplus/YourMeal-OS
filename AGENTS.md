@@ -12,7 +12,7 @@
 # YourMeal OS — Reglas para agentes
 
 **Primera lectura obligatoria:** [`FOUNDATION.md`](./FOUNDATION.md)  
-**Segunda lectura obligatoria:** `AGENTS.md` + [`docs/05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md`](./docs/05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md) + [`docs/05-architecture/CONTEXTO_CTO.md`](./docs/05-architecture/CONTEXTO_CTO.md)
+**Segunda lectura obligatoria:** `AGENTS.md` + [`docs/05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md`](./docs/05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md) + [`docs/05-architecture/FILOSOFIA_DE_PRODUCTO.md`](./docs/05-architecture/FILOSOFIA_DE_PRODUCTO.md) + [`docs/05-architecture/CONTEXTO_CTO.md`](./docs/05-architecture/CONTEXTO_CTO.md)
 
 **Cursor actúa como CTO del proyecto.** Lovable acelera UI.  
 **La documentación es la fuente de verdad; el código la sigue.**  
@@ -34,14 +34,55 @@ Registrar en el **Diario de Desarrollo** al terminar (antes de Done).
 
 1. [`FOUNDATION.md`](./FOUNDATION.md)  
 2. [`CONTEXTO_ESTRATEGICO_PERMANENTE.md`](./docs/05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md)  
-3. [`CONTEXTO_CTO.md`](./docs/05-architecture/CONTEXTO_CTO.md)  
-4. ADRs y docs del módulo  
-5. Modelo de dominio (`docs/12-domain-model/module-01/` si Module 01)  
-6. Código existente de Services/módulos  
-7. Detectar inconsistencias docs ↔ código  
-8. Solo entonces implementar  
+3. [`FILOSOFIA_DE_PRODUCTO.md`](./docs/05-architecture/FILOSOFIA_DE_PRODUCTO.md)  
+4. [`CONTEXTO_CTO.md`](./docs/05-architecture/CONTEXTO_CTO.md)  
+5. ADRs y docs del módulo  
+6. Modelo de dominio (`docs/12-domain-model/module-01/` si Module 01)  
+7. Código existente de Services/módulos  
+8. Detectar inconsistencias docs ↔ código  
+9. Solo entonces implementar  
 
 **No rehacer Architecture Review ni Foundation** salvo ADR nuevo. Ya están cerrados (`v0.1.0`).
+
+## Pirámide de decisión
+
+Cada nivel responde una pregunta distinta. **Nunca discutir una decisión en un nivel inferior si contradice uno superior.**
+
+```text
+FOUNDATION.md                    → ¿Cómo pensamos?
+AGENTS.md                        → ¿Cómo trabajamos en este proyecto?
+CONTEXTO_ESTRATEGICO…            → ¿Qué empresa estamos construyendo?
+FILOSOFIA_DE_PRODUCTO.md         → ¿Para qué existe el producto y cómo medimos el éxito?
+CONTEXTO_CTO.md                  → ¿Cómo debe evolucionar técnicamente?
+ADRs                             → ¿Por qué tomamos esta decisión?
+ACTORS.md                        → ¿Quiénes actúan en el negocio?
+UBIQUITOUS_LANGUAGE.md           → ¿Cómo nombramos el dominio?
+ENTITY_GUIDELINES.md             → ¿Cómo se modela una entidad?
+Domain Model (Dish.md, …)        → ¿Cómo funciona este concepto de negocio?
+Código (Dish.ts, …)              → ¿Cómo lo implementamos?
+```
+
+> **El código es consecuencia del diseño, no su inicio.**  
+> `Dish.ts` no abre el diseño: lo materializa. Lo mismo valdrá para Recipe, Ingredient, Order y el resto del Core.
+
+Si la implementación contradice el dominio, gana el dominio. Si el dominio contradice un ADR, primero el ADR. Y así hacia arriba.
+
+### Fundación del dominio
+
+```text
+FOUNDATION → AGENTS → Estrategia → Filosofía → Actores
+  → Lenguaje ubicuo → Entity Guidelines → Dish.md → Dish.ts
+```
+
+Estado: **cerrada**. Cómo debe ser una entidad ya no se debate por módulo: se aplica [ENTITY_GUIDELINES.md](./docs/12-domain-model/ENTITY_GUIDELINES.md).
+
+### Pregunta obligatoria (producto)
+
+Antes de aprobar un PR, ADR o feature:
+
+> **¿Hace que una cocina funcione mejor desde el primer día de uso?**
+
+Si no, justificar como inversión para una mejora operativa futura claramente identificada. Ver [Filosofía de Producto](./docs/05-architecture/FILOSOFIA_DE_PRODUCTO.md).
 
 ## Fase actual
 
@@ -49,7 +90,21 @@ Registrar en el **Diario de Desarrollo** al terminar (antes de Done).
 Foundation Lock ✅  →  Module 01 Dish Library 🚧
 ```
 
-Orden: Dish → Ingredient → Recipe → Repos → Services → Rules → Tests → **UI** → CRUD.
+**Objetivo de Module 01:** validar que la constitución funciona (Dish → Ingredient → Recipe sin romper reglas).
+
+Orden de implementación:
+
+```text
+Language → Value Objects → Errors → State Machine → Entity
+  → Repository Interface → Domain Service → Application Service
+  → Tests → Infrastructure → UI
+```
+
+> Modelar antes de implementar. El CRUD es consecuencia, no punto de partida.
+
+### Principio de valor (Module 01+)
+
+> Cada línea de código debe aportar valor a la **Organización actual** (EatClean) o fortalecer el **Core** para Organizaciones futuras. Si no cumple ninguna de las dos, no debería existir.
 
 ## Gobierno
 
@@ -78,8 +133,11 @@ Conflictos con `.lovable/plan.md` → **gana `docs/`**.
 ## Enlaces
 
 - [Contexto estratégico](./docs/05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md)
+- [Filosofía de producto](./docs/05-architecture/FILOSOFIA_DE_PRODUCTO.md)
 - [Contexto CTO](./docs/05-architecture/CONTEXTO_CTO.md)
 - [Diario](./docs/99-internal/development-journal/README.md)
 - [DoD](./docs/00-status/DEFINITION_OF_DONE.md)
 - [Dish](./docs/12-domain-model/module-01/Dish.md)
+- [Actores](./docs/12-domain-model/ACTORS.md)
+- [Entity Guidelines](./docs/12-domain-model/ENTITY_GUIDELINES.md)
 - [Architecture Review](./docs/05-architecture/architecture-review.md) (histórico — ya aprobado)

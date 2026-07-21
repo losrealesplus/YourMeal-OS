@@ -5,12 +5,45 @@
 ## Orden congelado
 
 ```text
-Dish → Ingredient → Recipe
-  → Repositories → Services → Business Rules
-  → Tests → UI → CRUD
+Dish Library
+  ↓
+Language (estructura domain/)
+  ↓
+Value Objects
+  ↓
+Domain Errors
+  ↓
+State Machine
+  ↓
+Entity
+  ↓
+Repository Interface
+  ↓
+Domain Service
+  ↓
+Application Service
+  ↓
+Tests
+  ↓
+Infrastructure
+  ↓
+UI
 ```
 
-## Documentos de dominio (antes de implementar UI)
+Luego: **Ingredient** → **Recipe** con la misma disciplina.
+
+## Estado actual
+
+| Pieza | Estado |
+|-------|--------|
+| Dominio documentado (`Dish.md`) | ✅ |
+| Lenguaje del dominio en código | ✅ |
+| Entidad `Dish` | ✅ |
+| Tests de dominio | ✅ |
+| Repository Interface | ⏳ pendiente |
+| UI / CRUD | ⏳ pendiente |
+
+## Documentos de dominio
 
 | Doc | Concepto |
 |-----|----------|
@@ -18,10 +51,15 @@ Dish → Ingredient → Recipe
 | [Ingredient.md](./module-01/Ingredient.md) | Materia prima |
 | [Recipe.md](./module-01/Recipe.md) | Composición Dish ← Ingredients |
 
-## Primer paso de código
+## Código
 
-Cerrar invariantes de **Dish** en `src/modules/dish-library/domain/` alineados con `Dish.md`.  
-No abrir CRUD ni UI.
+Namespace: `src/modules/dish-library/domain/`
+
+- `value-objects/` — `DishName`, `PortionSize`, `Money`, `Calories`
+- `errors/` — errores de dominio del módulo
+- `types/` — `DishStatus` y mapeos de persistencia
+- `events/` — eventos definidos, no emitidos aún
+- `entities/` — entidad `Dish` (siguiente paso)
 
 ## Diario
 

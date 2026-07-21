@@ -15,6 +15,8 @@
 
 ## Referencias
 
+- [Entity Guidelines](./ENTITY_GUIDELINES.md) — estándar de modelado de entidades
+- [Actores](./ACTORS.md) — roles oficiales del dominio
 - [Lenguaje ubicuo](./UBIQUITOUS_LANGUAGE.md)
 - [Entidades](./ENTITIES.md)
 - [State machines](./STATE_MACHINES.md)
