@@ -114,6 +114,26 @@ No son el argumento de venta principal.
 
 ---
 
+## Identidad técnica del producto
+
+YourMeal OS no hace magia.
+
+Hace **miles de comprobaciones pequeñas y consistentes**.
+
+Eso genera confianza. La confianza permite recomendar. La evidencia acumulada permite optimizar.
+
+| Concepto | Rol |
+|----------|-----|
+| **Operational Checks** | Mecanismo transversal: datos → comprobación → atención → acción |
+| **Centro de Control** | Superficie: estado de la operación (no vanity dashboard) |
+| **Etapas de adopción** | Digitalizar → Validar → Recomendar → Optimizar |
+
+No es un cuarto pilar. Es el comportamiento que deberían compartir casi todas las Capabilities.
+
+Detalle: [OPERATIONAL_CHECKS.md](./OPERATIONAL_CHECKS.md).
+
+---
+
 ## Primer profesor
 
 **EatClean** no es solo el primer cliente.
@@ -143,6 +163,8 @@ Si no elimina una pregunta o no ahorra tiempo real / errores / interrupciones, *
 ## Relacionado
 
 - [PRODUCT_PRINCIPLES.md](./PRODUCT_PRINCIPLES.md)
+- [OPERATIONAL_CHECKS.md](./OPERATIONAL_CHECKS.md)
+- [OPERATIONS_DASHBOARD.md](./OPERATIONS_DASHBOARD.md) — Centro de Control
 - [IDENTIDAD_ASISTENTES_OPERATIVOS.md](./IDENTIDAD_ASISTENTES_OPERATIVOS.md)
 - [EATCLEAN_DIA_OPERATIVO.md](./EATCLEAN_DIA_OPERATIVO.md)
 - [Filosofía de Producto](../05-architecture/FILOSOFIA_DE_PRODUCTO.md)

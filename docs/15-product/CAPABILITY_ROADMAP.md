@@ -25,7 +25,7 @@ Use Cases → Domain → Infra
 | **Purchasing** | Inventory · Suppliers · Orders · Recipe | ⏳ |
 | **Closing** | Inventory · Orders · Production Planning · Incidents | ⏳ |
 | **Menu (Weekly)** | Menu · Nutrition · Dish | Dish ✅ parcial; resto ⏳ |
-| **Operations (Dashboard)** | Orquesta las anteriores | ⏳ (especificación ✅) |
+| **Operations (Centro de Control)** | Orquesta Checks de las anteriores | ⏳ (especificación ✅) |
 
 \* «Customers» en sentido de actores de pedido (Consumidor / Beneficiario / Cuenta Empresa) — ver [ACTORS.md](../12-domain-model/ACTORS.md). No usar «Cliente» ambiguo.
 
@@ -61,7 +61,7 @@ Candidatos frecuentes (sin inventar prioridad cerrada):
 - Production Assistant / cierre de producción del día  
 - Closing / Purchasing (anticipación 18:00)  
 - Packaging Assistant  
-- Operations Dashboard (cuando haya al menos 2–3 fuentes de alerta)
+- Centro de Control (cuando haya al menos 2–3 fuentes de Checks)
 
 ---
 
@@ -71,13 +71,16 @@ Una Capability nueva solo entra si:
 
 1. Un Asistente la necesita para eliminar una pregunta; y  
 2. EatClean (u otra Organización) aporta evidencia; y  
-3. No se puede resolver reutilizando una Capability ya existente.
+3. No se puede resolver reutilizando una Capability ya existente; y  
+4. Puede responder: **¿qué comprueba, por qué, y qué acción permite?** ([Operational Checks](./OPERATIONAL_CHECKS.md)).
 
 ---
 
 ## Relacionado
 
 - [OPERATIVE_ASSISTANTS.md](./OPERATIVE_ASSISTANTS.md)
+- [OPERATIONAL_CHECKS.md](./OPERATIONAL_CHECKS.md)
+- [OPERATIONS_DASHBOARD.md](./OPERATIONS_DASHBOARD.md) — Centro de Control
 - [PRODUCT_VISION.md](./PRODUCT_VISION.md)
 - [DISH_USE_CASES.md](../14-application/DISH_USE_CASES.md)
 - [Estado del proyecto](../00-status/README.md)
