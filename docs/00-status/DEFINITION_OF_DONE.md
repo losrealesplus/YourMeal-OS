@@ -43,4 +43,9 @@ Language → Value Objects → Errors → State Machine → Entity
 Luego: Ingredient → Recipe con la misma disciplina.
 
 Docs de dominio: [module-01/](../12-domain-model/module-01/).  
-Filosofía: [FILOSOFIA_DE_PRODUCTO.md](../05-architecture/FILOSOFIA_DE_PRODUCTO.md).
+Filosofía: [FILOSOFIA_DE_PRODUCTO.md](../05-architecture/FILOSOFIA_DE_PRODUCTO.md).  
+Entidades: [ENTITY_GUIDELINES.md](../12-domain-model/ENTITY_GUIDELINES.md).
+
+## Definition of Done — Entidad
+
+Además del DoD de módulo, cada entidad debe cumplir el checklist de [ENTITY_GUIDELINES.md](../12-domain-model/ENTITY_GUIDELINES.md): identidad, ciclo de vida, invariantes, VOs, errores, eventos, relaciones, tests de dominio. La UI no cierra la entidad.

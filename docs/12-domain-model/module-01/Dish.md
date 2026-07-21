@@ -265,7 +265,7 @@ Estas capacidades **no forman parte del MVP**.
 Dish se considera terminado únicamente cuando existan:
 
 - Dominio definido
-- Entidad implementada
+- Entidad implementada según [ENTITY_GUIDELINES.md](../ENTITY_GUIDELINES.md)
 - Value Objects necesarios
 - Estados implementados
 - Invariantes protegidas

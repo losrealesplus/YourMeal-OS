@@ -42,6 +42,7 @@ Module 01 · Dish Library 🚧
 | Valor (Module 01+) | Código para la Organización (EatClean) o para fortalecer el Core |
 | Filosofía de producto | [FILOSOFIA_DE_PRODUCTO.md](../05-architecture/FILOSOFIA_DE_PRODUCTO.md) — impacto operativo |
 | Actores | [ACTORS.md](../12-domain-model/ACTORS.md) — roles oficiales del dominio |
+| Entity Guidelines | [ENTITY_GUIDELINES.md](../12-domain-model/ENTITY_GUIDELINES.md) — estándar de entidades |
 
 ## Module 01 — ahora
 

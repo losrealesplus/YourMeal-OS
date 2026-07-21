@@ -9,3 +9,9 @@ Implement only after domain language exists:
 - State Machine
 
 Then compose the entity exclusively from those concepts.
+
+**Standard:** [`docs/12-domain-model/ENTITY_GUIDELINES.md`](../../../../../docs/12-domain-model/ENTITY_GUIDELINES.md)
+
+Golden rule before coding:
+
+> ¿Qué representa esta entidad dentro del negocio?

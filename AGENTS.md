@@ -124,4 +124,5 @@ Conflictos con `.lovable/plan.md` → **gana `docs/`**.
 - [DoD](./docs/00-status/DEFINITION_OF_DONE.md)
 - [Dish](./docs/12-domain-model/module-01/Dish.md)
 - [Actores](./docs/12-domain-model/ACTORS.md)
+- [Entity Guidelines](./docs/12-domain-model/ENTITY_GUIDELINES.md)
 - [Architecture Review](./docs/05-architecture/architecture-review.md) (histórico — ya aprobado)

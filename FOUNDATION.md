@@ -120,6 +120,8 @@ Complex validation belongs in:
 
 Not inside the entity. Keep entities small and easy to understand.
 
+**Detailed standard (YourMeal OS):** [`docs/12-domain-model/ENTITY_GUIDELINES.md`](./docs/12-domain-model/ENTITY_GUIDELINES.md)
+
 ---
 
 ## Cambios

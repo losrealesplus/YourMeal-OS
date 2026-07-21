@@ -63,3 +63,4 @@ La arquitectura de YourMeal OS se considera **estable**.
 - Principio Entity Simplicity en `FOUNDATION.md`
 - Filosofía de Producto (`FILOSOFIA_DE_PRODUCTO.md`) — impacto operativo como criterio de éxito
 - Actores oficiales del dominio (`docs/12-domain-model/ACTORS.md`) — fin de «Cliente» ambiguo
+- Entity Guidelines (`docs/12-domain-model/ENTITY_GUIDELINES.md`) — estándar de modelado de entidades
