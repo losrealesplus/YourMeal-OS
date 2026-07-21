@@ -94,44 +94,29 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-FOUNDATION ERA ✅  →  PRODUCT ERA ⏳
-Capability: Dish Management (Core listo)
-  → Integration → UI MVP → EatClean Pilot
+FOUNDATION ERA ✅  →  PRODUCT BLUEPRINT ✅  →  PRODUCT ERA (piloto) ⏳
 ```
 
-**Jerarquía de planificación:**
+**Product Blueprint:** [docs/15-product/README.md](./docs/15-product/README.md)
 
-```text
-Platform → Capabilities → Use Cases → Domain → Infrastructure
-```
-
-El cliente compra **capacidades operativas**, no entidades ni repositorios.
-
-**Etapa:** Product Era — la arquitectura deja de ser el foco; el producto lo ocupa.
-
-**Objetivo actual:** Integration + UI MVP de Dish Management + validar el [día operativo EatClean](./docs/15-product/EATCLEAN_DIA_OPERATIVO.md) en cocina.
+**Objetivo actual:** Integration + UI MVP (Dish) · validar momentos de decisión en cocina · priorizar Asistente por evidencia.
 
 > **Orden:** EatClean → ¿qué necesita? → ¿cómo evoluciona YourMeal OS?
 
-> No construimos pantallas. **Eliminamos preguntas.** Anticipamos.  
-> Misión: la siguiente decisión correcta en el momento adecuado.  
-> **Filtro de diseño:** ¿qué pregunta elimina? (antes que ¿qué tablas?)  
-> Identidad: [Asistentes Operativos](./docs/15-product/IDENTIDAD_ASISTENTES_OPERATIVOS.md)
-
-> Preguntas guía: ¿qué tarda el cocinero? ¿qué desperdicia? ¿qué falta en el servicio? ¿qué necesita EatClean?
+> **Prueba de entrada:** ¿qué pregunta elimina?  
+> **Filtro:** antes que tablas.  
+> Visión: [PRODUCT_VISION.md](./docs/15-product/PRODUCT_VISION.md)
 
 Orden:
 
 ```text
-Infrastructure Validation ✅
+Product Blueprint ✅
   → Integration + UI MVP (Dish)
-  → Validar día operativo en cocina
-  → EatClean Pilot → Capability priorizada por minutos / preguntas
+  → Validar MOMENTOS_DE_DECISION en cocina
+  → EatClean Pilot → Asistente priorizado
 ```
 
-Actas: [Infrastructure Validation](./docs/00-status/MILESTONE_INFRASTRUCTURE_VALIDATION.md) · [Product Era](./docs/99-internal/development-journal/2026-07-21-product-era.md) · [Día operativo](./docs/99-internal/development-journal/2026-07-21-eatclean-dia-operativo.md)
-
-La unidad de diseño sigue siendo el **caso de uso**.
+Actas: [Product Era](./docs/99-internal/development-journal/2026-07-21-product-era.md) · [Product Blueprint](./docs/99-internal/development-journal/2026-07-21-product-blueprint.md)
 
 ### Principio de valor (Capabilities)
 

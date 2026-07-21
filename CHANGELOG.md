@@ -75,6 +75,7 @@ La arquitectura de YourMeal OS se considera **estable**.
 - Identidad de producto: **Asistentes Operativos** (proactivo; momentos de decisión; «¿qué necesita tu atención ahora?»)
 - Dos arquitecturas: técnica + experiencia operativa; dos niveles: Asistentes (compra) / Capabilities (implementación)
 - Principio de propósito + filtro *¿qué pregunta elimina?*
+- **Product Blueprint** (`docs/15-product/`) — VISION · PRINCIPLES · MOMENTOS · ASSISTANTS · DASHBOARD · CAPABILITY_ROADMAP
 - Secuencia definitiva en FOUNDATION: Guidelines → Spec → Implementation → Tests → Validation
 ### Gobierno
 

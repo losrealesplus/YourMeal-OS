@@ -78,34 +78,21 @@ Ya no aparece ninguna capa técnica nueva en el roadmap de producto: están cons
 
 ```text
 Platform: YourMeal OS
-Capability: Dish Management   (Core listo para piloto)
 
-Integration                 ⏳  ← siguiente
-UI MVP                      ⏳
-EatClean Pilot              ⏳
-Operational Feedback        ⏳
+FOUNDATION ERA ✅
+PRODUCT BLUEPRINT ✅  ← especificación funcional del producto
+        ↓
+Integration + UI MVP (Dish)     ⏳
+Validar momentos en cocina      ⏳
+EatClean Pilot                  ⏳
+Asistente priorizado por evidencia ⏳
 ```
 
-**Próximo paso:** Integration + UI MVP de Dish Management **y** validar en cocina el [día operativo de EatClean](../15-product/EATCLEAN_DIA_OPERATIVO.md).
+**Product Blueprint:** [docs/15-product/](../15-product/README.md)
 
-**Orden de pensamiento:**
+**Prueba de entrada a toda Capability:**
 
-```text
-EatClean → ¿qué necesita? → ¿cómo evoluciona YourMeal OS?
-```
+> ¿Qué pregunta elimina en la operación diaria de EatClean?
 
-**Preguntas guía:**
-
-- ¿Qué tarda demasiado un cocinero en hacer?
-- ¿Qué tarea genera más desperdicio?
-- ¿Qué información falta durante el servicio?
-- ¿Qué capacidad necesita realmente EatClean?
-
-No construimos pantallas: **eliminamos preguntas**. Anticipamos: **avisamos antes del problema**.
-
-> YourMeal OS ayuda a cada persona a tomar la **siguiente decisión correcta** en el momento adecuado.  
-> **Asistentes** = lo que se compra · **Capabilities** = cómo se implementa.  
-> Filtro: *¿qué pregunta elimina?* — si no es clara, aún no está madura.  
-> Identidad: [Asistentes Operativos](../15-product/IDENTIDAD_ASISTENTES_OPERATIVOS.md)
-
-> EatClean no es solo el primer cliente. Es el **primer profesor** del Core.
+**Próximo paso técnico:** Integration + UI MVP de Dish Management.  
+**Próximo paso de producto:** validar [MOMENTOS_DE_DECISION](../15-product/MOMENTOS_DE_DECISION.md) en cocina.

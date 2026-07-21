@@ -7,9 +7,9 @@
 | Documento | Propósito |
 |-----------|-----------|
 | [Estado](./00-status/README.md) | Fase oficial — Product Era |
+| [Product Blueprint](./15-product/README.md) | Qué construir y por qué (visión → asistentes → roadmap) |
+| [PRODUCT_VISION](./15-product/PRODUCT_VISION.md) | Qué es YourMeal OS para el cliente |
 | [Milestone · Infrastructure Validation](./00-status/MILESTONE_INFRASTRUCTURE_VALIDATION.md) | Core independiente de la tecnología ✅ |
-| [Producto · Día operativo EatClean](./15-product/EATCLEAN_DIA_OPERATIVO.md) | Mapa de operación → Capabilities |
-| [Producto · Asistentes Operativos](./15-product/IDENTIDAD_ASISTENTES_OPERATIVOS.md) | Identidad: decisión correcta a tiempo |
 | [Milestone · Foundation Validation](./00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md) | Hito histórico ✅ — metodología validada |
 | [Definition of Done](./00-status/DEFINITION_OF_DONE.md) | Checklist de módulo |
 | [Foundation Lock](./05-architecture/FOUNDATION_LOCK.md) | ✅ Cerrado v0.1.0 |
