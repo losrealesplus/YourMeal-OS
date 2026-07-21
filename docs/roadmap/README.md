@@ -74,21 +74,16 @@ A partir de aquí no rediseñamos la forma de construir salvo ADR. Foundation si
 
 ```text
 FOUNDATION ERA ✅
+PRODUCT BLUEPRINT ✅
         ↓
 PRODUCT ERA ⏳
-  Integration → UI MVP → EatClean Pilot → Operational Feedback
-        → Capability 2 → …
+  Integration → UI MVP → Validar momentos en cocina
+  → EatClean Pilot → Asistente priorizado por evidencia
 ```
 
-> La arquitectura ya no es el foco diario. El producto y la operación lo son.  
-> EatClean = primer profesor del Core.  
-> Orden: EatClean → ¿qué necesita? → ¿cómo evoluciona YourMeal OS?  
-> Mapa: [EATCLEAN_DIA_OPERATIVO.md](../15-product/EATCLEAN_DIA_OPERATIVO.md)
-
-> Planificación: Platform → Capabilities → Use Cases → Domain → Infrastructure.  
-> Primero evidencia; después abstracción. **No pantallas: eliminamos preguntas.**
-
-**Siguiente Capability** solo cuando el piloto (u otra evidencia operativa) lo demuestre.
+> FOUNDATION = cómo construir. Product Blueprint = **qué construir y por qué**.  
+> Prueba de entrada: ¿qué pregunta elimina en EatClean?  
+> Índice: [docs/15-product/](../15-product/README.md)
 
 ### Module 02 · Weekly Planning
 
