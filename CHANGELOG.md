@@ -64,6 +64,8 @@ La arquitectura de YourMeal OS se considera **estable**.
 - `DishAlreadyExists` — error de coordinación de unicidad
 - **Dish Management completo** — UC-002…UC-008 + tests (40 tests Application/domain)
 - Capability validada sin modificar Foundation ni tocar infraestructura
+- Jerarquía de planificación: Platform → Capabilities → Use Cases → Domain → Infrastructure
+- Disciplina: **primero evidencia, después abstracción** (no generalizar Use Cases prematuramente)
 - Secuencia definitiva en FOUNDATION: Guidelines → Spec → Implementation → Tests → Validation
 ### Gobierno
 

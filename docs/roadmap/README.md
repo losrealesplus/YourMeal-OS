@@ -75,8 +75,11 @@ Dish Management (UC-001…008) ✅ → SupabaseDishRepository ⏳ → UI
 
 > Capability Application completa sin infraestructura. Foundation intacto.
 
+> Planificación del Core: Platform → Capabilities → Use Cases → Domain → Infrastructure.  
+> Primero evidencia; después abstracción.
+
 **Segundo gran principio a validar:** el Core permanece estable; la infraestructura se adapta al dominio.
-Luego, con la misma disciplina: **Ingredient** → **Recipe**.
+Luego, con la misma disciplina: **Recipe Management** → **Inventory** (cuando el producto lo pida).
 
 ### Module 02 · Weekly Planning
 
