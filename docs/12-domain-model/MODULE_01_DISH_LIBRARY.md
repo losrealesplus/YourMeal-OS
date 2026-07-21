@@ -1,30 +1,23 @@
 # Module 01 — Dish Library
 
 **Dominio de Dish:** ✅ Domain Done ([DOMAIN_DONE.md](./DOMAIN_DONE.md))  
-**Siguiente capa:** Repository Interface → Application → Infrastructure → UI
+**Capa Repository:** Guidelines ✅ · Contrato md ✅ · Interface TS ⏳  
+**Siguiente:** `DishRepository.ts` → Application → Infrastructure → UI
 
 ## Orden congelado
 
 ```text
 Dish Library
   ↓
-Language ✅
+Language ✅ → VOs ✅ → Errors ✅ → State Machine ✅ → Entity ✅
   ↓
-Value Objects ✅
+REPOSITORY_GUIDELINES ✅
   ↓
-Domain Errors ✅
+DishRepository.md ✅
   ↓
-State Machine ✅
+DishRepository.ts ⏳
   ↓
-Entity ✅
-  ↓
-Repository Interface ⏳
-  ↓
-Domain / Application Service
-  ↓
-Infrastructure
-  ↓
-UI
+Application → Infrastructure → UI
 ```
 
 Luego: **Ingredient** → **Recipe** con la misma disciplina y el mismo [DOMAIN_DONE.md](./DOMAIN_DONE.md).
