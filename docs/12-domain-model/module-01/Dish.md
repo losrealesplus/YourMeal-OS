@@ -3,7 +3,7 @@
 **Término ubicuo:** Dish  
 **Módulo:** Dish Library (Module 01)  
 **Persistencia actual:** `dishes`  
-**Estado del documento:** ✅ Dominio cerrado — fuente de verdad previa a implementación  
+**Estado del documento:** ✅ Dominio cerrado — Domain Done ([DOMAIN_DONE.md](../DOMAIN_DONE.md))  
 **Código:** inglés · **Docs:** español
 
 ---

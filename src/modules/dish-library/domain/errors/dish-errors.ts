@@ -29,6 +29,17 @@ export class DishCategoryRequired extends DomainError {
   }
 }
 
+/** Application coordination: name uniqueness within the Organization. */
+export class DishAlreadyExists extends DomainError {
+  constructor(name: string, tenantId?: string) {
+    super("DISH_ALREADY_EXISTS", `Dish already exists: ${name}`, {
+      name,
+      tenantId,
+    });
+    this.name = "DishAlreadyExists";
+  }
+}
+
 export class DishAlreadyArchived extends DomainError {
   constructor(dishId?: string) {
     super("INVALID_STATE", "Dish is already archived", { dishId });

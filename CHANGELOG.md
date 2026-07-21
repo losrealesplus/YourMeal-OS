@@ -44,6 +44,33 @@ La arquitectura de YourMeal OS se considera **estable**.
 
 ## [Unreleased] — 2026-07-21
 
+### Hitos
+
+- **Foundation Validation ✅** — primera validación metodológica cerrada (`Dish` Domain Done)
+- Acta: `docs/00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md`
+- `DOMAIN_DONE.md` adoptado como DoD del dominio
+- `REPOSITORY_GUIDELINES.md` + `DishRepository.md` — contrato de persistencia modelado
+- Principio Repository Minimalism en `FOUNDATION.md`
+- Repository Contract Pattern (común implícito vs específico; sin BaseRepository genérico)
+- Interface `DishRepository.ts` — primer contrato tipado del Core
+- `APPLICATION_GUIDELINES.md` — estándar de orquestación (Application Orchestration)
+- `DISH_USE_CASES.md` — catálogo UC-001…UC-008 (comportamiento de negocio + trazabilidad)
+- Un caso de uso por clase (`CreateDishUseCase`, …); fachada Application Service opcional
+- Principio Use Case Clarity en FOUNDATION / Application Guidelines
+- **Metodología estable** — cimientos no se profundizan más; se construye producto
+- `use-cases/CreateDishUseCase.md` — contrato Producto↔Desarrollo (11 secciones + invariantes)
+- Principio **Use Case Specificity** — implementable leyendo solo la especificación
+- `CreateDishUseCase.ts` + tests — primera planta (traducción del contrato)
+- `DishAlreadyExists` — error de coordinación de unicidad
+- **Dish Management completo** — UC-002…UC-008 + tests (40 tests Application/domain)
+- Capability validada sin modificar Foundation ni tocar infraestructura
+- Jerarquía de planificación: Platform → Capabilities → Use Cases → Domain → Infrastructure
+- Disciplina: **primero evidencia, después abstracción** (no generalizar Use Cases prematuramente)
+- **Infrastructure Validation ✅** — `SupabaseDishRepository` + mapper; Core intacto; 45 tests
+- Migración de esquema alineada al dominio (`inactive`, `category_id`, `recipe_id`, `tags`)
+- **Product Era** — fin de Validación Arquitectónica; el producto y la operación pasan a ser el foco
+- Tres exámenes afirmados: Domain · Repository · Infrastructure
+- Secuencia definitiva en FOUNDATION: Guidelines → Spec → Implementation → Tests → Validation
 ### Gobierno
 
 - ADR 0011: Diario de Desarrollo + Principio de Intencionalidad
@@ -64,5 +91,7 @@ La arquitectura de YourMeal OS se considera **estable**.
 - Filosofía de Producto (`FILOSOFIA_DE_PRODUCTO.md`) — impacto operativo como criterio de éxito
 - Actores oficiales del dominio (`docs/12-domain-model/ACTORS.md`) — fin de «Cliente» ambiguo
 - Entity Guidelines (`docs/12-domain-model/ENTITY_GUIDELINES.md`) — estándar de modelado de entidades
-- Fundación del dominio cerrada — el código es consecuencia del diseño
+- Fundación del dominio: primera validación completada (Foundation permanece vivo)
 - Entidad de dominio `Dish` + tests (`vitest`) — primera validación real de Foundation
+- Acta oficial: `docs/00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md`
+- `DOMAIN_DONE.md` — Definition of Done del dominio (Dish cerrado a nivel de dominio)

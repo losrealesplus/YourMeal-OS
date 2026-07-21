@@ -1,25 +1,45 @@
 # Roadmap Maestro — YourMeal OS
 
+## Hitos históricos
+
+| Milestone | Estado |
+|-----------|--------|
+| Blueprint | ✅ |
+| Foundation | ✅ *(documento vivo)* |
+| Foundation Lock | ✅ |
+| Product Philosophy | ✅ |
+| Ubiquitous Language | ✅ |
+| ACTORS | ✅ |
+| ENTITY_GUIDELINES | ✅ |
+| DOMAIN_DONE | ✅ |
+| Primera entidad (`Dish`) | ✅ Domain Done |
+| **Foundation Validation** | ✅ |
+| **Infrastructure Validation** | ✅ |
+| **Product Era** (apertura) | ⏳ |
+
+> **Foundation Era ✅** — Domain · Repository · Infrastructure validados.  
+> **Product Era ⏳** — Integration → UI MVP → EatClean Pilot.  
+> Actas: [Infrastructure Validation](../00-status/MILESTONE_INFRASTRUCTURE_VALIDATION.md) · [Product Era](../99-internal/development-journal/2026-07-21-product-era.md)
+
+A partir de este hito, el foco pasa del **metamodelo** al **producto en operación** (qué necesita una cocina real).
+
+---
+
 ## Estado actual
 
 ```text
 FASE 0 — FUNDACIÓN
 ────────────────────────────────
-
 Blueprint                     ✅
-Foundation                    ✅
+Foundation                    ✅  (vivo)
 Foundation Lock               ✅
-Global Foundation             ✅
-Constitución                  ✅
-Arquitectura                  ✅
-Metodología                   ✅
-Contexto Estratégico          ✅
+Foundation Validation         ✅  ← hito histórico cerrado
 
-ESTADO:
-🟢 Cerrado
+ESTADO FASE 0 (metodología):
+🟢 Validada
 ```
 
-A partir de aquí no volveremos atrás salvo mediante ADR.
+A partir de aquí no rediseñamos la forma de construir salvo ADR. Foundation sigue evolucionando como documento vivo.
 
 ---
 
@@ -31,26 +51,42 @@ A partir de aquí no volveremos atrás salvo mediante ADR.
 
 ```text
 1. Dominio (documentado)          ✅
-2. Lenguaje del dominio           🚧
-3. Entidad Dish                   ⏳
-4. Ingredient Library
-5. Recipe Builder
-6. Repository Interface
-7. Domain / Application Services
-8. Tests
-9. Infrastructure
-10. UI
+2. Lenguaje del dominio           ✅
+3. Entidad Dish (Domain Done)     ✅
+4. Repository Guidelines          ✅
+5. DishRepository.md (contrato)   ✅
+6. DishRepository.ts (interface)  ✅
+7. Application Layer Guidelines   ✅
+8. DishApplication.md (casos de uso) ✅
+9. DishApplicationService / Use Cases ⏳  ← siguiente
+10. Application Tests
+11. Infrastructure Adapter (Supabase…)
+12. Infrastructure Tests
+13. Primera integración
+14. UI MVP
+15. Ingredient Library
+16. Recipe Builder
 ```
 
 **Meta de la fase:** terminar un catálogo de platos sólido, no una pantalla bonita.
 
-**Orden dentro de Dish:**
+**Orden — Product Era:**
 
 ```text
-Language → Value Objects → Errors → State Machine → Entity
+FOUNDATION ERA ✅
+        ↓
+PRODUCT ERA ⏳
+  Integration → UI MVP → EatClean Pilot → Operational Feedback
+        → Capability 2 → …
 ```
 
-Luego, con la misma disciplina: **Ingredient** → **Recipe**.
+> La arquitectura ya no es el foco diario. El producto y la operación lo son.  
+> EatClean = primer profesor del Core.
+
+> Planificación: Platform → Capabilities → Use Cases → Domain → Infrastructure.  
+> Primero evidencia; después abstracción.
+
+**Siguiente Capability** solo cuando el piloto (u otra evidencia operativa) lo demuestre.
 
 ### Module 02 · Weekly Planning
 

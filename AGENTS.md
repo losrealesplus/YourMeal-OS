@@ -14,6 +14,9 @@
 **Primera lectura obligatoria:** [`FOUNDATION.md`](./FOUNDATION.md)  
 **Segunda lectura obligatoria:** `AGENTS.md` + [`docs/05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md`](./docs/05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md) + [`docs/05-architecture/FILOSOFIA_DE_PRODUCTO.md`](./docs/05-architecture/FILOSOFIA_DE_PRODUCTO.md) + [`docs/05-architecture/CONTEXTO_CTO.md`](./docs/05-architecture/CONTEXTO_CTO.md)
 
+**Hito histórico:** **Foundation Validation ✅** — [acta](./docs/00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md).  
+A partir de aquí el foco es el **negocio** (qué necesita una cocina), no reinventar cómo se modela una entidad.
+
 **Cursor actúa como CTO del proyecto.** Lovable acelera UI.  
 **La documentación es la fuente de verdad; el código la sigue.**  
 Contexto permanente: [`docs/05-architecture/CONTEXTO_CTO.md`](./docs/05-architecture/CONTEXTO_CTO.md) (ADR 0012).
@@ -67,14 +70,18 @@ Código (Dish.ts, …)              → ¿Cómo lo implementamos?
 
 Si la implementación contradice el dominio, gana el dominio. Si el dominio contradice un ADR, primero el ADR. Y así hacia arriba.
 
-### Fundación del dominio
+### Primera validación del dominio
 
 ```text
 FOUNDATION → AGENTS → Estrategia → Filosofía → Actores
   → Lenguaje ubicuo → Entity Guidelines → Dish.md → Dish.ts
 ```
 
-Estado: **cerrada**. Cómo debe ser una entidad ya no se debate por módulo: se aplica [ENTITY_GUIDELINES.md](./docs/12-domain-model/ENTITY_GUIDELINES.md).
+Estado: **primera validación completada** mediante `Dish`.  
+`FOUNDATION.md` permanece como documento **vivo**.  
+Cómo debe ser una entidad ya no se debate por módulo: se aplica [ENTITY_GUIDELINES.md](./docs/12-domain-model/ENTITY_GUIDELINES.md).
+
+Acta: [MILESTONE_VALIDACION_DOMINIO_DISH.md](./docs/00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md).
 
 ### Pregunta obligatoria (producto)
 
@@ -87,22 +94,42 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-Foundation Lock ✅  →  Module 01 Dish Library 🚧
+FOUNDATION ERA ✅  →  PRODUCT ERA ⏳
+Capability: Dish Management (Core listo)
+  → Integration → UI MVP → EatClean Pilot
 ```
 
-**Objetivo de Module 01:** validar que la constitución funciona (Dish → Ingredient → Recipe sin romper reglas).
-
-Orden de implementación:
+**Jerarquía de planificación:**
 
 ```text
-Language → Value Objects → Errors → State Machine → Entity
-  → Repository Interface → Domain Service → Application Service
-  → Tests → Infrastructure → UI
+Platform → Capabilities → Use Cases → Domain → Infrastructure
 ```
 
-> Modelar antes de implementar. El CRUD es consecuencia, no punto de partida.
+El cliente compra **capacidades operativas**, no entidades ni repositorios.
 
-### Principio de valor (Module 01+)
+**Etapa:** Product Era — la arquitectura deja de ser el foco; el producto lo ocupa.
+
+**Objetivo actual:** Integration + UI MVP + piloto EatClean (primer profesor del Core).
+
+> **Metodología estable.** Preferir: *«Foundation ya responde»* / *«¿el producto lo necesita?»*.
+
+> **Primero evidencia. Después abstracción.**  
+> Modificaciones estructurales: evidencia de múltiples Capabilities u organizaciones.
+
+> Preguntas guía: ¿qué tarda el cocinero? ¿qué desperdicia? ¿qué falta en el servicio? ¿qué necesita EatClean?
+
+Orden:
+
+```text
+Infrastructure Validation ✅
+  → Integration → UI MVP → EatClean Pilot → feedback → Capability 2
+```
+
+Actas: [Infrastructure Validation](./docs/00-status/MILESTONE_INFRASTRUCTURE_VALIDATION.md) · [Product Era](./docs/99-internal/development-journal/2026-07-21-product-era.md)
+
+La unidad de diseño sigue siendo el **caso de uso**.
+
+### Principio de valor (Capabilities)
 
 > Cada línea de código debe aportar valor a la **Organización actual** (EatClean) o fortalecer el **Core** para Organizaciones futuras. Si no cumple ninguna de las dos, no debería existir.
 
@@ -140,4 +167,10 @@ Conflictos con `.lovable/plan.md` → **gana `docs/`**.
 - [Dish](./docs/12-domain-model/module-01/Dish.md)
 - [Actores](./docs/12-domain-model/ACTORS.md)
 - [Entity Guidelines](./docs/12-domain-model/ENTITY_GUIDELINES.md)
+- [Domain Done](./docs/12-domain-model/DOMAIN_DONE.md)
+- [Repository Guidelines](./docs/13-repositories/REPOSITORY_GUIDELINES.md)
+- [DishRepository (contrato)](./docs/13-repositories/DishRepository.md)
+- [Application Guidelines](./docs/14-application/APPLICATION_GUIDELINES.md)
+- [DISH_USE_CASES](./docs/14-application/DISH_USE_CASES.md)
+- [CreateDishUseCase (diseño)](./docs/14-application/use-cases/CreateDishUseCase.md)
 - [Architecture Review](./docs/05-architecture/architecture-review.md) (histórico — ya aprobado)

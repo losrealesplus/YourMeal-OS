@@ -7,5 +7,6 @@
 export * from "./entities";
 export * from "./errors";
 export * from "./events";
+export * from "./repositories";
 export * from "./types";
 export * from "./value-objects";

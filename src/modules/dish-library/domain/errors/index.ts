@@ -1,5 +1,6 @@
 export {
   DishAlreadyArchived,
+  DishAlreadyExists,
   DishCannotModifyWhenArchived,
   DishCategoryRequired,
   DishNameRequired,

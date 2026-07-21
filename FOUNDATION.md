@@ -122,6 +122,30 @@ Not inside the entity. Keep entities small and easy to understand.
 
 **Detailed standard (YourMeal OS):** [`docs/12-domain-model/ENTITY_GUIDELINES.md`](./docs/12-domain-model/ENTITY_GUIDELINES.md)
 
+### Repository Minimalism
+
+> A Repository exists only so the domain can retrieve and persist aggregates. It does not implement business rules, interpret data, or coordinate processes. The smaller the contract, the more independent the Core.
+
+**Detailed standard (YourMeal OS):** [`docs/13-repositories/REPOSITORY_GUIDELINES.md`](./docs/13-repositories/REPOSITORY_GUIDELINES.md)
+
+### Application Orchestration
+
+> The Application layer does not make business decisions. It coordinates decisions made by the domain. The less business knowledge lives in Application, the stronger the Core.
+
+**Detailed standard (YourMeal OS):** [`docs/14-application/APPLICATION_GUIDELINES.md`](./docs/14-application/APPLICATION_GUIDELINES.md)
+
+### Use Case Clarity
+
+> Every use case must represent an action a real user can understand and perform. If a use case cannot be described without talking about classes, services, or databases, it does not yet belong in the Application layer.
+
+### Use Case Specificity
+
+> A use case is done when any developer can implement it correctly by reading only its specification.
+
+The specification is a contract between Product and Engineering. Code translates it; it does not redefine it.
+
+**Detailed standard (YourMeal OS):** [`docs/14-application/APPLICATION_GUIDELINES.md`](./docs/14-application/APPLICATION_GUIDELINES.md)
+
 ---
 
 ## Cambios
@@ -194,6 +218,28 @@ Si una decisión cambia la arquitectura, la filosofía o la experiencia del prod
 - Roadmap
 - Learnings
 - Decision Ledger / Diario
+
+---
+
+## Secuencia definitiva (producto)
+
+Cuando la metodología del proyecto ya es estable:
+
+```text
+Guidelines
+        ↓
+Business Specification
+        ↓
+Implementation
+        ↓
+Tests
+        ↓
+Validation
+```
+
+No se añaden documentos metodológicos «por completitud».
+
+Si el producto revela una grieta común en varias capacidades, entonces se refuerza Foundation. Hasta entonces, la mejor forma de mejorar la metodología es construir producto sobre ella.
 
 ---
 

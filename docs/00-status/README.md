@@ -1,79 +1,101 @@
 # Estado del proyecto
 
 **Última actualización:** 2026-07-21  
-**Versión:** `v0.1.0` — FOUNDATION LOCKED
+**Versión:** `v0.1.0` — FOUNDATION LOCKED  
+**Etapa:** **PRODUCT ERA** ⏳  
+**Metodología:** estable (ya no es el foco diario)
 
-## Fase oficial
+**Actas de la Foundation Era:**  
+[Domain / Foundation Validation](./MILESTONE_VALIDACION_DOMINIO_DISH.md) · [Infrastructure Validation](./MILESTONE_INFRASTRUCTURE_VALIDATION.md) · [Cambio de etapa](../99-internal/development-journal/2026-07-21-product-era.md)
+
+---
+
+## Cambio de etapa
+
+YourMeal OS deja oficialmente la etapa de **Validación Arquitectónica**.
+
+A partir de este hito, el crecimiento del Core estará guiado prioritariamente por la **evidencia obtenida en operaciones reales**.
+
+Las futuras modificaciones estructurales requerirán evidencia acumulada de **múltiples Capabilities** o **múltiples organizaciones**.
+
+La arquitectura deja de ser el foco principal.
+
+**El producto pasa a ocupar ese lugar.**
+
+---
+
+## Los tres exámenes (Foundation Era) — superados
+
+| Examen | Afirmación demostrada | Estado |
+|--------|----------------------|--------|
+| **Domain Validation** | El negocio puede definirse antes que el código | ✅ |
+| **Repository Validation** | La persistencia puede definirse desde el dominio | ✅ |
+| **Infrastructure Validation** | La tecnología puede adaptarse al Core sin modificar el Core | ✅ |
+
+Dirección de la dependencia **demostrada**, no solo diseñada:
 
 ```text
-FASE 0 — FUNDACIÓN
-Blueprint              ✅
-Foundation             ✅
-Foundation Lock        ✅
-Global Foundation      ✅
-Constitución           ✅
-Arquitectura           ✅
-Metodología            ✅
-Contexto Estratégico   ✅
-Filosofía de Producto  ✅
-Actores                ✅
-Lenguaje ubicuo        ✅
-Entity Guidelines      ✅
-Fundación del dominio  ✅  ← cerrada
-────────────────────────
-FASE 1 — Core v0.1 (EatClean)
-Module 01 · Dish Library 🚧
-  Dominio documentado     ✅
-  Lenguaje en código      ✅
-  Entidad Dish            ✅
-  Repository Interface    ⏳
-  Application Service     ⏳
-  UI                      ⏳
+Negocio → Core → Infrastructure → Base de datos
 ```
 
-> La Fase 0 construyó la empresa y su sistema de decisión.  
-> **La fundación del dominio está cerrada:** el código es consecuencia, no el inicio.  
-> **La Fase 1** materializa producto a través de EatClean.
+Cita del proyecto (Infrastructure Validation):
 
-> **La arquitectura ya no se diseña; se aplica.**
+> El esquema legado no cubría `inactive` / `category_id` / `recipe_id` / `tags`.  
+> Infrastructure se adaptó al dominio con migración — **no al revés**.
 
-## Constitución (resumen)
+---
 
-| Pilar | Principio |
-|-------|-----------|
-| Arquitectura | Docs + ADRs son la fuente de verdad; **Cursor = CTO**; Lovable = UI |
-| Desarrollo | Español en docs/razonamiento; inglés en código/BD |
-| Calidad | Intencionalidad + Definition of Done + no estado amarillo |
-| Memoria | Diario de Desarrollo del Proyecto |
-| Cierre diario | Protocolo de 7 pasos (incluye Diario) |
-| Contexto sesiones | [CONTEXTO_CTO.md](../05-architecture/CONTEXTO_CTO.md) |
-| Pirámide de decisión | Jerarquía docs → código en [`AGENTS.md`](../../AGENTS.md) |
-| Valor (Module 01+) | Código para la Organización (EatClean) o para fortalecer el Core |
-| Filosofía de producto | [FILOSOFIA_DE_PRODUCTO.md](../05-architecture/FILOSOFIA_DE_PRODUCTO.md) — impacto operativo |
-| Actores | [ACTORS.md](../12-domain-model/ACTORS.md) — roles oficiales del dominio |
-| Entity Guidelines | [ENTITY_GUIDELINES.md](../12-domain-model/ENTITY_GUIDELINES.md) — estándar de entidades |
+## Roadmap por eras
 
-## Module 01 — ahora
+```text
+FOUNDATION ERA ✅
 
-Dominio primero (sin UI):
+Blueprint
+Foundation
+Domain
+Repository
+Application
+Infrastructure
 
-- [Dish.md](../12-domain-model/module-01/Dish.md)
-- [Ingredient.md](../12-domain-model/module-01/Ingredient.md)
-- [Recipe.md](../12-domain-model/module-01/Recipe.md)
+────────────────────────
 
-**Objetivo de Module 01:** validar la constitución materializando `Dish` como consecuencia de Entity Guidelines.
+PRODUCT ERA ⏳
 
-**Hecho:** entidad `Dish` + tests de dominio (`vitest`).
+Integration
+UI MVP
+EatClean Pilot
+Operational Feedback
+Capability 2
+Capability 3
+Platform Evolution
+```
 
-**Próximo paso:** Repository Interface de dominio → adaptar Application Service — sin pantalla.
+Ya no aparece ninguna capa técnica nueva en el roadmap de producto: están construidas.
 
-## Misión v0.1
+---
 
-> Construir la mejor plataforma posible para EatClean y convertir cada aprendizaje real en una capacidad reusable del Core.
+## Fase oficial (Product Era)
 
-## Enlaces
+```text
+Platform: YourMeal OS
+Capability: Dish Management   (Core listo para piloto)
 
-- [Diario](../99-internal/development-journal/README.md)
-- [Definition of Done](./DEFINITION_OF_DONE.md)
-- [Cierre de jornada](../05-architecture/CIERRE_DE_JORNADA.md)
-- [Roadmap](../roadmap/README.md)
+Integration                 ⏳  ← siguiente
+UI MVP                      ⏳
+EatClean Pilot              ⏳
+Operational Feedback        ⏳
+```
+
+**Próximo paso:** Integration + UI MVP para que EatClean pueda usar Dish Management.
+
+**Preguntas guía a partir de ahora:**
+
+- ¿Qué tarda demasiado un cocinero en hacer?
+- ¿Qué tarea genera más desperdicio?
+- ¿Qué información falta durante el servicio?
+- ¿Qué capacidad necesita realmente EatClean?
+
+El Core deja de ser el protagonista.  
+La **operación** lo es. El Core solo evoluciona cuando la operación demuestra que debe hacerlo.
+
+> EatClean no es solo el primer cliente. Es el **primer profesor** del Core.
