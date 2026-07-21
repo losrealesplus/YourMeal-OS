@@ -134,7 +134,7 @@ La cocina alimenta al producto. El producto vuelve a la cocina.
 
 No es un pilar nuevo. Vive en el Product Blueprint.
 
-Es el mecanismo compartido: datos → comprobación → atención → acción.
+Es la **unidad mínima de valor operativo** y el mecanismo: datos → comprobación → atención → acción.
 
 Unidad mínima de inteligencia del producto (sin IA).
 
@@ -143,6 +143,13 @@ Ver [OPERATIONAL_CHECKS.md](./OPERATIONAL_CHECKS.md).
 Filtro adicional:
 
 > ¿Qué comprueba, por qué lo comprueba y qué acción permite tomar?
+
+### Gate (propuesta nueva)
+
+1. ¿Evidencia en Discovery?  
+2. ¿Qué pregunta elimina?  
+3. ¿Se resuelve con un Operational Check?  
+4. ¿Qué Capabilities necesita? → solo entonces Core.
 
 ### Lemas internos (equipo)
 
@@ -153,6 +160,18 @@ Filtro adicional:
 ### Adopción
 
 Digitalizar → Validar → Recomendar → Optimizar (IA solo con evidencia).
+
+---
+
+## 12. Documentación estratégica madura
+
+No abrir nuevos documentos de estrategia «por si acaso».
+
+La base (tres pilares + Checks + Centro de Control) está definida.
+
+Siguiente fase: **evidencia de campo** ([FIRST_OBSERVATION_DAY](../16-operational-discovery/FIRST_OBSERVATION_DAY.md)).
+
+Los PRs grandes deberían contar **valor operativo**, no solo evolución técnica.
 
 ---
 

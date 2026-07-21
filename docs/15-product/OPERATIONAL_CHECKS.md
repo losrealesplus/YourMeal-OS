@@ -3,18 +3,82 @@
 **Tipo:** concepto transversal del Product Blueprint  
 **Ubicación:** `docs/15-product/` (identidad de producto)  
 **No es:** un cuarto pilar · Discovery · Foundation · una Capability · una capa de arquitectura  
-**Sí es:** el mecanismo mediante el cual YourMeal OS transforma datos operativos en acciones recomendadas
+**Sí es:** la **unidad mínima de valor operativo** del producto — y el mecanismo que transforma datos en acciones recomendadas
 
 ```text
 FOUNDATION              → cómo construir
 PRODUCT BLUEPRINT       → qué construir
 OPERATIONAL DISCOVERY   → por qué evolucionar (evidencia)
-Operational Checks      → cómo el producto guía la operación (transversal)
+Operational Checks      → unidad mínima de valor operativo (transversal)
 ```
+
+| Mundo | Unidad mínima |
+|-------|----------------|
+| Técnica | Entity · Repository · Use Case |
+| Producto / operación | **Operational Check** |
 
 Igual que los Use Cases son un concepto transversal de la arquitectura, los Operational Checks son un concepto transversal del **producto**.
 
 No crecen la documentación como un pilar nuevo. Viven dentro del Blueprint.
+
+---
+
+## Dos arquitecturas, un idioma
+
+### Técnica
+
+```text
+Capability
+    ↓
+Use Cases
+    ↓
+Domain
+    ↓
+Infrastructure
+```
+
+### Producto
+
+```text
+Operational Discovery
+        ↓
+Operational Check
+        ↓
+Operative Assistant
+        ↓
+Capability
+```
+
+### Trazabilidad (ejemplo)
+
+```text
+Observación
+        ↓
+OF-017  «Se olvidó descongelar el pollo»
+        ↓
+Operational Check  «¿Hay que descongelar pollo hoy?»
+        ↓
+Production Assistant
+        ↓
+Production Preparation Capability
+        ↓
+Use Cases → Implementación
+```
+
+El backlog sale de la cocina, no de un brainstorming.
+
+---
+
+## Gate mecánico (toda propuesta nueva)
+
+Antes de debatir una funcionalidad:
+
+1. **¿Existe evidencia en Operational Discovery?** → Si no, observar primero.  
+2. **¿Qué pregunta elimina?** → Si ninguna, probablemente no pertenece.  
+3. **¿Puede resolverse mediante un Operational Check?** → Si sí, definir el Check.  
+4. **¿Qué Capabilities necesita ese Check?** → Solo entonces entra en el Core.
+
+Evita desarrollo por intuición y exceso de abstracción.
 
 ---
 
