@@ -7,6 +7,7 @@ Coordinación de casos de uso. No contiene reglas de dominio ni detalles de infr
 | Documento | Propósito |
 |-----------|-----------|
 | [APPLICATION_GUIDELINES.md](./APPLICATION_GUIDELINES.md) | Cómo orquesta YourMeal OS un caso de uso |
+| [DishApplication.md](./DishApplication.md) | Casos de uso de Dish (negocio / cocina) |
 
 ## Flujo
 

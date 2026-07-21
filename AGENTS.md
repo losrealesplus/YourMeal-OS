@@ -94,8 +94,7 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-Foundation Validation ✅ → DishRepository.ts ✅ → APPLICATION_GUIDELINES ✅
-  → DishApplication.md ⏳
+APPLICATION_GUIDELINES ✅ → DishApplication.md ✅ → Use Cases (código) ⏳
 ```
 
 **Objetivo de Module 01:** materializar el catálogo de platos para EatClean **heredando** el patrón ya validado.
@@ -103,13 +102,14 @@ Foundation Validation ✅ → DishRepository.ts ✅ → APPLICATION_GUIDELINES �
 Orden:
 
 ```text
-APPLICATION_GUIDELINES ✅ → DishApplication.md ⏳ → Application Service
-  → Use Cases → SupabaseDishRepository → Integration Tests → UI
+DishApplication.md ✅
+  → CreateDish / UpdateDish / ActivateDish / … (código)
+  → Application Tests → SupabaseDishRepository → UI MVP
 ```
 
-Ingredient / Recipe: misma disciplina (DOMAIN_DONE + ENTITY / REPOSITORY / APPLICATION GUIDELINES).
+Pensar en **vertical slices** (`CreateDishUseCase`, …), aunque la primera agrupación viva en un servicio.
 
-> Modelar antes de implementar. El CRUD es consecuencia, no punto de partida.
+> Cada caso de uso = acción que un usuario real comprende. Sin clases ni SQL en la descripción.
 
 ### Principio de valor (Module 01+)
 

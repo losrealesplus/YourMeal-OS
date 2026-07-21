@@ -54,14 +54,15 @@ A partir de aquí no rediseñamos la forma de construir salvo ADR. Foundation si
 5. DishRepository.md (contrato)   ✅
 6. DishRepository.ts (interface)  ✅
 7. Application Layer Guidelines   ✅
-8. DishApplication.md / Service   ⏳  ← siguiente
-9. Use Cases
-10. Infrastructure Adapter (Supabase…)
-11. Persistence
-12. Integration Tests
-13. Ingredient Library
-14. Recipe Builder
-15. UI
+8. DishApplication.md (casos de uso) ✅
+9. DishApplicationService / Use Cases ⏳  ← siguiente
+10. Application Tests
+11. Infrastructure Adapter (Supabase…)
+12. Infrastructure Tests
+13. Primera integración
+14. UI MVP
+15. Ingredient Library
+16. Recipe Builder
 ```
 
 **Meta de la fase:** terminar un catálogo de platos sólido, no una pantalla bonita.
@@ -69,9 +70,10 @@ A partir de aquí no rediseñamos la forma de construir salvo ADR. Foundation si
 **Orden Application (misma disciplina):**
 
 ```text
-APPLICATION_GUIDELINES ✅ → DishApplication.md ⏳ → Application Service → …
+APPLICATION_GUIDELINES ✅ → DishApplication.md ✅ → Use Cases (código) ⏳
 ```
-**Segundo gran principio a validar:** el Core permanece estable; la infraestructura se adapta al dominio.
+
+> Application no existe por sí mismo: existe para ejecutar casos de uso. Primero el negocio; después el servicio.**Segundo gran principio a validar:** el Core permanece estable; la infraestructura se adapta al dominio.
 Luego, con la misma disciplina: **Ingredient** → **Recipe**.
 
 ### Module 02 · Weekly Planning

@@ -36,6 +36,12 @@ Nunca lo duplica.
 
 > La capa de Aplicación no toma decisiones de negocio. Coordina decisiones tomadas por el dominio. Cuanto menos conocimiento de negocio exista en Application, más fuerte será el Core.
 
+## Principio de claridad del caso de uso
+
+> Cada caso de uso debe representar una acción que un usuario real pueda comprender y ejecutar. Si un caso de uso no puede describirse sin hablar de clases, servicios o bases de datos, todavía no pertenece a la capa de Aplicación.
+
+Este principio es a Application lo que **Entity Simplicity** es al dominio.
+
 ---
 
 ## Responsabilidad

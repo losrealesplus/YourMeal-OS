@@ -134,6 +134,10 @@ Not inside the entity. Keep entities small and easy to understand.
 
 **Detailed standard (YourMeal OS):** [`docs/14-application/APPLICATION_GUIDELINES.md`](./docs/14-application/APPLICATION_GUIDELINES.md)
 
+### Use Case Clarity
+
+> Every use case must represent an action a real user can understand and perform. If a use case cannot be described without talking about classes, services, or databases, it does not yet belong in the Application layer.
+
 ---
 
 ## Cambios

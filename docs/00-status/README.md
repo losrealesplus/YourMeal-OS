@@ -35,7 +35,8 @@ Module 01 · Dish Library
   DishRepository.md                ✅
   DishRepository.ts                ✅
   Application Guidelines           ✅
-  DishApplication (docs/código)    ⏳  ← siguiente
+  DishApplication.md (casos uso)   ✅
+  Application Service / Use Cases  ⏳  ← siguiente
   Infra / UI                       ⏳
 ```
 
@@ -47,9 +48,8 @@ Module 01 · Dish Library
 | ¿Qué reglas tendrá el Core? | ¿Cómo modelamos producción, inventario, pedidos? |
 | ¿Cómo modelamos una entidad? | Materializar negocio con metodología ya demostrada |
 
-**Segunda etapa (en curso):** demostrar que la **infraestructura se adapta al dominio** — empezando por el contrato `DishRepository` (docs primero, luego interface, luego adaptador).
-
-Foco: del **metamodelo** al **dominio del negocio**, con fronteras de persistencia puras.
+**Segunda etapa:** infra se adapta al dominio.  
+**Ahora:** casos de uso de Dish documentados — el producto empieza a hablar el lenguaje de la cocina.
 
 ## Constitución (resumen)
 
