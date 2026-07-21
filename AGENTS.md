@@ -94,12 +94,12 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-Platform: YourMeal OS
-Capability: Dish Management
-  Application ✅ → Infrastructure Validation ✅ → Integration / UI ⏳
+FOUNDATION ERA ✅  →  PRODUCT ERA ⏳
+Capability: Dish Management (Core listo)
+  → Integration → UI MVP → EatClean Pilot
 ```
 
-**Jerarquía de planificación del Core** (no «módulos» como unidad de valor):
+**Jerarquía de planificación:**
 
 ```text
 Platform → Capabilities → Use Cases → Domain → Infrastructure
@@ -107,24 +107,27 @@ Platform → Capabilities → Use Cases → Domain → Infrastructure
 
 El cliente compra **capacidades operativas**, no entidades ni repositorios.
 
-**Objetivo actual:** Integration Validation + UI MVP para EatClean — sin tocar Foundation.
+**Etapa:** Product Era — la arquitectura deja de ser el foco; el producto lo ocupa.
+
+**Objetivo actual:** Integration + UI MVP + piloto EatClean (primer profesor del Core).
 
 > **Metodología estable.** Preferir: *«Foundation ya responde»* / *«¿el producto lo necesita?»*.
 
-> **Use Case Specificity** · **Primero evidencia. Después abstracción.**
+> **Primero evidencia. Después abstracción.**  
+> Modificaciones estructurales: evidencia de múltiples Capabilities u organizaciones.
 
-> Vamos a **validar Capabilities**, no solo a programar.
+> Preguntas guía: ¿qué tarda el cocinero? ¿qué desperdicia? ¿qué falta en el servicio? ¿qué necesita EatClean?
 
 Orden:
 
 ```text
 Infrastructure Validation ✅
-  → Integration Validation → UI MVP → feedback EatClean → Segunda Capability
+  → Integration → UI MVP → EatClean Pilot → feedback → Capability 2
 ```
 
-Acta: [Infrastructure Validation](./docs/00-status/MILESTONE_INFRASTRUCTURE_VALIDATION.md)
+Actas: [Infrastructure Validation](./docs/00-status/MILESTONE_INFRASTRUCTURE_VALIDATION.md) · [Product Era](./docs/99-internal/development-journal/2026-07-21-product-era.md)
 
-La unidad de diseño es el **caso de uso**. Una fachada `DishApplicationService` es opcional y posterior.
+La unidad de diseño sigue siendo el **caso de uso**.
 
 ### Principio de valor (Capabilities)
 

@@ -68,6 +68,8 @@ La arquitectura de YourMeal OS se considera **estable**.
 - Disciplina: **primero evidencia, después abstracción** (no generalizar Use Cases prematuramente)
 - **Infrastructure Validation ✅** — `SupabaseDishRepository` + mapper; Core intacto; 45 tests
 - Migración de esquema alineada al dominio (`inactive`, `category_id`, `recipe_id`, `tags`)
+- **Product Era** — fin de Validación Arquitectónica; el producto y la operación pasan a ser el foco
+- Tres exámenes afirmados: Domain · Repository · Infrastructure
 - Secuencia definitiva en FOUNDATION: Guidelines → Spec → Implementation → Tests → Validation
 ### Gobierno
 

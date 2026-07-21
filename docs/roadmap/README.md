@@ -14,11 +14,14 @@
 | DOMAIN_DONE | ✅ |
 | Primera entidad (`Dish`) | ✅ Domain Done |
 | **Foundation Validation** | ✅ |
+| **Infrastructure Validation** | ✅ |
+| **Product Era** (apertura) | ⏳ |
 
-> **Foundation Validation ✅** — hito histórico: donde dejó de construirse la metodología y empezó a construirse el producto.  
-> Acta: [MILESTONE_VALIDACION_DOMINIO_DISH.md](../00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md)
+> **Foundation Era ✅** — Domain · Repository · Infrastructure validados.  
+> **Product Era ⏳** — Integration → UI MVP → EatClean Pilot.  
+> Actas: [Infrastructure Validation](../00-status/MILESTONE_INFRASTRUCTURE_VALIDATION.md) · [Product Era](../99-internal/development-journal/2026-07-21-product-era.md)
 
-A partir de este hito, el foco pasa del **metamodelo** al **dominio del negocio** (qué necesita una cocina), heredando la forma de construir ya validada.
+A partir de este hito, el foco pasa del **metamodelo** al **producto en operación** (qué necesita una cocina real).
 
 ---
 
@@ -67,19 +70,23 @@ A partir de aquí no rediseñamos la forma de construir salvo ADR. Foundation si
 
 **Meta de la fase:** terminar un catálogo de platos sólido, no una pantalla bonita.
 
-**Orden Application (misma disciplina):**
+**Orden — Product Era:**
 
 ```text
-Dish Management Application ✅ → Infrastructure Validation ✅ → Integration / UI ⏳
+FOUNDATION ERA ✅
+        ↓
+PRODUCT ERA ⏳
+  Integration → UI MVP → EatClean Pilot → Operational Feedback
+        → Capability 2 → …
 ```
 
-> Core independiente de la tecnología. Supabase = primer adaptador, no una decisión de negocio.
+> La arquitectura ya no es el foco diario. El producto y la operación lo son.  
+> EatClean = primer profesor del Core.
 
 > Planificación: Platform → Capabilities → Use Cases → Domain → Infrastructure.  
 > Primero evidencia; después abstracción.
 
-**Segundo gran principio a validar:** Integration Validation con EatClean como profesor del Core.
-Luego: **Segunda Capability** cuando el producto lo pida.
+**Siguiente Capability** solo cuando el piloto (u otra evidencia operativa) lo demuestre.
 
 ### Module 02 · Weekly Planning
 
