@@ -75,15 +75,15 @@ Detalle: [03-RELATIONSHIPS.md](./03-RELATIONSHIPS.md).
 
 | # | Documento | Estado |
 |---|-----------|--------|
-| 01 | [Ubiquitous Language (operativo)](./01-UBIQUITOUS_LANGUAGE.md) | ✅ v0.1 |
-| 02 | [Core Operational Objects](./02-CORE_OBJECTS.md) | ✅ v0.1 |
-| 03 | [Relationships](./03-RELATIONSHIPS.md) | ✅ v0.1 |
-| 04 | [Lifecycles](./04-LIFECYCLES.md) | ✅ v0.1 |
-| 05 | [Invariants](./05-INVARIANTS.md) | ✅ v0.1 |
-| 06 | [Capability Mapping](./06-CAPABILITY_MAPPING.md) | ✅ v0.1 |
+| 01 | [Ubiquitous Language (operativo)](./01-UBIQUITOUS_LANGUAGE.md) | 🚧 v0.1 — **próximo a endurecer** |
+| 02 | [Core Operational Objects](./02-CORE_OBJECTS.md) | 🚧 v0.1 |
+| 03 | [Relationships](./03-RELATIONSHIPS.md) | 🚧 v0.1 |
+| 04 | [Lifecycles](./04-LIFECYCLES.md) | 🚧 v0.1 |
+| 05 | [Invariants](./05-INVARIANTS.md) | 🚧 v0.1 |
+| 06 | [Capability Mapping](./06-CAPABILITY_MAPPING.md) | 🚧 v0.1 |
 
-**v0.1** = hipótesis de lenguaje listas para validar en campo.  
-No son tablas ni schemas. Observation / Domain las endurecen después.
+**v0.1** = borrador de apertura. La próxima sesión endurece en orden 01 → 06.  
+Observation EatClean: ⏸ congelada. Sin pantallas / APIs / código en esta fase.
 
 ---
 

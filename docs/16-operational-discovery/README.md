@@ -8,7 +8,8 @@
 | [PRODUCT BLUEPRINT](../15-product/README.md) | ¿Qué construimos y por qué? *(fase diseño: cerrada)* |
 | **OPERATIONAL DISCOVERY** | **¿Por qué evolucionar el producto?** *(qué hemos aprendido observando)* |
 
-**Ahora:** la evidencia manda. Empieza aquí → [FIRST_OBSERVATION_DAY.md](./FIRST_OBSERVATION_DAY.md).
+**Ahora:** Observation de campo ⏸ **congelada**. Prioridad del repo: [Operational Model](../17-operational-model/README.md).  
+Checklist de campo (cuando se reactive): [FIRST_OBSERVATION_DAY.md](./FIRST_OBSERVATION_DAY.md).
 
 ---
 

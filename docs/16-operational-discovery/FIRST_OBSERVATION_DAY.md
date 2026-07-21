@@ -1,12 +1,12 @@
 # FIRST_OBSERVATION_DAY — Primera jornada observada
 
 **Tipo:** Operational Discovery (checklist de campo)  
-**Fase:** Blueprint cerrado · Operational Model v0.1 · observación  
-**Rol ese día:** **etnógrafo de operaciones** — no arquitecto · no vendedor · no demos
+**Estado:** ⏸ **CONGELADO** — no ejecutar hasta decisión explícita del equipo  
+**Rol cuando se reactive:** etnógrafo de operaciones — no arquitecto · no vendedor · no demos
 
-El siguiente arquitecto es **EatClean**.
+El siguiente arquitecto de campo será **EatClean** — cuando retomemos Observation.
 
-También valida el [Operational Model](../17-operational-model/README.md): ¿faltan objetos? ¿sobran? ¿los nombres coinciden con la cocina?
+Ahora la prioridad del repo es el [Operational Model](../17-operational-model/README.md).
 
 No validamos pantallas. No vendemos. No demostramos nada.
 

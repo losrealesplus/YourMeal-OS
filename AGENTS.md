@@ -94,23 +94,21 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-Diseño estratégico Blueprint ✅ CERRADO
+Blueprint ✅ · Checks ✅ · Discovery (campo) ⏸
         ↓
-Operational Model (Core Operativo) ⏳
-        ↓
-Observation EatClean (valida el lenguaje)
+Operational Model (Core Operativo) 🚧  ← siguiente trabajo
 ```
 
 > **FASE 4 — YourMeal Operational Model:** ¿qué objetos existen en cualquier negocio de comida preparada?  
-> No es Core DDD ni cuarto pilar: es el diccionario operativo ([docs/17-operational-model/](./docs/17-operational-model/README.md)).  
-> Observation sigue siendo el juez: valida / ajusta / amplía — no reinventar en brainstorming.  
-> Unidad mínima de valor: **Operational Check**.  
-> Lemas: evidencia → abstracción · ¿qué pregunta elimina? · no mostramos datos, confirmamos que la operación puede continuar.  
-> Sin pantallas / APIs / código en esta fase de modelo.
+> No es Core DDD ni cuarto pilar: [docs/17-operational-model/](./docs/17-operational-model/README.md).  
+> **Observation EatClean: CONGELADA** hasta decisión explícita de retomarla.  
+> Unidad mínima de valor: **Operational Check**. Gate: evidencia → pregunta → Check → Capability.  
+> Sin pantallas / APIs / código en esta fase.  
+> Actores: nunca «Customer» / «Cliente» ambiguo.
 
-**Objetivo:** completar y endurecer el Operational Model v0.1 · [FIRST_OBSERVATION_DAY](./docs/16-operational-discovery/FIRST_OBSERVATION_DAY.md) en paralelo.
+**Próxima sesión:** endurecer 01 Ubiquitous Language → 02…06.
 
-Índices: [Operational Model](./docs/17-operational-model/README.md) · [Checks](./docs/15-product/OPERATIONAL_CHECKS.md) · [Discovery](./docs/16-operational-discovery/README.md) · [Estado](./docs/00-status/README.md)
+Índices: [Operational Model](./docs/17-operational-model/README.md) · [Checks](./docs/15-product/OPERATIONAL_CHECKS.md) · [Estado](./docs/00-status/README.md)
 
 ### Principio de valor (Capabilities)
 
