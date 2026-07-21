@@ -94,29 +94,34 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-FOUNDATION ERA ✅  →  PRODUCT BLUEPRINT ✅  →  PRODUCT ERA (piloto) ⏳
+FOUNDATION ✅ → PRODUCT BLUEPRINT ✅ → OPERATIONAL DISCOVERY ⏳
 ```
 
-**Product Blueprint:** [docs/15-product/README.md](./docs/15-product/README.md)
+**Pilares:**
 
-**Objetivo actual:** Integration + UI MVP (Dish) · validar momentos de decisión en cocina · priorizar Asistente por evidencia.
+| Pilar | Pregunta |
+|-------|----------|
+| FOUNDATION | ¿Cómo construimos? |
+| PRODUCT BLUEPRINT | ¿Qué construimos y por qué? |
+| OPERATIONAL DISCOVERY | ¿Qué demuestra la cocina? |
 
-> **Orden:** EatClean → ¿qué necesita? → ¿cómo evoluciona YourMeal OS?
+**Regla:** ninguna Capability nueva en desarrollo sin evidencia operativa suficiente.
 
-> **Prueba de entrada:** ¿qué pregunta elimina?  
-> **Filtro:** antes que tablas.  
-> Visión: [PRODUCT_VISION.md](./docs/15-product/PRODUCT_VISION.md)
+**Objetivo actual:** observar EatClean (Findings) · Integration/UI MVP solo para Dish ya validado · no inventar Capabilities.
+
+> Índice Discovery: [docs/16-operational-discovery/](./docs/16-operational-discovery/README.md)  
+> Blueprint: [docs/15-product/](./docs/15-product/README.md)
 
 Orden:
 
 ```text
-Product Blueprint ✅
-  → Integration + UI MVP (Dish)
-  → Validar MOMENTOS_DE_DECISION en cocina
-  → EatClean Pilot → Asistente priorizado
+Operational Discovery ⏳
+  → OF reales + biblioteca de preguntas
+  → (en paralelo) Integration + UI Dish
+  → Priorizar Asistente con evidencia
 ```
 
-Actas: [Product Era](./docs/99-internal/development-journal/2026-07-21-product-era.md) · [Product Blueprint](./docs/99-internal/development-journal/2026-07-21-product-blueprint.md)
+Acta: [Operational Discovery](./docs/99-internal/development-journal/2026-07-21-operational-discovery.md)
 
 ### Principio de valor (Capabilities)
 

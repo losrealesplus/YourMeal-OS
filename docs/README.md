@@ -7,7 +7,8 @@
 | Documento | Propósito |
 |-----------|-----------|
 | [Estado](./00-status/README.md) | Fase oficial — Product Era |
-| [Product Blueprint](./15-product/README.md) | Qué construir y por qué (visión → asistentes → roadmap) |
+| [Product Blueprint](./15-product/README.md) | Qué construir y por qué |
+| [Operational Discovery](./16-operational-discovery/README.md) | Evidencia de cocina → backlog |
 | [PRODUCT_VISION](./15-product/PRODUCT_VISION.md) | Qué es YourMeal OS para el cliente |
 | [Milestone · Infrastructure Validation](./00-status/MILESTONE_INFRASTRUCTURE_VALIDATION.md) | Core independiente de la tecnología ✅ |
 | [Milestone · Foundation Validation](./00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md) | Hito histórico ✅ — metodología validada |

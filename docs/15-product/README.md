@@ -60,3 +60,10 @@ EatClean → ¿qué necesita?
 > **¿Qué pregunta elimina en la operación diaria de EatClean?**
 
 Si no elimina una pregunta o no ahorra tiempo / errores / interrupciones, aún no entra.
+
+---
+
+## Siguiente puente
+
+[Operational Discovery](../16-operational-discovery/README.md) — evidencia de campo que alimenta este Blueprint.
+

@@ -2,97 +2,63 @@
 
 **Última actualización:** 2026-07-21  
 **Versión:** `v0.1.0` — FOUNDATION LOCKED  
-**Etapa:** **PRODUCT ERA** ⏳  
-**Metodología:** estable (ya no es el foco diario)
 
-**Actas de la Foundation Era:**  
-[Domain / Foundation Validation](./MILESTONE_VALIDACION_DOMINIO_DISH.md) · [Infrastructure Validation](./MILESTONE_INFRASTRUCTURE_VALIDATION.md) · [Cambio de etapa](../99-internal/development-journal/2026-07-21-product-era.md)
+| Pilar | Estado |
+|-------|--------|
+| FOUNDATION | ✅ ¿Cómo construimos? |
+| PRODUCT BLUEPRINT | ✅ ¿Qué construimos y por qué? |
+| **OPERATIONAL DISCOVERY** | ⏳ ¿Qué demuestra la cocina? |
 
----
-
-## Cambio de etapa
-
-YourMeal OS deja oficialmente la etapa de **Validación Arquitectónica**.
-
-A partir de este hito, el crecimiento del Core estará guiado prioritariamente por la **evidencia obtenida en operaciones reales**.
-
-Las futuras modificaciones estructurales requerirán evidencia acumulada de **múltiples Capabilities** o **múltiples organizaciones**.
-
-La arquitectura deja de ser el foco principal.
-
-**El producto pasa a ocupar ese lugar.**
+**Actas:** [Infrastructure Validation](./MILESTONE_INFRASTRUCTURE_VALIDATION.md) · [Product Era](../99-internal/development-journal/2026-07-21-product-era.md) · [Product Blueprint](../99-internal/development-journal/2026-07-21-product-blueprint.md) · [Operational Discovery](../99-internal/development-journal/2026-07-21-operational-discovery.md)
 
 ---
 
-## Los tres exámenes (Foundation Era) — superados
-
-| Examen | Afirmación demostrada | Estado |
-|--------|----------------------|--------|
-| **Domain Validation** | El negocio puede definirse antes que el código | ✅ |
-| **Repository Validation** | La persistencia puede definirse desde el dominio | ✅ |
-| **Infrastructure Validation** | La tecnología puede adaptarse al Core sin modificar el Core | ✅ |
-
-Dirección de la dependencia **demostrada**, no solo diseñada:
+## Los tres pilares
 
 ```text
-Negocio → Core → Infrastructure → Base de datos
-```
-
-Cita del proyecto (Infrastructure Validation):
-
-> El esquema legado no cubría `inactive` / `category_id` / `recipe_id` / `tags`.  
-> Infrastructure se adaptó al dominio con migración — **no al revés**.
-
----
-
-## Roadmap por eras
-
-```text
-FOUNDATION ERA ✅
-
-Blueprint
-Foundation
-Domain
-Repository
-Application
-Infrastructure
-
-────────────────────────
-
-PRODUCT ERA ⏳
-
-Integration
-UI MVP
-EatClean Pilot
-Operational Feedback
-Capability 2
-Capability 3
-Platform Evolution
-```
-
-Ya no aparece ninguna capa técnica nueva en el roadmap de producto: están construidas.
-
----
-
-## Fase oficial (Product Era)
-
-```text
-Platform: YourMeal OS
-
-FOUNDATION ERA ✅
-PRODUCT BLUEPRINT ✅  ← especificación funcional del producto
+FOUNDATION ✅
         ↓
-Integration + UI MVP (Dish)     ⏳
-Validar momentos en cocina      ⏳
-EatClean Pilot                  ⏳
-Asistente priorizado por evidencia ⏳
+PRODUCT BLUEPRINT ✅
+        ↓
+OPERATIONAL DISCOVERY ⏳  ← etapa activa
+        ↓
+Capabilities priorizadas por evidencia
+        ↓
+Integration / UI / piloto
 ```
 
+---
+
+## Regla de la etapa activa
+
+> **Ninguna Capability nueva entra en desarrollo hasta que exista evidencia operativa suficiente de que elimina una pregunta recurrente o una decisión repetitiva.**
+
+El roadmap sale de la cocina.
+
+---
+
+## Fase oficial
+
+```text
+Foundation Era              ✅
+Product Blueprint           ✅
+Operational Discovery       ⏳  ← observar EatClean
+        ↓
+Integration + UI MVP (Dish) ⏳  (técnico; no abre Capabilities nuevas)
+EatClean Pilot              ⏳
+Asistente priorizado        ⏳  (solo con evidencia)
+```
+
+**Operational Discovery:** [docs/16-operational-discovery/](../16-operational-discovery/README.md)  
 **Product Blueprint:** [docs/15-product/](../15-product/README.md)
 
-**Prueba de entrada a toda Capability:**
+**Próximo paso de producto:** primeras jornadas de observación → OF reales (sustituir ejemplo OF-001).  
+**Próximo paso técnico (sin contradicción):** Integration + UI MVP de Dish Management (Capability ya validada).
 
-> ¿Qué pregunta elimina en la operación diaria de EatClean?
+---
 
-**Próximo paso técnico:** Integration + UI MVP de Dish Management.  
-**Próximo paso de producto:** validar [MOMENTOS_DE_DECISION](../15-product/MOMENTOS_DE_DECISION.md) en cocina.
+## Activo a largo plazo
+
+No solo el código ni el Core.
+
+Una **biblioteca de conocimiento operativo** (preguntas, minutos, decisiones repetidas) que hace a YourMeal OS cada vez más difícil de copiar.

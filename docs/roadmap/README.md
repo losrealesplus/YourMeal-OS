@@ -70,20 +70,23 @@ A partir de aquí no rediseñamos la forma de construir salvo ADR. Foundation si
 
 **Meta de la fase:** terminar un catálogo de platos sólido, no una pantalla bonita.
 
-**Orden — Product Era:**
+**Orden — Operational Discovery:**
 
 ```text
-FOUNDATION ERA ✅
+FOUNDATION ✅
 PRODUCT BLUEPRINT ✅
+OPERATIONAL DISCOVERY ⏳
         ↓
-PRODUCT ERA ⏳
-  Integration → UI MVP → Validar momentos en cocina
-  → EatClean Pilot → Asistente priorizado por evidencia
+Evidencia (OF · preguntas · minutos)
+        ↓
+Asistente / Capability priorizada
+        ↓
+(en paralelo OK) Integration + UI Dish ya validado
 ```
 
-> FOUNDATION = cómo construir. Product Blueprint = **qué construir y por qué**.  
-> Prueba de entrada: ¿qué pregunta elimina en EatClean?  
-> Índice: [docs/15-product/](../15-product/README.md)
+> Tres pilares: cómo · qué/por qué · **qué demuestra la cocina**.  
+> Discovery: [docs/16-operational-discovery/](../16-operational-discovery/README.md)  
+> Blueprint: [docs/15-product/](../15-product/README.md)
 
 ### Module 02 · Weekly Planning
 
