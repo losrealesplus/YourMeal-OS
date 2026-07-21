@@ -23,4 +23,6 @@ EatClean → ¿qué necesita?
 
 > No construimos pantallas. Eliminamos preguntas.  
 > No somos reactivos. Anticipamos.  
+> Nunca información sin propósito.  
+> Antes de tablas: **¿qué pregunta elimina?**  
 > YourMeal OS ayuda a tomar la siguiente decisión correcta en el momento adecuado.

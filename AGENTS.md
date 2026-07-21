@@ -115,6 +115,7 @@ El cliente compra **capacidades operativas**, no entidades ni repositorios.
 
 > No construimos pantallas. **Eliminamos preguntas.** Anticipamos.  
 > Misión: la siguiente decisión correcta en el momento adecuado.  
+> **Filtro de diseño:** ¿qué pregunta elimina? (antes que ¿qué tablas?)  
 > Identidad: [Asistentes Operativos](./docs/15-product/IDENTIDAD_ASISTENTES_OPERATIVOS.md)
 
 > Preguntas guía: ¿qué tarda el cocinero? ¿qué desperdicia? ¿qué falta en el servicio? ¿qué necesita EatClean?

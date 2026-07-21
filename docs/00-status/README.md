@@ -104,6 +104,8 @@ EatClean → ¿qué necesita? → ¿cómo evoluciona YourMeal OS?
 No construimos pantallas: **eliminamos preguntas**. Anticipamos: **avisamos antes del problema**.
 
 > YourMeal OS ayuda a cada persona a tomar la **siguiente decisión correcta** en el momento adecuado.  
+> **Asistentes** = lo que se compra · **Capabilities** = cómo se implementa.  
+> Filtro: *¿qué pregunta elimina?* — si no es clara, aún no está madura.  
 > Identidad: [Asistentes Operativos](../15-product/IDENTIDAD_ASISTENTES_OPERATIVOS.md)
 
 > EatClean no es solo el primer cliente. Es el **primer profesor** del Core.

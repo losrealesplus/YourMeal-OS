@@ -107,6 +107,20 @@ El producto no se recuerda por módulos.
 
 Se recuerda porque cada persona sabe **qué necesita su atención ahora**.
 
+### Dos niveles
+
+1. **Asistentes Operativos** — lo que compra el cliente.  
+2. **Capabilities** — cómo lo implementamos (pueden orquestarse varias para una decisión).
+
+### Principio de propósito
+
+> Cada Asistente debe responder una pregunta concreta o recomendar una acción concreta. **Nunca información sin propósito.**
+
+### Filtro de diseño
+
+Antes de *«¿qué tablas?»* → *«¿qué pregunta elimina?»*  
+Si no hay respuesta clara, la idea aún no está madura.
+
 Detalle: [Identidad · Asistentes Operativos](../15-product/IDENTIDAD_ASISTENTES_OPERATIVOS.md) · [Día operativo EatClean](../15-product/EATCLEAN_DIA_OPERATIVO.md)
 
 ---
