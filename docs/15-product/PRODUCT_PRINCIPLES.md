@@ -132,15 +132,23 @@ La cocina alimenta al producto. El producto vuelve a la cocina.
 
 ## 11. Operational Checks (transversal)
 
-No es un pilar nuevo.
+No es un pilar nuevo. Vive en el Product Blueprint.
 
 Es el mecanismo compartido: datos → comprobación → atención → acción.
+
+Unidad mínima de inteligencia del producto (sin IA).
 
 Ver [OPERATIONAL_CHECKS.md](./OPERATIONAL_CHECKS.md).
 
 Filtro adicional:
 
 > ¿Qué comprueba, por qué lo comprueba y qué acción permite tomar?
+
+### Lemas internos (equipo)
+
+1. Primero evidencia. Después abstracción.  
+2. ¿Qué pregunta elimina?  
+3. **No mostramos datos. Confirmamos que la operación puede continuar.**
 
 ### Adopción
 

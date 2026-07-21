@@ -113,6 +113,8 @@ El objetivo es descubrir **capacidades reutilizables** que beneficien a todas la
 
 Eso se logra con **Operational Checks** sencillos y acertados (Digitalizar → Validar → Recomendar → Optimizar).
 
+> **YourMeal OS no intenta ser más inteligente que el usuario. Intenta recordar todo aquello que el usuario no debería tener que recordar.**
+
 ### Criterio de éxito
 
 > ¿Cuántas decisiones dejamos de depender de la memoria humana para que el equipo pudiera centrarse en cocinar, servir y atender mejor a sus clientes?
@@ -124,6 +126,8 @@ Eso se logra con **Operational Checks** sencillos y acertados (Digitalizar → V
 ### Mecanismo transversal
 
 Cada Capability: **¿Qué sabemos? → ¿Qué comprobamos? → ¿Qué necesita atención?**
+
+Lema: **No mostramos datos. Confirmamos que la operación puede continuar.**
 
 Detalle: [OPERATIONAL_CHECKS](../15-product/OPERATIONAL_CHECKS.md) · [Centro de Control](../15-product/OPERATIONS_DASHBOARD.md) · [PRODUCT_VISION](../15-product/PRODUCT_VISION.md)
 

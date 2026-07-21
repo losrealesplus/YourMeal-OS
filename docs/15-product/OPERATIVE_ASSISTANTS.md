@@ -108,10 +108,26 @@ Cada uno puede apoyarse en **varias Capabilities**.
 | **Misión** | Sintetizar el estado del día en acciones, no en métricas sueltas |
 | **Pregunta que elimina** | ¿Cómo vamos? / ¿A quién pregunto ahora? |
 | **Acciones que recomienda** | Priorizar críticas · delegar · desbloquear cuellos de botella |
-| **Capabilities (apoyo)** | Orquesta todas las anteriores vía Operations Dashboard |
+| **Capabilities (apoyo)** | Orquesta Checks de las anteriores vía Centro de Control |
 | **Momentos** | Todos |
 
-Detalle de superficie: [OPERATIONS_DASHBOARD.md](./OPERATIONS_DASHBOARD.md)
+Detalle de superficie: [OPERATIONS_DASHBOARD.md](./OPERATIONS_DASHBOARD.md) *(Centro de Control)*  
+Checks orquestados: [OPERATIONAL_CHECKS.md](./OPERATIONAL_CHECKS.md)
+
+---
+
+## Asistentes = orquestadores de Checks
+
+| Asistente | Checks (ejemplos) |
+|-----------|-------------------|
+| Production | Stock · Descongelación · Producción |
+| Packaging | Etiquetas · Bolsas · Alergias |
+| Delivery / Route | Ruta · Entrega · Pago |
+| Purchasing | Stock mínimo · Compras |
+| Closing | Descongelación · Compras · Incidencias |
+| Menu | Repetición · Nutrición |
+
+No son pantallas de módulos. Son orquestadores de comprobaciones.
 
 ---
 
@@ -127,6 +143,7 @@ aún no está definido.
 
 ## Relacionado
 
+- [OPERATIONAL_CHECKS.md](./OPERATIONAL_CHECKS.md)
 - [CAPABILITY_ROADMAP.md](./CAPABILITY_ROADMAP.md)
 - [MOMENTOS_DE_DECISION.md](./MOMENTOS_DE_DECISION.md)
 - [PRODUCT_PRINCIPLES.md](./PRODUCT_PRINCIPLES.md)

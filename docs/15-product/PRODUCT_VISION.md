@@ -120,15 +120,19 @@ YourMeal OS no hace magia.
 
 Hace **miles de comprobaciones pequeñas y consistentes**.
 
+> **YourMeal OS no intenta ser más inteligente que el usuario. Intenta recordar todo aquello que el usuario no debería tener que recordar.**
+
+> **No mostramos datos. Confirmamos que la operación puede continuar.**
+
 Eso genera confianza. La confianza permite recomendar. La evidencia acumulada permite optimizar.
 
 | Concepto | Rol |
 |----------|-----|
-| **Operational Checks** | Mecanismo transversal: datos → comprobación → atención → acción |
+| **Operational Checks** | Unidad mínima de inteligencia (sin IA): datos → comprobación → acción |
 | **Centro de Control** | Superficie: estado de la operación (no vanity dashboard) |
 | **Etapas de adopción** | Digitalizar → Validar → Recomendar → Optimizar |
 
-No es un cuarto pilar. Es el comportamiento que deberían compartir casi todas las Capabilities.
+No es un cuarto pilar. Es el comportamiento transversal del Product Blueprint.
 
 Detalle: [OPERATIONAL_CHECKS.md](./OPERATIONAL_CHECKS.md).
 

@@ -32,7 +32,8 @@ Principios:
 - anticipación antes que reacción;
 - nunca métricas sin contexto;
 - contexto (hora, rol, estado) filtra qué se muestra;
-- Checks explicables que no deciden por la persona.
+- Checks explicables que no deciden por la persona;
+- **no mostramos datos: confirmamos que la operación puede continuar.**
 
 ---
 

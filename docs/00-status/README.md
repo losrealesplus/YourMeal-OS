@@ -18,13 +18,14 @@ Operación real → Discovery → Patrón → Blueprint → Capability
 
 > **Reducir la carga cognitiva de la operación diaria.**  
 > Confianza antes que IA: Checks sencillos que aciertan.  
+> **No mostramos datos. Confirmamos que la operación puede continuar.**  
 > Éxito: ¿cuántas decisiones dejamos de depender de la memoria humana?  
 > Métrica estrella: **preguntas eliminadas**.  
-> Mecanismo transversal: [Operational Checks](../15-product/OPERATIONAL_CHECKS.md) · [Centro de Control](../15-product/OPERATIONS_DASHBOARD.md)
+> Mecanismo transversal (Blueprint): [Operational Checks](../15-product/OPERATIONAL_CHECKS.md) · [Centro de Control](../15-product/OPERATIONS_DASHBOARD.md)
 
 > No implementamos ideas. Implementamos conocimiento validado.  
 > Discovery: solo evidencia — nunca soluciones.  
-> **No hay cuarto pilar.**
+> **No hay cuarto pilar.** Checks ≠ pilar nuevo.
 
 ---
 
