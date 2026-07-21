@@ -61,3 +61,4 @@ La arquitectura de YourMeal OS se considera **estable**.
 - Dominio `Dish` cerrado en documentación
 - Lenguaje del dominio `Dish` en código (VOs, errors, state machine)
 - Principio Entity Simplicity en `FOUNDATION.md`
+- Filosofía de Producto (`FILOSOFIA_DE_PRODUCTO.md`) — impacto operativo como criterio de éxito

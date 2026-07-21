@@ -257,6 +257,8 @@ AGENTS.md
 ↓
 CONTEXTO_ESTRATEGICO_PERMANENTE.md
 ↓
+FILOSOFIA_DE_PRODUCTO.md
+↓
 CONTEXTO_CTO.md
 ↓
 ADRs / docs del módulo
@@ -265,4 +267,5 @@ ADRs / docs del módulo
 - `FOUNDATION.md` → criterio global reusable
 - `AGENTS.md` → reglas operativas específicas de YourMeal OS
 - `CONTEXTO_ESTRATEGICO_PERMANENTE.md` → dirección empresarial y del Core
+- `FILOSOFIA_DE_PRODUCTO.md` → propósito del producto e impacto operativo
 - `CONTEXTO_CTO.md` → resumen operativo de arranque de sesión
