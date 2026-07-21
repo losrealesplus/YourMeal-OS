@@ -99,6 +99,46 @@ El objetivo es descubrir **capacidades reutilizables** que beneficien a todas la
 
 ---
 
+## Identidad operativa (Product Era)
+
+> **YourMeal OS ayuda a cada persona a tomar la siguiente decisión correcta en el momento adecuado.**
+
+### Misión de la plataforma
+
+> **Reducir la carga cognitiva de la operación diaria.**
+
+### Confianza antes que IA
+
+> El primer reto no es automatizar. Es conseguir que la gente confíe en el sistema.
+
+Eso se logra con **Operational Checks** sencillos y acertados (Digitalizar → Validar → Recomendar → Optimizar).
+
+> **YourMeal OS no intenta ser más inteligente que el usuario. Intenta recordar todo aquello que el usuario no debería tener que recordar.**
+
+### Criterio de éxito
+
+> ¿Cuántas decisiones dejamos de depender de la memoria humana para que el equipo pudiera centrarse en cocinar, servir y atender mejor a sus clientes?
+
+### Métrica estrella
+
+**Preguntas eliminadas** (junto a tiempo, errores, interrupciones).
+
+### Mecanismo transversal
+
+**Operational Check** = unidad mínima de valor operativo.
+
+YourMeal OS captura **conocimiento operativo** y lo convierte en lógica reutilizable.
+
+Cada Capability: **¿Qué sabemos? → ¿Qué comprobamos? → ¿Qué necesita atención?**
+
+Lema: **No mostramos datos. Confirmamos que la operación puede continuar.**
+
+Fase: diseño estratégico cerrado → observar EatClean.
+
+Detalle: [OPERATIONAL_CHECKS](../15-product/OPERATIONAL_CHECKS.md) · [Centro de Control](../15-product/OPERATIONS_DASHBOARD.md) · [PRODUCT_VISION](../15-product/PRODUCT_VISION.md) · [FIRST_OBSERVATION_DAY](../16-operational-discovery/FIRST_OBSERVATION_DAY.md)
+
+---
+
 ## El Core aprende
 
 El Core no evoluciona mediante suposiciones.

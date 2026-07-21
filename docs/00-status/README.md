@@ -2,100 +2,68 @@
 
 **Última actualización:** 2026-07-21  
 **Versión:** `v0.1.0` — FOUNDATION LOCKED  
-**Etapa:** **PRODUCT ERA** ⏳  
-**Metodología:** estable (ya no es el foco diario)
 
-**Actas de la Foundation Era:**  
-[Domain / Foundation Validation](./MILESTONE_VALIDACION_DOMINIO_DISH.md) · [Infrastructure Validation](./MILESTONE_INFRASTRUCTURE_VALIDATION.md) · [Cambio de etapa](../99-internal/development-journal/2026-07-21-product-era.md)
+## Fase de diseño estratégico: CERRADA
 
----
-
-## Cambio de etapa
-
-YourMeal OS deja oficialmente la etapa de **Validación Arquitectónica**.
-
-A partir de este hito, el crecimiento del Core estará guiado prioritariamente por la **evidencia obtenida en operaciones reales**.
-
-Las futuras modificaciones estructurales requerirán evidencia acumulada de **múltiples Capabilities** o **múltiples organizaciones**.
-
-La arquitectura deja de ser el foco principal.
-
-**El producto pasa a ocupar ese lugar.**
-
----
-
-## Los tres exámenes (Foundation Era) — superados
-
-| Examen | Afirmación demostrada | Estado |
-|--------|----------------------|--------|
-| **Domain Validation** | El negocio puede definirse antes que el código | ✅ |
-| **Repository Validation** | La persistencia puede definirse desde el dominio | ✅ |
-| **Infrastructure Validation** | La tecnología puede adaptarse al Core sin modificar el Core | ✅ |
-
-Dirección de la dependencia **demostrada**, no solo diseñada:
+Hasta que la realidad de campo obligue a reabrirla.
 
 ```text
-Negocio → Core → Infrastructure → Base de datos
+Foundation ✅ → Blueprint ✅ → Discovery (estructura) ✅
+                ↓
+        Observar EatClean ⏳
 ```
 
-Cita del proyecto (Infrastructure Validation):
+| Antes | Ahora |
+|-------|--------|
+| Diseñábamos para el producto | Observamos el producto en uso |
+| Hipótesis en docs | Evidencia en cocina |
+| Sombrero: arquitecto / PO | Sombrero: **etnógrafo de operaciones** |
 
-> El esquema legado no cubría `inactive` / `category_id` / `recipe_id` / `tags`.  
-> Infrastructure se adaptó al dominio con migración — **no al revés**.
+No añadir más documentos estratégicos «por si acaso».  
+El siguiente arquitecto es **EatClean**.
 
 ---
 
-## Roadmap por eras
+## Tres pilares (no habrá cuarto)
+
+| Pilar | Pregunta | Estado |
+|-------|----------|--------|
+| **FOUNDATION** | ¿Cómo construimos? | ✅ |
+| **PRODUCT BLUEPRINT** | ¿Qué construimos y por qué? | ✅ cerrado (fase) |
+| **OPERATIONAL DISCOVERY** | ¿Por qué evolucionar? | ✅ carpeta · ⏳ evidencia real |
 
 ```text
-FOUNDATION ERA ✅
-
-Blueprint
-Foundation
-Domain
-Repository
-Application
-Infrastructure
-
-────────────────────────
-
-PRODUCT ERA ⏳
-
-Integration
-UI MVP
-EatClean Pilot
-Operational Feedback
-Capability 2
-Capability 3
-Platform Evolution
+Producto:  Discovery → Operational Check → Assistant → Capability
+Técnica:   Capability → Use Cases → Domain → Infrastructure
 ```
 
-Ya no aparece ninguna capa técnica nueva en el roadmap de producto: están construidas.
+> YourMeal OS captura **conocimiento operativo** y lo convierte en lógica reutilizable.  
+> Unidad mínima: [Operational Check](../15-product/OPERATIONAL_CHECKS.md).  
+> **No mostramos datos. Confirmamos que la operación puede continuar.**
 
 ---
 
-## Fase oficial (Product Era)
+## Trabajo actual
 
-```text
-Platform: YourMeal OS
-Capability: Dish Management   (Core listo para piloto)
+### Primera jornada observada en EatClean
 
-Integration                 ⏳  ← siguiente
-UI MVP                      ⏳
-EatClean Pilot              ⏳
-Operational Feedback        ⏳
-```
+Misión:
 
-**Próximo paso:** Integration + UI MVP para que EatClean pueda usar Dish Management.
+> ¿Qué Operational Checks ya existen hoy… pero viven solo en la cabeza de las personas?
 
-**Preguntas guía a partir de ahora:**
+Checklist: [FIRST_OBSERVATION_DAY.md](../16-operational-discovery/FIRST_OBSERVATION_DAY.md)
 
-- ¿Qué tarda demasiado un cocinero en hacer?
-- ¿Qué tarea genera más desperdicio?
-- ¿Qué información falta durante el servicio?
-- ¿Qué capacidad necesita realmente EatClean?
+Éxito del día: **N Checks implícitos identificados** — no un backlog de desarrollo.
 
-El Core deja de ser el protagonista.  
-La **operación** lo es. El Core solo evoluciona cuando la operación demuestra que debe hacerlo.
+En paralelo (solo Capability ya validada): Integration + UI MVP Dish — sin inventar Capabilities.
 
-> EatClean no es solo el primer cliente. Es el **primer profesor** del Core.
+### Orientación de PRs
+
+Valor operativo (jornada · findings · Checks · Asistente) > PRs solo «por tecnología».
+
+| Índice | Ruta |
+|--------|------|
+| Jornada | [FIRST_OBSERVATION_DAY.md](../16-operational-discovery/FIRST_OBSERVATION_DAY.md) |
+| Discovery | [docs/16-operational-discovery/](../16-operational-discovery/README.md) |
+| Checks | [OPERATIONAL_CHECKS.md](../15-product/OPERATIONAL_CHECKS.md) |
+| Blueprint | [docs/15-product/](../15-product/README.md) |

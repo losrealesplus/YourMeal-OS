@@ -70,23 +70,18 @@ A partir de aquí no rediseñamos la forma de construir salvo ADR. Foundation si
 
 **Meta de la fase:** terminar un catálogo de platos sólido, no una pantalla bonita.
 
-**Orden — Product Era:**
+**Orden:**
 
 ```text
-FOUNDATION ERA ✅
+FOUNDATION ✅          Cómo construir
+PRODUCT BLUEPRINT ✅   Qué construir
+OPERATIONAL DISCOVERY ✅/⏳  Por qué evolucionar (llenar evidencia)
         ↓
-PRODUCT ERA ⏳
-  Integration → UI MVP → EatClean Pilot → Operational Feedback
-        → Capability 2 → …
+CAPABILITIES → USE CASES → IMPLEMENTACIÓN
 ```
 
-> La arquitectura ya no es el foco diario. El producto y la operación lo son.  
-> EatClean = primer profesor del Core.
-
-> Planificación: Platform → Capabilities → Use Cases → Domain → Infrastructure.  
-> Primero evidencia; después abstracción.
-
-**Siguiente Capability** solo cuando el piloto (u otra evidencia operativa) lo demuestre.
+> No implementamos ideas. Implementamos conocimiento validado.  
+> [Discovery](../16-operational-discovery/README.md) · [Blueprint](../15-product/README.md)
 
 ### Module 02 · Weekly Planning
 

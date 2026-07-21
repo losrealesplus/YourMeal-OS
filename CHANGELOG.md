@@ -70,6 +70,21 @@ La arquitectura de YourMeal OS se considera **estable**.
 - Migración de esquema alineada al dominio (`inactive`, `category_id`, `recipe_id`, `tags`)
 - **Product Era** — fin de Validación Arquitectónica; el producto y la operación pasan a ser el foco
 - Tres exámenes afirmados: Domain · Repository · Infrastructure
+- Orden de pensamiento: EatClean → necesidad → evolución de YourMeal OS
+- `docs/15-product/EATCLEAN_DIA_OPERATIVO.md` — día operativo + Capabilities «nunca preguntes…»
+- Identidad de producto: **Asistentes Operativos** (proactivo; momentos de decisión; «¿qué necesita tu atención ahora?»)
+- Dos arquitecturas: técnica + experiencia operativa; dos niveles: Asistentes (compra) / Capabilities (implementación)
+- Principio de propósito + filtro *¿qué pregunta elimina?*
+- **Product Blueprint** (`docs/15-product/`) — VISION · PRINCIPLES · MOMENTOS · ASSISTANTS · DASHBOARD · CAPABILITY_ROADMAP
+- **Operational Discovery** completo: Findings · Questions · Time · Decisions · Workarounds · Incidents · Patterns · Candidates
+- Regla de oro: Discovery nunca contiene soluciones — solo evidencia
+- Disciplina: no implementamos ideas; implementamos conocimiento validado
+- Misión plataforma: reducir la carga cognitiva de la operación diaria
+- KPI estrella: preguntas eliminadas · ciclo cerrado operación↔producto · sin cuarto pilar
+- **Operational Checks** = unidad mínima de valor operativo · gate evidencia→Check→Capability  
+- **Diseño estratégico cerrado** → fase observación EatClean (etnógrafo; éxito = N Checks implícitos)  
+- Lemas: evidencia→abstracción · ¿qué pregunta elimina? · no mostramos datos, confirmamos que la operación puede continuar  
+- Etapas Digitalizar→Validar→Recomendar→Optimizar (IA solo con evidencia)
 - Secuencia definitiva en FOUNDATION: Guidelines → Spec → Implementation → Tests → Validation
 ### Gobierno
 

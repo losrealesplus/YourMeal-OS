@@ -94,40 +94,20 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-FOUNDATION ERA ✅  →  PRODUCT ERA ⏳
-Capability: Dish Management (Core listo)
-  → Integration → UI MVP → EatClean Pilot
+Diseño estratégico ✅ CERRADO  →  Observación EatClean ⏳
 ```
 
-**Jerarquía de planificación:**
+> **Dejar de diseñar** hasta que la realidad obligue a reabrir.  
+> Siguiente arquitecto: **EatClean**. Rol en campo: etnógrafo de operaciones.  
+> Misión de la jornada: ¿qué Checks ya existen solo en la cabeza de las personas?  
+> Éxito del día: N Checks implícitos — no «hay que desarrollar X».  
+> Unidad mínima operativa: **Operational Check**.  
+> Lemas: evidencia → abstracción · ¿qué pregunta elimina? · no mostramos datos, confirmamos que la operación puede continuar.  
+> **No hay cuarto pilar.** No abrir docs de estrategia sin evidencia que lo fuerce.
 
-```text
-Platform → Capabilities → Use Cases → Domain → Infrastructure
-```
+**Objetivo:** [FIRST_OBSERVATION_DAY](./docs/16-operational-discovery/FIRST_OBSERVATION_DAY.md) · Integration/UI Dish solo en paralelo (Capability ya validada).
 
-El cliente compra **capacidades operativas**, no entidades ni repositorios.
-
-**Etapa:** Product Era — la arquitectura deja de ser el foco; el producto lo ocupa.
-
-**Objetivo actual:** Integration + UI MVP + piloto EatClean (primer profesor del Core).
-
-> **Metodología estable.** Preferir: *«Foundation ya responde»* / *«¿el producto lo necesita?»*.
-
-> **Primero evidencia. Después abstracción.**  
-> Modificaciones estructurales: evidencia de múltiples Capabilities u organizaciones.
-
-> Preguntas guía: ¿qué tarda el cocinero? ¿qué desperdicia? ¿qué falta en el servicio? ¿qué necesita EatClean?
-
-Orden:
-
-```text
-Infrastructure Validation ✅
-  → Integration → UI MVP → EatClean Pilot → feedback → Capability 2
-```
-
-Actas: [Infrastructure Validation](./docs/00-status/MILESTONE_INFRASTRUCTURE_VALIDATION.md) · [Product Era](./docs/99-internal/development-journal/2026-07-21-product-era.md)
-
-La unidad de diseño sigue siendo el **caso de uso**.
+Índices: [Discovery](./docs/16-operational-discovery/README.md) · [Checks](./docs/15-product/OPERATIONAL_CHECKS.md) · [Estado](./docs/00-status/README.md)
 
 ### Principio de valor (Capabilities)
 
