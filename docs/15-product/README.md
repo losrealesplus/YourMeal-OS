@@ -9,6 +9,7 @@ Son mapas de cómo una Organización real trabaja — y qué Capabilities elimin
 | Documento | Propósito |
 |-----------|-----------|
 | [EATCLEAN_DIA_OPERATIVO.md](./EATCLEAN_DIA_OPERATIVO.md) | Día completo + mapa de Capabilities emergentes |
+| [IDENTIDAD_ASISTENTES_OPERATIVOS.md](./IDENTIDAD_ASISTENTES_OPERATIVOS.md) | Misión, momentos de decisión, «¿qué necesita tu atención ahora?» |
 
 ## Orden de pensamiento
 
@@ -18,6 +19,8 @@ EatClean → ¿qué necesita?
 ¿cómo debe evolucionar YourMeal OS?
 ```
 
-## Principio
+## Principios
 
-> No construimos pantallas. Eliminamos preguntas.
+> No construimos pantallas. Eliminamos preguntas.  
+> No somos reactivos. Anticipamos.  
+> YourMeal OS ayuda a tomar la siguiente decisión correcta en el momento adecuado.

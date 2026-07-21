@@ -99,6 +99,18 @@ El objetivo es descubrir **capacidades reutilizables** que beneficien a todas la
 
 ---
 
+## Identidad operativa (Product Era)
+
+> **YourMeal OS ayuda a cada persona a tomar la siguiente decisión correcta en el momento adecuado.**
+
+El producto no se recuerda por módulos.
+
+Se recuerda porque cada persona sabe **qué necesita su atención ahora**.
+
+Detalle: [Identidad · Asistentes Operativos](../15-product/IDENTIDAD_ASISTENTES_OPERATIVOS.md) · [Día operativo EatClean](../15-product/EATCLEAN_DIA_OPERATIVO.md)
+
+---
+
 ## El Core aprende
 
 El Core no evoluciona mediante suposiciones.

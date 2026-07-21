@@ -72,6 +72,7 @@ La arquitectura de YourMeal OS se considera **estable**.
 - Tres exámenes afirmados: Domain · Repository · Infrastructure
 - Orden de pensamiento: EatClean → necesidad → evolución de YourMeal OS
 - `docs/15-product/EATCLEAN_DIA_OPERATIVO.md` — día operativo + Capabilities «nunca preguntes…»
+- Identidad de producto: **Asistentes Operativos** (proactivo; momentos de decisión; «¿qué necesita tu atención ahora?»)
 - Secuencia definitiva en FOUNDATION: Guidelines → Spec → Implementation → Tests → Validation
 ### Gobierno
 

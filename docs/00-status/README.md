@@ -101,6 +101,9 @@ EatClean → ¿qué necesita? → ¿cómo evoluciona YourMeal OS?
 - ¿Qué información falta durante el servicio?
 - ¿Qué capacidad necesita realmente EatClean?
 
-No construimos pantallas: **eliminamos preguntas**.
+No construimos pantallas: **eliminamos preguntas**. Anticipamos: **avisamos antes del problema**.
+
+> YourMeal OS ayuda a cada persona a tomar la **siguiente decisión correcta** en el momento adecuado.  
+> Identidad: [Asistentes Operativos](../15-product/IDENTIDAD_ASISTENTES_OPERATIVOS.md)
 
 > EatClean no es solo el primer cliente. Es el **primer profesor** del Core.
