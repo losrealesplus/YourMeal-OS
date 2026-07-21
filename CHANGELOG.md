@@ -58,7 +58,10 @@ La arquitectura de YourMeal OS se considera **estable**.
 - Un caso de uso por clase (`CreateDishUseCase`, …); fachada Application Service opcional
 - Principio Use Case Clarity en FOUNDATION / Application Guidelines
 - **Metodología estable** — cimientos no se profundizan más; se construye producto
-- `use-cases/CreateDishUseCase.md` — diseño de implementación UC-001 (no guideline)
+- `use-cases/CreateDishUseCase.md` — contrato Producto↔Desarrollo (11 secciones + invariantes)
+- Principio **Use Case Specificity** — implementable leyendo solo la especificación
+- `CreateDishUseCase.ts` + tests — primera planta (traducción del contrato)
+- `DishAlreadyExists` — error de coordinación de unicidad
 - Secuencia definitiva en FOUNDATION: Guidelines → Spec → Implementation → Tests → Validation
 ### Gobierno
 

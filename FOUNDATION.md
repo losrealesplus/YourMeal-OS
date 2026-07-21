@@ -138,6 +138,14 @@ Not inside the entity. Keep entities small and easy to understand.
 
 > Every use case must represent an action a real user can understand and perform. If a use case cannot be described without talking about classes, services, or databases, it does not yet belong in the Application layer.
 
+### Use Case Specificity
+
+> A use case is done when any developer can implement it correctly by reading only its specification.
+
+The specification is a contract between Product and Engineering. Code translates it; it does not redefine it.
+
+**Detailed standard (YourMeal OS):** [`docs/14-application/APPLICATION_GUIDELINES.md`](./docs/14-application/APPLICATION_GUIDELINES.md)
+
 ---
 
 ## Cambios

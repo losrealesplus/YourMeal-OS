@@ -42,6 +42,14 @@ Nunca lo duplica.
 
 Este principio es a Application lo que **Entity Simplicity** es al dominio.
 
+## Principio de especificabilidad del caso de uso
+
+> Un caso de uso está terminado cuando cualquier desarrollador puede implementarlo correctamente leyendo únicamente su especificación.
+
+La especificación es un contrato entre Producto y Desarrollo — no documentación decorativa. El código la traduce; no la redefine.
+
+Las especificaciones de implementación viven en `docs/14-application/use-cases/` (p. ej. [CreateDishUseCase.md](./use-cases/CreateDishUseCase.md)). No son documentos de Foundation.
+
 ---
 
 ## Responsabilidad

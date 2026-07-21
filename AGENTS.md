@@ -94,7 +94,7 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-Metodología estable ✅ → CreateDishUseCase.md ✅ → CreateDishUseCase.ts ⏳
+Metodología estable ✅ → CreateDishUseCase.md ✅ → CreateDishUseCase.ts ✅ → resto UCs ⏳
 ```
 
 **Objetivo de Module 01:** materializar el catálogo de platos para EatClean **heredando** el patrón ya validado.
@@ -102,18 +102,17 @@ Metodología estable ✅ → CreateDishUseCase.md ✅ → CreateDishUseCase.ts �
 > **Metodología estable.** No añadir documentos de Foundation «porque sí».  
 > Preferir: *«Foundation ya responde»* o *«primero que el producto lo demuestre»*.
 
+> **Use Case Specificity:** un UC está terminado cuando se puede implementar leyendo solo su especificación.
+
 Orden:
 
 ```text
-DISH_USE_CASES.md ✅
-  → CreateDishUseCase.md ✅ (diseño de implementación)
-  → CreateDishUseCase.ts ⏳
-  → Tests → resto de UCs → SupabaseDishRepository → UI MVP
+CreateDishUseCase ✅
+  → Update / Activate / Deactivate / Archive / Restore / Duplicate / AssignRecipe
+  → SupabaseDishRepository → UI MVP
 ```
 
 La unidad de diseño es el **caso de uso**. Una fachada `DishApplicationService` es opcional y posterior.
-
-> Cada caso de uso = acción que un usuario real comprende. Sin clases ni SQL en la descripción.
 
 ### Principio de valor (Module 01+)
 

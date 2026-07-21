@@ -23,7 +23,8 @@
 | Validación de la metodología | ✅ |
 | **Foundation Validation** | ✅ |
 | **Metodología estable** | ✅ |
-| Primera planta (UC-001 código) | ⏳ |
+| **UC-001 CreateDishUseCase** | ✅ |
+| Resto de UCs Dish | ⏳ |
 
 > Por debajo de Foundation no quedan decisiones arquitectónicas pendientes.  
 > Lo que sigue son implementaciones.  
@@ -38,12 +39,12 @@ Module 01 · Dish Library
   Domain Done (Dish)               ✅
   Repository                       ✅ (contrato)
   DISH_USE_CASES.md                ✅
-  CreateDishUseCase.md             ✅  ← diseño
-  CreateDishUseCase.ts             ⏳  ← siguiente
-  Resto UCs / Tests / Infra / UI   ⏳
+  CreateDishUseCase.md             ✅
+  CreateDishUseCase.ts             ✅  ← primera planta
+  Resto UCs / Supabase / UI        ⏳
 ```
 
-**Próximo paso:** implementar `CreateDishUseCase` como traducción de [CreateDishUseCase.md](../14-application/use-cases/CreateDishUseCase.md).
+**Próximo paso:** siguientes UCs (Update / Activate / …) con la misma disciplina de especificación → código → tests.
 
 ## Misión v0.1
 

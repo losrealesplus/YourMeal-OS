@@ -1,181 +1,195 @@
-# CreateDishUseCase — Diseño UC-001
+# UC-001 — Create Dish
 
-**Tipo:** especificación de implementación (no es estándar de Foundation)  
-**Caso de uso:** [UC-001 — Crear Dish](../DISH_USE_CASES.md#uc-001--crear-dish)  
-**Código previsto:** `src/modules/dish-library/application/create-dish-use-case.ts`  
-**Estado:** listo para implementar
+**Pregunta de prueba:** *¿Qué hace CreateDishUseCase?*  
+Si la respuesta exige abrir el código, este documento ha fallado.  
+Si basta con leerlo, es un contrato entre Producto y Desarrollo.
 
-> Documento breve. Cuando esté implementado, el código es la traducción de este diseño.
-
----
-
-## Objetivo
-
-Registrar un nuevo plato para una Organización, en estado **draft**.
+**Catálogo:** [DISH_USE_CASES · UC-001](../DISH_USE_CASES.md#uc-001--crear-dish)  
+**Código (traducción):** `src/modules/dish-library/application/create-dish-use-case.ts`
 
 ---
 
-## Actor
+## 1. Propósito
 
-Administrador (capability `dishes.create`).
-
----
-
-## Responsabilidad
-
-¿Qué coordina?
-
-1. Autorización del actor.
-2. Construcción de Value Objects a partir de la entrada.
-3. Comprobación de unicidad de nombre en la Organización.
-4. Creación del agregado (`Dish.create`).
-5. Persistencia (`DishRepository.save`).
-6. Auditoría y publicación del evento de dominio.
-7. Devolución del **resultado de aplicación**.
-
-No decide reglas de negocio. No conoce Supabase, HTTP ni React.
+Registrar un nuevo plato para una organización garantizando que cumple las reglas del dominio antes de quedar disponible para el resto del sistema.
 
 ---
 
-## Entradas
+## 2. Actor
 
-Entrada de aplicación (no DTO de UI, no body HTTP):
+**Administrador de la Organización** (o rol con responsabilidad de catálogo de platos).
 
-| Campo | Obligatorio | Notas |
-|-------|-------------|--------|
-| `name` | sí | → `DishName` |
-| `categoryId` | sí | → `CategoryId` |
-| `description` | no | |
-| `photoUrl` | no | |
-| `portionSize` | no | → `PortionSize` |
-| `calories` / nutrición básica | no | → `NutritionFacts` / `Calories` |
-| `price` | no | → `Money` |
-| `cost` | no | → `Money` |
-| `allergens` | no | |
-| `tags` | no | |
-| `recipeId` | no | → `RecipeId` (si se indica) |
+No es «quien pulsa el botón».  
+Es quien tiene la **responsabilidad de negocio** de incorporar un plato al catálogo.
 
-El `tenantId` y el usuario salen del **contexto de aplicación** (`ServiceContext`), no del body de negocio.
-
-Estado inicial: siempre **draft** (lo fija el dominio).
+Capability de autorización: `dishes.create`.
 
 ---
 
-## Precondiciones
+## 3. Trigger
 
-- Organización activa en el contexto.
-- Usuario con `dishes.create`.
-- Nombre válido y único en la Organización.
-- Categoría indicada.
+Cualquier origen que deba crear un plato ejecuta **exactamente este** caso de uso:
 
----
+- Un administrador crea un plato en la aplicación.
+- Una importación masiva de catálogo.
+- Una IA propone un nuevo menú y materializa platos.
 
-## Dependencias
-
-Contratos — nada más:
-
-| Dependencia | Obligatoria | Rol |
-|-------------|-------------|-----|
-| `DishRepository` | sí | `existsByName`, `save` |
-| `ServiceContext` + `requireCapability` | sí | autorización / tenant / actor |
-| Generador de id (`DishId`) | sí | identidad del nuevo plato |
-| Reloj (`Clock`) | opcional | testabilidad de `createdAt` |
-| Publicador de eventos | opcional v1 | si no hay bus aún: `pullDomainEvents()` tras `save` basta para tests |
-| `AuditService` | sí (patrón Core) | auditoría de la operación |
-
-No: Supabase client, React, HTTP, Prisma, UI DTOs.
+La UI, el batch o la IA no inventan otra forma de crear. Orquestan este caso de uso.
 
 ---
 
-## Flujo
+## 4. Entradas
+
+Conceptos del negocio — no DTOs de UI ni bodies HTTP.
+
+**Obligatorias**
+
+| Concepto | Significado |
+|----------|-------------|
+| OrganizationId | Organización dueña del plato |
+| ActorId | Quién inicia la operación (auditoría / contexto) |
+| Roles del actor | Para comprobar `dishes.create` |
+| DishName | Nombre del plato |
+| CategoryId | Categoría del plato |
+
+**Opcionales**
+
+| Concepto | Significado |
+|----------|-------------|
+| Description | Texto descriptivo |
+| PhotoUrl | Referencia a imagen |
+| Portion | Tamaño de porción (gramos) |
+| Calories | Energía (kcal) |
+| Price | Precio de venta |
+| Cost | Coste |
+| Allergens | Lista de alérgenos |
+| Tags | Etiquetas |
+| RecipeId | Recipe asociada, si ya existe |
+
+El estado inicial **no** es entrada: el dominio lo fija siempre en **draft**.
+
+---
+
+## 5. Dependencias
+
+Solo contratos. Nada tecnológico.
+
+| Contrato | Para qué |
+|----------|----------|
+| DishRepository | Comprobar unicidad del nombre y persistir el agregado |
+| EventPublisher | Publicar los hechos de dominio tras persistir con éxito |
+| IdGenerator | Generar la identidad del nuevo plato |
+| Clock | Momento de creación (testable; puede ser el reloj del sistema) |
+
+No conoce: Supabase, HTTP, React, PostgreSQL, formularios.
+
+La autorización usa las capabilities del Core (`dishes.create`) — no es un adaptador de infraestructura.
+
+---
+
+## 6. Flujo
+
+Comportamiento — sin pseudocódigo ni TypeScript.
 
 ```text
-Input + ServiceContext
+Autorizar al actor (dishes.create)
         ↓
-requireCapability(dishes.create)
+Construir Value Objects desde las entradas
         ↓
-Value Objects (DishName, CategoryId, Money, …)
+Verificar unicidad del nombre en la Organización
         ↓
-existsByName(tenantId, name)  →  si true: DishAlreadyExists
+Generar identidad del plato
         ↓
-DishId = generateId()
+Crear Dish en dominio (estado draft)
         ↓
-Dish.create({ … })            →  estado draft + DishCreated en el agregado
+Persistir mediante DishRepository
         ↓
-repository.save(dish)
+Publicar eventos del agregado (DishCreated)
         ↓
-audit + publish(pullDomainEvents())
-        ↓
-CreateDishResult
+Construir resultado de aplicación
 ```
+
+Si la unicidad falla → error de negocio `DishAlreadyExists` (no se crea nada).  
+Si un Value Object es inválido → error del dominio (no se persiste nada).  
+Si falla la persistencia → no se publica el evento como hecho consumado.
+
+Nunca queda un Dish «a medias» visible para el resto del sistema.
 
 ---
 
-## Resultado
+## 7. Resultado
 
-Resultado de **aplicación**, no HTTP Response ni DTO de React.
+No Response HTTP. No JSON de framework. No modelo de React.
 
-Propuesta mínima:
+Un **resultado de aplicación** que confirma el hecho de negocio:
 
 ```text
-CreateDishResult {
-  dishId: string
-  tenantId: string
-  name: string
-  status: "draft"
-}
+Dish creado correctamente.
+Identidad generada (DishId).
+Organización (OrganizationId).
+Nombre registrado.
+Estado inicial: draft.
 ```
 
-Si hace falta más datos en un caller concreto, se amplía el resultado de aplicación — no se filtra un row de Supabase ni un componente.
+Con eso el caller puede continuar (mostrar confirmación, navegar al plato, encadenar otro caso de uso).
 
 ---
 
-## Eventos
+## 8. Errores
 
-- `DishCreated` (registrado por el dominio en `Dish.create`)
+Solo errores posibles de negocio / coordinación. No excepciones técnicas de red o SQL.
 
----
-
-## Errores
-
-| Error | Origen |
+| Error | Cuándo |
 |-------|--------|
-| `PERMISSION_DENIED` | Application (capability) |
-| `DishNameRequired` / `DishNameTooLong` | Dominio (VO) |
-| `DishCategoryRequired` | Dominio (si aplica) |
-| `DishAlreadyExists` | Application (coordinación de unicidad) |
+| Sin permiso (`PERMISSION_DENIED`) | El actor no puede crear platos |
+| `DishNameRequired` | Nombre vacío o ausente |
+| `DishNameTooLong` | Nombre fuera del límite del dominio |
+| `DishCategoryRequired` / categoría inválida | Falta categoría válida |
+| `DishAlreadyExists` | Ya hay un plato con ese nombre en la Organización |
+| Errores de Value Object (precio, porción, calorías, …) | Entrada opcional inválida |
 
 ---
 
-## Tests
-
-`CreateDishUseCase.spec.ts` — con `DishRepository` en memoria (o fake):
-
-1. Crea Dish en `draft` y persiste.
-2. Rechaza nombre duplicado (`DishAlreadyExists`).
-3. Rechaza sin capability.
-4. Propaga errores de Value Object (nombre vacío / demasiado largo).
-5. Emite / expone `DishCreated` tras éxito.
-
-Sin Supabase. Sin React.
-
----
-
-## Definition of Done de esta especificación
-
-- [x] Cuatro preguntas respondidas (responsabilidad, dependencias, flujo, resultado)
-- [ ] Código `CreateDishUseCase`
-- [ ] Tests verdes
-- [ ] Sin fachada monolítica obligatoria
-
----
-
-## Siguiente paso
+## 9. Eventos
 
 ```text
-CreateDishUseCase.md   ✅
-        ↓
-CreateDishUseCase.ts   ⏳
-        ↓
-CreateDishUseCase.spec.ts
+DishCreated
 ```
+
+Y nada más en este caso de uso.
+
+---
+
+## 10. Invariantes
+
+¿Qué debe seguir siendo cierto cuando termina este caso de uso?
+
+- El nombre del nuevo plato es **único** dentro de la Organización.
+- El Dish creado cumple **todas las invariantes del agregado** (VOs válidos, estado `draft`).
+- **No existe** un Dish parcialmente creado: o el caso de uso completa persistencia + evento, o no deja rastro operativo.
+- El plato **no** queda operativo (`active`) solo por crearse: hace falta otro caso de uso (Activar).
+- Ninguna regla de negocio nueva se ha aplicado fuera del dominio.
+
+---
+
+## 11. Definition of Done
+
+Un caso de uso está terminado cuando **cualquier desarrollador puede implementarlo correctamente leyendo únicamente esta especificación**.
+
+Concretamente:
+
+- [x] Todos los Value Objects se crean correctamente (o fallan con el error de dominio esperado).
+- [x] Solo usa contratos del dominio / Application (`DishRepository`, `EventPublisher`, `IdGenerator`, `Clock`).
+- [x] No conoce infraestructura (Supabase, HTTP, React).
+- [x] Publica el evento `DishCreated` tras éxito.
+- [x] Tiene pruebas que cubren éxito, duplicado, sin permiso y nombre inválido.
+- [x] Cumple el flujo documentado aquí.
+- [x] El resultado es de aplicación, no de transporte.
+
+---
+
+## Principio
+
+> Un caso de uso está terminado cuando cualquier desarrollador puede implementarlo correctamente leyendo únicamente su especificación.
+
+La decisión nace en el negocio, se formaliza aquí, se traduce a código y se valida con pruebas.

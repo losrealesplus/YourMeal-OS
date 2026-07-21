@@ -70,10 +70,10 @@ A partir de aquí no rediseñamos la forma de construir salvo ADR. Foundation si
 **Orden Application (misma disciplina):**
 
 ```text
-DISH_USE_CASES ✅ → CreateDishUseCase.md ✅ → CreateDishUseCase.ts ⏳ → Tests
+CreateDishUseCase.md ✅ → CreateDishUseCase.ts ✅ → resto UCs ⏳ → Supabase → UI
 ```
 
-> Metodología estable. Lo que sigue es ingeniería. Un caso de uso por clase.
+> Metodología estable. Use Case Specificity. El `.md` responde qué hace; el `.ts` lo traduce.
 
 **Segundo gran principio a validar:** el Core permanece estable; la infraestructura se adapta al dominio.
 Luego, con la misma disciplina: **Ingredient** → **Recipe**.
