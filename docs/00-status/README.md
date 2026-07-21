@@ -34,8 +34,9 @@ Module 01 · Dish Library
   Repository Guidelines            ✅
   DishRepository.md                ✅
   DishRepository.ts                ✅
-  Application Guidelines           ⏳  ← siguiente
-  Application / Infra / UI         ⏳
+  Application Guidelines           ✅
+  DishApplication (docs/código)    ⏳  ← siguiente
+  Infra / UI                       ⏳
 ```
 
 ### Cambio de naturaleza del proyecto
