@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-20  
+**Última actualización:** 2026-07-21  
 **Versión:** `v0.1.0` — FOUNDATION LOCKED
 
 ## Fase oficial
@@ -29,6 +29,8 @@ Dish Library           🚧
 | Memoria | Diario de Desarrollo del Proyecto |
 | Cierre diario | Protocolo de 7 pasos (incluye Diario) |
 | Contexto sesiones | [CONTEXTO_CTO.md](../05-architecture/CONTEXTO_CTO.md) |
+| Pirámide de decisión | Jerarquía docs → código en [`AGENTS.md`](../../AGENTS.md) |
+| Valor (Module 01+) | Código para EatClean o para fortalecer el Core |
 
 ## Module 01 — ahora
 
@@ -38,7 +40,9 @@ Dominio primero (sin UI):
 - [Ingredient.md](../12-domain-model/module-01/Ingredient.md)
 - [Recipe.md](../12-domain-model/module-01/Recipe.md)
 
-**Próximo paso de implementación:** refinar/cerrar invariantes de **Dish** en código de dominio (`src/modules/dish-library/domain/`) — aún sin pantalla.
+**Objetivo de Module 01:** validar la constitución (Dish → Ingredient → Recipe sin romper reglas).
+
+**Próximo paso de implementación:** dominio **Dish** en código (`src/modules/dish-library/domain/`) — sin pantalla.
 
 ## Enlaces
 

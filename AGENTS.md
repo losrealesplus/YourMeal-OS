@@ -43,13 +43,35 @@ Registrar en el **Diario de Desarrollo** al terminar (antes de Done).
 
 **No rehacer Architecture Review ni Foundation** salvo ADR nuevo. Ya están cerrados (`v0.1.0`).
 
+## Pirámide de decisión
+
+Cada nivel responde una pregunta distinta. **Nunca discutir una decisión en un nivel inferior si contradice uno superior.**
+
+```text
+FOUNDATION.md              → ¿Cómo pensamos?
+AGENTS.md                  → ¿Cómo trabajamos en este proyecto?
+CONTEXTO_ESTRATEGICO…      → ¿Qué empresa estamos construyendo?
+CONTEXTO_CTO.md            → ¿Cómo debe evolucionar técnicamente?
+ADRs                       → ¿Por qué tomamos esta decisión?
+Domain Model               → ¿Cómo funciona el negocio?
+Código                     → ¿Cómo lo implementamos?
+```
+
+Si la implementación contradice el dominio, gana el dominio. Si el dominio contradice un ADR, primero el ADR. Y así hacia arriba.
+
 ## Fase actual
 
 ```text
 Foundation Lock ✅  →  Module 01 Dish Library 🚧
 ```
 
+**Objetivo de Module 01:** validar que la constitución funciona (Dish → Ingredient → Recipe sin romper reglas).
+
 Orden: Dish → Ingredient → Recipe → Repos → Services → Rules → Tests → **UI** → CRUD.
+
+### Principio de valor (Module 01+)
+
+> Cada línea de código debe aportar valor al **primer cliente** (EatClean) o fortalecer el **Core** para clientes futuros. Si no cumple ninguna de las dos, no debería existir.
 
 ## Gobierno
 
