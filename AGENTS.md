@@ -95,9 +95,8 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 
 ```text
 Platform: YourMeal OS
-Capability: Dish Management (Application) ✅
-        ↓
-Infrastructure (Supabase) / UI ⏳
+Capability: Dish Management
+  Application ✅ → Infrastructure Validation ✅ → Integration / UI ⏳
 ```
 
 **Jerarquía de planificación del Core** (no «módulos» como unidad de valor):
@@ -108,21 +107,22 @@ Platform → Capabilities → Use Cases → Domain → Infrastructure
 
 El cliente compra **capacidades operativas**, no entidades ni repositorios.
 
-**Objetivo actual:** materializar Dish Management para EatClean **heredando** el patrón ya validado.
+**Objetivo actual:** Integration Validation + UI MVP para EatClean — sin tocar Foundation.
 
-> **Metodología estable.** No añadir documentos de Foundation «porque sí».  
-> Preferir: *«Foundation ya responde»* o *«primero que el producto lo demuestre»*.
+> **Metodología estable.** Preferir: *«Foundation ya responde»* / *«¿el producto lo necesita?»*.
 
-> **Use Case Specificity:** un UC está terminado cuando se puede implementar leyendo solo su especificación.
+> **Use Case Specificity** · **Primero evidencia. Después abstracción.**
 
-> **Primero evidencia. Después abstracción.** Use Cases parecidos dentro de una Capability no justifican una clase base. Generalizar solo cuando varias Capabilities distintas demuestren el mismo patrón.
+> Vamos a **validar Capabilities**, no solo a programar.
 
 Orden:
 
 ```text
-Dish Management Application ✅
-  → SupabaseDishRepository → UI MVP
+Infrastructure Validation ✅
+  → Integration Validation → UI MVP → feedback EatClean → Segunda Capability
 ```
+
+Acta: [Infrastructure Validation](./docs/00-status/MILESTONE_INFRASTRUCTURE_VALIDATION.md)
 
 La unidad de diseño es el **caso de uso**. Una fachada `DishApplicationService` es opcional y posterior.
 
