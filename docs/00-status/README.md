@@ -1,39 +1,36 @@
 # Estado del proyecto
 
 **Última actualización:** 2026-07-21  
-**Versión:** `v0.1.0` — FOUNDATION LOCKED
+**Versión:** `v0.1.0` — FOUNDATION LOCKED  
+**Milestone:** [Primera validación del dominio (Dish)](./MILESTONE_VALIDACION_DOMINIO_DISH.md) ✅
 
 ## Fase oficial
 
 ```text
 FASE 0 — FUNDACIÓN
 Blueprint              ✅
-Foundation             ✅
+Foundation             ✅  (documento vivo)
 Foundation Lock        ✅
-Global Foundation      ✅
-Constitución           ✅
-Arquitectura           ✅
-Metodología            ✅
-Contexto Estratégico   ✅
-Filosofía de Producto  ✅
-Actores                ✅
-Lenguaje ubicuo        ✅
-Entity Guidelines      ✅
-Fundación del dominio  ✅  ← cerrada
 ────────────────────────
 FASE 1 — Core v0.1 (EatClean)
+Domain Language        ✅
+Entity Guidelines      ✅
+First Entity (Dish)    ✅
+Pattern Validation     ✅
+────────────────────────
 Module 01 · Dish Library 🚧
   Dominio documentado     ✅
   Lenguaje en código      ✅
   Entidad Dish            ✅
-  Repository Interface    ⏳
+  Repository Interface    ⏳  ← siguiente
   Application Service     ⏳
+  Infrastructure          ⏳
   UI                      ⏳
 ```
 
-> La Fase 0 construyó la empresa y su sistema de decisión.  
-> **La fundación del dominio está cerrada:** el código es consecuencia, no el inicio.  
-> **La Fase 1** materializa producto a través de EatClean.
+> Se considera **completada la primera validación** de la fundación del dominio.  
+> Foundation permanece vivo. El código es consecuencia del diseño, no su inicio.  
+> Las siguientes entidades **heredan** la metodología; no la definen.
 
 > **La arquitectura ya no se diseña; se aplica.**
 
@@ -52,6 +49,7 @@ Module 01 · Dish Library 🚧
 | Filosofía de producto | [FILOSOFIA_DE_PRODUCTO.md](../05-architecture/FILOSOFIA_DE_PRODUCTO.md) — impacto operativo |
 | Actores | [ACTORS.md](../12-domain-model/ACTORS.md) — roles oficiales del dominio |
 | Entity Guidelines | [ENTITY_GUIDELINES.md](../12-domain-model/ENTITY_GUIDELINES.md) — estándar de entidades |
+| Milestone Dish | [MILESTONE_VALIDACION_DOMINIO_DISH.md](./MILESTONE_VALIDACION_DOMINIO_DISH.md) |
 
 ## Module 01 — ahora
 
@@ -61,11 +59,9 @@ Dominio primero (sin UI):
 - [Ingredient.md](../12-domain-model/module-01/Ingredient.md)
 - [Recipe.md](../12-domain-model/module-01/Recipe.md)
 
-**Objetivo de Module 01:** validar la constitución materializando `Dish` como consecuencia de Entity Guidelines.
+**Hecho:** primera validación del dominio mediante entidad `Dish` + tests.
 
-**Hecho:** entidad `Dish` + tests de dominio (`vitest`).
-
-**Próximo paso:** Repository Interface de dominio → adaptar Application Service — sin pantalla.
+**Próximo paso:** Repository Interface → Application Service → Infrastructure → UI.
 
 ## Misión v0.1
 
@@ -73,6 +69,7 @@ Dominio primero (sin UI):
 
 ## Enlaces
 
+- [Milestone · Validación del dominio](./MILESTONE_VALIDACION_DOMINIO_DISH.md)
 - [Diario](../99-internal/development-journal/README.md)
 - [Definition of Done](./DEFINITION_OF_DONE.md)
 - [Cierre de jornada](../05-architecture/CIERRE_DE_JORNADA.md)

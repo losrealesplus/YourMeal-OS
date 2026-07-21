@@ -64,5 +64,6 @@ La arquitectura de YourMeal OS se considera **estable**.
 - Filosofía de Producto (`FILOSOFIA_DE_PRODUCTO.md`) — impacto operativo como criterio de éxito
 - Actores oficiales del dominio (`docs/12-domain-model/ACTORS.md`) — fin de «Cliente» ambiguo
 - Entity Guidelines (`docs/12-domain-model/ENTITY_GUIDELINES.md`) — estándar de modelado de entidades
-- Fundación del dominio cerrada — el código es consecuencia del diseño
+- Fundación del dominio: primera validación completada (Foundation permanece vivo)
 - Entidad de dominio `Dish` + tests (`vitest`) — primera validación real de Foundation
+- Acta oficial: `docs/00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md`

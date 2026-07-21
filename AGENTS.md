@@ -67,14 +67,18 @@ Código (Dish.ts, …)              → ¿Cómo lo implementamos?
 
 Si la implementación contradice el dominio, gana el dominio. Si el dominio contradice un ADR, primero el ADR. Y así hacia arriba.
 
-### Fundación del dominio
+### Primera validación del dominio
 
 ```text
 FOUNDATION → AGENTS → Estrategia → Filosofía → Actores
   → Lenguaje ubicuo → Entity Guidelines → Dish.md → Dish.ts
 ```
 
-Estado: **cerrada**. Cómo debe ser una entidad ya no se debate por módulo: se aplica [ENTITY_GUIDELINES.md](./docs/12-domain-model/ENTITY_GUIDELINES.md).
+Estado: **primera validación completada** mediante `Dish`.  
+`FOUNDATION.md` permanece como documento **vivo**.  
+Cómo debe ser una entidad ya no se debate por módulo: se aplica [ENTITY_GUIDELINES.md](./docs/12-domain-model/ENTITY_GUIDELINES.md).
+
+Acta: [MILESTONE_VALIDACION_DOMINIO_DISH.md](./docs/00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md).
 
 ### Pregunta obligatoria (producto)
 
