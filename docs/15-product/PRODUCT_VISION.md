@@ -124,6 +124,10 @@ Hace **miles de comprobaciones pequeñas y consistentes**.
 
 > **No mostramos datos. Confirmamos que la operación puede continuar.**
 
+En una frase de empresa:
+
+> Capturamos **conocimiento operativo** y lo convertimos en lógica reutilizable.
+
 Eso genera confianza. La confianza permite recomendar. La evidencia acumulada permite optimizar.
 
 | Concepto | Rol |
@@ -135,6 +139,8 @@ Eso genera confianza. La confianza permite recomendar. La evidencia acumulada pe
 No es un cuarto pilar. Es el comportamiento transversal del Product Blueprint.
 
 Detalle: [OPERATIONAL_CHECKS.md](./OPERATIONAL_CHECKS.md).
+
+**Fase actual:** diseño estratégico cerrado → [primera jornada observada](../16-operational-discovery/FIRST_OBSERVATION_DAY.md).
 
 ---
 

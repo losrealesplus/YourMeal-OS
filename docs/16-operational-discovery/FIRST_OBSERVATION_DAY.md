@@ -1,89 +1,90 @@
 # FIRST_OBSERVATION_DAY — Primera jornada observada
 
 **Tipo:** Operational Discovery (checklist de campo)  
-**Objetivo:** aprender, no enseñar la aplicación  
-**Rol ese día:** investigadores — no desarrolladores · no vendedores
+**Fase:** diseño estratégico **cerrado** → observación  
+**Rol ese día:** **etnógrafo de operaciones** — no arquitecto · no vendedor · no demos
 
-No es un cuarto pilar. Es la primera ejecución de Discovery.
+El siguiente arquitecto es **EatClean**.
 
-La documentación estratégica base ya está madura.  
-Esta jornada es la **siguiente fase del producto**.
-
----
-
-## Propósito
-
-Conseguir la **primera jornada observada** en EatClean.
-
-Registrar preguntas, tiempos, workarounds e incidentes — **sin proponer soluciones**.
-
-### Qué no es esta jornada
-
-- Validar pantallas.  
-- Vender funcionalidades.  
-- Buscar bugs de software.
-
-### Qué sí es
-
-Descubrir los **Operational Checks implícitos** que ya viven en la cabeza de los empleados — y cuáles faltan.
-
-Preguntas guía:
-
-| Pregunta de campo | Para qué sirve después |
-|-------------------|------------------------|
-| ¿Qué comprueba la gente de memoria? | Checks implícitos existentes |
-| ¿Qué se olvida o se descubre tarde? | Checks que faltan |
-| ¿Qué, si falla, para la operación? | Checks críticos |
-| ¿Qué comprobación, si fuera automática, ahorraría más minutos? | Prioridad de automatización |
-
-Los Checks se **diseñan después**. Este día solo captura evidencia (OF, preguntas, tiempos).
-
-Ver unidad mínima de valor: [OPERATIONAL_CHECKS.md](../15-product/OPERATIONAL_CHECKS.md).
+No validamos YourMeal OS. No vendemos. No demostramos nada.
 
 ---
 
-## Actitud
+## Misión (una sola pregunta)
 
-- Mirar más que preguntar.  
-- No interrumpir el flujo salvo necesidad.  
-- Anotar hora + pregunta exacta cuando alguien pregunta.  
-- Al final del día importa el **patrón**, no la solución.  
-- Si alguien «lleva en la cabeza» una regla («siempre saco el pollo antes de irme»), anotar la regla como evidencia — no como diseño de Check.
+> **¿Qué Operational Checks ya existen hoy… pero viven únicamente en la cabeza de las personas?**
 
----
+Eso es el verdadero objetivo.
 
-## Lista de observación
+| Lo que oyes | Lo que es |
+|-------------|-----------|
+| «Con esto no llegamos a mañana.» | Un Check (stock / producción) |
+| «Antes de irme tengo que sacar el pollo.» | Un Check (descongelación) |
+| «Esta ruta hoy va justa.» | Un Check (viabilidad de ruta) |
 
-### Producción
+No buscas funcionalidades.
 
-- ¿Cuántas veces alguien pregunta qué hacer?
-- ¿Cuántas veces cambia el orden previsto?
-- ¿Qué tareas esperan a otra persona?
-- ¿Qué se comprueba de memoria antes de cocinar (stock, descongelación, mise en place)?
-
-### Packaging
-
-- ¿Qué se comprueba manualmente?
-- ¿Qué se vuelve a revisar dos veces?
-- ¿Qué errores casi ocurren?
-
-### Reparto
-
-- ¿Qué llamadas se realizan?
-- ¿Qué información falta al salir?
-- ¿Qué decisiones improvisa el repartidor?
-- ¿Cómo saben si hay que cobrar / si la ruta «cabe»?
-
-### Administración / cierre
-
-- ¿Qué información se busca constantemente?
-- ¿Qué se copia entre sistemas?
-- ¿Qué se confirma por WhatsApp?
-- ¿Qué dejan anotado «para mañana» (compras, descongelar, incidencias)?
+Buscas **lógica de negocio** que hoy depende de la memoria humana.
 
 ---
 
-## Contador de preguntas (métrica estrella)
+## Regla de la jornada
+
+Durante la observación:
+
+| Hacer | No hacer |
+|-------|----------|
+| Mirar | Responder |
+| Escuchar | Proponer |
+| Anotar | Corregir |
+| Preguntar solo para entender | Enseñar |
+
+Preguntas permitidas (y casi solo estas):
+
+- ¿Por qué haces eso?
+- ¿Cómo sabes que falta?
+- ¿Qué pasaría si se te olvidara?
+- ¿Cómo lo recuerdas?
+- ¿Quién te lo dice normalmente?
+
+Cada respuesta probablemente esconde uno o varios Operational Checks.
+
+---
+
+## Qué esperar (y qué no)
+
+No descubriréis 50 Capabilities el primer día.
+
+Descubriréis **decenas de pequeñas comprobaciones**:
+
+- «Siempre miro si queda suficiente film.»
+- «Siempre reviso si todas las etiquetas tienen fecha.»
+- «Siempre cuento las bolsas antes de que salga la furgoneta.»
+- «Siempre compruebo que el cliente nuevo esté en la ruta.»
+
+Eso son Checks — más valiosos que una lista de funcionalidades.
+
+---
+
+## Criterio de éxito del día
+
+**No** terminar diciendo: «Necesitamos desarrollar esto.»
+
+**Sí** terminar diciendo: «Hoy hemos identificado N Checks implícitos.»
+
+Ese es un éxito enorme.
+
+Ese mismo día: **cero** decisiones de producto, **cero** diseños de Check/Capability/pantalla.
+
+Camino después (otro día):
+
+```text
+Observación → Discovery → Operational Check → Assistant → Capability
+```
+
+---
+
+## Contador de preguntas
 
 Anotar cada pregunta operativa con hora:
 
@@ -95,32 +96,44 @@ Anotar cada pregunta operativa con hora:
 09:10  ¿Qué ruta hago primero?
 ```
 
-Al cierre: total del día → [QUESTIONS_LIBRARY.md](./QUESTIONS_LIBRARY.md) + [TIME_LOSSES.md](./TIME_LOSSES.md) + OF en [OPERATIONAL_FINDINGS.md](./OPERATIONAL_FINDINGS.md).
+Al cierre → [QUESTIONS_LIBRARY.md](./QUESTIONS_LIBRARY.md) · [TIME_LOSSES.md](./TIME_LOSSES.md) · OF en [OPERATIONAL_FINDINGS.md](./OPERATIONAL_FINDINGS.md).
 
-Cada pregunta repetida es candidata a un futuro Operational Check — **después** de validar el patrón. No inventar Checks el mismo día.
+Además: lista informal de **Checks implícitos oídos** (cita + quién + momento). Sin diseñar el Check.
 
 ---
 
-## Entregable de la jornada
+## Zonas a observar
+
+### Producción
+
+¿Qué se comprueba de memoria? ¿Quién pregunta qué hacer? ¿Qué espera a otra persona?
+
+### Packaging
+
+¿Qué se revisa dos veces? ¿Qué errores casi ocurren?
+
+### Reparto
+
+¿Qué improvisa el repartidor? ¿Cómo saben si hay que cobrar / si la ruta «cabe»?
+
+### Cierre / administración
+
+¿Qué dejan «para mañana»? ¿Qué se confirma por WhatsApp?
+
+---
+
+## Entregable
 
 1. N OF reales (sustituir plantillas).  
 2. Conteo de preguntas.  
-3. Workarounds / incidentes vistos.  
-4. Lista informal (en OF o notas): «comprobaciones que ya hacen de cabeza» vs «olvidos / descubrimientos tardíos».  
-5. **Cero** diseños de Capability, Check o pantalla ese día.
-
----
-
-## Después de la jornada (no el mismo día)
-
-Gate: [OPERATIONAL_CHECKS.md](../15-product/OPERATIONAL_CHECKS.md) — evidencia → pregunta → Check → Capabilities.
-
-Orientación de PRs: valor operativo (jornada · findings · Asistente · Checks), no solo tecnología.
+3. Workarounds / incidentes.  
+4. **Lista de Checks implícitos** (citas; no specs).  
+5. Cero diseños.
 
 ---
 
 ## Relacionado
 
-- [README.md](./README.md)
-- [OPERATIONAL_CHECKS.md](../15-product/OPERATIONAL_CHECKS.md)
-- [PRODUCT_VISION.md](../15-product/PRODUCT_VISION.md) — KPIs y misión
+- [OPERATIONAL_CHECKS.md](../15-product/OPERATIONAL_CHECKS.md) — unidad mínima de valor (diseñar **después**)
+- [README.md](./README.md) — regla de oro: solo evidencia
+- [Estado](../00-status/README.md) — fase de diseño estratégico cerrada

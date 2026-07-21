@@ -163,13 +163,15 @@ Digitalizar → Validar → Recomendar → Optimizar (IA solo con evidencia).
 
 ---
 
-## 12. Documentación estratégica madura
+## 12. Diseño estratégico cerrado (hasta nueva evidencia)
+
+La fase de diseño estratégico está **cerrada** hasta que la realidad de campo obligue a reabrirla.
 
 No abrir nuevos documentos de estrategia «por si acaso».
 
-La base (tres pilares + Checks + Centro de Control) está definida.
+Siguiente trabajo: **observar** ([FIRST_OBSERVATION_DAY](../16-operational-discovery/FIRST_OBSERVATION_DAY.md)).
 
-Siguiente fase: **evidencia de campo** ([FIRST_OBSERVATION_DAY](../16-operational-discovery/FIRST_OBSERVATION_DAY.md)).
+Rol en campo: etnógrafo de operaciones — no confirmar ideas; descubrir en qué se equivoca el modelo.
 
 Los PRs grandes deberían contar **valor operativo**, no solo evolución técnica.
 

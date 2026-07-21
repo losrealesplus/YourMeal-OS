@@ -127,11 +127,15 @@ Eso se logra con **Operational Checks** sencillos y acertados (Digitalizar → V
 
 **Operational Check** = unidad mínima de valor operativo.
 
+YourMeal OS captura **conocimiento operativo** y lo convierte en lógica reutilizable.
+
 Cada Capability: **¿Qué sabemos? → ¿Qué comprobamos? → ¿Qué necesita atención?**
 
 Lema: **No mostramos datos. Confirmamos que la operación puede continuar.**
 
-Detalle: [OPERATIONAL_CHECKS](../15-product/OPERATIONAL_CHECKS.md) · [Centro de Control](../15-product/OPERATIONS_DASHBOARD.md) · [PRODUCT_VISION](../15-product/PRODUCT_VISION.md)
+Fase: diseño estratégico cerrado → observar EatClean.
+
+Detalle: [OPERATIONAL_CHECKS](../15-product/OPERATIONAL_CHECKS.md) · [Centro de Control](../15-product/OPERATIONS_DASHBOARD.md) · [PRODUCT_VISION](../15-product/PRODUCT_VISION.md) · [FIRST_OBSERVATION_DAY](../16-operational-discovery/FIRST_OBSERVATION_DAY.md)
 
 ---
 

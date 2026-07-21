@@ -5,14 +5,18 @@
 | Pilar | Pregunta |
 |-------|----------|
 | [FOUNDATION](../../FOUNDATION.md) | ¿Cómo construimos? |
-| [PRODUCT BLUEPRINT](../15-product/README.md) | ¿Qué construimos y por qué? |
+| [PRODUCT BLUEPRINT](../15-product/README.md) | ¿Qué construimos y por qué? *(fase diseño: cerrada)* |
 | **OPERATIONAL DISCOVERY** | **¿Por qué evolucionar el producto?** *(qué hemos aprendido observando)* |
+
+**Ahora:** la evidencia manda. Empieza aquí → [FIRST_OBSERVATION_DAY.md](./FIRST_OBSERVATION_DAY.md).
 
 ---
 
 ## Misión
 
 Capturar evidencia objetiva de cómo trabajan las Organizaciones para que la evolución de YourMeal OS esté guiada por la **realidad operativa** y no por hipótesis.
+
+En particular: sacar a la luz los **Operational Checks implícitos** que hoy viven solo en la cabeza de las personas.
 
 ---
 
