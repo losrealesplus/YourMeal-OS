@@ -44,6 +44,12 @@ La arquitectura de YourMeal OS se considera **estable**.
 
 ## [Unreleased] — 2026-07-21
 
+### Hitos
+
+- **Foundation Validation ✅** — primera validación metodológica cerrada (`Dish` Domain Done)
+- Acta: `docs/00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md`
+- `DOMAIN_DONE.md` adoptado como DoD del dominio
+
 ### Gobierno
 
 - ADR 0011: Diario de Desarrollo + Principio de Intencionalidad

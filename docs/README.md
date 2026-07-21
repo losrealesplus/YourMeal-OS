@@ -7,7 +7,7 @@
 | Documento | Propósito |
 |-----------|-----------|
 | [Estado](./00-status/README.md) | Fase oficial |
-| [Milestone · Validación dominio (Dish)](./00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md) | Acta de la primera validación Foundation |
+| [Milestone · Foundation Validation](./00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md) | Hito histórico ✅ — metodología validada |
 | [Definition of Done](./00-status/DEFINITION_OF_DONE.md) | Checklist de módulo |
 | [Foundation Lock](./05-architecture/FOUNDATION_LOCK.md) | ✅ Cerrado v0.1.0 |
 | [Contexto estratégico](./05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md) | Dirección empresarial y del Core |

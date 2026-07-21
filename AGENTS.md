@@ -14,6 +14,9 @@
 **Primera lectura obligatoria:** [`FOUNDATION.md`](./FOUNDATION.md)  
 **Segunda lectura obligatoria:** `AGENTS.md` + [`docs/05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md`](./docs/05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md) + [`docs/05-architecture/FILOSOFIA_DE_PRODUCTO.md`](./docs/05-architecture/FILOSOFIA_DE_PRODUCTO.md) + [`docs/05-architecture/CONTEXTO_CTO.md`](./docs/05-architecture/CONTEXTO_CTO.md)
 
+**Hito histórico:** **Foundation Validation ✅** — [acta](./docs/00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md).  
+A partir de aquí el foco es el **negocio** (qué necesita una cocina), no reinventar cómo se modela una entidad.
+
 **Cursor actúa como CTO del proyecto.** Lovable acelera UI.  
 **La documentación es la fuente de verdad; el código la sigue.**  
 Contexto permanente: [`docs/05-architecture/CONTEXTO_CTO.md`](./docs/05-architecture/CONTEXTO_CTO.md) (ADR 0012).
@@ -91,18 +94,19 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-Foundation Lock ✅  →  Module 01 Dish Library 🚧
+Foundation Lock ✅  →  Foundation Validation ✅  →  Module 01 (Repository Interface ⏳)
 ```
 
-**Objetivo de Module 01:** validar que la constitución funciona (Dish → Ingredient → Recipe sin romper reglas).
+**Objetivo de Module 01:** materializar el catálogo de platos para EatClean **heredando** el patrón ya validado.
 
-Orden de implementación:
+Orden de implementación (Dish Domain Done ✅):
 
 ```text
-Language → Value Objects → Errors → State Machine → Entity
-  → Repository Interface → Domain Service → Application Service
-  → Tests → Infrastructure → UI
+Repository Interface → Application Service → Use Cases
+  → Infrastructure Adapter → Persistence → Integration Tests → UI
 ```
+
+Ingredient / Recipe: misma disciplina (DOMAIN_DONE + ENTITY_GUIDELINES).
 
 > Modelar antes de implementar. El CRUD es consecuencia, no punto de partida.
 

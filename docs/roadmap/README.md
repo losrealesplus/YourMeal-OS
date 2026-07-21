@@ -1,25 +1,42 @@
 # Roadmap Maestro — YourMeal OS
 
+## Hitos históricos
+
+| Milestone | Estado |
+|-----------|--------|
+| Blueprint | ✅ |
+| Foundation | ✅ *(documento vivo)* |
+| Foundation Lock | ✅ |
+| Product Philosophy | ✅ |
+| Ubiquitous Language | ✅ |
+| ACTORS | ✅ |
+| ENTITY_GUIDELINES | ✅ |
+| DOMAIN_DONE | ✅ |
+| Primera entidad (`Dish`) | ✅ Domain Done |
+| **Foundation Validation** | ✅ |
+
+> **Foundation Validation ✅** — hito histórico: donde dejó de construirse la metodología y empezó a construirse el producto.  
+> Acta: [MILESTONE_VALIDACION_DOMINIO_DISH.md](../00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md)
+
+A partir de este hito, el foco pasa del **metamodelo** al **dominio del negocio** (qué necesita una cocina), heredando la forma de construir ya validada.
+
+---
+
 ## Estado actual
 
 ```text
 FASE 0 — FUNDACIÓN
 ────────────────────────────────
-
 Blueprint                     ✅
-Foundation                    ✅
+Foundation                    ✅  (vivo)
 Foundation Lock               ✅
-Global Foundation             ✅
-Constitución                  ✅
-Arquitectura                  ✅
-Metodología                   ✅
-Contexto Estratégico          ✅
+Foundation Validation         ✅  ← hito histórico cerrado
 
-ESTADO:
-🟢 Cerrado
+ESTADO FASE 0 (metodología):
+🟢 Validada
 ```
 
-A partir de aquí no volveremos atrás salvo mediante ADR.
+A partir de aquí no rediseñamos la forma de construir salvo ADR. Foundation sigue evolucionando como documento vivo.
 
 ---
 
@@ -31,23 +48,24 @@ A partir de aquí no volveremos atrás salvo mediante ADR.
 
 ```text
 1. Dominio (documentado)          ✅
-2. Lenguaje del dominio           🚧
-3. Entidad Dish                   ⏳
-4. Ingredient Library
-5. Recipe Builder
-6. Repository Interface
-7. Domain / Application Services
-8. Tests
-9. Infrastructure
-10. UI
+2. Lenguaje del dominio           ✅
+3. Entidad Dish (Domain Done)     ✅
+4. Repository Interface           ⏳  ← siguiente
+5. Application Service / Use Cases
+6. Infrastructure Adapter
+7. Persistence
+8. Integration Tests
+9. Ingredient Library
+10. Recipe Builder
+11. UI
 ```
 
 **Meta de la fase:** terminar un catálogo de platos sólido, no una pantalla bonita.
 
-**Orden dentro de Dish:**
+**Orden Repository (misma disciplina que Dish):**
 
 ```text
-Language → Value Objects → Errors → State Machine → Entity
+Documentar contrato → Interface → sin reglas de negocio → sin Supabase/ORM
 ```
 
 Luego, con la misma disciplina: **Ingredient** → **Recipe**.

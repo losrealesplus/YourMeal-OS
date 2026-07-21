@@ -1,9 +1,13 @@
 # FASE 1 · Cierre de la Validación del Dominio
 
-**Milestone — First Domain Validation**  
+**Milestone — First Domain Validation / Foundation Validation ✅**  
+**Estado:** 🟢 **Cerrado oficialmente**  
 **Módulo:** Module 01 (Dish)  
 **Fecha:** 2026-07-21  
 **Versión plataforma:** `v0.1.0` FOUNDATION LOCKED
+
+> Hito histórico: donde dejó de construirse la metodología y empezó a construirse el producto.  
+> El dominio del negocio **empieza**; la **forma** de construir el dominio **ya está demostrada**.
 
 ---
 

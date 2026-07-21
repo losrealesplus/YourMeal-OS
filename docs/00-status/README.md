@@ -2,37 +2,48 @@
 
 **Última actualización:** 2026-07-21  
 **Versión:** `v0.1.0` — FOUNDATION LOCKED  
-**Milestone:** [Primera validación del dominio (Dish)](./MILESTONE_VALIDACION_DOMINIO_DISH.md) ✅
+**Hito histórico:** **Foundation Validation ✅**  
+**Acta:** [MILESTONE_VALIDACION_DOMINIO_DISH.md](./MILESTONE_VALIDACION_DOMINIO_DISH.md)
+
+## Milestones
+
+| Milestone | Estado |
+|-----------|--------|
+| Blueprint | ✅ |
+| Foundation | ✅ *(documento vivo)* |
+| Foundation Lock | ✅ |
+| Product Philosophy | ✅ |
+| Ubiquitous Language | ✅ |
+| ACTORS | ✅ |
+| ENTITY_GUIDELINES | ✅ |
+| DOMAIN_DONE | ✅ |
+| Primera entidad (`Dish`) | ✅ |
+| Validación de la metodología | ✅ |
+| **Foundation Validation** | ✅ |
+
+> Aquí dejó de construirse la **metodología** y empezó a construirse el **producto**.  
+> Las siguientes entidades heredan el patrón; no lo reinventan.
 
 ## Fase oficial
 
 ```text
-FASE 0 — FUNDACIÓN
-Blueprint              ✅
-Foundation             ✅  (documento vivo)
-Foundation Lock        ✅
-────────────────────────
-FASE 1 — Core v0.1 (EatClean)
-Domain Language        ✅
-Entity Guidelines      ✅
-First Entity (Dish)    ✅
-Pattern Validation     ✅
-────────────────────────
-Module 01 · Dish Library 🚧
-  Dominio documentado     ✅
-  Lenguaje en código      ✅
-  Entidad Dish            ✅
-  Repository Interface    ⏳  ← siguiente
-  Application Service     ⏳
-  Infrastructure          ⏳
-  UI                      ⏳
+FASE 0 — FUNDACIÓN                 ✅ validada
+FASE 1 — Core v0.1 (EatClean)      🚧
+Module 01 · Dish Library
+  Domain Done (Dish)               ✅
+  Repository Interface             ⏳  ← siguiente
+  Application / Infra / UI         ⏳
 ```
 
-> Se considera **completada la primera validación** de la fundación del dominio.  
-> Foundation permanece vivo. El código es consecuencia del diseño, no su inicio.  
-> Las siguientes entidades **heredan** la metodología; no la definen.
+### Cambio de naturaleza del proyecto
 
-> **La arquitectura ya no se diseña; se aplica.**
+| Hasta Foundation Validation | A partir de ahora |
+|-----------------------------|-------------------|
+| ¿Cómo queremos construir? | ¿Qué necesita realmente una cocina? |
+| ¿Qué reglas tendrá el Core? | ¿Cómo modelamos producción, inventario, pedidos? |
+| ¿Cómo modelamos una entidad? | Materializar negocio con metodología ya demostrada |
+
+Foco: del **metamodelo** al **dominio del negocio**.
 
 ## Constitución (resumen)
 
@@ -40,30 +51,18 @@ Module 01 · Dish Library 🚧
 |-------|-----------|
 | Arquitectura | Docs + ADRs son la fuente de verdad; **Cursor = CTO**; Lovable = UI |
 | Desarrollo | Español en docs/razonamiento; inglés en código/BD |
-| Calidad | Intencionalidad + Definition of Done + no estado amarillo |
+| Calidad | Intencionalidad + Definition of Done + Domain Done |
 | Memoria | Diario de Desarrollo del Proyecto |
-| Cierre diario | Protocolo de 7 pasos (incluye Diario) |
-| Contexto sesiones | [CONTEXTO_CTO.md](../05-architecture/CONTEXTO_CTO.md) |
-| Pirámide de decisión | Jerarquía docs → código en [`AGENTS.md`](../../AGENTS.md) |
-| Valor (Module 01+) | Código para la Organización (EatClean) o para fortalecer el Core |
-| Filosofía de producto | [FILOSOFIA_DE_PRODUCTO.md](../05-architecture/FILOSOFIA_DE_PRODUCTO.md) — impacto operativo |
-| Actores | [ACTORS.md](../12-domain-model/ACTORS.md) — roles oficiales del dominio |
-| Entity Guidelines | [ENTITY_GUIDELINES.md](../12-domain-model/ENTITY_GUIDELINES.md) — estándar de entidades |
-| Domain Done | [DOMAIN_DONE.md](../12-domain-model/DOMAIN_DONE.md) — DoD del dominio |
-| Milestone Dish | [MILESTONE_VALIDACION_DOMINIO_DISH.md](./MILESTONE_VALIDACION_DOMINIO_DISH.md) |
+| Foundation | Documento **vivo**; validado, no «cerrado para siempre» |
+| Domain Done | [DOMAIN_DONE.md](../12-domain-model/DOMAIN_DONE.md) |
+| Entity Guidelines | [ENTITY_GUIDELINES.md](../12-domain-model/ENTITY_GUIDELINES.md) |
 
 ## Module 01 — ahora
 
-Dominio primero (sin UI):
+**Dish:** Domain Done — no ampliar comportamiento (evitar superentidad).
 
-- [Dish.md](../12-domain-model/module-01/Dish.md)
-- [Ingredient.md](../12-domain-model/module-01/Ingredient.md)
-- [Recipe.md](../12-domain-model/module-01/Recipe.md)
-
-**Hecho:** Domain Done de `Dish` ([DOMAIN_DONE.md](../12-domain-model/DOMAIN_DONE.md)) + primera validación metodológica.
-
-**Próximo paso:** Repository Interface → Application Service → Infrastructure → UI.  
-No ampliar comportamiento de `Dish` ahora (evitar superentidad).
+**Próximo paso:** Repository Interface  
+Documentar contrato → interface → sin reglas de negocio → independiente de Supabase/ORM.
 
 ## Misión v0.1
 
@@ -71,8 +70,8 @@ No ampliar comportamiento de `Dish` ahora (evitar superentidad).
 
 ## Enlaces
 
-- [Milestone · Validación del dominio](./MILESTONE_VALIDACION_DOMINIO_DISH.md)
+- [Milestone · Foundation Validation](./MILESTONE_VALIDACION_DOMINIO_DISH.md)
+- [Domain Done](../12-domain-model/DOMAIN_DONE.md)
+- [Roadmap](../roadmap/README.md)
 - [Diario](../99-internal/development-journal/README.md)
 - [Definition of Done](./DEFINITION_OF_DONE.md)
-- [Cierre de jornada](../05-architecture/CIERRE_DE_JORNADA.md)
-- [Roadmap](../roadmap/README.md)
