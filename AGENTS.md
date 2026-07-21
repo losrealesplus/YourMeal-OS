@@ -94,23 +94,18 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-FOUNDATION ✅ → PRODUCT BLUEPRINT ✅ → OPERATIONAL DISCOVERY ✅/⏳
+Tres pilares ✅  →  Primera jornada observada ⏳
 ```
 
-| Pilar | Pregunta |
-|-------|----------|
-| FOUNDATION | ¿Cómo construimos? |
-| PRODUCT BLUEPRINT | ¿Qué construimos y por qué? |
-| OPERATIONAL DISCOVERY | ¿Por qué evolucionar? (evidencia) |
+> Misión plataforma: **reducir la carga cognitiva de la operación diaria.**  
+> Éxito: decisiones que ya no dependen de la memoria humana.  
+> KPI estrella: **preguntas eliminadas**.  
+> Ciclo: operación → discovery → patrón → blueprint → capability → … → operación.  
+> **No hay cuarto pilar.**
 
-> **No implementamos ideas. Implementamos conocimiento validado.**  
-> Discovery: solo evidencia — nunca soluciones.
+**Objetivo:** [FIRST_OBSERVATION_DAY](./docs/16-operational-discovery/FIRST_OBSERVATION_DAY.md) · Integration/UI Dish en paralelo.
 
-**Objetivo:** jornadas reales en EatClean (OF, preguntas, minutos) · Integration/UI Dish en paralelo.
-
-Índices: [Discovery](./docs/16-operational-discovery/README.md) · [Blueprint](./docs/15-product/README.md)
-
-Acta: [Pilar Discovery](./docs/99-internal/development-journal/2026-07-21-operational-discovery-pilar-completo.md)
+Índices: [Discovery](./docs/16-operational-discovery/README.md) · [Blueprint](./docs/15-product/README.md) · [Visión](./docs/15-product/PRODUCT_VISION.md)
 
 ### Principio de valor (Capabilities)
 

@@ -29,11 +29,47 @@ Vende **minutos recuperados**, **errores evitados** y **coordinación entre equi
 
 ## Misión
 
+### Del software
+
 > Ayudar a cada persona de la operación a tomar la siguiente decisión correcta en el momento adecuado.
+
+### De la plataforma / empresa
+
+> **Reducir la carga cognitiva de la operación diaria.**
+
+No solo ahorrar tiempo.
+
+No solo automatizar tareas.
+
+Reducir la cantidad de cosas que las personas tienen que **recordar**, **preguntar** o **coordinar manualmente**.
 
 No sustituye al cocinero, al gerente ni al repartidor.
 
 Les evita tener que recordar cien cosas a la vez.
+
+---
+
+## Criterio de éxito (años)
+
+No se mide por el número de Capabilities implementadas.
+
+Se mide por:
+
+> **¿Cuántas decisiones dejamos de depender de la memoria humana para que el equipo pudiera centrarse en cocinar, servir y atender mejor a sus clientes?**
+
+### KPIs de operación (no de pantallas)
+
+| KPI | Qué mide |
+|-----|----------|
+| Tiempo recuperado | Minutos ahorrados |
+| Errores evitados | Incidencias reducidas |
+| **Preguntas eliminadas** | Dependencia de memoria y coordinación |
+| Decisiones asistidas | Acciones sugeridas por el sistema |
+| Interrupciones evitadas | Cambios de contexto del equipo |
+
+**Métrica estrella:** preguntas eliminadas (p. ej. de ~180/día a ~35/día).
+
+Detalle de medición: [Operational Discovery](../16-operational-discovery/README.md).
 
 ---
 

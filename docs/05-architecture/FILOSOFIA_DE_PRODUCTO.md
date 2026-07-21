@@ -103,6 +103,18 @@ El objetivo es descubrir **capacidades reutilizables** que beneficien a todas la
 
 > **YourMeal OS ayuda a cada persona a tomar la siguiente decisión correcta en el momento adecuado.**
 
+### Misión de la plataforma
+
+> **Reducir la carga cognitiva de la operación diaria.**
+
+### Criterio de éxito
+
+> ¿Cuántas decisiones dejamos de depender de la memoria humana para que el equipo pudiera centrarse en cocinar, servir y atender mejor a sus clientes?
+
+### Métrica estrella
+
+**Preguntas eliminadas** (junto a tiempo recuperado, errores evitados, interrupciones evitadas).
+
 El producto no se recuerda por módulos.
 
 Se recuerda porque cada persona sabe **qué necesita su atención ahora**.
@@ -121,7 +133,7 @@ Se recuerda porque cada persona sabe **qué necesita su atención ahora**.
 Antes de *«¿qué tablas?»* → *«¿qué pregunta elimina?»*  
 Si no hay respuesta clara, la idea aún no está madura.
 
-Detalle: [Identidad · Asistentes Operativos](../15-product/IDENTIDAD_ASISTENTES_OPERATIVOS.md) · [Día operativo EatClean](../15-product/EATCLEAN_DIA_OPERATIVO.md)
+Detalle: [PRODUCT_VISION](../15-product/PRODUCT_VISION.md) · [Asistentes](../15-product/IDENTIDAD_ASISTENTES_OPERATIVOS.md) · [Discovery](../16-operational-discovery/README.md)
 
 ---
 

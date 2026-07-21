@@ -79,6 +79,8 @@ La arquitectura de YourMeal OS se considera **estable**.
 - **Operational Discovery** completo: Findings · Questions · Time · Decisions · Workarounds · Incidents · Patterns · Candidates
 - Regla de oro: Discovery nunca contiene soluciones — solo evidencia
 - Disciplina: no implementamos ideas; implementamos conocimiento validado
+- Misión plataforma: reducir la carga cognitiva de la operación diaria
+- KPI estrella: preguntas eliminadas · ciclo cerrado operación↔producto · sin cuarto pilar
 - Secuencia definitiva en FOUNDATION: Guidelines → Spec → Implementation → Tests → Validation
 ### Gobierno
 

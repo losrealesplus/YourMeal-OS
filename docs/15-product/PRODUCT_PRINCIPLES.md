@@ -39,15 +39,21 @@ Filtro canónico:
 
 ---
 
-## 4. El tiempo es la métrica principal
+## 4. Las métricas son de la operación
 
-Cada mejora debe:
+Cada mejora debe mover al menos una:
 
-- ahorrar tiempo; o
-- reducir errores; o
-- disminuir interrupciones.
+| KPI | Qué mide |
+|-----|----------|
+| Tiempo recuperado | Minutos ahorrados |
+| Errores evitados | Incidencias reducidas |
+| **Preguntas eliminadas** | Dependencia de memoria y coordinación |
+| Decisiones asistidas | Acciones sugeridas por el sistema |
+| Interrupciones evitadas | Cambios de contexto del equipo |
 
-Si no mueve ninguna de las tres, cuestionar su prioridad.
+**Preguntas eliminadas** es la métrica que resume la filosofía.
+
+Si no mueve ninguna, cuestionar su prioridad.
 
 ---
 
@@ -90,8 +96,43 @@ No inventar Capabilities «por si acaso».
 
 ---
 
+## 9. Solo tres pilares
+
+No hay cuarto pilar documental.
+
+Todo nace de FOUNDATION · PRODUCT BLUEPRINT · OPERATIONAL DISCOVERY.
+
+---
+
+## 10. Ciclo cerrado (oficial)
+
+```text
+Operación real
+        ↓
+Operational Discovery
+        ↓
+Patrón validado
+        ↓
+Product Blueprint
+        ↓
+Capability
+        ↓
+Use Cases
+        ↓
+Implementación
+        ↓
+Integración
+        ↓
+Operación real
+```
+
+La cocina alimenta al producto. El producto vuelve a la cocina.
+
+---
+
 ## Relacionado
 
 - [PRODUCT_VISION.md](./PRODUCT_VISION.md)
 - [OPERATIONS_DASHBOARD.md](./OPERATIONS_DASHBOARD.md)
+- [Operational Discovery](../16-operational-discovery/README.md)
 - [Filosofía de Producto](../05-architecture/FILOSOFIA_DE_PRODUCTO.md)

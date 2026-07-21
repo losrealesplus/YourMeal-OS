@@ -63,6 +63,35 @@ Este espacio responde una sola pregunta:
 | [INCIDENTS.md](./INCIDENTS.md) | Errores de operación (no bugs de software) |
 | [VALIDATED_PATTERNS.md](./VALIDATED_PATTERNS.md) | Observaciones repetidas → listos para diseñar |
 | [CAPABILITY_CANDIDATES.md](./CAPABILITY_CANDIDATES.md) | Puente Discovery → Blueprint (sin diseño técnico) |
+| [FIRST_OBSERVATION_DAY.md](./FIRST_OBSERVATION_DAY.md) | Checklist de la primera jornada observada |
+
+---
+
+## Ciclo oficial de YourMeal OS
+
+```text
+Operación real
+        ↓
+Operational Discovery
+        ↓
+Patrón validado
+        ↓
+Product Blueprint
+        ↓
+Capability
+        ↓
+Use Cases
+        ↓
+Implementación
+        ↓
+Integración
+        ↓
+Operación real
+```
+
+La cocina alimenta al producto. El producto vuelve a la cocina.
+
+**No hay cuarto pilar.** Todo nace de los tres.
 
 ---
 
