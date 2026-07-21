@@ -130,9 +130,28 @@ La cocina alimenta al producto. El producto vuelve a la cocina.
 
 ---
 
+## 11. Operational Checks (transversal)
+
+No es un pilar nuevo.
+
+Es el mecanismo compartido: datos → comprobación → atención → acción.
+
+Ver [OPERATIONAL_CHECKS.md](./OPERATIONAL_CHECKS.md).
+
+Filtro adicional:
+
+> ¿Qué comprueba, por qué lo comprueba y qué acción permite tomar?
+
+### Adopción
+
+Digitalizar → Validar → Recomendar → Optimizar (IA solo con evidencia).
+
+---
+
 ## Relacionado
 
 - [PRODUCT_VISION.md](./PRODUCT_VISION.md)
-- [OPERATIONS_DASHBOARD.md](./OPERATIONS_DASHBOARD.md)
+- [OPERATIONAL_CHECKS.md](./OPERATIONAL_CHECKS.md)
+- [OPERATIONS_DASHBOARD.md](./OPERATIONS_DASHBOARD.md) — Centro de Control
 - [Operational Discovery](../16-operational-discovery/README.md)
 - [Filosofía de Producto](../05-architecture/FILOSOFIA_DE_PRODUCTO.md)

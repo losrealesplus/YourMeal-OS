@@ -1,16 +1,14 @@
-# OPERATIONS_DASHBOARD — ¿Qué necesita tu atención ahora?
+# OPERATIONS_CONTROL_CENTER — Centro de Control
 
-**Tipo:** Product Blueprint (Product Era)  
-**No es:** wireframe · mock React · BI dashboard  
-**Sí es:** especificación de la **pantalla principal del negocio**
+**Antes llamado:** Operations Dashboard  
+**Tipo:** Product Blueprint  
+**No es:** BI · vanity KPIs · wireframe React  
+**Sí es:** torre de control de la operación diaria
 
----
+> Un dashboard enseña datos.  
+> Un **Centro de Control** enseña el **estado de una operación**.
 
-## Filosofía
-
-No es un dashboard clásico de gráficos.
-
-Es una **bandeja de trabajo**.
+La superficie principal sigue siendo:
 
 ```text
 ¿Qué necesita tu atención ahora?
@@ -18,14 +16,23 @@ Es una **bandeja de trabajo**.
 
 Ese es el verdadero frontend del negocio.
 
-Todo lo demás son pantallas secundarias.
+---
 
-Principios aplicados ([PRODUCT_PRINCIPLES.md](./PRODUCT_PRINCIPLES.md)):
+## Filosofía
+
+Como una torre de control de aeropuerto:
+
+- no es un mural de estadísticas;
+- es el estado de lo que está pasando y lo que debe resolverse;
+- construido sobre [Operational Checks](./OPERATIONAL_CHECKS.md).
+
+Principios:
 
 - acción antes que información;
 - anticipación antes que reacción;
 - nunca métricas sin contexto;
-- el contexto (hora, rol, estado) filtra qué se muestra.
+- contexto (hora, rol, estado) filtra qué se muestra;
+- Checks explicables que no deciden por la persona.
 
 ---
 
@@ -34,34 +41,44 @@ Principios aplicados ([PRODUCT_PRINCIPLES.md](./PRODUCT_PRINCIPLES.md)):
 ```text
 1. Título / momento
    ¿Qué necesita tu atención ahora?
-   (contexto: rol · hora · fase operativa)
+   (rol · hora · fase operativa)
 
-2. Cola de atención (prioridad descendente)
-   🔴 Crítico
-   🟡 Atención
-   🟢 En orden / informativo positivo
-   🔵 Sugerencia / calidad (menú, etc.)
+2. Estado de la operación (Checks)
+   ✓ En orden
+   ⚠️ Requiere atención
+   ❌ Bloqueante / crítico
 
-3. Cada ítem = una decisión
-   Título de acción
-   Motivo breve
-   CTA → Asistente / Capability que resuelve
+3. Cada ítem = Check → acción
+   Qué se comprobó
+   Por qué avisa
+   CTA → Asistente que ayuda a resolver
 ```
 
 Una acción = el menor número de clics posible hasta la solución.
 
 ---
 
-## Tipos de alertas
+## Etapas de adopción en el Centro de Control
 
-| Severidad | Significado | Ejemplo |
-|-----------|-------------|---------|
-| 🔴 Crítica | Bloquea mañana o hoy si no se actúa | Descongelar 8 kg de pollo antes de las 18:00 |
-| 🟡 Atención | Riesgo o desvío manejable | Faltan ingredientes para 6 ensaladas · ruta +35 min |
-| 🟢 OK | Confirmación útil (no ruido) | Packaging completo · rutas dentro de tiempo |
-| 🔵 Calidad / editorial | Mejora, no emergencia | Platos demasiado similares a la semana pasada |
+| Etapa | Qué muestra el Centro |
+|-------|------------------------|
+| 1 Digitalizar | Datos digitalizados (aún pocas comprobaciones) |
+| 2 Validar | Checks que detectan sin recomendar compra/ruta |
+| 3 Recomendar | Checks + recomendación explícita |
+| 4 Optimizar | Patrones aprendidos (con evidencia / multi-org) |
 
-Nunca mostrar un 🟢 o un dato «por rellenar el dashboard».
+No saltar de la etapa 1 a la 4.
+
+---
+
+## Tipos de señal
+
+| Señal | Significado | Ejemplo |
+|-------|-------------|---------|
+| ✓ | Check OK | Pollo suficiente |
+| ⚠️ | Requiere atención | Falta lechuga / ruta larga |
+| 🔴 / ❌ | Crítico / bloqueante | Descongelar antes de las 18:00 |
+| 🔵 | Calidad / editorial | Menú demasiado similar |
 
 ---
 
@@ -69,67 +86,56 @@ Nunca mostrar un 🟢 o un dato «por rellenar el dashboard».
 
 Cada tarjeta debe permitir:
 
-1. **Entender** — qué pasa y por qué (una o dos líneas).  
-2. **Actuar** — ir al Asistente que resuelve.  
-3. **Posponer / asignar** (futuro) — sin perder la alerta.  
-4. **Resolver** — desaparece o baja de severidad cuando el estado lo confirma.
-
-❌ Abrir un informe de stock genérico.  
-✅ «Comprar 6 kg de lechuga» → Purchasing Assistant con la línea ya propuesta.
+1. **Entender** — qué se comprobó y por qué.  
+2. **Actuar** — ir al Asistente.  
+3. **Posponer / asignar** (futuro).  
+4. **Resolver** — cuando el estado lo confirma.
 
 ---
 
-## Prioridades
-
-Orden de presentación (salvo override por rol):
-
-1. 🔴 que afectan a la producción de las próximas horas / mañana  
-2. 🟡 que afectan a salida a ruta o packaging incompleto  
-3. 🟡 compras / cobros  
-4. 🔵 calidad de menú  
-5. 🟢 confirmaciones (pocas; solo si reducen ansiedad operativa)
-
-El **repartidor** no ve lo mismo que el **gerente**.  
-A las **17:00** no se prioriza igual que a las **04:15**.
-
----
-
-## Ejemplo de bandeja (gerente, tarde)
+## Ejemplo (gerente, tarde — etapa Validar/Recomendar)
 
 ```text
 ¿Qué necesita tu atención ahora?
 
-🔴 Acción crítica
-Descongelar 8 kg de pollo antes de las 18:00.
-Motivo: producción de mañana depende de ello.
+🔴 Check · Producción
+Pendiente descongelar pollo para mañana (merma incluida).
+Acción: sacar 28 kg antes de las 18:00.
 
-🟡 Producción / compras
-Faltan ingredientes para 6 ensaladas de mañana.
+⚠️ Check · Stock
+Lechuga cubre 10; producción prevista 20.
+Acción: comprar antes de las 18:00. (recomendación si etapa ≥ 3)
 
-🟡 Reparto
-2 rutas superan el tiempo habitual de los martes (~+35 min).
+⚠️ Check · Reparto
+Ruta Norte supera ventana habitual (~+35 min).
+Acción: adelantar salida o redistribuir.
 
-🟡 Administración
-3 pedidos con cobro en entrega.
-
-🟢 Packaging
-Todas las bolsas de mañana aún no aplican — o —
-Packaging de hoy completo.
+✓ Check · Packaging
+Bolsas del turno actual completas.
 ```
 
 ---
 
-## Qué no es esta pantalla
+## Qué no es
 
 - Un mural de KPIs vanity.  
-- Un acceso directo a todos los módulos.  
+- Un acceso a todos los módulos.  
 - Un chat con IA.  
-- Una lista infinita sin severidad.
+- Un sistema que decide por la persona.
+
+---
+
+## Nota de nombre
+
+El archivo histórico puede seguir enlazado como «dashboard» en conversaciones antiguas.
+
+El concepto de producto es **Centro de Control**.
 
 ---
 
 ## Relacionado
 
-- [OPERATIVE_ASSISTANTS.md](./OPERATIVE_ASSISTANTS.md) — Operations Assistant
-- [PRODUCT_VISION.md](./PRODUCT_VISION.md)
+- [OPERATIONAL_CHECKS.md](./OPERATIONAL_CHECKS.md)
+- [OPERATIVE_ASSISTANTS.md](./OPERATIVE_ASSISTANTS.md)
+- [PRODUCT_PRINCIPLES.md](./PRODUCT_PRINCIPLES.md)
 - [IDENTIDAD_ASISTENTES_OPERATIVOS.md](./IDENTIDAD_ASISTENTES_OPERATIVOS.md)

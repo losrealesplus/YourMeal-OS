@@ -107,33 +107,25 @@ El objetivo es descubrir **capacidades reutilizables** que beneficien a todas la
 
 > **Reducir la carga cognitiva de la operación diaria.**
 
+### Confianza antes que IA
+
+> El primer reto no es automatizar. Es conseguir que la gente confíe en el sistema.
+
+Eso se logra con **Operational Checks** sencillos y acertados (Digitalizar → Validar → Recomendar → Optimizar).
+
 ### Criterio de éxito
 
 > ¿Cuántas decisiones dejamos de depender de la memoria humana para que el equipo pudiera centrarse en cocinar, servir y atender mejor a sus clientes?
 
 ### Métrica estrella
 
-**Preguntas eliminadas** (junto a tiempo recuperado, errores evitados, interrupciones evitadas).
+**Preguntas eliminadas** (junto a tiempo, errores, interrupciones).
 
-El producto no se recuerda por módulos.
+### Mecanismo transversal
 
-Se recuerda porque cada persona sabe **qué necesita su atención ahora**.
+Cada Capability: **¿Qué sabemos? → ¿Qué comprobamos? → ¿Qué necesita atención?**
 
-### Dos niveles
-
-1. **Asistentes Operativos** — lo que compra el cliente.  
-2. **Capabilities** — cómo lo implementamos (pueden orquestarse varias para una decisión).
-
-### Principio de propósito
-
-> Cada Asistente debe responder una pregunta concreta o recomendar una acción concreta. **Nunca información sin propósito.**
-
-### Filtro de diseño
-
-Antes de *«¿qué tablas?»* → *«¿qué pregunta elimina?»*  
-Si no hay respuesta clara, la idea aún no está madura.
-
-Detalle: [PRODUCT_VISION](../15-product/PRODUCT_VISION.md) · [Asistentes](../15-product/IDENTIDAD_ASISTENTES_OPERATIVOS.md) · [Discovery](../16-operational-discovery/README.md)
+Detalle: [OPERATIONAL_CHECKS](../15-product/OPERATIONAL_CHECKS.md) · [Centro de Control](../15-product/OPERATIONS_DASHBOARD.md) · [PRODUCT_VISION](../15-product/PRODUCT_VISION.md)
 
 ---
 

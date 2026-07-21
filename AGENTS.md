@@ -98,14 +98,14 @@ Tres pilares ✅  →  Primera jornada observada ⏳
 ```
 
 > Misión plataforma: **reducir la carga cognitiva de la operación diaria.**  
-> Éxito: decisiones que ya no dependen de la memoria humana.  
+> Confianza antes que IA · Checks · Centro de Control.  
 > KPI estrella: **preguntas eliminadas**.  
 > Ciclo: operación → discovery → patrón → blueprint → capability → … → operación.  
-> **No hay cuarto pilar.**
+> **No hay cuarto pilar.** Checks son transversales, no un pilar.
 
 **Objetivo:** [FIRST_OBSERVATION_DAY](./docs/16-operational-discovery/FIRST_OBSERVATION_DAY.md) · Integration/UI Dish en paralelo.
 
-Índices: [Discovery](./docs/16-operational-discovery/README.md) · [Blueprint](./docs/15-product/README.md) · [Visión](./docs/15-product/PRODUCT_VISION.md)
+Índices: [Discovery](./docs/16-operational-discovery/README.md) · [Checks](./docs/15-product/OPERATIONAL_CHECKS.md) · [Blueprint](./docs/15-product/README.md)
 
 ### Principio de valor (Capabilities)
 

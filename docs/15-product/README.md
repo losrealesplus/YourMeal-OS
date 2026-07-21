@@ -42,8 +42,19 @@ CAPABILITY_ROADMAP
 | [MOMENTOS_DE_DECISION.md](./MOMENTOS_DE_DECISION.md) | El día organizado por cuándo decidir |
 | [IDENTIDAD_ASISTENTES_OPERATIVOS.md](./IDENTIDAD_ASISTENTES_OPERATIVOS.md) | Dos arquitecturas · dos niveles · filtro de diseño |
 | [OPERATIVE_ASSISTANTS.md](./OPERATIVE_ASSISTANTS.md) | Catálogo de Asistentes (lo que se compra) |
-| [OPERATIONS_DASHBOARD.md](./OPERATIONS_DASHBOARD.md) | Pantalla principal: atención → acción |
+| [OPERATIONS_DASHBOARD.md](./OPERATIONS_DASHBOARD.md) | Centro de Control: estado de la operación |
+| [OPERATIONAL_CHECKS.md](./OPERATIONAL_CHECKS.md) | Concepto transversal: datos → check → acción |
 | [CAPABILITY_ROADMAP.md](./CAPABILITY_ROADMAP.md) | Asistentes ↔ Capabilities del Core |
+
+---
+
+## Conceptos transversales (no son pilares)
+
+- **Operational Checks** — cómo el producto transforma datos en atención operativa.  
+- **Centro de Control** — superficie principal (no un dashboard de vanity).  
+- **Etapas de adopción** — Digitalizar → Validar → Recomendar → Optimizar.
+
+Solo tres pilares: FOUNDATION · PRODUCT BLUEPRINT · OPERATIONAL DISCOVERY.
 
 ---
 
