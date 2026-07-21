@@ -93,7 +93,7 @@ Dominio documentado:
 
 ## Roadmap v1 (alto nivel)
 
-Dish Library → Ingredient Library → Recipe Builder → Weekly Menus → Customers → Orders → Production → Kitchen → Inventory → Purchasing → Logistics → Accounting → Customer Support → Reports → AI
+Dish Library → Ingredient Library → Recipe Builder → Weekly Menus → Consumers / Company Accounts → Orders → Production → Kitchen → Inventory → Purchasing → Logistics → Accounting → Support → Reports → AI
 
 ---
 
