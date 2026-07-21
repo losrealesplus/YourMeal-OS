@@ -94,7 +94,7 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-Metodología estable ✅ → CreateDishUseCase.md ✅ → CreateDishUseCase.ts ✅ → resto UCs ⏳
+Metodología estable ✅ → Dish Management (UC-001…008) ✅ → Supabase / UI ⏳
 ```
 
 **Objetivo de Module 01:** materializar el catálogo de platos para EatClean **heredando** el patrón ya validado.
@@ -107,8 +107,7 @@ Metodología estable ✅ → CreateDishUseCase.md ✅ → CreateDishUseCase.ts �
 Orden:
 
 ```text
-CreateDishUseCase ✅
-  → Update / Activate / Deactivate / Archive / Restore / Duplicate / AssignRecipe
+Dish Management Application ✅
   → SupabaseDishRepository → UI MVP
 ```
 

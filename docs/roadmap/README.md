@@ -70,10 +70,10 @@ A partir de aquí no rediseñamos la forma de construir salvo ADR. Foundation si
 **Orden Application (misma disciplina):**
 
 ```text
-CreateDishUseCase.md ✅ → CreateDishUseCase.ts ✅ → resto UCs ⏳ → Supabase → UI
+Dish Management (UC-001…008) ✅ → SupabaseDishRepository ⏳ → UI
 ```
 
-> Metodología estable. Use Case Specificity. El `.md` responde qué hace; el `.ts` lo traduce.
+> Capability Application completa sin infraestructura. Foundation intacto.
 
 **Segundo gran principio a validar:** el Core permanece estable; la infraestructura se adapta al dominio.
 Luego, con la misma disciplina: **Ingredient** → **Recipe**.

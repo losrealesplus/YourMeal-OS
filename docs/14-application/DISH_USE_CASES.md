@@ -596,8 +596,10 @@ El código **no** es el lugar donde se toman decisiones.
 - [x] Trazabilidad por UC
 - [x] Un UC = una unidad de diseño futura
 - [x] Implementación de CreateDishUseCase (UC-001)
-- [ ] Resto de Use Cases en código
+- [x] Resto de Use Cases en código (UC-002…UC-008)
+- [x] Tests de Application
 - [ ] Fachada opcional
+- [ ] SupabaseDishRepository
 
 ---
 
@@ -605,10 +607,9 @@ El código **no** es el lugar donde se toman decisiones.
 
 ```text
 DISH_USE_CASES.md          ✅
-CreateDishUseCase.md       ✅
-CreateDishUseCase.ts       ✅
+CreateDishUseCase … UC-008 ✅
         ↓
-UpdateDishUseCase …       ⏳
+SupabaseDishRepository     ⏳
         ↓
-SupabaseDishRepository
+UI MVP
 ```

@@ -62,6 +62,8 @@ La arquitectura de YourMeal OS se considera **estable**.
 - Principio **Use Case Specificity** — implementable leyendo solo la especificación
 - `CreateDishUseCase.ts` + tests — primera planta (traducción del contrato)
 - `DishAlreadyExists` — error de coordinación de unicidad
+- **Dish Management completo** — UC-002…UC-008 + tests (40 tests Application/domain)
+- Capability validada sin modificar Foundation ni tocar infraestructura
 - Secuencia definitiva en FOUNDATION: Guidelines → Spec → Implementation → Tests → Validation
 ### Gobierno
 

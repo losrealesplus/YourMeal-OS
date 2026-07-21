@@ -24,7 +24,8 @@
 | **Foundation Validation** | ✅ |
 | **Metodología estable** | ✅ |
 | **UC-001 CreateDishUseCase** | ✅ |
-| Resto de UCs Dish | ⏳ |
+| **Dish Management (UC-001…008)** | ✅ |
+| SupabaseDishRepository / UI | ⏳ |
 
 > Por debajo de Foundation no quedan decisiones arquitectónicas pendientes.  
 > Lo que sigue son implementaciones.  
@@ -39,12 +40,14 @@ Module 01 · Dish Library
   Domain Done (Dish)               ✅
   Repository                       ✅ (contrato)
   DISH_USE_CASES.md                ✅
-  CreateDishUseCase.md             ✅
-  CreateDishUseCase.ts             ✅  ← primera planta
-  Resto UCs / Supabase / UI        ⏳
+  Dish Management (UC-001…008)     ✅  ← capability Application completa
+  SupabaseDishRepository           ⏳
+  UI MVP                           ⏳
 ```
 
-**Próximo paso:** siguientes UCs (Update / Activate / …) con la misma disciplina de especificación → código → tests.
+**Hecho:** capacidad **Dish Management** en Application — ocho Use Cases + tests, sin infraestructura.
+
+**Próximo paso:** `SupabaseDishRepository` (adaptador) o UI — sin tocar Foundation.
 
 ## Misión v0.1
 
