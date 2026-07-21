@@ -70,16 +70,16 @@ A partir de aquí no rediseñamos la forma de construir salvo ADR. Foundation si
 **Orden Application (misma disciplina):**
 
 ```text
-Dish Management (UC-001…008) ✅ → SupabaseDishRepository ⏳ → UI
+Dish Management Application ✅ → Infrastructure Validation ✅ → Integration / UI ⏳
 ```
 
-> Capability Application completa sin infraestructura. Foundation intacto.
+> Core independiente de la tecnología. Supabase = primer adaptador, no una decisión de negocio.
 
-> Planificación del Core: Platform → Capabilities → Use Cases → Domain → Infrastructure.  
+> Planificación: Platform → Capabilities → Use Cases → Domain → Infrastructure.  
 > Primero evidencia; después abstracción.
 
-**Segundo gran principio a validar:** el Core permanece estable; la infraestructura se adapta al dominio.
-Luego, con la misma disciplina: **Recipe Management** → **Inventory** (cuando el producto lo pida).
+**Segundo gran principio a validar:** Integration Validation con EatClean como profesor del Core.
+Luego: **Segunda Capability** cuando el producto lo pida.
 
 ### Module 02 · Weekly Planning
 

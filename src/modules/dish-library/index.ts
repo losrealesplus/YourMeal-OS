@@ -16,3 +16,7 @@ export { AssignRecipeToDishUseCase } from "./application/assign-recipe-to-dish-u
 export type { Clock, EventPublisher, IdGenerator } from "./application/ports";
 export * from "./domain";
 export { createDishRepository } from "./infrastructure/dish-repository";
+export {
+  createSupabaseDishRepository,
+  SupabaseDishRepository,
+} from "./infrastructure/supabase-dish-repository";

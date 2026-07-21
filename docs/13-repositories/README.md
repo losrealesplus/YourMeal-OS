@@ -8,6 +8,7 @@ Contratos de persistencia del **dominio**. Las implementaciones viven en Infrast
 |-----------|-----------|
 | [REPOSITORY_GUIDELINES.md](./REPOSITORY_GUIDELINES.md) | Cómo debe ser un Repository en YourMeal OS |
 | [DishRepository.md](./DishRepository.md) | Contrato de dominio para Dish |
+| [SupabaseDishRepository.md](./SupabaseDishRepository.md) | Adaptador concreto (Infrastructure Validation) |
 
 ## Flujo
 

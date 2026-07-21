@@ -170,22 +170,17 @@ El contrato se llamará siempre `DishRepository`.
 - [x] Sin SQL ni proveedor
 - [x] Checklist previo al TS respondido
 - [x] Interface TypeScript `DishRepository.ts`
-- [ ] Adaptador Supabase (posterior)
+- [x] Adaptador Supabase (`SupabaseDishRepository`) — Infrastructure Validation ✅
 
 ---
 
 ## Siguiente paso
 
 ```text
-DishRepository.md     ✅
+DishRepository (contrato)     ✅
+SupabaseDishRepository        ✅
         ↓
-DishRepository.ts     ✅
+Integration Validation (entorno real)
         ↓
-Application Layer Guidelines
-        ↓
-DishApplicationService
-        ↓
-Use Cases
-        ↓
-SupabaseDishRepository
+UI MVP
 ```

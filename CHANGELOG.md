@@ -66,6 +66,8 @@ La arquitectura de YourMeal OS se considera **estable**.
 - Capability validada sin modificar Foundation ni tocar infraestructura
 - Jerarquía de planificación: Platform → Capabilities → Use Cases → Domain → Infrastructure
 - Disciplina: **primero evidencia, después abstracción** (no generalizar Use Cases prematuramente)
+- **Infrastructure Validation ✅** — `SupabaseDishRepository` + mapper; Core intacto; 45 tests
+- Migración de esquema alineada al dominio (`inactive`, `category_id`, `recipe_id`, `tags`)
 - Secuencia definitiva en FOUNDATION: Guidelines → Spec → Implementation → Tests → Validation
 ### Gobierno
 
