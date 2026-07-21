@@ -36,7 +36,7 @@ When Cursor or Lovable generate code, they must align with this glossary.
 
 | Term | Definition |
 |------|------------|
-| **Dish** | A commercializable prepared meal offered by the tenant (e.g. “Chicken Teriyaki”). Heart of the domain. |
+| **Dish** | A commercializable food product offered by the tenant (e.g. “Chicken Teriyaki”). It is a business unit: plannable, producible, sellable, and manageable through its lifecycle. |
 | **Ingredient** | A raw material or purchasable input (e.g. chicken breast, soy sauce). Reusable across dishes. |
 | **Recipe** | The composition of a Dish: ordered list of Ingredients with canonical quantities. *Concept name in docs; table today: `dish_ingredients`.* |
 | **Recipe Ingredient** | One line of a Recipe: Ingredient + quantity + unit (canonical). Alias of Recipe line / `dish_ingredients` row. |
@@ -88,7 +88,9 @@ When Cursor or Lovable generate code, they must align with this glossary.
 |------|------------|
 | **Archive** | Soft-retire a business record (`deleted_at` / archived status). Reversible via **Restore**. |
 | **Purge** | Hard remove. **SaaS Admin only**, audited, rare. Never exposed as generic `delete()` in Services. |
-| **Publish** | Make a Draft entity available (e.g. Dish → Published, Weekly Menu → published). |
+| **Activate** | Make an entity operationally available (e.g. Dish → active). |
+| **Deactivate** | Keep an entity existing and historical, but unavailable for new operations (e.g. Dish → inactive). |
+| **Publish** | Make a Draft entity available where the aggregate uses publication semantics (e.g. Weekly Menu → published). |
 | **Confirm** | Customer/ops accepts an Order (state transition). |
 
 ---

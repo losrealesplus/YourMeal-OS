@@ -10,21 +10,24 @@ Related: ADR soft-delete (Archive) · Ubiquitous Language.
 
 | State | Meaning |
 |-------|---------|
-| `draft` | Editable; not offered on menus |
-| `published` | Available for menus/orders (*DB today: `active` — alias; migrate naming in Module 01*) |
+| `draft` | Editable; not offered on menus or production |
+| `active` | Available for planning, production, orders, and menus |
+| `inactive` | Preserved, but blocked for new operations |
 | `archived` | Soft-retired; hidden from new selection |
 
 **Transitions (Services):**
 
 ```text
-draft → published → archived
-draft → archived
-archived → draft | published   (restore)
+draft → active
+active → inactive
+inactive → active
+draft | active | inactive → archived
+archived → inactive | draft   (restore)
 ```
 
 Hard purge: SaaS Admin only (`purge()`), not a normal state.
 
-> **Note:** Current Postgres enum `dish_status` is `draft | active | archived`. Treat `active` ≡ `published` until a migration renames it (requires ADR).
+> **Note:** Current persistence may still lag the domain model. The domain source of truth for Dish is now `draft | active | inactive | archived`. If the database enum does not yet support `inactive`, implementation must adapt upward to the domain instead of simplifying the domain downward to the current schema.
 
 ---
 
@@ -110,6 +113,6 @@ Hard purge: SaaS Admin only (`purge()`), not a normal state.
 
 ## Soft-delete vs status
 
-- **Status** = business lifecycle (draft/published/…).
+- **Status** = business lifecycle (draft/active/inactive/…).
 - **`deleted_at`** = soft delete / archive marker for data retention.
 - Prefer Service methods: `archive()`, `restore()`, `purge()` — never `delete()`.
