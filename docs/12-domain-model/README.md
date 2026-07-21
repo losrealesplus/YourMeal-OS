@@ -15,6 +15,7 @@
 
 ## Referencias
 
+- [Domain Done](./DOMAIN_DONE.md) — cuándo el dominio de una entidad está terminado
 - [Entity Guidelines](./ENTITY_GUIDELINES.md) — estándar de modelado de entidades
 - [Actores](./ACTORS.md) — roles oficiales del dominio
 - [Lenguaje ubicuo](./UBIQUITOUS_LANGUAGE.md)

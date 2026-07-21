@@ -248,3 +248,39 @@ Las siguientes entidades ya no definirán la metodología.
 La heredarán.
 
 A partir de este momento el foco del proyecto cambia desde «cómo construir el Core» hacia «cómo hacerlo evolucionar manteniendo la coherencia establecida por Foundation».
+
+---
+
+## ¿Está realmente terminado Dish?
+
+**Sí, desde el punto de vista del dominio.**
+
+No se añadirá más comportamiento a `Dish` en esta etapa. El riesgo en DDD es convertir la primera entidad en una «superentidad»; ese riesgo se ha evitado.
+
+### Cerrado (Domain Done)
+
+- ✅ Documentación del dominio (`Dish.md`)
+- ✅ Ubiquitous Language
+- ✅ Actores
+- ✅ Entity Guidelines
+- ✅ Value Objects
+- ✅ Domain Errors
+- ✅ State Machine
+- ✅ Domain Events
+- ✅ Entidad `Dish`
+- ✅ Tests de dominio
+- ✅ Validación metodológica
+
+Estándar reutilizable: [DOMAIN_DONE.md](../12-domain-model/DOMAIN_DONE.md)
+
+### Deliberadamente fuera de Dish
+
+- Repository Interface (siguiente paso)
+- Application Service
+- Use Cases
+- Infraestructura
+- Persistencia
+- Integración
+- UI
+
+Eso pertenece a la siguiente etapa de la arquitectura.
