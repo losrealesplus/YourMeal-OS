@@ -36,18 +36,21 @@
 ```text
 FASE 0 — FUNDACIÓN                 ✅ estable
 FASE 1 — Core v0.1 (EatClean)      🚧 ingeniería
-Module 01 · Dish Library
-  Domain Done (Dish)               ✅
-  Repository                       ✅ (contrato)
-  DISH_USE_CASES.md                ✅
-  Dish Management (UC-001…008)     ✅  ← capability Application completa
-  SupabaseDishRepository           ⏳
+
+Platform: YourMeal OS
+Capability: Dish Management
+  Domain (Dish)                    ✅
+  Repository (contrato)            ✅
+  Use Cases UC-001…008             ✅  ← Application Done
+  Infrastructure (Supabase)        ⏳
   UI MVP                           ⏳
 ```
 
-**Hecho:** capacidad **Dish Management** en Application — ocho Use Cases + tests, sin infraestructura.
+**Hecho:** capacidad **Dish Management** en Application — ocho Use Cases + tests (40), sin infraestructura.  
+**Vocabulario:** planificar por Capabilities, no por «módulos» de valor.  
+**Disciplina:** primero evidencia; después abstracción.
 
-**Próximo paso:** `SupabaseDishRepository` (adaptador) o UI — sin tocar Foundation.
+**Próximo paso:** `SupabaseDishRepository` (adaptador) o UI — sin tocar Foundation. Sin generalizar Use Cases.
 
 ## Misión v0.1
 
@@ -55,6 +58,7 @@ Module 01 · Dish Library
 
 ## Enlaces
 
+- [Diario · Capabilities](../99-internal/development-journal/2026-07-21-capabilities-jerarquia-planificacion.md)
 - [Milestone · Foundation Validation](./MILESTONE_VALIDACION_DOMINIO_DISH.md)
 - [Domain Done](../12-domain-model/DOMAIN_DONE.md)
 - [DISH_USE_CASES](../14-application/DISH_USE_CASES.md)

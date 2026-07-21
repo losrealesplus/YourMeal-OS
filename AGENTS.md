@@ -94,15 +94,28 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-Metodología estable ✅ → Dish Management (UC-001…008) ✅ → Supabase / UI ⏳
+Platform: YourMeal OS
+Capability: Dish Management (Application) ✅
+        ↓
+Infrastructure (Supabase) / UI ⏳
 ```
 
-**Objetivo de Module 01:** materializar el catálogo de platos para EatClean **heredando** el patrón ya validado.
+**Jerarquía de planificación del Core** (no «módulos» como unidad de valor):
+
+```text
+Platform → Capabilities → Use Cases → Domain → Infrastructure
+```
+
+El cliente compra **capacidades operativas**, no entidades ni repositorios.
+
+**Objetivo actual:** materializar Dish Management para EatClean **heredando** el patrón ya validado.
 
 > **Metodología estable.** No añadir documentos de Foundation «porque sí».  
 > Preferir: *«Foundation ya responde»* o *«primero que el producto lo demuestre»*.
 
 > **Use Case Specificity:** un UC está terminado cuando se puede implementar leyendo solo su especificación.
+
+> **Primero evidencia. Después abstracción.** Use Cases parecidos dentro de una Capability no justifican una clase base. Generalizar solo cuando varias Capabilities distintas demuestren el mismo patrón.
 
 Orden:
 
@@ -113,7 +126,7 @@ Dish Management Application ✅
 
 La unidad de diseño es el **caso de uso**. Una fachada `DishApplicationService` es opcional y posterior.
 
-### Principio de valor (Module 01+)
+### Principio de valor (Capabilities)
 
 > Cada línea de código debe aportar valor a la **Organización actual** (EatClean) o fortalecer el **Core** para Organizaciones futuras. Si no cumple ninguna de las dos, no debería existir.
 
