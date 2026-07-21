@@ -25,7 +25,10 @@ FASE 1 — Core v0.1 (EatClean)
 Module 01 · Dish Library 🚧
   Dominio documentado     ✅
   Lenguaje en código      ✅
-  Entidad Dish            ⏳  ← consecuencia del diseño
+  Entidad Dish            ✅
+  Repository Interface    ⏳
+  Application Service     ⏳
+  UI                      ⏳
 ```
 
 > La Fase 0 construyó la empresa y su sistema de decisión.  
@@ -60,7 +63,9 @@ Dominio primero (sin UI):
 
 **Objetivo de Module 01:** validar la constitución materializando `Dish` como consecuencia de Entity Guidelines.
 
-**Próximo paso:** entidad `Dish` en código — sin pantalla.
+**Hecho:** entidad `Dish` + tests de dominio (`vitest`).
+
+**Próximo paso:** Repository Interface de dominio → adaptar Application Service — sin pantalla.
 
 ## Misión v0.1
 
