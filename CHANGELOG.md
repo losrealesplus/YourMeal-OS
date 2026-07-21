@@ -58,3 +58,6 @@ La arquitectura de YourMeal OS se considera **estable**.
 - Pirámide de decisión + principio de valor (Module 01+) en `AGENTS.md`
 - Cierre de etapa constitucional → inicio de construcción de producto
 - Roadmap Maestro v0.1 alineado con EatClean, Core y aprendizaje
+- Dominio `Dish` cerrado en documentación
+- Lenguaje del dominio `Dish` en código (VOs, errors, state machine)
+- Principio Entity Simplicity en `FOUNDATION.md`

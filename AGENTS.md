@@ -67,7 +67,15 @@ Foundation Lock ✅  →  Module 01 Dish Library 🚧
 
 **Objetivo de Module 01:** validar que la constitución funciona (Dish → Ingredient → Recipe sin romper reglas).
 
-Orden: Dish → Ingredient → Recipe → Repos → Services → Rules → Tests → **UI** → CRUD.
+Orden de implementación:
+
+```text
+Language → Value Objects → Errors → State Machine → Entity
+  → Repository Interface → Domain Service → Application Service
+  → Tests → Infrastructure → UI
+```
+
+> Modelar antes de implementar. El CRUD es consecuencia, no punto de partida.
 
 ### Principio de valor (Module 01+)
 

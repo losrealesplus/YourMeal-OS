@@ -18,6 +18,9 @@ Contexto Estratégico   ✅
 ────────────────────────
 FASE 1 — Core v0.1 (EatClean)
 Module 01 · Dish Library 🚧
+  Dominio documentado     ✅
+  Lenguaje en código      🚧
+  Entidad Dish            ⏳
 ```
 
 > La Fase 0 construyó la empresa y su sistema de decisión.  
@@ -46,9 +49,9 @@ Dominio primero (sin UI):
 - [Ingredient.md](../12-domain-model/module-01/Ingredient.md)
 - [Recipe.md](../12-domain-model/module-01/Recipe.md)
 
-**Objetivo de Module 01:** validar la constitución (Dish → Ingredient → Recipe sin romper reglas).
+**Objetivo de Module 01:** validar la constitución modelando antes de implementar.
 
-**Próximo paso de implementación:** dominio **Dish** en código (`src/modules/dish-library/domain/`) — sin pantalla.
+**Próximo paso:** entidad `Dish` en código, compuesta exclusivamente del lenguaje de dominio ya creado — sin pantalla.
 
 ## Misión v0.1
 

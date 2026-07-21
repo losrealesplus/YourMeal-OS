@@ -107,6 +107,19 @@ Evita clases, servicios o módulos que hagan demasiadas cosas.
 
 Prefiere sistemas pequeños y desacoplados.
 
+### Entity Simplicity
+
+> **Entities must contain only the behavior that truly belongs to them.**
+
+Complex validation belongs in:
+
+- Value Objects
+- Domain Services
+- Policies
+- Specifications
+
+Not inside the entity. Keep entities small and easy to understand.
+
 ---
 
 ## Cambios

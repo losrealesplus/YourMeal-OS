@@ -30,77 +30,27 @@ A partir de aquí no volveremos atrás salvo mediante ADR.
 ### Module 01 · Dish Library
 
 ```text
-1. Dominio
-```
-
-- Entidad Dish
-- Estados
-- Invariantes
-- Eventos
-- Value Objects
-- Relaciones
-
-↓
-
-```text
-2. Ingredient Library
-```
-
-- Entidad Ingredient
-- Unidad base
-- Conversiones
-- Costes
-- Alérgenos
-
-↓
-
-```text
-3. Recipe Builder
-```
-
-- Recetas
-- Ingredientes
-- Rendimiento
-- Escalado
-- Coste automático
-
-↓
-
-```text
-4. Repositories
-```
-
-↓
-
-```text
-5. Services
-```
-
-↓
-
-```text
-6. Business Rules
-```
-
-↓
-
-```text
-7. Tests
-```
-
-↓
-
-```text
-8. UI
-```
-
-↓
-
-```text
-9. CRUD
+1. Dominio (documentado)          ✅
+2. Lenguaje del dominio           🚧
+3. Entidad Dish                   ⏳
+4. Ingredient Library
+5. Recipe Builder
+6. Repository Interface
+7. Domain / Application Services
+8. Tests
+9. Infrastructure
+10. UI
 ```
 
 **Meta de la fase:** terminar un catálogo de platos sólido, no una pantalla bonita.
+
+**Orden dentro de Dish:**
+
+```text
+Language → Value Objects → Errors → State Machine → Entity
+```
+
+Luego, con la misma disciplina: **Ingredient** → **Recipe**.
 
 ### Module 02 · Weekly Planning
 
