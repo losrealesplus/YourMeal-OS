@@ -3,62 +3,47 @@
 **Última actualización:** 2026-07-21  
 **Versión:** `v0.1.0` — FOUNDATION LOCKED  
 
-| Pilar | Estado |
-|-------|--------|
-| FOUNDATION | ✅ ¿Cómo construimos? |
-| PRODUCT BLUEPRINT | ✅ ¿Qué construimos y por qué? |
-| **OPERATIONAL DISCOVERY** | ⏳ ¿Qué demuestra la cocina? |
+## Tres pilares documentales
 
-**Actas:** [Infrastructure Validation](./MILESTONE_INFRASTRUCTURE_VALIDATION.md) · [Product Era](../99-internal/development-journal/2026-07-21-product-era.md) · [Product Blueprint](../99-internal/development-journal/2026-07-21-product-blueprint.md) · [Operational Discovery](../99-internal/development-journal/2026-07-21-operational-discovery.md)
-
----
-
-## Los tres pilares
+| Pilar | Pregunta | Estado |
+|-------|----------|--------|
+| **FOUNDATION** | ¿Cómo construimos? | ✅ |
+| **PRODUCT BLUEPRINT** | ¿Qué construimos y por qué? | ✅ |
+| **OPERATIONAL DISCOVERY** | ¿Por qué evolucionar? *(qué aprendimos observando)* | ✅ carpeta · ⏳ evidencia real |
 
 ```text
-FOUNDATION ✅
+FOUNDATION
+        │
+        ├── Cómo construir
+
+PRODUCT BLUEPRINT
+        │
+        ├── Qué construir
+
+OPERATIONAL DISCOVERY
+        │
+        └── Por qué evolucionar
+
         ↓
-PRODUCT BLUEPRINT ✅
-        ↓
-OPERATIONAL DISCOVERY ⏳  ← etapa activa
-        ↓
-Capabilities priorizadas por evidencia
-        ↓
-Integration / UI / piloto
+CAPABILITIES → USE CASES → IMPLEMENTACIÓN
 ```
 
----
+> **En YourMeal OS no implementamos ideas. Implementamos conocimiento validado.**
 
-## Regla de la etapa activa
-
-> **Ninguna Capability nueva entra en desarrollo hasta que exista evidencia operativa suficiente de que elimina una pregunta recurrente o una decisión repetitiva.**
-
-El roadmap sale de la cocina.
+**Regla de oro (Discovery):** nunca soluciones aquí — solo evidencia.
 
 ---
 
-## Fase oficial
+## Etapa activa
 
-```text
-Foundation Era              ✅
-Product Blueprint           ✅
-Operational Discovery       ⏳  ← observar EatClean
-        ↓
-Integration + UI MVP (Dish) ⏳  (técnico; no abre Capabilities nuevas)
-EatClean Pilot              ⏳
-Asistente priorizado        ⏳  (solo con evidencia)
-```
+**Operational Discovery** — observar EatClean y llenar Findings reales (OF-001 actual es plantilla).
 
-**Operational Discovery:** [docs/16-operational-discovery/](../16-operational-discovery/README.md)  
-**Product Blueprint:** [docs/15-product/](../15-product/README.md)
+En paralelo (sin abrir Capabilities nuevas): Integration + UI MVP de **Dish Management** (ya validada en Core).
 
-**Próximo paso de producto:** primeras jornadas de observación → OF reales (sustituir ejemplo OF-001).  
-**Próximo paso técnico (sin contradicción):** Integration + UI MVP de Dish Management (Capability ya validada).
+| Índice | Ruta |
+|--------|------|
+| Discovery | [docs/16-operational-discovery/](../16-operational-discovery/README.md) |
+| Blueprint | [docs/15-product/](../15-product/README.md) |
+| Foundation | [FOUNDATION.md](../../FOUNDATION.md) |
 
----
-
-## Activo a largo plazo
-
-No solo el código ni el Core.
-
-Una **biblioteca de conocimiento operativo** (preguntas, minutos, decisiones repetidas) que hace a YourMeal OS cada vez más difícil de copiar.
+Actas: [Operational Discovery](../99-internal/development-journal/2026-07-21-operational-discovery.md) · [Pilar completo](../99-internal/development-journal/2026-07-21-operational-discovery-pilar-completo.md)

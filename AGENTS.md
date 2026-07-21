@@ -94,34 +94,23 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-FOUNDATION ✅ → PRODUCT BLUEPRINT ✅ → OPERATIONAL DISCOVERY ⏳
+FOUNDATION ✅ → PRODUCT BLUEPRINT ✅ → OPERATIONAL DISCOVERY ✅/⏳
 ```
-
-**Pilares:**
 
 | Pilar | Pregunta |
 |-------|----------|
 | FOUNDATION | ¿Cómo construimos? |
 | PRODUCT BLUEPRINT | ¿Qué construimos y por qué? |
-| OPERATIONAL DISCOVERY | ¿Qué demuestra la cocina? |
+| OPERATIONAL DISCOVERY | ¿Por qué evolucionar? (evidencia) |
 
-**Regla:** ninguna Capability nueva en desarrollo sin evidencia operativa suficiente.
+> **No implementamos ideas. Implementamos conocimiento validado.**  
+> Discovery: solo evidencia — nunca soluciones.
 
-**Objetivo actual:** observar EatClean (Findings) · Integration/UI MVP solo para Dish ya validado · no inventar Capabilities.
+**Objetivo:** jornadas reales en EatClean (OF, preguntas, minutos) · Integration/UI Dish en paralelo.
 
-> Índice Discovery: [docs/16-operational-discovery/](./docs/16-operational-discovery/README.md)  
-> Blueprint: [docs/15-product/](./docs/15-product/README.md)
+Índices: [Discovery](./docs/16-operational-discovery/README.md) · [Blueprint](./docs/15-product/README.md)
 
-Orden:
-
-```text
-Operational Discovery ⏳
-  → OF reales + biblioteca de preguntas
-  → (en paralelo) Integration + UI Dish
-  → Priorizar Asistente con evidencia
-```
-
-Acta: [Operational Discovery](./docs/99-internal/development-journal/2026-07-21-operational-discovery.md)
+Acta: [Pilar Discovery](./docs/99-internal/development-journal/2026-07-21-operational-discovery-pilar-completo.md)
 
 ### Principio de valor (Capabilities)
 

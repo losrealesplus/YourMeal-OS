@@ -76,8 +76,9 @@ La arquitectura de YourMeal OS se considera **estable**.
 - Dos arquitecturas: técnica + experiencia operativa; dos niveles: Asistentes (compra) / Capabilities (implementación)
 - Principio de propósito + filtro *¿qué pregunta elimina?*
 - **Product Blueprint** (`docs/15-product/`) — VISION · PRINCIPLES · MOMENTOS · ASSISTANTS · DASHBOARD · CAPABILITY_ROADMAP
-- **Operational Discovery** (`docs/16-operational-discovery/`) — Findings · Questions · Time Losses · Repeated Decisions
-- Regla: ninguna Capability nueva sin evidencia operativa suficiente
+- **Operational Discovery** completo: Findings · Questions · Time · Decisions · Workarounds · Incidents · Patterns · Candidates
+- Regla de oro: Discovery nunca contiene soluciones — solo evidencia
+- Disciplina: no implementamos ideas; implementamos conocimiento validado
 - Secuencia definitiva en FOUNDATION: Guidelines → Spec → Implementation → Tests → Validation
 ### Gobierno
 

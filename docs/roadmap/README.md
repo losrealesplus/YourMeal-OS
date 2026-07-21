@@ -70,23 +70,18 @@ A partir de aquí no rediseñamos la forma de construir salvo ADR. Foundation si
 
 **Meta de la fase:** terminar un catálogo de platos sólido, no una pantalla bonita.
 
-**Orden — Operational Discovery:**
+**Orden:**
 
 ```text
-FOUNDATION ✅
-PRODUCT BLUEPRINT ✅
-OPERATIONAL DISCOVERY ⏳
+FOUNDATION ✅          Cómo construir
+PRODUCT BLUEPRINT ✅   Qué construir
+OPERATIONAL DISCOVERY ✅/⏳  Por qué evolucionar (llenar evidencia)
         ↓
-Evidencia (OF · preguntas · minutos)
-        ↓
-Asistente / Capability priorizada
-        ↓
-(en paralelo OK) Integration + UI Dish ya validado
+CAPABILITIES → USE CASES → IMPLEMENTACIÓN
 ```
 
-> Tres pilares: cómo · qué/por qué · **qué demuestra la cocina**.  
-> Discovery: [docs/16-operational-discovery/](../16-operational-discovery/README.md)  
-> Blueprint: [docs/15-product/](../15-product/README.md)
+> No implementamos ideas. Implementamos conocimiento validado.  
+> [Discovery](../16-operational-discovery/README.md) · [Blueprint](../15-product/README.md)
 
 ### Module 02 · Weekly Planning
 
