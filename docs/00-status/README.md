@@ -6,16 +6,22 @@
 ## Fase oficial
 
 ```text
+FASE 0 — FUNDACIÓN
 Blueprint              ✅
 Foundation             ✅
 Foundation Lock        ✅
+Global Foundation      ✅
+Constitución           ✅
+Arquitectura           ✅
+Metodología            ✅
+Contexto Estratégico   ✅
 ────────────────────────
-Module 01
-Dish Library           🚧
+FASE 1 — Core v0.1 (EatClean)
+Module 01 · Dish Library 🚧
 ```
 
-> Las fases anteriores construyeron la plataforma.  
-> **Module 01** inicia la historia de desarrollo de negocio (Domain Driven).
+> La Fase 0 construyó la empresa y su sistema de decisión.  
+> **La Fase 1** empieza a construir el producto a través de las necesidades reales de EatClean.
 
 > **La arquitectura ya no se diseña; se aplica.**
 
@@ -43,6 +49,10 @@ Dominio primero (sin UI):
 **Objetivo de Module 01:** validar la constitución (Dish → Ingredient → Recipe sin romper reglas).
 
 **Próximo paso de implementación:** dominio **Dish** en código (`src/modules/dish-library/domain/`) — sin pantalla.
+
+## Misión v0.1
+
+> Construir la mejor plataforma posible para EatClean y convertir cada aprendizaje real en una capacidad reusable del Core.
 
 ## Enlaces
 

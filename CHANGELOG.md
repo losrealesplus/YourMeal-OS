@@ -57,3 +57,4 @@ La arquitectura de YourMeal OS se considera **estable**.
 - `FOUNDATION.md` en la raíz como constitución global reusable
 - Pirámide de decisión + principio de valor (Module 01+) en `AGENTS.md`
 - Cierre de etapa constitucional → inicio de construcción de producto
+- Roadmap Maestro v0.1 alineado con EatClean, Core y aprendizaje
