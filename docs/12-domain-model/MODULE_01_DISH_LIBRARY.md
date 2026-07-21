@@ -37,8 +37,10 @@ Luego: **Ingredient** → **Recipe** con la misma disciplina.
 | Pieza | Estado |
 |-------|--------|
 | Dominio documentado (`Dish.md`) | ✅ |
-| Lenguaje del dominio en código | 🚧 |
-| Entidad `Dish` | ⏳ pendiente |
+| Lenguaje del dominio en código | ✅ |
+| Entidad `Dish` | ✅ |
+| Tests de dominio | ✅ |
+| Repository Interface | ⏳ pendiente |
 | UI / CRUD | ⏳ pendiente |
 
 ## Documentos de dominio

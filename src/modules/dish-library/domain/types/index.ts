@@ -3,6 +3,7 @@ export {
   DishStatus,
   type DishStatusValue,
 } from "./dish-status";
+export { CategoryId, DishId, RecipeId, TenantId } from "./ids";
 export {
   dishStatusFromDb,
   dishStatusToDb,

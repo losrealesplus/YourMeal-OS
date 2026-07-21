@@ -1,17 +1,15 @@
 # Entities
 
-`Dish` entity pending.
+`Dish` entity: [`dish.ts`](./dish.ts)
 
-Implement only after domain language exists:
+Implements `docs/12-domain-model/module-01/Dish.md` under
+[`ENTITY_GUIDELINES.md`](../../../../../docs/12-domain-model/ENTITY_GUIDELINES.md).
 
-- Value Objects
+Composed from domain language only:
+
+- Value Objects (`DishName`, `Money`, `PortionSize`, `Calories`, `NutritionFacts`)
 - Domain Errors
-- State Machine
+- `DishStatus` state machine
+- Domain events (collected via `pullDomainEvents()`)
 
-Then compose the entity exclusively from those concepts.
-
-**Standard:** [`docs/12-domain-model/ENTITY_GUIDELINES.md`](../../../../../docs/12-domain-model/ENTITY_GUIDELINES.md)
-
-Golden rule before coding:
-
-> ¿Qué representa esta entidad dentro del negocio?
+No infrastructure. No UI. No database.

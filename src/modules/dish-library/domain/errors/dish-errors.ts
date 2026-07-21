@@ -22,10 +22,33 @@ export class DishNameTooLong extends DomainError {
   }
 }
 
+export class DishCategoryRequired extends DomainError {
+  constructor() {
+    super("INVALID_STATE", "Dish category is required", { field: "categoryId" });
+    this.name = "DishCategoryRequired";
+  }
+}
+
 export class DishAlreadyArchived extends DomainError {
   constructor(dishId?: string) {
     super("INVALID_STATE", "Dish is already archived", { dishId });
     this.name = "DishAlreadyArchived";
+  }
+}
+
+export class DishNotArchived extends DomainError {
+  constructor(dishId?: string) {
+    super("INVALID_STATE", "Dish is not archived", { dishId });
+    this.name = "DishNotArchived";
+  }
+}
+
+export class DishCannotModifyWhenArchived extends DomainError {
+  constructor(dishId?: string) {
+    super("INVALID_STATE", "Archived dish cannot be modified; restore first", {
+      dishId,
+    });
+    this.name = "DishCannotModifyWhenArchived";
   }
 }
 

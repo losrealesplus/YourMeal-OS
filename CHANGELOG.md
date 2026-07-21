@@ -65,3 +65,4 @@ La arquitectura de YourMeal OS se considera **estable**.
 - Actores oficiales del dominio (`docs/12-domain-model/ACTORS.md`) — fin de «Cliente» ambiguo
 - Entity Guidelines (`docs/12-domain-model/ENTITY_GUIDELINES.md`) — estándar de modelado de entidades
 - Fundación del dominio cerrada — el código es consecuencia del diseño
+- Entidad de dominio `Dish` + tests (`vitest`) — primera validación real de Foundation
