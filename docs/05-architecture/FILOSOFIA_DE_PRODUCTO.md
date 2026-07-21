@@ -125,6 +125,8 @@ Eso se logra con **Operational Checks** sencillos y acertados (Digitalizar → V
 
 ### Mecanismo transversal
 
+**Operational Check** = unidad mínima de valor operativo.
+
 Cada Capability: **¿Qué sabemos? → ¿Qué comprobamos? → ¿Qué necesita atención?**
 
 Lema: **No mostramos datos. Confirmamos que la operación puede continuar.**
