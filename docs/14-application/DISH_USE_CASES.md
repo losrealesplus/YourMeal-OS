@@ -122,6 +122,8 @@ Nuevo Dish registrado en **draft**.
 | Eventos | `DishCreated` |
 | Tests | `CreateDishUseCase.spec.ts` |
 
+**Diseño de implementación:** [CreateDishUseCase.md](./use-cases/CreateDishUseCase.md)
+
 ---
 
 ## UC-002 — Actualizar Dish
@@ -603,13 +605,9 @@ El código **no** es el lugar donde se toman decisiones.
 
 ```text
 DISH_USE_CASES.md          ✅
+CreateDishUseCase.md       ✅   (diseño — no guideline)
         ↓
-CreateDishUseCase          ⏳
-UpdateDishUseCase          ⏳
-ActivateDishUseCase        ⏳
-…
+CreateDishUseCase.ts       ⏳
         ↓
-Tests de Application
-        ↓
-SupabaseDishRepository
+CreateDishUseCase.spec.ts
 ```

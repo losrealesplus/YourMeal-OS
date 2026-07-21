@@ -213,6 +213,28 @@ Si una decisión cambia la arquitectura, la filosofía o la experiencia del prod
 
 ---
 
+## Secuencia definitiva (producto)
+
+Cuando la metodología del proyecto ya es estable:
+
+```text
+Guidelines
+        ↓
+Business Specification
+        ↓
+Implementation
+        ↓
+Tests
+        ↓
+Validation
+```
+
+No se añaden documentos metodológicos «por completitud».
+
+Si el producto revela una grieta común en varias capacidades, entonces se refuerza Foundation. Hasta entonces, la mejor forma de mejorar la metodología es construir producto sobre ella.
+
+---
+
 ## Objetivo final
 
 No construimos funcionalidades.

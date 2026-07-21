@@ -25,6 +25,7 @@
 | [DishRepository](./13-repositories/DishRepository.md) | Contrato de dominio Dish (docs) |
 | [Application Guidelines](./14-application/APPLICATION_GUIDELINES.md) | Estándar de la capa de Aplicación |
 | [DISH_USE_CASES](./14-application/DISH_USE_CASES.md) | Qué puede hacer la cocina con un Dish |
+| [CreateDishUseCase](./14-application/use-cases/CreateDishUseCase.md) | Diseño UC-001 (implementación) |
 | [Capability Matrix](./09-security/CAPABILITY_MATRIX.md) | AuthZ |
 | [ADRs](./adr/README.md) | Decisiones |
 | [Roadmap](./roadmap/README.md) | Secuencia |

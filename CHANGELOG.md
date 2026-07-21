@@ -57,6 +57,9 @@ La arquitectura de YourMeal OS se considera **estable**.
 - `DISH_USE_CASES.md` — catálogo UC-001…UC-008 (comportamiento de negocio + trazabilidad)
 - Un caso de uso por clase (`CreateDishUseCase`, …); fachada Application Service opcional
 - Principio Use Case Clarity en FOUNDATION / Application Guidelines
+- **Metodología estable** — cimientos no se profundizan más; se construye producto
+- `use-cases/CreateDishUseCase.md` — diseño de implementación UC-001 (no guideline)
+- Secuencia definitiva en FOUNDATION: Guidelines → Spec → Implementation → Tests → Validation
 ### Gobierno
 
 - ADR 0011: Diario de Desarrollo + Principio de Intencionalidad

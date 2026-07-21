@@ -94,17 +94,21 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-APPLICATION_GUIDELINES ✅ → DISH_USE_CASES.md ✅ → CreateDishUseCase … ⏳
+Metodología estable ✅ → CreateDishUseCase.md ✅ → CreateDishUseCase.ts ⏳
 ```
 
 **Objetivo de Module 01:** materializar el catálogo de platos para EatClean **heredando** el patrón ya validado.
+
+> **Metodología estable.** No añadir documentos de Foundation «porque sí».  
+> Preferir: *«Foundation ya responde»* o *«primero que el producto lo demuestre»*.
 
 Orden:
 
 ```text
 DISH_USE_CASES.md ✅
-  → CreateDishUseCase / Update / Activate / … (una clase por UC)
-  → Application Tests → (fachada opcional) → SupabaseDishRepository → UI MVP
+  → CreateDishUseCase.md ✅ (diseño de implementación)
+  → CreateDishUseCase.ts ⏳
+  → Tests → resto de UCs → SupabaseDishRepository → UI MVP
 ```
 
 La unidad de diseño es el **caso de uso**. Una fachada `DishApplicationService` es opcional y posterior.
@@ -154,4 +158,5 @@ Conflictos con `.lovable/plan.md` → **gana `docs/`**.
 - [DishRepository (contrato)](./docs/13-repositories/DishRepository.md)
 - [Application Guidelines](./docs/14-application/APPLICATION_GUIDELINES.md)
 - [DISH_USE_CASES](./docs/14-application/DISH_USE_CASES.md)
+- [CreateDishUseCase (diseño)](./docs/14-application/use-cases/CreateDishUseCase.md)
 - [Architecture Review](./docs/05-architecture/architecture-review.md) (histórico — ya aprobado)

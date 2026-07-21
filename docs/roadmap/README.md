@@ -70,10 +70,10 @@ A partir de aquí no rediseñamos la forma de construir salvo ADR. Foundation si
 **Orden Application (misma disciplina):**
 
 ```text
-APPLICATION_GUIDELINES ✅ → DISH_USE_CASES.md ✅ → CreateDishUseCase … → Tests → (fachada opcional)
+DISH_USE_CASES ✅ → CreateDishUseCase.md ✅ → CreateDishUseCase.ts ⏳ → Tests
 ```
 
-> Un caso de uso por clase. Application Service solo como fachada opcional. El código implementa el UC, no “un servicio”.
+> Metodología estable. Lo que sigue es ingeniería. Un caso de uso por clase.
 
 **Segundo gran principio a validar:** el Core permanece estable; la infraestructura se adapta al dominio.
 Luego, con la misma disciplina: **Ingredient** → **Recipe**.
