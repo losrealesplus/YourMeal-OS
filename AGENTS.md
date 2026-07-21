@@ -89,7 +89,7 @@ Language → Value Objects → Errors → State Machine → Entity
 
 ### Principio de valor (Module 01+)
 
-> Cada línea de código debe aportar valor al **primer cliente** (EatClean) o fortalecer el **Core** para clientes futuros. Si no cumple ninguna de las dos, no debería existir.
+> Cada línea de código debe aportar valor a la **Organización actual** (EatClean) o fortalecer el **Core** para Organizaciones futuras. Si no cumple ninguna de las dos, no debería existir.
 
 ## Gobierno
 
@@ -123,4 +123,5 @@ Conflictos con `.lovable/plan.md` → **gana `docs/`**.
 - [Diario](./docs/99-internal/development-journal/README.md)
 - [DoD](./docs/00-status/DEFINITION_OF_DONE.md)
 - [Dish](./docs/12-domain-model/module-01/Dish.md)
+- [Actores](./docs/12-domain-model/ACTORS.md)
 - [Architecture Review](./docs/05-architecture/architecture-review.md) (histórico — ya aprobado)

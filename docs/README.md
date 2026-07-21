@@ -17,6 +17,7 @@
 | [Module 01 — Dish](./12-domain-model/module-01/Dish.md) | Dominio Dish |
 | [Module 01 — Ingredient](./12-domain-model/module-01/Ingredient.md) | Dominio Ingredient |
 | [Module 01 — Recipe](./12-domain-model/module-01/Recipe.md) | Dominio Recipe |
+| [Actores](./12-domain-model/ACTORS.md) | Roles oficiales del dominio |
 | [Capability Matrix](./09-security/CAPABILITY_MATRIX.md) | AuthZ |
 | [ADRs](./adr/README.md) | Decisiones |
 | [Roadmap](./roadmap/README.md) | Secuencia |

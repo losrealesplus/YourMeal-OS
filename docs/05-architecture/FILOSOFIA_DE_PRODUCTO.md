@@ -15,7 +15,7 @@ Existe para ayudar a que una empresa de alimentación opere mejor cada día.
 
 La aplicación es únicamente el medio.
 
-El verdadero producto es la **mejora operativa** que obtiene el cliente.
+El verdadero producto es la **mejora operativa** que obtiene la Organización.
 
 ---
 
@@ -44,7 +44,7 @@ El éxito de YourMeal OS **no** se mide por:
 - tecnologías utilizadas;
 - funcionalidades implementadas.
 
-El éxito se mide por el **impacto** que genera en la operación diaria del cliente.
+El éxito se mide por el **impacto** que genera en la operación diaria de la Organización.
 
 Por ejemplo:
 
@@ -59,12 +59,12 @@ Cada mejora debe poder relacionarse con un beneficio operativo observable.
 
 ---
 
-## El cliente siempre es el punto de partida
+## El punto de partida siempre es la Organización
 
 Toda nueva capacidad debe seguir este recorrido:
 
 ```text
-Cliente
+Organización
 ↓
 Problema operativo
 ↓
@@ -79,21 +79,23 @@ Interfaz
 
 Nunca construiremos funcionalidades únicamente porque sean técnicamente interesantes.
 
-Construiremos capacidades que resuelvan problemas reales detectados durante la operación del cliente.
+Construiremos capacidades que resuelvan problemas reales detectados durante la operación de la Organización.
+
+> En este documento, cuando se habla del «cliente» comercial de YourMeal OS, se entiende **Organización**. Ver [ACTORS.md](../12-domain-model/ACTORS.md).
 
 ---
 
 ## EatClean es nuestro primer profesor
 
-EatClean no es únicamente el primer cliente.
+EatClean no es únicamente la primera Organización.
 
 Es la principal fuente de aprendizaje del Core.
 
 Cada problema descubierto durante su implantación representa una oportunidad para fortalecer YourMeal OS.
 
-El objetivo no es personalizar el sistema para un cliente.
+El objetivo no es personalizar el sistema para una Organización.
 
-El objetivo es descubrir **capacidades reutilizables** que beneficien a todos los clientes futuros.
+El objetivo es descubrir **capacidades reutilizables** que beneficien a todas las Organizaciones futuras.
 
 ---
 
@@ -161,7 +163,7 @@ Una interfaz bonita que complique el trabajo **no** cumple la misión del produc
 
 Diseñamos el Core pensando en cientos de clientes.
 
-Construimos únicamente aquello que el cliente actual necesita.
+Construimos únicamente aquello que la Organización actual necesita.
 
 Cada implantación fortalece el sistema.
 
@@ -193,7 +195,7 @@ Cada línea de código, cada decisión de dominio y cada nueva capacidad deben a
 
 Porque el verdadero éxito no ocurre cuando terminamos una funcionalidad.
 
-Ocurre cuando el cliente termina su jornada habiendo trabajado mejor gracias a YourMeal OS.
+Ocurre cuando la Organización termina su jornada habiendo trabajado mejor gracias a YourMeal OS.
 
 ---
 

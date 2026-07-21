@@ -115,11 +115,11 @@ Capacidades:
 - Entregas
 - Seguimiento
 
-### Module 08 · Customer Portal
+### Module 08 · Consumer Portal
 
 Capacidades:
 
-- App cliente
+- App del Consumidor / Beneficiario
 - Pedidos
 - Seguimiento
 - Notificaciones
@@ -162,7 +162,7 @@ Se incorpora al Core
 
 ↓
 
-Disponible para futuros clientes
+Disponible para futuras Organizaciones
 ```
 
 Nunca desarrollaremos algo porque “algún día podría hacer falta”. Solo cuando un caso real lo justifique.
@@ -172,28 +172,28 @@ Nunca desarrollaremos algo porque “algún día podría hacer falta”. Solo cu
 Mientras el Core madura:
 
 ```text
-Cliente 001
+Organización 001
 EatClean
 
 ↓
 
-Cliente 002
+Organización 002
 
 ↓
 
-Cliente 003
+Organización 003
 
 ↓
 
-Cliente 010
+Organización 010
 
 ↓
 
-Cliente 050
+Organización 050
 
 ↓
 
-Cliente 100
+Organización 100
 ```
 
 Con cada implantación:
@@ -207,14 +207,14 @@ Con cada implantación:
 
 No mediremos el éxito por el número de pantallas. Lo mediremos por cuatro indicadores:
 
-1. **Valor para el cliente**  
+1. **Valor para la Organización**  
    ¿Cuánto tiempo, dinero o esfuerzo ahorra EatClean?
 
 2. **Fortaleza del Core**  
    ¿Cuántas capacidades reutilizables hemos incorporado sin romper la arquitectura?
 
 3. **Reutilización**  
-   ¿Qué porcentaje de lo construido puede aprovechar el siguiente cliente sin modificaciones?
+   ¿Qué porcentaje de lo construido puede aprovechar la siguiente Organización sin modificaciones?
 
 4. **Aprendizaje**  
    ¿Qué conocimiento nuevo hemos obtenido y documentado para mejorar el siguiente despliegue?
@@ -223,8 +223,8 @@ No mediremos el éxito por el número de pantallas. Lo mediremos por cuatro indi
 
 > **Cada línea de código debe cumplir al menos una de estas dos condiciones:**
 >
-> 1. Aportar valor directo al cliente actual.
-> 2. Fortalecer el Core para los futuros clientes.
+> 1. Aportar valor directo a la Organización actual.
+> 2. Fortalecer el Core para las futuras Organizaciones.
 >
 > Si no cumple una de ellas, no debe implementarse.
 

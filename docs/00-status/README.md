@@ -39,8 +39,9 @@ Module 01 · Dish Library 🚧
 | Cierre diario | Protocolo de 7 pasos (incluye Diario) |
 | Contexto sesiones | [CONTEXTO_CTO.md](../05-architecture/CONTEXTO_CTO.md) |
 | Pirámide de decisión | Jerarquía docs → código en [`AGENTS.md`](../../AGENTS.md) |
-| Valor (Module 01+) | Código para EatClean o para fortalecer el Core |
+| Valor (Module 01+) | Código para la Organización (EatClean) o para fortalecer el Core |
 | Filosofía de producto | [FILOSOFIA_DE_PRODUCTO.md](../05-architecture/FILOSOFIA_DE_PRODUCTO.md) — impacto operativo |
+| Actores | [ACTORS.md](../12-domain-model/ACTORS.md) — roles oficiales del dominio |
 
 ## Module 01 — ahora
 

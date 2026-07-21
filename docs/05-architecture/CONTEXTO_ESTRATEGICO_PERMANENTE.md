@@ -3,6 +3,8 @@
 Documento estratégico de referencia para Cursor como CTO del proyecto.  
 No sustituye los ADRs ni el modelo de dominio: los enmarca.
 
+> **Lenguaje de actores:** en este documento, «cliente» (comercial SaaS) = **Organización**. Ver [ACTORS.md](../12-domain-model/ACTORS.md). Evitar «cliente» sin contexto en documentación nueva.
+
 ## Estado actual del proyecto
 
 YourMeal OS ha finalizado oficialmente las fases:
