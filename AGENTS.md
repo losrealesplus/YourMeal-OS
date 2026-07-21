@@ -49,17 +49,32 @@ Registrar en el **Diario de Desarrollo** al terminar (antes de Done).
 Cada nivel responde una pregunta distinta. **Nunca discutir una decisión en un nivel inferior si contradice uno superior.**
 
 ```text
-FOUNDATION.md              → ¿Cómo pensamos?
-AGENTS.md                  → ¿Cómo trabajamos en este proyecto?
-CONTEXTO_ESTRATEGICO…      → ¿Qué empresa estamos construyendo?
-FILOSOFIA_DE_PRODUCTO.md   → ¿Para qué existe el producto y cómo medimos el éxito?
-CONTEXTO_CTO.md            → ¿Cómo debe evolucionar técnicamente?
-ADRs                       → ¿Por qué tomamos esta decisión?
-Domain Model               → ¿Cómo funciona el negocio?
-Código                     → ¿Cómo lo implementamos?
+FOUNDATION.md                    → ¿Cómo pensamos?
+AGENTS.md                        → ¿Cómo trabajamos en este proyecto?
+CONTEXTO_ESTRATEGICO…            → ¿Qué empresa estamos construyendo?
+FILOSOFIA_DE_PRODUCTO.md         → ¿Para qué existe el producto y cómo medimos el éxito?
+CONTEXTO_CTO.md                  → ¿Cómo debe evolucionar técnicamente?
+ADRs                             → ¿Por qué tomamos esta decisión?
+ACTORS.md                        → ¿Quiénes actúan en el negocio?
+UBIQUITOUS_LANGUAGE.md           → ¿Cómo nombramos el dominio?
+ENTITY_GUIDELINES.md             → ¿Cómo se modela una entidad?
+Domain Model (Dish.md, …)        → ¿Cómo funciona este concepto de negocio?
+Código (Dish.ts, …)              → ¿Cómo lo implementamos?
 ```
 
+> **El código es consecuencia del diseño, no su inicio.**  
+> `Dish.ts` no abre el diseño: lo materializa. Lo mismo valdrá para Recipe, Ingredient, Order y el resto del Core.
+
 Si la implementación contradice el dominio, gana el dominio. Si el dominio contradice un ADR, primero el ADR. Y así hacia arriba.
+
+### Fundación del dominio
+
+```text
+FOUNDATION → AGENTS → Estrategia → Filosofía → Actores
+  → Lenguaje ubicuo → Entity Guidelines → Dish.md → Dish.ts
+```
+
+Estado: **cerrada**. Cómo debe ser una entidad ya no se debate por módulo: se aplica [ENTITY_GUIDELINES.md](./docs/12-domain-model/ENTITY_GUIDELINES.md).
 
 ### Pregunta obligatoria (producto)
 

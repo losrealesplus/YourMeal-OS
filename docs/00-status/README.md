@@ -15,16 +15,22 @@ Constitución           ✅
 Arquitectura           ✅
 Metodología            ✅
 Contexto Estratégico   ✅
+Filosofía de Producto  ✅
+Actores                ✅
+Lenguaje ubicuo        ✅
+Entity Guidelines      ✅
+Fundación del dominio  ✅  ← cerrada
 ────────────────────────
 FASE 1 — Core v0.1 (EatClean)
 Module 01 · Dish Library 🚧
   Dominio documentado     ✅
-  Lenguaje en código      🚧
-  Entidad Dish            ⏳
+  Lenguaje en código      ✅
+  Entidad Dish            ⏳  ← consecuencia del diseño
 ```
 
 > La Fase 0 construyó la empresa y su sistema de decisión.  
-> **La Fase 1** empieza a construir el producto a través de las necesidades reales de EatClean.
+> **La fundación del dominio está cerrada:** el código es consecuencia, no el inicio.  
+> **La Fase 1** materializa producto a través de EatClean.
 
 > **La arquitectura ya no se diseña; se aplica.**
 
@@ -52,9 +58,9 @@ Dominio primero (sin UI):
 - [Ingredient.md](../12-domain-model/module-01/Ingredient.md)
 - [Recipe.md](../12-domain-model/module-01/Recipe.md)
 
-**Objetivo de Module 01:** validar la constitución modelando antes de implementar.
+**Objetivo de Module 01:** validar la constitución materializando `Dish` como consecuencia de Entity Guidelines.
 
-**Próximo paso:** entidad `Dish` en código, compuesta exclusivamente del lenguaje de dominio ya creado — sin pantalla.
+**Próximo paso:** entidad `Dish` en código — sin pantalla.
 
 ## Misión v0.1
 
