@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-21 · **Cierre de jornada** 🟢  
+**Última actualización:** 2026-07-22 · sesión UL 🟢  
 **Versión:** `v0.1.0` — FOUNDATION LOCKED  
 
 ## Roadmap (oficial)
