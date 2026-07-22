@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-22 · FASE 4 Operational Model 🟢 (01–06)  
+**Última actualización:** 2026-07-22 · FASE 5 Operational Validation 🚧  
 **Versión:** `v0.1.0` — FOUNDATION LOCKED  
 
 ## Roadmap (oficial)
@@ -11,37 +11,50 @@
 | PRODUCT BLUEPRINT | ✅ Cerrado (fase diseño) |
 | OPERATIONAL DISCOVERY | ✅ Estructura cerrada |
 | OPERATIONAL CHECKS | ✅ Cerrado (transversal) |
-| FIRST OBSERVATION DAY | ⏸ Congelado (hasta retomar a propósito) |
-| Operational Model | 🟢 01–06 (gramática completa) |
+| Operational Model (FASE 4) | 🟢 01–06 (gramática completa) |
+| **Operational Validation (FASE 5)** | 🚧 Estructura + semillas |
+| Certificación modelo | ⏳ Operational Model Certified v1.0 |
 
 ---
 
-## Fase actual: YOURMEAL OPERATIONAL MODEL (Core Operativo)
+## Fase actual: OPERATIONAL VALIDATION
 
-No es el Core técnico (DDD).  
-Es el **lenguaje permanente** de la operación de comida preparada.
+> **¿Dónde nos equivocamos?** — no «¿qué construimos?»
+
+La validación **no busca confirmar. Busca refutar.**
 
 ```text
-Foundation ✅ → Blueprint ✅ → Checks ✅
+Operational Model 🟢 (hipótesis endurecida)
         ↓
-Operational Model 🟢
+Operational Validation 🚧  ← intentar romper el modelo
+        ↓
+Operational Model Certified v1.0  ⏳
+        ↓
+UX · Capabilities · código de producto
+```
+
+Índice: [docs/18-operational-validation/](../18-operational-validation/README.md)
+
+| Misión FASE 5 | Prohibido |
+|---------------|-----------|
+| Romper el modelo con escenarios y edge cases | Añadir features |
+| Dictámenes trazables (VR) | Cambiar el modelo sin VR |
+| Field observation bajo lente de coherencia | Saltar a UI / código |
+
+---
+
+## FASE 4 cerrada — Operational Model
+
+```text
    01 Ubiquitous Language 🟢
    02 Core Objects 🟢
    03 Operational Dependencies 🟢
    04 Lifecycles (transiciones) 🟢
    05 Invariants (Constitución) 🟢
    06 Capability Mapping (trazabilidad) 🟢
-        ↓
-Observation EatClean ⏸
 ```
 
-| Pregunta anterior | Pregunta ahora |
-|-------------------|----------------|
-| ¿Qué funcionalidades tendrá? | ¿Qué objetos existen en cualquier negocio de comida preparada? |
-
-Índice: [docs/17-operational-model/](../17-operational-model/README.md) · [01 UL](../17-operational-model/01-ubiquitous-language/README.md)
-
-**No es un cuarto pilar.** Equivalente producto del Domain Model.
+Índice: [docs/17-operational-model/](../17-operational-model/README.md)
 
 ---
 
@@ -51,19 +64,18 @@ Observation EatClean ⏸
 |--------|----------|--------|
 | **FOUNDATION** | ¿Cómo construimos? | ✅ |
 | **PRODUCT BLUEPRINT** | ¿Qué / por qué? | ✅ |
-| **OPERATIONAL DISCOVERY** | ¿Por qué evolucionar? | ✅ carpeta · ⏸ campo |
+| **OPERATIONAL DISCOVERY** | ¿Por qué evolucionar? | ✅ carpeta · ⏸ campo Discovery |
 | **Operational Checks** | ¿Cómo guía la operación? | ✅ transversal |
-| **Operational Model** | ¿Con qué lenguaje? | 🟢 01–06 |
+| **Operational Model** | ¿Con qué lenguaje? | 🟢 FASE 4 |
+| **Operational Validation** | ¿Dónde falla el modelo? | 🚧 FASE 5 |
 
 ```text
-Producto:  Discovery → Check → Assistant → Capability
-Lenguaje:  Operational Model (Ubiquitous Language primero)
-Técnica:   Capability → Use Cases → Domain → Infrastructure
+Producto:  Discovery → Check → Assistant → Capability  (post-certificación)
+Lenguaje:  Operational Model → Validation → Certified v1.0
+Técnica:   Capability → Use Cases → Domain → Infrastructure  (post-certificación)
 ```
 
-Gate: evidencia → pregunta → Check → Capability.
-
-Contrato semántico: *misma palabra ≠ cosas distintas; misma realidad ≠ dos palabras.*
+Gate actual: **refutar modelo** → certificar → entonces implementar.
 
 ---
 
@@ -73,17 +85,20 @@ Contrato semántico: *misma palabra ≠ cosas distintas; misma realidad ≠ dos 
 |----|------|--------|
 | [#9](https://github.com/losrealesplus/yourmeal-os/pull/9) | Operational Checks | ✅ Merged |
 | [#10](https://github.com/losrealesplus/yourmeal-os/pull/10) | Operational Model FASE 4 | 🚧 Open |
+| *(nuevo)* | Operational Validation FASE 5 | 🚧 |
 
 ---
 
 ## Próxima sesión / siguiente paso
 
-1. **Observation EatClean** ⏸ — retomar solo con decisión explícita del equipo  
-2. Trazabilidad de Capabilities candidatas cuando haya evidencia (plantilla en 06)  
-3. Sin código / pantallas / APIs hasta gate Discovery
+1. Ejecutar **VS-001** (semana normal) — walkthrough de coherencia del modelo  
+2. Ejecutar edge cases prioritarios (EC-001 stock · EC-002 payment)  
+3. Activar field observation EatClean **solo en modo validación** cuando el equipo decida  
+4. Sin código / pantallas / features nuevas hasta certificación
 
 | Índice | Ruta |
 |--------|------|
-| Constitución | [05-invariants/](../17-operational-model/05-invariants/README.md) |
-| Trazabilidad | [06-capability-mapping/](../17-operational-model/06-capability-mapping/README.md) |
-| Operational Model | [docs/17-operational-model/](../17-operational-model/README.md) |
+| Validation | [18-operational-validation/](../18-operational-validation/README.md) |
+| Principios | [01-validation-principles](../18-operational-validation/01-validation-principles.md) |
+| Certificación | [07-certification](../18-operational-validation/07-certification.md) |
+| Operational Model | [17-operational-model/](../17-operational-model/README.md) |

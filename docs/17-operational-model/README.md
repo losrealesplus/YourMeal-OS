@@ -83,7 +83,7 @@ Observation EatClean: ⏸. Sin pantallas / APIs / código.
 
 > ¿Gramática completa + Constitución + trazabilidad de referencia?  
 > **Sí** — 01–06 endurecidos. Dish Management mapeado como ejemplo.  
-> Siguiente trabajo producto: **Observation** (cuando se descongele) o trazabilidad de Capabilities con evidencia.
+> **Siguiente:** [FASE 5 — Operational Validation](../18-operational-validation/README.md) — intentar romper el modelo antes de implementar.
 
 ---
 

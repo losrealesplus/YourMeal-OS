@@ -8,8 +8,9 @@
 | [PRODUCT BLUEPRINT](../15-product/README.md) | ¿Qué construimos y por qué? *(fase diseño: cerrada)* |
 | **OPERATIONAL DISCOVERY** | **¿Por qué evolucionar el producto?** *(qué hemos aprendido observando)* |
 
-**Ahora:** Observation de campo ⏸ **congelada**. Prioridad del repo: [Operational Model](../17-operational-model/README.md).  
-Checklist de campo (cuando se reactive): [FIRST_OBSERVATION_DAY.md](./FIRST_OBSERVATION_DAY.md).
+**Ahora:** FASE 5 — [Operational Validation](../18-operational-validation/README.md) (refutar el modelo).  
+Observation de campo ⏸ en modo Discovery; al retomar EatClean, usar [04 field-observation](../18-operational-validation/04-field-observation/README.md).  
+Checklist histórico: [FIRST_OBSERVATION_DAY.md](./FIRST_OBSERVATION_DAY.md).
 
 ---
 
@@ -144,5 +145,6 @@ Ninguna Capability nueva entra en desarrollo sin evidencia operativa suficiente.
 
 ## Relacionado
 
+- [Operational Validation](../18-operational-validation/README.md) — validar que el modelo explica la operación (FASE 5)
 - [Product Blueprint](../15-product/README.md)
 - [Estado](../00-status/README.md)

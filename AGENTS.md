@@ -94,21 +94,20 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-Blueprint ✅ · Checks ✅ · Discovery (campo) ⏸
+Blueprint ✅ · Checks ✅ · Operational Model ✅ (FASE 4)
         ↓
-Operational Model (Core Operativo) 🚧  ← siguiente trabajo
+Operational Validation 🚧  ← FASE 5 — intentar romper el modelo
+        ↓
+Operational Model Certified v1.0 ⏳
 ```
 
-> **Gramática:** vocabulario · sustantivos · verbos · tiempo · constitución · trazabilidad.  
-> **01–06** endurecidos (FASE 4 Operational Model 🟢).  
-> Jerarquía: Invariant → Lifecycle → Check → Capability.  
-> Checks en **transiciones**, no en estados.  
-> Capabilities consumen el modelo — no lo definen.  
-> Observation ⏸ · sin código/pantallas.
+> **FASE 4:** gramática 01–06 endurecida.  
+> **FASE 5:** la validación **no busca confirmar — busca refutar**.  
+> Sin features · sin cambios al modelo sin Validation Report · sin UI/código hasta certificación.
 
-**Próxima sesión:** Observation (cuando se descongele) o trazabilidad de Capabilities con evidencia.
+**Próxima sesión:** ejecutar VS-001 y edge cases; field observation EatClean en modo validación cuando se active.
 
-Índices: [05 Invariants](./docs/17-operational-model/05-invariants/README.md) · [06 Mapping](./docs/17-operational-model/06-capability-mapping/README.md) · [Model](./docs/17-operational-model/README.md) · [Estado](./docs/00-status/README.md)
+Índices: [18 Validation](./docs/18-operational-validation/README.md) · [17 Model](./docs/17-operational-model/README.md) · [Estado](./docs/00-status/README.md)
 
 ### Principio de valor (Capabilities)
 
