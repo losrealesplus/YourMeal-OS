@@ -24,6 +24,8 @@ No es un cuarto pilar. Es el **equivalente, para producto, de lo que el Domain M
 | Sustantivos | 02 Core Objects |
 | Verbos | 03 Operational Dependencies |
 | Tiempo | 04 Lifecycles (transiciones) |
+| Constitución | 05 Invariants |
+| Trazabilidad | 06 Capability Mapping |
 
 > **Las Capabilities interactúan con el modelo — no lo definen.**
 
@@ -36,6 +38,20 @@ Solo si es imposible → estudiar nuevo Core Object.
 > **¿Qué objetos existen en cualquier negocio de comida preparada?**
 
 No ampliar el sistema. **Consolidar el lenguaje.**
+
+---
+
+## Jerarquía definitiva
+
+```text
+Invariant          ← gobierna (verdad permanente)
+        ↓
+Lifecycle          ← transiciones permitidas
+        ↓
+Operational Check  ← ¿puede ocurrir esta transición?
+        ↓
+Capability         ← consume el modelo (no lo define)
+```
 
 ---
 
@@ -58,16 +74,16 @@ Soportes: Dish · Recipe · Ingredient · Stock · Supplier · Vehicle · Kitche
 | 02 | [Core Objects](./02-core-objects/README.md) | 🟢 Endurecido + revisión de consistencia ✅ |
 | 03 | [Operational Dependencies](./03-relationships/README.md) | 🟢 Endurecido (verbos · flujo · checks en vínculos) |
 | 04 | [Lifecycles (transiciones)](./04-lifecycles/README.md) | 🟢 Endurecido |
-| 05 | [Invariants](./05-INVARIANTS.md) | 🚧 v0.1 — **siguiente** |
-| 06 | [Capability Mapping](./06-CAPABILITY_MAPPING.md) | 🚧 v0.1 |
+| 05 | [Invariants (Constitución)](./05-invariants/README.md) | 🟢 Endurecido |
+| 06 | [Capability Mapping (trazabilidad)](./06-capability-mapping/README.md) | 🟢 Marco + Dish ✅ |
 
 Observation EatClean: ⏸. Sin pantallas / APIs / código.
 
-### Gate 04 → 05
+### Gate FASE 4 cerrado
 
-> ¿Transiciones críticas con evento, responsable y Checks?  
-> **Sí** — ver [spine-transitions.md](./04-lifecycles/spine-transitions.md).  
-> Siguiente: **05 Invariants** = leyes permanentes del sistema.
+> ¿Gramática completa + Constitución + trazabilidad de referencia?  
+> **Sí** — 01–06 endurecidos. Dish Management mapeado como ejemplo.  
+> Siguiente trabajo producto: **Observation** (cuando se descongele) o trazabilidad de Capabilities con evidencia.
 
 ---
 
@@ -88,4 +104,5 @@ Observation EatClean: ⏸. Sin pantallas / APIs / código.
 1. No objetos «por si acaso» (evitar sobre-modelado).  
 2. Toda Capability y Check habla Nivel 1 (canónico).  
 3. Alias de cocina = Nivel 2/3, nunca sustituyen al canónico.  
-4. Sin nombres de DTO / Entity / Repository en el lenguaje operativo.
+4. Sin nombres de DTO / Entity / Repository en el lenguaje operativo.  
+5. Ningún Operational Check viola un Invariant.

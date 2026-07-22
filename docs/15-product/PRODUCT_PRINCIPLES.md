@@ -194,7 +194,15 @@ Interactúa con objetos existentes
 
 Solo si es imposible con el vocabulario actual → estudiar nuevo Core Object ([filtro 02](../17-operational-model/02-core-objects/README.md)).
 
-Gramática: vocabulario · sustantivos · verbos · tiempo — [Operational Model](../17-operational-model/README.md).
+Gramática: vocabulario · sustantivos · verbos · tiempo · constitución · trazabilidad — [Operational Model](../17-operational-model/README.md).
+
+Jerarquía:
+
+```text
+Invariant → Lifecycle → Operational Check → Capability
+```
+
+Los Checks nunca cambian leyes. Los Lifecycles nunca rompen Invariants. Ver [05 Invariants](../17-operational-model/05-invariants/README.md).
 
 ---
 

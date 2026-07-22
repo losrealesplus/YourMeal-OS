@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-22 · 04 Lifecycles 🟢  
+**Última actualización:** 2026-07-22 · FASE 4 Operational Model 🟢 (01–06)  
 **Versión:** `v0.1.0` — FOUNDATION LOCKED  
 
 ## Roadmap (oficial)
@@ -12,7 +12,7 @@
 | OPERATIONAL DISCOVERY | ✅ Estructura cerrada |
 | OPERATIONAL CHECKS | ✅ Cerrado (transversal) |
 | FIRST OBSERVATION DAY | ⏸ Congelado (hasta retomar a propósito) |
-| Operational Model | 🟢 01–04 · 🚧 05–06 |
+| Operational Model | 🟢 01–06 (gramática completa) |
 
 ---
 
@@ -24,12 +24,13 @@ Es el **lenguaje permanente** de la operación de comida preparada.
 ```text
 Foundation ✅ → Blueprint ✅ → Checks ✅
         ↓
-Operational Model 🚧
+Operational Model 🟢
    01 Ubiquitous Language 🟢
    02 Core Objects 🟢
    03 Operational Dependencies 🟢
    04 Lifecycles (transiciones) 🟢
-   05–06 siguientes
+   05 Invariants (Constitución) 🟢
+   06 Capability Mapping (trazabilidad) 🟢
         ↓
 Observation EatClean ⏸
 ```
@@ -52,7 +53,7 @@ Observation EatClean ⏸
 | **PRODUCT BLUEPRINT** | ¿Qué / por qué? | ✅ |
 | **OPERATIONAL DISCOVERY** | ¿Por qué evolucionar? | ✅ carpeta · ⏸ campo |
 | **Operational Checks** | ¿Cómo guía la operación? | ✅ transversal |
-| **Operational Model** | ¿Con qué lenguaje? | 🚧 01–04🟢 · 05–06 |
+| **Operational Model** | ¿Con qué lenguaje? | 🟢 01–06 |
 
 ```text
 Producto:  Discovery → Check → Assistant → Capability
@@ -77,12 +78,12 @@ Contrato semántico: *misma palabra ≠ cosas distintas; misma realidad ≠ dos 
 
 ## Próxima sesión / siguiente paso
 
-1. Endurecer **05 · Invariants** (leyes permanentes — no lista suelta)  
-2. Luego **06 · Capability Mapping**  
-3. Observation ⏸ · sin código / pantallas
+1. **Observation EatClean** ⏸ — retomar solo con decisión explícita del equipo  
+2. Trazabilidad de Capabilities candidatas cuando haya evidencia (plantilla en 06)  
+3. Sin código / pantallas / APIs hasta gate Discovery
 
 | Índice | Ruta |
 |--------|------|
-| Lifecycles | [04-lifecycles/](../17-operational-model/04-lifecycles/README.md) |
-| Dependencies | [03-relationships/](../17-operational-model/03-relationships/README.md) |
+| Constitución | [05-invariants/](../17-operational-model/05-invariants/README.md) |
+| Trazabilidad | [06-capability-mapping/](../17-operational-model/06-capability-mapping/README.md) |
 | Operational Model | [docs/17-operational-model/](../17-operational-model/README.md) |

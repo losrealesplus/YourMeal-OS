@@ -99,15 +99,16 @@ Blueprint ✅ · Checks ✅ · Discovery (campo) ⏸
 Operational Model (Core Operativo) 🚧  ← siguiente trabajo
 ```
 
-> **Gramática:** vocabulario · sustantivos · verbos · **tiempo** (transiciones).  
-> **01–04** endurecidos. **Siguiente:** 05 Invariants.  
+> **Gramática:** vocabulario · sustantivos · verbos · tiempo · constitución · trazabilidad.  
+> **01–06** endurecidos (FASE 4 Operational Model 🟢).  
+> Jerarquía: Invariant → Lifecycle → Check → Capability.  
 > Checks en **transiciones**, no en estados.  
-> Capabilities interactúan con el modelo — no lo definen.  
+> Capabilities consumen el modelo — no lo definen.  
 > Observation ⏸ · sin código/pantallas.
 
-**Próxima sesión:** endurecer **05 Invariants** → 06 Capability Mapping.
+**Próxima sesión:** Observation (cuando se descongele) o trazabilidad de Capabilities con evidencia.
 
-Índices: [04 Lifecycles](./docs/17-operational-model/04-lifecycles/README.md) · [Model](./docs/17-operational-model/README.md) · [Estado](./docs/00-status/README.md)
+Índices: [05 Invariants](./docs/17-operational-model/05-invariants/README.md) · [06 Mapping](./docs/17-operational-model/06-capability-mapping/README.md) · [Model](./docs/17-operational-model/README.md) · [Estado](./docs/00-status/README.md)
 
 ### Principio de valor (Capabilities)
 

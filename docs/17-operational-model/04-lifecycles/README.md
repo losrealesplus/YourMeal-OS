@@ -127,5 +127,5 @@ Si no → completar transiciones antes de listar invariantes sueltos.
 ## Relacionado
 
 - [03 spine-flow](../03-relationships/spine-flow.md)  
-- [05 Invariants](../05-INVARIANTS.md) — siguiente  
+- [05 Invariants (Constitución)](../05-invariants/README.md)  
 - [STATE_MACHINES.md](../../12-domain-model/STATE_MACHINES.md) — implementación técnica después
