@@ -40,14 +40,26 @@ Demostrar que el conocimiento consolidado genera **suficiente valor operativo** 
 
 ---
 
-## Las cuatro preguntas
+## Qué mide (estricto)
+
+No solo ahorro. También **coste evitado**:
+
+- tiempo de planificación ahorrado;
+- errores evitados;
+- retrabajos evitados;
+- cambios manuales reducidos;
+- decisiones automatizadas correctamente.
+
+El valor del modelo no depende solo de generar ingresos: también de **reducir fricción operacional**.
+
+### Las cuatro preguntas
 
 | # | Pregunta | Qué exige |
 |---|----------|-----------|
 | 1 | **¿Qué problema elimina?** | Hoy vs mañana |
 | 2 | **¿Cuánto tiempo ahorra?** | **Medido**, no estimado |
-| 3 | **¿Qué errores evita?** | Etiquetas · lotes · rutas · stock · … |
-| 4 | **¿Cuánto dinero representa?** | **Impacto económico**, no proyección de ingresos |
+| 3 | **¿Qué errores / costes evita?** | Etiquetas · lotes · rutas · stock · retrabajo · … |
+| 4 | **¿Cuánto dinero representa?** | Impacto = ahorro + **coste evitado** (no proyección de ingresos) |
 
 ---
 

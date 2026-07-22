@@ -5,27 +5,35 @@ Parte del [Evidence Framework](./README.md).
 
 ---
 
-## Hipótesis A
+## Hipótesis A / Objetivo preciso
 
-> **El modelo representa correctamente la realidad.**
+FOV **no** vuelve a validar el modelo en abstracto (eso ya ocurrió en mesa + IOV).
 
-FOV responde:
+Valida que:
 
-> **¿El mundo real genera el mismo modelo que hemos construido en mesa?**
+> **La realidad produce la misma evidencia que predijo el modelo.**
 
-No es una prueba del software.  
-Ni del usuario.  
-Ni del MVP.
-
-Es una prueba del **conocimiento**.
+Eso es distinto de «¿el modelo es coherente?».
 
 ---
 
-## Objetivo
+## Qué mide (solo operación)
 
-Responder:
+No funcionalidades · no pantallas · no UX.
 
-> ¿Las operaciones reales producen espontáneamente los Core Objects, Lifecycles, Dependencies, Checks e Invariants definidos en el modelo?
+Solo operación, p.ej.:
+
+- tiempo real de preparación;
+- cambios de pedidos;
+- incidencias;
+- rutas;
+- errores humanos;
+- trazabilidad;
+- decisiones manuales.
+
+Todo **comparado** con las predicciones del Operational Model (objetos · transiciones · checks · invariantes).
+
+**Cuándo abrir FOV:** solo tras campaña IOV cerrada y corpus RC — ver [06 Campaign Order](../../19-independent-operational-validation/06-campaign-order.md).
 
 ---
 

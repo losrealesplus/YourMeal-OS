@@ -1,11 +1,12 @@
 # KCM-001 — IOV-001 piloto (corpus congelable)
 
 **IOV nivel:** 001 · Comprehension  
-**Propósito:** primera sesión (recomendado: **piloto IA ciego** antes de humano)  
+**Propósito:** primera sesión — **piloto IA ciego** (antes de humano)  
 **Corpus label:** Operational Model Beta (mesa)  
-**Fecha de congelación:** *(rellenar al ejecutar)*  
-**Commit ancla:** *(rellenar — ej. tras push de protocolo)*  
+**Fecha de congelación:** 2026-07-22  
+**Commit ancla:** `357833e8360718b149c4b23774fb268e41581ae3` (`357833e`)  
 **Autores en silencio:** Sí  
+**Estado:** 🔒 **CONGELADO** para piloto IOV-001
 
 ---
 
@@ -92,4 +93,4 @@ Todo bajo `docs/17-operational-model/` en el commit ancla:
 - [ ] Hoja de tiempos + formulario de confianza  
 - [ ] Facilitador conoce [05 Experimental Protocol](../05-experimental-protocol.md)
 
-**Estado:** 📝 Listo para congelar al lanzar piloto.
+**Estado:** 🔒 Congelado · commit `357833e` · listo para piloto.

@@ -86,9 +86,10 @@ Detalle: [04 Findings](./04-findings/README.md) · [05 Experimental Protocol](./
 |----------|--------|
 | Prerrequisito modelo | ✅ Beta (mesa) |
 | Protocolo experimental | 🟢 Definido |
-| [KCM-001](./kcm/KCM-001-iov001-pilot.md) | 📝 Listo para congelar |
-| Piloto IA | ⏳ Pendiente |
+| [KCM-001](./kcm/KCM-001-iov001-pilot.md) | 🔒 Congelado `357833e` |
+| Piloto IA / IVR-001 | 🚧 En ejecución |
 | IOV-001 humano | ⏳ Tras piloto |
+| FOV | ⏳ **Después** de campaña IOV completa |
 
 ---
 
@@ -102,7 +103,10 @@ Detalle: [04 Findings](./04-findings/README.md) · [05 Experimental Protocol](./
 | [03 Independent Implementation](./03-independent-implementation.md) | IOV-003 |
 | [04 Findings](./04-findings/README.md) | DF · SF · IF · IFD · Classification |
 | [05 Experimental Protocol](./05-experimental-protocol.md) | P0–P3 · piloto · scores |
+| [06 Campaign Order](./06-campaign-order.md) | Ejecutar IOV antes de FOV |
 | [kcm/](./kcm/README.md) | Knowledge Corpus Manifest |
+| [ivr/](./ivr/README.md) | Independent Validation Reports |
+| [scenarios/](./scenarios/SC-IOV-001-pedido-semana.md) | SC-IOV-001 |
 
 ---
 

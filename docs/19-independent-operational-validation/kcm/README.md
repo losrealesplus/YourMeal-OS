@@ -65,7 +65,7 @@ Sin KCM, el experimento no es comparable dentro de seis meses.
 
 | ID | Sesión | Commit | Estado |
 |----|--------|--------|--------|
-| [KCM-001](./KCM-001-iov001-pilot.md) | IOV-001 piloto (preparación) | *(rellenar al congelar)* | 📝 Plantilla lista |
+| [KCM-001](./KCM-001-iov001-pilot.md) | IOV-001 piloto IA | `357833e` | 🔒 Congelado |
 
 ---
 

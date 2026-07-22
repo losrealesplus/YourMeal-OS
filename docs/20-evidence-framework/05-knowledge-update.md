@@ -24,18 +24,18 @@ G-01
 
 ---
 
-## Qué hace
+## Norma: no toda observación modifica el conocimiento
 
-1. Incorporar dictámenes FOV (Confirmed · Extended · Clarified · Contradicted).  
-2. Abrir VR → MC si hay Extended/Contradicted estructural.  
-3. Actualizar [Knowledge States](./01-knowledge-states.md).  
-4. Elevar / bajar [ECL](./02-evidence-confidence-levels.md) (típicamente → ECL-4 en lo confirmado en campo).  
-5. Ajustar [Stability Index](./03-stability-index.md) (MC → baja a S1; Confirmed sin cambio → camino a S2).  
-6. Publicar un **Knowledge Update Record** (resumen cerrado).
+Antes de actualizar el modelo, responder **cuatro preguntas**:
 
-No mide dinero.  
-No abre Etapa 2.  
-Deja el modelo **listo para justificar valor**.
+1. ¿La observación es **repetible**?  
+2. ¿Tiene suficiente nivel de evidencia (**ECL**)?  
+3. ¿**Contradice** o solo **amplía** el modelo?  
+4. ¿Justifica realmente un **MC**?
+
+Si alguna respuesta es **no**, la observación se conserva como evidencia (FOR), pero **no** cambia el conocimiento.
+
+Eso protege al modelo de reaccionar ante casos aislados.
 
 ---
 
