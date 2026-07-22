@@ -85,13 +85,14 @@ La arquitectura de YourMeal OS se considera **estable**.
 - **Operational Dynamics v0.2:** Lifecycles 2.0 · Supporting Taxonomy · Checks 2.0 (PASS/WARNING/BLOCKED/MANUAL DECISION)
 - Recovery Pattern · Temporal Grammar · Capability Impact integrados en Dynamics 01
 - **Tren MC-001…006 aplicado** a `17` (Amend/Revise/Pause/Hold · Lot · Location · cardinalidad · INV-031)
-- **Modo:** metodología FOPEBA **congelada** · proyecto principal = FOV EatClean
-- [FOV Mission Brief](./docs/00-status/FOV_MISSION_BRIEF.md) (ejecución · no framework)
-- Narrativa: EatClean = laboratorio · FOPEBA = método · YourMeal OS = primer producto post-certificación
-- Etapa 1: conocimiento operacional certificado + proceso reproducible — no una aplicación
-- FASE A ✅ · FASE B metodología ✅ / ejecución ⏳ · FASE C 🔒
+- **Hito:** FOPEBA Methodology Frozen (`docs/00-status/04-methodology-frozen.md`)
+- Ciclo activo: Observar → Registrar → Clasificar → Decidir
+- Éxito FOV = evidencia suficiente para decidir sin opiniones (FO-V sin MC también cuenta)
+- Etapa 1 cierra en G-01 Approved; Post-Certification Review → archivo FOPEBA v1.1
+- [FOV Mission Brief](./docs/00-status/FOV_MISSION_BRIEF.md) · sin evolución de framework sin evidencia de campo
+- Narrativa: EatClean laboratorio · FOPEBA método · YourMeal OS primer producto
+- FASE A ✅ · FASE B metodología frozen / ejecución ⏳ · FASE C 🔒
 - Sistemas KU · EC · G-01 listos; pendiente evidencia empírica
-- Mentalidad FOV: auditor — ¿qué evidencia obliga (o no) a cambiar el modelo?
 ### Gobierno
 
 - ADR 0011: Diario de Desarrollo + Principio de Intencionalidad

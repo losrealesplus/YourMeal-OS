@@ -94,15 +94,18 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-FASE A ✅ · FASE B metodología ✅ · FOV ejecución ⏳ · FASE C 🔒
-Metodología FOPEBA: CONGELADA durante campaña EatClean
+FOPEBA v1.0 · Methodology Frozen 🧊
+FASE A ✅ · FASE B ejecución FOV ⏳ · FASE C 🔒 G-01
 ```
 
-**EatClean** = laboratorio · **FOPEBA** = método · **YourMeal OS** = primer producto post–conocimiento certificado.
+**EatClean** = laboratorio · **FOPEBA** = método frozen · **YourMeal OS** = primer producto.
 
-**Proyecto principal ahora:** observación FOV — [Mission Brief](./docs/00-status/FOV_MISSION_BRIEF.md) (no ampliar el framework).
+**Proyecto principal:** [FOV Mission Brief](./docs/00-status/FOV_MISSION_BRIEF.md).  
+**Hito:** [Methodology Frozen](./docs/00-status/04-methodology-frozen.md) — sin evolución de framework sin evidencia de campo.
 
-Índices: [Estado](./docs/00-status/README.md) · [RC](./docs/00-status/02-operational-model-rc.md) · [FOPEBA](./docs/18-operational-validation/00-operational-product-engineering.md)
+Etapa 1 cierra en **G-01 Approved**, no en el RC. Tras G-01: [Post-Certification Review](./docs/00-status/05-post-certification-review.md) (archivo v1.1).
+
+Índices: [Estado](./docs/00-status/README.md) · [RC](./docs/00-status/02-operational-model-rc.md)
 
 ### Principio de valor (Capabilities)
 

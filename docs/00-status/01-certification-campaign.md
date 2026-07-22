@@ -47,17 +47,17 @@ Decisión: **APPROVED** · **APPROVED WITH CONDITIONS** · **REJECTED** — [g01
 
 ---
 
-## Próximo
+Cuando G-01 pase: **«Implementar conocimiento operacional certificado.»**  
+Etapa 1 **termina** en G-01 Approved (no en el RC).
 
-**No ampliar FOPEBA.**  
-Ejecutar [FOV Mission Brief](./FOV_MISSION_BRIEF.md) en EatClean.
-
-Cuando G-01 pase: **«Implementar conocimiento operacional certificado.»**
+Antes de Etapa 2 a pleno: [Post-Certification Review](./05-post-certification-review.md) — archivo candidatas FOPEBA v1.1; **no** evolucionar el método en caliente.
 
 ---
 
 ## Relacionado
 
+- [Methodology Frozen](./04-methodology-frozen.md)  
+- [Mission Brief](./FOV_MISSION_BRIEF.md)  
 - [Dual Track](./DUAL_TRACK_ANTECAMARA.md)  
 - [FOPEBA](../18-operational-validation/00-operational-product-engineering.md)  
 - [Estado](./README.md)

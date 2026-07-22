@@ -1,8 +1,8 @@
 # Estado del proyecto
 
 **Última actualización:** 2026-07-22  
-**Modo:** ejecución (metodología FOPEBA **congelada**)  
-**Proyecto principal:** FOV en EatClean — [Mission Brief](./FOV_MISSION_BRIEF.md)
+**Hito:** [Methodology Frozen](./04-methodology-frozen.md) 🧊  
+**Proyecto principal:** FOV EatClean — [Mission Brief](./FOV_MISSION_BRIEF.md)
 
 > La Etapa 1 de FOPEBA no produjo una aplicación; produjo un conocimiento operacional certificado y un proceso reproducible para incrementarlo mediante evidencia.
 
@@ -12,13 +12,13 @@
 
 | Rol | Qué es |
 |-----|--------|
-| **EatClean** | Laboratorio (operación real) |
-| **FOPEBA** | Método (descubrir · certificar · gobernar conocimiento) |
-| **YourMeal OS** | Primer producto que implementará conocimiento operacional certificado |
+| **EatClean** | Laboratorio |
+| **FOPEBA** | Método (v1.0 **frozen**) |
+| **YourMeal OS** | Primer producto post–conocimiento certificado |
 
 ---
 
-## Progreso FOPEBA
+## Progreso
 
 ```text
 FASE A · Knowledge Discovery
@@ -26,54 +26,54 @@ FASE A · Knowledge Discovery
 
 FASE B · Knowledge Certification
 ████████████████████████░░░░ ~85%
-  Metodología: 100% ✅
-  Ejecución:   pendiente (FOV → FER → KU → EC → G-01)
+  Metodología: 100% ✅ FROZEN
+  Ejecución:   FOV → FER → KU → EC → G-01
 
 FASE C · Product Engineering
 🔒 Bloqueada por G-01
 ```
 
-**Metodología ≠ evidencia.**  
-La metodología ya existe. La evidencia de campo todavía no.
+**Etapa 1 termina en G-01 Approved** — no en el RC.
 
 ---
 
-## Congelación metodológica
+## Methodology Frozen
 
-**No ampliar FOPEBA** mientras dure la campaña FOV.  
-Ningún documento nuevo de framework.  
-El activo más valioso ahora es la **primera evidencia empírica** en EatClean.
+```text
+❌ Framework evolution · New concepts · New phases · New evidence types
+✅ Doc fixes · Typos · FOV execution · Evidence collection
+```
 
----
+> Cualquier cambio metodológico necesita **evidencia de campo** que lo justifique.
 
-## Ejecución pendiente
-
-| Paso | Rol | Doc |
-|------|-----|-----|
-| 1 | **FOV** — proyecto principal | [Mission Brief](./FOV_MISSION_BRIEF.md) |
-| 2 | **FER** — filtro crítico | [fer](../20-evidence-framework/fov/04-field-evidence-review.md) |
-| 3 | **KU** — solo si FER autoriza | [ku/](../20-evidence-framework/ku/README.md) |
-| 4 | **EC** — valor del conocimiento | [ec/](../20-evidence-framework/ec/README.md) |
-| 5 | **G-01** — certificación Stage 2 | [g01/](../20-evidence-framework/g01/README.md) |
-
-Pregunta de campo (no «¿cómo mejoramos el modelo?»):
-
-> ¿Qué evidencia nos obliga —o no— a cambiar el modelo?
+Detalle: [04-methodology-frozen](./04-methodology-frozen.md).
 
 ---
 
-## Laboratorio cerrado (referencia)
+## Ciclo activo
 
-| Elemento | Estado |
-|----------|--------|
-| IOV-001…003 · RC | ✅ |
-| Sistemas FOV · KU · EC · G-01 | ✅ diseñados |
-| Known Limitations RC | ✅ |
+```text
+Observar → Registrar → Clasificar → Decidir
+```
 
-RC · Limitations: [02](./02-operational-model-rc.md) · [03](./03-known-limitations-rc.md)
+Éxito FOV:
+
+> ¿La evidencia basta para decidir **sin opiniones**?
+
+(FO-V en cadena + No KU = el modelo predijo bien — también es victoria.)
+
+---
+
+## Ejecución
+
+| Paso | Doc |
+|------|-----|
+| FOV | [Mission Brief](./FOV_MISSION_BRIEF.md) |
+| FER → KU → EC → G-01 | sistemas en `docs/20-evidence-framework/` |
+| Tras G-01 | [Post-Certification Review](./05-post-certification-review.md) → archivo v1.1 |
 
 ---
 
 ## Carril B
 
-UX / DS / arch / infra **sin** engines — permitido; **no** sustituye evidencia FOV.
+UX / DS / arch / infra sin engines — permitido; no sustituye evidencia.

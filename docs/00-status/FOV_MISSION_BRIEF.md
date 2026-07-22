@@ -58,10 +58,30 @@ Antes de cada sesión: marcar 2–4 hipótesis del día.
 
 ---
 
+## Éxito de esta campaña
+
+No se mide por cantidad de FO / KU / MC.
+
+> **¿La evidencia basta para decidir sin recurrir a opiniones?**
+
+Si sí — misión cumplida, aunque no haya Model Change.  
+Cadena de solo FO-V → No KU = el modelo predijo la operación (evidencia fuerte).
+
+---
+
+## Expectativa (no forzar)
+
+Más probable que Core nuevo: decisiones manuales, excepciones, reglas tácitas, gap prescrito vs ejecutado → Checks / Capabilities / gobernanza.
+
+---
+
 ## Tras el campo
 
 ```text
 FO → FER → KU o Archive → EC → G-01
 ```
 
-Protocolo (referencia, no ampliar ahora): [fov/](../20-evidence-framework/fov/README.md).
+FO-C sin umbral FER → **Archive**, no KU automático.
+
+Protocolo (referencia · frozen): [fov/](../20-evidence-framework/fov/README.md).  
+Hito: [Methodology Frozen](./04-methodology-frozen.md).
