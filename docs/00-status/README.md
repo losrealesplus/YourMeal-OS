@@ -1,69 +1,89 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-21  
+**Última actualización:** 2026-07-22 · FASE 4 Operational Model 🟢 (01–06)  
 **Versión:** `v0.1.0` — FOUNDATION LOCKED  
 
-## Fase de diseño estratégico: CERRADA
+## Roadmap (oficial)
 
-Hasta que la realidad de campo obligue a reabrirla.
-
-```text
-Foundation ✅ → Blueprint ✅ → Discovery (estructura) ✅
-                ↓
-        Observar EatClean ⏳
-```
-
-| Antes | Ahora |
-|-------|--------|
-| Diseñábamos para el producto | Observamos el producto en uso |
-| Hipótesis en docs | Evidencia en cocina |
-| Sombrero: arquitecto / PO | Sombrero: **etnógrafo de operaciones** |
-
-No añadir más documentos estratégicos «por si acaso».  
-El siguiente arquitecto es **EatClean**.
+| Área | Estado |
+|------|--------|
+| FOUNDATION | ✅ Cerrado |
+| PRODUCT BLUEPRINT | ✅ Cerrado (fase diseño) |
+| OPERATIONAL DISCOVERY | ✅ Estructura cerrada |
+| OPERATIONAL CHECKS | ✅ Cerrado (transversal) |
+| FIRST OBSERVATION DAY | ⏸ Congelado (hasta retomar a propósito) |
+| Operational Model | 🟢 01–06 (gramática completa) |
 
 ---
 
-## Tres pilares (no habrá cuarto)
+## Fase actual: YOURMEAL OPERATIONAL MODEL (Core Operativo)
 
-| Pilar | Pregunta | Estado |
-|-------|----------|--------|
-| **FOUNDATION** | ¿Cómo construimos? | ✅ |
-| **PRODUCT BLUEPRINT** | ¿Qué construimos y por qué? | ✅ cerrado (fase) |
-| **OPERATIONAL DISCOVERY** | ¿Por qué evolucionar? | ✅ carpeta · ⏳ evidencia real |
+No es el Core técnico (DDD).  
+Es el **lenguaje permanente** de la operación de comida preparada.
 
 ```text
-Producto:  Discovery → Operational Check → Assistant → Capability
+Foundation ✅ → Blueprint ✅ → Checks ✅
+        ↓
+Operational Model 🟢
+   01 Ubiquitous Language 🟢
+   02 Core Objects 🟢
+   03 Operational Dependencies 🟢
+   04 Lifecycles (transiciones) 🟢
+   05 Invariants (Constitución) 🟢
+   06 Capability Mapping (trazabilidad) 🟢
+        ↓
+Observation EatClean ⏸
+```
+
+| Pregunta anterior | Pregunta ahora |
+|-------------------|----------------|
+| ¿Qué funcionalidades tendrá? | ¿Qué objetos existen en cualquier negocio de comida preparada? |
+
+Índice: [docs/17-operational-model/](../17-operational-model/README.md) · [01 UL](../17-operational-model/01-ubiquitous-language/README.md)
+
+**No es un cuarto pilar.** Equivalente producto del Domain Model.
+
+---
+
+## Tres pilares (+ lenguaje + Checks)
+
+| Bloque | Pregunta | Estado |
+|--------|----------|--------|
+| **FOUNDATION** | ¿Cómo construimos? | ✅ |
+| **PRODUCT BLUEPRINT** | ¿Qué / por qué? | ✅ |
+| **OPERATIONAL DISCOVERY** | ¿Por qué evolucionar? | ✅ carpeta · ⏸ campo |
+| **Operational Checks** | ¿Cómo guía la operación? | ✅ transversal |
+| **Operational Model** | ¿Con qué lenguaje? | 🟢 01–06 |
+
+```text
+Producto:  Discovery → Check → Assistant → Capability
+Lenguaje:  Operational Model (Ubiquitous Language primero)
 Técnica:   Capability → Use Cases → Domain → Infrastructure
 ```
 
-> YourMeal OS captura **conocimiento operativo** y lo convierte en lógica reutilizable.  
-> Unidad mínima: [Operational Check](../15-product/OPERATIONAL_CHECKS.md).  
-> **No mostramos datos. Confirmamos que la operación puede continuar.**
+Gate: evidencia → pregunta → Check → Capability.
+
+Contrato semántico: *misma palabra ≠ cosas distintas; misma realidad ≠ dos palabras.*
 
 ---
 
-## Trabajo actual
+## PRs
 
-### Primera jornada observada en EatClean
+| PR | Tema | Estado |
+|----|------|--------|
+| [#9](https://github.com/losrealesplus/yourmeal-os/pull/9) | Operational Checks | ✅ Merged |
+| [#10](https://github.com/losrealesplus/yourmeal-os/pull/10) | Operational Model FASE 4 | 🚧 Open |
 
-Misión:
+---
 
-> ¿Qué Operational Checks ya existen hoy… pero viven solo en la cabeza de las personas?
+## Próxima sesión / siguiente paso
 
-Checklist: [FIRST_OBSERVATION_DAY.md](../16-operational-discovery/FIRST_OBSERVATION_DAY.md)
-
-Éxito del día: **N Checks implícitos identificados** — no un backlog de desarrollo.
-
-En paralelo (solo Capability ya validada): Integration + UI MVP Dish — sin inventar Capabilities.
-
-### Orientación de PRs
-
-Valor operativo (jornada · findings · Checks · Asistente) > PRs solo «por tecnología».
+1. **Observation EatClean** ⏸ — retomar solo con decisión explícita del equipo  
+2. Trazabilidad de Capabilities candidatas cuando haya evidencia (plantilla en 06)  
+3. Sin código / pantallas / APIs hasta gate Discovery
 
 | Índice | Ruta |
 |--------|------|
-| Jornada | [FIRST_OBSERVATION_DAY.md](../16-operational-discovery/FIRST_OBSERVATION_DAY.md) |
-| Discovery | [docs/16-operational-discovery/](../16-operational-discovery/README.md) |
-| Checks | [OPERATIONAL_CHECKS.md](../15-product/OPERATIONAL_CHECKS.md) |
-| Blueprint | [docs/15-product/](../15-product/README.md) |
+| Constitución | [05-invariants/](../17-operational-model/05-invariants/README.md) |
+| Trazabilidad | [06-capability-mapping/](../17-operational-model/06-capability-mapping/README.md) |
+| Operational Model | [docs/17-operational-model/](../17-operational-model/README.md) |

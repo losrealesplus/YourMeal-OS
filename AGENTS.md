@@ -94,20 +94,21 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-Diseño estratégico ✅ CERRADO  →  Observación EatClean ⏳
+Blueprint ✅ · Checks ✅ · Discovery (campo) ⏸
+        ↓
+Operational Model (Core Operativo) 🚧  ← siguiente trabajo
 ```
 
-> **Dejar de diseñar** hasta que la realidad obligue a reabrir.  
-> Siguiente arquitecto: **EatClean**. Rol en campo: etnógrafo de operaciones.  
-> Misión de la jornada: ¿qué Checks ya existen solo en la cabeza de las personas?  
-> Éxito del día: N Checks implícitos — no «hay que desarrollar X».  
-> Unidad mínima operativa: **Operational Check**.  
-> Lemas: evidencia → abstracción · ¿qué pregunta elimina? · no mostramos datos, confirmamos que la operación puede continuar.  
-> **No hay cuarto pilar.** No abrir docs de estrategia sin evidencia que lo fuerce.
+> **Gramática:** vocabulario · sustantivos · verbos · tiempo · constitución · trazabilidad.  
+> **01–06** endurecidos (FASE 4 Operational Model 🟢).  
+> Jerarquía: Invariant → Lifecycle → Check → Capability.  
+> Checks en **transiciones**, no en estados.  
+> Capabilities consumen el modelo — no lo definen.  
+> Observation ⏸ · sin código/pantallas.
 
-**Objetivo:** [FIRST_OBSERVATION_DAY](./docs/16-operational-discovery/FIRST_OBSERVATION_DAY.md) · Integration/UI Dish solo en paralelo (Capability ya validada).
+**Próxima sesión:** Observation (cuando se descongele) o trazabilidad de Capabilities con evidencia.
 
-Índices: [Discovery](./docs/16-operational-discovery/README.md) · [Checks](./docs/15-product/OPERATIONAL_CHECKS.md) · [Estado](./docs/00-status/README.md)
+Índices: [05 Invariants](./docs/17-operational-model/05-invariants/README.md) · [06 Mapping](./docs/17-operational-model/06-capability-mapping/README.md) · [Model](./docs/17-operational-model/README.md) · [Estado](./docs/00-status/README.md)
 
 ### Principio de valor (Capabilities)
 

@@ -135,7 +135,7 @@ Lema: **No mostramos datos. Confirmamos que la operación puede continuar.**
 
 Fase: diseño estratégico cerrado → observar EatClean.
 
-Detalle: [OPERATIONAL_CHECKS](../15-product/OPERATIONAL_CHECKS.md) · [Centro de Control](../15-product/OPERATIONS_DASHBOARD.md) · [PRODUCT_VISION](../15-product/PRODUCT_VISION.md) · [FIRST_OBSERVATION_DAY](../16-operational-discovery/FIRST_OBSERVATION_DAY.md)
+Detalle: [OPERATIONAL_CHECKS](../15-product/OPERATIONAL_CHECKS.md) · [Operational Model](../17-operational-model/README.md) · [Centro de Control](../15-product/OPERATIONS_DASHBOARD.md) · [PRODUCT_VISION](../15-product/PRODUCT_VISION.md) · [FIRST_OBSERVATION_DAY](../16-operational-discovery/FIRST_OBSERVATION_DAY.md)
 
 ---
 

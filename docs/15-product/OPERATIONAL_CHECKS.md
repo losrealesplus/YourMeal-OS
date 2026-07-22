@@ -190,6 +190,26 @@ Recomendación: Comprar.
 [Aceptar]  [Posponer]  [Ignorar]
 ```
 
+### 6. Los Checks viven en las transiciones
+
+Validan el **paso** de un estado a otro — no el estado en sí.
+
+❌ Check «Order Confirmed»  
+✔ ¿**Puede confirmarse** este Order?
+
+Detalle: [Lifecycles · transiciones](../17-operational-model/04-lifecycles/checks-on-transitions.md).
+
+### 7. Los Invariants gobiernan
+
+Un Check puede **bloquear** una transición.  
+Nunca puede **autorizar** lo que un [Invariant](../17-operational-model/05-invariants/README.md) prohíbe.
+
+```text
+Invariant → Lifecycle → Operational Check → Capability
+```
+
+Los Checks ayudan. Los Invariants gobiernan.
+
 ---
 
 ## Anatomía estándar

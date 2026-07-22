@@ -78,6 +78,7 @@ Una Capability nueva solo entra si:
 
 ## Relacionado
 
+- [06 Capability Mapping (trazabilidad)](../17-operational-model/06-capability-mapping/README.md)
 - [OPERATIVE_ASSISTANTS.md](./OPERATIVE_ASSISTANTS.md)
 - [OPERATIONAL_CHECKS.md](./OPERATIONAL_CHECKS.md)
 - [OPERATIONS_DASHBOARD.md](./OPERATIONS_DASHBOARD.md) — Centro de Control
