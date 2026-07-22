@@ -1,66 +1,46 @@
-# Sprint 2.1 — Product Foundation
+# Sprint 2.1 — Product Foundation · PM-001
 
-**Carril B · Fase A**  
-**Objetivo:**
+**Carril B en curso**  
+**Incremento Lovable:** [PM-001 Customer App](../../21-product-materialization/PM-001-Customer-App.md)
 
-> Transformar el Operational Model Table-Validated en una experiencia de producto coherente — vía **IA → Lovable**, sin inventar reglas.
-
----
-
-## Flujo del sprint
-
-```text
-OM → Information Architecture → Matriz pantalla↔conocimiento
-        ↓
-Lovable (nav · flujos · pantallas base · DS inicial)
-        ↓
-Iteración UX · sync repo
-```
-
-Figma solo si hace falta ([03](../../21-product-materialization/03-figma-support.md)).
+> Transformar el OM Table-Validated en la **primera versión** de la Customer App — no «una app genérica».
 
 ---
 
-## Entregables
+## Secuencia de sprints Carril B
+
+| Sprint | PM | Foco |
+|--------|-----|------|
+| **2.1** | PM-001 | Customer App |
+| 2.2 | PM-002 | Admin Suite |
+| 2.3 | PM-003 | Production |
+| 2.4 | PM-004 | Delivery |
+| 2.5 | PM-005 | Design System |
+
+---
+
+## Entregables 2.1
 
 | # | Entregable | Estado |
 |---|------------|--------|
-| 1 | Mapa Actor → Objetivos → Capacidades → Pantallas | ⏳ |
-| 2 | [Product Information Architecture](../PRODUCT_INFORMATION_ARCHITECTURE.md) | ⏳ borrador |
-| 3 | [Matriz pantalla↔conocimiento](../../21-product-materialization/01-screen-knowledge-matrix.md) | ⏳ |
-| 4 | Navegación + Happy Paths en **Lovable** | ⏳ |
-| 5 | Pantallas base (solo filas de la matriz) | ⏳ |
-| 6 | Design System inicial en Lovable / repo | ⏳ |
-| 7 | Prompt log alineado a [Lovable Brief](../../21-product-materialization/02-lovable-brief.md) | ⏳ |
-
----
-
-## Prompt mínimo (recordatorio)
-
-> Genera la navegación del [Actor] basada en estas capacidades operacionales.  
-> **No inventes reglas de negocio.** Usa únicamente capacidades/objetos del Operational Model / matriz.
-
----
-
-## Fuera de alcance
-
-- Motores Order / Plan / Batch / Route / Production  
-- Fase D (heurísticas FOV)  
-- Pantallas sin fila en matriz  
-- Sustituir Carril A (FOV)
+| 1 | Actor → Capacidades → Pantallas (Cliente) | ⏳ |
+| 2 | Matriz filas Customer | ⏳ |
+| 3 | **PM-001 en Lovable** (prompt §10 del PM) | ⏳ **siguiente** |
+| 4 | 4 tabs + `/app/orders` | ⏳ |
+| 5 | Dashboard · Menu · Orders · Profile (estados completos) | ⏳ |
+| 6 | Sync repo revisable | ⏳ |
 
 ---
 
 ## Criterio de done
 
-- [ ] IA + matriz completas para flujos principales  
-- [ ] Lovable refleja solo pantallas autorizadas  
-- [ ] Ninguna regla de negocio inventada en UI  
-- [ ] DS v0 usable  
-- [ ] Sync al repo documentado  
+- [ ] PM-001 criterios de aceptación cumplidos  
+- [ ] Infra (i18n · audit · flags) reutilizada, no recreada  
+- [ ] Sin lógica de negocio inventada  
+- [ ] Incremento revisable en PR/repo  
 
 ---
 
 ## Relacionado
 
-- [21 Product Materialization](../../21-product-materialization/README.md) · [etapa-2](./README.md) · [Dual Track](../../00-status/DUAL_TRACK_ANTECAMARA.md)
+- [Rules](../../21-product-materialization/PRODUCT_MATERIALIZATION_RULES.md) · [21 README](../../21-product-materialization/README.md)

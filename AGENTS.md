@@ -104,7 +104,7 @@ Si no hay cita → no se implementa (pasa por evidencia).
 | Carril | Entrada |
 |--------|---------|
 | A campo | [Mission Brief](./docs/00-status/FOV_MISSION_BRIEF.md) |
-| B producto | [21 Materialization](./docs/21-product-materialization/README.md) · [Sprint 2.1](./docs/15-product/etapa-2/SPRINT_2_1_PRODUCT_FOUNDATION.md) · [IA](./docs/15-product/PRODUCT_INFORMATION_ARCHITECTURE.md) |
+| B producto | **[PM-001](./docs/21-product-materialization/PM-001-Customer-App.md)** ← siguiente · [21](./docs/21-product-materialization/README.md) · [Rules](./docs/21-product-materialization/PRODUCT_MATERIALIZATION_RULES.md) |
 
 Flujo UI: **OM → IA → Lovable → iteración → código** (Figma = apoyo).
 

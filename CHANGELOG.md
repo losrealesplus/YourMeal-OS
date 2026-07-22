@@ -85,12 +85,12 @@ La arquitectura de YourMeal OS se considera **estable**.
 - **Operational Dynamics v0.2:** Lifecycles 2.0 · Supporting Taxonomy · Checks 2.0 (PASS/WARNING/BLOCKED/MANUAL DECISION)
 - Recovery Pattern · Temporal Grammar · Capability Impact integrados en Dynamics 01
 - **Tren MC-001…006 aplicado** a `17` (Amend/Revise/Pause/Hold · Lot · Location · cardinalidad · INV-031)
-- **Product Materialization** (`docs/21`): OM → IA → **Lovable** → UX → código; Figma = apoyo
-- Toda pantalla justifica conocimiento: [matriz](./docs/21-product-materialization/01-screen-knowledge-matrix.md)
-- [Lovable Brief](./docs/21-product-materialization/02-lovable-brief.md) — prompts sin inventar reglas
-- Carril B abierto · Sprint 2.1 actualizado Lovable-first
-- ❌ No inventar lógica · ✅ materializar OM Table-Validated
-- Carril A (FOV) en paralelo
+- **Carril B en curso:** Foundation de Producto · siguiente [PM-001 Customer App](./docs/21-product-materialization/PM-001-Customer-App.md)
+- PM-001…005 + [PRODUCT_MATERIALIZATION_RULES](./docs/21-product-materialization/PRODUCT_MATERIALIZATION_RULES.md)
+- Sprints 2.1–2.5: Customer → Admin → Production → Delivery → Design System
+- Lovable: incrementos revisables; reutilizar i18n/audit/flags; experiencias completas
+- FOPEBA certifica · YourMeal OS dominio · Lovable UI · Cursor integra
+- Figma = apoyo · no Figma-first
 ### Gobierno
 
 - ADR 0011: Diario de Desarrollo + Principio de Intencionalidad
