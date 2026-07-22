@@ -43,6 +43,10 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
+  --color-brand-cream: var(--brand-cream);
+  --color-brand-clay: var(--brand-clay);
+  --color-brand-leaf: var(--brand-leaf);
+  --color-brand-sand: var(--brand-sand);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -94,6 +98,12 @@
   --border: oklch(0.9 0.012 250);              /* #e2e8f0 */
   --input: oklch(0.9 0.012 250);
   --ring: oklch(0.63 0.14 160);
+
+  /* EatClean brand accents — natural, premium, warm */
+  --brand-cream: oklch(0.97 0.02 85);          /* warm off-white */
+  --brand-clay:  oklch(0.83 0.06 60);          /* soft terracotta */
+  --brand-leaf:  oklch(0.55 0.13 155);         /* deep leaf */
+  --brand-sand:  oklch(0.92 0.03 80);          /* pale sand */
 
   --chart-1: oklch(0.63 0.14 160);
   --chart-2: oklch(0.6 0.118 250);
