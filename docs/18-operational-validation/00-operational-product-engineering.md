@@ -1,12 +1,16 @@
-# FOPEBA — Framework de ingeniería de conocimiento operacional basado en evidencia progresiva
+# FOPEBA — Framework para convertir observaciones operacionales en conocimiento operacional verificable antes de convertirlo en software
 
-**Antes:** Operational Product Engineering (OPE) — proceso de adquisición de conocimiento.  
-**Ahora:** **FOPEBA** — reduce incertidumbre de forma sistemática hasta justificar implementación.
+**Antes:** metodología para diseñar productos operacionales / OPE.  
+**Ahora:** proceso que **reduce incertidumbre de forma medible**.
 
-YourMeal OS es el **experimento controlado** que demuestra (o refuta) la promesa del framework.
+El verdadero activo no son los documentos ni siquiera el modelo.  
+Es el **proceso** que convierte observación → conocimiento verificable → (solo entonces) software.
 
-> El foco ya no está en producir documentos ni modelos.  
-> Está en **reducir incertidumbre** hasta evidencia suficiente para construir.
+YourMeal OS es el **instrumento** (experimento controlado) con el que se demuestra que FOPEBA funciona — no el centro del framework.
+
+> Estamos en la **antesala** de la implementación.  
+> No cruzar la puerta un día antes de tiempo.  
+> Dual track: [DUAL_TRACK_ANTECAMARA](../00-status/DUAL_TRACK_ANTECAMARA.md).
 
 ---
 
@@ -134,8 +138,7 @@ FOUNDATION → BLUEPRINT → DISCOVERY → CHECKS → MODEL
 
 → [docs/20-evidence-framework](../20-evidence-framework/README.md)
 
-Tres ejes: **KS · ECL · Stability**.  
-Preguntas estratégicas: ¿% del modelo en campo? ¿qué parte del producto sigue en hipótesis?
+Dual track (antesala): [DUAL_TRACK_ANTECAMARA](../00-status/DUAL_TRACK_ANTECAMARA.md)
 
 ### Knowledge Validation Pyramid
 
@@ -217,7 +220,7 @@ Apertura Etapa 2: **[Gate G-01](../20-evidence-framework/07-gate-g01-operational
 
 ## Activo reutilizable
 
-**FOPEBA** — framework de ingeniería de conocimiento operacional basado en evidencia progresiva.
+**FOPEBA** — framework para convertir observaciones operacionales en conocimiento operacional verificable antes de convertirlo en software.
 
 Aplicable a logística, clínicas, talleres, hoteles… **sin cambiar la estructura de fases**.
 

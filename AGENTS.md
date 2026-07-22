@@ -94,14 +94,15 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-Etapa 1 — FOPEBA · Beta · Evidence Framework  🟢/⏳
-Etapa 2 — Producto                            🔒 Gate G-01
+Etapa 1 — Antesala · Carril A (IOV→G-01)     🚧
+Etapa 2 — Producto                           🔒 G-01
+Carril B — UX / DS / arch / infra (sin engines)  ✅ permitido
 ```
 
-**YourMeal OS** = experimento FOPEBA.  
-**Ahora:** IOV-002 (IVR-001 ✅). FOV después de IOV-001…003 + RC.
+**YourMeal OS** = instrumento FOPEBA.  
+**Ahora (A):** IOV-002. **Paralelo (B):** UX/infra sin lógica de negocio de espina.
 
-Índices: [Estado](./docs/00-status/README.md) · [Evidence Framework](./docs/20-evidence-framework/README.md) · [G-01](./docs/20-evidence-framework/07-gate-g01-operational-readiness.md) · [FOPEBA](./docs/18-operational-validation/00-operational-product-engineering.md)
+Índices: [Estado](./docs/00-status/README.md) · [Dual track](./docs/00-status/DUAL_TRACK_ANTECAMARA.md) · [FOPEBA](./docs/18-operational-validation/00-operational-product-engineering.md)
 
 ### Principio de valor (Capabilities)
 

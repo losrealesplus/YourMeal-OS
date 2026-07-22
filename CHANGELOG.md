@@ -92,8 +92,9 @@ La arquitectura de YourMeal OS se considera **estable**.
 - G-01 **no aprueba código** — aprueba conocimiento suficiente para justificarlo
 - Flujo: Validation → IOV → FOV → **KU** → EC → G-01 → Implementation
 - Regla de diseño: cada fase elimina una incertidumbre que ninguna anterior puede eliminar
-- **IVR-001** (IOV-001 piloto IA ciego): corpus suficiente · 0 IFD · Transferability Score ~90% comprensión · DF-001…009 docs-only
-- Campaña: ejecutar IOV-002/003 antes de FOV; G-01 = certificación sin excepciones
+- **Antesala de implementación** + dual track: Carril A (IOV→G-01) · Carril B (UX/DS/arch/infra sin engines de espina)
+- FOPEBA reposicionado: observaciones → conocimiento verificable → software
+- YourMeal OS = instrumento para demostrar FOPEBA
 - Observation EatClean: modo FOV; sin Etapa 2 hasta G-01
 - Secuencia definitiva en FOUNDATION: Guidelines → Spec → Implementation → Tests → Validation
 ### Gobierno

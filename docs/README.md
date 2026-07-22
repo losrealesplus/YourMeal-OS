@@ -6,7 +6,8 @@
 
 | Documento | Propósito |
 |-----------|-----------|
-| [Estado](./00-status/README.md) | Fase oficial — Product Era |
+| [Estado](./00-status/README.md) | Fase oficial — Antesala · dual track |
+| [Dual Track · Antesala](./00-status/DUAL_TRACK_ANTECAMARA.md) | Carril A (cerrar Etapa 1) · Carril B (UX/infra sin engines) |
 | [Product Blueprint](./15-product/README.md) | Qué construir y por qué |
 | [Operational Discovery](./16-operational-discovery/README.md) | Por qué evolucionar — solo evidencia |
 | [Operational Model](./17-operational-model/README.md) | Core Operativo — lenguaje / objetos permanentes |

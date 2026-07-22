@@ -1,41 +1,62 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-22 · **IVR-001 ✅ · siguiente IOV-002**  
-**Modelo:** Beta · KCM-001 🔒 `357833e` · G-01 🔒 · **FOV no abierto**
+**Última actualización:** 2026-07-22 · **Antesala de implementación**  
+**Modelo:** Beta · IVR-001 ✅ · G-01 🔒 · **FOV no abierto**
+
+> Estamos en la antesala. No crucemos la puerta un día antes de tiempo.
 
 ---
 
-## Milestone: campaña IOV
+## Lectura de evidencia
+
+| Señal | Valor |
+|-------|-------|
+| VS | 6/6 · Core Δ **0** · Contradicted **0** |
+| IOV-001 | ✅ · IFD **0** · Findings = docs, no conocimiento |
+| Confianza | Escenario B — grietas repetidas en el mismo sitio (docs) |
+
+Dual track: [DUAL_TRACK_ANTECAMARA](./DUAL_TRACK_ANTECAMARA.md)
+
+---
+
+## Carril A — Cerrar Etapa 1 *(orden fijo)*
 
 | Paso | Estado |
 |------|--------|
-| IOV-001 piloto IA | ✅ [IVR-001](../19-independent-operational-validation/ivr/IVR-001-iov001-piloto-ia.md) |
-| Transferability Score | Comprensión 91 · Interpretación 88 · Consistencia 90 |
-| DF abiertos | DF-001…009 (docs only · 0 IFD · 0 VR) |
-| IOV-002 | ⏳ Siguiente |
+| IOV-001 | ✅ [IVR-001](../19-independent-operational-validation/ivr/IVR-001-iov001-piloto-ia.md) |
+| IOV-002 | ⏳ **Siguiente** |
 | IOV-003 | ⏳ |
-| FOV | 🔒 Después de IOV + RC |
-
-Orden: [06 Campaign Order](../19-independent-operational-validation/06-campaign-order.md)
-
----
-
-## Lectura
-
-Corpus **suficiente** para Happy Path cotidiano.  
-Protocolo **funciona**.  
-Findings útiles → mejoras documentales (Payment · Delivery · navegación), **no** Core nuevos.
+| Operational Model RC | ⏳ |
+| FOV → KU → EC → **G-01** | 🔒 tras IOV+RC |
 
 ---
 
-## Próximo
+## Carril B — Soñar Etapa 2 *(sin lógica de negocio)*
 
-1. Aplicar mejoras docs de IVR-001 (DF-002/005/008 prioritarios)  
-2. **IOV-002** adversarial («oblígame a un Core Object nuevo»)  
-3. IOV-003 → RC → entonces FOV
+Permitido: UX · Design System · arquitectura técnica · infra.  
+**Prohibido aún:** Order / Plan / Batch / Route / Production engines.
+
+---
+
+## FOPEBA
+
+> Convertir observaciones operacionales en conocimiento operacional verificable **antes** de convertirlo en software.
+
+YourMeal OS = instrumento para demostrar el framework.
+
+---
+
+## Próximo (Carril A)
+
+1. **IOV-002** adversarial  
+2. IOV-003 → RC  
+3. FOV… G-01  
+
+Carril B puede avanzar en paralelo sin motores de espina.
 
 | Índice | Ruta |
 |--------|------|
-| IVR-001 | [ivr](../19-independent-operational-validation/ivr/IVR-001-iov001-piloto-ia.md) |
-| DF | [findings](../19-independent-operational-validation/04-findings/documentation-findings.md) |
+| Dual track | [DUAL_TRACK_ANTECAMARA](./DUAL_TRACK_ANTECAMARA.md) |
+| Campaña IOV | [06](../19-independent-operational-validation/06-campaign-order.md) |
+| FOPEBA | [00](../18-operational-validation/00-operational-product-engineering.md) |
 | G-01 | [07](../20-evidence-framework/07-gate-g01-operational-readiness.md) |
