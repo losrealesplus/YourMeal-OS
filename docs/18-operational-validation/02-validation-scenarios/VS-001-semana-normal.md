@@ -2,7 +2,14 @@
 
 **Estado:** ⏳ pendiente  
 **Validation Report:** —  
-**Protocolo:** [audit-protocol.md](./audit-protocol.md) — **auditoría**, no walkthrough informal
+**Protocolo:** [audit-protocol.md](./audit-protocol.md) — **auditoría hostil al modelo** (intentar hacerlo fallar)
+
+## Intención de la sesión
+
+> No «pasar» VS-001. **Hacerlo fallar.**
+
+Si termina sin grietas → evidencia fuerte.  
+Si encuentra contradicción → éxito (error barato, antes del código).
 
 ## Pregunta de refutación
 

@@ -134,10 +134,11 @@ diseño visual · UX · Capabilities · código — trazado a 17 certificado.
 
 ## Metodología reutilizable
 
-La secuencia Foundation → Blueprint → Discovery → Checks → Model → **Validation**  
-es aplicable más allá de YourMeal OS (logística, retail, mantenimiento…).
+La secuencia Foundation → Blueprint → Discovery → Checks → Model → **Validation** → **Implementation (traducción)**  
+es aplicable más allá de YourMeal OS.
 
-El activo no es solo el modelo de comida preparada: es el **patrón de modelar operaciones complejas con disciplina de refutación**.
+Marco: [00-operational-product-engineering](./00-operational-product-engineering.md).  
+YourMeal OS es el caso de referencia; el activo transferible es el **framework de ingeniería de productos operativos**.
 
 ---
 

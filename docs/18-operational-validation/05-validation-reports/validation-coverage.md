@@ -43,6 +43,17 @@ Ver [niveles de confianza](../07-certification.md#niveles-de-confianza).
 | Invariants modificados | 0 | **Alta señal** — revisar Constitución |
 | Model Changes totales | 0 | VR → MC acumulados |
 
+### Madurez por clasificación de VR
+
+| Clasificación | Conteo | Interpretación |
+|---------------|--------|----------------|
+| Confirmed | 0 | Modelo explica el escenario |
+| Clarified | 0 | Modelo OK · docs más precisas |
+| Extended | 0 | Vocabulario ampliado con evidencia |
+| Contradicted | 0 | Corrección estructural necesaria |
+
+**Tendencia deseada hacia certificación:** Confirmed + Clarified ↑ · Extended + Contradicted ↓
+
 ### Histórico (snapshots)
 
 | Fecha | VS | EC | FOV | MC | Invariants Δ | Nivel |
@@ -69,6 +80,13 @@ Checks añadidos:             N
 Invariants modificados:      N
 
 Model Changes:               N (MC-xxx, …)
+
+VR por clasificación:
+  Confirmed:    N
+  Clarified:    N
+  Extended:     N
+  Contradicted: N
+
 Nivel de confianza:          Alpha | Beta | RC | Certified v1.0
 ```
 
@@ -82,6 +100,8 @@ Nivel de confianza:          Alpha | Beta | RC | Certified v1.0
 | Invariants Δ > 0 repetido | Constitución aún frágil — priorizar antes de código |
 | Muchos Checks añadidos, 0 Objects | Saludable — operación sin inflar vocabulario |
 | «Concepto nuevo» frecuente en auditorías | Filtro 02 insuficiente o dominio mal acotado |
+| VR mayormente Extended/Contradicted | Modelo inmaduro — no saltar a implementación |
+| VR mayormente Confirmed/Clarified | Convergencia — candidato a subir nivel (Beta → RC) |
 
 ---
 

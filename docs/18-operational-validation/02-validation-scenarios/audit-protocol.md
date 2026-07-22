@@ -4,6 +4,9 @@ Cada escenario y observación de campo se ejecuta como **auditoría**, no como w
 
 > Nadie asume el resultado. Cada paso debe **demostrar** coherencia o revelar una grieta.
 
+**Objetivo de la sesión:** no intentar «pasar» el escenario — intentar **hacerlo fallar**.  
+Una contradición importante antes del código es **éxito**, no fracaso.
+
 ---
 
 ## Las seis preguntas (por cada paso operativo)
@@ -54,9 +57,11 @@ Si cualquier fila es ✗ o «concepto nuevo = Sí» → documentar en VR antes d
 ## Disciplina de sesión
 
 1. **Un facilitador** lee el paso; **no** anticipa el mapeo al modelo.  
-2. El grupo responde las seis preguntas **antes** de mirar la documentación 17.  
-3. Solo entonces se contrasta con [Operational Model](../17-operational-model/README.md).  
-4. Discrepancias → VR, no debate oral sin dictamen.
+2. El grupo responde las seis preguntas **antes** de abrir `docs/17-operational-model/`.  
+3. Solo entonces se contrasta con la documentación.  
+4. Discrepancias → VR, no debate oral sin dictamen.  
+5. Repetir con **distintos participantes** (cocina · producto · técnico) aumenta el valor del VR.  
+6. Sesión hostil al modelo: buscar activamente por qué **no** encaja.
 
 ---
 

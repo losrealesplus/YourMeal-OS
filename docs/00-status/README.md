@@ -75,7 +75,9 @@ Lenguaje:  Operational Model → Validation → Certified v1.0
 Técnica:   Capability → Use Cases → Domain → Infrastructure  (post-certificación)
 ```
 
-Gate actual: **refutar modelo** → certificar → entonces implementar.
+Gate actual: **refutar modelo** → certificar → **traducir** a software (no redescubrir dominio en código).
+
+Marco metodológico: [00-operational-product-engineering](../18-operational-validation/00-operational-product-engineering.md)
 
 ---
 

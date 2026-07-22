@@ -108,6 +108,19 @@ La sexta: **¿necesitamos inventar un concepto nuevo?** — Si sí, grieta.
 
 Actualizar [validation-coverage](./05-validation-reports/validation-coverage.md) tras cada VR/MC.
 
+### 13. La carga de la prueba recae sobre el cambio
+
+> **Toda anomalía debe intentar explicarse primero con el modelo existente.**  
+> **Solo cuando esa explicación sea imposible se propone una modificación del modelo.**
+
+Ante «este caso no encaja, añadamos un objeto»:
+
+1. ¿Se explica con Objects · Dependencies · Lifecycles · Checks · Invariants **actuales**?  
+2. ¿Es solo imprecisión documental? → VR **Clarified** (sin inflar vocabulario).  
+3. ¿Imposible sin ampliar? → VR **Extended** o **Contradicted** + MC con evidencia.
+
+El modelo no crece por comodidad.
+
 ---
 
 ## Dictámenes permitidos

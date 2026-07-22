@@ -1,12 +1,23 @@
 # Operational Validation — FASE 5
 
+**Marco completo:** [00 · Ingeniería de productos operativos](./00-operational-product-engineering.md)
+
 **No es:** Discovery · diseño de producto · implementación · pantallas · APIs · ampliación del modelo por intuición  
 **Sí es:** el intento sistemático de **romper** el [Operational Model](../17-operational-model/README.md) antes de convertirlo en software permanente
 
 ```text
 FASE 4 — Operational Model     → ¿Con qué lenguaje hablamos? (hipótesis endurecida)
 FASE 5 — Operational Validation  → ¿Dónde nos equivocamos? (refutación)
+FASE 6 — Implementation        → Traducción del modelo certificado (no redescubrimiento)
 ```
+
+---
+
+## Criterio de verdad del proyecto
+
+| Antes | Desde FASE 5 |
+|-------|--------------|
+| *«¿Está bien diseñado?»* | *«¿Ha sobrevivido a suficientes intentos de demostrar que está mal?»* |
 
 ---
 
@@ -79,6 +90,7 @@ Operational Model (17)
 
 | # | Carpeta | Propósito |
 |---|---------|-----------|
+| 00 | [operational-product-engineering](./00-operational-product-engineering.md) | Marco metodológico · criterio de verdad |
 | 01 | [validation-principles](./01-validation-principles.md) | Reglas del juego |
 | 02 | [validation-scenarios](./02-validation-scenarios/README.md) | Casos operativos completos |
 | 03 | [edge-cases](./03-edge-cases/README.md) | Rotura deliberada del modelo |
