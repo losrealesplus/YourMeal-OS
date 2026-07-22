@@ -1,6 +1,6 @@
 # Operational Validation — FASE 5
 
-**Marco completo:** [00 · Ingeniería de productos operativos](./00-operational-product-engineering.md)
+**Marco completo:** [00 · Operational Product Engineering (OPE)](./00-operational-product-engineering.md) — **proceso de adquisición de conocimiento**
 
 **No es:** Discovery · diseño de producto · implementación · pantallas · APIs · ampliación del modelo por intuición  
 **Sí es:** el intento sistemático de **romper** el [Operational Model](../17-operational-model/README.md) antes de convertirlo en software permanente
@@ -98,6 +98,7 @@ Operational Model (17)
 | 05 | [validation-reports](./05-validation-reports/README.md) | Dictámenes trazables · [coverage](./05-validation-reports/validation-coverage.md) |
 | 06 | [model-changes](./06-model-changes/README.md) | Cambios al modelo (solo vía report) |
 | 07 | [certification](./07-certification.md) | Niveles Alpha → Beta → RC → **Certified v1.0** |
+| — | [knowledge-state](./knowledge-state.md) | Estado del conocimiento · proveniencia |
 
 ---
 

@@ -8,14 +8,15 @@ Sin VR-xxx, el hallazgo no puede generar cambio en el modelo.
 
 ## Clasificación de madurez (cada VR)
 
-Además del símbolo de severidad, todo VR lleva una **clasificación de madurez**:
+Además del símbolo de severidad, todo VR lleva una **clasificación de madurez**  
+y debe actualizar [Knowledge State](../knowledge-state.md) de los elementos tocados.
 
-| Clasificación | Significado | Acción típica |
-|---------------|-------------|---------------|
-| **Confirmed** | El modelo explica completamente el escenario | Ninguna |
-| **Clarified** | El modelo era correcto; la documentación necesitaba mayor precisión | Ajuste en 17 (texto) · MC opcional si formaliza |
-| **Extended** | Se incorpora un elemento al modelo con evidencia suficiente | MC obligatorio |
-| **Contradicted** | Una parte del modelo era incorrecta y debe modificarse | MC obligatorio + revisión Constitución si aplica |
+| Clasificación | Significado | Knowledge State típico | Acción típica |
+|---------------|-------------|------------------------|---------------|
+| **Confirmed** | El modelo explica completamente el escenario | → **Validated** | Ninguna |
+| **Clarified** | Modelo correcto; docs más precisas | → **Validated** (misma afirmación) | Ajuste texto 17 |
+| **Extended** | Elemento nuevo con evidencia | nuevo → **Validated** | MC obligatorio |
+| **Contradicted** | Parte del modelo incorrecta | anterior → **Refuted**; corrección → **Validated** | MC obligatorio |
 
 ### Lectura de tendencias
 
@@ -100,6 +101,14 @@ Registrar contadores en [validation-coverage](./validation-coverage.md).
 ## Model Change
 
 MC-xxx (si aplica) · enlace
+
+## Knowledge State
+
+Elementos actualizados · enlace a [registry](../knowledge-state-registry.md)
+
+| Elemento | KS anterior | KS nuevo | Proveniencia |
+|----------|-------------|----------|--------------|
+| … | … | … | VR-xxx |
 ```
 
 ---

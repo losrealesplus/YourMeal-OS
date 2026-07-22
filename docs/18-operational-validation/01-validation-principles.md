@@ -121,6 +121,20 @@ Ante «este caso no encaja, añadamos un objeto»:
 
 El modelo no crece por comodidad.
 
+### 14. Rigor sí; blindaje ante evidencia, no
+
+El principio 13 evita inflar el modelo. Este principio evita el sesgo inverso:
+
+> **El modelo merece ser defendido con rigor, pero nunca protegido de la evidencia.**
+
+| Correcto | Incorrecto |
+|----------|------------|
+| Exigir evidencia para **cambiar** | «El modelo siempre tiene razón» |
+| VR **Contradicted** → MC sin drama | Validación como **defensa** del diseño |
+| Modificar tras refutación real | Ignorar VR porque «ya lo decidimos» |
+
+Una contradición demostrada no es derrota del proceso. **Es su resultado esperado.**
+
 ---
 
 ## Dictámenes permitidos
