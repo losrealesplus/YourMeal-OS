@@ -1,7 +1,10 @@
 export default {
   home: "Home",
   menu: "Weekly Menu",
+  orders: "Orders",
   settings: "Account",
+  noOrdersTitle: "No orders yet",
+  noOrdersHint: "Once you schedule your first week it will appear here.",
   greeting: "Hi",
   nextDelivery: "Next Delivery",
   scheduleTitle: "Have you scheduled your meals for this week?",

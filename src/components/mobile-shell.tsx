@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Home, UtensilsCrossed, User } from "lucide-react";
+import { Home, UtensilsCrossed, ClipboardList, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function MobileShell({ children }: { children: ReactNode }) {
@@ -22,6 +22,7 @@ function BottomNav() {
   const items = [
     { to: "/app", label: t("home"), icon: Home, exact: true },
     { to: "/app/menu", label: t("menu"), icon: UtensilsCrossed, exact: false },
+    { to: "/app/orders", label: t("orders"), icon: ClipboardList, exact: false },
     { to: "/app/settings", label: t("settings"), icon: User, exact: false },
   ] as const;
 

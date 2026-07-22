@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          ip: string | null
+          new_data: Json | null
+          old_data: Json | null
+          tenant_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          ip?: string | null
+          new_data?: Json | null
+          old_data?: Json | null
+          tenant_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          ip?: string | null
+          new_data?: Json | null
+          old_data?: Json | null
+          tenant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_log_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       companies: {
         Row: {
           billing_rule: Database["public"]["Enums"]["pay_mode"]
@@ -438,8 +485,11 @@ export type Database = {
       dishes: {
         Row: {
           allergens: string[]
+          category_id: string
           cost: number
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           description: string | null
           id: string
           kcal: number | null
@@ -449,14 +499,20 @@ export type Database = {
           prep_instructions: string | null
           prep_minutes: number | null
           price: number
+          recipe_id: string | null
           status: Database["public"]["Enums"]["dish_status"]
+          tags: string[]
           tenant_id: string
+          updated_at: string
           weight_g: number | null
         }
         Insert: {
           allergens?: string[]
+          category_id?: string
           cost?: number
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           id?: string
           kcal?: number | null
@@ -466,14 +522,20 @@ export type Database = {
           prep_instructions?: string | null
           prep_minutes?: number | null
           price?: number
+          recipe_id?: string | null
           status?: Database["public"]["Enums"]["dish_status"]
+          tags?: string[]
           tenant_id: string
+          updated_at?: string
           weight_g?: number | null
         }
         Update: {
           allergens?: string[]
+          category_id?: string
           cost?: number
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           id?: string
           kcal?: number | null
@@ -483,13 +545,57 @@ export type Database = {
           prep_instructions?: string | null
           prep_minutes?: number | null
           price?: number
+          recipe_id?: string | null
           status?: Database["public"]["Enums"]["dish_status"]
+          tags?: string[]
           tenant_id?: string
+          updated_at?: string
           weight_g?: number | null
         }
         Relationships: [
           {
             foreignKeyName: "dishes_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feature_flags: {
+        Row: {
+          created_at: string
+          description: string | null
+          enabled: boolean
+          id: string
+          key: string
+          metadata: Json
+          tenant_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          key: string
+          metadata?: Json
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          key?: string
+          metadata?: Json
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feature_flags_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -1277,7 +1383,7 @@ export type Database = {
         | "employee"
         | "customer"
       customer_kind: "individual" | "company_employee"
-      dish_status: "draft" | "active" | "archived"
+      dish_status: "draft" | "active" | "archived" | "inactive"
       invoice_status: "pending" | "paid" | "overdue" | "void"
       order_status:
         | "draft"
@@ -1437,7 +1543,7 @@ export const Constants = {
         "customer",
       ],
       customer_kind: ["individual", "company_employee"],
-      dish_status: ["draft", "active", "archived"],
+      dish_status: ["draft", "active", "archived", "inactive"],
       invoice_status: ["pending", "paid", "overdue", "void"],
       order_status: [
         "draft",

@@ -26,6 +26,7 @@ import { Route as AuthenticatedSaasDomainsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedSaasBrandingRouteImport } from './routes/_authenticated/saas.branding'
 import { Route as AuthenticatedSaasAnalyticsRouteImport } from './routes/_authenticated/saas.analytics'
 import { Route as AuthenticatedAppSettingsRouteImport } from './routes/_authenticated/app.settings'
+import { Route as AuthenticatedAppOrdersRouteImport } from './routes/_authenticated/app.orders'
 import { Route as AuthenticatedAppMenuRouteImport } from './routes/_authenticated/app.menu'
 import { Route as AuthenticatedAdminSupportRouteImport } from './routes/_authenticated/admin.support'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
@@ -131,6 +132,11 @@ const AuthenticatedAppSettingsRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppOrdersRoute = AuthenticatedAppOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
 const AuthenticatedAppMenuRoute = AuthenticatedAppMenuRouteImport.update({
   id: '/menu',
   path: '/menu',
@@ -236,6 +242,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/support': typeof AuthenticatedAdminSupportRoute
   '/app/menu': typeof AuthenticatedAppMenuRoute
+  '/app/orders': typeof AuthenticatedAppOrdersRoute
   '/app/settings': typeof AuthenticatedAppSettingsRoute
   '/saas/analytics': typeof AuthenticatedSaasAnalyticsRoute
   '/saas/branding': typeof AuthenticatedSaasBrandingRoute
@@ -265,6 +272,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/support': typeof AuthenticatedAdminSupportRoute
   '/app/menu': typeof AuthenticatedAppMenuRoute
+  '/app/orders': typeof AuthenticatedAppOrdersRoute
   '/app/settings': typeof AuthenticatedAppSettingsRoute
   '/saas/analytics': typeof AuthenticatedSaasAnalyticsRoute
   '/saas/branding': typeof AuthenticatedSaasBrandingRoute
@@ -299,6 +307,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/support': typeof AuthenticatedAdminSupportRoute
   '/_authenticated/app/menu': typeof AuthenticatedAppMenuRoute
+  '/_authenticated/app/orders': typeof AuthenticatedAppOrdersRoute
   '/_authenticated/app/settings': typeof AuthenticatedAppSettingsRoute
   '/_authenticated/saas/analytics': typeof AuthenticatedSaasAnalyticsRoute
   '/_authenticated/saas/branding': typeof AuthenticatedSaasBrandingRoute
@@ -333,6 +342,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/support'
     | '/app/menu'
+    | '/app/orders'
     | '/app/settings'
     | '/saas/analytics'
     | '/saas/branding'
@@ -362,6 +372,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/support'
     | '/app/menu'
+    | '/app/orders'
     | '/app/settings'
     | '/saas/analytics'
     | '/saas/branding'
@@ -395,6 +406,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/support'
     | '/_authenticated/app/menu'
+    | '/_authenticated/app/orders'
     | '/_authenticated/app/settings'
     | '/_authenticated/saas/analytics'
     | '/_authenticated/saas/branding'
@@ -532,6 +544,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/app/settings'
       preLoaderRoute: typeof AuthenticatedAppSettingsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/orders': {
+      id: '/_authenticated/app/orders'
+      path: '/orders'
+      fullPath: '/app/orders'
+      preLoaderRoute: typeof AuthenticatedAppOrdersRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/app/menu': {
@@ -674,12 +693,14 @@ const AuthenticatedAdminRouteWithChildren =
 
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppMenuRoute: typeof AuthenticatedAppMenuRoute
+  AuthenticatedAppOrdersRoute: typeof AuthenticatedAppOrdersRoute
   AuthenticatedAppSettingsRoute: typeof AuthenticatedAppSettingsRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
 }
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppMenuRoute: AuthenticatedAppMenuRoute,
+  AuthenticatedAppOrdersRoute: AuthenticatedAppOrdersRoute,
   AuthenticatedAppSettingsRoute: AuthenticatedAppSettingsRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
 }
