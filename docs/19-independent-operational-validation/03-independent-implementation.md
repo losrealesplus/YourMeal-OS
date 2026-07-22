@@ -10,10 +10,11 @@ Aquí desaparece la teoría: solo queda si el modelo es **interpretable de forma
 
 ## Material
 
-Exactamente el mismo que IOV-001: solo `docs/17-operational-model/` (gramática publicada).
+Exactamente el [KCM](./kcm/README.md) de la sesión (típicamente el mismo que IOV-001 o un KCM-00x versionado).
 
-Sin código de producto existente como plantilla obligatoria.  
-Sin que los autores «corrijan» el diseño a mitad.
+Sin código de producto como plantilla obligatoria.  
+Sin que los autores «corrijan» el diseño a mitad.  
+Protocolo: [05](./05-experimental-protocol.md).
 
 ---
 

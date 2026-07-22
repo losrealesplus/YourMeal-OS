@@ -44,10 +44,10 @@ Fuera de dominio (inválido para IOV-002): SaaS genérico, e-commerce de product
 
 ## Material
 
-Mismo corpus que IOV-001: solo Operational Model publicado.  
-El evaluador **sí** puede conocer FASE 5 a alto nivel, pero el ataque se formula contra el modelo, no contra los autores.
+Mismo corpus que IOV-001 vía [KCM](./kcm/README.md) (versión propia si el ataque lo requiere).  
+Protocolo: [05 Experimental Protocol](./05-experimental-protocol.md).
 
-Autores: no co-diseñan el ataque. Pueden observar en silencio o revisar el informe a posteriori.
+El evaluador **sí** puede conocer FASE 5 a alto nivel, pero el ataque se formula contra el modelo, no contra los autores. Todo supuesto de dominio debe poder narrarse con el corpus (prohibición de conocimiento implícito de EatClean/autores).
 
 ---
 
