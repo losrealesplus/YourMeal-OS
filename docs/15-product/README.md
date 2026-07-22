@@ -6,7 +6,8 @@
 > FOUNDATION → cómo construir.  
 > Product Blueprint → **qué construir y por qué**.
 
-No implementar código desde aquí sin evidencia de operación.
+No implementar lógica de dominio **inventada** desde aquí.  
+Materializar solo lo justificado por el Operational Model (Table-Validated) + [Knowledge Traceability](./etapa-2/knowledge-traceability.md).
 
 ---
 
@@ -47,6 +48,9 @@ CAPABILITY_ROADMAP
 | [OPERATIONS_DASHBOARD.md](./OPERATIONS_DASHBOARD.md) | Centro de Control: estado de la operación |
 | [OPERATIONAL_CHECKS.md](./OPERATIONAL_CHECKS.md) | Concepto transversal: datos → check → acción |
 | [CAPABILITY_ROADMAP.md](./CAPABILITY_ROADMAP.md) | Asistentes ↔ Capabilities del Core |
+| [PRODUCT_INFORMATION_ARCHITECTURE.md](./PRODUCT_INFORMATION_ARCHITECTURE.md) | IA de producto (Carril B · Sprint 2.1) |
+| [etapa-2/](./etapa-2/README.md) | Carril B · fases A–D |
+| [../21-product-materialization/](../21-product-materialization/README.md) | Lovable-first · matriz pantalla↔conocimiento |
 
 ---
 
@@ -77,7 +81,19 @@ Si no elimina una pregunta o no ahorra tiempo / errores / interrupciones, aún n
 
 ---
 
-## Siguiente puente
+## Carril B / Etapa 2 (abierto)
 
-[Operational Discovery](../16-operational-discovery/README.md) — evidencia de campo que alimenta este Blueprint.
+> ❌ No **inventar** lógica de negocio.  
+> ✅ Materializar el Operational Model Table-Validated.
+
+Arranque: [21 Materialization](../21-product-materialization/README.md) · [IA](./PRODUCT_INFORMATION_ARCHITECTURE.md) · [Sprint 2.1](./etapa-2/SPRINT_2_1_PRODUCT_FOUNDATION.md) · [Dual Track](../00-status/DUAL_TRACK_ANTECAMARA.md).
+
+Flujo: OM → IA → **Lovable** → UX → código (Figma apoyo).
+
+---
+
+## Siguiente puente (Carril A)
+
+[FOV Mission Brief](../00-status/FOV_MISSION_BRIEF.md) — evidencia empírica.  
+Discovery histórico: [Operational Discovery](../16-operational-discovery/README.md).
 

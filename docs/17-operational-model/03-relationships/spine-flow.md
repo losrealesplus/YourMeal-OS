@@ -125,14 +125,18 @@ No añadir flecha `Batch → Dish` si solo repite lo ya dicho por Recipe/Order.
 |--------|-------|--------|---------------------|
 | Weekly Menu | publishes | período pedible | 1 : 1 semana |
 | Consumer/Beneficiary | places | Order | 1 : n |
-| Order | contributes to | Production Plan | n : 1 (horizonte) |
-| Production Plan | executes as | Production Batch | 1 : n |
+| Order | contributes to | Production Plan | n : 1 (horizonte) · **también 1 : 1** (Plan expedito · MC-006) |
+| Production Plan | executes as | Production Batch | 1 : n (**en paralelo** bajo el mismo Plan / día · MC-005) |
 | Production Batch | produces | Packaging | 1 : n unidades |
-| Delivery Route | transports | Packaging | 1 : n |
+| Organization | owns | Kitchen / Vehicle | **1 : n** («a menudo 1» = arranque, no Invariant · MC-005) |
+| Delivery Route | transports | Packaging | 1 : n · **varias Routes en paralelo** el mismo día |
 | Delivery Route | performs | Delivery | 1 : n |
 | Order | settles | Payment | 1 : 0..n |
 
 No es schema SQL. Es lectura operativa.
+
+**Paralelismo (MC-005 · VR-005):** el modelo **soporta** escala; no leer Kitchen/Vehicle/Batch/Route como 1:1 implícitos.  
+Shift / Wave / Session / Super-Route **no** son Core.
 
 ---
 

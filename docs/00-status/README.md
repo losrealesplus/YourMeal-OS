@@ -1,89 +1,61 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-22 · FASE 4 Operational Model 🟢 (01–06)  
-**Versión:** `v0.1.0` — FOUNDATION LOCKED  
+**Última actualización:** 2026-07-22  
+**Hito:** [Methodology Frozen](./04-methodology-frozen.md) 🧊  
+**Conocimiento:** **Table-Validated** (Field-Validated tras G-01)  
+**Carril A:** FOV EatClean — [Mission Brief](./FOV_MISSION_BRIEF.md)  
+**Carril B:** 🟢 **ABIERTO** — [Dual Track](./DUAL_TRACK_ANTECAMARA.md) · [Sprint 2.1](../15-product/etapa-2/SPRINT_2_1_PRODUCT_FOUNDATION.md)
 
-## Roadmap (oficial)
-
-| Área | Estado |
-|------|--------|
-| FOUNDATION | ✅ Cerrado |
-| PRODUCT BLUEPRINT | ✅ Cerrado (fase diseño) |
-| OPERATIONAL DISCOVERY | ✅ Estructura cerrada |
-| OPERATIONAL CHECKS | ✅ Cerrado (transversal) |
-| FIRST OBSERVATION DAY | ⏸ Congelado (hasta retomar a propósito) |
-| Operational Model | 🟢 01–06 (gramática completa) |
+> El código no crea conocimiento; **materializa** conocimiento.  
+> ❌ No **inventar** lógica de negocio.
 
 ---
 
-## Fase actual: YOURMEAL OPERATIONAL MODEL (Core Operativo)
+## Narrativa
 
-No es el Core técnico (DDD).  
-Es el **lenguaje permanente** de la operación de comida preparada.
+| Rol | Qué es |
+|-----|--------|
+| **EatClean** | Laboratorio (FOV) |
+| **FOPEBA** | Método v1.0 frozen |
+| **YourMeal OS** | Producto — Carril B materializa el OM Table-Validated |
+
+---
+
+## Dual track
+
+| Carril | Estado | Foco |
+|--------|--------|------|
+| **A** Certificación | FOV → G-01 | Evidencia empírica |
+| **B** Producto | 🟢 Abierto | UX · arch · materialización con trazabilidad |
+
+Carril B fases: **A** Experience libre · **B** Tech libre · **C** Modelo+trazabilidad · **D** FOV-dependent 🔒
+
+---
+
+## Progreso FOPEBA
 
 ```text
-Foundation ✅ → Blueprint ✅ → Checks ✅
-        ↓
-Operational Model 🟢
-   01 Ubiquitous Language 🟢
-   02 Core Objects 🟢
-   03 Operational Dependencies 🟢
-   04 Lifecycles (transiciones) 🟢
-   05 Invariants (Constitución) 🟢
-   06 Capability Mapping (trazabilidad) 🟢
-        ↓
-Observation EatClean ⏸
+FASE A Discovery     100% ✅
+FASE B Certification ~85% · Table-Validated · FOV⏳
+FASE C Product Eng.  🔓 Carril B parcial · 🔒 G-01 pleno / Fase D
 ```
-
-| Pregunta anterior | Pregunta ahora |
-|-------------------|----------------|
-| ¿Qué funcionalidades tendrá? | ¿Qué objetos existen en cualquier negocio de comida preparada? |
-
-Índice: [docs/17-operational-model/](../17-operational-model/README.md) · [01 UL](../17-operational-model/01-ubiquitous-language/README.md)
-
-**No es un cuarto pilar.** Equivalente producto del Domain Model.
 
 ---
 
-## Tres pilares (+ lenguaje + Checks)
-
-| Bloque | Pregunta | Estado |
-|--------|----------|--------|
-| **FOUNDATION** | ¿Cómo construimos? | ✅ |
-| **PRODUCT BLUEPRINT** | ¿Qué / por qué? | ✅ |
-| **OPERATIONAL DISCOVERY** | ¿Por qué evolucionar? | ✅ carpeta · ⏸ campo |
-| **Operational Checks** | ¿Cómo guía la operación? | ✅ transversal |
-| **Operational Model** | ¿Con qué lenguaje? | 🟢 01–06 |
+## Arranque Carril B
 
 ```text
-Producto:  Discovery → Check → Assistant → Capability
-Lenguaje:  Operational Model (Ubiquitous Language primero)
-Técnica:   Capability → Use Cases → Domain → Infrastructure
+OM → IA → Lovable → UX iter · Código
 ```
 
-Gate: evidencia → pregunta → Check → Capability.
+1. [Product Information Architecture](../15-product/PRODUCT_INFORMATION_ARCHITECTURE.md)  
+2. [21 Product Materialization](../21-product-materialization/README.md) (matriz · Lovable Brief)  
+3. [Sprint 2.1](../15-product/etapa-2/SPRINT_2_1_PRODUCT_FOUNDATION.md)
 
-Contrato semántico: *misma palabra ≠ cosas distintas; misma realidad ≠ dos palabras.*
-
----
-
-## PRs
-
-| PR | Tema | Estado |
-|----|------|--------|
-| [#9](https://github.com/losrealesplus/yourmeal-os/pull/9) | Operational Checks | ✅ Merged |
-| [#10](https://github.com/losrealesplus/yourmeal-os/pull/10) | Operational Model FASE 4 | 🚧 Open |
+**Lovable** principal · **Figma** apoyo. No improvisar pantallas.
 
 ---
 
-## Próxima sesión / siguiente paso
+## Relacionado
 
-1. **Observation EatClean** ⏸ — retomar solo con decisión explícita del equipo  
-2. Trazabilidad de Capabilities candidatas cuando haya evidencia (plantilla en 06)  
-3. Sin código / pantallas / APIs hasta gate Discovery
-
-| Índice | Ruta |
-|--------|------|
-| Constitución | [05-invariants/](../17-operational-model/05-invariants/README.md) |
-| Trazabilidad | [06-capability-mapping/](../17-operational-model/06-capability-mapping/README.md) |
-| Operational Model | [docs/17-operational-model/](../17-operational-model/README.md) |
+- [Freeze](./04-methodology-frozen.md) · [RC](./02-operational-model-rc.md) · [etapa-2](../15-product/etapa-2/README.md)

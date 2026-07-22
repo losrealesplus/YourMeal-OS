@@ -86,10 +86,12 @@ Plantilla vacía: [transition-template.md](./transition-template.md).
 
 | Doc | Contenido |
 |-----|-----------|
-| [spine-transitions.md](./spine-transitions.md) | Máquinas de la espina (Core) |
-| [support-transitions.md](./support-transitions.md) | Supporting (Label, Stock, catálogo) |
-| [checks-on-transitions.md](./checks-on-transitions.md) | Checks ↔ transiciones |
+| [spine-transitions.md](./spine-transitions.md) | Máquinas de la espina (Core) + Dynamics |
+| [support-transitions.md](./support-transitions.md) | Supporting (Label, Stock, Lot, Location, catálogo) |
+| [checks-on-transitions.md](./checks-on-transitions.md) | Checks ↔ transiciones · resultados 2.0 |
 | [state-index.md](./state-index.md) | Índice rápido de estados (referencia) |
+
+**Enriquecimiento:** [07 Operational Dynamics](../07-operational-dynamics/README.md) — clases de transición · Recovery · Taxonomy · Checks 2.0.
 
 ---
 

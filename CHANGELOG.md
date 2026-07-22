@@ -81,14 +81,16 @@ La arquitectura de YourMeal OS se considera **estable**.
 - Disciplina: no implementamos ideas; implementamos conocimiento validado
 - Misión plataforma: reducir la carga cognitiva de la operación diaria
 - KPI estrella: preguntas eliminadas · ciclo cerrado operación↔producto · sin cuarto pilar
-- **FASE 4:** 01–06 🟢 (gramática completa: UL · objetos · dependencias · transiciones · constitución · trazabilidad)  
-- 05 Invariants — Constitución del sistema (6 categorías · INV-001…055)  
-- 06 Capability Mapping — trazabilidad Capability → Invariants (Dish Management ✅)  
-- Jerarquía: Invariant → Lifecycle → Operational Check → Capability  
-- Checks en transiciones · ningún Check viola Invariant (principio 7)  
-- Capabilities consumen el modelo — no lo definen (principio §13)  
-- Observation ⏸
-- Secuencia definitiva en FOUNDATION: Guidelines → Spec → Implementation → Tests → Validation
+- **FASE 5:** Operational Validation — batería VS-001…006 cerrada (Extended×4 · Clarified×2 · 0 Core)
+- **Operational Dynamics v0.2:** Lifecycles 2.0 · Supporting Taxonomy · Checks 2.0 (PASS/WARNING/BLOCKED/MANUAL DECISION)
+- Recovery Pattern · Temporal Grammar · Capability Impact integrados en Dynamics 01
+- **Tren MC-001…006 aplicado** a `17` (Amend/Revise/Pause/Hold · Lot · Location · cardinalidad · INV-031)
+- **Product Materialization** (`docs/21`): OM → IA → **Lovable** → UX → código; Figma = apoyo
+- Toda pantalla justifica conocimiento: [matriz](./docs/21-product-materialization/01-screen-knowledge-matrix.md)
+- [Lovable Brief](./docs/21-product-materialization/02-lovable-brief.md) — prompts sin inventar reglas
+- Carril B abierto · Sprint 2.1 actualizado Lovable-first
+- ❌ No inventar lógica · ✅ materializar OM Table-Validated
+- Carril A (FOV) en paralelo
 ### Gobierno
 
 - ADR 0011: Diario de Desarrollo + Principio de Intencionalidad

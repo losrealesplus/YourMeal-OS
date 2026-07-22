@@ -18,6 +18,16 @@ No empaquetado fantasma.
 
 > Todo **Production Batch** referencia **qué necesidad cubre** (Plan / Orders / Dish — según granularidad del Tenant).
 
+**Traza operativa (MC-003 · VR-003):** el Batch debe poder listar, vía puente canónico, los **Order Items / Packaging** cubiertos — no solo un Dish genérico:
+
+```text
+Lot → Stock consume → Batch → Packaging / Label → Order Item → Order → destinatario
+```
+
+Sin inventar Core Recall. Supporting **Lot** + Packaging/Label cierran el recorrido inverso.
+
+**Checks:** ¿Puede iniciarse/completarse Batch con traza a demanda? · ¿Puede listarse retirada desde Lot?
+
 ---
 
 ## INV-032 · Order Item dentro de Menu

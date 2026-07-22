@@ -94,21 +94,21 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-Blueprint ✅ · Checks ✅ · Discovery (campo) ⏸
-        ↓
-Operational Model (Core Operativo) 🚧  ← siguiente trabajo
+FOPEBA v1.0 Frozen 🧊 · OM Table-Validated
+Carril A: FOV ⏳ · Carril B: 🟢 ABIERTO (no inventar lógica)
 ```
 
-> **Gramática:** vocabulario · sustantivos · verbos · tiempo · constitución · trazabilidad.  
-> **01–06** endurecidos (FASE 4 Operational Model 🟢).  
-> Jerarquía: Invariant → Lifecycle → Check → Capability.  
-> Checks en **transiciones**, no en estados.  
-> Capabilities consumen el modelo — no lo definen.  
-> Observation ⏸ · sin código/pantallas.
+**Regla Etapa 2:** toda lógica → *¿en qué parte del Operational Model está basada?*  
+Si no hay cita → no se implementa (pasa por evidencia).
 
-**Próxima sesión:** Observation (cuando se descongele) o trazabilidad de Capabilities con evidencia.
+| Carril | Entrada |
+|--------|---------|
+| A campo | [Mission Brief](./docs/00-status/FOV_MISSION_BRIEF.md) |
+| B producto | [21 Materialization](./docs/21-product-materialization/README.md) · [Sprint 2.1](./docs/15-product/etapa-2/SPRINT_2_1_PRODUCT_FOUNDATION.md) · [IA](./docs/15-product/PRODUCT_INFORMATION_ARCHITECTURE.md) |
 
-Índices: [05 Invariants](./docs/17-operational-model/05-invariants/README.md) · [06 Mapping](./docs/17-operational-model/06-capability-mapping/README.md) · [Model](./docs/17-operational-model/README.md) · [Estado](./docs/00-status/README.md)
+Flujo UI: **OM → IA → Lovable → iteración → código** (Figma = apoyo).
+
+Índices: [Estado](./docs/00-status/README.md) · [Dual Track](./docs/00-status/DUAL_TRACK_ANTECAMARA.md) · [Traceability](./docs/15-product/etapa-2/knowledge-traceability.md)
 
 ### Principio de valor (Capabilities)
 

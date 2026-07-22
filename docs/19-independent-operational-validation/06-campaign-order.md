@@ -1,0 +1,76 @@
+# Campaña IOV — orden de ejecución
+
+**IOV no se “implementa”. Se ejecuta.**  
+El protocolo debe estar congelado antes de la primera sesión.
+
+Hasta ahora toda la evidencia ha sido **conceptual**.  
+IOV validó transferencia · resistencia · interpretabilidad.  
+FOV valida supervivencia en la realidad con **evidencia empírica**.  
+**FOV abierto** como campaña observacional: [fov/](../20-evidence-framework/fov/README.md) · objetivos = [Known Limitations RC](../00-status/03-known-limitations-rc.md).
+
+---
+
+## Progreso Etapa 1 (lectura)
+
+```text
+ETAPA 1 — Modelado                 ████████████████████████████ 100%
+Operational Validation             ████████████████████████████ 100%
+Gap Analysis                       ████████████████████████████ 100%
+Operational Dynamics               ████████████████████████████ 100%
+Evidence Framework                 ████████████████████████████ 100%
+IOV Protocol                       ████████████████████████████ 100%
+IOV-001 Piloto (IVR-001)           ████████████████████████████ 100%
+IOV-002 Adversarial (IVR-002)      ████████████████████████████ 100%
+IOV-003 Independent (IVR-003)      ████████████████████████████ 100%
+Operational Model RC               ████████████████████████████ 100%  Knowledge Certified
+FOV Protocol                       ████████████████████████████ 100%  FO-V/E/C/U · FER
+Field Validation (FOV ejecución)   ░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0%  ← siguiente
+```
+
+---
+
+## Orden obligatorio
+
+| # | Acción | Entregable |
+|---|--------|------------|
+| 1 | **IOV-001** piloto IA ciega + KCM congelado | IVR-001 · Findings · Transferability Score · mejoras docs |
+| 2 | Ajustar **solo** protocolo o docs si hay Findings | (sin teoría nueva) |
+| 3 | **IOV-002** adversarial | IVR-002 · SF |
+| 4 | **IOV-003** independent implementation | IVR-003 · IF |
+| 5 | Congelar corpus **Operational Model RC** | tag / acta |
+| 6 | Diseñar / congelar **protocolo FOV** | [fov/](../20-evidence-framework/fov/README.md) ✅ |
+| 7 | Ejecutar **FOV** (EatClean) | FO-V/E/C/U |
+| 8 | **Field Evidence Review** | FER-xxx |
+| 9 | **Knowledge Update** | [ku/](../20-evidence-framework/ku/README.md) · KUR |
+| 10 | **Economic Confirmation** | [ec/](../20-evidence-framework/ec/README.md) · OVI · ECR |
+| 11 | **Gate G-01** | [g01/](../20-evidence-framework/g01/README.md) · Package · Acta |
+
+---
+
+## Instrucciones por nivel
+
+### IOV-001
+¿El corpus basta? ¿El protocolo funciona? ¿DF/IFD producen evidencia útil?
+
+### IOV-002
+> Tu objetivo no es colaborar. Tu objetivo es obligarme a introducir un **Core Object nuevo**.
+
+### IOV-003
+¿Dos implementadores independientes producen arquitecturas conceptualmente equivalentes?
+
+---
+
+## Readiness Review (interno — no fase oficial)
+
+Antes de cada sesión IOV / FOV, una sola pregunta:
+
+> **¿Estamos intentando demostrar que el modelo funciona o intentando descubrir por qué podría fallar?**
+
+Mientras la respuesta sea la segunda, la evidencia tiene prioridad sobre el orgullo de la solución.
+
+---
+
+## Relacionado
+
+- [05 Experimental Protocol](./05-experimental-protocol.md)  
+- [KCM](./kcm/README.md) · [IVR](./ivr/README.md)
