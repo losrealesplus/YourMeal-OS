@@ -167,9 +167,9 @@ function CustomerHome() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-card border border-border rounded-2xl p-4">
+    <div className="surface-raised border border-border/60 rounded-2xl p-4">
       <p className="meta-label">{label}</p>
-      <p className="text-2xl font-extrabold tracking-tight mt-2 font-mono tabular-nums">
+      <p className="text-3xl font-extrabold tracking-tight mt-2 font-mono tabular-nums leading-none">
         {value}
       </p>
     </div>
