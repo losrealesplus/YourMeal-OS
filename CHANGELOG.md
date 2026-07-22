@@ -85,14 +85,13 @@ La arquitectura de YourMeal OS se considera **estable**.
 - **Operational Dynamics v0.2:** Lifecycles 2.0 · Supporting Taxonomy · Checks 2.0 (PASS/WARNING/BLOCKED/MANUAL DECISION)
 - Recovery Pattern · Temporal Grammar · Capability Impact integrados en Dynamics 01
 - **Tren MC-001…006 aplicado** a `17` (Amend/Revise/Pause/Hold · Lot · Location · cardinalidad · INV-031)
-- **Precisión:** Methodology certified · Operational Model **Table-Validated** · waiting for Field Evidence (no «Knowledge Certification complete»)
-- Freeze: mejoras ❌ · Emergency (inconsistencia / safety / lógica / corrupción evidencia) ✅
-- Principio: conocimiento post-freeze solo evoluciona con evidencia observacional suficiente
-- Tres capas de artefactos: Knowledge · Evidence · **Decision** (KUR, ECR, Acta G-01)
-- Indicador FOV: **Knowledge Leakage** (reglas tácitas / conocimiento implícito)
-- G-01 por **criterios/umbrales**, no por voto
-- Hito Methodology Frozen · Mission Brief · Post-Certification Review → v1.1 archivo
-- Etapa 1 cierra en G-01 (= Field-Validated)
+- **Carril B ABIERTO:** ❌ no inventar lógica · ✅ materializar OM Table-Validated
+- Etapa 2 en 4 fases: Experience · Tech · Materialización+trazabilidad · FOV-dependent 🔒
+- [Knowledge Traceability](./docs/15-product/etapa-2/knowledge-traceability.md)
+- Primer movimiento: [Product Information Architecture](./docs/15-product/PRODUCT_INFORMATION_ARCHITECTURE.md) · [Sprint 2.1](./docs/15-product/etapa-2/SPRINT_2_1_PRODUCT_FOUNDATION.md)
+- Dual track actualizado: [DUAL_TRACK](./docs/00-status/DUAL_TRACK_ANTECAMARA.md)
+- Carril A (FOV) sigue en paralelo — no sustituible por UX
+- Precisión Table-Validated · Freeze · Decision Artifacts · Knowledge Leakage (hitos previos)
 ### Gobierno
 
 - ADR 0011: Diario de Desarrollo + Principio de Intencionalidad
