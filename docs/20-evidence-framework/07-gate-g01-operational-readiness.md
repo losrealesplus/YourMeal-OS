@@ -18,13 +18,17 @@ Sistema: [g01/](./g01/README.md)
 ## Gobernanza
 
 > **G-01 no aprueba código.**  
-> **Aprueba conocimiento suficiente para justificar código.**
+> **No se decide por votación — solo por umbrales.**  
+> Aprueba Knowledge **Field-Validated** suficiente para justificar código.
 
 ```text
+Knowledge Field-Validated
 Operational Knowledge Certified
         ↓
 Stage 2 — Product Engineering
 ```
+
+Umbrales: [g01/02-decision](./g01/02-decision.md).
 
 ---
 
