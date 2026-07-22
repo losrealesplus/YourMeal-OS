@@ -1,9 +1,7 @@
 # 02 · Validation Scenarios
 
-Casos operativos **completos** — auditorías hostiles al modelo.
-
-> **Principio 15:** cada VS rompe una **dimensión distinta**. Nunca repetir el mismo tipo de tensión.  
-> **Principio 16:** no aplicar cambios a `17` hasta cerrar VS-001…006 y analizar brechas en conjunto.
+> **Principio 15:** cada VS una dimensión distinta.  
+> **Principio 16:** MC aparcados hasta análisis post VS-006.
 
 Protocolo: [audit-protocol.md](./audit-protocol.md).
 
@@ -11,31 +9,26 @@ Protocolo: [audit-protocol.md](./audit-protocol.md).
 
 ## Roadmap por dimensión
 
-| VS | Escenario | Dimensión puesta a prueba | Estado |
-|----|-----------|---------------------------|--------|
-| [VS-001](./VS-001-semana-normal.md) | Cambio operativo tardío (Amend Order) | **Adaptabilidad** de la operación | ✅ Extended · VR-001 |
-| [VS-002](./VS-002-interrupcion-horno.md) | Interrupción (horno) | **Continuidad** de la operación | ✅ Extended · VR-002 |
-| [VS-003](./VS-003-seguridad-alimentaria.md) | Retirada lote contaminado | **Trazabilidad** / seguridad (recorrido **inverso**) | ✅ Extended · VR-003 |
-| [VS-004](./VS-004-rotura-stock.md) | → reescribir: error humano | **Error humano** y recuperación | ⏳ |
-| [VS-005](./VS-005-cambio-menu-ultima-hora.md) | → reescribir: carga 2×–3× | **Escalabilidad** extrema | ⏳ |
-| [VS-006](./VS-006-cancelacion-cliente.md) | → reescribir: cliente reglas distintas | **Generalización** del dominio | ⏳ |
-| VS-007 | Repartidor / logística (opcional) | Complemento · no sustituye familia | ⏳ |
-
-Ninguno repite el anterior. Cada uno obliga a demostrar una capacidad diferente del modelo.
+| VS | Escenario | Dimensión | Estado |
+|----|-----------|-----------|--------|
+| [VS-001](./VS-001-semana-normal.md) | Cambio operativo tardío | **Adaptabilidad** | ✅ Extended · VR-001 |
+| [VS-002](./VS-002-interrupcion-horno.md) | Interrupción horno | **Continuidad** | ✅ Extended · VR-002 |
+| [VS-003](./VS-003-seguridad-alimentaria.md) | Retirada lote | **Trazabilidad inversa** | ✅ Extended · VR-003 |
+| [VS-004](./VS-004-error-humano-etiquetas.md) | Etiquetas cruzadas | **Error humano / recuperación** | ✅ Extended · VR-004 |
+| [VS-005](./VS-005-cambio-menu-ultima-hora.md) | → reescribir: carga 2×–3× | **Escalabilidad** | ⏳ |
+| [VS-006](./VS-006-cancelacion-cliente.md) | → reescribir: reglas distintas | **Generalización** | ⏳ |
 
 ---
 
-## Criterio de cierre de escenario
+## Criterio de cierre
 
-1. Auditoría completa (6 preguntas / paso).  
-2. VR con clasificación + Knowledge State.  
-3. MC **propuesto y aparcado** si Extended/Contradicted — **no** aplicado a 17.  
-4. Tras VS-006: sesión de análisis conjunto → priorizar MC.
+1. Auditoría 6 preguntas/paso · VR · KS  
+2. MC propuesto **aparcado** (no aplicado a 17)  
+3. Tras VS-006: análisis conjunto de MC-001…N
 
 ---
 
 ## Relacionado
 
-- [01 validation-principles](../01-validation-principles.md) §15–16  
-- [06 model-changes](../06-model-changes/README.md)  
-- [05 validation-reports](../05-validation-reports/README.md)
+- [01 principles §15–16](../01-validation-principles.md)  
+- [05 reports](../05-validation-reports/README.md)

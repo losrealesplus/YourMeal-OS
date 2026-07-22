@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-22 · VS-001…003 · Extended×3 · MC ⏸ (principio 16)  
+**Última actualización:** 2026-07-22 · VS-001…004 · Extended×4 · MC ⏸  
 **Versión técnica:** `v0.1.0` — FOUNDATION LOCKED  
 **Versión modelo:** Alpha (pre-certificación)
 
