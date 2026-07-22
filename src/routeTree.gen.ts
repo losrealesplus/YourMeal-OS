@@ -26,6 +26,7 @@ import { Route as AuthenticatedSaasDomainsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedSaasBrandingRouteImport } from './routes/_authenticated/saas.branding'
 import { Route as AuthenticatedSaasAnalyticsRouteImport } from './routes/_authenticated/saas.analytics'
 import { Route as AuthenticatedAppSettingsRouteImport } from './routes/_authenticated/app.settings'
+import { Route as AuthenticatedAppScheduleRouteImport } from './routes/_authenticated/app.schedule'
 import { Route as AuthenticatedAppOrdersRouteImport } from './routes/_authenticated/app.orders'
 import { Route as AuthenticatedAppMenuRouteImport } from './routes/_authenticated/app.menu'
 import { Route as AuthenticatedAdminSupportRouteImport } from './routes/_authenticated/admin.support'
@@ -41,6 +42,9 @@ import { Route as AuthenticatedAdminInventoryRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminDishesRouteImport } from './routes/_authenticated/admin.dishes'
 import { Route as AuthenticatedAdminCustomersRouteImport } from './routes/_authenticated/admin.customers'
 import { Route as AuthenticatedAdminAccountingRouteImport } from './routes/_authenticated/admin.accounting'
+import { Route as AuthenticatedAppSettingsProfileRouteImport } from './routes/_authenticated/app.settings.profile'
+import { Route as AuthenticatedAppOrdersOrderIdRouteImport } from './routes/_authenticated/app.orders.$orderId'
+import { Route as AuthenticatedAppMenuDishIdRouteImport } from './routes/_authenticated/app.menu.$dishId'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -132,6 +136,12 @@ const AuthenticatedAppSettingsRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppScheduleRoute =
+  AuthenticatedAppScheduleRouteImport.update({
+    id: '/schedule',
+    path: '/schedule',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppOrdersRoute = AuthenticatedAppOrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
@@ -219,6 +229,24 @@ const AuthenticatedAdminAccountingRoute =
     path: '/accounting',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAppSettingsProfileRoute =
+  AuthenticatedAppSettingsProfileRouteImport.update({
+    id: '/profile',
+    path: '/profile',
+    getParentRoute: () => AuthenticatedAppSettingsRoute,
+  } as any)
+const AuthenticatedAppOrdersOrderIdRoute =
+  AuthenticatedAppOrdersOrderIdRouteImport.update({
+    id: '/$orderId',
+    path: '/$orderId',
+    getParentRoute: () => AuthenticatedAppOrdersRoute,
+  } as any)
+const AuthenticatedAppMenuDishIdRoute =
+  AuthenticatedAppMenuDishIdRouteImport.update({
+    id: '/$dishId',
+    path: '/$dishId',
+    getParentRoute: () => AuthenticatedAppMenuRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -241,9 +269,10 @@ export interface FileRoutesByFullPath {
   '/admin/routes': typeof AuthenticatedAdminRoutesRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/support': typeof AuthenticatedAdminSupportRoute
-  '/app/menu': typeof AuthenticatedAppMenuRoute
-  '/app/orders': typeof AuthenticatedAppOrdersRoute
-  '/app/settings': typeof AuthenticatedAppSettingsRoute
+  '/app/menu': typeof AuthenticatedAppMenuRouteWithChildren
+  '/app/orders': typeof AuthenticatedAppOrdersRouteWithChildren
+  '/app/schedule': typeof AuthenticatedAppScheduleRoute
+  '/app/settings': typeof AuthenticatedAppSettingsRouteWithChildren
   '/saas/analytics': typeof AuthenticatedSaasAnalyticsRoute
   '/saas/branding': typeof AuthenticatedSaasBrandingRoute
   '/saas/domains': typeof AuthenticatedSaasDomainsRoute
@@ -252,6 +281,9 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/saas/': typeof AuthenticatedSaasIndexRoute
+  '/app/menu/$dishId': typeof AuthenticatedAppMenuDishIdRoute
+  '/app/orders/$orderId': typeof AuthenticatedAppOrdersOrderIdRoute
+  '/app/settings/profile': typeof AuthenticatedAppSettingsProfileRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -271,9 +303,10 @@ export interface FileRoutesByTo {
   '/admin/routes': typeof AuthenticatedAdminRoutesRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/support': typeof AuthenticatedAdminSupportRoute
-  '/app/menu': typeof AuthenticatedAppMenuRoute
-  '/app/orders': typeof AuthenticatedAppOrdersRoute
-  '/app/settings': typeof AuthenticatedAppSettingsRoute
+  '/app/menu': typeof AuthenticatedAppMenuRouteWithChildren
+  '/app/orders': typeof AuthenticatedAppOrdersRouteWithChildren
+  '/app/schedule': typeof AuthenticatedAppScheduleRoute
+  '/app/settings': typeof AuthenticatedAppSettingsRouteWithChildren
   '/saas/analytics': typeof AuthenticatedSaasAnalyticsRoute
   '/saas/branding': typeof AuthenticatedSaasBrandingRoute
   '/saas/domains': typeof AuthenticatedSaasDomainsRoute
@@ -282,6 +315,9 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/saas': typeof AuthenticatedSaasIndexRoute
+  '/app/menu/$dishId': typeof AuthenticatedAppMenuDishIdRoute
+  '/app/orders/$orderId': typeof AuthenticatedAppOrdersOrderIdRoute
+  '/app/settings/profile': typeof AuthenticatedAppSettingsProfileRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -306,9 +342,10 @@ export interface FileRoutesById {
   '/_authenticated/admin/routes': typeof AuthenticatedAdminRoutesRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/support': typeof AuthenticatedAdminSupportRoute
-  '/_authenticated/app/menu': typeof AuthenticatedAppMenuRoute
-  '/_authenticated/app/orders': typeof AuthenticatedAppOrdersRoute
-  '/_authenticated/app/settings': typeof AuthenticatedAppSettingsRoute
+  '/_authenticated/app/menu': typeof AuthenticatedAppMenuRouteWithChildren
+  '/_authenticated/app/orders': typeof AuthenticatedAppOrdersRouteWithChildren
+  '/_authenticated/app/schedule': typeof AuthenticatedAppScheduleRoute
+  '/_authenticated/app/settings': typeof AuthenticatedAppSettingsRouteWithChildren
   '/_authenticated/saas/analytics': typeof AuthenticatedSaasAnalyticsRoute
   '/_authenticated/saas/branding': typeof AuthenticatedSaasBrandingRoute
   '/_authenticated/saas/domains': typeof AuthenticatedSaasDomainsRoute
@@ -317,6 +354,9 @@ export interface FileRoutesById {
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/saas/': typeof AuthenticatedSaasIndexRoute
+  '/_authenticated/app/menu/$dishId': typeof AuthenticatedAppMenuDishIdRoute
+  '/_authenticated/app/orders/$orderId': typeof AuthenticatedAppOrdersOrderIdRoute
+  '/_authenticated/app/settings/profile': typeof AuthenticatedAppSettingsProfileRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -343,6 +383,7 @@ export interface FileRouteTypes {
     | '/admin/support'
     | '/app/menu'
     | '/app/orders'
+    | '/app/schedule'
     | '/app/settings'
     | '/saas/analytics'
     | '/saas/branding'
@@ -352,6 +393,9 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/app/'
     | '/saas/'
+    | '/app/menu/$dishId'
+    | '/app/orders/$orderId'
+    | '/app/settings/profile'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -373,6 +417,7 @@ export interface FileRouteTypes {
     | '/admin/support'
     | '/app/menu'
     | '/app/orders'
+    | '/app/schedule'
     | '/app/settings'
     | '/saas/analytics'
     | '/saas/branding'
@@ -382,6 +427,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/app'
     | '/saas'
+    | '/app/menu/$dishId'
+    | '/app/orders/$orderId'
+    | '/app/settings/profile'
   id:
     | '__root__'
     | '/'
@@ -407,6 +455,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/support'
     | '/_authenticated/app/menu'
     | '/_authenticated/app/orders'
+    | '/_authenticated/app/schedule'
     | '/_authenticated/app/settings'
     | '/_authenticated/saas/analytics'
     | '/_authenticated/saas/branding'
@@ -416,6 +465,9 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/'
     | '/_authenticated/app/'
     | '/_authenticated/saas/'
+    | '/_authenticated/app/menu/$dishId'
+    | '/_authenticated/app/orders/$orderId'
+    | '/_authenticated/app/settings/profile'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -546,6 +598,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppSettingsRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/schedule': {
+      id: '/_authenticated/app/schedule'
+      path: '/schedule'
+      fullPath: '/app/schedule'
+      preLoaderRoute: typeof AuthenticatedAppScheduleRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/app/orders': {
       id: '/_authenticated/app/orders'
       path: '/orders'
@@ -651,6 +710,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAccountingRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/app/settings/profile': {
+      id: '/_authenticated/app/settings/profile'
+      path: '/profile'
+      fullPath: '/app/settings/profile'
+      preLoaderRoute: typeof AuthenticatedAppSettingsProfileRouteImport
+      parentRoute: typeof AuthenticatedAppSettingsRoute
+    }
+    '/_authenticated/app/orders/$orderId': {
+      id: '/_authenticated/app/orders/$orderId'
+      path: '/$orderId'
+      fullPath: '/app/orders/$orderId'
+      preLoaderRoute: typeof AuthenticatedAppOrdersOrderIdRouteImport
+      parentRoute: typeof AuthenticatedAppOrdersRoute
+    }
+    '/_authenticated/app/menu/$dishId': {
+      id: '/_authenticated/app/menu/$dishId'
+      path: '/$dishId'
+      fullPath: '/app/menu/$dishId'
+      preLoaderRoute: typeof AuthenticatedAppMenuDishIdRouteImport
+      parentRoute: typeof AuthenticatedAppMenuRoute
+    }
   }
 }
 
@@ -691,17 +771,58 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
+interface AuthenticatedAppMenuRouteChildren {
+  AuthenticatedAppMenuDishIdRoute: typeof AuthenticatedAppMenuDishIdRoute
+}
+
+const AuthenticatedAppMenuRouteChildren: AuthenticatedAppMenuRouteChildren = {
+  AuthenticatedAppMenuDishIdRoute: AuthenticatedAppMenuDishIdRoute,
+}
+
+const AuthenticatedAppMenuRouteWithChildren =
+  AuthenticatedAppMenuRoute._addFileChildren(AuthenticatedAppMenuRouteChildren)
+
+interface AuthenticatedAppOrdersRouteChildren {
+  AuthenticatedAppOrdersOrderIdRoute: typeof AuthenticatedAppOrdersOrderIdRoute
+}
+
+const AuthenticatedAppOrdersRouteChildren: AuthenticatedAppOrdersRouteChildren =
+  {
+    AuthenticatedAppOrdersOrderIdRoute: AuthenticatedAppOrdersOrderIdRoute,
+  }
+
+const AuthenticatedAppOrdersRouteWithChildren =
+  AuthenticatedAppOrdersRoute._addFileChildren(
+    AuthenticatedAppOrdersRouteChildren,
+  )
+
+interface AuthenticatedAppSettingsRouteChildren {
+  AuthenticatedAppSettingsProfileRoute: typeof AuthenticatedAppSettingsProfileRoute
+}
+
+const AuthenticatedAppSettingsRouteChildren: AuthenticatedAppSettingsRouteChildren =
+  {
+    AuthenticatedAppSettingsProfileRoute: AuthenticatedAppSettingsProfileRoute,
+  }
+
+const AuthenticatedAppSettingsRouteWithChildren =
+  AuthenticatedAppSettingsRoute._addFileChildren(
+    AuthenticatedAppSettingsRouteChildren,
+  )
+
 interface AuthenticatedAppRouteChildren {
-  AuthenticatedAppMenuRoute: typeof AuthenticatedAppMenuRoute
-  AuthenticatedAppOrdersRoute: typeof AuthenticatedAppOrdersRoute
-  AuthenticatedAppSettingsRoute: typeof AuthenticatedAppSettingsRoute
+  AuthenticatedAppMenuRoute: typeof AuthenticatedAppMenuRouteWithChildren
+  AuthenticatedAppOrdersRoute: typeof AuthenticatedAppOrdersRouteWithChildren
+  AuthenticatedAppScheduleRoute: typeof AuthenticatedAppScheduleRoute
+  AuthenticatedAppSettingsRoute: typeof AuthenticatedAppSettingsRouteWithChildren
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
 }
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
-  AuthenticatedAppMenuRoute: AuthenticatedAppMenuRoute,
-  AuthenticatedAppOrdersRoute: AuthenticatedAppOrdersRoute,
-  AuthenticatedAppSettingsRoute: AuthenticatedAppSettingsRoute,
+  AuthenticatedAppMenuRoute: AuthenticatedAppMenuRouteWithChildren,
+  AuthenticatedAppOrdersRoute: AuthenticatedAppOrdersRouteWithChildren,
+  AuthenticatedAppScheduleRoute: AuthenticatedAppScheduleRoute,
+  AuthenticatedAppSettingsRoute: AuthenticatedAppSettingsRouteWithChildren,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
 }
 

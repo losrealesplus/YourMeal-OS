@@ -73,7 +73,7 @@ function OrderSummary() {
       <section className="px-6 mt-6">
         <p className="meta-label mb-2">{t("customer:orderItems")}</p>
         <div className="bg-card border border-border rounded-2xl divide-y divide-border">
-          {order.items.map((it) => {
+          {order.items.map((it: { dishId: string; qty: number }) => {
             const dish = getMockDish(it.dishId);
             if (!dish) return null;
             return (

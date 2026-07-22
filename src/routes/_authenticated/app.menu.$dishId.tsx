@@ -52,10 +52,10 @@ function DishDetail() {
       </div>
 
       <div className="px-6 mt-5 flex flex-wrap gap-1.5">
-        {dish.tags.map((t2) => (
-          <TagChip key={t2}>
+        {dish.tags.map((tg: string) => (
+          <TagChip key={tg}>
             <Leaf className="size-3" />
-            {tagLabels[t2]}
+            {tagLabels[tg]}
           </TagChip>
         ))}
       </div>
@@ -74,7 +74,7 @@ function DishDetail() {
         <p className="meta-label mb-2">{t("customer:ingredients")}</p>
         <div className="bg-card border border-border rounded-2xl p-4">
           <ul className="text-sm space-y-1.5">
-            {dish.ingredients.map((ing) => (
+            {dish.ingredients.map((ing: string) => (
               <li key={ing} className="flex items-center gap-2">
                 <span className="size-1.5 rounded-full bg-primary" />
                 <span className="capitalize">{ing}</span>
@@ -88,7 +88,7 @@ function DishDetail() {
         <section className="px-6 mt-6">
           <p className="meta-label mb-2">{t("customer:allergens")}</p>
           <div className="flex flex-wrap gap-2">
-            {dish.allergens.map((a) => (
+            {dish.allergens.map((a: string) => (
               <AllergenBadge key={a} label={a} />
             ))}
           </div>
