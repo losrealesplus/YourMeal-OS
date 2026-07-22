@@ -1,11 +1,11 @@
 # Validation Coverage
 
-**Última actualización:** 2026-07-22 · post **VR-005**
+**Última actualización:** 2026-07-22 · **batería VS-001…006 cerrada**
 
 ```text
-Nivel: Alpha
-VS: 5/6 · Extended × 4 · Clarified × 1 · Contradicted × 0 · Core Δ × 0
-MC aparcados: 5 · aplicados a 17: 0
+Nivel: Alpha → candidato Beta tras análisis conjunto + aplicación MC
+VS: 6/6 · Extended × 4 · Clarified × 2 · Contradicted × 0 · Core Δ × 0
+MC aparcados: 6 · aplicados a 17: 0
 ```
 
 | Dimensión | VS | Clasificación |
@@ -14,13 +14,17 @@ MC aparcados: 5 · aplicados a 17: 0
 | Continuidad | 002 | Extended |
 | Trazabilidad inversa | 003 | Extended |
 | Error humano / recuperación | 004 | Extended |
-| Escalabilidad | 005 | **Clarified** |
-| Generalización | 006 | ⏳ |
+| Escalabilidad | 005 | Clarified |
+| Generalización | 006 | Clarified |
 
-**Lectura:** Lifecycles incompletos (001–004) ≠ dominio pequeño. VS-005 sugiere que el **vocabulario de espina escala**; las grietas no eran «porque EatClean es chico».
+**Lectura de campaña:**  
+Lifecycles incompletos (tiempo · Packaging · lote) ≠ modelo «solo EatClean».  
+VS-005+006: estructura de dominio **generalizable**; 0 contradicciones estructurales de Core.
+
+**Gate:** [09-joint-gap-analysis](../09-joint-gap-analysis.md)
 
 ---
 
 ## Relacionado
 
-- [VR-005](./VR-005-escalabilidad-eatclean.md)
+- [VR-006](./VR-006-generalizacion-healthycorp.md)
