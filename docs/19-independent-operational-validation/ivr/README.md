@@ -16,8 +16,9 @@ IVR → Findings (DF/SF/IF/IFD) → Classification → (docs | VR)
 
 | ID | Nivel | Evaluador | KCM | Estado |
 |----|-------|-----------|-----|--------|
-| [IVR-001](./IVR-001-iov001-piloto-ia.md) | IOV-001 | Piloto IA ciego | KCM-001 | ✅ |
-| [IVR-002](./IVR-002-iov002-adversarial.md) | IOV-002 | Piloto IA adversarial | KCM-002 | ✅ |
+| [IVR-001](./IVR-001-iov001-piloto-ia.md) | IOV-001 | Piloto IA | KCM-001 | ✅ |
+| [IVR-002](./IVR-002-iov002-adversarial.md) | IOV-002 | Adversarial | KCM-002 | ✅ |
+| [IVR-003](./IVR-003-iov003-independent-implementation.md) | IOV-003 | Independent Implementation | KCM-003 | ✅ |
 
 ---
 

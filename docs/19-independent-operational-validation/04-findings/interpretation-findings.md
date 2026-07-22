@@ -1,6 +1,5 @@
 # Interpretation Findings (IF-A · IF-R · IF-D · IF-L)
 
-Evidencia de **IOV-003 · Independent Implementation**.  
 Origen: [IVR-003](../ivr/IVR-003-iov003-independent-implementation.md).
 
 | Código | Significado |
@@ -14,25 +13,47 @@ Origen: [IVR-003](../ivr/IVR-003-iov003-independent-implementation.md).
 
 ## Índice
 
-| ID | Código | Título | Estado |
-|----|--------|--------|--------|
-| — | | *(rellenar tras IVR-003)* | |
+| ID | Código | Título | ¿Bloquea RC? | Estado |
+|----|--------|--------|--------------|--------|
+| IF-001 | IF-A | Naming Bounded Contexts | No | ✅ cerrado |
+| IF-002 | IF-A | Checks: BC vs Domain Service | No | ✅ |
+| IF-003 | IF-A | Naming servicios Amend/Settlement | No | ✅ |
 
 ---
 
-## Plantilla
-
-```markdown
-## IF-xxx — [Título]
+## IF-001 — Naming Bounded Contexts
 
 | Campo | Valor |
 |-------|-------|
-| Código | IF-A · IF-R · IF-D · IF-L |
-| Diseño A | … |
-| Diseño B | … |
-| ¿Mismo concepto de dominio? | Sí / No / Ambiguo |
-| ¿Bloquea RC? | Sí / No |
-```
+| Código | IF-A |
+| Diseño A | Packaging & Identity · Logistics · … |
+| Diseño B | Unit Assembly · Last-Mile Logistics · … |
+| ¿Mismo concepto? | Sí |
+| ¿Bloquea RC? | No |
+
+---
+
+## IF-002 — Checks como contexto vs servicio
+
+| Campo | Valor |
+|-------|-------|
+| Código | IF-A |
+| Diseño A | Domain Service OperationalCheckEvaluator |
+| Diseño B | Bounded Context Transition Governance + Evaluator |
+| ¿Mismo concepto? | Sí — INV-043 / Checks 2.0 |
+| ¿Bloquea RC? | No |
+
+---
+
+## IF-003 — Naming servicios
+
+| Campo | Valor |
+|-------|-------|
+| Código | IF-A |
+| Diseño A | SettlementService · AmendImpactService |
+| Diseño B | SettlementPolicyService · AmendImpactPropagator |
+| ¿Mismo concepto? | Sí |
+| ¿Bloquea RC? | No |
 
 ---
 
