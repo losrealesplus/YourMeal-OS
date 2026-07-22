@@ -1,54 +1,86 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { AdminHeader, KpiCard, PanelCard, SectionTitle } from "@/components/admin";
+import { MOCK_ADMIN_KPIS, MOCK_TIMELINE } from "@/lib/mock-admin";
 
+/**
+ * ADMIN · Dashboard
+ * Objetivo operacional: Vista panorámica de la cocina para el turno actual
+ * Capability:            operations.overview
+ * Core Object:           Tenant + Order + ProductionRun
+ * Fuente:                Operational Model — Command Center
+ * PRODUCT_RULES.md
+ */
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminDashboard,
+  head: () => ({
+    meta: [
+      { title: "YourMeal OS — Panel operacional" },
+      { name: "description", content: "Vista panorámica de la cocina para el turno actual." },
+    ],
+  }),
 });
 
 function AdminDashboard() {
   const { t } = useTranslation("admin");
-  const cards = [
-    ["tomorrowOrders", "0"],
-    ["kitchenCapacity", "0%"],
-    ["inventoryAlerts", "0"],
-    ["purchasingPending", "0"],
-  ] as const;
 
   return (
-    <div className="grid gap-4">
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        {cards.map(([k, v]) => (
-          <div
-            key={k}
-            className="bg-card border border-border ring-1 ring-black/[0.03] rounded-2xl p-5"
-          >
-            <p className="meta-label">{t(k)}</p>
-            <p className="text-3xl font-extrabold tracking-tight mt-3">{v}</p>
-            <p className="text-[10px] font-mono text-muted-foreground mt-1 uppercase tracking-widest">
-              awaiting data
-            </p>
-          </div>
+    <div className="animate-fade-in">
+      <SectionTitle
+        overline={t("operationalOverview")}
+        title={t("dashboard")}
+        subtitle={t("dashboardSubtitle", { defaultValue: "Estado en vivo de pedidos, cocina, inventario y compras." })}
+      />
+      <AdminHeader
+        goal={t("dashboardGoal", { defaultValue: "Dar visibilidad completa del turno operativo" })}
+        capability="operations.overview"
+        object="Tenant · Order · ProductionRun"
+      />
+
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4 mb-4">
+        {MOCK_ADMIN_KPIS.map((k) => (
+          <KpiCard
+            key={k.key}
+            label={t(k.key)}
+            value={k.value}
+            delta={k.delta}
+            trend={k.trend}
+            hint={t("vsYesterday", { defaultValue: "vs yesterday" })}
+          />
         ))}
       </div>
 
       <div className="grid gap-3 xl:grid-cols-2">
-        <div className="bg-card border border-border ring-1 ring-black/[0.03] rounded-2xl p-5">
-          <div className="flex items-center justify-between">
-            <p className="meta-label">{t("liveProduction")}</p>
-            <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
-              live
-            </span>
-          </div>
-          <div className="mt-6 h-40 rounded-xl bg-secondary/60 border border-dashed border-border grid place-items-center">
-            <p className="text-xs text-muted-foreground">Awaiting production data</p>
-          </div>
-        </div>
-        <div className="bg-card border border-border ring-1 ring-black/[0.03] rounded-2xl p-5">
-          <p className="meta-label">{t("inventoryAlerts")}</p>
-          <div className="mt-6 h-40 rounded-xl bg-secondary/60 border border-dashed border-border grid place-items-center">
-            <p className="text-xs text-muted-foreground">No alerts</p>
-          </div>
-        </div>
+        <PanelCard title={t("liveProduction")} action={<span className="text-[10px] font-mono uppercase tracking-widest text-primary">● Live</span>}>
+          <ol className="space-y-2">
+            {MOCK_TIMELINE.map((item) => (
+              <li key={item.hour} className="flex items-center gap-4 py-2">
+                <span className="font-mono text-[11px] font-bold w-14 shrink-0 text-muted-foreground">{item.hour}</span>
+                <span className="h-6 w-px bg-border" aria-hidden />
+                <span className="flex-1 text-sm font-medium truncate">{item.label}</span>
+                <span className="font-mono text-xs font-bold tabular-nums">{item.qty}</span>
+              </li>
+            ))}
+          </ol>
+        </PanelCard>
+
+        <PanelCard title={t("inventoryAlerts")}>
+          <ul className="space-y-3">
+            {[
+              { name: "Aguacate", need: "12 kg", tone: "warn" as const },
+              { name: "Quinoa",   need: "6 kg",  tone: "warn" as const },
+              { name: "Salmón",   need: "8 kg",  tone: "danger" as const },
+            ].map((a) => (
+              <li key={a.name} className="flex items-center justify-between py-2 border-b border-border/60 last:border-0">
+                <div className="flex items-center gap-3">
+                  <span className={a.tone === "danger" ? "size-2 rounded-full bg-destructive" : "size-2 rounded-full bg-[oklch(0.68_0.16_75)]"} />
+                  <span className="font-medium text-sm">{a.name}</span>
+                </div>
+                <span className="font-mono text-xs font-bold text-muted-foreground">{a.need}</span>
+              </li>
+            ))}
+          </ul>
+        </PanelCard>
       </div>
     </div>
   );
