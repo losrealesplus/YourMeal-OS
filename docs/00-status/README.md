@@ -42,13 +42,17 @@ FASE C Product Eng.  🔓 Carril B parcial · 🔒 G-01 pleno / Fase D
 
 ---
 
-## Arranque Carril B (recomendado)
+## Arranque Carril B
+
+```text
+OM → IA → Lovable → UX iter · Código
+```
 
 1. [Product Information Architecture](../15-product/PRODUCT_INFORMATION_ARCHITECTURE.md)  
-2. [Sprint 2.1 Product Foundation](../15-product/etapa-2/SPRINT_2_1_PRODUCT_FOUNDATION.md)  
-3. [Knowledge Traceability](../15-product/etapa-2/knowledge-traceability.md)
+2. [21 Product Materialization](../21-product-materialization/README.md) (matriz · Lovable Brief)  
+3. [Sprint 2.1](../15-product/etapa-2/SPRINT_2_1_PRODUCT_FOUNDATION.md)
 
-No empezar por «pantalla bonita» ni por inventar reglas.
+**Lovable** principal · **Figma** apoyo. No improvisar pantallas.
 
 ---
 

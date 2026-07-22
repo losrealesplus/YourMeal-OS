@@ -62,10 +62,17 @@ Dish Library / Module 01 (ya validado) = excepción histórica.
 
 ## Primer movimiento recomendado
 
-No abrir Cursor primero. Abrir **arquitectura de información**.
+```text
+Operational Model → Information Architecture → Lovable → Iteración UX → Código
+```
 
 1. [Product Information Architecture](../15-product/PRODUCT_INFORMATION_ARCHITECTURE.md)  
-2. [Sprint 2.1 — Product Foundation](../15-product/etapa-2/SPRINT_2_1_PRODUCT_FOUNDATION.md)
+2. [Matriz / Lovable Brief](../21-product-materialization/README.md)  
+3. [Sprint 2.1](../15-product/etapa-2/SPRINT_2_1_PRODUCT_FOUNDATION.md)  
+
+**Lovable** = herramienta principal de UI.  
+**Figma** = apoyo puntual.  
+No empezar pidiendo «un dashboard bonito» sin Actor → Capacidades → Pantallas.
 
 ---
 

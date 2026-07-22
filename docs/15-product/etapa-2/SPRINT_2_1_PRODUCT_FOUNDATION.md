@@ -1,12 +1,23 @@
 # Sprint 2.1 — Product Foundation
 
-**Carril B · Fase A (y preparación de trazabilidad)**  
+**Carril B · Fase A**  
 **Objetivo:**
 
-> **Transformar el Operational Model Table-Validated en una experiencia de producto coherente.**
+> Transformar el Operational Model Table-Validated en una experiencia de producto coherente — vía **IA → Lovable**, sin inventar reglas.
 
-Sin escribir reglas de negocio nuevas.  
-Sin inventar conocimiento.
+---
+
+## Flujo del sprint
+
+```text
+OM → Information Architecture → Matriz pantalla↔conocimiento
+        ↓
+Lovable (nav · flujos · pantallas base · DS inicial)
+        ↓
+Iteración UX · sync repo
+```
+
+Figma solo si hace falta ([03](../../21-product-materialization/03-figma-support.md)).
 
 ---
 
@@ -14,55 +25,42 @@ Sin inventar conocimiento.
 
 | # | Entregable | Estado |
 |---|------------|--------|
-| 1 | Mapa de actores (Cliente · Producción · Administración · Reparto) | ⏳ |
-| 2 | [Product Information Architecture v1.0](../PRODUCT_INFORMATION_ARCHITECTURE.md) | ⏳ borrador |
-| 3 | Mapa completo de navegación | ⏳ |
-| 4 | Wireframes de baja fidelidad | ⏳ |
-| 5 | Flujos principales (Happy Paths) por actor | ⏳ |
-| 6 | Primer borrador Design System | ⏳ |
-| 7 | Matriz **pantalla → capability → objeto operacional** | ⏳ |
-
-Al cerrar el sprint, la implementación técnica deja de ser creatividad y pasa a ser **traducción** del conocimiento certificado a UI y código.
+| 1 | Mapa Actor → Objetivos → Capacidades → Pantallas | ⏳ |
+| 2 | [Product Information Architecture](../PRODUCT_INFORMATION_ARCHITECTURE.md) | ⏳ borrador |
+| 3 | [Matriz pantalla↔conocimiento](../../21-product-materialization/01-screen-knowledge-matrix.md) | ⏳ |
+| 4 | Navegación + Happy Paths en **Lovable** | ⏳ |
+| 5 | Pantallas base (solo filas de la matriz) | ⏳ |
+| 6 | Design System inicial en Lovable / repo | ⏳ |
+| 7 | Prompt log alineado a [Lovable Brief](../../21-product-materialization/02-lovable-brief.md) | ⏳ |
 
 ---
 
-## Preguntas guía (IA / actores)
+## Prompt mínimo (recordatorio)
 
-Para cada actor:
-
-1. ¿Qué objetivos tiene?  
-2. ¿Qué necesita ver primero?  
-3. ¿Qué decisiones toma?  
-4. ¿Qué información necesita para tomarlas?  
-5. ¿Qué Checks / objetos del OM sustentan esas decisiones?
+> Genera la navegación del [Actor] basada en estas capacidades operacionales.  
+> **No inventes reglas de negocio.** Usa únicamente capacidades/objetos del Operational Model / matriz.
 
 ---
 
-## Fuera de alcance (Sprint 2.1)
+## Fuera de alcance
 
 - Motores Order / Plan / Batch / Route / Production  
-- Heurísticas o automatizaciones dependientes de FOV (Fase D)  
-- Inventar pantallas «porque quedan bien» sin anclar a capability/objeto  
-- Sustituir FOV (Carril A)
+- Fase D (heurísticas FOV)  
+- Pantallas sin fila en matriz  
+- Sustituir Carril A (FOV)
 
 ---
 
 ## Criterio de done
 
-- [ ] IA responde las 5 preguntas por actor  
-- [ ] Navegación cubre Happy Paths sin inventar objetos  
-- [ ] Matriz de trazabilidad sin huecos en flujos principales  
-- [ ] Design System v0 (tokens + 1 set de componentes base)  
-- [ ] Ningún entregable introduce lógica no citada en el OM  
-
----
-
-## Siguiente tras 2.1
-
-Wireframes media fidelidad · arquitectura técnica (Fase B) · materialización selectiva (Fase C) con [Knowledge Traceability](./knowledge-traceability.md).
+- [ ] IA + matriz completas para flujos principales  
+- [ ] Lovable refleja solo pantallas autorizadas  
+- [ ] Ninguna regla de negocio inventada en UI  
+- [ ] DS v0 usable  
+- [ ] Sync al repo documentado  
 
 ---
 
 ## Relacionado
 
-- [etapa-2](./README.md) · [Dual Track](../../00-status/DUAL_TRACK_ANTECAMARA.md) · [Capability Roadmap](../CAPABILITY_ROADMAP.md)
+- [21 Product Materialization](../../21-product-materialization/README.md) · [etapa-2](./README.md) · [Dual Track](../../00-status/DUAL_TRACK_ANTECAMARA.md)
