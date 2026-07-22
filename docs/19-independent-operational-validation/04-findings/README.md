@@ -8,7 +8,7 @@ Ninguno es un Model Change. Ninguno edita `17` por sí solo.
 | IOV-001 | ¿Se entiende? | Documentation Findings | **DF-xxx** |
 | IOV-001 | ¿Interrupción total? | Impossible Findings | **IFD-xxx** |
 | IOV-002 | ¿Resiste ataques? | Structural Findings | **SF-xxx** |
-| IOV-003 | ¿Se implementa igual? | Interpretation Findings | **IF-xxx** |
+| IOV-003 | ¿Equivalencia conceptual (determinismo)? | Interpretation Findings | **IF-A / IF-R / IF-D / IF-L** |
 
 ---
 

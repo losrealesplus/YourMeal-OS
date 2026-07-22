@@ -36,7 +36,7 @@ Alimenta [Gate G-01](../20-evidence-framework/07-gate-g01-operational-readiness.
 |-------|--------|----------|-----------|
 | [IOV-001](./01-comprehension-validation.md) | Comprehension Validation | ¿Se entiende? | DF (+ IFD) |
 | [IOV-002](./02-adversarial-validation.md) | Adversarial Validation | ¿Resiste ataques? | SF |
-| [IOV-003](./03-independent-implementation.md) | Independent Implementation | ¿Se implementa igual? | IF |
+| [IOV-003](./03-independent-implementation.md) | Independent Implementation | ¿Equivalencia conceptual? | IF-A/R/D/L |
 
 Arquitectura estable. Lo que se fortalece antes de ejecutar es el **protocolo**.
 
@@ -84,12 +84,12 @@ Detalle: [04 Findings](./04-findings/README.md) · [05 Experimental Protocol](./
 
 | Elemento | Estado |
 |----------|--------|
-| Prerrequisito modelo | ✅ Beta (mesa) |
+| Prerrequisito modelo | ✅ Beta (mesa) → **RC Knowledge Certified** |
 | Protocolo experimental | 🟢 Definido |
-| [KCM-001](./kcm/KCM-001-iov001-pilot.md) | 🔒 Congelado `357833e` |
-| Piloto IA / IVR-001 | ✅ Cerrado |
-| IOV-002 | ⏳ Siguiente |
-| FOV | 🔒 Después de campaña IOV |
+| [KCM-001](./kcm/KCM-001-iov001-pilot.md) · [002](./kcm/KCM-002-iov002-adversarial.md) · [003](./kcm/KCM-003-iov003-implementation.md) | 🔒 |
+| IVR-001 · 002 · 003 | ✅ Cerrados |
+| Operational Model RC | 🟢 [Knowledge Certified](../00-status/02-operational-model-rc.md) |
+| FOV | ⏳ Siguiente juez (Known Limitations) |
 
 ---
 

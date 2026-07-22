@@ -94,15 +94,15 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-Etapa 1 — Antesala · Carril A (IOV→G-01)     🚧
-Etapa 2 — Producto                           🔒 G-01
-Carril B — UX / DS / arch / infra (sin engines)  ✅ permitido
+Etapa 1 — RC Knowledge Certified 🟢 · FOV…G-01 ⏳
+Etapa 2 — Producto 🔒 G-01
+Carril B — UX/DS/arch/infra sin engines ✅
 ```
 
 **YourMeal OS** = instrumento FOPEBA.  
-**Ahora (A):** IOV-003 (IVR-002 ✅). Luego RC. FOV después.
+**Modelo:** Operational Model RC (Knowledge Certified). **Siguiente:** FOV.
 
-Índices: [Estado](./docs/00-status/README.md) · [Dual track](./docs/00-status/DUAL_TRACK_ANTECAMARA.md) · [FOPEBA](./docs/18-operational-validation/00-operational-product-engineering.md)
+Índices: [Estado](./docs/00-status/README.md) · [RC](./docs/00-status/02-operational-model-rc.md) · [Known Limitations](./docs/00-status/03-known-limitations-rc.md)
 
 ### Principio de valor (Capabilities)
 

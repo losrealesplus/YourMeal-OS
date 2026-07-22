@@ -1,46 +1,63 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-22 · **Certificación · IVR-002 ✅**  
-**Mentalidad:** certificar (no construir más modelo)
+**Última actualización:** 2026-07-22 · **Operational Model RC (Knowledge Certified)** 🟢  
+**Mentalidad:** certificar · siguiente juez = FOV
+
+```text
+Operational Model Release Candidate
+(Knowledge Certified)
+```
 
 ---
 
 ## Campaña de certificación
 
-| Paso | Estado |
-|------|--------|
-| IOV-001 | ✅ |
-| IOV-002 | ✅ [IVR-002](../19-independent-operational-validation/ivr/IVR-002-iov002-adversarial.md) · Core forzado **0** |
-| IOV-003 | ⏳ **Siguiente** |
-| Operational Model RC | ⏳ |
-| FOV → KU → EC → G-01 | 🔒 |
+| Fase | Estado | Confianza |
+|------|--------|----------:|
+| Operational Validation | ✅ | Muy alto |
+| IOV-001 | ✅ | Alto |
+| IOV-002 | ✅ | Muy alto |
+| IOV-003 | ✅ | Alto |
+| **Operational Model RC** | ✅ | Knowledge Certified |
+| FOV | ⏳ | — |
+| Knowledge Update | ⏳ | — |
+| Economic Confirmation | ⏳ | — |
+| Gate G-01 | 🔒 | — |
 
-[01-certification-campaign](./01-certification-campaign.md) · [Dual track](./DUAL_TRACK_ANTECAMARA.md)
+Acta: [02-operational-model-rc](./02-operational-model-rc.md) · Límites: [03-known-limitations-rc](./03-known-limitations-rc.md)
 
 ---
 
-## Lectura IVR-002
+## Lectura de evidencias IOV
 
-6 ataques (hospital inbound · dual Plan · canteen · dual Account · diet · cook-chill).  
-Todos clasificados · 0 Contradicted · 0 Core nuevo.  
-Extended/Clarified = docs hacia RC, no espina nueva.
+| Nivel | Afirmación distinta | Evidencia |
+|-------|---------------------|-----------|
+| **IOV-001** | El conocimiento es **transferible** | IVR-001 |
+| **IOV-002** | El conocimiento es **estructuralmente resistente** | IVR-002 · 6 SF · 0 Core forzado |
+| **IOV-003** | El conocimiento es **interpretable de forma determinista** | IVR-003 · equivalencia conceptual · IF-A only |
+
+En IOV-002 lo relevante no fue el «0 Core forzado», sino **por qué**: los seis ataques recombinaron capacidades, reglas, supporting y configuración — la frontera Core / variabilidad operacional aguantó.
+
+En IOV-003: dos diseños independientes → equivalencia conceptual.  
+IF solo IF-A (nombres). 0 IF-R/D/L bloqueantes.
 
 ---
 
 ## Carril B
 
-UX / DS / arch / infra sin engines — permitido.
+UX / DS / arch / infra **sin** engines de espina — sigue permitido.
 
 ---
 
 ## Próximo
 
-1. **IOV-003** Independent Implementation  
-2. Congelar **Operational Model RC**  
-3. Entonces FOV…
+1. **FOV** EatClean (observar · no intervenir) — objetivos = Known Limitations  
+2. Knowledge Update (6 preguntas)  
+3. Economic Confirmation → **Gate G-01**
 
 | Índice | Ruta |
 |--------|------|
-| IVR-002 | [ivr](../19-independent-operational-validation/ivr/IVR-002-iov002-adversarial.md) |
-| SF | [findings](../19-independent-operational-validation/04-findings/structural-findings.md) |
 | RC | [02](./02-operational-model-rc.md) |
+| Known Limitations | [03](./03-known-limitations-rc.md) |
+| IVR-003 | [ivr](../19-independent-operational-validation/ivr/IVR-003-iov003-independent-implementation.md) |
+| Certificación | [01](./01-certification-campaign.md) |

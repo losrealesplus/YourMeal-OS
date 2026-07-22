@@ -32,11 +32,11 @@ Sí:
 | Operational Validation | ✅ | Muy alto |
 | IOV-001 transferible | ✅ | Alto |
 | IOV-002 resistente | ✅ | Muy alto |
-| **IOV-003 interpretable** | ⏳ | Pendiente |
-| Operational Model RC | ⏳ | Bloqueado por IOV-003 |
+| **IOV-003 interpretable** | ✅ | Alto — [IVR-003](./ivr/IVR-003-iov003-independent-implementation.md) |
+| Operational Model RC | ✅ | Knowledge Certified |
 
-Tras IOV-002, el riesgo principal ya no es el dominio.  
-Es la **interpretabilidad** — lo que mide este paso.
+Tras IOV-002, el riesgo principal ya no era el dominio.  
+Era la **interpretabilidad** — lo que midió este paso.
 
 ---
 
@@ -131,7 +131,7 @@ Antes de FOV: [Known Limitations RC](../00-status/03-known-limitations-rc.md).
 
 ## Estado
 
-⏳ / ✅ según [IVR](./ivr/README.md).
+✅ **APROBADO** — [IVR-003](./ivr/IVR-003-iov003-independent-implementation.md) · IF solo IF-A · RC declarado.
 
 ---
 

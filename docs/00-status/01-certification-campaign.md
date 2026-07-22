@@ -44,7 +44,7 @@ Diremos: **«Vamos a implementar conocimiento operacional certificado.»**
 | # | Paso | Pregunta | Doc |
 |---|------|----------|-----|
 | 1 | [IOV-002](../19-independent-operational-validation/02-adversarial-validation.md) | ¿Un tercero puede obligarnos a cambiar la estructura? | IVR-002 |
-| 2 | [IOV-003](../19-independent-operational-validation/03-independent-implementation.md) | ¿Dos personas implementan el mismo modelo? | IVR-003 |
+| 2 | [IOV-003](../19-independent-operational-validation/03-independent-implementation.md) | ¿El modelo restringe el diseño hacia equivalencia conceptual? | IVR-003 |
 | 3 | [Operational Model RC](./02-operational-model-rc.md) | ¿Congelamos antes de campo? | tag / KCM-RC |
 | 4 | [FOV](../20-evidence-framework/04-field-operational-validation.md) | ¿La realidad confirma el conocimiento? | FVR |
 | 5 | [Knowledge Update](../20-evidence-framework/05-knowledge-update.md) | ¿Qué cambia el conocimiento (con disciplina)? | KUR |
@@ -60,8 +60,8 @@ Diremos: **«Vamos a implementar conocimiento operacional certificado.»**
 | Operational Validation | ✅ | Muy alto |
 | IOV-001 (Comprehension) | ✅ | Alto |
 | IOV-002 (Adversarial) | ✅ | Muy alto |
-| IOV-003 (Independent Implementation) | ⏳ | Pendiente |
-| Operational Model RC (Knowledge Certified) | ⏳ | Bloqueado por IOV-003 |
+| IOV-003 (Independent Implementation) | ✅ | Alto |
+| **Operational Model RC (Knowledge Certified)** | ✅ | — |
 | FOV | ⏳ | |
 | Knowledge Update | ⏳ | |
 | Economic Confirmation | ⏳ | |

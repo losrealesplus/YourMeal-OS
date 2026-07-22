@@ -4,8 +4,9 @@
 El protocolo debe estar congelado antes de la primera sesión.
 
 Hasta ahora toda la evidencia ha sido **conceptual**.  
-IOV valida transferencia; FOV valida supervivencia en la realidad.  
-**No abrir diseño/expansión de FOV** hasta cerrar la campaña IOV.
+IOV validó transferencia · resistencia · interpretabilidad.  
+FOV valida supervivencia en la realidad.  
+**FOV abierto** con objetivos = [Known Limitations RC](../00-status/03-known-limitations-rc.md).
 
 ---
 
@@ -19,8 +20,10 @@ Operational Dynamics               ███████████████
 Evidence Framework                 ████████████████████████████ 100%
 IOV Protocol                       ████████████████████████████ 100%
 IOV-001 Piloto (IVR-001)           ████████████████████████████ 100%
-IOV-002 / 003                      ░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0%
-Field Validation (FOV)             ░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0%  ← no empezar aún
+IOV-002 Adversarial (IVR-002)      ████████████████████████████ 100%
+IOV-003 Independent (IVR-003)      ████████████████████████████ 100%
+Operational Model RC               ████████████████████████████ 100%  Knowledge Certified
+Field Validation (FOV)             ░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0%  ← siguiente juez
 ```
 
 ---

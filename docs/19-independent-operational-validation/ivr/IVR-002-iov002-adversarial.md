@@ -61,9 +61,9 @@ El atacante encontró la «parte blanda» (Batch→Packaging lineal, INV-015, di
 
 | Siguiente | Acción |
 |-----------|--------|
-| Ahora | **IOV-003** Independent Implementation |
-| Docs opcionales pre-RC | Notas servery · funding Account · receive-and-portion (SF-001/003/004) |
-| FOV | Sigue **cerrado** hasta IOV-003 + RC |
+| Cerrado | IOV-002 → IOV-003 ✅ · RC Knowledge Certified |
+| Ahora | **FOV** (EatClean) — objetivos = Known Limitations |
+| Docs opcionales | Notas servery · funding Account · receive-and-portion (SF-001/003/004) → pre-FOV / Extended |
 
 ---
 

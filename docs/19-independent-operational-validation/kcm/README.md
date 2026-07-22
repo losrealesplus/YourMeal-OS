@@ -67,6 +67,7 @@ Sin KCM, el experimento no es comparable dentro de seis meses.
 |----|--------|--------|--------|
 | [KCM-001](./KCM-001-iov001-pilot.md) | IOV-001 piloto IA | `357833e` | 🔒 |
 | [KCM-002](./KCM-002-iov002-adversarial.md) | IOV-002 adversarial | `3c4adb0` | 🔒 |
+| [KCM-003](./KCM-003-iov003-implementation.md) | IOV-003 Independent Implementation | `d9f4252` | 🔒 |
 
 ---
 
