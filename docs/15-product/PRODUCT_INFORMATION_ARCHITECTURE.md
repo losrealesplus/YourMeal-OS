@@ -8,15 +8,13 @@
 
 ## Propósito
 
-Transformar el Operational Model en una experiencia coherente:
+```text
+Actor → Objetivos → Capacidades → Pantallas → Componentes
+```
 
-- ¿Qué actores existen?  
-- ¿Qué objetivos tiene cada uno?  
-- ¿Qué necesita ver primero?  
-- ¿Qué decisiones toma?  
-- ¿Qué información necesita?
+Luego materializar en **Lovable** (no Figma-first): [21-product-materialization](../21-product-materialization/README.md).
 
-Solo después: wireframes y pantallas.
+Transformar el Operational Model en una experiencia coherente **sin inventar** objetos ni reglas.
 
 ---
 
@@ -70,13 +68,13 @@ Rellenar en Sprint 2.1 con citas a `docs/17` (objetos · lifecycles · checks).
 
 ---
 
-## Matriz de trazabilidad (pantalla → capability → objeto)
+## Matriz de trazabilidad
+
+Canónica en [01-screen-knowledge-matrix](../21-product-materialization/01-screen-knowledge-matrix.md).
 
 | Pantalla / flujo | Capability | Objeto / Lifecycle OM | Evidence |
 |------------------|------------|------------------------|----------|
-| *(Sprint 2.1)* | | | Table-Validated |
-
-Ver también [Knowledge Traceability](./etapa-2/knowledge-traceability.md).
+| *(ver matriz 21)* | | | Table-Validated |
 
 ---
 

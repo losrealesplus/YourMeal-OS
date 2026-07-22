@@ -104,9 +104,11 @@ Si no hay cita → no se implementa (pasa por evidencia).
 | Carril | Entrada |
 |--------|---------|
 | A campo | [Mission Brief](./docs/00-status/FOV_MISSION_BRIEF.md) |
-| B producto | [Dual Track](./docs/00-status/DUAL_TRACK_ANTECAMARA.md) · [Sprint 2.1](./docs/15-product/etapa-2/SPRINT_2_1_PRODUCT_FOUNDATION.md) · [IA](./docs/15-product/PRODUCT_INFORMATION_ARCHITECTURE.md) |
+| B producto | [21 Materialization](./docs/21-product-materialization/README.md) · [Sprint 2.1](./docs/15-product/etapa-2/SPRINT_2_1_PRODUCT_FOUNDATION.md) · [IA](./docs/15-product/PRODUCT_INFORMATION_ARCHITECTURE.md) |
 
-Índices: [Estado](./docs/00-status/README.md) · [Freeze](./docs/00-status/04-methodology-frozen.md) · [Traceability](./docs/15-product/etapa-2/knowledge-traceability.md)
+Flujo UI: **OM → IA → Lovable → iteración → código** (Figma = apoyo).
+
+Índices: [Estado](./docs/00-status/README.md) · [Dual Track](./docs/00-status/DUAL_TRACK_ANTECAMARA.md) · [Traceability](./docs/15-product/etapa-2/knowledge-traceability.md)
 
 ### Principio de valor (Capabilities)
 

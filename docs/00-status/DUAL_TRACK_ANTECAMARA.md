@@ -42,7 +42,7 @@ Detalle: [etapa-2/](../15-product/etapa-2/README.md).
 
 | Fase | Nombre | Libertad |
 |------|--------|----------|
-| **A** | Product Experience | 100% libre (UX · nav · wireframes · DS · dashboards) |
+| **A** | Product Experience | Libre — **Lovable** principal · Figma apoyo |
 | **B** | Arquitectura Técnica | Libre (repo · módulos · auth · RBAC · CI · DI…) |
 | **C** | Materialización del Modelo | Permitida **con trazabilidad** al OM |
 | **D** | Dependiente de FOV | **Bloqueada** hasta evidencia de campo |

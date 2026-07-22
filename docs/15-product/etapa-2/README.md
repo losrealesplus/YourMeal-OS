@@ -1,78 +1,66 @@
 # Etapa 2 / Carril B — YourMeal OS
 
 **Estado:** 🟢 **ABIERTO** (en paralelo a FOV · Carril A)  
-**Premisa:** el modelo está **Table-Validated**. El código materializa; no inventa.
+**Premisa:** el modelo está **Table-Validated**. El código / UI materializan; no inventan.
 
-Regla dual track: [DUAL_TRACK_ANTECAMARA](../../00-status/DUAL_TRACK_ANTECAMARA.md).
+Regla dual track: [DUAL_TRACK_ANTECAMARA](../../00-status/DUAL_TRACK_ANTECAMARA.md).  
+Materialización: [docs/21-product-materialization](../../21-product-materialization/README.md).
 
 ---
 
 ## Regla de la Etapa 2
 
-> **¿En qué parte del Operational Model certificado (Table-Validated) está basada esta decisión?**
+> **¿En qué parte del Operational Model Table-Validated está basada esta decisión?**
 
-Si no hay respuesta documental → no se implementa esa lógica.  
+Sin respuesta documental → no se implementa.  
 Pasa por evidencia (FOV → FER → KU).
+
+---
+
+## Flujo (no tradicional)
+
+```text
+Operational Model
+        ↓
+Information Architecture
+        ↓
+Lovable          ← herramienta principal de UI
+        ↓
+Iteración UX
+        ↓
+Código (Fase C + Knowledge Traceability)
+```
+
+**Figma** = apoyo (interacción compleja · componente · usabilidad · patrón DS).  
+No dibujar todas las pantallas en Figma.
+
+Separación de responsabilidades:
+
+> **FOPEBA certifica el conocimiento; Lovable materializa ese conocimiento en una experiencia de producto.**
 
 ---
 
 ## Cuatro fases
 
-### Fase A — Product Experience (libre)
-
-- Customer / Employee / Admin / Delivery Journey  
-- Navegación completa · jerarquía · menús · accesos · breadcrumbs  
-- Wireframes (baja → media fidelidad) · validación de flujos  
-- Dashboards (cliente · admin · producción · reparto)  
-- Design System (componentes · color · tipo · espacio · estados · iconos · responsive · a11y)
-
-No altera el Operational Model.
-
-### Fase B — Arquitectura Técnica (libre)
-
-Monorepo · módulos · convenciones · servicios · DI · auth · RBAC · observabilidad · eventos · CI/CD · logging.
-
-Infraestructura, no conocimiento operacional nuevo.
-
-### Fase C — Materialización del Modelo (permitida + trazabilidad)
-
-Sí a lógica de dominio **si** cada pieza importante apunta al OM:
-
-```text
-DishService → Core Object Dish → docs/17/… 
-ConfirmOrderUseCase → Lifecycle Confirm → Operational Dynamics / OD-…
-```
-
-Ver [Knowledge Traceability](./knowledge-traceability.md).
-
-### Fase D — Bloqueada hasta FOV
-
-Heurísticas · automatizaciones por excepciones reales · optimización por comportamiento observado · reglas aprendidas · decisiones «inteligentes» dependientes de campo.
+| Fase | Nombre | Notas |
+|------|--------|-------|
+| **A** | Product Experience | Journeys · nav · pantallas base vía **Lovable** · DS |
+| **B** | Arquitectura Técnica | Repo · auth · RBAC · CI · DI… |
+| **C** | Materialización del Modelo | Lógica con [Knowledge Traceability](./knowledge-traceability.md) |
+| **D** | Dependiente de FOV | 🔒 heurísticas · automatizaciones de campo |
 
 ---
 
 ## Orden de arranque
 
-```text
-Product Information Architecture
-        ↓
-Sprint 2.1 Product Foundation
-        ↓
-Wireframes / DS / arquitectura técnica
-        ↓
-Materialización (Fase C) con trazabilidad
-```
-
-| Doc | Rol |
-|-----|-----|
-| [PRODUCT_INFORMATION_ARCHITECTURE](../PRODUCT_INFORMATION_ARCHITECTURE.md) | Primer entregable |
-| [SPRINT_2_1](./SPRINT_2_1_PRODUCT_FOUNDATION.md) | Primer sprint |
-| [Knowledge Traceability](./knowledge-traceability.md) | Seña de identidad código↔conocimiento |
+1. [Product Information Architecture](../PRODUCT_INFORMATION_ARCHITECTURE.md) — Actor → Objetivos → Capacidades → Pantallas  
+2. [Matriz pantalla↔conocimiento](../../21-product-materialization/01-screen-knowledge-matrix.md)  
+3. [Sprint 2.1](./SPRINT_2_1_PRODUCT_FOUNDATION.md) + [Lovable Brief](../../21-product-materialization/02-lovable-brief.md)  
+4. Iterar en Lovable · sync repo  
+5. Fase C selectiva con trazabilidad  
 
 ---
 
 ## Relación con Carril A
 
-Carril B **no** acelera G-01.  
-FOV sigue siendo el juez del conocimiento.  
-Tras Field-Validated, Fase D y motores de espina se reevalúan.
+Carril B **no** acelera G-01. FOV sigue siendo el juez del conocimiento.

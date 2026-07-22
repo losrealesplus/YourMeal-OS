@@ -85,13 +85,12 @@ La arquitectura de YourMeal OS se considera **estable**.
 - **Operational Dynamics v0.2:** Lifecycles 2.0 · Supporting Taxonomy · Checks 2.0 (PASS/WARNING/BLOCKED/MANUAL DECISION)
 - Recovery Pattern · Temporal Grammar · Capability Impact integrados en Dynamics 01
 - **Tren MC-001…006 aplicado** a `17` (Amend/Revise/Pause/Hold · Lot · Location · cardinalidad · INV-031)
-- **Carril B ABIERTO:** ❌ no inventar lógica · ✅ materializar OM Table-Validated
-- Etapa 2 en 4 fases: Experience · Tech · Materialización+trazabilidad · FOV-dependent 🔒
-- [Knowledge Traceability](./docs/15-product/etapa-2/knowledge-traceability.md)
-- Primer movimiento: [Product Information Architecture](./docs/15-product/PRODUCT_INFORMATION_ARCHITECTURE.md) · [Sprint 2.1](./docs/15-product/etapa-2/SPRINT_2_1_PRODUCT_FOUNDATION.md)
-- Dual track actualizado: [DUAL_TRACK](./docs/00-status/DUAL_TRACK_ANTECAMARA.md)
-- Carril A (FOV) sigue en paralelo — no sustituible por UX
-- Precisión Table-Validated · Freeze · Decision Artifacts · Knowledge Leakage (hitos previos)
+- **Product Materialization** (`docs/21`): OM → IA → **Lovable** → UX → código; Figma = apoyo
+- Toda pantalla justifica conocimiento: [matriz](./docs/21-product-materialization/01-screen-knowledge-matrix.md)
+- [Lovable Brief](./docs/21-product-materialization/02-lovable-brief.md) — prompts sin inventar reglas
+- Carril B abierto · Sprint 2.1 actualizado Lovable-first
+- ❌ No inventar lógica · ✅ materializar OM Table-Validated
+- Carril A (FOV) en paralelo
 ### Gobierno
 
 - ADR 0011: Diario de Desarrollo + Principio de Intencionalidad
