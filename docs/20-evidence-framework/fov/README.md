@@ -23,10 +23,11 @@ Entrada de fase: [04 FOV](../04-field-operational-validation.md).
 
 | Elemento | Estado |
 |----------|--------|
-| Protocolo | 🟢 Congelado para primera campaña |
+| Protocolo | 🟢 Congelado — **no ampliar** durante campaña |
 | Hipótesis RC | 🟢 Derivadas |
 | Plan EatClean | 🟢 Definido |
-| Ejecución | ⏳ |
+| **Mission Brief (ejecución)** | [FOV_MISSION_BRIEF](../../00-status/FOV_MISSION_BRIEF.md) |
+| Ejecución | ⏳ **proyecto principal** |
 | FER | 🔒 Tras FO suficientes |
 
 ---

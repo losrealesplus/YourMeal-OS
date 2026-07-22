@@ -47,7 +47,17 @@ Decisión: **APPROVED** · **APPROVED WITH CONDITIONS** · **REJECTED** — [g01
 
 ---
 
+## Próximo
+
+**No ampliar FOPEBA.**  
+Ejecutar [FOV Mission Brief](./FOV_MISSION_BRIEF.md) en EatClean.
+
+Cuando G-01 pase: **«Implementar conocimiento operacional certificado.»**
+
+---
+
 ## Relacionado
 
 - [Dual Track](./DUAL_TRACK_ANTECAMARA.md)  
-- [FOPEBA](../18-operational-validation/00-operational-product-engineering.md)
+- [FOPEBA](../18-operational-validation/00-operational-product-engineering.md)  
+- [Estado](./README.md)

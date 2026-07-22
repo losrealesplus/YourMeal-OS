@@ -94,16 +94,15 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-Etapa 1 / FASE B — RC 🟢 · FOV ejecución ⏳ · KU/EC/G-01 sistemas 🟢
-FASE C — Product Engineering 🔒 G-01
-Carril B — UX/DS/arch/infra sin engines ✅
+FASE A ✅ · FASE B metodología ✅ · FOV ejecución ⏳ · FASE C 🔒
+Metodología FOPEBA: CONGELADA durante campaña EatClean
 ```
 
-**YourMeal OS** = instrumento FOPEBA (descubrir · certificar · gobernar conocimiento).  
-**Siguiente ejecución:** [FOV](./docs/20-evidence-framework/fov/README.md).  
-Sistemas: [KU](./docs/20-evidence-framework/ku/README.md) · [EC](./docs/20-evidence-framework/ec/README.md) · [G-01](./docs/20-evidence-framework/g01/README.md).
+**EatClean** = laboratorio · **FOPEBA** = método · **YourMeal OS** = primer producto post–conocimiento certificado.
 
-Índices: [Estado](./docs/00-status/README.md) · [FOPEBA A/B/C](./docs/18-operational-validation/00-operational-product-engineering.md) · [RC](./docs/00-status/02-operational-model-rc.md)
+**Proyecto principal ahora:** observación FOV — [Mission Brief](./docs/00-status/FOV_MISSION_BRIEF.md) (no ampliar el framework).
+
+Índices: [Estado](./docs/00-status/README.md) · [RC](./docs/00-status/02-operational-model-rc.md) · [FOPEBA](./docs/18-operational-validation/00-operational-product-engineering.md)
 
 ### Principio de valor (Capabilities)
 

@@ -85,22 +85,13 @@ La arquitectura de YourMeal OS se considera **estable**.
 - **Operational Dynamics v0.2:** Lifecycles 2.0 · Supporting Taxonomy · Checks 2.0 (PASS/WARNING/BLOCKED/MANUAL DECISION)
 - Recovery Pattern · Temporal Grammar · Capability Impact integrados en Dynamics 01
 - **Tren MC-001…006 aplicado** a `17` (Amend/Revise/Pause/Hold · Lot · Location · cardinalidad · INV-031)
-- **Nivel de confianza: Operational Model RC (Knowledge Certified)** — para prueba; FOV ejecución pendiente
-- **FOPEBA en tres etapas:** FASE A Discovery ✅ · FASE B Certification 🚧 · FASE C Product Engineering 🔒
-- **Independent Operational Validation (IOV)** cerrado
-- **FOV** campaña observacional diseñada (`fov/`: FO-V/E/C/U · FER)
-- **Knowledge Update** sistema completo: KU-01 Policy · KU-02 Workflow · KU-03 KUR (`ku/`)
-- **Economic Confirmation** sistema: Framework · OVI-01…09 · ECR (`ec/`)
-- **Gate G-01** proceso: Package · APPROVED / WITH CONDITIONS / REJECTED · Acta (`g01/`)
-- G-01 **no aprueba código** — aprueba conocimiento suficiente para justificarlo
-- Flujo ejecución: FOV → FER → KU → EC → G-01 → FASE C
-- Orden construcción metodológica aplicado: KU → EC → G-01
-- Known Limitations RC = guía FOV
-- Carril B sin engines permitido
-- Activo metodológico: **cadena de evidencia**
-- Observation EatClean: siguiente = **ejecutar** FOV; sin FASE C hasta G-01
-- Secuencia definitiva en FOUNDATION: Guidelines → Spec → Implementation → Tests → Validation
-- **FOPEBA Evidence Framework** (`docs/20`): KS · ECL · Stability · fov/ · ku/ · ec/ · g01/
+- **Modo:** metodología FOPEBA **congelada** · proyecto principal = FOV EatClean
+- [FOV Mission Brief](./docs/00-status/FOV_MISSION_BRIEF.md) (ejecución · no framework)
+- Narrativa: EatClean = laboratorio · FOPEBA = método · YourMeal OS = primer producto post-certificación
+- Etapa 1: conocimiento operacional certificado + proceso reproducible — no una aplicación
+- FASE A ✅ · FASE B metodología ✅ / ejecución ⏳ · FASE C 🔒
+- Sistemas KU · EC · G-01 listos; pendiente evidencia empírica
+- Mentalidad FOV: auditor — ¿qué evidencia obliga (o no) a cambiar el modelo?
 ### Gobierno
 
 - ADR 0011: Diario de Desarrollo + Principio de Intencionalidad
