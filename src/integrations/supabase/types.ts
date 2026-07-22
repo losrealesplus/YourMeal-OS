@@ -438,8 +438,11 @@ export type Database = {
       dishes: {
         Row: {
           allergens: string[]
+          category_id: string
           cost: number
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           description: string | null
           id: string
           kcal: number | null
@@ -449,14 +452,20 @@ export type Database = {
           prep_instructions: string | null
           prep_minutes: number | null
           price: number
+          recipe_id: string | null
           status: Database["public"]["Enums"]["dish_status"]
+          tags: string[]
           tenant_id: string
+          updated_at: string
           weight_g: number | null
         }
         Insert: {
           allergens?: string[]
+          category_id?: string
           cost?: number
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           id?: string
           kcal?: number | null
@@ -466,14 +475,20 @@ export type Database = {
           prep_instructions?: string | null
           prep_minutes?: number | null
           price?: number
+          recipe_id?: string | null
           status?: Database["public"]["Enums"]["dish_status"]
+          tags?: string[]
           tenant_id: string
+          updated_at?: string
           weight_g?: number | null
         }
         Update: {
           allergens?: string[]
+          category_id?: string
           cost?: number
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           id?: string
           kcal?: number | null
@@ -483,8 +498,11 @@ export type Database = {
           prep_instructions?: string | null
           prep_minutes?: number | null
           price?: number
+          recipe_id?: string | null
           status?: Database["public"]["Enums"]["dish_status"]
+          tags?: string[]
           tenant_id?: string
+          updated_at?: string
           weight_g?: number | null
         }
         Relationships: [
@@ -1277,7 +1295,7 @@ export type Database = {
         | "employee"
         | "customer"
       customer_kind: "individual" | "company_employee"
-      dish_status: "draft" | "active" | "archived"
+      dish_status: "draft" | "active" | "archived" | "inactive"
       invoice_status: "pending" | "paid" | "overdue" | "void"
       order_status:
         | "draft"
@@ -1437,7 +1455,7 @@ export const Constants = {
         "customer",
       ],
       customer_kind: ["individual", "company_employee"],
-      dish_status: ["draft", "active", "archived"],
+      dish_status: ["draft", "active", "archived", "inactive"],
       invoice_status: ["pending", "paid", "overdue", "void"],
       order_status: [
         "draft",
