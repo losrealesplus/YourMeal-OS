@@ -1,31 +1,37 @@
 # Reports — Evidence Framework
 
-| Tipo | Prefijo | Fase |
-|------|---------|------|
-| Field Observation | FO-xxx | FOV |
-| Field Evidence Review | FER-xxx | FOV |
-| Knowledge Candidate | KC-xxx | KU |
-| Knowledge Update Report | KUR-xxx / KUR-null | KU |
-| Economic Confirmation Record | ECR-xxx | EC |
-| Economic Confirmation Report | (campaña) | EC |
-| Open Risks | OR-xxx | G-01 Package |
-| Gate G-01 Acta | G01-yyy | G-01 |
+## Capas
 
-Índices: [fov/](../fov/README.md) · [ku/](../ku/README.md) · [ec/](../ec/README.md) · [g01/](../g01/README.md).
+| Capa | Qué es | Prefijos |
+|------|--------|----------|
+| **Evidence** | Observación / validación | FO · FER · IVR · mediciones OVI |
+| **Decision** | Decisión gobernada | KUR · ECR · G01 · OR aceptados |
+| **Knowledge** | Afirmación del modelo | vive en `docs/17` · Known Limitations |
 
 ---
 
-## Índice
+## Índice de tipos
+
+| Tipo | Prefijo | Capa | Fase |
+|------|---------|------|------|
+| Field Observation | FO-xxx | Evidence | FOV |
+| Field Evidence Review | FER-xxx | Evidence → Decision filter | FOV |
+| Knowledge Candidate | KC-xxx | Decision (propuesta) | KU |
+| Knowledge Update Report | KUR-xxx / null | **Decision** | KU |
+| Economic Confirmation Record/Report | ECR-xxx | **Decision** | EC |
+| Open Risks | OR-xxx | Decision (aceptación) | G-01 |
+| Gate G-01 Acta | G01-yyy | **Decision** | G-01 |
+
+---
+
+## Índice de instancias
 
 | ID | Título | Tipo | Estado |
 |----|--------|------|--------|
-| — | *(vacío hasta ejecución FOV→G-01)* | | |
+| — | *(vacío hasta ejecución)* | | |
 
 ---
 
 ## Relacionado
 
-- [04 FOV](../04-field-operational-validation.md)  
-- [05 KU](../05-knowledge-update.md)  
-- [06 EC](../06-economic-confirmation.md)  
-- [07 G-01](../07-gate-g01-operational-readiness.md)
+- [Evidence Framework](../README.md) · [fov/](../fov/README.md) · [ku/](../ku/README.md) · [ec/](../ec/README.md) · [g01/](../g01/README.md)

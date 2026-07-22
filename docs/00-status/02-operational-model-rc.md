@@ -1,4 +1,4 @@
-# Operational Model Release Candidate (Knowledge Certified)
+# Operational Model Release Candidate
 
 **Fecha:** 2026-07-22  
 **Tag:** `operational-model-rc-v0.1`  
@@ -7,42 +7,51 @@
 
 ---
 
-## Declaración
+## Estado epistemológico
+
+```text
+Knowledge Designed
+        ↓
+Knowledge Table-Validated     ← RC actual
+        ↓
+Knowledge Field-Validated     ← tras FOV … G-01
+```
 
 ```text
 Operational Model Release Candidate
-(Knowledge Certified)
+(Table-Validated · ready for field trial)
 ```
 
-> **Certificado para ser puesto a prueba — no certificado como verdad definitiva.**
+> Certificado **en entorno controlado** para ser puesto a prueba.  
+> **No** es todavía Knowledge Field-Validated ni verdad definitiva.
 
-Esa distinción mantiene el rigor: el siguiente paso no es confirmar lo que ya creemos,  
-sino intentar **refutarlo** en la operación real ([FOV](../20-evidence-framework/fov/README.md)).
-
-No conocemos razones suficientemente fuertes para modificar el Operational Model  
-antes del trabajo de campo, salvo Extended/Clarified documentales ya clasificados.
-
-Ha superado (evidencia de **laboratorio**):
-
-- validación conceptual (VS · Dynamics · tren MC);
-- transferencia del conocimiento (IOV-001);
-- resistencia estructural (IOV-002);
-- interpretación independiente (IOV-003).
-
-RC **no** significa perfecto ni completo para cualquier contexto.  
-Ver límites: [03-known-limitations-rc](./03-known-limitations-rc.md).
+No mezclar: metodología frozen ≠ conocimiento ya validado en campo.
 
 ---
 
-## Congelado
+## Declaración
 
-Ubiquitous Language · Core · Supporting · Dependencies · Lifecycles · Dynamics · Invariants · Checks en modelo · Capability Mapping marco.
+Ha superado (laboratorio):
 
-**No cambia** hasta FOV → **FER** → Knowledge Update (salvo errata tipográfica documentada).
+- validación conceptual (VS · Dynamics · tren MC);
+- transferencia (IOV-001);
+- resistencia estructural (IOV-002);
+- interpretación independiente (IOV-003).
+
+Límites: [03-known-limitations-rc](./03-known-limitations-rc.md).  
+Freeze metodológico: [04-methodology-frozen](./04-methodology-frozen.md).
+
+---
+
+## Congelado (modelo)
+
+Corpus `17` **no cambia** hasta FOV → FER → KU — salvo:
+
+- errata tipográfica documentada;
+- **Emergency** del freeze (inconsistencia interna · seguridad · contradicción lógica · corrupción de evidencia).
 
 ---
 
 ## Estado
 
-🟢 **DECLARADO** · Etapa 1 cambia de naturaleza: ya no es «modelo en desarrollo».  
-Siguiente: campaña observacional FOV (evidencia empírica) · Carril B sin engines permitido.
+🟢 **DECLARADO · Table-Validated** · siguiente: evidencia de campo (FOV).

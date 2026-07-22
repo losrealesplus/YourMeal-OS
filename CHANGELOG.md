@@ -85,14 +85,14 @@ La arquitectura de YourMeal OS se considera **estable**.
 - **Operational Dynamics v0.2:** Lifecycles 2.0 · Supporting Taxonomy · Checks 2.0 (PASS/WARNING/BLOCKED/MANUAL DECISION)
 - Recovery Pattern · Temporal Grammar · Capability Impact integrados en Dynamics 01
 - **Tren MC-001…006 aplicado** a `17` (Amend/Revise/Pause/Hold · Lot · Location · cardinalidad · INV-031)
-- **Hito:** FOPEBA Methodology Frozen (`docs/00-status/04-methodology-frozen.md`)
-- Ciclo activo: Observar → Registrar → Clasificar → Decidir
-- Éxito FOV = evidencia suficiente para decidir sin opiniones (FO-V sin MC también cuenta)
-- Etapa 1 cierra en G-01 Approved; Post-Certification Review → archivo FOPEBA v1.1
-- [FOV Mission Brief](./docs/00-status/FOV_MISSION_BRIEF.md) · sin evolución de framework sin evidencia de campo
-- Narrativa: EatClean laboratorio · FOPEBA método · YourMeal OS primer producto
-- FASE A ✅ · FASE B metodología frozen / ejecución ⏳ · FASE C 🔒
-- Sistemas KU · EC · G-01 listos; pendiente evidencia empírica
+- **Precisión:** Methodology certified · Operational Model **Table-Validated** · waiting for Field Evidence (no «Knowledge Certification complete»)
+- Freeze: mejoras ❌ · Emergency (inconsistencia / safety / lógica / corrupción evidencia) ✅
+- Principio: conocimiento post-freeze solo evoluciona con evidencia observacional suficiente
+- Tres capas de artefactos: Knowledge · Evidence · **Decision** (KUR, ECR, Acta G-01)
+- Indicador FOV: **Knowledge Leakage** (reglas tácitas / conocimiento implícito)
+- G-01 por **criterios/umbrales**, no por voto
+- Hito Methodology Frozen · Mission Brief · Post-Certification Review → v1.1 archivo
+- Etapa 1 cierra en G-01 (= Field-Validated)
 ### Gobierno
 
 - ADR 0011: Diario de Desarrollo + Principio de Intencionalidad

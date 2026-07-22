@@ -9,6 +9,35 @@ El rasgo distintivo: la **cadena de evidencia**.
 
 ---
 
+## Principio post-freeze
+
+> **Una vez congelada la metodología, el conocimiento solo puede evolucionar mediante evidencia observacional suficiente.**
+
+Forma corta: la única forma de avanzar es obteniendo evidencia de campo.  
+Hito: [Methodology Frozen](../00-status/04-methodology-frozen.md).
+
+---
+
+## Tres capas de artefactos
+
+```text
+Knowledge Artifacts     → qué afirmamos saber (modelo, UL, invariants…)
+        ↓
+Evidence Artifacts      → qué observamos / validamos (FO, IVR, VS…)
+        ↓
+Decision Artifacts      → qué decidimos con esa evidencia (KUR, ECR, Acta G-01…)
+```
+
+| Capa | Ejemplos |
+|------|----------|
+| **Knowledge** | Operational Model · Known Limitations · UL |
+| **Evidence** | FO · FER · IVR · VS · OVI mediciones |
+| **Decision** | KUR · ECR · Gate Acta · Open Risks aceptados · Decision Records |
+
+KUR / ECR / Actas **no** son conocimiento ni evidencia: son **decisiones** gobernadas.
+
+---
+
 ## Tres grandes etapas
 
 ```text
@@ -26,7 +55,7 @@ Architecture · Implementation · Verification · Release
 | Fase | Pregunta | YourMeal OS hoy |
 |------|----------|-----------------|
 | **A** | ¿Qué ocurre y qué se decide? | ✅ |
-| **B** | ¿El conocimiento está certificado para justificar producto? | 🚧 RC ✅ · FOV ejecución ⏳ · KU/EC/G-01 sistemas 🟢 |
+| **B** | ¿Table-Validated → Field-Validated? | RC Table-Validated ✅ · FOV ⏳ |
 | **C** | ¿Cómo traducimos ese conocimiento a software? | 🔒 G-01 |
 
 ---

@@ -16,9 +16,13 @@ YourMeal OS es el **instrumento** (experimento controlado) con el que se demuest
 | **FOPEBA** | Método |
 | **YourMeal OS** | Primer producto que implementará conocimiento operacional certificado |
 
-> **Operational Model RC (Knowledge Certified):** certificado para ser puesto a prueba, no como verdad definitiva.  
+> **Operational Model RC (Table-Validated):** certificado en entorno controlado para prueba de campo — no Field-Validated aún.  
 > Dual track: [DUAL_TRACK_ANTECAMARA](../00-status/DUAL_TRACK_ANTECAMARA.md).  
-> Ejecución FOV: [Mission Brief](../00-status/FOV_MISSION_BRIEF.md) — **no ampliar metodología** durante la campaña.
+> Freeze: [04-methodology-frozen](../00-status/04-methodology-frozen.md) · FOV: [Mission Brief](../00-status/FOV_MISSION_BRIEF.md).
+
+Principio post-freeze:
+
+> Una vez congelada la metodología, el conocimiento solo puede evolucionar mediante evidencia observacional suficiente.
 
 ---
 
@@ -39,10 +43,14 @@ Architecture · Implementation · Verification · Release
 | Fase | Estado YourMeal OS |
 |------|-------------------|
 | **A** Knowledge Discovery | ✅ |
-| **B** Knowledge Certification | Metodología ✅ · Ejecución FOV→G-01 ⏳ (~85%) |
+| **B** Knowledge Certification | Metodología frozen ✅ · **Table-Validated** ✅ · Field ⏳ |
 | **C** Product Engineering | 🔒 hasta G-01 |
 
-> La Etapa 1 no produjo una aplicación; produjo un conocimiento operacional certificado y un proceso reproducible para incrementarlo mediante evidencia.
+```text
+Knowledge Designed → Table-Validated → Field-Validated
+```
+
+> La Etapa 1 no produjo una aplicación; produjo un conocimiento operacional **table-validated** y un proceso reproducible para incrementarlo mediante evidencia.
 
 ---
 
@@ -50,8 +58,8 @@ Architecture · Implementation · Verification · Release
 
 | Promesa | Estado |
 |---------|--------|
-| *Si diseñamos primero el conocimiento operacional, podemos construir un modelo estable.* | ✅ Laboratorio → **RC Knowledge Certified** |
-| *Este proceso produce mejores productos.* | ⏳ Requiere FOV ejecución + KU + EC + G-01 |
+| *Si diseñamos primero el conocimiento operacional, podemos construir un modelo estable.* | ✅ **Table-Validated** (RC + IOV) |
+| *Este proceso produce mejores productos.* | ⏳ Requiere Field-Validated (FOV…G-01) |
 
 Documento madre de evidencia: [20 · Evidence Framework](../20-evidence-framework/README.md).
 

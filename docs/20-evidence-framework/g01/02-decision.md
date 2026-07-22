@@ -1,18 +1,35 @@
 # G-01 · Decisión
 
-Solo existen **tres** resultados. Nada más.
+**No por votación. Por criterios.**
+
+Si falta **un** umbral → no hay Gate.  
+No importa quién opine.
+
+Solo existen **tres** resultados:
 
 ```text
 APPROVED
-```
-
-```text
 APPROVED WITH CONDITIONS
-```
-
-```text
 REJECTED
 ```
+
+---
+
+## Umbrales (todos obligatorios para deliberar)
+
+| Evidencia | Umbral |
+|-----------|--------|
+| FOV completado | Sí |
+| Package G-01 completo | Sí |
+| IFD abiertos | **0** |
+| Contradicciones estructurales abiertas | **0** |
+| Findings / FO-C críticos resueltos (o KUR) | Sí |
+| ECL mínimo alcanzado (críticos rumbo ≥ 4) | Sí |
+| Economic Confirmation positiva (o parcial acotada) | Sí |
+| Riesgos Critical abiertos | **0** |
+| Riesgos aceptados documentados (Open Risks) | Sí |
+
+Filosofía FOPEBA: decisiones importantes dependen de **evidencia**, no de autoridad.
 
 ---
 
@@ -20,67 +37,34 @@ REJECTED
 
 ### APPROVED
 
-Package completo.  
-EC positiva.  
-Riesgos críticos = 0.  
-Known Limitations explícitas (no ocultan agujeros estructurales).  
-
-Efecto:
+Todos los umbrales. EC positiva. Known Limitations honestas.
 
 ```text
+Knowledge Field-Validated
 Operational Knowledge Certified
         ↓
 Stage 2 — Product Engineering
 ```
 
-Desbloquea: UX de espina · Capabilities · código de dominio · roadmap por evidencia.
-
----
-
 ### APPROVED WITH CONDITIONS
 
-Package completo.  
-Valor/EC suficiente para un **alcance acotado**.  
-Condiciones **explícitas, fechadas y con owner** — no waivers silenciosos.
-
-| Condición válida | Condición **inválida** (→ REJECTED) |
-|------------------|-------------------------------------|
-| Material risk con plan ≤ N días | Saltar FOV / FER / KUR / ECR |
-| Subconjunto de Capabilities autorizado | «Aprobamos Core a medias» |
-| Known Limitation que acota Stage 2 | Riesgo Critical abierto |
-| Medición OVI a reforzar en paralelo | Editar modelo sin KU |
-
-Efecto: Stage 2 **solo** dentro del alcance condicionado.  
-Fuera de alcance = sigue bloqueado.  
-Condiciones incumplidas en fecha → el gate se **revisa** (puede pasar a REJECTED).
-
----
+Umbrales cumplidos salvo riesgos **Material** con plan fechado / alcance acotado.  
+Condiciones explícitas · owner · fecha. Sin waivers de FOV/FER/KUR/ECR.
 
 ### REJECTED
 
-Cualquiera de:
-
-- Package incompleto  
-- EC negativa  
-- FO-C estructural sin KUR  
-- Riesgo Critical abierto  
-- Intento de waiver de criterios de conocimiento  
-
-Efecto: Stage 2 de espina **no** abre.  
-Carril B (sin engines) puede continuar.  
-Se indica qué remediar para reabrir sesión.
+Falta umbral · EC negativa · Critical abierto · package incompleto · waiver intentado.
 
 ---
 
-## Qué no desbloquea nunca (cualquier resultado)
+## Qué no desbloquea nunca
 
 - Reinventar dominio sin VR→MC  
-- Sustituir evidencia por preferencia de stack  
-- Tratar Lovable / UI como fuente de verdad de dominio  
+- Preferencia de stack sobre evidencia  
+- Lovable / UI como fuente de dominio  
 
 ---
 
 ## Relacionado
 
-- [01 Package](./01-package.md)  
-- [03 Acta](./03-acta.md)
+- [01 Package](./01-package.md) · [03 Acta](./03-acta.md)

@@ -1,8 +1,26 @@
 # Hito — FOPEBA Methodology Frozen
 
 **Fecha:** 2026-07-22  
-**Nivel:** Etapa 1 / FASE B — cierre de diseño metodológico  
-**Tag sugerido:** `fopeba-methodology-frozen-v1.0`
+**Tag:** `fopeba-methodology-frozen-v1.0`
+
+---
+
+## Precisión epistemológica
+
+No decimos «Knowledge Certification complete».
+
+Tres estados del conocimiento operacional:
+
+```text
+Knowledge Designed
+        ↓
+Knowledge Table-Validated     ← estamos aquí
+        ↓
+Knowledge Field-Validated     ← tras FOV → … → G-01
+```
+
+Tenéis conocimiento **certificado en entorno controlado** (mesa + IOV).  
+Aún no conocimiento **validado en campo**.
 
 ---
 
@@ -13,11 +31,12 @@ FOPEBA Framework
 Status: Methodology Frozen
 
 Reason:
-  Knowledge Certification methodology complete.
-  Waiting for empirical evidence.
+  Methodology certified.
+  Operational Model Table-Validated.
+  Waiting for Field Evidence.
 
 Changes allowed:
-  ❌ Framework evolution
+  ❌ Framework evolution (mejoras / intuición)
   ❌ New concepts
   ❌ New phases
   ❌ New evidence types
@@ -27,108 +46,85 @@ Allowed:
   ✅ Typographical corrections
   ✅ FOV execution
   ✅ Evidence collection
+
+Emergency Changes (solo errores demostrables):
+  ✅ Internal inconsistency
+  ✅ Safety issue
+  ✅ Logical contradiction
+  ✅ Evidence corruption
 ```
+
+**Congelado frente a mejoras. No frente a errores demostrables.**  
+v1.0 no es dogma.
 
 ---
 
-## Regla
+## Principio oficial (post-freeze)
 
-> **A partir de este punto, cualquier cambio metodológico necesita evidencia de campo que lo justifique.**
+> **Una vez congelada la metodología, el conocimiento solo puede evolucionar mediante evidencia observacional suficiente.**
 
-Protege el framework frente a mejoras basadas solo en intuición.
+Forma corta:
+
+> La única forma de avanzar es obteniendo evidencia de campo.
+
+Conecta con el [Evidence Framework](../20-evidence-framework/README.md).
+
+---
+
+## Madurez
+
+Hasta ahora el valor estaba en **producir** conocimiento.  
+A partir de ahora, también en **resistir la tentación** de cambiarlo sin evidencia suficiente.
+
+Muchos marcos saben crear modelos; pocos definen **cuándo está prohibido modificarlos**.
 
 ---
 
 ## Ciclo activo
 
-Hasta hoy:
-
-```text
-Pensar → Diseñar → Refinar → Certificar
-```
-
-Desde ahora:
-
 ```text
 Observar → Registrar → Clasificar → Decidir
 ```
 
-Eso es FOV → FER → KU/Archive → EC → G-01.
-
 ---
 
-## Éxito de FOV (única métrica)
-
-No: nº de FO · nº de KU · nº de MC.
-
-Sí:
+## Éxito de FOV
 
 > **¿La evidencia recogida es suficiente para tomar decisiones sin recurrir a opiniones?**
 
-Si la respuesta es sí, FOV cumplió — **aunque no haya ningún Model Change**.
+FO-V en cadena → No KU → No MC = el modelo predijo la operación (evidencia fuerte).  
+FO-C → FER → umbral → Archive si no basta (no KU automático).
 
-### Escenario infravalorado (también evidencia fuerte)
+Indicador de campo: **Knowledge Leakage** — [Mission Brief](./FOV_MISSION_BRIEF.md) · [FO](../20-evidence-framework/fov/03-field-observations.md).
+
+---
+
+## Cuándo termina la Etapa 1
 
 ```text
-FO-V · FO-V · FO-V · …
-    ↓
-FER → No KU → No MC
+RC (Table-Validated)
+  → FOV → FER → KU (si procede) → EC → G-01 → Approved
+  → Knowledge Field-Validated
 ```
 
-Lectura correcta: **el modelo predijo correctamente la operación.**
-
-### Si aparece FO-C
-
-Disciplina intacta: FER → ¿evidencia suficiente? → No → Archive.  
-No toda contradicción merece KU.
+No termina en el RC.
 
 ---
 
-## Cuándo termina realmente la Etapa 1
+## Predicción pre-campo
 
-**No** al declarar el RC.
-
-Sí cuando:
-
-```text
-Operational Model RC
-    → FOV → FER → KU (si procede) → EC → Gate G-01 → Approved
-```
-
-Todo lo anterior fue preparación.
+No se esperan Core Objects / Invariants nuevos.  
+Más probable: **reglas tácitas** (decisiones correctas sin explicación explícita) → Checks · heurísticas · criterios · automatizaciones futuras.
 
 ---
 
-## Predicción pre-campo (no es hipótesis formal)
+## Tras G-01
 
-Más probable que nuevos Core Objects:
-
-- decisiones manuales no documentadas;
-- excepciones operativas frecuentes;
-- reglas tácitas en personas;
-- gap prescrito vs ejecutado.
-
-Eso enriquecería Checks / Capabilities / gobernanza — no necesariamente el Core.
-
----
-
-## Tras G-01 — Post-Certification Review (diferido)
-
-**No** modificar FOPEBA en caliente.  
-Una sesión retrospectiva, tres preguntas:
-
-1. ¿Qué parte de la metodología aportó más evidencia útil?  
-2. ¿Qué parte generó más coste que valor?  
-3. ¿Qué descubrimos en certificación que no habríamos descubierto programando desde el principio?
-
-Archivar respuestas como candidatas a **FOPEBA v1.1** (más productos/dominios).  
-**FOPEBA v1.0** queda protegida por la evidencia de YourMeal OS + EatClean.
-
-Plantilla: [05-post-certification-review](./05-post-certification-review.md).
+[Post-Certification Review](./05-post-certification-review.md) → archivo FOPEBA v1.1.  
+v1.0 permanece protegida.
 
 ---
 
 ## Relacionado
 
-- [FOV Mission Brief](./FOV_MISSION_BRIEF.md)  
-- [Estado](./README.md) · [RC](./02-operational-model-rc.md)
+- [Estado](./README.md) · [RC](./02-operational-model-rc.md) · [Mission Brief](./FOV_MISSION_BRIEF.md)

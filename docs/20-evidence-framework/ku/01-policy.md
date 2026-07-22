@@ -6,7 +6,7 @@
 
 ## Pregunta que responde la política
 
-> ¿Qué evidencia, bajo qué autoridad, puede alterar el conocimiento que ya declaramos Knowledge Certified?
+> ¿Qué evidencia, bajo qué autoridad, puede alterar el conocimiento **Table-Validated** (y, tras G-01, Field-Validated)?
 
 ---
 

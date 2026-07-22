@@ -11,67 +11,70 @@ Una página. Llévala a campo.
 
 Observar la operación real **sin intervenir**.
 
-Pregunta:
-
 > ¿Qué hace realmente la operación cuando nadie le pide que siga el modelo?
 
-Mentalidad: **auditor**, no investigador que mejora el modelo.
+Mentalidad: **auditor**.
 
 > ¿Qué evidencia nos obliga —o no— a cambiar el modelo?
+
+Estado del conocimiento hoy: **Table-Validated** (no Field-Validated).
 
 ---
 
 ## Hipótesis activas
 
-Ver [H-01…H-22](../20-evidence-framework/fov/01-hypotheses-from-rc.md)  
-y [Known Limitations RC](./03-known-limitations-rc.md).
+[H-01…H-22](../20-evidence-framework/fov/01-hypotheses-from-rc.md) · [Known Limitations](./03-known-limitations-rc.md).
 
-Antes de cada sesión: marcar 2–4 hipótesis del día.
+Antes de cada sesión: 2–4 hipótesis del día.
 
 ---
 
 ## Prohibido
 
-- Explicar el modelo  
-- Corregir a los operarios  
-- Sugerir mejoras  
-- Enseñar pantallas  
-- Cambiar procesos  
-- Editar `docs/17` o abrir MC en caliente  
+- Explicar el modelo · corregir operarios · sugerir mejoras  
+- Enseñar pantallas · cambiar procesos  
+- Editar `docs/17` / MC en caliente  
 
 ---
 
 ## Permitido
 
-- Preguntar por aclaraciones **operativas**  
-- Registrar tiempos  
-- Registrar decisiones  
-- Registrar incidencias  
-- Registrar excepciones  
-- Redactar FO-xxx el mismo día (FO-V / FO-E / FO-C / FO-U)  
+- Aclaraciones **operativas**  
+- Registrar tiempos · decisiones · incidencias · excepciones  
+- FO-xxx el mismo día (FO-V / FO-E / FO-C / FO-U)  
+- Marcar **Knowledge Leakage** (ver abajo)
 
 ---
 
 ## Regla de oro
 
-> **Si durante la observación aparece una idea de mejora, se registra como observación. No se implementa durante la campaña.**
+> Si aparece una idea de mejora, se registra como observación. **No se implementa** durante la campaña.
 
 ---
 
-## Éxito de esta campaña
+## Knowledge Leakage (indicador)
 
-No se mide por cantidad de FO / KU / MC.
+> Toda decisión operacional **correcta** que depende del conocimiento **implícito** de una persona y no del modelo.
 
-> **¿La evidencia basta para decidir sin recurrir a opiniones?**
+Ejemplos: «siempre así porque Juan me enseñó» · «ese proveedor falla los martes» · «este cliente llama a última hora».
 
-Si sí — misión cumplida, aunque no haya Model Change.  
-Cadena de solo FO-V → No KU = el modelo predijo la operación (evidencia fuerte).
+No son bugs. Son **fugas de conocimiento** — oro para Checks / heurísticas / automatizaciones futuras.  
+Registrar en la FO (señal KL). No forzar Core nuevo.
 
 ---
 
-## Expectativa (no forzar)
+## Éxito
 
-Más probable que Core nuevo: decisiones manuales, excepciones, reglas tácitas, gap prescrito vs ejecutado → Checks / Capabilities / gobernanza.
+> ¿La evidencia basta para decidir **sin opiniones**?
+
+FO-V en cadena + No KU = el modelo predijo bien (victoria).
+
+---
+
+## Expectativa
+
+No: Core / Invariants nuevos.  
+Sí: **reglas tácitas**, excepciones, gap prescrito vs ejecutado.
 
 ---
 
@@ -81,7 +84,4 @@ Más probable que Core nuevo: decisiones manuales, excepciones, reglas tácitas,
 FO → FER → KU o Archive → EC → G-01
 ```
 
-FO-C sin umbral FER → **Archive**, no KU automático.
-
-Protocolo (referencia · frozen): [fov/](../20-evidence-framework/fov/README.md).  
-Hito: [Methodology Frozen](./04-methodology-frozen.md).
+Freeze: [04](./04-methodology-frozen.md) · protocolo: [fov/](../20-evidence-framework/fov/README.md).

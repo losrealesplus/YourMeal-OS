@@ -1,9 +1,9 @@
-# Known Limitations — Operational Model RC (Knowledge Certified)
+# Known Limitations — Operational Model RC (Table-Validated)
 
 **Publicado con:** [Operational Model RC](./02-operational-model-rc.md) · 2026-07-22
 
-> Esto sabemos con evidencia.  
-> Esto **todavía no** afirmamos saber.
+> Esto sabemos con evidencia de **laboratorio**.  
+> Esto **todavía no** afirmamos como Field-Validated.
 
 Documento guía de la campaña [FOV](../20-evidence-framework/fov/README.md):
 
@@ -48,7 +48,7 @@ Hipótesis operativas derivadas: [01-hypotheses-from-rc](../20-evidence-framewor
 
 ---
 
-## 4. Confianza del RC (laboratorio)
+## 4. Confianza del RC (laboratorio · Table-Validated)
 
 | Fase | Confianza |
 |------|----------:|
@@ -57,4 +57,4 @@ Hipótesis operativas derivadas: [01-hypotheses-from-rc](../20-evidence-framewor
 | IOV-002 | Muy alto |
 | IOV-003 | Alto (equivalencia conceptual) |
 
-Siguiente juez: **evidencia empírica** (FOV → FER).
+Siguiente juez: **evidencia empírica** (FOV → FER) → camino a Field-Validated.

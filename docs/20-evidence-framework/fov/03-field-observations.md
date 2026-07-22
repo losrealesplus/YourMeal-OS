@@ -41,6 +41,15 @@ Origen de campaña: [FOV](../04-field-operational-validation.md) · Protocolo: [
 | Tiempos / rework | … |
 | Preguntas oídas | … |
 | Incidencias | … |
+| **Knowledge Leakage** | Sí / No — ¿decisión correcta que vive en una persona, no en el modelo? |
+
+### Knowledge Leakage
+
+> Toda decisión operacional correcta que depende del conocimiento implícito de una persona y no del modelo.
+
+No es error. Es fuga. Suele alimentar Checks / heurísticas / Capabilities — no Core por defecto.
+
+Si KL = Sí, describir la regla tácita en lenguaje de cocina (sin implementar).
 
 ## Mapeo posterior (fuera de campo)
 

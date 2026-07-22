@@ -23,20 +23,21 @@
 
 ---
 
-## Criterios de conocimiento
+## Criterios (umbrales — no voto)
 
-| Criterio | ✅/❌ | Evidencia |
-|----------|------|-----------|
-| Operational Validation | | |
-| IOV-001 | | IVR-001 |
-| IOV-002 | | IVR-002 |
-| IOV-003 | | IVR-003 |
-| Findings críticos cerrados | | |
-| FOV ejecutado | | FO-… |
-| FER cerrado | | FER-… |
-| KU cerrado | | KUR-… |
-| EC dictamen | | ECR-… |
-| Riesgos Critical = 0 | | Open Risks |
+| Evidencia | Umbral | ✅/❌ | Ref |
+|-----------|--------|------|-----|
+| FOV completado | Sí | | FO-… |
+| Package completo | Sí | | |
+| IFD abiertos | 0 | | |
+| Contradicciones estructurales abiertas | 0 | | |
+| Findings / FO-C críticos resueltos | Sí | | |
+| ECL mínimo | Sí | | |
+| EC positiva (o parcial acotada) | Sí | | ECR-… |
+| Riesgos Critical | 0 | | |
+| Riesgos aceptados documentados | Sí | | Open Risks |
+
+Si falta **uno** → no hay Gate.
 
 ---
 
@@ -50,8 +51,8 @@
 
 ## Declaración
 
-Este gate **no** aprueba código.  
-Certifica (o rechaza) conocimiento suficiente para justificar Product Engineering.
+Este gate **no** aprueba código ni se decide por votación.  
+Certifica (o rechaza) Knowledge **Field-Validated** suficiente para Product Engineering.
 
 **Resultado:** …
 

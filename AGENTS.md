@@ -95,15 +95,14 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 
 ```text
 FOPEBA v1.0 · Methodology Frozen 🧊
-FASE A ✅ · FASE B ejecución FOV ⏳ · FASE C 🔒 G-01
+Operational Model · Table-Validated (no Field-Validated aún)
+FASE B ejecución FOV ⏳ · FASE C 🔒 G-01
 ```
 
-**EatClean** = laboratorio · **FOPEBA** = método frozen · **YourMeal OS** = primer producto.
+Principio: conocimiento post-freeze solo evoluciona con **evidencia observacional suficiente**.
 
-**Proyecto principal:** [FOV Mission Brief](./docs/00-status/FOV_MISSION_BRIEF.md).  
-**Hito:** [Methodology Frozen](./docs/00-status/04-methodology-frozen.md) — sin evolución de framework sin evidencia de campo.
-
-Etapa 1 cierra en **G-01 Approved**, no en el RC. Tras G-01: [Post-Certification Review](./docs/00-status/05-post-certification-review.md) (archivo v1.1).
+**Proyecto principal:** [FOV Mission Brief](./docs/00-status/FOV_MISSION_BRIEF.md) · [Freeze](./docs/00-status/04-methodology-frozen.md).  
+G-01 = criterios, no voto. Tras G-01: [Post-Certification Review](./docs/00-status/05-post-certification-review.md).
 
 Índices: [Estado](./docs/00-status/README.md) · [RC](./docs/00-status/02-operational-model-rc.md)
 
