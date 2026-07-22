@@ -162,6 +162,11 @@
   animation: slideUp 0.6s var(--ease-out-expo) both;
 }
 
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
 @layer base {
   * {
     border-color: var(--color-border);
