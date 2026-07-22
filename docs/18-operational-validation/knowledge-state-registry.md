@@ -47,6 +47,8 @@ Actualizar al cerrar VR o FOV. Ver [knowledge-state.md](./knowledge-state.md).
 | Kitchen | **V** parcial | VR-002 | Ancla OK · capacidad no modelada · Oven≠Core |
 | Notification | **V** (rechazo) | VR-002 | Capability · no entra en 17 |
 | Purchase Order | H | — | Supporting futuro · no promovido |
+| Lot (proveedor) | H | VR-003 | No canónico hoy · MC-003 aparcado |
+| Recall Core | **V** (rechazo) | VR-003 | No Core · Supporting/evento |
 
 ---
 
@@ -54,7 +56,7 @@ Actualizar al cerrar VR o FOV. Ver [knowledge-state.md](./knowledge-state.md).
 
 | ID | KS | VR respaldo | Notas |
 |----|-----|-------------|-------|
-| INV-011 | **V** | VR-001 | Batch → un Plan · sin grieta |
+| INV-031 | **V** parcial | VR-003 | Granularidad laxa · traza Batch→Orders no garantizada |
 | INV-020 | **V** | VR-001 · VR-002 | Amend + Pause deben ser explícitos |
 | INV-044 | **V** | VR-002 | Capabilities (notif.) no definen leyes |
 | INV-021 | **V** | VR-001 | Orden causal intacto |
