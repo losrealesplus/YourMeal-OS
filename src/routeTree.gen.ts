@@ -41,10 +41,15 @@ import { Route as AuthenticatedAdminInventoryRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminDishesRouteImport } from './routes/_authenticated/admin.dishes'
 import { Route as AuthenticatedAdminCustomersRouteImport } from './routes/_authenticated/admin.customers'
 import { Route as AuthenticatedAdminAccountingRouteImport } from './routes/_authenticated/admin.accounting'
+import { Route as AuthenticatedAdminRoutesIndexRouteImport } from './routes/_authenticated/admin.routes.index'
 import { Route as AuthenticatedAdminProductionIndexRouteImport } from './routes/_authenticated/admin.production.index'
 import { Route as AuthenticatedAppSettingsProfileRouteImport } from './routes/_authenticated/app.settings.profile'
 import { Route as AuthenticatedAppOrdersOrderIdRouteImport } from './routes/_authenticated/app.orders.$orderId'
 import { Route as AuthenticatedAppMenuDishIdRouteImport } from './routes/_authenticated/app.menu.$dishId'
+import { Route as AuthenticatedAdminRoutesStopsRouteImport } from './routes/_authenticated/admin.routes.stops'
+import { Route as AuthenticatedAdminRoutesIncidentsRouteImport } from './routes/_authenticated/admin.routes.incidents'
+import { Route as AuthenticatedAdminRoutesDeliveriesRouteImport } from './routes/_authenticated/admin.routes.deliveries'
+import { Route as AuthenticatedAdminRoutesAttemptRouteImport } from './routes/_authenticated/admin.routes.attempt'
 import { Route as AuthenticatedAdminProductionPackagingRouteImport } from './routes/_authenticated/admin.production.packaging'
 import { Route as AuthenticatedAdminProductionLabelsRouteImport } from './routes/_authenticated/admin.production.labels'
 import { Route as AuthenticatedAdminProductionKitchenRouteImport } from './routes/_authenticated/admin.production.kitchen'
@@ -227,6 +232,12 @@ const AuthenticatedAdminAccountingRoute =
     path: '/accounting',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminRoutesIndexRoute =
+  AuthenticatedAdminRoutesIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAdminRoutesRoute,
+  } as any)
 const AuthenticatedAdminProductionIndexRoute =
   AuthenticatedAdminProductionIndexRouteImport.update({
     id: '/',
@@ -250,6 +261,30 @@ const AuthenticatedAppMenuDishIdRoute =
     id: '/$dishId',
     path: '/$dishId',
     getParentRoute: () => AuthenticatedAppMenuRoute,
+  } as any)
+const AuthenticatedAdminRoutesStopsRoute =
+  AuthenticatedAdminRoutesStopsRouteImport.update({
+    id: '/stops',
+    path: '/stops',
+    getParentRoute: () => AuthenticatedAdminRoutesRoute,
+  } as any)
+const AuthenticatedAdminRoutesIncidentsRoute =
+  AuthenticatedAdminRoutesIncidentsRouteImport.update({
+    id: '/incidents',
+    path: '/incidents',
+    getParentRoute: () => AuthenticatedAdminRoutesRoute,
+  } as any)
+const AuthenticatedAdminRoutesDeliveriesRoute =
+  AuthenticatedAdminRoutesDeliveriesRouteImport.update({
+    id: '/deliveries',
+    path: '/deliveries',
+    getParentRoute: () => AuthenticatedAdminRoutesRoute,
+  } as any)
+const AuthenticatedAdminRoutesAttemptRoute =
+  AuthenticatedAdminRoutesAttemptRouteImport.update({
+    id: '/attempt',
+    path: '/attempt',
+    getParentRoute: () => AuthenticatedAdminRoutesRoute,
   } as any)
 const AuthenticatedAdminProductionPackagingRoute =
   AuthenticatedAdminProductionPackagingRouteImport.update({
@@ -293,7 +328,7 @@ export interface FileRoutesByFullPath {
   '/admin/promotions': typeof AuthenticatedAdminPromotionsRoute
   '/admin/purchasing': typeof AuthenticatedAdminPurchasingRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
-  '/admin/routes': typeof AuthenticatedAdminRoutesRoute
+  '/admin/routes': typeof AuthenticatedAdminRoutesRouteWithChildren
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/support': typeof AuthenticatedAdminSupportRoute
   '/app/menu': typeof AuthenticatedAppMenuRouteWithChildren
@@ -312,10 +347,15 @@ export interface FileRoutesByFullPath {
   '/admin/production/kitchen': typeof AuthenticatedAdminProductionKitchenRoute
   '/admin/production/labels': typeof AuthenticatedAdminProductionLabelsRoute
   '/admin/production/packaging': typeof AuthenticatedAdminProductionPackagingRoute
+  '/admin/routes/attempt': typeof AuthenticatedAdminRoutesAttemptRoute
+  '/admin/routes/deliveries': typeof AuthenticatedAdminRoutesDeliveriesRoute
+  '/admin/routes/incidents': typeof AuthenticatedAdminRoutesIncidentsRoute
+  '/admin/routes/stops': typeof AuthenticatedAdminRoutesStopsRoute
   '/app/menu/$dishId': typeof AuthenticatedAppMenuDishIdRoute
   '/app/orders/$orderId': typeof AuthenticatedAppOrdersOrderIdRoute
   '/app/settings/profile': typeof AuthenticatedAppSettingsProfileRoute
   '/admin/production/': typeof AuthenticatedAdminProductionIndexRoute
+  '/admin/routes/': typeof AuthenticatedAdminRoutesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -330,7 +370,6 @@ export interface FileRoutesByTo {
   '/admin/promotions': typeof AuthenticatedAdminPromotionsRoute
   '/admin/purchasing': typeof AuthenticatedAdminPurchasingRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
-  '/admin/routes': typeof AuthenticatedAdminRoutesRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/support': typeof AuthenticatedAdminSupportRoute
   '/app/menu': typeof AuthenticatedAppMenuRouteWithChildren
@@ -349,10 +388,15 @@ export interface FileRoutesByTo {
   '/admin/production/kitchen': typeof AuthenticatedAdminProductionKitchenRoute
   '/admin/production/labels': typeof AuthenticatedAdminProductionLabelsRoute
   '/admin/production/packaging': typeof AuthenticatedAdminProductionPackagingRoute
+  '/admin/routes/attempt': typeof AuthenticatedAdminRoutesAttemptRoute
+  '/admin/routes/deliveries': typeof AuthenticatedAdminRoutesDeliveriesRoute
+  '/admin/routes/incidents': typeof AuthenticatedAdminRoutesIncidentsRoute
+  '/admin/routes/stops': typeof AuthenticatedAdminRoutesStopsRoute
   '/app/menu/$dishId': typeof AuthenticatedAppMenuDishIdRoute
   '/app/orders/$orderId': typeof AuthenticatedAppOrdersOrderIdRoute
   '/app/settings/profile': typeof AuthenticatedAppSettingsProfileRoute
   '/admin/production': typeof AuthenticatedAdminProductionIndexRoute
+  '/admin/routes': typeof AuthenticatedAdminRoutesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -373,7 +417,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/promotions': typeof AuthenticatedAdminPromotionsRoute
   '/_authenticated/admin/purchasing': typeof AuthenticatedAdminPurchasingRoute
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
-  '/_authenticated/admin/routes': typeof AuthenticatedAdminRoutesRoute
+  '/_authenticated/admin/routes': typeof AuthenticatedAdminRoutesRouteWithChildren
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/support': typeof AuthenticatedAdminSupportRoute
   '/_authenticated/app/menu': typeof AuthenticatedAppMenuRouteWithChildren
@@ -392,10 +436,15 @@ export interface FileRoutesById {
   '/_authenticated/admin/production/kitchen': typeof AuthenticatedAdminProductionKitchenRoute
   '/_authenticated/admin/production/labels': typeof AuthenticatedAdminProductionLabelsRoute
   '/_authenticated/admin/production/packaging': typeof AuthenticatedAdminProductionPackagingRoute
+  '/_authenticated/admin/routes/attempt': typeof AuthenticatedAdminRoutesAttemptRoute
+  '/_authenticated/admin/routes/deliveries': typeof AuthenticatedAdminRoutesDeliveriesRoute
+  '/_authenticated/admin/routes/incidents': typeof AuthenticatedAdminRoutesIncidentsRoute
+  '/_authenticated/admin/routes/stops': typeof AuthenticatedAdminRoutesStopsRoute
   '/_authenticated/app/menu/$dishId': typeof AuthenticatedAppMenuDishIdRoute
   '/_authenticated/app/orders/$orderId': typeof AuthenticatedAppOrdersOrderIdRoute
   '/_authenticated/app/settings/profile': typeof AuthenticatedAppSettingsProfileRoute
   '/_authenticated/admin/production/': typeof AuthenticatedAdminProductionIndexRoute
+  '/_authenticated/admin/routes/': typeof AuthenticatedAdminRoutesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -435,10 +484,15 @@ export interface FileRouteTypes {
     | '/admin/production/kitchen'
     | '/admin/production/labels'
     | '/admin/production/packaging'
+    | '/admin/routes/attempt'
+    | '/admin/routes/deliveries'
+    | '/admin/routes/incidents'
+    | '/admin/routes/stops'
     | '/app/menu/$dishId'
     | '/app/orders/$orderId'
     | '/app/settings/profile'
     | '/admin/production/'
+    | '/admin/routes/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -453,7 +507,6 @@ export interface FileRouteTypes {
     | '/admin/promotions'
     | '/admin/purchasing'
     | '/admin/reports'
-    | '/admin/routes'
     | '/admin/settings'
     | '/admin/support'
     | '/app/menu'
@@ -472,10 +525,15 @@ export interface FileRouteTypes {
     | '/admin/production/kitchen'
     | '/admin/production/labels'
     | '/admin/production/packaging'
+    | '/admin/routes/attempt'
+    | '/admin/routes/deliveries'
+    | '/admin/routes/incidents'
+    | '/admin/routes/stops'
     | '/app/menu/$dishId'
     | '/app/orders/$orderId'
     | '/app/settings/profile'
     | '/admin/production'
+    | '/admin/routes'
   id:
     | '__root__'
     | '/'
@@ -514,10 +572,15 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/production/kitchen'
     | '/_authenticated/admin/production/labels'
     | '/_authenticated/admin/production/packaging'
+    | '/_authenticated/admin/routes/attempt'
+    | '/_authenticated/admin/routes/deliveries'
+    | '/_authenticated/admin/routes/incidents'
+    | '/_authenticated/admin/routes/stops'
     | '/_authenticated/app/menu/$dishId'
     | '/_authenticated/app/orders/$orderId'
     | '/_authenticated/app/settings/profile'
     | '/_authenticated/admin/production/'
+    | '/_authenticated/admin/routes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -753,6 +816,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAccountingRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/routes/': {
+      id: '/_authenticated/admin/routes/'
+      path: '/'
+      fullPath: '/admin/routes/'
+      preLoaderRoute: typeof AuthenticatedAdminRoutesIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoutesRoute
+    }
     '/_authenticated/admin/production/': {
       id: '/_authenticated/admin/production/'
       path: '/'
@@ -780,6 +850,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/menu/$dishId'
       preLoaderRoute: typeof AuthenticatedAppMenuDishIdRouteImport
       parentRoute: typeof AuthenticatedAppMenuRoute
+    }
+    '/_authenticated/admin/routes/stops': {
+      id: '/_authenticated/admin/routes/stops'
+      path: '/stops'
+      fullPath: '/admin/routes/stops'
+      preLoaderRoute: typeof AuthenticatedAdminRoutesStopsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoutesRoute
+    }
+    '/_authenticated/admin/routes/incidents': {
+      id: '/_authenticated/admin/routes/incidents'
+      path: '/incidents'
+      fullPath: '/admin/routes/incidents'
+      preLoaderRoute: typeof AuthenticatedAdminRoutesIncidentsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoutesRoute
+    }
+    '/_authenticated/admin/routes/deliveries': {
+      id: '/_authenticated/admin/routes/deliveries'
+      path: '/deliveries'
+      fullPath: '/admin/routes/deliveries'
+      preLoaderRoute: typeof AuthenticatedAdminRoutesDeliveriesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoutesRoute
+    }
+    '/_authenticated/admin/routes/attempt': {
+      id: '/_authenticated/admin/routes/attempt'
+      path: '/attempt'
+      fullPath: '/admin/routes/attempt'
+      preLoaderRoute: typeof AuthenticatedAdminRoutesAttemptRouteImport
+      parentRoute: typeof AuthenticatedAdminRoutesRoute
     }
     '/_authenticated/admin/production/packaging': {
       id: '/_authenticated/admin/production/packaging'
@@ -839,6 +937,30 @@ const AuthenticatedAdminProductionRouteWithChildren =
     AuthenticatedAdminProductionRouteChildren,
   )
 
+interface AuthenticatedAdminRoutesRouteChildren {
+  AuthenticatedAdminRoutesAttemptRoute: typeof AuthenticatedAdminRoutesAttemptRoute
+  AuthenticatedAdminRoutesDeliveriesRoute: typeof AuthenticatedAdminRoutesDeliveriesRoute
+  AuthenticatedAdminRoutesIncidentsRoute: typeof AuthenticatedAdminRoutesIncidentsRoute
+  AuthenticatedAdminRoutesStopsRoute: typeof AuthenticatedAdminRoutesStopsRoute
+  AuthenticatedAdminRoutesIndexRoute: typeof AuthenticatedAdminRoutesIndexRoute
+}
+
+const AuthenticatedAdminRoutesRouteChildren: AuthenticatedAdminRoutesRouteChildren =
+  {
+    AuthenticatedAdminRoutesAttemptRoute: AuthenticatedAdminRoutesAttemptRoute,
+    AuthenticatedAdminRoutesDeliveriesRoute:
+      AuthenticatedAdminRoutesDeliveriesRoute,
+    AuthenticatedAdminRoutesIncidentsRoute:
+      AuthenticatedAdminRoutesIncidentsRoute,
+    AuthenticatedAdminRoutesStopsRoute: AuthenticatedAdminRoutesStopsRoute,
+    AuthenticatedAdminRoutesIndexRoute: AuthenticatedAdminRoutesIndexRoute,
+  }
+
+const AuthenticatedAdminRoutesRouteWithChildren =
+  AuthenticatedAdminRoutesRoute._addFileChildren(
+    AuthenticatedAdminRoutesRouteChildren,
+  )
+
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAccountingRoute: typeof AuthenticatedAdminAccountingRoute
   AuthenticatedAdminCustomersRoute: typeof AuthenticatedAdminCustomersRoute
@@ -849,7 +971,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminPromotionsRoute: typeof AuthenticatedAdminPromotionsRoute
   AuthenticatedAdminPurchasingRoute: typeof AuthenticatedAdminPurchasingRoute
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
-  AuthenticatedAdminRoutesRoute: typeof AuthenticatedAdminRoutesRoute
+  AuthenticatedAdminRoutesRoute: typeof AuthenticatedAdminRoutesRouteWithChildren
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminSupportRoute: typeof AuthenticatedAdminSupportRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -866,7 +988,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminPromotionsRoute: AuthenticatedAdminPromotionsRoute,
   AuthenticatedAdminPurchasingRoute: AuthenticatedAdminPurchasingRoute,
   AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
-  AuthenticatedAdminRoutesRoute: AuthenticatedAdminRoutesRoute,
+  AuthenticatedAdminRoutesRoute: AuthenticatedAdminRoutesRouteWithChildren,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminSupportRoute: AuthenticatedAdminSupportRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,

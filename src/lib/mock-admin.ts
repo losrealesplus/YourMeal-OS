@@ -230,3 +230,112 @@ export const MOCK_ACCOUNTING_KPIS: AdminKpi[] = [
   { key: "invoicesIssued", value: "142",      delta: "+6",   trend: "up" },
   { key: "refunds",        value: "€ 160",    delta: "flat", trend: "flat" },
 ];
+
+// ─── PM-004 Delivery module ───────────────────────────────────────────
+// Sub-areas: Route · Stops · Deliveries · Attempt · Incidents
+// Scaffold-only data. Business rules will live in RouteService / DeliveryService.
+
+export type MockDeliveryRoute = {
+  id: string;
+  code: string;
+  name: string;
+  driver: string;
+  vehicle: string;
+  stops: number;
+  distanceKm: number;           // canonical km
+  startIso: string;             // UTC
+  etaIso: string;               // UTC
+  progress: number;             // 0..100
+  status: "planned" | "in_progress" | "completed";
+};
+
+export const MOCK_DELIVERY_ROUTES: MockDeliveryRoute[] = [
+  { id: "r-01", code: "RT-230723-N", name: "Ruta Norte",         driver: "Carlos M.", vehicle: "Van · 1234-ABC",  stops: 18, distanceKm: 62.4, startIso: "2026-07-23T13:30:00Z", etaIso: "2026-07-23T17:10:00Z", progress: 55,  status: "in_progress" },
+  { id: "r-02", code: "RT-230723-S", name: "Ruta Sur",           driver: "Elena R.",  vehicle: "Van · 5678-DEF",  stops: 21, distanceKm: 74.1, startIso: "2026-07-23T13:45:00Z", etaIso: "2026-07-23T17:40:00Z", progress: 32,  status: "in_progress" },
+  { id: "r-03", code: "RT-230723-C", name: "Ruta Centro",        driver: "Iván P.",   vehicle: "Moto · 9012-GHI", stops: 12, distanceKm: 18.7, startIso: "2026-07-23T14:00:00Z", etaIso: "2026-07-23T16:00:00Z", progress: 0,   status: "planned"     },
+  { id: "r-04", code: "RT-220723-N", name: "Ruta Norte (ayer)",  driver: "Carlos M.", vehicle: "Van · 1234-ABC",  stops: 20, distanceKm: 68.2, startIso: "2026-07-22T13:30:00Z", etaIso: "2026-07-22T17:15:00Z", progress: 100, status: "completed"   },
+];
+
+export type MockRouteStop = {
+  id: string;
+  routeCode: string;
+  sequence: number;
+  customer: string;
+  addressShort: string;
+  windowStart: string;          // HH:MM local
+  windowEnd: string;            // HH:MM local
+  boxes: number;
+  status: "pending" | "arrived" | "delivered" | "failed";
+};
+
+export const MOCK_ROUTE_STOPS: MockRouteStop[] = [
+  { id: "s-01", routeCode: "RT-230723-N", sequence: 1, customer: "María González", addressShort: "La Laguna · C/ Herradores 12", windowStart: "14:00", windowEnd: "14:30", boxes: 2, status: "delivered" },
+  { id: "s-02", routeCode: "RT-230723-N", sequence: 2, customer: "Javier Pérez",   addressShort: "La Laguna · Av. Trinidad 44",  windowStart: "14:15", windowEnd: "14:45", boxes: 3, status: "delivered" },
+  { id: "s-03", routeCode: "RT-230723-N", sequence: 3, customer: "Ana Martín",     addressShort: "Tacoronte · C/ Real 88",       windowStart: "14:40", windowEnd: "15:10", boxes: 1, status: "arrived"   },
+  { id: "s-04", routeCode: "RT-230723-N", sequence: 4, customer: "Diego Torres",   addressShort: "Tacoronte · Mesa del Mar",     windowStart: "15:00", windowEnd: "15:30", boxes: 2, status: "pending"   },
+  { id: "s-05", routeCode: "RT-230723-N", sequence: 5, customer: "Sofía Ramos",    addressShort: "El Sauzal · C/ Constitución 3",windowStart: "15:20", windowEnd: "15:50", boxes: 1, status: "pending"   },
+  { id: "s-06", routeCode: "RT-230723-S", sequence: 1, customer: "Laura Suárez",   addressShort: "Adeje · C/ Grande 21",         windowStart: "14:15", windowEnd: "14:45", boxes: 2, status: "delivered" },
+  { id: "s-07", routeCode: "RT-230723-S", sequence: 2, customer: "Tomás Herrera",  addressShort: "Adeje · Av. Los Pueblos 7",    windowStart: "14:30", windowEnd: "15:00", boxes: 4, status: "failed"    },
+  { id: "s-08", routeCode: "RT-230723-S", sequence: 3, customer: "Lucía Fdez.",    addressShort: "Arona · C/ Amalia Alayón 15",  windowStart: "15:00", windowEnd: "15:30", boxes: 1, status: "pending"   },
+];
+
+export type MockDelivery = {
+  id: string;
+  orderCode: string;
+  customer: string;
+  routeCode: string;
+  boxes: number;
+  status: "scheduled" | "out_for_delivery" | "delivered" | "failed";
+  slot: string;                 // HH:MM local
+  deliveredIso?: string;        // UTC when delivered
+};
+
+export const MOCK_DELIVERIES: MockDelivery[] = [
+  { id: "d-01", orderCode: "ORD-2043", customer: "María González", routeCode: "RT-230723-N", boxes: 2, status: "delivered",        slot: "14:00-14:30", deliveredIso: "2026-07-23T14:12:00Z" },
+  { id: "d-02", orderCode: "ORD-2044", customer: "Javier Pérez",   routeCode: "RT-230723-N", boxes: 3, status: "delivered",        slot: "14:15-14:45", deliveredIso: "2026-07-23T14:28:00Z" },
+  { id: "d-03", orderCode: "ORD-2045", customer: "Ana Martín",     routeCode: "RT-230723-N", boxes: 1, status: "out_for_delivery", slot: "14:40-15:10" },
+  { id: "d-04", orderCode: "ORD-2046", customer: "Diego Torres",   routeCode: "RT-230723-N", boxes: 2, status: "scheduled",        slot: "15:00-15:30" },
+  { id: "d-05", orderCode: "ORD-2047", customer: "Laura Suárez",   routeCode: "RT-230723-S", boxes: 2, status: "delivered",        slot: "14:15-14:45", deliveredIso: "2026-07-23T14:22:00Z" },
+  { id: "d-06", orderCode: "ORD-2048", customer: "Tomás Herrera",  routeCode: "RT-230723-S", boxes: 4, status: "failed",           slot: "14:30-15:00" },
+  { id: "d-07", orderCode: "ORD-2049", customer: "Lucía Fdez.",    routeCode: "RT-230723-S", boxes: 1, status: "scheduled",        slot: "15:00-15:30" },
+];
+
+export type MockAttemptOutcome = "delivered" | "left_at_door" | "no_answer" | "wrong_address" | "refused" | "damaged";
+
+export type MockDeliveryAttempt = {
+  id: string;
+  stopCode: string;
+  customer: string;
+  attempt: number;
+  outcome: MockAttemptOutcome;
+  photo: boolean;
+  signature: boolean;
+  timestampIso: string;
+  note?: string;
+};
+
+export const MOCK_DELIVERY_ATTEMPTS: MockDeliveryAttempt[] = [
+  { id: "a-01", stopCode: "RT-230723-N · 01", customer: "María González", attempt: 1, outcome: "delivered",     photo: true,  signature: true,  timestampIso: "2026-07-23T14:12:00Z" },
+  { id: "a-02", stopCode: "RT-230723-N · 02", customer: "Javier Pérez",   attempt: 1, outcome: "left_at_door",  photo: true,  signature: false, timestampIso: "2026-07-23T14:28:00Z", note: "Autorizado por el cliente" },
+  { id: "a-03", stopCode: "RT-230723-N · 03", customer: "Ana Martín",     attempt: 1, outcome: "no_answer",     photo: false, signature: false, timestampIso: "2026-07-23T14:44:00Z", note: "Reintento a las 16:00" },
+  { id: "a-04", stopCode: "RT-230723-S · 02", customer: "Tomás Herrera",  attempt: 2, outcome: "wrong_address", photo: true,  signature: false, timestampIso: "2026-07-23T14:36:00Z", note: "Portal incorrecto" },
+];
+
+export type MockDeliveryIncident = {
+  id: string;
+  code: string;
+  routeCode: string;
+  customer: string;
+  category: "traffic" | "vehicle" | "customer" | "product" | "weather";
+  severity: "low" | "medium" | "high";
+  status: "open" | "in_review" | "resolved";
+  openedIso: string;
+  summary: string;
+};
+
+export const MOCK_DELIVERY_INCIDENTS: MockDeliveryIncident[] = [
+  { id: "in-01", code: "INC-8801", routeCode: "RT-230723-S", customer: "Tomás Herrera", category: "customer", severity: "medium", status: "open",      openedIso: "2026-07-23T14:36:00Z", summary: "Dirección incorrecta en la ficha del cliente." },
+  { id: "in-02", code: "INC-8802", routeCode: "RT-230723-N", customer: "Ana Martín",    category: "customer", severity: "low",    status: "in_review", openedIso: "2026-07-23T14:44:00Z", summary: "Cliente ausente en primera visita." },
+  { id: "in-03", code: "INC-8798", routeCode: "RT-220723-N", customer: "—",             category: "traffic",  severity: "high",   status: "resolved", openedIso: "2026-07-22T14:10:00Z", summary: "Corte de tráfico en TF-5, ruta desviada." },
+  { id: "in-04", code: "INC-8799", routeCode: "RT-220723-S", customer: "Sara López",    category: "product",  severity: "medium", status: "resolved", openedIso: "2026-07-22T15:02:00Z", summary: "Caja dañada en tránsito, reposición programada." },
+];
