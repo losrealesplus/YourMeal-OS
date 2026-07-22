@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
+import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-/** CTA principal grande, mobile-first (touch target ≥ 48px). */
+/** CTA principal grande, mobile-first (touch target ≥ 56px). */
 export function PrimaryCTA({
   children,
   onClick,
@@ -9,6 +10,7 @@ export function PrimaryCTA({
   variant = "solid",
   type = "button",
   className,
+  trailingIcon = true,
 }: {
   children: ReactNode;
   onClick?: () => void;
@@ -16,6 +18,7 @@ export function PrimaryCTA({
   variant?: "solid" | "outline";
   type?: "button" | "submit";
   className?: string;
+  trailingIcon?: boolean;
 }) {
   return (
     <button
@@ -23,14 +26,17 @@ export function PrimaryCTA({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "w-full h-14 rounded-2xl text-sm font-bold uppercase tracking-widest transition-transform active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none",
+        "group relative w-full h-14 rounded-2xl text-sm font-bold uppercase tracking-widest transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none inline-flex items-center justify-center gap-2",
         variant === "solid"
-          ? "bg-primary text-primary-foreground shadow-sm"
-          : "bg-card border border-border text-foreground",
+          ? "hero-emerald text-primary-foreground"
+          : "bg-card border border-border text-foreground hover:border-primary/40",
         className,
       )}
     >
-      {children}
+      <span>{children}</span>
+      {trailingIcon ? (
+        <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+      ) : null}
     </button>
   );
 }
