@@ -1,199 +1,159 @@
 
-# YourMeal OS — Foundation Plan
+# Sprint — Client App (EatClean Tenerife · YourMeal OS)
 
-> **Architecture source of truth:** [`docs/`](../docs/README.md), especially the [Architecture Review](../docs/05-architecture/architecture-review.md) and [ADRs](../docs/adr/).
-> This Lovable plan is historical foundation context. When it conflicts with `docs/` or ADRs, **documentation wins**.
-> Lovable should accelerate UI/components only — not redefine architecture, schema, or module order.
+**Alcance:** solo Cliente. Solo scaffold visual + navegación + Design System + componentes reutilizables. Sin lógica de negocio, sin datos reales, sin nuevos Core Objects. Todo con `useFmt()` y `useTranslation()`.
 
-Ship the skeleton, not the features. After you approve this, feature modules (Weekly Menu ordering, Production, Routes, Accounting, etc.) become their own follow-up plans.
+**Fuera de alcance este sprint:** Admin, Producción, Reparto (ya existen shells vacíos; se abordarán después en este orden).
 
-## 1. Backend: Lovable Cloud (Supabase)
+---
 
-Enable Lovable Cloud. Multi-tenant model = single DB, `tenant_id` column on every business row, RLS filters by `tenant_id`.
+## 1. Alineación con Operational Model
 
-### Auth
-- Email + password
-- Google OAuth (via Lovable broker)
-- Apple OAuth (via Lovable broker)
-- Phone / SMS OTP
-- Password reset page at `/reset-password`
-
-### Core tables (migration #1 — schema only, seed EatClean Tenerife tenant)
-
-Grants + RLS + `GRANT` blocks on every table.
+Todas las pantallas se derivan de objetos ya certificados en `docs/17-operational-model/02-core-objects/` y del flujo de la espina:
 
 ```text
-tenants                (id, slug, name, brand_json, locale_default, status)
-tenant_domains         (id, tenant_id, domain, is_primary)
-profiles               (id=auth.uid, full_name, avatar_url, locale, phone)
-tenant_members         (tenant_id, user_id, joined_at, status)  -- which tenants a user belongs to
-app_role               ENUM: saas_admin, company_admin, kitchen, purchasing, inventory,
-                             production, support, accounting, logistics, driver, employee, customer
-user_roles             (id, tenant_id, user_id, role app_role)  -- roles are per-tenant
-has_role(_uid,_tid,_role)  security definer
-
--- Customer domain (empty scaffolds, no rows)
-customers              (id, tenant_id, user_id, kind: individual|company_employee)
-customer_addresses     (id, customer_id, tenant_id, label, street, city, zip, geo)
-customer_phones        (id, customer_id, tenant_id, phone, is_primary)
-customer_allergies     (id, customer_id, tenant_id, allergen)
-customer_preferences   (id, customer_id, tenant_id, key, value)
-
-companies              (id, tenant_id, name, billing_rule)
-company_locations      (id, company_id, tenant_id, name, address)
-company_departments    (id, company_location_id, tenant_id, name)
-company_employees      (id, company_id, tenant_id, customer_id, department_id, pay_mode)
-
--- Catalog
-dishes                 (id, tenant_id, name, description, photo_url, kcal, weight_g,
-                        macros_json, cost, price, prep_minutes, status)
-dish_ingredients       (dish_id, ingredient_id, qty, unit)
-dish_allergens         (dish_id, allergen)
-ingredients            (id, tenant_id, supplier_id, name, unit, cost, min_stock,
-                        stock, expiration)
-suppliers              (id, tenant_id, name, contact_json)
-ingredient_allergens   (ingredient_id, allergen)
-
-weekly_menus           (id, tenant_id, week_start, status, published_at)
-weekly_menu_slots      (id, weekly_menu_id, day_date, dish_id)
-
--- Orders / operations (empty; features fill these later)
-orders                 (id, tenant_id, customer_id, week_start, status, total, notes)
-order_items            (id, order_id, tenant_id, dish_id, day_date, qty, comment)
-
-routes                 (id, tenant_id, delivery_date, driver_id, status)
-route_stops            (id, route_id, tenant_id, order_id, sequence, eta, delivered_at, geo)
-
-invoices               (id, tenant_id, customer_id, company_id, amount, status,
-                        billing_period, pdf_url)
-payments               (id, tenant_id, invoice_id, method, amount, paid_at, status)
-
-promotions             (id, tenant_id, scope: global|group|personal, title, body,
-                        image_url, starts_at, ends_at)
-
-support_notes          (id, tenant_id, customer_id, kind: note|incident|request, body, author_id)
+Weekly Menu → Order → Production Plan → Delivery → Payment
 ```
 
-### RLS pattern (every business table)
-```sql
--- read/write only if the caller belongs to that tenant
-USING  (tenant_id = ANY (public.current_user_tenants()))
-WITH CHECK (tenant_id = ANY (public.current_user_tenants()))
-```
-Plus role-scoped policies via `has_role(auth.uid(), tenant_id, 'company_admin')` for admin surfaces.
+Objetos que el Cliente ve (Nivel 1 canónico, sin inventar):
+Weekly Menu · Dish · Order · Delivery · Payment · Beneficiary (self) · Subscription.
 
-`saas_admin` role bypass policy: `has_role(auth.uid(), null, 'saas_admin')`.
+Cualquier concepto que no exista en el modelo → **REQUIRES KNOWLEDGE REVIEW** (no se implementa).
 
-Email-domain auto-grant trigger for verified `@eatclean.*` addresses → `company_admin` on the EatClean tenant (safe verified-domain pattern from knowledge).
+---
 
-## 2. Frontend architecture
+## 2. Arquitectura de Información (Cliente)
 
-### Routes (all empty, correctly gated)
+Bottom navigation de 4 tabs (una mano, pulgar):
 
 ```text
-src/routes/
-  __root.tsx                       shell + providers + i18n
-  index.tsx                        public marketing landing (SaaS)
-  auth.tsx                         email/pw + Google + Apple + phone tabs
-  reset-password.tsx               public
-
-  _authenticated/
-    route.tsx                      integration-managed gate
-
-    (customer app — mobile-first)
-    app/index.tsx                  Home
-    app/menu.tsx                   Weekly Menu
-    app/settings.tsx               Settings hub
-    app/settings.profile.tsx
-    app/settings.addresses.tsx
-    app/settings.phones.tsx
-    app/settings.payment.tsx
-    app/settings.invoices.tsx
-    app/settings.orders.tsx
-    app/settings.allergies.tsx
-    app/settings.preferences.tsx
-    app/settings.language.tsx
-
-    (company suite — admin desktop + responsive)
-    admin/route.tsx                sidebar shell
-    admin/index.tsx                Dashboard
-    admin/customers.tsx
-    admin/support.tsx
-    admin/menus.tsx
-    admin/dishes.tsx               Dish Library
-    admin/production.tsx
-    admin/kitchen.tsx
-    admin/purchasing.tsx
-    admin/inventory.tsx
-    admin/routes.tsx
-    admin/accounting.tsx
-    admin/reports.tsx
-    admin/promotions.tsx
-    admin/settings.tsx
-
-    (SaaS admin — tenant management)
-    saas/index.tsx                 Tenants
-    saas/licenses.tsx
-    saas/domains.tsx
-    saas/branding.tsx
+Home     · «¿Qué necesita tu atención ahora?»
+Menu     · Weekly Menu + Dish detail
+Orders   · Pedido activo + historial + entregas
+Profile  · Cuenta, direcciones, pagos, suscripción, ayuda, ajustes
 ```
 
-Each route: real `head()` metadata (title, description, og), placeholder body ("Coming soon" + hint of intended layout from the chosen prototype), permission gate via `beforeLoad` reading `context.auth.role`.
+Se sustituye la tab actual `Settings` por `Orders` + `Profile` (Settings pasa a ser subpágina de Profile). El shell móvil ya existe (`mobile-shell.tsx`) — se amplía a 4 items.
 
-### Post-login routing
-- role `customer` → `/app`
-- role `driver` → `/driver` (deferred)
-- any staff role → `/admin`
-- `saas_admin` → `/saas`
+### Mapa de rutas (`src/routes/_authenticated/app.*`)
 
-## 3. Design system (from "Stainless industrial precision")
+```text
+/app                         Home (assistant feed)
+/app/menu                    Weekly Menu (semana actual + navegación semanas)
+/app/menu/$dishId            Dish detail (macros · ingredientes · alérgenos)
+/app/menu/plan               Programar pedido semanal (bottom sheet flow)
+/app/checkout                Checkout (resumen · dirección · pago)
+/app/orders                  Pedido activo + historial
+/app/orders/$orderId         Order detail + delivery timeline
+/app/profile                 Profile hub
+/app/profile/addresses
+/app/profile/payment-methods
+/app/profile/subscription
+/app/profile/invoices
+/app/profile/notifications
+/app/profile/settings        (regional, idioma, tema)
+/app/profile/help
+```
 
-Port these tokens verbatim into `src/styles.css`:
+Onboarding / auth ya existen (`/`, `/auth`, `/reset-password`). Se añade `/onboarding` (post-signup, 3 pasos: idioma+región · dirección · alérgenos) — solo UI, sin persistencia esta iteración.
 
-- Fonts: Inter (400/600/800) display, JetBrains Mono for data. Loaded via `<link>` in `__root.tsx` head.
-- Colors (oklch conversions):
-  - `--background: #f8fafc`
-  - `--foreground: #0f172a`
-  - `--muted: #64748b`
-  - `--border: #e2e8f0`
-  - `--primary: #059669` (emerald)
-  - `--accent-warn: #f59e0b`, `--accent-critical: #dc2626`
-  - Card surface: `bg-white` + `ring-1 ring-black/5 border border-slate-200`
-- Radius: `--radius: 1rem` (cards `rounded-2xl`, phone frame `rounded-[32px]`).
-- Motion: `--ease-out-expo: cubic-bezier(0.16,1,0.3,1)`, `slideUp` 600ms reveal keyframe.
-- Data typography: mono for numbers, uppercase 9–10px labels with `tracking-widest`.
-- Multi-tenant theming hook: `--brand-primary` overridable per tenant via a `<style>` injected from `tenants.brand_json` on load.
+---
 
-Shared UI primitives (all shadcn, restyled to tokens):
-- `MetricCard` (label / big number / delta)
-- `DataTable` header (mono uppercase)
-- `StatusPill` (queued / in-progress / completed / critical)
-- `MobileFrame` wrapper (dev preview only)
-- `PhoneBottomNav` (Home / Menu / Cuenta)
-- `AdminSidebar` (shadcn Sidebar, collapsible="icon", tenant chip pinned to footer)
+## 3. Flujos de usuario (máx. 3 taps)
 
-## 4. i18n
+- **Programar semana:** Home → «Planifica tu semana» → Menu/plan → Checkout (3 taps).
+- **Ver pedido activo:** Orders tab → tarjeta destacada (1 tap).
+- **Repetir última semana:** Home → «Repetir» → Confirmar (2 taps).
+- **Cambiar dirección de entrega:** Orders/$id → Cambiar dirección → seleccionar (3 taps).
 
-- `i18next` + `react-i18next`, `es` (default) + `en`, browser detection, persisted per user in `profiles.locale`.
-- Namespaces: `common`, `auth`, `customer`, `admin`.
-- Language switcher lives in `/app/settings/language` and admin topbar.
-- All placeholder screen copy already keyed.
+---
 
-## 5. Cross-cutting
+## 4. Design System
 
-- TanStack Query set up per template rules; `defaultPreloadStaleTime: 0`.
-- `onAuthStateChange` wired once in `__root.tsx` (filtered to identity transitions).
-- Sign-in header affordance reflects session; sign-out hygiene (cancelQueries → clear → signOut → replace to `/auth`).
-- Root `head()` replaced: "YourMeal OS — The Operating System for Meal Prep & Catering".
-- `/` becomes the public marketing landing (placeholder replaced), NOT the customer home.
+Tokens ya vigentes en `src/styles.css` (Stainless industrial precision). Se **extiende** con capa "consumer" sin romper Admin:
 
-## 6. Explicitly out of scope for this phase
+- `--surface-elevated`, `--surface-sunken` para cards y bottom sheets
+- `--brand-fresh` (verde EatClean, derivado de `--primary`)
+- `--brand-warm` (crema/off-white para fondos hero)
+- Radios: cards `rounded-3xl`, chips `rounded-full`, botones `rounded-2xl`
+- Sombras suaves (`--shadow-card`, `--shadow-sheet`)
+- Motion: reveal 200-260ms `--ease-out-expo`
 
-Weekly menu ordering logic, production/kitchen calculators, route optimization + Google Maps, Stripe/Resend/PostHog wiring, push notifications, tenant white-label admin UI, real dish/ingredient data. Those are follow-up plans once you approve this foundation.
+Sin hardcodear colores en componentes. Todo vía tokens.
 
-## Deliverable when built
-- Cloud enabled, migration #1 applied, EatClean Tenerife tenant seeded.
-- Auth works end-to-end for the four methods.
-- Sign in as a customer → land on `/app` (empty Home). Sign in as company admin → land on `/admin` (empty Dashboard styled per chosen direction). Sign in as SaaS admin → `/saas`.
-- Every listed route renders without errors, with correct metadata and RBAC gate.
-- No feature logic beyond navigation and design tokens.
+---
+
+## 5. Componentes reutilizables (`src/components/consumer/`)
+
+Solo primitivos presentacionales, sin datos:
+
+```text
+DishCard              foto + título + kcal + tag
+DishHero              header de detalle
+MacroCard             kcal · P · C · G
+AllergenBadge         icono + label
+StatusChip            estado de pedido/entrega
+OrderCard             resumen semanal
+DeliveryTimeline      pasos verticales
+WeeklyMenuGrid        grilla de días
+DayColumn             columna de un día
+BottomSheet           wrapper Radix
+SectionHeader         título + acción
+EmptyState            ilustración + CTA
+AssistantCard         tarjeta "atención ahora"
+QuantityStepper       − n +
+AddressRow · PaymentRow
+FormField (móvil)     input táctil grande
+PrimaryCTA            botón sticky bottom
+```
+
+Cada componente: props tipadas, sin fetch, sin i18n hardcoded (recibe strings o usa `useTranslation`).
+
+---
+
+## 6. Pantallas base (vacías, con placeholders)
+
+Cada ruta renderiza:
+- Header contextual
+- Contenido con componentes reales del Design System
+- Datos mock locales tipados (para que la UI se vea, no persistencia)
+- CTA en su sitio
+
+No se conecta a Supabase esta iteración. Comentario en cada archivo: `// UI scaffold — data wiring en siguiente sprint (Cursor)`.
+
+---
+
+## 7. i18n
+
+Nuevo namespace `customer` ya existe. Se amplían claves para: home, menu, dish, orders, delivery, profile, onboarding, checkout. Traducciones en ES (completo) + EN (completo); DE/FR/IT/PT copian ES como placeholder marcado `// TODO l10n`. Toda cadena visible pasa por `t()`. Todo formato por `useFmt()`.
+
+---
+
+## 8. Entregables del sprint
+
+1. Extensión de tokens en `src/styles.css`
+2. `src/components/consumer/*` (≈18 componentes)
+3. Rutas nuevas bajo `src/routes/_authenticated/app.*`
+4. `mobile-shell.tsx` con 4 tabs
+5. Onboarding route (`/onboarding`)
+6. Claves i18n ES/EN completas, resto marcadas
+7. Doc breve: `docs/04-design/CLIENT_APP.md` con IA + mapa + componentes (para que Cursor continúe)
+
+---
+
+## 9. Fuera de este sprint (siguiente)
+
+- Wiring a `DishService`, `OrderService`, etc.
+- Admin/Producción/Reparto redesign
+- Push notifications
+- Persistencia de onboarding y perfil regional avanzado
+- Suscripciones/facturación reales
+
+---
+
+## 10. Riesgos / notas
+
+- El shell móvil actual tiene 3 tabs; ampliarlo a 4 no rompe rutas existentes (se conservan `/app`, `/app/menu`, `/app/settings` moviendo settings bajo profile con redirect).
+- Ningún concepto nuevo introducido. Si durante el diseño aparece necesidad (p. ej. "wishlist", "favoritos"), se marca **REQUIRES KNOWLEDGE REVIEW** y se omite.
+
+¿Apruebas para ejecutar?
