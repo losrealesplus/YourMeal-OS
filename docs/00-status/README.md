@@ -12,7 +12,7 @@
 | OPERATIONAL DISCOVERY | ✅ Estructura cerrada |
 | OPERATIONAL CHECKS | ✅ Cerrado (transversal) |
 | FIRST OBSERVATION DAY | ⏸ Congelado (hasta retomar a propósito) |
-| OPERATIONAL MODEL | 🚧 Iniciado (FASE 4 · v0.1) |
+| Operational Model | 🟢 01 UL endurecido · 🚧 02–06 |
 
 ---
 
@@ -24,16 +24,18 @@ Es el **lenguaje permanente** de la operación de comida preparada.
 ```text
 Foundation ✅ → Blueprint ✅ → Checks ✅
         ↓
-Operational Model 🚧  ← prioridad ahora
+Operational Model 🚧
+   01 Ubiquitous Language 🟢
+   02–06 siguientes
         ↓
-Observation EatClean ⏸  (congelado hasta decisión explícita)
+Observation EatClean ⏸
 ```
 
 | Pregunta anterior | Pregunta ahora |
 |-------------------|----------------|
 | ¿Qué funcionalidades tendrá? | ¿Qué objetos existen en cualquier negocio de comida preparada? |
 
-Índice: [docs/17-operational-model/](../17-operational-model/README.md)
+Índice: [docs/17-operational-model/](../17-operational-model/README.md) · [01 UL](../17-operational-model/01-ubiquitous-language/README.md)
 
 **No es un cuarto pilar.** Equivalente producto del Domain Model.
 
@@ -47,15 +49,17 @@ Observation EatClean ⏸  (congelado hasta decisión explícita)
 | **PRODUCT BLUEPRINT** | ¿Qué / por qué? | ✅ |
 | **OPERATIONAL DISCOVERY** | ¿Por qué evolucionar? | ✅ carpeta · ⏸ campo |
 | **Operational Checks** | ¿Cómo guía la operación? | ✅ transversal |
-| **Operational Model** | ¿Con qué lenguaje? | 🚧 v0.1 |
+| **Operational Model** | ¿Con qué lenguaje? | 🚧 01🟢 · 02–06 |
 
 ```text
 Producto:  Discovery → Check → Assistant → Capability
-Lenguaje:  Operational Model
+Lenguaje:  Operational Model (Ubiquitous Language primero)
 Técnica:   Capability → Use Cases → Domain → Infrastructure
 ```
 
 Gate: evidencia → pregunta → Check → Capability.
+
+Contrato semántico: *misma palabra ≠ cosas distintas; misma realidad ≠ dos palabras.*
 
 ---
 
@@ -68,14 +72,14 @@ Gate: evidencia → pregunta → Check → Capability.
 
 ---
 
-## Próxima sesión
+## Próxima sesión / siguiente paso
 
-1. Endurecer **01 · Ubiquitous Language**  
-2. Luego 02 → 06 en ese orden  
-3. Sin código · sin pantallas · Observation sigue ⏸
+1. Endurecer **02 · Core Objects** (solo permanentes; sin sobre-modelado)  
+2. Luego 03 → 06  
+3. Observation sigue ⏸ · sin código / pantallas
 
 | Índice | Ruta |
 |--------|------|
+| Ubiquitous Language | [01-ubiquitous-language/](../17-operational-model/01-ubiquitous-language/README.md) |
 | Operational Model | [docs/17-operational-model/](../17-operational-model/README.md) |
 | Checks | [OPERATIONAL_CHECKS.md](../15-product/OPERATIONAL_CHECKS.md) |
-| Discovery (congelado) | [FIRST_OBSERVATION_DAY.md](../16-operational-discovery/FIRST_OBSERVATION_DAY.md) |

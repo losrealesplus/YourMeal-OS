@@ -4,7 +4,7 @@
 **Pregunta:** ¿Qué objetos existen en cualquier negocio de comida preparada?
 
 Hipótesis v0.1 — validar en Observation.  
-Definiciones: [01-UBIQUITOUS_LANGUAGE.md](./01-UBIQUITOUS_LANGUAGE.md).
+Definiciones: [01-ubiquitous-language/](./01-ubiquitous-language/README.md).
 
 ---
 

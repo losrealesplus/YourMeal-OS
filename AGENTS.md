@@ -99,16 +99,17 @@ Blueprint ✅ · Checks ✅ · Discovery (campo) ⏸
 Operational Model (Core Operativo) 🚧  ← siguiente trabajo
 ```
 
-> **FASE 4 — YourMeal Operational Model:** ¿qué objetos existen en cualquier negocio de comida preparada?  
+> **FASE 4 — YourMeal Operational Model:** consolidar el lenguaje (no ampliar).  
+> **01 Ubiquitous Language:** endurecido — contrato semántico, plantilla, 3 niveles, áreas.  
 > No es Core DDD ni cuarto pilar: [docs/17-operational-model/](./docs/17-operational-model/README.md).  
-> **Observation EatClean: CONGELADA** hasta decisión explícita de retomarla.  
+> **Observation EatClean: CONGELADA** ⏸.  
 > Unidad mínima de valor: **Operational Check**. Gate: evidencia → pregunta → Check → Capability.  
-> Sin pantallas / APIs / código en esta fase.  
-> Actores: nunca «Customer» / «Cliente» ambiguo.
+> Sin pantallas / APIs / código. Sin «Customer» / «Cliente» ambiguo.  
+> Regla: misma palabra ≠ cosas distintas; misma realidad ≠ dos palabras.
 
-**Próxima sesión:** endurecer 01 Ubiquitous Language → 02…06.
+**Próxima sesión:** endurecer **02 Core Objects** → 03…06 (01 UL ✅).
 
-Índices: [Operational Model](./docs/17-operational-model/README.md) · [Checks](./docs/15-product/OPERATIONAL_CHECKS.md) · [Estado](./docs/00-status/README.md)
+Índices: [01 UL](./docs/17-operational-model/01-ubiquitous-language/README.md) · [Operational Model](./docs/17-operational-model/README.md) · [Estado](./docs/00-status/README.md)
 
 ### Principio de valor (Capabilities)
 

@@ -4,7 +4,7 @@
 
 Cuando Cursor o Lovable generen código, deben alinearse con este glosario.
 
-**Sentido operativo (producto):** [Operational Model](../17-operational-model/README.md) — Core Operativo; este archivo es el glosario técnico / Domain.
+**Sentido operativo (producto):** [Operational Model · Ubiquitous Language](../17-operational-model/01-ubiquitous-language/README.md) — contrato semántico; este archivo es el glosario técnico / Domain.
 
 **Actores:** ver [ACTORS.md](./ACTORS.md) — fuente de verdad. Queda prohibido usar «Cliente» sin contexto explícito.
 
