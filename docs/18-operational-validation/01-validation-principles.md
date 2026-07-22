@@ -135,6 +135,45 @@ El principio 13 evita inflar el modelo. Este principio evita el sesgo inverso:
 
 Una contradición demostrada no es derrota del proceso. **Es su resultado esperado.**
 
+### 15. Cada VS rompe una dimensión distinta
+
+> **Nunca repetir el mismo tipo de tensión.**
+
+Seis escenarios que prueban lo mismo no son validación: son repetición.
+
+| VS | Dimensión |
+|----|-----------|
+| VS-001 | Adaptabilidad operativa |
+| VS-002 | Continuidad operativa |
+| VS-003 | Trazabilidad / seguridad alimentaria (recorrido **inverso**) |
+| VS-004 | Error humano y recuperación |
+| VS-005 | Escalabilidad extrema |
+| VS-006 | Generalización del dominio |
+
+Roadmap: [02-validation-scenarios](./02-validation-scenarios/README.md).
+
+### 16. No corregir el modelo tras cada VS
+
+> **Primero los seis VR. Luego el análisis conjunto. Solo entonces cambios al Operational Model.**
+
+| Correcto | Incorrecto |
+|----------|------------|
+| Acumular MC **propuestos / aparcados** | Aplicar MC-001 al cerrar VS-001 |
+| Buscar causas estructurales comunes | Sobreajustar a un único caso |
+| Priorizar brechas tras VS-001…006 | Tratar síntomas aislados |
+
+Una grieta de VS-001 puede ser la **misma** que en VS-003 y VS-006. Corregir pronto = riesgo de síntoma, no de causa.
+
+Flujo FASE 5:
+
+```text
+VS-001…006 → VR-001…006 (+ MC propuestos aparcados)
+        ↓
+Análisis conjunto de brechas
+        ↓
+Priorizar MC → aplicar a 17-operational-model
+```
+
 ---
 
 ## Dictámenes permitidos

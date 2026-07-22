@@ -3,7 +3,7 @@
 **Validation Report:** [VR-002](../05-validation-reports/VR-002-interrupcion-horno-eatclean.md)  
 **Fecha:** 2026-07-22  
 **Capa afectada:** Lifecycle Batch · Plan · Checks Kitchen · (amplía MC-001)  
-**Estado:** ⏳ **propuesto** — no aplicado a `17`
+**Estado:** ⏸ **aparcado** — no aplicar hasta análisis conjunto post VS-006 (principio 16)
 
 ---
 

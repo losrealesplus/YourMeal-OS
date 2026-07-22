@@ -2,54 +2,40 @@
 
 Casos operativos **completos** — auditorías hostiles al modelo.
 
-Cada escenario intenta refutar. Pregunta guía:
-
-> **¿Qué tendría que pasar para que este modelo dejara de ser válido?**
+> **Principio 15:** cada VS rompe una **dimensión distinta**. Nunca repetir el mismo tipo de tensión.  
+> **Principio 16:** no aplicar cambios a `17` hasta cerrar VS-001…006 y analizar brechas en conjunto.
 
 Protocolo: [audit-protocol.md](./audit-protocol.md).
 
 ---
 
-## Estrategia de familias (batería)
+## Roadmap por dimensión
 
-Cubrir perspectivas **distintas** — no variantes del mismo estrés.
+| VS | Escenario | Dimensión puesta a prueba | Estado |
+|----|-----------|---------------------------|--------|
+| [VS-001](./VS-001-semana-normal.md) | Cambio operativo tardío (Amend Order) | **Adaptabilidad** de la operación | ✅ Extended · VR-001 |
+| [VS-002](./VS-002-interrupcion-horno.md) | Interrupción (horno) | **Continuidad** de la operación | ✅ Extended · VR-002 |
+| [VS-003](./VS-003-seguridad-alimentaria.md) | Retirada lote contaminado | **Trazabilidad** / seguridad (recorrido **inverso**) | ✅ Extended · VR-003 |
+| [VS-004](./VS-004-rotura-stock.md) | → reescribir: error humano | **Error humano** y recuperación | ⏳ |
+| [VS-005](./VS-005-cambio-menu-ultima-hora.md) | → reescribir: carga 2×–3× | **Escalabilidad** extrema | ⏳ |
+| [VS-006](./VS-006-cancelacion-cliente.md) | → reescribir: cliente reglas distintas | **Generalización** del dominio | ⏳ |
+| VS-007 | Repartidor / logística (opcional) | Complemento · no sustituye familia | ⏳ |
 
-| ID | Familia | Estado |
-|----|---------|--------|
-| [VS-001](./VS-001-semana-normal.md) | **Comercial** — modificación tardía de Order | ✅ Extended · VR-001 |
-| [VS-002](./VS-002-interrupcion-horno.md) | **Disrupción operacional** — mid-execution | ✅ Extended · VR-002 |
-| [VS-003](./VS-003-pedido-masivo.md) → reorientar | **Seguridad alimentaria** — retirada ingrediente/lote | ⏳ reescribir |
-| [VS-004](./VS-004-rotura-stock.md) → reorientar | **Error humano** — producción/entrega incorrecta | ⏳ reescribir |
-| [VS-005](./VS-005-cambio-menu-ultima-hora.md) → reorientar | **Escalado extremo** — 2×–3× carga | ⏳ reescribir |
-| [VS-006](./VS-006-cancelacion-cliente.md) → reorientar | **Reglas de negocio** — cliente con requisitos distintos | ⏳ reescribir |
-| [VS-007](./VS-007-repartidor-ausente.md) | Logística (conductor) — mantener o fusionar | ⏳ |
-
-Semana con festivo (calendario): candidato a escenario futuro aparte — no bloquea la batería anterior.
+Ninguno repite el anterior. Cada uno obliga a demostrar una capacidad diferente del modelo.
 
 ---
 
-## Índice vivo
+## Criterio de cierre de escenario
 
-| ID | Escenario | Foco | Estado |
-|----|-----------|------|--------|
-| VS-001 | Modificación tardía EatClean | Amend · Plan · Stock · Route | ✅ VR-001 Extended |
-| VS-002 | Interrupción horno EatClean | Pause Batch · Replan · Kitchen · Notification≠dominio | ✅ VR-002 Extended |
-| VS-003…006 | Familias arriba | — | ⏳ |
-| VS-007 | Repartidor ausente | Route · Delivery | ⏳ |
-
----
-
-## Criterio de cierre
-
-1. Cadena de comprobación completa.  
+1. Auditoría completa (6 preguntas / paso).  
 2. VR con clasificación + Knowledge State.  
-3. MC si Extended/Contradicted.  
-4. Tras VS-001: retrospectiva metodológica.  
-5. Preferible aplicar/coordinar MC abiertos antes de saturar más Extended sobre el mismo Lifecycle.
+3. MC **propuesto y aparcado** si Extended/Contradicted — **no** aplicado a 17.  
+4. Tras VS-006: sesión de análisis conjunto → priorizar MC.
 
 ---
 
 ## Relacionado
 
-- [05 validation-reports](../05-validation-reports/README.md)  
-- [08 methodological-retrospective](../08-methodological-retrospective.md)
+- [01 validation-principles](../01-validation-principles.md) §15–16  
+- [06 model-changes](../06-model-changes/README.md)  
+- [05 validation-reports](../05-validation-reports/README.md)

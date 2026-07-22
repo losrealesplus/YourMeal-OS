@@ -8,20 +8,20 @@ Todo cambio debe estar respaldado por un [Validation Report](./05-validation-rep
 
 ---
 
-## Flujo obligatorio
+## Flujo obligatorio (FASE 5)
 
 ```text
-VR-xxx (dictamen ⚠ 🔁 🚨)
+VS → VR → MC propuesto (aparcado)
         ↓
-MC-xxx (propuesta de cambio documentada)
+[tras VS-001…006] Análisis conjunto de brechas
         ↓
-Revisión (Constitución / Lifecycles / UL según capa)
-        ↓
-Edición en docs/17-operational-model/
-        ↓
-Referencia MC en CHANGELOG + diario
+Priorizar MC → edición 17-operational-model
 ```
 
+> **Principio 16:** no aplicar cambios al Operational Model después de cada VS.  
+> Acumular evidencia; corregir causas estructurales, no síntomas.
+
+Durante la batería, los MC viven en esta carpeta como **propuestos / aparcados**.
 ---
 
 ## Plantilla · MC-xxx
@@ -64,8 +64,11 @@ Referencia MC en CHANGELOG + diario
 
 | ID | Título | VR | Estado |
 |----|--------|-----|--------|
-| [MC-001](./MC-001-amend-and-revise-transitions.md) | Amend Order + Revise Plan/Route (Ready) | VR-001 | ⏳ propuesto |
-| [MC-002](./MC-002-pause-batch-replan-execution.md) | Pause Batch + Replan In execution + Kitchen | VR-002 | ⏳ propuesto |
+| [MC-001](./MC-001-amend-and-revise-transitions.md) | Amend Order + Revise Plan/Route (Ready) | VR-001 | ⏸ aparcado (batería) |
+| [MC-002](./MC-002-pause-batch-replan-execution.md) | Pause Batch + Replan In execution + Kitchen | VR-002 | ⏸ aparcado (batería) |
+| [MC-003](./MC-003-lot-traceability-recall.md) | Lote · traza inversa · retirada | VR-003 | ⏸ aparcado (batería) |
+
+> Ningún MC se aplica a `17` hasta análisis conjunto post VS-006 (principio 16).
 
 ---
 

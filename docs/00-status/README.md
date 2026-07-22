@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-22 · VS-001 auditado · VR-001 Extended · MC-001 propuesto  
+**Última actualización:** 2026-07-22 · VS-001…003 · Extended×3 · MC ⏸ (principio 16)  
 **Versión técnica:** `v0.1.0` — FOUNDATION LOCKED  
 **Versión modelo:** Alpha (pre-certificación)
 
@@ -18,6 +18,8 @@ Es el **primer sistema que demostrará si el proceso OPE funciona**.
 | **YourMeal OS** | Experimento controlado · caso de referencia |
 
 Las decisiones de aquí en adelante: ¿fortalecen el conocimiento trazable o solo aceleran código?
+
+**FASE 5:** fricción deliberada (coste bajo). Principios **15** (dimensión distinta por VS) y **16** (no corregir `17` hasta análisis de los seis VR).
 
 ---
 
@@ -125,14 +127,13 @@ Plantilla: [07-certification](../18-operational-validation/07-certification.md).
 
 ## Próxima sesión
 
-1. Coordinar / aplicar **MC-001 + MC-002** (Amend · Revise · Pause · Replan)  
-2. Firmar retrospectiva metodológica  
-3. **VS-003** familia seguridad alimentaria (reescribir) — preferible tras MCs  
+1. **VS-004** — error humano y recuperación (reescribir escenario)  
+2. **No** aplicar MC-001…003 a `17` hasta VS-006 + análisis conjunto  
+3. Firmar retrospectiva metodológica cuando cierre la batería  
 4. Sin Etapa 2 hasta Certified v1.0
 
 | Índice | Ruta |
 |--------|------|
-| VR-002 | [VR-002](../18-operational-validation/05-validation-reports/VR-002-interrupcion-horno-eatclean.md) |
-| MC-002 | [MC-002](../18-operational-validation/06-model-changes/MC-002-pause-batch-replan-execution.md) |
-| VS-002 | [VS-002](../18-operational-validation/02-validation-scenarios/VS-002-interrupcion-horno.md) |
-| Familias | [02 README](../18-operational-validation/02-validation-scenarios/README.md) |
+| VR-003 | [VR-003](../18-operational-validation/05-validation-reports/VR-003-seguridad-alimentaria-retiro.md) |
+| Roadmap dimensiones | [02 scenarios](../18-operational-validation/02-validation-scenarios/README.md) |
+| Principios 15–16 | [01](../18-operational-validation/01-validation-principles.md) |

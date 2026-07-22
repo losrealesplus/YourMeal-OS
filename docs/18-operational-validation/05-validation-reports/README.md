@@ -119,8 +119,9 @@ Ver también [validation-coverage](./validation-coverage.md) — estabilidad del
 
 | ID | Título | Origen | Clasificación | MC |
 |----|--------|--------|---------------|-----|
-| [VR-001](./VR-001-modificacion-tardia-eatclean.md) | Modificación tardía EatClean | VS-001 | **Extended** | [MC-001](../06-model-changes/MC-001-amend-and-revise-transitions.md) ⏳ |
-| [VR-002](./VR-002-interrupcion-horno-eatclean.md) | Interrupción horno EatClean | VS-002 | **Extended** | [MC-002](../06-model-changes/MC-002-pause-batch-replan-execution.md) ⏳ |
+| [VR-001](./VR-001-modificacion-tardia-eatclean.md) | Modificación tardía EatClean | VS-001 Adaptabilidad | **Extended** | [MC-001](../06-model-changes/MC-001-amend-and-revise-transitions.md) ⏸ |
+| [VR-002](./VR-002-interrupcion-horno-eatclean.md) | Interrupción horno EatClean | VS-002 Continuidad | **Extended** | [MC-002](../06-model-changes/MC-002-pause-batch-replan-execution.md) ⏸ |
+| [VR-003](./VR-003-seguridad-alimentaria-retiro.md) | Retirada lote pollo | VS-003 Trazabilidad inversa | **Extended** | [MC-003](../06-model-changes/MC-003-lot-traceability-recall.md) ⏸ |
 
 ---
 

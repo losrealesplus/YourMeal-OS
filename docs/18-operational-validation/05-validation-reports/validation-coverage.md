@@ -1,78 +1,58 @@
 # Validation Coverage — Estabilidad del modelo
 
-**Última actualización:** 2026-07-22 · post **VR-002**
+**Última actualización:** 2026-07-22 · post **VR-003** · principio 16 (MC aparcados)
 
 ---
 
 ## Resumen ejecutivo
 
 ```text
-Nivel de confianza actual:  Alpha
-  2 escenarios hostiles · ambos Extended · 0 Contradicted · 0 Core nuevos
-  MC-001 + MC-002 propuestos (Lifecycles mid-commercial + mid-execution)
+Nivel: Alpha
+VS: 3/6 dimensiones · Extended × 3 · Contradicted × 0 · Core Δ × 0
+MC: 3 aparcados — NO aplicados a 17 hasta análisis post VS-006
 ```
 
 ---
 
-## Cobertura de ejecución
+## Cobertura
 
 | Área | Progreso | Notas |
 |------|----------|-------|
-| Validation Scenarios (VS) | **2 / 7** | VS-001 comercial · VS-002 disrupción |
-| Edge Cases (EC) | 0 / 6 | Parcialmente dentro de VS |
-| Field Observation (FOV) | 0 | Mesa |
-| Validation Reports (VR) | **2** | Extended × 2 |
-| Model Changes (MC) | **2 propuestos** | 0 aplicados |
+| VS por dimensión | **3 / 6** | Adaptabilidad · Continuidad · Trazabilidad |
+| VR | 3 | Extended × 3 |
+| MC aplicados a 17 | **0** | Principio 16 |
+| MC aparcados | 3 | MC-001 · 002 · 003 |
 
----
-
-## Estabilidad del modelo
-
-| Métrica | Valor |
-|---------|-------|
-| Core Objects modificados | **0** |
-| Dependencies modificadas | 0 |
-| Lifecycles aplicados | 0 · **propuestos:** Amend · Revise Ready · Pause · Replan In execution |
-| Checks añadidos aplicados | 0 |
-| Invariants modificados | **0** |
-| Model Changes | 2 ⏳ |
-
-### Madurez por VR
+### Madurez VR
 
 | Clasificación | Conteo |
 |---------------|--------|
-| Confirmed | 0 (global) |
-| Clarified | 0 |
-| Extended | **2** |
+| Extended | **3** |
 | Contradicted | **0** |
+| Confirmed (global) | 0 |
 
 ### Histórico
 
-| Fecha | VS | MC | Invariants Δ | VR class | Nivel |
-|-------|-----|-----|--------------|----------|-------|
-| 2026-07-22 | 0/7 | 0 | 0 | — | Alpha |
-| 2026-07-22 | 1/7 | 1⏳ | 0 | Extended | Alpha |
-| 2026-07-22 | 2/7 | 2⏳ | 0 | Extended×2 | Alpha |
+| Fecha | VS | MC aparcados | INV Δ | Nivel |
+|-------|-----|--------------|-------|-------|
+| 2026-07-22 | 3/6 | 3 | 0 | Alpha |
 
 ```text
-Validation Coverage — 2026-07-22 (post VR-002)
+Dimensiones cubiertas:
+  ✔ Adaptabilidad (VS-001)
+  ✔ Continuidad (VS-002)
+  ✔ Trazabilidad inversa (VS-003)
+  ⏳ Error humano (VS-004)
+  ⏳ Escalabilidad (VS-005)
+  ⏳ Generalización (VS-006)
 
-VS ejecutados:           2/7
-Edge Cases:              0/6
-Field Observations:      0
-
-Core Objects modificados:    0
-Lifecycles aplicados:        0 (MC-001·002 pendientes)
-Invariants modificados:      0
-
-VR: Confirmed 0 · Clarified 0 · Extended 2 · Contradicted 0
-Nivel: Alpha
+Patrón provisional: Extended en Lifecycles/Supporting — no en Core espina.
+Análisis estructural: diferido a post VS-006.
 ```
-
-**Lectura:** dos familias distintas → mismas grietas de **Lifecycle temporal**, no de vocabulario. Señal de aplicar MC antes de más VS sobre el mismo eje.
 
 ---
 
 ## Relacionado
 
-- [VR-001](./VR-001-modificacion-tardia-eatclean.md) · [VR-002](./VR-002-interrupcion-horno-eatclean.md)
+- [VR-003](./VR-003-seguridad-alimentaria-retiro.md)  
+- [principios §15–16](../01-validation-principles.md)

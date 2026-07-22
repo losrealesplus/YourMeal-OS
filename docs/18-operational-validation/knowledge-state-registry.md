@@ -35,7 +35,7 @@ Actualizar al cerrar VR o FOV. Ver [knowledge-state.md](./knowledge-state.md).
 
 ---
 
-## Supporting / órbita (tocados en VS-001)
+## Supporting / órbita
 
 | Elemento | KS | VR | Notas |
 |----------|-----|-----|-------|
@@ -44,8 +44,9 @@ Actualizar al cerrar VR o FOV. Ver [knowledge-state.md](./knowledge-state.md).
 | Label | **V** | VR-001 | sin gluten / alérgenos |
 | Beneficiary | **V** | VR-001 | alta 2 nuevos |
 | Order Item | **V** | VR-001 | líneas Amend |
-| Kitchen | **V** parcial | VS-002 | VR-002 | Alpha | Ancla OK · capacidad/equipo no Core |
-| Notification (rechazo) | **V** | VS-002 | VR-002 | — | Capability · no modelo 17 |
+| Kitchen | **V** parcial | VR-002 | Ancla OK · capacidad no modelada · Oven≠Core |
+| Notification | **V** (rechazo) | VR-002 | Capability · no entra en 17 |
+| Purchase Order | H | — | Supporting futuro · no promovido |
 
 ---
 
@@ -54,7 +55,8 @@ Actualizar al cerrar VR o FOV. Ver [knowledge-state.md](./knowledge-state.md).
 | ID | KS | VR respaldo | Notas |
 |----|-----|-------------|-------|
 | INV-011 | **V** | VR-001 | Batch → un Plan · sin grieta |
-| INV-020 | **V** | VR-001 | Exige Amend explícito (MC-001) |
+| INV-020 | **V** | VR-001 · VR-002 | Amend + Pause deben ser explícitos |
+| INV-044 | **V** | VR-002 | Capabilities (notif.) no definen leyes |
 | INV-021 | **V** | VR-001 | Orden causal intacto |
 | INV-032 | **V** | VR-001 | Dishes en Menu |
 | INV-034 | **V** | VR-001 | Pollo 12&lt;20 bloquea |

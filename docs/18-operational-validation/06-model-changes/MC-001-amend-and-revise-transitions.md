@@ -3,7 +3,7 @@
 **Validation Report:** [VR-001](../05-validation-reports/VR-001-modificacion-tardia-eatclean.md)  
 **Fecha:** 2026-07-22  
 **Capa afectada:** Lifecycle (Order · Production Plan · Delivery Route) · Checks en transición · docs 04  
-**Estado:** ⏳ **propuesto** — no aplicado aún a `17-operational-model`
+**Estado:** ⏸ **aparcado** — no aplicar hasta análisis conjunto post VS-006 (principio 16)
 
 ---
 
