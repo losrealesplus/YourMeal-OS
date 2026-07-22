@@ -2,10 +2,12 @@
 
 **Última actualización:** 2026-07-22  
 **Hito:** [Methodology Frozen](./04-methodology-frozen.md) 🧊  
-**Conocimiento:** **Table-Validated** (no Field-Validated aún)  
-**Proyecto principal:** FOV EatClean — [Mission Brief](./FOV_MISSION_BRIEF.md)
+**Conocimiento:** **Table-Validated** (Field-Validated tras G-01)  
+**Carril A:** FOV EatClean — [Mission Brief](./FOV_MISSION_BRIEF.md)  
+**Carril B:** 🟢 **ABIERTO** — [Dual Track](./DUAL_TRACK_ANTECAMARA.md) · [Sprint 2.1](../15-product/etapa-2/SPRINT_2_1_PRODUCT_FOUNDATION.md)
 
-> Una vez congelada la metodología, el conocimiento solo puede evolucionar mediante evidencia observacional suficiente.
+> El código no crea conocimiento; **materializa** conocimiento.  
+> ❌ No **inventar** lógica de negocio.
 
 ---
 
@@ -13,57 +15,43 @@
 
 | Rol | Qué es |
 |-----|--------|
-| **EatClean** | Laboratorio |
-| **FOPEBA** | Método v1.0 **frozen** (mejoras ❌ · errores demostrables ✅) |
-| **YourMeal OS** | Primer producto post–Field-Validated |
+| **EatClean** | Laboratorio (FOV) |
+| **FOPEBA** | Método v1.0 frozen |
+| **YourMeal OS** | Producto — Carril B materializa el OM Table-Validated |
 
 ---
 
-## Estados del conocimiento
+## Dual track
+
+| Carril | Estado | Foco |
+|--------|--------|------|
+| **A** Certificación | FOV → G-01 | Evidencia empírica |
+| **B** Producto | 🟢 Abierto | UX · arch · materialización con trazabilidad |
+
+Carril B fases: **A** Experience libre · **B** Tech libre · **C** Modelo+trazabilidad · **D** FOV-dependent 🔒
+
+---
+
+## Progreso FOPEBA
 
 ```text
-Knowledge Designed
-        ↓
-Knowledge Table-Validated     ← ahora (RC + IOV)
-        ↓
-Knowledge Field-Validated     ← tras FOV … G-01
+FASE A Discovery     100% ✅
+FASE B Certification ~85% · Table-Validated · FOV⏳
+FASE C Product Eng.  🔓 Carril B parcial · 🔒 G-01 pleno / Fase D
 ```
 
 ---
 
-## Progreso
+## Arranque Carril B (recomendado)
 
-```text
-FASE A  100% ✅
-FASE B  ~85% — metodología FROZEN · ejecución FOV→G-01
-FASE C  🔒 G-01
-```
+1. [Product Information Architecture](../15-product/PRODUCT_INFORMATION_ARCHITECTURE.md)  
+2. [Sprint 2.1 Product Foundation](../15-product/etapa-2/SPRINT_2_1_PRODUCT_FOUNDATION.md)  
+3. [Knowledge Traceability](../15-product/etapa-2/knowledge-traceability.md)
 
-Etapa 1 termina en **G-01 Approved** (= Field-Validated), no en el RC.
+No empezar por «pantalla bonita» ni por inventar reglas.
 
 ---
 
-## Artefactos (tres capas)
+## Relacionado
 
-```text
-Knowledge → Evidence → Decision
-```
-
-Decision: KUR · ECR · Acta G-01 (no son «más docs de modelo»).
-
----
-
-## Ejecución
-
-| Paso | Nota |
-|------|------|
-| FOV | [Mission Brief](./FOV_MISSION_BRIEF.md) · capturar **Knowledge Leakage** |
-| FER → KU → EC | sistemas listos |
-| G-01 | **por criterios**, no por voto |
-| Tras G-01 | [Post-Certification Review](./05-post-certification-review.md) → v1.1 archivo |
-
----
-
-## Carril B
-
-Sin engines — permitido; no sustituye evidencia.
+- [Freeze](./04-methodology-frozen.md) · [RC](./02-operational-model-rc.md) · [etapa-2](../15-product/etapa-2/README.md)

@@ -1,89 +1,75 @@
-# Dual Track — Antesala de la implementación
+# Dual Track — Carril A (campo) · Carril B (producto)
 
-> **Estamos en la antesala de la implementación. No crucemos la puerta un día antes de tiempo.**
-
-Hace semanas la respuesta era «todavía no».  
-Hoy ya no. Pero **tampoco** es «empezad a programar motores de dominio».
+> **Carril A** = evidencia empírica (FOV…G-01).  
+> **Carril B** = **abierto** — materializar conocimiento Table-Validated sin **inventarlo**.
 
 ---
 
-## Cuerpo de evidencia (lectura)
-
-| Señal | Estado |
-|-------|--------|
-| Validation Scenarios | 6/6 |
-| Core Objects nuevos | **0** |
-| Contradictions estructurales | **0** |
-| IOV-001 | ✅ · IFD **0** |
-| Findings | Documentación, **no** conocimiento |
-
-Eso ya no es intuición. Es evidencia.
-
-**Escenario B (el nuestro):** intentamos romper el modelo desde múltiples ángulos; las grietas aparecen siempre en el mismo sitio (docs / navegación), no en la espina.
-
----
-
-## Dos carriles
-
-### Carril A — Certificar Etapa 1 *(no construir más modelo)*
+## Regla de oro (Carril B / Etapa 2)
 
 ```text
-IOV-001…003 ✅ → Operational Model RC ✅
-    → FOV (ejecutar) → FER → KU → EC → Gate G-01 → FASE C
+❌ No inventar lógica de negocio.
+✅ Materializar lógica ya justificada por el Operational Model.
 ```
 
-Sistemas: [fov/](../20-evidence-framework/fov/README.md) · [ku/](../20-evidence-framework/ku/README.md) · [ec/](../20-evidence-framework/ec/README.md) · [g01/](../20-evidence-framework/g01/README.md).  
-Campaña: [01-certification-campaign](./01-certification-campaign.md).  
-RC **para prueba**; FOV intenta refutar, no celebrar.
+Toda lógica implementada debe responder:
+
+> **¿En qué parte del Operational Model (Table-Validated) está basada esta decisión?**
+
+| Respuesta | Acción |
+|-----------|--------|
+| Cita a Core · Lifecycle · Check · Dynamics · Capability… | ✅ Implementar (+ [Knowledge Traceability](../15-product/etapa-2/knowledge-traceability.md)) |
+| «Nos parece mejor…» / «más cómodo…» / «sobre la marcha…» | ❌ Esperar evidencia (FOV → FER → KU) |
+
+> **El código ya no crea conocimiento; el código materializa conocimiento.**
 
 ---
 
-### Carril B — Soñar Etapa 2 *(permitido · con condición)*
+## Carril A — Certificación (FASE B ejecución)
 
-> **No escribir lógica de negocio.**
+```text
+FOV → FER → KU → EC → G-01 → Field-Validated
+```
 
-Podéis avanzar sin comprometer el modelo:
-
-| Área | Permitido |
-|------|-----------|
-| **UX** | Navegación · arquitectura visual · flujos · wireframes · Dashboard · Admin Suite |
-| **Design System** | Componentes · tokens · iconografía · estados · responsive · a11y |
-| **Arquitectura técnica** | Estructura repo · módulos · convenciones · interfaces · servicios · DI |
-| **Infraestructura** | Supabase · auth · RBAC · observabilidad · CI/CD · analytics |
-
-Foundation ya cubre parte de infra; Carril B **extiende** sin implementar espina.
+Proyecto de campo: [FOV Mission Brief](./FOV_MISSION_BRIEF.md).  
+No sustituible por progreso de Carril B.
 
 ---
 
-## Lo que todavía se evita (Carril B)
+## Carril B — Producto (abierto en cuatro fases)
 
-No implementar todavía:
+Detalle: [etapa-2/](../15-product/etapa-2/README.md).
 
-- Production Engine  
-- Order Engine  
-- Route Engine  
-- Batch Engine  
-- Planning Engine  
+| Fase | Nombre | Libertad |
+|------|--------|----------|
+| **A** | Product Experience | 100% libre (UX · nav · wireframes · DS · dashboards) |
+| **B** | Arquitectura Técnica | Libre (repo · módulos · auth · RBAC · CI · DI…) |
+| **C** | Materialización del Modelo | Permitida **con trazabilidad** al OM |
+| **D** | Dependiente de FOV | **Bloqueada** hasta evidencia de campo |
 
-Esos motores dependen del conocimiento que FOV (empírica) + FER + KU aún van a terminar de validar.
+### Fase D — sigue bloqueado
 
-Dish Library / Module 01 ya validado es excepción histórica — no abrir nuevos motores de espina.
+No implementar aún (suelen cambiar tras FOV):
+
+- automatizaciones por excepciones reales;
+- optimización de rutas por comportamiento observado;
+- heurísticas / reglas aprendidas / «decisiones inteligentes»;
+- motores cuya semántica dependa de Knowledge Leakage aún no capturado.
+
+Dish Library / Module 01 (ya validado) = excepción histórica.
 
 ---
 
-## YourMeal OS como instrumento
+## Primer movimiento recomendado
 
-Al principio YourMeal OS era el objetivo.  
-Ahora es el **instrumento** con el que se demuestra que FOPEBA funciona.
+No abrir Cursor primero. Abrir **arquitectura de información**.
 
-Si EatClean cambiara o desapareciera, el **proceso que reduce incertidumbre de forma medible** seguiría teniendo valor.
-
-Cuando se abra Etapa 2 (G-01), el código será **consecuencia del conocimiento**, no su sustituto.
+1. [Product Information Architecture](../15-product/PRODUCT_INFORMATION_ARCHITECTURE.md)  
+2. [Sprint 2.1 — Product Foundation](../15-product/etapa-2/SPRINT_2_1_PRODUCT_FOUNDATION.md)
 
 ---
 
 ## Relacionado
 
-- [FOPEBA](../18-operational-validation/00-operational-product-engineering.md)  
-- [Gate G-01](../20-evidence-framework/07-gate-g01-operational-readiness.md)  
-- [Estado](./README.md)
+- [Estado](./README.md) · [Freeze](./04-methodology-frozen.md)  
+- [FOPEBA](../18-operational-validation/00-operational-product-engineering.md)

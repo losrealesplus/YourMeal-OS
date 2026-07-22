@@ -94,17 +94,19 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-FOPEBA v1.0 · Methodology Frozen 🧊
-Operational Model · Table-Validated (no Field-Validated aún)
-FASE B ejecución FOV ⏳ · FASE C 🔒 G-01
+FOPEBA v1.0 Frozen 🧊 · OM Table-Validated
+Carril A: FOV ⏳ · Carril B: 🟢 ABIERTO (no inventar lógica)
 ```
 
-Principio: conocimiento post-freeze solo evoluciona con **evidencia observacional suficiente**.
+**Regla Etapa 2:** toda lógica → *¿en qué parte del Operational Model está basada?*  
+Si no hay cita → no se implementa (pasa por evidencia).
 
-**Proyecto principal:** [FOV Mission Brief](./docs/00-status/FOV_MISSION_BRIEF.md) · [Freeze](./docs/00-status/04-methodology-frozen.md).  
-G-01 = criterios, no voto. Tras G-01: [Post-Certification Review](./docs/00-status/05-post-certification-review.md).
+| Carril | Entrada |
+|--------|---------|
+| A campo | [Mission Brief](./docs/00-status/FOV_MISSION_BRIEF.md) |
+| B producto | [Dual Track](./docs/00-status/DUAL_TRACK_ANTECAMARA.md) · [Sprint 2.1](./docs/15-product/etapa-2/SPRINT_2_1_PRODUCT_FOUNDATION.md) · [IA](./docs/15-product/PRODUCT_INFORMATION_ARCHITECTURE.md) |
 
-Índices: [Estado](./docs/00-status/README.md) · [RC](./docs/00-status/02-operational-model-rc.md)
+Índices: [Estado](./docs/00-status/README.md) · [Freeze](./docs/00-status/04-methodology-frozen.md) · [Traceability](./docs/15-product/etapa-2/knowledge-traceability.md)
 
 ### Principio de valor (Capabilities)
 
