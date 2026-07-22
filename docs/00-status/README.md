@@ -1,62 +1,39 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-22 · **Antesala de implementación**  
-**Modelo:** Beta · IVR-001 ✅ · G-01 🔒 · **FOV no abierto**
+**Última actualización:** 2026-07-22 · **Certificación · IOV-002**  
+**Mentalidad:** certificar (no construir más modelo)
 
-> Estamos en la antesala. No crucemos la puerta un día antes de tiempo.
-
----
-
-## Lectura de evidencia
-
-| Señal | Valor |
-|-------|-------|
-| VS | 6/6 · Core Δ **0** · Contradicted **0** |
-| IOV-001 | ✅ · IFD **0** · Findings = docs, no conocimiento |
-| Confianza | Escenario B — grietas repetidas en el mismo sitio (docs) |
-
-Dual track: [DUAL_TRACK_ANTECAMARA](./DUAL_TRACK_ANTECAMARA.md)
+> Estamos en la antesala. Campaña de certificación del Carril A.
 
 ---
 
-## Carril A — Cerrar Etapa 1 *(orden fijo)*
+## Campaña de certificación
 
 | Paso | Estado |
 |------|--------|
-| IOV-001 | ✅ [IVR-001](../19-independent-operational-validation/ivr/IVR-001-iov001-piloto-ia.md) |
-| IOV-002 | ⏳ **Siguiente** |
+| IOV-001 | ✅ |
+| IOV-002 | 🚧 |
 | IOV-003 | ⏳ |
 | Operational Model RC | ⏳ |
-| FOV → KU → EC → **G-01** | 🔒 tras IOV+RC |
+| FOV → KU → EC → G-01 | 🔒 |
+
+Detalle: [01-certification-campaign](./01-certification-campaign.md) · [Dual track](./DUAL_TRACK_ANTECAMARA.md)
 
 ---
 
-## Carril B — Soñar Etapa 2 *(sin lógica de negocio)*
+## Carril B
 
-Permitido: UX · Design System · arquitectura técnica · infra.  
-**Prohibido aún:** Order / Plan / Batch / Route / Production engines.
-
----
-
-## FOPEBA
-
-> Convertir observaciones operacionales en conocimiento operacional verificable **antes** de convertirlo en software.
-
-YourMeal OS = instrumento para demostrar el framework.
+UX / DS / arch / infra **sin** engines de espina — permitido en paralelo.
 
 ---
 
-## Próximo (Carril A)
+## Próximo
 
-1. **IOV-002** adversarial  
-2. IOV-003 → RC  
-3. FOV… G-01  
-
-Carril B puede avanzar en paralelo sin motores de espina.
+1. Cerrar **IVR-002** (adversarial)  
+2. IOV-003 → RC → FOV…
 
 | Índice | Ruta |
 |--------|------|
-| Dual track | [DUAL_TRACK_ANTECAMARA](./DUAL_TRACK_ANTECAMARA.md) |
-| Campaña IOV | [06](../19-independent-operational-validation/06-campaign-order.md) |
-| FOPEBA | [00](../18-operational-validation/00-operational-product-engineering.md) |
-| G-01 | [07](../20-evidence-framework/07-gate-g01-operational-readiness.md) |
+| Certificación | [01](./01-certification-campaign.md) |
+| RC | [02](./02-operational-model-rc.md) |
+| IOV-002 | [02](../19-independent-operational-validation/02-adversarial-validation.md) |

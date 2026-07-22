@@ -57,9 +57,8 @@ Diremos: **«Vamos a implementar conocimiento operacional certificado.»**
 
 | Requisito | Estado |
 |-----------|--------|
-| Operational Validation | ✅ |
 | IOV-001 | ✅ [IVR-001](../19-independent-operational-validation/ivr/IVR-001-iov001-piloto-ia.md) |
-| IOV-002 | ⏳ |
+| IOV-002 | ✅ [IVR-002](../19-independent-operational-validation/ivr/IVR-002-iov002-adversarial.md) |
 | IOV-003 | ⏳ |
 | Operational Model RC | ⏳ |
 | FOV | ⏳ |

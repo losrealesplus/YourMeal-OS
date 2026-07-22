@@ -96,7 +96,7 @@ Registro: [structural-findings](./04-findings/structural-findings.md).
 
 ## Estado
 
-⏳ / 🚧 según [IVR](./ivr/README.md).
+| IOV-002 | ⏳ / ✅ ver [IVR](./ivr/README.md) |
 
 ---
 

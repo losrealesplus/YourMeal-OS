@@ -100,7 +100,7 @@ Carril B — UX / DS / arch / infra (sin engines)  ✅ permitido
 ```
 
 **YourMeal OS** = instrumento FOPEBA.  
-**Ahora (A):** IOV-002. **Paralelo (B):** UX/infra sin lógica de negocio de espina.
+**Ahora (A):** IOV-003 (IVR-002 ✅). Luego RC. FOV después.
 
 Índices: [Estado](./docs/00-status/README.md) · [Dual track](./docs/00-status/DUAL_TRACK_ANTECAMARA.md) · [FOPEBA](./docs/18-operational-validation/00-operational-product-engineering.md)
 
