@@ -2,65 +2,136 @@
 
 **Paso 2 · Campaña de certificación** — [01](../00-status/01-certification-campaign.md)
 
-El paso más elegante de la metodología: la teoría desaparece.
+> **No es un test de arquitectura.**  
+> Es un test de **determinismo del conocimiento**.
 
 ---
 
-## Pregunta
+## Pregunta correcta
 
-> **¿Dos personas distintas implementan el mismo modelo?**
+No:
 
----
+> ¿Las dos arquitecturas son iguales?
 
-## Procedimiento
+Sí:
 
-1. Dos desarrolladores (o dos diseños) **independientes**.  
-2. **Sin comunicación** entre ellos.  
-3. Mismo [KCM](./kcm/README.md).  
-4. **No programan.** Diseñan arquitectura.
-
-Autores no corrigen a mitad.
+> **¿El Operational Model restringe suficientemente el espacio de diseño para que dos personas independientes lleguen a soluciones conceptualmente equivalentes?**
 
 ---
 
-## Qué entregan (no código)
+## Hipótesis
 
-- Agregados  
-- Límites de módulo / bounded context  
-- Repositorios (contratos)  
-- Casos de uso  
-- Servicios / orquestación  
+> Si el conocimiento operacional está suficientemente formalizado, dos implementadores independientes producirán arquitecturas **conceptualmente equivalentes**.
 
 ---
 
-## Comparación
+## Evidencia previa (contexto de campaña)
 
-No igualdad absoluta.  
-**Equivalencia conceptual.**
+| Fase | Estado | Confianza |
+|------|--------|-----------:|
+| Operational Validation | ✅ | Muy alto |
+| IOV-001 transferible | ✅ | Alto |
+| IOV-002 resistente | ✅ | Muy alto |
+| **IOV-003 interpretable** | ⏳ | Pendiente |
+| Operational Model RC | ⏳ | Bloqueado por IOV-003 |
 
-Si ambos llegan prácticamente al mismo diseño → **alta expresividad** del modelo.
-
----
-
-## Evidencia: Interpretation Findings (IF)
-
-No hablan del dominio.  
-Hablan de **cómo fue entendido**.
-
-Registro: [interpretation-findings](./04-findings/interpretation-findings.md) · IVR-003.
+Tras IOV-002, el riesgo principal ya no es el dominio.  
+Es la **interpretabilidad** — lo que mide este paso.
 
 ---
 
-## Criterio de salida
+## Material
 
-El modelo produce implementaciones **coherentes** (equivalencia conceptual aceptable).  
-IF clasificados · sin ambigüedad estructural abierta que bloquee RC.
+Exactamente el [KCM](./kcm/README.md) congelado (KCM-003).
+
+**Nada más.** Sin conversaciones · README extra · explicaciones · reuniones.
+
+---
+
+## Participantes
+
+Dos implementadores independientes (personas, IAs en conversaciones separadas, o mix).  
+**Sin contexto compartido.**
+
+---
+
+## Entregables (no código)
+
+Cada uno produce únicamente:
+
+1. **Bounded Contexts** — ¿cuáles identifica?  
+2. **Aggregate Roots** — ¿qué considera agregados?  
+3. **Casos de uso** — ¿qué operaciones existen?  
+4. **Repositorios** — ¿qué persiste?  
+5. **Servicios de dominio** — ¿qué lógica no pertenece a entidades?  
+6. **Dependencias** — ¿cómo se relacionan los módulos?
+
+---
+
+## Comparar conceptos, no nombres
+
+`Planning Service` vs `Scheduling Engine` no son distintos si resuelven la **misma responsabilidad**.
+
+---
+
+## Matriz de comparación
+
+| Aspecto | Coincide | Parcial | No coincide |
+|---------|----------|---------|-------------|
+| Core Objects | | | |
+| Aggregate Roots | | | |
+| Lifecycles | | | |
+| Checks | | | |
+| Dependencias | | | |
+| Servicios | | | |
+
+---
+
+## Findings IOV-003 (clasificación específica)
+
+No todos son «IF» genéricos:
+
+| Código | Significado |
+|--------|-------------|
+| **IF-A** | Arquitectura diferente, **mismo** modelo |
+| **IF-R** | Responsabilidad ambigua |
+| **IF-D** | Dependencia interpretada de forma distinta |
+| **IF-L** | Lifecycle interpretado de forma distinta |
+
+Registro: [interpretation-findings](./04-findings/interpretation-findings.md).
+
+---
+
+## Criterios de aprobación
+
+No exigimos identidad absoluta.
+
+- Ningún **Core Object** divergente.  
+- Ningún **Aggregate Root** incompatible.  
+- Ninguna **Dependency** estructural contradictoria.  
+- Ningún **Lifecycle** reinterpretado completamente.  
+- Diferencias restantes justificables como **decisiones técnicas**, no como interpretaciones distintas del dominio.
+
+---
+
+## Tras IOV-003 satisfactorio
+
+```text
+Operational Model Beta (Table Validated)
+        ↓
+Operational Model Release Candidate (Knowledge Certified)
+```
+
+Ha superado: validación conceptual · transferencia · resistencia estructural · interpretación independiente.  
+Siguiente juez: la **operación real** (FOV).
+
+Antes de FOV: [Known Limitations RC](../00-status/03-known-limitations-rc.md).
 
 ---
 
 ## Estado
 
-⏳ Tras IOV-002.
+⏳ / ✅ según [IVR](./ivr/README.md).
 
 ---
 

@@ -1,52 +1,41 @@
-# Interpretation Findings (IF)
+# Interpretation Findings (IF-A · IF-R · IF-D · IF-L)
 
 Evidencia de **IOV-003 · Independent Implementation**.  
-Miden **Consistency of Interpretation** entre diseños técnicos independientes.
+Origen: [IVR-003](../ivr/IVR-003-iov003-independent-implementation.md).
+
+| Código | Significado |
+|--------|-------------|
+| **IF-A** | Arquitectura diferente, mismo modelo |
+| **IF-R** | Responsabilidad ambigua |
+| **IF-D** | Dependencia interpretada de forma distinta |
+| **IF-L** | Lifecycle interpretado de forma distinta |
+
+---
+
+## Índice
+
+| ID | Código | Título | Estado |
+|----|--------|--------|--------|
+| — | | *(rellenar tras IVR-003)* | |
 
 ---
 
 ## Plantilla
 
 ```markdown
-## IF-xxx — [Título corto]
+## IF-xxx — [Título]
 
 | Campo | Valor |
 |-------|-------|
-| Tipo | Ambiguity · Over-interpretation · Under-specification · Designer bias · Other |
-| Divergencia | Eslabón · Cardinalidad · Estado · Verbo · Core inventado |
-| ¿Modelo explícito? | Sí · No · Ambiguo |
-| Diseñadores | A / B (anónimos en el informe si se prefiere) |
-| Fecha | YYYY-MM-DD |
-
-### Diseño A (resumen)
-
-…
-
-### Diseño B (resumen)
-
-…
-
-### Análisis de consistencia
-
-…
-
-### Seguimiento
-
-- [ ] Ninguno — divergencia aceptable / sesgo del diseñador
-- [ ] DF (claridad documental)
-- [ ] VR (hueco o ambigüedad estructural)
+| Código | IF-A · IF-R · IF-D · IF-L |
+| Diseño A | … |
+| Diseño B | … |
+| ¿Mismo concepto de dominio? | Sí / No / Ambiguo |
+| ¿Bloquea RC? | Sí / No |
 ```
-
----
-
-## Índice
-
-| ID | Título | Tipo | ¿Modelo explícito? | Estado |
-|----|--------|------|-------------------|--------|
-| — | *(vacío hasta IOV-003)* | | | |
 
 ---
 
 ## Relacionado
 
-- [IOV-003](../03-independent-implementation.md)
+- [03 Independent Implementation](../03-independent-implementation.md)

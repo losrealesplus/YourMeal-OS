@@ -57,14 +57,15 @@ Diremos: **«Vamos a implementar conocimiento operacional certificado.»**
 
 | Requisito | Estado |
 |-----------|--------|
-| IOV-001 | ✅ [IVR-001](../19-independent-operational-validation/ivr/IVR-001-iov001-piloto-ia.md) |
-| IOV-002 | ✅ [IVR-002](../19-independent-operational-validation/ivr/IVR-002-iov002-adversarial.md) |
-| IOV-003 | ⏳ |
-| Operational Model RC | ⏳ |
-| FOV | ⏳ |
-| Knowledge Update | ⏳ |
-| Economic Confirmation | ⏳ |
-| Riesgos críticos abiertos | 0 (meta) |
+| Operational Validation | ✅ | Muy alto |
+| IOV-001 (Comprehension) | ✅ | Alto |
+| IOV-002 (Adversarial) | ✅ | Muy alto |
+| IOV-003 (Independent Implementation) | ⏳ | Pendiente |
+| Operational Model RC (Knowledge Certified) | ⏳ | Bloqueado por IOV-003 |
+| FOV | ⏳ | |
+| Knowledge Update | ⏳ | |
+| Economic Confirmation | ⏳ | |
+| Riesgos críticos abiertos | 0 (meta) | |
 
 Sin excepciones. Si falta uno → Gate no abre.
 

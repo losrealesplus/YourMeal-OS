@@ -8,6 +8,14 @@ Significa:
 
 > **No conocemos razones suficientemente fuertes para modificarlo antes del trabajo de campo.**
 
+Nombre completo tras IOV-003:
+
+> **Operational Model Release Candidate (Knowledge Certified)**
+
+Ha superado: validación conceptual · transferencia (IOV-001) · resistencia (IOV-002) · interpretación independiente (IOV-003).
+
+Publicar junto al acta: [Known Limitations RC](./03-known-limitations-rc.md).
+
 ---
 
 ## Prerrequisitos
