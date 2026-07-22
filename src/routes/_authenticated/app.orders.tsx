@@ -1,27 +1,57 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { ClipboardList } from "lucide-react";
+import {
+  EmptyState,
+  OrderCard,
+  ScreenHeader,
+} from "@/components/consumer";
+import { MOCK_ORDERS } from "@/lib/mock-catalog";
 
+/**
+ * Screen: Customer · Orders List
+ * - Objetivo operacional: repasar pedidos pasados y en curso.
+ * - Capability: orders.list
+ * - Core Object(s): Order (+ Delivery status derivado)
+ */
 export const Route = createFileRoute("/_authenticated/app/orders")({
   component: OrdersPage,
 });
 
 function OrdersPage() {
   const { t } = useTranslation(["customer", "common"]);
+  const statusLabels = {
+    pending: t("customer:statusPending"),
+    preparing: t("customer:statusPreparing"),
+    dispatched: t("customer:statusDispatched"),
+    delivered: t("customer:statusDelivered"),
+    cancelled: t("customer:statusCancelled"),
+  };
+
   return (
     <div className="flex-1 flex flex-col">
-      <header className="px-6 pt-10 pb-6">
-        <p className="meta-label">{t("common:tenant")}</p>
-        <h1 className="text-3xl font-extrabold tracking-tight mt-1">
-          {t("customer:orders")}
-        </h1>
-      </header>
-      <div className="px-6">
-        <div className="bg-card border border-border rounded-2xl p-6 text-center">
-          <p className="font-bold">{t("customer:noOrdersTitle")}</p>
-          <p className="text-sm text-muted-foreground mt-2">
-            {t("customer:noOrdersHint")}
-          </p>
-        </div>
+      <ScreenHeader
+        overline={t("common:tenant")}
+        title={t("customer:orders")}
+        subtitle={t("customer:ordersHint")}
+      />
+      <div className="px-6 space-y-3 pb-6">
+        {MOCK_ORDERS.length === 0 ? (
+          <EmptyState
+            icon={<ClipboardList className="size-6" />}
+            title={t("customer:noOrdersTitle")}
+            hint={t("customer:noOrdersHint")}
+          />
+        ) : (
+          MOCK_ORDERS.map((o) => (
+            <OrderCard
+              key={o.id}
+              order={o}
+              mealsLabel={t("customer:meals")}
+              statusLabels={statusLabels}
+            />
+          ))
+        )}
       </div>
     </div>
   );
