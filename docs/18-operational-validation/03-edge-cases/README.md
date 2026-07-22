@@ -5,7 +5,7 @@ Rotura **deliberada** — casos puntuales que tensionan Invariants y Lifecycles.
 Más agresivos que los escenarios completos. Objetivo: encontrar grietas.
 
 > **Nomenclatura:** los IDs históricos `EC-xxx` son **Edge Cases** (mesa).  
-> En FOPEBA, **EC = Economic Confirmation** — [04](../../20-evidence-framework/04-economic-confirmation.md).  
+> En FOPEBA, **EC = Economic Confirmation** — [06](../../20-evidence-framework/06-economic-confirmation.md).
 > Preferir decir «Edge Case EC-001» en prosa para evitar confusión.
 
 ---

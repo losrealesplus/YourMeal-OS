@@ -101,7 +101,7 @@ Etapa 2 — Producto                            🔒 Gate G-01
 **YourMeal OS** = experimento FOPEBA.  
 **Beta** (mesa) ✅ · **Siguiente:** FOV · EC (Economic Confirmation) · IOV → **Gate G-01**.
 
-Índices: [Estado](./docs/00-status/README.md) · [Evidence Framework](./docs/20-evidence-framework/README.md) · [G-01](./docs/20-evidence-framework/05-gate-g01-operational-readiness.md) · [FOPEBA](./docs/18-operational-validation/00-operational-product-engineering.md)
+Índices: [Estado](./docs/00-status/README.md) · [Evidence Framework](./docs/20-evidence-framework/README.md) · [G-01](./docs/20-evidence-framework/07-gate-g01-operational-readiness.md) · [FOPEBA](./docs/18-operational-validation/00-operational-product-engineering.md)
 
 ### Principio de valor (Capabilities)
 

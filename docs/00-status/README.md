@@ -20,11 +20,11 @@ Promesa pendiente: *este proceso produce mejores productos* → **FOV + EC + G-0
 | Entregable | Estado |
 |------------|--------|
 | Operational Model Beta | 🟢 |
-| [Evidence Framework](../20-evidence-framework/README.md) | 🟢 Definido (ECL · FOV · EC · G-01) |
-| IOV | ⏳ Definido · no ejecutado |
-| FOV | ⏳ No ejecutado |
+| [Evidence Framework](../20-evidence-framework/README.md) | 🟢 KS · ECL transversal · Stability · FOV · KU · EC · G-01 |
+| Knowledge Update | ⏳ Tras FOV |
+| FOV (principio de sorpresa) | ⏳ No ejecutado |
 | EC (Economic Confirmation) | ⏳ No ejecutado |
-| Gate G-01 | 🔒 Cerrado |
+| Gate G-01 | 🔒 No aprueba código — aprueba conocimiento |
 
 ---
 
@@ -36,6 +36,7 @@ Promesa pendiente: *este proceso produce mejores productos* → **FOV + EC + G-0
 Model + Validation (mesa) ✅ Beta
 IOV ⏳
 FOV ⏳
+Knowledge Update ⏳
 EC ⏳
         ↓
 Gate G-01 · Operational Readiness
@@ -52,11 +53,11 @@ Solo tras **G-01** (no basta Beta).
 ## FOPEBA — flujo
 
 ```text
-Foundation → Blueprint → Discovery → Checks → Model
-    → Validation → IOV → FOV → EC → G-01 → Implementation
+Validation → IOV → FOV → Knowledge Update → EC → G-01 → Implementation
 ```
 
-Madre de evidencia: [20-evidence-framework](../20-evidence-framework/README.md)
+Madre de evidencia: [20-evidence-framework](../20-evidence-framework/README.md)  
+Tres ejes: KS · ECL · Stability · **G-01 no aprueba código**.
 
 ---
 
@@ -80,7 +81,9 @@ Madre de evidencia: [20-evidence-framework](../20-evidence-framework/README.md)
 | Índice | Ruta |
 |--------|------|
 | Evidence Framework | [20](../20-evidence-framework/README.md) |
-| Gate G-01 | [05](../20-evidence-framework/05-gate-g01-operational-readiness.md) |
+| Gate G-01 | [07](../20-evidence-framework/07-gate-g01-operational-readiness.md) |
+| Stability | [03](../20-evidence-framework/03-stability-index.md) |
 | ECL | [02](../20-evidence-framework/02-evidence-confidence-levels.md) |
+| Knowledge Update | [05](../20-evidence-framework/05-knowledge-update.md) |
 | FOPEBA | [00](../18-operational-validation/00-operational-product-engineering.md) |
 | IOV | [19](../19-independent-operational-validation/README.md) |

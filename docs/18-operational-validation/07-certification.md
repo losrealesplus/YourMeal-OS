@@ -74,17 +74,17 @@ Todos deben cumplirse:
 | 2 | Escenarios VS-001…007 auditados con VR | [05](./05-validation-reports/README.md) |
 | 3 | Edge cases EC-001…006 con VR | Índice 05 |
 | 4 | Ningún 🚨 sin MC aplicado o rechazo documentado | [06](./06-model-changes/README.md) |
-| 5 | Field observation (**FOV**): campaña FOR + Field Validation Report (o waiver documentado) | [20 FOV](../20-evidence-framework/03-field-operational-validation.md) |
+| 5 | Field observation (**FOV**): FOR + FVR + intento de sorpresa | [04 FOV](../20-evidence-framework/04-field-operational-validation.md) |
 | 6 | Constitución INV-001…055 revisada tras todos los MC | 05-invariants |
 | 7 | Trazabilidad Capabilities críticas al día | 06-capability-mapping |
 | 8 | Sin features ni código de producto añadidos antes de G-01 | CHANGELOG / PRs |
-| 9 | **IOV** ejecutado (Comprehension · Adversarial · Independent Implementation) | [19 IOV](../19-independent-operational-validation/README.md) |
+| 9 | **IOV** ejecutado | [19 IOV](../19-independent-operational-validation/README.md) |
 | 10 | Sin Forced concession estructural abierta sin VR→MC | [SF](../19-independent-operational-validation/04-findings/structural-findings.md) |
-| 11 | **Economic Confirmation** completada · roadmap por evidencia | [20 EC](../20-evidence-framework/04-economic-confirmation.md) |
-| 12 | **Gate G-01** PASS | [05 G-01](../20-evidence-framework/05-gate-g01-operational-readiness.md) |
+| 11 | **Knowledge Update** cerrado post-FOV | [05 KU](../20-evidence-framework/05-knowledge-update.md) |
+| 12 | **Economic Confirmation** · roadmap por evidencia | [06 EC](../20-evidence-framework/06-economic-confirmation.md) |
+| 13 | **Gate G-01** PASS (aprueba conocimiento, no código) | [07 G-01](../20-evidence-framework/07-gate-g01-operational-readiness.md) |
 
-> **FOV + EC** son fases obligatorias FOPEBA (Hipótesis A y B).  
-> **IOV** cubre transferibilidad. **G-01** abre Etapa 2.
+> FOV + Knowledge Update + EC son fases obligatorias. G-01 abre Etapa 2.
 
 ---
 
@@ -164,7 +164,7 @@ diseño visual · UX · Capabilities · código — trazado a 17 certificado.
 **Criterios Beta cumplidos:** VS-001…006 · 0 Contradicted · MC-001…006 · cobertura mesa.  
 **Pendiente G-01 / Certified:** FOV · Economic Confirmation · IOV · criterios Certified 1–10.
 
-> Abrir Etapa 2 ya **no** basta con Beta. Ver [Gate G-01](../20-evidence-framework/05-gate-g01-operational-readiness.md).
+> Abrir Etapa 2 ya **no** basta con Beta. Ver [Gate G-01](../20-evidence-framework/07-gate-g01-operational-readiness.md).
 
 
 ---

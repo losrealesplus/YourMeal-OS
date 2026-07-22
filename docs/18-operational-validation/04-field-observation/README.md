@@ -2,7 +2,7 @@
 
 EatClean y otras Organizaciones — **bajo lente de validación**.
 
-> **Fase FOPEBA elevada:** [FOV — Field Operational Validation](../../20-evidence-framework/03-field-operational-validation.md)  
+> **Fase FOPEBA elevada:** [FOV — Field Operational Validation](../../20-evidence-framework/04-field-operational-validation.md)  
 > Artefactos canónicos: **FOR** · **Field Validation Report** (no VR de mesa por defecto).
 
 Esta carpeta conserva la plantilla operativa de campo alineada a FASE 5; el marco de fase obligatoria vive en Evidence Framework.
@@ -26,7 +26,7 @@ Checklist histórico Discovery: [FIRST_OBSERVATION_DAY.md](../../16-operational-
 
 ## Plantilla · FOR-xxx (preferida)
 
-Preferir **FOR** según [03 FOV](../../20-evidence-framework/03-field-operational-validation.md).
+Preferir **FOR** según [04 FOV](../../20-evidence-framework/04-field-operational-validation.md).
 
 ```markdown
 # FOR-xxx — [Momento observado]
@@ -83,6 +83,6 @@ ECL-2 → ECL-4 al cerrar en FVR
 
 ## Relacionado
 
-- [20 FOV](../../20-evidence-framework/03-field-operational-validation.md)  
+- [20 FOV](../../20-evidence-framework/04-field-operational-validation.md)  
 - [16 Operational Discovery](../../16-operational-discovery/README.md)  
 - [05 validation-reports](../05-validation-reports/README.md)

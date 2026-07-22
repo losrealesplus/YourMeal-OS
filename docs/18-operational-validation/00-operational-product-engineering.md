@@ -1,9 +1,12 @@
-# FOPEBA — Framework de generación y validación progresiva de conocimiento
+# FOPEBA — Framework de ingeniería de conocimiento operacional basado en evidencia progresiva
 
 **Antes:** Operational Product Engineering (OPE) — proceso de adquisición de conocimiento.  
-**Ahora:** **FOPEBA** — el mismo núcleo, ampliado con evidencia de campo, confirmación económica y gate formal a implementación.
+**Ahora:** **FOPEBA** — reduce incertidumbre de forma sistemática hasta justificar implementación.
 
 YourMeal OS es el **experimento controlado** que demuestra (o refuta) la promesa del framework.
+
+> El foco ya no está en producir documentos ni modelos.  
+> Está en **reducir incertidumbre** hasta evidencia suficiente para construir.
 
 ---
 
@@ -45,8 +48,9 @@ Paralelos: ingeniería de seguridad · aeronáutica · ciencia experimental.
 | **Operational Validation** | ¿Qué parte de esa estructura es realmente cierta? (mesa) |
 | **IOV** | ¿El conocimiento es transferible, atacable e interpretable? |
 | **FOV** | ¿La realidad produce el mismo modelo? |
+| **Knowledge Update** | ¿Quedó consolidado el conocimiento post-campo? |
 | **EC (Economic Confirmation)** | ¿Hay valor suficiente para construir? |
-| **Gate G-01** | ¿Abrimos Etapa 2? |
+| **Gate G-01** | ¿Hay conocimiento suficiente para justificar código? (no aprueba código) |
 | **Implementation** | ¿Cómo traducimos esa verdad a software? |
 
 ```text
@@ -58,10 +62,20 @@ MODEL          → incertidumbre de estructura del dominio
 VALIDATION     → incertidumbre de verdad del modelo (mesa)
 IOV            → incertidumbre de transferibilidad
 FOV            → incertidumbre de correspondencia con la realidad
+KNOWLEDGE UPDATE → incertidumbre de consolidación post-campo
 EC             → incertidumbre de valor económico
-G-01           → incertidumbre de readiness
+G-01           → incertidumbre de readiness (gobernanza)
 IMPLEMENTATION → incertidumbre de traducción (no de dominio)
 ```
+
+---
+
+## Regla de diseño del framework
+
+> **Cada nueva fase debe eliminar una incertidumbre que ninguna fase anterior pueda eliminar.**
+
+Si no reduce un tipo nuevo de incertidumbre, pertenece a una fase existente.  
+Mantiene FOPEBA compacto y elegante.
 
 ---
 
@@ -84,6 +98,8 @@ IOV
     ↓
 FOV
     ↓
+Knowledge Update
+    ↓
 EC (Economic Confirmation)
     ↓
 Gate G-01 · Operational Readiness
@@ -95,11 +111,10 @@ Forma compacta:
 
 ```text
 FOUNDATION → BLUEPRINT → DISCOVERY → CHECKS → MODEL
-    → VALIDATION → IOV → FOV → EC → G-01 → IMPLEMENTATION
+    → VALIDATION → IOV → FOV → KU → EC → G-01 → IMPLEMENTATION
 ```
 
-**Implementation ya no depende solo de Operational Validation.**  
-Depende de Validation + FOV + EC (y el gate formal).
+**G-01 no aprueba código** — aprueba conocimiento suficiente para justificarlo.
 
 ---
 
@@ -109,29 +124,22 @@ Depende de Validation + FOV + EC (y el gate formal).
 08 · Evidence Framework
 │
 ├── Knowledge States
-├── Evidence Confidence Levels (ECL)
+├── Evidence Confidence Levels (ECL) — transversal
+├── Stability Index (S0…S3)
 ├── Field Operational Validation (FOV)
+├── Knowledge Update
 ├── Economic Confirmation (EC)
 └── Gate G-01 · Operational Readiness
 ```
 
 → [docs/20-evidence-framework](../20-evidence-framework/README.md)
 
+Tres ejes: **KS · ECL · Stability**.  
+Preguntas estratégicas: ¿% del modelo en campo? ¿qué parte del producto sigue en hipótesis?
+
 ### Knowledge Validation Pyramid
 
-Seña de identidad del núcleo metodológico — capas hasta conocimiento operacional reproducible:
-
 → [Knowledge Validation Pyramid](../19-independent-operational-validation/00-knowledge-validation-pyramid.md)
-
-### ECL (transversal)
-
-| Nivel | Significado |
-|-------|-------------|
-| ECL-1 | Hipótesis (Discovery) |
-| ECL-2 | Observada aislada |
-| ECL-3 | Validada en mesa (VS/VR) |
-| ECL-4 | Confirmada en operación real (FOV) |
-| ECL-5 | Impacto económico medido (EC) |
 
 ---
 
@@ -203,13 +211,13 @@ Operational Model (17) + KS + ECL
 ## Niveles de confianza del modelo
 
 Alpha → Beta → RC → **Certified v1.0** — [07-certification.md](./07-certification.md).  
-Apertura Etapa 2: **[Gate G-01](../20-evidence-framework/05-gate-g01-operational-readiness.md)** (más exigente que Beta sola).
+Apertura Etapa 2: **[Gate G-01](../20-evidence-framework/07-gate-g01-operational-readiness.md)** (más exigente que Beta sola).
 
 ---
 
 ## Activo reutilizable
 
-**FOPEBA** — framework para transformar conocimiento operativo en software verificable, con evidencia progresiva (ECL) y gate económico/campo.
+**FOPEBA** — framework de ingeniería de conocimiento operacional basado en evidencia progresiva.
 
 Aplicable a logística, clínicas, talleres, hoteles… **sin cambiar la estructura de fases**.
 

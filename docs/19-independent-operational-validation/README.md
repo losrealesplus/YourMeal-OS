@@ -27,7 +27,7 @@ Eso **no** demuestra que:
 - dos equipos lo **traduzcan** a la misma arquitectura técnica.
 
 IOV es, en FOPEBA, la prueba de **transferibilidad** del conocimiento.  
-Junto con [FOV](../20-evidence-framework/03-field-operational-validation.md) y [EC](../20-evidence-framework/04-economic-confirmation.md), alimenta el [Gate G-01](../20-evidence-framework/05-gate-g01-operational-readiness.md) antes de Etapa 2.
+Junto con [FOV](../20-evidence-framework/04-field-operational-validation.md) y [EC](../20-evidence-framework/06-economic-confirmation.md), alimenta el [Gate G-01](../20-evidence-framework/07-gate-g01-operational-readiness.md) antes de Etapa 2.
 
 ---
 
@@ -76,6 +76,8 @@ Joint Gap Analysis
 Independent Operational Validation   ← esta fase
     ↓
 FOV
+    ↓
+Knowledge Update
     ↓
 EC (Economic Confirmation)
     ↓

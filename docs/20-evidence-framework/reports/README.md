@@ -1,13 +1,12 @@
 # Reports — Evidence Framework
 
-Índice de artefactos FOV · EC · G-01.
-
 | Tipo | Prefijo | Fase |
 |------|---------|------|
 | Field Observation Report | FOR-xxx | FOV |
 | Field Validation Report | FVR-yyy | FOV |
+| Knowledge Update Record | KUR-xxx | Knowledge Update |
 | Economic Confirmation Record | ECR-xxx | EC |
-| Economic Confirmation Report | (por campaña) | EC |
+| Economic Confirmation Report | (campaña) | EC |
 | Gate G-01 Acta | G01-yyy | Gate |
 
 ---
@@ -22,6 +21,7 @@
 
 ## Relacionado
 
-- [03 FOV](../03-field-operational-validation.md)  
-- [04 EC](../04-economic-confirmation.md)  
-- [05 G-01](../05-gate-g01-operational-readiness.md)
+- [04 FOV](../04-field-operational-validation.md)  
+- [05 Knowledge Update](../05-knowledge-update.md)  
+- [06 EC](../06-economic-confirmation.md)  
+- [07 G-01](../07-gate-g01-operational-readiness.md)

@@ -35,7 +35,7 @@ OPE introduce un concepto distinto: validar el **conocimiento operacional** en c
 | **Comprehension / Adversarial / Independent Implementation** | Demuestra transferibilidad (IOV) |
 | **FOV + EC** *(Evidence Framework)* | Demuestra correspondencia con el campo e **impacto económico** (ECL-4/5) |
 
-Gate formal a producto: [G-01](../20-evidence-framework/05-gate-g01-operational-readiness.md).
+Gate formal a producto: [G-01](../20-evidence-framework/07-gate-g01-operational-readiness.md).
 
 
 ---

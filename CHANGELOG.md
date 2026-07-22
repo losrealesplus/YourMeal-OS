@@ -88,8 +88,11 @@ La arquitectura de YourMeal OS se considera **estable**.
 - **Nivel de confianza: Beta** (mesa) — FOV/EC pendientes para RC
 - **Independent Operational Validation (IOV)** definido: Comprehension · Adversarial · Independent Implementation
 - **Knowledge Validation Pyramid** adoptada como seña de identidad
-- **FOPEBA Evidence Framework** (`docs/20`): Knowledge States · **ECL-1…5** · FOV · **Economic Confirmation** · **Gate G-01**
-- Flujo FOPEBA: Validation → IOV → **FOV** → **EC** → **G-01** → Implementation
+- **FOPEBA Evidence Framework** (`docs/20`): KS · **ECL transversal** · **Stability Index S0…S3** · FOV · **Knowledge Update** · EC · **Gate G-01**
+- G-01 **no aprueba código** — aprueba conocimiento suficiente para justificarlo
+- Flujo: Validation → IOV → FOV → **KU** → EC → G-01 → Implementation
+- Regla de diseño: cada fase elimina una incertidumbre que ninguna anterior puede eliminar
+- FOV: principio de sorpresa (al menos un comportamiento no previsto intentado)
 - EC (Economic Confirmation) ≠ Edge Cases (`EC-xxx` históricos de mesa)
 - Observation EatClean: modo FOV; sin Etapa 2 hasta G-01
 - Secuencia definitiva en FOUNDATION: Guidelines → Spec → Implementation → Tests → Validation
