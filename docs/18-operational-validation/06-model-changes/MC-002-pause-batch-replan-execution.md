@@ -3,7 +3,7 @@
 **Validation Report:** [VR-002](../05-validation-reports/VR-002-interrupcion-horno-eatclean.md)  
 **Fecha:** 2026-07-22  
 **Capa afectada:** Lifecycle Batch · Plan · Checks Kitchen · (amplía MC-001)  
-**Estado:** ⏸ **aparcado** — no aplicar hasta análisis conjunto post VS-006 (principio 16)
+**Estado:** ✅ **aplicado** — tren Dynamics post [09 joint gap analysis](../09-joint-gap-analysis.md) — 2026-07-22
 
 ---
 
@@ -95,4 +95,4 @@ Reafirmar MC-001 **Revise Route** aplicable también con carga iniciada (antes d
 - [ ] Coordinado con MC-001  
 - [ ] Aplicado en 17  
 
-**Estado:** ⏳ propuesto
+**Estado:** ✅ aplicado

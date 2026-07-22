@@ -3,7 +3,7 @@
 **Validation Report:** [VR-005](../05-validation-reports/VR-005-escalabilidad-eatclean.md)  
 **Fecha:** 2026-07-22  
 **Capa afectada:** UL / level-2 Supporting / spine-flow cardinalidades — **texto**, no nuevos objetos  
-**Estado:** ⏸ **aparcado** — principio 16
+**Estado:** ✅ **aplicado** — tren Dynamics post [09 joint gap analysis](../09-joint-gap-analysis.md) — 2026-07-22
 
 ---
 
@@ -30,4 +30,4 @@ VS-005: el modelo **soporta** escala; la documentación puede leerse como si Kit
 | Invariants | 0 nuevos |
 | Lifecycles | 0 |
 
-**Estado:** ⏸ aparcado
+**Estado:** ✅ **aplicado** — tren Dynamics post [09 joint gap analysis](../09-joint-gap-analysis.md) — 2026-07-22

@@ -1,7 +1,7 @@
 # 09 · Análisis conjunto de brechas (post batería VS-001…006)
 
-**Estado:** ✅ marco de respuesta definido → [Operational Dynamics v0.2](../17-operational-model/07-operational-dynamics/README.md)  
-**Principio 16:** no aplicar seis parches sueltos a `04-lifecycles`; adoptar Dynamics y **luego** un tren coherente
+**Estado:** ✅ tren MC aplicado vía [Operational Dynamics v0.2](../17-operational-model/07-operational-dynamics/README.md)  
+**Principio 16:** no seis parches sueltos — un marco + un tren coherente
 
 ---
 
@@ -27,17 +27,19 @@ Extended × 4 · Clarified × 2 · Contradicted × 0 · Core Δ × 0
 
 ---
 
-## Próximo tren de aplicación (después de Dynamics)
+## Tren de aplicación — ✅ cerrado
 
-Orden sugerido al tocar `17` espina/supporting:
+| # | Paso | Estado |
+|---|------|--------|
+| 1 | Vocabulario Dynamics (docs 07) | ✅ |
+| 2 | Packaging Hold/Quarantine + Label Void (MC-004 · parte MC-003) | ✅ |
+| 3 | Order Amend · Plan/Route Revise · Batch Pause (MC-001 · 002) | ✅ |
+| 4 | Lot + INV-031 (MC-003) | ✅ |
+| 5 | Location activo (MC-006) | ✅ |
+| 6 | Cardinalidad docs (MC-005) | ✅ |
+| 7 | KS · Coverage · **Beta** | ✅ |
 
-1. Vocabulario Dynamics adoptado (este milestone) ✅ docs  
-2. Packaging Hold/Quarantine + Label Void (MC-004 · parte MC-003)  
-3. Order Amend · Plan/Route Revise · Batch Pause (MC-001 · 002)  
-4. Lot + INV-031 (MC-003)  
-5. Location activo (MC-006)  
-6. Cardinalidad docs (MC-005)  
-7. Actualizar KS · Coverage · evaluar **Beta**
+Archivos tocados en `17`: `spine-transitions` · `support-transitions` · `checks-on-transitions` · `state-index` · `level-2-supporting` · `spine-flow` · `consistency` (INV-031) · taxonomy.
 
 ---
 
@@ -51,4 +53,5 @@ Orden sugerido al tocar `17` espina/supporting:
 ## Relacionado
 
 - [07 Operational Dynamics](../17-operational-model/07-operational-dynamics/README.md)  
-- [06 model-changes](./06-model-changes/README.md)
+- [06 model-changes](./06-model-changes/README.md)  
+- [validation-coverage](./05-validation-reports/validation-coverage.md) · [07 certification](./07-certification.md)

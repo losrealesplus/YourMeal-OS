@@ -2,7 +2,7 @@
 
 **Validation Report:** [VR-006](../05-validation-reports/VR-006-generalizacion-healthycorp.md)  
 **Fecha:** 2026-07-22  
-**Estado:** ⏸ **aparcado** — principio 16 · análisis post-batería
+**Estado:** ✅ **aplicado** — tren Dynamics post [09 joint gap analysis](../09-joint-gap-analysis.md) — 2026-07-22
 
 ---
 
@@ -44,4 +44,4 @@ Sin violar INV-050 · sin Core EmergencyOrder.
 
 ---
 
-**Estado:** ⏸ aparcado · fusionar priorización con MC-001…005 en [09-joint-gap-analysis](../09-joint-gap-analysis.md)
+**Estado:** ✅ **aplicado** — tren Dynamics post [09 joint gap analysis](../09-joint-gap-analysis.md) — 2026-07-22

@@ -15,13 +15,14 @@ VS → VR → MC propuesto (aparcado)
         ↓
 [tras VS-001…006] Análisis conjunto de brechas
         ↓
-Priorizar MC → edición 17-operational-model
+Operational Dynamics v0.2 (marco único)
+        ↓
+Tren MC → edición 17-operational-model ✅
 ```
 
 > **Principio 16:** no aplicar cambios al Operational Model después de cada VS.  
 > Acumular evidencia; corregir causas estructurales, no síntomas.
 
-Durante la batería, los MC viven en esta carpeta como **propuestos / aparcados**.
 ---
 
 ## Plantilla · MC-xxx
@@ -64,14 +65,16 @@ Durante la batería, los MC viven en esta carpeta como **propuestos / aparcados*
 
 | ID | Título | VR | Estado |
 |----|--------|-----|--------|
-| [MC-001](./MC-001-amend-and-revise-transitions.md) | Amend Order + Revise Plan/Route (Ready) | VR-001 | ⏸ aparcado (batería) |
-| [MC-002](./MC-002-pause-batch-replan-execution.md) | Pause Batch + Replan In execution + Kitchen | VR-002 | ⏸ aparcado (batería) |
-| [MC-006](./MC-006-location-supporting-expedite.md) | Location Supporting · Plan expedito | VR-006 | ⏸ aparcado (batería) |
+| [MC-001](./MC-001-amend-and-revise-transitions.md) | Amend Order + Revise Plan/Route | VR-001 | ✅ aplicado |
+| [MC-002](./MC-002-pause-batch-replan-execution.md) | Pause Batch + Replan In execution + Kitchen | VR-002 | ✅ aplicado |
+| [MC-003](./MC-003-lot-traceability-recall.md) | Lot · traza inversa · INV-031 | VR-003 | ✅ aplicado |
+| [MC-004](./MC-004-packaging-hold-relabel.md) | Packaging Hold · Label Void/reapply | VR-004 | ✅ aplicado |
+| [MC-005](./MC-005-cardinality-parallelism-docs.md) | Cardinalidad Kitchen/Vehicle · paralelismo | VR-005 | ✅ aplicado |
+| [MC-006](./MC-006-location-supporting-expedite.md) | Location Supporting · Plan expedito | VR-006 | ✅ aplicado |
 
-> Ningún MC se aplica a `17` hasta [09 joint gap analysis](../09-joint-gap-analysis.md) (principio 16).
+**Marco:** [Operational Dynamics v0.2](../../17-operational-model/07-operational-dynamics/README.md) · [09 joint gap analysis](../09-joint-gap-analysis.md)
 
-**Solapes:** MC-003 Quarantine ↔ MC-004 Hold · MC-001/002 Amend-Revise-Pause · MC-005 docs · MC-006 Location.
-
+**Aplicación en `17`:** `spine-transitions` · `support-transitions` · `checks-on-transitions` · `state-index` · `level-2-supporting` · `spine-flow` · INV-031 · taxonomy.
 
 ---
 

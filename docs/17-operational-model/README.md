@@ -81,11 +81,11 @@ Soportes: Dish · Recipe · Ingredient · Stock · Supplier · Vehicle · Kitche
 
 Observation EatClean: ⏸. Sin pantallas / APIs / código.
 
-### Gate FASE 4 + Dynamics
+### Gate FASE 4 + Dynamics + Beta
 
-> Gramática 01–06 ✅ · Dynamics v0.2 ✅ (comportamiento)  
-> Aplicación tren MC a lifecycles por objeto: siguiente  
-> Validation batería VS-001…006 ✅ · [gap analysis](../18-operational-validation/09-joint-gap-analysis.md)
+> Gramática 01–06 ✅ · Dynamics v0.2 ✅ · tren MC-001…006 ✅  
+> Nivel de confianza: **Beta** (mesa) — [certification](../18-operational-validation/07-certification.md)  
+> Validation VS-001…006 ✅ · [gap analysis](../18-operational-validation/09-joint-gap-analysis.md)
 
 
 ---

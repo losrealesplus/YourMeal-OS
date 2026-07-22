@@ -175,10 +175,10 @@ Sin certificación, el modelo sigue siendo **hipótesis endurecida**, no base pe
 | Bloque | Estado |
 |--------|--------|
 | Estructura FASE 5 | 🟢 Definida |
-| Escenarios / edge cases | 🚧 Semillas — ejecutar |
+| Escenarios VS-001…006 | ✅ Cerrados (Extended×4 · Clarified×2) |
 | Field observation (EatClean) | ⏸ hasta activación bajo validación |
-| Reports / changes | Vacío (correcto) |
-| Certificación | Pendiente — nivel actual: **Alpha** |
+| Reports / MC | ✅ VR-001…006 · MC-001…006 aplicados vía Dynamics |
+| Certificación | **Beta** (mesa) — RC pendiente FOV/EC |
 
 ---
 

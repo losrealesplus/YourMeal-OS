@@ -2,7 +2,7 @@
 
 **Validation Report:** [VR-003](../05-validation-reports/VR-003-seguridad-alimentaria-retiro.md)  
 **Fecha:** 2026-07-22  
-**Estado:** ⏸ **aparcado** — no aplicar hasta análisis conjunto post VS-006 (principio 16)
+**Estado:** ✅ **aplicado** — tren Dynamics post [09 joint gap analysis](../09-joint-gap-analysis.md) — 2026-07-22
 
 ---
 
@@ -50,4 +50,4 @@ ni nombra quarantine/retirada/crédito sin forzar un Core ilegítimo.
 Puede solaparse con necesidades de VS-006 (reglas distintas).  
 **No fusionar ni aplicar** hasta ver VR-004…006.
 
-**Estado:** ⏸ aparcado
+**Estado:** ✅ **aplicado** — tren Dynamics post [09 joint gap analysis](../09-joint-gap-analysis.md) — 2026-07-22

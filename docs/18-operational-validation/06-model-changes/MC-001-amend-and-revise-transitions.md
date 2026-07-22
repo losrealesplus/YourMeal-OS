@@ -3,7 +3,7 @@
 **Validation Report:** [VR-001](../05-validation-reports/VR-001-modificacion-tardia-eatclean.md)  
 **Fecha:** 2026-07-22  
 **Capa afectada:** Lifecycle (Order · Production Plan · Delivery Route) · Checks en transición · docs 04  
-**Estado:** ⏸ **aparcado** — no aplicar hasta análisis conjunto post VS-006 (principio 16)
+**Estado:** ✅ **aplicado** — tren Dynamics post [09 joint gap analysis](../09-joint-gap-analysis.md) — 2026-07-22
 
 ---
 
@@ -81,8 +81,8 @@ Documentar que Batches en `Planned` / `Ready to cook` **pueden ajustarse** tras 
 
 ## Aprobación
 
-- [ ] Revisado contra Constitución  
-- [ ] Sin violar jerarquía Invariant → Lifecycle → Check → Capability  
-- [ ] Aplicado en 17-operational-model  
+- [x] Revisado contra Constitución  
+- [x] Sin violar jerarquía Invariant → Lifecycle → Check → Capability  
+- [x] Aplicado en 17-operational-model  
 
-**Estado:** ⏳ propuesto
+**Estado:** ✅ aplicado

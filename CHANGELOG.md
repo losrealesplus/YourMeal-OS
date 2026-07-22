@@ -81,10 +81,12 @@ La arquitectura de YourMeal OS se considera **estable**.
 - Disciplina: no implementamos ideas; implementamos conocimiento validado
 - Misión plataforma: reducir la carga cognitiva de la operación diaria
 - KPI estrella: preguntas eliminadas · ciclo cerrado operación↔producto · sin cuarto pilar
-- **FASE 5:** Operational Validation — refutar el modelo (18-operational-validation/)  
-- Sin features / UI / código de producto hasta Operational Model Certified v1.0  
-- Cambios al modelo solo vía VR → MC (06-model-changes)  
-- Observation EatClean: modo validación (04-field-observation), no Discovery de features
+- **FASE 5:** Operational Validation — batería VS-001…006 cerrada (Extended×4 · Clarified×2 · 0 Core)
+- **Operational Dynamics v0.2:** Lifecycles 2.0 · Supporting Taxonomy · Checks 2.0 (PASS/WARNING/BLOCKED/MANUAL DECISION)
+- Recovery Pattern · Temporal Grammar · Capability Impact integrados en Dynamics 01
+- **Tren MC-001…006 aplicado** a `17` (Amend/Revise/Pause/Hold · Lot · Location · cardinalidad · INV-031)
+- **Nivel de confianza: Beta** (mesa) — FOV/EC pendientes para RC
+- Observation EatClean: modo validación; sin UI/código producto hasta certificación
 - Secuencia definitiva en FOUNDATION: Guidelines → Spec → Implementation → Tests → Validation
 ### Gobierno
 

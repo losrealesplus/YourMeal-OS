@@ -37,19 +37,17 @@ No abrir veinte documentos. Estos tres bastan.
 
 ---
 
-## Relación con MC aparcados (FASE 5)
+## Relación con MC (FASE 5) — ✅ aplicados
 
-Dynamics v0.2 es el **marco** que unifica MC-001…006 antes de aplicar parches a `04-lifecycles` objeto a objeto.
+Dynamics v0.2 es el **marco** que unificó MC-001…006. Tren aplicado a `04-lifecycles` / supporting / INV-031 / cardinalidad.
 
-| Familia Dynamics | MC que absorbe |
-|------------------|----------------|
-| Operational / Protection transitions | MC-001 Amend/Revise · MC-002 Pause/Replan · MC-004 Hold |
-| Traceability + Spatial Supporting | MC-003 Lot · MC-006 Location |
-| Checks 2.0 + MANUAL DECISION | Todos los VR (INV-043) |
-| Recovery Pattern | VS-003 · VS-004 |
-| Cardinalidad / paralelismo | MC-005 |
-
-Aplicación a archivos de espina (`spine-transitions.md`, etc.): **después** de adoptar Dynamics v0.2 — un tren coherente, no seis PRs sueltos.
+| Familia Dynamics | MC absorbido |
+|------------------|--------------|
+| Operational / Protection transitions | MC-001 Amend/Revise · MC-002 Pause/Replan · MC-004 Hold ✅ |
+| Traceability + Spatial Supporting | MC-003 Lot · MC-006 Location ✅ |
+| Checks 2.0 + MANUAL DECISION | Todos los VR (INV-043) ✅ |
+| Recovery Pattern | VS-003 · VS-004 ✅ |
+| Cardinalidad / paralelismo | MC-005 ✅ |
 
 ---
 
@@ -57,7 +55,9 @@ Aplicación a archivos de espina (`spine-transitions.md`, etc.): **después** de
 
 > ¿El equipo puede narrar Amend · Hold · Quarantine · Resume · Recall con el vocabulario Dynamics sin inventar Core nuevos?
 
-Si sí → aplicar MC al Lifecycle por objeto · subir Knowledge State · evaluar **Beta**.
+**Sí** → tren MC aplicado · Knowledge State actualizado · nivel **Beta**.
+
+Siguiente: FOV / EC → RC.
 
 ---
 

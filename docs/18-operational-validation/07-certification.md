@@ -43,8 +43,8 @@ Comunican el **grado de madurez** del modelo en cada momento. No es burocracia: 
 
 ```text
 Alpha  →  Beta  →  RC  →  Certified v1.0
-  ↑
-(estado actual del modelo tras FASE 4)
+         ↑
+   (estado actual tras tren MC + Dynamics)
 ```
 
 Tras **Certified v1.0**, cualquier cambio mayor inicia ciclo hacia **v2.0** con el mismo proceso.
@@ -144,9 +144,12 @@ diseño visual · UX · Capabilities · código — trazado a 17 certificado.
 
 | Elemento | Estado |
 |----------|--------|
-| Nivel de confianza | **Alpha** |
+| Nivel de confianza | **Beta** |
 | Operational Model Certified v1.0 | ⏳ No certificado |
-| FASE 5 | 🚧 En curso — siguiente: auditoría VS-001 |
+| FASE 5 | ✅ Batería VS + Dynamics + tren MC · siguiente: FOV/EC → RC |
+
+**Criterios Beta cumplidos:** VS-001…006 con VR · 0 Contradicted · MC-001…006 aplicados vía Dynamics · cobertura mesa documentada.  
+**Pendiente RC:** FOV campo (o waiver) · EC-001…006 con VR.
 
 ---
 

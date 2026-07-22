@@ -38,7 +38,7 @@ Checks de capacidad viven en transiciones Start / Resume / Ready Route.
 | Ejemplo | Estado en modelo |
 |---------|------------------|
 | Label | Supporting activo |
-| Lot | Propuesto MC-003 (Receive / consume) |
+| Lot | **Activo** Supporting (MC-003 · Receive / consume) |
 | Barcode / QR / Seal | Extensiones de Label / Lot — Nivel 2/3; no espina |
 
 **Regla:** Traceability no es Delivery ni Packaging.  
@@ -50,7 +50,7 @@ Label `identifies` Packaging; Lot ancla Ingredient→Batch (recorrido inverso VS
 
 | Ejemplo | Estado en modelo |
 |---------|------------------|
-| Location | **Reservado** → activar (MC-006 · VS-006) |
+| Location | **Activo** Supporting (MC-006 · VS-006) |
 | Loading Bay · Shelf · Room · Floor | Especializaciones / atributos de Location |
 
 **Regla:** Delivery **confirma** al destinatario; Location **sitúa** el destino o el stock.  

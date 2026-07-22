@@ -2,7 +2,7 @@
 
 **Validation Report:** [VR-004](../05-validation-reports/VR-004-error-humano-etiquetas.md)  
 **Fecha:** 2026-07-22  
-**Estado:** ⏸ **aparcado** — principio 16 (análisis post VS-006)
+**Estado:** ✅ **aplicado** — tren Dynamics post [09 joint gap analysis](../09-joint-gap-analysis.md) — 2026-07-22
 
 ---
 
@@ -48,4 +48,4 @@ Reafirmar: corrección = `Void` + nuevo ciclo Printed→Applied · **sin** cambi
 
 ---
 
-**Estado:** ⏸ aparcado
+**Estado:** ✅ **aplicado** — tren Dynamics post [09 joint gap analysis](../09-joint-gap-analysis.md) — 2026-07-22
