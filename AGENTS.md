@@ -94,15 +94,15 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-Etapa 1 — Conocimiento + Dynamics v0.2  🟢
-Etapa 2 — Producto                      ⏳ (gate Certified / Beta+MC)
+Etapa 1 — Conocimiento · Beta · IOV definido  🟢/⏳
+Etapa 2 — Producto                            ⏳ (gate Certified tras IOV)
 ```
 
 **YourMeal OS** = experimento OPE.  
-**Batería VS-001…006** cerrada · **[Operational Dynamics v0.2](./docs/17-operational-model/07-operational-dynamics/README.md)** 🟢  
-**Siguiente:** tren MC (Amend/Hold/Lot/Location) sobre lifecycles → evaluar Beta.
+**Beta** alcanzada (VS + Dynamics + tren MC).  
+**Siguiente:** [Independent Operational Validation](./docs/19-independent-operational-validation/README.md) (Comprehension · Adversarial · Independent Implementation) → Certification.
 
-Índices: [Estado](./docs/00-status/README.md) · [Dynamics](./docs/17-operational-model/07-operational-dynamics/README.md) · [Gap analysis](./docs/18-operational-validation/09-joint-gap-analysis.md)
+Índices: [Estado](./docs/00-status/README.md) · [IOV](./docs/19-independent-operational-validation/README.md) · [Pirámide](./docs/19-independent-operational-validation/00-knowledge-validation-pyramid.md) · [OPE](./docs/18-operational-validation/00-operational-product-engineering.md)
 
 ### Principio de valor (Capabilities)
 

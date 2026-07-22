@@ -86,6 +86,9 @@ La arquitectura de YourMeal OS se considera **estable**.
 - Recovery Pattern · Temporal Grammar · Capability Impact integrados en Dynamics 01
 - **Tren MC-001…006 aplicado** a `17` (Amend/Revise/Pause/Hold · Lot · Location · cardinalidad · INV-031)
 - **Nivel de confianza: Beta** (mesa) — FOV/EC pendientes para RC
+- **Independent Operational Validation (IOV)** definido: Comprehension · Adversarial · Independent Implementation
+- **Knowledge Validation Pyramid** adoptada como seña de identidad OPE
+- Flujo OPE ampliado: Validation → Gap Analysis → **IOV** → Certification → Implementation
 - Observation EatClean: modo validación; sin UI/código producto hasta certificación
 - Secuencia definitiva en FOUNDATION: Guidelines → Spec → Implementation → Tests → Validation
 ### Gobierno

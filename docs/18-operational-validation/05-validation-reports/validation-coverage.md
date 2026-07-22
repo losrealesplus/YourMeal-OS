@@ -23,11 +23,12 @@ Lifecycles enriquecidos con Dynamics (Amend · Pause · Hold · Lot · Location 
 0 contradicciones estructurales de Core. Modelo **generalizable** en mesa.
 
 **Gate alcanzado:** **Beta** — ver [07 certification](../07-certification.md).  
-**Siguiente:** FOV / EC → RC · sin Etapa 2 producto hasta Certified (o acuerdo explícito).
+**Siguiente Etapa 1:** [IOV](../../19-independent-operational-validation/README.md) · FOV/EC → RC · Certified.
 
 ---
 
 ## Relacionado
 
 - [09 joint gap analysis](../09-joint-gap-analysis.md)  
+- [IOV](../../19-independent-operational-validation/README.md)  
 - [VR-006](./VR-006-generalizacion-healthycorp.md)

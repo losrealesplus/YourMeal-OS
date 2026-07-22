@@ -35,6 +35,8 @@ Paralelos: ingeniería de seguridad · aeronáutica · ciencia experimental.
 | **Operational Checks** | ¿Qué decisiones necesita tomar la operación? |
 | **Operational Model** | ¿Cuál es la estructura permanente del dominio? |
 | **Operational Validation** | ¿Qué parte de esa estructura es realmente cierta? |
+| **Independent Operational Validation** | ¿El conocimiento es transferible, atacable e interpretable? |
+| **Certification** | ¿Declaramos el modelo base permanente? |
 | **Implementation** | ¿Cómo traducimos esa verdad a software? |
 
 ```text
@@ -44,6 +46,8 @@ DISCOVERY           → incertidumbre de la operación real
 CHECKS              → incertidumbre de decisiones operativas
 MODEL               → incertidumbre de estructura del dominio
 VALIDATION          → incertidumbre de verdad del modelo
+IOV                 → incertidumbre de transferibilidad / resistencia / interpretación
+CERTIFICATION       → incertidumbre de cierre de Etapa 1
 IMPLEMENTATION      → incertidumbre de traducción (no de dominio)
 ```
 
@@ -52,14 +56,46 @@ IMPLEMENTATION      → incertidumbre de traducción (no de dominio)
 ## Secuencia de etapas
 
 ```text
-FOUNDATION → BLUEPRINT → DISCOVERY → CHECKS → MODEL → VALIDATION → IMPLEMENTATION
+Blueprint
+    ↓
+Discovery
+    ↓
+Checks
+    ↓
+Operational Model
+    ↓
+Validation Scenarios
+    ↓
+Joint Gap Analysis
+    ↓
+Independent Operational Validation
+    ↓
+Certification
+    ↓
+Implementation
 ```
+
+Forma compacta:
+
+```text
+FOUNDATION → BLUEPRINT → DISCOVERY → CHECKS → MODEL
+    → VALIDATION → IOV → CERTIFICATION → IMPLEMENTATION
+```
+
+### Knowledge Validation Pyramid
+
+Seña de identidad OPE — capas hasta **conocimiento operacional reproducible**:
+
+→ [Knowledge Validation Pyramid](../19-independent-operational-validation/00-knowledge-validation-pyramid.md)
 
 ### Implementación = traducción, no descubrimiento
 
-Tras **Operational Model Certified v1.0**, implementar es **traducir** conocimiento validado a código.
+Tras **Operational Model Certified v1.0** (y IOV como prueba de transferibilidad), implementar es **traducir** conocimiento validado a código.
 
 El producto (YourMeal OS) es un **experimento controlado** para este proceso: de operación real → software fundamentado.
+
+La implementación **no** empieza inmediatamente después de validar el modelo en mesa.  
+Empieza después de demostrar que ese modelo también es **transferible, atacable e interpretable**.
 
 ---
 
@@ -123,13 +159,15 @@ Operational Model (17) + actualización Knowledge State
 | Checks | `docs/15-product/OPERATIONAL_CHECKS.md` |
 | Model | `docs/17-operational-model/` |
 | Validation | `docs/18-operational-validation/` |
+| **IOV** | [`docs/19-independent-operational-validation/`](../19-independent-operational-validation/README.md) |
 | Implementation | `docs/12` · `docs/14` · código |
 
 ---
 
 ## Niveles de confianza del modelo
 
-Alpha → Beta → RC → **Certified v1.0** — [07-certification.md](./07-certification.md).
+Alpha → Beta → RC → **Certified v1.0** — [07-certification.md](./07-certification.md).  
+**IOV** es la última gran prueba de Etapa 1 antes de Certified (transferibilidad).
 
 ---
 
@@ -148,5 +186,6 @@ No el centro del trabajo: el **experimento controlado** del proceso.
 ## Relacionado
 
 - [README](./README.md)  
+- [IOV](../19-independent-operational-validation/README.md) · [Knowledge Validation Pyramid](../19-independent-operational-validation/00-knowledge-validation-pyramid.md)  
 - [knowledge-state-registry](./knowledge-state-registry.md)  
 - [Estado del proyecto](../00-status/README.md)

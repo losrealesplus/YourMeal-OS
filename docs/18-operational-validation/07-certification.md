@@ -77,7 +77,11 @@ Todos deben cumplirse:
 | 5 | Field observation: mínimo acordado (o waiver para Beta-only con fecha de RC obligatoria) | [04](./04-field-observation/README.md) |
 | 6 | Constitución INV-001…055 revisada tras todos los MC | 05-invariants |
 | 7 | Trazabilidad Capabilities críticas al día | 06-capability-mapping |
-| 8 | Sin features ni código de producto añadidos en FASE 5 | CHANGELOG / PRs |
+| 8 | Sin features ni código de producto añadidos en FASE 5 / IOV | CHANGELOG / PRs |
+| 9 | **IOV ejecutado** (Comprehension · Adversarial · Independent Implementation) | [19 IOV](../19-independent-operational-validation/README.md) · Findings DF/SF/IF |
+| 10 | Sin Forced concession estructural abierta sin VR→MC | [SF](../19-independent-operational-validation/04-findings/structural-findings.md) |
+
+> **IOV** es la última gran prueba de Etapa 1: transferibilidad, resistencia e interpretación consistente — no sustituye FOV/EC para RC, pero **sí** es requisito de Certified.
 
 ---
 
@@ -95,17 +99,18 @@ Si el campo no puede activarse antes de implementación limitada:
 
 Cuando se alcance Certified v1.0, el equipo debe poder afirmar con datos:
 
-> **«El Operational Model v1.0 ha sido validado mediante X escenarios, Y casos límite y Z observaciones de campo, con N Validation Reports, sin contradicciones abiertas.»**
+> **«El Operational Model v1.0 ha sido validado mediante X escenarios, Y casos límite y Z observaciones de campo, con N Validation Reports, IOV (DF/SF/IF) cerrado, sin contradicciones abiertas.»**
 
-Ese día la Etapa 2 (implementación) parte de **conocimiento**, no de una colección de requisitos.
+Ese día la Etapa 2 (implementación) parte de **conocimiento operacional reproducible**, no de una colección de requisitos.
 
 | Variable | Fuente |
 |----------|--------|
-| X | VS cerrados en [02](../02-validation-scenarios/README.md) |
-| Y | EC cerrados en [03](../03-edge-cases/README.md) |
-| Z | FOV en [04](../04-field-observation/README.md) |
-| N | VR en [05](../05-validation-reports/README.md) |
-| Contradicciones abiertas | VR Contradicted sin MC aplicado |
+| X | VS cerrados en [02](./02-validation-scenarios/README.md) |
+| Y | EC cerrados en [03](./03-edge-cases/README.md) |
+| Z | FOV en [04](./04-field-observation/README.md) |
+| N | VR en [05](./05-validation-reports/README.md) |
+| IOV | [19](../19-independent-operational-validation/README.md) |
+| Contradicciones abiertas | VR Contradicted / SF Forced sin MC aplicado |
 
 ---
 
@@ -126,7 +131,8 @@ Ese día la Etapa 2 (implementación) parte de **conocimiento**, no de una colec
 ## Declaración
 
 Tras intentar refutar el Operational Model mediante auditorías,
-edge cases y observación de campo [completa / waiver documentado],
+edge cases, observación de campo [completa / waiver documentado]
+e Independent Operational Validation (comprensión · adversario · implementación),
 el modelo se declara **Certified v1.0** como base permanente de YourMeal OS
 hasta una nueva fase de validación mayor (v2.0).
 
@@ -134,7 +140,8 @@ Cualquier cambio futuro al modelo requiere VR → MC.
 
 ## Próximo gate
 
-Implementar un modelo que ha sobrevivido a refutación deliberada:
+Implementar un modelo que ha sobrevivido a refutación deliberada
+y demostrado transferibilidad (Knowledge Validation Pyramid):
 diseño visual · UX · Capabilities · código — trazado a 17 certificado.
 ```
 
@@ -146,19 +153,21 @@ diseño visual · UX · Capabilities · código — trazado a 17 certificado.
 |----------|--------|
 | Nivel de confianza | **Beta** |
 | Operational Model Certified v1.0 | ⏳ No certificado |
-| FASE 5 | ✅ Batería VS + Dynamics + tren MC · siguiente: FOV/EC → RC |
+| FASE 5 | ✅ Batería VS + Dynamics + tren MC |
+| **IOV** | ⏳ Siguiente gran prueba Etapa 1 — [19](../19-independent-operational-validation/README.md) |
+| RC | ⏳ FOV/EC (en paralelo o tras IOV según sesión) |
 
 **Criterios Beta cumplidos:** VS-001…006 con VR · 0 Contradicted · MC-001…006 aplicados vía Dynamics · cobertura mesa documentada.  
-**Pendiente RC:** FOV campo (o waiver) · EC-001…006 con VR.
+**Pendiente Certified:** IOV-001…003 · RC (FOV/EC o waiver) · criterios 1–10.
 
 ---
 
 ## Metodología reutilizable
 
-La secuencia Foundation → Blueprint → Discovery → Checks → Model → **Validation** → **Implementation (traducción)**  
+La secuencia Foundation → Blueprint → Discovery → Checks → Model → **Validation** → **IOV** → **Certification** → **Implementation (traducción)**  
 es aplicable más allá de YourMeal OS.
 
-Marco: [00-operational-product-engineering](./00-operational-product-engineering.md).  
+Marco: [00-operational-product-engineering](./00-operational-product-engineering.md) · [Knowledge Validation Pyramid](../19-independent-operational-validation/00-knowledge-validation-pyramid.md).  
 YourMeal OS es el caso de referencia; el activo transferible es el **framework de ingeniería de productos operativos**.
 
 ---
@@ -166,5 +175,6 @@ YourMeal OS es el caso de referencia; el activo transferible es el **framework d
 ## Relacionado
 
 - [README](./README.md)  
+- [IOV](../19-independent-operational-validation/README.md)  
 - [validation-coverage](./05-validation-reports/validation-coverage.md)  
 - [audit-protocol](./02-validation-scenarios/audit-protocol.md)

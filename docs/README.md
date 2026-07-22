@@ -11,7 +11,8 @@
 | [Operational Discovery](./16-operational-discovery/README.md) | Por qué evolucionar — solo evidencia |
 | [Operational Model](./17-operational-model/README.md) | Core Operativo — lenguaje / objetos permanentes |
 | [Operational Dynamics v0.2](./17-operational-model/07-operational-dynamics/README.md) | Comportamiento: transitions · Supporting taxonomy · Checks 2.0 |
-| [Operational Validation](./18-operational-validation/README.md) | FASE 5 · [OPE](./18-operational-validation/00-operational-product-engineering.md) · batería VS cerrada |
+| [Operational Validation](./18-operational-validation/README.md) | FASE 5 · [OPE](./18-operational-validation/00-operational-product-engineering.md) · Beta |
+| [Independent Operational Validation](./19-independent-operational-validation/README.md) | IOV · transferibilidad · [Pirámide](./19-independent-operational-validation/00-knowledge-validation-pyramid.md) |
 | [PRODUCT_VISION](./15-product/PRODUCT_VISION.md) | Qué es YourMeal OS para el cliente |
 | [Operational Checks](./15-product/OPERATIONAL_CHECKS.md) | Datos → comprobación → acción (transversal) |
 | [Milestone · Infrastructure Validation](./00-status/MILESTONE_INFRASTRUCTURE_VALIDATION.md) | Core independiente de la tecnología ✅ |

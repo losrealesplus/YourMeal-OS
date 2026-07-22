@@ -178,7 +178,13 @@ Sin certificación, el modelo sigue siendo **hipótesis endurecida**, no base pe
 | Escenarios VS-001…006 | ✅ Cerrados (Extended×4 · Clarified×2) |
 | Field observation (EatClean) | ⏸ hasta activación bajo validación |
 | Reports / MC | ✅ VR-001…006 · MC-001…006 aplicados vía Dynamics |
-| Certificación | **Beta** (mesa) — RC pendiente FOV/EC |
+| Certificación | **Beta** (mesa) — IOV + RC pendientes para Certified |
+
+---
+
+## Siguiente fase (Etapa 1)
+
+[Independent Operational Validation](../19-independent-operational-validation/README.md) — ¿el conocimiento es transferible, atacable e interpretable?
 
 ---
 
@@ -186,4 +192,5 @@ Sin certificación, el modelo sigue siendo **hipótesis endurecida**, no base pe
 
 - [Estado del proyecto](../00-status/README.md)  
 - [Operational Model](../17-operational-model/README.md)  
+- [IOV](../19-independent-operational-validation/README.md)  
 - [PRODUCT_PRINCIPLES §13](../15-product/PRODUCT_PRINCIPLES.md)
