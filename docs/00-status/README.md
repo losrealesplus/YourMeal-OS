@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-22 · VS-001…004 · Extended×4 · MC ⏸  
+**Última actualización:** 2026-07-22 · VS-001…005 · Clarified×1 · Extended×4 · MC ⏸  
 **Versión técnica:** `v0.1.0` — FOUNDATION LOCKED  
 **Versión modelo:** Alpha (pre-certificación)
 
@@ -127,12 +127,12 @@ Plantilla: [07-certification](../18-operational-validation/07-certification.md).
 
 ## Próxima sesión
 
-1. **VS-005** — escalabilidad extrema (reescribir)  
-2. **VS-006** — generalización del dominio  
-3. **No** aplicar MC a `17` hasta análisis conjunto  
+1. **VS-006** — generalización del dominio (cliente con reglas radicalmente distintas)  
+2. Análisis conjunto de brechas MC-001…005  
+3. **No** aplicar MC a `17` hasta ese análisis  
 4. Sin Etapa 2 hasta Certified v1.0
 
 | Índice | Ruta |
 |--------|------|
-| VR-004 | [VR-004](../18-operational-validation/05-validation-reports/VR-004-error-humano-etiquetas.md) |
+| VR-005 | [VR-005](../18-operational-validation/05-validation-reports/VR-005-escalabilidad-eatclean.md) |
 | Roadmap | [02 scenarios](../18-operational-validation/02-validation-scenarios/README.md) |

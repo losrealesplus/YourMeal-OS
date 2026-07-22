@@ -66,7 +66,7 @@ Durante la batería, los MC viven en esta carpeta como **propuestos / aparcados*
 |----|--------|-----|--------|
 | [MC-001](./MC-001-amend-and-revise-transitions.md) | Amend Order + Revise Plan/Route (Ready) | VR-001 | ⏸ aparcado (batería) |
 | [MC-002](./MC-002-pause-batch-replan-execution.md) | Pause Batch + Replan In execution + Kitchen | VR-002 | ⏸ aparcado (batería) |
-| [MC-004](./MC-004-packaging-hold-relabel.md) | Packaging Hold · relabel · evidencia | VR-004 | ⏸ aparcado (batería) |
+| [MC-005](./MC-005-cardinality-parallelism-docs.md) | Cardinalidad · paralelismo (solo docs) | VR-005 | ⏸ aparcado (batería) |
 
 > Ningún MC se aplica a `17` hasta análisis conjunto post VS-006 (principio 16).
 
