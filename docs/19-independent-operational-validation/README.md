@@ -1,18 +1,22 @@
 # Independent Operational Validation (IOV)
 
+> **Si un evaluador necesita preguntar al autor para completar correctamente un escenario, el conocimiento todavía reside parcialmente en las personas y no completamente en el modelo.**
+
 **Pregunta de la fase:**
 
 > **¿El conocimiento puede transferirse y sobrevivir a personas que no participaron en su construcción?**
 
-Eso es **otra dimensión** de validación — distinta de FASE 5.
+Eso es **otra dimensión** de validación — distinta de [Operational Validation](../18-operational-validation/README.md).
 
 | Fase | Pregunta |
 |------|----------|
-| [Operational Validation](../18-operational-validation/README.md) | ¿El modelo **explica** la operación? |
+| Operational Validation | ¿El modelo **explica** la operación? |
 | **Independent Operational Validation** | ¿El conocimiento es **transferible, atacable e interpretable**? |
 
+No mezclar objetivos: validar el modelo ≠ validar su capacidad de transferencia.
+
 Ningún IOV modifica directamente el [Operational Model](../17-operational-model/README.md).  
-Todos producen **evidencia**. Los cambios al modelo siguen VR → MC (si la evidencia lo exige).
+Todos producen **evidencia**. Los cambios al modelo siguen Classification → VR → MC (si aplica).
 
 ---
 
@@ -20,14 +24,9 @@ Todos producen **evidencia**. Los cambios al modelo siguen VR → MC (si la evid
 
 Tras VS-001…006, Dynamics v0.2 y el tren MC, el modelo alcanza **Beta** (mesa): explica la operación bajo refutación propia.
 
-Eso **no** demuestra que:
+Eso **no** demuestra transferibilidad. IOV sí lo intenta — con [protocolo experimental](./05-experimental-protocol.md) reproducible.
 
-- un ingeniero nuevo pueda **usarlo** sin los autores;
-- resista ataques de quien **no** lo construyó;
-- dos equipos lo **traduzcan** a la misma arquitectura técnica.
-
-IOV es, en FOPEBA, la prueba de **transferibilidad** del conocimiento.  
-Junto con [FOV](../20-evidence-framework/04-field-operational-validation.md) y [EC](../20-evidence-framework/06-economic-confirmation.md), alimenta el [Gate G-01](../20-evidence-framework/07-gate-g01-operational-readiness.md) antes de Etapa 2.
+Alimenta [Gate G-01](../20-evidence-framework/07-gate-g01-operational-readiness.md) junto con FOV y EC.
 
 ---
 
@@ -35,58 +34,49 @@ Junto con [FOV](../20-evidence-framework/04-field-operational-validation.md) y [
 
 | Nivel | Nombre | Pregunta | Evidencia |
 |-------|--------|----------|-----------|
-| [IOV-001](./01-comprehension-validation.md) | Comprehension Validation | ¿Se entiende? | **Documentation Findings** (DF) |
-| [IOV-002](./02-adversarial-validation.md) | Adversarial Validation | ¿Resiste ataques? | **Structural Findings** (SF) |
-| [IOV-003](./03-independent-implementation.md) | Independent Implementation | ¿Se implementa igual? | **Interpretation Findings** (IF) |
+| [IOV-001](./01-comprehension-validation.md) | Comprehension Validation | ¿Se entiende? | DF (+ IFD) |
+| [IOV-002](./02-adversarial-validation.md) | Adversarial Validation | ¿Resiste ataques? | SF |
+| [IOV-003](./03-independent-implementation.md) | Independent Implementation | ¿Se implementa igual? | IF |
 
-No se llaman «Red Team 1/2/3». En OPE cada ejercicio responde una **pregunta concreta**.
+Arquitectura estable. Lo que se fortalece antes de ejecutar es el **protocolo**.
 
 ---
 
-## Regla de oro
+## Gobernanza de Findings
 
 ```text
-IOV → Findings (DF / SF / IF)
-        ↓
-(si hay contradicción estructural independiente)
-        ↓
-VR → MC → Operational Model
+Finding
+    ↓
+Classification
+    ↓
+    ├─ Navigation / docs-only     → reorganizar documentación (sin VR)
+    ├─ Ambiguity / estructural    → VR → posible MC
+    └─ Impossible Finding (IFD)   → VR (casi siempre)
 ```
 
-Los Findings **no** son Model Changes.  
-Son evidencia de transferibilidad, resistencia o consistencia de interpretación.
+Detalle: [04 Findings](./04-findings/README.md) · [05 Experimental Protocol](./05-experimental-protocol.md).
+
+---
+
+## Antes de ejecutar IOV-001
+
+| Prioridad | Acción |
+|-----------|--------|
+| **P0** | Congelar [KCM](./kcm/README.md) |
+| **P0** | Prohibición de conocimiento implícito (citas al corpus) |
+| **P1** | Transferability Score + evidencia negativa |
+| **P2** | Tiempos de localización + confianza 0–100% |
+| **P3** | Categoría Impossible Finding |
+
+**Recomendación:** piloto **IA ciego** (conversación nueva, solo corpus KCM) **antes** de un ingeniero humano — depurar protocolo, no el evaluador.
 
 ---
 
 ## Secuencia FOPEBA (IOV en contexto)
 
 ```text
-Blueprint
-    ↓
-Discovery
-    ↓
-Checks
-    ↓
-Operational Model
-    ↓
-Validation Scenarios
-    ↓
-Joint Gap Analysis
-    ↓
-Independent Operational Validation   ← esta fase
-    ↓
-FOV
-    ↓
-Knowledge Update
-    ↓
-EC (Economic Confirmation)
-    ↓
-Gate G-01
-    ↓
-Implementation
+… → Operational Validation → IOV → FOV → Knowledge Update → EC → G-01 → Implementation
 ```
-
-Detalle: [FOPEBA](../18-operational-validation/00-operational-product-engineering.md) · [Evidence Framework](../20-evidence-framework/README.md) · [Pirámide](./00-knowledge-validation-pyramid.md).
 
 ---
 
@@ -94,11 +84,11 @@ Detalle: [FOPEBA](../18-operational-validation/00-operational-product-engineerin
 
 | Elemento | Estado |
 |----------|--------|
-| Prerrequisito | ✅ Operational Validation VS-001…006 · Dynamics · tren MC · **Beta** |
-| IOV-001 | ⏳ No ejecutado |
-| IOV-002 | ⏳ No ejecutado |
-| IOV-003 | ⏳ No ejecutado |
-| Findings abiertos | — |
+| Prerrequisito modelo | ✅ Beta (mesa) |
+| Protocolo experimental | 🟢 Definido |
+| [KCM-001](./kcm/KCM-001-iov001-pilot.md) | 📝 Listo para congelar |
+| Piloto IA | ⏳ Pendiente |
+| IOV-001 humano | ⏳ Tras piloto |
 
 ---
 
@@ -106,16 +96,18 @@ Detalle: [FOPEBA](../18-operational-validation/00-operational-product-engineerin
 
 | Doc | Contenido |
 |-----|-----------|
-| [00 Knowledge Validation Pyramid](./00-knowledge-validation-pyramid.md) | Seña de identidad OPE |
-| [01 Comprehension](./01-comprehension-validation.md) | IOV-001 · DF |
-| [02 Adversarial](./02-adversarial-validation.md) | IOV-002 · SF |
-| [03 Independent Implementation](./03-independent-implementation.md) | IOV-003 · IF |
-| [04 Findings](./04-findings/README.md) | Taxonomía DF · SF · IF · plantillas |
+| [00 Pyramid](./00-knowledge-validation-pyramid.md) | Capas de validación de conocimiento |
+| [01 Comprehension](./01-comprehension-validation.md) | IOV-001 |
+| [02 Adversarial](./02-adversarial-validation.md) | IOV-002 |
+| [03 Independent Implementation](./03-independent-implementation.md) | IOV-003 |
+| [04 Findings](./04-findings/README.md) | DF · SF · IF · IFD · Classification |
+| [05 Experimental Protocol](./05-experimental-protocol.md) | P0–P3 · piloto · scores |
+| [kcm/](./kcm/README.md) | Knowledge Corpus Manifest |
 
 ---
 
 ## Relacionado
 
 - [18 Operational Validation](../18-operational-validation/README.md)  
-- [07 Certification](../18-operational-validation/07-certification.md)  
+- [FOPEBA](../18-operational-validation/00-operational-product-engineering.md)  
 - [Estado](../00-status/README.md)

@@ -92,8 +92,8 @@ La arquitectura de YourMeal OS se considera **estable**.
 - G-01 **no aprueba código** — aprueba conocimiento suficiente para justificarlo
 - Flujo: Validation → IOV → FOV → **KU** → EC → G-01 → Implementation
 - Regla de diseño: cada fase elimina una incertidumbre que ninguna anterior puede eliminar
-- FOV: principio de sorpresa (al menos un comportamiento no previsto intentado)
-- EC (Economic Confirmation) ≠ Edge Cases (`EC-xxx` históricos de mesa)
+- **IOV protocolo experimental** reforzado: KCM · conocimiento implícito prohibido · Transferability Score · evidencia negativa · tiempos · confianza · IFD · Classification→VR
+- Recomendación: piloto IA ciego antes de IOV-001 humano
 - Observation EatClean: modo FOV; sin Etapa 2 hasta G-01
 - Secuencia definitiva en FOUNDATION: Guidelines → Spec → Implementation → Tests → Validation
 ### Gobierno

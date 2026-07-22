@@ -7,113 +7,99 @@
 No queremos que lo critique.  
 Queremos saber si puede **utilizarlo**.
 
+Protocolo completo: [05 Experimental Protocol](./05-experimental-protocol.md).  
+Corpus: [KCM](./kcm/README.md) — sin KCM no se ejecuta.
+
 ---
 
 ## Material permitido
 
-Únicamente el [Operational Model](../17-operational-model/) y su gramática:
+**Solo** lo listado en el Knowledge Corpus Manifest de la sesión (p.ej. [KCM-001](./kcm/KCM-001-iov001-pilot.md)).
 
-- Ubiquitous Language  
-- Core Objects  
-- Supporting Objects  
-- Dependencies  
-- Lifecycles (incl. Dynamics si forma parte del modelo publicado)  
-- Invariants  
+Típicamente: gramática del Operational Model bajo `docs/17-operational-model/`.
 
 **Nada más.**  
-Sin Discovery, sin VR de la batería, sin Diario, sin explicaciones orales, sin PRs de contexto.
+Sin Discovery, VS/VR/MC, Diario, PRs, explicaciones orales.
 
 ---
 
-## Regla de silencio
+## Reglas P0
 
-Los **autores permanecen completamente en silencio**.
+### Silencio de autores
 
-No pueden responder preguntas.  
-No pueden «aclarar un poco».  
-Si el evaluador se atasca, eso **es** el dato.
+Los autores **no responden** preguntas. Atascarse es dato.
+
+### Prohibición de conocimiento implícito
+
+Solo información del corpus.  
+Todo supuesto cita ruta del KCM.  
+Sin cita → DF (`Implicit assumption`).
 
 ---
 
 ## Tarea
 
-Resolver un **escenario operacional sencillo**.
+Resolver un **escenario operacional sencillo** (no hostil).
 
-No uno hostil.  
-Algo cotidiano (p.ej. confirmar un Order B2B, planificar el día, empaquetar y entregar una ruta corta).
-
-El evaluador narra el escenario **solo** con el vocabulario y las transiciones del modelo.
+Narrar solo con vocabulario y transiciones del modelo.
 
 ---
 
 ## Qué medimos
 
-**No** si «acierta».
+| Señal | Dónde |
+|-------|-------|
+| Dudas / malas interpretaciones / no encontrado | DF |
+| Aciertos sin preguntar | Evidencia negativa |
+| Tiempos de localización | Protocolo P2 |
+| Confianza 0–100% vs acierto | Calibración / falsa claridad |
+| Interrupción total | Impossible Finding (IFD) |
+| Score agregado | Transferability Score |
 
-Sí:
-
-| Señal | Ejemplo |
-|-------|---------|
-| Dónde duda | Pausa larga ante Amend vs Cancel |
-| Qué interpreta mal | Cree que Batch es Core de Stock |
-| Qué busca y no encuentra | Índice de estados vs transiciones |
-| Cuánto tarda | Tiempo hasta narrar el ciclo completo |
+**No** medimos solo si «acertó el final».
 
 ---
 
-## Evidencia: Documentation Findings (DF)
+## Evidencia
 
-IOV-001 **no** produce Model Changes.
-
-Produce **Documentation Findings**:
-
-```text
-DF-001
-
-Título: Lifecycle difícil de localizar
-Tipo: Navigation
-Severidad: Medium
-Contexto: IOV-001 · escenario cotidiano X
-Observación: …
-Impacto en uso: …
-¿Sugiere cambio de docs? Sí / No (sin editar 17 aquí)
-```
-
-Tipos típicos: `Navigation` · `Ambiguity` · `Missing cross-link` · `Overloaded term` · `False friend` · `Gap in example`.
+- Documentation Findings (DF)  
+- Impossible Findings (IFD)  
+- Transferability Score + hoja de cierre  
 
 Registro: [04-findings](./04-findings/README.md).
 
 ---
 
-## Resultado posible
+## Classification → ¿VR?
 
-| Resultado | Significado |
-|-----------|------------|
-| Escenario narrado con fricción localizada | Modelo usable; DF abiertos para mejorar docs |
-| Escenario imposible sin ayuda de autores | Transferibilidad débil — no listo para Certified |
-| Malentendidos sistemáticos de un concepto | Señal fuerte de UL / Lifecycle / Naming |
-
-Los DF pueden motivar mejoras de **navegación y claridad** (docs) o, si revelan ambigüedad estructural, un VR — nunca un parche silencioso.
+| Tipo DF | ¿VR? |
+|---------|------|
+| Navigation · Missing cross-link | No — docs |
+| Ambiguity · Overloaded · False friend | Valorar VR |
+| Implicit assumption | Docs o VR si estructural |
+| Impossible | Casi siempre VR |
 
 ---
 
-## Protocolo mínimo (checklist)
+## Protocolo de sesión (checklist)
 
-1. Elegir evaluador **no autor** del modelo.  
-2. Entregar solo rutas `docs/17-operational-model/` (y Dynamics bajo 17).  
-3. Entregar escenario cotidiano por escrito.  
-4. Cronometrar · anotar dudas · no intervenir.  
-5. Cerrar con DF-xxx · sin MC en la misma sesión.
+1. Congelar y firmar **KCM**.  
+2. Preferible: **piloto IA ciego** antes de humano.  
+3. Entregar solo corpus + escenario.  
+4. Cronometrar localización · anotar aciertos y dudas · silencio total.  
+5. Pregunta de confianza 0–100%.  
+6. Classification de Findings · Transferability Score.  
+7. Sin MC en la misma sesión.
 
 ---
 
 ## Estado
 
-⏳ No ejecutado (YourMeal OS · post-Beta).
+⏳ No ejecutado — protocolo listo · KCM-001 pendiente de commit ancla al lanzar piloto.
 
 ---
 
 ## Relacionado
 
-- [IOV-002 Adversarial](./02-adversarial-validation.md)  
-- [Findings](./04-findings/README.md)
+- [05 Experimental Protocol](./05-experimental-protocol.md)  
+- [IOV-002](./02-adversarial-validation.md)

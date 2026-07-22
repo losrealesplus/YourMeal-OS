@@ -22,6 +22,7 @@ Promesa pendiente: *este proceso produce mejores productos* → **FOV + EC + G-0
 | Operational Model Beta | 🟢 |
 | [Evidence Framework](../20-evidence-framework/README.md) | 🟢 KS · ECL transversal · Stability · FOV · KU · EC · G-01 |
 | Knowledge Update | ⏳ Tras FOV |
+| IOV | ⏳ Protocolo + KCM listos · piloto IA antes de humano |
 | FOV (principio de sorpresa) | ⏳ No ejecutado |
 | EC (Economic Confirmation) | ⏳ No ejecutado |
 | Gate G-01 | 🔒 No aprueba código — aprueba conocimiento |
@@ -73,9 +74,9 @@ Tres ejes: KS · ECL · Stability · **G-01 no aprueba código**.
 
 ## Próxima sesión
 
-1. Planificar **FOV** EatClean (FOR · FVR) cuando el campo se reactive  
-2. Preparar medición para **EC** (cuatro preguntas)  
-3. Ejecutar **IOV-001** si hay evaluador independiente  
+1. **Piloto IOV** (IA ciega + [KCM-001](../19-independent-operational-validation/kcm/KCM-001-iov001-pilot.md)) antes de evaluador humano  
+2. Planificar **FOV** EatClean cuando el campo se reactive  
+3. Preparar medición para **EC**  
 4. No abrir Etapa 2 sin G-01
 
 | Índice | Ruta |
