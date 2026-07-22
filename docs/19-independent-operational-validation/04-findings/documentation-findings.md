@@ -8,14 +8,14 @@ Evidencia de **IOV-001**. Protocolo: [05](../05-experimental-protocol.md).
 
 | ID | Título | Tipo | Severidad | Classification | Estado |
 |----|--------|------|-----------|----------------|--------|
-| DF-001 | Quién places Order B2B | Ambiguity | Medium | Docs | ⏳ |
-| DF-002 | Transiciones Payment incompletas | Gap | High | Docs | ⏳ |
+| DF-001 | Quién places Order B2B | Ambiguity | Medium | Docs | ✅ aclarado en Confirm Order |
+| DF-002 | Transiciones Payment incompletas | Gap | High | Docs | ✅ spine-transitions Payment |
 | DF-003 | Semana Order → Plan del día | Implicit | Medium | Docs | ⏳ |
 | DF-004 | produces vs packages into | Ambiguity | Low | Docs | ⏳ |
-| DF-005 | Delivery Pending → Attempted | Gap | Medium | Docs | ⏳ |
-| DF-006 | Cross-link finance ↔ Settle | Missing cross-link | Medium | Docs | ⏳ |
+| DF-005 | Delivery Pending → Attempted | Gap | Medium | Docs | ✅ Attempt Delivery |
+| DF-006 | Cross-link finance ↔ Settle | Missing cross-link | Medium | Docs | ✅ nota en Settle |
 | DF-007 | Cardinalidad Plan día/semana | Ambiguity | Low | Docs | ⏳ |
-| DF-008 | Navegación Happy Path | Navigation | Medium | Docs | ⏳ |
+| DF-008 | Navegación Happy Path | Navigation | Medium | Docs | ✅ README 17 Happy Path |
 | DF-009 | Label en Packaging Complete | Implicit | Low | Docs | ⏳ |
 | IFD | — | — | — | — | ninguno en IVR-001 |
 

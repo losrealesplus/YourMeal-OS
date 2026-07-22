@@ -53,7 +53,7 @@ Verbos: [03](../03-relationships/verbs.md). Objetos: [02](../02-core-objects/lev
 
 | | |
 |--|--|
-| **Responsable** | Consumer / Beneficiary / admin |
+| **Responsable** | Consumer / Beneficiary / admin Organization (en B2B el admin puede confirmar en nombre del Beneficiary; el verbo canónico de demanda sigue siendo Beneficiary **`places`** — DF-001) |
 | **Precondiciones** | Dentro de Weekly Menu **Published** · líneas válidas |
 | **Checks** | ¿**Puede confirmarse** este Order? (completitud, plazos) |
 | **Postcondiciones** | Order **contributes to** Production Plan |
@@ -353,6 +353,18 @@ Mismo Finalize/Start con cardinalidad **1 Order** (urgencia). No Core «Emergenc
 
 ### Transiciones
 
+#### Attempt Delivery · *Happy*
+
+`Pending` → `Attempted`
+
+| | |
+|--|--|
+| **Responsable** | Repartidor |
+| **Precondiciones** | Route In progress · parada alcanzada |
+| **Checks** | ¿**Puede intentarse** la entrega? (ventana · destinatario presenteable) → PASS / WARNING / MANUAL |
+| **Postcondiciones** | Delivery en curso de confirmación o fallo |
+| **Nota** | IVR-001 / DF-005 |
+
 #### Confirm Delivered
 
 `Attempted` → `Delivered`
@@ -465,8 +477,8 @@ Production Batch ──Start──► In progress ──Pause──► Paused �
 Packaging ──Complete──► Complete ──Hold──► Held ──Release──► Complete
                                   └──Hand to Route──► Handed to route
 Delivery Route ──Ready──► Ready ──Revise──► Ready ──Depart──► In progress
-Delivery ──Confirm──► Delivered · Stop/Incident · Update destination
-Payment ──Settle──► Settled
+Delivery ──Attempt──► Attempted ──Confirm──► Delivered · Stop/Incident · Update destination
+Payment ──Due/Pending/Capture──► Settled
 ```
 
 Clases: [Lifecycles 2.0](../07-operational-dynamics/01-operational-lifecycles-2.0.md).  
