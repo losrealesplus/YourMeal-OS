@@ -1,117 +1,57 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-22 · Batería VS-001…006 **cerrada** · análisis conjunto 🚧  
+**Última actualización:** 2026-07-22 · **Operational Dynamics v0.2** 🟢  
 **Versión técnica:** `v0.1.0` — FOUNDATION LOCKED  
-**Versión modelo:** Alpha (pre-certificación)
+**Versión modelo:** Alpha · Dynamics v0.2 adoptado (docs) · Beta pendiente tren MC
 
 ---
 
 ## Perspectiva estratégica
 
-**YourMeal OS ya no es el centro del trabajo.**
-
-Es el **primer sistema que demostrará si el proceso OPE funciona**.
-
-| Centro | Rol |
-|--------|-----|
-| **OPE** (Operational Product Engineering) | Marco · proceso de adquisición de conocimiento |
-| **YourMeal OS** | Experimento controlado · caso de referencia |
-
-Las decisiones de aquí en adelante: ¿fortalecen el conocimiento trazable o solo aceleran código?
-
-**FASE 5:** fricción deliberada (coste bajo). Principios **15** (dimensión distinta por VS) y **16** (no corregir `17` hasta análisis de los seis VR).
+**YourMeal OS** = primer experimento OPE.  
+Batería VS-001…006 cerrada. Respuesta estructural: **Operational Dynamics v0.2** (comportamiento, no nueva espina).
 
 ---
 
-## Dos etapas del proyecto
+## Milestone actual: Operational Dynamics v0.2
 
-### Etapa 1 · Construcción del conocimiento — **casi consolidada**
+| Entregable | Estado |
+|------------|--------|
+| [01 Lifecycles 2.0](../17-operational-model/07-operational-dynamics/01-operational-lifecycles-2.0.md) | 🟢 Transition classes · Recovery · Impact · Temporal Grammar |
+| [02 Supporting Taxonomy](../17-operational-model/07-operational-dynamics/02-supporting-objects-taxonomy.md) | 🟢 Resources · Traceability · Spatial · Administrative |
+| [03 Checks 2.0](../17-operational-model/07-operational-dynamics/03-operational-checks-2.0.md) | 🟢 PASS · WARNING · BLOCKED · MANUAL DECISION |
 
-Objetivo: **reducir incertidumbre**. No desarrollar software de producto.
+**No es** cambio de arquitectura. **Sí es** enriquecer cómo se mueve la operación.
+
+---
+
+## Dos etapas
+
+### Etapa 1 · Conocimiento — consolidada + Dynamics
 
 ```text
-Foundation              ✅
-Blueprint               ✅
-Discovery               ✅ (estructura · campo ⏸)
-Operational Checks      ✅
-Operational Model       ✅ FASE 4
-Operational Validation  🚧 FASE 5 abierta
+Foundation … Model 01–06 ✅
+Validation VS-001…006 ✅
+Operational Dynamics v0.2 ✅
+        ↓
+Tren MC → lifecycles por objeto  ⏳
+        ↓
+Beta / Certified path
 ```
 
-### Etapa 2 · Construcción del producto — **aún no empezada**
+### Etapa 2 · Producto — no empezada
 
-Objetivo: **traducir conocimiento certificado** a software · UX · Capabilities.
+Gate: Certified v1.0 (o al menos Beta + tren MC aplicado).
+
+---
+
+## FASE 5 Validation (cerrada campaña)
 
 ```text
-Gate: Operational Model Certified v1.0
-        ↓
-Implementation (traducción, no redescubrimiento)
+Extended × 4 · Clarified × 2 · Contradicted × 0 · Core Δ × 0
 ```
 
-Que la Etapa 2 no haya empezado es **buena noticia**: cuando empiece, el conocimiento será más estable.
-
----
-
-## Fase actual: cerrar validación — empezar por VS-001
-
-```text
-Operational Model Alpha
-        ↓
-VS-001  ← primera evidencia externa al diseño
-        ↓
-VR-001 + Knowledge State + retrospectiva metodológica
-        ↓
-VS-002… · EC… · FOV…
-        ↓
-Operational Model Certified v1.0
-```
-
-Índice: [18-operational-validation/](../18-operational-validation/README.md)
-
-| Misión inmediata | Prohibido |
-|------------------|-----------|
-| Auditoría VS-001 · decisiones trazables | VS-002 sin retrospectiva post-VS-001 |
-| Actualizar Knowledge State registry | Features · UI · código producto |
-
-**Criterio de éxito VS-001:** cada hallazgo → decisión trazable (no «cero errores»).
-
----
-
-## FASE 4 — Operational Model 🟢
-
-```text
-01–06 endurecidos · Knowledge State inicial Hypothesized
-```
-
-[17-operational-model/](../17-operational-model/README.md)
-
----
-
-## Mapa de bloques
-
-| Bloque | Etapa | Estado |
-|--------|-------|--------|
-| Foundation | 1 | ✅ |
-| Blueprint | 1 | ✅ |
-| Discovery | 1 | ✅ · campo ⏸ |
-| Operational Checks | 1 | ✅ |
-| Operational Model | 1 | 🟢 |
-| Operational Validation | 1 | 🚧 · **Alpha** |
-| Implementation | 2 | ⏳ post-certificación |
-
-Marco: [OPE](../18-operational-validation/00-operational-product-engineering.md) · [Knowledge State](../18-operational-validation/knowledge-state.md)
-
----
-
-## El día que importa (objetivo de certificación)
-
-Poder decir con evidencia:
-
-> *«El Operational Model v1.0 ha sido validado mediante X escenarios, Y casos límite y Z observaciones de campo, con N Validation Reports, sin contradicciones abiertas.»*
-
-Ese día el software no partirá de requisitos sueltos — partirá de **conocimiento** puesto a prueba.
-
-Plantilla: [07-certification](../18-operational-validation/07-certification.md).
+Índice: [18-operational-validation](../18-operational-validation/README.md) · [09 gap analysis](../18-operational-validation/09-joint-gap-analysis.md)
 
 ---
 
@@ -121,19 +61,18 @@ Plantilla: [07-certification](../18-operational-validation/07-certification.md).
 |----|------|--------|
 | [#9](https://github.com/losrealesplus/yourmeal-os/pull/9) | Operational Checks | ✅ Merged |
 | [#10](https://github.com/losrealesplus/yourmeal-os/pull/10) | Operational Model FASE 4 | 🚧 Open |
-| [#11](https://github.com/losrealesplus/YourMeal-OS/pull/11) | Operational Validation · OPE | 🚧 Open |
+| [#11](https://github.com/losrealesplus/YourMeal-OS/pull/11) | Validation + Dynamics v0.2 | 🚧 Open |
 
 ---
 
 ## Próxima sesión
 
-1. **[Análisis conjunto de brechas](../18-operational-validation/09-joint-gap-analysis.md)** — priorizar MC-001…006  
-2. Aplicar paquete estructural a `17` (un tren, no seis parches)  
-3. Evaluar paso Alpha → **Beta**  
-4. Sin Etapa 2 (producto) hasta Certified v1.0
+1. Aplicar **tren MC** a `04-lifecycles` / supporting usando vocabulario Dynamics  
+2. Unificar Hold/Quarantine · Lot · Location · Amend/Pause  
+3. Evaluar **Beta**  
+4. Sin Etapa 2 UI/código producto hasta certificación
 
 | Índice | Ruta |
 |--------|------|
-| VR-006 | [VR-006](../18-operational-validation/05-validation-reports/VR-006-generalizacion-healthycorp.md) |
+| Dynamics v0.2 | [07-operational-dynamics](../17-operational-model/07-operational-dynamics/README.md) |
 | Gap analysis | [09](../18-operational-validation/09-joint-gap-analysis.md) |
-| Coverage | [coverage](../18-operational-validation/05-validation-reports/validation-coverage.md) |

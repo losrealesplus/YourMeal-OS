@@ -1,69 +1,54 @@
 # 09 · Análisis conjunto de brechas (post batería VS-001…006)
 
-**Estado:** 🚧 pendiente de sesión de equipo  
-**Prerrequisito:** VS-001…006 cerrados con VR · MC aparcados  
-**Principio 16:** **ningún** cambio a `17-operational-model` hasta completar este análisis
+**Estado:** ✅ marco de respuesta definido → [Operational Dynamics v0.2](../17-operational-model/07-operational-dynamics/README.md)  
+**Principio 16:** no aplicar seis parches sueltos a `04-lifecycles`; adoptar Dynamics y **luego** un tren coherente
 
 ---
 
-## Propósito
+## Decisión de sesión (milestone)
 
-No tratar síntomas VS a VS.  
-Identificar **causas estructurales** comunes y priorizar un paquete de Model Changes.
+En lugar de editar objeto a objeto los MC-001…006 como síntomas:
+
+> **Operational Dynamics v0.2** unifica transiciones, Supporting, Checks y Recovery.
+
+| Entregable Dynamics | Absorbe |
+|---------------------|---------|
+| Lifecycles 2.0 | MC-001 · 002 · 004 · Recovery · Impact · Temporal Grammar |
+| Supporting Taxonomy | MC-003 Lot · MC-006 Location · Resources · Spatial |
+| Checks 2.0 | MANUAL DECISION · PASS/WARNING/BLOCKED · todos los VR |
 
 ---
 
-## Resultados de la campaña
-
-| VS | Dimensión | Clasificación | MC |
-|----|-----------|---------------|-----|
-| 001 | Adaptabilidad | Extended | MC-001 Amend · Revise Ready |
-| 002 | Continuidad | Extended | MC-002 Pause · Replan In execution |
-| 003 | Trazabilidad inversa | Extended | MC-003 Lot · traza · retirada |
-| 004 | Recuperación error | Extended | MC-004 Packaging Hold · relabel |
-| 005 | Escalabilidad | **Clarified** | MC-005 Cardinalidad docs |
-| 006 | Generalización | **Clarified** | MC-006 Location · Plan expedito |
+## Resultados de la campaña (recordatorio)
 
 ```text
-Extended × 4 · Clarified × 2 · Contradicted × 0 · Core Objects nuevos × 0
-MC aplicados a 17 × 0
+Extended × 4 · Clarified × 2 · Contradicted × 0 · Core Δ × 0
 ```
 
 ---
 
-## Hipótesis estructurales (a validar en sesión)
+## Próximo tren de aplicación (después de Dynamics)
 
-| Tema | MC implicados | Hipótesis |
-|------|---------------|-----------|
-| Transiciones mid-cycle | 001 · 002 | Una familia «Revise/Amend/Pause» en Order · Plan · Batch · Route |
-| Packaging retención | 003 · 004 | Hold / Quarantine unificados |
-| Traza lote | 003 | Supporting Lot + INV-031 endurecido |
-| Destino / Location | 006 | Activar Supporting reservado |
-| Docs escala | 005 | Cardinalidad n · paralelismo |
-| Constitución | — | 0 INV refutados · posibles precisiones |
+Orden sugerido al tocar `17` espina/supporting:
 
----
-
-## Agenda de sesión sugerida
-
-1. Releer VR-001…006 (solo dictámenes + catálogos).  
-2. Confirmar/refutar hipótesis de la tabla.  
-3. Ordenar MC: P0 (coherencia temporal) · P1 (Packaging/Lot) · P2 (Location/docs).  
-4. Decidir qué se aplica a `17` en un solo tren de cambios.  
-5. Actualizar Knowledge State · Validation Coverage · nivel Alpha→Beta si procede.  
-6. Acto hacia [07-certification](./07-certification.md) (criterios Beta).
+1. Vocabulario Dynamics adoptado (este milestone) ✅ docs  
+2. Packaging Hold/Quarantine + Label Void (MC-004 · parte MC-003)  
+3. Order Amend · Plan/Route Revise · Batch Pause (MC-001 · 002)  
+4. Lot + INV-031 (MC-003)  
+5. Location activo (MC-006)  
+6. Cardinalidad docs (MC-005)  
+7. Actualizar KS · Coverage · evaluar **Beta**
 
 ---
 
-## Regla de oro del análisis
+## Regla de oro
 
-> Preferir **un** cambio estructural que cierre varios VR  
+> Preferir **un** marco estructural (Dynamics) que cierre varios VR  
 > antes que seis parches locales.
 
 ---
 
 ## Relacionado
 
-- [06 model-changes](./06-model-changes/README.md)  
-- [validation-coverage](./05-validation-reports/validation-coverage.md)  
-- [01 principles §16](./01-validation-principles.md)
+- [07 Operational Dynamics](../17-operational-model/07-operational-dynamics/README.md)  
+- [06 model-changes](./06-model-changes/README.md)

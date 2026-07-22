@@ -199,6 +199,9 @@ Validan el **paso** de un estado a otro — no el estado en sí.
 
 Detalle: [Lifecycles · transiciones](../17-operational-model/04-lifecycles/checks-on-transitions.md).
 
+**Dynamics v0.2 — resultados del Check:** PASS · WARNING · BLOCKED · **MANUAL DECISION**  
+→ Next Transition. Ver [Operational Checks 2.0](../17-operational-model/07-operational-dynamics/03-operational-checks-2.0.md).
+
 ### 7. Los Invariants gobiernan
 
 Un Check puede **bloquear** una transición.  

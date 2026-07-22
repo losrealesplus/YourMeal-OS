@@ -26,6 +26,7 @@ No es un cuarto pilar. Es el **equivalente, para producto, de lo que el Domain M
 | Tiempo | 04 Lifecycles (transiciones) |
 | Constitución | 05 Invariants |
 | Trazabilidad | 06 Capability Mapping |
+| **Dinámica** | [07 Operational Dynamics v0.2](./07-operational-dynamics/README.md) |
 
 > **Las Capabilities interactúan con el modelo — no lo definen.**
 
@@ -76,14 +77,16 @@ Soportes: Dish · Recipe · Ingredient · Stock · Supplier · Vehicle · Kitche
 | 04 | [Lifecycles (transiciones)](./04-lifecycles/README.md) | 🟢 Endurecido |
 | 05 | [Invariants (Constitución)](./05-invariants/README.md) | 🟢 Endurecido |
 | 06 | [Capability Mapping (trazabilidad)](./06-capability-mapping/README.md) | 🟢 Marco + Dish ✅ |
+| 07 | [Operational Dynamics v0.2](./07-operational-dynamics/README.md) | 🟢 Lifecycles 2.0 · Supporting Taxonomy · Checks 2.0 |
 
 Observation EatClean: ⏸. Sin pantallas / APIs / código.
 
-### Gate FASE 4 cerrado
+### Gate FASE 4 + Dynamics
 
-> ¿Gramática completa + Constitución + trazabilidad de referencia?  
-> **Sí** — 01–06 endurecidos. Dish Management mapeado como ejemplo.  
-> **Siguiente:** [FASE 5 — Operational Validation](../18-operational-validation/README.md) — intentar romper el modelo antes de implementar.
+> Gramática 01–06 ✅ · Dynamics v0.2 ✅ (comportamiento)  
+> Aplicación tren MC a lifecycles por objeto: siguiente  
+> Validation batería VS-001…006 ✅ · [gap analysis](../18-operational-validation/09-joint-gap-analysis.md)
+
 
 ---
 

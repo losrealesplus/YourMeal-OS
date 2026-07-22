@@ -10,7 +10,8 @@
 | [Product Blueprint](./15-product/README.md) | Qué construir y por qué |
 | [Operational Discovery](./16-operational-discovery/README.md) | Por qué evolucionar — solo evidencia |
 | [Operational Model](./17-operational-model/README.md) | Core Operativo — lenguaje / objetos permanentes |
-| [Operational Validation](./18-operational-validation/README.md) | FASE 5 · [OPE](./18-operational-validation/00-operational-product-engineering.md) · [Knowledge State](./18-operational-validation/knowledge-state.md) |
+| [Operational Dynamics v0.2](./17-operational-model/07-operational-dynamics/README.md) | Comportamiento: transitions · Supporting taxonomy · Checks 2.0 |
+| [Operational Validation](./18-operational-validation/README.md) | FASE 5 · [OPE](./18-operational-validation/00-operational-product-engineering.md) · batería VS cerrada |
 | [PRODUCT_VISION](./15-product/PRODUCT_VISION.md) | Qué es YourMeal OS para el cliente |
 | [Operational Checks](./15-product/OPERATIONAL_CHECKS.md) | Datos → comprobación → acción (transversal) |
 | [Milestone · Infrastructure Validation](./00-status/MILESTONE_INFRASTRUCTURE_VALIDATION.md) | Core independiente de la tecnología ✅ |

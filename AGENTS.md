@@ -94,16 +94,15 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-Etapa 1 — Construcción del conocimiento  (casi consolidada)
-Etapa 2 — Construcción del producto      (no empezada — gate: Certified v1.0)
+Etapa 1 — Conocimiento + Dynamics v0.2  🟢
+Etapa 2 — Producto                      ⏳ (gate Certified / Beta+MC)
 ```
 
-**YourMeal OS** = primer sistema que demuestra si **OPE** funciona (no el centro — el experimento).  
-**Siguiente:** VS-001 → VR-001 → [retrospectiva metodológica](./docs/18-operational-validation/08-methodological-retrospective.md) → VS-002.
+**YourMeal OS** = experimento OPE.  
+**Batería VS-001…006** cerrada · **[Operational Dynamics v0.2](./docs/17-operational-model/07-operational-dynamics/README.md)** 🟢  
+**Siguiente:** tren MC (Amend/Hold/Lot/Location) sobre lifecycles → evaluar Beta.
 
-Criterio éxito VS-001: **cada hallazgo → decisión trazable** (no «cero errores»).
-
-Índices: [Estado](./docs/00-status/README.md) · [VS-001](./docs/18-operational-validation/02-validation-scenarios/VS-001-semana-normal.md) · [OPE](./docs/18-operational-validation/00-operational-product-engineering.md)
+Índices: [Estado](./docs/00-status/README.md) · [Dynamics](./docs/17-operational-model/07-operational-dynamics/README.md) · [Gap analysis](./docs/18-operational-validation/09-joint-gap-analysis.md)
 
 ### Principio de valor (Capabilities)
 
