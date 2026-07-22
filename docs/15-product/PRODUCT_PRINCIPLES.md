@@ -178,6 +178,26 @@ Los PRs grandes deberían contar **valor operativo** (modelo · jornada · findi
 
 ---
 
+## 13. El modelo guía; las Capabilities ejecutan
+
+> **Las Capabilities interactúan con el modelo — no lo definen.**
+
+```text
+Nuevo problema
+        ↓
+Nuevo Check (en una transición del Operational Model)
+        ↓
+Capability
+        ↓
+Interactúa con objetos existentes
+```
+
+Solo si es imposible con el vocabulario actual → estudiar nuevo Core Object ([filtro 02](../17-operational-model/02-core-objects/README.md)).
+
+Gramática: vocabulario · sustantivos · verbos · tiempo — [Operational Model](../17-operational-model/README.md).
+
+---
+
 ## Relacionado
 
 - [PRODUCT_VISION.md](./PRODUCT_VISION.md)

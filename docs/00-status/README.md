@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-22 · 03 Dependencies 🟢  
+**Última actualización:** 2026-07-22 · 04 Lifecycles 🟢  
 **Versión:** `v0.1.0` — FOUNDATION LOCKED  
 
 ## Roadmap (oficial)
@@ -12,7 +12,7 @@
 | OPERATIONAL DISCOVERY | ✅ Estructura cerrada |
 | OPERATIONAL CHECKS | ✅ Cerrado (transversal) |
 | FIRST OBSERVATION DAY | ⏸ Congelado (hasta retomar a propósito) |
-| Operational Model | 🟢 01–03 · 🚧 04–06 |
+| Operational Model | 🟢 01–04 · 🚧 05–06 |
 
 ---
 
@@ -28,7 +28,8 @@ Operational Model 🚧
    01 Ubiquitous Language 🟢
    02 Core Objects 🟢
    03 Operational Dependencies 🟢
-   04–06 siguientes
+   04 Lifecycles (transiciones) 🟢
+   05–06 siguientes
         ↓
 Observation EatClean ⏸
 ```
@@ -51,7 +52,7 @@ Observation EatClean ⏸
 | **PRODUCT BLUEPRINT** | ¿Qué / por qué? | ✅ |
 | **OPERATIONAL DISCOVERY** | ¿Por qué evolucionar? | ✅ carpeta · ⏸ campo |
 | **Operational Checks** | ¿Cómo guía la operación? | ✅ transversal |
-| **Operational Model** | ¿Con qué lenguaje? | 🚧 01–03🟢 · 04–06 |
+| **Operational Model** | ¿Con qué lenguaje? | 🚧 01–04🟢 · 05–06 |
 
 ```text
 Producto:  Discovery → Check → Assistant → Capability
@@ -76,12 +77,12 @@ Contrato semántico: *misma palabra ≠ cosas distintas; misma realidad ≠ dos 
 
 ## Próxima sesión / siguiente paso
 
-1. Endurecer **04 · Lifecycles** (estados ya implícitos en el flujo)  
-2. Luego 05 → 06  
+1. Endurecer **05 · Invariants** (leyes permanentes — no lista suelta)  
+2. Luego **06 · Capability Mapping**  
 3. Observation ⏸ · sin código / pantallas
 
 | Índice | Ruta |
 |--------|------|
+| Lifecycles | [04-lifecycles/](../17-operational-model/04-lifecycles/README.md) |
 | Dependencies | [03-relationships/](../17-operational-model/03-relationships/README.md) |
-| Core Objects | [02-core-objects/](../17-operational-model/02-core-objects/README.md) |
 | Operational Model | [docs/17-operational-model/](../17-operational-model/README.md) |

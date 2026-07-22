@@ -1,7 +1,12 @@
 # 05 — Invariants
 
 **Tipo:** Operational Model · Core Operativo  
-**Pregunta:** ¿Qué no puede romperse nunca para que la operación sea coherente?
+**Estado:** 🚧 v0.1 — **siguiente a endurecer**  
+**Prerrequisito:** [04 Lifecycles](../04-lifecycles/README.md) ✅  
+
+**Pregunta:** ¿Qué no puede romperse nunca — independientemente de pantalla, API o implementación?
+
+Invariantes = **leyes permanentes** del sistema (no lista suelta de reglas).
 
 Invariantes = reglas permanentes del lenguaje.  
 No son features. Si se violan, el sistema miente o la cocina pierde confianza.

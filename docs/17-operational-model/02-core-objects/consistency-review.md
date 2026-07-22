@@ -61,7 +61,8 @@ Conclusión: el ciclo se cuenta en Core. Supporting afina ejecución y Checks �
 | Ciclo completo en lenguaje canónico | ✅ |
 | Sin «Customer» ambiguo | ✅ |
 | Sin Dashboard/KPI en el modelo | ✅ |
-| Listo para 03 · Relationships | ✅ **conectar piezas, no descubrir conceptos** |
+| Listo para 03 · Operational Dependencies | ✅ |
+| Listo para 04 · Lifecycles | ✅ **siguiente** |
 
 **Siguiente paso permitido:** endurecer [03 · Operational Dependencies](../03-relationships/README.md) — ✅ completado. Siguiente: [04 · Lifecycles](../04-LIFECYCLES.md).
 

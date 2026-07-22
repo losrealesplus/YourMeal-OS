@@ -81,9 +81,9 @@ La arquitectura de YourMeal OS se considera **estable**.
 - Disciplina: no implementamos ideas; implementamos conocimiento validado
 - Misión plataforma: reducir la carga cognitiva de la operación diaria
 - KPI estrella: preguntas eliminadas · ciclo cerrado operación↔producto · sin cuarto pilar
-- **FASE 4:** 01–03 🟢 (UL · Core Objects · Operational Dependencies con verbos) · siguiente 04 Lifecycles  
-- Observation ⏸ · Capabilities nacen del modelo, no al revés  
-- Operational Checks en vínculos · sin Customer ambiguo
+- **FASE 4:** 01–04 🟢 (gramática: UL · objetos · dependencias · transiciones) · siguiente 05 Invariants  
+- Checks en transiciones · Capabilities no definen el modelo (principio §13)  
+- Observation ⏸
 - Secuencia definitiva en FOUNDATION: Guidelines → Spec → Implementation → Tests → Validation
 ### Gobierno
 

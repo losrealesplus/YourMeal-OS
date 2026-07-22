@@ -16,7 +16,22 @@ No es un cuarto pilar. Es el **equivalente, para producto, de lo que el Domain M
 
 ---
 
-## Pregunta de esta fase
+## Gramática operativa
+
+| Rol | Bloque |
+|-----|--------|
+| Vocabulario | 01 Ubiquitous Language |
+| Sustantivos | 02 Core Objects |
+| Verbos | 03 Operational Dependencies |
+| Tiempo | 04 Lifecycles (transiciones) |
+
+> **Las Capabilities interactúan con el modelo — no lo definen.**
+
+```text
+Nuevo problema → Nuevo Check (en transición) → Capability → objetos existentes
+```
+
+Solo si es imposible → estudiar nuevo Core Object.
 
 > **¿Qué objetos existen en cualquier negocio de comida preparada?**
 
@@ -42,16 +57,17 @@ Soportes: Dish · Recipe · Ingredient · Stock · Supplier · Vehicle · Kitche
 | 01 | [Ubiquitous Language](./01-ubiquitous-language/README.md) | 🟢 Endurecido |
 | 02 | [Core Objects](./02-core-objects/README.md) | 🟢 Endurecido + revisión de consistencia ✅ |
 | 03 | [Operational Dependencies](./03-relationships/README.md) | 🟢 Endurecido (verbos · flujo · checks en vínculos) |
-| 04 | [Lifecycles](./04-LIFECYCLES.md) | 🚧 v0.1 — **siguiente** |
-| 05 | [Invariants](./05-INVARIANTS.md) | 🚧 v0.1 |
+| 04 | [Lifecycles (transiciones)](./04-lifecycles/README.md) | 🟢 Endurecido |
+| 05 | [Invariants](./05-INVARIANTS.md) | 🚧 v0.1 — **siguiente** |
 | 06 | [Capability Mapping](./06-CAPABILITY_MAPPING.md) | 🚧 v0.1 |
 
 Observation EatClean: ⏸. Sin pantallas / APIs / código.
 
-### Gate 03 → 04
+### Gate 04 → 05
 
-> ¿Se puede describir la operación con dependencias nombradas (verbos canónicos)?  
-> **Sí** — ver [spine-flow.md](./03-relationships/spine-flow.md).
+> ¿Transiciones críticas con evento, responsable y Checks?  
+> **Sí** — ver [spine-transitions.md](./04-lifecycles/spine-transitions.md).  
+> Siguiente: **05 Invariants** = leyes permanentes del sistema.
 
 ---
 

@@ -107,14 +107,14 @@ Si no se puede rellenar → no es Core.
 
 ---
 
-## Gate antes de 03 · Relationships
+## Gate antes de 03 · Operational Dependencies
 
-Tras cerrar este bloque: [consistency-review.md](./consistency-review.md)
+Tras cerrar este bloque: [consistency-review.md](./consistency-review.md) ✅
 
 > ¿Podemos contar el ciclo completo de una operación usando **solo** Core Objects (Nivel 1) y lenguaje canónico?
 
-Si sí → Relationships conecta piezas.  
-Si no → falta o sobra un objeto; no inventar relaciones para tapar huecos.
+Si sí → Dependencies conectan piezas con verbos.  
+Ver [03-relationships/](../03-relationships/README.md).
 
 ---
 
