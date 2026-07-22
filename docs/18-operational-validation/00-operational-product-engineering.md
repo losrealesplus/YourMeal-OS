@@ -3,13 +3,12 @@
 **Antes:** metodología para diseñar productos operacionales / OPE.  
 **Ahora:** proceso que **reduce incertidumbre de forma medible**.
 
-El verdadero activo no son los documentos ni siquiera el modelo.  
-Es el **proceso** que convierte observación → conocimiento verificable → (solo entonces) software.
+El verdadero activo no son los documentos ni siquiera el modelo solo.  
+Es la **cadena de evidencia**: observación → validación → nivel de confianza → estado del conocimiento → (solo entonces) software.
 
 YourMeal OS es el **instrumento** (experimento controlado) con el que se demuestra que FOPEBA funciona — no el centro del framework.
 
-> Estamos en la **antesala** de la implementación.  
-> No cruzar la puerta un día antes de tiempo.  
+> **Operational Model RC (Knowledge Certified):** certificado para ser puesto a prueba, no como verdad definitiva.  
 > Dual track: [DUAL_TRACK_ANTECAMARA](../00-status/DUAL_TRACK_ANTECAMARA.md).
 
 ---
@@ -18,8 +17,8 @@ YourMeal OS es el **instrumento** (experimento controlado) con el que se demuest
 
 | Promesa | Estado |
 |---------|--------|
-| *Si diseñamos primero el conocimiento operacional, podemos construir un modelo estable.* | ✅ Evidencia de mesa (Beta) |
-| *Este proceso produce mejores productos.* | ⏳ Requiere FOV + EC + Gate G-01 |
+| *Si diseñamos primero el conocimiento operacional, podemos construir un modelo estable.* | ✅ Laboratorio → **RC Knowledge Certified** |
+| *Este proceso produce mejores productos.* | ⏳ Requiere FOV (empírica) + FER + KU + EC + G-01 |
 
 Documento madre de evidencia: [20 · Evidence Framework](../20-evidence-framework/README.md).
 
@@ -50,9 +49,10 @@ Paralelos: ingeniería de seguridad · aeronáutica · ciencia experimental.
 | **Operational Checks** | ¿Qué decisiones necesita tomar la operación? |
 | **Operational Model** | ¿Cuál es la estructura permanente del dominio? |
 | **Operational Validation** | ¿Qué parte de esa estructura es realmente cierta? (mesa) |
-| **IOV** | ¿El conocimiento es transferible, atacable e interpretable? |
-| **FOV** | ¿La realidad produce el mismo modelo? |
-| **Knowledge Update** | ¿Quedó consolidado el conocimiento post-campo? |
+| **IOV** | ¿El conocimiento es transferible, resistente e interpretable? |
+| **FOV** | ¿Qué hace la operación real cuando nadie pide seguir el modelo? (evidencia **empírica**) |
+| **FER** | ¿Qué hipótesis de campo confirman / refutan / faltan / escalan a KU? |
+| **Knowledge Update** | ¿Quedó consolidado el conocimiento post-FER? |
 | **EC (Economic Confirmation)** | ¿Hay valor suficiente para construir? |
 | **Gate G-01** | ¿Hay conocimiento suficiente para justificar código? (no aprueba código) |
 | **Implementation** | ¿Cómo traducimos esa verdad a software? |
@@ -64,8 +64,9 @@ DISCOVERY      → incertidumbre de la operación real
 CHECKS         → incertidumbre de decisiones operativas
 MODEL          → incertidumbre de estructura del dominio
 VALIDATION     → incertidumbre de verdad del modelo (mesa)
-IOV            → incertidumbre de transferibilidad
-FOV            → incertidumbre de correspondencia con la realidad
+IOV            → incertidumbre de transferibilidad / resistencia / determinismo
+FOV            → incertidumbre empírica (correspondencia con la operación)
+FER            → incertidumbre de qué evidencia de campo escala
 KNOWLEDGE UPDATE → incertidumbre de consolidación post-campo
 EC             → incertidumbre de valor económico
 G-01           → incertidumbre de readiness (gobernanza)
@@ -100,9 +101,13 @@ Operational Validation
     ↓
 IOV
     ↓
-FOV
+Operational Model RC (Knowledge Certified)
     ↓
-Knowledge Update
+FOV (FO-V/E/C/U) — evidencia empírica
+    ↓
+Field Evidence Review (FER)
+    ↓
+Knowledge Update          ← solo si FER autoriza
     ↓
 EC (Economic Confirmation)
     ↓
@@ -115,7 +120,7 @@ Forma compacta:
 
 ```text
 FOUNDATION → BLUEPRINT → DISCOVERY → CHECKS → MODEL
-    → VALIDATION → IOV → FOV → KU → EC → G-01 → IMPLEMENTATION
+    → VALIDATION → IOV → RC → FOV → FER → KU → EC → G-01 → IMPLEMENTATION
 ```
 
 **G-01 no aprueba código** — aprueba conocimiento suficiente para justificarlo.
@@ -130,13 +135,13 @@ FOUNDATION → BLUEPRINT → DISCOVERY → CHECKS → MODEL
 ├── Knowledge States
 ├── Evidence Confidence Levels (ECL) — transversal
 ├── Stability Index (S0…S3)
-├── Field Operational Validation (FOV)
+├── Field Operational Validation (FOV) + fov/ (FO · FER)
 ├── Knowledge Update
 ├── Economic Confirmation (EC)
 └── Gate G-01 · Operational Readiness
 ```
 
-→ [docs/20-evidence-framework](../20-evidence-framework/README.md)
+→ [docs/20-evidence-framework](../20-evidence-framework/README.md) · campaña [fov/](../20-evidence-framework/fov/README.md)
 
 Dual track (antesala): [DUAL_TRACK_ANTECAMARA](../00-status/DUAL_TRACK_ANTECAMARA.md)
 
@@ -150,7 +155,7 @@ Dual track (antesala): [DUAL_TRACK_ANTECAMARA](../00-status/DUAL_TRACK_ANTECAMAR
 
 Tras **Gate G-01** (y Certified cuando aplique), implementar es **traducir** conocimiento validado a código.
 
-No se abre Etapa 2 solo con «Model Beta».
+No se abre Etapa 2 solo con «Model Beta» ni solo con RC de laboratorio.
 
 ---
 
@@ -184,9 +189,11 @@ Detalle: [knowledge-state.md](./knowledge-state.md) · puente ECL: [01 Knowledge
 ## Gobernanza del modelo
 
 ```text
-Observación / Escenario / Edge case / FOR
+Observación / Escenario / Edge case / FO
         ↓
-VR o Field Validation Report
+Classification (mesa VR · campo FO-V/E/C/U)
+        ↓
+FER (campo) → Knowledge Update si aplica
         ↓
 Model Change (MC) — si hace falta
         ↓
@@ -206,21 +213,23 @@ Operational Model (17) + KS + ECL
 | Model | `docs/17-operational-model/` |
 | Validation | `docs/18-operational-validation/` |
 | IOV | `docs/19-independent-operational-validation/` |
-| **Evidence Framework · FOV · EC · G-01** | [`docs/20-evidence-framework/`](../20-evidence-framework/README.md) |
+| **Evidence Framework · FOV · FER · EC · G-01** | [`docs/20-evidence-framework/`](../20-evidence-framework/README.md) · [`fov/`](../20-evidence-framework/fov/README.md) |
 | Implementation | `docs/12` · `docs/14` · código |
 
 ---
 
 ## Niveles de confianza del modelo
 
-Alpha → Beta → RC → **Certified v1.0** — [07-certification.md](./07-certification.md).  
-Apertura Etapa 2: **[Gate G-01](../20-evidence-framework/07-gate-g01-operational-readiness.md)** (más exigente que Beta sola).
+Alpha → Beta → **RC (Knowledge Certified)** → campo (FOV) → **Certified v1.0** — [07-certification.md](./07-certification.md).  
+Apertura Etapa 2: **[Gate G-01](../20-evidence-framework/07-gate-g01-operational-readiness.md)** (más exigente que RC de laboratorio solo).
 
 ---
 
 ## Activo reutilizable
 
 **FOPEBA** — framework para convertir observaciones operacionales en conocimiento operacional verificable antes de convertirlo en software.
+
+El diferenciador emergente de Etapa 1: la **trazabilidad de la cadena de evidencia** (no solo el modelo).
 
 Aplicable a logística, clínicas, talleres, hoteles… **sin cambiar la estructura de fases**.
 

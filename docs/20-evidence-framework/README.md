@@ -9,6 +9,30 @@ El foco:
 
 > **Reducir incertidumbre de manera sistemática** hasta que exista evidencia suficiente para justificar una implementación.
 
+El rasgo distintivo de FOPEBA no es solo el Operational Model.  
+Es la **cadena de evidencia**: cada decisión conectada a observación, validación, nivel de confianza y estado del conocimiento.
+
+---
+
+## Familias de evidencia
+
+| Familia | Fase | Qué demuestra |
+|---------|------|---------------|
+| Documental / Discovery | Discovery · Checks | Qué ocurre y qué se decide |
+| Conceptual (mesa) | Operational Validation | El modelo explica bajo refutación propia |
+| Transferencia | IOV-001 | El conocimiento es transferible |
+| Resistencia estructural | IOV-002 | El conocimiento resiste ataques |
+| Interpretabilidad / determinismo | IOV-003 | Dos lecturas independientes equivalen |
+| **Empírica** | **FOV** | La operación real produce / tensiona el modelo |
+| Consolidación | FER → KU | Qué cambia el conocimiento (con filtro) |
+| Valor | EC | ¿Merece construirse? |
+| Readiness | G-01 | ¿Conocimiento suficiente para justificar código? |
+
+Hasta el RC, toda la evidencia es de **laboratorio**.  
+Eso no es un defecto: es lo que pretendía la Etapa 1.
+
+FOV abre la familia **empírica**.
+
 ---
 
 ## De subproducto a activo
@@ -43,14 +67,18 @@ Un Capability puede ser ECL-5 y aun así S1 (changing).
 
 ---
 
-## Lo que ya está validado (mesa)
+## Lo que ya está certificado (laboratorio)
 
 ```text
-FOPEBA → Operational Model → Beta (Table Validated)
+Observations → Discovery → Checks → Model
+  → Operational Validation → IOV-001 → IOV-002 → IOV-003
+  → Operational Model RC (Knowledge Certified)
 ```
 
-Valida: *modelo estable*.  
-No valida aún: *este proceso produce mejores productos* → FOV + Knowledge Update + EC + G-01.
+RC = **certificado para ser puesto a prueba**, no verdad definitiva.  
+Acta: [02-operational-model-rc](../00-status/02-operational-model-rc.md).
+
+No valida aún: *este proceso produce mejores productos* → FOV (empírica) + FER + KU + EC + G-01.
 
 ---
 
@@ -58,7 +86,7 @@ No valida aún: *este proceso produce mejores productos* → FOV + Knowledge Upd
 
 | Hipótesis | Pregunta | Fase |
 |-----------|----------|------|
-| **A** | ¿El modelo representa la **realidad**? | [FOV](./04-field-operational-validation.md) |
+| **A** | ¿La operación real produce / tensiona el conocimiento certificado? | [FOV](./04-field-operational-validation.md) · [fov/](./fov/README.md) |
 | **B** | ¿Hay **valor** suficiente para construir? | [EC](./06-economic-confirmation.md) |
 
 ---
@@ -72,6 +100,7 @@ No valida aún: *este proceso produce mejores productos* → FOV + Knowledge Upd
 ├── 02 Evidence Confidence Levels (ECL) — transversal
 ├── 03 Stability Index
 ├── 04 Field Operational Validation (FOV)
+│     └── fov/  protocolo · hipótesis · plan · FO · FER
 ├── 05 Knowledge Update
 ├── 06 Economic Confirmation (EC)
 └── 07 Gate G-01 · Operational Readiness
@@ -82,8 +111,9 @@ No valida aún: *este proceso produce mejores productos* → FOV + Knowledge Upd
 | [01 KS](./01-knowledge-states.md) | Estado del conocimiento |
 | [02 ECL](./02-evidence-confidence-levels.md) | Calidad de evidencia · métricas estratégicas |
 | [03 Stability](./03-stability-index.md) | Deuda conceptual · S0…S3 |
-| [04 FOV](./04-field-operational-validation.md) | Campo · FOR · FVR · principio de sorpresa |
-| [05 Knowledge Update](./05-knowledge-update.md) | Consolidar antes de medir valor |
+| [04 FOV](./04-field-operational-validation.md) | Campaña observacional · evidencia empírica |
+| [fov/](./fov/README.md) | Protocolo · FO-V/E/C/U · FER |
+| [05 KU](./05-knowledge-update.md) | Consolidar **tras FER** |
 | [06 EC](./06-economic-confirmation.md) | ¿Merece construirse? |
 | [07 G-01](./07-gate-g01-operational-readiness.md) | Aprueba conocimiento, no código |
 
@@ -95,14 +125,13 @@ No valida aún: *este proceso produce mejores productos* → FOV + Knowledge Upd
 Foundation → Blueprint → Discovery → Checks → Model
     → Operational Validation
     → IOV
-    → FOV
-    → Knowledge Update          ← consolidar evidencia de campo
+    → Operational Model RC
+    → FOV (FO) → FER
+    → Knowledge Update          ← solo si FER autoriza
     → EC (Economic Confirmation)
     → Gate G-01
     → Implementation
 ```
-
-El conocimiento se consolida **antes** de medir el valor económico.
 
 ---
 
@@ -112,8 +141,6 @@ El conocimiento se consolida **antes** de medir el valor económico.
 
 Si una fase no reduce un tipo de incertidumbre nuevo, pertenece a una fase existente.
 
-Eso mantiene FOPEBA **compacto y elegante** a medida que evoluciona.
-
 ---
 
 ## Glosario
@@ -121,14 +148,14 @@ Eso mantiene FOPEBA **compacto y elegante** a medida que evoluciona.
 | Sigla | Significado | No confundir con |
 |-------|-------------|------------------|
 | **FOV** | Field Operational Validation | — |
-| **FOR** | Field Observation Report | — |
+| **FO** | Field Observation (FO-V/E/C/U) | Finding de mesa |
+| **FER** | Field Evidence Review | FVR legado |
+| **FOR** | Field Observation Report (legado; preferir FO) | — |
 | **EC** | Economic Confirmation | Edge Cases (`EC-xxx` mesa) |
 | **ECL** | Evidence Confidence Level | — |
 | **S0…S3** | Stability Index | — |
 | **KU** | Knowledge Update | — |
 | **G-01** | Operational Readiness Gate | — |
-
-Nombres alternativos explorados para EC (no adoptados): Implementation Justification (IJ) · Value Confirmation (VC). **EC** se mantiene: cuantifica impacto y prioriza roadmap.
 
 ---
 

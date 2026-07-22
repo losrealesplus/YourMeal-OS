@@ -85,18 +85,20 @@ La arquitectura de YourMeal OS se considera **estable**.
 - **Operational Dynamics v0.2:** Lifecycles 2.0 · Supporting Taxonomy · Checks 2.0 (PASS/WARNING/BLOCKED/MANUAL DECISION)
 - Recovery Pattern · Temporal Grammar · Capability Impact integrados en Dynamics 01
 - **Tren MC-001…006 aplicado** a `17` (Amend/Revise/Pause/Hold · Lot · Location · cardinalidad · INV-031)
-- **Nivel de confianza: Operational Model RC (Knowledge Certified)** — FOV/EC pendientes para G-01
+- **Nivel de confianza: Operational Model RC (Knowledge Certified)** — certificado para prueba; FOV/FER/EC pendientes para G-01
 - **Independent Operational Validation (IOV)** cerrado: Comprehension · Adversarial · Independent Implementation
 - **Knowledge Validation Pyramid** adoptada como seña de identidad
-- **FOPEBA Evidence Framework** (`docs/20`): KS · **ECL transversal** · **Stability Index S0…S3** · FOV · **Knowledge Update** · EC · **Gate G-01**
+- **FOPEBA Evidence Framework** (`docs/20`): KS · **ECL transversal** · **Stability Index S0…S3** · FOV · **FER** · **Knowledge Update** · EC · **Gate G-01**
 - G-01 **no aprueba código** — aprueba conocimiento suficiente para justificarlo
-- Flujo: Validation → IOV → FOV → **KU** → EC → G-01 → Implementation
+- Flujo: Validation → IOV → RC → **FOV (FO)** → **FER** → KU → EC → G-01 → Implementation
 - Regla de diseño: cada fase elimina una incertidumbre que ninguna anterior puede eliminar
 - **IVR-001** transferible · **IVR-002** estructuralmente resistente · **IVR-003** interpretabilidad determinista (IF-A only)
-- **Operational Model RC (Knowledge Certified)** + [Known Limitations](./docs/00-status/03-known-limitations-rc.md) pre-FOV
-- Siguiente: FOV (operación real)
+- **Operational Model RC (Knowledge Certified)** + [Known Limitations](./docs/00-status/03-known-limitations-rc.md)
+- **FOV** replanteado como campaña observacional empírica: FO-V/E/C/U · FER antes de KU · protocolo en `docs/20-evidence-framework/fov/`
+- Siguiente: ejecutar FOV EatClean (no diseñar KU todavía)
 - Observation EatClean: modo FOV; sin Etapa 2 hasta G-01
 - Secuencia definitiva en FOUNDATION: Guidelines → Spec → Implementation → Tests → Validation
+- Activo metodológico Etapa 1: **cadena de evidencia** (no solo el Operational Model)
 ### Gobierno
 
 - ADR 0011: Diario de Desarrollo + Principio de Intencionalidad

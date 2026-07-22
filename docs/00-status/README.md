@@ -1,11 +1,29 @@
 # Estado del proyecto
 
 **Última actualización:** 2026-07-22 · **Operational Model RC (Knowledge Certified)** 🟢  
-**Mentalidad:** certificar · siguiente juez = FOV
+**Mentalidad:** Etapa 1 ya no es «modelo en desarrollo» — está **certificado para prueba**  
+**Siguiente familia de evidencia:** empírica (FOV)
 
 ```text
 Operational Model Release Candidate
 (Knowledge Certified)
+```
+
+> Certificado para ser puesto a prueba — no como verdad definitiva.
+
+---
+
+## Cadena de evidencia (hasta aquí = laboratorio)
+
+```text
+Observations → Discovery → Checks → Model
+  → Operational Validation
+  → IOV-001 (Transferability)
+  → IOV-002 (Structural Resistance)
+  → IOV-003 (Determinism)
+  → Operational Model RC (Knowledge Certified)
+        ↓
+  FOV (evidencia empírica) ⏳
 ```
 
 ---
@@ -19,27 +37,23 @@ Operational Model Release Candidate
 | IOV-002 | ✅ | Muy alto |
 | IOV-003 | ✅ | Alto |
 | **Operational Model RC** | ✅ | Knowledge Certified |
-| FOV | ⏳ | — |
-| Knowledge Update | ⏳ | — |
+| **FOV** (campaña observacional) | ⏳ protocolo 🟢 | — |
+| Field Evidence Review | 🔒 tras FO | — |
+| Knowledge Update | 🔒 tras FER | — |
 | Economic Confirmation | ⏳ | — |
 | Gate G-01 | 🔒 | — |
 
-Acta: [02-operational-model-rc](./02-operational-model-rc.md) · Límites: [03-known-limitations-rc](./03-known-limitations-rc.md)
+Acta: [02](./02-operational-model-rc.md) · Límites: [03](./03-known-limitations-rc.md) · FOV: [fov/](../20-evidence-framework/fov/README.md)
 
 ---
 
-## Lectura de evidencias IOV
+## Lectura IOV (afirmaciones distintas)
 
-| Nivel | Afirmación distinta | Evidencia |
-|-------|---------------------|-----------|
-| **IOV-001** | El conocimiento es **transferible** | IVR-001 |
-| **IOV-002** | El conocimiento es **estructuralmente resistente** | IVR-002 · 6 SF · 0 Core forzado |
-| **IOV-003** | El conocimiento es **interpretable de forma determinista** | IVR-003 · equivalencia conceptual · IF-A only |
-
-En IOV-002 lo relevante no fue el «0 Core forzado», sino **por qué**: los seis ataques recombinaron capacidades, reglas, supporting y configuración — la frontera Core / variabilidad operacional aguantó.
-
-En IOV-003: dos diseños independientes → equivalencia conceptual.  
-IF solo IF-A (nombres). 0 IF-R/D/L bloqueantes.
+| Nivel | Afirmación | Evidencia |
+|-------|------------|-----------|
+| **IOV-001** | Transferible | IVR-001 |
+| **IOV-002** | Estructuralmente resistente | IVR-002 |
+| **IOV-003** | Interpretable / determinista | IVR-003 · IF-A only |
 
 ---
 
@@ -51,13 +65,14 @@ UX / DS / arch / infra **sin** engines de espina — sigue permitido.
 
 ## Próximo
 
-1. **FOV** EatClean (observar · no intervenir) — objetivos = Known Limitations  
-2. Knowledge Update (6 preguntas)  
-3. Economic Confirmation → **Gate G-01**
+1. Ejecutar **FOV** EatClean — pregunta: *¿qué hace la operación cuando nadie le pide seguir el modelo?*  
+2. Clasificar **FO-V / FO-E / FO-C / FO-U**  
+3. **FER** (4 preguntas) → solo entonces KU  
+4. EC → **Gate G-01**
 
 | Índice | Ruta |
 |--------|------|
 | RC | [02](./02-operational-model-rc.md) |
 | Known Limitations | [03](./03-known-limitations-rc.md) |
-| IVR-003 | [ivr](../19-independent-operational-validation/ivr/IVR-003-iov003-independent-implementation.md) |
+| Protocolo FOV | [fov/](../20-evidence-framework/fov/README.md) |
 | Certificación | [01](./01-certification-campaign.md) |

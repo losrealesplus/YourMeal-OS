@@ -89,7 +89,7 @@ Detalle: [04 Findings](./04-findings/README.md) · [05 Experimental Protocol](./
 | [KCM-001](./kcm/KCM-001-iov001-pilot.md) · [002](./kcm/KCM-002-iov002-adversarial.md) · [003](./kcm/KCM-003-iov003-implementation.md) | 🔒 |
 | IVR-001 · 002 · 003 | ✅ Cerrados |
 | Operational Model RC | 🟢 [Knowledge Certified](../00-status/02-operational-model-rc.md) |
-| FOV | ⏳ Siguiente juez (Known Limitations) |
+| FOV | ⏳ Protocolo 🟢 · ejecución pendiente (Known Limitations) |
 
 ---
 

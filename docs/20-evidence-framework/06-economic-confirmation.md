@@ -26,11 +26,11 @@ No técnicamente. **Económicamente** — y en sentido amplio: justificar implem
 ## Prerrequisito
 
 ```text
-FOV → Knowledge Update → EC
+FOV (FO) → FER → Knowledge Update (si FER autoriza) → EC
 ```
 
 EC **no** mide valor sobre un modelo que el campo acaba de dejar inconsistente.  
-Ver [05 Knowledge Update](./05-knowledge-update.md).
+Ver [FER](./fov/04-field-evidence-review.md) · [05 Knowledge Update](./05-knowledge-update.md).
 
 ---
 
@@ -86,7 +86,7 @@ Impacto = ahorro + **coste evitado**. No basta con que el modelo sea correcto: d
 ## Cadena
 
 ```text
-Reality → FOV → Knowledge Update → Model → Capabilities → EC → Roadmap
+Reality → FOV (FO) → FER → Knowledge Update → Model → Capabilities → EC → Roadmap
 ```
 
 El roadmap es **consecuencia de la evidencia**.

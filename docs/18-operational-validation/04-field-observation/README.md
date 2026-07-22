@@ -1,75 +1,35 @@
-# 04 · Field Observation (entrada FASE 5)
+# 04 · Field Observation (entrada legada FASE 5)
 
-EatClean y otras Organizaciones — **bajo lente de validación**.
+EatClean y otras Organizaciones — **bajo lente FOV**.
 
-> **Fase FOPEBA elevada:** [FOV — Field Operational Validation](../../20-evidence-framework/04-field-operational-validation.md)  
-> Artefactos canónicos: **FOR** · **Field Validation Report** (no VR de mesa por defecto).
+> **Campaña canónica:** [FOV · fov/](../../20-evidence-framework/fov/README.md)  
+> Artefactos: **FO-xxx** (FO-V/E/C/U) · **FER-xxx** · (luego KUR si aplica).
 
-Esta carpeta conserva la plantilla operativa de campo alineada a FASE 5; el marco de fase obligatoria vive en Evidence Framework.
+Esta carpeta conserva la plantilla operativa de campo; el protocolo experimental vive en Evidence Framework.
 
 ## Diferencia con Operational Discovery
 
-| | Discovery (16) | FOV (20) / Validation campo |
-|---|----------------|------------------------------|
-| Pregunta | ¿Qué aprendimos para evolucionar? | ¿La realidad produce el mismo modelo? |
-| Salida | Findings · Patterns · Candidates | FOR · Field Validation Report |
-| Mezcla con diseño | No (solo evidencia) | No (solo coherencia del modelo) |
+| | Discovery (16) | FOV (20) |
+|---|----------------|----------|
+| Pregunta | ¿Qué aprendimos para evolucionar? | ¿Qué hace la operación cuando nadie pide seguir el modelo? |
+| Salida | Findings · Patterns · Candidates | FO · FER |
+| Sesgo | Exploración de dominio | Observación dirigida por Known Limitations RC |
 
 > No vamos a descubrir procesos nuevos para inventar features.  
-> Vamos a **validar** que el modelo describe correctamente lo que ya ocurre.  
-> **No llevar el modelo al negocio** para forzar vocabulario — observar y mapear.
+> No llevamos el modelo al negocio para forzar vocabulario.  
+> Observamos y clasificamos (FO-V/E/C/U).
 
-Activación: cuando el equipo decida retomar campo **en modo FOV**.  
-Checklist histórico Discovery: [FIRST_OBSERVATION_DAY.md](../../16-operational-discovery/FIRST_OBSERVATION_DAY.md) — apoyo, no sustituto.
-
----
-
-## Plantilla · FOR-xxx (preferida)
-
-Preferir **FOR** según [04 FOV](../../20-evidence-framework/04-field-operational-validation.md).
-
-```markdown
-# FOR-xxx — [Momento observado]
-
-**Fecha / Organización:** …  
-**Field Validation Report:** FVR-…  
-**Origen Discovery (si aplica):** OF-xxx
-
-## Realidad (sin opinión)
-
-[Qué ocurrió, en lenguaje de cocina]
-
-## Cadena
-
-Realidad → Evento → Objeto → Lifecycle → Checks → Invariants
-
-| Pregunta | Respuesta |
-|----------|-----------|
-| ¿Existe ya en el modelo? | Sí / Parcial / No |
-| Core Objects | … |
-| Dependencies | … |
-| Lifecycle | … |
-| Checks | … |
-| Invariants | INV-… |
-
-## Dictamen
-
-Confirmed · Extended · Clarified · Contradicted
-
-## ECL preliminar
-
-ECL-2 → ECL-4 al cerrar en FVR
-```
+Preferir plantilla en [03-field-observations](../../20-evidence-framework/fov/03-field-observations.md).
 
 ---
 
 ## Reglas en campo
 
-1. Registrar en **lenguaje de cocina**; mapear después a canónico.  
+1. Registrar en **lenguaje de cocina**; mapear después.  
 2. No proponer pantallas ni APIs en el acto.  
-3. Si «no existe en el modelo» → Extended/Contradicted → seguimiento VR/MC si estructural.  
-4. Findings de Discovery pueden **alimentar** un FOR; el dictamen vive en FOV.  
-5. No intervenir en la operación observada.
+3. Clasificar FO-V / FO-E / FO-C / FO-U.  
+4. No intervenir.  
+5. No editar `17` ni abrir MC en caliente — pasar por FER.
 
 ---
 
@@ -77,12 +37,12 @@ ECL-2 → ECL-4 al cerrar en FVR
 
 | ID | Observación | Estado |
 |----|-------------|--------|
-| — | *(vacío hasta activación de campo)* | ⏸ |
+| — | *(usar índice en fov/03-field-observations.md)* | ⏸ |
 
 ---
 
 ## Relacionado
 
 - [20 FOV](../../20-evidence-framework/04-field-operational-validation.md)  
-- [16 Operational Discovery](../../16-operational-discovery/README.md)  
-- [05 validation-reports](../05-validation-reports/README.md)
+- [fov/](../../20-evidence-framework/fov/README.md)  
+- [16 Operational Discovery](../../16-operational-discovery/README.md)

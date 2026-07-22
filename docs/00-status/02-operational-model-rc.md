@@ -14,10 +14,15 @@ Operational Model Release Candidate
 (Knowledge Certified)
 ```
 
-No conocemos razones suficientemente fuertes para modificar el Operational Model  
-antes del trabajo de campo (FOV), salvo Extended/Clarified documentales ya clasificados.
+> **Certificado para ser puesto a prueba — no certificado como verdad definitiva.**
 
-Ha superado:
+Esa distinción mantiene el rigor: el siguiente paso no es confirmar lo que ya creemos,  
+sino intentar **refutarlo** en la operación real ([FOV](../20-evidence-framework/fov/README.md)).
+
+No conocemos razones suficientemente fuertes para modificar el Operational Model  
+antes del trabajo de campo, salvo Extended/Clarified documentales ya clasificados.
+
+Ha superado (evidencia de **laboratorio**):
 
 - validación conceptual (VS · Dynamics · tren MC);
 - transferencia del conocimiento (IOV-001);
@@ -33,10 +38,11 @@ Ver límites: [03-known-limitations-rc](./03-known-limitations-rc.md).
 
 Ubiquitous Language · Core · Supporting · Dependencies · Lifecycles · Dynamics · Invariants · Checks en modelo · Capability Mapping marco.
 
-**No cambia** hasta FOV → Knowledge Update (salvo errata tipográfica documentada).
+**No cambia** hasta FOV → **FER** → Knowledge Update (salvo errata tipográfica documentada).
 
 ---
 
 ## Estado
 
-🟢 **DECLARADO** · siguiente: FOV (EatClean) · Carril B sigue permitido sin engines.
+🟢 **DECLARADO** · Etapa 1 cambia de naturaleza: ya no es «modelo en desarrollo».  
+Siguiente: campaña observacional FOV (evidencia empírica) · Carril B sin engines permitido.

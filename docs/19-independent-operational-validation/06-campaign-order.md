@@ -5,8 +5,8 @@ El protocolo debe estar congelado antes de la primera sesión.
 
 Hasta ahora toda la evidencia ha sido **conceptual**.  
 IOV validó transferencia · resistencia · interpretabilidad.  
-FOV valida supervivencia en la realidad.  
-**FOV abierto** con objetivos = [Known Limitations RC](../00-status/03-known-limitations-rc.md).
+FOV valida supervivencia en la realidad con **evidencia empírica**.  
+**FOV abierto** como campaña observacional: [fov/](../20-evidence-framework/fov/README.md) · objetivos = [Known Limitations RC](../00-status/03-known-limitations-rc.md).
 
 ---
 
@@ -23,7 +23,8 @@ IOV-001 Piloto (IVR-001)           ███████████████
 IOV-002 Adversarial (IVR-002)      ████████████████████████████ 100%
 IOV-003 Independent (IVR-003)      ████████████████████████████ 100%
 Operational Model RC               ████████████████████████████ 100%  Knowledge Certified
-Field Validation (FOV)             ░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0%  ← siguiente juez
+FOV Protocol                       ████████████████████████████ 100%  FO-V/E/C/U · FER
+Field Validation (FOV ejecución)   ░░░░░░░░░░░░░░░░░░░░░░░░░░░░   0%  ← siguiente
 ```
 
 ---
@@ -36,10 +37,12 @@ Field Validation (FOV)             ░░░░░░░░░░░░░░░
 | 2 | Ajustar **solo** protocolo o docs si hay Findings | (sin teoría nueva) |
 | 3 | **IOV-002** adversarial | IVR-002 · SF |
 | 4 | **IOV-003** independent implementation | IVR-003 · IF |
-| 5 | Congelar corpus **Operational Model Release Candidate** | tag / KCM-RC |
-| 6 | Abrir **FOV** (EatClean / campo real) | FOR · FVR |
-| 7 | **Knowledge Update** solo con evidencia suficiente | KUR · MC si aplica |
-| 8 | **Economic Confirmation** + **Gate G-01** | ECR · acta G-01 |
+| 5 | Congelar corpus **Operational Model RC** | tag / acta |
+| 6 | Diseñar / congelar **protocolo FOV** | [fov/](../20-evidence-framework/fov/README.md) |
+| 7 | Ejecutar **FOV** (EatClean) | FO-V/E/C/U |
+| 8 | **Field Evidence Review** | FER-xxx |
+| 9 | **Knowledge Update** solo si FER autoriza | KUR · MC si aplica |
+| 10 | **Economic Confirmation** + **Gate G-01** | ECR · acta G-01 |
 
 ---
 

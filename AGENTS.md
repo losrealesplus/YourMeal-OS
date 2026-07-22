@@ -94,15 +94,16 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-Etapa 1 — RC Knowledge Certified 🟢 · FOV…G-01 ⏳
+Etapa 1 — RC Knowledge Certified 🟢 · FOV (empírica) ⏳
 Etapa 2 — Producto 🔒 G-01
 Carril B — UX/DS/arch/infra sin engines ✅
 ```
 
 **YourMeal OS** = instrumento FOPEBA.  
-**Modelo:** Operational Model RC (Knowledge Certified). **Siguiente:** FOV.
+**Modelo:** RC — certificado **para prueba**, no verdad definitiva.  
+**Siguiente:** campaña observacional [FOV](./docs/20-evidence-framework/fov/README.md).
 
-Índices: [Estado](./docs/00-status/README.md) · [RC](./docs/00-status/02-operational-model-rc.md) · [Known Limitations](./docs/00-status/03-known-limitations-rc.md)
+Índices: [Estado](./docs/00-status/README.md) · [RC](./docs/00-status/02-operational-model-rc.md) · [Known Limitations](./docs/00-status/03-known-limitations-rc.md) · [FOV](./docs/20-evidence-framework/fov/README.md)
 
 ### Principio de valor (Capabilities)
 

@@ -3,122 +3,104 @@
 Parte del [Evidence Framework](./README.md).  
 **Fase obligatoria** de FOPEBA — no anexo.
 
----
+> **No es «otra validación».**  
+> Es el comienzo de una **nueva familia de evidencia: evidencia empírica**.
 
-## Hipótesis A / Objetivo preciso
-
-FOV **no** vuelve a validar el modelo en abstracto (eso ya ocurrió en mesa + IOV).
-
-Valida que:
-
-> **La realidad confirma el conocimiento** — produce la misma evidencia que predijo el modelo.
-
-Observar operación (EatClean). **No** enseñar app · **no** vender · **no** proponer · **no** intervenir. Solo registrar.
-
-Clasificar observaciones (KS): Observed → Validated / Refuted / path to Generalized.
-
-Medir: decisiones · tiempos · preguntas · incidencias · interrupciones · trabajo manual · excepciones.
-
-Salida: **Field Validation Report (FVR)** · FORs.
-
-**Cuándo abrir:** solo tras IOV-001…003 + [Operational Model RC](../../00-status/02-operational-model-rc.md).
+Hasta IOV toda la evidencia fue de **laboratorio**.  
+FOV abre el juicio de la **operación real**.
 
 ---
 
-## Principio de sorpresa
+## Pregunta correcta
 
-FOV no solo confirma.
+No:
 
-También debe **intentar sorprender**.
+> ¿Confirmamos lo que ya creemos?
 
-> **Toda campaña FOV debe intentar descubrir al menos un comportamiento no previsto.**
+Sí:
 
-No porque tenga que existir.  
-Sino porque obliga al equipo a salir a observar con actitud **exploratoria**, no únicamente verificadora.
+> **¿Qué hace realmente la operación cuando nadie le pide que siga el modelo?**
 
-Una campaña sin ningún Extended/Clarified/Contradicted y sin “comportamiento no previsto” registrado debe justificar por escrito por qué la exploración fue suficiente (raro).
-
----
-
-## Lo que NO debe hacerse
-
-**No llevar el modelo al negocio** para «enseñárselo» o forzar el vocabulario.
-
-Ahora se hace lo **contrario**: observar la realidad y ver si **produce** el modelo.
+Esa diferencia evita el sesgo de confirmación.
 
 ---
 
-## Método (etnográfico)
+## Naturaleza del RC que se pone a prueba
 
-Durante varios días:
+El [Operational Model RC (Knowledge Certified)](../00-status/02-operational-model-rc.md) está:
 
-- observar;
-- preguntar;
-- registrar;
-- **no intervenir**.
+> **Certificado para ser puesto a prueba — no certificado como verdad definitiva.**
 
-Después convertir cada observación en:
+FOV intenta **refutar** hipótesis certificadas en campo, no celebrarlas.
+
+---
+
+## Tres campañas, tres tipos de evidencia
+
+| Campaña | Tipo de evidencia | Pregunta |
+|---------|-------------------|----------|
+| Operational Validation | Conceptual (mesa) | ¿El modelo explica? |
+| IOV | Transferencia · resistencia · determinismo | ¿Sobrevive sin el autor? |
+| **FOV** | **Empírica** | ¿La operación real produce / tensiona el modelo? |
+
+Continidad metodológica: cada campaña tiene reglas propias sobre cómo la evidencia puede influir —o no— en el conocimiento certificado.
+
+---
+
+## Campaña observacional (no «probar el modelo»)
+
+- Observar EatClean.  
+- **No** enseñar app · **no** vender · **no** proponer · **no** intervenir.  
+- Registrar en lenguaje de cocina; mapear después.  
+- Objetivos dirigidos = [Known Limitations RC](../00-status/03-known-limitations-rc.md).
+
+Pregunta operativa de la campaña:
+
+> ¿Cuáles de nuestras limitaciones conocidas siguen siendo ciertas y cuáles dejan de serlo?
+
+---
+
+## Productos (orden obligatorio)
 
 ```text
-Realidad → Evento → Objeto → Lifecycle → Checks → Invariants
+Field Observations (FO)
+        ↓
+Field Evidence Review (FER)
+        ↓
+Knowledge Update (solo si FER lo autoriza)
+        ↓
+EC → G-01
 ```
 
-Y comparar con el Operational Model publicado.
+| Artefacto | Rol |
+|-----------|-----|
+| **FO-xxx** | Observación de campo clasificada (FO-V / FO-E / FO-C / FO-U) |
+| **FER-xxx** | Revisión de evidencia empírica — filtro antes de KU |
+| **KUR-xxx** | Solo después del FER ([05](./05-knowledge-update.md)) |
 
-Plantilla de campo: [04-field-observation](../18-operational-validation/04-field-observation/README.md).
+**No** se espera Model Change inmediato tras una observación.  
+Primero evidencia; luego decisiones.
+
+Detalle del protocolo: [fov/](./fov/README.md).
 
 ---
 
-## Clasificación
+## Clasificación FO
 
-| Dictamen | Significado |
-|----------|-------------|
-| **Confirmed** | La realidad produjo exactamente el modelo |
-| **Extended** | Comportamiento nuevo (incluye sorpresas) |
-| **Clarified** | Correcto; faltaba precisión |
-| **Contradicted** | La realidad desmintió el modelo |
+| Código | Significado |
+|--------|-------------|
+| **FO-V** | Confirma el modelo |
+| **FO-E** | Extiende el conocimiento **sin** romper el Core |
+| **FO-C** | Contradice una hipótesis certificada |
+| **FO-U** | Observación aún insuficiente para concluir |
 
----
-
-## Productos
-
-### FOR — Field Observation Report
-
-```markdown
-# FOR-xxx — [Momento / escena]
-
-**Organización / fecha:** …
-**¿Comportamiento no previsto?** Sí / No
-
-## Realidad (sin opinión)
-…
-
-## Cadena
-| Paso | Contenido |
-|------|-----------|
-| Evento | … |
-| Objeto(s) | … |
-| Lifecycle | … |
-| Checks | … |
-| Invariants | INV-… |
-
-## Dictamen
-Confirmed · Extended · Clarified · Contradicted
-```
-
-### Field Validation Report (FVR)
-
-Resumen de campaña · conteo de dictámenes · sorpresas · ECL candidatas a elevar.
-
-Tras FVR → [05 Knowledge Update](./05-knowledge-update.md) **antes** de EC.
+Registro: [fov/03-field-observations.md](./fov/03-field-observations.md).
 
 ---
 
-## Gobierno
+## Cuándo abrir
 
-```text
-FOR → FVR → Knowledge Update → (VR/MC si aplica) → EC
-```
+Solo tras IOV-001…003 + Operational Model RC + Known Limitations publicados.
 
 ---
 
@@ -126,13 +108,16 @@ FOR → FVR → Knowledge Update → (VR/MC si aplica) → EC
 
 | Elemento | Estado |
 |----------|--------|
-| FOV | ⏳ No ejecutado |
-| FOR / FVR | — |
+| Prerrequisito RC | ✅ Knowledge Certified |
+| Protocolo FOV | 🟢 Definido |
+| Campaña EatClean | ⏳ Pendiente de ejecución |
+| FO / FER | — |
 
 ---
 
 ## Relacionado
 
+- [fov/ protocolo](./fov/README.md)  
+- [Known Limitations RC](../00-status/03-known-limitations-rc.md)  
 - [05 Knowledge Update](./05-knowledge-update.md)  
-- [06 Economic Confirmation](./06-economic-confirmation.md)  
-- [02 ECL](./02-evidence-confidence-levels.md)
+- [IOV](../19-independent-operational-validation/README.md)

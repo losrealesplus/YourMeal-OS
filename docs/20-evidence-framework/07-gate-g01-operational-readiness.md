@@ -27,8 +27,9 @@ Si falta **un** criterio → el Gate **no abre**.
 | IOV-003 | ✅ |
 | **Operational Model RC** | ✅ |
 | Findings críticos cerrados | ✅ |
-| FOV completado | ✅ |
-| Knowledge Update aplicado (o «sin MC» documentado) | ✅ |
+| FOV completado (FO clasificadas) | ✅ |
+| Field Evidence Review cerrado | ✅ |
+| Knowledge Update aplicado (o «sin KU» documentado tras FER) | ✅ |
 | Economic Confirmation positiva (ROI operacional) | ✅ |
 | Riesgos abiertos críticos | **0** |
 
@@ -65,9 +66,11 @@ Solo con checklist completo. **Sin excepciones.**
 | IOV-001 | | IVR-… |
 | IOV-002 | | IVR-… |
 | IOV-003 | | IVR-… |
+| Operational Model RC | | acta / tag |
 | Findings críticos cerrados | | |
-| FOV | | FVR-… |
-| Knowledge Update | | KUR-… |
+| FOV | | FO-… |
+| FER | | FER-… |
+| Knowledge Update | | KUR-… / «sin KU» |
 | Economic Confirmation positiva | | ECR-… |
 | Riesgos críticos abiertos = 0 | | |
 
@@ -83,7 +86,7 @@ Certifica conocimiento suficiente para justificar Etapa 2.
 
 | Elemento | Estado |
 |----------|--------|
-| G-01 | 🔒 FAIL (IOV/FOV/EC pendientes) |
+| G-01 | 🔒 FAIL (FOV/FER/EC pendientes; RC ✅) |
 | Etapa 2 | 🔒 |
 
 ---

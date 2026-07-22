@@ -28,12 +28,12 @@ Eso ya no es intuición. Es evidencia.
 ### Carril A — Certificar Etapa 1 *(no construir más modelo)*
 
 ```text
-IOV-002 → IOV-003 → Operational Model RC
-    → FOV → Knowledge Update → Economic Confirmation → Gate G-01
+IOV-001…003 ✅ → Operational Model RC ✅
+    → FOV (FO) → FER → Knowledge Update → Economic Confirmation → Gate G-01
 ```
 
-Campaña: [01-certification-campaign](./01-certification-campaign.md).  
-Orden fijo. Mentalidad: demostrar que **no hace falta añadir más**.
+Campaña: [01-certification-campaign](./01-certification-campaign.md) · FOV: [fov/](../20-evidence-framework/fov/README.md).  
+Orden fijo. Mentalidad: RC **para prueba**; FOV intenta refutar, no celebrar.
 
 ---
 
@@ -64,7 +64,7 @@ No implementar todavía:
 - Batch Engine  
 - Planning Engine  
 
-Esos motores dependen del conocimiento que IOV + FOV aún van a terminar de validar.
+Esos motores dependen del conocimiento que FOV (empírica) + FER + KU aún van a terminar de validar.
 
 Dish Library / Module 01 ya validado es excepción histórica — no abrir nuevos motores de espina.
 
