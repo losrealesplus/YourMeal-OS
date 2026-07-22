@@ -35,7 +35,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
     { to: "/admin/menus", label: t("admin:menus"), icon: CalendarDays, exact: false },
     { to: "/admin/dishes", label: t("admin:dishes"), icon: BookOpen, exact: false },
     { to: "/admin/production", label: t("admin:production"), icon: Factory, exact: false },
-    { to: "/admin/kitchen", label: t("admin:kitchen"), icon: ChefHat, exact: false },
+    { to: "/admin/production", label: t("admin:production"), icon: ChefHat, exact: false },
     { to: "/admin/purchasing", label: t("admin:purchasing"), icon: ShoppingCart, exact: false },
     { to: "/admin/inventory", label: t("admin:inventory"), icon: Boxes, exact: false },
     { to: "/admin/routes", label: t("admin:routes"), icon: Truck, exact: false },
