@@ -1,83 +1,115 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-22 · FASE 5 Operational Validation 🚧  
-**Versión:** `v0.1.0` — FOUNDATION LOCKED  
-
-## Roadmap (oficial)
-
-| Área | Estado |
-|------|--------|
-| FOUNDATION | ✅ Cerrado |
-| PRODUCT BLUEPRINT | ✅ Cerrado (fase diseño) |
-| OPERATIONAL DISCOVERY | ✅ Estructura cerrada |
-| OPERATIONAL CHECKS | ✅ Cerrado (transversal) |
-| Operational Model (FASE 4) | 🟢 01–06 (gramática completa) |
-| **Operational Validation (FASE 5)** | 🚧 Estructura + semillas |
-| Certificación modelo | ⏳ Operational Model Certified v1.0 |
+**Última actualización:** 2026-07-22 · Etapa 1 casi cerrada · VS-001 siguiente  
+**Versión técnica:** `v0.1.0` — FOUNDATION LOCKED  
+**Versión modelo:** Alpha (pre-certificación)
 
 ---
 
-## Fase actual: OPERATIONAL VALIDATION
+## Perspectiva estratégica
 
-> **¿Dónde nos equivocamos?** — no «¿qué construimos?»
+**YourMeal OS ya no es el centro del trabajo.**
 
-La validación **no busca confirmar. Busca refutar.**
+Es el **primer sistema que demostrará si el proceso OPE funciona**.
 
-```text
-Operational Model 🟢 (hipótesis endurecida)
-        ↓
-Operational Validation 🚧  ← intentar romper el modelo
-        ↓
-Operational Model Certified v1.0  ⏳
-        ↓
-UX · Capabilities · código de producto
-```
+| Centro | Rol |
+|--------|-----|
+| **OPE** (Operational Product Engineering) | Marco · proceso de adquisición de conocimiento |
+| **YourMeal OS** | Experimento controlado · caso de referencia |
 
-Índice: [docs/18-operational-validation/](../18-operational-validation/README.md)
-
-| Misión FASE 5 | Prohibido |
-|---------------|-----------|
-| Romper el modelo con escenarios y edge cases | Añadir features |
-| Dictámenes trazables (VR) | Cambiar el modelo sin VR |
-| Field observation bajo lente de coherencia | Saltar a UI / código |
+Las decisiones de aquí en adelante: ¿fortalecen el conocimiento trazable o solo aceleran código?
 
 ---
 
-## FASE 4 cerrada — Operational Model
+## Dos etapas del proyecto
+
+### Etapa 1 · Construcción del conocimiento — **casi consolidada**
+
+Objetivo: **reducir incertidumbre**. No desarrollar software de producto.
 
 ```text
-   01 Ubiquitous Language 🟢
-   02 Core Objects 🟢
-   03 Operational Dependencies 🟢
-   04 Lifecycles (transiciones) 🟢
-   05 Invariants (Constitución) 🟢
-   06 Capability Mapping (trazabilidad) 🟢
+Foundation              ✅
+Blueprint               ✅
+Discovery               ✅ (estructura · campo ⏸)
+Operational Checks      ✅
+Operational Model       ✅ FASE 4
+Operational Validation  🚧 FASE 5 abierta
 ```
 
-Índice: [docs/17-operational-model/](../17-operational-model/README.md)
+### Etapa 2 · Construcción del producto — **aún no empezada**
+
+Objetivo: **traducir conocimiento certificado** a software · UX · Capabilities.
+
+```text
+Gate: Operational Model Certified v1.0
+        ↓
+Implementation (traducción, no redescubrimiento)
+```
+
+Que la Etapa 2 no haya empezado es **buena noticia**: cuando empiece, el conocimiento será más estable.
 
 ---
 
-## Tres pilares (+ lenguaje + Checks)
-
-| Bloque | Pregunta | Estado |
-|--------|----------|--------|
-| **FOUNDATION** | ¿Cómo construimos? | ✅ |
-| **PRODUCT BLUEPRINT** | ¿Qué / por qué? | ✅ |
-| **OPERATIONAL DISCOVERY** | ¿Por qué evolucionar? | ✅ carpeta · ⏸ campo Discovery |
-| **Operational Checks** | ¿Cómo guía la operación? | ✅ transversal |
-| **Operational Model** | ¿Con qué lenguaje? | 🟢 FASE 4 |
-| **Operational Validation** | ¿Dónde falla el modelo? | 🚧 FASE 5 · nivel **Alpha** |
+## Fase actual: cerrar validación — empezar por VS-001
 
 ```text
-Producto:  Discovery → Check → Assistant → Capability  (post-certificación)
-Lenguaje:  Operational Model → Validation → Certified v1.0
-Técnica:   Capability → Use Cases → Domain → Infrastructure  (post-certificación)
+Operational Model Alpha
+        ↓
+VS-001  ← primera evidencia externa al diseño
+        ↓
+VR-001 + Knowledge State + retrospectiva metodológica
+        ↓
+VS-002… · EC… · FOV…
+        ↓
+Operational Model Certified v1.0
 ```
 
-Gate actual: **refutar modelo** → certificar → **traducir** a software (no redescubrir dominio en código).
+Índice: [18-operational-validation/](../18-operational-validation/README.md)
 
-Marco metodológico: [00-operational-product-engineering](../18-operational-validation/00-operational-product-engineering.md)
+| Misión inmediata | Prohibido |
+|------------------|-----------|
+| Auditoría VS-001 · decisiones trazables | VS-002 sin retrospectiva post-VS-001 |
+| Actualizar Knowledge State registry | Features · UI · código producto |
+
+**Criterio de éxito VS-001:** cada hallazgo → decisión trazable (no «cero errores»).
+
+---
+
+## FASE 4 — Operational Model 🟢
+
+```text
+01–06 endurecidos · Knowledge State inicial Hypothesized
+```
+
+[17-operational-model/](../17-operational-model/README.md)
+
+---
+
+## Mapa de bloques
+
+| Bloque | Etapa | Estado |
+|--------|-------|--------|
+| Foundation | 1 | ✅ |
+| Blueprint | 1 | ✅ |
+| Discovery | 1 | ✅ · campo ⏸ |
+| Operational Checks | 1 | ✅ |
+| Operational Model | 1 | 🟢 |
+| Operational Validation | 1 | 🚧 · **Alpha** |
+| Implementation | 2 | ⏳ post-certificación |
+
+Marco: [OPE](../18-operational-validation/00-operational-product-engineering.md) · [Knowledge State](../18-operational-validation/knowledge-state.md)
+
+---
+
+## El día que importa (objetivo de certificación)
+
+Poder decir con evidencia:
+
+> *«El Operational Model v1.0 ha sido validado mediante X escenarios, Y casos límite y Z observaciones de campo, con N Validation Reports, sin contradicciones abiertas.»*
+
+Ese día el software no partirá de requisitos sueltos — partirá de **conocimiento** puesto a prueba.
+
+Plantilla: [07-certification](../18-operational-validation/07-certification.md).
 
 ---
 
@@ -87,20 +119,18 @@ Marco metodológico: [00-operational-product-engineering](../18-operational-vali
 |----|------|--------|
 | [#9](https://github.com/losrealesplus/yourmeal-os/pull/9) | Operational Checks | ✅ Merged |
 | [#10](https://github.com/losrealesplus/yourmeal-os/pull/10) | Operational Model FASE 4 | 🚧 Open |
-| *(nuevo)* | Operational Validation FASE 5 | 🚧 |
+| [#11](https://github.com/losrealesplus/YourMeal-OS/pull/11) | Operational Validation · OPE | 🚧 Open |
 
 ---
 
-## Próxima sesión / siguiente paso
+## Próxima sesión
 
-1. Ejecutar **VS-001** (semana normal) — walkthrough de coherencia del modelo  
-2. Ejecutar edge cases prioritarios (EC-001 stock · EC-002 payment)  
-3. Activar field observation EatClean **solo en modo validación** cuando el equipo decida  
-4. Sin código / pantallas / features nuevas hasta certificación
+1. **VS-001** — auditoría hostil · VR-001 · registry  
+2. **Retrospectiva metodológica** — [08](../18-operational-validation/08-methodological-retrospective.md) antes de VS-002  
+3. Sin Etapa 2 hasta Certified v1.0
 
 | Índice | Ruta |
 |--------|------|
-| Validation | [18-operational-validation/](../18-operational-validation/README.md) |
-| Principios | [01-validation-principles](../18-operational-validation/01-validation-principles.md) |
-| Certificación | [07-certification](../18-operational-validation/07-certification.md) |
-| Operational Model | [17-operational-model/](../17-operational-model/README.md) |
+| VS-001 | [02-validation-scenarios/VS-001](../18-operational-validation/02-validation-scenarios/VS-001-semana-normal.md) |
+| Retrospectiva | [08-methodological-retrospective](../18-operational-validation/08-methodological-retrospective.md) |
+| Registry KS | [knowledge-state-registry](../18-operational-validation/knowledge-state-registry.md) |

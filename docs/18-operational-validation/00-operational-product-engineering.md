@@ -139,8 +139,9 @@ Alpha → Beta → RC → **Certified v1.0** — [07-certification.md](./07-cert
 
 Aplicable a logística, clínicas, talleres, hoteles… **sin cambiar la estructura de fases**.
 
-YourMeal OS es el caso de referencia.  
-El activo mayor puede ser el **proceso**, no solo la aplicación.
+YourMeal OS es el **caso de referencia** — el primer sistema que demuestra si OPE funciona.
+
+No el centro del trabajo: el **experimento controlado** del proceso.
 
 ---
 

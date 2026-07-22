@@ -105,4 +105,5 @@ Observation EatClean: ⏸. Sin pantallas / APIs / código.
 2. Toda Capability y Check habla Nivel 1 (canónico).  
 3. Alias de cocina = Nivel 2/3, nunca sustituyen al canónico.  
 4. Sin nombres de DTO / Entity / Repository en el lenguaje operativo.  
-5. Ningún Operational Check viola un Invariant.
+5. Ningún Operational Check viola un Invariant.  
+6. Cada afirmación canónica tiene [Knowledge State](../18-operational-validation/knowledge-state.md) trazable (proveniencia + VR).

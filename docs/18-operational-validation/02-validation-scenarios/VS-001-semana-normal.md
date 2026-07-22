@@ -11,6 +11,22 @@
 Si termina sin grietas → evidencia fuerte.  
 Si encuentra contradicción → éxito (error barato, antes del código).
 
+## Significado del hito
+
+Hasta ahora el Operational Model fue una **hipótesis bien argumentada** (FASE 4).
+
+VS-001 es la **primera evidencia externa al propio diseño** — aunque la sesión sea de mesa, el protocolo obliga a contrastar con la operación narrada, no con la memoria del documento.
+
+Cambia la naturaleza del modelo: de argumento a **candidato con trazabilidad**.
+
+## Criterio de éxito (no es ausencia de errores)
+
+> **Cada hallazgo produjo una decisión trazable** (VR con clasificación · actualización de Knowledge State · MC si aplica).
+
+Incluso un VR **Contradicted** cumple el criterio si la decisión queda documentada.
+
+Tras cerrar: [retrospectiva metodológica](../08-methodological-retrospective.md) **antes** de VS-002.
+
 ## Pregunta de refutación
 
 ¿Puede la espina `Menu → Order → Plan → Batch → Packaging → Route → Delivery → Payment` narrarse **sin saltos, sin conceptos huérfanos y sin inventar vocabulario nuevo** en una semana estándar?

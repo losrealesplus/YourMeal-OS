@@ -91,6 +91,24 @@ Si el campo no puede activarse antes de implementación limitada:
 
 ---
 
+## Declaración pública (objetivo del hito)
+
+Cuando se alcance Certified v1.0, el equipo debe poder afirmar con datos:
+
+> **«El Operational Model v1.0 ha sido validado mediante X escenarios, Y casos límite y Z observaciones de campo, con N Validation Reports, sin contradicciones abiertas.»**
+
+Ese día la Etapa 2 (implementación) parte de **conocimiento**, no de una colección de requisitos.
+
+| Variable | Fuente |
+|----------|--------|
+| X | VS cerrados en [02](../02-validation-scenarios/README.md) |
+| Y | EC cerrados en [03](../03-edge-cases/README.md) |
+| Z | FOV en [04](../04-field-observation/README.md) |
+| N | VR en [05](../05-validation-reports/README.md) |
+| Contradicciones abiertas | VR Contradicted sin MC aplicado |
+
+---
+
 ## Acto de certificación (plantilla)
 
 ```markdown

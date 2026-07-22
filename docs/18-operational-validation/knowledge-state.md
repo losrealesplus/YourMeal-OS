@@ -43,19 +43,28 @@ No todo alias de Nivel 2/3 necesita estado propio. El canónico Nivel 1 sí.
 
 ## Regla de proveniencia (memoria del modelo)
 
-> **Toda afirmación importante del modelo debe poder responder a dos preguntas:**
->
-> 1. **¿Dónde se observó por primera vez?**  
-> 2. **¿Qué Validation Reports siguen respaldándola?**
+> **Toda afirmación importante del modelo debe poder responder:**
 
-| Pregunta | Referencia |
-|----------|------------|
-| Primera observación | OF-xxx · FOV-xxx · VS-xxx · «FASE 4 — razonamiento» |
-| Respaldo actual | VR-xxx (lista) · MC-xxx si hubo corrección |
+| # | Pregunta | Referencia |
+|---|----------|------------|
+| 1 | **¿Dónde se observó por primera vez?** | OF-xxx · FOV-xxx · VS-xxx · «FASE 4 — razonamiento» |
+| 2 | **¿Qué Validation Reports la respaldan?** | VR-xxx (lista) |
+| 3 | **¿En qué versión del modelo quedó incorporada?** *(cuando madure el framework)* | ej. Operational Model v0.8 · commit · tag Certified |
 
-Sin proveniencia, la afirmación es **Hypothesized** hasta que se documente.
+Ejemplo:
 
-El modelo no solo dice *qué* decidimos — dice *qué evidencia* nos llevó ahí.
+```text
+INV-014
+
+Observed:     EatClean (FOV-002)
+Validated:    VR-004, VR-007
+Introduced:   Operational Model Alpha (pre-cert)
+Revised:      MC-003 → Certified v1.0
+```
+
+Sin proveniencia completa, la afirmación permanece **Hypothesized** hasta documentarse.
+
+El modelo no solo dice *qué* decidimos — reconstruye *por qué* y *cuándo* quedó fijado.
 
 ---
 
@@ -69,6 +78,7 @@ El modelo no solo dice *qué* decidimos — dice *qué evidencia* nos llevó ah�
 | Knowledge State | Hypothesized \| Observed \| Validated \| Refuted \| Generalized |
 | Primera observación | FASE 4 / OF-xxx / FOV-xxx / VS-xxx |
 | VR de respaldo | VR-001, VR-003 |
+| Versión del modelo | Alpha / MC-xxx → Certified v1.0 |
 | MC asociados | MC-002 (si Refuted → corregido) |
 | Notas | … |
 ```
