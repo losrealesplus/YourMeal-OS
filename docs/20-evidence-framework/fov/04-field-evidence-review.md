@@ -78,12 +78,12 @@ FO (clasificadas)
       ↓
 FER (4 preguntas)
       ↓
-├─ Sin KU → EC solo si el RC sigue intacto y ECL de campo basta
-└─ Con KU → KUR → (VR/MC) → EC → G-01
+├─ Sin KU → KUR-null → EC
+└─ Con KU → [ku/ Workflow](../ku/02-workflow.md) → KUR → (VR/MC) → EC → G-01
 ```
 
-Nota: Economic Confirmation sigue **después** de consolidar conocimiento.  
-Si FER no abre KU, EC usa el RC + FO-V acumuladas como refuerzo empírico — no inventa cambios.
+Nota: Economic Confirmation sigue **después** de consolidar conocimiento ([ku/](../ku/README.md) · [ec/](../ec/README.md)).  
+Si FER no abre KU, emitir KUR-null y EC usa el RC + FO-V acumuladas como refuerzo empírico.
 
 ---
 

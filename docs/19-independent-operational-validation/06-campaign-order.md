@@ -38,11 +38,12 @@ Field Validation (FOV ejecución)   ░░░░░░░░░░░░░░�
 | 3 | **IOV-002** adversarial | IVR-002 · SF |
 | 4 | **IOV-003** independent implementation | IVR-003 · IF |
 | 5 | Congelar corpus **Operational Model RC** | tag / acta |
-| 6 | Diseñar / congelar **protocolo FOV** | [fov/](../20-evidence-framework/fov/README.md) |
+| 6 | Diseñar / congelar **protocolo FOV** | [fov/](../20-evidence-framework/fov/README.md) ✅ |
 | 7 | Ejecutar **FOV** (EatClean) | FO-V/E/C/U |
 | 8 | **Field Evidence Review** | FER-xxx |
-| 9 | **Knowledge Update** solo si FER autoriza | KUR · MC si aplica |
-| 10 | **Economic Confirmation** + **Gate G-01** | ECR · acta G-01 |
+| 9 | **Knowledge Update** | [ku/](../20-evidence-framework/ku/README.md) · KUR |
+| 10 | **Economic Confirmation** | [ec/](../20-evidence-framework/ec/README.md) · OVI · ECR |
+| 11 | **Gate G-01** | [g01/](../20-evidence-framework/g01/README.md) · Package · Acta |
 
 ---
 
