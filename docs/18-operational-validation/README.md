@@ -98,8 +98,8 @@ Operational Model (17)
 | 05 | [validation-reports](./05-validation-reports/README.md) | Dictámenes trazables · [coverage](./05-validation-reports/validation-coverage.md) |
 | 06 | [model-changes](./06-model-changes/README.md) | Cambios al modelo (solo vía report) |
 | 07 | [certification](./07-certification.md) | Niveles Alpha → Beta → RC → **Certified v1.0** |
-| 08 | [methodological-retrospective](./08-methodological-retrospective.md) | Validar el proceso tras VS-001 |
-| — | Análisis conjunto post VS-006 | Priorizar MC aparcados (principio 16) |
+| 08 | [methodological-retrospective](./08-methodological-retrospective.md) | Validar el proceso |
+| 09 | [joint-gap-analysis](./09-joint-gap-analysis.md) | **Siguiente** — priorizar MC-001…006 |
 | — | [knowledge-state](./knowledge-state.md) | Estado del conocimiento · proveniencia |
 
 ---

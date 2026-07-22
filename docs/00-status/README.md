@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-22 · VS-001…005 · Clarified×1 · Extended×4 · MC ⏸  
+**Última actualización:** 2026-07-22 · Batería VS-001…006 **cerrada** · análisis conjunto 🚧  
 **Versión técnica:** `v0.1.0` — FOUNDATION LOCKED  
 **Versión modelo:** Alpha (pre-certificación)
 
@@ -127,12 +127,13 @@ Plantilla: [07-certification](../18-operational-validation/07-certification.md).
 
 ## Próxima sesión
 
-1. **VS-006** — generalización del dominio (cliente con reglas radicalmente distintas)  
-2. Análisis conjunto de brechas MC-001…005  
-3. **No** aplicar MC a `17` hasta ese análisis  
-4. Sin Etapa 2 hasta Certified v1.0
+1. **[Análisis conjunto de brechas](../18-operational-validation/09-joint-gap-analysis.md)** — priorizar MC-001…006  
+2. Aplicar paquete estructural a `17` (un tren, no seis parches)  
+3. Evaluar paso Alpha → **Beta**  
+4. Sin Etapa 2 (producto) hasta Certified v1.0
 
 | Índice | Ruta |
 |--------|------|
-| VR-005 | [VR-005](../18-operational-validation/05-validation-reports/VR-005-escalabilidad-eatclean.md) |
-| Roadmap | [02 scenarios](../18-operational-validation/02-validation-scenarios/README.md) |
+| VR-006 | [VR-006](../18-operational-validation/05-validation-reports/VR-006-generalizacion-healthycorp.md) |
+| Gap analysis | [09](../18-operational-validation/09-joint-gap-analysis.md) |
+| Coverage | [coverage](../18-operational-validation/05-validation-reports/validation-coverage.md) |

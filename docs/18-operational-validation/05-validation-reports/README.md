@@ -121,7 +121,7 @@ Ver también [validation-coverage](./validation-coverage.md) — estabilidad del
 |----|--------|--------|---------------|-----|
 | [VR-001](./VR-001-modificacion-tardia-eatclean.md) | Modificación tardía EatClean | VS-001 Adaptabilidad | **Extended** | [MC-001](../06-model-changes/MC-001-amend-and-revise-transitions.md) ⏸ |
 | [VR-002](./VR-002-interrupcion-horno-eatclean.md) | Interrupción horno EatClean | VS-002 Continuidad | **Extended** | [MC-002](../06-model-changes/MC-002-pause-batch-replan-execution.md) ⏸ |
-| [VR-005](./VR-005-escalabilidad-eatclean.md) | Escalabilidad +850 beneficiaries | VS-005 Escalabilidad | **Clarified** | [MC-005](../06-model-changes/MC-005-cardinality-parallelism-docs.md) ⏸ |
+| [VR-006](./VR-006-generalizacion-healthycorp.md) | HealthyCorp generalización | VS-006 Generalización | **Clarified** | [MC-006](../06-model-changes/MC-006-location-supporting-expedite.md) ⏸ |
 
 ---
 
