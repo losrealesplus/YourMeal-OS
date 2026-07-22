@@ -147,6 +147,6 @@ Weekly Menu → Order → Production Plan → Production Batch
 ## Relacionado
 
 - [Operational Model](../README.md)  
-- [Core Objects](../02-CORE_OBJECTS.md)  
+- [Core Objects](../02-core-objects/README.md)  
 - [OPERATIONAL_CHECKS](../../15-product/OPERATIONAL_CHECKS.md)  
 - [ACTORS](../../12-domain-model/ACTORS.md)

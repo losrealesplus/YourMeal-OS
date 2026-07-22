@@ -39,19 +39,19 @@ Soportes: Dish · Recipe · Ingredient · Stock · Supplier · Vehicle · Kitche
 
 | # | Documento | Estado |
 |---|-----------|--------|
-| 01 | [Ubiquitous Language](./01-ubiquitous-language/README.md) | 🟢 **Endurecido** (contrato semántico + áreas) |
-| 02 | [Core Operational Objects](./02-CORE_OBJECTS.md) | 🚧 v0.1 — siguiente |
-| 03 | [Relationships](./03-RELATIONSHIPS.md) | 🚧 v0.1 |
+| 01 | [Ubiquitous Language](./01-ubiquitous-language/README.md) | 🟢 Endurecido |
+| 02 | [Core Objects](./02-core-objects/README.md) | 🟢 Endurecido + revisión de consistencia ✅ |
+| 03 | [Relationships](./03-RELATIONSHIPS.md) | 🚧 v0.1 — **siguiente** (conectar, no descubrir) |
 | 04 | [Lifecycles](./04-LIFECYCLES.md) | 🚧 v0.1 |
 | 05 | [Invariants](./05-INVARIANTS.md) | 🚧 v0.1 |
 | 06 | [Capability Mapping](./06-CAPABILITY_MAPPING.md) | 🚧 v0.1 |
 
-Observation EatClean: ⏸ congelada. Sin pantallas / APIs / código.
+Observation EatClean: ⏸. Sin pantallas / APIs / código.
 
-### Regla diferencial del lenguaje
+### Gate 02 → 03
 
-> Si dos personas usan la misma palabra para cosas distintas, el modelo está roto.  
-> Si una misma realidad necesita dos palabras, el modelo también está roto.
+> ¿Se puede contar el ciclo completo solo con Core Objects y lenguaje canónico?  
+> **Sí** — ver [consistency-review.md](./02-core-objects/consistency-review.md).
 
 ---
 

@@ -99,17 +99,18 @@ Blueprint ✅ · Checks ✅ · Discovery (campo) ⏸
 Operational Model (Core Operativo) 🚧  ← siguiente trabajo
 ```
 
-> **FASE 4 — YourMeal Operational Model:** consolidar el lenguaje (no ampliar).  
-> **01 Ubiquitous Language:** endurecido — contrato semántico, plantilla, 3 niveles, áreas.  
+> **01–02:** Ubiquitous Language + Core Objects endurecidos (filtro · 3 niveles · revisión de ciclo ✅).  
+> **Siguiente:** 03 Relationships — conectar, no descubrir.  
 > No es Core DDD ni cuarto pilar: [docs/17-operational-model/](./docs/17-operational-model/README.md).  
 > **Observation EatClean: CONGELADA** ⏸.  
 > Unidad mínima de valor: **Operational Check**. Gate: evidencia → pregunta → Check → Capability.  
 > Sin pantallas / APIs / código. Sin «Customer» / «Cliente» ambiguo.  
-> Regla: misma palabra ≠ cosas distintas; misma realidad ≠ dos palabras.
+> Regla: misma palabra ≠ cosas distintas; misma realidad ≠ dos palabras.  
+> Core Object = operacional · permanente · estable (filtro de 5 preguntas).
 
-**Próxima sesión:** endurecer **02 Core Objects** → 03…06 (01 UL ✅).
+**Próxima sesión:** endurecer **03 Relationships** → 04…06 (01–02 ✅; consistencia del ciclo ✅).
 
-Índices: [01 UL](./docs/17-operational-model/01-ubiquitous-language/README.md) · [Operational Model](./docs/17-operational-model/README.md) · [Estado](./docs/00-status/README.md)
+Índices: [02 Core Objects](./docs/17-operational-model/02-core-objects/README.md) · [01 UL](./docs/17-operational-model/01-ubiquitous-language/README.md) · [Estado](./docs/00-status/README.md)
 
 ### Principio de valor (Capabilities)
 
