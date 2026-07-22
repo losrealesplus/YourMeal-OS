@@ -26,8 +26,8 @@ Actualizar al cerrar VR o FOV. Ver [knowledge-state.md](./knowledge-state.md).
 |----------|-----|---------------------|-------------|----------------|-------|
 | Weekly Menu | H | FASE 4 | — | Alpha | No tensionado en VS-001 |
 | Order | **V** parcial | VS-001 mesa | VR-001 | Alpha | Confirm/Cancel ✔ · **Amend** pendiente MC-001 |
-| Production Plan | **V** parcial | VS-001 | VR-001 | Alpha | Ready ✔ · **Revise** pendiente MC-001 |
-| Production Batch | **V** | VS-001 | VR-001 | Alpha | Stock Check · ajuste Planned vía Plan |
+| Production Batch | **V** parcial | VS-001 · VS-002 | VR-001 · VR-002 | Alpha | Stock ✔ · **Pause/Blocked** pendiente MC-002 |
+| Production Plan | **V** parcial | VS-001 · VS-002 | VR-001 · VR-002 | Alpha | Ready Revise MC-001 · **In execution** MC-002 |
 | Packaging | **V** | VS-001 | VR-001 | Alpha | Pending + Label alérgenos |
 | Delivery Route | **V** parcial | VS-001 | VR-001 | Alpha | Ready ✔ · **Revise** pendiente MC-001 |
 | Delivery | **V** | VS-001 | VR-001 | Alpha | Condicionado a Route revisada |

@@ -125,14 +125,14 @@ Plantilla: [07-certification](../18-operational-validation/07-certification.md).
 
 ## Próxima sesión
 
-1. Revisar / aprobar **MC-001** (Amend · Revise Plan/Route) → aplicar a `17`  
-2. Firmar [retrospectiva metodológica](../18-operational-validation/08-methodological-retrospective.md)  
-3. Entonces **VS-002** — no antes  
+1. Coordinar / aplicar **MC-001 + MC-002** (Amend · Revise · Pause · Replan)  
+2. Firmar retrospectiva metodológica  
+3. **VS-003** familia seguridad alimentaria (reescribir) — preferible tras MCs  
 4. Sin Etapa 2 hasta Certified v1.0
 
 | Índice | Ruta |
 |--------|------|
-| VR-001 | [VR-001](../18-operational-validation/05-validation-reports/VR-001-modificacion-tardia-eatclean.md) |
-| MC-001 | [MC-001](../18-operational-validation/06-model-changes/MC-001-amend-and-revise-transitions.md) |
-| VS-001 | [VS-001](../18-operational-validation/02-validation-scenarios/VS-001-semana-normal.md) |
-| Coverage | [validation-coverage](../18-operational-validation/05-validation-reports/validation-coverage.md) |
+| VR-002 | [VR-002](../18-operational-validation/05-validation-reports/VR-002-interrupcion-horno-eatclean.md) |
+| MC-002 | [MC-002](../18-operational-validation/06-model-changes/MC-002-pause-batch-replan-execution.md) |
+| VS-002 | [VS-002](../18-operational-validation/02-validation-scenarios/VS-002-interrupcion-horno.md) |
+| Familias | [02 README](../18-operational-validation/02-validation-scenarios/README.md) |

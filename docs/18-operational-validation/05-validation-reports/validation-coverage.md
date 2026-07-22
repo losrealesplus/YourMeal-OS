@@ -1,14 +1,15 @@
 # Validation Coverage — Estabilidad del modelo
 
-**Última actualización:** 2026-07-22 · post **VR-001**
+**Última actualización:** 2026-07-22 · post **VR-002**
 
 ---
 
 ## Resumen ejecutivo
 
 ```text
-Nivel de confianza actual:  Alpha → candidato Beta tras MC-001 + retrospectiva
-                            (1 escenario hostil auditado · Extended · 0 Refuted)
+Nivel de confianza actual:  Alpha
+  2 escenarios hostiles · ambos Extended · 0 Contradicted · 0 Core nuevos
+  MC-001 + MC-002 propuestos (Lifecycles mid-commercial + mid-execution)
 ```
 
 ---
@@ -17,78 +18,61 @@ Nivel de confianza actual:  Alpha → candidato Beta tras MC-001 + retrospectiva
 
 | Área | Progreso | Notas |
 |------|----------|-------|
-| Validation Scenarios (VS) | **1 / 7** | VS-001 Extended |
-| Edge Cases (EC) | 0 / 6 | EC-001 parcialmente ejercitado dentro de VS-001 |
-| Field Observation (FOV) | 0 | Mesa · no campo |
-| Validation Reports (VR) | **1** | VR-001 |
-| Model Changes (MC) | **1 propuesto** | MC-001 ⏳ |
+| Validation Scenarios (VS) | **2 / 7** | VS-001 comercial · VS-002 disrupción |
+| Edge Cases (EC) | 0 / 6 | Parcialmente dentro de VS |
+| Field Observation (FOV) | 0 | Mesa |
+| Validation Reports (VR) | **2** | Extended × 2 |
+| Model Changes (MC) | **2 propuestos** | 0 aplicados |
 
 ---
 
-## Estabilidad del modelo (contadores)
+## Estabilidad del modelo
 
-| Métrica | Valor | Interpretación |
-|---------|-------|----------------|
-| Core Objects modificados | **0** | Saludable — principio 13 |
-| Dependencies modificadas | 0 | |
-| Lifecycles modificados | **0 aplicados** · 3 propuestos | Amend · Revise Plan · Revise Route |
-| Checks añadidos | **0 aplicados** · 3 propuestos | |
-| Invariants modificados | **0** | Constitución intacta |
-| Model Changes totales | 1 propuesto | MC-001 |
+| Métrica | Valor |
+|---------|-------|
+| Core Objects modificados | **0** |
+| Dependencies modificadas | 0 |
+| Lifecycles aplicados | 0 · **propuestos:** Amend · Revise Ready · Pause · Replan In execution |
+| Checks añadidos aplicados | 0 |
+| Invariants modificados | **0** |
+| Model Changes | 2 ⏳ |
 
-### Madurez por clasificación de VR
+### Madurez por VR
 
-| Clasificación | Conteo | Interpretación |
-|---------------|--------|----------------|
-| Confirmed | 0 (global) | Pasos 4–6·8 locales Confirmed |
-| Clarified | 0 | |
-| Extended | **1** | VR-001 |
-| Contradicted | **0** | |
+| Clasificación | Conteo |
+|---------------|--------|
+| Confirmed | 0 (global) |
+| Clarified | 0 |
+| Extended | **2** |
+| Contradicted | **0** |
 
-### Histórico (snapshots)
+### Histórico
 
-| Fecha | VS | EC | FOV | MC | Invariants Δ | VR class | Nivel |
-|-------|----|----|-----|-----|--------------|----------|-------|
-| 2026-07-22 | 0/7 | 0/6 | 0 | 0 | 0 | — | Alpha |
-| 2026-07-22 | 1/7 | 0/6 | 0 | 1⏳ | 0 | Extended | Alpha |
+| Fecha | VS | MC | Invariants Δ | VR class | Nivel |
+|-------|-----|-----|--------------|----------|-------|
+| 2026-07-22 | 0/7 | 0 | 0 | — | Alpha |
+| 2026-07-22 | 1/7 | 1⏳ | 0 | Extended | Alpha |
+| 2026-07-22 | 2/7 | 2⏳ | 0 | Extended×2 | Alpha |
 
 ```text
-Validation Coverage — 2026-07-22 (post VR-001)
+Validation Coverage — 2026-07-22 (post VR-002)
 
-VS ejecutados:           1/7
-Edge Cases:              0/6 (EC-001 tensionado dentro VS-001)
+VS ejecutados:           2/7
+Edge Cases:              0/6
 Field Observations:      0
 
 Core Objects modificados:    0
-Dependencies modificadas:    0
-Lifecycles modificados:      0 (3 propuestos MC-001)
-Checks añadidos:             0 (3 propuestos)
+Lifecycles aplicados:        0 (MC-001·002 pendientes)
 Invariants modificados:      0
 
-Model Changes:               1 (MC-001 propuesto)
-
-VR por clasificación:
-  Confirmed:    0
-  Clarified:    0
-  Extended:     1
-  Contradicted: 0
-
-Nivel de confianza:          Alpha
+VR: Confirmed 0 · Clarified 0 · Extended 2 · Contradicted 0
+Nivel: Alpha
 ```
 
----
-
-## Lectura de tendencias
-
-| Patrón | Significado |
-|--------|-------------|
-| Extended + 0 Core Objects | Modelo vocabularmente sólido · Lifecycles incompletos |
-| 0 Contradicted · 0 Invariants Δ | Constitución resiste primer asalto hostil |
-| MC propuesto antes de aplicar | Gobernanza VR → MC respetada |
+**Lectura:** dos familias distintas → mismas grietas de **Lifecycle temporal**, no de vocabulario. Señal de aplicar MC antes de más VS sobre el mismo eje.
 
 ---
 
 ## Relacionado
 
-- [VR-001](./VR-001-modificacion-tardia-eatclean.md)  
-- [07 certification](../07-certification.md)
+- [VR-001](./VR-001-modificacion-tardia-eatclean.md) · [VR-002](./VR-002-interrupcion-horno-eatclean.md)

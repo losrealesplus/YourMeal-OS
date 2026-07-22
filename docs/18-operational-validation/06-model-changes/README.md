@@ -64,7 +64,8 @@ Referencia MC en CHANGELOG + diario
 
 | ID | Título | VR | Estado |
 |----|--------|-----|--------|
-| [MC-001](./MC-001-amend-and-revise-transitions.md) | Amend Order + Revise Plan/Route | VR-001 | ⏳ propuesto |
+| [MC-001](./MC-001-amend-and-revise-transitions.md) | Amend Order + Revise Plan/Route (Ready) | VR-001 | ⏳ propuesto |
+| [MC-002](./MC-002-pause-batch-replan-execution.md) | Pause Batch + Replan In execution + Kitchen | VR-002 | ⏳ propuesto |
 
 ---
 

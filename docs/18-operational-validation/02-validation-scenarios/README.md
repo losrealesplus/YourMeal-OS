@@ -1,76 +1,55 @@
 # 02 · Validation Scenarios
 
-Casos operativos **completos** — narrativas de negocio reales, no pantallas.
+Casos operativos **completos** — auditorías hostiles al modelo.
 
-Cada escenario intenta refutar el modelo. La pregunta guía:
+Cada escenario intenta refutar. Pregunta guía:
 
 > **¿Qué tendría que pasar para que este modelo dejara de ser válido?**
 
----
-
-## Plantilla (copiar por escenario)
-
-```markdown
-# VS-xxx — [Título]
-
-**Estado:** ⏳ pendiente · 🔄 en ejecución · ✅ cerrado  
-**Validation Report:** VR-xxx (cuando exista)
-
-## Pregunta de refutación
-
-¿Qué tendría que pasar para que el modelo dejara de ser válido en este caso?
-
-## Narrativa operativa
-
-[Descripción del día / semana / evento]
-
-## Cadena de comprobación
-
-| Capa | ¿Qué participa? | ¿Coherente? |
-|------|-----------------|-------------|
-| Core Objects | … | ⏳ |
-| Dependencies | … | ⏳ |
-| Lifecycles / transiciones | … | ⏳ |
-| Operational Checks | … | ⏳ |
-| Invariants | INV-… | ⏳ |
-
-## Hipótesis de rotura
-
-[Qué grieta buscamos a propósito]
-
-## Resultado preliminar
-
-⏳ Pendiente de ejecución
-```
+Protocolo: [audit-protocol.md](./audit-protocol.md).
 
 ---
 
-## Índice de escenarios
+## Estrategia de familias (batería)
 
-Auditorías: [audit-protocol.md](./audit-protocol.md) (6 preguntas por paso).
+Cubrir perspectivas **distintas** — no variantes del mismo estrés.
 
-| ID | Escenario | Foco de tensión | Estado |
-|----|-----------|-----------------|--------|
-| [VS-001](./VS-001-semana-normal.md) | **Hostil 001** · Modificación tardía EatClean | Amend Order · Plan · Stock · Route · alérgenos · Payment | ✅ Extended · VR-001 |
-| [VS-002](./VS-002-semana-festivo.md) | Semana con festivo | Weekly Menu · demanda irregular | ⏳ tras retrospectiva |
-| [VS-003](./VS-003-pedido-masivo.md) | Pedido masivo | Plan · Batch · Stock | ⏳ |
-| [VS-004](./VS-004-rotura-stock.md) | Rotura de stock | Checks · INV-034 · transiciones Batch | ⏳ |
-| [VS-005](./VS-005-cambio-menu-ultima-hora.md) | Cambio de menú de última hora | Menu Draft/Published · Orders | ⏳ |
-| [VS-006](./VS-006-cancelacion-cliente.md) | Consumer/Beneficiary cancela | Order Cancelled · Plan | ⏳ |
-| [VS-007](./VS-007-repartidor-ausente.md) | Repartidor ausente | Route · Delivery · reasignación | ⏳ |
+| ID | Familia | Estado |
+|----|---------|--------|
+| [VS-001](./VS-001-semana-normal.md) | **Comercial** — modificación tardía de Order | ✅ Extended · VR-001 |
+| [VS-002](./VS-002-interrupcion-horno.md) | **Disrupción operacional** — mid-execution | ✅ Extended · VR-002 |
+| [VS-003](./VS-003-pedido-masivo.md) → reorientar | **Seguridad alimentaria** — retirada ingrediente/lote | ⏳ reescribir |
+| [VS-004](./VS-004-rotura-stock.md) → reorientar | **Error humano** — producción/entrega incorrecta | ⏳ reescribir |
+| [VS-005](./VS-005-cambio-menu-ultima-hora.md) → reorientar | **Escalado extremo** — 2×–3× carga | ⏳ reescribir |
+| [VS-006](./VS-006-cancelacion-cliente.md) → reorientar | **Reglas de negocio** — cliente con requisitos distintos | ⏳ reescribir |
+| [VS-007](./VS-007-repartidor-ausente.md) | Logística (conductor) — mantener o fusionar | ⏳ |
+
+Semana con festivo (calendario): candidato a escenario futuro aparte — no bloquea la batería anterior.
 
 ---
 
-## Criterio de cierre de un escenario
+## Índice vivo
 
-1. Cadena de comprobación completa (las cinco capas).  
-2. Validation Report con dictamen y Knowledge State actualizado.  
-3. Si ⚠ 🔁 🚨 → Model Change antes de marcar ✅.  
-4. **VS-001 únicamente:** [retrospectiva metodológica](../08-methodological-retrospective.md) antes de VS-002.
+| ID | Escenario | Foco | Estado |
+|----|-----------|------|--------|
+| VS-001 | Modificación tardía EatClean | Amend · Plan · Stock · Route | ✅ VR-001 Extended |
+| VS-002 | Interrupción horno EatClean | Pause Batch · Replan · Kitchen · Notification≠dominio | ✅ VR-002 Extended |
+| VS-003…006 | Familias arriba | — | ⏳ |
+| VS-007 | Repartidor ausente | Route · Delivery | ⏳ |
+
+---
+
+## Criterio de cierre
+
+1. Cadena de comprobación completa.  
+2. VR con clasificación + Knowledge State.  
+3. MC si Extended/Contradicted.  
+4. Tras VS-001: retrospectiva metodológica.  
+5. Preferible aplicar/coordinar MC abiertos antes de saturar más Extended sobre el mismo Lifecycle.
 
 ---
 
 ## Relacionado
 
-- [03 edge-cases](../03-edge-cases/README.md) — rotura puntual  
-- [05 validation-reports](../05-validation-reports/README.md)
+- [05 validation-reports](../05-validation-reports/README.md)  
+- [08 methodological-retrospective](../08-methodological-retrospective.md)
