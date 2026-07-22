@@ -24,7 +24,7 @@ export const Route = createFileRoute("/_authenticated/admin/routes/attempt")({
 function outcomeTone(o: MockAttemptOutcome) {
   if (o === "delivered" || o === "left_at_door") return "positive" as const;
   if (o === "no_answer") return "warning" as const;
-  return "negative" as const;
+  return "danger" as const;
 }
 
 function AttemptPage() {

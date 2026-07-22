@@ -28,7 +28,7 @@ function statusTone(s: MockDeliveryIncident["status"]) {
 }
 
 function severityTone(s: MockDeliveryIncident["severity"]) {
-  if (s === "high") return "negative" as const;
+  if (s === "high") return "danger" as const;
   if (s === "medium") return "warning" as const;
   return "neutral" as const;
 }

@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_authenticated/admin/routes/deliveries")(
 function tone(s: MockDelivery["status"]) {
   if (s === "delivered") return "positive" as const;
   if (s === "out_for_delivery") return "info" as const;
-  if (s === "failed") return "negative" as const;
+  if (s === "failed") return "danger" as const;
   return "neutral" as const;
 }
 

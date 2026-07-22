@@ -22,7 +22,7 @@ export const Route = createFileRoute("/_authenticated/admin/routes/stops")({
 function stopTone(s: MockRouteStop["status"]) {
   if (s === "delivered") return "positive" as const;
   if (s === "arrived") return "info" as const;
-  if (s === "failed") return "negative" as const;
+  if (s === "failed") return "danger" as const;
   return "neutral" as const;
 }
 
