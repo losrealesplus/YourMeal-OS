@@ -11,7 +11,7 @@ export function DayPicker({
   onSelect: (i: number) => void;
 }) {
   return (
-    <div className="flex gap-2 overflow-x-auto no-scrollbar px-6 pb-2 -mx-6">
+    <div className="flex gap-2 overflow-x-auto no-scrollbar px-6 pb-3 -mx-6 snap-x snap-mandatory">
       {days.map((d, i) => {
         const active = i === activeIndex;
         return (
@@ -19,14 +19,23 @@ export function DayPicker({
             key={d + i}
             type="button"
             onClick={() => onSelect(i)}
+            aria-pressed={active}
             className={cn(
-              "size-12 rounded-xl font-bold text-sm shrink-0 border transition-colors",
+              "snap-start shrink-0 h-14 min-w-14 px-3 rounded-2xl border font-bold text-sm transition-all duration-200 active:scale-95",
               active
-                ? "bg-foreground text-background border-foreground"
-                : "bg-card text-foreground border-border hover:border-primary/40",
+                ? "bg-foreground text-background border-foreground shadow-[0_8px_20px_-10px_color-mix(in_oklab,var(--color-foreground)_55%,transparent)] scale-100"
+                : "bg-card text-foreground border-border/70 hover:border-primary/40",
             )}
           >
-            {d}
+            <span className="block leading-none">{d}</span>
+            <span
+              className={cn(
+                "block mt-1 font-mono text-[10px] tabular-nums uppercase tracking-widest",
+                active ? "opacity-70" : "text-muted-foreground",
+              )}
+            >
+              {String(i + 1).padStart(2, "0")}
+            </span>
           </button>
         );
       })}

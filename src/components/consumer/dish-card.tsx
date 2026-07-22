@@ -5,8 +5,8 @@ import { DishThumb } from "./dish-thumb";
 import { TagChip } from "./tag-chip";
 
 /**
- * DishCard — vista de tarjeta del plato en el menú semanal.
- * Toca todo el card → detalle. Sin CTAs secundarios (mobile-first, un solo toque).
+ * DishCard — tarjeta del plato en el menú semanal.
+ * Toca todo el card → detalle. Un solo objetivo por tarjeta.
  */
 export function DishCard({
   dish,
@@ -19,19 +19,22 @@ export function DishCard({
     <Link
       to="/app/menu/$dishId"
       params={{ dishId: dish.id }}
-      className="group flex gap-4 bg-card border border-border rounded-2xl p-3 pr-4 hover:border-primary/40 transition-colors"
+      className="group relative flex gap-4 surface-raised border border-border/60 rounded-3xl p-3 pr-4 items-stretch transition-all duration-200 hover:border-primary/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.995]"
     >
       <DishThumb emoji={dish.emoji} size="md" />
-      <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
+      <div className="flex-1 min-w-0 flex flex-col justify-between py-1.5">
         <div className="min-w-0">
-          <p className="font-bold truncate">{dish.name}</p>
-          <p className="text-xs text-muted-foreground truncate mt-0.5">
+          <p className="font-bold leading-tight truncate">{dish.name}</p>
+          <p className="text-xs text-muted-foreground truncate mt-1">
             {dish.tagline}
           </p>
         </div>
-        <div className="flex items-center gap-3 mt-2">
-          <span className="font-mono text-xs font-semibold tabular-nums text-foreground">
-            {dish.kcal} kcal
+        <div className="flex items-center gap-2 mt-2.5">
+          <span className="inline-flex items-center gap-1 font-mono text-[11px] font-bold tabular-nums text-foreground bg-secondary/80 rounded-md px-2 py-0.5">
+            {dish.kcal}
+            <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
+              kcal
+            </span>
           </span>
           <div className="flex gap-1 overflow-hidden">
             {dish.tags.slice(0, 2).map((t) => (
@@ -40,7 +43,7 @@ export function DishCard({
           </div>
         </div>
       </div>
-      <ChevronRight className="self-center size-5 text-muted-foreground group-hover:text-primary" />
+      <ChevronRight className="self-center size-5 text-muted-foreground transition-transform duration-200 group-hover:text-primary group-hover:translate-x-0.5" />
     </Link>
   );
 }

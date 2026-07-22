@@ -167,6 +167,27 @@
   &::-webkit-scrollbar { display: none; }
 }
 
+@utility safe-bottom {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
+}
+
+@utility surface-raised {
+  background: linear-gradient(180deg, var(--color-card) 0%, color-mix(in oklab, var(--color-card) 94%, var(--color-brand-sand) 6%) 100%);
+  box-shadow:
+    0 1px 0 0 color-mix(in oklab, white 55%, transparent) inset,
+    0 1px 2px 0 color-mix(in oklab, black 4%, transparent),
+    0 10px 28px -14px color-mix(in oklab, black 14%, transparent);
+}
+
+@utility hero-emerald {
+  background:
+    radial-gradient(120% 100% at 100% 0%, color-mix(in oklab, var(--color-primary) 65%, white 35%) 0%, transparent 55%),
+    linear-gradient(160deg, var(--color-primary) 0%, color-mix(in oklab, var(--color-primary) 78%, black 22%) 100%);
+  box-shadow:
+    0 1px 0 0 color-mix(in oklab, white 22%, transparent) inset,
+    0 20px 40px -20px color-mix(in oklab, var(--color-primary) 55%, transparent);
+}
+
 @layer base {
   * {
     border-color: var(--color-border);

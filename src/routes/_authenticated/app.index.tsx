@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { CalendarClock, Sparkles, Truck } from "lucide-react";
+import { ArrowRight, CalendarClock, Sparkles, Truck } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useFmt } from "@/i18n/localization-provider";
 import {
@@ -56,26 +56,28 @@ function CustomerHome() {
         {/* Momento de decisión: programar la semana */}
         <Link
           to="/app/schedule"
-          className="block relative overflow-hidden bg-primary text-primary-foreground rounded-3xl p-5"
+          className="group block relative overflow-hidden hero-emerald text-primary-foreground rounded-3xl p-6 transition-transform duration-200 active:scale-[0.99]"
         >
-          <div className="flex items-start gap-3">
-            <div className="grid place-items-center size-11 rounded-xl bg-primary-foreground/15 shrink-0">
+          <div className="absolute -right-8 -top-8 size-40 rounded-full bg-primary-foreground/10 blur-2xl pointer-events-none" aria-hidden />
+          <div className="relative flex items-start gap-3">
+            <div className="grid place-items-center size-11 rounded-2xl bg-primary-foreground/15 backdrop-blur-sm shrink-0 ring-1 ring-primary-foreground/20">
               <Sparkles className="size-5" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">
                 {t("customer:momentTitle")}
               </p>
-              <p className="font-bold text-lg leading-snug mt-1">
+              <p className="font-extrabold text-xl leading-snug mt-1.5 text-balance">
                 {t("customer:scheduleTitle")}
               </p>
-              <p className="text-xs opacity-80 mt-1">
+              <p className="text-xs opacity-85 mt-1.5 leading-relaxed max-w-[32ch]">
                 {t("customer:scheduleHint")}
               </p>
             </div>
           </div>
-          <div className="mt-4 inline-flex items-center gap-2 bg-primary-foreground text-primary text-xs font-bold uppercase tracking-widest py-2.5 px-4 rounded-lg">
+          <div className="relative mt-5 inline-flex items-center gap-2 bg-primary-foreground text-primary text-xs font-bold uppercase tracking-widest py-2.5 px-4 rounded-xl transition-transform duration-200 group-hover:translate-x-0.5">
             {t("customer:scheduleCta")}
+            <ArrowRight className="size-4" />
           </div>
         </Link>
 
@@ -84,20 +86,23 @@ function CustomerHome() {
           <Link
             to="/app/orders/$orderId"
             params={{ orderId: nextOrder.id }}
-            className="block bg-card border border-border rounded-2xl p-5"
+            className="group block surface-raised border border-border/60 rounded-3xl p-5 transition-all duration-200 hover:border-primary/40 hover:-translate-y-0.5"
           >
             <div className="flex items-center gap-3">
-              <div className="grid place-items-center size-10 rounded-xl bg-secondary shrink-0">
+              <div className="grid place-items-center size-11 rounded-2xl bg-primary/10 shrink-0">
                 <Truck className="size-5 text-primary" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="meta-label">{t("customer:nextDelivery")}</p>
-                <p className="font-bold mt-1">
+                <p className="font-bold mt-1 truncate">
                   {fmt.dateTime(nextOrder.deliveryDateIso)}
                 </p>
               </div>
-              <span className="font-mono text-sm font-extrabold tabular-nums">
-                {nextOrder.meals} {t("customer:meals")}
+              <span className="font-mono text-sm font-extrabold tabular-nums shrink-0">
+                {nextOrder.meals}
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground ml-1">
+                  {t("customer:meals")}
+                </span>
               </span>
             </div>
           </Link>
@@ -162,9 +167,9 @@ function CustomerHome() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-card border border-border rounded-2xl p-4">
+    <div className="surface-raised border border-border/60 rounded-2xl p-4">
       <p className="meta-label">{label}</p>
-      <p className="text-2xl font-extrabold tracking-tight mt-2 font-mono tabular-nums">
+      <p className="text-3xl font-extrabold tracking-tight mt-2 font-mono tabular-nums leading-none">
         {value}
       </p>
     </div>

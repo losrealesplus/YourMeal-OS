@@ -93,13 +93,13 @@ function SettingsPage() {
 
       {/* Profile card */}
       <div className="px-6">
-        <div className="bg-card border border-border rounded-2xl p-5 flex items-center gap-4">
-          <div className="grid place-items-center size-14 rounded-2xl bg-primary/10 text-primary text-lg font-extrabold">
+        <div className="surface-raised border border-border/60 rounded-3xl p-5 flex items-center gap-4">
+          <div className="grid place-items-center size-14 rounded-2xl hero-emerald text-primary-foreground text-lg font-extrabold shrink-0">
             {(displayName || "?").slice(0, 1).toUpperCase()}
           </div>
           <div className="min-w-0 flex-1">
             <p className="font-bold truncate">{displayName || "—"}</p>
-            <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+            <p className="text-xs text-muted-foreground truncate mt-0.5">{user?.email}</p>
           </div>
         </div>
       </div>
@@ -107,29 +107,32 @@ function SettingsPage() {
       <div className="px-6 space-y-6 mt-6">
         {groups.map((group) => (
           <div key={group.title}>
-            <p className="meta-label mb-2">{group.title}</p>
-            <div className="bg-card border border-border rounded-2xl divide-y divide-border">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="h-3 w-0.5 rounded-full bg-primary/70" aria-hidden />
+              <p className="meta-label">{group.title}</p>
+            </div>
+            <div className="surface-raised border border-border/60 rounded-3xl overflow-hidden divide-y divide-border/60">
               {group.items.map((item) => {
                 const body = (
                   <div className="w-full flex items-center gap-3 px-4 py-4">
-                    <span className="grid place-items-center size-8 rounded-lg bg-secondary text-muted-foreground shrink-0">
+                    <span className="grid place-items-center size-9 rounded-xl bg-secondary text-muted-foreground shrink-0">
                       {item.icon}
                     </span>
-                    <span className="flex-1 text-sm font-medium">
+                    <span className="flex-1 text-sm font-semibold truncate">
                       {t(`customer:${item.key}`)}
                     </span>
                     <ChevronRight className="size-4 text-muted-foreground" />
                   </div>
                 );
                 return item.to ? (
-                  <Link key={item.key} to={item.to} className="block hover:bg-secondary/40">
+                  <Link key={item.key} to={item.to} className="block transition-colors hover:bg-secondary/50 active:bg-secondary">
                     {body}
                   </Link>
                 ) : (
                   <button
                     key={item.key}
                     type="button"
-                    className="w-full text-left hover:bg-secondary/40"
+                    className="w-full text-left transition-colors hover:bg-secondary/50 active:bg-secondary"
                   >
                     {body}
                   </button>
@@ -140,9 +143,12 @@ function SettingsPage() {
         ))}
 
         <div>
-          <p className="meta-label mb-2">{t("customer:language")}</p>
-          <div className="bg-card border border-border rounded-2xl p-4 flex items-center justify-between">
-            <span className="text-sm font-medium">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="h-3 w-0.5 rounded-full bg-primary/70" aria-hidden />
+            <p className="meta-label">{t("customer:language")}</p>
+          </div>
+          <div className="surface-raised border border-border/60 rounded-3xl p-4 flex items-center justify-between">
+            <span className="text-sm font-semibold">
               {t("common:selectLanguage")}
             </span>
             <LanguageSelector />

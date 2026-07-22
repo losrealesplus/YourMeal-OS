@@ -12,17 +12,21 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="bg-card border border-border rounded-2xl p-8 text-center">
+    <div className="surface-raised border border-dashed border-border rounded-3xl p-8 text-center flex flex-col items-center gap-3">
       {icon ? (
-        <div className="grid place-items-center size-14 rounded-2xl bg-secondary mx-auto mb-4 text-muted-foreground">
+        <div className="grid place-items-center size-12 rounded-2xl bg-secondary text-muted-foreground">
           {icon}
         </div>
       ) : null}
-      <p className="font-bold">{title}</p>
-      {hint ? (
-        <p className="text-sm text-muted-foreground mt-2">{hint}</p>
-      ) : null}
-      {action ? <div className="mt-4">{action}</div> : null}
+      <div className="space-y-1">
+        <p className="font-bold">{title}</p>
+        {hint ? (
+          <p className="text-xs text-muted-foreground max-w-[28ch] mx-auto leading-relaxed">
+            {hint}
+          </p>
+        ) : null}
+      </div>
+      {action ? <div className="pt-2">{action}</div> : null}
     </div>
   );
 }
