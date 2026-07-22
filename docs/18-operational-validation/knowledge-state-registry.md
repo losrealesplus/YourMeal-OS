@@ -44,7 +44,8 @@ Actualizar al cerrar VR o FOV. Ver [knowledge-state.md](./knowledge-state.md).
 | Label | **V** | VR-001 | sin gluten / alérgenos |
 | Beneficiary | **V** | VR-001 | alta 2 nuevos |
 | Order Item | **V** | VR-001 | líneas Amend |
-| Purchase Order | H | — | Supporting futuro · **no** promovido |
+| Kitchen | **V** parcial | VS-002 | VR-002 | Alpha | Ancla OK · capacidad/equipo no Core |
+| Notification (rechazo) | **V** | VS-002 | VR-002 | — | Capability · no modelo 17 |
 
 ---
 
