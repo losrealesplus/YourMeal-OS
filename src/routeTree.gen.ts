@@ -37,14 +37,18 @@ import { Route as AuthenticatedAdminPurchasingRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminPromotionsRouteImport } from './routes/_authenticated/admin.promotions'
 import { Route as AuthenticatedAdminProductionRouteImport } from './routes/_authenticated/admin.production'
 import { Route as AuthenticatedAdminMenusRouteImport } from './routes/_authenticated/admin.menus'
-import { Route as AuthenticatedAdminKitchenRouteImport } from './routes/_authenticated/admin.kitchen'
 import { Route as AuthenticatedAdminInventoryRouteImport } from './routes/_authenticated/admin.inventory'
 import { Route as AuthenticatedAdminDishesRouteImport } from './routes/_authenticated/admin.dishes'
 import { Route as AuthenticatedAdminCustomersRouteImport } from './routes/_authenticated/admin.customers'
 import { Route as AuthenticatedAdminAccountingRouteImport } from './routes/_authenticated/admin.accounting'
+import { Route as AuthenticatedAdminProductionIndexRouteImport } from './routes/_authenticated/admin.production.index'
 import { Route as AuthenticatedAppSettingsProfileRouteImport } from './routes/_authenticated/app.settings.profile'
 import { Route as AuthenticatedAppOrdersOrderIdRouteImport } from './routes/_authenticated/app.orders.$orderId'
 import { Route as AuthenticatedAppMenuDishIdRouteImport } from './routes/_authenticated/app.menu.$dishId'
+import { Route as AuthenticatedAdminProductionPackagingRouteImport } from './routes/_authenticated/admin.production.packaging'
+import { Route as AuthenticatedAdminProductionLabelsRouteImport } from './routes/_authenticated/admin.production.labels'
+import { Route as AuthenticatedAdminProductionKitchenRouteImport } from './routes/_authenticated/admin.production.kitchen'
+import { Route as AuthenticatedAdminProductionBatchRouteImport } from './routes/_authenticated/admin.production.batch'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -199,12 +203,6 @@ const AuthenticatedAdminMenusRoute = AuthenticatedAdminMenusRouteImport.update({
   path: '/menus',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
-const AuthenticatedAdminKitchenRoute =
-  AuthenticatedAdminKitchenRouteImport.update({
-    id: '/kitchen',
-    path: '/kitchen',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
 const AuthenticatedAdminInventoryRoute =
   AuthenticatedAdminInventoryRouteImport.update({
     id: '/inventory',
@@ -229,6 +227,12 @@ const AuthenticatedAdminAccountingRoute =
     path: '/accounting',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminProductionIndexRoute =
+  AuthenticatedAdminProductionIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAdminProductionRoute,
+  } as any)
 const AuthenticatedAppSettingsProfileRoute =
   AuthenticatedAppSettingsProfileRouteImport.update({
     id: '/profile',
@@ -247,6 +251,30 @@ const AuthenticatedAppMenuDishIdRoute =
     path: '/$dishId',
     getParentRoute: () => AuthenticatedAppMenuRoute,
   } as any)
+const AuthenticatedAdminProductionPackagingRoute =
+  AuthenticatedAdminProductionPackagingRouteImport.update({
+    id: '/packaging',
+    path: '/packaging',
+    getParentRoute: () => AuthenticatedAdminProductionRoute,
+  } as any)
+const AuthenticatedAdminProductionLabelsRoute =
+  AuthenticatedAdminProductionLabelsRouteImport.update({
+    id: '/labels',
+    path: '/labels',
+    getParentRoute: () => AuthenticatedAdminProductionRoute,
+  } as any)
+const AuthenticatedAdminProductionKitchenRoute =
+  AuthenticatedAdminProductionKitchenRouteImport.update({
+    id: '/kitchen',
+    path: '/kitchen',
+    getParentRoute: () => AuthenticatedAdminProductionRoute,
+  } as any)
+const AuthenticatedAdminProductionBatchRoute =
+  AuthenticatedAdminProductionBatchRouteImport.update({
+    id: '/batch',
+    path: '/batch',
+    getParentRoute: () => AuthenticatedAdminProductionRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -260,9 +288,8 @@ export interface FileRoutesByFullPath {
   '/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/admin/dishes': typeof AuthenticatedAdminDishesRoute
   '/admin/inventory': typeof AuthenticatedAdminInventoryRoute
-  '/admin/kitchen': typeof AuthenticatedAdminKitchenRoute
   '/admin/menus': typeof AuthenticatedAdminMenusRoute
-  '/admin/production': typeof AuthenticatedAdminProductionRoute
+  '/admin/production': typeof AuthenticatedAdminProductionRouteWithChildren
   '/admin/promotions': typeof AuthenticatedAdminPromotionsRoute
   '/admin/purchasing': typeof AuthenticatedAdminPurchasingRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
@@ -281,9 +308,14 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/saas/': typeof AuthenticatedSaasIndexRoute
+  '/admin/production/batch': typeof AuthenticatedAdminProductionBatchRoute
+  '/admin/production/kitchen': typeof AuthenticatedAdminProductionKitchenRoute
+  '/admin/production/labels': typeof AuthenticatedAdminProductionLabelsRoute
+  '/admin/production/packaging': typeof AuthenticatedAdminProductionPackagingRoute
   '/app/menu/$dishId': typeof AuthenticatedAppMenuDishIdRoute
   '/app/orders/$orderId': typeof AuthenticatedAppOrdersOrderIdRoute
   '/app/settings/profile': typeof AuthenticatedAppSettingsProfileRoute
+  '/admin/production/': typeof AuthenticatedAdminProductionIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -294,9 +326,7 @@ export interface FileRoutesByTo {
   '/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/admin/dishes': typeof AuthenticatedAdminDishesRoute
   '/admin/inventory': typeof AuthenticatedAdminInventoryRoute
-  '/admin/kitchen': typeof AuthenticatedAdminKitchenRoute
   '/admin/menus': typeof AuthenticatedAdminMenusRoute
-  '/admin/production': typeof AuthenticatedAdminProductionRoute
   '/admin/promotions': typeof AuthenticatedAdminPromotionsRoute
   '/admin/purchasing': typeof AuthenticatedAdminPurchasingRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
@@ -315,9 +345,14 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/saas': typeof AuthenticatedSaasIndexRoute
+  '/admin/production/batch': typeof AuthenticatedAdminProductionBatchRoute
+  '/admin/production/kitchen': typeof AuthenticatedAdminProductionKitchenRoute
+  '/admin/production/labels': typeof AuthenticatedAdminProductionLabelsRoute
+  '/admin/production/packaging': typeof AuthenticatedAdminProductionPackagingRoute
   '/app/menu/$dishId': typeof AuthenticatedAppMenuDishIdRoute
   '/app/orders/$orderId': typeof AuthenticatedAppOrdersOrderIdRoute
   '/app/settings/profile': typeof AuthenticatedAppSettingsProfileRoute
+  '/admin/production': typeof AuthenticatedAdminProductionIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -333,9 +368,8 @@ export interface FileRoutesById {
   '/_authenticated/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/_authenticated/admin/dishes': typeof AuthenticatedAdminDishesRoute
   '/_authenticated/admin/inventory': typeof AuthenticatedAdminInventoryRoute
-  '/_authenticated/admin/kitchen': typeof AuthenticatedAdminKitchenRoute
   '/_authenticated/admin/menus': typeof AuthenticatedAdminMenusRoute
-  '/_authenticated/admin/production': typeof AuthenticatedAdminProductionRoute
+  '/_authenticated/admin/production': typeof AuthenticatedAdminProductionRouteWithChildren
   '/_authenticated/admin/promotions': typeof AuthenticatedAdminPromotionsRoute
   '/_authenticated/admin/purchasing': typeof AuthenticatedAdminPurchasingRoute
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
@@ -354,9 +388,14 @@ export interface FileRoutesById {
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/saas/': typeof AuthenticatedSaasIndexRoute
+  '/_authenticated/admin/production/batch': typeof AuthenticatedAdminProductionBatchRoute
+  '/_authenticated/admin/production/kitchen': typeof AuthenticatedAdminProductionKitchenRoute
+  '/_authenticated/admin/production/labels': typeof AuthenticatedAdminProductionLabelsRoute
+  '/_authenticated/admin/production/packaging': typeof AuthenticatedAdminProductionPackagingRoute
   '/_authenticated/app/menu/$dishId': typeof AuthenticatedAppMenuDishIdRoute
   '/_authenticated/app/orders/$orderId': typeof AuthenticatedAppOrdersOrderIdRoute
   '/_authenticated/app/settings/profile': typeof AuthenticatedAppSettingsProfileRoute
+  '/_authenticated/admin/production/': typeof AuthenticatedAdminProductionIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -372,7 +411,6 @@ export interface FileRouteTypes {
     | '/admin/customers'
     | '/admin/dishes'
     | '/admin/inventory'
-    | '/admin/kitchen'
     | '/admin/menus'
     | '/admin/production'
     | '/admin/promotions'
@@ -393,9 +431,14 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/app/'
     | '/saas/'
+    | '/admin/production/batch'
+    | '/admin/production/kitchen'
+    | '/admin/production/labels'
+    | '/admin/production/packaging'
     | '/app/menu/$dishId'
     | '/app/orders/$orderId'
     | '/app/settings/profile'
+    | '/admin/production/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -406,9 +449,7 @@ export interface FileRouteTypes {
     | '/admin/customers'
     | '/admin/dishes'
     | '/admin/inventory'
-    | '/admin/kitchen'
     | '/admin/menus'
-    | '/admin/production'
     | '/admin/promotions'
     | '/admin/purchasing'
     | '/admin/reports'
@@ -427,9 +468,14 @@ export interface FileRouteTypes {
     | '/admin'
     | '/app'
     | '/saas'
+    | '/admin/production/batch'
+    | '/admin/production/kitchen'
+    | '/admin/production/labels'
+    | '/admin/production/packaging'
     | '/app/menu/$dishId'
     | '/app/orders/$orderId'
     | '/app/settings/profile'
+    | '/admin/production'
   id:
     | '__root__'
     | '/'
@@ -444,7 +490,6 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/customers'
     | '/_authenticated/admin/dishes'
     | '/_authenticated/admin/inventory'
-    | '/_authenticated/admin/kitchen'
     | '/_authenticated/admin/menus'
     | '/_authenticated/admin/production'
     | '/_authenticated/admin/promotions'
@@ -465,9 +510,14 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/'
     | '/_authenticated/app/'
     | '/_authenticated/saas/'
+    | '/_authenticated/admin/production/batch'
+    | '/_authenticated/admin/production/kitchen'
+    | '/_authenticated/admin/production/labels'
+    | '/_authenticated/admin/production/packaging'
     | '/_authenticated/app/menu/$dishId'
     | '/_authenticated/app/orders/$orderId'
     | '/_authenticated/app/settings/profile'
+    | '/_authenticated/admin/production/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -675,13 +725,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminMenusRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/_authenticated/admin/kitchen': {
-      id: '/_authenticated/admin/kitchen'
-      path: '/kitchen'
-      fullPath: '/admin/kitchen'
-      preLoaderRoute: typeof AuthenticatedAdminKitchenRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
     '/_authenticated/admin/inventory': {
       id: '/_authenticated/admin/inventory'
       path: '/inventory'
@@ -710,6 +753,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAccountingRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/production/': {
+      id: '/_authenticated/admin/production/'
+      path: '/'
+      fullPath: '/admin/production/'
+      preLoaderRoute: typeof AuthenticatedAdminProductionIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminProductionRoute
+    }
     '/_authenticated/app/settings/profile': {
       id: '/_authenticated/app/settings/profile'
       path: '/profile'
@@ -731,17 +781,71 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppMenuDishIdRouteImport
       parentRoute: typeof AuthenticatedAppMenuRoute
     }
+    '/_authenticated/admin/production/packaging': {
+      id: '/_authenticated/admin/production/packaging'
+      path: '/packaging'
+      fullPath: '/admin/production/packaging'
+      preLoaderRoute: typeof AuthenticatedAdminProductionPackagingRouteImport
+      parentRoute: typeof AuthenticatedAdminProductionRoute
+    }
+    '/_authenticated/admin/production/labels': {
+      id: '/_authenticated/admin/production/labels'
+      path: '/labels'
+      fullPath: '/admin/production/labels'
+      preLoaderRoute: typeof AuthenticatedAdminProductionLabelsRouteImport
+      parentRoute: typeof AuthenticatedAdminProductionRoute
+    }
+    '/_authenticated/admin/production/kitchen': {
+      id: '/_authenticated/admin/production/kitchen'
+      path: '/kitchen'
+      fullPath: '/admin/production/kitchen'
+      preLoaderRoute: typeof AuthenticatedAdminProductionKitchenRouteImport
+      parentRoute: typeof AuthenticatedAdminProductionRoute
+    }
+    '/_authenticated/admin/production/batch': {
+      id: '/_authenticated/admin/production/batch'
+      path: '/batch'
+      fullPath: '/admin/production/batch'
+      preLoaderRoute: typeof AuthenticatedAdminProductionBatchRouteImport
+      parentRoute: typeof AuthenticatedAdminProductionRoute
+    }
   }
 }
+
+interface AuthenticatedAdminProductionRouteChildren {
+  AuthenticatedAdminProductionBatchRoute: typeof AuthenticatedAdminProductionBatchRoute
+  AuthenticatedAdminProductionKitchenRoute: typeof AuthenticatedAdminProductionKitchenRoute
+  AuthenticatedAdminProductionLabelsRoute: typeof AuthenticatedAdminProductionLabelsRoute
+  AuthenticatedAdminProductionPackagingRoute: typeof AuthenticatedAdminProductionPackagingRoute
+  AuthenticatedAdminProductionIndexRoute: typeof AuthenticatedAdminProductionIndexRoute
+}
+
+const AuthenticatedAdminProductionRouteChildren: AuthenticatedAdminProductionRouteChildren =
+  {
+    AuthenticatedAdminProductionBatchRoute:
+      AuthenticatedAdminProductionBatchRoute,
+    AuthenticatedAdminProductionKitchenRoute:
+      AuthenticatedAdminProductionKitchenRoute,
+    AuthenticatedAdminProductionLabelsRoute:
+      AuthenticatedAdminProductionLabelsRoute,
+    AuthenticatedAdminProductionPackagingRoute:
+      AuthenticatedAdminProductionPackagingRoute,
+    AuthenticatedAdminProductionIndexRoute:
+      AuthenticatedAdminProductionIndexRoute,
+  }
+
+const AuthenticatedAdminProductionRouteWithChildren =
+  AuthenticatedAdminProductionRoute._addFileChildren(
+    AuthenticatedAdminProductionRouteChildren,
+  )
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAccountingRoute: typeof AuthenticatedAdminAccountingRoute
   AuthenticatedAdminCustomersRoute: typeof AuthenticatedAdminCustomersRoute
   AuthenticatedAdminDishesRoute: typeof AuthenticatedAdminDishesRoute
   AuthenticatedAdminInventoryRoute: typeof AuthenticatedAdminInventoryRoute
-  AuthenticatedAdminKitchenRoute: typeof AuthenticatedAdminKitchenRoute
   AuthenticatedAdminMenusRoute: typeof AuthenticatedAdminMenusRoute
-  AuthenticatedAdminProductionRoute: typeof AuthenticatedAdminProductionRoute
+  AuthenticatedAdminProductionRoute: typeof AuthenticatedAdminProductionRouteWithChildren
   AuthenticatedAdminPromotionsRoute: typeof AuthenticatedAdminPromotionsRoute
   AuthenticatedAdminPurchasingRoute: typeof AuthenticatedAdminPurchasingRoute
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
@@ -756,9 +860,9 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminCustomersRoute: AuthenticatedAdminCustomersRoute,
   AuthenticatedAdminDishesRoute: AuthenticatedAdminDishesRoute,
   AuthenticatedAdminInventoryRoute: AuthenticatedAdminInventoryRoute,
-  AuthenticatedAdminKitchenRoute: AuthenticatedAdminKitchenRoute,
   AuthenticatedAdminMenusRoute: AuthenticatedAdminMenusRoute,
-  AuthenticatedAdminProductionRoute: AuthenticatedAdminProductionRoute,
+  AuthenticatedAdminProductionRoute:
+    AuthenticatedAdminProductionRouteWithChildren,
   AuthenticatedAdminPromotionsRoute: AuthenticatedAdminPromotionsRoute,
   AuthenticatedAdminPurchasingRoute: AuthenticatedAdminPurchasingRoute,
   AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
