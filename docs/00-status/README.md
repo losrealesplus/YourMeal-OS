@@ -1,70 +1,62 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-22 · **Beta + IOV definido** 🟢  
+**Última actualización:** 2026-07-22 · **FOPEBA · Evidence Framework** 🟢  
 **Versión técnica:** `v0.1.0` — FOUNDATION LOCKED  
-**Versión modelo:** **Beta** · Dynamics v0.2 · tren MC ✅ · **IOV** ⏳
+**Versión modelo:** **Beta** (mesa) · Gate G-01 🔒
 
 ---
 
 ## Perspectiva estratégica
 
-**YourMeal OS** = primer experimento OPE.  
-Operational Validation cerrada (Beta).  
-Siguiente madurez de Etapa 1: **Independent Operational Validation** — transferibilidad, ataque e interpretación.
+**YourMeal OS** = primer experimento **FOPEBA**.
+
+Promesa validada en mesa: modelo operacional estable.  
+Promesa pendiente: *este proceso produce mejores productos* → **FOV + EC + G-01**.
 
 ---
 
-## Milestone actual: IOV (pre-Certified)
+## Milestone actual: Evidence Framework
 
 | Entregable | Estado |
 |------------|--------|
-| Validation VS + Dynamics + tren MC | 🟢 **Beta** |
-| [IOV](../19-independent-operational-validation/README.md) | ⏳ Definido · no ejecutado |
-| [Knowledge Validation Pyramid](../19-independent-operational-validation/00-knowledge-validation-pyramid.md) | 🟢 Adoptada en OPE |
-| RC / Certified v1.0 | ⏳ IOV + FOV/EC |
+| Operational Model Beta | 🟢 |
+| [Evidence Framework](../20-evidence-framework/README.md) | 🟢 Definido (ECL · FOV · EC · G-01) |
+| IOV | ⏳ Definido · no ejecutado |
+| FOV | ⏳ No ejecutado |
+| EC (Economic Confirmation) | ⏳ No ejecutado |
+| Gate G-01 | 🔒 Cerrado |
 
 ---
 
 ## Dos etapas
 
-### Etapa 1 · Conocimiento — Beta; madurez vía IOV
+### Etapa 1 · Conocimiento — hacia G-01
 
 ```text
-Foundation … Model ✅
-Validation VS-001…006 ✅
-Dynamics + tren MC ✅
-Beta (mesa) ✅
+Model + Validation (mesa) ✅ Beta
+IOV ⏳
+FOV ⏳
+EC ⏳
         ↓
-Independent Operational Validation  ⏳
+Gate G-01 · Operational Readiness
         ↓
-Certification → Certified v1.0
+Etapa 2
 ```
 
-### Etapa 2 · Producto — no empezada
+### Etapa 2 · Producto — bloqueada
 
-Gate: Certified v1.0 (conocimiento operacional reproducible).  
-IOV es la última gran prueba antes de declarar Etapa 1 madura.
+Solo tras **G-01** (no basta Beta).
 
 ---
 
-## Independent Operational Validation
-
-| Nivel | Pregunta | Evidencia |
-|-------|----------|-----------|
-| IOV-001 Comprehension | ¿Se entiende? | DF |
-| IOV-002 Adversarial | ¿Resiste ataques? | SF |
-| IOV-003 Independent Implementation | ¿Se implementa igual? | IF |
-
-Índice: [docs/19-independent-operational-validation](../19-independent-operational-validation/README.md)
-
----
-
-## FASE 5 Validation (cerrada campaña)
+## FOPEBA — flujo
 
 ```text
-Extended × 4 · Clarified × 2 · Contradicted × 0 · Core Δ × 0
-MC aplicados × 6 · Nivel Beta
+Foundation → Blueprint → Discovery → Checks → Model
+    → Validation → IOV → FOV → EC → G-01 → Implementation
 ```
+
+Madre de evidencia: [20-evidence-framework](../20-evidence-framework/README.md)
 
 ---
 
@@ -74,20 +66,21 @@ MC aplicados × 6 · Nivel Beta
 |----|------|--------|
 | [#9](https://github.com/losrealesplus/yourmeal-os/pull/9) | Operational Checks | ✅ Merged |
 | [#10](https://github.com/losrealesplus/yourmeal-os/pull/10) | Operational Model FASE 4 | 🚧 Open |
-| [#11](https://github.com/losrealesplus/YourMeal-OS/pull/11) | Validation + Dynamics + Beta + IOV | 🚧 Open |
+| [#11](https://github.com/losrealesplus/YourMeal-OS/pull/11) | Validation · Beta · IOV · Evidence Framework | 🚧 Open |
 
 ---
 
 ## Próxima sesión
 
-1. Ejecutar **IOV-001** (Comprehension) con ingeniero independiente  
-2. Preparar **IOV-002** / **IOV-003**  
-3. FOV / EC hacia RC (en paralelo según disponibilidad de campo)  
-4. Sin Etapa 2 producto hasta Certified
+1. Planificar **FOV** EatClean (FOR · FVR) cuando el campo se reactive  
+2. Preparar medición para **EC** (cuatro preguntas)  
+3. Ejecutar **IOV-001** si hay evaluador independiente  
+4. No abrir Etapa 2 sin G-01
 
 | Índice | Ruta |
 |--------|------|
+| Evidence Framework | [20](../20-evidence-framework/README.md) |
+| Gate G-01 | [05](../20-evidence-framework/05-gate-g01-operational-readiness.md) |
+| ECL | [02](../20-evidence-framework/02-evidence-confidence-levels.md) |
+| FOPEBA | [00](../18-operational-validation/00-operational-product-engineering.md) |
 | IOV | [19](../19-independent-operational-validation/README.md) |
-| Pirámide | [00](../19-independent-operational-validation/00-knowledge-validation-pyramid.md) |
-| OPE | [00](../18-operational-validation/00-operational-product-engineering.md) |
-| Certification | [07](../18-operational-validation/07-certification.md) |

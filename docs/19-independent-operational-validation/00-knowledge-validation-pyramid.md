@@ -31,10 +31,12 @@ OPE introduce un concepto distinto: validar el **conocimiento operacional** en c
 | **Foundation** | Construye el lenguaje de trabajo |
 | **Discovery & Checks** | Construyen el conocimiento de la operación |
 | **Operational Model** | Lo formaliza |
-| **Operational Validation** | Demuestra que **explica** la realidad |
-| **Comprehension Validation** | Demuestra que **otros lo entienden** |
-| **Adversarial Validation** | Demuestra que **resiste ataques** |
-| **Independent Implementation** | Demuestra que se **traduce de forma consistente** a soluciones técnicas |
+| **Operational Validation** | Demuestra que **explica** la realidad (mesa) |
+| **Comprehension / Adversarial / Independent Implementation** | Demuestra transferibilidad (IOV) |
+| **FOV + EC** *(Evidence Framework)* | Demuestra correspondencia con el campo e **impacto económico** (ECL-4/5) |
+
+Gate formal a producto: [G-01](../20-evidence-framework/05-gate-g01-operational-readiness.md).
+
 
 ---
 

@@ -26,7 +26,8 @@ Eso **no** demuestra que:
 - resista ataques de quien **no** lo construyó;
 - dos equipos lo **traduzcan** a la misma arquitectura técnica.
 
-IOV es, en OPE, la **última gran prueba** antes de declarar la Etapa 1 (conocimiento) realmente madura — camino a [Certification](../18-operational-validation/07-certification.md).
+IOV es, en FOPEBA, la prueba de **transferibilidad** del conocimiento.  
+Junto con [FOV](../20-evidence-framework/03-field-operational-validation.md) y [EC](../20-evidence-framework/04-economic-confirmation.md), alimenta el [Gate G-01](../20-evidence-framework/05-gate-g01-operational-readiness.md) antes de Etapa 2.
 
 ---
 
@@ -57,7 +58,7 @@ Son evidencia de transferibilidad, resistencia o consistencia de interpretación
 
 ---
 
-## Secuencia OPE ampliada
+## Secuencia FOPEBA (IOV en contexto)
 
 ```text
 Blueprint
@@ -74,15 +75,16 @@ Joint Gap Analysis
     ↓
 Independent Operational Validation   ← esta fase
     ↓
-Certification
+FOV
+    ↓
+EC (Economic Confirmation)
+    ↓
+Gate G-01
     ↓
 Implementation
 ```
 
-La implementación **no** empieza inmediatamente después de validar el modelo en mesa.  
-Empieza después de demostrar que el conocimiento también es transferible, atacable e interpretable.
-
-Detalle: [00 Operational Product Engineering](../18-operational-validation/00-operational-product-engineering.md) · [Knowledge Validation Pyramid](./00-knowledge-validation-pyramid.md).
+Detalle: [FOPEBA](../18-operational-validation/00-operational-product-engineering.md) · [Evidence Framework](../20-evidence-framework/README.md) · [Pirámide](./00-knowledge-validation-pyramid.md).
 
 ---
 

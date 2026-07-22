@@ -1,54 +1,64 @@
-# 04 · Field Observation
+# 04 · Field Observation (entrada FASE 5)
 
 EatClean y otras Organizaciones — **bajo lente de validación**.
 
+> **Fase FOPEBA elevada:** [FOV — Field Operational Validation](../../20-evidence-framework/03-field-operational-validation.md)  
+> Artefactos canónicos: **FOR** · **Field Validation Report** (no VR de mesa por defecto).
+
+Esta carpeta conserva la plantilla operativa de campo alineada a FASE 5; el marco de fase obligatoria vive en Evidence Framework.
+
 ## Diferencia con Operational Discovery
 
-| | Discovery (16) | Validation (18) |
-|---|----------------|-----------------|
-| Pregunta | ¿Qué aprendimos para evolucionar? | ¿El modelo explica lo observado? |
-| Salida | Findings · Patterns · Candidates | Validation Reports |
+| | Discovery (16) | FOV (20) / Validation campo |
+|---|----------------|------------------------------|
+| Pregunta | ¿Qué aprendimos para evolucionar? | ¿La realidad produce el mismo modelo? |
+| Salida | Findings · Patterns · Candidates | FOR · Field Validation Report |
 | Mezcla con diseño | No (solo evidencia) | No (solo coherencia del modelo) |
 
 > No vamos a descubrir procesos nuevos para inventar features.  
-> Vamos a **validar** que el modelo describe correctamente lo que ya ocurre.
+> Vamos a **validar** que el modelo describe correctamente lo que ya ocurre.  
+> **No llevar el modelo al negocio** para forzar vocabulario — observar y mapear.
 
-Activación: cuando el equipo decida retomar campo **en modo validación**.  
-Checklist histórico Discovery: [FIRST_OBSERVATION_DAY.md](../16-operational-discovery/FIRST_OBSERVATION_DAY.md) — usar como apoyo, no como sustituto de esta plantilla.
+Activación: cuando el equipo decida retomar campo **en modo FOV**.  
+Checklist histórico Discovery: [FIRST_OBSERVATION_DAY.md](../../16-operational-discovery/FIRST_OBSERVATION_DAY.md) — apoyo, no sustituto.
 
 ---
 
-## Plantilla · Observación de campo (FOV-xxx)
+## Plantilla · FOR-xxx (preferida)
+
+Preferir **FOR** según [03 FOV](../../20-evidence-framework/03-field-operational-validation.md).
 
 ```markdown
-# FOV-xxx — [Momento observado]
+# FOR-xxx — [Momento observado]
 
 **Fecha / Organización:** …  
-**Validation Report:** VR-xxx  
+**Field Validation Report:** FVR-…  
 **Origen Discovery (si aplica):** OF-xxx
 
-## Hecho observado (sin opinión)
+## Realidad (sin opinión)
 
 [Qué ocurrió, en lenguaje de cocina]
 
-## Cadena de comprobación
+## Cadena
+
+Realidad → Evento → Objeto → Lifecycle → Checks → Invariants
 
 | Pregunta | Respuesta |
 |----------|-----------|
 | ¿Existe ya en el modelo? | Sí / Parcial / No |
 | Core Objects | … |
-| Dependencies recorridas | … |
-| Lifecycle que cambia | … |
-| Checks que intervienen | … |
-| Invariants que protegen | INV-… |
+| Dependencies | … |
+| Lifecycle | … |
+| Checks | … |
+| Invariants | INV-… |
 
-## Pregunta de refutación
+## Dictamen
 
-¿Este hecho real demuestra que el modelo es insuficiente o incorrecto?
+Confirmed · Extended · Clarified · Contradicted
 
-## Dictamen preliminar
+## ECL preliminar
 
-⏳ Pendiente → escalar a VR-xxx
+ECL-2 → ECL-4 al cerrar en FVR
 ```
 
 ---
@@ -57,8 +67,9 @@ Checklist histórico Discovery: [FIRST_OBSERVATION_DAY.md](../16-operational-dis
 
 1. Registrar en **lenguaje de cocina**; mapear después a canónico.  
 2. No proponer pantallas ni APIs en el acto.  
-3. Si «no existe en el modelo» → VR con dictamen 🔁 o 🚨, no parche verbal.  
-4. Findings de Discovery pueden **alimentar** un FOV, pero el dictamen vive aquí.
+3. Si «no existe en el modelo» → Extended/Contradicted → seguimiento VR/MC si estructural.  
+4. Findings de Discovery pueden **alimentar** un FOR; el dictamen vive en FOV.  
+5. No intervenir en la operación observada.
 
 ---
 
@@ -72,5 +83,6 @@ Checklist histórico Discovery: [FIRST_OBSERVATION_DAY.md](../16-operational-dis
 
 ## Relacionado
 
-- [16 Operational Discovery](../16-operational-discovery/README.md)  
+- [20 FOV](../../20-evidence-framework/03-field-operational-validation.md)  
+- [16 Operational Discovery](../../16-operational-discovery/README.md)  
 - [05 validation-reports](../05-validation-reports/README.md)

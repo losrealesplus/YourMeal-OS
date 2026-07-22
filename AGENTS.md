@@ -94,15 +94,14 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-Etapa 1 — Conocimiento · Beta · IOV definido  🟢/⏳
-Etapa 2 — Producto                            ⏳ (gate Certified tras IOV)
+Etapa 1 — FOPEBA · Beta · Evidence Framework  🟢/⏳
+Etapa 2 — Producto                            🔒 Gate G-01
 ```
 
-**YourMeal OS** = experimento OPE.  
-**Beta** alcanzada (VS + Dynamics + tren MC).  
-**Siguiente:** [Independent Operational Validation](./docs/19-independent-operational-validation/README.md) (Comprehension · Adversarial · Independent Implementation) → Certification.
+**YourMeal OS** = experimento FOPEBA.  
+**Beta** (mesa) ✅ · **Siguiente:** FOV · EC (Economic Confirmation) · IOV → **Gate G-01**.
 
-Índices: [Estado](./docs/00-status/README.md) · [IOV](./docs/19-independent-operational-validation/README.md) · [Pirámide](./docs/19-independent-operational-validation/00-knowledge-validation-pyramid.md) · [OPE](./docs/18-operational-validation/00-operational-product-engineering.md)
+Índices: [Estado](./docs/00-status/README.md) · [Evidence Framework](./docs/20-evidence-framework/README.md) · [G-01](./docs/20-evidence-framework/05-gate-g01-operational-readiness.md) · [FOPEBA](./docs/18-operational-validation/00-operational-product-engineering.md)
 
 ### Principio de valor (Capabilities)
 

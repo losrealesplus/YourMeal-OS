@@ -1,6 +1,7 @@
 # Operational Validation — FASE 5
 
-**Marco completo:** [00 · Operational Product Engineering (OPE)](./00-operational-product-engineering.md) — **proceso de adquisición de conocimiento**
+**Marco completo:** [FOPEBA](./00-operational-product-engineering.md) — generación y validación progresiva de conocimiento  
+**Evidence:** [20 Evidence Framework](../20-evidence-framework/README.md) (FOV · EC · ECL · G-01)
 
 **No es:** Discovery · diseño de producto · implementación · pantallas · APIs · ampliación del modelo por intuición  
 **Sí es:** el intento sistemático de **romper** el [Operational Model](../17-operational-model/README.md) antes de convertirlo en software permanente
@@ -184,7 +185,10 @@ Sin certificación, el modelo sigue siendo **hipótesis endurecida**, no base pe
 
 ## Siguiente fase (Etapa 1)
 
-[Independent Operational Validation](../19-independent-operational-validation/README.md) — ¿el conocimiento es transferible, atacable e interpretable?
+1. [Evidence Framework](../20-evidence-framework/README.md) — FOV · Economic Confirmation · Gate G-01  
+2. [IOV](../19-independent-operational-validation/README.md) — transferibilidad  
+
+No abrir Etapa 2 sin G-01.
 
 ---
 

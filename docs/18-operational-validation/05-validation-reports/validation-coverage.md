@@ -23,7 +23,7 @@ Lifecycles enriquecidos con Dynamics (Amend · Pause · Hold · Lot · Location 
 0 contradicciones estructurales de Core. Modelo **generalizable** en mesa.
 
 **Gate alcanzado:** **Beta** — ver [07 certification](../07-certification.md).  
-**Siguiente Etapa 1:** [IOV](../../19-independent-operational-validation/README.md) · FOV/EC → RC · Certified.
+**Siguiente Etapa 1:** [Evidence Framework](../../20-evidence-framework/README.md) (FOV · EC · G-01) · [IOV](../../19-independent-operational-validation/README.md).
 
 ---
 
