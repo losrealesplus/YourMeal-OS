@@ -127,13 +127,12 @@ Plantilla: [07-certification](../18-operational-validation/07-certification.md).
 
 ## Próxima sesión
 
-1. **VS-004** — error humano y recuperación (reescribir escenario)  
-2. **No** aplicar MC-001…003 a `17` hasta VS-006 + análisis conjunto  
-3. Firmar retrospectiva metodológica cuando cierre la batería  
+1. **VS-005** — escalabilidad extrema (reescribir)  
+2. **VS-006** — generalización del dominio  
+3. **No** aplicar MC a `17` hasta análisis conjunto  
 4. Sin Etapa 2 hasta Certified v1.0
 
 | Índice | Ruta |
 |--------|------|
-| VR-003 | [VR-003](../18-operational-validation/05-validation-reports/VR-003-seguridad-alimentaria-retiro.md) |
-| Roadmap dimensiones | [02 scenarios](../18-operational-validation/02-validation-scenarios/README.md) |
-| Principios 15–16 | [01](../18-operational-validation/01-validation-principles.md) |
+| VR-004 | [VR-004](../18-operational-validation/05-validation-reports/VR-004-error-humano-etiquetas.md) |
+| Roadmap | [02 scenarios](../18-operational-validation/02-validation-scenarios/README.md) |
