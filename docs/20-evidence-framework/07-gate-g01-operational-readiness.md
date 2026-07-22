@@ -2,8 +2,16 @@
 
 Parte del [Evidence Framework](./README.md).
 
-**No es una reunión.**  
-Es una **certificación** con criterios objetivos.
+**No es una reunión ni un checklist suelto.**  
+Es un **proceso de certificación** con un paquete de evidencia y tres resultados posibles.
+
+Sistema: [g01/](./g01/README.md)
+
+| Pieza | Rol |
+|-------|-----|
+| [G-01 Package](./g01/01-package.md) | Todo reunido |
+| [Decisión](./g01/02-decision.md) | APPROVED · APPROVED WITH CONDITIONS · REJECTED |
+| [Acta](./g01/03-acta.md) | Plantilla oficial |
 
 ---
 
@@ -12,72 +20,10 @@ Es una **certificación** con criterios objetivos.
 > **G-01 no aprueba código.**  
 > **Aprueba conocimiento suficiente para justificar código.**
 
-Si falta **un** criterio → el Gate **no abre**.  
-**Sin excepciones.**
-
----
-
-## Criterios (todos obligatorios)
-
-| Criterio | Estado requerido |
-|----------|------------------|
-| Operational Validation | ✅ |
-| IOV-001 | ✅ |
-| IOV-002 | ✅ |
-| IOV-003 | ✅ |
-| **Operational Model RC** | ✅ |
-| Findings críticos cerrados | ✅ |
-| FOV completado (FO clasificadas) | ✅ |
-| Field Evidence Review cerrado | ✅ |
-| Knowledge Update aplicado (o «sin KU» documentado tras FER) | ✅ |
-| Economic Confirmation positiva (ROI operacional) | ✅ |
-| Riesgos abiertos críticos | **0** |
-
 ```text
-Gate G-01
-APPROVED
 Operational Knowledge Certified
-Stage 2 Authorized
-```
-
-Solo con checklist completo. **Sin excepciones.**
-
----
-
-## Qué desbloquea / qué no
-
-**Desbloquea:** UX · Capabilities · código de espina · roadmap por evidencia.
-
-**No desbloquea:** reinventar dominio · saltarse VR→MC · waivers de criterios G-01 · “aprobar” un stack.
-
----
-
-## Acta
-
-```markdown
-# Gate G-01 — Operational Readiness (certificación)
-
-**Resultado:** PASS · FAIL
-**Excepciones:** ninguna admitida
-
-| Criterio | ✅/❌ | Evidencia |
-|----------|------|-----------|
-| Operational Validation | | |
-| IOV-001 | | IVR-… |
-| IOV-002 | | IVR-… |
-| IOV-003 | | IVR-… |
-| Operational Model RC | | acta / tag |
-| Findings críticos cerrados | | |
-| FOV | | FO-… |
-| FER | | FER-… |
-| Knowledge Update | | KUR-… / «sin KU» |
-| Economic Confirmation positiva | | ECR-… |
-| Riesgos críticos abiertos = 0 | | |
-
-## Declaración
-
-Este gate no aprueba código.
-Certifica conocimiento suficiente para justificar Etapa 2.
+        ↓
+Stage 2 — Product Engineering
 ```
 
 ---
@@ -86,12 +32,13 @@ Certifica conocimiento suficiente para justificar Etapa 2.
 
 | Elemento | Estado |
 |----------|--------|
-| G-01 | 🔒 FAIL (FOV/FER/EC pendientes; RC ✅) |
+| Proceso G-01 | 🟢 Diseñado e implementado (docs) |
+| Package completo | 🔒 Falta FOV ejecución · KU · EC |
 | Etapa 2 | 🔒 |
 
 ---
 
 ## Relacionado
 
-- [06 Campaign Order](../../19-independent-operational-validation/06-campaign-order.md)  
+- [ku/](./ku/README.md) · [ec/](./ec/README.md) · [fov/](./fov/README.md)  
 - [Estado](../00-status/README.md)

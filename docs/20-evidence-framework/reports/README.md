@@ -2,16 +2,16 @@
 
 | Tipo | Prefijo | Fase |
 |------|---------|------|
-| Field Observation | FO-xxx (FO-V/E/C/U) | FOV |
-| Field Evidence Review | FER-xxx | FOV → filtro KU |
-| Field Observation Report | FOR-xxx | legado (preferir FO) |
-| Field Validation Report | FVR-yyy | legado (preferir FER) |
-| Knowledge Update Record | KUR-xxx | Knowledge Update |
+| Field Observation | FO-xxx | FOV |
+| Field Evidence Review | FER-xxx | FOV |
+| Knowledge Candidate | KC-xxx | KU |
+| Knowledge Update Report | KUR-xxx / KUR-null | KU |
 | Economic Confirmation Record | ECR-xxx | EC |
 | Economic Confirmation Report | (campaña) | EC |
-| Gate G-01 Acta | G01-yyy | Gate |
+| Open Risks | OR-xxx | G-01 Package |
+| Gate G-01 Acta | G01-yyy | G-01 |
 
-Índices vivos de FO / FER: [fov/](../fov/README.md).
+Índices: [fov/](../fov/README.md) · [ku/](../ku/README.md) · [ec/](../ec/README.md) · [g01/](../g01/README.md).
 
 ---
 
@@ -19,14 +19,13 @@
 
 | ID | Título | Tipo | Estado |
 |----|--------|------|--------|
-| — | *(vacío hasta ejecución FOV)* | | |
+| — | *(vacío hasta ejecución FOV→G-01)* | | |
 
 ---
 
 ## Relacionado
 
 - [04 FOV](../04-field-operational-validation.md)  
-- [fov/](../fov/README.md)  
-- [05 Knowledge Update](../05-knowledge-update.md)  
+- [05 KU](../05-knowledge-update.md)  
 - [06 EC](../06-economic-confirmation.md)  
 - [07 G-01](../07-gate-g01-operational-readiness.md)

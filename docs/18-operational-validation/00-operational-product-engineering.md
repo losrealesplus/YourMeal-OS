@@ -3,8 +3,10 @@
 **Antes:** metodología para diseñar productos operacionales / OPE.  
 **Ahora:** proceso que **reduce incertidumbre de forma medible**.
 
-El verdadero activo no son los documentos ni siquiera el modelo solo.  
-Es la **cadena de evidencia**: observación → validación → nivel de confianza → estado del conocimiento → (solo entonces) software.
+> **FOPEBA no es un framework para desarrollar software.**  
+> Es un framework para **descubrir, certificar y gobernar conocimiento operacional**, y solo después utilizar ese conocimiento para desarrollar software.
+
+El verdadero activo es la **cadena de evidencia**: observación → validación → nivel de confianza → estado del conocimiento → (solo entonces) software.
 
 YourMeal OS es el **instrumento** (experimento controlado) con el que se demuestra que FOPEBA funciona — no el centro del framework.
 
@@ -13,12 +15,34 @@ YourMeal OS es el **instrumento** (experimento controlado) con el que se demuest
 
 ---
 
+## Tres grandes etapas
+
+```text
+FASE A — Knowledge Discovery
+Foundation · Blueprint · Discovery · Checks
+        ↓
+FASE B — Knowledge Certification
+Operational Model · Operational Validation · IOV
+FOV · Knowledge Update · Economic Confirmation · Gate G-01
+        ↓
+FASE C — Product Engineering
+Architecture · Implementation · Verification · Release
+```
+
+| Fase | Estado YourMeal OS |
+|------|-------------------|
+| **A** Knowledge Discovery | ✅ |
+| **B** Knowledge Certification | 🚧 RC + IOV ✅ · FOV ejecución ⏳ · KU/EC/G-01 sistemas 🟢 |
+| **C** Product Engineering | 🔒 hasta G-01 APPROVED (o WITH CONDITIONS acotado) |
+
+---
+
 ## Dos promesas
 
 | Promesa | Estado |
 |---------|--------|
 | *Si diseñamos primero el conocimiento operacional, podemos construir un modelo estable.* | ✅ Laboratorio → **RC Knowledge Certified** |
-| *Este proceso produce mejores productos.* | ⏳ Requiere FOV (empírica) + FER + KU + EC + G-01 |
+| *Este proceso produce mejores productos.* | ⏳ Requiere FOV ejecución + KU + EC + G-01 |
 
 Documento madre de evidencia: [20 · Evidence Framework](../20-evidence-framework/README.md).
 
@@ -132,16 +156,15 @@ FOUNDATION → BLUEPRINT → DISCOVERY → CHECKS → MODEL
 ```text
 08 · Evidence Framework
 │
-├── Knowledge States
-├── Evidence Confidence Levels (ECL) — transversal
-├── Stability Index (S0…S3)
-├── Field Operational Validation (FOV) + fov/ (FO · FER)
-├── Knowledge Update
-├── Economic Confirmation (EC)
-└── Gate G-01 · Operational Readiness
+├── Knowledge States · ECL · Stability
+├── FOV + fov/
+├── Knowledge Update + ku/     (KU-01 Policy · KU-02 Workflow · KU-03 KUR)
+├── Economic Confirmation + ec/ (Framework · OVI · ECR)
+└── Gate G-01 + g01/           (Package · Decision · Acta)
 ```
 
-→ [docs/20-evidence-framework](../20-evidence-framework/README.md) · campaña [fov/](../20-evidence-framework/fov/README.md)
+→ [docs/20-evidence-framework](../20-evidence-framework/README.md)  
+→ [ku/](../20-evidence-framework/ku/README.md) · [ec/](../20-evidence-framework/ec/README.md) · [g01/](../20-evidence-framework/g01/README.md) · [fov/](../20-evidence-framework/fov/README.md)
 
 Dual track (antesala): [DUAL_TRACK_ANTECAMARA](../00-status/DUAL_TRACK_ANTECAMARA.md)
 
@@ -227,9 +250,9 @@ Apertura Etapa 2: **[Gate G-01](../20-evidence-framework/07-gate-g01-operational
 
 ## Activo reutilizable
 
-**FOPEBA** — framework para convertir observaciones operacionales en conocimiento operacional verificable antes de convertirlo en software.
+**FOPEBA** — descubrir · certificar · gobernar conocimiento operacional — luego Product Engineering.
 
-El diferenciador emergente de Etapa 1: la **trazabilidad de la cadena de evidencia** (no solo el modelo).
+El diferenciador de Etapa 1 / FASE B: la **trazabilidad de la cadena de evidencia**.
 
 Aplicable a logística, clínicas, talleres, hoteles… **sin cambiar la estructura de fases**.
 

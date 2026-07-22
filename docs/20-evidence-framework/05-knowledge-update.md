@@ -1,105 +1,57 @@
-# 05 · Knowledge Update
+# 05 · Knowledge Update (KU)
 
 Parte del [Evidence Framework](./README.md).
 
-Paso **explícito** **después** del [Field Evidence Review](./fov/04-field-evidence-review.md) y **antes** de Economic Confirmation.
+> **¿Cómo cambia el conocimiento certificado cuando aparece nueva evidencia?**
 
-> El conocimiento debe **consolidarse** antes de medir el valor económico.
+No es una fase para editar documentación «porque sí».  
+Es la fase que **gobierna** el conocimiento.
 
-Sin FER → KU, EC arriesga priorizar Capabilities sobre un modelo tensionado por anécdotas de campo.
+Sistema completo: [ku/](./ku/README.md)
 
-**No diseñar KU en detalle hasta tener FO + FER.**  
-Este documento fija el umbral; la campaña activa ahora es [FOV](./fov/README.md).
+| ID | Artefacto | Rol |
+|----|-----------|-----|
+| **KU-01** | [Policy](./ku/01-policy.md) | Qué puede / no puede actualizar · quién autoriza · evidencia mínima |
+| **KU-02** | [Workflow](./ku/02-workflow.md) | FO → FER → Candidate → Impact → MC? |
+| **KU-03** | [KUR](./ku/03-kur.md) | Informe de cada actualización |
 
 ---
 
-## Posición en el flujo
+## Posición
 
 ```text
 FOV (FO-V/E/C/U)
     ↓
 Field Evidence Review (FER)
     ↓
-Knowledge Update    ← este paso (solo si FER autoriza)
+Knowledge Update    ← gobernanza
     ↓
 EC
     ↓
 G-01
 ```
 
----
-
-## Procedimiento de certificación (6 preguntas)
-
-Cada candidato que el FER envió a KU, antes de tocar el modelo:
-
-1. ¿Qué **observamos**?  
-2. ¿Qué **evidencia** existe (FO / repetición)?  
-3. ¿Qué **Knowledge State** cambia?  
-4. ¿Qué **ECL** obtiene?  
-5. ¿Qué **Stability** tiene / tendrá?  
-6. ¿Necesita **MC**?
-
-Más las [cuatro preguntas](#norma-no-toda-observación-modifica-el-conocimiento) de umbral.
-
-Solo entonces se modifica el conocimiento.
+Tras FER «sin candidatos a KU», se publica un **KUR-null** (sin cambios) para dejar constancia y desbloquear EC.
 
 ---
 
-## Norma — no toda observación modifica el conocimiento
+## Resultado
 
-Antes de MC / edición de `17`:
-
-1. ¿Es **repetible** (o materialmente crítica)?  
-2. ¿Qué **ECL** alcanza?  
-3. ¿**Contradice** o solo **amplía**?  
-4. ¿Justifica un **Model Change** (vs nota docs / Capability)?
-
-FO-V → no KU.  
-FO-U → no KU.  
-FO-E / FO-C → solo tras FER.
+El conocimiento deja de cambiar porque sí.  
+Cambia mediante un **procedimiento**.
 
 ---
 
-## Artefacto · KUR-xxx
+## Estado (YourMeal OS)
 
-```markdown
-# KUR-xxx — Knowledge Update post-FER
-
-**Período / Org:** …  
-**FER:** FER-…  
-**FO de origen:** FO-…  
-**Fecha:** …
-
-## Cambios al modelo
-
-| ID | Tipo | Resumen | MC |
-|----|------|---------|-----|
-| … | FO-E / FO-C → Extended / Clarified / Contradicted / ninguno | … | MC-… / — |
-
-## ECL / Stability tocados
-
-| Elemento | ECL antes → después | S antes → después |
-|----------|---------------------|-------------------|
-| … | 3 → 4 | S2 → S1 (si MC) |
-
-## Listo para EC
-
-- [ ] Sin FO-C estructural abierto sin decisión
-- [ ] Capabilities candidatas ancladas al modelo actualizado
-- [ ] Scorecard ECL revisado
-```
-
----
-
-## Regla
-
-**EC no arranca** mientras exista FO-C estructural abierto sin decisión FER/KUR, o FO-E material sin aplicar / rechazar / aparcar con fecha.
+| Elemento | Estado |
+|----------|--------|
+| Sistema KU (01–03) | 🟢 Diseñado e implementado (docs) |
+| Ejecución | 🔒 Tras FOV + FER |
 
 ---
 
 ## Relacionado
 
-- [04 FOV](./04-field-operational-validation.md) · [fov/](./fov/README.md)  
-- [FER](./fov/04-field-evidence-review.md)  
+- [fov/](./fov/README.md) · [FER](./fov/04-field-evidence-review.md)  
 - [06 EC](./06-economic-confirmation.md)

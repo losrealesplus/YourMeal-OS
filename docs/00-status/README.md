@@ -1,78 +1,66 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-22 · **Operational Model RC (Knowledge Certified)** 🟢  
-**Mentalidad:** Etapa 1 ya no es «modelo en desarrollo» — está **certificado para prueba**  
-**Siguiente familia de evidencia:** empírica (FOV)
+**Última actualización:** 2026-07-22 · **FASE B — Knowledge Certification**  
+**Modelo:** Operational Model RC (Knowledge Certified) 🟢 — *para prueba, no verdad definitiva*  
+**Siguiente ejecución:** FOV EatClean
 
 ```text
-Operational Model Release Candidate
-(Knowledge Certified)
+FASE A Knowledge Discovery     ✅
+FASE B Knowledge Certification 🚧
+FASE C Product Engineering     🔒 G-01
 ```
-
-> Certificado para ser puesto a prueba — no como verdad definitiva.
 
 ---
 
-## Cadena de evidencia (hasta aquí = laboratorio)
+## Cierre metodológico FASE B
+
+| Fase | Estado | ¿Qué queda? |
+|------|--------|-------------|
+| IOV-002 | ✅ Cerrado | Nada |
+| IOV-003 | ✅ Cerrado | Nada |
+| Operational Model RC | ✅ Declarado | Nada |
+| FOV | ✅ Diseñado | **Ejecutarlo en EatClean** |
+| Knowledge Update | ✅ Sistema KU-01…03 | Ejecutar tras FER |
+| Economic Confirmation | ✅ Framework · OVI · ECR | Ejecutar tras KU |
+| Gate G-01 | ✅ Package · Decision · Acta | Ejecutar tras EC |
+
+Trabajo metodológico pendiente de **construcción:** ninguno.  
+Pendiente de **ejecución:** FOV → KU → EC → G-01.
+
+---
+
+## Cadena de evidencia
 
 ```text
 Observations → Discovery → Checks → Model
-  → Operational Validation
-  → IOV-001 (Transferability)
-  → IOV-002 (Structural Resistance)
-  → IOV-003 (Determinism)
-  → Operational Model RC (Knowledge Certified)
-        ↓
-  FOV (evidencia empírica) ⏳
+  → Validation → IOV-001/002/003 → RC
+  → FOV ⏳ → FER → KU → EC → G-01 → FASE C
 ```
 
 ---
 
-## Campaña de certificación
+## Sistemas (docs)
 
-| Fase | Estado | Confianza |
-|------|--------|----------:|
-| Operational Validation | ✅ | Muy alto |
-| IOV-001 | ✅ | Alto |
-| IOV-002 | ✅ | Muy alto |
-| IOV-003 | ✅ | Alto |
-| **Operational Model RC** | ✅ | Knowledge Certified |
-| **FOV** (campaña observacional) | ⏳ protocolo 🟢 | — |
-| Field Evidence Review | 🔒 tras FO | — |
-| Knowledge Update | 🔒 tras FER | — |
-| Economic Confirmation | ⏳ | — |
-| Gate G-01 | 🔒 | — |
-
-Acta: [02](./02-operational-model-rc.md) · Límites: [03](./03-known-limitations-rc.md) · FOV: [fov/](../20-evidence-framework/fov/README.md)
-
----
-
-## Lectura IOV (afirmaciones distintas)
-
-| Nivel | Afirmación | Evidencia |
-|-------|------------|-----------|
-| **IOV-001** | Transferible | IVR-001 |
-| **IOV-002** | Estructuralmente resistente | IVR-002 |
-| **IOV-003** | Interpretable / determinista | IVR-003 · IF-A only |
+| Sistema | Ruta |
+|---------|------|
+| FOV | [fov/](../20-evidence-framework/fov/README.md) |
+| KU | [ku/](../20-evidence-framework/ku/README.md) |
+| EC | [ec/](../20-evidence-framework/ec/README.md) |
+| G-01 | [g01/](../20-evidence-framework/g01/README.md) |
+| RC / Limitations | [02](./02-operational-model-rc.md) · [03](./03-known-limitations-rc.md) |
+| FOPEBA A/B/C | [00](../18-operational-validation/00-operational-product-engineering.md) |
 
 ---
 
 ## Carril B
 
-UX / DS / arch / infra **sin** engines de espina — sigue permitido.
+UX / DS / arch / infra **sin** engines de espina — permitido hasta G-01.
 
 ---
 
-## Próximo
+## Próximo (ejecución)
 
-1. Ejecutar **FOV** EatClean — pregunta: *¿qué hace la operación cuando nadie le pide seguir el modelo?*  
-2. Clasificar **FO-V / FO-E / FO-C / FO-U**  
-3. **FER** (4 preguntas) → solo entonces KU  
-4. EC → **Gate G-01**
-
-| Índice | Ruta |
-|--------|------|
-| RC | [02](./02-operational-model-rc.md) |
-| Known Limitations | [03](./03-known-limitations-rc.md) |
-| Protocolo FOV | [fov/](../20-evidence-framework/fov/README.md) |
-| Certificación | [01](./01-certification-campaign.md) |
+1. **FOV** EatClean — FO-V/E/C/U  
+2. **FER** → **KU** (KUR o KUR-null)  
+3. **EC** (OVI → ECR)  
+4. **G-01** Package → APPROVED / WITH CONDITIONS / REJECTED  

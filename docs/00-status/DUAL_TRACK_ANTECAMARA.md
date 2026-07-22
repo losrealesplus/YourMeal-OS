@@ -29,11 +29,12 @@ Eso ya no es intuición. Es evidencia.
 
 ```text
 IOV-001…003 ✅ → Operational Model RC ✅
-    → FOV (FO) → FER → Knowledge Update → Economic Confirmation → Gate G-01
+    → FOV (ejecutar) → FER → KU → EC → Gate G-01 → FASE C
 ```
 
-Campaña: [01-certification-campaign](./01-certification-campaign.md) · FOV: [fov/](../20-evidence-framework/fov/README.md).  
-Orden fijo. Mentalidad: RC **para prueba**; FOV intenta refutar, no celebrar.
+Sistemas: [fov/](../20-evidence-framework/fov/README.md) · [ku/](../20-evidence-framework/ku/README.md) · [ec/](../20-evidence-framework/ec/README.md) · [g01/](../20-evidence-framework/g01/README.md).  
+Campaña: [01-certification-campaign](./01-certification-campaign.md).  
+RC **para prueba**; FOV intenta refutar, no celebrar.
 
 ---
 
