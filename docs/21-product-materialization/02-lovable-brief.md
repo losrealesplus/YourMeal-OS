@@ -30,15 +30,24 @@ inventar brand system paralelo al Design System del repo cuando exista.
 
 ---
 
-## Qué pedir en la primera pasada (Sprint 2.1)
+## Qué pedir ahora
 
-1. Arquitectura de navegación por actor  
-2. Flujos Happy Path  
-3. Pantallas base (lista de la [matriz](./01-screen-knowledge-matrix.md))  
-4. Design System inicial (tokens + componentes reutilizables)  
-5. Sync al repositorio  
+**Un PM por conversación** — empezando por [PM-001](./PM-001-Customer-App.md).
 
-**No** pedir aún: motores de dominio, reglas Amend/Hold complejas no cableadas, «IA que decide», optimización de rutas.
+No un único prompt enorme de «toda la app».
+
+Infraestructura a reutilizar (ver [Rules](./PRODUCT_MATERIALIZATION_RULES.md)):
+
+```text
+- navegación / shell Customer
+- audit_log
+- feature_flags
+- i18n (6 idiomas)
+
+Utiliza esta infraestructura. No la recrees. No propongas alternativas.
+```
+
+Experiencias completas: vacío · datos · loading · error · offline · a11y.
 
 ---
 
