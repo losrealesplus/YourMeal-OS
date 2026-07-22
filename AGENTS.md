@@ -94,20 +94,16 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-Blueprint ✅ · Checks ✅ · Operational Model ✅ (FASE 4)
-        ↓
-Operational Validation 🚧  ← FASE 5 — intentar romper el modelo
-        ↓
-Operational Model Certified v1.0 ⏳
+Etapa 1 — Construcción del conocimiento  (casi consolidada)
+Etapa 2 — Construcción del producto      (no empezada — gate: Certified v1.0)
 ```
 
-> **FASE 4:** gramática 01–06 endurecida.  
-> **FASE 5:** la validación **no busca confirmar — busca refutar**.  
-> Sin features · sin cambios al modelo sin Validation Report · sin UI/código hasta certificación.
+**YourMeal OS** = primer sistema que demuestra si **OPE** funciona (no el centro — el experimento).  
+**Siguiente:** VS-001 → VR-001 → [retrospectiva metodológica](./docs/18-operational-validation/08-methodological-retrospective.md) → VS-002.
 
-**Próxima sesión:** ejecutar VS-001 y edge cases; field observation EatClean en modo validación cuando se active.
+Criterio éxito VS-001: **cada hallazgo → decisión trazable** (no «cero errores»).
 
-Índices: [18 Validation](./docs/18-operational-validation/README.md) · [17 Model](./docs/17-operational-model/README.md) · [Estado](./docs/00-status/README.md)
+Índices: [Estado](./docs/00-status/README.md) · [VS-001](./docs/18-operational-validation/02-validation-scenarios/VS-001-semana-normal.md) · [OPE](./docs/18-operational-validation/00-operational-product-engineering.md)
 
 ### Principio de valor (Capabilities)
 
