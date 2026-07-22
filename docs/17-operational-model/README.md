@@ -16,6 +16,26 @@ No es un cuarto pilar. Es el **equivalente, para producto, de lo que el Domain M
 
 ---
 
+## Happy Path B2B (navegación rápida) · IVR-001 / DF-008
+
+Una página para no saltar a ciegas:
+
+```text
+1. Weekly Menu Published          → 04 spine-transitions · Publish
+2. Beneficiary places Order       → 03 spine-flow · Confirm Order (04)
+3. Orders aggregate into Plan     → Finalize / Start Plan (04)
+4. Plan executes as Batch         → Start / Complete Batch (04)
+5. Batch produces Packaging       → Complete Packaging + Label (04 · level-2)
+6. Packaging assigns to Route     → Hand to Route · Ready / Depart (04)
+7. Delivery confirms recipient    → Attempt → Confirm Delivered (04)
+8. Payment settles Order          → Schedule Due · Settle (04) · finance UL
+```
+
+Detalle de estados: [state-index](./04-lifecycles/state-index.md).  
+Gramática: bloques 01–07 abajo.
+
+---
+
 ## Gramática operativa
 
 | Rol | Bloque |

@@ -99,7 +99,7 @@ Etapa 2 — Producto                            🔒 Gate G-01
 ```
 
 **YourMeal OS** = experimento FOPEBA.  
-**Beta** ✅ · **Ahora:** campaña IOV (piloto → 002 → 003 → RC). **FOV después.**
+**Ahora:** IOV-002 (IVR-001 ✅). FOV después de IOV-001…003 + RC.
 
 Índices: [Estado](./docs/00-status/README.md) · [Evidence Framework](./docs/20-evidence-framework/README.md) · [G-01](./docs/20-evidence-framework/07-gate-g01-operational-readiness.md) · [FOPEBA](./docs/18-operational-validation/00-operational-product-engineering.md)
 

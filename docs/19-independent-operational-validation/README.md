@@ -87,9 +87,9 @@ Detalle: [04 Findings](./04-findings/README.md) · [05 Experimental Protocol](./
 | Prerrequisito modelo | ✅ Beta (mesa) |
 | Protocolo experimental | 🟢 Definido |
 | [KCM-001](./kcm/KCM-001-iov001-pilot.md) | 🔒 Congelado `357833e` |
-| Piloto IA / IVR-001 | 🚧 En ejecución |
-| IOV-001 humano | ⏳ Tras piloto |
-| FOV | ⏳ **Después** de campaña IOV completa |
+| Piloto IA / IVR-001 | ✅ Cerrado |
+| IOV-002 | ⏳ Siguiente |
+| FOV | 🔒 Después de campaña IOV |
 
 ---
 

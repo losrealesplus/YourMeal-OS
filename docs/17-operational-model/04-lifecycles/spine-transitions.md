@@ -400,15 +400,55 @@ Mismo Finalize/Start con cardinalidad **1 Order** (urgencia). No Core «Emergenc
 
 ### Transiciones
 
+#### Schedule / Open Amount · *Happy*
+
+`Not due` → `Due`  
+*(cuando la regla de la Organization hace exigible el cobro — p.ej. emisión de Invoice, fecha de factura, cierre de periodo)*
+
+| | |
+|--|--|
+| **Checks** | ¿**Puede exigirse** cobro? → PASS / BLOCKED / MANUAL |
+| **Postcondiciones** | Importe Due · puede Settle o Captured |
+
+#### Mark Pending at Delivery · *Happy*
+
+`Not due` \| `Due` → `Pending at delivery`
+
+| | |
+|--|--|
+| **Precondiciones** | Regla «cobro en ruta / contra entrega» |
+| **Checks** | ¿**Puede cobrarse** en Delivery? → PASS / BLOCKED |
+
+#### Capture Payment · *Happy / Operational*
+
+`Due` \| `Pending at delivery` → `Captured` *(autorización / cobro en curso)*  
+`Captured` → `Settled` *(confirmación)* **o** `Captured` → `Failed`
+
+| | |
+|--|--|
+| **Checks** | ¿**Puede capturarse**? → PASS / BLOCKED / MANUAL |
+
+#### Record Payment Failure · *Exceptional*
+
+`Due` \| `Pending at delivery` \| `Captured` → `Failed`
+
+| | |
+|--|--|
+| **Checks** | ¿**Puede registrarse** fallo de cobro? → PASS / MANUAL |
+| **Postcondiciones** | Order no Closed por Payment · reintento o ajuste Invoice |
+
 #### Settle Payment
 
-`Due` \| `Pending at delivery` → `Settled`
+`Due` \| `Pending at delivery` \| `Captured` → `Settled`
 
 | | |
 |--|--|
 | **Responsable** | Admin / repartidor (cobro en ruta) |
-| **Checks** | ¿**Puede liquidarse**? (¿debo cobrar? · importe · método) |
+| **Checks** | ¿**Puede liquidarse**? (¿debo cobrar? · importe · método) → PASS / BLOCKED / MANUAL |
 | **Postcondiciones** | Payment **settles** Order · Order puede → `Closed` |
+| **Cross-link** | Momento de cobro (anticipo / contra entrega / factura): [finance UL](../01-ubiquitous-language/finance.md) · Invoice Supporting |
+
+> **IVR-001 / DF-002 · DF-006:** máquina Payment y enlace a finance documentados aquí.
 
 ---
 
