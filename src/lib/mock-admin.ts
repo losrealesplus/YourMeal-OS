@@ -98,6 +98,94 @@ export const MOCK_PRODUCTION_TASKS: MockProductionTask[] = [
   { id: "p-05", dish: "Cajas del día",             station: "packing",  qty: 142, progress: 0,   eta: "13:00" },
 ];
 
+// ─── PM-003 Production module ─────────────────────────────────────────
+// Sub-areas: Planning · Batch · Packaging · Labels · Kitchen
+// Scaffold-only data. Business rules will live in ProductionService.
+
+export type MockPlanningRun = {
+  id: string;
+  serviceDateIso: string;   // UTC — day the meals are delivered
+  dish: string;
+  ordered: number;
+  planned: number;
+  station: "cold" | "hot" | "assembly" | "packing";
+  status: "draft" | "scheduled" | "released";
+};
+
+export const MOCK_PLANNING_RUNS: MockPlanningRun[] = [
+  { id: "pl-01", serviceDateIso: "2026-07-23T00:00:00Z", dish: "Bowl de quinoa & aguacate", ordered: 42, planned: 45, station: "cold",     status: "released"  },
+  { id: "pl-02", serviceDateIso: "2026-07-23T00:00:00Z", dish: "Pollo a la plancha",        ordered: 60, planned: 62, station: "hot",      status: "released"  },
+  { id: "pl-03", serviceDateIso: "2026-07-23T00:00:00Z", dish: "Salmón al horno",           ordered: 34, planned: 36, station: "hot",      status: "scheduled" },
+  { id: "pl-04", serviceDateIso: "2026-07-23T00:00:00Z", dish: "Wraps mediterráneos",       ordered: 28, planned: 30, station: "assembly", status: "scheduled" },
+  { id: "pl-05", serviceDateIso: "2026-07-24T00:00:00Z", dish: "Curry de garbanzos",        ordered: 22, planned: 24, station: "hot",      status: "draft"     },
+  { id: "pl-06", serviceDateIso: "2026-07-24T00:00:00Z", dish: "Ensalada césar de kale",    ordered: 18, planned: 20, station: "cold",     status: "draft"     },
+];
+
+export type MockBatch = {
+  id: string;
+  code: string;             // human-readable batch code
+  dish: string;
+  station: "cold" | "hot" | "assembly" | "packing";
+  qty: number;
+  startedIso: string;
+  targetIso: string;
+  progress: number;
+  operator: string;
+};
+
+export const MOCK_BATCHES: MockBatch[] = [
+  { id: "b-01", code: "B-260723-01", dish: "Bowl de quinoa & aguacate", station: "cold",     qty: 45,  startedIso: "2026-07-23T06:00:00Z", targetIso: "2026-07-23T07:40:00Z", progress: 100, operator: "Ana"   },
+  { id: "b-02", code: "B-260723-02", dish: "Pollo a la plancha",        station: "hot",      qty: 62,  startedIso: "2026-07-23T07:00:00Z", targetIso: "2026-07-23T09:15:00Z", progress: 68,  operator: "Marco" },
+  { id: "b-03", code: "B-260723-03", dish: "Salmón al horno",           station: "hot",      qty: 36,  startedIso: "2026-07-23T08:15:00Z", targetIso: "2026-07-23T10:00:00Z", progress: 20,  operator: "Iván"  },
+  { id: "b-04", code: "B-260723-04", dish: "Wraps mediterráneos",       station: "assembly", qty: 30,  startedIso: "2026-07-23T10:00:00Z", targetIso: "2026-07-23T11:30:00Z", progress: 0,   operator: "—"     },
+];
+
+export type MockPackagingLine = {
+  id: string;
+  channel: "delivery" | "pickup" | "corporate";
+  boxesTotal: number;
+  boxesDone: number;
+  eta: string;              // HH:MM local shift
+  status: "queued" | "running" | "done";
+};
+
+export const MOCK_PACKAGING_LINES: MockPackagingLine[] = [
+  { id: "pk-01", channel: "delivery",  boxesTotal: 96, boxesDone: 42, eta: "12:30", status: "running" },
+  { id: "pk-02", channel: "pickup",    boxesTotal: 24, boxesDone: 24, eta: "12:00", status: "done"    },
+  { id: "pk-03", channel: "corporate", boxesTotal: 22, boxesDone: 0,  eta: "13:15", status: "queued"  },
+];
+
+export type MockLabelJob = {
+  id: string;
+  dish: string;
+  qty: number;
+  format: "meal" | "batch" | "logistic";
+  printer: string;
+  status: "ready" | "printing" | "done";
+};
+
+export const MOCK_LABEL_JOBS: MockLabelJob[] = [
+  { id: "lb-01", dish: "Bowl de quinoa & aguacate", qty: 45,  format: "meal",      printer: "Zebra · Assembly", status: "done"     },
+  { id: "lb-02", dish: "Pollo a la plancha",        qty: 62,  format: "meal",      printer: "Zebra · Assembly", status: "printing" },
+  { id: "lb-03", dish: "Cajas Ruta Norte",          qty: 71,  format: "logistic",  printer: "Zebra · Dispatch", status: "ready"    },
+  { id: "lb-04", dish: "Cajas Ruta Sur",            qty: 71,  format: "logistic",  printer: "Zebra · Dispatch", status: "ready"    },
+];
+
+export type MockKitchenStation = {
+  id: "cold" | "hot" | "assembly" | "packing";
+  head: string;
+  load: number;            // 0..100
+  activeBatches: number;
+  nextBatchAt: string;     // HH:MM
+};
+
+export const MOCK_KITCHEN_STATIONS: MockKitchenStation[] = [
+  { id: "cold",     head: "Ana",    load: 62, activeBatches: 2, nextBatchAt: "09:30" },
+  { id: "hot",      head: "Marco",  load: 84, activeBatches: 3, nextBatchAt: "09:15" },
+  { id: "assembly", head: "Lucía",  load: 38, activeBatches: 1, nextBatchAt: "11:00" },
+  { id: "packing",  head: "Diego",  load: 12, activeBatches: 0, nextBatchAt: "12:30" },
+];
+
 // ─── Promotions ───────────────────────────────────────────────────────
 export type MockPromotion = {
   id: string;
