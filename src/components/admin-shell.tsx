@@ -15,6 +15,7 @@ import {
   BarChart3,
   Megaphone,
   Settings,
+  Palette,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,6 +41,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
     { to: "/admin/accounting", label: t("admin:accounting"), icon: Wallet, exact: false },
     { to: "/admin/reports", label: t("admin:reports"), icon: BarChart3, exact: false },
     { to: "/admin/promotions", label: t("admin:promotions"), icon: Megaphone, exact: false },
+    { to: "/admin/design-system", label: t("admin:designSystem", { defaultValue: "Design System" }), icon: Palette, exact: false },
     { to: "/admin/settings", label: t("admin:settings"), icon: Settings, exact: false },
   ] as const;
 
