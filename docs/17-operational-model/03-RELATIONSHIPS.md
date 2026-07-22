@@ -1,6 +1,10 @@
 # 03 — Relationships
 
 **Tipo:** Operational Model · Core Operativo  
+**Estado:** 🚧 v0.1 — **siguiente a endurecer**  
+**Prerrequisito:** [consistency-review](./02-core-objects/consistency-review.md) ✅  
+**Regla:** conectar piezas ya definidas — **no** descubrir conceptos nuevos aquí.
+
 **Pregunta:** ¿Cómo se relacionan los objetos desde el punto de vista operativo?
 
 ---
