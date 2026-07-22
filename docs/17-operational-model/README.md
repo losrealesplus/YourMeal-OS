@@ -41,17 +41,17 @@ Soportes: Dish · Recipe · Ingredient · Stock · Supplier · Vehicle · Kitche
 |---|-----------|--------|
 | 01 | [Ubiquitous Language](./01-ubiquitous-language/README.md) | 🟢 Endurecido |
 | 02 | [Core Objects](./02-core-objects/README.md) | 🟢 Endurecido + revisión de consistencia ✅ |
-| 03 | [Relationships](./03-RELATIONSHIPS.md) | 🚧 v0.1 — **siguiente** (conectar, no descubrir) |
-| 04 | [Lifecycles](./04-LIFECYCLES.md) | 🚧 v0.1 |
+| 03 | [Operational Dependencies](./03-relationships/README.md) | 🟢 Endurecido (verbos · flujo · checks en vínculos) |
+| 04 | [Lifecycles](./04-LIFECYCLES.md) | 🚧 v0.1 — **siguiente** |
 | 05 | [Invariants](./05-INVARIANTS.md) | 🚧 v0.1 |
 | 06 | [Capability Mapping](./06-CAPABILITY_MAPPING.md) | 🚧 v0.1 |
 
 Observation EatClean: ⏸. Sin pantallas / APIs / código.
 
-### Gate 02 → 03
+### Gate 03 → 04
 
-> ¿Se puede contar el ciclo completo solo con Core Objects y lenguaje canónico?  
-> **Sí** — ver [consistency-review.md](./02-core-objects/consistency-review.md).
+> ¿Se puede describir la operación con dependencias nombradas (verbos canónicos)?  
+> **Sí** — ver [spine-flow.md](./03-relationships/spine-flow.md).
 
 ---
 

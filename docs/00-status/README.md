@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-22 · 02 Core Objects 🟢  
+**Última actualización:** 2026-07-22 · 03 Dependencies 🟢  
 **Versión:** `v0.1.0` — FOUNDATION LOCKED  
 
 ## Roadmap (oficial)
@@ -12,7 +12,7 @@
 | OPERATIONAL DISCOVERY | ✅ Estructura cerrada |
 | OPERATIONAL CHECKS | ✅ Cerrado (transversal) |
 | FIRST OBSERVATION DAY | ⏸ Congelado (hasta retomar a propósito) |
-| Operational Model | 🟢 01–02 · 🚧 03–06 |
+| Operational Model | 🟢 01–03 · 🚧 04–06 |
 
 ---
 
@@ -26,8 +26,9 @@ Foundation ✅ → Blueprint ✅ → Checks ✅
         ↓
 Operational Model 🚧
    01 Ubiquitous Language 🟢
-   02 Core Objects 🟢 (+ consistencia ✅)
-   03–06 siguientes
+   02 Core Objects 🟢
+   03 Operational Dependencies 🟢
+   04–06 siguientes
         ↓
 Observation EatClean ⏸
 ```
@@ -50,7 +51,7 @@ Observation EatClean ⏸
 | **PRODUCT BLUEPRINT** | ¿Qué / por qué? | ✅ |
 | **OPERATIONAL DISCOVERY** | ¿Por qué evolucionar? | ✅ carpeta · ⏸ campo |
 | **Operational Checks** | ¿Cómo guía la operación? | ✅ transversal |
-| **Operational Model** | ¿Con qué lenguaje? | 🚧 01–02🟢 · 03–06 |
+| **Operational Model** | ¿Con qué lenguaje? | 🚧 01–03🟢 · 04–06 |
 
 ```text
 Producto:  Discovery → Check → Assistant → Capability
@@ -75,13 +76,12 @@ Contrato semántico: *misma palabra ≠ cosas distintas; misma realidad ≠ dos 
 
 ## Próxima sesión / siguiente paso
 
-1. Endurecer **03 · Relationships** (conectar piezas ya definidas — no descubrir objetos)  
-2. Luego 04 → 06  
+1. Endurecer **04 · Lifecycles** (estados ya implícitos en el flujo)  
+2. Luego 05 → 06  
 3. Observation ⏸ · sin código / pantallas
 
 | Índice | Ruta |
 |--------|------|
+| Dependencies | [03-relationships/](../17-operational-model/03-relationships/README.md) |
 | Core Objects | [02-core-objects/](../17-operational-model/02-core-objects/README.md) |
-| Ubiquitous Language | [01-ubiquitous-language/](../17-operational-model/01-ubiquitous-language/README.md) |
-| Consistency review | [consistency-review.md](../17-operational-model/02-core-objects/consistency-review.md) |
 | Operational Model | [docs/17-operational-model/](../17-operational-model/README.md) |

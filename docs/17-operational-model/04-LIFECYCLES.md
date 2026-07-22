@@ -1,7 +1,10 @@
 # 04 — Lifecycles
 
 **Tipo:** Operational Model · Core Operativo  
-**Pregunta:** ¿Qué estados atraviesa cada objeto en la vida real de la cocina?
+**Estado:** 🚧 v0.1 — **siguiente a endurecer**  
+**Prerrequisito:** [03 Operational Dependencies](../03-relationships/spine-flow.md) ✅  
+
+**Pregunta:** ¿Qué estados atraviesa cada objeto en el flujo operativo?
 
 Hipótesis v0.1. Las máquinas de estado técnicas viven en [STATE_MACHINES.md](../12-domain-model/STATE_MACHINES.md) cuando se implementen. Aquí: **ciclo operativo**.
 

@@ -99,18 +99,13 @@ Blueprint ✅ · Checks ✅ · Discovery (campo) ⏸
 Operational Model (Core Operativo) 🚧  ← siguiente trabajo
 ```
 
-> **01–02:** Ubiquitous Language + Core Objects endurecidos (filtro · 3 niveles · revisión de ciclo ✅).  
-> **Siguiente:** 03 Relationships — conectar, no descubrir.  
-> No es Core DDD ni cuarto pilar: [docs/17-operational-model/](./docs/17-operational-model/README.md).  
-> **Observation EatClean: CONGELADA** ⏸.  
-> Unidad mínima de valor: **Operational Check**. Gate: evidencia → pregunta → Check → Capability.  
-> Sin pantallas / APIs / código. Sin «Customer» / «Cliente» ambiguo.  
-> Regla: misma palabra ≠ cosas distintas; misma realidad ≠ dos palabras.  
-> Core Object = operacional · permanente · estable (filtro de 5 preguntas).
+> **01–03:** UL + Core Objects + Operational Dependencies (verbos · flujo · sin bidireccional por defecto).  
+> **Siguiente:** 04 Lifecycles.  
+> Observation ⏸ · sin código/pantallas. Capabilities nacen del modelo, no al revés.
 
-**Próxima sesión:** endurecer **03 Relationships** → 04…06 (01–02 ✅; consistencia del ciclo ✅).
+**Próxima sesión:** endurecer **04 Lifecycles** → 05…06 (01–03 ✅).
 
-Índices: [02 Core Objects](./docs/17-operational-model/02-core-objects/README.md) · [01 UL](./docs/17-operational-model/01-ubiquitous-language/README.md) · [Estado](./docs/00-status/README.md)
+Índices: [03 Dependencies](./docs/17-operational-model/03-relationships/README.md) · [02 Core](./docs/17-operational-model/02-core-objects/README.md) · [Estado](./docs/00-status/README.md)
 
 ### Principio de valor (Capabilities)
 

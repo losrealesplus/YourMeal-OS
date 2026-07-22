@@ -132,5 +132,5 @@ Si no → falta o sobra un objeto; no inventar relaciones para tapar huecos.
 ## Relacionado
 
 - [01 UL](../01-ubiquitous-language/README.md)  
-- [03 Relationships](../03-RELATIONSHIPS.md) — **después** de la revisión de consistencia  
+- [03 Operational Dependencies](../03-relationships/README.md)  
 - [OPERATIONAL_CHECKS](../../15-product/OPERATIONAL_CHECKS.md)

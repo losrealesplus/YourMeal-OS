@@ -63,6 +63,6 @@ Conclusión: el ciclo se cuenta en Core. Supporting afina ejecución y Checks �
 | Sin Dashboard/KPI en el modelo | ✅ |
 | Listo para 03 · Relationships | ✅ **conectar piezas, no descubrir conceptos** |
 
-**Siguiente paso permitido:** endurecer [03 · Relationships](../03-RELATIONSHIPS.md).
+**Siguiente paso permitido:** endurecer [03 · Operational Dependencies](../03-relationships/README.md) — ✅ completado. Siguiente: [04 · Lifecycles](../04-LIFECYCLES.md).
 
 **Siguiente paso no permitido:** añadir Core Objects sin filtro; saltar a código/pantallas; reactivar Observation sin decisión explícita.
