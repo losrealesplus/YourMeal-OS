@@ -8,7 +8,6 @@ import {
   CalendarDays,
   BookOpen,
   Factory,
-  ChefHat,
   ShoppingCart,
   Boxes,
   Truck,
