@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { CalendarClock, Sparkles, Truck } from "lucide-react";
+import { ArrowRight, CalendarClock, Sparkles, Truck } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useFmt } from "@/i18n/localization-provider";
 import {
