@@ -4,9 +4,9 @@
 **Propósito:** piloto IA ciego — oposición estructural  
 **Corpus label:** Operational Model Beta (+ docs post IVR-001)  
 **Fecha de congelación:** 2026-07-22  
-**Commit ancla:** *(rellenar al congelar — commit previo al IVR-002)*  
+**Commit ancla: `3c4adb094a1e1d23738c22d1ca2139cbc233a0f8` (`3c4adb0`)
 **Autores en silencio:** Sí  
-**Estado:** 🔒 al lanzar piloto  
+**Estado: 🔒 **CONGELADO** para piloto IOV-002
 
 ## Incluido
 
