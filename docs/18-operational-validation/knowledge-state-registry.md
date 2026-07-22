@@ -2,11 +2,9 @@
 
 Registro vivo del **estado del conocimiento** por elemento canónico del Operational Model.
 
-**Convención tras FASE 4:** elementos de la espina e Invariants críticos empiezan en **Hypothesized** hasta VR/FOV.
-
 Actualizar al cerrar VR o FOV. Ver [knowledge-state.md](./knowledge-state.md).
 
-**Última actualización:** 2026-07-22 (inicial)
+**Última actualización:** 2026-07-22 · **VR-001**
 
 ---
 
@@ -24,60 +22,75 @@ Actualizar al cerrar VR o FOV. Ver [knowledge-state.md](./knowledge-state.md).
 
 ## Core Objects (espina)
 
-| Elemento | KS | Primera observación | VR respaldo | Notas |
-|----------|-----|---------------------|-------------|-------|
-| Weekly Menu | H | FASE 4 | — | |
-| Order | H | FASE 4 | — | |
-| Production Plan | H | FASE 4 | — | |
-| Production Batch | H | FASE 4 | — | |
-| Packaging | H | FASE 4 | — | |
-| Delivery Route | H | FASE 4 | — | |
-| Delivery | H | FASE 4 | — | |
-| Payment | H | FASE 4 | — | |
+| Elemento | KS | Primera observación | VR respaldo | Versión modelo | Notas |
+|----------|-----|---------------------|-------------|----------------|-------|
+| Weekly Menu | H | FASE 4 | — | Alpha | No tensionado en VS-001 |
+| Order | **V** parcial | VS-001 mesa | VR-001 | Alpha | Confirm/Cancel ✔ · **Amend** pendiente MC-001 |
+| Production Plan | **V** parcial | VS-001 | VR-001 | Alpha | Ready ✔ · **Revise** pendiente MC-001 |
+| Production Batch | **V** | VS-001 | VR-001 | Alpha | Stock Check · ajuste Planned vía Plan |
+| Packaging | **V** | VS-001 | VR-001 | Alpha | Pending + Label alérgenos |
+| Delivery Route | **V** parcial | VS-001 | VR-001 | Alpha | Ready ✔ · **Revise** pendiente MC-001 |
+| Delivery | **V** | VS-001 | VR-001 | Alpha | Condicionado a Route revisada |
+| Payment | **V** | VS-001 | VR-001 | Alpha | B2B Not due / fin de mes |
 
 ---
 
-## Invariants (muestra — espina y operación)
+## Supporting / órbita (tocados en VS-001)
 
-| ID | KS | Primera observación | VR respaldo | Notas |
-|----|-----|---------------------|-------------|-------|
-| INV-011 | H | FASE 4 | — | Batch → un Plan |
-| INV-021 | H | FASE 4 | — | Orden causal espina |
-| INV-034 | H | FASE 4 | — | Stock no negativo silencioso |
-| INV-040 | H | FASE 4 | — | Payment liquida Order · tensión EC-002 |
-| INV-050…055 | H | FASE 4 | — | Orden operativo |
-
-Índice completo: [constitution-index](../17-operational-model/05-invariants/constitution-index.md) — añadir filas KS al validar.
+| Elemento | KS | VR | Notas |
+|----------|-----|-----|-------|
+| Stock | **V** | VR-001 | INV-034 · Check Start |
+| Supplier | **V** | VR-001 | `supplies` · Receive |
+| Label | **V** | VR-001 | sin gluten / alérgenos |
+| Beneficiary | **V** | VR-001 | alta 2 nuevos |
+| Order Item | **V** | VR-001 | líneas Amend |
+| Purchase Order | H | — | Supporting futuro · **no** promovido |
 
 ---
 
-## Dependencies (verbos espina — muestra)
+## Invariants
 
-| Verbo / vínculo | KS | Primera observación | VR respaldo |
-|-----------------|-----|---------------------|-------------|
-| Menu `offers` Dish | H | FASE 4 | — |
-| Order `commits` demanda | H | FASE 4 | — |
-| Plan `aggregates` Orders | H | FASE 4 | — |
-| Batch `consumes` Stock | H | FASE 4 | — |
-| Payment `settles` Order | H | FASE 4 | — |
+| ID | KS | VR respaldo | Notas |
+|----|-----|-------------|-------|
+| INV-011 | **V** | VR-001 | Batch → un Plan · sin grieta |
+| INV-020 | **V** | VR-001 | Exige Amend explícito (MC-001) |
+| INV-021 | **V** | VR-001 | Orden causal intacto |
+| INV-032 | **V** | VR-001 | Dishes en Menu |
+| INV-034 | **V** | VR-001 | Pollo 12&lt;20 bloquea |
+| INV-035 | **V** | VR-001 | Label Complete |
+| INV-040 | **V** | VR-001 | settles Order · no cobro inmediato |
+| INV-043 | **V** | VR-001 | Check no decide compra |
+| INV-050…055 | **V** | VR-001 | Orden operativo |
+| INV-042 | **V** parcial | VR-001 | ventana · Revise Route MC-001 |
+
+---
+
+## Dependencies
+
+| Verbo / vínculo | KS | VR respaldo |
+|-----------------|-----|-------------|
+| Orders `aggregate into` Plan | **V** | VR-001 |
+| Batch `consumes` Stock | **V** | VR-001 |
+| Supplier `supplies` Ingredient | **V** | VR-001 |
+| Packaging `assigns to` Route | **V** | VR-001 |
+| Payment `settles` Order | **V** | VR-001 |
+| Label `identifies` Packaging | **V** | VR-001 |
 
 ---
 
 ## Contadores (resumen)
 
-| KS | Conteo (muestra registrada) |
+| KS | Conteo (aprox. tras VR-001) |
 |----|----------------------------|
-| Hypothesized | 17+ |
-| Observed | 0 |
-| Validated | 0 |
-| Refuted | 0 |
+| Hypothesized | resto no tocado + Amend/Revise propuestas |
+| Observed | 0 (mesa, no FOV campo) |
+| Validated | ~20 elementos tocados |
+| Refuted | **0** |
 | Generalized | 0 |
-
-Actualizar desde [validation-coverage](./05-validation-reports/validation-coverage.md) cuando el registro crezca.
 
 ---
 
 ## Relacionado
 
-- [knowledge-state.md](./knowledge-state.md)  
-- [05 validation-reports](./05-validation-reports/README.md)
+- [VR-001](./05-validation-reports/VR-001-modificacion-tardia-eatclean.md)  
+- [validation-coverage](./05-validation-reports/validation-coverage.md)

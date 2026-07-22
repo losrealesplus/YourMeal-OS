@@ -1,22 +1,15 @@
 # Validation Coverage — Estabilidad del modelo
 
-Métrica viva de FASE 5.  
-No solo se cuentan fallos: se mide si el modelo **se estabiliza** o sigue necesitando cambios estructurales.
-
-Actualizar tras cada VR cerrado o MC aplicado.
-
-**Última actualización:** 2026-07-22 (inicial — sin ejecución)
+**Última actualización:** 2026-07-22 · post **VR-001**
 
 ---
 
 ## Resumen ejecutivo
 
 ```text
-Nivel de confianza actual:  Alpha
-                            (modelado completo FASE 4 · validación no iniciada)
+Nivel de confianza actual:  Alpha → candidato Beta tras MC-001 + retrospectiva
+                            (1 escenario hostil auditado · Extended · 0 Refuted)
 ```
-
-Ver [niveles de confianza](../07-certification.md#niveles-de-confianza).
 
 ---
 
@@ -24,11 +17,11 @@ Ver [niveles de confianza](../07-certification.md#niveles-de-confianza).
 
 | Área | Progreso | Notas |
 |------|----------|-------|
-| Validation Scenarios (VS) | 0 / 7 | VS-001 primero |
-| Edge Cases (EC) | 0 / 6 | Tras VS críticos |
-| Field Observation (FOV) | 0 / mínimo acordado | ⏸ EatClean |
-| Validation Reports (VR) | 0 | — |
-| Model Changes (MC) | 0 | — |
+| Validation Scenarios (VS) | **1 / 7** | VS-001 Extended |
+| Edge Cases (EC) | 0 / 6 | EC-001 parcialmente ejercitado dentro de VS-001 |
+| Field Observation (FOV) | 0 | Mesa · no campo |
+| Validation Reports (VR) | **1** | VR-001 |
+| Model Changes (MC) | **1 propuesto** | MC-001 ⏳ |
 
 ---
 
@@ -36,58 +29,51 @@ Ver [niveles de confianza](../07-certification.md#niveles-de-confianza).
 
 | Métrica | Valor | Interpretación |
 |---------|-------|----------------|
-| Core Objects modificados | 0 | Menor = más estable |
+| Core Objects modificados | **0** | Saludable — principio 13 |
 | Dependencies modificadas | 0 | |
-| Lifecycles modificados | 0 | |
-| Checks añadidos | 0 | Esperado si faltaban en transiciones |
-| Invariants modificados | 0 | **Alta señal** — revisar Constitución |
-| Model Changes totales | 0 | VR → MC acumulados |
+| Lifecycles modificados | **0 aplicados** · 3 propuestos | Amend · Revise Plan · Revise Route |
+| Checks añadidos | **0 aplicados** · 3 propuestos | |
+| Invariants modificados | **0** | Constitución intacta |
+| Model Changes totales | 1 propuesto | MC-001 |
 
 ### Madurez por clasificación de VR
 
 | Clasificación | Conteo | Interpretación |
 |---------------|--------|----------------|
-| Confirmed | 0 | Modelo explica el escenario |
-| Clarified | 0 | Modelo OK · docs más precisas |
-| Extended | 0 | Vocabulario ampliado con evidencia |
-| Contradicted | 0 | Corrección estructural necesaria |
-
-**Tendencia deseada hacia certificación:** Confirmed + Clarified ↑ · Extended + Contradicted ↓
+| Confirmed | 0 (global) | Pasos 4–6·8 locales Confirmed |
+| Clarified | 0 | |
+| Extended | **1** | VR-001 |
+| Contradicted | **0** | |
 
 ### Histórico (snapshots)
 
-| Fecha | VS | EC | FOV | MC | Invariants Δ | Nivel |
-|-------|----|----|-----|-----|--------------|-------|
-| 2026-07-22 | 0/7 | 0/6 | 0 | 0 | 0 | Alpha |
-
-Añadir fila al cerrar cada hito de validación.
-
----
-
-## Plantilla de snapshot (copiar al cerrar VR o MC)
+| Fecha | VS | EC | FOV | MC | Invariants Δ | VR class | Nivel |
+|-------|----|----|-----|-----|--------------|----------|-------|
+| 2026-07-22 | 0/7 | 0/6 | 0 | 0 | 0 | — | Alpha |
+| 2026-07-22 | 1/7 | 0/6 | 0 | 1⏳ | 0 | Extended | Alpha |
 
 ```text
-Validation Coverage — YYYY-MM-DD
+Validation Coverage — 2026-07-22 (post VR-001)
 
-VS ejecutados:           N/7
-Edge Cases:              N/6
-Field Observations:      N
+VS ejecutados:           1/7
+Edge Cases:              0/6 (EC-001 tensionado dentro VS-001)
+Field Observations:      0
 
-Core Objects modificados:    N
-Dependencies modificadas:    N
-Lifecycles modificados:      N
-Checks añadidos:             N
-Invariants modificados:      N
+Core Objects modificados:    0
+Dependencies modificadas:    0
+Lifecycles modificados:      0 (3 propuestos MC-001)
+Checks añadidos:             0 (3 propuestos)
+Invariants modificados:      0
 
-Model Changes:               N (MC-xxx, …)
+Model Changes:               1 (MC-001 propuesto)
 
 VR por clasificación:
-  Confirmed:    N
-  Clarified:    N
-  Extended:     N
-  Contradicted: N
+  Confirmed:    0
+  Clarified:    0
+  Extended:     1
+  Contradicted: 0
 
-Nivel de confianza:          Alpha | Beta | RC | Certified v1.0
+Nivel de confianza:          Alpha
 ```
 
 ---
@@ -96,17 +82,13 @@ Nivel de confianza:          Alpha | Beta | RC | Certified v1.0
 
 | Patrón | Significado |
 |--------|-------------|
-| MC ↓ con el tiempo | Modelo convergiendo |
-| Invariants Δ > 0 repetido | Constitución aún frágil — priorizar antes de código |
-| Muchos Checks añadidos, 0 Objects | Saludable — operación sin inflar vocabulario |
-| «Concepto nuevo» frecuente en auditorías | Filtro 02 insuficiente o dominio mal acotado |
-| VR mayormente Extended/Contradicted | Modelo inmaduro — no saltar a implementación |
-| VR mayormente Confirmed/Clarified | Convergencia — candidato a subir nivel (Beta → RC) |
+| Extended + 0 Core Objects | Modelo vocabularmente sólido · Lifecycles incompletos |
+| 0 Contradicted · 0 Invariants Δ | Constitución resiste primer asalto hostil |
+| MC propuesto antes de aplicar | Gobernanza VR → MC respetada |
 
 ---
 
 ## Relacionado
 
-- [07 certification](../07-certification.md)  
-- [audit-protocol](../02-validation-scenarios/audit-protocol.md)  
-- [06 model-changes](../06-model-changes/README.md)
+- [VR-001](./VR-001-modificacion-tardia-eatclean.md)  
+- [07 certification](../07-certification.md)

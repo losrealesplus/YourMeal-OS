@@ -1,83 +1,74 @@
 # Retrospectiva metodológica (post VS-001)
 
-**Cuándo:** inmediatamente después de cerrar VS-001 y VR-001 — **antes** de abrir VS-002.
+**Cuándo:** inmediatamente después de cerrar VS-001 y VR-001 — **antes** de abrir VS-002.  
+**Estado:** 🚧 borrador tras auditoría documental — completar con sesión de equipo
 
-**Objetivo:** validar la **herramienta** con la que validáis el modelo.  
-No retrospectiva del dominio — retrospectiva del **proceso OPE**.
+**Objetivo:** validar la **herramienta** con la que validáis el modelo.
 
 ---
 
-## Criterio de éxito de VS-001 (recordatorio)
-
-No es:
-
-> «No encontramos errores.»
-
-Es:
+## Criterio de éxito de VS-001
 
 > **«Cada hallazgo produjo una decisión trazable.»**
 
-Una contradicción bien documentada **aumenta** el conocimiento.
+✔ Cumplido: H1–H8 → VR-001 → MC-001 propuesto · registry actualizado · 0 Core Objects nuevos.
 
 ---
 
 ## Preguntas de la retrospectiva
 
-Responder por escrito (acta breve o diario).
-
 ### Protocolo de auditoría
 
-| Pregunta | Respuesta |
-|----------|-----------|
-| ¿El protocolo indujo algún sesgo? | |
-| ¿Responder **antes** de abrir `docs/17` fue viable? | |
-| ¿La sexta pregunta («¿concepto nuevo?») fue clara? | |
-| ¿La sesión intentó **hacer fallar** el escenario de verdad? | |
+| Pregunta | Respuesta (borrador) |
+|----------|----------------------|
+| ¿El protocolo indujo algún sesgo? | Riesgo bajo: se contrastó `docs/17` **después** del mapeo por paso |
+| ¿Responder antes de abrir `docs/17` fue viable? | Sí en auditoría documental |
+| ¿La sexta pregunta fue clara? | Sí — separó «Core nuevo» (No) de «transición faltante» (Sí) |
+| ¿La sesión intentó hacer fallar el escenario? | Sí — Escenario Hostil 001 con 8 tensores simultáneos |
 
 ### Evidencia y VR
 
-| Pregunta | Respuesta |
-|----------|-----------|
-| ¿Las seis preguntas por paso fueron suficientes? | |
-| ¿Algún tipo de evidencia quedó fuera? | |
-| ¿La clasificación VR (Confirmed / Clarified / Extended / Contradicted) fue clara? | |
-| ¿Cada hallazgo tiene VR con decisión trazable? | |
+| Pregunta | Respuesta (borrador) |
+|----------|----------------------|
+| ¿Las seis preguntas fueron suficientes? | Sí; añadir subpregunta «¿Cancel explica el evento?» ayudó en Paso 1 |
+| ¿Alguna evidencia quedó fuera? | FOV campo (ETA proveedor real) — mesa no sustituye Observation |
+| ¿Clasificación VR clara? | Extended vs Contradicted: criterio «Core nuevo / Invariant falso» funcionó |
+| ¿Cada hallazgo con VR trazable? | Sí |
 
 ### Knowledge State y proveniencia
 
-| Pregunta | Respuesta |
-|----------|-----------|
-| ¿El Knowledge State cambió de forma consistente? | |
-| ¿La proveniencia (observación + VR + versión modelo) fue fácil de registrar? | |
-| ¿El registry necesita columnas o estados adicionales? | |
+| Pregunta | Respuesta (borrador) |
+|----------|----------------------|
+| ¿KS cambió de forma consistente? | Parcial Validated donde Lifecycle incompleto — convención útil |
+| ¿Proveniencia fácil? | Sí (VS-001 · VR-001 · Alpha) |
+| ¿Registry necesita más? | Columna «parcial» documentada en notas |
 
 ### Equilibrio epistemológico
 
-| Pregunta | Respuesta |
-|----------|-----------|
-| ¿Apareció sesgo de «proteger el modelo» (principio 14)? | |
-| ¿Apareció sesgo de «añadir objeto por comodidad» (principio 13)? | |
-| ¿Algún VR Contradicted se trató como derrota en lugar de éxito? | |
+| Pregunta | Respuesta (borrador) |
+|----------|----------------------|
+| ¿Sesgo proteger el modelo? | Evitado: no se forzó Cancel como «solución» |
+| ¿Sesgo añadir objeto? | Evitado: PO sigue Supporting |
+| ¿Contradicted como derrota? | N/A — dictamen Extended |
 
 ---
 
 ## Decisiones de mejora del proceso
 
-| # | Ajuste propuesto | ¿Aplica a VS-002+? | MC de proceso* |
-|---|------------------|-------------------|----------------|
-| 1 | | | |
-| 2 | | | |
-
-\* Cambios al protocolo OPE (18), no al Operational Model (17), salvo que un VR lo exija.
+| # | Ajuste propuesto | ¿Aplica a VS-002+? | Estado |
+|---|------------------|-------------------|--------|
+| 1 | En Paso Amend-like: preguntar explícitamente si Cancel/recreate explica el hecho | Sí | ⏳ adoptar |
+| 2 | Distinguir en tabla «concepto nuevo» = Core vs transición vs Check | Sí | ⏳ adoptar |
+| 3 | No abrir VS-002 hasta aplicar o rechazar formalmente MC-001 | Gate | ⏳ |
 
 ---
 
 ## Gate VS-001 → VS-002
 
-- [ ] VR-001 cerrado con clasificación de madurez  
-- [ ] [knowledge-state-registry](../knowledge-state-registry.md) actualizado  
-- [ ] Esta retrospectiva completada  
-- [ ] Ajustes al protocolo aplicados (si los hay)
+- [x] VR-001 cerrado con clasificación Extended  
+- [x] knowledge-state-registry actualizado  
+- [ ] Esta retrospectiva **firmada por el equipo**  
+- [ ] MC-001 aplicado o rechazado documentado  
 
 Solo entonces abrir VS-002.
 
@@ -85,6 +76,6 @@ Solo entonces abrir VS-002.
 
 ## Relacionado
 
-- [VS-001](./VS-001-semana-normal.md)  
-- [audit-protocol](./audit-protocol.md)  
-- [00 operational-product-engineering](../00-operational-product-engineering.md)
+- [VS-001](./02-validation-scenarios/VS-001-semana-normal.md)  
+- [VR-001](./05-validation-reports/VR-001-modificacion-tardia-eatclean.md)  
+- [MC-001](./06-model-changes/MC-001-amend-and-revise-transitions.md)

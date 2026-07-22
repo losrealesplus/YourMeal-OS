@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-22 · Etapa 1 casi cerrada · VS-001 siguiente  
+**Última actualización:** 2026-07-22 · VS-001 auditado · VR-001 Extended · MC-001 propuesto  
 **Versión técnica:** `v0.1.0` — FOUNDATION LOCKED  
 **Versión modelo:** Alpha (pre-certificación)
 
@@ -125,12 +125,14 @@ Plantilla: [07-certification](../18-operational-validation/07-certification.md).
 
 ## Próxima sesión
 
-1. **VS-001** — auditoría hostil · VR-001 · registry  
-2. **Retrospectiva metodológica** — [08](../18-operational-validation/08-methodological-retrospective.md) antes de VS-002  
-3. Sin Etapa 2 hasta Certified v1.0
+1. Revisar / aprobar **MC-001** (Amend · Revise Plan/Route) → aplicar a `17`  
+2. Firmar [retrospectiva metodológica](../18-operational-validation/08-methodological-retrospective.md)  
+3. Entonces **VS-002** — no antes  
+4. Sin Etapa 2 hasta Certified v1.0
 
 | Índice | Ruta |
 |--------|------|
-| VS-001 | [02-validation-scenarios/VS-001](../18-operational-validation/02-validation-scenarios/VS-001-semana-normal.md) |
-| Retrospectiva | [08-methodological-retrospective](../18-operational-validation/08-methodological-retrospective.md) |
-| Registry KS | [knowledge-state-registry](../18-operational-validation/knowledge-state-registry.md) |
+| VR-001 | [VR-001](../18-operational-validation/05-validation-reports/VR-001-modificacion-tardia-eatclean.md) |
+| MC-001 | [MC-001](../18-operational-validation/06-model-changes/MC-001-amend-and-revise-transitions.md) |
+| VS-001 | [VS-001](../18-operational-validation/02-validation-scenarios/VS-001-semana-normal.md) |
+| Coverage | [validation-coverage](../18-operational-validation/05-validation-reports/validation-coverage.md) |

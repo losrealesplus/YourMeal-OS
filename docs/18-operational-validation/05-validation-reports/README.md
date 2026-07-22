@@ -119,7 +119,7 @@ Ver también [validation-coverage](./validation-coverage.md) — estabilidad del
 
 | ID | Título | Origen | Clasificación | MC |
 |----|--------|--------|---------------|-----|
-| — | *(vacío — correcto al inicio)* | — | — | — |
+| [VR-001](./VR-001-modificacion-tardia-eatclean.md) | Modificación tardía EatClean | VS-001 | **Extended** | [MC-001](../06-model-changes/MC-001-amend-and-revise-transitions.md) ⏳ |
 
 ---
 

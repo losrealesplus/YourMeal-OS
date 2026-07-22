@@ -51,8 +51,8 @@ Auditorías: [audit-protocol.md](./audit-protocol.md) (6 preguntas por paso).
 
 | ID | Escenario | Foco de tensión | Estado |
 |----|-----------|-----------------|--------|
-| [VS-001](./VS-001-semana-normal.md) | Semana normal | Espina completa sin fricción | ⏳ |
-| [VS-002](./VS-002-semana-festivo.md) | Semana con festivo | Weekly Menu · demanda irregular | ⏳ |
+| [VS-001](./VS-001-semana-normal.md) | **Hostil 001** · Modificación tardía EatClean | Amend Order · Plan · Stock · Route · alérgenos · Payment | ✅ Extended · VR-001 |
+| [VS-002](./VS-002-semana-festivo.md) | Semana con festivo | Weekly Menu · demanda irregular | ⏳ tras retrospectiva |
 | [VS-003](./VS-003-pedido-masivo.md) | Pedido masivo | Plan · Batch · Stock | ⏳ |
 | [VS-004](./VS-004-rotura-stock.md) | Rotura de stock | Checks · INV-034 · transiciones Batch | ⏳ |
 | [VS-005](./VS-005-cambio-menu-ultima-hora.md) | Cambio de menú de última hora | Menu Draft/Published · Orders | ⏳ |
