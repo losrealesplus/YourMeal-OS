@@ -13,8 +13,8 @@ YourMeal OS es el **instrumento** (experimento controlado) con el que se demuest
 | Rol | Qué es |
 |-----|--------|
 | **EatClean** | Laboratorio (operación real) |
-| **FOPEBA** | Método |
-| **YourMeal OS** | Primer producto que implementará conocimiento operacional certificado |
+| **FOPEBA** | Método v1.0 frozen |
+| **YourMeal OS** | Primer producto tras Knowledge Field-Validated |
 
 > **Operational Model RC (Table-Validated):** certificado en entorno controlado para prueba de campo — no Field-Validated aún.  
 > Dual track: [DUAL_TRACK_ANTECAMARA](../00-status/DUAL_TRACK_ANTECAMARA.md).  
