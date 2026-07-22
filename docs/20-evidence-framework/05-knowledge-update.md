@@ -24,18 +24,20 @@ G-01
 
 ---
 
-## Norma: no toda observación modifica el conocimiento
+## Procedimiento de certificación (6 preguntas)
 
-Antes de actualizar el modelo, responder **cuatro preguntas**:
+Cada hallazgo FOV, antes de tocar el modelo:
 
-1. ¿La observación es **repetible**?  
-2. ¿Tiene suficiente nivel de evidencia (**ECL**)?  
-3. ¿**Contradice** o solo **amplía** el modelo?  
-4. ¿Justifica realmente un **MC**?
+1. ¿Qué **observamos**?  
+2. ¿Qué **evidencia** existe (FOR / repetición)?  
+3. ¿Qué **Knowledge State** cambia?  
+4. ¿Qué **ECL** obtiene?  
+5. ¿Qué **Stability** tiene / tendrá?  
+6. ¿Necesita **MC**?
 
-Si alguna respuesta es **no**, la observación se conserva como evidencia (FOR), pero **no** cambia el conocimiento.
+Más las [cuatro preguntas](#norma-no-toda-observación-modifica-el-conocimiento) de umbral (repetible · ECL · contradice/amplía · justifica MC).
 
-Eso protege al modelo de reaccionar ante casos aislados.
+Solo entonces se modifica el conocimiento.
 
 ---
 

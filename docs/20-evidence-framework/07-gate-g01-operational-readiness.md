@@ -21,23 +21,25 @@ Si falta **un** criterio → el Gate **no abre**.
 
 | Criterio | Estado requerido |
 |----------|------------------|
-| Operational Validation completada | ✅ |
+| Operational Validation | ✅ |
 | IOV-001 | ✅ |
 | IOV-002 | ✅ |
 | IOV-003 | ✅ |
-| Findings críticos cerrados (IFD / SF Forced / Contradicted) | ✅ |
+| **Operational Model RC** | ✅ |
+| Findings críticos cerrados | ✅ |
 | FOV completado | ✅ |
-| Knowledge Update aplicado (o explícitamente «sin MC» tras las 4 preguntas) | ✅ |
-| Economic Confirmation positiva | ✅ |
+| Knowledge Update aplicado (o «sin MC» documentado) | ✅ |
+| Economic Confirmation positiva (ROI operacional) | ✅ |
 | Riesgos abiertos críticos | **0** |
 
-Evidencia: IVR · FVR · KUR · ECR · registries DF/SF/IF/IFD.
-
-Solo entonces:
-
 ```text
-Etapa 2 — Implementation
+Gate G-01
+APPROVED
+Operational Knowledge Certified
+Stage 2 Authorized
 ```
+
+Solo con checklist completo. **Sin excepciones.**
 
 ---
 

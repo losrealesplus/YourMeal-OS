@@ -40,17 +40,17 @@ Demostrar que el conocimiento consolidado genera **suficiente valor operativo** 
 
 ---
 
-## Qué mide (estricto)
+## Resultado: ROI operacional (no solo financiero)
 
-No solo ahorro. También **coste evitado**:
+Preguntas de certificación:
 
-- tiempo de planificación ahorrado;
-- errores evitados;
-- retrabajos evitados;
-- cambios manuales reducidos;
-- decisiones automatizadas correctamente.
+- ¿Cuántas **preguntas** eliminamos?  
+- ¿Cuántos **minutos** ahorramos?  
+- ¿Cuántos **errores** evitamos?  
+- ¿Cuántas decisiones dejan de depender de la **memoria**?  
+- ¿Cuánto trabajo dejó de hacerse **dos veces**?  
 
-El valor del modelo no depende solo de generar ingresos: también de **reducir fricción operacional**.
+Impacto = ahorro + **coste evitado**. No basta con que el modelo sea correcto: debe **aportar valor**.
 
 ### Las cuatro preguntas
 

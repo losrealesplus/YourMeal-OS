@@ -25,14 +25,15 @@ Eso ya no es intuición. Es evidencia.
 
 ## Dos carriles
 
-### Carril A — Cerrar Etapa 1 *(obligatorio · no reordenar)*
+### Carril A — Certificar Etapa 1 *(no construir más modelo)*
 
 ```text
 IOV-002 → IOV-003 → Operational Model RC
     → FOV → Knowledge Update → Economic Confirmation → Gate G-01
 ```
 
-Orden fijo: [06 Campaign Order](../19-independent-operational-validation/06-campaign-order.md).
+Campaña: [01-certification-campaign](./01-certification-campaign.md).  
+Orden fijo. Mentalidad: demostrar que **no hace falta añadir más**.
 
 ---
 

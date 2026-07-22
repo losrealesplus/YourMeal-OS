@@ -11,29 +11,17 @@ FOV **no** vuelve a validar el modelo en abstracto (eso ya ocurrió en mesa + IO
 
 Valida que:
 
-> **La realidad produce la misma evidencia que predijo el modelo.**
+> **La realidad confirma el conocimiento** — produce la misma evidencia que predijo el modelo.
 
-Eso es distinto de «¿el modelo es coherente?».
+Observar operación (EatClean). **No** enseñar app · **no** vender · **no** proponer · **no** intervenir. Solo registrar.
 
----
+Clasificar observaciones (KS): Observed → Validated / Refuted / path to Generalized.
 
-## Qué mide (solo operación)
+Medir: decisiones · tiempos · preguntas · incidencias · interrupciones · trabajo manual · excepciones.
 
-No funcionalidades · no pantallas · no UX.
+Salida: **Field Validation Report (FVR)** · FORs.
 
-Solo operación, p.ej.:
-
-- tiempo real de preparación;
-- cambios de pedidos;
-- incidencias;
-- rutas;
-- errores humanos;
-- trazabilidad;
-- decisiones manuales.
-
-Todo **comparado** con las predicciones del Operational Model (objetos · transiciones · checks · invariantes).
-
-**Cuándo abrir FOV:** solo tras campaña IOV cerrada y corpus RC — ver [06 Campaign Order](../../19-independent-operational-validation/06-campaign-order.md).
+**Cuándo abrir:** solo tras IOV-001…003 + [Operational Model RC](../../00-status/02-operational-model-rc.md).
 
 ---
 

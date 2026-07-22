@@ -1,130 +1,106 @@
 # IOV-002 · Adversarial Validation
 
-**Instrucción al evaluador:**
+**Paso 1 · Campaña de certificación** — [01](../00-status/01-certification-campaign.md)
 
-> **Destruye el modelo.**
-
-No queremos colaboración.  
-Queremos **oposición**.
+Mentalidad: **certificar**, no construir.  
+No colaborar. **Oposición.**
 
 ---
 
-## Pregunta que intenta responder
+## Pregunta única
 
-> **¿Cuál es el menor número de escenarios (en el dominio) necesarios para obligar al modelo a ceder estructuralmente?**
-
-«Ceder» significa al menos una de:
-
-- crear un **nuevo Core Object**;  
-- **romper** un Invariant;  
-- introducir un **Lifecycle completamente nuevo** (no una transición Dynamics);  
-- cambiar una **Dependency fundamental** de la espina.
+> **¿Puede un tercero obligarnos a cambiar la estructura del modelo?**
 
 ---
 
-## Regla de dominio
+## Instrucción oficial (entregar literal)
 
-No puede inventar un dominio distinto.
+> Tu misión no es comprender el modelo ni ayudar a mejorarlo.
+>
+> Tu objetivo es demostrar que el Operational Model es insuficiente.
+>
+> Intenta obligar al equipo a:
+>
+> * crear un nuevo Core Object;
+> * romper un Invariant;
+> * introducir una nueva Dependency estructural;
+> * redefinir un Lifecycle completo.
+>
+> Toda propuesta deberá justificarse exclusivamente mediante escenarios pertenecientes al dominio de alimentación preparada.
 
-Debe permanecer dentro de **alimentación preparada** (comida que se planifica, cocina/ensambla, identifica, mueve y entrega/cobra).
+---
 
-Ejemplos válidos (mismo dominio, contextos distintos):
+## Quién participa
 
-- Hospitales  
-- Comida militar  
-- Eventos deportivos  
-- Catering aéreo  
-- Prisiones / centros penitenciarios  
-- Universidades  
-- Guarderías · residencias · comedores industriales  
+Evaluador independiente: sin FOPEBA, sin YourMeal OS, sin contexto previo.  
+Primera aproximación válida: **IA en conversación nueva** (piloto).
 
-Fuera de dominio (inválido para IOV-002): SaaS genérico, e-commerce de productos secos sin operación de preparación, etc.
+Autores: silencio · no co-diseñan el ataque.
 
 ---
 
 ## Material
 
-Mismo corpus que IOV-001 vía [KCM](./kcm/README.md) (versión propia si el ataque lo requiere).  
-Protocolo: [05 Experimental Protocol](./05-experimental-protocol.md).
+Exactamente el [KCM](./kcm/README.md) de la sesión (p.ej. KCM-002).  
+Nada más. Prohibición de conocimiento implícito.
 
-El evaluador **sí** puede conocer FASE 5 a alto nivel, pero el ataque se formula contra el modelo, no contra los autores. Todo supuesto de dominio debe poder narrarse con el corpus (prohibición de conocimiento implícito de EatClean/autores).
-
----
-
-## Objetivo de economía
-
-Buscar el **mínimo** de escenarios que fuercen una cesión estructural.
-
-No un catálogo infinito de edge cases.  
-Calidad de ataque > volumen.
+Dominio: **alimentación preparada** únicamente (hospitales · militar · aéreo · prisiones · universidades · eventos · residencias…).
 
 ---
 
-## Evidencia: Structural Findings (SF)
+## Evidencia
 
-```text
-SF-001
+| Artefacto | Contenido |
+|-----------|-----------|
+| **SF-xxx** | Structural Findings |
+| IVR-002 | Informe de sesión |
 
-Título: …
-Ataque: (escenario adversario en 3–8 líneas)
-Objetivo forzado: Core nuevo / Invariant / Lifecycle nuevo / Dependency
-Resultado: Resisted | Forced concession | Inconclusive
-Si Forced: qué habría que cambiar (hipótesis) — sin editar 17
-Si Resisted: por qué el modelo ya lo narra (citar objetos / INV / transición)
+Cada ataque declara objetivo forzado: Core · Invariant · Dependency · Lifecycle.
+
+Resultado por ataque: **Resisted** · **Clarified** · **Extended** · **Contradicted** (Forced concession).
+
+---
+
+## Criterio de salida
+
+IOV-002 **termina** cuando **todas** las propuestas están clasificadas:
+
+- Rechazadas (Resisted)  
+- Clarified  
+- Extended  
+- Contradicted  
+
+**No quedan hallazgos abiertos.**
+
+Si hay Contradicted → VR → MC **antes** de RC (rompe mentalidad de “añadir por gusto”: solo evidencia).
+
+---
+
+## Plantilla SF
+
+```markdown
+## SF-xxx — [Título]
+
+| Campo | Valor |
+|-------|-------|
+| Objetivo forzado | Core nuevo · Invariant · Dependency · Lifecycle |
+| Escenario (dominio) | 3–8 líneas |
+| Resultado | Resisted · Clarified · Extended · Contradicted |
+| Cita corpus (si Resisted) | ruta |
+| Hipótesis de cambio (si Forced) | sin editar 17 aquí |
 ```
 
-Registro: [04-findings](./04-findings/README.md).
-
----
-
-## Resultados posibles
-
-```text
-No encontré ninguna contradicción estructural.
-```
-
-→ Evidencia **extremadamente fuerte** (ataque independiente fallido).
-
-```text
-El modelo necesita un nuevo Core Object.
-```
-
-→ Primer **Contradicted** realmente independiente → abrir VR → (si procede) MC.
-
-Otros: romper INV-… · Dependency espina · Lifecycle nuevo (no Amend/Hold ya cubiertos por Dynamics).
-
----
-
-## Relación con FASE 5
-
-| FASE 5 (VS) | IOV-002 |
-|-------------|---------|
-| Autores diseñan escenarios hostiles | Evaluador **independiente** ataca |
-| Extended/Clarified sobre huecos de comportamiento | Busca **cesión estructural** |
-| Dynamics absorbe muchos Extended | Dynamics no «salva» un Core ilegítimo |
-
-Un Extended de FASE 5 ≠ victoria adversaria.  
-Victoria adversaria = el modelo **no puede** narrar sin violar sus propias reglas o inventar Core.
-
----
-
-## Protocolo mínimo
-
-1. Evaluador independiente · dominio alimentación preparada.  
-2. Brief: «Destruye el modelo; economía de escenarios; sin salir del dominio.»  
-3. Informe SF-xxx.  
-4. Si Forced concession → VR (no MC directo).
+Registro: [structural-findings](./04-findings/structural-findings.md).
 
 ---
 
 ## Estado
 
-⏳ No ejecutado.
+⏳ / 🚧 según [IVR](./ivr/README.md).
 
 ---
 
 ## Relacionado
 
-- [IOV-001 Comprehension](./01-comprehension-validation.md)  
-- [IOV-003 Independent Implementation](./03-independent-implementation.md)  
-- [05 Validation Reports](../18-operational-validation/05-validation-reports/README.md)
+- [IOV-003](./03-independent-implementation.md)  
+- [05 Protocol](./05-experimental-protocol.md)
