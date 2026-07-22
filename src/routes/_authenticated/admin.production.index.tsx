@@ -59,28 +59,28 @@ function PlanningPage() {
           columns={[
             {
               key: "serviceDateIso",
-              label: t("planningService", { defaultValue: "Service" }),
+              header: t("planningService", { defaultValue: "Service" }),
               render: (r) => (
                 <span className="font-mono text-xs tabular-nums">
-                  {fmt.date(new Date(r.serviceDateIso), { weekday: "short", day: "2-digit", month: "short" })}
+                  {fmt.date(new Date(r.serviceDateIso), "medium")}
                 </span>
               ),
             },
-            { key: "dish", label: t("planningDish", { defaultValue: "Dish" }), render: (r) => <span className="font-semibold">{r.dish}</span> },
+            { key: "dish", header: t("planningDish", { defaultValue: "Dish" }), render: (r) => <span className="font-semibold">{r.dish}</span> },
             {
               key: "station",
-              label: t("planningStation", { defaultValue: "Station" }),
+              header: t("planningStation", { defaultValue: "Station" }),
               render: (r) => (
                 <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground bg-secondary rounded px-2 py-0.5">
                   {stationLabels[r.station]}
                 </span>
               ),
             },
-            { key: "ordered", label: t("planningOrderedShort", { defaultValue: "Ordered" }), render: (r) => <span className="font-mono tabular-nums">{r.ordered}</span> },
-            { key: "planned", label: t("planningPlannedShort", { defaultValue: "Planned" }), render: (r) => <span className="font-mono tabular-nums font-bold">{r.planned}</span> },
+            { key: "ordered", header: t("planningOrderedShort", { defaultValue: "Ordered" }), render: (r) => <span className="font-mono tabular-nums">{r.ordered}</span> },
+            { key: "planned", header: t("planningPlannedShort", { defaultValue: "Planned" }), render: (r) => <span className="font-mono tabular-nums font-bold">{r.planned}</span> },
             {
               key: "status",
-              label: t("status"),
+              header: t("status"),
               render: (r) => (
                 <StatusChip
                   tone={r.status === "released" ? "positive" : r.status === "scheduled" ? "info" : "neutral"}

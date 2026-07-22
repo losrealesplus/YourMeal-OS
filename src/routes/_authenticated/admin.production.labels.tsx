@@ -54,21 +54,21 @@ function LabelsPage() {
         <DataTable
           rows={MOCK_LABEL_JOBS}
           columns={[
-            { key: "dish", label: t("planningDish", { defaultValue: "Dish" }), render: (j) => <span className="font-semibold">{j.dish}</span> },
+            { key: "dish", header: t("planningDish", { defaultValue: "Dish" }), render: (j) => <span className="font-semibold">{j.dish}</span> },
             {
               key: "format",
-              label: t("labelsFormat", { defaultValue: "Format" }),
+              header: t("labelsFormat", { defaultValue: "Format" }),
               render: (j) => (
                 <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground bg-secondary rounded px-2 py-0.5">
                   {formatLabel[j.format]}
                 </span>
               ),
             },
-            { key: "printer", label: t("labelsPrinter", { defaultValue: "Printer" }), render: (j) => <span className="text-xs text-muted-foreground">{j.printer}</span> },
-            { key: "qty", label: t("labelsQtyShort", { defaultValue: "Qty" }), render: (j) => <span className="font-mono tabular-nums font-bold">{j.qty}</span> },
+            { key: "printer", header: t("labelsPrinter", { defaultValue: "Printer" }), render: (j) => <span className="text-xs text-muted-foreground">{j.printer}</span> },
+            { key: "qty", header: t("labelsQtyShort", { defaultValue: "Qty" }), render: (j) => <span className="font-mono tabular-nums font-bold">{j.qty}</span> },
             {
               key: "status",
-              label: t("status"),
+              header: t("status"),
               render: (j) => (
                 <StatusChip
                   tone={j.status === "done" ? "positive" : j.status === "printing" ? "info" : "neutral"}
