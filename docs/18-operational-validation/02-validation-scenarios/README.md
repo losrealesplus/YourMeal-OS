@@ -64,8 +64,9 @@ Auditorías: [audit-protocol.md](./audit-protocol.md) (6 preguntas por paso).
 ## Criterio de cierre de un escenario
 
 1. Cadena de comprobación completa (las cinco capas).  
-2. Validation Report con dictamen.  
-3. Si ⚠ 🔁 🚨 → Model Change antes de marcar ✅.
+2. Validation Report con dictamen y Knowledge State actualizado.  
+3. Si ⚠ 🔁 🚨 → Model Change antes de marcar ✅.  
+4. **VS-001 únicamente:** [retrospectiva metodológica](../08-methodological-retrospective.md) antes de VS-002.
 
 ---
 
