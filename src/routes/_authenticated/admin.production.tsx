@@ -1,106 +1,74 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Printer } from "lucide-react";
-import {
-  AdminHeader,
-  KpiCard,
-  PanelCard,
-  ProgressBar,
-  SectionTitle,
-  StatusChip,
-} from "@/components/admin";
-import { MOCK_PRODUCTION_TASKS } from "@/lib/mock-admin";
+import { AdminHeader, SectionTitle } from "@/components/admin";
+import { cn } from "@/lib/utils";
 
 /**
- * ADMIN · Producción
- * Objetivo operacional: Coordinar el flujo de cocina para cumplir los pedidos del día
+ * ADMIN · Producción (PM-003)
+ * Objetivo operacional: Orquestar la producción del turno de principio a fin
  * Capability:            production.orchestrate
- * Core Object:           ProductionRun + Dish
+ * Core Object:           ProductionRun · Batch · PackagingLine · Label · Station
+ *
+ * Layout hub — sub-áreas: Planning · Batch · Packaging · Labels · Kitchen.
  */
 export const Route = createFileRoute("/_authenticated/admin/production")({
-  component: AdminProductionPage,
+  component: AdminProductionLayout,
   head: () => ({
     meta: [
       { title: "YourMeal OS — Producción" },
-      { name: "description", content: "Coordinación del flujo de cocina para el turno operativo." },
+      { name: "description", content: "Módulo de producción: planning, tandas, packaging, etiquetas y cocina." },
     ],
   }),
 });
 
-const stationLabels: Record<string, string> = {
-  cold: "Cold",
-  hot: "Hot",
-  assembly: "Assembly",
-  packing: "Packing",
-};
+type Tab = { to: string; key: string; fallback: string; exact?: boolean };
 
-function AdminProductionPage() {
+const TABS: Tab[] = [
+  { to: "/admin/production",           key: "production.planning",  fallback: "Planning",  exact: true },
+  { to: "/admin/production/batch",     key: "production.batch",     fallback: "Batch" },
+  { to: "/admin/production/packaging", key: "production.packaging", fallback: "Packaging" },
+  { to: "/admin/production/labels",    key: "production.labels",    fallback: "Labels" },
+  { to: "/admin/production/kitchen",   key: "production.kitchen",   fallback: "Kitchen" },
+];
+
+function AdminProductionLayout() {
   const { t } = useTranslation("admin");
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
     <div className="animate-fade-in">
       <SectionTitle
         overline={t("production")}
-        title={t("productionTitle", { defaultValue: "Producción del turno" })}
-        subtitle={t("productionSubtitle", { defaultValue: "Estado de cada estación de cocina y estado de las tandas." })}
-        trailing={
-          <button className="h-10 rounded-xl border border-border bg-card px-4 text-xs font-bold uppercase tracking-widest inline-flex items-center gap-2 hover:bg-secondary/60 transition">
-            <Printer className="size-3.5" /> {t("printLabels")}
-          </button>
-        }
+        title={t("productionHubTitle", { defaultValue: "Producción" })}
+        subtitle={t("productionHubSubtitle", { defaultValue: "Orquesta cada fase del turno: planificación, cocinado, empaquetado, etiquetado y estaciones." })}
       />
       <AdminHeader
         goal={t("productionGoal", { defaultValue: "Cumplir los pedidos del día con calidad y a tiempo" })}
         capability="production.orchestrate"
-        object="ProductionRun · Dish"
+        object="ProductionRun · Batch · Label · Station"
       />
 
-      <div className="grid gap-3 md:grid-cols-4 mb-6">
-        <KpiCard label={t("totalMeals", { defaultValue: "Meals to produce" })} value="264" trend="up" delta="+18" />
-        <KpiCard label={t("stationsActive", { defaultValue: "Stations active" })} value="4/4" trend="flat" />
-        <KpiCard label={t("shiftProgress", { defaultValue: "Shift progress" })} value="42%" trend="up" delta="+12%" />
-        <KpiCard label={t("delayed", { defaultValue: "Delayed" })} value="0" trend="flat" />
-      </div>
+      <nav className="mb-6 flex items-center gap-1 overflow-x-auto no-scrollbar border-b border-border">
+        {TABS.map((tab) => {
+          const active = tab.exact ? pathname === tab.to : pathname.startsWith(tab.to);
+          return (
+            <Link
+              key={tab.to}
+              to={tab.to}
+              className={cn(
+                "shrink-0 px-3 py-2.5 text-[11px] font-bold uppercase tracking-widest border-b-2 -mb-px transition-colors",
+                active
+                  ? "border-primary text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {t(tab.key, { defaultValue: tab.fallback })}
+            </Link>
+          );
+        })}
+      </nav>
 
-      <PanelCard title={t("liveProduction")}>
-        <ul className="space-y-4">
-          {MOCK_PRODUCTION_TASKS.map((task) => {
-            const tone =
-              task.progress === 100 ? "positive" : task.progress > 0 ? "info" : "neutral";
-            return (
-              <li key={task.id} className="grid gap-2">
-                <div className="flex items-center justify-between gap-4">
-                  <div className="min-w-0 flex items-center gap-3">
-                    <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground bg-secondary rounded px-2 py-0.5">
-                      {stationLabels[task.station]}
-                    </span>
-                    <p className="font-semibold truncate">{task.dish}</p>
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <span className="font-mono text-xs font-bold tabular-nums">{task.qty}</span>
-                    <StatusChip
-                      tone={tone}
-                      label={
-                        task.progress === 100
-                          ? t("done", { defaultValue: "Done" })
-                          : task.progress > 0
-                          ? t("inProgress", { defaultValue: "In progress" })
-                          : t("queued", { defaultValue: "Queued" })
-                      }
-                    />
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <ProgressBar value={task.progress} />
-                  <span className="font-mono text-[10px] text-muted-foreground w-14 text-right">
-                    ETA {task.eta}
-                  </span>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      </PanelCard>
+      <Outlet />
     </div>
   );
 }
