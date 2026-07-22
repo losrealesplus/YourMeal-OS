@@ -66,6 +66,8 @@ MC-xxx (si aplica) · enlace
 
 ## Índice
 
+Ver también [validation-coverage](./validation-coverage.md) — estabilidad del modelo.
+
 | ID | Título | Origen | Dictamen | MC |
 |----|--------|--------|----------|-----|
 | — | *(vacío — correcto al inicio)* | — | — | — |

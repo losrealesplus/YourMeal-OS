@@ -47,6 +47,8 @@ Cada escenario intenta refutar el modelo. La pregunta guía:
 
 ## Índice de escenarios
 
+Auditorías: [audit-protocol.md](./audit-protocol.md) (6 preguntas por paso).
+
 | ID | Escenario | Foco de tensión | Estado |
 |----|-----------|-----------------|--------|
 | [VS-001](./VS-001-semana-normal.md) | Semana normal | Espina completa sin fricción | ⏳ |

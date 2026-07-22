@@ -94,10 +94,19 @@ Invariant → Lifecycle → Operational Check → Capability
 
 La validación puede proponer ajustes. No puede invertir la jerarquía.
 
-### 10. Certificación es un acto explícito
+### 10. Certificación y niveles de confianza
 
-No se cierra FASE 5 con «ya está».  
-Solo con [07-certification](./07-certification.md): **Operational Model Certified v1.0**.
+Alpha → Beta → RC → **Certified v1.0**. Ver [07-certification](./07-certification.md).  
+Tras Certified v1.0, todo cambio al modelo requiere VR → MC.
+
+### 11. Auditoría, no walkthrough
+
+Ejecutar escenarios con [protocolo de 6 preguntas](./02-validation-scenarios/audit-protocol.md) por paso.  
+La sexta: **¿necesitamos inventar un concepto nuevo?** — Si sí, grieta.
+
+### 12. Medir estabilidad, no solo fallos
+
+Actualizar [validation-coverage](./05-validation-reports/validation-coverage.md) tras cada VR/MC.
 
 ---
 

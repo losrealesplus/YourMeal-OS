@@ -67,7 +67,7 @@ UX · Capabilities · código de producto
 | **OPERATIONAL DISCOVERY** | ¿Por qué evolucionar? | ✅ carpeta · ⏸ campo Discovery |
 | **Operational Checks** | ¿Cómo guía la operación? | ✅ transversal |
 | **Operational Model** | ¿Con qué lenguaje? | 🟢 FASE 4 |
-| **Operational Validation** | ¿Dónde falla el modelo? | 🚧 FASE 5 |
+| **Operational Validation** | ¿Dónde falla el modelo? | 🚧 FASE 5 · nivel **Alpha** |
 
 ```text
 Producto:  Discovery → Check → Assistant → Capability  (post-certificación)

@@ -27,6 +27,41 @@ Si tras intentar romperlo el modelo sigue siendo coherente, gana el derecho a co
 
 ---
 
+## Artefacto verificable
+
+FASE 5 convierte el Operational Model en un **artefacto verificable**:
+
+| Antes | Después |
+|-------|---------|
+| «Creemos que este modelo representa la operación.» | «Hemos intentado romperlo; conocemos sus límites.» |
+
+Paralelo metodológico (no metáfora vacía):
+
+| Disciplina | Enfoque |
+|------------|---------|
+| Ciencia | Falsar la teoría |
+| Ingeniería | Llevar hasta el fallo |
+| Criptografía | Invitar a romper |
+| **YourMeal FASE 5** | Refutar el modelo operativo |
+
+---
+
+## Gobernanza: revisión antes del cambio
+
+```text
+Observación / Escenario / Edge case
+        ↓
+Validation Report (VR)
+        ↓
+Model Change (MC)
+        ↓
+Operational Model (17)
+```
+
+**No existe el cambio directo al modelo.** Ver [07 certification](./07-certification.md).
+
+---
+
 ## Misión (muy concreta)
 
 | Hacer | No hacer |
@@ -48,9 +83,9 @@ Si tras intentar romperlo el modelo sigue siendo coherente, gana el derecho a co
 | 02 | [validation-scenarios](./02-validation-scenarios/README.md) | Casos operativos completos |
 | 03 | [edge-cases](./03-edge-cases/README.md) | Rotura deliberada del modelo |
 | 04 | [field-observation](./04-field-observation/README.md) | EatClean — el modelo explica la realidad |
-| 05 | [validation-reports](./05-validation-reports/README.md) | Dictámenes trazables |
+| 05 | [validation-reports](./05-validation-reports/README.md) | Dictámenes trazables · [coverage](./05-validation-reports/validation-coverage.md) |
 | 06 | [model-changes](./06-model-changes/README.md) | Cambios al modelo (solo vía report) |
-| 07 | [certification](./07-certification.md) | Operational Model Certified v1.0 |
+| 07 | [certification](./07-certification.md) | Niveles Alpha → Beta → RC → **Certified v1.0** |
 
 ---
 
@@ -101,8 +136,10 @@ Si ajuste necesario → 06 Model Changes (respaldado por VR)
         ↓
 Repetir hasta umbral de certificación
         ↓
-07 · Operational Model Certified v1.0
+07 · Nivel Certified v1.0 (vía Alpha → Beta → RC)
 ```
+
+Métrica viva: [validation-coverage](./05-validation-reports/validation-coverage.md).
 
 ---
 
@@ -126,7 +163,7 @@ Sin certificación, el modelo sigue siendo **hipótesis endurecida**, no base pe
 | Escenarios / edge cases | 🚧 Semillas — ejecutar |
 | Field observation (EatClean) | ⏸ hasta activación bajo validación |
 | Reports / changes | Vacío (correcto) |
-| Certificación | Pendiente |
+| Certificación | Pendiente — nivel actual: **Alpha** |
 
 ---
 
