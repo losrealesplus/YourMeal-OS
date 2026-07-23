@@ -173,6 +173,7 @@ Core | Operational | Engineering | Historical
 | `DICT-047` | [BrandConfig](#brandconfig) | Engineering | Accepted |
 | `DICT-048` | [Tenant-Branded](#tenant-branded) | Core | Accepted |
 | `DICT-049` | [Powered by YourMeal OS](#powered-by-yourmeal-os) | Core | Accepted |
+| `DICT-050` | [Platform owns capability / Tenant owns experience](#platform-owns-capability--tenant-owns-experience) | Core | Accepted |
 
 ---
 
@@ -204,7 +205,7 @@ Core | Operational | Engineering | Historical
 
 ### Identidad SaaS (ADR 0014)
 
-[Customer Application](#customer-application) (`DICT-045`) · [YourMeal OS (Corporate Surface)](#yourmeal-os-corporate-surface) (`DICT-046`) · [BrandConfig](#brandconfig) (`DICT-047`) · [Tenant-Branded](#tenant-branded) (`DICT-048`) · [Powered by YourMeal OS](#powered-by-yourmeal-os) (`DICT-049`)
+[Customer Application](#customer-application) (`DICT-045`) · [YourMeal OS (Corporate Surface)](#yourmeal-os-corporate-surface) (`DICT-046`) · [BrandConfig](#brandconfig) (`DICT-047`) · [Tenant-Branded](#tenant-branded) (`DICT-048`) · [Powered by YourMeal OS](#powered-by-yourmeal-os) (`DICT-049`) · [Platform owns capability / Tenant owns experience](#platform-owns-capability--tenant-owns-experience) (`DICT-050`)
 
 ---
 
@@ -2122,6 +2123,8 @@ Principio de arquitectura de producto
 ## Definición
 Propiedad de la Customer Application: **100%** del branding visible pertenece al Tenant. YourMeal OS no es la marca principal frente al cliente final.
 
+Principio: *The Platform owns the capability. The Tenant owns the experience.*
+
 ## Cuándo ocurre
 Toda superficie de cliente (UI, auth, stores, emails al consumidor).
 
@@ -2182,6 +2185,46 @@ ADR 0014 · [TENANT_BRANDING](../05-architecture/TENANT_BRANDING.md)
 
 ---
 
+# Platform owns capability / Tenant owns experience
+
+## ID
+DICT-050
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Platform owns capability / Tenant owns experience
+
+## Tipo
+Principio de arquitectura de producto
+
+## Definición
+La plataforma (YourMeal OS) es propietaria de las **capabilities** y del motor operativo. El Tenant es propietario de la **experiencia** (marca, copy, tono, presentación) frente a sus usuarios.
+
+## Cuándo ocurre
+Diseño de pantallas · BrandConfig · separación Producto A / Producto B · filtro «¿Plataforma o Tenant?».
+
+## Produce
+SaaS multi-tenant escalable sin confundir marca del proveedor con marca del cliente.
+
+## No significa
+Que el Tenant invente reglas operacionales · que la plataforma no pueda mostrar Powered by.
+
+## Sinónimos
+La plataforma es propietaria de la capacidad; el tenant es propietario de la experiencia
+
+## Palabras relacionadas
+Tenant-Branded · BrandConfig · Customer Application · Capability
+
+## Referencias
+ADR 0014
+
+---
+
 ## Historial de este diccionario
 
 | Fecha | Cambio |
@@ -2190,4 +2233,5 @@ ADR 0014 · [TENANT_BRANDING](../05-architecture/TENANT_BRANDING.md)
 | 2026-07-23 | IDs DICT-xxx · Status · Madurez · autoridad semántica · cuatro pilares |
 | 2026-07-23 | Primera pregunta (nuevo vs sinónimo) · disciplina de evolución de pilares |
 | 2026-07-23 | ADR 0014 — DICT-045…049 Customer Application / BrandConfig / Tenant-Branded |
+| 2026-07-23 | ADR 0014 ampliación — cinco capas · filtro Plataforma/Tenant · DICT-050 |
 
