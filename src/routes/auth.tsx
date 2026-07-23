@@ -10,7 +10,7 @@ import {
   PoweredByLine,
   TenantBrandScope,
 } from "@/components/tenant/tenant-brand-scope";
-import { BrandLeafMark } from "@/components/tenant/brand-leaf-mark";
+
 import { TenantLogo } from "@/components/tenant/tenant-logo";
 import { QuietLocaleSwitch } from "@/components/tenant/quiet-locale-switch";
 import { brandConfig, tenantCopyEs } from "@/tenant/brand-config";
