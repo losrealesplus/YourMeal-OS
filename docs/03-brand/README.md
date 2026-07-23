@@ -39,6 +39,8 @@ Branding completo vía `BrandConfig` del Tenant (`tenants.brand` + assets).
 Nombre, logo, colores, tipografía, copy, stores y splash son del Tenant — no de YourMeal OS.
 
 Experiencia concreta (copy, login, home, nav): [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md)  
+Brief Cursor/Lovable: [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md)  
+Assets: [`tenants/eatclean/`](../../tenants/eatclean/README.md)  
 Fuente de identidad: [eatcleantenerifecatering.es](https://eatcleantenerifecatering.es/)
 
 ---

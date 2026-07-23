@@ -51,7 +51,8 @@ Tenant Experience Spec → Experience Refactor
 → BrandConfig Validation → EatClean Release UX
 ```
 
-Mejora percepción del producto **sin** tocar HP-001. Spec: [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md). Checklist por pantalla en ese doc.
+Mejora percepción del producto **sin** tocar HP-001.  
+Spec: [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md) · Brief: [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) · Assets: [`tenants/eatclean/`](../../tenants/eatclean/README.md).
 
 ---
 

@@ -1,0 +1,39 @@
+{
+  "slug": "eatclean",
+  "name": "EatClean",
+  "legalName": "Eat Clean Tenerife Catering",
+  "website": "https://eatcleantenerifecatering.es/",
+  "primaryColor": "#PLACEHOLDER_EXTRACT_FROM_WEB",
+  "secondaryColor": "#PLACEHOLDER_EXTRACT_FROM_WEB",
+  "background": "#PLACEHOLDER_EXTRACT_FROM_WEB",
+  "surface": "#PLACEHOLDER_EXTRACT_FROM_WEB",
+  "success": "#PLACEHOLDER_EXTRACT_FROM_WEB",
+  "error": "#PLACEHOLDER_EXTRACT_FROM_WEB",
+  "typography": {
+    "display": "PLACEHOLDER_MATCH_WEB_OR_NEAREST_LICENSE",
+    "body": "PLACEHOLDER_MATCH_WEB_OR_NEAREST_LICENSE"
+  },
+  "borderRadius": "PLACEHOLDER",
+  "poweredBy": {
+    "visible": true,
+    "label": "Powered by YourMeal OS",
+    "surfaces": ["login", "splash", "about"]
+  },
+  "assets": {
+    "logo": "./logo.svg",
+    "icon": "./icon.png",
+    "splash": "./splash.webp",
+    "heroHome": "./hero-home.webp",
+    "onboarding": [
+      "./onboarding-1.webp",
+      "./onboarding-2.webp",
+      "./onboarding-3.webp"
+    ],
+    "emptyOrders": "./empty-orders.webp"
+  },
+  "storeAssets": {
+    "appName": "EatClean",
+    "shortDescription": "Comida preparada para ayudarte a comer mejor."
+  },
+  "_notes": "Replace PLACEHOLDER_* by extracting tokens from the official website. Never hardcode EatClean values in application source — load this file via BrandConfig resolution."
+}

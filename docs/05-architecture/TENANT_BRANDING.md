@@ -222,7 +222,7 @@ Incremento futuro (p. ej. Lovable), **sin tocar HP-001 ni lógica operativa**:
 
 > Que cualquier cliente descargue la app y piense que es la app oficial de EatClean.
 
-Spec operativo: [TENANT_EXPERIENCE_SPEC](./TENANT_EXPERIENCE_SPEC.md) (identidad · copy · login · home · nav · tono · fotos).
+Spec operativo: [TENANT_EXPERIENCE_SPEC](./TENANT_EXPERIENCE_SPEC.md) · brief de ejecución: [TENANT_IMPLEMENTATION_EATCLEAN](./TENANT_IMPLEMENTATION_EATCLEAN.md) · assets: [`tenants/eatclean/`](../../tenants/eatclean/README.md).
 
 Revisa: onboarding · login · dashboard · navegación · tono · imágenes · iconografía · copy.
 
