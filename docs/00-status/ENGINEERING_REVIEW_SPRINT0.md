@@ -291,22 +291,30 @@ Tras ORR → FOV → Evidence → Knowledge Update, Operational Health se mide a
 
 ---
 
-## Orden sugerido (Engineering Fix Sprint → CAP-006 → ORR)
+## Roadmap post–auditoría (actualizado)
 
-**Grupo A · Integridad operacional (antes de CAP-006 / Confirm):**
+```text
+Fase A  Merge pila → main
+Fase B  Engineering Fix Sprint (P1 only)
+Fase C  Verificar CAP-006 / HP-001 estable
+Fase D  ORR (sin features)
+Fase E  FOV
+```
+
+Tablero vivo: [CURRENT_PHASE](./CURRENT_PHASE.md).
+
+### Engineering Integrity (confianza del sistema)
 
 1. INC-01 oferta + total servidor  
 2. INC-03 ownership confirm  
 3. INC-05 atomicidad draft + audit  
 
-**Grupo B · Calidad para estado Operational:**
+### Engineering Completeness (criterio Operational)
 
 4. INC-02 deleted_at + types  
 5. INC-04 N+1  
 6. INC-06 mocks home/orders (empty-state o lista)  
 7. INC-07 feature flags  
 
-Luego: **CAP-006** → **ORR** (sin features) → **FOV**.
-
-**Siguiente paso tras autorización:** PR de **Engineering Debt / Fixes** (hygiene) — **no** nuevas Capabilities, **no** UX, **no** OM.  
+**Engineering Fix Sprint** = un solo PR de hygiene — **no** nuevas Capabilities, **no** UX, **no** OM.  
 Capabilities = evolución funcional · Engineering Debt = implementación · la deuda no inventa conocimiento operacional.
