@@ -78,7 +78,7 @@ PR #23 → main → Apply migration → Smoke HP-001 → ORR → PASSED → Read
 
 ## Lenguaje oficial
 
-[PROJECT_DICTIONARY](../99-reference/PROJECT_DICTIONARY.md) — concepto nuevo → diccionario **antes** de uso oficial.
+[PROJECT_DICTIONARY](../99-reference/PROJECT_DICTIONARY.md) — autoridad semántica (`DICT-xxx` · Status · Madurez). Concepto Accepted → Dictionary **antes** de uso oficial.
 
 Ver [ENGINEERING_PHASE](./ENGINEERING_PHASE.md) · [FOV-001](../30-field-validation/FOV-001_HP-001.md).
 
