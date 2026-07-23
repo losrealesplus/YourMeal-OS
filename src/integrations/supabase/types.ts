@@ -1380,6 +1380,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_customer_owner: { Args: { _customer_id: string }; Returns: boolean }
       is_saas_admin: { Args: { _user_id: string }; Returns: boolean }
       is_tenant_member: { Args: { _tenant_id: string }; Returns: boolean }
     }
