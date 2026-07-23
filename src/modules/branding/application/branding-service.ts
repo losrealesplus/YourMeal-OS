@@ -76,7 +76,7 @@ export const BrandingService = {
         }
         if (!isValidHex(value)) {
           throw new DomainError(
-            "INVALID_INPUT",
+            "INVALID_STATE",
             `Invalid HEX color for ${key}: ${value}`,
           );
         }
@@ -98,7 +98,7 @@ export const BrandingService = {
         const validation = validateLogoFile(input.logoFile);
         if (validation) {
           throw new DomainError(
-            "INVALID_INPUT",
+            "INVALID_STATE",
             validation.kind === "too_large"
               ? `Logo exceeds 512 KB (${validation.sizeBytes} bytes)`
               : `Unsupported logo MIME type: ${validation.type}`,
