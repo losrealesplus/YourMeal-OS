@@ -8,15 +8,64 @@
 
 ---
 
-## Regla de gobernanza
+## Cuatro pilares documentales (no se solapan)
 
-> **Cada vez que se cree un concepto nuevo aceptado por el proyecto, su definición debe añadirse al PROJECT_DICTIONARY antes de considerarlo oficial.**
+| Documento | Responde a |
+|-----------|------------|
+| [FOUNDATION](../../FOUNDATION.md) | ¿Cuáles son las reglas permanentes del proyecto? |
+| [ADR](../adr/README.md) | ¿Por qué decidimos hacer esto? |
+| [Operational Model](../17-operational-model/README.md) | ¿Cómo funciona el dominio? |
+| **PROJECT_DICTIONARY** (este) | ¿Qué significa exactamente cada concepto? |
+
+---
+
+## Regla de gobernanza (autoridad semántica)
 
 ```text
-Nueva definición → Aceptada → PROJECT_DICTIONARY → Puede utilizarse
+Nuevo concepto
+        ↓
+Discusión
+        ↓
+Aceptado
+        ↓
+PROJECT_DICTIONARY  (entrada con ID DICT-xxx)
+        ↓
+Puede utilizarse en:
+- ADR
+- Operational Model
+- Código
+- Documentación
 ```
 
-No al revés. Una conversación que fija significado (p. ej. «ORR PASSED = …») implica una entrada aquí en el mismo ciclo documental.
+> **Solo conceptos estables y Accepted.** Hipótesis, ideas en discusión o términos provisionales permanecen en ADRs, notas o actas hasta ser aprobados. El diccionario no es un block de borradores.
+
+Cuando una conversación fija significado (p. ej. «ORR PASSED = …»), la siguiente tarea documental es: **nueva entrada DICT → commit**.
+
+---
+
+## Metadatos de cada entrada
+
+| Campo | Valores |
+|-------|---------|
+| **ID** | `DICT-001` … identificador estable (citable desde ADR / CAP / Gate) |
+| **Status** | `Draft` · `Accepted` · `Deprecated` · `Replaced` |
+| **Madurez** | `Core` · `Operational` · `Engineering` · `Historical` |
+
+| Madurez | Significado |
+|---------|-------------|
+| **Core** | Concepto fundamental del framework FOPEBA / gobernanza |
+| **Operational** | Concepto del dominio de producto / operación |
+| **Engineering** | Concepto de implementación YourMeal OS |
+| **Historical** | Se mantiene por compatibilidad; ya no se usa activamente |
+
+### Status
+
+| Status | Significado |
+|--------|-------------|
+| **Draft** | En revisión — **no** usar en docs oficiales todavía (excepcional; preferir fuera del Dictionary) |
+| **Accepted** | Oficial |
+| **Deprecated** | Evitar en texto nuevo; sigue documentado |
+| **Replaced** | Sustituido por otro DICT-xxx (indicar en Referencias) |
 
 ---
 
@@ -25,8 +74,17 @@ No al revés. Una conversación que fija significado (p. ej. «ORR PASSED = …�
 ```markdown
 # <TÉRMINO>
 
+## ID
+DICT-xxx
+
 ## Nombre
 ## Tipo
+## Status
+Accepted
+
+## Madurez
+Core | Operational | Engineering | Historical
+
 ## Definición
 ## Cuándo ocurre
 ## Produce
@@ -38,37 +96,98 @@ No al revés. Una conversación que fija significado (p. ej. «ORR PASSED = …�
 
 ---
 
+## Índice por ID
+
+
+| ID | Término | Madurez | Status |
+|----|---------|---------|--------|
+| `DICT-001` | [FOPEBA](#fopeba) | Core | Accepted |
+| `DICT-002` | [FOV](#fov) | Core | Accepted |
+| `DICT-003` | [IOV](#iov) | Core | Accepted |
+| `DICT-004` | [Knowledge Update](#knowledge-update) | Core | Accepted |
+| `DICT-005` | [Gate](#gate) | Core | Accepted |
+| `DICT-006` | [Evidence](#evidence) | Core | Accepted |
+| `DICT-007` | [Knowledge Leakage](#knowledge-leakage) | Core | Accepted |
+| `DICT-008` | [Operational Model](#operational-model) | Core | Accepted |
+| `DICT-009` | [Table Validation](#table-validation) | Core | Accepted |
+| `DICT-010` | [Field Validation](#field-validation) | Core | Accepted |
+| `DICT-011` | [Capability](#capability) | Engineering | Accepted |
+| `DICT-012` | [Repository](#repository) | Engineering | Accepted |
+| `DICT-013` | [Mutation Pattern](#mutation-pattern) | Engineering | Accepted |
+| `DICT-014` | [Read Pattern](#read-pattern) | Engineering | Accepted |
+| `DICT-015` | [Happy Path](#happy-path) | Engineering | Accepted |
+| `DICT-016` | [ORR](#orr) | Core | Accepted |
+| `DICT-017` | [Smoke Test](#smoke-test) | Engineering | Accepted |
+| `DICT-018` | [Engineering Baseline](#engineering-baseline) | Engineering | Accepted |
+| `DICT-019` | [Hardening Sprint](#hardening-sprint) | Engineering | Accepted |
+| `DICT-020` | [ADR](#adr) | Core | Accepted |
+| `DICT-021` | [Current Phase](#current-phase) | Engineering | Accepted |
+| `DICT-022` | [Milestone](#milestone) | Engineering | Accepted |
+| `DICT-023` | [Integration Release](#integration-release) | Engineering | Accepted |
+| `DICT-024` | [Evidence Gate](#evidence-gate) | Core | Accepted |
+| `DICT-025` | [Frozen](#frozen) | Core | Accepted |
+| `DICT-026` | [Foundation Lock](#foundation-lock) | Core | Accepted |
+| `DICT-027` | [Project Dictionary](#project-dictionary) | Core | Accepted |
+| `DICT-028` | [Knowledge Engineering](#knowledge-engineering) | Core | Accepted |
+| `DICT-029` | [Software Engineering](#software-engineering) | Engineering | Accepted |
+| `DICT-030` | [Operational Engineering](#operational-engineering) | Core | Accepted |
+| `DICT-031` | [Ready for CAP-006](#ready-for-cap-006) | Engineering | Accepted |
+| `DICT-032` | [Ready for ORR](#ready-for-orr) | Engineering | Accepted |
+| `DICT-033` | [Ready for FOV](#ready-for-fov) | Core | Accepted |
+| `DICT-034` | [Operational](#operational) | Engineering | Accepted |
+| `DICT-035` | [Connected](#connected) | Engineering | Accepted |
+| `DICT-036` | [Scaffold](#scaffold) | Engineering | Accepted |
+| `DICT-037` | [Field Validated](#field-validated) | Core | Accepted |
+| `DICT-038` | [Tenant](#tenant) | Operational | Accepted |
+| `DICT-039` | [Dish](#dish) | Operational | Accepted |
+| `DICT-040` | [Weekly Menu](#weekly-menu) | Operational | Accepted |
+| `DICT-041` | [Draft Order](#draft-order) | Operational | Accepted |
+| `DICT-042` | [Confirm Order](#confirm-order) | Operational | Accepted |
+| `DICT-043` | [Recipe](#recipe) | Operational | Accepted |
+| `DICT-044` | [Production](#production) | Operational | Accepted |
+
+---
+
 ## Índice por categoría
 
 ### Metodología
 
-[FOPEBA](#fopeba) · [FOV](#fov) · [IOV](#iov) · [Knowledge Update](#knowledge-update) · [Gate](#gate) · [Evidence](#evidence) · [Knowledge Leakage](#knowledge-leakage) · [Operational Model](#operational-model) · [Table Validation](#table-validation) · [Field Validation](#field-validation)
+[FOPEBA](#fopeba) (`DICT-001`) · [FOV](#fov) (`DICT-002`) · [IOV](#iov) (`DICT-003`) · [Knowledge Update](#knowledge-update) (`DICT-004`) · [Gate](#gate) (`DICT-005`) · [Evidence](#evidence) (`DICT-006`) · [Knowledge Leakage](#knowledge-leakage) (`DICT-007`) · [Operational Model](#operational-model) (`DICT-008`) · [Table Validation](#table-validation) (`DICT-009`) · [Field Validation](#field-validation) (`DICT-010`)
 
 ### Ingeniería
 
-[Capability](#capability) · [Repository](#repository) · [Mutation Pattern](#mutation-pattern) · [Read Pattern](#read-pattern) · [Happy Path](#happy-path) · [ORR](#orr) · [Smoke Test](#smoke-test) · [Engineering Baseline](#engineering-baseline) · [Hardening Sprint](#hardening-sprint)
+[Capability](#capability) (`DICT-011`) · [Repository](#repository) (`DICT-012`) · [Mutation Pattern](#mutation-pattern) (`DICT-013`) · [Read Pattern](#read-pattern) (`DICT-014`) · [Happy Path](#happy-path) (`DICT-015`) · [ORR](#orr) (`DICT-016`) · [Smoke Test](#smoke-test) (`DICT-017`) · [Engineering Baseline](#engineering-baseline) (`DICT-018`) · [Hardening Sprint](#hardening-sprint) (`DICT-019`)
 
 ### Gobernanza
 
-[ADR](#adr) · [Current Phase](#current-phase) · [Milestone](#milestone) · [Integration Release](#integration-release) · [Evidence Gate](#evidence-gate) · [Frozen](#frozen) · [Foundation Lock](#foundation-lock) · [Project Dictionary](#project-dictionary)
-
-### Estado
-
-[Ready for CAP-006](#ready-for-cap-006) · [Ready for ORR](#ready-for-orr) · [Ready for FOV](#ready-for-fov) · [Operational](#operational) · [Connected](#connected) · [Scaffold](#scaffold) · [Field Validated](#field-validated)
+[ADR](#adr) (`DICT-020`) · [Current Phase](#current-phase) (`DICT-021`) · [Milestone](#milestone) (`DICT-022`) · [Integration Release](#integration-release) (`DICT-023`) · [Evidence Gate](#evidence-gate) (`DICT-024`) · [Frozen](#frozen) (`DICT-025`) · [Foundation Lock](#foundation-lock) (`DICT-026`) · [Project Dictionary](#project-dictionary) (`DICT-027`)
 
 ### Dominios de trabajo
 
-[Knowledge Engineering](#knowledge-engineering) · [Software Engineering](#software-engineering) · [Operational Engineering](#operational-engineering)
+[Knowledge Engineering](#knowledge-engineering) (`DICT-028`) · [Software Engineering](#software-engineering) (`DICT-029`) · [Operational Engineering](#operational-engineering) (`DICT-030`)
+
+### Estado
+
+[Ready for CAP-006](#ready-for-cap-006) (`DICT-031`) · [Ready for ORR](#ready-for-orr) (`DICT-032`) · [Ready for FOV](#ready-for-fov) (`DICT-033`) · [Operational](#operational) (`DICT-034`) · [Connected](#connected) (`DICT-035`) · [Scaffold](#scaffold) (`DICT-036`) · [Field Validated](#field-validated) (`DICT-037`)
 
 ### Producto (núcleo HP-001)
 
-[Tenant](#tenant) · [Dish](#dish) · [Weekly Menu](#weekly-menu) · [Draft Order](#draft-order) · [Confirm Order](#confirm-order) · [Recipe](#recipe) · [Production](#production)
+[Tenant](#tenant) (`DICT-038`) · [Dish](#dish) (`DICT-039`) · [Weekly Menu](#weekly-menu) (`DICT-040`) · [Draft Order](#draft-order) (`DICT-041`) · [Confirm Order](#confirm-order) (`DICT-042`) · [Recipe](#recipe) (`DICT-043`) · [Production](#production) (`DICT-044`)
 
 ---
 
 # Metodología
 
 # FOPEBA
+
+## ID
+DICT-001
+
+## Status
+Accepted
+
+## Madurez
+Core
 
 ## Nombre
 Framework for Operational Product Engineering by Evidence-Based Analysis
@@ -101,6 +220,15 @@ Operational Model · FOV · Gate · Evidence · Knowledge Update
 
 # FOV
 
+## ID
+DICT-002
+
+## Status
+Accepted
+
+## Madurez
+Core
+
 ## Nombre
 Field Operational Validation
 
@@ -131,6 +259,15 @@ ORR · Gate · Evidence · Knowledge Leakage · FOV-001
 ---
 
 # IOV
+
+## ID
+DICT-003
+
+## Status
+Accepted
+
+## Madurez
+Core
 
 ## Nombre
 Independent Operational Validation
@@ -163,6 +300,15 @@ Table Validation · Field Validation · FOPEBA
 
 # Knowledge Update
 
+## ID
+DICT-004
+
+## Status
+Accepted
+
+## Madurez
+Core
+
 ## Nombre
 Knowledge Update
 
@@ -193,6 +339,15 @@ Gate · FOV · Evidence · Operational Model
 ---
 
 # Gate
+
+## ID
+DICT-005
+
+## Status
+Accepted
+
+## Madurez
+Core
 
 ## Nombre
 Gate (decisión post-evidencia)
@@ -225,6 +380,15 @@ FOV · Knowledge Update · Evidence · ORR
 
 # Evidence
 
+## ID
+DICT-006
+
+## Status
+Accepted
+
+## Madurez
+Core
+
 ## Nombre
 Evidence (evidencia)
 
@@ -255,6 +419,15 @@ SMOKE_HP-001.md · ORR.md · `docs/20-evidence-framework/`
 ---
 
 # Knowledge Leakage
+
+## ID
+DICT-007
+
+## Status
+Accepted
+
+## Madurez
+Core
 
 ## Nombre
 Knowledge Leakage
@@ -287,6 +460,15 @@ FOV-001 · FOV Mission Brief
 
 # Operational Model
 
+## ID
+DICT-008
+
+## Status
+Accepted
+
+## Madurez
+Core
+
 ## Nombre
 Operational Model (OM)
 
@@ -318,6 +500,15 @@ FOPEBA · Capability · Knowledge Update · Table Validation
 
 # Table Validation
 
+## ID
+DICT-009
+
+## Status
+Accepted
+
+## Madurez
+Core
+
 ## Nombre
 Table Validation
 
@@ -348,6 +539,15 @@ Field Validation · IOV · FOV
 ---
 
 # Field Validation
+
+## ID
+DICT-010
+
+## Status
+Accepted
+
+## Madurez
+Core
 
 ## Nombre
 Field Validation
@@ -382,6 +582,15 @@ MODULE_STATE_CRITERIA.md · FOV-001
 
 # Capability
 
+## ID
+DICT-011
+
+## Status
+Accepted
+
+## Madurez
+Engineering
+
 ## Nombre
 Capability
 
@@ -412,6 +621,15 @@ Read Pattern · Mutation Pattern · Happy Path · PR Change Levels
 ---
 
 # Repository
+
+## ID
+DICT-012
+
+## Status
+Accepted
+
+## Madurez
+Engineering
 
 ## Nombre
 Repository
@@ -444,6 +662,15 @@ Read Pattern · Mutation Pattern · Service
 
 # Mutation Pattern
 
+## ID
+DICT-013
+
+## Status
+Accepted
+
+## Madurez
+Engineering
+
 ## Nombre
 Mutation Pattern
 
@@ -474,6 +701,15 @@ MUTATION_PATTERN.md
 ---
 
 # Read Pattern
+
+## ID
+DICT-014
+
+## Status
+Accepted
+
+## Madurez
+Engineering
 
 ## Nombre
 Read Pattern
@@ -506,6 +742,15 @@ CAPABILITY_CONNECTION_PATTERN.md
 
 # Happy Path
 
+## ID
+DICT-015
+
+## Status
+Accepted
+
+## Madurez
+Engineering
+
 ## Nombre
 Happy Path
 
@@ -536,6 +781,15 @@ HAPPY_PATHS.md · SMOKE_HP-001.md
 ---
 
 # ORR
+
+## ID
+DICT-016
+
+## Status
+Accepted
+
+## Madurez
+Core
 
 ## Nombre
 Operational Readiness Review
@@ -568,6 +822,15 @@ Smoke Test · FOV · HP-001 · Evidence Gate · Ready for FOV
 
 # Smoke Test
 
+## ID
+DICT-017
+
+## Status
+Accepted
+
+## Madurez
+Engineering
+
 ## Nombre
 Smoke Test (HP-001)
 
@@ -599,6 +862,15 @@ SMOKE_HP-001.md
 
 # Engineering Baseline
 
+## ID
+DICT-018
+
+## Status
+Accepted
+
+## Madurez
+Engineering
+
 ## Nombre
 Engineering Baseline
 
@@ -629,6 +901,15 @@ IR-001_FIRST_ENGINEERING_INTEGRATION.md · ENGINEERING_PHASE.md
 ---
 
 # Hardening Sprint
+
+## ID
+DICT-019
+
+## Status
+Accepted
+
+## Madurez
+Engineering
 
 ## Nombre
 Hardening Sprint / Engineering Hardening
@@ -663,6 +944,15 @@ ENGINEERING_REVIEW_SPRINT0.md · PR #23
 
 # ADR
 
+## ID
+DICT-020
+
+## Status
+Accepted
+
+## Madurez
+Core
+
 ## Nombre
 Architecture Decision Record
 
@@ -693,6 +983,15 @@ Foundation Lock · Frozen
 ---
 
 # Current Phase
+
+## ID
+DICT-021
+
+## Status
+Accepted
+
+## Madurez
+Engineering
 
 ## Nombre
 Current Phase
@@ -725,6 +1024,15 @@ Milestone · Evidence Gate · ENGINEERING_PHASE
 
 # Milestone
 
+## ID
+DICT-022
+
+## Status
+Accepted
+
+## Madurez
+Engineering
+
 ## Nombre
 Milestone
 
@@ -755,6 +1063,15 @@ Integration Release · MILESTONES.md
 ---
 
 # Integration Release
+
+## ID
+DICT-023
+
+## Status
+Accepted
+
+## Madurez
+Engineering
 
 ## Nombre
 Integration Release (IR)
@@ -787,6 +1104,15 @@ IR-001_FIRST_ENGINEERING_INTEGRATION.md
 
 # Evidence Gate
 
+## ID
+DICT-024
+
+## Status
+Accepted
+
+## Madurez
+Core
+
 ## Nombre
 Evidence Gate
 
@@ -817,6 +1143,15 @@ CURRENT_PHASE.md · ENGINEERING_PHASE.md · AGENTS.md
 ---
 
 # Frozen
+
+## ID
+DICT-025
+
+## Status
+Accepted
+
+## Madurez
+Core
 
 ## Nombre
 Frozen
@@ -849,6 +1184,15 @@ Foundation Lock · Acta · Gate
 
 # Foundation Lock
 
+## ID
+DICT-026
+
+## Status
+Accepted
+
+## Madurez
+Core
+
 ## Nombre
 Foundation Lock
 
@@ -879,6 +1223,15 @@ ADR · Frozen · FOUNDATION.md
 ---
 
 # Project Dictionary
+
+## ID
+DICT-027
+
+## Status
+Accepted
+
+## Madurez
+Core
 
 ## Nombre
 Project Dictionary
@@ -913,6 +1266,15 @@ Este archivo · AGENTS.md
 
 # Knowledge Engineering
 
+## ID
+DICT-028
+
+## Status
+Accepted
+
+## Madurez
+Core
+
 ## Nombre
 Knowledge Engineering
 
@@ -944,6 +1306,15 @@ ENGINEERING_PHASE.md · CURRENT_PHASE.md
 
 # Software Engineering
 
+## ID
+DICT-029
+
+## Status
+Accepted
+
+## Madurez
+Engineering
+
 ## Nombre
 Software Engineering
 
@@ -974,6 +1345,15 @@ ENGINEERING_PHASE.md
 ---
 
 # Operational Engineering
+
+## ID
+DICT-030
+
+## Status
+Accepted
+
+## Madurez
+Core
 
 ## Nombre
 Operational Engineering
@@ -1008,6 +1388,15 @@ ENGINEERING_PHASE.md · `docs/30-field-validation/`
 
 # Ready for CAP-006
 
+## ID
+DICT-031
+
+## Status
+Accepted
+
+## Madurez
+Engineering
+
 ## Nombre
 Ready for CAP-006
 
@@ -1038,6 +1427,15 @@ ENGINEERING_REVIEW_SPRINT0.md
 ---
 
 # Ready for ORR
+
+## ID
+DICT-032
+
+## Status
+Accepted
+
+## Madurez
+Engineering
 
 ## Nombre
 Ready for ORR
@@ -1070,6 +1468,15 @@ CURRENT_PHASE.md · ORR.md
 
 # Ready for FOV
 
+## ID
+DICT-033
+
+## Status
+Accepted
+
+## Madurez
+Core
+
 ## Nombre
 Ready for FOV
 
@@ -1100,6 +1507,15 @@ ORR.md · CURRENT_PHASE.md
 ---
 
 # Operational
+
+## ID
+DICT-034
+
+## Status
+Accepted
+
+## Madurez
+Engineering
 
 ## Nombre
 Operational (estado de módulo / Capability)
@@ -1132,6 +1548,15 @@ MODULE_STATE_CRITERIA.md
 
 # Connected
 
+## ID
+DICT-035
+
+## Status
+Accepted
+
+## Madurez
+Engineering
+
 ## Nombre
 Connected
 
@@ -1163,6 +1588,15 @@ MODULE_STATE_CRITERIA.md
 
 # Scaffold
 
+## ID
+DICT-036
+
+## Status
+Accepted
+
+## Madurez
+Engineering
+
 ## Nombre
 Scaffold
 
@@ -1193,6 +1627,15 @@ MODULE_STATE_CRITERIA.md
 ---
 
 # Field Validated
+
+## ID
+DICT-037
+
+## Status
+Accepted
+
+## Madurez
+Core
 
 ## Nombre
 Field Validated
@@ -1227,6 +1670,15 @@ MODULE_STATE_CRITERIA.md
 
 # Tenant
 
+## ID
+DICT-038
+
+## Status
+Accepted
+
+## Madurez
+Operational
+
 ## Nombre
 Tenant
 
@@ -1257,6 +1709,15 @@ OM · auth hooks
 ---
 
 # Dish
+
+## ID
+DICT-039
+
+## Status
+Accepted
+
+## Madurez
+Operational
 
 ## Nombre
 Dish
@@ -1289,6 +1750,15 @@ Weekly Menu · Recipe · CAP-002
 
 # Weekly Menu
 
+## ID
+DICT-040
+
+## Status
+Accepted
+
+## Madurez
+Operational
+
 ## Nombre
 Weekly Menu
 
@@ -1319,6 +1789,15 @@ CAP-003 · OM Weekly Menu
 ---
 
 # Draft Order
+
+## ID
+DICT-041
+
+## Status
+Accepted
+
+## Madurez
+Operational
 
 ## Nombre
 Draft Order
@@ -1351,6 +1830,15 @@ CAP-004 · MUTATION_PATTERN.md
 
 # Confirm Order
 
+## ID
+DICT-042
+
+## Status
+Accepted
+
+## Madurez
+Operational
+
 ## Nombre
 Confirm Order
 
@@ -1382,6 +1870,15 @@ CAP-006 · spine-transitions OM
 
 # Recipe
 
+## ID
+DICT-043
+
+## Status
+Accepted
+
+## Madurez
+Operational
+
 ## Nombre
 Recipe
 
@@ -1412,6 +1909,15 @@ Dish · Ingredient · Production
 ---
 
 # Production
+
+## ID
+DICT-044
+
+## Status
+Accepted
+
+## Madurez
+Operational
 
 ## Nombre
 Production
@@ -1447,3 +1953,5 @@ OM · IMPLEMENTATION_BACKLOG (posterior)
 | Fecha | Cambio |
 |-------|--------|
 | 2026-07-23 | Creación — lenguaje Evidence Gate / ORR / FOV / dominios / HP-001 |
+| 2026-07-23 | IDs DICT-xxx · Status · Madurez · autoridad semántica · cuatro pilares |
+
