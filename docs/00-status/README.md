@@ -2,6 +2,7 @@
 
 **Última actualización:** 2026-07-23  
 **Fase actual:** [CURRENT_PHASE](./CURRENT_PHASE.md) ← abrir primero  
+**Última integración:** [IR-001](./IR-001_FIRST_ENGINEERING_INTEGRATION.md) · PR #22  
 **Pre-piloto:** [PRE_PILOT_AUDIT](./PRE_PILOT_AUDIT.md)  
 **Gobernanza:** [Acta — Fin construcción metodológica](./ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) **Cerrada**  
 **Historia:** [MILESTONES](./MILESTONES.md)  
