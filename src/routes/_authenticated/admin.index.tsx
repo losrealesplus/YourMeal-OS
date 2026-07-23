@@ -1,16 +1,22 @@
 /**
- * Centro de Operaciones — home con tarjetas Cocina / Reparto (datos reales).
- * PR-034 · Operations Workspace Activation
+ * Centro de Operaciones — punto de entrada diario.
+ * PR-034: qué necesita atención hoy (trabajo operativo, no dashboard KPI).
  */
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { ChefHat, Truck, ArrowRight } from "lucide-react";
+import { useEffect, useState, type CSSProperties } from "react";
+import {
+  Boxes,
+  ChefHat,
+  Truck,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useCan } from "@/hooks/use-can";
 import { supabase } from "@/integrations/supabase/client";
 import { createServiceContext } from "@/services/types";
 import { OperationsService } from "@/modules/operations";
-import { SectionTitle } from "@/components/admin";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
@@ -21,7 +27,7 @@ export const Route = createFileRoute("/_authenticated/admin/")({
       { title: "YourMeal OS — Centro de Operaciones" },
       {
         name: "description",
-        content: "Cocina y Reparto para la jornada operativa.",
+        content: "Qué necesita atención hoy en la operación.",
       },
     ],
   }),
@@ -31,18 +37,85 @@ function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function greetingForHour(hour: number): string {
+  if (hour < 12) return "Buenos días";
+  if (hour < 20) return "Buenas tardes";
+  return "Buenas noches";
+}
+
+function firstName(fullName: string | null | undefined): string | null {
+  if (!fullName?.trim()) return null;
+  return fullName.trim().split(/\s+/)[0] ?? null;
+}
+
+type AttentionItem = {
+  id: string;
+  to: string;
+  title: string;
+  icon: LucideIcon;
+  count: number | null;
+  countLabel: (n: number) => string;
+  visible: boolean;
+};
+
+async function countInventoryAlerts(tenantId: string): Promise<number> {
+  const db = supabase as any;
+  const { data, error } = await db
+    .from("ingredients")
+    .select("stock, min_stock")
+    .eq("tenant_id", tenantId)
+    .is("deleted_at", null);
+  if (error) throw error;
+  const rows = (data ?? []) as { stock: number; min_stock: number }[];
+  return rows.filter((r) => Number(r.stock) <= Number(r.min_stock)).length;
+}
+
+async function countClientIncidents(tenantId: string): Promise<number> {
+  const { count, error } = await supabase
+    .from("support_notes")
+    .select("id", { count: "exact", head: true })
+    .eq("tenant_id", tenantId)
+    .in("kind", ["incident", "complaint"]);
+  if (error) throw error;
+  return count ?? 0;
+}
+
 function OpsCenterHome() {
-  const { user, tenantId, roles } = useAuth();
+  const { user, tenantId, roles, profile } = useAuth();
   const { can } = useCan();
   const [kitchenCount, setKitchenCount] = useState<number | null>(null);
   const [deliveryCount, setDeliveryCount] = useState<number | null>(null);
+  const [inventoryCount, setInventoryCount] = useState<number | null>(null);
+  const [clientsCount, setClientsCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const date = todayISO();
+  const hour = new Date().getHours();
+  const name = firstName(profile?.fullName);
+  const greeting = greetingForHour(hour);
+
+  const showKitchen =
+    can("kitchen.operate") ||
+    roles.includes("operations_manager") ||
+    roles.includes("company_admin") ||
+    can("saas.manage");
+  const showDelivery =
+    can("logistics.operate") ||
+    roles.includes("operations_manager") ||
+    can("saas.manage");
+  const showInventory =
+    can("inventory.operate") ||
+    roles.includes("operations_manager") ||
+    can("saas.manage");
+  const showClients =
+    can("customers.read") ||
+    can("support.read") ||
+    roles.includes("operations_manager") ||
+    can("saas.manage");
 
   useEffect(() => {
     let cancelled = false;
     void (async () => {
-      if (!user || !tenantId || !can("orders.read")) {
+      if (!user || !tenantId) {
         setLoading(false);
         return;
       }
@@ -54,23 +127,41 @@ function OpsCenterHome() {
           tenantId,
           roles,
         });
-        const [k, d] = await Promise.all([
-          can("kitchen.operate") || can("orders.read")
-            ? OperationsService.kitchenPendingCount(ctx, date)
-            : Promise.resolve(0),
-          can("logistics.operate") || can("orders.read")
-            ? OperationsService.deliveryPendingCount(ctx, date)
-            : Promise.resolve(0),
-        ]);
-        if (!cancelled) {
-          setKitchenCount(k);
-          setDeliveryCount(d);
+
+        const tasks: Promise<void>[] = [];
+
+        if (showKitchen && can("orders.read")) {
+          tasks.push(
+            OperationsService.kitchenPendingCount(ctx, date).then((n) => {
+              if (!cancelled) setKitchenCount(n);
+            }),
+          );
         }
+        if (showDelivery && can("orders.read")) {
+          tasks.push(
+            OperationsService.deliveryPendingCount(ctx, date).then((n) => {
+              if (!cancelled) setDeliveryCount(n);
+            }),
+          );
+        }
+        if (showInventory) {
+          tasks.push(
+            countInventoryAlerts(tenantId).then((n) => {
+              if (!cancelled) setInventoryCount(n);
+            }),
+          );
+        }
+        if (showClients) {
+          tasks.push(
+            countClientIncidents(tenantId).then((n) => {
+              if (!cancelled) setClientsCount(n);
+            }),
+          );
+        }
+
+        await Promise.allSettled(tasks);
       } catch {
-        if (!cancelled) {
-          setKitchenCount(null);
-          setDeliveryCount(null);
-        }
+        /* per-item nulls stay */
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -78,126 +169,182 @@ function OpsCenterHome() {
     return () => {
       cancelled = true;
     };
-  }, [user, tenantId, roles, can, date]);
+  }, [
+    user,
+    tenantId,
+    roles,
+    can,
+    date,
+    showKitchen,
+    showDelivery,
+    showInventory,
+    showClients,
+  ]);
+
+  const items: AttentionItem[] = [
+    {
+      id: "kitchen",
+      to: "/admin/kitchen",
+      title: "Cocina",
+      icon: ChefHat,
+      count: kitchenCount,
+      countLabel: (n: number) =>
+        n === 1 ? "1 pedido pendiente" : `${n} pedidos pendientes`,
+      visible: showKitchen,
+    },
+    {
+      id: "delivery",
+      to: "/admin/delivery",
+      title: "Reparto",
+      icon: Truck,
+      count: deliveryCount,
+      countLabel: (n: number) =>
+        n === 1 ? "1 entrega programada" : `${n} entregas programadas`,
+      visible: showDelivery,
+    },
+    {
+      id: "inventory",
+      to: "/admin/inventory",
+      title: "Inventario",
+      icon: Boxes,
+      count: inventoryCount,
+      countLabel: (n: number) => (n === 1 ? "1 alerta" : `${n} alertas`),
+      visible: showInventory,
+    },
+    {
+      id: "clients",
+      to: can("support.read") ? "/admin/support" : "/admin/customers",
+      title: "Clientes",
+      icon: Users,
+      count: clientsCount,
+      countLabel: (n: number) => (n === 1 ? "1 incidencia" : `${n} incidencias`),
+      visible: showClients,
+    },
+  ].filter((i) => i.visible);
+
+  const needsAttention = items.some(
+    (i) => typeof i.count === "number" && i.count > 0,
+  );
 
   return (
-    <div className="animate-fade-in space-y-8">
-      <SectionTitle
-        overline="Centro de Operaciones"
-        title="Jornada operativa"
-        subtitle={`Pedidos reales del ${date}. Cocina → Reparto → Cierre.`}
+    <div className="relative mx-auto max-w-2xl animate-fade-in">
+      {/* Atmosphere — soft wash, not a flat void */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -inset-x-8 -top-8 h-56 bg-[radial-gradient(ellipse_at_top,_oklch(0.96_0.02_85)_0%,_transparent_70%)]"
       />
 
-      <div className="grid gap-4 md:grid-cols-2">
-        {(can("kitchen.operate") || can("saas.manage") || roles.includes("operations_manager") || roles.includes("company_admin")) && (
-          <WorkspaceCard
-            to="/admin/kitchen"
-            title="Cocina"
-            icon={ChefHat}
-            loading={loading}
-            pending={kitchenCount}
-            pendingLabel="Pedidos pendientes"
-            statusHint={
-              kitchenCount === null
-                ? "Sin lectura"
-                : kitchenCount === 0
-                  ? "Cola vacía"
-                  : "En curso"
-            }
-            description="Preparación: Pendiente → En preparación → Preparado → Listo"
-          />
-        )}
-        {(can("logistics.operate") || can("saas.manage") || roles.includes("operations_manager")) && (
-          <WorkspaceCard
-            to="/admin/delivery"
-            title="Reparto"
-            icon={Truck}
-            loading={loading}
-            pending={deliveryCount}
-            pendingLabel="Pedidos listos / en ruta"
-            statusHint={
-              deliveryCount === null
-                ? "Sin lectura"
-                : deliveryCount === 0
-                  ? "Cola vacía"
-                  : "En curso"
-            }
-            description="Entrega: Listo → En reparto → Entregado / Incidencia"
-          />
-        )}
-      </div>
-
-      {!can("kitchen.operate") && !can("logistics.operate") && (
-        <p className="text-sm text-muted-foreground">
-          Tu rol no tiene workspaces de Cocina ni Reparto. Usa el menú de
-          Operaciones para Pedidos, Clientes o Inventario.
+      <header className="relative space-y-2 pb-8 pt-2">
+        <p
+          className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl"
+          style={{ animation: "ops-home-in 0.45s ease-out both" }}
+        >
+          {greeting}
+          {name ? (
+            <>
+              , <span className="text-foreground/90">{name}</span>
+            </>
+          ) : null}
         </p>
-      )}
+        <p
+          className="text-base text-muted-foreground sm:text-lg"
+          style={{ animation: "ops-home-in 0.45s ease-out 0.08s both" }}
+        >
+          ¿Qué necesita atención hoy?
+        </p>
+        {!loading && !needsAttention && items.length > 0 && (
+          <p
+            className="pt-1 text-sm text-muted-foreground"
+            style={{ animation: "ops-home-in 0.45s ease-out 0.12s both" }}
+          >
+            Nada urgente por ahora. Entra a un área si quieres revisar.
+          </p>
+        )}
+      </header>
+
+      <section
+        className="relative divide-y divide-border border-y border-border"
+        aria-label="Áreas que necesitan atención"
+      >
+        {items.length === 0 ? (
+          <p className="py-10 text-sm text-muted-foreground">
+            Tu rol no tiene áreas operativas asignadas en este centro.
+          </p>
+        ) : (
+          items.map((item, index) => (
+            <AttentionRow
+              key={item.id}
+              item={item}
+              loading={loading}
+              style={{
+                animation: `ops-home-in 0.4s ease-out ${0.1 + index * 0.06}s both`,
+              }}
+            />
+          ))
+        )}
+      </section>
+
+      <style>{`
+        @keyframes ops-home-in {
+          from { opacity: 0; transform: translateY(6px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }
 
-function WorkspaceCard({
-  to,
-  title,
-  icon: Icon,
+function AttentionRow({
+  item,
   loading,
-  pending,
-  pendingLabel,
-  statusHint,
-  description,
+  style,
 }: {
-  to: "/admin/kitchen" | "/admin/delivery";
-  title: string;
-  icon: typeof ChefHat;
+  item: AttentionItem;
   loading: boolean;
-  pending: number | null;
-  pendingLabel: string;
-  statusHint: string;
-  description: string;
+  style?: CSSProperties;
 }) {
+  const Icon = item.icon;
+  const hasWork = typeof item.count === "number" && item.count > 0;
+
   return (
-    <Link
-      to={to}
+    <div
+      style={style}
       className={cn(
-        "group block rounded-xl border border-border bg-card p-6 transition-colors",
-        "hover:border-foreground/20 hover:bg-secondary/30",
+        "flex flex-wrap items-center justify-between gap-4 py-6",
+        hasWork ? "bg-transparent" : "opacity-90",
       )}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary">
-            <Icon className="h-5 w-5" />
-          </span>
-          <div>
-            <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
-            <p className="text-xs text-muted-foreground">{description}</p>
-          </div>
-        </div>
-        <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-      </div>
-
-      <div className="mt-6 flex items-end justify-between gap-4">
-        <div>
-          <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-            {pendingLabel}
-          </p>
+      <div className="flex min-w-0 items-start gap-3">
+        <span
+          className={cn(
+            "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md",
+            hasWork ? "bg-foreground text-background" : "bg-secondary text-foreground",
+          )}
+        >
+          <Icon className="h-4 w-4" aria-hidden />
+        </span>
+        <div className="min-w-0">
+          <h2 className="text-lg font-semibold tracking-tight">{item.title}</h2>
           {loading ? (
-            <Skeleton className="mt-1 h-9 w-16" />
+            <Skeleton className="mt-1.5 h-4 w-36" />
           ) : (
-            <p className="mt-1 text-3xl font-semibold tabular-nums">
-              {pending ?? "—"}
+            <p
+              className={cn(
+                "mt-1 text-sm",
+                hasWork ? "font-medium text-foreground" : "text-muted-foreground",
+              )}
+            >
+              {item.count === null
+                ? "Sin lectura"
+                : item.countLabel(item.count)}
             </p>
           )}
         </div>
-        <div className="text-right">
-          <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-            Estado general
-          </p>
-          <p className="mt-1 text-sm font-medium">{statusHint}</p>
-          <p className="mt-2 text-xs text-primary">Acceso rápido →</p>
-        </div>
       </div>
-    </Link>
+
+      <Button asChild size="sm" variant={hasWork ? "default" : "outline"}>
+        <Link to={item.to}>Entrar</Link>
+      </Button>
+    </div>
   );
 }
