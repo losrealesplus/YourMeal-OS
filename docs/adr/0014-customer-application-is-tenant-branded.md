@@ -168,6 +168,40 @@ La app publicada en App Store / Google Play representa **exclusivamente** al Ten
 
 Los módulos internos (Kitchen, Delivery, Purchasing, Inventory, Finance, Administration, …) solo son visibles con permisos adecuados (RBAC — ADR [0004](./0004-authentication-rbac.md)). Forman parte de la operación del Tenant; **nunca** de la experiencia pública del cliente final.
 
+Misma identidad visual del Tenant; objetivos distintos a la Customer App:
+
+```text
+Cliente:   «Estoy en la app de EatClean.»
+Empleado:  «Estoy en el centro de operaciones de EatClean.»
+```
+
+### Administrative entry (regla reutilizable)
+
+Los puntos de acceso administrativos **pueden** integrarse en la identidad visual del Tenant (p. ej. una hoja del logotipo en Login que abre `/auth/admin`), siempre que cumplan esta regla:
+
+> **Administrative entry points may be integrated into the tenant branding, provided they do not interfere with the customer journey and all access control is enforced exclusively by authentication and RBAC.**
+
+> **Los puntos de acceso administrativos pueden integrarse en la identidad visual del tenant siempre que no interfieran con el recorrido del cliente y que toda la seguridad recaiga exclusivamente en la autenticación y el RBAC.**
+
+Implicaciones:
+
+| Sí | No |
+|----|-----|
+| Marca contiene accesos secundarios coherentes | Seguridad por “difícil de encontrar” |
+| Diseño y seguridad son responsabilidades distintas | Exponer módulos BO en el recorrido del cliente |
+| Misma puerta de marca → pantallas distintas (`/auth` · `/auth/admin`) | Nuevos permisos inventados en la UI |
+
+```text
+                Tenant App (p. ej. EatClean)
+                           │
+               ┌───────────┴───────────┐
+               ▼                       ▼
+         Cliente (/auth)         Personal (/auth/admin)
+               │                       │
+               ▼                       ▼
+        Pedido semanal           Auth + RBAC → módulos
+```
+
 ### Autenticación
 
 La autenticación usa el branding del Tenant:

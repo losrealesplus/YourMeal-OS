@@ -21,6 +21,7 @@ export function applyBrandTheme(el: HTMLElement | null, config: BrandConfig = br
   el.style.setProperty("--tenant-background", config.background);
   el.style.setProperty("--tenant-surface", config.surface);
   el.style.setProperty("--tenant-foreground", config.foreground);
+  el.style.setProperty("--tenant-accent", config.accent);
   el.style.setProperty("--tenant-success", config.success);
   el.style.setProperty("--tenant-error", config.error);
   el.style.setProperty("--tenant-radius", config.borderRadius);
@@ -28,5 +29,9 @@ export function applyBrandTheme(el: HTMLElement | null, config: BrandConfig = br
 }
 
 export function poweredByLabel(config: BrandConfig = brandConfig) {
-  return config.poweredBy.visible ? config.poweredBy.label : "";
+  if (!config.poweredBy.visible) return "";
+  if (config.poweredBy.prefix && config.poweredBy.name) {
+    return `${config.poweredBy.prefix} ${config.poweredBy.name}`;
+  }
+  return config.poweredBy.label;
 }

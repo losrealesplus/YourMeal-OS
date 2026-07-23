@@ -24,14 +24,24 @@ export function TenantBrandScope({
 
 export function PoweredByLine({ className }: { className?: string }) {
   if (!brandConfig.poweredBy.visible) return null;
+
+  const prefix = brandConfig.poweredBy.prefix ?? "Powered by";
+  const name = brandConfig.poweredBy.name ?? "YourMeal OS";
+
   return (
     <p
       className={cn(
-        "text-[10px] font-medium tracking-wide text-muted-foreground/70 text-center",
+        "text-center select-none leading-tight",
         className,
       )}
+      aria-hidden
     >
-      {brandConfig.poweredBy.label}
+      <span className="block text-[8px] font-normal tracking-[0.1em] text-[#9a8f7c]/50">
+        {prefix}
+      </span>
+      <span className="mt-0.5 block text-[9px] font-normal tracking-[0.04em] text-[#9a8f7c]/40">
+        {name}
+      </span>
     </p>
   );
 }

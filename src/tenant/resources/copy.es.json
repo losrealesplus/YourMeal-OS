@@ -1,7 +1,7 @@
 {
   "login": {
-    "title": "Bienvenido a EatClean",
-    "subtitle": "Comida preparada para ayudarte a comer mejor.",
+    "title": "¡Bienvenido!",
+    "subtitle": "Inicia sesión y programa tu menú semanal.",
     "cta": "Iniciar sesión",
     "poweredBy": "Powered by YourMeal OS"
   },
@@ -41,7 +41,9 @@
     "about": "Acerca de"
   },
   "backOffice": {
-    "entryLabel": "EatClean Admin"
+    "entryLabel": "Centro de Operaciones",
+    "subtitle": "Empieza aquí tu jornada.",
+    "enter": "Entrar"
   },
   "claims": {
     "enjoy": "Cocinamos para que tú solo tengas que disfrutar.",

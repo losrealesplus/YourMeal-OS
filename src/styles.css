@@ -218,24 +218,38 @@
 /* Customer Application — BrandConfig overrides (ADR 0014 / Experience Refactor) */
 .tenant-branded {
   --background: var(--tenant-background, var(--brand-cream));
-  --foreground: var(--tenant-foreground, #1a2e24);
-  --card: var(--tenant-surface, #fffcf7);
-  --card-foreground: var(--tenant-foreground, #1a2e24);
-  --primary: var(--tenant-primary, var(--brand-leaf));
-  --primary-foreground: #fffcf7;
-  --secondary: color-mix(in oklab, var(--tenant-background, var(--brand-cream)) 70%, white);
-  --muted: color-mix(in oklab, var(--tenant-background, var(--brand-cream)) 85%, var(--brand-sand));
-  --muted-foreground: color-mix(in oklab, var(--tenant-foreground, #1a2e24) 55%, transparent);
-  --accent: var(--brand-sand);
-  --border: color-mix(in oklab, var(--tenant-secondary, var(--brand-clay)) 35%, white);
-  --ring: var(--tenant-primary, var(--brand-leaf));
+  --foreground: var(--tenant-foreground, #0f2317);
+  --card: var(--tenant-surface, #ffffff);
+  --card-foreground: var(--tenant-foreground, #0f2317);
+  --primary: var(--tenant-primary, #145b32);
+  --primary-foreground: #ffffff;
+  /* Neutral chrome — never map brand yellow here (yellow = attention only). */
+  --secondary: color-mix(in oklab, var(--tenant-background, #f7f5f1) 82%, white);
+  --secondary-foreground: var(--tenant-foreground, #0f2317);
+  --muted: var(--tenant-accent, #eff4f1);
+  --muted-foreground: color-mix(in oklab, var(--tenant-foreground, #0f2317) 48%, #8a7a5c);
+  --accent: var(--tenant-accent, #eff4f1);
+  --accent-foreground: var(--tenant-foreground, #0f2317);
+  /* Brand golden — chips, badges, active indicators, promos. Never primary CTA. */
+  --attention: var(--tenant-secondary, #edb32a);
+  --attention-foreground: var(--tenant-foreground, #0f2317);
+  --border: color-mix(in oklab, var(--tenant-primary, #145b32) 12%, #e8e0d4);
+  --input: color-mix(in oklab, var(--tenant-primary, #145b32) 12%, #e8e0d4);
+  --ring: var(--tenant-primary, #145b32);
   --radius: var(--tenant-radius, 1.25rem);
   background-color: var(--background);
   color: var(--foreground);
 }
 
 .tenant-branded .hero-emerald {
-  background:
-    radial-gradient(120% 100% at 100% 0%, color-mix(in oklab, var(--primary) 55%, white 45%) 0%, transparent 55%),
-    linear-gradient(160deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 82%, black 18%) 100%);
+  background: var(--primary);
+}
+
+.tenant-branded .attention-chip {
+  background: color-mix(in oklab, var(--attention) 28%, white);
+  color: color-mix(in oklab, var(--attention-foreground) 88%, var(--attention));
+}
+
+.tenant-branded .attention-dot {
+  background: var(--attention);
 }

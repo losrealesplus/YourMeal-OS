@@ -1,6 +1,6 @@
 export default {
-  welcome: "Bem-vindo à EatClean",
-  welcomeSub: "Comida preparada para te ajudar a comer melhor.",
+  welcome: "Bem-vindo!",
+  welcomeSub: "Inicie sessão e programe o seu menu semanal.",
 
   startNow: "Start now",
   onboarding1Title: "Welcome to EatClean",
@@ -24,4 +24,10 @@ export default {
   checkEmail: "Verifique a sua caixa de entrada",
   resetSent: "Enviámos um link para redefinir a palavra-passe.",
   passwordUpdated: "Palavra-passe atualizada",
+  adminTitle: "Centro de Operações",
+  adminSubtitle: "Começa aqui o teu dia.",
+  adminEnter: "Entrar",
+  adminEntryLabel: "Centro de Operações",
+  adminEntryAria: "Centro de Operações",
+  backToCustomerLogin: "Voltar ao início de sessão",
 } as const;

@@ -193,6 +193,10 @@ El **cliente nunca** ve:
 
 El administrador del Tenant sí (back office del Tenant — sigue siendo capa Tenant, no Platform).
 
+Misma identidad EatClean; otro objetivo: *centro de operaciones*, no pedido semanal.
+
+**Administrative entry** (ADR 0014): un elemento de marca (p. ej. hoja del logotipo) puede abrir `/auth/admin` sin interferir el recorrido del cliente. La seguridad **nunca** depende de ocultar el acceso — solo de autenticación + RBAC.
+
 ---
 
 ## Sistema visual

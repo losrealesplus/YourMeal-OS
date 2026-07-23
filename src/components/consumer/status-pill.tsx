@@ -2,7 +2,7 @@ import type { MockOrderStatus } from "@/lib/mock-catalog";
 import { cn } from "@/lib/utils";
 
 const toneByStatus: Record<MockOrderStatus, { chip: string; dot: string }> = {
-  pending:    { chip: "bg-secondary text-secondary-foreground",              dot: "bg-muted-foreground" },
+  pending:    { chip: "attention-chip",                                      dot: "attention-dot" },
   preparing:  { chip: "bg-warn/15 text-[oklch(0.5_0.12_75)]",                 dot: "bg-[oklch(0.68_0.16_75)]" },
   dispatched: { chip: "bg-chart-2/20 text-chart-2",                           dot: "bg-chart-2" },
   delivered:  { chip: "bg-primary/12 text-primary",                           dot: "bg-primary" },

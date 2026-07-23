@@ -1,6 +1,6 @@
 export default {
-  welcome: "Welcome to EatClean",
-  welcomeSub: "Prepared food to help you eat better.",
+  welcome: "Welcome!",
+  welcomeSub: "Sign in and plan your weekly menu.",
   startNow: "Start now",
   onboarding1Title: "Welcome to EatClean",
   onboarding1Body: "Prepared food to help you eat better.",
@@ -22,4 +22,10 @@ export default {
   checkEmail: "Check your email",
   resetSent: "We sent you a password reset link.",
   passwordUpdated: "Password updated",
+  adminTitle: "Operations Center",
+  adminSubtitle: "Start your day here.",
+  adminEnter: "Sign in",
+  adminEntryLabel: "Operations Center",
+  adminEntryAria: "Operations Center",
+  backToCustomerLogin: "Back to customer sign-in",
 } as const;
