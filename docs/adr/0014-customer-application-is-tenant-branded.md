@@ -265,8 +265,9 @@ La primera protege la evolución del conocimiento. La segunda protege la escalab
 ## Relacionado
 
 - [TENANT_BRANDING](../05-architecture/TENANT_BRANDING.md) — contrato técnico  
-- [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md) — identidad EatClean (Experience Refactor)  
-- [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) — brief Cursor/Lovable  
+- [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md) — reglas permanentes de experiencia Tenant  
+- [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) — implementación específica EatClean  
+- [EXPERIENCE_REFACTOR_EATCLEAN_V1_1](../07-experience/EXPERIENCE_REFACTOR_EATCLEAN_V1_1.md) — bitácora de sprint Experience 
 - [`tenants/eatclean/`](../../tenants/eatclean/README.md) — BrandConfig + assets  
 - [ADR 0003](./0003-multi-tenant.md) — aislamiento multi-tenant  
 - [ADR 0004](./0004-authentication-rbac.md) — autenticación / RBAC  
