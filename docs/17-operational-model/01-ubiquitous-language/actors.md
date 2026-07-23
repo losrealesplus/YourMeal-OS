@@ -97,7 +97,8 @@ Alias de Tenant. En producto preferimos **Organization**.
 
 ## Definición
 
-Persona que compra directamente a la Organization (B2C).
+Persona que compra directamente a la Organization (B2C).  
+Bajo el Party Model: subtipo **Individual Customer** sin Membership de empresa (ADR 0016).
 
 ## Qué es
 
