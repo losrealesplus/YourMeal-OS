@@ -11,10 +11,12 @@
 | Doc | Why |
 |-----|-----|
 | [FOUNDATION_LOCK.md](./FOUNDATION_LOCK.md) | Close the platform before features |
+| [TENANT_BRANDING.md](./TENANT_BRANDING.md) | Contrato BrandConfig · Customer App white-label (ADR 0014) |
 | [architecture-review.md](./architecture-review.md) | As-built senior review |
 | [MODULE_CONVENTION.md](./MODULE_CONVENTION.md) | `src/modules/...` layout |
 | [../10-api/README.md](../10-api/README.md) | Service → Repository → Supabase |
 | [../adr/0009-foundation-lock.md](../adr/0009-foundation-lock.md) | Lock ADR |
+| [../adr/0014-customer-application-is-tenant-branded.md](../adr/0014-customer-application-is-tenant-branded.md) | Customer App = Tenant-Branded |
 
 ## As-built stack
 

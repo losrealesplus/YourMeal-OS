@@ -22,6 +22,7 @@
 | [Milestone · Foundation Validation](./00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md) | Hito histórico ✅ — metodología validada |
 | [Definition of Done](./00-status/DEFINITION_OF_DONE.md) | Checklist de módulo |
 | [Foundation Lock](./05-architecture/FOUNDATION_LOCK.md) | ✅ Cerrado v0.1.0 |
+| [Tenant Branding](./05-architecture/TENANT_BRANDING.md) | Contrato BrandConfig · Customer App white-label (ADR 0014) |
 | [Contexto estratégico](./05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md) | Dirección empresarial y del Core |
 | [Filosofía de producto](./05-architecture/FILOSOFIA_DE_PRODUCTO.md) | Propósito, éxito e impacto operativo |
 | [Contexto CTO](./05-architecture/CONTEXTO_CTO.md) | Arranque operativo de sesión Cursor (CTO) |

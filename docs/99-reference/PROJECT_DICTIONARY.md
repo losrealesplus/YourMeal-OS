@@ -168,6 +168,11 @@ Core | Operational | Engineering | Historical
 | `DICT-042` | [Confirm Order](#confirm-order) | Operational | Accepted |
 | `DICT-043` | [Recipe](#recipe) | Operational | Accepted |
 | `DICT-044` | [Production](#production) | Operational | Accepted |
+| `DICT-045` | [Customer Application](#customer-application) | Core | Accepted |
+| `DICT-046` | [YourMeal OS (Corporate Surface)](#yourmeal-os-corporate-surface) | Core | Accepted |
+| `DICT-047` | [BrandConfig](#brandconfig) | Engineering | Accepted |
+| `DICT-048` | [Tenant-Branded](#tenant-branded) | Core | Accepted |
+| `DICT-049` | [Powered by YourMeal OS](#powered-by-yourmeal-os) | Core | Accepted |
 
 ---
 
@@ -196,6 +201,10 @@ Core | Operational | Engineering | Historical
 ### Producto (núcleo HP-001)
 
 [Tenant](#tenant) (`DICT-038`) · [Dish](#dish) (`DICT-039`) · [Weekly Menu](#weekly-menu) (`DICT-040`) · [Draft Order](#draft-order) (`DICT-041`) · [Confirm Order](#confirm-order) (`DICT-042`) · [Recipe](#recipe) (`DICT-043`) · [Production](#production) (`DICT-044`)
+
+### Identidad SaaS (ADR 0014)
+
+[Customer Application](#customer-application) (`DICT-045`) · [YourMeal OS (Corporate Surface)](#yourmeal-os-corporate-surface) (`DICT-046`) · [BrandConfig](#brandconfig) (`DICT-047`) · [Tenant-Branded](#tenant-branded) (`DICT-048`) · [Powered by YourMeal OS](#powered-by-yourmeal-os) (`DICT-049`)
 
 ---
 
@@ -1724,10 +1733,10 @@ Usuario · customer profile.
 Tenant · Organización (contexto EatClean)
 
 ## Palabras relacionadas
-Customer · RLS · CAP-001
+Customer · RLS · CAP-001 · BrandConfig · Customer Application
 
 ## Referencias
-OM · auth hooks
+OM · auth hooks · ADR 0014
 
 ---
 
@@ -1971,6 +1980,208 @@ OM · IMPLEMENTATION_BACKLOG (posterior)
 
 ---
 
+# Identidad SaaS (ADR 0014)
+
+# Customer Application
+
+## ID
+DICT-045
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Customer Application
+
+## Tipo
+Producto / superficie
+
+## Definición
+Aplicación utilizada por los **clientes finales** de cada Tenant. Pertenece al Tenant en identidad: el usuario no usa «YourMeal OS»; usa la marca del Tenant (p. ej. EatClean).
+
+## Cuándo ocurre
+Front office · auth de cliente · stores · emails al consumidor.
+
+## Produce
+Experiencia white-label continua con el sitio web del Tenant.
+
+## No significa
+SaaS corporativo YourMeal OS · back office operacional · consola `saas_admin`.
+
+## Sinónimos
+Customer App · Front office (cliente) · App del Tenant
+
+## Palabras relacionadas
+Tenant-Branded · BrandConfig · YourMeal OS (Corporate Surface) · Powered by YourMeal OS
+
+## Referencias
+ADR 0014 · [TENANT_BRANDING](../05-architecture/TENANT_BRANDING.md) · PM-001
+
+---
+
+# YourMeal OS (Corporate Surface)
+
+## ID
+DICT-046
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+YourMeal OS (Corporate Surface)
+
+## Tipo
+Producto / superficie del proveedor
+
+## Definición
+Superficie corporativa del SaaS (landing, docs, módulos, pricing, contacto, demo, soporte). Branding **YourMeal OS**. No es la marca principal de la Customer Application.
+
+## Cuándo ocurre
+Adquisición · onboarding de empresas · administración de plataforma.
+
+## Produce
+Identidad del proveedor del servicio / motor operativo.
+
+## No significa
+La app que ve el cliente final del Tenant.
+
+## Sinónimos
+Producto A · SaaS corporativo · plataforma YourMeal OS
+
+## Palabras relacionadas
+Customer Application · Powered by YourMeal OS · Tenant
+
+## Referencias
+ADR 0014 · [03-brand](../03-brand/README.md)
+
+---
+
+# BrandConfig
+
+## ID
+DICT-047
+
+## Status
+Accepted
+
+## Madurez
+Engineering
+
+## Nombre
+BrandConfig
+
+## Tipo
+Contrato / Capability transversal
+
+## Definición
+Configuración de branding del Tenant (nombre, logo, colores, tipografía, copy, store assets, splash, PoweredBy, …). Se resuelve dinámicamente y alimenta la Customer Application.
+
+## Cuándo ocurre
+Carga de sesión / dominio del Tenant · render de front office · emails · stores.
+
+## Produce
+Identidad visual y verbal inyectada en runtime.
+
+## No significa
+Design system fijo de EatClean en código · retoque cosmético sin contrato.
+
+## Sinónimos
+`tenants.brand` · Tenant brand JSON
+
+## Palabras relacionadas
+Tenant-Branded · Customer Application · Tenant
+
+## Referencias
+[TENANT_BRANDING](../05-architecture/TENANT_BRANDING.md) · ADR 0014
+
+---
+
+# Tenant-Branded
+
+## ID
+DICT-048
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Tenant-Branded
+
+## Tipo
+Principio de arquitectura de producto
+
+## Definición
+Propiedad de la Customer Application: **100%** del branding visible pertenece al Tenant. YourMeal OS no es la marca principal frente al cliente final.
+
+## Cuándo ocurre
+Toda superficie de cliente (UI, auth, stores, emails al consumidor).
+
+## Produce
+Plataforma white-label multi-tenant escalable.
+
+## No significa
+Que el back office no exista · que YourMeal OS no pueda citarse como Powered by.
+
+## Sinónimos
+White-label (Customer App) · Tenant identity
+
+## Palabras relacionadas
+BrandConfig · Customer Application · Powered by YourMeal OS
+
+## Referencias
+ADR 0014
+
+---
+
+# Powered by YourMeal OS
+
+## ID
+DICT-049
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Powered by YourMeal OS
+
+## Tipo
+Mención de plataforma
+
+## Definición
+Única forma admitida (o equivalente configurable) de mostrar YourMeal OS en la Customer Application. Nunca como marca principal.
+
+## Cuándo ocurre
+Footer / about / emails · si `BrandConfig.poweredBy.visible`.
+
+## Produce
+Atribución del motor operativo sin sustituir la identidad del Tenant.
+
+## No significa
+Bienvenida, título de app, store name o hero con marca YourMeal OS.
+
+## Sinónimos
+PoweredBy · atribución de plataforma
+
+## Palabras relacionadas
+BrandConfig · Customer Application · YourMeal OS (Corporate Surface)
+
+## Referencias
+ADR 0014 · [TENANT_BRANDING](../05-architecture/TENANT_BRANDING.md)
+
+---
+
 ## Historial de este diccionario
 
 | Fecha | Cambio |
@@ -1978,4 +2189,5 @@ OM · IMPLEMENTATION_BACKLOG (posterior)
 | 2026-07-23 | Creación — lenguaje Evidence Gate / ORR / FOV / dominios / HP-001 |
 | 2026-07-23 | IDs DICT-xxx · Status · Madurez · autoridad semántica · cuatro pilares |
 | 2026-07-23 | Primera pregunta (nuevo vs sinónimo) · disciplina de evolución de pilares |
+| 2026-07-23 | ADR 0014 — DICT-045…049 Customer Application / BrandConfig / Tenant-Branded |
 

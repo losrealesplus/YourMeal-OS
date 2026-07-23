@@ -17,3 +17,4 @@ Permanent decisions for YourMeal OS. New ADRs are additive; do not silently reve
 | [0011](./0011-diario-desarrollo-intencionalidad.md) | Diario de Desarrollo + Principio de Intencionalidad |
 | [0012](./0012-cursor-cto-lovable-ui.md) | Cursor CTO · Lovable UI · Docs como fuente de verdad |
 | [0013](./0013-implementation-is-knowledge-materialization.md) | Implementation is Knowledge Materialization |
+| [0014](./0014-customer-application-is-tenant-branded.md) | Customer Application is Tenant-Branded |
