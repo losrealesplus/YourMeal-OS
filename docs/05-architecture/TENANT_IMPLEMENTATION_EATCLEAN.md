@@ -1,5 +1,6 @@
 # TENANT IMPLEMENTATION · EatClean
 
+**Knowledge Lifetime:** Implementation  
 **Para:** Cursor · Lovable · ingeniería de experiencia  
 **ADR:** [0014](../adr/0014-customer-application-is-tenant-branded.md)  
 **Reglas permanentes:** [TENANT_EXPERIENCE_SPEC](./TENANT_EXPERIENCE_SPEC.md)  

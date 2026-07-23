@@ -10,29 +10,33 @@ PROJECT STATE
 
 Documentary / SaaS identity: Closed (pending #25 → main)
 Engineering Phase: Complete (pending operational authorization)
-Current Phase:     Evidence Gate  (pre-ORR)
+Experience base (EatClean): Closed (#24→#29) — identidad · CJ/OJ · Operaciones
+Current Phase:     Evidence Gate  (pre-ORR)  +  Milestone EatClean Pilot Ready 🟡
 Next Gate:         ORR  (PASSED | BLOCKED)
 Next Discipline:   Operational Engineering
-Primary Artifact:  Field Evidence
+Primary Artifact:  Field Evidence + ciclo E2E (EP-01…EP-04)
 Focus operativo:   ¿Está listo para evidencia? · Smoke HP-001 · ORR
-Focus experiencia: ¿Mi madre podría pedir sin que nadie le explique la app?
+Focus piloto:      ¿Cliente pide y el equipo produce/entrega en la misma plataforma?
 Last Baseline:     v0.2.0-engineering-baseline (IR-001)
 
 ══════════════════════════════════════════════════
 ```
 
-Cierre formal: [ENGINEERING_PHASE](./ENGINEERING_PHASE.md).
+Cierre formal ingeniería: [ENGINEERING_PHASE](./ENGINEERING_PHASE.md).  
+Milestone abierto: [MILESTONE_EATCLEAN_PILOT_READY](./MILESTONE_EATCLEAN_PILOT_READY.md).  
+Documentación evolutiva: [Knowledge Lifetime](../18-operational-validation/knowledge-lifetime.md).
 
 ```text
 Foundation ✅ → Governance ✅ → OM ✅ → Implementation ✅
 → Engineering Baseline ✅ → Dictionary + ADR-0014 ✅ (#25)
+→ Experience base EatClean ✅ (#24→#29)
 ───────────────
 Comienza Operational Engineering  (tras ORR PASSED)
-Experience: Journey-first (CJ-001) · pantallas MVP ≤ 15
+Piloto: EP-01 Weekly Experience → EP-04 Operational Close
 ```
 
-> Dos líneas en paralelo: **evidencia operativa** (FOPEBA) y **experiencia Tenant** (Journey → Screen → Capability). No compiten.  
-> Estabilidad conceptual: el valor siguiente es **demostrar en campo** (CJ-001 + Smoke/ORR/FOV), no añadir conceptos.  
+> Dos líneas en paralelo: **evidencia operativa** (FOPEBA) y **piloto E2E** (Customer Journey → Operational Journey → Outcome). No compiten.  
+> Estabilidad conceptual: el valor siguiente es **demostrar el ciclo completo con datos reales**, no reabrir PRs de identidad.  
 > Motores de cambio por dominio: [PROJECT_DOMAINS](./PROJECT_DOMAINS.md).
 
 ---
@@ -47,27 +51,27 @@ Migration → Smoke HP-001 → ORR → FOV
 
 Pregunta: ¿Hay evidencia para ORR? Congelación funcional hasta ORR.
 
-### Línea de experiencia (nuevo frente)
+### Línea de piloto — EatClean Pilot Ready 🟡
 
 ```text
-Customer Journeys (CJ-001)
+EP-01 Weekly Experience
         ↓
-Pantallas MVP (≤ 15)
+EP-02 Kitchen Operations
         ↓
-Experience Refactor ✅ (UI)
+EP-03 Delivery Operations
         ↓
-Observación de uso  ← AQUÍ
-        ↓
-EatClean Release UX (solo con evidencia)
+EP-04 Operational Close
 ```
 
-Pregunta: **¿Mi madre podría hacer un pedido sin que nadie le explique la app?**
+Pregunta: **¿Una persona nueva completa el pedido mientras el equipo lo produce y entrega en la misma plataforma?**
 
-**Congelado por intuición.** Siguiente paso: [CJ001_USAGE_OBSERVATION](../07-experience/CJ001_USAGE_OBSERVATION.md) — móvil, cuatro preguntas, sesión sin ayudar.
+Acta: [MILESTONE_EATCLEAN_PILOT_READY](./MILESTONE_EATCLEAN_PILOT_READY.md).
 
-Sprint UI: [EXPERIENCE_REFACTOR_EATCLEAN_V1](../07-experience/EXPERIENCE_REFACTOR_EATCLEAN_V1.md).
+La **experiencia base** (Login · Home · Menú · Operaciones · docs Contract/Implementation) está **cerrada**. No reabrir como PRs «UI» genéricos.
 
-Docs: [CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md) · [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) · [`tenants/eatclean/`](../../tenants/eatclean/README.md).
+Observación de uso CJ-001 sigue siendo útil: [CJ001_USAGE_OBSERVATION](../07-experience/CJ001_USAGE_OBSERVATION.md).
+
+Docs: [CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md) · [OPERATIONAL_JOURNEYS](../07-experience/OPERATIONAL_JOURNEYS.md) · [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) · [`tenants/eatclean/`](../../tenants/eatclean/README.md).
 
 ---
 
@@ -79,7 +83,7 @@ Mapa: [PROJECT_DOMAINS](./PROJECT_DOMAINS.md).
 |---------|------------|--------|
 | **Knowledge** | Operational Model | ✅ Frozen / Closed |
 | **Engineering** | Código | ✅ Implementado · ✅ #23 en main |
-| **Experience** | Customer Journeys + Screens | 🟡 UI CJ-001 lista · **falta observación de uso** |
+| **Experience** | CJ + OJ + identidad Tenant | ✅ Base cerrada · 🟡 Pilot Ready (EP-01…04) |
 | **Operations** | Evidencia | ⏳ Smoke → ORR → FOV |
 
 ---

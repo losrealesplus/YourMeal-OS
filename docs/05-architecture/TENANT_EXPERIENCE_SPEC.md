@@ -1,5 +1,6 @@
 # Tenant Experience Spec — reglas permanentes
 
+**Knowledge Lifetime:** Contract  
 **ADR:** [0014 — Customer Application is Tenant-Branded](../adr/0014-customer-application-is-tenant-branded.md)  
 **Contrato técnico:** [TENANT_BRANDING](./TENANT_BRANDING.md)  
 **Ejemplo de implementación:** [TENANT_IMPLEMENTATION_EATCLEAN](./TENANT_IMPLEMENTATION_EATCLEAN.md)  

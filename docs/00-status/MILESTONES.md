@@ -17,6 +17,8 @@ Registro **inmutable** de hitos. No es gestión de sprint: es memoria objetiva.
 | PR #21 | Sprint 0 Engineering Review | Health 74 · Ready CAP-006 ✅ · Ready ORR ❌ |
 | **PR #22** | **IR-001 · First Engineering Integration** | Stack → `main` · [IR-001](./IR-001_FIRST_ENGINEERING_INTEGRATION.md) · tag `v0.2.0-engineering-baseline` |
 | PR #23 | Engineering Hardening · Evidence Gate | P1 cerrados · [ENGINEERING_PHASE](./ENGINEERING_PHASE.md) Complete (pending operational authorization) |
+| 2026-07-23 | Experience base EatClean (identidad · CJ/OJ · Operaciones) | Bloque #24→#29 · [bitácora v1.1](../07-experience/EXPERIENCE_REFACTOR_EATCLEAN_V1_1.md) · Knowledge Lifetime |
+| *(abierto)* | **EatClean Pilot Ready** | [Acta](./MILESTONE_EATCLEAN_PILOT_READY.md) · EP-01…EP-04 |
 | *(pendiente)* | ORR PASSED \| BLOCKED | Puerta binaria · evidencia · sin features |
 | *(pendiente)* | First FOV (FOV-001) | Phase 3 — Operational Engineering |
 

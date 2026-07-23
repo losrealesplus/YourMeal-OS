@@ -180,6 +180,7 @@ Core | Operational | Engineering | Historical
 | `DICT-054` | [Customer Journey](#customer-journey) | Operational | Accepted |
 | `DICT-055` | [Experience Domain](#experience-domain) | Core | Accepted |
 | `DICT-056` | [Screen (SCR)](#screen-scr) | Engineering | Accepted |
+| `DICT-057` | [Knowledge Lifetime](#knowledge-lifetime) | Core | Accepted |
 
 ---
 
@@ -187,7 +188,7 @@ Core | Operational | Engineering | Historical
 
 ### Metodología
 
-[FOPEBA](#fopeba) (`DICT-001`) · [FOV](#fov) (`DICT-002`) · [IOV](#iov) (`DICT-003`) · [Knowledge Update](#knowledge-update) (`DICT-004`) · [Gate](#gate) (`DICT-005`) · [Evidence](#evidence) (`DICT-006`) · [Knowledge Leakage](#knowledge-leakage) (`DICT-007`) · [Operational Model](#operational-model) (`DICT-008`) · [Table Validation](#table-validation) (`DICT-009`) · [Field Validation](#field-validation) (`DICT-010`)
+[FOPEBA](#fopeba) (`DICT-001`) · [FOV](#fov) (`DICT-002`) · [IOV](#iov) (`DICT-003`) · [Knowledge Update](#knowledge-update) (`DICT-004`) · [Gate](#gate) (`DICT-005`) · [Evidence](#evidence) (`DICT-006`) · [Knowledge Leakage](#knowledge-leakage) (`DICT-007`) · [Operational Model](#operational-model) (`DICT-008`) · [Table Validation](#table-validation) (`DICT-009`) · [Field Validation](#field-validation) (`DICT-010`) · [Knowledge Lifetime](#knowledge-lifetime) (`DICT-057`)
 
 ### Ingeniería
 
@@ -2481,6 +2482,56 @@ Customer Journey · Experience First · Capability
 [CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md)
 
 
+---
+
+# Knowledge Lifetime
+
+## ID
+DICT-057
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Knowledge Lifetime
+
+## Tipo
+Regla metodológica de documentación (FOPEBA)
+
+## Definición
+Disciplina que clasifica cada documento en exactamente un nivel de caducidad:
+
+| Nivel | Propósito | Cambia |
+|-------|-----------|--------|
+| **Contract** | Reglas permanentes | Muy raramente |
+| **Implementation** | Cómo un producto/tenant aplica el contrato | Con la evolución del producto |
+| **Iteration** | Trabajo de una fase/sprint/PR | Nunca tras el cierre |
+
+Distinto de **Knowledge State** (cuán validado está el conocimiento operacional).  
+No es un ADR. No añade fases ni tipos de evidencia al framework congelado.
+
+## Cuándo ocurre
+Al crear o fusionar documentación · al cerrar sprints · al evitar que reglas permanentes vivan solo en bitácoras.
+
+## Produce
+Sistema documental evolutivo · búsqueda fiable de reglas · bitácoras inmutables al cierre.
+
+## No significa
+Knowledge State · ADR · nueva fase FOPEBA · permiso para evolucionar el framework de validación por intuición.
+
+## Sinónimos
+Contract / Implementation / Iteration · caducidad documental
+
+## Palabras relacionadas
+FOPEBA · Project Dictionary · Milestone · Tenant Experience Spec
+
+## Referencias
+[knowledge-lifetime.md](../18-operational-validation/knowledge-lifetime.md) · [Knowledge States](../20-evidence-framework/01-knowledge-states.md)
+
+
 ## Historial de este diccionario
 
 | Fecha | Cambio |
@@ -2494,4 +2545,5 @@ Customer Journey · Experience First · Capability
 | 2026-07-23 | TENANT_IMPLEMENTATION_EATCLEAN · `tenants/eatclean/` · DICT-052 Tenant Assets |
 | 2026-07-23 | Experience First · CUSTOMER_JOURNEYS · DICT-053/054 |
 | 2026-07-23 | Experience Domain · SCR trazabilidad · DICT-055/056 · PROJECT_DOMAINS |
+| 2026-07-23 | Knowledge Lifetime · DICT-057 · Milestone EatClean Pilot Ready |
 

@@ -11,9 +11,11 @@
 **Auditoría ingeniería:** [ENGINEERING_REVIEW_SPRINT0](./ENGINEERING_REVIEW_SPRINT0.md)  
 **Objetivo:** demostrar que FOPEBA puede producir software operacional de alta calidad.  
 **Hito operativo:** `HP-001 · Operational · ORR PASSED · Ready for FOV` (en curso)  
-**Hito experiencia:** CJ-001 usable sin explicación ([CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md))
+**Hito piloto:** [EatClean Pilot Ready](./MILESTONE_EATCLEAN_PILOT_READY.md) 🟡 · EP-01…EP-04  
+**Hito experiencia base:** ✅ cerrado (#24→#29)  
+**Documentación:** [Knowledge Lifetime](../18-operational-validation/knowledge-lifetime.md) — Contract · Implementation · Iteration
 
-> Ops: **¿Hay evidencia para ORR?** · Experience: **¿Mi madre podría pedir sin ayuda?**  
+> Ops: **¿Hay evidencia para ORR?** · Piloto: **¿Cliente pide y el equipo entrega en la misma plataforma?**  
 > El software es una implementación del conocimiento. Nunca su origen.  
 > [ADR 0013](../adr/0013-implementation-is-knowledge-materialization.md) · [ADR 0014](../adr/0014-customer-application-is-tenant-branded.md)
 
