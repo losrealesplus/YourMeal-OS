@@ -24,8 +24,8 @@ export type ProgramDraftOrderResult = {
 };
 
 /**
- * CAP-004 — program a Draft order (first mutation pattern).
- * Does not confirm (CAP-006). Audit is part of the flow.
+ * CAP-004 programDraft · CAP-006 confirm — Mutation Pattern.
+ * Audit is part of every write flow.
  */
 export const OrderService = {
   async programDraft(
@@ -75,5 +75,38 @@ export const OrderService = {
     });
 
     return result;
+  },
+
+  /**
+   * CAP-006 — OM: Draft → Confirmed.
+   * @see docs/17-operational-model/04-lifecycles/spine-transitions.md
+   */
+  async confirm(ctx: ServiceContext, orderId: string): Promise<OrderRow> {
+    requireCapability(ctx.roles, "orders.write");
+    if (!orderId) {
+      throw new DomainError("INVALID_STATE", "orderId is required");
+    }
+
+    const repo = createOrderRepository(ctx.supabase, ctx.tenantId);
+    let result: { old: OrderRow; order: OrderRow };
+    try {
+      result = await repo.confirmDraft(orderId);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Confirm failed";
+      if (message.includes("not found")) {
+        throw new DomainError("NOT_FOUND", message);
+      }
+      throw new DomainError("INVALID_STATE", message);
+    }
+
+    await AuditService.write(ctx, {
+      entityType: "order",
+      entityId: result.order.id,
+      action: "status_change",
+      oldData: { status: result.old.status } as Record<string, unknown>,
+      newData: { status: result.order.status } as Record<string, unknown>,
+    });
+
+    return result.order;
   },
 };

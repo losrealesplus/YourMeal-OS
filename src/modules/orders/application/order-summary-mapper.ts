@@ -7,6 +7,7 @@ import type { OrderItemRow, OrderRow } from "../infrastructure/order-repository"
  */
 export type OrderSummaryStatus =
   | "draft"
+  | "confirmed"
   | "pending"
   | "preparing"
   | "dispatched"
@@ -37,7 +38,7 @@ function mapDbStatus(status: string): OrderSummaryStatus {
     case "draft":
       return "draft";
     case "confirmed":
-      return "pending";
+      return "confirmed";
     case "in_production":
       return "preparing";
     case "delivered":

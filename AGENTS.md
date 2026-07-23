@@ -104,7 +104,8 @@ Hito: HP-001 · Operational · ORR PASSED · Ready for FOV
 > Sin documentos metodológicos nuevos hasta FOV (gobernanza: Acta).
 
 **Contexto:** [CURSOR_MASTER_PROMPT](./docs/22-implementation/CURSOR_MASTER_PROMPT.md)  
-**Siguiente:** [CAP-006 Order Confirmation](./docs/22-implementation/caps/CAP-006-order-confirmation.md) — solo Confirm  
+**Siguiente:** [ORR](../22-implementation/ORR.md) (PASSED \| BLOCKED) — sin features  
+**Pre-piloto:** [PRE_PILOT_AUDIT](./docs/00-status/PRE_PILOT_AUDIT.md)  
 **Cierre metodológico:** [Acta](./docs/00-status/ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md)  
 **Historia:** [MILESTONES](./docs/00-status/MILESTONES.md)  
 **Filosofía:** [IMPLEMENTATION_PHILOSOPHY](./docs/23-engineering/IMPLEMENTATION_PHILOSOPHY.md)

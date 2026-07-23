@@ -134,8 +134,9 @@ CAP-002 Dish Catalog            → Connected (lectura)
 CAP-003 Weekly Menu             → Connected (lectura)
 CAP-004 Order Programming       → Connected (mutación + audit)
 CAP-005 Order Summary           → Connected (lectura resumen)
-CAP-006 Order Confirmation      → siguiente
+CAP-006 Order Confirmation      → Operational (HP-001)
 CAP-007 Order History
+# Siguiente tras CAP-006: ORR (PASSED|BLOCKED) — sin features
 
 Posteriormente: Production · Delivery · Admin Suite
 (ver docs/22-implementation/caps/)
