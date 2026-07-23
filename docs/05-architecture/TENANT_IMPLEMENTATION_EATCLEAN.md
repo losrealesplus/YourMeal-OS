@@ -2,13 +2,15 @@
 
 **Para:** Cursor · Lovable (Experience Refactor)  
 **ADR:** [0014](../adr/0014-customer-application-is-tenant-branded.md)  
+**Journey canónico:** [CJ-001 · Pedido semanal](../07-experience/CUSTOMER_JOURNEYS.md#cj-001--pedido-semanal)  
 **Spec de identidad:** [TENANT_EXPERIENCE_SPEC](./TENANT_EXPERIENCE_SPEC.md)  
 **Contrato:** [TENANT_BRANDING](./TENANT_BRANDING.md)  
 **Assets:** [`tenants/eatclean/`](../../tenants/eatclean/README.md)
 
-> La web es la **referencia de marca, tono y contenido**.  
-> La app debe sentirse como **la app oficial de EatClean**, no como una web metida en un móvil.  
-> **No copiar el layout** de [eatcleantenerifecatering.es](https://eatcleantenerifecatering.es/).
+> **Experience First:** Customer Journey → Screen → Capability.  
+> Pregunta: ¿Mi madre podría hacer un pedido sin que nadie le explique la app?  
+> La web es la **referencia de marca, tono y contenido** — no el layout.  
+> La app debe sentirse como **la app oficial de EatClean**, no como una web metida en un móvil.
 
 ---
 
@@ -16,14 +18,21 @@
 
 Transformar la Customer Application en la aplicación oficial de **EatClean Tenerife Catering**, publicada para clientes finales.
 
+Si **[CJ-001](../07-experience/CUSTOMER_JOURNEYS.md#cj-001--pedido-semanal)** es excelente, el MVP cumple:
+
+> «Qué fácil. En dos minutos ya tengo mi pedido de la semana hecho.»
+
 - No debe percibirse como una aplicación SaaS.  
 - No debe mostrar YourMeal OS como marca principal.  
 - Toda la identidad visual, lenguaje y experiencia pertenecen al Tenant.  
-- YourMeal OS únicamente aparece como: **Powered by YourMeal OS**.
+- YourMeal OS únicamente aparece como: **Powered by YourMeal OS**.  
+- **No copiar el layout** de [eatcleantenerifecatering.es](https://eatcleantenerifecatering.es/).
 
 **Sin** modificar lógica de negocio / HP-001.  
 **Sin** forks.  
 **Sin** código específico para EatClean — solo `BrandConfig` + Tenant Resources.
+
+**Antes de pintar pantallas:** congelar CJ-001 y el inventario ≤ 15 pantallas en [CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md).
 
 ---
 
@@ -264,14 +273,12 @@ Cuando llegue un nuevo Tenant: **cambiar recursos y configuración**, no redise�
 ## Brief para Cursor / Lovable
 
 ```text
-Implementa TENANT IMPLEMENTATION · EatClean v1.
-Referencia de marca: eatcleantenerifecatering.es — identidad/tono/fotos, NO layout web.
-App oficial de EatClean para clientes finales. No SaaS. No YourMeal OS como marca.
-Powered by solo en Login / Splash / Acerca de.
-Home = app de comida (hero + cards), no dashboard admin.
-Nav: Inicio · Pedidos · Favoritos · Mi cuenta.
-BackOffice solo RBAC.
-Usa tenants/eatclean/brand.json + copy.es.json + assets.
-NO toques lógica HP-001. NO forks. NO if (tenant === 'eatclean') en código.
-Pasa la checklist Branding/Copy/Continuidad/Rol/Powered by/Configuración.
+Experience First: CJ-001 (Pedido semanal) → pantallas MVP ≤ 15 → capabilities.
+Pregunta: ¿mi madre podría pedir sin que le expliquen la app?
+Implementa TENANT IMPLEMENTATION · EatClean v1 + CUSTOMER_JOURNEYS.
+Referencia de marca: eatcleantenerifecatering.es — identidad/tono/fotos, NO layout.
+App oficial EatClean. No SaaS. Powered by solo Login/Splash/Acerca de.
+Home = comida. Nav: Inicio · Pedidos · Favoritos · Mi cuenta.
+tenants/eatclean/ only. NO HP-001 logic. NO forks. NO if (eatclean).
+Checklist Branding/Copy/Continuidad/Rol/Powered by/Configuración.
 ```

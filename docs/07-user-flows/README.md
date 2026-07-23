@@ -1,5 +1,8 @@
 # User flows
 
+Flujos **técnicos** (rutas, auth, roles).  
+Recorridos de **experiencia** del cliente: [07-experience · CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md) (Experience First).
+
 ## Authentication
 
 1. User opens `/auth`.

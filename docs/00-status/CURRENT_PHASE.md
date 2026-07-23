@@ -14,8 +14,8 @@ Current Phase:     Evidence Gate  (pre-ORR)
 Next Gate:         ORR  (PASSED | BLOCKED)
 Next Discipline:   Operational Engineering
 Primary Artifact:  Field Evidence
-Focus operativo:   Migración · Smoke HP-001 · ORR
-Focus experiencia: Spec ✅ · Refactor (paralelo, no bloquea ORR)
+Focus operativo:   ¿Está listo para evidencia? · Smoke HP-001 · ORR
+Focus experiencia: ¿Mi madre podría pedir sin que nadie le explique la app?
 Last Baseline:     v0.2.0-engineering-baseline (IR-001)
 
 ══════════════════════════════════════════════════
@@ -28,9 +28,10 @@ Foundation ✅ → Governance ✅ → OM ✅ → Implementation ✅
 → Engineering Baseline ✅ → Dictionary + ADR-0014 ✅ (#25)
 ───────────────
 Comienza Operational Engineering  (tras ORR PASSED)
+Experience: Journey-first (CJ-001) · pantallas MVP ≤ 15
 ```
 
-> Dos líneas en paralelo: **evidencia operativa** (FOPEBA) y **experiencia Tenant** (BrandConfig). No compiten.
+> Dos líneas en paralelo: **evidencia operativa** (FOPEBA) y **experiencia Tenant** (Journey → Screen → Capability). No compiten.
 
 ---
 
@@ -42,17 +43,25 @@ Comienza Operational Engineering  (tras ORR PASSED)
 Migration → Smoke HP-001 → ORR → FOV
 ```
 
-Genera evidencia para FOPEBA. Congelación funcional hasta ORR.
+Pregunta: ¿Hay evidencia para ORR? Congelación funcional hasta ORR.
 
 ### Línea de experiencia (nuevo frente)
 
 ```text
-Tenant Experience Spec → Experience Refactor
-→ BrandConfig Validation → EatClean Release UX
+Customer Journeys (CJ-001)
+        ↓
+Pantallas MVP (≤ 15)
+        ↓
+Experience Refactor
+        ↓
+BrandConfig Validation
+        ↓
+EatClean Release UX
 ```
 
-Mejora percepción del producto **sin** tocar HP-001.  
-Spec: [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md) · Brief: [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) · Assets: [`tenants/eatclean/`](../../tenants/eatclean/README.md).
+Pregunta: **¿Mi madre podría hacer un pedido sin que nadie le explique la app?**
+
+Docs: [CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md) · [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) · [`tenants/eatclean/`](../../tenants/eatclean/README.md).
 
 ---
 

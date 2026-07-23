@@ -176,6 +176,8 @@ Core | Operational | Engineering | Historical
 | `DICT-050` | [Platform owns capability / Tenant owns experience](#platform-owns-capability--tenant-owns-experience) | Core | Accepted |
 | `DICT-051` | [Tenant Experience Spec](#tenant-experience-spec) | Operational | Accepted |
 | `DICT-052` | [Tenant Assets](#tenant-assets) | Engineering | Accepted |
+| `DICT-053` | [Experience First](#experience-first) | Core | Accepted |
+| `DICT-054` | [Customer Journey](#customer-journey) | Operational | Accepted |
 
 ---
 
@@ -207,7 +209,7 @@ Core | Operational | Engineering | Historical
 
 ### Identidad SaaS (ADR 0014)
 
-[Customer Application](#customer-application) (`DICT-045`) · [YourMeal OS (Corporate Surface)](#yourmeal-os-corporate-surface) (`DICT-046`) · [BrandConfig](#brandconfig) (`DICT-047`) · [Tenant-Branded](#tenant-branded) (`DICT-048`) · [Powered by YourMeal OS](#powered-by-yourmeal-os) (`DICT-049`) · [Platform owns capability / Tenant owns experience](#platform-owns-capability--tenant-owns-experience) (`DICT-050`) · [Tenant Experience Spec](#tenant-experience-spec) (`DICT-051`) · [Tenant Assets](#tenant-assets) (`DICT-052`)
+[Customer Application](#customer-application) (`DICT-045`) · [YourMeal OS (Corporate Surface)](#yourmeal-os-corporate-surface) (`DICT-046`) · [BrandConfig](#brandconfig) (`DICT-047`) · [Tenant-Branded](#tenant-branded) (`DICT-048`) · [Powered by YourMeal OS](#powered-by-yourmeal-os) (`DICT-049`) · [Platform owns capability / Tenant owns experience](#platform-owns-capability--tenant-owns-experience) (`DICT-050`) · [Tenant Experience Spec](#tenant-experience-spec) (`DICT-051`) · [Tenant Assets](#tenant-assets) (`DICT-052`) · [Experience First](#experience-first) (`DICT-053`) · [Customer Journey](#customer-journey) (`DICT-054`)
 
 ---
 
@@ -2309,6 +2311,90 @@ BrandConfig · Tenant Experience Spec · Tenant-Branded
 
 ---
 
+
+---
+
+# Experience First
+
+## ID
+DICT-053
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Experience First
+
+## Tipo
+Principio de diseño de producto
+
+## Definición
+Orden de diseño de la Customer Application: **Customer Journey → Screen → Capability**. La capability no cambia; la pantalla se diseña desde el recorrido del usuario, no desde la estructura interna del sistema.
+
+Pregunta guía: ¿Mi madre podría hacer un pedido sin que nadie le explique la app?
+
+## Cuándo ocurre
+Experience Refactor · definición de pantallas MVP · auditoría de UX.
+
+## Produce
+Apps usables por clientes finales no técnicos.
+
+## No significa
+Ignorar capabilities · inventar reglas del OM · saltarse FOPEBA.
+
+## Sinónimos
+Journey-first · recorrido primero
+
+## Palabras relacionadas
+Customer Journey · Tenant Experience Spec · Capability
+
+## Referencias
+[07-experience](../07-experience/README.md) · [CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md)
+
+---
+
+# Customer Journey
+
+## ID
+DICT-054
+
+## Status
+Accepted
+
+## Madurez
+Operational
+
+## Nombre
+Customer Journey
+
+## Tipo
+Recorrido de experiencia / artefacto
+
+## Definición
+Secuencia de pasos que un cliente final atraviesa para completar un objetivo (p. ej. CJ-001 Pedido semanal). Complementa al Operational Model: el OM describe la operación; el Journey describe cómo la vive el usuario.
+
+## Cuándo ocurre
+Antes del Experience Refactor · diseño de pantallas · validación de usabilidad.
+
+## Produce
+Inventario de pantallas justificado · criterio de éxito emocional («en dos minutos…»).
+
+## No significa
+User flow técnico de rutas · Capability Roadmap · diagrama de módulos.
+
+## Sinónimos
+CJ-xxx · recorrido del cliente
+
+## Palabras relacionadas
+Experience First · CJ-001 · Tenant Experience Spec
+
+## Referencias
+[CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md)
+
+
 ## Historial de este diccionario
 
 | Fecha | Cambio |
@@ -2320,4 +2406,5 @@ BrandConfig · Tenant Experience Spec · Tenant-Branded
 | 2026-07-23 | ADR 0014 ampliación — cinco capas · filtro Plataforma/Tenant · DICT-050 |
 | 2026-07-23 | TENANT_EXPERIENCE_SPEC EatClean · DICT-051 · consecuencia BrandConfig-only |
 | 2026-07-23 | TENANT_IMPLEMENTATION_EATCLEAN · `tenants/eatclean/` · DICT-052 Tenant Assets |
+| 2026-07-23 | Experience First · CUSTOMER_JOURNEYS · DICT-053/054 |
 
