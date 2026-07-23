@@ -67,6 +67,7 @@ Architecture · Implementation · Verification · Release
 | Documental / Discovery | A | Qué ocurre y qué se decide |
 | Conceptual (mesa) | B · Validation | El modelo explica bajo refutación propia |
 | Transferencia / resistencia / determinismo | B · IOV | Sobrevive sin el autor |
+| **Pilot Integrity (G-02)** | B · pre-FOV | El Journey mínimo es íntegro para exponer la RI a realidad |
 | Empírica | B · FOV | La operación real produce / tensiona |
 | Gobernanza del cambio | B · KU | Cómo cambia el conocimiento certificado |
 | Valor | B · EC | ¿El conocimiento genera valor medible? |
@@ -85,7 +86,8 @@ Architecture · Implementation · Verification · Release
 ├── 04 FOV + fov/
 ├── 05 Knowledge Update + ku/   (KU-01 · 02 · 03)
 ├── 06 Economic Confirmation + ec/  (Framework · OVI · ECR)
-└── 07 Gate G-01 + g01/         (Package · Decision · Acta)
+├── 07 Gate G-01 + g01/         (Package · Decision · Acta)
+└── 08 Gate G-02                (Pilot Readiness · RI)
 ```
 
 | Doc | Contenido |
@@ -97,22 +99,27 @@ Architecture · Implementation · Verification · Release
 | [05 KU](./05-knowledge-update.md) · [ku/](./ku/README.md) | Gobernanza del cambio |
 | [06 EC](./06-economic-confirmation.md) · [ec/](./ec/README.md) | Valor operacional |
 | [07 G-01](./07-gate-g01-operational-readiness.md) · [g01/](./g01/README.md) | Certificación Stage 2 |
+| [08 G-02](./08-gate-g02-pilot-readiness.md) | Pilot Readiness · integridad del Journey |
 
 ---
 
 ## Secuencia FASE B (cierre)
 
+En una **Reference Implementation** (RI), G-02 autoriza el experimento de campo **antes** de FOV/KU/EC/G-01:
+
 ```text
-Operational Model RC
+Operational Journey Closed · ORR Signed
+    → Gate G-02 (Pilot Readiness)
+    → Pilot · Evidence Collection
     → FOV (FO) → FER
     → Knowledge Update (KUR)
     → Economic Confirmation (OVI · ECR)
     → Gate G-01 (Package → Decision)
-    → FASE C Product Engineering
+    → FASE C Product Engineering (si aplica)
 ```
 
 Orden de **construcción metodológica** (ya aplicado): KU → EC → G-01.  
-Orden de **ejecución**: FOV → KU → EC → G-01.
+Orden de **ejecución en RI**: G-02 → Pilot → FOV → KU → EC → G-01.
 
 ---
 
@@ -130,7 +137,9 @@ Orden de **ejecución**: FOV → KU → EC → G-01.
 | **KU** / **KUR** / **KC** | Knowledge Update · Report · Candidate |
 | **EC** / **OVI** / **ECR** | Economic Confirmation · Value Indicators · Report |
 | **G-01** | Operational Readiness Gate |
+| **G-02** | Pilot Readiness Gate (integridad del Journey · RI) |
 | **ECL** / **S0…S3** | Confidence · Stability |
+| **RI** | Reference Implementation |
 
 ---
 

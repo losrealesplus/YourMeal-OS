@@ -95,6 +95,7 @@ Paralelos: ingeniería de seguridad · aeronáutica · ciencia experimental.
 | **FER** | ¿Qué hipótesis de campo confirman / refutan / faltan / escalan a KU? |
 | **Knowledge Update** | ¿Quedó consolidado el conocimiento post-FER? |
 | **EC (Economic Confirmation)** | ¿Hay valor suficiente para construir? |
+| **Gate G-02** | ¿El Journey mínimo es íntegro para un piloto controlado? (no certifica el producto) |
 | **Gate G-01** | ¿Hay conocimiento suficiente para justificar código? (no aprueba código) |
 | **Implementation** | ¿Cómo traducimos esa verdad a software? |
 
@@ -106,6 +107,7 @@ CHECKS         → incertidumbre de decisiones operativas
 MODEL          → incertidumbre de estructura del dominio
 VALIDATION     → incertidumbre de verdad del modelo (mesa)
 IOV            → incertidumbre de transferibilidad / resistencia / determinismo
+G-02           → incertidumbre de integridad del Journey (¿listo para realidad?)
 FOV            → incertidumbre empírica (correspondencia con la operación)
 FER            → incertidumbre de qué evidencia de campo escala
 KNOWLEDGE UPDATE → incertidumbre de consolidación post-campo
@@ -144,6 +146,10 @@ IOV
     ↓
 Operational Model RC (Knowledge Certified)
     ↓
+Gate G-02 · Pilot Readiness     ← integridad del Journey (RI)
+    ↓
+Pilot · Evidence Collection
+    ↓
 FOV (FO-V/E/C/U) — evidencia empírica
     ↓
 Field Evidence Review (FER)
@@ -161,10 +167,18 @@ Forma compacta:
 
 ```text
 FOUNDATION → BLUEPRINT → DISCOVERY → CHECKS → MODEL
-    → VALIDATION → IOV → RC → FOV → FER → KU → EC → G-01 → IMPLEMENTATION
+    → VALIDATION → IOV → RC → G-02 → Pilot → FOV → FER → KU → EC → G-01 → IMPLEMENTATION
 ```
 
+**G-02 no certifica el producto** — autoriza el experimento controlado.  
 **G-01 no aprueba código** — aprueba conocimiento suficiente para justificarlo.
+
+### Patrón · reducir incertidumbre antes de ampliar alcance
+
+> Antes de G-02: **cerrar o esconder huecos**, firmar ORR, **no abrir módulos nuevos**.  
+> Ampliar alcance introduce incertidumbre evitable; FOPEBA exige reducirla primero.
+
+Ver: [Gate G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md) · [Pilot Integrity](../99-reference/PROJECT_DICTIONARY.md#pilot-integrity).
 
 ---
 
@@ -177,11 +191,12 @@ FOUNDATION → BLUEPRINT → DISCOVERY → CHECKS → MODEL
 ├── FOV + fov/
 ├── Knowledge Update + ku/     (KU-01 Policy · KU-02 Workflow · KU-03 KUR)
 ├── Economic Confirmation + ec/ (Framework · OVI · ECR)
-└── Gate G-01 + g01/           (Package · Decision · Acta)
+├── Gate G-01 + g01/           (Package · Decision · Acta)
+└── Gate G-02                  (Pilot Readiness · RI)
 ```
 
 → [docs/20-evidence-framework](../20-evidence-framework/README.md)  
-→ [ku/](../20-evidence-framework/ku/README.md) · [ec/](../20-evidence-framework/ec/README.md) · [g01/](../20-evidence-framework/g01/README.md) · [fov/](../20-evidence-framework/fov/README.md)
+→ [ku/](../20-evidence-framework/ku/README.md) · [ec/](../20-evidence-framework/ec/README.md) · [g01/](../20-evidence-framework/g01/README.md) · [g02](../20-evidence-framework/08-gate-g02-pilot-readiness.md) · [fov/](../20-evidence-framework/fov/README.md)
 
 Dual track (antesala): [DUAL_TRACK_ANTECAMARA](../00-status/DUAL_TRACK_ANTECAMARA.md)
 
