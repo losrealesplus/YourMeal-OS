@@ -1,128 +1,73 @@
-# Objetivo
+# Bitácora · Experience Refactor EatClean v1.1
 
-**Experience Refactor · EatClean v1.1**
+**Tipo:** changelog de sprint (no fuente de verdad permanente)  
+**PRs:** ~#24 → #29  
+**Reglas permanentes:** [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md)  
+**Implementación EatClean:** [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md)  
+**Contrato:** [TENANT_BRANDING](../05-architecture/TENANT_BRANDING.md) · [ADR 0014](../adr/0014-customer-application-is-tenant-branded.md)
 
-Diseñar la primera impresión del producto digital de EatClean sobre YourMeal OS: dos experiencias (Customer App · Centro de Operaciones), una sola identidad de marca, una sola plataforma.
-
-**Alcance de esta refactorización:** experiencia / navegación / copy / assets de tenant.  
-**No toca:** HP-001 · servicios · Supabase · lógica · RBAC (reutiliza el existente).
-
-Principio canónico: [ADR 0014 · Tenant-Branded Customer Application](../adr/0014-customer-application-is-tenant-branded.md) · [Tenant Experience](../05-architecture/TENANT_EXPERIENCE_SPEC.md) · [BrandConfig](../05-architecture/TENANT_BRANDING.md).
-
----
-
-## Identidad
-
-- Logo oficial EatClean
-- Fotografía real (web / Instagram — platos, no stock SaaS)
-- Colores EatClean (primario verde, cream, golden solo como atención)
-- Tipografía oficial (Montserrat / Open Sans)
-- **Powered by** discreto — firma tipográfica mínima (`Powered by` / `YourMeal OS`), no parte del contenido principal
-
-> Cambiar identidad de tenant = `tenants/<slug>/` + BrandConfig. Nunca forks de producto.
+> Si una regla debe sobrevivir al siguiente sprint, **no** la añadas solo aquí: súbela a TENANT_EXPERIENCE_SPEC o a TENANT_IMPLEMENTATION_EATCLEAN.
 
 ---
 
-## Login
+## Objetivo del sprint
 
-Jerarquía visual:
+Hacer que EatClean deje de parecer un SaaS personalizado y se sienta como **dos productos** sobre YourMeal OS:
 
-```text
-[ Logo EatClean ]
+| Cara | Pregunta |
+|------|----------|
+| Customer App | ¿Qué quiero comer esta semana? |
+| Centro de Operaciones | ¿Qué necesita hacer hoy mi equipo? |
 
-¡Bienvenido!
-
-Inicia sesión y programa tu menú semanal.
-```
-
-- Logo oficial como ancla de marca (protagonismo y aire respecto al título)
-- Copy de bienvenida orientado al pedido semanal (CJ-001)
-- Pie: enlace **Centro de Operaciones** + Powered by discreto
-- La hoja / marca en el pie es elemento de identidad, no un “botón Admin” oculto
-- Seguridad = auth + RBAC, no obscuridad de UI  
-  Regla: [ADR 0014 · Administrative entry](../adr/0014-customer-application-is-tenant-branded.md#administrative-entry-regla-reutilizable)
-
-Pantalla de staff (`/auth/admin`): email + contraseña · Entrar · sin registro público · sin OAuth/teléfono de cliente.
+**Alcance:** experiencia / navegación / copy / assets.  
+**No tocó:** HP-001 · servicios · Supabase · lógica · RBAC.
 
 ---
 
-## Home
+## Cambios realizados
 
-- Hero fotográfico
-- CTA principal (programar / continuar pedido)
-- Menú semanal
-- Favoritos
-- Próxima entrega
+### Identidad
 
-Sensación: calma, apetito, simplicidad. Responde **«¿Qué quiero comer esta semana?»**.
+- Logo oficial EatClean en Login / Splash / Operaciones  
+- Paleta web (verde · cream · golden = atención)  
+- Tipografía Montserrat / Open Sans  
+- Powered by reducido a firma en dos líneas  
 
----
+### Login
 
-## Menú
+- Jerarquía: logo → «¡Bienvenido!» → subtítulo de pedido semanal  
+- Entrada staff etiquetada **Centro de Operaciones** (sin «Adm»)  
+- `/auth/admin` → email/password · sin signup/OAuth cliente  
 
-- Hero editorial
-- Tarjetas grandes
-- Fotos reales
-- Macros
-- CTA Añadir
+### Customer App (continuum v1 → v1.1)
 
----
+- Home orientada a comida (hero · CTA · menú · favoritos · entrega)  
+- Menú editorial (posts/tarjetas · macros · Añadir)  
+- Resumen con confirmación calmada  
+- Observación de uso: [CJ001_USAGE_OBSERVATION](./CJ001_USAGE_OBSERVATION.md)  
 
-## Resumen
+### Centro de Operaciones
 
-- Foto real
-- Tu pedido está listo
-- Confirmar pedido
+- Reemplazo del dashboard KPI por agenda + workspaces  
+- Nav: Operaciones · Pedidos · Clientes · Inventario · Más  
+- Regla 1 workspace → directo · admin → todas las áreas  
+- Doc OJ: [OPERATIONAL_JOURNEYS](./OPERATIONAL_JOURNEYS.md)  
 
----
+### Tenant assets
 
-## Centro de Operaciones
-
-Tras el login de staff, la primera impresión **no es un dashboard**.
-
-Es el [Centro de Operaciones](./OPERATIONAL_JOURNEYS.md): punto de entrada al trabajo diario.
-
-- Agenda del día («¿Qué necesita hacer hoy mi equipo?»)
-- Workspaces (Cocina · Reparto · Stock · Clientes · Administración · Finanzas)
-- Navegación en lenguaje **Operaciones**
-- Sin KPIs / gráficos / estadísticas como pantalla inicial
-- Solo áreas autorizadas — nunca módulos bloqueados
-
-| Regla | Comportamiento |
-|-------|----------------|
-| 1 workspace | Entrada directa al área de trabajo |
-| 2+ workspaces | Picker del Centro de Operaciones |
-| Administrador | Siempre ve todas las áreas |
-
-Front Office = Customer Journeys (CJ).  
-Centro de Operaciones = Operational Journeys (OJ).
+- Carpetas `brand/` `copy/` `media/` `weekly-menu/` `promotions/` `onboarding/`  
+- README unificado post-merge (`tenants/eatclean/`)  
 
 ---
 
-## Qué / No (checklist de esta refactorización)
+## Resultado del sprint
 
-**Qué**
+La app empieza a leerse como producto digital de EatClean (ADR 0014), no como panel white-label.
 
-1. Logo oficial como ancla · pie Centro de Operaciones · Powered by mínimo  
-2. Pantalla de staff sin signup público  
-3. Tras login → `resolveHomePath` → Centro de Operaciones / workspace  
-4. Continuidad visual Customer App ↔ Operaciones (misma marca EatClean)
-
-**No**
-
-- Exponer Admin en Home pública  
-- Nuevos permisos / cambios RBAC  
-- Lenguaje “Adm” / “Admin” en la UI de cliente  
-- KPIs como primera pantalla del Centro de Operaciones  
-- Reutilizar el formulario de cliente (OAuth / teléfono / signup) en staff login
+**Siguiente hito de producto (fuera de esta bitácora):** contenido vivo + criterio *EatClean Pilot Ready* — ver [TENANT_IMPLEMENTATION_EATCLEAN § Contenido vivo](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md#fotografía-y-contenido-vivo-prioridad-siguiente).
 
 ---
 
-## Resultado esperado
+## Predecesor
 
-La aplicación debe sentirse como la **app oficial de EatClean**.
-
-No como una plataforma SaaS.
-
-Dos productos en percepción (quiero comer · tengo que trabajar).  
-Una identidad. Una plataforma. Un Operational Model.
+Sprint UI inicial (5 pantallas): [EXPERIENCE_REFACTOR_EATCLEAN_V1](./EXPERIENCE_REFACTOR_EATCLEAN_V1.md).
