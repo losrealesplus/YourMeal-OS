@@ -107,7 +107,7 @@ function AdminBrandingPage() {
       });
     },
     onSuccess: () => {
-      toast({ title: t("actions.saved") });
+      toast.success(t("actions.saved"));
       setPendingLogo(null);
       if (pendingLogoPreview) URL.revokeObjectURL(pendingLogoPreview);
       setPendingLogoPreview(null);
@@ -123,11 +123,7 @@ function AdminBrandingPage() {
           : err instanceof Error
             ? err.message
             : t("errors.unknown");
-      toast({
-        title: t("errors.unknown"),
-        description: message,
-        variant: "destructive",
-      });
+      toast.error(t("errors.unknown"), { description: message });
     },
   });
 
@@ -135,11 +131,9 @@ function AdminBrandingPage() {
     if (!file) return;
     const err = validateLogoFile(file);
     if (err) {
-      toast({
-        title:
-          err.kind === "too_large" ? t("errors.tooLarge") : t("errors.invalidType"),
-        variant: "destructive",
-      });
+      toast.error(
+        err.kind === "too_large" ? t("errors.tooLarge") : t("errors.invalidType"),
+      );
       return;
     }
     if (pendingLogoPreview) URL.revokeObjectURL(pendingLogoPreview);
