@@ -175,6 +175,11 @@ Core | Operational | Engineering | Historical
 | `DICT-049` | [Powered by YourMeal OS](#powered-by-yourmeal-os) | Core | Accepted |
 | `DICT-050` | [Platform owns capability / Tenant owns experience](#platform-owns-capability--tenant-owns-experience) | Core | Accepted |
 | `DICT-051` | [Tenant Experience Spec](#tenant-experience-spec) | Operational | Accepted |
+| `DICT-052` | [Tenant Assets](#tenant-assets) | Engineering | Accepted |
+| `DICT-053` | [Experience First](#experience-first) | Core | Accepted |
+| `DICT-054` | [Customer Journey](#customer-journey) | Operational | Accepted |
+| `DICT-055` | [Experience Domain](#experience-domain) | Core | Accepted |
+| `DICT-056` | [Screen (SCR)](#screen-scr) | Engineering | Accepted |
 
 ---
 
@@ -206,7 +211,7 @@ Core | Operational | Engineering | Historical
 
 ### Identidad SaaS (ADR 0014)
 
-[Customer Application](#customer-application) (`DICT-045`) · [YourMeal OS (Corporate Surface)](#yourmeal-os-corporate-surface) (`DICT-046`) · [BrandConfig](#brandconfig) (`DICT-047`) · [Tenant-Branded](#tenant-branded) (`DICT-048`) · [Powered by YourMeal OS](#powered-by-yourmeal-os) (`DICT-049`) · [Platform owns capability / Tenant owns experience](#platform-owns-capability--tenant-owns-experience) (`DICT-050`) · [Tenant Experience Spec](#tenant-experience-spec) (`DICT-051`)
+[Customer Application](#customer-application) (`DICT-045`) · [YourMeal OS (Corporate Surface)](#yourmeal-os-corporate-surface) (`DICT-046`) · [BrandConfig](#brandconfig) (`DICT-047`) · [Tenant-Branded](#tenant-branded) (`DICT-048`) · [Powered by YourMeal OS](#powered-by-yourmeal-os) (`DICT-049`) · [Platform owns capability / Tenant owns experience](#platform-owns-capability--tenant-owns-experience) (`DICT-050`) · [Tenant Experience Spec](#tenant-experience-spec) (`DICT-051`) · [Tenant Assets](#tenant-assets) (`DICT-052`) · [Experience First](#experience-first) (`DICT-053`) · [Customer Journey](#customer-journey) (`DICT-054`) · [Experience Domain](#experience-domain) (`DICT-055`) · [Screen (SCR)](#screen-scr) (`DICT-056`)
 
 ---
 
@@ -2268,6 +2273,214 @@ BrandConfig · Tenant-Branded · Customer Application · Platform owns capabilit
 
 ---
 
+# Tenant Assets
+
+## ID
+DICT-052
+
+## Status
+Accepted
+
+## Madurez
+Engineering
+
+## Nombre
+Tenant Assets
+
+## Tipo
+Patrón de recursos / carpeta por Tenant
+
+## Definición
+Conjunto de recursos y configuración por Tenant (`tenants/<slug>/`: `brand.json`, `copy.*.json`, logo, splash, hero, onboarding, empty states) que alimentan `BrandConfig` y la Customer Application **sin** modificar el código fuente del producto.
+
+## Cuándo ocurre
+Onboarding de un Tenant · Experience Refactor · cambio de identidad visual.
+
+## Produce
+Experiencia white-label reutilizable (nuevo cliente = nuevos assets, no fork).
+
+## No significa
+Código específico por cliente · fork de la app · lógica de negocio en la carpeta de assets.
+
+## Sinónimos
+Tenant Resources · carpeta `tenants/`
+
+## Palabras relacionadas
+BrandConfig · Tenant Experience Spec · Tenant-Branded
+
+## Referencias
+[`tenants/`](../../tenants/README.md) · [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) · ADR 0014
+
+---
+
+
+---
+
+# Experience First
+
+## ID
+DICT-053
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Experience First
+
+## Tipo
+Principio de diseño de producto
+
+## Definición
+Orden de diseño de la Customer Application: **Customer Journey → Screen → Capability**. La capability no cambia; la pantalla se diseña desde el recorrido del usuario, no desde la estructura interna del sistema.
+
+Pregunta guía: ¿Mi madre podría hacer un pedido sin que nadie le explique la app?
+
+## Cuándo ocurre
+Experience Refactor · definición de pantallas MVP · auditoría de UX.
+
+## Produce
+Apps usables por clientes finales no técnicos.
+
+## No significa
+Ignorar capabilities · inventar reglas del OM · saltarse FOPEBA.
+
+## Sinónimos
+Journey-first · recorrido primero
+
+## Palabras relacionadas
+Customer Journey · Tenant Experience Spec · Capability
+
+## Referencias
+[07-experience](../07-experience/README.md) · [CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md)
+
+---
+
+# Customer Journey
+
+## ID
+DICT-054
+
+## Status
+Accepted
+
+## Madurez
+Operational
+
+## Nombre
+Customer Journey
+
+## Tipo
+Recorrido de experiencia / artefacto
+
+## Definición
+Secuencia de pasos que un cliente final atraviesa para completar un objetivo (p. ej. CJ-001 Pedido semanal). Complementa al Operational Model: el OM describe la operación; el Journey describe cómo la vive el usuario.
+
+## Cuándo ocurre
+Antes del Experience Refactor · diseño de pantallas · validación de usabilidad.
+
+## Produce
+Inventario de pantallas justificado · criterio de éxito emocional («en dos minutos…»).
+
+## No significa
+User flow técnico de rutas · Capability Roadmap · diagrama de módulos.
+
+## Sinónimos
+CJ-xxx · recorrido del cliente
+
+## Palabras relacionadas
+Experience First · CJ-001 · Tenant Experience Spec
+
+## Referencias
+[CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md)
+
+
+
+---
+
+# Experience Domain
+
+## ID
+DICT-055
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Experience Domain
+
+## Tipo
+Dominio del proyecto
+
+## Definición
+Cuarto dominio de YourMeal OS junto a Knowledge, Engineering y Operations. Entregable: Customer Journeys + Screens. No es conocimiento ni implementación: es cómo el usuario final vive el producto (Tenant-Branded · Experience First).
+
+## Cuándo ocurre
+Diseño de Customer App · Experience Refactor · onboarding de Tenant.
+
+## Produce
+CJ-xxx · SCR-xxx · BrandConfig / Tenant Assets aplicados a pantallas.
+
+## No significa
+Operational Model · código de plataforma · evidencia de campo (Operations).
+
+## Sinónimos
+Dominio Experience · capa Experience
+
+## Palabras relacionadas
+Experience First · Customer Journey · Screen (SCR) · Tenant-Branded
+
+## Referencias
+[PROJECT_DOMAINS](../00-status/PROJECT_DOMAINS.md) · [07-experience](../07-experience/README.md)
+
+---
+
+# Screen (SCR)
+
+## ID
+DICT-056
+
+## Status
+Accepted
+
+## Madurez
+Engineering
+
+## Nombre
+Screen (SCR)
+
+## Tipo
+Artefacto de experiencia
+
+## Definición
+Pantalla de la Customer Application identificada como `SCR-xxx`. Debe pertenecer exactamente a un Customer Journey y puede trazar Capabilities, objetos del OM y Evidence.
+
+Regla: ninguna pantalla existe por sí sola.
+
+## Cuándo ocurre
+Inventario MVP · Experience Refactor · auditoría de UX.
+
+## Produce
+UI justificada por un journey · trazabilidad Journey → Screen → Capability.
+
+## No significa
+Ruta técnica suelta · módulo de back office · pantalla «por si acaso».
+
+## Sinónimos
+SCR-xxx · pantalla de journey
+
+## Palabras relacionadas
+Customer Journey · Experience First · Capability
+
+## Referencias
+[CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md)
+
+
 ## Historial de este diccionario
 
 | Fecha | Cambio |
@@ -2278,4 +2491,7 @@ BrandConfig · Tenant-Branded · Customer Application · Platform owns capabilit
 | 2026-07-23 | ADR 0014 — DICT-045…049 Customer Application / BrandConfig / Tenant-Branded |
 | 2026-07-23 | ADR 0014 ampliación — cinco capas · filtro Plataforma/Tenant · DICT-050 |
 | 2026-07-23 | TENANT_EXPERIENCE_SPEC EatClean · DICT-051 · consecuencia BrandConfig-only |
+| 2026-07-23 | TENANT_IMPLEMENTATION_EATCLEAN · `tenants/eatclean/` · DICT-052 Tenant Assets |
+| 2026-07-23 | Experience First · CUSTOMER_JOURNEYS · DICT-053/054 |
+| 2026-07-23 | Experience Domain · SCR trazabilidad · DICT-055/056 · PROJECT_DOMAINS |
 

@@ -3,15 +3,16 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Home, UtensilsCrossed, ClipboardList, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { TenantBrandScope } from "@/components/tenant/tenant-brand-scope";
 
 export function MobileShell({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-background flex justify-center">
+    <TenantBrandScope className="min-h-screen bg-background flex justify-center">
       <div className="w-full max-w-[430px] min-h-screen bg-background flex flex-col relative pb-24">
         <div className="flex-1 flex flex-col animate-fade-in">{children}</div>
         <BottomNav />
       </div>
-    </div>
+    </TenantBrandScope>
   );
 }
 
@@ -23,12 +24,12 @@ function BottomNav() {
     { to: "/app", label: t("home"), icon: Home, exact: true },
     { to: "/app/menu", label: t("menu"), icon: UtensilsCrossed, exact: false },
     { to: "/app/orders", label: t("orders"), icon: ClipboardList, exact: false },
-    { to: "/app/settings", label: t("settings"), icon: User, exact: false },
+    { to: "/app/settings", label: t("profile"), icon: User, exact: false },
   ] as const;
 
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 mx-auto max-w-[430px] border-t border-border/70 bg-card/85 backdrop-blur-xl safe-bottom"
+      className="fixed bottom-0 inset-x-0 mx-auto max-w-[430px] border-t border-border/70 bg-card/90 backdrop-blur-xl safe-bottom"
       style={{ paddingTop: "0.5rem" }}
     >
       <ul className="flex justify-around items-stretch px-3">

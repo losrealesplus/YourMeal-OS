@@ -1,0 +1,40 @@
+{
+  "slug": "eatclean",
+  "name": "EatClean",
+  "legalName": "Eat Clean Tenerife Catering",
+  "website": "https://eatcleantenerifecatering.es/",
+  "primaryColor": "#2F6B4F",
+  "secondaryColor": "#C4A484",
+  "background": "#F7F3EC",
+  "surface": "#FFFcf7",
+  "foreground": "#1A2E24",
+  "success": "#2F6B4F",
+  "error": "#B42318",
+  "typography": {
+    "display": "Inter",
+    "body": "Inter"
+  },
+  "borderRadius": "1.25rem",
+  "poweredBy": {
+    "visible": true,
+    "label": "Powered by YourMeal OS",
+    "surfaces": ["login", "splash", "about"]
+  },
+  "assets": {
+    "logo": "./logo.svg",
+    "icon": "./icon.png",
+    "splash": "./splash.webp",
+    "heroHome": "./hero-home.webp",
+    "onboarding": [
+      "./onboarding-1.webp",
+      "./onboarding-2.webp",
+      "./onboarding-3.webp"
+    ],
+    "emptyOrders": "./empty-orders.webp"
+  },
+  "storeAssets": {
+    "appName": "EatClean",
+    "shortDescription": "Comida preparada para ayudarte a comer mejor."
+  },
+  "_notes": "Tokens derived for Tenant Experience (warm food brand). Runtime loads via BrandConfig — no EatClean branches in app code."
+}

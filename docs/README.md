@@ -7,6 +7,8 @@
 | Documento | Propósito |
 |-----------|-----------|
 | [**Project Dictionary**](./99-reference/PROJECT_DICTIONARY.md) | **Autoridad semántica** (`DICT-xxx` · Status · Madurez) — no se solapa con FOUNDATION / ADR / OM |
+| [Customer Journeys](./07-experience/CUSTOMER_JOURNEYS.md) | Experience First · CJ-001 Pedido semanal (cómo vive el usuario) |
+| [Project Domains](./00-status/PROJECT_DOMAINS.md) | Knowledge · Engineering · Experience · Operations |
 | [Estado](./00-status/README.md) | Fase oficial — Antesala · dual track |
 | [Dual Track · Antesala](./00-status/DUAL_TRACK_ANTECAMARA.md) | Carril A (cerrar Etapa 1) · Carril B (UX/infra sin engines) |
 | [Product Blueprint](./15-product/README.md) | Qué construir y por qué |
@@ -24,6 +26,7 @@
 | [Foundation Lock](./05-architecture/FOUNDATION_LOCK.md) | ✅ Cerrado v0.1.0 |
 | [Tenant Branding](./05-architecture/TENANT_BRANDING.md) | Contrato BrandConfig · Customer App white-label (ADR 0014) |
 | [Tenant Experience Spec](./05-architecture/TENANT_EXPERIENCE_SPEC.md) | Identidad EatClean · Experience Refactor |
+| [Tenant Implementation · EatClean](./05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) | Brief Cursor/Lovable · Tenant Assets |
 | [Contexto estratégico](./05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md) | Dirección empresarial y del Core |
 | [Filosofía de producto](./05-architecture/FILOSOFIA_DE_PRODUCTO.md) | Propósito, éxito e impacto operativo |
 | [Contexto CTO](./05-architecture/CONTEXTO_CTO.md) | Arranque operativo de sesión Cursor (CTO) |

@@ -1,0 +1,62 @@
+{
+  "login": {
+    "title": "Bienvenido a EatClean",
+    "subtitle": "Comida preparada para ayudarte a comer mejor.",
+    "cta": "Iniciar sesión",
+    "poweredBy": "Powered by YourMeal OS"
+  },
+  "splash": {
+    "poweredBy": "Powered by YourMeal OS"
+  },
+  "home": {
+    "greeting": "Hola, {{name}}",
+    "prompt": "¿Ya programaste tu pedido de esta semana?",
+    "primaryCta": "Programar pedido",
+    "cards": {
+      "nextOrder": "Próximo pedido",
+      "deliveryDate": "Fecha de entrega",
+      "status": "Estado",
+      "thisWeek": "Pedido de esta semana",
+      "seeSummary": "Ver resumen",
+      "favorites": "Mis menús favoritos",
+      "promotions": "Promociones"
+    }
+  },
+  "nav": {
+    "home": "Inicio",
+    "orders": "Pedidos",
+    "favorites": "Favoritos",
+    "account": "Mi cuenta"
+  },
+  "profile": {
+    "personalData": "Datos personales",
+    "addresses": "Direcciones",
+    "paymentMethods": "Métodos de pago",
+    "invoices": "Facturas",
+    "history": "Historial",
+    "dietaryPreferences": "Preferencias alimentarias",
+    "allergens": "Alérgenos",
+    "logout": "Cerrar sesión",
+    "about": "Acerca de"
+  },
+  "backOffice": {
+    "entryLabel": "EatClean Admin"
+  },
+  "claims": {
+    "enjoy": "Cocinamos para que tú solo tengas que disfrutar.",
+    "nutrition": "Soluciones nutritivas.",
+    "method": "Cocina 100% grill y al horno.",
+    "ingredients": "Ingredientes naturales.",
+    "service": "Servicio personalizado.",
+    "delivery": "Reparto gratuito.",
+    "everyday": "Comida saludable en tu día a día."
+  },
+  "_forbiddenTone": [
+    "operación",
+    "módulo",
+    "plataforma",
+    "SaaS",
+    "sistema operativo",
+    "ERP"
+  ]
+}

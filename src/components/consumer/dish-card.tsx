@@ -19,18 +19,18 @@ export function DishCard({
     <Link
       to="/app/menu/$dishId"
       params={{ dishId: dish.id }}
-      className="group relative flex gap-4 surface-raised border border-border/60 rounded-3xl p-3 pr-4 items-stretch transition-all duration-200 hover:border-primary/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.995]"
+      className="group relative flex gap-4 surface-raised border border-border/60 rounded-[1.5rem] p-4 pr-4 items-stretch transition-all duration-200 hover:border-primary/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.995]"
     >
-      <DishThumb emoji={dish.emoji} size="md" />
-      <div className="flex-1 min-w-0 flex flex-col justify-between py-1.5">
+      <DishThumb emoji={dish.emoji} size="md" className="!size-28 !text-5xl !rounded-3xl" />
+      <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
         <div className="min-w-0">
-          <p className="font-bold leading-tight truncate">{dish.name}</p>
-          <p className="text-xs text-muted-foreground truncate mt-1">
+          <p className="font-extrabold text-base leading-tight truncate">{dish.name}</p>
+          <p className="text-sm text-muted-foreground truncate mt-1.5">
             {dish.tagline}
           </p>
         </div>
-        <div className="flex items-center gap-2 mt-2.5">
-          <span className="inline-flex items-center gap-1 font-mono text-[11px] font-bold tabular-nums text-foreground bg-secondary/80 rounded-md px-2 py-0.5">
+        <div className="flex items-center gap-2 mt-3">
+          <span className="inline-flex items-center gap-1 font-mono text-xs font-bold tabular-nums text-foreground bg-secondary/80 rounded-lg px-2.5 py-1">
             {dish.kcal}
             <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
               kcal

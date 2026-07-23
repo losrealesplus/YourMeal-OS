@@ -1,37 +1,32 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { CalendarClock } from "lucide-react";
+import type { ReactNode } from "react";
+import {
+  CalendarClock,
+  ChevronRight,
+  RefreshCw,
+  Sparkles,
+  Truck,
+} from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useDishes } from "@/hooks/use-dishes";
 import {
   DishCard,
-  OrderCard,
-  ScreenHeader,
-  SectionHeader,
   PrimaryCTA,
   EmptyState,
   DashboardSkeleton,
   DashboardError,
   OfflineBanner,
-  ConfirmedOrderHero,
-  PendingOrderHero,
-  DeliveryHero,
-  OnboardingHero,
   DashboardStateSwitcher,
   dashboardStateIds,
   isDashboardState,
   type DashboardStateId,
 } from "@/components/consumer";
-import { MOCK_ORDERS, type MockOrder } from "@/lib/mock-catalog";
+import { brandConfig } from "@/tenant/brand-config";
 
 /**
- * Screen: Customer · Home Dashboard (todos los estados)
- * - Objetivo operacional: momento «Antes de empezar la semana» — anticipar la programación.
- * - Capability: orders.schedule + weekly-menu.browse
- * - Core Object(s): Order · WeeklyMenu · Delivery
- * - CAP-002: featured dishes from useDishes() (real catalog read)
- * Estados diseñados: default · empty · withOrders · confirmed · pending · loading · error · offline
- * Ver docs/15-product/PRODUCT_RULES.md y CUSTOMER_APP_SCREEN_MAP.md
+ * SCR-005 · Home — CJ-001
+ * Experience Refactor: food app home, not admin dashboard.
  */
 export const Route = createFileRoute("/_authenticated/app/")({
   validateSearch: (search: Record<string, unknown>): { state?: DashboardStateId } => ({
@@ -60,14 +55,6 @@ function CustomerHome() {
     spicy: t("customer:tagSpicy"),
   };
 
-  const statusLabels = {
-    pending: t("customer:statusPending"),
-    preparing: t("customer:statusPreparing"),
-    dispatched: t("customer:statusDispatched"),
-    delivered: t("customer:statusDelivered"),
-    cancelled: t("customer:statusCancelled"),
-  };
-
   const stateOptions = dashboardStateIds.map((id) => ({
     id,
     label: t(`customer:state${id.charAt(0).toUpperCase()}${id.slice(1)}` as const),
@@ -75,12 +62,6 @@ function CustomerHome() {
 
   return (
     <div className="flex-1 flex flex-col">
-      <ScreenHeader
-        overline={t("common:tenant")}
-        title={`${t("customer:greeting")}, ${name}`}
-        subtitle={t("customer:assistantHint")}
-      />
-
       {isStaff ? (
         <DashboardStateSwitcher
           states={stateOptions}
@@ -96,23 +77,24 @@ function CustomerHome() {
         />
       ) : null}
 
-      <DashboardBody state={state} tagLabels={tagLabels} statusLabels={statusLabels} />
+      <HomeBody name={name} state={state} tagLabels={tagLabels} />
     </div>
   );
 }
 
-function DashboardBody({
+function HomeBody({
+  name,
   state,
   tagLabels,
-  statusLabels,
 }: {
+  name: string;
   state: DashboardStateId;
   tagLabels: Record<string, string>;
-  statusLabels: Record<string, string>;
 }) {
   const { t } = useTranslation("customer");
   const navigate = useNavigate({ from: "/app" });
   const { data: catalogDishes = [] } = useDishes();
+  const featured = catalogDishes.slice(0, 3);
 
   if (state === "loading") {
     return <DashboardSkeleton label={t("loadingDashboard")} />;
@@ -124,139 +106,115 @@ function DashboardBody({
         title={t("errorTitle")}
         hint={t("errorHint")}
         retryLabel={t("retry")}
-        onRetry={() =>
-          navigate({ search: () => ({ state: undefined }) })
-        }
+        onRetry={() => navigate({ search: () => ({ state: undefined }) })}
       />
     );
   }
 
-  // Staff-only design fixtures (DashboardStateSwitcher). Live customer path: no mocks (INC-06).
-  const useOrderFixtures =
-    state === "confirmed" || state === "pending" || state === "withOrders";
-  const confirmedOrder: MockOrder = { ...MOCK_ORDERS[0], status: "preparing" };
-  const pendingOrder: MockOrder = { ...MOCK_ORDERS[0], status: "pending" };
-  const deliveryOrder = useOrderFixtures
-    ? MOCK_ORDERS.find((o) => o.status !== "delivered")
-    : undefined;
-  const featured = catalogDishes.slice(0, 3);
-  const isEmpty = state === "empty" || !useOrderFixtures;
-  const showOffline = state === "offline";
-
   return (
     <>
-      {showOffline ? (
-        <div className="mb-4">
-          <OfflineBanner
-            title={t("offlineTitle")}
-            hint={t("offlineHint")}
-          />
+      {state === "offline" ? (
+        <div className="mb-2 px-6">
+          <OfflineBanner title={t("offlineTitle")} hint={t("offlineHint")} />
         </div>
       ) : null}
 
-      <section className="px-6 space-y-4">
-        {useOrderFixtures && state === "confirmed" ? (
-          <ConfirmedOrderHero
-            order={confirmedOrder}
-            overline={t("confirmedOverline")}
-            title={t("confirmedTitle")}
-            mealsLabel={t("meals")}
-            ctaLabel={t("viewDetails")}
-          />
-        ) : useOrderFixtures && state === "pending" ? (
-          <PendingOrderHero
-            order={pendingOrder}
-            overline={t("pendingOverline")}
-            title={t("pendingTitle")}
-            hint={t("pendingHint")}
-            ctaLabel={t("finishOrder")}
-          />
-        ) : (
-          <OnboardingHero
-            overline={state === "empty" ? t("onboardingOverline") : t("momentTitle")}
-            title={state === "empty" ? t("onboardingTitle") : t("scheduleTitle")}
-            hint={state === "empty" ? t("onboardingHint") : t("scheduleHint")}
-            ctaLabel={t("scheduleCta")}
-          />
-        )}
-
-        {isEmpty ? (
-          <EmptyState
-            icon={<CalendarClock className="size-6" aria-hidden />}
-            title={state === "empty" ? t("emptyTitle") : t("noOrdersTitle")}
-            hint={state === "empty" ? t("emptyHint") : t("noOrdersHint")}
-          />
-        ) : deliveryOrder ? (
-          <DeliveryHero
-            order={deliveryOrder}
-            overline={t("nextDelivery")}
-            mealsLabel={t("meals")}
-          />
-        ) : (
-          <EmptyState
-            icon={<CalendarClock className="size-6" aria-hidden />}
-            title={t("noOrdersTitle")}
-            hint={t("noOrdersHint")}
-          />
-        )}
-
-        {useOrderFixtures ? (
-          <div className="grid grid-cols-2 gap-3">
-            <Stat label={t("mealsOrdered")} value={String(deliveryOrder?.meals ?? 0)} />
-            <Stat
-              label={t("daysCovered")}
-              value={String(Math.ceil((deliveryOrder?.meals ?? 0) / 2))}
-            />
-          </div>
-        ) : null}
+      <section className="px-6 pt-6 pb-2">
+        <p className="meta-label text-primary">{brandConfig.name}</p>
+        <h1 className="text-3xl font-extrabold tracking-tight mt-2 text-balance">
+          {t("greeting")}, {name}
+        </h1>
+        <p className="text-base text-muted-foreground mt-3 leading-relaxed text-pretty">
+          {t("scheduleTitle")}
+        </p>
+        <div className="mt-6">
+          <Link to="/app/schedule" className="block">
+            <PrimaryCTA>{t("scheduleCta")}</PrimaryCTA>
+          </Link>
+        </div>
       </section>
 
-      <SectionHeader
-        title={t("featuredDishes")}
-        action={
-          <Link to="/app/menu" className="font-bold text-primary focus-visible:outline-none focus-visible:underline">
-            {t("seeAll")}
-          </Link>
-        }
-      />
-      <div className="px-6 space-y-3 pb-8">
-        {featured.map((d) => (
-          <DishCard key={d.id} dish={d} tagLabels={tagLabels} />
-        ))}
-      </div>
+      <section className="px-6 mt-8 grid gap-3">
+        <HomeCard
+          to="/app/orders"
+          icon={<Truck className="size-5" />}
+          title={t("nextDelivery")}
+          hint={t("homeCardDeliveryHint")}
+        />
+        <HomeCard
+          to="/app/orders"
+          icon={<CalendarClock className="size-5" />}
+          title={t("homeCardCurrentOrder")}
+          hint={t("homeCardCurrentHint")}
+        />
+        <HomeCard
+          to="/app/orders"
+          icon={<RefreshCw className="size-5" />}
+          title={t("homeCardRepeat")}
+          hint={t("homeCardRepeatHint")}
+        />
+        <HomeCard
+          to="/app/menu"
+          icon={<Sparkles className="size-5" />}
+          title={t("promotions")}
+          hint={t("homeCardPromoHint")}
+        />
+      </section>
 
-      {useOrderFixtures ? (
+      {featured.length > 0 ? (
         <>
-          <SectionHeader title={t("recentOrders")} />
-          <div className="px-6 space-y-3 pb-6">
-            {(state === "withOrders" ? MOCK_ORDERS : MOCK_ORDERS.slice(0, 2)).map((o) => (
-              <OrderCard
-                key={o.id}
-                order={o}
-                mealsLabel={t("meals")}
-                statusLabels={statusLabels}
-              />
+          <div className="px-6 mt-10 mb-3 flex items-end justify-between">
+            <h2 className="text-lg font-extrabold tracking-tight">{t("featuredDishes")}</h2>
+            <Link
+              to="/app/menu"
+              className="text-sm font-bold text-primary focus-visible:outline-none focus-visible:underline"
+            >
+              {t("seeAll")}
+            </Link>
+          </div>
+          <div className="px-6 space-y-3 pb-10">
+            {featured.map((d) => (
+              <DishCard key={d.id} dish={d} tagLabels={tagLabels} />
             ))}
           </div>
         </>
-      ) : null}
-
-      <div className="px-6 pb-4">
-        <Link to="/app/schedule" className="block">
-          <PrimaryCTA>{t("scheduleCta")}</PrimaryCTA>
-        </Link>
-      </div>
+      ) : (
+        <div className="px-6 py-10">
+          <EmptyState
+            icon={<CalendarClock className="size-6" aria-hidden />}
+            title={t("emptyTitle")}
+            hint={t("emptyHint")}
+          />
+        </div>
+      )}
     </>
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function HomeCard({
+  to,
+  icon,
+  title,
+  hint,
+}: {
+  to: "/app/orders" | "/app/menu";
+  icon: ReactNode;
+  title: string;
+  hint: string;
+}) {
   return (
-    <div className="surface-raised border border-border/60 rounded-2xl p-4">
-      <p className="meta-label">{label}</p>
-      <p className="text-3xl font-extrabold tracking-tight mt-2 font-mono tabular-nums leading-none">
-        {value}
-      </p>
-    </div>
+    <Link
+      to={to}
+      className="flex items-center gap-4 rounded-3xl border border-border/70 bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 active:scale-[0.99]"
+    >
+      <div className="grid place-items-center size-12 rounded-2xl bg-primary/10 text-primary">
+        {icon}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="font-bold truncate">{title}</p>
+        <p className="text-xs text-muted-foreground mt-0.5 truncate">{hint}</p>
+      </div>
+      <ChevronRight className="size-5 text-muted-foreground" />
+    </Link>
   );
 }

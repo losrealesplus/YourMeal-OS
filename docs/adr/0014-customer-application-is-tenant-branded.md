@@ -12,6 +12,16 @@
 
 Esta frase resume la separación entre YourMeal OS (motor operativo) y cada Customer Application (marca y experiencia de cara al usuario).
 
+### Tres niveles de personalización
+
+| Nivel | Responsable | ¿Cambia por cliente? |
+|-------|-------------|----------------------|
+| **Platform** | YourMeal OS | No |
+| **BrandConfig** | Tenant | Sí — configuración |
+| **Tenant Experience** | Tenant | Sí — contenido y recursos |
+
+Una sola base de código. Experiencia completa por Tenant sin forks.
+
 ---
 
 ## Contexto
@@ -222,7 +232,9 @@ La primera protege la evolución del conocimiento. La segunda protege la escalab
 
 - [TENANT_BRANDING](../05-architecture/TENANT_BRANDING.md) — contrato técnico  
 - [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md) — identidad EatClean (Experience Refactor)  
+- [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) — brief Cursor/Lovable  
+- [`tenants/eatclean/`](../../tenants/eatclean/README.md) — BrandConfig + assets  
 - [ADR 0003](./0003-multi-tenant.md) — aislamiento multi-tenant  
 - [ADR 0004](./0004-authentication-rbac.md) — autenticación / RBAC  
 - [docs/03-brand](../03-brand/README.md)  
-- Dictionary: `DICT-045`…`DICT-051`
+- Dictionary: `DICT-045`…`DICT-052`

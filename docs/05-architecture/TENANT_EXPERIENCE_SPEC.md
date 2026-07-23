@@ -2,6 +2,8 @@
 
 **ADR:** [0014 — Customer Application is Tenant-Branded](../adr/0014-customer-application-is-tenant-branded.md)  
 **Contrato técnico:** [TENANT_BRANDING](./TENANT_BRANDING.md) (`BrandConfig`)  
+**Implementación Cursor/Lovable:** [TENANT_IMPLEMENTATION_EATCLEAN](./TENANT_IMPLEMENTATION_EATCLEAN.md)  
+**Assets:** [`tenants/eatclean/`](../../tenants/eatclean/README.md)  
 **Tenant:** EatClean Tenerife Catering  
 **Audiencia del documento:** Cursor · Lovable · diseño (Experience Refactor)  
 **Ámbito:** identidad, tono, copy y navegación de la **Customer Application** — **sin** cambiar HP-001 ni lógica operativa.
@@ -15,6 +17,21 @@ Convertir la Customer Application en una **extensión natural** de la identidad 
 > Que cualquier cliente descargue la app y piense que es la **app oficial de EatClean**.
 
 No copiar la web literalmente. Heredar su **identidad**, su **tono** y su **lenguaje**.
+
+### Tres niveles (separación SaaS)
+
+| Nivel | Responsable | ¿Cambia por cliente? |
+|-------|-------------|----------------------|
+| **Platform** | YourMeal OS | **No** — una sola base de código |
+| **BrandConfig** | Tenant | **Sí** — mediante configuración |
+| **Tenant Experience** | Tenant | **Sí** — mediante contenido y recursos |
+
+Eso evita:
+
+* forks del producto por cliente;  
+* reducir el branding a «un logo y dos colores».
+
+El Tenant define una **experiencia completa** (identidad · lenguaje · tono · recursos); la plataforma sigue siendo una única codebase.
 
 ---
 
@@ -229,14 +246,44 @@ No mostrar en Customer Application:
 
 **No bloquea** Smoke / ORR. Priorizable en paralelo como incremento Lovable/Cursor de experiencia.
 
-### Brief corto para Lovable / Cursor
+### Cadena de experiencia
 
 ```text
-Aplica TENANT_EXPERIENCE_SPEC (EatClean) + ADR 0014 + BrandConfig.
-La Customer App debe sentirse como la app oficial de EatClean.
-Hereda identidad/tono/lenguaje de eatcleantenerifecatering.es — no copies layout web.
-No toques lógica HP-001. No inventes módulos. No muestres back office al cliente.
-Login/home/nav según el Spec. Powered by YourMeal OS solo en footer discreto.
+Tenant Experience Spec
+        ↓
+Experience Refactor
+        ↓
+BrandConfig Validation
+        ↓
+EatClean Release UX
+```
+
+No abordar pantalla por pantalla de forma aislada: **auditoría de toda la experiencia**.
+
+### Checklist por pantalla (obligatoria)
+
+Cada pantalla de Customer Application debe cumplir **todas** estas preguntas antes de darse por válida:
+
+| # | Criterio | Pregunta |
+|---|----------|----------|
+| 1 | **Branding** | ¿Parece una pantalla de EatClean o de un SaaS genérico? |
+| 2 | **Copy** | ¿Usa el mismo tono y lenguaje que la web del Tenant? |
+| 3 | **Continuidad** | ¿La transición web → app resulta natural? |
+| 4 | **Rol** | ¿Corresponde a Front Office o Back Office? (cliente ≠ operador) |
+| 5 | **Powered by** | ¿YourMeal OS aparece **únicamente** donde corresponde? |
+| 6 | **Configuración** | ¿Todo lo visible proviene de `BrandConfig` o recursos del Tenant, **sin** lógica específica hardcodeada para EatClean? |
+
+Si **todas** las pantallas pasan la checklist, se valida no solo la UX de EatClean, sino el **patrón reutilizable** para cualquier Tenant futuro.
+
+### Brief corto para Lovable / Cursor
+
+Usar el brief completo: [TENANT_IMPLEMENTATION_EATCLEAN](./TENANT_IMPLEMENTATION_EATCLEAN.md).
+
+```text
+Implementa TENANT IMPLEMENTATION · EatClean v1 (+ Spec + ADR 0014).
+App oficial EatClean — no SaaS. Identidad de eatcleantenerifecatering.es, NO layout web.
+BrandConfig + tenants/eatclean/ only. NO HP-001. NO forks. NO if (eatclean).
+Checklist Branding/Copy/Continuidad/Rol/Powered by/Configuración.
 ```
 
 ---
@@ -245,7 +292,9 @@ Login/home/nav según el Spec. Powered by YourMeal OS solo en footer discreto.
 
 - [ADR 0014](../adr/0014-customer-application-is-tenant-branded.md)  
 - [TENANT_BRANDING](./TENANT_BRANDING.md)  
+- [TENANT_IMPLEMENTATION_EATCLEAN](./TENANT_IMPLEMENTATION_EATCLEAN.md)  
+- [`tenants/eatclean/`](../../tenants/eatclean/README.md)  
 - [03-brand](../03-brand/README.md)  
 - [CUSTOMER_APP_SCREEN_MAP](../15-product/CUSTOMER_APP_SCREEN_MAP.md)  
 - [Lovable Brief](../21-product-materialization/02-lovable-brief.md)  
-- Dictionary: `DICT-045`…`DICT-051`
+- Dictionary: `DICT-045`…`DICT-052`

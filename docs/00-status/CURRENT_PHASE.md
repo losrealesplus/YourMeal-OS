@@ -8,13 +8,14 @@
 PROJECT STATE
 ══════════════════════════════════════════════════
 
-Documentary stack: Closed (pending #24 → main)
+Documentary / SaaS identity: Closed (pending #25 → main)
 Engineering Phase: Complete (pending operational authorization)
 Current Phase:     Evidence Gate  (pre-ORR)
 Next Gate:         ORR  (PASSED | BLOCKED)
 Next Discipline:   Operational Engineering
 Primary Artifact:  Field Evidence
-Focus:             Abrir la app · recorrido HP-001
+Focus operativo:   ¿Está listo para evidencia? · Smoke HP-001 · ORR
+Focus experiencia: ¿Mi madre podría pedir sin que nadie le explique la app?
 Last Baseline:     v0.2.0-engineering-baseline (IR-001)
 
 ══════════════════════════════════════════════════
@@ -24,22 +25,60 @@ Cierre formal: [ENGINEERING_PHASE](./ENGINEERING_PHASE.md).
 
 ```text
 Foundation ✅ → Governance ✅ → OM ✅ → Implementation ✅
-→ Engineering Baseline ✅ → Project Dictionary ✅ (#24)
+→ Engineering Baseline ✅ → Dictionary + ADR-0014 ✅ (#25)
 ───────────────
 Comienza Operational Engineering  (tras ORR PASSED)
+Experience: Journey-first (CJ-001) · pantallas MVP ≤ 15
 ```
 
-> No más inversión en estructura metodológica. El retorno está en **ejecutar** el recorrido y generar evidencia.
+> Dos líneas en paralelo: **evidencia operativa** (FOPEBA) y **experiencia Tenant** (Journey → Screen → Capability). No compiten.  
+> Estabilidad conceptual: el valor siguiente es **demostrar en campo** (CJ-001 + Smoke/ORR/FOV), no añadir conceptos.  
+> Motores de cambio por dominio: [PROJECT_DOMAINS](./PROJECT_DOMAINS.md).
+
+---
+
+## Dos líneas de trabajo (independientes)
+
+### Línea operativa (no se mueve)
+
+```text
+Migration → Smoke HP-001 → ORR → FOV
+```
+
+Pregunta: ¿Hay evidencia para ORR? Congelación funcional hasta ORR.
+
+### Línea de experiencia (nuevo frente)
+
+```text
+Customer Journeys (CJ-001)
+        ↓
+Pantallas MVP (≤ 15)
+        ↓
+Experience Refactor
+        ↓
+BrandConfig Validation
+        ↓
+EatClean Release UX
+```
+
+Pregunta: **¿Mi madre podría hacer un pedido sin que nadie le explique la app?**
+
+Sprint activo: [EXPERIENCE_REFACTOR_EATCLEAN_V1](../07-experience/EXPERIENCE_REFACTOR_EATCLEAN_V1.md) — primer entregable: Splash · Login · Home · Menú · Resumen.
+
+Docs: [CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md) · [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) · [`tenants/eatclean/`](../../tenants/eatclean/README.md).
 
 ---
 
 ## Dominios oficiales
 
-| Dominio | Estado |
-|---------|--------|
-| Knowledge Engineering | ✅ Frozen / Closed |
-| Software Engineering | ✅ Implementado · ✅ #23 en main |
-| Operational Engineering | ⏳ Pendiente de ORR PASSED |
+Mapa: [PROJECT_DOMAINS](./PROJECT_DOMAINS.md).
+
+| Dominio | Entregable | Estado |
+|---------|------------|--------|
+| **Knowledge** | Operational Model | ✅ Frozen / Closed |
+| **Engineering** | Código | ✅ Implementado · ✅ #23 en main |
+| **Experience** | Customer Journeys + Screens | 🟡 CJ-001 definido · Refactor pendiente |
+| **Operations** | Evidencia | ⏳ Smoke → ORR → FOV |
 
 ---
 
@@ -60,13 +99,13 @@ Cualquier “pequeña mejora” en el merge **espera** al siguiente ciclo.
 ## Cadena (sin pasos intermedios)
 
 ```text
-#24 → main → Apply migration → Smoke HP-001 → ORR → PASSED → Ready for FOV → FOV-001
+#25 → main → Apply migration → Smoke HP-001 → ORR → PASSED → Ready for FOV → FOV-001
 ```
 
 | Evento | Estado |
 |--------|:------:|
 | PR #23 merge (hardening) | ✅ |
-| PR #24 merge (Dictionary) | ⏳ |
+| PR #25 merge (Dictionary · ADR-0014 · Experience Spec) | ⏳ |
 | Migración `program_draft_order` | ⏳ |
 | Smoke HP-001 | ⏳ |
 | ORR | ⏳ |

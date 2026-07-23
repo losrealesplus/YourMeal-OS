@@ -2,6 +2,7 @@
 
 **Última actualización:** 2026-07-23  
 **Fase actual:** [CURRENT_PHASE](./CURRENT_PHASE.md) ← abrir primero  
+**Dominios:** [PROJECT_DOMAINS](./PROJECT_DOMAINS.md) — Knowledge · Engineering · Experience · Operations  
 **Engineering Phase:** [ENGINEERING_PHASE](./ENGINEERING_PHASE.md) — Complete (pending operational authorization)  
 **Última integración:** [IR-001](./IR-001_FIRST_ENGINEERING_INTEGRATION.md) · PR #22  
 **Pre-piloto:** [PRE_PILOT_AUDIT](./PRE_PILOT_AUDIT.md)  
@@ -9,13 +10,12 @@
 **Historia:** [MILESTONES](./MILESTONES.md)  
 **Auditoría ingeniería:** [ENGINEERING_REVIEW_SPRINT0](./ENGINEERING_REVIEW_SPRINT0.md)  
 **Objetivo:** demostrar que FOPEBA puede producir software operacional de alta calidad.  
-**Hito operativo:** `HP-001 · Operational · ORR PASSED · Ready for FOV` (en curso)
+**Hito operativo:** `HP-001 · Operational · ORR PASSED · Ready for FOV` (en curso)  
+**Hito experiencia:** CJ-001 usable sin explicación ([CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md))
 
-> Pregunta: **¿Cuál es la siguiente Capability?** — no la siguiente regla.  
-> Ahora: **Engineering Fix Sprint** (P1) → luego **ORR** (PASSED \| BLOCKED) — no features.  
+> Ops: **¿Hay evidencia para ORR?** · Experience: **¿Mi madre podría pedir sin ayuda?**  
 > El software es una implementación del conocimiento. Nunca su origen.  
-> [ADR 0013](../adr/0013-implementation-is-knowledge-materialization.md)  
-> No abrir documentos metodológicos nuevos hasta la primera FOV.
+> [ADR 0013](../adr/0013-implementation-is-knowledge-materialization.md) · [ADR 0014](../adr/0014-customer-application-is-tenant-branded.md)
 
 ---
 
@@ -27,7 +27,7 @@
 | CAP-006 Confirm | Operational | ✔ cierra HP-001 |
 | CAP-007 History | Scaffold | — |
 
-**Siguiente:** [CURRENT_PHASE](./CURRENT_PHASE.md) · Engineering Fix (P1) → [ORR](../22-implementation/ORR.md) → Phase 3 FOV.
+**Siguiente:** [CURRENT_PHASE](./CURRENT_PHASE.md) · migración → [SMOKE_HP-001](./SMOKE_HP-001.md) → [ORR](../22-implementation/ORR.md) · Experience: [CJ-001](../07-experience/CUSTOMER_JOURNEYS.md)
 
 ### Etapa 2 Levels
 
@@ -64,5 +64,5 @@ FOV ⏳ tras ORR **PASSED**.
 
 ## Índices
 
-[CURRENT_PHASE](./CURRENT_PHASE.md) · [PROJECT_DICTIONARY](../99-reference/PROJECT_DICTIONARY.md) · [SMOKE_HP-001](./SMOKE_HP-001.md) · [ORR_HP-001](./ORR_HP-001.md) · [IR-001](./IR-001_FIRST_ENGINEERING_INTEGRATION.md) · [ENGINEERING_PHASE](./ENGINEERING_PHASE.md) · [ENGINEERING_REVIEW_SPRINT0](./ENGINEERING_REVIEW_SPRINT0.md) · [PRE_PILOT_AUDIT](./PRE_PILOT_AUDIT.md) · [Acta](./ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) · [MILESTONES](./MILESTONES.md) · [FOV-001](../30-field-validation/FOV-001_HP-001.md) · [22 Implementation](../22-implementation/README.md) · [FOV Brief](./FOV_MISSION_BRIEF.md)
+[CURRENT_PHASE](./CURRENT_PHASE.md) · [PROJECT_DOMAINS](./PROJECT_DOMAINS.md) · [PROJECT_DICTIONARY](../99-reference/PROJECT_DICTIONARY.md) · [CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md) · [SMOKE_HP-001](./SMOKE_HP-001.md) · [ORR_HP-001](./ORR_HP-001.md) · [IR-001](./IR-001_FIRST_ENGINEERING_INTEGRATION.md) · [ENGINEERING_PHASE](./ENGINEERING_PHASE.md) · [ENGINEERING_REVIEW_SPRINT0](./ENGINEERING_REVIEW_SPRINT0.md) · [PRE_PILOT_AUDIT](./PRE_PILOT_AUDIT.md) · [Acta](./ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) · [MILESTONES](./MILESTONES.md) · [FOV-001](../30-field-validation/FOV-001_HP-001.md) · [22 Implementation](../22-implementation/README.md) · [FOV Brief](./FOV_MISSION_BRIEF.md)
 

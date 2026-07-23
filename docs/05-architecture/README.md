@@ -4,7 +4,7 @@
 
 ## Phase
 
-**FOUNDATION ✅** → **[FOUNDATION LOCK](./FOUNDATION_LOCK.md) 🚧** → Module 01
+**FOUNDATION ✅** → **[FOUNDATION LOCK](./FOUNDATION_LOCK.md)** → Module 01 · Evidence Gate
 
 ## Key documents
 
@@ -12,7 +12,9 @@
 |-----|-----|
 | [FOUNDATION_LOCK.md](./FOUNDATION_LOCK.md) | Close the platform before features |
 | [TENANT_BRANDING.md](./TENANT_BRANDING.md) | Contrato BrandConfig · Customer App white-label (ADR 0014) |
-| [TENANT_EXPERIENCE_SPEC.md](./TENANT_EXPERIENCE_SPEC.md) | Identidad EatClean · Experience Refactor (sin tocar HP-001) |
+| [TENANT_EXPERIENCE_SPEC.md](./TENANT_EXPERIENCE_SPEC.md) | Identidad EatClean · checklist |
+| [TENANT_IMPLEMENTATION_EATCLEAN.md](./TENANT_IMPLEMENTATION_EATCLEAN.md) | Brief Cursor/Lovable · EatClean v1 |
+| [../07-experience/CUSTOMER_JOURNEYS.md](../07-experience/CUSTOMER_JOURNEYS.md) | Experience First · CJ-001 Pedido semanal |
 | [architecture-review.md](./architecture-review.md) | As-built senior review |
 | [MODULE_CONVENTION.md](./MODULE_CONVENTION.md) | `src/modules/...` layout |
 | [../10-api/README.md](../10-api/README.md) | Service → Repository → Supabase |
@@ -43,3 +45,4 @@ Single `ServiceContext` (tenant, user, capabilities, localization, audit, flags,
 - [Business rules](../08-business-rules/README.md)
 - [Domain model](../12-domain-model/README.md)
 - [Capability matrix](../09-security/CAPABILITY_MATRIX.md)
+- [Experience](../07-experience/README.md)

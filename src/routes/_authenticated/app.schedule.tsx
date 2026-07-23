@@ -166,7 +166,11 @@ function ScheduleFlow() {
 
       {step === 3 ? (
         <section className="px-6 space-y-4">
-          <div className="bg-card border border-border rounded-2xl p-5 space-y-3">
+          <div className="rounded-3xl border border-border/70 bg-card p-6 space-y-4 shadow-sm">
+            <p className="meta-label text-primary">{t("customer:orderSummary")}</p>
+            <h2 className="text-xl font-extrabold tracking-tight">
+              {t("customer:summaryReadyTitle")}
+            </h2>
             <Row label={t("customer:mealsPerDay")} value={String(mealsPerDay)} />
             <Row label={t("customer:deliveryDay")} value={days[deliveryDay]} />
             <Row
@@ -174,7 +178,7 @@ function ScheduleFlow() {
               value={`${selected.length} ${t("customer:meals")}`}
             />
           </div>
-          <div className="bg-card border border-border rounded-2xl p-5 space-y-2">
+          <div className="rounded-3xl border border-border/70 bg-card p-6 space-y-3 shadow-sm">
             <Row
               label={t("customer:subtotal")}
               value={fmt.currency(totalEur, { currency: "EUR" })}

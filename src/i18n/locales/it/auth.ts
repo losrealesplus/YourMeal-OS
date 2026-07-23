@@ -1,6 +1,15 @@
 export default {
-  welcome: "Benvenuto",
-  welcomeSub: "Accedi alla tua operazione",
+  welcome: "Benvenuto in EatClean",
+  welcomeSub: "Cibo preparato per aiutarti a mangiare meglio.",
+
+  startNow: "Start now",
+  onboarding1Title: "Welcome to EatClean",
+  onboarding1Body: "Prepared food to help you eat better.",
+  onboarding2Title: "Plan your weekly order",
+  onboarding2Body: "Pick your favourite dishes. We cook.",
+  onboarding3Title: "Get it where you prefer",
+  onboarding3Body: "At home or wherever you choose. Start now.",
+
   tabs: { email: "Email", phone: "Telefono" },
   withGoogle: "Continua con Google",
   withApple: "Continua con Apple",
