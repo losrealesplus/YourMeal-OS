@@ -102,7 +102,9 @@ Lovable = UX (relevo infra cerrado) · Cursor = conectar CAP-00x
 > Regla nueva → **STOP** · `REQUIRES KNOWLEDGE REVIEW` · Carril A.
 
 **Contexto permanente:** [CURSOR_MASTER_PROMPT](./docs/22-implementation/CURSOR_MASTER_PROMPT.md)  
-**Siguiente tarea:** [CAP-002 Dish Catalog](./docs/22-implementation/caps/CAP-002-dish-catalog.md)  
+**Siguiente tarea:** [CAP-002 Dish Catalog — solo lectura](./docs/22-implementation/caps/CAP-002-dish-catalog.md)  
+**PRs:** un nivel por PR — [PR_CHANGE_LEVELS](./docs/22-implementation/PR_CHANGE_LEVELS.md)  
+**ADR:** [0013 Implementation is Knowledge Materialization](./docs/adr/0013-implementation-is-knowledge-materialization.md)  
 **Filosofía:** [IMPLEMENTATION_PHILOSOPHY](./docs/23-engineering/IMPLEMENTATION_PHILOSOPHY.md)
 
 | Herramienta | Rol |

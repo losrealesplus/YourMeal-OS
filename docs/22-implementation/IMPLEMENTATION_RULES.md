@@ -92,8 +92,18 @@ Evidence Level: Table-Validated.
 
 ---
 
+## Pull Requests
+
+- Un PR = **un nivel** ([PR_CHANGE_LEVELS](./PR_CHANGE_LEVELS.md)).  
+- Capability PRs: un solo CAP-00x; sin UX mezclada.  
+- Indicar en la descripción: Nivel · CAP · Estado Scaffold→…  
+
+---
+
 ## Relacionado
 
+- [PR Change Levels](./PR_CHANGE_LEVELS.md)  
+- [ADR 0013](../adr/0013-implementation-is-knowledge-materialization.md)  
 - [IMPLEMENTATION_BACKLOG](./IMPLEMENTATION_BACKLOG.md)  
 - [Happy Path E2E](./HAPPY_PATH_E2E.md)  
 - [Knowledge Traceability](../15-product/etapa-2/knowledge-traceability.md)  
