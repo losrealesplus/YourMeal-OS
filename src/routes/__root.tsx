@@ -98,10 +98,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         property: "og:description",
         content:
-          "One source of truth for kitchens, purchasing, inventory, production and delivery routes.",
+          "The multi-tenant operating system for meal prep, healthy catering and corporate food services. Every order generates every department's plan — no Excel, no WhatsApp.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "YourMeal OS — The Operating System for Meal Prep & Catering" },
+      { name: "twitter:description", content: "The multi-tenant operating system for meal prep, healthy catering and corporate food services. Every order generates every department's plan — no Excel, no WhatsApp." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/59fc57f6-0159-4577-bb70-0b62b1fbcd1d/id-preview-b02a611d--f8ba586d-0a01-4ad6-b65a-43058bf8649c.lovable.app-1784835094341.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/59fc57f6-0159-4577-bb70-0b62b1fbcd1d/id-preview-b02a611d--f8ba586d-0a01-4ad6-b65a-43058bf8649c.lovable.app-1784835094341.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
