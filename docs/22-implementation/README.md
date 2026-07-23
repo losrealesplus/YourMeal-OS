@@ -19,15 +19,18 @@
 | [IMPLEMENTATION_BACKLOG](./IMPLEMENTATION_BACKLOG.md) | Mock / Real / Happy Path |
 | [HAPPY_PATH_E2E](./HAPPY_PATH_E2E.md) | Primer pedido → FOV |
 | [IMPLEMENTATION_RULES](./IMPLEMENTATION_RULES.md) | Constitución |
-| [caps/](./caps/README.md) | CAP-001…007 — **CAP-005** siguiente |
+| [caps/](./caps/README.md) | CAP-001…007 — **CAP-006** siguiente |
 | [ADR 0013](../adr/0013-implementation-is-knowledge-materialization.md) | Implementation is Knowledge Materialization |
 
 ## Siguiente
 
-**[CAP-005 Order Summary](./caps/CAP-005-order-summary.md)** → CAP-006 → ORR → Evidence Log → FOV.
+**[CAP-006 Order Confirmation](./caps/CAP-006-order-confirmation.md)** → **ORR** → FOV.
 
 | CAP | Estado |
 |-----|--------|
-| 001–004 | Connected |
-| 005–007 | Scaffold |
+| 001–005 | Connected |
+| 006–007 | Scaffold |
 | Business logic inventada | 🔒 STOP |
+
+Fase metodológica: [cerrada](../00-status/05-methodology-construction-closed.md).
+

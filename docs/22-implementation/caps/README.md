@@ -13,9 +13,10 @@ Checklist: [PR_TECHNICAL_CHECKLIST](../PR_TECHNICAL_CHECKLIST.md).
 | CAP-002 | Dish Catalog | L2 | ❌ | ✅ | Connected ✓ | Parcial | [CAP-002](./CAP-002-dish-catalog.md) |
 | CAP-003 | Weekly Menu | L2 | ❌ | ✅ | Connected ✓ | Parcial | [CAP-003](./CAP-003-weekly-menu.md) |
 | CAP-004 | Order Programming | L2 | ❌ | ✅ | Connected ✓ | Parcial | [CAP-004](./CAP-004-order-programming.md) |
-| CAP-005 | Order Summary | L2 | ⏳ | ⏳ | Scaffold | ✖ | [CAP-005](./CAP-005-order-summary.md) ← **siguiente** |
-| CAP-006 | Order Confirmation | L3 | ⏳ | ⏳ | Scaffold | ✖ | [CAP-006](./CAP-006-order-confirmation.md) |
+| CAP-005 | Order Summary | L2 | ❌ | ✅ | Connected ✓ | Parcial | [CAP-005](./CAP-005-order-summary.md) |
+| CAP-006 | Order Confirmation | L3 | ⏳ | ⏳ | Scaffold | ✖ | [CAP-006](./CAP-006-order-confirmation.md) ← **siguiente** |
 | CAP-007 | Order History | L3 | ⏳ | ⏳ | Scaffold | ✖ | [CAP-007](./CAP-007-order-history.md) |
 
 **Hito:** Happy Path sin mocks (L3→L4) — [HAPPY_PATH_E2E](../HAPPY_PATH_E2E.md).  
-Tras CAP-006: [ORR](../ORR.md) · [HP-001 Evidence Log](../HP-001_EVIDENCE_LOG.md).
+Tras CAP-006: [ORR](../ORR.md) (PR sin features) · [Evidence Log](../HP-001_EVIDENCE_LOG.md).
+

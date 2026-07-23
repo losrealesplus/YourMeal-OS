@@ -24,12 +24,12 @@ Checklist: [PR_TECHNICAL_CHECKLIST](./PR_TECHNICAL_CHECKLIST.md)
 | CAP-002 | Dish Catalog | ❌ | ✅ | Connected | Parcial | [caps](./caps/CAP-002-dish-catalog.md) |
 | CAP-003 | Weekly Menu | ❌ | ✅ | Connected | Parcial | [caps](./caps/CAP-003-weekly-menu.md) |
 | CAP-004 | Order Programming | ❌ | ✅ | Connected | Parcial | [caps](./caps/CAP-004-order-programming.md) |
-| CAP-005 | Order Summary | ⏳ | ⏳ | Scaffold | ✖ | [caps](./caps/CAP-005-order-summary.md) ← siguiente |
-| CAP-006 | Order Confirmation | ⏳ | ⏳ | Scaffold | ✖ | [caps](./caps/CAP-006-order-confirmation.md) |
+| CAP-005 | Order Summary | ❌ | ✅ | Connected | Parcial | [caps](./caps/CAP-005-order-summary.md) |
+| CAP-006 | Order Confirmation | ⏳ | ⏳ | Scaffold | ✖ | [caps](./caps/CAP-006-order-confirmation.md) ← siguiente |
 | CAP-007 | Order History | ⏳ | ⏳ | Scaffold | ✖ | [caps](./caps/CAP-007-order-history.md) |
 
-**Hito:** HP-001 sin mocks → ORR → Evidence Log → FOV.
-
+**Hito:** `HP-001 · Operational · ORR Passed · Ready for FOV`  
+Fase metodológica: [cerrada](../00-status/05-methodology-construction-closed.md).  
 A partir de CAP-004: **ejecutar el patrón**, no añadir metodología nueva.
 
 ---
@@ -37,3 +37,4 @@ A partir de CAP-004: **ejecutar el patrón**, no añadir metodología nueva.
 ## Anti-métrica
 
 No medir por pantallas. Medir por CAP × Mock/Real × Happy Path × [Knowledge Coverage](./KNOWLEDGE_COVERAGE.md).
+
