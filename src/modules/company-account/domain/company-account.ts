@@ -1,6 +1,9 @@
 /**
  * Company Account domain (OM) — B2B structural model (ADR 0015).
  *
+ * Party umbrella (ADR 0016 — semantic; physical convergence later):
+ *   Party → Individual Customer | Company → Memberships
+ *
  * DB tables keep foresight names; product language uses Site / Organizational Unit.
  */
 

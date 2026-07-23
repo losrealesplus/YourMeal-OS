@@ -185,6 +185,7 @@ Core | Operational | Engineering | Historical
 | `DICT-065` | [Organizational Unit](#organizational-unit) | Operational | Accepted |
 | `DICT-066` | [Delivery Group](#delivery-group) | Operational | Accepted |
 | `DICT-067` | [Company Code](#company-code) | Engineering | Accepted |
+| `DICT-068` | [Party](#party) | Core | Accepted |
 
 ---
 
@@ -2691,6 +2692,56 @@ Company Account · Employee Membership
 [ADR 0015](../adr/0015-b2b-b2c-customer-model.md)
 
 
+---
+
+# Party
+
+## ID
+DICT-068
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Party
+
+## Tipo
+Core Object (umbrella · Party Model)
+
+## Definición
+Concepto paraguas de demanda dentro de un Tenant:
+
+```text
+Party
+ ├── Individual Customer
+ └── Company
+       └── Employees (Memberships)
+```
+
+Permite compartir facets futuros (contacto, direcciones) entre persona y empresa sin confundir comportamientos (onboarding, Company Code, Delivery Group, facturación). En el piloto físico sigue ADR 0015 (`customers` / `companies`); la tabla `parties` es convergencia post-Gate (ADR 0016).
+
+## Cuándo ocurre
+Diseño OM · onboarding B2B/B2C · lectura de ADRs 0015/0016
+
+## Produce
+Lenguaje estable para SaaS multi-empresa sin migrar el esquema del piloto
+
+## No significa
+Organization (Tenant) · implementación inmediata de tabla `parties` · permiso para duplicar Customer genérico
+
+## Sinónimos
+Parte de demanda · Party Model
+
+## Palabras relacionadas
+Individual Customer · Company Account · Membership · Consumer · Beneficiary
+
+## Referencias
+[ADR 0016](../adr/0016-party-model-demand-actors.md) · [actors.md](../17-operational-model/01-ubiquitous-language/actors.md)
+
+
 ## Historial de este diccionario
 
 | Fecha | Cambio |
@@ -2705,4 +2756,5 @@ Company Account · Employee Membership
 | 2026-07-23 | Experience First · CUSTOMER_JOURNEYS · DICT-053/054 |
 | 2026-07-23 | Experience Domain · SCR trazabilidad · DICT-055/056 · PROJECT_DOMAINS |
 | 2026-07-23 | ADR 0015 B2B/B2C · DICT-063…067 Company Account · Site · OU · Delivery Group · Company Code |
+| 2026-07-23 | ADR 0016 Party Model · DICT-068 Party (semantic now · physical later) |
 

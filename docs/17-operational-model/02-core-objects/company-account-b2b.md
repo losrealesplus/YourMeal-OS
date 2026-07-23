@@ -1,11 +1,22 @@
 # Company Account · Site · Organizational Unit · Delivery Group
 
-**Status:** Accepted · **ADR:** [0015](../../adr/0015-b2b-b2c-customer-model.md)  
+**Status:** Accepted · **ADR:** [0015](../../adr/0015-b2b-b2c-customer-model.md) · [0016 Party](../../adr/0016-party-model-demand-actors.md)  
 **Knowledge Lifetime:** Contract (structural Core correction)
 
-Structural correction before EatClean pilot: separate **B2C Consumer** from **B2B Company Account** demand without breaking CJ-001.
+Structural correction before EatClean pilot: separate **B2C** from **B2B** under the **Party** umbrella, without breaking CJ-001.
 
-## Hierarchy
+## Party umbrella (semantic)
+
+```text
+Party
+ ├── Individual Customer   (B2C Consumer · B2B Beneficiary as person)
+ └── Company               (Company Account)
+       └── Memberships     (Employee → Site → Organizational Unit)
+```
+
+Physical pilot tables remain ADR 0015 (`customers` / `companies` / `company_employees`). Convergence to a `parties` table is **post-Gate** (ADR 0016).
+
+## Hierarchy (operational)
 
 ```text
 Organization (Tenant)

@@ -4,7 +4,7 @@
 **Date:** 2026-07-23  
 **Deciders:** Product · Architecture · FOPEBA  
 **Supersedes:** — (structural correction of Customer demand model)  
-**Related:** [OM Actors](../17-operational-model/01-ubiquitous-language/actors.md) · [level-1-core](../17-operational-model/02-core-objects/level-1-core.md) · CAP-004
+**Related:** [OM Actors](../17-operational-model/01-ubiquitous-language/actors.md) · [level-1-core](../17-operational-model/02-core-objects/level-1-core.md) · [ADR 0016 Party Model](./0016-party-model-demand-actors.md) · CAP-004
 
 ---
 
@@ -54,7 +54,16 @@ Demand actors
 | Employee Membership | Beneficiary ↔ Company Account link (evolves `company_employees`) |
 | Delivery Group | minimum logistics aggregation key |
 
-Bare `Customer` remains ambiguous in UL; in code/DB the `customers` table is the **person demand identity**. Company Account is **not** a row in `customers`.
+Bare `Customer` remains ambiguous in UL; in code/DB the `customers` table is the **person demand identity** (Individual Customer under the [Party](./0016-party-model-demand-actors.md) umbrella). Company Account is **not** a row in `customers`.
+
+Semantic umbrella (ADR 0016):
+
+```text
+Party
+ ├── Individual Customer  → customers (person)
+ └── Company              → companies
+       └── Memberships    → company_employees
+```
 
 ### 3. CustomerType
 

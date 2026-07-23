@@ -1,9 +1,45 @@
 # Actores — Ubiquitous Language
 
 **Área:** quién actúa en la operación  
-**Fuente de verdad ampliada:** [ACTORS.md](../../12-domain-model/ACTORS.md)
+**Fuente de verdad ampliada:** [ACTORS.md](../../12-domain-model/ACTORS.md)  
+**Umbrella demanda:** [ADR 0016 Party Model](../../adr/0016-party-model-demand-actors.md) · físico piloto: [ADR 0015](../../adr/0015-b2b-b2c-customer-model.md)
 
-> Queda **prohibido** usar «Cliente» o `Customer` sin contexto que indique el actor exacto.
+> Queda **prohibido** usar «Cliente» o `Customer` sin contexto que indique el actor exacto (Individual Customer · Company · Membership).
+
+---
+
+# Party · `Party`
+
+## Definición
+
+Concepto paraguas (Party Model) para las partes de demanda dentro de un Tenant: personas y empresas que participan en Orders, cobros y entregas.
+
+## Qué es
+
+```text
+Party
+ ├── Individual Customer
+ └── Company
+       └── Employees (Memberships)
+```
+
+## Qué NO es
+
+No es Organization (Tenant).  
+No es un rol de staff (`company_admin` del Tenant).  
+No obliga aún a una tabla física `parties` (ver ADR 0016).
+
+## Se relaciona con
+
+Individual Customer · Company Account · Membership · Order · Address / Contact (facets futuros compartidos)
+
+## Sinónimos prohibidos
+
+Customer (sin subtipo) · Cliente genérico
+
+## Notas
+
+Físico piloto: Individual → `customers` · Company → `companies` · Membership → `company_employees`.
 
 ---
 
