@@ -60,15 +60,15 @@ Dish Library / Module 01 (ya validado) = excepción histórica.
 
 ---
 
-## Primer movimiento recomendado
+## Primer movimiento recomendado (ahora)
 
-```text
-Operational Model → Information Architecture → Lovable → Iteración UX → Código
-```
+**No más Lovable para infraestructura.** Cursor toma el relevo.
 
-1. [IA](../15-product/PRODUCT_INFORMATION_ARCHITECTURE.md)  
-2. **[PM-001](../21-product-materialization/PM-001-Customer-App.md)** — siguiente Lovable  
-3. [21 Materialization](../21-product-materialization/README.md) · [Sprint 2.1](../15-product/etapa-2/SPRINT_2_1_PRODUCT_FOUNDATION.md)
+1. [CURSOR_MASTER_PROMPT](../22-implementation/CURSOR_MASTER_PROMPT.md) — contexto permanente  
+2. **[CAP-002](../22-implementation/caps/CAP-002-dish-catalog.md)** — una capability  
+3. [Philosophy](../23-engineering/IMPLEMENTATION_PHILOSOPHY.md)
+
+Mentalidad: **conectar capacidades**, no implementar pantallas.
 
 ---
 

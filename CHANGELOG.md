@@ -85,8 +85,12 @@ La arquitectura de YourMeal OS se considera **estable**.
 - **Operational Dynamics v0.2:** Lifecycles 2.0 · Supporting Taxonomy · Checks 2.0 (PASS/WARNING/BLOCKED/MANUAL DECISION)
 - Recovery Pattern · Temporal Grammar · Capability Impact integrados en Dynamics 01
 - **Tren MC-001…006 aplicado** a `17` (Amend/Revise/Pause/Hold · Lot · Location · cardinalidad · INV-031)
-- **Carril B en curso:** Foundation de Producto · siguiente [PM-001 Customer App](./docs/21-product-materialization/PM-001-Customer-App.md)
-- PM-001…005 + [PRODUCT_MATERIALIZATION_RULES](./docs/21-product-materialization/PRODUCT_MATERIALIZATION_RULES.md)
+- **Roles claros:** FOPEBA certifica · Lovable UX (sin más infra) · Cursor ingeniería · GitHub evidencia
+- [CURSOR_MASTER_PROMPT](./docs/22-implementation/CURSOR_MASTER_PROMPT.md) — contexto permanente Etapa 2
+- CAP-001…007 en [caps/](./docs/22-implementation/caps/README.md) — siguiente CAP-002 Dish Catalog
+- [IMPLEMENTATION_PHILOSOPHY](./docs/23-engineering/IMPLEMENTATION_PHILOSOPHY.md) — el software no es origen del conocimiento
+- MODULE_STATE_CRITERIA: Scaffold → Connected → Operational → Field Validated
+- Product Skeleton ✅ · Cursor conecta capacidades (no pantallas)
 - Sprints 2.1–2.5: Customer → Admin → Production → Delivery → Design System
 - Lovable: incrementos revisables; reutilizar i18n/audit/flags; experiencias completas
 - FOPEBA certifica · YourMeal OS dominio · Lovable UI · Cursor integra

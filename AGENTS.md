@@ -94,21 +94,28 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-FOPEBA v1.0 Frozen 🧊 · OM Table-Validated
-Carril A: FOV ⏳ · Carril B: 🟢 ABIERTO (no inventar lógica)
+FOPEBA Frozen 🧊 · OM Table-Validated · Product Skeleton ✅
+Lovable = UX (relevo infra cerrado) · Cursor = conectar CAP-00x
 ```
 
-**Regla Etapa 2:** toda lógica → *¿en qué parte del Operational Model está basada?*  
-Si no hay cita → no se implementa (pasa por evidencia).
+> Cursor no implementa funcionalidades. Conecta **capacidades** certificadas.  
+> Regla nueva → **STOP** · `REQUIRES KNOWLEDGE REVIEW` · Carril A.
+
+**Contexto permanente:** [CURSOR_MASTER_PROMPT](./docs/22-implementation/CURSOR_MASTER_PROMPT.md)  
+**Siguiente tarea:** [CAP-002 Dish Catalog](./docs/22-implementation/caps/CAP-002-dish-catalog.md)  
+**Filosofía:** [IMPLEMENTATION_PHILOSOPHY](./docs/23-engineering/IMPLEMENTATION_PHILOSOPHY.md)
+
+| Herramienta | Rol |
+|-------------|-----|
+| **FOPEBA** | Certifica conocimiento |
+| **Lovable** | Materializó UX/estructura — no más infraestructura |
+| **Cursor** | Ingeniería / conexión |
+| **GitHub** | Historia y evidencia |
 
 | Carril | Entrada |
 |--------|---------|
 | A campo | [Mission Brief](./docs/00-status/FOV_MISSION_BRIEF.md) |
-| B producto | **[PM-001](./docs/21-product-materialization/PM-001-Customer-App.md)** ← siguiente · [21](./docs/21-product-materialization/README.md) · [Rules](./docs/21-product-materialization/PRODUCT_MATERIALIZATION_RULES.md) |
-
-Flujo UI: **OM → IA → Lovable → iteración → código** (Figma = apoyo).
-
-Índices: [Estado](./docs/00-status/README.md) · [Dual Track](./docs/00-status/DUAL_TRACK_ANTECAMARA.md) · [Traceability](./docs/15-product/etapa-2/knowledge-traceability.md)
+| B conectar | [22-implementation](./docs/22-implementation/README.md) · [caps](./docs/22-implementation/caps/README.md) · [MODULE_STATE_CRITERIA](./docs/00-status/MODULE_STATE_CRITERIA.md) |
 
 ### Principio de valor (Capabilities)
 
@@ -118,10 +125,10 @@ Flujo UI: **OM → IA → Lovable → iteración → código** (Figma = apoyo).
 
 | Quién | Rol |
 |-------|-----|
-| **Cursor** | CTO — arquitectura, dominio, implementación |
+| **Cursor** | Ingeniero de materialización — conecta skeleton (ver [IMPLEMENTATION_RULES](./docs/22-implementation/IMPLEMENTATION_RULES.md)) |
 | **`docs/` + ADRs** | Fuente de verdad |
-| **Lovable** | UI / pantallas (no redefine arquitectura) |
-| **Código** | Sigue a la documentación |
+| **Lovable** | Arquitecto visual — Product Skeleton (no reinventar dominio) |
+| **Código** | Materializa OM; no inventa reglas |
 
 Conflictos con `.lovable/plan.md` → **gana `docs/`**.
 
