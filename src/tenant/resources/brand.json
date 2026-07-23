@@ -18,6 +18,8 @@
   "borderRadius": "1.25rem",
   "poweredBy": {
     "visible": true,
+    "prefix": "Powered by",
+    "name": "YourMeal OS",
     "label": "Powered by YourMeal OS",
     "surfaces": ["login", "splash", "about"]
   },
