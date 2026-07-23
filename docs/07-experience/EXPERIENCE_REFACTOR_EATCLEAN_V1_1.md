@@ -22,6 +22,21 @@ Regla canónica: [ADR 0014 · Administrative entry](../adr/0014-customer-applica
 2. Pantalla **EatClean Admin**: email + contraseña · Entrar · sin registro público
 3. Tras login → `resolveHomePath` (RBAC existente)
 
+## Continuación · Centro de Operaciones
+
+Tras el login Admin, la primera impresión **no es un dashboard**.
+
+Es el [Centro de Operaciones](./OPERATIONAL_JOURNEYS.md): agenda del día + workspaces autorizados.
+
+| Regla | Comportamiento |
+|-------|----------------|
+| 1 workspace | Entrada directa al área de trabajo |
+| 2+ workspaces | Picker del Centro de Operaciones |
+| Administrador | Siempre ve todas las áreas |
+
+Front Office = Customer Journeys (CJ).  
+Centro de Operaciones = Operational Journeys (OJ).
+
 ## No
 
 - Exponer Admin en Home pública  
