@@ -180,6 +180,9 @@ Core | Operational | Engineering | Historical
 | `DICT-054` | [Customer Journey](#customer-journey) | Operational | Accepted |
 | `DICT-055` | [Experience Domain](#experience-domain) | Core | Accepted |
 | `DICT-056` | [Screen (SCR)](#screen-scr) | Engineering | Accepted |
+| `DICT-060` | [Tenant Brand](#tenant-brand) | Operational | Accepted |
+| `DICT-061` | [brand.manage](#brandmanage) | Engineering | Accepted |
+| `DICT-062` | [Tenant-Managed](#tenant-managed) | Core | Accepted |
 
 ---
 
@@ -211,7 +214,7 @@ Core | Operational | Engineering | Historical
 
 ### Identidad SaaS (ADR 0014)
 
-[Customer Application](#customer-application) (`DICT-045`) · [YourMeal OS (Corporate Surface)](#yourmeal-os-corporate-surface) (`DICT-046`) · [BrandConfig](#brandconfig) (`DICT-047`) · [Tenant-Branded](#tenant-branded) (`DICT-048`) · [Powered by YourMeal OS](#powered-by-yourmeal-os) (`DICT-049`) · [Platform owns capability / Tenant owns experience](#platform-owns-capability--tenant-owns-experience) (`DICT-050`) · [Tenant Experience Spec](#tenant-experience-spec) (`DICT-051`) · [Tenant Assets](#tenant-assets) (`DICT-052`) · [Experience First](#experience-first) (`DICT-053`) · [Customer Journey](#customer-journey) (`DICT-054`) · [Experience Domain](#experience-domain) (`DICT-055`) · [Screen (SCR)](#screen-scr) (`DICT-056`)
+[Customer Application](#customer-application) (`DICT-045`) · [YourMeal OS (Corporate Surface)](#yourmeal-os-corporate-surface) (`DICT-046`) · [BrandConfig](#brandconfig) (`DICT-047`) · [Tenant-Branded](#tenant-branded) (`DICT-048`) · [Powered by YourMeal OS](#powered-by-yourmeal-os) (`DICT-049`) · [Platform owns capability / Tenant owns experience](#platform-owns-capability--tenant-owns-experience) (`DICT-050`) · [Tenant Experience Spec](#tenant-experience-spec) (`DICT-051`) · [Tenant Assets](#tenant-assets) (`DICT-052`) · [Experience First](#experience-first) (`DICT-053`) · [Customer Journey](#customer-journey) (`DICT-054`) · [Experience Domain](#experience-domain) (`DICT-055`) · [Screen (SCR)](#screen-scr) (`DICT-056`) · [Tenant Brand](#tenant-brand) (`DICT-060`) · [brand.manage](#brandmanage) (`DICT-061`) · [Tenant-Managed](#tenant-managed) (`DICT-062`)
 
 ---
 
@@ -2481,6 +2484,129 @@ Customer Journey · Experience First · Capability
 [CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md)
 
 
+---
+
+# Tenant Brand
+
+## ID
+DICT-060
+
+## Status
+Accepted
+
+## Madurez
+Operational
+
+## Nombre
+Tenant Brand
+
+## Tipo
+Configuration Object (OM Nivel 3)
+
+## Definición
+Identidad visual oficial de un Tenant (logo, colores; extensible a tipografía e imágenes) con ciclo de vida propio, persistencia y capability `brand.manage`. No es solo un facet cosmético: se publica en runtime vía BrandingService → Storage → TenantBrandScope.
+
+## Cuándo ocurre
+Onboarding de Tenant · cambio de marca · FOV de identidad · checklist Brand Validation.
+
+## Produce
+Tokens y logo aplicados a Customer App y Centro de Operaciones sin redespliegue.
+
+## No significa
+Core Object Nivel 1 · BrandConfig estático como única fuente · libertad absoluta sin Brand Contract.
+
+## Sinónimos
+TenantBrand · marca del tenant
+
+## Palabras relacionadas
+BrandConfig · brand.manage · Tenant-Managed · Tenant-Branded
+
+## Referencias
+[tenant-brand.md](../17-operational-model/02-core-objects/tenant-brand.md) · [BRAND_CONTRACT](../05-architecture/BRAND_CONTRACT.md)
+
+
+---
+
+# brand.manage
+
+## ID
+DICT-061
+
+## Status
+Accepted
+
+## Madurez
+Engineering
+
+## Nombre
+brand.manage
+
+## Tipo
+Capability
+
+## Definición
+Capability que autoriza crear/actualizar/limpiar el Tenant Brand (logo y colores) a través de BrandingService. Otorgada a `company_admin` y `saas_admin`.
+
+## Cuándo ocurre
+Guard de `/admin/branding` · assert en BrandingService · matriz de capacidades.
+
+## Produce
+Cambios de identidad persistidos y auditables.
+
+## No significa
+Permiso de UI únicamente · edición de HP-001 · branding de la superficie SaaS corporativa.
+
+## Sinónimos
+gestionar marca · Tenant Brand Management
+
+## Palabras relacionadas
+Tenant Brand · admin.settings · company_admin · saas_admin
+
+## Referencias
+[CAPABILITY_MATRIX](../09-security/CAPABILITY_MATRIX.md) · `src/permissions/index.ts`
+
+
+---
+
+# Tenant-Managed
+
+## ID
+DICT-062
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Tenant-Managed
+
+## Tipo
+Principio de plataforma (evolución de ADR 0014)
+
+## Definición
+Fase en la que el propio Tenant administra su identidad visual en runtime (sin forks, sin despliegues, sin tocar código de producto), dentro del Brand Contract. Sucede a Hardcoded y Tenant-Branded.
+
+## Cuándo ocurre
+Cuando `brand.manage` + TenantBrandRepository + TenantBrandScope están Connected.
+
+## Produce
+SaaS multi-tenant con servicio de branding gobernado por capabilities y RBAC.
+
+## No significa
+Tenant-Branded sin editor · libertad absoluta de assets · cambio de metodología FOPEBA.
+
+## Sinónimos
+branding gestionado por el cliente · runtime brand
+
+## Palabras relacionadas
+Tenant-Branded · BrandConfig · Tenant Brand · brand.manage
+
+## Referencias
+[ADR 0014](../adr/0014-customer-application-is-tenant-branded.md) · [TENANT_BRANDING](../05-architecture/TENANT_BRANDING.md)
+
+
 ## Historial de este diccionario
 
 | Fecha | Cambio |
@@ -2494,4 +2620,5 @@ Customer Journey · Experience First · Capability
 | 2026-07-23 | TENANT_IMPLEMENTATION_EATCLEAN · `tenants/eatclean/` · DICT-052 Tenant Assets |
 | 2026-07-23 | Experience First · CUSTOMER_JOURNEYS · DICT-053/054 |
 | 2026-07-23 | Experience Domain · SCR trazabilidad · DICT-055/056 · PROJECT_DOMAINS |
+| 2026-07-23 | Tenant-Managed · Tenant Brand · brand.manage · DICT-060…062 |
 

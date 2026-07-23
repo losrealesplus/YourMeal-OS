@@ -1,20 +1,35 @@
 # Tenant Branding — contrato técnico
 
 **ADR:** [0014 — Customer Application is Tenant-Branded](../adr/0014-customer-application-is-tenant-branded.md)  
-**Estado del contrato:** Accepted (especificación) · implementación incremental  
-**Ámbito:** Capability transversal del sistema — no un ajuste cosmético de UI.
+**Estado del contrato:** Accepted · **Tenant-Managed** (runtime)  
+**Ámbito:** Capability transversal — BrandConfig, Tenant Brand, recursos y configuración.  
+**Límites de edición:** [BRAND_CONTRACT](./BRAND_CONTRACT.md)  
+**Core Object:** [Tenant Brand](../17-operational-model/02-core-objects/tenant-brand.md)  
+**Capability:** `brand.manage`
+
+---
+
+## Evolución de la plataforma
+
+| Fase | Nombre | Quién cambia la identidad |
+|------|--------|---------------------------|
+| 1 | **Hardcoded** | Desarrollador en código |
+| 2 | **Tenant-Branded** | Desarrollador vía config/assets (`tenants/<slug>/`) |
+| 3 | **Tenant-Managed** | `company_admin` / `saas_admin` en runtime · sin forks · sin despliegue |
+
+ADR 0014 cierra el *principio* Tenant-Branded.  
+La capability `brand.manage` + persistencia cierran el *servicio* multi-tenant: el cliente administra su identidad.
 
 ---
 
 ## Principio
 
-> **The Platform owns the capability. The Tenant owns the experience.**  
-> **La plataforma es propietaria de la capacidad; el tenant es propietario de la experiencia.**
+> **The Platform owns the capability. The Tenant owns the experience.**
 
 ```text
-Customer Application  →  branding del Tenant (100%)
-YourMeal OS (SaaS)    →  branding del proveedor (capabilities)
-Powered by            →  única mención visible de YourMeal OS en front office
+Customer Application / Operaciones  →  branding del Tenant (100%)
+YourMeal OS (SaaS)                  →  branding del proveedor
+Powered by                          →  única mención visible de YourMeal OS en front office
 ```
 
 ### Filtro de diseño
@@ -23,9 +38,37 @@ Powered by            →  única mención visible de YourMeal OS en front offic
 
 | Ejemplo | Capa |
 |---------|------|
-| Login · Dashboard cliente · Confirmar pedido | **Tenant** |
-| Cocina / Delivery / … (RBAC) | **Tenant** (BackOffice) |
-| Superadmin · Gestión de tenants · Facturación SaaS | **Platform** |
+| Login · Home · Confirmar pedido | **Tenant** |
+| Centro de Operaciones (RBAC) | **Tenant** |
+| `/admin/branding` (gestión) | **Tenant** · capability `brand.manage` |
+| Superadmin · facturación SaaS | **Platform** |
+
+---
+
+## Ciclo de materialización (runtime)
+
+```text
+YourMeal OS
+        ↓
+Tenant
+        ↓
+BrandConfig  (defaults / assets de arranque)
+        ↓
+BrandingService  (brand.manage)
+        ↓
+TenantBrandRepository
+        ↓
+Storage  (tenant-branding) + columnas brand_*
+        ↓
+useTenantBrand()
+        ↓
+TenantBrandScope
+        ↓
+Aplicación completa (Customer App · Operaciones)
+```
+
+La identidad visual forma parte del **runtime**, no de la compilación.  
+Defaults estáticos (`tenants/<slug>/brand.json`) siguen siendo fallback / seed; el **Tenant Brand** publicado los sobrescribe.
 
 ---
 
@@ -34,18 +77,18 @@ Powered by            →  única mención visible de YourMeal OS en front offic
 ```text
 Tenant
   ↓
-BrandConfig
+BrandConfig + Tenant Brand (publicado)
   ↓
 Logo · Typography · Palette · Illustrations · Copy · PoweredBy
   ↓
 CSS variables / assets / i18n scoped al tenant
 ```
 
-Fuente canónica prevista: configuración del Tenant (p. ej. `tenants.brand` JSON + assets en storage). La UI de Customer Application **lee** `BrandConfig`; no define marca propia.
+La UI **lee** vía `useTenantBrand` / BrandConfig; no define marca propia.
 
 ---
 
-## BrandConfig (contrato)
+## BrandConfig (contrato de forma)
 
 ```typescript
 /** Contrato de branding por Tenant — ADR 0014 */
@@ -212,20 +255,16 @@ Hasta que la inyección esté Connected, cualquier marca hardcodeada de YourMeal
 
 ## Fuera de alcance (este documento)
 
-- Implementar el editor SaaS de branding (scaffold en `/saas/branding`).  
 - Cambiar comportamiento funcional de HP-001.  
-- Rediseñar EatClean como marca fija del código.
+- Libertad absoluta de colores/assets sin [BRAND_CONTRACT](./BRAND_CONTRACT.md).  
+- Tipografía / splash / store assets en el editor v1 (extensiones futuras del mismo Tenant Brand).
 
-### Experience Refactor (dirección de producto)
+### Validación tras publicar
 
-Incremento futuro (p. ej. Lovable), **sin tocar HP-001 ni lógica operativa**:
+[BRAND_VALIDATION_CHECKLIST](./BRAND_VALIDATION_CHECKLIST.md).
 
-> Que cualquier cliente descargue la app y piense que es la app oficial de EatClean.
+### Experience / implementación Tenant
 
-Spec operativo: [TENANT_EXPERIENCE_SPEC](./TENANT_EXPERIENCE_SPEC.md) · brief de ejecución: [TENANT_IMPLEMENTATION_EATCLEAN](./TENANT_IMPLEMENTATION_EATCLEAN.md) · assets: [`tenants/eatclean/`](../../tenants/eatclean/README.md).
+Spec: [TENANT_EXPERIENCE_SPEC](./TENANT_EXPERIENCE_SPEC.md) · EatClean: [TENANT_IMPLEMENTATION_EATCLEAN](./TENANT_IMPLEMENTATION_EATCLEAN.md) · assets seed: [`tenants/eatclean/`](../../tenants/eatclean/README.md).
 
-Revisa: onboarding · login · dashboard · navegación · tono · imágenes · iconografía · copy.
-
-No sustituye Smoke / ORR; no es bloqueo de Evidence Gate. Se prioriza cuando producto lo decida.
-
-La implementación de `BrandConfig` se trata como Capability / incremento de ingeniería cuando el Gate lo priorice — no como mejora ad hoc de UX.
+`brand.manage` es Capability de plataforma; el contenido lo posee el Tenant.

@@ -24,7 +24,10 @@
 | [Milestone · Foundation Validation](./00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md) | Hito histórico ✅ — metodología validada |
 | [Definition of Done](./00-status/DEFINITION_OF_DONE.md) | Checklist de módulo |
 | [Foundation Lock](./05-architecture/FOUNDATION_LOCK.md) | ✅ Cerrado v0.1.0 |
-| [Tenant Branding](./05-architecture/TENANT_BRANDING.md) | Contrato BrandConfig · Customer App white-label (ADR 0014) |
+| [Tenant Branding](./05-architecture/TENANT_BRANDING.md) | BrandConfig · Tenant-Managed runtime · `brand.manage` |
+| [Brand Contract](./05-architecture/BRAND_CONTRACT.md) | Límites de logo/colores/accesibilidad |
+| [Brand Validation Checklist](./05-architecture/BRAND_VALIDATION_CHECKLIST.md) | Coherencia de marca tras gestión por el Tenant |
+| [Tenant Brand (OM)](./17-operational-model/02-core-objects/tenant-brand.md) | Configuration Object Nivel 3 |
 | [Tenant Experience Spec](./05-architecture/TENANT_EXPERIENCE_SPEC.md) | Identidad EatClean · Experience Refactor |
 | [Tenant Implementation · EatClean](./05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) | Brief Cursor/Lovable · Tenant Assets |
 | [Contexto estratégico](./05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md) | Dirección empresarial y del Core |
