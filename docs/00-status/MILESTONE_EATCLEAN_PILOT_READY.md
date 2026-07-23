@@ -1,13 +1,14 @@
 # Milestone · EatClean Pilot Ready
 
-**Estado:** 🟡 **Abierto** (definido · no consumado)  
+**Estado:** 🟡 **Abierto** (oficial)  
 **Knowledge Lifetime:** Iteration *(definición del hito; al cerrarse queda inmutable)*  
 **Tenant:** EatClean  
+**Prerrequisito:** [ACT-001 · Experience Baseline Frozen](./ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) ✅  
 **Criterio único de aceptación:** ver § Criterio de piloto  
-**No es:** un PR de UI · un ADR · un reemplazo de ORR/FOV
+**No es:** un PR de UI · un ADR · un reemplazo de ORR/FOV · permiso para pulir estética
 
-> La fase de **identidad y experiencia base** (#24→#29) se considera **cerrada**.  
-> A partir de aquí el foco no es «cómo se ve la app», sino **demostrar el ciclo operativo completo con datos reales**.
+> Experiencia base **congelada** (#24→#30 · ACT-001).  
+> Foco: **demostrar el ciclo operativo completo con datos reales** y recopilar evidencia FOPEBA.
 
 ---
 
@@ -23,13 +24,15 @@ Operational Objects
 Operational Journey
         ↓
 Outcome
+        ↓
+Evidence (FOPEBA)
 ```
 
 FOPEBA deja de validar solo objetos aislados y demuestra **experiencias operacionales de extremo a extremo**.
 
 ---
 
-## 2. Criterio de piloto (Definition of Done del milestone)
+## 2. Criterio de piloto (Definition of Done)
 
 Una persona que **nunca** ha usado la aplicación debe poder:
 
@@ -38,7 +41,7 @@ Una persona que **nunca** ha usado la aplicación debe poder:
 3. confirmar el pedido;
 4. recibir la confirmación;
 
-…mientras el equipo de EatClean, desde el **Centro de Operaciones**, puede **producir y entregar** ese mismo pedido **sin salir de la misma plataforma**.
+…mientras el equipo de EatClean, desde el **Centro de Operaciones**, puede **producir y entregar** ese mismo pedido **sin salir de la misma plataforma**, y FOPEBA **recoge evidencia** del recorrido.
 
 Si eso ocurre, el primer tenant ya no es un prototipo: está **listo para un piloto real**.
 
@@ -48,72 +51,87 @@ Si eso ocurre, el primer tenant ya no es un prototipo: está **listo para un pil
 
 | ID | Nombre | Pregunta | Cara |
 |----|--------|----------|------|
-| [EP-01](#ep-01--weekly-experience) | Weekly Experience | ¿El cliente completa un pedido real? | Customer App · CJ-001 |
-| [EP-02](#ep-02--kitchen-operations) | Kitchen Operations | ¿La cocina recibe exactamente ese pedido? | OJ · Workspace Cocina |
-| [EP-03](#ep-03--delivery-operations) | Delivery Operations | ¿El reparto recibe la ruta correspondiente? | OJ · Workspace Reparto |
-| [EP-04](#ep-04--operational-close) | Operational Close | ¿El pedido queda entregado y cerrado? | OJ · cierre de jornada |
+| [EP-001](#ep-001--weekly-experience) | Weekly Experience | ¿El cliente completa un pedido real? | Customer App · CJ-001 |
+| [EP-002](#ep-002--kitchen-operations) | Kitchen Operations | ¿La cocina recibe exactamente ese pedido? | OJ · Workspace Cocina |
+| [EP-003](#ep-003--delivery-operations) | Delivery Operations | ¿El reparto trabaja con ese pedido? | OJ · Workspace Reparto |
+| [EP-004](#ep-004--operational-close) | Operational Close | ¿El pedido se entrega y se cierra? | OJ · cierre |
+| [EP-005](#ep-005--evidence-collection) | Evidence Collection | ¿FOPEBA recopila la evidencia del piloto? | Operations · FOV / EC |
 
-Los cuatro son necesarios. Ninguno sustituye a ORR/FOV: se **alinean** con la línea operativa (Smoke → ORR → FOV) y la línea de experiencia (contenido vivo + observación).
+Los cinco son necesarios. Ninguno sustituye a ORR: se **alinean** con Smoke → ORR → FOV.
 
 ---
 
-### EP-01 · Weekly Experience
+### EP-001 · Weekly Experience
 
 **Outcome:** pedido confirmado con menú real del Tenant.
 
-- Menú semanal con nombres · fotografías · macros reales (`tenants/eatclean/weekly-menu/` + catálogo)  
-- Home viva (próxima entrega con ventana, promoción semanal si aplica, favoritos cuando existan)  
+- Menú semanal con nombres · fotografías · macros reales  
+- Home viva (próxima entrega con ventana, promoción, favoritos cuando existan)  
 - Flujo CJ-001 completo sin ayuda  
 
-Refs: [CUSTOMER_JOURNEYS · CJ-001](../07-experience/CUSTOMER_JOURNEYS.md#cj-001--pedido-semanal) · [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md)
+Refs: [CJ-001](../07-experience/CUSTOMER_JOURNEYS.md#cj-001--pedido-semanal) · [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md)
 
 ---
 
-### EP-02 · Kitchen Operations
+### EP-002 · Kitchen Operations
 
-**Outcome:** el pedido confirmado es visible y accionable en producción.
+**Outcome:** la cocina recibe exactamente ese pedido.
 
-- Entrada por Centro de Operaciones → Workspace Cocina  
-- Lista / plan del día refleja el pedido del cliente  
-- OJ-001 (iniciar producción) viable con ese dato  
+- Centro de Operaciones → Workspace Cocina  
+- Plan / lista del día refleja el pedido del cliente  
+- OJ-001 viable  
 
 Refs: [OPERATIONAL_JOURNEYS](../07-experience/OPERATIONAL_JOURNEYS.md) · `/admin/production`
 
 ---
 
-### EP-03 · Delivery Operations
+### EP-003 · Delivery Operations
 
-**Outcome:** existe ruta / paradas coherentes con el pedido.
+**Outcome:** el reparto trabaja con ese pedido.
 
 - Workspace Reparto  
-- Asignación o visibilidad de ruta para la entrega programada  
+- Ruta / paradas coherentes con la entrega programada  
 - OJ-002 viable  
 
 Refs: [OPERATIONAL_JOURNEYS](../07-experience/OPERATIONAL_JOURNEYS.md) · `/admin/routes`
 
 ---
 
-### EP-04 · Operational Close
+### EP-004 · Operational Close
 
-**Outcome:** el pedido pasa a entregado / cerrado en la plataforma.
+**Outcome:** el pedido se entrega y se cierra.
 
-- Estado de entrega actualizado  
+- Estado entregado / cerrado en plataforma  
 - Cliente y operación comparten el mismo outcome  
-- Cierre de jornada (OJ-004) al menos en su forma mínima de piloto  
+- OJ-004 en forma mínima de piloto  
 
 ---
 
-## 4. Qué ya está cerrado (no reabrir como “UI PR”)
+### EP-005 · Evidence Collection
 
-Bloque #24→#29 — identidad y experiencia base:
+**Outcome:** FOPEBA dispone de evidencia usable del piloto.
 
-* SaaS ↔ Tenant (ADR 0014)  
-* Identidad visual EatClean  
-* Experience First · CJ / OJ  
-* Centro de Operaciones como entrada del equipo  
-* Documentación con [Knowledge Lifetime](../18-operational-validation/knowledge-lifetime.md)  
+- Observaciones / FOV alineadas al recorrido E2E (no solo objetos aislados)  
+- Hallazgos clasificados (sin “arreglar por intuición”)  
+- Entrada al ciclo FOV → Knowledge Update → Gate cuando proceda  
 
-Bitácora: [EXPERIENCE_REFACTOR_EATCLEAN_V1_1](../07-experience/EXPERIENCE_REFACTOR_EATCLEAN_V1_1.md).
+Refs: [FOV Mission Brief](./FOV_MISSION_BRIEF.md) · [Evidence Framework](../20-evidence-framework/README.md) · [CJ001_USAGE_OBSERVATION](../07-experience/CJ001_USAGE_OBSERVATION.md)
+
+---
+
+## 4. Bloque cerrado (#24–#30)
+
+No reabrir como PRs estéticos. Ver [ACT-001](./ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md).
+
+| PR | Resultado |
+|----|-----------|
+| #24 | Tenant Experience |
+| #25 | ADR-0014 |
+| #26 | Experience Refactor |
+| #27 | Weekly Menu Experience |
+| #28 | Login Experience |
+| #29 | Centro de Operaciones + OJ |
+| #30 | Brand Continuity Lock · gobernanza docs |
 
 ---
 
@@ -122,27 +140,25 @@ Bitácora: [EXPERIENCE_REFACTOR_EATCLEAN_V1_1](../07-experience/EXPERIENCE_REFAC
 | Línea | Pregunta | Artefactos |
 |-------|----------|------------|
 | Operativa | ¿Hay evidencia para ORR / FOV? | Smoke · ORR · FOV-001 |
-| Piloto (este milestone) | ¿El ciclo cliente→entrega funciona de punta a punta? | EP-01…EP-04 |
+| Piloto (este milestone) | ¿El ciclo cliente→entrega funciona y deja evidencia? | EP-001…EP-005 |
 
-No compiten. El piloto **necesita** datos reales y operación; ORR/FOV **autorizan** y **aprenden** del campo.  
-Un EP puede generar observaciones útiles para FOV; no salta el Evidence Gate.
+No compiten. Un EP puede alimentar FOV; **no** salta el Evidence Gate.
 
 ---
 
 ## 6. Gobernanza de PRs
 
-A partir de la apertura de este milestone:
-
-* Preferir PRs etiquetados `EP-0x` (o equivalentes) frente a PRs genéricos «UI».  
-* Iteration docs nuevos = bitácoras por EP, no reescritura del Contract.  
-* Al completar los cuatro EP + criterio §2 → fila en [MILESTONES](./MILESTONES.md) y este acta pasa a **Cerrado**.
+- Preferir PRs etiquetados `EP-00x` frente a «UI» / polish.  
+- ❌ Cambios estéticos por preferencia (ACT-001).  
+- Iteration docs = bitácoras por EP; no reescribir Contract.  
+- Al completar EP-001…EP-005 + criterio §2 → este acta **Cerrado** y fila consumada en [MILESTONES](./MILESTONES.md).
 
 ---
 
 ## 7. Referencias
 
+- [ACT-001](./ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md)  
 - [CURRENT_PHASE](./CURRENT_PHASE.md)  
-- [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md)  
-- [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md)  
+- [Brand Continuity Locked](../21-product-materialization/EATCLEAN_BRAND_CONTINUITY_LOCKED.md)  
 - [Knowledge Lifetime](../18-operational-validation/knowledge-lifetime.md)  
-- [PROJECT_DOMAINS](./PROJECT_DOMAINS.md)
+- Hipótesis BJ: [BRAND_JOURNEY_HYPOTHESIS](../07-experience/BRAND_JOURNEY_HYPOTHESIS.md)

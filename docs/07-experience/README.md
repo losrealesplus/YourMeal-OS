@@ -106,7 +106,9 @@ Inventario SCR del MVP: [CUSTOMER_JOURNEYS § Pantallas](./CUSTOMER_JOURNEYS.md#
 | [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) | Implementación específica EatClean |
 | [EXPERIENCE_REFACTOR_EATCLEAN_V1](./EXPERIENCE_REFACTOR_EATCLEAN_V1.md) | Bitácora sprint UI · 5 pantallas |
 | [EXPERIENCE_REFACTOR_EATCLEAN_V1_1](./EXPERIENCE_REFACTOR_EATCLEAN_V1_1.md) | Bitácora sprint · Login + Operaciones (#24→#29) · **Iteration** |
-| [MILESTONE_EATCLEAN_PILOT_READY](../00-status/MILESTONE_EATCLEAN_PILOT_READY.md) | Milestone abierto · EP-01…EP-04 |
+| [MILESTONE_EATCLEAN_PILOT_READY](../00-status/MILESTONE_EATCLEAN_PILOT_READY.md) | Milestone abierto · EP-001…EP-005 |
+| [ACT-001 Experience Baseline Frozen](../00-status/ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) | Congelación experiencia base (#24→#30) |
+| [BRAND_JOURNEY_HYPOTHESIS](./BRAND_JOURNEY_HYPOTHESIS.md) | 🧪 Hipótesis BJ — no oficial FOPEBA |
 | [Knowledge Lifetime](../18-operational-validation/knowledge-lifetime.md) | Contract · Implementation · Iteration |
 | [PROJECT_DOMAINS](../00-status/PROJECT_DOMAINS.md) | Mapa de cuatro dominios |
 

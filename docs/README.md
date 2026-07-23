@@ -22,7 +22,8 @@
 | [Operational Checks](./15-product/OPERATIONAL_CHECKS.md) | Datos → comprobación → acción (transversal) |
 | [Milestone · Infrastructure Validation](./00-status/MILESTONE_INFRASTRUCTURE_VALIDATION.md) | Core independiente de la tecnología ✅ |
 | [Milestone · Foundation Validation](./00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md) | Hito histórico ✅ — metodología validada |
-| [Milestone · EatClean Pilot Ready](./00-status/MILESTONE_EATCLEAN_PILOT_READY.md) | Hito abierto 🟡 — EP-01…EP-04 · ciclo E2E |
+| [Milestone · EatClean Pilot Ready](./00-status/MILESTONE_EATCLEAN_PILOT_READY.md) | Hito abierto 🟡 — EP-001…EP-005 · ciclo E2E |
+| [ACT-001 · Experience Baseline Frozen](./00-status/ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) | Congelación experiencia EatClean (#24→#30) |
 | [Knowledge Lifetime](./18-operational-validation/knowledge-lifetime.md) | Caducidad documental · Contract · Implementation · Iteration |
 | [Definition of Done](./00-status/DEFINITION_OF_DONE.md) | Checklist de módulo |
 | [Foundation Lock](./05-architecture/FOUNDATION_LOCK.md) | ✅ Cerrado v0.1.0 |

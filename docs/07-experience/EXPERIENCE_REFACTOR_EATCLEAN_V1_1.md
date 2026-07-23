@@ -66,7 +66,8 @@ Hacer que EatClean deje de parecer un SaaS personalizado y se sienta como **dos 
 
 La app empieza a leerse como producto digital de EatClean (ADR 0014), no como panel white-label.
 
-**Siguiente hito de producto:** [EatClean Pilot Ready](../00-status/MILESTONE_EATCLEAN_PILOT_READY.md) (EP-01…EP-04) — contenido vivo + ciclo E2E. Ver también [§ Contenido vivo](#fotografía-y-contenido-vivo-prioridad-siguiente).
+**Siguiente hito de producto:** [EatClean Pilot Ready](../00-status/MILESTONE_EATCLEAN_PILOT_READY.md) (EP-001…EP-005).  
+**Congelación:** [ACT-001](../00-status/ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) — no polish estético por preferencia.
 
 ---
 

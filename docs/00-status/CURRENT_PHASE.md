@@ -10,34 +10,34 @@ PROJECT STATE
 
 Documentary / SaaS identity: Closed (pending #25 → main)
 Engineering Phase: Complete (pending operational authorization)
-Experience base (EatClean): Closed (#24→#29) — identidad · CJ/OJ · Operaciones
+Experience base (EatClean): **Frozen** — [ACT-001](./ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) (#24→#30)
 Current Phase:     Evidence Gate  (pre-ORR)  +  Milestone EatClean Pilot Ready 🟡
 Next Gate:         ORR  (PASSED | BLOCKED)
 Next Discipline:   Operational Engineering
-Primary Artifact:  Field Evidence + ciclo E2E (EP-01…EP-04)
+Primary Artifact:  Field Evidence + ciclo E2E (EP-001…EP-005)
 Focus operativo:   ¿Está listo para evidencia? · Smoke HP-001 · ORR
-Focus piloto:      ¿Cliente pide y el equipo produce/entrega en la misma plataforma?
+Focus piloto:      ¿Cliente pide y el equipo produce/entrega — con evidencia FOPEBA?
 Last Baseline:     v0.2.0-engineering-baseline (IR-001)
 
 ══════════════════════════════════════════════════
 ```
 
 Cierre formal ingeniería: [ENGINEERING_PHASE](./ENGINEERING_PHASE.md).  
+Experiencia base: [ACT-001](./ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) ✅ Frozen.  
 Milestone abierto: [MILESTONE_EATCLEAN_PILOT_READY](./MILESTONE_EATCLEAN_PILOT_READY.md).  
 Documentación evolutiva: [Knowledge Lifetime](../18-operational-validation/knowledge-lifetime.md).
 
 ```text
 Foundation ✅ → Governance ✅ → OM ✅ → Implementation ✅
 → Engineering Baseline ✅ → Dictionary + ADR-0014 ✅ (#25)
-→ Experience base EatClean ✅ (#24→#29)
+→ Experience base EatClean ✅ Frozen (ACT-001 · #24→#30)
 ───────────────
-Comienza Operational Engineering  (tras ORR PASSED)
-Piloto: EP-01 Weekly Experience → EP-04 Operational Close
+Piloto: EP-001 → EP-005  ·  Operational Engineering tras ORR PASSED
 ```
 
-> Dos líneas en paralelo: **evidencia operativa** (FOPEBA) y **piloto E2E** (Customer Journey → Operational Journey → Outcome). No compiten.  
-> Estabilidad conceptual: el valor siguiente es **demostrar el ciclo completo con datos reales**, no reabrir PRs de identidad.  
-> Motores de cambio por dominio: [PROJECT_DOMAINS](./PROJECT_DOMAINS.md).
+> ❌ No polish estético por preferencia (ACT-001).  
+> Dos líneas: **evidencia operativa** (FOPEBA) y **piloto E2E** (CJ → OJ → Outcome → Evidence).  
+> Motores de cambio: [PROJECT_DOMAINS](./PROJECT_DOMAINS.md).
 
 ---
 
@@ -54,24 +54,21 @@ Pregunta: ¿Hay evidencia para ORR? Congelación funcional hasta ORR.
 ### Línea de piloto — EatClean Pilot Ready 🟡
 
 ```text
-EP-01 Weekly Experience
+EP-001 Weekly Experience
         ↓
-EP-02 Kitchen Operations
+EP-002 Kitchen Operations
         ↓
-EP-03 Delivery Operations
+EP-003 Delivery Operations
         ↓
-EP-04 Operational Close
+EP-004 Operational Close
+        ↓
+EP-005 Evidence Collection
 ```
 
-Pregunta: **¿Una persona nueva completa el pedido mientras el equipo lo produce y entrega en la misma plataforma?**
+Pregunta: **¿Una persona nueva completa el pedido mientras el equipo lo produce y entrega — y FOPEBA recoge evidencia?**
 
-Acta: [MILESTONE_EATCLEAN_PILOT_READY](./MILESTONE_EATCLEAN_PILOT_READY.md).
-
-La **experiencia base** (Login · Home · Menú · Operaciones · docs Contract/Implementation) está **cerrada**. No reabrir como PRs «UI» genéricos.
-
-Observación de uso CJ-001 sigue siendo útil: [CJ001_USAGE_OBSERVATION](../07-experience/CJ001_USAGE_OBSERVATION.md).
-
-Docs: [CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md) · [OPERATIONAL_JOURNEYS](../07-experience/OPERATIONAL_JOURNEYS.md) · [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) · [`tenants/eatclean/`](../../tenants/eatclean/README.md).
+Acta experiencia: [ACT-001](./ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md).  
+Acta piloto: [MILESTONE_EATCLEAN_PILOT_READY](./MILESTONE_EATCLEAN_PILOT_READY.md).
 
 ---
 
@@ -83,8 +80,8 @@ Mapa: [PROJECT_DOMAINS](./PROJECT_DOMAINS.md).
 |---------|------------|--------|
 | **Knowledge** | Operational Model | ✅ Frozen / Closed |
 | **Engineering** | Código | ✅ Implementado · ✅ #23 en main |
-| **Experience** | CJ + OJ + identidad Tenant | ✅ Base cerrada · 🟡 Pilot Ready (EP-01…04) |
-| **Operations** | Evidencia | ⏳ Smoke → ORR → FOV |
+| **Experience** | CJ + OJ + identidad Tenant | ✅ **ACT-001 Frozen** · 🟡 Pilot Ready (EP-001…005) |
+| **Operations** | Evidencia | ⏳ Smoke → ORR → FOV · EP-005 |
 
 ---
 
