@@ -1,8 +1,14 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { applyBrandTheme, brandConfig } from "@/tenant/brand-config";
 import { cn } from "@/lib/utils";
+import { useTenantBrand } from "@/hooks/use-tenant-brand";
 
-/** Wraps Customer App / auth surfaces with Tenant BrandConfig theme. */
+/**
+ * Wraps Customer App / auth surfaces with the tenant's BrandConfig theme,
+ * and overrides color tokens with any values set by the tenant in
+ * Ajustes → Marca (BrandingService). Overrides are scoped: they only affect
+ * descendants of this element, never global tokens.
+ */
 export function TenantBrandScope({
   children,
   className,
@@ -11,9 +17,28 @@ export function TenantBrandScope({
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const { colors } = useTenantBrand();
+
   useEffect(() => {
     applyBrandTheme(ref.current, brandConfig);
   }, []);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    // `.tenant-branded` maps --primary/--accent to --tenant-primary/--tenant-accent.
+    // Override the base tenant vars so all shadcn/Tailwind classes pick them up.
+    if (colors.primary) {
+      el.style.setProperty("--tenant-primary", colors.primary);
+    }
+    if (colors.accent) {
+      el.style.setProperty("--tenant-accent", colors.accent);
+    }
+    // --primary-foreground is not tokenized through tenant-*; override directly.
+    if (colors.primaryForeground) {
+      el.style.setProperty("--primary-foreground", colors.primaryForeground);
+    }
+  }, [colors.primary, colors.accent, colors.primaryForeground]);
 
   return (
     <div ref={ref} className={cn("tenant-branded", className)}>

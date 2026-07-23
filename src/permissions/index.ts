@@ -36,6 +36,7 @@ export type Capability =
   | "accounting.operate"
   | "logistics.operate"
   | "admin.settings"
+  | "brand.manage"
   | "saas.manage"
   | "records.purge";
 
@@ -83,6 +84,7 @@ const ROLE_CAPABILITIES: Record<AppRole, readonly Capability[]> = {
     "accounting.operate",
     "logistics.operate",
     "admin.settings",
+    "brand.manage",
     "saas.manage",
     "records.purge",
   ],
@@ -116,6 +118,7 @@ const ROLE_CAPABILITIES: Record<AppRole, readonly Capability[]> = {
     "accounting.operate",
     "logistics.operate",
     "admin.settings",
+    "brand.manage",
   ],
   kitchen: [
     "dishes.read",
