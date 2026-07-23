@@ -1,21 +1,40 @@
-# CAP-002 — Dish Catalog
+# CAP-002 — Dish Catalog (lectura)
 
 **Estado:** Scaffold → **Connected** (siguiente)  
+**Nivel PR:** Capability  
 **Master:** [CURSOR_MASTER_PROMPT](../CURSOR_MASTER_PROMPT.md)
 
 ---
 
 ## 1. Objetivo
 
-Sustituir catálogo mock por datos reales de Supabase (Dish).
+Conectar **solo la lectura** del catálogo Dish a Supabase.
 
-## 2. Alcance
+Validar infraestructura antes de mutaciones.
 
-Repository · Query · Cache · Hooks · Adapters.
+## 2. Alcance (únicamente)
 
-## 3. No modificar
+```text
+Supabase
+    ↓
+Repository
+    ↓
+TanStack Query
+    ↓
+Hook
+    ↓
+DishCard (sin modificar el componente)
+```
 
-Componentes visuales · DishCard · UX · navegación · campos del modelo Dish.
+## 3. Fuera de alcance (este PR)
+
+- Búsqueda  
+- Filtros  
+- Favoritos  
+- Paginación  
+- Edición / mutaciones  
+- Campos nuevos  
+- Cambios UX / navegación / animaciones  
 
 ## 4. Traceability
 
@@ -23,31 +42,45 @@ Componentes visuales · DishCard · UX · navegación · campos del modelo Dish.
 |-------|-------|
 | Capability | CAP-002 Dish Catalog |
 | Core Object | Dish |
-| Supporting | Ingredient (solo si lectura ya justificada; no expandir) |
 | OM | `docs/17` · Module 01 Dish |
-| Infra | Supabase · Service/Repository · i18n · useFmt |
+| Infra | Supabase · Repository · TanStack Query · i18n · useFmt |
+| Mutaciones | Ninguna |
 
-## 5. Criterios Connected
+## 5. Criterios Connected (lectura)
 
-Ver [MODULE_STATE_CRITERIA](../../00-status/MODULE_STATE_CRITERIA.md) · Scaffold → Connected.
+- [ ] Datos desde Supabase (no `mock-*`)  
+- [ ] Tenant / auth respetados  
+- [ ] i18n + useFmt  
+- [ ] DishCard sin cambios visuales  
+- [ ] Typecheck limpio  
+- [ ] Checks [MODULE_STATE_CRITERIA](../../00-status/MODULE_STATE_CRITERIA.md) Scaffold→Connected aplicables a lectura  
 
 ## 6. Prompt
 
 ```text
-Implementar CAP-002 Dish Catalog.
+Implementar CAP-002 Dish Catalog — SOLO LECTURA.
 
-Objetivo: sustituir el catálogo mock por datos reales de Supabase.
+Cadena: Supabase → Repository → TanStack Query → Hook → DishCard.
 
-No modificar componentes.
-No modificar DishCard.
-No modificar UX.
-No modificar navegación.
-No añadir campos.
+No modificar DishCard ni UX ni navegación.
+No añadir: búsqueda, filtros, favoritos, paginación, edición, campos.
 
-Solo conectar: Repository · Query · Cache · Hooks · Adapters.
+Solo conectar lectura real.
+Typecheck limpio.
+Cerrar con formato oficial del Master Prompt.
+Nivel del cambio: Capability
+Estado objetivo: Scaffold → Connected
+Knowledge Review requerido: No (salvo hallazgo)
+```
 
-Mantener typecheck limpio.
-Cerrar con el formato oficial del Master Prompt (Etapa 2).
-Knowledge Review requerido: No (salvo hallazgo).
-Estado final objetivo: Connected.
+## 7. Plantilla de descripción PR
+
+```text
+Nivel del cambio: Capability
+
+CAP-002 Dish Catalog
+Estado: Scaffold → Connected
+Alcance: lectura únicamente
+Mutaciones: ninguna
+Cambios UI: ninguno
 ```
