@@ -8,11 +8,24 @@
 
 ## Principio
 
+> **The Platform owns the capability. The Tenant owns the experience.**  
+> **La plataforma es propietaria de la capacidad; el tenant es propietario de la experiencia.**
+
 ```text
 Customer Application  →  branding del Tenant (100%)
-YourMeal OS (SaaS)    →  branding del proveedor
+YourMeal OS (SaaS)    →  branding del proveedor (capabilities)
 Powered by            →  única mención visible de YourMeal OS en front office
 ```
+
+### Filtro de diseño
+
+> **¿Esta pantalla pertenece a la Plataforma o al Tenant?**
+
+| Ejemplo | Capa |
+|---------|------|
+| Login · Dashboard cliente · Confirmar pedido | **Tenant** |
+| Cocina / Delivery / … (RBAC) | **Tenant** (BackOffice) |
+| Superadmin · Gestión de tenants · Facturación SaaS | **Platform** |
 
 ---
 
@@ -110,6 +123,38 @@ type BrandSurfaceRef = {
 }
 ```
 
+### Extensión futura (no bloquea el contrato actual)
+
+`BrandConfig` puede crecer más allá de colores y logos — sin mezclar **capabilities de plataforma** con **experiencia de tenant**:
+
+```yaml
+tenant:
+  name: EatClean
+  logo: logo.svg
+  primaryColor: "#0D1B2A"
+  typography: Inter
+  heroImage: hero.webp
+
+copy:
+  welcomeTitle: "Bienvenido a EatClean"
+  welcomeSubtitle: "Comida preparada para ayudarte a comer mejor"
+
+# Flags de experiencia del Tenant (no reglas del OM)
+features:
+  loyalty: true
+  referrals: false
+  nutritionScore: true
+
+stores:
+  iosBundleId: "…"
+  androidPackage: "…"
+
+branding:
+  poweredBy: true
+```
+
+Las `features` aquí son **presentación / producto del Tenant**, no Knowledge Layer. Toda regla operacional nueva sigue el ciclo FOPEBA (evidencia → Knowledge Update → Gate).
+
 ---
 
 ## Superficies
@@ -170,5 +215,15 @@ Hasta que la inyección esté Connected, cualquier marca hardcodeada de YourMeal
 - Implementar el editor SaaS de branding (scaffold en `/saas/branding`).  
 - Cambiar comportamiento funcional de HP-001.  
 - Rediseñar EatClean como marca fija del código.
+
+### Experience Refactor (dirección de producto)
+
+Incremento futuro (p. ej. Lovable), **sin tocar HP-001 ni lógica operativa**:
+
+> Que cualquier cliente descargue la app y piense que es la app oficial de EatClean.
+
+Revisa: onboarding · login · dashboard · navegación · tono · imágenes · iconografía · copy.
+
+No sustituye Smoke / ORR; no es bloqueo de Evidence Gate. Se prioriza cuando producto lo decida.
 
 La implementación de `BrandConfig` se trata como Capability / incremento de ingeniería cuando el Gate lo priorice — no como mejora ad hoc de UX.

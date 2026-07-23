@@ -15,6 +15,8 @@ La Customer Application pertenece al Tenant.
 YourMeal OS pertenece al proveedor del servicio.
 ```
 
+> **The Platform owns the capability. The Tenant owns the experience.**
+
 En front office, YourMeal OS solo puede aparecer como **Powered by YourMeal OS** (configurable).
 
 ---

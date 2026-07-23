@@ -4,25 +4,92 @@
 
 **Aceptado** — 2026-07-23
 
+## Principio canónico
+
+> **The Platform owns the capability. The Tenant owns the experience.**
+
+> **La plataforma es propietaria de la capacidad; el tenant es propietario de la experiencia.**
+
+Esta frase resume la separación entre YourMeal OS (motor operativo) y cada Customer Application (marca y experiencia de cara al usuario).
+
+---
+
 ## Contexto
 
 YourMeal OS es una plataforma SaaS multi-tenant para empresas de meal prep, catering y operaciones gastronómicas (ADR [0003](./0003-multi-tenant.md)).
 
-La plataforma se compone de **dos productos** claramente diferenciados:
+### Cambio de modelo mental
 
-### Producto A — YourMeal OS (superficie corporativa)
+Hasta esta ADR, la arquitectura se pensaba (a menudo de forma implícita) así:
+
+```text
+YourMeal OS
+        ↓
+Aplicación
+        ↓
+Clientes
+```
+
+Con ADR 0014 pasa a ser:
+
+```text
+YourMeal OS Platform
+        │
+        ├──────────────┐
+        ▼              ▼
+ EatClean App     Cliente B App
+        │              │
+        ▼              ▼
+ Clientes        Clientes
+```
+
+Esa es la diferencia entre un software personalizado y un SaaS multi-tenant bien diseñado: el sistema operativo se **materializa** por Tenant, no se presenta como una app genérica única.
+
+### Cinco capas
+
+```text
+FOPEBA
+        │
+        ▼
+Knowledge Layer
+        │
+        ▼
+Platform Layer (YourMeal OS)
+        │
+        ▼
+Tenant Layer (p. ej. EatClean)
+        │
+        ▼
+End User Experience
+```
+
+| Capa | Responsabilidad |
+|------|-----------------|
+| **FOPEBA** | Cómo se genera conocimiento |
+| **Knowledge** | Qué sabe el sistema |
+| **Platform** | Cómo se implementa ese conocimiento (capabilities) |
+| **Tenant** | Cómo se presenta ese conocimiento para una empresa concreta |
+| **UX** | Cómo interactúa el usuario final |
+
+El branding **no** pertenece al Platform Layer: pertenece al Tenant Layer (y se percibe en UX).
+
+### Dos productos
+
+#### Producto A — YourMeal OS (superficie corporativa)
 
 Aplicación y web del proveedor SaaS. Dirigida a empresas interesadas en contratar la plataforma.
 
 Funciones típicas: landing corporativa · documentación · módulos · pricing · contacto · demo · soporte.
 
-**Branding:** YourMeal OS.
+**Branding:** YourMeal OS. **Capa:** Platform.
 
-### Producto B — Customer Application
+#### Producto B — Customer Application
 
 Aplicación utilizada por los **clientes finales** de cada empresa (tenant).
 
 Ejemplo: el usuario de EatClean no utiliza «YourMeal OS»; utiliza **EatClean**.
+
+**Branding:** Tenant 100%. **Capa:** Tenant → UX.
 
 Hasta esta ADR, el chrome de plataforma y el copy de onboarding podían presentar YourMeal OS como marca principal en superficies de cliente. Eso confunde la relación SaaS ↔ Tenant y debilita la confianza del usuario final.
 
@@ -54,11 +121,30 @@ Powered by YourMeal OS
 El branding se resuelve dinámicamente desde la configuración del Tenant:
 
 ```text
-Tenant → BrandConfig → Logo → Typography → Palette
-       → Illustrations → Copy → PoweredBy
+Tenant → BrandConfig → Logo · Typography · Palette
+       → Illustrations · Copy · PoweredBy
+       → (futuro) features · store ids · …
 ```
 
 Contrato técnico: [TENANT_BRANDING](../05-architecture/TENANT_BRANDING.md).
+
+### Filtro de diseño (obligatorio)
+
+Ante cada pantalla / superficie, la primera pregunta es:
+
+> **¿Esta pantalla pertenece a la Plataforma o al Tenant?**
+
+| Superficie | Capa |
+|------------|------|
+| Login / onboarding (cliente) | **Tenant** |
+| Dashboard del cliente | **Tenant** |
+| Confirmar pedido | **Tenant** |
+| Cocina / Delivery / … (back office) | **Tenant** (BackOffice, RBAC) |
+| Panel Superadmin YourMeal OS | **Platform** |
+| Gestión de tenants | **Platform** |
+| Facturación SaaS | **Platform** |
+
+Ese filtro evita mezclar landing/chrome de plataforma con la experiencia del Tenant.
 
 ### Front Office
 
@@ -110,7 +196,15 @@ YourMeal OS no compite por ser la marca visible. Compite por ser el motor operat
 1. `BrandConfig` es una **Capability transversal** (no un retoque de diseño).  
 2. Tokens / copy / assets de la Customer App se inyectan desde el Tenant; no se hardcodea la marca YourMeal OS en front office.  
 3. Superficies corporativas (Producto A) siguen branding YourMeal OS.  
-4. Cambios de branding de Tenant no requieren fork de código de producto.
+4. Cambios de branding de Tenant no requieren fork de código de producto.  
+5. Un incremento futuro de **Experience Refactor** (Lovable) puede alinear onboarding, login, dashboard, navegación, tono e iconografía del Tenant **sin tocar HP-001 ni lógica operativa** — priorizable por Gate / producto, no como bloqueo de Smoke/ORR.
+
+**Dos decisiones de largo recorrido (contexto FOPEBA)**
+
+1. FOPEBA termina cuando empieza la **evidencia de campo**, no cuando termina el código.  
+2. YourMeal OS es el **motor operativo**; el Tenant es la **marca** de cara al usuario.
+
+La primera protege la evolución del conocimiento. La segunda protege la escalabilidad del SaaS.
 
 **Superseder** esta ADR requiere evidencia y un ADR nuevo explícito.
 
@@ -120,4 +214,4 @@ YourMeal OS no compite por ser la marca visible. Compite por ser el motor operat
 - [ADR 0003](./0003-multi-tenant.md) — aislamiento multi-tenant  
 - [ADR 0004](./0004-authentication-rbac.md) — autenticación / RBAC  
 - [docs/03-brand](../03-brand/README.md)  
-- Dictionary: `DICT-045`…`DICT-049`
+- Dictionary: `DICT-045`…`DICT-050`
