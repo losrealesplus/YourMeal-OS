@@ -197,7 +197,17 @@ YourMeal OS no compite por ser la marca visible. Compite por ser el motor operat
 2. Tokens / copy / assets de la Customer App se inyectan desde el Tenant; no se hardcodea la marca YourMeal OS en front office.  
 3. Superficies corporativas (Producto A) siguen branding YourMeal OS.  
 4. Cambios de branding de Tenant no requieren fork de código de producto.  
-5. Un incremento futuro de **Experience Refactor** (Lovable) puede alinear onboarding, login, dashboard, navegación, tono e iconografía del Tenant **sin tocar HP-001 ni lógica operativa** — priorizable por Gate / producto, no como bloqueo de Smoke/ORR.
+5. Un incremento futuro de **Experience Refactor** (Lovable) puede alinear onboarding, login, dashboard, navegación, tono e iconografía del Tenant **sin tocar HP-001 ni lógica operativa** — priorizable por Gate / producto, no como bloqueo de Smoke/ORR. Spec: [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md).
+
+**Consecuencia explícita (configuración, no forks)**
+
+> **La experiencia del usuario final debe poder recrear fielmente la identidad digital del Tenant utilizando únicamente la configuración de `BrandConfig` y los recursos asociados al Tenant. No se realizarán personalizaciones de código por cliente para adaptar el branding o la experiencia visual.**
+
+Cuando llegue el segundo o el décimo cliente, el cambio de identidad es **configuración + contenido**, no bifurcar la aplicación.
+
+**Regla de arquitectura SaaS**
+
+> **Cada Tenant debe poder hacer que un usuario crea que la aplicación fue desarrollada específicamente para su empresa, sin necesidad de modificar el código fuente del producto.**
 
 **Dos decisiones de largo recorrido (contexto FOPEBA)**
 
@@ -211,7 +221,8 @@ La primera protege la evolución del conocimiento. La segunda protege la escalab
 ## Relacionado
 
 - [TENANT_BRANDING](../05-architecture/TENANT_BRANDING.md) — contrato técnico  
+- [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md) — identidad EatClean (Experience Refactor)  
 - [ADR 0003](./0003-multi-tenant.md) — aislamiento multi-tenant  
 - [ADR 0004](./0004-authentication-rbac.md) — autenticación / RBAC  
 - [docs/03-brand](../03-brand/README.md)  
-- Dictionary: `DICT-045`…`DICT-050`
+- Dictionary: `DICT-045`…`DICT-051`

@@ -222,6 +222,8 @@ Incremento futuro (p. ej. Lovable), **sin tocar HP-001 ni lógica operativa**:
 
 > Que cualquier cliente descargue la app y piense que es la app oficial de EatClean.
 
+Spec operativo: [TENANT_EXPERIENCE_SPEC](./TENANT_EXPERIENCE_SPEC.md) (identidad · copy · login · home · nav · tono · fotos).
+
 Revisa: onboarding · login · dashboard · navegación · tono · imágenes · iconografía · copy.
 
 No sustituye Smoke / ORR; no es bloqueo de Evidence Gate. Se prioriza cuando producto lo decida.

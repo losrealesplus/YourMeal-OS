@@ -12,6 +12,7 @@
 |-----|-----|
 | [FOUNDATION_LOCK.md](./FOUNDATION_LOCK.md) | Close the platform before features |
 | [TENANT_BRANDING.md](./TENANT_BRANDING.md) | Contrato BrandConfig · Customer App white-label (ADR 0014) |
+| [TENANT_EXPERIENCE_SPEC.md](./TENANT_EXPERIENCE_SPEC.md) | Identidad EatClean · Experience Refactor (sin tocar HP-001) |
 | [architecture-review.md](./architecture-review.md) | As-built senior review |
 | [MODULE_CONVENTION.md](./MODULE_CONVENTION.md) | `src/modules/...` layout |
 | [../10-api/README.md](../10-api/README.md) | Service → Repository → Supabase |
