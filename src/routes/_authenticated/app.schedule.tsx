@@ -167,11 +167,31 @@ function ScheduleFlow() {
 
       {step === 3 ? (
         <section className="px-6 space-y-4">
+          <div className="relative rounded-3xl overflow-hidden shadow-sm">
+            <img
+              src={heroImage}
+              alt=""
+              width={1600}
+              height={1200}
+              className="w-full h-32 object-cover"
+            />
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(180deg, transparent 30%, rgba(26,46,36,0.85) 100%)",
+              }}
+            />
+            <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-90">
+                {t("customer:orderSummary")}
+              </p>
+              <p className="text-lg font-extrabold tracking-tight mt-1">
+                {t("customer:summaryReadyTitle")}
+              </p>
+            </div>
+          </div>
           <div className="rounded-3xl border border-border/70 bg-card p-6 space-y-4 shadow-sm">
-            <p className="meta-label text-primary">{t("customer:orderSummary")}</p>
-            <h2 className="text-xl font-extrabold tracking-tight">
-              {t("customer:summaryReadyTitle")}
-            </h2>
             <Row label={t("customer:mealsPerDay")} value={String(mealsPerDay)} />
             <Row label={t("customer:deliveryDay")} value={days[deliveryDay]} />
             <Row
