@@ -27,15 +27,17 @@ Evidence creada: (FO-V / FO-E / FO-C / …)
 Knowledge Update necesario: (sí/no · ref KUR)
 
 
-Resultado ORR: (READY | READY WITH GAPS | NOT READY)
+Resultado ORR: (PASSED | BLOCKED)
 ```
 
 ---
 
 ## Uso
 
-1. Ejecutar HP-001 con datos reales.  
-2. Completar este log (copiar a `docs/00-status/` o evidencia FOV).  
-3. Si hay Knowledge Gap → Carril A (FER → KU), no parchear en código.  
+1. Fusionar Hardening (PR #23) · aplicar migración `program_draft_order`.  
+2. Ejecutar smoke HP-001 con datos reales (sin mocks live).  
+3. Completar este log / acta `docs/00-status/ORR_HP-001.md`.  
+4. Si hay Knowledge Gap → Carril A (FER → KU), no parchear en código.  
+5. Solo con ORR **PASSED** → Ready for FOV.  
 
 Ver [HAPPY_PATHS](./HAPPY_PATHS.md) · [ORR](./ORR.md) · [FOV Mission Brief](../00-status/FOV_MISSION_BRIEF.md).

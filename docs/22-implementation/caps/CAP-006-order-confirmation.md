@@ -1,7 +1,10 @@
 # CAP-006 — Order Confirmation
 
-**Estado:** Scaffold → **Operational** (cierra HP-001)  
+**Estado implementación:** Scaffold → **Operational** (código en `main` · IR-001)  
+**Estado demostración:** ⏳ Smoke HP-001 pendiente · ⏳ ORR pendiente  
 **OM:** `docs/17-operational-model/04-lifecycles/spine-transitions.md` — Draft → Confirmed  
+
+> No requiere más desarrollo. Requiere **demostración** (smoke) y **autorización** (ORR PASSED).
 
 ---
 

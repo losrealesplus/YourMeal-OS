@@ -29,6 +29,27 @@ No se usan estados intermedios («casi listo», «pendiente de…», «READY WIT
 
 ---
 
+## Checklist de evidencias (pre-ORR)
+
+Marcar solo con evidencia verificable. La ORR **no** revisa implementación pendiente: revisa estas casillas.
+
+| Área | Evidencia | Estado |
+|------|-----------|:------:|
+| Ingeniería | PR #23 fusionado en `main` | ☐ |
+| Migraciones | RPC `program_draft_order` aplicada y verificada | ☐ |
+| Tests | Suite verde (p. ej. 59/59 en Hardening) | ☑ |
+| TypeScript | `tsc --noEmit` limpio | ☑ |
+| Happy Path | Smoke HP-001 exitoso (datos reales) | ☐ |
+| Auditoría | Eventos `create` + `status_change` en `audit_log` | ☐ |
+| Caché | Invalidación TanStack tras program / confirm | ☐ |
+| Mocks | Ausentes en flujo live HP-001 | ☑ (código Hardening) |
+| P1 | INC-01…07 cerrados | ☑ (código Hardening) |
+
+Si **todas** las ☐ pasan a ☑ **y** las cuatro preguntas fijas son «sí» → **PASSED**.  
+Si alguna falla → **BLOCKED** con causa documentada en `docs/00-status/ORR_HP-001.md`.
+
+---
+
 ## Preguntas fijas (todas deben ser «sí» para PASSED)
 
 ### Arquitectura
