@@ -34,6 +34,14 @@ inventar brand system paralelo al Design System del repo cuando exista.
 
 **Un PM por conversación** — empezando por [PM-001](./PM-001-Customer-App.md).
 
+Para alinear la Customer App a la identidad del Tenant (EatClean), usar además:
+
+- [ADR 0014](../adr/0014-customer-application-is-tenant-branded.md)  
+- [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md)  
+- [TENANT_BRANDING](../05-architecture/TENANT_BRANDING.md)  
+
+Sin tocar HP-001 ni inventar lógica de negocio.
+
 No un único prompt enorme de «toda la app».
 
 Infraestructura a reutilizar (ver [Rules](./PRODUCT_MATERIALIZATION_RULES.md)):

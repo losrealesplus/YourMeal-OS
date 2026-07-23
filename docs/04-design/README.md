@@ -24,7 +24,8 @@ Apple quality. Minimal. Professional. Fast. Native feeling. Large touch targets.
 
 - Prefer shared primitives over one-off card stacks.
 - Numbers and codes use mono typography.
-- Tenant theming: override `--brand-primary` from `tenants.brand` on load.
+- Tenant theming: override `--brand-primary` (y resto de `BrandConfig`) from `tenants.brand` on load — [ADR 0014](../adr/0014-customer-application-is-tenant-branded.md) · [TENANT_BRANDING](../05-architecture/TENANT_BRANDING.md).
+- Customer Application: branding **100% Tenant**; YourMeal OS solo como Powered by.
 - Customer surfaces are mobile-first; admin is desktop-first and responsive.
 - Never call `toLocaleString()` in components — use `useFmt()`.
 
