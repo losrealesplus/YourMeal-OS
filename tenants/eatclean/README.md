@@ -27,6 +27,8 @@ Primera instancia del patrón **Tenant Resources** (ADR 0014).
 
 Los binarios oficiales los aporta el Tenant (o se exportan de la web con licencia). No usar stock SaaS.
 
+**Bundling:** copia espejo en `src/tenant/resources/` para Vite. Mantener sincronizado con esta carpeta.
+
 ## Convención para futuros tenants
 
 ```text

@@ -94,6 +94,7 @@ Inventario SCR del MVP: [CUSTOMER_JOURNEYS § Pantallas](./CUSTOMER_JOURNEYS.md#
 | Doc | Rol |
 |-----|-----|
 | [CUSTOMER_JOURNEYS](./CUSTOMER_JOURNEYS.md) | Recorridos CJ-xxx · pantallas MVP · SCR |
+| [EXPERIENCE_REFACTOR_EATCLEAN_V1](./EXPERIENCE_REFACTOR_EATCLEAN_V1.md) | Sprint Experience · 5 pantallas primero |
 | [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md) | Identidad EatClean |
 | [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) | Brief Cursor/Lovable |
 | [PROJECT_DOMAINS](../00-status/PROJECT_DOMAINS.md) | Mapa de cuatro dominios |

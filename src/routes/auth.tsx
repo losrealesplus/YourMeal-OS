@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,12 +6,21 @@ import { lovable } from "@/integrations/lovable";
 import { LanguageSelector } from "@/components/language-selector";
 import { resolveHomePath } from "@/lib/resolve-home-path";
 import { toast } from "sonner";
+import {
+  PoweredByLine,
+  TenantBrandScope,
+} from "@/components/tenant/tenant-brand-scope";
+import { brandConfig } from "@/tenant/brand-config";
+import { PrimaryCTA } from "@/components/consumer";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — YourMeal OS" },
-      { name: "description", content: "Sign in to your YourMeal OS operation." },
+      { title: `${brandConfig.name} — ${brandConfig.storeAssets.shortDescription}` },
+      {
+        name: "description",
+        content: brandConfig.storeAssets.shortDescription,
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -19,6 +28,9 @@ export const Route = createFileRoute("/auth")({
 });
 
 type Tab = "email" | "phone";
+type Phase = "splash" | "onboarding" | "login";
+
+const ONBOARDING_KEY = "tenant_onboarding_done";
 
 async function goHome(
   navigate: ReturnType<typeof useNavigate>,
@@ -32,6 +44,8 @@ function AuthPage() {
   const { t } = useTranslation(["auth", "common"]);
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("email");
+  const [phase, setPhase] = useState<Phase>("splash");
+  const [onboardingStep, setOnboardingStep] = useState(0);
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
@@ -41,75 +55,169 @@ function AuthPage() {
     });
   }, [navigate]);
 
+  useEffect(() => {
+    if (phase !== "splash") return;
+    const id = window.setTimeout(() => {
+      const done = localStorage.getItem(ONBOARDING_KEY) === "1";
+      setPhase(done ? "login" : "onboarding");
+    }, 1600);
+    return () => window.clearTimeout(id);
+  }, [phase]);
+
+  const onboardingSlides = [
+    {
+      title: t("auth:onboarding1Title"),
+      body: t("auth:onboarding1Body"),
+    },
+    {
+      title: t("auth:onboarding2Title"),
+      body: t("auth:onboarding2Body"),
+    },
+    {
+      title: t("auth:onboarding3Title"),
+      body: t("auth:onboarding3Body"),
+    },
+  ];
+
   return (
-    <div className="min-h-screen grid place-items-center bg-secondary/40 p-4 relative">
-      <div className="absolute top-4 right-4 md:top-6 md:right-6">
-        <LanguageSelector />
+    <TenantBrandScope className="min-h-screen">
+      <div className="min-h-screen grid place-items-center p-4 relative bg-[var(--background)]">
+        <div className="absolute top-4 right-4 md:top-6 md:right-6 z-10">
+          <LanguageSelector />
+        </div>
+
+        {phase === "splash" ? (
+          <div className="flex flex-col items-center gap-6 animate-fade-in text-center px-6">
+            <div className="size-20 rounded-[1.5rem] bg-primary text-primary-foreground grid place-items-center text-2xl font-extrabold tracking-tight shadow-lg">
+              EC
+            </div>
+            <div>
+              <p className="text-2xl font-extrabold tracking-tight">{brandConfig.name}</p>
+              <p className="text-sm text-muted-foreground mt-2 max-w-xs">
+                {brandConfig.storeAssets.shortDescription}
+              </p>
+            </div>
+            <PoweredByLine className="mt-8" />
+          </div>
+        ) : null}
+
+        {phase === "onboarding" ? (
+          <div className="w-full max-w-md animate-fade-in">
+            <div className="rounded-[1.75rem] bg-card border border-border/70 p-8 shadow-sm min-h-[28rem] flex flex-col">
+              <p className="meta-label text-primary">{brandConfig.name}</p>
+              <h1 className="text-3xl font-extrabold tracking-tight mt-4 text-balance">
+                {onboardingSlides[onboardingStep]?.title}
+              </h1>
+              <p className="text-base text-muted-foreground mt-4 leading-relaxed text-pretty flex-1">
+                {onboardingSlides[onboardingStep]?.body}
+              </p>
+              <div className="flex gap-2 my-6">
+                {onboardingSlides.map((_, i) => (
+                  <div
+                    key={i}
+                    className={
+                      "h-1.5 flex-1 rounded-full " +
+                      (i <= onboardingStep ? "bg-primary" : "bg-secondary")
+                    }
+                  />
+                ))}
+              </div>
+              <PrimaryCTA
+                trailingIcon={onboardingStep < onboardingSlides.length - 1}
+                onClick={() => {
+                  if (onboardingStep < onboardingSlides.length - 1) {
+                    setOnboardingStep((s) => s + 1);
+                    return;
+                  }
+                  localStorage.setItem(ONBOARDING_KEY, "1");
+                  setPhase("login");
+                }}
+              >
+                {onboardingStep < onboardingSlides.length - 1
+                  ? t("common:continue")
+                  : t("auth:startNow")}
+              </PrimaryCTA>
+            </div>
+            <PoweredByLine className="mt-6" />
+          </div>
+        ) : null}
+
+        {phase === "login" ? (
+          <div className="w-full max-w-md animate-fade-in">
+            <div className="rounded-[1.75rem] bg-card border border-border/70 p-8 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="size-11 rounded-2xl bg-primary text-primary-foreground grid place-items-center text-sm font-extrabold">
+                  EC
+                </div>
+                <p className="font-extrabold tracking-tight">{brandConfig.name}</p>
+              </div>
+              <h1 className="text-2xl font-extrabold tracking-tight mt-6">
+                {t("auth:welcome")}
+              </h1>
+              <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+                {t("auth:welcomeSub")}
+              </p>
+
+              <div className="mt-6 grid grid-cols-2 gap-2 bg-secondary/60 p-1 rounded-xl">
+                {(["email", "phone"] as const).map((k) => (
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => setTab(k)}
+                    className={
+                      "text-xs font-bold uppercase tracking-widest py-2.5 rounded-lg transition-colors " +
+                      (tab === k
+                        ? "bg-card text-foreground shadow-sm"
+                        : "text-muted-foreground")
+                    }
+                  >
+                    {t(`auth:tabs.${k}`)}
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-6">
+                {tab === "email" ? <EmailForm /> : <PhoneForm />}
+              </div>
+
+              <div className="mt-6 flex items-center gap-3">
+                <div className="h-px flex-1 bg-border" />
+                <span className="meta-label">{t("common:or")}</span>
+                <div className="h-px flex-1 bg-border" />
+              </div>
+
+              <div className="mt-6 grid gap-2">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const r = await lovable.auth.signInWithOAuth("google", {
+                      redirect_uri: window.location.origin,
+                    });
+                    if (r.error) toast.error(r.error.message);
+                  }}
+                  className="border border-border bg-card text-sm font-bold py-3 rounded-xl hover:bg-secondary/60 transition-colors"
+                >
+                  {t("auth:withGoogle")}
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const r = await lovable.auth.signInWithOAuth("apple", {
+                      redirect_uri: window.location.origin,
+                    });
+                    if (r.error) toast.error(r.error.message);
+                  }}
+                  className="border border-border bg-card text-sm font-bold py-3 rounded-xl hover:bg-secondary/60 transition-colors"
+                >
+                  {t("auth:withApple")}
+                </button>
+              </div>
+            </div>
+            <PoweredByLine className="mt-6" />
+          </div>
+        ) : null}
       </div>
-      <div className="w-full max-w-md bg-card ring-1 ring-black/[0.03] border border-border rounded-3xl p-8 shadow-sm">
-        <Link to="/" className="meta-label">
-          ← YourMeal OS
-        </Link>
-        <h1 className="text-2xl font-extrabold tracking-tight mt-4">
-          {t("auth:welcome")}
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          {t("auth:welcomeSub")}
-        </p>
-
-        <div className="mt-6 grid grid-cols-2 gap-2 bg-secondary/60 p-1 rounded-lg">
-          {(["email", "phone"] as const).map((k) => (
-            <button
-              key={k}
-              onClick={() => setTab(k)}
-              className={
-                "text-xs font-bold uppercase tracking-widest py-2 rounded-md transition-colors " +
-                (tab === k
-                  ? "bg-card text-foreground shadow-sm"
-                  : "text-muted-foreground")
-              }
-            >
-              {t(`auth:tabs.${k}`)}
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-6">
-          {tab === "email" ? <EmailForm /> : <PhoneForm />}
-        </div>
-
-        <div className="mt-6 flex items-center gap-3">
-          <div className="h-px flex-1 bg-border" />
-          <span className="meta-label">{t("common:or")}</span>
-          <div className="h-px flex-1 bg-border" />
-        </div>
-
-        <div className="mt-6 grid gap-2">
-          <button
-            onClick={async () => {
-              const r = await lovable.auth.signInWithOAuth("google", {
-                redirect_uri: window.location.origin,
-              });
-              if (r.error) toast.error(r.error.message);
-            }}
-            className="border border-border bg-card text-sm font-bold py-3 rounded-lg hover:bg-secondary/60 transition-colors"
-          >
-            {t("auth:withGoogle")}
-          </button>
-          <button
-            onClick={async () => {
-              const r = await lovable.auth.signInWithOAuth("apple", {
-                redirect_uri: window.location.origin,
-              });
-              if (r.error) toast.error(r.error.message);
-            }}
-            className="border border-border bg-card text-sm font-bold py-3 rounded-lg hover:bg-secondary/60 transition-colors"
-          >
-            {t("auth:withApple")}
-          </button>
-        </div>
-      </div>
-    </div>
+    </TenantBrandScope>
   );
 }
 
@@ -174,7 +282,7 @@ function EmailForm() {
           placeholder={t("auth:fullName")}
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
-          className="border border-border rounded-lg px-4 py-3 text-sm bg-background"
+          className="border border-border rounded-xl px-4 py-3.5 text-sm bg-background"
         />
       )}
       <input
@@ -183,7 +291,7 @@ function EmailForm() {
         placeholder={t("common:email")}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="border border-border rounded-lg px-4 py-3 text-sm bg-background"
+        className="border border-border rounded-xl px-4 py-3.5 text-sm bg-background"
       />
       <input
         type="password"
@@ -191,11 +299,11 @@ function EmailForm() {
         placeholder={t("common:password")}
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        className="border border-border rounded-lg px-4 py-3 text-sm bg-background"
+        className="border border-border rounded-xl px-4 py-3.5 text-sm bg-background"
       />
       <button
         disabled={busy}
-        className="bg-foreground text-background text-sm font-bold py-3 rounded-lg disabled:opacity-50"
+        className="bg-primary text-primary-foreground text-sm font-bold py-3.5 rounded-xl disabled:opacity-50"
       >
         {mode === "signin" ? t("common:signIn") : t("common:signUp")}
       </button>
@@ -263,20 +371,21 @@ function PhoneForm() {
         placeholder="+34 600 000 000"
         value={phone}
         onChange={(e) => setPhone(e.target.value)}
-        className="border border-border rounded-lg px-4 py-3 text-sm bg-background"
+        className="border border-border rounded-xl px-4 py-3.5 text-sm bg-background"
       />
       {sent && (
         <input
           placeholder="123456"
           value={code}
           onChange={(e) => setCode(e.target.value)}
-          className="border border-border rounded-lg px-4 py-3 text-sm bg-background font-mono tracking-widest"
+          className="border border-border rounded-xl px-4 py-3.5 text-sm bg-background font-mono tracking-widest"
         />
       )}
       <button
+        type="button"
         onClick={sent ? verify : sendCode}
         disabled={busy}
-        className="bg-foreground text-background text-sm font-bold py-3 rounded-lg disabled:opacity-50"
+        className="bg-primary text-primary-foreground text-sm font-bold py-3.5 rounded-xl disabled:opacity-50"
       >
         {sent ? t("auth:verifyCode") : t("auth:sendCode")}
       </button>

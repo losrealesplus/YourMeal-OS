@@ -63,6 +63,8 @@ EatClean Release UX
 
 Pregunta: **¿Mi madre podría hacer un pedido sin que nadie le explique la app?**
 
+Sprint activo: [EXPERIENCE_REFACTOR_EATCLEAN_V1](../07-experience/EXPERIENCE_REFACTOR_EATCLEAN_V1.md) — primer entregable: Splash · Login · Home · Menú · Resumen.
+
 Docs: [CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md) · [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) · [`tenants/eatclean/`](../../tenants/eatclean/README.md).
 
 ---
