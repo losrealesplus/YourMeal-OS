@@ -27,6 +27,30 @@ Sin estados intermedios («casi listo», «READY WITH GAPS», etc.).
 
 ---
 
+## Qué significa ORR PASSED
+
+**No significa:**
+
+* que el producto esté terminado;  
+* que el Operational Model sea definitivo;  
+* que ya no existan mejoras posibles.
+
+**Significa:**
+
+> Existe evidencia suficiente para afirmar que HP-001 puede ejecutarse en operación real y que cualquier aprendizaje posterior provendrá de la **observación del sistema**, no de incertidumbres conocidas en su implementación.
+
+---
+
+## Después de ORR
+
+| Antes (Engineering) | Después (FOV) |
+|---------------------|---------------|
+| ¿Está correctamente implementado? | ¿El conocimiento operacional refleja cómo trabaja el cliente? |
+
+Evidencia en FOV; decisiones en el **Gate** — no durante la observación.
+
+---
+
 ## Qué debe responder la ORR
 
 La ORR **no** pregunta «¿el código está bien?». Solo:

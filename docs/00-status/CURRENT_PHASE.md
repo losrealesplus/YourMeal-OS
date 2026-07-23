@@ -8,42 +8,48 @@
 PROJECT STATE
 ══════════════════════════════════════════════════
 
+Engineering Phase: Complete (pending operational authorization)
 Current Phase:     Evidence Gate  (pre-ORR)
 Next Gate:         ORR  (PASSED | BLOCKED)
-Current Objective: Producir evidencia — no escribir software nuevo
+Next Discipline:   Operational Engineering
+Primary Artifact:  Field Evidence
 Last Baseline:     v0.2.0-engineering-baseline (IR-001)
 
 ══════════════════════════════════════════════════
 ```
 
+Cierre formal: [ENGINEERING_PHASE](./ENGINEERING_PHASE.md).
+
 ---
 
-## Tres dominios
+## Dominios oficiales
 
 | Dominio | Estado |
 |---------|--------|
-| **Knowledge Engineering** | ✅ Cerrado — FOPEBA v1 · OM · Governance · Methodology Closed |
-| **Software Engineering** | ✅ Implementación cerrada — ⏳ integrar PR #23 → `main` |
-| **Operational Engineering** | ⏳ **Aún no comienza** — empieza con FOV tras ORR PASSED |
-
-La ORR **no** es una revisión de código. Esa revisión ya ocurrió en el Hardening Sprint.
+| Knowledge Engineering | ✅ Frozen / Closed |
+| Software Engineering | ✅ Implementado · ⏳ Integración final (#23) |
+| Operational Engineering | ⏳ Pendiente de ORR PASSED |
 
 ---
 
-## Ciclo (sin pasos intermedios)
+## Regla de congelación funcional
+
+> **Hasta que ORR emita un resultado, ningún commit puede modificar el comportamiento funcional del producto.**
+
+Admitido únicamente:
+
+* bloqueo descubierto en Smoke;  
+* corrección imprescindible para completar HP-001;  
+* documentación de evidencia.
+
+Cualquier “pequeña mejora” en el merge **espera** al siguiente ciclo.
+
+---
+
+## Cadena (sin pasos intermedios)
 
 ```text
-PR #23 → main
-        ↓
-Apply migration
-        ↓
-Smoke HP-001
-        ↓
-ORR → PASSED | BLOCKED
-        ↓
-Ready for FOV
-        ↓
-FOV-001 · Knowledge Update · Gate
+PR #23 → main → Apply migration → Smoke HP-001 → ORR → PASSED → Ready for FOV → FOV-001
 ```
 
 | Evento | Estado |
@@ -66,16 +72,4 @@ FOV-001 · Knowledge Update · Gate
 
 ---
 
-## CAP-006
-
-| Estado | Resultado |
-|--------|-----------|
-| Implementación | ✅ Completa |
-| Verificación (Smoke HP-001) | ⏳ |
-| Validación ORR | ⏳ |
-
-No más desarrollo. Solo demostración + autorización.
-
----
-
-Checklists: [SMOKE_HP-001](./SMOKE_HP-001.md) · [ORR](../22-implementation/ORR.md) · plantilla FOV [FOV-001](../30-field-validation/FOV-001_HP-001.md) (rellenar **solo** tras ORR PASSED).
+Checklists: [SMOKE_HP-001](./SMOKE_HP-001.md) · [ORR](../22-implementation/ORR.md) · [FOV-001](../30-field-validation/FOV-001_HP-001.md) (solo tras ORR PASSED).

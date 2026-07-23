@@ -16,9 +16,9 @@ Registro **inmutable** de hitos. No es gestión de sprint: es memoria objetiva.
 | PR #20 | CAP-006 Operational | Order Confirmation · cierra HP-001 (código en pila) |
 | PR #21 | Sprint 0 Engineering Review | Health 74 · Ready CAP-006 ✅ · Ready ORR ❌ |
 | **PR #22** | **IR-001 · First Engineering Integration** | Stack → `main` · [IR-001](./IR-001_FIRST_ENGINEERING_INTEGRATION.md) · tag `v0.2.0-engineering-baseline` |
-| *(en curso)* | Engineering Hardening Sprint | P1 Integrity + Completeness → Ready for ORR |
-| *(pendiente)* | ORR PASSED \| BLOCKED | Puerta binaria · sin features |
-| *(pendiente)* | First FOV | Phase 3 — Field Operational Validation |
+| PR #23 | Engineering Hardening · Evidence Gate | P1 cerrados · [ENGINEERING_PHASE](./ENGINEERING_PHASE.md) Complete (pending operational authorization) |
+| *(pendiente)* | ORR PASSED \| BLOCKED | Puerta binaria · evidencia · sin features |
+| *(pendiente)* | First FOV (FOV-001) | Phase 3 — Operational Engineering |
 
 **Regla:** no reescribir filas pasadas. Solo añadir hitos al completarlos.
 
