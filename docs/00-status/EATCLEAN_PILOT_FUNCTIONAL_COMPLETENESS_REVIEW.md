@@ -8,23 +8,54 @@
 **No es:** Smoke ejecutado · ORR · FOV · permiso para implementar features
 
 > **Regla aplicada:** todo elemento visible debe funcionar, estar oculto por Feature Flag, o marcarse explícitamente como «Próximamente».  
+> **Regla de cero humo (piloto):** nada visible puede ser decorativo.  
 > Esta revisión **documenta** el estado real. No implementa, no rediseña, no refactoriza.
+
+---
+
+## 0. Regla de cero humo (gate del piloto)
+
+> **Nada visible puede ser decorativo.**
+
+Antes de marcar **EatClean Pilot Ready**, la superficie expuesta al usuario debe cumplir:
+
+| Si existe… | Entonces… |
+|------------|-----------|
+| Un botón | Hace la acción esperada |
+| Una estadística / KPI | Proviene de datos reales |
+| Un formulario | Guarda (CREATE / UPDATE / soft DELETE) |
+| Una pantalla | Cumple un objetivo operativo |
+| Un departamento / workspace | Se puede usar de principio a fin |
+| Un menú / nav item | **Todas** sus opciones funcionan, están ocultas o dicen «Próximamente» |
+
+Tres salidas válidas por elemento visible:
+
+```text
+1. Completo (funciona + datos reales + RBAC)
+2. Oculto (Feature Flag o fuera de nav)
+3. Marcado explícitamente «Próximamente»
+```
+
+Cualquier otra cosa = **humo** = bloquea Pilot Ready para esa superficie.
+
+**Estado del gate en este baseline:** 🔴 **NO PASSED**  
+Motivo: humo en Settings (botones muertos), Home (enlaces engañosos) y casi todo el admin operativo (mocks que parecen live).
 
 ---
 
 ## 1. Veredicto ejecutivo
 
-| Cara | ¿Lista para piloto exclusivo YourMeal OS? |
-|------|:------------------------------------------:|
-| **Customer App · CJ-001** (menú → pedido draft → resumen → confirmar) | 🟡 **Parcial** — camino feliz Connected; huecos visibles sin “Próximamente” |
-| **Centro de Operaciones · OJ** (cocina · reparto · stock · clientes · finanzas) | 🔴 **No** — UI mock / PlaceholderPanel; servicios `unimplemented` |
-| **Branding Tenant-Managed** | ✅ **Completo** (logo · colores · preview · persistencia) |
-| **Perfil / cobros / favoritos / historial** | 🔴 **No** — menús muertos o solo lectura |
+| Cara | ¿Lista para piloto exclusivo YourMeal OS? | Cero humo |
+|------|:------------------------------------------:|:---------:|
+| **Customer App · CJ-001** (menú → pedido draft → resumen → confirmar) | 🟡 **Parcial** — camino feliz Connected; huecos visibles sin “Próximamente” | 🔴 |
+| **Centro de Operaciones · OJ** (cocina · reparto · stock · clientes · finanzas) | 🔴 **No** — UI mock / PlaceholderPanel; servicios `unimplemented` | 🔴 |
+| **Branding Tenant-Managed** | ✅ **Completo** (logo · colores · preview · persistencia) | ✅ |
+| **Perfil / cobros / favoritos / historial** | 🔴 **No** — menús muertos o solo lectura | 🔴 |
 
 **Conclusión para el piloto**
 
-> En el estado actual de `main`, **no** se cumple la regla de completitud funcional en superficies de operaciones ni en gran parte del hub de perfil.  
-> El ciclo **Cliente pide → Sistema genera pedido** puede demostrarse (con datos reales y flags ON).  
+> En el estado actual de `main`, **no** se cumple la regla de completitud funcional ni la de **cero humo** en superficies de operaciones ni en gran parte del hub de perfil.  
+> El ciclo **Cliente pide → Sistema genera pedido** puede demostrarse (con datos reales y flags ON) **solo si** se elimina el humo visible del Customer App.  
 > El ciclo **Cocina produce → Reparto entrega** **no** puede demostrarse con datos reales: las pantallas muestran mocks y no mutan.
 
 **Riesgo #1 del piloto:** personal operativo cree que cocina/reparto/stock “funcionan” porque ven listados, pero los datos son simulados (`src/lib/mock-admin.ts`) y los servicios lanzan `unimplemented`.
@@ -336,21 +367,31 @@ En `/app/settings` (sin `to`, `<button>` sin handler, **sin** «Próximamente»)
 
 ---
 
-## 6. Cumplimiento de la regla principal
+## 6. Cumplimiento de la regla principal + cero humo
 
 ```text
 Visible + útil     → minority (CJ-001 core + branding + auth)
 Visible + marcado  → PlaceholderPanels + algunos comingSoon
-Visible + muerto   → settings hub + mocks admin + home links engañosos
+Visible + muerto   → settings hub + mocks admin + home links engañosos  ← HUMO
 Oculto por Flag UI → casi inexistente
 ```
+
+| Test de cero humo | ¿Pasa? |
+|-------------------|:------:|
+| Todo botón visible hace algo real o dice «Próximamente» | 🔴 |
+| Toda estadística visible es de datos reales | 🔴 (admin KPIs mock) |
+| Todo formulario visible guarda | 🔴 |
+| Toda pantalla visible tiene objetivo operativo real | 🔴 (mocks) |
+| Todo departamento visible es usable E2E | 🔴 |
+| Todo menú visible tiene opciones válidas | 🔴 |
 
 **Para cumplir la regla antes del piloto (recomendación documental — no implementado aquí):**
 
 1. Ocultar o marcar «Próximamente» **todos** los botones muertos de Settings.  
 2. Ocultar / flaggear / marcar módulos admin mock (production, routes, customers, accounting, menus, promotions, dashboard KPI).  
 3. Corregir o quitar enlaces Home Favoritos / Próxima entrega hasta que existan.  
-4. No iniciar EP-002…004 hasta que cocina/reparto lean **pedidos reales** (no `mock-admin`).
+4. No iniciar EP-002…004 hasta que cocina/reparto lean **pedidos reales** (no `mock-admin`).  
+5. No declarar **EatClean Pilot Ready** hasta que el gate de **cero humo** pase en las superficies del alcance del piloto.
 
 ---
 
@@ -360,8 +401,12 @@ Pregunta de éxito del piloto:
 
 > ¿Puede EatClean operar una semana **exclusivamente** con YourMeal OS y dejar evidencia FOPEBA?
 
-Con este baseline: **aún no** para la cara operativa.  
-Sí se puede preparar un **piloto acotado a EP-001** (pedido cliente) si se cierran las violaciones visibles del Customer App y hay menú/datos reales.
+Gate previo (esta acta):
+
+> ¿La superficie del piloto cumple **cero humo**?
+
+Con este baseline: **aún no** para la cara operativa, y **aún no** para cero humo en Customer App completo.  
+Sí se puede preparar un **piloto acotado a EP-001** (pedido cliente) **después** de eliminar el humo visible del Customer App (settings muertos + enlaces engañosos), con menú/datos reales.
 
 ---
 
