@@ -1,37 +1,59 @@
-# Capability Connection Pattern — biblioteca de patrones
+# Capability Connection Pattern
 
-Patrón repetible consolidado por CAP-002 / CAP-003.
+**Papel central:** toda Capability de Etapa 2 debe seguir este ciclo salvo justificación explícita.
 
 ```text
 Operational Model
         ↓
-Repository          (acceso a datos; sin inventar reglas)
+Repository
         ↓
-TanStack Query      (keys tenant-scoped · cache)
+TanStack Query / Command
         ↓
-Hook                (useX + useAuth.tenantId)
+Hook
         ↓
-UI existente        (sin rediseño)
+Existing UI (Presentation)
         ↓
-Capability Closure  (pre/postcondiciones · estado · Happy Path)
+Capability Closure (pre/post · Mock/Real · Happy Path)
 ```
 
-## Reglas
+Si una Capability **salta** este patrón, debe justificar por qué en el CAP doc (y, si implica regla nueva → STOP · Carril A).
 
-1. Un PR = una Capability = un nivel de cambio.  
-2. Solo lectura hasta que la CAP declare mutaciones.  
-3. STOP si hace falta una regla operacional nueva.  
-4. Reutilizar mappers/view contracts (`CatalogDish`) cuando el OM lo permita.  
+---
 
-## Ejemplos
+## Lectura (CAP-002 · CAP-003)
+
+```text
+OM → Repository → Query → Hook → UI
+```
 
 | CAP | Repository | Hook | UI |
 |-----|------------|------|-----|
 | CAP-002 | `DishRepository.listCatalog` | `useDishes` | DishCard |
 | CAP-003 | `WeeklyMenuRepository` | `useWeeklyMenu` | DayPicker + DishCard |
 
+---
+
+## Mutación (oficial desde CAP-004)
+
+Ver [MUTATION_PATTERN](./MUTATION_PATTERN.md).
+
+```text
+UI → Command → Application Service → Repository → Supabase
+  → auditService → audit_log → Query Invalidation → UI
+```
+
+La auditoría es **parte del flujo**, no un añadido al final.
+
+---
+
+## Reglas
+
+1. Un PR = una Capability = un [nivel de cambio](./PR_CHANGE_LEVELS.md).  
+2. STOP si hace falta una regla operacional nueva.  
+3. Sin «ya que estamos…».  
+4. Checklist: [PR_TECHNICAL_CHECKLIST](./PR_TECHNICAL_CHECKLIST.md).  
+
 ## Relacionado
 
 - [ADR 0013](../adr/0013-implementation-is-knowledge-materialization.md)  
-- [PR_TECHNICAL_CHECKLIST](./PR_TECHNICAL_CHECKLIST.md)  
-- [ETAPA_2_LEVELS](./ETAPA_2_LEVELS.md) (si está en la rama base)
+- [HAPPY_PATHS](./HAPPY_PATHS.md) · [ORR](./ORR.md)

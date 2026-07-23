@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Check } from "lucide-react";
 import {
@@ -10,17 +10,18 @@ import {
   SectionHeader,
 } from "@/components/consumer";
 import { useFmt } from "@/i18n/localization-provider";
-import { useDishes } from "@/hooks/use-dishes";
+import { useWeeklyMenu } from "@/hooks/use-weekly-menu";
+import { useProgramDraftOrder } from "@/hooks/use-program-draft-order";
+import { utcWeekDates, utcWeekStartMonday } from "@/modules/weekly-menu/application/week-dates";
 import { cn } from "@/lib/utils";
 
 /**
  * Screen: Customer · Schedule Weekly Order (3-step flow)
  * - Objetivo operacional: cerrar el pedido semanal antes del corte.
- * - Capability: orders.schedule (declarada; sin lógica de negocio en UI)
+ * - Capability: orders.write (program Draft — CAP-004)
  * - Core Object(s): Order · WeeklyMenu · Delivery
- * - CAP-002: step 2 meal picker uses useDishes() (real catalog; no persist yet)
- * NOTE (scaffold): mantiene estado local; NO persiste. Cuando exista OrderService
- * se conectará por Ports declarados en 14-application.
+ * - CAP-003: step 2 offers dishes from published menu day
+ * - CAP-004: step 3 persists Draft order + audit_log (no Confirm — CAP-006)
  */
 export const Route = createFileRoute("/_authenticated/app/schedule")({
   component: ScheduleFlow,
@@ -30,12 +31,15 @@ type Step = 1 | 2 | 3;
 
 function ScheduleFlow() {
   const { t } = useTranslation(["customer", "common"]);
+  const navigate = useNavigate();
   const [step, setStep] = useState<Step>(1);
   const [mealsPerDay, setMealsPerDay] = useState(2);
   const [deliveryDay, setDeliveryDay] = useState(0);
   const [selected, setSelected] = useState<string[]>([]);
   const fmt = useFmt();
-  const { data: catalogDishes = [] } = useDishes();
+  const weekStart = utcWeekStartMonday();
+  const { data: weeklyMenu } = useWeeklyMenu(weekStart);
+  const programDraft = useProgramDraftOrder();
 
   const days = [
     t("customer:dayMon"), t("customer:dayTue"), t("customer:dayWed"),
@@ -56,7 +60,22 @@ function ScheduleFlow() {
     t("customer:scheduleStep3"),
   ];
 
-  const total = selected.length * 990; // mock EUR cents
+  const offerDishes = weeklyMenu?.days[deliveryDay]?.dishes ?? [];
+  const dayDate = utcWeekDates(weekStart)[deliveryDay] ?? weekStart;
+  const totalCents = selected.length * 990; // scaffold display (existing)
+  const totalEur = totalCents / 100;
+
+  async function onProgramDraft() {
+    if (selected.length === 0 || programDraft.isPending) return;
+    await programDraft.mutateAsync({
+      weekStart,
+      dayDate,
+      dishIds: selected,
+      total: totalEur,
+      notes: `mealsPerDay=${mealsPerDay}`,
+    });
+    void navigate({ to: "/app" });
+  }
 
   return (
     <div className="flex-1 flex flex-col pb-4">
@@ -112,7 +131,7 @@ function ScheduleFlow() {
         <>
           <SectionHeader title={t("customer:chooseMeals")} />
           <div className="px-6 space-y-3">
-            {catalogDishes.map((d) => {
+            {offerDishes.map((d) => {
               const active = selected.includes(d.id);
               return (
                 <button
@@ -156,7 +175,7 @@ function ScheduleFlow() {
           <div className="bg-card border border-border rounded-2xl p-5 space-y-2">
             <Row
               label={t("customer:subtotal")}
-              value={fmt.currency(total / 100, { currency: "EUR" })}
+              value={fmt.currency(totalEur, { currency: "EUR" })}
             />
             <Row
               label={t("customer:deliveryFee")}
@@ -165,11 +184,16 @@ function ScheduleFlow() {
             <div className="border-t border-border pt-3 mt-1">
               <Row
                 label={t("customer:total")}
-                value={fmt.currency(total / 100, { currency: "EUR" })}
+                value={fmt.currency(totalEur, { currency: "EUR" })}
                 emphasis
               />
             </div>
           </div>
+          {programDraft.isError ? (
+            <p className="text-sm text-destructive" role="alert">
+              {(programDraft.error as Error)?.message ?? "Error"}
+            </p>
+          ) : null}
         </section>
       ) : null}
 
@@ -179,11 +203,14 @@ function ScheduleFlow() {
             {t("common:continue")}
           </PrimaryCTA>
         ) : (
-          <Link to="/app" className="block">
-            <PrimaryCTA disabled={selected.length === 0}>
-              {t("customer:confirmOrder")}
-            </PrimaryCTA>
-          </Link>
+          <PrimaryCTA
+            disabled={selected.length === 0 || programDraft.isPending}
+            onClick={() => {
+              void onProgramDraft();
+            }}
+          >
+            {t("customer:confirmOrder")}
+          </PrimaryCTA>
         )}
       </div>
     </div>

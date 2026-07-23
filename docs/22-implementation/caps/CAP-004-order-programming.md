@@ -1,55 +1,63 @@
-# CAP-004 — Order Programming
+# CAP-004 — Order Programming (primera mutación)
 
-**Estado:** Scaffold → Connected  
-**Depende de:** CAP-001…003 Connected  
+**Estado:** Scaffold → **Connected**  
+**Nivel PR:** Capability  
+**Patrón:** [MUTATION_PATTERN](../MUTATION_PATTERN.md)
 
 ---
 
 ## Preconditions
 
-- CAP-001 Auth Connected  
-- CAP-002 Dish Catalog Connected  
-- CAP-003 Weekly Menu Connected  
-- Usuario autenticado · tenant activo  
+- CAP-001…003 Connected  
+- Usuario autenticado · tenant · fila `customers` vinculada al user  
+- Oferta published (CAP-003) para seleccionar platos del día  
 
 ## Postconditions
 
-- Programación de pedido persistida en Supabase  
-- `audit_log` donde el OM lo exija  
-- Tenant / RBAC respetados  
-- Sin cambios UX del schedule  
+- Order `status = draft` + `order_items` en Supabase  
+- `audit_log` action `create` en el mismo flujo  
+- Invalidación de `orderKeys`  
+- Sin transición Confirm (CAP-006)  
+- Sin cambios UX/navegación del schedule  
 - Typecheck + tests limpios  
-- Happy Path: Parcial (hacia HP-001)  
+- Happy Path: Parcial  
 
 ---
 
-## Objetivo
+## Flujo
 
-Primera **mutación** real del Happy Path: conectar programación del pedido a persistencia — **sin** inventar reglas de confirmación (CAP-006).
+```text
+UI schedule step 3
+        ↓
+useProgramDraftOrder (Command)
+        ↓
+OrderService.programDraft
+        ↓
+OrderRepository.insertDraft
+        ↓
+Supabase
+        ↓
+AuditService.write → audit_log
+        ↓
+invalidateQueries(orders)
+        ↓
+navigate /app
+```
 
 ## Fuera de alcance
 
-Confirmación final · resumen (CAP-005) · UX nueva · stock/promos.
+Confirmación · CAP-005 summary redesign · historial · pricing OM nuevo · estados inventados.
 
 ## Traceability
 
 | Campo | Valor |
 |-------|-------|
-| Core | Order · Order Item · Weekly Menu |
-| OM | Order lifecycle (pre-confirm) |
+| Core | Order · Order Item · Weekly Menu · Dish |
+| OM | Order lifecycle — **Draft** (place/program) |
 | Mutaciones | Sí |
-| Mock / Real | ⏳ → ✅ |
+| Mock / Real | Real (persistencia) |
+| Audit | Sí |
 
 ## Checklist
 
 [PR_TECHNICAL_CHECKLIST](../PR_TECHNICAL_CHECKLIST.md) — sección mutaciones.
-
-## Prompt
-
-```text
-Implementar CAP-004 Order Programming.
-Primera mutación: persistir programación + audit si aplica.
-No modificar UX. No inventar confirmación (CAP-006).
-Tenant/RBAC. Typecheck + tests.
-Estado: Connected.
-```

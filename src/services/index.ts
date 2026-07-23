@@ -6,6 +6,7 @@
 export { AuditService } from "./audit-service";
 export { FeatureFlagService } from "./feature-flag-service";
 export { DishService } from "@/modules/dish-library/application/dish-service";
+export { OrderService } from "@/modules/orders/application/order-service";
 export {
   AccountingService,
   InventoryService,
