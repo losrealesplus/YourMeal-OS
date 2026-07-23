@@ -11,12 +11,12 @@ PROJECT STATE
 Documentary / SaaS identity: Closed (pending #25 → main)
 Engineering Phase: Complete (pending operational authorization)
 Current Phase:     Evidence Gate  (pre-ORR)  +  ORR Party/B2B/B2C
-Next Gate:         ORR  (PASSED | BLOCKED)  ·  [ORR_B2B_B2C_PARTY](./ORR_B2B_B2C_PARTY.md)
-Next Discipline:   Operational Readiness (no new modules until ORR)
-Primary Artifact:  ORR checklist + Field Evidence
-Focus operativo:   ¿Tres recorridos (Particular · Empresa staff · Empleado) E2E?
+Next Gate:         ORR  →  **G-02 · Pilot Readiness**  ·  [PILOT_ACCEPTANCE_CHECKLIST](./PILOT_ACCEPTANCE_CHECKLIST.md)
+Next Discipline:   Operational Readiness (no new modules until checklist + ORR)
+Primary Artifact:  [PILOT_ACCEPTANCE_CHECKLIST](./PILOT_ACCEPTANCE_CHECKLIST.md) + [ORR Party](./ORR_B2B_B2C_PARTY.md)
+Focus operativo:   ¿Operational Journey E2E (pedido → cocina → reparto → entregado)?
 Focus experiencia: ¿Mi madre podría pedir sin que nadie le explique la app?
-Completitud UI:    [Functional Completeness](./EATCLEAN_PILOT_FUNCTIONAL_COMPLETENESS_REVIEW.md) si existe · cero humo
+Completitud UI:    Checklist pantalla a pantalla · cero humo · [Functional Completeness](./EATCLEAN_PILOT_FUNCTIONAL_COMPLETENESS_REVIEW.md)
 Last Baseline:     v0.2.0-engineering-baseline (IR-001)
 
 ══════════════════════════════════════════════════
