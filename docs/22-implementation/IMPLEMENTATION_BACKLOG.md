@@ -1,8 +1,12 @@
 # Implementation Backlog — por Capability
 
+Escala módulo: [MODULE_STATE_CRITERIA](../00-status/MODULE_STATE_CRITERIA.md)  
+Niveles Etapa 2: [ETAPA_2_LEVELS](./ETAPA_2_LEVELS.md)  
+Cobertura: [KNOWLEDGE_COVERAGE](./KNOWLEDGE_COVERAGE.md)  
 Patrón lectura: [CAPABILITY_CONNECTION_PATTERN](./CAPABILITY_CONNECTION_PATTERN.md)  
 Patrón mutación: [MUTATION_PATTERN](./MUTATION_PATTERN.md)  
-Recorridos: [HAPPY_PATHS](./HAPPY_PATHS.md) · [ORR](./ORR.md) · [HP-001 Evidence](./HP-001_EVIDENCE_LOG.md)
+Recorridos: [HAPPY_PATHS](./HAPPY_PATHS.md) · [ORR](./ORR.md) · [HP-001 Evidence](./HP-001_EVIDENCE_LOG.md)  
+Checklist: [PR_TECHNICAL_CHECKLIST](./PR_TECHNICAL_CHECKLIST.md)
 
 | Mock | Real | Significado |
 |------|------|------------|
@@ -27,3 +31,9 @@ Recorridos: [HAPPY_PATHS](./HAPPY_PATHS.md) · [ORR](./ORR.md) · [HP-001 Eviden
 **Hito:** HP-001 sin mocks → ORR → Evidence Log → FOV.
 
 A partir de CAP-004: **ejecutar el patrón**, no añadir metodología nueva.
+
+---
+
+## Anti-métrica
+
+No medir por pantallas. Medir por CAP × Mock/Real × Happy Path × [Knowledge Coverage](./KNOWLEDGE_COVERAGE.md).
