@@ -6,6 +6,7 @@
 
 | Documento | Propósito |
 |-----------|-----------|
+| [**Project Dictionary**](./99-reference/PROJECT_DICTIONARY.md) | **Autoridad semántica** (`DICT-xxx` · Status · Madurez) — no se solapa con FOUNDATION / ADR / OM |
 | [Estado](./00-status/README.md) | Fase oficial — Antesala · dual track |
 | [Dual Track · Antesala](./00-status/DUAL_TRACK_ANTECAMARA.md) | Carril A (cerrar Etapa 1) · Carril B (UX/infra sin engines) |
 | [Product Blueprint](./15-product/README.md) | Qué construir y por qué |

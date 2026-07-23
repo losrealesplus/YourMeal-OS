@@ -100,14 +100,18 @@ Pregunta: ¿Hay evidencia para ORR? (no la siguiente Capability)
 Hito: ORR PASSED → Ready for FOV → FOV-001
 ```
 
+> **El Project Dictionary es la autoridad semántica.** Solo conceptos estables y **Accepted** (`DICT-xxx` · Status · Madurez).  
+> Ante un término: ¿concepto nuevo o sinónimo de uno existente? → reutilizar / discutir / solo entonces `DICT-xxx`.  
 > **Congelación funcional:** hasta que ORR emita PASSED \| BLOCKED, ningún commit modifica el comportamiento del producto — salvo bloqueo de Smoke, corrección imprescindible de HP-001, o docs de evidencia.  
+> **Foco:** abrir la app · Smoke HP-001 — no más estructura metodológica.  
 > Cursor no implementa funcionalidades nuevas. Conecta capacidades / produce evidencia.  
 > Regla nueva → **STOP** · `REQUIRES KNOWLEDGE REVIEW` · Carril A.  
 > Sin documentos metodológicos nuevos hasta FOV (gobernanza: Acta).  
 > Un PR · un nivel — sin «ya que estamos…».
 
 **Tablero:** [CURRENT_PHASE](./docs/00-status/CURRENT_PHASE.md) · [ENGINEERING_PHASE](./docs/00-status/ENGINEERING_PHASE.md)  
-**Siguiente:** merge PR #23 → migración → [SMOKE_HP-001](./docs/00-status/SMOKE_HP-001.md) → [ORR](./docs/22-implementation/ORR.md)  
+**Diccionario:** [PROJECT_DICTIONARY](./docs/99-reference/PROJECT_DICTIONARY.md) (`DICT-xxx`)  
+**Siguiente:** merge [#24](https://github.com/losrealesplus/YourMeal-OS/pull/24) → migración → [SMOKE_HP-001](./docs/00-status/SMOKE_HP-001.md) → [ORR](./docs/22-implementation/ORR.md)  
 **Pre-piloto:** [PRE_PILOT_AUDIT](./docs/00-status/PRE_PILOT_AUDIT.md)  
 
 **Cierre metodológico:** [Acta](./docs/00-status/ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md)  
