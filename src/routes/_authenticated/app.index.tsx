@@ -21,6 +21,7 @@ import {
   dishMacrosLine,
 } from "@/components/consumer";
 import { brandConfig } from "@/tenant/brand-config";
+import { TenantLogo } from "@/components/tenant/tenant-logo";
 import { useWeeklyMenu } from "@/hooks/use-weekly-menu";
 import { utcWeekStartMonday } from "@/modules/weekly-menu/application/week-dates";
 import dishPhoto from "@/assets/eatclean-hero.jpg";
