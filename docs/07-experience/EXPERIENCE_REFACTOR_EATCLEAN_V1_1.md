@@ -14,6 +14,8 @@ La hoja **no es un secreto**. Es un detalle de marca EatClean junto a “Powered
 
 La seguridad **no** vive en la interfaz: el icono solo abre otra pantalla. Sin credenciales válidas + RBAC, no hay acceso a nada.
 
+Regla canónica: [ADR 0014 · Administrative entry](../adr/0014-customer-application-is-tenant-branded.md#administrative-entry-regla-reutilizable).
+
 ## Qué
 
 1. Hoja de marca centrada sobre “Powered by” en Login cliente → `/auth/admin`
