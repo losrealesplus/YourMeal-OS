@@ -9,68 +9,73 @@ PROJECT STATE
 ══════════════════════════════════════════════════
 
 Current Phase:     Evidence Gate  (pre-ORR)
-Current Branch:    main  (IR-001) · Hardening = PR #23 ⏳
-Last Integration:  IR-001 · tag v0.2.0-engineering-baseline
 Next Gate:         ORR  (PASSED | BLOCKED)
-Current Objective: Evidencias — no más código de producto
+Current Objective: Producir evidencia — no escribir software nuevo
+Last Baseline:     v0.2.0-engineering-baseline (IR-001)
 
 ══════════════════════════════════════════════════
 ```
 
 ---
 
-## Implementación vs preparación operacional
+## Tres dominios
 
-| Estado | Resultado |
-|--------|-----------|
-| Ready for CAP-006 | ✅ |
-| CAP-006 Implemented | ✅ (código en `main` vía IR-001) |
-| Hardening P1 (código) | ✅ (PR #23) |
-| Hardening en `main` | ⏳ PR #23 merge |
-| Migración `program_draft_order` | ⏳ aplicar + verificar |
-| HP-001 Smoke (datos reales) | ⏳ pendiente |
-| HP-001 Operational | ⏳ pendiente de smoke |
-| ORR | ⏳ pendiente |
-| Ready for FOV | ⏳ **solo tras ORR PASSED** |
+| Dominio | Estado |
+|---------|--------|
+| **Knowledge Engineering** | ✅ Cerrado — FOPEBA v1 · OM · Governance · Methodology Closed |
+| **Software Engineering** | ✅ Implementación cerrada — ⏳ integrar PR #23 → `main` |
+| **Operational Engineering** | ⏳ **Aún no comienza** — empieza con FOV tras ORR PASSED |
 
-> CAP-006 **no** necesita más desarrollo. Necesita **demostración** (smoke) y **autorización** (ORR).
+La ORR **no** es una revisión de código. Esa revisión ya ocurrió en el Hardening Sprint.
+
+---
+
+## Ciclo (sin pasos intermedios)
+
+```text
+PR #23 → main
+        ↓
+Apply migration
+        ↓
+Smoke HP-001
+        ↓
+ORR → PASSED | BLOCKED
+        ↓
+Ready for FOV
+        ↓
+FOV-001 · Knowledge Update · Gate
+```
+
+| Evento | Estado |
+|--------|:------:|
+| PR #23 merge | ⏳ |
+| Migración `program_draft_order` | ⏳ |
+| Smoke HP-001 | ⏳ |
+| ORR | ⏳ |
+| Ready for FOV | ⏳ |
 
 ---
 
 ## Operational Confidence
 
-| Dimensión | Estado | Nota |
-|-----------|:------:|------|
-| Knowledge Confidence | 🟢 | FOPEBA Frozen · OM · Methodology Closed |
-| Engineering Confidence | 🟢 | Baseline + Hardening código · tests 59/59 · tsc limpio |
-| Operational Confidence | ⚪ | Solo tras smoke HP-001 + ORR PASSED + FOV |
+| Dimensión | Estado |
+|-----------|:------:|
+| Knowledge Confidence | 🟢 |
+| Engineering Confidence | 🟢 (código) · ⏳ (#23 en trunk) |
+| Operational Confidence | ⚪ |
 
 ---
 
-## Ciclo obligatorio (sin código nuevo)
+## CAP-006
 
-```text
-PR #23 → main
-        ↓
-Aplicar migración 20260723120000_program_draft_order_atomic.sql
-        ↓
-Smoke HP-001 (datos reales, sin mocks live)
-        ↓
-ORR  →  PASSED | BLOCKED
-        ↓
-Si PASSED: HP-001 Operational · Ready for FOV
-        ↓
-FOV · Knowledge Update · Gate
-```
+| Estado | Resultado |
+|--------|-----------|
+| Implementación | ✅ Completa |
+| Verificación (Smoke HP-001) | ⏳ |
+| Validación ORR | ⏳ |
 
-Checklist de evidencias ORR: [ORR](../22-implementation/ORR.md) · plantilla [HP-001_EVIDENCE_LOG](../22-implementation/HP-001_EVIDENCE_LOG.md).
+No más desarrollo. Solo demostración + autorización.
 
 ---
 
-## Hardening P1 (código)
-
-| ID | Grupo | Código |
-|----|-------|:------:|
-| INC-01…07 | Integrity + Completeness | ✅ en PR #23 |
-
-Detalle: [ENGINEERING_REVIEW_SPRINT0](./ENGINEERING_REVIEW_SPRINT0.md).
+Checklists: [SMOKE_HP-001](./SMOKE_HP-001.md) · [ORR](../22-implementation/ORR.md) · plantilla FOV [FOV-001](../30-field-validation/FOV-001_HP-001.md) (rellenar **solo** tras ORR PASSED).

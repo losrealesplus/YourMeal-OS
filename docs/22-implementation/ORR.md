@@ -1,14 +1,12 @@
 # Operational Readiness Review (ORR)
 
-**Cuándo:** tras CAP-006 y HP-001 ensamblado (sin mocks en el recorrido).  
-**Qué no es:** validación de negocio (FOV).  
-**Qué es:** una **puerta**, no un proceso.
+**Cuándo:** tras Hardening en `main` + migración + Smoke HP-001 ok.  
+**Qué no es:** revisión de código (eso fue el Hardening Sprint) · validación de negocio (FOV).  
+**Qué es:** una **puerta binaria** que autoriza observación en campo.
 
 ---
 
 ## Resultado (binario)
-
-La ORR solo puede terminar en:
 
 ```text
 PASSED
@@ -20,74 +18,80 @@ o
 BLOCKED
 ```
 
-No se usan estados intermedios («casi listo», «pendiente de…», «READY WITH GAPS»).
+Sin estados intermedios («casi listo», «READY WITH GAPS», etc.).
 
 | Veredicto | Significado |
 |-----------|-------------|
-| **PASSED** | HP-001 listo para cliente real → abrir Phase 3 FOV |
-| **BLOCKED** | Corregir gaps; no exponer a campo; no abrir FOV |
+| **PASSED** | HP-001 autorizado para cliente real → Phase 3 FOV |
+| **BLOCKED** | Corregir; no FOV; documentar causa en `ORR_HP-001.md` |
+
+---
+
+## Qué debe responder la ORR
+
+La ORR **no** pregunta «¿el código está bien?». Solo:
+
+1. ¿Existe **evidencia** de que HP-001 funciona extremo a extremo?  
+2. ¿La implementación **coincide** con el Operational Model?  
+3. ¿La instrumentación (auditoría, invalidación, persistencia) genera la **evidencia necesaria para FOV**?  
+4. ¿Existe algún **bloqueo conocido** que invalide la observación en campo?
+
+Si las cuatro son satisfactorias → **PASSED**. Si no → **BLOCKED**.
 
 ---
 
 ## Checklist de evidencias (pre-ORR)
 
-Marcar solo con evidencia verificable. La ORR **no** revisa implementación pendiente: revisa estas casillas.
-
 | Área | Evidencia | Estado |
 |------|-----------|:------:|
 | Ingeniería | PR #23 fusionado en `main` | ☐ |
 | Migraciones | RPC `program_draft_order` aplicada y verificada | ☐ |
-| Tests | Suite verde (p. ej. 59/59 en Hardening) | ☑ |
-| TypeScript | `tsc --noEmit` limpio | ☑ |
-| Happy Path | Smoke HP-001 exitoso (datos reales) | ☐ |
-| Auditoría | Eventos `create` + `status_change` en `audit_log` | ☐ |
-| Caché | Invalidación TanStack tras program / confirm | ☐ |
-| Mocks | Ausentes en flujo live HP-001 | ☑ (código Hardening) |
-| P1 | INC-01…07 cerrados | ☑ (código Hardening) |
-
-Si **todas** las ☐ pasan a ☑ **y** las cuatro preguntas fijas son «sí» → **PASSED**.  
-Si alguna falla → **BLOCKED** con causa documentada en `docs/00-status/ORR_HP-001.md`.
+| Tests | Suite verde | ☑ |
+| TypeScript | `tsc` limpio | ☑ |
+| Happy Path | [Smoke HP-001](../00-status/SMOKE_HP-001.md) exitoso | ☐ |
+| Auditoría | `create` + `status_change` en `audit_log` | ☐ |
+| Caché | Invalidación correcta post program/confirm | ☐ |
+| Mocks | Ausentes en flujo live | ☑ (Hardening) |
+| P1 | INC-01…07 cerrados | ☑ (Hardening) |
 
 ---
 
-## Preguntas fijas (todas deben ser «sí» para PASSED)
+## Acta ORR — sección FOV Scope (obligatoria al cerrar PASSED)
 
-### Arquitectura
+Incluir en `docs/00-status/ORR_HP-001.md`:
 
-* ¿CAP-001…006 del Happy Path están Connected y el recorrido E2E es operable?
+```text
+FOV Scope
 
-### Ingeniería
+Capability:
+HP-001
 
-* ¿Quedan **mocks** en HP-001? → si sí, **BLOCKED**
+Operational Scenario:
+Programación de un pedido semanal por un cliente real.
 
-### Conocimiento
+Success Criteria:
+El pedido se completa sin intervención manual y genera evidencia
+suficiente para observación operacional.
 
-* ¿Apareció alguna **regla no prevista** por el OM? → si sí, **BLOCKED** (Carril A)
+Observation Targets:
+- Comportamiento del usuario
+- Fricciones del flujo
+- Reglas operacionales no modeladas
+- Incidencias
+- Knowledge Leakage
+```
 
-### Operación
-
-* ¿Listo para cliente real **sin** intervención manual de ingeniería?
-
-Si **alguna** respuesta es «no» → **BLOCKED**.
-
----
-
-## Checklist de apoyo
-
-1. Trazabilidad OM → Repository → Query/Command → Hook → UI  
-2. Mutaciones con `audit_log`  
-3. Tenant / RLS / RBAC E2E  
-4. Product Skeleton sin UX/navegación alterada  
+La ORR **autoriza** la observación y deja explícito **qué se va a observar**.
 
 ---
 
 ## Tras PASSED
 
-Abrir **Phase 3 — Field Operational Validation (FOV)**.  
-Evidencia: [HP-001_EVIDENCE_LOG](./HP-001_EVIDENCE_LOG.md).  
-Acta de ejecución: `docs/00-status/ORR_HP-001.md` (crear solo al ejecutar).
+1. Declarar: HP-001 Operational · Ready for FOV  
+2. Abrir / rellenar [FOV-001_HP-001](../30-field-validation/FOV-001_HP-001.md)  
+3. Evidence se recoge en FOV; **decisiones** solo en el Gate (no durante FOV)
 
 ## Relacionado
 
-- [Acta cierre metodológico](../00-status/ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md)  
-- [HAPPY_PATHS](./HAPPY_PATHS.md) · [FOV Mission Brief](../00-status/FOV_MISSION_BRIEF.md)
+- [SMOKE_HP-001](../00-status/SMOKE_HP-001.md) · [HAPPY_PATHS](./HAPPY_PATHS.md)  
+- [Acta metodología](../00-status/ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) · [FOV Mission Brief](../00-status/FOV_MISSION_BRIEF.md)

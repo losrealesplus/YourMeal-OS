@@ -1,45 +1,46 @@
-# SMOKE_HP-001 — checklist de demostración
+# SMOKE_HP-001 — evidencia de demostración
 
 **No es desarrollo.** Es evidencia para ORR.  
-Ejecutar **después** de: PR #23 en `main` + migración `program_draft_order` aplicada.
+**Precondiciones:** PR #23 en `main` + migración `program_draft_order` aplicada.
+
+Si **cualquier** paso falla → sigue siendo **bloqueo de ORR**, no fallo de FOV.
 
 ---
 
-## Recorrido producto
+## Recorridos
 
 ```text
-Login → Dish → Weekly Menu → Program Order → Summary → Confirm
-```
-
-## Recorrido técnico
-
-```text
-Draft → Confirm → Persist → Audit → Invalidate → Confirmed
+Producto:  Login → Dish → Weekly Menu → Program Order → Summary → Confirm
+Técnico:   Draft → Confirm → Persist → Audit → Invalidate → Confirmed
 ```
 
 ---
 
-## Pasos
+## Evidencia mínima (responder con hechos)
 
-| # | Paso | Esperado | ☐ |
-|---|------|----------|:-:|
-| 1 | Login customer + tenant activo | Sesión + `tenantId` | ☐ |
-| 2 | Catálogo Dish (lectura real) | Platos reales, no mocks | ☐ |
-| 3 | Weekly Menu published del día | Oferta real | ☐ |
-| 4 | Program Draft (schedule) | Order `draft` + items; `total` servidor | ☐ |
-| 5 | Summary `/app/orders/$id` | Datos reales del pedido | ☐ |
-| 6 | Confirm CTA | `status=confirmed` | ☐ |
-| 7 | `audit_log` | `create` + `status_change` | ☐ |
-| 8 | Invalid invalidation | UI refleja confirmed (sin CTA Confirm) | ☐ |
-| 9 | Ownership / tenant | Sin cruce de pedidos ajenos | ☐ |
-| 10 | Sin mocks en flujo live | Home/orders list sin MOCK_ORDERS | ☐ |
+| Paso | Evidencia esperada | ☐ / ref |
+|------|--------------------|---------|
+| Login | Usuario autenticado (+ tenant activo) | ☐ |
+| Weekly Menu | Menú published cargado correctamente | ☐ |
+| Program Order | Draft creado (order + items) | ☐ |
+| Summary | Totales calculados por **servidor** (no cliente) | ☐ |
+| Confirm | Confirmación aceptada (`status=confirmed`) | ☐ |
+| Persist | Pedido almacenado en BD | ☐ |
+| Audit | Evento(s) en `audit_log` (`create` + `status_change`) | ☐ |
+| Invalidate | UI actualizada sin inconsistencias (sin CTA Confirm) | ☐ |
 
-**Resultado smoke:** ok · parcial · fallo  
-
-**Commit / tag:**  
-
-**Notas:**  
+Complemento: Dish lectura real · sin mocks en flujo live · ownership/tenant coherente.
 
 ---
 
-Tras smoke **ok** → ejecutar [ORR](../22-implementation/ORR.md) y crear `ORR_HP-001.md` solo al cerrar.
+## Resultado
+
+```text
+Resultado smoke:  ok | parcial | fallo
+Commit / tag:
+Fecha:
+Ejecutor:
+Notas:
+```
+
+Tras smoke **ok** → [ORR](../22-implementation/ORR.md) · acta `ORR_HP-001.md` solo al cerrar.
