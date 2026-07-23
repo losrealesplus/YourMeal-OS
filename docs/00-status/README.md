@@ -1,33 +1,41 @@
 # Estado del proyecto
 
 **Última actualización:** 2026-07-23  
-**Hito:** [Methodology Frozen](./04-methodology-frozen.md) 🧊 · OM **Table-Validated**  
-**Product Skeleton:** ✅ UX materializada (Lovable)  
-**Cursor ahora:** ingeniero de **conexión** — [22-implementation](../22-implementation/README.md)
+**Objetivo (desde CAP-002):** demostrar que FOPEBA puede producir software operacional de alta calidad.  
+**Cadena:** Observation → Discovery → Model → Validation → IOV → Product Skeleton → **Connected Capabilities (L1→L2)** → Workflow (L3) → FOV (L4) → KU → G-01
 
-> Cursor no implementa funcionalidades.  
-> Cursor implementa **capacidades previamente certificadas**.
+> El software es una implementación del conocimiento. Nunca su origen.  
+> [ADR 0013](../adr/0013-implementation-is-knowledge-materialization.md)
 
 ---
 
-## Evaluación
+## Auditoría
+
+### Carril A
+
+| Fase | Estado |
+|------|--------|
+| Foundation · Blueprint · Discovery · Checks | ✅ |
+| Operational Model | ✅ Table-Validated |
+| Operational Validation · IOV | ✅ |
+| FOV · KU · EC · G-01 | ⏳ |
+
+### Carril B — Etapa 2 Levels
+
+| Level | Nombre | Estado |
+|-------|--------|--------|
+| L1 | Infrastructure Connection | ✅ CAP-001 Connected |
+| L2 | Capability Connection | ▶️ CAP-002 lectura siguiente |
+| L3 | Operational Workflow | ⏳ |
+| L4 | Operational Verification | ⏳ |
 
 | Área | Estado |
 |------|--------|
-| Operational Model | ✅ Table-Validated |
-| Customer / Admin / Production / Delivery / DS | ✅ Product Skeleton |
-| UX Foundation | ✅ |
-| Business Logic | 🔒 Solo capacidades certificadas |
-| Happy Path E2E connected | ⏳ [Siguiente](../22-implementation/HAPPY_PATH_E2E.md) |
+| IA · Product Skeleton · Apps · DS | ✅ |
+| Cursor Rules · Backlog · CAP Framework · ADR 0013 | ✅ |
+| **Hito:** Happy Path sin mocks | ⏳ |
 
----
-
-## Dual track
-
-| Carril | Estado | Foco |
-|--------|--------|------|
-| **A** FOV…G-01 | ⏳ | Evidencia empírica |
-| **B** Producto | 🟢 Skeleton listo → **conectar** | [IMPLEMENTATION_RULES](../22-implementation/IMPLEMENTATION_RULES.md) |
+Detalle: [ETAPA_2_LEVELS](../22-implementation/ETAPA_2_LEVELS.md) · [KNOWLEDGE_COVERAGE](../22-implementation/KNOWLEDGE_COVERAGE.md)
 
 ---
 
@@ -35,24 +43,21 @@
 
 | Herramienta | Rol |
 |-------------|-----|
-| **FOPEBA** | Certifica conocimiento |
-| **Lovable** | Materializó UX y estructura — **no más infraestructura** |
-| **Cursor** | Implementa ingeniería ([Master Prompt](../22-implementation/CURSOR_MASTER_PROMPT.md)) |
-| **GitHub** | Conserva historia y evidencia |
+| FOPEBA | Qué sabe el sistema |
+| Lovable | Cómo se ve (skeleton; sin más infra) |
+| Cursor | Cómo funciona técnicamente |
+| GitHub | Historia y evidencia ([PR levels](../22-implementation/PR_CHANGE_LEVELS.md)) |
 
 ---
 
-## Siguiente (Cursor)
+## Siguiente
 
 1. [CURSOR_MASTER_PROMPT](../22-implementation/CURSOR_MASTER_PROMPT.md)  
-2. **[CAP-002 Dish Catalog](../22-implementation/caps/CAP-002-dish-catalog.md)**  
-3. CAP-003…007 · [Happy Path E2E](../22-implementation/HAPPY_PATH_E2E.md)
-
-Filosofía: [23-engineering](../23-engineering/IMPLEMENTATION_PHILOSOPHY.md).
+2. **[CAP-002 — solo lectura](../22-implementation/caps/CAP-002-dish-catalog.md)** — Level 2 · un PR Capability  
+3. Rumbo al **[Happy Path sin mocks](../22-implementation/HAPPY_PATH_E2E.md)**  
 
 ---
 
 ## Índices
 
-- [22 Implementation](../22-implementation/README.md) · [caps](../22-implementation/caps/README.md)  
-- [MODULE_STATE_CRITERIA](./MODULE_STATE_CRITERIA.md) · [FOV Brief](./FOV_MISSION_BRIEF.md) · [Dual Track](./DUAL_TRACK_ANTECAMARA.md)
+[22 Implementation](../22-implementation/README.md) · [Etapa 2 Levels](../22-implementation/ETAPA_2_LEVELS.md) · [PR Change Levels](../22-implementation/PR_CHANGE_LEVELS.md) · [Philosophy](../23-engineering/IMPLEMENTATION_PHILOSOPHY.md) · [FOV Brief](./FOV_MISSION_BRIEF.md)
