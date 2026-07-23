@@ -44,15 +44,13 @@ FASE C Product Eng.  🔓 Carril B parcial · 🔒 G-01 pleno / Fase D
 
 ## Arranque Carril B
 
+**Foundation de Producto en curso.** Siguiente: [PM-001](../21-product-materialization/PM-001-Customer-App.md).
+
 ```text
-OM → IA → Lovable → UX iter · Código
+OM → IA → Lovable (PM-001…005) → UX · Código
 ```
 
-1. [Product Information Architecture](../15-product/PRODUCT_INFORMATION_ARCHITECTURE.md)  
-2. [21 Product Materialization](../21-product-materialization/README.md) (matriz · Lovable Brief)  
-3. [Sprint 2.1](../15-product/etapa-2/SPRINT_2_1_PRODUCT_FOUNDATION.md)
-
-**Lovable** principal · **Figma** apoyo. No improvisar pantallas.
+Índice: [21 Product Materialization](../21-product-materialization/README.md) · [Sprints](../15-product/etapa-2/SPRINTS.md)
 
 ---
 

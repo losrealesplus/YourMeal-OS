@@ -53,11 +53,11 @@ Separación de responsabilidades:
 
 ## Orden de arranque
 
-1. [Product Information Architecture](../PRODUCT_INFORMATION_ARCHITECTURE.md) — Actor → Objetivos → Capacidades → Pantallas  
-2. [Matriz pantalla↔conocimiento](../../21-product-materialization/01-screen-knowledge-matrix.md)  
-3. [Sprint 2.1](./SPRINT_2_1_PRODUCT_FOUNDATION.md) + [Lovable Brief](../../21-product-materialization/02-lovable-brief.md)  
-4. Iterar en Lovable · sync repo  
-5. Fase C selectiva con trazabilidad  
+1. [IA](../PRODUCT_INFORMATION_ARCHITECTURE.md)  
+2. [Matriz](../../21-product-materialization/01-screen-knowledge-matrix.md)  
+3. **[PM-001](../../21-product-materialization/PM-001-Customer-App.md)** ← siguiente Lovable  
+4. PM-002…005 ([SPRINTS](./SPRINTS.md))  
+5. Fase C selectiva + [Knowledge Traceability](./knowledge-traceability.md)
 
 ---
 
