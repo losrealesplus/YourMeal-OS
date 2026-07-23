@@ -1,36 +1,28 @@
 # CAP-006 — Order Confirmation
 
-**Estado:** Connected → **Operational** (Happy Path)  
-**Depende de:** CAP-005  
-**Puente FOV:** [HAPPY_PATH_E2E](../HAPPY_PATH_E2E.md)
+**Estado:** Scaffold → **Operational** (cierra HP-001)  
+**OM:** `docs/17-operational-model/04-lifecycles/spine-transitions.md` — Draft → Confirmed  
 
 ---
 
-## Objetivo
+## Preconditions
 
-Confirmar pedido con persistencia real + `audit_log`. Citar lifecycle OM de confirmación. Sin mocks.
+- CAP-001…005 Connected  
+- Order Draft existente  
 
-## No modificar
+## Postconditions
 
-UX de confirmación · navegación.
+- `status: confirmed` persistido  
+- `audit_log` action `status_change`  
+- Invalidación de queries · UI sin CTA Confirm si ya confirmado  
+- Sin notificaciones / emails / integraciones  
 
-## Traceability
-
-| Campo | Valor |
-|-------|-------|
-| Core | Order |
-| OM | Order Lifecycle · Confirm |
-| Infra | Supabase · auditService · RLS |
-
-## Prompt
+## Flujo
 
 ```text
-Implementar CAP-006 Order Confirmation.
-No modificar UX ni componentes.
-Persistir Order en Supabase con RLS.
-Emitir audit_log (Who/What/When/Old/New/Tenant).
-Citar referencia OM del lifecycle Confirm.
-Sin mocks. Typecheck limpio. Formato de cierre oficial.
-Estado objetivo: Operational (Happy Path).
-Si falta una regla en el OM: DETENER · REQUIRES KNOWLEDGE REVIEW.
+Draft → Confirm → Persist → Audit → Invalidate → Estado confirmado
 ```
+
+## Fuera de alcance
+
+Notificaciones · correos · CAP-007 · UX nueva · reglas OM nuevas.

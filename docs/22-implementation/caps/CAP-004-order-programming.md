@@ -1,32 +1,63 @@
-# CAP-004 — Order Programming
+# CAP-004 — Order Programming (primera mutación)
 
-**Estado:** Scaffold → Connected  
-**Depende de:** CAP-003
+**Estado:** Scaffold → **Connected**  
+**Nivel PR:** Capability  
+**Patrón:** [MUTATION_PATTERN](../MUTATION_PATTERN.md)
 
 ---
 
-## Objetivo
+## Preconditions
 
-Conectar programación del pedido (selección semanal) a estado/persistencia preparatoria — **sin** inventar reglas de confirmación (eso es CAP-006).
+- CAP-001…003 Connected  
+- Usuario autenticado · tenant · fila `customers` vinculada al user  
+- Oferta published (CAP-003) para seleccionar platos del día  
 
-## No modificar
+## Postconditions
 
-UX del flujo de programación · navegación.
+- Order `status = draft` + `order_items` en Supabase  
+- `audit_log` action `create` en el mismo flujo  
+- Invalidación de `orderKeys`  
+- Sin transición Confirm (CAP-006)  
+- Sin cambios UX/navegación del schedule  
+- Typecheck + tests limpios  
+- Happy Path: Parcial  
+
+---
+
+## Flujo
+
+```text
+UI schedule step 3
+        ↓
+useProgramDraftOrder (Command)
+        ↓
+OrderService.programDraft
+        ↓
+OrderRepository.insertDraft
+        ↓
+Supabase
+        ↓
+AuditService.write → audit_log
+        ↓
+invalidateQueries(orders)
+        ↓
+navigate /app
+```
+
+## Fuera de alcance
+
+Confirmación · CAP-005 summary redesign · historial · pricing OM nuevo · estados inventados.
 
 ## Traceability
 
 | Campo | Valor |
 |-------|-------|
-| Core | Order · Order Item · Menu |
-| OM | Order lifecycle (pre-confirm) |
+| Core | Order · Order Item · Weekly Menu · Dish |
+| OM | Order lifecycle — **Draft** (place/program) |
+| Mutaciones | Sí |
+| Mock / Real | Real (persistencia) |
+| Audit | Sí |
 
-## Prompt
+## Checklist
 
-```text
-Implementar CAP-004 Order Programming.
-No modificar UX ni componentes.
-Solo conectar estado/datos reales para programar el pedido.
-No inventar reglas de confirmación (CAP-006).
-Typecheck limpio. Formato de cierre oficial.
-Estado objetivo: Connected.
-```
+[PR_TECHNICAL_CHECKLIST](../PR_TECHNICAL_CHECKLIST.md) — sección mutaciones.
