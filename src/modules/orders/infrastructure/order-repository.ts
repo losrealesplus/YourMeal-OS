@@ -70,6 +70,29 @@ export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
 
       return { order: order as OrderRow, items: (items ?? []) as OrderItemRow[] };
     },
+
+    async findByIdWithItems(
+      orderId: string,
+    ): Promise<{ order: OrderRow; items: OrderItemRow[] } | null> {
+      const { data: order, error: orderError } = await supabase
+        .from("orders")
+        .select("*")
+        .eq("tenant_id", tenantId)
+        .eq("id", orderId)
+        .maybeSingle();
+      if (orderError) throw orderError;
+      if (!order) return null;
+
+      const { data: items, error: itemsError } = await supabase
+        .from("order_items")
+        .select("*")
+        .eq("tenant_id", tenantId)
+        .eq("order_id", orderId)
+        .order("day_date", { ascending: true });
+      if (itemsError) throw itemsError;
+
+      return { order: order as OrderRow, items: (items ?? []) as OrderItemRow[] };
+    },
   };
 }
 

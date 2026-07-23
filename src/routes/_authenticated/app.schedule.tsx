@@ -67,13 +67,16 @@ function ScheduleFlow() {
 
   async function onProgramDraft() {
     if (selected.length === 0 || programDraft.isPending) return;
-    await programDraft.mutateAsync({
+    const result = await programDraft.mutateAsync({
       weekStart,
       dayDate,
       dishIds: selected,
       total: totalEur,
     });
-    void navigate({ to: "/app" });
+    void navigate({
+      to: "/app/orders/$orderId",
+      params: { orderId: result.order.id },
+    });
   }
 
   return (

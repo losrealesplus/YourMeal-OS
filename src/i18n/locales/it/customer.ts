@@ -50,6 +50,7 @@ export default {
   tagLactoseFree: "Senza lattosio",
   tagSpicy: "Piccante",
   statusPending: "In attesa",
+  statusDraft: "Bozza",
   statusPreparing: "In preparazione",
   statusDispatched: "In consegna",
   statusDelivered: "Consegnato",

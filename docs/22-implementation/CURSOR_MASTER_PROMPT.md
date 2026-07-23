@@ -133,8 +133,8 @@ CAP-001 Auth & User Context     → Connected (mantener)
 CAP-002 Dish Catalog            → Connected (lectura)
 CAP-003 Weekly Menu             → Connected (lectura)
 CAP-004 Order Programming       → Connected (mutación + audit)
-CAP-005 Order Summary           → siguiente
-CAP-006 Order Confirmation
+CAP-005 Order Summary           → Connected (lectura resumen)
+CAP-006 Order Confirmation      → siguiente
 CAP-007 Order History
 
 Posteriormente: Production · Delivery · Admin Suite

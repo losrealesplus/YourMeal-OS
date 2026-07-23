@@ -94,15 +94,18 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-FOPEBA Frozen 🧊 · OM Table-Validated · Product Skeleton ✅
-Lovable = UX (relevo infra cerrado) · Cursor = conectar CAP-00x
+Metodología cerrada · FOPEBA Frozen 🧊 · Materialización HP-001
+Pregunta: ¿Cuál es la siguiente Capability? (no la siguiente regla)
+Hito: HP-001 · Operational · ORR Passed · Ready for FOV
 ```
 
 > Cursor no implementa funcionalidades. Conecta **capacidades** certificadas.  
-> Regla nueva → **STOP** · `REQUIRES KNOWLEDGE REVIEW` · Carril A.
+> Regla nueva → **STOP** · `REQUIRES KNOWLEDGE REVIEW` · Carril A.  
+> Sin documentos metodológicos nuevos hasta FOV.
 
-**Contexto permanente:** [CURSOR_MASTER_PROMPT](./docs/22-implementation/CURSOR_MASTER_PROMPT.md)  
-**Siguiente tarea:** [CAP-002 Dish Catalog](./docs/22-implementation/caps/CAP-002-dish-catalog.md)  
+**Contexto:** [CURSOR_MASTER_PROMPT](./docs/22-implementation/CURSOR_MASTER_PROMPT.md)  
+**Siguiente:** [CAP-006 Order Confirmation](./docs/22-implementation/caps/CAP-006-order-confirmation.md)  
+**Cierre metodológico:** [05-methodology-construction-closed](./docs/00-status/05-methodology-construction-closed.md)  
 **Filosofía:** [IMPLEMENTATION_PHILOSOPHY](./docs/23-engineering/IMPLEMENTATION_PHILOSOPHY.md)
 
 | Herramienta | Rol |

@@ -1,58 +1,33 @@
 # Estado del proyecto
 
 **Última actualización:** 2026-07-23  
-**Hito:** [Methodology Frozen](./04-methodology-frozen.md) 🧊 · OM **Table-Validated**  
-**Product Skeleton:** ✅ UX materializada (Lovable)  
-**Cursor ahora:** ingeniero de **conexión** — [22-implementation](../22-implementation/README.md)
+**Fase metodológica:** [cerrada](./05-methodology-construction-closed.md)  
+**Hito operativo:** `HP-001 · Operational · ORR Passed · Ready for FOV` (en curso)
 
-> Cursor no implementa funcionalidades.  
-> Cursor implementa **capacidades previamente certificadas**.
+> Pregunta: **¿Cuál es la siguiente Capability?** — no la siguiente regla.
 
 ---
 
-## Evaluación
+## Carril B — HP-001
 
-| Área | Estado |
-|------|--------|
-| Operational Model | ✅ Table-Validated |
-| Customer / Admin / Production / Delivery / DS | ✅ Product Skeleton |
-| UX Foundation | ✅ |
-| Business Logic | 🔒 Solo capacidades certificadas |
-| Happy Path E2E connected | ⏳ [Siguiente](../22-implementation/HAPPY_PATH_E2E.md) |
+| CAP | Mock | Real | Estado | Happy Path |
+|-----|------|------|--------|------------|
+| CAP-001 Auth | — | ✅ | Connected | ✔ |
+| CAP-002 Dish | ❌ | ✅ | Connected | Parcial |
+| CAP-003 Menu | ❌ | ✅ | Connected | Parcial |
+| CAP-004 Program | ❌ | ✅ | Connected | Parcial |
+| CAP-005 Summary | ❌ | ✅ | Connected | Parcial |
+| CAP-006 Confirm | ⏳ | ⏳ | Scaffold | ✖ |
+| CAP-007 History | ⏳ | ⏳ | Scaffold | ✖ |
 
----
-
-## Dual track
-
-| Carril | Estado | Foco |
-|--------|--------|------|
-| **A** FOV…G-01 | ⏳ | Evidencia empírica |
-| **B** Producto | 🟢 Skeleton listo → **conectar** | [IMPLEMENTATION_RULES](../22-implementation/IMPLEMENTATION_RULES.md) |
+**Siguiente:** [CAP-006](../22-implementation/caps/CAP-006-order-confirmation.md) → [ORR](../22-implementation/ORR.md) (sin features).
 
 ---
 
-## Roles
+## Carril A
 
-| Herramienta | Rol |
-|-------------|-----|
-| **FOPEBA** | Certifica conocimiento |
-| **Lovable** | Materializó UX y estructura — **no más infraestructura** |
-| **Cursor** | Implementa ingeniería ([Master Prompt](../22-implementation/CURSOR_MASTER_PROMPT.md)) |
-| **GitHub** | Conserva historia y evidencia |
-
----
-
-## Siguiente (Cursor)
-
-1. [CURSOR_MASTER_PROMPT](../22-implementation/CURSOR_MASTER_PROMPT.md)  
-2. **[CAP-002 Dish Catalog](../22-implementation/caps/CAP-002-dish-catalog.md)**  
-3. CAP-003…007 · [Happy Path E2E](../22-implementation/HAPPY_PATH_E2E.md)
-
-Filosofía: [23-engineering](../23-engineering/IMPLEMENTATION_PHILOSOPHY.md).
-
----
+FOV · KU · EC · G-01 — tras ORR Passed.
 
 ## Índices
 
-- [22 Implementation](../22-implementation/README.md) · [caps](../22-implementation/caps/README.md)  
-- [MODULE_STATE_CRITERIA](./MODULE_STATE_CRITERIA.md) · [FOV Brief](./FOV_MISSION_BRIEF.md) · [Dual Track](./DUAL_TRACK_ANTECAMARA.md)
+[22 Implementation](../22-implementation/README.md) · [Freeze](./04-methodology-frozen.md) · [FOV Brief](./FOV_MISSION_BRIEF.md)

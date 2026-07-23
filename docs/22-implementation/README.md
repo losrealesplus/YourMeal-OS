@@ -16,9 +16,11 @@
 
 ## Siguiente
 
-**[CAP-005 Order Summary](./caps/CAP-005-order-summary.md)** → CAP-006 → ORR → Evidence Log → FOV.
+**[CAP-006 Order Confirmation](./caps/CAP-006-order-confirmation.md)** → **ORR** → FOV.
 
 | CAP | Estado |
 |-----|--------|
-| 001–004 | Connected |
-| 005–007 | Scaffold |
+| 001–005 | Connected |
+| 006–007 | Scaffold |
+
+Fase metodológica: [cerrada](../00-status/05-methodology-construction-closed.md).
