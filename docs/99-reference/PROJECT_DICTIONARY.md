@@ -186,6 +186,10 @@ Core | Operational | Engineering | Historical
 | `DICT-066` | [Delivery Group](#delivery-group) | Operational | Accepted |
 | `DICT-067` | [Company Code](#company-code) | Engineering | Accepted |
 | `DICT-068` | [Party](#party) | Core | Accepted |
+| `DICT-057` | [Knowledge Lifetime](#knowledge-lifetime) | Core | Accepted |
+| `DICT-060` | [Tenant Brand](#tenant-brand) | Operational | Accepted |
+| `DICT-061` | [brand.manage](#brandmanage) | Engineering | Accepted |
+| `DICT-062` | [Tenant-Managed](#tenant-managed) | Core | Accepted |
 
 ---
 
@@ -193,7 +197,7 @@ Core | Operational | Engineering | Historical
 
 ### Metodología
 
-[FOPEBA](#fopeba) (`DICT-001`) · [FOV](#fov) (`DICT-002`) · [IOV](#iov) (`DICT-003`) · [Knowledge Update](#knowledge-update) (`DICT-004`) · [Gate](#gate) (`DICT-005`) · [Evidence](#evidence) (`DICT-006`) · [Knowledge Leakage](#knowledge-leakage) (`DICT-007`) · [Operational Model](#operational-model) (`DICT-008`) · [Table Validation](#table-validation) (`DICT-009`) · [Field Validation](#field-validation) (`DICT-010`)
+[FOPEBA](#fopeba) (`DICT-001`) · [FOV](#fov) (`DICT-002`) · [IOV](#iov) (`DICT-003`) · [Knowledge Update](#knowledge-update) (`DICT-004`) · [Gate](#gate) (`DICT-005`) · [Evidence](#evidence) (`DICT-006`) · [Knowledge Leakage](#knowledge-leakage) (`DICT-007`) · [Operational Model](#operational-model) (`DICT-008`) · [Table Validation](#table-validation) (`DICT-009`) · [Field Validation](#field-validation) (`DICT-010`) · [Knowledge Lifetime](#knowledge-lifetime) (`DICT-057`)
 
 ### Ingeniería
 
@@ -217,7 +221,7 @@ Core | Operational | Engineering | Historical
 
 ### Identidad SaaS (ADR 0014)
 
-[Customer Application](#customer-application) (`DICT-045`) · [YourMeal OS (Corporate Surface)](#yourmeal-os-corporate-surface) (`DICT-046`) · [BrandConfig](#brandconfig) (`DICT-047`) · [Tenant-Branded](#tenant-branded) (`DICT-048`) · [Powered by YourMeal OS](#powered-by-yourmeal-os) (`DICT-049`) · [Platform owns capability / Tenant owns experience](#platform-owns-capability--tenant-owns-experience) (`DICT-050`) · [Tenant Experience Spec](#tenant-experience-spec) (`DICT-051`) · [Tenant Assets](#tenant-assets) (`DICT-052`) · [Experience First](#experience-first) (`DICT-053`) · [Customer Journey](#customer-journey) (`DICT-054`) · [Experience Domain](#experience-domain) (`DICT-055`) · [Screen (SCR)](#screen-scr) (`DICT-056`)
+[Customer Application](#customer-application) (`DICT-045`) · [YourMeal OS (Corporate Surface)](#yourmeal-os-corporate-surface) (`DICT-046`) · [BrandConfig](#brandconfig) (`DICT-047`) · [Tenant-Branded](#tenant-branded) (`DICT-048`) · [Powered by YourMeal OS](#powered-by-yourmeal-os) (`DICT-049`) · [Platform owns capability / Tenant owns experience](#platform-owns-capability--tenant-owns-experience) (`DICT-050`) · [Tenant Experience Spec](#tenant-experience-spec) (`DICT-051`) · [Tenant Assets](#tenant-assets) (`DICT-052`) · [Experience First](#experience-first) (`DICT-053`) · [Customer Journey](#customer-journey) (`DICT-054`) · [Experience Domain](#experience-domain) (`DICT-055`) · [Screen (SCR)](#screen-scr) (`DICT-056`) · [Knowledge Lifetime](#knowledge-lifetime) (`DICT-057`) · [Tenant Brand](#tenant-brand) (`DICT-060`) · [brand.manage](#brandmanage) (`DICT-061`) · [Tenant-Managed](#tenant-managed) (`DICT-062`)
 
 ---
 
@@ -2698,6 +2702,10 @@ Company Account · Employee Membership
 
 ## ID
 DICT-068
+# Knowledge Lifetime
+
+## ID
+DICT-057
 
 ## Status
 Accepted
@@ -2740,6 +2748,164 @@ Individual Customer · Company Account · Membership · Consumer · Beneficiary
 
 ## Referencias
 [ADR 0016](../adr/0016-party-model-demand-actors.md) · [actors.md](../17-operational-model/01-ubiquitous-language/actors.md)
+Knowledge Lifetime
+
+## Tipo
+Regla metodológica de documentación (FOPEBA)
+
+## Definición
+Disciplina que clasifica cada documento en exactamente un nivel de caducidad:
+
+| Nivel | Propósito | Cambia |
+|-------|-----------|--------|
+| **Contract** | Reglas permanentes | Muy raramente |
+| **Implementation** | Cómo un producto/tenant aplica el contrato | Con la evolución del producto |
+| **Iteration** | Trabajo de una fase/sprint/PR | Nunca tras el cierre |
+
+Distinto de **Knowledge State** (cuán validado está el conocimiento operacional).  
+No es un ADR. No añade fases ni tipos de evidencia al framework congelado.
+
+## Cuándo ocurre
+Al crear o fusionar documentación · al cerrar sprints · al evitar que reglas permanentes vivan solo en bitácoras.
+
+## Produce
+Sistema documental evolutivo · búsqueda fiable de reglas · bitácoras inmutables al cierre.
+
+## No significa
+Knowledge State · ADR · nueva fase FOPEBA · permiso para evolucionar el framework de validación por intuición.
+
+## Sinónimos
+Contract / Implementation / Iteration · caducidad documental
+
+## Palabras relacionadas
+FOPEBA · Project Dictionary · Milestone · Tenant Experience Spec
+
+## Referencias
+[knowledge-lifetime.md](../18-operational-validation/knowledge-lifetime.md) · [Knowledge States](../20-evidence-framework/01-knowledge-states.md)
+
+
+---
+
+# Tenant Brand
+
+## ID
+DICT-060
+
+## Status
+Accepted
+
+## Madurez
+Operational
+
+## Nombre
+Tenant Brand
+
+## Tipo
+Configuration Object (OM Nivel 3)
+
+## Definición
+Identidad visual oficial de un Tenant (logo, colores; extensible a tipografía e imágenes) con ciclo de vida propio, persistencia y capability `brand.manage`. No es solo un facet cosmético: se publica en runtime vía BrandingService → Storage → TenantBrandScope.
+
+## Cuándo ocurre
+Onboarding de Tenant · cambio de marca · FOV de identidad · checklist Brand Validation.
+
+## Produce
+Tokens y logo aplicados a Customer App y Centro de Operaciones sin redespliegue.
+
+## No significa
+Core Object Nivel 1 · BrandConfig estático como única fuente · libertad absoluta sin Brand Contract.
+
+## Sinónimos
+TenantBrand · marca del tenant
+
+## Palabras relacionadas
+BrandConfig · brand.manage · Tenant-Managed · Tenant-Branded
+
+## Referencias
+[tenant-brand.md](../17-operational-model/02-core-objects/tenant-brand.md) · [BRAND_CONTRACT](../05-architecture/BRAND_CONTRACT.md)
+
+
+---
+
+# brand.manage
+
+## ID
+DICT-061
+
+## Status
+Accepted
+
+## Madurez
+Engineering
+
+## Nombre
+brand.manage
+
+## Tipo
+Capability
+
+## Definición
+Capability que autoriza crear/actualizar/limpiar el Tenant Brand (logo y colores) a través de BrandingService. Otorgada a `company_admin` y `saas_admin`.
+
+## Cuándo ocurre
+Guard de `/admin/branding` · assert en BrandingService · matriz de capacidades.
+
+## Produce
+Cambios de identidad persistidos y auditables.
+
+## No significa
+Permiso de UI únicamente · edición de HP-001 · branding de la superficie SaaS corporativa.
+
+## Sinónimos
+gestionar marca · Tenant Brand Management
+
+## Palabras relacionadas
+Tenant Brand · admin.settings · company_admin · saas_admin
+
+## Referencias
+[CAPABILITY_MATRIX](../09-security/CAPABILITY_MATRIX.md) · `src/permissions/index.ts`
+
+
+---
+
+# Tenant-Managed
+
+## ID
+DICT-062
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Tenant-Managed
+
+## Tipo
+Principio de plataforma (evolución de ADR 0014)
+
+## Definición
+Fase en la que el propio Tenant administra su identidad visual en runtime (sin forks, sin despliegues, sin tocar código de producto), dentro del Brand Contract. Sucede a Hardcoded y Tenant-Branded.
+
+## Cuándo ocurre
+Cuando `brand.manage` + TenantBrandRepository + TenantBrandScope están Connected.
+
+## Produce
+SaaS multi-tenant con servicio de branding gobernado por capabilities y RBAC.
+
+## No significa
+Tenant-Branded sin editor · libertad absoluta de assets · cambio de metodología FOPEBA.
+
+## Sinónimos
+branding gestionado por el cliente · runtime brand
+
+## Palabras relacionadas
+Tenant-Branded · BrandConfig · Tenant Brand · brand.manage
+
+## Referencias
+[ADR 0014](../adr/0014-customer-application-is-tenant-branded.md) · [TENANT_BRANDING](../05-architecture/TENANT_BRANDING.md)
+
 
 
 ## Historial de este diccionario
@@ -2757,4 +2923,7 @@ Individual Customer · Company Account · Membership · Consumer · Beneficiary
 | 2026-07-23 | Experience Domain · SCR trazabilidad · DICT-055/056 · PROJECT_DOMAINS |
 | 2026-07-23 | ADR 0015 B2B/B2C · DICT-063…067 Company Account · Site · OU · Delivery Group · Company Code |
 | 2026-07-23 | ADR 0016 Party Model · DICT-068 Party (semantic now · physical later) |
+| 2026-07-23 | Knowledge Lifetime · DICT-057 · Milestone EatClean Pilot Ready |
+| 2026-07-23 | Tenant-Managed · Tenant Brand · brand.manage · DICT-060…062 |
+| 2026-07-23 | Foundation of Materialization Frozen · Four Layers · Pilot Execution Guide |
 
