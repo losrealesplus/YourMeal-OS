@@ -22,6 +22,7 @@ export function createWeeklyMenuRepository(supabase: AppSupabase, tenantId: stri
         .eq("tenant_id", tenantId)
         .eq("week_start", weekStart)
         .eq("status", "published")
+        .is("deleted_at", null)
         .maybeSingle();
       if (error) throw error;
       return data as WeeklyMenuRow | null;
@@ -36,7 +37,10 @@ export function createWeeklyMenuRepository(supabase: AppSupabase, tenantId: stri
         .order("day_date", { ascending: true })
         .order("sort_order", { ascending: true });
       if (error) throw error;
-      return (data ?? []) as WeeklyMenuSlotWithDish[];
+      // Soft-deleted dishes excluded; slots without an active dish are dropped by mapper/service.
+      return ((data ?? []) as WeeklyMenuSlotWithDish[]).filter(
+        (slot) => !slot.dishes?.deleted_at,
+      );
     },
   };
 }

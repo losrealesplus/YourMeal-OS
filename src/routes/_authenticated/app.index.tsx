@@ -131,12 +131,16 @@ function DashboardBody({
     );
   }
 
-  // Data selection per state
+  // Staff-only design fixtures (DashboardStateSwitcher). Live customer path: no mocks (INC-06).
+  const useOrderFixtures =
+    state === "confirmed" || state === "pending" || state === "withOrders";
   const confirmedOrder: MockOrder = { ...MOCK_ORDERS[0], status: "preparing" };
   const pendingOrder: MockOrder = { ...MOCK_ORDERS[0], status: "pending" };
-  const deliveryOrder = MOCK_ORDERS.find((o) => o.status !== "delivered");
+  const deliveryOrder = useOrderFixtures
+    ? MOCK_ORDERS.find((o) => o.status !== "delivered")
+    : undefined;
   const featured = catalogDishes.slice(0, 3);
-  const isEmpty = state === "empty";
+  const isEmpty = state === "empty" || !useOrderFixtures;
   const showOffline = state === "offline";
 
   return (
@@ -151,7 +155,7 @@ function DashboardBody({
       ) : null}
 
       <section className="px-6 space-y-4">
-        {state === "confirmed" ? (
+        {useOrderFixtures && state === "confirmed" ? (
           <ConfirmedOrderHero
             order={confirmedOrder}
             overline={t("confirmedOverline")}
@@ -159,7 +163,7 @@ function DashboardBody({
             mealsLabel={t("meals")}
             ctaLabel={t("viewDetails")}
           />
-        ) : state === "pending" ? (
+        ) : useOrderFixtures && state === "pending" ? (
           <PendingOrderHero
             order={pendingOrder}
             overline={t("pendingOverline")}
@@ -167,18 +171,11 @@ function DashboardBody({
             hint={t("pendingHint")}
             ctaLabel={t("finishOrder")}
           />
-        ) : isEmpty ? (
-          <OnboardingHero
-            overline={t("onboardingOverline")}
-            title={t("onboardingTitle")}
-            hint={t("onboardingHint")}
-            ctaLabel={t("scheduleCta")}
-          />
         ) : (
           <OnboardingHero
-            overline={t("momentTitle")}
-            title={t("scheduleTitle")}
-            hint={t("scheduleHint")}
+            overline={state === "empty" ? t("onboardingOverline") : t("momentTitle")}
+            title={state === "empty" ? t("onboardingTitle") : t("scheduleTitle")}
+            hint={state === "empty" ? t("onboardingHint") : t("scheduleHint")}
             ctaLabel={t("scheduleCta")}
           />
         )}
@@ -186,8 +183,8 @@ function DashboardBody({
         {isEmpty ? (
           <EmptyState
             icon={<CalendarClock className="size-6" aria-hidden />}
-            title={t("emptyTitle")}
-            hint={t("emptyHint")}
+            title={state === "empty" ? t("emptyTitle") : t("noOrdersTitle")}
+            hint={state === "empty" ? t("emptyHint") : t("noOrdersHint")}
           />
         ) : deliveryOrder ? (
           <DeliveryHero
@@ -203,7 +200,7 @@ function DashboardBody({
           />
         )}
 
-        {!isEmpty ? (
+        {useOrderFixtures ? (
           <div className="grid grid-cols-2 gap-3">
             <Stat label={t("mealsOrdered")} value={String(deliveryOrder?.meals ?? 0)} />
             <Stat
@@ -214,22 +211,22 @@ function DashboardBody({
         ) : null}
       </section>
 
-      {!isEmpty ? (
-        <>
-          <SectionHeader
-            title={t("featuredDishes")}
-            action={
-              <Link to="/app/menu" className="font-bold text-primary focus-visible:outline-none focus-visible:underline">
-                {t("seeAll")}
-              </Link>
-            }
-          />
-          <div className="px-6 space-y-3 pb-8">
-            {featured.map((d) => (
-              <DishCard key={d.id} dish={d} tagLabels={tagLabels} />
-            ))}
-          </div>
+      <SectionHeader
+        title={t("featuredDishes")}
+        action={
+          <Link to="/app/menu" className="font-bold text-primary focus-visible:outline-none focus-visible:underline">
+            {t("seeAll")}
+          </Link>
+        }
+      />
+      <div className="px-6 space-y-3 pb-8">
+        {featured.map((d) => (
+          <DishCard key={d.id} dish={d} tagLabels={tagLabels} />
+        ))}
+      </div>
 
+      {useOrderFixtures ? (
+        <>
           <SectionHeader title={t("recentOrders")} />
           <div className="px-6 space-y-3 pb-6">
             {(state === "withOrders" ? MOCK_ORDERS : MOCK_ORDERS.slice(0, 2)).map((o) => (

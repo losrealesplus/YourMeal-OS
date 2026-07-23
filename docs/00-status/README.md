@@ -2,6 +2,7 @@
 
 **Última actualización:** 2026-07-23  
 **Fase actual:** [CURRENT_PHASE](./CURRENT_PHASE.md) ← abrir primero  
+**Engineering Phase:** [ENGINEERING_PHASE](./ENGINEERING_PHASE.md) — Complete (pending operational authorization)  
 **Última integración:** [IR-001](./IR-001_FIRST_ENGINEERING_INTEGRATION.md) · PR #22  
 **Pre-piloto:** [PRE_PILOT_AUDIT](./PRE_PILOT_AUDIT.md)  
 **Gobernanza:** [Acta — Fin construcción metodológica](./ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) **Cerrada**  
@@ -63,5 +64,5 @@ FOV ⏳ tras ORR **PASSED**.
 
 ## Índices
 
-[CURRENT_PHASE](./CURRENT_PHASE.md) · [IR-001](./IR-001_FIRST_ENGINEERING_INTEGRATION.md) · [ENGINEERING_REVIEW_SPRINT0](./ENGINEERING_REVIEW_SPRINT0.md) · [PRE_PILOT_AUDIT](./PRE_PILOT_AUDIT.md) · [Acta](./ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) · [MILESTONES](./MILESTONES.md) · [Etapa 2 Levels](../22-implementation/ETAPA_2_LEVELS.md) · [Freeze](./04-methodology-frozen.md) · [22 Implementation](../22-implementation/README.md) · [FOV Brief](./FOV_MISSION_BRIEF.md) · [Philosophy](../23-engineering/IMPLEMENTATION_PHILOSOPHY.md)
+[CURRENT_PHASE](./CURRENT_PHASE.md) · [SMOKE_HP-001](./SMOKE_HP-001.md) · [ORR_HP-001](./ORR_HP-001.md) · [IR-001](./IR-001_FIRST_ENGINEERING_INTEGRATION.md) · [ENGINEERING_REVIEW_SPRINT0](./ENGINEERING_REVIEW_SPRINT0.md) · [PRE_PILOT_AUDIT](./PRE_PILOT_AUDIT.md) · [Acta](./ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) · [MILESTONES](./MILESTONES.md) · [FOV-001](../30-field-validation/FOV-001_HP-001.md) · [22 Implementation](../22-implementation/README.md) · [FOV Brief](./FOV_MISSION_BRIEF.md)
 

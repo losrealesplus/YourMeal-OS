@@ -1,7 +1,19 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { DomainError } from "@/domain/errors";
 import { OrderService } from "./order-service";
 import type { ServiceContext } from "@/services/types";
+
+vi.mock("@/services/feature-flag-service", () => ({
+  FeatureFlagService: {
+    isEnabled: vi.fn(async () => true),
+  },
+}));
+
+vi.mock("@/services/audit-service", () => ({
+  AuditService: {
+    write: vi.fn(async () => undefined),
+  },
+}));
 
 function ctx(overrides: Partial<ServiceContext> = {}): ServiceContext {
   return {
@@ -23,7 +35,6 @@ describe("OrderService.programDraft", () => {
         weekStart: "2026-07-20",
         dayDate: "2026-07-22",
         dishIds: [],
-        total: 0,
       }),
     ).rejects.toBeInstanceOf(DomainError);
   });
@@ -34,12 +45,35 @@ describe("OrderService.programDraft", () => {
         weekStart: "2026-07-20",
         dayDate: "2026-07-22",
         dishIds: ["d1"],
-        total: 9.9,
       }),
     ).rejects.toBeTruthy();
   });
 
   it("rejects confirm without orderId", async () => {
     await expect(OrderService.confirm(ctx(), "")).rejects.toBeInstanceOf(DomainError);
+  });
+});
+
+describe("OrderService feature flags", () => {
+  it("rejects programDraft when order_programming is off", async () => {
+    const { FeatureFlagService } = await import("@/services/feature-flag-service");
+    vi.mocked(FeatureFlagService.isEnabled).mockResolvedValueOnce(false);
+
+    await expect(
+      OrderService.programDraft(ctx(), {
+        weekStart: "2026-07-20",
+        dayDate: "2026-07-22",
+        dishIds: ["d1"],
+      }),
+    ).rejects.toMatchObject({ code: "UNIMPLEMENTED" });
+  });
+
+  it("rejects confirm when order_confirmation is off", async () => {
+    const { FeatureFlagService } = await import("@/services/feature-flag-service");
+    vi.mocked(FeatureFlagService.isEnabled).mockResolvedValueOnce(false);
+
+    await expect(OrderService.confirm(ctx(), "order-1")).rejects.toMatchObject({
+      code: "UNIMPLEMENTED",
+    });
   });
 });

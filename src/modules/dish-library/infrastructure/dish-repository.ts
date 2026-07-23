@@ -62,6 +62,21 @@ export function createDishRepository(supabase: AppSupabase, tenantId: string) {
       return data as DishRow | null;
     },
 
+    /** Batch catalog read — INC-04 (avoid N+1 on order summary). */
+    async listCatalogByIds(ids: string[]): Promise<DishRow[]> {
+      if (!ids.length) return [];
+      const unique = [...new Set(ids)];
+      const { data, error } = await supabase
+        .from("dishes")
+        .select("*")
+        .eq("tenant_id", tenantId)
+        .eq("status", "active")
+        .is("deleted_at", null)
+        .in("id", unique);
+      if (error) throw error;
+      return (data ?? []) as DishRow[];
+    },
+
     async findByIdIncludingArchived(id: string): Promise<DishRow | null> {
       const { data, error } = await supabase
         .from("dishes")

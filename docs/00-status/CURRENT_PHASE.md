@@ -8,88 +8,68 @@
 PROJECT STATE
 ══════════════════════════════════════════════════
 
-Current Phase:     Engineering Fix Sprint
-Current Branch:    main  (tras merge IR-001 / PR #22)
-Last Integration:  IR-001 · First Engineering Integration
+Engineering Phase: Complete (pending operational authorization)
+Current Phase:     Evidence Gate  (pre-ORR)
 Next Gate:         ORR  (PASSED | BLOCKED)
-Current Objective: Resolve P1 findings
-
-Operational Status:
-  Ready for CAP-006  ✅
-  Ready for ORR      ❌
+Next Discipline:   Operational Engineering
+Primary Artifact:  Field Evidence
+Last Baseline:     v0.2.0-engineering-baseline (IR-001)
 
 ══════════════════════════════════════════════════
 ```
 
-> Si PR #22 aún no está en `main`, la **Current Branch** efectiva es el tip de integración hasta el merge.
+Cierre formal: [ENGINEERING_PHASE](./ENGINEERING_PHASE.md).
 
 ---
 
-## Project Phase detail
+## Dominios oficiales
+
+| Dominio | Estado |
+|---------|--------|
+| Knowledge Engineering | ✅ Frozen / Closed |
+| Software Engineering | ✅ Implementado · ⏳ Integración final (#23) |
+| Operational Engineering | ⏳ Pendiente de ORR PASSED |
+
+---
+
+## Regla de congelación funcional
+
+> **Hasta que ORR emita un resultado, ningún commit puede modificar el comportamiento funcional del producto.**
+
+Admitido únicamente:
+
+* bloqueo descubierto en Smoke;  
+* corrección imprescindible para completar HP-001;  
+* documentación de evidencia.
+
+Cualquier “pequeña mejora” en el merge **espera** al siguiente ciclo.
+
+---
+
+## Cadena (sin pasos intermedios)
 
 ```text
-Fase A  IR-001 · Stack → main     (PR #22)
-Fase B  Engineering Fix Sprint    ← ahora (tras A)
-Fase C  Verificación técnica      (tsc · tests · RLS · audit · flags · HP)
-Fase D  ORR                       (sin código)
-Fase E  FOV                       (aprendizaje en campo)
+PR #23 → main → Apply migration → Smoke HP-001 → ORR → PASSED → Ready for FOV → FOV-001
 ```
 
----
-
-## Current Objective
-
-Resolve **P1 Engineering Findings** — sin UX, OM, Capabilities ni Design System.
-
-### Engineering Integrity
-
-| ID | Tema |
-|----|------|
-| INC-01 | No confiar `total` / `dishIds` del cliente |
-| INC-03 | Ownership order → customer en Confirm |
-| INC-05 | Atomicidad draft + audit consistente |
-
-### Engineering Completeness
-
-| ID | Tema |
-|----|------|
-| INC-02 | Soft-delete (`deleted_at`) + types |
-| INC-04 | N+1 en Order Summary |
-| INC-06 | Eliminar `MOCK_ORDERS` (home / lista) |
-| INC-07 | Cablear `featureFlagService` |
-
-Detalle: [ENGINEERING_REVIEW_SPRINT0](./ENGINEERING_REVIEW_SPRINT0.md).
+| Evento | Estado |
+|--------|:------:|
+| PR #23 merge | ⏳ |
+| Migración `program_draft_order` | ⏳ |
+| Smoke HP-001 | ⏳ |
+| ORR | ⏳ |
+| Ready for FOV | ⏳ |
 
 ---
 
-## Next Gate
+## Operational Confidence
 
-```text
-ORR  (PASSED | BLOCKED)  — sin features
-```
-
----
-
-## Next Milestone
-
-```text
-HP-001 · Operational · ORR PASSED · Ready for FOV
-```
+| Dimensión | Estado |
+|-----------|:------:|
+| Knowledge Confidence | 🟢 |
+| Engineering Confidence | 🟢 (código) · ⏳ (#23 en trunk) |
+| Operational Confidence | ⚪ |
 
 ---
 
-## Baseline tag (tras merge IR-001)
-
-Tras fusionar PR #22 en `main`, crear tag de restauración:
-
-```text
-v0.2.0-engineering-baseline
-```
-
-Punto de referencia: metodología cerrada · skeleton · patrones · CAP conectadas · gobernanza · pila en `main`.
-
-Ver [IR-001](./IR-001_FIRST_ENGINEERING_INTEGRATION.md).
-
----
-
-Gobernanza: **no** abrir documentos metodológicos nuevos hasta terminar la primera FOV.
+Checklists: [SMOKE_HP-001](./SMOKE_HP-001.md) · [ORR](../22-implementation/ORR.md) · [FOV-001](../30-field-validation/FOV-001_HP-001.md) (solo tras ORR PASSED).
