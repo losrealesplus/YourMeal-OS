@@ -103,15 +103,16 @@ Hito: ORR PASSED → Ready for FOV → FOV-001
 > **El Project Dictionary es la autoridad semántica.** Solo conceptos estables y **Accepted** (`DICT-xxx` · Status · Madurez).  
 > Ante un término: ¿concepto nuevo o sinónimo de uno existente? → reutilizar / discutir / solo entonces `DICT-xxx`.  
 > **Congelación funcional:** hasta que ORR emita PASSED \| BLOCKED, ningún commit modifica el comportamiento del producto — salvo bloqueo de Smoke, corrección imprescindible de HP-001, o docs de evidencia.  
-> **Foco:** abrir la app · Smoke HP-001 — no más estructura metodológica.  
-> Cursor no implementa funcionalidades nuevas. Conecta capacidades / produce evidencia.  
+> **Ops:** Smoke HP-001 · ORR · **Experience:** ¿mi madre podría pedir sin ayuda? (CJ-001 → SCR).  
+> Cursor no implementa funcionalidades nuevas. Conecta capacidades / produce evidencia / Experience Refactor sin tocar HP-001.  
 > Regla nueva → **STOP** · `REQUIRES KNOWLEDGE REVIEW` · Carril A.  
-> Sin documentos metodológicos nuevos hasta FOV (gobernanza: Acta).  
+> Ninguna pantalla sin Customer Journey.  
 > Un PR · un nivel — sin «ya que estamos…».
 
-**Tablero:** [CURRENT_PHASE](./docs/00-status/CURRENT_PHASE.md) · [ENGINEERING_PHASE](./docs/00-status/ENGINEERING_PHASE.md)  
+**Tablero:** [CURRENT_PHASE](./docs/00-status/CURRENT_PHASE.md) · [PROJECT_DOMAINS](./docs/00-status/PROJECT_DOMAINS.md) · [ENGINEERING_PHASE](./docs/00-status/ENGINEERING_PHASE.md)  
 **Diccionario:** [PROJECT_DICTIONARY](./docs/99-reference/PROJECT_DICTIONARY.md) (`DICT-xxx`)  
-**Siguiente:** merge [#24](https://github.com/losrealesplus/YourMeal-OS/pull/24) → migración → [SMOKE_HP-001](./docs/00-status/SMOKE_HP-001.md) → [ORR](./docs/22-implementation/ORR.md)  
+**Journeys:** [CUSTOMER_JOURNEYS](./docs/07-experience/CUSTOMER_JOURNEYS.md)  
+**Siguiente:** merge [#25](https://github.com/losrealesplus/YourMeal-OS/pull/25) → migración → [SMOKE_HP-001](./docs/00-status/SMOKE_HP-001.md) → [ORR](./docs/22-implementation/ORR.md)  
 **Pre-piloto:** [PRE_PILOT_AUDIT](./docs/00-status/PRE_PILOT_AUDIT.md)  
 
 **Cierre metodológico:** [Acta](./docs/00-status/ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md)  
