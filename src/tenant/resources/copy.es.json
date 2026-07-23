@@ -40,7 +40,9 @@
     "about": "Acerca de"
   },
   "backOffice": {
-    "entryLabel": "EatClean Admin"
+    "entryLabel": "EatClean Admin",
+    "subtitle": "Acceso exclusivo para personal autorizado.",
+    "enter": "Entrar"
   },
   "claims": {
     "enjoy": "Cocinamos para que tú solo tengas que disfrutar.",

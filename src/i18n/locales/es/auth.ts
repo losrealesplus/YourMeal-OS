@@ -22,4 +22,9 @@ export default {
   checkEmail: "Revisa tu correo",
   resetSent: "Te hemos enviado un enlace para restablecer tu contraseña.",
   passwordUpdated: "Contraseña actualizada",
+  adminTitle: "EatClean Admin",
+  adminSubtitle: "Acceso exclusivo para personal autorizado.",
+  adminEnter: "Entrar",
+  adminEntryAria: "Acceso EatClean Admin",
+  backToCustomerLogin: "Volver al inicio de sesión",
 } as const;

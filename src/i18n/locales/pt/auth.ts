@@ -24,4 +24,9 @@ export default {
   checkEmail: "Verifique a sua caixa de entrada",
   resetSent: "Enviámos um link para redefinir a palavra-passe.",
   passwordUpdated: "Palavra-passe atualizada",
+  adminTitle: "EatClean Admin",
+  adminSubtitle: "Acesso exclusivo para pessoal autorizado.",
+  adminEnter: "Entrar",
+  adminEntryAria: "Acesso EatClean Admin",
+  backToCustomerLogin: "Voltar ao início de sessão",
 } as const;

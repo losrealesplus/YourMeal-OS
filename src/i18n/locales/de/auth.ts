@@ -24,4 +24,9 @@ export default {
   checkEmail: "Prüfen Sie Ihren Posteingang",
   resetSent: "Wir haben Ihnen einen Link zum Zurücksetzen gesendet.",
   passwordUpdated: "Passwort aktualisiert",
+  adminTitle: "EatClean Admin",
+  adminSubtitle: "Zugang nur für autorisiertes Personal.",
+  adminEnter: "Anmelden",
+  adminEntryAria: "EatClean Admin Zugang",
+  backToCustomerLogin: "Zurück zur Kundenanmeldung",
 } as const;

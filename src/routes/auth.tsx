@@ -1,6 +1,7 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Leaf } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { LanguageSelector } from "@/components/language-selector";
@@ -220,7 +221,16 @@ function AuthPage() {
                 </button>
               </div>
             </div>
-            <PoweredByLine className="mt-6" />
+            <div className="mt-6 relative flex flex-col items-center gap-3 min-h-9">
+              <PoweredByLine />
+              <Link
+                to="/auth/admin"
+                aria-label={t("auth:adminEntryAria")}
+                className="absolute right-0 top-1/2 -translate-y-1/2 size-9 grid place-items-center rounded-full text-muted-foreground/40 hover:text-primary/70 hover:bg-primary/5 transition-colors"
+              >
+                <Leaf className="size-4" strokeWidth={1.75} aria-hidden />
+              </Link>
+            </div>
           </div>
         ) : null}
       </div>

@@ -17,6 +17,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedDriverRouteImport } from './routes/_authenticated/driver'
 import { Route as AuthenticatedSaasRouteImport } from './routes/_authenticated/saas'
+import { Route as AuthAdminRouteImport } from './routes/auth.admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAccountingRouteImport } from './routes/_authenticated/admin.accounting'
 import { Route as AuthenticatedAdminCustomersRouteImport } from './routes/_authenticated/admin.customers'
@@ -100,6 +101,11 @@ const AuthenticatedSaasRoute = AuthenticatedSaasRouteImport.update({
   id: '/saas',
   path: '/saas',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthAdminRoute = AuthAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthRoute,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
@@ -362,12 +368,13 @@ const AuthenticatedAppSettingsProfileRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/app': typeof AuthenticatedAppRouteWithChildren
   '/driver': typeof AuthenticatedDriverRoute
   '/saas': typeof AuthenticatedSaasRouteWithChildren
+  '/auth/admin': typeof AuthAdminRoute
   '/admin/accounting': typeof AuthenticatedAdminAccountingRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/admin/design-system': typeof AuthenticatedAdminDesignSystemRouteWithChildren
@@ -415,9 +422,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/driver': typeof AuthenticatedDriverRoute
+  '/auth/admin': typeof AuthAdminRoute
   '/admin/accounting': typeof AuthenticatedAdminAccountingRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/admin/dishes': typeof AuthenticatedAdminDishesRoute
@@ -464,12 +472,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
   '/_authenticated/driver': typeof AuthenticatedDriverRoute
   '/_authenticated/saas': typeof AuthenticatedSaasRouteWithChildren
+  '/auth/admin': typeof AuthAdminRoute
   '/_authenticated/admin/accounting': typeof AuthenticatedAdminAccountingRoute
   '/_authenticated/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/_authenticated/admin/design-system': typeof AuthenticatedAdminDesignSystemRouteWithChildren
@@ -525,6 +534,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/driver'
     | '/saas'
+    | '/auth/admin'
     | '/admin/accounting'
     | '/admin/customers'
     | '/admin/design-system'
@@ -575,6 +585,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/driver'
+    | '/auth/admin'
     | '/admin/accounting'
     | '/admin/customers'
     | '/admin/dishes'
@@ -626,6 +637,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app'
     | '/_authenticated/driver'
     | '/_authenticated/saas'
+    | '/auth/admin'
     | '/_authenticated/admin/accounting'
     | '/_authenticated/admin/customers'
     | '/_authenticated/admin/design-system'
@@ -675,7 +687,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  AuthRoute: typeof AuthRoute
+  AuthRoute: typeof AuthRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
@@ -736,6 +748,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/saas'
       preLoaderRoute: typeof AuthenticatedSaasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/auth/admin': {
+      id: '/auth/admin'
+      path: '/admin'
+      fullPath: '/auth/admin'
+      preLoaderRoute: typeof AuthAdminRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
@@ -1264,12 +1283,32 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AuthRouteChildren {
+  AuthAdminRoute: typeof AuthAdminRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthAdminRoute: AuthAdminRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  AuthRoute: AuthRoute,
+  AuthRoute: AuthRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
