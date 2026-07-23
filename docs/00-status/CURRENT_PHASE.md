@@ -27,7 +27,7 @@ Cierre formal: [ENGINEERING_PHASE](./ENGINEERING_PHASE.md).
 | Dominio | Estado |
 |---------|--------|
 | Knowledge Engineering | ✅ Frozen / Closed |
-| Software Engineering | ✅ Implementado · ⏳ Integración final (#23) |
+| Software Engineering | ✅ Implementado · ✅ #23 en main |
 | Operational Engineering | ⏳ Pendiente de ORR PASSED |
 
 ---
@@ -49,12 +49,12 @@ Cualquier “pequeña mejora” en el merge **espera** al siguiente ciclo.
 ## Cadena (sin pasos intermedios)
 
 ```text
-PR #23 → main → Apply migration → Smoke HP-001 → ORR → PASSED → Ready for FOV → FOV-001
+main (post-#23) → Apply migration → Smoke HP-001 → ORR → PASSED → Ready for FOV → FOV-001
 ```
 
 | Evento | Estado |
 |--------|:------:|
-| PR #23 merge | ⏳ |
+| PR #23 merge | ✅ |
 | Migración `program_draft_order` | ⏳ |
 | Smoke HP-001 | ⏳ |
 | ORR | ⏳ |
@@ -67,8 +67,20 @@ PR #23 → main → Apply migration → Smoke HP-001 → ORR → PASSED → Read
 | Dimensión | Estado |
 |-----------|:------:|
 | Knowledge Confidence | 🟢 |
-| Engineering Confidence | 🟢 (código) · ⏳ (#23 en trunk) |
+| Engineering Confidence | 🟢 |
 | Operational Confidence | ⚪ |
+
+---
+
+## Regla permanente (post-ORR)
+
+> **La FOV produce evidencia. El Gate decide cambios.**
+
+## Lenguaje oficial
+
+[PROJECT_DICTIONARY](../99-reference/PROJECT_DICTIONARY.md) — autoridad semántica (`DICT-xxx` · Status · Madurez). Concepto Accepted → Dictionary **antes** de uso oficial.
+
+Ver [ENGINEERING_PHASE](./ENGINEERING_PHASE.md) · [FOV-001](../30-field-validation/FOV-001_HP-001.md).
 
 ---
 

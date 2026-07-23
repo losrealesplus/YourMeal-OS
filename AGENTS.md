@@ -100,6 +100,7 @@ Pregunta: ¿Hay evidencia para ORR? (no la siguiente Capability)
 Hito: ORR PASSED → Ready for FOV → FOV-001
 ```
 
+> **El Project Dictionary es la fuente oficial de significado.** Concepto nuevo aceptado → entrada en [PROJECT_DICTIONARY](./docs/99-reference/PROJECT_DICTIONARY.md) **antes** de usarlo como oficial.  
 > **Congelación funcional:** hasta que ORR emita PASSED \| BLOCKED, ningún commit modifica el comportamiento del producto — salvo bloqueo de Smoke, corrección imprescindible de HP-001, o docs de evidencia.  
 > Cursor no implementa funcionalidades nuevas. Conecta capacidades / produce evidencia.  
 > Regla nueva → **STOP** · `REQUIRES KNOWLEDGE REVIEW` · Carril A.  
@@ -107,6 +108,7 @@ Hito: ORR PASSED → Ready for FOV → FOV-001
 > Un PR · un nivel — sin «ya que estamos…».
 
 **Tablero:** [CURRENT_PHASE](./docs/00-status/CURRENT_PHASE.md) · [ENGINEERING_PHASE](./docs/00-status/ENGINEERING_PHASE.md)  
+**Diccionario:** [PROJECT_DICTIONARY](./docs/99-reference/PROJECT_DICTIONARY.md)  
 **Siguiente:** merge PR #23 → migración → [SMOKE_HP-001](./docs/00-status/SMOKE_HP-001.md) → [ORR](./docs/22-implementation/ORR.md)  
 **Pre-piloto:** [PRE_PILOT_AUDIT](./docs/00-status/PRE_PILOT_AUDIT.md)  
 

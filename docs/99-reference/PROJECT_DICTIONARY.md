@@ -1304,7 +1304,7 @@ Antes de programar pedido.
 ## Produce
 Slots por `day_date` · constraint de oferta para Draft.
 
-## No significado
+## No significa
 Draft Order.
 
 ## Sinónimos
