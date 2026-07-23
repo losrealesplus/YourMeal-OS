@@ -16,7 +16,15 @@ export { AssignRecipeToDishUseCase } from "./application/assign-recipe-to-dish-u
 export type { Clock, EventPublisher, IdGenerator } from "./application/ports";
 export * from "./domain";
 export { createDishRepository } from "./infrastructure/dish-repository";
+export type { DishRow, DishRepository } from "./infrastructure/dish-repository";
 export {
   createSupabaseDishRepository,
   SupabaseDishRepository,
 } from "./infrastructure/supabase-dish-repository";
+export { mapDishRowToCatalogDish } from "./application/dish-catalog-mapper";
+export type { CatalogDish } from "./application/dish-catalog-mapper";
+export {
+  dishCatalogKeys,
+  fetchCatalogDish,
+  fetchCatalogDishes,
+} from "./application/dish-catalog-queries";

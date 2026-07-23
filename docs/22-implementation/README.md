@@ -29,8 +29,8 @@ GitHub → historia / evidencia
 ## Siguiente
 
 1. Pegar [Master Prompt](./CURSOR_MASTER_PROMPT.md) en la sesión Cursor.  
-2. Ejecutar **[CAP-002 Dish Catalog](./caps/CAP-002-dish-catalog.md)**.  
-3. Seguir CAP-003…007 sin mezclar.
+2. Ejecutar **[CAP-003 Weekly Menu](./caps/CAP-003-weekly-menu.md)** (CAP-002 lectura Connected).  
+3. Seguir CAP-004…007 sin mezclar.
 
 ---
 
@@ -40,5 +40,6 @@ GitHub → historia / evidencia
 |------|--------|
 | Product Skeleton UX | ✅ |
 | CAP-001 Auth | Connected |
-| CAP-002…007 | ⏳ |
+| CAP-002 Dish Catalog (lectura) | Connected |
+| CAP-003…007 | ⏳ |
 | Business logic inventada | 🔒 STOP |

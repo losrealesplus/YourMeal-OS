@@ -20,12 +20,42 @@ export function createDishRepository(supabase: AppSupabase, tenantId: string) {
       return (data ?? []) as DishRow[];
     },
 
+    /**
+     * Customer catalog read (CAP-002): published dishes only.
+     * Soft-deleted and non-active statuses excluded.
+     */
+    async listCatalog(): Promise<DishRow[]> {
+      const { data, error } = await supabase
+        .from("dishes")
+        .select("*")
+        .eq("tenant_id", tenantId)
+        .eq("status", "active")
+        .is("deleted_at", null)
+        .order("name", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as DishRow[];
+    },
+
     async findActiveById(id: string): Promise<DishRow | null> {
       const { data, error } = await supabase
         .from("dishes")
         .select("*")
         .eq("tenant_id", tenantId)
         .eq("id", id)
+        .is("deleted_at", null)
+        .maybeSingle();
+      if (error) throw error;
+      return data as DishRow | null;
+    },
+
+    /** Customer catalog detail (CAP-002): active + not soft-deleted. */
+    async findCatalogById(id: string): Promise<DishRow | null> {
+      const { data, error } = await supabase
+        .from("dishes")
+        .select("*")
+        .eq("tenant_id", tenantId)
+        .eq("id", id)
+        .eq("status", "active")
         .is("deleted_at", null)
         .maybeSingle();
       if (error) throw error;

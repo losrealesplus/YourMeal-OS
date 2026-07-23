@@ -130,8 +130,8 @@ Cambios pequeños. Reversibles. Verificables.
 ORDEN DE IMPLEMENTACIÓN
 
 CAP-001 Auth & User Context     → Connected (mantener)
-CAP-002 Dish Catalog            → siguiente
-CAP-003 Weekly Menu
+CAP-002 Dish Catalog            → Connected (lectura)
+CAP-003 Weekly Menu             → siguiente
 CAP-004 Order Programming
 CAP-005 Order Summary
 CAP-006 Order Confirmation

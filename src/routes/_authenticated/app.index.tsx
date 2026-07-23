@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { CalendarClock } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useDishes } from "@/hooks/use-dishes";
 import {
   DishCard,
   OrderCard,
@@ -21,13 +22,14 @@ import {
   isDashboardState,
   type DashboardStateId,
 } from "@/components/consumer";
-import { MOCK_DISHES, MOCK_ORDERS, type MockOrder } from "@/lib/mock-catalog";
+import { MOCK_ORDERS, type MockOrder } from "@/lib/mock-catalog";
 
 /**
  * Screen: Customer · Home Dashboard (todos los estados)
  * - Objetivo operacional: momento «Antes de empezar la semana» — anticipar la programación.
  * - Capability: orders.schedule + weekly-menu.browse
  * - Core Object(s): Order · WeeklyMenu · Delivery
+ * - CAP-002: featured dishes from useDishes() (real catalog read)
  * Estados diseñados: default · empty · withOrders · confirmed · pending · loading · error · offline
  * Ver docs/15-product/PRODUCT_RULES.md y CUSTOMER_APP_SCREEN_MAP.md
  */
@@ -108,6 +110,7 @@ function DashboardBody({
 }) {
   const { t } = useTranslation("customer");
   const navigate = useNavigate({ from: "/app" });
+  const { data: catalogDishes = [] } = useDishes();
 
   if (state === "loading") {
     return <DashboardSkeleton label={t("loadingDashboard")} />;
@@ -130,7 +133,7 @@ function DashboardBody({
   const confirmedOrder: MockOrder = { ...MOCK_ORDERS[0], status: "preparing" };
   const pendingOrder: MockOrder = { ...MOCK_ORDERS[0], status: "pending" };
   const deliveryOrder = MOCK_ORDERS.find((o) => o.status !== "delivered");
-  const featured = MOCK_DISHES.slice(0, 3);
+  const featured = catalogDishes.slice(0, 3);
   const isEmpty = state === "empty";
   const showOffline = state === "offline";
 

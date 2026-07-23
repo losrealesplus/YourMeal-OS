@@ -1,53 +1,63 @@
-# CAP-002 — Dish Catalog
+# CAP-002 — Dish Catalog (lectura)
 
-**Estado:** Scaffold → **Connected** (siguiente)  
-**Master:** [CURSOR_MASTER_PROMPT](../CURSOR_MASTER_PROMPT.md)
+**Estado:** Scaffold → **Connected**  
+**Nivel PR:** Capability  
+**Objetivo del PR:** Materializar la primera lectura real del conocimiento operacional.
 
 ---
 
-## 1. Objetivo
+## Preconditions
 
-Sustituir catálogo mock por datos reales de Supabase (Dish).
+- CAP-001 = Connected  
+- Usuario autenticado  
+- Tenant activo resuelto (`useAuth().tenantId`)  
+- Tabla `dishes` disponible + RLS de lectura por miembro de tenant  
 
-## 2. Alcance
+## Postconditions
 
-Repository · Query · Cache · Hooks · Adapters.
+- `useDishes()` / `useDish()` devuelven datos reales (Supabase)  
+- `DishCard` recibe entidades proyectadas (sin cambio visual)  
+- Flujo home / menu / detalle / schedule step 2 **sin** `MOCK_DISHES`  
+- Typecheck limpio  
+- Sin búsqueda, filtros, favoritos, paginación, mutaciones ni UX nueva  
 
-## 3. No modificar
+---
 
-Componentes visuales · DishCard · UX · navegación · campos del modelo Dish.
+## 1. Alcance
 
-## 4. Traceability
+```text
+Operational Model (Dish)
+        ↓
+DishRepository.listCatalog / findCatalogById
+        ↓
+TanStack Query
+        ↓
+useDishes() / useDish()
+        ↓
+DishCard (existente)
+```
+
+## 2. Fuera de alcance
+
+Búsqueda · filtros · favoritos · paginación · ordenación · CRUD · optimizaciones no necesarias.
+
+## 3. Traceability
 
 | Campo | Valor |
 |-------|-------|
 | Capability | CAP-002 Dish Catalog |
 | Core Object | Dish |
-| Supporting | Ingredient (solo si lectura ya justificada; no expandir) |
-| OM | `docs/17` · Module 01 Dish |
-| Infra | Supabase · Service/Repository · i18n · useFmt |
+| OM | Module 01 Dish · `docs/17` |
+| Infra | Supabase · Repository · TanStack Query |
+| Mutaciones | Ninguna |
+| Happy Path | Parcial (lectura de platos) |
 
-## 5. Criterios Connected
-
-Ver [MODULE_STATE_CRITERIA](../../00-status/MODULE_STATE_CRITERIA.md) · Scaffold → Connected.
-
-## 6. Prompt
+## 4. Prompt
 
 ```text
-Implementar CAP-002 Dish Catalog.
+CAP-002 — materializar la primera lectura real del conocimiento operacional.
 
-Objetivo: sustituir el catálogo mock por datos reales de Supabase.
-
-No modificar componentes.
-No modificar DishCard.
-No modificar UX.
-No modificar navegación.
-No añadir campos.
-
-Solo conectar: Repository · Query · Cache · Hooks · Adapters.
-
-Mantener typecheck limpio.
-Cerrar con el formato oficial del Master Prompt (Etapa 2).
-Knowledge Review requerido: No (salvo hallazgo).
-Estado final objetivo: Connected.
+DishRepository → TanStack Query → useDishes() → DishCard.
+Sustituir mocks de platos. UI idéntica.
+Sin búsqueda/filtros/favoritos/paginación/mutaciones.
 ```

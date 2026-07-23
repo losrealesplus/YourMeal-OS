@@ -5,6 +5,20 @@
 
 ---
 
+## Preconditions
+
+- Supabase Auth configurado  
+- Tablas de roles / membership / tenants disponibles  
+
+## Postconditions
+
+- Sesión autenticada disponible vía `useAuth`  
+- `tenantId` resuelto para el usuario  
+- Roles cargados  
+- Happy Path: N/A (infraestructura)  
+
+---
+
 ## Objetivo
 
 Sesión autenticada + contexto de usuario/tenant disponible para Customer App.

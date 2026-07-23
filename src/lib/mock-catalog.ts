@@ -1,13 +1,11 @@
 /**
- * Mock catalog for the Customer App scaffold.
+ * Mock catalog leftovers for Customer App scaffold.
  *
- * NOT business data. NOT persisted. Do NOT use in Services.
- * Exists only so screens can render coherent placeholders while the real
- * DishService / OrderService / MenuService are wired in.
+ * CAP-002 connected dish reads via useDishes() / DishRepository.listCatalog().
+ * MOCK_DISHES retained only as type host (`MockDish`) and for order-line
+ * scaffolding until CAP-004+ replace order mocks.
  *
- * Backed conceptually by Operational Model:
- *   Dish · WeeklyMenu · Order · Delivery
- * See docs/17-operational-model/02-core-objects/README.md
+ * Do NOT use MOCK_DISHES as the source for dish list/detail screens.
  */
 export type MockDish = {
   id: string;
