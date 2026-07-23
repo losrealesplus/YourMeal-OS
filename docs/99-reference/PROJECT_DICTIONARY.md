@@ -180,6 +180,11 @@ Core | Operational | Engineering | Historical
 | `DICT-054` | [Customer Journey](#customer-journey) | Operational | Accepted |
 | `DICT-055` | [Experience Domain](#experience-domain) | Core | Accepted |
 | `DICT-056` | [Screen (SCR)](#screen-scr) | Engineering | Accepted |
+| `DICT-063` | [Company Account](#company-account) | Operational | Accepted |
+| `DICT-064` | [Site](#site) | Operational | Accepted |
+| `DICT-065` | [Organizational Unit](#organizational-unit) | Operational | Accepted |
+| `DICT-066` | [Delivery Group](#delivery-group) | Operational | Accepted |
+| `DICT-067` | [Company Code](#company-code) | Engineering | Accepted |
 
 ---
 
@@ -2481,6 +2486,211 @@ Customer Journey · Experience First · Capability
 [CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md)
 
 
+---
+
+# Company Account
+
+## ID
+DICT-063
+
+## Status
+Accepted
+
+## Madurez
+Operational
+
+## Nombre
+Company Account
+
+## Tipo
+Core Object (B2B)
+
+## Definición
+Entidad B2B que contrata comida para un colectivo dentro de un Tenant (Organization). Posee Company Code, sedes (Site), unidades organizativas y memberships de empleados (Beneficiaries). No es el Consumer B2C ni el Tenant.
+
+## Cuándo ocurre
+Registro empresa · portal Company · pedidos con demand_channel = company
+
+## Produce
+Agrupación comercial y logística B2B · facturación a empresa
+
+## No significa
+Organization / Tenant · Consumer · rol `company_admin` del staff del Tenant
+
+## Sinónimos
+Empresa cliente · Cuenta Empresa
+
+## Palabras relacionadas
+Site · Organizational Unit · Delivery Group · Beneficiary · Company Code
+
+## Referencias
+[ADR 0015](../adr/0015-b2b-b2c-customer-model.md) · [company-account-b2b](../17-operational-model/02-core-objects/company-account-b2b.md)
+
+
+---
+
+# Site
+
+## ID
+DICT-064
+
+## Status
+Accepted
+
+## Madurez
+Operational
+
+## Nombre
+Site
+
+## Tipo
+Core Object (B2B · sede)
+
+## Definición
+Centro físico de una Company Account (oficina, hotel, clínica…). Persistido como `company_locations`.
+
+## Cuándo ocurre
+Alta de sede · asignación de empleados · resolución de Delivery Group
+
+## Produce
+Ancla geográfica / de entrega para Unidades Organizativas
+
+## No significa
+Dirección personal B2C · Tenant
+
+## Sinónimos
+Sede · Location (legacy DB)
+
+## Palabras relacionadas
+Company Account · Organizational Unit · Delivery Group
+
+## Referencias
+[ADR 0015](../adr/0015-b2b-b2c-customer-model.md)
+
+
+---
+
+# Organizational Unit
+
+## ID
+DICT-065
+
+## Status
+Accepted
+
+## Madurez
+Operational
+
+## Nombre
+Organizational Unit
+
+## Tipo
+Core Object (B2B · unidad configurable)
+
+## Definición
+Unidad organizativa libre dentro de un Site. El Tenant/Company elige la etiqueta (Departamento, Área, Planta, Servicio, Turno…). **No** hardcodear “Departamento” como nombre técnico. Persistido como `company_departments`.
+
+## Cuándo ocurre
+Alta por Company Admin · join de empleado · Delivery Group
+
+## Produce
+Partición operativa dentro de una sede
+
+## No significa
+Department fijo de producto · rol de staff
+
+## Sinónimos
+Unidad · Área · Departamento (solo etiqueta)
+
+## Palabras relacionadas
+Site · Employee Membership · Delivery Group
+
+## Referencias
+[ADR 0015](../adr/0015-b2b-b2c-customer-model.md)
+
+
+---
+
+# Delivery Group
+
+## ID
+DICT-066
+
+## Status
+Accepted
+
+## Madurez
+Operational
+
+## Nombre
+Delivery Group
+
+## Tipo
+Core Object (logística · agregación mínima)
+
+## Definición
+Grupo mínimo de entrega derivado de Company + Site + Organizational Unit (ej. Hotel Paradise → Recepción → N pedidos → 1 entrega). Depende de la logística, no solo del organigrama comercial.
+
+## Cuándo ocurre
+Al programar / confirmar pedidos B2B · planificación de rutas (futuro)
+
+## Produce
+Clave de agrupación para fulfillment
+
+## No significa
+Ruta inteligente · optimización (fuera de alcance ADR 0015)
+
+## Sinónimos
+Grupo de entrega
+
+## Palabras relacionadas
+Order · Site · Organizational Unit · Company Account
+
+## Referencias
+[ADR 0015](../adr/0015-b2b-b2c-customer-model.md)
+
+
+---
+
+# Company Code
+
+## ID
+DICT-067
+
+## Status
+Accepted
+
+## Madurez
+Engineering
+
+## Nombre
+Company Code
+
+## Tipo
+Identifier
+
+## Definición
+Código único por Tenant que identifica una Company Account (ej. EC-4821). Se genera al crear la empresa; no es editable; los empleados lo usan para unirse.
+
+## Cuándo ocurre
+Registro empresa · onboarding empleado
+
+## Produce
+Join seguro sin invitación compleja (v1)
+
+## No significa
+Slug de Tenant · código promocional
+
+## Sinónimos
+Código empresa
+
+## Palabras relacionadas
+Company Account · Employee Membership
+
+## Referencias
+[ADR 0015](../adr/0015-b2b-b2c-customer-model.md)
+
+
 ## Historial de este diccionario
 
 | Fecha | Cambio |
@@ -2494,4 +2704,5 @@ Customer Journey · Experience First · Capability
 | 2026-07-23 | TENANT_IMPLEMENTATION_EATCLEAN · `tenants/eatclean/` · DICT-052 Tenant Assets |
 | 2026-07-23 | Experience First · CUSTOMER_JOURNEYS · DICT-053/054 |
 | 2026-07-23 | Experience Domain · SCR trazabilidad · DICT-055/056 · PROJECT_DOMAINS |
+| 2026-07-23 | ADR 0015 B2B/B2C · DICT-063…067 Company Account · Site · OU · Delivery Group · Company Code |
 

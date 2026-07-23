@@ -25,6 +25,8 @@
 | [Definition of Done](./00-status/DEFINITION_OF_DONE.md) | Checklist de módulo |
 | [Foundation Lock](./05-architecture/FOUNDATION_LOCK.md) | ✅ Cerrado v0.1.0 |
 | [Tenant Branding](./05-architecture/TENANT_BRANDING.md) | Contrato BrandConfig · Customer App white-label (ADR 0014) |
+| [ADR 0015 · B2B/B2C Customer Model](./adr/0015-b2b-b2c-customer-model.md) | Separación Consumer / Company Account antes del piloto |
+| [Company Account B2B](./17-operational-model/02-core-objects/company-account-b2b.md) | Site · Organizational Unit · Delivery Group |
 | [Tenant Experience Spec](./05-architecture/TENANT_EXPERIENCE_SPEC.md) | Identidad EatClean · Experience Refactor |
 | [Tenant Implementation · EatClean](./05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) | Brief Cursor/Lovable · Tenant Assets |
 | [Contexto estratégico](./05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md) | Dirección empresarial y del Core |

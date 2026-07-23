@@ -18,3 +18,4 @@ Permanent decisions for YourMeal OS. New ADRs are additive; do not silently reve
 | [0012](./0012-cursor-cto-lovable-ui.md) | Cursor CTO · Lovable UI · Docs como fuente de verdad |
 | [0013](./0013-implementation-is-knowledge-materialization.md) | Implementation is Knowledge Materialization |
 | [0014](./0014-customer-application-is-tenant-branded.md) | Customer Application is Tenant-Branded |
+| [0015](./0015-b2b-b2c-customer-model.md) | B2B / B2C Customer Model Separation |

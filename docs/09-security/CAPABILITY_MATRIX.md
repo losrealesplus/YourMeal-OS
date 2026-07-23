@@ -111,8 +111,15 @@ Legend: ✅ granted · ❌ denied
 |------------|------------|---------------|------------|
 | accounting.operate | ✅ | ✅ | ✅ |
 | admin.settings | ❌ | ✅ | ✅ |
+| brand.manage | ❌ | ✅ | ✅ |
+| company.manage | ❌ | ✅ | ✅ |
+| site.manage | ❌ | ✅ | ✅ |
+| organization.manage | ❌ | ✅ | ✅ |
+| employee.manage | ❌ | ✅ | ✅ |
 | saas.manage | ❌ | ❌ | ✅ |
 | records.purge | ❌ | ❌ | ✅ |
+
+> **ADR 0015:** B2B Company Account portal admins are scoped by `company_employees.is_admin` (not the Tenant role `company_admin`). Tenant `company_admin` / `saas_admin` oversee any company in the tenant. Services enforce both paths.
 
 ---
 

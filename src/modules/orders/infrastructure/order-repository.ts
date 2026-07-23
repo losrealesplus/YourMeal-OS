@@ -16,6 +16,11 @@ export type ProgramOrderInput = {
   total: number;
   notes?: string | null;
   items: ProgramOrderItemInput[];
+  demandChannel?: "individual" | "company";
+  companyId?: string | null;
+  siteId?: string | null;
+  organizationalUnitId?: string | null;
+  deliveryGroupId?: string | null;
 };
 
 type ProgramDraftRpcResult = {
@@ -89,6 +94,11 @@ export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
         _total: input.total,
         _notes: input.notes ?? null,
         _items: payload,
+        _demand_channel: input.demandChannel ?? "individual",
+        _company_id: input.companyId ?? null,
+        _site_id: input.siteId ?? null,
+        _organizational_unit_id: input.organizationalUnitId ?? null,
+        _delivery_group_id: input.deliveryGroupId ?? null,
       });
       if (error) throw error;
 
