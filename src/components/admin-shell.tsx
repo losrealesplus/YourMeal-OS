@@ -20,6 +20,7 @@ import {
   Settings,
   Palette,
   X,
+  Building2,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
@@ -92,6 +93,15 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
   const moreItems: NavItem[] = (
     [
+      ...(admin
+        ? ([
+            {
+              to: "/admin/companies",
+              labelKey: "ops.nav.companyClients",
+              icon: Building2,
+            },
+          ] satisfies NavItem[])
+        : []),
       {
         to: "/admin/routes",
         labelKey: "routes",
@@ -143,6 +153,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         : []),
     ] satisfies NavItem[]
   ).filter((item) => {
+    if (item.to === "/admin/companies") return admin;
     if (!item.requiresPath) return admin;
     return admin || allowedPaths.has(item.requiresPath);
   });

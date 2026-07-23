@@ -21,6 +21,7 @@ import { Route as AuthAdminRouteImport } from './routes/auth.admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAccountingRouteImport } from './routes/_authenticated/admin.accounting'
 import { Route as AuthenticatedAdminBrandingRouteImport } from './routes/_authenticated/admin.branding'
+import { Route as AuthenticatedAdminCompaniesRouteImport } from './routes/_authenticated/admin.companies'
 import { Route as AuthenticatedAdminCustomersRouteImport } from './routes/_authenticated/admin.customers'
 import { Route as AuthenticatedAdminDesignSystemRouteImport } from './routes/_authenticated/admin.design-system'
 import { Route as AuthenticatedAdminDishesRouteImport } from './routes/_authenticated/admin.dishes'
@@ -34,7 +35,9 @@ import { Route as AuthenticatedAdminRoutesRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminSupportRouteImport } from './routes/_authenticated/admin.support'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
+import { Route as AuthenticatedAppCompanyRouteImport } from './routes/_authenticated/app.company'
 import { Route as AuthenticatedAppMenuRouteImport } from './routes/_authenticated/app.menu'
+import { Route as AuthenticatedAppOnboardingRouteImport } from './routes/_authenticated/app.onboarding'
 import { Route as AuthenticatedAppOrdersRouteImport } from './routes/_authenticated/app.orders'
 import { Route as AuthenticatedAppScheduleRouteImport } from './routes/_authenticated/app.schedule'
 import { Route as AuthenticatedAppSettingsRouteImport } from './routes/_authenticated/app.settings'
@@ -60,7 +63,11 @@ import { Route as AuthenticatedAdminRoutesAttemptRouteImport } from './routes/_a
 import { Route as AuthenticatedAdminRoutesDeliveriesRouteImport } from './routes/_authenticated/admin.routes.deliveries'
 import { Route as AuthenticatedAdminRoutesIncidentsRouteImport } from './routes/_authenticated/admin.routes.incidents'
 import { Route as AuthenticatedAdminRoutesStopsRouteImport } from './routes/_authenticated/admin.routes.stops'
+import { Route as AuthenticatedAppCompanyOrganizationRouteImport } from './routes/_authenticated/app.company.organization'
+import { Route as AuthenticatedAppCompanySitesRouteImport } from './routes/_authenticated/app.company.sites'
 import { Route as AuthenticatedAppMenuDishIdRouteImport } from './routes/_authenticated/app.menu.$dishId'
+import { Route as AuthenticatedAppOnboardingCompanyRouteImport } from './routes/_authenticated/app.onboarding.company'
+import { Route as AuthenticatedAppOnboardingEmployeeRouteImport } from './routes/_authenticated/app.onboarding.employee'
 import { Route as AuthenticatedAppOrdersOrderIdRouteImport } from './routes/_authenticated/app.orders.$orderId'
 import { Route as AuthenticatedAppSettingsProfileRouteImport } from './routes/_authenticated/app.settings.profile'
 
@@ -123,6 +130,12 @@ const AuthenticatedAdminBrandingRoute =
   AuthenticatedAdminBrandingRouteImport.update({
     id: '/branding',
     path: '/branding',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminCompaniesRoute =
+  AuthenticatedAdminCompaniesRouteImport.update({
+    id: '/companies',
+    path: '/companies',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminCustomersRoute =
@@ -201,11 +214,22 @@ const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const AuthenticatedAppCompanyRoute = AuthenticatedAppCompanyRouteImport.update({
+  id: '/company',
+  path: '/company',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
 const AuthenticatedAppMenuRoute = AuthenticatedAppMenuRouteImport.update({
   id: '/menu',
   path: '/menu',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const AuthenticatedAppOnboardingRoute =
+  AuthenticatedAppOnboardingRouteImport.update({
+    id: '/onboarding',
+    path: '/onboarding',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppOrdersRoute = AuthenticatedAppOrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
@@ -354,11 +378,35 @@ const AuthenticatedAdminRoutesStopsRoute =
     path: '/stops',
     getParentRoute: () => AuthenticatedAdminRoutesRoute,
   } as any)
+const AuthenticatedAppCompanyOrganizationRoute =
+  AuthenticatedAppCompanyOrganizationRouteImport.update({
+    id: '/organization',
+    path: '/organization',
+    getParentRoute: () => AuthenticatedAppCompanyRoute,
+  } as any)
+const AuthenticatedAppCompanySitesRoute =
+  AuthenticatedAppCompanySitesRouteImport.update({
+    id: '/sites',
+    path: '/sites',
+    getParentRoute: () => AuthenticatedAppCompanyRoute,
+  } as any)
 const AuthenticatedAppMenuDishIdRoute =
   AuthenticatedAppMenuDishIdRouteImport.update({
     id: '/$dishId',
     path: '/$dishId',
     getParentRoute: () => AuthenticatedAppMenuRoute,
+  } as any)
+const AuthenticatedAppOnboardingCompanyRoute =
+  AuthenticatedAppOnboardingCompanyRouteImport.update({
+    id: '/company',
+    path: '/company',
+    getParentRoute: () => AuthenticatedAppOnboardingRoute,
+  } as any)
+const AuthenticatedAppOnboardingEmployeeRoute =
+  AuthenticatedAppOnboardingEmployeeRouteImport.update({
+    id: '/employee',
+    path: '/employee',
+    getParentRoute: () => AuthenticatedAppOnboardingRoute,
   } as any)
 const AuthenticatedAppOrdersOrderIdRoute =
   AuthenticatedAppOrdersOrderIdRouteImport.update({
@@ -384,6 +432,7 @@ export interface FileRoutesByFullPath {
   '/auth/admin': typeof AuthAdminRoute
   '/admin/accounting': typeof AuthenticatedAdminAccountingRoute
   '/admin/branding': typeof AuthenticatedAdminBrandingRoute
+  '/admin/companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/admin/design-system': typeof AuthenticatedAdminDesignSystemRouteWithChildren
   '/admin/dishes': typeof AuthenticatedAdminDishesRoute
@@ -396,7 +445,9 @@ export interface FileRoutesByFullPath {
   '/admin/routes': typeof AuthenticatedAdminRoutesRouteWithChildren
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/support': typeof AuthenticatedAdminSupportRoute
+  '/app/company': typeof AuthenticatedAppCompanyRouteWithChildren
   '/app/menu': typeof AuthenticatedAppMenuRouteWithChildren
+  '/app/onboarding': typeof AuthenticatedAppOnboardingRouteWithChildren
   '/app/orders': typeof AuthenticatedAppOrdersRouteWithChildren
   '/app/schedule': typeof AuthenticatedAppScheduleRoute
   '/app/settings': typeof AuthenticatedAppSettingsRouteWithChildren
@@ -421,7 +472,11 @@ export interface FileRoutesByFullPath {
   '/admin/routes/deliveries': typeof AuthenticatedAdminRoutesDeliveriesRoute
   '/admin/routes/incidents': typeof AuthenticatedAdminRoutesIncidentsRoute
   '/admin/routes/stops': typeof AuthenticatedAdminRoutesStopsRoute
+  '/app/company/organization': typeof AuthenticatedAppCompanyOrganizationRoute
+  '/app/company/sites': typeof AuthenticatedAppCompanySitesRoute
   '/app/menu/$dishId': typeof AuthenticatedAppMenuDishIdRoute
+  '/app/onboarding/company': typeof AuthenticatedAppOnboardingCompanyRoute
+  '/app/onboarding/employee': typeof AuthenticatedAppOnboardingEmployeeRoute
   '/app/orders/$orderId': typeof AuthenticatedAppOrdersOrderIdRoute
   '/app/settings/profile': typeof AuthenticatedAppSettingsProfileRoute
   '/admin/design-system/': typeof AuthenticatedAdminDesignSystemIndexRoute
@@ -436,6 +491,7 @@ export interface FileRoutesByTo {
   '/auth/admin': typeof AuthAdminRoute
   '/admin/accounting': typeof AuthenticatedAdminAccountingRoute
   '/admin/branding': typeof AuthenticatedAdminBrandingRoute
+  '/admin/companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/admin/dishes': typeof AuthenticatedAdminDishesRoute
   '/admin/inventory': typeof AuthenticatedAdminInventoryRoute
@@ -445,7 +501,9 @@ export interface FileRoutesByTo {
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/support': typeof AuthenticatedAdminSupportRoute
+  '/app/company': typeof AuthenticatedAppCompanyRouteWithChildren
   '/app/menu': typeof AuthenticatedAppMenuRouteWithChildren
+  '/app/onboarding': typeof AuthenticatedAppOnboardingRouteWithChildren
   '/app/orders': typeof AuthenticatedAppOrdersRouteWithChildren
   '/app/schedule': typeof AuthenticatedAppScheduleRoute
   '/app/settings': typeof AuthenticatedAppSettingsRouteWithChildren
@@ -470,7 +528,11 @@ export interface FileRoutesByTo {
   '/admin/routes/deliveries': typeof AuthenticatedAdminRoutesDeliveriesRoute
   '/admin/routes/incidents': typeof AuthenticatedAdminRoutesIncidentsRoute
   '/admin/routes/stops': typeof AuthenticatedAdminRoutesStopsRoute
+  '/app/company/organization': typeof AuthenticatedAppCompanyOrganizationRoute
+  '/app/company/sites': typeof AuthenticatedAppCompanySitesRoute
   '/app/menu/$dishId': typeof AuthenticatedAppMenuDishIdRoute
+  '/app/onboarding/company': typeof AuthenticatedAppOnboardingCompanyRoute
+  '/app/onboarding/employee': typeof AuthenticatedAppOnboardingEmployeeRoute
   '/app/orders/$orderId': typeof AuthenticatedAppOrdersOrderIdRoute
   '/app/settings/profile': typeof AuthenticatedAppSettingsProfileRoute
   '/admin/design-system': typeof AuthenticatedAdminDesignSystemIndexRoute
@@ -490,6 +552,7 @@ export interface FileRoutesById {
   '/auth/admin': typeof AuthAdminRoute
   '/_authenticated/admin/accounting': typeof AuthenticatedAdminAccountingRoute
   '/_authenticated/admin/branding': typeof AuthenticatedAdminBrandingRoute
+  '/_authenticated/admin/companies': typeof AuthenticatedAdminCompaniesRoute
   '/_authenticated/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/_authenticated/admin/design-system': typeof AuthenticatedAdminDesignSystemRouteWithChildren
   '/_authenticated/admin/dishes': typeof AuthenticatedAdminDishesRoute
@@ -502,7 +565,9 @@ export interface FileRoutesById {
   '/_authenticated/admin/routes': typeof AuthenticatedAdminRoutesRouteWithChildren
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/support': typeof AuthenticatedAdminSupportRoute
+  '/_authenticated/app/company': typeof AuthenticatedAppCompanyRouteWithChildren
   '/_authenticated/app/menu': typeof AuthenticatedAppMenuRouteWithChildren
+  '/_authenticated/app/onboarding': typeof AuthenticatedAppOnboardingRouteWithChildren
   '/_authenticated/app/orders': typeof AuthenticatedAppOrdersRouteWithChildren
   '/_authenticated/app/schedule': typeof AuthenticatedAppScheduleRoute
   '/_authenticated/app/settings': typeof AuthenticatedAppSettingsRouteWithChildren
@@ -527,7 +592,11 @@ export interface FileRoutesById {
   '/_authenticated/admin/routes/deliveries': typeof AuthenticatedAdminRoutesDeliveriesRoute
   '/_authenticated/admin/routes/incidents': typeof AuthenticatedAdminRoutesIncidentsRoute
   '/_authenticated/admin/routes/stops': typeof AuthenticatedAdminRoutesStopsRoute
+  '/_authenticated/app/company/organization': typeof AuthenticatedAppCompanyOrganizationRoute
+  '/_authenticated/app/company/sites': typeof AuthenticatedAppCompanySitesRoute
   '/_authenticated/app/menu/$dishId': typeof AuthenticatedAppMenuDishIdRoute
+  '/_authenticated/app/onboarding/company': typeof AuthenticatedAppOnboardingCompanyRoute
+  '/_authenticated/app/onboarding/employee': typeof AuthenticatedAppOnboardingEmployeeRoute
   '/_authenticated/app/orders/$orderId': typeof AuthenticatedAppOrdersOrderIdRoute
   '/_authenticated/app/settings/profile': typeof AuthenticatedAppSettingsProfileRoute
   '/_authenticated/admin/design-system/': typeof AuthenticatedAdminDesignSystemIndexRoute
@@ -547,6 +616,7 @@ export interface FileRouteTypes {
     | '/auth/admin'
     | '/admin/accounting'
     | '/admin/branding'
+    | '/admin/companies'
     | '/admin/customers'
     | '/admin/design-system'
     | '/admin/dishes'
@@ -559,7 +629,9 @@ export interface FileRouteTypes {
     | '/admin/routes'
     | '/admin/settings'
     | '/admin/support'
+    | '/app/company'
     | '/app/menu'
+    | '/app/onboarding'
     | '/app/orders'
     | '/app/schedule'
     | '/app/settings'
@@ -584,7 +656,11 @@ export interface FileRouteTypes {
     | '/admin/routes/deliveries'
     | '/admin/routes/incidents'
     | '/admin/routes/stops'
+    | '/app/company/organization'
+    | '/app/company/sites'
     | '/app/menu/$dishId'
+    | '/app/onboarding/company'
+    | '/app/onboarding/employee'
     | '/app/orders/$orderId'
     | '/app/settings/profile'
     | '/admin/design-system/'
@@ -599,6 +675,7 @@ export interface FileRouteTypes {
     | '/auth/admin'
     | '/admin/accounting'
     | '/admin/branding'
+    | '/admin/companies'
     | '/admin/customers'
     | '/admin/dishes'
     | '/admin/inventory'
@@ -608,7 +685,9 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/settings'
     | '/admin/support'
+    | '/app/company'
     | '/app/menu'
+    | '/app/onboarding'
     | '/app/orders'
     | '/app/schedule'
     | '/app/settings'
@@ -633,7 +712,11 @@ export interface FileRouteTypes {
     | '/admin/routes/deliveries'
     | '/admin/routes/incidents'
     | '/admin/routes/stops'
+    | '/app/company/organization'
+    | '/app/company/sites'
     | '/app/menu/$dishId'
+    | '/app/onboarding/company'
+    | '/app/onboarding/employee'
     | '/app/orders/$orderId'
     | '/app/settings/profile'
     | '/admin/design-system'
@@ -652,6 +735,7 @@ export interface FileRouteTypes {
     | '/auth/admin'
     | '/_authenticated/admin/accounting'
     | '/_authenticated/admin/branding'
+    | '/_authenticated/admin/companies'
     | '/_authenticated/admin/customers'
     | '/_authenticated/admin/design-system'
     | '/_authenticated/admin/dishes'
@@ -664,7 +748,9 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/routes'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/support'
+    | '/_authenticated/app/company'
     | '/_authenticated/app/menu'
+    | '/_authenticated/app/onboarding'
     | '/_authenticated/app/orders'
     | '/_authenticated/app/schedule'
     | '/_authenticated/app/settings'
@@ -689,7 +775,11 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/routes/deliveries'
     | '/_authenticated/admin/routes/incidents'
     | '/_authenticated/admin/routes/stops'
+    | '/_authenticated/app/company/organization'
+    | '/_authenticated/app/company/sites'
     | '/_authenticated/app/menu/$dishId'
+    | '/_authenticated/app/onboarding/company'
+    | '/_authenticated/app/onboarding/employee'
     | '/_authenticated/app/orders/$orderId'
     | '/_authenticated/app/settings/profile'
     | '/_authenticated/admin/design-system/'
@@ -790,6 +880,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminBrandingRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/companies': {
+      id: '/_authenticated/admin/companies'
+      path: '/companies'
+      fullPath: '/admin/companies'
+      preLoaderRoute: typeof AuthenticatedAdminCompaniesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/customers': {
       id: '/_authenticated/admin/customers'
       path: '/customers'
@@ -881,11 +978,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/company': {
+      id: '/_authenticated/app/company'
+      path: '/company'
+      fullPath: '/app/company'
+      preLoaderRoute: typeof AuthenticatedAppCompanyRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/app/menu': {
       id: '/_authenticated/app/menu'
       path: '/menu'
       fullPath: '/app/menu'
       preLoaderRoute: typeof AuthenticatedAppMenuRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/onboarding': {
+      id: '/_authenticated/app/onboarding'
+      path: '/onboarding'
+      fullPath: '/app/onboarding'
+      preLoaderRoute: typeof AuthenticatedAppOnboardingRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/app/orders': {
@@ -1063,12 +1174,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRoutesStopsRouteImport
       parentRoute: typeof AuthenticatedAdminRoutesRoute
     }
+    '/_authenticated/app/company/organization': {
+      id: '/_authenticated/app/company/organization'
+      path: '/organization'
+      fullPath: '/app/company/organization'
+      preLoaderRoute: typeof AuthenticatedAppCompanyOrganizationRouteImport
+      parentRoute: typeof AuthenticatedAppCompanyRoute
+    }
+    '/_authenticated/app/company/sites': {
+      id: '/_authenticated/app/company/sites'
+      path: '/sites'
+      fullPath: '/app/company/sites'
+      preLoaderRoute: typeof AuthenticatedAppCompanySitesRouteImport
+      parentRoute: typeof AuthenticatedAppCompanyRoute
+    }
     '/_authenticated/app/menu/$dishId': {
       id: '/_authenticated/app/menu/$dishId'
       path: '/$dishId'
       fullPath: '/app/menu/$dishId'
       preLoaderRoute: typeof AuthenticatedAppMenuDishIdRouteImport
       parentRoute: typeof AuthenticatedAppMenuRoute
+    }
+    '/_authenticated/app/onboarding/company': {
+      id: '/_authenticated/app/onboarding/company'
+      path: '/company'
+      fullPath: '/app/onboarding/company'
+      preLoaderRoute: typeof AuthenticatedAppOnboardingCompanyRouteImport
+      parentRoute: typeof AuthenticatedAppOnboardingRoute
+    }
+    '/_authenticated/app/onboarding/employee': {
+      id: '/_authenticated/app/onboarding/employee'
+      path: '/employee'
+      fullPath: '/app/onboarding/employee'
+      preLoaderRoute: typeof AuthenticatedAppOnboardingEmployeeRouteImport
+      parentRoute: typeof AuthenticatedAppOnboardingRoute
     }
     '/_authenticated/app/orders/$orderId': {
       id: '/_authenticated/app/orders/$orderId'
@@ -1171,6 +1310,7 @@ const AuthenticatedAdminRoutesRouteWithChildren =
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAccountingRoute: typeof AuthenticatedAdminAccountingRoute
   AuthenticatedAdminBrandingRoute: typeof AuthenticatedAdminBrandingRoute
+  AuthenticatedAdminCompaniesRoute: typeof AuthenticatedAdminCompaniesRoute
   AuthenticatedAdminCustomersRoute: typeof AuthenticatedAdminCustomersRoute
   AuthenticatedAdminDesignSystemRoute: typeof AuthenticatedAdminDesignSystemRouteWithChildren
   AuthenticatedAdminDishesRoute: typeof AuthenticatedAdminDishesRoute
@@ -1189,6 +1329,7 @@ interface AuthenticatedAdminRouteChildren {
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAccountingRoute: AuthenticatedAdminAccountingRoute,
   AuthenticatedAdminBrandingRoute: AuthenticatedAdminBrandingRoute,
+  AuthenticatedAdminCompaniesRoute: AuthenticatedAdminCompaniesRoute,
   AuthenticatedAdminCustomersRoute: AuthenticatedAdminCustomersRoute,
   AuthenticatedAdminDesignSystemRoute:
     AuthenticatedAdminDesignSystemRouteWithChildren,
@@ -1209,6 +1350,23 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
+interface AuthenticatedAppCompanyRouteChildren {
+  AuthenticatedAppCompanyOrganizationRoute: typeof AuthenticatedAppCompanyOrganizationRoute
+  AuthenticatedAppCompanySitesRoute: typeof AuthenticatedAppCompanySitesRoute
+}
+
+const AuthenticatedAppCompanyRouteChildren: AuthenticatedAppCompanyRouteChildren =
+  {
+    AuthenticatedAppCompanyOrganizationRoute:
+      AuthenticatedAppCompanyOrganizationRoute,
+    AuthenticatedAppCompanySitesRoute: AuthenticatedAppCompanySitesRoute,
+  }
+
+const AuthenticatedAppCompanyRouteWithChildren =
+  AuthenticatedAppCompanyRoute._addFileChildren(
+    AuthenticatedAppCompanyRouteChildren,
+  )
+
 interface AuthenticatedAppMenuRouteChildren {
   AuthenticatedAppMenuDishIdRoute: typeof AuthenticatedAppMenuDishIdRoute
 }
@@ -1219,6 +1377,24 @@ const AuthenticatedAppMenuRouteChildren: AuthenticatedAppMenuRouteChildren = {
 
 const AuthenticatedAppMenuRouteWithChildren =
   AuthenticatedAppMenuRoute._addFileChildren(AuthenticatedAppMenuRouteChildren)
+
+interface AuthenticatedAppOnboardingRouteChildren {
+  AuthenticatedAppOnboardingCompanyRoute: typeof AuthenticatedAppOnboardingCompanyRoute
+  AuthenticatedAppOnboardingEmployeeRoute: typeof AuthenticatedAppOnboardingEmployeeRoute
+}
+
+const AuthenticatedAppOnboardingRouteChildren: AuthenticatedAppOnboardingRouteChildren =
+  {
+    AuthenticatedAppOnboardingCompanyRoute:
+      AuthenticatedAppOnboardingCompanyRoute,
+    AuthenticatedAppOnboardingEmployeeRoute:
+      AuthenticatedAppOnboardingEmployeeRoute,
+  }
+
+const AuthenticatedAppOnboardingRouteWithChildren =
+  AuthenticatedAppOnboardingRoute._addFileChildren(
+    AuthenticatedAppOnboardingRouteChildren,
+  )
 
 interface AuthenticatedAppOrdersRouteChildren {
   AuthenticatedAppOrdersOrderIdRoute: typeof AuthenticatedAppOrdersOrderIdRoute
@@ -1249,7 +1425,9 @@ const AuthenticatedAppSettingsRouteWithChildren =
   )
 
 interface AuthenticatedAppRouteChildren {
+  AuthenticatedAppCompanyRoute: typeof AuthenticatedAppCompanyRouteWithChildren
   AuthenticatedAppMenuRoute: typeof AuthenticatedAppMenuRouteWithChildren
+  AuthenticatedAppOnboardingRoute: typeof AuthenticatedAppOnboardingRouteWithChildren
   AuthenticatedAppOrdersRoute: typeof AuthenticatedAppOrdersRouteWithChildren
   AuthenticatedAppScheduleRoute: typeof AuthenticatedAppScheduleRoute
   AuthenticatedAppSettingsRoute: typeof AuthenticatedAppSettingsRouteWithChildren
@@ -1257,7 +1435,9 @@ interface AuthenticatedAppRouteChildren {
 }
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
+  AuthenticatedAppCompanyRoute: AuthenticatedAppCompanyRouteWithChildren,
   AuthenticatedAppMenuRoute: AuthenticatedAppMenuRouteWithChildren,
+  AuthenticatedAppOnboardingRoute: AuthenticatedAppOnboardingRouteWithChildren,
   AuthenticatedAppOrdersRoute: AuthenticatedAppOrdersRouteWithChildren,
   AuthenticatedAppScheduleRoute: AuthenticatedAppScheduleRoute,
   AuthenticatedAppSettingsRoute: AuthenticatedAppSettingsRouteWithChildren,
@@ -1324,3 +1504,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

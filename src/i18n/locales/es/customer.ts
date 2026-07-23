@@ -101,6 +101,8 @@ export default {
   groupFood: "Comida",
   groupApp: "Aplicación",
   profile: "Perfil",
+  onboarding: "Tipo de cliente",
+  companyPortal: "Mi empresa",
   personalInfo: "Datos personales",
   fullName: "Nombre completo",
   editProfile: "Editar perfil",

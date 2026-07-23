@@ -50,6 +50,8 @@ function SettingsPage() {
       title: t("customer:groupAccount"),
       items: [
         { key: "profile", icon: <UserIcon className="size-4" />, to: "/app/settings/profile" },
+        { key: "onboarding", icon: <UserIcon className="size-4" />, to: "/app/onboarding" },
+        { key: "companyPortal", icon: <UserIcon className="size-4" />, to: "/app/company" },
         { key: "addresses", icon: <MapPin className="size-4" /> },
         { key: "phones", icon: <Phone className="size-4" /> },
       ],

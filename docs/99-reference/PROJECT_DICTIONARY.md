@@ -180,6 +180,12 @@ Core | Operational | Engineering | Historical
 | `DICT-054` | [Customer Journey](#customer-journey) | Operational | Accepted |
 | `DICT-055` | [Experience Domain](#experience-domain) | Core | Accepted |
 | `DICT-056` | [Screen (SCR)](#screen-scr) | Engineering | Accepted |
+| `DICT-063` | [Company Account](#company-account) | Operational | Accepted |
+| `DICT-064` | [Site](#site) | Operational | Accepted |
+| `DICT-065` | [Organizational Unit](#organizational-unit) | Operational | Accepted |
+| `DICT-066` | [Delivery Group](#delivery-group) | Operational | Accepted |
+| `DICT-067` | [Company Code](#company-code) | Engineering | Accepted |
+| `DICT-068` | [Party](#party) | Core | Accepted |
 | `DICT-057` | [Knowledge Lifetime](#knowledge-lifetime) | Core | Accepted |
 | `DICT-060` | [Tenant Brand](#tenant-brand) | Operational | Accepted |
 | `DICT-061` | [brand.manage](#brandmanage) | Engineering | Accepted |
@@ -2487,6 +2493,215 @@ Customer Journey · Experience First · Capability
 
 ---
 
+# Company Account
+
+## ID
+DICT-063
+
+## Status
+Accepted
+
+## Madurez
+Operational
+
+## Nombre
+Company Account
+
+## Tipo
+Core Object (B2B)
+
+## Definición
+Entidad B2B que contrata comida para un colectivo dentro de un Tenant (Organization). Posee Company Code, sedes (Site), unidades organizativas y memberships de empleados (Beneficiaries). No es el Consumer B2C ni el Tenant.
+
+## Cuándo ocurre
+Registro empresa · portal Company · pedidos con demand_channel = company
+
+## Produce
+Agrupación comercial y logística B2B · facturación a empresa
+
+## No significa
+Organization / Tenant · Consumer · rol `company_admin` del staff del Tenant
+
+## Sinónimos
+Empresa cliente · Cuenta Empresa
+
+## Palabras relacionadas
+Site · Organizational Unit · Delivery Group · Beneficiary · Company Code
+
+## Referencias
+[ADR 0015](../adr/0015-b2b-b2c-customer-model.md) · [company-account-b2b](../17-operational-model/02-core-objects/company-account-b2b.md)
+
+
+---
+
+# Site
+
+## ID
+DICT-064
+
+## Status
+Accepted
+
+## Madurez
+Operational
+
+## Nombre
+Site
+
+## Tipo
+Core Object (B2B · sede)
+
+## Definición
+Centro físico de una Company Account (oficina, hotel, clínica…). Persistido como `company_locations`.
+
+## Cuándo ocurre
+Alta de sede · asignación de empleados · resolución de Delivery Group
+
+## Produce
+Ancla geográfica / de entrega para Unidades Organizativas
+
+## No significa
+Dirección personal B2C · Tenant
+
+## Sinónimos
+Sede · Location (legacy DB)
+
+## Palabras relacionadas
+Company Account · Organizational Unit · Delivery Group
+
+## Referencias
+[ADR 0015](../adr/0015-b2b-b2c-customer-model.md)
+
+
+---
+
+# Organizational Unit
+
+## ID
+DICT-065
+
+## Status
+Accepted
+
+## Madurez
+Operational
+
+## Nombre
+Organizational Unit
+
+## Tipo
+Core Object (B2B · unidad configurable)
+
+## Definición
+Unidad organizativa libre dentro de un Site. El Tenant/Company elige la etiqueta (Departamento, Área, Planta, Servicio, Turno…). **No** hardcodear “Departamento” como nombre técnico. Persistido como `company_departments`.
+
+## Cuándo ocurre
+Alta por Company Admin · join de empleado · Delivery Group
+
+## Produce
+Partición operativa dentro de una sede
+
+## No significa
+Department fijo de producto · rol de staff
+
+## Sinónimos
+Unidad · Área · Departamento (solo etiqueta)
+
+## Palabras relacionadas
+Site · Employee Membership · Delivery Group
+
+## Referencias
+[ADR 0015](../adr/0015-b2b-b2c-customer-model.md)
+
+
+---
+
+# Delivery Group
+
+## ID
+DICT-066
+
+## Status
+Accepted
+
+## Madurez
+Operational
+
+## Nombre
+Delivery Group
+
+## Tipo
+Core Object (logística · agregación mínima)
+
+## Definición
+Grupo mínimo de entrega derivado de Company + Site + Organizational Unit (ej. Hotel Paradise → Recepción → N pedidos → 1 entrega). Depende de la logística, no solo del organigrama comercial.
+
+## Cuándo ocurre
+Al programar / confirmar pedidos B2B · planificación de rutas (futuro)
+
+## Produce
+Clave de agrupación para fulfillment
+
+## No significa
+Ruta inteligente · optimización (fuera de alcance ADR 0015)
+
+## Sinónimos
+Grupo de entrega
+
+## Palabras relacionadas
+Order · Site · Organizational Unit · Company Account
+
+## Referencias
+[ADR 0015](../adr/0015-b2b-b2c-customer-model.md)
+
+
+---
+
+# Company Code
+
+## ID
+DICT-067
+
+## Status
+Accepted
+
+## Madurez
+Engineering
+
+## Nombre
+Company Code
+
+## Tipo
+Identifier
+
+## Definición
+Código único por Tenant que identifica una Company Account (ej. EC-4821). Se genera al crear la empresa; no es editable; los empleados lo usan para unirse.
+
+## Cuándo ocurre
+Registro empresa · onboarding empleado
+
+## Produce
+Join seguro sin invitación compleja (v1)
+
+## No significa
+Slug de Tenant · código promocional
+
+## Sinónimos
+Código empresa
+
+## Palabras relacionadas
+Company Account · Employee Membership
+
+## Referencias
+[ADR 0015](../adr/0015-b2b-b2c-customer-model.md)
+
+
+---
+
+# Party
+
+## ID
+DICT-068
 # Knowledge Lifetime
 
 ## ID
@@ -2499,6 +2714,40 @@ Accepted
 Core
 
 ## Nombre
+Party
+
+## Tipo
+Core Object (umbrella · Party Model)
+
+## Definición
+Concepto paraguas de demanda dentro de un Tenant:
+
+```text
+Party
+ ├── Individual Customer
+ └── Company
+       └── Employees (Memberships)
+```
+
+Permite compartir facets futuros (contacto, direcciones) entre persona y empresa sin confundir comportamientos (onboarding, Company Code, Delivery Group, facturación). En el piloto físico sigue ADR 0015 (`customers` / `companies`); la tabla `parties` es convergencia post-Gate (ADR 0016).
+
+## Cuándo ocurre
+Diseño OM · onboarding B2B/B2C · lectura de ADRs 0015/0016
+
+## Produce
+Lenguaje estable para SaaS multi-empresa sin migrar el esquema del piloto
+
+## No significa
+Organization (Tenant) · implementación inmediata de tabla `parties` · permiso para duplicar Customer genérico
+
+## Sinónimos
+Parte de demanda · Party Model
+
+## Palabras relacionadas
+Individual Customer · Company Account · Membership · Consumer · Beneficiary
+
+## Referencias
+[ADR 0016](../adr/0016-party-model-demand-actors.md) · [actors.md](../17-operational-model/01-ubiquitous-language/actors.md)
 Knowledge Lifetime
 
 ## Tipo
@@ -2672,6 +2921,8 @@ Tenant-Branded · BrandConfig · Tenant Brand · brand.manage
 | 2026-07-23 | TENANT_IMPLEMENTATION_EATCLEAN · `tenants/eatclean/` · DICT-052 Tenant Assets |
 | 2026-07-23 | Experience First · CUSTOMER_JOURNEYS · DICT-053/054 |
 | 2026-07-23 | Experience Domain · SCR trazabilidad · DICT-055/056 · PROJECT_DOMAINS |
+| 2026-07-23 | ADR 0015 B2B/B2C · DICT-063…067 Company Account · Site · OU · Delivery Group · Company Code |
+| 2026-07-23 | ADR 0016 Party Model · DICT-068 Party (semantic now · physical later) |
 | 2026-07-23 | Knowledge Lifetime · DICT-057 · Milestone EatClean Pilot Ready |
 | 2026-07-23 | Tenant-Managed · Tenant Brand · brand.manage · DICT-060…062 |
 | 2026-07-23 | Foundation of Materialization Frozen · Four Layers · Pilot Execution Guide |

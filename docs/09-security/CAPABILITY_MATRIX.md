@@ -111,9 +111,15 @@ Legend: ✅ granted · ❌ denied
 |------------|------------|---------------|------------|
 | accounting.operate | ✅ | ✅ | ✅ |
 | admin.settings | ❌ | ✅ | ✅ |
-| **brand.manage** | ❌ | ✅ | ✅ |
+| brand.manage | ❌ | ✅ | ✅ |
+| company.manage | ❌ | ✅ | ✅ |
+| site.manage | ❌ | ✅ | ✅ |
+| organization.manage | ❌ | ✅ | ✅ |
+| employee.manage | ❌ | ✅ | ✅ |
 | saas.manage | ❌ | ❌ | ✅ |
 | records.purge | ❌ | ❌ | ✅ |
+
+> **ADR 0015:** B2B Company Account portal admins are scoped by `company_employees.is_admin` (not the Tenant role `company_admin`). Tenant `company_admin` / `saas_admin` oversee any company in the tenant. Services enforce both paths.
 
 ### `brand.manage`
 
@@ -126,6 +132,7 @@ Legend: ✅ granted · ❌ denied
 | **Objeto** | [Tenant Brand](../17-operational-model/02-core-objects/tenant-brand.md) |
 
 La UI puede ocultar el acceso; la **seguridad** es Service + roles/capabilities + RLS/Storage policies.
+
 
 ---
 

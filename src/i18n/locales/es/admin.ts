@@ -31,6 +31,7 @@ export default {
       customers: "Clientes",
       inventory: "Inventario",
       more: "Más",
+      companyClients: "Clientes Empresa",
     },
     workspace: {
       kitchen: {

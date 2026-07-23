@@ -30,6 +30,14 @@
 | [Knowledge Lifetime](./18-operational-validation/knowledge-lifetime.md) | Caducidad documental · Contract · Implementation · Iteration |
 | [Definition of Done](./00-status/DEFINITION_OF_DONE.md) | Checklist de módulo |
 | [Foundation Lock](./05-architecture/FOUNDATION_LOCK.md) | ✅ Cerrado v0.1.0 |
+| [Tenant Branding](./05-architecture/TENANT_BRANDING.md) | Contrato BrandConfig · Customer App white-label (ADR 0014) |
+| [ADR 0015 · B2B/B2C Customer Model](./adr/0015-b2b-b2c-customer-model.md) | Separación Consumer / Company Account antes del piloto |
+| [ADR 0016 · Party Model](./adr/0016-party-model-demand-actors.md) | Party → Individual Customer \| Company → Memberships |
+| [Core Object Traceability](./17-operational-model/CORE_OBJECT_TRACEABILITY.md) | OM Party ↔ tablas físicas del piloto |
+| [ORR Party / B2B / B2C](./00-status/ORR_B2B_B2C_PARTY.md) | Checklist pre–Pilot Ready (alta empresa = EatClean) |
+| [Company Account B2B](./17-operational-model/02-core-objects/company-account-b2b.md) | Site · Organizational Unit · Delivery Group |
+| [Tenant Experience Spec](./05-architecture/TENANT_EXPERIENCE_SPEC.md) | Identidad EatClean · Experience Refactor |
+| [Tenant Implementation · EatClean](./05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) | Brief Cursor/Lovable · Tenant Assets |
 | [Tenant Branding](./05-architecture/TENANT_BRANDING.md) | BrandConfig · Tenant-Managed runtime · `brand.manage` |
 | [Brand Contract](./05-architecture/BRAND_CONTRACT.md) | Límites de logo/colores/accesibilidad |
 | [Brand Validation Checklist](./05-architecture/BRAND_VALIDATION_CHECKLIST.md) | Coherencia de marca tras gestión por el Tenant |

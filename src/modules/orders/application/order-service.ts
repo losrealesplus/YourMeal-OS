@@ -90,13 +90,22 @@ export const OrderService = {
     total = Math.round(total * 100) / 100;
 
     const repo = createOrderRepository(ctx.supabase, ctx.tenantId);
-    const customerId = await repo.findCustomerIdForUser(ctx.userId);
+    let customerId = await repo.findCustomerIdForUser(ctx.userId);
     if (!customerId) {
-      throw new DomainError(
-        "NOT_FOUND",
-        "No customer profile linked to this user for the active tenant",
+      // Structural correction ADR 0015 — provision Individual Customer without breaking CJ-001.
+      const { CompanyAccountService } = await import(
+        "@/modules/company-account/application/company-account-service"
       );
+      customerId = await CompanyAccountService.ensureIndividualCustomer(ctx);
     }
+
+    const { CompanyAccountService } = await import(
+      "@/modules/company-account/application/company-account-service"
+    );
+    const demand = await CompanyAccountService.resolveOrderDemandContext(
+      ctx,
+      customerId,
+    );
 
     const result = await repo.insertDraft({
       customerId,
@@ -104,6 +113,11 @@ export const OrderService = {
       total,
       notes: command.notes ?? null,
       items,
+      demandChannel: demand.demandChannel,
+      companyId: demand.companyId,
+      siteId: demand.siteId,
+      organizationalUnitId: demand.organizationalUnitId,
+      deliveryGroupId: demand.deliveryGroupId,
     });
 
     try {
