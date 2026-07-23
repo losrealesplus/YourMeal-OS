@@ -72,7 +72,6 @@ function ScheduleFlow() {
       dayDate,
       dishIds: selected,
       total: totalEur,
-      notes: `mealsPerDay=${mealsPerDay}`,
     });
     void navigate({ to: "/app" });
   }
