@@ -17,10 +17,31 @@ Esta frase resume la separación entre YourMeal OS (motor operativo) y cada Cust
 | Nivel | Responsable | ¿Cambia por cliente? |
 |-------|-------------|----------------------|
 | **Platform** | YourMeal OS | No |
-| **BrandConfig** | Tenant | Sí — configuración |
+| **BrandConfig / Tenant Brand** | Tenant | Sí — configuración + **gestión en runtime** |
 | **Tenant Experience** | Tenant | Sí — contenido y recursos |
 
 Una sola base de código. Experiencia completa por Tenant sin forks.
+
+### Evolución Hardcoded → Tenant-Branded → Tenant-Managed
+
+```text
+Fase 1  Hardcoded        → identidad en código
+Fase 2  Tenant-Branded   → identidad por config/assets (aún depende del desarrollador)
+Fase 3  Tenant-Managed   → el Tenant administra identidad (brand.manage) sin despliegues
+```
+
+**Tenant-Branded** responde: *¿de quién es la marca?*  
+**Tenant-Managed** responde: *¿quién puede cambiarla sin tocar el producto?*
+
+Runtime:
+
+```text
+BrandConfig → BrandingService → TenantBrandRepository → Storage
+        → useTenantBrand() → TenantBrandScope → aplicación
+```
+
+Contrato de límites: [BRAND_CONTRACT](../05-architecture/BRAND_CONTRACT.md).  
+Objeto: [Tenant Brand](../17-operational-model/02-core-objects/tenant-brand.md).
 
 ---
 
@@ -237,38 +258,43 @@ YourMeal OS no compite por ser la marca visible. Compite por ser el motor operat
 
 **Implicaciones de implementación**
 
-1. `BrandConfig` es una **Capability transversal** (no un retoque de diseño).  
-2. Tokens / copy / assets de la Customer App se inyectan desde el Tenant; no se hardcodea la marca YourMeal OS en front office.  
+1. `BrandConfig` / **Tenant Brand** son Capability transversal (`brand.manage`) — no un retoque de diseño.  
+2. Tokens / logo de la Customer App y Operaciones se inyectan en **runtime** (`useTenantBrand` · `TenantBrandScope`).  
 3. Superficies corporativas (Producto A) siguen branding YourMeal OS.  
-4. Cambios de branding de Tenant no requieren fork de código de producto.  
-5. Un incremento futuro de **Experience Refactor** (Lovable) puede alinear onboarding, login, dashboard, navegación, tono e iconografía del Tenant **sin tocar HP-001 ni lógica operativa** — priorizable por Gate / producto, no como bloqueo de Smoke/ORR. Spec: [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md).
+4. Cambios de branding de Tenant **no** requieren fork ni despliegue de producto.  
+5. Límites de assets/colores: [BRAND_CONTRACT](../05-architecture/BRAND_CONTRACT.md). Validación post-cambio: [BRAND_VALIDATION_CHECKLIST](../05-architecture/BRAND_VALIDATION_CHECKLIST.md).  
+6. Experience Spec / pantallas: [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md).
 
-**Consecuencia explícita (configuración, no forks)**
+**Consecuencia explícita (configuración + gestión, no forks)**
 
-> **La experiencia del usuario final debe poder recrear fielmente la identidad digital del Tenant utilizando únicamente la configuración de `BrandConfig` y los recursos asociados al Tenant. No se realizarán personalizaciones de código por cliente para adaptar el branding o la experiencia visual.**
-
-Cuando llegue el segundo o el décimo cliente, el cambio de identidad es **configuración + contenido**, no bifurcar la aplicación.
+> **La experiencia del usuario final debe poder recrear fielmente la identidad digital del Tenant utilizando BrandConfig / Tenant Brand y recursos asociados. No se realizarán personalizaciones de código por cliente. El Tenant puede administrar esa identidad dentro del Brand Contract.**
 
 **Regla de arquitectura SaaS**
 
 > **Cada Tenant debe poder hacer que un usuario crea que la aplicación fue desarrollada específicamente para su empresa, sin necesidad de modificar el código fuente del producto.**
 
+**Brand Recognition Filter (experiencia)**
+
+> **Si ocultamos el nombre "YourMeal OS", ¿un cliente o un empleado reconocería inmediatamente que esta aplicación pertenece al Tenant gracias al logo, los colores, la tipografía, el lenguaje y la fotografía?**
+
+Si la respuesta es **sí**, la implementación respeta esta ADR. Detalle: [TENANT_EXPERIENCE_SPEC § Brand Recognition Filter](../05-architecture/TENANT_EXPERIENCE_SPEC.md#principio-rector--brand-recognition-filter-no-negociable).
+
 **Dos decisiones de largo recorrido (contexto FOPEBA)**
 
 1. FOPEBA termina cuando empieza la **evidencia de campo**, no cuando termina el código.  
-2. YourMeal OS es el **motor operativo**; el Tenant es la **marca** de cara al usuario.
-
-La primera protege la evolución del conocimiento. La segunda protege la escalabilidad del SaaS.
+2. YourMeal OS es el **motor operativo**; el Tenant es la **marca** de cara al usuario — y ahora también el **gestor** de esa marca (Tenant-Managed).
 
 **Superseder** esta ADR requiere evidencia y un ADR nuevo explícito.
 
 ## Relacionado
 
-- [TENANT_BRANDING](../05-architecture/TENANT_BRANDING.md) — contrato técnico  
-- [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md) — identidad EatClean (Experience Refactor)  
-- [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) — brief Cursor/Lovable  
-- [`tenants/eatclean/`](../../tenants/eatclean/README.md) — BrandConfig + assets  
-- [ADR 0003](./0003-multi-tenant.md) — aislamiento multi-tenant  
-- [ADR 0004](./0004-authentication-rbac.md) — autenticación / RBAC  
-- [docs/03-brand](../03-brand/README.md)  
-- Dictionary: `DICT-045`…`DICT-052`
+- [TENANT_BRANDING](../05-architecture/TENANT_BRANDING.md) — contrato técnico / runtime  
+- [BRAND_CONTRACT](../05-architecture/BRAND_CONTRACT.md) — límites de edición  
+- [Tenant Brand](../17-operational-model/02-core-objects/tenant-brand.md) — Configuration Object  
+- [CAPABILITY_MATRIX](../09-security/CAPABILITY_MATRIX.md) — `brand.manage`  
+- [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md) — reglas permanentes  
+- [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md)  
+- [EXPERIENCE_REFACTOR_EATCLEAN_V1_1](../07-experience/EXPERIENCE_REFACTOR_EATCLEAN_V1_1.md) — bitácora  
+- [`tenants/eatclean/`](../../tenants/eatclean/README.md) — seed / fallback  
+- [ADR 0003](./0003-multi-tenant.md) · [ADR 0004](./0004-authentication-rbac.md)  
+- Dictionary: `DICT-045`…`DICT-062`
