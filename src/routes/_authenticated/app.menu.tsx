@@ -6,14 +6,14 @@ import {
   DishCard,
   ScreenHeader,
 } from "@/components/consumer";
-import { useDishes } from "@/hooks/use-dishes";
+import { useWeeklyMenu } from "@/hooks/use-weekly-menu";
 
 /**
  * Screen: Customer · Weekly Menu
  * - Objetivo operacional: explorar el menú semanal antes de programar.
  * - Capability: weekly-menu.browse
  * - Core Object(s): WeeklyMenu · Dish
- * - CAP-002: dish list from useDishes() (real catalog read; day rotation UX unchanged)
+ * - CAP-003: useWeeklyMenu() published offer by day (no order/stock/promo rules)
  */
 export const Route = createFileRoute("/_authenticated/app/menu")({
   component: MenuPage,
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/_authenticated/app/menu")({
 function MenuPage() {
   const { t } = useTranslation(["customer", "common"]);
   const [active, setActive] = useState(0);
-  const { data: catalogDishes = [] } = useDishes();
+  const { data: weeklyMenu } = useWeeklyMenu();
   const days = [
     t("customer:dayMon"),
     t("customer:dayTue"),
@@ -41,11 +41,7 @@ function MenuPage() {
     spicy: t("customer:tagSpicy"),
   };
 
-  // Same day-rotation UX; data source is real catalog.
-  const dishes = [
-    ...catalogDishes.slice(active),
-    ...catalogDishes.slice(0, active),
-  ];
+  const dishes = weeklyMenu?.days[active]?.dishes ?? [];
 
   return (
     <div className="flex-1 flex flex-col">
