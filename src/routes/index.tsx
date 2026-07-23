@@ -6,6 +6,7 @@ import {
 } from "@/components/tenant/tenant-brand-scope";
 import { brandConfig, tenantCopyEs } from "@/tenant/brand-config";
 import { PrimaryCTA } from "@/components/consumer";
+import { TenantLogo } from "@/components/tenant/tenant-logo";
 import heroImage from "@/assets/eatclean-hero.jpg";
 
 /**
@@ -41,14 +42,8 @@ function Landing() {
     <TenantBrandScope className="min-h-screen bg-[var(--background)] text-foreground">
       <div className="mx-auto max-w-[430px] min-h-screen flex flex-col">
         <header className="flex items-center justify-between px-6 pt-6">
-          <div className="flex items-center gap-2">
-            <div className="size-9 rounded-2xl bg-primary text-primary-foreground grid place-items-center text-[11px] font-extrabold tracking-tight">
-              EC
-            </div>
-            <span className="font-extrabold tracking-tight text-sm">
-              {brandConfig.name}
-            </span>
-          </div>
+          <TenantLogo height={40} />
+
           <LanguageSelector />
         </header>
 

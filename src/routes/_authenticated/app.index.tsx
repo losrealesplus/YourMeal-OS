@@ -120,9 +120,9 @@ function HomeBody({
         </div>
       ) : null}
 
-      <p className="text-center text-sm font-extrabold tracking-[0.2em] uppercase text-primary">
-        {brandConfig.name}
-      </p>
+      <div className="flex justify-center">
+        <TenantLogo height={44} />
+      </div>
 
       <div className="mt-10 text-center space-y-3">
         <h1 className="text-[1.75rem] font-extrabold tracking-tight text-balance">
