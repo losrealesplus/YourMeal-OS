@@ -41,6 +41,29 @@ Puede utilizarse en:
 
 Cuando una conversación fija significado (p. ej. «ORR PASSED = …»), la siguiente tarea documental es: **nueva entrada DICT → commit**.
 
+### Primera pregunta ante un término nuevo
+
+> **¿Es un concepto nuevo o es una forma distinta de nombrar un concepto existente?**
+
+| Respuesta | Acción |
+|-----------|--------|
+| Ya existe en el Dictionary | **Reutilizar** el término oficial (`DICT-xxx`) |
+| No existe | **Discutir** (ADR / nota / acta) |
+| Aceptado | Asignar `DICT-xxx` → entrada Accepted → uso oficial |
+
+Así se evita que aparezcan sinónimos no oficiales («Evidence Review», «Operational Gate», «Production Readiness») para conceptos que ya tienen significado preciso.
+
+### Disciplina de evolución (pilares)
+
+| Pilar | Cuándo cambia |
+|-------|----------------|
+| **FOUNDATION** | Solo circunstancias excepcionales |
+| **ADR** | Cuando hay una decisión nueva |
+| **Operational Model** | Solo tras *Knowledge Update* aprobado |
+| **PROJECT_DICTIONARY** | Solo al aceptar un concepto nuevo o modificar oficialmente uno existente |
+
+Cada documento cumple una función; no se mezclan definición, decisión y conocimiento.
+
 ---
 
 ## Metadatos de cada entrada

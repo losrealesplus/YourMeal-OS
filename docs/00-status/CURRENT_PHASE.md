@@ -8,17 +8,28 @@
 PROJECT STATE
 ══════════════════════════════════════════════════
 
+Documentary stack: Closed (pending #24 → main)
 Engineering Phase: Complete (pending operational authorization)
 Current Phase:     Evidence Gate  (pre-ORR)
 Next Gate:         ORR  (PASSED | BLOCKED)
 Next Discipline:   Operational Engineering
 Primary Artifact:  Field Evidence
+Focus:             Abrir la app · recorrido HP-001
 Last Baseline:     v0.2.0-engineering-baseline (IR-001)
 
 ══════════════════════════════════════════════════
 ```
 
 Cierre formal: [ENGINEERING_PHASE](./ENGINEERING_PHASE.md).
+
+```text
+Foundation ✅ → Governance ✅ → OM ✅ → Implementation ✅
+→ Engineering Baseline ✅ → Project Dictionary ✅ (#24)
+───────────────
+Comienza Operational Engineering  (tras ORR PASSED)
+```
+
+> No más inversión en estructura metodológica. El retorno está en **ejecutar** el recorrido y generar evidencia.
 
 ---
 
@@ -49,16 +60,26 @@ Cualquier “pequeña mejora” en el merge **espera** al siguiente ciclo.
 ## Cadena (sin pasos intermedios)
 
 ```text
-main (post-#23) → Apply migration → Smoke HP-001 → ORR → PASSED → Ready for FOV → FOV-001
+#24 → main → Apply migration → Smoke HP-001 → ORR → PASSED → Ready for FOV → FOV-001
 ```
 
 | Evento | Estado |
 |--------|:------:|
-| PR #23 merge | ✅ |
+| PR #23 merge (hardening) | ✅ |
+| PR #24 merge (Dictionary) | ⏳ |
 | Migración `program_draft_order` | ⏳ |
 | Smoke HP-001 | ⏳ |
 | ORR | ⏳ |
 | Ready for FOV | ⏳ |
+
+### Recorrido a observar (Smoke / FOV)
+
+```text
+Login → Dashboard → Weekly Menu → Seleccionar platos
+→ Programar pedido → Resumen → Confirmar → Persistencia → Auditoría
+```
+
+Ese flujo ya no valida la arquitectura: valida **experiencia** y genera las primeras observaciones reales (FOV → Knowledge Update → Gate).
 
 ---
 

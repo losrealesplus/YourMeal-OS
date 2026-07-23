@@ -2,13 +2,16 @@
 
 **Fecha:** 2026-07-23  
 **Baseline:** `v0.2.0-engineering-baseline` (IR-001)  
-**Hardening:** PR #23 (integración final a `main` pendiente)
+**Hardening:** PR #23 → `main` ✅ · **Dictionary:** PR #24 ⏳
 
 ```text
 Engineering Phase
 ───────────────
 Status:
 Complete (pending operational authorization)
+
+Documentary stack:
+Closed (post-Dictionary)
 
 Next Gate:
 ORR
@@ -18,6 +21,9 @@ Operational Engineering
 
 Primary Artifact:
 Field Evidence
+
+Focus:
+HP-001 end-to-end (no más metodología)
 ```
 
 ---
@@ -27,7 +33,7 @@ Field Evidence
 | Dominio | Estado |
 |---------|--------|
 | Knowledge Engineering | ✅ Frozen / Closed |
-| Software Engineering | ✅ Implementado · ⏳ Integración final (#23) |
+| Software Engineering | ✅ Implementado · ✅ #23 en main |
 | Operational Engineering | ⏳ Pendiente de ORR PASSED |
 
 ---
@@ -35,7 +41,7 @@ Field Evidence
 ## Cadena de decisión (sin pasos extra)
 
 ```text
-PR #23 → main → Apply migration → Smoke HP-001 → ORR → PASSED → Ready for FOV → FOV-001
+#24 → main → Apply migration → Smoke HP-001 → ORR → PASSED → Ready for FOV → FOV-001
 ```
 
 ---
@@ -57,6 +63,8 @@ Todo lo demás espera al siguiente ciclo (post-ORR / post-FOV Gate).
 ## Qué produce esta fase
 
 No más código ni metodología como activo principal.  
+YourMeal OS deja de ser principalmente un proyecto de **construcción** y pasa a ser un proyecto de **aprendizaje continuo**.
+
 El activo más valioso a partir de ahora: **evidencia operacional de calidad**.
 
-Ver [CURRENT_PHASE](./CURRENT_PHASE.md) · [ORR](../22-implementation/ORR.md) · [FOV-001](../30-field-validation/FOV-001_HP-001.md).
+Ver [CURRENT_PHASE](./CURRENT_PHASE.md) · [ORR](../22-implementation/ORR.md) · [SMOKE_HP-001](./SMOKE_HP-001.md) · [FOV-001](../30-field-validation/FOV-001_HP-001.md).
