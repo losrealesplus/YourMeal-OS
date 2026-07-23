@@ -22,6 +22,13 @@
 | [Operational Checks](./15-product/OPERATIONAL_CHECKS.md) | Datos → comprobación → acción (transversal) |
 | [Milestone · Infrastructure Validation](./00-status/MILESTONE_INFRASTRUCTURE_VALIDATION.md) | Core independiente de la tecnología ✅ |
 | [Milestone · Foundation Validation](./00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md) | Hito histórico ✅ — metodología validada |
+| [Functional Completeness Review](./00-status/EATCLEAN_PILOT_FUNCTIONAL_COMPLETENESS_REVIEW.md) | Pre-piloto · matriz Visible/Funciona/Guarda/RBAC |
+| [Milestone · EatClean Pilot Ready](./00-status/MILESTONE_EATCLEAN_PILOT_READY.md) | Hito abierto 🟡 — EP-001…EP-005 · ciclo E2E |
+| [ACT-001 · Experience Baseline Frozen](./00-status/ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) | Congelación experiencia EatClean (#24→#30) |
+| [ACT-002 · Materialization Frozen](./00-status/ACT-002_FOUNDATION_OF_MATERIALIZATION_FROZEN.md) | Foundation of Materialization Frozen v1 (#24→#31) |
+| [Four Layers](./05-architecture/FOUR_LAYERS.md) | Knowledge · Platform · Materialization · Operational |
+| [Pilot Execution Guide](./18-operational-validation/PILOT_EXECUTION_GUIDE.md) | Validación: demostrar una semana EatClean con YourMeal OS |
+| [Knowledge Lifetime](./18-operational-validation/knowledge-lifetime.md) | Caducidad documental · Contract · Implementation · Iteration |
 | [Definition of Done](./00-status/DEFINITION_OF_DONE.md) | Checklist de módulo |
 | [Foundation Lock](./05-architecture/FOUNDATION_LOCK.md) | ✅ Cerrado v0.1.0 |
 | [Tenant Branding](./05-architecture/TENANT_BRANDING.md) | Contrato BrandConfig · Customer App white-label (ADR 0014) |
@@ -33,6 +40,12 @@
 | [Company Account B2B](./17-operational-model/02-core-objects/company-account-b2b.md) | Site · Organizational Unit · Delivery Group |
 | [Tenant Experience Spec](./05-architecture/TENANT_EXPERIENCE_SPEC.md) | Identidad EatClean · Experience Refactor |
 | [Tenant Implementation · EatClean](./05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) | Brief Cursor/Lovable · Tenant Assets |
+| [Tenant Branding](./05-architecture/TENANT_BRANDING.md) | BrandConfig · Tenant-Managed runtime · `brand.manage` |
+| [Brand Contract](./05-architecture/BRAND_CONTRACT.md) | Límites de logo/colores/accesibilidad |
+| [Brand Validation Checklist](./05-architecture/BRAND_VALIDATION_CHECKLIST.md) | Coherencia de marca tras gestión por el Tenant |
+| [Tenant Brand (OM)](./17-operational-model/02-core-objects/tenant-brand.md) | Configuration Object Nivel 3 |
+| [Tenant Experience Spec](./05-architecture/TENANT_EXPERIENCE_SPEC.md) | Reglas permanentes de experiencia Tenant |
+| [Tenant Implementation · EatClean](./05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) | Implementación específica EatClean |
 | [Contexto estratégico](./05-architecture/CONTEXTO_ESTRATEGICO_PERMANENTE.md) | Dirección empresarial y del Core |
 | [Filosofía de producto](./05-architecture/FILOSOFIA_DE_PRODUCTO.md) | Propósito, éxito e impacto operativo |
 | [Contexto CTO](./05-architecture/CONTEXTO_CTO.md) | Arranque operativo de sesión Cursor (CTO) |

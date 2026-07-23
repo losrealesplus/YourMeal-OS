@@ -15,9 +15,10 @@ La Customer App fusiona ambas. Instagram es la referencia visual principal del p
 
 | Doc | Rol |
 |-----|-----|
-| [TENANT_IMPLEMENTATION_EATCLEAN](../../docs/05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) | Brief Cursor/Lovable |
-| [TENANT_EXPERIENCE_SPEC](../../docs/05-architecture/TENANT_EXPERIENCE_SPEC.md) | Identidad / checklist Tenant Experience |
+| [TENANT_IMPLEMENTATION_EATCLEAN](../../docs/05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) | Implementación específica EatClean |
+| [TENANT_EXPERIENCE_SPEC](../../docs/05-architecture/TENANT_EXPERIENCE_SPEC.md) | Reglas permanentes de experiencia |
 | [TENANT_BRANDING](../../docs/05-architecture/TENANT_BRANDING.md) | Contrato BrandConfig |
+| Web oficial | https://eatcleantenerifecatering.es/ |
 
 ## Inventario
 

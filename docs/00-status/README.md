@@ -5,17 +5,22 @@
 **Dominios:** [PROJECT_DOMAINS](./PROJECT_DOMAINS.md) — Knowledge · Engineering · Experience · Operations  
 **Engineering Phase:** [ENGINEERING_PHASE](./ENGINEERING_PHASE.md) — Complete (pending operational authorization)  
 **Última integración:** [IR-001](./IR-001_FIRST_ENGINEERING_INTEGRATION.md) · PR #22  
-**Pre-piloto:** [PRE_PILOT_AUDIT](./PRE_PILOT_AUDIT.md) · [ORR Party/B2B/B2C](./ORR_B2B_B2C_PARTY.md) · [**PILOT_ACCEPTANCE_CHECKLIST**](./PILOT_ACCEPTANCE_CHECKLIST.md) (control único → G-02)  
-**Gobernanza:** [Acta — Fin construcción metodológica](./ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) **Cerrada**  
+**Pre-piloto:** [PRE_PILOT_AUDIT](./PRE_PILOT_AUDIT.md) · [ORR Party/B2B/B2C](./ORR_B2B_B2C_PARTY.md) · [**PILOT_ACCEPTANCE_CHECKLIST**](./PILOT_ACCEPTANCE_CHECKLIST.md) (G-02) · [Functional Completeness Review](./EATCLEAN_PILOT_FUNCTIONAL_COMPLETENESS_REVIEW.md)  
+**Gobernanza:** [Acta — Fin construcción metodológica](./ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) **Cerrada** · [ACT-001 Experience Baseline Frozen](./ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) ✅ · [ACT-002 Materialization Frozen](./ACT-002_FOUNDATION_OF_MATERIALIZATION_FROZEN.md) ✅  
 **Historia:** [MILESTONES](./MILESTONES.md)  
 **Auditoría ingeniería:** [ENGINEERING_REVIEW_SPRINT0](./ENGINEERING_REVIEW_SPRINT0.md)  
-**Objetivo:** demostrar que FOPEBA puede producir software operacional de alta calidad.  
+**Objetivo:** demostrar que un negocio real puede operar una semana con YourMeal OS y que FOPEBA genera evidencia usable.  
 **Hito operativo:** `HP-001 · Operational · ORR PASSED · Ready for FOV` (en curso)  
 **Hito experiencia:** CJ-001 usable sin explicación ([CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md))  
-**Party / B2B:** [ADR 0015](../adr/0015-b2b-b2c-customer-model.md) · [ADR 0016](../adr/0016-party-model-demand-actors.md) · [Traceability](../17-operational-model/CORE_OBJECT_TRACEABILITY.md)
+**Hito piloto:** [EatClean Pilot Ready](./MILESTONE_EATCLEAN_PILOT_READY.md) 🟡 · [PILOT_EXECUTION_GUIDE](../18-operational-validation/PILOT_EXECUTION_GUIDE.md) · EP-001…EP-005  
+**Hito experiencia base:** ✅ [ACT-001 Frozen](./ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) (#24→#30)  
+**Hito materialization:** ✅ [ACT-002 Frozen v1](./ACT-002_FOUNDATION_OF_MATERIALIZATION_FROZEN.md) (#24→#31) · [FOUR_LAYERS](../05-architecture/FOUR_LAYERS.md)  
+**Party / B2B:** [ADR 0015](../adr/0015-b2b-b2c-customer-model.md) · [ADR 0016](../adr/0016-party-model-demand-actors.md) · [Traceability](../17-operational-model/CORE_OBJECT_TRACEABILITY.md)  
+**Documentación:** [Knowledge Lifetime](../18-operational-validation/knowledge-lifetime.md) — Contract · Implementation · Iteration
 
-> Ops: **¿ORR Party PASSED?** · Experience: **¿Mi madre podría pedir sin ayuda?**  
+> Ops: **¿ORR Party PASSED?** · Experience: **¿Mi madre podría pedir sin ayuda?** · Piloto: **¿Cliente pide, equipo entrega, FOPEBA observa?**  
 > Empresas = alta EatClean · Empleados = vínculo (código/invite) · Particular = CJ-001.  
+> ❌ No diseñar materialization / no polish estético (ACT-001 · ACT-002).  
 > [ADR 0013](../adr/0013-implementation-is-knowledge-materialization.md) · [ADR 0014](../adr/0014-customer-application-is-tenant-branded.md)
 
 ---

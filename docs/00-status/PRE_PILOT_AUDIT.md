@@ -83,5 +83,6 @@ Login → Dish → Weekly Menu → Program → Summary → Confirm
 | Implementación | 🟢 95% (CAP-006) |
 | Capabilities HP-001 | 🟡 ~80% |
 | FOV | ⚪ 0% |
+| **Completitud funcional pre-piloto** | 🔴 Ver [Functional Completeness Review](./EATCLEAN_PILOT_FUNCTIONAL_COMPLETENESS_REVIEW.md) |
 
-Ver [Acta](./ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) · [MILESTONES](./MILESTONES.md) · [ORR](../22-implementation/ORR.md).
+Ver [Acta](./ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) · [MILESTONES](./MILESTONES.md) · [ORR](../22-implementation/ORR.md) · [Completeness Review](./EATCLEAN_PILOT_FUNCTIONAL_COMPLETENESS_REVIEW.md).

@@ -109,7 +109,7 @@ Legend: ✅ granted · ❌ denied
 
 ---
 
-## Accounting & admin
+## Accounting, admin & brand
 
 | Capability | accounting | company_admin | saas_admin |
 |------------|------------|---------------|------------|
@@ -124,6 +124,19 @@ Legend: ✅ granted · ❌ denied
 | records.purge | ❌ | ❌ | ✅ |
 
 > **ADR 0015:** B2B Company Account portal admins are scoped by `company_employees.is_admin` (not the Tenant role `company_admin`). Tenant `company_admin` / `saas_admin` oversee any company in the tenant. Services enforce both paths.
+
+### `brand.manage`
+
+| | |
+|--|--|
+| **Qué** | Leer/actualizar Tenant Brand (logo · colores) vía BrandingService |
+| **Quién** | `company_admin` · `saas_admin` |
+| **Superficie** | `/admin/branding` |
+| **Límites** | [BRAND_CONTRACT](../05-architecture/BRAND_CONTRACT.md) |
+| **Objeto** | [Tenant Brand](../17-operational-model/02-core-objects/tenant-brand.md) |
+
+La UI puede ocultar el acceso; la **seguridad** es Service + roles/capabilities + RLS/Storage policies.
+
 
 ---
 

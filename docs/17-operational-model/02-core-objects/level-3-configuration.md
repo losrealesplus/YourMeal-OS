@@ -17,9 +17,10 @@ No se mezclan con Core Objects ni se tratan como eslabones de la espina.
 | Roles | `Role` | AuthZ de Employee |
 | Permissions / Capabilities (auth) | `Permission` | Claves `dishes.read` — no confundir con Capability de producto |
 | Feature Flags | `FeatureFlag` | Rollout — plataforma |
+| **Tenant Brand** | `TenantBrand` | Identidad visual gestionada · [detalle](./tenant-brand.md) · `brand.manage` |
 
 Estas piezas pueden vivir en Domain / Platform.  
-**No** engordan el catálogo de Core Objects.
+**No** engordan el catálogo de Core Objects de Nivel 1.
 
 ---
 
