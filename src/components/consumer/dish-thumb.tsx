@@ -10,7 +10,7 @@ export function DishThumb({
   className,
 }: {
   emoji: string;
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl" | "hero";
   className?: string;
 }) {
   const sizes: Record<string, string> = {
@@ -18,6 +18,8 @@ export function DishThumb({
     md: "size-24 text-5xl rounded-2xl",
     lg: "h-40 w-full text-7xl rounded-3xl",
     xl: "aspect-[4/3] w-full text-8xl rounded-3xl",
+    /** Instagram-style feed frame — photo owns the viewport. */
+    hero: "aspect-[5/4] w-full text-8xl rounded-[1.75rem]",
   };
   return (
     <div

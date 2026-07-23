@@ -17,12 +17,16 @@ import {
   dashboardStateIds,
   isDashboardState,
   type DashboardStateId,
+  MenuDishPost,
+  dishMacrosLine,
 } from "@/components/consumer";
 import { brandConfig } from "@/tenant/brand-config";
+import { useWeeklyMenu } from "@/hooks/use-weekly-menu";
+import { utcWeekStartMonday } from "@/modules/weekly-menu/application/week-dates";
 
 /**
  * SCR-005 · Home — CJ-001
- * Food app, not dashboard. Dominant question + one CTA.
+ * Alive food-app home: weekly menu available + one CTA + featured dish.
  */
 export const Route = createFileRoute("/_authenticated/app/")({
   validateSearch: (search: Record<string, unknown>): { state?: DashboardStateId } => ({
@@ -80,6 +84,17 @@ function HomeBody({
 }) {
   const { t } = useTranslation("customer");
   const navigate = useNavigate({ from: "/app" });
+  const weekStart = utcWeekStartMonday();
+  const { data: weeklyMenu } = useWeeklyMenu(weekStart);
+
+  const featured =
+    weeklyMenu?.days.flatMap((d) => d.dishes).find(Boolean) ?? null;
+
+  const macroLabels = {
+    protein: t("macroProtein"),
+    carbs: t("macroCarbs"),
+    fat: t("macroFat"),
+  };
 
   if (state === "loading") {
     return <DashboardSkeleton label={t("loadingDashboard")} />;
@@ -97,47 +112,64 @@ function HomeBody({
   }
 
   return (
-    <div className="flex-1 flex flex-col px-6 pt-8 pb-8">
+    <div className="flex-1 flex flex-col px-6 pt-8 pb-10">
       {state === "offline" ? (
         <div className="mb-4">
           <OfflineBanner title={t("offlineTitle")} hint={t("offlineHint")} />
         </div>
       ) : null}
 
-      {/* Brand mark */}
       <p className="text-center text-sm font-extrabold tracking-[0.2em] uppercase text-primary">
         {brandConfig.name}
       </p>
 
-      {/* Hero — one question dominates */}
-      <div className="mt-10 text-center">
+      <div className="mt-10 text-center space-y-3">
         <h1 className="text-[1.75rem] font-extrabold tracking-tight text-balance">
-          {t("greeting")}, {name}
+          {t("greeting")}{name ? ` ${name}` : ""}
         </h1>
-        <p className="mt-4 text-xl font-semibold leading-snug text-foreground/90 text-pretty max-w-[18rem] mx-auto">
-          {t("homeHeroQuestion")}
+        <p className="text-lg font-semibold leading-snug text-foreground/90 text-pretty max-w-[20rem] mx-auto">
+          {t("homeMenuReady")}
         </p>
       </div>
 
       <div className="mt-8">
-        <Link to="/app/schedule" className="block">
+        <Link to="/app/menu" className="block">
           <PrimaryCTA className="!h-16 !text-base !rounded-[1.25rem]">
-            {t("scheduleCta")}
+            {t("homeViewMenuCta")}
           </PrimaryCTA>
         </Link>
       </div>
 
-      {/* Quiet shortcuts — food app, not KPIs */}
+      {featured ? (
+        <div className="mt-12 space-y-5">
+          <p className="text-sm font-semibold text-muted-foreground tracking-wide">
+            {t("homeFeatured")}
+          </p>
+          <MenuDishPost
+            dish={featured}
+            macrosLabel={dishMacrosLine(featured, macroLabels)}
+            cta={
+              <Link
+                to="/app/menu"
+                className="flex h-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground text-[15px] font-bold"
+              >
+                {t("homeViewMenuCta")}
+              </Link>
+            }
+          />
+        </div>
+      ) : null}
+
       <div className="mt-12 space-y-1 border-t border-border/60 pt-6">
+        <QuietLink
+          to="/app/schedule"
+          icon={<UtensilsCrossed className="size-5" strokeWidth={2} />}
+          label={t("scheduleCta")}
+        />
         <QuietLink
           to="/app/menu"
           icon={<Heart className="size-5" strokeWidth={2} />}
           label={t("homeFavorites")}
-        />
-        <QuietLink
-          to="/app/menu"
-          icon={<UtensilsCrossed className="size-5" strokeWidth={2} />}
-          label={t("homeThisWeekMenu")}
         />
         <QuietLink
           to="/app/orders"
@@ -154,7 +186,7 @@ function QuietLink({
   icon,
   label,
 }: {
-  to: "/app/menu" | "/app/orders";
+  to: "/app/menu" | "/app/orders" | "/app/schedule";
   icon: ReactNode;
   label: string;
 }) {

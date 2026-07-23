@@ -5,36 +5,34 @@ Primera instancia del patrón **Tenant Resources** (ADR 0014).
 > Cambiar identidad de un cliente = cambiar esta carpeta + `BrandConfig`.  
 > **No** bifurcar el código del producto.
 
-| Doc | Rol |
-|-----|-----|
-| [TENANT_IMPLEMENTATION_EATCLEAN](../../docs/05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) | Brief Cursor/Lovable |
-| [TENANT_EXPERIENCE_SPEC](../../docs/05-architecture/TENANT_EXPERIENCE_SPEC.md) | Identidad / checklist |
-| [TENANT_BRANDING](../../docs/05-architecture/TENANT_BRANDING.md) | Contrato BrandConfig |
-| Web oficial | https://eatcleantenerifecatering.es/ |
+| Fuente | Aporta |
+|--------|--------|
+| [Web oficial](https://eatcleantenerifecatering.es/) | Brand identity · confianza · tono institucional |
+| Instagram EatClean | **Product identity** · fotos reales · platos · menú semanal · comunicación diaria |
+
+La Customer App fusiona ambas. Instagram es referencia visual principal del producto (platos), no layout SaaS.
 
 ## Inventario
 
-| Archivo | Estado | Uso |
-|---------|--------|-----|
+| Ruta | Estado | Uso |
+|------|--------|-----|
 | `brand.json` | ✅ stub | Paleta · tipografía · poweredBy → BrandConfig |
 | `copy.es.json` | ✅ stub | Login · home · claims |
-| `logo.svg` | ⏳ pending | Sustituir por logo oficial |
-| `icon.png` | ⏳ pending | App icon / favicon |
-| `splash.webp` | ⏳ pending | Splash |
-| `hero-home.webp` | ⏳ pending | Home hero |
-| `onboarding-1.webp` … `3` | ⏳ pending | Onboarding |
-| `empty-orders.webp` | ⏳ pending | Empty state pedidos |
+| `brand/` | 📁 | Logo · icon · splash oficiales |
+| `copy/` | 📁 | Copy adicional por locale |
+| `media/` | 📁 | Fotografías de producto (platos) |
+| `weekly-menu/` | 📁 | Assets del menú semanal publicado |
+| `promotions/` | 📁 | Promos / novedades de temporada |
+| `onboarding/` | 📁 | Imágenes onboarding (≤3) |
 
-Los binarios oficiales los aporta el Tenant (o se exportan de la web con licencia). No usar stock SaaS.
+Binarios oficiales: los aporta el Tenant. No usar stock genérico.
 
-**Bundling:** copia espejo en `src/tenant/resources/` para Vite. Mantener sincronizado con esta carpeta.
+**Bundling:** espejo en `src/tenant/resources/` para Vite. Mantener sincronizado.
 
-## Convención para futuros tenants
+## Convención
 
 ```text
 tenants/<tenant-slug>/
-  brand.json
-  copy.<locale>.json
-  logo.svg · icon.png · splash.webp · …
-  README.md
+  brand.json · copy.<locale>.json · README.md
+  brand/ · copy/ · media/ · weekly-menu/ · promotions/ · onboarding/
 ```

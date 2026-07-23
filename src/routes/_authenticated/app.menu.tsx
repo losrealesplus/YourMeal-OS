@@ -1,24 +1,27 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { DayPicker } from "@/components/consumer";
+import { DayPicker, MenuDishPost, dishMacrosLine, PrimaryCTA } from "@/components/consumer";
 import { useWeeklyMenu } from "@/hooks/use-weekly-menu";
+import { utcWeekStartMonday } from "@/modules/weekly-menu/application/week-dates";
 import { DishThumb } from "@/components/consumer/dish-thumb";
-import { TagChip } from "@/components/consumer/tag-chip";
 
 /**
  * SCR-006 · Weekly Menu — CJ-001
- * Food-app heart: big photos, clear macros, visible CTA. No tables.
+ * Instagram product language: big photos, dish name hero, macros secondary.
+ * Choosing food for the week — not filling a form.
  */
 export const Route = createFileRoute("/_authenticated/app/menu")({
   component: MenuPage,
 });
 
 function MenuPage() {
-  const { t } = useTranslation(["customer", "common"]);
+  const { t, i18n } = useTranslation(["customer", "common"]);
   const [active, setActive] = useState(0);
-  const { data: weeklyMenu } = useWeeklyMenu();
-  const days = [
+  const weekStart = utcWeekStartMonday();
+  const { data: weeklyMenu } = useWeeklyMenu(weekStart);
+
+  const dayShort = [
     t("customer:dayMon"),
     t("customer:dayTue"),
     t("customer:dayWed"),
@@ -28,69 +31,126 @@ function MenuPage() {
     t("customer:daySun"),
   ];
 
-  const tagLabels = {
-    vegan: t("customer:tagVegan"),
-    vegetarian: t("customer:tagVegetarian"),
-    glutenFree: t("customer:tagGlutenFree"),
-    lactoseFree: t("customer:tagLactoseFree"),
-    spicy: t("customer:tagSpicy"),
+  const dayFull = [
+    t("customer:dayMonFull"),
+    t("customer:dayTueFull"),
+    t("customer:dayWedFull"),
+    t("customer:dayThuFull"),
+    t("customer:dayFriFull"),
+    t("customer:daySatFull"),
+    t("customer:daySunFull"),
+  ];
+
+  const macroLabels = {
+    protein: t("customer:macroProtein"),
+    carbs: t("customer:macroCarbs"),
+    fat: t("customer:macroFat"),
   };
 
   const dishes = weeklyMenu?.days[active]?.dishes ?? [];
+  const hasAnyDish = useMemo(
+    () => (weeklyMenu?.days ?? []).some((d) => d.dishes.length > 0),
+    [weeklyMenu],
+  );
+
+  const weekLabel = formatWeekOf(weekStart, i18n.language, t("customer:weekOf"));
 
   return (
-    <div className="flex-1 flex flex-col pb-4">
-      <div className="px-6 pt-7 pb-2">
-        <h1 className="text-3xl font-extrabold tracking-tight">
-          {t("customer:weeklyMenu")}
+    <div className="flex-1 flex flex-col pb-28">
+      <header className="px-6 pt-8 pb-2 space-y-3">
+        <p className="text-sm font-semibold text-muted-foreground tracking-wide">
+          {weekLabel}
+        </p>
+        <h1 className="text-[1.85rem] font-extrabold tracking-tight text-balance leading-tight">
+          {t("customer:programWeeklyMenu")}
         </h1>
-        <p className="text-sm text-muted-foreground mt-2">{t("customer:menuHint")}</p>
+      </header>
+
+      <div className="px-6 mt-5 sticky top-0 z-10 bg-background/95 backdrop-blur-sm py-3">
+        <DayPicker days={dayShort} activeIndex={active} onSelect={setActive} />
       </div>
-      <div className="px-6 mt-4">
-        <DayPicker days={days} activeIndex={active} onSelect={setActive} />
+
+      <div className="px-6 pt-2 pb-4">
+        <p className="text-lg font-extrabold tracking-tight">{dayFull[active]}</p>
       </div>
-      <div className="px-5 space-y-5 py-5">
+
+      <div className="px-6 space-y-12 pb-6">
         {dishes.map((d) => (
-          <article
+          <MenuDishPost
             key={d.id + active}
-            className="rounded-[1.5rem] overflow-hidden bg-card border border-border/60 shadow-sm"
-          >
-            <DishThumb
-              emoji={d.emoji}
-              size="xl"
-              className="!rounded-none border-0"
-            />
-            <div className="p-4 space-y-3">
-              <div>
-                <h2 className="text-lg font-extrabold tracking-tight">{d.name}</h2>
-                <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                  {d.tagline}
-                </p>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="font-mono text-xs font-bold tabular-nums bg-secondary rounded-lg px-2.5 py-1">
-                  {d.kcal} kcal
-                </span>
-                {d.tags.slice(0, 3).map((tag) => (
-                  <TagChip key={tag}>{tagLabels[tag] ?? tag}</TagChip>
-                ))}
-              </div>
+            dish={d}
+            macrosLabel={dishMacrosLine(d, macroLabels)}
+            cta={
               <Link
-                to="/app/menu/$dishId"
-                params={{ dishId: d.id }}
-                className="flex h-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground text-sm font-bold"
+                to="/app/schedule"
+                className="flex h-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground text-[15px] font-bold tracking-wide"
               >
-                {t("customer:addToOrder")}
+                {t("customer:selectDish")}
               </Link>
-            </div>
-          </article>
+            }
+          />
         ))}
+
         {dishes.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-16 px-6">
-            {t("customer:menuEmptyDay")}
-          </p>
+          <MenuEmpty
+            title={
+              hasAnyDish
+                ? t("customer:menuEmptyDay")
+                : t("customer:menuEmptyTitle")
+            }
+            hint={hasAnyDish ? undefined : t("customer:menuEmptyHint")}
+            ctaLabel={t("customer:menuEmptyCta")}
+          />
         ) : null}
       </div>
+
+      {dishes.length > 0 ? (
+        <div className="fixed bottom-20 inset-x-0 z-20 px-6 pointer-events-none">
+          <div className="mx-auto max-w-lg pointer-events-auto">
+            <Link to="/app/schedule" className="block">
+              <PrimaryCTA className="!h-14 !rounded-2xl shadow-lg shadow-primary/20">
+                {t("customer:scheduleCta")}
+              </PrimaryCTA>
+            </Link>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
+}
+
+function MenuEmpty({
+  title,
+  hint,
+  ctaLabel,
+}: {
+  title: string;
+  hint?: string;
+  ctaLabel: string;
+}) {
+  return (
+    <div className="flex flex-col items-center text-center pt-6 pb-10 space-y-6">
+      <DishThumb emoji="🥗" size="hero" className="!rounded-[1.75rem] max-w-sm" />
+      <div className="space-y-2 max-w-[22rem]">
+        <p className="text-xl font-extrabold tracking-tight text-balance">{title}</p>
+        {hint ? (
+          <p className="text-sm text-muted-foreground leading-relaxed">{hint}</p>
+        ) : null}
+      </div>
+      <Link to="/app" className="w-full max-w-sm">
+        <PrimaryCTA className="!h-14 !rounded-2xl">{ctaLabel}</PrimaryCTA>
+      </Link>
+    </div>
+  );
+}
+
+function formatWeekOf(weekStart: string, locale: string, prefix: string): string {
+  const [y, m, d] = weekStart.split("-").map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d));
+  const formatted = new Intl.DateTimeFormat(locale || "es", {
+    day: "numeric",
+    month: "long",
+    timeZone: "UTC",
+  }).format(date);
+  return `${prefix} ${formatted}`;
 }

@@ -9,6 +9,9 @@
 
 Pregunta: ¿Mi madre podría hacer un pedido sin que nadie le explique la app?
 
+**Product identity:** el Instagram de EatClean (platos reales) + brand de la web.  
+El Menú semanal debe sentir «hoy toca elegir qué voy a comer», no un CRUD.
+
 ## Fuera de alcance (hard)
 
 - Lógica de negocio · repositorios · servicios · BD · HP-001 · nuevas capabilities  
