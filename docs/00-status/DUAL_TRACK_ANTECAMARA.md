@@ -62,18 +62,13 @@ Dish Library / Module 01 (ya validado) = excepción histórica.
 
 ## Primer movimiento recomendado (ahora)
 
-**Product Skeleton listo.** Lovable = visual. **Cursor = conectar.**
+**No más Lovable para infraestructura.** Cursor toma el relevo.
 
-1. [IMPLEMENTATION_RULES](../22-implementation/IMPLEMENTATION_RULES.md)  
-2. [Happy Path E2E](../22-implementation/HAPPY_PATH_E2E.md)  
-3. [IMPLEMENTATION_BACKLOG](../22-implementation/IMPLEMENTATION_BACKLOG.md)  
+1. [CURSOR_MASTER_PROMPT](../22-implementation/CURSOR_MASTER_PROMPT.md) — contexto permanente  
+2. **[CAP-002](../22-implementation/caps/CAP-002-dish-catalog.md)** — una capability  
+3. [Philosophy](../23-engineering/IMPLEMENTATION_PHILOSOPHY.md)
 
-```text
-No modifiques diseño / UX / rutas / componentes.
-Implementa: estado · query · repos · services · hooks · Supabase · audit_log.
-```
-
-Puente a Carril A: primer pedido real sin mocks → evidencia FOV.
+Mentalidad: **conectar capacidades**, no implementar pantallas.
 
 ---
 

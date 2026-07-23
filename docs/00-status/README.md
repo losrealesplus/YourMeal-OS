@@ -35,22 +35,24 @@
 
 | Herramienta | Rol |
 |-------------|-----|
-| FOPEBA | Certifica conocimiento |
-| Lovable | Arquitecto visual (skeleton) |
-| **Cursor** | Conecta: query · repos · services · Supabase · audit |
-| EatClean | Laboratorio FOV |
+| **FOPEBA** | Certifica conocimiento |
+| **Lovable** | Materializó UX y estructura — **no más infraestructura** |
+| **Cursor** | Implementa ingeniería ([Master Prompt](../22-implementation/CURSOR_MASTER_PROMPT.md)) |
+| **GitHub** | Conserva historia y evidencia |
 
 ---
 
 ## Siguiente (Cursor)
 
-[Happy Path E2E](../22-implementation/HAPPY_PATH_E2E.md): Auth → Dish → Menu → Order → Confirm → audit_log → Dashboard.
+1. [CURSOR_MASTER_PROMPT](../22-implementation/CURSOR_MASTER_PROMPT.md)  
+2. **[CAP-002 Dish Catalog](../22-implementation/caps/CAP-002-dish-catalog.md)**  
+3. CAP-003…007 · [Happy Path E2E](../22-implementation/HAPPY_PATH_E2E.md)
 
-No conectar todo a la vez. No modificar UX.
+Filosofía: [23-engineering](../23-engineering/IMPLEMENTATION_PHILOSOPHY.md).
 
 ---
 
 ## Índices
 
-- [Implementation](../22-implementation/README.md) · [Backlog](../22-implementation/IMPLEMENTATION_BACKLOG.md)  
-- [FOV Mission Brief](./FOV_MISSION_BRIEF.md) · [Dual Track](./DUAL_TRACK_ANTECAMARA.md) · [21 PM](../21-product-materialization/README.md)
+- [22 Implementation](../22-implementation/README.md) · [caps](../22-implementation/caps/README.md)  
+- [MODULE_STATE_CRITERIA](./MODULE_STATE_CRITERIA.md) · [FOV Brief](./FOV_MISSION_BRIEF.md) · [Dual Track](./DUAL_TRACK_ANTECAMARA.md)

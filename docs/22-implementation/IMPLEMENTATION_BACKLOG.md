@@ -1,72 +1,55 @@
-# Implementation Backlog — materialización de capacidades
+# Implementation Backlog — por Capability
 
-**No es un backlog Scrum de «pantallas».**  
-Mide el **nivel de materialización** de cada capacidad.
+Escala: [MODULE_STATE_CRITERIA](../00-status/MODULE_STATE_CRITERIA.md)
 
 ```text
-Scaffold → Connected → Operational → Validated
+Scaffold → Connected → Operational → Field Validated
 ```
-
-| Nivel | Significado |
-|-------|------------|
-| **Scaffold** | UI / ruta existe (Lovable); sin datos reales o mock local |
-| **Connected** | Lee/escribe vía repository/service + Supabase; sin mocks en Happy Path |
-| **Operational** | Usable en operación EatClean del día a día (flujo estable) |
-| **Validated** | Evidencia FOV / Field-Validated o cierre explícito post-G-01 |
-
----
-
-## Leyenda de estado
 
 | Símbolo | Nivel |
 |---------|-------|
-| ░░░░ | No iniciado |
 | ▓░░░ | Scaffold |
 | ▓▓░░ | Connected |
 | ▓▓▓░ | Operational |
-| ▓▓▓▓ | Validated |
+| ▓▓▓▓ | Field Validated |
 
 ---
 
-## Capacidad → progreso
+## CAP — Happy Path
 
-| Capacidad | Nivel | Notas |
-|-----------|-------|-------|
-| Authentication | ▓░░░ | Auth existe; completar contexto cliente |
-| Dish Catalog | ▓░░░ | Module 01 / admin dishes; conectar Customer |
-| Weekly Menu | ▓░░░ | UI menu; conectar oferta real |
-| Orders | ▓░░░ | Prioridad Happy Path E2E |
-| Planning | ▓░░░ | UI production; sin motor inventado |
-| Batch | ▓░░░ | UI; conectar cuando OM lo justifique |
-| Packaging | ▓░░░ | UI |
-| Delivery | ▓░░░ | driver/routes UI |
-| Invoices | ░░░░ | Consulta Account/Payment |
-| Notifications | ░░░░ | Capability; no Core |
-| Audit | ▓▓░░ | `audit_log` + AuditService |
-| Feature Flags | ▓▓░░ | `feature_flags` + service |
-| Localization | ▓▓░░ | i18n 6 idiomas |
-| Analytics | ░░░░ | Post Happy Path |
-
-Actualizar esta tabla en cada sprint de conexión.
+| ID | Capability | Nivel | Doc |
+|----|------------|-------|-----|
+| CAP-001 | Auth & User Context | ▓▓░░ | [caps](./caps/CAP-001-auth-user-context.md) |
+| CAP-002 | Dish Catalog | ▓░░░ | [caps](./caps/CAP-002-dish-catalog.md) ← siguiente |
+| CAP-003 | Weekly Menu | ▓░░░ | [caps](./caps/CAP-003-weekly-menu.md) |
+| CAP-004 | Order Programming | ▓░░░ | [caps](./caps/CAP-004-order-programming.md) |
+| CAP-005 | Order Summary | ▓░░░ | [caps](./caps/CAP-005-order-summary.md) |
+| CAP-006 | Order Confirmation | ▓░░░ | [caps](./caps/CAP-006-order-confirmation.md) |
+| CAP-007 | Order History | ▓░░░ | [caps](./caps/CAP-007-order-history.md) |
 
 ---
 
-## Orden de sprints Cursor (conexión)
+## Infra transversal
 
-| Sprint | Foco | Instrucción tipo |
-|--------|------|------------------|
-| **I-2.1** | Infra de conexión | Query · loaders · adapters · sin tocar UX |
-| **I-2.2** | Auth + contexto cliente | Solo conectar sesión / perfil / tenant |
-| **I-2.3** | DishRepository / catálogo | No cambiar pantallas · no añadir campos |
-| **I-2.4** | Weekly Menu | Solo conectar |
-| **I-2.5** | Order Summary + confirmación | Persistencia + audit_log · ver [Happy Path](./HAPPY_PATH_E2E.md) |
+| Capacidad | Nivel |
+|-----------|-------|
+| Audit (`audit_log`) | ▓▓░░ |
+| Feature Flags | ▓▓░░ |
+| Localization (6 idiomas) | ▓▓░░ |
 
-Detalle del objetivo E2E: [HAPPY_PATH_E2E](./HAPPY_PATH_E2E.md).  
-Reglas: [IMPLEMENTATION_RULES](./IMPLEMENTATION_RULES.md).
+---
+
+## Posterior (no mezclar con Happy Path)
+
+| Área | Nivel |
+|------|-------|
+| Planning / Batch / Packaging | ▓░░░ |
+| Delivery | ▓░░░ |
+| Admin Suite (conexión) | ▓░░░ |
+| Invoices / Notifications / Analytics | ░░░░ |
 
 ---
 
 ## Anti-métrica
 
-**No** medir progreso por «pantallas hechas» (ya están).  
-**Sí** medir por columnas Scaffold → … → Validated.
+No medir por pantallas. Medir por CAP × estado.
