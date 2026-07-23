@@ -253,6 +253,12 @@ Cuando llegue el segundo o el décimo cliente, el cambio de identidad es **confi
 
 > **Cada Tenant debe poder hacer que un usuario crea que la aplicación fue desarrollada específicamente para su empresa, sin necesidad de modificar el código fuente del producto.**
 
+**Brand Recognition Filter (experiencia)**
+
+> **Si ocultamos el nombre "YourMeal OS", ¿un cliente o un empleado reconocería inmediatamente que esta aplicación pertenece al Tenant gracias al logo, los colores, la tipografía, el lenguaje y la fotografía?**
+
+Si la respuesta es **sí**, la implementación respeta esta ADR. Detalle: [TENANT_EXPERIENCE_SPEC § Brand Recognition Filter](../05-architecture/TENANT_EXPERIENCE_SPEC.md#principio-rector--brand-recognition-filter-no-negociable).
+
 **Dos decisiones de largo recorrido (contexto FOPEBA)**
 
 1. FOPEBA termina cuando empieza la **evidencia de campo**, no cuando termina el código.  

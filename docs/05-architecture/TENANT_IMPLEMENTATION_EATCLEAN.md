@@ -7,11 +7,14 @@
 **Contrato técnico:** [TENANT_BRANDING](./TENANT_BRANDING.md)  
 **Assets:** [`tenants/eatclean/`](../../tenants/eatclean/README.md)  
 **Journeys:** [CJ-001](../07-experience/CUSTOMER_JOURNEYS.md#cj-001--pedido-semanal) · [OPERATIONAL_JOURNEYS](../07-experience/OPERATIONAL_JOURNEYS.md)  
-**Bitácora de sprint:** [EXPERIENCE_REFACTOR_EATCLEAN_V1_1](../07-experience/EXPERIENCE_REFACTOR_EATCLEAN_V1_1.md)
+**Bitácora de sprint:** [EXPERIENCE_REFACTOR_EATCLEAN_V1_1](../07-experience/EXPERIENCE_REFACTOR_EATCLEAN_V1_1.md)  
+**Prompt Lovable bloqueado:** [EATCLEAN_BRAND_CONTINUITY_LOCKED](../21-product-materialization/EATCLEAN_BRAND_CONTINUITY_LOCKED.md)  
+**Milestone:** [EatClean Pilot Ready](../00-status/MILESTONE_EATCLEAN_PILOT_READY.md)
 
 > **Qué es este doc:** la implementación **específica** de EatClean (copy, pantallas, assets, nav).  
 > **Qué no es:** el contrato BrandConfig, ni las reglas permanentes, ni el changelog del sprint.  
-> Ante duda de principio → SPEC. Ante duda de schema → BRANDING. Ante «qué se hizo en el PR» → bitácora.
+> Ante duda de principio → SPEC. Ante duda de schema → BRANDING. Ante «qué se hizo en el PR» → bitácora.  
+> Prompt para Lovable sin reinterpretar → [EATCLEAN_BRAND_CONTINUITY_LOCKED](../21-product-materialization/EATCLEAN_BRAND_CONTINUITY_LOCKED.md).
 
 ---
 
