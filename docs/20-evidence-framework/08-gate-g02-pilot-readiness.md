@@ -25,9 +25,20 @@ Evalúa integridad del Operational Journey.
 | G-02 **es** | G-02 **no es** |
 |-------------|----------------|
 | Gate de gobernanza | Checklist de QA |
+| **Pilot Authorization** | **Release** / v1.0 |
 | Autorización a experimentar | Certificación del producto |
 | Evaluación de integridad del Journey | Cobertura funcional al 100 % |
 | Pregunta de evidencia | Conteo de features |
+
+```text
+G-02
+
+≠ Release
+
+=
+
+Pilot Authorization
+```
 
 **Pregunta única:**
 
@@ -35,6 +46,14 @@ Evalúa integridad del Operational Journey.
 
 G-02 **no certifica el producto**.  
 Certifica que **la hipótesis operacional está lista para enfrentarse a la realidad**.
+
+Lo certificado al pasar G-02 es que:
+
+* el Journey está cerrado,
+* el modelo es consistente,
+* la operación puede ejecutarse.
+
+**Falta demostrar** que eso **resiste la realidad**.
 
 ---
 
@@ -69,15 +88,34 @@ Formulado desde la evidencia, no desde el backlog:
 
 | # | Condición |
 |---|-----------|
-| 1 | El **Operational Journey** completo puede ejecutarse extremo a extremo. |
-| 2 | Los **estados del ciclo operacional** son consistentes (UI ↔ persistencia ↔ timeline). |
-| 3 | No existen **bloqueadores conocidos** en el flujo principal. |
-| 4 | Los **huecos pendientes** están documentados y **no comprometen** la validación. |
-| 5 | Las **limitaciones conocidas** son explícitas (**Explicit Uncertainty**). |
-| 6 | Los **ORR** definidos para el piloto están firmados (PASSED o fuera de alcance firmado). |
-| 7 | Existe **trazabilidad** entre evidencia, modelo e implementación. |
+| G-02.1 | El **Operational Journey** completo puede ejecutarse extremo a extremo. |
+| G-02.2 | Los **estados del ciclo operacional** son consistentes (UI ↔ persistencia ↔ timeline). |
+| G-02.3 | No existen **bloqueadores conocidos** en el flujo principal. |
+| G-02.4 | Los **huecos pendientes** están documentados y **no comprometen** la validación. |
+| G-02.5 | Las **limitaciones conocidas** son explícitas (**Explicit Uncertainty**). |
+| G-02.6 | Los **ORR** definidos para el piloto están firmados (PASSED o fuera de alcance firmado). |
+| G-02.7 | **No Artificiality** — ver sección siguiente. |
+| G-02.8 | Existe **trazabilidad** entre evidencia, modelo e implementación. |
 
 Control operativo: [PILOT_ACCEPTANCE_CHECKLIST](../00-status/PILOT_ACCEPTANCE_CHECKLIST.md) · [ORR Party](../00-status/ORR_B2B_B2C_PARTY.md).
+
+---
+
+## G-02.7 · No Artificiality
+
+Protege el valor de la RI. Una intervención “para que el pedido siga” no es un detalle técnico: es **evidencia** de un hueco del modelo.
+
+Durante el piloto **no** podrán utilizarse:
+
+- datos inventados para ocultar errores
+- procesos manuales **no documentados**
+- cambios directos en la base de datos para completar un Journey
+- bypass de permisos
+- simulaciones que oculten una limitación conocida
+
+**Toda intervención manual** necesaria para completar una operación deberá registrarse como **evidencia operacional** (qué se hizo, por qué, qué Journey afectó, qué hipótesis pone en duda).
+
+Si alguien “arregla” un pedido en SQL para que continúe el flujo, eso alimenta el siguiente ciclo de conocimiento — no se borra ni se normaliza en silencio.
 
 ---
 
@@ -132,30 +170,64 @@ Ese paso, con el tiempo, debe registrarse como **Knowledge Contribution** de RI-
 
 ---
 
+## Cambio de objetivo (construcción → validación)
+
+| Antes | Ahora |
+|-------|-------|
+| **Construir** YourMeal OS | **Demostrar** que el modelo operacional funciona en una operación real |
+| “¿Qué funcionalidad desarrollamos ahora?” | “¿Qué nos enseña la operación real sobre nuestro modelo?” |
+| Siguiente artefacto = PR de arquitectura | Siguiente artefacto = **evidencia** |
+
+---
+
+## Taxonomía de cambios en fase RI (post G-02)
+
+A partir de G-02 PASSED, los cambios **no** se clasifican por capa de producto (arquitectura · experiencia · branding…), sino por **aprendizaje de campo**:
+
+| Tipo | Motivo del cambio |
+|------|-------------------|
+| **Evidence PR** | Incorpora o estructura evidencia observada en piloto |
+| **KU PR** | Knowledge Update autorizado por FER / evidencia |
+| **Correction PR** | Corrige el modelo o la materialización tras hallazgo |
+| **Pilot Fix** | Remedio mínimo para desbloquear Journey (con registro No Artificiality si hubo intervención) |
+| **Operational Finding** | Documenta hallazgo sin código (o con código mínimo de instrumentación) |
+
+El motivo del cambio es el aprendizaje obtenido en campo — **no** una decisión de diseño aislada.
+
+---
+
 ## Secuencia RI-001 (YourMeal OS · EatClean)
 
 ```text
-RI-001
-│
-├── Foundation Lock ✅
-│
-├── Experience Baseline ✅
-│
-├── Methodology Frozen ✅
-│
-├── Operational Journey Closed ✅
-│
-├── ORR Signed                    ← en curso
-│
-├── G-02 Pilot Readiness          ← este Gate
-│
-├── Pilot
-│
-├── Evidence Collection
-│
-├── Knowledge Update
-│
-└── RI-001 Certified              (conocimiento; no “Release v1.0”)
+RI-001 — niveles de conocimiento (no fases de “desarrollo”)
+
+FOUNDATION              ✅
+BLUEPRINT               ✅
+DISCOVERY               ✅
+OPERATIONAL MODEL       ✅
+VALIDATION              ✅
+IOV                     ✅
+FOV PREPARATION         ✅
+ORR (marco + checklist) ✅  ← firma pendiente en checklist
+G-02 (Gate formalizado) ✅  ← PASS operativo = Pilot Authorization
+
+────────────────────────────
+Siguiente etapa
+PILOT (RI-001)  →  Evidence  →  Knowledge Update  →  RI Certified
+```
+
+Secuencia de valor (FOPEBA):
+
+```text
+Operational Model
+    ↓
+Pilot
+    ↓
+Evidence
+    ↓
+Knowledge Update
+    ↓
+Reference Implementation (conocimiento verificable — no “v1.0”)
 ```
 
 ---

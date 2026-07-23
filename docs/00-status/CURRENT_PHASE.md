@@ -5,20 +5,26 @@
 
 ```text
 ══════════════════════════════════════════════════
-PROJECT STATE
+PROJECT STATE · RI-001 (niveles de conocimiento)
 ══════════════════════════════════════════════════
 
-Foundation of Materialization: **Frozen v1** — [ACT-002](./ACT-002_FOUNDATION_OF_MATERIALIZATION_FROZEN.md) (#24→#31)
-Experience base (EatClean): **Frozen** — [ACT-001](./ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) (#24→#30)
-Engineering Phase: Complete (pending operational authorization)
-Current Phase:     **RI-001** · demostrar (no construir) · Evidence Gate + ORR
-Next Gate:         ORR Signed → **G-02 · Pilot Readiness** · [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md) · [Checklist](./PILOT_ACCEPTANCE_CHECKLIST.md)
-Next Discipline:   Pilot Integrity — cerrar/esconder huecos · firmar ORR · luego G-02 (sin módulos nuevos)
-Primary Artifact:  [PILOT_ACCEPTANCE_CHECKLIST](./PILOT_ACCEPTANCE_CHECKLIST.md) · [ORR Party](./ORR_B2B_B2C_PARTY.md)
-Focus operativo:   ¿Operational Journey E2E íntegro (pedido → cocina → reparto → entregado)?
-Focus experiencia: ¿Mi madre podría pedir sin que nadie le explique la app?
-Focus piloto:      ¿EatClean opera una semana solo con YourMeal OS + evidencia FOPEBA?
-Completitud UI:    [Functional Completeness](./EATCLEAN_PILOT_FUNCTIONAL_COMPLETENESS_REVIEW.md) · cero humo (Inventario/Clientes ops aún 🟡)
+FOUNDATION / BLUEPRINT / DISCOVERY / OM / VALIDATION / IOV   ✅
+FOV PREPARATION · ORR (marco) · G-02 (Gate formalizado)     ✅
+────────────────────────────
+Siguiente etapa:  **PILOT (RI-001)**  →  Evidence  →  Knowledge Update
+Siguiente artefacto:  **evidencia** (no PR de arquitectura)
+
+Objetivo del proyecto:
+  Antes → Construir YourMeal OS
+  Ahora → Demostrar que el modelo operacional funciona en operación real
+
+G-02 = Pilot Authorization  ≠  Release / v1.0
+Pregunta principal: ¿Qué nos enseña la operación real sobre nuestro modelo?
+
+Primary Artifact:  [PILOT_ACCEPTANCE_CHECKLIST](./PILOT_ACCEPTANCE_CHECKLIST.md) · [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md)
+Antes de firmar G-02 PASSED: ORR firmados · cero humo · No Artificiality
+PR taxonomy (post G-02): Evidence · KU · Correction · Pilot Fix · Operational Finding
+Completitud UI:    [Functional Completeness](./EATCLEAN_PILOT_FUNCTIONAL_COMPLETENESS_REVIEW.md) · huecos 🟡 documentados
 Last Baseline:     v0.2.0-engineering-baseline (IR-001)
 
 ══════════════════════════════════════════════════
