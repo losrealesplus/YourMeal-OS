@@ -1,53 +1,94 @@
-# CAP-002 — Dish Catalog
+# CAP-002 — Dish Catalog (lectura)
 
 **Estado:** Scaffold → **Connected** (siguiente)  
+**Etapa 2 Level:** **2 — Capability Connection**  
+**Nivel PR:** Capability  
 **Master:** [CURSOR_MASTER_PROMPT](../CURSOR_MASTER_PROMPT.md)
 
 ---
 
 ## 1. Objetivo
 
-Sustituir catálogo mock por datos reales de Supabase (Dish).
+Conectar **solo la lectura** del catálogo Dish a Supabase.
 
-## 2. Alcance
+Validar infraestructura de datos antes de mutaciones o UI extra.
 
-Repository · Query · Cache · Hooks · Adapters.
+El usuario solo debe poder **ver platos reales**. Sin estados complejos.
 
-## 3. No modificar
+## 2. Alcance (únicamente)
 
-Componentes visuales · DishCard · UX · navegación · campos del modelo Dish.
+```text
+DishRepository
+        ↓
+TanStack Query
+        ↓
+useDishes()
+        ↓
+DishCard (sin modificar el componente)
+```
+
+## 3. Fuera de alcance (este PR)
+
+- Búsqueda  
+- Filtros  
+- Favoritos  
+- Paginación  
+- Edición / mutaciones  
+- Campos nuevos  
+- Estados de carga elaborados / empty states rediseñados  
+- Cambios UX / navegación / animaciones  
+- «Ya que estamos…» cualquier cosa  
 
 ## 4. Traceability
 
 | Campo | Valor |
 |-------|-------|
 | Capability | CAP-002 Dish Catalog |
+| Etapa 2 Level | 2 |
 | Core Object | Dish |
-| Supporting | Ingredient (solo si lectura ya justificada; no expandir) |
 | OM | `docs/17` · Module 01 Dish |
-| Infra | Supabase · Service/Repository · i18n · useFmt |
+| Infra | Supabase · Repository · TanStack Query · i18n · useFmt |
+| Mutaciones | Ninguna |
+| Knowledge Coverage (objetivo Connected) | ~35% del dominio Dish (solo lectura) |
 
-## 5. Criterios Connected
+## 5. Criterios Connected (lectura)
 
-Ver [MODULE_STATE_CRITERIA](../../00-status/MODULE_STATE_CRITERIA.md) · Scaffold → Connected.
+- [ ] Datos desde Supabase (no `mock-*`)  
+- [ ] Tenant / auth respetados  
+- [ ] i18n + useFmt  
+- [ ] DishCard sin cambios visuales  
+- [ ] Typecheck limpio  
+- [ ] [KNOWLEDGE_COVERAGE](../KNOWLEDGE_COVERAGE.md) actualizado  
+- [ ] Checks [MODULE_STATE_CRITERIA](../../00-status/MODULE_STATE_CRITERIA.md) Scaffold→Connected aplicables a lectura  
 
 ## 6. Prompt
 
 ```text
-Implementar CAP-002 Dish Catalog.
+Implementar CAP-002 Dish Catalog — SOLO LECTURA (Etapa 2 Level 2).
 
-Objetivo: sustituir el catálogo mock por datos reales de Supabase.
+Cadena: DishRepository → TanStack Query → useDishes() → DishCard.
 
-No modificar componentes.
-No modificar DishCard.
-No modificar UX.
-No modificar navegación.
-No añadir campos.
+No modificar DishCard ni UX ni navegación.
+No añadir: búsqueda, filtros, favoritos, paginación, edición, campos, empty states nuevos.
 
-Solo conectar: Repository · Query · Cache · Hooks · Adapters.
+Solo conectar lectura real. El usuario ve platos reales.
+Typecheck limpio.
+Actualizar Knowledge Coverage.
+Cerrar con formato oficial del Master Prompt.
+Nivel del cambio: Capability
+Estado objetivo: Scaffold → Connected
+Knowledge Review requerido: No (salvo hallazgo)
+```
 
-Mantener typecheck limpio.
-Cerrar con el formato oficial del Master Prompt (Etapa 2).
-Knowledge Review requerido: No (salvo hallazgo).
-Estado final objetivo: Connected.
+## 7. Plantilla de descripción PR
+
+```text
+Nivel del cambio: Capability
+Etapa 2 Level: 2
+
+CAP-002 Dish Catalog
+Estado: Scaffold → Connected
+Alcance: DishRepository → Query → useDishes → DishCard
+Mutaciones: ninguna
+Cambios UI: ninguno
 ```

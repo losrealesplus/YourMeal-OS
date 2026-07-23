@@ -1,7 +1,9 @@
 # Implementation Rules — Constitución Etapa 2
 
 **Ámbito:** Carril B · fase de **conexión** (Cursor = ingeniero de materialización).  
-**Premisa:** el Product Skeleton UX ya existe. Cursor **no rediseña**. Cursor **conecta**.
+**Premisa:** el Product Skeleton UX ya existe. Cursor **no rediseña**. Cursor **conecta**.  
+**Objetivo:** demostrar que FOPEBA produce software operacional de alta calidad.  
+**Niveles:** [ETAPA_2_LEVELS](./ETAPA_2_LEVELS.md) (L1→L4).
 
 ---
 
@@ -32,6 +34,9 @@ Si una funcionalidad requiere una regla nueva:
 Debe volver al Carril A (FOV → FER → KU).
 No se implementa.
 ```
+
+Un PR · una Capability · un [nivel de cambio](./PR_CHANGE_LEVELS.md).  
+Prohibido el «ya que estamos…».
 
 ---
 
@@ -92,8 +97,18 @@ Evidence Level: Table-Validated.
 
 ---
 
+## Pull Requests
+
+- Un PR = **un nivel** ([PR_CHANGE_LEVELS](./PR_CHANGE_LEVELS.md)).  
+- Capability PRs: un solo CAP-00x; sin UX mezclada.  
+- Indicar en la descripción: Nivel · CAP · Estado Scaffold→…  
+
+---
+
 ## Relacionado
 
+- [PR Change Levels](./PR_CHANGE_LEVELS.md)  
+- [ADR 0013](../adr/0013-implementation-is-knowledge-materialization.md)  
 - [IMPLEMENTATION_BACKLOG](./IMPLEMENTATION_BACKLOG.md)  
 - [Happy Path E2E](./HAPPY_PATH_E2E.md)  
 - [Knowledge Traceability](../15-product/etapa-2/knowledge-traceability.md)  
