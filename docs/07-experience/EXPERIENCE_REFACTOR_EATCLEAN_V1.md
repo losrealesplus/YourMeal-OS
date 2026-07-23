@@ -9,6 +9,18 @@
 
 Pregunta: ¿Mi madre podría hacer un pedido sin que nadie le explique la app?
 
+**Product identity:** Instagram EatClean (platos reales) + brand de la web.  
+El Menú semanal debe sentir «hoy toca elegir qué voy a comer», no un CRUD.
+
+## Cierre del sprint UI → evidencia
+
+Cuando Splash · Login · Home · Menú · Resumen están en la app:
+
+> **Dejar de diseñar por intuición. Observar uso real.**
+
+Protocolo: [CJ001_USAGE_OBSERVATION](./CJ001_USAGE_OBSERVATION.md)  
+Cuatro preguntas · sesión 20–30 min · sin ayudar.
+
 ## Fuera de alcance (hard)
 
 - Lógica de negocio · repositorios · servicios · BD · HP-001 · nuevas capabilities  

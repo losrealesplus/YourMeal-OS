@@ -1,6 +1,7 @@
 export { ScreenHeader } from "./screen-header";
 export { DishThumb } from "./dish-thumb";
 export { DishCard } from "./dish-card";
+export { MenuDishPost, dishMacrosLine } from "./menu-dish-post";
 export { MacroPill } from "./macro-pill";
 export { AllergenBadge } from "./allergen-badge";
 export { TagChip } from "./tag-chip";

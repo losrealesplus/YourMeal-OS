@@ -10,8 +10,9 @@
   },
   "home": {
     "greeting": "Hola, {{name}}",
-    "prompt": "¿Ya programaste tu pedido de esta semana?",
-    "primaryCta": "Programar pedido",
+    "prompt": "Ya está disponible el menú de esta semana.",
+    "primaryCta": "Ver menú semanal",
+    "featured": "Destacado de la semana",
     "cards": {
       "nextOrder": "Próximo pedido",
       "deliveryDate": "Fecha de entrega",
