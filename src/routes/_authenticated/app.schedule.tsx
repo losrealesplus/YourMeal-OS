@@ -10,7 +10,7 @@ import {
   SectionHeader,
 } from "@/components/consumer";
 import { useFmt } from "@/i18n/localization-provider";
-import { MOCK_DISHES } from "@/lib/mock-catalog";
+import { useDishes } from "@/hooks/use-dishes";
 import { cn } from "@/lib/utils";
 
 /**
@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
  * - Objetivo operacional: cerrar el pedido semanal antes del corte.
  * - Capability: orders.schedule (declarada; sin lógica de negocio en UI)
  * - Core Object(s): Order · WeeklyMenu · Delivery
+ * - CAP-002: step 2 meal picker uses useDishes() (real catalog; no persist yet)
  * NOTE (scaffold): mantiene estado local; NO persiste. Cuando exista OrderService
  * se conectará por Ports declarados en 14-application.
  */
@@ -34,6 +35,7 @@ function ScheduleFlow() {
   const [deliveryDay, setDeliveryDay] = useState(0);
   const [selected, setSelected] = useState<string[]>([]);
   const fmt = useFmt();
+  const { data: catalogDishes = [] } = useDishes();
 
   const days = [
     t("customer:dayMon"), t("customer:dayTue"), t("customer:dayWed"),
@@ -110,7 +112,7 @@ function ScheduleFlow() {
         <>
           <SectionHeader title={t("customer:chooseMeals")} />
           <div className="px-6 space-y-3">
-            {MOCK_DISHES.map((d) => {
+            {catalogDishes.map((d) => {
               const active = selected.includes(d.id);
               return (
                 <button

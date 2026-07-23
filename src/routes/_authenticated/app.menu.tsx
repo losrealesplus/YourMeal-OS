@@ -6,13 +6,14 @@ import {
   DishCard,
   ScreenHeader,
 } from "@/components/consumer";
-import { MOCK_DISHES } from "@/lib/mock-catalog";
+import { useDishes } from "@/hooks/use-dishes";
 
 /**
  * Screen: Customer · Weekly Menu
  * - Objetivo operacional: explorar el menú semanal antes de programar.
  * - Capability: weekly-menu.browse
  * - Core Object(s): WeeklyMenu · Dish
+ * - CAP-002: dish list from useDishes() (real catalog read; day rotation UX unchanged)
  */
 export const Route = createFileRoute("/_authenticated/app/menu")({
   component: MenuPage,
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/_authenticated/app/menu")({
 function MenuPage() {
   const { t } = useTranslation(["customer", "common"]);
   const [active, setActive] = useState(0);
+  const { data: catalogDishes = [] } = useDishes();
   const days = [
     t("customer:dayMon"),
     t("customer:dayTue"),
@@ -39,8 +41,11 @@ function MenuPage() {
     spicy: t("customer:tagSpicy"),
   };
 
-  // Scaffold: same mock dishes rotated per day.
-  const dishes = [...MOCK_DISHES.slice(active), ...MOCK_DISHES.slice(0, active)];
+  // Same day-rotation UX; data source is real catalog.
+  const dishes = [
+    ...catalogDishes.slice(active),
+    ...catalogDishes.slice(0, active),
+  ];
 
   return (
     <div className="flex-1 flex flex-col">

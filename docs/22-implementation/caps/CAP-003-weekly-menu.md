@@ -5,6 +5,21 @@
 
 ---
 
+## Preconditions
+
+- CAP-002 = Connected (lectura de platos reales)  
+- Usuario autenticado · tenant resuelto  
+- Oferta / menú semanal disponible en OM (sin inventar reglas)  
+
+## Postconditions
+
+- Menú semanal muestra datos reales (no mock de oferta)  
+- Sin cambios UX / navegación  
+- Typecheck limpio  
+- Happy Path: Parcial (tras Connected)  
+
+---
+
 ## Objetivo
 
 Conectar Menú semanal a datos reales (Menu / oferta) sin cambiar UX.

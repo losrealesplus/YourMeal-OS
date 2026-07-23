@@ -9,26 +9,35 @@ import {
   ScreenHeader,
   TagChip,
 } from "@/components/consumer";
-import { getMockDish } from "@/lib/mock-catalog";
+import { useDish } from "@/hooks/use-dishes";
 
 /**
  * Screen: Customer · Dish Detail
  * - Objetivo operacional: decidir si un plato encaja (macros, alérgenos, ingredientes).
  * - Capability: weekly-menu.browse · dish-catalog.read
  * - Core Object(s): Dish (+ RecipeSummary vía Dish)
+ * - CAP-002: useDish() real catalog read (UI unchanged)
  */
 export const Route = createFileRoute("/_authenticated/app/menu/$dishId")({
-  loader: ({ params }) => {
-    const dish = getMockDish(params.dishId);
-    if (!dish) throw notFound();
-    return { dish };
-  },
   component: DishDetail,
 });
 
 function DishDetail() {
   const { t } = useTranslation(["customer", "common"]);
-  const { dish } = Route.useLoaderData();
+  const { dishId } = Route.useParams();
+  const { data: dish, isPending, isFetched } = useDish(dishId);
+
+  if (isPending) {
+    return <div className="flex-1 flex flex-col" aria-busy="true" />;
+  }
+
+  if (isFetched && !dish) {
+    throw notFound();
+  }
+
+  if (!dish) {
+    return <div className="flex-1 flex flex-col" aria-busy="true" />;
+  }
 
   const tagLabels: Record<string, string> = {
     vegan: t("customer:tagVegan"),

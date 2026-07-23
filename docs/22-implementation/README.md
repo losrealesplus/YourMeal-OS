@@ -24,7 +24,7 @@ GitHub → historia / evidencia
 | [HAPPY_PATH_E2E](./HAPPY_PATH_E2E.md) | Hito: primer pedido sin mocks |
 | [IMPLEMENTATION_RULES](./IMPLEMENTATION_RULES.md) | Constitución |
 | [IMPLEMENTATION_BACKLOG](./IMPLEMENTATION_BACKLOG.md) | CAP × estado |
-| [caps/](./caps/README.md) | CAP-001…007 — **CAP-002 lectura** siguiente |
+| [caps/](./caps/README.md) | CAP-001…007 — **CAP-003** siguiente |
 | [ADR 0013](../adr/0013-implementation-is-knowledge-materialization.md) | Implementation is Knowledge Materialization |
 
 ---
@@ -32,8 +32,8 @@ GitHub → historia / evidencia
 ## Siguiente
 
 1. Pegar [Master Prompt](./CURSOR_MASTER_PROMPT.md) en la sesión Cursor.  
-2. Ejecutar **[CAP-002 Dish Catalog — solo lectura](./caps/CAP-002-dish-catalog.md)** (Level 2).  
-3. Avanzar CAP-003…007 hacia el **Happy Path sin mocks** (Level 3→4).
+2. Ejecutar **[CAP-003 Weekly Menu](./caps/CAP-003-weekly-menu.md)** (Level 2; CAP-002 lectura Connected).  
+3. Avanzar CAP-004…007 hacia el **Happy Path sin mocks** (Level 3→4).
 
 ---
 
@@ -44,6 +44,7 @@ GitHub → historia / evidencia
 | Objetivo FOPEBA→software | ✅ Declarado |
 | Product Skeleton UX | ✅ |
 | L1 CAP-001 Auth | Connected |
-| L2 CAP-002…005 | ⏳ CAP-002 siguiente |
+| L2 CAP-002 Dish Catalog (lectura) | Connected |
+| L2 CAP-003…005 | ⏳ CAP-003 siguiente |
 | L3 Workflow / L4 FOV | ⏳ |
 | Business logic inventada | 🔒 STOP |

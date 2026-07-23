@@ -15,6 +15,8 @@ Scaffold → Connected → Operational → Field Validated
 | ▓▓▓░ | Operational |
 | ▓▓▓▓ | Field Validated |
 
+Cada CAP declara **Preconditions** y **Postconditions** en su doc (`caps/CAP-00x`).
+
 ---
 
 ## Hito
@@ -25,29 +27,33 @@ Scaffold → Connected → Operational → Field Validated
 
 ## LEVEL 1 — Infrastructure
 
-| ID | Capability | Nivel | Doc |
-|----|------------|-------|-----|
-| CAP-001 | Auth & User Context | ▓▓░░ | [caps](./caps/CAP-001-auth-user-context.md) |
+| ID | Capability | Nivel | Happy Path | Doc |
+|----|------------|-------|------------|-----|
+| CAP-001 | Auth & User Context | ▓▓░░ | N/A | [caps](./caps/CAP-001-auth-user-context.md) |
+
+**Happy Path** = ¿esta CAP ya aporta datos/flujo real al recorrido operativo E2E?  
+(No es cobertura funcional completa.)
 
 ---
 
 ## LEVEL 2 — Capability Connection
 
-| ID | Capability | Nivel | Doc |
-|----|------------|-------|-----|
-| CAP-002 | Dish Catalog (lectura) | ▓░░░ | [caps](./caps/CAP-002-dish-catalog.md) ← siguiente |
-| CAP-003 | Weekly Menu | ▓░░░ | [caps](./caps/CAP-003-weekly-menu.md) |
-| CAP-004 | Order Programming | ▓░░░ | [caps](./caps/CAP-004-order-programming.md) |
-| CAP-005 | Order Summary | ▓░░░ | [caps](./caps/CAP-005-order-summary.md) |
+| ID | Capability | Nivel | Happy Path | Doc |
+|----|------------|-------|------------|-----|
+| CAP-002 | Dish Catalog (lectura) | ▓▓░░ | Parcial | [caps](./caps/CAP-002-dish-catalog.md) |
+| CAP-003 | Weekly Menu | ▓░░░ | No | [caps](./caps/CAP-003-weekly-menu.md) ← siguiente |
+| CAP-004 | Order Programming | ▓░░░ | No | [caps](./caps/CAP-004-order-programming.md) |
+| CAP-005 | Order Summary | ▓░░░ | No | [caps](./caps/CAP-005-order-summary.md) |
 
 ---
 
 ## LEVEL 3 — Operational Workflow
 
-| ID | Capability | Nivel | Doc |
-|----|------------|-------|-----|
-| CAP-006 | Order Confirmation | ▓░░░ | [caps](./caps/CAP-006-order-confirmation.md) |
-| CAP-007 | Order History | ▓░░░ | [caps](./caps/CAP-007-order-history.md) |
+| ID | Capability | Nivel | Happy Path | Doc |
+|----|------------|-------|------------|-----|
+| CAP-006 | Order Confirmation | ▓░░░ | No | [caps](./caps/CAP-006-order-confirmation.md) |
+| CAP-007 | Order History | ▓░░░ | No | [caps](./caps/CAP-007-order-history.md) |
+
 
 Ensamblaje: [HAPPY_PATH_E2E](./HAPPY_PATH_E2E.md).
 
@@ -86,4 +92,4 @@ Ensamblaje: [HAPPY_PATH_E2E](./HAPPY_PATH_E2E.md).
 
 ## Anti-métrica
 
-No medir por pantallas. Medir por CAP × estado × [Knowledge Coverage](./KNOWLEDGE_COVERAGE.md).
+No medir por pantallas. Medir por CAP × estado × contribución al Happy Path × [Knowledge Coverage](./KNOWLEDGE_COVERAGE.md).
