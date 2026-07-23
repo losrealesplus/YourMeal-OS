@@ -96,18 +96,26 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ```text
 Metodología cerrada (Acta) · FOPEBA Frozen 🧊 · Materialización HP-001
 Pregunta: ¿Cuál es la siguiente Capability? (no la siguiente regla)
+Etapa 2: L1✅ · L2 CAP-002…005 Connected · L3 CAP-006 Operational · L4 ORR/FOV
 Hito: HP-001 · Operational · ORR PASSED · Ready for FOV
 ```
 
 > Cursor no implementa funcionalidades. Conecta **capacidades** certificadas.  
 > Regla nueva → **STOP** · `REQUIRES KNOWLEDGE REVIEW` · Carril A.  
-> Sin documentos metodológicos nuevos hasta FOV (gobernanza: Acta).
+> Sin documentos metodológicos nuevos hasta FOV (gobernanza: Acta).  
+> Un PR · una Capability · un nivel — sin «ya que estamos…».
 
-**Contexto:** [CURSOR_MASTER_PROMPT](./docs/22-implementation/CURSOR_MASTER_PROMPT.md)  
-**Siguiente:** [ORR](../22-implementation/ORR.md) (PASSED \| BLOCKED) — sin features  
+**Contexto permanente:** [CURSOR_MASTER_PROMPT](./docs/22-implementation/CURSOR_MASTER_PROMPT.md)  
+**Niveles:** [ETAPA_2_LEVELS](./docs/22-implementation/ETAPA_2_LEVELS.md) · [KNOWLEDGE_COVERAGE](./docs/22-implementation/KNOWLEDGE_COVERAGE.md)  
+**Siguiente:** [ORR](./docs/22-implementation/ORR.md) (PASSED \| BLOCKED) — sin features  
 **Pre-piloto:** [PRE_PILOT_AUDIT](./docs/00-status/PRE_PILOT_AUDIT.md)  
+
 **Cierre metodológico:** [Acta](./docs/00-status/ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md)  
 **Historia:** [MILESTONES](./docs/00-status/MILESTONES.md)  
+**PRs:** un nivel por PR — [PR_CHANGE_LEVELS](./docs/22-implementation/PR_CHANGE_LEVELS.md)  
+**ADR:** [0013 Implementation is Knowledge Materialization](./docs/adr/0013-implementation-is-knowledge-materialization.md)  
+**Hito:** [Happy Path E2E](./docs/22-implementation/HAPPY_PATH_E2E.md)  
+
 **Filosofía:** [IMPLEMENTATION_PHILOSOPHY](./docs/23-engineering/IMPLEMENTATION_PHILOSOPHY.md)
 
 | Herramienta | Rol |
