@@ -31,7 +31,9 @@ Comienza Operational Engineering  (tras ORR PASSED)
 Experience: Journey-first (CJ-001) · pantallas MVP ≤ 15
 ```
 
-> Dos líneas en paralelo: **evidencia operativa** (FOPEBA) y **experiencia Tenant** (Journey → Screen → Capability). No compiten.
+> Dos líneas en paralelo: **evidencia operativa** (FOPEBA) y **experiencia Tenant** (Journey → Screen → Capability). No compiten.  
+> Estabilidad conceptual: el valor siguiente es **demostrar en campo** (CJ-001 + Smoke/ORR/FOV), no añadir conceptos.  
+> Motores de cambio por dominio: [PROJECT_DOMAINS](./PROJECT_DOMAINS.md).
 
 ---
 

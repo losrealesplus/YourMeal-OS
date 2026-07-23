@@ -40,6 +40,32 @@ Customer Journey → Screen → Capability
 
 Nunca al revés. Evita pantallas «porque podrían ser útiles».
 
+## Cadena completa
+
+```text
+Customer Journey
+        ↓
+Screen (SCR)
+        ↓
+Capability
+        ↓
+Operational Model
+        ↓
+Evidence
+```
+
+## Revisión de PR (Experience)
+
+Antes de aprobar cualquier pantalla / cambio de Experience, responder **las cinco**:
+
+1. ¿A qué **Customer Journey** pertenece?  
+2. ¿Qué **Capability** utiliza?  
+3. ¿Qué **Operational Object** representa?  
+4. ¿Qué **decisión** toma el usuario en esta pantalla?  
+5. ¿Qué **evidencia** futura esperamos obtener de ella en FOV?
+
+Si no puede responderlas, la pantalla **aún no está justificada**.
+
 ## Trazabilidad de pantalla (SCR)
 
 Campo opcional — extensión natural OM ↔ implementación:

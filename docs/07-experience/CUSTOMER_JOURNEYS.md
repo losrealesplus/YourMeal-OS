@@ -119,16 +119,18 @@ Screen:
   name: Weekly Menu
 Journey: CJ-001
 Capabilities:
-  - weekly-menu.browse   # o CAP-id cuando esté indexado
+  - weekly-menu.browse
   - dish-catalog.read
 Operational Objects:
   - Weekly Menu
   - Dish
-Evidence:
-  - FOV-001   # rellenar tras campo
+UserDecision: "¿Qué platos quiero esta semana?"
+EvidenceExpected:
+  - FOV-001   # ¿completa el menú sin ayuda? ¿dónde duda?
 ```
 
-Eso es suficiente para una primera versión sólida. **No** añadir SCR sin un CJ que lo justifique.
+Eso es suficiente para una primera versión sólida. **No** añadir SCR sin un CJ que lo justifique.  
+PR Experience: pasar las [cinco preguntas](./README.md#revisión-de-pr-experience).
 
 ---
 
