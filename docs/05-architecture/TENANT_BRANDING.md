@@ -1,17 +1,20 @@
 # Tenant Branding — contrato técnico
 
+**Knowledge Lifetime:** Contract  
 **ADR:** [0014 — Customer Application is Tenant-Branded](../adr/0014-customer-application-is-tenant-branded.md)  
 **Estado:** Accepted (especificación) · implementación incremental  
 **Ámbito:** Capability transversal — BrandConfig, recursos y configuración. **No** es la guía de UX ni la bitácora de un sprint.
 
-### Mapa de documentos (evitar duplicar)
+### Mapa de documentos (Knowledge Lifetime)
 
-| Documento | Rol |
-|-----------|-----|
-| **Este** ([TENANT_BRANDING](./TENANT_BRANDING.md)) | Contrato técnico: BrandConfig · recursos · runtime |
-| [TENANT_EXPERIENCE_SPEC](./TENANT_EXPERIENCE_SPEC.md) | Reglas **permanentes** de experiencia Tenant |
-| [TENANT_IMPLEMENTATION_EATCLEAN](./TENANT_IMPLEMENTATION_EATCLEAN.md) | Implementación **específica** del tenant EatClean |
-| [EXPERIENCE_REFACTOR_EATCLEAN_V1_1](../07-experience/EXPERIENCE_REFACTOR_EATCLEAN_V1_1.md) | Bitácora del sprint Experience (#24→#29) |
+| Documento | Nivel | Rol |
+|-----------|-------|-----|
+| **Este** ([TENANT_BRANDING](./TENANT_BRANDING.md)) | **Contract** | BrandConfig · recursos · runtime |
+| [TENANT_EXPERIENCE_SPEC](./TENANT_EXPERIENCE_SPEC.md) | **Contract** | Reglas permanentes de experiencia Tenant |
+| [TENANT_IMPLEMENTATION_EATCLEAN](./TENANT_IMPLEMENTATION_EATCLEAN.md) | **Implementation** | EatClean concreto |
+| [EXPERIENCE_REFACTOR_EATCLEAN_V1_1](../07-experience/EXPERIENCE_REFACTOR_EATCLEAN_V1_1.md) | **Iteration** | Bitácora sprint |
+
+Regla: [Knowledge Lifetime](../18-operational-validation/knowledge-lifetime.md).
 
 ---
 

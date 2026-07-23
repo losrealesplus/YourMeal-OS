@@ -1,10 +1,12 @@
 # Bitácora · Experience Refactor EatClean v1.1
 
+**Knowledge Lifetime:** Iteration *(cerrada — no reeditar reglas aquí)*  
 **Tipo:** changelog de sprint (no fuente de verdad permanente)  
 **PRs:** ~#24 → #29  
 **Reglas permanentes:** [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md)  
 **Implementación EatClean:** [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md)  
-**Contrato:** [TENANT_BRANDING](../05-architecture/TENANT_BRANDING.md) · [ADR 0014](../adr/0014-customer-application-is-tenant-branded.md)
+**Contrato:** [TENANT_BRANDING](../05-architecture/TENANT_BRANDING.md) · [ADR 0014](../adr/0014-customer-application-is-tenant-branded.md)  
+**Siguiente hito:** [EatClean Pilot Ready](../00-status/MILESTONE_EATCLEAN_PILOT_READY.md) · [Knowledge Lifetime](../18-operational-validation/knowledge-lifetime.md)
 
 > Si una regla debe sobrevivir al siguiente sprint, **no** la añadas solo aquí: súbela a TENANT_EXPERIENCE_SPEC o a TENANT_IMPLEMENTATION_EATCLEAN.
 
@@ -64,7 +66,8 @@ Hacer que EatClean deje de parecer un SaaS personalizado y se sienta como **dos 
 
 La app empieza a leerse como producto digital de EatClean (ADR 0014), no como panel white-label.
 
-**Siguiente hito de producto (fuera de esta bitácora):** contenido vivo + criterio *EatClean Pilot Ready* — ver [TENANT_IMPLEMENTATION_EATCLEAN § Contenido vivo](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md#fotografía-y-contenido-vivo-prioridad-siguiente).
+**Siguiente hito de producto:** [EatClean Pilot Ready](../00-status/MILESTONE_EATCLEAN_PILOT_READY.md) (EP-001…EP-005).  
+**Congelación:** [ACT-001](../00-status/ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) — no polish estético por preferencia.
 
 ---
 

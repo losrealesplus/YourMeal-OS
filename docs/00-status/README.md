@@ -6,15 +6,17 @@
 **Engineering Phase:** [ENGINEERING_PHASE](./ENGINEERING_PHASE.md) — Complete (pending operational authorization)  
 **Última integración:** [IR-001](./IR-001_FIRST_ENGINEERING_INTEGRATION.md) · PR #22  
 **Pre-piloto:** [PRE_PILOT_AUDIT](./PRE_PILOT_AUDIT.md)  
-**Gobernanza:** [Acta — Fin construcción metodológica](./ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) **Cerrada**  
+**Gobernanza:** [Acta — Fin construcción metodológica](./ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) **Cerrada** · [ACT-001 Experience Baseline Frozen](./ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) ✅  
 **Historia:** [MILESTONES](./MILESTONES.md)  
 **Auditoría ingeniería:** [ENGINEERING_REVIEW_SPRINT0](./ENGINEERING_REVIEW_SPRINT0.md)  
 **Objetivo:** demostrar que FOPEBA puede producir software operacional de alta calidad.  
 **Hito operativo:** `HP-001 · Operational · ORR PASSED · Ready for FOV` (en curso)  
-**Hito experiencia:** CJ-001 usable sin explicación ([CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md))
+**Hito piloto:** [EatClean Pilot Ready](./MILESTONE_EATCLEAN_PILOT_READY.md) 🟡 · EP-001…EP-005  
+**Hito experiencia base:** ✅ [ACT-001 Frozen](./ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) (#24→#30)  
+**Documentación:** [Knowledge Lifetime](../18-operational-validation/knowledge-lifetime.md) — Contract · Implementation · Iteration
 
-> Ops: **¿Hay evidencia para ORR?** · Experience: **¿Mi madre podría pedir sin ayuda?**  
-> El software es una implementación del conocimiento. Nunca su origen.  
+> Ops: **¿Hay evidencia para ORR?** · Piloto: **¿Cliente pide, equipo entrega, FOPEBA recoge evidencia?**  
+> ❌ No polish estético por preferencia (ACT-001).  
 > [ADR 0013](../adr/0013-implementation-is-knowledge-materialization.md) · [ADR 0014](../adr/0014-customer-application-is-tenant-branded.md)
 
 ---

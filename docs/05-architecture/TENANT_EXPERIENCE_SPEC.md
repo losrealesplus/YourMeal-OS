@@ -1,5 +1,6 @@
 # Tenant Experience Spec — reglas permanentes
 
+**Knowledge Lifetime:** Contract  
 **ADR:** [0014 — Customer Application is Tenant-Branded](../adr/0014-customer-application-is-tenant-branded.md)  
 **Contrato técnico:** [TENANT_BRANDING](./TENANT_BRANDING.md)  
 **Ejemplo de implementación:** [TENANT_IMPLEMENTATION_EATCLEAN](./TENANT_IMPLEMENTATION_EATCLEAN.md)  
@@ -28,6 +29,31 @@ No copiar la web literalmente. Heredar **identidad**, **tono** y **lenguaje**.
 | **Tenant Experience** | Tenant | **Sí** — contenido y recursos |
 
 Eso evita forks por cliente y reducir el branding a «un logo y dos colores».
+
+---
+
+## Principio rector — Brand Recognition Filter (no negociable)
+
+Antes de dar por válida **cualquier** pantalla Tenant (Customer App **o** Centro de Operaciones):
+
+> **Si ocultamos el nombre "YourMeal OS", ¿un cliente o un empleado reconocería inmediatamente que esta aplicación pertenece al Tenant gracias al logo, los colores, la tipografía, el lenguaje y la fotografía?**
+
+| Respuesta | Dictamen |
+|-----------|----------|
+| **Sí** | Respeta [ADR 0014](../adr/0014-customer-application-is-tenant-branded.md) |
+| **No** | La pantalla **no** está lista — falta identidad, no «más UI SaaS» |
+
+Continuidad visual esperada:
+
+```text
+Instagram / redes del Tenant  →  Web oficial  →  App
+```
+
+No copiar el **layout** de la web. Sí heredar la **identidad** (marca, tono, foto, tipografía).
+
+Customer App → calma · apetito · simplicidad.  
+Centro de Operaciones → claridad · prioridad · acción.  
+Misma marca. Distinto propósito.
 
 ---
 
@@ -154,6 +180,7 @@ Cada pantalla Tenant debe cumplir **todas**:
 
 | # | Criterio | Pregunta |
 |---|----------|----------|
+| 0 | **Reconocimiento** | ¿Pasa el [Brand Recognition Filter](#principio-rector--brand-recognition-filter-no-negociable)? |
 | 1 | **Branding** | ¿Parece del Tenant o de un SaaS genérico? |
 | 2 | **Copy** | ¿Mismo tono que la identidad digital del Tenant? |
 | 3 | **Continuidad** | ¿La transición web/redes → app resulta natural? |
