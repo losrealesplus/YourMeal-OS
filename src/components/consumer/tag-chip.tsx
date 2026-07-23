@@ -10,8 +10,8 @@ export function TagChip({
 }) {
   const toneClass: Record<string, string> = {
     leaf: "bg-primary/10 text-primary",
-    clay: "bg-[var(--brand-cream)] text-[var(--brand-clay)]",
-    muted: "bg-secondary text-secondary-foreground",
+    clay: "attention-chip",
+    muted: "bg-muted text-muted-foreground",
   };
   return (
     <span

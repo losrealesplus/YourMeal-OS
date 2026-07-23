@@ -46,7 +46,7 @@ export function QuietLocaleSwitch({ className }: { className?: string }) {
             className={cn(
               "uppercase transition-colors",
               current === lng.code
-                ? "text-primary"
+                ? "text-[color:var(--attention,#EDB32A)]"
                 : "text-[#9a8f7c]/70 hover:text-primary/80",
             )}
           >

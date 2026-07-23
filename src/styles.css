@@ -223,12 +223,16 @@
   --card-foreground: var(--tenant-foreground, #0f2317);
   --primary: var(--tenant-primary, #145b32);
   --primary-foreground: #ffffff;
-  --secondary: var(--tenant-secondary, #edb32a);
+  /* Neutral chrome — never map brand yellow here (yellow = attention only). */
+  --secondary: color-mix(in oklab, var(--tenant-background, #f7f5f1) 82%, white);
   --secondary-foreground: var(--tenant-foreground, #0f2317);
   --muted: var(--tenant-accent, #eff4f1);
   --muted-foreground: color-mix(in oklab, var(--tenant-foreground, #0f2317) 48%, #8a7a5c);
   --accent: var(--tenant-accent, #eff4f1);
   --accent-foreground: var(--tenant-foreground, #0f2317);
+  /* Brand golden — chips, badges, active indicators, promos. Never primary CTA. */
+  --attention: var(--tenant-secondary, #edb32a);
+  --attention-foreground: var(--tenant-foreground, #0f2317);
   --border: color-mix(in oklab, var(--tenant-primary, #145b32) 12%, #e8e0d4);
   --input: color-mix(in oklab, var(--tenant-primary, #145b32) 12%, #e8e0d4);
   --ring: var(--tenant-primary, #145b32);
@@ -239,4 +243,13 @@
 
 .tenant-branded .hero-emerald {
   background: var(--primary);
+}
+
+.tenant-branded .attention-chip {
+  background: color-mix(in oklab, var(--attention) 28%, white);
+  color: color-mix(in oklab, var(--attention-foreground) 88%, var(--attention));
+}
+
+.tenant-branded .attention-dot {
+  background: var(--attention);
 }

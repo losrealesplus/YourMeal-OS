@@ -158,8 +158,8 @@ function AuthPage() {
                   <div
                     key={i}
                     className={
-                      "h-1.5 flex-1 rounded-full " +
-                      (i <= onboardingStep ? "bg-primary" : "bg-muted")
+                      "h-1.5 flex-1 rounded-full transition-colors " +
+                      (i <= onboardingStep ? "attention-dot" : "bg-muted")
                     }
                   />
                 ))}
@@ -209,13 +209,19 @@ function AuthPage() {
                     type="button"
                     onClick={() => setTab(k)}
                     className={
-                      "text-xs font-semibold py-2.5 rounded-xl transition-colors " +
+                      "relative text-xs font-semibold py-2.5 rounded-xl transition-colors " +
                       (tab === k
                         ? "bg-white text-foreground shadow-sm"
                         : "text-muted-foreground")
                     }
                   >
                     {t(`auth:tabs.${k}`)}
+                    {tab === k ? (
+                      <span
+                        className="absolute left-1/2 -translate-x-1/2 bottom-1 h-0.5 w-6 rounded-full attention-dot"
+                        aria-hidden
+                      />
+                    ) : null}
                   </button>
                 ))}
               </div>

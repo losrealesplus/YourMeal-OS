@@ -37,5 +37,5 @@
     "appName": "EatClean",
     "shortDescription": "Comida preparada para ayudarte a comer mejor."
   },
-  "_notes": "Palette + logo from eatcleantenerifecatering.es (primary 145 63% 22%, golden 42 85% 55%, cream 40 30% 96%). Runtime via BrandConfig — no product forks."
+  "_notes": "Palette from eatcleantenerifecatering.es. primary=green CTA; secondaryColor=golden ATTENTION only (chips/badges/indicators/promos — never primary button); accent=soft olive; cream background."
 }

@@ -1,6 +1,6 @@
 export default {
-  welcome: "Willkommen bei EatClean",
-  welcomeSub: "Zubereitetes Essen, das dir hilft, besser zu essen.",
+  welcome: "Willkommen!",
+  welcomeSub: "Melde dich an und plane dein Wochenmenü.",
 
   startNow: "Start now",
   onboarding1Title: "Welcome to EatClean",
