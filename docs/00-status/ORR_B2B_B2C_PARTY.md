@@ -98,22 +98,34 @@ Centro de Operaciones → Administración → Clientes Empresa → Nueva Empresa
 
 ## ORR-004 · Operaciones
 
-### Cocina
+> **PR-034 · Operations Workspace Activation** — Cocina (`/admin/kitchen`) y Reparto (`/admin/delivery`) sobre pedidos reales. Ya **NO** queda DEFERRED por mock.
+
+### Checklist validación piloto
+
+- [ ] Cocina visible (`kitchen` · `operations_manager` · `company_admin` · `saas_admin`).
+- [ ] Cocina funcional (lista, filtros, detalle, transiciones).
+- [ ] Reparto visible (`delivery` · `logistics` · `operations_manager` · `saas_admin`).
+- [ ] Reparto funcional (lista, filtros, detalle, transiciones).
+- [ ] Estados cambian correctamente (Cocina: Pendiente → En preparación → Preparado → Listo; Reparto: Listo → En reparto → Entregado / Incidencia).
+- [ ] Persistencia correcta (`transition_order_status` + audit).
+- [ ] Timeline operacional actualizado en detalle de pedido.
+- [ ] RBAC correcto (Kitchen solo Cocina · Delivery solo Reparto · Operations Manager todo Operaciones · SaaS Admin todo).
+
+### Cocina (detalle funcional)
 
 - [ ] Distingue pedidos B2C / B2B (`demand_channel`).
-- [ ] Filtra por empresa.
-- [ ] Filtra por sede.
-- [ ] Filtra por Delivery Group.
+- [ ] Filtra por fecha / empresa / sede / Delivery Group.
+- [ ] Muestra platos, cantidades, observaciones, OU, hora/día.
 
-### Reparto
+### Reparto (detalle funcional)
 
-- [ ] Agrupa entregas por Delivery Group.
-- [ ] Ve empresa y sede.
-- [ ] Dirección de entrega correcta.
+- [ ] Filtra por fecha / empresa / Delivery Group (ruta cuando exista).
+- [ ] Ve empresa, sede, dirección, contacto, observaciones.
 
-> Si Cocina/Reparto siguen en mock (`mock-admin`), ORR-004 = **BLOCKED** para piloto E2E completo; puede acotarse el piloto a EP-001 + evidencia de stamp en Order.
+**Fuera de alcance (no bloquean ORR-004):** optimización de rutas, mapas, GPS, ETA, app conductor, firma, tracking.
 
-**Resultado ORR-004:** ☐ PASSED · ☐ BLOCKED · ☐ DEFERRED (piloto acotado)
+**Resultado ORR-004:** ☐ PASSED · ☐ BLOCKED  
+~~DEFERRED~~ — retirado; el mock de cocina/reparto ya no aplica como salida válida.
 
 ---
 
@@ -177,7 +189,7 @@ Company Admin o EatClean → Invitar → enlace seguro → empresa preselecciona
 
 | Condición | Acción |
 |-----------|--------|
-| ORR-001 + 002 + 003 + 006 PASSED; 004 DEFERRED | Piloto **acotado** (pedido + modelo Party) posible |
+| ORR-001 + 002 + 003 + 006 PASSED; ORR-004 validable (PR-034) | Piloto operativo posible tras checklist Cocina/Reparto |
 | ORR-004 PASSED | Piloto E2E operativo posible |
 | Cualquier BLOCKED en 001–003 o 006 | **No** Pilot Ready |
 
