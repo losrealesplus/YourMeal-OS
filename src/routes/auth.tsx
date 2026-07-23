@@ -10,8 +10,9 @@ import {
   PoweredByLine,
   TenantBrandScope,
 } from "@/components/tenant/tenant-brand-scope";
-import { brandConfig } from "@/tenant/brand-config";
+import { brandConfig, tenantCopyEs } from "@/tenant/brand-config";
 import { PrimaryCTA } from "@/components/consumer";
+import splashImage from "@/assets/eatclean-splash.jpg";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -87,17 +88,23 @@ function AuthPage() {
         </div>
 
         {phase === "splash" ? (
-          <div className="flex flex-col items-center gap-6 animate-fade-in text-center px-6">
-            <div className="size-20 rounded-[1.5rem] bg-primary text-primary-foreground grid place-items-center text-2xl font-extrabold tracking-tight shadow-lg">
-              EC
+          <div className="w-full max-w-md animate-fade-in flex flex-col items-center gap-8 text-center px-6">
+            <div className="relative w-40 h-40 rounded-[2rem] overflow-hidden shadow-lg">
+              <img
+                src={splashImage}
+                alt=""
+                className="w-full h-full object-cover"
+              />
             </div>
             <div>
-              <p className="text-2xl font-extrabold tracking-tight">{brandConfig.name}</p>
-              <p className="text-sm text-muted-foreground mt-2 max-w-xs">
-                {brandConfig.storeAssets.shortDescription}
+              <p className="text-3xl font-extrabold tracking-tight">
+                {brandConfig.name}
+              </p>
+              <p className="text-sm text-muted-foreground mt-3 max-w-xs leading-relaxed">
+                {tenantCopyEs.claims.enjoy}
               </p>
             </div>
-            <PoweredByLine className="mt-8" />
+            <PoweredByLine className="mt-4" />
           </div>
         ) : null}
 

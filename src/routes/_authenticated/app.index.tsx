@@ -23,6 +23,7 @@ import {
   type DashboardStateId,
 } from "@/components/consumer";
 import { brandConfig } from "@/tenant/brand-config";
+import heroImage from "@/assets/eatclean-hero.jpg";
 
 /**
  * SCR-005 · Home — CJ-001
@@ -119,15 +120,39 @@ function HomeBody({
         </div>
       ) : null}
 
-      <section className="px-6 pt-6 pb-2">
+      <section className="px-6 pt-6">
         <p className="meta-label text-primary">{brandConfig.name}</p>
         <h1 className="text-3xl font-extrabold tracking-tight mt-2 text-balance">
           {t("greeting")}, {name}
         </h1>
-        <p className="text-base text-muted-foreground mt-3 leading-relaxed text-pretty">
-          {t("scheduleTitle")}
-        </p>
-        <div className="mt-6">
+      </section>
+
+      <section className="px-6 mt-5">
+        <div className="relative rounded-[1.75rem] overflow-hidden shadow-sm">
+          <img
+            src={heroImage}
+            alt=""
+            width={1600}
+            height={1200}
+            className="w-full h-56 object-cover"
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(180deg, transparent 35%, rgba(26,46,36,0.75) 100%)",
+            }}
+          />
+          <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-90">
+              {t("scheduleTitle")}
+            </p>
+            <p className="text-lg font-extrabold tracking-tight mt-1 text-balance">
+              {t("onboardingTitle")}
+            </p>
+          </div>
+        </div>
+        <div className="mt-4">
           <Link to="/app/schedule" className="block">
             <PrimaryCTA>{t("scheduleCta")}</PrimaryCTA>
           </Link>
