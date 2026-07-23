@@ -17,12 +17,10 @@ GitHub → historia / evidencia
 | Doc | Rol |
 |-----|-----|
 | [CURSOR_MASTER_PROMPT](./CURSOR_MASTER_PROMPT.md) | **Contexto permanente** Etapa 2 |
+| [PR_CHANGE_LEVELS](./PR_CHANGE_LEVELS.md) | Un PR = un nivel (no mezclar) |
 | [IMPLEMENTATION_RULES](./IMPLEMENTATION_RULES.md) | Constitución |
-| [IMPLEMENTATION_BACKLOG](./IMPLEMENTATION_BACKLOG.md) | Progreso por CAP |
-| [HAPPY_PATH_E2E](./HAPPY_PATH_E2E.md) | Primer pedido real → FOV |
-| [caps/](./caps/README.md) | CAP-001…007 (un prompt cada uno) |
-| [Philosophy](../23-engineering/IMPLEMENTATION_PHILOSOPHY.md) | El software no es origen del conocimiento |
-| [MODULE_STATE_CRITERIA](../00-status/MODULE_STATE_CRITERIA.md) | Scaffold→…→Field Validated |
+| [caps/](./caps/README.md) | CAP-001…007 — **CAP-002 lectura** siguiente |
+| [ADR 0013](../adr/0013-implementation-is-knowledge-materialization.md) | Implementation is Knowledge Materialization |
 
 ---
 
