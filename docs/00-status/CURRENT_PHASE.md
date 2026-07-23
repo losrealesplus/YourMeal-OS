@@ -54,16 +54,18 @@ Customer Journeys (CJ-001)
         ↓
 Pantallas MVP (≤ 15)
         ↓
-Experience Refactor
+Experience Refactor ✅ (UI)
         ↓
-BrandConfig Validation
+Observación de uso  ← AQUÍ
         ↓
-EatClean Release UX
+EatClean Release UX (solo con evidencia)
 ```
 
 Pregunta: **¿Mi madre podría hacer un pedido sin que nadie le explique la app?**
 
-Sprint activo: [EXPERIENCE_REFACTOR_EATCLEAN_V1](../07-experience/EXPERIENCE_REFACTOR_EATCLEAN_V1.md) — primer entregable: Splash · Login · Home · Menú · Resumen.
+**Congelado por intuición.** Siguiente paso: [CJ001_USAGE_OBSERVATION](../07-experience/CJ001_USAGE_OBSERVATION.md) — móvil, cuatro preguntas, sesión sin ayudar.
+
+Sprint UI: [EXPERIENCE_REFACTOR_EATCLEAN_V1](../07-experience/EXPERIENCE_REFACTOR_EATCLEAN_V1.md).
 
 Docs: [CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md) · [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) · [`tenants/eatclean/`](../../tenants/eatclean/README.md).
 
@@ -77,7 +79,7 @@ Mapa: [PROJECT_DOMAINS](./PROJECT_DOMAINS.md).
 |---------|------------|--------|
 | **Knowledge** | Operational Model | ✅ Frozen / Closed |
 | **Engineering** | Código | ✅ Implementado · ✅ #23 en main |
-| **Experience** | Customer Journeys + Screens | 🟡 CJ-001 definido · Refactor pendiente |
+| **Experience** | Customer Journeys + Screens | 🟡 UI CJ-001 lista · **falta observación de uso** |
 | **Operations** | Evidencia | ⏳ Smoke → ORR → FOV |
 
 ---
