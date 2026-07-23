@@ -49,16 +49,7 @@ PM UI (histórico): [21](../../21-product-materialization/README.md).
 
 ---
 
-## Orden de arranque
-
-1. [IA](../PRODUCT_INFORMATION_ARCHITECTURE.md)  
-2. [Matriz](../../21-product-materialization/01-screen-knowledge-matrix.md)  
-3. **[PM-001](../../21-product-materialization/PM-001-Customer-App.md)** ← siguiente Lovable  
-4. PM-002…005 ([SPRINTS](./SPRINTS.md))  
-5. Fase C selectiva + [Knowledge Traceability](./knowledge-traceability.md)
-
----
-
 ## Relación con Carril A
 
-Carril B **no** acelera G-01. FOV sigue siendo el juez del conocimiento.
+Carril B **no** acelera G-01.  
+Happy Path E2E conectado = puente natural a FOV (evidencia de campo).

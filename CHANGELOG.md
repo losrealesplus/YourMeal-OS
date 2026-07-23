@@ -85,7 +85,13 @@ La arquitectura de YourMeal OS se considera **estable**.
 - **Operational Dynamics v0.2:** Lifecycles 2.0 · Supporting Taxonomy · Checks 2.0 (PASS/WARNING/BLOCKED/MANUAL DECISION)
 - Recovery Pattern · Temporal Grammar · Capability Impact integrados en Dynamics 01
 - **Tren MC-001…006 aplicado** a `17` (Amend/Revise/Pause/Hold · Lot · Location · cardinalidad · INV-031)
-- **Carril B en curso:** Foundation de Producto · siguiente [PM-001 Customer App](./docs/21-product-materialization/PM-001-Customer-App.md)
+- **Product Skeleton ✅** · Cursor = ingeniero de conexión ([docs/22-implementation](./docs/22-implementation/README.md))
+- [IMPLEMENTATION_RULES](./docs/22-implementation/IMPLEMENTATION_RULES.md) — constitución Etapa 2
+- [IMPLEMENTATION_BACKLOG](./docs/22-implementation/IMPLEMENTATION_BACKLOG.md) — Scaffold→Connected→Operational→Validated
+- [Happy Path E2E](./docs/22-implementation/HAPPY_PATH_E2E.md) — primer pedido real · puente a FOV
+- Regla: Cursor no implementa funcionalidades; implementa capacidades certificadas
+- STOP si la regla no existe en el Knowledge Base → Carril A
+- Carril B en curso: Foundation de Producto · PM-001…005 (UI) · siguiente = conectar Happy Path
 - PM-001…005 + [PRODUCT_MATERIALIZATION_RULES](./docs/21-product-materialization/PRODUCT_MATERIALIZATION_RULES.md)
 - Sprints 2.1–2.5: Customer → Admin → Production → Delivery → Design System
 - Lovable: incrementos revisables; reutilizar i18n/audit/flags; experiencias completas
