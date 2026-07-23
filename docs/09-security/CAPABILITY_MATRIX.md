@@ -18,6 +18,8 @@ Hiding a nav item is **not** security. Guards must prevent render and Service en
 | `employee` | Employee |
 | `driver` | Driver |
 | `kitchen` | Kitchen |
+| `delivery` | Delivery (Reparto) |
+| `operations_manager` | Operations Manager |
 | `production` | Production |
 | `purchasing` | Purchasing |
 | `inventory` | Inventory |
@@ -95,13 +97,15 @@ Legend: ✅ granted · ❌ denied
 
 ## Operations
 
-| Capability | kitchen | production | purchasing | inventory | logistics | driver | company_admin | saas_admin |
-|------------|---------|------------|------------|-----------|-----------|--------|---------------|------------|
-| kitchen.operate | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
-| production.operate | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
-| purchasing.operate | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ |
-| inventory.operate | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ✅ | ✅ |
-| logistics.operate | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ |
+| Capability | kitchen | delivery | operations_manager | production | purchasing | inventory | logistics | driver | company_admin | saas_admin |
+|------------|---------|----------|--------------------|------------|------------|-----------|-----------|--------|---------------|------------|
+| kitchen.operate | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
+| production.operate | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
+| purchasing.operate | ❌ | ❌ | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ |
+| inventory.operate | ❌ | ❌ | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ | ✅ | ✅ |
+| logistics.operate | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ |
+
+> **PR-034:** `delivery` = solo Reparto; `operations_manager` = todo Operaciones (Cocina + Reparto + pedidos/clientes/inventario). Workspace routes: `/admin/kitchen`, `/admin/delivery`.
 
 ---
 
