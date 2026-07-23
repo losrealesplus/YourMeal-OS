@@ -174,6 +174,7 @@ Core | Operational | Engineering | Historical
 | `DICT-048` | [Tenant-Branded](#tenant-branded) | Core | Accepted |
 | `DICT-049` | [Powered by YourMeal OS](#powered-by-yourmeal-os) | Core | Accepted |
 | `DICT-050` | [Platform owns capability / Tenant owns experience](#platform-owns-capability--tenant-owns-experience) | Core | Accepted |
+| `DICT-051` | [Tenant Experience Spec](#tenant-experience-spec) | Operational | Accepted |
 
 ---
 
@@ -205,7 +206,7 @@ Core | Operational | Engineering | Historical
 
 ### Identidad SaaS (ADR 0014)
 
-[Customer Application](#customer-application) (`DICT-045`) · [YourMeal OS (Corporate Surface)](#yourmeal-os-corporate-surface) (`DICT-046`) · [BrandConfig](#brandconfig) (`DICT-047`) · [Tenant-Branded](#tenant-branded) (`DICT-048`) · [Powered by YourMeal OS](#powered-by-yourmeal-os) (`DICT-049`) · [Platform owns capability / Tenant owns experience](#platform-owns-capability--tenant-owns-experience) (`DICT-050`)
+[Customer Application](#customer-application) (`DICT-045`) · [YourMeal OS (Corporate Surface)](#yourmeal-os-corporate-surface) (`DICT-046`) · [BrandConfig](#brandconfig) (`DICT-047`) · [Tenant-Branded](#tenant-branded) (`DICT-048`) · [Powered by YourMeal OS](#powered-by-yourmeal-os) (`DICT-049`) · [Platform owns capability / Tenant owns experience](#platform-owns-capability--tenant-owns-experience) (`DICT-050`) · [Tenant Experience Spec](#tenant-experience-spec) (`DICT-051`)
 
 ---
 
@@ -2225,6 +2226,48 @@ ADR 0014
 
 ---
 
+# Tenant Experience Spec
+
+## ID
+DICT-051
+
+## Status
+Accepted
+
+## Madurez
+Operational
+
+## Nombre
+Tenant Experience Spec
+
+## Tipo
+Especificación de experiencia / incremento de producto
+
+## Definición
+Documento que fija cómo la Customer Application hereda la **identidad, tono y lenguaje** de un Tenant concreto (primera instancia: EatClean), sin copiar la web literalmente y sin personalizar código por cliente.
+
+Implica: login/home/nav/copy/fotos alineados al Tenant; back office solo vía RBAC; `BrandConfig` como única vía de personalización visual.
+
+## Cuándo ocurre
+Experience Refactor · onboarding de un Tenant nuevo · revisión Lovable/Cursor de superficies cliente.
+
+## Produce
+App que el usuario percibe como desarrollada por el Tenant.
+
+## No significa
+Fork del producto · cambios a HP-001 · inventar reglas del OM.
+
+## Sinónimos
+Experience Spec · Spec de identidad del Tenant
+
+## Palabras relacionadas
+BrandConfig · Tenant-Branded · Customer Application · Platform owns capability / Tenant owns experience
+
+## Referencias
+[TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md) · ADR 0014
+
+---
+
 ## Historial de este diccionario
 
 | Fecha | Cambio |
@@ -2234,4 +2277,5 @@ ADR 0014
 | 2026-07-23 | Primera pregunta (nuevo vs sinónimo) · disciplina de evolución de pilares |
 | 2026-07-23 | ADR 0014 — DICT-045…049 Customer Application / BrandConfig / Tenant-Branded |
 | 2026-07-23 | ADR 0014 ampliación — cinco capas · filtro Plataforma/Tenant · DICT-050 |
+| 2026-07-23 | TENANT_EXPERIENCE_SPEC EatClean · DICT-051 · consecuencia BrandConfig-only |
 
