@@ -1,3 +1,7 @@
+/**
+ * Admin shell — Centro de Operaciones.
+ * Combines main Ops Center chrome with PR-034 Cocina / Reparto navigation.
+ */
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
@@ -21,17 +25,14 @@ import {
   Palette,
   X,
   Building2,
+  ChefHat,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import {
-  isOperationsAdmin,
-  resolveOperationsEntry,
-  workspacesForRoles,
-  type OperationsWorkspacePath,
-} from "@/lib/operations-workspaces";
+import { useCan } from "@/hooks/use-can";
+import { isOperationsAdmin } from "@/lib/operations-workspaces";
 import { TenantBrandScope } from "@/components/tenant/tenant-brand-scope";
 import { TenantLogo } from "@/components/tenant/tenant-logo";
 
@@ -40,8 +41,7 @@ type NavItem = {
   labelKey: string;
   icon: typeof LayoutGrid;
   exact?: boolean;
-  /** Workspace path gate — omit for always-on (ops home for multi/admin). */
-  requiresPath?: OperationsWorkspacePath;
+  visible: boolean;
 };
 
 export function AdminShell({ children }: { children: ReactNode }) {
@@ -50,113 +50,136 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { roles, profile, user } = useAuth();
+  const { can } = useCan();
   const [moreOpen, setMoreOpen] = useState(false);
 
-  const entry = resolveOperationsEntry(roles);
-  const workspaces = workspacesForRoles(roles);
-  const allowedPaths = new Set<string>(workspaces.map((w) => w.path));
   const admin = isOperationsAdmin(roles);
+  const showKitchen =
+    can("kitchen.operate") ||
+    roles.includes("kitchen") ||
+    admin;
+  const showDelivery =
+    can("logistics.operate") ||
+    roles.includes("delivery") ||
+    roles.includes("logistics") ||
+    roles.includes("driver") ||
+    admin;
+  const showAllOps = admin || roles.includes("saas_admin");
 
-  const opsHome: string =
-    entry.kind === "direct" ? entry.path : "/admin";
+  const primary: NavItem[] = [
+    {
+      to: "/admin",
+      labelKey: "ops.nav.operations",
+      icon: LayoutGrid,
+      exact: true,
+      visible: true,
+    },
+    {
+      to: "/admin/kitchen",
+      labelKey: "ops.nav.kitchen",
+      icon: ChefHat,
+      visible: showKitchen,
+    },
+    {
+      to: "/admin/delivery",
+      labelKey: "ops.nav.delivery",
+      icon: Truck,
+      visible: showDelivery,
+    },
+    {
+      to: "/admin/orders",
+      labelKey: "ops.nav.orders",
+      icon: ClipboardList,
+      visible: can("orders.read") || showAllOps,
+    },
+    {
+      to: "/admin/customers",
+      labelKey: "ops.nav.customers",
+      icon: Users,
+      visible: can("customers.read") || showAllOps,
+    },
+    {
+      to: "/admin/inventory",
+      labelKey: "ops.nav.inventory",
+      icon: Boxes,
+      visible: can("inventory.operate") || showAllOps,
+    },
+  ].filter((i) => i.visible);
 
-  const primary: NavItem[] = (
-    [
-      {
-        to: opsHome,
-        labelKey: "ops.nav.operations",
-        icon: LayoutGrid,
-        exact: entry.kind !== "direct",
-      },
-      {
-        to: "/admin/production",
-        labelKey: "ops.nav.orders",
-        icon: ClipboardList,
-        requiresPath: "/admin/production",
-      },
-      {
-        to: "/admin/customers",
-        labelKey: "ops.nav.customers",
-        icon: Users,
-        requiresPath: "/admin/customers",
-      },
-      {
-        to: "/admin/inventory",
-        labelKey: "ops.nav.inventory",
-        icon: Boxes,
-        requiresPath: "/admin/inventory",
-      },
-    ] satisfies NavItem[]
-  ).filter(
-    (item) => !item.requiresPath || admin || allowedPaths.has(item.requiresPath),
-  );
-
-  const moreItems: NavItem[] = (
-    [
-      ...(admin
-        ? ([
-            {
-              to: "/admin/companies",
-              labelKey: "ops.nav.companyClients",
-              icon: Building2,
-            },
-          ] satisfies NavItem[])
-        : []),
-      {
-        to: "/admin/routes",
-        labelKey: "routes",
-        icon: Truck,
-        requiresPath: "/admin/routes",
-      },
-      { to: "/admin/menus", labelKey: "menus", icon: CalendarDays },
-      { to: "/admin/dishes", labelKey: "dishes", icon: BookOpen },
-      {
-        to: "/admin/purchasing",
-        labelKey: "purchasing",
-        icon: ShoppingCart,
-        requiresPath: "/admin/inventory",
-      },
-      {
-        to: "/admin/support",
-        labelKey: "support",
-        icon: LifeBuoy,
-        requiresPath: "/admin/customers",
-      },
-      {
-        to: "/admin/accounting",
-        labelKey: "accounting",
-        icon: Wallet,
-        requiresPath: "/admin/accounting",
-      },
-      { to: "/admin/reports", labelKey: "reports", icon: BarChart3 },
-      { to: "/admin/promotions", labelKey: "promotions", icon: Megaphone },
-      {
-        to: "/admin/production",
-        labelKey: "production",
-        icon: Factory,
-        requiresPath: "/admin/production",
-      },
-      {
-        to: "/admin/settings",
-        labelKey: "settings",
-        icon: Settings,
-        requiresPath: "/admin/settings",
-      },
-      ...(admin
-        ? ([
-            {
-              to: "/admin/design-system",
-              labelKey: "designSystem",
-              icon: Palette,
-            },
-          ] satisfies NavItem[])
-        : []),
-    ] satisfies NavItem[]
-  ).filter((item) => {
-    if (item.to === "/admin/companies") return admin;
-    if (!item.requiresPath) return admin;
-    return admin || allowedPaths.has(item.requiresPath);
-  });
+  const moreItems: NavItem[] = [
+    {
+      to: "/admin/companies",
+      labelKey: "ops.nav.companyClients",
+      icon: Building2,
+      visible: can("company.manage") || admin,
+    },
+    {
+      to: "/admin/routes",
+      labelKey: "routes",
+      icon: Truck,
+      visible: can("logistics.operate") || showAllOps,
+    },
+    {
+      to: "/admin/menus",
+      labelKey: "menus",
+      icon: CalendarDays,
+      visible: can("menus.read") || showAllOps,
+    },
+    {
+      to: "/admin/dishes",
+      labelKey: "dishes",
+      icon: BookOpen,
+      visible: can("dishes.read") || showAllOps,
+    },
+    {
+      to: "/admin/purchasing",
+      labelKey: "purchasing",
+      icon: ShoppingCart,
+      visible: can("purchasing.operate") || showAllOps,
+    },
+    {
+      to: "/admin/support",
+      labelKey: "support",
+      icon: LifeBuoy,
+      visible: can("support.read") || showAllOps,
+    },
+    {
+      to: "/admin/accounting",
+      labelKey: "accounting",
+      icon: Wallet,
+      visible: can("accounting.operate") || showAllOps,
+    },
+    {
+      to: "/admin/reports",
+      labelKey: "reports",
+      icon: BarChart3,
+      visible: showAllOps,
+    },
+    {
+      to: "/admin/promotions",
+      labelKey: "promotions",
+      icon: Megaphone,
+      visible: showAllOps,
+    },
+    {
+      to: "/admin/production",
+      labelKey: "production",
+      icon: Factory,
+      visible: can("production.operate") || showAllOps,
+    },
+    {
+      to: "/admin/settings",
+      labelKey: "settings",
+      icon: Settings,
+      visible: can("admin.settings") || admin,
+    },
+    {
+      to: "/admin/design-system",
+      labelKey: "designSystem",
+      icon: Palette,
+      visible: admin,
+    },
+  ].filter((i) => i.visible);
 
   const firstName =
     profile?.fullName?.trim().split(/\s+/)[0] ||
@@ -176,16 +199,19 @@ export function AdminShell({ children }: { children: ReactNode }) {
     return pathname === to || pathname.startsWith(`${to}/`);
   }
 
-  function NavLink({
-    item,
-    dense,
-  }: {
-    item: NavItem;
-    dense?: boolean;
-  }) {
+  function NavLink({ item, dense }: { item: NavItem; dense?: boolean }) {
     const active = isActive(item.to, item.exact);
     const Icon = item.icon;
-    const label = t(`admin:${item.labelKey}` as "admin:ops.nav.operations");
+    const label = t(`admin:${item.labelKey}` as "admin:ops.nav.operations", {
+      defaultValue:
+        item.labelKey === "ops.nav.kitchen"
+          ? "Cocina"
+          : item.labelKey === "ops.nav.delivery"
+            ? "Reparto"
+            : item.labelKey === "ops.nav.companyClients"
+              ? "Clientes Empresa"
+              : undefined,
+    });
     return (
       <Link
         to={item.to}
@@ -203,6 +229,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
       </Link>
     );
   }
+
+  // Mobile: Operaciones + up to 3 workspaces + Más
+  const mobilePrimary = primary.slice(0, 4);
 
   return (
     <TenantBrandScope className="min-h-screen bg-[color:var(--tenant-cream,#F7F5F1)] font-[family-name:var(--font-tenant-body,Open_Sans,sans-serif)] text-foreground">
@@ -222,18 +251,30 @@ export function AdminShell({ children }: { children: ReactNode }) {
             </div>
           </div>
 
-          <nav className="flex-1 space-y-1 overflow-y-auto p-3" aria-label={t("admin:ops.shellTitle")}>
+          <nav
+            className="flex-1 space-y-1 overflow-y-auto p-3"
+            aria-label={t("admin:ops.shellTitle")}
+          >
+            <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              Operaciones
+            </p>
             {primary.map((item) => (
               <NavLink key={`${item.to}-${item.labelKey}`} item={item} />
             ))}
-            <div className="my-3 border-t border-border/60 pt-3">
-              <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                {t("admin:ops.nav.more")}
-              </p>
-              {moreItems.map((item) => (
-                <NavLink key={`${item.to}-${item.labelKey}`} item={item} dense />
-              ))}
-            </div>
+            {moreItems.length > 0 && (
+              <div className="my-3 border-t border-border/60 pt-3">
+                <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t("admin:ops.nav.more")}
+                </p>
+                {moreItems.map((item) => (
+                  <NavLink
+                    key={`${item.to}-${item.labelKey}`}
+                    item={item}
+                    dense
+                  />
+                ))}
+              </div>
+            )}
           </nav>
 
           <div className="border-t border-border/70 p-3">
@@ -275,16 +316,17 @@ export function AdminShell({ children }: { children: ReactNode }) {
         </div>
       </div>
 
-      {/* Mobile bottom nav — Operaciones · Pedidos · Clientes · Inventario · Más */}
       <nav
         className="fixed inset-x-0 bottom-0 z-40 border-t border-border/70 bg-card/95 px-1 pb-[env(safe-area-inset-bottom)] pt-1 backdrop-blur-md lg:hidden"
         aria-label={t("admin:ops.shellTitle")}
       >
         <ul
           className="grid gap-0.5"
-          style={{ gridTemplateColumns: `repeat(${primary.length + 1}, minmax(0, 1fr))` }}
+          style={{
+            gridTemplateColumns: `repeat(${mobilePrimary.length + 1}, minmax(0, 1fr))`,
+          }}
         >
-          {primary.map((item) => {
+          {mobilePrimary.map((item) => {
             const active = isActive(item.to, item.exact);
             const Icon = item.icon;
             return (
@@ -298,7 +340,14 @@ export function AdminShell({ children }: { children: ReactNode }) {
                 >
                   <Icon className="size-5" strokeWidth={1.75} aria-hidden />
                   <span className="truncate">
-                    {t(`admin:${item.labelKey}` as "admin:ops.nav.operations")}
+                    {t(`admin:${item.labelKey}` as "admin:ops.nav.operations", {
+                      defaultValue:
+                        item.labelKey === "ops.nav.kitchen"
+                          ? "Cocina"
+                          : item.labelKey === "ops.nav.delivery"
+                            ? "Reparto"
+                            : undefined,
+                    })}
                   </span>
                 </Link>
               </li>
@@ -342,9 +391,16 @@ export function AdminShell({ children }: { children: ReactNode }) {
               </button>
             </div>
             <div className="space-y-1">
-              {moreItems.map((item) => (
-                <NavLink key={`sheet-${item.to}-${item.labelKey}`} item={item} dense />
-              ))}
+              {primary
+                .slice(mobilePrimary.length)
+                .concat(moreItems)
+                .map((item) => (
+                  <NavLink
+                    key={`sheet-${item.to}-${item.labelKey}`}
+                    item={item}
+                    dense
+                  />
+                ))}
             </div>
             <button
               type="button"

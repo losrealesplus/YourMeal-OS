@@ -1387,6 +1387,7 @@ export type Database = {
       app_role:
         | "saas_admin"
         | "company_admin"
+        | "operations_manager"
         | "kitchen"
         | "purchasing"
         | "inventory"
@@ -1394,6 +1395,7 @@ export type Database = {
         | "support"
         | "accounting"
         | "logistics"
+        | "delivery"
         | "driver"
         | "employee"
         | "customer"
@@ -1404,7 +1406,11 @@ export type Database = {
         | "draft"
         | "confirmed"
         | "in_production"
+        | "prepared"
+        | "ready_for_delivery"
+        | "out_for_delivery"
         | "delivered"
+        | "delivery_issue"
         | "cancelled"
       pay_mode: "employee_pays" | "company_pays" | "grouped" | "custom"
       promotion_scope: "global" | "group" | "personal"
@@ -1546,6 +1552,7 @@ export const Constants = {
       app_role: [
         "saas_admin",
         "company_admin",
+        "operations_manager",
         "kitchen",
         "purchasing",
         "inventory",
@@ -1553,6 +1560,7 @@ export const Constants = {
         "support",
         "accounting",
         "logistics",
+        "delivery",
         "driver",
         "employee",
         "customer",
@@ -1564,7 +1572,11 @@ export const Constants = {
         "draft",
         "confirmed",
         "in_production",
+        "prepared",
+        "ready_for_delivery",
+        "out_for_delivery",
         "delivered",
+        "delivery_issue",
         "cancelled",
       ],
       pay_mode: ["employee_pays", "company_pays", "grouped", "custom"],

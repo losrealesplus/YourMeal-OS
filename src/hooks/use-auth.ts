@@ -6,6 +6,7 @@ import { homePathForRoles } from "@/lib/home-path";
 export type AppRole =
   | "saas_admin"
   | "company_admin"
+  | "operations_manager"
   | "kitchen"
   | "purchasing"
   | "inventory"
@@ -13,12 +14,14 @@ export type AppRole =
   | "support"
   | "accounting"
   | "logistics"
+  | "delivery"
   | "driver"
   | "employee"
   | "customer";
 
 const STAFF_ROLES: AppRole[] = [
   "company_admin",
+  "operations_manager",
   "kitchen",
   "purchasing",
   "inventory",
@@ -26,6 +29,7 @@ const STAFF_ROLES: AppRole[] = [
   "support",
   "accounting",
   "logistics",
+  "delivery",
 ];
 
 export type UserProfile = {

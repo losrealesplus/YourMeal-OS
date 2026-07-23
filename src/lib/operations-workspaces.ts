@@ -1,9 +1,6 @@
 /**
- * Operations workspaces — presentation mapping only (ADR 0014 / Experience).
- * Visibility uses existing AppRole values. Does not invent RBAC or capabilities.
- *
- * Roles are multi-user: many people can share the same role.
- * Workspaces are the day-to-day entry points for those roles.
+ * Operations workspaces — presentation mapping (ADR 0014 / Experience).
+ * PR-034: kitchen → /admin/kitchen · delivery → /admin/delivery
  */
 import type { AppRole } from "@/hooks/use-auth";
 
@@ -16,42 +13,42 @@ export type OperationsWorkspaceId =
   | "finance";
 
 export type OperationsWorkspacePath =
+  | "/admin/kitchen"
+  | "/admin/delivery"
   | "/admin/production"
   | "/admin/routes"
   | "/admin/inventory"
   | "/admin/customers"
   | "/admin/settings"
-  | "/admin/accounting";
+  | "/admin/accounting"
+  | "/admin/orders";
 
 export type OperationsWorkspace = {
   id: OperationsWorkspaceId;
-  /** Existing admin route — no new modules. */
   path: OperationsWorkspacePath;
-  /** Roles that unlock this workspace. company_admin / saas_admin see all. */
   roles: readonly AppRole[];
 };
 
-/** Canonical workspaces of the EatClean Operations Center. */
 export const OPERATIONS_WORKSPACES: readonly OperationsWorkspace[] = [
   {
     id: "kitchen",
-    path: "/admin/production",
-    roles: ["kitchen", "production"],
+    path: "/admin/kitchen",
+    roles: ["kitchen", "production", "operations_manager"],
   },
   {
     id: "delivery",
-    path: "/admin/routes",
-    roles: ["logistics"],
+    path: "/admin/delivery",
+    roles: ["logistics", "delivery", "driver", "operations_manager"],
   },
   {
     id: "stock",
     path: "/admin/inventory",
-    roles: ["inventory", "purchasing"],
+    roles: ["inventory", "purchasing", "operations_manager"],
   },
   {
     id: "customers",
     path: "/admin/customers",
-    roles: ["support"],
+    roles: ["support", "operations_manager"],
   },
   {
     id: "administration",
@@ -66,13 +63,13 @@ export const OPERATIONS_WORKSPACES: readonly OperationsWorkspace[] = [
 ] as const;
 
 export function isOperationsAdmin(roles: readonly AppRole[]): boolean {
-  return roles.includes("company_admin") || roles.includes("saas_admin");
+  return (
+    roles.includes("company_admin") ||
+    roles.includes("saas_admin") ||
+    roles.includes("operations_manager")
+  );
 }
 
-/**
- * Workspaces the signed-in user may enter.
- * Admin → all. Otherwise → role intersection. Never show locked cards.
- */
 export function workspacesForRoles(
   roles: readonly AppRole[],
 ): OperationsWorkspace[] {
@@ -87,15 +84,12 @@ export function workspacesForRoles(
 
 export type OperationsEntry =
   | { kind: "center"; workspaces: OperationsWorkspace[] }
-  | { kind: "direct"; path: OperationsWorkspacePath; workspace: OperationsWorkspace };
+  | {
+      kind: "direct";
+      path: OperationsWorkspacePath;
+      workspace: OperationsWorkspace;
+    };
 
-/**
- * Entry rule:
- * - Admin → always Operations Center (picker)
- * - Exactly 1 workspace → enter directly
- * - 2+ → Operations Center
- * - 0 → Operations Center empty state (rare)
- */
 export function resolveOperationsEntry(
   roles: readonly AppRole[],
 ): OperationsEntry {

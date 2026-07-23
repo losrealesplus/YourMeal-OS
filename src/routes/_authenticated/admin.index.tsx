@@ -1,227 +1,350 @@
 /**
- * Centro de Operaciones — Experience First entry for EatClean staff.
- *
- * Not a dashboard. Not KPIs. Not charts.
- * Answers: "¿Qué necesita hacer hoy mi departamento?"
- *
- * Workspace rule (presentation only — RBAC unchanged):
- * - 1 authorized workspace → enter directly
- * - 2+ workspaces → show this Operations Center
- * - company_admin / saas_admin → always show all workspaces
- *
- * No services / Supabase / RBAC changes.
+ * Centro de Operaciones — punto de entrada diario.
+ * PR-034: qué necesita atención hoy (trabajo operativo, no dashboard KPI).
  */
-import type { ComponentType } from "react";
-import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
-import { useTranslation } from "react-i18next";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState, type CSSProperties } from "react";
 import {
+  Boxes,
   ChefHat,
   Truck,
-  Package,
   Users,
-  Briefcase,
-  Wallet,
-  ArrowRight,
-  CircleAlert,
-  CircleDot,
-  CircleCheck,
+  type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import {
-  resolveOperationsEntry,
-  type OperationsWorkspaceId,
-} from "@/lib/operations-workspaces";
+import { useCan } from "@/hooks/use-can";
+import { supabase } from "@/integrations/supabase/client";
+import { createServiceContext } from "@/services/types";
+import { OperationsService } from "@/modules/operations";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
-  component: OperationsCenterPage,
+  component: OpsCenterHome,
+  head: () => ({
+    meta: [
+      { title: "YourMeal OS — Centro de Operaciones" },
+      {
+        name: "description",
+        content: "Qué necesita atención hoy en la operación.",
+      },
+    ],
+  }),
 });
 
-const WORKSPACE_ICONS: Record<
-  OperationsWorkspaceId,
-  ComponentType<{ className?: string; strokeWidth?: number }>
-> = {
-  kitchen: ChefHat,
-  delivery: Truck,
-  stock: Package,
-  customers: Users,
-  administration: Briefcase,
-  finance: Wallet,
+function todayISO() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function greetingForHour(hour: number): string {
+  if (hour < 12) return "Buenos días";
+  if (hour < 20) return "Buenas tardes";
+  return "Buenas noches";
+}
+
+function firstName(fullName: string | null | undefined): string | null {
+  if (!fullName?.trim()) return null;
+  return fullName.trim().split(/\s+/)[0] ?? null;
+}
+
+type AttentionItem = {
+  id: string;
+  to: string;
+  title: string;
+  icon: LucideIcon;
+  count: number | null;
+  countLabel: (n: number) => string;
+  visible: boolean;
 };
 
-/** Agenda cues — presentation placeholders until live ops signals exist. */
-const AGENDA_CUES = [
-  {
-    tone: "urgent" as const,
-    icon: CircleAlert,
-    key: "cueProduction",
-  },
-  {
-    tone: "attention" as const,
-    icon: CircleDot,
-    key: "cueRoutes",
-  },
-  {
-    tone: "ok" as const,
-    icon: CircleCheck,
-    key: "cueStock",
-  },
-];
+async function countInventoryAlerts(tenantId: string): Promise<number> {
+  const db = supabase as any;
+  const { data, error } = await db
+    .from("ingredients")
+    .select("stock, min_stock")
+    .eq("tenant_id", tenantId)
+    .is("deleted_at", null);
+  if (error) throw error;
+  const rows = (data ?? []) as { stock: number; min_stock: number }[];
+  return rows.filter((r) => Number(r.stock) <= Number(r.min_stock)).length;
+}
 
-function OperationsCenterPage() {
-  const { t, i18n } = useTranslation("admin");
-  const { profile, roles, user } = useAuth();
-  const entry = resolveOperationsEntry(roles);
+async function countClientIncidents(tenantId: string): Promise<number> {
+  const { count, error } = await supabase
+    .from("support_notes")
+    .select("id", { count: "exact", head: true })
+    .eq("tenant_id", tenantId)
+    .in("kind", ["incident", "complaint"]);
+  if (error) throw error;
+  return count ?? 0;
+}
 
-  if (entry.kind === "direct") {
-    return <Navigate to={entry.path} replace />;
-  }
+function OpsCenterHome() {
+  const { user, tenantId, roles, profile } = useAuth();
+  const { can } = useCan();
+  const [kitchenCount, setKitchenCount] = useState<number | null>(null);
+  const [deliveryCount, setDeliveryCount] = useState<number | null>(null);
+  const [inventoryCount, setInventoryCount] = useState<number | null>(null);
+  const [clientsCount, setClientsCount] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const date = todayISO();
+  const hour = new Date().getHours();
+  const name = firstName(profile?.fullName);
+  const greeting = greetingForHour(hour);
 
-  const firstName =
-    profile?.fullName?.trim().split(/\s+/)[0] ||
-    user?.email?.split("@")[0] ||
-    "";
+  const showKitchen =
+    can("kitchen.operate") ||
+    roles.includes("operations_manager") ||
+    roles.includes("company_admin") ||
+    can("saas.manage");
+  const showDelivery =
+    can("logistics.operate") ||
+    roles.includes("operations_manager") ||
+    can("saas.manage");
+  const showInventory =
+    can("inventory.operate") ||
+    roles.includes("operations_manager") ||
+    can("saas.manage");
+  const showClients =
+    can("customers.read") ||
+    can("support.read") ||
+    roles.includes("operations_manager") ||
+    can("saas.manage");
 
-  const weekday = new Intl.DateTimeFormat(i18n.language || "es", {
-    weekday: "long",
-  }).format(new Date());
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      if (!user || !tenantId) {
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+      try {
+        const ctx = await createServiceContext({
+          supabase,
+          userId: user.id,
+          tenantId,
+          roles,
+        });
 
-  const paths = new Set(entry.workspaces.map((w) => w.path));
-  const canProduction = paths.has("/admin/production");
-  const canDelivery = paths.has("/admin/routes");
+        const tasks: Promise<void>[] = [];
+
+        if (showKitchen && can("orders.read")) {
+          tasks.push(
+            OperationsService.kitchenPendingCount(ctx, date).then((n) => {
+              if (!cancelled) setKitchenCount(n);
+            }),
+          );
+        }
+        if (showDelivery && can("orders.read")) {
+          tasks.push(
+            OperationsService.deliveryPendingCount(ctx, date).then((n) => {
+              if (!cancelled) setDeliveryCount(n);
+            }),
+          );
+        }
+        if (showInventory) {
+          tasks.push(
+            countInventoryAlerts(tenantId).then((n) => {
+              if (!cancelled) setInventoryCount(n);
+            }),
+          );
+        }
+        if (showClients) {
+          tasks.push(
+            countClientIncidents(tenantId).then((n) => {
+              if (!cancelled) setClientsCount(n);
+            }),
+          );
+        }
+
+        await Promise.allSettled(tasks);
+      } catch {
+        /* per-item nulls stay */
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    user,
+    tenantId,
+    roles,
+    can,
+    date,
+    showKitchen,
+    showDelivery,
+    showInventory,
+    showClients,
+  ]);
+
+  const items: AttentionItem[] = [
+    {
+      id: "kitchen",
+      to: "/admin/kitchen",
+      title: "Cocina",
+      icon: ChefHat,
+      count: kitchenCount,
+      countLabel: (n: number) =>
+        n === 1 ? "1 pedido pendiente" : `${n} pedidos pendientes`,
+      visible: showKitchen,
+    },
+    {
+      id: "delivery",
+      to: "/admin/delivery",
+      title: "Reparto",
+      icon: Truck,
+      count: deliveryCount,
+      countLabel: (n: number) =>
+        n === 1 ? "1 entrega programada" : `${n} entregas programadas`,
+      visible: showDelivery,
+    },
+    {
+      id: "inventory",
+      to: "/admin/inventory",
+      title: "Inventario",
+      icon: Boxes,
+      count: inventoryCount,
+      countLabel: (n: number) => (n === 1 ? "1 alerta" : `${n} alertas`),
+      visible: showInventory,
+    },
+    {
+      id: "clients",
+      to: can("support.read") ? "/admin/support" : "/admin/customers",
+      title: "Clientes",
+      icon: Users,
+      count: clientsCount,
+      countLabel: (n: number) => (n === 1 ? "1 incidencia" : `${n} incidencias`),
+      visible: showClients,
+    },
+  ].filter((i) => i.visible);
+
+  const needsAttention = items.some(
+    (i) => typeof i.count === "number" && i.count > 0,
+  );
 
   return (
-    <div className="mx-auto max-w-3xl space-y-10">
-      <header className="space-y-3">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-          {t("ops.kicker")}
+    <div className="relative mx-auto max-w-2xl animate-fade-in">
+      {/* Atmosphere — soft wash, not a flat void */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -inset-x-8 -top-8 h-56 bg-[radial-gradient(ellipse_at_top,_oklch(0.96_0.02_85)_0%,_transparent_70%)]"
+      />
+
+      <header className="relative space-y-2 pb-8 pt-2">
+        <p
+          className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl"
+          style={{ animation: "ops-home-in 0.45s ease-out both" }}
+        >
+          {greeting}
+          {name ? (
+            <>
+              , <span className="text-foreground/90">{name}</span>
+            </>
+          ) : null}
         </p>
-        <h1 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-          {t("ops.title")}
-        </h1>
-        <p className="text-base text-muted-foreground sm:text-lg">
-          {firstName
-            ? t("ops.greetingNamed", { name: firstName })
-            : t("ops.greeting")}
+        <p
+          className="text-base text-muted-foreground sm:text-lg"
+          style={{ animation: "ops-home-in 0.45s ease-out 0.08s both" }}
+        >
+          ¿Qué necesita atención hoy?
         </p>
-        <p className="text-sm capitalize text-muted-foreground/80">
-          {t("ops.todayIs", { weekday })}
-        </p>
+        {!loading && !needsAttention && items.length > 0 && (
+          <p
+            className="pt-1 text-sm text-muted-foreground"
+            style={{ animation: "ops-home-in 0.45s ease-out 0.12s both" }}
+          >
+            Nada urgente por ahora. Entra a un área si quieres revisar.
+          </p>
+        )}
       </header>
 
       <section
-        aria-labelledby="ops-agenda-heading"
-        className="rounded-2xl border border-border/60 bg-card/80 p-5 shadow-sm sm:p-6"
+        className="relative divide-y divide-border border-y border-border"
+        aria-label="Áreas que necesitan atención"
       >
-        <h2
-          id="ops-agenda-heading"
-          className="font-display text-lg font-semibold text-foreground"
-        >
-          {t("ops.agendaTitle")}
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">{t("ops.agendaLead")}</p>
-
-        <ul className="mt-5 space-y-3">
-          {AGENDA_CUES.map((cue) => {
-            const Icon = cue.icon;
-            return (
-              <li
-                key={cue.key}
-                className="flex items-start gap-3 text-sm text-foreground"
-              >
-                <Icon
-                  className={cn(
-                    "mt-0.5 h-4 w-4 shrink-0",
-                    cue.tone === "urgent" && "text-destructive",
-                    cue.tone === "attention" && "text-[color:var(--attention,#EDB32A)]",
-                    cue.tone === "ok" && "text-primary",
-                  )}
-                  strokeWidth={2.25}
-                  aria-hidden
-                />
-                <span>{t(`ops.agenda.${cue.key}`)}</span>
-              </li>
-            );
-          })}
-        </ul>
-
-        <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-          {canProduction && (
-            <Link
-              to="/admin/production"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-95"
-            >
-              {t("ops.ctaStartProduction")}
-              <ArrowRight className="h-4 w-4" aria-hidden />
-            </Link>
-          )}
-          {canDelivery && (
-            <Link
-              to="/admin/routes"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-semibold text-foreground transition hover:bg-muted/50"
-            >
-              {t("ops.ctaPrepareDelivery")}
-            </Link>
-          )}
-          {canDelivery && (
-            <Link
-              to="/admin/routes/incidents"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-transparent px-4 py-2.5 text-sm font-medium text-muted-foreground transition hover:bg-muted/40 hover:text-foreground"
-            >
-              {t("ops.ctaReviewIncidents")}
-            </Link>
-          )}
-        </div>
-      </section>
-
-      <section aria-labelledby="ops-workspaces-heading" className="space-y-4">
-        <div>
-          <h2
-            id="ops-workspaces-heading"
-            className="font-display text-lg font-semibold text-foreground"
-          >
-            {t("ops.workspacesTitle")}
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t("ops.workspacesLead")}
-          </p>
-        </div>
-
-        {entry.workspaces.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-border px-5 py-8 text-center text-sm text-muted-foreground">
-            {t("ops.noWorkspaces")}
+        {items.length === 0 ? (
+          <p className="py-10 text-sm text-muted-foreground">
+            Tu rol no tiene áreas operativas asignadas en este centro.
           </p>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2">
-            {entry.workspaces.map((ws) => {
-              const Icon = WORKSPACE_ICONS[ws.id];
-              return (
-                <Link
-                  key={ws.id}
-                  to={ws.path}
-                  className="group flex flex-col gap-3 rounded-2xl border border-border/70 bg-card p-5 transition hover:border-primary/35 hover:bg-accent/40"
-                >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
-                    <Icon className="h-5 w-5" strokeWidth={1.75} aria-hidden />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="font-display text-base font-semibold text-foreground">
-                      {t(`ops.workspace.${ws.id}.label`)}
-                    </p>
-                    <p className="text-sm leading-snug text-muted-foreground">
-                      {t(`ops.workspace.${ws.id}.description`)}
-                    </p>
-                  </div>
-                  <span className="mt-auto inline-flex items-center gap-1 text-xs font-semibold text-primary opacity-0 transition group-hover:opacity-100">
-                    {t("ops.enterWorkspace")}
-                    <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
+          items.map((item, index) => (
+            <AttentionRow
+              key={item.id}
+              item={item}
+              loading={loading}
+              style={{
+                animation: `ops-home-in 0.4s ease-out ${0.1 + index * 0.06}s both`,
+              }}
+            />
+          ))
         )}
       </section>
+
+      <style>{`
+        @keyframes ops-home-in {
+          from { opacity: 0; transform: translateY(6px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function AttentionRow({
+  item,
+  loading,
+  style,
+}: {
+  item: AttentionItem;
+  loading: boolean;
+  style?: CSSProperties;
+}) {
+  const Icon = item.icon;
+  const hasWork = typeof item.count === "number" && item.count > 0;
+
+  return (
+    <div
+      style={style}
+      className={cn(
+        "flex flex-wrap items-center justify-between gap-4 py-6",
+        hasWork ? "bg-transparent" : "opacity-90",
+      )}
+    >
+      <div className="flex min-w-0 items-start gap-3">
+        <span
+          className={cn(
+            "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md",
+            hasWork ? "bg-foreground text-background" : "bg-secondary text-foreground",
+          )}
+        >
+          <Icon className="h-4 w-4" aria-hidden />
+        </span>
+        <div className="min-w-0">
+          <h2 className="text-lg font-semibold tracking-tight">{item.title}</h2>
+          {loading ? (
+            <Skeleton className="mt-1.5 h-4 w-36" />
+          ) : (
+            <p
+              className={cn(
+                "mt-1 text-sm",
+                hasWork ? "font-medium text-foreground" : "text-muted-foreground",
+              )}
+            >
+              {item.count === null
+                ? "Sin lectura"
+                : item.countLabel(item.count)}
+            </p>
+          )}
+        </div>
+      </div>
+
+      <Button asChild size="sm" variant={hasWork ? "default" : "outline"}>
+        <Link to={item.to}>Entrar</Link>
+      </Button>
     </div>
   );
 }
