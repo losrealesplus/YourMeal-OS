@@ -24,9 +24,10 @@ export default {
   checkEmail: "Controlla la tua casella",
   resetSent: "Ti abbiamo inviato un link di reimpostazione.",
   passwordUpdated: "Password aggiornata",
-  adminTitle: "EatClean Admin",
-  adminSubtitle: "Accesso esclusivo per il personale autorizzato.",
+  adminTitle: "Centro operazioni",
+  adminSubtitle: "Inizia qui la tua giornata.",
   adminEnter: "Entra",
-  adminEntryAria: "Accesso EatClean Admin",
+  adminEntryLabel: "Centro operazioni",
+  adminEntryAria: "Centro operazioni",
   backToCustomerLogin: "Torna all'accesso cliente",
 } as const;

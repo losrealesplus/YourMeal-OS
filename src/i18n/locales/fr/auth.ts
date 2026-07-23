@@ -24,9 +24,10 @@ export default {
   checkEmail: "Vérifiez votre boîte de réception",
   resetSent: "Nous vous avons envoyé un lien de réinitialisation.",
   passwordUpdated: "Mot de passe mis à jour",
-  adminTitle: "EatClean Admin",
-  adminSubtitle: "Accès réservé au personnel autorisé.",
+  adminTitle: "Centre d'opérations",
+  adminSubtitle: "Commencez votre journée ici.",
   adminEnter: "Entrer",
-  adminEntryAria: "Accès EatClean Admin",
+  adminEntryLabel: "Centre d'opérations",
+  adminEntryAria: "Centre d'opérations",
   backToCustomerLogin: "Retour à la connexion client",
 } as const;

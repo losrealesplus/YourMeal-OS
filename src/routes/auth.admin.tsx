@@ -14,8 +14,8 @@ import { QuietLocaleSwitch } from "@/components/tenant/quiet-locale-switch";
 import { brandConfig, tenantCopyEs } from "@/tenant/brand-config";
 
 /**
- * EatClean Admin Login — staff only surface.
- * Brand leaf opens this screen; protection is auth + RBAC, not UI secrecy.
+ * Operations Center login — staff only surface.
+ * Footer link on customer Login opens this screen; protection is auth + RBAC.
  * No public registration. No customer OAuth / phone.
  */
 export const Route = createFileRoute("/auth/admin")({
@@ -86,10 +86,10 @@ function AdminAuthPage() {
         <div className="w-full max-w-[26rem] animate-fade-in">
           <div className="rounded-[1.75rem] bg-white border border-border/50 p-8 sm:p-10 shadow-sm">
             <div className="flex justify-center">
-              <TenantLogo height={48} />
+              <TenantLogo height={56} />
             </div>
 
-            <h1 className="text-[1.65rem] font-bold tracking-tight mt-8 text-center">
+            <h1 className="text-[1.65rem] font-bold tracking-tight mt-12 text-center">
               {t("auth:adminTitle")}
             </h1>
             <p className="text-[15px] text-muted-foreground mt-3 text-center leading-[1.7] font-normal">

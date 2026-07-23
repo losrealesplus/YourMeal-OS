@@ -123,8 +123,8 @@ function AuthPage() {
         </div>
 
         {phase === "splash" ? (
-          <div className="w-full max-w-md animate-fade-in flex flex-col items-center gap-8 text-center px-6 relative z-10">
-            <TenantLogo height={56} />
+          <div className="w-full max-w-md animate-fade-in flex flex-col items-center gap-10 text-center px-6 relative z-10">
+            <TenantLogo height={64} />
             <div>
               <p
                 className="text-2xl font-bold tracking-tight"
@@ -136,14 +136,14 @@ function AuthPage() {
                 {tenantCopyEs.claims.enjoy}
               </p>
             </div>
-            <PoweredByLine className="mt-2" />
+            <PoweredByLine className="mt-4" />
           </div>
         ) : null}
 
         {phase === "onboarding" ? (
           <div className="w-full max-w-md animate-fade-in relative z-10">
             <div className="rounded-[1.75rem] bg-card border border-border/50 p-8 sm:p-10 shadow-sm min-h-[28rem] flex flex-col">
-              <TenantLogo height={44} className="mb-6" />
+              <TenantLogo height={50} className="mb-8" />
               <h1
                 className="text-[1.75rem] font-bold tracking-tight text-balance leading-snug"
                 style={{ fontFamily: "var(--font-tenant-display)" }}
@@ -189,11 +189,11 @@ function AuthPage() {
           <div className="w-full max-w-[26rem] animate-fade-in relative z-10 py-6">
             <div className="rounded-[1.75rem] bg-white/95 backdrop-blur-[2px] border border-white/60 p-8 sm:p-10 shadow-[0_20px_50px_-28px_rgba(15,35,23,0.35)]">
               <div className="flex justify-center">
-                <TenantLogo height={52} />
+                <TenantLogo height={60} />
               </div>
 
               <h1
-                className="text-[1.65rem] font-bold tracking-tight mt-8 text-center text-balance leading-snug"
+                className="text-[1.65rem] font-bold tracking-tight mt-12 text-center text-balance leading-snug"
                 style={{ fontFamily: "var(--font-tenant-display)" }}
               >
                 {t("auth:welcome")}
@@ -266,7 +266,7 @@ function AuthPage() {
               </div>
             </div>
 
-            <div className="mt-10 flex flex-col items-center gap-3">
+            <div className="mt-12 flex flex-col items-center gap-4">
               <BrandLeafMark />
               <PoweredByLine />
             </div>

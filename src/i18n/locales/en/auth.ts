@@ -22,9 +22,10 @@ export default {
   checkEmail: "Check your email",
   resetSent: "We sent you a password reset link.",
   passwordUpdated: "Password updated",
-  adminTitle: "EatClean Admin",
-  adminSubtitle: "Access for authorised staff only.",
+  adminTitle: "Operations Center",
+  adminSubtitle: "Start your day here.",
   adminEnter: "Sign in",
-  adminEntryAria: "EatClean Admin access",
+  adminEntryLabel: "Operations Center",
+  adminEntryAria: "Operations Center",
   backToCustomerLogin: "Back to customer sign-in",
 } as const;

@@ -29,5 +29,9 @@ export function applyBrandTheme(el: HTMLElement | null, config: BrandConfig = br
 }
 
 export function poweredByLabel(config: BrandConfig = brandConfig) {
-  return config.poweredBy.visible ? config.poweredBy.label : "";
+  if (!config.poweredBy.visible) return "";
+  if (config.poweredBy.prefix && config.poweredBy.name) {
+    return `${config.poweredBy.prefix} ${config.poweredBy.name}`;
+  }
+  return config.poweredBy.label;
 }
