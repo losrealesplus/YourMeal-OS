@@ -18,7 +18,7 @@ if (!i18n.isInitialized) {
       load: "languageOnly",
       nonExplicitSupportedLngs: true,
       defaultNS: "common",
-      ns: ["common", "auth", "customer", "admin"],
+      ns: ["common", "auth", "customer", "admin", "branding"],
       interpolation: { escapeValue: false },
       detection: {
         order: ["localStorage", "navigator", "htmlTag"],
