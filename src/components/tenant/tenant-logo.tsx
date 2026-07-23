@@ -1,11 +1,15 @@
 import logoAsset from "@/assets/eatclean-logo.png.asset.json";
-const logoUrl = logoAsset.url;
 import { brandConfig } from "@/tenant/brand-config";
 import { cn } from "@/lib/utils";
+import { useTenantBrand } from "@/hooks/use-tenant-brand";
+
+const FALLBACK_LOGO = logoAsset.url;
 
 /**
- * Official Tenant logo from BrandConfig assets (bundled mirror of tenants/<slug>/logo.svg).
- * Do not crop, recolor, or invent marks — preserve official proportions.
+ * Tenant logo — reads live from BrandingService via useTenantBrand.
+ *
+ * Falls back to the bundled default when the tenant has not uploaded a logo
+ * yet, or before the query resolves. Ratio is always preserved.
  */
 export function TenantLogo({
   className,
@@ -15,9 +19,11 @@ export function TenantLogo({
   /** CSS height in px — width follows intrinsic ratio. */
   height?: number;
 }) {
+  const { logoUrl } = useTenantBrand();
+  const src = logoUrl ?? FALLBACK_LOGO;
   return (
     <img
-      src={logoUrl}
+      src={src}
       alt={brandConfig.name}
       height={height}
       className={cn("w-auto object-contain select-none", className)}
