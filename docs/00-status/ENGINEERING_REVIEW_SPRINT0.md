@@ -16,6 +16,8 @@ Los riesgos más densos no son de UX ni de OM, sino de **integridad de datos y c
 
 **No hay P0 que rompa el login o el RLS customer básico**, pero hay **varios P1 que deben resolverse antes de ORR / piloto real**.
 
+Puertas: **Ready for CAP-006 ✅** · **Ready for ORR ❌**. Engineering Health 74; Operational Health aún no medible.
+
 ---
 
 ## Incidencias
@@ -261,27 +263,50 @@ Los riesgos más densos no son de UX ni de OM, sino de **integridad de datos y c
 
 ---
 
-## Decisión
+## Decisión (dos puertas)
+
+| Estado | Resultado |
+|--------|-----------|
+| Ready for CAP-006 | ✅ |
+| Ready for ORR | ❌ |
 
 ```text
-READY FOR CAP-006
+READY FOR CAP-006   ✅   (implementable; no P0 de arquitectura)
+READY FOR ORR       ❌   (P1 de integridad/calidad pendientes)
 ```
 
-**Motivo:** no hay P0 que impida completar el tramo Confirm del Happy Path. Los hallazgos críticos son **P1 orientados a ORR / piloto**, no a bloquear la existencia de CAP-006.
+**Motivo CAP-006:** no hay P0 que impida completar Confirm del Happy Path.  
+**Motivo ORR:** INC-01…07 bloquean declarar Operational / piloto.
 
-**Condición explícita:** no declarar **ORR PASSED** ni “Ready for FOV” hasta resolver al menos **INC-01…07** (o documentar excepciones aceptadas con riesgo firmado).
+> Distinción operativa: *Ready to implement CAP-006* ≠ *Ready for ORR / FOV*.
+
+### Health dual
+
+| Métrica | Valor |
+|---------|-------|
+| **Engineering Health** | **74 / 100** |
+| **Operational Health** | *no medible* hasta ORR |
+
+Tras ORR → FOV → Evidence → Knowledge Update, Operational Health se mide aparte: un sistema puede tener ingeniería sólida y aún así requerir ajustes de modelo en campo.
 
 ---
 
-## Orden sugerido de fixes (cuando se autorice corregir)
+## Orden sugerido (Engineering Fix Sprint → CAP-006 → ORR)
+
+**Grupo A · Integridad operacional (antes de CAP-006 / Confirm):**
 
 1. INC-01 oferta + total servidor  
 2. INC-03 ownership confirm  
-3. INC-02 deleted_at + types  
-4. INC-04 N+1  
-5. INC-06 mocks home/orders (empty-state o lista)  
-6. INC-07 feature flags  
-7. INC-05 atomicidad (si tiempo)  
-8. P2 restantes  
+3. INC-05 atomicidad draft + audit  
 
-**Siguiente paso tras autorización:** PR de **Engineering Fixes** (Infrastructure/Capability hygiene) — **no** nuevas Capabilities, **no** UX, **no** OM.
+**Grupo B · Calidad para estado Operational:**
+
+4. INC-02 deleted_at + types  
+5. INC-04 N+1  
+6. INC-06 mocks home/orders (empty-state o lista)  
+7. INC-07 feature flags  
+
+Luego: **CAP-006** → **ORR** (sin features) → **FOV**.
+
+**Siguiente paso tras autorización:** PR de **Engineering Debt / Fixes** (hygiene) — **no** nuevas Capabilities, **no** UX, **no** OM.  
+Capabilities = evolución funcional · Engineering Debt = implementación · la deuda no inventa conocimiento operacional.
