@@ -22,6 +22,7 @@
 | [Operational Checks](./15-product/OPERATIONAL_CHECKS.md) | Datos → comprobación → acción (transversal) |
 | [Milestone · Infrastructure Validation](./00-status/MILESTONE_INFRASTRUCTURE_VALIDATION.md) | Core independiente de la tecnología ✅ |
 | [Milestone · Foundation Validation](./00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md) | Hito histórico ✅ — metodología validada |
+| [Functional Completeness Review](./00-status/EATCLEAN_PILOT_FUNCTIONAL_COMPLETENESS_REVIEW.md) | Pre-piloto · matriz Visible/Funciona/Guarda/RBAC |
 | [Definition of Done](./00-status/DEFINITION_OF_DONE.md) | Checklist de módulo |
 | [Foundation Lock](./05-architecture/FOUNDATION_LOCK.md) | ✅ Cerrado v0.1.0 |
 | [Tenant Branding](./05-architecture/TENANT_BRANDING.md) | Contrato BrandConfig · Customer App white-label (ADR 0014) |
