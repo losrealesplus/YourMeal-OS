@@ -1,54 +1,72 @@
 # Operational Readiness Review (ORR)
 
-**Cuándo:** después de completar **HP-001** (CAP-006 / Happy Path sin mocks).  
+**Cuándo:** tras CAP-006 y HP-001 ensamblado (sin mocks en el recorrido).  
 **Qué no es:** validación de negocio (FOV).  
-**Qué es:** comprobar que el software está listo para un cliente real **sin reglas operacionales nuevas**.
+**Qué es:** una **puerta**, no un proceso.
 
 ---
 
-## Preguntas fijas (todas deben ser «sí»)
+## Resultado (binario)
+
+La ORR solo puede terminar en:
+
+```text
+PASSED
+```
+
+o
+
+```text
+BLOCKED
+```
+
+No se usan estados intermedios («casi listo», «pendiente de…», «READY WITH GAPS»).
+
+| Veredicto | Significado |
+|-----------|-------------|
+| **PASSED** | HP-001 listo para cliente real → abrir Phase 3 FOV |
+| **BLOCKED** | Corregir gaps; no exponer a campo; no abrir FOV |
+
+---
+
+## Preguntas fijas (todas deben ser «sí» para PASSED)
 
 ### Arquitectura
 
-* ¿Todas las capacidades del Happy Path (CAP-001…006) están al menos en estado **Connected**, y el recorrido ensamblado es operable de extremo a extremo?
+* ¿CAP-001…006 del Happy Path están Connected y el recorrido E2E es operable?
 
 ### Ingeniería
 
-* ¿Quedan **mocks** en el recorrido HP-001?
+* ¿Quedan **mocks** en HP-001? → si sí, **BLOCKED**
 
 ### Conocimiento
 
-* ¿Ha aparecido alguna **regla no prevista** por el Operational Model durante la implementación?
+* ¿Apareció alguna **regla no prevista** por el OM? → si sí, **BLOCKED** (Carril A)
 
 ### Operación
 
-* ¿El recorrido está listo para ejecutarse con un **cliente real** sin intervención manual de ingeniería?
+* ¿Listo para cliente real **sin** intervención manual de ingeniería?
 
-Si **alguna** respuesta es «no» → ORR **no superada** (`NOT READY`).
+Si **alguna** respuesta es «no» → **BLOCKED**.
 
 ---
 
 ## Checklist de apoyo
 
-1. Trazabilidad OM → Repository → Query/Command → Hook → UI intacta.  
-2. Mutaciones generan `audit_log` donde corresponde.  
-3. Tenant / RLS / RBAC de extremo a extremo.  
-4. Product Skeleton sin alteraciones de UX/navegación.  
+1. Trazabilidad OM → Repository → Query/Command → Hook → UI  
+2. Mutaciones con `audit_log`  
+3. Tenant / RLS / RBAC E2E  
+4. Product Skeleton sin UX/navegación alterada  
 
 ---
 
-## Resultado
+## Tras PASSED
 
-| Veredicto | Significado |
-|-----------|-------------|
-| READY | HP-001 listo como escenario FOV |
-| READY WITH GAPS | Gaps no críticos documentados |
-| NOT READY | Corregir antes de campo |
-
-Acta al ejecutar: `docs/00-status/ORR_HP-001.md` (no crear vacía antes).  
-Plantilla de evidencia: [HP-001_EVIDENCE_LOG](./HP-001_EVIDENCE_LOG.md).
+Abrir **Phase 3 — Field Operational Validation (FOV)**.  
+Evidencia: [HP-001_EVIDENCE_LOG](./HP-001_EVIDENCE_LOG.md).  
+Acta de ejecución: `docs/00-status/ORR_HP-001.md` (crear solo al ejecutar).
 
 ## Relacionado
 
-- [HAPPY_PATHS](./HAPPY_PATHS.md)  
-- [FOV Mission Brief](../00-status/FOV_MISSION_BRIEF.md)
+- [Acta cierre metodológico](../00-status/ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md)  
+- [HAPPY_PATHS](./HAPPY_PATHS.md) · [FOV Mission Brief](../00-status/FOV_MISSION_BRIEF.md)

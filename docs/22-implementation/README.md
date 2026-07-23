@@ -32,5 +32,5 @@
 | 006–007 | Scaffold |
 | Business logic inventada | 🔒 STOP |
 
-Fase metodológica: [cerrada](../00-status/05-methodology-construction-closed.md).
+Fase metodológica: [Acta](../00-status/ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) · [MILESTONES](../00-status/MILESTONES.md).
 

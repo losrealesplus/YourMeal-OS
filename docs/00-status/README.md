@@ -1,9 +1,10 @@
 # Estado del proyecto
 
 **Última actualización:** 2026-07-23  
-**Fase metodológica:** [cerrada](./05-methodology-construction-closed.md)  
+**Gobernanza:** [Acta — Fin construcción metodológica](./ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) **Cerrada**  
+**Historia:** [MILESTONES](./MILESTONES.md)  
 **Objetivo:** demostrar que FOPEBA puede producir software operacional de alta calidad.  
-**Hito operativo:** `HP-001 · Operational · ORR Passed · Ready for FOV` (en curso)
+**Hito operativo:** `HP-001 · Operational · ORR PASSED · Ready for FOV` (en curso)
 
 > Pregunta: **¿Cuál es la siguiente Capability?** — no la siguiente regla.  
 > El software es una implementación del conocimiento. Nunca su origen.  
@@ -23,7 +24,8 @@
 | CAP-006 Confirm | ⏳ | ⏳ | Scaffold | ✖ |
 | CAP-007 History | ⏳ | ⏳ | Scaffold | ✖ |
 
-**Siguiente:** [CAP-006](../22-implementation/caps/CAP-006-order-confirmation.md) → [ORR](../22-implementation/ORR.md) (sin features).
+**Siguiente:** [CAP-006](../22-implementation/caps/CAP-006-order-confirmation.md) — solo `Draft→Confirm→Persist→Audit→Invalidate`.  
+Luego: [ORR](../22-implementation/ORR.md) → **PASSED \| BLOCKED** → Phase 3 FOV.
 
 ### Etapa 2 Levels
 
@@ -38,14 +40,17 @@ Detalle: [ETAPA_2_LEVELS](../22-implementation/ETAPA_2_LEVELS.md) · [KNOWLEDGE_
 
 ---
 
-## Carril A
+## Carril A / Phase 3
+
+Tras ORR **PASSED**: Field Operational Validation (FOV).  
+No abrir FOV con ORR **BLOCKED**.
 
 | Fase | Estado |
 |------|--------|
 | Foundation · Blueprint · Discovery · Checks | ✅ |
 | Operational Model | ✅ Table-Validated |
 | Operational Validation · IOV | ✅ |
-| FOV · KU · EC · G-01 | ⏳ — tras ORR Passed |
+| FOV · KU · EC · G-01 | ⏳ — tras ORR PASSED |
 
 ## Roles
 
@@ -58,4 +63,5 @@ Detalle: [ETAPA_2_LEVELS](../22-implementation/ETAPA_2_LEVELS.md) · [KNOWLEDGE_
 
 ## Índices
 
-[22 Implementation](../22-implementation/README.md) · [Etapa 2 Levels](../22-implementation/ETAPA_2_LEVELS.md) · [Freeze](./04-methodology-frozen.md) · [FOV Brief](./FOV_MISSION_BRIEF.md) · [Philosophy](../23-engineering/IMPLEMENTATION_PHILOSOPHY.md)
+[Acta](./ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) · [MILESTONES](./MILESTONES.md) · [Etapa 2 Levels](../22-implementation/ETAPA_2_LEVELS.md) · [Freeze](./04-methodology-frozen.md) · [22 Implementation](../22-implementation/README.md) · [FOV Brief](./FOV_MISSION_BRIEF.md) · [Philosophy](../23-engineering/IMPLEMENTATION_PHILOSOPHY.md)
+
