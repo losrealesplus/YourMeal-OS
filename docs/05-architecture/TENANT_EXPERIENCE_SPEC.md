@@ -1,293 +1,180 @@
-# TENANT EXPERIENCE SPEC — EatClean
+# Tenant Experience Spec — reglas permanentes
 
 **ADR:** [0014 — Customer Application is Tenant-Branded](../adr/0014-customer-application-is-tenant-branded.md)  
-**Contrato técnico:** [TENANT_BRANDING](./TENANT_BRANDING.md) (`BrandConfig`)  
-**Implementación Cursor/Lovable:** [TENANT_IMPLEMENTATION_EATCLEAN](./TENANT_IMPLEMENTATION_EATCLEAN.md)  
-**Assets:** [`tenants/eatclean/`](../../tenants/eatclean/README.md)  
-**Tenant:** EatClean Tenerife Catering  
-**Audiencia del documento:** Cursor · Lovable · diseño (Experience Refactor)  
-**Ámbito:** identidad, tono, copy y navegación de la **Customer Application** — **sin** cambiar HP-001 ni lógica operativa.
+**Contrato técnico:** [TENANT_BRANDING](./TENANT_BRANDING.md)  
+**Ejemplo de implementación:** [TENANT_IMPLEMENTATION_EATCLEAN](./TENANT_IMPLEMENTATION_EATCLEAN.md)  
+**Bitácora de sprint:** [EXPERIENCE_REFACTOR_EATCLEAN_V1_1](../07-experience/EXPERIENCE_REFACTOR_EATCLEAN_V1_1.md)
+
+> Este documento fija **reglas que no cambian con cada PR de UI**.  
+> Copy, assets y pantallas concretas de un tenant viven en su implementación + `tenants/<slug>/`.  
+> No duplicar aquí el BrandConfig TypeScript ni el changelog del sprint.
 
 ---
 
 ## Objetivo
 
-Convertir la Customer Application en una **extensión natural** de la identidad digital del Tenant.
+Que la Customer Application sea una **extensión natural** de la identidad digital del Tenant.
 
-> Que cualquier cliente descargue la app y piense que es la **app oficial de EatClean**.
+> Que cualquier cliente descargue la app y piense que es la **app oficial del Tenant**.
 
-No copiar la web literalmente. Heredar su **identidad**, su **tono** y su **lenguaje**.
+No copiar la web literalmente. Heredar **identidad**, **tono** y **lenguaje**.
 
-### Tres niveles (separación SaaS)
+### Tres niveles (SaaS)
 
 | Nivel | Responsable | ¿Cambia por cliente? |
 |-------|-------------|----------------------|
-| **Platform** | YourMeal OS | **No** — una sola base de código |
-| **BrandConfig** | Tenant | **Sí** — mediante configuración |
-| **Tenant Experience** | Tenant | **Sí** — mediante contenido y recursos |
+| **Platform** | YourMeal OS | **No** — una sola codebase |
+| **BrandConfig** | Tenant | **Sí** — configuración |
+| **Tenant Experience** | Tenant | **Sí** — contenido y recursos |
 
-Eso evita:
-
-* forks del producto por cliente;  
-* reducir el branding a «un logo y dos colores».
-
-El Tenant define una **experiencia completa** (identidad · lenguaje · tono · recursos); la plataforma sigue siendo una única codebase.
+Eso evita forks por cliente y reducir el branding a «un logo y dos colores».
 
 ---
 
-## Fuente de verdad (branding)
+## Principios permanentes
 
-| Campo | Valor |
-|-------|--------|
-| Marca | EatClean Tenerife Catering |
-| Web oficial | https://eatcleantenerifecatering.es/ |
-| Producto de plataforma | YourMeal OS (solo *Powered by*, nunca marca principal) |
+1. El usuario final **nunca** siente que usa YourMeal OS como producto.  
+2. La app parece desarrollada por el Tenant.  
+3. La experiencia móvil es continuidad de la identidad digital del Tenant (web / redes).  
+4. El copy habla de **alimentación / servicio**, no de tecnología.  
+5. Todo el sistema visual deriva de `BrandConfig` + recursos del Tenant.  
+6. Filtro: **¿Plataforma o Tenant?** → Customer App y Centro de Operaciones son **Tenant**.
 
-Toda personalización visual/verbal debe resolverse con **`BrandConfig` + recursos del Tenant**.  
-**Prohibido** bifurcar código de producto por cliente (ADR 0014).
+### Regla de arquitectura
+
+> **Cada Tenant debe poder hacer que un usuario crea que la aplicación fue desarrollada específicamente para su empresa, sin modificar el código fuente del producto.**
 
 ---
 
-## Principios
+## Dos experiencias · una identidad
 
-1. El usuario **nunca** siente que usa YourMeal OS.  
-2. La app parece desarrollada por EatClean.  
-3. La experiencia móvil es una extensión de la web.  
-4. Todo el copy respeta el tono del Tenant (alimentación, no tecnología).  
-5. Todo el sistema visual deriva de `BrandConfig`.  
-6. Filtro obligatorio: **¿Plataforma o Tenant?** → esta app es **Tenant**.
+```text
+                    YourMeal OS
+                         │
+                   Tenant (BrandConfig)
+          ┌──────────────┴──────────────┐
+          ▼                             ▼
+     Customer App              Centro de Operaciones
+     "Quiero comer"            "Tengo que trabajar"
+          │                             │
+   Customer Journeys          Operational Journeys
+```
 
-### Regla de arquitectura (SaaS)
+| Cara | Pregunta | Sensación |
+|------|----------|-----------|
+| Customer App | ¿Qué quiero comer esta semana? | Calma · apetito · simplicidad |
+| Centro de Operaciones | ¿Qué necesita hacer hoy mi equipo? | Claridad · prioridad · acción |
 
-> **Cada Tenant debe poder hacer que un usuario crea que la aplicación fue desarrollada específicamente para su empresa, sin necesidad de modificar el código fuente del producto.**
+Misma marca. Distinto usuario. Misma plataforma.  
+Detalle CJ: [CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md) · OJ: [OPERATIONAL_JOURNEYS](../07-experience/OPERATIONAL_JOURNEYS.md).
 
 ---
 
 ## Identidad que debe heredar la app
 
-La web transmite cuatro ideas:
-
 | Sí | No |
 |----|-----|
-| Comida saludable | ERP |
-| Cercanía | Sistema operativo |
-| Calidad gastronómica | Tecnología / módulos |
-| Profesionalidad | Inventario / departamentos |
-
-Eso es exactamente lo que debe sentir el usuario al abrir la app.
+| Comida / servicio del Tenant | ERP · SaaS · «sistema operativo» |
+| Cercanía · calidad | Módulos · departamentos · inventario |
+| Fotografía real de producto | Stock genérico / ilustración tech |
 
 ---
 
-## Copy canónico (reutilizar)
+## Copy — reglas (no textos fijos)
 
-Tomado del tono y mensajes de la web — adaptar a pantallas, no inventar voz SaaS:
-
-| Uso | Texto |
-|-----|--------|
-| Hero / claim | Cocinamos para que tú solo tengas que disfrutar. |
-| Propuesta | Soluciones nutritivas. |
-| Calidad | Ingredientes naturales. |
-| Método | Cocina 100% grill y al horno. |
-| Servicio | Servicio personalizado. |
-| Entrega | Reparto gratuito. |
-| Pie / ambiente | Comida saludable en tu día a día. |
-
-**Tono:** empresa de alimentación. No empresa tecnológica.  
-Sin: «operación», «módulos», «plataforma», «capabilities», «tenant».
+- El tono lo define el Tenant (claims en `copy.<locale>.json`).  
+- Prohibido en Front Office: «operación», «módulo», «plataforma», «capability», «tenant», «ERP».  
+- YourMeal OS solo como **Powered by** (firma discreta).  
+- Textos exactos de pantallas → implementación del tenant + assets.
 
 ---
 
-## Login
+## Login (reglas)
 
-```text
-Bienvenido a EatClean
-
-Comida preparada para ayudarte
-a comer mejor.
-```
-
-Footer (discreto):
-
-```text
-Powered by YourMeal OS
-```
-
-**Eliminar / no usar:**
-
-```text
-Bienvenido
-Inicia sesión en tu operación
-```
-
-ni cualquier copy que presente YourMeal OS o «la operación» como producto.
-
-Campos BrandConfig: `copy.welcomeTitle` · `copy.welcomeSubtitle` · `poweredBy`.
+- El **logo del Tenant** es el ancla de marca (protagonismo y aire respecto al título).  
+- El copy invita al valor del producto (p. ej. pedido semanal), no a «entrar en la operación».  
+- **Powered by** es firma tipográfica mínima, no contenido principal.  
+- El acceso de staff usa lenguaje natural del producto operativo (p. ej. **Centro de Operaciones**), no abreviaturas «Adm» / «Admin».  
+- Seguridad = autenticación + RBAC — [ADR 0014 · Administrative entry](../adr/0014-customer-application-is-tenant-branded.md#administrative-entry-regla-reutilizable).
 
 ---
 
-## Home del cliente
+## Home del cliente (reglas)
 
-**Eliminar completamente** de la experiencia cliente:
+- No es un dashboard administrativo.  
+- Responde la pregunta del Customer Journey principal (pedido / servicio).  
+- CTA principal claro.  
+- Bloques típicos: pedido actual · próxima entrega · favoritos · promociones del Tenant — **sin** módulos internos.
 
-- Kitchen · Inventory · Purchasing · Delivery · Finance  
-- Modules · Platform Landing · chrome YourMeal OS  
-
-**Sustituir por** un dashboard de cliente:
-
-```text
-Hola {nombre}
-
-¿Ya programaste tu pedido de esta semana?
-```
-
-CTA principal:
-
-```text
-Programar pedido
-```
-
-Luego, solo:
-
-| Bloque | Notas |
-|--------|--------|
-| Pedido actual | Estado del pedido en curso |
-| Próxima entrega | Fecha / ventana |
-| Historial | Pedidos pasados |
-| Facturas | Si aplica al actor cliente |
-| Direcciones | Gestión propia |
-| Perfil | Cuenta |
-
-Nada más. Sin módulos internos. Sin saludo con emoji obligatorio — el tono es cercano; el gesto tipográfico puede omitirse si el design system del Tenant lo prefiere sobrio.
+**Eliminar de la experiencia cliente:** Kitchen · Inventory · Purchasing · Delivery · Finance · Modules · Platform chrome.
 
 ---
 
-## Navegación (cliente)
+## Navegación cliente (reglas)
 
-Pensada para **clientes**, no para operadores:
-
-```text
-Inicio
-Pedidos
-Mi cuenta
-Más
-```
-
-Dentro de **Más**:
-
-- Ayuda  
-- Contacto  
-- Facturación  
-- Configuración  
-
-Mapa de pantallas existente ([CUSTOMER_APP_SCREEN_MAP](../15-product/CUSTOMER_APP_SCREEN_MAP.md)) se **realinea** a esta IA: mismas capabilities de fondo; distinta presentación de marca y nav.
+Pensada para **clientes**, no operadores. Bottom nav corto (Inicio · Pedidos · … · Cuenta).  
+El [CUSTOMER_APP_SCREEN_MAP](../15-product/CUSTOMER_APP_SCREEN_MAP.md) se realinea a esta IA: mismas capabilities; distinta presentación.
 
 ---
 
-## BackOffice
+## Centro de Operaciones (reglas)
 
-Solo visible mediante **RBAC** (ADR 0004).
-
-El **cliente nunca** ve:
-
-- Kitchen · Purchasing · Inventory · Delivery · Finance · Administration  
-
-El administrador del Tenant sí (back office del Tenant — sigue siendo capa Tenant, no Platform).
-
-Misma identidad EatClean; otro objetivo: *centro de operaciones*, no pedido semanal.
-
-**Administrative entry** (ADR 0014): un elemento de marca (p. ej. hoja del logotipo) puede abrir `/auth/admin` sin interferir el recorrido del cliente. La seguridad **nunca** depende de ocultar el acceso — solo de autenticación + RBAC.
+- Visible solo con **RBAC** (ADR 0004).  
+- Primera pantalla = **trabajo del día**, no KPIs / gráficos financieros.  
+- Workspaces autorizados únicamente — nunca módulos «bloqueados» visibles.  
+- 1 workspace → entrada directa · 2+ → picker · admin → todas las áreas.  
+- Misma identidad visual del Tenant; otro objetivo.
 
 ---
 
-## Sistema visual
+## Sistema visual (reglas)
 
-No inventar una identidad nueva. Extraer / mapear a `BrandConfig` desde la web oficial:
-
-| Token | Origen |
-|-------|--------|
-| Colores principales / secundarios | Web EatClean |
-| Radios · sombras · espaciados | Web EatClean |
-| Tipografía | Oficial del Tenant (o equivalente licenciable si la web no puede reutilizarse) |
-| Botones · tarjetas · bordes | Web EatClean |
-| Logo · favicon · icon app | Assets oficiales del Tenant |
-
-La app y la web deben parecer **un solo producto**.
-
-Hasta que `BrandConfig` esté Connected en runtime, cualquier token hardcodeado de «marca plataforma» en rutas cliente es **deuda ADR 0014**.
+- Extraer colores, tipografía, radios y logo oficiales → `BrandConfig`.  
+- App y web/redes del Tenant deben parecer **un solo producto**.  
+- Fotografía real de producto; no ilustraciones SaaS.  
+- Hasta Connected: tokens de marca plataforma en rutas cliente = deuda ADR 0014.
 
 ---
 
-## Imágenes
+## Powered by (reglas)
 
-La web usa **fotografías reales** de comida. La app debe igual:
-
-- bowls · platos · ingredientes · cocina  
-
-**No** usar ilustraciones genéricas de SaaS, dashboards abstractos ni stock «tech».
+Únicamente Login · Splash · Acerca de (y equivalentes). Nunca protagonista.
 
 ---
 
-## Restricciones (hard)
+## Restricciones hard (Front Office)
 
-No mostrar en Customer Application:
-
-- YourMeal OS como marca principal  
-- Arquitectura SaaS  
-- Departamentos internos  
-- Conceptos operacionales de cocina/compras  
-- Módulos técnicos  
-- Copy de «sistema operativo» / ERP  
+No mostrar: YourMeal OS como marca principal · arquitectura SaaS · departamentos internos · conceptos de cocina/compras · copy de ERP / sistema operativo.
 
 ---
 
-## Experience Refactor (ejecución)
+## Checklist por pantalla (obligatoria)
 
-| Incluye | Excluye |
-|---------|---------|
-| Onboarding · login · home · nav · tono · imágenes · iconografía · copy | Cambios a HP-001 |
-| Mapeo visual → `BrandConfig` | Nueva lógica de negocio |
-| Ocultar back office sin RBAC | Nuevas capabilities |
-
-**No bloquea** Smoke / ORR. Priorizable en paralelo como incremento Lovable/Cursor de experiencia.
-
-### Cadena de experiencia
-
-```text
-Tenant Experience Spec
-        ↓
-Experience Refactor
-        ↓
-BrandConfig Validation
-        ↓
-EatClean Release UX
-```
-
-No abordar pantalla por pantalla de forma aislada: **auditoría de toda la experiencia**.
-
-### Checklist por pantalla (obligatoria)
-
-Cada pantalla de Customer Application debe cumplir **todas** estas preguntas antes de darse por válida:
+Cada pantalla Tenant debe cumplir **todas**:
 
 | # | Criterio | Pregunta |
 |---|----------|----------|
-| 1 | **Branding** | ¿Parece una pantalla de EatClean o de un SaaS genérico? |
-| 2 | **Copy** | ¿Usa el mismo tono y lenguaje que la web del Tenant? |
-| 3 | **Continuidad** | ¿La transición web → app resulta natural? |
-| 4 | **Rol** | ¿Corresponde a Front Office o Back Office? (cliente ≠ operador) |
-| 5 | **Powered by** | ¿YourMeal OS aparece **únicamente** donde corresponde? |
-| 6 | **Configuración** | ¿Todo lo visible proviene de `BrandConfig` o recursos del Tenant, **sin** lógica específica hardcodeada para EatClean? |
+| 1 | **Branding** | ¿Parece del Tenant o de un SaaS genérico? |
+| 2 | **Copy** | ¿Mismo tono que la identidad digital del Tenant? |
+| 3 | **Continuidad** | ¿La transición web/redes → app resulta natural? |
+| 4 | **Rol** | ¿Front Office o Centro de Operaciones? (cliente ≠ operador) |
+| 5 | **Powered by** | ¿YourMeal OS solo donde corresponde? |
+| 6 | **Configuración** | ¿Lo visible viene de BrandConfig / recursos, sin `if (tenant)`? |
 
-Si **todas** las pantallas pasan la checklist, se valida no solo la UX de EatClean, sino el **patrón reutilizable** para cualquier Tenant futuro.
+Si todas las pantallas pasan, se valida el **patrón reutilizable** para cualquier Tenant.
 
-### Brief corto para Lovable / Cursor
+---
 
-Usar el brief completo: [TENANT_IMPLEMENTATION_EATCLEAN](./TENANT_IMPLEMENTATION_EATCLEAN.md).
+## Cadena
 
 ```text
-Implementa TENANT IMPLEMENTATION · EatClean v1 (+ Spec + ADR 0014).
-App oficial EatClean — no SaaS. Identidad de eatcleantenerifecatering.es, NO layout web.
-BrandConfig + tenants/eatclean/ only. NO HP-001. NO forks. NO if (eatclean).
-Checklist Branding/Copy/Continuidad/Rol/Powered by/Configuración.
+Tenant Experience Spec (reglas permanentes)
+        ↓
+Tenant Implementation (tenant concreto)
+        ↓
+Experience Refactor bitácora (sprint)
+        ↓
+BrandConfig + Tenant Resources
 ```
 
 ---
@@ -297,8 +184,5 @@ Checklist Branding/Copy/Continuidad/Rol/Powered by/Configuración.
 - [ADR 0014](../adr/0014-customer-application-is-tenant-branded.md)  
 - [TENANT_BRANDING](./TENANT_BRANDING.md)  
 - [TENANT_IMPLEMENTATION_EATCLEAN](./TENANT_IMPLEMENTATION_EATCLEAN.md)  
-- [`tenants/eatclean/`](../../tenants/eatclean/README.md)  
-- [03-brand](../03-brand/README.md)  
-- [CUSTOMER_APP_SCREEN_MAP](../15-product/CUSTOMER_APP_SCREEN_MAP.md)  
-- [Lovable Brief](../21-product-materialization/02-lovable-brief.md)  
-- Dictionary: `DICT-045`…`DICT-052`
+- [`tenants/`](../../tenants/README.md)  
+- [CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md) · [OPERATIONAL_JOURNEYS](../07-experience/OPERATIONAL_JOURNEYS.md)

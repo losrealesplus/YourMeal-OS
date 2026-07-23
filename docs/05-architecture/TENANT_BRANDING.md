@@ -1,15 +1,23 @@
 # Tenant Branding — contrato técnico
 
 **ADR:** [0014 — Customer Application is Tenant-Branded](../adr/0014-customer-application-is-tenant-branded.md)  
-**Estado del contrato:** Accepted (especificación) · implementación incremental  
-**Ámbito:** Capability transversal del sistema — no un ajuste cosmético de UI.
+**Estado:** Accepted (especificación) · implementación incremental  
+**Ámbito:** Capability transversal — BrandConfig, recursos y configuración. **No** es la guía de UX ni la bitácora de un sprint.
+
+### Mapa de documentos (evitar duplicar)
+
+| Documento | Rol |
+|-----------|-----|
+| **Este** ([TENANT_BRANDING](./TENANT_BRANDING.md)) | Contrato técnico: BrandConfig · recursos · runtime |
+| [TENANT_EXPERIENCE_SPEC](./TENANT_EXPERIENCE_SPEC.md) | Reglas **permanentes** de experiencia Tenant |
+| [TENANT_IMPLEMENTATION_EATCLEAN](./TENANT_IMPLEMENTATION_EATCLEAN.md) | Implementación **específica** del tenant EatClean |
+| [EXPERIENCE_REFACTOR_EATCLEAN_V1_1](../07-experience/EXPERIENCE_REFACTOR_EATCLEAN_V1_1.md) | Bitácora del sprint Experience (#24→#29) |
 
 ---
 
 ## Principio
 
-> **The Platform owns the capability. The Tenant owns the experience.**  
-> **La plataforma es propietaria de la capacidad; el tenant es propietario de la experiencia.**
+> **The Platform owns the capability. The Tenant owns the experience.**
 
 ```text
 Customer Application  →  branding del Tenant (100%)
@@ -23,8 +31,8 @@ Powered by            →  única mención visible de YourMeal OS en front offic
 
 | Ejemplo | Capa |
 |---------|------|
-| Login · Dashboard cliente · Confirmar pedido | **Tenant** |
-| Cocina / Delivery / … (RBAC) | **Tenant** (BackOffice) |
+| Login · Home cliente · Confirmar pedido | **Tenant** (Customer App) |
+| Cocina / Reparto / … (RBAC) | **Tenant** (Centro de Operaciones) |
 | Superadmin · Gestión de tenants · Facturación SaaS | **Platform** |
 
 ---
@@ -41,7 +49,7 @@ Logo · Typography · Palette · Illustrations · Copy · PoweredBy
 CSS variables / assets / i18n scoped al tenant
 ```
 
-Fuente canónica prevista: configuración del Tenant (p. ej. `tenants.brand` JSON + assets en storage). La UI de Customer Application **lee** `BrandConfig`; no define marca propia.
+Fuente canónica: configuración del Tenant (`tenants/<slug>/brand.json` + recursos) y, a futuro, storage/config remota. La UI **lee** `BrandConfig`; no define marca propia.
 
 ---
 
@@ -89,8 +97,11 @@ type BrandConfig = {
   /** Única mención de la plataforma en front office */
   poweredBy: {
     visible: boolean
+    /** Firma tipográfica; puede renderizarse en dos líneas (prefix + name) */
     label: string           // default: "Powered by YourMeal OS"
-    href?: string           // sitio corporativo YourMeal OS
+    prefix?: string         // default: "Powered by"
+    name?: string           // default: "YourMeal OS"
+    href?: string
   }
 
   /** Publicación en stores */
@@ -125,35 +136,28 @@ type BrandSurfaceRef = {
 
 ### Extensión futura (no bloquea el contrato actual)
 
-`BrandConfig` puede crecer más allá de colores y logos — sin mezclar **capabilities de plataforma** con **experiencia de tenant**:
+`BrandConfig` puede crecer (features de presentación, store IDs, …) **sin** mezclar capabilities de plataforma con experiencia de tenant. Toda regla operacional nueva sigue FOPEBA.
 
-```yaml
-tenant:
-  name: EatClean
-  logo: logo.svg
-  primaryColor: "#0D1B2A"
-  typography: Inter
-  heroImage: hero.webp
+---
 
-copy:
-  welcomeTitle: "Bienvenido a EatClean"
-  welcomeSubtitle: "Comida preparada para ayudarte a comer mejor"
+## Recursos del Tenant (patrón)
 
-# Flags de experiencia del Tenant (no reglas del OM)
-features:
-  loyalty: true
-  referrals: false
-  nutritionScore: true
-
-stores:
-  iosBundleId: "…"
-  androidPackage: "…"
-
-branding:
-  poweredBy: true
+```text
+tenants/<tenant-slug>/
+  brand.json              → BrandConfig
+  copy.<locale>.json      → copy de marca / pantallas
+  README.md
+  brand/                  → logo · icon · splash
+  copy/                   → copy adicional
+  media/                  → fotografías de producto
+  weekly-menu/            → assets del menú publicado
+  promotions/             → promos / novedades
+  onboarding/             → imágenes onboarding
 ```
 
-Las `features` aquí son **presentación / producto del Tenant**, no Knowledge Layer. Toda regla operacional nueva sigue el ciclo FOPEBA (evidencia → Knowledge Update → Gate).
+**Regla:** un nuevo tenant = recursos + configuración. **Nunca** forks de producto ni `if (tenantSlug)`.
+
+Bundling actual (Vite): espejo en `src/tenant/resources/` — mantener sincronizado. Detalle por tenant: p. ej. [`tenants/eatclean/`](../../tenants/eatclean/README.md).
 
 ---
 
@@ -165,25 +169,27 @@ Las `features` aquí son **presentación / producto del Tenant**, no Knowledge L
 | Auth / onboarding del cliente final | **Tenant** |
 | Emails al cliente final | **Tenant** (+ Powered by opcional) |
 | Store listing (iOS / Android) | **Tenant** |
-| Back office (Kitchen, Delivery, …) | Tenant (operación) · sin exponerse al cliente |
-| SaaS corporativo (landing, pricing, docs, demo) | **YourMeal OS** |
-| Consola `saas_admin` | **YourMeal OS** |
+| Centro de Operaciones (staff, RBAC) | **Tenant** (misma marca · otro usuario) |
+| SaaS corporativo / consola `saas_admin` | **YourMeal OS** |
 
 ---
 
-## Front office vs back office
+## Front office vs Centro de Operaciones
 
 ```text
-Front office (cliente final)
+Front office (cliente)
   · Solo experiencia del Tenant
   · Sin módulos internos
-  · Sin conceptos operacionales de cocina / compras / finanzas
+  · Sin conceptos de cocina / compras / finanzas
 
-Back office (staff del Tenant, RBAC)
-  · Kitchen · Delivery · Purchasing · Inventory · Finance · Administration
+Centro de Operaciones (staff del Tenant, RBAC)
+  · Workspaces operativos (producción, reparto, stock, …)
   · Visible solo con permisos
   · Nunca en la app pública del cliente
 ```
+
+Reglas de experiencia permanentes: [TENANT_EXPERIENCE_SPEC](./TENANT_EXPERIENCE_SPEC.md).  
+Journeys de staff: [OPERATIONAL_JOURNEYS](../07-experience/OPERATIONAL_JOURNEYS.md).
 
 ---
 
@@ -191,41 +197,28 @@ Back office (staff del Tenant, RBAC)
 
 1. Resolver `tenantId` (sesión / dominio / deep link).  
 2. Cargar `BrandConfig` del Tenant.  
-3. Aplicar tokens CSS (`--brand-primary`, tipografías, …).  
+3. Aplicar tokens CSS / tipografías.  
 4. Sustituir copy de auth / home / emails.  
 5. Renderizar `PoweredBy` si `poweredBy.visible`.
 
-Hasta que la inyección esté Connected, cualquier marca hardcodeada de YourMeal OS en rutas `/app/*` (cliente) se considera **deuda respecto a ADR 0014**, no diseño intencional.
+Hasta Connected: marca hardcodeada de YourMeal OS en rutas cliente = **deuda ADR 0014**.
 
 ---
 
-## Relación con documentos existentes
+## Relación con otros docs
 
-| Doc | Rol tras ADR 0014 |
-|-----|-------------------|
-| [03-brand](../03-brand/README.md) | Identidad del **proveedor** + puntero a este contrato |
+| Doc | Rol |
+|-----|-----|
+| [03-brand](../03-brand/README.md) | Identidad del **proveedor** |
 | [04-design](../04-design/README.md) | Design system base; tokens de tenant los sobrescriben |
-| [CUSTOMER_APP_SCREEN_MAP](../15-product/CUSTOMER_APP_SCREEN_MAP.md) | Intencionalidad de pantallas; tokens brand = del Tenant |
-| ADR [0003](../adr/0003-multi-tenant.md) | Aislamiento de datos; esta ADR aísla **identidad** |
+| [CUSTOMER_APP_SCREEN_MAP](../15-product/CUSTOMER_APP_SCREEN_MAP.md) | Mapa de pantallas; tokens brand = del Tenant |
+| ADR [0003](../adr/0003-multi-tenant.md) | Aislamiento de datos; ADR 0014 aísla **identidad** |
 
 ---
 
 ## Fuera de alcance (este documento)
 
-- Implementar el editor SaaS de branding (scaffold en `/saas/branding`).  
-- Cambiar comportamiento funcional de HP-001.  
-- Rediseñar EatClean como marca fija del código.
-
-### Experience Refactor (dirección de producto)
-
-Incremento futuro (p. ej. Lovable), **sin tocar HP-001 ni lógica operativa**:
-
-> Que cualquier cliente descargue la app y piense que es la app oficial de EatClean.
-
-Spec operativo: [TENANT_EXPERIENCE_SPEC](./TENANT_EXPERIENCE_SPEC.md) · brief de ejecución: [TENANT_IMPLEMENTATION_EATCLEAN](./TENANT_IMPLEMENTATION_EATCLEAN.md) · assets: [`tenants/eatclean/`](../../tenants/eatclean/README.md).
-
-Revisa: onboarding · login · dashboard · navegación · tono · imágenes · iconografía · copy.
-
-No sustituye Smoke / ORR; no es bloqueo de Evidence Gate. Se prioriza cuando producto lo decida.
-
-La implementación de `BrandConfig` se trata como Capability / incremento de ingeniería cuando el Gate lo priorice — no como mejora ad hoc de UX.
+- Copy concreto de pantallas EatClean → [TENANT_IMPLEMENTATION_EATCLEAN](./TENANT_IMPLEMENTATION_EATCLEAN.md)  
+- Checklist permanente de experiencia → [TENANT_EXPERIENCE_SPEC](./TENANT_EXPERIENCE_SPEC.md)  
+- Historial de PRs / sprints → [EXPERIENCE_REFACTOR_EATCLEAN_V1_1](../07-experience/EXPERIENCE_REFACTOR_EATCLEAN_V1_1.md)  
+- Editor SaaS de branding · cambios HP-001 · forks por tenant

@@ -33,13 +33,18 @@ Si un usuario nuevo necesita explicación para completar **CJ-001**, hay que mej
 
 ## Regla de pantallas
 
-> **Ninguna pantalla existe por sí sola. Toda pantalla pertenece exactamente a un Customer Journey.**
+> **Ninguna pantalla existe por sí sola. Toda pantalla pertenece exactamente a un Customer Journey o a un Operational Journey.**
 
 ```text
 Customer Journey → Screen → Capability
+Operational Journey → Screen → Capability
 ```
 
 Nunca al revés. Evita pantallas «porque podrían ser útiles».
+
+**Pregunta de diseño (Centro de Operaciones):**
+
+> ¿El equipo sabe qué hacer hoy sin mirar un dashboard de KPIs?
 
 ## Cadena completa
 
@@ -95,9 +100,12 @@ Inventario SCR del MVP: [CUSTOMER_JOURNEYS § Pantallas](./CUSTOMER_JOURNEYS.md#
 | Doc | Rol |
 |-----|-----|
 | [CUSTOMER_JOURNEYS](./CUSTOMER_JOURNEYS.md) | Recorridos CJ-xxx · pantallas MVP · SCR |
-| [EXPERIENCE_REFACTOR_EATCLEAN_V1](./EXPERIENCE_REFACTOR_EATCLEAN_V1.md) | Sprint Experience · 5 pantallas primero |
-| [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md) | Identidad EatClean |
-| [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) | Brief Cursor/Lovable |
+| [OPERATIONAL_JOURNEYS](./OPERATIONAL_JOURNEYS.md) | Recorridos OJ-xxx · Centro de Operaciones · Workspaces |
+| [TENANT_BRANDING](../05-architecture/TENANT_BRANDING.md) | Contrato técnico BrandConfig · recursos |
+| [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md) | Reglas **permanentes** de experiencia Tenant |
+| [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) | Implementación específica EatClean |
+| [EXPERIENCE_REFACTOR_EATCLEAN_V1](./EXPERIENCE_REFACTOR_EATCLEAN_V1.md) | Bitácora sprint UI · 5 pantallas |
+| [EXPERIENCE_REFACTOR_EATCLEAN_V1_1](./EXPERIENCE_REFACTOR_EATCLEAN_V1_1.md) | Bitácora sprint · Login + Operaciones (#24→#29) |
 | [PROJECT_DOMAINS](../00-status/PROJECT_DOMAINS.md) | Mapa de cuatro dominios |
 
 ## Relacionado
