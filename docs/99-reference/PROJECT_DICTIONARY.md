@@ -1977,4 +1977,5 @@ OM · IMPLEMENTATION_BACKLOG (posterior)
 |-------|--------|
 | 2026-07-23 | Creación — lenguaje Evidence Gate / ORR / FOV / dominios / HP-001 |
 | 2026-07-23 | IDs DICT-xxx · Status · Madurez · autoridad semántica · cuatro pilares |
+| 2026-07-23 | Primera pregunta (nuevo vs sinónimo) · disciplina de evolución de pilares |
 
