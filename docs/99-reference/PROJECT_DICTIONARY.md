@@ -175,6 +175,7 @@ Core | Operational | Engineering | Historical
 | `DICT-049` | [Powered by YourMeal OS](#powered-by-yourmeal-os) | Core | Accepted |
 | `DICT-050` | [Platform owns capability / Tenant owns experience](#platform-owns-capability--tenant-owns-experience) | Core | Accepted |
 | `DICT-051` | [Tenant Experience Spec](#tenant-experience-spec) | Operational | Accepted |
+| `DICT-052` | [Tenant Assets](#tenant-assets) | Engineering | Accepted |
 
 ---
 
@@ -206,7 +207,7 @@ Core | Operational | Engineering | Historical
 
 ### Identidad SaaS (ADR 0014)
 
-[Customer Application](#customer-application) (`DICT-045`) · [YourMeal OS (Corporate Surface)](#yourmeal-os-corporate-surface) (`DICT-046`) · [BrandConfig](#brandconfig) (`DICT-047`) · [Tenant-Branded](#tenant-branded) (`DICT-048`) · [Powered by YourMeal OS](#powered-by-yourmeal-os) (`DICT-049`) · [Platform owns capability / Tenant owns experience](#platform-owns-capability--tenant-owns-experience) (`DICT-050`) · [Tenant Experience Spec](#tenant-experience-spec) (`DICT-051`)
+[Customer Application](#customer-application) (`DICT-045`) · [YourMeal OS (Corporate Surface)](#yourmeal-os-corporate-surface) (`DICT-046`) · [BrandConfig](#brandconfig) (`DICT-047`) · [Tenant-Branded](#tenant-branded) (`DICT-048`) · [Powered by YourMeal OS](#powered-by-yourmeal-os) (`DICT-049`) · [Platform owns capability / Tenant owns experience](#platform-owns-capability--tenant-owns-experience) (`DICT-050`) · [Tenant Experience Spec](#tenant-experience-spec) (`DICT-051`) · [Tenant Assets](#tenant-assets) (`DICT-052`)
 
 ---
 
@@ -2268,6 +2269,46 @@ BrandConfig · Tenant-Branded · Customer Application · Platform owns capabilit
 
 ---
 
+# Tenant Assets
+
+## ID
+DICT-052
+
+## Status
+Accepted
+
+## Madurez
+Engineering
+
+## Nombre
+Tenant Assets
+
+## Tipo
+Patrón de recursos / carpeta por Tenant
+
+## Definición
+Conjunto de recursos y configuración por Tenant (`tenants/<slug>/`: `brand.json`, `copy.*.json`, logo, splash, hero, onboarding, empty states) que alimentan `BrandConfig` y la Customer Application **sin** modificar el código fuente del producto.
+
+## Cuándo ocurre
+Onboarding de un Tenant · Experience Refactor · cambio de identidad visual.
+
+## Produce
+Experiencia white-label reutilizable (nuevo cliente = nuevos assets, no fork).
+
+## No significa
+Código específico por cliente · fork de la app · lógica de negocio en la carpeta de assets.
+
+## Sinónimos
+Tenant Resources · carpeta `tenants/`
+
+## Palabras relacionadas
+BrandConfig · Tenant Experience Spec · Tenant-Branded
+
+## Referencias
+[`tenants/`](../../tenants/README.md) · [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) · ADR 0014
+
+---
+
 ## Historial de este diccionario
 
 | Fecha | Cambio |
@@ -2278,4 +2319,5 @@ BrandConfig · Tenant-Branded · Customer Application · Platform owns capabilit
 | 2026-07-23 | ADR 0014 — DICT-045…049 Customer Application / BrandConfig / Tenant-Branded |
 | 2026-07-23 | ADR 0014 ampliación — cinco capas · filtro Plataforma/Tenant · DICT-050 |
 | 2026-07-23 | TENANT_EXPERIENCE_SPEC EatClean · DICT-051 · consecuencia BrandConfig-only |
+| 2026-07-23 | TENANT_IMPLEMENTATION_EATCLEAN · `tenants/eatclean/` · DICT-052 Tenant Assets |
 
