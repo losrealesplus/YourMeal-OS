@@ -79,7 +79,10 @@ export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
       }));
 
       // TODO(HP-001): program_draft_order RPC pending migration.
-      const { data, error } = await supabase.rpc("program_draft_order" as never, {
+      const { data, error } = await (supabase.rpc as unknown as (
+        name: string,
+        args: Record<string, unknown>,
+      ) => Promise<{ data: unknown; error: unknown }>)("program_draft_order", {
         _tenant_id: tenantId,
         _customer_id: input.customerId,
         _week_start: input.weekStart,
