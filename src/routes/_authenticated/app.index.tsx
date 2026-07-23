@@ -40,7 +40,7 @@ export const Route = createFileRoute("/_authenticated/app/")({
 
 function CustomerHome() {
   const { t } = useTranslation(["customer", "common"]);
-  const { user } = useAuth();
+  const { user, isStaff } = useAuth();
   const navigate = useNavigate({ from: "/app" });
   const search = Route.useSearch();
   const state: DashboardStateId = search.state ?? "default";
