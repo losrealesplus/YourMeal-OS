@@ -1,56 +1,33 @@
-# 22 · Implementation — demostrar FOPEBA en software
+# 22 · Implementation
 
 **Objetivo:** demostrar que FOPEBA produce software operacional de alta calidad.  
-**Lovable:** relevo visual cerrado (no pedir más infraestructura).  
-**Cursor:** ingeniero — conectar capacidades certificadas, no pantallas.
-
-```text
-FOPEBA → certifica
-Lovable → UX skeleton
-Cursor → ingeniería
-GitHub → historia / evidencia
-```
-
----
-
-## Documentos
+**Foco ahora:** ejecutar el patrón hasta HP-001 — sin metodología nueva.  
+**Lovable:** relevo visual cerrado. **Cursor:** conectar capacidades certificadas.
 
 | Doc | Rol |
 |-----|-----|
-| [ETAPA_2_LEVELS](./ETAPA_2_LEVELS.md) | **L1→L4** · objetivo · hito Happy Path |
+| [ETAPA_2_LEVELS](./ETAPA_2_LEVELS.md) | **L1→L4** · hito Happy Path |
 | [KNOWLEDGE_COVERAGE](./KNOWLEDGE_COVERAGE.md) | Métrica OM ↔ código |
-| [CAPABILITY_CONNECTION_PATTERN](./CAPABILITY_CONNECTION_PATTERN.md) | Patrón OM→Repo→Query→Hook→UI |
+| [CAPABILITY_CONNECTION_PATTERN](./CAPABILITY_CONNECTION_PATTERN.md) | **Central** — lectura |
+| [MUTATION_PATTERN](./MUTATION_PATTERN.md) | **Central** — escritura (desde CAP-004) |
 | [HAPPY_PATHS](./HAPPY_PATHS.md) | HP-001…003 |
-| [ORR](./ORR.md) | Pausar tras HP-001 |
-| [PR_TECHNICAL_CHECKLIST](./PR_TECHNICAL_CHECKLIST.md) | Checklist desde CAP-003 |
+| [ORR](./ORR.md) | Cuatro preguntas fijas |
+| [HP-001_EVIDENCE_LOG](./HP-001_EVIDENCE_LOG.md) | Puente a FOV (plantilla) |
+| [PR_TECHNICAL_CHECKLIST](./PR_TECHNICAL_CHECKLIST.md) | Checklist PR |
 | [CURSOR_MASTER_PROMPT](./CURSOR_MASTER_PROMPT.md) | Contexto permanente |
-| [PR_CHANGE_LEVELS](./PR_CHANGE_LEVELS.md) | Un PR = un nivel (no mezclar) |
+| [PR_CHANGE_LEVELS](./PR_CHANGE_LEVELS.md) | Un PR = un nivel |
 | [IMPLEMENTATION_BACKLOG](./IMPLEMENTATION_BACKLOG.md) | Mock / Real / Happy Path |
 | [HAPPY_PATH_E2E](./HAPPY_PATH_E2E.md) | Primer pedido → FOV |
 | [IMPLEMENTATION_RULES](./IMPLEMENTATION_RULES.md) | Constitución |
-| [caps/](./caps/README.md) | CAP-001…007 — **CAP-004** siguiente |
+| [caps/](./caps/README.md) | CAP-001…007 — **CAP-005** siguiente |
 | [ADR 0013](../adr/0013-implementation-is-knowledge-materialization.md) | Implementation is Knowledge Materialization |
-
----
 
 ## Siguiente
 
-1. Pegar [Master Prompt](./CURSOR_MASTER_PROMPT.md) en la sesión Cursor.  
-2. **[CAP-004 Order Programming](./caps/CAP-004-order-programming.md)** — primera mutación (Level 2).  
-3. CAP-005 → CAP-006 → **ORR** → FOV (Level 3→4).
+**[CAP-005 Order Summary](./caps/CAP-005-order-summary.md)** → CAP-006 → ORR → Evidence Log → FOV.
 
----
-
-## Evaluación
-
-| Área | Estado |
-|------|--------|
-| Objetivo FOPEBA→software | ✅ Declarado |
-| Product Skeleton UX | ✅ |
-| L1 CAP-001 Auth | Connected · Real |
-| L2 CAP-002 Dish Catalog | Connected · Real |
-| L2 CAP-003 Weekly Menu | Connected · Real |
-| L2 CAP-004…005 | ⏳ CAP-004 siguiente |
-| L3 Workflow / L4 FOV | ⏳ |
-| HP-001 | Parcial (catálogo + menú) |
+| CAP | Estado |
+|-----|--------|
+| 001–004 | Connected |
+| 005–007 | Scaffold |
 | Business logic inventada | 🔒 STOP |

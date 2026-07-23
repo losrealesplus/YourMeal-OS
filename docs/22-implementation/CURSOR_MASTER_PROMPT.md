@@ -169,8 +169,8 @@ ORDEN DE IMPLEMENTACIÓN
 L1  CAP-001 Auth & User Context     → Connected (mantener)
 L2  CAP-002 Dish Catalog            → Connected (lectura)
 L2  CAP-003 Weekly Menu             → Connected (lectura)
-L2  CAP-004 Order Programming       → siguiente (primera mutación)
-L2  CAP-005 Order Summary
+L2  CAP-004 Order Programming       → Connected (mutación + audit)
+L2  CAP-005 Order Summary           → siguiente
 L3  CAP-006 Order Confirmation
 L3  CAP-007 Order History
 L3→L4  Happy Path E2E sin mocks     → hito
