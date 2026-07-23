@@ -12,7 +12,7 @@ Registro **inmutable** de hitos. No es gestión de sprint: es memoria objetiva.
 | PR #16 | CAP-003 Connected | Weekly Menu (Read Pattern) |
 | PR #17 | CAP-004 Connected | Order Programming (Mutation Pattern) |
 | PR #18 | CAP-005 Connected | Order Summary |
-| 2026-07-23 | Methodology Construction Closed | [Acta](./ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) |
+| 2026-07-23 | Methodology Construction Closed | [Acta](./ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) · PR #19 |
 | *(pendiente)* | CAP-006 Connected | Order Confirmation |
 | *(pendiente)* | HP-001 Operational | Happy Path sin mocks |
 | *(pendiente)* | ORR PASSED | Puerta binaria |
