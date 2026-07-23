@@ -401,7 +401,6 @@ export type Database = {
       customers: {
         Row: {
           created_at: string
-          deleted_at: string | null
           display_name: string | null
           email: string | null
           id: string
@@ -411,7 +410,6 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          deleted_at?: string | null
           display_name?: string | null
           email?: string | null
           id?: string
@@ -421,7 +419,6 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          deleted_at?: string | null
           display_name?: string | null
           email?: string | null
           id?: string
@@ -722,7 +719,6 @@ export type Database = {
         Row: {
           comment: string | null
           day_date: string
-          deleted_at: string | null
           dish_id: string
           id: string
           order_id: string
@@ -732,7 +728,6 @@ export type Database = {
         Insert: {
           comment?: string | null
           day_date: string
-          deleted_at?: string | null
           dish_id: string
           id?: string
           order_id: string
@@ -742,7 +737,6 @@ export type Database = {
         Update: {
           comment?: string | null
           day_date?: string
-          deleted_at?: string | null
           dish_id?: string
           id?: string
           order_id?: string
@@ -777,7 +771,6 @@ export type Database = {
         Row: {
           created_at: string
           customer_id: string
-          deleted_at: string | null
           id: string
           notes: string | null
           status: Database["public"]["Enums"]["order_status"]
@@ -788,7 +781,6 @@ export type Database = {
         Insert: {
           created_at?: string
           customer_id: string
-          deleted_at?: string | null
           id?: string
           notes?: string | null
           status?: Database["public"]["Enums"]["order_status"]
@@ -799,7 +791,6 @@ export type Database = {
         Update: {
           created_at?: string
           customer_id?: string
-          deleted_at?: string | null
           id?: string
           notes?: string | null
           status?: Database["public"]["Enums"]["order_status"]
@@ -1326,7 +1317,6 @@ export type Database = {
       }
       weekly_menus: {
         Row: {
-          deleted_at: string | null
           id: string
           published_at: string | null
           status: string
@@ -1334,7 +1324,6 @@ export type Database = {
           week_start: string
         }
         Insert: {
-          deleted_at?: string | null
           id?: string
           published_at?: string | null
           status?: string
@@ -1342,7 +1331,6 @@ export type Database = {
           week_start: string
         }
         Update: {
-          deleted_at?: string | null
           id?: string
           published_at?: string | null
           status?: string
@@ -1379,17 +1367,6 @@ export type Database = {
       }
       is_saas_admin: { Args: { _user_id: string }; Returns: boolean }
       is_tenant_member: { Args: { _tenant_id: string }; Returns: boolean }
-      program_draft_order: {
-        Args: {
-          _tenant_id: string
-          _customer_id: string
-          _week_start: string
-          _total: number
-          _notes: string | null
-          _items: Json
-        }
-        Returns: Json
-      }
     }
     Enums: {
       app_role:
