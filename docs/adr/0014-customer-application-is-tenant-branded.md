@@ -273,6 +273,12 @@ YourMeal OS no compite por ser la marca visible. Compite por ser el motor operat
 
 > **Cada Tenant debe poder hacer que un usuario crea que la aplicación fue desarrollada específicamente para su empresa, sin necesidad de modificar el código fuente del producto.**
 
+**Brand Recognition Filter (experiencia)**
+
+> **Si ocultamos el nombre "YourMeal OS", ¿un cliente o un empleado reconocería inmediatamente que esta aplicación pertenece al Tenant gracias al logo, los colores, la tipografía, el lenguaje y la fotografía?**
+
+Si la respuesta es **sí**, la implementación respeta esta ADR. Detalle: [TENANT_EXPERIENCE_SPEC § Brand Recognition Filter](../05-architecture/TENANT_EXPERIENCE_SPEC.md#principio-rector--brand-recognition-filter-no-negociable).
+
 **Dos decisiones de largo recorrido (contexto FOPEBA)**
 
 1. FOPEBA termina cuando empieza la **evidencia de campo**, no cuando termina el código.  
@@ -286,7 +292,9 @@ YourMeal OS no compite por ser la marca visible. Compite por ser el motor operat
 - [BRAND_CONTRACT](../05-architecture/BRAND_CONTRACT.md) — límites de edición  
 - [Tenant Brand](../17-operational-model/02-core-objects/tenant-brand.md) — Configuration Object  
 - [CAPABILITY_MATRIX](../09-security/CAPABILITY_MATRIX.md) — `brand.manage`  
-- [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md)  
+- [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md) — reglas permanentes  
 - [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md)  
+- [EXPERIENCE_REFACTOR_EATCLEAN_V1_1](../07-experience/EXPERIENCE_REFACTOR_EATCLEAN_V1_1.md) — bitácora  
 - [`tenants/eatclean/`](../../tenants/eatclean/README.md) — seed / fallback  
+- [ADR 0003](./0003-multi-tenant.md) · [ADR 0004](./0004-authentication-rbac.md)  
 - Dictionary: `DICT-045`…`DICT-062`
