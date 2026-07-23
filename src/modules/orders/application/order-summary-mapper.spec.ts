@@ -14,7 +14,6 @@ describe("mapOrderToSummaryView", () => {
       total: 19.8,
       notes: null,
       created_at: "2026-07-23T00:00:00Z",
-      deleted_at: null,
     } satisfies OrderRow;
 
     const items = [
@@ -26,7 +25,7 @@ describe("mapOrderToSummaryView", () => {
         day_date: "2026-07-22",
         qty: 2,
         comment: null,
-        deleted_at: null,
+        
       },
     ] satisfies OrderItemRow[];
 
