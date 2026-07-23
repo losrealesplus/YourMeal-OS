@@ -12,13 +12,14 @@ Foundation of Materialization: **Frozen v1** — [ACT-002](./ACT-002_FOUNDATION_
 Experience base (EatClean): **Frozen** — [ACT-001](./ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) (#24→#30)
 Engineering Phase: Complete (pending operational authorization)
 Current Phase:     Pilot Ready  ·  Evidence Gate  +  ORR Party/B2B/B2C
-Next Gate:         ORR  (PASSED | BLOCKED)  ·  [ORR_B2B_B2C_PARTY](./ORR_B2B_B2C_PARTY.md)  +  ciclo EP-001…EP-005
+Next Gate:         ORR  →  **G-02 · Pilot Readiness**  ·  [PILOT_ACCEPTANCE_CHECKLIST](./PILOT_ACCEPTANCE_CHECKLIST.md)  ·  [ORR_B2B_B2C_PARTY](./ORR_B2B_B2C_PARTY.md)  +  ciclo EP-001…EP-005
 Next Discipline:   Demostrar (no diseñar) · Operational Readiness (no new modules until ORR)
 Primary Artifact:  [ORR Party](./ORR_B2B_B2C_PARTY.md) · [PILOT_EXECUTION_GUIDE](../18-operational-validation/PILOT_EXECUTION_GUIDE.md)
 Focus operativo:   ¿Tres recorridos (Particular · Empresa staff · Empleado) E2E?
 Focus experiencia: ¿Mi madre podría pedir sin que nadie le explique la app?
 Focus piloto:      ¿EatClean opera una semana solo con YourMeal OS + evidencia FOPEBA?
-Completitud UI:    [Functional Completeness](./EATCLEAN_PILOT_FUNCTIONAL_COMPLETENESS_REVIEW.md) · cero humo
+Primary Artifact:  [PILOT_ACCEPTANCE_CHECKLIST](./PILOT_ACCEPTANCE_CHECKLIST.md) · ORR Party
+Completitud UI:    [Functional Completeness](./EATCLEAN_PILOT_FUNCTIONAL_COMPLETENESS_REVIEW.md) · cero humo (Inventario/Clientes ops aún 🟡)
 Last Baseline:     v0.2.0-engineering-baseline (IR-001)
 
 ══════════════════════════════════════════════════

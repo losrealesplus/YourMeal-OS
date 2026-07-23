@@ -22,6 +22,7 @@
 | [Operational Checks](./15-product/OPERATIONAL_CHECKS.md) | Datos → comprobación → acción (transversal) |
 | [Milestone · Infrastructure Validation](./00-status/MILESTONE_INFRASTRUCTURE_VALIDATION.md) | Core independiente de la tecnología ✅ |
 | [Milestone · Foundation Validation](./00-status/MILESTONE_VALIDACION_DOMINIO_DISH.md) | Hito histórico ✅ — metodología validada |
+| [Functional Completeness Review](./00-status/EATCLEAN_PILOT_FUNCTIONAL_COMPLETENESS_REVIEW.md) | Pre-piloto · matriz Visible/Funciona/Guarda/RBAC |
 | [Milestone · EatClean Pilot Ready](./00-status/MILESTONE_EATCLEAN_PILOT_READY.md) | Hito abierto 🟡 — EP-001…EP-005 · ciclo E2E |
 | [ACT-001 · Experience Baseline Frozen](./00-status/ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) | Congelación experiencia EatClean (#24→#30) |
 | [ACT-002 · Materialization Frozen](./00-status/ACT-002_FOUNDATION_OF_MATERIALIZATION_FROZEN.md) | Foundation of Materialization Frozen v1 (#24→#31) |
@@ -35,6 +36,7 @@
 | [ADR 0016 · Party Model](./adr/0016-party-model-demand-actors.md) | Party → Individual Customer \| Company → Memberships |
 | [Core Object Traceability](./17-operational-model/CORE_OBJECT_TRACEABILITY.md) | OM Party ↔ tablas físicas del piloto |
 | [ORR Party / B2B / B2C](./00-status/ORR_B2B_B2C_PARTY.md) | Checklist pre–Pilot Ready (alta empresa = EatClean) |
+| [**Pilot Acceptance Checklist**](./00-status/PILOT_ACCEPTANCE_CHECKLIST.md) | Control único del piloto · cero humo · **G-02 Pilot Readiness** |
 | [Company Account B2B](./17-operational-model/02-core-objects/company-account-b2b.md) | Site · Organizational Unit · Delivery Group |
 | [Tenant Experience Spec](./05-architecture/TENANT_EXPERIENCE_SPEC.md) | Identidad EatClean · Experience Refactor |
 | [Tenant Implementation · EatClean](./05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) | Brief Cursor/Lovable · Tenant Assets |
