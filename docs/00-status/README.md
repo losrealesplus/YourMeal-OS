@@ -1,23 +1,24 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-22  
-**Hito:** [Methodology Frozen](./04-methodology-frozen.md) 🧊  
-**Conocimiento:** **Table-Validated** (Field-Validated tras G-01)  
-**Carril A:** FOV EatClean — [Mission Brief](./FOV_MISSION_BRIEF.md)  
-**Carril B:** 🟢 **ABIERTO** — [Dual Track](./DUAL_TRACK_ANTECAMARA.md) · [Sprint 2.1](../15-product/etapa-2/SPRINT_2_1_PRODUCT_FOUNDATION.md)
+**Última actualización:** 2026-07-23  
+**Hito:** [Methodology Frozen](./04-methodology-frozen.md) 🧊 · OM **Table-Validated**  
+**Product Skeleton:** ✅ UX materializada (Lovable)  
+**Cursor ahora:** ingeniero de **conexión** — [22-implementation](../22-implementation/README.md)
 
-> El código no crea conocimiento; **materializa** conocimiento.  
-> ❌ No **inventar** lógica de negocio.
+> Cursor no implementa funcionalidades.  
+> Cursor implementa **capacidades previamente certificadas**.
 
 ---
 
-## Narrativa
+## Evaluación
 
-| Rol | Qué es |
-|-----|--------|
-| **EatClean** | Laboratorio (FOV) |
-| **FOPEBA** | Método v1.0 frozen |
-| **YourMeal OS** | Producto — Carril B materializa el OM Table-Validated |
+| Área | Estado |
+|------|--------|
+| Operational Model | ✅ Table-Validated |
+| Customer / Admin / Production / Delivery / DS | ✅ Product Skeleton |
+| UX Foundation | ✅ |
+| Business Logic | 🔒 Solo capacidades certificadas |
+| Happy Path E2E connected | ⏳ [Siguiente](../22-implementation/HAPPY_PATH_E2E.md) |
 
 ---
 
@@ -25,35 +26,31 @@
 
 | Carril | Estado | Foco |
 |--------|--------|------|
-| **A** Certificación | FOV → G-01 | Evidencia empírica |
-| **B** Producto | 🟢 Abierto | UX · arch · materialización con trazabilidad |
-
-Carril B fases: **A** Experience libre · **B** Tech libre · **C** Modelo+trazabilidad · **D** FOV-dependent 🔒
+| **A** FOV…G-01 | ⏳ | Evidencia empírica |
+| **B** Producto | 🟢 Skeleton listo → **conectar** | [IMPLEMENTATION_RULES](../22-implementation/IMPLEMENTATION_RULES.md) |
 
 ---
 
-## Progreso FOPEBA
+## Roles
 
-```text
-FASE A Discovery     100% ✅
-FASE B Certification ~85% · Table-Validated · FOV⏳
-FASE C Product Eng.  🔓 Carril B parcial · 🔒 G-01 pleno / Fase D
-```
-
----
-
-## Arranque Carril B
-
-**Foundation de Producto en curso.** Siguiente: [PM-001](../21-product-materialization/PM-001-Customer-App.md).
-
-```text
-OM → IA → Lovable (PM-001…005) → UX · Código
-```
-
-Índice: [21 Product Materialization](../21-product-materialization/README.md) · [Sprints](../15-product/etapa-2/SPRINTS.md)
+| Herramienta | Rol |
+|-------------|-----|
+| FOPEBA | Certifica conocimiento |
+| Lovable | Arquitecto visual (skeleton) |
+| **Cursor** | Conecta: query · repos · services · Supabase · audit |
+| EatClean | Laboratorio FOV |
 
 ---
 
-## Relacionado
+## Siguiente (Cursor)
 
-- [Freeze](./04-methodology-frozen.md) · [RC](./02-operational-model-rc.md) · [etapa-2](../15-product/etapa-2/README.md)
+[Happy Path E2E](../22-implementation/HAPPY_PATH_E2E.md): Auth → Dish → Menu → Order → Confirm → audit_log → Dashboard.
+
+No conectar todo a la vez. No modificar UX.
+
+---
+
+## Índices
+
+- [Implementation](../22-implementation/README.md) · [Backlog](../22-implementation/IMPLEMENTATION_BACKLOG.md)  
+- [FOV Mission Brief](./FOV_MISSION_BRIEF.md) · [Dual Track](./DUAL_TRACK_ANTECAMARA.md) · [21 PM](../21-product-materialization/README.md)

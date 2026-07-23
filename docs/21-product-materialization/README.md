@@ -59,6 +59,7 @@ Matriz: [01](./01-screen-knowledge-matrix.md).
 
 ---
 
-## Relacionado
+## Siguiente
 
-- [Sprint 2.1](../15-product/etapa-2/SPRINT_2_1_PRODUCT_FOUNDATION.md) · [Dual Track](../00-status/DUAL_TRACK_ANTECAMARA.md)
+**Cursor:** [Happy Path E2E](../22-implementation/HAPPY_PATH_E2E.md) — conectar, no rediseñar.  
+UI PM histórico: [PM-001…](./PM-001-Customer-App.md).

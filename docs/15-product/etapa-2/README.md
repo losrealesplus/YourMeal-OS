@@ -17,26 +17,24 @@ Pasa por evidencia (FOV → FER → KU).
 
 ---
 
-## Flujo (no tradicional)
+## Flujo (invertido)
 
 ```text
-Operational Model
-        ↓
-Information Architecture
-        ↓
-Lovable          ← herramienta principal de UI
-        ↓
-Iteración UX
-        ↓
-Código (Fase C + Knowledge Traceability)
+Operational Knowledge → Operational Model → UX Skeleton → Frontend connected → Backend
 ```
 
-**Figma** = apoyo (interacción compleja · componente · usabilidad · patrón DS).  
-No dibujar todas las pantallas en Figma.
+Lovable = arquitecto visual (skeleton ✅).  
+**Cursor = ingeniero de materialización** — [22-implementation](../../22-implementation/README.md).
 
-Separación de responsabilidades:
+> FOPEBA certifica · Lovable materializa UX · Cursor conecta capacidades certificadas.
 
-> **FOPEBA certifica el conocimiento; Lovable materializa ese conocimiento en una experiencia de producto.**
+### Orden de arranque (Cursor)
+
+1. [IMPLEMENTATION_RULES](../../22-implementation/IMPLEMENTATION_RULES.md)  
+2. [Happy Path E2E](../../22-implementation/HAPPY_PATH_E2E.md)  
+3. [Backlog](../../22-implementation/IMPLEMENTATION_BACKLOG.md)  
+
+PM UI (histórico): [21](../../21-product-materialization/README.md).
 
 ---
 

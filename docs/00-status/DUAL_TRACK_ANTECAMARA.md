@@ -60,15 +60,20 @@ Dish Library / Module 01 (ya validado) = excepción histórica.
 
 ---
 
-## Primer movimiento recomendado
+## Primer movimiento recomendado (ahora)
+
+**Product Skeleton listo.** Lovable = visual. **Cursor = conectar.**
+
+1. [IMPLEMENTATION_RULES](../22-implementation/IMPLEMENTATION_RULES.md)  
+2. [Happy Path E2E](../22-implementation/HAPPY_PATH_E2E.md)  
+3. [IMPLEMENTATION_BACKLOG](../22-implementation/IMPLEMENTATION_BACKLOG.md)  
 
 ```text
-Operational Model → Information Architecture → Lovable → Iteración UX → Código
+No modifiques diseño / UX / rutas / componentes.
+Implementa: estado · query · repos · services · hooks · Supabase · audit_log.
 ```
 
-1. [IA](../15-product/PRODUCT_INFORMATION_ARCHITECTURE.md)  
-2. **[PM-001](../21-product-materialization/PM-001-Customer-App.md)** — siguiente Lovable  
-3. [21 Materialization](../21-product-materialization/README.md) · [Sprint 2.1](../15-product/etapa-2/SPRINT_2_1_PRODUCT_FOUNDATION.md)
+Puente a Carril A: primer pedido real sin mocks → evidencia FOV.
 
 ---
 
