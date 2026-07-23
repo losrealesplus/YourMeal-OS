@@ -14,6 +14,7 @@ import { useWeeklyMenu } from "@/hooks/use-weekly-menu";
 import { useProgramDraftOrder } from "@/hooks/use-program-draft-order";
 import { utcWeekDates, utcWeekStartMonday } from "@/modules/weekly-menu/application/week-dates";
 import { cn } from "@/lib/utils";
+import heroImage from "@/assets/eatclean-hero.jpg";
 
 /**
  * Screen: Customer · Schedule Weekly Order (3-step flow)
