@@ -40,7 +40,7 @@ export const Route = createFileRoute("/_authenticated/app/")({
 
 function CustomerHome() {
   const { t } = useTranslation(["customer", "common"]);
-  const { user } = useAuth();
+  const { user, isStaff } = useAuth();
   const navigate = useNavigate({ from: "/app" });
   const search = Route.useSearch();
   const state: DashboardStateId = search.state ?? "default";
@@ -79,18 +79,20 @@ function CustomerHome() {
         subtitle={t("customer:assistantHint")}
       />
 
-      <DashboardStateSwitcher
-        states={stateOptions}
-        current={state}
-        onSelect={(id) =>
-          navigate({
-            search: () => ({
-              state: id === "default" ? undefined : (id as DashboardStateId),
-            }),
-          })
-        }
-        label={t("customer:dashboardState")}
-      />
+      {isStaff ? (
+        <DashboardStateSwitcher
+          states={stateOptions}
+          current={state}
+          onSelect={(id) =>
+            navigate({
+              search: () => ({
+                state: id === "default" ? undefined : (id as DashboardStateId),
+              }),
+            })
+          }
+          label={t("customer:dashboardState")}
+        />
+      ) : null}
 
       <DashboardBody state={state} tagLabels={tagLabels} statusLabels={statusLabels} />
     </div>
