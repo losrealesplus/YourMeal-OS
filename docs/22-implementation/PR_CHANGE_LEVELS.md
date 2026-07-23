@@ -50,6 +50,20 @@ Rompe trazabilidad y confunde el historial de GitHub (evidencia del proyecto).
 
 ---
 
+## Anti-patrón «ya que estamos»
+
+En Capability PRs está prohibido añadir de paso:
+
+- filtros / búsqueda / favoritos  
+- mejoras de tarjeta / colores / animaciones  
+- optimizaciones de dashboard no relacionadas  
+
+Eso es riesgo **organizativo**, no técnico: pierde la disciplina FOPEBA ↔ código.
+
+> Un PR · una Capability · un nivel de cambio.
+
+---
+
 ## Capability PRs — checklist
 
 - [ ] Un solo CAP-00x  

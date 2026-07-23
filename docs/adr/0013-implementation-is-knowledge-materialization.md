@@ -39,12 +39,14 @@ ADR 0013 fija la **epistemología de la implementación**: el código materializ
 
 ## Consecuencias
 
-- Etapa 2 se mide por CAP × estado (Scaffold→Field Validated), no por pantallas.  
-- El primer pedido real valida reproducción del modelo, no improvisación.  
+- Objetivo del proyecto (desde CAP-002): demostrar que FOPEBA produce software operacional de alta calidad.  
+- Etapa 2 se organiza en Levels 1–4 ([ETAPA_2_LEVELS](../22-implementation/ETAPA_2_LEVELS.md)) y se mide por CAP × estado × [Knowledge Coverage](../22-implementation/KNOWLEDGE_COVERAGE.md), no por pantallas.  
+- Hito: primer Happy Path sin mocks — no «una CAP más».  
 - Superseder esta ADR requiere evidencia y un ADR nuevo explícito.
 
 ## Relacionado
 
 - [IMPLEMENTATION_PHILOSOPHY](../23-engineering/IMPLEMENTATION_PHILOSOPHY.md)  
+- [ETAPA_2_LEVELS](../22-implementation/ETAPA_2_LEVELS.md)  
 - [CURSOR_MASTER_PROMPT](../22-implementation/CURSOR_MASTER_PROMPT.md)  
 - [ADR 0012](./0012-cursor-cto-lovable-ui.md)
