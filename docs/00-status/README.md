@@ -5,7 +5,7 @@
 **Dominios:** [PROJECT_DOMAINS](./PROJECT_DOMAINS.md) — Knowledge · Engineering · Experience · Operations  
 **Engineering Phase:** [ENGINEERING_PHASE](./ENGINEERING_PHASE.md) — Complete (pending operational authorization)  
 **Última integración:** [IR-001](./IR-001_FIRST_ENGINEERING_INTEGRATION.md) · PR #22  
-**Pre-piloto:** [PRE_PILOT_AUDIT](./PRE_PILOT_AUDIT.md)  
+**Pre-piloto:** [PRE_PILOT_AUDIT](./PRE_PILOT_AUDIT.md) · [Functional Completeness Review](./EATCLEAN_PILOT_FUNCTIONAL_COMPLETENESS_REVIEW.md)  
 **Gobernanza:** [Acta — Fin construcción metodológica](./ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) **Cerrada**  
 **Historia:** [MILESTONES](./MILESTONES.md)  
 **Auditoría ingeniería:** [ENGINEERING_REVIEW_SPRINT0](./ENGINEERING_REVIEW_SPRINT0.md)  

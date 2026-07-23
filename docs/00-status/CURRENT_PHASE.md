@@ -16,6 +16,7 @@ Next Discipline:   Operational Engineering
 Primary Artifact:  Field Evidence
 Focus operativo:   ¿Está listo para evidencia? · Smoke HP-001 · ORR
 Focus experiencia: ¿Mi madre podría pedir sin que nadie le explique la app?
+Completitud UI:    [Functional Completeness Review](./EATCLEAN_PILOT_FUNCTIONAL_COMPLETENESS_REVIEW.md) — 🔴 ops mock · settings muertos
 Last Baseline:     v0.2.0-engineering-baseline (IR-001)
 
 ══════════════════════════════════════════════════
