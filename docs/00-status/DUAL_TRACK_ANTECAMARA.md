@@ -64,11 +64,15 @@ Dish Library / Module 01 (ya validado) = excepción histórica.
 
 **No más Lovable para infraestructura.** Cursor toma el relevo.
 
-1. [CURSOR_MASTER_PROMPT](../22-implementation/CURSOR_MASTER_PROMPT.md) — contexto permanente  
-2. **[CAP-002](../22-implementation/caps/CAP-002-dish-catalog.md)** — una capability  
-3. [Philosophy](../23-engineering/IMPLEMENTATION_PHILOSOPHY.md)
+**Objetivo:** demostrar que FOPEBA produce software operacional de alta calidad.  
+**Hito:** [Primer Happy Path sin mocks](../22-implementation/HAPPY_PATH_E2E.md) — no «CAP-002 terminada».
 
-Mentalidad: **conectar capacidades**, no implementar pantallas.
+1. [ETAPA_2_LEVELS](../22-implementation/ETAPA_2_LEVELS.md) — L1→L4  
+2. [CURSOR_MASTER_PROMPT](../22-implementation/CURSOR_MASTER_PROMPT.md) — contexto permanente  
+3. **[CAP-002](../22-implementation/caps/CAP-002-dish-catalog.md)** — Level 2 · solo lectura · un PR  
+4. [Philosophy](../23-engineering/IMPLEMENTATION_PHILOSOPHY.md)
+
+Mentalidad: **conectar capacidades**, no implementar pantallas. Sin «ya que estamos…».
 
 ---
 
