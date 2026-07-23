@@ -57,7 +57,8 @@ const DEFAULT_ACCENT = "#eff4f1";
 
 function AdminBrandingPage() {
   const { t } = useTranslation("branding");
-  const { tenantId, userId, roles } = useAuth();
+  const { tenantId, user, roles } = useAuth();
+  const userId = user?.id ?? null;
   const queryClient = useQueryClient();
   const { colors, logoUrl, isLoading } = useTenantBrand();
 
