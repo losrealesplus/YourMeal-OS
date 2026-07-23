@@ -2939,12 +2939,13 @@ Un piloto **no** comienza cuando el producto tiene más funcionalidades, sino cu
 - Firmar ORR del piloto.
 - Pasar **G-02 · Pilot Readiness** antes de campo.
 - Documentar Explicit Uncertainty (limitaciones conocidas).
+- Cumplir **No Artificiality** (G-02.7): ninguna intervención manual silenciosa para “salvar” un Journey.
 
 ## No significa
 “Más features antes del piloto” · cobertura 100 % · Release v1.0.
 
 ## Palabras relacionadas
-Gate · G-02 · Explicit Uncertainty · Operational Integrity · Evidence · Knowledge First
+Gate · G-02 · Explicit Uncertainty · Operational Integrity · Evidence · Knowledge First · No Artificiality
 
 ## Referencias
 [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md) · [PILOT_ACCEPTANCE_CHECKLIST](../00-status/PILOT_ACCEPTANCE_CHECKLIST.md)
@@ -3006,4 +3007,5 @@ FOPEBA · Gate · G-02 · Pilot Integrity · FOV · Knowledge Update
 | 2026-07-23 | Tenant-Managed · Tenant Brand · brand.manage · DICT-060…062 |
 | 2026-07-23 | Foundation of Materialization Frozen · Four Layers · Pilot Execution Guide |
 | 2026-07-23 | Gate G-02 Pilot Readiness · DICT-069 Pilot Integrity · DICT-070 Reference Implementation (RI) |
+| 2026-07-23 | G-02.7 No Artificiality · taxonomía Evidence/KU/Correction/Pilot Fix · RI-001 ≠ v1.0 |
 

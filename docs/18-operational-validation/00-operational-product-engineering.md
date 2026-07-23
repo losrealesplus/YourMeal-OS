@@ -178,6 +178,10 @@ FOUNDATION → BLUEPRINT → DISCOVERY → CHECKS → MODEL
 > Antes de G-02: **cerrar o esconder huecos**, firmar ORR, **no abrir módulos nuevos**.  
 > Ampliar alcance introduce incertidumbre evitable; FOPEBA exige reducirla primero.
 
+**G-02 = Pilot Authorization ≠ Release.** Tras PASSED, el siguiente artefacto es **evidencia**, no un PR de arquitectura.  
+Cambios en fase RI: Evidence PR · KU PR · Correction PR · Pilot Fix · Operational Finding.  
+**No Artificiality (G-02.7):** ninguna intervención manual silenciosa (SQL, bypass, datos inventados) para completar un Journey — toda intervención es evidencia.
+
 Ver: [Gate G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md) · [Pilot Integrity](../99-reference/PROJECT_DICTIONARY.md#pilot-integrity).
 
 ---

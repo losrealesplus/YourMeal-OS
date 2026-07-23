@@ -257,13 +257,28 @@ G-02 **no certifica el producto**. Certifica que la **hipótesis operacional** e
 
 | # | Condición | Evidencia aquí |
 |---|-----------|----------------|
-| 1 | Journey completo E2E | § 4 · ciclo de pedido |
-| 2 | Estados del ciclo consistentes | Cocina/Reparto · timeline · persistencia |
-| 3 | Sin bloqueadores en flujo principal | Tabla maestra · § 1–3 camino crítico |
-| 4 | Huecos documentados y no comprometedores | § Huecos conocidos |
-| 5 | Limitaciones explícitas (Explicit Uncertainty) | Filas 🟡 / ❌ + fuera de alcance firmado |
-| 6 | ORR del piloto firmados | § ORR |
-| 7 | Trazabilidad evidencia ↔ modelo ↔ implementación | ORR · ADR · esta hoja |
+| G-02.1 | Journey completo E2E | § 4 · ciclo de pedido |
+| G-02.2 | Estados del ciclo consistentes | Cocina/Reparto · timeline · persistencia |
+| G-02.3 | Sin bloqueadores en flujo principal | Tabla maestra · § 1–3 camino crítico |
+| G-02.4 | Huecos documentados y no comprometedores | § Huecos conocidos |
+| G-02.5 | Limitaciones explícitas (Explicit Uncertainty) | Filas 🟡 / ❌ + fuera de alcance firmado |
+| G-02.6 | ORR del piloto firmados | § ORR |
+| G-02.7 | **No Artificiality** | § No Artificiality (abajo) |
+| G-02.8 | Trazabilidad evidencia ↔ modelo ↔ implementación | ORR · ADR · esta hoja |
+
+### G-02.7 · No Artificiality
+
+Durante el piloto **no** podrán utilizarse:
+
+- datos inventados para ocultar errores
+- procesos manuales no documentados
+- cambios directos en la base de datos para completar un Journey
+- bypass de permisos
+- simulaciones que oculten una limitación conocida
+
+Toda intervención manual necesaria para completar una operación deberá registrarse como **evidencia operacional**.
+
+> Arreglar un pedido en SQL para que el flujo continúe **no** es un detalle técnico: es evidencia de un hueco del modelo que alimenta el siguiente Knowledge Update.
 
 ### No exige
 
@@ -286,8 +301,10 @@ Funcionalidad completa · cobertura 100 % · UX pulida · escalabilidad · autom
 
 ### Si G-02 = PASSED
 
-YourMeal OS deja de comportarse solo como proyecto de software y opera como **RI-001** ([DICT-070](../99-reference/PROJECT_DICTIONARY.md#reference-implementation-ri)): fase de **validación operacional** / experimento controlado.  
-No es el final del desarrollo: es el **inicio** de la obtención de evidencia que determinará cuánto del conocimiento actual resiste el contacto con la operación.
+YourMeal OS opera como **RI-001**: empieza el **experimento controlado**.  
+La pregunta principal deja de ser *«¿qué funcionalidad desarrollamos?»* y pasa a ser *«¿qué nos enseña la operación real sobre nuestro modelo?»*.
+
+Cambios posteriores se clasifican como: **Evidence PR · KU PR · Correction PR · Pilot Fix · Operational Finding** — ver [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md).
 
 ### Si G-02 = BLOCKED
 
