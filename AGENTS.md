@@ -94,18 +94,19 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ## Fase actual
 
 ```text
-Metodología cerrada · FOPEBA Frozen 🧊 · Materialización HP-001
+Metodología cerrada (Acta) · FOPEBA Frozen 🧊 · Materialización HP-001
 Pregunta: ¿Cuál es la siguiente Capability? (no la siguiente regla)
-Hito: HP-001 · Operational · ORR Passed · Ready for FOV
+Hito: HP-001 · Operational · ORR PASSED · Ready for FOV
 ```
 
 > Cursor no implementa funcionalidades. Conecta **capacidades** certificadas.  
 > Regla nueva → **STOP** · `REQUIRES KNOWLEDGE REVIEW` · Carril A.  
-> Sin documentos metodológicos nuevos hasta FOV.
+> Sin documentos metodológicos nuevos hasta FOV (gobernanza: Acta).
 
 **Contexto:** [CURSOR_MASTER_PROMPT](./docs/22-implementation/CURSOR_MASTER_PROMPT.md)  
-**Siguiente:** [CAP-006 Order Confirmation](./docs/22-implementation/caps/CAP-006-order-confirmation.md)  
-**Cierre metodológico:** [05-methodology-construction-closed](./docs/00-status/05-methodology-construction-closed.md)  
+**Siguiente:** [CAP-006 Order Confirmation](./docs/22-implementation/caps/CAP-006-order-confirmation.md) — solo Confirm  
+**Cierre metodológico:** [Acta](./docs/00-status/ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md)  
+**Historia:** [MILESTONES](./docs/00-status/MILESTONES.md)  
 **Filosofía:** [IMPLEMENTATION_PHILOSOPHY](./docs/23-engineering/IMPLEMENTATION_PHILOSOPHY.md)
 
 | Herramienta | Rol |

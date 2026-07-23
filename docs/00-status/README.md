@@ -1,8 +1,9 @@
 # Estado del proyecto
 
 **Última actualización:** 2026-07-23  
-**Fase metodológica:** [cerrada](./05-methodology-construction-closed.md)  
-**Hito operativo:** `HP-001 · Operational · ORR Passed · Ready for FOV` (en curso)
+**Gobernanza:** [Acta — Fin construcción metodológica](./ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) **Cerrada**  
+**Historia:** [MILESTONES](./MILESTONES.md)  
+**Hito operativo:** `HP-001 · Operational · ORR PASSED · Ready for FOV`
 
 > Pregunta: **¿Cuál es la siguiente Capability?** — no la siguiente regla.
 
@@ -20,14 +21,16 @@
 | CAP-006 Confirm | ⏳ | ⏳ | Scaffold | ✖ |
 | CAP-007 History | ⏳ | ⏳ | Scaffold | ✖ |
 
-**Siguiente:** [CAP-006](../22-implementation/caps/CAP-006-order-confirmation.md) → [ORR](../22-implementation/ORR.md) (sin features).
+**Siguiente:** [CAP-006](../22-implementation/caps/CAP-006-order-confirmation.md) — solo `Draft→Confirm→Persist→Audit→Invalidate`.  
+Luego: [ORR](../22-implementation/ORR.md) → **PASSED \| BLOCKED** → Phase 3 FOV.
 
 ---
 
-## Carril A
+## Carril A / Phase 3
 
-FOV · KU · EC · G-01 — tras ORR Passed.
+Tras ORR **PASSED**: Field Operational Validation (FOV).  
+No abrir FOV con ORR **BLOCKED**.
 
 ## Índices
 
-[22 Implementation](../22-implementation/README.md) · [Freeze](./04-methodology-frozen.md) · [FOV Brief](./FOV_MISSION_BRIEF.md)
+[Acta](./ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) · [MILESTONES](./MILESTONES.md) · [Freeze](./04-methodology-frozen.md) · [22 Implementation](../22-implementation/README.md) · [FOV Brief](./FOV_MISSION_BRIEF.md)

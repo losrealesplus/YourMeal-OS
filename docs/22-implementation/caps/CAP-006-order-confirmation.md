@@ -1,18 +1,35 @@
 # CAP-006 — Order Confirmation
 
-**Estado:** Connected → **Operational** (Happy Path)  
-**Depende de:** CAP-005  
-**Puente FOV:** [HAPPY_PATH_E2E](../HAPPY_PATH_E2E.md)
+**Estado:** Scaffold → **Operational** (cierra HP-001)  
+**Depende de:** CAP-001…005 Connected  
+**ORR:** tras este CAP → puerta [PASSED \| BLOCKED](../ORR.md)
 
 ---
 
-## Objetivo
+## Preconditions
 
-Confirmar pedido con persistencia real + `audit_log`. Citar lifecycle OM de confirmación. Sin mocks.
+- CAP-005 Connected (resumen real del Draft)  
+- Auth · tenant · Order Draft existente  
 
-## No modificar
+## Postconditions
 
-UX de confirmación · navegación.
+- Transición **Draft → Confirmed** persistida  
+- `audit_log` en el mismo flujo de mutación  
+- Query invalidation · UI muestra estado confirmado  
+- Sin mocks en el recorrido de confirmación  
+- Typecheck limpio  
+
+---
+
+## Única responsabilidad
+
+```text
+Draft → Confirm → Persist → Audit → Invalidate → Estado confirmado
+```
+
+## Fuera de alcance (este PR)
+
+Notificaciones · correos · integraciones · CAP-007 historial · UX nueva · reglas OM nuevas.
 
 ## Traceability
 
@@ -20,17 +37,15 @@ UX de confirmación · navegación.
 |-------|-------|
 | Core | Order |
 | OM | Order Lifecycle · Confirm |
-| Infra | Supabase · auditService · RLS |
+| Patrón | [MUTATION_PATTERN](../MUTATION_PATTERN.md) |
+| Mock / Real | Real |
 
 ## Prompt
 
 ```text
-Implementar CAP-006 Order Confirmation.
-No modificar UX ni componentes.
-Persistir Order en Supabase con RLS.
-Emitir audit_log (Who/What/When/Old/New/Tenant).
-Citar referencia OM del lifecycle Confirm.
-Sin mocks. Typecheck limpio. Formato de cierre oficial.
-Estado objetivo: Operational (Happy Path).
-Si falta una regla en el OM: DETENER · REQUIRES KNOWLEDGE REVIEW.
+CAP-006 — solo Draft→Confirm→Persist→Audit→Invalidate.
+Sin notificaciones, emails ni integraciones.
+Sin UX nueva. Sin reglas OM nuevas.
+Si falta regla: STOP · REQUIRES KNOWLEDGE REVIEW.
+Estado: Operational (HP-001).
 ```
