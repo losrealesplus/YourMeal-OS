@@ -7,6 +7,8 @@ type Props = {
   title: ReactNode;
   subtitle?: ReactNode;
   backTo?: string;
+  /** Presentation-only back (e.g. previous step in a flow). */
+  onBack?: () => void;
   trailing?: ReactNode;
 };
 
@@ -14,21 +16,43 @@ type Props = {
  * Cabecera unificada de la Customer App.
  * Mobile-first, tipografía dominante, ritmo vertical calmo.
  */
-export function ScreenHeader({ overline, title, subtitle, backTo, trailing }: Props) {
+export function ScreenHeader({
+  overline,
+  title,
+  subtitle,
+  backTo,
+  onBack,
+  trailing,
+}: Props) {
+  const backControl = onBack ? (
+    <button
+      type="button"
+      onClick={onBack}
+      className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground mb-3 -ml-1 hover:text-foreground transition-colors"
+    >
+      <ChevronLeft className="size-4" />
+      <span className="uppercase tracking-widest">Back</span>
+    </button>
+  ) : backTo ? (
+    <Link
+      to={backTo}
+      className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground mb-3 -ml-1 hover:text-foreground transition-colors"
+    >
+      <ChevronLeft className="size-4" />
+      <span className="uppercase tracking-widest">Back</span>
+    </Link>
+  ) : null;
+
   return (
     <header className="px-6 pt-10 pb-5">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          {backTo ? (
-            <Link
-              to={backTo}
-              className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground mb-3 -ml-1 hover:text-foreground transition-colors"
-            >
-              <ChevronLeft className="size-4" />
-              <span className="uppercase tracking-widest">Back</span>
-            </Link>
-          ) : overline ? (
+          {backControl}
+          {!backControl && overline ? (
             <p className="meta-label">{overline}</p>
+          ) : null}
+          {backControl && overline ? (
+            <p className="meta-label mb-1">{overline}</p>
           ) : null}
           <h1 className="text-[30px] leading-[1.1] font-extrabold tracking-tight mt-1.5 text-balance">
             {title}
