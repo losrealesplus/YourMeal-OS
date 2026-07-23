@@ -24,13 +24,15 @@
 
 ## Siguiente
 
-**[CAP-006 Order Confirmation](./caps/CAP-006-order-confirmation.md)** → **ORR** → FOV.
+**[ORR](./ORR.md)** — puerta binaria PASSED \| BLOCKED (sin features).  
+Luego Phase 3 FOV.
 
 | CAP | Estado |
 |-----|--------|
 | 001–005 | Connected |
-| 006–007 | Scaffold |
+| 006 Confirm | Operational (HP-001) |
+| 007 | Scaffold |
 | Business logic inventada | 🔒 STOP |
 
-Fase metodológica: [Acta](../00-status/ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) · [MILESTONES](../00-status/MILESTONES.md).
+[PRE_PILOT_AUDIT](../00-status/PRE_PILOT_AUDIT.md) · [Acta](../00-status/ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) · [MILESTONES](../00-status/MILESTONES.md).
 

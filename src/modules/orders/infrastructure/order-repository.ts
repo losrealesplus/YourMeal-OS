@@ -19,10 +19,32 @@ export type ProgramOrderInput = {
 };
 
 /**
- * Persistence only — CAP-004 draft programming.
- * No confirm transition (CAP-006).
+ * Persistence only — CAP-004 draft · CAP-006 confirm.
  */
 export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
+  async function findByIdWithItems(
+    orderId: string,
+  ): Promise<{ order: OrderRow; items: OrderItemRow[] } | null> {
+    const { data: order, error: orderError } = await supabase
+      .from("orders")
+      .select("*")
+      .eq("tenant_id", tenantId)
+      .eq("id", orderId)
+      .maybeSingle();
+    if (orderError) throw orderError;
+    if (!order) return null;
+
+    const { data: items, error: itemsError } = await supabase
+      .from("order_items")
+      .select("*")
+      .eq("tenant_id", tenantId)
+      .eq("order_id", orderId)
+      .order("day_date", { ascending: true });
+    if (itemsError) throw itemsError;
+
+    return { order: order as OrderRow, items: (items ?? []) as OrderItemRow[] };
+  }
+
   return {
     async findCustomerIdForUser(userId: string): Promise<string | null> {
       const { data, error } = await supabase
@@ -71,27 +93,29 @@ export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
       return { order: order as OrderRow, items: (items ?? []) as OrderItemRow[] };
     },
 
-    async findByIdWithItems(
-      orderId: string,
-    ): Promise<{ order: OrderRow; items: OrderItemRow[] } | null> {
-      const { data: order, error: orderError } = await supabase
+    findByIdWithItems,
+
+    /** CAP-006 — atomic Draft → Confirmed. */
+    async confirmDraft(orderId: string): Promise<{ old: OrderRow; order: OrderRow }> {
+      const current = await findByIdWithItems(orderId);
+      if (!current) {
+        throw new Error(`Order not found: ${orderId}`);
+      }
+      if (current.order.status !== "draft") {
+        throw new Error(`Order ${orderId} is not draft (status=${current.order.status})`);
+      }
+
+      const { data: order, error } = await supabase
         .from("orders")
-        .select("*")
+        .update({ status: "confirmed" })
         .eq("tenant_id", tenantId)
         .eq("id", orderId)
-        .maybeSingle();
-      if (orderError) throw orderError;
-      if (!order) return null;
-
-      const { data: items, error: itemsError } = await supabase
-        .from("order_items")
+        .eq("status", "draft")
         .select("*")
-        .eq("tenant_id", tenantId)
-        .eq("order_id", orderId)
-        .order("day_date", { ascending: true });
-      if (itemsError) throw itemsError;
+        .single();
+      if (error) throw error;
 
-      return { order: order as OrderRow, items: (items ?? []) as OrderItemRow[] };
+      return { old: current.order, order: order as OrderRow };
     },
   };
 }

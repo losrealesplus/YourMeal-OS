@@ -96,7 +96,7 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 ```text
 Metodología cerrada (Acta) · FOPEBA Frozen 🧊 · Materialización HP-001
 Pregunta: ¿Cuál es la siguiente Capability? (no la siguiente regla)
-Etapa 2: L1✅ · L2 CAP-002…005 Connected · L3 CAP-006 siguiente · L4 FOV
+Etapa 2: L1✅ · L2 CAP-002…005 Connected · L3 CAP-006 Operational · L4 ORR/FOV
 Hito: HP-001 · Operational · ORR PASSED · Ready for FOV
 ```
 
@@ -107,7 +107,9 @@ Hito: HP-001 · Operational · ORR PASSED · Ready for FOV
 
 **Contexto permanente:** [CURSOR_MASTER_PROMPT](./docs/22-implementation/CURSOR_MASTER_PROMPT.md)  
 **Niveles:** [ETAPA_2_LEVELS](./docs/22-implementation/ETAPA_2_LEVELS.md) · [KNOWLEDGE_COVERAGE](./docs/22-implementation/KNOWLEDGE_COVERAGE.md)  
-**Siguiente:** [CAP-006 Order Confirmation](./docs/22-implementation/caps/CAP-006-order-confirmation.md) — solo Confirm  
+**Siguiente:** [ORR](./docs/22-implementation/ORR.md) (PASSED \| BLOCKED) — sin features  
+**Pre-piloto:** [PRE_PILOT_AUDIT](./docs/00-status/PRE_PILOT_AUDIT.md)  
+
 **Cierre metodológico:** [Acta](./docs/00-status/ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md)  
 **Historia:** [MILESTONES](./docs/00-status/MILESTONES.md)  
 **PRs:** un nivel por PR — [PR_CHANGE_LEVELS](./docs/22-implementation/PR_CHANGE_LEVELS.md)  

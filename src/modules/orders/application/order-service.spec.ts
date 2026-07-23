@@ -38,4 +38,8 @@ describe("OrderService.programDraft", () => {
       }),
     ).rejects.toBeTruthy();
   });
+
+  it("rejects confirm without orderId", async () => {
+    await expect(OrderService.confirm(ctx(), "")).rejects.toBeInstanceOf(DomainError);
+  });
 });

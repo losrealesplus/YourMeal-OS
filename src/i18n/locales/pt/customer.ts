@@ -51,6 +51,7 @@ export default {
   tagSpicy: "Picante",
   statusPending: "Pendente",
   statusDraft: "Rascunho",
+  statusConfirmed: "Confirmado",
   statusPreparing: "Em preparação",
   statusDispatched: "Em entrega",
   statusDelivered: "Entregue",
