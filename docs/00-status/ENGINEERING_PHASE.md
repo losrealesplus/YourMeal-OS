@@ -2,7 +2,7 @@
 
 **Fecha:** 2026-07-23  
 **Baseline:** `v0.2.0-engineering-baseline` (IR-001)  
-**Hardening:** PR #23 → `main` ✅ · **Dictionary:** PR #24 ⏳
+**Hardening:** PR #23 → `main` ✅ · **Identity / Experience:** PR #25 ⏳
 
 ```text
 Engineering Phase
@@ -11,37 +11,42 @@ Status:
 Complete (pending operational authorization)
 
 Documentary stack:
-Closed (post-Dictionary)
+Closed (Dictionary · ADR-0014 · Experience domain)
 
 Next Gate:
 ORR
 
 Next Discipline:
-Operational Engineering
+Operational Engineering (+ Experience en paralelo)
 
 Primary Artifact:
 Field Evidence
 
-Focus:
-HP-001 end-to-end (no más metodología)
+Focus operativo:
+HP-001 end-to-end
+Focus experiencia:
+¿Mi madre podría pedir sin ayuda? (CJ-001)
 ```
 
 ---
 
 ## Dominios oficiales
 
-| Dominio | Estado |
-|---------|--------|
-| Knowledge Engineering | ✅ Frozen / Closed |
-| Software Engineering | ✅ Implementado · ✅ #23 en main |
-| Operational Engineering | ⏳ Pendiente de ORR PASSED |
+Mapa: [PROJECT_DOMAINS](./PROJECT_DOMAINS.md).
+
+| Dominio | Entregable | Estado |
+|---------|------------|--------|
+| Knowledge | Operational Model | ✅ Frozen / Closed |
+| Engineering | Código | ✅ #23 en main |
+| Experience | Journeys + Screens | 🟡 CJ-001 · SCR-001…012 |
+| Operations | Evidencia | ⏳ Smoke → ORR → FOV |
 
 ---
 
 ## Cadena de decisión (sin pasos extra)
 
 ```text
-#24 → main → Apply migration → Smoke HP-001 → ORR → PASSED → Ready for FOV → FOV-001
+#25 → main → Apply migration → Smoke HP-001 → ORR → PASSED → Ready for FOV → FOV-001
 ```
 
 ---

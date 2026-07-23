@@ -178,6 +178,8 @@ Core | Operational | Engineering | Historical
 | `DICT-052` | [Tenant Assets](#tenant-assets) | Engineering | Accepted |
 | `DICT-053` | [Experience First](#experience-first) | Core | Accepted |
 | `DICT-054` | [Customer Journey](#customer-journey) | Operational | Accepted |
+| `DICT-055` | [Experience Domain](#experience-domain) | Core | Accepted |
+| `DICT-056` | [Screen (SCR)](#screen-scr) | Engineering | Accepted |
 
 ---
 
@@ -209,7 +211,7 @@ Core | Operational | Engineering | Historical
 
 ### Identidad SaaS (ADR 0014)
 
-[Customer Application](#customer-application) (`DICT-045`) · [YourMeal OS (Corporate Surface)](#yourmeal-os-corporate-surface) (`DICT-046`) · [BrandConfig](#brandconfig) (`DICT-047`) · [Tenant-Branded](#tenant-branded) (`DICT-048`) · [Powered by YourMeal OS](#powered-by-yourmeal-os) (`DICT-049`) · [Platform owns capability / Tenant owns experience](#platform-owns-capability--tenant-owns-experience) (`DICT-050`) · [Tenant Experience Spec](#tenant-experience-spec) (`DICT-051`) · [Tenant Assets](#tenant-assets) (`DICT-052`) · [Experience First](#experience-first) (`DICT-053`) · [Customer Journey](#customer-journey) (`DICT-054`)
+[Customer Application](#customer-application) (`DICT-045`) · [YourMeal OS (Corporate Surface)](#yourmeal-os-corporate-surface) (`DICT-046`) · [BrandConfig](#brandconfig) (`DICT-047`) · [Tenant-Branded](#tenant-branded) (`DICT-048`) · [Powered by YourMeal OS](#powered-by-yourmeal-os) (`DICT-049`) · [Platform owns capability / Tenant owns experience](#platform-owns-capability--tenant-owns-experience) (`DICT-050`) · [Tenant Experience Spec](#tenant-experience-spec) (`DICT-051`) · [Tenant Assets](#tenant-assets) (`DICT-052`) · [Experience First](#experience-first) (`DICT-053`) · [Customer Journey](#customer-journey) (`DICT-054`) · [Experience Domain](#experience-domain) (`DICT-055`) · [Screen (SCR)](#screen-scr) (`DICT-056`)
 
 ---
 
@@ -2395,6 +2397,90 @@ Experience First · CJ-001 · Tenant Experience Spec
 [CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md)
 
 
+
+---
+
+# Experience Domain
+
+## ID
+DICT-055
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Experience Domain
+
+## Tipo
+Dominio del proyecto
+
+## Definición
+Cuarto dominio de YourMeal OS junto a Knowledge, Engineering y Operations. Entregable: Customer Journeys + Screens. No es conocimiento ni implementación: es cómo el usuario final vive el producto (Tenant-Branded · Experience First).
+
+## Cuándo ocurre
+Diseño de Customer App · Experience Refactor · onboarding de Tenant.
+
+## Produce
+CJ-xxx · SCR-xxx · BrandConfig / Tenant Assets aplicados a pantallas.
+
+## No significa
+Operational Model · código de plataforma · evidencia de campo (Operations).
+
+## Sinónimos
+Dominio Experience · capa Experience
+
+## Palabras relacionadas
+Experience First · Customer Journey · Screen (SCR) · Tenant-Branded
+
+## Referencias
+[PROJECT_DOMAINS](../00-status/PROJECT_DOMAINS.md) · [07-experience](../07-experience/README.md)
+
+---
+
+# Screen (SCR)
+
+## ID
+DICT-056
+
+## Status
+Accepted
+
+## Madurez
+Engineering
+
+## Nombre
+Screen (SCR)
+
+## Tipo
+Artefacto de experiencia
+
+## Definición
+Pantalla de la Customer Application identificada como `SCR-xxx`. Debe pertenecer exactamente a un Customer Journey y puede trazar Capabilities, objetos del OM y Evidence.
+
+Regla: ninguna pantalla existe por sí sola.
+
+## Cuándo ocurre
+Inventario MVP · Experience Refactor · auditoría de UX.
+
+## Produce
+UI justificada por un journey · trazabilidad Journey → Screen → Capability.
+
+## No significa
+Ruta técnica suelta · módulo de back office · pantalla «por si acaso».
+
+## Sinónimos
+SCR-xxx · pantalla de journey
+
+## Palabras relacionadas
+Customer Journey · Experience First · Capability
+
+## Referencias
+[CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md)
+
+
 ## Historial de este diccionario
 
 | Fecha | Cambio |
@@ -2407,4 +2493,5 @@ Experience First · CJ-001 · Tenant Experience Spec
 | 2026-07-23 | TENANT_EXPERIENCE_SPEC EatClean · DICT-051 · consecuencia BrandConfig-only |
 | 2026-07-23 | TENANT_IMPLEMENTATION_EATCLEAN · `tenants/eatclean/` · DICT-052 Tenant Assets |
 | 2026-07-23 | Experience First · CUSTOMER_JOURNEYS · DICT-053/054 |
+| 2026-07-23 | Experience Domain · SCR trazabilidad · DICT-055/056 · PROJECT_DOMAINS |
 

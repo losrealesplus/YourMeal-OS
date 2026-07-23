@@ -1,8 +1,9 @@
 # 07 · Experience
 
-Capa de **experiencia del usuario final** (Customer Application).
+**Cuarto dominio** de YourMeal OS (junto a Knowledge · Engineering · Operations).  
+Ver mapa completo: [PROJECT_DOMAINS](../00-status/PROJECT_DOMAINS.md).
 
-Complementa al Operational Model:
+Capa de **experiencia del usuario final** (Customer Application).
 
 | Documento | Responde a |
 |-----------|------------|
@@ -27,17 +28,51 @@ La capability no cambia. La pantalla se diseña desde el **recorrido del usuario
 
 > ¿Mi madre podría hacer un pedido sin que nadie le explique la app?
 
-No: «¿Está bien implementado?»
+Si un usuario nuevo necesita explicación para completar **CJ-001**, hay que mejorar la experiencia — aunque el flujo técnico funcione.
+
+## Regla de pantallas
+
+> **Ninguna pantalla existe por sí sola. Toda pantalla pertenece exactamente a un Customer Journey.**
+
+```text
+Customer Journey → Screen → Capability
+```
+
+Nunca al revés. Evita pantallas «porque podrían ser útiles».
+
+## Trazabilidad de pantalla (SCR)
+
+Campo opcional — extensión natural OM ↔ implementación:
+
+```yaml
+Screen:
+  id: SCR-006
+  name: Weekly Menu
+Journey: CJ-001
+Capabilities:
+  - CAP-003
+  - CAP-004
+Operational Objects:
+  - Weekly Menu
+  - Order
+Evidence:
+  - FOV-001   # cuando exista
+```
+
+Cada pantalla debe poder responder: ¿por qué existe? · ¿qué capability? · ¿qué objeto OM? · ¿qué evidencia?
+
+Inventario SCR del MVP: [CUSTOMER_JOURNEYS § Pantallas](./CUSTOMER_JOURNEYS.md#inventario-de-pantallas-mvp--12-15).
 
 ## Documentos
 
 | Doc | Rol |
 |-----|-----|
-| [CUSTOMER_JOURNEYS](./CUSTOMER_JOURNEYS.md) | Recorridos CJ-xxx · pantallas MVP |
+| [CUSTOMER_JOURNEYS](./CUSTOMER_JOURNEYS.md) | Recorridos CJ-xxx · pantallas MVP · SCR |
 | [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md) | Identidad EatClean |
 | [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) | Brief Cursor/Lovable |
+| [PROJECT_DOMAINS](../00-status/PROJECT_DOMAINS.md) | Mapa de cuatro dominios |
 
 ## Relacionado
 
-- [07-user-flows](../07-user-flows/README.md) — flujos técnicos / rutas (auth, roles)  
-- ADR [0014](../adr/0014-customer-application-is-tenant-branded.md) · [DICT-050](../99-reference/PROJECT_DICTIONARY.md)
+- [07-user-flows](../07-user-flows/README.md) — flujos técnicos / rutas  
+- ADR [0014](../adr/0014-customer-application-is-tenant-branded.md) · Dictionary Experience First / Customer Journey / Screen

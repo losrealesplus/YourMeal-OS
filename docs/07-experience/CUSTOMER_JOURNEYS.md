@@ -72,38 +72,63 @@ Splash · Bienvenida · Beneficios · Login · Home · Menú semanal · Detalle 
 
 No más para la primera versión publicada.
 
+### Regla
+
+> **Ninguna pantalla existe por sí sola. Toda pantalla pertenece exactamente a un Customer Journey.**
+
+Trazabilidad opcional por pantalla (`SCR-xxx`): Journey · Capabilities · Operational Objects · Evidence.
+
 ### Onboarding
 
-| Pantalla | Notas |
-|----------|--------|
-| Splash | Logo EatClean · Powered by discreto |
-| Bienvenida | Tono Tenant |
-| Beneficios | 1 pantalla (máx. 2–3 onboarding total con bienvenida) |
-| Login / Registro | Copy Tenant — nunca «tu operación» |
+| SCR | Pantalla | Journey | Capabilities (trazas) | Objetos OM |
+|-----|----------|---------|------------------------|------------|
+| SCR-001 | Splash | CJ-001 | auth | — |
+| SCR-002 | Bienvenida | CJ-001 | — (experiencia) | — |
+| SCR-003 | Beneficios | CJ-001 | — (experiencia) | — |
+| SCR-004 | Login / Registro | CJ-001 | auth / profile | Customer |
 
 ### Cliente
 
-| Pantalla | Notas |
-|----------|--------|
-| Home | App de comida · CTA Programar pedido |
-| Menú semanal | Selección de platos |
-| Detalle de plato | Macros · alérgenos · foto real |
-| Cesta / Resumen | Incluye resumen nutricional |
-| Confirmación | Pedido realizado |
-| Historial | Pedidos pasados |
-| Perfil | Datos · direcciones · preferencias |
-| Configuración / Acerca de | Powered by aquí |
+| SCR | Pantalla | Journey | Capabilities (trazas) | Objetos OM |
+|-----|----------|---------|------------------------|------------|
+| SCR-005 | Home | CJ-001 | `orders.schedule` · `weekly-menu.browse` | Order · WeeklyMenu |
+| SCR-006 | Menú semanal | CJ-001 | `weekly-menu.browse` · `dish-catalog.read` | WeeklyMenu · Dish |
+| SCR-007 | Detalle de plato | CJ-001 | `dish-catalog.read` · `weekly-menu.browse` | Dish |
+| SCR-008 | Cesta / Resumen | CJ-001 | `orders.schedule` | Order · OrderItem |
+| SCR-009 | Confirmación | CJ-001 | `orders.confirm` | Order |
+| SCR-010 | Historial | CJ-001* | `orders.list` · `orders.read` | Order |
+| SCR-011 | Perfil | CJ-001* | `profile.manage` | CustomerProfile |
+| SCR-012 | Configuración / Acerca de | CJ-001* | — | — |
 
-### Estados
+\* Historial / Perfil / Configuración también servirán CJ-002…005; en MVP anclan a CJ-001 como soporte del pedido semanal.
 
-| Estado | Notas |
-|--------|--------|
-| Sin pedidos | Empty state con foto Tenant |
-| Error | Claro · calmado · sin jerga técnica |
-| Sin conexión | Recuperable |
-| Pedido confirmado | Cierre emocional del CJ-001 |
+### Estados (no son pantallas sueltas — pertenecen a un SCR del journey)
 
-Eso es suficiente para una primera versión sólida.
+| Estado | Ancla | Notas |
+|--------|-------|--------|
+| Sin pedidos | SCR-005 / SCR-010 | Empty state foto Tenant |
+| Error | cualquier SCR CJ-001 | Claro · sin jerga técnica |
+| Sin conexión | cualquier SCR CJ-001 | Recuperable |
+| Pedido confirmado | SCR-009 | Cierre emocional de CJ-001 |
+
+### Plantilla YAML (por pantalla)
+
+```yaml
+Screen:
+  id: SCR-006
+  name: Weekly Menu
+Journey: CJ-001
+Capabilities:
+  - weekly-menu.browse   # o CAP-id cuando esté indexado
+  - dish-catalog.read
+Operational Objects:
+  - Weekly Menu
+  - Dish
+Evidence:
+  - FOV-001   # rellenar tras campo
+```
+
+Eso es suficiente para una primera versión sólida. **No** añadir SCR sin un CJ que lo justifique.
 
 ---
 

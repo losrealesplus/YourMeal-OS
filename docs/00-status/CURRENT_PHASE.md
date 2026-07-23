@@ -67,11 +67,14 @@ Docs: [CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md) · [TENANT_IMPL
 
 ## Dominios oficiales
 
-| Dominio | Estado |
-|---------|--------|
-| Knowledge Engineering | ✅ Frozen / Closed |
-| Software Engineering | ✅ Implementado · ✅ #23 en main |
-| Operational Engineering | ⏳ Pendiente de ORR PASSED |
+Mapa: [PROJECT_DOMAINS](./PROJECT_DOMAINS.md).
+
+| Dominio | Entregable | Estado |
+|---------|------------|--------|
+| **Knowledge** | Operational Model | ✅ Frozen / Closed |
+| **Engineering** | Código | ✅ Implementado · ✅ #23 en main |
+| **Experience** | Customer Journeys + Screens | 🟡 CJ-001 definido · Refactor pendiente |
+| **Operations** | Evidencia | ⏳ Smoke → ORR → FOV |
 
 ---
 
