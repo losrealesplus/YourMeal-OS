@@ -244,6 +244,35 @@ No mostrar en Customer Application:
 
 **No bloquea** Smoke / ORR. Priorizable en paralelo como incremento Lovable/Cursor de experiencia.
 
+### Cadena de experiencia
+
+```text
+Tenant Experience Spec
+        ↓
+Experience Refactor
+        ↓
+BrandConfig Validation
+        ↓
+EatClean Release UX
+```
+
+No abordar pantalla por pantalla de forma aislada: **auditoría de toda la experiencia**.
+
+### Checklist por pantalla (obligatoria)
+
+Cada pantalla de Customer Application debe cumplir **todas** estas preguntas antes de darse por válida:
+
+| # | Criterio | Pregunta |
+|---|----------|----------|
+| 1 | **Branding** | ¿Parece una pantalla de EatClean o de un SaaS genérico? |
+| 2 | **Copy** | ¿Usa el mismo tono y lenguaje que la web del Tenant? |
+| 3 | **Continuidad** | ¿La transición web → app resulta natural? |
+| 4 | **Rol** | ¿Corresponde a Front Office o Back Office? (cliente ≠ operador) |
+| 5 | **Powered by** | ¿YourMeal OS aparece **únicamente** donde corresponde? |
+| 6 | **Configuración** | ¿Todo lo visible proviene de `BrandConfig` o recursos del Tenant, **sin** lógica específica hardcodeada para EatClean? |
+
+Si **todas** las pantallas pasan la checklist, se valida no solo la UX de EatClean, sino el **patrón reutilizable** para cualquier Tenant futuro.
+
 ### Brief corto para Lovable / Cursor
 
 ```text
@@ -252,6 +281,7 @@ La Customer App debe sentirse como la app oficial de EatClean.
 Hereda identidad/tono/lenguaje de eatcleantenerifecatering.es — no copies layout web.
 No toques lógica HP-001. No inventes módulos. No muestres back office al cliente.
 Login/home/nav según el Spec. Powered by YourMeal OS solo en footer discreto.
+Audita cada pantalla con la checklist Branding/Copy/Continuidad/Rol/Powered by/Configuración.
 ```
 
 ---

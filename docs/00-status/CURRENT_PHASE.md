@@ -8,13 +8,14 @@
 PROJECT STATE
 ══════════════════════════════════════════════════
 
-Documentary stack: Closed (pending #24 → main)
+Documentary / SaaS identity: Closed (pending #25 → main)
 Engineering Phase: Complete (pending operational authorization)
 Current Phase:     Evidence Gate  (pre-ORR)
 Next Gate:         ORR  (PASSED | BLOCKED)
 Next Discipline:   Operational Engineering
 Primary Artifact:  Field Evidence
-Focus:             Abrir la app · recorrido HP-001
+Focus operativo:   Migración · Smoke HP-001 · ORR
+Focus experiencia: Spec ✅ · Refactor (paralelo, no bloquea ORR)
 Last Baseline:     v0.2.0-engineering-baseline (IR-001)
 
 ══════════════════════════════════════════════════
@@ -24,12 +25,33 @@ Cierre formal: [ENGINEERING_PHASE](./ENGINEERING_PHASE.md).
 
 ```text
 Foundation ✅ → Governance ✅ → OM ✅ → Implementation ✅
-→ Engineering Baseline ✅ → Project Dictionary ✅ (#24)
+→ Engineering Baseline ✅ → Dictionary + ADR-0014 ✅ (#25)
 ───────────────
 Comienza Operational Engineering  (tras ORR PASSED)
 ```
 
-> No más inversión en estructura metodológica. El retorno está en **ejecutar** el recorrido y generar evidencia.
+> Dos líneas en paralelo: **evidencia operativa** (FOPEBA) y **experiencia Tenant** (BrandConfig). No compiten.
+
+---
+
+## Dos líneas de trabajo (independientes)
+
+### Línea operativa (no se mueve)
+
+```text
+Migration → Smoke HP-001 → ORR → FOV
+```
+
+Genera evidencia para FOPEBA. Congelación funcional hasta ORR.
+
+### Línea de experiencia (nuevo frente)
+
+```text
+Tenant Experience Spec → Experience Refactor
+→ BrandConfig Validation → EatClean Release UX
+```
+
+Mejora percepción del producto **sin** tocar HP-001. Spec: [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md). Checklist por pantalla en ese doc.
 
 ---
 
@@ -60,13 +82,13 @@ Cualquier “pequeña mejora” en el merge **espera** al siguiente ciclo.
 ## Cadena (sin pasos intermedios)
 
 ```text
-#24 → main → Apply migration → Smoke HP-001 → ORR → PASSED → Ready for FOV → FOV-001
+#25 → main → Apply migration → Smoke HP-001 → ORR → PASSED → Ready for FOV → FOV-001
 ```
 
 | Evento | Estado |
 |--------|:------:|
 | PR #23 merge (hardening) | ✅ |
-| PR #24 merge (Dictionary) | ⏳ |
+| PR #25 merge (Dictionary · ADR-0014 · Experience Spec) | ⏳ |
 | Migración `program_draft_order` | ⏳ |
 | Smoke HP-001 | ⏳ |
 | ORR | ⏳ |

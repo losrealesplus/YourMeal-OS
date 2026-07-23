@@ -12,6 +12,16 @@
 
 Esta frase resume la separación entre YourMeal OS (motor operativo) y cada Customer Application (marca y experiencia de cara al usuario).
 
+### Tres niveles de personalización
+
+| Nivel | Responsable | ¿Cambia por cliente? |
+|-------|-------------|----------------------|
+| **Platform** | YourMeal OS | No |
+| **BrandConfig** | Tenant | Sí — configuración |
+| **Tenant Experience** | Tenant | Sí — contenido y recursos |
+
+Una sola base de código. Experiencia completa por Tenant sin forks.
+
 ---
 
 ## Contexto
