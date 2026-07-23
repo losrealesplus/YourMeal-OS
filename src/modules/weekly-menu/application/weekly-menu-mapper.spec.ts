@@ -69,6 +69,7 @@ describe("mapWeeklyMenuToView", () => {
       week_start: "2026-07-20",
       status: "published",
       published_at: "2026-07-19T00:00:00Z",
+      deleted_at: null,
     } satisfies WeeklyMenuRow;
 
     const slots: WeeklyMenuSlotWithDish[] = [

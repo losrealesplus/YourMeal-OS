@@ -25,3 +25,11 @@ export async function fetchCatalogDish(
   const row = await createDishRepository(supabase, tenantId).findCatalogById(dishId);
   return row ? mapDishRowToCatalogDish(row) : null;
 }
+
+export async function fetchCatalogDishesByIds(
+  tenantId: string,
+  dishIds: string[],
+): Promise<Map<string, CatalogDish>> {
+  const rows = await createDishRepository(supabase, tenantId).listCatalogByIds(dishIds);
+  return new Map(rows.map((row) => [row.id, mapDishRowToCatalogDish(row)]));
+}

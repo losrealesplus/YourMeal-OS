@@ -1,4 +1,4 @@
-import type { Tables, TablesInsert } from "@/integrations/supabase/types";
+import type { Json, Tables } from "@/integrations/supabase/types";
 import type { AppSupabase } from "@/services/types";
 
 export type OrderRow = Tables<"orders">;
@@ -18,6 +18,11 @@ export type ProgramOrderInput = {
   items: ProgramOrderItemInput[];
 };
 
+type ProgramDraftRpcResult = {
+  order: OrderRow;
+  items: OrderItemRow[];
+};
+
 /**
  * Persistence only — CAP-004 draft · CAP-006 confirm.
  */
@@ -30,6 +35,7 @@ export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
       .select("*")
       .eq("tenant_id", tenantId)
       .eq("id", orderId)
+      .is("deleted_at", null)
       .maybeSingle();
     if (orderError) throw orderError;
     if (!order) return null;
@@ -39,6 +45,7 @@ export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
       .select("*")
       .eq("tenant_id", tenantId)
       .eq("order_id", orderId)
+      .is("deleted_at", null)
       .order("day_date", { ascending: true });
     if (itemsError) throw itemsError;
 
@@ -52,50 +59,45 @@ export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
         .select("id")
         .eq("tenant_id", tenantId)
         .eq("user_id", userId)
+        .is("deleted_at", null)
         .maybeSingle();
       if (error) throw error;
       return data?.id ?? null;
     },
 
+    /**
+     * Atomic order + items via SECURITY DEFINER RPC (INC-05).
+     * Audit remains in OrderService after success.
+     */
     async insertDraft(
       input: ProgramOrderInput,
     ): Promise<{ order: OrderRow; items: OrderItemRow[] }> {
-      const orderInsert: TablesInsert<"orders"> = {
-        tenant_id: tenantId,
-        customer_id: input.customerId,
-        week_start: input.weekStart,
-        status: "draft",
-        total: input.total,
-        notes: input.notes ?? null,
-      };
-
-      const { data: order, error: orderError } = await supabase
-        .from("orders")
-        .insert(orderInsert)
-        .select("*")
-        .single();
-      if (orderError) throw orderError;
-
-      const itemRows: TablesInsert<"order_items">[] = input.items.map((item) => ({
-        tenant_id: tenantId,
-        order_id: order.id,
+      const payload: Json = input.items.map((item) => ({
         dish_id: item.dishId,
         day_date: item.dayDate,
         qty: item.qty,
       }));
 
-      const { data: items, error: itemsError } = await supabase
-        .from("order_items")
-        .insert(itemRows)
-        .select("*");
-      if (itemsError) throw itemsError;
+      const { data, error } = await supabase.rpc("program_draft_order", {
+        _tenant_id: tenantId,
+        _customer_id: input.customerId,
+        _week_start: input.weekStart,
+        _total: input.total,
+        _notes: input.notes ?? null,
+        _items: payload,
+      });
+      if (error) throw error;
 
-      return { order: order as OrderRow, items: (items ?? []) as OrderItemRow[] };
+      const result = data as unknown as ProgramDraftRpcResult;
+      if (!result?.order || !Array.isArray(result.items)) {
+        throw new Error("program_draft_order returned unexpected payload");
+      }
+      return { order: result.order, items: result.items };
     },
 
     findByIdWithItems,
 
-    /** CAP-006 — atomic Draft → Confirmed. */
+    /** CAP-006 — Draft → Confirmed (status guard + soft-delete filter). */
     async confirmDraft(orderId: string): Promise<{ old: OrderRow; order: OrderRow }> {
       const current = await findByIdWithItems(orderId);
       if (!current) {
@@ -111,6 +113,7 @@ export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
         .eq("tenant_id", tenantId)
         .eq("id", orderId)
         .eq("status", "draft")
+        .is("deleted_at", null)
         .select("*")
         .single();
       if (error) throw error;
@@ -121,3 +124,4 @@ export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
 }
 
 export type OrderRepository = ReturnType<typeof createOrderRepository>;
+

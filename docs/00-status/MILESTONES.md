@@ -15,8 +15,8 @@ Registro **inmutable** de hitos. No es gestión de sprint: es memoria objetiva.
 | 2026-07-23 | Methodology Construction Closed | [Acta](./ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) · PR #19 |
 | PR #20 | CAP-006 Operational | Order Confirmation · cierra HP-001 (código en pila) |
 | PR #21 | Sprint 0 Engineering Review | Health 74 · Ready CAP-006 ✅ · Ready ORR ❌ |
-| **PR #22** | **IR-001 · First Engineering Integration** | Stack → `main` · [IR-001](./IR-001_FIRST_ENGINEERING_INTEGRATION.md) · tag `v0.2.0-engineering-baseline` post-merge |
-| *(pendiente)* | Engineering Fix Sprint | P1 Integrity + Completeness |
+| **PR #22** | **IR-001 · First Engineering Integration** | Stack → `main` · [IR-001](./IR-001_FIRST_ENGINEERING_INTEGRATION.md) · tag `v0.2.0-engineering-baseline` |
+| *(en curso)* | Engineering Hardening Sprint | P1 Integrity + Completeness → Ready for ORR |
 | *(pendiente)* | ORR PASSED \| BLOCKED | Puerta binaria · sin features |
 | *(pendiente)* | First FOV | Phase 3 — Field Operational Validation |
 

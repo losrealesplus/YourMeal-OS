@@ -62,7 +62,8 @@ function ScheduleFlow() {
 
   const offerDishes = weeklyMenu?.days[deliveryDay]?.dishes ?? [];
   const dayDate = utcWeekDates(weekStart)[deliveryDay] ?? weekStart;
-  const totalCents = selected.length * 990; // scaffold display (existing)
+  // Display-only scaffold estimate — authoritative total is computed server-side (INC-01).
+  const totalCents = selected.length * 990;
   const totalEur = totalCents / 100;
 
   async function onProgramDraft() {
@@ -71,7 +72,6 @@ function ScheduleFlow() {
       weekStart,
       dayDate,
       dishIds: selected,
-      total: totalEur,
     });
     void navigate({
       to: "/app/orders/$orderId",
