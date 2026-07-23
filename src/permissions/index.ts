@@ -37,11 +37,16 @@ export type Capability =
   | "logistics.operate"
   | "admin.settings"
   | "brand.manage"
+  | "company.manage"
+  | "site.manage"
+  | "organization.manage"
+  | "employee.manage"
   | "saas.manage"
   | "records.purge";
 
 const STAFF_ROLES: AppRole[] = [
   "company_admin",
+  "operations_manager",
   "kitchen",
   "purchasing",
   "inventory",
@@ -49,6 +54,7 @@ const STAFF_ROLES: AppRole[] = [
   "support",
   "accounting",
   "logistics",
+  "delivery",
 ];
 
 /** Role → capabilities. Single source of truth with CAPABILITY_MATRIX.md */
@@ -85,6 +91,10 @@ const ROLE_CAPABILITIES: Record<AppRole, readonly Capability[]> = {
     "logistics.operate",
     "admin.settings",
     "brand.manage",
+    "company.manage",
+    "site.manage",
+    "organization.manage",
+    "employee.manage",
     "saas.manage",
     "records.purge",
   ],
@@ -119,6 +129,30 @@ const ROLE_CAPABILITIES: Record<AppRole, readonly Capability[]> = {
     "logistics.operate",
     "admin.settings",
     "brand.manage",
+    "company.manage",
+    "site.manage",
+    "organization.manage",
+    "employee.manage",
+  ],
+  operations_manager: [
+    "dishes.read",
+    "ingredients.read",
+    "recipes.read",
+    "menus.read",
+    "orders.read",
+    "orders.write",
+    "orders.manage",
+    "customers.read",
+    "customers.write",
+    "kitchen.operate",
+    "production.operate",
+    "purchasing.operate",
+    "inventory.operate",
+    "logistics.operate",
+    "company.manage",
+    "site.manage",
+    "organization.manage",
+    "employee.manage",
   ],
   kitchen: [
     "dishes.read",
@@ -161,6 +195,7 @@ const ROLE_CAPABILITIES: Record<AppRole, readonly Capability[]> = {
   ],
   accounting: ["orders.read", "customers.read", "accounting.operate"],
   logistics: ["orders.read", "customers.read", "logistics.operate"],
+  delivery: ["orders.read", "customers.read", "logistics.operate"],
   support: [
     "customers.read",
     "customers.write",

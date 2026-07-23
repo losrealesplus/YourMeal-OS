@@ -18,6 +18,8 @@ Hiding a nav item is **not** security. Guards must prevent render and Service en
 | `employee` | Employee |
 | `driver` | Driver |
 | `kitchen` | Kitchen |
+| `delivery` | Delivery (Reparto) |
+| `operations_manager` | Operations Manager |
 | `production` | Production |
 | `purchasing` | Purchasing |
 | `inventory` | Inventory |
@@ -95,24 +97,46 @@ Legend: ✅ granted · ❌ denied
 
 ## Operations
 
-| Capability | kitchen | production | purchasing | inventory | logistics | driver | company_admin | saas_admin |
-|------------|---------|------------|------------|-----------|-----------|--------|---------------|------------|
-| kitchen.operate | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
-| production.operate | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
-| purchasing.operate | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ |
-| inventory.operate | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ✅ | ✅ |
-| logistics.operate | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ |
+| Capability | kitchen | delivery | operations_manager | production | purchasing | inventory | logistics | driver | company_admin | saas_admin |
+|------------|---------|----------|--------------------|------------|------------|-----------|-----------|--------|---------------|------------|
+| kitchen.operate | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
+| production.operate | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
+| purchasing.operate | ❌ | ❌ | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ |
+| inventory.operate | ❌ | ❌ | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ | ✅ | ✅ |
+| logistics.operate | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ |
+
+> **PR-034:** `delivery` = solo Reparto; `operations_manager` = todo Operaciones (Cocina + Reparto + pedidos/clientes/inventario). Workspace routes: `/admin/kitchen`, `/admin/delivery`.
 
 ---
 
-## Accounting & admin
+## Accounting, admin & brand
 
 | Capability | accounting | company_admin | saas_admin |
 |------------|------------|---------------|------------|
 | accounting.operate | ✅ | ✅ | ✅ |
 | admin.settings | ❌ | ✅ | ✅ |
+| brand.manage | ❌ | ✅ | ✅ |
+| company.manage | ❌ | ✅ | ✅ |
+| site.manage | ❌ | ✅ | ✅ |
+| organization.manage | ❌ | ✅ | ✅ |
+| employee.manage | ❌ | ✅ | ✅ |
 | saas.manage | ❌ | ❌ | ✅ |
 | records.purge | ❌ | ❌ | ✅ |
+
+> **ADR 0015:** B2B Company Account portal admins are scoped by `company_employees.is_admin` (not the Tenant role `company_admin`). Tenant `company_admin` / `saas_admin` oversee any company in the tenant. Services enforce both paths.
+
+### `brand.manage`
+
+| | |
+|--|--|
+| **Qué** | Leer/actualizar Tenant Brand (logo · colores) vía BrandingService |
+| **Quién** | `company_admin` · `saas_admin` |
+| **Superficie** | `/admin/branding` |
+| **Límites** | [BRAND_CONTRACT](../05-architecture/BRAND_CONTRACT.md) |
+| **Objeto** | [Tenant Brand](../17-operational-model/02-core-objects/tenant-brand.md) |
+
+La UI puede ocultar el acceso; la **seguridad** es Service + roles/capabilities + RLS/Storage policies.
+
 
 ---
 

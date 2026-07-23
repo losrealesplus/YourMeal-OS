@@ -11,9 +11,12 @@
 | Doc | Why |
 |-----|-----|
 | [FOUNDATION_LOCK.md](./FOUNDATION_LOCK.md) | Close the platform before features |
-| [TENANT_BRANDING.md](./TENANT_BRANDING.md) | Contrato BrandConfig · Customer App white-label (ADR 0014) |
-| [TENANT_EXPERIENCE_SPEC.md](./TENANT_EXPERIENCE_SPEC.md) | Identidad EatClean · checklist |
-| [TENANT_IMPLEMENTATION_EATCLEAN.md](./TENANT_IMPLEMENTATION_EATCLEAN.md) | Brief Cursor/Lovable · EatClean v1 |
+| [FOUR_LAYERS.md](./FOUR_LAYERS.md) | Knowledge · Platform · Materialization · Operational |
+| [TENANT_BRANDING.md](./TENANT_BRANDING.md) | BrandConfig · Tenant-Managed runtime · `brand.manage` |
+| [BRAND_CONTRACT.md](./BRAND_CONTRACT.md) | Límites logo/colores/WCAG |
+| [BRAND_VALIDATION_CHECKLIST.md](./BRAND_VALIDATION_CHECKLIST.md) | Checklist post-gestión de marca |
+| [TENANT_EXPERIENCE_SPEC.md](./TENANT_EXPERIENCE_SPEC.md) | Reglas permanentes de experiencia Tenant |
+| [TENANT_IMPLEMENTATION_EATCLEAN.md](./TENANT_IMPLEMENTATION_EATCLEAN.md) | Implementación específica EatClean |
 | [../07-experience/CUSTOMER_JOURNEYS.md](../07-experience/CUSTOMER_JOURNEYS.md) | Experience First · CJ-001 Pedido semanal |
 | [architecture-review.md](./architecture-review.md) | As-built senior review |
 | [MODULE_CONVENTION.md](./MODULE_CONVENTION.md) | `src/modules/...` layout |

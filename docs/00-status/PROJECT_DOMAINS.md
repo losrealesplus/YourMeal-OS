@@ -19,6 +19,7 @@ FOPEBA
 │
 ├── Experience
 │     ├── Customer Journeys
+│     ├── Operational Journeys
 │     ├── Tenant Experience
 │     ├── BrandConfig
 │     └── Screens
@@ -34,8 +35,11 @@ FOPEBA
 |---------|----------------------|------------|---------------------|
 | **Knowledge** | ¿Qué sabemos de la operación? | Operational Model | FOV → Knowledge Update → Gate |
 | **Engineering** | ¿Cómo materializamos ese conocimiento? | Código + Arquitectura | ADR + Implementación |
-| **Experience** | ¿Cómo vive el usuario esa operación? | Customer Journeys + Screens | Investigación y pruebas de usuarios |
+| **Experience** | ¿Cómo vive el usuario esa operación? | CJ + OJ + Screens | Investigación · piloto E2E · observación |
 | **Operations** | ¿Qué ocurre en el mundo real? | Evidencia operacional | Smoke → ORR → FOV |
+
+Documentación evolutiva (no dominio): [Knowledge Lifetime](../18-operational-validation/knowledge-lifetime.md) — Contract · Implementation · Iteration.  
+Hito de producto abierto: [EatClean Pilot Ready](./MILESTONE_EATCLEAN_PILOT_READY.md).
 
 Cada dominio tiene un **motor de cambio** distinto. Eso evita mezclar:
 

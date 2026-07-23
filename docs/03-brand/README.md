@@ -38,8 +38,9 @@ En front office, YourMeal OS solo puede aparecer como **Powered by YourMeal OS**
 Branding completo vía `BrandConfig` del Tenant (`tenants.brand` + assets).  
 Nombre, logo, colores, tipografía, copy, stores y splash son del Tenant — no de YourMeal OS.
 
-Experiencia concreta (copy, login, home, nav): [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md)  
-Brief Cursor/Lovable: [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md)  
+Experiencia (reglas permanentes): [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md)  
+Implementación EatClean: [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md)  
+Bitácora de sprint: [EXPERIENCE_REFACTOR_EATCLEAN_V1_1](../07-experience/EXPERIENCE_REFACTOR_EATCLEAN_V1_1.md) 
 Assets: [`tenants/eatclean/`](../../tenants/eatclean/README.md)  
 Fuente de identidad: [eatcleantenerifecatering.es](https://eatcleantenerifecatering.es/)
 

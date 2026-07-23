@@ -180,6 +180,16 @@ Core | Operational | Engineering | Historical
 | `DICT-054` | [Customer Journey](#customer-journey) | Operational | Accepted |
 | `DICT-055` | [Experience Domain](#experience-domain) | Core | Accepted |
 | `DICT-056` | [Screen (SCR)](#screen-scr) | Engineering | Accepted |
+| `DICT-063` | [Company Account](#company-account) | Operational | Accepted |
+| `DICT-064` | [Site](#site) | Operational | Accepted |
+| `DICT-065` | [Organizational Unit](#organizational-unit) | Operational | Accepted |
+| `DICT-066` | [Delivery Group](#delivery-group) | Operational | Accepted |
+| `DICT-067` | [Company Code](#company-code) | Engineering | Accepted |
+| `DICT-068` | [Party](#party) | Core | Accepted |
+| `DICT-057` | [Knowledge Lifetime](#knowledge-lifetime) | Core | Accepted |
+| `DICT-060` | [Tenant Brand](#tenant-brand) | Operational | Accepted |
+| `DICT-061` | [brand.manage](#brandmanage) | Engineering | Accepted |
+| `DICT-062` | [Tenant-Managed](#tenant-managed) | Core | Accepted |
 
 ---
 
@@ -187,7 +197,7 @@ Core | Operational | Engineering | Historical
 
 ### Metodología
 
-[FOPEBA](#fopeba) (`DICT-001`) · [FOV](#fov) (`DICT-002`) · [IOV](#iov) (`DICT-003`) · [Knowledge Update](#knowledge-update) (`DICT-004`) · [Gate](#gate) (`DICT-005`) · [Evidence](#evidence) (`DICT-006`) · [Knowledge Leakage](#knowledge-leakage) (`DICT-007`) · [Operational Model](#operational-model) (`DICT-008`) · [Table Validation](#table-validation) (`DICT-009`) · [Field Validation](#field-validation) (`DICT-010`)
+[FOPEBA](#fopeba) (`DICT-001`) · [FOV](#fov) (`DICT-002`) · [IOV](#iov) (`DICT-003`) · [Knowledge Update](#knowledge-update) (`DICT-004`) · [Gate](#gate) (`DICT-005`) · [Evidence](#evidence) (`DICT-006`) · [Knowledge Leakage](#knowledge-leakage) (`DICT-007`) · [Operational Model](#operational-model) (`DICT-008`) · [Table Validation](#table-validation) (`DICT-009`) · [Field Validation](#field-validation) (`DICT-010`) · [Knowledge Lifetime](#knowledge-lifetime) (`DICT-057`)
 
 ### Ingeniería
 
@@ -211,7 +221,7 @@ Core | Operational | Engineering | Historical
 
 ### Identidad SaaS (ADR 0014)
 
-[Customer Application](#customer-application) (`DICT-045`) · [YourMeal OS (Corporate Surface)](#yourmeal-os-corporate-surface) (`DICT-046`) · [BrandConfig](#brandconfig) (`DICT-047`) · [Tenant-Branded](#tenant-branded) (`DICT-048`) · [Powered by YourMeal OS](#powered-by-yourmeal-os) (`DICT-049`) · [Platform owns capability / Tenant owns experience](#platform-owns-capability--tenant-owns-experience) (`DICT-050`) · [Tenant Experience Spec](#tenant-experience-spec) (`DICT-051`) · [Tenant Assets](#tenant-assets) (`DICT-052`) · [Experience First](#experience-first) (`DICT-053`) · [Customer Journey](#customer-journey) (`DICT-054`) · [Experience Domain](#experience-domain) (`DICT-055`) · [Screen (SCR)](#screen-scr) (`DICT-056`)
+[Customer Application](#customer-application) (`DICT-045`) · [YourMeal OS (Corporate Surface)](#yourmeal-os-corporate-surface) (`DICT-046`) · [BrandConfig](#brandconfig) (`DICT-047`) · [Tenant-Branded](#tenant-branded) (`DICT-048`) · [Powered by YourMeal OS](#powered-by-yourmeal-os) (`DICT-049`) · [Platform owns capability / Tenant owns experience](#platform-owns-capability--tenant-owns-experience) (`DICT-050`) · [Tenant Experience Spec](#tenant-experience-spec) (`DICT-051`) · [Tenant Assets](#tenant-assets) (`DICT-052`) · [Experience First](#experience-first) (`DICT-053`) · [Customer Journey](#customer-journey) (`DICT-054`) · [Experience Domain](#experience-domain) (`DICT-055`) · [Screen (SCR)](#screen-scr) (`DICT-056`) · [Knowledge Lifetime](#knowledge-lifetime) (`DICT-057`) · [Tenant Brand](#tenant-brand) (`DICT-060`) · [brand.manage](#brandmanage) (`DICT-061`) · [Tenant-Managed](#tenant-managed) (`DICT-062`)
 
 ---
 
@@ -2481,6 +2491,423 @@ Customer Journey · Experience First · Capability
 [CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md)
 
 
+---
+
+# Company Account
+
+## ID
+DICT-063
+
+## Status
+Accepted
+
+## Madurez
+Operational
+
+## Nombre
+Company Account
+
+## Tipo
+Core Object (B2B)
+
+## Definición
+Entidad B2B que contrata comida para un colectivo dentro de un Tenant (Organization). Posee Company Code, sedes (Site), unidades organizativas y memberships de empleados (Beneficiaries). No es el Consumer B2C ni el Tenant.
+
+## Cuándo ocurre
+Registro empresa · portal Company · pedidos con demand_channel = company
+
+## Produce
+Agrupación comercial y logística B2B · facturación a empresa
+
+## No significa
+Organization / Tenant · Consumer · rol `company_admin` del staff del Tenant
+
+## Sinónimos
+Empresa cliente · Cuenta Empresa
+
+## Palabras relacionadas
+Site · Organizational Unit · Delivery Group · Beneficiary · Company Code
+
+## Referencias
+[ADR 0015](../adr/0015-b2b-b2c-customer-model.md) · [company-account-b2b](../17-operational-model/02-core-objects/company-account-b2b.md)
+
+
+---
+
+# Site
+
+## ID
+DICT-064
+
+## Status
+Accepted
+
+## Madurez
+Operational
+
+## Nombre
+Site
+
+## Tipo
+Core Object (B2B · sede)
+
+## Definición
+Centro físico de una Company Account (oficina, hotel, clínica…). Persistido como `company_locations`.
+
+## Cuándo ocurre
+Alta de sede · asignación de empleados · resolución de Delivery Group
+
+## Produce
+Ancla geográfica / de entrega para Unidades Organizativas
+
+## No significa
+Dirección personal B2C · Tenant
+
+## Sinónimos
+Sede · Location (legacy DB)
+
+## Palabras relacionadas
+Company Account · Organizational Unit · Delivery Group
+
+## Referencias
+[ADR 0015](../adr/0015-b2b-b2c-customer-model.md)
+
+
+---
+
+# Organizational Unit
+
+## ID
+DICT-065
+
+## Status
+Accepted
+
+## Madurez
+Operational
+
+## Nombre
+Organizational Unit
+
+## Tipo
+Core Object (B2B · unidad configurable)
+
+## Definición
+Unidad organizativa libre dentro de un Site. El Tenant/Company elige la etiqueta (Departamento, Área, Planta, Servicio, Turno…). **No** hardcodear “Departamento” como nombre técnico. Persistido como `company_departments`.
+
+## Cuándo ocurre
+Alta por Company Admin · join de empleado · Delivery Group
+
+## Produce
+Partición operativa dentro de una sede
+
+## No significa
+Department fijo de producto · rol de staff
+
+## Sinónimos
+Unidad · Área · Departamento (solo etiqueta)
+
+## Palabras relacionadas
+Site · Employee Membership · Delivery Group
+
+## Referencias
+[ADR 0015](../adr/0015-b2b-b2c-customer-model.md)
+
+
+---
+
+# Delivery Group
+
+## ID
+DICT-066
+
+## Status
+Accepted
+
+## Madurez
+Operational
+
+## Nombre
+Delivery Group
+
+## Tipo
+Core Object (logística · agregación mínima)
+
+## Definición
+Grupo mínimo de entrega derivado de Company + Site + Organizational Unit (ej. Hotel Paradise → Recepción → N pedidos → 1 entrega). Depende de la logística, no solo del organigrama comercial.
+
+## Cuándo ocurre
+Al programar / confirmar pedidos B2B · planificación de rutas (futuro)
+
+## Produce
+Clave de agrupación para fulfillment
+
+## No significa
+Ruta inteligente · optimización (fuera de alcance ADR 0015)
+
+## Sinónimos
+Grupo de entrega
+
+## Palabras relacionadas
+Order · Site · Organizational Unit · Company Account
+
+## Referencias
+[ADR 0015](../adr/0015-b2b-b2c-customer-model.md)
+
+
+---
+
+# Company Code
+
+## ID
+DICT-067
+
+## Status
+Accepted
+
+## Madurez
+Engineering
+
+## Nombre
+Company Code
+
+## Tipo
+Identifier
+
+## Definición
+Código único por Tenant que identifica una Company Account (ej. EC-4821). Se genera al crear la empresa; no es editable; los empleados lo usan para unirse.
+
+## Cuándo ocurre
+Registro empresa · onboarding empleado
+
+## Produce
+Join seguro sin invitación compleja (v1)
+
+## No significa
+Slug de Tenant · código promocional
+
+## Sinónimos
+Código empresa
+
+## Palabras relacionadas
+Company Account · Employee Membership
+
+## Referencias
+[ADR 0015](../adr/0015-b2b-b2c-customer-model.md)
+
+
+---
+
+# Party
+
+## ID
+DICT-068
+# Knowledge Lifetime
+
+## ID
+DICT-057
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Party
+
+## Tipo
+Core Object (umbrella · Party Model)
+
+## Definición
+Concepto paraguas de demanda dentro de un Tenant:
+
+```text
+Party
+ ├── Individual Customer
+ └── Company
+       └── Employees (Memberships)
+```
+
+Permite compartir facets futuros (contacto, direcciones) entre persona y empresa sin confundir comportamientos (onboarding, Company Code, Delivery Group, facturación). En el piloto físico sigue ADR 0015 (`customers` / `companies`); la tabla `parties` es convergencia post-Gate (ADR 0016).
+
+## Cuándo ocurre
+Diseño OM · onboarding B2B/B2C · lectura de ADRs 0015/0016
+
+## Produce
+Lenguaje estable para SaaS multi-empresa sin migrar el esquema del piloto
+
+## No significa
+Organization (Tenant) · implementación inmediata de tabla `parties` · permiso para duplicar Customer genérico
+
+## Sinónimos
+Parte de demanda · Party Model
+
+## Palabras relacionadas
+Individual Customer · Company Account · Membership · Consumer · Beneficiary
+
+## Referencias
+[ADR 0016](../adr/0016-party-model-demand-actors.md) · [actors.md](../17-operational-model/01-ubiquitous-language/actors.md)
+Knowledge Lifetime
+
+## Tipo
+Regla metodológica de documentación (FOPEBA)
+
+## Definición
+Disciplina que clasifica cada documento en exactamente un nivel de caducidad:
+
+| Nivel | Propósito | Cambia |
+|-------|-----------|--------|
+| **Contract** | Reglas permanentes | Muy raramente |
+| **Implementation** | Cómo un producto/tenant aplica el contrato | Con la evolución del producto |
+| **Iteration** | Trabajo de una fase/sprint/PR | Nunca tras el cierre |
+
+Distinto de **Knowledge State** (cuán validado está el conocimiento operacional).  
+No es un ADR. No añade fases ni tipos de evidencia al framework congelado.
+
+## Cuándo ocurre
+Al crear o fusionar documentación · al cerrar sprints · al evitar que reglas permanentes vivan solo en bitácoras.
+
+## Produce
+Sistema documental evolutivo · búsqueda fiable de reglas · bitácoras inmutables al cierre.
+
+## No significa
+Knowledge State · ADR · nueva fase FOPEBA · permiso para evolucionar el framework de validación por intuición.
+
+## Sinónimos
+Contract / Implementation / Iteration · caducidad documental
+
+## Palabras relacionadas
+FOPEBA · Project Dictionary · Milestone · Tenant Experience Spec
+
+## Referencias
+[knowledge-lifetime.md](../18-operational-validation/knowledge-lifetime.md) · [Knowledge States](../20-evidence-framework/01-knowledge-states.md)
+
+
+---
+
+# Tenant Brand
+
+## ID
+DICT-060
+
+## Status
+Accepted
+
+## Madurez
+Operational
+
+## Nombre
+Tenant Brand
+
+## Tipo
+Configuration Object (OM Nivel 3)
+
+## Definición
+Identidad visual oficial de un Tenant (logo, colores; extensible a tipografía e imágenes) con ciclo de vida propio, persistencia y capability `brand.manage`. No es solo un facet cosmético: se publica en runtime vía BrandingService → Storage → TenantBrandScope.
+
+## Cuándo ocurre
+Onboarding de Tenant · cambio de marca · FOV de identidad · checklist Brand Validation.
+
+## Produce
+Tokens y logo aplicados a Customer App y Centro de Operaciones sin redespliegue.
+
+## No significa
+Core Object Nivel 1 · BrandConfig estático como única fuente · libertad absoluta sin Brand Contract.
+
+## Sinónimos
+TenantBrand · marca del tenant
+
+## Palabras relacionadas
+BrandConfig · brand.manage · Tenant-Managed · Tenant-Branded
+
+## Referencias
+[tenant-brand.md](../17-operational-model/02-core-objects/tenant-brand.md) · [BRAND_CONTRACT](../05-architecture/BRAND_CONTRACT.md)
+
+
+---
+
+# brand.manage
+
+## ID
+DICT-061
+
+## Status
+Accepted
+
+## Madurez
+Engineering
+
+## Nombre
+brand.manage
+
+## Tipo
+Capability
+
+## Definición
+Capability que autoriza crear/actualizar/limpiar el Tenant Brand (logo y colores) a través de BrandingService. Otorgada a `company_admin` y `saas_admin`.
+
+## Cuándo ocurre
+Guard de `/admin/branding` · assert en BrandingService · matriz de capacidades.
+
+## Produce
+Cambios de identidad persistidos y auditables.
+
+## No significa
+Permiso de UI únicamente · edición de HP-001 · branding de la superficie SaaS corporativa.
+
+## Sinónimos
+gestionar marca · Tenant Brand Management
+
+## Palabras relacionadas
+Tenant Brand · admin.settings · company_admin · saas_admin
+
+## Referencias
+[CAPABILITY_MATRIX](../09-security/CAPABILITY_MATRIX.md) · `src/permissions/index.ts`
+
+
+---
+
+# Tenant-Managed
+
+## ID
+DICT-062
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Tenant-Managed
+
+## Tipo
+Principio de plataforma (evolución de ADR 0014)
+
+## Definición
+Fase en la que el propio Tenant administra su identidad visual en runtime (sin forks, sin despliegues, sin tocar código de producto), dentro del Brand Contract. Sucede a Hardcoded y Tenant-Branded.
+
+## Cuándo ocurre
+Cuando `brand.manage` + TenantBrandRepository + TenantBrandScope están Connected.
+
+## Produce
+SaaS multi-tenant con servicio de branding gobernado por capabilities y RBAC.
+
+## No significa
+Tenant-Branded sin editor · libertad absoluta de assets · cambio de metodología FOPEBA.
+
+## Sinónimos
+branding gestionado por el cliente · runtime brand
+
+## Palabras relacionadas
+Tenant-Branded · BrandConfig · Tenant Brand · brand.manage
+
+## Referencias
+[ADR 0014](../adr/0014-customer-application-is-tenant-branded.md) · [TENANT_BRANDING](../05-architecture/TENANT_BRANDING.md)
+
+
+
 ## Historial de este diccionario
 
 | Fecha | Cambio |
@@ -2494,4 +2921,9 @@ Customer Journey · Experience First · Capability
 | 2026-07-23 | TENANT_IMPLEMENTATION_EATCLEAN · `tenants/eatclean/` · DICT-052 Tenant Assets |
 | 2026-07-23 | Experience First · CUSTOMER_JOURNEYS · DICT-053/054 |
 | 2026-07-23 | Experience Domain · SCR trazabilidad · DICT-055/056 · PROJECT_DOMAINS |
+| 2026-07-23 | ADR 0015 B2B/B2C · DICT-063…067 Company Account · Site · OU · Delivery Group · Company Code |
+| 2026-07-23 | ADR 0016 Party Model · DICT-068 Party (semantic now · physical later) |
+| 2026-07-23 | Knowledge Lifetime · DICT-057 · Milestone EatClean Pilot Ready |
+| 2026-07-23 | Tenant-Managed · Tenant Brand · brand.manage · DICT-060…062 |
+| 2026-07-23 | Foundation of Materialization Frozen · Four Layers · Pilot Execution Guide |
 

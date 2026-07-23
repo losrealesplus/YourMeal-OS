@@ -38,6 +38,8 @@ Knowledge State
 
 Una Capability **Validated** (KS) puede seguir en **ECL-3** y **S1** hasta FOV / Knowledge Update / EC.
 
+**No confundir** con [Knowledge Lifetime](../18-operational-validation/knowledge-lifetime.md) (Contract · Implementation · Iteration): ese eje organiza **documentos**, no el estado de validación del modelo.
+
 ---
 
 ## Regla
