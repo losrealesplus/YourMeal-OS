@@ -1183,6 +1183,11 @@ export type Database = {
       tenants: {
         Row: {
           brand: Json
+          brand_accent: string | null
+          brand_logo_path: string | null
+          brand_primary: string | null
+          brand_primary_foreground: string | null
+          brand_updated_at: string | null
           country: string | null
           created_at: string
           currency: string | null
@@ -1200,6 +1205,11 @@ export type Database = {
         }
         Insert: {
           brand?: Json
+          brand_accent?: string | null
+          brand_logo_path?: string | null
+          brand_primary?: string | null
+          brand_primary_foreground?: string | null
+          brand_updated_at?: string | null
           country?: string | null
           created_at?: string
           currency?: string | null
@@ -1217,6 +1227,11 @@ export type Database = {
         }
         Update: {
           brand?: Json
+          brand_accent?: string | null
+          brand_logo_path?: string | null
+          brand_primary?: string | null
+          brand_primary_foreground?: string | null
+          brand_updated_at?: string | null
           country?: string | null
           created_at?: string
           currency?: string | null
