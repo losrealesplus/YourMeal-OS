@@ -1,18 +1,13 @@
 # 22 · Implementation — conectar el Product Skeleton
 
-**Product Skeleton UX:** materializado (Lovable).  
-**Business logic:** 🔒 deliberadamente bloqueada salvo capacidades certificadas.
+**Lovable:** relevo visual cerrado (no pedir más infraestructura).  
+**Cursor:** ingeniero — **conectar capacidades**, no pantallas.
 
 ```text
-Operational Knowledge
-        ↓
-Operational Model (Table-Validated)
-        ↓
-UX / Product Skeleton
-        ↓
-Frontend connected      ← Cursor ahora
-        ↓
-Backend / Supabase
+FOPEBA → certifica
+Lovable → UX skeleton
+Cursor → ingeniería
+GitHub → historia / evidencia
 ```
 
 ---
@@ -21,26 +16,29 @@ Backend / Supabase
 
 | Doc | Rol |
 |-----|-----|
-| [IMPLEMENTATION_RULES](./IMPLEMENTATION_RULES.md) | Constitución Etapa 2 (Cursor) |
-| [IMPLEMENTATION_BACKLOG](./IMPLEMENTATION_BACKLOG.md) | Scaffold → Connected → Operational → Validated |
-| [HAPPY_PATH_E2E](./HAPPY_PATH_E2E.md) | Primer pedido real · puente a FOV |
+| [CURSOR_MASTER_PROMPT](./CURSOR_MASTER_PROMPT.md) | **Contexto permanente** Etapa 2 |
+| [IMPLEMENTATION_RULES](./IMPLEMENTATION_RULES.md) | Constitución |
+| [IMPLEMENTATION_BACKLOG](./IMPLEMENTATION_BACKLOG.md) | Progreso por CAP |
+| [HAPPY_PATH_E2E](./HAPPY_PATH_E2E.md) | Primer pedido real → FOV |
+| [caps/](./caps/README.md) | CAP-001…007 (un prompt cada uno) |
+| [Philosophy](../23-engineering/IMPLEMENTATION_PHILOSOPHY.md) | El software no es origen del conocimiento |
+| [MODULE_STATE_CRITERIA](../00-status/MODULE_STATE_CRITERIA.md) | Scaffold→…→Field Validated |
 
 ---
 
-## Evaluación de estado
+## Siguiente
+
+1. Pegar [Master Prompt](./CURSOR_MASTER_PROMPT.md) en la sesión Cursor.  
+2. Ejecutar **[CAP-002 Dish Catalog](./caps/CAP-002-dish-catalog.md)**.  
+3. Seguir CAP-003…007 sin mezclar.
+
+---
+
+## Evaluación
 
 | Área | Estado |
 |------|--------|
-| Operational Model | ✅ Table-Validated |
-| Customer / Admin / Production / Delivery / DS | ✅ Product Skeleton (UX) |
-| UX Foundation | ✅ |
-| Business Logic | 🔒 Solo vía capacidades certificadas + trazabilidad |
-| Conexión E2E Happy Path | ⏳ Siguiente Cursor |
-
----
-
-## Siguiente sprint Cursor
-
-No conectar todo. Ejecutar [Happy Path E2E](./HAPPY_PATH_E2E.md) pasos 1→8.
-
-Plantilla de prompt: ver [IMPLEMENTATION_RULES](./IMPLEMENTATION_RULES.md).
+| Product Skeleton UX | ✅ |
+| CAP-001 Auth | Connected |
+| CAP-002…007 | ⏳ |
+| Business logic inventada | 🔒 STOP |

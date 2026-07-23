@@ -95,18 +95,27 @@ Si no, justificar como inversión para una mejora operativa futura claramente id
 
 ```text
 FOPEBA Frozen 🧊 · OM Table-Validated · Product Skeleton ✅
-Cursor = conectar capacidades (no rediseñar UX)
+Lovable = UX (relevo infra cerrado) · Cursor = conectar CAP-00x
 ```
 
-> Cursor no implementa funcionalidades. Implementa capacidades certificadas.  
-> Regla nueva sin OM → **STOP** → Carril A.
+> Cursor no implementa funcionalidades. Conecta **capacidades** certificadas.  
+> Regla nueva → **STOP** · `REQUIRES KNOWLEDGE REVIEW` · Carril A.
+
+**Contexto permanente:** [CURSOR_MASTER_PROMPT](./docs/22-implementation/CURSOR_MASTER_PROMPT.md)  
+**Siguiente tarea:** [CAP-002 Dish Catalog](./docs/22-implementation/caps/CAP-002-dish-catalog.md)  
+**Filosofía:** [IMPLEMENTATION_PHILOSOPHY](./docs/23-engineering/IMPLEMENTATION_PHILOSOPHY.md)
+
+| Herramienta | Rol |
+|-------------|-----|
+| **FOPEBA** | Certifica conocimiento |
+| **Lovable** | Materializó UX/estructura — no más infraestructura |
+| **Cursor** | Ingeniería / conexión |
+| **GitHub** | Historia y evidencia |
 
 | Carril | Entrada |
 |--------|---------|
 | A campo | [Mission Brief](./docs/00-status/FOV_MISSION_BRIEF.md) |
-| B conectar | [IMPLEMENTATION_RULES](./docs/22-implementation/IMPLEMENTATION_RULES.md) · [Happy Path E2E](./docs/22-implementation/HAPPY_PATH_E2E.md) · [Backlog](./docs/22-implementation/IMPLEMENTATION_BACKLOG.md) |
-
-Índices: [Estado](./docs/00-status/README.md) · [22 Implementation](./docs/22-implementation/README.md) · [Traceability](./docs/15-product/etapa-2/knowledge-traceability.md)
+| B conectar | [22-implementation](./docs/22-implementation/README.md) · [caps](./docs/22-implementation/caps/README.md) · [MODULE_STATE_CRITERIA](./docs/00-status/MODULE_STATE_CRITERIA.md) |
 
 ### Principio de valor (Capabilities)
 
