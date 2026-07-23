@@ -16,6 +16,21 @@ Convertir la Customer Application en una **extensión natural** de la identidad 
 
 No copiar la web literalmente. Heredar su **identidad**, su **tono** y su **lenguaje**.
 
+### Tres niveles (separación SaaS)
+
+| Nivel | Responsable | ¿Cambia por cliente? |
+|-------|-------------|----------------------|
+| **Platform** | YourMeal OS | **No** — una sola base de código |
+| **BrandConfig** | Tenant | **Sí** — mediante configuración |
+| **Tenant Experience** | Tenant | **Sí** — mediante contenido y recursos |
+
+Eso evita:
+
+* forks del producto por cliente;  
+* reducir el branding a «un logo y dos colores».
+
+El Tenant define una **experiencia completa** (identidad · lenguaje · tono · recursos); la plataforma sigue siendo una única codebase.
+
 ---
 
 ## Fuente de verdad (branding)
