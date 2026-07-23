@@ -101,6 +101,7 @@ Hito: ORR PASSED → Ready for FOV → FOV-001
 ```
 
 > **Congelación funcional:** hasta que ORR emita PASSED \| BLOCKED, ningún commit modifica el comportamiento del producto — salvo bloqueo de Smoke, corrección imprescindible de HP-001, o docs de evidencia.  
+> **FOV → Gate:** la FOV produce evidencia; el Gate decide cambios.  
 > Cursor no implementa funcionalidades nuevas. Conecta capacidades / produce evidencia.  
 > Regla nueva → **STOP** · `REQUIRES KNOWLEDGE REVIEW` · Carril A.  
 > Sin documentos metodológicos nuevos hasta FOV (gobernanza: Acta).  

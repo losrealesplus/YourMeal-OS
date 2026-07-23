@@ -72,4 +72,12 @@ PR #23 → main → Apply migration → Smoke HP-001 → ORR → PASSED → Read
 
 ---
 
+## Regla permanente (post-ORR)
+
+> **La FOV produce evidencia. El Gate decide cambios.**
+
+Ver [ENGINEERING_PHASE](./ENGINEERING_PHASE.md) · [FOV-001](../30-field-validation/FOV-001_HP-001.md).
+
+---
+
 Checklists: [SMOKE_HP-001](./SMOKE_HP-001.md) · [ORR](../22-implementation/ORR.md) · [FOV-001](../30-field-validation/FOV-001_HP-001.md) (solo tras ORR PASSED).

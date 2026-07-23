@@ -46,6 +46,9 @@ Sin estados intermedios («casi listo», «READY WITH GAPS», etc.).
 | Antes (Engineering) | Después (FOV) |
 |---------------------|---------------|
 | ¿Está correctamente implementado? | ¿El conocimiento operacional refleja cómo trabaja el cliente? |
+| Entregable: código · tests · docs · evidencias técnicas | Entregable: observaciones · evidencia de campo · hipótesis · propuestas KU |
+
+> **La FOV produce evidencia. El Gate decide cambios.**
 
 Evidencia en FOV; decisiones en el **Gate** — no durante la observación.
 

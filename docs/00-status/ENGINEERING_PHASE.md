@@ -59,4 +59,24 @@ Todo lo demás espera al siguiente ciclo (post-ORR / post-FOV Gate).
 No más código ni metodología como activo principal.  
 El activo más valioso a partir de ahora: **evidencia operacional de calidad**.
 
+---
+
+## Cambio de responsabilidad (post-ORR PASSED)
+
+| | Antes de ORR | Después de ORR |
+|-|--------------|----------------|
+| Criterio | ¿Hemos implementado correctamente el sistema? | ¿Qué nos enseña la operación real sobre nuestro conocimiento operacional? |
+| Entregables | Código · Tests · Docs · Evidencias técnicas | Observaciones · Evidencias de campo · Hipótesis confirmadas/refutadas · Propuestas KU |
+| Éxito medido por | PRs · Capabilities · documentos | Calidad de evidencia · KU verificables vía FOV → KU → Gate |
+
+Si #23 se integra y ORR = **PASSED**, la **primera etapa de construcción** de YourMeal OS se considera terminada. FOPEBA pasa de metodología *diseñada* a metodología *demostrada* en el primer ciclo de campo.
+
+---
+
+## Regla permanente (Operational Engineering)
+
+> **La FOV produce evidencia. El Gate decide cambios.**
+
+Una observación aislada **no** modifica directamente el producto ni el Operational Model.
+
 Ver [CURRENT_PHASE](./CURRENT_PHASE.md) · [ORR](../22-implementation/ORR.md) · [FOV-001](../30-field-validation/FOV-001_HP-001.md).
