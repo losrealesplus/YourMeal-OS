@@ -1,32 +1,45 @@
 # CURRENT_PHASE
 
 **Última actualización:** 2026-07-23  
-**No sustituye** [MILESTONES](./MILESTONES.md) — es el tablero de “dónde estamos ahora”.
-
----
-
-## Project Phase
+**No sustituye** [MILESTONES](./MILESTONES.md) — tablero de “dónde estamos ahora”.
 
 ```text
-Engineering Fix Sprint
+══════════════════════════════════════════════════
+PROJECT STATE
+══════════════════════════════════════════════════
+
+Current Phase:     Engineering Fix Sprint
+Current Branch:    main  (tras merge IR-001 / PR #22)
+Last Integration:  IR-001 · First Engineering Integration
+Next Gate:         ORR  (PASSED | BLOCKED)
+Current Objective: Resolve P1 findings
+
+Operational Status:
+  Ready for CAP-006  ✅
+  Ready for ORR      ❌
+
+══════════════════════════════════════════════════
 ```
 
-*(Fase A — merge de pila a `main` — en curso vía este PR si aún no está en trunk.)*
+> Si PR #22 aún no está en `main`, la **Current Branch** efectiva es el tip de integración hasta el merge.
 
 ---
 
-## Status
+## Project Phase detail
 
-| Puerta | Resultado |
-|--------|-----------|
-| Ready for CAP-006 | ✅ (implementado en pila CAP-002…006; Confirm en código) |
-| Ready for ORR | ❌ |
+```text
+Fase A  IR-001 · Stack → main     (PR #22)
+Fase B  Engineering Fix Sprint    ← ahora (tras A)
+Fase C  Verificación técnica      (tsc · tests · RLS · audit · flags · HP)
+Fase D  ORR                       (sin código)
+Fase E  FOV                       (aprendizaje en campo)
+```
 
 ---
 
 ## Current Objective
 
-Resolve **P1 Engineering Findings** — sin nuevas Capabilities, sin UX, sin OM.
+Resolve **P1 Engineering Findings** — sin UX, OM, Capabilities ni Design System.
 
 ### Engineering Integrity
 
@@ -55,8 +68,6 @@ Detalle: [ENGINEERING_REVIEW_SPRINT0](./ENGINEERING_REVIEW_SPRINT0.md).
 ORR  (PASSED | BLOCKED)  — sin features
 ```
 
-*(Tras cerrar P1. CAP-006 ya materializado; el Fix Sprint consolida confianza antes de ORR.)*
-
 ---
 
 ## Next Milestone
@@ -67,14 +78,18 @@ HP-001 · Operational · ORR PASSED · Ready for FOV
 
 ---
 
-## Roadmap (post–construcción)
+## Baseline tag (tras merge IR-001)
+
+Tras fusionar PR #22 en `main`, crear tag de restauración:
 
 ```text
-Fase A  Merge pila → main
-Fase B  Engineering Fix Sprint (P1)
-Fase C  Verificar CAP-006 / HP-001 estable
-Fase D  ORR
-Fase E  FOV (EatClean)
+v0.2.0-engineering-baseline
 ```
+
+Punto de referencia: metodología cerrada · skeleton · patrones · CAP conectadas · gobernanza · pila en `main`.
+
+Ver [IR-001](./IR-001_FIRST_ENGINEERING_INTEGRATION.md).
+
+---
 
 Gobernanza: **no** abrir documentos metodológicos nuevos hasta terminar la primera FOV.
