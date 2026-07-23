@@ -14,7 +14,7 @@ import { brandConfig, tenantCopyEs } from "@/tenant/brand-config";
 
 /**
  * EatClean Admin Login — staff only surface.
- * Presentation / navigation entry. Auth + RBAC reuse existing flows.
+ * Brand leaf opens this screen; protection is auth + RBAC, not UI secrecy.
  * No public registration. No customer OAuth / phone.
  */
 export const Route = createFileRoute("/auth/admin")({

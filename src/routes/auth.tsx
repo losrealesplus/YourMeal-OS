@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Leaf } from "lucide-react";
@@ -11,6 +11,7 @@ import {
   PoweredByLine,
   TenantBrandScope,
 } from "@/components/tenant/tenant-brand-scope";
+import { BrandLeafMark } from "@/components/tenant/brand-leaf-mark";
 import { brandConfig, tenantCopyEs } from "@/tenant/brand-config";
 import { PrimaryCTA } from "@/components/consumer";
 import splashImage from "@/assets/eatclean-splash.jpg";
@@ -154,8 +155,8 @@ function AuthPage() {
           <div className="w-full max-w-md animate-fade-in">
             <div className="rounded-[1.75rem] bg-card border border-border/70 p-8 shadow-sm">
               <div className="flex items-center gap-3">
-                <div className="size-11 rounded-2xl bg-primary text-primary-foreground grid place-items-center text-sm font-extrabold">
-                  EC
+                <div className="size-11 rounded-2xl bg-primary/12 text-primary grid place-items-center">
+                  <Leaf className="size-5" strokeWidth={1.5} aria-hidden />
                 </div>
                 <p className="font-extrabold tracking-tight">{brandConfig.name}</p>
               </div>
@@ -221,15 +222,9 @@ function AuthPage() {
                 </button>
               </div>
             </div>
-            <div className="mt-6 relative flex flex-col items-center gap-3 min-h-9">
+            <div className="mt-8 flex flex-col items-center gap-2.5">
+              <BrandLeafMark />
               <PoweredByLine />
-              <Link
-                to="/auth/admin"
-                aria-label={t("auth:adminEntryAria")}
-                className="absolute right-0 top-1/2 -translate-y-1/2 size-9 grid place-items-center rounded-full text-muted-foreground/40 hover:text-primary/70 hover:bg-primary/5 transition-colors"
-              >
-                <Leaf className="size-4" strokeWidth={1.75} aria-hidden />
-              </Link>
             </div>
           </div>
         ) : null}
