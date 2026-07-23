@@ -10,7 +10,7 @@ import {
   PoweredByLine,
   TenantBrandScope,
 } from "@/components/tenant/tenant-brand-scope";
-import { BrandLeafMark } from "@/components/tenant/brand-leaf-mark";
+
 import { TenantLogo } from "@/components/tenant/tenant-logo";
 import { QuietLocaleSwitch } from "@/components/tenant/quiet-locale-switch";
 import { brandConfig, tenantCopyEs } from "@/tenant/brand-config";
@@ -188,12 +188,12 @@ function AuthPage() {
         {phase === "login" ? (
           <div className="w-full max-w-[26rem] animate-fade-in relative z-10 py-6">
             <div className="rounded-[1.75rem] bg-white/95 backdrop-blur-[2px] border border-white/60 p-8 sm:p-10 shadow-[0_20px_50px_-28px_rgba(15,35,23,0.35)]">
-              <div className="flex justify-center">
-                <TenantLogo height={60} />
+              <div className="flex justify-center pt-2">
+                <TenantLogo height={72} />
               </div>
 
               <h1
-                className="text-[1.65rem] font-bold tracking-tight mt-12 text-center text-balance leading-snug"
+                className="text-[1.65rem] font-bold tracking-tight mt-16 text-center text-balance leading-snug"
                 style={{ fontFamily: "var(--font-tenant-display)" }}
               >
                 {t("auth:welcome")}
@@ -266,8 +266,13 @@ function AuthPage() {
               </div>
             </div>
 
-            <div className="mt-12 flex flex-col items-center gap-4">
-              <BrandLeafMark />
+            <div className="mt-10 flex flex-col items-center gap-5">
+              <a
+                href="/auth/admin"
+                className="text-[11px] font-medium tracking-[0.08em] text-[#9a8f7c]/80 hover:text-foreground transition-colors underline-offset-4 hover:underline"
+              >
+                {tenantCopyEs.backOffice.entryLabel}
+              </a>
               <PoweredByLine />
             </div>
           </div>
