@@ -17,7 +17,8 @@
 | [Operational Dynamics v0.2](./17-operational-model/07-operational-dynamics/README.md) | Comportamiento: transitions · Supporting taxonomy · Checks 2.0 |
 | [Operational Validation](./18-operational-validation/README.md) | Mesa · [FOPEBA](./18-operational-validation/00-operational-product-engineering.md) · Beta |
 | [Independent Operational Validation](./19-independent-operational-validation/README.md) | IOV · transferibilidad · [Pirámide](./19-independent-operational-validation/00-knowledge-validation-pyramid.md) |
-| [Evidence Framework](./20-evidence-framework/README.md) | FOV · EC · ECL · Gate G-01 |
+| [Evidence Framework](./20-evidence-framework/README.md) | FOV · EC · ECL · Gate G-01 · **Gate G-02** |
+| [Gate G-02 · Pilot Readiness](./20-evidence-framework/08-gate-g02-pilot-readiness.md) | Integridad del Journey · RI · Pilot Integrity |
 | [PRODUCT_VISION](./15-product/PRODUCT_VISION.md) | Qué es YourMeal OS para el cliente |
 | [Operational Checks](./15-product/OPERATIONAL_CHECKS.md) | Datos → comprobación → acción (transversal) |
 | [Milestone · Infrastructure Validation](./00-status/MILESTONE_INFRASTRUCTURE_VALIDATION.md) | Core independiente de la tecnología ✅ |
@@ -36,7 +37,8 @@
 | [ADR 0016 · Party Model](./adr/0016-party-model-demand-actors.md) | Party → Individual Customer \| Company → Memberships |
 | [Core Object Traceability](./17-operational-model/CORE_OBJECT_TRACEABILITY.md) | OM Party ↔ tablas físicas del piloto |
 | [ORR Party / B2B / B2C](./00-status/ORR_B2B_B2C_PARTY.md) | Checklist pre–Pilot Ready (alta empresa = EatClean) |
-| [**Pilot Acceptance Checklist**](./00-status/PILOT_ACCEPTANCE_CHECKLIST.md) | Control único del piloto · cero humo · **G-02 Pilot Readiness** |
+| [**Pilot Acceptance Checklist**](./00-status/PILOT_ACCEPTANCE_CHECKLIST.md) | Gobernanza del piloto · **G-02** · Pilot Integrity |
+| [Gate G-02 · Pilot Readiness](./20-evidence-framework/08-gate-g02-pilot-readiness.md) | Autoriza Validación Operacional · integridad del Journey · RI |
 | [Company Account B2B](./17-operational-model/02-core-objects/company-account-b2b.md) | Site · Organizational Unit · Delivery Group |
 | [Tenant Experience Spec](./05-architecture/TENANT_EXPERIENCE_SPEC.md) | Identidad EatClean · Experience Refactor |
 | [Tenant Implementation · EatClean](./05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) | Brief Cursor/Lovable · Tenant Assets |

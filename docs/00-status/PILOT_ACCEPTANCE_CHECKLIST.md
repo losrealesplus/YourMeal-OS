@@ -1,17 +1,23 @@
 # PILOT_ACCEPTANCE_CHECKLIST · EatClean
 
 **Última actualización:** 2026-07-23  
-**Propósito:** visión única del estado real del piloto — no depender de recordar qué PR implementó cada pieza.  
+**Rol FOPEBA:** artefacto de **gobernanza** (no QA de features) que alimenta **[G-02 · Pilot Readiness](../20-evidence-framework/08-gate-g02-pilot-readiness.md)**.  
+**Pregunta única:** ¿Existe evidencia suficiente para exponer el modelo operacional a la realidad sin introducir nueva incertidumbre evitable?  
 **Regla cero humo:** nada visible puede ser decorativo. Visible sin funcionalidad = **BLOCKED** para G-02.  
-**Relacionado:** [ORR Party/B2B/B2C](./ORR_B2B_B2C_PARTY.md) · [CURRENT_PHASE](./CURRENT_PHASE.md) · [Functional Completeness](./EATCLEAN_PILOT_FUNCTIONAL_COMPLETENESS_REVIEW.md)
+**Relacionado:** [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md) · [ORR Party](./ORR_B2B_B2C_PARTY.md) · [CURRENT_PHASE](./CURRENT_PHASE.md) · [Pilot Integrity](../99-reference/PROJECT_DICTIONARY.md#pilot-integrity) · [RI](../99-reference/PROJECT_DICTIONARY.md#reference-implementation-ri)
 
 ---
 
 ## Por qué existe este documento
 
-Con los PR **#30–#34** el sistema deja de ser solo “recibir pedidos” y pasa a una **cadena operativa continua**. FOPEBA puede observar un Operational Journey completo.
+Con los PR **#30–#34** el sistema deja de ser solo “recibir pedidos” y pasa a una **cadena operativa continua**.  
 
-Antes de declarar **Pilot Ready**, este checklist es el control único:
+Ese es el momento en que YourMeal OS / EatClean empieza a comportarse como **Implementación de Referencia (RI-001)**:
+
+* Antes el objetivo era **construir funcionalidades**.
+* Ahora el objetivo es **demostrar que el modelo operacional sobrevive al uso**.
+
+Antes de G-02, esta checklist es el control único:
 
 | Pregunta | Respuesta esperada |
 |----------|-------------------|
@@ -227,17 +233,47 @@ Prioridad = **cerrar o esconder**, no expandir superficie.
 
 ## Gate G-02 · Pilot Readiness
 
-**Después** de completar esta checklist y los ORR obligatorios.
+Definición canónica FOPEBA: [08 · Gate G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md).
 
-### Condiciones (todas)
+Esta checklist es el **artefacto de gobernanza** que alimenta G-02 — no un QA de features.
 
-1. Todos los ORR obligatorios del piloto en **PASSED** (o ítem explícitamente fuera de alcance firmado).
-2. Ningún botón visible sin funcionalidad (cero humo).
-3. Ninguna pantalla vacía en el camino crítico del Operational Journey.
-4. Ningún flujo roto en Cliente → Pedido → Cocina → Reparto → Entregado.
-5. Ningún dato crítico simulado cuando deba ser real (pedidos, estados, empresas, memberships).
-6. RBAC validado para roles del piloto: `kitchen`, `delivery` / `logistics`, `operations_manager`, `company_admin`, `saas_admin`, customer/employee.
-7. Un pedido recorre el ciclo completo **sin intervención manual en la base de datos**.
+```text
+G-02 · Pilot Readiness
+
+Objetivo
+
+Autorizar el inicio de la Validación Operacional en entorno real.
+
+No evalúa cantidad de funcionalidades.
+
+Evalúa integridad del Operational Journey.
+```
+
+**Pregunta única:** ¿Existe evidencia suficiente para exponer el modelo operacional a la realidad sin introducir nueva incertidumbre evitable?
+
+G-02 **no certifica el producto**. Certifica que la **hipótesis operacional** está lista para enfrentarse a la realidad.
+
+### Debe cumplirse (evidencia)
+
+| # | Condición | Evidencia aquí |
+|---|-----------|----------------|
+| 1 | Journey completo E2E | § 4 · ciclo de pedido |
+| 2 | Estados del ciclo consistentes | Cocina/Reparto · timeline · persistencia |
+| 3 | Sin bloqueadores en flujo principal | Tabla maestra · § 1–3 camino crítico |
+| 4 | Huecos documentados y no comprometedores | § Huecos conocidos |
+| 5 | Limitaciones explícitas (Explicit Uncertainty) | Filas 🟡 / ❌ + fuera de alcance firmado |
+| 6 | ORR del piloto firmados | § ORR |
+| 7 | Trazabilidad evidencia ↔ modelo ↔ implementación | ORR · ADR · esta hoja |
+
+### No exige
+
+Funcionalidad completa · cobertura 100 % · UX pulida · escalabilidad · automatización total · Release v1.0.
+
+### Principio · Pilot Integrity (DICT-069)
+
+> Un piloto no comienza cuando el producto tiene más funcionalidades, sino cuando el Journey mínimo puede recorrerse de forma íntegra, auditable y con incertidumbres explícitamente conocidas.
+
+**Patrón:** sin módulos nuevos → cerrar o esconder huecos → firmar ORR → G-02.
 
 ### Resultado
 
@@ -245,17 +281,17 @@ Prioridad = **cerrar o esconder**, no expandir superficie.
 |-------|-------|
 | Fecha | |
 | Entorno | |
-| Evidencia (links / capturas / FOV) | |
+| Evidencia (links / capturas) | |
 | **G-02** | ☐ PASSED · ☐ BLOCKED |
 
 ### Si G-02 = PASSED
 
-YourMeal OS **deja la fase de construcción** y entra en **validación operacional** (FOV / conocimiento de campo).  
-Ahí FOPEBA genera el mayor valor: observar fricción real, no inventar módulos.
+YourMeal OS deja de comportarse solo como proyecto de software y opera como **RI-001** ([DICT-070](../99-reference/PROJECT_DICTIONARY.md#reference-implementation-ri)): fase de **validación operacional** / experimento controlado.  
+No es el final del desarrollo: es el **inicio** de la obtención de evidencia que determinará cuánto del conocimiento actual resiste el contacto con la operación.
 
 ### Si G-02 = BLOCKED
 
-Registrar bloqueos en esta tabla; no abrir módulos nuevos; resolver huecos o reducir alcance del piloto por escrito.
+Registrar bloqueos; no abrir módulos nuevos; resolver huecos o reducir alcance por escrito.
 
 | Bloqueo | Área | Acción | Dueño |
 |---------|------|--------|-------|

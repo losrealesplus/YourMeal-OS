@@ -129,6 +129,8 @@ Core | Operational | Engineering | Historical
 | `DICT-003` | [IOV](#iov) | Core | Accepted |
 | `DICT-004` | [Knowledge Update](#knowledge-update) | Core | Accepted |
 | `DICT-005` | [Gate](#gate) | Core | Accepted |
+| `DICT-069` | [Pilot Integrity](#pilot-integrity) | Core | Accepted |
+| `DICT-070` | [Reference Implementation (RI)](#reference-implementation-ri) | Core | Accepted |
 | `DICT-006` | [Evidence](#evidence) | Core | Accepted |
 | `DICT-007` | [Knowledge Leakage](#knowledge-leakage) | Core | Accepted |
 | `DICT-008` | [Operational Model](#operational-model) | Core | Accepted |
@@ -197,7 +199,7 @@ Core | Operational | Engineering | Historical
 
 ### Metodología
 
-[FOPEBA](#fopeba) (`DICT-001`) · [FOV](#fov) (`DICT-002`) · [IOV](#iov) (`DICT-003`) · [Knowledge Update](#knowledge-update) (`DICT-004`) · [Gate](#gate) (`DICT-005`) · [Evidence](#evidence) (`DICT-006`) · [Knowledge Leakage](#knowledge-leakage) (`DICT-007`) · [Operational Model](#operational-model) (`DICT-008`) · [Table Validation](#table-validation) (`DICT-009`) · [Field Validation](#field-validation) (`DICT-010`) · [Knowledge Lifetime](#knowledge-lifetime) (`DICT-057`)
+[FOPEBA](#fopeba) (`DICT-001`) · [FOV](#fov) (`DICT-002`) · [IOV](#iov) (`DICT-003`) · [Knowledge Update](#knowledge-update) (`DICT-004`) · [Gate](#gate) (`DICT-005`) · [Pilot Integrity](#pilot-integrity) (`DICT-069`) · [Reference Implementation](#reference-implementation-ri) (`DICT-070`) · [Evidence](#evidence) (`DICT-006`) · [Knowledge Leakage](#knowledge-leakage) (`DICT-007`) · [Operational Model](#operational-model) (`DICT-008`) · [Table Validation](#table-validation) (`DICT-009`) · [Field Validation](#field-validation) (`DICT-010`) · [Knowledge Lifetime](#knowledge-lifetime) (`DICT-057`)
 
 ### Ingeniería
 
@@ -405,25 +407,27 @@ Gate (decisión post-evidencia)
 Puerta de decisión
 
 ## Definición
-Momento formal en el que, a partir de evidencia, se decide si el conocimiento o el producto deben cambiar. **La FOV produce evidencia; el Gate decide cambios.**
+Momento formal en el que, a partir de evidencia, se decide si el conocimiento, el piloto o el producto deben avanzar. **La evidencia informa; el Gate decide.**
 
 ## Cuándo ocurre
-Tras FOV (p. ej. G-01) · también ORR es una puerta binaria previa a FOV.
+- **G-02 · Pilot Readiness** — tras Journey cerrado + ORR; **antes** del piloto / FOV de campo.  
+- **G-01 · Operational Readiness** — tras FOV → KU → EC.  
+- ORR es una puerta binaria de preparación asociada al piloto.
 
 ## Produce
-Aprobación / rechazo de KU · siguiente ciclo · o mantenimiento del modelo.
+Aprobación / rechazo · autorización de experimento (G-02) · readiness de conocimiento (G-01) · o mantenimiento del modelo.
 
 ## No significa
-Daily standup · merge de PR.
+Daily standup · merge de PR · “ya tenemos bastantes features”.
 
 ## Sinónimos
-Gate · G-01 (instancia de campaña)
+Gate · G-01 · G-02 · Pilot Readiness (instancia)
 
 ## Palabras relacionadas
-FOV · Knowledge Update · Evidence · ORR
+FOV · Knowledge Update · Evidence · ORR · Pilot Integrity · Reference Implementation
 
 ## Referencias
-`docs/20-evidence-framework/g01/` · ENGINEERING_PHASE.md
+`docs/20-evidence-framework/g01/` · `docs/20-evidence-framework/08-gate-g02-pilot-readiness.md` · ENGINEERING_PHASE.md
 
 ---
 
@@ -2908,6 +2912,81 @@ Tenant-Branded · BrandConfig · Tenant Brand · brand.manage
 
 
 
+---
+
+# Pilot Integrity
+
+## ID
+DICT-069
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Pilot Integrity
+
+## Tipo
+Principio operativo (FOPEBA)
+
+## Definición
+Un piloto **no** comienza cuando el producto tiene más funcionalidades, sino cuando el **Journey mínimo** puede recorrerse de forma **íntegra**, **auditable** y con **incertidumbres explícitamente conocidas**.
+
+## Implica
+- Cerrar o esconder huecos antes de ampliar alcance.
+- Firmar ORR del piloto.
+- Pasar **G-02 · Pilot Readiness** antes de campo.
+- Documentar Explicit Uncertainty (limitaciones conocidas).
+
+## No significa
+“Más features antes del piloto” · cobertura 100 % · Release v1.0.
+
+## Palabras relacionadas
+Gate · G-02 · Explicit Uncertainty · Operational Integrity · Evidence · Knowledge First
+
+## Referencias
+[G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md) · [PILOT_ACCEPTANCE_CHECKLIST](../00-status/PILOT_ACCEPTANCE_CHECKLIST.md)
+
+
+---
+
+# Reference Implementation (RI)
+
+## ID
+DICT-070
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Reference Implementation (RI)
+
+## Tipo
+Rol del sistema respecto a FOPEBA
+
+## Definición
+Sistema (p. ej. **YourMeal OS / EatClean = RI-001**) que deja de evaluarse solo como proyecto de software y pasa a **demostrar** si el modelo operacional **sobrevive al uso**. Su valor principal para el framework es la **evidencia** y las **Knowledge Contributions**, no el número de módulos.
+
+## Implica
+- Objetivo: demostrar, no construir por construir.
+- Tras G-02: experimento controlado → evidencia → Knowledge Update.
+- Certificación RI ≠ Release v1.0 de producto.
+
+## No significa
+Producto comercial terminado · demoware · piloto sin gobernanza.
+
+## Palabras relacionadas
+FOPEBA · Gate · G-02 · Pilot Integrity · FOV · Knowledge Update
+
+## Referencias
+[G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md) · [FOPEBA](../18-operational-validation/00-operational-product-engineering.md) · [PRE_PILOT_AUDIT](../00-status/PRE_PILOT_AUDIT.md)
+
+
 ## Historial de este diccionario
 
 | Fecha | Cambio |
@@ -2926,4 +3005,5 @@ Tenant-Branded · BrandConfig · Tenant Brand · brand.manage
 | 2026-07-23 | Knowledge Lifetime · DICT-057 · Milestone EatClean Pilot Ready |
 | 2026-07-23 | Tenant-Managed · Tenant Brand · brand.manage · DICT-060…062 |
 | 2026-07-23 | Foundation of Materialization Frozen · Four Layers · Pilot Execution Guide |
+| 2026-07-23 | Gate G-02 Pilot Readiness · DICT-069 Pilot Integrity · DICT-070 Reference Implementation (RI) |
 
