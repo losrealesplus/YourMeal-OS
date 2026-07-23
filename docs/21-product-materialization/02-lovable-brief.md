@@ -36,14 +36,15 @@ inventar brand system paralelo al Design System del repo cuando exista.
 
 Para alinear la Customer App a la identidad del Tenant (EatClean), usar:
 
+- **[EATCLEAN_BRAND_CONTINUITY_LOCKED](./EATCLEAN_BRAND_CONTINUITY_LOCKED.md)** ← prompt Lovable **bloqueado** (PR #28·#29 · no reinterpretar)  
 - [CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md) ← **CJ-001 primero** (Experience First)  
 - [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) ← brief de pantallas  
 - [ADR 0014](../adr/0014-customer-application-is-tenant-branded.md)  
-- [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md)  
+- [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md) ← **Brand Recognition Filter** (no negociable)  
 - [TENANT_BRANDING](../05-architecture/TENANT_BRANDING.md)  
 - [`tenants/eatclean/`](../../tenants/eatclean/README.md)  
 
-Pregunta: ¿Mi madre podría hacer un pedido sin que nadie le explique la app?  
+Filtro: *Si ocultamos "YourMeal OS", ¿se reconoce EatClean por logo, color, tipografía, lenguaje y foto?*  
 Sin tocar HP-001 ni inventar lógica de negocio.
 
 No un único prompt enorme de «toda la app».

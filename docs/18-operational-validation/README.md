@@ -101,7 +101,9 @@ Operational Model (17)
 | 07 | [certification](./07-certification.md) | Niveles Alpha → Beta → RC → **Certified v1.0** |
 | 08 | [methodological-retrospective](./08-methodological-retrospective.md) | Validar el proceso |
 | 09 | [joint-gap-analysis](./09-joint-gap-analysis.md) | **Siguiente** — priorizar MC-001…006 |
-| — | [knowledge-state](./knowledge-state.md) | Estado del conocimiento · proveniencia |
+| — | [knowledge-state](./knowledge-state.md) | Estado del conocimiento operacional · proveniencia |
+| — | [knowledge-lifetime](./knowledge-lifetime.md) | **Caducidad documental** · Contract · Implementation · Iteration |
+| — | [PILOT_EXECUTION_GUIDE](./PILOT_EXECUTION_GUIDE.md) | **Fase 2** — demostrar una semana EatClean · FOPEBA observa |
 
 ---
 

@@ -1,7 +1,8 @@
 # EXPERIENCE REFACTOR · EatClean v1
 
 **Sprint:** Experience only · no lógica · no Supabase · no HP-001  
-**Docs:** [TENANT_IMPLEMENTATION](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) · [CJ-001](./CUSTOMER_JOURNEYS.md#cj-001--pedido-semanal) · [ADR 0014](../adr/0014-customer-application-is-tenant-branded.md)
+**Docs:** [TENANT_IMPLEMENTATION](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) · [TENANT_EXPERIENCE_SPEC](../05-architecture/TENANT_EXPERIENCE_SPEC.md) · [CJ-001](./CUSTOMER_JOURNEYS.md#cj-001--pedido-semanal) · [ADR 0014](../adr/0014-customer-application-is-tenant-branded.md)  
+**Continuación (bitácora):** [EXPERIENCE_REFACTOR_EATCLEAN_V1_1](./EXPERIENCE_REFACTOR_EATCLEAN_V1_1.md)
 
 ## Objetivo
 

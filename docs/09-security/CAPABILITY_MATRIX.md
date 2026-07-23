@@ -105,14 +105,27 @@ Legend: ✅ granted · ❌ denied
 
 ---
 
-## Accounting & admin
+## Accounting, admin & brand
 
 | Capability | accounting | company_admin | saas_admin |
 |------------|------------|---------------|------------|
 | accounting.operate | ✅ | ✅ | ✅ |
 | admin.settings | ❌ | ✅ | ✅ |
+| **brand.manage** | ❌ | ✅ | ✅ |
 | saas.manage | ❌ | ❌ | ✅ |
 | records.purge | ❌ | ❌ | ✅ |
+
+### `brand.manage`
+
+| | |
+|--|--|
+| **Qué** | Leer/actualizar Tenant Brand (logo · colores) vía BrandingService |
+| **Quién** | `company_admin` · `saas_admin` |
+| **Superficie** | `/admin/branding` |
+| **Límites** | [BRAND_CONTRACT](../05-architecture/BRAND_CONTRACT.md) |
+| **Objeto** | [Tenant Brand](../17-operational-model/02-core-objects/tenant-brand.md) |
+
+La UI puede ocultar el acceso; la **seguridad** es Service + roles/capabilities + RLS/Storage policies.
 
 ---
 

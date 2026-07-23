@@ -55,6 +55,7 @@ Matriz: [01](./01-screen-knowledge-matrix.md).
 | [PRODUCT_MATERIALIZATION_RULES](./PRODUCT_MATERIALIZATION_RULES.md) | Infra · experiencias completas · roles |
 | [01 Matrix](./01-screen-knowledge-matrix.md) | Pantalla ↔ OM |
 | [02 Lovable Brief](./02-lovable-brief.md) | Patrones de prompt |
+| [EATCLEAN_BRAND_CONTINUITY_LOCKED](./EATCLEAN_BRAND_CONTINUITY_LOCKED.md) | Prompt Lovable **bloqueado** · continuidad de marca (#28·#29) |
 | [03 Figma Support](./03-figma-support.md) | Figma = apoyo |
 
 ---

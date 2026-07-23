@@ -8,32 +8,53 @@
 PROJECT STATE
 ══════════════════════════════════════════════════
 
-Documentary / SaaS identity: Closed (pending #25 → main)
+Foundation of Materialization: **Frozen v1** — [ACT-002](./ACT-002_FOUNDATION_OF_MATERIALIZATION_FROZEN.md) (#24→#31)
+Experience base (EatClean): **Frozen** — [ACT-001](./ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) (#24→#30)
 Engineering Phase: Complete (pending operational authorization)
-Current Phase:     Evidence Gate  (pre-ORR)
-Next Gate:         ORR  (PASSED | BLOCKED)
-Next Discipline:   Operational Engineering
-Primary Artifact:  Field Evidence
-Focus operativo:   ¿Está listo para evidencia? · Smoke HP-001 · ORR
-Focus experiencia: ¿Mi madre podría pedir sin que nadie le explique la app?
+Current Phase:     Pilot Ready  ·  Evidence Gate (pre-ORR)
+Next Gate:         ORR  (PASSED | BLOCKED)  +  ciclo EP-001…EP-005
+Next Discipline:   Demostrar (no diseñar) · Operational Engineering
+Primary Artifact:  [PILOT_EXECUTION_GUIDE](../18-operational-validation/PILOT_EXECUTION_GUIDE.md)
+Focus:             ¿EatClean opera una semana solo con YourMeal OS + evidencia FOPEBA?
 Last Baseline:     v0.2.0-engineering-baseline (IR-001)
 
 ══════════════════════════════════════════════════
 ```
 
-Cierre formal: [ENGINEERING_PHASE](./ENGINEERING_PHASE.md).
+Materialization: [ACT-002](./ACT-002_FOUNDATION_OF_MATERIALIZATION_FROZEN.md) ✅ Frozen v1.  
+Experiencia base: [ACT-001](./ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) ✅ Frozen.  
+Guía de validación: [PILOT_EXECUTION_GUIDE](../18-operational-validation/PILOT_EXECUTION_GUIDE.md).  
+Milestone abierto: [MILESTONE_EATCLEAN_PILOT_READY](./MILESTONE_EATCLEAN_PILOT_READY.md).  
+Mapa del sistema: [FOUR_LAYERS](../05-architecture/FOUR_LAYERS.md).
 
 ```text
-Foundation ✅ → Governance ✅ → OM ✅ → Implementation ✅
-→ Engineering Baseline ✅ → Dictionary + ADR-0014 ✅ (#25)
+Foundation ✅ → Methodology ✅ → Tenant Branding ✅ → Experience Baseline ✅
+→ Materialization ✅ Frozen (ACT-002 · #24→#31)
 ───────────────
-Comienza Operational Engineering  (tras ORR PASSED)
-Experience: Journey-first (CJ-001) · pantallas MVP ≤ 15
+Piloto: demostrar  ·  EP-001 → EP-005  ·  FOPEBA observa
 ```
 
-> Dos líneas en paralelo: **evidencia operativa** (FOPEBA) y **experiencia Tenant** (Journey → Screen → Capability). No compiten.  
-> Estabilidad conceptual: el valor siguiente es **demostrar en campo** (CJ-001 + Smoke/ORR/FOV), no añadir conceptos.  
-> Motores de cambio por dominio: [PROJECT_DOMAINS](./PROJECT_DOMAINS.md).
+> ❌ No diseñar / no polish estético (ACT-001 · ACT-002).  
+> ✅ Demostrar el ciclo: Cliente → Sistema → Cocina → Reparto → Cliente → Evidencia.  
+> Motores de cambio: [PROJECT_DOMAINS](./PROJECT_DOMAINS.md).
+
+---
+
+## Pregunta de éxito (Fase 2)
+
+> **¿Puede un negocio real operar durante una semana completa utilizando exclusivamente YourMeal OS y generar evidencia suficiente para que FOPEBA confirme, corrija o amplíe el conocimiento obtenido?**
+
+---
+
+## Frozen v1 (no reabrir por preferencia)
+
+| Bloque | Acta / ancla |
+|--------|----------------|
+| Foundation | Foundation Lock |
+| Methodology | Acta metodología · FOPEBA · Dictionary · Knowledge Lifetime |
+| Tenant Branding | ADR-0014 · Brand Contract · PR #31 |
+| Experience Baseline | [ACT-001](./ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) |
+| Materialization | [ACT-002](./ACT-002_FOUNDATION_OF_MATERIALIZATION_FROZEN.md) · [FOUR_LAYERS](../05-architecture/FOUR_LAYERS.md) |
 
 ---
 
@@ -47,40 +68,40 @@ Migration → Smoke HP-001 → ORR → FOV
 
 Pregunta: ¿Hay evidencia para ORR? Congelación funcional hasta ORR.
 
-### Línea de experiencia (nuevo frente)
+### Línea de piloto — EatClean Pilot Ready 🟡
 
 ```text
-Customer Journeys (CJ-001)
+EP-001 Weekly Experience
         ↓
-Pantallas MVP (≤ 15)
+EP-002 Kitchen Operations
         ↓
-Experience Refactor ✅ (UI)
+EP-003 Delivery Operations
         ↓
-Observación de uso  ← AQUÍ
+EP-004 Operational Close
         ↓
-EatClean Release UX (solo con evidencia)
+EP-005 Evidence Collection
 ```
 
-Pregunta: **¿Mi madre podría hacer un pedido sin que nadie le explique la app?**
+Ejecución: [PILOT_EXECUTION_GUIDE](../18-operational-validation/PILOT_EXECUTION_GUIDE.md).
 
-**Congelado por intuición.** Siguiente paso: [CJ001_USAGE_OBSERVATION](../07-experience/CJ001_USAGE_OBSERVATION.md) — móvil, cuatro preguntas, sesión sin ayudar.
+FOPEBA en piloto:
 
-Sprint UI: [EXPERIENCE_REFACTOR_EATCLEAN_V1](../07-experience/EXPERIENCE_REFACTOR_EATCLEAN_V1.md).
-
-Docs: [CUSTOMER_JOURNEYS](../07-experience/CUSTOMER_JOURNEYS.md) · [TENANT_IMPLEMENTATION_EATCLEAN](../05-architecture/TENANT_IMPLEMENTATION_EATCLEAN.md) · [`tenants/eatclean/`](../../tenants/eatclean/README.md).
+```text
+Construcción → Validación → Observación → Aprendizaje → Knowledge Update
+```
 
 ---
 
 ## Dominios oficiales
 
-Mapa: [PROJECT_DOMAINS](./PROJECT_DOMAINS.md).
+Mapa: [PROJECT_DOMAINS](./PROJECT_DOMAINS.md). Capas: [FOUR_LAYERS](../05-architecture/FOUR_LAYERS.md).
 
 | Dominio | Entregable | Estado |
 |---------|------------|--------|
-| **Knowledge** | Operational Model | ✅ Frozen / Closed |
-| **Engineering** | Código | ✅ Implementado · ✅ #23 en main |
-| **Experience** | Customer Journeys + Screens | 🟡 UI CJ-001 lista · **falta observación de uso** |
-| **Operations** | Evidencia | ⏳ Smoke → ORR → FOV |
+| **Knowledge** | Operational Model · FOPEBA | ✅ Frozen / Closed · observa en piloto |
+| **Engineering** | Código · Platform Layer | ✅ Implementado · Materialization Frozen |
+| **Experience** | CJ + OJ + identidad Tenant | ✅ ACT-001 · ✅ ACT-002 |
+| **Operations** | Evidencia · semana piloto | ⏳ Smoke → ORR → FOV · EP-001…005 |
 
 ---
 
@@ -90,8 +111,8 @@ Mapa: [PROJECT_DOMAINS](./PROJECT_DOMAINS.md).
 
 Admitido únicamente:
 
-* bloqueo descubierto en Smoke;  
-* corrección imprescindible para completar HP-001;  
+* bloqueo descubierto en Smoke o en el piloto;  
+* corrección imprescindible para completar HP-001 / EP;  
 * documentación de evidencia.
 
 Cualquier “pequeña mejora” en el merge **espera** al siguiente ciclo.
@@ -101,26 +122,31 @@ Cualquier “pequeña mejora” en el merge **espera** al siguiente ciclo.
 ## Cadena (sin pasos intermedios)
 
 ```text
-#25 → main → Apply migration → Smoke HP-001 → ORR → PASSED → Ready for FOV → FOV-001
+#31 / ACT-002 → main → Apply migration → Smoke HP-001 → ORR → PASSED → Ready for FOV → FOV-001
+                └── paralelo: semana piloto (PILOT_EXECUTION_GUIDE · EP-001…005)
 ```
 
 | Evento | Estado |
 |--------|:------:|
 | PR #23 merge (hardening) | ✅ |
-| PR #25 merge (Dictionary · ADR-0014 · Experience Spec) | ⏳ |
+| PR #24→#30 Experience + ACT-001 | ✅ / en curso según merge |
+| PR #31 Tenant-Managed + ACT-002 | ⏳ |
 | Migración `program_draft_order` | ⏳ |
 | Smoke HP-001 | ⏳ |
 | ORR | ⏳ |
 | Ready for FOV | ⏳ |
+| Semana piloto EatClean | ⏳ |
 
-### Recorrido a observar (Smoke / FOV)
+### Recorrido a observar (Smoke / FOV / piloto)
 
 ```text
-Login → Dashboard → Weekly Menu → Seleccionar platos
-→ Programar pedido → Resumen → Confirmar → Persistencia → Auditoría
+Login → Customer App → Weekly Menu → Seleccionar platos
+→ Programar pedido → Resumen → Confirmar
+→ Centro de Operaciones → Cocina → Reparto → Cierre
+→ Evidencia FOPEBA
 ```
 
-Ese flujo ya no valida la arquitectura: valida **experiencia** y genera las primeras observaciones reales (FOV → Knowledge Update → Gate).
+Ese flujo ya no valida la arquitectura de materialización: **la da por congelada** y valida la **operación**.
 
 ---
 
@@ -130,13 +156,15 @@ Ese flujo ya no valida la arquitectura: valida **experiencia** y genera las prim
 |-----------|:------:|
 | Knowledge Confidence | 🟢 |
 | Engineering Confidence | 🟢 |
+| Materialization Confidence | 🟢 |
 | Operational Confidence | ⚪ |
 
 ---
 
-## Regla permanente (post-ORR)
+## Regla permanente (post-ORR / durante piloto)
 
-> **La FOV produce evidencia. El Gate decide cambios.**
+> **La FOV produce evidencia. El Gate decide cambios.**  
+> FOPEBA observa; no inventa metodología en caliente.
 
 ## Lenguaje oficial
 
@@ -146,4 +174,4 @@ Ver [ENGINEERING_PHASE](./ENGINEERING_PHASE.md) · [FOV-001](../30-field-validat
 
 ---
 
-Checklists: [SMOKE_HP-001](./SMOKE_HP-001.md) · [ORR](../22-implementation/ORR.md) · [FOV-001](../30-field-validation/FOV-001_HP-001.md) (solo tras ORR PASSED).
+Checklists: [SMOKE_HP-001](./SMOKE_HP-001.md) · [ORR](../22-implementation/ORR.md) · [PILOT_EXECUTION_GUIDE](../18-operational-validation/PILOT_EXECUTION_GUIDE.md) · [FOV-001](../30-field-validation/FOV-001_HP-001.md) (solo tras ORR PASSED).
