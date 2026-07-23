@@ -110,7 +110,7 @@ Hito: ORR PASSED → Ready for FOV → FOV-001
 
 **Tablero:** [CURRENT_PHASE](./docs/00-status/CURRENT_PHASE.md) · [ENGINEERING_PHASE](./docs/00-status/ENGINEERING_PHASE.md)  
 **Diccionario:** [PROJECT_DICTIONARY](./docs/99-reference/PROJECT_DICTIONARY.md) (`DICT-xxx`)  
-**Siguiente:** merge PR #23 → migración → [SMOKE_HP-001](./docs/00-status/SMOKE_HP-001.md) → [ORR](./docs/22-implementation/ORR.md)  
+**Siguiente:** migración → [SMOKE_HP-001](./docs/00-status/SMOKE_HP-001.md) → [ORR](./docs/22-implementation/ORR.md)  
 **Pre-piloto:** [PRE_PILOT_AUDIT](./docs/00-status/PRE_PILOT_AUDIT.md)  
 
 **Cierre metodológico:** [Acta](./docs/00-status/ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md)  
