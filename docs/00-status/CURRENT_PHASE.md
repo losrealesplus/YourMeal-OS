@@ -18,7 +18,7 @@ Primary Artifact:  [ORR Party](./ORR_B2B_B2C_PARTY.md) · [PILOT_EXECUTION_GUIDE
 Focus operativo:   ¿Tres recorridos (Particular · Empresa staff · Empleado) E2E?
 Focus experiencia: ¿Mi madre podría pedir sin que nadie le explique la app?
 Focus piloto:      ¿EatClean opera una semana solo con YourMeal OS + evidencia FOPEBA?
-Completitud UI:    [Functional Completeness](./EATCLEAN_PILOT_FUNCTIONAL_COMPLETENESS_REVIEW.md) · cero humo
+Completitud UI:    [Functional Completeness](./EATCLEAN_PILOT_FUNCTIONAL_COMPLETENESS_REVIEW.md) · cero humo (Inventario/Clientes ops aún 🟡)
 Last Baseline:     v0.2.0-engineering-baseline (IR-001)
 
 ══════════════════════════════════════════════════
