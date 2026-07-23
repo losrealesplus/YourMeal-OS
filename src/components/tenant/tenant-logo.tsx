@@ -1,4 +1,5 @@
-import logoUrl from "@/tenant/resources/logo.svg?url";
+import logoAsset from "@/assets/eatclean-logo.png.asset.json";
+const logoUrl = logoAsset.url;
 import { brandConfig } from "@/tenant/brand-config";
 import { cn } from "@/lib/utils";
 
