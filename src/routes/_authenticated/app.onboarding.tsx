@@ -1,11 +1,11 @@
 /**
- * Onboarding — choose demand mode (ADR 0015).
- * Individual path preserves CJ-001; Company / Employee extend B2B.
+ * Onboarding — Individual (B2C) or Employee join (B2B).
+ * Companies are NOT self-registered (EatClean provisions them — ADR 0015).
  */
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Building2, UserRound, Users } from "lucide-react";
+import { UserRound, Users } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { createServiceContext } from "@/services/types";
@@ -50,11 +50,11 @@ function OnboardingTypePage() {
     <div className="flex-1 flex flex-col pb-10">
       <ScreenHeader
         title={t("customer:onboardingTitle", {
-          defaultValue: "¿Cómo vas a usar EatClean?",
+          defaultValue: "¿Cómo vas a pedir?",
         })}
         subtitle={t("customer:onboardingHint", {
           defaultValue:
-            "Particular y Empresa son flujos distintos. Elige el que corresponde a tu operación.",
+            "Particular o empleado de una empresa ya dada de alta por EatClean.",
         })}
       />
 
@@ -68,16 +68,6 @@ function OnboardingTypePage() {
           onClick={chooseIndividual}
           disabled={busy}
         />
-        <Link to="/app/onboarding/company" className="block">
-          <ChoiceCard
-            icon={<Building2 className="size-5" />}
-            title={t("customer:onboardingCompany", { defaultValue: "Empresa" })}
-            hint={t("customer:onboardingCompanyHint", {
-              defaultValue: "Registro de empresa, código y portal de administración.",
-            })}
-            asDiv
-          />
-        </Link>
         <Link to="/app/onboarding/employee" className="block">
           <ChoiceCard
             icon={<Users className="size-5" />}
@@ -85,14 +75,20 @@ function OnboardingTypePage() {
               defaultValue: "Empleado de una empresa",
             })}
             hint={t("customer:onboardingEmployeeHint", {
-              defaultValue: "Me uno con el Company Code de mi empresa.",
+              defaultValue:
+                "Me uno con el Company Code que me ha facilitado mi empresa.",
             })}
             asDiv
           />
         </Link>
       </div>
 
-      <div className="px-6 mt-8">
+      <p className="px-6 mt-8 text-xs text-muted-foreground text-pretty">
+        ¿Representas a una empresa interesada? El alta la realiza EatClean tras el
+        proceso comercial — no hay registro público de empresas.
+      </p>
+
+      <div className="px-6 mt-4">
         <PrimaryCTA variant="outline" onClick={() => navigate({ to: "/app" })}>
           {t("common:back", { defaultValue: "Volver" })}
         </PrimaryCTA>

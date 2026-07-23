@@ -94,12 +94,18 @@ B2C CJ-001 path unchanged: channel `individual`, company fields null.
 
 | Capability | Who |
 |------------|-----|
-| `company.manage` | Tenant `company_admin` / `saas_admin` · Company Account portal admins (`membership.is_admin`) |
+| `company.manage` | Tenant `company_admin` / `saas_admin` · Company Account portal admins (`membership.is_admin`) for structure only |
 | `site.manage` | same |
 | `organization.manage` | Organizational Units |
 | `employee.manage` | memberships / invitations |
 
 Tenant role `company_admin` = **Organization (EatClean) admin**, not “any B2B company”. Portal admins are scoped by membership.
+
+### 6b. Commercial provisioning (mandatory)
+
+> **Companies are not self-registered.** EatClean staff provisions Company Accounts after the sales process (`/admin/companies`). Employees only **join** via Company Code (and/or Invite later).
+
+Public Customer App must not create Company Accounts.
 
 ### 7. Preserve CJ-001
 
@@ -119,11 +125,13 @@ Provisioning ensures a `customers` row + tenant membership exists for individual
 ### Negative / trade-offs
 
 - Evolves foresight tables (`companies`, `company_locations`, …) instead of greenfield rename (aliases in app layer)  
-- Company portal is minimal v1 (no smart invites email pipeline)  
+- Company portal is minimal v1 (Company Invite email pipeline = follow-up)  
 - `company_admin` role name remains historically Tenant-centric
+- Public company self-registration intentionally removed (commercial event)
 
 ### Follow-ups (explicitly out of this ADR)
 
+- Company Invite (secure link) as primary join mode for large orgs  
 - Intelligent routes / route optimization  
 - Advanced invoicing / ERP  
 - Cross-tenant multi-empresa  

@@ -11,7 +11,7 @@ import type {
 } from "../domain/company-account";
 import { isValidCompanyCodeFormat } from "../domain/company-account";
 
-export type RegisterCompanyInput = {
+export type ProvisionCompanyInput = {
   name: string;
   vatId?: string | null;
   contactName: string;
@@ -26,6 +26,9 @@ export type RegisterCompanyInput = {
   /** Optional first organizational unit name. */
   unitName?: string;
 };
+
+/** @deprecated Use ProvisionCompanyInput — companies are not self-registered. */
+export type RegisterCompanyInput = ProvisionCompanyInput;
 
 export type JoinCompanyInput = {
   companyCode: string;
@@ -46,6 +49,15 @@ function canStaffManage(ctx: ServiceContext): boolean {
   );
 }
 
+function assertStaffCanProvision(ctx: ServiceContext): void {
+  if (!canStaffManage(ctx)) {
+    throw new DomainError(
+      "PERMISSION_DENIED",
+      "Company Accounts are provisioned by EatClean staff only (company.manage)",
+    );
+  }
+}
+
 export const CompanyAccountService = {
   /** CJ-001 safety: person Customer + membership + role for the active tenant. */
   async ensureIndividualCustomer(ctx: ServiceContext): Promise<string> {
@@ -60,11 +72,16 @@ export const CompanyAccountService = {
     return customerId;
   },
 
-  async registerCompany(
+  /**
+   * Commercial event: EatClean staff creates a Company Account.
+   * Does **not** attach the staff user as an Employee Membership.
+   */
+  async provisionCompany(
     ctx: ServiceContext,
-    input: RegisterCompanyInput,
+    input: ProvisionCompanyInput,
   ): Promise<{ company: CompanyAccount; site: Site; unit: OrganizationalUnit }> {
     assertTenant(ctx);
+    assertStaffCanProvision(ctx);
     if (!input.name.trim()) {
       throw new DomainError("INVALID_STATE", "Company name is required");
     }
@@ -76,12 +93,6 @@ export const CompanyAccountService = {
     }
 
     const repo = createCompanyAccountRepository(ctx.supabase, ctx.tenantId);
-    const customerId = await repo.ensureIndividualCustomer({
-      userId: ctx.userId,
-      displayName: input.contactName,
-      email: input.contactEmail,
-    });
-
     const companyCode = await repo.generateCompanyCode();
     const company = await repo.insertCompany({
       name: input.name.trim(),
@@ -106,22 +117,33 @@ export const CompanyAccountService = {
       name: input.unitName?.trim() || "General",
     });
 
-    await repo.insertMembership({
-      companyId: company.id,
-      customerId,
-      siteId: site.id,
-      organizationalUnitId: unit.id,
-      isAdmin: true,
-    });
-
     await AuditService.write(ctx, {
       entityType: "company",
       entityId: company.id,
       action: "create",
-      newData: { companyCode: company.companyCode, name: company.name },
+      newData: {
+        companyCode: company.companyCode,
+        name: company.name,
+        provisionedBy: "tenant_staff",
+      },
     });
 
     return { company, site, unit };
+  },
+
+  /** @deprecated Public self-registration removed — use provisionCompany from admin. */
+  async registerCompany(
+    ctx: ServiceContext,
+    input: ProvisionCompanyInput,
+  ): Promise<{ company: CompanyAccount; site: Site; unit: OrganizationalUnit }> {
+    return this.provisionCompany(ctx, input);
+  },
+
+  async listCompanies(ctx: ServiceContext): Promise<CompanyAccount[]> {
+    assertTenant(ctx);
+    assertStaffCanProvision(ctx);
+    const repo = createCompanyAccountRepository(ctx.supabase, ctx.tenantId);
+    return repo.listCompanies();
   },
 
   async lookupCompanyByCode(

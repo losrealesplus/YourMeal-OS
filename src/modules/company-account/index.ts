@@ -11,6 +11,7 @@ export type {
 export { isValidCompanyCodeFormat } from "./domain/company-account";
 export { CompanyAccountService } from "./application/company-account-service";
 export type {
+  ProvisionCompanyInput,
   RegisterCompanyInput,
   JoinCompanyInput,
 } from "./application/company-account-service";

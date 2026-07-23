@@ -75,13 +75,9 @@ function CompanyPortalPage() {
         <div className="px-6 text-sm text-muted-foreground">
           {t("customer:noCompanyMembership", {
             defaultValue:
-              "Aún no perteneces a una empresa. Regístrala o únete con un Company Code.",
+              "Aún no perteneces a una empresa. Únete con el Company Code que te facilite EatClean o tu empresa. El alta de empresas la realiza EatClean (no hay registro público).",
           })}
           <div className="mt-4 space-y-2">
-            <Link className="text-primary font-semibold underline" to="/app/onboarding/company">
-              Registrar empresa
-            </Link>
-            <br />
             <Link className="text-primary font-semibold underline" to="/app/onboarding/employee">
               Unirme con código
             </Link>

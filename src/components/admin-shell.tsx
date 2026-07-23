@@ -16,6 +16,7 @@ import {
   Megaphone,
   Settings,
   Palette,
+  Building2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,6 +31,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
   const items = [
     { to: "/admin", label: t("admin:dashboard"), icon: LayoutDashboard, exact: true },
+    { to: "/admin/companies", label: t("admin:companyClients", { defaultValue: "Clientes Empresa" }), icon: Building2, exact: false },
     { to: "/admin/customers", label: t("admin:customers"), icon: Users, exact: false },
     { to: "/admin/support", label: t("admin:support"), icon: LifeBuoy, exact: false },
     { to: "/admin/menus", label: t("admin:menus"), icon: CalendarDays, exact: false },

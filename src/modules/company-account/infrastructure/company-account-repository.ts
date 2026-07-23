@@ -59,6 +59,17 @@ export function createCompanyAccountRepository(client: Client, tenantId: string)
       return String(data);
     },
 
+    async listCompanies(): Promise<CompanyAccount[]> {
+      const { data, error } = await db
+        .from("companies")
+        .select("*")
+        .eq("tenant_id", tenantId)
+        .is("deleted_at", null)
+        .order("name");
+      if (error) throw error;
+      return ((data ?? []) as Record<string, unknown>[]).map(mapCompany);
+    },
+
     async findCompanyByCode(code: string): Promise<CompanyAccount | null> {
       const { data, error } = await db
         .from("companies")
