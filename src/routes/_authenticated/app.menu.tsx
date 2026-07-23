@@ -1,29 +1,28 @@
-import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import {
-  DayPicker,
-  DishCard,
-} from "@/components/consumer";
+import { DayPicker, MenuDishPost, dishMacrosLine, PrimaryCTA } from "@/components/consumer";
 import { useWeeklyMenu } from "@/hooks/use-weekly-menu";
-import heroImage from "@/assets/eatclean-hero.jpg";
+import { utcWeekStartMonday } from "@/modules/weekly-menu/application/week-dates";
+import { DishThumb } from "@/components/consumer/dish-thumb";
+import dishPhoto from "@/assets/eatclean-hero.jpg";
 
 /**
- * Screen: Customer · Weekly Menu
- * - Objetivo operacional: explorar el menú semanal antes de programar.
- * - Capability: weekly-menu.browse
- * - Core Object(s): WeeklyMenu · Dish
- * - CAP-003: useWeeklyMenu() published offer by day (no order/stock/promo rules)
+ * SCR-006 · Weekly Menu — CJ-001
+ * Instagram product language: big photos, dish name hero, macros secondary.
+ * Choosing food for the week — not filling a form.
  */
 export const Route = createFileRoute("/_authenticated/app/menu")({
   component: MenuPage,
 });
 
 function MenuPage() {
-  const { t } = useTranslation(["customer", "common"]);
+  const { t, i18n } = useTranslation(["customer", "common"]);
   const [active, setActive] = useState(0);
-  const { data: weeklyMenu } = useWeeklyMenu();
-  const days = [
+  const weekStart = utcWeekStartMonday();
+  const { data: weeklyMenu } = useWeeklyMenu(weekStart);
+
+  const dayShort = [
     t("customer:dayMon"),
     t("customer:dayTue"),
     t("customer:dayWed"),
@@ -33,78 +32,132 @@ function MenuPage() {
     t("customer:daySun"),
   ];
 
-  const tagLabels = {
-    vegan: t("customer:tagVegan"),
-    vegetarian: t("customer:tagVegetarian"),
-    glutenFree: t("customer:tagGlutenFree"),
-    lactoseFree: t("customer:tagLactoseFree"),
-    spicy: t("customer:tagSpicy"),
+  const dayFull = [
+    t("customer:dayMonFull"),
+    t("customer:dayTueFull"),
+    t("customer:dayWedFull"),
+    t("customer:dayThuFull"),
+    t("customer:dayFriFull"),
+    t("customer:daySatFull"),
+    t("customer:daySunFull"),
+  ];
+
+  const macroLabels = {
+    protein: t("customer:macroProtein"),
+    carbs: t("customer:macroCarbs"),
+    fat: t("customer:macroFat"),
   };
 
   const dishes = weeklyMenu?.days[active]?.dishes ?? [];
-  const featured = dishes[0];
+  const hasAnyDish = useMemo(
+    () => (weeklyMenu?.days ?? []).some((d) => d.dishes.length > 0),
+    [weeklyMenu],
+  );
+
+  const weekLabel = formatWeekOf(weekStart, i18n.language, t("customer:weekOf"));
 
   return (
-    <div className="flex-1 flex flex-col pb-4">
-      {/* Editorial header */}
-      <section className="px-6 pt-6">
-        <p className="meta-label text-primary">{t("customer:weekOf")}</p>
-        <h1 className="text-3xl font-extrabold tracking-tight mt-1 text-balance">
-          {t("customer:weeklyMenu")}
-        </h1>
-        <p className="text-sm text-muted-foreground mt-2 max-w-md">
-          {t("customer:menuHint")}
+    <div className="flex-1 flex flex-col pb-28">
+      <header className="px-6 pt-8 pb-2 space-y-3">
+        <p className="text-sm font-semibold text-muted-foreground tracking-wide">
+          {weekLabel}
         </p>
-      </section>
+        <h1 className="text-[1.85rem] font-extrabold tracking-tight text-balance leading-tight">
+          {t("customer:programWeeklyMenu")}
+        </h1>
+      </header>
 
-      <div className="px-6 mt-5">
-        <DayPicker days={days} activeIndex={active} onSelect={setActive} />
+      <div className="px-6 mt-5 sticky top-0 z-10 bg-background/95 backdrop-blur-sm py-3">
+        <DayPicker days={dayShort} activeIndex={active} onSelect={setActive} />
       </div>
 
-      {/* Featured hero for the day */}
-      {featured ? (
-        <section className="px-6 mt-6">
-          <div className="relative rounded-[1.75rem] overflow-hidden shadow-sm">
-            <img
-              src={heroImage}
-              alt=""
-              width={1600}
-              height={1200}
-              className="w-full h-52 object-cover"
-            />
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(180deg, transparent 30%, rgba(26,46,36,0.8) 100%)",
-              }}
-            />
-            <div className="absolute inset-x-0 bottom-0 p-5 text-white">
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-90">
-                {days[active]}
-              </p>
-              <p className="text-xl font-extrabold tracking-tight mt-1 text-balance">
-                {featured.name}
-              </p>
-              <p className="text-xs opacity-90 mt-1 line-clamp-1">
-                {featured.tagline}
-              </p>
-            </div>
-          </div>
-        </section>
-      ) : null}
+      <div className="px-6 pt-2 pb-4">
+        <p className="text-lg font-extrabold tracking-tight">{dayFull[active]}</p>
+      </div>
 
-      {/* Rest of the day */}
-      <div className="px-6 space-y-4 py-6">
-        {dishes.slice(1).map((d) => (
-          <DishCard key={d.id + active} dish={d} tagLabels={tagLabels} />
+      <div className="px-6 space-y-12 pb-6">
+        {dishes.map((d) => (
+          <MenuDishPost
+            key={d.id + active}
+            dish={d}
+            imageSrc={dishPhoto}
+            macrosLabel={dishMacrosLine(d, macroLabels)}
+            cta={
+              <Link
+                to="/app/schedule"
+                className="flex h-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground text-[15px] font-bold tracking-wide"
+              >
+                {t("customer:selectDish")}
+              </Link>
+            }
+          />
         ))}
+
         {dishes.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-10">
-            {t("customer:menuEmptyDay")}
-          </p>
+          <MenuEmpty
+            title={
+              hasAnyDish
+                ? t("customer:menuEmptyDay")
+                : t("customer:menuEmptyTitle")
+            }
+            hint={hasAnyDish ? undefined : t("customer:menuEmptyHint")}
+            ctaLabel={t("customer:menuEmptyCta")}
+          />
         ) : null}
       </div>
+
+      {dishes.length > 0 ? (
+        <div className="fixed bottom-20 inset-x-0 z-20 px-6 pointer-events-none">
+          <div className="mx-auto max-w-lg pointer-events-auto">
+            <Link to="/app/schedule" className="block">
+              <PrimaryCTA className="!h-14 !rounded-2xl shadow-lg shadow-primary/20">
+                {t("customer:scheduleCta")}
+              </PrimaryCTA>
+            </Link>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
+}
+
+function MenuEmpty({
+  title,
+  hint,
+  ctaLabel,
+}: {
+  title: string;
+  hint?: string;
+  ctaLabel: string;
+}) {
+  return (
+    <div className="flex flex-col items-center text-center pt-6 pb-10 space-y-6">
+      <DishThumb
+        emoji="🥗"
+        imageSrc={dishPhoto}
+        size="hero"
+        className="!rounded-[1.75rem] max-w-sm"
+      />
+      <div className="space-y-2 max-w-[22rem]">
+        <p className="text-xl font-extrabold tracking-tight text-balance">{title}</p>
+        {hint ? (
+          <p className="text-sm text-muted-foreground leading-relaxed">{hint}</p>
+        ) : null}
+      </div>
+      <Link to="/app" className="w-full max-w-sm">
+        <PrimaryCTA className="!h-14 !rounded-2xl">{ctaLabel}</PrimaryCTA>
+      </Link>
+    </div>
+  );
+}
+
+function formatWeekOf(weekStart: string, locale: string, prefix: string): string {
+  const [y, m, d] = weekStart.split("-").map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d));
+  const formatted = new Intl.DateTimeFormat(locale || "es", {
+    day: "numeric",
+    month: "long",
+    timeZone: "UTC",
+  }).format(date);
+  return `${prefix} ${formatted}`;
 }

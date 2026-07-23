@@ -9,6 +9,7 @@ Capa de **experiencia del usuario final** (Customer Application).
 |-----------|------------|
 | [Operational Model](../17-operational-model/README.md) | ¿Cómo funciona la operación? |
 | **Experience** (esta carpeta) | ¿Cómo la vive el usuario? |
+| [CJ001_USAGE_OBSERVATION](./CJ001_USAGE_OBSERVATION.md) | ¿Una persona real completa el pedido sin ayuda? |
 
 ## Principio: Experience First
 
