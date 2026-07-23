@@ -6,6 +6,14 @@ export default {
   profile: "Profil",
   noOrdersTitle: "Noch keine Bestellungen",
   noOrdersHint: "Sobald Sie Ihre erste Woche planen, erscheint sie hier.",
+  
+  homeHeroQuestion: "Have you scheduled your order for this week?",
+  homeFavorites: "Your favourite dishes",
+  homeThisWeekMenu: "This week's menu",
+  summaryCalmTitle: "Your order is ready",
+  summaryCalmHint: "Check delivery and total before confirming.",
+  summaryAllGood: "All set.",
+
   greeting: "Hallo",
   assistantHint: "Was benötigt jetzt Ihre Aufmerksamkeit?",
   momentTitle: "Vor Wochenstart",

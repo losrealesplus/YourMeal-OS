@@ -87,17 +87,17 @@ function AuthPage() {
         </div>
 
         {phase === "splash" ? (
-          <div className="flex flex-col items-center gap-6 animate-fade-in text-center px-6">
-            <div className="size-20 rounded-[1.5rem] bg-primary text-primary-foreground grid place-items-center text-2xl font-extrabold tracking-tight shadow-lg">
-              EC
-            </div>
-            <div>
-              <p className="text-2xl font-extrabold tracking-tight">{brandConfig.name}</p>
-              <p className="text-sm text-muted-foreground mt-2 max-w-xs">
+          <div className="relative flex flex-col items-center justify-center gap-8 animate-fade-in text-center px-8 min-h-[80vh] w-full">
+            <div className="space-y-3">
+              <p className="text-4xl font-extrabold tracking-tight text-foreground">
+                {brandConfig.name}
+              </p>
+              <div className="mx-auto h-1 w-12 rounded-full bg-primary" />
+              <p className="text-sm text-muted-foreground max-w-[16rem] mx-auto leading-relaxed">
                 {brandConfig.storeAssets.shortDescription}
               </p>
             </div>
-            <PoweredByLine className="mt-8" />
+            <PoweredByLine className="absolute bottom-6 left-0 right-0" />
           </div>
         ) : null}
 
@@ -144,17 +144,14 @@ function AuthPage() {
 
         {phase === "login" ? (
           <div className="w-full max-w-md animate-fade-in">
-            <div className="rounded-[1.75rem] bg-card border border-border/70 p-8 shadow-sm">
-              <div className="flex items-center gap-3">
-                <div className="size-11 rounded-2xl bg-primary text-primary-foreground grid place-items-center text-sm font-extrabold">
-                  EC
-                </div>
-                <p className="font-extrabold tracking-tight">{brandConfig.name}</p>
-              </div>
-              <h1 className="text-2xl font-extrabold tracking-tight mt-6">
+            <div className="rounded-[1.75rem] bg-card border border-border/50 p-8 shadow-sm">
+              <p className="text-center text-sm font-extrabold tracking-[0.18em] uppercase text-primary">
+                {brandConfig.name}
+              </p>
+              <h1 className="text-2xl font-extrabold tracking-tight mt-8 text-center text-balance">
                 {t("auth:welcome")}
               </h1>
-              <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+              <p className="text-sm text-muted-foreground mt-3 text-center leading-relaxed text-pretty">
                 {t("auth:welcomeSub")}
               </p>
 

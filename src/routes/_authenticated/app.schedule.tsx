@@ -165,38 +165,38 @@ function ScheduleFlow() {
       ) : null}
 
       {step === 3 ? (
-        <section className="px-6 space-y-4">
-          <div className="rounded-3xl border border-border/70 bg-card p-6 space-y-4 shadow-sm">
-            <p className="meta-label text-primary">{t("customer:orderSummary")}</p>
-            <h2 className="text-xl font-extrabold tracking-tight">
-              {t("customer:summaryReadyTitle")}
-            </h2>
-            <Row label={t("customer:mealsPerDay")} value={String(mealsPerDay)} />
-            <Row label={t("customer:deliveryDay")} value={days[deliveryDay]} />
-            <Row
-              label={t("customer:mealsSelected")}
-              value={`${selected.length} ${t("customer:meals")}`}
-            />
+        <section className="px-6 space-y-6 pt-2">
+          <div className="text-center space-y-2">
+            <p className="text-2xl font-extrabold tracking-tight">
+              {t("customer:summaryCalmTitle")}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {t("customer:summaryCalmHint")}
+            </p>
           </div>
-          <div className="rounded-3xl border border-border/70 bg-card p-6 space-y-3 shadow-sm">
-            <Row
-              label={t("customer:subtotal")}
-              value={fmt.currency(totalEur, { currency: "EUR" })}
-            />
-            <Row
-              label={t("customer:deliveryFee")}
-              value={fmt.currency(0, { currency: "EUR" })}
-            />
-            <div className="border-t border-border pt-3 mt-1">
-              <Row
-                label={t("customer:total")}
-                value={fmt.currency(totalEur, { currency: "EUR" })}
-                emphasis
-              />
+          <div className="rounded-[1.5rem] bg-card border border-border/60 p-6 space-y-5 shadow-sm">
+            <div>
+              <p className="meta-label">{t("customer:deliveryDay")}</p>
+              <p className="text-xl font-extrabold mt-1">{days[deliveryDay]}</p>
             </div>
+            <div className="border-t border-border/70 pt-4">
+              <p className="meta-label">{t("customer:mealsSelected")}</p>
+              <p className="text-lg font-bold mt-1">
+                {selected.length} {t("customer:meals")}
+              </p>
+            </div>
+            <div className="border-t border-border/70 pt-4">
+              <p className="meta-label">{t("customer:total")}</p>
+              <p className="text-3xl font-extrabold tracking-tight mt-1 tabular-nums">
+                {fmt.currency(totalEur, { currency: "EUR" })}
+              </p>
+            </div>
+            <p className="text-sm font-medium text-primary pt-1">
+              {t("customer:summaryAllGood")}
+            </p>
           </div>
           {programDraft.isError ? (
-            <p className="text-sm text-destructive" role="alert">
+            <p className="text-sm text-destructive text-center" role="alert">
               {(programDraft.error as Error)?.message ?? "Error"}
             </p>
           ) : null}

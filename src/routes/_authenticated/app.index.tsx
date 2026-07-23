@@ -2,18 +2,14 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { ReactNode } from "react";
 import {
-  CalendarClock,
   ChevronRight,
-  RefreshCw,
-  Sparkles,
+  Heart,
   Truck,
+  UtensilsCrossed,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { useDishes } from "@/hooks/use-dishes";
 import {
-  DishCard,
   PrimaryCTA,
-  EmptyState,
   DashboardSkeleton,
   DashboardError,
   OfflineBanner,
@@ -26,7 +22,7 @@ import { brandConfig } from "@/tenant/brand-config";
 
 /**
  * SCR-005 · Home — CJ-001
- * Experience Refactor: food app home, not admin dashboard.
+ * Food app, not dashboard. Dominant question + one CTA.
  */
 export const Route = createFileRoute("/_authenticated/app/")({
   validateSearch: (search: Record<string, unknown>): { state?: DashboardStateId } => ({
@@ -47,14 +43,6 @@ function CustomerHome() {
     user?.email?.split("@")[0] ??
     "";
 
-  const tagLabels = {
-    vegan: t("customer:tagVegan"),
-    vegetarian: t("customer:tagVegetarian"),
-    glutenFree: t("customer:tagGlutenFree"),
-    lactoseFree: t("customer:tagLactoseFree"),
-    spicy: t("customer:tagSpicy"),
-  };
-
   const stateOptions = dashboardStateIds.map((id) => ({
     id,
     label: t(`customer:state${id.charAt(0).toUpperCase()}${id.slice(1)}` as const),
@@ -63,21 +51,22 @@ function CustomerHome() {
   return (
     <div className="flex-1 flex flex-col">
       {isStaff ? (
-        <DashboardStateSwitcher
-          states={stateOptions}
-          current={state}
-          onSelect={(id) =>
-            navigate({
-              search: () => ({
-                state: id === "default" ? undefined : (id as DashboardStateId),
-              }),
-            })
-          }
-          label={t("customer:dashboardState")}
-        />
+        <div className="opacity-40 hover:opacity-100 transition-opacity">
+          <DashboardStateSwitcher
+            states={stateOptions}
+            current={state}
+            onSelect={(id) =>
+              navigate({
+                search: () => ({
+                  state: id === "default" ? undefined : (id as DashboardStateId),
+                }),
+              })
+            }
+            label={t("customer:dashboardState")}
+          />
+        </div>
       ) : null}
-
-      <HomeBody name={name} state={state} tagLabels={tagLabels} />
+      <HomeBody name={name} state={state} />
     </div>
   );
 }
@@ -85,16 +74,12 @@ function CustomerHome() {
 function HomeBody({
   name,
   state,
-  tagLabels,
 }: {
   name: string;
   state: DashboardStateId;
-  tagLabels: Record<string, string>;
 }) {
   const { t } = useTranslation("customer");
   const navigate = useNavigate({ from: "/app" });
-  const { data: catalogDishes = [] } = useDishes();
-  const featured = catalogDishes.slice(0, 3);
 
   if (state === "loading") {
     return <DashboardSkeleton label={t("loadingDashboard")} />;
@@ -112,109 +97,75 @@ function HomeBody({
   }
 
   return (
-    <>
+    <div className="flex-1 flex flex-col px-6 pt-8 pb-8">
       {state === "offline" ? (
-        <div className="mb-2 px-6">
+        <div className="mb-4">
           <OfflineBanner title={t("offlineTitle")} hint={t("offlineHint")} />
         </div>
       ) : null}
 
-      <section className="px-6 pt-6 pb-2">
-        <p className="meta-label text-primary">{brandConfig.name}</p>
-        <h1 className="text-3xl font-extrabold tracking-tight mt-2 text-balance">
+      {/* Brand mark */}
+      <p className="text-center text-sm font-extrabold tracking-[0.2em] uppercase text-primary">
+        {brandConfig.name}
+      </p>
+
+      {/* Hero — one question dominates */}
+      <div className="mt-10 text-center">
+        <h1 className="text-[1.75rem] font-extrabold tracking-tight text-balance">
           {t("greeting")}, {name}
         </h1>
-        <p className="text-base text-muted-foreground mt-3 leading-relaxed text-pretty">
-          {t("scheduleTitle")}
+        <p className="mt-4 text-xl font-semibold leading-snug text-foreground/90 text-pretty max-w-[18rem] mx-auto">
+          {t("homeHeroQuestion")}
         </p>
-        <div className="mt-6">
-          <Link to="/app/schedule" className="block">
-            <PrimaryCTA>{t("scheduleCta")}</PrimaryCTA>
-          </Link>
-        </div>
-      </section>
+      </div>
 
-      <section className="px-6 mt-8 grid gap-3">
-        <HomeCard
-          to="/app/orders"
-          icon={<Truck className="size-5" />}
-          title={t("nextDelivery")}
-          hint={t("homeCardDeliveryHint")}
-        />
-        <HomeCard
-          to="/app/orders"
-          icon={<CalendarClock className="size-5" />}
-          title={t("homeCardCurrentOrder")}
-          hint={t("homeCardCurrentHint")}
-        />
-        <HomeCard
-          to="/app/orders"
-          icon={<RefreshCw className="size-5" />}
-          title={t("homeCardRepeat")}
-          hint={t("homeCardRepeatHint")}
-        />
-        <HomeCard
+      <div className="mt-8">
+        <Link to="/app/schedule" className="block">
+          <PrimaryCTA className="!h-16 !text-base !rounded-[1.25rem]">
+            {t("scheduleCta")}
+          </PrimaryCTA>
+        </Link>
+      </div>
+
+      {/* Quiet shortcuts — food app, not KPIs */}
+      <div className="mt-12 space-y-1 border-t border-border/60 pt-6">
+        <QuietLink
           to="/app/menu"
-          icon={<Sparkles className="size-5" />}
-          title={t("promotions")}
-          hint={t("homeCardPromoHint")}
+          icon={<Heart className="size-5" strokeWidth={2} />}
+          label={t("homeFavorites")}
         />
-      </section>
-
-      {featured.length > 0 ? (
-        <>
-          <div className="px-6 mt-10 mb-3 flex items-end justify-between">
-            <h2 className="text-lg font-extrabold tracking-tight">{t("featuredDishes")}</h2>
-            <Link
-              to="/app/menu"
-              className="text-sm font-bold text-primary focus-visible:outline-none focus-visible:underline"
-            >
-              {t("seeAll")}
-            </Link>
-          </div>
-          <div className="px-6 space-y-3 pb-10">
-            {featured.map((d) => (
-              <DishCard key={d.id} dish={d} tagLabels={tagLabels} />
-            ))}
-          </div>
-        </>
-      ) : (
-        <div className="px-6 py-10">
-          <EmptyState
-            icon={<CalendarClock className="size-6" aria-hidden />}
-            title={t("emptyTitle")}
-            hint={t("emptyHint")}
-          />
-        </div>
-      )}
-    </>
+        <QuietLink
+          to="/app/menu"
+          icon={<UtensilsCrossed className="size-5" strokeWidth={2} />}
+          label={t("homeThisWeekMenu")}
+        />
+        <QuietLink
+          to="/app/orders"
+          icon={<Truck className="size-5" strokeWidth={2} />}
+          label={t("nextDelivery")}
+        />
+      </div>
+    </div>
   );
 }
 
-function HomeCard({
+function QuietLink({
   to,
   icon,
-  title,
-  hint,
+  label,
 }: {
-  to: "/app/orders" | "/app/menu";
+  to: "/app/menu" | "/app/orders";
   icon: ReactNode;
-  title: string;
-  hint: string;
+  label: string;
 }) {
   return (
     <Link
       to={to}
-      className="flex items-center gap-4 rounded-3xl border border-border/70 bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 active:scale-[0.99]"
+      className="flex items-center gap-4 py-4 border-b border-border/50 last:border-0 active:opacity-70"
     >
-      <div className="grid place-items-center size-12 rounded-2xl bg-primary/10 text-primary">
-        {icon}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="font-bold truncate">{title}</p>
-        <p className="text-xs text-muted-foreground mt-0.5 truncate">{hint}</p>
-      </div>
-      <ChevronRight className="size-5 text-muted-foreground" />
+      <span className="text-primary">{icon}</span>
+      <span className="flex-1 text-[15px] font-semibold">{label}</span>
+      <ChevronRight className="size-4 text-muted-foreground/70" />
     </Link>
   );
 }

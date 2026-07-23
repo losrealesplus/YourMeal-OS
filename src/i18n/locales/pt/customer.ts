@@ -5,6 +5,14 @@ export default {
   settings: "Conta",
   noOrdersTitle: "Ainda sem pedidos",
   noOrdersHint: "Quando programar a sua primeira semana aparecerá aqui.",
+  
+  homeHeroQuestion: "Have you scheduled your order for this week?",
+  homeFavorites: "Your favourite dishes",
+  homeThisWeekMenu: "This week's menu",
+  summaryCalmTitle: "Your order is ready",
+  summaryCalmHint: "Check delivery and total before confirming.",
+  summaryAllGood: "All set.",
+
   greeting: "Olá",
   assistantHint: "O que precisa da sua atenção agora?",
   momentTitle: "Antes de começar a semana",

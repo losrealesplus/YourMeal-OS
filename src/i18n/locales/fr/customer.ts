@@ -5,6 +5,14 @@ export default {
   settings: "Compte",
   noOrdersTitle: "Aucune commande",
   noOrdersHint: "Dès que vous programmerez votre première semaine, elle apparaîtra ici.",
+  
+  homeHeroQuestion: "Have you scheduled your order for this week?",
+  homeFavorites: "Your favourite dishes",
+  homeThisWeekMenu: "This week's menu",
+  summaryCalmTitle: "Your order is ready",
+  summaryCalmHint: "Check delivery and total before confirming.",
+  summaryAllGood: "All set.",
+
   greeting: "Bonjour",
   assistantHint: "Que faut-il traiter maintenant ?",
   momentTitle: "Avant le début de la semaine",
