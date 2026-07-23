@@ -79,18 +79,20 @@ function CustomerHome() {
         subtitle={t("customer:assistantHint")}
       />
 
-      <DashboardStateSwitcher
-        states={stateOptions}
-        current={state}
-        onSelect={(id) =>
-          navigate({
-            search: () => ({
-              state: id === "default" ? undefined : (id as DashboardStateId),
-            }),
-          })
-        }
-        label={t("customer:dashboardState")}
-      />
+      {isStaff ? (
+        <DashboardStateSwitcher
+          states={stateOptions}
+          current={state}
+          onSelect={(id) =>
+            navigate({
+              search: () => ({
+                state: id === "default" ? undefined : (id as DashboardStateId),
+              }),
+            })
+          }
+          label={t("customer:dashboardState")}
+        />
+      ) : null}
 
       <DashboardBody state={state} tagLabels={tagLabels} statusLabels={statusLabels} />
     </div>
