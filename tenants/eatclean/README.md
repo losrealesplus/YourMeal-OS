@@ -16,11 +16,12 @@ Primera instancia del patrón **Tenant Resources** (ADR 0014).
 
 | Archivo | Estado | Uso |
 |---------|--------|-----|
-| `brand.json` | ✅ stub | Paleta · tipografía · poweredBy → BrandConfig |
-| `copy.es.json` | ✅ stub | Login · home · claims |
-| `logo.svg` | ⏳ pending | Sustituir por logo oficial |
+| `brand.json` | ✅ | Paleta oficial web · tipografía · poweredBy |
+| `copy.es.json` | ✅ | Login · home · claims |
+| `logo.svg` | ✅ oficial | Logotipo web (`logo-DCRiXn3_.png` embebido) |
+| `logo.png` | ✅ oficial | Misma pieza binaria |
 | `icon.png` | ⏳ pending | App icon / favicon |
-| `splash.webp` | ⏳ pending | Splash |
+| `splash.webp` | ⏳ pending | Splash (hoy: `src/assets/eatclean-splash.jpg`) |
 | `hero-home.webp` | ⏳ pending | Home hero |
 | `onboarding-1.webp` … `3` | ⏳ pending | Onboarding |
 | `empty-orders.webp` | ⏳ pending | Empty state pedidos |

@@ -27,7 +27,7 @@ export function PoweredByLine({ className }: { className?: string }) {
   return (
     <p
       className={cn(
-        "text-[10px] font-medium tracking-wide text-muted-foreground/70 text-center",
+        "text-[9px] font-normal tracking-[0.08em] text-[#9a8f7c]/80 text-center",
         className,
       )}
     >
