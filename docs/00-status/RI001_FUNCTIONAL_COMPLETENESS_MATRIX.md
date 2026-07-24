@@ -1,10 +1,11 @@
 # RI-001 · Functional Completeness Matrix
 
 **Fecha:** 2026-07-24  
-**Modo:** **Certificación** — Correction de hub permitida; no Packaging/features nuevas  
+**Modo:** **Certificación** — Release Board (eliminar bloqueos); no Packaging/features nuevas  
 **Baseline:** `main` @ post-#52 (EP-002A.2–A.3 · EP-002B.1–B.2 · DICT-072 · Readiness docs)  
-**Secuencia:** primero [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) (bloque Ops Center en verde) → luego resto de filas  
-**Principio:** [DICT-071 Operational Visibility](../20-evidence-framework/09-operational-visibility-principle.md)  
+**Board:** [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md) — B1 `/admin` · B2 `/saas` · B3 jornada · Day-0  
+**Spec:** [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)  
+**Principio:** [DICT-071](../20-evidence-framework/09-operational-visibility-principle.md) · [DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)  
 **Sprint:** [RI001_READINESS_SPRINT](./RI001_READINESS_SPRINT.md)
 
 > Pregunta del momento:  
@@ -51,7 +52,7 @@ Leyenda: ✅ OK · 🟡 Parcial / acotado · ⏳ Pendiente de review en vivo · 
 | Membership 1:1 | modelo | — | — | — | — | ⏳ | — | ⏳ | RI-001: un user ↔ un tenant |
 | Auditoría provisioning | `audit_log` | ⏳ | ⏳ | — | ⏳ | ⏳ | ⏳ | ⏳ | WP-5 evidencia |
 
-PASS del bloque = todas las filas visibles en ✅ (o ocultas honestamente) + RBAC ± documentado. Ver [EP-OPS-001 DoD](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md#definition-of-done).
+PASS del bloque = DoD del [Release Board](./EP_OPS_001_RELEASE_BOARD.md#definition-of-done--ep-ops-001) (12 criterios simultáneos) + filas en ✅ (o ocultas honestamente).
 
 ---
 

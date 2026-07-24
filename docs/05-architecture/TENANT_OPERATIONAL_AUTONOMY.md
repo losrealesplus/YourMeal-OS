@@ -71,6 +71,12 @@ Si en el futuro se admite multi-membership, será un cambio de modelo documentad
 
 ---
 
+## Day-0 Provisioning Scenario
+
+Primera demostración pública de YourMeal OS: tenant vacío → ciclo operativo completo **sin** ingeniería.
+
+Ver [Release Board · Day-0](../00-status/EP_OPS_001_RELEASE_BOARD.md#day-0-provisioning-scenario).
+
 ## Relación con Architecture Freeze
 
 Tras **EP-OPS-001 PASS**, la arquitectura se congela temporalmente hasta cerrar RI-001:
@@ -81,4 +87,4 @@ Tras **EP-OPS-001 PASS**, la arquitectura se congela temporalmente hasta cerrar 
 
 Solo: corrección de defectos · evidencia · certificación.
 
-Ver hoja de ruta en [EP-OPS-001](../00-status/EP_OPS_001_OPERATIONAL_CENTER_READINESS.md#hoja-de-ruta).
+Secuencia estabilizada: [Release Board · Después del PASS](../00-status/EP_OPS_001_RELEASE_BOARD.md#después-del-pass).

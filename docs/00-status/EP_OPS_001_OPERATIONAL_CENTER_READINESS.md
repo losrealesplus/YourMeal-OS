@@ -3,6 +3,7 @@
 **Estado:** Active — **bloquea RI-001**  
 **Tipo:** Correction / Certification — no Packaging / no features de cocina nuevas  
 **Bloqueo:** RI-001 está temporalmente bloqueado por EP-OPS-001 (no por falta de módulos, sino por falta de **punto de entrada operacional certificado**)  
+**Working board:** [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md) ← **usar esto a diario** (no “roadmap”)  
 **Principio:** [DICT-071](../20-evidence-framework/09-operational-visibility-principle.md) · [DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md) · [DICT-073 Tenant Operational Autonomy](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)  
 **Gap:** [OPS_CENTER_DUAL_SURFACE](./OPS_CENTER_DUAL_SURFACE.md)  
 **Matriz:** [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md) — bloque Ops primero; resto ⏸
@@ -19,15 +20,17 @@ Hasta que este EP sea **PASS**, cualquier E2E estará condicionado por el hueco 
 RI-001  ←── bloqueado por ──  EP-OPS-001 PASS
 ```
 
+DICT-073 cierra el último principio arquitectónico previo a RI-001. El trabajo diario es el **Release Board**: eliminar bloqueos, no abrir features.
+
 ---
 
-## Objetivo del sprint
+## Objetivo
 
 No construir nuevas capacidades de producto (Packaging, etc.).
 
-**Certificar el Centro de Operaciones como hub operacional de EatClean y de la plataforma YourMeal OS.**
+**Certificar el Centro de Operaciones como hub operacional de EatClean y como Centro de Gobierno de YourMeal OS.**
 
-No es un dashboard decorativo. Es el punto desde el que cualquier empleado interno inicia su jornada.
+No es un dashboard decorativo. Es el punto desde el que cualquier empleado interno inicia su jornada — y desde el que la plataforma aprovisiona tenants (DICT-073).
 
 ---
 
@@ -40,7 +43,9 @@ Landing → Login
             └── Centro de Operaciones EatClean   /admin
                     ├── Dashboard (datos reales)
                     ├── Cocina
-                    ├── Producción (Hoja + Execution)
+                    │   ├── Kitchen Queue
+                    │   ├── Hoja de Producción
+                    │   └── Kitchen Execution
                     ├── Reparto
                     ├── Atención al Cliente
                     ├── Clientes
@@ -51,28 +56,29 @@ Landing → Login
 
                 Powered by YourMeal OS
                 Centro de Operaciones YourMeal OS   /saas
-                    (solo saas_admin)
+                    (solo saas_admin · Centro de Gobierno)
 ```
 
 ---
 
 ## WP-1 · Operational Navigation
 
-**Objetivo:** «Centro de Operaciones» = punto de entrada único para usuarios internos del tenant → `/admin`.
+**Objetivo:** «Centro de Operaciones» = punto de entrada único para usuarios internos del tenant → `/admin`.  
+**Bloqueador:** [1 · EatClean Ops Center](./EP_OPS_001_RELEASE_BOARD.md#-bloqueador-1-crítico--centro-de-operaciones-eatclean)
 
 ### Estructura EatClean (`/admin`)
 
 | Área | Contenido |
 |------|-----------|
 | Dashboard | Resumen operativo · indicadores **reales** (sin mocks) |
-| Departamentos | Cocina · Producción · Reparto · Atención al Cliente · Clientes · Empresas · Administración · Finanzas · Configuración |
-
-Producción incluye entradas a Hoja de Producción y Kitchen Execution (o subnav clara).
+| Cocina | Kitchen Queue · Hoja de Producción · Kitchen Execution |
+| Departamentos | Reparto · Atención al Cliente · Clientes · Empresas · Administración · Finanzas · Configuración |
 
 ### Criterios
 
 - Todas las rutas del hub accesibles según rol.
 - Sin enlaces rotos, botones sin acción ni módulos vacíos fingiendo live (DICT-071).
+- Sin pantallas placeholder ni datos simulados.
 
 **DoD WP-1:** Todos los departamentos son navegables y funcionales según el rol correspondiente.
 
@@ -111,6 +117,8 @@ Cada celda: prueba **positiva** y **negativa** (URL directa incluida).
 
 ## WP-3 · Dual Operations Center
 
+**Bloqueador:** [2 · YourMeal OS Governance](./EP_OPS_001_RELEASE_BOARD.md#-bloqueador-2-crítico--centro-de-operaciones-yourmeal-os)
+
 ### Entrada principal
 
 ```text
@@ -119,7 +127,7 @@ Centro de Operaciones   →  /admin
 
 Visible para usuarios del tenant con permisos staff.
 
-### Entrada secundaria (menor jerarquía visual)
+### Entrada secundaria (menor jerarquía visual · Centro de Gobierno)
 
 ```text
 Powered by YourMeal OS
@@ -129,13 +137,14 @@ Centro de Operaciones YourMeal OS   →  /saas
 Condiciones:
 
 - Visible **solo** `saas_admin`.
+- No es “un botón oculto”: es el Centro de Gobierno de la plataforma.
 - No renderizar el control para otros roles.
 - Redirige a `/saas`.
 
 | Superficie | Responsabilidad |
 |------------|-----------------|
 | `/admin` | Opera **EatClean** |
-| `/saas` | Administra **YourMeal OS** (Tenants, Admins, Roles globales, Branding, Licencias, Feature Flags, Auditoría global, Config SaaS) |
+| `/saas` | Gobierna **YourMeal OS** (Tenants · Company Admins · Roles · Branding · Auditoría · Flags · Config SaaS) |
 
 Alinear `homePathForRoles` y `decideOperationsCenterEntry` para dual-role.
 
@@ -159,7 +168,8 @@ Eliminar cualquier dato ficticio en `/admin`.
 
 > **Principio (DICT-073):** un tenant no está operacionalmente activo hasta que puede autogestionar su organización **sin intervención del proveedor SaaS**.
 
-WP-5 **no es una pantalla**. Es el puente crítico elevado a capacidad de plataforma.
+WP-5 **no es una pantalla**. Es el puente crítico elevado a capacidad de plataforma.  
+**Bloqueador:** [2 · YourMeal OS](./EP_OPS_001_RELEASE_BOARD.md#-bloqueador-2-crítico--centro-de-operaciones-yourmeal-os) · demo: [Day-0](./EP_OPS_001_RELEASE_BOARD.md#day-0-provisioning-scenario)
 
 | Antes (lectura débil) | Ahora (lectura correcta) |
 |-----------------------|--------------------------|
@@ -173,57 +183,29 @@ WP-5 **no es una pantalla**. Es el puente crítico elevado a capacidad de plataf
 
 #### 1. Tenant Management (`/saas`)
 
-- Listado de tenants  
-- Crear tenant  
-- Activar / desactivar  
-- Estado  
-- Branding asociado  
+- Listado de tenants · Estado · Activar / desactivar · Branding asociado · Crear tenant  
 
 #### 2. Company Administration (por tenant)
 
-- Crear Company Admin  
-- Editar  
-- Desactivar  
-- Restablecer contraseña **o** enviar invitación (según flujo elegido)  
+- Crear / Editar / Desactivar Company Admin  
+- Reenviar invitación o restablecer acceso  
 - Ver estado de la cuenta  
 
 #### 3. Roles
 
-Asignar **roles** soportados por el tenant — **no** permisos individuales. Los permisos los define el sistema.
+Asignar **roles** — **nunca** permisos individuales.
 
 ```text
-Company Admin
-Kitchen
-Delivery
-Customer Support
-Finance
-Operations
-Custom (futuro)
+Company Admin · Kitchen · Delivery · Customer Support · Finance · Operations
 ```
 
 #### 4. Membership (decisión RI-001)
 
 > **Un usuario pertenece a un único tenant.**
 
-Multi-membership (una cuenta en varios tenants) queda **fuera de RI-001** y debe documentarse como cambio de modelo si se adopta después.
-
 #### 5. Auditoría
 
-Toda acción genera evidencia en `audit_log` (o equivalente persistido):
-
-```text
-Company Admin creado
-        ↓
-Rol asignado
-        ↓
-Cuenta activada
-        ↓
-Permisos / roles modificados
-        ↓
-Cuenta desactivada
-```
-
-Cada evento: **quién** · **cuándo** · **tenant afectado** · **resultado**.
+Toda acción en `audit_log`: quién · cuándo · tenant · resultado.
 
 ### Criterios PASS de WP-5
 
@@ -237,71 +219,51 @@ Cada evento: **quién** · **cuándo** · **tenant afectado** · **resultado**.
 
 **DoD WP-5:** un `saas_admin` aprovisiona un Company Admin real; ese usuario entra a `/admin`, gestiona staff del tenant y **nunca** ve `/saas` — sin SQL manual ni intervención de ingeniería.
 
-**Archivos típicos:** rutas `/saas/*`, servicios de tenant/membership/roles, RLS, `audit_log`.
-
 > Nota DICT-071: si alguna subpantalla SaaS no está lista, FF OFF o «Próximamente» — **no** fingir Tenant Provisioning; WP-5 es PASS obligatorio del EP.
-
-### Primera prueba de certificación (post WP-5)
-
-**No la ejecuta el equipo de ingeniería.** Escenario de autonomía:
-
-1. Un `saas_admin` crea un nuevo `company_admin` para EatClean.  
-2. El `company_admin` inicia sesión por primera vez.  
-3. Accede al Centro de Operaciones (`/admin`).  
-4. Crea usuarios de Cocina, Reparto y Atención al Cliente.  
-5. Asigna sus roles.  
-6. Cada usuario inicia sesión y accede **únicamente** a su área.  
-
-Si ese flujo funciona sin intervención adicional de desarrollo, se ha demostrado aprovisionamiento autónomo del tenant — no solo un CRUD.
 
 ---
 
 ## WP-6 · Operational Certification (mini-gate)
 
-Tras WP-1…WP-5, mini certificación del hub **antes** de Architecture Freeze y del resto de la auditoría.
+Tras WP-1…WP-5, mini certificación del hub **antes** de Architecture Freeze.  
+**Bloqueador:** [3 · Jornada Operativa](./EP_OPS_001_RELEASE_BOARD.md#-bloqueador-3-crítico--jornada-operativa-completa) (arranque; E2E completo post-PASS).
 
-```text
-□ Navegación completa (WP-1)
-□ RBAC positivo (WP-2)
-□ RBAC negativo + URL directa (WP-2)
-□ Persistencia en módulos visibles
-□ Dashboard sin mocks (WP-4)
-□ Separación /admin vs /saas (WP-3)
-□ Tenant Provisioning + autonomía (WP-5 · DICT-073)
-□ Escenario de certificación autónomo (saas_admin → company_admin → staff)
-□ Sin hallazgos CRITICAL
-□ Sin hallazgos HIGH bloqueantes
-□ Matriz bloque Ops en verde
-```
+Checklist canónico: tabla DoD del [Release Board](./EP_OPS_001_RELEASE_BOARD.md#definition-of-done--ep-ops-001).
 
-Solo con este checklist **PASS** → **Architecture Freeze** → reanudar Functional Completeness Review del resto.
+Solo con ese checklist **PASS** → **Architecture Freeze** → FCR / RBAC / E2E / Evidence / RRR / RI-001.
 
 ---
 
-## Hoja de ruta
+## Secuencia post-PASS (estabilizada)
+
+Ya no se habla de roadmap de producto. Ver [Release Board · Después del PASS](./EP_OPS_001_RELEASE_BOARD.md#después-del-pass).
 
 ```text
 EP-OPS-001 PASS
         │
         ▼
-Architecture Freeze
+🔒 Architecture Freeze
         │
         ▼
-Functional Completeness Review (resto)
+Functional Completeness Review
         │
         ▼
-RBAC Certification (ampliada) / E2E
+RBAC Certification
         │
         ▼
-Evidence Review
+End-to-End Operational Journey
         │
         ▼
-RI-001 Readiness Decision
+Evidence Collection
+        │
+        ▼
+Release Readiness Review
+        │
+        ▼
+RI-001 Decision
 ```
 
-### Architecture Freeze (tras EP-OPS-001 PASS)
-
-Hasta finalizar RI-001:
+### Architecture Freeze
 
 | Prohibido | Permitido |
 |-----------|-----------|
@@ -309,15 +271,11 @@ Hasta finalizar RI-001:
 | ❌ Nuevos patrones arquitectónicos | ✅ Evidencia |
 | ❌ Nuevas capacidades | ✅ Certificación |
 
-Objetivo: alcance estable mientras FOPEBA obtiene evidencia de campo de esta primera implementación.
-
-Detalle: [DICT-073 · Tenant Operational Autonomy](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md).
-
 ---
 
 ## Fuera de alcance de este EP
 
-- Packaging / Delivery nuevos módulos.
+- Packaging / Delivery como módulos nuevos.
 - Monitoring live / métricas de cocina avanzadas.
 - Rediseño estético / polish ACT-001.
 - Multi-membership (usuario ↔ varios tenants).
@@ -326,11 +284,11 @@ Detalle: [DICT-073 · Tenant Operational Autonomy](../05-architecture/TENANT_OPE
 
 ## Definition of Done (EP completo)
 
-- [ ] WP-1…WP-6 PASS.
-- [ ] Un empleado EatClean inicia jornada en el hub, trabaja en su departamento y no necesita salir (salvo clientes → Customer App).
-- [ ] Tenant Provisioning: `saas_admin` aprovisiona Company Admin; Company Admin gestiona staff; auditoría completa (DICT-073).
-- [ ] Escenario de certificación autónomo ejecutado **sin** intervención de ingeniería.
-- [ ] Separación `/admin` vs `/saas` evidente y enforceable.
-- [ ] Membership RI-001: un usuario ↔ un tenant (documentado).
+Fuente de verdad: [Release Board DoD](./EP_OPS_001_RELEASE_BOARD.md#definition-of-done--ep-ops-001).
+
+Resumen:
+
+- [ ] Bloqueadores 1–3 en verde (tabla DoD completa).
+- [ ] Day-0 Provisioning Scenario ejecutable sin ingeniería.
 - [ ] Architecture Freeze activado hasta cierre de RI-001.
 - [ ] RI-001 **desbloqueado** para FCR + E2E sobre base estable.

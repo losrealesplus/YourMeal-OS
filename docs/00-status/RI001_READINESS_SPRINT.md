@@ -8,13 +8,14 @@
 > Pregunta anterior: ¿Qué falta por construir?  
 > Pregunta ahora: **¿Podemos demostrar, con evidencia, que EatClean puede trabajar con YourMeal OS durante una jornada real?**
 
-Artefacto primario (ahora): [EP-OPS-001 Operational Center Readiness](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)  
+**Artefacto diario:** [Release Board · EP-OPS-001](./EP_OPS_001_RELEASE_BOARD.md) — eliminar bloqueos, no roadmap  
+Spec de corrección: [EP_OPS_001_OPERATIONAL_CENTER_READINESS](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)  
 Matriz (bloque Ops primero): [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md)  
 Patrón: [DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md) · Visibilidad: [DICT-071](../20-evidence-framework/09-operational-visibility-principle.md) · Autonomía: [DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)
 
 Packaging (EP-002B.3) y Delivery (EP-002B.4) permanecen **en cola**.  
-FCR del resto de módulos: **en pausa** hasta Ops Center PASS.  
-Tras Ops PASS: **Architecture Freeze** hasta cerrar RI-001 (solo defectos · evidencia · certificación).
+FCR del resto: **en pausa** hasta Ops PASS.  
+Tras Ops PASS: **Architecture Freeze** → FCR → RBAC → E2E → Evidence → RRR → RI-001.
 
 ---
 
@@ -35,65 +36,58 @@ Tras Ops PASS: **Architecture Freeze** hasta cerrar RI-001 (solo defectos · evi
 
 ---
 
-## Prioridades (orden estricto)
-
-### 0 · EP-OPS-001 · Operational Center Readiness ← **AHORA (bloquea RI-001)**
+## Release Board · ahora (bloquea RI-001)
 
 > **RI-001 está temporalmente bloqueado por EP-OPS-001.**  
-> No por falta de módulos — por falta de punto de entrada operacional certificado.
+> No por falta de módulos — por falta de operación certificable.
 
-Spec completa (WP-1…WP-6): [EP_OPS_001_OPERATIONAL_CENTER_READINESS](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)  
-Gap: [OPS_CENTER_DUAL_SURFACE](./OPS_CENTER_DUAL_SURFACE.md)
+Board: [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md)
 
-| WP | Nombre |
-|----|--------|
-| WP-1 | Operational Navigation |
-| WP-2 | Operational RBAC (± · URL · CRUD · backend) |
-| WP-3 | Dual Operations Center (`/admin` vs `/saas`) |
-| WP-4 | Dashboard operacional sin mocks |
-| WP-5 | **Tenant Provisioning** (DICT-073) — no “pantalla de admins” |
-| WP-6 | Mini-certificación del hub + escenario autónomo |
+| Bloqueador | Contenido |
+|------------|-----------|
+| 🔴 B1 | Centro de Operaciones EatClean `/admin` |
+| 🔴 B2 | Centro de Gobierno YourMeal OS `/saas` (DICT-073) |
+| 🔴 B3 | Jornada Operativa Completa |
+| Day-0 | Tenant vacío → ciclo operativo autónomo (demo pública) |
 
-Hasta PASS: no continuar FCR amplio ni E2E completo.
+WPs de corrección (detalle): [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · Gap: [OPS_CENTER_DUAL_SURFACE](./OPS_CENTER_DUAL_SURFACE.md)
 
-### 0b · Architecture Freeze (inmediato tras EP-OPS-001 PASS)
+Hasta PASS: no FCR amplio ni E2E completo.
 
-Hasta finalizar RI-001:
-
-- ❌ No nuevos módulos · patrones · capacidades  
-- ✅ Solo corrección de defectos · evidencia · certificación  
-
-### 1 · Functional Completeness Review (resto)
-
-Matriz viva: [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md) — filas no-hub **⏸** hasta Ops PASS.
-
-Por pantalla: Visible · Navega · Guarda · Lee · RBAC · Audit · Estado.
-
-### 2 · Dual surface (incluido en EP-OPS-001)
-
-EatClean `/admin` vs YourMeal OS `/saas` — sin mezclar nav, branding ni permisos.
-
-### 3 · Validación RBAC
-
-Positivo **y** negativo por perfil — evidencia en EP-OPS-001 y matriz.
-
-### 4 · Recorrido E2E (guion)
-
-Tras hub PASS + Freeze:
-
-```text
-Cliente → … → Kitchen Queue → Kitchen Execution → Hoja
-  → Packaging* → Delivery* → Entrega → Historial → Repetir
-```
-
-Más el escenario autónomo WP-5 (saas_admin → company_admin → staff por área).
-
-### 5 · Evidence Collection
-
-Clasificar antes de corregir (tabla en la matriz).
 ---
 
-## Fase 9 · Release Readiness Review
+## Secuencia post-PASS (estabilizada)
+
+```text
+EP-OPS-001 PASS
+        │
+        ▼
+🔒 Architecture Freeze
+        │
+        ▼
+Functional Completeness Review
+        │
+        ▼
+RBAC Certification
+        │
+        ▼
+End-to-End Operational Journey
+        │
+        ▼
+Evidence Collection
+        │
+        ▼
+Release Readiness Review
+        │
+        ▼
+RI-001 Decision
+```
+
+Durante Freeze: ❌ módulos / patrones / capacidades nuevas · ✅ defectos · evidencia · certificación.
+
+---
+
+## Release Readiness Review
 
 Última puerta antes de declarar listo para RI-001:
 
@@ -105,15 +99,17 @@ Clasificar antes de corregir (tabla en la matriz).
 □ RLS/RBAC validado (positivo + negativo)
 □ Cero PRs funcionales abiertos
 □ Matriz de completitud sin ⏳ críticos en alcance
-□ Docs EP / CURRENT_PHASE = estado real
-□ Roadmap: Packaging/Delivery en cola (honesto)
+□ Docs EP / CURRENT_PHASE / Release Board = estado real
+□ Packaging/Delivery en cola (honesto)
+□ Day-0 Provisioning Scenario PASS (o evidencia de bloqueo clasificada)
 ```
 
 ---
 
 ## Definition of Done
 
-- [ ] Certificación ejecutada (prioridades 1–5).
-- [ ] Hallazgos clasificados FOPEBA.
+- [ ] EP-OPS-001 PASS (tabla DoD del Release Board).
+- [ ] Architecture Freeze activo.
+- [ ] FCR · RBAC · E2E · Evidence ejecutados.
 - [ ] Release Readiness Review ✅.
 - [ ] `main` estable → **iniciar RI-001** como consecuencia natural, no como salto de fe.

@@ -1,8 +1,8 @@
 # Ops Center · Dual Surface (EatClean vs YourMeal OS)
 
-**Estado:** Gap documentado · absorbido por **[EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)** (sprint activo)  
+**Estado:** Gap documentado · absorbido por **[Release Board EP-OPS-001](./EP_OPS_001_RELEASE_BOARD.md)** (Bloqueador 2)  
 **Tipo:** Correction / Certification — **no** nueva capacidad de cocina  
-**Sprint:** [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · [Matriz bloque Ops](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md)
+**Board:** [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md) · Spec: [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · [Matriz](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md)
 
 ---
 

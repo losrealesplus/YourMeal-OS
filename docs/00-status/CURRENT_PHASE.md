@@ -12,14 +12,16 @@ FOUNDATION / BLUEPRINT / DISCOVERY / OM / VALIDATION / IOV   ✅
 FOV PREPARATION · ORR (marco) · G-02 (Gate formalizado)     ✅
 EP-001 Functional Completeness (cero humo Admin/Ops nav)    ✅
 ────────────────────────────
-Modo:                **CERTIFICACIÓN** — Correction hub OK · **no** Packaging
+Modo:                **CERTIFICACIÓN** — Release Board (eliminar bloqueos) · **no** Packaging
 Bloqueo:             **RI-001 bloqueado por EP-OPS-001** (punto de entrada no certificado)
-Siguiente sprint:    **EP-OPS-001** WP-1…WP-6 (nav · RBAC · dual · dashboard · **Tenant Provisioning** · mini-gate)
+Trabajo diario:      **[Release Board EP-OPS-001](./EP_OPS_001_RELEASE_BOARD.md)** · 3 bloqueadores críticos
+                     · B1 EatClean `/admin` · B2 YourMeal OS `/saas` · B3 Jornada operativa
+                     · Day-0 Provisioning Scenario (demo pública DICT-073)
                      · FCR resto **en pausa** hasta Ops PASS
-                     · Tras Ops PASS → **Architecture Freeze** hasta RI-001
+                     · Tras Ops PASS → **Architecture Freeze** → FCR → RBAC → E2E → Evidence → RRR → RI-001
                      · Packaging/Delivery **en cola**
-Siguiente artefacto: [EP_OPS_001_OPERATIONAL_CENTER_READINESS](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)
-                     → Ops PASS → Architecture Freeze → FCR → E2E → Evidence → decisión RI-001
+Artefacto primario:  [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md)
+Spec corrección:     [EP_OPS_001_OPERATIONAL_CENTER_READINESS](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████
@@ -36,16 +38,17 @@ Mapa EP:
   EP-002A · Customer Experience    ██████████
   EP-002B.1 · Production Report    ██████████
   EP-002B.2 · Kitchen Execution    ██████████
-  —— EP-OPS-001 Ops Center ——      □□□□□□□□□□  ← HOY (bloquea RI-001)
+  —— EP-OPS-001 Release Board ——   □□□□□□□□□□  ← HOY (3 bloqueadores · bloquea RI-001)
   —— Architecture Freeze ——        □□□□□□□□□□  (tras Ops PASS → hasta RI-001)
-  —— FCR / E2E / Evidence ——       □□□□□□□□□□  (tras Freeze)
+  —— FCR / RBAC / E2E / Evidence —— □□□□□□□□□□  (tras Freeze)
+  —— Release Readiness Review ——   □□□□□□□□□□
   EP-002B.3 · Packaging            □□□□□□□□□□  (cola)
   EP-002B.4 · Delivery             □□□□□□□□□□
   RI-001                           ████████░░  ← bloqueado hasta EP-OPS-001 PASS
 
 Patrón permanente: Operational Representation (DICT-072)
-Madurez tenant:    Tenant Operational Autonomy (DICT-073) — WP-5 aprovisiona, no “crea admins”
-Hoy: Certificar el hub — no auditar el resto sobre navegación incompleta.
+Madurez tenant:    Tenant Operational Autonomy (DICT-073) — último principio previo a RI-001
+Hoy: Release Board — eliminar bloqueos; no roadmap de features.
 
 Riesgo principal: E2E / FCR sobre hub no PASS → evidencia contaminada
 
@@ -59,7 +62,7 @@ Primary Artifact:  [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) ·
 Visibilidad:       [Operational Visibility · DICT-071](../20-evidence-framework/09-operational-visibility-principle.md)
 Ops pattern:       [Operational Representation · DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md)
 Tenant autonomy:   [Tenant Operational Autonomy · DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)
-Hoy (Certificación): [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · [Ops dual surface](./OPS_CENTER_DUAL_SURFACE.md) · [Readiness](./RI001_READINESS_SPRINT.md)
+Hoy (Certificación): [Release Board](./EP_OPS_001_RELEASE_BOARD.md) · [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · [Ops dual](./OPS_CENTER_DUAL_SURFACE.md) · [Readiness](./RI001_READINESS_SPRINT.md)
 Seguridad pre-piloto: [Pilot Security Checklist](../09-security/PILOT_SECURITY_CHECKLIST.md) (10 corregidos · 1 Accepted documentado)
 Antes de firmar G-02 PASSED: ORR firmados · cero humo · No Artificiality
 PR taxonomy (post G-02): Evidence · KU · Correction · Pilot Fix · Operational Finding
