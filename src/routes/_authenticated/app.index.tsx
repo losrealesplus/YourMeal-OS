@@ -18,7 +18,6 @@ import {
 } from "@/components/consumer";
 import { TenantLogo } from "@/components/tenant/tenant-logo";
 import { BrandLeafMark } from "@/components/tenant/brand-leaf-mark";
-import { SaasOpsEntry } from "@/components/tenant/saas-ops-entry";
 import { PoweredByLine } from "@/components/tenant/tenant-brand-scope";
 import { useWeeklyMenu } from "@/hooks/use-weekly-menu";
 import { useUpcomingDelivery } from "@/hooks/use-upcoming-delivery";
