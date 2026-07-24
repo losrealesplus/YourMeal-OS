@@ -152,9 +152,10 @@ function SaasTenantDetailPage() {
         <PanelCard>
           <DataTable
             columns={memberCols}
-            rows={members as Member[]}
+            rows={(members as Omit<Member, "id">[]).map((m) => ({ ...m, id: m.userId }))}
             empty="No members yet. Invite a Company Admin to bootstrap this tenant."
           />
+
           <div className="pt-3">
             <Link to="/saas/company-admin" className="text-xs text-primary hover:underline">
               → Invite a Company Admin
