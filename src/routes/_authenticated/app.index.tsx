@@ -17,6 +17,8 @@ import {
   dishMacrosLine,
 } from "@/components/consumer";
 import { TenantLogo } from "@/components/tenant/tenant-logo";
+import { BrandLeafMark } from "@/components/tenant/brand-leaf-mark";
+import { PoweredByLine } from "@/components/tenant/tenant-brand-scope";
 import { useWeeklyMenu } from "@/hooks/use-weekly-menu";
 import { useUpcomingDelivery } from "@/hooks/use-upcoming-delivery";
 import { utcWeekStartMonday } from "@/modules/weekly-menu/application/week-dates";
@@ -189,6 +191,12 @@ function HomeBody({
           icon={<Heart className="size-5" strokeWidth={2} />}
           label={t("homeFavorites")}
         />
+      </div>
+
+      {/* EP-002A.1.1 — secure Ops Center entry (checks staff session) */}
+      <div className="mt-10 flex flex-col items-center gap-3 pb-2">
+        <BrandLeafMark />
+        <PoweredByLine />
       </div>
     </div>
   );

@@ -1,20 +1,32 @@
 /**
  * Centro de Operaciones — punto de entrada diario.
- * PR-034: qué necesita atención hoy (trabajo operativo, no dashboard KPI).
+ * PR-034: qué necesita atención hoy + EP-002A.1.1 departamentos por RBAC.
  */
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Boxes,
   ChefHat,
+  ClipboardList,
+  LineChart,
+  Settings,
+  Shield,
+  ScrollText,
   Truck,
   Users,
+  Wallet,
+  LifeBuoy,
   type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useCan } from "@/hooks/use-can";
 import { usePilotAdminModuleFlags } from "@/hooks/use-pilot-admin-module-flags";
 import { PILOT_ADMIN_MODULE_FLAGS } from "@/lib/pilot-feature-flags";
+import {
+  departmentsForRoles,
+  type OperationsDepartmentId,
+} from "@/lib/operations-departments";
 import { supabase } from "@/integrations/supabase/client";
 import { createServiceContext } from "@/services/types";
 import { OperationsService } from "@/modules/operations";
@@ -50,6 +62,20 @@ function firstName(fullName: string | null | undefined): string | null {
   return fullName.trim().split(/\s+/)[0] ?? null;
 }
 
+const DEPARTMENT_ICONS: Record<OperationsDepartmentId, LucideIcon> = {
+  dashboard: ClipboardList,
+  kitchen: ChefHat,
+  delivery: Truck,
+  stock: Boxes,
+  customers: Users,
+  support: LifeBuoy,
+  commercial: LineChart,
+  finance: Wallet,
+  administration: Shield,
+  settings: Settings,
+  audit: ScrollText,
+};
+
 type AttentionItem = {
   id: string;
   to: string;
@@ -83,6 +109,7 @@ async function countClientIncidents(tenantId: string): Promise<number> {
 }
 
 function OpsCenterHome() {
+  const { t } = useTranslation("admin");
   const { user, tenantId, roles, profile } = useAuth();
   const { can } = useCan();
   const { flags: moduleFlags } = usePilotAdminModuleFlags();
@@ -96,6 +123,12 @@ function OpsCenterHome() {
   const name = firstName(profile?.fullName);
   const greeting = greetingForHour(hour);
 
+  const departments = useMemo(
+    () =>
+      departmentsForRoles(roles, moduleFlags).filter((d) => d.id !== "dashboard"),
+    [roles, moduleFlags],
+  );
+
   const showKitchen =
     can("kitchen.operate") ||
     roles.includes("operations_manager") ||
@@ -104,6 +137,7 @@ function OpsCenterHome() {
   const showDelivery =
     can("logistics.operate") ||
     roles.includes("operations_manager") ||
+    roles.includes("company_admin") ||
     can("saas.manage");
   const showInventory =
     (can("inventory.operate") ||
@@ -232,7 +266,6 @@ function OpsCenterHome() {
 
   return (
     <div className="relative mx-auto max-w-2xl animate-fade-in">
-      {/* Atmosphere — soft wash, not a flat void */}
       <div
         aria-hidden
         className="pointer-events-none absolute -inset-x-8 -top-8 h-56 bg-[radial-gradient(ellipse_at_top,_oklch(0.96_0.02_85)_0%,_transparent_70%)]"
@@ -287,6 +320,41 @@ function OpsCenterHome() {
           ))
         )}
       </section>
+
+      {departments.length > 0 ? (
+        <section className="relative mt-10" aria-label={t("departmentsTitle")}>
+          <h2 className="text-lg font-semibold tracking-tight">
+            {t("departmentsTitle")}
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {t("departmentsLead")}
+          </p>
+          <ul className="mt-4 divide-y divide-border border-y border-border">
+            {departments.map((dept) => {
+              const Icon = DEPARTMENT_ICONS[dept.id];
+              const label = t(dept.labelKey as "ops.nav.kitchen");
+              return (
+                <li key={dept.id}>
+                  <Link
+                    to={dept.path}
+                    className="flex items-center gap-3 py-4 transition-opacity hover:opacity-80"
+                  >
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-secondary text-foreground">
+                      <Icon className="h-4 w-4" aria-hidden />
+                    </span>
+                    <span className="flex-1 text-[15px] font-semibold">
+                      {label}
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      {t("ops.enterWorkspace")}
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ) : null}
 
       <style>{`
         @keyframes ops-home-in {

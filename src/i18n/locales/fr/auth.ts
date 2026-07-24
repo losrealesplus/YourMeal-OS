@@ -29,5 +29,9 @@ export default {
   adminEnter: "Entrer",
   adminEntryLabel: "Centre d'opérations",
   adminEntryAria: "Centre d'opérations",
+  adminNotStaff: "Ce compte n'a pas accès au Centre d'opérations.",
+  adminNotStaffHint:
+    "Vous êtes connecté en tant que client. Déconnectez-vous et utilisez un compte du personnel.",
+  adminSwitchAccount: "Utiliser un autre compte",
   backToCustomerLogin: "Retour à la connexion client",
 } as const;
