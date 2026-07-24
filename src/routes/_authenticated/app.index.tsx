@@ -197,6 +197,7 @@ function HomeBody({
       {/* EP-002A.1.1 — secure Ops Center entry (checks staff session) */}
       <div className="mt-10 flex flex-col items-center gap-3 pb-2">
         <BrandLeafMark />
+        <SaasOpsEntry />
         <PoweredByLine />
       </div>
     </div>
