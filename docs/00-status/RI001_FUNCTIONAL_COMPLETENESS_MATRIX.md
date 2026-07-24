@@ -3,10 +3,10 @@
 **Fecha:** 2026-07-24  
 **Modo:** **Certificación** — Release Board (eliminar bloqueos); no Packaging/features nuevas  
 **Baseline:** `main` @ post-#52 (EP-002A.2–A.3 · EP-002B.1–B.2 · DICT-072 · Readiness docs)  
-**Board:** [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md) — B1 `/admin` · B2 `/saas` · B3 jornada · Day-0  
-**Estructura:** [EATCLEAN_OPERATIONAL_STRUCTURE](./EATCLEAN_OPERATIONAL_STRUCTURE.md) — actores · RBAC · recorrido  
+**Board:** [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md) — 3 preguntas · Observability · Day-0  
+**Canon:** [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md) (DICT-074) · ORS-001  
 **Spec:** [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)  
-**Principio:** [DICT-071](../20-evidence-framework/09-operational-visibility-principle.md) · [DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)  
+**Principio:** [DICT-071](../20-evidence-framework/09-operational-visibility-principle.md) · [DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md) · [DICT-074](./EATCLEAN_OPERATIONAL_STRUCTURE.md)  
 **Sprint:** [RI001_READINESS_SPRINT](./RI001_READINESS_SPRINT.md)
 
 > Pregunta del momento:  

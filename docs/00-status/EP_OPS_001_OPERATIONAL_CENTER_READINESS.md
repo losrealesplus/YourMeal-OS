@@ -3,9 +3,9 @@
 **Estado:** Active — **bloquea RI-001**  
 **Tipo:** Correction / Certification — no Packaging / no features de cocina nuevas  
 **Bloqueo:** RI-001 está temporalmente bloqueado por EP-OPS-001 (no por falta de módulos, sino por falta de **punto de entrada operacional certificado**)  
-**Working board:** [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md) ← **usar esto a diario** (no “roadmap”)  
-**Estructura visual:** [EATCLEAN_OPERATIONAL_STRUCTURE](./EATCLEAN_OPERATIONAL_STRUCTURE.md) — actores · impacto por departamento · dual hub  
-**Principio:** [DICT-071](../20-evidence-framework/09-operational-visibility-principle.md) · [DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md) · [DICT-073 Tenant Operational Autonomy](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)  
+**Working board:** [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md) ← **3 preguntas ejecutivas** (no “roadmap”)  
+**Canon:** [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md) — contrato UI · RBAC · Operación · ORS-001  
+**Principio:** [DICT-071](../20-evidence-framework/09-operational-visibility-principle.md) · [DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md) · [DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md) · [DICT-074](../99-reference/PROJECT_DICTIONARY.md#operational-canonical-model)  
 **Gap:** [OPS_CENTER_DUAL_SURFACE](./OPS_CENTER_DUAL_SURFACE.md)  
 **Matriz:** [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md) — bloque Ops primero; resto ⏸
 
@@ -13,7 +13,7 @@
 
 ## Pregunta
 
-> **¿Podemos demostrar una jornada real EatClean × YourMeal OS?**
+> **¿Puede YourMeal OS operar una empresa real de alimentación sin intervención del equipo de ingeniería?**
 
 Hasta que este EP sea **PASS**, cualquier E2E estará condicionado por el hueco del hub.
 
@@ -21,7 +21,7 @@ Hasta que este EP sea **PASS**, cualquier E2E estará condicionado por el hueco 
 RI-001  ←── bloqueado por ──  EP-OPS-001 PASS
 ```
 
-DICT-073 cierra el último principio arquitectónico previo a RI-001. El trabajo diario es el **Release Board**: eliminar bloqueos, no abrir features.
+Naturaleza del proyecto: ya no construir módulos — **demostrar operación** vía Release Board + OCM-001.
 
 ---
 
@@ -288,11 +288,13 @@ RI-001 Decision
 
 ## Definition of Done (EP completo)
 
-Fuente de verdad: [Release Board DoD](./EP_OPS_001_RELEASE_BOARD.md#definition-of-done--ep-ops-001).
+Fuente de verdad: [Release Board DoD](./EP_OPS_001_RELEASE_BOARD.md#definition-of-done--ep-ops-001) (3 preguntas + checklist + Observability).
 
 Resumen:
 
-- [ ] Bloqueadores 1–3 en verde (tabla DoD completa).
-- [ ] Day-0 Provisioning Scenario ejecutable sin ingeniería.
-- [ ] Architecture Freeze activado hasta cierre de RI-001.
-- [ ] RI-001 **desbloqueado** para FCR + E2E sobre base estable.
+- [ ] Preguntas 1–3 = Sí.
+- [ ] OCM-001 / invariantes respetados.
+- [ ] ORS-001 demostrable · Observability (7 preguntas).
+- [ ] Day-0 sin ingeniería.
+- [ ] Architecture Freeze activado (lista explícita).
+- [ ] RI-001 desbloqueado para FCR + E2E sobre base estable.

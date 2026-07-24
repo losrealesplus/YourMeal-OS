@@ -22,6 +22,7 @@
 | [MODULE_CONVENTION.md](./MODULE_CONVENTION.md) | `src/modules/...` layout |
 | [OPERATIONAL_REPRESENTATION_PATTERN.md](./OPERATIONAL_REPRESENTATION_PATTERN.md) | Service → Report / Workspace (DICT-072) |
 | [TENANT_OPERATIONAL_AUTONOMY.md](./TENANT_OPERATIONAL_AUTONOMY.md) | Criterio de madurez multi-tenant · WP-5 (DICT-073) |
+| [../00-status/EATCLEAN_OPERATIONAL_STRUCTURE.md](../00-status/EATCLEAN_OPERATIONAL_STRUCTURE.md) | OCM-001 · contrato canónico RI-001 (DICT-074) |
 | [../10-api/README.md](../10-api/README.md) | Service → Repository → Supabase |
 | [../adr/0009-foundation-lock.md](../adr/0009-foundation-lock.md) | Lock ADR |
 | [../adr/0014-customer-application-is-tenant-branded.md](../adr/0014-customer-application-is-tenant-branded.md) | Customer App = Tenant-Branded |

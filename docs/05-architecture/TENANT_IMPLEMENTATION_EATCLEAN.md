@@ -7,7 +7,7 @@
 **Contrato técnico:** [TENANT_BRANDING](./TENANT_BRANDING.md)  
 **Assets:** [`tenants/eatclean/`](../../tenants/eatclean/README.md)  
 **Journeys:** [CJ-001](../07-experience/CUSTOMER_JOURNEYS.md#cj-001--pedido-semanal) · [OPERATIONAL_JOURNEYS](../07-experience/OPERATIONAL_JOURNEYS.md)  
-**Estructura operacional (RI-001):** [EATCLEAN_OPERATIONAL_STRUCTURE](../00-status/EATCLEAN_OPERATIONAL_STRUCTURE.md) — actores · RBAC · dual hub · recorrido  
+**Estructura operacional (RI-001):** [OCM-001](../00-status/EATCLEAN_OPERATIONAL_STRUCTURE.md) — contrato canónico · ORS-001 · RBAC  
 **Bitácora de sprint:** [EXPERIENCE_REFACTOR_EATCLEAN_V1_1](../07-experience/EXPERIENCE_REFACTOR_EATCLEAN_V1_1.md)  
 **Prompt Lovable bloqueado:** [EATCLEAN_BRAND_CONTINUITY_LOCKED](../21-product-materialization/EATCLEAN_BRAND_CONTINUITY_LOCKED.md)  
 **Milestone:** [EatClean Pilot Ready](../00-status/MILESTONE_EATCLEAN_PILOT_READY.md)

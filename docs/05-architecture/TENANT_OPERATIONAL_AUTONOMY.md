@@ -87,4 +87,5 @@ Tras **EP-OPS-001 PASS**, la arquitectura se congela temporalmente hasta cerrar 
 
 Solo: corrección de defectos · evidencia · certificación.
 
-Secuencia estabilizada: [Release Board · Después del PASS](../00-status/EP_OPS_001_RELEASE_BOARD.md#después-del-pass).
+Secuencia estabilizada: [Release Board · Después del PASS](../00-status/EP_OPS_001_RELEASE_BOARD.md#después-del-pass--architecture-freeze).  
+Freeze congela explícitamente OCM-001 / DICT-074 junto a DICT-071…073.

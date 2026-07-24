@@ -134,6 +134,7 @@ Core | Operational | Engineering | Historical
 | `DICT-071` | [Operational Visibility](#operational-visibility) | Core | Accepted |
 | `DICT-072` | [Operational Representation Pattern](#operational-representation-pattern) | Engineering | Accepted |
 | `DICT-073` | [Tenant Operational Autonomy](#tenant-operational-autonomy) | Core | Accepted |
+| `DICT-074` | [Operational Canonical Model](#operational-canonical-model) | Core | Accepted |
 | `DICT-006` | [Evidence](#evidence) | Core | Accepted |
 | `DICT-007` | [Knowledge Leakage](#knowledge-leakage) | Core | Accepted |
 | `DICT-008` | [Operational Model](#operational-model) | Core | Accepted |
@@ -202,7 +203,7 @@ Core | Operational | Engineering | Historical
 
 ### Metodología
 
-[FOPEBA](#fopeba) (`DICT-001`) · [FOV](#fov) (`DICT-002`) · [IOV](#iov) (`DICT-003`) · [Knowledge Update](#knowledge-update) (`DICT-004`) · [Gate](#gate) (`DICT-005`) · [Pilot Integrity](#pilot-integrity) (`DICT-069`) · [Reference Implementation](#reference-implementation-ri) (`DICT-070`) · [Operational Visibility](#operational-visibility) (`DICT-071`) · [Operational Representation Pattern](#operational-representation-pattern) (`DICT-072`) · [Tenant Operational Autonomy](#tenant-operational-autonomy) (`DICT-073`) · [Evidence](#evidence) (`DICT-006`) · [Knowledge Leakage](#knowledge-leakage) (`DICT-007`) · [Operational Model](#operational-model) (`DICT-008`) · [Table Validation](#table-validation) (`DICT-009`) · [Field Validation](#field-validation) (`DICT-010`) · [Knowledge Lifetime](#knowledge-lifetime) (`DICT-057`)
+[FOPEBA](#fopeba) (`DICT-001`) · [FOV](#fov) (`DICT-002`) · [IOV](#iov) (`DICT-003`) · [Knowledge Update](#knowledge-update) (`DICT-004`) · [Gate](#gate) (`DICT-005`) · [Pilot Integrity](#pilot-integrity) (`DICT-069`) · [Reference Implementation](#reference-implementation-ri) (`DICT-070`) · [Operational Visibility](#operational-visibility) (`DICT-071`) · [Operational Representation Pattern](#operational-representation-pattern) (`DICT-072`) · [Tenant Operational Autonomy](#tenant-operational-autonomy) (`DICT-073`) · [Operational Canonical Model](#operational-canonical-model) (`DICT-074`) · [Evidence](#evidence) (`DICT-006`) · [Knowledge Leakage](#knowledge-leakage) (`DICT-007`) · [Operational Model](#operational-model) (`DICT-008`) · [Table Validation](#table-validation) (`DICT-009`) · [Field Validation](#field-validation) (`DICT-010`) · [Knowledge Lifetime](#knowledge-lifetime) (`DICT-057`)
 
 ### Ingeniería
 
@@ -3108,6 +3109,45 @@ Tenant · Company Admin · saas_admin · Dual Ops Center · EP-OPS-001 · Archit
 [TENANT_OPERATIONAL_AUTONOMY](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md) · [EP-OPS-001 Release Board](../00-status/EP_OPS_001_RELEASE_BOARD.md) · [EP-OPS-001](../00-status/EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · [OPS_CENTER_DUAL_SURFACE](../00-status/OPS_CENTER_DUAL_SURFACE.md)
 
 
+---
+
+# Operational Canonical Model
+
+## ID
+DICT-074
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Operational Canonical Model (OCM)
+
+## Tipo
+Contrato de arquitectura / fuente de verdad operacional (certificación)
+
+## Definición
+El **Operational Canonical Model** (artefacto **OCM-001**, archivo `EATCLEAN_OPERATIONAL_STRUCTURE.md`) es el contrato entre UI/UX, RBAC y Operación que gobierna Functional Completeness y Release Readiness (RI-001). No es una ilustración: contradecirlo es defecto; modificarlo exige ADR/DICT.
+
+## Implica
+- Invariantes operacionales (tenant · RBAC · `/admin` vs `/saas` · auditoría · sin mocks · ORS-001 · excepciones vía ADR/DICT).
+- Matriz RBAC con ✅ completo · 🟡 parcial (consulta/ejecución parcial, **no** admin del módulo) · — sin acceso.
+- **ORS-001** (Operational Reference Scenario #001): recorrido Cliente → Pedido → Kitchen Queue → Hoja → Execution → Reparto → Entrega → Historial; todo E2E futuro es variación de este escenario.
+- Architecture Freeze post EP-OPS-001 PASS congela OCM-001 junto a DICT-071…073.
+- Release Board reduce la certificación a tres preguntas ejecutivas + Observability transversal.
+
+## No significa
+Mock de marketing · inventario exhaustivo de pantallas · sustituir el Operational Model de conocimiento (DICT-008) · nuevos módulos sin decisión.
+
+## Palabras relacionadas
+OCM-001 · ORS-001 · Release Board · EP-OPS-001 · Tenant Operational Autonomy · Operational Visibility · Reference Implementation · FOPEBA
+
+## Referencias
+[OCM-001](../00-status/EATCLEAN_OPERATIONAL_STRUCTURE.md) · [Release Board](../00-status/EP_OPS_001_RELEASE_BOARD.md) · [EP-OPS-001](../00-status/EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)
+
+
 ## Historial de este diccionario
 
 | Fecha | Cambio |
@@ -3132,3 +3172,4 @@ Tenant · Company Admin · saas_admin · Dual Ops Center · EP-OPS-001 · Archit
 | 2026-07-24 | DICT-072 Operational Representation Pattern · Service → Report / Workspace |
 | 2026-07-24 | DICT-073 Tenant Operational Autonomy · WP-5 Tenant Provisioning · Architecture Freeze |
 | 2026-07-24 | Release Board EP-OPS-001 · Day-0 Provisioning Scenario · post-PASS RRR |
+| 2026-07-24 | DICT-074 OCM-001 · ORS-001 · Observability · project nature = demonstrate |
