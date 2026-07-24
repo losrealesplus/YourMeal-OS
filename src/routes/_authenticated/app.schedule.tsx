@@ -65,9 +65,9 @@ function ScheduleFlow() {
   const offerDishes = weeklyMenu?.days[deliveryDay]?.dishes ?? [];
   const dayDate = utcWeekDates(weekStart)[deliveryDay] ?? weekStart;
   const selectedDishes = offerDishes.filter((d) => selected.includes(d.id));
-  // Display-only scaffold estimate — authoritative total is computed server-side (INC-01).
-  const totalCents = selected.length * 990;
-  const totalEur = totalCents / 100;
+  // Authoritative total = sum of real dish prices from the published catalog.
+  // Matches OrderService.programDraft server-side computation (INC-01).
+  const totalEur = selectedDishes.reduce((sum, d) => sum + Number(d.price ?? 0), 0);
 
   const deliveryDateLabel = formatDeliveryDate(dayDate, i18n.language);
 
