@@ -61,14 +61,14 @@ function SettingsPage() {
       items: [
         { key: "payment", icon: <CreditCard className="size-4" /> },
         { key: "invoices", icon: <FileText className="size-4" /> },
-        { key: "orderHistory", icon: <History className="size-4" /> },
+        { key: "orderHistory", icon: <History className="size-4" />, to: "/app/orders" },
       ],
     },
     {
       title: t("customer:groupFood"),
       items: [
         { key: "allergies", icon: <Leaf className="size-4" /> },
-        { key: "preferences", icon: <Leaf className="size-4" /> },
+        { key: "preferences", icon: <Leaf className="size-4" />, to: "/app/favorites" },
       ],
     },
     {
