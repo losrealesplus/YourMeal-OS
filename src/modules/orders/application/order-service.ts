@@ -20,6 +20,13 @@ export type ProgramDraftOrderCommand = {
   notes?: string | null;
 };
 
+/** Multi-day draft (EP-002A.2 repeat). Each line validated against its day offer. */
+export type ProgramDraftItemsCommand = {
+  weekStart: string;
+  items: ProgramOrderItemInput[];
+  notes?: string | null;
+};
+
 export type ProgramDraftOrderResult = {
   order: OrderRow;
   items: OrderItemRow[];
@@ -34,20 +41,40 @@ export const OrderService = {
     ctx: ServiceContext,
     command: ProgramDraftOrderCommand,
   ): Promise<ProgramDraftOrderResult> {
+    return OrderService.programDraftItems(ctx, {
+      weekStart: command.weekStart,
+      notes: command.notes,
+      items: command.dishIds.map((dishId) => ({
+        dishId,
+        dayDate: command.dayDate,
+        qty: 1,
+      })),
+    });
+  },
+
+  async programDraftItems(
+    ctx: ServiceContext,
+    command: ProgramDraftItemsCommand,
+  ): Promise<ProgramDraftOrderResult> {
     requireCapability(ctx.roles, "orders.write");
 
     if (!(await FeatureFlagService.isEnabled(ctx, "order_programming"))) {
       throw new DomainError("UNIMPLEMENTED", "Order programming is disabled by feature flag");
     }
 
-    if (!command.dishIds.length) {
+    if (!command.items.length) {
       throw new DomainError("INVALID_STATE", "Order programming requires at least one dish");
     }
-    if (!command.weekStart || !command.dayDate) {
-      throw new DomainError("INVALID_STATE", "weekStart and dayDate are required");
+    if (!command.weekStart) {
+      throw new DomainError("INVALID_STATE", "weekStart is required");
+    }
+    for (const item of command.items) {
+      if (!item.dishId || !item.dayDate || item.qty <= 0) {
+        throw new DomainError("INVALID_STATE", "Each item needs dishId, dayDate and qty > 0");
+      }
     }
 
-    const uniqueDishIds = [...new Set(command.dishIds)];
+    const uniqueDishIds = [...new Set(command.items.map((i) => i.dishId))];
     const menuRepo = createWeeklyMenuRepository(ctx.supabase, ctx.tenantId);
     const menu = await menuRepo.findPublishedByWeekStart(command.weekStart);
     if (!menu) {
@@ -55,17 +82,20 @@ export const OrderService = {
     }
 
     const slots = await menuRepo.listSlotsWithDishes(menu.id);
-    const offeredIds = new Set(
-      slots
-        .filter((s) => s.day_date === command.dayDate && s.dishes && !s.dishes.deleted_at)
-        .map((s) => s.dish_id),
-    );
+    const offeredByDay = new Map<string, Set<string>>();
+    for (const s of slots) {
+      if (!s.dishes || s.dishes.deleted_at) continue;
+      const set = offeredByDay.get(s.day_date) ?? new Set<string>();
+      set.add(s.dish_id);
+      offeredByDay.set(s.day_date, set);
+    }
 
-    for (const dishId of uniqueDishIds) {
-      if (!offeredIds.has(dishId)) {
+    for (const item of command.items) {
+      const offered = offeredByDay.get(item.dayDate);
+      if (!offered?.has(item.dishId)) {
         throw new DomainError(
           "INVALID_STATE",
-          `Dish ${dishId} is not on the published offer for ${command.dayDate}`,
+          `Dish ${item.dishId} is not on the published offer for ${item.dayDate}`,
         );
       }
     }
@@ -78,13 +108,17 @@ export const OrderService = {
 
     const priceById = new Map(dishes.map((d) => [d.id, Number(d.price)]));
     let total = 0;
-    const items: ProgramOrderItemInput[] = command.dishIds.map((dishId) => {
-      const price = priceById.get(dishId);
-      if (price == null || Number.isNaN(price)) {
-        throw new DomainError("INVALID_STATE", `Missing price for dish ${dishId}`);
+    const items: ProgramOrderItemInput[] = command.items.map((item) => {
+      const unit = priceById.get(item.dishId);
+      if (unit == null || Number.isNaN(unit)) {
+        throw new DomainError("INVALID_STATE", `Missing price for dish ${item.dishId}`);
       }
-      total += price;
-      return { dishId, dayDate: command.dayDate, qty: 1 };
+      total += unit * item.qty;
+      return {
+        dishId: item.dishId,
+        dayDate: item.dayDate,
+        qty: item.qty,
+      };
     });
     // Persist with 2 decimal places (orders.total numeric(12,2))
     total = Math.round(total * 100) / 100;
