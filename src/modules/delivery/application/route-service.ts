@@ -316,7 +316,7 @@ export const RouteService = {
     await AuditService.write(ctx, {
       entityType: "route_stop",
       entityId: stopId,
-      action: "delete",
+      action: "archive",
       oldData: existing,
     });
   },
