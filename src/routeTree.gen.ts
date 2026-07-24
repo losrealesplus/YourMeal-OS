@@ -22,10 +22,15 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedSaasIndexRouteImport } from './routes/_authenticated/saas.index'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedSaasTenantsRouteImport } from './routes/_authenticated/saas.tenants'
 import { Route as AuthenticatedSaasSettingsRouteImport } from './routes/_authenticated/saas.settings'
+import { Route as AuthenticatedSaasRolesRouteImport } from './routes/_authenticated/saas.roles'
+import { Route as AuthenticatedSaasMembershipRouteImport } from './routes/_authenticated/saas.membership'
 import { Route as AuthenticatedSaasLicensesRouteImport } from './routes/_authenticated/saas.licenses'
 import { Route as AuthenticatedSaasDomainsRouteImport } from './routes/_authenticated/saas.domains'
+import { Route as AuthenticatedSaasCompanyAdminRouteImport } from './routes/_authenticated/saas.company-admin'
 import { Route as AuthenticatedSaasBrandingRouteImport } from './routes/_authenticated/saas.branding'
+import { Route as AuthenticatedSaasAuditRouteImport } from './routes/_authenticated/saas.audit'
 import { Route as AuthenticatedSaasAnalyticsRouteImport } from './routes/_authenticated/saas.analytics'
 import { Route as AuthenticatedAppSettingsRouteImport } from './routes/_authenticated/app.settings'
 import { Route as AuthenticatedAppScheduleRouteImport } from './routes/_authenticated/app.schedule'
@@ -60,6 +65,7 @@ import { Route as AuthenticatedAdminAccountingRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminRoutesIndexRouteImport } from './routes/_authenticated/admin.routes.index'
 import { Route as AuthenticatedAdminProductionIndexRouteImport } from './routes/_authenticated/admin.production.index'
 import { Route as AuthenticatedAdminDesignSystemIndexRouteImport } from './routes/_authenticated/admin.design-system.index'
+import { Route as AuthenticatedSaasTenantsTenantIdRouteImport } from './routes/_authenticated/saas.tenants.$tenantId'
 import { Route as AuthenticatedAppSettingsProfileRouteImport } from './routes/_authenticated/app.settings.profile'
 import { Route as AuthenticatedAppOrdersOrderIdRouteImport } from './routes/_authenticated/app.orders.$orderId'
 import { Route as AuthenticatedAppOnboardingEmployeeRouteImport } from './routes/_authenticated/app.onboarding.employee'
@@ -145,10 +151,27 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedSaasTenantsRoute =
+  AuthenticatedSaasTenantsRouteImport.update({
+    id: '/tenants',
+    path: '/tenants',
+    getParentRoute: () => AuthenticatedSaasRoute,
+  } as any)
 const AuthenticatedSaasSettingsRoute =
   AuthenticatedSaasSettingsRouteImport.update({
     id: '/settings',
     path: '/settings',
+    getParentRoute: () => AuthenticatedSaasRoute,
+  } as any)
+const AuthenticatedSaasRolesRoute = AuthenticatedSaasRolesRouteImport.update({
+  id: '/roles',
+  path: '/roles',
+  getParentRoute: () => AuthenticatedSaasRoute,
+} as any)
+const AuthenticatedSaasMembershipRoute =
+  AuthenticatedSaasMembershipRouteImport.update({
+    id: '/membership',
+    path: '/membership',
     getParentRoute: () => AuthenticatedSaasRoute,
   } as any)
 const AuthenticatedSaasLicensesRoute =
@@ -163,12 +186,23 @@ const AuthenticatedSaasDomainsRoute =
     path: '/domains',
     getParentRoute: () => AuthenticatedSaasRoute,
   } as any)
+const AuthenticatedSaasCompanyAdminRoute =
+  AuthenticatedSaasCompanyAdminRouteImport.update({
+    id: '/company-admin',
+    path: '/company-admin',
+    getParentRoute: () => AuthenticatedSaasRoute,
+  } as any)
 const AuthenticatedSaasBrandingRoute =
   AuthenticatedSaasBrandingRouteImport.update({
     id: '/branding',
     path: '/branding',
     getParentRoute: () => AuthenticatedSaasRoute,
   } as any)
+const AuthenticatedSaasAuditRoute = AuthenticatedSaasAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AuthenticatedSaasRoute,
+} as any)
 const AuthenticatedSaasAnalyticsRoute =
   AuthenticatedSaasAnalyticsRouteImport.update({
     id: '/analytics',
@@ -367,6 +401,12 @@ const AuthenticatedAdminDesignSystemIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedAdminDesignSystemRoute,
   } as any)
+const AuthenticatedSaasTenantsTenantIdRoute =
+  AuthenticatedSaasTenantsTenantIdRouteImport.update({
+    id: '/$tenantId',
+    path: '/$tenantId',
+    getParentRoute: () => AuthenticatedSaasTenantsRoute,
+  } as any)
 const AuthenticatedAppSettingsProfileRoute =
   AuthenticatedAppSettingsProfileRouteImport.update({
     id: '/profile',
@@ -529,10 +569,15 @@ export interface FileRoutesByFullPath {
   '/app/schedule': typeof AuthenticatedAppScheduleRoute
   '/app/settings': typeof AuthenticatedAppSettingsRouteWithChildren
   '/saas/analytics': typeof AuthenticatedSaasAnalyticsRoute
+  '/saas/audit': typeof AuthenticatedSaasAuditRoute
   '/saas/branding': typeof AuthenticatedSaasBrandingRoute
+  '/saas/company-admin': typeof AuthenticatedSaasCompanyAdminRoute
   '/saas/domains': typeof AuthenticatedSaasDomainsRoute
   '/saas/licenses': typeof AuthenticatedSaasLicensesRoute
+  '/saas/membership': typeof AuthenticatedSaasMembershipRoute
+  '/saas/roles': typeof AuthenticatedSaasRolesRoute
   '/saas/settings': typeof AuthenticatedSaasSettingsRoute
+  '/saas/tenants': typeof AuthenticatedSaasTenantsRouteWithChildren
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/saas/': typeof AuthenticatedSaasIndexRoute
@@ -556,6 +601,7 @@ export interface FileRoutesByFullPath {
   '/app/onboarding/employee': typeof AuthenticatedAppOnboardingEmployeeRoute
   '/app/orders/$orderId': typeof AuthenticatedAppOrdersOrderIdRoute
   '/app/settings/profile': typeof AuthenticatedAppSettingsProfileRoute
+  '/saas/tenants/$tenantId': typeof AuthenticatedSaasTenantsTenantIdRoute
   '/admin/design-system/': typeof AuthenticatedAdminDesignSystemIndexRoute
   '/admin/production/': typeof AuthenticatedAdminProductionIndexRoute
   '/admin/routes/': typeof AuthenticatedAdminRoutesIndexRoute
@@ -595,10 +641,15 @@ export interface FileRoutesByTo {
   '/app/schedule': typeof AuthenticatedAppScheduleRoute
   '/app/settings': typeof AuthenticatedAppSettingsRouteWithChildren
   '/saas/analytics': typeof AuthenticatedSaasAnalyticsRoute
+  '/saas/audit': typeof AuthenticatedSaasAuditRoute
   '/saas/branding': typeof AuthenticatedSaasBrandingRoute
+  '/saas/company-admin': typeof AuthenticatedSaasCompanyAdminRoute
   '/saas/domains': typeof AuthenticatedSaasDomainsRoute
   '/saas/licenses': typeof AuthenticatedSaasLicensesRoute
+  '/saas/membership': typeof AuthenticatedSaasMembershipRoute
+  '/saas/roles': typeof AuthenticatedSaasRolesRoute
   '/saas/settings': typeof AuthenticatedSaasSettingsRoute
+  '/saas/tenants': typeof AuthenticatedSaasTenantsRouteWithChildren
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/saas': typeof AuthenticatedSaasIndexRoute
@@ -622,6 +673,7 @@ export interface FileRoutesByTo {
   '/app/onboarding/employee': typeof AuthenticatedAppOnboardingEmployeeRoute
   '/app/orders/$orderId': typeof AuthenticatedAppOrdersOrderIdRoute
   '/app/settings/profile': typeof AuthenticatedAppSettingsProfileRoute
+  '/saas/tenants/$tenantId': typeof AuthenticatedSaasTenantsTenantIdRoute
   '/admin/design-system': typeof AuthenticatedAdminDesignSystemIndexRoute
   '/admin/production': typeof AuthenticatedAdminProductionIndexRoute
   '/admin/routes': typeof AuthenticatedAdminRoutesIndexRoute
@@ -669,10 +721,15 @@ export interface FileRoutesById {
   '/_authenticated/app/schedule': typeof AuthenticatedAppScheduleRoute
   '/_authenticated/app/settings': typeof AuthenticatedAppSettingsRouteWithChildren
   '/_authenticated/saas/analytics': typeof AuthenticatedSaasAnalyticsRoute
+  '/_authenticated/saas/audit': typeof AuthenticatedSaasAuditRoute
   '/_authenticated/saas/branding': typeof AuthenticatedSaasBrandingRoute
+  '/_authenticated/saas/company-admin': typeof AuthenticatedSaasCompanyAdminRoute
   '/_authenticated/saas/domains': typeof AuthenticatedSaasDomainsRoute
   '/_authenticated/saas/licenses': typeof AuthenticatedSaasLicensesRoute
+  '/_authenticated/saas/membership': typeof AuthenticatedSaasMembershipRoute
+  '/_authenticated/saas/roles': typeof AuthenticatedSaasRolesRoute
   '/_authenticated/saas/settings': typeof AuthenticatedSaasSettingsRoute
+  '/_authenticated/saas/tenants': typeof AuthenticatedSaasTenantsRouteWithChildren
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/saas/': typeof AuthenticatedSaasIndexRoute
@@ -696,6 +753,7 @@ export interface FileRoutesById {
   '/_authenticated/app/onboarding/employee': typeof AuthenticatedAppOnboardingEmployeeRoute
   '/_authenticated/app/orders/$orderId': typeof AuthenticatedAppOrdersOrderIdRoute
   '/_authenticated/app/settings/profile': typeof AuthenticatedAppSettingsProfileRoute
+  '/_authenticated/saas/tenants/$tenantId': typeof AuthenticatedSaasTenantsTenantIdRoute
   '/_authenticated/admin/design-system/': typeof AuthenticatedAdminDesignSystemIndexRoute
   '/_authenticated/admin/production/': typeof AuthenticatedAdminProductionIndexRoute
   '/_authenticated/admin/routes/': typeof AuthenticatedAdminRoutesIndexRoute
@@ -743,10 +801,15 @@ export interface FileRouteTypes {
     | '/app/schedule'
     | '/app/settings'
     | '/saas/analytics'
+    | '/saas/audit'
     | '/saas/branding'
+    | '/saas/company-admin'
     | '/saas/domains'
     | '/saas/licenses'
+    | '/saas/membership'
+    | '/saas/roles'
     | '/saas/settings'
+    | '/saas/tenants'
     | '/admin/'
     | '/app/'
     | '/saas/'
@@ -770,6 +833,7 @@ export interface FileRouteTypes {
     | '/app/onboarding/employee'
     | '/app/orders/$orderId'
     | '/app/settings/profile'
+    | '/saas/tenants/$tenantId'
     | '/admin/design-system/'
     | '/admin/production/'
     | '/admin/routes/'
@@ -809,10 +873,15 @@ export interface FileRouteTypes {
     | '/app/schedule'
     | '/app/settings'
     | '/saas/analytics'
+    | '/saas/audit'
     | '/saas/branding'
+    | '/saas/company-admin'
     | '/saas/domains'
     | '/saas/licenses'
+    | '/saas/membership'
+    | '/saas/roles'
     | '/saas/settings'
+    | '/saas/tenants'
     | '/admin'
     | '/app'
     | '/saas'
@@ -836,6 +905,7 @@ export interface FileRouteTypes {
     | '/app/onboarding/employee'
     | '/app/orders/$orderId'
     | '/app/settings/profile'
+    | '/saas/tenants/$tenantId'
     | '/admin/design-system'
     | '/admin/production'
     | '/admin/routes'
@@ -882,10 +952,15 @@ export interface FileRouteTypes {
     | '/_authenticated/app/schedule'
     | '/_authenticated/app/settings'
     | '/_authenticated/saas/analytics'
+    | '/_authenticated/saas/audit'
     | '/_authenticated/saas/branding'
+    | '/_authenticated/saas/company-admin'
     | '/_authenticated/saas/domains'
     | '/_authenticated/saas/licenses'
+    | '/_authenticated/saas/membership'
+    | '/_authenticated/saas/roles'
     | '/_authenticated/saas/settings'
+    | '/_authenticated/saas/tenants'
     | '/_authenticated/admin/'
     | '/_authenticated/app/'
     | '/_authenticated/saas/'
@@ -909,6 +984,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/onboarding/employee'
     | '/_authenticated/app/orders/$orderId'
     | '/_authenticated/app/settings/profile'
+    | '/_authenticated/saas/tenants/$tenantId'
     | '/_authenticated/admin/design-system/'
     | '/_authenticated/admin/production/'
     | '/_authenticated/admin/routes/'
@@ -1015,11 +1091,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/saas/tenants': {
+      id: '/_authenticated/saas/tenants'
+      path: '/tenants'
+      fullPath: '/saas/tenants'
+      preLoaderRoute: typeof AuthenticatedSaasTenantsRouteImport
+      parentRoute: typeof AuthenticatedSaasRoute
+    }
     '/_authenticated/saas/settings': {
       id: '/_authenticated/saas/settings'
       path: '/settings'
       fullPath: '/saas/settings'
       preLoaderRoute: typeof AuthenticatedSaasSettingsRouteImport
+      parentRoute: typeof AuthenticatedSaasRoute
+    }
+    '/_authenticated/saas/roles': {
+      id: '/_authenticated/saas/roles'
+      path: '/roles'
+      fullPath: '/saas/roles'
+      preLoaderRoute: typeof AuthenticatedSaasRolesRouteImport
+      parentRoute: typeof AuthenticatedSaasRoute
+    }
+    '/_authenticated/saas/membership': {
+      id: '/_authenticated/saas/membership'
+      path: '/membership'
+      fullPath: '/saas/membership'
+      preLoaderRoute: typeof AuthenticatedSaasMembershipRouteImport
       parentRoute: typeof AuthenticatedSaasRoute
     }
     '/_authenticated/saas/licenses': {
@@ -1036,11 +1133,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSaasDomainsRouteImport
       parentRoute: typeof AuthenticatedSaasRoute
     }
+    '/_authenticated/saas/company-admin': {
+      id: '/_authenticated/saas/company-admin'
+      path: '/company-admin'
+      fullPath: '/saas/company-admin'
+      preLoaderRoute: typeof AuthenticatedSaasCompanyAdminRouteImport
+      parentRoute: typeof AuthenticatedSaasRoute
+    }
     '/_authenticated/saas/branding': {
       id: '/_authenticated/saas/branding'
       path: '/branding'
       fullPath: '/saas/branding'
       preLoaderRoute: typeof AuthenticatedSaasBrandingRouteImport
+      parentRoute: typeof AuthenticatedSaasRoute
+    }
+    '/_authenticated/saas/audit': {
+      id: '/_authenticated/saas/audit'
+      path: '/audit'
+      fullPath: '/saas/audit'
+      preLoaderRoute: typeof AuthenticatedSaasAuditRouteImport
       parentRoute: typeof AuthenticatedSaasRoute
     }
     '/_authenticated/saas/analytics': {
@@ -1280,6 +1391,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/design-system/'
       preLoaderRoute: typeof AuthenticatedAdminDesignSystemIndexRouteImport
       parentRoute: typeof AuthenticatedAdminDesignSystemRoute
+    }
+    '/_authenticated/saas/tenants/$tenantId': {
+      id: '/_authenticated/saas/tenants/$tenantId'
+      path: '/$tenantId'
+      fullPath: '/saas/tenants/$tenantId'
+      preLoaderRoute: typeof AuthenticatedSaasTenantsTenantIdRouteImport
+      parentRoute: typeof AuthenticatedSaasTenantsRoute
     }
     '/_authenticated/app/settings/profile': {
       id: '/_authenticated/app/settings/profile'
@@ -1665,21 +1783,46 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
 const AuthenticatedAppRouteWithChildren =
   AuthenticatedAppRoute._addFileChildren(AuthenticatedAppRouteChildren)
 
+interface AuthenticatedSaasTenantsRouteChildren {
+  AuthenticatedSaasTenantsTenantIdRoute: typeof AuthenticatedSaasTenantsTenantIdRoute
+}
+
+const AuthenticatedSaasTenantsRouteChildren: AuthenticatedSaasTenantsRouteChildren =
+  {
+    AuthenticatedSaasTenantsTenantIdRoute:
+      AuthenticatedSaasTenantsTenantIdRoute,
+  }
+
+const AuthenticatedSaasTenantsRouteWithChildren =
+  AuthenticatedSaasTenantsRoute._addFileChildren(
+    AuthenticatedSaasTenantsRouteChildren,
+  )
+
 interface AuthenticatedSaasRouteChildren {
   AuthenticatedSaasAnalyticsRoute: typeof AuthenticatedSaasAnalyticsRoute
+  AuthenticatedSaasAuditRoute: typeof AuthenticatedSaasAuditRoute
   AuthenticatedSaasBrandingRoute: typeof AuthenticatedSaasBrandingRoute
+  AuthenticatedSaasCompanyAdminRoute: typeof AuthenticatedSaasCompanyAdminRoute
   AuthenticatedSaasDomainsRoute: typeof AuthenticatedSaasDomainsRoute
   AuthenticatedSaasLicensesRoute: typeof AuthenticatedSaasLicensesRoute
+  AuthenticatedSaasMembershipRoute: typeof AuthenticatedSaasMembershipRoute
+  AuthenticatedSaasRolesRoute: typeof AuthenticatedSaasRolesRoute
   AuthenticatedSaasSettingsRoute: typeof AuthenticatedSaasSettingsRoute
+  AuthenticatedSaasTenantsRoute: typeof AuthenticatedSaasTenantsRouteWithChildren
   AuthenticatedSaasIndexRoute: typeof AuthenticatedSaasIndexRoute
 }
 
 const AuthenticatedSaasRouteChildren: AuthenticatedSaasRouteChildren = {
   AuthenticatedSaasAnalyticsRoute: AuthenticatedSaasAnalyticsRoute,
+  AuthenticatedSaasAuditRoute: AuthenticatedSaasAuditRoute,
   AuthenticatedSaasBrandingRoute: AuthenticatedSaasBrandingRoute,
+  AuthenticatedSaasCompanyAdminRoute: AuthenticatedSaasCompanyAdminRoute,
   AuthenticatedSaasDomainsRoute: AuthenticatedSaasDomainsRoute,
   AuthenticatedSaasLicensesRoute: AuthenticatedSaasLicensesRoute,
+  AuthenticatedSaasMembershipRoute: AuthenticatedSaasMembershipRoute,
+  AuthenticatedSaasRolesRoute: AuthenticatedSaasRolesRoute,
   AuthenticatedSaasSettingsRoute: AuthenticatedSaasSettingsRoute,
+  AuthenticatedSaasTenantsRoute: AuthenticatedSaasTenantsRouteWithChildren,
   AuthenticatedSaasIndexRoute: AuthenticatedSaasIndexRoute,
 }
 
