@@ -270,7 +270,6 @@ function AuthPage() {
 
             <div className="mt-10 flex flex-col items-center gap-5">
               <BrandLeafMark className="text-[11px] tracking-[0.08em] underline-offset-4 hover:underline" />
-              <SaasOpsEntry />
               <PoweredByLine />
             </div>
           </div>
