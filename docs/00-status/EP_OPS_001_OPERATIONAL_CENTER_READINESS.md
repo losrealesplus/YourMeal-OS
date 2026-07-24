@@ -4,6 +4,7 @@
 **Tipo:** Correction / Certification — no Packaging / no features de cocina nuevas  
 **Bloqueo:** RI-001 está temporalmente bloqueado por EP-OPS-001 (no por falta de módulos, sino por falta de **punto de entrada operacional certificado**)  
 **Working board:** [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md) ← **usar esto a diario** (no “roadmap”)  
+**Estructura visual:** [EATCLEAN_OPERATIONAL_STRUCTURE](./EATCLEAN_OPERATIONAL_STRUCTURE.md) — actores · impacto por departamento · dual hub  
 **Principio:** [DICT-071](../20-evidence-framework/09-operational-visibility-principle.md) · [DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md) · [DICT-073 Tenant Operational Autonomy](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)  
 **Gap:** [OPS_CENTER_DUAL_SURFACE](./OPS_CENTER_DUAL_SURFACE.md)  
 **Matriz:** [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md) — bloque Ops primero; resto ⏸
@@ -98,13 +99,16 @@ Crítico: no basta ocultar el menú. Validar:
 
 ### Matriz de acceso (piloto)
 
+Fuente canónica ampliada (incl. parciales 🟡): [EATCLEAN_OPERATIONAL_STRUCTURE §2](./EATCLEAN_OPERATIONAL_STRUCTURE.md#2--matriz-de-acceso-rbac).
+
 | Rol | Dashboard | Cocina | Producción | Reparto | Clientes | Empresas | Finanzas | Admin | SaaS |
 |-----|:---------:|:------:|:----------:|:-------:|:--------:|:--------:|:--------:|:-----:|:----:|
 | Cliente | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Cocina | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Cocina | ✅ | ✅ | 🟡 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Producción | ✅ | 🟡 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Reparto | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Atención Cliente | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Finanzas | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Atención Cliente | ✅ | ❌ | ❌ | 🟡 | ✅ | 🟡 | ❌ | ❌ | ❌ |
+| Finanzas | ✅ | ❌ | ❌ | ❌ | 🟡 | 🟡 | ✅ | ❌ | ❌ |
 | Company Admin | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
 | SaaS Admin | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 

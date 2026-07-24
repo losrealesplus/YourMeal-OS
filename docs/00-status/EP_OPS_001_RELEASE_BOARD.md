@@ -4,6 +4,7 @@
 **Estado:** Active — bloquea RI-001  
 **Principios:** [DICT-071](../20-evidence-framework/09-operational-visibility-principle.md) · [DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md) · [DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)  
 **Spec de corrección:** [EP_OPS_001_OPERATIONAL_CENTER_READINESS](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)  
+**Estructura visual (canon):** [EATCLEAN_OPERATIONAL_STRUCTURE](./EATCLEAN_OPERATIONAL_STRUCTURE.md) — actores · RBAC · dual hub · recorrido pedido  
 **Matriz:** [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md)
 
 > DICT-073 cierra el último principio arquitectónico previo a RI-001.  
@@ -19,7 +20,8 @@ Objetivo del board
 
 ## 🔴 Bloqueador 1 (Crítico) · Centro de Operaciones EatClean
 
-**Objetivo:** que `/admin` sea el verdadero centro de trabajo de EatClean.
+**Objetivo:** que `/admin` sea el verdadero centro de trabajo de EatClean.  
+**Canon visual:** [EATCLEAN_OPERATIONAL_STRUCTURE §3](./EATCLEAN_OPERATIONAL_STRUCTURE.md#3--centros-de-operaciones-dual-surface)
 
 ```text
 Centro de Operaciones EatClean   /admin
