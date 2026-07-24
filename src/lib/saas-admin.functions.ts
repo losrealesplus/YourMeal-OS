@@ -17,7 +17,6 @@ const PROVISIONING_ENTITIES = [
 
 const ROLE_CATALOG = [
   "company_admin",
-  "operations_manager",
   "kitchen",
   "production",
   "purchasing",
@@ -25,11 +24,11 @@ const ROLE_CATALOG = [
   "support",
   "accounting",
   "logistics",
-  "delivery",
   "driver",
   "employee",
   "customer",
 ] as const;
+
 
 async function assertSaasAdmin(ctx: {
   supabase: import("@supabase/supabase-js").SupabaseClient;
