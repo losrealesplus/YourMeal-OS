@@ -191,7 +191,9 @@ function StopsPage() {
                     <SelectTrigger><SelectValue placeholder="Selecciona pedido" /></SelectTrigger>
                     <SelectContent>
                       {candidates.length === 0 ? (
-                        <SelectItem value="" disabled>No hay pedidos disponibles</SelectItem>
+                        <div className="px-2 py-4 text-center text-xs text-muted-foreground">
+                          No hay pedidos disponibles
+                        </div>
                       ) : candidates.map((c) => (
                         <SelectItem key={c.id} value={c.id}>{c.label}</SelectItem>
                       ))}
