@@ -179,47 +179,22 @@ Detalle gap/código: [OPS_CENTER_DUAL_SURFACE](./OPS_CENTER_DUAL_SURFACE.md).
 
 ## 4 · ORS-001 · Operational Reference Scenario
 
-**Nombre:** Operational Reference Scenario #001 · Recorrido completo del pedido  
-**Uso FOPEBA:** caso de referencia. Todo E2E futuro es una **variación** de este escenario, no un flujo distinto.
+**Documento formal (activo principal RI-001):** [ORS_001_OPERATIONAL_REFERENCE_SCENARIO](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md)
 
 ```text
-Cliente
-    │
-    ▼
-Pedido
-    │
-    ▼
-Kitchen Queue
-    │
-    ▼
-Hoja de Producción
-    │
-    ▼
-Kitchen Execution
-    │
-    ▼
-Reparto
-    │
-    ▼
-Entrega
-    │
-    ▼
-Historial
+ORS-001 · Objetivo:
+Demostrar que un tenant puede operar una jornada completa
+utilizando YourMeal OS sin intervención del equipo de ingeniería.
 ```
-
-### Timeline operativo
 
 ```text
-1. Cliente          T − X días     Pedido (menú semanal → confirma)
-2. Cocina           Día −1 mañana  Kitchen Queue · recibe y planifica
-3. Producción       Día −1 tarde   Hoja · ingredientes
-4. Cocina (ejec.)   Día 0 mañana   Kitchen Execution → Finalizado
-5. Reparto          Día 0 mediodía Entrega
-6. Cliente          Día 0 tarde    Recibe · Historial · Repetir · Favoritos
-                                   → datos reales a Finanzas / Inventario / Auditoría
+Cliente → Pedido → Kitchen Queue → Hoja → Kitchen Execution
+       → Reparto → Entrega → Historial
 ```
 
-Alineación: [Bloqueador 3](./EP_OPS_001_RELEASE_BOARD.md) · [Day-0](./EP_OPS_001_RELEASE_BOARD.md#day-0-provisioning-scenario).
+**Regla:** ORS-001 FAIL ⇒ RI-001 no certificable.  
+Criterios 1–8 y Observability: ver documento ORS-001.  
+Todo E2E futuro = variación de este escenario.
 
 ---
 

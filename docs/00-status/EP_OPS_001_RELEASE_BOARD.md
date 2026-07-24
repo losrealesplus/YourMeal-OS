@@ -1,24 +1,43 @@
 # Release Board · EP-OPS-001
 
-**Modo:** Certificación — **demostrar operación**, no construir features  
-**Estado:** Active — bloquea RI-001  
-**Naturaleza del proyecto:** demostrar que YourMeal OS opera una empresa real de alimentación **sin intervención de ingeniería**  
-**Canon:** [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md) · [DICT-074](../99-reference/PROJECT_DICTIONARY.md#operational-canonical-model)  
+**Modo:** Certificación operacional — **eliminar bloqueadores**, no backlog de desarrollo  
+**Estado:** Active — alimenta el [RI-001 Certification Gate](./RI001_CERTIFICATION_GATE.md)  
+**Naturaleza:** producto en **fase de certificación operacional** (no “SaaS en desarrollo”)  
+**Canon:** [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md) · [ORS-001](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) · [DICT-074](../99-reference/PROJECT_DICTIONARY.md#operational-canonical-model)  
 **Principios:** [DICT-071](../20-evidence-framework/09-operational-visibility-principle.md) · [DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md) · [DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)  
+**Gate:** [CG-RI-001](./RI001_CERTIFICATION_GATE.md) · [DICT-075](../99-reference/PROJECT_DICTIONARY.md#certification-gate)  
 **Spec de corrección:** [EP_OPS_001_OPERATIONAL_CENTER_READINESS](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)  
 **Matriz:** [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md)
 
 ```text
-Antes:  Construir YourMeal OS
-Ahora:  Demostrar que YourMeal OS puede operar una empresa real
-        de alimentación sin intervención del equipo de ingeniería
+Antes:  Construir YourMeal OS · ¿qué desarrollamos hoy?
+Ahora:  Certificar operación · ¿qué bloqueador eliminamos hoy?
+        ¿Qué evidencia falta para una decisión objetiva sobre RI-001?
 ```
+
+---
+
+## Tablero de eliminación de bloqueadores
+
+**No es un backlog.** Cada fila tiene estado de certificación.
+
+Leyenda: 🔴 bloquea · 🟡 en progreso / evidencia parcial · 🟢 eliminado · ⚪ pendiente de fase
+
+| Bloqueador | Evidencia requerida | Estado |
+|------------|---------------------|:------:|
+| `/admin` Operativo | FCR bloque Ops + EP-OPS-001 (P1) | 🔴 |
+| `/saas` Gobierno | Tenant Provisioning (P2 · DICT-073) | 🔴 |
+| Jornada completa | [ORS-001](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) ejecutado | 🔴 |
+| Observability | KPIs + auditoría verificados (7 preguntas) | 🔴 |
+| RRR | Checklist completo (tras Gate abierto) | ⚪ |
+
+Pregunta diaria: **¿qué bloqueador eliminamos hoy?**
 
 ---
 
 ## Visión ejecutiva · tres preguntas
 
-Si las **tres** son **Sí**, EP-OPS-001 está listo para certificación.
+Si las **tres** son **Sí** (y Observability), EP-OPS-001 puede PASS y se abre el trabajo pleno del Certification Gate.
 
 | # | Pregunta | Responsable | Sí ☐ |
 |---|----------|-------------|:----:|
@@ -54,7 +73,7 @@ SaaS Admin, **sin** entrar en la operación diaria de EatClean:
 ### 3 · ¿Puede completarse una jornada real?
 
 Cada actor trabaja **solo** desde su área. El sistema conecta todo.  
-Escenario base: [ORS-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md#4--ors-001--operational-reference-scenario).
+Prueba de referencia: [ORS-001](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) — si falla, RI-001 no certificable.
 
 → [Bloqueador 3](#-bloqueador-3--jornada-operativa--ors-001)
 
@@ -149,19 +168,22 @@ WPs: WP-3 · WP-5.
 
 ## 🔴 Bloqueador 3 · Jornada operativa · ORS-001
 
-Responde la pregunta de RI-001. Base: [ORS-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md#4--ors-001--operational-reference-scenario).
+Responde la pregunta de RI-001.  
+**Activo principal:** [ORS-001 · Operational Reference Scenario](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) (8 criterios de aceptación).
 
 ```text
-1. Company Admin → crea equipo (Kitchen · Delivery · Support) → verifica accesos
-2. Cliente → registro → login → menú semanal → confirma pedido
-3. Kitchen Queue → Hoja → Kitchen Execution → Finalizado
-4. Reparto → rutas → entrega → confirma
-5. Cliente → recibe → Historial → Repetir → Favoritos
+1. Company Admin → crea equipo → verifica accesos
+2. Cliente → pedido
+3. Kitchen Queue → Hoja → Execution → Finalizado
+4. Reparto → entrega
+5. Cliente → resultado · Historial
 ```
 
-WPs: WP-6 + E2E post-PASS.
+WPs: WP-6 + E2E en el Certification Gate.
 
-> Packaging / Delivery avanzados en cola: el tramo Reparto usa lo certificado o se marca acotado (DICT-071) — no se finge.
+> Packaging / Delivery avanzados en cola: tramo Reparto certificado o acotado (DICT-071) — no se finge.
+
+**Regla:** ORS-001 FAIL ⇒ RI-001 no certificable.
 
 ---
 
@@ -219,7 +241,7 @@ PASS
 
 ---
 
-## Después del PASS · Architecture Freeze
+## Después del PASS · entrada al Certification Gate
 
 ```text
 EP-OPS-001 PASS
@@ -228,23 +250,22 @@ EP-OPS-001 PASS
 🔒 Architecture Freeze
         │
         ▼
-Functional Completeness Review
+══════════════════════════════════
+     RI-001 CERTIFICATION GATE
+══════════════════════════════════
+        │
+        ├── Functional Completeness Review
+        ├── RBAC Certification
+        ├── Operational Observability
+        ├── End-to-End Validation (ORS-001)
+        ├── Evidence Collection
+        └── Release Readiness Review
         │
         ▼
-RBAC Certification
-        │
-        ▼
-End-to-End Operational Journey (ORS-001 + variaciones)
-        │
-        ▼
-Evidence Collection
-        │
-        ▼
-Release Readiness Review
-        │
-        ▼
-RI-001 Decision
+RI-001 Decision · READY | READY WITH OBSERVATIONS | NOT READY
 ```
+
+Detalle: [RI001_CERTIFICATION_GATE](./RI001_CERTIFICATION_GATE.md).
 
 ### Congelado (explícito)
 
@@ -255,55 +276,40 @@ RI-001 Decision
 - Roles  
 - Navegación principal  
 - Patrones Service → Report / Workspace (DICT-072)  
-- DICT-071 · DICT-072 · DICT-073 · DICT-074 (OCM-001)  
-- ORS-001 como escenario de referencia  
+- DICT-071 · DICT-072 · DICT-073 · DICT-074 (OCM-001) · DICT-075 · DICT-076 (ORS)  
+- ORS-001 como prueba de referencia  
 
 ### Permitido durante el freeze
 
-- Corrección de defectos  
-- Ajustes de UX  
-- Rendimiento  
-- Evidencia  
-- Documentación  
-- Validaciones de RI-001  
+- Corrección de defectos (**debe producir evidencia**)  
+- Ajustes de UX · Rendimiento  
+- Evidencia · Documentación  
+- Validaciones de RI-001 / carriles del Gate  
 
 ### No permitido
 
-- Nuevos módulos  
-- Nuevos roles  
-- Cambios estructurales de arquitectura  
-- Nuevos patrones  
+- Nuevos módulos · nuevos roles  
+- Cambios estructurales de arquitectura · nuevos patrones  
 - Ampliación del alcance funcional  
+- Trabajo que no reduzca incertidumbre de certificación  
 
 ---
 
 ## Day-0 Provisioning Scenario
 
-**Primera demostración pública de YourMeal OS.**  
-Tenant vacío · sin ingeniería · demuestra DICT-073 + OCM-001 + ORS-001 + Observability.
+**Primera demostración pública.** Incluye aprovisionamiento + [ORS-001](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) + Observability.  
+Sin ingeniería · demuestra DICT-073 + OCM-001.
 
-```text
-1. saas_admin crea el tenant EatClean
-2. Configura branding y parámetros básicos
-3. Crea el company_admin
-4. company_admin crea el equipo (Cocina, Reparto, Atención al Cliente, …)
-5. El equipo inicia sesión y empieza a trabajar
-6. Un cliente realiza un pedido y el sistema completa ORS-001
-7. En cualquier momento: las 7 preguntas de Observability tienen respuesta
-```
+Ver criterios 1–8 en ORS-001. Ejecutor preferido: ops / producto / FOPEBA.
 
-### Éxito RI-001 (demostración ante observador)
+### Éxito ante observador (decisión informada)
 
 1. La plataforma crea y aprovisiona un nuevo tenant.  
 2. El tenant se autogestiona sin ayuda del proveedor.  
 3. Un cliente realiza un pedido.  
 4. La cocina lo procesa.  
 5. El reparto lo entrega.  
-6. Toda la operación queda registrada y es auditable.  
-
-Sin bloqueos funcionales + evidencia de cada paso = validación de EatClean **y** del modelo operativo para futuros clientes.
-
-Ejecutor preferido: **no** el equipo de desarrollo (ops / producto / FOPEBA).
+6. Toda la operación queda registrada, auditable y **observable**.  
 
 ---
 
@@ -311,10 +317,11 @@ Ejecutor preferido: **no** el equipo de desarrollo (ops / producto / FOPEBA).
 
 | Elemento | WPs |
 |----------|-----|
-| Pregunta 1 / Bloqueador 1 | WP-1, WP-2, WP-4 |
-| Pregunta 2 / Bloqueador 2 | WP-3, WP-5 |
-| Pregunta 3 / Bloqueador 3 | WP-6 + E2E |
+| Pregunta 1 / `/admin` | WP-1, WP-2, WP-4 |
+| Pregunta 2 / `/saas` | WP-3, WP-5 |
+| Pregunta 3 / ORS-001 | WP-6 + E2E (Gate) |
 | Observability | Propiedad transversal (no WP-7) |
-| Day-0 | WP-5 + B3 + Observability |
+| Day-0 | WP-5 + ORS-001 + Observability |
 
-Detalle de corrección: [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md).
+Detalle de corrección: [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md).  
+Cosecha FOPEBA post-decisión: [Certification Gate §](./RI001_CERTIFICATION_GATE.md#cosecha-fopeba-post-ri-001).

@@ -2,20 +2,21 @@
 
 **Fecha:** 2026-07-24 (actualizado post-#52)  
 **Tipo:** Gobernanza operativa · **certificación** — **prohibido** abrir PRs de nuevas capacidades  
-**Objetivo:** Demostrar que YourMeal OS puede operar una empresa real de alimentación **sin intervención del equipo de ingeniería**.  
-**Distinción clave:** construir ≠ demostrar · arquitectura ya cerrada · cuello de botella = evidencia.
+**Objetivo:** Emitir una decisión objetiva sobre RI-001 (READY / READY WITH OBSERVATIONS / NOT READY).  
+**Fase:** Certificación operacional · [CG-RI-001](./RI001_CERTIFICATION_GATE.md)
 
-> Antes: ¿Qué falta por construir?  
-> Ahora: **¿Puede operar EatClean? ¿Puede gobernarse YourMeal OS? ¿Puede completarse una jornada real?**
+> Antes: ¿Qué falta por implementar?  
+> En el Gate: **¿Qué evidencia falta para decidir RI-001?**
 
-**Artefacto diario:** [Release Board · EP-OPS-001](./EP_OPS_001_RELEASE_BOARD.md) — 3 preguntas + Observability  
-**Canon:** [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md) (DICT-074) · ORS-001  
-Spec: [EP_OPS_001_OPERATIONAL_CENTER_READINESS](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)  
-Matriz: [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md)  
-DICT: [071](../20-evidence-framework/09-operational-visibility-principle.md) · [072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md) · [073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md) · [074](./EATCLEAN_OPERATIONAL_STRUCTURE.md)
+**Gate:** [RI001_CERTIFICATION_GATE](./RI001_CERTIFICATION_GATE.md)  
+**Board (no backlog):** [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md)  
+**Prueba de referencia:** [ORS-001](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md)  
+**Canon:** [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md)  
+Spec hub: [EP_OPS_001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · Matriz: [FCR](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md)  
+DICT: 071 · 072 · 073 · 074 · 075 · 076
 
-Packaging / Delivery **en cola**. FCR **en pausa** hasta Ops PASS.  
-Tras PASS: Architecture Freeze (lista explícita en Release Board) → FCR → RBAC → E2E (ORS-001) → Evidence → RRR → RI-001.
+Packaging / Delivery **en cola**.  
+EP-OPS-001 = entrada al Gate. Tras PASS: Freeze → carriles del Gate → decisión RI-001.
 
 ---
 
@@ -36,55 +37,40 @@ Tras PASS: Architecture Freeze (lista explícita en Release Board) → FCR → R
 
 ---
 
-## Release Board · ahora (bloquea RI-001)
+## Release Board · eliminar bloqueadores (entrada al Gate)
 
-> **RI-001 está temporalmente bloqueado por EP-OPS-001.**  
-> No por falta de módulos — por falta de operación certificable.
+Board: [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md) · Gate: [CG-RI-001](./RI001_CERTIFICATION_GATE.md)
 
-Board: [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md) · Canon: [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md)
+| Bloqueador | Evidencia | Estado |
+|------------|-----------|:------:|
+| `/admin` Operativo | FCR + EP-OPS-001 | 🔴 |
+| `/saas` Gobierno | Tenant Provisioning | 🔴 |
+| Jornada completa | ORS-001 ejecutado | 🔴 |
+| Observability | KPIs + auditoría | 🔴 |
+| RRR | Checklist | ⚪ |
 
-| Pregunta / elemento | Contenido |
-|---------------------|-----------|
-| 1 | ¿Puede operar EatClean? (Company Admin · `/admin`) |
-| 2 | ¿Puede gobernarse YourMeal OS? (SaaS Admin · `/saas` · DICT-073) |
-| 3 | ¿Puede completarse una jornada real? (ORS-001) |
-| Transversal | Operational Observability (7 preguntas · no WP-7) |
-| Day-0 | Tenant vacío → ciclo autónomo + Observability |
+Pregunta diaria: **¿qué bloqueador eliminamos hoy?**
 
-WPs: [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · Gap: [OPS_CENTER_DUAL_SURFACE](./OPS_CENTER_DUAL_SURFACE.md)
-
-Hasta PASS: no FCR amplio ni E2E completo.
+Hasta EP-OPS-001 PASS: no FCR amplio ni E2E completo del Gate.
 
 ---
 
-## Secuencia post-PASS (estabilizada)
+## Secuencia · Certification Gate
 
 ```text
-EP-OPS-001 PASS
+EP-OPS-001 PASS → Architecture Freeze
         │
         ▼
-🔒 Architecture Freeze
+RI-001 CERTIFICATION GATE
+  FCR · RBAC · Observability · ORS-001 · Evidence · RRR
         │
         ▼
-Functional Completeness Review
-        │
-        ▼
-RBAC Certification
-        │
-        ▼
-End-to-End Operational Journey
-        │
-        ▼
-Evidence Collection
-        │
-        ▼
-Release Readiness Review
-        │
-        ▼
-RI-001 Decision
+READY | READY WITH OBSERVATIONS | NOT READY
 ```
 
-Durante Freeze: ❌ módulos / patrones / capacidades nuevas · ✅ defectos · evidencia · certificación.
+Durante Freeze: ❌ módulos / patrones / capacidades nuevas · ✅ defectos que producen evidencia · certificación.
+
+Detalle: [RI001_CERTIFICATION_GATE](./RI001_CERTIFICATION_GATE.md) · cosecha FOPEBA post-decisión.
 
 ---
 

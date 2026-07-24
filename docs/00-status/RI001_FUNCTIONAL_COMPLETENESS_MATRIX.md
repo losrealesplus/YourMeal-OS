@@ -3,11 +3,11 @@
 **Fecha:** 2026-07-24  
 **Modo:** **Certificación** — Release Board (eliminar bloqueos); no Packaging/features nuevas  
 **Baseline:** `main` @ post-#52 (EP-002A.2–A.3 · EP-002B.1–B.2 · DICT-072 · Readiness docs)  
-**Board:** [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md) — 3 preguntas · Observability · Day-0  
-**Canon:** [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md) (DICT-074) · ORS-001  
+**Gate:** [RI001_CERTIFICATION_GATE](./RI001_CERTIFICATION_GATE.md)  
+**Board:** [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md) — bloqueadores con estado  
+**Canon:** [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md) · [ORS-001](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md)  
 **Spec:** [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)  
-**Principio:** [DICT-071](../20-evidence-framework/09-operational-visibility-principle.md) · [DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md) · [DICT-074](./EATCLEAN_OPERATIONAL_STRUCTURE.md)  
-**Sprint:** [RI001_READINESS_SPRINT](./RI001_READINESS_SPRINT.md)
+**Principio:** DICT-071…076 · Sprint: [RI001_READINESS_SPRINT](./RI001_READINESS_SPRINT.md)
 
 > Pregunta del momento:  
 > **¿Podemos demostrar, con evidencia, que EatClean puede trabajar con YourMeal OS durante una jornada real?**  

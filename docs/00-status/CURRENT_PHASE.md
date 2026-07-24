@@ -12,55 +12,51 @@ FOUNDATION / BLUEPRINT / DISCOVERY / OM / VALIDATION / IOV   ✅
 FOV PREPARATION · ORR (marco) · G-02 (Gate formalizado)     ✅
 EP-001 Functional Completeness (cero humo Admin/Ops nav)    ✅
 ────────────────────────────
-Naturaleza:          Ya no «construir YourMeal OS» → **demostrar operación real sin ingeniería**
-Modo:                **CERTIFICACIÓN** — Release Board (3 preguntas) · **no** Packaging
-Bloqueo:             **RI-001 bloqueado por EP-OPS-001**
-Trabajo diario:      **[Release Board](./EP_OPS_001_RELEASE_BOARD.md)** · P1 EatClean · P2 SaaS · P3 Jornada
-                     · [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md) contrato canónico
-                     · Observability transversal · Day-0 · ORS-001
-                     · Tras PASS → **Architecture Freeze** (lista explícita) → FCR → RBAC → E2E → Evidence → RRR → RI-001
-Artefacto primario:  [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md)
-Canon:               [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md) · Spec: [EP_OPS_001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)
+Fase:                **CERTIFICACIÓN OPERACIONAL** (no “SaaS en desarrollo”)
+Naturaleza:          Demostrar operación real sin ingeniería
+Pregunta del Gate:   **¿Qué evidencia falta para una decisión objetiva sobre RI-001?**
+Gate:                [RI-001 Certification Gate · CG-RI-001](./RI001_CERTIFICATION_GATE.md)
+Trabajo diario:      [Release Board](./EP_OPS_001_RELEASE_BOARD.md) — eliminar bloqueadores (no backlog)
+                     · [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md) · [ORS-001](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md)
+                     · EP-OPS-001 PASS → Freeze → carriles del Gate → READY | READY WITH OBSERVATIONS | NOT READY
+Artefacto primario:  [RI001_CERTIFICATION_GATE](./RI001_CERTIFICATION_GATE.md)
+Board:               [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md)
 
 Pilot Readiness (lectura)
-  Arquitectura        ██████████  100%  ← ya no es el cuello de botella
+  Arquitectura        ██████████  100%
   Gobernanza          ██████████  100%
-  Modelo operacional  ██████████  100%  ← OCM-001 / DICT-074
+  Modelo operacional  ██████████  100%  ← OCM-001
   Implementación      █████████░
-  Certificación       ███░░░░░░░  ← cuello de botella = evidencia
-  Operaciones (hub)   ██████░░░░  ← **EP-OPS-001** (bloqueante)
+  Certificación       ███░░░░░░░  ← Certification Gate (evidencia)
+  Operaciones (hub)   ██████░░░░  ← EP-OPS-001 entrada al Gate
 
 Mapa EP:
   FASE 0 · FOUNDATION              ██████████
   EP-001 · Functional Completeness ██████████
   EP-002A · Customer Experience    ██████████
-  EP-002B.1 · Production Report    ██████████
-  EP-002B.2 · Kitchen Execution    ██████████
-  —— EP-OPS-001 Release Board ——   □□□□□□□□□□  ← HOY (3 preguntas · bloquea RI-001)
-  —— Architecture Freeze ——        □□□□□□□□□□  (tras Ops PASS)
-  —— FCR / RBAC / E2E / Evidence —— □□□□□□□□□□
-  —— Release Readiness Review ——   □□□□□□□□□□
-  EP-002B.3 · Packaging            □□□□□□□□□□  (cola)
-  EP-002B.4 · Delivery             □□□□□□□□□□
-  RI-001                           ████████░░  ← bloqueado hasta EP-OPS-001 PASS
+  EP-002B.1–B.2                    ██████████
+  —— EP-OPS-001 (entrada Gate) ——  □□□□□□□□□□  ← HOY
+  —— Architecture Freeze ——        □□□□□□□□□□
+  —— RI-001 CERTIFICATION GATE ——  □□□□□□□□□□  ← FCR·RBAC·Obs·ORS·Evidence·RRR
+  —— RI-001 Decision ——            □□□□□□□□□□  READY | RWO | NOT READY
+  EP-002B.3–B.4 Packaging/Delivery □□□□□□□□□□  (cola)
 
-OCM-001:           contrato UI/UX · RBAC · Operación → FCR → RI-001
-ORS-001:           Operational Reference Scenario · recorrido del pedido
-Hoy: Demostrar operación — la arquitectura ya no es el cuello de botella; lo es la evidencia.
+Hoy: Certification Gate — cada corrección produce evidencia; la arquitectura está estable.
+Confianza: lo que evoluciona es el nivel de confianza operacional, no el diseño.
 
-Riesgo principal: E2E / FCR sobre hub no PASS → evidencia contaminada
+Riesgo principal: abrir FCR/E2E sin EP-OPS-001 PASS → evidencia contaminada
 
 Incertidumbres de diseño grandes: **ninguna**.
 
 G-02 = Pilot Authorization  ≠  Release / v1.0
-Pregunta principal: ¿Puede YourMeal OS operar una empresa real sin el equipo de ingeniería?
+Pregunta principal: ¿Qué evidencia falta para decidir RI-001 con objetividad?
 
-Primary Artifact:  [Release Board](./EP_OPS_001_RELEASE_BOARD.md) · [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md) · [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md)
-Visibilidad:       [Operational Visibility · DICT-071](../20-evidence-framework/09-operational-visibility-principle.md)
-Ops pattern:       [Operational Representation · DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md)
-Tenant autonomy:   [Tenant Operational Autonomy · DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)
-OCM:               [Operational Canonical Model · DICT-074](./EATCLEAN_OPERATIONAL_STRUCTURE.md)
-Hoy (Certificación): [Release Board](./EP_OPS_001_RELEASE_BOARD.md) · [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md) · [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · [Ops dual](./OPS_CENTER_DUAL_SURFACE.md) · [Readiness](./RI001_READINESS_SPRINT.md)
+Primary Artifact:  [Certification Gate](./RI001_CERTIFICATION_GATE.md) · [Release Board](./EP_OPS_001_RELEASE_BOARD.md) · [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md) · [ORS-001](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md)
+Visibilidad:       [DICT-071](../20-evidence-framework/09-operational-visibility-principle.md)
+Ops pattern:       [DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md)
+Tenant autonomy:   [DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)
+OCM / ORS / Gate:  [DICT-074](./EATCLEAN_OPERATIONAL_STRUCTURE.md) · [DICT-076](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) · [DICT-075](./RI001_CERTIFICATION_GATE.md)
+Hoy (Certificación): [Gate](./RI001_CERTIFICATION_GATE.md) · [Board](./EP_OPS_001_RELEASE_BOARD.md) · [OCM](./EATCLEAN_OPERATIONAL_STRUCTURE.md) · [ORS](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) · [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)
 Seguridad pre-piloto: [Pilot Security Checklist](../09-security/PILOT_SECURITY_CHECKLIST.md) (10 corregidos · 1 Accepted documentado)
 Antes de firmar G-02 PASSED: ORR firmados · cero humo · No Artificiality
 PR taxonomy (post G-02): Evidence · KU · Correction · Pilot Fix · Operational Finding
@@ -89,7 +85,8 @@ Piloto: demostrar  ·  EP-001 ✅ → EP-002A (Weekly Cycle) → EP-002B (Ops) �
 > ✅ EP-002B: ¿Qué necesita **hacer** el equipo?  
 > ✅ Operational Visibility (DICT-071): lo visible existe; lo inexistente no se promete.  
 > ✅ Tenant Operational Autonomy (DICT-073): el tenant se autogestiona sin el proveedor SaaS.  
-> ✅ OCM-001 (DICT-074): contrato canónico UI · RBAC · Operación · ORS-001.  
+> ✅ OCM-001 (DICT-074): contrato canónico UI · RBAC · Operación.  
+> ✅ Certification Gate (DICT-075) · ORS-001 (DICT-076): decisión por evidencia.  
 > Motores de cambio: [PROJECT_DOMAINS](./PROJECT_DOMAINS.md).
 
 ---
