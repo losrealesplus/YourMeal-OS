@@ -56,6 +56,7 @@ describe("production report aggregation", () => {
     expect(report.standardDishes).toHaveLength(2);
     const pechuga = report.standardDishes.find((d) => d.dishId === "d1");
     expect(pechuga?.totalQty).toBe(3);
+    expect(pechuga?.batchStatus).toBe("pending");
     expect(pechuga?.customers.map((c) => c.customerName)).toEqual([
       "Ana",
       "Bruno",
@@ -128,6 +129,25 @@ describe("production report aggregation", () => {
       recipeLines: [],
     });
     expect(report.ingredientSummary).toEqual([]);
+  });
+
+  it("attaches kitchen batch status per dish lot", () => {
+    const report = buildProductionReport({
+      deliveryDate: "2026-07-24",
+      lines: [
+        line({ orderId: "o1", customerId: "c1", dishId: "d1", qty: 2 }),
+        line({ orderId: "o2", customerId: "c2", dishId: "d2", qty: 1 }),
+      ],
+      batchStatusByDish: new Map([
+        ["d1", { status: "preparing", updatedAt: "2026-07-24T09:14:00Z" }],
+      ]),
+    });
+    expect(report.standardDishes.find((d) => d.dishId === "d1")?.batchStatus).toBe(
+      "preparing",
+    );
+    expect(report.standardDishes.find((d) => d.dishId === "d2")?.batchStatus).toBe(
+      "pending",
+    );
   });
 
   it("scales grams to kilograms for display", () => {

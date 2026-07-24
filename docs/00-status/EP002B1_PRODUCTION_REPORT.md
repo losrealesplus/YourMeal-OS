@@ -22,12 +22,11 @@ Pedidos (confirmed → prepared)
         │
 ProductionReportService
         │
-Agrupar por plato · Separar personalizados · Resumen ingredientes
-        │
-Vista digital (enriquecida)  +  Hoja papel / PDF (print)
+        ├── Report  → Hoja de Producción (digital + print)
+        └── Workspace → [Kitchen Execution](./EP002B2_KITCHEN_EXECUTION.md)
 ```
 
-La UI no contiene lógica de negocio.
+La UI no contiene lógica de negocio. El estado de lote (`batchStatus`) vive en `kitchen_production_batches` y se lee en ambas superficies.
 
 ---
 

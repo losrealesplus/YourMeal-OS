@@ -1,3 +1,5 @@
+import type { KitchenBatchStatus } from "./kitchen-batch-status";
+
 /**
  * EP-002B — Hoja de Producción (pure aggregation).
  * Groups kitchen lines by dish; customizations stay separate.
@@ -37,6 +39,9 @@ export type ProductionDishBlock = {
   weightG: number | null;
   /** Distinct order statuses contributing to this block */
   orderStatuses: string[];
+  /** EP-002B.2 — lot status for this dish × day (defaults to pending) */
+  batchStatus: KitchenBatchStatus;
+  batchUpdatedAt: string | null;
 };
 
 export type ProductionCustomLine = {
@@ -162,6 +167,10 @@ export function buildProductionReport(input: {
   lines: readonly ProductionSourceLine[];
   dishMetaById?: ReadonlyMap<string, DishMeta>;
   recipeLines?: readonly RecipeLine[];
+  batchStatusByDish?: ReadonlyMap<
+    string,
+    { status: KitchenBatchStatus; updatedAt: string | null }
+  >;
 }): ProductionReportModel {
   const meta = input.dishMetaById ?? new Map<string, DishMeta>();
   const standardMap = new Map<
@@ -228,10 +237,12 @@ export function buildProductionReport(input: {
     standardMap.set(line.dishId, block);
   }
 
+  const batchMap = input.batchStatusByDish ?? new Map();
   const standardDishes: ProductionDishBlock[] = [...standardMap.entries()]
     .map(([dishId, block]) => {
       const totalQty = block.customers.reduce((s, c) => s + c.qty, 0);
       const dishMeta = meta.get(dishId);
+      const batch = batchMap.get(dishId);
       return {
         dishId,
         dishName: block.dishName,
@@ -243,6 +254,8 @@ export function buildProductionReport(input: {
         prepMinutes: dishMeta?.prepMinutes ?? null,
         weightG: dishMeta?.weightG ?? null,
         orderStatuses: [...block.statuses],
+        batchStatus: batch?.status ?? "pending",
+        batchUpdatedAt: batch?.updatedAt ?? null,
       };
     })
     .sort((a, b) => a.dishName.localeCompare(b.dishName, "es"));

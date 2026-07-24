@@ -196,11 +196,13 @@ function KitchenWorkspacePage() {
         />
         <div className="flex flex-wrap gap-2">
           <Button asChild variant="secondary" size="sm">
-            <Link
-              to="/admin/production-sheet"
-              search={{ date }}
-            >
+            <Link to="/admin/kitchen-execution" search={{ date }}>
               <ChefHat className="mr-2 h-4 w-4" />
+              Ejecución
+            </Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link to="/admin/production-sheet" search={{ date }}>
               Hoja de Producción
             </Link>
           </Button>

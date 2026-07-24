@@ -31,6 +31,7 @@ import { Route as AuthenticatedAdminDesignSystemRouteImport } from './routes/_au
 import { Route as AuthenticatedAdminDishesRouteImport } from './routes/_authenticated/admin.dishes'
 import { Route as AuthenticatedAdminInventoryRouteImport } from './routes/_authenticated/admin.inventory'
 import { Route as AuthenticatedAdminKitchenRouteImport } from './routes/_authenticated/admin.kitchen'
+import { Route as AuthenticatedAdminKitchenExecutionRouteImport } from './routes/_authenticated/admin.kitchen-execution'
 import { Route as AuthenticatedAdminMenusRouteImport } from './routes/_authenticated/admin.menus'
 import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin.orders'
 import { Route as AuthenticatedAdminProductionRouteImport } from './routes/_authenticated/admin.production'
@@ -196,6 +197,12 @@ const AuthenticatedAdminKitchenRoute =
   AuthenticatedAdminKitchenRouteImport.update({
     id: '/kitchen',
     path: '/kitchen',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminKitchenExecutionRoute =
+  AuthenticatedAdminKitchenExecutionRouteImport.update({
+    id: '/kitchen-execution',
+    path: '/kitchen-execution',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminMenusRoute = AuthenticatedAdminMenusRouteImport.update({
@@ -495,6 +502,7 @@ export interface FileRoutesByFullPath {
   '/admin/dishes': typeof AuthenticatedAdminDishesRoute
   '/admin/inventory': typeof AuthenticatedAdminInventoryRoute
   '/admin/kitchen': typeof AuthenticatedAdminKitchenRoute
+  '/admin/kitchen-execution': typeof AuthenticatedAdminKitchenExecutionRoute
   '/admin/menus': typeof AuthenticatedAdminMenusRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/production': typeof AuthenticatedAdminProductionRouteWithChildren
@@ -561,6 +569,7 @@ export interface FileRoutesByTo {
   '/admin/dishes': typeof AuthenticatedAdminDishesRoute
   '/admin/inventory': typeof AuthenticatedAdminInventoryRoute
   '/admin/kitchen': typeof AuthenticatedAdminKitchenRoute
+  '/admin/kitchen-execution': typeof AuthenticatedAdminKitchenExecutionRoute
   '/admin/menus': typeof AuthenticatedAdminMenusRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/production-sheet': typeof AuthenticatedAdminProductionSheetRoute
@@ -631,6 +640,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/dishes': typeof AuthenticatedAdminDishesRoute
   '/_authenticated/admin/inventory': typeof AuthenticatedAdminInventoryRoute
   '/_authenticated/admin/kitchen': typeof AuthenticatedAdminKitchenRoute
+  '/_authenticated/admin/kitchen-execution': typeof AuthenticatedAdminKitchenExecutionRoute
   '/_authenticated/admin/menus': typeof AuthenticatedAdminMenusRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/_authenticated/admin/production': typeof AuthenticatedAdminProductionRouteWithChildren
@@ -703,6 +713,7 @@ export interface FileRouteTypes {
     | '/admin/dishes'
     | '/admin/inventory'
     | '/admin/kitchen'
+    | '/admin/kitchen-execution'
     | '/admin/menus'
     | '/admin/orders'
     | '/admin/production'
@@ -769,6 +780,7 @@ export interface FileRouteTypes {
     | '/admin/dishes'
     | '/admin/inventory'
     | '/admin/kitchen'
+    | '/admin/kitchen-execution'
     | '/admin/menus'
     | '/admin/orders'
     | '/admin/production-sheet'
@@ -838,6 +850,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/dishes'
     | '/_authenticated/admin/inventory'
     | '/_authenticated/admin/kitchen'
+    | '/_authenticated/admin/kitchen-execution'
     | '/_authenticated/admin/menus'
     | '/_authenticated/admin/orders'
     | '/_authenticated/admin/production'
@@ -1050,6 +1063,13 @@ declare module '@tanstack/react-router' {
       path: '/kitchen'
       fullPath: '/admin/kitchen'
       preLoaderRoute: typeof AuthenticatedAdminKitchenRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/kitchen-execution': {
+      id: '/_authenticated/admin/kitchen-execution'
+      path: '/kitchen-execution'
+      fullPath: '/admin/kitchen-execution'
+      preLoaderRoute: typeof AuthenticatedAdminKitchenExecutionRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/menus': {
@@ -1477,6 +1497,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminDishesRoute: typeof AuthenticatedAdminDishesRoute
   AuthenticatedAdminInventoryRoute: typeof AuthenticatedAdminInventoryRoute
   AuthenticatedAdminKitchenRoute: typeof AuthenticatedAdminKitchenRoute
+  AuthenticatedAdminKitchenExecutionRoute: typeof AuthenticatedAdminKitchenExecutionRoute
   AuthenticatedAdminMenusRoute: typeof AuthenticatedAdminMenusRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
   AuthenticatedAdminProductionRoute: typeof AuthenticatedAdminProductionRouteWithChildren
@@ -1504,6 +1525,8 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminDishesRoute: AuthenticatedAdminDishesRoute,
   AuthenticatedAdminInventoryRoute: AuthenticatedAdminInventoryRoute,
   AuthenticatedAdminKitchenRoute: AuthenticatedAdminKitchenRoute,
+  AuthenticatedAdminKitchenExecutionRoute:
+    AuthenticatedAdminKitchenExecutionRoute,
   AuthenticatedAdminMenusRoute: AuthenticatedAdminMenusRoute,
   AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
   AuthenticatedAdminProductionRoute:
