@@ -12,20 +12,21 @@ FOUNDATION / BLUEPRINT / DISCOVERY / OM / VALIDATION / IOV   ✅
 FOV PREPARATION · ORR (marco) · G-02 (Gate formalizado)     ✅
 EP-001 Functional Completeness (cero humo Admin/Ops nav)    ✅
 ────────────────────────────
-Modo:                **CERTIFICACIÓN** — no nuevas capacidades / no PRs funcionales
-Siguiente sprint:    **RI-001 Certification** (matriz · dual Ops · RBAC · E2E · evidencia)
-                     (EP-002A ✅ · EP-002B.1–B.2 ✅ · #45–#48 · #52 en main)
+Modo:                **CERTIFICACIÓN** — Correction de hub OK · **no** Packaging/features nuevas
+Siguiente sprint:    **EP-OPS-001 · Operational Center Readiness**
+                     (hub `/admin` PASS antes de auditar el resto)
+                     · Matriz FCR del resto **en pausa** hasta Ops PASS
                      · Packaging/Delivery **en cola**
-Siguiente artefacto: [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md)
-                     → Release Review → iniciar RI-001
+Siguiente artefacto: [EP_OPS_001_OPERATIONAL_CENTER_READINESS](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)
+                     → matriz bloque Ops en verde → reanudar FCR → RI-001
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████
   Gobernanza          ██████████
   Modelo operacional  ██████████
   Administración      ██████████
-  Customer App        █████████░  ← certificar (A.1–A.3 en main)
-  Operaciones         ████████░░  ← certificar (B.1·B.2 en main)
+  Customer App        █████████░  ← certificar tras hub estable
+  Operaciones         ███████░░░  ← **EP-OPS-001 hub** (bloqueante)
   Data                ███████░░░
 
 Mapa EP:
@@ -34,15 +35,16 @@ Mapa EP:
   EP-002A · Customer Experience    ██████████
   EP-002B.1 · Production Report    ██████████
   EP-002B.2 · Kitchen Execution    ██████████
-  —— CERTIFICACIÓN RI-001 ——       □□□□□□□□□□  ← HOY
+  —— EP-OPS-001 Ops Center ——      □□□□□□□□□□  ← HOY (requisito certificación)
+  —— FCR resto / E2E / evidencia —— □□□□□□□□□□  (tras Ops PASS)
   EP-002B.3 · Packaging            □□□□□□□□□□  (cola)
   EP-002B.4 · Delivery             □□□□□□□□□□
   RI-001                           █████████░
 
 Patrón permanente: Operational Representation (DICT-072)
-Hoy: ¿Podemos demostrar con evidencia una jornada real EatClean × YourMeal OS?
+Hoy: ¿Puede cada rol iniciar la jornada en el Centro de Operaciones y completar su trabajo?
 
-Riesgo principal: ya no es construir → **certificar sin humo y con RBAC negativo**
+Riesgo principal: hub operacional inestable → contaminaría toda la auditoría posterior
 
 Incertidumbres de diseño grandes: **ninguna**.
 RI-001 comienza cuando EP-002A y EP-002B estén cerrados.
@@ -50,10 +52,10 @@ RI-001 comienza cuando EP-002A y EP-002B estén cerrados.
 G-02 = Pilot Authorization  ≠  Release / v1.0
 Pregunta principal: ¿Qué nos enseña la operación real sobre nuestro modelo?
 
-Primary Artifact:  [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md) · [PILOT_ACCEPTANCE_CHECKLIST](./PILOT_ACCEPTANCE_CHECKLIST.md) · [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md)
+Primary Artifact:  [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md) · [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md)
 Visibilidad:       [Operational Visibility · DICT-071](../20-evidence-framework/09-operational-visibility-principle.md)
 Ops pattern:       [Operational Representation · DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md)
-Hoy (Certificación): [RI-001 Readiness](./RI001_READINESS_SPRINT.md) · [Ops dual surface](./OPS_CENTER_DUAL_SURFACE.md)
+Hoy (Certificación): [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · [Ops dual surface](./OPS_CENTER_DUAL_SURFACE.md) · [Readiness](./RI001_READINESS_SPRINT.md)
 Seguridad pre-piloto: [Pilot Security Checklist](../09-security/PILOT_SECURITY_CHECKLIST.md) (10 corregidos · 1 Accepted documentado)
 Antes de firmar G-02 PASSED: ORR firmados · cero humo · No Artificiality
 PR taxonomy (post G-02): Evidence · KU · Correction · Pilot Fix · Operational Finding

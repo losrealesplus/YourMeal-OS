@@ -8,10 +8,12 @@
 > Pregunta anterior: ¿Qué falta por construir?  
 > Pregunta ahora: **¿Podemos demostrar, con evidencia, que EatClean puede trabajar con YourMeal OS durante una jornada real?**
 
-Artefacto primario: [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md)  
+Artefacto primario (ahora): [EP-OPS-001 Operational Center Readiness](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)  
+Matriz (bloque Ops primero): [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md)  
 Patrón: [DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md) · Visibilidad: [DICT-071](../20-evidence-framework/09-operational-visibility-principle.md)
 
-Packaging (EP-002B.3) y Delivery (EP-002B.4) permanecen **en cola** hasta cerrar certificación.
+Packaging (EP-002B.3) y Delivery (EP-002B.4) permanecen **en cola**.  
+FCR del resto de módulos: **en pausa** hasta Ops Center PASS.
 
 ---
 
@@ -34,51 +36,39 @@ Packaging (EP-002B.3) y Delivery (EP-002B.4) permanecen **en cola** hasta cerrar
 
 ## Prioridades (orden estricto)
 
-### 1 · Functional Completeness Review
+### 0 · EP-OPS-001 · Operational Center Readiness ← **AHORA**
 
-Matriz viva: [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md).
+El Centro de Operaciones es **requisito de certificación**, no una feature más.  
+Spec: [EP_OPS_001_OPERATIONAL_CENTER_READINESS](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · Gap: [OPS_CENTER_DUAL_SURFACE](./OPS_CENTER_DUAL_SURFACE.md).
+
+Hasta PASS del hub: no continuar FCR amplio ni E2E completo.
+
+### 1 · Functional Completeness Review (resto)
+
+Matriz viva: [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md) — filas no-hub **⏸** hasta Ops PASS.
 
 Por pantalla: Visible · Navega · Guarda · Lee · RBAC · Audit · Estado.
 
-### 2 · Centro de Operaciones (único hueco arquitectónico visible)
+### 2 · Dual surface (incluido en EP-OPS-001)
 
-[OPS_CENTER_DUAL_SURFACE](./OPS_CENTER_DUAL_SURFACE.md)
-
-```text
-EatClean Ops  →  opera el negocio (tenant)
-YourMeal OS   →  administra la plataforma (SaaS)
-```
-
-Sin mezclar navegación, branding ni permisos.
+EatClean `/admin` vs YourMeal OS `/saas` — sin mezclar nav, branding ni permisos.
 
 ### 3 · Validación RBAC
 
-Positivo **y** negativo por perfil (Cliente · Empresa · Cocina · Reparto · Support · Admin · Finanzas · Company Admin · SaaS Admin). Ver matriz.
+Positivo **y** negativo por perfil — evidencia en EP-OPS-001 y matriz.
 
 ### 4 · Recorrido E2E (guion)
 
+Tras hub PASS:
+
 ```text
-Cliente → Registro → Login → Menú → Pedido → Confirmación → Próxima entrega
-  → Kitchen Queue → Kitchen Execution → Hoja Producción
+Cliente → … → Kitchen Queue → Kitchen Execution → Hoja
   → Packaging* → Delivery* → Entrega → Historial → Repetir
 ```
 
-\* Pendiente — no fingir. Fallo = Operational Finding.
-
 ### 5 · Evidence Collection
 
-Clasificar antes de corregir:
-
-| Tipo | Ejemplo |
-|------|---------|
-| Operational Finding | Cocina necesita agrupar por temperatura |
-| Knowledge Gap | Faltan reglas para pedidos de empresa |
-| UX Finding | Cliente no entiende cuándo llega el pedido |
-| Engineering Defect | Botón no persiste |
-| Data Issue | Estado incorrecto |
-| Security Finding | Permiso excesivo |
-
-Log en la matriz de completitud.
+Clasificar antes de corregir (tabla en la matriz).
 
 ---
 
