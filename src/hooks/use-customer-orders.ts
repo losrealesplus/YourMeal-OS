@@ -9,14 +9,15 @@ import {
  * CAP-007 — orders history for the signed-in customer.
  */
 export function useCustomerOrders() {
-  const { activeTenantId, userId } = useAuth();
+  const { tenantId, user } = useAuth();
+  const userId = user?.id ?? null;
   return useQuery({
     queryKey:
-      activeTenantId && userId
-        ? orderKeys.list(activeTenantId, userId)
+      tenantId && userId
+        ? orderKeys.list(tenantId, userId)
         : ["orders", "list", "anon"],
-    queryFn: () => fetchCustomerOrders(activeTenantId!, userId!),
-    enabled: Boolean(activeTenantId && userId),
+    queryFn: () => fetchCustomerOrders(tenantId!, userId!),
+    enabled: Boolean(tenantId && userId),
     staleTime: 30_000,
   });
 }
