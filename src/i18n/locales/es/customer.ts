@@ -164,5 +164,14 @@ export default {
   onboardingHint: "Elige tu ritmo, tus platos y tu día de entrega.",
   emptyTitle: "Aún no hay actividad",
   emptyHint: "Programa tu semana y verás aquí tus pedidos, entregas y platos favoritos.",
+  repeatOrder: "Repetir pedido",
+  repeatSuccess: "Hemos creado un borrador con los platos disponibles.",
+  repeatPartialTitle: "Pedido repetido parcialmente",
+  repeatPartialHint:
+    "{{count}} plato(s) ya no están disponibles en el menú de esta semana.",
+  dishUnavailable: "Este plato ya no está disponible.",
+  repeatUnavailableTitle: "No disponibles esta semana",
+  companyLabel: "Empresa",
+  viewOrder: "Ver pedido",
 } as const;
 

@@ -21,6 +21,12 @@ export type OrderSummaryItemView = {
   dish: CatalogDish | null;
 };
 
+export type OrderDeliveryAddressView = {
+  label: string | null;
+  line: string;
+  city: string | null;
+};
+
 export type OrderSummaryView = {
   id: string;
   weekStart: string;
@@ -31,6 +37,8 @@ export type OrderSummaryView = {
   total: number;
   currency: string;
   items: OrderSummaryItemView[];
+  address: OrderDeliveryAddressView | null;
+  companyName: string | null;
 };
 
 function mapDbStatus(status: string): OrderSummaryStatus {
@@ -54,6 +62,10 @@ export function mapOrderToSummaryView(
   order: OrderRow,
   items: OrderItemRow[],
   dishesById: Map<string, CatalogDish>,
+  extras: {
+    address?: OrderDeliveryAddressView | null;
+    companyName?: string | null;
+  } = {},
 ): OrderSummaryView {
   const firstDay = items[0]?.day_date ?? order.week_start;
   return {
@@ -70,5 +82,7 @@ export function mapOrderToSummaryView(
       dayDate: item.day_date,
       dish: dishesById.get(item.dish_id) ?? null,
     })),
+    address: extras.address ?? null,
+    companyName: extras.companyName ?? null,
   };
 }
