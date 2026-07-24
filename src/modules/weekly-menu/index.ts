@@ -5,6 +5,7 @@ export type {
   WeeklyMenuSlotRow,
   WeeklyMenuSlotWithDish,
 } from "./infrastructure/weekly-menu-repository";
+export { WeeklyMenuService } from "./application/weekly-menu-service";
 export {
   fetchPublishedWeeklyMenu,
   weeklyMenuKeys,

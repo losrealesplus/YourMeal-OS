@@ -1,8 +1,10 @@
 import { createFileRoute, Outlet, Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { assertSaasRoute } from "@/permissions/route-guards";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/_authenticated/saas")({
   beforeLoad: async ({ context }) => {
@@ -28,6 +30,41 @@ function SaasShell() {
   const { t } = useTranslation("common");
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const { user, roles } = useAuth();
+  const [hasTenantMembership, setHasTenantMembership] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function check() {
+      if (!user?.id) {
+        if (!cancelled) setHasTenantMembership(false);
+        return;
+      }
+      // Hybrid operators (staff + saas_admin) already have tenant home.
+      const staffish = roles.some(
+        (r) =>
+          r === "company_admin" ||
+          r === "operations_manager" ||
+          r === "kitchen" ||
+          r === "delivery",
+      );
+      if (staffish) {
+        if (!cancelled) setHasTenantMembership(true);
+        return;
+      }
+      const { data } = await supabase
+        .from("tenant_members")
+        .select("tenant_id")
+        .eq("user_id", user.id)
+        .limit(1)
+        .maybeSingle();
+      if (!cancelled) setHasTenantMembership(Boolean(data?.tenant_id));
+    }
+    check();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id, roles]);
 
   async function handleSignOut() {
     await qc.cancelQueries();
@@ -65,12 +102,14 @@ function SaasShell() {
           ))}
         </nav>
         <div className="p-3 border-t border-border space-y-1">
-          <Link
-            to="/admin"
-            className="block text-xs text-muted-foreground hover:text-foreground px-3 py-2"
-          >
-            ← Back to tenant Ops Center
-          </Link>
+          {hasTenantMembership ? (
+            <Link
+              to="/admin"
+              className="block text-xs text-muted-foreground hover:text-foreground px-3 py-2"
+            >
+              ← Back to tenant Ops Center
+            </Link>
+          ) : null}
           <button
             onClick={handleSignOut}
             className="w-full text-xs text-muted-foreground hover:text-foreground text-left px-3 py-2"

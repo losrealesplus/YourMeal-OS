@@ -167,17 +167,14 @@ export function AdminShell({ children }: { children: ReactNode }) {
       to: "/admin/menus",
       labelKey: "menus",
       icon: CalendarDays,
-      visible:
-        (can("menus.read") || showAllOps) &&
-        moduleFlags[PILOT_ADMIN_MODULE_FLAGS.menus],
+      // OP-001: dishes/menus are bootstrap-critical — no FF gate.
+      visible: can("menus.read") || showAllOps,
     },
     {
       to: "/admin/dishes",
       labelKey: "dishes",
       icon: BookOpen,
-      visible:
-        (can("dishes.read") || showAllOps) &&
-        moduleFlags[PILOT_ADMIN_MODULE_FLAGS.dishes],
+      visible: can("dishes.read") || showAllOps,
     },
     {
       to: "/admin/purchasing",

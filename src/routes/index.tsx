@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { LanguageSelector } from "@/components/language-selector";
 import {
   PoweredByLine,
@@ -7,6 +8,8 @@ import {
 import { brandConfig, tenantCopyEs } from "@/tenant/brand-config";
 import { PrimaryCTA } from "@/components/consumer";
 import { TenantLogo } from "@/components/tenant/tenant-logo";
+import { supabase } from "@/integrations/supabase/client";
+import { resolveHomePath } from "@/lib/resolve-home-path";
 import heroImage from "@/assets/eatclean-hero.jpg";
 
 /**
@@ -73,6 +76,22 @@ export const Route = createFileRoute("/")({
 
 function Landing() {
   const copy = tenantCopyEs;
+  const navigate = useNavigate();
+
+  // OP-001: OAuth / session return must not stall on public landing.
+  useEffect(() => {
+    let cancelled = false;
+    supabase.auth.getSession().then(async ({ data }) => {
+      const userId = data.session?.user?.id;
+      if (!userId || cancelled) return;
+      const path = await resolveHomePath(userId);
+      if (!cancelled) navigate({ to: path as "/app", replace: true });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [navigate]);
+
   return (
     <TenantBrandScope className="min-h-screen bg-[var(--background)] text-foreground">
       <div className="mx-auto max-w-[430px] min-h-screen flex flex-col">

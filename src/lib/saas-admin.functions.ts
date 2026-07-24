@@ -17,7 +17,9 @@ const PROVISIONING_ENTITIES = [
 
 const ROLE_CATALOG = [
   "company_admin",
+  "operations_manager",
   "kitchen",
+  "delivery",
   "production",
   "purchasing",
   "inventory",
