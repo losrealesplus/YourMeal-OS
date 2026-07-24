@@ -29,5 +29,9 @@ export default {
   adminEnter: "Entra",
   adminEntryLabel: "Centro operazioni",
   adminEntryAria: "Centro operazioni",
+  adminNotStaff: "Questo account non ha accesso al Centro operazioni.",
+  adminNotStaffHint:
+    "Sei connesso come cliente. Esci e usa un account dello staff EatClean.",
+  adminSwitchAccount: "Usa un altro account",
   backToCustomerLogin: "Torna all'accesso cliente",
 } as const;

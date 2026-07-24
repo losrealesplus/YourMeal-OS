@@ -53,6 +53,10 @@ Cuando el cliente abre la app, la primera pregunta es:
 
 La tarjeta debe responder con datos reales. Ver [EP002A1_UPCOMING_DELIVERY](./EP002A1_UPCOMING_DELIVERY.md).
 
+### P1.1 · Entrada al Centro de Operaciones *(cerrado con EP-002A.1.1)*
+
+El botón **Centro de Operaciones** es la puerta segura al backoffice (sesión staff → Ops Center; si no → `/auth/admin` + return). Ver [EP002A11_OPS_CENTER_ENTRY](./EP002A11_OPS_CENTER_ENTRY.md).
+
 ### P2 · Historial + Repetir pedido *(cerrado — EP-002A.2)*
 
 Reutilizar el pasado sin copiar a ciegas. Ver [EP002A2_REPEAT_ORDER](./EP002A2_REPEAT_ORDER.md).
