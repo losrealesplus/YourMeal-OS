@@ -1,5 +1,7 @@
 # EatClean Pilot Ready · Functional Completeness Review
 
+> **Actualización 2026-07-24:** sprint de implementación EP-001 — ver matriz e informe en [EP001_FUNCTIONAL_COMPLETENESS_SPRINT.md](./EP001_FUNCTIONAL_COMPLETENESS_SPRINT.md). Este documento conserva la revisión estática del 2026-07-23.
+
 **Fecha:** 2026-07-23  
 **Tipo:** Evidence / Status *(no metodología nueva · no implementación)*  
 **Knowledge Lifetime:** Iteration  

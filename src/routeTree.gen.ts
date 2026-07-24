@@ -20,7 +20,9 @@ import { Route as AuthenticatedSaasRouteImport } from './routes/_authenticated/s
 import { Route as AuthAdminRouteImport } from './routes/auth.admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAccountingRouteImport } from './routes/_authenticated/admin.accounting'
+import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
 import { Route as AuthenticatedAdminBrandingRouteImport } from './routes/_authenticated/admin.branding'
+import { Route as AuthenticatedAdminCommercialRouteImport } from './routes/_authenticated/admin.commercial'
 import { Route as AuthenticatedAdminCompaniesRouteImport } from './routes/_authenticated/admin.companies'
 import { Route as AuthenticatedAdminCustomersRouteImport } from './routes/_authenticated/admin.customers'
 import { Route as AuthenticatedAdminDeliveryRouteImport } from './routes/_authenticated/admin.delivery'
@@ -37,6 +39,7 @@ import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminRoutesRouteImport } from './routes/_authenticated/admin.routes'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminSupportRouteImport } from './routes/_authenticated/admin.support'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as AuthenticatedAppCompanyRouteImport } from './routes/_authenticated/app.company'
 import { Route as AuthenticatedAppMenuRouteImport } from './routes/_authenticated/app.menu'
@@ -129,10 +132,21 @@ const AuthenticatedAdminAccountingRoute =
     path: '/accounting',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedAdminBrandingRoute =
   AuthenticatedAdminBrandingRouteImport.update({
     id: '/branding',
     path: '/branding',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminCommercialRoute =
+  AuthenticatedAdminCommercialRouteImport.update({
+    id: '/commercial',
+    path: '/commercial',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminCompaniesRoute =
@@ -230,6 +244,11 @@ const AuthenticatedAdminSupportRoute =
     path: '/support',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -452,7 +471,9 @@ export interface FileRoutesByFullPath {
   '/saas': typeof AuthenticatedSaasRouteWithChildren
   '/auth/admin': typeof AuthAdminRoute
   '/admin/accounting': typeof AuthenticatedAdminAccountingRoute
+  '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/branding': typeof AuthenticatedAdminBrandingRoute
+  '/admin/commercial': typeof AuthenticatedAdminCommercialRoute
   '/admin/companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/admin/delivery': typeof AuthenticatedAdminDeliveryRoute
@@ -469,6 +490,7 @@ export interface FileRoutesByFullPath {
   '/admin/routes': typeof AuthenticatedAdminRoutesRouteWithChildren
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/support': typeof AuthenticatedAdminSupportRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/company': typeof AuthenticatedAppCompanyRouteWithChildren
   '/app/menu': typeof AuthenticatedAppMenuRouteWithChildren
   '/app/onboarding': typeof AuthenticatedAppOnboardingRouteWithChildren
@@ -514,7 +536,9 @@ export interface FileRoutesByTo {
   '/driver': typeof AuthenticatedDriverRoute
   '/auth/admin': typeof AuthAdminRoute
   '/admin/accounting': typeof AuthenticatedAdminAccountingRoute
+  '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/branding': typeof AuthenticatedAdminBrandingRoute
+  '/admin/commercial': typeof AuthenticatedAdminCommercialRoute
   '/admin/companies': typeof AuthenticatedAdminCompaniesRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/admin/delivery': typeof AuthenticatedAdminDeliveryRoute
@@ -528,6 +552,7 @@ export interface FileRoutesByTo {
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/support': typeof AuthenticatedAdminSupportRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/company': typeof AuthenticatedAppCompanyRouteWithChildren
   '/app/menu': typeof AuthenticatedAppMenuRouteWithChildren
   '/app/onboarding': typeof AuthenticatedAppOnboardingRouteWithChildren
@@ -578,7 +603,9 @@ export interface FileRoutesById {
   '/_authenticated/saas': typeof AuthenticatedSaasRouteWithChildren
   '/auth/admin': typeof AuthAdminRoute
   '/_authenticated/admin/accounting': typeof AuthenticatedAdminAccountingRoute
+  '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/branding': typeof AuthenticatedAdminBrandingRoute
+  '/_authenticated/admin/commercial': typeof AuthenticatedAdminCommercialRoute
   '/_authenticated/admin/companies': typeof AuthenticatedAdminCompaniesRoute
   '/_authenticated/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/_authenticated/admin/delivery': typeof AuthenticatedAdminDeliveryRoute
@@ -595,6 +622,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/routes': typeof AuthenticatedAdminRoutesRouteWithChildren
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/support': typeof AuthenticatedAdminSupportRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/app/company': typeof AuthenticatedAppCompanyRouteWithChildren
   '/_authenticated/app/menu': typeof AuthenticatedAppMenuRouteWithChildren
   '/_authenticated/app/onboarding': typeof AuthenticatedAppOnboardingRouteWithChildren
@@ -645,7 +673,9 @@ export interface FileRouteTypes {
     | '/saas'
     | '/auth/admin'
     | '/admin/accounting'
+    | '/admin/audit'
     | '/admin/branding'
+    | '/admin/commercial'
     | '/admin/companies'
     | '/admin/customers'
     | '/admin/delivery'
@@ -662,6 +692,7 @@ export interface FileRouteTypes {
     | '/admin/routes'
     | '/admin/settings'
     | '/admin/support'
+    | '/admin/users'
     | '/app/company'
     | '/app/menu'
     | '/app/onboarding'
@@ -707,7 +738,9 @@ export interface FileRouteTypes {
     | '/driver'
     | '/auth/admin'
     | '/admin/accounting'
+    | '/admin/audit'
     | '/admin/branding'
+    | '/admin/commercial'
     | '/admin/companies'
     | '/admin/customers'
     | '/admin/delivery'
@@ -721,6 +754,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/settings'
     | '/admin/support'
+    | '/admin/users'
     | '/app/company'
     | '/app/menu'
     | '/app/onboarding'
@@ -770,7 +804,9 @@ export interface FileRouteTypes {
     | '/_authenticated/saas'
     | '/auth/admin'
     | '/_authenticated/admin/accounting'
+    | '/_authenticated/admin/audit'
     | '/_authenticated/admin/branding'
+    | '/_authenticated/admin/commercial'
     | '/_authenticated/admin/companies'
     | '/_authenticated/admin/customers'
     | '/_authenticated/admin/delivery'
@@ -787,6 +823,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/routes'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/support'
+    | '/_authenticated/admin/users'
     | '/_authenticated/app/company'
     | '/_authenticated/app/menu'
     | '/_authenticated/app/onboarding'
@@ -912,11 +949,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAccountingRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/audit': {
+      id: '/_authenticated/admin/audit'
+      path: '/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/branding': {
       id: '/_authenticated/admin/branding'
       path: '/branding'
       fullPath: '/admin/branding'
       preLoaderRoute: typeof AuthenticatedAdminBrandingRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/commercial': {
+      id: '/_authenticated/admin/commercial'
+      path: '/commercial'
+      fullPath: '/admin/commercial'
+      preLoaderRoute: typeof AuthenticatedAdminCommercialRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/companies': {
@@ -1029,6 +1080,13 @@ declare module '@tanstack/react-router' {
       path: '/support'
       fullPath: '/admin/support'
       preLoaderRoute: typeof AuthenticatedAdminSupportRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/app/': {
@@ -1369,7 +1427,9 @@ const AuthenticatedAdminRoutesRouteWithChildren =
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAccountingRoute: typeof AuthenticatedAdminAccountingRoute
+  AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminBrandingRoute: typeof AuthenticatedAdminBrandingRoute
+  AuthenticatedAdminCommercialRoute: typeof AuthenticatedAdminCommercialRoute
   AuthenticatedAdminCompaniesRoute: typeof AuthenticatedAdminCompaniesRoute
   AuthenticatedAdminCustomersRoute: typeof AuthenticatedAdminCustomersRoute
   AuthenticatedAdminDeliveryRoute: typeof AuthenticatedAdminDeliveryRoute
@@ -1386,12 +1446,15 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminRoutesRoute: typeof AuthenticatedAdminRoutesRouteWithChildren
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminSupportRoute: typeof AuthenticatedAdminSupportRoute
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAccountingRoute: AuthenticatedAdminAccountingRoute,
+  AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
   AuthenticatedAdminBrandingRoute: AuthenticatedAdminBrandingRoute,
+  AuthenticatedAdminCommercialRoute: AuthenticatedAdminCommercialRoute,
   AuthenticatedAdminCompaniesRoute: AuthenticatedAdminCompaniesRoute,
   AuthenticatedAdminCustomersRoute: AuthenticatedAdminCustomersRoute,
   AuthenticatedAdminDeliveryRoute: AuthenticatedAdminDeliveryRoute,
@@ -1410,6 +1473,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminRoutesRoute: AuthenticatedAdminRoutesRouteWithChildren,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminSupportRoute: AuthenticatedAdminSupportRoute,
+  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
@@ -1570,3 +1634,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

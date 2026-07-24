@@ -1,6 +1,13 @@
-import { createFileRoute } from "@tanstack/react-router";
+/**
+ * ADMIN · Clientes — Particulares + Empresas (datos reales).
+ * Capability: customers.read / customers.write / company.manage
+ * Shared repo: CustomerDirectoryService (+ CompanyAccountService for provision)
+ */
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Download } from "lucide-react";
+import { Download, Building2, Users } from "lucide-react";
+import { toast } from "sonner";
 import {
   AdminHeader,
   DataTable,
@@ -8,113 +15,438 @@ import {
   PanelCard,
   SectionTitle,
   StatusChip,
-  Toolbar,
 } from "@/components/admin";
 import type { Column } from "@/components/admin/data-table";
-import { MOCK_ADMIN_CUSTOMERS, type MockAdminCustomer } from "@/lib/mock-admin";
 import { useFmt } from "@/i18n/localization-provider";
+import { useAuth } from "@/hooks/use-auth";
+import { useCan } from "@/hooks/use-can";
+import { supabase } from "@/integrations/supabase/client";
+import { createServiceContext } from "@/services/types";
+import {
+  CustomerDirectoryService,
+  type CompanyDirectoryRecord,
+  type IndividualCustomerRecord,
+} from "@/modules/customer-directory";
+import { cn } from "@/lib/utils";
 
-/**
- * ADMIN · Gestión de clientes
- * Objetivo operacional: Conocer y gestionar la base de clientes activa
- * Capability:            customers.manage
- * Core Object:           Customer + Subscription
- */
 export const Route = createFileRoute("/_authenticated/admin/customers")({
   component: AdminCustomersPage,
   head: () => ({
     meta: [
       { title: "YourMeal OS — Clientes" },
-      { name: "description", content: "Gestión y seguimiento de la base de clientes." },
+      {
+        name: "description",
+        content: "Gestión de particulares y empresas (datos reales).",
+      },
     ],
   }),
 });
 
+type Tab = "individuals" | "companies";
+
+function downloadCsv(filename: string, content: string) {
+  const blob = new Blob([content], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function AdminCustomersPage() {
   const { t } = useTranslation("admin");
   const fmt = useFmt();
+  const { user, tenantId, roles } = useAuth();
+  const { can } = useCan();
+  const [tab, setTab] = useState<Tab>("individuals");
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [individuals, setIndividuals] = useState<IndividualCustomerRecord[]>(
+    [],
+  );
+  const [companies, setCompanies] = useState<CompanyDirectoryRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [archivingId, setArchivingId] = useState<string | null>(null);
+
+  const reload = useCallback(async () => {
+    if (!user || !tenantId) return;
+    setLoading(true);
+    try {
+      const ctx = await createServiceContext({
+        supabase,
+        userId: user.id,
+        tenantId,
+        roles,
+      });
+      const [inds, cos] = await Promise.all([
+        CustomerDirectoryService.listIndividuals(ctx, {
+          query,
+          status:
+            statusFilter === "all"
+              ? "all"
+              : (statusFilter as "active" | "inactive" | "new"),
+          kind: "individual",
+        }),
+        CustomerDirectoryService.listCompanies(ctx, {
+          query,
+          status:
+            statusFilter === "all"
+              ? "all"
+              : statusFilter === "new"
+                ? "all"
+                : (statusFilter as "active" | "inactive"),
+        }),
+      ]);
+      setIndividuals(inds);
+      setCompanies(cos);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : String(e));
+    } finally {
+      setLoading(false);
+    }
+  }, [user, tenantId, roles, query, statusFilter]);
+
+  useEffect(() => {
+    const handle = window.setTimeout(() => {
+      reload().catch(() => undefined);
+    }, 200);
+    return () => window.clearTimeout(handle);
+  }, [reload]);
+
+  async function archiveCustomer(id: string) {
+    if (!user || !tenantId || !can("customers.write")) return;
+    if (!window.confirm("¿Archivar este cliente? (soft delete)")) return;
+    setArchivingId(id);
+    try {
+      const ctx = await createServiceContext({
+        supabase,
+        userId: user.id,
+        tenantId,
+        roles,
+      });
+      await CustomerDirectoryService.archiveCustomer(ctx, id);
+      toast.success("Cliente archivado");
+      await reload();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : String(e));
+    } finally {
+      setArchivingId(null);
+    }
+  }
 
   const toneByStatus = {
-    active:  "positive" as const,
-    paused:  "warning"  as const,
-    churned: "danger"   as const,
+    active: "positive" as const,
+    inactive: "danger" as const,
+    new: "warning" as const,
   };
 
-  const columns: Column<MockAdminCustomer>[] = [
-    {
-      key: "name",
-      header: t("customer", { defaultValue: "Customer" }),
-      render: (r) => (
-        <div className="min-w-0">
-          <p className="font-semibold truncate">{r.name}</p>
-          <p className="text-xs text-muted-foreground truncate">{r.email}</p>
-        </div>
-      ),
-    },
-    {
-      key: "plan",
-      header: t("plan", { defaultValue: "Plan" }),
-      render: (r) => <span className="text-xs font-bold uppercase tracking-widest">{t(`plans.${r.plan}`, { defaultValue: r.plan })}</span>,
-    },
-    {
-      key: "meals",
-      header: t("mealsWeek", { defaultValue: "Meals / week" }),
-      className: "text-right",
-      render: (r) => <span className="font-mono tabular-nums">{r.mealsThisWeek}</span>,
-    },
-    {
-      key: "lifetime",
-      header: t("lifetime", { defaultValue: "Lifetime" }),
-      className: "text-right",
-      render: (r) => <span className="font-mono tabular-nums">{fmt.currency(r.lifetimeCents / 100, { currency: r.currency })}</span>,
-    },
-    {
-      key: "joined",
-      header: t("joined", { defaultValue: "Joined" }),
-      render: (r) => <span className="text-xs text-muted-foreground">{fmt.date(r.joinedIso, "medium")}</span>,
-    },
-    {
-      key: "status",
-      header: t("status", { defaultValue: "Status" }),
-      render: (r) => <StatusChip tone={toneByStatus[r.status]} label={t(`statuses.${r.status}`, { defaultValue: r.status })} />,
-    },
-  ];
+  const individualColumns: Column<IndividualCustomerRecord>[] = useMemo(
+    () => [
+      {
+        key: "name",
+        header: "Nombre",
+        render: (r) => (
+          <div className="min-w-0">
+            <p className="font-semibold truncate">
+              {r.displayName || "Sin nombre"}
+            </p>
+            <p className="text-xs text-muted-foreground truncate">
+              {r.kind === "company_employee" ? "Empleado empresa" : "Particular"}
+              {r.companyName ? ` · ${r.companyName}` : ""}
+            </p>
+          </div>
+        ),
+      },
+      {
+        key: "status",
+        header: "Estado",
+        render: (r) => (
+          <StatusChip tone={toneByStatus[r.status]} label={r.status} />
+        ),
+      },
+      {
+        key: "email",
+        header: "Correo",
+        render: (r) => (
+          <span className="text-xs truncate block max-w-[180px]">
+            {r.email || "—"}
+          </span>
+        ),
+      },
+      {
+        key: "phone",
+        header: "Teléfono",
+        render: (r) => <span className="text-xs">{r.phone || "—"}</span>,
+      },
+      {
+        key: "last",
+        header: "Último pedido",
+        render: (r) => (
+          <span className="text-xs text-muted-foreground">
+            {r.lastOrderAt ? fmt.date(r.lastOrderAt, "medium") : "—"}
+          </span>
+        ),
+      },
+      {
+        key: "orders",
+        header: "Pedidos",
+        className: "text-right",
+        render: (r) => (
+          <span className="font-mono tabular-nums">{r.orderCount}</span>
+        ),
+      },
+      {
+        key: "avg",
+        header: "Ticket medio",
+        className: "text-right",
+        render: (r) => (
+          <span className="font-mono tabular-nums">
+            {fmt.currency(r.averageTicket, { currency: "EUR" })}
+          </span>
+        ),
+      },
+      {
+        key: "actions",
+        header: "Acciones",
+        render: (r) => (
+          <div className="flex flex-wrap gap-2">
+            <Link
+              to="/admin/support"
+              search={{ customerId: r.id }}
+              className="text-xs font-semibold uppercase tracking-widest text-primary hover:underline"
+            >
+              Ver
+            </Link>
+            {can("customers.write") ? (
+              <button
+                type="button"
+                disabled={archivingId === r.id}
+                onClick={() => archiveCustomer(r.id)}
+                className="text-xs font-semibold uppercase tracking-widest text-destructive hover:underline disabled:opacity-50"
+              >
+                Archivar
+              </button>
+            ) : null}
+          </div>
+        ),
+      },
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [fmt, can, archivingId],
+  );
+
+  const companyColumns: Column<CompanyDirectoryRecord>[] = useMemo(
+    () => [
+      {
+        key: "name",
+        header: "Nombre",
+        render: (r) => (
+          <div className="min-w-0">
+            <p className="font-semibold truncate">{r.name}</p>
+            <p className="text-xs text-muted-foreground font-mono">
+              {r.companyCode}
+            </p>
+          </div>
+        ),
+      },
+      {
+        key: "contact",
+        header: "Responsable",
+        render: (r) => (
+          <div className="min-w-0">
+            <p className="text-sm truncate">{r.contactName || "—"}</p>
+            <p className="text-xs text-muted-foreground truncate">
+              {r.contactEmail || "—"}
+            </p>
+          </div>
+        ),
+      },
+      {
+        key: "employees",
+        header: "Empleados",
+        className: "text-right",
+        render: (r) => (
+          <span className="font-mono tabular-nums">{r.employeeCount}</span>
+        ),
+      },
+      {
+        key: "orders",
+        header: "Pedidos",
+        className: "text-right",
+        render: (r) => (
+          <span className="font-mono tabular-nums">{r.orderCount}</span>
+        ),
+      },
+      {
+        key: "status",
+        header: "Estado",
+        render: (r) => (
+          <StatusChip
+            tone={r.status === "active" ? "positive" : "danger"}
+            label={r.status}
+          />
+        ),
+      },
+      {
+        key: "created",
+        header: "Alta",
+        render: (r) => (
+          <span className="text-xs text-muted-foreground">
+            {fmt.date(r.createdAt, "medium")}
+          </span>
+        ),
+      },
+      {
+        key: "actions",
+        header: "Acciones",
+        render: () => (
+          <Link
+            to="/admin/companies"
+            className="text-xs font-semibold uppercase tracking-widest text-primary hover:underline"
+          >
+            Gestionar
+          </Link>
+        ),
+      },
+    ],
+    [fmt],
+  );
+
+  const particulares = individuals;
+  const activeCount = particulares.filter((c) => c.status === "active").length;
 
   return (
     <div className="animate-fade-in">
       <SectionTitle
         overline={t("customers")}
-        title={t("customersTitle", { defaultValue: "Gestión de clientes" })}
-        subtitle={t("customersSubtitle", { defaultValue: "Segmenta, contacta y monitoriza la actividad de tus clientes." })}
+        title="Base de clientes"
+        subtitle="Particulares y empresas — mismos datos que Atención al Cliente."
       />
       <AdminHeader
-        goal={t("customersGoal", { defaultValue: "Mantener y hacer crecer la base activa" })}
-        capability="customers.manage"
-        object="Customer · Subscription"
+        goal="Conocer y gestionar la base activa"
+        capability="customers.read"
+        object="Customer · Company Account"
       />
 
       <div className="grid gap-3 md:grid-cols-4 mb-6">
-        <KpiCard label={t("totalCustomers", { defaultValue: "Total customers" })} value="248" delta="+12" trend="up" />
-        <KpiCard label={t("activeSubs", { defaultValue: "Active subscriptions" })} value="196" delta="+7"  trend="up" />
-        <KpiCard label={t("paused", { defaultValue: "Paused" })}               value="14"  delta="−2" trend="down" />
-        <KpiCard label={t("churn30", { defaultValue: "Churn (30d)" })}         value="3.4%" delta="−0.4%" trend="down" />
+        <KpiCard
+          label="Particulares"
+          value={String(particulares.length)}
+          trend="flat"
+        />
+        <KpiCard
+          label="Activos"
+          value={String(activeCount)}
+          trend="up"
+        />
+        <KpiCard
+          label="Empresas"
+          value={String(companies.length)}
+          trend="flat"
+        />
+        <KpiCard
+          label="Empleados vinculados"
+          value={String(
+            companies.reduce((s, c) => s + c.employeeCount, 0),
+          )}
+          trend="flat"
+        />
+      </div>
+
+      <div className="flex flex-wrap gap-2 mb-4">
+        <button
+          type="button"
+          onClick={() => setTab("individuals")}
+          className={cn(
+            "h-10 rounded-xl px-4 text-xs font-bold uppercase tracking-widest inline-flex items-center gap-2 border transition",
+            tab === "individuals"
+              ? "bg-foreground text-background border-foreground"
+              : "bg-card border-border hover:bg-secondary/60",
+          )}
+        >
+          <Users className="size-3.5" /> Particulares
+        </button>
+        <button
+          type="button"
+          onClick={() => setTab("companies")}
+          className={cn(
+            "h-10 rounded-xl px-4 text-xs font-bold uppercase tracking-widest inline-flex items-center gap-2 border transition",
+            tab === "companies"
+              ? "bg-foreground text-background border-foreground"
+              : "bg-card border-border hover:bg-secondary/60",
+          )}
+        >
+          <Building2 className="size-3.5" /> Empresas
+        </button>
       </div>
 
       <PanelCard>
-        <Toolbar
-          searchPlaceholder={t("searchCustomers", { defaultValue: "Search by name or email…" })}
-          actions={
-            <>
-              <button className="h-10 rounded-xl border border-border bg-card px-4 text-xs font-bold uppercase tracking-widest inline-flex items-center gap-2 hover:bg-secondary/60 transition">
-                <Download className="size-3.5" /> {t("export", { defaultValue: "Export" })}
-              </button>
-              <button className="h-10 rounded-xl bg-foreground text-background px-4 text-xs font-bold uppercase tracking-widest inline-flex items-center gap-2 hover:opacity-90 transition">
-                <Plus className="size-3.5" /> {t("newCustomer", { defaultValue: "New customer" })}
-              </button>
-            </>
-          }
-        />
-        <DataTable columns={columns} rows={MOCK_ADMIN_CUSTOMERS} />
+        <div className="flex flex-wrap items-center gap-3 mb-4">
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Buscar por nombre, correo, código…"
+            className="flex-1 min-w-[220px] h-10 rounded-xl border border-border bg-card px-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+          />
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="h-10 rounded-xl border border-border bg-card px-3 text-xs font-semibold uppercase tracking-widest"
+          >
+            <option value="all">Todos</option>
+            <option value="active">Activos</option>
+            <option value="inactive">Inactivos</option>
+            <option value="new">Nuevos</option>
+          </select>
+          <button
+            type="button"
+            onClick={() => {
+              if (tab === "individuals") {
+                downloadCsv(
+                  "clientes-particulares.csv",
+                  CustomerDirectoryService.toIndividualsCsv(individuals),
+                );
+              } else {
+                downloadCsv(
+                  "clientes-empresas.csv",
+                  CustomerDirectoryService.toCompaniesCsv(companies),
+                );
+              }
+              toast.success("Exportación generada");
+            }}
+            className="h-10 rounded-xl border border-border bg-card px-4 text-xs font-bold uppercase tracking-widest inline-flex items-center gap-2 hover:bg-secondary/60 transition"
+          >
+            <Download className="size-3.5" /> Exportar
+          </button>
+          {tab === "companies" && can("company.manage") ? (
+            <Link
+              to="/admin/companies"
+              className="h-10 rounded-xl bg-foreground text-background px-4 text-xs font-bold uppercase tracking-widest inline-flex items-center hover:opacity-90 transition"
+            >
+              Alta empresa
+            </Link>
+          ) : null}
+        </div>
+
+        {loading ? (
+          <p className="text-sm text-muted-foreground py-8 text-center">
+            Cargando…
+          </p>
+        ) : tab === "individuals" ? (
+          <DataTable
+            columns={individualColumns}
+            rows={individuals}
+            empty="No hay clientes particulares con estos filtros."
+          />
+        ) : (
+          <DataTable
+            columns={companyColumns}
+            rows={companies}
+            empty="No hay empresas. Créalas desde Administración → Clientes Empresa."
+          />
+        )}
       </PanelCard>
     </div>
   );
