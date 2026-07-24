@@ -90,15 +90,13 @@ function SaasTenantDetailPage() {
 
   return (
     <div className="animate-fade-in space-y-6">
-      <SectionTitle
-        overline={
-          <Link to="/saas/tenants" className="hover:underline">
-            ← Tenants
-          </Link>
-        }
-        title={t.name}
-        subtitle={`/${t.slug}`}
-      />
+      <div>
+        <Link to="/saas/tenants" className="meta-label hover:underline">
+          ← Tenants
+        </Link>
+        <SectionTitle title={t.name} subtitle={`/${t.slug}`} />
+      </div>
+
       <AdminHeader
         goal="Tenant governance detail"
         capability="saas.manage"
