@@ -12,8 +12,9 @@ FOUNDATION / BLUEPRINT / DISCOVERY / OM / VALIDATION / IOV   ✅
 FOV PREPARATION · ORR (marco) · G-02 (Gate formalizado)     ✅
 EP-001 Functional Completeness (cero humo Admin/Ops nav)    ✅
 ────────────────────────────
-Siguiente sprint:  **EP-002A** (Favoritos · Home dinámica) en paralelo controlado con
+Siguiente sprint:  **EP-002A** (Favoritos · Home dinámica) en paralelo con
                    **EP-002B** (Hoja de Producción ✅ · ejecución cocina/reparto)
+                   (EP-002A.1 ✅ · EP-002A.1.1 ✅ · EP-002A.2 Historial+Repetir ✅)
                    → RI-001
 Siguiente artefacto:  experiencia cliente completa → ejecución ops → RI-001
 

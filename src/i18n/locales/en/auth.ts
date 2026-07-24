@@ -27,5 +27,9 @@ export default {
   adminEnter: "Sign in",
   adminEntryLabel: "Operations Center",
   adminEntryAria: "Operations Center",
+  adminNotStaff: "This account cannot open the Operations Center.",
+  adminNotStaffHint:
+    "You are signed in as a customer. Sign out and use an EatClean staff account.",
+  adminSwitchAccount: "Use another account",
   backToCustomerLogin: "Back to customer sign-in",
 } as const;
