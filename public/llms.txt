@@ -1,0 +1,7 @@
+# EatClean Tenerife
+
+> Comida preparada saludable en Tenerife con ingredientes naturales, cocina al horno y grill, y reparto gratuito a domicilio. Programa tu menú semanal en minutos.
+
+## Pages
+
+- [Inicio](/): Bienvenida a EatClean, claims de marca y acceso al pedido semanal.

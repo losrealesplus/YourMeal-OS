@@ -14,23 +14,58 @@ import heroImage from "@/assets/eatclean-hero.jpg";
  * SCR (pre-auth) · CJ-001 door
  * BackOffice is invisible here by design; only /auth links out.
  */
+const SITE_URL = "https://eatcleanapp.lovable.app";
+const HOME_TITLE = `${brandConfig.name} — Comida preparada saludable en Tenerife`;
+const HOME_DESCRIPTION =
+  "EatClean Tenerife: comida preparada saludable con ingredientes naturales, cocina al horno y grill, y reparto gratuito a domicilio. Programa tu menú semanal en minutos.";
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      {
-        title: `${brandConfig.name} — ${brandConfig.storeAssets.shortDescription}`,
-      },
-      {
-        name: "description",
-        content: brandConfig.storeAssets.shortDescription,
-      },
-      { property: "og:title", content: brandConfig.name },
-      {
-        property: "og:description",
-        content: brandConfig.storeAssets.shortDescription,
-      },
+      { title: HOME_TITLE },
+      { name: "description", content: HOME_DESCRIPTION },
+      { property: "og:title", content: HOME_TITLE },
+      { property: "og:description", content: HOME_DESCRIPTION },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: SITE_URL + "/" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: HOME_TITLE },
+      { name: "twitter:description", content: HOME_DESCRIPTION },
+    ],
+    links: [{ rel: "canonical", href: SITE_URL + "/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: brandConfig.name,
+          url: SITE_URL,
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: brandConfig.legalName ?? brandConfig.name,
+          url: SITE_URL,
+          logo: SITE_URL + "/favicon.ico",
+          sameAs: [brandConfig.website].filter(Boolean),
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          name: brandConfig.legalName ?? brandConfig.name,
+          url: SITE_URL,
+          image: SITE_URL + "/favicon.ico",
+          servesCuisine: "Healthy",
+          areaServed: "Tenerife, Spain",
+        }),
+      },
     ],
   }),
   component: Landing,
@@ -54,6 +89,7 @@ function Landing() {
               alt=""
               width={1600}
               height={1200}
+              fetchPriority="high"
               className="w-full h-[380px] object-cover"
             />
             <div
