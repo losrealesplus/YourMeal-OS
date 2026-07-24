@@ -29,7 +29,8 @@ Esa separación (Customer Experience vs Operational Execution) es intencional y 
 | Ítem | Pregunta | Nota |
 |------|----------|------|
 | Cocina | ¿La cola del día refleja pedidos reales y cambia estados? | Base en `/admin/kitchen` — cerrar huecos |
-| **Hoja de Producción** | ¿Cocina puede trabajar el día sin hoja manual? | [EP-002B.1](./EP002B1_PRODUCTION_REPORT.md) — `ProductionReportService` |
+| **Hoja de Producción** | ¿Cocina puede trabajar el día sin hoja manual? | [EP-002B.1](./EP002B1_PRODUCTION_REPORT.md) — Report via `ProductionReportService` |
+| **Kitchen Execution** | ¿Cocina ve y avanza el estado de cada lote ahora? | [EP-002B.2](./EP002B2_KITCHEN_EXECUTION.md) — Workspace; mismos datos que el Report |
 | Producción (batch) | ¿Hace falta planning/batch admin o basta cocina + hoja? | Solo activar `admin_module_production` si hay persistencia |
 | Rutas | ¿El reparto opera sin mocks? | Preferir `/admin/delivery` real; rutas mock FF OFF |
 | Entregas | ¿Estados de entrega coherentes UI ↔ DB? | Misma spine que ve el cliente en EP-002A |

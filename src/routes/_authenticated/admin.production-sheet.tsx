@@ -31,7 +31,9 @@ import {
 import { SectionTitle } from "@/components/admin";
 import {
   ProductionReportService,
+  kitchenBatchStatusLabel,
   operationalStatusLabel,
+  type KitchenBatchStatus,
   type OperationalOrderStatus,
   type ProductionReportModel,
 } from "@/modules/operations";
@@ -146,6 +148,11 @@ function ProductionSheetPage() {
           />
         </div>
         <div className="flex flex-wrap gap-2">
+          <Button asChild variant="secondary" size="sm">
+            <Link to="/admin/kitchen-execution" search={{ date }}>
+              Ejecución
+            </Link>
+          </Button>
           <Button
             variant="outline"
             size="sm"
@@ -248,6 +255,9 @@ function DigitalProductionView({ report }: { report: ProductionReportModel }) {
               <span className="flex flex-wrap items-center gap-2 text-left">
                 <span className="font-semibold">{dish.dishName}</span>
                 <Badge variant="secondary">{dish.totalQty} raciones</Badge>
+                <Badge variant="outline">
+                  {kitchenBatchStatusLabel(dish.batchStatus as KitchenBatchStatus)}
+                </Badge>
                 {dish.prepMinutes != null ? (
                   <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                     <Clock className="h-3 w-3" />
@@ -368,6 +378,9 @@ function PrintableProductionSheet({
           <h2 className="text-lg font-bold underline decoration-2 underline-offset-4">
             {dish.dishName}
           </h2>
+          <p className="mt-1 text-xs uppercase tracking-wide">
+            Estado: {kitchenBatchStatusLabel(dish.batchStatus as KitchenBatchStatus)}
+          </p>
           <ul className="mt-2 space-y-0.5 text-sm">
             {dish.customers.map((c) => (
               <li key={`${c.orderId}-${c.customerId}`}>
