@@ -80,6 +80,8 @@ export function useAuth(): AuthState {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  const router = useRouter();
+
   useEffect(() => {
     if (!session?.user) {
       setRoles([]);
@@ -89,6 +91,15 @@ export function useAuth(): AuthState {
     }
     let cancelled = false;
     const uid = session.user.id;
+
+    async function loadRoles() {
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", uid);
+      if (cancelled) return;
+      setRoles((data ?? []).map((r) => r.role as AppRole));
+    }
 
     void (async () => {
       const [rolesRes, profileRes, memberRes] = await Promise.all([
@@ -127,10 +138,33 @@ export function useAuth(): AuthState {
       setTenant(t ? { id: t.id, name: t.name, slug: t.slug ?? null } : null);
     })();
 
+    // RBAC realtime — role grants/revocations propagate without page refresh.
+    // Router.invalidate() forces beforeLoad guards to re-run against the
+    // new role set, so a revoked role instantly loses route access.
+    const channel = supabase
+      .channel(`rbac:${uid}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "user_roles",
+          filter: `user_id=eq.${uid}`,
+        },
+        () => {
+          void loadRoles().then(() => {
+            void router.invalidate();
+          });
+        },
+      )
+      .subscribe();
+
     return () => {
       cancelled = true;
+      void supabase.removeChannel(channel);
     };
-  }, [session?.user?.id]);
+  }, [session?.user?.id, router]);
+
 
   const isSaasAdmin = roles.includes("saas_admin");
   const isStaff = roles.some((r) => STAFF_ROLES.includes(r));
