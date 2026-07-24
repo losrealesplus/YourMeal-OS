@@ -3,6 +3,7 @@
  * @see docs/20-evidence-framework/09-operational-visibility-principle.md
  */
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -21,6 +22,9 @@ import {
 } from "@/modules/customer-directory";
 
 export const Route = createFileRoute("/_authenticated/admin/commercial")({
+  beforeLoad: ({ context }) => {
+    assertCapabilityFromContext(context, "customers.read");
+  },
   component: AdminCommercialPage,
   head: () => ({
     meta: [

@@ -3,7 +3,8 @@
  * Capability: production.orchestrate  ·  Core Object: ProductionRun (dish × day)
  * Reads: ProductionReportService.buildForDay (real orders, no simulation).
  */
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { RefreshCw, ChefHat, Package, Tag, ClipboardList } from "lucide-react";
 import { toast } from "sonner";
@@ -28,8 +29,7 @@ const ROLES_ALLOWED = ["saas_admin", "company_admin", "operations_manager", "kit
 
 export const Route = createFileRoute("/_authenticated/admin/production/")({
   beforeLoad: ({ context }) => {
-    const roles = (context as { roles?: string[] }).roles ?? [];
-    if (!roles.some((r) => ROLES_ALLOWED.includes(r))) throw redirect({ to: "/admin" });
+    assertCapabilityFromContext(context, "production.operate");
   },
   component: ProductionDashboardPage,
   head: () => ({

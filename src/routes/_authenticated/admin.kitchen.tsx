@@ -2,7 +2,8 @@
  * Workspace Cocina — pedidos reales, filtros y transición de estado.
  * PR-034 · Operations Workspace Activation
  */
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useState } from "react";
 import { ChefHat, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
@@ -48,15 +49,7 @@ import {
 
 export const Route = createFileRoute("/_authenticated/admin/kitchen")({
   beforeLoad: ({ context }) => {
-    const roles = (context as { roles?: string[] }).roles ?? [];
-    const allowed =
-      roles.includes("saas_admin") ||
-      roles.includes("company_admin") ||
-      roles.includes("operations_manager") ||
-      roles.includes("kitchen");
-    if (!allowed) {
-      throw redirect({ to: "/admin" });
-    }
+    assertCapabilityFromContext(context, "kitchen.operate");
   },
   component: KitchenWorkspacePage,
   head: () => ({

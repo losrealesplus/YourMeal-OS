@@ -1,8 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useTranslation } from "react-i18next";
 import { PlaceholderPanel } from "@/components/placeholder-panel";
 
 export const Route = createFileRoute("/_authenticated/admin/purchasing")({
+  beforeLoad: ({ context }) => {
+    assertCapabilityFromContext(context, "purchasing.operate");
+  },
   component: AdminPurchasingPage,
   head: () => ({
     meta: [

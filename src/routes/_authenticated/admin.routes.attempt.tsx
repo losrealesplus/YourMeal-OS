@@ -3,7 +3,8 @@
  * Capability: logistics.operate  ·  Core Object: DeliveryAttempt
  * Writes: DeliveryService.recordAttempt (transiciona estado + marca parada + audit)
  */
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useState } from "react";
 import { RefreshCw, CheckCircle2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
@@ -33,8 +34,7 @@ const ROLES_ALLOWED = ["saas_admin", "company_admin", "operations_manager", "log
 
 export const Route = createFileRoute("/_authenticated/admin/routes/attempt")({
   beforeLoad: ({ context }) => {
-    const roles = (context as { roles?: string[] }).roles ?? [];
-    if (!roles.some((r) => ROLES_ALLOWED.includes(r))) throw redirect({ to: "/admin" });
+    assertCapabilityFromContext(context, "logistics.operate");
   },
   component: AttemptPage,
   head: () => ({ meta: [{ title: "YourMeal OS — Intento de entrega" }] }),

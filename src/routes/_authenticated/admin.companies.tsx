@@ -2,7 +2,8 @@
  * Admin · Clientes Empresa — commercial provisioning of Company Accounts (ADR 0015).
  * Companies are NOT self-registered; EatClean staff creates them here.
  */
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -22,12 +23,7 @@ import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/_authenticated/admin/companies")({
   beforeLoad: ({ context }) => {
-    const roles = (context as { roles?: string[] }).roles ?? [];
-    const allowed =
-      roles.includes("saas_admin") || roles.includes("company_admin");
-    if (!allowed) {
-      throw redirect({ to: "/admin" });
-    }
+    assertCapabilityFromContext(context, "company.manage");
   },
   component: AdminCompaniesPage,
   head: () => ({

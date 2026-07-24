@@ -4,6 +4,7 @@
  * Communications / campaigns: architecture catalog only (no external integrations).
  */
 import { createFileRoute } from "@tanstack/react-router";
+import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -40,6 +41,9 @@ type SupportSearch = {
 };
 
 export const Route = createFileRoute("/_authenticated/admin/support")({
+  beforeLoad: ({ context }) => {
+    assertCapabilityFromContext(context, "support.read");
+  },
   validateSearch: (search: Record<string, unknown>): SupportSearch => ({
     customerId:
       typeof search.customerId === "string" ? search.customerId : undefined,

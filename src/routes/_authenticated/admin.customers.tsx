@@ -4,6 +4,7 @@
  * Shared repo: CustomerDirectoryService (+ CompanyAccountService for provision)
  */
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Download, Building2, Users } from "lucide-react";
@@ -30,6 +31,9 @@ import {
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/customers")({
+  beforeLoad: ({ context }) => {
+    assertCapabilityFromContext(context, "customers.read");
+  },
   component: AdminCustomersPage,
   head: () => ({
     meta: [

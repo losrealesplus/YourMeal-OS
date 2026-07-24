@@ -3,7 +3,8 @@
  * Capability: logistics.operate  ·  Core Object: Stop (route_stop)
  * Reads/writes: RouteService.listStopsByDate · addStop · removeStop · markStopDelivered
  */
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { RefreshCw, Trash2, CheckCircle2, Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -40,8 +41,7 @@ export const Route = createFileRoute("/_authenticated/admin/routes/stops")({
     routeId: typeof s.routeId === "string" ? s.routeId : undefined,
   }),
   beforeLoad: ({ context }) => {
-    const roles = (context as { roles?: string[] }).roles ?? [];
-    if (!roles.some((r) => ROLES_ALLOWED.includes(r))) throw redirect({ to: "/admin" });
+    assertCapabilityFromContext(context, "logistics.operate");
   },
   component: StopsPage,
   head: () => ({ meta: [{ title: "YourMeal OS — Paradas" }] }),

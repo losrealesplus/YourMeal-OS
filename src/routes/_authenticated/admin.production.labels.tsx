@@ -3,7 +3,8 @@
  * Capability: kitchen.operate  ·  Core Object: ProductionLabel (portion-level)
  * Reads: ProductionReportService. Genera una etiqueta por ración a partir de pedidos reales.
  */
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Printer, RefreshCw, Wheat } from "lucide-react";
 import { toast } from "sonner";
@@ -35,8 +36,7 @@ type LabelRow = {
 
 export const Route = createFileRoute("/_authenticated/admin/production/labels")({
   beforeLoad: ({ context }) => {
-    const roles = (context as { roles?: string[] }).roles ?? [];
-    if (!roles.some((r) => ROLES_ALLOWED.includes(r))) throw redirect({ to: "/admin" });
+    assertCapabilityFromContext(context, "production.operate");
   },
   component: LabelsPage,
   head: () => ({ meta: [{ title: "YourMeal OS — Etiquetas" }] }),
