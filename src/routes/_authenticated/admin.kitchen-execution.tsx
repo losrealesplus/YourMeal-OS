@@ -2,7 +2,8 @@
  * EP-002B.2 — Kitchen Execution workspace.
  * Same data as Hoja de Producción; lot-level status mutations via KitchenExecutionService.
  */
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useState } from "react";
 import {
   ArrowLeft,
@@ -46,13 +47,7 @@ export const Route = createFileRoute("/_authenticated/admin/kitchen-execution")(
     date: typeof search.date === "string" ? search.date : undefined,
   }),
   beforeLoad: ({ context }) => {
-    const roles = (context as { roles?: string[] }).roles ?? [];
-    const allowed =
-      roles.includes("saas_admin") ||
-      roles.includes("company_admin") ||
-      roles.includes("operations_manager") ||
-      roles.includes("kitchen");
-    if (!allowed) throw redirect({ to: "/admin" });
+    assertCapabilityFromContext(context, "kitchen.operate");
   },
   component: KitchenExecutionPage,
   head: () => ({

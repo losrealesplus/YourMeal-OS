@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,9 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({
+  beforeLoad: ({ context }) => {
+    assertCapabilityFromContext(context, "admin.settings");
+  },
   component: AdminSettingsPage,
   head: () => ({
     meta: [

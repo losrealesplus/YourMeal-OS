@@ -3,7 +3,8 @@
  * Capability: kitchen.operate  ·  Core Object: PackagingBag (por pedido / cliente)
  * Reads: ProductionReportService — agrega raciones por pedido para armar bolsas reales.
  */
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Printer, RefreshCw, Package } from "lucide-react";
 import { toast } from "sonner";
@@ -34,8 +35,7 @@ type Bag = {
 
 export const Route = createFileRoute("/_authenticated/admin/production/packaging")({
   beforeLoad: ({ context }) => {
-    const roles = (context as { roles?: string[] }).roles ?? [];
-    if (!roles.some((r) => ROLES_ALLOWED.includes(r))) throw redirect({ to: "/admin" });
+    assertCapabilityFromContext(context, "production.operate");
   },
   component: PackagingPage,
   head: () => ({ meta: [{ title: "YourMeal OS — Packaging" }] }),

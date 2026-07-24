@@ -1,4 +1,5 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useTranslation } from "react-i18next";
 import { AdminHeader, SectionTitle } from "@/components/admin";
 import { cn } from "@/lib/utils";
@@ -12,6 +13,9 @@ import { cn } from "@/lib/utils";
  * Layout hub — sub-áreas: Route · Stops · Deliveries · Attempt · Incidencias.
  */
 export const Route = createFileRoute("/_authenticated/admin/routes")({
+  beforeLoad: ({ context }) => {
+    assertCapabilityFromContext(context, "logistics.operate");
+  },
   component: AdminDeliveryLayout,
   head: () => ({
     meta: [

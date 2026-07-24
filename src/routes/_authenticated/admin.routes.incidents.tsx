@@ -3,7 +3,8 @@
  * Capability: logistics.operate  ·  Core Object: Incident (order en delivery_issue)
  * Reads: DeliveryService.listIncidents  ·  Writes: OperationsService.transitionDelivery (retry)
  */
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useState } from "react";
 import { RefreshCw, AlertTriangle, Repeat2 } from "lucide-react";
 import { toast } from "sonner";
@@ -30,8 +31,7 @@ const ROLES_ALLOWED = ["saas_admin", "company_admin", "operations_manager", "log
 
 export const Route = createFileRoute("/_authenticated/admin/routes/incidents")({
   beforeLoad: ({ context }) => {
-    const roles = (context as { roles?: string[] }).roles ?? [];
-    if (!roles.some((r) => ROLES_ALLOWED.includes(r))) throw redirect({ to: "/admin" });
+    assertCapabilityFromContext(context, "logistics.operate");
   },
   component: IncidentsPage,
   head: () => ({ meta: [{ title: "YourMeal OS — Incidencias" }] }),

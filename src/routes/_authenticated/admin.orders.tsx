@@ -3,6 +3,7 @@
  * PR-034
  */
 import { createFileRoute } from "@tanstack/react-router";
+import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
@@ -37,6 +38,9 @@ import {
 } from "@/modules/operations";
 
 export const Route = createFileRoute("/_authenticated/admin/orders")({
+  beforeLoad: ({ context }) => {
+    assertCapabilityFromContext(context, "orders.read");
+  },
   component: AdminOrdersPage,
   head: () => ({
     meta: [{ title: "YourMeal OS — Pedidos" }],

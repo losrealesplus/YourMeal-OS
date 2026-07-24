@@ -3,7 +3,8 @@
  * Capability: logistics.operate  ·  Core Object: Route
  * Reads/writes: RouteService  ·  Audit: automático (create / status_change / update).
  */
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useState } from "react";
 import { RefreshCw, Plus, Truck, MapPin } from "lucide-react";
 import { toast } from "sonner";
@@ -31,8 +32,7 @@ const ROLES_ALLOWED = ["saas_admin", "company_admin", "operations_manager", "log
 
 export const Route = createFileRoute("/_authenticated/admin/routes/")({
   beforeLoad: ({ context }) => {
-    const roles = (context as { roles?: string[] }).roles ?? [];
-    if (!roles.some((r) => ROLES_ALLOWED.includes(r))) throw redirect({ to: "/admin" });
+    assertCapabilityFromContext(context, "logistics.operate");
   },
   component: RoutesIndexPage,
   head: () => ({ meta: [{ title: "YourMeal OS — Rutas" }] }),

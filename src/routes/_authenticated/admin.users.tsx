@@ -2,7 +2,8 @@
  * ADMIN · Usuarios — listado real de miembros del tenant + roles (RBAC).
  * Capability: admin.settings / saas.manage / company_admin
  */
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -18,10 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/admin/users")({
   beforeLoad: ({ context }) => {
-    const roles = (context as { roles?: string[] }).roles ?? [];
-    const allowed =
-      roles.includes("saas_admin") || roles.includes("company_admin");
-    if (!allowed) throw redirect({ to: "/admin" });
+    assertCapabilityFromContext(context, "employee.manage");
   },
   component: AdminUsersPage,
   head: () => ({

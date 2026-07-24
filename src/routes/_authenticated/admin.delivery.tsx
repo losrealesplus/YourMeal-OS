@@ -2,7 +2,8 @@
  * Workspace Reparto — pedidos listos / en ruta / incidencia.
  * PR-034 · Operations Workspace Activation
  */
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useState } from "react";
 import { Truck, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
@@ -48,16 +49,7 @@ import {
 
 export const Route = createFileRoute("/_authenticated/admin/delivery")({
   beforeLoad: ({ context }) => {
-    const roles = (context as { roles?: string[] }).roles ?? [];
-    const allowed =
-      roles.includes("saas_admin") ||
-      roles.includes("operations_manager") ||
-      roles.includes("delivery") ||
-      roles.includes("logistics") ||
-      roles.includes("driver");
-    if (!allowed) {
-      throw redirect({ to: "/admin" });
-    }
+    assertCapabilityFromContext(context, "logistics.operate");
   },
   component: DeliveryWorkspacePage,
   head: () => ({

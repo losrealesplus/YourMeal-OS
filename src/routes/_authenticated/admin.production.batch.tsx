@@ -3,7 +3,8 @@
  * Capability: kitchen.operate  ·  Core Object: KitchenProductionBatch (dish × day)
  * Reads: ProductionReportService  ·  Writes: KitchenExecutionService.transitionBatch
  */
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useState } from "react";
 import { RefreshCw, Clock, Wheat } from "lucide-react";
 import { toast } from "sonner";
@@ -33,8 +34,7 @@ const ROLES_ALLOWED = ["saas_admin", "company_admin", "operations_manager", "kit
 
 export const Route = createFileRoute("/_authenticated/admin/production/batch")({
   beforeLoad: ({ context }) => {
-    const roles = (context as { roles?: string[] }).roles ?? [];
-    if (!roles.some((r) => ROLES_ALLOWED.includes(r))) throw redirect({ to: "/admin" });
+    assertCapabilityFromContext(context, "production.operate");
   },
   component: ProductionBatchPage,
   head: () => ({ meta: [{ title: "YourMeal OS — Batch" }] }),
