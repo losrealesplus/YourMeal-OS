@@ -99,7 +99,7 @@ function AdminAuthPage() {
             <form onSubmit={submit} className="grid gap-4 mt-8">
               <label className="relative block">
                 <Mail
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-[#9a8f7c]/80"
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground"
                   strokeWidth={1.75}
                   aria-hidden
                 />
@@ -115,7 +115,7 @@ function AdminAuthPage() {
               </label>
               <label className="relative block">
                 <Lock
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-[#9a8f7c]/80"
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground"
                   strokeWidth={1.75}
                   aria-hidden
                 />
@@ -143,7 +143,7 @@ function AdminAuthPage() {
             <PoweredByLine />
             <Link
               to="/auth"
-              className="text-xs text-[#9a8f7c]/80 hover:text-foreground transition-colors"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
               {t("auth:backToCustomerLogin")}
             </Link>
