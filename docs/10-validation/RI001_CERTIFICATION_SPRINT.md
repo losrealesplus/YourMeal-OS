@@ -1,58 +1,72 @@
 # RI-001 Certification Sprint
 
 **Mode:** Certificador — **no new features**  
+**Stage:** Stabilization · Integration · Certification  
 **Prerequisite:** [Acta de Cierre OP-001](./ACTA_CIERRE_OP001.md) · Bootstrap Engineering = PASS  
-**Goal:** Convert ORR PASS WITH OBSERVATIONS → PASS, then CHECK-IT 05 → RI-001 Certification Report
+**Goal:** DV-001 PASS → Day-0 → ORR PASS → CHECK-IT 05 → RI-001 Certification Report
+
+Every advance should answer: deployed correctly? · demonstrated with evidence? · documented for certification?
 
 ---
 
-## Order of work
+## Fase 1 · Integración
 
-### 1. Merge stack to `main` (Lovable publish branch)
-
-**AUD-001:** PR #54 merged into feature branch only — Runtime Deployment = **FAIL**, Evidence = **BLOCKED**.
-
+**AUD-001:** PR #54 is on the feature stack only — Runtime Deployment = FAIL, Evidence = BLOCKED.  
 See [AUD001_RUNTIME_DEPLOYMENT_AUDIT.md](./AUD001_RUNTIME_DEPLOYMENT_AUDIT.md).
 
-**No more feature code.** Integration checklist:
+1. Merge OP-001 → OP-001.1 → OP-001.2 stack into Lovable publish branch (`main`)  
+2. Verify final SHA of `main`  
+3. Trigger Lovable deploy  
+4. Record new `x-deployment-id`
 
-1. Merge OP-001 stack → `main` (or Lovable-connected branch)  
-2. Verify SHA on publish branch  
-3. New Lovable deploy → record `x-deployment-id` in [DV-001](./DEPLOYMENT_VERIFICATION.md)  
-4. [Post-deploy smoke](./POST_DEPLOY_SMOKE_OP001.md) (6 checks)  
-5. Only if smoke PASS → Day-0
+**No continuar si el stack no está en `main`.**
 
-### 2. Clean environment
+---
 
-```bash
-supabase db reset
-npm run seed
-# login as seeded saas_admin → /saas
-```
+## Fase 2 · DV-001
 
-### 3. Complete Day-0 checklist
+**No continuar si DV-001 no pasa.**
 
-Fill [OP001_DAY0_CHECKLIST.md](./OP001_DAY0_CHECKLIST.md) with Expected / Actual / **Evidence ID**.  
-Store artifacts under `evidence/op001/screenshots/` and `evidence/op001/run-logs/`.
+Question: *¿Estoy probando realmente la versión correcta?*
 
-### 4. Update ORR
+1. [DEPLOYMENT_VERIFICATION.md](./DEPLOYMENT_VERIFICATION.md) — SHA match + deployment-id  
+2. [POST_DEPLOY_SMOKE_OP001.md](./POST_DEPLOY_SMOKE_OP001.md) — 6 checks  
+3. On **first PASS**: fill [evidence/op001/DV001_FIRST_PASS.md](./evidence/op001/DV001_FIRST_PASS.md) and copy the identity block into ORR + RI-001 Certification Report
 
-[OP001_OPERATIONAL_READINESS_REPORT.md](./OP001_OPERATIONAL_READINESS_REPORT.md)
+| Campo | Valor |
+|-------|-------|
+| Branch certificada | `main` |
+| Commit SHA | `<sha>` |
+| Deployment ID | `<x-deployment-id>` |
+| Fecha | `<timestamp>` |
+| DV-001 | PASS |
+
+---
+
+## Fase 3 · Day-0
+
+Only after DV-001 + smoke PASS:
 
 ```text
-PASS WITH OBSERVATIONS  →  PASS
+supabase db reset
+        ↓
+npm run seed
+        ↓
+Login
+        ↓
+Bootstrap completo
 ```
 
-Remove ORR-01 once Day-0 is demonstrated with service role.
+Fill [OP001_DAY0_CHECKLIST.md](./OP001_DAY0_CHECKLIST.md) (Expected / Actual / Evidence ID).  
+Store EV-* under `evidence/op001/`.  
+Update [ORR](./OP001_OPERATIONAL_READINESS_REPORT.md) → **PASS** (cite DV-001 identity block).
 
-### 5. Re-run CHECK-IT 05
+---
 
-Record result in [reports/CHECKIT05_REPORT.md](./reports/CHECKIT05_REPORT.md) and `evidence/ri001/`.
+## Fase 4 · Certificación
 
-### 6. Emit RI-001 Certification Report
-
-Fill [reports/RI001_CERTIFICATION_REPORT.md](./reports/RI001_CERTIFICATION_REPORT.md)  
-Decision: READY / READY WITH OBSERVATIONS / NOT READY (CG-RI-001).
+1. [CHECK-IT 05](./reports/CHECKIT05_REPORT.md) — cite same SHA + Deployment ID  
+2. [RI-001 Certification Report](./reports/RI001_CERTIFICATION_REPORT.md) — READY / RWO / NOT READY  
 
 ---
 
@@ -66,8 +80,10 @@ Decision: READY / READY WITH OBSERVATIONS / NOT READY (CG-RI-001).
 
 ## Definition of done (sprint)
 
-- [ ] Day-0 executed on clean env  
-- [ ] Checklist EV-* complete  
+- [ ] Stack on publish branch (`main`)  
+- [ ] DV-001 PASS + identity block recorded  
+- [ ] Post-deploy smoke 6/6  
+- [ ] Day-0 + EV-* complete  
 - [ ] ORR = PASS  
 - [ ] CHECK-IT 05 recorded  
 - [ ] RI-001 Certification Report issued  

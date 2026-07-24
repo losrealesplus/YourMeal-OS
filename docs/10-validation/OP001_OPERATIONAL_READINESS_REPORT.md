@@ -22,6 +22,22 @@
 
 ---
 
+## Certified runtime identity (DV-001)
+
+Fill when the publish-branch deploy is verified — **required before ORR → PASS**.
+
+| Campo | Valor |
+|-------|-------|
+| Branch certificada | `main` |
+| Commit SHA | _(pending merge + DV-001)_ |
+| Deployment ID | _(pending)_ |
+| Fecha | _(pending)_ |
+| DV-001 | _(pending)_ |
+
+See [DEPLOYMENT_VERIFICATION.md](./DEPLOYMENT_VERIFICATION.md).
+
+---
+
 ## Scope verified in this run
 
 | Item | Result |

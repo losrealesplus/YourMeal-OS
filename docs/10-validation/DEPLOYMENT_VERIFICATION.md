@@ -8,6 +8,26 @@ Sin este gate, se puede invertir una jornada intentando certificar una versión 
 
 ---
 
+## Permanent certification identity (first DV-001 PASS)
+
+When DV-001 passes for the **first** time on the publish branch, copy this block into:
+
+- [OP001_OPERATIONAL_READINESS_REPORT.md](./OP001_OPERATIONAL_READINESS_REPORT.md)
+- [reports/RI001_CERTIFICATION_REPORT.md](./reports/RI001_CERTIFICATION_REPORT.md)
+- Evidence: `evidence/op001/DV001_<UTC-date>.md`
+
+| Campo | Valor |
+|-------|-------|
+| Branch certificada | `main` |
+| Commit SHA | `<sha>` |
+| Deployment ID | `<x-deployment-id>` |
+| Fecha | `<timestamp UTC>` |
+| DV-001 | PASS |
+
+All subsequent EV-* / CHECK-IT 05 / RI-001 artifacts for that certification wave **must** cite this SHA + Deployment ID.
+
+---
+
 ## When to run
 
 | Moment | Required |

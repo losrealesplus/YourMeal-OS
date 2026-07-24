@@ -37,11 +37,13 @@ docs/10-validation/
 | Bootstrap Evidence | ⛔ BLOCKED (cannot certify wrong build) |
 | CHECK-IT 05 | ⛔ BLOCKED |
 
+**Project stage:** Stabilization · Integration · Certification (not feature construction).
+
 ## Next
 
 **No feature PRs.** Integration only:
 
 1. Merge OP-001 stack → Lovable publish branch (`main`)  
-2. [DV-001 Deployment Verification](./DEPLOYMENT_VERIFICATION.md)  
-3. [Post-deploy smoke](./POST_DEPLOY_SMOKE_OP001.md)  
-4. Then [RI001_CERTIFICATION_SPRINT.md](./RI001_CERTIFICATION_SPRINT.md)
+2. [DV-001](./DEPLOYMENT_VERIFICATION.md) + [post-deploy smoke](./POST_DEPLOY_SMOKE_OP001.md)  
+3. Record first PASS in [DV001_FIRST_PASS.md](./evidence/op001/DV001_FIRST_PASS.md)  
+4. Then [RI001_CERTIFICATION_SPRINT.md](./RI001_CERTIFICATION_SPRINT.md) Fases 3–4
