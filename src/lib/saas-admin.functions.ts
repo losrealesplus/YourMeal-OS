@@ -46,15 +46,8 @@ async function assertSaasAdmin(ctx: {
 }
 
 async function writeAudit(
-  admin: Awaited<
-    ReturnType<
-      typeof import("@/integrations/supabase/client.server")
-    >["supabaseAdmin"] extends infer T
-      ? T
-      : never
-  > extends infer U
-    ? U
-    : never,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  admin: any,
   input: {
     tenantId: string | null;
     actorId: string;
@@ -65,17 +58,17 @@ async function writeAudit(
     newData?: unknown;
   },
 ) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (admin as any).from("audit_log").insert({
+  await admin.from("audit_log").insert({
     tenant_id: input.tenantId,
     actor_id: input.actorId,
     entity_type: input.entityType,
     entity_id: input.entityId,
     action: input.action,
-    old_data: (input.oldData ?? null) as never,
-    new_data: (input.newData ?? null) as never,
+    old_data: input.oldData ?? null,
+    new_data: input.newData ?? null,
   });
 }
+
 
 // -------- Tenants --------
 
