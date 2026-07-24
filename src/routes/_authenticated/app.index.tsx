@@ -1,12 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { ReactNode } from "react";
-import {
-  ChevronRight,
-  Heart,
-  Truck,
-  UtensilsCrossed,
-} from "lucide-react";
+import { ChevronRight, Heart, UtensilsCrossed } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import {
   PrimaryCTA,
@@ -14,21 +9,22 @@ import {
   DashboardError,
   OfflineBanner,
   DashboardStateSwitcher,
+  UpcomingDeliveryCard,
   dashboardStateIds,
   isDashboardState,
   type DashboardStateId,
   MenuDishPost,
   dishMacrosLine,
 } from "@/components/consumer";
-import { brandConfig } from "@/tenant/brand-config";
 import { TenantLogo } from "@/components/tenant/tenant-logo";
 import { useWeeklyMenu } from "@/hooks/use-weekly-menu";
+import { useUpcomingDelivery } from "@/hooks/use-upcoming-delivery";
 import { utcWeekStartMonday } from "@/modules/weekly-menu/application/week-dates";
 import dishPhoto from "@/assets/eatclean-hero.jpg";
 
 /**
- * SCR-005 · Home — CJ-001
- * Alive food-app home: weekly menu available + one CTA + featured dish.
+ * SCR-005 · Home — CJ-001 + EP-002A.1 Próxima entrega
+ * Customer Weekly Cycle: next delivery is the information center.
  */
 export const Route = createFileRoute("/_authenticated/app/")({
   validateSearch: (search: Record<string, unknown>): { state?: DashboardStateId } => ({
@@ -88,9 +84,11 @@ function HomeBody({
   const navigate = useNavigate({ from: "/app" });
   const weekStart = utcWeekStartMonday();
   const { data: weeklyMenu } = useWeeklyMenu(weekStart);
+  const { data: upcoming, isLoading: upcomingLoading } = useUpcomingDelivery();
 
   const featured =
     weeklyMenu?.days.flatMap((d) => d.dishes).find(Boolean) ?? null;
+  const hasUpcoming = upcoming?.kind === "upcoming";
 
   const macroLabels = {
     protein: t("macroProtein"),
@@ -127,22 +125,39 @@ function HomeBody({
 
       <div className="mt-10 text-center space-y-3">
         <h1 className="text-[1.75rem] font-extrabold tracking-tight text-balance">
-          {t("greeting")}{name ? ` ${name}` : ""}
+          {t("greeting")}
+          {name ? ` ${name}` : ""}
         </h1>
         <p className="text-lg font-semibold leading-snug text-foreground/90 text-pretty max-w-[20rem] mx-auto">
-          {t("homeMenuReady")}
+          {hasUpcoming ? t("assistantHint") : t("homeMenuReady")}
         </p>
       </div>
 
+      {/* EP-002A.1 — information center */}
       <div className="mt-8">
-        <Link to="/app/menu" className="block">
-          <PrimaryCTA className="!h-16 !text-base !rounded-[1.25rem]">
-            {t("homeViewMenuCta")}
-          </PrimaryCTA>
-        </Link>
+        <UpcomingDeliveryCard result={upcoming} isLoading={upcomingLoading} />
       </div>
 
-      {featured ? (
+      {!hasUpcoming ? (
+        <div className="mt-4">
+          <Link to="/app/menu" className="block">
+            <PrimaryCTA className="!h-14 !text-base !rounded-[1.25rem]" variant="outline">
+              {t("homeViewMenuCta")}
+            </PrimaryCTA>
+          </Link>
+        </div>
+      ) : (
+        <div className="mt-4">
+          <Link
+            to="/app/menu"
+            className="flex h-12 items-center justify-center rounded-2xl border border-border text-sm font-bold"
+          >
+            {t("homeViewMenuCta")}
+          </Link>
+        </div>
+      )}
+
+      {featured && !hasUpcoming ? (
         <div className="mt-12 space-y-5">
           <p className="text-sm font-semibold text-muted-foreground tracking-wide">
             {t("homeFeatured")}
@@ -174,11 +189,6 @@ function HomeBody({
           icon={<Heart className="size-5" strokeWidth={2} />}
           label={t("homeFavorites")}
         />
-        <QuietLink
-          to="/app/orders"
-          icon={<Truck className="size-5" strokeWidth={2} />}
-          label={t("nextDelivery")}
-        />
       </div>
     </div>
   );
@@ -189,7 +199,7 @@ function QuietLink({
   icon,
   label,
 }: {
-  to: "/app/menu" | "/app/orders" | "/app/schedule";
+  to: "/app/menu" | "/app/schedule";
   icon: ReactNode;
   label: string;
 }) {
