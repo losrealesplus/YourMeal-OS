@@ -99,6 +99,7 @@ Detalle: [RI001_CERTIFICATION_GATE](./RI001_CERTIFICATION_GATE.md) · cosecha FO
 - [ ] EP-OPS-001 PASS · Architecture Freeze activo.
 - [ ] Carriles del Gate ejecutados con evidencia (DICT-006).
 - [ ] ORS-001 PASS (o NOT READY documentado).
-- [ ] [RI-001 Certification Report](./RI001_CERTIFICATION_REPORT.md) emitido (READY / RWO / NOT READY).
-- [ ] Knowledge harvested for FOPEBA registrado.
-- [ ] Congelación metodológica respetada (sin nuevos principios hasta el Report).
+- [ ] [RI-001 Certification Report](./RI001_CERTIFICATION_REPORT.md) emitido (decisión + rationale + evidence).
+- [ ] Decisión firmada (READY / RWO / NOT READY).
+- [ ] Knowledge Harvest incorporado a FOPEBA (cierre formal RI-001).
+- [ ] Congelación metodológica respetada durante la certificación.

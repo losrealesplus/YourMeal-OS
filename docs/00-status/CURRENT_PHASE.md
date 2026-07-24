@@ -42,24 +42,24 @@ Mapa EP:
   —— RI-001 Certification Report —— □□□□□□□□□□  ← decisión + cosecha FOPEBA
   EP-002B.3–B.4 (cola)             □□□□□□□□□□
 
-Hoy: Capas separadas · Gate con salidas objetivas · siguiente hito = Certification Report (no DICT nuevo).
-Ciclo: principios → implementación → certificación → conocimiento validado.
+Hoy: Capas estabilizadas · Report = decisión justificada por evidencia · cierre RI-001 = Report + firma + FOPEBA.
+Ciclo: principios → conocimiento → implementación → certificación → conocimiento validado → siguiente producto.
 
 Riesgo principal: abrir FCR/E2E sin EP-OPS-001 PASS → evidencia contaminada
 
 Incertidumbres de diseño grandes: **ninguna**.
-Congelación metodológica: **activa** hasta decisión RI-001.
+Congelación metodológica: **activa** hasta Certification Report + cosecha FOPEBA.
 
 G-02 = Pilot Authorization  ≠  Release / v1.0
-Pregunta principal: ¿Qué evidencia falta para decidir RI-001 con objetividad?
+Pregunta del Report: ¿Por qué esta decisión está justificada por la evidencia disponible?
 
-Primary Artifact:  [Gate](./RI001_CERTIFICATION_GATE.md) · [Report](./RI001_CERTIFICATION_REPORT.md) · [Board](./EP_OPS_001_RELEASE_BOARD.md) · [OCM](./EATCLEAN_OPERATIONAL_STRUCTURE.md) · [ORS](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md)
+Primary Artifact:  [Report](./RI001_CERTIFICATION_REPORT.md) · [Gate](./RI001_CERTIFICATION_GATE.md) · [Board](./EP_OPS_001_RELEASE_BOARD.md) · [OCM](./EATCLEAN_OPERATIONAL_STRUCTURE.md) · [ORS](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md)
 Evidence:          [DICT-006](../99-reference/PROJECT_DICTIONARY.md#evidence) — escenario ejecutado y documentado
 Visibilidad:       [DICT-071](../20-evidence-framework/09-operational-visibility-principle.md)
 Ops pattern:       [DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md)
 Tenant autonomy:   [DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)
 OCM / Gate / ORS:  DICT-074 · DICT-075 · DICT-076
-Hoy (Certificación): [Gate](./RI001_CERTIFICATION_GATE.md) · [Report](./RI001_CERTIFICATION_REPORT.md) · [Board](./EP_OPS_001_RELEASE_BOARD.md) · [OCM](./EATCLEAN_OPERATIONAL_STRUCTURE.md) · [ORS](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) · [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)
+Hoy (Certificación): [Report](./RI001_CERTIFICATION_REPORT.md) · [Gate](./RI001_CERTIFICATION_GATE.md) · [Board](./EP_OPS_001_RELEASE_BOARD.md) · [OCM](./EATCLEAN_OPERATIONAL_STRUCTURE.md) · [ORS](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) · [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)
 Seguridad pre-piloto: [Pilot Security Checklist](../09-security/PILOT_SECURITY_CHECKLIST.md) (10 corregidos · 1 Accepted documentado)
 Antes de firmar G-02 PASSED: ORR firmados · cero humo · No Artificiality
 PR taxonomy (post G-02): Evidence · KU · Correction · Pilot Fix · Operational Finding

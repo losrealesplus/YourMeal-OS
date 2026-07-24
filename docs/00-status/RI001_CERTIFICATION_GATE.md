@@ -238,14 +238,32 @@ Pregunta diaria: **¿qué bloqueador eliminamos hoy?**
 
 ## Siguiente hito
 
-Tras completar los carriles → emitir [**RI-001 Certification Report**](./RI001_CERTIFICATION_REPORT.md):
+Tras completar los carriles → emitir [**RI-001 Certification Report**](./RI001_CERTIFICATION_REPORT.md) (estructura orientada a **decisión**, no a cronología):
 
 ```text
-Resultado · Fecha · Versión · Evidencias · Hallazgos
-Decisión · Lecciones · Knowledge harvested for FOPEBA
+1 Executive Summary · 2 Scope · 3 Certification Basis
+4 Evidence Summary · 5 Findings · 6 Decision · 7 Rationale
+8 Knowledge Harvest · 9 Next Actions
 ```
 
-Ese informe es el puente YourMeal OS → FOPEBA.
+Pregunta del informe: **¿por qué esta decisión está justificada por la evidencia disponible?**
+
+---
+
+## Cierre formal de RI-001
+
+RI-001 **termina** únicamente cuando:
+
+1. Se emite el **RI-001 Certification Report**.  
+2. La decisión (READY / RWO / NOT READY) queda **firmada** y **justificada con evidencia**.  
+3. El conocimiento se incorpora a **FOPEBA** como patrones reutilizables.  
+
+```text
+Principios → Conocimiento → Implementación → Certificación
+        → Conocimiento validado → FOPEBA → Siguiente producto
+```
+
+**Consecuencia estratégica:** YourMeal OS deja de ser solo el primer producto del ecosistema y pasa a ser el **primer caso de referencia certificado de FOPEBA**. CompiME, LosReales+ y siguientes reutilizan arquitectura, código **y** un proceso de certificación respaldado por experiencia real.
 
 ---
 
@@ -259,5 +277,6 @@ Ese informe es el puente YourMeal OS → FOPEBA.
 | Release Board | Gestión de liberaciones / bloqueadores |
 | Operational Observability | Evidencia en operación |
 | Evidence (DICT-006) | Criterio epistémico de certificación |
+| Certification Report | Plantilla de decisión de RI |
 
 Ciclo completo: **principios → implementación → certificación → conocimiento validado**.
