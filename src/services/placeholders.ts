@@ -18,7 +18,6 @@ function stub(name: string) {
 
 export const InventoryService = stub("InventoryService");
 export const AccountingService = stub("AccountingService");
-export const RouteService = stub("RouteService");
 export const NotificationService = stub("NotificationService");
 export const ProductionService = stub("ProductionService");
 export const PurchasingService = stub("PurchasingService");
