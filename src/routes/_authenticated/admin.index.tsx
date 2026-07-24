@@ -33,6 +33,7 @@ import { OperationsService } from "@/modules/operations";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { SaasOpsEntry } from "@/components/tenant/saas-ops-entry";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: OpsCenterHome,
@@ -355,6 +356,11 @@ function OpsCenterHome() {
           </ul>
         </section>
       ) : null}
+
+      <div className="relative mt-12 flex justify-center pb-2">
+        <SaasOpsEntry />
+      </div>
+
 
       <style>{`
         @keyframes ops-home-in {
