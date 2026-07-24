@@ -1,5 +1,9 @@
 # EatClean Pilot Ready · Functional Completeness Review
 
+> **Actualización 2026-07-24 (tarde):** el proyecto entra en **modo certificación RI-001**.  
+> Matriz viva y guion E2E: **[RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md)**.  
+> Este documento conserva la revisión estática del 2026-07-23 y el enlace a EP-001.
+
 > **Actualización 2026-07-24:** sprint de implementación EP-001 — ver matriz e informe en [EP001_FUNCTIONAL_COMPLETENESS_SPRINT.md](./EP001_FUNCTIONAL_COMPLETENESS_SPRINT.md). Este documento conserva la revisión estática del 2026-07-23.
 
 **Fecha:** 2026-07-23  

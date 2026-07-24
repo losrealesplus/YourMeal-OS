@@ -12,18 +12,20 @@ FOUNDATION / BLUEPRINT / DISCOVERY / OM / VALIDATION / IOV   ✅
 FOV PREPARATION · ORR (marco) · G-02 (Gate formalizado)     ✅
 EP-001 Functional Completeness (cero humo Admin/Ops nav)    ✅
 ────────────────────────────
-Siguiente sprint:  **RI-001 Readiness** (cerrar PRs · cero humo · RBAC · E2E · Release Review)
-                   (EP-002A.1–A.3 ✅ · Hoja de Producción ✅ · Kitchen Execution ✅)
-                   · EP-002B.3 Packaging / B.4 Delivery **en cola** (después de Readiness)
-Siguiente artefacto:  [RI001_READINESS_SPRINT](./RI001_READINESS_SPRINT.md) → iniciar RI-001
+Modo:                **CERTIFICACIÓN** — no nuevas capacidades / no PRs funcionales
+Siguiente sprint:    **RI-001 Certification** (matriz · dual Ops · RBAC · E2E · evidencia)
+                     (EP-002A ✅ · EP-002B.1–B.2 ✅ · #45–#48 · #52 en main)
+                     · Packaging/Delivery **en cola**
+Siguiente artefacto: [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md)
+                     → Release Review → iniciar RI-001
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████
   Gobernanza          ██████████
   Modelo operacional  ██████████
   Administración      ██████████
-  Customer App        ████████░░  ← EP-002A (último tramo / consolidación)
-  Operaciones         ████████░░  ← EP-002B (B.1·B.2 ✅ · Readiness antes de B.3)
+  Customer App        █████████░  ← certificar (A.1–A.3 en main)
+  Operaciones         ████████░░  ← certificar (B.1·B.2 en main)
   Data                ███████░░░
 
 Mapa EP:
@@ -32,15 +34,15 @@ Mapa EP:
   EP-002A · Customer Experience    ██████████
   EP-002B.1 · Production Report    ██████████
   EP-002B.2 · Kitchen Execution    ██████████
-  —— RI-001 Readiness ——           □□□□□□□□□□  ← HOY
-  EP-002B.3 · Packaging            □□□□□□□□□□  (cola post-Readiness)
+  —— CERTIFICACIÓN RI-001 ——       □□□□□□□□□□  ← HOY
+  EP-002B.3 · Packaging            □□□□□□□□□□  (cola)
   EP-002B.4 · Delivery             □□□□□□□□□□
   RI-001                           █████████░
 
 Patrón permanente: Operational Representation (DICT-072)
-Hoy: RI-001 Readiness — no nuevas capacidades; certificar operación.
+Hoy: ¿Podemos demostrar con evidencia una jornada real EatClean × YourMeal OS?
 
-Riesgo principal: ya no es diseño → **completar el ciclo semanal cliente + ejecución ops**
+Riesgo principal: ya no es construir → **certificar sin humo y con RBAC negativo**
 
 Incertidumbres de diseño grandes: **ninguna**.
 RI-001 comienza cuando EP-002A y EP-002B estén cerrados.
@@ -48,14 +50,14 @@ RI-001 comienza cuando EP-002A y EP-002B estén cerrados.
 G-02 = Pilot Authorization  ≠  Release / v1.0
 Pregunta principal: ¿Qué nos enseña la operación real sobre nuestro modelo?
 
-Primary Artifact:  [PILOT_ACCEPTANCE_CHECKLIST](./PILOT_ACCEPTANCE_CHECKLIST.md) · [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md)
+Primary Artifact:  [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md) · [PILOT_ACCEPTANCE_CHECKLIST](./PILOT_ACCEPTANCE_CHECKLIST.md) · [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md)
 Visibilidad:       [Operational Visibility · DICT-071](../20-evidence-framework/09-operational-visibility-principle.md)
 Ops pattern:       [Operational Representation · DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md)
-Hoy (Readiness):   [RI-001 Readiness Sprint](./RI001_READINESS_SPRINT.md) · [Ops dual surface](./OPS_CENTER_DUAL_SURFACE.md)
+Hoy (Certificación): [RI-001 Readiness](./RI001_READINESS_SPRINT.md) · [Ops dual surface](./OPS_CENTER_DUAL_SURFACE.md)
 Seguridad pre-piloto: [Pilot Security Checklist](../09-security/PILOT_SECURITY_CHECKLIST.md) (10 corregidos · 1 Accepted documentado)
 Antes de firmar G-02 PASSED: ORR firmados · cero humo · No Artificiality
 PR taxonomy (post G-02): Evidence · KU · Correction · Pilot Fix · Operational Finding
-Completitud UI:    [EP-001](./EP001_FUNCTIONAL_COMPLETENESS_SPRINT.md) · siguiente [EP-002A](./EP002A_CUSTOMER_EXPERIENCE_COMPLETION.md) · [EP-002B](./EP002B_OPERATIONAL_EXECUTION.md)
+Completitud UI:    [Matriz RI-001](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md) · [EP-001](./EP001_FUNCTIONAL_COMPLETENESS_SPRINT.md) · [EP-002A](./EP002A_CUSTOMER_EXPERIENCE_COMPLETION.md) · [EP-002B](./EP002B_OPERATIONAL_EXECUTION.md)
 Hallazgos Lovable: [Decisiones](./LOVABLE_FINDINGS_DECISIONS.md) (contraste ✅ · GSC → [Marketing Readiness](./MILESTONE_MARKETING_READINESS.md) · Semrush draft)
 Last Baseline:     v0.2.0-engineering-baseline (IR-001)
 
