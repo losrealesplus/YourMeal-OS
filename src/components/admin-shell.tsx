@@ -68,7 +68,6 @@ export function AdminShell({ children }: { children: ReactNode }) {
     can("logistics.operate") ||
     roles.includes("delivery") ||
     roles.includes("logistics") ||
-    roles.includes("driver") ||
     admin;
   const showAllOps = admin || roles.includes("saas_admin");
   const showAdminMgmt =
