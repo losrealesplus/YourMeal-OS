@@ -73,6 +73,7 @@ export function mapDishRowToCatalogDish(row: DishRow): CatalogDish {
     proteinG: macros.proteinG,
     carbsG: macros.carbsG,
     fatG: macros.fatG,
+    price: num(row.price),
     tags: filterTags(row.tags),
     allergens: row.allergens ?? [],
     ingredients: [],
