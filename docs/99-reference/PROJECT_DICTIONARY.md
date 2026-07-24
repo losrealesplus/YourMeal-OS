@@ -135,6 +135,8 @@ Core | Operational | Engineering | Historical
 | `DICT-072` | [Operational Representation Pattern](#operational-representation-pattern) | Engineering | Accepted |
 | `DICT-073` | [Tenant Operational Autonomy](#tenant-operational-autonomy) | Core | Accepted |
 | `DICT-074` | [Operational Canonical Model](#operational-canonical-model) | Core | Accepted |
+| `DICT-075` | [Certification Gate](#certification-gate) | Core | Accepted |
+| `DICT-076` | [Operational Reference Scenario](#operational-reference-scenario) | Core | Accepted |
 | `DICT-006` | [Evidence](#evidence) | Core | Accepted |
 | `DICT-007` | [Knowledge Leakage](#knowledge-leakage) | Core | Accepted |
 | `DICT-008` | [Operational Model](#operational-model) | Core | Accepted |
@@ -203,7 +205,7 @@ Core | Operational | Engineering | Historical
 
 ### Metodología
 
-[FOPEBA](#fopeba) (`DICT-001`) · [FOV](#fov) (`DICT-002`) · [IOV](#iov) (`DICT-003`) · [Knowledge Update](#knowledge-update) (`DICT-004`) · [Gate](#gate) (`DICT-005`) · [Pilot Integrity](#pilot-integrity) (`DICT-069`) · [Reference Implementation](#reference-implementation-ri) (`DICT-070`) · [Operational Visibility](#operational-visibility) (`DICT-071`) · [Operational Representation Pattern](#operational-representation-pattern) (`DICT-072`) · [Tenant Operational Autonomy](#tenant-operational-autonomy) (`DICT-073`) · [Operational Canonical Model](#operational-canonical-model) (`DICT-074`) · [Evidence](#evidence) (`DICT-006`) · [Knowledge Leakage](#knowledge-leakage) (`DICT-007`) · [Operational Model](#operational-model) (`DICT-008`) · [Table Validation](#table-validation) (`DICT-009`) · [Field Validation](#field-validation) (`DICT-010`) · [Knowledge Lifetime](#knowledge-lifetime) (`DICT-057`)
+[FOPEBA](#fopeba) (`DICT-001`) · [FOV](#fov) (`DICT-002`) · [IOV](#iov) (`DICT-003`) · [Knowledge Update](#knowledge-update) (`DICT-004`) · [Gate](#gate) (`DICT-005`) · [Pilot Integrity](#pilot-integrity) (`DICT-069`) · [Reference Implementation](#reference-implementation-ri) (`DICT-070`) · [Operational Visibility](#operational-visibility) (`DICT-071`) · [Operational Representation Pattern](#operational-representation-pattern) (`DICT-072`) · [Tenant Operational Autonomy](#tenant-operational-autonomy) (`DICT-073`) · [Operational Canonical Model](#operational-canonical-model) (`DICT-074`) · [Certification Gate](#certification-gate) (`DICT-075`) · [Operational Reference Scenario](#operational-reference-scenario) (`DICT-076`) · [Evidence](#evidence) (`DICT-006`) · [Knowledge Leakage](#knowledge-leakage) (`DICT-007`) · [Operational Model](#operational-model) (`DICT-008`) · [Table Validation](#table-validation) (`DICT-009`) · [Field Validation](#field-validation) (`DICT-010`) · [Knowledge Lifetime](#knowledge-lifetime) (`DICT-057`)
 
 ### Ingeniería
 
@@ -3145,7 +3147,85 @@ Mock de marketing · inventario exhaustivo de pantallas · sustituir el Operatio
 OCM-001 · ORS-001 · Release Board · EP-OPS-001 · Tenant Operational Autonomy · Operational Visibility · Reference Implementation · FOPEBA
 
 ## Referencias
-[OCM-001](../00-status/EATCLEAN_OPERATIONAL_STRUCTURE.md) · [Release Board](../00-status/EP_OPS_001_RELEASE_BOARD.md) · [EP-OPS-001](../00-status/EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)
+[OCM-001](../00-status/EATCLEAN_OPERATIONAL_STRUCTURE.md) · [Release Board](../00-status/EP_OPS_001_RELEASE_BOARD.md) · [EP-OPS-001](../00-status/EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · [ORS-001](../00-status/ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) · [Certification Gate](../00-status/RI001_CERTIFICATION_GATE.md)
+
+
+---
+
+# Certification Gate
+
+## ID
+DICT-075
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Certification Gate
+
+## Tipo
+Patrón de Gate (DICT-005) para certificación operacional de una Reference Implementation
+
+## Definición
+Momento formal en el que, con arquitectura y OCM estables, se decide el estado de una RI (**READY** · **READY WITH OBSERVATIONS** · **NOT READY**) exclusivamente a partir de evidencia. La pregunta guía deja de ser “¿qué falta por implementar?” y pasa a ser “¿qué evidencia falta para una decisión objetiva?”.
+
+## Implica
+- Instancia RI-001: **CG-RI-001** ([RI001_CERTIFICATION_GATE](../00-status/RI001_CERTIFICATION_GATE.md)).
+- Carriles: FCR · RBAC · Observability · E2E/ORS · Evidence · RRR.
+- Entrada típica: EP de hub operacional PASS + Architecture Freeze.
+- Release Board = eliminación de bloqueadores (no backlog).
+- Cosecha FOPEBA post-decisión: patrones reutilizables (OCM · ORS · Gate · Board · Observability).
+
+## No significa
+Release a producción · v1.0 · sustituir G-02 Pilot Readiness · reabrir arquitectura por preferencia.
+
+## Palabras relacionadas
+Gate · Reference Implementation · Evidence · OCM · ORS · Release Board · FOPEBA · Architecture Freeze
+
+## Referencias
+[RI001_CERTIFICATION_GATE](../00-status/RI001_CERTIFICATION_GATE.md) · [Gate DICT-005](#gate) · [Release Board](../00-status/EP_OPS_001_RELEASE_BOARD.md)
+
+
+---
+
+# Operational Reference Scenario
+
+## ID
+DICT-076
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Operational Reference Scenario (ORS)
+
+## Tipo
+Prueba operacional de referencia / patrón de validación
+
+## Definición
+Escenario formal que demuestra que un tenant puede operar una jornada completa en la plataforma **sin intervención de ingeniería**. Es el activo central de certificación de una RI. Fallar el ORS impide certificar la RI.
+
+## Implica
+- Instancia RI-001: **ORS-001** ([ORS_001](../00-status/ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md)).
+- Criterios de aceptación explícitos (aprovisionamiento → pedido → cocina → reparto → resultado → observabilidad).
+- Todo E2E futuro es variación del ORS, no un flujo distinto.
+- Acoplado a Operational Observability.
+- Patrón FOPEBA de validación operacional post-cosecha.
+
+## No significa
+Test unitario · checklist de UI aislada · demo de marketing sin evidencia · sustituir FCR.
+
+## Palabras relacionadas
+ORS-001 · OCM-001 · Certification Gate · Day-0 · FOPEBA · Evidence · Tenant Operational Autonomy
+
+## Referencias
+[ORS-001](../00-status/ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) · [OCM-001](../00-status/EATCLEAN_OPERATIONAL_STRUCTURE.md) · [Certification Gate](../00-status/RI001_CERTIFICATION_GATE.md)
 
 
 ## Historial de este diccionario
@@ -3173,3 +3253,4 @@ OCM-001 · ORS-001 · Release Board · EP-OPS-001 · Tenant Operational Autonomy
 | 2026-07-24 | DICT-073 Tenant Operational Autonomy · WP-5 Tenant Provisioning · Architecture Freeze |
 | 2026-07-24 | Release Board EP-OPS-001 · Day-0 Provisioning Scenario · post-PASS RRR |
 | 2026-07-24 | DICT-074 OCM-001 · ORS-001 · Observability · project nature = demonstrate |
+| 2026-07-24 | DICT-075 Certification Gate · DICT-076 ORS · CG-RI-001 · FOPEBA harvest |

@@ -3,25 +3,26 @@
 **Estado:** Active — **bloquea RI-001**  
 **Tipo:** Correction / Certification — no Packaging / no features de cocina nuevas  
 **Bloqueo:** RI-001 está temporalmente bloqueado por EP-OPS-001 (no por falta de módulos, sino por falta de **punto de entrada operacional certificado**)  
-**Working board:** [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md) ← **3 preguntas ejecutivas** (no “roadmap”)  
-**Canon:** [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md) — contrato UI · RBAC · Operación · ORS-001  
-**Principio:** [DICT-071](../20-evidence-framework/09-operational-visibility-principle.md) · [DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md) · [DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md) · [DICT-074](../99-reference/PROJECT_DICTIONARY.md#operational-canonical-model)  
+**Working board:** [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md) ← eliminar bloqueadores (no backlog)  
+**Gate:** [RI-001 Certification Gate · CG-RI-001](./RI001_CERTIFICATION_GATE.md)  
+**Canon:** [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md) · [ORS-001](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md)  
+**Principio:** DICT-071…076  
 **Gap:** [OPS_CENTER_DUAL_SURFACE](./OPS_CENTER_DUAL_SURFACE.md)  
-**Matriz:** [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md) — bloque Ops primero; resto ⏸
+**Matriz:** [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md)
 
 ---
 
 ## Pregunta
 
-> **¿Puede YourMeal OS operar una empresa real de alimentación sin intervención del equipo de ingeniería?**
+> **¿Qué evidencia falta para emitir una decisión objetiva sobre RI-001?**
 
-Hasta que este EP sea **PASS**, cualquier E2E estará condicionado por el hueco del hub.
+EP-OPS-001 es la **entrada** al [Certification Gate](./RI001_CERTIFICATION_GATE.md). Sin hub PASS, el Gate no puede producir decisión fiable.
 
 ```text
-RI-001  ←── bloqueado por ──  EP-OPS-001 PASS
+RI-001 Decision  ←── Certification Gate  ←── EP-OPS-001 PASS
 ```
 
-Naturaleza del proyecto: ya no construir módulos — **demostrar operación** vía Release Board + OCM-001.
+Naturaleza: **certificación operacional** — no desarrollo de features.
 
 ---
 
