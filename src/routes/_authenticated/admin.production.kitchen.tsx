@@ -1,14 +1,13 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { PlaceholderPanel } from "@/components/placeholder-panel";
+/**
+ * ADMIN · Producción · Kitchen
+ * Redirección al workspace real de Cocina (fuente única, datos reales).
+ * Capability: kitchen.operate  ·  Core Object: OperationalOrder (kitchen queue)
+ */
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/admin/production/kitchen")({
-  component: () => (
-    <PlaceholderPanel
-      title="Kitchen board"
-      description="Módulo no activado en RI-001 (flag admin_module_production). Sin datos simulados."
-    />
-  ),
-  head: () => ({
-    meta: [{ title: "YourMeal OS — Kitchen board" }],
-  }),
+  beforeLoad: () => {
+    throw redirect({ to: "/admin/kitchen" });
+  },
+  head: () => ({ meta: [{ title: "YourMeal OS — Cocina" }] }),
 });
