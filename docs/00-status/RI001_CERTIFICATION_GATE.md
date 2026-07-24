@@ -9,7 +9,8 @@
 **Informe de decisión:** [RI-001 Certification Report](./RI001_CERTIFICATION_REPORT.md) (plantilla · siguiente gran entregable)
 
 > YourMeal OS está en **fase de certificación operacional**.  
-> **Congelación metodológica:** no crear nuevos principios / DICT / EP de metodología hasta concluir RI-001.
+> **Congelación metodológica:** no crear nuevos principios / DICT / EP de metodología hasta concluir RI-001.  
+> **Alcance de la certificación:** no valida el software; valida la **capacidad operacional** bajo escenario real + evidencia suficiente ([Report](./RI001_CERTIFICATION_REPORT.md)).
 
 ---
 
@@ -38,6 +39,19 @@ CG-RI-001
 EatClean
 (Operación real)
 ```
+
+### Lo que queda estabilizado (congelación metodológica)
+
+| Capa | Estado | Evolución permitida |
+|------|--------|---------------------|
+| FON AI | Congelada | Ninguna durante RI-001 |
+| FOPEBA | Congelada | Solo cosecha de conocimiento **tras** RI-001 |
+| Knowledge (DICT, ADR, OCM, ORS) | Congelado | Correcciones documentales únicamente |
+| YourMeal OS | Estable | Corrección de defectos y obtención de evidencia |
+| CG-RI-001 | Activo | Ejecución de la certificación |
+| EatClean | Caso de referencia | Operación y validación en campo |
+
+Evita mezclar decisiones metodológicas con decisiones de implementación durante la certificación.
 
 | Nivel | Responsabilidad | No debe… |
 |-------|-----------------|----------|

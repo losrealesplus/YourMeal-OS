@@ -16,14 +16,14 @@ Fase:                **CERTIFICACIÓN OPERACIONAL** (no “SaaS en desarrollo”
 Naturaleza:          Demostrar operación real sin ingeniería
 Pregunta del Gate:   **¿Qué evidencia falta para una decisión objetiva sobre RI-001?**
 Gate:                [CG-RI-001](./RI001_CERTIFICATION_GATE.md) · salidas: READY | RWO | NOT READY
-Informe:             [RI-001 Certification Report](./RI001_CERTIFICATION_REPORT.md) ← **siguiente gran entregable**
-Congelación:         **No nuevos principios / DICT / EP metodológicos** hasta cerrar RI-001
-Trabajo diario:      [Release Board](./EP_OPS_001_RELEASE_BOARD.md) — eliminar bloqueadores
-                     · [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md) · [ORS-001](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md)
-                     · EP-OPS-001 PASS → Freeze → Gate → **Certification Report**
+Informe:             [RI-001 Certification Report](./RI001_CERTIFICATION_REPORT.md) ← **artefacto de decisión** (no cronología)
+Congelación:         Capas FON/FOPEBA/Knowledge congeladas · YourMeal OS = defectos+evidencia · CG activo
+Alcance certificación: valida **capacidad operacional** (no “calidad del software” aislada)
+Cierre RI-001:       Report emitido + decisión firmada con evidencia + cosecha FOPEBA
+                     → YourMeal OS = primer caso de referencia **certificado** de FOPEBA
 Capas:               FON AI → FOPEBA → Knowledge → YourMeal OS → CG-RI-001 → EatClean
-Artefacto primario:  [RI001_CERTIFICATION_GATE](./RI001_CERTIFICATION_GATE.md)
-Board:               [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md)
+Artefacto primario:  [RI001_CERTIFICATION_REPORT](./RI001_CERTIFICATION_REPORT.md) (tras Gate)
+Gate / Board:        [CG-RI-001](./RI001_CERTIFICATION_GATE.md) · [Release Board](./EP_OPS_001_RELEASE_BOARD.md)
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████  100%
