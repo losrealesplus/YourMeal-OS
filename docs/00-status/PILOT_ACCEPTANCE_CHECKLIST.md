@@ -4,7 +4,7 @@
 **Rol FOPEBA:** artefacto de **gobernanza** (no QA de features) que alimenta **[G-02 · Pilot Readiness](../20-evidence-framework/08-gate-g02-pilot-readiness.md)**.  
 **Pregunta única:** ¿Existe evidencia suficiente para exponer el modelo operacional a la realidad sin introducir nueva incertidumbre evitable?  
 **Regla cero humo:** nada visible puede ser decorativo. Visible sin funcionalidad = **BLOCKED** para G-02.  
-**Relacionado:** [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md) · [ORR Party](./ORR_B2B_B2C_PARTY.md) · [CURRENT_PHASE](./CURRENT_PHASE.md) · [Pilot Integrity](../99-reference/PROJECT_DICTIONARY.md#pilot-integrity) · [RI](../99-reference/PROJECT_DICTIONARY.md#reference-implementation-ri)
+**Relacionado:** [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md) · [ORR Party](./ORR_B2B_B2C_PARTY.md) · [CURRENT_PHASE](./CURRENT_PHASE.md) · [Pilot Integrity](../99-reference/PROJECT_DICTIONARY.md#pilot-integrity) · [RI](../99-reference/PROJECT_DICTIONARY.md#reference-implementation-ri) · [Pilot Security Checklist](../09-security/PILOT_SECURITY_CHECKLIST.md)
 
 ---
 

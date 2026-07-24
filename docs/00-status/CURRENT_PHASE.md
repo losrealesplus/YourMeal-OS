@@ -31,6 +31,7 @@ Pregunta principal: ¿Qué nos enseña la operación real sobre nuestro modelo?
 
 Primary Artifact:  [PILOT_ACCEPTANCE_CHECKLIST](./PILOT_ACCEPTANCE_CHECKLIST.md) · [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md)
 Visibilidad:       [Operational Visibility · DICT-071](../20-evidence-framework/09-operational-visibility-principle.md)
+Seguridad pre-piloto: [Pilot Security Checklist](../09-security/PILOT_SECURITY_CHECKLIST.md) (10 corregidos · 1 Accepted documentado)
 Antes de firmar G-02 PASSED: ORR firmados · cero humo · No Artificiality
 PR taxonomy (post G-02): Evidence · KU · Correction · Pilot Fix · Operational Finding
 Completitud UI:    [EP-001](./EP001_FUNCTIONAL_COMPLETENESS_SPRINT.md) · siguiente [EP-002A](./EP002A_CUSTOMER_EXPERIENCE_COMPLETION.md) · [EP-002B](./EP002B_OPERATIONAL_EXECUTION.md)

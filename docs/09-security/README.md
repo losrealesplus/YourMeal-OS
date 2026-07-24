@@ -10,6 +10,14 @@ Code: `src/permissions` must stay aligned. Route guards: `src/permissions/route-
 Route → Permission Guard → Service → Repository → Database (RLS)
 ```
 
+## Pilot security (RI-001)
+
+**Checklist + memoria de hallazgos aceptados:** [PILOT_SECURITY_CHECKLIST.md](./PILOT_SECURITY_CHECKLIST.md)
+
+- Vulnerabilidades reales → corregir.
+- Patrones necesarios (p. ej. `authenticated` + helpers `SECURITY DEFINER` de RLS) → documentar y justificar.
+- Segunda auditoría de seguridad: **después** de RI-001, no perseguir “0 issues” ahora.
+
 ## Authentication
 
 - Supabase Authentication
