@@ -34,11 +34,14 @@ import { Route as AuthenticatedSaasAuditRouteImport } from './routes/_authentica
 import { Route as AuthenticatedSaasAnalyticsRouteImport } from './routes/_authenticated/saas.analytics'
 import { Route as AuthenticatedAppSettingsRouteImport } from './routes/_authenticated/app.settings'
 import { Route as AuthenticatedAppScheduleRouteImport } from './routes/_authenticated/app.schedule'
+import { Route as AuthenticatedAppPaymentMethodsRouteImport } from './routes/_authenticated/app.payment-methods'
 import { Route as AuthenticatedAppOrdersRouteImport } from './routes/_authenticated/app.orders'
 import { Route as AuthenticatedAppOnboardingRouteImport } from './routes/_authenticated/app.onboarding'
+import { Route as AuthenticatedAppNotificationsRouteImport } from './routes/_authenticated/app.notifications'
 import { Route as AuthenticatedAppMenuRouteImport } from './routes/_authenticated/app.menu'
 import { Route as AuthenticatedAppFavoritesRouteImport } from './routes/_authenticated/app.favorites'
 import { Route as AuthenticatedAppCompanyRouteImport } from './routes/_authenticated/app.company'
+import { Route as AuthenticatedAppAddressesRouteImport } from './routes/_authenticated/app.addresses'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminSupportRouteImport } from './routes/_authenticated/admin.support'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
@@ -221,6 +224,12 @@ const AuthenticatedAppScheduleRoute =
     path: '/schedule',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppPaymentMethodsRoute =
+  AuthenticatedAppPaymentMethodsRouteImport.update({
+    id: '/payment-methods',
+    path: '/payment-methods',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppOrdersRoute = AuthenticatedAppOrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
@@ -230,6 +239,12 @@ const AuthenticatedAppOnboardingRoute =
   AuthenticatedAppOnboardingRouteImport.update({
     id: '/onboarding',
     path: '/onboarding',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppNotificationsRoute =
+  AuthenticatedAppNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const AuthenticatedAppMenuRoute = AuthenticatedAppMenuRouteImport.update({
@@ -248,6 +263,12 @@ const AuthenticatedAppCompanyRoute = AuthenticatedAppCompanyRouteImport.update({
   path: '/company',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const AuthenticatedAppAddressesRoute =
+  AuthenticatedAppAddressesRouteImport.update({
+    id: '/addresses',
+    path: '/addresses',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -561,11 +582,14 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/support': typeof AuthenticatedAdminSupportRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/app/addresses': typeof AuthenticatedAppAddressesRoute
   '/app/company': typeof AuthenticatedAppCompanyRouteWithChildren
   '/app/favorites': typeof AuthenticatedAppFavoritesRoute
   '/app/menu': typeof AuthenticatedAppMenuRouteWithChildren
+  '/app/notifications': typeof AuthenticatedAppNotificationsRoute
   '/app/onboarding': typeof AuthenticatedAppOnboardingRouteWithChildren
   '/app/orders': typeof AuthenticatedAppOrdersRouteWithChildren
+  '/app/payment-methods': typeof AuthenticatedAppPaymentMethodsRoute
   '/app/schedule': typeof AuthenticatedAppScheduleRoute
   '/app/settings': typeof AuthenticatedAppSettingsRouteWithChildren
   '/saas/analytics': typeof AuthenticatedSaasAnalyticsRoute
@@ -633,11 +657,14 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/support': typeof AuthenticatedAdminSupportRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/app/addresses': typeof AuthenticatedAppAddressesRoute
   '/app/company': typeof AuthenticatedAppCompanyRouteWithChildren
   '/app/favorites': typeof AuthenticatedAppFavoritesRoute
   '/app/menu': typeof AuthenticatedAppMenuRouteWithChildren
+  '/app/notifications': typeof AuthenticatedAppNotificationsRoute
   '/app/onboarding': typeof AuthenticatedAppOnboardingRouteWithChildren
   '/app/orders': typeof AuthenticatedAppOrdersRouteWithChildren
+  '/app/payment-methods': typeof AuthenticatedAppPaymentMethodsRoute
   '/app/schedule': typeof AuthenticatedAppScheduleRoute
   '/app/settings': typeof AuthenticatedAppSettingsRouteWithChildren
   '/saas/analytics': typeof AuthenticatedSaasAnalyticsRoute
@@ -713,11 +740,14 @@ export interface FileRoutesById {
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/support': typeof AuthenticatedAdminSupportRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/_authenticated/app/addresses': typeof AuthenticatedAppAddressesRoute
   '/_authenticated/app/company': typeof AuthenticatedAppCompanyRouteWithChildren
   '/_authenticated/app/favorites': typeof AuthenticatedAppFavoritesRoute
   '/_authenticated/app/menu': typeof AuthenticatedAppMenuRouteWithChildren
+  '/_authenticated/app/notifications': typeof AuthenticatedAppNotificationsRoute
   '/_authenticated/app/onboarding': typeof AuthenticatedAppOnboardingRouteWithChildren
   '/_authenticated/app/orders': typeof AuthenticatedAppOrdersRouteWithChildren
+  '/_authenticated/app/payment-methods': typeof AuthenticatedAppPaymentMethodsRoute
   '/_authenticated/app/schedule': typeof AuthenticatedAppScheduleRoute
   '/_authenticated/app/settings': typeof AuthenticatedAppSettingsRouteWithChildren
   '/_authenticated/saas/analytics': typeof AuthenticatedSaasAnalyticsRoute
@@ -793,11 +823,14 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/support'
     | '/admin/users'
+    | '/app/addresses'
     | '/app/company'
     | '/app/favorites'
     | '/app/menu'
+    | '/app/notifications'
     | '/app/onboarding'
     | '/app/orders'
+    | '/app/payment-methods'
     | '/app/schedule'
     | '/app/settings'
     | '/saas/analytics'
@@ -865,11 +898,14 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/support'
     | '/admin/users'
+    | '/app/addresses'
     | '/app/company'
     | '/app/favorites'
     | '/app/menu'
+    | '/app/notifications'
     | '/app/onboarding'
     | '/app/orders'
+    | '/app/payment-methods'
     | '/app/schedule'
     | '/app/settings'
     | '/saas/analytics'
@@ -944,11 +980,14 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/support'
     | '/_authenticated/admin/users'
+    | '/_authenticated/app/addresses'
     | '/_authenticated/app/company'
     | '/_authenticated/app/favorites'
     | '/_authenticated/app/menu'
+    | '/_authenticated/app/notifications'
     | '/_authenticated/app/onboarding'
     | '/_authenticated/app/orders'
+    | '/_authenticated/app/payment-methods'
     | '/_authenticated/app/schedule'
     | '/_authenticated/app/settings'
     | '/_authenticated/saas/analytics'
@@ -1175,6 +1214,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppScheduleRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/payment-methods': {
+      id: '/_authenticated/app/payment-methods'
+      path: '/payment-methods'
+      fullPath: '/app/payment-methods'
+      preLoaderRoute: typeof AuthenticatedAppPaymentMethodsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/app/orders': {
       id: '/_authenticated/app/orders'
       path: '/orders'
@@ -1187,6 +1233,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/app/onboarding'
       preLoaderRoute: typeof AuthenticatedAppOnboardingRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/notifications': {
+      id: '/_authenticated/app/notifications'
+      path: '/notifications'
+      fullPath: '/app/notifications'
+      preLoaderRoute: typeof AuthenticatedAppNotificationsRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/app/menu': {
@@ -1208,6 +1261,13 @@ declare module '@tanstack/react-router' {
       path: '/company'
       fullPath: '/app/company'
       preLoaderRoute: typeof AuthenticatedAppCompanyRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/addresses': {
+      id: '/_authenticated/app/addresses'
+      path: '/addresses'
+      fullPath: '/app/addresses'
+      preLoaderRoute: typeof AuthenticatedAppAddressesRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/admin/users': {
@@ -1759,22 +1819,28 @@ const AuthenticatedAppSettingsRouteWithChildren =
   )
 
 interface AuthenticatedAppRouteChildren {
+  AuthenticatedAppAddressesRoute: typeof AuthenticatedAppAddressesRoute
   AuthenticatedAppCompanyRoute: typeof AuthenticatedAppCompanyRouteWithChildren
   AuthenticatedAppFavoritesRoute: typeof AuthenticatedAppFavoritesRoute
   AuthenticatedAppMenuRoute: typeof AuthenticatedAppMenuRouteWithChildren
+  AuthenticatedAppNotificationsRoute: typeof AuthenticatedAppNotificationsRoute
   AuthenticatedAppOnboardingRoute: typeof AuthenticatedAppOnboardingRouteWithChildren
   AuthenticatedAppOrdersRoute: typeof AuthenticatedAppOrdersRouteWithChildren
+  AuthenticatedAppPaymentMethodsRoute: typeof AuthenticatedAppPaymentMethodsRoute
   AuthenticatedAppScheduleRoute: typeof AuthenticatedAppScheduleRoute
   AuthenticatedAppSettingsRoute: typeof AuthenticatedAppSettingsRouteWithChildren
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
 }
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
+  AuthenticatedAppAddressesRoute: AuthenticatedAppAddressesRoute,
   AuthenticatedAppCompanyRoute: AuthenticatedAppCompanyRouteWithChildren,
   AuthenticatedAppFavoritesRoute: AuthenticatedAppFavoritesRoute,
   AuthenticatedAppMenuRoute: AuthenticatedAppMenuRouteWithChildren,
+  AuthenticatedAppNotificationsRoute: AuthenticatedAppNotificationsRoute,
   AuthenticatedAppOnboardingRoute: AuthenticatedAppOnboardingRouteWithChildren,
   AuthenticatedAppOrdersRoute: AuthenticatedAppOrdersRouteWithChildren,
+  AuthenticatedAppPaymentMethodsRoute: AuthenticatedAppPaymentMethodsRoute,
   AuthenticatedAppScheduleRoute: AuthenticatedAppScheduleRoute,
   AuthenticatedAppSettingsRoute: AuthenticatedAppSettingsRouteWithChildren,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
