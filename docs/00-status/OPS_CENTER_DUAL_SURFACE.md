@@ -1,8 +1,8 @@
 # Ops Center · Dual Surface (EatClean vs YourMeal OS)
 
-**Estado:** Gap documentado · corrección pendiente (RI-001 Readiness · Fase 3)  
-**Tipo:** Correction / Readiness — **no** nueva capacidad de cocina  
-**Sprint:** [RI001_READINESS_SPRINT](./RI001_READINESS_SPRINT.md)
+**Estado:** Gap documentado · absorbido por **[EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)** (sprint activo)  
+**Tipo:** Correction / Certification — **no** nueva capacidad de cocina  
+**Sprint:** [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · [Matriz bloque Ops](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md)
 
 ---
 
@@ -41,10 +41,12 @@ Debajo del acceso principal / *Powered by YourMeal OS*. Sin protagonismo.
 Contenido objetivo:
 
 ```text
-Tenants · Administradores · Licencias · Branding
-Auditoría global · Feature Flags · Configuración SaaS · Monitoring
+Tenants · Company Admins · Roles · Branding asociado
+Auditoría global · Feature Flags · Configuración SaaS · Monitoring*
 ```
 
+\* Monitoring: FF OFF o «Próximamente» si no está listo (DICT-071).  
+WP-5 = **Tenant Provisioning** ([DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)), no solo listados.
 ---
 
 ## Estado actual (código)
@@ -78,6 +80,7 @@ Archivos clave:
 3. Company Admin **nunca** ve superficie SaaS.
 4. `homePathForRoles` y `decideOperationsCenterEntry` alineados para dual-role.
 5. Sin fingir módulos SaaS: placeholder → Feature Flag OFF o «Próximamente» explícito (DICT-071).
+6. WP-5: aprovisionar tenant + Company Admin + roles + auditoría (DICT-073); membership RI-001 = un usuario ↔ un tenant.
 
 ---
 

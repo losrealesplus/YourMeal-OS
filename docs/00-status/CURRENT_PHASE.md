@@ -12,18 +12,22 @@ FOUNDATION / BLUEPRINT / DISCOVERY / OM / VALIDATION / IOV   ✅
 FOV PREPARATION · ORR (marco) · G-02 (Gate formalizado)     ✅
 EP-001 Functional Completeness (cero humo Admin/Ops nav)    ✅
 ────────────────────────────
-Siguiente sprint:  **RI-001 Readiness** (cerrar PRs · cero humo · RBAC · E2E · Release Review)
-                   (EP-002A.1–A.3 ✅ · Hoja de Producción ✅ · Kitchen Execution ✅)
-                   · EP-002B.3 Packaging / B.4 Delivery **en cola** (después de Readiness)
-Siguiente artefacto:  [RI001_READINESS_SPRINT](./RI001_READINESS_SPRINT.md) → iniciar RI-001
+Modo:                **CERTIFICACIÓN** — Correction hub OK · **no** Packaging
+Bloqueo:             **RI-001 bloqueado por EP-OPS-001** (punto de entrada no certificado)
+Siguiente sprint:    **EP-OPS-001** WP-1…WP-6 (nav · RBAC · dual · dashboard · **Tenant Provisioning** · mini-gate)
+                     · FCR resto **en pausa** hasta Ops PASS
+                     · Tras Ops PASS → **Architecture Freeze** hasta RI-001
+                     · Packaging/Delivery **en cola**
+Siguiente artefacto: [EP_OPS_001_OPERATIONAL_CENTER_READINESS](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)
+                     → Ops PASS → Architecture Freeze → FCR → E2E → Evidence → decisión RI-001
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████
   Gobernanza          ██████████
   Modelo operacional  ██████████
   Administración      ██████████
-  Customer App        ████████░░  ← EP-002A (último tramo / consolidación)
-  Operaciones         ████████░░  ← EP-002B (B.1·B.2 ✅ · Readiness antes de B.3)
+  Customer App        █████████░  ← tras hub PASS
+  Operaciones         ██████░░░░  ← **EP-OPS-001** (bloqueante RI-001)
   Data                ███████░░░
 
 Mapa EP:
@@ -32,15 +36,18 @@ Mapa EP:
   EP-002A · Customer Experience    ██████████
   EP-002B.1 · Production Report    ██████████
   EP-002B.2 · Kitchen Execution    ██████████
-  —— RI-001 Readiness ——           □□□□□□□□□□  ← HOY
-  EP-002B.3 · Packaging            □□□□□□□□□□  (cola post-Readiness)
+  —— EP-OPS-001 Ops Center ——      □□□□□□□□□□  ← HOY (bloquea RI-001)
+  —— Architecture Freeze ——        □□□□□□□□□□  (tras Ops PASS → hasta RI-001)
+  —— FCR / E2E / Evidence ——       □□□□□□□□□□  (tras Freeze)
+  EP-002B.3 · Packaging            □□□□□□□□□□  (cola)
   EP-002B.4 · Delivery             □□□□□□□□□□
-  RI-001                           █████████░
+  RI-001                           ████████░░  ← bloqueado hasta EP-OPS-001 PASS
 
 Patrón permanente: Operational Representation (DICT-072)
-Hoy: RI-001 Readiness — no nuevas capacidades; certificar operación.
+Madurez tenant:    Tenant Operational Autonomy (DICT-073) — WP-5 aprovisiona, no “crea admins”
+Hoy: Certificar el hub — no auditar el resto sobre navegación incompleta.
 
-Riesgo principal: ya no es diseño → **completar el ciclo semanal cliente + ejecución ops**
+Riesgo principal: E2E / FCR sobre hub no PASS → evidencia contaminada
 
 Incertidumbres de diseño grandes: **ninguna**.
 RI-001 comienza cuando EP-002A y EP-002B estén cerrados.
@@ -48,14 +55,15 @@ RI-001 comienza cuando EP-002A y EP-002B estén cerrados.
 G-02 = Pilot Authorization  ≠  Release / v1.0
 Pregunta principal: ¿Qué nos enseña la operación real sobre nuestro modelo?
 
-Primary Artifact:  [PILOT_ACCEPTANCE_CHECKLIST](./PILOT_ACCEPTANCE_CHECKLIST.md) · [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md)
+Primary Artifact:  [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md) · [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md)
 Visibilidad:       [Operational Visibility · DICT-071](../20-evidence-framework/09-operational-visibility-principle.md)
 Ops pattern:       [Operational Representation · DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md)
-Hoy (Readiness):   [RI-001 Readiness Sprint](./RI001_READINESS_SPRINT.md) · [Ops dual surface](./OPS_CENTER_DUAL_SURFACE.md)
+Tenant autonomy:   [Tenant Operational Autonomy · DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)
+Hoy (Certificación): [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · [Ops dual surface](./OPS_CENTER_DUAL_SURFACE.md) · [Readiness](./RI001_READINESS_SPRINT.md)
 Seguridad pre-piloto: [Pilot Security Checklist](../09-security/PILOT_SECURITY_CHECKLIST.md) (10 corregidos · 1 Accepted documentado)
 Antes de firmar G-02 PASSED: ORR firmados · cero humo · No Artificiality
 PR taxonomy (post G-02): Evidence · KU · Correction · Pilot Fix · Operational Finding
-Completitud UI:    [EP-001](./EP001_FUNCTIONAL_COMPLETENESS_SPRINT.md) · siguiente [EP-002A](./EP002A_CUSTOMER_EXPERIENCE_COMPLETION.md) · [EP-002B](./EP002B_OPERATIONAL_EXECUTION.md)
+Completitud UI:    [Matriz RI-001](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md) · [EP-001](./EP001_FUNCTIONAL_COMPLETENESS_SPRINT.md) · [EP-002A](./EP002A_CUSTOMER_EXPERIENCE_COMPLETION.md) · [EP-002B](./EP002B_OPERATIONAL_EXECUTION.md)
 Hallazgos Lovable: [Decisiones](./LOVABLE_FINDINGS_DECISIONS.md) (contraste ✅ · GSC → [Marketing Readiness](./MILESTONE_MARKETING_READINESS.md) · Semrush draft)
 Last Baseline:     v0.2.0-engineering-baseline (IR-001)
 
@@ -79,6 +87,7 @@ Piloto: demostrar  ·  EP-001 ✅ → EP-002A (Weekly Cycle) → EP-002B (Ops) �
 > ✅ EP-002A: ¿Qué necesita **saber** el cliente? (Customer Weekly Cycle)  
 > ✅ EP-002B: ¿Qué necesita **hacer** el equipo?  
 > ✅ Operational Visibility (DICT-071): lo visible existe; lo inexistente no se promete.  
+> ✅ Tenant Operational Autonomy (DICT-073): el tenant se autogestiona sin el proveedor SaaS.  
 > Motores de cambio: [PROJECT_DOMAINS](./PROJECT_DOMAINS.md).
 
 ---
