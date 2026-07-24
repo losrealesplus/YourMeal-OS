@@ -12,7 +12,7 @@
 |-------|-------|
 | Date (UTC) | 2026-07-24 |
 | Branch | `cursor/op-001-2-bootstrap-evidence-f54a` |
-| Commit | _(filled at evidence generation)_ |
+| Commit | `b8b3ff6` (b8b3ff6a8a51e6c760c723dc5f9d6d49a18ce391) |
 | Environment | Cursor Cloud Agent workspace |
 | Seed mechanism | `npm run seed` (`scripts/seed-day0.mjs`) |
 | Seed version | OP-001.2 Day-0 (idempotent saas_admin) |
