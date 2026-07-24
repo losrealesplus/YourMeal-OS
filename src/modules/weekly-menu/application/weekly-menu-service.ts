@@ -12,6 +12,16 @@ import {
   type WeeklyMenuSlotWithDish,
 } from "@/modules/weekly-menu/infrastructure/weekly-menu-repository";
 import { utcWeekStartMonday } from "@/modules/weekly-menu/application/week-dates";
+import {
+  canComposeWeeklyMenu,
+  canPublishWeeklyMenu,
+} from "@/modules/bootstrap-integrity";
+import { createDishRepository } from "@/modules/dish-library/infrastructure/dish-repository";
+
+async function activeDishCount(ctx: ServiceContext): Promise<number> {
+  const dishes = await createDishRepository(ctx.supabase, ctx.tenantId).listActive();
+  return dishes.length;
+}
 
 export const WeeklyMenuService = {
   async list(ctx: ServiceContext): Promise<WeeklyMenuRow[]> {
@@ -24,6 +34,14 @@ export const WeeklyMenuService = {
     weekStart?: string,
   ): Promise<WeeklyMenuRow> {
     requireCapability(ctx.roles, "menus.write");
+    const dishesOk = canComposeWeeklyMenu({
+      activeDishCount: await activeDishCount(ctx),
+    });
+    if (!dishesOk.ok) {
+      throw new DomainError("INVALID_STATE", dishesOk.message, {
+        code: dishesOk.code,
+      });
+    }
     const start = weekStart ?? utcWeekStartMonday();
     const repo = createWeeklyMenuRepository(ctx.supabase, ctx.tenantId);
     const existing = await repo.findByWeekStart(start);
@@ -71,11 +89,14 @@ export const WeeklyMenuService = {
     requireCapability(ctx.roles, "menus.write");
     const repo = createWeeklyMenuRepository(ctx.supabase, ctx.tenantId);
     const slots = await repo.listSlotsWithDishes(weeklyMenuId);
-    if (slots.length === 0) {
-      throw new DomainError(
-        "INVALID_STATE",
-        "Cannot publish an empty weekly menu — add at least one dish",
-      );
+    const publishOk = canPublishWeeklyMenu({
+      slotCount: slots.length,
+      activeDishCount: await activeDishCount(ctx),
+    });
+    if (!publishOk.ok) {
+      throw new DomainError("INVALID_STATE", publishOk.message, {
+        code: publishOk.code,
+      });
     }
     const published = await repo.publish(weeklyMenuId);
     await AuditService.write(ctx, {

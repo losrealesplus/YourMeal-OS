@@ -5,6 +5,7 @@ import { requireCapability, hasStaffAccess } from "@/permissions";
 import { DomainError } from "@/domain/errors";
 import { createDishRepository } from "@/modules/dish-library/infrastructure/dish-repository";
 import { createWeeklyMenuRepository } from "@/modules/weekly-menu/infrastructure/weekly-menu-repository";
+import { canAcceptOrders } from "@/modules/bootstrap-integrity";
 import {
   createOrderRepository,
   type OrderItemRow,
@@ -78,7 +79,8 @@ export const OrderService = {
     const menuRepo = createWeeklyMenuRepository(ctx.supabase, ctx.tenantId);
     const menu = await menuRepo.findPublishedByWeekStart(command.weekStart);
     if (!menu) {
-      throw new DomainError("MENU_LOCKED", "No published weekly menu for this week");
+      const gate = canAcceptOrders({ publishedMenuCount: 0 });
+      throw new DomainError("MENU_LOCKED", gate.message, { code: gate.code });
     }
 
     const slots = await menuRepo.listSlotsWithDishes(menu.id);

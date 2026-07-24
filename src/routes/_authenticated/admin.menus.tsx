@@ -19,12 +19,8 @@ import {
 import type { WeeklyMenuRow } from "@/modules/weekly-menu/infrastructure/weekly-menu-repository";
 import type { WeeklyMenuSlotWithDish } from "@/modules/weekly-menu/infrastructure/weekly-menu-repository";
 import type { DishRow } from "@/modules/dish-library/infrastructure/dish-repository";
-import {
-  AdminHeader,
-  PanelCard,
-  SectionTitle,
-  StatusChip,
-} from "@/components/admin";
+import { AdminHeader, PanelCard, SectionTitle, StatusChip } from "@/components/admin";
+import { BootstrapReadinessBanner } from "@/components/tenant/bootstrap-readiness-banner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
@@ -171,6 +167,10 @@ function AdminMenusPage() {
         goal="Publicar oferta semanal"
         capability="menus.write"
         object="WeeklyMenu · MenuSlot"
+      />
+
+      <BootstrapReadinessBanner
+        focus={["BOOTSTRAP_NO_DISHES", "BOOTSTRAP_EMPTY_MENU"]}
       />
 
       <div className="flex flex-wrap gap-2">

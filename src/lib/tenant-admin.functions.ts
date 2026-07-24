@@ -11,6 +11,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { can } from "@/permissions";
 import type { AppRole } from "@/hooks/use-auth";
+import { canInviteOperationalStaff } from "@/modules/bootstrap-integrity";
 
 const STAFF_INVITE_ROLES = [
   "kitchen",
@@ -80,6 +81,22 @@ export const inviteTenantStaff = createServerFn({ method: "POST" })
     if (memErr) throw new Error(memErr.message);
     if (!membership) {
       throw new Error("Forbidden: no membership in target tenant");
+    }
+
+    const { count: companyAdminCount, error: adminCountErr } =
+      await context.supabase
+        .from("user_roles")
+        .select("id", { count: "exact", head: true })
+        .eq("tenant_id", data.tenantId)
+        .eq("role", "company_admin");
+    if (adminCountErr) throw new Error(adminCountErr.message);
+
+    const staffGate = canInviteOperationalStaff({
+      companyAdminCount: companyAdminCount ?? 0,
+      role: data.role,
+    });
+    if (!staffGate.ok) {
+      throw new Error(staffGate.message);
     }
 
     const { supabaseAdmin } = await import(

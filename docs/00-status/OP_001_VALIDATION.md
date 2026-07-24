@@ -98,7 +98,9 @@ vitest home-path + open-operations-center + weekly-menu-mapper → PASS (20)
 **CODE PASS / LIVE JOURNEY PENDING**
 
 Software blockers for bootstrap content chain are removed.  
-Full Definition of Done (delivered order without SQL) requires a live Supabase session with service-role available to the server runtime and the one-time `saas_admin` seed. Re-run CHECK-IT 05 after live pass.
+Full Definition of Done (delivered order without SQL) requires a live Supabase session with service-role available to the server runtime and **`npm run seed`** for the first `saas_admin` (OP-001.1). Re-run CHECK-IT 05 after live pass.
+
+Follow-up: [OP_001_1_BOOTSTRAP_VALIDATION](./OP_001_1_BOOTSTRAP_VALIDATION.md) — integrity audit, Day-0 checklist, state machine, `bootstrap:verify`.
 
 ### Constraints respected
 
