@@ -12,21 +12,21 @@ FOUNDATION / BLUEPRINT / DISCOVERY / OM / VALIDATION / IOV   ✅
 FOV PREPARATION · ORR (marco) · G-02 (Gate formalizado)     ✅
 EP-001 Functional Completeness (cero humo Admin/Ops nav)    ✅
 ────────────────────────────
-Modo:                **CERTIFICACIÓN** — Correction de hub OK · **no** Packaging/features nuevas
-Siguiente sprint:    **EP-OPS-001 · Operational Center Readiness**
-                     (hub `/admin` PASS antes de auditar el resto)
-                     · Matriz FCR del resto **en pausa** hasta Ops PASS
+Modo:                **CERTIFICACIÓN** — Correction hub OK · **no** Packaging
+Bloqueo:             **RI-001 bloqueado por EP-OPS-001** (punto de entrada no certificado)
+Siguiente sprint:    **EP-OPS-001** WP-1…WP-6 (nav · RBAC · dual · dashboard · admins · mini-gate)
+                     · FCR resto **en pausa** hasta Ops PASS
                      · Packaging/Delivery **en cola**
 Siguiente artefacto: [EP_OPS_001_OPERATIONAL_CENTER_READINESS](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)
-                     → matriz bloque Ops en verde → reanudar FCR → RI-001
+                     → Ops PASS → FCR → E2E → Evidence → decisión RI-001
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████
   Gobernanza          ██████████
   Modelo operacional  ██████████
   Administración      ██████████
-  Customer App        █████████░  ← certificar tras hub estable
-  Operaciones         ███████░░░  ← **EP-OPS-001 hub** (bloqueante)
+  Customer App        █████████░  ← tras hub PASS
+  Operaciones         ██████░░░░  ← **EP-OPS-001** (bloqueante RI-001)
   Data                ███████░░░
 
 Mapa EP:
@@ -35,16 +35,16 @@ Mapa EP:
   EP-002A · Customer Experience    ██████████
   EP-002B.1 · Production Report    ██████████
   EP-002B.2 · Kitchen Execution    ██████████
-  —— EP-OPS-001 Ops Center ——      □□□□□□□□□□  ← HOY (requisito certificación)
-  —— FCR resto / E2E / evidencia —— □□□□□□□□□□  (tras Ops PASS)
+  —— EP-OPS-001 Ops Center ——      □□□□□□□□□□  ← HOY (bloquea RI-001)
+  —— FCR / E2E / Evidence ——       □□□□□□□□□□  (tras Ops PASS)
   EP-002B.3 · Packaging            □□□□□□□□□□  (cola)
   EP-002B.4 · Delivery             □□□□□□□□□□
-  RI-001                           █████████░
+  RI-001                           ████████░░  ← bloqueado hasta EP-OPS-001 PASS
 
 Patrón permanente: Operational Representation (DICT-072)
-Hoy: ¿Puede cada rol iniciar la jornada en el Centro de Operaciones y completar su trabajo?
+Hoy: Certificar el hub — no auditar el resto sobre navegación incompleta.
 
-Riesgo principal: hub operacional inestable → contaminaría toda la auditoría posterior
+Riesgo principal: E2E / FCR sobre hub no PASS → evidencia contaminada
 
 Incertidumbres de diseño grandes: **ninguna**.
 RI-001 comienza cuando EP-002A y EP-002B estén cerrados.

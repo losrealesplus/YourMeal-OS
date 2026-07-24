@@ -36,12 +36,24 @@ FCR del resto de módulos: **en pausa** hasta Ops Center PASS.
 
 ## Prioridades (orden estricto)
 
-### 0 · EP-OPS-001 · Operational Center Readiness ← **AHORA**
+### 0 · EP-OPS-001 · Operational Center Readiness ← **AHORA (bloquea RI-001)**
 
-El Centro de Operaciones es **requisito de certificación**, no una feature más.  
-Spec: [EP_OPS_001_OPERATIONAL_CENTER_READINESS](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · Gap: [OPS_CENTER_DUAL_SURFACE](./OPS_CENTER_DUAL_SURFACE.md).
+> **RI-001 está temporalmente bloqueado por EP-OPS-001.**  
+> No por falta de módulos — por falta de punto de entrada operacional certificado.
 
-Hasta PASS del hub: no continuar FCR amplio ni E2E completo.
+Spec completa (WP-1…WP-6): [EP_OPS_001_OPERATIONAL_CENTER_READINESS](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)  
+Gap: [OPS_CENTER_DUAL_SURFACE](./OPS_CENTER_DUAL_SURFACE.md)
+
+| WP | Nombre |
+|----|--------|
+| WP-1 | Operational Navigation |
+| WP-2 | Operational RBAC (± · URL · CRUD · backend) |
+| WP-3 | Dual Operations Center (`/admin` vs `/saas`) |
+| WP-4 | Dashboard operacional sin mocks |
+| WP-5 | Gestión de administradores (Company Admin desde SaaS) |
+| WP-6 | Mini-certificación del hub |
+
+Hasta PASS: no continuar FCR amplio ni E2E completo.
 
 ### 1 · Functional Completeness Review (resto)
 

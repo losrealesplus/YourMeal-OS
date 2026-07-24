@@ -43,8 +43,9 @@ Leyenda: ✅ OK · 🟡 Parcial / acotado · ⏳ Pendiente de review en vivo · 
 | Administración | `/admin/users` · … | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | |
 | Finanzas | `/admin/accounting` | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | FF si no listo |
 | Configuración | `/admin/settings` · branding | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | |
-| SaaS plataforma | `/saas/*` | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | Solo saas_admin |
-| Separación admin/saas | entry discreta | ⏳ | ⏳ | — | — | ⏳ | — | ⏳ | Dual surface |
+| SaaS plataforma | `/saas/*` | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | WP-5: admins/roles |
+| Separación admin/saas | entry discreta | ⏳ | ⏳ | — | — | ⏳ | — | ⏳ | WP-3 Dual |
+| Gestión Company Admin | SaaS → tenant | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | WP-5 puente |
 
 PASS del bloque = todas las filas visibles en ✅ (o ocultas honestamente) + RBAC ± documentado. Ver [EP-OPS-001 DoD](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md#definition-of-done).
 

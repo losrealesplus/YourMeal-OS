@@ -1,144 +1,244 @@
 # EP-OPS-001 · Operational Center Readiness
 
-**Estado:** Active — sprint de certificación (bloquea RI-001)  
-**Tipo:** Correction / Certification — **no** feature nueva de cocina/packaging  
-**Pregunta RI-001:** ¿Podemos demostrar una jornada real EatClean × YourMeal OS?  
+**Estado:** Active — **bloquea RI-001**  
+**Tipo:** Correction / Certification — no Packaging / no features de cocina nuevas  
+**Bloqueo:** RI-001 está temporalmente bloqueado por EP-OPS-001 (no por falta de módulos, sino por falta de **punto de entrada operacional certificado**)  
 **Principio:** [DICT-071](../20-evidence-framework/09-operational-visibility-principle.md) · [DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md)  
-**Gap técnico:** [OPS_CENTER_DUAL_SURFACE](./OPS_CENTER_DUAL_SURFACE.md)  
-**Matriz:** [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md) (bloque Ops Center primero)
+**Gap:** [OPS_CENTER_DUAL_SURFACE](./OPS_CENTER_DUAL_SURFACE.md)  
+**Matriz:** [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md) — bloque Ops primero; resto ⏸
 
 ---
 
-## Por qué ahora
+## Pregunta
 
-El Centro de Operaciones **deja de ser una funcionalidad** y pasa a ser un **requisito de certificación**.
+> **¿Podemos demostrar una jornada real EatClean × YourMeal OS?**
 
-Sin un hub operacional usable, no se puede demostrar una jornada completa: Cocina, Clientes o Administración auditados sobre una navegación inestable no representan el estado final del producto.
+Hasta que este EP sea **PASS**, cualquier E2E estará condicionado por el hueco del hub.
 
 ```text
-Hasta ahora:  ¿Qué falta por construir?
-Ahora:        ¿Puede cada rol entrar a su espacio y completar la jornada?
+RI-001  ←── bloqueado por ──  EP-OPS-001 PASS
 ```
-
-**Recomendación de secuencia:** pausar temporalmente el Functional Completeness Review del resto de módulos y certificar primero este hub. Luego reanudar la matriz con base estable.
 
 ---
 
-## Objetivo
+## Objetivo del sprint
 
-> Certificar que el Centro de Operaciones permite a cada rol acceder **únicamente** a los módulos necesarios para desempeñar su trabajo durante una jornada completa.
+No construir nuevas capacidades de producto (Packaging, etc.).
 
-No es un dashboard de KPIs. Es el **hub operacional** del tenant.
+**Certificar el Centro de Operaciones como hub operacional de EatClean y de la plataforma YourMeal OS.**
+
+No es un dashboard decorativo. Es el punto desde el que cualquier empleado interno inicia su jornada.
 
 ---
 
 ## Arquitectura objetivo
 
 ```text
-Landing
-    │
-    ▼
-Login
-    │
-    ├──► Customer App  →  Cliente
-    │
-    ▼
-Centro de Operaciones EatClean  (/admin)
-    │
-    ├── Dashboard
-    ├── Cocina (cola)
-    ├── Hoja de Producción
-    ├── Kitchen Execution
-    ├── Reparto
-    ├── Atención al Cliente
-    ├── Clientes
-    ├── Empresas
-    ├── Administración
-    ├── Finanzas
-    └── Configuración
+Landing → Login
+            ├── Customer App          → Cliente
+            │
+            └── Centro de Operaciones EatClean   /admin
+                    ├── Dashboard (datos reales)
+                    ├── Cocina
+                    ├── Producción (Hoja + Execution)
+                    ├── Reparto
+                    ├── Atención al Cliente
+                    ├── Clientes
+                    ├── Empresas
+                    ├── Administración
+                    ├── Finanzas
+                    └── Configuración
 
-Powered by YourMeal OS
-    └── Centro de Operaciones YourMeal OS  (/saas)  ← solo saas_admin
+                Powered by YourMeal OS
+                Centro de Operaciones YourMeal OS   /saas
+                    (solo saas_admin)
 ```
 
 ---
 
-## Criterios PASS
+## WP-1 · Operational Navigation
 
-### 1. Navegación
+**Objetivo:** «Centro de Operaciones» = punto de entrada único para usuarios internos del tenant → `/admin`.
 
-- Todos los accesos del hub funcionan.
-- Sin enlaces rotos, rutas huérfanas ni botones sin acción.
-- Ítems fuera de alcance piloto: ocultos (FF) o «Próximamente» explícito (DICT-071).
+### Estructura EatClean (`/admin`)
 
-### 2. RBAC (positivo y negativo)
+| Área | Contenido |
+|------|-----------|
+| Dashboard | Resumen operativo · indicadores **reales** (sin mocks) |
+| Departamentos | Cocina · Producción · Reparto · Atención al Cliente · Clientes · Empresas · Administración · Finanzas · Configuración |
 
-| Rol | Ve en `/admin` | No ve |
-|-----|----------------|-------|
-| Cliente | — (no entra al Centro) | `/admin`, `/saas` |
-| Cocina | Dashboard (si aplica) · Kitchen Queue · Hoja · Execution | Finanzas · SaaS · admin completo |
-| Reparto | Dashboard · Reparto · Entregas (cuando existan) | Cocina mutación · SaaS |
-| Atención al Cliente | Clientes · Pedidos · Soporte | Ejecución cocina · SaaS |
-| Finanzas | Facturación · Pagos · Informes financieros | Cocina · SaaS |
-| Company Admin | Todo el **tenant** | `/saas` |
-| SaaS Admin | Tenant (según dual-role) **+** `/saas` | — |
+Producción incluye entradas a Hoja de Producción y Kitchen Execution (o subnav clara).
 
-### 3. Separación Tenant / Plataforma
+### Criterios
+
+- Todas las rutas del hub accesibles según rol.
+- Sin enlaces rotos, botones sin acción ni módulos vacíos fingiendo live (DICT-071).
+
+**DoD WP-1:** Todos los departamentos son navegables y funcionales según el rol correspondiente.
+
+**Archivos típicos:** `admin-shell.tsx`, `operations-departments.ts`, i18n admin.
+
+---
+
+## WP-2 · Operational RBAC
+
+Crítico: no basta ocultar el menú. Validar:
+
+1. Visibilidad del menú  
+2. Acceso directo por URL  
+3. Acciones CRUD  
+4. Persistencia  
+5. Respuestas del backend  
+
+### Matriz de acceso (piloto)
+
+| Rol | Dashboard | Cocina | Producción | Reparto | Clientes | Empresas | Finanzas | Admin | SaaS |
+|-----|:---------:|:------:|:----------:|:-------:|:--------:|:--------:|:--------:|:-----:|:----:|
+| Cliente | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Cocina | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Reparto | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Atención Cliente | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Finanzas | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Company Admin | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
+| SaaS Admin | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+Cada celda: prueba **positiva** y **negativa** (URL directa incluida).  
+`saas_admin` no debe tratarse automáticamente como “ops admin de menú tenant” sin el dual-role explícito acordado; Company Admin **nunca** ve `/saas`.
+
+**Archivos típicos:** `operations-workspaces.ts`, route `beforeLoad`, permissions, RLS.
+
+---
+
+## WP-3 · Dual Operations Center
+
+### Entrada principal
+
+```text
+Centro de Operaciones   →  /admin
+```
+
+Visible para usuarios del tenant con permisos staff.
+
+### Entrada secundaria (menor jerarquía visual)
+
+```text
+Powered by YourMeal OS
+Centro de Operaciones YourMeal OS   →  /saas
+```
+
+Condiciones:
+
+- Visible **solo** `saas_admin`.
+- No renderizar el control para otros roles.
+- Redirige a `/saas`.
 
 | Superficie | Responsabilidad |
 |------------|-----------------|
 | `/admin` | Opera **EatClean** |
-| `/saas` | Administra **YourMeal OS** |
+| `/saas` | Administra **YourMeal OS** (Tenants, Admins, Roles globales, Branding, Licencias, Feature Flags, Auditoría global, Config SaaS) |
 
-Sin compartir navegación, branding ni responsabilidades. Entrada SaaS discreta (p. ej. bajo *Powered by YourMeal OS*), solo `saas_admin`.
+Alinear `homePathForRoles` y `decideOperationsCenterEntry` para dual-role.
 
-### 4. Persistencia
+**Archivos típicos:** `PoweredByLine` / brand mark, `home-path.ts`, `open-operations-center.ts`, `saas.tsx`.
 
-Cada módulo **visible** desde el hub demuestra CREATE / READ / UPDATE / soft DELETE cuando aplica.  
-Ninguna pantalla meramente decorativa.
+---
 
-### 5. Operational Visibility (Dashboard)
+## WP-4 · Dashboard operacional
 
-Solo información real. Prohibido: tarjetas vacías fingiendo live, KPIs ficticios, contadores inventados, mocks.  
-Sin dato → «Sin datos disponibles» u oculto.
+Eliminar cualquier dato ficticio en `/admin`.
 
-### 6. Criterio FOPEBA (matriz)
+- Solo información persistida.
+- Sin datos → «Sin datos disponibles» **o** ocultar el widget.
+- Nunca números inventados / mocks que parezcan live.
 
-El bloque Centro de Operaciones en `RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md` debe estar en verde:
+**Archivos típicos:** `admin.index.tsx`, deps de `mock-admin` si aún alimentan el dashboard.
+
+---
+
+## WP-5 · Gestión de administradores (imprescindible)
+
+**Limitación actual:** no hay forma completa de que la plataforma asigne Company Admin, permisos y actores del tenant sin depender del desarrollador.
+
+Sin esto, EatClean no puede autogestionar su organización → bloquea demostración RI-001 de “operar sin el equipo de ingeniería”.
+
+### Mínimo en Centro YourMeal OS (`/saas`)
+
+- Crear Company Admin.
+- Asignar roles.
+- Revocar roles.
+- Activar / desactivar cuentas.
+- Asociar usuarios al tenant correcto.
+- Auditar cambios de permisos (`audit_log`).
+
+Este WP es el **puente** plataforma → operación del cliente.
+
+**DoD WP-5:** un `saas_admin` puede aprovisionar un Company Admin real y ese usuario entra a `/admin` con permisos correctos — sin SQL manual.
+
+**Archivos típicos:** rutas `/saas/*`, servicios de membership/roles, RLS, audit.
+
+> Nota DICT-071: si alguna subpantalla SaaS no está lista, FF OFF o «Próximamente» — **no** fingir la gestión de admins; WP-5 es PASS obligatorio del EP.
+
+---
+
+## WP-6 · Operational Certification (mini-gate)
+
+Tras WP-1…WP-5, mini certificación del hub **antes** de reanudar el resto de la auditoría.
 
 ```text
-Visible ✔ · Navega ✔ · Guarda ✔ · Lee ✔ · RBAC ✔ · Auditoría ✔
+□ Navegación completa (WP-1)
+□ RBAC positivo (WP-2)
+□ RBAC negativo + URL directa (WP-2)
+□ Persistencia en módulos visibles
+□ Dashboard sin mocks (WP-4)
+□ Separación /admin vs /saas (WP-3)
+□ Gestión de administradores (WP-5)
+□ Sin hallazgos CRITICAL
+□ Sin hallazgos HIGH bloqueantes
+□ Matriz bloque Ops en verde
 ```
 
-Sin hallazgos CRITICAL / HIGH abiertos de acceso u operación.
+Solo con este checklist **PASS** → reanudar Functional Completeness Review del resto.
 
 ---
 
-## Work packages (Correction)
+## Hoja de ruta
 
-| WP | Entrega | Archivos típicos |
-|----|---------|------------------|
-| WP-1 | Nav EatClean acotada al hub objetivo + kitchen sheet/execution en primary | `admin-shell.tsx`, `operations-departments.ts` |
-| WP-2 | RBAC por rol (ocultar depts ajenos; saas_admin ≠ ops admin automático) | `operations-workspaces.ts`, permissions |
-| WP-3 | Entrada discreta `/saas` + alinear `homePathForRoles` / `decideOperationsCenterEntry` | `PoweredByLine`, `home-path.ts`, `open-operations-center.ts` |
-| WP-4 | Dashboard `/admin` sin mocks (datos reales o vacío honesto) | `admin.index.tsx` |
-| WP-5 | SaaS shell: placeholders → FF OFF o «Próximamente»; IA plataforma | `saas.tsx`, `saas.*.tsx` |
-| WP-6 | Evidencia: matriz Ops en verde + RBAC ± registrado | matriz + log hallazgos |
-
-Fuera de alcance de este EP: Packaging, Delivery nuevo, Monitoring live, rediseño estético.
+```text
+EP-OPS-001
+        │
+        ▼
+Centro de Operaciones PASS
+        │
+        ▼
+Functional Completeness Review (resto)
+        │
+        ▼
+RBAC Certification (ampliada)
+        │
+        ▼
+End-to-End Operational Journey
+        │
+        ▼
+Evidence Review
+        │
+        ▼
+RI-001 Readiness Decision
+```
 
 ---
 
-## Definition of Done
+## Fuera de alcance de este EP
 
-El Centro de Operaciones está listo para RI-001 cuando:
+- Packaging / Delivery nuevos módulos.
+- Monitoring live / métricas de cocina avanzadas.
+- Rediseño estético / polish ACT-001.
 
-- [ ] Todos los accesos del hub navegan correctamente.
-- [ ] No existen botones sin función en el hub visible.
-- [ ] Cada módulo visible usa solo datos persistidos (o vacío honesto).
-- [ ] Separación `/admin` vs `/saas` clara y funcional.
-- [ ] RBAC validado en positivo y negativo para todos los perfiles del piloto.
-- [ ] Auditoría sin CRITICAL/HIGH abiertos de acceso/operación.
-- [ ] Un empleado EatClean puede iniciar la jornada, entrar a su espacio y completar tareas **sin salir** del Centro de Operaciones (salvo Customer App para clientes).
+---
 
-Tras PASS → reanudar Functional Completeness Review del resto de superficies sobre esta base estable.
+## Definition of Done (EP completo)
+
+- [ ] WP-1…WP-6 PASS.
+- [ ] Un empleado EatClean inicia jornada en el hub, trabaja en su departamento y no necesita salir (salvo clientes → Customer App).
+- [ ] Un `saas_admin` puede crear/asignar Company Admin y auditar el cambio.
+- [ ] Separación `/admin` vs `/saas` evidente y enforceable.
+- [ ] RI-001 **desbloqueado** para continuar FCR + E2E sobre base estable.
