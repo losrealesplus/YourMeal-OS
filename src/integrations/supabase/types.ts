@@ -1368,6 +1368,15 @@ export type Database = {
     }
     Functions: {
       current_user_tenants: { Args: never; Returns: string[] }
+      ensure_individual_customer: {
+        Args: {
+          p_display_name?: string
+          p_email?: string
+          p_tenant_id: string
+          p_user_id: string
+        }
+        Returns: string
+      }
       has_any_staff_role: {
         Args: { _tenant_id: string; _user_id: string }
         Returns: boolean
@@ -1383,6 +1392,15 @@ export type Database = {
       is_customer_owner: { Args: { _customer_id: string }; Returns: boolean }
       is_saas_admin: { Args: { _user_id: string }; Returns: boolean }
       is_tenant_member: { Args: { _tenant_id: string }; Returns: boolean }
+      resolve_delivery_group: {
+        Args: {
+          p_company_id: string
+          p_ou_id: string
+          p_site_id: string
+          p_tenant_id: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       app_role:
