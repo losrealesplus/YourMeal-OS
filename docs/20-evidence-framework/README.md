@@ -16,6 +16,20 @@ El rasgo distintivo: la **cadena de evidencia**.
 Forma corta: la única forma de avanzar es obteniendo evidencia de campo.  
 Hito: [Methodology Frozen](../00-status/04-methodology-frozen.md).
 
+### Evidencia en certificación (DICT-006)
+
+> Resultado verificable obtenido mediante la ejecución de un escenario operacional definido, suficiente para aumentar o disminuir la confianza en una decisión de certificación.
+
+Opinión · intención · diff de código por sí solo ≠ evidencia.  
+Instancia RI-001: [CG-RI-001](../00-status/RI001_CERTIFICATION_GATE.md) · [ORS-001](../00-status/ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) · [Certification Report](../00-status/RI001_CERTIFICATION_REPORT.md).
+
+### Capas del ecosistema (no mezclar)
+
+```text
+FON AI → FOPEBA → Knowledge → YourMeal OS → CG-RI-001 → EatClean
+```
+
+Hasta cerrar RI-001: **congelación metodológica** (no nuevos principios DICT/EP de metodología).
 ---
 
 ## Tres capas de artefactos

@@ -5,9 +5,50 @@
 **Patrón reutilizable:** [DICT-075 · Certification Gate](../99-reference/PROJECT_DICTIONARY.md#certification-gate)  
 **Estado:** Active — pendiente de entrada plena tras EP-OPS-001 PASS  
 **Producto:** YourMeal OS · RI: EatClean Tenerife  
-**Canon:** [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md) · [ORS-001](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) · [Release Board](./EP_OPS_001_RELEASE_BOARD.md)
+**Canon:** [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md) · [ORS-001](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) · [Release Board](./EP_OPS_001_RELEASE_BOARD.md)  
+**Informe de decisión:** [RI-001 Certification Report](./RI001_CERTIFICATION_REPORT.md) (plantilla · siguiente gran entregable)
 
-> YourMeal OS no está en “desarrollo de SaaS”. Está en **fase de certificación operacional**.
+> YourMeal OS está en **fase de certificación operacional**.  
+> **Congelación metodológica:** no crear nuevos principios / DICT / EP de metodología hasta concluir RI-001.
+
+---
+
+## Niveles del ecosistema (responsabilidades separadas)
+
+```text
+FON AI
+    │
+    ▼
+FOPEBA
+(Framework)
+    │
+    ▼
+Knowledge
+(Principios · DICT · ADR · OCM · ORS)
+    │
+    ▼
+YourMeal OS
+(Implementación)
+    │
+    ▼
+CG-RI-001
+(Certificación)
+    │
+    ▼
+EatClean
+(Operación real)
+```
+
+| Nivel | Responsabilidad | No debe… |
+|-------|-----------------|----------|
+| FON AI | Visión / ecosistema | Sustituir evidencia de campo |
+| FOPEBA | Framework metodológico | Implementar producto |
+| Knowledge | Principios · DICT · ADR · OCM · ORS | Mezclarse con código ad hoc |
+| YourMeal OS | Implementación | Redefinir metodología en caliente |
+| CG-RI-001 | Certificación / decisión | Ampliar alcance funcional |
+| EatClean | Operación real | Depender de ingeniería para la jornada |
+
+Esa separación evita que metodología, conocimiento, implementación y certificación se mezclen.
 
 ---
 
@@ -42,10 +83,10 @@ EP-OPS-001
 ══════════════════════════════════
       │
       ▼
-RI-001 Decision
-READY
-READY WITH OBSERVATIONS
-NOT READY
+RI-001 Certification Report
+      │
+      ▼
+READY | READY WITH OBSERVATIONS | NOT READY
 ```
 
 ---
@@ -56,14 +97,28 @@ NOT READY
 |-------|--------------------------|
 | ¿Qué falta por implementar? | **¿Qué evidencia falta para emitir una decisión objetiva sobre RI-001?** |
 
-Toda priorización, corrección y PR de Certification Mode debe responder solo a esa pregunta.
-
 ### Disciplina
 
-- Cada corrección debe producir **nueva evidencia**.  
+- Cada corrección debe producir **nueva evidencia** ([DICT-006](../99-reference/PROJECT_DICTIONARY.md#evidence)).  
 - Cada evidencia debe **reducir incertidumbre**.  
 - Cada bloqueador eliminado acerca una **decisión de certificación**.  
-- La arquitectura permanece **estable**; evoluciona el **nivel de confianza** en que el sistema sostiene una operación real.
+- La arquitectura permanece **estable**; evoluciona el **nivel de confianza**.  
+- **No** nuevos principios metodológicos hasta cierre RI-001.
+
+---
+
+## Evidencia (criterio FOPEBA)
+
+> **Evidencia:** resultado verificable obtenido mediante la ejecución de un escenario operacional definido, suficiente para aumentar o disminuir la confianza en una decisión de certificación.
+
+| No es evidencia | Sí es evidencia |
+|-----------------|-----------------|
+| Opinión | Acta de ORS-001 ejecutado |
+| Intención / roadmap | RBAC ± con sesión y roles reales |
+| Diff de código por sí solo | Respuestas de Observability desde el sistema |
+| “Parece que funciona” | Checklist RRR firmado con artefactos |
+
+La evidencia nace cuando un escenario como **ORS-001** se ejecuta y queda documentado.
 
 ---
 
@@ -75,9 +130,8 @@ Toda priorización, corrección y PR de Certification Mode debe responder solo a
 | Operational Architecture | ✅ |
 | Governance | ✅ |
 | OCM-001 (DICT-074) | ✅ Documentado |
+| Congelación metodológica (sin nuevos DICT/EP de principio) | ✅ En vigor |
 | EP-OPS-001 PASS | ☐ Bloqueante |
-
-Sin EP-OPS-001 PASS no se abre el trabajo pleno del Gate (FCR amplio / E2E / RRR). La corrección del hub es la vía de entrada.
 
 ---
 
@@ -86,23 +140,76 @@ Sin EP-OPS-001 PASS no se abre el trabajo pleno del Gate (FCR amplio / E2E / RRR
 | Carril | Artefacto | Pregunta de evidencia |
 |--------|-----------|------------------------|
 | Functional Completeness | [Matriz](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md) | ¿Lo visible existe y funciona? |
-| RBAC Certification | [OCM-001 §2](./EATCLEAN_OPERATIONAL_STRUCTURE.md#2--matriz-de-acceso-rbac) | ¿± validado (menú · URL · CRUD · backend)? |
-| Operational Observability | [Release Board](./EP_OPS_001_RELEASE_BOARD.md#-condición-transversal--operational-observability) | ¿Las 7 preguntas tienen respuesta en sistema? |
-| End-to-End Validation | [ORS-001](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) | ¿Jornada completa sin ingeniería? |
-| Evidence Collection | Log de hallazgos / FOPEBA | ¿Incertidumbre clasificada? |
-| Release Readiness Review | [Readiness sprint](./RI001_READINESS_SPRINT.md) | ¿Checklist RRR completo? |
+| RBAC Certification | [OCM-001 §2](./EATCLEAN_OPERATIONAL_STRUCTURE.md#2--matriz-de-acceso-rbac) | ¿± validado? |
+| Operational Observability | [Release Board](./EP_OPS_001_RELEASE_BOARD.md#-condición-transversal--operational-observability) | ¿7 preguntas con datos del sistema? |
+| End-to-End Validation | [ORS-001](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) | ¿Jornada sin ingeniería? |
+| Evidence Collection | Log / actas | ¿Incertidumbre clasificada? |
+| Release Readiness Review | [Readiness](./RI001_READINESS_SPRINT.md) | ¿RRR completo? |
 
 ---
 
-## Salidas válidas (decisión RI-001)
+## Salidas · definición objetiva y repetible
 
-| Decisión | Significa |
-|----------|-----------|
-| **READY** | Evidencia suficiente · ORS-001 PASS · sin bloqueadores CRITICAL/HIGH abiertos |
-| **READY WITH OBSERVATIONS** | Operable con hallazgos acotados documentados (no invalidan la tesis RI) |
-| **NOT READY** | Falta evidencia objetiva o ORS-001 / Observability / hub fallan |
+### 🟢 READY
 
-La evidencia **informa**; este Gate **decide** (DICT-005).
+El sistema puede operar una jornada real **sin intervención del equipo de ingeniería**.
+
+**Criterios (todos):**
+
+- Todos los bloqueadores críticos eliminados (Release Board 🟢).  
+- [ORS-001](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) completado (8 criterios).  
+- Sin hallazgos **CRITICAL**.  
+- Sin hallazgos **HIGH** bloqueantes.  
+- Evidencia suficiente para respaldar la decisión (DICT-006).  
+
+**Consecuencia:**
+
+```text
+Autorizado para RI-001
+```
+
+---
+
+### 🟡 READY WITH OBSERVATIONS
+
+La operación puede realizarse, pero existen observaciones que **no impiden** el piloto.
+
+**Ejemplos admitidos:**
+
+- Problemas menores de UX.  
+- Métricas no críticas.  
+- Ajustes visuales.  
+- Hallazgos **LOW** o **MEDIUM** aceptados con plan.  
+
+**No admite:** ORS-001 FAIL · CRITICAL · HIGH bloqueante · dependencia de ingeniería.
+
+**Consecuencia:**
+
+```text
+RI-001 autorizado
++
+Plan de seguimiento
+```
+
+---
+
+### 🔴 NOT READY
+
+No existe evidencia suficiente **o** existen bloqueadores que impiden una jornada operativa.
+
+**Ejemplos:**
+
+- ORS-001 falla.  
+- RBAC incorrecto.  
+- Persistencia defectuosa.  
+- Bloqueadores críticos abiertos.  
+- Dependencia del equipo de ingeniería para operar.  
+
+**Consecuencia:**
+
+```text
+RI-001 bloqueado
+```
 
 ---
 
@@ -111,24 +218,32 @@ La evidencia **informa**; este Gate **decide** (DICT-005).
 El [Release Board](./EP_OPS_001_RELEASE_BOARD.md) **no es un backlog**.  
 Es el tablero de **eliminación de bloqueadores** que alimenta este Gate.
 
-Pregunta diaria:
-
-> ¿Qué bloqueador eliminamos hoy?
-
-No: ¿qué desarrollamos hoy?
+Pregunta diaria: **¿qué bloqueador eliminamos hoy?**
 
 ---
 
-## Cosecha FOPEBA (post RI-001)
+## Siguiente hito
 
-Tras la decisión RI-001, **no** archivar solo dentro de YourMeal OS. Extraer patrones validados hacia FOPEBA para CompiME, LosReales+ y futuros productos:
+Tras completar los carriles → emitir [**RI-001 Certification Report**](./RI001_CERTIFICATION_REPORT.md):
+
+```text
+Resultado · Fecha · Versión · Evidencias · Hallazgos
+Decisión · Lecciones · Knowledge harvested for FOPEBA
+```
+
+Ese informe es el puente YourMeal OS → FOPEBA.
+
+---
+
+## Cosecha FOPEBA (post decisión)
 
 | Activo YourMeal OS | Patrón FOPEBA |
 |--------------------|---------------|
-| OCM-001 | Patrón metodológico reutilizable (modelo canónico operacional) |
-| ORS-001 | Patrón de validación operacional |
-| CG-RI-001 / DICT-075 | Patrón de Certification Gate |
-| Release Board | Patrón de gestión de liberaciones / eliminación de bloqueadores |
-| Operational Observability | Patrón de evidencia en operación |
+| OCM-001 | Modelo canónico operacional |
+| ORS-001 | Validación operacional |
+| CG-RI-001 / DICT-075 | Certification Gate |
+| Release Board | Gestión de liberaciones / bloqueadores |
+| Operational Observability | Evidencia en operación |
+| Evidence (DICT-006) | Criterio epistémico de certificación |
 
-Conocimiento validado en un caso real → no empezar de cero en el siguiente producto.
+Ciclo completo: **principios → implementación → certificación → conocimiento validado**.

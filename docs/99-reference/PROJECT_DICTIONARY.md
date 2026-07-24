@@ -455,26 +455,27 @@ Evidence (evidencia)
 Artefacto epistémico
 
 ## Definición
-Hecho verificable (técnico o de campo) que sustenta una afirmación sobre el sistema o el conocimiento operacional. Sin evidencia, no hay ORR PASSED ni KU válido.
+Resultado verificable obtenido mediante la ejecución de un escenario operacional definido (técnico o de campo), suficiente para **aumentar o disminuir la confianza** en una decisión (ORR, KU, Certification Gate). Sin evidencia no hay ORR PASSED, KU válido ni decisión objetiva de RI.
+
+En certificación (CG-RI-001): la evidencia nace cuando un escenario como **ORS-001** se ejecuta y queda documentado.
 
 ## Cuándo ocurre
-Smoke / ORR (evidencia técnica) · FOV (evidencia operacional).
+Smoke / ORR (evidencia técnica) · FOV (evidencia operacional) · Certification Gate / ORS (evidencia de certificación).
 
 ## Produce
-Logs · actas · FO-V / FO-E / FO-C · checklists firmados.
+Logs · actas · FO-V / FO-E / FO-C · checklists firmados · actas ORS · samples de auditoría · Certification Report.
 
 ## No significa
-Opinión · “parece que funciona” · capturas sin contexto.
+Opinión · intención · roadmap · “parece que funciona” · capturas sin contexto · **diff de código por sí solo** (sin ejecución documentada del escenario).
 
 ## Sinónimos
-Evidencia · Field Evidence · Technical Evidence
+Evidencia · Field Evidence · Technical Evidence · Certification Evidence
 
 ## Palabras relacionadas
-Smoke Test · ORR · FOV · Evidence Gate
+Smoke Test · ORR · FOV · Evidence Gate · ORS-001 · Certification Gate · RI-001 Certification Report
 
 ## Referencias
-SMOKE_HP-001.md · ORR.md · `docs/20-evidence-framework/`
-
+SMOKE_HP-001.md · ORR.md · `docs/20-evidence-framework/` · [ORS-001](../00-status/ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) · [CG-RI-001](../00-status/RI001_CERTIFICATION_GATE.md) · [Certification Report](../00-status/RI001_CERTIFICATION_REPORT.md)
 ---
 
 # Knowledge Leakage
@@ -3186,7 +3187,7 @@ Release a producción · v1.0 · sustituir G-02 Pilot Readiness · reabrir arqui
 Gate · Reference Implementation · Evidence · OCM · ORS · Release Board · FOPEBA · Architecture Freeze
 
 ## Referencias
-[RI001_CERTIFICATION_GATE](../00-status/RI001_CERTIFICATION_GATE.md) · [Gate DICT-005](#gate) · [Release Board](../00-status/EP_OPS_001_RELEASE_BOARD.md)
+[RI001_CERTIFICATION_GATE](../00-status/RI001_CERTIFICATION_GATE.md) · [RI001_CERTIFICATION_REPORT](../00-status/RI001_CERTIFICATION_REPORT.md) · [Gate DICT-005](#gate) · [Release Board](../00-status/EP_OPS_001_RELEASE_BOARD.md) · [Evidence DICT-006](#evidence)
 
 
 ---
@@ -3254,3 +3255,4 @@ ORS-001 · OCM-001 · Certification Gate · Day-0 · FOPEBA · Evidence · Tenan
 | 2026-07-24 | Release Board EP-OPS-001 · Day-0 Provisioning Scenario · post-PASS RRR |
 | 2026-07-24 | DICT-074 OCM-001 · ORS-001 · Observability · project nature = demonstrate |
 | 2026-07-24 | DICT-075 Certification Gate · DICT-076 ORS · CG-RI-001 · FOPEBA harvest |
+| 2026-07-24 | DICT-006 Evidence refined (certification) · READY/RWO/NOT READY · Certification Report · methodological freeze |

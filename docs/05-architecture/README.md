@@ -24,6 +24,7 @@
 | [TENANT_OPERATIONAL_AUTONOMY.md](./TENANT_OPERATIONAL_AUTONOMY.md) | Criterio de madurez multi-tenant · WP-5 (DICT-073) |
 | [../00-status/EATCLEAN_OPERATIONAL_STRUCTURE.md](../00-status/EATCLEAN_OPERATIONAL_STRUCTURE.md) | OCM-001 · contrato canónico RI-001 (DICT-074) |
 | [../00-status/RI001_CERTIFICATION_GATE.md](../00-status/RI001_CERTIFICATION_GATE.md) | CG-RI-001 · Certification Gate (DICT-075) |
+| [../00-status/RI001_CERTIFICATION_REPORT.md](../00-status/RI001_CERTIFICATION_REPORT.md) | Plantilla de decisión RI-001 + cosecha FOPEBA |
 | [../00-status/ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md](../00-status/ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) | ORS-001 · prueba operacional de referencia (DICT-076) |
 | [../10-api/README.md](../10-api/README.md) | Service → Repository → Supabase |
 | [../adr/0009-foundation-lock.md](../adr/0009-foundation-lock.md) | Lock ADR |

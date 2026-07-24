@@ -5,6 +5,7 @@
 **Naturaleza:** producto en **fase de certificación operacional** (no “SaaS en desarrollo”)  
 **Canon:** [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md) · [ORS-001](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) · [DICT-074](../99-reference/PROJECT_DICTIONARY.md#operational-canonical-model)  
 **Principios:** [DICT-071](../20-evidence-framework/09-operational-visibility-principle.md) · [DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md) · [DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)  
+**Informe de decisión:** [RI-001 Certification Report](./RI001_CERTIFICATION_REPORT.md)  
 **Gate:** [CG-RI-001](./RI001_CERTIFICATION_GATE.md) · [DICT-075](../99-reference/PROJECT_DICTIONARY.md#certification-gate)  
 **Spec de corrección:** [EP_OPS_001_OPERATIONAL_CENTER_READINESS](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)  
 **Matriz:** [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md)

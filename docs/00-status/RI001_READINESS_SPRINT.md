@@ -2,21 +2,22 @@
 
 **Fecha:** 2026-07-24 (actualizado post-#52)  
 **Tipo:** Gobernanza operativa · **certificación** — **prohibido** abrir PRs de nuevas capacidades  
-**Objetivo:** Emitir una decisión objetiva sobre RI-001 (READY / READY WITH OBSERVATIONS / NOT READY).  
-**Fase:** Certificación operacional · [CG-RI-001](./RI001_CERTIFICATION_GATE.md)
+**Objetivo:** Emitir [RI-001 Certification Report](./RI001_CERTIFICATION_REPORT.md) con decisión READY / RWO / NOT READY.  
+**Fase:** Certificación operacional · [CG-RI-001](./RI001_CERTIFICATION_GATE.md)  
+**Congelación:** no nuevos principios / DICT / EP metodológicos hasta cerrar RI-001.
 
 > Antes: ¿Qué falta por implementar?  
-> En el Gate: **¿Qué evidencia falta para decidir RI-001?**
+> En el Gate: **¿Qué evidencia falta para decidir RI-001?**  
+> Evidencia (DICT-006): escenario operacional ejecutado y documentado — no opinión ni código solo.
 
-**Gate:** [RI001_CERTIFICATION_GATE](./RI001_CERTIFICATION_GATE.md)  
-**Board (no backlog):** [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md)  
-**Prueba de referencia:** [ORS-001](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md)  
-**Canon:** [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md)  
-Spec hub: [EP_OPS_001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · Matriz: [FCR](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md)  
-DICT: 071 · 072 · 073 · 074 · 075 · 076
+**Gate:** [RI001_CERTIFICATION_GATE](./RI001_CERTIFICATION_GATE.md) · salidas objetivas READY / RWO / NOT READY  
+**Informe:** [RI001_CERTIFICATION_REPORT](./RI001_CERTIFICATION_REPORT.md) ← siguiente gran entregable  
+**Board:** [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md)  
+**ORS / OCM:** [ORS-001](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) · [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md)  
+Spec hub: [EP_OPS_001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · Matriz: [FCR](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md)
 
-Packaging / Delivery **en cola**.  
-EP-OPS-001 = entrada al Gate. Tras PASS: Freeze → carriles del Gate → decisión RI-001.
+Capas: FON AI → FOPEBA → Knowledge → YourMeal OS → CG-RI-001 → EatClean.  
+EP-OPS-001 = entrada al Gate. Tras PASS: Freeze → carriles → **Certification Report** → cosecha FOPEBA.
 
 ---
 
@@ -95,8 +96,9 @@ Detalle: [RI001_CERTIFICATION_GATE](./RI001_CERTIFICATION_GATE.md) · cosecha FO
 
 ## Definition of Done
 
-- [ ] EP-OPS-001 PASS (tabla DoD del Release Board).
-- [ ] Architecture Freeze activo.
-- [ ] FCR · RBAC · E2E · Evidence ejecutados.
-- [ ] Release Readiness Review ✅.
-- [ ] `main` estable → **iniciar RI-001** como consecuencia natural, no como salto de fe.
+- [ ] EP-OPS-001 PASS · Architecture Freeze activo.
+- [ ] Carriles del Gate ejecutados con evidencia (DICT-006).
+- [ ] ORS-001 PASS (o NOT READY documentado).
+- [ ] [RI-001 Certification Report](./RI001_CERTIFICATION_REPORT.md) emitido (READY / RWO / NOT READY).
+- [ ] Knowledge harvested for FOPEBA registrado.
+- [ ] Congelación metodológica respetada (sin nuevos principios hasta el Report).
