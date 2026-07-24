@@ -1,9 +1,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
-import { Link } from "@tanstack/react-router";
 import { applyBrandTheme, brandConfig } from "@/tenant/brand-config";
 import { cn } from "@/lib/utils";
 import { useTenantBrand } from "@/hooks/use-tenant-brand";
-import { useAuth } from "@/hooks/use-auth";
 
 
 /**
