@@ -75,7 +75,7 @@ function SaasMembershipPage() {
         (dupes.get(r.userId) ?? 0) > 1 ? (
           <StatusChip tone="danger" label="multi-tenant (RI-001 breach)" />
         ) : (
-          <StatusChip tone="success" label="active" />
+          <StatusChip tone="positive" label="active" />
         ),
     },
     {

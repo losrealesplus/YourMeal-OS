@@ -123,7 +123,7 @@ function SaasCompanyAdminPage() {
     {
       key: "status",
       header: "Status",
-      render: () => <StatusChip tone="success" label="active" />,
+      render: () => <StatusChip tone="positive" label="active" />,
     },
     {
       key: "actions",

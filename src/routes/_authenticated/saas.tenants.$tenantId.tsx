@@ -111,7 +111,7 @@ function SaasTenantDetailPage() {
             <p className="meta-label">Operational</p>
             <div className="mt-2 flex items-center gap-2">
               <StatusChip
-                tone={t.status === "active" ? "success" : t.status === "suspended" ? "danger" : "warning"}
+                tone={t.status === "active" ? "positive" : t.status === "suspended" ? "danger" : "warning"}
                 label={t.status}
               />
               {t.status !== "active" ? (
@@ -133,7 +133,7 @@ function SaasTenantDetailPage() {
                 style={{ background: t.brand_primary ?? "hsl(var(--muted))" }}
               />
               <StatusChip
-                tone={t.brand_updated_at ? "success" : "neutral"}
+                tone={t.brand_updated_at ? "positive" : "neutral"}
                 label={t.brand_updated_at ? "configured" : "default"}
               />
             </div>

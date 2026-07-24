@@ -114,7 +114,7 @@ function SaasTenantsPage() {
       header: "Operational",
       render: (r) => (
         <StatusChip
-          tone={r.status === "active" ? "success" : r.status === "suspended" ? "danger" : "warning"}
+          tone={r.status === "active" ? "positive" : r.status === "suspended" ? "danger" : "warning"}
           label={r.status}
         />
       ),
@@ -129,7 +129,7 @@ function SaasTenantsPage() {
             style={{ background: r.brand_primary ?? "hsl(var(--muted))" }}
           />
           <StatusChip
-            tone={r.brand_updated_at ? "success" : "neutral"}
+            tone={r.brand_updated_at ? "positive" : "neutral"}
             label={r.brand_updated_at ? "configured" : "default"}
           />
         </div>
