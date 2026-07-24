@@ -49,5 +49,7 @@ describe("mapOrderToSummaryView", () => {
     expect(view.total).toBe(19.8);
     expect(view.items[0]?.dish?.name).toBe("Bowl");
     expect(view.deliveryDateIso).toBe("2026-07-22T12:00:00.000Z");
+    expect(view.address).toBeNull();
+    expect(view.companyName).toBeNull();
   });
 });

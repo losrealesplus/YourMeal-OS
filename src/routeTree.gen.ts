@@ -45,6 +45,7 @@ import { Route as AuthenticatedAdminSupportRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as AuthenticatedAppCompanyRouteImport } from './routes/_authenticated/app.company'
+import { Route as AuthenticatedAppFavoritesRouteImport } from './routes/_authenticated/app.favorites'
 import { Route as AuthenticatedAppMenuRouteImport } from './routes/_authenticated/app.menu'
 import { Route as AuthenticatedAppOnboardingRouteImport } from './routes/_authenticated/app.onboarding'
 import { Route as AuthenticatedAppOrdersRouteImport } from './routes/_authenticated/app.orders'
@@ -279,6 +280,12 @@ const AuthenticatedAppCompanyRoute = AuthenticatedAppCompanyRouteImport.update({
   path: '/company',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const AuthenticatedAppFavoritesRoute =
+  AuthenticatedAppFavoritesRouteImport.update({
+    id: '/favorites',
+    path: '/favorites',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppMenuRoute = AuthenticatedAppMenuRouteImport.update({
   id: '/menu',
   path: '/menu',
@@ -515,6 +522,7 @@ export interface FileRoutesByFullPath {
   '/admin/support': typeof AuthenticatedAdminSupportRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/company': typeof AuthenticatedAppCompanyRouteWithChildren
+  '/app/favorites': typeof AuthenticatedAppFavoritesRoute
   '/app/menu': typeof AuthenticatedAppMenuRouteWithChildren
   '/app/onboarding': typeof AuthenticatedAppOnboardingRouteWithChildren
   '/app/orders': typeof AuthenticatedAppOrdersRouteWithChildren
@@ -580,6 +588,7 @@ export interface FileRoutesByTo {
   '/admin/support': typeof AuthenticatedAdminSupportRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/company': typeof AuthenticatedAppCompanyRouteWithChildren
+  '/app/favorites': typeof AuthenticatedAppFavoritesRoute
   '/app/menu': typeof AuthenticatedAppMenuRouteWithChildren
   '/app/onboarding': typeof AuthenticatedAppOnboardingRouteWithChildren
   '/app/orders': typeof AuthenticatedAppOrdersRouteWithChildren
@@ -653,6 +662,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/support': typeof AuthenticatedAdminSupportRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/app/company': typeof AuthenticatedAppCompanyRouteWithChildren
+  '/_authenticated/app/favorites': typeof AuthenticatedAppFavoritesRoute
   '/_authenticated/app/menu': typeof AuthenticatedAppMenuRouteWithChildren
   '/_authenticated/app/onboarding': typeof AuthenticatedAppOnboardingRouteWithChildren
   '/_authenticated/app/orders': typeof AuthenticatedAppOrdersRouteWithChildren
@@ -726,6 +736,7 @@ export interface FileRouteTypes {
     | '/admin/support'
     | '/admin/users'
     | '/app/company'
+    | '/app/favorites'
     | '/app/menu'
     | '/app/onboarding'
     | '/app/orders'
@@ -791,6 +802,7 @@ export interface FileRouteTypes {
     | '/admin/support'
     | '/admin/users'
     | '/app/company'
+    | '/app/favorites'
     | '/app/menu'
     | '/app/onboarding'
     | '/app/orders'
@@ -863,6 +875,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/support'
     | '/_authenticated/admin/users'
     | '/_authenticated/app/company'
+    | '/_authenticated/app/favorites'
     | '/_authenticated/app/menu'
     | '/_authenticated/app/onboarding'
     | '/_authenticated/app/orders'
@@ -1161,6 +1174,13 @@ declare module '@tanstack/react-router' {
       path: '/company'
       fullPath: '/app/company'
       preLoaderRoute: typeof AuthenticatedAppCompanyRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/favorites': {
+      id: '/_authenticated/app/favorites'
+      path: '/favorites'
+      fullPath: '/app/favorites'
+      preLoaderRoute: typeof AuthenticatedAppFavoritesRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/app/menu': {
@@ -1622,6 +1642,7 @@ const AuthenticatedAppSettingsRouteWithChildren =
 
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppCompanyRoute: typeof AuthenticatedAppCompanyRouteWithChildren
+  AuthenticatedAppFavoritesRoute: typeof AuthenticatedAppFavoritesRoute
   AuthenticatedAppMenuRoute: typeof AuthenticatedAppMenuRouteWithChildren
   AuthenticatedAppOnboardingRoute: typeof AuthenticatedAppOnboardingRouteWithChildren
   AuthenticatedAppOrdersRoute: typeof AuthenticatedAppOrdersRouteWithChildren
@@ -1632,6 +1653,7 @@ interface AuthenticatedAppRouteChildren {
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppCompanyRoute: AuthenticatedAppCompanyRouteWithChildren,
+  AuthenticatedAppFavoritesRoute: AuthenticatedAppFavoritesRoute,
   AuthenticatedAppMenuRoute: AuthenticatedAppMenuRouteWithChildren,
   AuthenticatedAppOnboardingRoute: AuthenticatedAppOnboardingRouteWithChildren,
   AuthenticatedAppOrdersRoute: AuthenticatedAppOrdersRouteWithChildren,

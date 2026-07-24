@@ -1,6 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { MapPin, Truck } from "lucide-react";
+import { Building2, MapPin, RotateCcw, Truck } from "lucide-react";
 import {
   DishThumb,
   PrimaryCTA,
@@ -10,13 +10,18 @@ import {
 import { useFmt } from "@/i18n/localization-provider";
 import { useOrder } from "@/hooks/use-order";
 import { useConfirmOrder } from "@/hooks/use-confirm-order";
+import {
+  useRepeatOrder,
+  useRepeatOrderPreview,
+} from "@/hooks/use-repeat-order";
 import type { OrderSummaryStatus } from "@/modules/orders/application/order-summary-mapper";
 import type { MockOrderStatus } from "@/lib/mock-catalog";
 
 /**
- * Screen: Customer · Order Summary / Confirm
+ * Screen: Customer · Order Summary / Confirm / Repeat
  * - CAP-005: useOrder() real read
- * - CAP-006: Confirm Draft → Confirmed (PrimaryCTA when draft)
+ * - CAP-006: Confirm Draft → Confirmed
+ * - EP-002A.2: Repetir pedido (menu-validated draft)
  */
 export const Route = createFileRoute("/_authenticated/app/orders/$orderId")({
   component: OrderSummary,
@@ -32,11 +37,31 @@ function pillTone(status: OrderSummaryStatus): MockOrderStatus {
   return "cancelled";
 }
 
+function formatAddress(
+  address: {
+    label: string | null;
+    line: string;
+    city: string | null;
+  } | null,
+): string | null {
+  if (!address) return null;
+  if (address.label && address.city) return `${address.label} · ${address.city}`;
+  if (address.label && address.line) return `${address.label} · ${address.line}`;
+  if (address.city) return `${address.line} · ${address.city}`;
+  return address.line;
+}
+
 function OrderSummary() {
   const { t } = useTranslation(["customer", "common"]);
   const { orderId } = Route.useParams();
   const { data: order, isPending, isFetched } = useOrder(orderId);
   const confirmOrder = useConfirmOrder();
+  const repeatOrder = useRepeatOrder();
+  const repeatPreview = useRepeatOrderPreview(
+    order && order.status !== "draft" && order.status !== "cancelled"
+      ? order.id
+      : undefined,
+  );
   const fmt = useFmt();
 
   if (isPending) {
@@ -60,6 +85,11 @@ function OrderSummary() {
   };
 
   const isDraft = order.status === "draft";
+  const addressLine = formatAddress(order.address);
+  const showRepeat =
+    !isDraft &&
+    order.status !== "cancelled" &&
+    Boolean(repeatPreview.data?.canRepeat);
 
   return (
     <div className="flex-1 flex flex-col pb-6">
@@ -92,9 +122,22 @@ function OrderSummary() {
             </div>
             <div>
               <p className="meta-label">{t("customer:deliveryAddress")}</p>
-              <p className="text-sm mt-1">{t("common:comingSoon")}</p>
+              <p className="text-sm mt-1">
+                {addressLine ?? t("common:comingSoon")}
+              </p>
             </div>
           </div>
+          {order.companyName ? (
+            <div className="flex items-center gap-3">
+              <div className="grid place-items-center size-10 rounded-xl bg-secondary shrink-0">
+                <Building2 className="size-5 text-primary" />
+              </div>
+              <div>
+                <p className="meta-label">{t("customer:companyLabel")}</p>
+                <p className="text-sm mt-1 font-semibold">{order.companyName}</p>
+              </div>
+            </div>
+          ) : null}
         </div>
       </section>
 
@@ -122,6 +165,29 @@ function OrderSummary() {
         </div>
       </section>
 
+      {repeatPreview.data &&
+      repeatPreview.data.unavailable.length > 0 &&
+      showRepeat ? (
+        <section className="px-6 mt-6">
+          <p className="meta-label mb-2">{t("customer:repeatUnavailableTitle")}</p>
+          <ul className="bg-card border border-border rounded-2xl divide-y divide-border">
+            {repeatPreview.data.unavailable.map((line) => (
+              <li
+                key={`${line.dishId}-${line.sourceDayDate}`}
+                className="px-4 py-3 text-sm"
+              >
+                <p className="font-semibold">
+                  {line.dishName ?? line.dishId}
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {t("customer:dishUnavailable")}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       <section className="px-6 mt-6">
         <div className="bg-card border border-border rounded-2xl p-5 space-y-2">
           <TotalsRow
@@ -141,23 +207,39 @@ function OrderSummary() {
         </div>
       </section>
 
-      {isDraft ? (
-        <div className="px-6 mt-8 space-y-3">
-          {confirmOrder.isError ? (
-            <p className="text-sm text-destructive" role="alert">
-              {(confirmOrder.error as Error)?.message ?? "Error"}
-            </p>
-          ) : null}
+      <div className="px-6 mt-8 space-y-3">
+        {isDraft ? (
+          <>
+            {confirmOrder.isError ? (
+              <p className="text-sm text-destructive" role="alert">
+                {(confirmOrder.error as Error)?.message ?? "Error"}
+              </p>
+            ) : null}
+            <PrimaryCTA
+              disabled={confirmOrder.isPending}
+              onClick={() => {
+                void confirmOrder.mutateAsync(order.id);
+              }}
+            >
+              {t("customer:confirmOrder")}
+            </PrimaryCTA>
+          </>
+        ) : null}
+
+        {showRepeat ? (
           <PrimaryCTA
-            disabled={confirmOrder.isPending}
-            onClick={() => {
-              void confirmOrder.mutateAsync(order.id);
-            }}
+            variant={isDraft ? "outline" : "solid"}
+            disabled={repeatOrder.isPending}
+            trailingIcon={false}
+            onClick={() => repeatOrder.mutate(order.id)}
           >
-            {t("customer:confirmOrder")}
+            <span className="inline-flex items-center gap-2">
+              <RotateCcw className="size-4" strokeWidth={2} />
+              {t("customer:repeatOrder")}
+            </span>
           </PrimaryCTA>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
     </div>
   );
 }

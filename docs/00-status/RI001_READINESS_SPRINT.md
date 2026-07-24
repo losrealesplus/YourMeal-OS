@@ -24,19 +24,19 @@ Al cerrar la jornada debe saberse exactamente:
 
 ### PRs a cerrar
 
-| PR | Tema | Mergeable (2026-07-24) | Nota |
-|----|------|------------------------|------|
-| [#45](https://github.com/losrealesplus/YourMeal-OS/pull/45) | EP-002A.2 Historial + Repetir | CONFLICTING | Solo docs (`CURRENT_PHASE`, `EP002A_…`) — resolver y merge |
-| [#46](https://github.com/losrealesplus/YourMeal-OS/pull/46) | EP-002B.1 Hoja de Producción | CONFLICTING | Código **ya incluido** en #48 (cherry-pick). Preferir: **cerrar #46** tras merge de #48, o resolver solo docs si se mergea antes |
-| [#47](https://github.com/losrealesplus/YourMeal-OS/pull/47) | EP-002A.3 Preferencias / Favoritos | CLEAN | Merge tras #45 si hay solape Customer App |
-| [#48](https://github.com/losrealesplus/YourMeal-OS/pull/48) | EP-002B.2 Kitchen Execution (+ B.1) | CLEAN | Incluye Hoja de Producción + Ejecución |
-| [#49](https://github.com/losrealesplus/YourMeal-OS/pull/49) | DICT-072 + brief Packaging | CLEAN (base #48) | Docs; merge después de #48 |
+| PR | Tema | Estado (2026-07-24) | Nota |
+|----|------|---------------------|------|
+| [#45](https://github.com/losrealesplus/YourMeal-OS/pull/45) | EP-002A.2 Historial + Repetir | ✅ Merged | — |
+| [#46](https://github.com/losrealesplus/YourMeal-OS/pull/46) | EP-002B.1 Hoja de Producción | ✅ Merged | También cubierto por #48 |
+| [#47](https://github.com/losrealesplus/YourMeal-OS/pull/47) | EP-002A.3 Preferencias / Favoritos | ✅ Merged | — |
+| [#48](https://github.com/losrealesplus/YourMeal-OS/pull/48) | EP-002B.2 Kitchen Execution (+ B.1) | ✅ Merged | Aplicar migración `kitchen_production_batches` |
+| [#49](https://github.com/losrealesplus/YourMeal-OS/pull/49) / [#51](https://github.com/losrealesplus/YourMeal-OS/pull/51) | DICT-072 Operational Representation | ⏳ | Preferir **#51** → `main`; cerrar #49 |
+| [#50](https://github.com/losrealesplus/YourMeal-OS/pull/50) / este | RI-001 Readiness sprint | ⏳ | Preferir PR retarget a `main` |
 
-### Orden recomendado de merge
+### Orden recomendado de merge (docs restantes)
 
 ```text
-#45 → #47 → #48 → #49
-         ↘ cerrar #46 como superseded por #48
+#51 (DICT-072) → este PR (Readiness) → cerrar #49 / #50 apilados
 ```
 
 ### Checklist por PR

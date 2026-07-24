@@ -13,6 +13,7 @@ FOV PREPARATION · ORR (marco) · G-02 (Gate formalizado)     ✅
 EP-001 Functional Completeness (cero humo Admin/Ops nav)    ✅
 ────────────────────────────
 Siguiente sprint:  **RI-001 Readiness** (cerrar PRs · cero humo · RBAC · E2E · Release Review)
+                   (EP-002A.1–A.3 ✅ · Hoja de Producción ✅ · Kitchen Execution ✅)
                    · EP-002B.3 Packaging / B.4 Delivery **en cola** (después de Readiness)
 Siguiente artefacto:  [RI001_READINESS_SPRINT](./RI001_READINESS_SPRINT.md) → iniciar RI-001
 
@@ -22,15 +23,15 @@ Pilot Readiness (lectura)
   Modelo operacional  ██████████
   Administración      ██████████
   Customer App        ████████░░  ← EP-002A (último tramo / consolidación)
-  Operaciones         ████████░░  ← EP-002B (B.1·B.2 en PRs · Readiness antes de B.3)
+  Operaciones         ████████░░  ← EP-002B (B.1·B.2 ✅ · Readiness antes de B.3)
   Data                ███████░░░
 
 Mapa EP:
   FASE 0 · FOUNDATION              ██████████
   EP-001 · Functional Completeness ██████████
-  EP-002A · Customer Experience    █████████░  (#45·#47 por merge)
-  EP-002B.1 · Production Report    █████████░  (en #48; #46 superseded)
-  EP-002B.2 · Kitchen Execution    █████████░  (#48 por merge)
+  EP-002A · Customer Experience    ██████████
+  EP-002B.1 · Production Report    ██████████
+  EP-002B.2 · Kitchen Execution    ██████████
   —— RI-001 Readiness ——           □□□□□□□□□□  ← HOY
   EP-002B.3 · Packaging            □□□□□□□□□□  (cola post-Readiness)
   EP-002B.4 · Delivery             □□□□□□□□□□

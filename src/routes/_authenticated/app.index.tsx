@@ -187,7 +187,7 @@ function HomeBody({
           label={t("scheduleCta")}
         />
         <QuietLink
-          to="/app/menu"
+          to="/app/favorites"
           icon={<Heart className="size-5" strokeWidth={2} />}
           label={t("homeFavorites")}
         />
@@ -207,7 +207,7 @@ function QuietLink({
   icon,
   label,
 }: {
-  to: "/app/menu" | "/app/schedule";
+  to: "/app/menu" | "/app/schedule" | "/app/favorites";
   icon: ReactNode;
   label: string;
 }) {
