@@ -49,45 +49,19 @@ export function TenantBrandScope({
 }
 
 export function PoweredByLine({ className }: { className?: string }) {
-  const { isSaasAdmin } = useAuth();
   if (!brandConfig.poweredBy.visible) return null;
 
   const prefix = brandConfig.poweredBy.prefix ?? "Powered by";
   const name = brandConfig.poweredBy.name ?? "YourMeal OS";
 
-  const body = (
-    <>
+  return (
+    <p className={cn("text-center select-none leading-tight", className)} aria-hidden>
       <span className="block text-[8px] font-normal tracking-[0.1em] text-muted-foreground">
         {prefix}
       </span>
       <span className="mt-0.5 block text-[9px] font-normal tracking-[0.04em] text-muted-foreground">
         {name}
       </span>
-      {isSaasAdmin ? (
-        <span className="mt-1 block text-[8px] font-medium tracking-[0.14em] uppercase text-primary/80">
-          Platform Operations →
-        </span>
-      ) : null}
-    </>
-  );
-
-  const baseClass = cn("text-center select-none leading-tight", className);
-
-  if (isSaasAdmin) {
-    return (
-      <Link
-        to="/saas"
-        aria-label="Open Platform Operations"
-        className={cn(baseClass, "block hover:text-foreground transition-colors")}
-      >
-        {body}
-      </Link>
-    );
-  }
-
-  return (
-    <p className={baseClass} aria-hidden>
-      {body}
     </p>
   );
 }
