@@ -74,7 +74,7 @@ function SettingsPage() {
     {
       title: t("customer:groupApp"),
       items: [
-        { key: "notifications", icon: <Bell className="size-4" /> },
+        { key: "notifications", icon: <Bell className="size-4" />, to: "/app/notifications" },
         { key: "help", icon: <HelpCircle className="size-4" /> },
         { key: "about", icon: <Info className="size-4" /> },
       ],
