@@ -59,3 +59,26 @@ export async function assertCapability(
   }
   return roles;
 }
+
+/**
+ * Sync capability guard for admin child routes. Reads pre-loaded roles from
+ * the parent `/admin` route context (set by `assertStaffRoute`) and enforces
+ * the specific capability required for the module. Hiding the nav item is
+ * not enough — direct URL access must be blocked at `beforeLoad`.
+ *
+ * Every protected `/admin/*` route MUST call this in its `beforeLoad`.
+ * @see docs/09-security/CAPABILITY_MATRIX.md
+ * @see docs/00-status/RBAC_HARDENING_RI-001.md
+ */
+export function assertCapabilityFromContext(
+  context: unknown,
+  capability: Capability | readonly Capability[],
+  fallback: "/app" | "/admin" = "/admin",
+): void {
+  const roles = (context as { roles?: AppRole[] }).roles ?? [];
+  const caps = Array.isArray(capability) ? capability : [capability];
+  const ok = caps.some((c) => can(roles, c));
+  if (!ok) {
+    throw redirect({ to: fallback });
+  }
+}
