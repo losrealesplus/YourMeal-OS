@@ -11,6 +11,7 @@ export { DayPicker } from "./day-picker";
 export { SectionHeader } from "./section-header";
 export { EmptyState } from "./empty-state";
 export { PrimaryCTA } from "./primary-cta";
+export { UpcomingDeliveryCard } from "./upcoming-delivery-card";
 export {
   DashboardSkeleton,
   DashboardError,
