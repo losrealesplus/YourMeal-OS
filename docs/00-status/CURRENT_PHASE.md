@@ -12,19 +12,31 @@ FOUNDATION / BLUEPRINT / DISCOVERY / OM / VALIDATION / IOV   ✅
 FOV PREPARATION · ORR (marco) · G-02 (Gate formalizado)     ✅
 EP-001 Functional Completeness (cero humo Admin/Ops nav)    ✅
 ────────────────────────────
-Siguiente sprint:  **EP-002B · Packaging / Delivery** (tras Kitchen Execution)
-                   · EP-002A cierre de ciclo cliente en paralelo
-                   → RI-001
-Siguiente artefacto:  empaquetado / reparto → RI-001
+Siguiente sprint:  **EP-002B.3 Packaging** (tras Kitchen Execution)
+                   · EP-002A ciclo cliente en paralelo si faltan cierres
+                   → Delivery (B.4) → RI-001
+Siguiente artefacto:  Packaging Workspace/Report → Delivery → RI-001
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████
   Gobernanza          ██████████
   Modelo operacional  ██████████
   Administración      ██████████
-  Customer App        ████████░░  ← EP-002A (último tramo)
-  Operaciones         █████████░  ← EP-002B
+  Customer App        ████████░░  ← EP-002A (último tramo / consolidación)
+  Operaciones         ████████░░  ← EP-002B (B.1·B.2 ✅ · B.3 Packaging siguiente)
   Data                ███████░░░
+
+Mapa EP:
+  FASE 0 · FOUNDATION              ██████████
+  EP-001 · Functional Completeness ██████████
+  EP-002A · Customer Experience    ██████████  (prácticamente cerrado)
+  EP-002B.1 · Production Report    ██████████
+  EP-002B.2 · Kitchen Execution    ██████████
+  EP-002B.3 · Packaging            □□□□□□□□□□  ← siguiente
+  EP-002B.4 · Delivery             □□□□□□□□□□
+  RI-001                           █████████░
+
+Patrón permanente: Operational Representation (DICT-072)
 
 Riesgo principal: ya no es diseño → **completar el ciclo semanal cliente + ejecución ops**
 
@@ -36,6 +48,7 @@ Pregunta principal: ¿Qué nos enseña la operación real sobre nuestro modelo?
 
 Primary Artifact:  [PILOT_ACCEPTANCE_CHECKLIST](./PILOT_ACCEPTANCE_CHECKLIST.md) · [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md)
 Visibilidad:       [Operational Visibility · DICT-071](../20-evidence-framework/09-operational-visibility-principle.md)
+Ops pattern:       [Operational Representation · DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md)
 Seguridad pre-piloto: [Pilot Security Checklist](../09-security/PILOT_SECURITY_CHECKLIST.md) (10 corregidos · 1 Accepted documentado)
 Antes de firmar G-02 PASSED: ORR firmados · cero humo · No Artificiality
 PR taxonomy (post G-02): Evidence · KU · Correction · Pilot Fix · Operational Finding

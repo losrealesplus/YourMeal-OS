@@ -3,6 +3,7 @@
 **Estado:** Done (implementation)  
 **Cara:** Centro de Operaciones · Cocina  
 **Principio:** [Operational Visibility](../20-evidence-framework/09-operational-visibility-principle.md) (DICT-071)  
+**Patrón:** [Operational Representation](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md) (DICT-072)  
 **Pregunta:** ¿Qué está ocurriendo en la cocina **ahora mismo**?
 
 ---
@@ -27,9 +28,7 @@ ProductionReportService
         └── Workspace → Ejecución de Cocina (/admin/kitchen-execution)
 ```
 
-Un único origen. Dos representaciones.
-
-Convención YourMeal OS:
+Un único origen. Dos representaciones. Ver [DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md).
 
 | Capa | Rol |
 |------|-----|
@@ -68,6 +67,25 @@ Sin fila = estado efectivo `pending` (no se inventa progreso).
 
 ---
 
+## Checklist de despliegue (antes de usar en un entorno)
+
+```text
+□ Ejecutar migración
+  20260724170000_kitchen_production_batches.sql
+
+□ Verificar RLS (select/write staff + saas_admin)
+
+□ Verificar auditoría (status_change → audit_log)
+
+□ Validar estados iniciales (sin fila = pending)
+
+□ Comprobar que Report y Workspace leen el mismo batchStatus
+```
+
+Así se evita divergencia código ↔ base de datos.
+
+---
+
 ## Superficies
 
 | Superficie | Contenido |
@@ -82,7 +100,7 @@ Entrada: **Cocina** → «Ejecución» · enlace cruzado con Hoja de Producción
 ## Fuera de alcance (no simular)
 
 - Temporizadores artificiales / responsables no persistidos.
-- Packaging, métricas de cocina, alertas de retraso (consumirán este mismo lote más adelante).
+- Packaging, métricas de cocina, alertas de retraso → [EP-002B.3](./EP002B3_PACKAGING.md) y siguientes.
 - Mutar estado de pedido individual desde este workspace (sigue siendo cola de pedidos).
 
 ---
