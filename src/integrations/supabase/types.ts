@@ -715,60 +715,6 @@ export type Database = {
           },
         ]
       }
-      kitchen_production_batches: {
-        Row: {
-          created_at: string
-          delivery_date: string
-          dish_id: string
-          finished_at: string | null
-          id: string
-          started_at: string | null
-          status: Database["public"]["Enums"]["kitchen_batch_status"]
-          tenant_id: string
-          updated_at: string
-          updated_by: string | null
-        }
-        Insert: {
-          created_at?: string
-          delivery_date: string
-          dish_id: string
-          finished_at?: string | null
-          id?: string
-          started_at?: string | null
-          status?: Database["public"]["Enums"]["kitchen_batch_status"]
-          tenant_id: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Update: {
-          created_at?: string
-          delivery_date?: string
-          dish_id?: string
-          finished_at?: string | null
-          id?: string
-          started_at?: string | null
-          status?: Database["public"]["Enums"]["kitchen_batch_status"]
-          tenant_id?: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "kitchen_production_batches_dish_id_fkey"
-            columns: ["dish_id"]
-            isOneToOne: false
-            referencedRelation: "dishes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "kitchen_production_batches_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       order_items: {
         Row: {
           comment: string | null
@@ -1473,11 +1419,6 @@ export type Database = {
       customer_kind: "individual" | "company_employee"
       dish_status: "draft" | "active" | "archived" | "inactive"
       invoice_status: "pending" | "paid" | "overdue" | "void"
-      kitchen_batch_status:
-        | "pending"
-        | "preparing"
-        | "plating"
-        | "finished"
       order_status:
         | "draft"
         | "confirmed"
@@ -1638,12 +1579,6 @@ export const Constants = {
       customer_kind: ["individual", "company_employee"],
       dish_status: ["draft", "active", "archived", "inactive"],
       invoice_status: ["pending", "paid", "overdue", "void"],
-      kitchen_batch_status: [
-        "pending",
-        "preparing",
-        "plating",
-        "finished",
-      ],
       order_status: [
         "draft",
         "confirmed",
