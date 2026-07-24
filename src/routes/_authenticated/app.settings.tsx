@@ -59,7 +59,7 @@ function SettingsPage() {
     {
       title: t("customer:groupBilling"),
       items: [
-        { key: "payment", icon: <CreditCard className="size-4" /> },
+        { key: "payment", icon: <CreditCard className="size-4" />, to: "/app/payment-methods" },
         { key: "invoices", icon: <FileText className="size-4" /> },
         { key: "orderHistory", icon: <History className="size-4" />, to: "/app/orders" },
       ],
