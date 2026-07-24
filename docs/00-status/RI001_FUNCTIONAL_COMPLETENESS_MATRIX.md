@@ -43,9 +43,13 @@ Leyenda: ✅ OK · 🟡 Parcial / acotado · ⏳ Pendiente de review en vivo · 
 | Administración | `/admin/users` · … | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | |
 | Finanzas | `/admin/accounting` | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | FF si no listo |
 | Configuración | `/admin/settings` · branding | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | |
-| SaaS plataforma | `/saas/*` | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | WP-5: admins/roles |
+| SaaS plataforma | `/saas/*` | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | WP-5: Tenant Provisioning |
 | Separación admin/saas | entry discreta | ⏳ | ⏳ | — | — | ⏳ | — | ⏳ | WP-3 Dual |
-| Gestión Company Admin | SaaS → tenant | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | WP-5 puente |
+| Tenant Management | `/saas` tenants | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | WP-5 · list/create/activate |
+| Company Admin provisioning | SaaS → tenant | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | WP-5 · DICT-073 |
+| Roles (no permisos sueltos) | SaaS / admin users | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | WP-5 · roles de sistema |
+| Membership 1:1 | modelo | — | — | — | — | ⏳ | — | ⏳ | RI-001: un user ↔ un tenant |
+| Auditoría provisioning | `audit_log` | ⏳ | ⏳ | — | ⏳ | ⏳ | ⏳ | ⏳ | WP-5 evidencia |
 
 PASS del bloque = todas las filas visibles en ✅ (o ocultas honestamente) + RBAC ± documentado. Ver [EP-OPS-001 DoD](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md#definition-of-done).
 

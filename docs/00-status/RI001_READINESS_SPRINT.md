@@ -10,10 +10,11 @@
 
 Artefacto primario (ahora): [EP-OPS-001 Operational Center Readiness](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)  
 Matriz (bloque Ops primero): [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md)  
-Patrón: [DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md) · Visibilidad: [DICT-071](../20-evidence-framework/09-operational-visibility-principle.md)
+Patrón: [DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md) · Visibilidad: [DICT-071](../20-evidence-framework/09-operational-visibility-principle.md) · Autonomía: [DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)
 
 Packaging (EP-002B.3) y Delivery (EP-002B.4) permanecen **en cola**.  
-FCR del resto de módulos: **en pausa** hasta Ops Center PASS.
+FCR del resto de módulos: **en pausa** hasta Ops Center PASS.  
+Tras Ops PASS: **Architecture Freeze** hasta cerrar RI-001 (solo defectos · evidencia · certificación).
 
 ---
 
@@ -50,10 +51,17 @@ Gap: [OPS_CENTER_DUAL_SURFACE](./OPS_CENTER_DUAL_SURFACE.md)
 | WP-2 | Operational RBAC (± · URL · CRUD · backend) |
 | WP-3 | Dual Operations Center (`/admin` vs `/saas`) |
 | WP-4 | Dashboard operacional sin mocks |
-| WP-5 | Gestión de administradores (Company Admin desde SaaS) |
-| WP-6 | Mini-certificación del hub |
+| WP-5 | **Tenant Provisioning** (DICT-073) — no “pantalla de admins” |
+| WP-6 | Mini-certificación del hub + escenario autónomo |
 
 Hasta PASS: no continuar FCR amplio ni E2E completo.
+
+### 0b · Architecture Freeze (inmediato tras EP-OPS-001 PASS)
+
+Hasta finalizar RI-001:
+
+- ❌ No nuevos módulos · patrones · capacidades  
+- ✅ Solo corrección de defectos · evidencia · certificación  
 
 ### 1 · Functional Completeness Review (resto)
 
@@ -71,17 +79,18 @@ Positivo **y** negativo por perfil — evidencia en EP-OPS-001 y matriz.
 
 ### 4 · Recorrido E2E (guion)
 
-Tras hub PASS:
+Tras hub PASS + Freeze:
 
 ```text
 Cliente → … → Kitchen Queue → Kitchen Execution → Hoja
   → Packaging* → Delivery* → Entrega → Historial → Repetir
 ```
 
+Más el escenario autónomo WP-5 (saas_admin → company_admin → staff por área).
+
 ### 5 · Evidence Collection
 
 Clasificar antes de corregir (tabla en la matriz).
-
 ---
 
 ## Fase 9 · Release Readiness Review

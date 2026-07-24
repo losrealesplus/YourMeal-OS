@@ -133,6 +133,7 @@ Core | Operational | Engineering | Historical
 | `DICT-070` | [Reference Implementation (RI)](#reference-implementation-ri) | Core | Accepted |
 | `DICT-071` | [Operational Visibility](#operational-visibility) | Core | Accepted |
 | `DICT-072` | [Operational Representation Pattern](#operational-representation-pattern) | Engineering | Accepted |
+| `DICT-073` | [Tenant Operational Autonomy](#tenant-operational-autonomy) | Core | Accepted |
 | `DICT-006` | [Evidence](#evidence) | Core | Accepted |
 | `DICT-007` | [Knowledge Leakage](#knowledge-leakage) | Core | Accepted |
 | `DICT-008` | [Operational Model](#operational-model) | Core | Accepted |
@@ -201,7 +202,7 @@ Core | Operational | Engineering | Historical
 
 ### Metodología
 
-[FOPEBA](#fopeba) (`DICT-001`) · [FOV](#fov) (`DICT-002`) · [IOV](#iov) (`DICT-003`) · [Knowledge Update](#knowledge-update) (`DICT-004`) · [Gate](#gate) (`DICT-005`) · [Pilot Integrity](#pilot-integrity) (`DICT-069`) · [Reference Implementation](#reference-implementation-ri) (`DICT-070`) · [Operational Visibility](#operational-visibility) (`DICT-071`) · [Operational Representation Pattern](#operational-representation-pattern) (`DICT-072`) · [Evidence](#evidence) (`DICT-006`) · [Knowledge Leakage](#knowledge-leakage) (`DICT-007`) · [Operational Model](#operational-model) (`DICT-008`) · [Table Validation](#table-validation) (`DICT-009`) · [Field Validation](#field-validation) (`DICT-010`) · [Knowledge Lifetime](#knowledge-lifetime) (`DICT-057`)
+[FOPEBA](#fopeba) (`DICT-001`) · [FOV](#fov) (`DICT-002`) · [IOV](#iov) (`DICT-003`) · [Knowledge Update](#knowledge-update) (`DICT-004`) · [Gate](#gate) (`DICT-005`) · [Pilot Integrity](#pilot-integrity) (`DICT-069`) · [Reference Implementation](#reference-implementation-ri) (`DICT-070`) · [Operational Visibility](#operational-visibility) (`DICT-071`) · [Operational Representation Pattern](#operational-representation-pattern) (`DICT-072`) · [Tenant Operational Autonomy](#tenant-operational-autonomy) (`DICT-073`) · [Evidence](#evidence) (`DICT-006`) · [Knowledge Leakage](#knowledge-leakage) (`DICT-007`) · [Operational Model](#operational-model) (`DICT-008`) · [Table Validation](#table-validation) (`DICT-009`) · [Field Validation](#field-validation) (`DICT-010`) · [Knowledge Lifetime](#knowledge-lifetime) (`DICT-057`)
 
 ### Ingeniería
 
@@ -3068,6 +3069,45 @@ Service · Report · Workspace · Operational Visibility · Module Convention ·
 [OPERATIONAL_REPRESENTATION_PATTERN](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md) · [MODULE_CONVENTION](../05-architecture/MODULE_CONVENTION.md) · [EP-002B.2](../00-status/EP002B2_KITCHEN_EXECUTION.md)
 
 
+---
+
+# Tenant Operational Autonomy
+
+## ID
+DICT-073
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Tenant Operational Autonomy
+
+## Tipo
+Principio de arquitectura / madurez multi-tenant
+
+## Definición
+Un tenant no está **operacionalmente activo** hasta que puede autogestionar su organización **sin intervención del proveedor SaaS**. El criterio no es “existen pantallas de admin”, sino que el cliente puede aprovisionar usuarios, roles y operación diaria de forma autónoma.
+
+## Implica
+- WP-5 (EP-OPS-001) es **Tenant Provisioning** (capacidad de plataforma), no un CRUD de administradores.
+- Alcance mínimo: Tenant Management · Company Administration · Roles (no permisos sueltos) · Membership · Auditoría.
+- En RI-001: **un usuario pertenece a un único tenant** (multi-membership fuera de alcance salvo ADR/KU futuro).
+- Tras EP-OPS-001 PASS: Architecture Freeze hasta RI-001 (solo defectos · evidencia · certificación).
+- Compatible con Dual Ops Center (`/admin` tenant vs `/saas` plataforma) y DICT-071.
+
+## No significa
+Self-service de billing · multi-tenant membership en RI-001 · que `saas_admin` deje de existir · que el tenant pueda cambiar el modelo de permisos del sistema.
+
+## Palabras relacionadas
+Tenant · Company Admin · saas_admin · Dual Ops Center · EP-OPS-001 · Architecture Freeze · Reference Implementation · Operational Visibility
+
+## Referencias
+[TENANT_OPERATIONAL_AUTONOMY](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md) · [EP-OPS-001](../00-status/EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · [OPS_CENTER_DUAL_SURFACE](../00-status/OPS_CENTER_DUAL_SURFACE.md)
+
+
 ## Historial de este diccionario
 
 | Fecha | Cambio |
@@ -3090,4 +3130,4 @@ Service · Report · Workspace · Operational Visibility · Module Convention ·
 | 2026-07-23 | G-02.7 No Artificiality · taxonomía Evidence/KU/Correction/Pilot Fix · RI-001 ≠ v1.0 |
 | 2026-07-24 | DICT-071 Operational Visibility · G-02.9 · EP-002A/B prep |
 | 2026-07-24 | DICT-072 Operational Representation Pattern · Service → Report / Workspace |
-
+| 2026-07-24 | DICT-073 Tenant Operational Autonomy · WP-5 Tenant Provisioning · Architecture Freeze |

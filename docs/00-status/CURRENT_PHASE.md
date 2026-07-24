@@ -14,11 +14,12 @@ EP-001 Functional Completeness (cero humo Admin/Ops nav)    ✅
 ────────────────────────────
 Modo:                **CERTIFICACIÓN** — Correction hub OK · **no** Packaging
 Bloqueo:             **RI-001 bloqueado por EP-OPS-001** (punto de entrada no certificado)
-Siguiente sprint:    **EP-OPS-001** WP-1…WP-6 (nav · RBAC · dual · dashboard · admins · mini-gate)
+Siguiente sprint:    **EP-OPS-001** WP-1…WP-6 (nav · RBAC · dual · dashboard · **Tenant Provisioning** · mini-gate)
                      · FCR resto **en pausa** hasta Ops PASS
+                     · Tras Ops PASS → **Architecture Freeze** hasta RI-001
                      · Packaging/Delivery **en cola**
 Siguiente artefacto: [EP_OPS_001_OPERATIONAL_CENTER_READINESS](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)
-                     → Ops PASS → FCR → E2E → Evidence → decisión RI-001
+                     → Ops PASS → Architecture Freeze → FCR → E2E → Evidence → decisión RI-001
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████
@@ -36,12 +37,14 @@ Mapa EP:
   EP-002B.1 · Production Report    ██████████
   EP-002B.2 · Kitchen Execution    ██████████
   —— EP-OPS-001 Ops Center ——      □□□□□□□□□□  ← HOY (bloquea RI-001)
-  —— FCR / E2E / Evidence ——       □□□□□□□□□□  (tras Ops PASS)
+  —— Architecture Freeze ——        □□□□□□□□□□  (tras Ops PASS → hasta RI-001)
+  —— FCR / E2E / Evidence ——       □□□□□□□□□□  (tras Freeze)
   EP-002B.3 · Packaging            □□□□□□□□□□  (cola)
   EP-002B.4 · Delivery             □□□□□□□□□□
   RI-001                           ████████░░  ← bloqueado hasta EP-OPS-001 PASS
 
 Patrón permanente: Operational Representation (DICT-072)
+Madurez tenant:    Tenant Operational Autonomy (DICT-073) — WP-5 aprovisiona, no “crea admins”
 Hoy: Certificar el hub — no auditar el resto sobre navegación incompleta.
 
 Riesgo principal: E2E / FCR sobre hub no PASS → evidencia contaminada
@@ -55,6 +58,7 @@ Pregunta principal: ¿Qué nos enseña la operación real sobre nuestro modelo?
 Primary Artifact:  [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md) · [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md)
 Visibilidad:       [Operational Visibility · DICT-071](../20-evidence-framework/09-operational-visibility-principle.md)
 Ops pattern:       [Operational Representation · DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md)
+Tenant autonomy:   [Tenant Operational Autonomy · DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)
 Hoy (Certificación): [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · [Ops dual surface](./OPS_CENTER_DUAL_SURFACE.md) · [Readiness](./RI001_READINESS_SPRINT.md)
 Seguridad pre-piloto: [Pilot Security Checklist](../09-security/PILOT_SECURITY_CHECKLIST.md) (10 corregidos · 1 Accepted documentado)
 Antes de firmar G-02 PASSED: ORR firmados · cero humo · No Artificiality
@@ -83,6 +87,7 @@ Piloto: demostrar  ·  EP-001 ✅ → EP-002A (Weekly Cycle) → EP-002B (Ops) �
 > ✅ EP-002A: ¿Qué necesita **saber** el cliente? (Customer Weekly Cycle)  
 > ✅ EP-002B: ¿Qué necesita **hacer** el equipo?  
 > ✅ Operational Visibility (DICT-071): lo visible existe; lo inexistente no se promete.  
+> ✅ Tenant Operational Autonomy (DICT-073): el tenant se autogestiona sin el proveedor SaaS.  
 > Motores de cambio: [PROJECT_DOMAINS](./PROJECT_DOMAINS.md).
 
 ---
