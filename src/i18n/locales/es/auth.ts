@@ -27,6 +27,9 @@ export default {
   adminEnter: "Entrar",
   adminEntryLabel: "Centro de Operaciones",
   adminEntryAria: "Centro de Operaciones",
+  saasEntryLabel: "Centro de Operaciones YourMeal OS",
+  saasEntryAria: "Centro de Operaciones YourMeal OS",
+  saasEntrySubtitle: "Administración de la plataforma SaaS",
   adminNotStaff: "Esta cuenta no tiene acceso al Centro de Operaciones.",
   adminNotStaffHint:
     "Tu sesión actual es de cliente. Cierra sesión e inicia con una cuenta de personal de EatClean.",
