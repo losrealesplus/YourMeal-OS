@@ -1,10 +1,26 @@
 # EP-002B.3 · Packaging
 
-**Estado:** Queued (siguiente tras EP-002B.2)  
+**Estado:** Queued (**después** de [RI-001 Readiness](./RI001_READINESS_SPRINT.md))  
 **Cara:** Centro de Operaciones · Empaquetado  
 **Patrón:** [Operational Representation Pattern (DICT-072)](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md)  
 **Principio:** [Operational Visibility](../20-evidence-framework/09-operational-visibility-principle.md) (DICT-071)  
 **Pregunta:** ¿Qué hay que **empaquetar** ahora, y en qué estado está cada unidad / lote listo?
+
+---
+
+## Prioridad
+
+No implementar Packaging mientras el sprint de Readiness esté abierto.
+
+Orden:
+
+```text
+Cerrar PRs #45–#49 → Completeness · Cero humo · RBAC · E2E → Release Review
+        → iniciar RI-001
+        → (luego) EP-002B.3 Packaging · EP-002B.4 Delivery
+```
+
+El patrón Service → Report / Workspace ya está listo para reutilizar cuando toque.
 
 ---
 
