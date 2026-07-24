@@ -15,7 +15,15 @@ const STAFF_ROLES: AppRole[] = [
 
 /** Post-login home — one app; path depends on roles. */
 export function homePathForRoles(roles: readonly AppRole[]): string {
-  if (roles.includes("saas_admin")) return "/saas";
+  // Pure saas_admin lands on the customer app so the WP-3 dual entry
+  // (Centro de Operaciones + Centro de Operaciones YourMeal OS) is visible.
+  // If they also hold tenant ops roles, tenant home wins below.
+  if (
+    roles.includes("saas_admin") &&
+    !STAFF_ROLES.some((r) => roles.includes(r))
+  ) {
+    return "/app";
+  }
   if (roles.includes("operations_manager") || roles.includes("company_admin")) {
     return "/admin";
   }
