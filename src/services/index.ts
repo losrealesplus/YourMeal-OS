@@ -13,8 +13,8 @@ export {
   NotificationService,
   ProductionService,
   PurchasingService,
-  RouteService,
 } from "./placeholders";
+export { RouteService, DeliveryService } from "@/modules/delivery";
 export {
   createServiceContext,
   type AuditAction,
