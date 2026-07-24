@@ -132,6 +132,7 @@ Core | Operational | Engineering | Historical
 | `DICT-069` | [Pilot Integrity](#pilot-integrity) | Core | Accepted |
 | `DICT-070` | [Reference Implementation (RI)](#reference-implementation-ri) | Core | Accepted |
 | `DICT-071` | [Operational Visibility](#operational-visibility) | Core | Accepted |
+| `DICT-072` | [Operational Representation Pattern](#operational-representation-pattern) | Engineering | Accepted |
 | `DICT-006` | [Evidence](#evidence) | Core | Accepted |
 | `DICT-007` | [Knowledge Leakage](#knowledge-leakage) | Core | Accepted |
 | `DICT-008` | [Operational Model](#operational-model) | Core | Accepted |
@@ -200,7 +201,7 @@ Core | Operational | Engineering | Historical
 
 ### Metodología
 
-[FOPEBA](#fopeba) (`DICT-001`) · [FOV](#fov) (`DICT-002`) · [IOV](#iov) (`DICT-003`) · [Knowledge Update](#knowledge-update) (`DICT-004`) · [Gate](#gate) (`DICT-005`) · [Pilot Integrity](#pilot-integrity) (`DICT-069`) · [Reference Implementation](#reference-implementation-ri) (`DICT-070`) · [Operational Visibility](#operational-visibility) (`DICT-071`) · [Evidence](#evidence) (`DICT-006`) · [Knowledge Leakage](#knowledge-leakage) (`DICT-007`) · [Operational Model](#operational-model) (`DICT-008`) · [Table Validation](#table-validation) (`DICT-009`) · [Field Validation](#field-validation) (`DICT-010`) · [Knowledge Lifetime](#knowledge-lifetime) (`DICT-057`)
+[FOPEBA](#fopeba) (`DICT-001`) · [FOV](#fov) (`DICT-002`) · [IOV](#iov) (`DICT-003`) · [Knowledge Update](#knowledge-update) (`DICT-004`) · [Gate](#gate) (`DICT-005`) · [Pilot Integrity](#pilot-integrity) (`DICT-069`) · [Reference Implementation](#reference-implementation-ri) (`DICT-070`) · [Operational Visibility](#operational-visibility) (`DICT-071`) · [Operational Representation Pattern](#operational-representation-pattern) (`DICT-072`) · [Evidence](#evidence) (`DICT-006`) · [Knowledge Leakage](#knowledge-leakage) (`DICT-007`) · [Operational Model](#operational-model) (`DICT-008`) · [Table Validation](#table-validation) (`DICT-009`) · [Field Validation](#field-validation) (`DICT-010`) · [Knowledge Lifetime](#knowledge-lifetime) (`DICT-057`)
 
 ### Ingeniería
 
@@ -3028,6 +3029,45 @@ Pilot Integrity · No Artificiality · Explicit Uncertainty · Cero humo · Gate
 [09 Operational Visibility](../20-evidence-framework/09-operational-visibility-principle.md) · [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md) · [EP-001](../00-status/EP001_FUNCTIONAL_COMPLETENESS_SPRINT.md)
 
 
+---
+
+# Operational Representation Pattern
+
+## ID
+DICT-072
+
+## Status
+Accepted
+
+## Madurez
+Engineering
+
+## Nombre
+Operational Representation Pattern
+
+## Tipo
+Patrón arquitectónico permanente (Ops)
+
+## Definición
+Una misma realidad operacional se expresa con **un Service** (lógica y fuente de verdad) y, cuando hace falta, dos representaciones: **Report** (documento operativo) y **Workspace** (superficie interactiva donde el equipo cambia estado). No se duplica el modelo ni la lógica entre documento y pantalla.
+
+## Implica
+- Report y Workspace consumen el mismo Service.
+- Estados de proceso (p. ej. lote plato × día) viven en agregados de ejecución, no se inventan por línea de pedido si el trabajo real es por lote.
+- Transiciones del Workspace dejan traza en `audit_log`.
+- Compatible con Operational Visibility (DICT-071) y No Artificiality: no simular capacidades no persistidas.
+- Reutilizable en Packaging, Delivery, Control de Calidad, etc.
+
+## No significa
+Dos bases de datos · UI con reglas de negocio · Report que muta estado · Workspace con datos mock.
+
+## Palabras relacionadas
+Service · Report · Workspace · Operational Visibility · Module Convention · Kitchen Execution · Packaging
+
+## Referencias
+[OPERATIONAL_REPRESENTATION_PATTERN](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md) · [MODULE_CONVENTION](../05-architecture/MODULE_CONVENTION.md) · [EP-002B.2](../00-status/EP002B2_KITCHEN_EXECUTION.md)
+
+
 ## Historial de este diccionario
 
 | Fecha | Cambio |
@@ -3049,4 +3089,5 @@ Pilot Integrity · No Artificiality · Explicit Uncertainty · Cero humo · Gate
 | 2026-07-23 | Gate G-02 Pilot Readiness · DICT-069 Pilot Integrity · DICT-070 Reference Implementation (RI) |
 | 2026-07-23 | G-02.7 No Artificiality · taxonomía Evidence/KU/Correction/Pilot Fix · RI-001 ≠ v1.0 |
 | 2026-07-24 | DICT-071 Operational Visibility · G-02.9 · EP-002A/B prep |
+| 2026-07-24 | DICT-072 Operational Representation Pattern · Service → Report / Workspace |
 

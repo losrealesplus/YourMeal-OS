@@ -1,9 +1,10 @@
 # EP-002B · Operational Execution
 
-**Estado:** Queued (después de EP-002A, o solape controlado solo si Home ya sin humo)  
+**Estado:** In progress (B.1·B.2 done · B.3 Packaging queued)  
 **Tras:** [EP-001](./EP001_FUNCTIONAL_COMPLETENESS_SPRINT.md) · [EP-002A](./EP002A_CUSTOMER_EXPERIENCE_COMPLETION.md)  
 **Cara:** Centro de Operaciones · OJ  
 **Principio:** [Operational Visibility](../20-evidence-framework/09-operational-visibility-principle.md) (DICT-071)  
+**Patrón:** [Operational Representation](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md) (DICT-072)  
 **Pregunta del sprint:** ¿Qué necesita **hacer** el equipo de EatClean?
 
 ---
@@ -31,8 +32,9 @@ Esa separación (Customer Experience vs Operational Execution) es intencional y 
 | Cocina | ¿La cola del día refleja pedidos reales y cambia estados? | Base en `/admin/kitchen` — cerrar huecos |
 | **Hoja de Producción** | ¿Cocina puede trabajar el día sin hoja manual? | [EP-002B.1](./EP002B1_PRODUCTION_REPORT.md) — Report via `ProductionReportService` |
 | **Kitchen Execution** | ¿Cocina ve y avanza el estado de cada lote ahora? | [EP-002B.2](./EP002B2_KITCHEN_EXECUTION.md) — Workspace; mismos datos que el Report |
+| **Packaging** | ¿Qué hay que empaquetar y en qué estado está? | [EP-002B.3](./EP002B3_PACKAGING.md) — siguiente; mismo patrón Service → Report / Workspace |
 | Producción (batch) | ¿Hace falta planning/batch admin o basta cocina + hoja? | Solo activar `admin_module_production` si hay persistencia |
-| Rutas | ¿El reparto opera sin mocks? | Preferir `/admin/delivery` real; rutas mock FF OFF |
+| Rutas / Delivery | ¿El reparto opera sin mocks? | EP-002B.4; preferir `/admin/delivery` real |
 | Entregas | ¿Estados de entrega coherentes UI ↔ DB? | Misma spine que ve el cliente en EP-002A |
 | Cierre operativo | ¿El pedido termina en delivered / issue documentado? | Evidencia FOPEBA |
 

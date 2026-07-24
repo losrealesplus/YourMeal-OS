@@ -42,3 +42,4 @@ Foundation code may still live under `src/services` during Foundation Lock. New 
 - [API philosophy](../10-api/README.md)
 - [ADR 0005 Services](../adr/0005-services-layer.md)
 - [Foundation Lock](../05-architecture/FOUNDATION_LOCK.md)
+- [Operational Representation Pattern](./OPERATIONAL_REPRESENTATION_PATTERN.md) — Service → Report / Workspace (DICT-072)

@@ -20,6 +20,7 @@
 | [../07-experience/CUSTOMER_JOURNEYS.md](../07-experience/CUSTOMER_JOURNEYS.md) | Experience First · CJ-001 Pedido semanal |
 | [architecture-review.md](./architecture-review.md) | As-built senior review |
 | [MODULE_CONVENTION.md](./MODULE_CONVENTION.md) | `src/modules/...` layout |
+| [OPERATIONAL_REPRESENTATION_PATTERN.md](./OPERATIONAL_REPRESENTATION_PATTERN.md) | Service → Report / Workspace (DICT-072) |
 | [../10-api/README.md](../10-api/README.md) | Service → Repository → Supabase |
 | [../adr/0009-foundation-lock.md](../adr/0009-foundation-lock.md) | Lock ADR |
 | [../adr/0014-customer-application-is-tenant-branded.md](../adr/0014-customer-application-is-tenant-branded.md) | Customer App = Tenant-Branded |
