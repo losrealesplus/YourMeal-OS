@@ -22,6 +22,7 @@ export const Route = createFileRoute("/_authenticated/saas/membership")({
 });
 
 type Row = {
+  id: string;
   userId: string;
   tenantId: string;
   tenantName: string;
@@ -29,6 +30,7 @@ type Row = {
   roles: string[];
   joinedAt: string;
 };
+
 
 function SaasMembershipPage() {
   const fetch = useServerFn(listMemberships);
@@ -107,10 +109,14 @@ function SaasMembershipPage() {
         ) : (
           <DataTable
             columns={columns}
-            rows={(q.data ?? []) as Row[]}
+            rows={((q.data ?? []) as Omit<Row, "id">[]).map((r) => ({
+              ...r,
+              id: `${r.userId}::${r.tenantId}`,
+            }))}
             empty="No memberships yet."
           />
         )}
+
       </PanelCard>
     </div>
   );

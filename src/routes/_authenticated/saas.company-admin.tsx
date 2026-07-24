@@ -48,6 +48,7 @@ export const Route = createFileRoute("/_authenticated/saas/company-admin")({
 });
 
 type AdminRow = {
+  id: string;
   userId: string;
   tenantId: string | null;
   tenantName: string | null;
@@ -55,6 +56,7 @@ type AdminRow = {
   email: string | null;
   createdAt: string;
 };
+
 
 function SaasCompanyAdminPage() {
   const fetchAdmins = useServerFn(listCompanyAdmins);
@@ -230,10 +232,14 @@ function SaasCompanyAdminPage() {
         ) : (
           <DataTable
             columns={columns}
-            rows={(admins.data ?? []) as AdminRow[]}
+            rows={((admins.data ?? []) as Omit<AdminRow, "id">[]).map((r) => ({
+              ...r,
+              id: `${r.userId}::${r.tenantId ?? "none"}`,
+            }))}
             empty="No Company Admins provisioned yet."
           />
         )}
+
       </PanelCard>
     </div>
   );

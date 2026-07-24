@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_authenticated/saas/tenants/$tenantId")({
   }),
 });
 
-type Member = { userId: string; fullName: string | null; roles: string[]; joinedAt: string };
+type Member = { id: string; userId: string; fullName: string | null; roles: string[]; joinedAt: string };
 
 function SaasTenantDetailPage() {
   const { tenantId } = Route.useParams();
