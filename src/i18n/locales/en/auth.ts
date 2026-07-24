@@ -27,6 +27,9 @@ export default {
   adminEnter: "Sign in",
   adminEntryLabel: "Operations Center",
   adminEntryAria: "Operations Center",
+  saasEntryLabel: "YourMeal OS Operations Center",
+  saasEntryAria: "YourMeal OS Operations Center",
+  saasEntrySubtitle: "SaaS platform administration",
   adminNotStaff: "This account cannot open the Operations Center.",
   adminNotStaffHint:
     "You are signed in as a customer. Sign out and use an EatClean staff account.",

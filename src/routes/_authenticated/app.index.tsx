@@ -18,6 +18,7 @@ import {
 } from "@/components/consumer";
 import { TenantLogo } from "@/components/tenant/tenant-logo";
 import { BrandLeafMark } from "@/components/tenant/brand-leaf-mark";
+import { SaasOpsEntry } from "@/components/tenant/saas-ops-entry";
 import { PoweredByLine } from "@/components/tenant/tenant-brand-scope";
 import { useWeeklyMenu } from "@/hooks/use-weekly-menu";
 import { useUpcomingDelivery } from "@/hooks/use-upcoming-delivery";
@@ -196,6 +197,7 @@ function HomeBody({
       {/* EP-002A.1.1 — secure Ops Center entry (checks staff session) */}
       <div className="mt-10 flex flex-col items-center gap-3 pb-2">
         <BrandLeafMark />
+        <SaasOpsEntry />
         <PoweredByLine />
       </div>
     </div>

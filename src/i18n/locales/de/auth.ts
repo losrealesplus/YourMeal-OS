@@ -29,6 +29,9 @@ export default {
   adminEnter: "Anmelden",
   adminEntryLabel: "Operationszentrum",
   adminEntryAria: "Operationszentrum",
+  saasEntryLabel: "YourMeal OS Operationszentrum",
+  saasEntryAria: "YourMeal OS Operationszentrum",
+  saasEntrySubtitle: "Verwaltung der SaaS-Plattform",
   adminNotStaff: "Dieses Konto hat keinen Zugang zum Operationszentrum.",
   adminNotStaffHint:
     "Du bist als Kunde angemeldet. Melde dich ab und nutze ein Mitarbeiterkonto.",
