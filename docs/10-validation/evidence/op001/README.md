@@ -6,7 +6,7 @@ Auditor reconstruction kit for RI-001 / CHECK-IT 05.
 docs/10-validation/evidence/op001/
 ├── README.md                 ← this file
 ├── screenshots/              ← operator captures (EV-NAV-*, EV-TEN-*, …)
-├── logs/                     ← command transcripts from verification runs
+├── run-logs/                 ← command transcripts (gitignored path `logs/` avoided)
 ├── bootstrap-report.json     ← output of bootstrap:verify --json=…
 ├── checklist.md              ← pointer / snapshot of Day-0 checklist status
 └── verification.md           ← how to re-run verification
@@ -16,7 +16,7 @@ docs/10-validation/evidence/op001/
 
 ```bash
 npm run bootstrap:verify:ci -- --json=docs/10-validation/evidence/op001/bootstrap-report.json
-npx vitest run src/modules/bootstrap-integrity > docs/10-validation/evidence/op001/logs/vitest-bootstrap.txt
+npx vitest run src/modules/bootstrap-integrity | tee docs/10-validation/evidence/op001/run-logs/vitest-bootstrap.txt
 
 # When service role available:
 npm run bootstrap:verify -- --live --tenant=eatclean-tenerife \

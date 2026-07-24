@@ -54,7 +54,7 @@ npx vitest run src/modules/bootstrap-integrity
 npx tsc --noEmit
 ```
 
-Logs: [evidence/op001/logs/](./evidence/op001/logs/)
+Logs: [evidence/op001/run-logs/](./evidence/op001/run-logs/)
 
 ---
 
