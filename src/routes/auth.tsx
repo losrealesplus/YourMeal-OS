@@ -38,7 +38,7 @@ type Phase = "splash" | "onboarding" | "login";
 const ONBOARDING_KEY = "tenant_onboarding_done";
 
 const authInputClass =
-  "w-full border border-border/80 rounded-2xl bg-white pl-11 pr-4 py-3.5 text-sm text-foreground placeholder:text-[#9a8f7c]/75 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-colors";
+  "w-full border border-border/80 rounded-2xl bg-white pl-11 pr-4 py-3.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-colors";
 
 async function goHome(
   navigate: ReturnType<typeof useNavigate>,
