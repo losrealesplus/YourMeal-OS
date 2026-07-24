@@ -45,36 +45,21 @@ Toda la **Home** debe reflejar ese ciclo (Home dinámica según fase).
 
 ## 2. Prioridades (orden de ejecución)
 
-### P1 · Próxima entrega *(prioridad máxima)*
+### P1 · Próxima entrega *(cerrado — EP-002A.1)*
 
 Cuando el cliente abre la app, la primera pregunta es:
 
 > **¿Qué pasa con mi próximo pedido?**
 
-La tarjeta debe responder con datos reales:
-
-| Campo | Requisito |
-|-------|-----------|
-| Estado del pedido | Programado / En preparación / En reparto / Entregado (alineado a Ops) |
-| Fecha | Real |
-| Franja horaria | Real cuando exista; si no, no inventar |
-| Dirección | Real del pedido / default |
-| Acción | Enlace al detalle del pedido (sin humo) |
-
-Si no hay próximo pedido → no fingir una entrega; la Home pasa a destacar el menú (ver §3).
+La tarjeta debe responder con datos reales. Ver [EP002A1_UPCOMING_DELIVERY](./EP002A1_UPCOMING_DELIVERY.md).
 
 ### P1.1 · Entrada al Centro de Operaciones *(cerrado con EP-002A.1.1)*
 
 El botón **Centro de Operaciones** es la puerta segura al backoffice (sesión staff → Ops Center; si no → `/auth/admin` + return). Ver [EP002A11_OPS_CENTER_ENTRY](./EP002A11_OPS_CENTER_ENTRY.md).
 
-### P2 · Historial + Repetir pedido
+### P2 · Historial + Repetir pedido *(cerrado — EP-002A.2)*
 
-Cada pedido muestra:
-
-- Fecha · Platos · Importe · Estado  
-- Acción **«Repetir pedido»** (comportamiento real o no visible)
-
-Aprovecha pedidos persistidos y sienta la base de Favoritos.
+Reutilizar el pasado sin copiar a ciegas. Ver [EP002A2_REPEAT_ORDER](./EP002A2_REPEAT_ORDER.md).
 
 ### P3 · Favoritos / Customer Preferences *(cerrado — EP-002A.3)*
 

@@ -194,10 +194,21 @@ function KitchenWorkspacePage() {
           title="Cocina"
           subtitle="Pedidos pendientes de preparación. Filtros por fecha, empresa, sede y delivery group."
         />
-        <Button variant="outline" size="sm" onClick={() => void load()} disabled={loading}>
-          <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-          Actualizar
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="secondary" size="sm">
+            <Link
+              to="/admin/production-sheet"
+              search={{ date }}
+            >
+              <ChefHat className="mr-2 h-4 w-4" />
+              Hoja de Producción
+            </Link>
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => void load()} disabled={loading}>
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            Actualizar
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

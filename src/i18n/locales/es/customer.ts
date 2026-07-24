@@ -181,5 +181,14 @@ export default {
   favoriteUnavailableThisWeek: "No está en el menú esta semana",
   favoriteViewNutrition: "Ver ficha",
   favoriteOrderedTimes: "Pedido {{count}} veces",
+  repeatOrder: "Repetir pedido",
+  repeatSuccess: "Hemos creado un borrador con los platos disponibles.",
+  repeatPartialTitle: "Pedido repetido parcialmente",
+  repeatPartialHint:
+    "{{count}} plato(s) ya no están disponibles en el menú de esta semana.",
+  dishUnavailable: "Este plato ya no está disponible.",
+  repeatUnavailableTitle: "No disponibles esta semana",
+  companyLabel: "Empresa",
+  viewOrder: "Ver pedido",
 } as const;
 

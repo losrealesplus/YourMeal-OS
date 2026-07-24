@@ -180,5 +180,14 @@ export default {
   favoriteUnavailableThisWeek: "Not on this week's menu",
   favoriteViewNutrition: "View details",
   favoriteOrderedTimes: "Ordered {{count}} times",
+  repeatOrder: "Repeat order",
+  repeatSuccess: "We created a draft with the dishes available this week.",
+  repeatPartialTitle: "Order partially repeated",
+  repeatPartialHint:
+    "{{count}} dish(es) are no longer on this week's menu.",
+  dishUnavailable: "This dish is no longer available.",
+  repeatUnavailableTitle: "Unavailable this week",
+  companyLabel: "Company",
+  viewOrder: "View order",
 } as const;
 
