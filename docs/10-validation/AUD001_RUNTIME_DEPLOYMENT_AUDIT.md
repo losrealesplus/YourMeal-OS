@@ -214,38 +214,47 @@ Present on runtime (main-class): `/saas` shell, tenants/company-admin **code**, 
 
 ---
 
-## FOPEBA implication
+## FOPEBA implication (corrected)
 
-| Layer | Status |
-|-------|--------|
-| Repository engineering (stack) | Still solid |
-| Deployed product (Lovable field) | **NOT OPERATIONAL for OP-001 DoD** |
-| CHECK-IT 05 | **Do not start** until stack is on the publish branch and field re-probed |
+| Dominio | Estado | Significado |
+|---------|--------|-------------|
+| Bootstrap Engineering | ✅ **PASS** | Código/tests/guards del stack son válidos |
+| Runtime Deployment | ❌ **FAIL** | Publish branch / Lovable ≠ commit aprobado (PR #54) |
+| Bootstrap Evidence | ⛔ **BLOCKED** | No hay sujeto de certificación en el runtime |
+| CHECK-IT 05 | ⛔ **BLOCKED** | Bloqueado por Evidence |
 
 ```text
-Bootstrap Engineering (repo stack)     PASS
-Bootstrap Evidence (field runtime)     FAIL — wrong deploy target / pre-OP-001 build
+Bootstrap Engineering     PASS
+Runtime Deployment        FAIL
+Bootstrap Evidence        BLOCKED   ← not FAIL (process block, not product fail)
+CHECK-IT 05               BLOCKED
 ```
+
+**FAIL vs BLOCKED:** FAIL = evaluated product fails DoD.  
+BLOCKED = certification cannot proceed because the evaluated build is not the intended release.
+
+New light gate: [DEPLOYMENT_VERIFICATION.md](./DEPLOYMENT_VERIFICATION.md) (DV-001).
 
 ---
 
 ## Recommended next actions (no feature coding)
 
-1. **Merge the OP-001 stack into `main`** (or whatever branch Lovable is connected to).  
-2. Confirm Lovable rebuild picks up new `x-deployment-id`.  
-3. Re-probe deploy JS: must **lose** `Dish Library — Module 01` placeholder; must gain menu/staff paths.  
+1. **Merge the OP-001 stack into `main`** (Lovable publish branch).  
+2. Fill **DV-001** — SHA match + new `x-deployment-id`.  
+3. Run [Post-deploy smoke](./POST_DEPLOY_SMOKE_OP001.md) (6 checks).  
 4. Confirm tester `saas_admin` row.  
-5. Only then resume Day-0 checklist → ORR PASS → CHECK-IT 05.
+5. Only then Day-0 → ORR PASS → CHECK-IT 05.
 
 ---
 
 ## Verdict
 
 ```text
-AUD-001: FAIL (runtime ≠ repository publish intent)
+AUD-001 · Runtime Deployment: FAIL
+AUD-001 · Bootstrap Evidence:  BLOCKED (pending correct deploy)
 ```
 
 **Root cause:** PR #54 never landed on `main`; Lovable serves a `main`-class build that still ships Dish Library placeholder and lacks OP-001 bootstrap modules.
 
 **Not a proof that OP-001 code is wrong.**  
-**Proof that field evidence cannot certify OP-001 until deploy sync is fixed.**
+**Proof that field certification is blocked until deploy sync is fixed.**

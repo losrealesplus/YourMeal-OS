@@ -24,9 +24,13 @@ La única observación pendiente corresponde a la ejecución del recorrido Day-0
 | Dominio | Status | Observación |
 |---------|--------|-------------|
 | Bootstrap Engineering | **PASS** | Cadena operacional restaurada; guards en dominio/servicios |
-| Bootstrap Evidence | **PASS WITH OBSERVATIONS** | External execution blocked by environment credentials (`SUPABASE_SERVICE_ROLE_KEY` / Supabase CLI ausentes en el agente) |
+| Runtime Deployment | **FAIL** | Lovable publica `main` sin stack OP-001 (AUD-001) |
+| Bootstrap Evidence | **BLOCKED** | No se certifica un build que no incluye la implementación |
+| CHECK-IT 05 | **BLOCKED** | Depende de Evidence |
 
-La observación **no es funcional**. Es operacional (entorno de ejecución).
+La observación de Evidence **no es un fallo funcional del código**. Es un **bloqueo de proceso** (integración/despliegue).
+
+Post-AUD-001: [FOPEBA_AUD001_RUNTIME_2026-07-24](../00-status/FOPEBA_AUD001_RUNTIME_2026-07-24.md) · [DV-001](./DEPLOYMENT_VERIFICATION.md)
 
 ---
 

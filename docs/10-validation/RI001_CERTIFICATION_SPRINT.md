@@ -8,14 +8,19 @@
 
 ## Order of work
 
-### 1. Merge stack to `main` (or Lovable-connected branch)
+### 1. Merge stack to `main` (Lovable publish branch)
 
-**Blocked by AUD-001 until done.**  
-PR #54 merged into `cursor/op-001-1-bootstrap-validation-f54a` only — **not** `main`.  
-Lovable field build was still `main`-class (Dish Library placeholder).  
+**AUD-001:** PR #54 merged into feature branch only — Runtime Deployment = **FAIL**, Evidence = **BLOCKED**.
+
 See [AUD001_RUNTIME_DEPLOYMENT_AUDIT.md](./AUD001_RUNTIME_DEPLOYMENT_AUDIT.md).
 
-Merge OP-001 → OP-001.1 → OP-001.2 stack → publish branch → confirm new `x-deployment-id` → re-probe.
+**No more feature code.** Integration checklist:
+
+1. Merge OP-001 stack → `main` (or Lovable-connected branch)  
+2. Verify SHA on publish branch  
+3. New Lovable deploy → record `x-deployment-id` in [DV-001](./DEPLOYMENT_VERIFICATION.md)  
+4. [Post-deploy smoke](./POST_DEPLOY_SMOKE_OP001.md) (6 checks)  
+5. Only if smoke PASS → Day-0
 
 ### 2. Clean environment
 
