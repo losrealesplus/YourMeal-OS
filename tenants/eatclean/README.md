@@ -35,6 +35,7 @@ La Customer App fusiona ambas. Instagram es la referencia visual principal del p
 |------|--------|-----|
 | `brand/` | 📁 | Logo · icon · splash oficiales |
 | `copy/` | 📁 | Copy adicional por locale |
+| `copy/drafts/` | 📁 | Borradores no publicados (p. ej. guías product-led) |
 | `media/` | 📁 | Fotografías de producto (platos) |
 | `weekly-menu/` | 📁 | Assets del menú semanal publicado |
 | `promotions/` | 📁 | Promos / novedades de temporada |

@@ -40,6 +40,7 @@ Seguridad pre-piloto: [Pilot Security Checklist](../09-security/PILOT_SECURITY_C
 Antes de firmar G-02 PASSED: ORR firmados · cero humo · No Artificiality
 PR taxonomy (post G-02): Evidence · KU · Correction · Pilot Fix · Operational Finding
 Completitud UI:    [EP-001](./EP001_FUNCTIONAL_COMPLETENESS_SPRINT.md) · siguiente [EP-002A](./EP002A_CUSTOMER_EXPERIENCE_COMPLETION.md) · [EP-002B](./EP002B_OPERATIONAL_EXECUTION.md)
+Hallazgos Lovable: [Decisiones](./LOVABLE_FINDINGS_DECISIONS.md) (contraste ✅ · GSC → [Marketing Readiness](./MILESTONE_MARKETING_READINESS.md) · Semrush draft)
 Last Baseline:     v0.2.0-engineering-baseline (IR-001)
 
 ══════════════════════════════════════════════════
@@ -55,11 +56,12 @@ Mapa del sistema: [FOUR_LAYERS](../05-architecture/FOUR_LAYERS.md).
 Foundation ✅ → Methodology ✅ → Tenant Branding ✅ → Experience Baseline ✅
 → Materialization ✅ Frozen (ACT-002 · #24→#31)
 ───────────────
-Piloto: demostrar  ·  EP-001 ✅ → EP-002A → EP-002B → Evidence  ·  FOPEBA observa
+Piloto: demostrar  ·  EP-001 ✅ → EP-002A (Weekly Cycle) → EP-002B (Ops) → RI-001 Evidence  ·  FOPEBA observa
 ```
 
 > ❌ No diseñar / no polish estético (ACT-001 · ACT-002).  
-> ✅ Demostrar el ciclo: Cliente → Sistema → Cocina → Reparto → Cliente → Evidencia.  
+> ✅ EP-002A: ¿Qué necesita **saber** el cliente? (Customer Weekly Cycle)  
+> ✅ EP-002B: ¿Qué necesita **hacer** el equipo?  
 > ✅ Operational Visibility (DICT-071): lo visible existe; lo inexistente no se promete.  
 > Motores de cambio: [PROJECT_DOMAINS](./PROJECT_DOMAINS.md).
 
