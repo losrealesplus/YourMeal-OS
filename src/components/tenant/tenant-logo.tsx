@@ -24,7 +24,7 @@ export function TenantLogo({
   return (
     <img
       src={src}
-      alt={brandConfig.name}
+      alt={`${brandConfig.name} — ${brandConfig.storeAssets.shortDescription}`}
       height={height}
       className={cn("w-auto object-contain select-none", className)}
       style={{ height, width: "auto" }}

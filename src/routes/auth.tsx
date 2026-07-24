@@ -21,10 +21,10 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: `${brandConfig.name} — ${brandConfig.storeAssets.shortDescription}` },
+      { title: `Iniciar sesión — ${brandConfig.name}` },
       {
         name: "description",
-        content: brandConfig.storeAssets.shortDescription,
+        content: `Accede a tu cuenta de ${brandConfig.name} para programar tu pedido semanal de comida preparada saludable.`,
       },
       { name: "robots", content: "noindex" },
     ],
