@@ -33,12 +33,12 @@ type Row = {
   created_at: string;
 };
 
-const TONE: Record<string, "success" | "warning" | "danger" | "neutral"> = {
-  TENANT_CREATED: "success",
-  TENANT_ACTIVATED: "success",
+const TONE: Record<string, "positive" | "warning" | "danger" | "neutral"> = {
+  TENANT_CREATED: "positive",
+  TENANT_ACTIVATED: "positive",
   TENANT_STATUS_CHANGED: "warning",
-  COMPANY_ADMIN_CREATED: "success",
-  MEMBERSHIP_ASSIGNED: "success",
+  COMPANY_ADMIN_CREATED: "positive",
+  MEMBERSHIP_ASSIGNED: "positive",
   ROLE_CHANGED: "neutral",
 };
 
