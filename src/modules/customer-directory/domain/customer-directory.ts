@@ -87,8 +87,10 @@ export type CommercialDashboardMetrics = {
   recurringCustomers: number;
   inactiveCustomers: number;
   peakPurchaseDay: string | null;
+  troughPurchaseDay: string | null;
   peakPurchaseHour: number | null;
   purchaseFrequencyDays: number | null;
+  companiesWithoutOrders: number;
   topCompanies: Array<{
     id: string;
     name: string;

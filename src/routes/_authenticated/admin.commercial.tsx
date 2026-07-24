@@ -1,8 +1,8 @@
 /**
- * ADMIN · Dashboard Comercial — métricas de negocio con datos reales.
- * No es el Centro de Operaciones (atención del día); responde preguntas comerciales.
+ * ADMIN · Dashboard Comercial — cada KPI responde una pregunta y justifica una acción.
+ * @see docs/20-evidence-framework/09-operational-visibility-principle.md
  */
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/_authenticated/admin/commercial")({
       { title: "YourMeal OS — Dashboard Comercial" },
       {
         name: "description",
-        content: "Métricas comerciales reales de EatClean.",
+        content: "Métricas accionables con datos reales de EatClean.",
       },
     ],
   }),
@@ -74,10 +74,10 @@ function AdminCommercialPage() {
       <SectionTitle
         overline="Administración"
         title="Dashboard Comercial"
-        subtitle="Preguntas de negocio respondidas con pedidos, clientes y empresas reales."
+        subtitle="Cada métrica responde una pregunta y sugiere una acción. Datos reales del tenant."
       />
       <AdminHeader
-        goal="Entender la demanda comercial del tenant"
+        goal="Decidir qué contactar, promocionar o reforzar hoy"
         capability="customers.read"
         object="Order · Customer · Company"
       />
@@ -88,20 +88,99 @@ function AdminCommercialPage() {
         </p>
       ) : (
         <>
+          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">
+            Acciones prioritarias
+          </h3>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+            <KpiCard
+              label="Inactivos (¿recuperar?)"
+              value={String(metrics.inactiveCustomers)}
+              hint="Acción → campaña / contacto en Atención al Cliente"
+              trend={metrics.inactiveCustomers > 0 ? "down" : "flat"}
+            />
+            <KpiCard
+              label="Empresas sin pedidos"
+              value={String(metrics.companiesWithoutOrders)}
+              hint="Acción → contactar responsable comercial"
+              trend={metrics.companiesWithoutOrders > 0 ? "down" : "flat"}
+            />
+            <KpiCard
+              label="Día de menor volumen"
+              value={metrics.troughPurchaseDay ?? "—"}
+              hint="Acción → promoción o menú especial ese día"
+            />
+            <KpiCard
+              label="Nuevos (¿activar?)"
+              value={String(metrics.newCustomers)}
+              hint="Acción → onboarding / primer pedido"
+              trend={metrics.newCustomers > 0 ? "up" : "flat"}
+            />
+          </div>
+
+          <div className="flex flex-wrap gap-2 mb-8">
+            <Link
+              to="/admin/support"
+              className="h-10 rounded-xl bg-foreground text-background px-4 text-xs font-bold uppercase tracking-widest inline-flex items-center hover:opacity-90"
+            >
+              Ir a Atención al Cliente
+            </Link>
+            <Link
+              to="/admin/customers"
+              className="h-10 rounded-xl border border-border bg-card px-4 text-xs font-bold uppercase tracking-widest inline-flex items-center hover:bg-secondary/60"
+            >
+              Ver directorio
+            </Link>
+            <Link
+              to="/admin/companies"
+              className="h-10 rounded-xl border border-border bg-card px-4 text-xs font-bold uppercase tracking-widest inline-flex items-center hover:bg-secondary/60"
+            >
+              Empresas
+            </Link>
+          </div>
+
+          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">
+            Contexto (con pregunta)
+          </h3>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-            <KpiCard label="Clientes totales" value={String(metrics.totalCustomers)} />
-            <KpiCard label="Clientes activos" value={String(metrics.activeCustomers)} />
-            <KpiCard label="Clientes nuevos" value={String(metrics.newCustomers)} />
-            <KpiCard label="Inactivos" value={String(metrics.inactiveCustomers)} />
-            <KpiCard label="Empresas" value={String(metrics.companies)} />
-            <KpiCard label="Empresas activas" value={String(metrics.activeCompanies)} />
-            <KpiCard label="Empleados vinculados" value={String(metrics.linkedEmployees)} />
-            <KpiCard label="Recurrentes" value={String(metrics.recurringCustomers)} />
-            <KpiCard label="Pedidos (7d)" value={String(metrics.weeklyOrders)} />
-            <KpiCard label="Pedidos (30d)" value={String(metrics.monthlyOrders)} />
+            <KpiCard
+              label="Base total"
+              value={String(metrics.totalCustomers)}
+              hint="Pregunta → ¿crece la base o solo el ticket?"
+            />
+            <KpiCard
+              label="Activos"
+              value={String(metrics.activeCustomers)}
+              hint="Pregunta → ¿quién pide de forma sostenida?"
+            />
+            <KpiCard
+              label="Recurrentes"
+              value={String(metrics.recurringCustomers)}
+              hint="Pregunta → ¿a quién fidelizar primero?"
+            />
+            <KpiCard
+              label="Empresas activas"
+              value={String(metrics.activeCompanies)}
+              hint="Pregunta → ¿el canal B2B aporta demanda?"
+            />
+            <KpiCard
+              label="Empleados vinculados"
+              value={String(metrics.linkedEmployees)}
+              hint="Pregunta → ¿el Company Code convierte?"
+            />
+            <KpiCard
+              label="Pedidos (7d)"
+              value={String(metrics.weeklyOrders)}
+              hint="Pregunta → ¿la semana operativa aguanta?"
+            />
+            <KpiCard
+              label="Pedidos (30d)"
+              value={String(metrics.monthlyOrders)}
+              hint="Pregunta → ¿tendencia vs semana?"
+            />
             <KpiCard
               label="Ticket medio (30d)"
               value={fmt.currency(metrics.averageTicket, { currency: "EUR" })}
+              hint="Pregunta → ¿subir ticket o frecuencia?"
             />
             <KpiCard
               label="Frecuencia media"
@@ -110,33 +189,32 @@ function AdminCommercialPage() {
                   ? `${metrics.purchaseFrequencyDays}d`
                   : "—"
               }
+              hint="Pregunta → ¿cada cuánto vuelve el cliente?"
+            />
+            <KpiCard
+              label="Día de mayor compra"
+              value={metrics.peakPurchaseDay ?? "—"}
+              hint="Pregunta → ¿reforzar capacidad ese día?"
+            />
+            <KpiCard
+              label="Hora pico (UTC)"
+              value={
+                metrics.peakPurchaseHour != null
+                  ? `${String(metrics.peakPurchaseHour).padStart(2, "0")}:00`
+                  : "—"
+              }
+              hint="Pregunta → ¿cuándo abrir soporte / cocina?"
             />
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2 mb-6">
             <PanelCard>
-              <h3 className="text-sm font-bold uppercase tracking-widest mb-3">
-                Pico de compra
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Día de mayor compra:{" "}
-                <span className="font-semibold text-foreground">
-                  {metrics.peakPurchaseDay ?? "Sin datos"}
-                </span>
-              </p>
-              <p className="text-sm text-muted-foreground mt-2">
-                Hora de mayor compra (UTC):{" "}
-                <span className="font-semibold text-foreground">
-                  {metrics.peakPurchaseHour != null
-                    ? `${String(metrics.peakPurchaseHour).padStart(2, "0")}:00`
-                    : "Sin datos"}
-                </span>
-              </p>
-            </PanelCard>
-            <PanelCard>
-              <h3 className="text-sm font-bold uppercase tracking-widest mb-3">
+              <h3 className="text-sm font-bold uppercase tracking-widest mb-2">
                 Menús más vendidos
               </h3>
+              <p className="text-xs text-muted-foreground mb-3">
+                Acción → priorizar stock y producción de estos platos.
+              </p>
               {metrics.topMenus.length === 0 ? (
                 <p className="text-sm text-muted-foreground">Sin pedidos aún.</p>
               ) : (
@@ -155,13 +233,13 @@ function AdminCommercialPage() {
                 </ul>
               )}
             </PanelCard>
-          </div>
-
-          <div className="grid gap-4 lg:grid-cols-2">
             <PanelCard>
-              <h3 className="text-sm font-bold uppercase tracking-widest mb-3">
+              <h3 className="text-sm font-bold uppercase tracking-widest mb-2">
                 Top empresas
               </h3>
+              <p className="text-xs text-muted-foreground mb-3">
+                Acción → cuidar cuentas; revisar las que no aparecen aquí.
+              </p>
               {metrics.topCompanies.length === 0 ? (
                 <p className="text-sm text-muted-foreground">Sin empresas.</p>
               ) : (
@@ -185,34 +263,39 @@ function AdminCommercialPage() {
                 </ul>
               )}
             </PanelCard>
-            <PanelCard>
-              <h3 className="text-sm font-bold uppercase tracking-widest mb-3">
-                Top clientes
-              </h3>
-              {metrics.topCustomers.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Sin clientes.</p>
-              ) : (
-                <ul className="space-y-2">
-                  {metrics.topCustomers.map((c) => (
-                    <li
-                      key={c.id}
-                      className="flex justify-between text-sm gap-4"
-                    >
-                      <span className="truncate">
-                        {c.name}{" "}
-                        <span className="text-muted-foreground">
-                          ({c.orderCount} ped.)
-                        </span>
-                      </span>
-                      <span className="font-mono tabular-nums shrink-0">
-                        {fmt.currency(c.total, { currency: "EUR" })}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </PanelCard>
           </div>
+
+          <PanelCard>
+            <h3 className="text-sm font-bold uppercase tracking-widest mb-2">
+              Top clientes
+            </h3>
+            <p className="text-xs text-muted-foreground mb-3">
+              Acción → reconocimiento / retención personalizada vía Atención al
+              Cliente.
+            </p>
+            {metrics.topCustomers.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Sin clientes.</p>
+            ) : (
+              <ul className="space-y-2">
+                {metrics.topCustomers.map((c) => (
+                  <li
+                    key={c.id}
+                    className="flex justify-between text-sm gap-4"
+                  >
+                    <span className="truncate">
+                      {c.name}{" "}
+                      <span className="text-muted-foreground">
+                        ({c.orderCount} ped.)
+                      </span>
+                    </span>
+                    <span className="font-mono tabular-nums shrink-0">
+                      {fmt.currency(c.total, { currency: "EUR" })}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </PanelCard>
         </>
       )}
     </div>

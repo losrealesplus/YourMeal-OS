@@ -96,6 +96,7 @@ Formulado desde la evidencia, no desde el backlog:
 | G-02.6 | Los **ORR** definidos para el piloto están firmados (PASSED o fuera de alcance firmado). |
 | G-02.7 | **No Artificiality** — ver sección siguiente. |
 | G-02.8 | Existe **trazabilidad** entre evidencia, modelo e implementación. |
+| G-02.9 | **Operational Visibility** — ningún elemento visible aparenta una capacidad inexistente ([09](./09-operational-visibility-principle.md)). |
 
 Control operativo: [PILOT_ACCEPTANCE_CHECKLIST](../00-status/PILOT_ACCEPTANCE_CHECKLIST.md) · [ORR Party](../00-status/ORR_B2B_B2C_PARTY.md).
 
@@ -144,6 +145,7 @@ Conecta con:
 | Explicit Uncertainty | Huecos visibles documentados o escondidos — nunca silenciosos |
 | Operational Integrity | Estados y trazas coherentes en el ciclo |
 | Evidence over Opinion | ORR firmados + checklist; no “casi listo” |
+| **Operational Visibility** | Lo visible existe; lo inexistente no se promete ([09](./09-operational-visibility-principle.md)) |
 
 Patrón recomendado del framework:
 
@@ -235,6 +237,7 @@ Reference Implementation (conocimiento verificable — no “v1.0”)
 ## Relacionado
 
 - [Gate G-01](./07-gate-g01-operational-readiness.md)  
+- [Operational Visibility (09)](./09-operational-visibility-principle.md) · [DICT-071](../99-reference/PROJECT_DICTIONARY.md#operational-visibility)  
 - [FOPEBA](../18-operational-validation/00-operational-product-engineering.md)  
 - [PILOT_ACCEPTANCE_CHECKLIST](../00-status/PILOT_ACCEPTANCE_CHECKLIST.md)  
 - [DICT-005 Gate](../99-reference/PROJECT_DICTIONARY.md#gate) · [DICT-069 Pilot Integrity](../99-reference/PROJECT_DICTIONARY.md#pilot-integrity) · [DICT-070 Reference Implementation](../99-reference/PROJECT_DICTIONARY.md#reference-implementation-ri)
