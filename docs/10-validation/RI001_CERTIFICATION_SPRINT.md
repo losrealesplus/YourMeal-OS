@@ -8,9 +8,19 @@
 
 ## Order of work
 
-### 1. Merge stack to `main`
+### 1. Merge stack to `main` (Lovable publish branch)
 
-Merge OP-001 → OP-001.1 → OP-001.2 (PR #54 and predecessors as applicable).
+**AUD-001:** PR #54 merged into feature branch only — Runtime Deployment = **FAIL**, Evidence = **BLOCKED**.
+
+See [AUD001_RUNTIME_DEPLOYMENT_AUDIT.md](./AUD001_RUNTIME_DEPLOYMENT_AUDIT.md).
+
+**No more feature code.** Integration checklist:
+
+1. Merge OP-001 stack → `main` (or Lovable-connected branch)  
+2. Verify SHA on publish branch  
+3. New Lovable deploy → record `x-deployment-id` in [DV-001](./DEPLOYMENT_VERIFICATION.md)  
+4. [Post-deploy smoke](./POST_DEPLOY_SMOKE_OP001.md) (6 checks)  
+5. Only if smoke PASS → Day-0
 
 ### 2. Clean environment
 

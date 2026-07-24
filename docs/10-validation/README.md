@@ -28,13 +28,20 @@ docs/10-validation/
     └── smoke/                             ← HP / smoke runs
 ```
 
-## FOPEBA status (as of Acta OP-001)
+## FOPEBA status (as of Acta OP-001 + AUD-001)
 
 | Domain | Status |
 |--------|--------|
-| Bootstrap Engineering | PASS |
-| Bootstrap Evidence | PASS WITH OBSERVATIONS — credentials blocked Day-0 in agent env |
+| Bootstrap Engineering | ✅ PASS |
+| Runtime Deployment | ❌ FAIL (AUD-001 — publish branch ≠ stack) |
+| Bootstrap Evidence | ⛔ BLOCKED (cannot certify wrong build) |
+| CHECK-IT 05 | ⛔ BLOCKED |
 
 ## Next
 
-Do **not** open functional PRs. Execute [RI001_CERTIFICATION_SPRINT.md](./RI001_CERTIFICATION_SPRINT.md).
+**No feature PRs.** Integration only:
+
+1. Merge OP-001 stack → Lovable publish branch (`main`)  
+2. [DV-001 Deployment Verification](./DEPLOYMENT_VERIFICATION.md)  
+3. [Post-deploy smoke](./POST_DEPLOY_SMOKE_OP001.md)  
+4. Then [RI001_CERTIFICATION_SPRINT.md](./RI001_CERTIFICATION_SPRINT.md)
