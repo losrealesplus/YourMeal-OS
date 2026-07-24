@@ -75,11 +75,12 @@ export const DeliveryService = {
     await AuditService.write(ctx, {
       entityType: "delivery_attempt",
       entityId: input.orderId,
-      action: input.outcome === "delivered" ? "delivered" : "incident",
+      action: "status_change",
+      oldData: { status: current.status },
       newData: {
         outcome: input.outcome,
         note: input.note ?? null,
-        from_status: current.status,
+        result_status: target,
       },
     });
 
