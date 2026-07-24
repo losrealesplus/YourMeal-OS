@@ -29,6 +29,9 @@ export default {
   adminEnter: "Entra",
   adminEntryLabel: "Centro operazioni",
   adminEntryAria: "Centro operazioni",
+  saasEntryLabel: "Centro operazioni YourMeal OS",
+  saasEntryAria: "Centro operazioni YourMeal OS",
+  saasEntrySubtitle: "Amministrazione della piattaforma SaaS",
   adminNotStaff: "Questo account non ha accesso al Centro operazioni.",
   adminNotStaffHint:
     "Sei connesso come cliente. Esci e usa un account dello staff EatClean.",
