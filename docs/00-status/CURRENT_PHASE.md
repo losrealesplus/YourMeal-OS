@@ -1,6 +1,6 @@
 # CURRENT_PHASE
 
-**Última actualización:** 2026-07-23  
+**Última actualización:** 2026-07-24  
 **No sustituye** [MILESTONES](./MILESTONES.md) — tablero de “dónde estamos ahora”.
 
 ```text
@@ -24,7 +24,7 @@ Pregunta principal: ¿Qué nos enseña la operación real sobre nuestro modelo?
 Primary Artifact:  [PILOT_ACCEPTANCE_CHECKLIST](./PILOT_ACCEPTANCE_CHECKLIST.md) · [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md)
 Antes de firmar G-02 PASSED: ORR firmados · cero humo · No Artificiality
 PR taxonomy (post G-02): Evidence · KU · Correction · Pilot Fix · Operational Finding
-Completitud UI:    [Functional Completeness](./EATCLEAN_PILOT_FUNCTIONAL_COMPLETENESS_REVIEW.md) · huecos 🟡 documentados
+Completitud UI:    [Functional Completeness](./EATCLEAN_PILOT_FUNCTIONAL_COMPLETENESS_REVIEW.md) · [**EP-001 Sprint**](./EP001_FUNCTIONAL_COMPLETENESS_SPRINT.md)  
 Last Baseline:     v0.2.0-engineering-baseline (IR-001)
 
 ══════════════════════════════════════════════════

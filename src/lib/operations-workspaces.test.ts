@@ -22,11 +22,11 @@ describe("operations workspaces (presentation)", () => {
     }
   });
 
-  it("single kitchen role enters production directly", () => {
+  it("single kitchen role enters kitchen workspace directly", () => {
     const entry = resolveOperationsEntry(["kitchen"]);
     expect(entry).toEqual({
       kind: "direct",
-      path: "/admin/production",
+      path: "/admin/kitchen",
       workspace: expect.objectContaining({ id: "kitchen" }),
     });
   });

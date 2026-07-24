@@ -26,12 +26,17 @@ import {
   X,
   Building2,
   ChefHat,
+  LineChart,
+  Shield,
+  ScrollText,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useCan } from "@/hooks/use-can";
+import { usePilotAdminModuleFlags } from "@/hooks/use-pilot-admin-module-flags";
+import { PILOT_ADMIN_MODULE_FLAGS } from "@/lib/pilot-feature-flags";
 import { isOperationsAdmin } from "@/lib/operations-workspaces";
 import { TenantBrandScope } from "@/components/tenant/tenant-brand-scope";
 import { TenantLogo } from "@/components/tenant/tenant-logo";
@@ -54,6 +59,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const [moreOpen, setMoreOpen] = useState(false);
 
   const admin = isOperationsAdmin(roles);
+  const { flags: moduleFlags } = usePilotAdminModuleFlags();
   const showKitchen =
     can("kitchen.operate") ||
     roles.includes("kitchen") ||
@@ -65,6 +71,11 @@ export function AdminShell({ children }: { children: ReactNode }) {
     roles.includes("driver") ||
     admin;
   const showAllOps = admin || roles.includes("saas_admin");
+  const showAdminMgmt =
+    can("customers.read") ||
+    can("company.manage") ||
+    can("admin.settings") ||
+    admin;
 
   const primary: NavItem[] = [
     {
@@ -102,40 +113,24 @@ export function AdminShell({ children }: { children: ReactNode }) {
       to: "/admin/inventory",
       labelKey: "ops.nav.inventory",
       icon: Boxes,
-      visible: can("inventory.operate") || showAllOps,
+      visible:
+        (can("inventory.operate") || showAllOps) &&
+        moduleFlags[PILOT_ADMIN_MODULE_FLAGS.inventory],
     },
   ].filter((i) => i.visible);
 
   const moreItems: NavItem[] = [
     {
+      to: "/admin/commercial",
+      labelKey: "commercial",
+      icon: LineChart,
+      visible: showAdminMgmt,
+    },
+    {
       to: "/admin/companies",
       labelKey: "ops.nav.companyClients",
       icon: Building2,
       visible: can("company.manage") || admin,
-    },
-    {
-      to: "/admin/routes",
-      labelKey: "routes",
-      icon: Truck,
-      visible: can("logistics.operate") || showAllOps,
-    },
-    {
-      to: "/admin/menus",
-      labelKey: "menus",
-      icon: CalendarDays,
-      visible: can("menus.read") || showAllOps,
-    },
-    {
-      to: "/admin/dishes",
-      labelKey: "dishes",
-      icon: BookOpen,
-      visible: can("dishes.read") || showAllOps,
-    },
-    {
-      to: "/admin/purchasing",
-      labelKey: "purchasing",
-      icon: ShoppingCart,
-      visible: can("purchasing.operate") || showAllOps,
     },
     {
       to: "/admin/support",
@@ -144,28 +139,82 @@ export function AdminShell({ children }: { children: ReactNode }) {
       visible: can("support.read") || showAllOps,
     },
     {
+      to: "/admin/users",
+      labelKey: "users",
+      icon: Shield,
+      visible: admin,
+    },
+    {
+      to: "/admin/branding",
+      labelKey: "branding",
+      icon: Palette,
+      visible: can("admin.settings") || admin,
+    },
+    {
+      to: "/admin/audit",
+      labelKey: "audit",
+      icon: ScrollText,
+      visible: admin,
+    },
+    {
+      to: "/admin/routes",
+      labelKey: "routes",
+      icon: Truck,
+      visible:
+        (can("logistics.operate") || showAllOps) &&
+        moduleFlags[PILOT_ADMIN_MODULE_FLAGS.routes],
+    },
+    {
+      to: "/admin/menus",
+      labelKey: "menus",
+      icon: CalendarDays,
+      visible:
+        (can("menus.read") || showAllOps) &&
+        moduleFlags[PILOT_ADMIN_MODULE_FLAGS.menus],
+    },
+    {
+      to: "/admin/dishes",
+      labelKey: "dishes",
+      icon: BookOpen,
+      visible:
+        (can("dishes.read") || showAllOps) &&
+        moduleFlags[PILOT_ADMIN_MODULE_FLAGS.dishes],
+    },
+    {
+      to: "/admin/purchasing",
+      labelKey: "purchasing",
+      icon: ShoppingCart,
+      visible:
+        (can("purchasing.operate") || showAllOps) &&
+        moduleFlags[PILOT_ADMIN_MODULE_FLAGS.purchasing],
+    },
+    {
       to: "/admin/accounting",
       labelKey: "accounting",
       icon: Wallet,
-      visible: can("accounting.operate") || showAllOps,
+      visible:
+        (can("accounting.operate") || showAllOps) &&
+        moduleFlags[PILOT_ADMIN_MODULE_FLAGS.accounting],
     },
     {
       to: "/admin/reports",
       labelKey: "reports",
       icon: BarChart3,
-      visible: showAllOps,
+      visible: showAllOps && moduleFlags[PILOT_ADMIN_MODULE_FLAGS.reports],
     },
     {
       to: "/admin/promotions",
       labelKey: "promotions",
       icon: Megaphone,
-      visible: showAllOps,
+      visible: showAllOps && moduleFlags[PILOT_ADMIN_MODULE_FLAGS.promotions],
     },
     {
       to: "/admin/production",
       labelKey: "production",
       icon: Factory,
-      visible: can("production.operate") || showAllOps,
+      visible:
+        (can("production.operate") || showAllOps) &&
+        moduleFlags[PILOT_ADMIN_MODULE_FLAGS.production],
     },
     {
       to: "/admin/settings",
@@ -177,7 +226,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
       to: "/admin/design-system",
       labelKey: "designSystem",
       icon: Palette,
-      visible: admin,
+      visible: admin && moduleFlags[PILOT_ADMIN_MODULE_FLAGS.designSystem],
     },
   ].filter((i) => i.visible);
 
@@ -210,7 +259,17 @@ export function AdminShell({ children }: { children: ReactNode }) {
             ? "Reparto"
             : item.labelKey === "ops.nav.companyClients"
               ? "Clientes Empresa"
-              : undefined,
+              : item.labelKey === "commercial"
+                ? "Dashboard Comercial"
+                : item.labelKey === "users"
+                  ? "Usuarios"
+                  : item.labelKey === "branding"
+                    ? "Branding"
+                    : item.labelKey === "audit"
+                      ? "Auditoría"
+                      : item.labelKey === "support"
+                        ? "Atención al Cliente"
+                        : undefined,
     });
     return (
       <Link

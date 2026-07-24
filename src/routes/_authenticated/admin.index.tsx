@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useCan } from "@/hooks/use-can";
+import { usePilotAdminModuleFlags } from "@/hooks/use-pilot-admin-module-flags";
+import { PILOT_ADMIN_MODULE_FLAGS } from "@/lib/pilot-feature-flags";
 import { supabase } from "@/integrations/supabase/client";
 import { createServiceContext } from "@/services/types";
 import { OperationsService } from "@/modules/operations";
@@ -83,6 +85,7 @@ async function countClientIncidents(tenantId: string): Promise<number> {
 function OpsCenterHome() {
   const { user, tenantId, roles, profile } = useAuth();
   const { can } = useCan();
+  const { flags: moduleFlags } = usePilotAdminModuleFlags();
   const [kitchenCount, setKitchenCount] = useState<number | null>(null);
   const [deliveryCount, setDeliveryCount] = useState<number | null>(null);
   const [inventoryCount, setInventoryCount] = useState<number | null>(null);
@@ -103,9 +106,10 @@ function OpsCenterHome() {
     roles.includes("operations_manager") ||
     can("saas.manage");
   const showInventory =
-    can("inventory.operate") ||
-    roles.includes("operations_manager") ||
-    can("saas.manage");
+    (can("inventory.operate") ||
+      roles.includes("operations_manager") ||
+      can("saas.manage")) &&
+    moduleFlags[PILOT_ADMIN_MODULE_FLAGS.inventory];
   const showClients =
     can("customers.read") ||
     can("support.read") ||
