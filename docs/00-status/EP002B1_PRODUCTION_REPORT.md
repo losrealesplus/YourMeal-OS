@@ -26,6 +26,7 @@ ProductionReportService
         └── Workspace → [Kitchen Execution](./EP002B2_KITCHEN_EXECUTION.md)
 ```
 
+Patrón: [Operational Representation (DICT-072)](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md).  
 La UI no contiene lógica de negocio. El estado de lote (`batchStatus`) vive en `kitchen_production_batches` y se lee en ambas superficies.
 
 ---
