@@ -16,6 +16,7 @@ export type MockDish = {
   proteinG: number;     // grams (canonical)
   carbsG: number;       // grams
   fatG: number;         // grams
+  price: number;        // canonical decimal (EUR), matches dishes.price
   tags: Array<"vegan" | "vegetarian" | "glutenFree" | "lactoseFree" | "spicy">;
   allergens: string[];
   ingredients: string[];
@@ -41,7 +42,7 @@ export const MOCK_DISHES: MockDish[] = [
     name: "Bowl de quinoa & aguacate",
     tagline: "Bowl fresco de temporada",
     emoji: "🥗",
-    kcal: 520, proteinG: 22, carbsG: 58, fatG: 18,
+    kcal: 520, proteinG: 22, carbsG: 58, fatG: 18, price: 9.9,
     tags: ["vegetarian", "glutenFree"],
     allergens: ["sesame"],
     ingredients: ["quinoa", "aguacate", "tomate cherry", "pepino", "semillas de sésamo", "lima"],
@@ -51,7 +52,7 @@ export const MOCK_DISHES: MockDish[] = [
     name: "Salmón al horno con brócoli",
     tagline: "Fuente de omega-3",
     emoji: "🐟",
-    kcal: 610, proteinG: 42, carbsG: 32, fatG: 28,
+    kcal: 610, proteinG: 42, carbsG: 32, fatG: 28, price: 12.5,
     tags: ["glutenFree", "lactoseFree"],
     allergens: ["fish"],
     ingredients: ["salmón atlántico", "brócoli", "aceite de oliva", "limón", "ajo"],
@@ -61,7 +62,7 @@ export const MOCK_DISHES: MockDish[] = [
     name: "Curry de garbanzos",
     tagline: "Especias suaves, base cremosa",
     emoji: "🍛",
-    kcal: 540, proteinG: 18, carbsG: 66, fatG: 20,
+    kcal: 540, proteinG: 18, carbsG: 66, fatG: 20, price: 10.5,
     tags: ["vegan", "spicy"],
     allergens: [],
     ingredients: ["garbanzos", "leche de coco", "tomate", "cebolla", "curry", "arroz basmati"],
@@ -71,7 +72,7 @@ export const MOCK_DISHES: MockDish[] = [
     name: "Pollo teriyaki con arroz",
     tagline: "Proteína magra y arroz jazmín",
     emoji: "🍗",
-    kcal: 640, proteinG: 46, carbsG: 68, fatG: 14,
+    kcal: 640, proteinG: 46, carbsG: 68, fatG: 14, price: 11.9,
     tags: ["lactoseFree"],
     allergens: ["soy", "gluten"],
     ingredients: ["pollo de corral", "arroz jazmín", "soja", "jengibre", "cebolleta"],
@@ -81,7 +82,7 @@ export const MOCK_DISHES: MockDish[] = [
     name: "Ensalada mediterránea",
     tagline: "Ligera, fresca, canaria",
     emoji: "🥙",
-    kcal: 430, proteinG: 16, carbsG: 34, fatG: 24,
+    kcal: 430, proteinG: 16, carbsG: 34, fatG: 24, price: 8.9,
     tags: ["vegetarian"],
     allergens: ["milk"],
     ingredients: ["lechuga", "tomate", "aceituna", "feta", "pepino", "aceite de oliva"],
@@ -91,7 +92,7 @@ export const MOCK_DISHES: MockDish[] = [
     name: "Tacos de tempeh",
     tagline: "Plant-based, alto en proteína",
     emoji: "🌮",
-    kcal: 560, proteinG: 28, carbsG: 52, fatG: 22,
+    kcal: 560, proteinG: 28, carbsG: 52, fatG: 22, price: 10.9,
     tags: ["vegan"],
     allergens: ["soy", "gluten"],
     ingredients: ["tempeh", "tortilla de maíz", "aguacate", "lima", "cilantro"],

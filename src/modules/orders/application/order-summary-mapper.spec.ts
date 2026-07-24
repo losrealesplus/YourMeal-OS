@@ -38,6 +38,7 @@ describe("mapOrderToSummaryView", () => {
       proteinG: 0,
       carbsG: 0,
       fatG: 0,
+      price: 9.9,
       tags: [],
       allergens: [],
       ingredients: [],
