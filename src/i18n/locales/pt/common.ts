@@ -20,4 +20,9 @@ export default {
   selectLanguage: "Selecionar idioma",
   exploreModules: "Explorar módulos",
   module: "Módulo",
+  saved: "Guardado",
+  delete: "Eliminar",
+  required: "Obrigatório",
+  default: "Padrão",
+  setDefault: "Definir como padrão",
 } as const;
