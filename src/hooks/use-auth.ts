@@ -142,7 +142,7 @@ export function useAuth(): AuthState {
     // Router.invalidate() forces beforeLoad guards to re-run against the
     // new role set, so a revoked role instantly loses route access.
     const channel = supabase
-      .channel(`rbac:${uid}`)
+      .channel(`rbac:${uid}:${crypto.randomUUID()}`)
       .on(
         "postgres_changes",
         {
