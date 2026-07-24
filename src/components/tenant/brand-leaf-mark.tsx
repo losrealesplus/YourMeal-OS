@@ -15,8 +15,8 @@ export function BrandLeafMark({ className }: { className?: string }) {
       to="/auth/admin"
       aria-label={t("adminEntryAria")}
       className={cn(
-        "text-[10px] font-medium tracking-[0.04em] text-[#9a8f7c]/55",
-        "transition-colors duration-300 hover:text-[#9a8f7c]/90",
+        "text-[10px] font-medium tracking-[0.04em] text-muted-foreground",
+        "transition-colors duration-300 hover:text-foreground",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:rounded-sm",
         className,
       )}
