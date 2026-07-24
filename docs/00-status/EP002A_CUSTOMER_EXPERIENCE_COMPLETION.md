@@ -61,14 +61,9 @@ El botón **Centro de Operaciones** es la puerta segura al backoffice (sesión s
 
 Reutilizar el pasado sin copiar a ciegas. Ver [EP002A2_REPEAT_ORDER](./EP002A2_REPEAT_ORDER.md).
 
-### P3 · Favoritos
+### P3 · Favoritos / Customer Preferences *(cerrado — EP-002A.3)*
 
-No solo una lista. Deben **ahorrar tiempo**:
-
-- Repetir pedido (cuando aplique).
-- Añadir al menú / pedido actual.
-- Ver cuándo fue la última vez que lo pidió.
-- Persistencia real o CTA oculto (DICT-071).
+Explícitos + sugeridos por frecuencia (sin auto-marcar). Ver [EP002A3_CUSTOMER_PREFERENCES](./EP002A3_CUSTOMER_PREFERENCES.md).
 
 ### P4 · Home dinámica
 
