@@ -29,6 +29,9 @@ export default {
   adminEnter: "Entrer",
   adminEntryLabel: "Centre d'opérations",
   adminEntryAria: "Centre d'opérations",
+  saasEntryLabel: "Centre d'opérations YourMeal OS",
+  saasEntryAria: "Centre d'opérations YourMeal OS",
+  saasEntrySubtitle: "Administration de la plateforme SaaS",
   adminNotStaff: "Ce compte n'a pas accès au Centre d'opérations.",
   adminNotStaffHint:
     "Vous êtes connecté en tant que client. Déconnectez-vous et utilisez un compte du personnel.",
