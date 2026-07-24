@@ -1,52 +1,63 @@
 # EP-002B · Operational Execution
 
-**Estado:** Queued (tras o en paralelo controlado con EP-002A)  
-**Tras:** [EP-001](./EP001_FUNCTIONAL_COMPLETENESS_SPRINT.md) · preferible solapar solo tras Home sin humo  
+**Estado:** Queued (después de EP-002A, o solape controlado solo si Home ya sin humo)  
+**Tras:** [EP-001](./EP001_FUNCTIONAL_COMPLETENESS_SPRINT.md) · [EP-002A](./EP002A_CUSTOMER_EXPERIENCE_COMPLETION.md)  
 **Cara:** Centro de Operaciones · OJ  
-**Principio:** [Operational Visibility](../20-evidence-framework/09-operational-visibility-principle.md) (DICT-071)
+**Principio:** [Operational Visibility](../20-evidence-framework/09-operational-visibility-principle.md) (DICT-071)  
+**Pregunta del sprint:** ¿Qué necesita **hacer** el equipo de EatClean?
 
 ---
 
-## Objetivo
+## 1. Objetivo
 
 Profundizar la **ejecución operativa diaria** (no dashboards decorativos): cocina, producción necesaria, rutas/entregas y cierre — siempre con datos reales o superficie oculta.
 
 ```text
-Customer Experience (EP-002A)     Operational Execution (EP-002B)
-        │                                    │
-        └──────── same Order object ─────────┘
+EP-002A · ¿Qué necesita saber el cliente?
+                │
+                │  same Order object
+                │
+EP-002B · ¿Qué necesita hacer el equipo?
 ```
+
+Esa separación (Customer Experience vs Operational Execution) es intencional y permanente.
 
 ---
 
-## Alcance
+## 2. Alcance
 
 | Ítem | Pregunta | Nota |
 |------|----------|------|
-| Cocina | ¿La cola del día refleja pedidos reales y cambia estados? | Ya base en `/admin/kitchen` — cerrar huecos |
+| Cocina | ¿La cola del día refleja pedidos reales y cambia estados? | Base en `/admin/kitchen` — cerrar huecos |
 | Producción | ¿Hace falta planning/batch admin o basta cocina? | Solo activar `admin_module_production` si hay persistencia |
-| Rutas | ¿El reparto opera sin mocks? | Preferir `/admin/delivery` real; rutas mock siguen FF OFF |
-| Entregas | ¿Estados de entrega coherentes UI ↔ DB? | Misma spine de estados |
+| Rutas | ¿El reparto opera sin mocks? | Preferir `/admin/delivery` real; rutas mock FF OFF |
+| Entregas | ¿Estados de entrega coherentes UI ↔ DB? | Misma spine que ve el cliente en EP-002A |
 | Cierre operativo | ¿El pedido termina en delivered / issue documentado? | Evidencia FOPEBA |
 
 ---
 
-## Fuera de alcance
+## 3. Fuera de alcance
 
-- Inventario/contabilidad/promos admin (siguen FF OFF hasta datos reales).
+- Inventario/contabilidad/promos admin (FF OFF hasta datos reales).
 - Rediseño de FOPEBA / ADR.
 - Marketing senders.
+- Rediseño de la Customer App (pertenece a EP-002A).
 
 ---
 
-## Relación con Milestone
+## 4. Relación con Milestone
 
 Alimenta outcomes **Kitchen / Delivery / Operational Close** del [Milestone Pilot Ready](./MILESTONE_EATCLEAN_PILOT_READY.md).
 
 ---
 
-## Definition of Done
+## 5. Definition of Done
 
-- Journey operativo del día usable sin salir de la plataforma.
+> **¿Puede el equipo de EatClean producir y entregar los pedidos de la semana sin salir de YourMeal OS y sin inventar estados?**
+
+Apoyo:
+
+- Journey operativo del día usable en plataforma.
 - Ningún workspace en nav con datos simulados.
-- Intervenciones manuales (si las hay) registradas como evidencia (G-02.7).
+- Intervenciones manuales registradas como evidencia (G-02.7).
+- Estados visibles al cliente (EP-002A) = estados que Ops muta aquí.

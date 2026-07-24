@@ -1,48 +1,141 @@
 # EP-002A · Customer Experience Completion
 
-**Estado:** Ready to start  
+**Estado:** Locked · Ready to start  
 **Tras:** [EP-001 Functional Completeness](./EP001_FUNCTIONAL_COMPLETENESS_SPRINT.md) ✅  
 **Cara:** Customer App · CJ-001  
-**Principio:** [Operational Visibility](../20-evidence-framework/09-operational-visibility-principle.md) (DICT-071)
+**Principio:** [Operational Visibility](../20-evidence-framework/09-operational-visibility-principle.md) (DICT-071)  
+**Pregunta del sprint:** ¿Qué necesita **saber** el cliente?
+
+> No empezamos por pantallas.  
+> Empezamos por el **Customer Weekly Cycle**.
 
 ---
 
-## Objetivo
+## 1. Objetivo
 
-Completar las superficies **visibles al cliente final** que aún están parciales, para que el producto se sienta terminado sin abrir módulos nuevos.
+Que el cliente sienta que la aplicación le **acompaña toda la semana**, no solo en el momento de pedir.
 
-> Primera tarea del bloque: **Home** — Favoritos · Próxima entrega.
+```text
+Customer Weekly Cycle
+
+Domingo / Lunes
+        ↓
+Nuevo menú disponible
+        ↓
+Explorar platos
+        ↓
+Elegir pedido
+        ↓
+Confirmar
+        ↓
+Pedido en preparación
+        ↓
+Pedido en reparto
+        ↓
+Pedido entregado
+        ↓
+Historial y favoritos
+        ↓
+Esperar nuevo menú
+```
+
+Toda la **Home** debe reflejar ese ciclo (Home dinámica según fase).
 
 ---
 
-## Alcance
+## 2. Prioridades (orden de ejecución)
 
-| Ítem | Pregunta | Acción esperada |
-|------|----------|-----------------|
-| Favoritos | ¿Puedo guardar y recuperar platos que me gustan? | Persistencia real o ocultar CTA |
-| Próxima entrega | ¿Cuándo llega mi pedido? | Ventana real desde pedido confirmado |
-| Historial completo | ¿Qué pedí antes? | Lista + detalle con estados reales |
-| Confirmaciones | ¿Sé que el pedido quedó hecho? | Confirmación clara post-CJ-001 |
-| Estados del pedido | ¿En qué punto está mi pedido? | Mismos estados que Ops (sin humo) |
+### P1 · Próxima entrega *(prioridad máxima)*
+
+Cuando el cliente abre la app, la primera pregunta es:
+
+> **¿Qué pasa con mi próximo pedido?**
+
+La tarjeta debe responder con datos reales:
+
+| Campo | Requisito |
+|-------|-----------|
+| Estado del pedido | Programado / En preparación / En reparto / Entregado (alineado a Ops) |
+| Fecha | Real |
+| Franja horaria | Real cuando exista; si no, no inventar |
+| Dirección | Real del pedido / default |
+| Acción | Enlace al detalle del pedido (sin humo) |
+
+Si no hay próximo pedido → no fingir una entrega; la Home pasa a destacar el menú (ver §3).
+
+### P2 · Favoritos
+
+No solo una lista. Deben **ahorrar tiempo**:
+
+- Repetir pedido (cuando aplique).
+- Añadir al menú / pedido actual.
+- Ver cuándo fue la última vez que lo pidió.
+- Persistencia real o CTA oculto (DICT-071).
+
+### P3 · Historial
+
+Cada pedido muestra:
+
+- Fecha · Platos · Importe · Estado  
+- Acción **«Repetir pedido»** (comportamiento real o no visible)
+
+### P4 · Home dinámica
+
+La Home **no es siempre igual**:
+
+| Situación del cliente | Home destaca |
+|----------------------|--------------|
+| Aún no ha pedido esta semana | Menú semanal (CTA principal) |
+| Ya confirmó | Próxima entrega |
+| Inactivo semanas | Sugerir volver *(solo cuando exista motor de campañas; hasta entonces no inventar promo)* |
+
+Confirmación post-pedido y estados visibles en detalle forman parte del mismo ciclo (sin pantallas decorativas).
 
 ---
 
-## Fuera de alcance
+## 3. Reglas
 
-- WhatsApp / Email / Push senders (modelo ya en Customer Directory · Communications).
-- Rediseño estético (ACT-001).
+- Cero humo: lo visible funciona o se oculta ([DICT-071](../20-evidence-framework/09-operational-visibility-principle.md)).
+- Mismos estados de pedido que Ops (una sola spine).
+- No rediseño estético (ACT-001).
+- No WhatsApp / Email senders (motor Communication ya modelado; envío = más adelante).
+- Etiqueta UI puede seguir siendo familiar; dominio evolutivo = **Customer Success** en Admin (PR #42).
+
+---
+
+## 4. Fuera de alcance
+
+- EP-002B (cocina · rutas · cierre operativo).
 - Nuevos módulos admin.
+- Campañas reales (solo hueco preparado; sin fake promo en Home).
 
 ---
 
-## Relación con Milestone
+## 5. Relación con Milestone / EP-002B
 
-Alimenta el outcome de **Weekly Experience** del [Milestone Pilot Ready](./MILESTONE_EATCLEAN_PILOT_READY.md) (Home viva + CJ-001 sin huecos visibles).
+| Sprint | Pregunta |
+|--------|----------|
+| **EP-002A** (este) | ¿Qué necesita **saber** el cliente? |
+| **[EP-002B](./EP002B_OPERATIONAL_EXECUTION.md)** | ¿Qué necesita **hacer** el equipo de EatClean? |
+
+Alimenta el outcome **Weekly Experience** del [Milestone Pilot Ready](./MILESTONE_EATCLEAN_PILOT_READY.md).
 
 ---
 
-## Definition of Done
+## 6. Definition of Done
 
-- Ningún CTA de Home promete una capacidad inexistente.
-- Historial y estados leen pedidos reales del tenant.
-- Cero humo en Customer App del alcance EP-002A.
+No se mide por pantallas completadas.
+
+Se mide por esta pregunta:
+
+> **¿Puede un cliente utilizar la aplicación durante una semana completa sin echar en falta información sobre su pedido?**
+
+Si la respuesta es **sí** (y la Home refleja el Customer Weekly Cycle sin humo), EP-002A está terminado.
+
+Checklist de apoyo (no sustituye la pregunta):
+
+- [ ] Próxima entrega con datos reales o ausente de forma honesta  
+- [ ] Favoritos útiles (repetir / añadir / última vez) o no visibles  
+- [ ] Historial con detalle + repetir (real)  
+- [ ] Home dinámica según fase del ciclo  
+- [ ] Estados alineados con Ops  

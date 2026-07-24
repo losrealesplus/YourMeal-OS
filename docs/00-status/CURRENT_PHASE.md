@@ -12,19 +12,24 @@ FOUNDATION / BLUEPRINT / DISCOVERY / OM / VALIDATION / IOV   ✅
 FOV PREPARATION · ORR (marco) · G-02 (Gate formalizado)     ✅
 EP-001 Functional Completeness (cero humo Admin/Ops nav)    ✅
 ────────────────────────────
-Siguiente sprint:  **EP-002A · Customer Experience Completion**
-                   (luego EP-002B · Operational Execution)
-Siguiente artefacto:  **evidencia** + cierre de huecos visibles cliente
+Siguiente sprint:  **EP-002A · Customer Weekly Cycle**
+                   (Próxima entrega → Favoritos → Historial → Home dinámica)
+                   luego **EP-002B · Operational Execution**
+Siguiente artefacto:  experiencia cliente completa → ejecución ops → RI-001
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████
   Gobernanza          ██████████
-  Operaciones         █████████░
+  Modelo operacional  ██████████
   Administración      ██████████
-  Customer App        ████████░░
+  Customer App        ████████░░  ← EP-002A (último tramo)
+  Operaciones         █████████░  ← EP-002B
   Data                ███████░░░
 
-Riesgo principal: ya no es arquitectura → **experiencia operativa real**
+Riesgo principal: ya no es diseño → **completar el ciclo semanal cliente + ejecución ops**
+
+Incertidumbres de diseño grandes: **ninguna**.
+RI-001 comienza cuando EP-002A y EP-002B estén cerrados.
 
 G-02 = Pilot Authorization  ≠  Release / v1.0
 Pregunta principal: ¿Qué nos enseña la operación real sobre nuestro modelo?
