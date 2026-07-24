@@ -55,9 +55,11 @@ Operational
 | Dish → Weekly Menu draft | Company Admin | `WeeklyMenuService.ensureDraft` | **≥1 active dish** | Draft `weekly_menus` | `BOOTSTRAP_NO_DISHES` |
 | Draft → Published | Company Admin | `WeeklyMenuService.publish` | ≥1 slot + dishes | `status=published` | `BOOTSTRAP_EMPTY_MENU` |
 | Menu → Customer order | Customer | `OrderService.programDraft*` | Published menu for week | Draft order | `MENU_LOCKED` / `BOOTSTRAP_NO_PUBLISHED_MENU` |
-| Order → Kitchen | Kitchen | `OperationsService.transitionKitchen` | Order in kitchen queue (`confirmed`…) | Status advance | `INVALID_STATE` transition; UI integrity banner if no demand |
-| Kitchen → Delivery | Delivery | `OperationsService.transitionDelivery` | `ready_for_delivery` | Status advance | Transition refused; banner if no ready orders |
+| Order → Kitchen | Kitchen | `OperationsService.transitionKitchen` | Order in kitchen queue + **tenant kitchen demand > 0** | Status advance | `BOOTSTRAP_NO_KITCHEN_DEMAND` / `INVALID_STATE` |
+| Kitchen → Delivery | Delivery | `OperationsService.transitionDelivery` | Delivery queue non-empty | Status advance | `BOOTSTRAP_NO_DELIVERY_DEMAND` |
 | Delivery → Operational | Delivery | `delivered` | Out for delivery | Delivered count ≥1 | Transition refused |
+
+**Event table (certification form):** [BOOTSTRAP_STATE_MACHINE_TRANSITIONS.md](./BOOTSTRAP_STATE_MACHINE_TRANSITIONS.md)
 
 ---
 
@@ -65,11 +67,14 @@ Operational
 
 | Case | Forbidden | Guard |
 |------|-----------|-------|
-| 1 | Orders without published menu | `canAcceptOrders` · OrderService |
-| 2 | Production/kitchen without orders | `canOperateKitchen` · banner + empty queue |
-| 3 | Delivery without production output | `canOperateDelivery` · status machine + banner |
-| 4 | Staff without Company Admin | `canInviteOperationalStaff` · inviteTenantStaff |
-| 5 | Menu without dishes | `canComposeWeeklyMenu` · WeeklyMenuService |
+| 1 | Orders without published menu | `canAcceptOrders` · **OrderService** |
+| 2 | Production/kitchen without orders | `canOperateKitchen` · **OperationsService.transition** |
+| 3 | Delivery without production output | `canOperateDelivery` · **OperationsService.transition** |
+| 4 | Staff without Company Admin | `canInviteOperationalStaff` · **inviteTenantStaff** |
+| 5 | Menu without dishes | `canComposeWeeklyMenu` / `canPublishWeeklyMenu` · **WeeklyMenuService** |
+
+UI banners are advisory only — enforcement is in services / server functions.
+
 
 ---
 
@@ -89,7 +94,9 @@ No SQL editor. Idempotent. See [OP_001_FIRST_SAAS_ADMIN](../00-status/OP_001_FIR
 
 ```bash
 npm run bootstrap:verify
-npm run bootstrap:verify -- --live --tenant=<slug|uuid>
+npm run bootstrap:verify:ci
+npm run bootstrap:verify -- --live --tenant=<slug|uuid> --json=docs/10-validation/evidence/op001/bootstrap-report.json
 ```
 
-Pure mode asserts the rule matrix. Live mode prints snapshot + OPEN/BLOCK per gate.
+Pure / CI mode asserts the negative rule matrix (exit 0/1/2/3).  
+Live mode prints snapshot + **relationship chain** + OPEN/BLOCK per gate.

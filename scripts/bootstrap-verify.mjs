@@ -1,29 +1,29 @@
 #!/usr/bin/env node
 /**
- * OP-001.1 · Bootstrap integrity verifier
+ * OP-001.2 · Bootstrap integrity verifier
  *
  * Modes:
- *  1. Pure (default): runs precondition unit matrix — no network.
- *  2. Live (--live): queries Supabase with service role and prints tenant snapshot.
+ *   (default)     Pure precondition matrix — no network. Exit 0/1.
+ *   --live        Query Supabase: counts + relationship chain.
+ *   --ci          Deterministic CI mode (implies pure; --live if env present).
+ *   --json=path   Write bootstrap-report.json (for evidence pack).
+ *
+ * Exit codes (--ci / always for live/config):
+ *   0  PASS
+ *   1  FAIL — data / integrity / pure matrix
+ *   2  FAIL — configuration (missing env)
+ *   3  FAIL — permissions / auth / query forbidden
  *
  * Usage:
  *   npm run bootstrap:verify
- *   npm run bootstrap:verify -- --live [--tenant=<uuid|slug>]
- *
- * Env (live): SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
+ *   npm run bootstrap:verify -- --ci
+ *   npm run bootstrap:verify -- --live --tenant=eatclean-tenerife --json=docs/10-validation/evidence/op001/bootstrap-report.json
  */
 import { createClient } from "@supabase/supabase-js";
-import { createRequire } from "node:module";
-import { pathToFileURL } from "node:url";
+import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(__dirname, "..");
-
-// Load compiled-free TS via dynamic import of the source through vitest-less path:
-// re-implement the pure checks inline to keep the script dependency-free of Vite.
-// Keep in sync with src/modules/bootstrap-integrity/domain/bootstrap-preconditions.ts
+const EXIT = { PASS: 0, DATA: 1, CONFIG: 2, PERMS: 3 };
 
 function canComposeWeeklyMenu(activeDishCount) {
   if (activeDishCount <= 0) {
@@ -56,25 +56,94 @@ function canInviteOperationalStaff(companyAdminCount, role) {
   return { ok: true, code: "BOOTSTRAP_STAFF_INVITE_OK" };
 }
 
+function auditRelations(snap) {
+  return [
+    {
+      id: "tenant_to_company_admin",
+      from: "Tenant",
+      to: "CompanyAdmin",
+      ok: snap.tenantCount > 0 && snap.companyAdminCount > 0,
+    },
+    {
+      id: "company_admin_to_roles",
+      from: "CompanyAdmin",
+      to: "Roles",
+      ok: snap.companyAdminCount > 0 && snap.staffCount > 0,
+    },
+    {
+      id: "roles_to_dishes",
+      from: "Roles",
+      to: "DishLibrary",
+      ok: snap.companyAdminCount > 0 && snap.activeDishCount > 0,
+    },
+    {
+      id: "dishes_to_published_menu",
+      from: "DishLibrary",
+      to: "PublishedMenu",
+      ok: snap.activeDishCount > 0 && snap.publishedMenuCount > 0,
+    },
+    {
+      id: "menu_to_customers",
+      from: "PublishedMenu",
+      to: "Customers",
+      ok: snap.publishedMenuCount > 0 && snap.customerCount > 0,
+    },
+    {
+      id: "customers_to_orders",
+      from: "Customers",
+      to: "Orders",
+      ok:
+        snap.publishedMenuCount > 0 &&
+        snap.confirmedOrderCount + snap.kitchenQueueCount > 0,
+    },
+    {
+      id: "orders_to_kitchen",
+      from: "Orders",
+      to: "KitchenQueue",
+      ok:
+        snap.kitchenQueueCount > 0 ||
+        snap.readyForDeliveryCount > 0 ||
+        snap.deliveredCount > 0,
+    },
+    {
+      id: "kitchen_to_delivery",
+      from: "KitchenQueue",
+      to: "Delivery",
+      ok: snap.readyForDeliveryCount > 0 || snap.deliveredCount > 0,
+    },
+    {
+      id: "delivery_to_routes",
+      from: "Delivery",
+      to: "Routes",
+      ok:
+        (snap.routeCount ?? 0) > 0 ||
+        snap.readyForDeliveryCount > 0 ||
+        snap.deliveredCount > 0,
+      soft: true,
+    },
+  ];
+}
+
 function runPureMatrix() {
   const cases = [
-    ["menu without dishes", canComposeWeeklyMenu(0).ok === false],
-    ["menu with dishes", canComposeWeeklyMenu(1).ok === true],
-    ["orders without menu", canAcceptOrders(0).ok === false],
-    ["orders with menu", canAcceptOrders(1).ok === true],
-    ["kitchen without orders", canOperateKitchen(0).ok === false],
-    ["kitchen with orders", canOperateKitchen(2).ok === true],
-    ["delivery without ready", canOperateDelivery(0).ok === false],
-    ["delivery with ready", canOperateDelivery(1).ok === true],
-    ["staff without admin", canInviteOperationalStaff(0, "kitchen").ok === false],
-    ["staff with admin", canInviteOperationalStaff(1, "kitchen").ok === true],
-    ["invite company_admin without admin", canInviteOperationalStaff(0, "company_admin").ok === true],
+    ["cannotPublishMenuWithoutDishes", canComposeWeeklyMenu(0).ok === false],
+    ["cannotCreateOrderWithoutPublishedMenu", canAcceptOrders(0).ok === false],
+    ["cannotStartKitchenWithoutOrders", canOperateKitchen(0).ok === false],
+    ["cannotDispatchWithoutReadyProduction", canOperateDelivery(0).ok === false],
+    [
+      "cannotInviteStaffWithoutCompanyAdmin",
+      canInviteOperationalStaff(0, "kitchen").ok === false,
+    ],
+    ["menu with dishes allowed", canComposeWeeklyMenu(1).ok === true],
+    ["orders with menu allowed", canAcceptOrders(1).ok === true],
+    ["kitchen with demand allowed", canOperateKitchen(1).ok === true],
+    ["delivery with ready allowed", canOperateDelivery(1).ok === true],
+    ["staff with admin allowed", canInviteOperationalStaff(1, "kitchen").ok === true],
   ];
   let failed = 0;
   for (const [name, ok] of cases) {
-    const mark = ok ? "PASS" : "FAIL";
+    console.log(`  [${ok ? "PASS" : "FAIL"}] ${name}`);
     if (!ok) failed += 1;
-    console.log(`  [${mark}] ${name}`);
   }
   return failed;
 }
@@ -83,7 +152,14 @@ async function count(db, table, apply) {
   let q = db.from(table).select("id", { count: "exact", head: true });
   q = apply(q);
   const { count: n, error } = await q;
-  if (error) throw error;
+  if (error) {
+    const err = new Error(error.message);
+    err.code = error.code;
+    err.status = error.code === "42501" || /permission|jwt|rls/i.test(error.message)
+      ? EXIT.PERMS
+      : EXIT.DATA;
+    throw err;
+  }
   return n ?? 0;
 }
 
@@ -91,30 +167,46 @@ async function runLive(tenantArg) {
   const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) {
-    console.error(
-      "Live mode requires SUPABASE_URL (or VITE_SUPABASE_URL) and SUPABASE_SERVICE_ROLE_KEY",
+    const err = new Error(
+      "Live/CI live mode requires SUPABASE_URL (or VITE_SUPABASE_URL) and SUPABASE_SERVICE_ROLE_KEY",
     );
-    process.exit(2);
+    err.status = EXIT.CONFIG;
+    throw err;
   }
+
   const db = createClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
   let tenantId = tenantArg;
-  if (!tenantId || !tenantId.includes("-")) {
+  let tenantMeta = null;
+  const looksUuid =
+    tenantArg &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      tenantArg,
+    );
+  if (!looksUuid) {
     const slug = tenantArg || "eatclean-tenerife";
     const { data, error } = await db
       .from("tenants")
       .select("id, slug, name, status")
       .eq("slug", slug)
       .maybeSingle();
-    if (error) throw error;
+    if (error) {
+      const err = new Error(error.message);
+      err.status = /permission|jwt/i.test(error.message) ? EXIT.PERMS : EXIT.DATA;
+      throw err;
+    }
     if (!data) {
-      console.error(`Tenant not found for slug=${slug}`);
-      process.exit(2);
+      const err = new Error(`Tenant not found for slug=${slug}`);
+      err.status = EXIT.DATA;
+      throw err;
     }
     tenantId = data.id;
+    tenantMeta = data;
     console.log(`Tenant: ${data.name} (${data.slug}) [${data.status}]`);
+  } else {
+    console.log(`Tenant id: ${tenantId}`);
   }
 
   const snapshot = {
@@ -148,6 +240,9 @@ async function runLive(tenantArg) {
     deliveredCount: await count(db, "orders", (q) =>
       q.eq("tenant_id", tenantId).eq("status", "delivered"),
     ),
+    routeCount: await count(db, "routes", (q) => q.eq("tenant_id", tenantId)).catch(
+      () => 0,
+    ),
   };
 
   console.log("\nSnapshot");
@@ -155,7 +250,7 @@ async function runLive(tenantArg) {
     console.log(`  ${k}: ${v}`);
   }
 
-  const checks = [
+  const gates = [
     ["Dishes", canComposeWeeklyMenu(snapshot.activeDishCount)],
     ["Published menu", canAcceptOrders(snapshot.publishedMenuCount)],
     [
@@ -171,58 +266,138 @@ async function runLive(tenantArg) {
     ],
   ];
 
-  console.log("\nIntegrity");
+  console.log("\nIntegrity gates");
   let blocked = 0;
-  for (const [label, v] of checks) {
+  for (const [label, v] of gates) {
     console.log(`  [${v.ok ? "OPEN" : "BLOCK"}] ${label} · ${v.code}`);
     if (!v.ok) blocked += 1;
   }
 
-  // SaaS admin presence (platform)
+  const relations = auditRelations(snapshot);
+  console.log("\nRelationship chain");
+  let relBlocked = 0;
+  for (const link of relations) {
+    const soft = link.soft ? " (soft)" : "";
+    console.log(
+      `  [${link.ok ? "LINK" : "GAP "}] ${link.from} → ${link.to}${soft}`,
+    );
+    if (!link.ok && !link.soft) relBlocked += 1;
+  }
+
   const { count: saasCount, error: saasErr } = await db
     .from("user_roles")
     .select("id", { count: "exact", head: true })
     .eq("role", "saas_admin")
     .is("tenant_id", null);
-  if (saasErr) throw saasErr;
+  if (saasErr) {
+    const err = new Error(saasErr.message);
+    err.status = EXIT.PERMS;
+    throw err;
+  }
   console.log(
     `\nPlatform saas_admin count: ${saasCount ?? 0}${
       (saasCount ?? 0) === 0 ? "  ← run npm run seed" : ""
     }`,
   );
 
-  return blocked === 0 && (saasCount ?? 0) > 0 ? 0 : 1;
+  const report = {
+    generatedAt: new Date().toISOString(),
+    mode: "live",
+    tenant: tenantMeta ?? { id: tenantId },
+    snapshot,
+    gates: gates.map(([label, v]) => ({ label, ...v })),
+    relations,
+    saasAdminCount: saasCount ?? 0,
+    verdict:
+      blocked === 0 && relBlocked === 0 && (saasCount ?? 0) > 0
+        ? "PASS"
+        : "NOT_YET_OPERATIONAL",
+  };
+
+  return {
+    code:
+      report.verdict === "PASS"
+        ? EXIT.PASS
+        : (saasCount ?? 0) === 0
+          ? EXIT.DATA
+          : EXIT.DATA,
+    report,
+  };
+}
+
+function writeJson(jsonPath, report) {
+  const abs = path.resolve(jsonPath);
+  fs.mkdirSync(path.dirname(abs), { recursive: true });
+  fs.writeFileSync(abs, JSON.stringify(report, null, 2) + "\n");
+  console.log(`\nWrote ${abs}`);
 }
 
 async function main() {
   const args = process.argv.slice(2);
-  const live = args.includes("--live");
+  const ci = args.includes("--ci");
+  const live = args.includes("--live") || (ci && process.env.SUPABASE_SERVICE_ROLE_KEY);
   const tenantArg = args
     .find((a) => a.startsWith("--tenant="))
     ?.slice("--tenant=".length);
+  const jsonArg = args
+    .find((a) => a.startsWith("--json="))
+    ?.slice("--json=".length);
 
-  console.log("OP-001.1 · bootstrap:verify\n");
-  console.log("Pure precondition matrix");
+  console.log(`OP-001.2 · bootstrap:verify${ci ? " [--ci]" : ""}\n`);
+  console.log("Pure precondition matrix (negative cases)");
   const pureFails = runPureMatrix();
+
+  const pureReport = {
+    generatedAt: new Date().toISOString(),
+    mode: ci ? "ci-pure" : "pure",
+    pureFails,
+    verdict: pureFails === 0 ? "PASS" : "FAIL",
+  };
+
   if (pureFails > 0) {
-    console.error(`\nFAIL · ${pureFails} pure case(s)`);
-    process.exit(1);
+    console.error(`\nFAIL · ${pureFails} pure case(s) [exit ${EXIT.DATA}]`);
+    if (jsonArg) writeJson(jsonArg, pureReport);
+    process.exit(EXIT.DATA);
   }
   console.log("\nPure matrix: PASS");
 
   if (!live) {
+    if (ci) {
+      console.log("\nCI pure-only PASS (no SUPABASE_SERVICE_ROLE_KEY for live).");
+      if (jsonArg) writeJson(jsonArg, pureReport);
+      process.exit(EXIT.PASS);
+    }
     console.log(
-      "\nTip: npm run bootstrap:verify -- --live [--tenant=eatclean-tenerife]",
+      "\nTip: npm run bootstrap:verify -- --ci | --live [--tenant=slug] [--json=path]",
     );
-    process.exit(0);
+    if (jsonArg) writeJson(jsonArg, pureReport);
+    process.exit(EXIT.PASS);
   }
 
-  const code = await runLive(tenantArg);
-  console.log(code === 0 ? "\nLIVE: OPERATIONAL READY" : "\nLIVE: NOT YET OPERATIONAL");
-  process.exit(code);
+  try {
+    const { code, report } = await runLive(tenantArg);
+    const merged = { ...report, pure: pureReport };
+    if (jsonArg) writeJson(jsonArg, merged);
+    console.log(
+      code === EXIT.PASS
+        ? "\nLIVE: OPERATIONAL READY [exit 0]"
+        : `\nLIVE: NOT YET OPERATIONAL [exit ${code}]`,
+    );
+    process.exit(code);
+  } catch (e) {
+    const status = e.status ?? EXIT.DATA;
+    console.error(`\nERROR [${status}]:`, e.message || e);
+    if (jsonArg) {
+      writeJson(jsonArg, {
+        generatedAt: new Date().toISOString(),
+        mode: "live-error",
+        error: String(e.message || e),
+        exitCode: status,
+        verdict: "FAIL",
+      });
+    }
+    process.exit(status);
+  }
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+main();

@@ -196,3 +196,145 @@ export function auditBootstrapIntegrity(
     },
   ];
 }
+
+export type BootstrapRelationLink = {
+  id: string;
+  from: string;
+  to: string;
+  ok: boolean;
+  detail: string;
+};
+
+/**
+ * OP-001.2 · Relationship chain — not mere existence counts.
+ * Each link requires the previous link to be present (connected ladder).
+ */
+export function auditBootstrapRelations(
+  snap: BootstrapSnapshot & { routeCount?: number },
+): BootstrapRelationLink[] {
+  const links: BootstrapRelationLink[] = [
+    {
+      id: "tenant_to_company_admin",
+      from: "Tenant",
+      to: "CompanyAdmin",
+      ok: snap.tenantCount > 0 && snap.companyAdminCount > 0,
+      detail:
+        snap.tenantCount <= 0
+          ? "No tenant"
+          : snap.companyAdminCount > 0
+            ? `${snap.companyAdminCount} company_admin linked`
+            : "Tenant exists but no Company Admin",
+    },
+    {
+      id: "company_admin_to_roles",
+      from: "CompanyAdmin",
+      to: "Roles/Staff",
+      ok: snap.companyAdminCount > 0 && snap.staffCount > 0,
+      detail:
+        snap.companyAdminCount <= 0
+          ? "Blocked: no Company Admin"
+          : snap.staffCount > 0
+            ? `${snap.staffCount} operational staff roles`
+            : "Company Admin present; kitchen/delivery staff not yet invited",
+    },
+    {
+      id: "staff_to_dishes",
+      from: "Roles",
+      to: "DishLibrary",
+      ok: snap.companyAdminCount > 0 && snap.activeDishCount > 0,
+      detail:
+        snap.activeDishCount > 0
+          ? `${snap.activeDishCount} active dishes`
+          : "No active dishes — menu chain blocked",
+    },
+    {
+      id: "dishes_to_published_menu",
+      from: "DishLibrary",
+      to: "PublishedMenu",
+      ok: snap.activeDishCount > 0 && snap.publishedMenuCount > 0,
+      detail:
+        snap.activeDishCount <= 0
+          ? "Blocked: no dishes"
+          : snap.publishedMenuCount > 0
+            ? `${snap.publishedMenuCount} published menu(s)`
+            : "Dishes exist but no published weekly menu",
+    },
+    {
+      id: "menu_to_customers",
+      from: "PublishedMenu",
+      to: "Customers",
+      ok: snap.publishedMenuCount > 0 && snap.customerCount > 0,
+      detail:
+        snap.publishedMenuCount <= 0
+          ? "Blocked: no published menu"
+          : snap.customerCount > 0
+            ? `${snap.customerCount} customer(s)`
+            : "Menu published; no customers yet",
+    },
+    {
+      id: "customers_to_orders",
+      from: "Customers",
+      to: "Orders",
+      ok:
+        snap.publishedMenuCount > 0 &&
+        (snap.confirmedOrderCount > 0 || snap.kitchenQueueCount > 0),
+      detail:
+        snap.publishedMenuCount <= 0
+          ? "Blocked: no published menu"
+          : snap.confirmedOrderCount + snap.kitchenQueueCount > 0
+            ? `${snap.confirmedOrderCount + snap.kitchenQueueCount} order(s) in demand`
+            : "No confirmed / kitchen orders",
+    },
+    {
+      id: "orders_to_kitchen",
+      from: "Orders",
+      to: "KitchenQueue",
+      ok: snap.kitchenQueueCount > 0 || snap.readyForDeliveryCount > 0 || snap.deliveredCount > 0,
+      detail:
+        snap.kitchenQueueCount > 0
+          ? `${snap.kitchenQueueCount} in kitchen queue`
+          : snap.readyForDeliveryCount + snap.deliveredCount > 0
+            ? "Kitchen queue empty (downstream already progressed)"
+            : "No kitchen demand",
+    },
+    {
+      id: "kitchen_to_delivery",
+      from: "KitchenQueue",
+      to: "Delivery",
+      ok: snap.readyForDeliveryCount > 0 || snap.deliveredCount > 0,
+      detail:
+        snap.readyForDeliveryCount > 0
+          ? `${snap.readyForDeliveryCount} ready for delivery`
+          : snap.deliveredCount > 0
+            ? "Delivery progressed (delivered > 0)"
+            : "No ready-for-delivery output from kitchen",
+    },
+    {
+      id: "delivery_to_routes",
+      from: "Delivery",
+      to: "Routes",
+      ok:
+        (snap.routeCount ?? 0) > 0 ||
+        snap.readyForDeliveryCount > 0 ||
+        snap.deliveredCount > 0,
+      detail:
+        (snap.routeCount ?? 0) > 0
+          ? `${snap.routeCount} route(s)`
+          : snap.deliveredCount > 0 || snap.readyForDeliveryCount > 0
+            ? "Delivery active (routes optional in RI-001 pilot)"
+            : "No delivery activity / routes",
+    },
+  ];
+  return links;
+}
+
+/** True when the operational chain is connected through delivery. */
+export function isOperationalChainConnected(
+  snap: BootstrapSnapshot & { routeCount?: number },
+): boolean {
+  const links = auditBootstrapRelations(snap);
+  // Require core path through delivery; routes link may be soft in pilot.
+  return links
+    .filter((l) => l.id !== "delivery_to_routes" && l.id !== "company_admin_to_roles")
+    .every((l) => l.ok);
+}
