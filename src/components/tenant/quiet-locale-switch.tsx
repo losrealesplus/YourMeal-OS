@@ -36,7 +36,7 @@ export function QuietLocaleSwitch({ className }: { className?: string }) {
       {codes.map((lng, i) => (
         <span key={lng.code} className="inline-flex items-center gap-1.5">
           {i > 0 ? (
-            <span className="text-[#9a8f7c]/50" aria-hidden>
+            <span className="text-muted-foreground" aria-hidden>
               /
             </span>
           ) : null}
@@ -47,7 +47,7 @@ export function QuietLocaleSwitch({ className }: { className?: string }) {
               "uppercase transition-colors",
               current === lng.code
                 ? "text-[color:var(--attention,#EDB32A)]"
-                : "text-[#9a8f7c]/70 hover:text-primary/80",
+                : "text-muted-foreground hover:text-primary/80",
             )}
           >
             {lng.code}

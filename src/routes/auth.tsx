@@ -38,7 +38,7 @@ type Phase = "splash" | "onboarding" | "login";
 const ONBOARDING_KEY = "tenant_onboarding_done";
 
 const authInputClass =
-  "w-full border border-border/80 rounded-2xl bg-white pl-11 pr-4 py-3.5 text-sm text-foreground placeholder:text-[#9a8f7c]/75 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-colors";
+  "w-full border border-border/80 rounded-2xl bg-white pl-11 pr-4 py-3.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-colors";
 
 async function goHome(
   navigate: ReturnType<typeof useNavigate>,
@@ -232,7 +232,7 @@ function AuthPage() {
 
               <div className="mt-8 flex items-center gap-3">
                 <div className="h-px flex-1 bg-border/80" />
-                <span className="text-[10px] uppercase tracking-[0.14em] text-[#9a8f7c]/80 font-medium">
+                <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-medium">
                   {t("common:or")}
                 </span>
                 <div className="h-px flex-1 bg-border/80" />
@@ -269,7 +269,7 @@ function AuthPage() {
             <div className="mt-10 flex flex-col items-center gap-5">
               <a
                 href="/auth/admin"
-                className="text-[11px] font-medium tracking-[0.08em] text-[#9a8f7c]/80 hover:text-foreground transition-colors underline-offset-4 hover:underline"
+                className="text-[11px] font-medium tracking-[0.08em] text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
               >
                 {tenantCopyEs.backOffice.entryLabel}
               </a>
@@ -348,7 +348,7 @@ function EmailForm() {
       ) : null}
       <label className="relative block">
         <Mail
-          className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-[#9a8f7c]/80"
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground"
           strokeWidth={1.75}
           aria-hidden
         />
@@ -363,7 +363,7 @@ function EmailForm() {
       </label>
       <label className="relative block">
         <Lock
-          className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-[#9a8f7c]/80"
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground"
           strokeWidth={1.75}
           aria-hidden
         />
@@ -443,7 +443,7 @@ function PhoneForm() {
     <div className="grid gap-4">
       <label className="relative block">
         <Phone
-          className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-[#9a8f7c]/80"
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground"
           strokeWidth={1.75}
           aria-hidden
         />

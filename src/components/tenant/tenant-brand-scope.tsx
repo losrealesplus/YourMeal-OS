@@ -61,10 +61,10 @@ export function PoweredByLine({ className }: { className?: string }) {
       )}
       aria-hidden
     >
-      <span className="block text-[8px] font-normal tracking-[0.1em] text-[#9a8f7c]/50">
+      <span className="block text-[8px] font-normal tracking-[0.1em] text-muted-foreground">
         {prefix}
       </span>
-      <span className="mt-0.5 block text-[9px] font-normal tracking-[0.04em] text-[#9a8f7c]/40">
+      <span className="mt-0.5 block text-[9px] font-normal tracking-[0.04em] text-muted-foreground">
         {name}
       </span>
     </p>
