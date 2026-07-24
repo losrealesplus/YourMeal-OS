@@ -69,7 +69,7 @@ function OrdersPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="meta-label">
-                      {fmt.date(new Date(`${order.weekStart}T00:00:00`), { dateStyle: "medium" })}
+                      {fmt.date(new Date(`${order.weekStart}T00:00:00`), "medium")}
                     </p>
                     <p className="font-bold text-lg mt-1.5 leading-tight">
                       <span className="font-mono tabular-nums">{order.itemCount}</span>{" "}
