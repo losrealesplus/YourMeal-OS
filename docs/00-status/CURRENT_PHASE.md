@@ -12,40 +12,45 @@ FOUNDATION / BLUEPRINT / DISCOVERY / OM / VALIDATION / IOV   ✅
 FOV PREPARATION · ORR (marco) · G-02 (Gate formalizado)     ✅
 EP-001 Functional Completeness (cero humo Admin/Ops nav)    ✅
 ────────────────────────────
-Fase:                **CERTIFICACIÓN OPERACIONAL** (no “SaaS en desarrollo”)
+Fase:                **CERTIFICACIÓN OPERACIONAL** · Certification Sprint
 Naturaleza:          Demostrar operación real sin ingeniería
+CHECK-IT 04:         ✅ RBAC Hardening **PASS**
+CHECK-IT 05:         🔴 Evidence Audit **NOT READY** (gaps de evidencia, no de software)
 Pregunta del Gate:   **¿Qué evidencia falta para una decisión objetiva sobre RI-001?**
+Próximo foco:        [CERTIFICATION_SPRINT](./CERTIFICATION_SPRINT.md) — ORR · evidencia · dataset · re-run 05 · Report
 Gate:                [CG-RI-001](./RI001_CERTIFICATION_GATE.md) · salidas: READY | RWO | NOT READY
-Informe:             [RI-001 Certification Report](./RI001_CERTIFICATION_REPORT.md) ← **artefacto de decisión** (no cronología)
-Congelación:         Capas FON/FOPEBA/Knowledge congeladas · YourMeal OS = defectos+evidencia · CG activo
-Alcance certificación: valida **capacidad operacional** (no “calidad del software” aislada)
-Cierre RI-001:       Report emitido + decisión firmada con evidencia + cosecha FOPEBA
-                     → YourMeal OS = primer caso de referencia **certificado** de FOPEBA
+Informe:             [RI-001 Certification Report](./RI001_CERTIFICATION_REPORT.md)
+Congelación:         Capas FON/FOPEBA/Knowledge congeladas · YourMeal OS = defectos+evidencia
+Cierre jornada:      [2026-07-24 diario](../99-internal/development-journal/2026-07-24-cierre-jornada-certificacion.md)
 Capas:               FON AI → FOPEBA → Knowledge → YourMeal OS → CG-RI-001 → EatClean
-Artefacto primario:  [RI001_CERTIFICATION_REPORT](./RI001_CERTIFICATION_REPORT.md) (tras Gate)
+Artefacto primario:  [CERTIFICATION_SPRINT](./CERTIFICATION_SPRINT.md) · [Report](./RI001_CERTIFICATION_REPORT.md)
 Gate / Board:        [CG-RI-001](./RI001_CERTIFICATION_GATE.md) · [Release Board](./EP_OPS_001_RELEASE_BOARD.md)
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████  100%
-  Gobernanza          ██████████  100%
-  Modelo operacional  ██████████  100%  ← OCM-001
-  Implementación      █████████░
-  Certificación       ███░░░░░░░  ← Gate + Report (no nuevos principios)
-  Operaciones (hub)   ██████░░░░  ← EP-OPS-001 entrada al Gate
+  Implementación      ██████████  100%  ← hardening + dual ops en main
+  Seguridad (RBAC)    ██████████  100%  ← CHECK-IT 04 PASS
+  Operación           ██████████  100%
+  Documentación       ████████░░   80%
+  Evidencia           ███████░░░   70%  ← CHECK-IT 05 NOT READY
+  Certificación       ██████░░░░   60%  ← Report pendiente
+
+Estado del proyecto: 🟢 VERDE
 
 Mapa EP:
   FASE 0 · FOUNDATION              ██████████
   EP-001…EP-002B.2                 ██████████
-  —— EP-OPS-001 (entrada Gate) ——  □□□□□□□□□□  ← HOY
-  —— Architecture Freeze ——        □□□□□□□□□□
-  —— RI-001 CERTIFICATION GATE ——  □□□□□□□□□□
-  —— RI-001 Certification Report —— □□□□□□□□□□  ← decisión + cosecha FOPEBA
+  RBAC Hardening (CHECK-IT 04)     ██████████  ✅ PASS
+  Dual Ops Entry (WP-3 UI)         ██████████  ✅ en main
+  —— EP-OPS-001 evidencia ——       ██████░░░░  ← Certification Sprint
+  —— CHECK-IT 05 ——                ███░░░░░░░  ← NOT READY (re-run)
+  —— RI-001 Certification Report —— □□□□□□□□□□
   EP-002B.3–B.4 (cola)             □□□□□□□□□□
 
-Hoy: Capas estabilizadas · Report = decisión justificada por evidencia · cierre RI-001 = Report + firma + FOPEBA.
-Ciclo: principios → conocimiento → implementación → certificación → conocimiento validado → siguiente producto.
+Hoy: Software listo · falta evidencia formal · Certification Sprint exclusivo.
+Diario: [cierre 2026-07-24](../99-internal/development-journal/2026-07-24-cierre-jornada-certificacion.md)
 
-Riesgo principal: abrir FCR/E2E sin EP-OPS-001 PASS → evidencia contaminada
+Riesgo principal: confundir NOT READY de evidencia con necesidad de nuevas features
 
 Incertidumbres de diseño grandes: **ninguna**.
 Congelación metodológica: **activa** hasta Certification Report + cosecha FOPEBA.
@@ -53,13 +58,13 @@ Congelación metodológica: **activa** hasta Certification Report + cosecha FOPE
 G-02 = Pilot Authorization  ≠  Release / v1.0
 Pregunta del Report: ¿Por qué esta decisión está justificada por la evidencia disponible?
 
-Primary Artifact:  [Report](./RI001_CERTIFICATION_REPORT.md) · [Gate](./RI001_CERTIFICATION_GATE.md) · [Board](./EP_OPS_001_RELEASE_BOARD.md) · [OCM](./EATCLEAN_OPERATIONAL_STRUCTURE.md) · [ORS](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md)
-Evidence:          [DICT-006](../99-reference/PROJECT_DICTIONARY.md#evidence) — escenario ejecutado y documentado
+Primary Artifact:  [Certification Sprint](./CERTIFICATION_SPRINT.md) · [CHECK-IT 05](./CHECK_IT_05_EVIDENCE_AUDIT.md) · [Report](./RI001_CERTIFICATION_REPORT.md)
+RBAC:              [CHECK-IT 04](./CHECK_IT_04_RBAC_HARDENING.md) · [RBAC_HARDENING_RI-001](./RBAC_HARDENING_RI-001.md)
+Dual Ops:          [OPS_CENTER_DUAL_SURFACE](./OPS_CENTER_DUAL_SURFACE.md) · SaasOpsEntry en `/admin`
+Evidence:          [DICT-006](../99-reference/PROJECT_DICTIONARY.md#evidence)
 Visibilidad:       [DICT-071](../20-evidence-framework/09-operational-visibility-principle.md)
-Ops pattern:       [DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md)
-Tenant autonomy:   [DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)
 OCM / Gate / ORS:  DICT-074 · DICT-075 · DICT-076
-Hoy (Certificación): [Report](./RI001_CERTIFICATION_REPORT.md) · [Gate](./RI001_CERTIFICATION_GATE.md) · [Board](./EP_OPS_001_RELEASE_BOARD.md) · [OCM](./EATCLEAN_OPERATIONAL_STRUCTURE.md) · [ORS](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) · [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)
+Hoy (Certificación): [Sprint](./CERTIFICATION_SPRINT.md) · [Gate](./RI001_CERTIFICATION_GATE.md) · [Board](./EP_OPS_001_RELEASE_BOARD.md) · [OCM](./EATCLEAN_OPERATIONAL_STRUCTURE.md) · [ORS](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md)
 Seguridad pre-piloto: [Pilot Security Checklist](../09-security/PILOT_SECURITY_CHECKLIST.md) (10 corregidos · 1 Accepted documentado)
 Antes de firmar G-02 PASSED: ORR firmados · cero humo · No Artificiality
 PR taxonomy (post G-02): Evidence · KU · Correction · Pilot Fix · Operational Finding

@@ -2,22 +2,20 @@
 
 **Fecha:** 2026-07-24 (actualizado post-#52)  
 **Tipo:** Gobernanza operativa · **certificación** — **prohibido** abrir PRs de nuevas capacidades  
-**Objetivo:** Emitir [RI-001 Certification Report](./RI001_CERTIFICATION_REPORT.md) con decisión READY / RWO / NOT READY.  
+**Objetivo:** Completar [Certification Sprint](./CERTIFICATION_SPRINT.md) y emitir [RI-001 Certification Report](./RI001_CERTIFICATION_REPORT.md).  
 **Fase:** Certificación operacional · [CG-RI-001](./RI001_CERTIFICATION_GATE.md)  
+**CHECK-IT:** [04 PASS](./CHECK_IT_04_RBAC_HARDENING.md) · [05 NOT READY](./CHECK_IT_05_EVIDENCE_AUDIT.md)  
 **Congelación:** no nuevos principios / DICT / EP metodológicos hasta cerrar RI-001.
 
 > Antes: ¿Qué falta por implementar?  
-> En el Gate: **¿Qué evidencia falta para decidir RI-001?**  
-> Evidencia (DICT-006): escenario operacional ejecutado y documentado — no opinión ni código solo.
+> Ahora: **¿Qué evidencia falta para decidir RI-001?** (CHECK-IT 05 lo confirma)
 
-**Gate:** [RI001_CERTIFICATION_GATE](./RI001_CERTIFICATION_GATE.md) · salidas objetivas READY / RWO / NOT READY  
-**Informe:** [RI001_CERTIFICATION_REPORT](./RI001_CERTIFICATION_REPORT.md) ← siguiente gran entregable  
-**Board:** [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md)  
-**ORS / OCM:** [ORS-001](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) · [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md)  
-Spec hub: [EP_OPS_001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · Matriz: [FCR](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md)
+Diario: [cierre 2026-07-24](../99-internal/development-journal/2026-07-24-cierre-jornada-certificacion.md)  
+**Gate / Sprint / Report:** [CG-RI-001](./RI001_CERTIFICATION_GATE.md) · [CERTIFICATION_SPRINT](./CERTIFICATION_SPRINT.md) · [Report](./RI001_CERTIFICATION_REPORT.md)  
+**Board:** [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md) · **ORS / OCM:** [ORS-001](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) · [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md)
 
 Capas: FON AI → FOPEBA → Knowledge → YourMeal OS → CG-RI-001 → EatClean.  
-EP-OPS-001 = entrada al Gate. Tras PASS: Freeze → carriles → **Certification Report** → cosecha FOPEBA.
+Implementación RI-001: ✅ · Evidencia: 🟡 · Certificación: 🟡.
 
 ---
 

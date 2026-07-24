@@ -3,14 +3,16 @@
 **ID:** CG-RI-001  
 **Tipo:** Gate de certificación operacional (instancia de [DICT-005 Gate](../99-reference/PROJECT_DICTIONARY.md#gate))  
 **Patrón reutilizable:** [DICT-075 · Certification Gate](../99-reference/PROJECT_DICTIONARY.md#certification-gate)  
-**Estado:** Active — pendiente de entrada plena tras EP-OPS-001 PASS  
+**Estado:** Active — Certification Sprint tras CHECK-IT 05 NOT READY  
 **Producto:** YourMeal OS · RI: EatClean Tenerife  
 **Canon:** [OCM-001](./EATCLEAN_OPERATIONAL_STRUCTURE.md) · [ORS-001](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) · [Release Board](./EP_OPS_001_RELEASE_BOARD.md)  
-**Informe de decisión:** [RI-001 Certification Report](./RI001_CERTIFICATION_REPORT.md) (plantilla · siguiente gran entregable)
+**Informe de decisión:** [RI-001 Certification Report](./RI001_CERTIFICATION_REPORT.md)  
+**Sprint:** [CERTIFICATION_SPRINT](./CERTIFICATION_SPRINT.md) · Diario: [cierre 2026-07-24](../99-internal/development-journal/2026-07-24-cierre-jornada-certificacion.md)
 
 > YourMeal OS está en **fase de certificación operacional**.  
 > **Congelación metodológica:** no crear nuevos principios / DICT / EP de metodología hasta concluir RI-001.  
-> **Alcance de la certificación:** no valida el software; valida la **capacidad operacional** bajo escenario real + evidencia suficiente ([Report](./RI001_CERTIFICATION_REPORT.md)).
+> **Alcance:** no valida el software; valida la **capacidad operacional** bajo escenario real + evidencia.  
+> **CHECK-IT 04** ✅ PASS · **CHECK-IT 05** 🔴 NOT READY (evidencia, no código).
 
 ---
 
@@ -144,8 +146,12 @@ La evidencia nace cuando un escenario como **ORS-001** se ejecuta y queda docume
 | Operational Architecture | ✅ |
 | Governance | ✅ |
 | OCM-001 (DICT-074) | ✅ Documentado |
-| Congelación metodológica (sin nuevos DICT/EP de principio) | ✅ En vigor |
-| EP-OPS-001 PASS | ☐ Bloqueante |
+| Congelación metodológica | ✅ En vigor |
+| RBAC Hardening (CHECK-IT 04) | ✅ PASS |
+| Dual Ops Entry (código) | ✅ en `main` |
+| EP-OPS-001 evidencia / matriz | 🟡 Certification Sprint |
+| Evidence Audit (CHECK-IT 05) | 🔴 NOT READY |
+| ORR HP-001 firmado | ☐ |
 
 ---
 

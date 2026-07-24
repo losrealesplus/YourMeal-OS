@@ -28,8 +28,13 @@ docs/99-internal/development-journal/
   2026-07-20-foundation-lock.md
   2026-07-20-constitucion-y-arranque-module-01.md
   2026-07-23-transicion-ri001-g02.md
+  2026-07-24-cierre-jornada-certificacion.md
   YYYY-MM-DD-<hito-o-tema>.md
 ```
+
+### Última ficha
+
+- [2026-07-24 · Cierre jornada certificación](./2026-07-24-cierre-jornada-certificacion.md) — RBAC PASS · Dual Ops · CHECK-IT 05 NOT READY · Certification Sprint
 
 Un archivo por **jornada** o por **hito**, no un monolito.
 

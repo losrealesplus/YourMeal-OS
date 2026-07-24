@@ -26,14 +26,16 @@ Leyenda: 🔴 bloquea · 🟡 en progreso / evidencia parcial · 🟢 eliminado 
 
 | Bloqueador | Evidencia requerida | Estado |
 |------------|---------------------|:------:|
-| `/admin` Operativo | FCR bloque Ops + EP-OPS-001 (P1) | 🔴 |
-| `/saas` Gobierno | Tenant Provisioning (P2 · DICT-073) | 🔴 |
+| `/admin` Operativo | FCR bloque Ops + EP-OPS-001 (P1) | 🟡 |
+| `/saas` Gobierno | Tenant Provisioning (P2 · DICT-073) · entry dual ✅ en código | 🟡 |
 | Jornada completa | [ORS-001](./ORS_001_OPERATIONAL_REFERENCE_SCENARIO.md) ejecutado | 🔴 |
 | Observability | KPIs + auditoría verificados (7 preguntas) | 🔴 |
 | RRR | Checklist completo (tras Gate abierto) | ⚪ |
+| RBAC hardening (impl.) | [CHECK-IT 04](./CHECK_IT_04_RBAC_HARDENING.md) | 🟢 |
+| Evidence Audit | [CHECK-IT 05](./CHECK_IT_05_EVIDENCE_AUDIT.md) | 🔴 NOT READY |
 
-Pregunta diaria: **¿qué bloqueador eliminamos hoy?**
-
+Pregunta diaria: **¿qué bloqueador eliminamos hoy?**  
+Foco: [CERTIFICATION_SPRINT](./CERTIFICATION_SPRINT.md)
 ---
 
 ## Visión ejecutiva · tres preguntas

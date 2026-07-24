@@ -1,19 +1,47 @@
 # Ops Center · Dual Surface (EatClean vs YourMeal OS)
 
-**Estado:** Gap documentado · absorbido por **[Release Board EP-OPS-001](./EP_OPS_001_RELEASE_BOARD.md)** (Bloqueador 2)  
-**Tipo:** Correction / Certification — **no** nueva capacidad de cocina  
-**Board:** [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md) · Spec: [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · [Matriz](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md)
+**Estado:** Entry Point **implementado en `main`** · evidencia de certificación pendiente (EP-OPS-001 / CHECK-IT 05)  
+**Tipo:** Correction / Certification — alineado OCM-001  
+**Board:** [EP_OPS_001_RELEASE_BOARD](./EP_OPS_001_RELEASE_BOARD.md) · Spec: [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · Hardening: [RBAC_HARDENING_RI-001](./RBAC_HARDENING_RI-001.md)
 
 ---
 
 ## Principio
 
 ```text
-EatClean              →  Opera el negocio (tenant)
-YourMeal OS           →  Administra la plataforma (SaaS)
+EatClean              →  Opera el negocio (tenant)     /admin
+YourMeal OS           →  Gobierna la plataforma (SaaS) /saas
 ```
 
-Dos niveles. Un solo producto plataforma; un Centro de Operaciones por tenant + un Centro discreto de plataforma.
+Dos niveles. Un solo producto; un Centro de Operaciones por tenant + Centro de Gobierno de plataforma.
+
+---
+
+## Modelo de acceso (definitivo · 2026-07-24)
+
+| Actor | Home | Notas |
+|-------|------|-------|
+| Cliente | `/app` | Customer App |
+| Staff tenant | `/admin` | Company Ops Center |
+| `saas_admin` puro | `/saas` | Platform console |
+| Híbrido staff + saas | `/admin` | + `SaasOpsEntry` → `/saas` |
+| Driver | `/driver` | Workspace propio |
+
+**No** enviar `saas_admin` a `/app`.
+
+---
+
+## Dual Operations Entry Point (WP-3) · estado código
+
+| Aspecto | Estado |
+|---------|:------:|
+| `home-path.ts` (saas puro → `/saas`; híbrido → `/admin`) | ✅ |
+| `SaasOpsEntry` en `/admin` (bajo Centro de Operaciones) | ✅ |
+| Ausente en `/app` y `/auth` | ✅ |
+| RBAC vía `isSaasAdmin` (sin duplicar lógica) | ✅ |
+| Alineado OCM-001 | ✅ |
+
+Componente: `src/components/tenant/saas-ops-entry.tsx`.
 
 ---
 
@@ -21,69 +49,27 @@ Dos niveles. Un solo producto plataforma; un Centro de Operaciones por tenant + 
 
 ### 1. Centro de Operaciones EatClean (`/admin`)
 
-Uso diario. Solo módulos del tenant. IA objetivo:
+Uso diario. Solo módulos del tenant:
 
 ```text
-Dashboard
-Cocina
-Producción
-Reparto
-Atención al Cliente
-Administración
-Configuración
+Dashboard · Cocina · Producción · Reparto
+Atención al Cliente · Clientes · Empresas
+Administración · Finanzas · Configuración
+(+ SaasOpsEntry si saas_admin)
 ```
 
 ### 2. Centro de Operaciones YourMeal OS (`/saas`)
 
-Debajo del acceso principal / *Powered by YourMeal OS*. Sin protagonismo.  
-**Solo `saas_admin`.** Nunca usuarios normales del tenant.
-
-Contenido objetivo:
-
 ```text
-Tenants · Company Admins · Roles · Branding asociado
-Auditoría global · Feature Flags · Configuración SaaS · Monitoring*
+Powered by YourMeal OS
+Centro de Operaciones YourMeal OS
 ```
 
-\* Monitoring: FF OFF o «Próximamente» si no está listo (DICT-071).  
-WP-5 = **Tenant Provisioning** ([DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)), no solo listados.
----
-
-## Estado actual (código)
-
-| Aspecto | Hoy | Gap |
-|---------|-----|-----|
-| Rutas | `/admin` vs `/saas` separados | ✅ Base sana |
-| Guard SaaS | `saas.manage` → solo `saas_admin` | ✅ |
-| Nav tenant | ERP amplio (`admin-shell.tsx`) | Demasiados ítems; Producción enterrada |
-| Nav SaaS | Placeholder panels | Faltan Admins, Audit global, Flags, Monitoring |
-| Entry SaaS desde admin | No hay botón discreto | ❌ |
-| `PoweredByLine` | Texto estático | No es enlace SaaS |
-| `saas_admin` en tenant | Tratado como ops admin completo | Mezcla plataformas |
-| `homePathForRoles` vs `decideOperationsCenterEntry` | Divergentes si dual-role | Inconsistente |
-
-Archivos clave:
-
-- `src/components/admin-shell.tsx`
-- `src/lib/operations-departments.ts`
-- `src/lib/open-operations-center.ts`
-- `src/lib/home-path.ts`
-- `src/routes/_authenticated/saas.tsx`
-- `src/components/tenant/tenant-brand-scope.tsx` (`PoweredByLine`)
+Solo `saas_admin`. Tenant Provisioning (DICT-073) · Roles · Branding · Auditoría · Flags.
 
 ---
 
-## Criterio de aceptación (Fase 3)
+## Criterio de aceptación restante (certificación)
 
-1. Nav EatClean acotada a departamentos del tenant (extras ocultos por flag o fuera de nav).
-2. Entrada discreta a `/saas` **solo** para `saas_admin`.
-3. Company Admin **nunca** ve superficie SaaS.
-4. `homePathForRoles` y `decideOperationsCenterEntry` alineados para dual-role.
-5. Sin fingir módulos SaaS: placeholder → Feature Flag OFF o «Próximamente» explícito (DICT-071).
-6. WP-5: aprovisionar tenant + Company Admin + roles + auditoría (DICT-073); membership RI-001 = un usuario ↔ un tenant.
-
----
-
-## Fuera de alcance de este documento
-
-Implementar Packaging, Monitoring live, o rediseño visual. Solo clarificar la separación de superficies.
+Implementación del entry: ✅.  
+Pendiente Certification Sprint: evidencia de que Company Admin **nunca** ve `/saas` y que saas híbrido opera desde `/admin` con entry discreta (actas / CHECK-IT 05).
