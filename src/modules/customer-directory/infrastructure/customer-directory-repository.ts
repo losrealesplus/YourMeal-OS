@@ -459,6 +459,8 @@ export function createCustomerDirectoryRepository(
       }
       const peakPurchaseDay =
         [...dayCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+      const troughPurchaseDay =
+        [...dayCounts.entries()].sort((a, b) => a[1] - b[1])[0]?.[0] ?? null;
       const peakPurchaseHour =
         [...hourCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
 
@@ -542,9 +544,12 @@ export function createCustomerDirectoryRepository(
         inactiveCustomers: individuals.filter((c) => c.status === "inactive")
           .length,
         peakPurchaseDay,
+        troughPurchaseDay,
         peakPurchaseHour,
         purchaseFrequencyDays:
           frequencyN > 0 ? Math.round(frequencySum / frequencyN) : null,
+        companiesWithoutOrders: companyRows.filter((c) => c.orderCount === 0)
+          .length,
         topCompanies,
         topCustomers,
         topMenus,

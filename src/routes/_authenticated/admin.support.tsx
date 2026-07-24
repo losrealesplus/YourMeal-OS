@@ -22,6 +22,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { createServiceContext } from "@/services/types";
 import {
   CustomerDirectoryService,
+  COMMUNICATION_ENGINE_STAGES,
   PLANNED_CAMPAIGN_KINDS,
   PLANNED_COMMUNICATION_CHANNELS,
   type CustomerOrderSummary,
@@ -267,7 +268,7 @@ function AdminSupportPage() {
       <SectionTitle
         overline="Atención al Cliente"
         title="Centro de consulta"
-        subtitle="Misma base de datos que Administración · Clientes. Sin duplicar información."
+        subtitle="Misma base que Administración. Dominio evolutivo: Customer Success (fidelizar · comunicar · recuperar · analizar)."
       />
       <AdminHeader
         goal="Resolver consultas con historial real"
@@ -306,11 +307,25 @@ function AdminSupportPage() {
         <div className="grid gap-4 lg:grid-cols-2">
           <PanelCard>
             <h3 className="text-sm font-bold uppercase tracking-widest mb-2">
+              Motor común
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Communication → Channel → Recipient → Template → Campaign →
+              Delivery → Result. Sin integraciones externas todavía.
+            </p>
+            <ol className="space-y-2 list-decimal list-inside text-sm">
+              {COMMUNICATION_ENGINE_STAGES.map((stage) => (
+                <li key={stage}>{stage}</li>
+              ))}
+            </ol>
+          </PanelCard>
+          <PanelCard>
+            <h3 className="text-sm font-bold uppercase tracking-widest mb-2">
               Canales planificados
             </h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Arquitectura lista. Integraciones externas no implementadas en
-              piloto.
+              Cualquier canal futuro usa el mismo motor. Audience = Customer
+              Directory.
             </p>
             <ul className="space-y-2">
               {PLANNED_COMMUNICATION_CHANNELS.map((c) => (
@@ -324,14 +339,14 @@ function AdminSupportPage() {
               ))}
             </ul>
           </PanelCard>
-          <PanelCard>
+          <PanelCard className="lg:col-span-2">
             <h3 className="text-sm font-bold uppercase tracking-widest mb-2">
               Campañas soportadas
             </h3>
             <p className="text-sm text-muted-foreground mb-4">
               Segmentación reutiliza filtros del directorio compartido.
             </p>
-            <ul className="space-y-2">
+            <ul className="grid sm:grid-cols-2 gap-2">
               {PLANNED_CAMPAIGN_KINDS.map((c) => (
                 <li key={c.id} className="text-sm py-1">
                   {c.label}

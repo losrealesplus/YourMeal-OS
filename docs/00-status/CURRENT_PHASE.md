@@ -5,26 +5,35 @@
 
 ```text
 ══════════════════════════════════════════════════
-PROJECT STATE · RI-001 (niveles de conocimiento)
+PROJECT STATE · RI-001 · Pilot Readiness
 ══════════════════════════════════════════════════
 
 FOUNDATION / BLUEPRINT / DISCOVERY / OM / VALIDATION / IOV   ✅
 FOV PREPARATION · ORR (marco) · G-02 (Gate formalizado)     ✅
+EP-001 Functional Completeness (cero humo Admin/Ops nav)    ✅
 ────────────────────────────
-Siguiente etapa:  **PILOT (RI-001)**  →  Evidence  →  Knowledge Update
-Siguiente artefacto:  **evidencia** (no PR de arquitectura)
+Siguiente sprint:  **EP-002A · Customer Experience Completion**
+                   (luego EP-002B · Operational Execution)
+Siguiente artefacto:  **evidencia** + cierre de huecos visibles cliente
 
-Objetivo del proyecto:
-  Antes → Construir YourMeal OS
-  Ahora → Demostrar que el modelo operacional funciona en operación real
+Pilot Readiness (lectura)
+  Arquitectura        ██████████
+  Gobernanza          ██████████
+  Operaciones         █████████░
+  Administración      ██████████
+  Customer App        ████████░░
+  Data                ███████░░░
+
+Riesgo principal: ya no es arquitectura → **experiencia operativa real**
 
 G-02 = Pilot Authorization  ≠  Release / v1.0
 Pregunta principal: ¿Qué nos enseña la operación real sobre nuestro modelo?
 
 Primary Artifact:  [PILOT_ACCEPTANCE_CHECKLIST](./PILOT_ACCEPTANCE_CHECKLIST.md) · [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md)
+Visibilidad:       [Operational Visibility · DICT-071](../20-evidence-framework/09-operational-visibility-principle.md)
 Antes de firmar G-02 PASSED: ORR firmados · cero humo · No Artificiality
 PR taxonomy (post G-02): Evidence · KU · Correction · Pilot Fix · Operational Finding
-Completitud UI:    [Functional Completeness](./EATCLEAN_PILOT_FUNCTIONAL_COMPLETENESS_REVIEW.md) · [**EP-001 Sprint**](./EP001_FUNCTIONAL_COMPLETENESS_SPRINT.md)  
+Completitud UI:    [EP-001](./EP001_FUNCTIONAL_COMPLETENESS_SPRINT.md) · siguiente [EP-002A](./EP002A_CUSTOMER_EXPERIENCE_COMPLETION.md) · [EP-002B](./EP002B_OPERATIONAL_EXECUTION.md)
 Last Baseline:     v0.2.0-engineering-baseline (IR-001)
 
 ══════════════════════════════════════════════════
@@ -40,11 +49,12 @@ Mapa del sistema: [FOUR_LAYERS](../05-architecture/FOUR_LAYERS.md).
 Foundation ✅ → Methodology ✅ → Tenant Branding ✅ → Experience Baseline ✅
 → Materialization ✅ Frozen (ACT-002 · #24→#31)
 ───────────────
-Piloto: demostrar  ·  EP-001 → EP-005  ·  FOPEBA observa
+Piloto: demostrar  ·  EP-001 ✅ → EP-002A → EP-002B → Evidence  ·  FOPEBA observa
 ```
 
 > ❌ No diseñar / no polish estético (ACT-001 · ACT-002).  
 > ✅ Demostrar el ciclo: Cliente → Sistema → Cocina → Reparto → Cliente → Evidencia.  
+> ✅ Operational Visibility (DICT-071): lo visible existe; lo inexistente no se promete.  
 > Motores de cambio: [PROJECT_DOMAINS](./PROJECT_DOMAINS.md).
 
 ---

@@ -20,6 +20,7 @@ export {
 export {
   PLANNED_COMMUNICATION_CHANNELS,
   PLANNED_CAMPAIGN_KINDS,
+  COMMUNICATION_ENGINE_STAGES,
 } from "./domain/communications";
 export type {
   CommunicationChannel,
@@ -27,5 +28,9 @@ export type {
   AudienceSegmentDraft,
   CampaignDraft,
   SegmentDimension,
+  CommunicationRecipient,
+  MessageTemplateDraft,
+  DeliveryDraft,
+  DeliveryStatus,
 } from "./domain/communications";
 export { CustomerDirectoryService } from "./application/customer-directory-service";

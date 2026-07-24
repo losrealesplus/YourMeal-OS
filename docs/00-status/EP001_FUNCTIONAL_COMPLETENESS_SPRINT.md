@@ -116,3 +116,17 @@ Módulos incompletos **no aparecen** en navegación a menos que se active el fla
 > Cada clic visible produce una acción real o está oculto.  
 > Cada dato del Dashboard Comercial y del Directorio proviene de Postgres.  
 > Administración y Atención al Cliente no duplican repositorios.
+
+---
+
+## 6. Revisión de producto (2026-07-24)
+
+Aceptada. Ampliaciones derivadas:
+
+| Decisión | Artefacto |
+|----------|-----------|
+| Cero humo → principio FOPEBA | [DICT-071 · Operational Visibility](../20-evidence-framework/09-operational-visibility-principle.md) · G-02.9 |
+| KPI → pregunta → acción | Dashboard Comercial reframed |
+| Support → Customer Success (evolución) | Nota en `/admin/support` + docs |
+| Motor Communication común | `communications.ts` (Channel…Result) |
+| Siguiente sprint | [EP-002A](./EP002A_CUSTOMER_EXPERIENCE_COMPLETION.md) primero · [EP-002B](./EP002B_OPERATIONAL_EXECUTION.md) |

@@ -148,7 +148,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
       to: "/admin/branding",
       labelKey: "branding",
       icon: Palette,
-      visible: can("admin.settings") || admin,
+      visible: can("brand.manage") || admin,
     },
     {
       to: "/admin/audit",
