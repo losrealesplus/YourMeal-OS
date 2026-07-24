@@ -12,6 +12,7 @@ import {
 } from "@/components/tenant/tenant-brand-scope";
 
 import { TenantLogo } from "@/components/tenant/tenant-logo";
+import { BrandLeafMark } from "@/components/tenant/brand-leaf-mark";
 import { QuietLocaleSwitch } from "@/components/tenant/quiet-locale-switch";
 import { brandConfig, tenantCopyEs } from "@/tenant/brand-config";
 import { PrimaryCTA } from "@/components/consumer";
@@ -267,12 +268,7 @@ function AuthPage() {
             </div>
 
             <div className="mt-10 flex flex-col items-center gap-5">
-              <a
-                href="/auth/admin"
-                className="text-[11px] font-medium tracking-[0.08em] text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
-              >
-                {tenantCopyEs.backOffice.entryLabel}
-              </a>
+              <BrandLeafMark className="text-[11px] tracking-[0.08em] underline-offset-4 hover:underline" />
               <PoweredByLine />
             </div>
           </div>

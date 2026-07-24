@@ -29,5 +29,9 @@ export default {
   adminEnter: "Anmelden",
   adminEntryLabel: "Operationszentrum",
   adminEntryAria: "Operationszentrum",
+  adminNotStaff: "Dieses Konto hat keinen Zugang zum Operationszentrum.",
+  adminNotStaffHint:
+    "Du bist als Kunde angemeldet. Melde dich ab und nutze ein Mitarbeiterkonto.",
+  adminSwitchAccount: "Anderes Konto verwenden",
   backToCustomerLogin: "Zurück zur Kundenanmeldung",
 } as const;

@@ -63,7 +63,20 @@ La tarjeta debe responder con datos reales:
 
 Si no hay próximo pedido → no fingir una entrega; la Home pasa a destacar el menú (ver §3).
 
-### P2 · Favoritos
+### P1.1 · Entrada al Centro de Operaciones *(cerrado con EP-002A.1.1)*
+
+El botón **Centro de Operaciones** es la puerta segura al backoffice (sesión staff → Ops Center; si no → `/auth/admin` + return). Ver [EP002A11_OPS_CENTER_ENTRY](./EP002A11_OPS_CENTER_ENTRY.md).
+
+### P2 · Historial + Repetir pedido
+
+Cada pedido muestra:
+
+- Fecha · Platos · Importe · Estado  
+- Acción **«Repetir pedido»** (comportamiento real o no visible)
+
+Aprovecha pedidos persistidos y sienta la base de Favoritos.
+
+### P3 · Favoritos
 
 No solo una lista. Deben **ahorrar tiempo**:
 
@@ -71,13 +84,6 @@ No solo una lista. Deben **ahorrar tiempo**:
 - Añadir al menú / pedido actual.
 - Ver cuándo fue la última vez que lo pidió.
 - Persistencia real o CTA oculto (DICT-071).
-
-### P3 · Historial
-
-Cada pedido muestra:
-
-- Fecha · Platos · Importe · Estado  
-- Acción **«Repetir pedido»** (comportamiento real o no visible)
 
 ### P4 · Home dinámica
 
