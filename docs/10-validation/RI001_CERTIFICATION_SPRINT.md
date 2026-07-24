@@ -8,9 +8,14 @@
 
 ## Order of work
 
-### 1. Merge stack to `main`
+### 1. Merge stack to `main` (or Lovable-connected branch)
 
-Merge OP-001 → OP-001.1 → OP-001.2 (PR #54 and predecessors as applicable).
+**Blocked by AUD-001 until done.**  
+PR #54 merged into `cursor/op-001-1-bootstrap-validation-f54a` only — **not** `main`.  
+Lovable field build was still `main`-class (Dish Library placeholder).  
+See [AUD001_RUNTIME_DEPLOYMENT_AUDIT.md](./AUD001_RUNTIME_DEPLOYMENT_AUDIT.md).
+
+Merge OP-001 → OP-001.1 → OP-001.2 stack → publish branch → confirm new `x-deployment-id` → re-probe.
 
 ### 2. Clean environment
 

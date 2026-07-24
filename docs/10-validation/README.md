@@ -37,4 +37,6 @@ docs/10-validation/
 
 ## Next
 
-Do **not** open functional PRs. Execute [RI001_CERTIFICATION_SPRINT.md](./RI001_CERTIFICATION_SPRINT.md).
+Do **not** open functional PRs until [AUD-001](./AUD001_RUNTIME_DEPLOYMENT_AUDIT.md) is resolved (stack on Lovable publish branch + field re-probe).
+
+Then execute [RI001_CERTIFICATION_SPRINT.md](./RI001_CERTIFICATION_SPRINT.md).
