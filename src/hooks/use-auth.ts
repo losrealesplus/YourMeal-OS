@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
+import { useRouter } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { homePathForRoles } from "@/lib/home-path";
 
