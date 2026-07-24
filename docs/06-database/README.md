@@ -29,6 +29,9 @@ Every business row carries `tenant_id` (except platform identity tables).
 | `current_user_tenants()` | Membership set |
 | `is_tenant_member(tenant_id)` | Member **or** saas_admin |
 | `has_any_staff_role(uid, tenant_id)` | Company staff roles (not customer/driver/saas alone) |
+| `is_customer_owner(customer_id)` | Row owner for customer-scoped tables |
+
+**EXECUTE policy (Accepted):** `anon` / `PUBLIC` revoked; `authenticated` retains EXECUTE because RLS policies evaluate these helpers in the caller role context. See [PILOT_SECURITY_CHECKLIST](../09-security/PILOT_SECURITY_CHECKLIST.md) §3 — scanner finding “authenticated can execute SECURITY DEFINER” is **documented, not ignored**.
 
 ## Canonical storage
 

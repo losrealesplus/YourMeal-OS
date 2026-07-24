@@ -87,7 +87,8 @@ Architecture · Implementation · Verification · Release
 ├── 05 Knowledge Update + ku/   (KU-01 · 02 · 03)
 ├── 06 Economic Confirmation + ec/  (Framework · OVI · ECR)
 ├── 07 Gate G-01 + g01/         (Package · Decision · Acta)
-└── 08 Gate G-02                (Pilot Readiness · RI)
+├── 08 Gate G-02                (Pilot Readiness · RI)
+└── 09 Operational Visibility   (cero humo · DICT-071)
 ```
 
 | Doc | Contenido |
@@ -100,6 +101,7 @@ Architecture · Implementation · Verification · Release
 | [06 EC](./06-economic-confirmation.md) · [ec/](./ec/README.md) | Valor operacional |
 | [07 G-01](./07-gate-g01-operational-readiness.md) · [g01/](./g01/README.md) | Certificación Stage 2 |
 | [08 G-02](./08-gate-g02-pilot-readiness.md) | Pilot Readiness · integridad del Journey |
+| [09 Visibility](./09-operational-visibility-principle.md) | Cero humo · lo visible existe |
 
 ---
 

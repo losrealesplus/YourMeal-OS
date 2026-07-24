@@ -131,6 +131,7 @@ Core | Operational | Engineering | Historical
 | `DICT-005` | [Gate](#gate) | Core | Accepted |
 | `DICT-069` | [Pilot Integrity](#pilot-integrity) | Core | Accepted |
 | `DICT-070` | [Reference Implementation (RI)](#reference-implementation-ri) | Core | Accepted |
+| `DICT-071` | [Operational Visibility](#operational-visibility) | Core | Accepted |
 | `DICT-006` | [Evidence](#evidence) | Core | Accepted |
 | `DICT-007` | [Knowledge Leakage](#knowledge-leakage) | Core | Accepted |
 | `DICT-008` | [Operational Model](#operational-model) | Core | Accepted |
@@ -199,7 +200,7 @@ Core | Operational | Engineering | Historical
 
 ### Metodología
 
-[FOPEBA](#fopeba) (`DICT-001`) · [FOV](#fov) (`DICT-002`) · [IOV](#iov) (`DICT-003`) · [Knowledge Update](#knowledge-update) (`DICT-004`) · [Gate](#gate) (`DICT-005`) · [Pilot Integrity](#pilot-integrity) (`DICT-069`) · [Reference Implementation](#reference-implementation-ri) (`DICT-070`) · [Evidence](#evidence) (`DICT-006`) · [Knowledge Leakage](#knowledge-leakage) (`DICT-007`) · [Operational Model](#operational-model) (`DICT-008`) · [Table Validation](#table-validation) (`DICT-009`) · [Field Validation](#field-validation) (`DICT-010`) · [Knowledge Lifetime](#knowledge-lifetime) (`DICT-057`)
+[FOPEBA](#fopeba) (`DICT-001`) · [FOV](#fov) (`DICT-002`) · [IOV](#iov) (`DICT-003`) · [Knowledge Update](#knowledge-update) (`DICT-004`) · [Gate](#gate) (`DICT-005`) · [Pilot Integrity](#pilot-integrity) (`DICT-069`) · [Reference Implementation](#reference-implementation-ri) (`DICT-070`) · [Operational Visibility](#operational-visibility) (`DICT-071`) · [Evidence](#evidence) (`DICT-006`) · [Knowledge Leakage](#knowledge-leakage) (`DICT-007`) · [Operational Model](#operational-model) (`DICT-008`) · [Table Validation](#table-validation) (`DICT-009`) · [Field Validation](#field-validation) (`DICT-010`) · [Knowledge Lifetime](#knowledge-lifetime) (`DICT-057`)
 
 ### Ingeniería
 
@@ -2988,6 +2989,45 @@ FOPEBA · Gate · G-02 · Pilot Integrity · FOV · Knowledge Update
 [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md) · [FOPEBA](../18-operational-validation/00-operational-product-engineering.md) · [PRE_PILOT_AUDIT](../00-status/PRE_PILOT_AUDIT.md)
 
 
+---
+
+# Operational Visibility
+
+## ID
+DICT-071
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Operational Visibility
+
+## Tipo
+Principio operativo (FOPEBA) · superficie de producto
+
+## Definición
+**Ningún elemento visible puede aparentar una capacidad inexistente.** Lo que el usuario ve existe (funciona, persiste, usa datos reales y respeta RBAC). Lo que no existe todavía no se promete: se oculta (Feature Flag) o se marca explícitamente «Próximamente» sin apariencia de live.
+
+## Implica
+- Botón visible → acción real.
+- Formulario visible → persistencia.
+- KPI / gráfico visible → datos reales + pregunta operativa + acción justificada.
+- Módulo en navegación → flujo usable.
+- Complementa **No Artificiality** (G-02.7): no fingir en UI ni en backend.
+
+## No significa
+Cobertura 100 % · ocultar Explicit Uncertainty · sustituir ORR / G-02.
+
+## Palabras relacionadas
+Pilot Integrity · No Artificiality · Explicit Uncertainty · Cero humo · Gate · G-02.9
+
+## Referencias
+[09 Operational Visibility](../20-evidence-framework/09-operational-visibility-principle.md) · [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md) · [EP-001](../00-status/EP001_FUNCTIONAL_COMPLETENESS_SPRINT.md)
+
+
 ## Historial de este diccionario
 
 | Fecha | Cambio |
@@ -3008,4 +3048,5 @@ FOPEBA · Gate · G-02 · Pilot Integrity · FOV · Knowledge Update
 | 2026-07-23 | Foundation of Materialization Frozen · Four Layers · Pilot Execution Guide |
 | 2026-07-23 | Gate G-02 Pilot Readiness · DICT-069 Pilot Integrity · DICT-070 Reference Implementation (RI) |
 | 2026-07-23 | G-02.7 No Artificiality · taxonomía Evidence/KU/Correction/Pilot Fix · RI-001 ≠ v1.0 |
+| 2026-07-24 | DICT-071 Operational Visibility · G-02.9 · EP-002A/B prep |
 
