@@ -23,9 +23,9 @@ const STATUS_LABEL_KEYS: Record<string, string> = {
   cancelled: "customer:statusCancelled",
 };
 
-const STATUS_PILL_MAP: Record<string, "draft" | "confirmed" | "preparing" | "dispatched" | "delivered" | "cancelled" | "pending"> = {
-  draft: "draft",
-  confirmed: "confirmed",
+const STATUS_PILL_MAP: Record<string, "pending" | "preparing" | "dispatched" | "delivered" | "cancelled"> = {
+  draft: "pending",
+  confirmed: "pending",
   in_production: "preparing",
   delivered: "delivered",
   cancelled: "cancelled",
