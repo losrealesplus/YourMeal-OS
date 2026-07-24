@@ -163,5 +163,14 @@ export default {
   onboardingHint: "Pick your pace, your dishes and your delivery day.",
   emptyTitle: "Nothing here yet",
   emptyHint: "Schedule your week and you'll see your orders, deliveries and favourite dishes here.",
+  repeatOrder: "Repeat order",
+  repeatSuccess: "We created a draft with the dishes available this week.",
+  repeatPartialTitle: "Order partially repeated",
+  repeatPartialHint:
+    "{{count}} dish(es) are no longer on this week's menu.",
+  dishUnavailable: "This dish is no longer available.",
+  repeatUnavailableTitle: "Unavailable this week",
+  companyLabel: "Company",
+  viewOrder: "View order",
 } as const;
 

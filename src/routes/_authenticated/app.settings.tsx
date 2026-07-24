@@ -61,7 +61,7 @@ function SettingsPage() {
       items: [
         { key: "payment", icon: <CreditCard className="size-4" /> },
         { key: "invoices", icon: <FileText className="size-4" /> },
-        { key: "orderHistory", icon: <History className="size-4" /> },
+        { key: "orderHistory", icon: <History className="size-4" />, to: "/app/orders" },
       ],
     },
     {
