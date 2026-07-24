@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   auditBootstrapIntegrity,
+  auditBootstrapRelations,
   canAcceptOrders,
   canComposeWeeklyMenu,
   canInviteOperationalStaff,
@@ -98,5 +99,29 @@ describe("bootstrap preconditions", () => {
       "admin_before_staff",
     ]);
     expect(items.every((i) => !i.verdict.ok)).toBe(true);
+  });
+
+  it("relationship chain requires connected ladder", () => {
+    const gaps = auditBootstrapRelations(empty);
+    expect(gaps.some((l) => l.id === "tenant_to_company_admin" && !l.ok)).toBe(
+      true,
+    );
+    const operational = auditBootstrapRelations({
+      ...empty,
+      tenantCount: 1,
+      companyAdminCount: 1,
+      staffCount: 2,
+      activeDishCount: 3,
+      publishedMenuCount: 1,
+      customerCount: 5,
+      confirmedOrderCount: 2,
+      kitchenQueueCount: 2,
+      readyForDeliveryCount: 1,
+      deliveredCount: 1,
+      routeCount: 0,
+    });
+    expect(
+      operational.filter((l) => l.id !== "delivery_to_routes").every((l) => l.ok),
+    ).toBe(true);
   });
 });

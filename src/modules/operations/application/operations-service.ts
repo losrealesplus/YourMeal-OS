@@ -14,6 +14,10 @@ import {
   nextKitchenStatuses,
   type OperationalOrderStatus,
 } from "../domain/operational-status";
+import {
+  canOperateDelivery,
+  canOperateKitchen,
+} from "@/modules/bootstrap-integrity";
 
 export const OperationsService = {
   async listKitchenOrders(
@@ -98,6 +102,26 @@ export const OperationsService = {
       throw new DomainError("INVALID_STATE", "orderId required");
     }
     const repo = createOperationsRepository(ctx.supabase, ctx.tenantId);
+
+    // OP-001.2 · Service-level integrity (not UI-only).
+    if (workspace === "kitchen") {
+      const demand = await repo.countByStatuses(KITCHEN_QUEUE_STATUSES);
+      const gate = canOperateKitchen({ confirmedOrInKitchenCount: demand });
+      if (!gate.ok) {
+        throw new DomainError("INVALID_STATE", gate.message, {
+          code: gate.code,
+        });
+      }
+    } else {
+      const demand = await repo.countByStatuses(DELIVERY_QUEUE_STATUSES);
+      const gate = canOperateDelivery({ readyForDeliveryCount: demand });
+      if (!gate.ok) {
+        throw new DomainError("INVALID_STATE", gate.message, {
+          code: gate.code,
+        });
+      }
+    }
+
     const current = await repo.getOrder(orderId);
     if (!current) {
       throw new DomainError("NOT_FOUND", `Order not found: ${orderId}`);
