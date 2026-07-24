@@ -16,6 +16,7 @@ export type MockDish = {
   proteinG: number;     // grams (canonical)
   carbsG: number;       // grams
   fatG: number;         // grams
+  price: number;        // canonical decimal (EUR), matches dishes.price
   tags: Array<"vegan" | "vegetarian" | "glutenFree" | "lactoseFree" | "spicy">;
   allergens: string[];
   ingredients: string[];
