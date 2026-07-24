@@ -3105,7 +3105,7 @@ Self-service de billing · multi-tenant membership en RI-001 · que `saas_admin`
 Tenant · Company Admin · saas_admin · Dual Ops Center · EP-OPS-001 · Architecture Freeze · Reference Implementation · Operational Visibility
 
 ## Referencias
-[TENANT_OPERATIONAL_AUTONOMY](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md) · [EP-OPS-001](../00-status/EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · [OPS_CENTER_DUAL_SURFACE](../00-status/OPS_CENTER_DUAL_SURFACE.md)
+[TENANT_OPERATIONAL_AUTONOMY](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md) · [EP-OPS-001 Release Board](../00-status/EP_OPS_001_RELEASE_BOARD.md) · [EP-OPS-001](../00-status/EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · [OPS_CENTER_DUAL_SURFACE](../00-status/OPS_CENTER_DUAL_SURFACE.md)
 
 
 ## Historial de este diccionario
@@ -3131,3 +3131,4 @@ Tenant · Company Admin · saas_admin · Dual Ops Center · EP-OPS-001 · Archit
 | 2026-07-24 | DICT-071 Operational Visibility · G-02.9 · EP-002A/B prep |
 | 2026-07-24 | DICT-072 Operational Representation Pattern · Service → Report / Workspace |
 | 2026-07-24 | DICT-073 Tenant Operational Autonomy · WP-5 Tenant Provisioning · Architecture Freeze |
+| 2026-07-24 | Release Board EP-OPS-001 · Day-0 Provisioning Scenario · post-PASS RRR |
