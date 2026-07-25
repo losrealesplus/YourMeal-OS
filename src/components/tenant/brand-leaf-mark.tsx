@@ -7,7 +7,6 @@ import { supabase } from "@/integrations/supabase/client";
 import type { AppRole } from "@/hooks/use-auth";
 import {
   decideOperationsCenterEntry,
-  OPERATIONS_AUTH_PATH,
   OPERATIONS_CENTER_PATH,
 } from "@/lib/open-operations-center";
 
