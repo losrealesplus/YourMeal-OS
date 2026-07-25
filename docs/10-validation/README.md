@@ -9,7 +9,9 @@ docs/10-validation/
 ├── ACTA_CIERRE_OP001.md
 ├── AUD001_RUNTIME_DEPLOYMENT_AUDIT.md
 ├── MIGRATION_BOOTSTRAP_VALIDATION.md     ← Empty-DB migration gate (FOPEBA CI)
-├── RUNTIME_VERIFICATION_EVIDENCE.md      ← Playwright 2026-07-25
+├── CUTOVER_REPORT.md                     ← INFRA-002 (cuando esté en main)
+├── G03_PRODUCTION_SMOKE_CHECKLIST.md     ← Smoke E2E → Gate G-03
+├── RUNTIME_VERIFICATION_EVIDENCE.md
 ├── UX_BRANDLEAFMARK_ADMIN_SHELL.md
 ├── DEPLOYMENT_VERIFICATION.md
 ├── POST_DEPLOY_SMOKE_OP001.md
@@ -17,30 +19,31 @@ docs/10-validation/
 ├── checklists/ · reports/ · evidence/
 ```
 
-## FOPEBA gates (CI)
+## FOPEBA gates
 
-| Gate | Doc | Command / workflow |
-|------|-----|-------------------|
-| Migration Bootstrap Validation | [MIGRATION_BOOTSTRAP_VALIDATION](./MIGRATION_BOOTSTRAP_VALIDATION.md) | `.github/workflows/migration-bootstrap.yml` · `npm run test:migration-bootstrap:static` |
+| Gate | Doc | Notas |
+|------|-----|-------|
+| Migration Bootstrap (CI) | [MIGRATION_BOOTSTRAP_VALIDATION](./MIGRATION_BOOTSTRAP_VALIDATION.md) | Empty DB |
+| **G-03 Platform Operational Baseline** | [Gate](../20-evidence-framework/10-gate-g03-platform-operational-baseline.md) · [Smoke](./G03_PRODUCTION_SMOKE_CHECKLIST.md) | **Siguiente** — tras keys/cutover |
+| G-02 Pilot Readiness | [08-gate-g02](../20-evidence-framework/08-gate-g02-pilot-readiness.md) | Después de G-03 + módulos |
+
+> **Nombres:** **OP-001** = Day-0 seed histórico. El smoke post-cutover es **G-03**, no un segundo OP-001.
+
 ## FOPEBA status (2026-07-25)
 
 | Domain | Status |
 |--------|--------|
 | Bootstrap Engineering | ✅ PASS |
-| Runtime Deployment | ✅ PASS |
-| Runtime Navigation / RBAC | ✅ PASS |
-| Bootstrap Evidence | ⛔ BLOCKED (Day-0 pendiente) |
+| Schema clean bootstrap | ✅ PASS |
+| Binding cutover (INFRA-002) | 🟡 keys / Lovable operator |
+| **G-03 smoke E2E** | ⏳ PENDING |
+| Runtime Navigation / RBAC | ✅ código PASS · runtime ⏳ G-03 |
+| Bootstrap Evidence Day-0 | ⛔ BLOCKED |
 | CHECK-IT 05 | ⛔ BLOCKED |
-
-**Project stage:** Stabilization · Integration · Certification.
-
-Canonical status: [FOPEBA_STATUS_2026-07-25.md](../00-status/FOPEBA_STATUS_2026-07-25.md)
 
 ## Next
 
-**No feature PRs** for navigation/RBAC (PASS).
-
-1. Day-0 operacional + EV-*  
-2. ORR → PASS  
-3. CHECK-IT 05  
-4. Emit decision on [RI001_CERTIFICATION_REPORT.md](./reports/RI001_CERTIFICATION_REPORT.md)
+1. Completar keys (`.env` + Lovable) — INFRA-002  
+2. Ejecutar [G03_PRODUCTION_SMOKE_CHECKLIST](./G03_PRODUCTION_SMOKE_CHECKLIST.md)  
+3. Acta G-03 PASS → reanudar módulos  
+4. No abrir CAP/feature dependiente de Supabase hasta G-03 PASS  

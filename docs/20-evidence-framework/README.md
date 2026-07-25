@@ -88,7 +88,8 @@ Architecture · Implementation · Verification · Release
 ├── 06 Economic Confirmation + ec/  (Framework · OVI · ECR)
 ├── 07 Gate G-01 + g01/         (Package · Decision · Acta)
 ├── 08 Gate G-02                (Pilot Readiness · RI)
-└── 09 Operational Visibility   (cero humo · DICT-071)
+├── 09 Operational Visibility   (cero humo · DICT-071)
+└── 10 Gate G-03                (Platform Operational Baseline · post-cutover)
 ```
 
 | Doc | Contenido |
@@ -102,6 +103,7 @@ Architecture · Implementation · Verification · Release
 | [07 G-01](./07-gate-g01-operational-readiness.md) · [g01/](./g01/README.md) | Certificación Stage 2 |
 | [08 G-02](./08-gate-g02-pilot-readiness.md) | Pilot Readiness · integridad del Journey |
 | [09 Visibility](./09-operational-visibility-principle.md) | Cero humo · lo visible existe |
+| [10 G-03](./10-gate-g03-platform-operational-baseline.md) | Platform Operational Baseline · smoke post-cutover |
 
 ---
 
@@ -140,6 +142,7 @@ Orden de **ejecución en RI**: G-02 → Pilot → FOV → KU → EC → G-01.
 | **EC** / **OVI** / **ECR** | Economic Confirmation · Value Indicators · Report |
 | **G-01** | Operational Readiness Gate |
 | **G-02** | Pilot Readiness Gate (integridad del Journey · RI) |
+| **G-03** | Platform Operational Baseline (smoke E2E post-bootstrap/cutover · autoriza seguir módulos) |
 | **ECL** / **S0…S3** | Confidence · Stability |
 | **RI** | Reference Implementation |
 
