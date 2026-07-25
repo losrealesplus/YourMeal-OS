@@ -5,18 +5,34 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import type { AppRole } from "@/hooks/use-auth";
-import { decideOperationsCenterEntry } from "@/lib/open-operations-center";
+import {
+  decideOperationsCenterEntry,
+  OPERATIONS_AUTH_PATH,
+  OPERATIONS_CENTER_PATH,
+} from "@/lib/open-operations-center";
+
+export type BrandLeafMarkTarget = "admin" | "saas";
 
 /**
  * Staff entry into the Operations Center — sits near Powered by / Home footer.
- * Customers see a quiet brand control; staff recognize where the day starts.
+ * Two variants: `admin` (tenant Ops) and `saas` (platform Ops, YourMeal OS).
  * Never navigates blindly: checks staff session, then auth or Ops Center.
  */
-export function BrandLeafMark({ className }: { className?: string }) {
+export function BrandLeafMark({
+  className,
+  target = "admin",
+}: {
+  className?: string;
+  target?: BrandLeafMarkTarget;
+}) {
   const { t } = useTranslation("auth");
   const navigate = useNavigate();
   const { roles, loading } = useAuth();
   const [busy, setBusy] = useState(false);
+
+  const isSaas = target === "saas";
+  const label = t(isSaas ? "saasEntryLabel" : "adminEntryLabel");
+  const aria = t(isSaas ? "saasEntryAria" : "adminEntryAria");
 
   async function openOperationsCenter() {
     if (loading || busy) return;
@@ -34,20 +50,30 @@ export function BrandLeafMark({ className }: { className?: string }) {
         effectiveRoles = (roleRows ?? []).map((r) => r.role as AppRole);
       }
 
+      if (isSaas) {
+        const isSaasAdmin = effectiveRoles.includes("saas_admin");
+        if (uid && isSaasAdmin) {
+          await navigate({ to: "/saas" });
+          return;
+        }
+        await navigate({
+          to: OPERATIONS_AUTH_PATH,
+          search: { returnTo: "/saas" },
+        });
+        return;
+      }
+
       const decision = decideOperationsCenterEntry({
         sessionUserId: uid,
         roles: effectiveRoles,
       });
 
       if (decision.action === "auth") {
-        await navigate({
-          to: decision.to,
-          search: decision.search,
-        });
+        await navigate({ to: decision.to, search: decision.search });
         return;
       }
 
-      await navigate({ to: decision.to as "/admin" });
+      await navigate({ to: decision.to as typeof OPERATIONS_CENTER_PATH });
     } finally {
       setBusy(false);
     }
@@ -58,7 +84,7 @@ export function BrandLeafMark({ className }: { className?: string }) {
       type="button"
       onClick={() => void openOperationsCenter()}
       disabled={loading || busy}
-      aria-label={t("adminEntryAria")}
+      aria-label={aria}
       className={cn(
         "text-[10px] font-medium tracking-[0.04em] text-muted-foreground",
         "transition-colors duration-300 hover:text-foreground",
@@ -67,7 +93,7 @@ export function BrandLeafMark({ className }: { className?: string }) {
         className,
       )}
     >
-      {t("adminEntryLabel")}
+      {label}
     </button>
   );
 }

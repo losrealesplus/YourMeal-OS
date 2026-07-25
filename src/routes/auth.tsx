@@ -268,7 +268,13 @@ function AuthPage() {
             </div>
 
             <div className="mt-10 flex flex-col items-center gap-5">
-              <BrandLeafMark className="text-[11px] tracking-[0.08em] underline-offset-4 hover:underline" />
+              <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+                <BrandLeafMark className="text-[11px] tracking-[0.08em] underline-offset-4 hover:underline" />
+                <BrandLeafMark
+                  target="saas"
+                  className="text-[11px] tracking-[0.08em] underline-offset-4 hover:underline"
+                />
+              </div>
               <PoweredByLine />
             </div>
           </div>
