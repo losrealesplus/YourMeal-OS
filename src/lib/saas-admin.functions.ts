@@ -496,7 +496,7 @@ export const assignRole = createServerFn({ method: "POST" })
     const { error } = await supabaseAdmin
       .from("user_roles")
       .upsert(
-        { user_id: data.userId, tenant_id: data.tenantId, role: data.role },
+        { user_id: data.userId, tenant_id: data.tenantId, role: data.role as never },
         { onConflict: "user_id,tenant_id,role" },
       );
     if (error) throw new Error(error.message);
