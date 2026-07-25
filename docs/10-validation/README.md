@@ -8,6 +8,7 @@ docs/10-validation/
 ├── README.md
 ├── ACTA_CIERRE_OP001.md
 ├── AUD001_RUNTIME_DEPLOYMENT_AUDIT.md
+├── SUPABASE_CLI_ENV_AUDIT.md             ← CLI IPv6 / project-ref diagnosis
 ├── RUNTIME_VERIFICATION_EVIDENCE.md      ← Playwright 2026-07-25
 ├── UX_BRANDLEAFMARK_ADMIN_SHELL.md
 ├── DEPLOYMENT_VERIFICATION.md
