@@ -237,7 +237,18 @@ $$;
 GRANT EXECUTE ON FUNCTION public.resolve_delivery_group(uuid, uuid, uuid, uuid) TO authenticated;
 
 -- ========== RLS: allow company portal admins to manage their company ==========
+-- Foundation Lock (20260720220000) split the legacy companies_all
+-- policy into companies_read / companies_write / companies_update /
+-- companies_purge.
+--
+-- B2B replaces those policies with a richer authorization model.
+-- Therefore previous policies must be removed before recreating them.
 DROP POLICY IF EXISTS companies_all ON public.companies;
+DROP POLICY IF EXISTS companies_read ON public.companies;
+DROP POLICY IF EXISTS companies_write ON public.companies;
+DROP POLICY IF EXISTS companies_update ON public.companies;
+DROP POLICY IF EXISTS companies_purge ON public.companies;
+DROP POLICY IF EXISTS companies_insert ON public.companies;
 CREATE POLICY companies_read ON public.companies FOR SELECT TO authenticated
   USING (
     public.is_tenant_member(tenant_id)
