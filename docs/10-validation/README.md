@@ -8,6 +8,7 @@ docs/10-validation/
 ├── README.md
 ├── ACTA_CIERRE_OP001.md
 ├── AUD001_RUNTIME_DEPLOYMENT_AUDIT.md
+├── MIGRATION_BOOTSTRAP_VALIDATION.md     ← Empty-DB migration gate (FOPEBA CI)
 ├── RUNTIME_VERIFICATION_EVIDENCE.md      ← Playwright 2026-07-25
 ├── UX_BRANDLEAFMARK_ADMIN_SHELL.md
 ├── DEPLOYMENT_VERIFICATION.md
@@ -16,6 +17,11 @@ docs/10-validation/
 ├── checklists/ · reports/ · evidence/
 ```
 
+## FOPEBA gates (CI)
+
+| Gate | Doc | Command / workflow |
+|------|-----|-------------------|
+| Migration Bootstrap Validation | [MIGRATION_BOOTSTRAP_VALIDATION](./MIGRATION_BOOTSTRAP_VALIDATION.md) | `.github/workflows/migration-bootstrap.yml` · `npm run test:migration-bootstrap:static` |
 ## FOPEBA status (2026-07-25)
 
 | Domain | Status |

@@ -1,0 +1,52 @@
+name: Migration Bootstrap Validation
+
+# FOPEBA gate: every migration chain must apply cleanly on an empty database.
+# Catches redefine-without-teardown conflicts (e.g. SQLSTATE 42710 on policies)
+# before they reach a new Supabase project.
+#
+# Method: docs/10-validation/MIGRATION_BOOTSTRAP_VALIDATION.md
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: migration-bootstrap-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-preflight:
+    name: Static policy teardown preflight
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Detect CREATE POLICY collisions across migrations
+        run: npm run test:migration-bootstrap:static
+
+  empty-db-bootstrap:
+    name: Empty DB · apply all migrations
+    runs-on: ubuntu-latest
+    needs: static-preflight
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v3
+        with:
+          version: latest
+
+      - name: Start fresh local database (applies all migrations)
+        run: supabase db start
+
+      - name: Reset and re-apply all migrations
+        run: supabase db reset --yes
+
+      - name: Confirm migration list is clean
+        run: |
+          echo "Bootstrap OK — all migrations applied on empty database."
+          supabase migration list --local
