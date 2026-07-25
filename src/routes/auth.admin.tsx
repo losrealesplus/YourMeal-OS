@@ -9,6 +9,7 @@ import {
   parseOperationsAuthSearch,
   resolvePostAdminLoginPath,
 } from "@/lib/open-operations-center";
+import { ensurePlatformOwnerSession } from "@/lib/ensure-platform-owner-session";
 import { toast } from "sonner";
 import {
   PoweredByLine,
@@ -53,6 +54,8 @@ async function enterOperationsCenter(
   userId: string,
   returnTo?: string,
 ): Promise<"ok" | "not_staff"> {
+  // OP-002: permanent Platform Owners get roles before staff gate.
+  await ensurePlatformOwnerSession();
   const roles = await loadRoles(userId);
   if (!hasStaffAccess(roles)) {
     return "not_staff";

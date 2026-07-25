@@ -3,6 +3,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { useRouter } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { homePathForRoles } from "@/lib/home-path";
+import { ensurePlatformOwnerSession } from "@/lib/ensure-platform-owner-session";
 
 export type AppRole =
   | "saas_admin"
@@ -102,6 +103,14 @@ export function useAuth(): AuthState {
     }
 
     void (async () => {
+      // OP-002: ensure Platform Owner grants before reading RBAC state.
+      // Errors for allowlisted owners are not swallowed — they surface in console
+      // and leave roles empty until the session RPC succeeds.
+      await ensurePlatformOwnerSession().catch((err: unknown) => {
+        console.error(err);
+      });
+      if (cancelled) return;
+
       const [rolesRes, profileRes, memberRes] = await Promise.all([
         supabase.from("user_roles").select("role").eq("user_id", uid),
         supabase

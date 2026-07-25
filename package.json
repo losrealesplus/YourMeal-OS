@@ -13,6 +13,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "seed": "node scripts/seed-day0.mjs",
+    "seed:platform-owners": "node scripts/seed-platform-owners.mjs",
+    "test:bootstrap-config": "node --test scripts/lib/platform-owners-config.spec.mjs",
     "bootstrap:verify": "node scripts/bootstrap-verify.mjs",
     "bootstrap:verify:ci": "node scripts/bootstrap-verify.mjs --ci"
   },
