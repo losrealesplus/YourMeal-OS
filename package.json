@@ -17,7 +17,9 @@
     "seed:platform-owners": "node scripts/seed-platform-owners.mjs",
     "test:bootstrap-config": "node --test scripts/lib/platform-owners-config.spec.mjs",
     "bootstrap:verify": "node scripts/bootstrap-verify.mjs",
-    "bootstrap:verify:ci": "node scripts/bootstrap-verify.mjs --ci"
+    "bootstrap:verify:ci": "node scripts/bootstrap-verify.mjs --ci",
+    "test:migration-bootstrap:static": "node scripts/migration-bootstrap-static.mjs",
+    "test:migration-bootstrap": "node scripts/migration-bootstrap.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
