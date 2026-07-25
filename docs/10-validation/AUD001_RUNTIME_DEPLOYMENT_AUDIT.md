@@ -219,42 +219,69 @@ Present on runtime (main-class): `/saas` shell, tenants/company-admin **code**, 
 | Dominio | Estado | Significado |
 |---------|--------|-------------|
 | Bootstrap Engineering | ✅ **PASS** | Código/tests/guards del stack son válidos |
-| Runtime Deployment | ❌ **FAIL** | Publish branch / Lovable ≠ commit aprobado (PR #54) |
-| Bootstrap Evidence | ⛔ **BLOCKED** | No hay sujeto de certificación en el runtime |
+| Runtime Deployment | ❌ **FAIL** *(histórico AUD-001 · 2026-07-24)* | Publish branch / Lovable ≠ commit aprobado (PR #54) en el momento de la auditoría |
+| Bootstrap Evidence | ⛔ **BLOCKED** | No hay sujeto de certificación operacional completa (Day-0) |
 | CHECK-IT 05 | ⛔ **BLOCKED** | Bloqueado por Evidence |
 
 ```text
 Bootstrap Engineering     PASS
-Runtime Deployment        FAIL
-Bootstrap Evidence        BLOCKED   ← not FAIL (process block, not product fail)
+Runtime Deployment        FAIL     ← estado al cierre AUD-001 (2026-07-24)
+Bootstrap Evidence        BLOCKED
 CHECK-IT 05               BLOCKED
 ```
 
 **FAIL vs BLOCKED:** FAIL = evaluated product fails DoD.  
-BLOCKED = certification cannot proceed because the evaluated build is not the intended release.
+BLOCKED = certification cannot proceed because the evaluated build is not the intended release **or** operational evidence is incomplete.
 
-New light gate: [DEPLOYMENT_VERIFICATION.md](./DEPLOYMENT_VERIFICATION.md) (DV-001).
+---
+
+## Addendum · 2026-07-25 — Runtime Verification (Playwright)
+
+**Estado supersede para Runtime Deployment:** ✅ **PASS**
+
+Playwright sobre el runtime actual confirmó navegación / landing / RBAC / entrada SaaS para:
+
+| Perfil | Resultado |
+|--------|-----------|
+| `company_admin` | PASS → `/admin` |
+| `saas_admin` | PASS → `/saas` |
+| mixed | PASS → `/admin` → SaasOpsEntry → `/saas` |
+
+Documentación:
+
+- [RUNTIME_VERIFICATION_EVIDENCE.md](./RUNTIME_VERIFICATION_EVIDENCE.md)
+- [UX_BRANDLEAFMARK_ADMIN_SHELL.md](./UX_BRANDLEAFMARK_ADMIN_SHELL.md)
+- [FOPEBA_STATUS_2026-07-25.md](../00-status/FOPEBA_STATUS_2026-07-25.md)
+
+**Conclusión actualizada:** no hay incidencias funcionales en la navegación observada.  
+El bloqueo restante de RI-001 **ya no** es Runtime Deployment; es **Bootstrap Evidence** (Day-0 → ORR → CHECK-IT 05).
+
+```text
+Bootstrap Engineering ........ PASS
+Runtime Deployment ........... PASS   ← actualizado 2026-07-25
+Runtime Navigation / RBAC .... PASS
+Bootstrap Evidence ........... BLOCKED
+CHECK-IT 05 ................. BLOCKED
+```
 
 ---
 
 ## Recommended next actions (no feature coding)
 
-1. **Merge the OP-001 stack into `main`** (Lovable publish branch).  
-2. Fill **DV-001** — SHA match + new `x-deployment-id`.  
-3. Run [Post-deploy smoke](./POST_DEPLOY_SMOKE_OP001.md) (6 checks).  
-4. Confirm tester `saas_admin` row.  
-5. Only then Day-0 → ORR PASS → CHECK-IT 05.
+1. ~~Merge stack / re-probe deploy~~ → Runtime Deployment PASS (Playwright).  
+2. Day-0 operacional + EV-*.  
+3. ORR → PASS.  
+4. CHECK-IT 05.  
 
 ---
 
 ## Verdict
 
 ```text
-AUD-001 · Runtime Deployment: FAIL
-AUD-001 · Bootstrap Evidence:  BLOCKED (pending correct deploy)
+AUD-001 · Runtime Deployment (2026-07-24): FAIL (histórico)
+AUD-001 addendum · Runtime Deployment (2026-07-25): PASS
+Bootstrap Evidence: BLOCKED (Day-0 pendiente)
 ```
 
-**Root cause:** PR #54 never landed on `main`; Lovable serves a `main`-class build that still ships Dish Library placeholder and lacks OP-001 bootstrap modules.
-
-**Not a proof that OP-001 code is wrong.**  
-**Proof that field certification is blocked until deploy sync is fixed.**
+**Root cause histórico:** PR #54 no estaba en `main` al momento de AUD-001.  
+**Estado actual:** navegación/RBAC del runtime verificado; falta evidencia operacional Day-0.

@@ -1,34 +1,37 @@
-# DV-001 · First PASS record (template)
+# DV-001 · First PASS record
 
-Copy values here when Deployment Verification passes for the first time on the Lovable publish branch.  
-Also paste the same table into ORR + RI-001 Certification Report.
+**Estado:** PASS (Runtime Verification · Playwright · 2026-07-25)  
+**Alcance de este PASS:** identidad de runtime + navegación/RBAC verificada.  
+**No cubre:** Day-0 operacional completo (sigue BLOCKED en Bootstrap Evidence).
 
 | Campo | Valor |
 |-------|-------|
 | Branch certificada | `main` |
-| Commit SHA | |
-| Deployment ID | |
-| Fecha | |
-| DV-001 | PASS |
-| Post-deploy smoke (6/6) | |
+| Commit SHA | `dc49aaf49b0b148f074d9c6e180a1c7e82b815a1` (`dc49aaf` — tip `origin/main` al registrar) |
+| Deployment ID | _(registrar `x-deployment-id` del deploy Playwright si disponible)_ |
+| Fecha | 2026-07-25 |
+| DV-001 | **PASS** |
+| Post-deploy smoke (navegación / RBAC) | **PASS** (3/3 perfiles) |
+| Post-deploy smoke OP-001 (dishes/menus/staff) | Pendiente Day-0 / Bootstrap Evidence |
 | Environment URL | https://eatcleanapp.lovable.app |
-| Operator | |
+| Operator | Runtime validation (Playwright) |
+| Evidence doc | [RUNTIME_VERIFICATION_EVIDENCE.md](../../RUNTIME_VERIFICATION_EVIDENCE.md) |
 
-## Marker probe notes
+## Marker probe notes (navegación)
 
 ```text
-Dish Library placeholder absent: Yes / No
-Dish CRUD present: Yes / No
-Weekly menus present: Yes / No
-Staff invite present: Yes / No
-/admin entry OK: Yes / No
-/saas for saas_admin OK: Yes / No
+company_admin → /admin, sin SaasOpsEntry: PASS
+saas_admin → /saas, Governance OK: PASS
+mixed → /admin + SaasOpsEntry → /saas: PASS
+BrandLeafMark ausente dentro de /admin shell: UX decision (not a bug)
 ```
 
 ## Linkage rule
 
-Every EV-* artifact produced after this timestamp for RI-001 must reference:
+Every EV-* artifact produced after this timestamp for the navigation wave must reference:
 
 ```text
-SHA=<Commit SHA> · Deployment-ID=<Deployment ID>
+SHA=dc49aaf49b0b148f074d9c6e180a1c7e82b815a1 · DV-001=PASS
 ```
+
+Day-0 / bootstrap operational EV-* may cite a newer SHA if `main` advances; update this file when that deploy is certified.

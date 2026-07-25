@@ -24,13 +24,12 @@ La única observación pendiente corresponde a la ejecución del recorrido Day-0
 | Dominio | Status | Observación |
 |---------|--------|-------------|
 | Bootstrap Engineering | **PASS** | Cadena operacional restaurada; guards en dominio/servicios |
-| Runtime Deployment | **FAIL** | Lovable publica `main` sin stack OP-001 (AUD-001) |
-| Bootstrap Evidence | **BLOCKED** | No se certifica un build que no incluye la implementación |
+| Runtime Deployment | **PASS** *(actualizado 2026-07-25)* | Playwright: navegación/RBAC verificados |
+| Runtime Navigation / RBAC | **PASS** | company_admin / saas_admin / mixed |
+| Bootstrap Evidence | **BLOCKED** | Pendiente Day-0 operacional |
 | CHECK-IT 05 | **BLOCKED** | Depende de Evidence |
 
-La observación de Evidence **no es un fallo funcional del código**. Es un **bloqueo de proceso** (integración/despliegue).
-
-Post-AUD-001: [FOPEBA_AUD001_RUNTIME_2026-07-24](../00-status/FOPEBA_AUD001_RUNTIME_2026-07-24.md) · [DV-001](./DEPLOYMENT_VERIFICATION.md)
+Actualización: [FOPEBA_STATUS_2026-07-25.md](../00-status/FOPEBA_STATUS_2026-07-25.md) · [RUNTIME_VERIFICATION_EVIDENCE.md](./RUNTIME_VERIFICATION_EVIDENCE.md)
 
 ---
 
