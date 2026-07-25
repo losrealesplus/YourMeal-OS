@@ -16,6 +16,13 @@ dist-ssr
 .nitro
 *.local
 
+# Supabase CLI local link state (machine-specific)
+supabase/.temp/
+
+# Local env overrides (keep committed `.env` for Lovable sync if required)
+.env.local
+.env.*.local
+
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars

@@ -73,8 +73,9 @@ No hace falta modificar TypeScript, ni roles, ni RBAC.
 ## Comando
 
 ```bash
-export SUPABASE_URL=...
-export SUPABASE_SERVICE_ROLE_KEY=...
+# Official project: djangucecsphnejplvic (INFRA-002)
+export SUPABASE_URL=https://djangucecsphnejplvic.supabase.co
+export SUPABASE_SERVICE_ROLE_KEY=...   # Dashboard → API (service_role / secret)
 # opcional — si falta, se invita por email
 export PLATFORM_OWNERS_PASSWORD='........'
 
