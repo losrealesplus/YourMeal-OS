@@ -7,6 +7,10 @@ Do not redesign tables from Lovable prompts without an ADR or migration reviewed
 
 PostgreSQL via Supabase (Lovable Cloud). Generated types: `src/integrations/supabase/types.ts`.
 
+**Official project (INFRA-002 · Single Source of Truth):** `djangucecsphnejplvic`  
+URL: `https://djangucecsphnejplvic.supabase.co`  
+Config: `supabase/config.toml` · env: `.env` / `.env.example` · cutover: [CUTOVER_REPORT](../10-validation/CUTOVER_REPORT.md)
+
 ## Migrations (as-built)
 
 | Migration | Purpose |

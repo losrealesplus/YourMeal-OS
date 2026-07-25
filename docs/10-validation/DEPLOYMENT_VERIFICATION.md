@@ -4,6 +4,8 @@
 **Código:** DV-001  
 **Objetivo único:** Verificar que el entorno usado para certificación ejecuta **exactamente** el commit previsto.
 
+**Supabase oficial (INFRA-002):** project ref `djangucecsphnejplvic` — ver [CUTOVER_REPORT](./CUTOVER_REPORT.md).
+
 Sin este gate, se puede invertir una jornada intentando certificar una versión que nunca llegó al runtime (AUD-001).
 
 ---

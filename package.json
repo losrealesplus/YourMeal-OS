@@ -19,7 +19,8 @@
     "bootstrap:verify": "node scripts/bootstrap-verify.mjs",
     "bootstrap:verify:ci": "node scripts/bootstrap-verify.mjs --ci",
     "test:migration-bootstrap:static": "node scripts/migration-bootstrap-static.mjs",
-    "test:migration-bootstrap": "node scripts/migration-bootstrap.mjs"
+    "test:migration-bootstrap": "node scripts/migration-bootstrap.mjs",
+    "gen:types": "supabase gen types typescript --project-id djangucecsphnejplvic --schema public > src/integrations/supabase/types.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
