@@ -17,7 +17,9 @@ const PROVISIONING_ENTITIES = [
 
 const ROLE_CATALOG = [
   "company_admin",
+  "operations_manager",
   "kitchen",
+  "delivery",
   "production",
   "purchasing",
   "inventory",
@@ -293,6 +295,17 @@ export const createCompanyAdmin = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import(
       "@/integrations/supabase/client.server"
     );
+
+    const { data: tenant, error: tenantErr } = await supabaseAdmin
+      .from("tenants")
+      .select("id, status")
+      .eq("id", data.tenantId)
+      .maybeSingle();
+    if (tenantErr) throw new Error(tenantErr.message);
+    if (!tenant) throw new Error("Tenant not found");
+    if (tenant.status !== "active") {
+      throw new Error("Tenant must be active before inviting a Company Admin");
+    }
 
     // Reuse existing user if present, otherwise invite.
     let userId: string | null = null;

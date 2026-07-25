@@ -11,7 +11,10 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "seed": "node scripts/seed-day0.mjs",
+    "bootstrap:verify": "node scripts/bootstrap-verify.mjs",
+    "bootstrap:verify:ci": "node scripts/bootstrap-verify.mjs --ci"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

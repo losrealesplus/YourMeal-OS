@@ -34,6 +34,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { SaasOpsEntry } from "@/components/tenant/saas-ops-entry";
+import { BootstrapReadinessBanner } from "@/components/tenant/bootstrap-readiness-banner";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: OpsCenterHome,
@@ -271,6 +272,8 @@ function OpsCenterHome() {
         aria-hidden
         className="pointer-events-none absolute -inset-x-8 -top-8 h-56 bg-[radial-gradient(ellipse_at_top,_oklch(0.96_0.02_85)_0%,_transparent_70%)]"
       />
+
+      <BootstrapReadinessBanner className="relative mb-6" />
 
       <header className="relative space-y-2 pb-8 pt-2">
         <p

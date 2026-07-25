@@ -1,0 +1,8 @@
+# Reports
+
+| Report | Path | Status |
+|--------|------|--------|
+| OP-001 ORR | [../OP001_OPERATIONAL_READINESS_REPORT.md](../OP001_OPERATIONAL_READINESS_REPORT.md) | PASS WITH OBSERVATIONS (Runtime PASS; Day-0 pending) |
+| Runtime Verification | [../RUNTIME_VERIFICATION_EVIDENCE.md](../RUNTIME_VERIFICATION_EVIDENCE.md) | PASS |
+| CHECK-IT 05 | [CHECKIT05_REPORT.md](./CHECKIT05_REPORT.md) | Stub / BLOCKED |
+| RI-001 Certification | [RI001_CERTIFICATION_REPORT.md](./RI001_CERTIFICATION_REPORT.md) | In progress |

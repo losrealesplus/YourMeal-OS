@@ -39,6 +39,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { OperationalTimeline } from "@/components/operations/operational-timeline";
 import { SectionTitle } from "@/components/admin";
+import { BootstrapReadinessBanner } from "@/components/tenant/bootstrap-readiness-banner";
 import {
   OperationsService,
   deliveryNextStatuses,
@@ -175,6 +176,10 @@ function DeliveryWorkspacePage() {
           Actualizar
         </Button>
       </div>
+
+      <BootstrapReadinessBanner
+        focus={["BOOTSTRAP_NO_DELIVERY_DEMAND", "BOOTSTRAP_NO_KITCHEN_DEMAND"]}
+      />
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-1.5">

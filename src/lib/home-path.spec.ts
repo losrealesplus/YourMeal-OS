@@ -14,4 +14,26 @@ describe("homePathForRoles", () => {
   it("routes operations_manager to ops center", () => {
     expect(homePathForRoles(["operations_manager"])).toBe("/admin");
   });
+
+  it("routes company_admin to ops center", () => {
+    expect(homePathForRoles(["company_admin"])).toBe("/admin");
+  });
+
+  it("routes pure saas_admin to platform console", () => {
+    expect(homePathForRoles(["saas_admin"])).toBe("/saas");
+  });
+
+  it("routes hybrid operations_manager + saas_admin to tenant ops", () => {
+    expect(homePathForRoles(["operations_manager", "saas_admin"])).toBe(
+      "/admin",
+    );
+  });
+
+  it("routes hybrid company_admin + saas_admin to tenant ops", () => {
+    expect(homePathForRoles(["company_admin", "saas_admin"])).toBe("/admin");
+  });
+
+  it("routes customer to consumer app", () => {
+    expect(homePathForRoles(["customer"])).toBe("/app");
+  });
 });

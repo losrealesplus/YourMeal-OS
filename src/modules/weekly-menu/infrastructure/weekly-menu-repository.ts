@@ -28,6 +28,80 @@ export function createWeeklyMenuRepository(supabase: AppSupabase, tenantId: stri
       return data as WeeklyMenuRow | null;
     },
 
+    /** OP-001 · Bootstrap: list all non-deleted menus for admin planning. */
+    async listAll(): Promise<WeeklyMenuRow[]> {
+      const { data, error } = await supabase
+        .from("weekly_menus")
+        .select("*")
+        .eq("tenant_id", tenantId)
+        .is("deleted_at", null)
+        .order("week_start", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as WeeklyMenuRow[];
+    },
+
+    async findByWeekStart(weekStart: string): Promise<WeeklyMenuRow | null> {
+      const { data, error } = await supabase
+        .from("weekly_menus")
+        .select("*")
+        .eq("tenant_id", tenantId)
+        .eq("week_start", weekStart)
+        .is("deleted_at", null)
+        .maybeSingle();
+      if (error) throw error;
+      return data as WeeklyMenuRow | null;
+    },
+
+    async insertDraft(weekStart: string): Promise<WeeklyMenuRow> {
+      const { data, error } = await supabase
+        .from("weekly_menus")
+        .insert({
+          tenant_id: tenantId,
+          week_start: weekStart,
+          status: "draft",
+        })
+        .select("*")
+        .single();
+      if (error) throw error;
+      return data as WeeklyMenuRow;
+    },
+
+    async publish(id: string): Promise<WeeklyMenuRow> {
+      const { data, error } = await supabase
+        .from("weekly_menus")
+        .update({
+          status: "published",
+          published_at: new Date().toISOString(),
+        })
+        .eq("tenant_id", tenantId)
+        .eq("id", id)
+        .select("*")
+        .single();
+      if (error) throw error;
+      return data as WeeklyMenuRow;
+    },
+
+    async addSlot(input: {
+      weeklyMenuId: string;
+      dayDate: string;
+      dishId: string;
+      sortOrder?: number;
+    }): Promise<WeeklyMenuSlotRow> {
+      const { data, error } = await supabase
+        .from("weekly_menu_slots")
+        .insert({
+          tenant_id: tenantId,
+          weekly_menu_id: input.weeklyMenuId,
+          day_date: input.dayDate,
+          dish_id: input.dishId,
+          sort_order: input.sortOrder ?? 0,
+        })
+        .select("*")
+        .single();
+      if (error) throw error;
+      return data as WeeklyMenuSlotRow;
+    },
+
     async listSlotsWithDishes(weeklyMenuId: string): Promise<WeeklyMenuSlotWithDish[]> {
       const { data, error } = await supabase
         .from("weekly_menu_slots")

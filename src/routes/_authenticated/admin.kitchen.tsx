@@ -39,6 +39,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { OperationalTimeline } from "@/components/operations/operational-timeline";
 import { SectionTitle } from "@/components/admin";
+import { BootstrapReadinessBanner } from "@/components/tenant/bootstrap-readiness-banner";
 import {
   OperationsService,
   kitchenNextStatuses,
@@ -205,6 +206,10 @@ function KitchenWorkspacePage() {
           </Button>
         </div>
       </div>
+
+      <BootstrapReadinessBanner
+        focus={["BOOTSTRAP_NO_KITCHEN_DEMAND", "BOOTSTRAP_NO_PUBLISHED_MENU"]}
+      />
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-1.5">

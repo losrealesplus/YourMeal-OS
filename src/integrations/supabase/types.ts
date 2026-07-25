@@ -1416,6 +1416,8 @@ export type Database = {
         | "driver"
         | "employee"
         | "customer"
+        | "operations_manager"
+        | "delivery"
       customer_kind: "individual" | "company_employee"
       dish_status: "draft" | "active" | "archived" | "inactive"
       invoice_status: "pending" | "paid" | "overdue" | "void"
@@ -1575,6 +1577,8 @@ export const Constants = {
         "driver",
         "employee",
         "customer",
+        "operations_manager",
+        "delivery",
       ],
       customer_kind: ["individual", "company_employee"],
       dish_status: ["draft", "active", "archived", "inactive"],

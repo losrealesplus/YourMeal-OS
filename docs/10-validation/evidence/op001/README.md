@@ -1,0 +1,33 @@
+# OP-001 Evidence Pack
+
+Auditor reconstruction kit for RI-001 / CHECK-IT 05.
+
+```text
+docs/10-validation/evidence/op001/
+├── README.md                 ← this file
+├── screenshots/              ← operator captures (EV-NAV-*, EV-TEN-*, …)
+├── run-logs/                 ← command transcripts (gitignored path `logs/` avoided)
+├── bootstrap-report.json     ← output of bootstrap:verify --json=…
+├── checklist.md              ← pointer / snapshot of Day-0 checklist status
+└── verification.md           ← how to re-run verification
+```
+
+## How to refresh
+
+```bash
+npm run bootstrap:verify:ci -- --json=docs/10-validation/evidence/op001/bootstrap-report.json
+npx vitest run src/modules/bootstrap-integrity | tee docs/10-validation/evidence/op001/run-logs/vitest-bootstrap.txt
+
+# When service role available:
+npm run bootstrap:verify -- --live --tenant=eatclean-tenerife \
+  --json=docs/10-validation/evidence/op001/bootstrap-report.json
+```
+
+## Linked documents
+
+- [OP001_DAY0_CHECKLIST.md](../OP001_DAY0_CHECKLIST.md)
+- [OP001_OPERATIONAL_READINESS_REPORT.md](../OP001_OPERATIONAL_READINESS_REPORT.md)
+- [RUNTIME_VERIFICATION_EVIDENCE.md](../RUNTIME_VERIFICATION_EVIDENCE.md)
+- [DV001_FIRST_PASS.md](./DV001_FIRST_PASS.md)
+- [FOPEBA_STATUS_2026-07-25.md](../../00-status/FOPEBA_STATUS_2026-07-25.md)
+- [BOOTSTRAP_STATE_MACHINE_TRANSITIONS.md](../../05-architecture/BOOTSTRAP_STATE_MACHINE_TRANSITIONS.md)

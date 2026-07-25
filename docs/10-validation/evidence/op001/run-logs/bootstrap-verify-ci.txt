@@ -1,0 +1,23 @@
+
+> bootstrap:verify:ci
+> node scripts/bootstrap-verify.mjs --ci --json=docs/10-validation/evidence/op001/bootstrap-report.json
+
+OP-001.2 · bootstrap:verify [--ci]
+
+Pure precondition matrix (negative cases)
+  [PASS] cannotPublishMenuWithoutDishes
+  [PASS] cannotCreateOrderWithoutPublishedMenu
+  [PASS] cannotStartKitchenWithoutOrders
+  [PASS] cannotDispatchWithoutReadyProduction
+  [PASS] cannotInviteStaffWithoutCompanyAdmin
+  [PASS] menu with dishes allowed
+  [PASS] orders with menu allowed
+  [PASS] kitchen with demand allowed
+  [PASS] delivery with ready allowed
+  [PASS] staff with admin allowed
+
+Pure matrix: PASS
+
+CI pure-only PASS (no SUPABASE_SERVICE_ROLE_KEY for live).
+
+Wrote /workspace/docs/10-validation/evidence/op001/bootstrap-report.json

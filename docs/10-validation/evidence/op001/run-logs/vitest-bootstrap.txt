@@ -1,0 +1,11 @@
+
+ RUN  v3.2.4 /workspace
+
+ ✓ src/modules/bootstrap-integrity/domain/bootstrap-preconditions.spec.ts (9 tests) 4ms
+ ✓ src/modules/bootstrap-integrity/domain/bootstrap-negative.spec.ts (7 tests) 4ms
+
+ Test Files  2 passed (2)
+      Tests  16 passed (16)
+   Start at  20:00:04
+   Duration  196ms (transform 82ms, setup 0ms, collect 103ms, tests 8ms, environment 0ms, prepare 88ms)
+
