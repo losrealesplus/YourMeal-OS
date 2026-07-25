@@ -1,0 +1,14 @@
+# AUD-002 live REST probes 2026-07-25T12:38Z
+project=https://cbeegcxkayybfncnuirg.supabase.co
+---
+PATH rpc/ensure_platform_owner_session
+HTTP 404
+{"code":"PGRST202","details":"Searched for the function public.ensure_platform_owner_session without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.","hint":null,"message":"Could not find the function public.ensure_platform_owner_session without parameters in the schema cache"}
+---
+PATH rpc/ensure_platform_owner_for_user
+HTTP 404
+{"code":"PGRST202","details":"Searched for the function public.ensure_platform_owner_for_user without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.","hint":"Perhaps you meant to call the function public.is_customer_owner","message":"Could not find the function public.ensure_platform_owner_for_user without parameters in the schema cache"}
+---
+PATH platform_owners?select=email
+HTTP 404
+{"code":"PGRST205","details":null,"hint":"Perhaps you meant the table 'public.customers'","message":"Could not find the table 'public.platform_owners' in the schema cache"}
