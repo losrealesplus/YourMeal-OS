@@ -1,0 +1,198 @@
+[
+  {
+    "migration": "20260720164312_9137d8ab-e998-4e02-816c-63bda5634159.sql",
+    "tables": [
+      "tenants",
+      "tenant_domains",
+      "profiles",
+      "tenant_members",
+      "user_roles",
+      "customers",
+      "customer_addresses",
+      "customer_phones",
+      "customer_allergies",
+      "customer_preferences",
+      "companies",
+      "company_locations",
+      "company_departments",
+      "company_employees",
+      "suppliers",
+      "ingredients",
+      "dishes",
+      "dish_ingredients",
+      "weekly_menus",
+      "weekly_menu_slots",
+      "orders",
+      "order_items",
+      "routes",
+      "route_stops",
+      "invoices",
+      "payments",
+      "promotions",
+      "support_notes"
+    ],
+    "statuses": {
+      "tenants": "EXISTS",
+      "tenant_domains": "EXISTS",
+      "profiles": "EXISTS",
+      "tenant_members": "EXISTS",
+      "user_roles": "EXISTS",
+      "customers": "EXISTS",
+      "customer_addresses": "EXISTS",
+      "customer_phones": "EXISTS",
+      "customer_allergies": "EXISTS",
+      "customer_preferences": "EXISTS",
+      "companies": "EXISTS",
+      "company_locations": "EXISTS",
+      "company_departments": "EXISTS",
+      "company_employees": "EXISTS",
+      "suppliers": "EXISTS",
+      "ingredients": "EXISTS",
+      "dishes": "EXISTS",
+      "dish_ingredients": "EXISTS",
+      "weekly_menus": "EXISTS",
+      "weekly_menu_slots": "EXISTS",
+      "orders": "EXISTS",
+      "order_items": "EXISTS",
+      "routes": "EXISTS",
+      "route_stops": "EXISTS",
+      "invoices": "EXISTS",
+      "payments": "EXISTS",
+      "promotions": "EXISTS",
+      "support_notes": "EXISTS"
+    }
+  },
+  {
+    "migration": "20260720164327_63fdc61e-1100-4fa6-ad62-e2a91eb9f2b1.sql",
+    "tables": [],
+    "statuses": null
+  },
+  {
+    "migration": "20260720170834_2a394c23-2b57-4ded-87ae-7824d406b01e.sql",
+    "tables": [],
+    "statuses": null
+  },
+  {
+    "migration": "20260720210000_soft_delete_audit_feature_flags.sql",
+    "tables": [
+      "audit_log",
+      "feature_flags"
+    ],
+    "statuses": {
+      "audit_log": "EXISTS",
+      "feature_flags": "EXISTS"
+    }
+  },
+  {
+    "migration": "20260720220000_foundation_lock_soft_delete_rbac.sql",
+    "tables": [],
+    "statuses": null
+  },
+  {
+    "migration": "20260721190000_dish_infra_align_domain.sql",
+    "tables": [],
+    "statuses": null
+  },
+  {
+    "migration": "20260722172703_596a291b-6c2c-4e61-a38a-27760d7bc0bc.sql",
+    "tables": [],
+    "statuses": null
+  },
+  {
+    "migration": "20260722172737_55b5491b-422d-4966-b5df-fb5c62d8ed02.sql",
+    "tables": [
+      "audit_log",
+      "feature_flags"
+    ],
+    "statuses": {
+      "audit_log": "EXISTS",
+      "feature_flags": "EXISTS"
+    }
+  },
+  {
+    "migration": "20260723120000_program_draft_order_atomic.sql",
+    "tables": [],
+    "statuses": null
+  },
+  {
+    "migration": "20260723174724_de4a9047-5477-4932-abcc-94ce217570b3.sql",
+    "tables": [],
+    "statuses": null
+  },
+  {
+    "migration": "20260723183000_b2b_b2c_customer_model.sql",
+    "tables": [
+      "delivery_groups"
+    ],
+    "statuses": {
+      "delivery_groups": "MISSING"
+    }
+  },
+  {
+    "migration": "20260723190000_company_provision_staff_only.sql",
+    "tables": [],
+    "statuses": null
+  },
+  {
+    "migration": "20260723193459_41cf7a3a-71c9-4f23-8d9d-f41660ade316.sql",
+    "tables": [],
+    "statuses": null
+  },
+  {
+    "migration": "20260723200000_operations_workspace_statuses.sql",
+    "tables": [],
+    "statuses": null
+  },
+  {
+    "migration": "20260723200100_operations_transition_rpc.sql",
+    "tables": [],
+    "statuses": null
+  },
+  {
+    "migration": "20260724132839_f9e39003-6584-4d8b-af26-975d95c6dd20.sql",
+    "tables": [],
+    "statuses": null
+  },
+  {
+    "migration": "20260724132857_5f8e76e5-5e14-45a6-b36a-d890ab2e6d20.sql",
+    "tables": [],
+    "statuses": null
+  },
+  {
+    "migration": "20260724160000_customer_dish_favorites.sql",
+    "tables": [
+      "customer_dish_favorites"
+    ],
+    "statuses": {
+      "customer_dish_favorites": "MISSING"
+    }
+  },
+  {
+    "migration": "20260724170000_kitchen_production_batches.sql",
+    "tables": [
+      "kitchen_production_batches"
+    ],
+    "statuses": {
+      "kitchen_production_batches": "MISSING"
+    }
+  },
+  {
+    "migration": "20260724185434_2bdc2c0f-86fa-45f7-bb2a-d34dfe96ee30.sql",
+    "tables": [],
+    "statuses": null
+  },
+  {
+    "migration": "20260725120000_op002_platform_owners_bootstrap.sql",
+    "tables": [],
+    "statuses": null
+  },
+  {
+    "migration": "20260725123000_op002_platform_owners_config.sql",
+    "tables": [
+      "platform_owners"
+    ],
+    "statuses": {
+      "platform_owners": "MISSING"
+    }
+  }
+]
