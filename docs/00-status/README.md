@@ -1,6 +1,7 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-24  
+**Última actualización:** 2026-07-25  
+**Hito infraestructura:** ✅ [Clean Bootstrap Verified](./MILESTONE_CLEAN_BOOTSTRAP_VERIFIED.md) — `db push` vacío · `djangucecsphnejplvic` · 22 migraciones  
 **Fase actual:** [CURRENT_PHASE](./CURRENT_PHASE.md) ← abrir primero  
 **Dominios:** [PROJECT_DOMAINS](./PROJECT_DOMAINS.md) — Knowledge · Engineering · Experience · Operations  
 **Engineering Phase:** [ENGINEERING_PHASE](./ENGINEERING_PHASE.md) — Complete (pending operational authorization)  

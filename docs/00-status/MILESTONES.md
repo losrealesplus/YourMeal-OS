@@ -21,6 +21,7 @@ Registro **inmutable** de hitos. No es gestión de sprint: es memoria objetiva.
 | 2026-07-23 | **Foundation of Materialization · ACT-002 Frozen v1** | Bloque #24→#31 · [ACT-002](./ACT-002_FOUNDATION_OF_MATERIALIZATION_FROZEN.md) · [FOUR_LAYERS](../05-architecture/FOUR_LAYERS.md) · Tenant-Managed |
 | *(abierto)* | **EatClean Pilot Ready** | [Acta](./MILESTONE_EATCLEAN_PILOT_READY.md) · [PILOT_EXECUTION_GUIDE](../18-operational-validation/PILOT_EXECUTION_GUIDE.md) · EP-001…EP-005 |
 | *(aplazado)* | **Marketing Readiness** | [Acta](./MILESTONE_MARKETING_READINESS.md) · GSC/SEO **después** de RI-001 · [decisiones Lovable](./LOVABLE_FINDINGS_DECISIONS.md) |
+| **2026-07-25** | **Clean Bootstrap Verified** | Proyecto vacío `djangucecsphnejplvic` · 22 migraciones · [Acta](./MILESTONE_CLEAN_BOOTSTRAP_VERIFIED.md) · fix/CI PR #64 · gate [Migration Bootstrap Validation](../10-validation/MIGRATION_BOOTSTRAP_VALIDATION.md) |
 | *(pendiente)* | ORR PASSED \| BLOCKED | Puerta binaria · evidencia · sin features |
 | *(pendiente)* | First FOV (FOV-001) | Phase 3 — Operational Engineering |
 

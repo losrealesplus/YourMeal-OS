@@ -1,0 +1,128 @@
+[
+  {
+    "kind": "TABLE",
+    "name": "platform_owners",
+    "status": "MISSING",
+    "http": 404,
+    "message": "Could not find the table 'public.platform_owners' in the schema cache"
+  },
+  {
+    "kind": "TABLE",
+    "name": "user_roles",
+    "status": "EXISTS_RLS_BLOCKED",
+    "http": 401,
+    "message": "permission denied for function is_saas_admin"
+  },
+  {
+    "kind": "TABLE",
+    "name": "profiles",
+    "status": "EXISTS",
+    "http": 200,
+    "message": "ok"
+  },
+  {
+    "kind": "TABLE",
+    "name": "tenants",
+    "status": "EXISTS_RLS_BLOCKED",
+    "http": 401,
+    "message": "permission denied for function current_user_tenants"
+  },
+  {
+    "kind": "TABLE",
+    "name": "tenant_members",
+    "status": "EXISTS_RLS_BLOCKED",
+    "http": 401,
+    "message": "permission denied for function is_saas_admin"
+  },
+  {
+    "kind": "TABLE",
+    "name": "feature_flags",
+    "status": "EXISTS",
+    "http": 200,
+    "message": "ok"
+  },
+  {
+    "kind": "TABLE",
+    "name": "audit_log",
+    "status": "EXISTS",
+    "http": 200,
+    "message": "ok"
+  },
+  {
+    "kind": "TABLE",
+    "name": "customer_dish_favorites",
+    "status": "MISSING",
+    "http": 404,
+    "message": "Could not find the table 'public.customer_dish_favorites' in the schema cache"
+  },
+  {
+    "kind": "TABLE",
+    "name": "kitchen_production_batches",
+    "status": "MISSING",
+    "http": 404,
+    "message": "Could not find the table 'public.kitchen_production_batches' in the schema cache"
+  },
+  {
+    "kind": "TABLE",
+    "name": "dishes",
+    "status": "EXISTS",
+    "http": 200,
+    "message": "ok"
+  },
+  {
+    "kind": "RPC",
+    "name": "ensure_platform_owner_session",
+    "status": "MISSING",
+    "http": 404,
+    "message": "Could not find the function public.ensure_platform_owner_session without parameters in the schema cache"
+  },
+  {
+    "kind": "RPC",
+    "name": "ensure_platform_owner_for_user",
+    "status": "MISSING",
+    "http": 404,
+    "message": "Could not find the function public.ensure_platform_owner_for_user(_user_id) in the schema cache"
+  },
+  {
+    "kind": "RPC",
+    "name": "is_platform_owner_email",
+    "status": "MISSING",
+    "http": 404,
+    "message": "Could not find the function public.is_platform_owner_email(_email) in the schema cache"
+  },
+  {
+    "kind": "RPC",
+    "name": "revoke_platform_owner_for_email",
+    "status": "MISSING",
+    "http": 404,
+    "message": "Could not find the function public.revoke_platform_owner_for_email(_email) in the schema cache"
+  },
+  {
+    "kind": "RPC",
+    "name": "is_saas_admin",
+    "status": "EXISTS_EXEC_DENIED",
+    "http": 401,
+    "message": "permission denied for function is_saas_admin"
+  },
+  {
+    "kind": "RPC",
+    "name": "handle_new_user",
+    "status": "MISSING",
+    "http": 404,
+    "message": "Could not find the function public.handle_new_user without parameters in the schema cache"
+  },
+  {
+    "kind": "RPC",
+    "name": "ensure_individual_customer",
+    "status": "EXISTS_EXEC_DENIED",
+    "http": 401,
+    "message": "permission denied for function ensure_individual_customer"
+  },
+  {
+    "kind": "RPC",
+    "name": "current_user_tenants",
+    "status": "EXISTS_EXEC_DENIED",
+    "http": 401,
+    "message": "permission denied for function current_user_tenants"
+  }
+]

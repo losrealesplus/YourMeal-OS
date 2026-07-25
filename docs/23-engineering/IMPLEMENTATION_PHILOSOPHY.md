@@ -68,3 +68,4 @@ A partir de ahora: **no pedir a Lovable infraestructura**. Cursor toma el relevo
 - [IMPLEMENTATION_RULES](../22-implementation/IMPLEMENTATION_RULES.md)  
 - [MODULE_STATE_CRITERIA](../00-status/MODULE_STATE_CRITERIA.md)  
 - [ADR 0013](../adr/0013-implementation-is-knowledge-materialization.md)
+- [Migration Bootstrap Validation](../10-validation/MIGRATION_BOOTSTRAP_VALIDATION.md) — empty-DB migration gate (CI)
