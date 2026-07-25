@@ -532,7 +532,7 @@ export const revokeRole = createServerFn({ method: "POST" })
       .delete()
       .eq("user_id", data.userId)
       .eq("tenant_id", data.tenantId)
-      .eq("role", data.role);
+      .eq("role", data.role as never);
     if (error) throw new Error(error.message);
     await writeAudit(supabaseAdmin, {
       tenantId: data.tenantId,
