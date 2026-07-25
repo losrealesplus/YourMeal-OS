@@ -83,6 +83,7 @@ function HomeBody({
   state: DashboardStateId;
 }) {
   const { t } = useTranslation("customer");
+  const { isStaff } = useAuth();
   const navigate = useNavigate({ from: "/app" });
   const weekStart = utcWeekStartMonday();
   const { data: weeklyMenu } = useWeeklyMenu(weekStart);
