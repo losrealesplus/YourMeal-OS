@@ -7,6 +7,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { AppRole } from "@/hooks/use-auth";
 
 const PROVISIONING_ENTITIES = [
   "tenant",
@@ -29,7 +30,7 @@ const ROLE_CATALOG = [
   "driver",
   "employee",
   "customer",
-] as const;
+] as const satisfies readonly AppRole[];
 
 
 async function assertSaasAdmin(ctx: {
@@ -493,10 +494,11 @@ export const assignRole = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import(
       "@/integrations/supabase/client.server"
     );
+    const role: AppRole = data.role;
     const { error } = await supabaseAdmin
       .from("user_roles")
       .upsert(
-        { user_id: data.userId, tenant_id: data.tenantId, role: data.role as never },
+        { user_id: data.userId, tenant_id: data.tenantId, role },
         { onConflict: "user_id,tenant_id,role" },
       );
     if (error) throw new Error(error.message);
@@ -506,7 +508,7 @@ export const assignRole = createServerFn({ method: "POST" })
       entityType: "user_role",
       entityId: data.userId,
       action: "ROLE_CHANGED",
-      newData: { role: data.role },
+      newData: { role },
     });
     return { ok: true };
   });
@@ -527,12 +529,13 @@ export const revokeRole = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import(
       "@/integrations/supabase/client.server"
     );
+    const role: AppRole = data.role;
     const { error } = await supabaseAdmin
       .from("user_roles")
       .delete()
       .eq("user_id", data.userId)
       .eq("tenant_id", data.tenantId)
-      .eq("role", data.role as never);
+      .eq("role", role);
     if (error) throw new Error(error.message);
     await writeAudit(supabaseAdmin, {
       tenantId: data.tenantId,
@@ -540,7 +543,7 @@ export const revokeRole = createServerFn({ method: "POST" })
       entityType: "user_role",
       entityId: data.userId,
       action: "ROLE_CHANGED",
-      oldData: { role: data.role },
+      oldData: { role },
       newData: { role: null },
     });
     return { ok: true };
@@ -560,7 +563,7 @@ export const listProvisioningAudit = createServerFn({ method: "GET" })
       .select(
         "id, tenant_id, actor_id, entity_type, entity_id, action, new_data, created_at",
       )
-      .in("entity_type", PROVISIONING_ENTITIES as unknown as string[])
+      .in("entity_type", [...PROVISIONING_ENTITIES])
       .order("created_at", { ascending: false })
       .limit(200);
     if (error) throw new Error(error.message);

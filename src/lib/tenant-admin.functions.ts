@@ -7,8 +7,10 @@
  * @see docs/00-status/OP_001_OPERATIONAL_BOOTSTRAP.md
  */
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
 import { can } from "@/permissions";
 import type { AppRole } from "@/hooks/use-auth";
 import { canInviteOperationalStaff } from "@/modules/bootstrap-integrity";
@@ -20,11 +22,10 @@ const STAFF_INVITE_ROLES = [
   "company_admin",
   "logistics",
   "production",
-] as const;
+] as const satisfies readonly AppRole[];
 
 async function assertEmployeeManager(ctx: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  supabase: any;
+  supabase: SupabaseClient<Database>;
   userId: string;
   tenantId: string;
 }) {
@@ -34,7 +35,7 @@ async function assertEmployeeManager(ctx: {
     .eq("user_id", ctx.userId)
     .eq("tenant_id", ctx.tenantId);
   if (error) throw new Error(`Auth check failed: ${error.message}`);
-  const roles = ((data ?? []) as Array<{ role: AppRole }>).map((r) => r.role);
+  const roles: AppRole[] = (data ?? []).map((r) => r.role);
   // Pure saas_admin may also manage when listed on the tenant.
   const { data: saas } = await ctx.supabase
     .from("user_roles")
@@ -44,7 +45,7 @@ async function assertEmployeeManager(ctx: {
     .is("tenant_id", null)
     .maybeSingle();
   const effective: AppRole[] = saas
-    ? ([...roles, "saas_admin"] as AppRole[])
+    ? [...roles, "saas_admin"]
     : roles;
   if (!can(effective, "employee.manage")) {
     throw new Error("Forbidden: employee.manage required");
@@ -134,6 +135,8 @@ export const inviteTenantStaff = createServerFn({ method: "POST" })
       );
     }
 
+    const role: AppRole = data.role;
+
     await supabaseAdmin
       .from("tenant_members")
       .upsert({ user_id: userId, tenant_id: data.tenantId });
@@ -141,7 +144,7 @@ export const inviteTenantStaff = createServerFn({ method: "POST" })
       {
         user_id: userId,
         tenant_id: data.tenantId,
-        role: data.role as never,
+        role,
       },
       { onConflict: "user_id,tenant_id,role" },
     );
@@ -160,12 +163,12 @@ export const inviteTenantStaff = createServerFn({ method: "POST" })
       action: "STAFF_INVITED",
       new_data: {
         email: data.email,
-        role: data.role,
+        role,
         tenantId: data.tenantId,
       },
     });
 
-    return { userId, tenantId: data.tenantId, role: data.role };
+    return { userId, tenantId: data.tenantId, role };
   });
 
 export { STAFF_INVITE_ROLES };
