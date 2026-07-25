@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import { useTranslation } from "react-i18next";
+import { getUser, onAuthStateChange } from "@/auth";
 import { supabase } from "@/integrations/supabase/client";
 import {
   getFormatter,
@@ -90,7 +91,7 @@ export function LocalizationProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
 
     async function load() {
-      const { data: auth } = await supabase.auth.getUser();
+      const { data: auth } = await getUser();
       if (!auth.user) {
         if (!cancelled) {
           setUserRow(null);
@@ -124,7 +125,7 @@ export function LocalizationProvider({ children }: { children: ReactNode }) {
     }
 
     load();
-    const { data: sub } = supabase.auth.onAuthStateChange((e) => {
+    const { data: sub } = onAuthStateChange((e) => {
       if (e === "SIGNED_IN" || e === "SIGNED_OUT" || e === "USER_UPDATED") load();
     });
     return () => {

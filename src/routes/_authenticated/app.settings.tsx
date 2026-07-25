@@ -13,7 +13,7 @@ import {
   HelpCircle,
   Info,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { signOut as authSignOut } from "@/auth";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { LanguageSelector } from "@/components/language-selector";
@@ -38,7 +38,7 @@ function SettingsPage() {
   async function signOut() {
     await qc.cancelQueries();
     qc.clear();
-    await supabase.auth.signOut();
+    await authSignOut();
     navigate({ to: "/auth", replace: true });
   }
 

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Check, Globe } from "lucide-react";
+import { getUser } from "@/auth";
 import { LANGUAGES, type LanguageCode, getLanguage } from "@/i18n/languages";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -34,7 +35,7 @@ export function LanguageSelector({
     await i18n.changeLanguage(code);
     document.documentElement.setAttribute("lang", code);
     // Persist to profile if signed in — non-blocking, silent on failure.
-    const { data } = await supabase.auth.getUser();
+    const { data } = await getUser();
     if (data.user) {
       await supabase
         .from("profiles")

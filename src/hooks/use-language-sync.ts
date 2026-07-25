@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { getUser, onAuthStateChange } from "@/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { isSupportedLanguage, LANG_STORAGE_KEY } from "@/i18n";
 import type { LanguageCode } from "@/i18n/languages";
@@ -61,11 +62,11 @@ export function useLanguageSync() {
       if (tenant?.locale_default) await apply(tenant.locale_default);
     }
 
-    supabase.auth.getUser().then(({ data }) => {
+    getUser().then(({ data }) => {
       if (data.user) loadForUser(data.user.id);
     });
 
-    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: sub } = onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session?.user) loadForUser(session.user.id);
     });
 
