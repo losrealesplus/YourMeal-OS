@@ -496,7 +496,7 @@ export const assignRole = createServerFn({ method: "POST" })
     const { error } = await supabaseAdmin
       .from("user_roles")
       .upsert(
-        { user_id: data.userId, tenant_id: data.tenantId, role: data.role },
+        { user_id: data.userId, tenant_id: data.tenantId, role: data.role as never },
         { onConflict: "user_id,tenant_id,role" },
       );
     if (error) throw new Error(error.message);
@@ -532,7 +532,7 @@ export const revokeRole = createServerFn({ method: "POST" })
       .delete()
       .eq("user_id", data.userId)
       .eq("tenant_id", data.tenantId)
-      .eq("role", data.role);
+      .eq("role", data.role as never);
     if (error) throw new Error(error.message);
     await writeAudit(supabaseAdmin, {
       tenantId: data.tenantId,

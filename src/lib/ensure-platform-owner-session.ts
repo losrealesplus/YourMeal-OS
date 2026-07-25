@@ -23,7 +23,10 @@ export async function ensurePlatformOwnerSession(): Promise<PlatformOwnerEnsureR
   if (userErr) throw userErr;
   if (!userData.user) return null;
 
-  const { data, error } = await supabase.rpc("ensure_platform_owner_session");
+  const { data, error } = await supabase.rpc(
+    // Types are stale until regeneration; RPC is defined in OP-002 migration.
+    "ensure_platform_owner_session" as never,
+  );
   if (error) {
     // Function missing (migration not applied) — do not invent grants client-side.
     console.error(
@@ -33,5 +36,5 @@ export async function ensurePlatformOwnerSession(): Promise<PlatformOwnerEnsureR
     throw new Error(`Platform owner bootstrap failed: ${error.message}`);
   }
   if (data == null) return null;
-  return data as PlatformOwnerEnsureResult;
+  return data as unknown as PlatformOwnerEnsureResult;
 }
