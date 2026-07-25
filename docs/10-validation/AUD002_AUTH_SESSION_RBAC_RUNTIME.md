@@ -204,28 +204,24 @@ Repo: migraciones OP-002 + config/bootstrap/platform-owners.json
                     │
                     ▼
 Live Supabase schema cache
-  �/bootstrap/platform-owners.json
+  [missing] platform_owners
+  [missing] ensure_platform_owner_session   <--- FAIL CONFIRMED (HTTP 404)
+  [missing] ensure_platform_owner_for_user
                     │
                     ▼
-Live Supabase schema cache
-  ✗ platform_owners
-  ✗ ensure_platform_owner_session     ◄── FAIL CONFIRMADO (HTTP 404)
-  ✗ ensure_platform_owner_for_user
+Client ensurePlatformOwnerSession() -> throw
                     │
                     ▼
-Cliente ensurePlatformOwnerSession() → throw
-                    │
-                    ▼
-useAuth .catch → SELECT user_roles → sin saas_admin/company_admin
+useAuth .catch -> SELECT user_roles -> no saas_admin/company_admin
                     │
                     ▼
 isStaff=false · isSaasAdmin=false · isCustomer=true
                     │
                     ▼
-homePath=/app · /admin,/saas → /app
+homePath=/app · /admin,/saas -> /app
                     │
                     ▼
-Usuario entra como cliente
+User enters as customer
 ```
 
 ---
