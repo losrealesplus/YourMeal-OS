@@ -141,7 +141,7 @@ export const inviteTenantStaff = createServerFn({ method: "POST" })
       {
         user_id: userId,
         tenant_id: data.tenantId,
-        role: data.role,
+        role: data.role as never,
       },
       { onConflict: "user_id,tenant_id,role" },
     );
