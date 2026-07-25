@@ -27,17 +27,25 @@ export function BrandLeafMark({
 }) {
   const { t } = useTranslation("auth");
   const navigate = useNavigate();
-  const { roles, loading } = useAuth();
+  const { roles, loading, isSaasAdmin } = useAuth();
   const [busy, setBusy] = useState(false);
 
   const isSaas = target === "saas";
   const label = t(isSaas ? "saasEntryLabel" : "adminEntryLabel");
   const aria = t(isSaas ? "saasEntryAria" : "adminEntryAria");
 
+  // Button 2 (SaaS) is visible only to platform admins.
+  if (isSaas && (loading || !isSaasAdmin)) return null;
+
   async function openOperationsCenter() {
     if (loading || busy) return;
     setBusy(true);
     try {
+      if (isSaas) {
+        await navigate({ to: "/saas" });
+        return;
+      }
+
       const { data } = await supabase.auth.getSession();
       const uid = data.session?.user?.id ?? null;
       let effectiveRoles = roles;
@@ -50,18 +58,7 @@ export function BrandLeafMark({
         effectiveRoles = (roleRows ?? []).map((r) => r.role as AppRole);
       }
 
-      if (isSaas) {
-        const isSaasAdmin = effectiveRoles.includes("saas_admin");
-        if (uid && isSaasAdmin) {
-          await navigate({ to: "/saas" });
-          return;
-        }
-        await navigate({
-          to: OPERATIONS_AUTH_PATH,
-          search: { returnTo: "/saas" },
-        });
-        return;
-      }
+
 
       const decision = decideOperationsCenterEntry({
         sessionUserId: uid,
