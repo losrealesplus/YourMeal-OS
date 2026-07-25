@@ -1,10 +1,11 @@
-# 09 · Gate G-03 · Platform Operational Baseline
+# 10 · Gate G-03 · Platform Operational Baseline
 
 Parte del [Evidence Framework](./README.md).
 
 **Instancia de Gate** previa a reanudar el desarrollo de módulos funcionales tras el cutover de infraestructura Supabase (INFRA-002).
 
-Artefacto de ejecución: [G03_PRODUCTION_SMOKE_CHECKLIST](../10-validation/G03_PRODUCTION_SMOKE_CHECKLIST.md).
+Artefacto de ejecución: [G03_PRODUCTION_SMOKE_CHECKLIST](../10-validation/G03_PRODUCTION_SMOKE_CHECKLIST.md).  
+*(Fichero `10-…` — el `09` del directorio es Operational Visibility.)*
 
 ---
 
