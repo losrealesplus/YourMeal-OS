@@ -10,7 +10,9 @@ All users enter one application. Departments and capabilities differ by role. Ha
 
 ## Decision
 
-- Authentication: Supabase Auth.
+- Authentication: Supabase Auth (**native** — OAuth, email/password, OTP, session).
+- Application entrypoint: `src/auth/*` (UI must not call Lovable cloud-auth or raw SDK auth APIs).
+- OAuth providers use `supabase.auth.signInWithOAuth` with PKCE callback at `/auth/callback`.
 - Identity profile: `profiles` (1:1 with `auth.users`).
 - Membership: `tenant_members`.
 - Roles: `user_roles` + `app_role` enum; roles are tenant-aware.
@@ -23,3 +25,4 @@ All users enter one application. Departments and capabilities differ by role. Ha
 - Adding a role or capability is a data/config change, not a UI rewrite.
 - RLS helpers (`has_role`, …) remain the database safety net.
 - Route gates use capabilities or shared permission helpers, not one-off role lists.
+- Auth works on localhost and production without Lovable’s `/~oauth/initiate` broker (INFRA-003).
