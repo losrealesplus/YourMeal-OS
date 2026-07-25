@@ -193,9 +193,9 @@ function HomeBody({
         />
       </div>
 
-      {/* EP-002A.1.1 — secure Ops Center entry (checks staff session) */}
+      {/* EP-002A.1.1 — Ops Center entry only for staff; customers never see it */}
       <div className="mt-10 flex flex-col items-center gap-3 pb-2">
-        <BrandLeafMark />
+        {isStaff ? <BrandLeafMark /> : null}
         <PoweredByLine />
       </div>
     </div>
