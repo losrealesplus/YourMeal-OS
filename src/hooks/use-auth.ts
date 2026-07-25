@@ -4,22 +4,10 @@ import { useRouter } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { homePathForRoles } from "@/lib/home-path";
 import { ensurePlatformOwnerSession } from "@/lib/ensure-platform-owner-session";
+import type { Database } from "@/integrations/supabase/types";
 
-export type AppRole =
-  | "saas_admin"
-  | "company_admin"
-  | "operations_manager"
-  | "kitchen"
-  | "purchasing"
-  | "inventory"
-  | "production"
-  | "support"
-  | "accounting"
-  | "logistics"
-  | "delivery"
-  | "driver"
-  | "employee"
-  | "customer";
+/** Official role union — single source of truth with Postgres `app_role`. */
+export type AppRole = Database["public"]["Enums"]["app_role"];
 
 const STAFF_ROLES: AppRole[] = [
   "company_admin",

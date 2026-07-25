@@ -12,6 +12,7 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
     "seed": "node scripts/seed-day0.mjs",
     "seed:platform-owners": "node scripts/seed-platform-owners.mjs",
     "test:bootstrap-config": "node --test scripts/lib/platform-owners-config.spec.mjs",
