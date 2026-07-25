@@ -1154,33 +1154,6 @@ export type Database = {
           },
         ]
       }
-      platform_owners: {
-        Row: {
-          active: boolean
-          created_at: string
-          email: string
-          full_name: string | null
-          tenant_slug: string
-          updated_at: string
-        }
-        Insert: {
-          active?: boolean
-          created_at?: string
-          email: string
-          full_name?: string | null
-          tenant_slug?: string
-          updated_at?: string
-        }
-        Update: {
-          active?: boolean
-          created_at?: string
-          email?: string
-          full_name?: string | null
-          tenant_slug?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       tenant_members: {
         Row: {
           joined_at: string
@@ -1404,11 +1377,6 @@ export type Database = {
         }
         Returns: string
       }
-      ensure_platform_owner_for_user: {
-        Args: { _user_id: string }
-        Returns: Json
-      }
-      ensure_platform_owner_session: { Args: never; Returns: Json }
       has_any_staff_role: {
         Args: { _tenant_id: string; _user_id: string }
         Returns: boolean
@@ -1422,13 +1390,8 @@ export type Database = {
         Returns: boolean
       }
       is_customer_owner: { Args: { _customer_id: string }; Returns: boolean }
-      is_platform_owner_email: { Args: { _email: string }; Returns: boolean }
       is_saas_admin: { Args: { _user_id: string }; Returns: boolean }
       is_tenant_member: { Args: { _tenant_id: string }; Returns: boolean }
-      revoke_platform_owner_for_email: {
-        Args: { _email: string }
-        Returns: Json
-      }
       resolve_delivery_group: {
         Args: {
           p_company_id: string
@@ -1453,8 +1416,6 @@ export type Database = {
         | "driver"
         | "employee"
         | "customer"
-        | "operations_manager"
-        | "delivery"
       customer_kind: "individual" | "company_employee"
       dish_status: "draft" | "active" | "archived" | "inactive"
       invoice_status: "pending" | "paid" | "overdue" | "void"
@@ -1614,8 +1575,6 @@ export const Constants = {
         "driver",
         "employee",
         "customer",
-        "operations_manager",
-        "delivery",
       ],
       customer_kind: ["individual", "company_employee"],
       dish_status: ["draft", "active", "archived", "inactive"],
