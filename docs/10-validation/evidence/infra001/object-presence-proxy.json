@@ -1,0 +1,497 @@
+{
+  "project": "cbeegcxkayybfncnuirg",
+  "schema_migrations_direct": {
+    "http": 406,
+    "body": "{\"code\":\"PGRST106\",\"details\":null,\"hint\":\"Only the following schemas are exposed: public, graphql_public\",\"message\":\"Invalid schema: supabase_migrations\"}",
+    "accessible": false
+  },
+  "last_present_inferred": "20260722172737_55b5491b-422d-4966-b5df-fb5c62d8ed02.sql",
+  "first_missing_inferred": "20260723120000_program_draft_order_atomic.sql",
+  "migrations": [
+    {
+      "migration": "20260720164312_9137d8ab-e998-4e02-816c-63bda5634159.sql",
+      "version": "20260720164312",
+      "verdict": "PRESENT",
+      "probes": [
+        {
+          "kind": "table",
+          "name": "tenants",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "user_roles",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "rpc",
+          "name": "is_saas_admin",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "tenant_domains",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "profiles",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "tenant_members",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "customers",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "customer_addresses",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "customer_phones",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "customer_allergies",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "customer_preferences",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "companies",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "company_locations",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "company_departments",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "company_employees",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "suppliers",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "ingredients",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "dishes",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "dish_ingredients",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "weekly_menus",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "weekly_menu_slots",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "orders",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "order_items",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "routes",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "route_stops",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "invoices",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "payments",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "promotions",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "support_notes",
+          "status": "PRESENT"
+        }
+      ],
+      "tables_in_git": [
+        "tenants",
+        "tenant_domains",
+        "profiles",
+        "tenant_members",
+        "user_roles",
+        "customers",
+        "customer_addresses",
+        "customer_phones",
+        "customer_allergies",
+        "customer_preferences",
+        "companies",
+        "company_locations",
+        "company_departments",
+        "company_employees",
+        "suppliers",
+        "ingredients",
+        "dishes",
+        "dish_ingredients",
+        "weekly_menus",
+        "weekly_menu_slots",
+        "orders",
+        "order_items",
+        "routes",
+        "route_stops",
+        "invoices",
+        "payments",
+        "promotions",
+        "support_notes"
+      ],
+      "functions_in_git": [
+        "has_role",
+        "is_saas_admin",
+        "current_user_tenants",
+        "is_tenant_member",
+        "has_any_staff_role",
+        "handle_new_user",
+        "touch_updated_at"
+      ]
+    },
+    {
+      "migration": "20260720164327_63fdc61e-1100-4fa6-ad62-e2a91eb9f2b1.sql",
+      "version": "20260720164327",
+      "verdict": "NO_MARKER",
+      "probes": [],
+      "tables_in_git": [],
+      "functions_in_git": [
+        "touch_updated_at"
+      ]
+    },
+    {
+      "migration": "20260720170834_2a394c23-2b57-4ded-87ae-7824d406b01e.sql",
+      "version": "20260720170834",
+      "verdict": "NO_MARKER",
+      "probes": [],
+      "tables_in_git": [],
+      "functions_in_git": [
+        "validate_regional_settings"
+      ]
+    },
+    {
+      "migration": "20260720210000_soft_delete_audit_feature_flags.sql",
+      "version": "20260720210000",
+      "verdict": "PRESENT",
+      "probes": [
+        {
+          "kind": "table",
+          "name": "audit_log",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "feature_flags",
+          "status": "PRESENT"
+        }
+      ],
+      "tables_in_git": [
+        "audit_log",
+        "feature_flags"
+      ],
+      "functions_in_git": []
+    },
+    {
+      "migration": "20260720220000_foundation_lock_soft_delete_rbac.sql",
+      "version": "20260720220000",
+      "verdict": "NO_MARKER",
+      "probes": [],
+      "tables_in_git": [],
+      "functions_in_git": []
+    },
+    {
+      "migration": "20260721190000_dish_infra_align_domain.sql",
+      "version": "20260721190000",
+      "verdict": "NO_MARKER",
+      "probes": [],
+      "tables_in_git": [],
+      "functions_in_git": []
+    },
+    {
+      "migration": "20260722172703_596a291b-6c2c-4e61-a38a-27760d7bc0bc.sql",
+      "version": "20260722172703",
+      "verdict": "NO_MARKER",
+      "probes": [],
+      "tables_in_git": [],
+      "functions_in_git": []
+    },
+    {
+      "migration": "20260722172737_55b5491b-422d-4966-b5df-fb5c62d8ed02.sql",
+      "version": "20260722172737",
+      "verdict": "PRESENT",
+      "probes": [
+        {
+          "kind": "table",
+          "name": "feature_flags",
+          "status": "PRESENT"
+        },
+        {
+          "kind": "table",
+          "name": "audit_log",
+          "status": "PRESENT"
+        }
+      ],
+      "tables_in_git": [
+        "audit_log",
+        "feature_flags"
+      ],
+      "functions_in_git": []
+    },
+    {
+      "migration": "20260723120000_program_draft_order_atomic.sql",
+      "version": "20260723120000",
+      "verdict": "MISSING",
+      "probes": [
+        {
+          "kind": "rpc",
+          "name": "program_draft_order_atomic",
+          "status": "MISSING"
+        }
+      ],
+      "tables_in_git": [],
+      "functions_in_git": [
+        "program_draft_order"
+      ]
+    },
+    {
+      "migration": "20260723174724_de4a9047-5477-4932-abcc-94ce217570b3.sql",
+      "version": "20260723174724",
+      "verdict": "NO_MARKER",
+      "probes": [],
+      "tables_in_git": [],
+      "functions_in_git": [
+        "validate_tenant_branding"
+      ]
+    },
+    {
+      "migration": "20260723183000_b2b_b2c_customer_model.sql",
+      "version": "20260723183000",
+      "verdict": "MISSING",
+      "probes": [
+        {
+          "kind": "table",
+          "name": "delivery_groups",
+          "status": "MISSING"
+        }
+      ],
+      "tables_in_git": [
+        "delivery_groups"
+      ],
+      "functions_in_git": [
+        "generate_company_code",
+        "ensure_individual_customer",
+        "resolve_delivery_group",
+        "program_draft_order"
+      ]
+    },
+    {
+      "migration": "20260723190000_company_provision_staff_only.sql",
+      "version": "20260723190000",
+      "verdict": "NO_MARKER",
+      "probes": [],
+      "tables_in_git": [],
+      "functions_in_git": []
+    },
+    {
+      "migration": "20260723193459_41cf7a3a-71c9-4f23-8d9d-f41660ade316.sql",
+      "version": "20260723193459",
+      "verdict": "NO_MARKER",
+      "probes": [],
+      "tables_in_git": [],
+      "functions_in_git": [
+        "is_customer_owner"
+      ]
+    },
+    {
+      "migration": "20260723200000_operations_workspace_statuses.sql",
+      "version": "20260723200000",
+      "verdict": "NO_MARKER",
+      "probes": [],
+      "tables_in_git": [],
+      "functions_in_git": []
+    },
+    {
+      "migration": "20260723200100_operations_transition_rpc.sql",
+      "version": "20260723200100",
+      "verdict": "MISSING",
+      "probes": [
+        {
+          "kind": "rpc",
+          "name": "transition_order_status",
+          "status": "MISSING"
+        }
+      ],
+      "tables_in_git": [],
+      "functions_in_git": [
+        "has_any_staff_role",
+        "transition_order_status"
+      ]
+    },
+    {
+      "migration": "20260724132839_f9e39003-6584-4d8b-af26-975d95c6dd20.sql",
+      "version": "20260724132839",
+      "verdict": "PRESENT",
+      "probes": [
+        {
+          "kind": "rpc",
+          "name": "ensure_individual_customer",
+          "status": "PRESENT"
+        }
+      ],
+      "tables_in_git": [],
+      "functions_in_git": [
+        "ensure_individual_customer",
+        "resolve_delivery_group"
+      ]
+    },
+    {
+      "migration": "20260724132857_5f8e76e5-5e14-45a6-b36a-d890ab2e6d20.sql",
+      "version": "20260724132857",
+      "verdict": "NO_MARKER",
+      "probes": [],
+      "tables_in_git": [],
+      "functions_in_git": []
+    },
+    {
+      "migration": "20260724160000_customer_dish_favorites.sql",
+      "version": "20260724160000",
+      "verdict": "MISSING",
+      "probes": [
+        {
+          "kind": "table",
+          "name": "customer_dish_favorites",
+          "status": "MISSING"
+        }
+      ],
+      "tables_in_git": [
+        "customer_dish_favorites"
+      ],
+      "functions_in_git": []
+    },
+    {
+      "migration": "20260724170000_kitchen_production_batches.sql",
+      "version": "20260724170000",
+      "verdict": "MISSING",
+      "probes": [
+        {
+          "kind": "table",
+          "name": "kitchen_production_batches",
+          "status": "MISSING"
+        }
+      ],
+      "tables_in_git": [
+        "kitchen_production_batches"
+      ],
+      "functions_in_git": []
+    },
+    {
+      "migration": "20260724185434_2bdc2c0f-86fa-45f7-bb2a-d34dfe96ee30.sql",
+      "version": "20260724185434",
+      "verdict": "NO_MARKER",
+      "probes": [],
+      "tables_in_git": [],
+      "functions_in_git": []
+    },
+    {
+      "migration": "20260725120000_op002_platform_owners_bootstrap.sql",
+      "version": "20260725120000",
+      "verdict": "MISSING",
+      "probes": [
+        {
+          "kind": "rpc",
+          "name": "ensure_platform_owner_session",
+          "status": "MISSING"
+        },
+        {
+          "kind": "rpc",
+          "name": "is_platform_owner_email",
+          "status": "MISSING"
+        }
+      ],
+      "tables_in_git": [],
+      "functions_in_git": [
+        "is_platform_owner_email",
+        "ensure_platform_owner_for_user",
+        "ensure_platform_owner_session",
+        "handle_new_user"
+      ]
+    },
+    {
+      "migration": "20260725123000_op002_platform_owners_config.sql",
+      "version": "20260725123000",
+      "verdict": "MISSING",
+      "probes": [
+        {
+          "kind": "table",
+          "name": "platform_owners",
+          "status": "MISSING"
+        },
+        {
+          "kind": "rpc",
+          "name": "revoke_platform_owner_for_email",
+          "status": "MISSING"
+        }
+      ],
+      "tables_in_git": [
+        "platform_owners"
+      ],
+      "functions_in_git": [
+        "is_platform_owner_email",
+        "ensure_platform_owner_for_user",
+        "revoke_platform_owner_for_email"
+      ]
+    }
+  ],
+  "method_note": "schema_migrations not readable via PostgREST (406). Inference from object presence. Corrected RPC name program_draft_order.",
+  "cut_sentence_es": "La sincronizaci\u00f3n se rompi\u00f3 despu\u00e9s de la migraci\u00f3n 20260722172737_55b5491b-422d-4966-b5df-fb5c62d8ed02.sql"
+}
