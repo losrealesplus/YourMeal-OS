@@ -1,0 +1,16 @@
+{
+  "$schema": "./platform-owners.schema.json",
+  "version": 1,
+  "description": "OP-002 · Platform Owner bootstrap configuration. Edit this file and re-run `npm run seed:platform-owners` to change platform ownership — no application source changes required.",
+  "defaultTenantSlug": "eatclean-tenerife",
+  "owners": [
+    {
+      "email": "alex1409h@gmail.com",
+      "fullName": "Alex Hernandez"
+    },
+    {
+      "email": "alexhdezmtinez@gmail.com",
+      "fullName": "Alex Hdez Martinez"
+    }
+  ]
+}

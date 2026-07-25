@@ -7,20 +7,21 @@ CREATE UNIQUE INDEX IF NOT EXISTS user_roles_saas_admin_uidx
   ON public.user_roles (user_id)
   WHERE role = 'saas_admin' AND tenant_id IS NULL;
 
+-- Placeholder until 20260725123000_op002_platform_owners_config.sql installs
+-- public.platform_owners and replaces this with a table-backed check.
+-- Owner emails live in config/bootstrap/platform-owners.json (ops config),
+-- not in application source.
 CREATE OR REPLACE FUNCTION public.is_platform_owner_email(_email text)
 RETURNS boolean
 LANGUAGE sql
-IMMUTABLE
+STABLE
 SET search_path = public
 AS $$
-  SELECT lower(trim(coalesce(_email, ''))) IN (
-    'alex1409h@gmail.com',
-    'alexhdezmtinez@gmail.com'
-  );
+  SELECT false;
 $$;
 
 COMMENT ON FUNCTION public.is_platform_owner_email(text) IS
-  'OP-002: permanent Platform Owner allowlist (emails only; grants via ensure_platform_owner_for_user).';
+  'OP-002: Platform Owner allowlist check (replaced by config-backed implementation in later migration).';
 
 CREATE OR REPLACE FUNCTION public.ensure_platform_owner_for_user(_user_id uuid)
 RETURNS jsonb
@@ -210,16 +211,5 @@ GRANT EXECUTE ON FUNCTION public.is_platform_owner_email(text) TO authenticated,
 GRANT EXECUTE ON FUNCTION public.ensure_platform_owner_for_user(uuid) TO service_role;
 GRANT EXECUTE ON FUNCTION public.ensure_platform_owner_session() TO authenticated, service_role;
 
--- Backfill: any existing Auth users already matching the allowlist.
-DO $$
-DECLARE
-  r record;
-BEGIN
-  FOR r IN
-    SELECT id
-    FROM auth.users
-    WHERE public.is_platform_owner_email(email)
-  LOOP
-    PERFORM public.ensure_platform_owner_for_user(r.id);
-  END LOOP;
-END $$;
+-- Backfill runs in 20260725123000_op002_platform_owners_config.sql after the
+-- platform_owners config table is populated from bootstrap configuration.

@@ -1,31 +1,32 @@
 #!/usr/bin/env node
 /**
- * OP-002 · Permanent Platform Owners bootstrap (idempotent).
+ * OP-002 · Platform Owners bootstrap from configuration (idempotent).
  *
- * Creates or reuses Auth users for the permanent Platform Owner emails and
- * assigns official roles via ensure_platform_owner_for_user:
- *   - saas_admin (tenant_id NULL) — platform
- *   - company_admin on EatClean Tenerife — tenant
+ * Reads config/bootstrap/platform-owners.json (bootstrap config, not app logic),
+ * syncs public.platform_owners, then for each active owner:
+ *   - create or reuse Auth user
+ *   - ensure profile + membership + saas_admin + company_admin
  *
- * Not a temporary seed. Safe to re-run. Never duplicates profiles / memberships / roles.
+ * Ownership changes: edit the JSON config and re-run this script.
+ * Emails removed from config are deactivated and platform grants revoked.
  *
  * Required env:
  *   SUPABASE_URL (or VITE_SUPABASE_URL)
  *   SUPABASE_SERVICE_ROLE_KEY
  *
- * Optional (used only when creating a missing Auth user):
- *   PLATFORM_OWNERS_PASSWORD   (min 8; shared for both, if creating with password)
- *   If password is omitted, invites the user by email instead.
+ * Optional:
+ *   PLATFORM_OWNERS_PASSWORD   (min 8; used only when creating Auth users)
+ *   PLATFORM_OWNERS_CONFIG     (path override)
  *
  * Usage:
  *   npm run seed:platform-owners
  */
 import { createClient } from "@supabase/supabase-js";
-
-const PLATFORM_OWNERS = [
-  { email: "alex1409h@gmail.com", fullName: "Alex Hernandez" },
-  { email: "alexhdezmtinez@gmail.com", fullName: "Alex Hdez Martinez" },
-];
+import { resolve } from "node:path";
+import {
+  DEFAULT_PLATFORM_OWNERS_CONFIG_PATH,
+  loadPlatformOwnersConfig,
+} from "./lib/platform-owners-config.mjs";
 
 function requireEnv(name, fallbacks = []) {
   const keys = [name, ...fallbacks];
@@ -36,7 +37,6 @@ function requireEnv(name, fallbacks = []) {
 }
 
 async function findUserByEmail(admin, email) {
-  // Paginate — owner emails may not be on page 1 in larger projects.
   for (let page = 1; page <= 20; page += 1) {
     const { data, error } = await admin.auth.admin.listUsers({
       page,
@@ -79,7 +79,55 @@ async function ensureAuthUser(admin, { email, fullName }, password) {
   return { userId, created: true, invited: true };
 }
 
+async function syncConfigTable(admin, config) {
+  const activeEmails = config.owners.map((o) => o.email);
+
+  for (const owner of config.owners) {
+    const { error } = await admin.from("platform_owners").upsert(
+      {
+        email: owner.email,
+        full_name: owner.fullName,
+        tenant_slug: owner.tenantSlug,
+        active: true,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "email" },
+    );
+    if (error) throw error;
+  }
+
+  const { data: existing, error: listErr } = await admin
+    .from("platform_owners")
+    .select("email, active");
+  if (listErr) throw listErr;
+
+  const deactivated = [];
+  for (const row of existing ?? []) {
+    if (!activeEmails.includes(row.email)) {
+      const { error } = await admin
+        .from("platform_owners")
+        .update({ active: false, updated_at: new Date().toISOString() })
+        .eq("email", row.email);
+      if (error) throw error;
+
+      const { data: revoked, error: revErr } = await admin.rpc(
+        "revoke_platform_owner_for_email",
+        { _email: row.email },
+      );
+      if (revErr) throw revErr;
+      deactivated.push({ email: row.email, revoke: revoked });
+    }
+  }
+
+  return { deactivated };
+}
+
 async function main() {
+  const configPath = process.env.PLATFORM_OWNERS_CONFIG
+    ? resolve(process.env.PLATFORM_OWNERS_CONFIG)
+    : DEFAULT_PLATFORM_OWNERS_CONFIG_PATH;
+  const config = loadPlatformOwnersConfig(configPath);
+
   const url = requireEnv("SUPABASE_URL", ["VITE_SUPABASE_URL"]);
   const serviceKey = requireEnv("SUPABASE_SERVICE_ROLE_KEY");
   const password = process.env.PLATFORM_OWNERS_PASSWORD;
@@ -88,24 +136,37 @@ async function main() {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
-  const { data: tenant, error: tenantErr } = await admin
-    .from("tenants")
-    .select("id, name, slug")
-    .eq("slug", "eatclean-tenerife")
-    .maybeSingle();
-  if (tenantErr) throw tenantErr;
-  if (!tenant) {
-    throw new Error(
-      "Tenant eatclean-tenerife missing — apply migrations before seeding Platform Owners",
-    );
+  console.log("OP-002 · Platform Owners bootstrap (from config)");
+  console.log(`  config: ${configPath}`);
+  console.log(`  default tenant slug: ${config.defaultTenantSlug}`);
+  console.log(`  owners in config: ${config.owners.length}`);
+
+  for (const slug of new Set(config.owners.map((o) => o.tenantSlug))) {
+    const { data: tenant, error } = await admin
+      .from("tenants")
+      .select("id, name, slug")
+      .eq("slug", slug)
+      .maybeSingle();
+    if (error) throw error;
+    if (!tenant) {
+      throw new Error(
+        `Tenant slug "${slug}" missing — apply migrations / provision tenant before Platform Owner bootstrap`,
+      );
+    }
+    console.log(`  tenant ok: ${tenant.name} (${tenant.slug})`);
   }
 
-  console.log("OP-002 · Platform Owners bootstrap");
-  console.log(`  tenant: ${tenant.name} (${tenant.slug})`);
+  const { deactivated } = await syncConfigTable(admin, config);
+  if (deactivated.length) {
+    console.log(`\n  deactivated / revoked (${deactivated.length}):`);
+    for (const d of deactivated) {
+      console.log(`    - ${d.email}`);
+    }
+  }
 
   const results = [];
 
-  for (const owner of PLATFORM_OWNERS) {
+  for (const owner of config.owners) {
     const auth = await ensureAuthUser(admin, owner, password);
     const { data: ensured, error: ensureErr } = await admin.rpc(
       "ensure_platform_owner_for_user",
@@ -113,7 +174,12 @@ async function main() {
     );
     if (ensureErr) throw ensureErr;
 
-    // Verify final state (no duplicates assumed by unique constraints / NOT EXISTS).
+    const { data: tenant } = await admin
+      .from("tenants")
+      .select("id")
+      .eq("slug", owner.tenantSlug)
+      .maybeSingle();
+
     const [{ data: roles, error: rolesErr }, { data: membership, error: memErr }] =
       await Promise.all([
         admin
@@ -156,6 +222,7 @@ async function main() {
 
     console.log(`\n  ${owner.email}`);
     console.log(`    auth:          ${row.auth} (${row.userId})`);
+    console.log(`    tenant:        ${owner.tenantSlug}`);
     console.log(`    roles:         ${roleNames.join(", ") || "(none)"}`);
     console.log(`    saas_admin:    ${hasSaas ? "OK" : "MISSING"}`);
     console.log(`    company_admin: ${hasCompany ? "OK" : "MISSING"}`);
@@ -166,12 +233,20 @@ async function main() {
     (r) => !r.saas_admin || !r.company_admin || !r.membership,
   );
   if (failed.length) {
-    console.error("\nOP-002 FAILED — incomplete grants for:", failed.map((f) => f.email));
+    console.error(
+      "\nOP-002 FAILED — incomplete grants for:",
+      failed.map((f) => f.email),
+    );
     process.exit(1);
   }
 
-  console.log("\nOP-002 complete — both Platform Owners ready.");
-  console.log("Expected login path: Landing → /admin → Centro de Operaciones YourMeal OS → /saas");
+  console.log("\nOP-002 complete — Platform Owners synced from config.");
+  console.log(
+    "Expected login path: Landing → /admin → Centro de Operaciones YourMeal OS → /saas",
+  );
+  console.log(
+    "To change ownership later: edit config/bootstrap/platform-owners.json and re-run this script.",
+  );
 }
 
 main().catch((e) => {

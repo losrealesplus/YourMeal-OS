@@ -1154,6 +1154,33 @@ export type Database = {
           },
         ]
       }
+      platform_owners: {
+        Row: {
+          active: boolean
+          created_at: string
+          email: string
+          full_name: string | null
+          tenant_slug: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          email: string
+          full_name?: string | null
+          tenant_slug?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          tenant_slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       tenant_members: {
         Row: {
           joined_at: string
@@ -1398,6 +1425,10 @@ export type Database = {
       is_platform_owner_email: { Args: { _email: string }; Returns: boolean }
       is_saas_admin: { Args: { _user_id: string }; Returns: boolean }
       is_tenant_member: { Args: { _tenant_id: string }; Returns: boolean }
+      revoke_platform_owner_for_email: {
+        Args: { _email: string }
+        Returns: Json
+      }
       resolve_delivery_group: {
         Args: {
           p_company_id: string
