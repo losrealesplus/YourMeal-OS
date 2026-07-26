@@ -4,7 +4,7 @@ import { useRouter } from "@tanstack/react-router";
 import { getSession, onAuthStateChange } from "@/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { homePathForRoles } from "@/lib/home-path";
-import { ensurePlatformOwnerSession } from "@/lib/ensure-platform-owner-session";
+import { tryEnsurePlatformOwnerSession } from "@/lib/ensure-platform-owner-session";
 import type { Database } from "@/integrations/supabase/types";
 
 /** Official role union — single source of truth with Postgres `app_role`. */
@@ -92,12 +92,10 @@ export function useAuth(): AuthState {
     }
 
     void (async () => {
-      // OP-002: ensure Platform Owner grants before reading RBAC state.
-      // Errors for allowlisted owners are not swallowed — they surface in console
-      // and leave roles empty until the session RPC succeeds.
-      await ensurePlatformOwnerSession().catch((err: unknown) => {
-        console.error(err);
-      });
+      // BUGFIX-002: best-effort ensure — must not block role/profile load for
+      // non–Platform Owner users when the specialized RPC is down.
+      // Strict ensure remains on `/auth/admin` → enterOperationsCenter.
+      await tryEnsurePlatformOwnerSession();
       if (cancelled) return;
 
       const [rolesRes, profileRes, memberRes] = await Promise.all([
