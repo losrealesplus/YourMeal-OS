@@ -6,14 +6,15 @@ describe("isBootstrapMode", () => {
     vi.resetModules();
   });
 
-  it("defaults to false when unset", async () => {
+  // DIAGNOSTIC SMOKE: flag is hard-forced ON. Restore env-based tests after revert.
+  it("smoke force: always true regardless of env", async () => {
     vi.stubEnv("VITE_BOOTSTRAP_MODE", "");
     const { isBootstrapMode } = await import("./flag");
-    expect(isBootstrapMode()).toBe(false);
+    expect(isBootstrapMode()).toBe(true);
   });
 
-  it("enables only when true", async () => {
-    vi.stubEnv("VITE_BOOTSTRAP_MODE", "true");
+  it("smoke force: still true when env is false", async () => {
+    vi.stubEnv("VITE_BOOTSTRAP_MODE", "false");
     const { isBootstrapMode } = await import("./flag");
     expect(isBootstrapMode()).toBe(true);
   });
