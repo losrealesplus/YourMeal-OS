@@ -1,8 +1,11 @@
 # OP-002 · Permanent Platform Owners Bootstrap
 
-**Fecha:** 2026-07-25  
-**Rama:** `cursor/op-002-platform-owners-f54a`  
+**Última actualización:** 2026-07-26  
+**Proyecto oficial:** `djangucecsphnejplvic`  
 **Modelo:** Auth → Profile → Membership → `user_roles` → RBAC  
+
+**Runbook:** [BOOTSTRAP_RUNBOOK.md](./BOOTSTRAP_RUNBOOK.md)  
+**Validación live:** [PLATFORM_OWNER_VALIDATION.md](./PLATFORM_OWNER_VALIDATION.md) · [evidence/op002](./evidence/op002/validation-run.json)
 
 ---
 
@@ -21,7 +24,51 @@ Los correos **no viven en el código de aplicación**. Son configuración de boo
 
 ---
 
-## Configuración de bootstrap (fuente operativa)
+## 1. ¿De dónde sale el rol Platform Owner?
+
+**No** proviene de JWT claims custom ni de `user_metadata` para autorización.
+
+| Pieza | Rol en el flujo |
+|-------|-----------------|
+| `config/bootstrap/platform-owners.json` | Allowlist operativa (fuente de verdad de emails) |
+| `scripts/seed-platform-owners.mjs` | Sync JSON → `platform_owners` + Auth Admin create/reuse + RPC ensure |
+| `public.platform_owners` | Tabla de bootstrap (`active`, email, tenant_slug) |
+| RPC `ensure_platform_owner_for_user` | Seed: grants profile / membership / roles |
+| RPC `ensure_platform_owner_session` | Login: si email activo en tabla → mismos grants (idempotente) |
+| `user_roles` | `saas_admin` (global) + `company_admin` (tenant) |
+| `tenant_members` | Membership EatClean |
+| `src/lib/ensure-platform-owner-session.ts` | Cliente llama RPC — **sin** lista de emails |
+| `homePathForRoles` | `saas_admin`+`company_admin` → `/admin` (entry UI a `/saas`) |
+
+```text
+config JSON
+  → seed (Auth Admin API)
+  → auth.users + platform_owners
+  → ensure_platform_owner_for_user
+  → profiles + tenant_members + user_roles
+  → login
+  → ensure_platform_owner_session (no-op si ya granted)
+  → resolveHomePath → /admin → UI → /saas
+```
+
+---
+
+## 2. Procedimiento oficial elegido
+
+**Mecanismo:** Bootstrap Script ya soportado — `npm run seed:platform-owners`.
+
+| Alternativa | ¿Usada? | Motivo |
+|-------------|---------|--------|
+| Signup público UI | No como bootstrap primario | Requiere confirm email; seed es idempotente y confirmado |
+| Invite email | Sí si no hay `PLATFORM_OWNERS_PASSWORD` | `inviteUserByEmail` en el mismo script |
+| Auth Admin `createUser` | Sí (default con password) | Flujo Admin API oficial Supabase |
+| SQL `INSERT auth.users` | **Prohibido** | — |
+
+No se crearon mecanismos paralelos.
+
+---
+
+## 3. Configuración
 
 ```json
 {
@@ -34,120 +81,84 @@ Los correos **no viven en el código de aplicación**. Son configuración de boo
 }
 ```
 
-### Cambiar el propietario de la plataforma (sin tocar código)
+### Cambiar el propietario (sin tocar código app)
 
 1. Editar `config/bootstrap/platform-owners.json`  
 2. `npm run seed:platform-owners`  
-3. El script:
-   - sincroniza `public.platform_owners`
-   - crea/reutiliza Auth para los activos
-   - asigna `saas_admin` + `company_admin`
-   - **desactiva y revoca** grants de correos eliminados de la config  
-
-No hace falta modificar TypeScript, ni roles, ni RBAC.
+3. Removidos → deactivate + revoke  
 
 ---
 
-## Implementación
+## 4. Implementación
 
-| Pieza | Ruta | Función |
-|-------|------|---------|
-| Config | `config/bootstrap/platform-owners.json` | Lista de owners + tenant por defecto |
-| Schema | `config/bootstrap/platform-owners.schema.json` | Contrato JSON |
-| Migración base | `…120000_op002_platform_owners_bootstrap.sql` | RPCs + trigger + índice `saas_admin` |
-| Migración config | `…123000_op002_platform_owners_config.sql` | Tabla `platform_owners` + allowlist dinámica + revoke |
-| Script | `scripts/seed-platform-owners.mjs` | Sync config → DB → Auth → roles |
-| npm | `npm run seed:platform-owners` | Entrypoint |
-| Cliente | `src/lib/ensure-platform-owner-session.ts` | Primer login → RPC (sin lista hardcodeada) |
-
-**No** se crean roles nuevos, enums, bypasses ni allowlists en el frontend. El cliente solo invoca la RPC; los grants viven en Postgres según la tabla de bootstrap.
+| Pieza | Ruta |
+|-------|------|
+| Config | `config/bootstrap/platform-owners.json` |
+| Schema | `config/bootstrap/platform-owners.schema.json` |
+| Migraciones | `…_op002_platform_owners_*.sql` (ya en cadena) |
+| Script | `scripts/seed-platform-owners.mjs` |
+| npm | `npm run seed:platform-owners` |
+| Cliente | `src/lib/ensure-platform-owner-session.ts` |
 
 ### Idempotencia
 
-- `platform_owners` → upsert / `active=false` para removidos  
-- `profiles` / `tenant_members` / `user_roles` → sin duplicados  
-- Re-ejecutar seed es seguro  
+- Auth: reuse por email  
+- `platform_owners` upsert  
+- Roles/membership: ensure sin duplicar  
+- Re-run 2026-07-26: `auth: reused` PASS  
 
 ---
 
-## Comando
+## 5. Comando
 
 ```bash
-# Official project: djangucecsphnejplvic (INFRA-002)
 export SUPABASE_URL=https://djangucecsphnejplvic.supabase.co
-export SUPABASE_SERVICE_ROLE_KEY=...   # Dashboard → API (service_role / secret)
-# opcional — si falta, se invita por email
-export PLATFORM_OWNERS_PASSWORD='........'
+export SUPABASE_SERVICE_ROLE_KEY=...
+export PLATFORM_OWNERS_PASSWORD='........'   # opcional
 
 npm run seed:platform-owners
 ```
 
-Tras aplicar migraciones, el **primer login** también invoca `ensure_platform_owner_session()` y completa grants si el email está activo en `platform_owners`.
-
 ---
 
-## Navegación esperada
+## 6. Navegación esperada
 
 ```text
 Login
   ↓
-Landing
-  ↓
 /admin                    (company_admin + saas_admin → home híbrido)
   ↓
-Centro de Operaciones YourMeal OS   (SaasOpsEntry visible)
+Centro de Operaciones YourMeal OS / BrandLeaf SaaS
   ↓
 /saas
 ```
 
 ---
 
-## Evidencia de verificación
-
-### A · Código / contrato
+## 7. Evidencia live (2026-07-26)
 
 | Check | Resultado |
 |-------|-----------|
-| Owners en config de bootstrap (no en app source) | ✅ PASS |
-| Tabla `platform_owners` + RPCs config-backed | ✅ PASS |
-| Roles oficiales únicamente (`saas_admin`, `company_admin`) | ✅ PASS |
-| Tenant slug desde config (`eatclean-tenerife`) | ✅ PASS |
-| Session RPC sin allowlist hardcodeada en cliente | ✅ PASS |
-| Cambio de owner = editar JSON + re-seed | ✅ PASS (diseño) |
-| home-path híbrido | ✅ PASS (`company_admin`+`saas_admin` → `/admin`) |
+| Sync config → `platform_owners` | ✅ PASS |
+| Auth users ambos emails | ✅ PASS |
+| Roles `saas_admin` + `company_admin` | ✅ PASS |
+| Membership EatClean | ✅ PASS |
+| Login / refresh / re-login | ✅ PASS |
+| `ensure_platform_owner_session` | ✅ PASS |
+| List + create tenant (privilegio SaaS) | ✅ PASS |
+| Negativo no-owner | ✅ PASS |
+| Sin SQL Auth manual | ✅ PASS |
 
-### B · Runtime live (Auth + roles + UI)
-
-| Check | Observado | Resultado |
-|-------|-----------|-----------|
-| Sync config → `platform_owners` | *Pendiente service-role* | ⏳ PENDING |
-| Usuario `alex1409h@gmail.com` creado o reutilizado | *Pendiente service-role* | ⏳ PENDING |
-| Usuario `alexhdezmtinez@gmail.com` creado o reutilizado | *Pendiente service-role* | ⏳ PENDING |
-| Roles asignados (`saas_admin` + `company_admin`) | *Tras migración + seed/login* | ⏳ PENDING |
-| Tenant asignado EatClean Tenerife | *Tras migración + seed/login* | ⏳ PENDING |
-| Landing → `/admin` → SaasOpsEntry → `/saas` | *Tras login live* | ⏳ PENDING |
-
-> El entorno del agente Cloud no tiene `SUPABASE_SERVICE_ROLE_KEY`. Ejecutar seed + recorrido UI en el proyecto Supabase enlazado tras apply de migraciones.
+Detalle: [PLATFORM_OWNER_VALIDATION.md](./PLATFORM_OWNER_VALIDATION.md).
 
 ---
 
-## Verdict
+## 8. Verdict
 
 | Capa | Estado |
 |------|--------|
-| **Bootstrap Engineering (config + migración + script)** | **PASS** |
-| **Live Platform Owner journey** | **PENDING** |
+| Bootstrap Engineering | ✅ PASS |
+| Live Platform Owner identities | ✅ PASS |
+| Password human setup | ⬜ Forgot-password por operador |
 
-**OP-002 overall:** **PASS (engineering) / PENDING (live evidence)**
-
----
-
-## Checklist post-deploy
-
-1. Aplicar migraciones OP-002 (+ config table)  
-2. Confirmar `config/bootstrap/platform-owners.json`  
-3. `npm run seed:platform-owners`  
-4. Login con cada owner → `/admin` → YourMeal OS → `/saas`  
-5. Re-ejecutar seed → sin duplicados  
-6. (Opcional) Probar cambio de owner: editar JSON, re-seed, verificar revoke del anterior  
-7. Marcar sección B = PASS  
+**OP-002 overall:** **PASS** (operador: fijar passwords vía recovery).

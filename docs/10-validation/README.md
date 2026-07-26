@@ -50,7 +50,6 @@ Canonical status: [FOPEBA_STATUS_2026-07-25.md](../00-status/FOPEBA_STATUS_2026-
 
 ## Next
 
-1. Completar keys + Lovable Cloud (CUTOVER_REPORT checklist)  
-2. `npm run gen:types` con CLI autenticada  
-3. Day-0 / Platform Owner seed + smoke SaaS/Ops  
-4. ORR → PASS · CHECK-IT 05
+1. OP-002: Platform Owners live — [PLATFORM_OWNER_VALIDATION](./PLATFORM_OWNER_VALIDATION.md) · [BOOTSTRAP_RUNBOOK](./BOOTSTRAP_RUNBOOK.md)  
+2. Forgot-password para ambos owners → smoke UI `/admin` → `/saas`  
+3. INFRA-005 OAuth re-enable cuando proceda · ORR / módulos
