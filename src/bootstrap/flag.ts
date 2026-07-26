@@ -1,9 +1,17 @@
 /**
  * EP-BOOTSTRAP-001 · Development Bootstrap Mode flag.
  *
- * Default OFF. Never enable in production builds.
- * When false, zero bootstrap code paths affect identity behavior.
+ * ⚠️ DIAGNOSTIC SMOKE (temporary) — 2026-07-26
+ * Forced ON to answer: is Lovable serving this commit?
+ *
+ * Mundo A — Bootstrap UI appears → code runs; env injection was the failure.
+ * Mundo B — still /auth login → preview is NOT this build. Stop app changes.
+ *
+ * REVERT after the test. Production must never ship with FORCE_ON.
  */
+
+/** @diagnostic hard-coded true — do not merge as permanent */
+const BOOTSTRAP_SMOKE_FORCE_ON = true;
 
 function readFlag(value: unknown): boolean | undefined {
   if (value === undefined || value === null || value === "") return undefined;
@@ -21,8 +29,13 @@ function viteEnvFlag(): unknown {
   }
 }
 
-/** True only when `VITE_BOOTSTRAP_MODE` is explicitly enabled. Default: false. */
+/**
+ * Bootstrap Mode gate.
+ * During smoke diagnostic: always true (ignores env).
+ */
 export function isBootstrapMode(): boolean {
+  if (BOOTSTRAP_SMOKE_FORCE_ON) return true;
+
   const fromProcess = readFlag(process.env.VITE_BOOTSTRAP_MODE);
   if (fromProcess !== undefined) return fromProcess;
   return readFlag(viteEnvFlag()) ?? false;
