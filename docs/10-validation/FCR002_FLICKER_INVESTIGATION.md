@@ -1,14 +1,39 @@
-# FCR-002 · Titileo / vibración — investigación
+# FCR-002 · Render Stability Regression
 
 **Severidad:** P1  
+**Clasificación:** Render Stability Regression (no «solo titileo»)  
+**Síntoma visible:** titileo / parpadeo / vibración en Ops  
 **Estado:** Hipótesis priorizadas — **sin fix en este PR**  
 **Contexto:** Functional Review Mode · Centro de Operaciones
 
 ---
 
-## Síntoma
+## Nota metodológica
 
-Vibración / titileo durante la navegación en Ops (capturas Bootstrap).
+| | |
+|--|--|
+| **Síntoma** | Titileo / parpadeo |
+| **Clase de defecto** | **Render Stability Regression** |
+| **Causa sospechada** | Render loop inducido por dependencia inestable |
+
+No clasificar el hallazgo solo por el síntoma visual.  
+ORR y el bloque de fixes deben atacar la estabilidad de render, no «quitar la animación».
+
+---
+
+## Cadena sospechada
+
+```text
+render
+  → useCan()  (nueva referencia de `can`)
+  → useEffect([…, can, …])
+  → setLoading(…)
+  → render
+  → useCan()
+  → …
+```
+
+Patrón: **render loop inducido por dependencia inestable**.
 
 ---
 
@@ -16,69 +41,46 @@ Vibración / titileo durante la navegación en Ops (capturas Bootstrap).
 
 | Patrón | Hallazgos relevantes |
 |--------|----------------------|
-| `refetchInterval` | `use-upcoming-delivery.ts` → `60_000` (Customer Home; poco probable causa Ops) |
+| `refetchInterval` | `use-upcoming-delivery.ts` → `60_000` (Customer; poco probable en Ops) |
 | `setInterval` | No en shell Ops |
-| `setTimeout` | Debounce en `admin.customers` / `admin.support` — no continuo |
-| `navigate()` en `useEffect` | `index`, `auth*`, `saas.tsx` sign-out — no loop obvio en `/admin` |
-| `router.invalidate()` | `__root`, `supabase-identity-provider`, **`bootstrap-identity-provider`** (al cambiar perfil) |
-| Animaciones | `animate-fade-in` en muchas rutas admin; **`ops-home-in`** (translateY) en `admin.index.tsx` |
+| `setTimeout` | Debounce customers/support — no continuo |
+| `navigate()` en `useEffect` | Auth/index — no loop obvio en `/admin` |
+| `router.invalidate()` | Bootstrap al cambiar perfil (esperado) |
+| Animaciones | `ops-home-in` / `animate-fade-in` — **amplifican** el síntoma al remount; no son la causa raíz |
 
 ---
 
-## Hipótesis #1 (alta probabilidad) — deps inestables en Ops Home
+## Hipótesis #1 (alta) — deps inestables en Ops Home
 
-`src/routes/_authenticated/admin.index.tsx`:
+`src/routes/_authenticated/admin.index.tsx` incluye `can` en el array de deps del `useEffect` de contadores.
 
-```ts
-useEffect(() => { /* fetch counts; setLoading(true/false) */ }, [
-  user, tenantId, roles, can, date, showKitchen, ...
-]);
-```
+`useCan()` devuelve un **nuevo** `can` en cada render → el efecto se re- dispara → `setLoading` → re-render.
 
-`useCan()` devuelve un **nuevo** `can` en cada render:
-
-```ts
-// src/hooks/use-can.ts
-return { can: (capability) => can(roles, capability), ... };
-```
-
-Efecto: cada render → efecto se re-ejecuta → `setLoading(true)` → re-render → efecto otra vez.  
-La animación `ops-home-in` / `animate-fade-in` se re-dispara → **titileo visual**.
-
-**Fix candidato (bloque render, no este PR):** estabilizar `can` (`useCallback`) o quitar `can` de deps y depender solo de `roles`.
+**Fix candidato (bloque Render Stability, no ahora):** estabilizar `can` o depender de `roles` (valores), no de la identidad de la función.
 
 ---
 
 ## Hipótesis #2 (media) — remount por `router.invalidate`
 
-`BootstrapIdentityProvider` llama `router.invalidate()` en cada evento `subscribeBootstrapAuth`.  
-Al cambiar perfil es correcto; si algo notificara listeners en bucle, remountaría el árbol.  
-El DEV panel **no** hace polling; solo `navigate` al cambiar select.
+Solo al cambiar identidad Bootstrap. No explica titileo en idle si no hay eventos de auth.
 
 ---
 
-## Hipótesis #3 (baja en Ops) — polling React Query
+## Hipótesis #3 (baja) — polling
 
-Único `refetchInterval` encontrado: 60s en upcoming delivery (Customer). No explica titileo continuo en `/admin`.
-
----
-
-## Hipótesis #4 — CSS de entrada
-
-`ops-home-in` mueve `translateY(6px)`. Si el nodo remonta a >1 Hz, se percibe como vibración aunque el layout sea estable.
+Único `refetchInterval` 60s en Customer Home.
 
 ---
 
-## Cómo confirmar (operador / DevTools)
+## Cómo confirmar
 
-1. Abrir `/admin` como Company Admin (Bootstrap).
-2. React Profiler / highlight updates — ¿Ops Home parpadea sin interacción?
-3. Comentar temporalmente (solo local) deps `can` o las keyframes — ¿desaparece?
-4. Ocultar DEV panel (CSS) — ¿persiste? (esperado: sí, si H1 es cierta)
+1. `/admin` Company Admin — ¿parpadea sin interacción?
+2. Profiler: ¿Ops Home re-renderiza en bucle?
+3. Quitar `can` de deps (solo local) — ¿desaparece el loop?
+4. Ocultar DEV panel — esperado: el síntoma **persiste** si H1 es cierta
 
 ---
 
 ## Decisión
 
-No aplicar fix hasta cerrar más hallazgos del bloque «Render».  
-Prioridad del bloque: FCR-002 H1 primero.
+Sin fix hasta el bloque «Render stability». Prioridad: H1.

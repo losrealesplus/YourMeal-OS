@@ -25,8 +25,10 @@ docs/10-validation/
 ├── UX_BRANDLEAFMARK_ADMIN_SHELL.md
 ├── DEPLOYMENT_VERIFICATION.md
 ├── FCR_FINDINGS_REGISTER.md              ← Functional Review Mode · hallazgos
-├── RBAC_MATRIX_V1.md                     ← matriz pantallas × perfiles
-├── FCR002_FLICKER_INVESTIGATION.md       ← titileo Ops (sin fix aún)
+├── FCR_SESSION_LOG.md                    ← pantalla × resultado × evidencia × acción
+├── RBAC_MATRIX_V1.md                     ← autorización por Tenant/Platform Surface
+├── WORKSPACE_ENTRY_POLICY.md             ← landings (≠ RBAC)
+├── FCR002_FLICKER_INVESTIGATION.md       ← Render Stability Regression
 ├── POST_DEPLOY_SMOKE_OP001.md
 ├── RI001_CERTIFICATION_SPRINT.md
 ├── checklists/ · reports/ · evidence/

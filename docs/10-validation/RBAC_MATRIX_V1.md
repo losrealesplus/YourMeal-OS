@@ -2,29 +2,40 @@
 
 **Estado:** Borrador de certificación (esperado vs observado Bootstrap)  
 **No corrige permisos** — alimenta el bloque de fixes tras la pasada FCR.  
-**Regla:** [RBAC-001 en FCR_FINDINGS_REGISTER](./FCR_FINDINGS_REGISTER.md)
+**Eje:** Autorización por **superficie** (Tenant / Platform / Customer) — no «usuario vs usuario».  
+**Landings:** [WORKSPACE_ENTRY_POLICY](./WORKSPACE_ENTRY_POLICY.md) (eje distinto).  
+**Regla:** [RBAC-001](./FCR_FINDINGS_REGISTER.md)
 
 Leyenda: ✅ permitido · ❌ denegado · ⚠ parcial / ambiguo · □ por recorrer
 
----
-
-## Home path esperado (producto)
-
-| Perfil | Landing esperado |
-|--------|------------------|
-| Customer | `/app` |
-| Kitchen | `/admin/kitchen-execution` |
-| Delivery | `/admin/delivery` |
-| Support | `/admin/support` |
-| Accounting | `/admin/accounting` |
-| Company Admin | `/admin` (EatClean Ops) |
-| SaaS Admin | `/admin` **y** `/saas` (plataformas distintas) |
-
-**Código actual (`homePathForRoles`):** Kitchen → `/admin/kitchen` · Support/Accounting → `/admin` · SaaS+company_admin → `/admin`. Ver FCR-004/005/006.
+```text
+Tenant Surface     →  /admin
+Platform Surface   →  /saas
+Customer Surface   →  /app
+```
 
 ---
 
-## Superficies
+## Landings (resumen — ver Entry Policy)
+
+| Perfil | Landing (política) | Superficie de entrada |
+|--------|--------------------|------------------------|
+| Customer | `/app` | Customer |
+| Kitchen | `/admin/kitchen-execution` | Tenant · Workspace |
+| Delivery | `/admin/delivery` | Tenant · Workspace |
+| Support | `/admin/support` | Tenant · Workspace |
+| Accounting | `/admin/accounting` | Tenant · Workspace |
+| Company Admin | `/admin` | Tenant Surface |
+| SaaS Admin | `/saas` | Platform Surface |
+
+**Código actual (`homePathForRoles`):** gaps FCR-004/005/006.
+
+---
+
+## Autorización por pantalla (Tenant / Platform / Customer)
+
+Columnas = roles de sesión Bootstrap. Filas = rutas.  
+SaaS Admin en columnas Tenant = acceso *al tenant* solo si el producto lo concede; su superficie nativa es Platform.
 
 | Pantalla / ruta | Customer | Kitchen | Delivery | Support | Accounting | Company Admin | SaaS Admin |
 |-----------------|----------|---------|----------|---------|------------|---------------|------------|
@@ -68,9 +79,9 @@ Leyenda: ✅ permitido · ❌ denegado · ⚠ parcial / ambiguo · □ por recor
 | Selector muestra Company Admin (`company_admin`) vs SaaS Admin (`company_admin, saas_admin`) | ✅ perfiles OK |
 | Company Admin → `/admin` EatClean | □ confirmar en pasada |
 | Company Admin → no navega a `/saas` por defecto | □ |
-| Company Admin Ajustes ≈ mismas tiles que SaaS Admin en `/admin/settings` | **FCR-001** observado |
-| SaaS Admin tiene entry a `/saas` desde Ops | □ |
-| Titileo en navegación Ops | **FCR-002** |
+| Ajustes Tenant: mismas tiles con o sin rol Platform | **FCR-001** · Tenant vs Platform Surface |
+| SaaS Admin Entry Policy → `/saas` | □ · FCR-006 |
+| Render Stability (titileo Ops) | **FCR-002** |
 
 ---
 
