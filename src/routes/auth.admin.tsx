@@ -5,11 +5,13 @@ import { Lock, Mail } from "lucide-react";
 import { getSession, signInWithPassword, signOut } from "@/auth";
 import { supabase } from "@/integrations/supabase/client";
 import type { AppRole } from "@/hooks/use-auth";
-import { hasStaffAccess } from "@/permissions";
 import {
-  parseOperationsAuthSearch,
-  resolvePostAdminLoginPath,
-} from "@/lib/open-operations-center";
+  classifyAdminAuthBootstrapError,
+  enterOperationsCenter,
+  reportAdminAuthBootstrapFailure,
+  type ClassifiedAdminAuthError,
+} from "@/lib/admin-auth-bootstrap";
+import { parseOperationsAuthSearch } from "@/lib/open-operations-center";
 import { ensurePlatformOwnerSession } from "@/lib/ensure-platform-owner-session";
 import { toast } from "sonner";
 import {
@@ -24,6 +26,8 @@ import { brandConfig, tenantCopyEs } from "@/tenant/brand-config";
  * Operations Center login — official backoffice gate.
  * EP-002A.1.1: after staff auth, return to Ops Center (or safe returnTo).
  * No public registration. No customer OAuth / phone.
+ *
+ * BUGFIX-001: bootstrap failures must never leave checkingSession stuck true.
  */
 export const Route = createFileRoute("/auth/admin")({
   validateSearch: (search: Record<string, unknown>) =>
@@ -50,20 +54,13 @@ async function loadRoles(userId: string): Promise<AppRole[]> {
   return (data ?? []).map((r) => r.role as AppRole);
 }
 
-async function enterOperationsCenter(
-  navigate: ReturnType<typeof useNavigate>,
-  userId: string,
-  returnTo?: string,
-): Promise<"ok" | "not_staff"> {
-  // OP-002: permanent Platform Owners get roles before staff gate.
-  await ensurePlatformOwnerSession();
-  const roles = await loadRoles(userId);
-  if (!hasStaffAccess(roles)) {
-    return "not_staff";
-  }
-  const path = resolvePostAdminLoginPath(roles, returnTo);
-  navigate({ to: path as "/admin", replace: true });
-  return "ok";
+async function tryEnterOperationsCenter(userId: string, returnTo?: string) {
+  return enterOperationsCenter({
+    userId,
+    returnTo,
+    ensurePlatformOwnerSession,
+    loadRoles,
+  });
 }
 
 function AdminAuthPage() {
@@ -75,39 +72,65 @@ function AdminAuthPage() {
   const [busy, setBusy] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
   const [nonStaffSession, setNonStaffSession] = useState(false);
+  const [bootstrapError, setBootstrapError] =
+    useState<ClassifiedAdminAuthError | null>(null);
+  const [retryNonce, setRetryNonce] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
+
     void (async () => {
-      const { data } = await getSession();
-      const user = data.session?.user;
-      if (!user) {
+      setCheckingSession(true);
+      setBootstrapError(null);
+      setNonStaffSession(false);
+
+      let userId: string | null = null;
+      try {
+        const { data, error: sessionError } = await getSession();
+        if (sessionError) throw sessionError;
+
+        const user = data.session?.user;
+        if (!user) {
+          return;
+        }
+        userId = user.id;
+
+        const result = await tryEnterOperationsCenter(user.id, returnTo);
+        if (cancelled) return;
+
+        if (result.status === "not_staff") {
+          setNonStaffSession(true);
+          return;
+        }
+
+        navigate({ to: result.path as "/admin", replace: true });
+      } catch (err) {
+        if (cancelled) return;
+        const classified = classifyAdminAuthBootstrapError(err);
+        reportAdminAuthBootstrapFailure(err, classified, {
+          route: "/auth/admin",
+          userId,
+        });
+        setBootstrapError(classified);
+        // Do not navigate. Do not treat ensure failure as staff success.
+      } finally {
         if (!cancelled) {
           setCheckingSession(false);
-          setNonStaffSession(false);
         }
-        return;
       }
-
-      const result = await enterOperationsCenter(navigate, user.id, returnTo);
-      if (cancelled) return;
-      if (result === "not_staff") {
-        setNonStaffSession(true);
-        setCheckingSession(false);
-        return;
-      }
-      // staff → navigation in progress
     })();
+
     return () => {
       cancelled = true;
     };
-  }, [navigate, returnTo]);
+  }, [navigate, returnTo, retryNonce]);
 
   async function switchAccount() {
     setBusy(true);
     try {
       await signOut();
       setNonStaffSession(false);
+      setBootstrapError(null);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
     } finally {
@@ -118,6 +141,7 @@ function AdminAuthPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
+    setBootstrapError(null);
     try {
       const { error } = await signInWithPassword({
         email,
@@ -127,16 +151,33 @@ function AdminAuthPage() {
       const { data: sessionData } = await getSession();
       const uid = sessionData.session?.user?.id;
       if (!uid) {
-        navigate({ to: "/admin", replace: true });
-        return;
+        throw new Error("Auth session missing");
       }
-      const result = await enterOperationsCenter(navigate, uid, returnTo);
-      if (result === "not_staff") {
+      const result = await tryEnterOperationsCenter(uid, returnTo);
+      if (result.status === "not_staff") {
         setNonStaffSession(true);
         toast.error(t("auth:adminNotStaff"));
+        return;
       }
+      navigate({ to: result.path as "/admin", replace: true });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : String(err));
+      const classified = classifyAdminAuthBootstrapError(err);
+      reportAdminAuthBootstrapFailure(err, classified, {
+        route: "/auth/admin",
+        userId: null,
+      });
+      // Credential mistakes stay on the form (toast only). Bootstrap/infra
+      // failures also surface the retry panel without granting access.
+      if (
+        classified.kind === "rpc_missing" ||
+        classified.kind === "network" ||
+        classified.kind === "forbidden" ||
+        classified.kind === "unexpected" ||
+        classified.kind === "session"
+      ) {
+        setBootstrapError(classified);
+      }
+      toast.error(t(`auth:${classified.messageKey}`));
     } finally {
       setBusy(false);
     }
@@ -166,6 +207,28 @@ function AdminAuthPage() {
               <p className="mt-8 text-center text-sm text-muted-foreground">
                 {t("common:loading")}
               </p>
+            ) : bootstrapError ? (
+              <div className="mt-8 space-y-4 text-center">
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {t(`auth:${bootstrapError.messageKey}`)}
+                </p>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => setRetryNonce((n) => n + 1)}
+                  className="w-full bg-primary text-primary-foreground text-[15px] font-semibold py-3.5 rounded-2xl disabled:opacity-50 hover:opacity-95 transition-opacity"
+                >
+                  {t("auth:adminBootstrapRetry")}
+                </button>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => void switchAccount()}
+                  className="w-full border border-border/80 bg-white text-[15px] font-semibold py-3.5 rounded-2xl disabled:opacity-50 hover:bg-muted/60 transition-colors"
+                >
+                  {t("auth:adminSwitchAccount")}
+                </button>
+              </div>
             ) : nonStaffSession ? (
               <div className="mt-8 space-y-4 text-center">
                 <p className="text-sm text-muted-foreground leading-relaxed">

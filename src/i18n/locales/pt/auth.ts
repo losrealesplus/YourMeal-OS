@@ -37,4 +37,17 @@ export default {
     "Está autenticado como cliente. Termine a sessão e use uma conta de pessoal.",
   adminSwitchAccount: "Usar outra conta",
   backToCustomerLogin: "Voltar ao início de sessão",
+  adminBootstrapRetry: "Tentar novamente",
+  adminBootstrapNetwork:
+    "Não foi possível contactar o serviço de autenticação. Verifique a ligação e tente novamente.",
+  adminBootstrapRpcMissing:
+    "O bootstrap da plataforma ainda não está disponível (migração ou RPC em falta). O acesso de staff não pode continuar com segurança.",
+  adminBootstrapAuth:
+    "A autenticação falhou ao preparar a sessão. Inicie sessão novamente.",
+  adminBootstrapSession:
+    "A sessão falta ou expirou. Inicie sessão novamente para continuar.",
+  adminBootstrapForbidden:
+    "Esta conta não pode concluir o bootstrap do Centro de Operações.",
+  adminBootstrapUnexpected:
+    "Algo falhou ao abrir o Centro de Operações. Tente novamente.",
 } as const;
