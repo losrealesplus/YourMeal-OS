@@ -24,6 +24,7 @@ docs/10-validation/
 ├── RUNTIME_VERIFICATION_EVIDENCE.md      ← Playwright 2026-07-25
 ├── UX_BRANDLEAFMARK_ADMIN_SHELL.md
 ├── DEPLOYMENT_VERIFICATION.md
+<<<<<<< HEAD
 ├── OPERATIONAL_READINESS_CERTIFICATION.md ← Surface + Flow · ORR READY
 ├── FLOW_CERTIFICATION.md                 ← Nivel 2 · plantilla (post Pasada 2)
 ├── FCR_FINDINGS_REGISTER.md              ← Functional Review Mode · hallazgos
@@ -31,6 +32,9 @@ docs/10-validation/
 ├── RBAC_MATRIX_V1.md                     ← autorización por Tenant/Platform Surface
 ├── WORKSPACE_ENTRY_POLICY.md             ← landings (≠ RBAC; candidato ADR)
 ├── FCR002_FLICKER_INVESTIGATION.md       ← Render Stability Regression
+=======
+├── LOVABLE_DEPLOYMENT_AUDIT_BOOTSTRAP.md  ← Bootstrap #82 · DV-001 Lovable sync
+>>>>>>> origin/main
 ├── POST_DEPLOY_SMOKE_OP001.md
 ├── RI001_CERTIFICATION_SPRINT.md
 ├── checklists/ · reports/ · evidence/
