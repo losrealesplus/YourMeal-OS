@@ -1,20 +1,29 @@
 import type { ReactNode } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { isBootstrapMode } from "./flag";
+import { BootstrapModeBanner } from "./BootstrapModeBanner";
 import { BootstrapProfileSelector } from "./BootstrapProfileSelector";
 import { BootstrapDevPanel } from "./BootstrapDevPanel";
 
 /**
- * When Bootstrap Mode is on and no profile is selected, show the selector.
- * Otherwise render the app unchanged + DEV panel (if profile active).
- * Uses useAuth() so profile switches re-render without screen-level flags.
+ * When Bootstrap Mode is on:
+ * - always show the permanent Bootstrap Mode banner
+ * - if no profile → selector
+ * - else → app + DEV panel
  */
 export function BootstrapShell({ children }: { children: ReactNode }) {
   if (!isBootstrapMode()) {
     return <>{children}</>;
   }
 
-  return <BootstrapShellActive>{children}</BootstrapShellActive>;
+  return (
+    <div className="min-h-screen flex flex-col">
+      <BootstrapModeBanner />
+      <div className="flex-1 min-h-0">
+        <BootstrapShellActive>{children}</BootstrapShellActive>
+      </div>
+    </div>
+  );
 }
 
 function BootstrapShellActive({ children }: { children: ReactNode }) {
