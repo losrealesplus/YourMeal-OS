@@ -24,3 +24,22 @@ describe("isOAuthSocialEnabled", () => {
     expect(isOAuthSocialEnabled()).toBe(false);
   });
 });
+
+describe("isPhoneAuthEnabled", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
+  it("defaults to false when unset", async () => {
+    vi.stubEnv("VITE_AUTH_PHONE_ENABLED", "");
+    const { isPhoneAuthEnabled } = await import("./features");
+    expect(isPhoneAuthEnabled()).toBe(false);
+  });
+
+  it("enables when VITE_AUTH_PHONE_ENABLED=true", async () => {
+    vi.stubEnv("VITE_AUTH_PHONE_ENABLED", "true");
+    const { isPhoneAuthEnabled } = await import("./features");
+    expect(isPhoneAuthEnabled()).toBe(true);
+  });
+});

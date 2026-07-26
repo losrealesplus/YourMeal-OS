@@ -21,9 +21,15 @@ export default {
   resetPassword: "Reimposta password",
   newPassword: "Nuova password",
   updatePassword: "Aggiorna password",
-  checkEmail: "Controlla la tua casella",
+  checkEmail: "Controlla la posta per confermare l'account.",
   resetSent: "Ti abbiamo inviato un link di reimpostazione.",
   passwordUpdated: "Password aggiornata",
+  emailAlreadyRegistered:
+    "Questa email ha già un account. Accedi o reimposta la password.",
+  passwordTooWeak: "La password deve avere almeno 6 caratteri.",
+  recoveryPreparing: "Preparazione del reset…",
+  recoveryLinkInvalid:
+    "Questo link di recupero non è valido o è scaduto. Richiedine uno nuovo da Accedi.",
   adminTitle: "Centro operazioni",
   adminSubtitle: "Inizia qui la tua giornata.",
   adminEnter: "Entra",

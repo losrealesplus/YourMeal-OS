@@ -1,0 +1,45 @@
+{
+  "capturedAt": "2026-07-26T16:53:35.245Z",
+  "project": "djangucecsphnejplvic",
+  "epic": "PRODUCT-001",
+  "settings": {
+    "email": true,
+    "phone": false,
+    "google": false,
+    "apple": false,
+    "disable_signup": false,
+    "mailer_autoconfirm": false,
+    "phone_autoconfirm": false,
+    "sms_provider": "twilio"
+  },
+  "probes": {
+    "phoneOtp": {
+      "error": "Unsupported phone provider",
+      "status": 400
+    },
+    "weakPassword": {
+      "error": "Password should be at least 6 characters.",
+      "status": 422
+    },
+    "resetInvalidEmail": {
+      "error": "Unable to validate email address: invalid format"
+    },
+    "resetValidRequest": {
+      "error": null,
+      "accepted": true
+    },
+    "signup": {
+      "error": "email rate limit exceeded",
+      "status": 429,
+      "session": false
+    }
+  },
+  "codeFindings": {
+    "signupUiWired": true,
+    "resetRequestWired": true,
+    "resetPkceGapFixed": "passwordResetRedirectTo → /auth/callback?next=/reset-password; AuthCallback honors next",
+    "phoneUiPlaceholder": "Phone Auth off; UI gated by VITE_AUTH_PHONE_ENABLED=false",
+    "employeeFreeSignup": false,
+    "employeeOfficialPath": "inviteTenantStaff / saas inviteUserByEmail"
+  }
+}

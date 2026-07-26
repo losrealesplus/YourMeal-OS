@@ -10,6 +10,10 @@ docs/10-validation/
 ├── SUPABASE_AUTH_VALIDATION.md           ← INFRA-003 Fase 2
 ├── AUTH_MIGRATION_REPORT.md              ← INFRA-003 cierre código
 ├── IDENTITY_VALIDATION_REPORT.md         ← INFRA-005 email/password
+├── IDENTITY_PRODUCT_REPORT.md            ← PRODUCT-001 epic cierre
+├── EMAIL_SIGNUP_VALIDATION.md            ← PRODUCT-001
+├── PASSWORD_RESET_VALIDATION.md          ← PRODUCT-001
+├── PHONE_AUTH_AUDIT.md                   ← PRODUCT-001
 ├── RBAC_VALIDATION.md                    ← INFRA-005
 ├── TENANT_ISOLATION_REPORT.md            ← INFRA-005
 ├── CHECKLIST_IDENTITY_VALIDATION.md      ← INFRA-005 operador
@@ -34,6 +38,11 @@ Cutover report: [CUTOVER_REPORT](./CUTOVER_REPORT.md)
 
 Email/password focus · OAuth UI gated by `VITE_AUTH_OAUTH_SOCIAL_ENABLED` (default false).  
 Reports: [IDENTITY](./IDENTITY_VALIDATION_REPORT.md) · [RBAC](./RBAC_VALIDATION.md) · [TENANT](./TENANT_ISOLATION_REPORT.md) · [Checklist](./CHECKLIST_IDENTITY_VALIDATION.md)
+
+## PRODUCT-001 · Identity flows (product)
+
+Signup / password reset / phone audit (no OAuth reactivation).  
+Reports: [PRODUCT](./IDENTITY_PRODUCT_REPORT.md) · [Email signup](./EMAIL_SIGNUP_VALIDATION.md) · [Password reset](./PASSWORD_RESET_VALIDATION.md) · [Phone](./PHONE_AUTH_AUDIT.md) · [evidence](./evidence/product-001/)
 
 ## FOPEBA gates (CI)
 

@@ -21,9 +21,15 @@ export default {
   resetPassword: "Redefinir palavra-passe",
   newPassword: "Nova palavra-passe",
   updatePassword: "Atualizar palavra-passe",
-  checkEmail: "Verifique a sua caixa de entrada",
+  checkEmail: "Verifique o e-mail para confirmar a conta.",
   resetSent: "Enviámos um link para redefinir a palavra-passe.",
   passwordUpdated: "Palavra-passe atualizada",
+  emailAlreadyRegistered:
+    "Este e-mail já tem conta. Inicie sessão ou redefina a palavra-passe.",
+  passwordTooWeak: "A palavra-passe deve ter pelo menos 6 caracteres.",
+  recoveryPreparing: "A preparar a redefinição…",
+  recoveryLinkInvalid:
+    "Este link de recuperação é inválido ou expirou. Peça um novo em Iniciar sessão.",
   adminTitle: "Centro de Operações",
   adminSubtitle: "Começa aqui o teu dia.",
   adminEnter: "Entrar",

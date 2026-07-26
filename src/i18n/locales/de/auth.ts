@@ -21,9 +21,15 @@ export default {
   resetPassword: "Passwort zurücksetzen",
   newPassword: "Neues Passwort",
   updatePassword: "Passwort aktualisieren",
-  checkEmail: "Prüfen Sie Ihren Posteingang",
+  checkEmail: "Prüfen Sie Ihren Posteingang, um das Konto zu bestätigen.",
   resetSent: "Wir haben Ihnen einen Link zum Zurücksetzen gesendet.",
   passwordUpdated: "Passwort aktualisiert",
+  emailAlreadyRegistered:
+    "Diese E-Mail hat bereits ein Konto. Melde dich an oder setze dein Passwort zurück.",
+  passwordTooWeak: "Das Passwort muss mindestens 6 Zeichen haben.",
+  recoveryPreparing: "Passwort-Reset wird vorbereitet…",
+  recoveryLinkInvalid:
+    "Dieser Wiederherstellungslink ist ungültig oder abgelaufen. Fordere einen neuen unter Anmelden an.",
   adminTitle: "Operationszentrum",
   adminSubtitle: "Hier beginnt dein Arbeitstag.",
   adminEnter: "Anmelden",

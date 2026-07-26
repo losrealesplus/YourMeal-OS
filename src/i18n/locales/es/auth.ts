@@ -19,9 +19,15 @@ export default {
   resetPassword: "Restablecer contraseña",
   newPassword: "Nueva contraseña",
   updatePassword: "Actualizar contraseña",
-  checkEmail: "Revisa tu correo",
+  checkEmail: "Revisa tu correo para confirmar la cuenta.",
   resetSent: "Te hemos enviado un enlace para restablecer tu contraseña.",
   passwordUpdated: "Contraseña actualizada",
+  emailAlreadyRegistered:
+    "Este correo ya tiene una cuenta. Inicia sesión o restablece tu contraseña.",
+  passwordTooWeak: "La contraseña debe tener al menos 6 caracteres.",
+  recoveryPreparing: "Preparando restablecimiento…",
+  recoveryLinkInvalid:
+    "Este enlace de recuperación no es válido o ha caducado. Solicita uno nuevo desde Iniciar sesión.",
   adminTitle: "Centro de Operaciones",
   adminSubtitle: "Empieza aquí tu jornada.",
   adminEnter: "Entrar",
