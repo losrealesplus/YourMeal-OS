@@ -1,0 +1,32 @@
+{
+  "epic": "BUGFIX-002",
+  "capturedAt": "2026-07-26T17:21:10.467Z",
+  "result": "PASS",
+  "testFiles": [
+    {
+      "name": "admin-auth-bootstrap.spec.ts",
+      "status": "passed"
+    },
+    {
+      "name": "ensure-platform-owner-session.spec.ts",
+      "status": "passed"
+    },
+    {
+      "name": "resolve-home-path.spec.ts",
+      "status": "passed"
+    }
+  ],
+  "totals": {
+    "testFiles": 9,
+    "tests": 29,
+    "passed": 29,
+    "failed": 0
+  },
+  "actors": {
+    "customer": "PASS — resolveHomePath → /app when PO RPC fails",
+    "employee": "PASS — resolveHomePath → /admin/kitchen when PO RPC fails",
+    "tenantAdmin": "PASS — resolveHomePath → /admin when PO RPC fails",
+    "platformOwnerStrict": "PASS — enterOperationsCenter still throws on ensure failure",
+    "noPrivilegeInvention": "PASS — empty roles → /app"
+  }
+}

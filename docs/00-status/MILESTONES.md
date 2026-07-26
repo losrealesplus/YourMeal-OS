@@ -20,6 +20,8 @@ Registro **inmutable** de hitos. No es gestión de sprint: es memoria objetiva.
 | 2026-07-23 | Experience base EatClean · **ACT-001 Frozen** | Bloque #24→#30 · [ACT-001](./ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) · Brand Continuity Lock |
 | 2026-07-23 | **Foundation of Materialization · ACT-002 Frozen v1** | Bloque #24→#31 · [ACT-002](./ACT-002_FOUNDATION_OF_MATERIALIZATION_FROZEN.md) · [FOUR_LAYERS](../05-architecture/FOUR_LAYERS.md) · Tenant-Managed |
 | 2026-07-26 | **Identity Freeze v1** | Auth · session · OP-002 · RBAC · tenant isolation · admin entry · [IDENTITY_FREEZE_v1](./IDENTITY_FREEZE_v1.md) |
+| 2026-07-26 | **BUGFIX-002 · Nav ≠ PO ensure** | [BUGFIX002](../10-validation/BUGFIX002_NAVIGATION_DECOUPLING.md) · least privilege preserved |
+| 2026-07-26 | **Auth Layer STATUS: Frozen** | No más PRs Auth salvo bug / providers · foco → dominio de negocio |
 | *(abierto)* | **EatClean Pilot Ready** | [Acta](./MILESTONE_EATCLEAN_PILOT_READY.md) · [PILOT_EXECUTION_GUIDE](../18-operational-validation/PILOT_EXECUTION_GUIDE.md) · EP-001…EP-005 |
 | *(aplazado)* | **Marketing Readiness** | [Acta](./MILESTONE_MARKETING_READINESS.md) · GSC/SEO **después** de RI-001 · [decisiones Lovable](./LOVABLE_FINDINGS_DECISIONS.md) |
 | *(pendiente)* | ORR PASSED \| BLOCKED | Puerta binaria · evidencia · sin features |

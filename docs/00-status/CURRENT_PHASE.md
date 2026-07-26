@@ -1,9 +1,19 @@
 # CURRENT_PHASE
 
-**Última actualización:** 2026-07-24  
+**Última actualización:** 2026-07-26  
 **No sustituye** [MILESTONES](./MILESTONES.md) — tablero de “dónde estamos ahora”.
 
 ```text
+══════════════════════════════════════════════════
+AUTH LAYER · FROZEN (2026-07-26)
+══════════════════════════════════════════════════
+FOUNDATION · INFRA · Identity · PO Bootstrap · Product Identity · Nav Decoupling  ✅
+Allowed: bug / security / OAuth·Phone activation
+Forbidden: Auth refactor · RBAC · Session · Bootstrap · Callback redesign
+Siguiente: dominio de negocio — no más PRs Auth salvo incidencia/providers
+Acta: IDENTITY_FREEZE_v1.md
+══════════════════════════════════════════════════
+
 ══════════════════════════════════════════════════
 PROJECT STATE · RI-001 · Pilot Readiness
 ══════════════════════════════════════════════════

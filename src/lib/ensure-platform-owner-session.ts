@@ -6,6 +6,10 @@
  * `config/bootstrap/platform-owners.json`) — not by hardcoded frontend lists.
  *
  * For non-owners the RPC is a no-op. Does not bypass RBAC.
+ *
+ * BUGFIX-002: call sites choose strict vs best-effort:
+ * - `required: true` (default) — Ops / SaaS entry; failures throw
+ * - `required: false` — home / global nav; failures never block navigation
  */
 import { getUser } from "@/auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,6 +32,14 @@ export type PlatformOwnerEnsureResult = {
   email?: string;
   roles?: AppRole[];
   tenant_slug?: string;
+};
+
+export type EnsurePlatformOwnerSessionOptions = {
+  /**
+   * When true (default), auth/RPC failures throw (strict Ops entry).
+   * When false, log and return null so global navigation can continue.
+   */
+  required?: boolean;
 };
 
 function isAppRole(value: string): value is AppRole {
@@ -68,9 +80,25 @@ function parsePlatformOwnerEnsureResult(
   return result;
 }
 
-export async function ensurePlatformOwnerSession(): Promise<PlatformOwnerEnsureResult | null> {
+/**
+ * Best-effort Platform Owner ensure for global navigation / home resolution.
+ * Never throws — never grants roles client-side on failure.
+ */
+export async function tryEnsurePlatformOwnerSession(): Promise<PlatformOwnerEnsureResult | null> {
+  return ensurePlatformOwnerSession({ required: false });
+}
+
+export async function ensurePlatformOwnerSession(
+  options: EnsurePlatformOwnerSessionOptions = {},
+): Promise<PlatformOwnerEnsureResult | null> {
+  const required = options.required ?? true;
+
   const { data: userData, error: userErr } = await getUser();
-  if (userErr) throw userErr;
+  if (userErr) {
+    if (required) throw userErr;
+    console.error("[OP-002] ensure skipped (auth):", userErr.message);
+    return null;
+  }
   if (!userData.user) return null;
 
   const { data, error } = await supabase.rpc("ensure_platform_owner_session");
@@ -80,7 +108,10 @@ export async function ensurePlatformOwnerSession(): Promise<PlatformOwnerEnsureR
       "[OP-002] ensure_platform_owner_session failed:",
       error.message,
     );
-    throw new Error(`Platform owner bootstrap failed: ${error.message}`);
+    if (required) {
+      throw new Error(`Platform owner bootstrap failed: ${error.message}`);
+    }
+    return null;
   }
   if (data == null) return null;
   return parsePlatformOwnerEnsureResult(data);

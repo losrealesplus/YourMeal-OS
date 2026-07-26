@@ -1,7 +1,9 @@
 /**
- * BUGFIX-001 · Admin auth bootstrap helpers (consumer-side resilience).
+ * BUGFIX-001 / BUGFIX-002 · Admin auth bootstrap helpers.
  *
- * Does NOT alter ensurePlatformOwnerSession — failures still throw.
+ * Ops entry (`enterOperationsCenter`) keeps ensurePlatformOwnerSession
+ * **strict** — failures still throw (no privilege bypass).
+ * Global navigation uses `tryEnsurePlatformOwnerSession` instead (BUGFIX-002).
  * Callers must catch, surface UI, and always clear loading state.
  */
 import type { AppRole } from "@/hooks/use-auth";
@@ -133,12 +135,14 @@ export function reportAdminAuthBootstrapFailure(
 }
 
 /**
- * Staff gate after optional Platform Owner ensure.
+ * Staff gate after **strict** Platform Owner ensure (Ops / SaaS entry).
  * Propagates ensurePlatformOwnerSession errors — callers must catch.
+ * Never converts ensure failure into staff access.
  */
 export async function enterOperationsCenter(opts: {
   userId: string;
   returnTo?: string;
+  /** Must be the strict ensure (default required:true). */
   ensurePlatformOwnerSession: () => Promise<unknown>;
   loadRoles: (userId: string) => Promise<AppRole[]>;
 }): Promise<EnterOperationsCenterResult> {
