@@ -1,0 +1,137 @@
+{
+  "createdAt": "2026-07-26T16:06:07.547Z",
+  "project": "djangucecsphnejplvic",
+  "checks": [
+    {
+      "name": "seed.idempotent_rerun",
+      "ok": true,
+      "detail": "    auth:          reused (eb87be19-e7d3-4e15-b429-20d3cc9766e8) |     auth:          reused (ddc40f80-8980-475c-a7a2-1f3be4eaa59f) | OP-002 complete — Platform Owners synced from config."
+    },
+    {
+      "name": "auth.exists alex1409h@gmail.com",
+      "ok": true,
+      "detail": "eb87be19-e7d3-4e15-b429-20d3cc9766e8"
+    },
+    {
+      "name": "auth.setPassword alex1409h@gmail.com",
+      "ok": true,
+      "detail": "ok"
+    },
+    {
+      "name": "login alex1409h@gmail.com",
+      "ok": true,
+      "detail": "uid=eb87be19-e7d3-4e15-b429-20d3cc9766e8"
+    },
+    {
+      "name": "ensure_platform_owner_session alex1409h@gmail.com",
+      "ok": true,
+      "detail": "{\"ok\":true,\"email\":\"alex1409h@gmail.com\",\"roles\":[\"saas_admin\",\"company_admin\"],\"applied\":true,\"profile\":true,\"user_id\":\"eb87be19-e7d3-4e15-b429-20d3cc9766e8\",\"tenant_id\":\"7823e85a-986f-401f-9bbe-e4e431ff3be1\",\"membership\":true,\"tenant_slug\":\"eatclean-tenerife\",\"created_membership\":false,\"created_saas_admin\":false,\"created_company_admin\":false}"
+    },
+    {
+      "name": "rbac.roles alex1409h@gmail.com",
+      "ok": true,
+      "detail": "company_admin,saas_admin"
+    },
+    {
+      "name": "membership alex1409h@gmail.com",
+      "ok": true,
+      "detail": "[{\"tenant_id\":\"7823e85a-986f-401f-9bbe-e4e431ff3be1\",\"tenants\":{\"slug\":\"eatclean-tenerife\"}}]"
+    },
+    {
+      "name": "saas.list_tenants alex1409h@gmail.com",
+      "ok": true,
+      "detail": "[{\"id\":\"7823e85a-986f-401f-9bbe-e4e431ff3be1\",\"slug\":\"eatclean-tenerife\",\"name\":\"EatClean Tenerife\"}]"
+    },
+    {
+      "name": "refresh alex1409h@gmail.com",
+      "ok": true,
+      "detail": "ok"
+    },
+    {
+      "name": "relogin alex1409h@gmail.com",
+      "ok": true,
+      "detail": "ok"
+    },
+    {
+      "name": "homePath alex1409h@gmail.com",
+      "ok": true,
+      "detail": "home=/admin (saas entry via Centro de Operaciones → /saas)"
+    },
+    {
+      "name": "auth.exists alexhdezmtinez@gmail.com",
+      "ok": true,
+      "detail": "ddc40f80-8980-475c-a7a2-1f3be4eaa59f"
+    },
+    {
+      "name": "auth.setPassword alexhdezmtinez@gmail.com",
+      "ok": true,
+      "detail": "ok"
+    },
+    {
+      "name": "login alexhdezmtinez@gmail.com",
+      "ok": true,
+      "detail": "uid=ddc40f80-8980-475c-a7a2-1f3be4eaa59f"
+    },
+    {
+      "name": "ensure_platform_owner_session alexhdezmtinez@gmail.com",
+      "ok": true,
+      "detail": "{\"ok\":true,\"email\":\"alexhdezmtinez@gmail.com\",\"roles\":[\"saas_admin\",\"company_admin\"],\"applied\":true,\"profile\":true,\"user_id\":\"ddc40f80-8980-475c-a7a2-1f3be4eaa59f\",\"tenant_id\":\"7823e85a-986f-401f-9bbe-e4e431ff3be1\",\"membership\":true,\"tenant_slug\":\"eatclean-tenerife\",\"created_membership\":false,\"created_saas_admin\":false,\"created_company_admin\":false}"
+    },
+    {
+      "name": "rbac.roles alexhdezmtinez@gmail.com",
+      "ok": true,
+      "detail": "company_admin,saas_admin"
+    },
+    {
+      "name": "membership alexhdezmtinez@gmail.com",
+      "ok": true,
+      "detail": "[{\"tenant_id\":\"7823e85a-986f-401f-9bbe-e4e431ff3be1\",\"tenants\":{\"slug\":\"eatclean-tenerife\"}}]"
+    },
+    {
+      "name": "saas.list_tenants alexhdezmtinez@gmail.com",
+      "ok": true,
+      "detail": "[{\"id\":\"7823e85a-986f-401f-9bbe-e4e431ff3be1\",\"slug\":\"eatclean-tenerife\",\"name\":\"EatClean Tenerife\"}]"
+    },
+    {
+      "name": "refresh alexhdezmtinez@gmail.com",
+      "ok": true,
+      "detail": "ok"
+    },
+    {
+      "name": "relogin alexhdezmtinez@gmail.com",
+      "ok": true,
+      "detail": "ok"
+    },
+    {
+      "name": "homePath alexhdezmtinez@gmail.com",
+      "ok": true,
+      "detail": "home=/admin (saas entry via Centro de Operaciones → /saas)"
+    },
+    {
+      "name": "negative.ensure_no_owner",
+      "ok": true,
+      "detail": "{\"ensured\":{\"ok\":true,\"email\":\"infra.neg.1785081975165@mailinator.com\",\"reason\":\"not_platform_owner\",\"applied\":false},\"roles\":[]}"
+    },
+    {
+      "name": "negative.no_tenant_list",
+      "ok": true,
+      "detail": "count=0"
+    },
+    {
+      "name": "tenant.eatclean_exists",
+      "ok": true,
+      "detail": "{\"id\":\"7823e85a-986f-401f-9bbe-e4e431ff3be1\",\"slug\":\"eatclean-tenerife\",\"name\":\"EatClean Tenerife\"}"
+    },
+    {
+      "name": "saas.create_tenant_via_rls",
+      "ok": true,
+      "detail": "{\"id\":\"ebaafd91-ed30-4b02-befe-81439ab50572\",\"slug\":\"probe-1785081975165\",\"name\":\"Probe Tenant 1785081975165\"}"
+    },
+    {
+      "name": "saas.cleanup_probe_tenant",
+      "ok": true,
+      "detail": "ebaafd91-ed30-4b02-befe-81439ab50572"
+    }
+  ],
+  "note": "Passwords set via Auth Admin for validation only; operators should use forgot-password or known PLATFORM_OWNERS_PASSWORD from secure store."
+}
