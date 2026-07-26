@@ -30,6 +30,9 @@ export default {
   recoveryPreparing: "Preparazione del reset…",
   recoveryLinkInvalid:
     "Questo link di recupero non è valido o è scaduto. Richiedine uno nuovo da Accedi.",
+  recoveryLabel: "Recupero",
+  emailRequired: "Inserisci il tuo indirizzo email.",
+  callbackFailed: "Impossibile completare l'accesso. Riprova.",
   adminTitle: "Centro operazioni",
   adminSubtitle: "Inizia qui la tua giornata.",
   adminEnter: "Entra",

@@ -355,7 +355,7 @@ function EmailForm() {
 
   async function forgot() {
     if (!email) {
-      toast.error(t("common:email"));
+      toast.error(t("auth:emailRequired"));
       return;
     }
     setBusy(true);

@@ -30,6 +30,9 @@ export default {
   recoveryPreparing: "A preparar a redefinição…",
   recoveryLinkInvalid:
     "Este link de recuperação é inválido ou expirou. Peça um novo em Iniciar sessão.",
+  recoveryLabel: "Recuperação",
+  emailRequired: "Introduza o seu e-mail.",
+  callbackFailed: "Não foi possível concluir o início de sessão. Tente novamente.",
   adminTitle: "Centro de Operações",
   adminSubtitle: "Começa aqui o teu dia.",
   adminEnter: "Entrar",

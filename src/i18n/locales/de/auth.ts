@@ -30,6 +30,9 @@ export default {
   recoveryPreparing: "Passwort-Reset wird vorbereitet…",
   recoveryLinkInvalid:
     "Dieser Wiederherstellungslink ist ungültig oder abgelaufen. Fordere einen neuen unter Anmelden an.",
+  recoveryLabel: "Wiederherstellung",
+  emailRequired: "Bitte E-Mail-Adresse eingeben.",
+  callbackFailed: "Anmeldung konnte nicht abgeschlossen werden. Bitte erneut versuchen.",
   adminTitle: "Operationszentrum",
   adminSubtitle: "Hier beginnt dein Arbeitstag.",
   adminEnter: "Anmelden",

@@ -30,6 +30,9 @@ export default {
   recoveryPreparing: "Préparation de la réinitialisation…",
   recoveryLinkInvalid:
     "Ce lien de récupération est invalide ou a expiré. Demandez-en un nouveau depuis Connexion.",
+  recoveryLabel: "Récupération",
+  emailRequired: "Saisissez votre adresse e-mail.",
+  callbackFailed: "Impossible de terminer la connexion. Réessayez.",
   adminTitle: "Centre d'opérations",
   adminSubtitle: "Commencez votre journée ici.",
   adminEnter: "Entrer",

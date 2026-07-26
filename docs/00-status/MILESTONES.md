@@ -23,6 +23,7 @@ Registro **inmutable** de hitos. No es gestión de sprint: es memoria objetiva.
 | *(aplazado)* | **Marketing Readiness** | [Acta](./MILESTONE_MARKETING_READINESS.md) · GSC/SEO **después** de RI-001 · [decisiones Lovable](./LOVABLE_FINDINGS_DECISIONS.md) |
 | *(pendiente)* | ORR PASSED \| BLOCKED | Puerta binaria · evidencia · sin features |
 | *(pendiente)* | First FOV (FOV-001) | Phase 3 — Operational Engineering |
+| 2026-07-26 | **Identity Block Frozen v1** | CLOSEOUT-001 · [IDENTITY_FREEZE_v1](./IDENTITY_FREEZE_v1.md) · OAuth/Phone flags OFF |
 
 **Regla:** no reescribir filas pasadas. Solo añadir hitos al completarlos.
 

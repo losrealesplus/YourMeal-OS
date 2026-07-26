@@ -1,12 +1,12 @@
 /**
- * Auth surface feature toggles (INFRA-005 / PRODUCT-001).
+ * Auth surface feature toggles — Identity Freeze v1 / CLOSEOUT-001.
  *
- * OAuth social (Google/Apple) remains fully implemented in `oauth.ts` and
- * `/auth/callback`. That flag only controls UI exposure on `/auth`.
+ * Defaults are OFF. Implementations stay in tree for future activation:
+ * - OAuth: `oauth.ts` + `/auth/callback` (Google/Apple UI gated)
+ * - Phone OTP: `credentials.ts` (tab gated until SMS provider is live)
  *
- * Phone OTP is implemented in `credentials.ts` (`signInWithOtp` / `verifyOtp`),
- * but the official Supabase project has `phone=false` / no SMS provider.
- * The phone tab stays hidden until Phone Auth is configured and this flag is on.
+ * Do not delete OAuth/Phone code to “clean up”; flip flags after Dashboard
+ * providers are configured. See docs/00-status/IDENTITY_FREEZE_v1.md.
  */
 
 function readFlag(value: unknown): boolean | undefined {
@@ -33,20 +33,18 @@ function flagFromEnv(name: string): boolean | undefined {
 }
 
 /**
- * Whether Google/Apple OAuth buttons are shown on the customer login screen.
- * Defaults to **false** while identity validation is active.
+ * Google/Apple buttons on `/auth`.
+ * Default: **false** (Identity Freeze — providers not product-enabled).
+ * Activate: Dashboard Google/Apple ON → `VITE_AUTH_OAUTH_SOCIAL_ENABLED=true` → rebuild.
  */
 export function isOAuthSocialEnabled(): boolean {
   return flagFromEnv("VITE_AUTH_OAUTH_SOCIAL_ENABLED") ?? false;
 }
 
 /**
- * Whether the Phone OTP tab is shown on `/auth`.
- * Defaults to **false** — PRODUCT-001 audit: Phone Auth not configured
- * (`Unsupported phone provider` / `external.phone=false`).
- *
- * Reactivate only after Dashboard Phone Auth + SMS provider are live, then
- * set `VITE_AUTH_PHONE_ENABLED=true` and rebuild.
+ * Phone OTP tab on `/auth`.
+ * Default: **false** (Phone Auth off — `Unsupported phone provider`).
+ * Activate: Dashboard Phone + SMS → validate OTP → `VITE_AUTH_PHONE_ENABLED=true` → rebuild.
  */
 export function isPhoneAuthEnabled(): boolean {
   return flagFromEnv("VITE_AUTH_PHONE_ENABLED") ?? false;

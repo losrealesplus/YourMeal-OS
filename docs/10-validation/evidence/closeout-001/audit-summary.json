@@ -1,0 +1,35 @@
+{
+  "epic": "IDENTITY-CLOSEOUT-001",
+  "capturedAt": "2026-07-26T17:15:00.000Z",
+  "project": "djangucecsphnejplvic",
+  "baseline": "PRODUCT-001 merged into closeout branch",
+  "declaration": "Identity Block Frozen v1",
+  "featureFlags": {
+    "VITE_AUTH_OAUTH_SOCIAL_ENABLED": { "default": false, "codeRetained": true },
+    "VITE_AUTH_PHONE_ENABLED": { "default": false, "codeRetained": true }
+  },
+  "debtScan": {
+    "paths": [
+      "src/auth",
+      "src/routes/auth.tsx",
+      "src/routes/auth.callback.tsx",
+      "src/routes/auth.admin.tsx",
+      "src/routes/reset-password.tsx"
+    ],
+    "TODO": 0,
+    "FIXME": 0,
+    "HACK": 0,
+    "console.log": 0
+  },
+  "security": {
+    "serviceRoleInAuthClientBundle": false,
+    "nextAllowlisted": true,
+    "publicStackTraces": false
+  },
+  "checklist": "PASS",
+  "docs": [
+    "docs/00-status/IDENTITY_FREEZE_v1.md",
+    "docs/10-validation/IDENTITY_CLOSEOUT_CHECKLIST.md",
+    "docs/10-validation/IDENTITY_CLOSEOUT_REPORT.md"
+  ]
+}

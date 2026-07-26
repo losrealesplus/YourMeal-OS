@@ -28,6 +28,9 @@ export default {
   recoveryPreparing: "Preparing password reset…",
   recoveryLinkInvalid:
     "This recovery link is invalid or has expired. Request a new one from Sign in.",
+  recoveryLabel: "Recovery",
+  emailRequired: "Enter your email address.",
+  callbackFailed: "We could not complete sign-in. Please try again.",
   adminTitle: "Operations Center",
   adminSubtitle: "Start your day here.",
   adminEnter: "Sign in",

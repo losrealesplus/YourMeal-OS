@@ -109,7 +109,7 @@ function ResetPage() {
         onSubmit={submit}
         className="w-full max-w-md bg-card border border-border rounded-3xl p-8 grid gap-4"
       >
-        <p className="meta-label">Recovery</p>
+        <p className="meta-label">{t("auth:recoveryLabel")}</p>
         <h1 className="text-2xl font-extrabold tracking-tight">
           {t("auth:resetPassword")}
         </h1>

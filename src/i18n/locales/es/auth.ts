@@ -28,6 +28,9 @@ export default {
   recoveryPreparing: "Preparando restablecimiento…",
   recoveryLinkInvalid:
     "Este enlace de recuperación no es válido o ha caducado. Solicita uno nuevo desde Iniciar sesión.",
+  recoveryLabel: "Recuperación",
+  emailRequired: "Introduce tu correo electrónico.",
+  callbackFailed: "No pudimos completar el inicio de sesión. Inténtalo de nuevo.",
   adminTitle: "Centro de Operaciones",
   adminSubtitle: "Empieza aquí tu jornada.",
   adminEnter: "Entrar",

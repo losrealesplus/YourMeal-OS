@@ -1,6 +1,7 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-24  
+**Última actualización:** 2026-07-26  
+**Identidad:** ✅ [Identity Block Frozen v1](./IDENTITY_FREEZE_v1.md) · [Closeout](../10-validation/IDENTITY_CLOSEOUT_REPORT.md)  
 **Fase actual:** [CURRENT_PHASE](./CURRENT_PHASE.md) ← abrir primero  
 **Dominios:** [PROJECT_DOMAINS](./PROJECT_DOMAINS.md) — Knowledge · Engineering · Experience · Operations  
 **Engineering Phase:** [ENGINEERING_PHASE](./ENGINEERING_PHASE.md) — Complete (pending operational authorization)  

@@ -39,7 +39,7 @@ function AuthCallbackPage() {
       const result = await handleAuthCallback(window.location.href);
       if (cancelled) return;
       if (result.error || !result.userId) {
-        const msg = result.error?.message ?? t("auth:welcome");
+        const msg = result.error?.message ?? t("auth:callbackFailed");
         toast.error(msg);
         setMessage(msg);
         navigate({ to: "/auth", replace: true });
