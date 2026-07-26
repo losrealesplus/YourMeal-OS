@@ -3,12 +3,15 @@
 **Estado:** Available (default **OFF**)  
 **Fecha:** 2026-07-26  
 **Tipo:** Adaptador temporal de desarrollo — **no** cambia producción  
+**Práctica FOPEBA:** [Development Identity Adapter](../20-evidence-framework/11-development-identity-adapter.md)
 
 ---
 
 ## Objetivo
 
-Desbloquear certificación RI-001 / Day-0 / Functional Completeness Review cuando el flujo real de autenticación bloquee la navegación UI.
+Desbloquear certificación RI-001 / Day-0 / **Functional Completeness Review operacional** cuando el Auth de producción bloquee la navegación UI.
+
+Herramienta de **certificación**, no solución permanente de identidad.
 
 Permite recorrer:
 
@@ -38,6 +41,22 @@ Ninguna pantalla de negocio debe ramificar con `if (bootstrap)`.
 
 ---
 
+## Identificación visual (obligatoria)
+
+Con Bootstrap Mode activo, la UI muestra **siempre**:
+
+1. **Banner superior permanente**
+
+```text
+⚠ Bootstrap Mode — Identity Source: BootstrapIdentityProvider · Not Supabase Auth
+```
+
+2. **Panel DEV** (esquina) con perfil actual + cambio de rol + salir.
+
+Ninguna captura de FCR debe poder confundirse con una sesión Supabase real.
+
+---
+
 ## Activación
 
 ```bash
@@ -47,15 +66,16 @@ VITE_BOOTSTRAP_MODE=true
 
 Default / `.env.example`: `false`.
 
-Tras cambiar la flag: **rebuild** (Vite inyecta `import.meta.env` en build).
+Tras cambiar la flag: **rebuild**.
 
 ---
 
 ## Uso
 
-1. Arrancar la app con la flag `true`.  
-2. Pantalla **Development Bootstrap** → elegir perfil → **Entrar**.  
-3. Panel flotante **DEV MODE** → cambiar perfil / salir.  
+1. Arrancar con la flag `true`.  
+2. Pantalla **Development Bootstrap** → perfil → **Entrar**.  
+3. Recorrer pantallas con el checklist operacional: [BOOTSTRAP_FCR_CHECKLIST](../10-validation/BOOTSTRAP_FCR_CHECKLIST.md).  
+4. Panel DEV → cambiar perfil / salir.  
 
 | Perfil | Roles | Home típico |
 |--------|-------|-------------|
@@ -65,9 +85,23 @@ Tras cambiar la flag: **rebuild** (Vite inyecta `import.meta.env` en build).
 | Support | `support` | `/admin` |
 | Finance | `accounting` | `/admin` |
 | Company Admin | `company_admin` | `/admin` |
-| SaaS Admin | `company_admin` + `saas_admin` | `/admin` (entry a `/saas` vía UI) |
+| SaaS Admin | `company_admin` + `saas_admin` | `/admin` (entry UI → `/saas`) |
 
-El botón **Centro de Operaciones YourMeal OS** sigue visible solo si `isSaasAdmin` (RBAC real vía roles del perfil).
+El botón **Centro de Operaciones YourMeal OS** solo si `isSaasAdmin`.
+
+---
+
+## Limitaciones (no ocultar)
+
+| Qué funciona | Qué NO certifica |
+|--------------|------------------|
+| Navegación UI | Auth de producción |
+| Guards / RBAC con roles inyectados | JWT Supabase real |
+| Recorrido FCR / Day-0 de pantallas | Mutaciones server que exijan sesión Auth |
+| Cambio de perfil sin reiniciar | Evidencia de login/signup/reset |
+
+> Las mutaciones que dependan de un JWT real **pueden fallar**.  
+> Bootstrap Mode **no** sustituye la validación de Identity Frozen.
 
 ---
 
@@ -75,45 +109,26 @@ El botón **Centro de Operaciones YourMeal OS** sigue visible solo si `isSaasAdm
 
 | Pieza | Rol |
 |-------|-----|
-| `src/bootstrap/*` | Flag, perfiles, store, selector, DEV panel |
+| `src/bootstrap/*` | Flag, perfiles, store, selector, banner, DEV panel |
 | `src/identity/*` | IdentityProvider swap |
 | `src/auth/session.ts` | Origen getUser/getSession/signOut cuando flag ON |
-| `src/permissions/route-guards.ts` | `loadRoles` lee roles bootstrap si flag ON |
-| `src/lib/ensure-platform-owner-session.ts` | No-op seguro en bootstrap (no RPC) |
+| `src/permissions/route-guards.ts` | `loadRoles` origen bootstrap si flag ON |
+| `src/lib/ensure-platform-owner-session.ts` | No-op en bootstrap |
 
-**No toca:** RLS · migraciones · policies · repositories · services de negocio · lógica de guards (solo origen de roles).
-
----
-
-## Limitaciones
-
-- Sesión **sintética** — no hay JWT real de Supabase.  
-- Mutaciones / server functions que exijan Auth real de Supabase **fallarán** o quedarán vacías.  
-- Sirve para **navegación UI**, FCR visual, Day-0 de pantallas — no sustituye evidencias de Auth de producción.  
-- Tenant/company IDs son fijos de seed documental (`eatclean-tenerife`).
+**No toca:** RLS · migraciones · policies · repositories · services · lógica de guards.
 
 ---
 
 ## Cómo eliminarlo cuando Auth esté resuelto
 
-1. Poner `VITE_BOOTSTRAP_MODE=false` (o quitar la variable) en todos los entornos.  
+1. `VITE_BOOTSTRAP_MODE=false` en todos los entornos.  
 2. Verificar login real Customer / Admin / SaaS.  
-3. (Opcional, PR de limpieza) eliminar `src/bootstrap/*` + `src/identity/bootstrap-*` y dejar solo `SupabaseIdentityProvider` si ya no se necesita el adaptador.  
-4. Actualizar esta acta a **Retired**.
-
-Mientras la flag sea `false`, el código bootstrap no altera el flujo de producción.
+3. (Opcional) retirar `src/bootstrap/*` + provider bootstrap.  
+4. Marcar esta acta **Retired**.
 
 ---
 
 ## Relación con Identity Freeze
 
-Excepción **temporal y encapsulada** para certificación — no es rediseño de Auth ni nuevo modelo RBAC.  
-Producción permanece en el modelo Frozen (email/password · OP-002 · BUGFIX-002).
-
----
-
-## Seguridad
-
-- Default OFF.  
-- No activar en builds de producción / Lovable prod.  
-- No concede privilegios en DB; solo identidad en memoria / `sessionStorage`.  
+Excepción **temporal y encapsulada** — no rediseño Auth / RBAC.  
+Producción: modelo Frozen (email/password · OP-002 · BUGFIX-002).
