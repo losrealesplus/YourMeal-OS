@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { handleAuthCallback } from "@/auth";
+import { AUTH_RESET_PASSWORD_PATH } from "@/auth/urls";
 import { resolveHomePath } from "@/lib/resolve-home-path";
 import { toast } from "sonner";
 import {
@@ -12,8 +13,9 @@ import { TenantLogo } from "@/components/tenant/tenant-logo";
 import { brandConfig } from "@/tenant/brand-config";
 
 /**
- * OAuth / PKCE return — Supabase Auth only (INFRA-003).
- * No Lovable `/~oauth/initiate` broker.
+ * OAuth / PKCE / email-confirm / password-recovery return — Supabase Auth only.
+ * Honors allowlisted `?next=` (PRODUCT-001) so recovery can reach `/reset-password`
+ * after `exchangeCodeForSession`.
  */
 export const Route = createFileRoute("/auth/callback")({
   ssr: false,
@@ -43,6 +45,23 @@ function AuthCallbackPage() {
         navigate({ to: "/auth", replace: true });
         return;
       }
+
+      // Recovery: keep the recovery session and let the user set a new password.
+      if (result.next === AUTH_RESET_PASSWORD_PATH) {
+        navigate({ to: "/reset-password", replace: true });
+        return;
+      }
+
+      if (result.next === "/auth" || result.next === "/auth/admin") {
+        navigate({ to: result.next, replace: true });
+        return;
+      }
+
+      if (result.next === "/app" || result.next === "/admin" || result.next === "/saas") {
+        navigate({ to: result.next, replace: true });
+        return;
+      }
+
       const path = await resolveHomePath(result.userId);
       if (!cancelled) navigate({ to: path as "/app", replace: true });
     })();

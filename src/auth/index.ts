@@ -47,13 +47,16 @@ export {
 } from "./guards";
 
 export {
+  AUTH_ALLOWED_NEXT_PATHS,
   AUTH_CALLBACK_PATH,
   AUTH_LOGIN_PATH,
   AUTH_RESET_PASSWORD_PATH,
+  authCallbackUrl,
   authOrigin,
   emailConfirmRedirectTo,
   oauthRedirectTo,
   passwordResetRedirectTo,
+  safeAuthNextPath,
 } from "./urls";
 
-export { isOAuthSocialEnabled } from "./features";
+export { isOAuthSocialEnabled, isPhoneAuthEnabled } from "./features";

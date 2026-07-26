@@ -19,9 +19,15 @@ export default {
   resetPassword: "Reset password",
   newPassword: "New password",
   updatePassword: "Update password",
-  checkEmail: "Check your email",
+  checkEmail: "Check your email to confirm your account.",
   resetSent: "We sent you a password reset link.",
   passwordUpdated: "Password updated",
+  emailAlreadyRegistered:
+    "This email already has an account. Sign in or reset your password.",
+  passwordTooWeak: "Password must be at least 6 characters.",
+  recoveryPreparing: "Preparing password reset…",
+  recoveryLinkInvalid:
+    "This recovery link is invalid or has expired. Request a new one from Sign in.",
   adminTitle: "Operations Center",
   adminSubtitle: "Start your day here.",
   adminEnter: "Sign in",

@@ -5,6 +5,7 @@ import { Lock, Mail, Phone } from "lucide-react";
 import {
   getSession,
   isOAuthSocialEnabled,
+  isPhoneAuthEnabled,
   resetPasswordForEmail,
   signInWithOAuth,
   signInWithOtpPhone,
@@ -60,6 +61,7 @@ async function goHome(
 function AuthPage() {
   const { t } = useTranslation(["auth", "common"]);
   const navigate = useNavigate();
+  const phoneEnabled = isPhoneAuthEnabled();
   const [tab, setTab] = useState<Tab>("email");
   const [phase, setPhase] = useState<Phase>("splash");
   const [onboardingStep, setOnboardingStep] = useState(0);
@@ -211,32 +213,35 @@ function AuthPage() {
                 {t("auth:welcomeSub")}
               </p>
 
-              <div className="mt-8 grid grid-cols-2 gap-1 bg-muted/80 p-1 rounded-2xl">
-                {(["email", "phone"] as const).map((k) => (
-                  <button
-                    key={k}
-                    type="button"
-                    onClick={() => setTab(k)}
-                    className={
-                      "relative text-xs font-semibold py-2.5 rounded-xl transition-colors " +
-                      (tab === k
-                        ? "bg-white text-foreground shadow-sm"
-                        : "text-muted-foreground")
-                    }
-                  >
-                    {t(`auth:tabs.${k}`)}
-                    {tab === k ? (
-                      <span
-                        className="absolute left-1/2 -translate-x-1/2 bottom-1 h-0.5 w-6 rounded-full attention-dot"
-                        aria-hidden
-                      />
-                    ) : null}
-                  </button>
-                ))}
-              </div>
+              {/* PRODUCT-001: phone tab only when Phone Auth is configured + flagged */}
+              {phoneEnabled ? (
+                <div className="mt-8 grid grid-cols-2 gap-1 bg-muted/80 p-1 rounded-2xl">
+                  {(["email", "phone"] as const).map((k) => (
+                    <button
+                      key={k}
+                      type="button"
+                      onClick={() => setTab(k)}
+                      className={
+                        "relative text-xs font-semibold py-2.5 rounded-xl transition-colors " +
+                        (tab === k
+                          ? "bg-white text-foreground shadow-sm"
+                          : "text-muted-foreground")
+                      }
+                    >
+                      {t(`auth:tabs.${k}`)}
+                      {tab === k ? (
+                        <span
+                          className="absolute left-1/2 -translate-x-1/2 bottom-1 h-0.5 w-6 rounded-full attention-dot"
+                          aria-hidden
+                        />
+                      ) : null}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
 
-              <div className="mt-7">
-                {tab === "email" ? <EmailForm /> : <PhoneForm />}
+              <div className={phoneEnabled ? "mt-7" : "mt-8"}>
+                {tab === "phone" && phoneEnabled ? <PhoneForm /> : <EmailForm />}
               </div>
 
               {/* INFRA-005: OAuth kept in src/auth/oauth.ts — UI gated by flag */}
@@ -304,6 +309,10 @@ function EmailForm() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (mode === "signup" && password.length < 6) {
+      toast.error(t("auth:passwordTooWeak"));
+      return;
+    }
     setBusy(true);
     try {
       if (mode === "signin") {
@@ -314,13 +323,28 @@ function EmailForm() {
         if (uid) await goHome(navigate, uid);
         else navigate({ to: "/app", replace: true });
       } else {
-        const { error } = await signUp({
+        const { data, error } = await signUp({
           email,
           password,
           fullName,
         });
         if (error) throw error;
+        // Supabase often returns 200 with empty identities when the email exists.
+        const identities = data.user?.identities;
+        if (
+          data.user &&
+          Array.isArray(identities) &&
+          identities.length === 0
+        ) {
+          toast.error(t("auth:emailAlreadyRegistered"));
+          return;
+        }
+        if (data.session?.user?.id) {
+          await goHome(navigate, data.session.user.id);
+          return;
+        }
         toast.success(t("auth:checkEmail"));
+        setMode("signin");
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
@@ -334,9 +358,14 @@ function EmailForm() {
       toast.error(t("common:email"));
       return;
     }
-    const { error } = await resetPasswordForEmail(email);
-    if (error) toast.error(error.message);
-    else toast.success(t("auth:resetSent"));
+    setBusy(true);
+    try {
+      const { error } = await resetPasswordForEmail(email);
+      if (error) toast.error(error.message);
+      else toast.success(t("auth:resetSent"));
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -417,24 +446,31 @@ function PhoneForm() {
 
   async function sendCode() {
     setBusy(true);
-    const { error } = await signInWithOtpPhone(phone);
-    setBusy(false);
-    if (error) toast.error(error.message);
-    else {
-      setSent(true);
-      toast.success(t("auth:codeSent"));
+    try {
+      const { error } = await signInWithOtpPhone(phone);
+      if (error) toast.error(error.message);
+      else {
+        setSent(true);
+        toast.success(t("auth:codeSent"));
+      }
+    } finally {
+      setBusy(false);
     }
   }
   async function verify() {
     setBusy(true);
-    const { error } = await verifyOtpSms({ phone, token: code });
-    setBusy(false);
-    if (error) toast.error(error.message);
-    else {
+    try {
+      const { error } = await verifyOtpSms({ phone, token: code });
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
       const { data: sessionData } = await getSession();
       const uid = sessionData.session?.user?.id;
       if (uid) await goHome(navigate, uid);
       else navigate({ to: "/app", replace: true });
+    } finally {
+      setBusy(false);
     }
   }
 

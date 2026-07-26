@@ -1,11 +1,12 @@
 /**
- * Auth surface feature toggles (INFRA-005).
+ * Auth surface feature toggles (INFRA-005 / PRODUCT-001).
  *
  * OAuth social (Google/Apple) remains fully implemented in `oauth.ts` and
- * `/auth/callback`. This flag only controls UI exposure on `/auth`.
+ * `/auth/callback`. That flag only controls UI exposure on `/auth`.
  *
- * Reactivate: set `VITE_AUTH_OAUTH_SOCIAL_ENABLED=true` in `.env` and rebuild.
- * Default: disabled — identity validation focuses on email/password.
+ * Phone OTP is implemented in `credentials.ts` (`signInWithOtp` / `verifyOtp`),
+ * but the official Supabase project has `phone=false` / no SMS provider.
+ * The phone tab stays hidden until Phone Auth is configured and this flag is on.
  */
 
 function readFlag(value: unknown): boolean | undefined {
@@ -16,25 +17,37 @@ function readFlag(value: unknown): boolean | undefined {
   return undefined;
 }
 
-function viteEnvFlag(): unknown {
+function viteEnvFlag(name: string): unknown {
   try {
-    return import.meta.env.VITE_AUTH_OAUTH_SOCIAL_ENABLED;
+    return (import.meta.env as Record<string, unknown>)[name];
   } catch {
     return undefined;
   }
 }
 
+function flagFromEnv(name: string): boolean | undefined {
+  // process.env first — reliable under Vitest / SSR; Vite also injects VITE_*.
+  const fromProcess = readFlag(process.env[name]);
+  if (fromProcess !== undefined) return fromProcess;
+  return readFlag(viteEnvFlag(name));
+}
+
 /**
  * Whether Google/Apple OAuth buttons are shown on the customer login screen.
- * Defaults to **false** while INFRA-005 identity validation is active.
+ * Defaults to **false** while identity validation is active.
  */
 export function isOAuthSocialEnabled(): boolean {
-  // process.env first — reliable under Vitest / SSR; Vite also injects VITE_*.
-  const fromProcess = readFlag(process.env.VITE_AUTH_OAUTH_SOCIAL_ENABLED);
-  if (fromProcess !== undefined) return fromProcess;
+  return flagFromEnv("VITE_AUTH_OAUTH_SOCIAL_ENABLED") ?? false;
+}
 
-  const fromVite = readFlag(viteEnvFlag());
-  if (fromVite !== undefined) return fromVite;
-
-  return false;
+/**
+ * Whether the Phone OTP tab is shown on `/auth`.
+ * Defaults to **false** — PRODUCT-001 audit: Phone Auth not configured
+ * (`Unsupported phone provider` / `external.phone=false`).
+ *
+ * Reactivate only after Dashboard Phone Auth + SMS provider are live, then
+ * set `VITE_AUTH_PHONE_ENABLED=true` and rebuild.
+ */
+export function isPhoneAuthEnabled(): boolean {
+  return flagFromEnv("VITE_AUTH_PHONE_ENABLED") ?? false;
 }

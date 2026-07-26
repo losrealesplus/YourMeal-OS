@@ -21,9 +21,15 @@ export default {
   resetPassword: "Réinitialiser le mot de passe",
   newPassword: "Nouveau mot de passe",
   updatePassword: "Mettre à jour",
-  checkEmail: "Vérifiez votre boîte de réception",
+  checkEmail: "Vérifiez votre e-mail pour confirmer le compte.",
   resetSent: "Nous vous avons envoyé un lien de réinitialisation.",
   passwordUpdated: "Mot de passe mis à jour",
+  emailAlreadyRegistered:
+    "Cet e-mail a déjà un compte. Connectez-vous ou réinitialisez le mot de passe.",
+  passwordTooWeak: "Le mot de passe doit contenir au moins 6 caractères.",
+  recoveryPreparing: "Préparation de la réinitialisation…",
+  recoveryLinkInvalid:
+    "Ce lien de récupération est invalide ou a expiré. Demandez-en un nouveau depuis Connexion.",
   adminTitle: "Centre d'opérations",
   adminSubtitle: "Commencez votre journée ici.",
   adminEnter: "Entrer",
