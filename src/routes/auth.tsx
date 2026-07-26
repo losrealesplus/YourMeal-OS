@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Lock, Mail, Phone } from "lucide-react";
 import {
   getSession,
+  isOAuthSocialEnabled,
   resetPasswordForEmail,
   signInWithOAuth,
   signInWithOtpPhone,
@@ -238,36 +239,41 @@ function AuthPage() {
                 {tab === "email" ? <EmailForm /> : <PhoneForm />}
               </div>
 
-              <div className="mt-8 flex items-center gap-3">
-                <div className="h-px flex-1 bg-border/80" />
-                <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-medium">
-                  {t("common:or")}
-                </span>
-                <div className="h-px flex-1 bg-border/80" />
-              </div>
+              {/* INFRA-005: OAuth kept in src/auth/oauth.ts — UI gated by flag */}
+              {isOAuthSocialEnabled() ? (
+                <>
+                  <div className="mt-8 flex items-center gap-3">
+                    <div className="h-px flex-1 bg-border/80" />
+                    <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-medium">
+                      {t("common:or")}
+                    </span>
+                    <div className="h-px flex-1 bg-border/80" />
+                  </div>
 
-              <div className="mt-6 grid gap-3">
-                <button
-                  type="button"
-                  onClick={async () => {
-                    const r = await signInWithOAuth("google");
-                    if (r.error) toast.error(r.error.message);
-                  }}
-                  className="border border-border/80 bg-white text-sm font-semibold py-3.5 rounded-2xl hover:bg-muted/60 transition-colors"
-                >
-                  {t("auth:withGoogle")}
-                </button>
-                <button
-                  type="button"
-                  onClick={async () => {
-                    const r = await signInWithOAuth("apple");
-                    if (r.error) toast.error(r.error.message);
-                  }}
-                  className="border border-border/80 bg-white text-sm font-semibold py-3.5 rounded-2xl hover:bg-muted/60 transition-colors"
-                >
-                  {t("auth:withApple")}
-                </button>
-              </div>
+                  <div className="mt-6 grid gap-3">
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const r = await signInWithOAuth("google");
+                        if (r.error) toast.error(r.error.message);
+                      }}
+                      className="border border-border/80 bg-white text-sm font-semibold py-3.5 rounded-2xl hover:bg-muted/60 transition-colors"
+                    >
+                      {t("auth:withGoogle")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const r = await signInWithOAuth("apple");
+                        if (r.error) toast.error(r.error.message);
+                      }}
+                      className="border border-border/80 bg-white text-sm font-semibold py-3.5 rounded-2xl hover:bg-muted/60 transition-colors"
+                    >
+                      {t("auth:withApple")}
+                    </button>
+                  </div>
+                </>
+              ) : null}
             </div>
 
             <div className="mt-10 flex flex-col items-center gap-5">

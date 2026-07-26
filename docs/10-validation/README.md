@@ -9,6 +9,10 @@ docs/10-validation/
 ├── AUTH_AUDIT.md                         ← INFRA-003 Fase 1
 ├── SUPABASE_AUTH_VALIDATION.md           ← INFRA-003 Fase 2
 ├── AUTH_MIGRATION_REPORT.md              ← INFRA-003 cierre código
+├── IDENTITY_VALIDATION_REPORT.md         ← INFRA-005 email/password
+├── RBAC_VALIDATION.md                    ← INFRA-005
+├── TENANT_ISOLATION_REPORT.md            ← INFRA-005
+├── CHECKLIST_IDENTITY_VALIDATION.md      ← INFRA-005 operador
 ├── ACTA_CIERRE_OP001.md
 ├── AUD001_RUNTIME_DEPLOYMENT_AUDIT.md
 ├── MIGRATION_BOOTSTRAP_VALIDATION.md     ← Empty-DB migration gate (FOPEBA CI)
@@ -25,6 +29,11 @@ docs/10-validation/
 
 **Project ref:** `djangucecsphnejplvic`  
 Cutover report: [CUTOVER_REPORT](./CUTOVER_REPORT.md)
+
+## INFRA-005 · Identity validation
+
+Email/password focus · OAuth UI gated by `VITE_AUTH_OAUTH_SOCIAL_ENABLED` (default false).  
+Reports: [IDENTITY](./IDENTITY_VALIDATION_REPORT.md) · [RBAC](./RBAC_VALIDATION.md) · [TENANT](./TENANT_ISOLATION_REPORT.md) · [Checklist](./CHECKLIST_IDENTITY_VALIDATION.md)
 
 ## FOPEBA gates (CI)
 
