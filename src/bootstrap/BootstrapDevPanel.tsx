@@ -32,6 +32,9 @@ export function BootstrapDevPanel() {
       <p className="font-bold tracking-wide uppercase text-[10px] text-amber-800">
         DEV MODE
       </p>
+      <p className="mt-0.5 text-[9px] font-medium text-amber-800/90 leading-snug">
+        Identity: BootstrapIdentityProvider
+      </p>
       <p className="mt-1 font-semibold truncate">
         {active.label}
         {profile?.fullName ? ` · ${profile.fullName}` : null}
