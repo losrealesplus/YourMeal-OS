@@ -53,19 +53,22 @@ ORR READY  →  solo cuando las tres = CERTIFIED
 
 ## Pasada 2 · siete perfiles · jornadas
 
-**No recorrer pantallas. Recorrer jornadas de trabajo.**
+**No recorrer pantallas. Recorrer jornadas de trabajo.**  
+**No solo camino feliz** — incluir vacío de datos, ya completado, superficie incorrecta.
 
 Pregunta por perfil: *¿Puede este usuario terminar su jornada laboral utilizando únicamente YourMeal OS?*
 
-| Perfil | Landing | Navegación | Permisos | Operación completada | Resultado |
-|--------|---------|------------|----------|----------------------|-----------|
-| Customer | | | | □ | □ |
-| Kitchen | | | | □ | □ |
-| Delivery | | | | □ | □ |
-| Support | | | | □ | □ |
-| Accounting | | | | □ | □ |
-| Company Admin | | | | □ | □ |
-| SaaS Admin | | | | □ | □ |
+Si no: **brecha operacional**. Anotar categoría observada (sin SPEC): Acceso · Ejecución · Información · Cierre.
+
+| Perfil | Landing | Navegación | Permisos | Operación completada | Categoría brecha (si no) | Resultado |
+|--------|---------|------------|----------|----------------------|--------------------------|-----------|
+| Customer | | | | □ | | □ |
+| Kitchen | | | | □ | | □ |
+| Delivery | | | | □ | | □ |
+| Support | | | | □ | | □ |
+| Accounting | | | | □ | | □ |
+| Company Admin | | | | □ | | □ |
+| SaaS Admin | | | | □ | | □ |
 
 ### Guías de jornada
 

@@ -15,7 +15,9 @@
 | [FCR002](./FCR002_FLICKER_INVESTIGATION.md) | Render Stability Regression |
 | [BOOTSTRAP_FCR_CHECKLIST](./BOOTSTRAP_FCR_CHECKLIST.md) | Checklist 7 perfiles |
 
-**Regla de evidencia:** nunca registrar un síntoma como si fuera la causa.
+**Regla de evidencia:** nunca registrar un síntoma como si fuera la causa.  
+**Pasada 2:** jornadas de trabajo; si no puede terminar la jornada solo con YourMeal OS → **brecha operacional** (no bug menor).  
+**Categorías a observar** (sin SPEC): Acceso · Ejecución · Información · Cierre. Incluir escenarios límite (sin datos / ya completado / superficie incorrecta).
 
 ---
 

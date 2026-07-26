@@ -186,6 +186,31 @@ Evolución natural de observar → certificar → liberar. No abrir documento FO
 
 ---
 
+## Anotación · categorías de brecha (observar en Pasada 2 · sin SPEC)
+
+**No crear taxonomía oficial todavía.** Al registrar brechas operacionales, anotar si encajan en:
+
+| Categoría | Pregunta |
+|-----------|----------|
+| **Acceso** | ¿Puede entrar donde necesita? |
+| **Ejecución** | ¿Puede realizar su trabajo? |
+| **Información** | ¿Tiene los datos necesarios para decidir? |
+| **Cierre** | ¿Puede completar y registrar la operación? |
+
+Sirve para detectar patrones entre departamentos. Si Pasada 2 las confirma, entonces SPEC.
+
+### Escenarios límite (obligatorios en cada jornada)
+
+No validar solo el camino feliz. Por perfil, también:
+
+* ¿Qué ocurre si **no hay datos**?
+* ¿Qué ocurre si la operación **ya está completada**?
+* ¿Qué ocurre si intenta entrar en una **superficie que no le corresponde**?
+
+Muchas brechas aparecen ahí — no en el happy path.
+
+---
+
 ## Relación con artefactos
 
 | Artefacto | Rol |
