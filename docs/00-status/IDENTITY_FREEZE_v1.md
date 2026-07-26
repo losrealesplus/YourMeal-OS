@@ -118,14 +118,16 @@ Cualquier ítem prohibido requiere **nuevo acta / ADR**, no un PR de feature.
 
 ## PRE-CHECK (obligatorio en análisis externos)
 
+Aplicación de **[P12 · Evidence Freshness](../20-evidence-framework/10-evidence-freshness-p12.md)**.
+
 Antes de implementar cambios a partir de Lovable u otro revisor:
 
 1. Verificar que el análisis sigue siendo reproducible sobre la rama actual.  
 2. Comprobar si PRs recientes ya resolvieron total o parcialmente el problema.  
-3. Si el análisis está desactualizado, documentarlo como obsoleto y **no** modificar código innecesariamente.  
+3. Si el análisis está desactualizado → clasificar **STALE** y **no** modificar código.  
 4. Si solo una parte sigue siendo válida, limitar la implementación a esa parte.  
 
-*(FOPEBA: la evidencia debe ser actual antes de convertirse en trabajo de ingeniería.)*
+Caso canónico STALE (PO nav): [FINDING_STALE_PO_NAV_LOVABLE](../10-validation/FINDING_STALE_PO_NAV_LOVABLE.md).
 
 ---
 

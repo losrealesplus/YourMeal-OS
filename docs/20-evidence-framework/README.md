@@ -88,7 +88,8 @@ Architecture · Implementation · Verification · Release
 ├── 06 Economic Confirmation + ec/  (Framework · OVI · ECR)
 ├── 07 Gate G-01 + g01/         (Package · Decision · Acta)
 ├── 08 Gate G-02                (Pilot Readiness · RI)
-└── 09 Operational Visibility   (cero humo · DICT-071)
+├── 09 Operational Visibility   (cero humo · DICT-071)
+└── 10 P12 Evidence Freshness   (PRE-CHECK · STALE)
 ```
 
 | Doc | Contenido |
@@ -102,6 +103,7 @@ Architecture · Implementation · Verification · Release
 | [07 G-01](./07-gate-g01-operational-readiness.md) · [g01/](./g01/README.md) | Certificación Stage 2 |
 | [08 G-02](./08-gate-g02-pilot-readiness.md) | Pilot Readiness · integridad del Journey |
 | [09 Visibility](./09-operational-visibility-principle.md) | Cero humo · lo visible existe |
+| [10 P12 Freshness](./10-evidence-freshness-p12.md) | Evidencia vigente antes de ingeniería · STALE |
 
 ---
 
