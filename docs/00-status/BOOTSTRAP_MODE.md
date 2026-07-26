@@ -1,9 +1,10 @@
 # EP-BOOTSTRAP-001 · Development Bootstrap Mode
 
-**Estado:** Available (default **OFF**)  
+**Estado:** Available (default **OFF**) · en uso como **Functional Review Mode**  
 **Fecha:** 2026-07-26  
 **Tipo:** Adaptador temporal de desarrollo — **no** cambia producción  
-**Práctica FOPEBA:** [Development Identity Adapter](../20-evidence-framework/11-development-identity-adapter.md)
+**Práctica FOPEBA:** [Development Identity Adapter](../20-evidence-framework/11-development-identity-adapter.md)  
+**FCR en curso:** [FCR_FINDINGS_REGISTER](../10-validation/FCR_FINDINGS_REGISTER.md) · [RBAC_MATRIX_V1](../10-validation/RBAC_MATRIX_V1.md)
 
 ---
 
@@ -11,7 +12,8 @@
 
 Desbloquear certificación RI-001 / Day-0 / **Functional Completeness Review operacional** cuando el Auth de producción bloquee la navegación UI.
 
-Herramienta de **certificación**, no solución permanente de identidad.
+Nombre operativo mientras se recorre el producto: **Functional Review Mode**.  
+Herramienta de **certificación / QA**, no solución permanente de identidad.
 
 Permite recorrer:
 
