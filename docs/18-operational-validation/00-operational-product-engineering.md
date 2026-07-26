@@ -196,10 +196,12 @@ Ver: [Gate G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md) · [Pi
 ├── Knowledge Update + ku/     (KU-01 Policy · KU-02 Workflow · KU-03 KUR)
 ├── Economic Confirmation + ec/ (Framework · OVI · ECR)
 ├── Gate G-01 + g01/           (Package · Decision · Acta)
-└── Gate G-02                  (Pilot Readiness · RI)
+├── Gate G-02                  (Pilot Readiness · RI)
+└── P12 Evidence Freshness     (PRE-CHECK · STALE antes de ingeniería)
 ```
 
 → [docs/20-evidence-framework](../20-evidence-framework/README.md)  
+→ [P12 · Evidence Freshness](../20-evidence-framework/10-evidence-freshness-p12.md)  
 → [ku/](../20-evidence-framework/ku/README.md) · [ec/](../20-evidence-framework/ec/README.md) · [g01/](../20-evidence-framework/g01/README.md) · [g02](../20-evidence-framework/08-gate-g02-pilot-readiness.md) · [fov/](../20-evidence-framework/fov/README.md)
 
 Dual track (antesala): [DUAL_TRACK_ANTECAMARA](../00-status/DUAL_TRACK_ANTECAMARA.md)

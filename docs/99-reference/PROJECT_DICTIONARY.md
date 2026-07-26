@@ -134,6 +134,7 @@ Core | Operational | Engineering | Historical
 | `DICT-071` | [Operational Visibility](#operational-visibility) | Core | Accepted |
 | `DICT-072` | [Operational Representation Pattern](#operational-representation-pattern) | Engineering | Accepted |
 | `DICT-073` | [Tenant Operational Autonomy](#tenant-operational-autonomy) | Core | Accepted |
+| `DICT-074` | [Evidence Freshness (P12)](#evidence-freshness-p12) | Core | Accepted |
 | `DICT-006` | [Evidence](#evidence) | Core | Accepted |
 | `DICT-007` | [Knowledge Leakage](#knowledge-leakage) | Core | Accepted |
 | `DICT-008` | [Operational Model](#operational-model) | Core | Accepted |
@@ -3108,6 +3109,44 @@ Tenant · Company Admin · saas_admin · Dual Ops Center · EP-OPS-001 · Archit
 [TENANT_OPERATIONAL_AUTONOMY](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md) · [EP-OPS-001](../00-status/EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · [OPS_CENTER_DUAL_SURFACE](../00-status/OPS_CENTER_DUAL_SURFACE.md)
 
 
+---
+
+# Evidence Freshness (P12)
+
+## ID
+DICT-074
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Evidence Freshness · P12
+
+## Tipo
+Principio de gobernanza de evidencia / ingeniería
+
+## Definición
+Ningún hallazgo de auditoría, revisión automática o análisis externo puede convertirse en tarea de ingeniería sin verificar antes que sigue siendo **reproducible** sobre la revisión actual del código. Si posteriores cambios lo resolvieron, el hallazgo se clasifica **STALE** y se cierra sin modificar código.
+
+## Implica
+- PRE-CHECK obligatorio (reproducibilidad · PRs posteriores · alcance parcial).
+- Status: ACTIVE · PARTIAL · STALE · INVALID.
+- Complementa “Evidence before Versioning”: la evidencia debe existir **y** estar vigente.
+- Aplicación en Auth: Identity Freeze PRE-CHECK.
+
+## No significa
+Ignorar hallazgos reales · omitir security · saltarse FOV/VR · que STALE equiva a “el reviewer se equivocó siempre” (puede haber sido correcto en una revisión anterior).
+
+## Palabras relacionadas
+PRE-CHECK · STALE · Evidence · FOPEBA · Identity Freeze · Lovable Review
+
+## Referencias
+[P12 · Evidence Freshness](../20-evidence-framework/10-evidence-freshness-p12.md) · [FINDING_STALE_PO_NAV_LOVABLE](../10-validation/FINDING_STALE_PO_NAV_LOVABLE.md)
+
+
 ## Historial de este diccionario
 
 | Fecha | Cambio |
@@ -3131,3 +3170,4 @@ Tenant · Company Admin · saas_admin · Dual Ops Center · EP-OPS-001 · Archit
 | 2026-07-24 | DICT-071 Operational Visibility · G-02.9 · EP-002A/B prep |
 | 2026-07-24 | DICT-072 Operational Representation Pattern · Service → Report / Workspace |
 | 2026-07-24 | DICT-073 Tenant Operational Autonomy · WP-5 Tenant Provisioning · Architecture Freeze |
+| 2026-07-26 | DICT-074 Evidence Freshness (P12) · PRE-CHECK · STALE · caso PO nav Lovable |

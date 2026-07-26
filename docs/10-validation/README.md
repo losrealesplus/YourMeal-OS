@@ -52,6 +52,10 @@ Reports: [PRODUCT](./IDENTITY_PRODUCT_REPORT.md) · [Email signup](./EMAIL_SIGNU
 
 Acta: [IDENTITY_FREEZE_v1](../00-status/IDENTITY_FREEZE_v1.md) · [Checklist](./IDENTITY_CLOSEOUT_CHECKLIST.md) · [Report](./IDENTITY_CLOSEOUT_REPORT.md) · [evidence](./evidence/closeout-001/)
 
+## P12 · Evidence Freshness (ejemplo STALE)
+
+[P12](../20-evidence-framework/10-evidence-freshness-p12.md) · caso canónico: [FINDING_STALE_PO_NAV_LOVABLE](./FINDING_STALE_PO_NAV_LOVABLE.md) — Lovable PO-nav finding cerrado sin código (BUGFIX-001/002).
+
 ## FOPEBA gates (CI)
 
 | Gate | Doc | Command / workflow |

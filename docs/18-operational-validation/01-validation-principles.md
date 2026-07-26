@@ -174,6 +174,16 @@ Análisis conjunto de brechas
 Priorizar MC → aplicar a 17-operational-model
 ```
 
+### 17. Evidence Freshness (P12) — antes de ingeniería
+
+> **La evidencia debe estar vigente sobre la revisión actual del código antes de justificar trabajo de desarrollo.**
+
+Hallazgos de auditorías o revisores externos (p. ej. Lovable) → **PRE-CHECK** obligatorio.  
+Si ya fueron resueltos → clasificar **STALE** y cerrar **sin código**.
+
+Regla formal: [P12 · Evidence Freshness](../20-evidence-framework/10-evidence-freshness-p12.md).  
+Caso canónico: [FINDING_STALE_PO_NAV_LOVABLE](../10-validation/FINDING_STALE_PO_NAV_LOVABLE.md).
+
 ---
 
 ## Dictámenes permitidos
