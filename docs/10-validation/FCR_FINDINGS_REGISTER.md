@@ -3,7 +3,8 @@
 **Modo:** Functional Review Mode (Bootstrap / Development Identity Adapter)  
 **Identity source:** `BootstrapIdentityProvider`  
 **Auth producción:** **NO** certificada en esta pasada  
-**Metodología:** certificar el sistema → corregir por dominios. No «arreglar lo que encuentro».
+**Metodología:** certificar el sistema → corregir por dominios. No «arreglar lo que encuentro».  
+**Cadena:** RI → KC → SPEC → **[Construcción]** → FCR → ORR → RELEASE (FCR/ORR = certificación, no construcción).
 
 | Artefacto | Uso |
 |-----------|-----|

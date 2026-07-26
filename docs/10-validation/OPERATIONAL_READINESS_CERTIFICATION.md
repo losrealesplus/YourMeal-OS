@@ -2,22 +2,38 @@
 
 **Estado:** Accepted as working method (Functional Review Mode)  
 **No sustituye** el ORR binario de producto ([ORR](../22-implementation/ORR.md) · PASSED / BLOCKED).  
-**Complementa:** permite certificar **superficies** antes de que todo el producto esté perfecto.
+**Complementa:** certifica **superficies**; ORR de producto se habilita como **consecuencia**.
 
 ---
 
-## Cadena (FOPEBA · lectura operacional)
+## Cadena (con separación Construcción / Certificación)
 
 ```text
-RI   Raw Insight              → observar
-KC   Knowledge Consolidation  → convertir observación en conocimiento
-SPEC                          → definir principios / superficies / políticas
-FCR  Functional Completeness  → verificar experiencia operacional
-ORR  Operational Readiness    → certificar que una unidad está lista para operar
+RI    Raw Insight
+ ↓
+KC    Knowledge Consolidation
+ ↓
+SPEC  principios · superficies · políticas
+────────────────────────
+Construcción
+────────────────────────
+ ↓
+FCR   Functional Completeness Review   ← certificación (no construcción)
+ ↓
+ORR   Operational Readiness Review     ← ¿puede liberarse el producto?
+ ↓
+RELEASE
 ```
 
-FCR no es QA de bugs.  
-Es la fase que produce evidencia operacional reutilizable para ORR (por superficie o por capacidad).
+| Fase | Naturaleza |
+|------|------------|
+| RI · KC · SPEC | Conocimiento y definición |
+| Construcción | Implementación |
+| **FCR** | **Certificación** de experiencia operacional |
+| **ORR** | **Certificación** de readiness de producto / piloto |
+| RELEASE | Liberación |
+
+FCR no es QA de bugs ni construcción. Produce evidencia operacional para ORR.
 
 ---
 
@@ -30,7 +46,7 @@ Es la fase que produce evidencia operacional reutilizable para ORR (por superfic
 | **Workspace Entry Policy** | Dónde empieza a trabajar | Autorización RBAC |
 | **Render Stability Regression** | Clase de defecto de render | El síntoma «titileo» |
 
-Roles futuros (Platform Support, Platform Billing, Platform Operations, Platform Owner) trabajan sobre **Platform Surface** sin redefinir la superficie.
+Roles futuros (Platform Support, Billing, Operations, Owner) trabajan sobre **Platform Surface** sin redefinir la superficie.
 
 ---
 
@@ -42,92 +58,141 @@ Roles futuros (Platform Support, Platform Billing, Platform Operations, Platform
 |------------|----------|
 | Hallazgo: «Titileo» | Clase: Render Stability Regression · Síntoma: titileo · Hipótesis: render loop |
 
-Aplica a FCR-002 y a cualquier hallazgo futuro.
-
 ---
 
-## Surface Certified
+## Surface Status (≠ ORR)
 
-Una **superficie** (Tenant / Platform / Customer) queda **CERTIFIED** cuando:
+Responde solo:
 
-1. Todas sus pantallas del alcance FCR fueron recorridas.
-2. Los botones / CTAs del flujo operativo fueron accionados (no solo «vistos»).
-3. No quedan **P0**.
-4. No quedan **P1** abiertos (o están aceptados explícitamente con waiver).
-5. Los **P2** están listados y **aceptados** (o corregidos).
-6. Existe evidencia en el [FCR Session Log](./FCR_SESSION_LOG.md).
+> ¿Cuál es el estado de **esta superficie**?
 
-Estados por superficie:
-
-| Estado | Significado |
-|--------|-------------|
+| Surface Status | Significado |
+|----------------|-------------|
 | **NOT STARTED** | Sin recorrido FCR |
-| **IN REVIEW** | Pasada en curso / hallazgos abiertos P0–P1 |
-| **CERTIFIED** | Criterios arriba cumplidos |
-| **REGRESSED** | Hallazgo nuevo P0/P1 tras CERTIFIED |
+| **IN REVIEW** | Pasada en curso / P0–P1 abiertos |
+| **CERTIFIED** | Criterios Surface Certified cumplidos |
+| **REGRESSED** | P0/P1 nuevo tras CERTIFIED |
 
-Ejemplo de lenguaje ORR-prep:
+ORR responde otra pregunta:
+
+> ¿Puede **liberarse el producto** (piloto / HP-001)?
+
+Son preguntas distintas. Surface Status no sustituye ORR.
+
+### Surface Certified — criterios
+
+1. Jornadas de trabajo del alcance recorridas (no solo pantallas abiertas).
+2. Acciones del flujo accionadas; columna **Operación completada** = sí donde aplique.
+3. No quedan **P0**.
+4. No quedan **P1** abiertos (salvo waiver explícito).
+5. **P2** listados y aceptados (o corregidos).
+6. Evidencia en [FCR Session Log](./FCR_SESSION_LOG.md).
+
+### ORR READY (consecuencia)
+
+Cuando:
 
 ```text
-Tenant Surface     → IN REVIEW / CERTIFIED
-Platform Surface   → IN REVIEW
-Customer Surface   → NOT STARTED
+Customer Surface   CERTIFIED
+Tenant Surface     CERTIFIED
+Platform Surface   CERTIFIED
 ```
 
-**ORR de producto** (HP-001 / piloto) sigue siendo binario PASSED|BLOCKED.  
-Surface Certified alimenta esa puerta; no la reemplaza.
+→ se habilita automáticamente:
+
+```text
+ORR READY
+```
+
+ORR deja de ser una actividad manual de «revisar todo otra vez»: es la puerta binaria ([PASSED|BLOCKED](../22-implementation/ORR.md)) alimentada por superficies ya certificadas. El acta ORR sigue siendo el veredicto formal de producto.
 
 ---
 
-## Anotación · Operational Journey (aún no SPEC)
+## Pasada 2 · jornadas de trabajo (no pantallas)
 
-**No documentar como política todavía.** Anotar para formación / onboarding:
+Pregunta única por perfil:
 
-Además de *qué puede* (RBAC) y *dónde aterriza* (Entry Policy), importa el **recorrido operativo**:
+> **¿Puede este usuario terminar su jornada laboral utilizando únicamente YourMeal OS?**
+
+| Respuesta | Lectura |
+|-----------|---------|
+| **Sí** | Cerca de Surface CERTIFIED |
+| **No** | No es «un bug»: es una **brecha operacional** — evidencia que ORR debe capturar |
+
+### Ejemplos de jornada (guía)
+
+**Kitchen**
 
 ```text
-Kitchen:  Login → Kitchen Workspace → Producción → Finalizar lote → Packaging
-Support:  Login → Customer Support → Cliente → Pedido → Incidencia
+Llego → Veo qué cocinar → Cambio estados → Finalizo → Salgo
 ```
 
-Cuando FCR lo necesite, abrir SPEC / ADR de **Operational Journey** (después de Entry Policy).
+**Delivery**
 
----
+```text
+Entro → Veo rutas → Marco entrega → Salgo
+```
 
-## Pasada 2 · siete perfiles (formato)
+**Support**
 
-Evaluación **operacional**, no solo visual.
+```text
+Entro → Busco cliente → Abro pedido → Registro incidencia → Salgo
+```
 
-| Perfil | Landing | Navegación | Permisos | Resultado |
-|--------|---------|------------|----------|-----------|
-| Customer | | | | □ |
-| Kitchen | | | | □ |
-| Delivery | | | | □ |
-| Support | | | | □ |
-| Accounting | | | | □ |
-| Company Admin | | | | □ |
-| SaaS Admin | | | | □ |
-
-Criterios por columna:
+Tabla de perfiles: [FCR_SESSION_LOG · Pasada 2](./FCR_SESSION_LOG.md#pasada-2--siete-perfiles).
 
 | Columna | Pregunta |
 |---------|----------|
 | Landing | ¿Cumple Workspace Entry Policy? |
-| Navegación | ¿Llega a su workspace y recorre el flujo sin callejones? |
-| Permisos | ¿Ve solo su superficie / capabilities? ¿Nada de Platform desde Tenant-only? |
+| Navegación | ¿La jornada avanza sin callejones? |
+| Permisos | ¿Solo su superficie / capabilities? |
 | Resultado | ✅ / ⚠+ID / ❌+ID |
+| *(en session log)* Operación completada | ¿Terminó el trabajo, no solo abrió UI? |
 
-Plantilla viva: [FCR_SESSION_LOG · Pasada 2](./FCR_SESSION_LOG.md#pasada-2--siete-perfiles).
+---
+
+## Anotación · Operational Journey (aún no modelo oficial)
+
+**No ADR / no SPEC todavía** — necesita más evidencia de Pasada 2.
+
+Evolución probable (modelo, no política):
+
+```text
+Operational Journey
+  → Entry
+  → Workspace
+  → Actions
+  → Completion
+  → Exit
+```
+
+Reusable por departamento. Formación y onboarding se apoyarán aquí más adelante.
+
+---
+
+## Anotación · capa emergente (sin nombre oficial)
+
+FOPEBA ya gobierna conocimiento operacional. Con FCR/ORC aparece otra capa — **describir, no bautizar aún**:
+
+```text
+Operational Knowledge
+        ↓
+Operational Certification
+        ↓
+Operational Release
+```
+
+Evolución natural de observar → certificar → liberar. No abrir documento FOPEBA formal hasta que Pasada 2 y un ORR lo respalden.
 
 ---
 
 ## Relación con artefactos
 
-| Artefacto | Rol en la cadena |
-|-----------|------------------|
-| [FCR_FINDINGS_REGISTER](./FCR_FINDINGS_REGISTER.md) | Hallazgos clasificados |
-| [FCR_SESSION_LOG](./FCR_SESSION_LOG.md) | Evidencia de cobertura |
+| Artefacto | Rol |
+|-----------|-----|
+| [FCR_FINDINGS_REGISTER](./FCR_FINDINGS_REGISTER.md) | Hallazgos / brechas operacionales |
+| [FCR_SESSION_LOG](./FCR_SESSION_LOG.md) | Evidencia + Operación completada |
 | [RBAC_MATRIX_V1](./RBAC_MATRIX_V1.md) | Autorización por superficie |
 | [WORKSPACE_ENTRY_POLICY](./WORKSPACE_ENTRY_POLICY.md) | Landings (candidato ADR) |
-| [Development Identity Adapter](../20-evidence-framework/11-development-identity-adapter.md) | Cómo se obtiene identidad en FCR |
-| [ORR](../22-implementation/ORR.md) | Puerta binaria de readiness de producto |
+| [Development Identity Adapter](../20-evidence-framework/11-development-identity-adapter.md) | Identidad en FCR |
+| [ORR](../22-implementation/ORR.md) | Puerta binaria PASSED\|BLOCKED tras ORR READY |

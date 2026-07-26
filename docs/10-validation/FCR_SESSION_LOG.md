@@ -1,66 +1,88 @@
 # FCR Session Log · formato de certificación
 
 **Modo:** Functional Review Mode  
-**Uso:** una fila por pantalla / flujo recorrido. Demuestra qué está verificado para ORR.  
-**Metodología:** [OPERATIONAL_READINESS_CERTIFICATION](./OPERATIONAL_READINESS_CERTIFICATION.md) · Surface Certified
+**Uso:** evidencia de cobertura hacia Surface Certified → ORR READY.  
+**Metodología:** [OPERATIONAL_READINESS_CERTIFICATION](./OPERATIONAL_READINESS_CERTIFICATION.md)
 
-Leyenda resultado: ✅ verificado · ⚠ hallazgo · ❌ bloqueado · □ pendiente
+Leyenda resultado: ✅ verificado · ⚠ hallazgo · ❌ bloqueado · □ pendiente  
+**Operación completada:** sí / no / n/a — ¿pudo terminar el trabajo, no solo abrir la UI?
 
-### Estado de superficies (ORR-prep)
+### Surface Status (≠ ORR)
 
-| Superficie | Estado |
-|------------|--------|
+| Superficie | Surface Status |
+|------------|----------------|
 | Tenant Surface `/admin` | **IN REVIEW** |
 | Platform Surface `/saas` | **NOT STARTED** |
 | Customer Surface `/app` | **NOT STARTED** |
+
+```text
+ORR READY  →  solo cuando las tres = CERTIFIED
+```
 
 ---
 
 ## Sesión 1 · 2026-07-26 · Bootstrap Identity
 
-| Pantalla / flujo | Resultado | Evidencia | Acción |
-|------------------|-----------|-----------|--------|
-| Bootstrap selector / banner | ✅ | Captura — Identity Source BootstrapIdentityProvider | Ninguna |
-| Centro Operaciones `/admin` (estructura departamentos) | ✅ | Recorrido visual — Cocina, Reparto, Atención, Comercial | FCR-003 validado |
-| Ajustes `/admin/settings` | ⚠ | Company Admin tiles ≡ SaaS Admin (Marca, Comercial, Clientes, Soporte, Usuarios, Auditoría) | FCR-001 · Tenant vs Platform Surface |
-| Ops Home / dashboard | ⚠ | Titileo / parpadeo al navegar | FCR-002 · Render Stability Regression |
-| Cocina (presencia en nav / área) | ✅ | Visible en Ops como departamento | Ninguna (landing Kitchen = FCR-004) |
-| Customer Home / Menú / Pedido / Historial / Favoritos | □ | — | Recorrer perfil Customer |
-| Kitchen landing → workspace | □ | — | FCR-004 · Workspace Entry Policy |
-| Delivery `/admin/delivery` | □ | — | Recorrer + Entry Policy |
-| Support `/admin/support` | □ | — | FCR-005 |
-| Accounting `/admin/accounting` | □ | — | FCR-005 |
-| Company Admin — sin acceso Platform (`/saas`) | □ | — | Confirmar RBAC-001 |
-| Platform Surface `/saas` (Tenants, PO, Roles, Audit, Flags) | □ | — | Recorrer perfil SaaS Admin |
-| Business Branding vs Platform Branding | □ | — | Separar conceptos en FCR-001 |
+| Pantalla / flujo | Resultado | Evidencia | Acción | Operación completada |
+|------------------|-----------|-----------|--------|----------------------|
+| Bootstrap selector / banner | ✅ | Identity Source BootstrapIdentityProvider | Ninguna | n/a |
+| Centro Operaciones `/admin` (estructura departamentos) | ✅ | Recorrido visual — departamentos | FCR-003 | n/a (estructura) |
+| Ajustes `/admin/settings` | ⚠ | Tiles Tenant ≡ perfil con Platform | FCR-001 | no (superficie mezclada) |
+| Ops Home / dashboard | ⚠ | Titileo — clase Render Stability | FCR-002 | no (regresión render) |
+| Cocina (presencia en nav) | ✅ | Visible como departamento | FCR-004 pending landing | n/a |
+| Customer jornada | □ | — | Pasada 2 | □ |
+| Kitchen jornada | □ | — | Pasada 2 · FCR-004 | □ |
+| Delivery jornada | □ | — | Pasada 2 | □ |
+| Support jornada | □ | — | Pasada 2 · FCR-005 | □ |
+| Accounting jornada | □ | — | Pasada 2 · FCR-005 | □ |
+| Company Admin jornada (Tenant only) | □ | — | RBAC-001 | □ |
+| SaaS Admin jornada (Platform) | □ | — | FCR-006 · Entry `/saas` | □ |
+| Business vs Platform Branding | □ | — | FCR-001 | □ |
 
 ---
 
 ## Cómo rellenar
 
-1. Un perfil Bootstrap por bloque de filas (anotar perfil en Evidencia).
-2. No mezclar severidades en «Acción» — referenciar ID del [registro](./FCR_FINDINGS_REGISTER.md).
-3. ✅ solo si el recorrido operativo del flujo se completó (no solo «se ve el menú»).
-4. Al cerrar ORR: este log + registro de hallazgos = evidencia de cobertura.
+1. Preferir **jornadas** a pantallas sueltas.
+2. Pregunta maestra: *¿Puede terminar su jornada laboral solo con YourMeal OS?*
+3. Si la UI funciona pero el trabajo no se cierra → **Operación completada = no** → brecha operacional (no «bug menor»).
+4. Referenciar IDs del [registro](./FCR_FINDINGS_REGISTER.md) en Acción.
+5. Nunca registrar síntoma como causa.
 
 ---
 
-## Pasada 2 · siete perfiles
+## Pasada 2 · siete perfiles · jornadas
 
-Evaluación **operacional** (no solo visual). Metodología: [ORC](./OPERATIONAL_READINESS_CERTIFICATION.md).
+**No recorrer pantallas. Recorrer jornadas de trabajo.**
 
-| Perfil | Landing | Navegación | Permisos | Resultado |
-|--------|---------|------------|----------|-----------|
-| Customer | | | | □ |
-| Kitchen | | | | □ |
-| Delivery | | | | □ |
-| Support | | | | □ |
-| Accounting | | | | □ |
-| Company Admin | | | | □ |
-| SaaS Admin | | | | □ |
+Pregunta por perfil: *¿Puede este usuario terminar su jornada laboral utilizando únicamente YourMeal OS?*
 
-Al cerrar cada perfil: actualizar filas de Sesión 1 / nuevas filas con evidencia, IDs FCR, y el estado de superficie (CERTIFIED solo si cumple criterios Surface Certified).
+| Perfil | Landing | Navegación | Permisos | Operación completada | Resultado |
+|--------|---------|------------|----------|----------------------|-----------|
+| Customer | | | | □ | □ |
+| Kitchen | | | | □ | □ |
+| Delivery | | | | □ | □ |
+| Support | | | | □ | □ |
+| Accounting | | | | □ | □ |
+| Company Admin | | | | □ | □ |
+| SaaS Admin | | | | □ | □ |
 
-### Anotación (no SPEC) · Operational Journey
+### Guías de jornada
 
-Cuando un perfil se recorra end-to-end, anotar en Evidencia el **recorrido operativo** (p. ej. Kitchen: Workspace → Producción → lote → Packaging). No abrir documento de política hasta que Entry Policy esté estable.
+| Perfil | Jornada mínima |
+|--------|----------------|
+| Kitchen | Llego → veo qué cocinar → cambio estados → finalizo → salgo |
+| Delivery | Entro → veo rutas → marco entrega → salgo |
+| Support | Entro → busco cliente → abro pedido → registro incidencia → salgo |
+| Customer | Home → menú → pedido → (historial/favoritos según alcance) |
+| Company Admin | Ops home → áreas tenant → ajustes tenant (sin Platform) |
+| SaaS Admin | Entry Platform `/saas` → tenants / PO / roles según alcance |
+| Accounting | Entry accounting → flujo contable mínimo del alcance |
+
+### Anotación · Operational Journey (modelo futuro, no oficial)
+
+```text
+Entry → Workspace → Actions → Completion → Exit
+```
+
+Anotar en Evidencia si la jornada encaja; no abrir SPEC/ADR aún.
