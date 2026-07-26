@@ -24,6 +24,9 @@ docs/10-validation/
 ├── RUNTIME_VERIFICATION_EVIDENCE.md      ← Playwright 2026-07-25
 ├── UX_BRANDLEAFMARK_ADMIN_SHELL.md
 ├── DEPLOYMENT_VERIFICATION.md
+├── FCR_FINDINGS_REGISTER.md              ← Functional Review Mode · hallazgos
+├── RBAC_MATRIX_V1.md                     ← matriz pantallas × perfiles
+├── FCR002_FLICKER_INVESTIGATION.md       ← titileo Ops (sin fix aún)
 ├── POST_DEPLOY_SMOKE_OP001.md
 ├── RI001_CERTIFICATION_SPRINT.md
 ├── checklists/ · reports/ · evidence/
