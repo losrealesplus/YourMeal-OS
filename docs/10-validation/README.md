@@ -24,9 +24,10 @@ docs/10-validation/
 ├── RUNTIME_VERIFICATION_EVIDENCE.md      ← Playwright 2026-07-25
 ├── UX_BRANDLEAFMARK_ADMIN_SHELL.md
 ├── DEPLOYMENT_VERIFICATION.md
-├── OPERATIONAL_READINESS_CERTIFICATION.md ← FCR→ORR · Surface Certified
+├── OPERATIONAL_READINESS_CERTIFICATION.md ← Surface + Flow · ORR READY
+├── FLOW_CERTIFICATION.md                 ← Nivel 2 · plantilla (post Pasada 2)
 ├── FCR_FINDINGS_REGISTER.md              ← Functional Review Mode · hallazgos
-├── FCR_SESSION_LOG.md                    ← pantalla × resultado × evidencia × acción
+├── FCR_SESSION_LOG.md                    ← Nivel 1 · jornadas × evidencia
 ├── RBAC_MATRIX_V1.md                     ← autorización por Tenant/Platform Surface
 ├── WORKSPACE_ENTRY_POLICY.md             ← landings (≠ RBAC; candidato ADR)
 ├── FCR002_FLICKER_INVESTIGATION.md       ← Render Stability Regression
