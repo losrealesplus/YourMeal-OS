@@ -58,7 +58,8 @@ Los hallazgos de **Auth** siguen el bloque Identity Frozen + P12 PRE-CHECK.
 
 No mezclar niveles en el mismo ítem.
 
-Checklist operacional: [BOOTSTRAP_FCR_CHECKLIST](../10-validation/BOOTSTRAP_FCR_CHECKLIST.md).
+Checklist operacional: [BOOTSTRAP_FCR_CHECKLIST](../10-validation/BOOTSTRAP_FCR_CHECKLIST.md).  
+Certificación por superficie: [OPERATIONAL_READINESS_CERTIFICATION](../10-validation/OPERATIONAL_READINESS_CERTIFICATION.md) (FCR → ORR).
 
 ---
 
@@ -67,3 +68,4 @@ Checklist operacional: [BOOTSTRAP_FCR_CHECKLIST](../10-validation/BOOTSTRAP_FCR_
 - [P12 · Evidence Freshness](./10-evidence-freshness-p12.md) — no reabrir Auth con hallazgos STALE  
 - [Identity Freeze v1](../00-status/IDENTITY_FREEZE_v1.md) — producción congelada  
 - [BOOTSTRAP_MODE](../00-status/BOOTSTRAP_MODE.md) — implementación YourMeal OS  
+- [ORC · Surface Certified](../10-validation/OPERATIONAL_READINESS_CERTIFICATION.md) — FCR como evidencia hacia ORR  
