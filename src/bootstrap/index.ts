@@ -16,3 +16,4 @@ export {
 } from "./session-store";
 export { IdentityProvider } from "@/identity/identity-provider";
 export { BootstrapShell } from "./BootstrapShell";
+export { BootstrapModeBanner } from "./BootstrapModeBanner";

@@ -56,6 +56,10 @@ Acta: [IDENTITY_FREEZE_v1](../00-status/IDENTITY_FREEZE_v1.md) · [Checklist](./
 
 [P12](../20-evidence-framework/10-evidence-freshness-p12.md) · caso canónico: [FINDING_STALE_PO_NAV_LOVABLE](./FINDING_STALE_PO_NAV_LOVABLE.md) — Lovable PO-nav finding cerrado sin código (BUGFIX-001/002).
 
+## EP-BOOTSTRAP-001 · Dev identity + FCR operacional
+
+[BOOTSTRAP_MODE](../00-status/BOOTSTRAP_MODE.md) · [Dev Identity Adapter](../20-evidence-framework/11-development-identity-adapter.md) · [FCR checklist](./BOOTSTRAP_FCR_CHECKLIST.md)
+
 ## FOPEBA gates (CI)
 
 | Gate | Doc | Command / workflow |
