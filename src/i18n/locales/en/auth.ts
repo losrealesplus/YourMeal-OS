@@ -35,4 +35,17 @@ export default {
     "You are signed in as a customer. Sign out and use an EatClean staff account.",
   adminSwitchAccount: "Use another account",
   backToCustomerLogin: "Back to customer sign-in",
+  adminBootstrapRetry: "Try again",
+  adminBootstrapNetwork:
+    "We could not reach the authentication service. Check your connection and try again.",
+  adminBootstrapRpcMissing:
+    "Platform bootstrap is not available yet (migration or RPC missing). Staff sign-in cannot continue safely.",
+  adminBootstrapAuth:
+    "Authentication failed while preparing your session. Sign in again.",
+  adminBootstrapSession:
+    "Your session is missing or expired. Sign in again to continue.",
+  adminBootstrapForbidden:
+    "This account is not allowed to complete Operations Center bootstrap.",
+  adminBootstrapUnexpected:
+    "Something went wrong while opening the Operations Center. Try again.",
 } as const;

@@ -37,4 +37,17 @@ export default {
     "Vous êtes connecté en tant que client. Déconnectez-vous et utilisez un compte du personnel.",
   adminSwitchAccount: "Utiliser un autre compte",
   backToCustomerLogin: "Retour à la connexion client",
+  adminBootstrapRetry: "Réessayer",
+  adminBootstrapNetwork:
+    "Impossible de joindre le service d'authentification. Vérifiez la connexion et réessayez.",
+  adminBootstrapRpcMissing:
+    "Le bootstrap plateforme n'est pas encore disponible (migration ou RPC manquante). La connexion staff ne peut pas continuer en sécurité.",
+  adminBootstrapAuth:
+    "Échec d'authentification lors de la préparation de la session. Reconnectez-vous.",
+  adminBootstrapSession:
+    "Session absente ou expirée. Reconnectez-vous pour continuer.",
+  adminBootstrapForbidden:
+    "Ce compte n'est pas autorisé à terminer le bootstrap du centre d'opérations.",
+  adminBootstrapUnexpected:
+    "Une erreur s'est produite en ouvrant le centre d'opérations. Réessayez.",
 } as const;

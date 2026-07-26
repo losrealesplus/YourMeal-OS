@@ -37,4 +37,17 @@ export default {
     "Sei connesso come cliente. Esci e usa un account dello staff EatClean.",
   adminSwitchAccount: "Usa un altro account",
   backToCustomerLogin: "Torna all'accesso cliente",
+  adminBootstrapRetry: "Riprova",
+  adminBootstrapNetwork:
+    "Impossibile raggiungere il servizio di autenticazione. Controlla la connessione e riprova.",
+  adminBootstrapRpcMissing:
+    "Il bootstrap della piattaforma non è ancora disponibile (migrazione o RPC mancante). L'accesso staff non può continuare in sicurezza.",
+  adminBootstrapAuth:
+    "Autenticazione non riuscita durante la preparazione della sessione. Accedi di nuovo.",
+  adminBootstrapSession:
+    "Sessione mancante o scaduta. Accedi di nuovo per continuare.",
+  adminBootstrapForbidden:
+    "Questo account non può completare il bootstrap del Centro Operazioni.",
+  adminBootstrapUnexpected:
+    "Qualcosa è andato storto aprendo il Centro Operazioni. Riprova.",
 } as const;

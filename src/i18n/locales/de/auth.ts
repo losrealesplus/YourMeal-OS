@@ -37,4 +37,17 @@ export default {
     "Du bist als Kunde angemeldet. Melde dich ab und nutze ein Mitarbeiterkonto.",
   adminSwitchAccount: "Anderes Konto verwenden",
   backToCustomerLogin: "Zurück zur Kundenanmeldung",
+  adminBootstrapRetry: "Erneut versuchen",
+  adminBootstrapNetwork:
+    "Der Authentifizierungsdienst ist nicht erreichbar. Bitte Verbindung prüfen und erneut versuchen.",
+  adminBootstrapRpcMissing:
+    "Plattform-Bootstrap ist noch nicht verfügbar (Migration/RPC fehlt). Personal-Login kann nicht sicher fortgesetzt werden.",
+  adminBootstrapAuth:
+    "Authentifizierung beim Vorbereiten der Sitzung fehlgeschlagen. Bitte erneut anmelden.",
+  adminBootstrapSession:
+    "Sitzung fehlt oder ist abgelaufen. Bitte erneut anmelden.",
+  adminBootstrapForbidden:
+    "Dieses Konto darf den Operations-Center-Bootstrap nicht abschließen.",
+  adminBootstrapUnexpected:
+    "Beim Öffnen des Operations Centers ist ein Fehler aufgetreten. Bitte erneut versuchen.",
 } as const;

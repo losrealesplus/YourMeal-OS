@@ -35,4 +35,17 @@ export default {
     "Tu sesión actual es de cliente. Cierra sesión e inicia con una cuenta de personal de EatClean.",
   adminSwitchAccount: "Usar otra cuenta",
   backToCustomerLogin: "Volver al inicio de sesión",
+  adminBootstrapRetry: "Reintentar",
+  adminBootstrapNetwork:
+    "No pudimos contactar el servicio de autenticación. Comprueba tu conexión e inténtalo de nuevo.",
+  adminBootstrapRpcMissing:
+    "El bootstrap de plataforma no está disponible (migración o RPC pendiente). El acceso de personal no puede continuar de forma segura.",
+  adminBootstrapAuth:
+    "Falló la autenticación al preparar tu sesión. Vuelve a iniciar sesión.",
+  adminBootstrapSession:
+    "Tu sesión falta o ha caducado. Inicia sesión de nuevo para continuar.",
+  adminBootstrapForbidden:
+    "Esta cuenta no puede completar el bootstrap del Centro de Operaciones.",
+  adminBootstrapUnexpected:
+    "Algo falló al abrir el Centro de Operaciones. Inténtalo de nuevo.",
 } as const;
