@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { supabase } from "@/integrations/supabase/client";
+import { updatePassword } from "@/auth";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/reset-password")({
@@ -23,7 +23,7 @@ function ResetPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
-    const { error } = await supabase.auth.updateUser({ password });
+    const { error } = await updatePassword(password);
     setBusy(false);
     if (error) toast.error(error.message);
     else {

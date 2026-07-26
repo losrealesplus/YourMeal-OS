@@ -6,6 +6,9 @@
 ```text
 docs/10-validation/
 ├── README.md
+├── AUTH_AUDIT.md                         ← INFRA-003 Fase 1
+├── SUPABASE_AUTH_VALIDATION.md           ← INFRA-003 Fase 2
+├── AUTH_MIGRATION_REPORT.md              ← INFRA-003 cierre código
 ├── ACTA_CIERRE_OP001.md
 ├── AUD001_RUNTIME_DEPLOYMENT_AUDIT.md
 ├── MIGRATION_BOOTSTRAP_VALIDATION.md     ← Empty-DB migration gate (FOPEBA CI)

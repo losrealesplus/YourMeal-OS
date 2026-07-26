@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
+import { getSession } from "@/auth";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import type { AppRole } from "@/hooks/use-auth";
@@ -45,7 +46,7 @@ export function BrandLeafMark({
         return;
       }
 
-      const { data } = await supabase.auth.getSession();
+      const { data } = await getSession();
       const uid = data.session?.user?.id ?? null;
       let effectiveRoles = roles;
 

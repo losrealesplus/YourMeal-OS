@@ -11,7 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { supabase } from "@/integrations/supabase/client";
+import { onAuthStateChange } from "@/auth";
 import "@/i18n";
 import { useLanguageSync } from "@/hooks/use-language-sync";
 import { LocalizationProvider } from "@/i18n/localization-provider";
@@ -148,7 +148,7 @@ function RootComponent() {
   useLanguageSync();
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+    const { data: sub } = onAuthStateChange((event) => {
       if (
         event !== "SIGNED_IN" &&
         event !== "SIGNED_OUT" &&

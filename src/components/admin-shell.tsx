@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/integrations/supabase/client";
+import { signOut } from "@/auth";
 import { useAuth } from "@/hooks/use-auth";
 import { useCan } from "@/hooks/use-can";
 import { usePilotAdminModuleFlags } from "@/hooks/use-pilot-admin-module-flags";
@@ -234,7 +234,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
   async function handleSignOut() {
     await qc.cancelQueries();
     qc.clear();
-    await supabase.auth.signOut();
+    await signOut();
     navigate({ to: "/auth", replace: true });
   }
 

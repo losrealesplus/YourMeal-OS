@@ -7,6 +7,7 @@
  *
  * For non-owners the RPC is a no-op. Does not bypass RBAC.
  */
+import { getUser } from "@/auth";
 import { supabase } from "@/integrations/supabase/client";
 import type { AppRole } from "@/hooks/use-auth";
 import type { Json } from "@/integrations/supabase/types";
@@ -68,7 +69,7 @@ function parsePlatformOwnerEnsureResult(
 }
 
 export async function ensurePlatformOwnerSession(): Promise<PlatformOwnerEnsureResult | null> {
-  const { data: userData, error: userErr } = await supabase.auth.getUser();
+  const { data: userData, error: userErr } = await getUser();
   if (userErr) throw userErr;
   if (!userData.user) return null;
 

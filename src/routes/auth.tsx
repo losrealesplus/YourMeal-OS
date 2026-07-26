@@ -2,8 +2,15 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 import { Lock, Mail, Phone } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
+import {
+  getSession,
+  resetPasswordForEmail,
+  signInWithOAuth,
+  signInWithOtpPhone,
+  signInWithPassword,
+  signUp,
+  verifyOtpSms,
+} from "@/auth";
 import { resolveHomePath } from "@/lib/resolve-home-path";
 import { toast } from "sonner";
 import {
@@ -57,7 +64,7 @@ function AuthPage() {
   const [onboardingStep, setOnboardingStep] = useState(0);
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data }) => {
+    getSession().then(async ({ data }) => {
       if (data.session?.user) {
         await goHome(navigate, data.session.user.id);
       }
@@ -243,9 +250,7 @@ function AuthPage() {
                 <button
                   type="button"
                   onClick={async () => {
-                    const r = await lovable.auth.signInWithOAuth("google", {
-                      redirect_uri: window.location.origin,
-                    });
+                    const r = await signInWithOAuth("google");
                     if (r.error) toast.error(r.error.message);
                   }}
                   className="border border-border/80 bg-white text-sm font-semibold py-3.5 rounded-2xl hover:bg-muted/60 transition-colors"
@@ -255,9 +260,7 @@ function AuthPage() {
                 <button
                   type="button"
                   onClick={async () => {
-                    const r = await lovable.auth.signInWithOAuth("apple", {
-                      redirect_uri: window.location.origin,
-                    });
+                    const r = await signInWithOAuth("apple");
                     if (r.error) toast.error(r.error.message);
                   }}
                   className="border border-border/80 bg-white text-sm font-semibold py-3.5 rounded-2xl hover:bg-muted/60 transition-colors"
@@ -298,23 +301,17 @@ function EmailForm() {
     setBusy(true);
     try {
       if (mode === "signin") {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+        const { error } = await signInWithPassword({ email, password });
         if (error) throw error;
-        const { data: sessionData } = await supabase.auth.getSession();
+        const { data: sessionData } = await getSession();
         const uid = sessionData.session?.user?.id;
         if (uid) await goHome(navigate, uid);
         else navigate({ to: "/app", replace: true });
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { error } = await signUp({
           email,
           password,
-          options: {
-            emailRedirectTo: window.location.origin,
-            data: { full_name: fullName },
-          },
+          fullName,
         });
         if (error) throw error;
         toast.success(t("auth:checkEmail"));
@@ -331,9 +328,7 @@ function EmailForm() {
       toast.error(t("common:email"));
       return;
     }
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
+    const { error } = await resetPasswordForEmail(email);
     if (error) toast.error(error.message);
     else toast.success(t("auth:resetSent"));
   }
@@ -416,7 +411,7 @@ function PhoneForm() {
 
   async function sendCode() {
     setBusy(true);
-    const { error } = await supabase.auth.signInWithOtp({ phone });
+    const { error } = await signInWithOtpPhone(phone);
     setBusy(false);
     if (error) toast.error(error.message);
     else {
@@ -426,15 +421,11 @@ function PhoneForm() {
   }
   async function verify() {
     setBusy(true);
-    const { error } = await supabase.auth.verifyOtp({
-      phone,
-      token: code,
-      type: "sms",
-    });
+    const { error } = await verifyOtpSms({ phone, token: code });
     setBusy(false);
     if (error) toast.error(error.message);
     else {
-      const { data: sessionData } = await supabase.auth.getSession();
+      const { data: sessionData } = await getSession();
       const uid = sessionData.session?.user?.id;
       if (uid) await goHome(navigate, uid);
       else navigate({ to: "/app", replace: true });

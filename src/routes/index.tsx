@@ -8,7 +8,7 @@ import {
 import { brandConfig, tenantCopyEs } from "@/tenant/brand-config";
 import { PrimaryCTA } from "@/components/consumer";
 import { TenantLogo } from "@/components/tenant/tenant-logo";
-import { supabase } from "@/integrations/supabase/client";
+import { getSession } from "@/auth";
 import { resolveHomePath } from "@/lib/resolve-home-path";
 import heroImage from "@/assets/eatclean-hero.jpg";
 
@@ -81,7 +81,7 @@ function Landing() {
   // OP-001: OAuth / session return must not stall on public landing.
   useEffect(() => {
     let cancelled = false;
-    supabase.auth.getSession().then(async ({ data }) => {
+    getSession().then(async ({ data }) => {
       const userId = data.session?.user?.id;
       if (!userId || cancelled) return;
       const path = await resolveHomePath(userId);

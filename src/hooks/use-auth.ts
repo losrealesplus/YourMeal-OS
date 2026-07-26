@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { useRouter } from "@tanstack/react-router";
+import { getSession, onAuthStateChange } from "@/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { homePathForRoles } from "@/lib/home-path";
 import { ensurePlatformOwnerSession } from "@/lib/ensure-platform-owner-session";
@@ -59,10 +60,10 @@ export function useAuth(): AuthState {
   const [tenant, setTenant] = useState<ActiveTenant | null>(null);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+    const { data: sub } = onAuthStateChange((_e, s) => {
       setSession(s);
     });
-    supabase.auth.getSession().then(({ data }) => {
+    getSession().then(({ data }) => {
       setSession(data.session);
       setLoading(false);
     });

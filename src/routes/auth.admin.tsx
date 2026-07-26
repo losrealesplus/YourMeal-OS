@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Lock, Mail } from "lucide-react";
+import { getSession, signInWithPassword, signOut } from "@/auth";
 import { supabase } from "@/integrations/supabase/client";
 import type { AppRole } from "@/hooks/use-auth";
 import { hasStaffAccess } from "@/permissions";
@@ -78,7 +79,7 @@ function AdminAuthPage() {
   useEffect(() => {
     let cancelled = false;
     void (async () => {
-      const { data } = await supabase.auth.getSession();
+      const { data } = await getSession();
       const user = data.session?.user;
       if (!user) {
         if (!cancelled) {
@@ -105,7 +106,7 @@ function AdminAuthPage() {
   async function switchAccount() {
     setBusy(true);
     try {
-      await supabase.auth.signOut();
+      await signOut();
       setNonStaffSession(false);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
@@ -118,12 +119,12 @@ function AdminAuthPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error } = await signInWithPassword({
         email,
         password,
       });
       if (error) throw error;
-      const { data: sessionData } = await supabase.auth.getSession();
+      const { data: sessionData } = await getSession();
       const uid = sessionData.session?.user?.id;
       if (!uid) {
         navigate({ to: "/admin", replace: true });
