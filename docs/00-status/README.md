@@ -2,6 +2,7 @@
 
 **Última actualización:** 2026-07-26  
 **Auth Layer:** ✅ **Frozen** — [IDENTITY_FREEZE_v1](./IDENTITY_FREEZE_v1.md) · PRODUCT-001 · BUGFIX-002 · [Closeout](../10-validation/IDENTITY_CLOSEOUT_REPORT.md)  
+**Dev Bootstrap:** [BOOTSTRAP_MODE](./BOOTSTRAP_MODE.md) · `VITE_BOOTSTRAP_MODE` default OFF (nunca producción)  
 **Fase actual:** [CURRENT_PHASE](./CURRENT_PHASE.md) ← abrir primero · siguiente foco = **dominio de negocio** (no Auth)  
 **Dominios:** [PROJECT_DOMAINS](./PROJECT_DOMAINS.md) — Knowledge · Engineering · Experience · Operations  
 **Engineering Phase:** [ENGINEERING_PHASE](./ENGINEERING_PHASE.md) — Complete (pending operational authorization)  

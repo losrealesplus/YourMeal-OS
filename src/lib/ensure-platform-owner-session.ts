@@ -12,6 +12,7 @@
  * - `required: false` — home / global nav; failures never block navigation
  */
 import { getUser } from "@/auth";
+import { isBootstrapMode } from "@/bootstrap/flag";
 import { supabase } from "@/integrations/supabase/client";
 import type { AppRole } from "@/hooks/use-auth";
 import type { Json } from "@/integrations/supabase/types";
@@ -92,6 +93,11 @@ export async function ensurePlatformOwnerSession(
   options: EnsurePlatformOwnerSessionOptions = {},
 ): Promise<PlatformOwnerEnsureResult | null> {
   const required = options.required ?? true;
+
+  // EP-BOOTSTRAP-001: synthetic identities — never call PO RPC / invent grants.
+  if (isBootstrapMode()) {
+    return { ok: true, applied: false, reason: "bootstrap_mode" };
+  }
 
   const { data: userData, error: userErr } = await getUser();
   if (userErr) {

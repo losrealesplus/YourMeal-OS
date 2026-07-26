@@ -23,6 +23,7 @@ Registro **inmutable** de hitos. No es gestión de sprint: es memoria objetiva.
 | 2026-07-26 | **BUGFIX-002 · Nav ≠ PO ensure** | [BUGFIX002](../10-validation/BUGFIX002_NAVIGATION_DECOUPLING.md) · least privilege preserved |
 | 2026-07-26 | **Auth Layer STATUS: Frozen** | No más PRs Auth salvo bug / providers · foco → dominio de negocio |
 | 2026-07-26 | **FOPEBA P12 · Evidence Freshness** | PRE-CHECK · STALE · [P12](../20-evidence-framework/10-evidence-freshness-p12.md) · [DICT-074](../99-reference/PROJECT_DICTIONARY.md#evidence-freshness-p12) |
+| 2026-07-26 | **EP-BOOTSTRAP-001 · Dev Bootstrap Mode** | Adaptador temporal · flag OFF por defecto · [BOOTSTRAP_MODE](./BOOTSTRAP_MODE.md) |
 | *(abierto)* | **EatClean Pilot Ready** | [Acta](./MILESTONE_EATCLEAN_PILOT_READY.md) · [PILOT_EXECUTION_GUIDE](../18-operational-validation/PILOT_EXECUTION_GUIDE.md) · EP-001…EP-005 |
 | *(aplazado)* | **Marketing Readiness** | [Acta](./MILESTONE_MARKETING_READINESS.md) · GSC/SEO **después** de RI-001 · [decisiones Lovable](./LOVABLE_FINDINGS_DECISIONS.md) |
 | *(pendiente)* | ORR PASSED \| BLOCKED | Puerta binaria · evidencia · sin features |

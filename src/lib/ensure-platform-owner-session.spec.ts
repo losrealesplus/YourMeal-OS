@@ -127,4 +127,17 @@ describe("ensurePlatformOwnerSession", () => {
     );
     await expect(tryEnsurePlatformOwnerSession()).resolves.toBeNull();
   });
+
+  it("no-ops without RPC when VITE_BOOTSTRAP_MODE=true", async () => {
+    vi.stubEnv("VITE_BOOTSTRAP_MODE", "true");
+    const { ensurePlatformOwnerSession } = await import(
+      "./ensure-platform-owner-session"
+    );
+    await expect(ensurePlatformOwnerSession()).resolves.toMatchObject({
+      ok: true,
+      applied: false,
+      reason: "bootstrap_mode",
+    });
+    expect(rpc).not.toHaveBeenCalled();
+  });
 });

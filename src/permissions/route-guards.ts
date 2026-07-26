@@ -1,10 +1,18 @@
 import type { Capability } from "@/permissions";
 import { can, hasStaffAccess } from "@/permissions";
 import type { AppRole } from "@/hooks/use-auth";
+import { isBootstrapMode } from "@/bootstrap/flag";
+import { getBootstrapProfileByUserId } from "@/bootstrap/profiles";
 import { supabase } from "@/integrations/supabase/client";
 import { redirect } from "@tanstack/react-router";
 
 async function loadRoles(userId: string): Promise<AppRole[]> {
+  // EP-BOOTSTRAP-001: identity origin only — guard logic unchanged.
+  if (isBootstrapMode()) {
+    const profile = getBootstrapProfileByUserId(userId);
+    if (profile) return [...profile.roles];
+  }
+
   const { data } = await supabase
     .from("user_roles")
     .select("role")
