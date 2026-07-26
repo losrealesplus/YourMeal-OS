@@ -24,6 +24,7 @@ docs/10-validation/
 ├── RUNTIME_VERIFICATION_EVIDENCE.md      ← Playwright 2026-07-25
 ├── UX_BRANDLEAFMARK_ADMIN_SHELL.md
 ├── DEPLOYMENT_VERIFICATION.md
+├── LOVABLE_DEPLOYMENT_AUDIT_BOOTSTRAP.md  ← Bootstrap #82 · DV-001 Lovable sync
 ├── POST_DEPLOY_SMOKE_OP001.md
 ├── RI001_CERTIFICATION_SPRINT.md
 ├── checklists/ · reports/ · evidence/
