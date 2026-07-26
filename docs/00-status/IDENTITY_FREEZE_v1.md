@@ -1,78 +1,137 @@
-# Identity Freeze v1
+# Identity Freeze v1 · Auth Layer Frozen
 
 **Documento:** `IDENTITY_FREEZE_v1.md`  
 **Fecha:** 2026-07-26  
-**Estado:** **Frozen v1**  
+**Estado:** **Frozen v1** — Identity Block + Navigation Decoupling cerrados  
 **Proyecto Supabase:** `djangucecsphnejplvic`  
-**Knowledge Lifetime:** Iteration *(acta inmutable al cierre)*  
+**Declaración oficial:** **Identity Block Frozen v1** · **Auth Layer STATUS: Frozen**
 
 ---
 
-## Decisión
+## Estado del bloque
 
-Queda **congelada** la foundation de identidad de YourMeal OS.
-
-A partir de este momento, la identidad operativa se considera estable para continuar módulos de producto **sin rediseñar Auth, roles ni sesión**.
+| Bloque | Estado |
+|--------|:------:|
+| FOUNDATION | ✅ |
+| INFRA | ✅ |
+| Identity | ✅ **Frozen v1** |
+| Platform Owner Bootstrap | ✅ |
+| Product Identity (PRODUCT-001) | ✅ |
+| Navigation Decoupling (BUGFIX-002) | ✅ |
 
 ```text
-❌ No reabrir arquitectura de identidad.
-✅ Operar, endurecer seguridad y completar OAuth cuando proceda.
+Auth Layer
+
+STATUS: Frozen
+
+Allowed:
+✓ Bug fixes
+✓ Security fixes
+✓ Google OAuth activation
+✓ Apple OAuth activation
+✓ Phone Auth activation
+
+Forbidden:
+✗ Refactor Auth
+✗ Cambios RBAC
+✗ Cambios Session
+✗ Cambios Bootstrap
+✗ Cambios Callback
 ```
 
----
-
-## Frozen Components
-
-| Componente | Estado | Evidencia / ancla |
-|------------|--------|-------------------|
-| Supabase Auth | ✓ Frozen | INFRA-003 · `src/auth/*` · cliente oficial |
-| Email / Password | ✓ Frozen | INFRA-005 · credentials + `/auth` |
-| Session Lifecycle | ✓ Frozen | getSession / refresh / persist / signOut · BUGFIX-001 resiliencia admin |
-| Platform Owner Bootstrap | ✓ Frozen | OP-002 · `seed:platform-owners` · `ensure_platform_owner_session` |
-| RBAC Foundation | ✓ Frozen | `user_roles` · `src/permissions` · route guards |
-| Tenant Isolation | ✓ Frozen | RLS + membership · INFRA-005 TENANT report |
-| Admin Entry | ✓ Frozen | `/auth/admin` · Ops Center entry · BUGFIX-001 |
+A partir de este momento **no se abren más PRs de autenticación** salvo bug real o activación de providers.  
+Siguiente foco: **dominio de negocio** (Tenants, Usuarios, Pedidos, Cocina, Producción, Rutas, Facturación, …).
 
 ---
 
-## Future Changes
+## Componentes congelados
 
-### Allowed
+| Componente | Estado | Ancla |
+|------------|--------|-------|
+| Email Auth | Frozen | INFRA-005 · PRODUCT-001 |
+| Session Lifecycle | Frozen | `src/auth/session` · BUGFIX-001 |
+| Callback / PKCE | Frozen | `/auth/callback` · PRODUCT-001 `next` |
+| Password Reset | Frozen | PRODUCT-001 |
+| Platform Owner Bootstrap | Frozen | OP-002 |
+| RBAC Foundation | Frozen | INFRA-005 |
+| Tenant Isolation | Frozen | INFRA-005 |
+| Navigation vs PO ensure | Frozen | BUGFIX-002 · `tryEnsure*` / strict Ops |
+
+---
+
+## Feature Flags
+
+### OAuth
+
+| | |
+|--|--|
+| Flag | `VITE_AUTH_OAUTH_SOCIAL_ENABLED` |
+| Estado | **Disabled** (default `false`) |
+| Activación futura | Google + Apple configurados en Dashboard → flag `true` → rebuild |
+
+### Phone
+
+| | |
+|--|--|
+| Flag | `VITE_AUTH_PHONE_ENABLED` |
+| Estado | **Disabled** (default `false`) |
+| Activación futura | Proveedor SMS + OTP validados → flag `true` → rebuild |
+
+Código OAuth/Phone **conservado**; solo UI gated.
+
+---
+
+## Modelo de bootstrap (inmutable)
+
+```text
+Evidencia > Bootstrap > Roles persistidos > Acceso
+```
+
+Nunca:
+
+```text
+RPC falló → "Asumimos que es Platform Owner"
+```
+
+BUGFIX-002: navegación global usa `tryEnsurePlatformOwnerSession()`; Ops entry (`/auth/admin`) mantiene ensure **strict**. Si la RPC falla en home → solo roles ya en DB.
+
+---
+
+## Cambios permitidos
 
 - Bug fixes  
-- Security fixes  
-- OAuth provider enablement (`VITE_AUTH_OAUTH_SOCIAL_ENABLED` + Dashboard providers)
+- Security patches  
+- Provider activation (OAuth / Phone)  
+- UX improvements menores sin cambiar el modelo  
 
-### Forbidden
+## Cambios prohibidos
 
-- Auth architecture changes  
-- New identity models  
-- Role redesign  
-- Session redesign  
+- Rediseño Auth  
+- Nuevo modelo RBAC  
+- Nuevo modelo Session  
+- Nuevo Bootstrap  
+- Cambios Callback / arquitectura de identidad  
 
----
-
-## Alcance explícito (no congelado aquí)
-
-Estos temas **no** forman parte de Identity Freeze v1 y siguen su propio ciclo:
-
-- Product modules (Pedidos, Cocina, Packaging, …)  
-- Tenant branding / experience polish  
-- Feature flags de módulos piloto  
-- Multi-tenant commercial expansion beyond EatClean seed  
+Cualquier ítem prohibido requiere **nuevo acta / ADR**, no un PR de feature.
 
 ---
 
-## Reactivación OAuth (permitida)
+## PRE-CHECK (obligatorio en análisis externos)
 
-Procedimiento permitido sin romper el freeze:
+Antes de implementar cambios a partir de Lovable u otro revisor:
 
-1. Dashboard: Google / Apple ON + Redirect URLs `/auth/callback`  
-2. `.env`: `VITE_AUTH_OAUTH_SOCIAL_ENABLED=true`  
-3. Rebuild Preview / producción  
-4. Smoke OAuth (sin `/~oauth/initiate`)
+1. Verificar que el análisis sigue siendo reproducible sobre la rama actual.  
+2. Comprobar si PRs recientes ya resolvieron total o parcialmente el problema.  
+3. Si el análisis está desactualizado, documentarlo como obsoleto y **no** modificar código innecesariamente.  
+4. Si solo una parte sigue siendo válida, limitar la implementación a esa parte.  
 
-No requiere nuevo modelo de identidad.
+*(FOPEBA: la evidencia debe ser actual antes de convertirse en trabajo de ingeniería.)*
+
+---
+
+## Epics cerrados
+
+FOUNDATION · INFRA-001…005 · OP-002 · BUGFIX-001 · PRODUCT-001 · IDENTITY-CLOSEOUT-001 · BUGFIX-002 · Identity Freeze v1
 
 ---
 
@@ -80,19 +139,21 @@ No requiere nuevo modelo de identidad.
 
 | Doc |
 |-----|
+| [IDENTITY_CLOSEOUT_REPORT](../10-validation/IDENTITY_CLOSEOUT_REPORT.md) |
+| [IDENTITY_CLOSEOUT_CHECKLIST](../10-validation/IDENTITY_CLOSEOUT_CHECKLIST.md) |
+| [BUGFIX002_NAVIGATION_DECOUPLING](../10-validation/BUGFIX002_NAVIGATION_DECOUPLING.md) |
+| [NAVIGATION_REGRESSION_REPORT](../10-validation/NAVIGATION_REGRESSION_REPORT.md) |
+| [IDENTITY_PRODUCT_REPORT](../10-validation/IDENTITY_PRODUCT_REPORT.md) |
 | [OP002_PLATFORM_OWNER_BOOTSTRAP](../10-validation/OP002_PLATFORM_OWNER_BOOTSTRAP.md) |
-| [PLATFORM_OWNER_VALIDATION](../10-validation/PLATFORM_OWNER_VALIDATION.md) |
-| [BOOTSTRAP_RUNBOOK](../10-validation/BOOTSTRAP_RUNBOOK.md) |
-| [IDENTITY_VALIDATION_REPORT](../10-validation/IDENTITY_VALIDATION_REPORT.md) |
-| [RBAC_VALIDATION](../10-validation/RBAC_VALIDATION.md) |
-| [TENANT_ISOLATION_REPORT](../10-validation/TENANT_ISOLATION_REPORT.md) |
-| [BUGFIX001_ADMIN_AUTH_LOADING](../10-validation/BUGFIX001_ADMIN_AUTH_LOADING.md) |
-| [ADR 0004 · Authentication and RBAC](../adr/0004-authentication-rbac.md) |
+| [ADR 0004](../adr/0004-authentication-rbac.md) |
 
 ---
 
 ## Acta
 
-**Identity Freeze v1** — cerrada el 2026-07-26.
+**Identity Block Frozen v1** · **Auth Layer Frozen** — 2026-07-26.
 
-Cualquier cambio en la columna *Forbidden* requiere decisión explícita de gobernanza (nuevo acta / ADR), no un PR de feature.
+```text
+❌ No reabrir arquitectura de identidad.
+✅ Negocio · bugs · seguridad · activar providers cuando proceda.
+```

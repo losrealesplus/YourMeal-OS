@@ -48,6 +48,10 @@ Reports: [PRODUCT](./IDENTITY_PRODUCT_REPORT.md) · [Email signup](./EMAIL_SIGNU
 
 [BUGFIX002_NAVIGATION_DECOUPLING](./BUGFIX002_NAVIGATION_DECOUPLING.md) · [Regression](./NAVIGATION_REGRESSION_REPORT.md) · [evidence](./evidence/bugfix-002/)
 
+## Auth Layer Frozen · CLOSEOUT
+
+Acta: [IDENTITY_FREEZE_v1](../00-status/IDENTITY_FREEZE_v1.md) · [Checklist](./IDENTITY_CLOSEOUT_CHECKLIST.md) · [Report](./IDENTITY_CLOSEOUT_REPORT.md) · [evidence](./evidence/closeout-001/)
+
 ## FOPEBA gates (CI)
 
 | Gate | Doc | Command / workflow |
