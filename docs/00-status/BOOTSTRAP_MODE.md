@@ -4,7 +4,7 @@
 **Fecha:** 2026-07-26  
 **Tipo:** Adaptador temporal de desarrollo — **no** cambia producción  
 **Práctica FOPEBA:** [Development Identity Adapter](../20-evidence-framework/11-development-identity-adapter.md)  
-**FCR en curso:** [FCR_FINDINGS_REGISTER](../10-validation/FCR_FINDINGS_REGISTER.md) · [FCR_SESSION_LOG](../10-validation/FCR_SESSION_LOG.md) · [RBAC_MATRIX_V1](../10-validation/RBAC_MATRIX_V1.md) · [WORKSPACE_ENTRY_POLICY](../10-validation/WORKSPACE_ENTRY_POLICY.md)
+**FCR en curso:** [OPERATIONAL_READINESS_CERTIFICATION](../10-validation/OPERATIONAL_READINESS_CERTIFICATION.md) · [FCR_FINDINGS_REGISTER](../10-validation/FCR_FINDINGS_REGISTER.md) · [FCR_SESSION_LOG](../10-validation/FCR_SESSION_LOG.md) · [RBAC_MATRIX_V1](../10-validation/RBAC_MATRIX_V1.md) · [WORKSPACE_ENTRY_POLICY](../10-validation/WORKSPACE_ENTRY_POLICY.md)
 
 ---
 

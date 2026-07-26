@@ -1,7 +1,8 @@
 # Workspace Entry Policy
 
 **Estado:** Propuesta de producto (Functional Review Mode) — **no implementada**  
-**Relacionado:** FCR-004 · FCR-005 · FCR-006 · [`homePathForRoles`](../../src/lib/home-path.ts)
+**Candidato ADR** tras Pasada 2 FCR (cuando landings observados confirmen la tabla).  
+**Relacionado:** FCR-004 · FCR-005 · FCR-006 · [`homePathForRoles`](../../src/lib/home-path.ts) · [ORC](./OPERATIONAL_READINESS_CERTIFICATION.md)
 
 ---
 

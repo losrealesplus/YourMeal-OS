@@ -16,6 +16,8 @@
 | **Clase de defecto** | **Render Stability Regression** |
 | **Causa sospechada** | Render loop inducido por dependencia inestable |
 
+**Regla permanente (FOPEBA / FCR):** nunca registrar un síntoma como si fuera la causa.
+
 No clasificar el hallazgo solo por el síntoma visual.  
 ORR y el bloque de fixes deben atacar la estabilidad de render, no «quitar la animación».
 

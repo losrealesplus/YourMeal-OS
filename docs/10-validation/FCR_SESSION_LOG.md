@@ -1,9 +1,18 @@
 # FCR Session Log · formato de certificación
 
 **Modo:** Functional Review Mode  
-**Uso:** una fila por pantalla / flujo recorrido. Demuestra qué está verificado para ORR.
+**Uso:** una fila por pantalla / flujo recorrido. Demuestra qué está verificado para ORR.  
+**Metodología:** [OPERATIONAL_READINESS_CERTIFICATION](./OPERATIONAL_READINESS_CERTIFICATION.md) · Surface Certified
 
 Leyenda resultado: ✅ verificado · ⚠ hallazgo · ❌ bloqueado · □ pendiente
+
+### Estado de superficies (ORR-prep)
+
+| Superficie | Estado |
+|------------|--------|
+| Tenant Surface `/admin` | **IN REVIEW** |
+| Platform Surface `/saas` | **NOT STARTED** |
+| Customer Surface `/app` | **NOT STARTED** |
 
 ---
 
@@ -36,12 +45,22 @@ Leyenda resultado: ✅ verificado · ⚠ hallazgo · ❌ bloqueado · □ pendie
 
 ---
 
-## Perfiles pendientes de sesión completa
+## Pasada 2 · siete perfiles
 
-- [ ] Customer  
-- [ ] Kitchen  
-- [ ] Delivery  
-- [ ] Support  
-- [ ] Accounting  
-- [ ] Company Admin (resto de nav)  
-- [ ] SaaS Admin (Platform Surface)
+Evaluación **operacional** (no solo visual). Metodología: [ORC](./OPERATIONAL_READINESS_CERTIFICATION.md).
+
+| Perfil | Landing | Navegación | Permisos | Resultado |
+|--------|---------|------------|----------|-----------|
+| Customer | | | | □ |
+| Kitchen | | | | □ |
+| Delivery | | | | □ |
+| Support | | | | □ |
+| Accounting | | | | □ |
+| Company Admin | | | | □ |
+| SaaS Admin | | | | □ |
+
+Al cerrar cada perfil: actualizar filas de Sesión 1 / nuevas filas con evidencia, IDs FCR, y el estado de superficie (CERTIFIED solo si cumple criterios Surface Certified).
+
+### Anotación (no SPEC) · Operational Journey
+
+Cuando un perfil se recorra end-to-end, anotar en Evidencia el **recorrido operativo** (p. ej. Kitchen: Workspace → Producción → lote → Packaging). No abrir documento de política hasta que Entry Policy esté estable.

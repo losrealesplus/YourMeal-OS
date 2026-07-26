@@ -7,11 +7,14 @@
 
 | Artefacto | Uso |
 |-----------|-----|
+| [OPERATIONAL_READINESS_CERTIFICATION](./OPERATIONAL_READINESS_CERTIFICATION.md) | Cadena RI→KC→SPEC→FCR→ORR · Surface Certified · Pasada 2 |
 | [FCR_SESSION_LOG](./FCR_SESSION_LOG.md) | Cobertura pantalla × resultado × evidencia × acción |
 | [RBAC_MATRIX_V1](./RBAC_MATRIX_V1.md) | Autorización por superficie |
-| [WORKSPACE_ENTRY_POLICY](./WORKSPACE_ENTRY_POLICY.md) | Dónde empieza cada rol (≠ RBAC) |
+| [WORKSPACE_ENTRY_POLICY](./WORKSPACE_ENTRY_POLICY.md) | Dónde empieza cada rol (≠ RBAC; candidato ADR) |
 | [FCR002](./FCR002_FLICKER_INVESTIGATION.md) | Render Stability Regression |
 | [BOOTSTRAP_FCR_CHECKLIST](./BOOTSTRAP_FCR_CHECKLIST.md) | Checklist 7 perfiles |
+
+**Regla de evidencia:** nunca registrar un síntoma como si fuera la causa.
 
 ---
 
