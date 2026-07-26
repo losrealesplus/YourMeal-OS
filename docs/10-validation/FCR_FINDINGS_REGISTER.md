@@ -8,16 +8,18 @@
 
 | Artefacto | Uso |
 |-----------|-----|
-| [OPERATIONAL_READINESS_CERTIFICATION](./OPERATIONAL_READINESS_CERTIFICATION.md) | Cadena RI→KC→SPEC→FCR→ORR · Surface Certified · Pasada 2 |
-| [FCR_SESSION_LOG](./FCR_SESSION_LOG.md) | Cobertura pantalla × resultado × evidencia × acción |
+| [OPERATIONAL_READINESS_CERTIFICATION](./OPERATIONAL_READINESS_CERTIFICATION.md) | Niveles Surface + Flow · ORR READY |
+| [FCR_SESSION_LOG](./FCR_SESSION_LOG.md) | Evidencia Nivel 1 · Pasada 2 |
+| [FLOW_CERTIFICATION](./FLOW_CERTIFICATION.md) | Nivel 2 · plantilla (vacía hasta superficies CERTIFIED) |
 | [RBAC_MATRIX_V1](./RBAC_MATRIX_V1.md) | Autorización por superficie |
 | [WORKSPACE_ENTRY_POLICY](./WORKSPACE_ENTRY_POLICY.md) | Dónde empieza cada rol (≠ RBAC; candidato ADR) |
 | [FCR002](./FCR002_FLICKER_INVESTIGATION.md) | Render Stability Regression |
 | [BOOTSTRAP_FCR_CHECKLIST](./BOOTSTRAP_FCR_CHECKLIST.md) | Checklist 7 perfiles |
 
 **Regla de evidencia:** nunca registrar un síntoma como si fuera la causa.  
-**Pasada 2:** jornadas de trabajo; si no puede terminar la jornada solo con YourMeal OS → **brecha operacional** (no bug menor).  
-**Categorías a observar** (sin SPEC): Acceso · Ejecución · Información · Cierre. Incluir escenarios límite (sin datos / ya completado / superficie incorrecta).
+**Pasada 2 (Nivel 1):** jornadas → si no → **Surface Gap** / brecha operacional.  
+**Después:** flujos A/B/C → **Flow Gap** si el traspaso falla.  
+**Categorías a observar** (sin SPEC): Acceso · Ejecución · Información · Cierre. Escenarios límite.
 
 ---
 

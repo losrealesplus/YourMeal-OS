@@ -2,12 +2,15 @@
 
 **Modo:** Functional Review Mode  
 **Uso:** evidencia de cobertura hacia Surface Certified → ORR READY.  
-**Metodología:** [OPERATIONAL_READINESS_CERTIFICATION](./OPERATIONAL_READINESS_CERTIFICATION.md)
+**Metodología:** [OPERATIONAL_READINESS_CERTIFICATION](./OPERATIONAL_READINESS_CERTIFICATION.md)  
+**Nivel actual:** 1 · Surface Certification · Pasada 2  
+**Siguiente (no aún):** [FLOW_CERTIFICATION](./FLOW_CERTIFICATION.md) · Nivel 2
 
 Leyenda resultado: ✅ verificado · ⚠ hallazgo · ❌ bloqueado · □ pendiente  
-**Operación completada:** sí / no / n/a — ¿pudo terminar el trabajo, no solo abrir la UI?
+**Operación completada:** sí / no / n/a — ¿pudo terminar el trabajo, no solo abrir la UI?  
+**Tipo de brecha:** Surface Gap (jornada) · Flow Gap (solo en Nivel 2)
 
-### Surface Status (≠ ORR)
+### Surface Status (Nivel 1 · ≠ ORR)
 
 | Superficie | Surface Status |
 |------------|----------------|
@@ -16,7 +19,9 @@ Leyenda resultado: ✅ verificado · ⚠ hallazgo · ❌ bloqueado · □ pendie
 | Customer Surface `/app` | **NOT STARTED** |
 
 ```text
-ORR READY  →  solo cuando las tres = CERTIFIED
+Surfaces CERTIFIED + Flow Certification PASS + sin P0/P1
+        ↓
+ORR READY
 ```
 
 ---
