@@ -1,14 +1,16 @@
 # EP-OPS-003 · Workspace Operational Journey Certification
 
-**Estado ejecución:** IN PROGRESS · Kitchen+Delivery+Support CERTIFIED · Accounting **FAIL** · Correction NEXT  
+**Estado ejecución:** FIRST VALIDATION CLOSED · Kitchen+Delivery+Support CERTIFIED · Accounting **FAIL** · Correction NEXT  
+**Acta cierre 1ª validación:** [EP_OPS_003_FIRST_VALIDATION_CLOSED](./EP_OPS_003_FIRST_VALIDATION_CLOSED.md) · 2026-07-28  
 **Metodología:** ✅ **FROZEN** — [acta](./EP_OPS_003_METHODOLOGY_FROZEN.md) · 2026-07-28  
 **Fecha apertura:** 2026-07-28  
 **Programa:** RI-001 · Bloque C (jornadas)  
 **Prerrequisito:** EP-OPS-002 · Entry architecture **CERTIFIED**  
 `(RBAC-001 · WEP-001 · LP-001)` — PR #88 · [WORKSPACE_ENTRY_POLICY](../10-validation/WORKSPACE_ENTRY_POLICY.md)  
 
-> **Methodology Frozen:** no nuevos conceptos. Solo ejecutar pasadas · evidencia · Gates (P11–P13).  
-> Reabrir metodología solo con aprobación explícita + evidencia que lo justifique.  
+> **First Validation Closed:** las 4 pasadas se ejecutaron; el proceso metodológico se comportó como diseñado.  
+> Epic **no** cerrado: Accounting requiere Correction → Re-Certification antes de Bloque G.  
+> **Methodology Frozen:** no nuevos conceptos. Solo corrección de implementación · evidencia · Gates (P11–P13).  
 
 ```text
 Identity

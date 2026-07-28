@@ -11,12 +11,13 @@
 
 La **metodología** de Journeys (conceptos, gates, continuidad Outcome→Input, orden de pasadas).
 
-La **ejecución** de las pasadas restantes **no** está congelada: Accounting sigue abierta a evidencia de campo (Kitchen · Delivery · Support ya CERTIFIED).
+La **ejecución** de Accounting Correction **no** está congelada: la primera validación completa del proceso está **cerrada** ([acta](./EP_OPS_003_FIRST_VALIDATION_CLOSED.md)); queda Correction P0 Accounting → Re-Certification → Bloque G.
 
 ```text
-Metodología EP-OPS-003     FROZEN  ← este acta
-Pasadas Journey            OPEN    ← demostrar validez con evidencia
-Bloque G Flow              PENDING ← tras las 4 jornadas
+Metodología EP-OPS-003     FROZEN
+Primera validación (4 pasadas)  CLOSED  ← proceso demostrado
+Accounting Correction      OPEN    ← implementación + re-cert
+Bloque G Flow              PENDING ← tras Accounting CERTIFIED
 ```
 
 ---
@@ -26,7 +27,7 @@ Bloque G Flow              PENDING ← tras las 4 jornadas
 | Nivel | Estado |
 |-------|--------|
 | **Entry** | ✅ Certificado (EP-OPS-002) |
-| **Journey** | ✅ Metodología fijada (EP-OPS-003) · ejecución en curso |
+| **Journey** | ✅ Metodología fijada · **1ª validación CLOSED** · Accounting Correction OPEN |
 | **Flow** | ⏳ Pendiente (Bloque G) |
 
 ---

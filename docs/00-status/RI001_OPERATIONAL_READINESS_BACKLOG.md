@@ -221,10 +221,11 @@ Gate: — → PASS solo cuando las superficies del alcance = CERTIFIED
 
 **Vehículo activo:** [EP-OPS-003 · Workspace Operational Journey](./EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md)  
 **Metodología:** ✅ **FROZEN** — [EP_OPS_003_METHODOLOGY_FROZEN](./EP_OPS_003_METHODOLOGY_FROZEN.md)  
+**1ª validación:** ✅ **CLOSED** — [EP_OPS_003_FIRST_VALIDATION_CLOSED](./EP_OPS_003_FIRST_VALIDATION_CLOSED.md)  
 **Evidencia:** [docs/10-validation/ep-ops-003/](../10-validation/ep-ops-003/README.md)  
 **Prerrequisito:** Entry CERTIFIED (EP-OPS-002 · RBAC-001 · WEP-001 · LP-001)
 
-> Tras Methodology Frozen: solo corrección Accounting + evidencia. Sin nuevos conceptos.
+> Primera validación del proceso Journey **cerrada** (4 pasadas ejecutadas). Siguiente: Correction Accounting + evidencia. Sin nuevos conceptos.
 
 Pregunta Entry (cerrada en EP-OPS-002): *¿Aterriza en su Workspace?*  
 Pregunta Journey (este bloque): *¿Puede este departamento terminar su jornada solo con YourMeal OS en su Workspace?*

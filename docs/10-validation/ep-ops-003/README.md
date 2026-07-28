@@ -2,7 +2,8 @@
 
 **Epic:** [EP_OPS_003](../../00-status/EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md)  
 **Metodología:** ✅ **FROZEN** — [acta](../../00-status/EP_OPS_003_METHODOLOGY_FROZEN.md)  
-**Modo:** ejecutar pasadas · evidencia · Gates — **no** evolucionar conceptos  
+**1ª validación:** ✅ **CLOSED** — [acta](../../00-status/EP_OPS_003_FIRST_VALIDATION_CLOSED.md)  
+**Modo:** Accounting Correction · evidencia · Gates — **no** evolucionar conceptos  
 
 ### Continuidad Outcome → Input
 
