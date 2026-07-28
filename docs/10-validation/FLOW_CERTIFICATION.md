@@ -1,9 +1,9 @@
 # Operational Flow Certification · EatClean
 
-**Estado:** Plantilla preparada — **no ejecutar hasta Surface Certification (Pasada 2)**  
-**Nivel:** 2 de certificación operacional  
-**Predecesor:** [OPERATIONAL_READINESS_CERTIFICATION](./OPERATIONAL_READINESS_CERTIFICATION.md) · Surface Status = CERTIFIED en Customer · Tenant · Platform (según alcance piloto)  
-**Piloto:** EatClean — valida una **operación completa**, no perfiles aislados
+**Estado:** Plantilla preparada — **no ejecutar hasta Workspace Journeys (EP-OPS-003) CERTIFIED en el alcance**  
+**Nivel:** 2 de certificación operacional (tras Entry + Journeys)  
+**Predecesor:** [EP-OPS-003](../00-status/EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md) · [ORC](./OPERATIONAL_READINESS_CERTIFICATION.md)  
+**Piloto:** EatClean — valida una **operación completa entre departamentos**, no jornadas aisladas
 
 ---
 

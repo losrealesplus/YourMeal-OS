@@ -24,7 +24,8 @@ DONE:                Progress 100% · Gates PASS · Report READY|RWO · evidenci
 Permitido en RI-001: ejecutar cert · fix de hallazgo de cert · reabrir gate aprobado
 Prohibido:           nuevas features / ampliar alcance bajo etiqueta RI-001
 Pregunta maestra:    ¿Qué evidencia falta para certificar que YM OS opera una empresa real?
-Siguiente:           Ejecutar Bloque A → B (Pasada 2) dentro del alcance Frozen
+Siguiente:           **EP-OPS-003** · Workspace Operational Journeys (Bloque C)
+                     · Prerrequisito Entry: EP-OPS-002 (#88)
                      · AUTH-B solo tras flujos certificados
                      · P14 Traceability = futuro (segundo producto)
 ══════════════════════════════════════════════════
@@ -34,9 +35,10 @@ Siguiente:           Ejecutar Bloque A → B (Pasada 2) dentro del alcance Froze
 
 ```text
 Siguiente artefacto activo:
-  [RI001_OPERATIONAL_READINESS_BACKLOG](./RI001_OPERATIONAL_READINESS_BACKLOG.md)
-  · Bloque A Foundation · Bloque B Surfaces (Pasada 2)
-  · EP-OPS-001 subsumido en B/C · Flow G tras superficies CERTIFIED
+  [EP-OPS-003 · Workspace Operational Journey](./EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md)
+  · Evidencia: [ep-ops-003/](../10-validation/ep-ops-003/README.md)
+  · Entry CERTIFIED (EP-OPS-002) → Journeys (este epic) → Flow G
+  · Backlog: [RI001](./RI001_OPERATIONAL_READINESS_BACKLOG.md) Bloque C
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████
@@ -44,19 +46,22 @@ Pilot Readiness (lectura)
   Modelo operacional  ██████████
   Administración      ██████████
   Customer App        █████████░
-  Operaciones         ██████░░░░  ← Surface + Workspace certification
+  Operaciones         ███████░░░  ← Entry done · Journeys EP-OPS-003
   Data                ███████░░░
 
 Mapa certificación (activo):
   A Foundation              □□□□□□□□□□
-  B Surfaces                ██░░░░░░░░  Tenant IN REVIEW
-  C Department Workspaces   □□□□□□□□□□
+  B Surfaces                ██░░░░░░░░  Entry EP-OPS-002 (#88)
+  C Department Workspaces   ██░░░░░░░░  EP-OPS-003 Journeys OPEN
   D Operational Language    □□□□□□□□□□
   E RBAC & Access           □□□□□□□□□□
   F Observability Ready     □□□□□□□□□□
-  G Flow Certification      □□□□□□□□□□  (plantilla lista)
+  G Flow Certification      □□□□□□□□□□  (tras jornadas)
   H Auth Transition         □□□□□□□□□□  AUTH-A/B
   I Certification Report    □□□□□□□□□□  CG-RI-001
+
+Siguiente foco:            Workspace → Operational Journey → Outcome
+                           Kitchen · Delivery · Support · Accounting
 
 Patrón permanente: Operational Representation (DICT-072)
 Madurez tenant:    Tenant Operational Autonomy (DICT-073)

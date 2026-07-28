@@ -74,8 +74,8 @@ Ejemplo: `OPS-001` → Kitchen Workspace Validation → Gate C PASS → Progress
 RI-001 Progress
 
 Foundation            ░░░░░░░░░░   0%   Gate —
-Surfaces              ██░░░░░░░░  20%   Tenant IN REVIEW
-Workspaces            ░░░░░░░░░░   0%   Gate —
+Surfaces              ██░░░░░░░░  20%   Tenant IN REVIEW · Entry vía EP-OPS-002 (#88)
+Workspaces            ██░░░░░░░░  20%   Entry done* · Journeys EP-OPS-003 OPEN
 Language              ░░░░░░░░░░   0%   Gate —
 RBAC Access           ░░░░░░░░░░   0%   Gate —
 Observability         ░░░░░░░░░░   0%   Gate —
@@ -83,20 +83,22 @@ Flows                 ░░░░░░░░░░   0%   Gate —
 Auth Transition       ░░░░░░░░░░   0%   Gate —
 Certification Report  ░░░░░░░░░░   0%   Gate —
 
-Overall (certificación)           ~2%   (1/9 bloques · parcial B)
+Overall (certificación)           ~4%   (C Journeys scaffolding · B pending merge #88)
 ```
 
 | Bloque | Nombre | Gate | % cert. |
 |--------|--------|:----:|--------:|
 | A | Foundation | — | 0 |
-| B | Surfaces | IN REVIEW | ~20 |
-| C | Workspaces | — | 0 |
+| B | Surfaces | IN REVIEW → PASS al merge EP-OPS-002 | ~20 |
+| C | Workspaces | IN REVIEW · **EP-OPS-003** Journeys | ~20 |
 | D | Language | — | 0 |
 | E | RBAC Access | — | 0 |
 | F | Observability | — | 0 |
 | G | Flows | — | 0 |
 | H | Auth Transition | — | 0 |
 | I | Certification Report | — | 0 |
+
+\* Entry CERTIFIED en EP-OPS-002; jornadas aún NOT STARTED.
 
 ---
 
@@ -217,28 +219,40 @@ Gate: — → PASS solo cuando las superficies del alcance = CERTIFIED
 
 ## Bloque C · Department Workspace Certification
 
-| Workspace | Estado |
-|-----------|:------:|
-| Kitchen | Pendiente |
-| Delivery | Pendiente |
-| Support | Pendiente |
-| Accounting | Pendiente |
-| Operations | Pendiente |
+**Vehículo activo:** [EP-OPS-003 · Workspace Operational Journey](./EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md)  
+**Evidencia:** [docs/10-validation/ep-ops-003/](../10-validation/ep-ops-003/README.md)  
+**Prerrequisito:** Entry CERTIFIED (EP-OPS-002 · RBAC-001 · WEP-001 · LP-001)
 
-Pregunta: *¿Puede este departamento terminar su jornada solo con YourMeal OS?*
+Pregunta Entry (cerrada en EP-OPS-002): *¿Aterriza en su Workspace?*  
+Pregunta Journey (este bloque): *¿Puede este departamento terminar su jornada solo con YourMeal OS en su Workspace?*
+
+| Workspace | Entry | Journey Gate | Estado |
+|-----------|:-----:|:------------:|--------|
+| Kitchen | CERTIFIED* | — | NOT STARTED · [pack](../10-validation/ep-ops-003/kitchen.md) |
+| Delivery | CERTIFIED* | — | NOT STARTED · [pack](../10-validation/ep-ops-003/delivery.md) |
+| Support | CERTIFIED* | — | NOT STARTED · [pack](../10-validation/ep-ops-003/support.md) |
+| Accounting | CERTIFIED* | — | NOT STARTED · [pack](../10-validation/ep-ops-003/accounting.md) |
+| Operations | hub `/admin` | — | Fuera del núcleo EP-OPS-003 (handoffs) |
+
+\* Entry vía EP-OPS-002 (merge PR #88). No confundir Entry CERTIFIED con Journey CERTIFIED.
 
 ### Evidence Gate · C
 
 ```text
 Evidence
-  □ Jornada por workspace del alcance
-  □ Landing (Workspace Entry Policy)
-  □ Operación completada
-  □ Casos negativos / handovers anotados
-  □ Hallazgos clasificados
+  ☑ Landing / Entry Policy (EP-OPS-002) — prerrequisito
+  □ Jornada Kitchen PASS|OBSERVATIONS
+  □ Jornada Delivery PASS|OBSERVATIONS
+  □ Jornada Support PASS|OBSERVATIONS
+  □ Jornada Accounting PASS|OBSERVATIONS
+  □ Casos negativos por workspace
+  □ Hallazgos clasificados (Journey Gap ≠ Flow Gap)
 
-Gate: — → PASS → puede comenzar D
+Gate: — → PASS solo cuando las 4 jornadas del alcance cierran Gate
 ```
+
+**Salida:** jornadas CERTIFIED → Language D / preparar Flow G.  
+**No** marcar C completo solo porque Entry esté certificado.
 
 ---
 

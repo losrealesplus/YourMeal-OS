@@ -26,37 +26,47 @@ Cuando alguien dice «estamos en FCR» significa: **demostramos que lo desarroll
 
 ---
 
-## Dos niveles de certificación
+## Dos niveles de certificación → tres capas
 
 ```text
-Nivel 1 · Surface Certification     ← Pasada 2 (ahora)
+Nivel 0 · Entry Certification          ← EP-OPS-002 · CERTIFIED
+        Identity → Surface → Workspace
         ↓
-Nivel 2 · Operational Flow Certification  ← después · FLOW_CERTIFICATION.md
+Nivel 1 · Workspace Operational Journey ← EP-OPS-003 · activo
+        Workspace → Journey → Outcome
+        ↓
+Nivel 2 · Operational Flow Certification ← FLOW_CERTIFICATION · después
+        Traspasos entre departamentos
         ↓
 ORR READY
         ↓
 ORR (PASSED | BLOCKED)
 ```
 
-### Nivel 1 · Surface Certification
+### Nivel 0 · Entry Certification (hecho)
+
+Pregunta: *¿El usuario entra en la superficie y workspace correctos?*  
+Artefactos: RBAC-001 · WEP-001 · LP-001 · EP-OPS-002 (PR #88) · [WORKSPACE_ENTRY_POLICY](./WORKSPACE_ENTRY_POLICY.md).
+
+### Nivel 1 · Workspace Operational Journey (ahora)
 
 Pregunta:
 
-> ¿Este perfil puede completar su trabajo?
+> ¿Este departamento puede completar su jornada operativa sin salir de su Workspace?
 
-Ejemplo Kitchen: Entrar → Ver producción → Cambiar estados → Cerrar jornada.
+Ejemplo Kitchen: Recepción → Preparación → Producción → Finalización → Disponible Delivery.
 
-Cuando se cumplen los criterios → Surface Status **CERTIFIED** (p. ej. jornada Kitchen / Tenant Surface según alcance).
+Plantillas: [ep-ops-003/](./ep-ops-003/README.md) · Epic [EP-OPS-003](../00-status/EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md).
 
-Plantilla viva: [FCR_SESSION_LOG · Pasada 2](./FCR_SESSION_LOG.md#pasada-2--siete-perfiles).
+Cuando el Gate del workspace = PASS → Workspace Journey **CERTIFIED**.
 
 ### Nivel 2 · Operational Flow Certification
 
-Cuando las superficies del alcance estén CERTIFIED, **no** ir directo a ORR.
+Cuando las jornadas del alcance estén CERTIFIED, **no** ir directo a ORR.
 
 Antes: **3 recorridos** que simulan el negocio real (pedido normal · personalizado · incidencia).
 
-Plantilla (vacía hasta entonces): [FLOW_CERTIFICATION.md](./FLOW_CERTIFICATION.md).
+Plantilla: [FLOW_CERTIFICATION.md](./FLOW_CERTIFICATION.md).
 
 Pregunta:
 
@@ -64,15 +74,16 @@ Pregunta:
 
 ---
 
-## Surface Gap vs Flow Gap
+## Surface Gap vs Flow Gap vs Journey Gap
 
 | Tipo | Definición | Ejemplo |
 |------|------------|---------|
-| **Surface Gap** | El usuario no puede completar su trabajo | Kitchen no cierra un lote |
-| **Flow Gap** | Superficies OK por separado; falla el traspaso | Kitchen finaliza → Delivery no recibe información |
+| **Entry Gap** | No aterriza en el workspace correcto | Support cae en `/admin` genérico |
+| **Journey Gap** (Surface Gap de jornada) | No puede completar su trabajo en el workspace | Kitchen no cierra un lote |
+| **Flow Gap** | Workspaces OK por separado; falla el traspaso | Kitchen finaliza → Delivery no recibe información |
 
-Una Surface Gap es brecha operacional de perfil.  
-Una Flow Gap es brecha de **flujo operacional** — prioridad alta para ORR aunque cada superficie esté CERTIFIED.
+Una Journey Gap es brecha operacional de departamento.  
+Una Flow Gap es brecha de **flujo entre departamentos** — prioridad alta para ORR aunque cada journey esté CERTIFIED.
 
 ---
 
