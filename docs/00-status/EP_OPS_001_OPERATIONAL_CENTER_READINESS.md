@@ -1,11 +1,12 @@
 # EP-OPS-001 · Operational Center Readiness
 
-**Estado:** Active — **bloquea RI-001**  
+**Estado:** Active — **absorbido en** [RI-001 Operational Readiness Backlog](./RI001_OPERATIONAL_READINESS_BACKLOG.md) (bloques B/C)  
 **Tipo:** Correction / Certification — no Packaging / no features de cocina nuevas  
-**Bloqueo:** RI-001 está temporalmente bloqueado por EP-OPS-001 (no por falta de módulos, sino por falta de **punto de entrada operacional certificado**)  
+**Bloqueo:** RI-001 avanza por evidencia operacional (CG-RI-001), no por listas de módulos  
 **Principio:** [DICT-071](../20-evidence-framework/09-operational-visibility-principle.md) · [DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md) · [DICT-073 Tenant Operational Autonomy](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)  
 **Gap:** [OPS_CENTER_DUAL_SURFACE](./OPS_CENTER_DUAL_SURFACE.md)  
-**Matriz:** [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md) — bloque Ops primero; resto ⏸
+**Matriz:** [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md) — hub Ops primero; resto según backlog A–I  
+**Backlog activo:** [RI001_OPERATIONAL_READINESS_BACKLOG](./RI001_OPERATIONAL_READINESS_BACKLOG.md)
 
 ---
 
