@@ -75,7 +75,7 @@ RI-001 Progress
 
 Foundation            ░░░░░░░░░░   0%   Gate —
 Surfaces              ██░░░░░░░░  20%   Tenant IN REVIEW · Entry vía EP-OPS-002 (#88)
-Workspaces            ███████░░░  75%   Kitchen+Delivery+Support CERTIFIED · Accounting NEXT
+Workspaces            ███████░░░  75%   Kitchen+Delivery+Support CERTIFIED · Accounting FAIL
 Language              ░░░░░░░░░░   0%   Gate —
 RBAC Access           ░░░░░░░░░░   0%   Gate —
 Observability         ░░░░░░░░░░   0%   Gate —
@@ -83,14 +83,14 @@ Flows                 ░░░░░░░░░░   0%   Gate —
 Auth Transition       ░░░░░░░░░░   0%   Gate —
 Certification Report  ░░░░░░░░░░   0%   Gate —
 
-Overall (certificación)          ~15%   (3/4 Journeys CERTIFIED · Accounting NEXT)
+Overall (certificación)          ~15%   (3/4 Journeys CERTIFIED · Accounting Correction)
 ```
 
 | Bloque | Nombre | Gate | % cert. |
 |--------|--------|:----:|--------:|
 | A | Foundation | — | 0 |
 | B | Surfaces | IN REVIEW → PASS al merge EP-OPS-002 | ~20 |
-| C | Workspaces | IN REVIEW · Accounting NEXT · EP-OPS-003 | ~75 |
+| C | Workspaces | IN REVIEW · Accounting FAIL · EP-OPS-003 | ~75 |
 | D | Language | — | 0 |
 | E | RBAC Access | — | 0 |
 | F | Observability | — | 0 |
@@ -98,7 +98,7 @@ Overall (certificación)          ~15%   (3/4 Journeys CERTIFIED · Accounting N
 | H | Auth Transition | — | 0 |
 | I | Certification Report | — | 0 |
 
-\* Entry CERTIFIED; Kitchen+Delivery+Support CERTIFIED (Support vía FAIL→Correction→Re-Cert); Accounting pending.
+\* Entry CERTIFIED; Kitchen+Delivery+Support CERTIFIED; Accounting FAIL (placeholder · P0); Correction NEXT.
 
 ---
 
@@ -224,7 +224,7 @@ Gate: — → PASS solo cuando las superficies del alcance = CERTIFIED
 **Evidencia:** [docs/10-validation/ep-ops-003/](../10-validation/ep-ops-003/README.md)  
 **Prerrequisito:** Entry CERTIFIED (EP-OPS-002 · RBAC-001 · WEP-001 · LP-001)
 
-> Tras Methodology Frozen: solo pasada Accounting + evidencia. Sin nuevos conceptos.
+> Tras Methodology Frozen: solo corrección Accounting + evidencia. Sin nuevos conceptos.
 
 Pregunta Entry (cerrada en EP-OPS-002): *¿Aterriza en su Workspace?*  
 Pregunta Journey (este bloque): *¿Puede este departamento terminar su jornada solo con YourMeal OS en su Workspace?*
@@ -234,11 +234,11 @@ Pregunta Journey (este bloque): *¿Puede este departamento terminar su jornada s
 | Kitchen | CERTIFIED* | Production Ready | **OBSERVATIONS** | **CERTIFIED** · [pack](../10-validation/ep-ops-003/kitchen/) |
 | Delivery | CERTIFIED* | Orders Delivered | **OBSERVATIONS** | **CERTIFIED** · [pack](../10-validation/ep-ops-003/delivery/) |
 | Support | CERTIFIED* | Issues Resolved | **OBSERVATIONS** | **CERTIFIED** · [pack](../10-validation/ep-ops-003/support/) |
-| Accounting | CERTIFIED* | Financial Records Complete | — | NOT STARTED · [pack](../10-validation/ep-ops-003/accounting.md) |
+| Accounting | CERTIFIED* | Financial Records Complete | **FAIL** | **NOT CERTIFIED** · [pack](../10-validation/ep-ops-003/accounting/) |
 | Operations | hub `/admin` | — | — | Fuera del núcleo EP-OPS-003 |
 
 **Kitchen + Delivery + Support:** ✅ CERTIFIED · continuidad OK.  
-**Support:** FAIL → Correction (lifecycle) → Re-Certification CERTIFIED · **no** reabrió upstream.  
+**Accounting:** Gate FAIL (placeholder · sin lifecycle financiero) — **no** reabre upstream.  
 \* Entry vía EP-OPS-002.
 
 ### Evidence Gate · C
@@ -249,12 +249,12 @@ Evidence
   ☑ Jornada Kitchen — CERTIFIED · OBSERVATIONS · Production Ready
   ☑ Jornada Delivery — CERTIFIED · OBSERVATIONS · Orders Delivered
   ☑ Jornada Support — CERTIFIED · OBSERVATIONS · Issues Resolved (tras Correction)
-  □ Jornada Accounting PASS|OBSERVATIONS
-  ☑ Casos negativos Kitchen + Delivery + Support
+  ☑ Jornada Accounting — Gate FAIL · Financial Records Complete no alcanzable
+  ☑ Casos negativos Kitchen + Delivery + Support + Accounting
   ☑ Ciclo P13 FAIL→Correction→Re-Cert demostrado (Support)
-  ☑ Estabilidad: FAIL Support no reabrió Kitchen/Delivery
+  ☑ Estabilidad: FAIL Accounting no reabrió Kitchen/Delivery/Support
 
-Gate: — → PASS solo cuando las 4 jornadas del alcance cierran Gate (Accounting NEXT)
+Gate: — → PASS solo cuando las 4 jornadas del alcance cierran Gate (Accounting requiere Correction)
 ```
 
 **Salida:** jornadas CERTIFIED → Language D / preparar Flow G.  

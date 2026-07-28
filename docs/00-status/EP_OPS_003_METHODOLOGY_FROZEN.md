@@ -116,7 +116,7 @@ Demostrar validez mediante evidencia de campo
 P11 · P12 · P13
 ```
 
-**Siguiente acción operativa:** pasada **Accounting** · Outcome **Financial Records Complete**.  
+**Siguiente acción operativa:** **Correction** Accounting P0 (superficie financiera real) → Re-Certification · Outcome **Financial Records Complete**.  
 Kitchen · Delivery · Support permanecen CERTIFIED (regla de estabilidad).
 
 ---

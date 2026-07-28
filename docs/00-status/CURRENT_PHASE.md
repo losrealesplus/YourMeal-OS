@@ -24,10 +24,10 @@ DONE:                Progress 100% · Gates PASS · Report READY|RWO · evidenci
 Permitido en RI-001: ejecutar cert · fix de hallazgo de cert · reabrir gate aprobado
 Prohibido:           nuevas features / ampliar alcance bajo etiqueta RI-001
 Pregunta maestra:    ¿Qué evidencia falta para certificar que YM OS opera una empresa real?
-Siguiente:           **EP-OPS-003** · Accounting Journey (metodología **FROZEN**)
+Siguiente:           **EP-OPS-003** · Correction Accounting P0 (metodología **FROZEN**)
                      · Acta: [EP_OPS_003_METHODOLOGY_FROZEN](./EP_OPS_003_METHODOLOGY_FROZEN.md)
-                     · Kitchen+Delivery+Support CERTIFIED · Accounting NEXT
-                     · Ciclo P13 FAIL→Correction→Re-Cert demostrado en Support
+                     · Accounting Gate FAIL · Financial Records Complete no alcanzable
+                     · Kitchen+Delivery+Support permanecen CERTIFIED (no reopen)
 ══════════════════════════════════════════════════
 ```
 
@@ -37,8 +37,8 @@ Siguiente:           **EP-OPS-003** · Accounting Journey (metodología **FROZEN
 Siguiente artefacto activo:
   [EP-OPS-003 Methodology FROZEN](./EP_OPS_003_METHODOLOGY_FROZEN.md)
   · Ejecución: [EP-OPS-003](./EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md) · [ep-ops-003/](../10-validation/ep-ops-003/README.md)
-  · Kitchen+Delivery+Support CERTIFIED · Accounting NEXT
-  · No evolucionar metodología — solo evidencia (P11–P13)
+  · Kitchen+Delivery+Support CERTIFIED · Accounting FAIL · Correction NEXT
+  · No evolucionar metodología — solo evidencia / corrección de P0 (P11–P13)
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████
@@ -46,13 +46,13 @@ Pilot Readiness (lectura)
   Modelo operacional  ██████████
   Administración      ██████████
   Customer App        █████████░
-  Operaciones         ███████░░░  ← 3/4 Journeys CERTIFIED · Accounting NEXT
+  Operaciones         ███████░░░  ← 3/4 Journeys CERTIFIED · Accounting FAIL
   Data                ███████░░░
 
 Mapa certificación (activo):
   A Foundation              □□□□□□□□□□
   B Surfaces                ██░░░░░░░░  Entry EP-OPS-002 (#88)
-  C Department Workspaces   ███████░░░  Support CERTIFIED · Accounting NEXT
+  C Department Workspaces   ███████░░░  Accounting FAIL · Correction NEXT
   D Operational Language    □□□□□□□□□□
   E RBAC & Access           □□□□□□□□□□
   F Observability Ready     □□□□□□□□□□
@@ -60,8 +60,8 @@ Mapa certificación (activo):
   H Auth Transition         □□□□□□□□□□  AUTH-A/B
   I Certification Report    □□□□□□□□□□  CG-RI-001
 
-Siguiente foco:            Accounting Journey · Financial Records Complete
-                           (no reopen Kitchen/Delivery/Support)
+Siguiente foco:            Accounting Correction · superficie financiera → Re-Certification
+                           (Financial Records Complete · no reopen upstream)
 
 Patrón permanente: Operational Representation (DICT-072)
 Madurez tenant:    Tenant Operational Autonomy (DICT-073)

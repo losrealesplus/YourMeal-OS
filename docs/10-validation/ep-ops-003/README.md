@@ -13,10 +13,10 @@ Delivery    Orders Delivered          ✅ CERTIFIED · OBSERVATIONS
     ↓
 Support     Issues Resolved           ✅ CERTIFIED · OBSERVATIONS
     ↓
-Accounting  Financial Records Complete  ⏳ NOT STARTED
+Accounting  Financial Records Complete  ✗ Gate FAIL · NOT CERTIFIED
 ```
 
-**Estabilidad:** FAIL/Correction de Support **no** reabrió Kitchen ni Delivery.
+**Estabilidad:** FAIL de Accounting **no** reabre Kitchen · Delivery · Support.
 
 ---
 
@@ -27,7 +27,7 @@ Accounting  Financial Records Complete  ⏳ NOT STARTED
 | 1 | [Kitchen](./kitchen.md) | Demanda | Production Ready | OBSERVATIONS | ✅ CERTIFIED |
 | 2 | [Delivery](./delivery.md) | Production Ready | Orders Delivered | OBSERVATIONS | ✅ CERTIFIED |
 | 3 | [Support](./support.md) | Orders Delivered | Issues Resolved | OBSERVATIONS | ✅ CERTIFIED |
-| 4 | [Accounting](./accounting.md) | Completed ops | Financial Records Complete | — | NOT STARTED |
+| 4 | [Accounting](./accounting.md) | Completed ops · Issues Resolved | Financial Records Complete | **FAIL** | **NOT CERTIFIED** |
 
 ---
 
@@ -37,11 +37,11 @@ Accounting  Financial Records Complete  ⏳ NOT STARTED
 Kitchen      ████████████  CERTIFIED · OBSERVATIONS · Production Ready
 Delivery     ████████████  CERTIFIED · OBSERVATIONS · Orders Delivered
 Support      ████████████  CERTIFIED · OBSERVATIONS · Issues Resolved
-Accounting   ░░░░░░░░░░░░  NOT STARTED
+Accounting   ░░░░░░░░░░░░  FAIL · Financial Records Complete no alcanzable
 
-Journeys CERTIFIED  3/4  (75% · Accounting NEXT)
+Journeys CERTIFIED  3/4  (75% · Accounting Correction required)
 ```
 
-Packs: [kitchen/](./kitchen/) · [delivery/](./delivery/) · [support/](./support/)
+Packs: [kitchen/](./kitchen/) · [delivery/](./delivery/) · [support/](./support/) · [accounting/](./accounting/)
 
-**Siguiente:** pasada Accounting · Outcome Financial Records Complete.
+**Siguiente:** Correction P0 Accounting (superficie financiera real) → Re-Certification · **no** reopen upstream.

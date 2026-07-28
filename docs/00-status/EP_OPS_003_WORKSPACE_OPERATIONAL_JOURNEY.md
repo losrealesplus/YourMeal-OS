@@ -1,6 +1,6 @@
 # EP-OPS-003 · Workspace Operational Journey Certification
 
-**Estado ejecución:** IN PROGRESS · Kitchen+Delivery+Support CERTIFIED · Accounting NEXT  
+**Estado ejecución:** IN PROGRESS · Kitchen+Delivery+Support CERTIFIED · Accounting **FAIL** · Correction NEXT  
 **Metodología:** ✅ **FROZEN** — [acta](./EP_OPS_003_METHODOLOGY_FROZEN.md) · 2026-07-28  
 **Fecha apertura:** 2026-07-28  
 **Programa:** RI-001 · Bloque C (jornadas)  
@@ -148,7 +148,7 @@ Kitchen → Delivery → Support → Accounting
 | Kitchen | `/admin/kitchen` | Production Ready | **OBSERVATIONS** | ✅ **CERTIFIED** |
 | Delivery | `/admin/delivery` | Orders Delivered | **OBSERVATIONS** | ✅ **CERTIFIED** |
 | Support | `/admin/support` | Issues Resolved | **OBSERVATIONS** | ✅ **CERTIFIED** |
-| Accounting | `/admin/accounting` | Financial Records Complete | — | NOT STARTED |
+| Accounting | `/admin/accounting` | Financial Records Complete | **FAIL** | **NOT CERTIFIED** |
 
 ### Progress global
 
@@ -161,12 +161,12 @@ Delivery            CERTIFIED · OBSERVATIONS · Orders Delivered
         ↓
 Support             CERTIFIED · OBSERVATIONS · Issues Resolved
         ↓
-Accounting          Pendiente ← NEXT
+Accounting          FAIL · Financial Records Complete no alcanzable  ← Correction
         ↓
 Bloque G            Flow Certification
 ```
 
-Evidencia: [kitchen/](../10-validation/ep-ops-003/kitchen/) · [delivery/](../10-validation/ep-ops-003/delivery/) · [support/](../10-validation/ep-ops-003/support/)
+Evidencia: [kitchen/](../10-validation/ep-ops-003/kitchen/) · [delivery/](../10-validation/ep-ops-003/delivery/) · [support/](../10-validation/ep-ops-003/support/) · [accounting/](../10-validation/ep-ops-003/accounting/)
 
 **Regla de estabilidad:** un Journey FAIL no invalida Journeys previamente CERTIFIED (solo reopen con evidencia de Outcome upstream falso).
 ---
@@ -194,12 +194,13 @@ FAIL (no lifecycle) → Correction open→resolved→closed → Re-Certification
 SJ-01…SJ-05  ·  Outcome: Issues Resolved · Gate OBSERVATIONS
 ```
 
-### Accounting → Financial Records Complete
+### Accounting → Financial Records Complete ✗ FAIL
 
 ```text
-Input: Completed Orders · Resolved Incidents · Billing Events
-  ·  Outcome: Financial Records Complete
-  ·  NEXT (continuidad Issues Resolved disponible)
+Input: Completed Orders · Issues Resolved ✅
+AJ-01 parcial (entry/placeholder) · AJ-02…05 ausentes
+Outcome Financial Records Complete: NOT DEMONSTRABLE
+Cause: PlaceholderPanel · sin lifecycle financiero
 ```
 
 ---
