@@ -24,10 +24,12 @@ If each channel becomes a separate “Nuevo pedido / Pedido manual / Pedido CSV�
 ```text
 Order Intake
   responsibility: convert purchase intent → valid Order
-  then: hand off to Orders (fulfillment lifecycle)
+  then: emit / hand off (fulfillment & side effects react)
 ```
 
-**Orders never creates Orders.** Every purchase intent enters **Order Intake**; only Intake constructs an Order.
+**Orders never creates Orders.** Every purchase intent enters **Order Intake**; only Intake constructs an Order at **Build**.
+
+Intake is a **transversal business process**, not an Orders submenu. Protects Orders from becoming a catch-all.
 
 ```text
 App | WhatsApp | Phone | In person | Admin | CSV | API
@@ -35,16 +37,41 @@ App | WhatsApp | Phone | In person | Admin | CSV | API
                         ▼
                Order Intake Engine
                         │
-            validate · resolve customer · resolve week
-            build order · record origin trace
-                        │
                         ▼
                      Orders
 ```
 
 Kitchen / Delivery / Production **do not care** about intake channel.
 
-### 2. Order Source (mandatory on intake)
+### 1b. Engine pipeline (responsibility stages)
+
+```text
+Intent → Normalize → Validate → Resolve → Build → Emit
+```
+
+| Stage | Responsibility |
+|-------|----------------|
+| **Intent** | Accept purchase intent from any channel (same contract) |
+| **Normalize** | Map channel-specific payload → internal intake model |
+| **Validate** | Customer · open week · valid menu · tenant rules · (stock later) |
+| **Resolve** | Customer · address · week · plan / repeats · (promos later) |
+| **Build** | **Only here** an `Order` is born (via internal Order builder) |
+| **Emit** | Intake ends; other modules react (`Order Created` → Kitchen, Billing, Analytics, Notifications) |
+
+Scaffold today: App path exercises Validate/Resolve/Build via existing CAP-004 builder; Normalize/Emit deepen in CAP-008+ (connectors + domain events).
+
+**Motor before Wizard:** connectors (Web, Tablet, TPV, API, WhatsApp bot, AI) must share this engine — UI is one adapter.
+
+### 2. Two dimensions (do not mix)
+
+| Concept | Question | Examples |
+|---------|----------|----------|
+| **`demand_channel`** (ADR 0015) | ¿Qué modelo comercial / tipo de demanda? | B2B · B2C (`individual` / `company`) |
+| **Order Source** (DICT-076) | ¿Por dónde entró el pedido? | App · WhatsApp · Teléfono · API · … |
+
+Mixing them breaks reporting. Intake always records **Order Source**; Orders keep demand stamps from ADR 0015.
+
+### 3. Order Source (mandatory on intake)
 
 Intake always records **Order Source** (channel), separate from Order core fields:
 
@@ -61,14 +88,14 @@ Intake always records **Order Source** (channel), separate from Order core field
 
 Origin metadata (channel, createdBy user/role, createdAt, notes) lives in an **intake / audit trace** — not twenty columns on `orders`.
 
-### 3. Surface placement
+### 4. Surface placement
 
 - **Tenant Surface** operational action: `+ Nuevo pedido` (Ops / Intake) — **not** buried inside Orders CRUD.
 - Customer Surface continues to call the **same** Intake engine with `channel = app`.
 - Kitchen / Delivery: **never** create orders via Intake.
 - SaaS / Platform: no Tenant Intake UI (support impersonation is a future explicit rule).
 
-### 4. Who may intake
+### 5. Who may intake
 
 | Actor | Channels allowed |
 |-------|------------------|
@@ -76,11 +103,23 @@ Origin metadata (channel, createdBy user/role, createdAt, notes) lives in an **i
 | Company Admin / Operations Manager | staff channels (`whatsapp`, `phone`, `in_person`, `admin`, …) for a **resolved customer** |
 | Kitchen / Delivery / Accounting | none |
 
-### 5. Implementation sequence (no big-bang UI)
+### 6. Implementation sequence (motor before UI)
 
 1. **This ADR + DICT + module scaffold** — App path routed through Intake (`channel=app`).
-2. **CAP-008** — Tenant Surface wizard + staff `targetCustomerId` + persisted origin store.
+2. **CAP-008** — Tenant Surface wizard + staff `targetCustomerId` + persisted origin store + Emit contract.
 3. Later connectors (WhatsApp API, CSV, TPV) speak only to Intake — **Orders unchanged**.
+
+### 7. Future evolution (not now) · incomplete intents
+
+Some tenants receive incomplete purchase talk (“María quiere lo de siempre; confirmo el jueves”). That is **not** yet an Order.
+
+Possible later intake-internal progression (does **not** pollute Orders):
+
+```text
+Intent → Draft (incomplete) → Validated → Build Order → Emit
+```
+
+Do **not** implement until a tenant evidences the need. Separation of Intake makes this growth possible without rewriting Orders.
 
 ---
 

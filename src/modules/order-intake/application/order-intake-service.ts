@@ -30,8 +30,10 @@ function buildOrigin(
 /**
  * CAP-008 · Order Intake Engine (ADR 0017).
  *
+ * Pipeline: Intent → Normalize → Validate → Resolve → Build → Emit
  * Sole public entry for constructing Orders from purchase intent.
- * Delegates persistence to OrderService (internal builder).
+ * Delegates Build persistence to OrderService (internal builder).
+ * After Build, Intake should Emit (domain events) — deepen in CAP-008+.
  */
 export const OrderIntakeService = {
   /**
