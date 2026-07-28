@@ -66,7 +66,10 @@ Cuando el Gate del workspace = PASS u OBSERVATIONS (aceptadas) → Workspace Jou
 
 **Kitchen (2026-07-28):** CERTIFIED · Gate OBSERVATIONS · Outcome **Production Ready**  
 Evidencia: [ep-ops-003/kitchen/](./ep-ops-003/kitchen/).  
-**Siguiente:** Delivery · Input = Production Ready · Outcome = Orders Delivered · **ejecutar, no redefinir**.
+**Siguiente:** Support · Input = Orders Delivered · Outcome = Issues Resolved · **ejecutar, no redefinir**.
+
+**Delivery (2026-07-28):** CERTIFIED · Gate OBSERVATIONS · Outcome **Orders Delivered**  
+Evidencia: [ep-ops-003/delivery/](./ep-ops-003/delivery/).
 
 ### Nivel 2 · Operational Flow Certification
 

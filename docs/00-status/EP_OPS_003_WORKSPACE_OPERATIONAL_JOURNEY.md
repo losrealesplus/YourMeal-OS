@@ -1,6 +1,6 @@
 # EP-OPS-003 · Workspace Operational Journey Certification
 
-**Estado ejecución:** IN PROGRESS · Kitchen CERTIFIED · Delivery NEXT  
+**Estado ejecución:** IN PROGRESS · Kitchen+Delivery CERTIFIED · Support NEXT  
 **Metodología:** ✅ **FROZEN** — [acta](./EP_OPS_003_METHODOLOGY_FROZEN.md) · 2026-07-28  
 **Fecha apertura:** 2026-07-28  
 **Programa:** RI-001 · Bloque C (jornadas)  
@@ -146,8 +146,8 @@ Kitchen → Delivery → Support → Accounting
 | Workspace | Landing | Outcome | Gate | Estado |
 |-----------|---------|---------|:----:|--------|
 | Kitchen | `/admin/kitchen` | Production Ready | **OBSERVATIONS** | ✅ **CERTIFIED** |
-| Delivery | `/admin/delivery` | Orders Delivered | — | NOT STARTED · **NEXT** |
-| Support | `/admin/support` | Issues Resolved | — | NOT STARTED |
+| Delivery | `/admin/delivery` | Orders Delivered | **OBSERVATIONS** | ✅ **CERTIFIED** |
+| Support | `/admin/support` | Issues Resolved | — | NOT STARTED · **NEXT** |
 | Accounting | `/admin/accounting` | Financial Records Complete | — | NOT STARTED |
 
 ### Progress global
@@ -157,17 +157,16 @@ EP-OPS-002          Entry CERTIFIED
         ↓
 Kitchen             CERTIFIED · OBSERVATIONS · Production Ready
         ↓
-Delivery            Pendiente · Orders Delivered
+Delivery            CERTIFIED · OBSERVATIONS · Orders Delivered
         ↓
-Support             Pendiente · Issues Resolved
+Support             Pendiente · Issues Resolved  ← NEXT
         ↓
 Accounting          Pendiente · Financial Records Complete
         ↓
 Bloque G            Flow Certification
 ```
 
-Evidencia Kitchen: [ep-ops-003/kitchen/](../10-validation/ep-ops-003/kitchen/)  
-Prep Delivery: [ep-ops-003/delivery/](../10-validation/ep-ops-003/delivery/)
+Evidencia: [kitchen/](../10-validation/ep-ops-003/kitchen/) · [delivery/](../10-validation/ep-ops-003/delivery/)
 
 ---
 
@@ -179,14 +178,14 @@ Prep Delivery: [ep-ops-003/delivery/](../10-validation/ep-ops-003/delivery/)
 KJ-01 → KJ-04  ·  Outcome: Production Ready
 ```
 
-### Delivery → Orders Delivered (NEXT)
+### Delivery → Orders Delivered ✅
 
 ```text
 Input: Production Ready
 DJ-01…DJ-06  ·  Outcome: Orders Delivered
 ```
 
-### Support → Issues Resolved
+### Support → Issues Resolved (NEXT)
 
 ```text
 Input: Orders Delivered

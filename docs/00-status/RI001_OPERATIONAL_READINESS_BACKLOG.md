@@ -75,7 +75,7 @@ RI-001 Progress
 
 Foundation            ░░░░░░░░░░   0%   Gate —
 Surfaces              ██░░░░░░░░  20%   Tenant IN REVIEW · Entry vía EP-OPS-002 (#88)
-Workspaces            ███░░░░░░░  30%   Kitchen CERTIFIED · Delivery NEXT (EP-OPS-003)
+Workspaces            █████░░░░░  50%   Kitchen+Delivery CERTIFIED · Support NEXT
 Language              ░░░░░░░░░░   0%   Gate —
 RBAC Access           ░░░░░░░░░░   0%   Gate —
 Observability         ░░░░░░░░░░   0%   Gate —
@@ -83,14 +83,14 @@ Flows                 ░░░░░░░░░░   0%   Gate —
 Auth Transition       ░░░░░░░░░░   0%   Gate —
 Certification Report  ░░░░░░░░░░   0%   Gate —
 
-Overall (certificación)           ~6%   (Kitchen Journey CERTIFIED · B pending merge #88)
+Overall (certificación)          ~10%   (Kitchen+Delivery Journeys · B pending merge #88)
 ```
 
 | Bloque | Nombre | Gate | % cert. |
 |--------|--------|:----:|--------:|
 | A | Foundation | — | 0 |
 | B | Surfaces | IN REVIEW → PASS al merge EP-OPS-002 | ~20 |
-| C | Workspaces | IN REVIEW · Kitchen CERTIFIED · EP-OPS-003 | ~30 |
+| C | Workspaces | IN REVIEW · 2/4 Journeys CERTIFIED · EP-OPS-003 | ~50 |
 | D | Language | — | 0 |
 | E | RBAC Access | — | 0 |
 | F | Observability | — | 0 |
@@ -98,7 +98,7 @@ Overall (certificación)           ~6%   (Kitchen Journey CERTIFIED · B pending
 | H | Auth Transition | — | 0 |
 | I | Certification Report | — | 0 |
 
-\* Entry CERTIFIED en EP-OPS-002; jornadas aún NOT STARTED.
+\* Entry CERTIFIED en EP-OPS-002; Kitchen+Delivery Journeys CERTIFIED; Support+Accounting pending.
 
 ---
 
@@ -232,28 +232,25 @@ Pregunta Journey (este bloque): *¿Puede este departamento terminar su jornada s
 | Workspace | Entry | Outcome | Journey Gate | Estado |
 |-----------|:-----:|---------|:------------:|--------|
 | Kitchen | CERTIFIED* | Production Ready | **OBSERVATIONS** | **CERTIFIED** · [pack](../10-validation/ep-ops-003/kitchen/) |
-| Delivery | CERTIFIED* | Orders Delivered | — | NOT STARTED · **NEXT** · [pack](../10-validation/ep-ops-003/delivery.md) |
-| Support | CERTIFIED* | Issues Resolved | — | NOT STARTED · [pack](../10-validation/ep-ops-003/support.md) |
+| Delivery | CERTIFIED* | Orders Delivered | **OBSERVATIONS** | **CERTIFIED** · [pack](../10-validation/ep-ops-003/delivery/) |
+| Support | CERTIFIED* | Issues Resolved | — | NOT STARTED · **NEXT** · [pack](../10-validation/ep-ops-003/support.md) |
 | Accounting | CERTIFIED* | Financial Records Complete | — | NOT STARTED · [pack](../10-validation/ep-ops-003/accounting.md) |
 | Operations | hub `/admin` | — | — | Fuera del núcleo EP-OPS-003 (handoffs) |
 
-**Kitchen:** ✅ CERTIFIED · Gate **OBSERVATIONS** · Outcome **Production Ready**  
-(= Journey cumple; observaciones documentadas no bloquean — FOPEBA)
-
-\* Entry vía EP-OPS-002 (PR #88). Continuidad: Kitchen Outcome → Delivery Input.  
-Kitchen Journey CERTIFIED — no confundir con Bloque C completo.
+**Kitchen + Delivery:** ✅ CERTIFIED · Gate OBSERVATIONS · continuidad Production Ready → Orders Delivered.  
+\* Entry vía EP-OPS-002. Continuidad Outcome→Input. Bloque C no completo hasta Support + Accounting.
 
 ### Evidence Gate · C
 
 ```text
 Evidence
   ☑ Landing / Entry Policy (EP-OPS-002) — prerrequisito
-  ☑ Jornada Kitchen — CERTIFIED · Gate OBSERVATIONS · Production Ready
-  □ Jornada Delivery PASS|OBSERVATIONS
+  ☑ Jornada Kitchen — CERTIFIED · OBSERVATIONS · Production Ready
+  ☑ Jornada Delivery — CERTIFIED · OBSERVATIONS · Orders Delivered
   □ Jornada Support PASS|OBSERVATIONS
   □ Jornada Accounting PASS|OBSERVATIONS
-  □ Casos negativos por workspace (Kitchen ☑)
-  □ Hallazgos clasificados (Journey Gap ≠ Flow Gap)
+  ☑ Casos negativos Kitchen + Delivery
+  □ Hallazgos clasificados (Journey Gap ≠ Flow Gap) — Support/Accounting pending
 
 Gate: — → PASS solo cuando las 4 jornadas del alcance cierran Gate
 ```

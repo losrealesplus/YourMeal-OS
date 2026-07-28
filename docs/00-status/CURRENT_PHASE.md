@@ -26,7 +26,7 @@ Prohibido:           nuevas features / ampliar alcance bajo etiqueta RI-001
 Pregunta maestra:    ¿Qué evidencia falta para certificar que YM OS opera una empresa real?
 Siguiente:           **EP-OPS-003** · ejecutar Journeys (metodología **FROZEN**)
                      · Acta: [EP_OPS_003_METHODOLOGY_FROZEN](./EP_OPS_003_METHODOLOGY_FROZEN.md)
-                     · NEXT: Delivery · Orders Delivered (Input: Production Ready)
+                     · NEXT: Support · Issues Resolved (Input: Orders Delivered)
                      · AUTH-B solo tras flujos certificados
                      · P14 Traceability = futuro (segundo producto)
 ══════════════════════════════════════════════════
@@ -38,7 +38,7 @@ Siguiente:           **EP-OPS-003** · ejecutar Journeys (metodología **FROZEN*
 Siguiente artefacto activo:
   [EP-OPS-003 Methodology FROZEN](./EP_OPS_003_METHODOLOGY_FROZEN.md)
   · Ejecución: [EP-OPS-003](./EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md) · [ep-ops-003/](../10-validation/ep-ops-003/README.md)
-  · Kitchen CERTIFIED · Delivery NEXT (Orders Delivered)
+  · Kitchen+Delivery CERTIFIED · Support NEXT (Issues Resolved)
   · No evolucionar metodología — solo evidencia de campo (P11–P13)
 
 Pilot Readiness (lectura)
@@ -47,13 +47,13 @@ Pilot Readiness (lectura)
   Modelo operacional  ██████████
   Administración      ██████████
   Customer App        █████████░
-  Operaciones         ████░░░░░░  ← Kitchen CERTIFIED · Delivery next
+  Operaciones         █████░░░░░  ← Kitchen+Delivery CERTIFIED · Support next
   Data                ███████░░░
 
 Mapa certificación (activo):
   A Foundation              □□□□□□□□□□
   B Surfaces                ██░░░░░░░░  Entry EP-OPS-002 (#88)
-  C Department Workspaces   ███░░░░░░░  Kitchen CERTIFIED · Delivery NEXT
+  C Department Workspaces   █████░░░░░  Kitchen+Delivery CERTIFIED · Support NEXT
   D Operational Language    □□□□□□□□□□
   E RBAC & Access           □□□□□□□□□□
   F Observability Ready     □□□□□□□□□□
@@ -61,8 +61,8 @@ Mapa certificación (activo):
   H Auth Transition         □□□□□□□□□□  AUTH-A/B
   I Certification Report    □□□□□□□□□□  CG-RI-001
 
-Siguiente foco:            Delivery Journey · Orders Delivered
-                           (Kitchen = Production Ready · Gate OBSERVATIONS)
+Siguiente foco:            Support Journey · Issues Resolved
+                           (Input = Orders Delivered)
 
 Patrón permanente: Operational Representation (DICT-072)
 Madurez tenant:    Tenant Operational Autonomy (DICT-073)

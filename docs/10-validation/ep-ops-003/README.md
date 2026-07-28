@@ -12,9 +12,9 @@
 ```text
 Kitchen     Production Ready          ✅ CERTIFIED · OBSERVATIONS
     ↓
-Delivery    Input = Production Ready  ← NEXT · Outcome: Orders Delivered
+Delivery    Orders Delivered          ✅ CERTIFIED · OBSERVATIONS
     ↓
-Support     Input = Orders Delivered  · Outcome: Issues Resolved
+Support     Input = Orders Delivered  ← NEXT · Outcome: Issues Resolved
     ↓
 Accounting  Input = Completed ops     · Outcome: Financial Records Complete
 ```
@@ -37,8 +37,8 @@ Accounting  Input = Completed ops     · Outcome: Financial Records Complete
 | Orden | Workspace | Input | Outcome | Gate | Status |
 |:-----:|-----------|-------|---------|:----:|--------|
 | 1 | [Kitchen](./kitchen.md) | Demanda confirmada | Production Ready | **OBSERVATIONS** | ✅ **CERTIFIED** |
-| 2 | [Delivery](./delivery.md) | **Production Ready** | Orders Delivered | — | NOT STARTED · **NEXT** |
-| 3 | [Support](./support.md) | Orders Delivered | Issues Resolved | — | NOT STARTED |
+| 2 | [Delivery](./delivery.md) | Production Ready | Orders Delivered | **OBSERVATIONS** | ✅ **CERTIFIED** |
+| 3 | [Support](./support.md) | **Orders Delivered** | Issues Resolved | — | NOT STARTED · **NEXT** |
 | 4 | [Accounting](./accounting.md) | Completed ops / billing | Financial Records Complete | — | NOT STARTED |
 
 ---
@@ -47,11 +47,11 @@ Accounting  Input = Completed ops     · Outcome: Financial Records Complete
 
 ```text
 Kitchen      ████████████  CERTIFIED · OBSERVATIONS · Production Ready
-Delivery     ░░░░░░░░░░░░  NOT STARTED · NEXT
-Support      ░░░░░░░░░░░░  NOT STARTED
+Delivery     ████████████  CERTIFIED · OBSERVATIONS · Orders Delivered
+Support      ░░░░░░░░░░░░  NOT STARTED · NEXT
 Accounting   ░░░░░░░░░░░░  NOT STARTED
 
-Journeys     ███░░░░░░░░░  25%  (1/4)
+Journeys     ██████░░░░░░  50%  (2/4)
 ```
 
-Kitchen pack: [kitchen/](./kitchen/) · Delivery prep: [delivery/](./delivery/) (scaffold)
+Packs: [kitchen/](./kitchen/) · [delivery/](./delivery/)

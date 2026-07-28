@@ -92,7 +92,7 @@ Demostrar validez mediante evidencia de campo
 P11 · P12 · P13
 ```
 
-**Siguiente acción operativa:** pasada **Delivery** · Outcome **Orders Delivered** · Input **Production Ready**.
+**Siguiente acción operativa:** pasada **Support** · Outcome **Issues Resolved** · Input **Orders Delivered**.
 
 ---
 
