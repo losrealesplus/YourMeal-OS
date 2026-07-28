@@ -36,6 +36,9 @@ export type ProgramDraftOrderResult = {
 /**
  * CAP-004 programDraft · CAP-006 confirm — Mutation Pattern.
  * Audit is part of every write flow.
+ *
+ * ADR 0017: UI capture must go through OrderIntakeService.
+ * This service remains the internal Order builder invoked by Intake.
  */
 export const OrderService = {
   async programDraft(

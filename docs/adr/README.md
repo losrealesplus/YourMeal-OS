@@ -20,3 +20,4 @@ Permanent decisions for YourMeal OS. New ADRs are additive; do not silently reve
 | [0014](./0014-customer-application-is-tenant-branded.md) | Customer Application is Tenant-Branded |
 | [0015](./0015-b2b-b2c-customer-model.md) | B2B / B2C Customer Model Separation |
 | [0016](./0016-party-model-demand-actors.md) | Party Model for Demand Actors (semantic now · physical later) |
+| [0017](./0017-order-intake.md) | Order Intake — unified order capture (all channels) |

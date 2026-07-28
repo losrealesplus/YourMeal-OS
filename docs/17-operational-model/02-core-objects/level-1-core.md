@@ -108,8 +108,20 @@ Definiciones amplias: [Ubiquitous Language](../01-ubiquitous-language/README.md)
 | **Operational Checks** | Completitud · cobro · destinatario en ruta |
 | **Capabilities** | Orders |
 | **Invariants** | Solo Confirmed alimenta Production Plan; no es Batch ni Purchase Order |
+| **Creación** | **Solo vía [Order Intake](../../../adr/0017-order-intake.md)** — Orders no crea Orders |
 
 \* Order Item es [Supporting](./level-2-supporting.md) (línea; ciclo dentro del Order).
+
+### Order Intake · proceso (no Core Object de cumplimiento)
+
+| Campo | Contenido |
+|-------|-----------|
+| **Definición** | Proceso que convierte una **intención de compra** (cualquier canal) en un Order válido |
+| **Responsabilidad** | Capturar · validar · resolver cliente/semana · construir Order · registrar Order Source |
+| **Propietario** | Tenant Surface (Company Admin) · Customer App (self, channel=`app`) |
+| **No es** | El Order · un CRUD de Pedidos · `demand_channel` B2B/B2C |
+| **Capabilities** | CAP-008 Order Intake · usa CAP-004 como builder interno |
+| **Invariants** | Toda intención de compra entra por Intake; Kitchen/Delivery no capturan |
 
 ---
 

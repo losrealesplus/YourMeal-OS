@@ -3147,6 +3147,82 @@ PRE-CHECK · STALE · Evidence · FOPEBA · Identity Freeze · Lovable Review
 [P12 · Evidence Freshness](../20-evidence-framework/10-evidence-freshness-p12.md) · [FINDING_STALE_PO_NAV_LOVABLE](../10-validation/FINDING_STALE_PO_NAV_LOVABLE.md)
 
 
+---
+
+# Order Intake
+
+## ID
+DICT-075
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Order Intake
+
+## Tipo
+Bounded context / proceso operacional
+
+## Definición
+Proceso responsable de **convertir una intención de compra en un Order válido**, independientemente del canal de origen (App, WhatsApp, teléfono, presencial, administración, API, importación). Únicamente Order Intake construye Orders; el agregado Orders gestiona el ciclo de cumplimiento, no la captura.
+
+## Implica
+- Toda captura (cliente o staff) pasa por Order Intake.
+- **Order Source** (DICT-076) es obligatorio en el intake.
+- Metadata de origen (quién / canal / cuándo) en traza de intake/auditoría — no ensucia el núcleo de Order.
+- Acción Tenant Surface `+ Nuevo pedido` es Intake, no un CRUD dentro de Pedidos.
+- Kitchen / Delivery no capturan pedidos.
+
+## No significa
+«Pedido manual» como excepción · botón «Pedido CSV / API / WhatsApp» separado en Orders · confundir con `demand_channel` (B2B/B2C).
+
+## Palabras relacionadas
+Order Source · Order · CAP-008 · Tenant Surface · Purchase intent
+
+## Referencias
+[ADR 0017](../adr/0017-order-intake.md) · [CAP-008](../22-implementation/caps/CAP-008-order-intake.md) · [ORDER_INTAKE](../00-status/ORDER_INTAKE.md)
+
+
+---
+
+# Order Source
+
+## ID
+DICT-076
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Order Source (canal de entrada)
+
+## Tipo
+Atributo de captura / telemetría operacional
+
+## Definición
+Canal por el que llegó la intención de compra al Order Intake (p. ej. `app`, `whatsapp`, `phone`, `in_person`, `admin`, `api`, `csv_import`, `other`). Es **obligatorio** en cada intake y distinto de `demand_channel` (modo B2B/B2C de la demanda).
+
+## Implica
+- Métricas de migración a canal digital.
+- Auditoría: el pedido no debe parecer creado por el cliente si lo capturó administración.
+- Connectors futuros hablan el mismo vocabulario de Source.
+
+## No significa
+Tipo de cliente · modo de pago · `demand_channel`.
+
+## Palabras relacionadas
+Order Intake · DICT-075 · canal · WhatsApp · App
+
+## Referencias
+[ADR 0017](../adr/0017-order-intake.md)
+
+
 ## Historial de este diccionario
 
 | Fecha | Cambio |
@@ -3171,3 +3247,4 @@ PRE-CHECK · STALE · Evidence · FOPEBA · Identity Freeze · Lovable Review
 | 2026-07-24 | DICT-072 Operational Representation Pattern · Service → Report / Workspace |
 | 2026-07-24 | DICT-073 Tenant Operational Autonomy · WP-5 Tenant Provisioning · Architecture Freeze |
 | 2026-07-26 | DICT-074 Evidence Freshness (P12) · PRE-CHECK · STALE · caso PO nav Lovable |
+| 2026-07-28 | DICT-075 Order Intake · DICT-076 Order Source · ADR 0017 · CAP-008 |

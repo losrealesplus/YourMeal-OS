@@ -10,7 +10,8 @@ import { createWeeklyMenuRepository } from "@/modules/weekly-menu/infrastructure
 import { utcWeekStartMonday } from "@/modules/weekly-menu/application/week-dates";
 import { fetchCatalogDishesByIds } from "@/modules/dish-library/application/dish-catalog-queries";
 import { createOrderRepository } from "../infrastructure/order-repository";
-import { OrderService, type ProgramDraftOrderResult } from "./order-service";
+import { OrderIntakeService } from "@/modules/order-intake";
+import type { ProgramDraftOrderResult } from "./order-service";
 import {
   buildRepeatOrderPlan,
   canRepeatPlan,
@@ -152,7 +153,8 @@ export const RepeatOrderService = {
       );
     }
 
-    const draft = await OrderService.programDraftItems(ctx, {
+    const draft = await OrderIntakeService.intakeDraft(ctx, {
+      channel: "app",
       weekStart: preview.targetWeekStart,
       notes: `repeat:${sourceOrderId}`,
       items: preview.available.map((line) => ({
