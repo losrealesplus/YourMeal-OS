@@ -66,6 +66,20 @@ Bloque G · Flow Certification
 
 No re-certificar el Journey anterior. Consumir su Outcome como Input.
 
+### Regla de estabilidad (FOPEBA) · no reabrir upstream
+
+> **Un Journey certificado no se reabre porque el Journey siguiente consuma su Outcome.**
+
+| Caso | Acción |
+|------|--------|
+| Downstream encuentra un problema en **su** Workspace | Clasificar como Journey Gap del downstream · Gate del downstream |
+| Downstream no puede consumir el Outcome upstream | Primero: ¿Input ausente o mal formado? · evidencia |
+| Evidencia demuestra que el **Outcome upstream era incorrecto** | Solo entonces reabrir upstream (aprobación explícita + revalidación) |
+
+Ejemplo: Delivery CERTIFIED no invalida Kitchen. Un FAIL en Support **no** reabre Delivery/Kitchen salvo prueba de Outcome falso.
+
+Kitchen y Delivery permanecen CERTIFIED mientras Support/Accounting se ejecutan.
+
 ---
 
 ## Permitido / prohibido tras este acta
@@ -92,7 +106,8 @@ Demostrar validez mediante evidencia de campo
 P11 · P12 · P13
 ```
 
-**Siguiente acción operativa:** pasada **Support** · Outcome **Issues Resolved** · Input **Orders Delivered**.
+**Siguiente acción operativa:** **Correction** Support P0 (lifecycle resolve/close) → Re-Certification · Outcome **Issues Resolved**.  
+Kitchen + Delivery permanecen CERTIFIED.
 
 ---
 

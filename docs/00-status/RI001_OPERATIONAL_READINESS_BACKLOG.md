@@ -233,12 +233,13 @@ Pregunta Journey (este bloque): *¿Puede este departamento terminar su jornada s
 |-----------|:-----:|---------|:------------:|--------|
 | Kitchen | CERTIFIED* | Production Ready | **OBSERVATIONS** | **CERTIFIED** · [pack](../10-validation/ep-ops-003/kitchen/) |
 | Delivery | CERTIFIED* | Orders Delivered | **OBSERVATIONS** | **CERTIFIED** · [pack](../10-validation/ep-ops-003/delivery/) |
-| Support | CERTIFIED* | Issues Resolved | — | NOT STARTED · **NEXT** · [pack](../10-validation/ep-ops-003/support.md) |
+| Support | CERTIFIED* | Issues Resolved | **FAIL** | **NOT CERTIFIED** · [pack](../10-validation/ep-ops-003/support/) |
 | Accounting | CERTIFIED* | Financial Records Complete | — | NOT STARTED · [pack](../10-validation/ep-ops-003/accounting.md) |
-| Operations | hub `/admin` | — | — | Fuera del núcleo EP-OPS-003 (handoffs) |
+| Operations | hub `/admin` | — | — | Fuera del núcleo EP-OPS-003 |
 
-**Kitchen + Delivery:** ✅ CERTIFIED · Gate OBSERVATIONS · continuidad Production Ready → Orders Delivered.  
-\* Entry vía EP-OPS-002. Continuidad Outcome→Input. Bloque C no completo hasta Support + Accounting.
+**Kitchen + Delivery:** ✅ CERTIFIED · continuidad OK.  
+**Support:** Gate FAIL (sin lifecycle resolve/close) — **no** reabre upstream.  
+\* Entry vía EP-OPS-002.
 
 ### Evidence Gate · C
 
@@ -247,12 +248,12 @@ Evidence
   ☑ Landing / Entry Policy (EP-OPS-002) — prerrequisito
   ☑ Jornada Kitchen — CERTIFIED · OBSERVATIONS · Production Ready
   ☑ Jornada Delivery — CERTIFIED · OBSERVATIONS · Orders Delivered
-  □ Jornada Support PASS|OBSERVATIONS
+  ☑ Jornada Support — Gate FAIL · Issues Resolved no alcanzable (P0 lifecycle)
   □ Jornada Accounting PASS|OBSERVATIONS
-  ☑ Casos negativos Kitchen + Delivery
-  □ Hallazgos clasificados (Journey Gap ≠ Flow Gap) — Support/Accounting pending
+  ☑ Casos negativos Kitchen + Delivery + Support
+  ☑ Hallazgo Support clasificado como implementación (no reopen upstream)
 
-Gate: — → PASS solo cuando las 4 jornadas del alcance cierran Gate
+Gate: — → PASS solo cuando las 4 jornadas del alcance cierran Gate (Support requiere Correction)
 ```
 
 **Salida:** jornadas CERTIFIED → Language D / preparar Flow G.  

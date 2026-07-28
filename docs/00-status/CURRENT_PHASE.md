@@ -24,11 +24,10 @@ DONE:                Progress 100% · Gates PASS · Report READY|RWO · evidenci
 Permitido en RI-001: ejecutar cert · fix de hallazgo de cert · reabrir gate aprobado
 Prohibido:           nuevas features / ampliar alcance bajo etiqueta RI-001
 Pregunta maestra:    ¿Qué evidencia falta para certificar que YM OS opera una empresa real?
-Siguiente:           **EP-OPS-003** · ejecutar Journeys (metodología **FROZEN**)
+Siguiente:           **EP-OPS-003** · Correction Support P0 (metodología **FROZEN**)
                      · Acta: [EP_OPS_003_METHODOLOGY_FROZEN](./EP_OPS_003_METHODOLOGY_FROZEN.md)
-                     · NEXT: Support · Issues Resolved (Input: Orders Delivered)
-                     · AUTH-B solo tras flujos certificados
-                     · P14 Traceability = futuro (segundo producto)
+                     · Support Gate FAIL · Issues Resolved no alcanzable
+                     · Kitchen+Delivery permanecen CERTIFIED (no reopen)
 ══════════════════════════════════════════════════
 ```
 
@@ -38,8 +37,8 @@ Siguiente:           **EP-OPS-003** · ejecutar Journeys (metodología **FROZEN*
 Siguiente artefacto activo:
   [EP-OPS-003 Methodology FROZEN](./EP_OPS_003_METHODOLOGY_FROZEN.md)
   · Ejecución: [EP-OPS-003](./EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md) · [ep-ops-003/](../10-validation/ep-ops-003/README.md)
-  · Kitchen+Delivery CERTIFIED · Support NEXT (Issues Resolved)
-  · No evolucionar metodología — solo evidencia de campo (P11–P13)
+  · Kitchen+Delivery CERTIFIED · Support FAIL · Correction lifecycle
+  · No evolucionar metodología — solo evidencia / corrección de P0 (P11–P13)
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████
@@ -47,13 +46,13 @@ Pilot Readiness (lectura)
   Modelo operacional  ██████████
   Administración      ██████████
   Customer App        █████████░
-  Operaciones         █████░░░░░  ← Kitchen+Delivery CERTIFIED · Support next
+  Operaciones         █████░░░░░  ← Kitchen+Delivery OK · Support FAIL
   Data                ███████░░░
 
 Mapa certificación (activo):
   A Foundation              □□□□□□□□□□
   B Surfaces                ██░░░░░░░░  Entry EP-OPS-002 (#88)
-  C Department Workspaces   █████░░░░░  Kitchen+Delivery CERTIFIED · Support NEXT
+  C Department Workspaces   █████░░░░░  Support FAIL · Correction NEXT
   D Operational Language    □□□□□□□□□□
   E RBAC & Access           □□□□□□□□□□
   F Observability Ready     □□□□□□□□□□
@@ -61,8 +60,8 @@ Mapa certificación (activo):
   H Auth Transition         □□□□□□□□□□  AUTH-A/B
   I Certification Report    □□□□□□□□□□  CG-RI-001
 
-Siguiente foco:            Support Journey · Issues Resolved
-                           (Input = Orders Delivered)
+Siguiente foco:            Support Correction · issue lifecycle → Re-Certification
+                           (Issues Resolved · no reopen Delivery/Kitchen)
 
 Patrón permanente: Operational Representation (DICT-072)
 Madurez tenant:    Tenant Operational Autonomy (DICT-073)

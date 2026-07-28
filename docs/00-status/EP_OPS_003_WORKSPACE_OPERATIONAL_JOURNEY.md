@@ -1,6 +1,6 @@
 # EP-OPS-003 · Workspace Operational Journey Certification
 
-**Estado ejecución:** IN PROGRESS · Kitchen+Delivery CERTIFIED · Support NEXT  
+**Estado ejecución:** IN PROGRESS · Kitchen+Delivery CERTIFIED · Support **FAIL** · Correction NEXT  
 **Metodología:** ✅ **FROZEN** — [acta](./EP_OPS_003_METHODOLOGY_FROZEN.md) · 2026-07-28  
 **Fecha apertura:** 2026-07-28  
 **Programa:** RI-001 · Bloque C (jornadas)  
@@ -147,7 +147,7 @@ Kitchen → Delivery → Support → Accounting
 |-----------|---------|---------|:----:|--------|
 | Kitchen | `/admin/kitchen` | Production Ready | **OBSERVATIONS** | ✅ **CERTIFIED** |
 | Delivery | `/admin/delivery` | Orders Delivered | **OBSERVATIONS** | ✅ **CERTIFIED** |
-| Support | `/admin/support` | Issues Resolved | — | NOT STARTED · **NEXT** |
+| Support | `/admin/support` | Issues Resolved | **FAIL** | **NOT CERTIFIED** |
 | Accounting | `/admin/accounting` | Financial Records Complete | — | NOT STARTED |
 
 ### Progress global
@@ -159,15 +159,16 @@ Kitchen             CERTIFIED · OBSERVATIONS · Production Ready
         ↓
 Delivery            CERTIFIED · OBSERVATIONS · Orders Delivered
         ↓
-Support             Pendiente · Issues Resolved  ← NEXT
+Support             FAIL · Issues Resolved no alcanzable  ← Correction
         ↓
-Accounting          Pendiente · Financial Records Complete
+Accounting          Pendiente
         ↓
 Bloque G            Flow Certification
 ```
 
-Evidencia: [kitchen/](../10-validation/ep-ops-003/kitchen/) · [delivery/](../10-validation/ep-ops-003/delivery/)
+Evidencia: [kitchen/](../10-validation/ep-ops-003/kitchen/) · [delivery/](../10-validation/ep-ops-003/delivery/) · [support/](../10-validation/ep-ops-003/support/)
 
+**Regla:** FAIL Support no reabre Kitchen/Delivery.
 ---
 
 ## Jornadas objetivo
@@ -185,11 +186,12 @@ Input: Production Ready
 DJ-01…DJ-06  ·  Outcome: Orders Delivered
 ```
 
-### Support → Issues Resolved (NEXT)
+### Support → Issues Resolved ✗ FAIL
 
 ```text
-Input: Orders Delivered
-  ·  Outcome: Issues Resolved
+Input: Orders Delivered ✅
+SJ-01…SJ-03 parcial · SJ-04/05 ausentes
+Outcome Issues Resolved: NOT DEMONSTRABLE
 ```
 
 ### Accounting → Financial Records Complete
@@ -197,6 +199,7 @@ Input: Orders Delivered
 ```text
 Input: Completed Orders · Resolved Incidents · Billing Events
   ·  Outcome: Financial Records Complete
+  ·  Bloqueado en práctica hasta Support Correction (continuidad)
 ```
 
 ---
