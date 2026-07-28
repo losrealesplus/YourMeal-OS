@@ -234,8 +234,11 @@ Pregunta Journey (este bloque): *¿Puede este departamento terminar su jornada s
 | Accounting | CERTIFIED* | Financial Records Complete | — | NOT STARTED · [pack](../10-validation/ep-ops-003/accounting.md) |
 | Operations | hub `/admin` | — | — | Fuera del núcleo EP-OPS-003 (handoffs) |
 
-\* Entry vía EP-OPS-002 (PR #88). Orden: Kitchen → Delivery → Support → Accounting.  
-Kitchen Journey CERTIFIED (OBSERVATIONS) — no confundir con Bloque C completo.
+**Kitchen:** ✅ CERTIFIED · Gate **OBSERVATIONS** · Outcome **Production Ready**  
+(= Journey cumple; observaciones documentadas no bloquean — FOPEBA)
+
+\* Entry vía EP-OPS-002 (PR #88). Continuidad: Kitchen Outcome → Delivery Input.  
+Kitchen Journey CERTIFIED — no confundir con Bloque C completo.
 
 ### Evidence Gate · C
 

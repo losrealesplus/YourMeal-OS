@@ -1,6 +1,6 @@
 # EP-OPS-003 · Workspace Operational Journey Certification
 
-**Estado:** OPEN · NOT STARTED (scaffolding)  
+**Estado:** IN PROGRESS · Kitchen CERTIFIED · Delivery NEXT  
 **Fecha apertura:** 2026-07-28  
 **Programa:** RI-001 · Bloque C (jornadas)  
 **Prerrequisito:** EP-OPS-002 · Entry architecture **CERTIFIED**  
@@ -24,13 +24,79 @@ Operational Readiness
 
 ---
 
+## CERTIFIED vs Gate (FOPEBA)
+
+Una certificación **no** exige ausencia total de observaciones.
+
+| Señal | Significado |
+|-------|-------------|
+| **CERTIFIED** | El Journey cumple su **objetivo operacional** (Outcome alcanzado) |
+| **Gate PASS** | Cumple sin observaciones materiales |
+| **Gate OBSERVATIONS** | Cumple el Outcome; aspectos documentados a seguir — **no bloquean** la operación |
+| **Gate FAIL** | No se alcanza el Outcome · bloqueo P0/P1 · o evidencia insuficiente (P13) |
+
+```text
+CERTIFIED  ≠  “perfecto”
+CERTIFIED  =  Outcome operacional demostrado + evidencia reproducible
+OBSERVATIONS = deuda/seguimiento explícito, no denegación del Journey
+```
+
+Ejemplo Kitchen:
+
+| Workspace | Estado | Gate | Outcome |
+|-----------|--------|------|---------|
+| Kitchen | ✅ CERTIFIED | OBSERVATIONS | Production Ready |
+
+---
+
+## Regla de continuidad entre Journeys
+
+**Cada Journey comienza exactamente donde termina el anterior.**
+
+```text
+Workspace N
+  Outcome: X
+        ↓
+Workspace N+1
+  Input:   X
+```
+
+Cadena EP-OPS-003:
+
+```text
+Kitchen
+  Outcome: Production Ready
+        ↓
+Delivery
+  Input:   Production Ready
+  Outcome: Orders Delivered
+        ↓
+Support
+  Input:   Orders Delivered
+  Outcome: Issues Resolved
+        ↓
+Accounting
+  Input:   Completed Orders · Resolved Incidents · Billing Events
+  Outcome: Financial Records Complete
+```
+
+Efectos:
+
+- Evita duplicar certificación del eslabón anterior.
+- El Outcome del upstream es el contrato de Input del downstream.
+- Prepara **Bloque G (Flow)**: trazabilidad Outcome→Input entre departamentos.
+
+**No abrir** el Journey N+1 si el Outcome de N no está CERTIFIED (Gate PASS u OBSERVATIONS).
+
+---
+
 ## Cadena metodológica
 
 | Nivel | Epic / bloque | Qué certifica |
 |-------|---------------|---------------|
 | **Entry** | EP-OPS-002 | El usuario entra donde corresponde |
-| **Journey** | **EP-OPS-003** | El usuario completa su trabajo **dentro** del Workspace |
-| **Flow** | RI-001 Bloque G | Los departamentos colaboran / se traspasan información |
+| **Journey** | **EP-OPS-003** | El usuario completa su trabajo **dentro** del Workspace → **Outcome** |
+| **Flow** | RI-001 Bloque G | Continuidad Outcome→Input entre departamentos |
 | **Readiness** | ORR / CG-RI-001 | La empresa opera como sistema |
 
 Entry ≠ Journey ≠ Flow. No mezclar gaps de navegación con gaps operacionales ni con handoffs.
@@ -39,10 +105,10 @@ Entry ≠ Journey ≠ Flow. No mezclar gaps de navegación con gaps operacionale
 
 ## Contexto
 
-La arquitectura de entrada está certificada. Todo usuario autenticado llega de forma determinista a su Surface y Workspace.
+La arquitectura de entrada está certificada.
 
 **Este epic no certifica el acceso.**  
-**Certifica la operación interna de cada Workspace.**
+**Certifica la operación interna de cada Workspace → Outcome operacional.**
 
 Pregunta maestra por workspace:
 
@@ -52,7 +118,7 @@ Pregunta maestra por workspace:
 
 ## Objetivo
 
-Validar que cada Workspace soporta el trabajo operativo para el que fue diseñado — siguiendo la **cadena natural de valor** del meal prep.
+Validar que cada Workspace soporta el trabajo operativo para el que fue diseñado — cadena de valor meal prep + **regla de continuidad**.
 
 ---
 
@@ -62,16 +128,12 @@ Validar que cada Workspace soporta el trabajo operativo para el que fue diseñad
 Kitchen → Delivery → Support → Accounting
 ```
 
-| # | Workspace | Por qué este orden | Outcome esperado |
-|---|-----------|--------------------|------------------|
-| 1 | **Kitchen** | Origen de la operación | **Production Ready** |
-| 2 | **Delivery** | Depende de producción certificada | **Orders Delivered** |
-| 3 | **Support** | Valor cuando hay pedidos entregados | **Issues Resolved** |
-| 4 | **Accounting** | Economía depende de la operación previa | **Financial Records Complete** |
-
-No certificar Delivery si Kitchen no está certificado.  
-No certificar Support sin base de pedidos/entregas.  
-Accounting es el último: sin operación previa no hay registros financieros reales (P13 · No Artificiality).
+| # | Workspace | Input (continuidad) | Outcome |
+|---|-----------|---------------------|---------|
+| 1 | **Kitchen** | Demanda / pedidos confirmados | **Production Ready** |
+| 2 | **Delivery** | **Production Ready** (Kitchen) | **Orders Delivered** |
+| 3 | **Support** | **Orders Delivered** (Delivery) | **Issues Resolved** |
+| 4 | **Accounting** | Pedidos completados · incidencias · eventos de cobro | **Financial Records Complete** |
 
 ---
 
@@ -79,100 +141,82 @@ Accounting es el último: sin operación previa no hay registros financieros rea
 
 | Workspace | Landing | Outcome | Gate | Estado |
 |-----------|---------|---------|:----:|--------|
-| Kitchen | `/admin/kitchen` | Production Ready | **OBSERVATIONS** | **CERTIFIED** |
+| Kitchen | `/admin/kitchen` | Production Ready | **OBSERVATIONS** | ✅ **CERTIFIED** |
 | Delivery | `/admin/delivery` | Orders Delivered | — | NOT STARTED · **NEXT** |
 | Support | `/admin/support` | Issues Resolved | — | NOT STARTED |
 | Accounting | `/admin/accounting` | Financial Records Complete | — | NOT STARTED |
 
-### Progress
+### Progress global
 
 ```text
-Kitchen      CERTIFIED · OBSERVATIONS · Production Ready
-Delivery     NOT STARTED  ← siguiente
-Support      NOT STARTED
-Accounting   NOT STARTED
-Journeys     1/4 (25%)
+EP-OPS-002          Entry CERTIFIED
+        ↓
+Kitchen             CERTIFIED · OBSERVATIONS · Production Ready
+        ↓
+Delivery            Pendiente · Orders Delivered
+        ↓
+Support             Pendiente · Issues Resolved
+        ↓
+Accounting          Pendiente · Financial Records Complete
+        ↓
+Bloque G            Flow Certification
 ```
 
-Evidencia Kitchen: [ep-ops-003/kitchen/](../10-validation/ep-ops-003/kitchen/)
-
-
-Operations Center (`/admin`) = hub Company Admin / Ops Manager — fuera del núcleo EP-OPS-003 salvo observaciones de handoff.
+Evidencia Kitchen: [ep-ops-003/kitchen/](../10-validation/ep-ops-003/kitchen/)  
+Prep Delivery: [ep-ops-003/delivery/](../10-validation/ep-ops-003/delivery/)
 
 ---
 
 ## Jornadas objetivo
 
-### Kitchen → Production Ready
+### Kitchen → Production Ready ✅
 
 ```text
-Recepción de producción → Lista de preparación → Producción
-  → Finalización → Disponible para Delivery
+KJ-01 → KJ-04  ·  Outcome: Production Ready
 ```
 
-### Delivery → Orders Delivered
+### Delivery → Orders Delivered (NEXT)
 
 ```text
-Pedidos preparados → Asignación → Ruta → Entrega → Confirmación → Cierre
+Input: Production Ready
+DJ-01…DJ-06  ·  Outcome: Orders Delivered
 ```
 
 ### Support → Issues Resolved
 
 ```text
-Recepción de incidencia → Clasificación → Seguimiento → Resolución → Cierre
+Input: Orders Delivered
+  ·  Outcome: Issues Resolved
 ```
 
 ### Accounting → Financial Records Complete
 
 ```text
-Facturación → Cobros → Conciliación → Estado financiero → Cierre
+Input: Completed Orders · Resolved Incidents · Billing Events
+  ·  Outcome: Financial Records Complete
 ```
-
----
-
-## Plantilla por Workspace (obligatoria)
-
-| Sección | Pregunta |
-|---------|----------|
-| Objetivo operacional | ¿Qué problema resuelve? |
-| Actor principal | ¿Quién trabaja aquí? |
-| Entradas | ¿Qué recibe? |
-| Proceso | ¿Qué operaciones ejecuta? |
-| Salidas / Outcome | ¿Qué produce? (ver tabla Outcomes) |
-| Dependencias | ¿Qué información necesita? |
-| Restricciones | ¿Qué NO puede hacer? |
-| Casos negativos | ¿Errores / accesos no permitidos? |
-
-Artefactos: [ep-ops-003/](../10-validation/ep-ops-003/README.md)
 
 ---
 
 ## Evidence Gate (por Workspace)
 
 ```text
-PASS            → journey completo · críticas OK · outcome alcanzado · sin bloqueos · límites claros · negativos OK · evidencia reproducible
-OBSERVATIONS    → operable con hallazgos no bloqueantes documentados
-FAIL            → bloqueo operacional o evidencia insuficiente (P13)
+PASS            → Outcome alcanzado · sin observaciones materiales
+OBSERVATIONS    → Outcome alcanzado · hallazgos no bloqueantes → CERTIFIED permitido
+FAIL            → Outcome no alcanzado · bloqueo P0/P1 · evidencia insuficiente (P13)
 ```
 
-**CERTIFIED** solo con Gate **PASS** (OBSERVATIONS aceptadas solo vía Certification Report explícito).
+**CERTIFIED** = Outcome demostrado (PASS u OBSERVATIONS). No requiere “cero observaciones”.
 
 ---
 
 ## Tras los cuatro packs
 
-Cuando Kitchen · Delivery · Support · Accounting cierren Gate:
-
 ```text
-Departamentos aislados CERTIFIED
-        ↓
-Empresa como sistema
+Journeys CERTIFIED (continuidad Outcome→Input)
         ↓
 Bloque G · Flow Certification
 ```
-
-Flow responde: ¿se transfiere la información? ¿trazabilidad del pedido? ¿bloqueos entre áreas?  
-EP-OPS-003 = funcionamiento **interno**; Bloque G = funcionamiento **transversal**.
 
 ---
 
@@ -180,24 +224,19 @@ EP-OPS-003 = funcionamiento **interno**; Bloque G = funcionamiento **transversal
 
 | Permitido | Prohibido |
 |-----------|-----------|
-| Certificar jornadas existentes | Features nuevas solo “para pasar el gate” |
-| Corregir bloqueos hallados en cert | Reabrir Auth / Identity / RBAC model |
-| Anotar Flow Gap candidatos → Bloque G | Ejecutar Flow Certification aquí |
-| Actualizar Progress al cerrar cada gate | Marcar Bloque C PASS sin las 4 jornadas |
+| Certificar jornadas existentes | Features solo “para pasar el gate” |
+| CERTIFIED con OBSERVATIONS | Fingir PASS limpio ocultando hallazgos |
+| Anotar Flow Gaps → Bloque G | Ejecutar Flow aquí |
+| Actualizar Progress por gate | Bloque C PASS sin las 4 jornadas |
+| Corregir bloqueos de cert | Reabrir Auth / Identity / RBAC |
 
 ---
 
 ## Resultado al cerrar el epic
 
-- RI-001 Progress · Bloque C  
-- ORC / Operational Readiness  
-- Evidence Gates por workspace  
-- Certification Report (cuando proceda)  
-- Desbloqueo de **Bloque G · Flow**
-
 ```text
 EP-OPS-002 → Entry
-EP-OPS-003 → Journey
+EP-OPS-003 → Journey (+ Outcomes + continuidad)
 Bloque G   → Flow
 ORR        → Operational Readiness
 ```
