@@ -24,10 +24,10 @@ DONE:                Progress 100% · Gates PASS · Report READY|RWO · evidenci
 Permitido en RI-001: ejecutar cert · fix de hallazgo de cert · reabrir gate aprobado
 Prohibido:           nuevas features / ampliar alcance bajo etiqueta RI-001
 Pregunta maestra:    ¿Qué evidencia falta para certificar que YM OS opera una empresa real?
-Siguiente:           **EP-OPS-003** · 1ª validación **CLOSED** · Accounting Correction P0
-                     · Acta cierre: [EP_OPS_003_FIRST_VALIDATION_CLOSED](./EP_OPS_003_FIRST_VALIDATION_CLOSED.md)
-                     · Metodología FROZEN · Accounting FAIL · no reopen upstream
-                     · Tras Re-Cert Accounting → Bloque G Flow
+Siguiente:           **Bloque G · Flow Certification** (metodología EP-OPS-003 **FROZEN**)
+                     · 1ª validación CLOSED · Journeys **4/4 CERTIFIED**
+                     · Acta: [EP_OPS_003_FIRST_VALIDATION_CLOSED](./EP_OPS_003_FIRST_VALIDATION_CLOSED.md)
+                     · Accounting Correction + Re-Cert DONE (Financial Records Complete)
 ══════════════════════════════════════════════════
 ```
 
@@ -35,10 +35,9 @@ Siguiente:           **EP-OPS-003** · 1ª validación **CLOSED** · Accounting 
 
 ```text
 Siguiente artefacto activo:
-  [EP-OPS-003 First Validation Closed](./EP_OPS_003_FIRST_VALIDATION_CLOSED.md)
-  · Metodología: [FROZEN](./EP_OPS_003_METHODOLOGY_FROZEN.md) · Epic: [EP-OPS-003](./EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md)
-  · Kitchen+Delivery+Support CERTIFIED · Accounting FAIL · Correction NEXT
-  · Proceso metodológico demostrado (continuidad · estabilidad · P13 ambos sentidos)
+  Bloque G · Flow Certification (RI-001)
+  · Journeys: [EP-OPS-003](./EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md) · 4/4 CERTIFIED
+  · Metodología: [FROZEN](./EP_OPS_003_METHODOLOGY_FROZEN.md) · [1ª validación CLOSED](./EP_OPS_003_FIRST_VALIDATION_CLOSED.md)
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████
@@ -46,22 +45,22 @@ Pilot Readiness (lectura)
   Modelo operacional  ██████████
   Administración      ██████████
   Customer App        █████████░
-  Operaciones         ███████░░░  ← 3/4 Journeys CERTIFIED · Accounting Correction
+  Operaciones         ██████████  ← 4/4 Journeys CERTIFIED · Flow NEXT
   Data                ███████░░░
 
 Mapa certificación (activo):
   A Foundation              □□□□□□□□□□
   B Surfaces                ██░░░░░░░░  Entry EP-OPS-002 (#88)
-  C Department Workspaces   ███████░░░  1ª validación CLOSED · Accounting Correction
+  C Department Workspaces   ██████████  4/4 Journeys CERTIFIED
   D Operational Language    □□□□□□□□□□
   E RBAC & Access           □□□□□□□□□□
   F Observability Ready     □□□□□□□□□□
-  G Flow Certification      □□□□□□□□□□  (tras Accounting CERTIFIED)
+  G Flow Certification      ░░░░░░░░░░  ← NEXT
   H Auth Transition         □□□□□□□□□□  AUTH-A/B
   I Certification Report    □□□□□□□□□□  CG-RI-001
 
-Siguiente foco:            Accounting Correction · Financial Workspace + Lifecycle → Re-Certification
-                           (Financial Records Complete · no reopen upstream)
+Siguiente foco:            Bloque G · Flow Certification
+                           (continuidad transversal · no reopen Journeys)
 
 Patrón permanente: Operational Representation (DICT-072)
 Madurez tenant:    Tenant Operational Autonomy (DICT-073)

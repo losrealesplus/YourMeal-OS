@@ -11,6 +11,14 @@ describe("homePathForRoles", () => {
     expect(homePathForRoles(["logistics"])).toBe("/admin/delivery");
   });
 
+  it("routes support-only to atención al cliente", () => {
+    expect(homePathForRoles(["support"])).toBe("/admin/support");
+  });
+
+  it("routes accounting-only to contabilidad", () => {
+    expect(homePathForRoles(["accounting"])).toBe("/admin/accounting");
+  });
+
   it("routes operations_manager to ops center", () => {
     expect(homePathForRoles(["operations_manager"])).toBe("/admin");
   });

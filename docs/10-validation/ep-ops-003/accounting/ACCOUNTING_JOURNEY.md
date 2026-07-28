@@ -1,77 +1,78 @@
-# Accounting Journey · AJ-01 → AJ-05
+# Accounting Journey · AJ-01 → AJ-05 (Re-Certification)
 
-**Epic:** EP-OPS-003 · Accounting Journey Certification  
-**Metodología:** FROZEN  
+**Epic:** EP-OPS-003 · Accounting Correction + Re-Certification  
+**Metodología:** FROZEN · 1ª validación CLOSED  
 **Workspace:** `/admin/accounting`  
-**Actor:** `accounting` (cap `accounting.operate`)  
-**Input (continuidad):** Completed Orders · **Issues Resolved** (Support CERTIFIED) · Billing Events  
+**Actor:** `accounting`  
+**Input:** Orders Delivered · Issues Resolved (continuidad)  
 **Outcome:** **Financial Records Complete**  
-**Fecha pasada:** 2026-07-28  
-**Gate:** **FAIL** · **Status:** **NOT CERTIFIED**  
+**Pasada FAIL:** 2026-07-28 · **Re-Certification:** 2026-07-28  
+**Gate:** **OBSERVATIONS** · **Status:** **CERTIFIED**  
 
 ```text
-Support Outcome: Issues Resolved ✅
+FAIL (PlaceholderPanel)
         ↓
-Accounting Workspace
+Correction: invoice ← delivered orders · payment · period complete
         ↓
-Placeholder only · sin ciclo financiero operable
+Re-Certification
         ↓
-Outcome Financial Records Complete ✗ NOT DEMONSTRABLE
+Financial Records Complete ✅
 ```
 
-Upstream Kitchen · Delivery · Support **permanecen CERTIFIED** (regla de estabilidad).
+Upstream Kitchen · Delivery · Support **permanecen CERTIFIED**.
 
 ---
 
 ## Continuidad Input
 
-| Check | Resultado | Evidencia |
-|-------|:---------:|-----------|
-| Orders Delivered disponible aguas arriba | ✅ | Delivery CERTIFIED |
-| Issues Resolved disponible | ✅ | Support CERTIFIED · lifecycle |
-| Eventos de cobro / facturación consumibles en Workspace | ✗ | Sin UI/servicio Accounting |
-| No reabre Support/Delivery/Kitchen | ✅ | Clasificación: Accounting Gap |
+| Check | Resultado |
+|-------|:---------:|
+| Lista pedidos `delivered` | ✅ |
+| Emite factura con importe = suma pedidos | ✅ |
+| No reabre Delivery/Support | ✅ |
 
 ---
 
-## AJ stages
+## AJ stages post-corrección
 
 | Stage | Resultado | Evidencia |
 |-------|:---------:|-----------|
-| AJ-01 Entrada Workspace | ⚠ | Ruta + cap `accounting.operate` · landing es `PlaceholderPanel` |
-| AJ-02 Facturación | ✗ | Sin emitir/listar facturas operativas en `/admin/accounting` |
-| AJ-03 Cobros | ✗ | Tabla `payments` existe en schema · **sin** superficie Accounting |
-| AJ-04 Conciliación | ✗ | Ausente |
-| AJ-05 Cierre de periodo | ✗ | Ausente |
+| AJ-01 Entrada | ✅ | `/admin/accounting` · cap · homePath accounting-only |
+| AJ-02 Facturación | ✅ | `createInvoiceFromOrders` · `invoice_orders` |
+| AJ-03 Cobros | ✅ | `recordPayment` · pending → paid |
+| AJ-04 Conciliación | ⚠ | Thin: paidTotal vs amount en UI (OBS) |
+| AJ-05 Cierre periodo | ✅ | `derivePeriodComplete` · KPI Periodo Completo |
 
 **Outcome:**
 
 ```text
-Financial Records Complete = facturación → cobros → conciliación → cierre
-                             demostrable en el Accounting Workspace
+Financial Records Complete =
+  periodo con ≥1 factura anclada a delivered
+  AND pending=0 AND overdue=0
 ```
-
-**Estado:** NOT DEMONSTRABLE (P13 · No Artificiality).
 
 ---
 
-## Hallazgo (código)
+## Recorrido E2E
 
-| Artefacto | Estado |
-|-----------|--------|
-| `admin.accounting.tsx` | Placeholder · flag `admin_module_accounting` |
-| Schema `invoices` / `payments` | Persistencia B2C / company parcial |
-| `app.payment-methods.tsx` | Lectura cliente · **no** jornada Accounting |
-| Servicio Accounting / lifecycle | **No existe** |
+```text
+Input: Orders Delivered
+  → /admin/accounting
+  → seleccionar delivered facturables
+  → Emitir factura
+  → Registrar cobro
+Outcome: periodo Completo (Financial Records Complete)
+```
 
-Clasificación: **Accounting Journey Gap** (implementación), no Entry · no Flow · no Outcome upstream falso.
+Migración: `20260728210000_accounting_invoice_orders.sql`  
+Dominio/tests: `src/modules/accounting` PASS  
 
 ---
 
 ## Pregunta maestra
 
-> ¿Puede un agente Accounting, partiendo de operaciones completadas e incidencias resueltas, cerrar el ciclo financiero sin abandonar su Workspace?
+> ¿Puede un agente Accounting cerrar el ciclo financiero operativo del alcance piloto sin salir de su Workspace?
 
-**No** — el Workspace no ofrece operaciones financieras reales.
+**Sí** (actor `accounting`) — con observaciones (conciliación thin · flag nav · sin pasarela).
 
-**Gate:** FAIL · **NOT CERTIFIED** · Outcome **Financial Records Complete** no alcanzable.
+**Gate:** OBSERVATIONS · **CERTIFIED** · Outcome **Financial Records Complete**

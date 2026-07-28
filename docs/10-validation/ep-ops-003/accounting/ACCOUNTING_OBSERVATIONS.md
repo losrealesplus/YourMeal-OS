@@ -1,44 +1,39 @@
-# Accounting Observations
+# Accounting Observations (Re-Certification)
 
-**Gate:** FAIL · **NOT CERTIFIED**
-
----
-
-## P0 (bloquean Outcome)
-
-| ID | Hallazgo |
-|----|----------|
-| P0-A-01 | `/admin/accounting` es `PlaceholderPanel` — sin operaciones |
-| P0-A-02 | Sin lifecycle financiero (facturar → cobrar → conciliar → cerrar) |
-| P0-A-03 | Sin servicio de dominio Accounting que consuma Orders / Issues Resolved / billing |
+**Gate:** OBSERVATIONS · **CERTIFIED**
 
 ---
 
-## Observaciones / deuda (no cambian el Gate)
+## P0 cerrados
+
+| ID | Antes | Después |
+|----|-------|---------|
+| P0-A-01 | PlaceholderPanel | Workspace operativo |
+| P0-A-02 | Sin lifecycle | pending → paid / void · period complete |
+| P0-A-03 | Sin servicio | `AccountingService` + `invoice_orders` |
+
+---
+
+## Observaciones residuales (no bloquean Outcome)
 
 | ID | Hallazgo |
 |----|----------|
-| OBS-A-01 | Tablas `invoices` / `payments` existen · no expuestas a actor `accounting` |
-| OBS-A-02 | Flag `admin_module_accounting` · cero humo correcto |
-| OBS-A-03 | `homePathForRoles` no aterriza `accounting`-only en `/admin/accounting` (Entry residual · no reabre EP-OPS-002 sin evidencia) |
-| OBS-A-04 | Lectura de facturas en `/app/payment-methods` ≠ jornada Accounting |
+| OBS-A-01 | Conciliación thin (paid vs amount) · sin ledger formal |
+| OBS-A-02 | Flag `admin_module_accounting` oculta nav (URL directa OK) |
+| OBS-A-03 | Sin pasarela de pago · cobro manual |
+| OBS-A-04 | Sin PDF / numeración fiscal avanzada |
+| OBS-A-05 | Issues Resolved → abono/crédito diferido a Flow (FG-S-A-01) |
 
 ---
 
 ## Estabilidad upstream
 
-| Journey | Tras FAIL Accounting |
-|---------|----------------------|
+| Journey | Tras Re-Certification Accounting |
+|---------|----------------------------------|
 | Kitchen | ✅ CERTIFIED (sin cambio) |
 | Delivery | ✅ CERTIFIED (sin cambio) |
 | Support | ✅ CERTIFIED (sin cambio) |
-| Accounting | ❌ NOT CERTIFIED · FAIL |
-
-```text
-Un Journey FAIL
-NO invalida
-ningún Journey previamente CERTIFIED.
-```
+| Accounting | ✅ CERTIFIED · OBSERVATIONS |
 
 ---
 
@@ -46,6 +41,6 @@ ningún Journey previamente CERTIFIED.
 
 | ID | Descripción |
 |----|-------------|
-| FG-D-A-01 | Pedido `delivered` → evento facturable |
-| FG-S-A-01 | Issues Resolved → impacto financiero / abono |
-| FG-A-G-01 | Cierre contable como handoff a Flow / ORR |
+| FG-D-A-01 | Auto-sugerir factura al pasar a `delivered` |
+| FG-S-A-01 | Issues Resolved → crédito / ajuste |
+| FG-A-G-01 | Periodo complete como handoff ORR |

@@ -3,7 +3,7 @@
 **Estado:** ✅ **FIRST VALIDATION CLOSED** · 2026-07-28  
 **PR:** [#89](https://github.com/losrealesplus/yourmeal-os/pull/89)  
 **Epic:** [EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY](./EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md)  
-**Metodología:** [FROZEN](./EP_OPS_003_METHODOLOGY_FROZEN.md) (sin cambio)  
+**Metodología:** [FROZEN](./EP_OPS_003_METHODOLOGY_FROZEN.md) · **probada** en primer ciclo (sin cambio de marco)  
 **Programa:** RI-001 · Bloque C  
 
 > Este acta **no** cierra EP-OPS-003 como epic completo (Accounting pendiente de Correction).  
@@ -11,7 +11,21 @@
 
 ---
 
-## Estado final de la ejecución
+## Separación marco · aplicación
+
+| Elemento | Estado (al cierre 1ª validación) | Estado actual |
+|----------|----------------------------------|---------------|
+| **EP-OPS-003 (metodología)** | ✅ Frozen | ✅ Frozen |
+| **Primera validación metodológica** | ✅ Cerrada (PR #89) | ✅ Cerrada |
+| **EP-OPS-003 (ejecución Journey)** | 🔄 Abierto (Accounting FAIL) | ✅ **4/4 CERTIFIED** |
+| **Accounting Journey** | ❌ Correction pendiente | ✅ CERTIFIED · OBSERVATIONS |
+| **Bloque G (Flow)** | ⏳ Pendiente | ⏳ **NEXT** |
+
+Eso mantiene separación limpia entre el **marco** y su **aplicación**.
+
+---
+
+## Estado final de la ejecución (1ª pasada)
 
 | Workspace | Estado | Gate | Outcome |
 |-----------|--------|------|---------|
@@ -22,80 +36,45 @@
 
 ---
 
-## Por qué este cierre es válido
+## Propiedades demostradas (metodología probada)
 
-No porque todos los Workspaces hayan terminado certificados a la primera, sino porque **el proceso metodológico ha demostrado comportarse como estaba diseñado**.
+Con estas cinco propiedades, EP-OPS-003 deja de ser hipótesis y pasa a ser metodología **probada** en un primer ciclo:
 
-### 1. Continuidad operacional
+1. **Continuidad** — cada Outcome alimenta el siguiente Journey.
+2. **Estabilidad** — un FAIL no invalida Journeys previamente certificados.
+3. **FAIL localizado** — los problemas pertenecen al Journey donde aparecen hasta evidencia en contrario.
+4. **P13 bidireccional** — certifica éxitos y estructura FAIL → Correction → Re-Certification.
+5. **Metodología congelada** — la evidencia evoluciona; el marco no.
 
-```text
-Production Ready
-        ↓
-Orders Delivered
-        ↓
-Issues Resolved
-        ↓
-Financial Records Complete  (Input OK · Outcome Accounting no alcanzable)
-```
-
-Cada Journey consume el **Outcome** certificado del anterior.
-
-### 2. Estabilidad de la certificación
+### Continuidad operacional
 
 ```text
-Accounting FAIL
+Kitchen → Production Ready
         ↓
-Kitchen   NO se reabre
-Delivery  NO se reabre
-Support   NO se reabre
+Delivery → Orders Delivered
+        ↓
+Support → Issues Resolved
+        ↓
+Accounting → FAIL (Financial Lifecycle pendiente)
 ```
 
-Regla formalizada:
+La cadena está demostrada hasta Support. Accounting es el único punto que impide completar el recorrido operacional.
+
+### Estabilidad
 
 ```text
-Un Journey FAIL
-NO invalida
-ningún Journey previamente CERTIFIED.
-
-Solo podrá reabrirse un Journey anterior cuando exista evidencia
-reproducible de que el FAIL fue provocado por un Outcome
-previamente certificado incorrecto.
+Accounting FAIL → Kitchen / Delivery / Support NO se reabre
 ```
 
-### 3. FAIL localizado
-
-Accounting falla porque:
+### FAIL localizado
 
 ```text
 Workspace → PlaceholderPanel → No existe Financial Lifecycle
 ```
 
-Es un FAIL **interno** del Journey. La continuidad está demostrada.
-
-### 4. P13 en ambos sentidos
-
-```text
-Support:     Discovery → Evaluation → FAIL → Correction → Re-Certification → CERTIFIED
-Accounting:  Discovery → Evaluation → FAIL → Correction → Re-Certification   (NEXT)
-```
-
-P13 no solo certifica éxitos; estructura la gestión de fallos.
-
-### 5. Metodología permanece congelada
-
-Durante Kitchen · Delivery · Support · Accounting:
-
-- no se añadieron nuevas fases;
-- no se redefinieron niveles de certificación;
-- no se modificaron los criterios de P13.
-
-Las mejoras fueron sobre **implementación**, no sobre el marco.
-
 ---
 
 ## Distinciones demostradas (confianza RI-001)
-
-El marco distingue entre:
 
 | Caso | Ejemplo |
 |------|---------|
@@ -110,7 +89,7 @@ El marco distingue entre:
 ```text
 EP-OPS-002  Entry CERTIFIED
         ↓
-EP-OPS-003  Journey methodology FROZEN + first full pass executed
+EP-OPS-003  Journey methodology FROZEN + first full pass CLOSED
         ↓
 Correction / Re-Certification  (Support demostrado)
         ↓
@@ -123,21 +102,25 @@ Bloque G    Flow Certification
 
 ## Siguiente etapa (operativa · no metodológica)
 
+Al cierre de la 1ª validación:
+
 ```text
-Accounting FAIL
-        ↓
-Correction P0
-        ↓
-Financial Workspace + Financial Lifecycle
-        ↓
-Re-Certification
-        ↓
-Financial Records Complete
-        ↓
-Bloque G · Flow Certification
+Accounting FAIL → Correction P0 → Financial Lifecycle → Re-Certification → Block G
 ```
 
-**Prohibido en esta etapa:** reabrir metodología EP-OPS-003 · reopen Journeys CERTIFIED sin evidencia de Outcome incorrecto · PASS vacío / artificialidad.
+**Post-Correction (2026-07-28):** Accounting CERTIFIED · OBSERVATIONS · Financial Records Complete.  
+
+**Ahora:**
+
+```text
+4/4 Journeys CERTIFIED
+        ↓
+Block G · Flow Certification
+```
+
+No hace falta ningún concepto nuevo. El framework es la **herramienta** con la que se certifica la operación real.
+
+**Prohibido:** reabrir metodología · reopen Journeys CERTIFIED sin evidencia de Outcome incorrecto · PASS vacío / artificialidad.
 
 ---
 

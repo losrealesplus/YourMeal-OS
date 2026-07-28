@@ -11,13 +11,14 @@
 
 La **metodología** de Journeys (conceptos, gates, continuidad Outcome→Input, orden de pasadas).
 
-La **ejecución** de Accounting Correction **no** está congelada: la primera validación completa del proceso está **cerrada** ([acta](./EP_OPS_003_FIRST_VALIDATION_CLOSED.md)); queda Correction P0 Accounting → Re-Certification → Bloque G.
+La **ejecución Journey** de EP-OPS-003 está **cerrada** (4/4 CERTIFIED). Queda Bloque G Flow. Metodología sigue FROZEN.
 
 ```text
 Metodología EP-OPS-003     FROZEN
-Primera validación (4 pasadas)  CLOSED  ← proceso demostrado
-Accounting Correction      OPEN    ← implementación + re-cert
-Bloque G Flow              PENDING ← tras Accounting CERTIFIED
+Primera validación (4 pasadas)  CLOSED
+Accounting Correction      DONE · Re-Cert CERTIFIED
+Journeys 4/4               CERTIFIED
+Bloque G Flow              NEXT
 ```
 
 ---
@@ -27,7 +28,7 @@ Bloque G Flow              PENDING ← tras Accounting CERTIFIED
 | Nivel | Estado |
 |-------|--------|
 | **Entry** | ✅ Certificado (EP-OPS-002) |
-| **Journey** | ✅ Metodología fijada · **1ª validación CLOSED** · Accounting Correction OPEN |
+| **Journey** | ✅ Metodología fijada · 1ª validación CLOSED · **4/4 CERTIFIED** |
 | **Flow** | ⏳ Pendiente (Bloque G) |
 
 ---
@@ -97,7 +98,7 @@ Kitchen y Delivery permanecen CERTIFIED mientras Support/Accounting se ejecutan.
 
 | Permitido | Prohibido |
 |-----------|-----------|
-| Ejecutar pasada Accounting · re-certificar tras corrección | Nuevos conceptos metodológicos sin evidencia que los justifique |
+| Ejecutar Bloque G Flow · evidencia transversal | Nuevos conceptos metodológicos sin evidencia que los justifique |
 | Recopilar evidencia · cerrar Gates | Redefinir CERTIFIED / Gate / Outcomes |
 | Corregir bloqueos hallados **durante** una pasada | Ampliar alcance de EP-OPS-003 (nuevos workspaces / outcomes) |
 | Anotar Flow Gaps → Bloque G | Empezar Flow Certification antes de cerrar las 4 jornadas |
@@ -117,8 +118,8 @@ Demostrar validez mediante evidencia de campo
 P11 · P12 · P13
 ```
 
-**Siguiente acción operativa:** **Correction** Accounting P0 (superficie financiera real) → Re-Certification · Outcome **Financial Records Complete**.  
-Kitchen · Delivery · Support permanecen CERTIFIED (regla de estabilidad).
+**Siguiente acción operativa:** **Bloque G · Flow Certification** (continuidad transversal Outcome→Input).  
+Kitchen · Delivery · Support · Accounting permanecen CERTIFIED (regla de estabilidad).
 
 ---
 

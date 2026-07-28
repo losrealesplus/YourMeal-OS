@@ -35,6 +35,10 @@ export function homePathForRoles(roles: readonly AppRole[]): string {
   ) {
     return "/admin/delivery";
   }
+  if (staff.length === 1 && staff[0] === "support") return "/admin/support";
+  if (staff.length === 1 && staff[0] === "accounting") {
+    return "/admin/accounting";
+  }
   if (staff.includes("kitchen") && !staff.includes("delivery") && !staff.includes("logistics") && !staff.includes("operations_manager")) {
     return "/admin/kitchen";
   }

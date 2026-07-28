@@ -1,10 +1,16 @@
-# Accounting Validation
+# Accounting Validation (Re-Certification)
 
 **Fecha:** 2026-07-28  
-**Gate:** **FAIL**  
-**Status:** **NOT CERTIFIED**  
-**Input:** Completed Orders · Issues Resolved ✅ (continuidad OK)  
-**Outcome:** **Financial Records Complete** ✗  
+**Gate:** **OBSERVATIONS**  
+**Status:** **CERTIFIED**  
+**Input:** Orders Delivered · Issues Resolved ✅  
+**Outcome:** **Financial Records Complete** ✅  
+
+Ciclo P13 demostrado (segundo FAIL→Correction del epic):
+
+```text
+Discovery → Evaluation → FAIL → Correction → Re-Certification → CERTIFIED
+```
 
 ---
 
@@ -12,31 +18,29 @@
 
 | Criterio | OK |
 |----------|:--:|
-| Consume Inputs de continuidad | ⚠ Input disponible · Workspace no lo opera |
+| Consume Orders Delivered | ✅ |
 | No reabre Kitchen/Delivery/Support | ✅ |
-| Facturación operable | ✗ |
-| Cobros operables | ✗ |
-| Conciliación | ✗ |
-| Cierre de periodo | ✗ |
+| Facturas ancladas a pedidos reales | ✅ |
+| Cobro pending → paid | ✅ |
+| Periodo complete derivable | ✅ |
 | Negativos documentados | ✅ |
-| Evidencia reproducible · sin artificialidad | ✅ |
+| Tests dominio lifecycle | ✅ |
+| Sin importes inventados | ✅ |
 
 ---
 
 ## Evidence Gate · Accounting
 
 ```text
-STATUS: NOT CERTIFIED
+STATUS: CERTIFIED (with OBSERVATIONS)
 
 Evidence
-  ☑ ACCOUNTING_JOURNEY.md
+  ☑ ACCOUNTING_JOURNEY.md (re-cert)
   ☑ ACCOUNTING_VALIDATION.md
   ☑ ACCOUNTING_NEGATIVE_CASES.md
   ☑ ACCOUNTING_OBSERVATIONS.md
 
-Gate: FAIL
-Outcome: Financial Records Complete — NOT DEMONSTRABLE
-Cause: Placeholder Workspace · sin lifecycle financiero
+Gate: OBSERVATIONS
+Outcome: Financial Records Complete
+Prior Gate: FAIL (placeholder) — corrected
 ```
-
-**Siguiente:** Correction P0 Accounting (superficie operativa mínima facturación/cobros/cierre) **o** decisión de alcance firmada — **no** PASS vacío.

@@ -1,16 +1,16 @@
 # EP-OPS-003 · Workspace Operational Journey Certification
 
-**Estado ejecución:** FIRST VALIDATION CLOSED · Kitchen+Delivery+Support CERTIFIED · Accounting **FAIL** · Correction NEXT  
-**Acta cierre 1ª validación:** [EP_OPS_003_FIRST_VALIDATION_CLOSED](./EP_OPS_003_FIRST_VALIDATION_CLOSED.md) · 2026-07-28  
+**Estado ejecución:** ✅ **4/4 Journeys CERTIFIED** · Bloque G Flow NEXT  
+**Acta 1ª validación:** [EP_OPS_003_FIRST_VALIDATION_CLOSED](./EP_OPS_003_FIRST_VALIDATION_CLOSED.md) · 2026-07-28  
 **Metodología:** ✅ **FROZEN** — [acta](./EP_OPS_003_METHODOLOGY_FROZEN.md) · 2026-07-28  
 **Fecha apertura:** 2026-07-28  
-**Programa:** RI-001 · Bloque C (jornadas)  
+**Programa:** RI-001 · Bloque C (jornadas) · **ejecución Journey cerrada**  
 **Prerrequisito:** EP-OPS-002 · Entry architecture **CERTIFIED**  
 `(RBAC-001 · WEP-001 · LP-001)` — PR #88 · [WORKSPACE_ENTRY_POLICY](../10-validation/WORKSPACE_ENTRY_POLICY.md)  
 
-> **First Validation Closed:** las 4 pasadas se ejecutaron; el proceso metodológico se comportó como diseñado.  
-> Epic **no** cerrado: Accounting requiere Correction → Re-Certification antes de Bloque G.  
-> **Methodology Frozen:** no nuevos conceptos. Solo corrección de implementación · evidencia · Gates (P11–P13).  
+> **Journey execution CLOSED:** Kitchen · Delivery · Support · Accounting CERTIFIED (OBSERVATIONS).  
+> Accounting vía FAIL → Correction (Financial Lifecycle) → Re-Certification.  
+> **Methodology Frozen:** no nuevos conceptos. Siguiente nivel = Bloque G Flow (P11–P13).  
 
 ```text
 Identity
@@ -150,7 +150,7 @@ Kitchen → Delivery → Support → Accounting
 | Kitchen | `/admin/kitchen` | Production Ready | **OBSERVATIONS** | ✅ **CERTIFIED** |
 | Delivery | `/admin/delivery` | Orders Delivered | **OBSERVATIONS** | ✅ **CERTIFIED** |
 | Support | `/admin/support` | Issues Resolved | **OBSERVATIONS** | ✅ **CERTIFIED** |
-| Accounting | `/admin/accounting` | Financial Records Complete | **FAIL** | **NOT CERTIFIED** |
+| Accounting | `/admin/accounting` | Financial Records Complete | **OBSERVATIONS** | ✅ **CERTIFIED** |
 
 ### Progress global
 
@@ -163,9 +163,9 @@ Delivery            CERTIFIED · OBSERVATIONS · Orders Delivered
         ↓
 Support             CERTIFIED · OBSERVATIONS · Issues Resolved
         ↓
-Accounting          FAIL · Financial Records Complete no alcanzable  ← Correction
+Accounting          CERTIFIED · OBSERVATIONS · Financial Records Complete
         ↓
-Bloque G            Flow Certification
+Bloque G            Flow Certification ← NEXT
 ```
 
 Evidencia: [kitchen/](../10-validation/ep-ops-003/kitchen/) · [delivery/](../10-validation/ep-ops-003/delivery/) · [support/](../10-validation/ep-ops-003/support/) · [accounting/](../10-validation/ep-ops-003/accounting/)
@@ -196,13 +196,12 @@ FAIL (no lifecycle) → Correction open→resolved→closed → Re-Certification
 SJ-01…SJ-05  ·  Outcome: Issues Resolved · Gate OBSERVATIONS
 ```
 
-### Accounting → Financial Records Complete ✗ FAIL
+### Accounting → Financial Records Complete ✅ CERTIFIED
 
 ```text
 Input: Completed Orders · Issues Resolved ✅
-AJ-01 parcial (entry/placeholder) · AJ-02…05 ausentes
-Outcome Financial Records Complete: NOT DEMONSTRABLE
-Cause: PlaceholderPanel · sin lifecycle financiero
+FAIL (placeholder) → Correction invoice_orders + payment lifecycle → Re-Certification
+AJ-01…AJ-05  ·  Outcome: Financial Records Complete · Gate OBSERVATIONS
 ```
 
 ---

@@ -664,6 +664,7 @@ export type Database = {
           company_id: string | null
           created_at: string
           customer_id: string | null
+          deleted_at?: string | null
           id: string
           pdf_url: string | null
           status: Database["public"]["Enums"]["invoice_status"]
@@ -675,6 +676,7 @@ export type Database = {
           company_id?: string | null
           created_at?: string
           customer_id?: string | null
+          deleted_at?: string | null
           id?: string
           pdf_url?: string | null
           status?: Database["public"]["Enums"]["invoice_status"]
@@ -686,6 +688,7 @@ export type Database = {
           company_id?: string | null
           created_at?: string
           customer_id?: string | null
+          deleted_at?: string | null
           id?: string
           pdf_url?: string | null
           status?: Database["public"]["Enums"]["invoice_status"]
@@ -708,6 +711,49 @@ export type Database = {
           },
           {
             foreignKeyName: "invoices_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoice_orders: {
+        Row: {
+          created_at: string
+          invoice_id: string
+          order_id: string
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          invoice_id: string
+          order_id: string
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          invoice_id?: string
+          order_id?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_orders_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_orders_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_orders_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"

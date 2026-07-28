@@ -3,11 +3,11 @@
 **Workspace:** Accounting  
 **Landing:** `/admin/accounting`  
 **Epic:** EP-OPS-003  
-**Metodología:** FROZEN  
-**Estado:** **NOT CERTIFIED**  
-**Gate:** **FAIL**  
-**Input:** Completed Orders · **Issues Resolved** (Support) · Billing Events · continuidad Input OK  
-**Outcome:** **Financial Records Complete** · **no alcanzado**  
+**Metodología:** FROZEN · 1ª validación CLOSED  
+**Estado:** ✅ **CERTIFIED**  
+**Gate:** **OBSERVATIONS**  
+**Input:** Orders Delivered · Issues Resolved · continuidad OK  
+**Outcome:** **Financial Records Complete** · alcanzado (tras Correction + Re-Certification)  
 **Fecha:** 2026-07-28  
 
 **Pack:** [accounting/](./accounting/)
@@ -24,11 +24,13 @@
 ## Continuidad
 
 ```text
-Issues Resolved (Support CERTIFIED)
+Orders Delivered + Issues Resolved
         ↓  Input OK
 Accounting Journey
         ↓
-Financial Records Complete  ✗  Gate FAIL (placeholder)
+FAIL (placeholder) → Correction → Re-Certification
+        ↓
+Financial Records Complete  ✅  Gate OBSERVATIONS · CERTIFIED
 ```
 
 Upstream Kitchen · Delivery · Support **no se reabren**.
@@ -39,16 +41,17 @@ Upstream Kitchen · Delivery · Support **no se reabren**.
 
 > ¿Puede un agente Accounting cerrar el ciclo financiero operativo del alcance piloto sin salir de su Workspace?
 
-**No** (Workspace placeholder · sin lifecycle financiero).
+**Sí** — con observaciones residuales no bloqueantes.
 
 ---
 
 ## Evidence Gate · Accounting
 
 ```text
-STATUS: NOT CERTIFIED
-Gate: FAIL
-Outcome: Financial Records Complete — NOT DEMONSTRABLE
+STATUS: CERTIFIED (with OBSERVATIONS)
+Gate: OBSERVATIONS
+Outcome: Financial Records Complete
+Prior Gate: FAIL (placeholder) — corrected
 ```
 
-**Siguiente:** Correction P0 Accounting (implementación real, no teatro) → Re-Certification · **o** waiver de alcance explícito.
+**Siguiente:** Bloque G · Flow Certification (4/4 Journeys CERTIFIED).
