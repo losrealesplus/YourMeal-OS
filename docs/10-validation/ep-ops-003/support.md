@@ -3,18 +3,13 @@
 **Workspace:** Support  
 **Landing:** `/admin/support`  
 **Epic:** EP-OPS-003  
-**Estado:** NOT STARTED  
-**Gate:** —
+**Estado:** NOT STARTED · **NEXT**  
+**Gate:** —  
+**Input (continuidad):** **Orders Delivered** (Delivery CERTIFIED · OBSERVATIONS)  
+**Outcome esperado:** `Issues Resolved`  
+**Prerrequisito:** Delivery CERTIFIED ✅  
 
----
-
-## Objetivo operacional
-
-Permitir a Atención al Cliente recibir, clasificar, seguir y resolver incidencias **sin cambiar de contexto** fuera del Support Workspace.
-
-**Outcome certificado:** `Issues Resolved`  
-**Prerrequisito de orden:** Delivery Gate (pedidos entregados como base de incidencias).  
-**Pregunta:** ¿Puede un agente gestionar una incidencia completa sin abandonar su Workspace?
+**Pregunta:** ¿Puede un agente, partiendo de Orders Delivered, gestionar una incidencia completa sin abandonar su Workspace?
 
 ---
 
