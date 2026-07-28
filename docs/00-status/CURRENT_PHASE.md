@@ -1,6 +1,6 @@
 # CURRENT_PHASE
 
-**Última actualización:** 2026-07-26  
+**Última actualización:** 2026-07-28  
 **No sustituye** [MILESTONES](./MILESTONES.md) — tablero de “dónde estamos ahora”.
 
 ```text
@@ -8,77 +8,78 @@
 AUTH LAYER · FROZEN (2026-07-26)
 ══════════════════════════════════════════════════
 FOUNDATION · INFRA · Identity · PO Bootstrap · Product Identity · Nav Decoupling  ✅
-Allowed: bug / security / OAuth·Phone activation
-Forbidden: Auth refactor · RBAC · Session · Bootstrap · Callback redesign
-Siguiente: dominio de negocio — no más PRs Auth salvo incidencia/providers
+Allowed: bug / security / OAuth·Phone activation · AUTH-A/B solo en Bloque H del backlog RI-001
+Forbidden: Auth refactor · RBAC redesign · Session redesign fuera de Bloque H
 Acta: IDENTITY_FREEZE_v1.md
 ══════════════════════════════════════════════════
 
 ══════════════════════════════════════════════════
-PROJECT STATE · RI-001 · Pilot Readiness
+PROJECT STATE · RI-001 · Operational Certification
 ══════════════════════════════════════════════════
 
-FOUNDATION / BLUEPRINT / DISCOVERY / OM / VALIDATION / IOV   ✅
-FOV PREPARATION · ORR (marco) · G-02 (Gate formalizado)     ✅
-EP-001 Functional Completeness (cero humo Admin/Ops nav)    ✅
-────────────────────────────
-Modo:                **CERTIFICACIÓN** — Correction hub OK · **no** Packaging
-Bloqueo:             **RI-001 bloqueado por EP-OPS-001** (punto de entrada no certificado)
-Siguiente sprint:    **EP-OPS-001** WP-1…WP-6 (nav · RBAC · dual · dashboard · **Tenant Provisioning** · mini-gate)
-                     · FCR resto **en pausa** hasta Ops PASS
-                     · Tras Ops PASS → **Architecture Freeze** hasta RI-001
-                     · Packaging/Delivery **en cola**
-Siguiente artefacto: [EP_OPS_001_OPERATIONAL_CENTER_READINESS](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md)
-                     → Ops PASS → Architecture Freeze → FCR → E2E → Evidence → decisión RI-001
+Modo:                **PROGRAMA DE CERTIFICACIÓN OPERACIONAL**
+Backlog:             [RI001_OPERATIONAL_READINESS_BACKLOG](./RI001_OPERATIONAL_READINESS_BACKLOG.md)
+                     Bloques A→I · Evidence Gates · P11–P13
+DONE:                Progress 100% · Gates PASS · Report READY|RWO · evidencia reproducible
+Pregunta maestra:    ¿Qué evidencia falta para certificar que YM OS opera una empresa real?
+Siguiente:           Bloque A Foundation · Bloque B Surface (Pasada 2)
+                     · AUTH-B solo tras flujos certificados
+                     · P14 Traceability = futuro (segundo producto)
+══════════════════════════════════════════════════
+```
+
+*(Secciones detalladas históricas debajo — el backlog A–I es la hoja de ruta activa de certificación.)*
+
+```text
+Siguiente artefacto activo:
+  [RI001_OPERATIONAL_READINESS_BACKLOG](./RI001_OPERATIONAL_READINESS_BACKLOG.md)
+  · Bloque A Foundation · Bloque B Surfaces (Pasada 2)
+  · EP-OPS-001 subsumido en B/C · Flow G tras superficies CERTIFIED
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████
   Gobernanza          ██████████
   Modelo operacional  ██████████
   Administración      ██████████
-  Customer App        █████████░  ← tras hub PASS
-  Operaciones         ██████░░░░  ← **EP-OPS-001** (bloqueante RI-001)
+  Customer App        █████████░
+  Operaciones         ██████░░░░  ← Surface + Workspace certification
   Data                ███████░░░
 
-Mapa EP:
-  FASE 0 · FOUNDATION              ██████████
-  EP-001 · Functional Completeness ██████████
-  EP-002A · Customer Experience    ██████████
-  EP-002B.1 · Production Report    ██████████
-  EP-002B.2 · Kitchen Execution    ██████████
-  —— EP-OPS-001 Ops Center ——      □□□□□□□□□□  ← HOY (bloquea RI-001)
-  —— Architecture Freeze ——        □□□□□□□□□□  (tras Ops PASS → hasta RI-001)
-  —— FCR / E2E / Evidence ——       □□□□□□□□□□  (tras Freeze)
-  EP-002B.3 · Packaging            □□□□□□□□□□  (cola)
-  EP-002B.4 · Delivery             □□□□□□□□□□
-  RI-001                           ████████░░  ← bloqueado hasta EP-OPS-001 PASS
+Mapa certificación (activo):
+  A Foundation              □□□□□□□□□□
+  B Surfaces                ██░░░░░░░░  Tenant IN REVIEW
+  C Department Workspaces   □□□□□□□□□□
+  D Operational Language    □□□□□□□□□□
+  E RBAC & Access           □□□□□□□□□□
+  F Observability Ready     □□□□□□□□□□
+  G Flow Certification      □□□□□□□□□□  (plantilla lista)
+  H Auth Transition         □□□□□□□□□□  AUTH-A/B
+  I Certification Report    □□□□□□□□□□  CG-RI-001
 
 Patrón permanente: Operational Representation (DICT-072)
-Madurez tenant:    Tenant Operational Autonomy (DICT-073) — WP-5 aprovisiona, no “crea admins”
-Hoy: Certificar el hub — no auditar el resto sobre navegación incompleta.
+Madurez tenant:    Tenant Operational Autonomy (DICT-073)
 
-Riesgo principal: E2E / FCR sobre hub no PASS → evidencia contaminada
+Riesgo principal: certificar sin evidencia de jornadas / flujos → CG-RI-001 NOT READY
 
-Incertidumbres de diseño grandes: **ninguna**.
-RI-001 comienza cuando EP-002A y EP-002B estén cerrados.
-
-G-02 = Pilot Authorization  ≠  Release / v1.0
-Pregunta principal: ¿Qué nos enseña la operación real sobre nuestro modelo?
-
-Primary Artifact:  [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · [RI001_FUNCTIONAL_COMPLETENESS_MATRIX](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md) · [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md)
+Primary Artifact:  [RI-001 Ops Readiness Backlog](./RI001_OPERATIONAL_READINESS_BACKLOG.md) · [ORC](../10-validation/OPERATIONAL_READINESS_CERTIFICATION.md) · [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md)
 Visibilidad:       [Operational Visibility · DICT-071](../20-evidence-framework/09-operational-visibility-principle.md)
 Ops pattern:       [Operational Representation · DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md)
 Tenant autonomy:   [Tenant Operational Autonomy · DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)
-Hoy (Certificación): [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · [Ops dual surface](./OPS_CENTER_DUAL_SURFACE.md) · [Readiness](./RI001_READINESS_SPRINT.md)
+Hoy (Certificación): [Backlog RI-001](./RI001_OPERATIONAL_READINESS_BACKLOG.md) · [FCR Session Log](../10-validation/FCR_SESSION_LOG.md) · [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) (histórico / hub)
 Seguridad pre-piloto: [Pilot Security Checklist](../09-security/PILOT_SECURITY_CHECKLIST.md) (10 corregidos · 1 Accepted documentado)
 Antes de firmar G-02 PASSED: ORR firmados · cero humo · No Artificiality
 PR taxonomy (post G-02): Evidence · KU · Correction · Pilot Fix · Operational Finding
 Completitud UI:    [Matriz RI-001](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md) · [EP-001](./EP001_FUNCTIONAL_COMPLETENESS_SPRINT.md) · [EP-002A](./EP002A_CUSTOMER_EXPERIENCE_COMPLETION.md) · [EP-002B](./EP002B_OPERATIONAL_EXECUTION.md)
 Hallazgos Lovable: [Decisiones](./LOVABLE_FINDINGS_DECISIONS.md) (contraste ✅ · GSC → [Marketing Readiness](./MILESTONE_MARKETING_READINESS.md) · Semrush draft)
 Last Baseline:     v0.2.0-engineering-baseline (IR-001)
-
-══════════════════════════════════════════════════
 ```
+
+---
+
+## Continuación histórica (referencia)
+
+El bloque siguiente conserva contexto de fases anteriores (EP-OPS-001 WPs, FOV, etc.).  
+**Prioridad operativa:** backlog A–I arriba.
 
 Materialization: [ACT-002](./ACT-002_FOUNDATION_OF_MATERIALIZATION_FROZEN.md) ✅ Frozen v1.  
 Experiencia base: [ACT-001](./ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) ✅ Frozen.  

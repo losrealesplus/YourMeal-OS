@@ -2,7 +2,8 @@
 
 **Estado:** Accepted as working method (Functional Review Mode)  
 **No sustituye** el ORR binario de producto ([ORR](../22-implementation/ORR.md) · PASSED / BLOCKED).  
-**Criterio RI-001:** demostrar operación completa EatClean — no solo módulos ni perfiles aislados.
+**Criterio RI-001:** demostrar operación completa EatClean — no solo módulos ni perfiles aislados.  
+**Backlog activo:** [RI-001 Operational Readiness Backlog](../00-status/RI001_OPERATIONAL_READINESS_BACKLOG.md) (bloques A→I · no “stabilization”).
 
 ---
 
@@ -170,4 +171,6 @@ ORR deja de ser opinión: es consecuencia de evidencia de superficie + flujo.
 | [FLOW_CERTIFICATION](./FLOW_CERTIFICATION.md) | Evidencia Nivel 2 (plantilla) |
 | [RBAC_MATRIX_V1](./RBAC_MATRIX_V1.md) | Autorización |
 | [WORKSPACE_ENTRY_POLICY](./WORKSPACE_ENTRY_POLICY.md) | Landings |
+| [ORC](../10-validation/OPERATIONAL_READINESS_CERTIFICATION.md) | Método Surface + Flow |
+| [RI-001 Ops Readiness Backlog](../00-status/RI001_OPERATIONAL_READINESS_BACKLOG.md) | Bloques A→I hacia CG-RI-001 |
 | [ORR](../22-implementation/ORR.md) | Puerta binaria tras ORR READY |

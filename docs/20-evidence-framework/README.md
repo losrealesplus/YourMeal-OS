@@ -90,7 +90,8 @@ Architecture · Implementation · Verification · Release
 ├── 08 Gate G-02                (Pilot Readiness · RI)
 ├── 09 Operational Visibility   (cero humo · DICT-071)
 ├── 10 P12 Evidence Freshness   (PRE-CHECK · STALE)
-└── 11 Development Identity Adapter
+├── 11 Development Identity Adapter
+└── 12 P13 Certification Completeness  (Evidence Gate · impl ≠ cert)
 ```
 
 | Doc | Contenido |
@@ -106,6 +107,7 @@ Architecture · Implementation · Verification · Release
 | [09 Visibility](./09-operational-visibility-principle.md) | Cero humo · lo visible existe |
 | [10 P12 Freshness](./10-evidence-freshness-p12.md) | Evidencia vigente antes de ingeniería · STALE |
 | [11 Dev Identity Adapter](./11-development-identity-adapter.md) | Proveedor identidad dev reversible · no bypass |
+| [12 P13 Completeness](./12-certification-completeness-p13.md) | Evidencia completa del bloque · impl ≠ cert |
 
 ---
 
