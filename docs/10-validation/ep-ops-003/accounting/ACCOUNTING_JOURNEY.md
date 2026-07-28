@@ -1,18 +1,19 @@
-# Accounting Journey · AJ-01 → AJ-05 (Re-Certification)
+# Accounting Journey · AJ-01 → AJ-05 (Re-Certification · Correction P0)
 
-**Epic:** EP-OPS-003 · Accounting Correction + Re-Certification  
+**Epic:** EP-OPS-003 · Accounting Correction P0  
 **Metodología:** FROZEN · 1ª validación CLOSED  
 **Workspace:** `/admin/accounting`  
 **Actor:** `accounting`  
-**Input:** Orders Delivered · Issues Resolved (continuidad)  
+**Input:** Orders Delivered · Issues Resolved  
 **Outcome:** **Financial Records Complete**  
-**Pasada FAIL:** 2026-07-28 · **Re-Certification:** 2026-07-28  
 **Gate:** **OBSERVATIONS** · **Status:** **CERTIFIED**  
+**Bloque G:** **NOT STARTED** (elegible tras 4/4 CERTIFIED)
 
 ```text
 FAIL (PlaceholderPanel)
         ↓
-Correction: invoice ← delivered orders · payment · period complete
+Correction P0 · Financial Lifecycle
+Pending → Review → Processed → Closed
         ↓
 Re-Certification
         ↓
@@ -23,56 +24,43 @@ Upstream Kitchen · Delivery · Support **permanecen CERTIFIED**.
 
 ---
 
-## Continuidad Input
+## Lifecycle (as-built ≡ brief)
 
-| Check | Resultado |
-|-------|:---------:|
-| Lista pedidos `delivered` | ✅ |
-| Emite factura con importe = suma pedidos | ✅ |
-| No reabre Delivery/Support | ✅ |
+| Brief | As-built |
+|-------|----------|
+| Pending Financial Items | Pedidos `delivered` + factura `pending` |
+| Review | `reviewed_at` · acción Revisar |
+| Processed | `recordPayment` → status `paid` |
+| Close Financial Period | `closeFinancialPeriod` · `financial_period_closures` |
 
 ---
 
-## AJ stages post-corrección
+## AJ stages
 
 | Stage | Resultado | Evidencia |
 |-------|:---------:|-----------|
-| AJ-01 Entrada | ✅ | `/admin/accounting` · cap · homePath accounting-only |
-| AJ-02 Facturación | ✅ | `createInvoiceFromOrders` · `invoice_orders` |
-| AJ-03 Cobros | ✅ | `recordPayment` · pending → paid |
-| AJ-04 Conciliación | ⚠ | Thin: paidTotal vs amount en UI (OBS) |
-| AJ-05 Cierre periodo | ✅ | `derivePeriodComplete` · KPI Periodo Completo |
+| AJ-01 Workspace operativo | ✅ | Sustituye PlaceholderPanel |
+| AJ-02 Pending items | ✅ | Billable delivered orders |
+| AJ-03 Review | ✅ | `AccountingService.reviewInvoice` |
+| AJ-04 Process / Payment | ✅ | Cobro tras Review |
+| AJ-05 Close period | ✅ | Cierre explícito → Outcome |
 
 **Outcome:**
 
 ```text
-Financial Records Complete =
-  periodo con ≥1 factura anclada a delivered
-  AND pending=0 AND overdue=0
+Financial Records Complete = financial_period_closures row
+                             para el periodo (tras readyToClose)
 ```
 
 ---
 
-## Recorrido E2E
+## Pregunta maestra (Re-Certification)
 
-```text
-Input: Orders Delivered
-  → /admin/accounting
-  → seleccionar delivered facturables
-  → Emitir factura
-  → Registrar cobro
-Outcome: periodo Completo (Financial Records Complete)
-```
+> ¿Puede Accounting completar todo su trabajo operativo y alcanzar "Financial Records Complete" sin abandonar su Workspace?
 
-Migración: `20260728210000_accounting_invoice_orders.sql`  
-Dominio/tests: `src/modules/accounting` PASS  
+**Sí.**
 
----
-
-## Pregunta maestra
-
-> ¿Puede un agente Accounting cerrar el ciclo financiero operativo del alcance piloto sin salir de su Workspace?
-
-**Sí** (actor `accounting`) — con observaciones (conciliación thin · flag nav · sin pasarela).
-
-**Gate:** OBSERVATIONS · **CERTIFIED** · Outcome **Financial Records Complete**
+**Workspace:** Accounting  
+**Status:** CERTIFIED  
+**Gate:** OBSERVATIONS  
+**Outcome:** Financial Records Complete

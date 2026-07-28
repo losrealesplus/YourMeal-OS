@@ -1,46 +1,43 @@
-# Accounting Observations (Re-Certification)
+# Accounting Observations (Correction P0 · Re-Cert)
 
 **Gate:** OBSERVATIONS · **CERTIFIED**
 
 ---
 
-## P0 cerrados
+## P0 cerrados (causa FAIL)
 
 | ID | Antes | Después |
 |----|-------|---------|
-| P0-A-01 | PlaceholderPanel | Workspace operativo |
-| P0-A-02 | Sin lifecycle | pending → paid / void · period complete |
-| P0-A-03 | Sin servicio | `AccountingService` + `invoice_orders` |
+| P0-A-01 | PlaceholderPanel | Financial Workspace |
+| P0-A-02 | Sin lifecycle | Pending → Review → Processed → Closed |
+| P0-A-03 | Sin Outcome alcanzable | `closeFinancialPeriod` |
 
 ---
 
-## Observaciones residuales (no bloquean Outcome)
+## Observaciones residuales (no bloquean)
 
 | ID | Hallazgo |
 |----|----------|
-| OBS-A-01 | Conciliación thin (paid vs amount) · sin ledger formal |
-| OBS-A-02 | Flag `admin_module_accounting` oculta nav (URL directa OK) |
-| OBS-A-03 | Sin pasarela de pago · cobro manual |
-| OBS-A-04 | Sin PDF / numeración fiscal avanzada |
-| OBS-A-05 | Issues Resolved → abono/crédito diferido a Flow (FG-S-A-01) |
+| OBS-A-01 | Conciliación thin (paid vs amount) |
+| OBS-A-02 | Flag nav `admin_module_accounting` (URL directa OK) |
+| OBS-A-03 | Cobro manual · sin pasarela |
+| OBS-A-04 | Sin PDF / numeración fiscal |
+| OBS-A-05 | Issues Resolved → crédito diferido a Flow |
 
 ---
 
-## Estabilidad upstream
+## Estabilidad
 
-| Journey | Tras Re-Certification Accounting |
-|---------|----------------------------------|
-| Kitchen | ✅ CERTIFIED (sin cambio) |
-| Delivery | ✅ CERTIFIED (sin cambio) |
-| Support | ✅ CERTIFIED (sin cambio) |
+| Journey | Estado |
+|---------|--------|
+| Kitchen | ✅ CERTIFIED |
+| Delivery | ✅ CERTIFIED |
+| Support | ✅ CERTIFIED |
 | Accounting | ✅ CERTIFIED · OBSERVATIONS |
 
 ---
 
-## Flow Gaps → Bloque G
+## Bloque G
 
-| ID | Descripción |
-|----|-------------|
-| FG-D-A-01 | Auto-sugerir factura al pasar a `delivered` |
-| FG-S-A-01 | Issues Resolved → crédito / ajuste |
-| FG-A-G-01 | Periodo complete como handoff ORR |
+**NOT STARTED.** Elegible solo porque 4/4 Journeys = CERTIFIED.  
+No iniciar Flow en este Correction.

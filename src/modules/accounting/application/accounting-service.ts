@@ -106,26 +106,75 @@ export const AccountingService = {
 
     const billingPeriod =
       input.billingPeriod?.trim() || currentBillingPeriod();
-    const invoice = await repo.createInvoice({
-      customerId: customerIds[0] ?? null,
-      companyId: companyIds[0] ?? null,
-      amount,
-      billingPeriod,
-      orderIds: orders.map((o) => o.id),
-    });
 
+    try {
+      const invoice = await repo.createInvoice({
+        customerId: customerIds[0] ?? null,
+        companyId: companyIds[0] ?? null,
+        amount,
+        billingPeriod,
+        orderIds: orders.map((o) => o.id),
+      });
+
+      await AuditService.write(ctx, {
+        entityType: "invoice",
+        entityId: invoice.id,
+        action: "create",
+        newData: {
+          amount: invoice.amount,
+          billingPeriod,
+          orderIds: invoice.orderIds,
+          lifecycleStage: "pending",
+        },
+      });
+
+      return invoice;
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      if (msg.includes("already closed")) {
+        throw new DomainError("INVALID_STATE", msg);
+      }
+      throw e;
+    }
+  },
+
+  /** Review step — Pending → Review (reviewed_at). */
+  async reviewInvoice(
+    ctx: ServiceContext,
+    invoiceId: string,
+  ): Promise<InvoiceRecord> {
+    assertTenant(ctx);
+    assertAccounting(ctx);
+    const repo = createAccountingRepository(ctx.supabase, ctx.tenantId);
+    const current = await repo.getInvoice(invoiceId);
+    if (!current) {
+      throw new DomainError("NOT_FOUND", `Invoice ${invoiceId}`);
+    }
+    if (current.status === "paid" || current.status === "void") {
+      throw new DomainError(
+        "INVALID_STATE",
+        `Cannot review invoice in status ${current.status}`,
+      );
+    }
+    if (current.reviewedAt) {
+      throw new DomainError("INVALID_STATE", "Invoice already reviewed");
+    }
+    if (current.lifecycleStage === "closed") {
+      throw new DomainError("INVALID_STATE", "Period already closed");
+    }
+
+    await repo.markInvoiceReviewed(invoiceId);
     await AuditService.write(ctx, {
       entityType: "invoice",
-      entityId: invoice.id,
-      action: "create",
-      newData: {
-        amount: invoice.amount,
-        billingPeriod,
-        orderIds: invoice.orderIds,
-      },
+      entityId: invoiceId,
+      action: "status_change",
+      oldData: { lifecycleStage: "pending" },
+      newData: { lifecycleStage: "review", reviewedAt: true },
     });
 
-    return invoice;
+    const updated = await repo.getInvoice(invoiceId);
+    if (!updated) throw new DomainError("NOT_FOUND", invoiceId);
+    return updated;
   },
 
   async recordPayment(
@@ -143,6 +192,15 @@ export const AccountingService = {
       throw new DomainError(
         "INVALID_STATE",
         `Cannot record payment on invoice status ${current.status}`,
+      );
+    }
+    if (current.lifecycleStage === "closed") {
+      throw new DomainError("INVALID_STATE", "Period already closed");
+    }
+    if (!current.reviewedAt) {
+      throw new DomainError(
+        "INVALID_STATE",
+        "Invoice must be reviewed before payment (Pending → Review → Processed)",
       );
     }
 
@@ -177,6 +235,7 @@ export const AccountingService = {
         invoiceId: current.id,
         amount: payment.amount,
         method: payment.method,
+        lifecycleStage: "processed",
       },
     });
 
@@ -195,6 +254,9 @@ export const AccountingService = {
     if (!current) {
       throw new DomainError("NOT_FOUND", `Invoice ${invoiceId}`);
     }
+    if (current.lifecycleStage === "closed") {
+      throw new DomainError("INVALID_STATE", "Period already closed");
+    }
     if (!canTransitionInvoice(current.status, "void")) {
       throw new DomainError(
         "INVALID_STATE",
@@ -212,5 +274,50 @@ export const AccountingService = {
     const updated = await repo.getInvoice(invoiceId);
     if (!updated) throw new DomainError("NOT_FOUND", invoiceId);
     return updated;
+  },
+
+  /** Close Financial Period → Outcome Financial Records Complete. */
+  async closeFinancialPeriod(
+    ctx: ServiceContext,
+    billingPeriod?: string | null,
+  ): Promise<PeriodSummary> {
+    assertTenant(ctx);
+    assertAccounting(ctx);
+    const period = billingPeriod?.trim() || currentBillingPeriod();
+    const repo = createAccountingRepository(ctx.supabase, ctx.tenantId);
+    const summary = await repo.periodSummary(period);
+
+    if (summary.periodClosed) {
+      throw new DomainError(
+        "INVALID_STATE",
+        `Period ${period} is already closed`,
+      );
+    }
+    if (!summary.readyToClose) {
+      throw new DomainError(
+        "INVALID_STATE",
+        `Period ${period} is not ready to close (need invoices with no pending/overdue)`,
+      );
+    }
+
+    await repo.closePeriod(period, ctx.userId, {
+      invoiceCount: summary.invoiceCount,
+      paidAmount: summary.paidAmount,
+    });
+
+    await AuditService.write(ctx, {
+      entityType: "financial_period",
+      entityId: `${ctx.tenantId}:${period}`,
+      action: "status_change",
+      oldData: { periodClosed: false },
+      newData: {
+        periodClosed: true,
+        billingPeriod: period,
+        lifecycleStage: "closed",
+        outcome: "Financial Records Complete",
+      },
+    });
+
+    return repo.periodSummary(period);
   },
 };

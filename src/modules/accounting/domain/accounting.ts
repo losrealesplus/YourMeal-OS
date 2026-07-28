@@ -1,9 +1,24 @@
 /**
- * Accounting domain — Financial Records Complete (EP-OPS-003).
- * Physical tables: invoices, payments, invoice_orders, orders (delivered).
+ * Accounting domain — Financial Records Complete (EP-OPS-003 Correction P0).
+ *
+ * Journey lifecycle (brief mapping → as-built):
+ *   Pending Financial Items  → billable delivered orders / invoice pending
+ *   Review                   → invoice.reviewed_at set
+ *   Processed                → invoice status paid (payment recorded)
+ *   Closed                   → financial_period_closures row
+ *
+ * Physical: invoices, payments, invoice_orders, orders(delivered),
+ *           financial_period_closures
  */
 
 export type InvoiceStatus = "pending" | "paid" | "overdue" | "void";
+
+/** Deterministic Journey stages (no ambiguous states). */
+export type FinancialLifecycleStage =
+  | "pending"
+  | "review"
+  | "processed"
+  | "closed";
 
 export type BillableOrder = {
   id: string;
@@ -26,8 +41,11 @@ export type InvoiceRecord = {
   status: InvoiceStatus;
   billingPeriod: string | null;
   createdAt: string;
+  reviewedAt: string | null;
   orderIds: string[];
   paidTotal: number;
+  /** Derived Journey stage for this invoice (period closed elevates to closed). */
+  lifecycleStage: FinancialLifecycleStage;
 };
 
 export type PaymentRecord = {
@@ -46,9 +64,19 @@ export type PeriodSummary = {
   paidCount: number;
   voidCount: number;
   overdueCount: number;
+  reviewPendingCount: number;
   invoicedAmount: number;
   paidAmount: number;
-  /** Complete when there is ≥1 invoice and zero pending/overdue. */
+  /** Preconditions met to close (Processed, no open items). */
+  readyToClose: boolean;
+  /** Explicit Close Financial Period executed. */
+  periodClosed: boolean;
+  closedAt: string | null;
+  /**
+   * Outcome Financial Records Complete =
+   * periodClosed OR (readyToClose demonstrated with closure path available).
+   * Certification requires periodClosed after close action.
+   */
   recordsComplete: boolean;
 };
 
@@ -76,7 +104,19 @@ export function currentBillingPeriod(d = new Date()): string {
   return `${y}-${m}`;
 }
 
-export function derivePeriodComplete(summary: {
+export function deriveInvoiceLifecycleStage(input: {
+  status: InvoiceStatus;
+  reviewedAt: string | null;
+  periodClosed: boolean;
+}): FinancialLifecycleStage {
+  if (input.periodClosed) return "closed";
+  if (input.status === "paid") return "processed";
+  if (input.status === "void") return "processed";
+  if (input.reviewedAt) return "review";
+  return "pending";
+}
+
+export function derivePeriodReadyToClose(summary: {
   invoiceCount: number;
   pendingCount: number;
   overdueCount: number;
@@ -87,3 +127,19 @@ export function derivePeriodComplete(summary: {
     summary.overdueCount === 0
   );
 }
+
+/** @deprecated use derivePeriodReadyToClose */
+export function derivePeriodComplete(summary: {
+  invoiceCount: number;
+  pendingCount: number;
+  overdueCount: number;
+}): boolean {
+  return derivePeriodReadyToClose(summary);
+}
+
+export const FINANCIAL_LIFECYCLE: readonly FinancialLifecycleStage[] = [
+  "pending",
+  "review",
+  "processed",
+  "closed",
+] as const;

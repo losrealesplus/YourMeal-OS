@@ -75,26 +75,26 @@ RI-001 Progress
 
 Foundation            ░░░░░░░░░░   0%   Gate —
 Surfaces              ██░░░░░░░░  20%   Tenant IN REVIEW · Entry vía EP-OPS-002 (#88)
-Workspaces            ██████████ 100%   4/4 Journeys CERTIFIED · Flow NEXT
+Workspaces            ██████████ 100%   4/4 CERTIFIED · EP-OPS-003 Complete · G NOT STARTED
 Language              ░░░░░░░░░░   0%   Gate —
 RBAC Access           ░░░░░░░░░░   0%   Gate —
 Observability         ░░░░░░░░░░   0%   Gate —
-Flows                 ░░░░░░░░░░   0%   Gate — · NEXT
+Flows                 ░░░░░░░░░░   0%   Gate — · elegible · NOT STARTED
 Auth Transition       ░░░░░░░░░░   0%   Gate —
 Certification Report  ░░░░░░░░░░   0%   Gate —
 
-Overall (certificación)          ~25%   (Bloque C Journeys DONE · Bloque G NEXT)
+Overall (certificación)          ~25%   (Bloque C DONE · Bloque G NOT STARTED)
 ```
 
 | Bloque | Nombre | Gate | % cert. |
 |--------|--------|:----:|--------:|
 | A | Foundation | — | 0 |
 | B | Surfaces | IN REVIEW → PASS al merge EP-OPS-002 | ~20 |
-| C | Workspaces | **PASS** · 4/4 Journeys CERTIFIED · EP-OPS-003 | 100 |
+| C | Workspaces | **PASS** · 4/4 Journeys CERTIFIED · EP-OPS-003 Complete | 100 |
 | D | Language | — | 0 |
 | E | RBAC Access | — | 0 |
 | F | Observability | — | 0 |
-| G | Flows | — · NEXT | 0 |
+| G | Flows | — · elegible · **NOT STARTED** | 0 |
 | H | Auth Transition | — | 0 |
 | I | Certification Report | — | 0 |
 
@@ -225,7 +225,7 @@ Gate: — → PASS solo cuando las superficies del alcance = CERTIFIED
 **Evidencia:** [docs/10-validation/ep-ops-003/](../10-validation/ep-ops-003/README.md)  
 **Prerrequisito:** Entry CERTIFIED (EP-OPS-002 · RBAC-001 · WEP-001 · LP-001)
 
-> Primera validación del proceso Journey **cerrada**. Ejecución Journey **4/4 CERTIFIED**. Siguiente: Bloque G Flow. Sin nuevos conceptos.
+> Primera validación CLOSED. Ejecución Journey **4/4 CERTIFIED · EP-OPS-003 Complete**. Bloque G elegible · **NOT STARTED**.
 
 Pregunta Entry (cerrada en EP-OPS-002): *¿Aterriza en su Workspace?*  
 Pregunta Journey (este bloque): *¿Puede este departamento terminar su jornada solo con YourMeal OS en su Workspace?*
@@ -238,24 +238,23 @@ Pregunta Journey (este bloque): *¿Puede este departamento terminar su jornada s
 | Accounting | CERTIFIED* | Financial Records Complete | **OBSERVATIONS** | **CERTIFIED** · [pack](../10-validation/ep-ops-003/accounting/) |
 | Operations | hub `/admin` | — | — | Fuera del núcleo EP-OPS-003 |
 
-**Kitchen + Delivery + Support + Accounting:** ✅ CERTIFIED · continuidad OK.  
-**Accounting:** FAIL → Correction (Financial Lifecycle) → Re-Certification CERTIFIED · **no** reabrió upstream.  
+**4/4 CERTIFIED.** Accounting: FAIL → Correction P0 (Pending→Review→Processed→Closed) → Re-Cert.  
 \* Entry vía EP-OPS-002.
 
 ### Evidence Gate · C
 
 ```text
 Evidence
-  ☑ Landing / Entry Policy (EP-OPS-002) — prerrequisito
-  ☑ Jornada Kitchen — CERTIFIED · OBSERVATIONS · Production Ready
-  ☑ Jornada Delivery — CERTIFIED · OBSERVATIONS · Orders Delivered
-  ☑ Jornada Support — CERTIFIED · OBSERVATIONS · Issues Resolved (tras Correction)
-  ☑ Jornada Accounting — CERTIFIED · OBSERVATIONS · Financial Records Complete (tras Correction)
-  ☑ Casos negativos Kitchen + Delivery + Support + Accounting
-  ☑ Ciclo P13 FAIL→Correction→Re-Cert demostrado (Support · Accounting)
-  ☑ Estabilidad: FAIL no reabrió Journeys CERTIFIED upstream
+  ☑ Landing / Entry Policy (EP-OPS-002)
+  ☑ Jornada Kitchen — CERTIFIED
+  ☑ Jornada Delivery — CERTIFIED
+  ☑ Jornada Support — CERTIFIED (tras Correction)
+  ☑ Jornada Accounting — CERTIFIED (tras Correction P0)
+  ☑ Ciclo P13 FAIL→Correction→Re-Cert (Support · Accounting)
+  ☑ Estabilidad upstream preservada
+  ☑ Bloque G NOT STARTED (elegible)
 
-Gate: PASS · Bloque C Journeys cerrados · puede comenzar G (Flow)
+Gate: PASS · Bloque C Journeys COMPLETE · Bloque G no abierto automáticamente
 ```
 
 **Salida:** jornadas CERTIFIED → Language D / preparar Flow G.  

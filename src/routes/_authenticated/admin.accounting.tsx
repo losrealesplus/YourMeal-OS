@@ -1,6 +1,7 @@
 /**
  * Accounting Workspace — Financial Records Complete (EP-OPS-003 Correction P0).
- * Grounds invoices in delivered orders (Orders Delivered input). No simulated amounts.
+ * Lifecycle: Pending → Review → Processed → Closed (period).
+ * Grounds invoices in delivered orders. No simulated amounts.
  */
 import { createFileRoute } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
@@ -43,7 +44,7 @@ export const Route = createFileRoute("/_authenticated/admin/accounting")({
       {
         name: "description",
         content:
-          "Facturación y cobros anclados a pedidos entregados — Financial Records Complete.",
+          "Financial Lifecycle: Pending → Review → Processed → Closed.",
       },
     ],
   }),
@@ -108,7 +109,9 @@ function AdminAccountingPage() {
     });
   }
 
-  async function createInvoice() {
+  async function withCtx(
+    fn: (ctx: Awaited<ReturnType<typeof createServiceContext>>) => Promise<void>,
+  ) {
     if (!user || !tenantId || !can("accounting.operate")) return;
     setBusy(true);
     try {
@@ -118,54 +121,7 @@ function AdminAccountingPage() {
         tenantId,
         roles,
       });
-      await AccountingService.createInvoiceFromOrders(ctx, {
-        orderIds: [...selected],
-        billingPeriod: period,
-      });
-      toast.success("Factura emitida desde pedidos entregados");
-      await reload();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : String(e));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function recordPayment(invoiceId: string) {
-    if (!user || !tenantId || !can("accounting.operate")) return;
-    setBusy(true);
-    try {
-      const ctx = await createServiceContext({
-        supabase,
-        userId: user.id,
-        tenantId,
-        roles,
-      });
-      await AccountingService.recordPayment(ctx, {
-        invoiceId,
-        method: "manual",
-      });
-      toast.success("Cobro registrado");
-      await reload();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : String(e));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function voidInvoice(invoiceId: string) {
-    if (!user || !tenantId || !can("accounting.operate")) return;
-    setBusy(true);
-    try {
-      const ctx = await createServiceContext({
-        supabase,
-        userId: user.id,
-        tenantId,
-        roles,
-      });
-      await AccountingService.voidInvoice(ctx, invoiceId);
-      toast.success("Factura anulada");
+      await fn(ctx);
       await reload();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : String(e));
@@ -183,7 +139,7 @@ function AdminAccountingPage() {
           type="checkbox"
           checked={selected.has(r.id)}
           onChange={() => toggleOrder(r.id)}
-          disabled={!can("accounting.operate")}
+          disabled={!can("accounting.operate") || summary?.periodClosed}
           aria-label={`Seleccionar pedido ${r.id.slice(0, 8)}`}
         />
       ),
@@ -240,50 +196,88 @@ function AdminAccountingPage() {
       ),
     },
     {
-      key: "status",
-      header: "Estado",
+      key: "lifecycle",
+      header: "Lifecycle",
       render: (r) => (
         <StatusChip
           tone={
-            r.status === "paid"
+            r.lifecycleStage === "closed"
               ? "positive"
-              : r.status === "pending"
-                ? "warning"
-                : r.status === "overdue"
-                  ? "danger"
-                  : "neutral"
+              : r.lifecycleStage === "processed"
+                ? "positive"
+                : r.lifecycleStage === "review"
+                  ? "info"
+                  : "warning"
           }
-          label={r.status}
+          label={r.lifecycleStage}
         />
       ),
     },
     {
       key: "actions",
       header: "",
-      render: (r) =>
-        can("accounting.operate") &&
-        (r.status === "pending" || r.status === "overdue") ? (
-          <div className="flex flex-wrap gap-2 justify-end">
+      render: (r) => {
+        if (!can("accounting.operate") || summary?.periodClosed) return null;
+        if (r.status === "pending" && !r.reviewedAt) {
+          return (
             <Button
               type="button"
               size="sm"
               variant="secondary"
               disabled={busy}
-              onClick={() => void recordPayment(r.id)}
+              onClick={() =>
+                void withCtx(async (ctx) => {
+                  await AccountingService.reviewInvoice(ctx, r.id);
+                  toast.success("Factura en Review");
+                })
+              }
             >
-              Registrar cobro
+              Revisar
             </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              disabled={busy}
-              onClick={() => void voidInvoice(r.id)}
-            >
-              Anular
-            </Button>
-          </div>
-        ) : null,
+          );
+        }
+        if (
+          (r.status === "pending" || r.status === "overdue") &&
+          r.reviewedAt
+        ) {
+          return (
+            <div className="flex flex-wrap gap-2 justify-end">
+              <Button
+                type="button"
+                size="sm"
+                variant="secondary"
+                disabled={busy}
+                onClick={() =>
+                  void withCtx(async (ctx) => {
+                    await AccountingService.recordPayment(ctx, {
+                      invoiceId: r.id,
+                      method: "manual",
+                    });
+                    toast.success("Procesado (cobro registrado)");
+                  })
+                }
+              >
+                Procesar cobro
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                disabled={busy}
+                onClick={() =>
+                  void withCtx(async (ctx) => {
+                    await AccountingService.voidInvoice(ctx, r.id);
+                    toast.success("Factura anulada");
+                  })
+                }
+              >
+                Anular
+              </Button>
+            </div>
+          );
+        }
+        return null;
+      },
     },
   ];
 
@@ -291,13 +285,13 @@ function AdminAccountingPage() {
     <div className="animate-fade-in">
       <SectionTitle
         overline="Contabilidad"
-        title="Registros financieros"
-        subtitle="Facturación y cobros anclados a pedidos entregados (Orders Delivered)."
+        title="Financial Workspace"
+        subtitle="Pending → Review → Processed → Closed · anclado a Orders Delivered."
       />
       <AdminHeader
-        goal="Cerrar el ciclo financiero del periodo"
+        goal="Financial Records Complete"
         capability="accounting.operate"
-        object="Invoice · Payment · DeliveredOrder"
+        object="Invoice · Payment · PeriodClosure"
       />
 
       <div className="flex flex-wrap items-end gap-3 mb-6">
@@ -314,41 +308,69 @@ function AdminAccountingPage() {
         <Button type="button" variant="outline" onClick={() => void reload()}>
           Actualizar
         </Button>
+        {can("accounting.operate") && summary?.readyToClose && !summary.periodClosed ? (
+          <Button
+            type="button"
+            disabled={busy}
+            onClick={() =>
+              void withCtx(async (ctx) => {
+                await AccountingService.closeFinancialPeriod(ctx, period);
+                toast.success("Periodo cerrado · Financial Records Complete");
+              })
+            }
+          >
+            Cerrar periodo
+          </Button>
+        ) : null}
       </div>
 
       {summary ? (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5 mb-6">
           <KpiCard label="Facturas" value={String(summary.invoiceCount)} />
-          <KpiCard label="Pendientes" value={String(summary.pendingCount)} />
+          <KpiCard label="Pending" value={String(summary.pendingCount)} />
+          <KpiCard
+            label="Por revisar"
+            value={String(summary.reviewPendingCount)}
+          />
           <KpiCard
             label="Cobrado"
             value={fmt.currency(summary.paidAmount, { currency: "EUR" })}
           />
           <KpiCard
             label="Periodo"
-            value={summary.recordsComplete ? "Completo" : "Abierto"}
+            value={
+              summary.periodClosed
+                ? "Closed"
+                : summary.readyToClose
+                  ? "Ready"
+                  : "Open"
+            }
           />
         </div>
       ) : null}
 
-      {summary?.recordsComplete ? (
+      {summary?.periodClosed ? (
         <p
           className={cn(
             "mb-6 text-sm rounded-xl border border-border bg-card px-4 py-3",
           )}
         >
-          Outcome <strong>Financial Records Complete</strong> alcanzable para{" "}
-          {summary.billingPeriod}: sin facturas pendientes u overdue.
+          Outcome <strong>Financial Records Complete</strong> para{" "}
+          {summary.billingPeriod}
+          {summary.closedAt
+            ? ` · cerrado ${fmt.date(summary.closedAt, "medium")}`
+            : ""}
+          .
         </p>
       ) : null}
 
       <div className="grid gap-4 xl:grid-cols-2">
         <PanelCard>
           <h3 className="text-sm font-bold uppercase tracking-widest mb-2">
-            Pedidos entregados facturables
+            Pending Financial Items
           </h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Input: Orders Delivered · solo `delivered` sin factura previa.
+            Pedidos `delivered` sin factura · Input Orders Delivered.
           </p>
           {loading ? (
             <p className="text-sm text-muted-foreground py-6 text-center">
@@ -361,7 +383,9 @@ function AdminAccountingPage() {
                 rows={billable}
                 empty="No hay pedidos delivered pendientes de facturar."
               />
-              {can("accounting.operate") && selected.size > 0 ? (
+              {can("accounting.operate") &&
+              selected.size > 0 &&
+              !summary?.periodClosed ? (
                 <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
                   <p className="text-sm">
                     {selected.size} seleccionado(s) ·{" "}
@@ -372,7 +396,15 @@ function AdminAccountingPage() {
                   <Button
                     type="button"
                     disabled={busy}
-                    onClick={() => void createInvoice()}
+                    onClick={() =>
+                      void withCtx(async (ctx) => {
+                        await AccountingService.createInvoiceFromOrders(ctx, {
+                          orderIds: [...selected],
+                          billingPeriod: period,
+                        });
+                        toast.success("Factura emitida (Pending)");
+                      })
+                    }
                   >
                     Emitir factura
                   </Button>
@@ -384,10 +416,10 @@ function AdminAccountingPage() {
 
         <PanelCard>
           <h3 className="text-sm font-bold uppercase tracking-widest mb-2">
-            Facturas · {period}
+            Invoice / Payment Status · {period}
           </h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Cobro manual (pago fuera de pasarela) · pending → paid.
+            Review → Procesar cobro → Closed (periodo).
           </p>
           {loading ? (
             <p className="text-sm text-muted-foreground py-6 text-center">

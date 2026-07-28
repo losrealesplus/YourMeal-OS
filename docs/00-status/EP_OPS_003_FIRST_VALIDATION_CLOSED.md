@@ -17,9 +17,9 @@
 |----------|----------------------------------|---------------|
 | **EP-OPS-003 (metodología)** | ✅ Frozen | ✅ Frozen |
 | **Primera validación metodológica** | ✅ Cerrada (PR #89) | ✅ Cerrada |
-| **EP-OPS-003 (ejecución Journey)** | 🔄 Abierto (Accounting FAIL) | ✅ **4/4 CERTIFIED** |
+| **EP-OPS-003 (ejecución Journey)** | 🔄 Abierto (Accounting FAIL) | ✅ **COMPLETE** (4/4 CERTIFIED) |
 | **Accounting Journey** | ❌ Correction pendiente | ✅ CERTIFIED · OBSERVATIONS |
-| **Bloque G (Flow)** | ⏳ Pendiente | ⏳ **NEXT** |
+| **Bloque G (Flow)** | ⏳ Pendiente | ⏳ **NOT STARTED** (elegible) |
 
 Eso mantiene separación limpia entre el **marco** y su **aplicación**.
 
@@ -114,8 +114,10 @@ Accounting FAIL → Correction P0 → Financial Lifecycle → Re-Certification �
 
 ```text
 4/4 Journeys CERTIFIED
+EP-OPS-003 Complete (journeys)
         ↓
-Block G · Flow Certification
+Bloque G · Flow Certification
+        (elegible · NOT STARTED — decisión explícita)
 ```
 
 No hace falta ningún concepto nuevo. El framework es la **herramienta** con la que se certifica la operación real.

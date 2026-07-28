@@ -11,14 +11,14 @@
 
 La **metodología** de Journeys (conceptos, gates, continuidad Outcome→Input, orden de pasadas).
 
-La **ejecución Journey** de EP-OPS-003 está **cerrada** (4/4 CERTIFIED). Queda Bloque G Flow. Metodología sigue FROZEN.
+La **ejecución Journey** de EP-OPS-003 está **COMPLETE** (4/4 CERTIFIED). Bloque G es elegible pero **NOT STARTED**.
 
 ```text
 Metodología EP-OPS-003     FROZEN
-Primera validación (4 pasadas)  CLOSED
-Accounting Correction      DONE · Re-Cert CERTIFIED
-Journeys 4/4               CERTIFIED
-Bloque G Flow              NEXT
+Primera validación         CLOSED
+Accounting Correction P0   DONE · Re-Cert CERTIFIED
+Journeys 4/4               CERTIFIED · EP-OPS-003 Complete
+Bloque G Flow              NOT STARTED (elegible)
 ```
 
 ---
@@ -98,7 +98,7 @@ Kitchen y Delivery permanecen CERTIFIED mientras Support/Accounting se ejecutan.
 
 | Permitido | Prohibido |
 |-----------|-----------|
-| Ejecutar Bloque G Flow · evidencia transversal | Nuevos conceptos metodológicos sin evidencia que los justifique |
+| Ejecutar Bloque G **solo tras decisión explícita** · evidencia transversal | Nuevos conceptos metodológicos sin evidencia que los justifique |
 | Recopilar evidencia · cerrar Gates | Redefinir CERTIFIED / Gate / Outcomes |
 | Corregir bloqueos hallados **durante** una pasada | Ampliar alcance de EP-OPS-003 (nuevos workspaces / outcomes) |
 | Anotar Flow Gaps → Bloque G | Empezar Flow Certification antes de cerrar las 4 jornadas |
@@ -118,8 +118,9 @@ Demostrar validez mediante evidencia de campo
 P11 · P12 · P13
 ```
 
-**Siguiente acción operativa:** **Bloque G · Flow Certification** (continuidad transversal Outcome→Input).  
-Kitchen · Delivery · Support · Accounting permanecen CERTIFIED (regla de estabilidad).
+**Siguiente acción operativa:** EP-OPS-003 Journeys **COMPLETE**.  
+Bloque G · Flow Certification está **elegible** (4/4 CERTIFIED) y **NOT STARTED** — no abrir en este Correction.  
+Kitchen · Delivery · Support · Accounting permanecen CERTIFIED.
 
 ---
 

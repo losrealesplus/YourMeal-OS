@@ -24,10 +24,10 @@ DONE:                Progress 100% · Gates PASS · Report READY|RWO · evidenci
 Permitido en RI-001: ejecutar cert · fix de hallazgo de cert · reabrir gate aprobado
 Prohibido:           nuevas features / ampliar alcance bajo etiqueta RI-001
 Pregunta maestra:    ¿Qué evidencia falta para certificar que YM OS opera una empresa real?
-Siguiente:           **Bloque G · Flow Certification** (metodología EP-OPS-003 **FROZEN**)
-                     · 1ª validación CLOSED · Journeys **4/4 CERTIFIED**
+Siguiente:           **EP-OPS-003 Journeys COMPLETE** · Bloque G **NOT STARTED** (elegible)
+                     · Accounting CERTIFIED (Correction P0 · Re-Cert)
                      · Acta: [EP_OPS_003_FIRST_VALIDATION_CLOSED](./EP_OPS_003_FIRST_VALIDATION_CLOSED.md)
-                     · Accounting Correction + Re-Cert DONE (Financial Records Complete)
+                     · No abrir Flow hasta decisión explícita de Bloque G
 ══════════════════════════════════════════════════
 ```
 
@@ -35,9 +35,9 @@ Siguiente:           **Bloque G · Flow Certification** (metodología EP-OPS-003
 
 ```text
 Siguiente artefacto activo:
-  Bloque G · Flow Certification (RI-001)
-  · Journeys: [EP-OPS-003](./EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md) · 4/4 CERTIFIED
-  · Metodología: [FROZEN](./EP_OPS_003_METHODOLOGY_FROZEN.md) · [1ª validación CLOSED](./EP_OPS_003_FIRST_VALIDATION_CLOSED.md)
+  EP-OPS-003 Journeys COMPLETE · [epic](./EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md)
+  · Accounting Correction P0 DONE · 4/4 CERTIFIED
+  · Bloque G Flow: elegible · NOT STARTED
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████
@@ -45,22 +45,22 @@ Pilot Readiness (lectura)
   Modelo operacional  ██████████
   Administración      ██████████
   Customer App        █████████░
-  Operaciones         ██████████  ← 4/4 Journeys CERTIFIED · Flow NEXT
+  Operaciones         ██████████  ← 4/4 Journeys CERTIFIED
   Data                ███████░░░
 
 Mapa certificación (activo):
   A Foundation              □□□□□□□□□□
   B Surfaces                ██░░░░░░░░  Entry EP-OPS-002 (#88)
-  C Department Workspaces   ██████████  4/4 Journeys CERTIFIED
+  C Department Workspaces   ██████████  4/4 CERTIFIED · COMPLETE
   D Operational Language    □□□□□□□□□□
   E RBAC & Access           □□□□□□□□□□
   F Observability Ready     □□□□□□□□□□
-  G Flow Certification      ░░░░░░░░░░  ← NEXT
+  G Flow Certification      □□□□□□□□□□  elegible · NOT STARTED
   H Auth Transition         □□□□□□□□□□  AUTH-A/B
   I Certification Report    □□□□□□□□□□  CG-RI-001
 
-Siguiente foco:            Bloque G · Flow Certification
-                           (continuidad transversal · no reopen Journeys)
+Siguiente foco:            Decisión explícita Bloque G (Flow) — no automático
+                           (4/4 Journeys CERTIFIED · no reopen)
 
 Patrón permanente: Operational Representation (DICT-072)
 Madurez tenant:    Tenant Operational Autonomy (DICT-073)

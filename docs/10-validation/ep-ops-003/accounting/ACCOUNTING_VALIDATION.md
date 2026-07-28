@@ -1,12 +1,9 @@
-# Accounting Validation (Re-Certification)
+# Accounting Validation (Re-Certification · Correction P0)
 
 **Fecha:** 2026-07-28  
 **Gate:** **OBSERVATIONS**  
 **Status:** **CERTIFIED**  
-**Input:** Orders Delivered · Issues Resolved ✅  
 **Outcome:** **Financial Records Complete** ✅  
-
-Ciclo P13 demostrado (segundo FAIL→Correction del epic):
 
 ```text
 Discovery → Evaluation → FAIL → Correction → Re-Certification → CERTIFIED
@@ -14,18 +11,26 @@ Discovery → Evaluation → FAIL → Correction → Re-Certification → CERTIF
 
 ---
 
+## Pregunta maestra
+
+> ¿Puede Accounting completar todo su trabajo operativo y alcanzar "Financial Records Complete" sin abandonar su Workspace?
+
+**Sí.**
+
+---
+
 ## Criterios
 
 | Criterio | OK |
 |----------|:--:|
-| Consume Orders Delivered | ✅ |
-| No reabre Kitchen/Delivery/Support | ✅ |
-| Facturas ancladas a pedidos reales | ✅ |
-| Cobro pending → paid | ✅ |
-| Periodo complete derivable | ✅ |
+| Workspace operativo (no Placeholder) | ✅ |
+| Pending → Review → Processed → Closed | ✅ |
+| Anclado a Orders Delivered | ✅ |
+| Cierre de periodo explícito | ✅ |
 | Negativos documentados | ✅ |
-| Tests dominio lifecycle | ✅ |
-| Sin importes inventados | ✅ |
+| No reopen upstream | ✅ |
+| Sin ERP / sin módulos futuros | ✅ |
+| Bloque G no iniciado | ✅ |
 
 ---
 
@@ -35,12 +40,11 @@ Discovery → Evaluation → FAIL → Correction → Re-Certification → CERTIF
 STATUS: CERTIFIED (with OBSERVATIONS)
 
 Evidence
-  ☑ ACCOUNTING_JOURNEY.md (re-cert)
+  ☑ ACCOUNTING_JOURNEY.md
   ☑ ACCOUNTING_VALIDATION.md
   ☑ ACCOUNTING_NEGATIVE_CASES.md
   ☑ ACCOUNTING_OBSERVATIONS.md
 
 Gate: OBSERVATIONS
 Outcome: Financial Records Complete
-Prior Gate: FAIL (placeholder) — corrected
 ```

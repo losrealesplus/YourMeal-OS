@@ -2,11 +2,43 @@ import { describe, expect, it } from "vitest";
 import {
   canTransitionInvoice,
   currentBillingPeriod,
-  derivePeriodComplete,
+  deriveInvoiceLifecycleStage,
+  derivePeriodReadyToClose,
   nextInvoiceStatuses,
 } from "./accounting";
 
 describe("accounting financial lifecycle · EP-OPS-003", () => {
+  it("maps Pending → Review → Processed → Closed", () => {
+    expect(
+      deriveInvoiceLifecycleStage({
+        status: "pending",
+        reviewedAt: null,
+        periodClosed: false,
+      }),
+    ).toBe("pending");
+    expect(
+      deriveInvoiceLifecycleStage({
+        status: "pending",
+        reviewedAt: "2026-07-28T00:00:00Z",
+        periodClosed: false,
+      }),
+    ).toBe("review");
+    expect(
+      deriveInvoiceLifecycleStage({
+        status: "paid",
+        reviewedAt: "2026-07-28T00:00:00Z",
+        periodClosed: false,
+      }),
+    ).toBe("processed");
+    expect(
+      deriveInvoiceLifecycleStage({
+        status: "paid",
+        reviewedAt: "2026-07-28T00:00:00Z",
+        periodClosed: true,
+      }),
+    ).toBe("closed");
+  });
+
   it("allows pending → paid | overdue | void", () => {
     expect(nextInvoiceStatuses("pending")).toEqual([
       "paid",
@@ -17,23 +49,23 @@ describe("accounting financial lifecycle · EP-OPS-003", () => {
     expect(canTransitionInvoice("paid", "pending")).toBe(false);
   });
 
-  it("marks period complete only when invoices exist and none open", () => {
+  it("readyToClose only when invoices exist and none open", () => {
     expect(
-      derivePeriodComplete({
+      derivePeriodReadyToClose({
         invoiceCount: 0,
         pendingCount: 0,
         overdueCount: 0,
       }),
     ).toBe(false);
     expect(
-      derivePeriodComplete({
+      derivePeriodReadyToClose({
         invoiceCount: 2,
         pendingCount: 1,
         overdueCount: 0,
       }),
     ).toBe(false);
     expect(
-      derivePeriodComplete({
+      derivePeriodReadyToClose({
         invoiceCount: 2,
         pendingCount: 0,
         overdueCount: 0,

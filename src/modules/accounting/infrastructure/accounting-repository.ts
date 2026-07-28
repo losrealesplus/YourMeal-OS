@@ -2,7 +2,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import {
-  derivePeriodComplete,
+  deriveInvoiceLifecycleStage,
+  derivePeriodReadyToClose,
   type BillableOrder,
   type InvoiceRecord,
   type InvoiceStatus,
@@ -21,6 +22,62 @@ export function createAccountingRepository(
   tenantId: string,
 ) {
   const db = supabase as any;
+
+  async function isPeriodClosed(billingPeriod: string): Promise<{
+    closed: boolean;
+    closedAt: string | null;
+  }> {
+    const { data, error } = await db
+      .from("financial_period_closures")
+      .select("closed_at")
+      .eq("tenant_id", tenantId)
+      .eq("billing_period", billingPeriod)
+      .maybeSingle();
+    if (error) throw error;
+    return {
+      closed: Boolean(data),
+      closedAt: data?.closed_at ?? null,
+    };
+  }
+
+  function mapInvoice(
+    inv: {
+      id: string;
+      customer_id: string | null;
+      company_id: string | null;
+      amount: number | string;
+      status: InvoiceStatus;
+      billing_period: string | null;
+      created_at: string;
+      reviewed_at: string | null;
+      customers: { display_name: string | null } | null;
+      companies: { name: string | null } | null;
+    },
+    orderIds: string[],
+    paidTotal: number,
+    periodClosed: boolean,
+  ): InvoiceRecord {
+    const reviewedAt = inv.reviewed_at ?? null;
+    return {
+      id: inv.id,
+      customerId: inv.customer_id,
+      customerName: inv.customers?.display_name ?? null,
+      companyId: inv.company_id,
+      companyName: inv.companies?.name ?? null,
+      amount: num(inv.amount),
+      status: inv.status,
+      billingPeriod: inv.billing_period,
+      createdAt: inv.created_at,
+      reviewedAt,
+      orderIds,
+      paidTotal,
+      lifecycleStage: deriveInvoiceLifecycleStage({
+        status: inv.status,
+        reviewedAt,
+        periodClosed,
+      }),
+    };
+  }
 
   return {
     async listBillableOrders(): Promise<BillableOrder[]> {
@@ -72,7 +129,7 @@ export function createAccountingRepository(
       let q = db
         .from("invoices")
         .select(
-          "id, customer_id, company_id, amount, status, billing_period, created_at, customers(display_name), companies(name)",
+          "id, customer_id, company_id, amount, status, billing_period, created_at, reviewed_at, customers(display_name), companies(name)",
         )
         .eq("tenant_id", tenantId)
         .is("deleted_at", null)
@@ -90,11 +147,25 @@ export function createAccountingRepository(
         status: InvoiceStatus;
         billing_period: string | null;
         created_at: string;
+        reviewed_at: string | null;
         customers: { display_name: string | null } | null;
         companies: { name: string | null } | null;
       }>;
 
       if (invoices.length === 0) return [];
+
+      const periodFlags = new Map<string, boolean>();
+      const periods = [
+        ...new Set(
+          invoices.map((i) => i.billing_period).filter(Boolean) as string[],
+        ),
+      ];
+      await Promise.all(
+        periods.map(async (p) => {
+          const { closed } = await isPeriodClosed(p);
+          periodFlags.set(p, closed);
+        }),
+      );
 
       const ids = invoices.map((i) => i.id);
       const [{ data: links }, { data: pays }] = await Promise.all([
@@ -134,19 +205,16 @@ export function createAccountingRepository(
         );
       }
 
-      return invoices.map((inv) => ({
-        id: inv.id,
-        customerId: inv.customer_id,
-        customerName: inv.customers?.display_name ?? null,
-        companyId: inv.company_id,
-        companyName: inv.companies?.name ?? null,
-        amount: num(inv.amount),
-        status: inv.status,
-        billingPeriod: inv.billing_period,
-        createdAt: inv.created_at,
-        orderIds: ordersByInvoice.get(inv.id) ?? [],
-        paidTotal: paidByInvoice.get(inv.id) ?? 0,
-      }));
+      return invoices.map((inv) =>
+        mapInvoice(
+          inv,
+          ordersByInvoice.get(inv.id) ?? [],
+          paidByInvoice.get(inv.id) ?? 0,
+          inv.billing_period
+            ? (periodFlags.get(inv.billing_period) ?? false)
+            : false,
+        ),
+      );
     },
 
     async getOrdersByIds(orderIds: string[]): Promise<
@@ -187,6 +255,11 @@ export function createAccountingRepository(
       billingPeriod: string;
       orderIds: string[];
     }): Promise<InvoiceRecord> {
+      const { closed } = await isPeriodClosed(input.billingPeriod);
+      if (closed) {
+        throw new Error(`Period ${input.billingPeriod} is already closed`);
+      }
+
       const { data, error } = await db
         .from("invoices")
         .insert({
@@ -198,7 +271,7 @@ export function createAccountingRepository(
           billing_period: input.billingPeriod,
         })
         .select(
-          "id, customer_id, company_id, amount, status, billing_period, created_at",
+          "id, customer_id, company_id, amount, status, billing_period, created_at, reviewed_at",
         )
         .single();
       if (error) throw error;
@@ -211,24 +284,68 @@ export function createAccountingRepository(
       const { error: linkErr } = await db.from("invoice_orders").insert(links);
       if (linkErr) throw linkErr;
 
-      return {
-        id: data.id,
-        customerId: data.customer_id,
-        customerName: null,
-        companyId: data.company_id,
-        companyName: null,
-        amount: num(data.amount),
-        status: data.status,
-        billingPeriod: data.billing_period,
-        createdAt: data.created_at,
-        orderIds: input.orderIds,
-        paidTotal: 0,
-      };
+      return mapInvoice(
+        {
+          ...data,
+          customers: null,
+          companies: null,
+        },
+        input.orderIds,
+        0,
+        false,
+      );
     },
 
     async getInvoice(invoiceId: string): Promise<InvoiceRecord | null> {
-      const rows = await this.listInvoices(null);
-      return rows.find((r) => r.id === invoiceId) ?? null;
+      const { data, error } = await db
+        .from("invoices")
+        .select(
+          "id, customer_id, company_id, amount, status, billing_period, created_at, reviewed_at, customers(display_name), companies(name)",
+        )
+        .eq("tenant_id", tenantId)
+        .eq("id", invoiceId)
+        .is("deleted_at", null)
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) return null;
+
+      const periodClosed = data.billing_period
+        ? (await isPeriodClosed(data.billing_period)).closed
+        : false;
+
+      const [{ data: links }, { data: pays }] = await Promise.all([
+        db
+          .from("invoice_orders")
+          .select("order_id")
+          .eq("tenant_id", tenantId)
+          .eq("invoice_id", invoiceId),
+        db
+          .from("payments")
+          .select("amount, status")
+          .eq("tenant_id", tenantId)
+          .eq("invoice_id", invoiceId)
+          .is("deleted_at", null),
+      ]);
+
+      const orderIds = ((links ?? []) as { order_id: string }[]).map(
+        (r) => r.order_id,
+      );
+      const paidTotal = ((pays ?? []) as { amount: number | string; status: string }[])
+        .filter((p) => p.status !== "void")
+        .reduce((s, p) => s + num(p.amount), 0);
+
+      return mapInvoice(data, orderIds, paidTotal, periodClosed);
+    },
+
+    async markInvoiceReviewed(invoiceId: string): Promise<void> {
+      const { error } = await db
+        .from("invoices")
+        .update({ reviewed_at: new Date().toISOString() })
+        .eq("tenant_id", tenantId)
+        .eq("id", invoiceId)
+        .is("deleted_at", null)
+        .is("reviewed_at", null);
+      if (error) throw error;
     },
 
     async updateInvoiceStatus(
@@ -275,10 +392,14 @@ export function createAccountingRepository(
 
     async periodSummary(billingPeriod: string): Promise<PeriodSummary> {
       const invoices = await this.listInvoices(billingPeriod);
+      const { closed, closedAt } = await isPeriodClosed(billingPeriod);
       const pendingCount = invoices.filter((i) => i.status === "pending").length;
       const paidCount = invoices.filter((i) => i.status === "paid").length;
       const voidCount = invoices.filter((i) => i.status === "void").length;
       const overdueCount = invoices.filter((i) => i.status === "overdue").length;
+      const reviewPendingCount = invoices.filter(
+        (i) => i.status === "pending" && !i.reviewedAt,
+      ).length;
       const invoicedAmount = invoices
         .filter((i) => i.status !== "void")
         .reduce((s, i) => s + i.amount, 0);
@@ -290,15 +411,35 @@ export function createAccountingRepository(
         pendingCount,
         overdueCount,
       };
+      const readyToClose = derivePeriodReadyToClose(base);
       return {
         billingPeriod,
         ...base,
         paidCount,
         voidCount,
+        reviewPendingCount,
         invoicedAmount,
         paidAmount,
-        recordsComplete: derivePeriodComplete(base),
+        readyToClose,
+        periodClosed: closed,
+        closedAt,
+        recordsComplete: closed,
       };
+    },
+
+    async closePeriod(
+      billingPeriod: string,
+      closedBy: string,
+      snapshot: { invoiceCount: number; paidAmount: number },
+    ): Promise<void> {
+      const { error } = await db.from("financial_period_closures").insert({
+        tenant_id: tenantId,
+        billing_period: billingPeriod,
+        closed_by: closedBy,
+        invoice_count: snapshot.invoiceCount,
+        paid_amount: snapshot.paidAmount,
+      });
+      if (error) throw error;
     },
   };
 }

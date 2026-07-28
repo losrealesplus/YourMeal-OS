@@ -1,15 +1,14 @@
 # Accounting Journey · Evidence Pack
 
 **Estado:** Gate **OBSERVATIONS** · ✅ **CERTIFIED** · Outcome **Financial Records Complete**  
-**Input:** Orders Delivered · Issues Resolved ✅  
-**Ciclo:** FAIL → Correction (Financial Lifecycle) → Re-Certification  
-**Fecha:** 2026-07-28  
+**Ciclo:** FAIL → Correction P0 → Re-Certification  
+**Bloque G:** NOT STARTED  
 
 | Artefacto | |
 |-----------|--|
-| [ACCOUNTING_JOURNEY.md](./ACCOUNTING_JOURNEY.md) | AJ-01…05 (re-cert) |
-| [ACCOUNTING_VALIDATION.md](./ACCOUNTING_VALIDATION.md) | Gate OBSERVATIONS |
+| [ACCOUNTING_JOURNEY.md](./ACCOUNTING_JOURNEY.md) | Lifecycle Pending→Review→Processed→Closed |
+| [ACCOUNTING_VALIDATION.md](./ACCOUNTING_VALIDATION.md) | Re-Cert Gate |
 | [ACCOUNTING_NEGATIVE_CASES.md](./ACCOUNTING_NEGATIVE_CASES.md) | Negativos |
-| [ACCOUNTING_OBSERVATIONS.md](./ACCOUNTING_OBSERVATIONS.md) | P0 cerrados · residuales |
+| [ACCOUNTING_OBSERVATIONS.md](./ACCOUNTING_OBSERVATIONS.md) | P0 cerrados |
 
 Upstream Kitchen · Delivery · Support permanecen CERTIFIED.

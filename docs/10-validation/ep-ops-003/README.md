@@ -1,48 +1,38 @@
 # EP-OPS-003 · Evidence Index
 
 **Epic:** [EP_OPS_003](../../00-status/EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md)  
-**Metodología:** ✅ **FROZEN** — [acta](../../00-status/EP_OPS_003_METHODOLOGY_FROZEN.md)  
-**1ª validación:** ✅ **CLOSED** — [acta](../../00-status/EP_OPS_003_FIRST_VALIDATION_CLOSED.md)  
-**Modo:** 4/4 Journeys CERTIFIED · Bloque G NEXT — **no** evolucionar conceptos  
+**Metodología:** ✅ **FROZEN**  
+**1ª validación:** ✅ **CLOSED**  
+**Journey execution:** ✅ **4/4 CERTIFIED** · **EP-OPS-003 Complete** (journeys)  
+**Bloque G:** ⏳ **NOT STARTED** (elegible · no abierto)
 
 ### Continuidad Outcome → Input
 
 ```text
-Kitchen     Production Ready          ✅ CERTIFIED · OBSERVATIONS
+Kitchen     Production Ready             ✅ CERTIFIED
     ↓
-Delivery    Orders Delivered          ✅ CERTIFIED · OBSERVATIONS
+Delivery    Orders Delivered             ✅ CERTIFIED
     ↓
-Support     Issues Resolved           ✅ CERTIFIED · OBSERVATIONS
+Support     Issues Resolved              ✅ CERTIFIED
     ↓
-Accounting  Financial Records Complete ✅ CERTIFIED · OBSERVATIONS
+Accounting  Financial Records Complete   ✅ CERTIFIED
 ```
-
-**Estabilidad:** FAIL/Correction de Accounting **no** reabrió Kitchen · Delivery · Support.
 
 ---
 
 ## Gate board
 
-| Orden | Workspace | Input | Outcome | Gate | Status |
-|:-----:|-----------|-------|---------|:----:|--------|
-| 1 | [Kitchen](./kitchen.md) | Demanda | Production Ready | OBSERVATIONS | ✅ CERTIFIED |
-| 2 | [Delivery](./delivery.md) | Production Ready | Orders Delivered | OBSERVATIONS | ✅ CERTIFIED |
-| 3 | [Support](./support.md) | Orders Delivered | Issues Resolved | OBSERVATIONS | ✅ CERTIFIED |
-| 4 | [Accounting](./accounting.md) | Completed ops · Issues Resolved | Financial Records Complete | OBSERVATIONS | ✅ CERTIFIED |
-
----
-
-## Progress EP-OPS-003
+| Orden | Workspace | Outcome | Gate | Status |
+|:-----:|-----------|---------|:----:|--------|
+| 1 | [Kitchen](./kitchen.md) | Production Ready | OBSERVATIONS | ✅ CERTIFIED |
+| 2 | [Delivery](./delivery.md) | Orders Delivered | OBSERVATIONS | ✅ CERTIFIED |
+| 3 | [Support](./support.md) | Issues Resolved | OBSERVATIONS | ✅ CERTIFIED |
+| 4 | [Accounting](./accounting.md) | Financial Records Complete | OBSERVATIONS | ✅ CERTIFIED |
 
 ```text
-Kitchen      ████████████  CERTIFIED · OBSERVATIONS · Production Ready
-Delivery     ████████████  CERTIFIED · OBSERVATIONS · Orders Delivered
-Support      ████████████  CERTIFIED · OBSERVATIONS · Issues Resolved
-Accounting   ████████████  CERTIFIED · OBSERVATIONS · Financial Records Complete
-
-Journeys CERTIFIED  4/4  (100% · Bloque G Flow NEXT)
+Journeys CERTIFIED  4/4
+EP-OPS-003 (journeys)  COMPLETE
+Bloque G (Flow)        NOT STARTED
 ```
 
-Packs: [kitchen/](./kitchen/) · [delivery/](./delivery/) · [support/](./support/) · [accounting/](./accounting/)
-
-**Siguiente:** Bloque G · Flow Certification (continuidad transversal Outcome→Input).
+**Criterio:** Bloque G solo cuando Kitchen+Delivery+Support+Accounting = CERTIFIED — **cumplido**. Apertura de Flow = decisión separada (no en este Correction).

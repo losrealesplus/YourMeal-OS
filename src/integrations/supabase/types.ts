@@ -667,6 +667,7 @@ export type Database = {
           deleted_at?: string | null
           id: string
           pdf_url: string | null
+          reviewed_at: string | null
           status: Database["public"]["Enums"]["invoice_status"]
           tenant_id: string
         }
@@ -679,6 +680,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           pdf_url?: string | null
+          reviewed_at?: string | null
           status?: Database["public"]["Enums"]["invoice_status"]
           tenant_id: string
         }
@@ -691,6 +693,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           pdf_url?: string | null
+          reviewed_at?: string | null
           status?: Database["public"]["Enums"]["invoice_status"]
           tenant_id?: string
         }
@@ -754,6 +757,41 @@ export type Database = {
           },
           {
             foreignKeyName: "invoice_orders_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      financial_period_closures: {
+        Row: {
+          billing_period: string
+          closed_at: string
+          closed_by: string | null
+          invoice_count: number
+          paid_amount: number
+          tenant_id: string
+        }
+        Insert: {
+          billing_period: string
+          closed_at?: string
+          closed_by?: string | null
+          invoice_count?: number
+          paid_amount?: number
+          tenant_id: string
+        }
+        Update: {
+          billing_period?: string
+          closed_at?: string
+          closed_by?: string | null
+          invoice_count?: number
+          paid_amount?: number
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_period_closures_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
