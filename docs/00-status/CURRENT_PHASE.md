@@ -60,6 +60,8 @@ Mapa certificación (activo):
   I Certification Report    □□□□□□□□□□  CG-RI-001
 
 Siguiente foco:            Workspace → Operational Journey (Kitchen · Delivery · Support · Accounting)
+
+Patrón permanente: Operational Representation (DICT-072)
 Madurez tenant:    Tenant Operational Autonomy (DICT-073)
 
 Riesgo principal: certificar sin evidencia de jornadas / flujos → CG-RI-001 NOT READY
