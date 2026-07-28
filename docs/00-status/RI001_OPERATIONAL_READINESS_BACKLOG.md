@@ -225,11 +225,13 @@ Gate: — → PASS solo cuando las superficies del alcance = CERTIFIED
 **Evidencia:** [docs/10-validation/ep-ops-003/](../10-validation/ep-ops-003/README.md)  
 **Prerrequisito:** Entry CERTIFIED (EP-OPS-002 · RBAC-001 · WEP-001 · LP-001)
 
-> **EP-OPS-003 (Journeys) COMPLETE** — [acta](./EP_OPS_003_JOURNEYS_COMPLETE.md). Framework Frozen · 1ª validación Cerrada. Bloque G elegible · **NOT STARTED**.
+> **EP-OPS-003 (Journeys) COMPLETE** — [acta](./EP_OPS_003_JOURNEYS_COMPLETE.md).  
+> **Capa Entry+Journey CLOSED** — [OPERATIONAL_CERTIFICATION_LAYER_CLOSED](./OPERATIONAL_CERTIFICATION_LAYER_CLOSED.md).  
+> Framework Frozen · Bloque G elegible · **NOT STARTED** (objeto = handoffs).
 
-Pregunta Entry (cerrada en EP-OPS-002): *¿Aterriza en su Workspace?*  
-Pregunta Journey (cerrada): *¿Puede este departamento terminar su jornada solo con YourMeal OS en su Workspace?*  
-Pregunta Flow (Bloque G · no iniciada): *¿Puede la empresa operar de extremo a extremo?*
+Pregunta Entry (cerrada): *¿Dónde entra el usuario?*  
+Pregunta Journey (cerrada): *¿Puede cada departamento completar su trabajo?*  
+Pregunta Flow (Bloque G · no iniciada): *¿Puede la empresa operar end-to-end?*
 
 | Workspace | Entry | Outcome | Journey Gate | Estado |
 |-----------|:-----:|---------|:------------:|--------|

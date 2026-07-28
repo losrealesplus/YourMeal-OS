@@ -24,10 +24,10 @@ DONE:                Progress 100% · Gates PASS · Report READY|RWO · evidenci
 Permitido en RI-001: ejecutar cert · fix de hallazgo de cert · reabrir gate aprobado
 Prohibido:           nuevas features / ampliar alcance bajo etiqueta RI-001
 Pregunta maestra:    ¿Qué evidencia falta para certificar que YM OS opera una empresa real?
-Siguiente:           **EP-OPS-003 (Journeys) COMPLETE** · Bloque G elegible · **NOT STARTED**
-                     · Acta: [EP_OPS_003_JOURNEYS_COMPLETE](./EP_OPS_003_JOURNEYS_COMPLETE.md)
-                     · Framework Frozen · 1ª validación Cerrada · 4/4 CERTIFIED
-                     · Flow = cambio de nivel (empresa E2E) — apertura explícita
+Siguiente:           **Capa Entry+Journey CLOSED** · Flow pendiente de apertura
+                     · Acta capa: [OPERATIONAL_CERTIFICATION_LAYER_CLOSED](./OPERATIONAL_CERTIFICATION_LAYER_CLOSED.md)
+                     · Journeys: [EP_OPS_003_JOURNEYS_COMPLETE](./EP_OPS_003_JOURNEYS_COMPLETE.md)
+                     · Framing G (objeto = handoffs): [BLOCK_G_FLOW_FRAMING](../10-validation/ep-ops-003/BLOCK_G_FLOW_FRAMING.md)
 ══════════════════════════════════════════════════
 ```
 
@@ -35,10 +35,9 @@ Siguiente:           **EP-OPS-003 (Journeys) COMPLETE** · Bloque G elegible · 
 
 ```text
 Siguiente artefacto activo:
-  [EP-OPS-003 Journeys COMPLETE](./EP_OPS_003_JOURNEYS_COMPLETE.md)
-  · Framing G (no ejecución): [BLOCK_G_FLOW_FRAMING](../10-validation/ep-ops-003/BLOCK_G_FLOW_FRAMING.md)
-  · Pregunta cerrada: ¿cada Workspace cumple su misión?
-  · Pregunta siguiente (G): ¿puede la empresa operar E2E?
+  [Operational Certification Layer CLOSED](./OPERATIONAL_CERTIFICATION_LAYER_CLOSED.md)
+  · Entry ✅ · Journey ✅ · Flow ⏳ (NOT STARTED)
+  · Paradigma G: organización · transferencias · no pantallas
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████
@@ -46,22 +45,22 @@ Pilot Readiness (lectura)
   Modelo operacional  ██████████
   Administración      ██████████
   Customer App        █████████░
-  Operaciones         ██████████  ← Journeys COMPLETE
+  Operaciones         ██████████  ← capa Entry+Journey CLOSED
   Data                ███████░░░
 
 Mapa certificación (activo):
   A Foundation              □□□□□□□□□□
-  B Surfaces                ██░░░░░░░░  Entry EP-OPS-002 (#88)
-  C Department Workspaces   ██████████  EP-OPS-003 Journeys COMPLETE
+  B Surfaces                ██░░░░░░░░  Entry CERTIFIED
+  C Department Workspaces   ██████████  Journey COMPLETE
   D Operational Language    □□□□□□□□□□
   E RBAC & Access           □□□□□□□□□□
   F Observability Ready     □□□□□□□□□□
   G Flow Certification      □□□□□□□□□□  elegible · NOT STARTED
-  H Auth Transition         □□□□□□□□□□  AUTH-A/B
-  I Certification Report    □□□□□□□□□□  CG-RI-001
+  H Auth Transition         □□□□□□□□□□
+  I Certification Report    □□□□□□□□□□
 
-Siguiente foco:            Apertura explícita Bloque G (handoffs · no pantallas)
-                           cuando se decida certificar el sistema como organización
+Siguiente foco:            Apertura explícita Bloque G
+                           (handoffs operacionales · pregunta empresa E2E)
 
 Patrón permanente: Operational Representation (DICT-072)
 Madurez tenant:    Tenant Operational Autonomy (DICT-073)

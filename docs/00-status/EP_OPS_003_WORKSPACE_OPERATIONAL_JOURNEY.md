@@ -1,6 +1,7 @@
 # EP-OPS-003 · Workspace Operational Journey Certification
 
-**Estado ejecución:** ✅ **JOURNEYS COMPLETE** · 4/4 CERTIFIED · Bloque G **NOT STARTED**  
+**Estado ejecución:** ✅ **JOURNEYS COMPLETE** · capa Entry+Journey **CLOSED** · Bloque G **NOT STARTED**  
+**Acta capa:** [OPERATIONAL_CERTIFICATION_LAYER_CLOSED](./OPERATIONAL_CERTIFICATION_LAYER_CLOSED.md)  
 **Acta Journeys:** [EP_OPS_003_JOURNEYS_COMPLETE](./EP_OPS_003_JOURNEYS_COMPLETE.md) · 2026-07-28  
 **Acta 1ª validación:** [EP_OPS_003_FIRST_VALIDATION_CLOSED](./EP_OPS_003_FIRST_VALIDATION_CLOSED.md)  
 **Metodología:** ✅ **FROZEN** — [acta](./EP_OPS_003_METHODOLOGY_FROZEN.md) · 2026-07-28  
@@ -9,9 +10,9 @@
 **Prerrequisito:** EP-OPS-002 · Entry architecture **CERTIFIED**  
 `(RBAC-001 · WEP-001 · LP-001)` — PR #88 · [WORKSPACE_ENTRY_POLICY](../10-validation/WORKSPACE_ENTRY_POLICY.md)  
 
-> **EP-OPS-003 (Journeys) COMPLETE.** Framework Frozen · 1ª validación Cerrada · 4/4 CERTIFIED.  
-> **Bloque G:** elegible · **no iniciado** — framing: [BLOCK_G_FLOW_FRAMING](../10-validation/ep-ops-003/BLOCK_G_FLOW_FRAMING.md).  
-> Pregunta Journey cerrada. Pregunta Flow (empresa E2E) pendiente de apertura explícita.  
+> **Capa Entry + Journey CLOSED.** Framework Frozen · 4/4 CERTIFIED.  
+> **Bloque G:** elegible · **no iniciado** — objeto = handoffs ([BLOCK_G_FLOW_FRAMING](../10-validation/ep-ops-003/BLOCK_G_FLOW_FRAMING.md)).  
+> Paradigma Flow: organización · transferencias · no pantallas.  
 
 ```text
 Identity

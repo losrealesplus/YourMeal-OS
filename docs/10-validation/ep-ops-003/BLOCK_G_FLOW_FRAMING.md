@@ -1,52 +1,85 @@
 # Bloque G · Flow Framing (NOT STARTED)
 
-**Estado:** ⏳ **NOT STARTED** · elegible tras EP-OPS-003 Journeys COMPLETE  
+**Estado:** ⏳ **NOT STARTED** · elegible tras capa Entry+Journey cerrada  
+**Capa cerrada:** [OPERATIONAL_CERTIFICATION_LAYER_CLOSED](../../00-status/OPERATIONAL_CERTIFICATION_LAYER_CLOSED.md)  
 **Acta Journeys:** [EP_OPS_003_JOURNEYS_COMPLETE](../../00-status/EP_OPS_003_JOURNEYS_COMPLETE.md)  
 **Metodología Journey:** FROZEN — este documento **no** la modifica  
 **Plantilla Flow:** [FLOW_CERTIFICATION](../FLOW_CERTIFICATION.md)
 
-> Framing previo a la apertura de Bloque G.  
-> **No** es evidencia de certificación Flow.  
-> **No** inicia ejecución de handoffs.
+> Función de este documento: **fijar el objeto de certificación** de Flow.  
+> **No** ejecuta handoffs. **No** es Evidence Gate G.
+
+---
+
+## Cambio de paradigma
+
+| Hasta ahora (Entry · Journey) | A partir de Bloque G |
+|-------------------------------|----------------------|
+| Actor = departamento | Actor = **organización** |
+| Objeto = Workspace / Journey / Outcome | Objeto = **transferencia** entre Outcomes |
+| *¿Kitchen funciona?* | *¿Kitchen entrega correctamente a Delivery?* |
+
+```text
+Departamento
+        ↓
+Transferencia   ← objeto de certificación Flow
+        ↓
+Departamento
+```
 
 ---
 
 ## Cambio de pregunta
 
-| Nivel | Pregunta |
-|-------|----------|
-| Entry (EP-OPS-002) | ¿Aterriza en su Workspace? |
-| Journey (EP-OPS-003) | ¿Puede cada Workspace completar su propia misión? |
-| **Flow (Bloque G)** | **¿Puede la empresa operar de extremo a extremo?** |
+| Capa | Pregunta | Estado |
+|------|----------|--------|
+| Entry | ¿Dónde entra el usuario? | ✅ CERTIFIED |
+| Journey | ¿Puede cada departamento completar su trabajo? | ✅ COMPLETE |
+| **Flow** | **¿Puede la empresa operar end-to-end?** | ⏳ Pendiente de apertura |
 
 ---
 
-## Qué certifica Bloque G
+## Disciplina (obligatoria)
+
+| Certificar | No certificar |
+|------------|---------------|
+| **Handoffs operacionales** | Pantallas |
+| Evidencia reproducible del traspaso | Componentes UI |
+| Consumo correcto del Outcome upstream | APIs de forma aislada |
+| Trazabilidad Outcome → Input | Re-certificación de Journeys ya CERTIFIED |
+
+Cada Flow / handoff responde:
 
 ```text
-Outcome
-  ↓
-Department Handoff
-  ↓
-Next Outcome
-  ↓
-Operational Flow
+¿El Outcome certificado del departamento A
+es consumido correctamente por el departamento B
+sin pérdida de información,
+sin intervención manual indebida
+y manteniendo la trazabilidad?
 ```
 
-Certifica la **calidad de las transferencias** entre departamentos — no capacidades individuales ya CERTIFIED en EP-OPS-003.
+Si se mantiene ese criterio, Bloque G **no** es una repetición de EP-OPS-003: es la certificación del sistema operativo empresarial como **cadena coordinada de resultados**.
 
 ---
 
-## Handoffs a certificar (contrato)
+## Handoffs candidatos (objeto fijado)
 
-| From | To | Artefacto transferido | Criterio de calidad (a evidenciar en G) |
-|------|----|------------------------|------------------------------------------|
-| Kitchen | Delivery | Production Ready | Delivery consume el Outcome sin reopen Kitchen |
-| Delivery | Support | Orders Delivered | Support opera sobre entregas reales |
-| Support | Accounting | Issues Resolved / eventos financieros | Accounting refleja impacto o continuidad demostrable |
-| Accounting | Cierre operativo | Financial Records Complete | Periodo cerrado · cadena E2E trazable |
+| Handoff | Certifica |
+|---------|-----------|
+| Kitchen → Delivery | Production Ready se transfiere correctamente |
+| Delivery → Support | Orders Delivered genera trabajo gestionable |
+| Support → Accounting | Issues Resolved produce eventos financieros válidos |
+| Accounting → Cierre operativo | Financial Records Complete permite cerrar el ciclo empresarial |
 
-Flow Gaps ya anotados en packs Journey (FG-*) alimentan esta pasada; no se inventan handoffs nuevos sin evidencia.
+```text
+Outcome A (CERTIFIED)
+        ↓  handoff
+Input B
+        ↓
+Outcome B (CERTIFIED)
+```
+
+Flow Gaps (FG-*) de los packs Journey alimentan esta pasada; no se inventan handoffs sin evidencia.
 
 ---
 
@@ -54,21 +87,20 @@ Flow Gaps ya anotados en packs Journey (FG-*) alimentan esta pasada; no se inven
 
 | Evitar | Preferir |
 |--------|----------|
-| Rediseñar pantallas / módulos | Definir y probar handoffs |
+| Pantallas / módulos / APIs aisladas | Handoffs con evidencia |
 | Re-certificar Workspaces | Consumir Outcomes CERTIFIED |
 | Ampliar metodología Journey | Aplicar plantilla Flow |
-| Abrir G “por inercia” | Decisión explícita + Evidence Gate G |
+| Abrir G por inercia | Decisión explícita + Evidence Gate G |
 
 ---
 
-## Precondiciones (cumplidas)
+## Precondiciones
 
 ```text
-☑ Kitchen CERTIFIED
-☑ Delivery CERTIFIED
-☑ Support CERTIFIED
-☑ Accounting CERTIFIED
+☑ Entry CERTIFIED
+☑ Kitchen · Delivery · Support · Accounting CERTIFIED
 ☑ EP-OPS-003 Journeys COMPLETE
+☑ Capa operacional Entry+Journey CLOSED
 ☐ Apertura explícita Bloque G
 ```
 

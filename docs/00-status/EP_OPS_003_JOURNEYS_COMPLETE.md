@@ -8,6 +8,7 @@
 **Programa:** RI-001 · Bloque C  
 
 > Declara **EP-OPS-003 (Journeys) funcionalmente completado**.  
+> Forma parte de la **capa operacional Entry+Journey CLOSED** — [OPERATIONAL_CERTIFICATION_LAYER_CLOSED](./OPERATIONAL_CERTIFICATION_LAYER_CLOSED.md).  
 > **No** inicia Bloque G. Flow permanece elegible · NOT STARTED.
 
 ---

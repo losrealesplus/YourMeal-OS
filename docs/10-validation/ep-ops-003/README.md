@@ -4,6 +4,7 @@
 **Framework:** ✅ **FROZEN**  
 **1ª validación:** ✅ **CLOSED**  
 **Journeys:** ✅ **COMPLETE** — [acta](../../00-status/EP_OPS_003_JOURNEYS_COMPLETE.md)  
+**Capa Entry+Journey:** ✅ **CLOSED** — [acta](../../00-status/OPERATIONAL_CERTIFICATION_LAYER_CLOSED.md)  
 **Bloque G:** ⏳ Elegible · **NOT STARTED** — [framing](./BLOCK_G_FLOW_FRAMING.md)
 
 ### Continuidad Outcome → Input (demostrada)
