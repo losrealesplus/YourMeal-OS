@@ -74,8 +74,8 @@ Ejemplo: `OPS-001` → Kitchen Workspace Validation → Gate C PASS → Progress
 RI-001 Progress
 
 Foundation            ░░░░░░░░░░   0%   Gate —
-Surfaces              ██░░░░░░░░  20%   Tenant IN REVIEW
-Workspaces            ░░░░░░░░░░   0%   Gate —
+Surfaces              ██████████ 100%   CERTIFIED (EP-OPS-002 · Tenant+Platform)
+Workspaces            ████░░░░░░  40%   Entry CERTIFIED (WEP) · jornadas dept. pendientes
 Language              ░░░░░░░░░░   0%   Gate —
 RBAC Access           ░░░░░░░░░░   0%   Gate —
 Observability         ░░░░░░░░░░   0%   Gate —
@@ -83,14 +83,14 @@ Flows                 ░░░░░░░░░░   0%   Gate —
 Auth Transition       ░░░░░░░░░░   0%   Gate —
 Certification Report  ░░░░░░░░░░   0%   Gate —
 
-Overall (certificación)           ~2%   (1/9 bloques · parcial B)
+Overall (certificación)          ~16%   (B PASS · C parcial Entry)
 ```
 
 | Bloque | Nombre | Gate | % cert. |
 |--------|--------|:----:|--------:|
 | A | Foundation | — | 0 |
-| B | Surfaces | IN REVIEW | ~20 |
-| C | Workspaces | — | 0 |
+| B | Surfaces | **PASS / CERTIFIED** | 100 |
+| C | Workspaces | IN REVIEW (Entry PASS) | ~40 |
 | D | Language | — | 0 |
 | E | RBAC Access | — | 0 |
 | F | Observability | — | 0 |
@@ -190,28 +190,31 @@ Gate: — (PASS solo con ☑ completos)
 
 | Superficie | Surface Status |
 |------------|:--------------:|
-| Tenant Surface `/admin` | **IN REVIEW** |
-| Platform Surface `/saas` | NOT STARTED |
-| Customer Surface `/app` | NOT STARTED |
+| Tenant Surface `/admin` | **CERTIFIED** (EP-OPS-002) |
+| Platform Surface `/saas` | **CERTIFIED** (EP-OPS-002) |
+| Customer Surface `/app` | Landing documentado · jornada Customer fuera de este epic |
 
-### Evidence Gate · B (ejemplo por superficie)
+### Evidence Gate · B
 
 ```text
-B · Surface Certification · Tenant (ejemplo)
+B · Surface Certification · Tenant + Platform
 
-STATUS: IN REVIEW
+STATUS: CERTIFIED
 
 Evidence
-  □ Navegación / jornadas
-  □ Permisos de superficie
-  □ UX operacional (Operación completada)
-  □ Casos negativos (sin datos · ya completado · superficie incorrecta)
-  □ Observaciones clasificadas (Session Log)
+  ☑ Navegación / landings — [SURFACE_NAVIGATION_REPORT](../10-validation/SURFACE_NAVIGATION_REPORT.md)
+  ☑ Separación de superficies — [RBAC_SURFACE_CERTIFICATION](../10-validation/RBAC_SURFACE_CERTIFICATION.md)
+  ☑ Matrix — [SURFACE_MATRIX](../10-validation/SURFACE_MATRIX.md)
+  ☑ Casos negativos cross-surface PASS
+  ☑ Observaciones FCR-001/004/005/006 cerradas o reclasificadas
 
-Gate: — → PASS solo cuando las superficies del alcance = CERTIFIED
+Gate: PASS
 ```
 
-**Salida:** superficies del alcance CERTIFIED → puede comenzar **C**.
+**Salida:** superficies Tenant + Platform CERTIFIED → puede avanzar **C** (jornadas de workspace).
+
+**Artefactos EP-OPS-002:**  
+[PRECHECK](../10-validation/EP_OPS_002_PRECHECK.md) · [WEP](../10-validation/WORKSPACE_ENTRY_POLICY.md) · [LP](../10-validation/LANDING_POLICY_VALIDATION.md)
 
 ---
 
@@ -219,26 +222,29 @@ Gate: — → PASS solo cuando las superficies del alcance = CERTIFIED
 
 | Workspace | Estado |
 |-----------|:------:|
-| Kitchen | Pendiente |
-| Delivery | Pendiente |
-| Support | Pendiente |
-| Accounting | Pendiente |
-| Operations | Pendiente |
+| Kitchen | Entry **CERTIFIED** · jornada operativa pendiente |
+| Delivery | Entry **CERTIFIED** · jornada operativa pendiente |
+| Support | Entry **CERTIFIED** · jornada operativa pendiente |
+| Accounting | Entry **CERTIFIED** · jornada operativa pendiente |
+| Operations | Entry **CERTIFIED** (`/admin`) · jornada pendiente |
 
-Pregunta: *¿Puede este departamento terminar su jornada solo con YourMeal OS?*
+Pregunta Entry (WEP-001): *¿Aterriza automáticamente en su Workspace?* → **SÍ** (CERTIFIED).  
+Pregunta jornada: *¿Puede este departamento terminar su jornada solo con YourMeal OS?* → pendiente Bloque C completo.
 
 ### Evidence Gate · C
 
 ```text
 Evidence
+  ☑ Landing (Workspace Entry Policy) — CERTIFIED EP-OPS-002
   □ Jornada por workspace del alcance
-  □ Landing (Workspace Entry Policy)
   □ Operación completada
-  □ Casos negativos / handovers anotados
-  □ Hallazgos clasificados
+  □ Casos negativos / handovers anotados (jornada)
+  □ Hallazgos clasificados (jornada)
 
-Gate: — → PASS → puede comenzar D
+Gate: — (Entry PASS; jornada NOT STARTED)
 ```
+
+**Salida parcial:** Entry CERTIFIED → jornadas de workspace deben completar Gate C antes de D.
 
 ---
 

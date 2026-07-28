@@ -18,17 +18,18 @@ Customer Surface   →  /app
 
 ## Landings (resumen — ver Entry Policy)
 
-| Perfil | Landing (política) | Superficie de entrada |
-|--------|--------------------|------------------------|
+| Perfil | Landing (política CERTIFIED) | Superficie de entrada |
+|--------|------------------------------|------------------------|
 | Customer | `/app` | Customer |
-| Kitchen | `/admin/kitchen-execution` | Tenant · Workspace |
+| Kitchen | `/admin/kitchen` | Tenant · Workspace |
 | Delivery | `/admin/delivery` | Tenant · Workspace |
 | Support | `/admin/support` | Tenant · Workspace |
 | Accounting | `/admin/accounting` | Tenant · Workspace |
 | Company Admin | `/admin` | Tenant Surface |
-| SaaS Admin | `/saas` | Platform Surface |
+| SaaS Admin (puro) | `/saas` | Platform Surface |
+| SaaS Admin (híbrido Bootstrap) | `/admin` | Tenant-first |
 
-**Código actual (`homePathForRoles`):** gaps FCR-004/005/006.
+**Código:** `homePathForRoles` alineado · EP-OPS-002 · [WORKSPACE_ENTRY_POLICY](./WORKSPACE_ENTRY_POLICY.md) · [SURFACE_MATRIX](./SURFACE_MATRIX.md).
 
 ---
 
@@ -57,7 +58,7 @@ SaaS Admin en columnas Tenant = acceso *al tenant* solo si el producto lo conced
 | `/admin/users` | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ (tenant) |
 | `/admin/audit` (tenant) | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ (tenant) |
 | `/admin/branding` **Business** | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ⚠ (tenant) |
-| `/admin/settings` hub | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ⚠ **FCR-001** |
+| `/admin/settings` hub | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ⚠ híbrido Tenant settings (FCR-001 cerrado) |
 | `/admin/commercial` | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ⚠ |
 | `/saas` Overview | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 | `/saas/tenants` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
