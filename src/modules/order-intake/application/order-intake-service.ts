@@ -62,7 +62,7 @@ export const OrderIntakeService = {
 
     if (!staff && !selfChannel) {
       throw new DomainError(
-        "FORBIDDEN",
+        "PERMISSION_DENIED",
         "Customers may only intake via the App channel",
       );
     }
