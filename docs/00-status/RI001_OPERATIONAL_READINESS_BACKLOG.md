@@ -1,11 +1,14 @@
 # RI-001 Operational Readiness Backlog
 
 **Nombre oficial:** RI-001 Operational Readiness Backlog  
+**Alcance del programa:** **[FROZEN](./RI001_PROGRAM_FROZEN.md)** · 2026-07-28  
 *(no “Stabilization Backlog” — el cuello de botella es evidencia operacional)*  
 
 **Epic marco:** EP-OPS-001 · RI-001 Operational Certification  
 **Gate final:** [CG-RI-001](../10-validation/reports/RI001_CERTIFICATION_REPORT.md)  
 **Principios:** P11 Evidence before Versioning · [P12](../20-evidence-framework/10-evidence-freshness-p12.md) · **[P13 Certification Completeness](../20-evidence-framework/12-certification-completeness-p13.md)**
+
+> **Frozen:** no nuevas tareas de alcance. Solo ejecutar A–I, corregir hallazgos de certificación, o reabrir un gate con aprobación explícita. Todo lo demás → otra épica.
 
 ```text
 P11  evidencia antes de versionar
