@@ -46,7 +46,7 @@ Pilot Readiness (lectura)
   Modelo operacional  ██████████
   Administración      ██████████
   Customer App        █████████░
-  Operaciones         ███████░░░  ← Entry done · Journeys EP-OPS-003
+  Operaciones         ████░░░░░░  ← Kitchen CERTIFIED · Delivery next
   Data                ███████░░░
 
 Mapa certificación (activo):
