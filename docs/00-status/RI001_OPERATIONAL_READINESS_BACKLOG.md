@@ -226,15 +226,16 @@ Gate: — → PASS solo cuando las superficies del alcance = CERTIFIED
 Pregunta Entry (cerrada en EP-OPS-002): *¿Aterriza en su Workspace?*  
 Pregunta Journey (este bloque): *¿Puede este departamento terminar su jornada solo con YourMeal OS en su Workspace?*
 
-| Workspace | Entry | Journey Gate | Estado |
-|-----------|:-----:|:------------:|--------|
-| Kitchen | CERTIFIED* | — | NOT STARTED · [pack](../10-validation/ep-ops-003/kitchen.md) |
-| Delivery | CERTIFIED* | — | NOT STARTED · [pack](../10-validation/ep-ops-003/delivery.md) |
-| Support | CERTIFIED* | — | NOT STARTED · [pack](../10-validation/ep-ops-003/support.md) |
-| Accounting | CERTIFIED* | — | NOT STARTED · [pack](../10-validation/ep-ops-003/accounting.md) |
-| Operations | hub `/admin` | — | Fuera del núcleo EP-OPS-003 (handoffs) |
+| Workspace | Entry | Outcome | Journey Gate | Estado |
+|-----------|:-----:|---------|:------------:|--------|
+| Kitchen | CERTIFIED* | Production Ready | — | NOT STARTED · [pack](../10-validation/ep-ops-003/kitchen.md) |
+| Delivery | CERTIFIED* | Orders Delivered | — | NOT STARTED · [pack](../10-validation/ep-ops-003/delivery.md) |
+| Support | CERTIFIED* | Issues Resolved | — | NOT STARTED · [pack](../10-validation/ep-ops-003/support.md) |
+| Accounting | CERTIFIED* | Financial Records Complete | — | NOT STARTED · [pack](../10-validation/ep-ops-003/accounting.md) |
+| Operations | hub `/admin` | — | — | Fuera del núcleo EP-OPS-003 (handoffs) |
 
-\* Entry vía EP-OPS-002 (merge PR #88). No confundir Entry CERTIFIED con Journey CERTIFIED.
+\* Entry vía EP-OPS-002 (PR #88). Orden de jornadas: Kitchen → Delivery → Support → Accounting (cadena de valor).  
+No confundir Entry CERTIFIED con Journey CERTIFIED.
 
 ### Evidence Gate · C
 

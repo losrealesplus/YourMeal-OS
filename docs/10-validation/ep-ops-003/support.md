@@ -12,9 +12,9 @@
 
 Permitir a Atención al Cliente recibir, clasificar, seguir y resolver incidencias **sin cambiar de contexto** fuera del Support Workspace.
 
-**Pregunta de certificación:**
-
-> ¿Puede un agente gestionar una incidencia completa sin abandonar su Workspace?
+**Outcome certificado:** `Issues Resolved`  
+**Prerrequisito de orden:** Delivery Gate (pedidos entregados como base de incidencias).  
+**Pregunta:** ¿Puede un agente gestionar una incidencia completa sin abandonar su Workspace?
 
 ---
 
@@ -64,6 +64,8 @@ Cierre
 - Incidencia resuelta / cerrada
 - Notas y trazabilidad en directorio
 - Escalados documentados (si aplica)
+
+**Outcome:** **Issues Resolved** — Gate PASS solo si este outcome es demostrable con evidencia.
 
 ---
 

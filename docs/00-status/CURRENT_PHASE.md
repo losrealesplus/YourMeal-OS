@@ -61,7 +61,8 @@ Mapa certificación (activo):
   I Certification Report    □□□□□□□□□□  CG-RI-001
 
 Siguiente foco:            Workspace → Operational Journey → Outcome
-                           Kitchen · Delivery · Support · Accounting
+                           Kitchen (Production Ready) → Delivery → Support → Accounting
+                           luego Bloque G · Cross-Department Flow
 
 Patrón permanente: Operational Representation (DICT-072)
 Madurez tenant:    Tenant Operational Autonomy (DICT-073)
@@ -72,7 +73,7 @@ Primary Artifact:  [RI-001 Ops Readiness Backlog](./RI001_OPERATIONAL_READINESS_
 Visibilidad:       [Operational Visibility · DICT-071](../20-evidence-framework/09-operational-visibility-principle.md)
 Ops pattern:       [Operational Representation · DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md)
 Tenant autonomy:   [Tenant Operational Autonomy · DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)
-Hoy (Certificación): [Backlog RI-001](./RI001_OPERATIONAL_READINESS_BACKLOG.md) · [FCR Session Log](../10-validation/FCR_SESSION_LOG.md) · [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) (histórico / hub)
+Hoy (Certificación): [EP-OPS-003](./EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md) · [Backlog RI-001](./RI001_OPERATIONAL_READINESS_BACKLOG.md) · [ep-ops-003 evidence](../10-validation/ep-ops-003/README.md)
 Seguridad pre-piloto: [Pilot Security Checklist](../09-security/PILOT_SECURITY_CHECKLIST.md) (10 corregidos · 1 Accepted documentado)
 Antes de firmar G-02 PASSED: ORR firmados · cero humo · No Artificiality
 PR taxonomy (post G-02): Evidence · KU · Correction · Pilot Fix · Operational Finding

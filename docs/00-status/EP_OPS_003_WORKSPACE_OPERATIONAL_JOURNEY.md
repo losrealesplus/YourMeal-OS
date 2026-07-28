@@ -7,9 +7,33 @@
 `(RBAC-001 · WEP-001 · LP-001)` — PR #88 · [WORKSPACE_ENTRY_POLICY](../10-validation/WORKSPACE_ENTRY_POLICY.md)  
 
 ```text
-Identity → Surface → Workspace     ← CERTIFIED (EP-OPS-002)
-Workspace → Operational Journey → Operational Outcome   ← ESTE EPIC
+Identity
+    ↓
+Surface
+    ↓
+Workspace                    ← Entry CERTIFIED (EP-OPS-002)
+    ↓
+Operational Journey          ← ESTE EPIC (EP-OPS-003)
+    ↓
+Operational Outcome
+    ↓
+Cross-Department Flow        ← Bloque G (después)
+    ↓
+Operational Readiness
 ```
+
+---
+
+## Cadena metodológica
+
+| Nivel | Epic / bloque | Qué certifica |
+|-------|---------------|---------------|
+| **Entry** | EP-OPS-002 | El usuario entra donde corresponde |
+| **Journey** | **EP-OPS-003** | El usuario completa su trabajo **dentro** del Workspace |
+| **Flow** | RI-001 Bloque G | Los departamentos colaboran / se traspasan información |
+| **Readiness** | ORR / CG-RI-001 | La empresa opera como sistema |
+
+Entry ≠ Journey ≠ Flow. No mezclar gaps de navegación con gaps operacionales ni con handoffs.
 
 ---
 
@@ -18,7 +42,7 @@ Workspace → Operational Journey → Operational Outcome   ← ESTE EPIC
 La arquitectura de entrada está certificada. Todo usuario autenticado llega de forma determinista a su Surface y Workspace.
 
 **Este epic no certifica el acceso.**  
-**Certifica la operación.**
+**Certifica la operación interna de cada Workspace.**
 
 Pregunta maestra por workspace:
 
@@ -28,55 +52,64 @@ Pregunta maestra por workspace:
 
 ## Objetivo
 
-Validar que cada Workspace soporta el trabajo operativo para el que fue diseñado.
+Validar que cada Workspace soporta el trabajo operativo para el que fue diseñado — siguiendo la **cadena natural de valor** del meal prep.
+
+---
+
+## Orden de certificación (cadena de valor)
 
 ```text
-Antes (certificado)          Ahora (este epic)
-─────────────────            ─────────────────
-Surface                      Workspace
-  ↓                            ↓
-Workspace                    Operational Journey
-                               ↓
-                             Operational Outcome
+Kitchen → Delivery → Support → Accounting
 ```
+
+| # | Workspace | Por qué este orden | Outcome esperado |
+|---|-----------|--------------------|------------------|
+| 1 | **Kitchen** | Origen de la operación | **Production Ready** |
+| 2 | **Delivery** | Depende de producción certificada | **Orders Delivered** |
+| 3 | **Support** | Valor cuando hay pedidos entregados | **Issues Resolved** |
+| 4 | **Accounting** | Economía depende de la operación previa | **Financial Records Complete** |
+
+No certificar Delivery si Kitchen no está certificado.  
+No certificar Support sin base de pedidos/entregas.  
+Accounting es el último: sin operación previa no hay registros financieros reales (P13 · No Artificiality).
 
 ---
 
 ## Workspaces en alcance
 
-| Workspace | Landing | Gate | Estado |
-|-----------|---------|:----:|--------|
-| Kitchen | `/admin/kitchen` | — | NOT STARTED |
-| Delivery | `/admin/delivery` | — | NOT STARTED |
-| Support | `/admin/support` | — | NOT STARTED |
-| Accounting | `/admin/accounting` | — | NOT STARTED |
+| Workspace | Landing | Outcome | Gate | Estado |
+|-----------|---------|---------|:----:|--------|
+| Kitchen | `/admin/kitchen` | Production Ready | — | NOT STARTED |
+| Delivery | `/admin/delivery` | Orders Delivered | — | NOT STARTED |
+| Support | `/admin/support` | Issues Resolved | — | NOT STARTED |
+| Accounting | `/admin/accounting` | Financial Records Complete | — | NOT STARTED |
 
-Operations Center (`/admin`) no es un departamento de ejecución: se valida solo como hub de Company Admin / Ops Manager (fuera del núcleo EP-OPS-003 salvo observaciones de handoff).
+Operations Center (`/admin`) = hub Company Admin / Ops Manager — fuera del núcleo EP-OPS-003 salvo observaciones de handoff.
 
 ---
 
 ## Jornadas objetivo
 
-### Kitchen
+### Kitchen → Production Ready
 
 ```text
 Recepción de producción → Lista de preparación → Producción
   → Finalización → Disponible para Delivery
 ```
 
-### Delivery
+### Delivery → Orders Delivered
 
 ```text
 Pedidos preparados → Asignación → Ruta → Entrega → Confirmación → Cierre
 ```
 
-### Support
+### Support → Issues Resolved
 
 ```text
 Recepción de incidencia → Clasificación → Seguimiento → Resolución → Cierre
 ```
 
-### Accounting
+### Accounting → Financial Records Complete
 
 ```text
 Facturación → Cobros → Conciliación → Estado financiero → Cierre
@@ -86,39 +119,47 @@ Facturación → Cobros → Conciliación → Estado financiero → Cierre
 
 ## Plantilla por Workspace (obligatoria)
 
-Para cada workspace documentar y evidenciar:
-
 | Sección | Pregunta |
 |---------|----------|
 | Objetivo operacional | ¿Qué problema resuelve? |
 | Actor principal | ¿Quién trabaja aquí? |
 | Entradas | ¿Qué recibe? |
 | Proceso | ¿Qué operaciones ejecuta? |
-| Salidas | ¿Qué produce? |
+| Salidas / Outcome | ¿Qué produce? (ver tabla Outcomes) |
 | Dependencias | ¿Qué información necesita? |
 | Restricciones | ¿Qué NO puede hacer? |
 | Casos negativos | ¿Errores / accesos no permitidos? |
 
-Artefactos por workspace (carpeta `docs/10-validation/ep-ops-003/`):
-
-- Operational Journey
-- Workspace Validation
-- Negative Cases
-- Observaciones
-- Riesgos
-- Estado / Evidence Gate
+Artefactos: [ep-ops-003/](../10-validation/ep-ops-003/README.md)
 
 ---
 
 ## Evidence Gate (por Workspace)
 
 ```text
-PASS            → recorrido completo · críticas OK · sin bloqueos · límites claros · negativos OK · evidencia reproducible
+PASS            → journey completo · críticas OK · outcome alcanzado · sin bloqueos · límites claros · negativos OK · evidencia reproducible
 OBSERVATIONS    → operable con hallazgos no bloqueantes documentados
 FAIL            → bloqueo operacional o evidencia insuficiente (P13)
 ```
 
-Un Workspace es **CERTIFIED** solo con Gate **PASS** (o PASS con OBSERVATIONS aceptadas explícitamente en el Certification Report — no por defecto).
+**CERTIFIED** solo con Gate **PASS** (OBSERVATIONS aceptadas solo vía Certification Report explícito).
+
+---
+
+## Tras los cuatro packs
+
+Cuando Kitchen · Delivery · Support · Accounting cierren Gate:
+
+```text
+Departamentos aislados CERTIFIED
+        ↓
+Empresa como sistema
+        ↓
+Bloque G · Flow Certification
+```
+
+Flow responde: ¿se transfiere la información? ¿trazabilidad del pedido? ¿bloqueos entre áreas?  
+EP-OPS-003 = funcionamiento **interno**; Bloque G = funcionamiento **transversal**.
 
 ---
 
@@ -126,43 +167,24 @@ Un Workspace es **CERTIFIED** solo con Gate **PASS** (o PASS con OBSERVATIONS ac
 
 | Permitido | Prohibido |
 |-----------|-----------|
-| Certificar jornadas existentes | Nuevas features “para pasar el gate” sin hallazgo |
-| Corregir bloqueos operacionales hallados en cert | Reabrir Auth / Identity / RBAC model |
-| Documentar Surface Gap vs Flow Gap | Sustituir Flow Certification (Bloque G) |
-| Actualizar Progress al cerrar cada workspace gate | Marcar Bloque C completo sin las 4 jornadas |
-
----
-
-## Relación con metodología
-
-| Nivel | Qué certifica | Artefacto |
-|-------|---------------|-----------|
-| Entry (hecho) | Cómo entra el usuario | EP-OPS-002 |
-| **Workspace Journey (este)** | Cómo trabaja el departamento | **EP-OPS-003** |
-| Flow (después) | Traspasos entre departamentos | FLOW_CERTIFICATION · Bloque G |
-
-Ver [ORC](../10-validation/OPERATIONAL_READINESS_CERTIFICATION.md).
-
----
-
-## Orden de ejecución sugerido
-
-1. Kitchen  
-2. Delivery  
-3. Support  
-4. Accounting  
-
-Cerrar gate por workspace antes de avanzar (P13). Handoffs anotados como Flow Gap candidatos → Bloque G.
+| Certificar jornadas existentes | Features nuevas solo “para pasar el gate” |
+| Corregir bloqueos hallados en cert | Reabrir Auth / Identity / RBAC model |
+| Anotar Flow Gap candidatos → Bloque G | Ejecutar Flow Certification aquí |
+| Actualizar Progress al cerrar cada gate | Marcar Bloque C PASS sin las 4 jornadas |
 
 ---
 
 ## Resultado al cerrar el epic
 
-Actualizar:
-
-- [RI-001 Progress](./RI001_OPERATIONAL_READINESS_BACKLOG.md) · Bloque C  
-- Operational Readiness / ORC  
+- RI-001 Progress · Bloque C  
+- ORC / Operational Readiness  
 - Evidence Gates por workspace  
-- [Certification Report](../10-validation/reports/RI001_CERTIFICATION_REPORT.md) (cuando proceda)
+- Certification Report (cuando proceda)  
+- Desbloqueo de **Bloque G · Flow**
 
-**Salida:** Bloque C jornadas = PASS → Language D / Flow G según backlog.
+```text
+EP-OPS-002 → Entry
+EP-OPS-003 → Journey
+Bloque G   → Flow
+ORR        → Operational Readiness
+```

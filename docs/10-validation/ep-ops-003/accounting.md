@@ -12,9 +12,10 @@
 
 Permitir al responsable financiero completar el ciclo de **facturación → cobros → conciliación → estado → cierre** desde el Accounting Workspace.
 
-**Pregunta de certificación:**
-
-> ¿Puede Accounting cerrar el ciclo financiero operativo del alcance piloto sin salir de su Workspace?
+**Outcome certificado:** `Financial Records Complete`  
+**Prerrequisito de orden:** último en la cadena (Kitchen → Delivery → Support → Accounting).  
+**Pregunta:** ¿Puede Accounting cerrar el ciclo financiero operativo del alcance piloto sin salir de su Workspace?  
+**No Artificiality:** sin operación previa real no hay PASS.
 
 ---
 
@@ -64,6 +65,8 @@ Cierre
 - Facturas / estados de cobro
 - Conciliación documentada
 - Cierre de periodo (o evidencia de limitación honesta)
+
+**Outcome:** **Financial Records Complete** — Gate PASS solo si este outcome es demostrable sin datos fingidos.
 
 ---
 

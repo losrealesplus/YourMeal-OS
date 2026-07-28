@@ -12,9 +12,8 @@
 
 Permitir al equipo de cocina recibir la demanda de producción, preparar, ejecutar y finalizar lotes, dejando el resultado **disponible para Delivery** sin salir del Kitchen Workspace.
 
-**Pregunta de certificación:**
-
-> ¿Puede un cocinero preparar toda la producción (del alcance piloto) sin salir de su Workspace?
+**Outcome certificado:** `Production Ready`  
+**Pregunta:** ¿Puede un cocinero completar la producción del alcance piloto sin salir de su Workspace?
 
 ---
 
@@ -64,6 +63,8 @@ Disponible para Delivery
 - Lotes / producción finalizada
 - Señal o estado consumible por Delivery
 - Registro operacional de la jornada
+
+**Outcome:** **Production Ready** — Gate PASS solo si este outcome es demostrable con evidencia.
 
 ---
 

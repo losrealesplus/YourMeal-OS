@@ -12,9 +12,9 @@
 
 Permitir al equipo de reparto tomar pedidos preparados, asignar, ejecutar ruta, confirmar entregas y cerrar la jornada **dentro del Delivery Workspace**.
 
-**Pregunta de certificación:**
-
-> ¿Puede el equipo de Delivery completar una ruta de extremo a extremo desde su Workspace?
+**Outcome certificado:** `Orders Delivered`  
+**Prerrequisito de orden:** Kitchen Gate PASS|OBSERVATIONS (cadena de valor).  
+**Pregunta:** ¿Puede el equipo de Delivery completar una ruta de extremo a extremo desde su Workspace?
 
 ---
 
@@ -68,6 +68,8 @@ Cierre
 - Rutas cerradas
 - Entregas confirmadas / incidencias de entrega
 - Estado consumible por Support / Accounting (si aplica)
+
+**Outcome:** **Orders Delivered** — Gate PASS solo si este outcome es demostrable con evidencia.
 
 ---
 
