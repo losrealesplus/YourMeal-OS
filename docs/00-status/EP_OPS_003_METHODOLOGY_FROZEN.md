@@ -28,8 +28,8 @@ Bloque G Flow              NOT STARTED (elegible)
 | Nivel | Estado |
 |-------|--------|
 | **Entry** | ✅ Certificado (EP-OPS-002) |
-| **Journey** | ✅ Metodología fijada · 1ª validación CLOSED · **4/4 CERTIFIED** |
-| **Flow** | ⏳ Pendiente (Bloque G) |
+| **Journey** | ✅ **COMPLETE** · 4/4 CERTIFIED · [acta](./EP_OPS_003_JOURNEYS_COMPLETE.md) |
+| **Flow** | ⏳ Elegible · **NOT STARTED** (Bloque G) |
 
 ---
 
@@ -118,9 +118,9 @@ Demostrar validez mediante evidencia de campo
 P11 · P12 · P13
 ```
 
-**Siguiente acción operativa:** EP-OPS-003 Journeys **COMPLETE**.  
-Bloque G · Flow Certification está **elegible** (4/4 CERTIFIED) y **NOT STARTED** — no abrir en este Correction.  
-Kitchen · Delivery · Support · Accounting permanecen CERTIFIED.
+**Siguiente acción operativa:** EP-OPS-003 (Journeys) **COMPLETE** — [acta](./EP_OPS_003_JOURNEYS_COMPLETE.md).  
+Bloque G · Flow está **elegible** y **NOT STARTED**. Framing: handoffs, no pantallas — [BLOCK_G_FLOW_FRAMING](../10-validation/ep-ops-003/BLOCK_G_FLOW_FRAMING.md).  
+Apertura de G = decisión explícita. No automática.
 
 ---
 

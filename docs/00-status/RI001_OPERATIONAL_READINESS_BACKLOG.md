@@ -225,10 +225,11 @@ Gate: — → PASS solo cuando las superficies del alcance = CERTIFIED
 **Evidencia:** [docs/10-validation/ep-ops-003/](../10-validation/ep-ops-003/README.md)  
 **Prerrequisito:** Entry CERTIFIED (EP-OPS-002 · RBAC-001 · WEP-001 · LP-001)
 
-> Primera validación CLOSED. Ejecución Journey **4/4 CERTIFIED · EP-OPS-003 Complete**. Bloque G elegible · **NOT STARTED**.
+> **EP-OPS-003 (Journeys) COMPLETE** — [acta](./EP_OPS_003_JOURNEYS_COMPLETE.md). Framework Frozen · 1ª validación Cerrada. Bloque G elegible · **NOT STARTED**.
 
 Pregunta Entry (cerrada en EP-OPS-002): *¿Aterriza en su Workspace?*  
-Pregunta Journey (este bloque): *¿Puede este departamento terminar su jornada solo con YourMeal OS en su Workspace?*
+Pregunta Journey (cerrada): *¿Puede este departamento terminar su jornada solo con YourMeal OS en su Workspace?*  
+Pregunta Flow (Bloque G · no iniciada): *¿Puede la empresa operar de extremo a extremo?*
 
 | Workspace | Entry | Outcome | Journey Gate | Estado |
 |-----------|:-----:|---------|:------------:|--------|
@@ -323,7 +324,21 @@ Gate: — → PASS → puede comenzar G
 
 ## Bloque G · Flow Certification
 
-Plantilla: [FLOW_CERTIFICATION](../10-validation/FLOW_CERTIFICATION.md).
+**Estado:** ⏳ **NOT STARTED** · elegible tras [EP-OPS-003 Journeys COMPLETE](./EP_OPS_003_JOURNEYS_COMPLETE.md)  
+**Framing (sin ejecución):** [BLOCK_G_FLOW_FRAMING](../10-validation/ep-ops-003/BLOCK_G_FLOW_FRAMING.md)  
+**Plantilla:** [FLOW_CERTIFICATION](../10-validation/FLOW_CERTIFICATION.md)
+
+> Pregunta de nivel: *¿Puede la empresa operar de extremo a extremo?*  
+> Certifica **handoffs** (Outcome → Next Outcome), no departamentos ya CERTIFIED.
+
+Handoffs a certificar:
+
+| From | To | Artefacto |
+|------|----|-----------|
+| Kitchen | Delivery | Production Ready |
+| Delivery | Support | Orders Delivered |
+| Support | Accounting | Issues Resolved / eventos financieros |
+| Accounting | Cierre operativo | Financial Records Complete |
 
 ### Evidence Gate · G
 
@@ -333,8 +348,10 @@ Evidence
   □ Flujo B Personalizado
   □ Flujo C Incidencia
   □ Handovers críticos sin Flow Gap P0/P1
+  □ Framing handoffs aplicado (no pantallas-first)
 
 Gate: — → PASS → puede comenzar H
+Status: NOT STARTED (apertura explícita requerida)
 ```
 
 ---

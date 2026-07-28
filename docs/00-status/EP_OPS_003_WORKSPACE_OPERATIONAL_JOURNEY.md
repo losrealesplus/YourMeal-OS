@@ -1,17 +1,17 @@
 # EP-OPS-003 · Workspace Operational Journey Certification
 
-**Estado ejecución:** ✅ **EP-OPS-003 Journeys COMPLETE** · 4/4 CERTIFIED · Bloque G **NOT STARTED**  
-**Acta 1ª validación:** [EP_OPS_003_FIRST_VALIDATION_CLOSED](./EP_OPS_003_FIRST_VALIDATION_CLOSED.md) · 2026-07-28  
+**Estado ejecución:** ✅ **JOURNEYS COMPLETE** · 4/4 CERTIFIED · Bloque G **NOT STARTED**  
+**Acta Journeys:** [EP_OPS_003_JOURNEYS_COMPLETE](./EP_OPS_003_JOURNEYS_COMPLETE.md) · 2026-07-28  
+**Acta 1ª validación:** [EP_OPS_003_FIRST_VALIDATION_CLOSED](./EP_OPS_003_FIRST_VALIDATION_CLOSED.md)  
 **Metodología:** ✅ **FROZEN** — [acta](./EP_OPS_003_METHODOLOGY_FROZEN.md) · 2026-07-28  
 **Fecha apertura:** 2026-07-28  
-**Programa:** RI-001 · Bloque C (jornadas) · **ejecución Journey cerrada**  
+**Programa:** RI-001 · Bloque C (jornadas) · **funcionalmente completado**  
 **Prerrequisito:** EP-OPS-002 · Entry architecture **CERTIFIED**  
 `(RBAC-001 · WEP-001 · LP-001)` — PR #88 · [WORKSPACE_ENTRY_POLICY](../10-validation/WORKSPACE_ENTRY_POLICY.md)  
 
-> **EP-OPS-003 Complete (journeys):** Kitchen · Delivery · Support · Accounting CERTIFIED.  
-> Accounting: FAIL → Correction P0 (Pending→Review→Processed→Closed) → Re-Certification.  
-> **Bloque G NOT STARTED** — elegible, no abierto en este Correction.  
-> **Methodology Frozen.**  
+> **EP-OPS-003 (Journeys) COMPLETE.** Framework Frozen · 1ª validación Cerrada · 4/4 CERTIFIED.  
+> **Bloque G:** elegible · **no iniciado** — framing: [BLOCK_G_FLOW_FRAMING](../10-validation/ep-ops-003/BLOCK_G_FLOW_FRAMING.md).  
+> Pregunta Journey cerrada. Pregunta Flow (empresa E2E) pendiente de apertura explícita.  
 
 ```text
 Identity

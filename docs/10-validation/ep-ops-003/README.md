@@ -1,12 +1,12 @@
 # EP-OPS-003 · Evidence Index
 
 **Epic:** [EP_OPS_003](../../00-status/EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md)  
-**Metodología:** ✅ **FROZEN**  
+**Framework:** ✅ **FROZEN**  
 **1ª validación:** ✅ **CLOSED**  
-**Journey execution:** ✅ **4/4 CERTIFIED** · **EP-OPS-003 Complete** (journeys)  
-**Bloque G:** ⏳ **NOT STARTED** (elegible · no abierto)
+**Journeys:** ✅ **COMPLETE** — [acta](../../00-status/EP_OPS_003_JOURNEYS_COMPLETE.md)  
+**Bloque G:** ⏳ Elegible · **NOT STARTED** — [framing](./BLOCK_G_FLOW_FRAMING.md)
 
-### Continuidad Outcome → Input
+### Continuidad Outcome → Input (demostrada)
 
 ```text
 Kitchen     Production Ready             ✅ CERTIFIED
@@ -30,9 +30,10 @@ Accounting  Financial Records Complete   ✅ CERTIFIED
 | 4 | [Accounting](./accounting.md) | Financial Records Complete | OBSERVATIONS | ✅ CERTIFIED |
 
 ```text
-Journeys CERTIFIED  4/4
-EP-OPS-003 (journeys)  COMPLETE
-Bloque G (Flow)        NOT STARTED
+EP-OPS-003 Framework           FROZEN
+EP-OPS-003 Primera validación  CLOSED
+EP-OPS-003 Journeys            COMPLETE (4/4)
+Bloque G (Flow)                NOT STARTED
 ```
 
-**Criterio:** Bloque G solo cuando Kitchen+Delivery+Support+Accounting = CERTIFIED — **cumplido**. Apertura de Flow = decisión separada (no en este Correction).
+**Nivel siguiente:** no “¿cada Workspace cumple?” sino **¿puede la empresa operar E2E?** — vía handoffs ([framing G](./BLOCK_G_FLOW_FRAMING.md)).

@@ -6,8 +6,9 @@
 **Metodología:** [FROZEN](./EP_OPS_003_METHODOLOGY_FROZEN.md) · **probada** en primer ciclo (sin cambio de marco)  
 **Programa:** RI-001 · Bloque C  
 
-> Este acta **no** cierra EP-OPS-003 como epic completo (Accounting pendiente de Correction).  
-> Cierra la **primera validación completa del proceso metodológico**: las cuatro pasadas se ejecutaron y el marco se comportó como estaba diseñado.
+> Este acta cierra la **primera validación metodológica** (cuatro pasadas ejecutadas; marco demostrado).  
+> La ejecución Journey quedó después **COMPLETE** — ver [EP_OPS_003_JOURNEYS_COMPLETE](./EP_OPS_003_JOURNEYS_COMPLETE.md).  
+> Bloque G permanece elegible · NOT STARTED.
 
 ---
 
@@ -15,11 +16,10 @@
 
 | Elemento | Estado (al cierre 1ª validación) | Estado actual |
 |----------|----------------------------------|---------------|
-| **EP-OPS-003 (metodología)** | ✅ Frozen | ✅ Frozen |
-| **Primera validación metodológica** | ✅ Cerrada (PR #89) | ✅ Cerrada |
-| **EP-OPS-003 (ejecución Journey)** | 🔄 Abierto (Accounting FAIL) | ✅ **COMPLETE** (4/4 CERTIFIED) |
-| **Accounting Journey** | ❌ Correction pendiente | ✅ CERTIFIED · OBSERVATIONS |
-| **Bloque G (Flow)** | ⏳ Pendiente | ⏳ **NOT STARTED** (elegible) |
+| **EP-OPS-003 (Framework)** | ✅ Frozen | ✅ Frozen |
+| **EP-OPS-003 (Primera validación)** | ✅ Cerrada (PR #89) | ✅ Cerrada |
+| **EP-OPS-003 (Journeys)** | 🔄 Abierto (Accounting FAIL) | ✅ **Complete (4/4 CERTIFIED)** |
+| **Bloque G (Flow)** | ⏳ Pendiente | ⏳ Elegible · **No iniciado** |
 
 Eso mantiene separación limpia entre el **marco** y su **aplicación**.
 
