@@ -1,23 +1,25 @@
-# Support Journey · SJ-01 → SJ-05
+# Support Journey · SJ-01 → SJ-05 (Re-Certification)
 
-**Epic:** EP-OPS-003 · Support Journey Certification  
+**Epic:** EP-OPS-003 · Support Correction + Re-Certification  
 **Metodología:** FROZEN  
 **Workspace:** `/admin/support`  
-**Actor:** `support` (caps `support.read` / `support.write`)  
-**Input (continuidad):** **Orders Delivered** (Delivery CERTIFIED · OBSERVATIONS)  
-**Outcome esperado:** **Issues Resolved**  
-**Fecha pasada:** 2026-07-28  
-**Gate:** **FAIL**  
+**Actor:** `support`  
+**Input:** **Orders Delivered** (Delivery CERTIFIED)  
+**Outcome:** **Issues Resolved**  
+**Pasada FAIL:** 2026-07-28 · **Re-Certification:** 2026-07-28  
+**Gate:** **OBSERVATIONS** · **Status:** **CERTIFIED**  
 
 ```text
-Delivery Outcome: Orders Delivered
+FAIL (no lifecycle)
         ↓
-SJ-01 … SJ-05
+Correction: open → resolved → closed
         ↓
-Outcome Issues Resolved  ✗  no alcanzable en código actual
+Re-Certification
+        ↓
+Issues Resolved ✅
 ```
 
-**Estabilidad upstream:** Kitchen y Delivery **permanecen CERTIFIED**. Este FAIL es del Journey Support — no reabre Delivery salvo evidencia de Outcome falso (no hallada).
+Upstream Kitchen + Delivery **permanecen CERTIFIED** (regla de estabilidad).
 
 ---
 
@@ -25,55 +27,44 @@ Outcome Issues Resolved  ✗  no alcanzable en código actual
 
 | Check | Resultado |
 |-------|:---------:|
-| Ve historial de pedidos incl. `delivered` | ✅ `getCustomerOrders` |
-| Puede abrir nota/incidencia sobre cliente con entregas | ✅ `addSupportNote` |
-| No re-certifica Delivery/Kitchen | ✅ |
+| Ve pedidos `delivered` | ✅ |
+| Abre incidencia sobre cliente entregado | ✅ |
+| No reabre Delivery | ✅ |
 
 ---
 
-## SJ-01 · Recepción
+## SJ stages post-corrección
 
-| Check | Resultado | Evidencia |
+| Stage | Resultado | Evidencia |
 |-------|:---------:|-----------|
-| Localizar cliente / caso | ✅ | `/admin/support` · búsqueda · filtros · `?customerId=` |
-| Ver pedidos relacionados | ✅ | Ficha + lista de pedidos |
+| SJ-01 Recepción | ✅ | Directory + ficha + pedidos |
+| SJ-02 Clasificación | ⚠ | `kind` tipificado · sin prioridad (OBS) |
+| SJ-03 Seguimiento | ✅ | Notas + status visible |
+| SJ-04 Resolución | ✅ | `transitionSupportNote` → `resolved` · UI Resolver |
+| SJ-05 Cierre | ✅ | → `closed` · KPI `openIncidents` solo `status=open` |
+
+**Outcome:**
+
+```text
+Issues Resolved = issue kind (incident|complaint) alcanza status closed
+                  (vía resolved → closed o open → closed)
+```
 
 ---
 
-## SJ-02 · Clasificación
+## Recorrido E2E
 
-| Check | Resultado | Evidencia |
-|-------|:---------:|-----------|
-| Tipificar nota | ⚠ | `kind`: note · incident · complaint · request · allergy_update |
-| Prioridad / severidad | ✗ | No existe |
+```text
+Input: Orders Delivered
+  → /admin/support
+  → localizar cliente con pedido delivered
+  → crear incident/complaint (open)
+  → Resolver → Cerrar
+Outcome: Issues Resolved
+```
 
----
-
-## SJ-03 · Seguimiento
-
-| Check | Resultado | Evidencia |
-|-------|:---------:|-----------|
-| Notas append-only | ✅ | `support_notes` |
-| Estados de caso | ✗ | Sin state machine |
-| Vínculo nota ↔ pedido | ✗ | Sin `order_id` |
-
----
-
-## SJ-04 · Resolución
-
-| Check | Resultado | Evidencia |
-|-------|:---------:|-----------|
-| Acción resolutiva estructurada | ✗ | Solo texto libre · sin resolve API |
-
----
-
-## SJ-05 · Cierre → Issues Resolved
-
-| Check | Resultado | Evidencia |
-|-------|:---------:|-----------|
-| Cerrar / archivar incidencia | ✗ | No close/archive |
-| KPI “incidencias abiertas” decrece | ✗ | Cuenta todos incident/complaint forever |
-| Outcome demostrable | ✗ | **Bloquea CERTIFIED** |
+Migración: `20260728200000_support_note_lifecycle.sql`  
+Dominio: `canTransitionSupportNote` · tests PASS  
 
 ---
 
@@ -81,6 +72,6 @@ Outcome Issues Resolved  ✗  no alcanzable en código actual
 
 > ¿Puede un agente, partiendo de Orders Delivered, gestionar una incidencia completa sin abandonar su Workspace?
 
-**Hasta seguimiento: parcial. Hasta Issues Resolved: NO.**
+**Sí** (actor `support`) — con observaciones menores.
 
-**Gate: FAIL** · **Status: NOT CERTIFIED** · Outcome no alcanzado.
+**Gate:** OBSERVATIONS · **CERTIFIED** · Outcome **Issues Resolved**

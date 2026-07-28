@@ -1,6 +1,6 @@
 # EP-OPS-003 · Workspace Operational Journey Certification
 
-**Estado ejecución:** IN PROGRESS · Kitchen+Delivery CERTIFIED · Support **FAIL** · Correction NEXT  
+**Estado ejecución:** IN PROGRESS · Kitchen+Delivery+Support CERTIFIED · Accounting NEXT  
 **Metodología:** ✅ **FROZEN** — [acta](./EP_OPS_003_METHODOLOGY_FROZEN.md) · 2026-07-28  
 **Fecha apertura:** 2026-07-28  
 **Programa:** RI-001 · Bloque C (jornadas)  
@@ -147,7 +147,7 @@ Kitchen → Delivery → Support → Accounting
 |-----------|---------|---------|:----:|--------|
 | Kitchen | `/admin/kitchen` | Production Ready | **OBSERVATIONS** | ✅ **CERTIFIED** |
 | Delivery | `/admin/delivery` | Orders Delivered | **OBSERVATIONS** | ✅ **CERTIFIED** |
-| Support | `/admin/support` | Issues Resolved | **FAIL** | **NOT CERTIFIED** |
+| Support | `/admin/support` | Issues Resolved | **OBSERVATIONS** | ✅ **CERTIFIED** |
 | Accounting | `/admin/accounting` | Financial Records Complete | — | NOT STARTED |
 
 ### Progress global
@@ -159,16 +159,16 @@ Kitchen             CERTIFIED · OBSERVATIONS · Production Ready
         ↓
 Delivery            CERTIFIED · OBSERVATIONS · Orders Delivered
         ↓
-Support             FAIL · Issues Resolved no alcanzable  ← Correction
+Support             CERTIFIED · OBSERVATIONS · Issues Resolved
         ↓
-Accounting          Pendiente
+Accounting          Pendiente ← NEXT
         ↓
 Bloque G            Flow Certification
 ```
 
 Evidencia: [kitchen/](../10-validation/ep-ops-003/kitchen/) · [delivery/](../10-validation/ep-ops-003/delivery/) · [support/](../10-validation/ep-ops-003/support/)
 
-**Regla:** FAIL Support no reabre Kitchen/Delivery.
+**Regla de estabilidad:** un Journey FAIL no invalida Journeys previamente CERTIFIED (solo reopen con evidencia de Outcome upstream falso).
 ---
 
 ## Jornadas objetivo
@@ -186,12 +186,12 @@ Input: Production Ready
 DJ-01…DJ-06  ·  Outcome: Orders Delivered
 ```
 
-### Support → Issues Resolved ✗ FAIL
+### Support → Issues Resolved ✅ CERTIFIED
 
 ```text
 Input: Orders Delivered ✅
-SJ-01…SJ-03 parcial · SJ-04/05 ausentes
-Outcome Issues Resolved: NOT DEMONSTRABLE
+FAIL (no lifecycle) → Correction open→resolved→closed → Re-Certification
+SJ-01…SJ-05  ·  Outcome: Issues Resolved · Gate OBSERVATIONS
 ```
 
 ### Accounting → Financial Records Complete
@@ -199,7 +199,7 @@ Outcome Issues Resolved: NOT DEMONSTRABLE
 ```text
 Input: Completed Orders · Resolved Incidents · Billing Events
   ·  Outcome: Financial Records Complete
-  ·  Bloqueado en práctica hasta Support Correction (continuidad)
+  ·  NEXT (continuidad Issues Resolved disponible)
 ```
 
 ---

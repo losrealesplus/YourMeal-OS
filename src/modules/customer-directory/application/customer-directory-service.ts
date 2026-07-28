@@ -12,6 +12,7 @@ import type {
   SupportNoteRecord,
   SupportStats,
 } from "../domain/customer-directory";
+import { canTransitionSupportNote } from "../domain/customer-directory";
 
 function assertTenant(ctx: ServiceContext): void {
   if (!ctx.tenantId || !ctx.userId) {
@@ -183,6 +184,37 @@ export const CustomerDirectoryService = {
       },
     });
     return note;
+  },
+
+  async transitionSupportNote(
+    ctx: ServiceContext,
+    noteId: string,
+    toStatus: SupportNoteRecord["status"],
+  ): Promise<SupportNoteRecord> {
+    assertTenant(ctx);
+    assertCanWriteSupport(ctx);
+    const repo = createCustomerDirectoryRepository(ctx.supabase, ctx.tenantId);
+    const current = await repo.getSupportNote(noteId);
+    if (!current) {
+      throw new DomainError("NOT_FOUND", `Support note ${noteId}`);
+    }
+    if (!canTransitionSupportNote(current.status, toStatus)) {
+      throw new DomainError(
+        "INVALID_STATE",
+        `Cannot transition support note from ${current.status} to ${toStatus}`,
+      );
+    }
+    const updated = await repo.transitionSupportNote(noteId, toStatus, {
+      preserveResolvedAt: current.resolvedAt,
+    });
+    await AuditService.write(ctx, {
+      entityType: "support_note",
+      entityId: noteId,
+      action: "status_change",
+      oldData: { status: current.status },
+      newData: { status: toStatus },
+    });
+    return updated;
   },
 
   async archiveCustomer(

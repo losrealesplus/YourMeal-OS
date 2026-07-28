@@ -4,10 +4,10 @@
 **Landing:** `/admin/support`  
 **Epic:** EP-OPS-003  
 **Metodología:** FROZEN  
-**Estado:** **NOT CERTIFIED**  
-**Gate:** **FAIL**  
+**Estado:** ✅ **CERTIFIED**  
+**Gate:** **OBSERVATIONS**  
 **Input:** **Orders Delivered** (Delivery) · continuidad OK  
-**Outcome:** **Issues Resolved** · **no alcanzado**  
+**Outcome:** **Issues Resolved** · alcanzado (tras Correction + Re-Certification)  
 **Fecha:** 2026-07-28  
 
 **Pack:** [support/](./support/)
@@ -28,10 +28,12 @@ Orders Delivered (Delivery CERTIFIED)
         ↓  Input OK
 Support Journey
         ↓
-Issues Resolved  ✗  Gate FAIL
+FAIL (no lifecycle) → Correction → Re-Certification
+        ↓
+Issues Resolved  ✅  Gate OBSERVATIONS · CERTIFIED
 ```
 
-Upstream Kitchen + Delivery **no se reabren**.
+Upstream Kitchen + Delivery **no se reabren** (regla de estabilidad).
 
 ---
 
@@ -39,16 +41,17 @@ Upstream Kitchen + Delivery **no se reabren**.
 
 > ¿Puede un agente, partiendo de Orders Delivered, gestionar una incidencia completa sin abandonar su Workspace?
 
-**No** (falta resolución/cierre demostrable).
+**Sí** (actor `support`) — con observaciones residuales no bloqueantes.
 
 ---
 
 ## Evidence Gate · Support
 
 ```text
-STATUS: NOT CERTIFIED
-Gate: FAIL
-Outcome: Issues Resolved — NOT DEMONSTRABLE
+STATUS: CERTIFIED (with OBSERVATIONS)
+Gate: OBSERVATIONS
+Outcome: Issues Resolved
+Prior Gate: FAIL (lifecycle missing) — corrected
 ```
 
-**Siguiente:** Corrección P0 Support (lifecycle) → Re-certification · Accounting permanece bloqueado por continuidad (Input Issues Resolved / billing events incompletos hasta entonces).
+**Siguiente:** Accounting Journey · Outcome Financial Records Complete.

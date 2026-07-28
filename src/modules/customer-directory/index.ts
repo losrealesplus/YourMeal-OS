@@ -4,6 +4,7 @@ export type {
   IndividualCustomerRecord,
   CompanyDirectoryRecord,
   SupportNoteRecord,
+  SupportNoteStatus,
   CustomerOrderSummary,
   IndividualCustomerFilters,
   CompanyDirectoryFilters,
@@ -15,7 +16,10 @@ export {
   ACTIVE_WITHIN_DAYS,
   NEW_WITHIN_DAYS,
   RECURRING_MIN_ORDERS,
+  SUPPORT_ISSUE_KINDS,
   deriveCustomerStatus,
+  nextSupportNoteStatuses,
+  canTransitionSupportNote,
 } from "./domain/customer-directory";
 export {
   PLANNED_COMMUNICATION_CHANNELS,

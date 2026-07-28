@@ -11,7 +11,7 @@
 
 La **metodología** de Journeys (conceptos, gates, continuidad Outcome→Input, orden de pasadas).
 
-La **ejecución** de las pasadas restantes **no** está congelada: Delivery · Support · Accounting siguen abiertas a evidencia de campo.
+La **ejecución** de las pasadas restantes **no** está congelada: Accounting sigue abierta a evidencia de campo (Kitchen · Delivery · Support ya CERTIFIED).
 
 ```text
 Metodología EP-OPS-003     FROZEN  ← este acta
@@ -68,6 +68,16 @@ No re-certificar el Journey anterior. Consumir su Outcome como Input.
 
 ### Regla de estabilidad (FOPEBA) · no reabrir upstream
 
+```text
+Un Journey FAIL
+NO invalida
+ningún Journey previamente CERTIFIED.
+
+Solo podrá reabrirse un Journey anterior cuando exista evidencia
+reproducible de que el FAIL fue provocado por un Outcome
+previamente certificado incorrecto.
+```
+
 > **Un Journey certificado no se reabre porque el Journey siguiente consuma su Outcome.**
 
 | Caso | Acción |
@@ -86,7 +96,7 @@ Kitchen y Delivery permanecen CERTIFIED mientras Support/Accounting se ejecutan.
 
 | Permitido | Prohibido |
 |-----------|-----------|
-| Ejecutar pasadas Delivery · Support · Accounting | Nuevos conceptos metodológicos sin evidencia que los justifique |
+| Ejecutar pasada Accounting · re-certificar tras corrección | Nuevos conceptos metodológicos sin evidencia que los justifique |
 | Recopilar evidencia · cerrar Gates | Redefinir CERTIFIED / Gate / Outcomes |
 | Corregir bloqueos hallados **durante** una pasada | Ampliar alcance de EP-OPS-003 (nuevos workspaces / outcomes) |
 | Anotar Flow Gaps → Bloque G | Empezar Flow Certification antes de cerrar las 4 jornadas |
@@ -106,8 +116,8 @@ Demostrar validez mediante evidencia de campo
 P11 · P12 · P13
 ```
 
-**Siguiente acción operativa:** **Correction** Support P0 (lifecycle resolve/close) → Re-Certification · Outcome **Issues Resolved**.  
-Kitchen + Delivery permanecen CERTIFIED.
+**Siguiente acción operativa:** pasada **Accounting** · Outcome **Financial Records Complete**.  
+Kitchen · Delivery · Support permanecen CERTIFIED (regla de estabilidad).
 
 ---
 

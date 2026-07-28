@@ -40,15 +40,48 @@ export type CompanyDirectoryRecord = {
   createdAt: string;
 };
 
+export type SupportNoteStatus = "open" | "resolved" | "closed";
+
 export type SupportNoteRecord = {
   id: string;
   customerId: string;
   customerName: string | null;
   kind: "note" | "incident" | "request" | "allergy_update" | "complaint";
+  status: SupportNoteStatus;
   body: string;
   authorId: string | null;
   createdAt: string;
+  resolvedAt: string | null;
+  closedAt: string | null;
 };
+
+/** Issue kinds that participate in Issues Resolved KPI / lifecycle. */
+export const SUPPORT_ISSUE_KINDS: readonly SupportNoteRecord["kind"][] = [
+  "incident",
+  "complaint",
+];
+
+const SUPPORT_STATUS_TRANSITIONS: Record<
+  SupportNoteStatus,
+  readonly SupportNoteStatus[]
+> = {
+  open: ["resolved", "closed"],
+  resolved: ["closed"],
+  closed: [],
+};
+
+export function nextSupportNoteStatuses(
+  from: SupportNoteStatus,
+): SupportNoteStatus[] {
+  return [...(SUPPORT_STATUS_TRANSITIONS[from] ?? [])];
+}
+
+export function canTransitionSupportNote(
+  from: SupportNoteStatus,
+  to: SupportNoteStatus,
+): boolean {
+  return nextSupportNoteStatuses(from).includes(to);
+}
 
 export type CustomerOrderSummary = {
   id: string;

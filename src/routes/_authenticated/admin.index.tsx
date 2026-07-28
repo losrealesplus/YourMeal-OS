@@ -105,7 +105,9 @@ async function countClientIncidents(tenantId: string): Promise<number> {
     .from("support_notes")
     .select("id", { count: "exact", head: true })
     .eq("tenant_id", tenantId)
-    .in("kind", ["incident", "complaint"]);
+    .in("kind", ["incident", "complaint"])
+    .eq("status", "open")
+    .is("deleted_at", null);
   if (error) throw error;
   return count ?? 0;
 }

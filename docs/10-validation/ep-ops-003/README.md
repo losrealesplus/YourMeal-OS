@@ -11,12 +11,12 @@ Kitchen     Production Ready          ✅ CERTIFIED · OBSERVATIONS
     ↓
 Delivery    Orders Delivered          ✅ CERTIFIED · OBSERVATIONS
     ↓
-Support     Issues Resolved           ✗ Gate FAIL · NOT CERTIFIED
+Support     Issues Resolved           ✅ CERTIFIED · OBSERVATIONS
     ↓
-Accounting  Financial Records Complete  ⏳ bloqueado por continuidad / pendiente
+Accounting  Financial Records Complete  ⏳ NOT STARTED
 ```
 
-**Estabilidad:** FAIL de Support **no** reabre Kitchen ni Delivery.
+**Estabilidad:** FAIL/Correction de Support **no** reabrió Kitchen ni Delivery.
 
 ---
 
@@ -26,7 +26,7 @@ Accounting  Financial Records Complete  ⏳ bloqueado por continuidad / pendient
 |:-----:|-----------|-------|---------|:----:|--------|
 | 1 | [Kitchen](./kitchen.md) | Demanda | Production Ready | OBSERVATIONS | ✅ CERTIFIED |
 | 2 | [Delivery](./delivery.md) | Production Ready | Orders Delivered | OBSERVATIONS | ✅ CERTIFIED |
-| 3 | [Support](./support.md) | Orders Delivered | Issues Resolved | **FAIL** | **NOT CERTIFIED** |
+| 3 | [Support](./support.md) | Orders Delivered | Issues Resolved | OBSERVATIONS | ✅ CERTIFIED |
 | 4 | [Accounting](./accounting.md) | Completed ops | Financial Records Complete | — | NOT STARTED |
 
 ---
@@ -36,12 +36,12 @@ Accounting  Financial Records Complete  ⏳ bloqueado por continuidad / pendient
 ```text
 Kitchen      ████████████  CERTIFIED · OBSERVATIONS · Production Ready
 Delivery     ████████████  CERTIFIED · OBSERVATIONS · Orders Delivered
-Support      ░░░░░░░░░░░░  FAIL · Issues Resolved no alcanzable
+Support      ████████████  CERTIFIED · OBSERVATIONS · Issues Resolved
 Accounting   ░░░░░░░░░░░░  NOT STARTED
 
-Journeys CERTIFIED  2/4  (50% certified · Support correction required)
+Journeys CERTIFIED  3/4  (75% · Accounting NEXT)
 ```
 
 Packs: [kitchen/](./kitchen/) · [delivery/](./delivery/) · [support/](./support/)
 
-**Siguiente:** Corrección P0 Support (lifecycle resolve/close) → Re-Certification Support.
+**Siguiente:** pasada Accounting · Outcome Financial Records Complete.
