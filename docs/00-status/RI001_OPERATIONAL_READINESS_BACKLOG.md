@@ -75,7 +75,7 @@ RI-001 Progress
 
 Foundation            ░░░░░░░░░░   0%   Gate —
 Surfaces              ██░░░░░░░░  20%   Tenant IN REVIEW · Entry vía EP-OPS-002 (#88)
-Workspaces            █████░░░░░  50%   Kitchen+Delivery CERTIFIED · Support NEXT
+Workspaces            █████░░░░░  50%   Kitchen+Delivery CERTIFIED · Support FAIL
 Language              ░░░░░░░░░░   0%   Gate —
 RBAC Access           ░░░░░░░░░░   0%   Gate —
 Observability         ░░░░░░░░░░   0%   Gate —
@@ -83,14 +83,14 @@ Flows                 ░░░░░░░░░░   0%   Gate —
 Auth Transition       ░░░░░░░░░░   0%   Gate —
 Certification Report  ░░░░░░░░░░   0%   Gate —
 
-Overall (certificación)          ~10%   (Kitchen+Delivery Journeys · B pending merge #88)
+Overall (certificación)          ~10%   (2/4 Journeys CERTIFIED · Support Correction)
 ```
 
 | Bloque | Nombre | Gate | % cert. |
 |--------|--------|:----:|--------:|
 | A | Foundation | — | 0 |
 | B | Surfaces | IN REVIEW → PASS al merge EP-OPS-002 | ~20 |
-| C | Workspaces | IN REVIEW · 2/4 Journeys CERTIFIED · EP-OPS-003 | ~50 |
+| C | Workspaces | IN REVIEW · Support FAIL · EP-OPS-003 | ~50 |
 | D | Language | — | 0 |
 | E | RBAC Access | — | 0 |
 | F | Observability | — | 0 |
@@ -98,7 +98,7 @@ Overall (certificación)          ~10%   (Kitchen+Delivery Journeys · B pending
 | H | Auth Transition | — | 0 |
 | I | Certification Report | — | 0 |
 
-\* Entry CERTIFIED en EP-OPS-002; Kitchen+Delivery Journeys CERTIFIED; Support+Accounting pending.
+\* Entry CERTIFIED; Kitchen+Delivery CERTIFIED; Support FAIL (P0 lifecycle); Accounting pending.
 
 ---
 
