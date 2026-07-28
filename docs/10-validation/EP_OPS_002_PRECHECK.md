@@ -1,55 +1,66 @@
-# EP-OPS-002 · Correction Status
+# EP-OPS-002 · Surface & Workspace Certification
 
-**Fase:** Correction  
-**Estado del bloque:** **READY FOR RE-CERTIFICATION**  
-**Fecha:** 2026-07-28  
+**Estado final:** **CERTIFIED** (2026-07-28)  
+**Ciclo P13 completo:**
 
 ```text
-Discovery        ✓ COMPLETADO
-Evaluation       ✓ COMPLETADO
-Correction       ✓ COMPLETADO  ← este documento
-Re-Certification   Pendiente (pasada RI-001)
+Discovery → Evaluation → Correction → Re-Certification → CERTIFIED
 ```
 
----
-
-## Incidencias corregidas (sin re-evaluación)
-
-| ID | Corrección |
-|----|------------|
-| **RBAC-001** | Separación Tenant `/admin` vs Platform `/saas`; deny Platform → Tenant home para staff |
-| **WEP-001** | Landings directos por workspace (Support/Accounting/Kitchen/Delivery/…) |
-| **LP-001** | `homePathForRoles` prioridad + desempates deterministas |
+| ID | Estado |
+|----|--------|
+| RBAC-001 | ✅ CERTIFIED |
+| WEP-001 | ✅ CERTIFIED |
+| LP-001 | ✅ CERTIFIED |
 
 ---
 
-## Código tocado (navegación únicamente)
+## Alcance certificado (mínimo)
 
-- `src/lib/home-path.ts` (+ specs)
-- `src/lib/operations-workspaces.ts` (+ tests; workspace id `support`)
-- `src/permissions/route-guards.ts` (+ specs)
-- `src/lib/open-operations-center.spec.ts` (cobertura entry)
-
-**No modificado:** Identity · Auth · OAuth · Phone · Sessions · RLS · Bootstrap · Platform Owner · capabilities / roles nuevos.
-
----
-
-## Evidencia de corrección
-
-| Artefacto | Estado |
-|-----------|--------|
-| [RBAC_SURFACE_CERTIFICATION](./RBAC_SURFACE_CERTIFICATION.md) | READY FOR RE-CERTIFICATION |
-| [WORKSPACE_ENTRY_POLICY](./WORKSPACE_ENTRY_POLICY.md) | READY FOR RE-CERTIFICATION |
-| [LANDING_POLICY_VALIDATION](./LANDING_POLICY_VALIDATION.md) | READY FOR RE-CERTIFICATION |
-| [SURFACE_NAVIGATION_REPORT](./SURFACE_NAVIGATION_REPORT.md) | READY FOR RE-CERTIFICATION |
-| [SURFACE_MATRIX](./SURFACE_MATRIX.md) | READY FOR RE-CERTIFICATION |
+| Ítem | Resultado |
+|------|:---------:|
+| Landings Support · Accounting · Inventory | ✅ |
+| Workspace `support` consolidado | ✅ |
+| Company Admin → `/saas` denegado → `/admin` | ✅ |
+| Sin cambios Auth | ✅ |
+| Sin cambios Identity | ✅ |
+| Sin cambios modelo RBAC | ✅ |
+| Solo navegación / entry policy | ✅ |
 
 ---
 
-## Pregunta de cierre (Correction)
+## Evidencia
 
-> ¿Las incidencias previamente detectadas han sido corregidas de forma que el bloque está preparado para volver a certificarse?
+| Artefacto | Path |
+|-----------|------|
+| Surface Certification | [RBAC_SURFACE_CERTIFICATION](./RBAC_SURFACE_CERTIFICATION.md) |
+| Workspace Entry Policy | [WORKSPACE_ENTRY_POLICY](./WORKSPACE_ENTRY_POLICY.md) |
+| Landing Policy | [LANDING_POLICY_VALIDATION](./LANDING_POLICY_VALIDATION.md) |
+| Navigation Report | [SURFACE_NAVIGATION_REPORT](./SURFACE_NAVIGATION_REPORT.md) |
+| Surface Matrix | [SURFACE_MATRIX](./SURFACE_MATRIX.md) |
 
-**Sí → READY FOR RE-CERTIFICATION**
+---
 
-No PASS. No CERTIFIED. No actualización de RI-001 Progress (certificación = siguiente pasada).
+## Impacto RI-001
+
+| Bloque | Estado |
+|--------|--------|
+| **B · Surfaces** | **PASS** (Tenant + Platform entry architecture) |
+| **C · Entry** | **CERTIFIED** (cómo entra el usuario) |
+| **C · Operational Journeys** | Pendiente (cómo trabaja — siguiente foco) |
+
+### Siguiente foco (no parte de EP-OPS-002)
+
+```text
+Workspace → Operational Journey
+```
+
+Kitchen · Delivery · Support · Accounting — jornadas diarias, no solo acceso.
+
+---
+
+## Pregunta maestra (cerrada)
+
+> ¿Cuando cualquier usuario inicia sesión, entra automáticamente en la superficie correcta, el workspace correcto y el contexto operacional correcto?
+
+**Sí.** Arquitectura de entrada certificada · PR #88.

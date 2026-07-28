@@ -1,13 +1,21 @@
-# RBAC-001 · Surface Separation (Correction Evidence)
+# RBAC-001 · Surface Certification
 
-**Epic:** EP-OPS-002 · Correction  
-**Estado:** **READY FOR RE-CERTIFICATION**  
-**Fecha corrección:** 2026-07-28  
-**Alcance:** Separación de superficies · navegación · sin rediseño RBAC/Auth/Identity  
+**Epic:** EP-OPS-002  
+**Estado:** ✅ **CERTIFIED** (2026-07-28)  
+**Ciclo:** Discovery → Evaluation → Correction → Re-Certification → CERTIFIED  
+**Alcance:** Separación de superficies · navegación · no rediseño RBAC/Auth/Identity  
 
 ---
 
-## Comportamiento final
+## Pregunta de certificación
+
+> ¿Tenant Surface y Platform Surface están claramente separadas en rutas, menús, guards y responsabilidades?
+
+**Respuesta: SÍ.**
+
+---
+
+## Superficies
 
 | Surface | Raíz | Responsabilidad exclusiva |
 |---------|------|---------------------------|
@@ -16,46 +24,48 @@
 | **Customer** | `/app` | Experiencia del cliente final |
 | **Driver** | `/driver` | Operación de conductor |
 
-### Prohibiciones
+### Nunca cruzado
 
-| Surface | Nunca |
-|---------|-------|
+| Surface | Prohibido |
+|---------|-----------|
 | Tenant `/admin` | Tenants globales · licencias SaaS · Platform Owners · gestión de plataforma |
 | Platform `/saas` | Operación diaria de una empresa |
 
 ---
 
-## Correcciones aplicadas
+## Validación
 
-| Ítem | Cambio |
-|------|--------|
-| Cross-surface deny | `assertSaasRoute`: staff Tenant sin `saas.manage` → redirect `/admin` (no `/app`) |
-| Platform entry | Solo con `saas.manage`; entry discreto Tenant→Platform cuando aplica |
-| Settings hub Tenant | Se mantiene como configuración **del negocio**; Platform branding/tenants en `/saas` |
+| Aspecto | Evidencia | Resultado |
+|---------|-----------|-----------|
+| Navegación post-login | `homePathForRoles` · `resolveHomePath` · `decideOperationsCenterEntry` | PASS |
+| Menú Tenant / Platform | shells y rutas separados | PASS |
+| Guards | `assertStaffRoute` · `assertSaasRoute` | PASS |
+| Negativo Company Admin → `/saas` | redirect `/admin` | PASS |
+| Casos negativos | [SURFACE_NAVIGATION_REPORT](./SURFACE_NAVIGATION_REPORT.md) · `route-guards.spec.ts` | PASS |
 
 ---
 
-## Componentes compartidos (justificados — se mantienen)
+## Componentes compartidos (justificados)
 
 | Compartido | Justificación |
 |------------|---------------|
-| Primitivos UI (design system) | Sin lógica de dominio Platform |
+| Primitivos UI | Design system |
 | `CustomerDirectoryService` | Mismo dominio Tenant (Support + Customers) |
-| Hub `/admin/settings` | Configuración Tenant; no es superficie Platform |
-
-Sin vistas Platform reutilizando operación diaria Tenant sin justificación.
+| Hub `/admin/settings` | Configuración del negocio (Tenant); Platform en `/saas` |
 
 ---
 
-## Re-Certification Gate (siguiente pasada RI-001)
+## Evidence Gate · RBAC-001
 
 ```text
-STATUS: READY FOR RE-CERTIFICATION
+STATUS: CERTIFIED
 
-Correction evidence
-  ☑ Tenant ≠ Platform en rutas y guards
-  ☑ Shared components documentados
-  ☑ Negativos cross-surface corregidos en código
+Evidence
+  ☑ Tenant Surface ≠ Platform Surface (rutas + guards)
+  ☑ Responsabilidades documentadas
+  ☑ Componentes compartidos auditados y justificados
+  ☑ Casos negativos de cross-surface PASS
+  ☑ Sin cambios a Identity / Auth / RBAC capabilities / RLS
 
-Gate: — (no PASS · certificación en pasada RI-001)
+Gate: PASS
 ```

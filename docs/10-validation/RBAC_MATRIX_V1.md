@@ -18,7 +18,7 @@ Customer Surface   →  /app
 
 ## Landings (resumen — ver Entry Policy)
 
-| Perfil | Landing (post-corrección EP-OPS-002) | Superficie de entrada |
+| Perfil | Landing (CERTIFIED EP-OPS-002) | Superficie de entrada |
 |--------|--------------------------------------|------------------------|
 | Customer | `/app` | Customer |
 | Kitchen | `/admin/kitchen` | Tenant · Workspace |
@@ -29,7 +29,7 @@ Customer Surface   →  /app
 | SaaS Admin (puro) | `/saas` | Platform Surface |
 | SaaS Admin (híbrido Bootstrap) | `/admin` | Tenant-first |
 
-**Estado:** READY FOR RE-CERTIFICATION · [WORKSPACE_ENTRY_POLICY](./WORKSPACE_ENTRY_POLICY.md) · [SURFACE_MATRIX](./SURFACE_MATRIX.md).
+**Estado:** ✅ CERTIFIED · [WORKSPACE_ENTRY_POLICY](./WORKSPACE_ENTRY_POLICY.md) · [SURFACE_MATRIX](./SURFACE_MATRIX.md).
 
 ---
 

@@ -1,6 +1,6 @@
 # Workspace Entry Policy (WEP-001)
 
-**Estado:** **READY FOR RE-CERTIFICATION** (EP-OPS-002 · Correction)  
+**Estado:** ✅ **CERTIFIED** (EP-OPS-002 · 2026-07-28)  
 **Fuente de verdad:** [`homePathForRoles`](../../src/lib/home-path.ts) · [`resolveOperationsEntry`](../../src/lib/operations-workspaces.ts) · [`decideOperationsCenterEntry`](../../src/lib/open-operations-center.ts)
 
 ---
@@ -16,7 +16,7 @@ Workspace Entry (WEP)   →  ¿Dónde empieza a trabajar?
 
 ---
 
-## Comportamiento final (post-corrección)
+## Política certificada
 
 | Rol | Landing | Surface | Workspace |
 |-----|---------|---------|-----------|
@@ -32,37 +32,24 @@ Workspace Entry (WEP)   →  ¿Dónde empieza a trabajar?
 | Driver | `/driver` | Driver | Driver |
 | Customer | `/app` | Customer | Customer Dashboard |
 
-### Decisiones de corrección
+### Decisiones certificadas
 
-- **Kitchen canónico** = `/admin/kitchen` (execution es pantalla secundaria, no landing).
-- **Support / Accounting** ya no aterrizan en `/admin` genérico.
-- **Híbrido Platform+Tenant** = tenant-first; Platform vía entry con `saas.manage`.
-
----
-
-## Mecanismo
-
-| Entrada | Resolver |
-|---------|----------|
-| Login / OAuth / `"/"` | `resolveHomePath` → `homePathForRoles` |
-| `/auth/admin` | `resolvePostAdminLoginPath` / `enterOperationsCenter` |
-| Centro de Operaciones | `decideOperationsCenterEntry` |
-| Bootstrap / DEV panel | `homePathForRoles` |
-
-Staff con un solo workspace → entrada **directa**.  
-Admin / multi-workspace → `/admin` (Ops Center).
+- Kitchen canónico = `/admin/kitchen` (execution = pantalla secundaria).
+- Support / Accounting = landings directos (no hub genérico).
+- Híbrido Platform+Tenant = tenant-first.
 
 ---
 
-## Re-Certification Gate
+## Evidence Gate · WEP-001
 
 ```text
-STATUS: READY FOR RE-CERTIFICATION
+STATUS: CERTIFIED
 
-Correction evidence
-  ☑ Landings de departamento únicos sin hub genérico
-  ☑ Navegación determinista vía resolvers únicos
-  ☑ Tests de entry alineados
+Evidence
+  ☑ Cada rol del alcance aterriza en su Workspace
+  ☑ Sin landing genérico ambiguo para roles de departamento únicos
+  ☑ Kitchen / Support / Accounting / Delivery alineados
+  ☑ Tests: home-path · operations-workspaces · open-operations-center
 
-Gate: — (no PASS · pendiente pasada RI-001)
+Gate: PASS
 ```

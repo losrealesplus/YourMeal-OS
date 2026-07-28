@@ -1,21 +1,25 @@
 # Landing Policy Validation (LP-001)
 
-**Estado:** **READY FOR RE-CERTIFICATION** (EP-OPS-002 · Correction)  
+**Estado:** ✅ **CERTIFIED** (EP-OPS-002 · 2026-07-28)  
 **Implementación:** [`src/lib/home-path.ts`](../../src/lib/home-path.ts)  
 **Tests:** [`src/lib/home-path.spec.ts`](../../src/lib/home-path.spec.ts)
 
 ---
 
-## Comportamiento final
+## Pregunta
 
-`homePathForRoles(roles)` es determinista: mismo conjunto de roles → mismo destino (independiente del orden del array).
+> ¿`homePathForRoles(roles)` es determinista para cualquier conjunto de roles?
 
-### Prioridad (mayor → menor)
+**Respuesta: SÍ.**
+
+---
+
+## Prioridad (mayor → menor)
 
 1. Puro Platform (`saas_admin` sin staff Tenant) → `/saas`
 2. Company Admin / Operations Manager → `/admin`
 3. Staff único de departamento → workspace canónico
-4. Familia exclusiva multi-rol (solo kitchen · solo delivery · solo support · solo accounting) → workspace de esa familia
+4. Familia exclusiva multi-rol → workspace de esa familia
 5. Otro staff Tenant mezclado → `/admin`
 6. Driver → `/driver`
 7. Customer / default → `/app`
@@ -39,26 +43,21 @@
 | Caso | Destino |
 |------|---------|
 | `company_admin` o `operations_manager` + otros | `/admin` |
-| `saas_admin` + staff Tenant | Tenant-first (`/admin` o workspace vía reglas 2–4) |
-| `kitchen` + `delivery` (u otras familias mezcladas) | `/admin` |
-| `support` + `accounting` | `/admin` |
-
-### Consumidores
-
-`resolveHomePath` · Identity `homePath` · Bootstrap selector · DEV panel · `"/"` · `/auth` callback.  
-`/auth/admin` usa `decideOperationsCenterEntry` (alineado; respeta `returnTo` seguro).
+| `saas_admin` + staff Tenant | Tenant-first |
+| Familias de departamento mezcladas | `/admin` |
 
 ---
 
-## Re-Certification Gate
+## Evidence Gate · LP-001
 
 ```text
-STATUS: READY FOR RE-CERTIFICATION
+STATUS: CERTIFIED
 
-Correction evidence
-  ☑ Prioridad y desempates documentados
-  ☑ Destino único por conjunto de roles
-  ☑ Tests de reproducibilidad
+Evidence
+  ☑ Prioridad documentada
+  ☑ Desempates documentados
+  ☑ Determinismo verificado en tests
+  ☑ Platform / Company Admin / Employees / Customers cubiertos
 
-Gate: — (no PASS · pendiente pasada RI-001)
+Gate: PASS
 ```

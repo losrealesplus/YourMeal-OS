@@ -1,8 +1,7 @@
-# Surface Matrix · EP-OPS-002 (comportamiento final)
+# Surface Matrix · EP-OPS-002
 
-**Estado:** **READY FOR RE-CERTIFICATION**  
-**Fecha:** 2026-07-28  
-**Nota:** Solo comportamiento post-corrección. Certificación en pasada RI-001.
+**Estado:** ✅ Completa · **CERTIFIED** con RBAC-001 / WEP-001 / LP-001  
+**Fecha:** 2026-07-28
 
 ---
 
@@ -13,7 +12,7 @@
 | Platform Owner / puro `saas_admin` | Platform | Platform Ops | `/saas` |
 | SaaS Admin híbrido (`company_admin`+`saas_admin`) | Tenant (entry) · Platform (opcional) | Operations Center | `/admin` |
 | Company Admin | Tenant | Operations Center | `/admin` |
-| Operations (`operations_manager`) | Tenant | Operations Center | `/admin` |
+| Operations | Tenant | Operations Center | `/admin` |
 | Kitchen | Tenant | Kitchen | `/admin/kitchen` |
 | Delivery | Tenant | Delivery | `/admin/delivery` |
 | Support | Tenant | Support | `/admin/support` |
@@ -26,8 +25,8 @@
 
 | Rol | Permitido | Prohibido |
 |-----|-----------|-----------|
-| Puro SaaS Admin | `/saas/*` | Sustituir operación diaria Tenant; landing Customer |
-| Company Admin | Tenant `/admin/*` (caps admin) | `/saas` sin `saas.manage` |
+| Puro SaaS Admin | `/saas/*` | Sustituir operación diaria Tenant |
+| Company Admin | Tenant `/admin/*` | `/saas` sin `saas.manage` |
 | Kitchen | Kitchen workspace | Platform · settings admin · accounting |
 | Delivery | Delivery / logistics | Platform · kitchen write · accounting |
 | Support | Support workspace | Platform · producción write · settings admin |
@@ -36,7 +35,7 @@
 
 ---
 
-## Referencias de corrección
+## Referencias
 
 - [RBAC_SURFACE_CERTIFICATION](./RBAC_SURFACE_CERTIFICATION.md)
 - [WORKSPACE_ENTRY_POLICY](./WORKSPACE_ENTRY_POLICY.md)
