@@ -220,8 +220,11 @@ Gate: — → PASS solo cuando las superficies del alcance = CERTIFIED
 ## Bloque C · Department Workspace Certification
 
 **Vehículo activo:** [EP-OPS-003 · Workspace Operational Journey](./EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md)  
+**Metodología:** ✅ **FROZEN** — [EP_OPS_003_METHODOLOGY_FROZEN](./EP_OPS_003_METHODOLOGY_FROZEN.md)  
 **Evidencia:** [docs/10-validation/ep-ops-003/](../10-validation/ep-ops-003/README.md)  
 **Prerrequisito:** Entry CERTIFIED (EP-OPS-002 · RBAC-001 · WEP-001 · LP-001)
+
+> Tras Methodology Frozen: solo pasadas Delivery · Support · Accounting + evidencia. Sin nuevos conceptos.
 
 Pregunta Entry (cerrada en EP-OPS-002): *¿Aterriza en su Workspace?*  
 Pregunta Journey (este bloque): *¿Puede este departamento terminar su jornada solo con YourMeal OS en su Workspace?*

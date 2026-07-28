@@ -1,10 +1,14 @@
 # EP-OPS-003 · Workspace Operational Journey Certification
 
-**Estado:** IN PROGRESS · Kitchen CERTIFIED · Delivery NEXT  
+**Estado ejecución:** IN PROGRESS · Kitchen CERTIFIED · Delivery NEXT  
+**Metodología:** ✅ **FROZEN** — [acta](./EP_OPS_003_METHODOLOGY_FROZEN.md) · 2026-07-28  
 **Fecha apertura:** 2026-07-28  
 **Programa:** RI-001 · Bloque C (jornadas)  
 **Prerrequisito:** EP-OPS-002 · Entry architecture **CERTIFIED**  
 `(RBAC-001 · WEP-001 · LP-001)` — PR #88 · [WORKSPACE_ENTRY_POLICY](../10-validation/WORKSPACE_ENTRY_POLICY.md)  
+
+> **Methodology Frozen:** no nuevos conceptos. Solo ejecutar pasadas · evidencia · Gates (P11–P13).  
+> Reabrir metodología solo con aprobación explícita + evidencia que lo justifique.  
 
 ```text
 Identity

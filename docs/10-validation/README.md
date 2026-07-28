@@ -40,7 +40,7 @@ docs/10-validation/
 
 ## EP-OPS-003 · Workspace Operational Journeys
 
-[Epic](../00-status/EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md) · [Evidence index](./ep-ops-003/README.md) · Kitchen · Delivery · Support · Accounting
+[Epic](../00-status/EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md) · **[Methodology FROZEN](../00-status/EP_OPS_003_METHODOLOGY_FROZEN.md)** · [Evidence index](./ep-ops-003/README.md) · Kitchen CERTIFIED · Delivery NEXT
 
 ## Official Supabase (INFRA-002)
 

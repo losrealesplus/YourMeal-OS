@@ -24,8 +24,9 @@ DONE:                Progress 100% · Gates PASS · Report READY|RWO · evidenci
 Permitido en RI-001: ejecutar cert · fix de hallazgo de cert · reabrir gate aprobado
 Prohibido:           nuevas features / ampliar alcance bajo etiqueta RI-001
 Pregunta maestra:    ¿Qué evidencia falta para certificar que YM OS opera una empresa real?
-Siguiente:           **EP-OPS-003** · Workspace Operational Journeys (Bloque C)
-                     · Prerrequisito Entry: EP-OPS-002 (#88)
+Siguiente:           **EP-OPS-003** · ejecutar Journeys (metodología **FROZEN**)
+                     · Acta: [EP_OPS_003_METHODOLOGY_FROZEN](./EP_OPS_003_METHODOLOGY_FROZEN.md)
+                     · NEXT: Delivery · Orders Delivered (Input: Production Ready)
                      · AUTH-B solo tras flujos certificados
                      · P14 Traceability = futuro (segundo producto)
 ══════════════════════════════════════════════════
@@ -35,10 +36,10 @@ Siguiente:           **EP-OPS-003** · Workspace Operational Journeys (Bloque C)
 
 ```text
 Siguiente artefacto activo:
-  [EP-OPS-003 · Workspace Operational Journey](./EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md)
-  · Evidencia: [ep-ops-003/](../10-validation/ep-ops-003/README.md)
-  · Entry CERTIFIED (EP-OPS-002) → Journeys (este epic) → Flow G
-  · Backlog: [RI001](./RI001_OPERATIONAL_READINESS_BACKLOG.md) Bloque C
+  [EP-OPS-003 Methodology FROZEN](./EP_OPS_003_METHODOLOGY_FROZEN.md)
+  · Ejecución: [EP-OPS-003](./EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md) · [ep-ops-003/](../10-validation/ep-ops-003/README.md)
+  · Kitchen CERTIFIED · Delivery NEXT (Orders Delivered)
+  · No evolucionar metodología — solo evidencia de campo (P11–P13)
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████

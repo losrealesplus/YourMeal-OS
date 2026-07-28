@@ -1,7 +1,10 @@
 # EP-OPS-003 · Evidence Index
 
 **Epic:** [EP_OPS_003](../../00-status/EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md)  
+**Metodología:** ✅ **FROZEN** — [acta](../../00-status/EP_OPS_003_METHODOLOGY_FROZEN.md)  
 **Prerrequisito:** Entry CERTIFIED (EP-OPS-002)  
+**Modo:** ejecutar pasadas · evidencia · Gates — **no** evolucionar conceptos  
+
 **Cadena:** Entry → **Journey** → Flow (G) → Operational Readiness  
 
 ### Continuidad Outcome → Input
