@@ -17,12 +17,14 @@ Acta: IDENTITY_FREEZE_v1.md
 PROJECT STATE · RI-001 · Operational Certification
 ══════════════════════════════════════════════════
 
-Modo:                **PROGRAMA DE CERTIFICACIÓN OPERACIONAL**
+Modo:                **PROGRAMA DE CERTIFICACIÓN · FROZEN** ([acta](./RI001_PROGRAM_FROZEN.md))
 Backlog:             [RI001_OPERATIONAL_READINESS_BACKLOG](./RI001_OPERATIONAL_READINESS_BACKLOG.md)
-                     Bloques A→I · Evidence Gates · P11–P13
+                     Bloques A→I · Evidence Gates · P11–P13 · alcance cerrado
 DONE:                Progress 100% · Gates PASS · Report READY|RWO · evidencia reproducible
+Permitido en RI-001: ejecutar cert · fix de hallazgo de cert · reabrir gate aprobado
+Prohibido:           nuevas features / ampliar alcance bajo etiqueta RI-001
 Pregunta maestra:    ¿Qué evidencia falta para certificar que YM OS opera una empresa real?
-Siguiente:           Bloque A Foundation · Bloque B Surface (Pasada 2)
+Siguiente:           Ejecutar Bloque A → B (Pasada 2) dentro del alcance Frozen
                      · AUTH-B solo tras flujos certificados
                      · P14 Traceability = futuro (segundo producto)
 ══════════════════════════════════════════════════
