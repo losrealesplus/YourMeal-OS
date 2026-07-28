@@ -1119,28 +1119,40 @@ export type Database = {
         Row: {
           author_id: string | null
           body: string
+          closed_at: string | null
           created_at: string
           customer_id: string
+          deleted_at: string | null
           id: string
           kind: Database["public"]["Enums"]["support_kind"]
+          resolved_at: string | null
+          status: Database["public"]["Enums"]["support_note_status"]
           tenant_id: string
         }
         Insert: {
           author_id?: string | null
           body: string
+          closed_at?: string | null
           created_at?: string
           customer_id: string
+          deleted_at?: string | null
           id?: string
           kind?: Database["public"]["Enums"]["support_kind"]
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["support_note_status"]
           tenant_id: string
         }
         Update: {
           author_id?: string | null
           body?: string
+          closed_at?: string | null
           created_at?: string
           customer_id?: string
+          deleted_at?: string | null
           id?: string
           kind?: Database["public"]["Enums"]["support_kind"]
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["support_note_status"]
           tenant_id?: string
         }
         Relationships: [
@@ -1481,6 +1493,7 @@ export type Database = {
         | "request"
         | "allergy_update"
         | "complaint"
+      support_note_status: "open" | "resolved" | "closed"
       tenant_status: "active" | "suspended" | "trial"
     }
     CompositeTypes: {
@@ -1649,6 +1662,7 @@ export const Constants = {
         "allergy_update",
         "complaint",
       ],
+      support_note_status: ["open", "resolved", "closed"],
       tenant_status: ["active", "suspended", "trial"],
     },
   },
