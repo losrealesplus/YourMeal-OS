@@ -24,7 +24,7 @@ DONE:                Progress 100% · Gates PASS · Report READY|RWO · evidenci
 Permitido en RI-001: ejecutar cert · fix de hallazgo de cert · reabrir gate aprobado
 Prohibido:           nuevas features / ampliar alcance bajo etiqueta RI-001
 Pregunta maestra:    ¿Qué evidencia falta para certificar que YM OS opera una empresa real?
-Siguiente:           Ejecutar Bloque A → B (Pasada 2) dentro del alcance Frozen
+Siguiente:           Completar **C · Operational Journeys** (Entry ya CERTIFIED · EP-OPS-002)
                      · AUTH-B solo tras flujos certificados
                      · P14 Traceability = futuro (segundo producto)
 ══════════════════════════════════════════════════
@@ -35,8 +35,9 @@ Siguiente:           Ejecutar Bloque A → B (Pasada 2) dentro del alcance Froze
 ```text
 Siguiente artefacto activo:
   [RI001_OPERATIONAL_READINESS_BACKLOG](./RI001_OPERATIONAL_READINESS_BACKLOG.md)
-  · Bloque A Foundation · Bloque B Surfaces (Pasada 2)
-  · EP-OPS-001 subsumido en B/C · Flow G tras superficies CERTIFIED
+  · Bloque B Surfaces = PASS (EP-OPS-002)
+  · Bloque C Entry CERTIFIED · jornadas operacionales pendientes
+  · EP-OPS-001 subsumido · Flow G tras jornadas workspace
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████
@@ -44,19 +45,21 @@ Pilot Readiness (lectura)
   Modelo operacional  ██████████
   Administración      ██████████
   Customer App        █████████░
-  Operaciones         ██████░░░░  ← Surface + Workspace certification
+  Operaciones         ███████░░░  ← Entry CERTIFIED · Journeys next
   Data                ███████░░░
 
 Mapa certificación (activo):
   A Foundation              □□□□□□□□□□
-  B Surfaces                ██░░░░░░░░  Tenant IN REVIEW
-  C Department Workspaces   □□□□□□□□□□
+  B Surfaces                ██████████  CERTIFIED · PASS · EP-OPS-002
+  C Department Workspaces   ████░░░░░░  Entry CERTIFIED · Journeys pending
   D Operational Language    □□□□□□□□□□
   E RBAC & Access           □□□□□□□□□□
   F Observability Ready     □□□□□□□□□□
   G Flow Certification      □□□□□□□□□□  (plantilla lista)
   H Auth Transition         □□□□□□□□□□  AUTH-A/B
   I Certification Report    □□□□□□□□□□  CG-RI-001
+
+Siguiente foco:            Workspace → Operational Journey (Kitchen · Delivery · Support · Accounting)
 
 Patrón permanente: Operational Representation (DICT-072)
 Madurez tenant:    Tenant Operational Autonomy (DICT-073)

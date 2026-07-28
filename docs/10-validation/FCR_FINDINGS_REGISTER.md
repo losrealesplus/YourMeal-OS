@@ -56,12 +56,12 @@ Es **qué superficie** está administrando cada menú.
 
 | ID | Hallazgo | Severidad | Tema | Estado | Notas |
 |----|----------|-----------|------|--------|-------|
-| **FCR-001** | Ajustes de Tenant Surface muestran el mismo hub para quien también opera Platform — separación insuficiente Tenant vs Platform Surface | **P1** | Superficies | Pendiente | No implementar aún. Ver RBAC-001 |
+| **FCR-001** | Ajustes de Tenant Surface muestran el mismo hub para quien también opera Platform — separación insuficiente Tenant vs Platform Surface | **P1** | Superficies | ✅ **CERTIFIED** (EP-OPS-002) | Hub = Tenant business settings; Platform = `/saas`. [RBAC_SURFACE_CERTIFICATION](./RBAC_SURFACE_CERTIFICATION.md) |
 | **FCR-002** | **Render Stability Regression** (síntoma: titileo/parpadeo en Ops) | **P1** | Render stability | Investigar | Causa ≠ síntoma. Loop por dependencia inestable (`can`). Sin fix aún |
 | **FCR-003** | Superficie Ops (departamentos) validada visualmente | ✅ | Producto | Validado | Experiencia operacional coherente |
-| **FCR-004** | Workspace Entry Kitchen: esperado `/admin/kitchen-execution`; código → `/admin/kitchen` | **P2** | Workspace Entry | Pendiente | Entrar al Workspace, no al dashboard |
-| **FCR-005** | Workspace Entry Support / Accounting → hoy `/admin` | **P2** | Workspace Entry | Pendiente | Política: `/admin/support`, `/admin/accounting` |
-| **FCR-006** | SaaS Admin Bootstrap aterriza en Tenant Surface (`/admin`); política Entry → `/saas` | ⚠ | Workspace Entry | Documentado | Separar autorización Platform de landing Platform |
+| **FCR-004** | Workspace Entry Kitchen: esperado `/admin/kitchen-execution`; código → `/admin/kitchen` | **P2** | Workspace Entry | ✅ **CERTIFIED** (EP-OPS-002) | Canónico = `/admin/kitchen`; execution = pantalla secundaria |
+| **FCR-005** | Workspace Entry Support / Accounting → hoy `/admin` | **P2** | Workspace Entry | ✅ **CERTIFIED** (EP-OPS-002) | `/admin/support` · `/admin/accounting` |
+| **FCR-006** | SaaS Admin Bootstrap aterriza en Tenant Surface (`/admin`); política Entry → `/saas` | ⚠ | Workspace Entry | ✅ **CERTIFIED** (EP-OPS-002) | Puro `saas_admin` → `/saas`; híbrido → tenant-first `/admin` |
 
 ---
 

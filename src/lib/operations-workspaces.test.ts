@@ -15,7 +15,7 @@ describe("operations workspaces (presentation)", () => {
         "kitchen",
         "delivery",
         "stock",
-        "customers",
+        "support",
         "administration",
         "finance",
       ]);
@@ -28,6 +28,24 @@ describe("operations workspaces (presentation)", () => {
       kind: "direct",
       path: "/admin/kitchen",
       workspace: expect.objectContaining({ id: "kitchen" }),
+    });
+  });
+
+  it("single support role enters support workspace directly", () => {
+    const entry = resolveOperationsEntry(["support"]);
+    expect(entry).toEqual({
+      kind: "direct",
+      path: "/admin/support",
+      workspace: expect.objectContaining({ id: "support" }),
+    });
+  });
+
+  it("single accounting role enters finance workspace directly", () => {
+    const entry = resolveOperationsEntry(["accounting"]);
+    expect(entry).toEqual({
+      kind: "direct",
+      path: "/admin/accounting",
+      workspace: expect.objectContaining({ id: "finance" }),
     });
   });
 
