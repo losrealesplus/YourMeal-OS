@@ -79,10 +79,23 @@ Accounting es el último: sin operación previa no hay registros financieros rea
 
 | Workspace | Landing | Outcome | Gate | Estado |
 |-----------|---------|---------|:----:|--------|
-| Kitchen | `/admin/kitchen` | Production Ready | — | NOT STARTED |
-| Delivery | `/admin/delivery` | Orders Delivered | — | NOT STARTED |
+| Kitchen | `/admin/kitchen` | Production Ready | **OBSERVATIONS** | **CERTIFIED** |
+| Delivery | `/admin/delivery` | Orders Delivered | — | NOT STARTED · **NEXT** |
 | Support | `/admin/support` | Issues Resolved | — | NOT STARTED |
 | Accounting | `/admin/accounting` | Financial Records Complete | — | NOT STARTED |
+
+### Progress
+
+```text
+Kitchen      CERTIFIED · OBSERVATIONS · Production Ready
+Delivery     NOT STARTED  ← siguiente
+Support      NOT STARTED
+Accounting   NOT STARTED
+Journeys     1/4 (25%)
+```
+
+Evidencia Kitchen: [ep-ops-003/kitchen/](../10-validation/ep-ops-003/kitchen/)
+
 
 Operations Center (`/admin`) = hub Company Admin / Ops Manager — fuera del núcleo EP-OPS-003 salvo observaciones de handoff.
 

@@ -58,7 +58,10 @@ Ejemplo Kitchen: Recepción → Preparación → Producción → Finalización �
 
 Plantillas: [ep-ops-003/](./ep-ops-003/README.md) · Epic [EP-OPS-003](../00-status/EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md).
 
-Cuando el Gate del workspace = PASS → Workspace Journey **CERTIFIED**.
+Cuando el Gate del workspace = PASS u OBSERVATIONS (aceptadas) → Workspace Journey **CERTIFIED**.
+
+**Kitchen (2026-07-28):** CERTIFIED · Gate OBSERVATIONS · Outcome **Production Ready**  
+Evidencia: [ep-ops-003/kitchen/](./ep-ops-003/kitchen/).
 
 ### Nivel 2 · Operational Flow Certification
 

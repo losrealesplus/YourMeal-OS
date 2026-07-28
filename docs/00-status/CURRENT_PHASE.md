@@ -52,7 +52,7 @@ Pilot Readiness (lectura)
 Mapa certificación (activo):
   A Foundation              □□□□□□□□□□
   B Surfaces                ██░░░░░░░░  Entry EP-OPS-002 (#88)
-  C Department Workspaces   ██░░░░░░░░  EP-OPS-003 Journeys OPEN
+  C Department Workspaces   ███░░░░░░░  Kitchen CERTIFIED · Delivery NEXT
   D Operational Language    □□□□□□□□□□
   E RBAC & Access           □□□□□□□□□□
   F Observability Ready     □□□□□□□□□□
@@ -60,9 +60,8 @@ Mapa certificación (activo):
   H Auth Transition         □□□□□□□□□□  AUTH-A/B
   I Certification Report    □□□□□□□□□□  CG-RI-001
 
-Siguiente foco:            Workspace → Operational Journey → Outcome
-                           Kitchen (Production Ready) → Delivery → Support → Accounting
-                           luego Bloque G · Cross-Department Flow
+Siguiente foco:            Delivery Journey · Orders Delivered
+                           (Kitchen = Production Ready · Gate OBSERVATIONS)
 
 Patrón permanente: Operational Representation (DICT-072)
 Madurez tenant:    Tenant Operational Autonomy (DICT-073)

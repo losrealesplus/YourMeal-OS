@@ -3,148 +3,69 @@
 **Workspace:** Kitchen  
 **Landing:** `/admin/kitchen`  
 **Epic:** EP-OPS-003  
-**Estado:** NOT STARTED  
-**Gate:** —
+**Estado:** **CERTIFIED** (with OBSERVATIONS)  
+**Gate:** **OBSERVATIONS**  
+**Outcome:** **Production Ready**  
+**Fecha:** 2026-07-28  
+
+**Pack de evidencia:** [kitchen/](./kitchen/)
+
+| Artefacto | Path |
+|-----------|------|
+| Journey KJ-01…04 | [KITCHEN_JOURNEY.md](./kitchen/KITCHEN_JOURNEY.md) |
+| Validation / Gate | [KITCHEN_VALIDATION.md](./kitchen/KITCHEN_VALIDATION.md) |
+| Negative Cases | [KITCHEN_NEGATIVE_CASES.md](./kitchen/KITCHEN_NEGATIVE_CASES.md) |
+| Observations | [KITCHEN_OBSERVATIONS.md](./kitchen/KITCHEN_OBSERVATIONS.md) |
+
+---
+
+## Pregunta maestra
+
+> ¿Puede Kitchen completar todo su trabajo operativo y entregar una producción lista para Delivery sin abandonar su Workspace?
+
+**Sí** — actor `kitchen` · Outcome **Production Ready**.
 
 ---
 
 ## Objetivo operacional
 
-Permitir al equipo de cocina recibir la demanda de producción, preparar, ejecutar y finalizar lotes, dejando el resultado **disponible para Delivery** sin salir del Kitchen Workspace.
-
-**Outcome certificado:** `Production Ready`  
-**Pregunta:** ¿Puede un cocinero completar la producción del alcance piloto sin salir de su Workspace?
+Transformar demanda de pedidos en producción preparada para Delivery, íntegramente desde el Kitchen Workspace.
 
 ---
 
-## Actor principal
+## Actor certificado
 
-| Rol | Notas |
-|-----|-------|
-| `kitchen` / `production` | Actor de jornada |
-| `operations_manager` / `company_admin` | Supervisión (no sustituye la jornada Kitchen) |
-
----
-
-## Entradas
-
-- Órdenes / demanda de producción del periodo
-- Lista de preparación / hoja de producción
-- Estado de platos / lotes pendientes
+| Rol | Rol en Gate |
+|-----|-------------|
+| `kitchen` | **Actor de jornada CERTIFIED** |
+| `operations_manager` / `company_admin` | Supervisión (tienen `kitchen.operate`) |
+| `production` | **No** actor de este Gate (falta `kitchen.operate`) — OBS-K-03 |
 
 ---
 
-## Proceso (jornada objetivo)
+## Journey (resumen)
 
 ```text
-Recepción de producción
-        ↓
-Lista de preparación
-        ↓
-Producción
-        ↓
-Finalización
-        ↓
-Disponible para Delivery
+KJ-01 Recepción     → /admin/kitchen
+KJ-02 Preparación   → /admin/production-sheet
+KJ-03 Producción    → /admin/kitchen-execution + transiciones pedido
+KJ-04 Finalización  → prepared → ready_for_delivery  = Production Ready
 ```
-
-| Paso | Qué demostrar | Evidencia |
-|------|---------------|-----------|
-| Recepción | Ve demanda / lotes entrantes | □ |
-| Preparación | Lista accionable en workspace | □ |
-| Producción | Cambia estados / ejecuta | □ |
-| Finalización | Cierra lote / marca listo | □ |
-| Handoff | Queda disponible para Delivery | □ (anotar Flow Gap si falla traspaso) |
-
----
-
-## Salidas
-
-- Lotes / producción finalizada
-- Señal o estado consumible por Delivery
-- Registro operacional de la jornada
-
-**Outcome:** **Production Ready** — Gate PASS solo si este outcome es demostrable con evidencia.
-
----
-
-## Dependencias
-
-- Pedidos / intake ya materializados (no certifica Intake aquí)
-- Datos de menú / platos del tenant
-- Entry CERTIFIED (llega a `/admin/kitchen`)
-
----
-
-## Restricciones (qué NO puede hacer)
-
-- Gestión Platform (`/saas`)
-- Facturación / conciliación Accounting
-- Operar Delivery como home
-- Configuración admin del negocio (salvo caps explícitas)
-
----
-
-## Operational Journey (evidencia)
-
-| # | Paso | Resultado | Notas / captura |
-|---|------|-----------|-----------------|
-| 1 | Entrar Kitchen Workspace | □ | |
-| 2 | Recepción producción | □ | |
-| 3 | Lista preparación | □ | |
-| 4 | Producción | □ | |
-| 5 | Finalización | □ | |
-| 6 | Disponible Delivery | □ | |
-
----
-
-## Workspace Validation
-
-| Criterio | OK |
-|----------|:--:|
-| Recorrido operativo completo en Workspace | □ |
-| Operaciones críticas funcionan | □ |
-| Sin bloqueos operacionales P0/P1 | □ |
-| Límites del Workspace claros | □ |
-| Evidencia reproducible | □ |
-
----
-
-## Negative Cases
-
-| Caso | Esperado | Resultado |
-|------|----------|-----------|
-| Rol sin `kitchen.operate` → deep link Kitchen | Denegado / redirect | □ |
-| Intento de cerrar lote sin datos | Error claro · sin estado corrupto | □ |
-| Acceso a Accounting / SaaS desde sesión Kitchen | Bloqueado | □ |
-
----
-
-## Observaciones
-
-*(rellenar en pasada)*
-
----
-
-## Riesgos
-
-| Riesgo | Severidad | Mitigación |
-|--------|-----------|------------|
-| Handoff Kitchen→Delivery opaco | Flow Gap | Anotar ID · no bloquear Gate Kitchen si trabajo local OK |
-| Módulo incompleto vs jornada | Surface Gap | FAIL o OBSERVATIONS según P13 |
 
 ---
 
 ## Evidence Gate · Kitchen
 
 ```text
-STATUS: NOT STARTED
+STATUS: CERTIFIED (with OBSERVATIONS)
+Gate: OBSERVATIONS
+Outcome: Production Ready
 
 Evidence
-  □ Operational Journey completo
-  □ Workspace Validation
-  □ Negative Cases
-  □ Observaciones / Riesgos clasificados
-
-Gate: — | PASS | OBSERVATIONS | FAIL
+  ☑ Journey completo
+  ☑ Validation
+  ☑ Negative Cases
+  ☑ Observations / Risks
 ```
+
+**Siguiente pack:** Delivery (Orders Delivered) — depende de Production Ready.

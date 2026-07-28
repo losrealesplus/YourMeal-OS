@@ -5,9 +5,9 @@
 **Cadena:** Entry → **Journey** → Flow (G) → Operational Readiness  
 
 ```text
-Kitchen (Production Ready)
+Kitchen (Production Ready)          ← CERTIFIED · Gate OBSERVATIONS
     ↓
-Delivery (Orders Delivered)
+Delivery (Orders Delivered)         ← NEXT
     ↓
 Support (Issues Resolved)
     ↓
@@ -20,14 +20,27 @@ Accounting (Financial Records Complete)
 
 | Orden | Workspace | Outcome | Journey | Validation | Negatives | Gate | Status |
 |:-----:|-----------|---------|:-------:|:----------:|:---------:|:----:|--------|
-| 1 | [Kitchen](./kitchen.md) | Production Ready | □ | □ | □ | — | NOT STARTED |
+| 1 | [Kitchen](./kitchen.md) | Production Ready | ☑ | ☑ | ☑ | **OBSERVATIONS** | **CERTIFIED** |
 | 2 | [Delivery](./delivery.md) | Orders Delivered | □ | □ | □ | — | NOT STARTED |
 | 3 | [Support](./support.md) | Issues Resolved | □ | □ | □ | — | NOT STARTED |
 | 4 | [Accounting](./accounting.md) | Financial Records Complete | □ | □ | □ | — | NOT STARTED |
 
 Leyenda Gate: `PASS` · `OBSERVATIONS` · `FAIL` · `—`
 
-**Regla de orden:** no abrir el siguiente workspace hasta Gate del anterior = PASS|OBSERVATIONS (salvo waiver explícito). Delivery no se certifica sin Kitchen.
+**Regla de orden:** Delivery puede abrirse — Kitchen Gate cerrado (OBSERVATIONS aceptadas).
+
+---
+
+## Progress EP-OPS-003
+
+```text
+Kitchen      ████████████  CERTIFIED · OBSERVATIONS · Production Ready
+Delivery     ░░░░░░░░░░░░  NOT STARTED
+Support      ░░░░░░░░░░░░  NOT STARTED
+Accounting   ░░░░░░░░░░░░  NOT STARTED
+
+Journeys     ███░░░░░░░░░  25%  (1/4)
+```
 
 ---
 
@@ -51,4 +64,4 @@ No fingir Accounting PASS sin operación previa real (No Artificiality).
 
 ## Pack por workspace
 
-Cada `*.md`: Objetivo · Actor · Entradas · Proceso · Outcome · Dependencias · Restricciones · Journey · Validation · Negative Cases · Observaciones · Riesgos · Evidence Gate.
+Kitchen evidencia en [kitchen/](./kitchen/). Resto: un `*.md` índice + pack al abrir pasada.
