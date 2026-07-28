@@ -7,16 +7,59 @@
 **Gate final:** [CG-RI-001](../10-validation/reports/RI001_CERTIFICATION_REPORT.md)  
 **Principios:** P11 Evidence before Versioning · [P12](../20-evidence-framework/10-evidence-freshness-p12.md) · **[P13 Certification Completeness](../20-evidence-framework/12-certification-completeness-p13.md)**
 
+```text
+P11  evidencia antes de versionar
+P12  evidencia vigente
+P13  evidencia completa del bloque  →  CERTIFIED
+```
+
 **Pregunta maestra (cada tarea):**
 
 > **¿Qué evidencia falta para poder certificar que YourMeal OS opera una empresa real?**
 
 ```text
-¿Qué queda por corregir?     ← NO (backlog técnico)
-¿Qué evidencia falta?        ← SÍ  (programa de certificación)
+Features → Evidencia
+Bugs → Brechas operacionales
+Implementación → Certificación
+"Done" → "Certified"
 ```
 
 **Método:** [ORC](../10-validation/OPERATIONAL_READINESS_CERTIFICATION.md) · [FCR_SESSION_LOG](../10-validation/FCR_SESSION_LOG.md) · [FLOW_CERTIFICATION](../10-validation/FLOW_CERTIFICATION.md)
+
+---
+
+## RI-001 DONE (definición de salida del programa)
+
+RI-001 **no** se cierra porque “ya no quedan tareas”.  
+Se cierra solo cuando:
+
+```text
+RI-001 DONE cuando:
+
+✓ Todos los bloques A–I = PASS (Evidence Gate).
+✓ Todos los Evidence Gates = PASS.
+✓ RI-001 Progress = 100% (certificación, no implementación).
+✓ No existen observaciones críticas (P0/P1) abiertas.
+✓ Certification Report emitido.
+✓ Decisión CG-RI-001 = READY o READY WITH OBSERVATIONS.
+✓ Existe evidencia reproducible para cada decisión de certificación.
+```
+
+Cualquier ítem en FAIL o evidencia obligatoria pendiente → **RI-001 no DONE** (P13).
+
+---
+
+## Evolución futura (no ahora) · P14 Certification Traceability
+
+Cuando FOPEBA se aplique a un **segundo producto**, cada evidencia debería rastrear:
+
+```text
+Requirement → Evidence → Certification Gate → Decision
+```
+
+Ejemplo: `OPS-001` → Kitchen Workspace Validation → Gate C PASS → Progress → Report.
+
+**No implementar en RI-001.** Anotar solo. Ver [P13](../20-evidence-framework/12-certification-completeness-p13.md) § Futuro.
 
 ---
 

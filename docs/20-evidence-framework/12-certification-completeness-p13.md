@@ -59,3 +59,11 @@ No se inicia el bloque N+1 con el gate N en FAIL (salvo waiver explícito docume
 - [P12](./10-evidence-freshness-p12.md) — vigencia  
 - [ORC](../10-validation/OPERATIONAL_READINESS_CERTIFICATION.md) — Surface / Flow  
 - [DICT-077](../99-reference/PROJECT_DICTIONARY.md) — Certification Completeness  
+- [RI-001 Ops Readiness Backlog](../00-status/RI001_OPERATIONAL_READINESS_BACKLOG.md) — Evidence Gates A–I · DONE  
+
+---
+
+## Futuro (no ahora) · P14 Certification Traceability
+
+Para un segundo producto FOPEBA: Requirement → Evidence → Gate → Decision.  
+No abrir P14 en RI-001.

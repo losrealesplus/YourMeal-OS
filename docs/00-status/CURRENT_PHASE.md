@@ -17,14 +17,14 @@ Acta: IDENTITY_FREEZE_v1.md
 PROJECT STATE · RI-001 · Operational Certification
 ══════════════════════════════════════════════════
 
-Modo:                **CERTIFICACIÓN OPERACIONAL** (no estabilización infra)
+Modo:                **PROGRAMA DE CERTIFICACIÓN OPERACIONAL**
 Backlog:             [RI001_OPERATIONAL_READINESS_BACKLOG](./RI001_OPERATIONAL_READINESS_BACKLOG.md)
-                     Bloques A→I · evidencia para CG-RI-001
+                     Bloques A→I · Evidence Gates · P11–P13
+DONE:                Progress 100% · Gates PASS · Report READY|RWO · evidencia reproducible
 Pregunta maestra:    ¿Qué evidencia falta para certificar que YM OS opera una empresa real?
-Bloqueo histórico:   EP-OPS-001 (entrada Ops) · ahora subsumido en bloques B/C del backlog
-Siguiente:           Bloque A Foundation · Bloque B Surface (Pasada 2) — sin Flow G aún
+Siguiente:           Bloque A Foundation · Bloque B Surface (Pasada 2)
                      · AUTH-B solo tras flujos certificados
-                     · Bloque I = Certification Report (READY / RWO / NOT READY)
+                     · P14 Traceability = futuro (segundo producto)
 ══════════════════════════════════════════════════
 ```
 
