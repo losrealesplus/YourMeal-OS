@@ -16,6 +16,7 @@ import {
 export type OperationsDepartmentId =
   | "dashboard"
   | OperationsWorkspaceId
+  | "customers"
   | "support"
   | "audit"
   | "settings"
