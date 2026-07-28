@@ -74,29 +74,31 @@ Ejemplo: `OPS-001` → Kitchen Workspace Validation → Gate C PASS → Progress
 RI-001 Progress
 
 Foundation            ░░░░░░░░░░   0%   Gate —
-Surfaces              ██████████ 100%   CERTIFIED · PASS (EP-OPS-002)
-Workspaces            ████░░░░░░  40%   Entry CERTIFIED · jornadas dept. pendientes
+Surfaces              ██████████ 100%   CERTIFIED · PASS (EP-OPS-002 #88)
+Workspaces            ██████████ 100%   4/4 CERTIFIED · EP-OPS-003 Complete · G NOT STARTED
 Language              ░░░░░░░░░░   0%   Gate —
 RBAC Access           ░░░░░░░░░░   0%   Gate —
 Observability         ░░░░░░░░░░   0%   Gate —
-Flows                 ░░░░░░░░░░   0%   Gate —
+Flows                 ░░░░░░░░░░   0%   Gate — · elegible · NOT STARTED
 Auth Transition       ░░░░░░░░░░   0%   Gate —
 Certification Report  ░░░░░░░░░░   0%   Gate —
 
-Overall (certificación)          ~16%   (B PASS · C Entry parcial)
+Overall (certificación)          ~28%   (B+C DONE · Bloque G NOT STARTED)
 ```
 
 | Bloque | Nombre | Gate | % cert. |
 |--------|--------|:----:|--------:|
 | A | Foundation | — | 0 |
-| B | Surfaces | **PASS / CERTIFIED** | 100 |
-| C | Workspaces | IN REVIEW (Entry CERTIFIED) | ~40 |
+| B | Surfaces | **PASS / CERTIFIED** (EP-OPS-002) | 100 |
+| C | Workspaces | **PASS** · 4/4 Journeys CERTIFIED · EP-OPS-003 Complete | 100 |
 | D | Language | — | 0 |
 | E | RBAC Access | — | 0 |
 | F | Observability | — | 0 |
-| G | Flows | — | 0 |
+| G | Flows | — · elegible · **NOT STARTED** | 0 |
 | H | Auth Transition | — | 0 |
 | I | Certification Report | — | 0 |
+
+\* Entry CERTIFIED; Kitchen+Delivery+Support+Accounting CERTIFIED (Support+Accounting vía FAIL→Correction→Re-Cert).
 
 ---
 
@@ -220,39 +222,49 @@ Gate: PASS
 
 ## Bloque C · Department Workspace Certification
 
-| Workspace | Entry | Jornada operativa |
-|-----------|:-----:|:-----------------:|
-| Kitchen | **CERTIFIED** | Pendiente |
-| Delivery | **CERTIFIED** | Pendiente |
-| Support | **CERTIFIED** | Pendiente |
-| Accounting | **CERTIFIED** | Pendiente |
-| Operations | **CERTIFIED** (`/admin`) | Pendiente |
+**Vehículo activo:** [EP-OPS-003 · Workspace Operational Journey](./EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md)  
+**Metodología:** ✅ **FROZEN** — [EP_OPS_003_METHODOLOGY_FROZEN](./EP_OPS_003_METHODOLOGY_FROZEN.md)  
+**1ª validación:** ✅ **CLOSED** — [EP_OPS_003_FIRST_VALIDATION_CLOSED](./EP_OPS_003_FIRST_VALIDATION_CLOSED.md)  
+**Evidencia:** [docs/10-validation/ep-ops-003/](../10-validation/ep-ops-003/README.md)  
+**Prerrequisito:** Entry CERTIFIED (EP-OPS-002 · RBAC-001 · WEP-001 · LP-001)
 
-**Entry (cómo entra):** CERTIFIED vía EP-OPS-002 / WEP-001.  
-**Jornada (cómo trabaja):** pendiente — siguiente foco RI-001.
+> **EP-OPS-003 (Journeys) COMPLETE** — [acta](./EP_OPS_003_JOURNEYS_COMPLETE.md).  
+> **Capa Entry+Journey CLOSED** — [OPERATIONAL_CERTIFICATION_LAYER_CLOSED](./OPERATIONAL_CERTIFICATION_LAYER_CLOSED.md).  
+> Framework Frozen · Bloque G elegible · **NOT STARTED** (objeto = handoffs).
 
-```text
-Workspace → Operational Journey
-  Kitchen: preparación → producción → cierre
-  Delivery: ruta → entrega → confirmación
-  Support: incidencias → resolución → cierre
-  Accounting: facturación → conciliación → cierre
-```
+Pregunta Entry (cerrada): *¿Dónde entra el usuario?*  
+Pregunta Journey (cerrada): *¿Puede cada departamento completar su trabajo?*  
+Pregunta Flow (Bloque G · no iniciada): *¿Puede la empresa operar end-to-end?*
+
+| Workspace | Entry | Outcome | Journey Gate | Estado |
+|-----------|:-----:|---------|:------------:|--------|
+| Kitchen | CERTIFIED* | Production Ready | **OBSERVATIONS** | **CERTIFIED** · [pack](../10-validation/ep-ops-003/kitchen/) |
+| Delivery | CERTIFIED* | Orders Delivered | **OBSERVATIONS** | **CERTIFIED** · [pack](../10-validation/ep-ops-003/delivery/) |
+| Support | CERTIFIED* | Issues Resolved | **OBSERVATIONS** | **CERTIFIED** · [pack](../10-validation/ep-ops-003/support/) |
+| Accounting | CERTIFIED* | Financial Records Complete | **OBSERVATIONS** | **CERTIFIED** · [pack](../10-validation/ep-ops-003/accounting/) |
+| Operations | hub `/admin` | — | — | Fuera del núcleo EP-OPS-003 |
+
+**4/4 CERTIFIED.** Accounting: FAIL → Correction P0 (Pending→Review→Processed→Closed) → Re-Cert.  
+\* Entry vía EP-OPS-002.
 
 ### Evidence Gate · C
 
 ```text
 Evidence
-  ☑ Landing (Workspace Entry Policy) — CERTIFIED EP-OPS-002
-  □ Jornada por workspace del alcance
-  □ Operación completada
-  □ Casos negativos / handovers anotados (jornada)
-  □ Hallazgos clasificados (jornada)
+  ☑ Landing / Entry Policy (EP-OPS-002)
+  ☑ Jornada Kitchen — CERTIFIED
+  ☑ Jornada Delivery — CERTIFIED
+  ☑ Jornada Support — CERTIFIED (tras Correction)
+  ☑ Jornada Accounting — CERTIFIED (tras Correction P0)
+  ☑ Ciclo P13 FAIL→Correction→Re-Cert (Support · Accounting)
+  ☑ Estabilidad upstream preservada
+  ☑ Bloque G NOT STARTED (elegible)
 
-Gate: — (Entry PASS; jornadas NOT STARTED → bloque C no completo)
+Gate: PASS · Bloque C Journeys COMPLETE · Bloque G no abierto automáticamente
 ```
 
-**Salida parcial:** no dar C por completado hasta certificar jornadas departamentales.
+**Salida:** jornadas CERTIFIED → Language D / preparar Flow G.  
+**No** marcar C completo solo porque Entry esté certificado.
 
 ---
 
@@ -317,7 +329,21 @@ Gate: — → PASS → puede comenzar G
 
 ## Bloque G · Flow Certification
 
-Plantilla: [FLOW_CERTIFICATION](../10-validation/FLOW_CERTIFICATION.md).
+**Estado:** ⏳ **NOT STARTED** · elegible tras [EP-OPS-003 Journeys COMPLETE](./EP_OPS_003_JOURNEYS_COMPLETE.md)  
+**Framing (sin ejecución):** [BLOCK_G_FLOW_FRAMING](../10-validation/ep-ops-003/BLOCK_G_FLOW_FRAMING.md)  
+**Plantilla:** [FLOW_CERTIFICATION](../10-validation/FLOW_CERTIFICATION.md)
+
+> Pregunta de nivel: *¿Puede la empresa operar de extremo a extremo?*  
+> Certifica **handoffs** (Outcome → Next Outcome), no departamentos ya CERTIFIED.
+
+Handoffs a certificar:
+
+| From | To | Artefacto |
+|------|----|-----------|
+| Kitchen | Delivery | Production Ready |
+| Delivery | Support | Orders Delivered |
+| Support | Accounting | Issues Resolved / eventos financieros |
+| Accounting | Cierre operativo | Financial Records Complete |
 
 ### Evidence Gate · G
 
@@ -327,8 +353,10 @@ Evidence
   □ Flujo B Personalizado
   □ Flujo C Incidencia
   □ Handovers críticos sin Flow Gap P0/P1
+  □ Framing handoffs aplicado (no pantallas-first)
 
 Gate: — → PASS → puede comenzar H
+Status: NOT STARTED (apertura explícita requerida)
 ```
 
 ---

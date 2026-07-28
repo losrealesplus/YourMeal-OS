@@ -24,9 +24,10 @@ DONE:                Progress 100% · Gates PASS · Report READY|RWO · evidenci
 Permitido en RI-001: ejecutar cert · fix de hallazgo de cert · reabrir gate aprobado
 Prohibido:           nuevas features / ampliar alcance bajo etiqueta RI-001
 Pregunta maestra:    ¿Qué evidencia falta para certificar que YM OS opera una empresa real?
-Siguiente:           Completar **C · Operational Journeys** (Entry ya CERTIFIED · EP-OPS-002)
-                     · AUTH-B solo tras flujos certificados
-                     · P14 Traceability = futuro (segundo producto)
+Siguiente:           **Capa Entry+Journey CLOSED** · Flow pendiente de apertura
+                     · Acta capa: [OPERATIONAL_CERTIFICATION_LAYER_CLOSED](./OPERATIONAL_CERTIFICATION_LAYER_CLOSED.md)
+                     · Journeys: [EP_OPS_003_JOURNEYS_COMPLETE](./EP_OPS_003_JOURNEYS_COMPLETE.md)
+                     · Framing G (objeto = handoffs): [BLOCK_G_FLOW_FRAMING](../10-validation/ep-ops-003/BLOCK_G_FLOW_FRAMING.md)
 ══════════════════════════════════════════════════
 ```
 
@@ -34,10 +35,9 @@ Siguiente:           Completar **C · Operational Journeys** (Entry ya CERTIFIED
 
 ```text
 Siguiente artefacto activo:
-  [RI001_OPERATIONAL_READINESS_BACKLOG](./RI001_OPERATIONAL_READINESS_BACKLOG.md)
-  · Bloque B Surfaces = PASS (EP-OPS-002)
-  · Bloque C Entry CERTIFIED · jornadas operacionales pendientes
-  · EP-OPS-001 subsumido · Flow G tras jornadas workspace
+  [Operational Certification Layer CLOSED](./OPERATIONAL_CERTIFICATION_LAYER_CLOSED.md)
+  · Entry ✅ · Journey ✅ · Flow ⏳ (NOT STARTED)
+  · Paradigma G: organización · transferencias · no pantallas
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████
@@ -45,21 +45,22 @@ Pilot Readiness (lectura)
   Modelo operacional  ██████████
   Administración      ██████████
   Customer App        █████████░
-  Operaciones         ███████░░░  ← Entry CERTIFIED · Journeys next
+  Operaciones         ██████████  ← capa Entry+Journey CLOSED
   Data                ███████░░░
 
 Mapa certificación (activo):
   A Foundation              □□□□□□□□□□
   B Surfaces                ██████████  CERTIFIED · PASS · EP-OPS-002
-  C Department Workspaces   ████░░░░░░  Entry CERTIFIED · Journeys pending
+  C Department Workspaces   ██████████  Journey COMPLETE · EP-OPS-003
   D Operational Language    □□□□□□□□□□
   E RBAC & Access           □□□□□□□□□□
   F Observability Ready     □□□□□□□□□□
-  G Flow Certification      □□□□□□□□□□  (plantilla lista)
-  H Auth Transition         □□□□□□□□□□  AUTH-A/B
-  I Certification Report    □□□□□□□□□□  CG-RI-001
+  G Flow Certification      □□□□□□□□□□  elegible · NOT STARTED
+  H Auth Transition         □□□□□□□□□□
+  I Certification Report    □□□□□□□□□□
 
-Siguiente foco:            Workspace → Operational Journey (Kitchen · Delivery · Support · Accounting)
+Siguiente foco:            Apertura explícita Bloque G
+                           (handoffs operacionales · pregunta empresa E2E)
 
 Patrón permanente: Operational Representation (DICT-072)
 Madurez tenant:    Tenant Operational Autonomy (DICT-073)
@@ -70,7 +71,7 @@ Primary Artifact:  [RI-001 Ops Readiness Backlog](./RI001_OPERATIONAL_READINESS_
 Visibilidad:       [Operational Visibility · DICT-071](../20-evidence-framework/09-operational-visibility-principle.md)
 Ops pattern:       [Operational Representation · DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md)
 Tenant autonomy:   [Tenant Operational Autonomy · DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)
-Hoy (Certificación): [Backlog RI-001](./RI001_OPERATIONAL_READINESS_BACKLOG.md) · [FCR Session Log](../10-validation/FCR_SESSION_LOG.md) · [EP-OPS-001](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) (histórico / hub)
+Hoy (Certificación): [EP-OPS-003](./EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md) · [Backlog RI-001](./RI001_OPERATIONAL_READINESS_BACKLOG.md) · [ep-ops-003 evidence](../10-validation/ep-ops-003/README.md)
 Seguridad pre-piloto: [Pilot Security Checklist](../09-security/PILOT_SECURITY_CHECKLIST.md) (10 corregidos · 1 Accepted documentado)
 Antes de firmar G-02 PASSED: ORR firmados · cero humo · No Artificiality
 PR taxonomy (post G-02): Evidence · KU · Correction · Pilot Fix · Operational Finding

@@ -26,6 +26,8 @@ import {
   COMMUNICATION_ENGINE_STAGES,
   PLANNED_CAMPAIGN_KINDS,
   PLANNED_COMMUNICATION_CHANNELS,
+  nextSupportNoteStatuses,
+  SUPPORT_ISSUE_KINDS,
   type CustomerOrderSummary,
   type IndividualCustomerRecord,
   type SupportNoteRecord,
@@ -198,6 +200,43 @@ function AdminSupportPage() {
       toast.error(err instanceof Error ? err.message : String(err));
     } finally {
       setSavingNote(false);
+    }
+  }
+
+  async function transitionNote(
+    noteId: string,
+    toStatus: SupportNoteRecord["status"],
+  ) {
+    if (!user || !tenantId || !can("support.write")) return;
+    try {
+      const ctx = await createServiceContext({
+        supabase,
+        userId: user.id,
+        tenantId,
+        roles,
+      });
+      await CustomerDirectoryService.transitionSupportNote(
+        ctx,
+        noteId,
+        toStatus,
+      );
+      toast.success(
+        toStatus === "resolved"
+          ? "Incidencia resuelta"
+          : toStatus === "closed"
+            ? "Incidencia cerrada"
+            : "Estado actualizado",
+      );
+      if (selectedId) {
+        const n = await CustomerDirectoryService.listSupportNotes(
+          ctx,
+          selectedId,
+        );
+        setNotes(n);
+      }
+      await reloadDirectory();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : String(err));
     }
   }
 
@@ -526,15 +565,62 @@ function AdminSupportPage() {
                   </p>
                 ) : (
                   <ul className="space-y-2 max-h-40 overflow-auto mb-3">
-                    {notes.map((n) => (
-                      <li key={n.id} className="text-sm border-b border-border/50 py-2">
-                        <span className="meta-label">{n.kind}</span>
-                        <p className="mt-1">{n.body}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {fmt.date(n.createdAt, "medium")}
-                        </p>
-                      </li>
-                    ))}
+                    {notes.map((n) => {
+                      const isIssue = SUPPORT_ISSUE_KINDS.includes(n.kind);
+                      const next = nextSupportNoteStatuses(n.status);
+                      return (
+                        <li
+                          key={n.id}
+                          className="text-sm border-b border-border/50 py-2"
+                        >
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="meta-label">{n.kind}</span>
+                            <StatusChip
+                              tone={
+                                n.status === "open"
+                                  ? "warning"
+                                  : n.status === "resolved"
+                                    ? "info"
+                                    : "positive"
+                              }
+                              label={n.status}
+                            />
+                          </div>
+                          <p className="mt-1">{n.body}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {fmt.date(n.createdAt, "medium")}
+                          </p>
+                          {can("support.write") && isIssue && next.length > 0 ? (
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              {next.includes("resolved") ? (
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="secondary"
+                                  onClick={() =>
+                                    void transitionNote(n.id, "resolved")
+                                  }
+                                >
+                                  Resolver
+                                </Button>
+                              ) : null}
+                              {next.includes("closed") ? (
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() =>
+                                    void transitionNote(n.id, "closed")
+                                  }
+                                >
+                                  Cerrar
+                                </Button>
+                              ) : null}
+                            </div>
+                          ) : null}
+                        </li>
+                      );
+                    })}
                   </ul>
                 )}
                 {can("support.write") && selectedId ? (

@@ -24,10 +24,10 @@ docs/10-validation/
 ├── RUNTIME_VERIFICATION_EVIDENCE.md      ← Playwright 2026-07-25
 ├── UX_BRANDLEAFMARK_ADMIN_SHELL.md
 ├── DEPLOYMENT_VERIFICATION.md
-├── OPERATIONAL_READINESS_CERTIFICATION.md ← Surface + Flow · ORR READY
-├── FLOW_CERTIFICATION.md                 ← Nivel 2 · plantilla (post Pasada 2)
+├── OPERATIONAL_READINESS_CERTIFICATION.md ← Entry · Journey · Flow · ORR READY
+├── FLOW_CERTIFICATION.md                 ← Nivel 2 · Bloque G (NOT STARTED)
 ├── FCR_FINDINGS_REGISTER.md              ← Functional Review Mode · hallazgos
-├── FCR_SESSION_LOG.md                    ← Nivel 1 · jornadas × evidencia
+├── FCR_SESSION_LOG.md                    ← jornadas × evidencia
 ├── RBAC_MATRIX_V1.md                     ← autorización por Tenant/Platform Surface
 ├── WORKSPACE_ENTRY_POLICY.md             ← WEP-001 ✅ CERTIFIED (EP-OPS-002)
 ├── LANDING_POLICY_VALIDATION.md          ← LP-001 ✅ CERTIFIED
@@ -35,12 +35,17 @@ docs/10-validation/
 ├── SURFACE_MATRIX.md                     ← rol → surface → workspace → landing
 ├── SURFACE_NAVIGATION_REPORT.md          ← recorrido + casos negativos
 ├── EP_OPS_002_PRECHECK.md                ← EP-OPS-002 CERTIFIED · acta de ciclo P13
+├── ep-ops-003/                           ← EP-OPS-003 · Journeys COMPLETE
 ├── FCR002_FLICKER_INVESTIGATION.md       ← Render Stability Regression
 ├── LOVABLE_DEPLOYMENT_AUDIT_BOOTSTRAP.md  ← Bootstrap #82 · DV-001 Lovable sync
 ├── POST_DEPLOY_SMOKE_OP001.md
 ├── RI001_CERTIFICATION_SPRINT.md
 ├── checklists/ · reports/ · evidence/
 ```
+
+## EP-OPS-003 · Workspace Operational Journeys
+
+[Epic](../00-status/EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md) · **[Methodology FROZEN](../00-status/EP_OPS_003_METHODOLOGY_FROZEN.md)** · [Journeys COMPLETE](../00-status/EP_OPS_003_JOURNEYS_COMPLETE.md) · [Evidence index](./ep-ops-003/README.md) · 4/4 CERTIFIED · Bloque G NOT STARTED
 
 ## Official Supabase (INFRA-002)
 

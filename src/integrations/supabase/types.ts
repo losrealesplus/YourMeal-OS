@@ -664,8 +664,10 @@ export type Database = {
           company_id: string | null
           created_at: string
           customer_id: string | null
+          deleted_at?: string | null
           id: string
           pdf_url: string | null
+          reviewed_at: string | null
           status: Database["public"]["Enums"]["invoice_status"]
           tenant_id: string
         }
@@ -675,8 +677,10 @@ export type Database = {
           company_id?: string | null
           created_at?: string
           customer_id?: string | null
+          deleted_at?: string | null
           id?: string
           pdf_url?: string | null
+          reviewed_at?: string | null
           status?: Database["public"]["Enums"]["invoice_status"]
           tenant_id: string
         }
@@ -686,8 +690,10 @@ export type Database = {
           company_id?: string | null
           created_at?: string
           customer_id?: string | null
+          deleted_at?: string | null
           id?: string
           pdf_url?: string | null
+          reviewed_at?: string | null
           status?: Database["public"]["Enums"]["invoice_status"]
           tenant_id?: string
         }
@@ -708,6 +714,84 @@ export type Database = {
           },
           {
             foreignKeyName: "invoices_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoice_orders: {
+        Row: {
+          created_at: string
+          invoice_id: string
+          order_id: string
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          invoice_id: string
+          order_id: string
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          invoice_id?: string
+          order_id?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_orders_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_orders_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_orders_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      financial_period_closures: {
+        Row: {
+          billing_period: string
+          closed_at: string
+          closed_by: string | null
+          invoice_count: number
+          paid_amount: number
+          tenant_id: string
+        }
+        Insert: {
+          billing_period: string
+          closed_at?: string
+          closed_by?: string | null
+          invoice_count?: number
+          paid_amount?: number
+          tenant_id: string
+        }
+        Update: {
+          billing_period?: string
+          closed_at?: string
+          closed_by?: string | null
+          invoice_count?: number
+          paid_amount?: number
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_period_closures_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -1084,28 +1168,37 @@ export type Database = {
         Row: {
           author_id: string | null
           body: string
+          closed_at: string | null
           created_at: string
           customer_id: string
           id: string
           kind: Database["public"]["Enums"]["support_kind"]
+          resolved_at: string | null
+          status: Database["public"]["Enums"]["support_note_status"]
           tenant_id: string
         }
         Insert: {
           author_id?: string | null
           body: string
+          closed_at?: string | null
           created_at?: string
           customer_id: string
           id?: string
           kind?: Database["public"]["Enums"]["support_kind"]
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["support_note_status"]
           tenant_id: string
         }
         Update: {
           author_id?: string | null
           body?: string
+          closed_at?: string | null
           created_at?: string
           customer_id?: string
           id?: string
           kind?: Database["public"]["Enums"]["support_kind"]
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["support_note_status"]
           tenant_id?: string
         }
         Relationships: [
@@ -1434,6 +1527,7 @@ export type Database = {
         | "request"
         | "allergy_update"
         | "complaint"
+      support_note_status: "open" | "resolved" | "closed"
       tenant_status: "active" | "suspended" | "trial"
     }
     CompositeTypes: {
@@ -1596,6 +1690,7 @@ export const Constants = {
         "allergy_update",
         "complaint",
       ],
+      support_note_status: ["open", "resolved", "closed"],
       tenant_status: ["active", "suspended", "trial"],
     },
   },

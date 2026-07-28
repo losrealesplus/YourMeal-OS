@@ -359,7 +359,7 @@ export function createCustomerDirectoryRepository(
       let q = db
         .from("support_notes")
         .select(
-          "id, customer_id, kind, body, author_id, created_at, customers(display_name)",
+          "id, customer_id, kind, status, body, author_id, created_at, resolved_at, closed_at, customers(display_name)",
         )
         .eq("tenant_id", tenantId)
         .is("deleted_at", null)
@@ -372,18 +372,24 @@ export function createCustomerDirectoryRepository(
         id: string;
         customer_id: string;
         kind: SupportNoteRecord["kind"];
+        status: SupportNoteRecord["status"];
         body: string;
         author_id: string | null;
         created_at: string;
+        resolved_at: string | null;
+        closed_at: string | null;
         customers: { display_name: string | null } | null;
       }>).map((row) => ({
         id: row.id,
         customerId: row.customer_id,
         customerName: row.customers?.display_name ?? null,
         kind: row.kind,
+        status: row.status ?? "open",
         body: row.body,
         authorId: row.author_id,
         createdAt: row.created_at,
+        resolvedAt: row.resolved_at,
+        closedAt: row.closed_at,
       }));
     },
 
@@ -401,8 +407,11 @@ export function createCustomerDirectoryRepository(
           kind: input.kind,
           body: input.body,
           author_id: input.authorId,
+          status: "open",
         })
-        .select("id, customer_id, kind, body, author_id, created_at")
+        .select(
+          "id, customer_id, kind, status, body, author_id, created_at, resolved_at, closed_at",
+        )
         .single();
       if (error) throw error;
       return {
@@ -410,9 +419,77 @@ export function createCustomerDirectoryRepository(
         customerId: data.customer_id,
         customerName: null,
         kind: data.kind,
+        status: data.status ?? "open",
         body: data.body,
         authorId: data.author_id,
         createdAt: data.created_at,
+        resolvedAt: data.resolved_at ?? null,
+        closedAt: data.closed_at ?? null,
+      };
+    },
+
+    async transitionSupportNote(
+      noteId: string,
+      toStatus: SupportNoteRecord["status"],
+      opts?: { preserveResolvedAt?: string | null },
+    ): Promise<SupportNoteRecord> {
+      const now = new Date().toISOString();
+      const patch: Record<string, string> = { status: toStatus };
+      if (toStatus === "resolved") patch.resolved_at = now;
+      if (toStatus === "closed") {
+        patch.closed_at = now;
+        // open → closed: stamp resolved_at; resolved → closed: keep original
+        if (!opts?.preserveResolvedAt) patch.resolved_at = now;
+      }
+
+      const { data, error } = await db
+        .from("support_notes")
+        .update(patch)
+        .eq("tenant_id", tenantId)
+        .eq("id", noteId)
+        .is("deleted_at", null)
+        .select(
+          "id, customer_id, kind, status, body, author_id, created_at, resolved_at, closed_at",
+        )
+        .single();
+      if (error) throw error;
+      return {
+        id: data.id,
+        customerId: data.customer_id,
+        customerName: null,
+        kind: data.kind,
+        status: data.status,
+        body: data.body,
+        authorId: data.author_id,
+        createdAt: data.created_at,
+        resolvedAt: data.resolved_at ?? null,
+        closedAt: data.closed_at ?? null,
+      };
+    },
+
+    async getSupportNote(noteId: string): Promise<SupportNoteRecord | null> {
+      const { data, error } = await db
+        .from("support_notes")
+        .select(
+          "id, customer_id, kind, status, body, author_id, created_at, resolved_at, closed_at",
+        )
+        .eq("tenant_id", tenantId)
+        .eq("id", noteId)
+        .is("deleted_at", null)
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) return null;
+      return {
+        id: data.id,
+        customerId: data.customer_id,
+        customerName: null,
+        kind: data.kind,
+        status: data.status ?? "open",
+        body: data.body,
+        authorId: data.author_id,
+        createdAt: data.created_at,
+        resolvedAt: data.resolved_at ?? null,
+        closedAt: data.closed_at ?? null,
       };
     },
 
@@ -564,6 +641,7 @@ export function createCustomerDirectoryRepository(
         .select("id", { count: "exact", head: true })
         .eq("tenant_id", tenantId)
         .in("kind", ["incident", "complaint"])
+        .eq("status", "open")
         .is("deleted_at", null);
       if (error) throw error;
 
