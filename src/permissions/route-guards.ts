@@ -39,7 +39,8 @@ export async function assertStaffRoute(userId: string): Promise<AppRole[]> {
 export async function assertSaasRoute(userId: string): Promise<AppRole[]> {
   const roles = await loadRoles(userId);
   if (!can(roles, "saas.manage")) {
-    throw redirect({ to: "/app" });
+    // EP-OPS-002 negative case: Tenant staff denied Platform → Tenant home, not Customer App.
+    throw redirect({ to: hasStaffAccess(roles) ? "/admin" : "/app" });
   }
   return roles;
 }

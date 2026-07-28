@@ -50,8 +50,8 @@ Pilot Readiness (lectura)
 
 Mapa certificación (activo):
   A Foundation              □□□□□□□□□□
-  B Surfaces                ██░░░░░░░░  Entry CERTIFIED
-  C Department Workspaces   ██████████  Journey COMPLETE
+  B Surfaces                ██████████  CERTIFIED · PASS · EP-OPS-002
+  C Department Workspaces   ██████████  Journey COMPLETE · EP-OPS-003
   D Operational Language    □□□□□□□□□□
   E RBAC & Access           □□□□□□□□□□
   F Observability Ready     □□□□□□□□□□

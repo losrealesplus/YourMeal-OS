@@ -1,5 +1,11 @@
 import type { AppRole } from "@/hooks/use-auth";
 
+/**
+ * EP-OPS-002 · Landing Policy (LP-001)
+ * Deterministic post-login / post-auth home. Single source for login, "/", Bootstrap.
+ * @see docs/10-validation/LANDING_POLICY_VALIDATION.md
+ */
+
 const STAFF_ROLES: AppRole[] = [
   "company_admin",
   "operations_manager",
@@ -13,33 +19,59 @@ const STAFF_ROLES: AppRole[] = [
   "delivery",
 ];
 
-/** Post-login home — one app; path depends on roles. */
+function hasTenantStaff(roles: readonly AppRole[]): boolean {
+  return STAFF_ROLES.some((r) => roles.includes(r));
+}
+
+/**
+ * Priority (highest first):
+ * 1. Pure Platform (`saas_admin` without tenant staff) → `/saas`
+ * 2. Company Admin / Operations Manager → Tenant Ops `/admin`
+ * 3. Sole department workspace (kitchen, delivery, support, accounting, …)
+ * 4. Other tenant staff → `/admin`
+ * 5. Driver → `/driver`
+ * 6. Customer / default → `/app`
+ *
+ * Hybrid Platform + Tenant staff → Tenant Surface first (`/admin`);
+ * Platform entry remains available via SaaS ops entry (not a second ambiguous landing).
+ */
 export function homePathForRoles(roles: readonly AppRole[]): string {
-  // Pure saas_admin → platform console. Staff + saas_admin falls through to
-  // tenant home; the Centro de Operaciones surfaces a `/saas` entry there.
-  if (
-    roles.includes("saas_admin") &&
-    !STAFF_ROLES.some((r) => roles.includes(r))
-  ) {
+  if (roles.includes("saas_admin") && !hasTenantStaff(roles)) {
     return "/saas";
   }
   if (roles.includes("operations_manager") || roles.includes("company_admin")) {
     return "/admin";
   }
-  // Kitchen-only → Cocina; delivery/logistics-only → Reparto
+
   const staff = roles.filter((r) => STAFF_ROLES.includes(r));
-  if (staff.length === 1 && staff[0] === "kitchen") return "/admin/kitchen";
+
+  if (staff.length === 1) {
+    switch (staff[0]) {
+      case "kitchen":
+      case "production":
+        return "/admin/kitchen";
+      case "delivery":
+      case "logistics":
+        return "/admin/delivery";
+      case "support":
+        return "/admin/support";
+      case "accounting":
+        return "/admin/accounting";
+      case "inventory":
+      case "purchasing":
+        return "/admin/inventory";
+      default:
+        break;
+    }
+  }
+
+  // Multi-role staff without company_admin: prefer kitchen / delivery if exclusive family
   if (
-    staff.length === 1 &&
-    (staff[0] === "delivery" || staff[0] === "logistics")
+    staff.includes("kitchen") &&
+    !staff.includes("delivery") &&
+    !staff.includes("logistics") &&
+    !staff.includes("operations_manager")
   ) {
-    return "/admin/delivery";
-  }
-  if (staff.length === 1 && staff[0] === "support") return "/admin/support";
-  if (staff.length === 1 && staff[0] === "accounting") {
-    return "/admin/accounting";
-  }
-  if (staff.includes("kitchen") && !staff.includes("delivery") && !staff.includes("logistics") && !staff.includes("operations_manager")) {
     return "/admin/kitchen";
   }
   if (
@@ -49,6 +81,25 @@ export function homePathForRoles(roles: readonly AppRole[]): string {
   ) {
     return "/admin/delivery";
   }
+  if (
+    staff.includes("support") &&
+    !staff.includes("kitchen") &&
+    !staff.includes("delivery") &&
+    !staff.includes("logistics") &&
+    !staff.includes("accounting")
+  ) {
+    return "/admin/support";
+  }
+  if (
+    staff.includes("accounting") &&
+    !staff.includes("kitchen") &&
+    !staff.includes("delivery") &&
+    !staff.includes("logistics") &&
+    !staff.includes("support")
+  ) {
+    return "/admin/accounting";
+  }
+
   if (roles.some((r) => STAFF_ROLES.includes(r))) return "/admin";
   if (roles.includes("driver")) return "/driver";
   return "/app";

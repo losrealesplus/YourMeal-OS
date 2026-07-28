@@ -74,7 +74,7 @@ Ejemplo: `OPS-001` → Kitchen Workspace Validation → Gate C PASS → Progress
 RI-001 Progress
 
 Foundation            ░░░░░░░░░░   0%   Gate —
-Surfaces              ██░░░░░░░░  20%   Tenant IN REVIEW · Entry vía EP-OPS-002 (#88)
+Surfaces              ██████████ 100%   CERTIFIED · PASS (EP-OPS-002 #88)
 Workspaces            ██████████ 100%   4/4 CERTIFIED · EP-OPS-003 Complete · G NOT STARTED
 Language              ░░░░░░░░░░   0%   Gate —
 RBAC Access           ░░░░░░░░░░   0%   Gate —
@@ -83,13 +83,13 @@ Flows                 ░░░░░░░░░░   0%   Gate — · elegible
 Auth Transition       ░░░░░░░░░░   0%   Gate —
 Certification Report  ░░░░░░░░░░   0%   Gate —
 
-Overall (certificación)          ~25%   (Bloque C DONE · Bloque G NOT STARTED)
+Overall (certificación)          ~28%   (B+C DONE · Bloque G NOT STARTED)
 ```
 
 | Bloque | Nombre | Gate | % cert. |
 |--------|--------|:----:|--------:|
 | A | Foundation | — | 0 |
-| B | Surfaces | IN REVIEW → PASS al merge EP-OPS-002 | ~20 |
+| B | Surfaces | **PASS / CERTIFIED** (EP-OPS-002) | 100 |
 | C | Workspaces | **PASS** · 4/4 Journeys CERTIFIED · EP-OPS-003 Complete | 100 |
 | D | Language | — | 0 |
 | E | RBAC Access | — | 0 |
@@ -192,28 +192,31 @@ Gate: — (PASS solo con ☑ completos)
 
 | Superficie | Surface Status |
 |------------|:--------------:|
-| Tenant Surface `/admin` | **IN REVIEW** |
-| Platform Surface `/saas` | NOT STARTED |
-| Customer Surface `/app` | NOT STARTED |
+| Tenant Surface `/admin` | **CERTIFIED** (EP-OPS-002) |
+| Platform Surface `/saas` | **CERTIFIED** (EP-OPS-002) |
+| Customer Surface `/app` | Landing documentado · jornada Customer fuera de este epic |
 
-### Evidence Gate · B (ejemplo por superficie)
+> **EP-OPS-002:** ciclo Discovery → Evaluation → Correction → Re-Certification → **CERTIFIED**.  
+> Evidencia: [EP_OPS_002](../10-validation/EP_OPS_002_PRECHECK.md) · [Surface Matrix](../10-validation/SURFACE_MATRIX.md) · WEP · LP · RBAC Surface.
+
+### Evidence Gate · B
 
 ```text
-B · Surface Certification · Tenant (ejemplo)
+B · Surface Certification · Tenant + Platform
 
-STATUS: IN REVIEW
+STATUS: CERTIFIED
 
 Evidence
-  □ Navegación / jornadas
-  □ Permisos de superficie
-  □ UX operacional (Operación completada)
-  □ Casos negativos (sin datos · ya completado · superficie incorrecta)
-  □ Observaciones clasificadas (Session Log)
+  ☑ Navegación / landings — SURFACE_NAVIGATION_REPORT
+  ☑ Separación de superficies — RBAC_SURFACE_CERTIFICATION
+  ☑ Matrix — SURFACE_MATRIX
+  ☑ Casos negativos cross-surface PASS
+  ☑ RBAC-001 · WEP-001 · LP-001 = CERTIFIED (P13)
 
-Gate: — → PASS solo cuando las superficies del alcance = CERTIFIED
+Gate: PASS
 ```
 
-**Salida:** superficies del alcance CERTIFIED → puede comenzar **C**.
+**Salida:** superficies Tenant + Platform CERTIFIED → foco en **C · Operational Journeys**.
 
 ---
 

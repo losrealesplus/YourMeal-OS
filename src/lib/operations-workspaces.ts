@@ -1,6 +1,6 @@
 /**
  * Operations workspaces — presentation mapping (ADR 0014 / Experience).
- * PR-034: kitchen → /admin/kitchen · delivery → /admin/delivery
+ * EP-OPS-002: kitchen → /admin/kitchen · delivery → /admin/delivery · support → /admin/support
  */
 import type { AppRole } from "@/hooks/use-auth";
 
@@ -8,7 +8,7 @@ export type OperationsWorkspaceId =
   | "kitchen"
   | "delivery"
   | "stock"
-  | "customers"
+  | "support"
   | "administration"
   | "finance";
 
@@ -19,6 +19,7 @@ export type OperationsWorkspacePath =
   | "/admin/routes"
   | "/admin/inventory"
   | "/admin/customers"
+  | "/admin/support"
   | "/admin/settings"
   | "/admin/accounting"
   | "/admin/orders";
@@ -46,8 +47,8 @@ export const OPERATIONS_WORKSPACES: readonly OperationsWorkspace[] = [
     roles: ["inventory", "purchasing", "operations_manager"],
   },
   {
-    id: "customers",
-    path: "/admin/customers",
+    id: "support",
+    path: "/admin/support",
     roles: ["support", "operations_manager"],
   },
   {
