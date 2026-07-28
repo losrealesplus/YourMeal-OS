@@ -65,6 +65,7 @@ export type Database = {
         Row: {
           billing_rule: Database["public"]["Enums"]["pay_mode"]
           created_at: string
+          deleted_at: string | null
           id: string
           name: string
           tenant_id: string
@@ -73,6 +74,7 @@ export type Database = {
         Insert: {
           billing_rule?: Database["public"]["Enums"]["pay_mode"]
           created_at?: string
+          deleted_at?: string | null
           id?: string
           name: string
           tenant_id: string
@@ -81,6 +83,7 @@ export type Database = {
         Update: {
           billing_rule?: Database["public"]["Enums"]["pay_mode"]
           created_at?: string
+          deleted_at?: string | null
           id?: string
           name?: string
           tenant_id?: string
@@ -231,6 +234,7 @@ export type Database = {
         Row: {
           city: string | null
           customer_id: string
+          deleted_at: string | null
           id: string
           is_default: boolean
           label: string | null
@@ -243,6 +247,7 @@ export type Database = {
         Insert: {
           city?: string | null
           customer_id: string
+          deleted_at?: string | null
           id?: string
           is_default?: boolean
           label?: string | null
@@ -255,6 +260,7 @@ export type Database = {
         Update: {
           city?: string | null
           customer_id?: string
+          deleted_at?: string | null
           id?: string
           is_default?: boolean
           label?: string | null
@@ -401,6 +407,7 @@ export type Database = {
       customers: {
         Row: {
           created_at: string
+          deleted_at: string | null
           display_name: string | null
           email: string | null
           id: string
@@ -410,6 +417,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          deleted_at?: string | null
           display_name?: string | null
           email?: string | null
           id?: string
@@ -419,6 +427,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          deleted_at?: string | null
           display_name?: string | null
           email?: string | null
           id?: string
@@ -719,6 +728,7 @@ export type Database = {
         Row: {
           comment: string | null
           day_date: string
+          deleted_at: string | null
           dish_id: string
           id: string
           order_id: string
@@ -728,6 +738,7 @@ export type Database = {
         Insert: {
           comment?: string | null
           day_date: string
+          deleted_at?: string | null
           dish_id: string
           id?: string
           order_id: string
@@ -737,6 +748,7 @@ export type Database = {
         Update: {
           comment?: string | null
           day_date?: string
+          deleted_at?: string | null
           dish_id?: string
           id?: string
           order_id?: string
@@ -769,8 +781,11 @@ export type Database = {
       }
       orders: {
         Row: {
+          company_id: string | null
           created_at: string
           customer_id: string
+          deleted_at: string | null
+          delivery_address_id: string | null
           id: string
           notes: string | null
           status: Database["public"]["Enums"]["order_status"]
@@ -779,8 +794,11 @@ export type Database = {
           week_start: string
         }
         Insert: {
+          company_id?: string | null
           created_at?: string
           customer_id: string
+          deleted_at?: string | null
+          delivery_address_id?: string | null
           id?: string
           notes?: string | null
           status?: Database["public"]["Enums"]["order_status"]
@@ -789,8 +807,11 @@ export type Database = {
           week_start: string
         }
         Update: {
+          company_id?: string | null
           created_at?: string
           customer_id?: string
+          deleted_at?: string | null
+          delivery_address_id?: string | null
           id?: string
           notes?: string | null
           status?: Database["public"]["Enums"]["order_status"]
@@ -800,10 +821,24 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "orders_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "orders_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_delivery_address_id_fkey"
+            columns: ["delivery_address_id"]
+            isOneToOne: false
+            referencedRelation: "customer_addresses"
             referencedColumns: ["id"]
           },
           {
@@ -1377,6 +1412,11 @@ export type Database = {
         }
         Returns: string
       }
+      ensure_platform_owner_for_user: {
+        Args: { _user_id: string }
+        Returns: Json
+      }
+      ensure_platform_owner_session: { Args: never; Returns: Json }
       has_any_staff_role: {
         Args: { _tenant_id: string; _user_id: string }
         Returns: boolean
@@ -1390,6 +1430,7 @@ export type Database = {
         Returns: boolean
       }
       is_customer_owner: { Args: { _customer_id: string }; Returns: boolean }
+      is_platform_owner_email: { Args: { _email: string }; Returns: boolean }
       is_saas_admin: { Args: { _user_id: string }; Returns: boolean }
       is_tenant_member: { Args: { _tenant_id: string }; Returns: boolean }
       resolve_delivery_group: {
@@ -1416,6 +1457,8 @@ export type Database = {
         | "driver"
         | "employee"
         | "customer"
+        | "operations_manager"
+        | "delivery"
       customer_kind: "individual" | "company_employee"
       dish_status: "draft" | "active" | "archived" | "inactive"
       invoice_status: "pending" | "paid" | "overdue" | "void"
@@ -1425,6 +1468,10 @@ export type Database = {
         | "in_production"
         | "delivered"
         | "cancelled"
+        | "prepared"
+        | "ready_for_delivery"
+        | "out_for_delivery"
+        | "delivery_issue"
       pay_mode: "employee_pays" | "company_pays" | "grouped" | "custom"
       promotion_scope: "global" | "group" | "personal"
       route_status: "planned" | "in_progress" | "completed" | "cancelled"
@@ -1575,6 +1622,8 @@ export const Constants = {
         "driver",
         "employee",
         "customer",
+        "operations_manager",
+        "delivery",
       ],
       customer_kind: ["individual", "company_employee"],
       dish_status: ["draft", "active", "archived", "inactive"],
@@ -1585,6 +1634,10 @@ export const Constants = {
         "in_production",
         "delivered",
         "cancelled",
+        "prepared",
+        "ready_for_delivery",
+        "out_for_delivery",
+        "delivery_issue",
       ],
       pay_mode: ["employee_pays", "company_pays", "grouped", "custom"],
       promotion_scope: ["global", "group", "personal"],
