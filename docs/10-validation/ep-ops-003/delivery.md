@@ -3,18 +3,32 @@
 **Workspace:** Delivery  
 **Landing:** `/admin/delivery`  
 **Epic:** EP-OPS-003  
-**Estado:** NOT STARTED  
-**Gate:** —
+**Estado:** NOT STARTED · **NEXT**  
+**Gate:** —  
+**Outcome esperado:** **Orders Delivered**  
+
+**Continuidad (regla EP-OPS-003):**
+
+```text
+Kitchen Outcome: Production Ready
+        ↓
+Delivery Input:  Production Ready
+        ↓
+Delivery Outcome: Orders Delivered
+```
+
+**Prerrequisito:** Kitchen CERTIFIED (Gate PASS|OBSERVATIONS) ✅  
+**Pack de evidencia (al abrir pasada):** [delivery/](./delivery/)
 
 ---
 
 ## Objetivo operacional
 
-Permitir al equipo de reparto tomar pedidos preparados, asignar, ejecutar ruta, confirmar entregas y cerrar la jornada **dentro del Delivery Workspace**.
+Tomar pedidos en estado **Production Ready** (`ready_for_delivery`), asignar, ejecutar ruta, confirmar entregas y cerrar la jornada **dentro del Delivery Workspace**.
 
-**Outcome certificado:** `Orders Delivered`  
-**Prerrequisito de orden:** Kitchen Gate PASS|OBSERVATIONS (cadena de valor).  
-**Pregunta:** ¿Puede el equipo de Delivery completar una ruta de extremo a extremo desde su Workspace?
+**Pregunta maestra:**
+
+> ¿Puede Delivery completar el reparto de principio a fin desde su Workspace, partiendo del Outcome Kitchen (Production Ready), y producir **Orders Delivered**?
 
 ---
 
@@ -22,135 +36,77 @@ Permitir al equipo de reparto tomar pedidos preparados, asignar, ejecutar ruta, 
 
 | Rol | Notas |
 |-----|-------|
-| `delivery` / `logistics` | Actor de jornada en Ops |
-| `driver` | Superficie `/driver` — anotar handoff si aplica |
+| `delivery` / `logistics` | Actor de jornada Ops |
+| `driver` | Superficie `/driver` — límite Workspace vs Driver a documentar |
 | `operations_manager` / `company_admin` | Supervisión |
 
 ---
 
-## Entradas
+## Entradas (contrato de continuidad)
 
-- Pedidos / lotes marcados preparados (salida Kitchen u origen equivalente)
-- Asignaciones de ruta / stops
-- Datos de cliente / dirección / ventana
+| Input | Origen | Estado |
+|-------|--------|--------|
+| **Production Ready** | Kitchen Journey CERTIFIED | ✅ disponible como contrato |
+| Pedidos `ready_for_delivery` | Espina operacional Kitchen handoff | A validar en pasada Delivery |
+| Datos cliente / dirección / ventana | Tenant ops | A validar |
+
+**No re-certificar** KJ-01…04. Delivery **consume** Production Ready.
 
 ---
 
 ## Proceso (jornada objetivo)
 
 ```text
-Pedidos preparados
+Input: Production Ready
         ↓
-Asignación
+DJ-01  Pedidos preparados (cola Delivery)
         ↓
-Ruta
+DJ-02  Asignación
         ↓
-Entrega
+DJ-03  Ruta
         ↓
-Confirmación
+DJ-04  Entrega
         ↓
-Cierre
+DJ-05  Confirmación
+        ↓
+DJ-06  Cierre
+        ↓
+Outcome: Orders Delivered
 ```
-
-| Paso | Qué demostrar | Evidencia |
-|------|---------------|-----------|
-| Preparados | Ve cola lista para repartir | □ |
-| Asignación | Asigna conductor / ruta | □ |
-| Ruta | Recorre / gestiona stops | □ |
-| Entrega | Registra intento / entrega | □ |
-| Confirmación | Confirma resultado | □ |
-| Cierre | Cierra ruta / jornada | □ |
 
 ---
 
 ## Salidas
 
-- Rutas cerradas
-- Entregas confirmadas / incidencias de entrega
-- Estado consumible por Support / Accounting (si aplica)
+**Outcome:** **Orders Delivered** — Gate solo si demostrable con evidencia reproducible.
 
-**Outcome:** **Orders Delivered** — Gate PASS solo si este outcome es demostrable con evidencia.
+Downstream (continuidad):
 
----
-
-## Dependencias
-
-- Señal “preparado” desde Kitchen (o equivalente)
-- Caps `logistics.operate`
-- Entry CERTIFIED (`/admin/delivery`)
+```text
+Orders Delivered  →  Input Support
+```
 
 ---
 
-## Restricciones
+## Restricciones de la pasada Delivery
 
-- No cocina / producción write
-- No Platform SaaS
-- No facturación como home Accounting
-- Driver surface distinta — documentar límite Workspace vs `/driver`
-
----
-
-## Operational Journey (evidencia)
-
-| # | Paso | Resultado | Notas |
-|---|------|-----------|-------|
-| 1 | Entrar Delivery Workspace | □ | |
-| 2 | Pedidos preparados | □ | |
-| 3 | Asignación | □ | |
-| 4 | Ruta | □ | |
-| 5 | Entrega | □ | |
-| 6 | Confirmación | □ | |
-| 7 | Cierre | □ | |
+No modificar Identity · Auth · RBAC · Entry · Kitchen CERTIFIED · Support · Accounting.  
+No inventar features solo para pasar el gate.  
+No mezclar Flow Certification (Bloque G) — solo anotar Flow Gaps.
 
 ---
 
-## Workspace Validation
-
-| Criterio | OK |
-|----------|:--:|
-| Recorrido completo en Workspace | □ |
-| Operaciones críticas OK | □ |
-| Sin bloqueos P0/P1 | □ |
-| Límites claros (incl. Driver) | □ |
-| Evidencia reproducible | □ |
-
----
-
-## Negative Cases
-
-| Caso | Esperado | Resultado |
-|------|----------|-----------|
-| Sin `logistics.operate` | Denegado | □ |
-| Entrega sin stop asignado | Error controlado | □ |
-| Acceso Kitchen write / SaaS | Bloqueado | □ |
-
----
-
-## Observaciones
-
-*(rellenar en pasada)*
-
----
-
-## Riesgos
-
-| Riesgo | Severidad | Notas |
-|--------|-----------|-------|
-| Dependencia Kitchen handoff | Flow Gap | |
-| Split Delivery Ops vs Driver app | Surface boundary | Documentar |
-
----
-
-## Evidence Gate · Delivery
+## Evidence Gate · Delivery (plantilla)
 
 ```text
 STATUS: NOT STARTED
 
-Evidence
-  □ Operational Journey completo
-  □ Workspace Validation
-  □ Negative Cases
-  □ Observaciones / Riesgos clasificados
+Evidence (al cerrar)
+  □ DELIVERY_JOURNEY.md
+  □ DELIVERY_VALIDATION.md
+  □ DELIVERY_NEGATIVE_CASES.md
+  □ DELIVERY_OBSERVATIONS.md
 
 Gate: — | PASS | OBSERVATIONS | FAIL
+Outcome: Orders Delivered
 ```

@@ -4,30 +4,39 @@
 **Prerrequisito:** Entry CERTIFIED (EP-OPS-002)  
 **Cadena:** Entry → **Journey** → Flow (G) → Operational Readiness  
 
+### Continuidad Outcome → Input
+
 ```text
-Kitchen (Production Ready)          ← CERTIFIED · Gate OBSERVATIONS
+Kitchen     Production Ready          ✅ CERTIFIED · OBSERVATIONS
     ↓
-Delivery (Orders Delivered)         ← NEXT
+Delivery    Input = Production Ready  ← NEXT · Outcome: Orders Delivered
     ↓
-Support (Issues Resolved)
+Support     Input = Orders Delivered  · Outcome: Issues Resolved
     ↓
-Accounting (Financial Records Complete)
+Accounting  Input = Completed ops     · Outcome: Financial Records Complete
 ```
+
+---
+
+## CERTIFIED ≠ Gate perfecto
+
+| Señal | Significa |
+|-------|-----------|
+| CERTIFIED | Outcome operacional alcanzado |
+| OBSERVATIONS | Seguimiento documentado · no bloquea |
+| PASS | Sin observaciones materiales |
+| FAIL | Outcome no alcanzado |
 
 ---
 
 ## Gate board
 
-| Orden | Workspace | Outcome | Journey | Validation | Negatives | Gate | Status |
-|:-----:|-----------|---------|:-------:|:----------:|:---------:|:----:|--------|
-| 1 | [Kitchen](./kitchen.md) | Production Ready | ☑ | ☑ | ☑ | **OBSERVATIONS** | **CERTIFIED** |
-| 2 | [Delivery](./delivery.md) | Orders Delivered | □ | □ | □ | — | NOT STARTED |
-| 3 | [Support](./support.md) | Issues Resolved | □ | □ | □ | — | NOT STARTED |
-| 4 | [Accounting](./accounting.md) | Financial Records Complete | □ | □ | □ | — | NOT STARTED |
-
-Leyenda Gate: `PASS` · `OBSERVATIONS` · `FAIL` · `—`
-
-**Regla de orden:** Delivery puede abrirse — Kitchen Gate cerrado (OBSERVATIONS aceptadas).
+| Orden | Workspace | Input | Outcome | Gate | Status |
+|:-----:|-----------|-------|---------|:----:|--------|
+| 1 | [Kitchen](./kitchen.md) | Demanda confirmada | Production Ready | **OBSERVATIONS** | ✅ **CERTIFIED** |
+| 2 | [Delivery](./delivery.md) | **Production Ready** | Orders Delivered | — | NOT STARTED · **NEXT** |
+| 3 | [Support](./support.md) | Orders Delivered | Issues Resolved | — | NOT STARTED |
+| 4 | [Accounting](./accounting.md) | Completed ops / billing | Financial Records Complete | — | NOT STARTED |
 
 ---
 
@@ -35,33 +44,11 @@ Leyenda Gate: `PASS` · `OBSERVATIONS` · `FAIL` · `—`
 
 ```text
 Kitchen      ████████████  CERTIFIED · OBSERVATIONS · Production Ready
-Delivery     ░░░░░░░░░░░░  NOT STARTED
+Delivery     ░░░░░░░░░░░░  NOT STARTED · NEXT
 Support      ░░░░░░░░░░░░  NOT STARTED
 Accounting   ░░░░░░░░░░░░  NOT STARTED
 
 Journeys     ███░░░░░░░░░  25%  (1/4)
 ```
 
----
-
-## Niveles (no mezclar)
-
-| Nivel | Certifica | Gap típico |
-|-------|-----------|------------|
-| Entry | Navegación / landing | Entry Gap |
-| Journey | Trabajo en el Workspace | Journey Gap |
-| Flow | Traspaso entre departamentos | Flow Gap |
-
----
-
-## Regla P13
-
-No marcar un workspace **CERTIFIED** mientras falte evidencia de su pack.  
-No marcar Bloque C **PASS** mientras quede un workspace del alcance sin Gate.  
-No fingir Accounting PASS sin operación previa real (No Artificiality).
-
----
-
-## Pack por workspace
-
-Kitchen evidencia en [kitchen/](./kitchen/). Resto: un `*.md` índice + pack al abrir pasada.
+Kitchen pack: [kitchen/](./kitchen/) · Delivery prep: [delivery/](./delivery/) (scaffold)

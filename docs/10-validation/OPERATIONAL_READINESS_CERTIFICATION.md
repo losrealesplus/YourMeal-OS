@@ -60,8 +60,13 @@ Plantillas: [ep-ops-003/](./ep-ops-003/README.md) · Epic [EP-OPS-003](../00-sta
 
 Cuando el Gate del workspace = PASS u OBSERVATIONS (aceptadas) → Workspace Journey **CERTIFIED**.
 
+**FOPEBA:** CERTIFIED = Outcome operacional demostrado. OBSERVATIONS = seguimiento documentado, no denegación del Journey.
+
+**Continuidad:** el Outcome de un Journey es el Input del siguiente (ver [EP-OPS-003](../00-status/EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md) · Regla de continuidad).
+
 **Kitchen (2026-07-28):** CERTIFIED · Gate OBSERVATIONS · Outcome **Production Ready**  
-Evidencia: [ep-ops-003/kitchen/](./ep-ops-003/kitchen/).
+Evidencia: [ep-ops-003/kitchen/](./ep-ops-003/kitchen/).  
+**Siguiente:** Delivery · Input = Production Ready · Outcome = Orders Delivered.
 
 ### Nivel 2 · Operational Flow Certification
 
