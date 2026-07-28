@@ -1,81 +1,42 @@
-# Surface Matrix · EP-OPS-002
+# Surface Matrix · EP-OPS-002 (comportamiento final)
 
-**Estado:** Completa · CERTIFIED con RBAC-001 / WEP-001 / LP-001  
-**Fecha:** 2026-07-28
+**Estado:** **READY FOR RE-CERTIFICATION**  
+**Fecha:** 2026-07-28  
+**Nota:** Solo comportamiento post-corrección. Certificación en pasada RI-001.
 
 ---
 
-## Matriz principal
+## Matriz
 
 | Rol | Surface | Workspace | Landing |
 |-----|---------|-----------|---------|
 | Platform Owner / puro `saas_admin` | Platform | Platform Ops | `/saas` |
-| SaaS Admin (híbrido `company_admin`+`saas_admin`) | Tenant (entry) · Platform (entry opcional) | Operations Center | `/admin` |
+| SaaS Admin híbrido (`company_admin`+`saas_admin`) | Tenant (entry) · Platform (opcional) | Operations Center | `/admin` |
 | Company Admin | Tenant | Operations Center | `/admin` |
-| Operations | Tenant | Operations Center | `/admin` |
+| Operations (`operations_manager`) | Tenant | Operations Center | `/admin` |
 | Kitchen | Tenant | Kitchen | `/admin/kitchen` |
 | Delivery | Tenant | Delivery | `/admin/delivery` |
 | Support | Tenant | Support | `/admin/support` |
 | Accounting | Tenant | Accounting | `/admin/accounting` |
 | Customer | Customer | Customer Dashboard | `/app` |
 
-*Operations* = `operations_manager` (y Company Admin como superconjunto).
+---
+
+## Permitido / prohibido (resumen)
+
+| Rol | Permitido | Prohibido |
+|-----|-----------|-----------|
+| Puro SaaS Admin | `/saas/*` | Sustituir operación diaria Tenant; landing Customer |
+| Company Admin | Tenant `/admin/*` (caps admin) | `/saas` sin `saas.manage` |
+| Kitchen | Kitchen workspace | Platform · settings admin · accounting |
+| Delivery | Delivery / logistics | Platform · kitchen write · accounting |
+| Support | Support workspace | Platform · producción write · settings admin |
+| Accounting | Accounting workspace | Platform · cocina/reparto operate |
+| Customer | `/app` | `/admin/*` · `/saas/*` · workspaces internos |
 
 ---
 
-## Operaciones permitidas / prohibidas (por rol)
-
-### Platform Owner / puro SaaS Admin
-
-| Permitido | Prohibido |
-|-----------|-----------|
-| `/saas/*` · tenants · licencias · owners · config global | Usar Platform como sustituto de cocina/reparto del día |
-| Entrada Tenant solo si RBAC lo concede (`hasStaffAccess`) | Landing ambiguo a Customer App |
-
-### Company Admin
-
-| Permitido | Prohibido |
-|-----------|-----------|
-| Todo Tenant Ops `/admin/*` según capabilities de admin | `/saas` sin `saas.manage` → redirect `/admin` |
-| Configuración del negocio | Gestión Platform Owners / licencias globales |
-
-### Kitchen
-
-| Permitido | Prohibido |
-|-----------|-----------|
-| Kitchen workspace · ejecución cocina (capability) | Platform `/saas` · Admin settings · Accounting |
-| | Customer App como home |
-
-### Delivery
-
-| Permitido | Prohibido |
-|-----------|-----------|
-| Delivery / routes (logistics.operate) | Platform · Kitchen write · Accounting |
-| | Customer App como home |
-
-### Support
-
-| Permitido | Prohibido |
-|-----------|-----------|
-| Support workspace · lectura clientes/soporte | Platform · producción/cocina write · settings admin |
-| | Customer App como home |
-
-### Accounting
-
-| Permitido | Prohibido |
-|-----------|-----------|
-| Accounting workspace | Platform · cocina/reparto operate |
-| | Customer App como home |
-
-### Customer
-
-| Permitido | Prohibido |
-|-----------|-----------|
-| `/app` · menú · pedidos · perfil | `/admin/*` · `/saas/*` · workspaces internos |
-
----
-
-## Referencias
+## Referencias de corrección
 
 - [RBAC_SURFACE_CERTIFICATION](./RBAC_SURFACE_CERTIFICATION.md)
 - [WORKSPACE_ENTRY_POLICY](./WORKSPACE_ENTRY_POLICY.md)

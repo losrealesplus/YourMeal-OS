@@ -1,88 +1,64 @@
 # Landing Policy Validation (LP-001)
 
-**Estado:** **CERTIFIED** (EP-OPS-002 · 2026-07-28)  
+**Estado:** **READY FOR RE-CERTIFICATION** (EP-OPS-002 · Correction)  
 **Implementación:** [`src/lib/home-path.ts`](../../src/lib/home-path.ts)  
 **Tests:** [`src/lib/home-path.spec.ts`](../../src/lib/home-path.spec.ts)
 
 ---
 
-## Pregunta
+## Comportamiento final
 
-> ¿`homePathForRoles(roles)` es determinista para cualquier conjunto de roles?
+`homePathForRoles(roles)` es determinista: mismo conjunto de roles → mismo destino (independiente del orden del array).
 
-**Respuesta: SÍ.** Mismo multiset de roles → mismo path. El orden de entrada no altera el resultado (prioridad por reglas, no por posición en el array).
+### Prioridad (mayor → menor)
 
----
+1. Puro Platform (`saas_admin` sin staff Tenant) → `/saas`
+2. Company Admin / Operations Manager → `/admin`
+3. Staff único de departamento → workspace canónico
+4. Familia exclusiva multi-rol (solo kitchen · solo delivery · solo support · solo accounting) → workspace de esa familia
+5. Otro staff Tenant mezclado → `/admin`
+6. Driver → `/driver`
+7. Customer / default → `/app`
 
-## Prioridad (mayor → menor)
-
-1. **Puro Platform** — `saas_admin` **sin** ningún rol de staff Tenant → `/saas`
-2. **Company Admin / Operations Manager** → `/admin`
-3. **Staff único de departamento** → workspace canónico (tabla abajo)
-4. **Familias exclusivas multi-rol** — solo kitchen · solo delivery/logistics · solo support · solo accounting → workspace de esa familia
-5. **Otro staff Tenant** (multi-departamento mezclado) → `/admin` (picker / Ops Center)
-6. **Driver** (sin staff superior) → `/driver`
-7. **Customer / default** → `/app`
-
-### Staff Tenant reconocido
-
-`company_admin` · `operations_manager` · `kitchen` · `purchasing` · `inventory` · `production` · `support` · `accounting` · `logistics` · `delivery`
-
----
-
-## Mapa rol → landing (únicos)
+### Mapa (roles únicos)
 
 | Rol(es) | Landing |
 |---------|---------|
 | `saas_admin` solo | `/saas` |
-| `company_admin` | `/admin` |
-| `operations_manager` | `/admin` |
-| `kitchen` \| `production` | `/admin/kitchen` |
-| `delivery` \| `logistics` | `/admin/delivery` |
+| `company_admin` / `operations_manager` | `/admin` |
+| `kitchen` / `production` | `/admin/kitchen` |
+| `delivery` / `logistics` | `/admin/delivery` |
 | `support` | `/admin/support` |
 | `accounting` | `/admin/accounting` |
-| `inventory` \| `purchasing` | `/admin/inventory` |
+| `inventory` / `purchasing` | `/admin/inventory` |
 | `driver` | `/driver` |
 | `customer` / vacío | `/app` |
 
----
+### Desempates
 
-## Desempates
+| Caso | Destino |
+|------|---------|
+| `company_admin` o `operations_manager` + otros | `/admin` |
+| `saas_admin` + staff Tenant | Tenant-first (`/admin` o workspace vía reglas 2–4) |
+| `kitchen` + `delivery` (u otras familias mezcladas) | `/admin` |
+| `support` + `accounting` | `/admin` |
 
-| Caso | Regla | Destino |
-|------|-------|---------|
-| `company_admin` + cualquier otro | Admin gana | `/admin` |
-| `operations_manager` + dept | Ops gana | `/admin` |
-| `saas_admin` + staff Tenant | Tenant-first | `/admin` (o workspace vía reglas 2–4) |
-| `kitchen` + `delivery` | Multi-familia | `/admin` |
-| `support` + `accounting` | Multi-familia | `/admin` |
-| Solo `kitchen` + `production` | Familia cocina | `/admin/kitchen` |
+### Consumidores
 
----
-
-## Consumidores (una sola política)
-
-| Flujo | Usa LP |
-|-------|--------|
-| `resolveHomePath` | Sí |
-| Identity providers (`homePath`) | Sí |
-| Bootstrap selector / DEV panel | Sí |
-| Ruta `"/"` con sesión | Sí → `resolveHomePath` |
-| `/auth` / callback post-login | Sí → `resolveHomePath` |
-| `/auth/admin` | `decideOperationsCenterEntry` (alineado WEP; respeta `returnTo` seguro) |
+`resolveHomePath` · Identity `homePath` · Bootstrap selector · DEV panel · `"/"` · `/auth` callback.  
+`/auth/admin` usa `decideOperationsCenterEntry` (alineado; respeta `returnTo` seguro).
 
 ---
 
-## Evidence Gate · LP-001
+## Re-Certification Gate
 
 ```text
-STATUS: CERTIFIED
+STATUS: READY FOR RE-CERTIFICATION
 
-Evidence
-  ☑ Prioridad documentada
-  ☑ Desempates documentados
-  ☑ Determinismo verificado en tests (incl. orden invertido)
-  ☑ Platform Owner / SaaS · Company Admin · Employees · Customers cubiertos
+Correction evidence
+  ☑ Prioridad y desempates documentados
+  ☑ Destino único por conjunto de roles
+  ☑ Tests de reproducibilidad
 
-Gate: PASS
+Gate: — (no PASS · pendiente pasada RI-001)
 ```

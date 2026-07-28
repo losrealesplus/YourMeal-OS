@@ -1,12 +1,12 @@
-# Surface Navigation Report (EP-OPS-002 · Bloque D + F)
+# Surface Navigation Report (EP-OPS-002 · Correction)
 
-**Estado:** Validado (2026-07-28)  
-**Alcance:** Login → Landing → Workspace → Menú → Operación → Logout → Login  
-**Sin cambios:** Auth · sesiones · RLS · capabilities (solo redirect negativo Platform)
+**Estado:** **READY FOR RE-CERTIFICATION**  
+**Alcance:** Login → Landing → Workspace → Operación (consistencia post-corrección)  
+**Sin cambios:** Auth · sesiones · RLS · matriz de capabilities (solo redirect negativo Platform)
 
 ---
 
-## Recorrido positivo
+## Flujo corregido
 
 ```text
 Login
@@ -14,54 +14,40 @@ Login
 Landing (determinista)
   → Workspace path o Ops Center
 Menú de superficie
-  → Operación (capability guard en ruta hija)
-Logout
-  → /auth (o flujo auth existente)
-Login
-  → Mismo Landing / Workspace (misma política, sin estado de “última pantalla” obligatorio)
+  → Operación (capability guard)
+Logout → Login
+  → Mismo Landing (misma política de roles)
 ```
 
-| Check | Resultado | Notas |
-|-------|:---------:|-------|
-| Persistencia de roles → mismo home | PASS | Código puro sobre roles |
-| Refresh en ruta protegida | PASS | `beforeLoad` revalida guards |
-| Deep link workspace autorizado | PASS | Ruta hija + `assertCapabilityFromContext` |
-| Deep link workspace no autorizado | PASS | Redirect a `/admin` o `/app` según guard |
-| Logout → login → mismo workspace | PASS | LP no depende de historial |
+| Check | Comportamiento final |
+|-------|----------------------|
+| Mismos roles → mismo home | Sí (`homePathForRoles`) |
+| Refresh en ruta protegida | `beforeLoad` revalida guards |
+| Deep link autorizado | Ruta hija + capability |
+| Deep link no autorizado | Redirect `/admin` o `/app` |
+| Logout → login | Sin dependencia de “última pantalla” |
 
 ---
 
-## Casos negativos (Bloque F)
+## Casos negativos (comportamiento final)
 
-| Caso | Entrada | Esperado | Resultado |
-|------|---------|----------|:---------:|
-| Company Admin → `/saas` | sin `saas.manage` | Redirect **`/admin`** (Tenant home) | PASS (`assertSaasRoute`) |
-| Customer → `/saas` | sin staff | Redirect **`/app`** | PASS |
-| Customer → `/admin` | sin staff | Redirect **`/app`** | PASS |
-| Employee Kitchen → módulo Admin settings | sin `admin.settings` | Redirect **`/admin`** | PASS (capability context) |
-| Customer → workspace interno Support | sin staff | No entra Tenant Surface | PASS |
-| Pure SaaS Admin → Tenant `/admin` | `hasStaffAccess` incluye `saas_admin` | Acceso Tenant **permitido por RBAC vigente**; landing nativo sigue `/saas` | PASS (documentado; sin rediseño RBAC) |
-| Hybrid SaaS+Company Admin → Tenant | roles Bootstrap | Landing `/admin`; Platform vía entry | PASS |
-| Kitchen → `/admin/accounting` | sin `accounting.operate` | Redirect `/admin` | PASS |
+| Caso | Resultado esperado |
+|------|--------------------|
+| Company Admin → `/saas` sin `saas.manage` | Redirect `/admin` |
+| Customer → `/saas` | Redirect `/app` |
+| Customer → `/admin` | Redirect `/app` |
+| Kitchen → settings sin `admin.settings` | Redirect `/admin` |
+| Customer → workspaces internos | Bloqueado (no staff) |
+| Puro `saas_admin` | Landing `/saas`; Tenant solo si RBAC vigente lo concede |
+| Híbrido SaaS+Company Admin | Landing `/admin`; Platform vía entry |
 
----
-
-## Navegación desde raíces
-
-| Origen | Sesión | Destino |
-|--------|--------|---------|
-| `"/"` | autenticado | `resolveHomePath` |
-| `"/"` | anónimo | marketing / auth según ruta |
-| `/auth` post-login | OK | `resolveHomePath` |
-| `/auth/admin` post-login | staff | `resolvePostAdminLoginPath` (WEP) |
+Tests: `home-path.spec` · `operations-workspaces.test` · `open-operations-center.spec` · `route-guards.spec` · `resolve-home-path.spec`
 
 ---
 
-## Evidencia automatizada
+## Re-Certification Gate
 
-- `src/lib/home-path.spec.ts`
-- `src/lib/operations-workspaces.test.ts`
-- `src/lib/open-operations-center.spec.ts`
-- `src/permissions/route-guards.spec.ts`
-- `src/lib/resolve-home-path.spec.ts`
-- `src/bootstrap/profiles.spec.ts`
+```text
+STATUS: READY FOR RE-CERTIFICATION
+Gate: — (no PASS · pendiente pasada RI-001)
+```

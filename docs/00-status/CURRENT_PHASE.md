@@ -24,7 +24,7 @@ DONE:                Progress 100% · Gates PASS · Report READY|RWO · evidenci
 Permitido en RI-001: ejecutar cert · fix de hallazgo de cert · reabrir gate aprobado
 Prohibido:           nuevas features / ampliar alcance bajo etiqueta RI-001
 Pregunta maestra:    ¿Qué evidencia falta para certificar que YM OS opera una empresa real?
-Siguiente:           Ejecutar jornadas Bloque C (Entry ya CERTIFIED vía EP-OPS-002)
+Siguiente:           Ejecutar Bloque A → B (Pasada 2) dentro del alcance Frozen
                      · AUTH-B solo tras flujos certificados
                      · P14 Traceability = futuro (segundo producto)
 ══════════════════════════════════════════════════
@@ -49,17 +49,14 @@ Pilot Readiness (lectura)
 
 Mapa certificación (activo):
   A Foundation              □□□□□□□□□□
-  B Surfaces                ██████████  CERTIFIED · EP-OPS-002 (Tenant+Platform)
-  C Department Workspaces   ████░░░░░░  Entry CERTIFIED · jornadas pendientes
+  B Surfaces                ██░░░░░░░░  Tenant IN REVIEW
+  C Department Workspaces   □□□□□□□□□□
   D Operational Language    □□□□□□□□□□
   E RBAC & Access           □□□□□□□□□□
   F Observability Ready     □□□□□□□□□□
   G Flow Certification      □□□□□□□□□□  (plantilla lista)
   H Auth Transition         □□□□□□□□□□  AUTH-A/B
   I Certification Report    □□□□□□□□□□  CG-RI-001
-
-Siguiente:                 Completar jornadas Bloque C · Language D
-EP-OPS-002:                [PRECHECK](../10-validation/EP_OPS_002_PRECHECK.md) · Surface Matrix · WEP · LP
 
 Patrón permanente: Operational Representation (DICT-072)
 Madurez tenant:    Tenant Operational Autonomy (DICT-073)

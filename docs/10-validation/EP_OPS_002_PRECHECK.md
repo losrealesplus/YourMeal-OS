@@ -1,58 +1,55 @@
-# EP-OPS-002 · PRE-CHECK
+# EP-OPS-002 · Correction Status
 
+**Fase:** Correction  
+**Estado del bloque:** **READY FOR RE-CERTIFICATION**  
 **Fecha:** 2026-07-28  
-**Rama tip auditada:** `main` @ post-#87 → implementación en `cursor/ep-ops-002-surface-cert-f54a`  
-**Epic:** Surface & Workspace Certification  
-**Restricciones:** no Auth · no RBAC redesign · no Identity · no RLS · no Bootstrap  
+
+```text
+Discovery        ✓ COMPLETADO
+Evaluation       ✓ COMPLETADO
+Correction       ✓ COMPLETADO  ← este documento
+Re-Certification   Pendiente (pasada RI-001)
+```
 
 ---
 
-## Hallazgos previos (reproducibilidad)
+## Incidencias corregidas (sin re-evaluación)
 
-| ID | Descripción | Reproducible | Clasificación |
-|----|-------------|:------------:|---------------|
-| **RBAC-001 / FCR-001** | Tenant `/admin/settings` hub idéntico para Company Admin y perfil híbrido Platform+Tenant; Platform Surface es `/saas` (guard `saas.manage`) | Sí | **VALID** → cerrado como diseño Tenant (ver cert) |
-| **WEP-001 / FCR-004** | Kitchen landing: WEP pedía `kitchen-execution`; código + `OPERATIONS_WORKSPACES` → `/admin/kitchen` | Sí | **PARTIAL** → **CERTIFIED** canónico `/admin/kitchen` |
-| **WEP-001 / FCR-005** | Support → `/admin` (genérico); Accounting → `/admin` (genérico) | Sí | **VALID** → **FIXED** → `/admin/support` · `/admin/accounting` |
-| **WEP-001 / FCR-006** | Híbrido `company_admin`+`saas_admin` → `/admin` (no `/saas`) | Sí | **PARTIAL** → **CERTIFIED** tenant-first |
-| **LP-001** | `homePathForRoles` determinista (tests) pero no alineado WEP Support/Accounting | Sí | **VALID** → **FIXED** + documentado |
-
-Ningún hallazgo **STALE** por PRs posteriores en tip auditado.
+| ID | Corrección |
+|----|------------|
+| **RBAC-001** | Separación Tenant `/admin` vs Platform `/saas`; deny Platform → Tenant home para staff |
+| **WEP-001** | Landings directos por workspace (Support/Accounting/Kitchen/Delivery/…) |
+| **LP-001** | `homePathForRoles` prioridad + desempates deterministas |
 
 ---
 
-## Auditoría de código (pre → post)
+## Código tocado (navegación únicamente)
 
-| Función / ruta | Pre | Post EP-OPS-002 |
-|----------------|-----|-----------------|
-| `homePathForRoles()` | Support/Accounting → `/admin` | Support → `/admin/support` · Accounting → `/admin/accounting` · inventory/purchasing → `/admin/inventory` |
-| `resolveHomePath()` | roles + LP | Sin cambio de contrato |
-| `decideOperationsCenterEntry()` | sole workspace / admin / saas | Alineado (support/accounting direct) |
-| `assertSaasRoute` | deny → `/app` | deny staff → **`/admin`** · else `/app` |
-| Workspace id support | `customers` | **`support`** → `/admin/support` |
+- `src/lib/home-path.ts` (+ specs)
+- `src/lib/operations-workspaces.ts` (+ tests; workspace id `support`)
+- `src/permissions/route-guards.ts` (+ specs)
+- `src/lib/open-operations-center.spec.ts` (cobertura entry)
 
----
-
-## Decisión PRE-CHECK → ejecución
-
-| Acción | Estado |
-|--------|--------|
-| Documentar LP / WEP / Matrix / Surface cert | **DONE** |
-| Alinear landings Support · Accounting · kitchen canónico | **DONE** |
-| Negativo: Company Admin → `/saas` → Tenant home | **DONE** |
-| Cambiar capabilities / roles / Auth | **No** |
-| Evidence Gate | **PASS** — ver docs Bloque G |
+**No modificado:** Identity · Auth · OAuth · Phone · Sessions · RLS · Bootstrap · Platform Owner · capabilities / roles nuevos.
 
 ---
 
-## Certificación
+## Evidencia de corrección
 
-| ID | Status |
-|----|--------|
-| RBAC-001 | **CERTIFIED** |
-| WEP-001 | **CERTIFIED** |
-| LP-001 | **CERTIFIED** |
+| Artefacto | Estado |
+|-----------|--------|
+| [RBAC_SURFACE_CERTIFICATION](./RBAC_SURFACE_CERTIFICATION.md) | READY FOR RE-CERTIFICATION |
+| [WORKSPACE_ENTRY_POLICY](./WORKSPACE_ENTRY_POLICY.md) | READY FOR RE-CERTIFICATION |
+| [LANDING_POLICY_VALIDATION](./LANDING_POLICY_VALIDATION.md) | READY FOR RE-CERTIFICATION |
+| [SURFACE_NAVIGATION_REPORT](./SURFACE_NAVIGATION_REPORT.md) | READY FOR RE-CERTIFICATION |
+| [SURFACE_MATRIX](./SURFACE_MATRIX.md) | READY FOR RE-CERTIFICATION |
 
-**Pregunta maestra:** ¿Cuando cualquier usuario inicia sesión, entra automáticamente en la superficie correcta, el workspace correcto y el contexto operacional correcto?
+---
 
-**Respuesta: SÍ.**
+## Pregunta de cierre (Correction)
+
+> ¿Las incidencias previamente detectadas han sido corregidas de forma que el bloque está preparado para volver a certificarse?
+
+**Sí → READY FOR RE-CERTIFICATION**
+
+No PASS. No CERTIFIED. No actualización de RI-001 Progress (certificación = siguiente pasada).

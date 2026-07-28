@@ -1,8 +1,7 @@
 # Workspace Entry Policy (WEP-001)
 
-**Estado:** **CERTIFIED** (EP-OPS-002 · 2026-07-28)  
-**Fuente de verdad en código:** [`homePathForRoles`](../../src/lib/home-path.ts) · [`resolveOperationsEntry`](../../src/lib/operations-workspaces.ts) · [`decideOperationsCenterEntry`](../../src/lib/open-operations-center.ts)  
-**Relacionado:** [LANDING_POLICY_VALIDATION](./LANDING_POLICY_VALIDATION.md) · [SURFACE_MATRIX](./SURFACE_MATRIX.md)
+**Estado:** **READY FOR RE-CERTIFICATION** (EP-OPS-002 · Correction)  
+**Fuente de verdad:** [`homePathForRoles`](../../src/lib/home-path.ts) · [`resolveOperationsEntry`](../../src/lib/operations-workspaces.ts) · [`decideOperationsCenterEntry`](../../src/lib/open-operations-center.ts)
 
 ---
 
@@ -13,18 +12,16 @@ Autorización (RBAC)     →  ¿Qué puede hacer?
 Workspace Entry (WEP)   →  ¿Dónde empieza a trabajar?
 ```
 
-No son lo mismo. Un rol puede *poder* abrir `/admin` y aun así *debe* aterrizar en su workspace.
-
 **Nunca:** landing genérico → el usuario decide dónde entrar.
 
 ---
 
-## Política certificada
+## Comportamiento final (post-corrección)
 
 | Rol | Landing | Surface | Workspace |
 |-----|---------|---------|-----------|
-| Platform Owner / puro `saas_admin` | `/saas` | Platform | Platform Ops |
-| SaaS Admin híbrido (`company_admin`+`saas_admin`) | `/admin` | Tenant (tenant-first) | Operations Center |
+| Puro `saas_admin` | `/saas` | Platform | Platform Ops |
+| Híbrido `company_admin`+`saas_admin` | `/admin` | Tenant (tenant-first) | Operations Center |
 | Company Admin | `/admin` | Tenant | Operations Center |
 | Operations Manager | `/admin` | Tenant | Operations Center |
 | Kitchen / Production | `/admin/kitchen` | Tenant | Kitchen Workspace |
@@ -35,44 +32,37 @@ No son lo mismo. Un rol puede *poder* abrir `/admin` y aun así *debe* aterrizar
 | Driver | `/driver` | Driver | Driver |
 | Customer | `/app` | Customer | Customer Dashboard |
 
-### Kitchen canónico
+### Decisiones de corrección
 
-Workspace de entrada = **`/admin/kitchen`**.  
-`/admin/kitchen-execution` es una **pantalla operativa secundaria** dentro del workspace (no el landing).  
-Cierra FCR-004 como decisión de producto (no gap).
-
-### Híbrido Platform + Tenant
-
-Si el actor tiene roles de staff Tenant **y** `saas_admin`, el landing es **Tenant-first** (`/admin`).  
-Platform permanece accesible vía entry SaaS (`saas.manage`), no como segundo landing ambiguo.  
-Cierra FCR-006 como política documentada.
+- **Kitchen canónico** = `/admin/kitchen` (execution es pantalla secundaria, no landing).
+- **Support / Accounting** ya no aterrizan en `/admin` genérico.
+- **Híbrido Platform+Tenant** = tenant-first; Platform vía entry con `saas.manage`.
 
 ---
 
 ## Mecanismo
 
-| Punto de entrada | Función |
-|------------------|---------|
-| Login / OAuth callback / `"/"` | `resolveHomePath` → `homePathForRoles` |
-| `/auth/admin` post-login | `resolvePostAdminLoginPath` / `enterOperationsCenter` |
-| Brand / “Centro de Operaciones” | `decideOperationsCenterEntry` |
-| Bootstrap selector / DEV panel | `homePathForRoles` |
+| Entrada | Resolver |
+|---------|----------|
+| Login / OAuth / `"/"` | `resolveHomePath` → `homePathForRoles` |
+| `/auth/admin` | `resolvePostAdminLoginPath` / `enterOperationsCenter` |
+| Centro de Operaciones | `decideOperationsCenterEntry` |
+| Bootstrap / DEV panel | `homePathForRoles` |
 
-Staff con **un solo** workspace autorizado → `resolveOperationsEntry` → **direct**.  
-Admin / multi-workspace → Operations Center `/admin`.
+Staff con un solo workspace → entrada **directa**.  
+Admin / multi-workspace → `/admin` (Ops Center).
 
 ---
 
-## Evidence Gate · WEP-001
+## Re-Certification Gate
 
 ```text
-STATUS: CERTIFIED
+STATUS: READY FOR RE-CERTIFICATION
 
-Evidence
-  ☑ Cada rol del alcance aterriza en su Workspace
-  ☑ Sin landing genérico ambiguo para roles de departamento únicos
-  ☑ Kitchen / Support / Accounting / Delivery alineados
-  ☑ Tests: home-path · operations-workspaces · open-operations-center
+Correction evidence
+  ☑ Landings de departamento únicos sin hub genérico
+  ☑ Navegación determinista vía resolvers únicos
+  ☑ Tests de entry alineados
 
-Gate: PASS
+Gate: — (no PASS · pendiente pasada RI-001)
 ```
