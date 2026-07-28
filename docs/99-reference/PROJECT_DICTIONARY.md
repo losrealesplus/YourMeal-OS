@@ -3223,6 +3223,43 @@ Order Intake · DICT-075 · canal · WhatsApp · App
 [ADR 0017](../adr/0017-order-intake.md)
 
 
+---
+
+# Certification Completeness (P13)
+
+## ID
+DICT-077
+
+## Status
+Accepted
+
+## Madurez
+Core
+
+## Nombre
+Certification Completeness · P13
+
+## Tipo
+Principio de gobernanza de evidencia / certificación
+
+## Definición
+Un bloque de certificación no puede marcarse **CERTIFIED** mientras exista evidencia obligatoria pendiente para ese bloque. El porcentaje de **implementación** no sustituye al porcentaje de **certificación**.
+
+## Implica
+- Evidence Gate al cierre de cada bloque (PASS → siguiente).
+- Tabla viva de progreso de certificación (RI-001 Progress).
+- Un flujo crítico sin validar puede bloquear el gate completo.
+
+## No significa
+Exigir perfección absoluta · impedir waivers documentados · confundir ORR binario con % de features.
+
+## Palabras relacionadas
+Evidence Gate · P11 · P12 · CG-RI-001 · Surface Certified · Flow Certification
+
+## Referencias
+[P13](../20-evidence-framework/12-certification-completeness-p13.md) · [RI-001 Ops Readiness Backlog](../00-status/RI001_OPERATIONAL_READINESS_BACKLOG.md)
+
+
 ## Historial de este diccionario
 
 | Fecha | Cambio |
@@ -3248,3 +3285,4 @@ Order Intake · DICT-075 · canal · WhatsApp · App
 | 2026-07-24 | DICT-073 Tenant Operational Autonomy · WP-5 Tenant Provisioning · Architecture Freeze |
 | 2026-07-26 | DICT-074 Evidence Freshness (P12) · PRE-CHECK · STALE · caso PO nav Lovable |
 | 2026-07-28 | DICT-075 Order Intake · DICT-076 Order Source · ADR 0017 · CAP-008 |
+| 2026-07-28 | DICT-077 Certification Completeness · P13 · Evidence Gate · RI-001 backlog |

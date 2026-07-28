@@ -1,55 +1,98 @@
 # RI-001 Operational Readiness Backlog
 
 **Nombre oficial:** RI-001 Operational Readiness Backlog  
-*(no “Stabilization Backlog” — el cuello de botella ya no es infraestructura; es evidencia operacional)*  
+*(no “Stabilization Backlog” — el cuello de botella es evidencia operacional)*  
 
 **Epic marco:** EP-OPS-001 · RI-001 Operational Certification  
-**Gate:** [CG-RI-001](../10-validation/reports/RI001_CERTIFICATION_REPORT.md) — Certification Report  
-**Pregunta maestra de cada tarea:**
+**Gate final:** [CG-RI-001](../10-validation/reports/RI001_CERTIFICATION_REPORT.md)  
+**Principios:** P11 Evidence before Versioning · [P12](../20-evidence-framework/10-evidence-freshness-p12.md) · **[P13 Certification Completeness](../20-evidence-framework/12-certification-completeness-p13.md)**
+
+**Pregunta maestra (cada tarea):**
 
 > **¿Qué evidencia falta para poder certificar que YourMeal OS opera una empresa real?**
 
-**Método:** [OPERATIONAL_READINESS_CERTIFICATION](../10-validation/OPERATIONAL_READINESS_CERTIFICATION.md) · [FCR_SESSION_LOG](../10-validation/FCR_SESSION_LOG.md) · [FLOW_CERTIFICATION](../10-validation/FLOW_CERTIFICATION.md)
+```text
+¿Qué queda por corregir?     ← NO (backlog técnico)
+¿Qué evidencia falta?        ← SÍ  (programa de certificación)
+```
+
+**Método:** [ORC](../10-validation/OPERATIONAL_READINESS_CERTIFICATION.md) · [FCR_SESSION_LOG](../10-validation/FCR_SESSION_LOG.md) · [FLOW_CERTIFICATION](../10-validation/FLOW_CERTIFICATION.md)
+
+---
+
+## RI-001 Progress (vivo)
+
+*Actualizar al cerrar cada Evidence Gate. Implementación ≠ certificación (P13).*
+
+```text
+RI-001 Progress
+
+Foundation            ░░░░░░░░░░   0%   Gate —
+Surfaces              ██░░░░░░░░  20%   Tenant IN REVIEW
+Workspaces            ░░░░░░░░░░   0%   Gate —
+Language              ░░░░░░░░░░   0%   Gate —
+RBAC Access           ░░░░░░░░░░   0%   Gate —
+Observability         ░░░░░░░░░░   0%   Gate —
+Flows                 ░░░░░░░░░░   0%   Gate —
+Auth Transition       ░░░░░░░░░░   0%   Gate —
+Certification Report  ░░░░░░░░░░   0%   Gate —
+
+Overall (certificación)           ~2%   (1/9 bloques · parcial B)
+```
+
+| Bloque | Nombre | Gate | % cert. |
+|--------|--------|:----:|--------:|
+| A | Foundation | — | 0 |
+| B | Surfaces | IN REVIEW | ~20 |
+| C | Workspaces | — | 0 |
+| D | Language | — | 0 |
+| E | RBAC Access | — | 0 |
+| F | Observability | — | 0 |
+| G | Flows | — | 0 |
+| H | Auth Transition | — | 0 |
+| I | Certification Report | — | 0 |
 
 ---
 
 ## Organización
 
-No por áreas técnicas (Auth, UX, Render…).  
-Por **bloques de certificación operacional**.
-
 ```text
-A Foundation
- ↓
-B Surfaces
- ↓
-C Department Workspaces
- ↓
-D Operational Language
- ↓
-E RBAC & Operational Access
- ↓
-F Observability Readiness
- ↓
-G Flow Certification
- ↓
-H Authentication Transition
- ↓
-I RI-001 Certification Report  →  READY | READY WITH OBSERVATIONS | NOT READY
+A Foundation → B Surfaces → C Workspaces → D Language
+→ E RBAC → F Observability → G Flow → H Auth → I Report
 ```
+
+Cada bloque termina en un **Evidence Gate**.  
+**PASS** → puede comenzar el siguiente. **FAIL** → no saltar (P13).
 
 ---
 
-## Reglas transversales (cada bloque)
+## Evidence Gate (plantilla)
 
-Al **cerrar** cada bloque:
+Al cerrar **cada** bloque:
+
+```text
+STATUS
+  NOT STARTED | IN REVIEW | CERTIFIED
+
+Evidence (obligatoria del bloque)
+  ☑ … checklist del bloque …
+
+Gate
+  PASS | FAIL
+
+↓
+PASS → puede comenzar el siguiente bloque
+FAIL → completar evidencia obligatoria
+```
+
+Más:
 
 ### REVALIDATION CHECK · superficies
 
 ```text
 ¿Este bloque modificó otra superficie?
 NO → Continuar
-SÍ → Revalidar únicamente la(s) superficie(s) afectada(s)
+SÍ → Revalidar únicamente la(s) afectada(s)
 ```
 
 ### REVALIDATION CHECK · flujos
@@ -60,34 +103,44 @@ NO → Continuar
 SÍ → Recertificar únicamente ese flujo
 ```
 
-No recorrer todo el sistema por una corrección localizada.
-
 ### Disciplina
 
-- No corregir mientras se inspecciona (dentro de un bloque de evidencia).
-- No abrir conceptos metodológicos nuevos en medio de un bloque.
-- Toda observación → evidencia + clasificación (Surface Gap / Flow Gap / Render Stability / …).
+- No corregir mientras se inspecciona.
+- No abrir metodología nueva a mitad de bloque.
+- Toda observación → evidencia + clasificación.
 
 ---
 
 ## Bloque A · Foundation Validation
 
-**Objetivo:** confirmar que la base sobre la que se certifica no ha cambiado.
+**Objetivo:** confirmar que la base de certificación no ha cambiado.
 
 | Ítem | Evidencia / artefacto | Estado |
 |------|------------------------|--------|
 | Identity Frozen v1 | [IDENTITY_FREEZE_v1](./IDENTITY_FREEZE_v1.md) | □ |
-| Infrastructure Stable | INFRA / DV-001 · [DEPLOYMENT_VERIFICATION](../10-validation/DEPLOYMENT_VERIFICATION.md) | □ |
-| PRE-CHECK (P12) | [Evidence Freshness](../20-evidence-framework/10-evidence-freshness-p12.md) | □ |
-| Bloqueadores abiertos | Lista explícita + severidad | □ |
+| Infrastructure Stable | DV-001 · [DEPLOYMENT_VERIFICATION](../10-validation/DEPLOYMENT_VERIFICATION.md) | □ |
+| PRE-CHECK (P12) | [P12](../20-evidence-framework/10-evidence-freshness-p12.md) | □ |
+| Bloqueadores abiertos | Lista + severidad | □ |
 
-**Salida:** Foundation Certified ✅
+### Evidence Gate · A
+
+```text
+STATUS: NOT STARTED / IN REVIEW / CERTIFIED
+
+Evidence
+  □ Identity Frozen vigente
+  □ Infra / DV estable
+  □ P12 PRE-CHECK aplicado a hallazgos abiertos
+  □ Bloqueadores listados
+
+Gate: — (PASS solo con ☑ completos)
+```
+
+**Salida:** Foundation Certified → puede comenzar **B**.
 
 ---
 
 ## Bloque B · Surface Certification
-
-Certificar cada superficie como unidad independiente.
 
 | Superficie | Surface Status |
 |------------|:--------------:|
@@ -95,16 +148,28 @@ Certificar cada superficie como unidad independiente.
 | Platform Surface `/saas` | NOT STARTED |
 | Customer Surface `/app` | NOT STARTED |
 
-**CERTIFIED** solo tras validación completa (jornadas + Operación completada + sin P0/P1 abiertos).  
-Ver [ORC · Surface Certified](../10-validation/OPERATIONAL_READINESS_CERTIFICATION.md).
+### Evidence Gate · B (ejemplo por superficie)
 
-**Salida:** las tres superficies CERTIFIED (o waiver explícito de alcance piloto).
+```text
+B · Surface Certification · Tenant (ejemplo)
+
+STATUS: IN REVIEW
+
+Evidence
+  □ Navegación / jornadas
+  □ Permisos de superficie
+  □ UX operacional (Operación completada)
+  □ Casos negativos (sin datos · ya completado · superficie incorrecta)
+  □ Observaciones clasificadas (Session Log)
+
+Gate: — → PASS solo cuando las superficies del alcance = CERTIFIED
+```
+
+**Salida:** superficies del alcance CERTIFIED → puede comenzar **C**.
 
 ---
 
 ## Bloque C · Department Workspace Certification
-
-No se revisan pantallas: se certifica que el **departamento puede operar**.
 
 | Workspace | Estado |
 |-----------|:------:|
@@ -112,133 +177,151 @@ No se revisan pantallas: se certifica que el **departamento puede operar**.
 | Delivery | Pendiente |
 | Support | Pendiente |
 | Accounting | Pendiente |
-| Operations (Company Admin hub) | Pendiente |
+| Operations | Pendiente |
 
-Pregunta: *¿Puede este departamento terminar su jornada laboral solo con YourMeal OS?*  
-(Workspace Entry Policy · [WORKSPACE_ENTRY_POLICY](../10-validation/WORKSPACE_ENTRY_POLICY.md))
+Pregunta: *¿Puede este departamento terminar su jornada solo con YourMeal OS?*
 
-**Salida:** workspaces del alcance piloto CERTIFIED.
+### Evidence Gate · C
+
+```text
+Evidence
+  □ Jornada por workspace del alcance
+  □ Landing (Workspace Entry Policy)
+  □ Operación completada
+  □ Casos negativos / handovers anotados
+  □ Hallazgos clasificados
+
+Gate: — → PASS → puede comenzar D
+```
 
 ---
 
 ## Bloque D · Operational Language Review
 
-Consistencia del lenguaje operativo entre docs, UI y modelo.
+Alinear: Workspace · Intake · Order · Production · Dispatch · Route · Batch · Delivery · Customer · Order Source · Demand Channel.
 
-Ejemplos a alinear: Workspace · Intake · Order · Production · Dispatch · Route · Batch · Delivery · Customer · Order Source · Demand Channel.
+### Evidence Gate · D
 
-**Salida:** lenguaje coherente (DICT / OM / UI) — lista de divergencias cerrada o aceptada.
+```text
+Evidence
+  □ Divergencias DICT / OM / UI listadas
+  □ Divergencias cerradas o waiver
+  □ Glosario piloto coherente
+
+Gate: — → PASS → puede comenzar E
+```
 
 ---
 
 ## Bloque E · RBAC & Operational Access
 
-**Separado de Auth.** No reabre Identity Freeze.
+Separado de Auth (no reabre Identity Freeze).
 
-Certificar:
+### Evidence Gate · E
 
-- cada rol accede solo a su superficie;
-- permisos correctos;
-- sin accesos cruzados Tenant ↔ Platform indebidos.
+```text
+Evidence
+  □ Matriz rol × superficie verificada
+  □ Sin accesos cruzados indebidos
+  □ FCR-001 / hallazgos access clasificados
 
-Artefactos: [RBAC_MATRIX_V1](../10-validation/RBAC_MATRIX_V1.md) · FCR-001.
-
-**Salida:** access map verificado + hallazgos clasificados.
+Gate: — → PASS → puede comenzar F
+```
 
 ---
 
 ## Bloque F · Observability Readiness
 
-**Sin añadir observabilidad nueva** en este bloque.
+Sin añadir observabilidad nueva: validar evidencia existente.
 
-Validar que las operaciones críticas dejan evidencia suficiente:
+| Campo | □ |
+|-------|---|
+| Actor | |
+| Timestamp | |
+| Tenant | |
+| Superficie | |
+| Canal (Order Source) | |
+| Operación | |
 
-| Campo | Presente |
-|-------|:--------:|
-| Actor | □ |
-| Timestamp | □ |
-| Tenant | □ |
-| Superficie | □ |
-| Canal (Order Source, si Intake) | □ |
-| Operación | □ |
+### Evidence Gate · F
 
-**Salida:** Observability Ready for certification (gaps listados, no features nuevas).
+```text
+Evidence
+  □ Campos críticos presentes en ops clave
+  □ Gaps listados (sin features nuevas)
+
+Gate: — → PASS → puede comenzar G
+```
 
 ---
 
 ## Bloque G · Flow Certification
 
-Recorridos completos (Nivel 2). Plantilla: [FLOW_CERTIFICATION](../10-validation/FLOW_CERTIFICATION.md).
+Plantilla: [FLOW_CERTIFICATION](../10-validation/FLOW_CERTIFICATION.md).
 
-Ejemplos / mapeo:
+### Evidence Gate · G
 
-| Flujo | Evidencia |
-|-------|-----------|
-| Cliente → Pedido | A / B |
-| Cocina → Producción | G / workspace Kitchen |
-| Producción → Reparto | Flow Gap check |
-| Reparto → Entrega | A / Delivery |
-| Soporte → Incidencia | C |
+```text
+Evidence
+  □ Flujo A Pedido normal
+  □ Flujo B Personalizado
+  □ Flujo C Incidencia
+  □ Handovers críticos sin Flow Gap P0/P1
 
-Cada flujo genera evidencia para CG-RI-001.  
-Surface Gaps ≠ Flow Gaps.
-
-**Salida:** Flow Certification PASS (A/B/C + handovers críticos).
+Gate: — → PASS → puede comenzar H
+```
 
 ---
 
 ## Bloque H · Authentication Transition
 
-Separado del resto. No mezclar con Foundation ni con FCR Bootstrap.
+| Sub | Objetivo | Cuándo |
+|-----|----------|--------|
+| AUTH-A | Flujo Auth real | Escenarios finales |
+| AUTH-B | Quitar bootstrap temporal | **Solo** tras flujos certificados |
 
-| Sub-bloque | Objetivo | Cuándo |
-|------------|----------|--------|
-| **AUTH-A** | Recuperar flujo real de autenticación (necesario para escenarios finales) | Tras superficies/flujos de evidencia bajo Bootstrap si aplica |
-| **AUTH-B** | Eliminar bootstrap / smoke force temporal | **Solo** cuando flujos críticos estén certificados |
+### Evidence Gate · H
 
-Identity Freeze sigue: bug/security/provider activation — no rediseño Auth.
+```text
+Evidence
+  □ AUTH-A: login real operable en entorno de cert
+  □ AUTH-B: Bootstrap / smoke OFF en cert final
+  □ Identity Freeze respetado
 
-**Salida:** Auth producción operable · adaptador de desarrollo OFF en el entorno de certificación final.
+Gate: — → PASS → puede comenzar I
+```
 
 ---
 
 ## Bloque I · RI-001 Certification Report
 
-**No se desarrolla nada.** Solo se decide con evidencia.
+No se desarrolla. Solo decisión con evidencia.
 
-| Veredicto | Significado |
-|-----------|-------------|
-| **READY** | Evidencias respaldan operación real |
-| **READY WITH OBSERVATIONS** | Operable con observaciones aceptadas |
-| **NOT READY** | Brechas P0/P1 o flujos críticos incompletos |
+| Veredicto | |
+|-----------|--|
+| **READY** | |
+| **READY WITH OBSERVATIONS** | |
+| **NOT READY** | |
 
-Plantilla: [RI001_CERTIFICATION_REPORT](../10-validation/reports/RI001_CERTIFICATION_REPORT.md).
+### Evidence Gate · I
 
-**Salida:** decisión CG-RI-001 firmada.
+```text
+Evidence
+  □ Gates A–H PASS (o waivers)
+  □ Session Log + Flow evidence adjuntos
+  □ Decisión CG-RI-001 emitida
 
----
-
-## Estado resumen
-
-| Bloque | Nombre | Estado |
-|--------|--------|--------|
-| A | Foundation Validation | Pendiente / en curso |
-| B | Surface Certification | Tenant IN REVIEW · resto NOT STARTED |
-| C | Department Workspaces | Pendiente |
-| D | Operational Language | Pendiente |
-| E | RBAC & Operational Access | Pendiente (FCR-001 abierto) |
-| F | Observability Readiness | Pendiente |
-| G | Flow Certification | Plantilla lista · no ejecutar aún |
-| H | Authentication Transition | Diferido (AUTH-A/B) |
-| I | Certification Report | Diferido |
+Gate: PASS = informe firmado
+```
 
 ---
 
-## Relación con artefactos vivos
+## Relación con artefactos
 
 | Artefacto | Bloques |
 |-----------|---------|
 | FCR Session Log · Pasada 2 | B · C · E |
 | FLOW_CERTIFICATION | G |
-| Order Intake ADR 0017 | D (lenguaje) · F (canal) · G (Cliente→Pedido) |
-| ORR READY | consecuencia de B+G + sin P0/P1 → luego I / ORR formal |
+| Order Intake ADR 0017 | D · F · G |
+| P13 Certification Completeness | todos los Evidence Gates |
+| ORR / CG-RI-001 | tras I |

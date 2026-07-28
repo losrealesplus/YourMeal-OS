@@ -4,7 +4,7 @@
 **Auth Layer:** ✅ **Frozen** — [IDENTITY_FREEZE_v1](./IDENTITY_FREEZE_v1.md) · PRODUCT-001 · BUGFIX-002 · [Closeout](../10-validation/IDENTITY_CLOSEOUT_REPORT.md)  
 **Dev Bootstrap:** [BOOTSTRAP_MODE](./BOOTSTRAP_MODE.md) · `VITE_BOOTSTRAP_MODE` default OFF (nunca producción)  
 **Order Intake:** [ORDER_INTAKE](./ORDER_INTAKE.md) · [ADR 0017](../adr/0017-order-intake.md) · CAP-008 scaffold  
-**RI-001 backlog:** [RI001_OPERATIONAL_READINESS_BACKLOG](./RI001_OPERATIONAL_READINESS_BACKLOG.md) — bloques A→I · evidencia CG-RI-001  
+**RI-001 backlog:** [RI001_OPERATIONAL_READINESS_BACKLOG](./RI001_OPERATIONAL_READINESS_BACKLOG.md) — bloques A→I · Evidence Gates · [P13](../20-evidence-framework/12-certification-completeness-p13.md)  
 **Fase actual:** [CURRENT_PHASE](./CURRENT_PHASE.md) ← abrir primero · **certificación operacional** (no Auth)  
 **Dominios:** [PROJECT_DOMAINS](./PROJECT_DOMAINS.md) — Knowledge · Engineering · Experience · Operations  
 **Engineering Phase:** [ENGINEERING_PHASE](./ENGINEERING_PHASE.md) — Complete (pending operational authorization)  
