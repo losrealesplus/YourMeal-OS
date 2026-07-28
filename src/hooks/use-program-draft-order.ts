@@ -2,12 +2,13 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { createServiceContext } from "@/services/types";
-import { OrderService } from "@/modules/orders/application/order-service";
+import { OrderIntakeService } from "@/modules/order-intake";
 import { orderKeys } from "@/modules/orders/application/order-query-keys";
 import type { ProgramDraftOrderCommand } from "@/modules/orders/application/order-service";
 
 /**
- * CAP-004 — mutation hook: program Draft order + audit + invalidate.
+ * CAP-004 — mutation hook: program Draft order via Order Intake (ADR 0017).
+ * Channel: app (customer self-service).
  */
 export function useProgramDraftOrder() {
   const { user, tenantId, roles } = useAuth();
@@ -24,7 +25,12 @@ export function useProgramDraftOrder() {
         tenantId,
         roles,
       });
-      return OrderService.programDraft(ctx, command);
+      return OrderIntakeService.intakeDraftDay(ctx, {
+        weekStart: command.weekStart,
+        dayDate: command.dayDate,
+        dishIds: command.dishIds,
+        notes: command.notes,
+      });
     },
     onSuccess: async () => {
       if (!tenantId) return;

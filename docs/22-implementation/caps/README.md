@@ -16,6 +16,7 @@ Checklist: [PR_TECHNICAL_CHECKLIST](../PR_TECHNICAL_CHECKLIST.md).
 | CAP-005 | Order Summary | L2 | ❌ | ✅ | Connected ✓ | Parcial | [CAP-005](./CAP-005-order-summary.md) |
 | CAP-006 | Order Confirmation | L3 | ❌ | ✅ | Operational ✓ | ✔ HP-001 | [CAP-006](./CAP-006-order-confirmation.md) |
 | CAP-007 | Order History | L3 | ⏳ | ⏳ | Scaffold | ✖ | [CAP-007](./CAP-007-order-history.md) |
+| CAP-008 | Order Intake | L2 | — | ⏳ | Scaffold (App→Intake) | Parcial | [CAP-008](./CAP-008-order-intake.md) |
 
 **Hito:** Happy Path sin mocks (L3→L4) — [HAPPY_PATH_E2E](../HAPPY_PATH_E2E.md).  
 **Siguiente:** [ORR](../ORR.md) (PR sin features) → Phase 3 FOV · [Evidence Log](../HP-001_EVIDENCE_LOG.md).
