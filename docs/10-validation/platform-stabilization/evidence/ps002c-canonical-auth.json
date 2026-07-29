@@ -1,0 +1,35 @@
+{
+  "status": "BLOCKED",
+  "reason": "PS002_EMAIL / PS002_PASSWORD missing",
+  "gate": "PS-002-C",
+  "contract": "FCR-008",
+  "auth": "supabase_real",
+  "code_status": "UNCHANGED",
+  "at": "2026-07-29T17:09:45.641Z",
+  "pipeline": [],
+  "expected": [
+    "LOGIN",
+    "LOGIN_OK",
+    "CANONICAL_SESSION",
+    "BOOTSTRAP_START",
+    "IDENTITY_READY",
+    "PROFILE_READY",
+    "MEMBERSHIP_READY",
+    "ROLE_READY",
+    "HOME_PATH_RESOLVED",
+    "NAVIGATE",
+    "DASHBOARD_RENDERED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": null,
+  "duration_ms": {
+    "login_to_session": null,
+    "session_to_bootstrap": null,
+    "bootstrap_to_dashboard": null
+  },
+  "base": "http://127.0.0.1:8080",
+  "route": "/auth/admin",
+  "open_fcr": false
+}

@@ -1,0 +1,23 @@
+{
+  "$schema_note": "Example envelope for PS-002-C — status is PASS | FAIL | BLOCKED",
+  "status": "BLOCKED",
+  "reason": "PS002_EMAIL / PS002_PASSWORD missing",
+  "gate": "PS-002-C",
+  "contract": "FCR-008",
+  "auth": "supabase_real",
+  "code_status": "UNCHANGED",
+  "pipeline": [],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "duration_ms": {
+    "login_to_session": null,
+    "session_to_bootstrap": null,
+    "bootstrap_to_dashboard": null
+  },
+  "notes": [
+    "PASS = pipeline contract satisfied",
+    "FAIL = pipeline began and broke at a concrete step (open FCR for that step)",
+    "BLOCKED = validation could not start (credentials / server / env) — no FCR"
+  ]
+}

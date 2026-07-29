@@ -27,10 +27,13 @@ FLOW-01
 | Gate | Resultado | Acta |
 |------|-----------|------|
 | **PS-001** UI Stability | ✅ PASS | [PS-001.md](./PS-001.md) |
-| **PS-002** Auth Smoke | ✅ PASS | [PS-002.md](./PS-002.md) |
+| **PS-002-B** Auth Bootstrap smoke | ✅ PASS | [PS-002.md](./PS-002.md) |
+| **PS-002-C** Canonical Session (Auth Supabase real) | ⏳ PENDING | [PS-002.md](./PS-002.md) · [FCR-008](../FCR008_CANONICAL_POST_LOGIN_SESSION.md) |
 | **PS-003** Navigation Smoke | ✅ PASS | [PS-003.md](./PS-003.md) |
 
 Evidencia reproducible: `evidence/gates-summary.json` · capturas PNG · `scripts/platform-stabilization-gates.mjs`
+
+> **Flow gate:** PS-002 para FLOW-01 = **PS-002-C** (contrato canónico con Auth real). Bootstrap PASS no basta.
 
 ## Pre-check
 
@@ -41,30 +44,45 @@ Evidencia reproducible: `evidence/gates-summary.json` · capturas PNG · `script
 | Dual `getSession` | STALE (corregida) |
 | PRs #89→#99 | Revisados; #91/#92 mergeados en main |
 
-## Criterio de cierre (cumplido)
+## Criterio de cierre (Bootstrap — cumplido)
 
 ```text
 PS-001 = PASS
-PS-002 = PASS
+PS-002-B = PASS
 PS-003 = PASS
-→ PLATFORM STABILIZATION COMPLETE
-→ Platform Ready for FLOW CERTIFICATION
+→ PLATFORM STABILIZATION COMPLETE (Bootstrap)
 ```
 
-## Siguiente movimiento (humano / PR separado)
+## Criterio Flow-ready (estricto — pendiente)
 
 ```text
-FLOW-01
-Kitchen → Delivery
-Specification
+PS-001 = PASS
+AND
+PS-002-C = PASS (Auth Supabase real · contrato canónico)
+AND
+PS-003 = PASS
+↓
+PLATFORM STABILIZATION COMPLETE (Flow-ready)
+↓
+FLOW CERTIFICATION READY
+↓
+PR FLOW-01 · Kitchen → Delivery · Specification
 ```
 
-Bajo [FLOW_GOVERNANCE](../../00-status/FLOW_GOVERNANCE.md) / Operating Model v1 — **no** en este PR.
+## Siguiente movimiento
+
+```text
+1. Ejecutar PS-002-C (Auth real) — ver PS-002.md
+2. Solo entonces abrir PR FLOW-01
+```
+
+Bajo [FLOW_GOVERNANCE](../../00-status/FLOW_GOVERNANCE.md) / Operating Model v1 — **no** abrir FLOW-01 con “parece que funciona”.
 
 ## Firma
 
 | Campo | Valor |
 |-------|-------|
-| Decisión | Platform Stabilization **COMPLETE** |
-| Método | Bootstrap Mode + Playwright gates + estático FCR-002 |
-| Flow | Elegible para apertura · no iniciado |
+| Decisión | Stabilization Bootstrap **COMPLETE** · Flow-ready **PENDING PS-002-C** |
+| Método | Bootstrap gates + FCR-008 contrato + validador pipeline |
+| Flow | ⏸ **NO** hasta PS-002-C PASS |
+| Fix login | [FCR-008](../FCR008_CANONICAL_POST_LOGIN_SESSION.md) (cierra FCR-007) |

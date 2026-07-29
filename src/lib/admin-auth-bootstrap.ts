@@ -6,6 +6,7 @@
  * Global navigation uses `tryEnsurePlatformOwnerSession` instead (BUGFIX-002).
  * Callers must catch, surface UI, and always clear loading state.
  */
+import { emitCanonicalReady } from "@/auth/post-login-pipeline";
 import type { AppRole } from "@/hooks/use-auth";
 import { hasStaffAccess } from "@/permissions";
 import { resolvePostAdminLoginPath } from "@/lib/open-operations-center";
@@ -146,11 +147,22 @@ export async function enterOperationsCenter(opts: {
   ensurePlatformOwnerSession: () => Promise<unknown>;
   loadRoles: (userId: string) => Promise<AppRole[]>;
 }): Promise<EnterOperationsCenterResult> {
+  emitCanonicalReady("IDENTITY_READY", { userId: opts.userId });
   await opts.ensurePlatformOwnerSession();
+  emitCanonicalReady("PROFILE_READY", { userId: opts.userId });
   const roles = await opts.loadRoles(opts.userId);
+  emitCanonicalReady("MEMBERSHIP_READY", {
+    userId: opts.userId,
+    roleCount: roles.length,
+  });
+  emitCanonicalReady("ROLE_READY", { userId: opts.userId, roles });
   if (!hasStaffAccess(roles)) {
     return { status: "not_staff" };
   }
   const path = resolvePostAdminLoginPath(roles, opts.returnTo);
+  emitCanonicalReady("HOME_PATH_RESOLVED", {
+    userId: opts.userId,
+    path,
+  });
   return { status: "ok", path };
 }

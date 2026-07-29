@@ -28,8 +28,10 @@ export function SupabaseIdentityProvider({ children }: { children: ReactNode }) 
       setSession(s);
       setLoading(false);
     });
-    // INITIAL_SESSION from onAuthStateChange replaces a parallel getSession()
-    // (duplicate setSession caused an extra mount flash — Platform Stabilization).
+    // FCR-008: do NOT restore parallel getSession() here — that reopened FCR-002
+    // flicker and raced post-login. Canonical session after login comes from
+    // signInWithPassword / verifyOtp `data.session` (see auth.tsx / auth.admin.tsx).
+    // Cold hydrate relies on INITIAL_SESSION from onAuthStateChange.
     return () => sub.subscription.unsubscribe();
   }, []);
 

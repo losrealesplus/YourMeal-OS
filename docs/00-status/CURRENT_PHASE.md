@@ -4,42 +4,53 @@
 **No sustituye** [MILESTONES](./MILESTONES.md) — tablero de “dónde estamos ahora”.
 
 ```text
-══════════════════════════════════════════════════════════════
-YOURMEAL OS · OPERATING MODEL v1 · ACTIVE
-══════════════════════════════════════════════════════════════
+═══════════════════════════════════════════════
+YOURMEAL OS · CURRENT GATE
+═══════════════════════════════════════════════
 
-Platform                  ✅ CLOSED (v1)
-Operating Model           ✅ v1 ACTIVE  (constitución operativa)
-Transition                ✅ DECLARED (Platform → Flow)
-Baseline                  🔒 v1
-Operational Core          🔒 LOCKED
-Governance                🔒 COMPLETE
-Flow Governance           🔒 ACTIVE
+Foundation                  ✅ COMPLETE
+Identity                    ✅ COMPLETE
+Operational Core            ✅ COMPLETE
+Governance                  ✅ COMPLETE
+Operating Model             ✅ COMPLETE (v1 ACTIVE)
+Platform Stabilization      🟡 IN PROGRESS
 
-Foundation                🔒 LOCKED
-Auth                      🔒 FROZEN
-Identity                  🔒 FOUNDATION LOCKED
-Platform Stabilization    ✅ COMPLETE (Bootstrap gates; Flow-ready ver PS-002-C)
+PS-001                      ✅ PASS
+PS-002-B                    ✅ PASS
+PS-002-C                    ⏳ WAITING / BLOCKED
+                             (Auth Supabase real · credenciales)
+PS-003                      ✅ PASS
 
-Entry                     ✅ CERTIFIED
-Journeys                  ✅ COMPLETE
-Flow                      ▶ CURRENT  (certificación operacional)
+FCR-008                     ✅ Canonical session (código)
+FCR-009                     🔍 Auth E2E investigation
+                             (Toaster ausente · no fix aún)
 
-══════════════════════════════════════════════════════════════
-CURRENT OBJECTIVE
+═══════════════════════════════════════════════
+OPEN GATE
 
-  Flow Certification
-  Outcome → Handoff → Outcome → Evidence → Certification
-  (nunca Pantalla → API → Componente → PASS)
+  PS-002-C = PASS
+  (status · pipeline completo · duplicates=[] · missing=[] · out_of_order=[])
+  → DASHBOARD_RENDERED
+  Evidencia: npm run test:ps002-canonical-auth
+  duration_ms = telemetría diagnóstica (no criterio PASS/FAIL)
+  BLOCKED ≠ FAIL (faltan PS002_EMAIL / PS002_PASSWORD)
 
-Progress metric:
-  Flows especificados · ejecutados · certificados
-  (no pantallas · features · PRs)
+═══════════════════════════════════════════════
+NEXT PHASE (solo tras OPEN GATE)
 
-FLOW-01: ⏸ abrir solo con PR Specification dedicado
-         (tras PS-001 ∧ PS-002 Auth real ∧ PS-003 según acta de estabilización)
+  Platform Stabilization COMPLETE
+  ↓
+  FLOW-01
+  Kitchen → Delivery
+  Specification
+
 Prohibido prematuro: Event Bus · Notifications · Jobs · Analytics · AI
-══════════════════════════════════════════════════════════════
+═══════════════════════════════════════════════
+Ver: ../10-validation/PRIORITY_PS002C_BEFORE_FLOW.md
+     ../10-validation/platform-stabilization/PS-002.md
+     ../10-validation/FCR008_CANONICAL_POST_LOGIN_SESSION.md
+     ../10-validation/auth/AUTH_E2E_INVESTIGATION.md
+═══════════════════════════════════════════════
 ```
 
 **Constitución operativa:** [OPERATING_MODEL_v1](./OPERATING_MODEL_v1.md) — ACTIVE  
@@ -47,9 +58,9 @@ Prohibido prematuro: Event Bus · Notifications · Jobs · Analytics · AI
 
 **Pregunta del producto:** ¿Cómo **opera** YourMeal OS? → solo Flow puede responderla.
 
-**Locks vigentes (main):**  
+**Locks vigentes:**  
 [IDENTITY_FOUNDATION_LOCK_v1](./IDENTITY_FOUNDATION_LOCK_v1.md) · [IDENTITY_FREEZE_v1](./IDENTITY_FREEZE_v1.md) · [STRATEGIC_ORDER_POST_IDENTITY_LOCK](./STRATEGIC_ORDER_POST_IDENTITY_LOCK.md)  
-**Stabilization:** [PLATFORM_STABILIZATION_COMPLETE](../10-validation/platform-stabilization/PLATFORM_STABILIZATION_COMPLETE.md)
+**Stabilization:** [PLATFORM_STABILIZATION_COMPLETE](../10-validation/platform-stabilization/PLATFORM_STABILIZATION_COMPLETE.md) (Bootstrap PASS · Flow-ready = PS-002-C)
 
 **Acta de transición:** [PLATFORM_FLOW_TRANSITION_DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) — COMPLETE  
 **Gobernanza:** [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) — política permanente (6 reglas)  
@@ -72,11 +83,11 @@ Prohibido prematuro: Event Bus · Notifications · Jobs · Analytics · AI
 ## Continuación histórica (referencia)
 
 El bloque siguiente conserva contexto de fases anteriores.  
-**Prioridad operativa:** Flow Certification · Core sin cambios salvo evidencia.
+**Prioridad operativa:** cerrar PS-002-C · luego Flow Certification · Core sin cambios salvo evidencia.
 
 ```text
 Siguiente artefacto activo:
-  Flow Certification (Bloque G)
+  PS-002-C (Auth Supabase real) → luego Flow Certification (Bloque G)
   · Entry ✅ · Journey ✅ · Flow ⏳ NOT STARTED (elegible · Operating Model ACTIVE)
   · Paradigma G: organización · transferencias · no pantallas
   · Post-Identity: STRATEGIC_ORDER_POST_IDENTITY_LOCK.md
@@ -88,7 +99,7 @@ Mapa certificación (activo):
   D Operational Language    □□□□□□□□□□
   E RBAC & Access           □□□□□□□□□□
   F Observability Ready     □□□□□□□□□□
-  G Flow Certification      □□□□□□□□□□  elegible · NEXT
+  G Flow Certification      □□□□□□□□□□  elegible · NEXT (tras PS-002-C)
   H Auth Transition         □□□□□□□□□□
   I Certification Report    □□□□□□□□□□
 
@@ -104,5 +115,5 @@ Journeys: [EP_OPS_003_JOURNEYS_COMPLETE](./EP_OPS_003_JOURNEYS_COMPLETE.md) ✅
 Programa RI-001: [RI001_PROGRAM_FROZEN](./RI001_PROGRAM_FROZEN.md) · Backlog A–I arriba.
 
 > ❌ No reabrir Foundation / Auth / Identity / Core sin evidencia + ADR ([CHANGE_AUTHORITY](./CHANGE_AUTHORITY.md)).  
-> ✅ Toda la energía en **Flow Certification**.  
+> ✅ Primero evidencia PS-002-C · luego **Flow Certification**.  
 > Acta: [PLATFORM_FLOW_TRANSITION_DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) · COMPLETE.
