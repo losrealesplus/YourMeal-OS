@@ -5,15 +5,13 @@
 
 ```text
 ═══════════════════════════════════════════════
-        YOURMEAL OS · PLATFORM STATUS
+        YOURMEAL OS · PLATFORM BASELINE v1
 ═══════════════════════════════════════════════
 
-Platform                  COMPLETE
-
-Operational Core          LOCKED
-  · Declared              ✅
-  · Contract              ACTIVE
-  · Docs                  CLOSED
+Platform                  ✅ COMPLETE
+Baseline                  🔒 v1
+Operational Core          🔒 LOCKED
+Governance                🔒 COMPLETE
 
 Foundation                🔒 LOCKED
 Auth                      🔒 FROZEN
@@ -21,7 +19,7 @@ Identity                  🔒 FOUNDATION LOCKED
 
 Entry                     ✅ CERTIFIED
 Journeys                  ✅ COMPLETE
-Flow                      ⏳ NEXT
+Flow                      ▶ CURRENT
 
 ═══════════════════════════════════════════════
 CURRENT OBJECTIVE
@@ -29,17 +27,21 @@ CURRENT OBJECTIVE
   Flow Certification
   (Bloque G · handoffs · no pantallas)
 
+Progress metric:
+  Certificaciones superadas
+  (no funcionalidades acumuladas)
+
 ═══════════════════════════════════════════════
 ```
 
-**Pregunta obligatoria en todo PR:**  
-¿Este cambio **consume** el Operational Core o intenta **redefinirlo**?  
-→ Redefine = ❌ rechazado · Consume = ✅ continúa revisión  
-→ Checklist: plantilla de PR · Contrato: [OPERATIONAL_CORE_CONTRACT](./OPERATIONAL_CORE_CONTRACT.md)  
-→ Autoridad de cambio: [CHANGE_AUTHORITY](./CHANGE_AUTHORITY.md)
+**Pregunta de fase (todo PR):**  
+¿Respeta la Baseline? → ¿Respeta el Core? → ¿Produce evidencia operacional? → ¿Acerca Flow a certificación?  
+
+**Pregunta Core:** ¿Consume el Operational Core o lo redefine? → Redefine = ❌  
+→ [PLATFORM_BASELINE_v1](./PLATFORM_BASELINE_v1.md) · [OPERATIONAL_CORE_CONTRACT](./OPERATIONAL_CORE_CONTRACT.md) · [CHANGE_AUTHORITY](./CHANGE_AUTHORITY.md) · plantilla PR
 
 **Actas de plataforma:**  
-[OPERATIONAL_CORE_DECLARED](./OPERATIONAL_CORE_DECLARED.md) · [OPERATIONAL_CORE_CONTRACT](./OPERATIONAL_CORE_CONTRACT.md) · [CORE_DOCUMENTATION_CLOSED](./CORE_DOCUMENTATION_CLOSED.md) · [PLATFORM_PHASE_COMPLETE](./PLATFORM_PHASE_COMPLETE.md)
+[PLATFORM_BASELINE_v1](./PLATFORM_BASELINE_v1.md) · [PLATFORM_PHASE_COMPLETE](./PLATFORM_PHASE_COMPLETE.md) · [OPERATIONAL_CORE_DECLARED](./OPERATIONAL_CORE_DECLARED.md) · [OPERATIONAL_CORE_CONTRACT](./OPERATIONAL_CORE_CONTRACT.md) · [CORE_DOCUMENTATION_CLOSED](./CORE_DOCUMENTATION_CLOSED.md)
 
 **Certificación (detalle RI-001):** [RI001_OPERATIONAL_READINESS_BACKLOG](./RI001_OPERATIONAL_READINESS_BACKLOG.md) · [BLOCK_G_FLOW_FRAMING](../10-validation/ep-ops-003/BLOCK_G_FLOW_FRAMING.md)
 

@@ -55,11 +55,17 @@ Experience
 | #91 | Identity Hardening |
 | #92 | Identity Foundation Lock |
 | #93 / #94 | Core Declared · Contract · docs closed |
-| #95 (este) | Governance: CURRENT_PHASE · CHANGE_AUTHORITY · PR template |
+| #95 | Governance: CURRENT_PHASE · CHANGE_AUTHORITY · PR template |
+| #96 | Platform Baseline v1 |
 
 ---
 
+## Baseline
+
+Fotografía oficial: [PLATFORM_BASELINE_v1](./PLATFORM_BASELINE_v1.md).  
+Todo desarrollo futuro parte de esa baseline.
+
 ## Siguiente fase
 
-**Flow Certification** — única prioridad de capa Core pendiente.  
-Core sin cambios salvo [CHANGE_AUTHORITY](./CHANGE_AUTHORITY.md).
+**Flow Certification** — única prioridad.  
+Core / Baseline sin cambios salvo [CHANGE_AUTHORITY](./CHANGE_AUTHORITY.md).

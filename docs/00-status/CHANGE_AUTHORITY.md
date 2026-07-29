@@ -4,7 +4,7 @@
 **Fecha:** 2026-07-29  
 **Tipo:** Regla de gobierno  
 **Estado:** Active  
-**No modifica FOPEBA.** Complementa [OPERATIONAL_CORE_CONTRACT](./OPERATIONAL_CORE_CONTRACT.md).
+**No modifica FOPEBA.** Complementa [OPERATIONAL_CORE_CONTRACT](./OPERATIONAL_CORE_CONTRACT.md) · [PLATFORM_BASELINE_v1](./PLATFORM_BASELINE_v1.md).
 
 ---
 

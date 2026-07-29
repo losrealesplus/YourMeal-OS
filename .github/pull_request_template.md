@@ -2,11 +2,17 @@
 
 <!-- What changed and why (1–3 sentences). -->
 
+## Phase alignment (Flow Certification)
+
+- [ ] Respeta [PLATFORM_BASELINE_v1](../docs/00-status/PLATFORM_BASELINE_v1.md)
+- [ ] Produce o habilita evidencia operacional (o N/A justificado)
+- [ ] Acerca Flow a certificación (o N/A — consumidor/servicio post-Flow)
+
 ## Operational Core Compliance
 
-> Pregunta obligatoria: ¿este cambio **consume** el Operational Core o intenta **redefinirlo**?  
-> Si redefine → ❌ rechazado. Si consume → continúa revisión.  
-> Contrato: `docs/00-status/OPERATIONAL_CORE_CONTRACT.md` · Autoridad: `docs/00-status/CHANGE_AUTHORITY.md`
+> ¿Este cambio **consume** el Operational Core o intenta **redefinirlo**?  
+> Redefine → ❌ rechazado · Consume → continúa revisión.  
+> Baseline: `docs/00-status/PLATFORM_BASELINE_v1.md` · Contract: `docs/00-status/OPERATIONAL_CORE_CONTRACT.md` · Authority: `docs/00-status/CHANGE_AUTHORITY.md`
 
 - [ ] No redefine Foundation
 - [ ] No redefine Auth
@@ -19,7 +25,7 @@
 ## Test plan
 
 - [ ] Tests / checks relevantes pasan (o N/A justificado)
-- [ ] Sin cambios a Auth / Identity / Core salvo evidencia + ADR
+- [ ] Sin cambios a Auth / Identity / Core salvo evidencia + ADR ([CHANGE_AUTHORITY](../docs/00-status/CHANGE_AUTHORITY.md))
 
 ## Notes
 

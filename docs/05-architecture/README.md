@@ -16,6 +16,7 @@
 | [../00-status/OPERATIONAL_CORE_CONTRACT.md](../00-status/OPERATIONAL_CORE_CONTRACT.md) | Core Contract ACTIVE — 8 garantías a módulos |
 | [../00-status/CHANGE_AUTHORITY.md](../00-status/CHANGE_AUTHORITY.md) | Quién puede cambiar cada área del sistema |
 | [../00-status/PLATFORM_PHASE_COMPLETE.md](../00-status/PLATFORM_PHASE_COMPLETE.md) | Fase de Plataforma COMPLETE |
+| [../00-status/PLATFORM_BASELINE_v1.md](../00-status/PLATFORM_BASELINE_v1.md) | Baseline v1 — punto de partida de todo desarrollo futuro |
 | [../00-status/CORE_DOCUMENTATION_CLOSED.md](../00-status/CORE_DOCUMENTATION_CLOSED.md) | Cierre documental Foundation / Identity / Core |
 | [FOUR_LAYERS.md](./FOUR_LAYERS.md) | Knowledge · Platform · Materialization · Operational |
 | [TENANT_BRANDING.md](./TENANT_BRANDING.md) | BrandConfig · Tenant-Managed runtime · `brand.manage` |

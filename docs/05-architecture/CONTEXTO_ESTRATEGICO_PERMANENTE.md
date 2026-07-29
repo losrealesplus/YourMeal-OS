@@ -19,7 +19,7 @@ La arquitectura base se considera estable.
 
 Cualquier cambio estructural requiere un ADR.
 
-**2026-07-29 — Operational Core Declared + Contract ACTIVE.** El corazón operativo (Foundation → Auth → Identity → Entry → Journey → Flow*) se declara como **Operational Core** con [contrato de 8 garantías](../00-status/OPERATIONAL_CORE_CONTRACT.md). Los módulos futuros **consumen** el Core; no lo redefinen. Principio: [Operational Layer Independence](./OPERATIONAL_LAYER_INDEPENDENCE.md) · [Declared](../00-status/OPERATIONAL_CORE_DECLARED.md) · [Docs Core cerradas](../00-status/CORE_DOCUMENTATION_CLOSED.md). \*Flow entra al Core al certificar.
+**2026-07-29 — Platform Baseline v1.** Fase de Plataforma **COMPLETE**. Fotografía oficial: [PLATFORM_BASELINE_v1](../00-status/PLATFORM_BASELINE_v1.md). Pregunta del producto: *¿cómo opera YourMeal OS?* Progreso = certificaciones. Objetivo actual: Flow Certification. Core / Baseline solo cambian con evidencia + [CHANGE_AUTHORITY](../00-status/CHANGE_AUTHORITY.md).
 
 Entramos oficialmente en:
 
