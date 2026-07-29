@@ -120,3 +120,4 @@ Categorías ambiguas (“refactor general”, “mejoras varias”) → ❌ rech
 | Pregunta abierta | ¿Cómo opera YourMeal OS? → Flow |
 | Siguiente fase | Flow Certification ▶ CURRENT |
 | Transición institucional | [PLATFORM_FLOW_TRANSITION_DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) · COMPLETE |
+| Operating Model | [OPERATING_MODEL_v1](./OPERATING_MODEL_v1.md) · ACTIVE |

@@ -5,10 +5,11 @@
 
 ```text
 ══════════════════════════════════════════════════════════════
-YOURMEAL OS · PLATFORM → FLOW TRANSITION · COMPLETE
+YOURMEAL OS · OPERATING MODEL v1 · ACTIVE
 ══════════════════════════════════════════════════════════════
 
 Platform                  ✅ CLOSED (v1)
+Operating Model           ✅ v1 ACTIVE  (constitución operativa)
 Transition                ✅ DECLARED (Platform → Flow)
 Baseline                  🔒 v1
 Operational Core          🔒 LOCKED
@@ -37,6 +38,9 @@ Progress metric:
 ══════════════════════════════════════════════════════════════
 ```
 
+**Constitución operativa:** [OPERATING_MODEL_v1](./OPERATING_MODEL_v1.md) — ACTIVE  
+> La arquitectura ya no dirige el desarrollo; el **Flow** dirige el desarrollo sobre una arquitectura estable.
+
 **Pregunta del producto:** ¿Cómo **opera** YourMeal OS? → solo Flow puede responderla.
 
 **Acta de transición:** [PLATFORM_FLOW_TRANSITION_DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) — COMPLETE  
@@ -51,7 +55,7 @@ Progress metric:
 **Categoría de PR (exactamente una):** [PR_TAXONOMY](./PR_TAXONOMY.md) — preferir títulos `FLOW-NN`  
 
 **Actas:**  
-[PLATFORM_FLOW_TRANSITION_DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) · [PLATFORM_V1_CLOSED](./PLATFORM_V1_CLOSED.md) · [PLATFORM_BASELINE_v1](./PLATFORM_BASELINE_v1.md) · [FLOW_CERTIFICATION_OPEN](./FLOW_CERTIFICATION_OPEN.md) · [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) · [FLOW_FIRST](./FLOW_FIRST.md) · [CHANGE_AUTHORITY](./CHANGE_AUTHORITY.md) · [OPERATIONAL_CORE_CONTRACT](./OPERATIONAL_CORE_CONTRACT.md)
+[OPERATING_MODEL_v1](./OPERATING_MODEL_v1.md) · [PLATFORM_FLOW_TRANSITION_DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) · [PLATFORM_V1_CLOSED](./PLATFORM_V1_CLOSED.md) · [PLATFORM_BASELINE_v1](./PLATFORM_BASELINE_v1.md) · [FLOW_CERTIFICATION_OPEN](./FLOW_CERTIFICATION_OPEN.md) · [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) · [FLOW_FIRST](./FLOW_FIRST.md) · [CHANGE_AUTHORITY](./CHANGE_AUTHORITY.md) · [OPERATIONAL_CORE_CONTRACT](./OPERATIONAL_CORE_CONTRACT.md)
 
 **Certificación (detalle RI-001):** [RI001_OPERATIONAL_READINESS_BACKLOG](./RI001_OPERATIONAL_READINESS_BACKLOG.md) · [BLOCK_G_FLOW_FRAMING](../10-validation/ep-ops-003/BLOCK_G_FLOW_FRAMING.md)
 

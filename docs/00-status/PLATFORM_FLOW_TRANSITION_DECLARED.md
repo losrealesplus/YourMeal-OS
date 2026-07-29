@@ -141,6 +141,8 @@ A partir de ahora, cada nueva capacidad deberá justificar su existencia por:
 
 no simplemente por añadir una funcionalidad más.
 
+Constitución operativa resultante: [OPERATING_MODEL_v1](./OPERATING_MODEL_v1.md) · ACTIVE.
+
 ---
 
 ## Firma
@@ -149,6 +151,7 @@ no simplemente por añadir una funcionalidad más.
 |-------|-------|
 | Decisión | Platform → Flow Transition **DECLARED · COMPLETE** |
 | Platform | v1 CLOSED |
+| Operating Model | [v1 ACTIVE](./OPERATING_MODEL_v1.md) |
 | Fase actual | Flow Certification ▶ CURRENT |
 | Lenguaje oficial | Operación certificable ([FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md)) |
 | Knowledge Lifetime | Iteration *(acta inmutable al cierre de transición)* |
