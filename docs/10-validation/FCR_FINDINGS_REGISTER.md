@@ -16,6 +16,7 @@
 | [FCR002](./FCR002_FLICKER_INVESTIGATION.md) | Render Stability Regression |
 | [FCR007](./FCR007_LOGIN_BLOCKER_INVESTIGATION.md) | Login Blocker (post-login no Navigate) · P0 |
 | [FCR008](./FCR008_CANONICAL_POST_LOGIN_SESSION.md) | Canonical Post-Login Session · fix FCR-007 |
+| [auth/AUTH_E2E_INVESTIGATION](./auth/AUTH_E2E_INVESTIGATION.md) | FCR-009 Auth E2E investigation (no fix) |
 | [platform-stabilization/](./platform-stabilization/PLATFORM_STABILIZATION_REPORT.md) | Platform Stabilization v1 · Pre-Flow |
 | [BOOTSTRAP_FCR_CHECKLIST](./BOOTSTRAP_FCR_CHECKLIST.md) | Checklist 7 perfiles |
 
@@ -63,6 +64,7 @@ Es **qué superficie** está administrando cada menú.
 | **FCR-002** | **Render Stability Regression** (síntoma: titileo/parpadeo en Ops) | **P1** | Render stability | ✅ **CLOSED** (PS-001 PASS) | Fix #99 + gate [PS-001](./platform-stabilization/PS-001.md) · acta [COMPLETE](./platform-stabilization/PLATFORM_STABILIZATION_COMPLETE.md) |
 | **FCR-007** | **Login Blocker** — tras auth real no navega a Ops ni Customer Portal | **P0** | Access pipeline | ✅ Causa cerrada por **FCR-008** | [FCR007](./FCR007_LOGIN_BLOCKER_INVESTIGATION.md) · fix [FCR008](./FCR008_CANONICAL_POST_LOGIN_SESSION.md) |
 | **FCR-008** | **Canonical Post-Login Session** — `data.session` como fuente de verdad post-login | **P0** | Access pipeline | ✅ Implemented · PS-002-C ⏳ | Contrato + `validateCanonicalPipeline`; sin `getSession` en Identity Provider |
+| **FCR-009** | **Auth E2E** — `/auth` no avanza; signup “no crea”; Toaster ausente + credenciales / confirm email | **P0** | Access / UX | 🔍 Investigation only | [AUTH_E2E](./auth/AUTH_E2E_INVESTIGATION.md) · [ROOT_CAUSE](./auth/ROOT_CAUSE.md) · **no fix** |
 | **FCR-003** | Superficie Ops (departamentos) validada visualmente | ✅ | Producto | Validado | Experiencia operacional coherente |
 | **FCR-004** | Workspace Entry Kitchen: esperado `/admin/kitchen-execution`; código → `/admin/kitchen` | **P2** | Workspace Entry | ✅ **CERTIFIED** (EP-OPS-002) | Canónico = `/admin/kitchen`; execution = pantalla secundaria |
 | **FCR-005** | Workspace Entry Support / Accounting → hoy `/admin` | **P2** | Workspace Entry | ✅ **CERTIFIED** (EP-OPS-002) | `/admin/support` · `/admin/accounting` |
