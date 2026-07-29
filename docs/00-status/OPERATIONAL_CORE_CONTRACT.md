@@ -216,5 +216,6 @@ Misma disciplina: no desarrollar infraestructura porque “algún día hará fal
 |-------|-------|
 | Contrato | Operational Core **ACTIVE** |
 | Fecha | 2026-07-29 |
-| Complementa | OPERATIONAL_CORE_DECLARED · Layer Independence |
+| Complementa | OPERATIONAL_CORE_DECLARED · Layer Independence · [CHANGE_AUTHORITY](./CHANGE_AUTHORITY.md) |
+| Plataforma | [PLATFORM_PHASE_COMPLETE](./PLATFORM_PHASE_COMPLETE.md) |
 | Siguiente capa Core | Flow (Bloque G) |
