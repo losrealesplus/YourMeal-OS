@@ -50,10 +50,11 @@ docs/10-validation/
 
 [Epic](../00-status/EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md) · **[Methodology FROZEN](../00-status/EP_OPS_003_METHODOLOGY_FROZEN.md)** · [Journeys COMPLETE](../00-status/EP_OPS_003_JOURNEYS_COMPLETE.md) · [Evidence index](./ep-ops-003/README.md) · 4/4 CERTIFIED · Bloque G NOT STARTED
 
-## Official Supabase (INFRA-002)
+## Official Supabase (SoT)
 
 **Project ref:** `djangucecsphnejplvic`  
-Cutover report: [CUTOVER_REPORT](./CUTOVER_REPORT.md)
+Cutover plan (repo prep): [INFRA007_CUTOVER_PLAN](./INFRA007_CUTOVER_PLAN.md)  
+Cutover report (histórico INFRA-002): [CUTOVER_REPORT](./CUTOVER_REPORT.md)
 
 ## INFRA-005 · Identity validation
 
