@@ -41,6 +41,7 @@ export type Capability =
   | "site.manage"
   | "organization.manage"
   | "employee.manage"
+  | "users.create"
   | "saas.manage"
   | "records.purge";
 
@@ -95,6 +96,7 @@ const ROLE_CAPABILITIES: Record<AppRole, readonly Capability[]> = {
     "site.manage",
     "organization.manage",
     "employee.manage",
+    "users.create",
     "saas.manage",
     "records.purge",
   ],
@@ -133,6 +135,7 @@ const ROLE_CAPABILITIES: Record<AppRole, readonly Capability[]> = {
     "site.manage",
     "organization.manage",
     "employee.manage",
+    "users.create",
   ],
   operations_manager: [
     "dishes.read",
@@ -153,6 +156,7 @@ const ROLE_CAPABILITIES: Record<AppRole, readonly Capability[]> = {
     "site.manage",
     "organization.manage",
     "employee.manage",
+    "users.create",
   ],
   kitchen: [
     "dishes.read",
