@@ -5,13 +5,13 @@
 
 ```text
 ══════════════════════════════════════════════════
-PLATFORM STABILIZATION · FCR-007 BLOCKER
+FCR-008 · CANONICAL POST-LOGIN SESSION
 ══════════════════════════════════════════════════
-Acta #100: gates Bootstrap PASS — insuficiente para auth real
-FCR-007: Login Blocker · Session post-login · INVESTIGATED (no fix)
-Platform Ready for FLOW: ❌ NO
-FLOW-01: ⏸ NO ABRIR
-Ver: ../10-validation/FCR007_LOGIN_BLOCKER_INVESTIGATION.md
+Fix: data.session del auth API = fuente canónica (sin getSession inmediato)
+FCR-007 causa cerrada · FCR-002 intacto (sin getSession en Identity Provider)
+Pendiente: PS-002 con autenticación Supabase real
+FLOW-01: ⏸ NO ABRIR hasta PS-002 real PASS
+Ver: ../10-validation/FCR008_CANONICAL_POST_LOGIN_SESSION.md
 ══════════════════════════════════════════════════
 
 ══════════════════════════════════════════════════

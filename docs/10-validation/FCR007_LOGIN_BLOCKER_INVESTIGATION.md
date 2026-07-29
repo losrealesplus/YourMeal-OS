@@ -142,14 +142,13 @@ Si `INITIAL_SESSION` no pone `loading=false`, `useAuth().loading` permanece `tru
 1. **Punto exacto del bloqueo:** Session post-login (paso 2) — entre `signInWithPassword` OK y `navigate` a Dashboard.  
 2. **Causa raíz:** Regresión de hidratación/sincronización de sesión tras quitar `getSession` del Identity Provider (#99), en concurrencia con `getSession`/`getUser` del flujo de login (clase deadlock / sesión no lista). PS-002 no lo detectó por usar solo Bootstrap.  
 3. **Archivos:** listados arriba (provider + `auth.tsx` / `auth.admin.tsx` + ensure PO + root + `_authenticated`).  
-4. **Fix mínimo propuesto:** rehidratar sesión de forma segura + usar `data.session` del sign-in para navegar; revalidar PS-002 en auth real. **Sin implementar aquí.**
+4. **Fix mínimo propuesto:** usar `data.session` del sign-in como fuente canónica (sin reintroducir `getSession` en Identity Provider). **Implementado en [FCR-008](./FCR008_CANONICAL_POST_LOGIN_SESSION.md).**
 
 ---
 
 ## Impacto en Flow
 
 ```text
-FLOW-01          ⏸ NO ABRIR
-Platform Ready   ❌ bloqueado por FCR-007
-Stabilization    🟡 COMPLETE en acta #100 — INVALIDADA para Flow hasta fix FCR-007
+FCR-008          ✅ Canonical Post-Login Session implementada
+FLOW-01          ⏸ NO ABRIR hasta PS-002 real (Supabase) PASS
 ```

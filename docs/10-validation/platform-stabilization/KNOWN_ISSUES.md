@@ -10,25 +10,25 @@
 
 | ID | Descripción | Severidad |
 |----|-------------|-----------|
-| **FCR-007** | Login real no navega a Ops/Customer — Session post-login | **P0** · [investigación](../FCR007_LOGIN_BLOCKER_INVESTIGATION.md) |
+| **PS-002 real** | Revalidar login E2E con Supabase (no solo Bootstrap) tras FCR-008 | **P1** |
 
-## Cerrados (gates Bootstrap)
+## Cerrados
 
 | ID | Descripción | Resolución |
 |----|-------------|------------|
 | PS-001 | Titileo /admin idle | PASS — [PS-001](./PS-001.md) |
-| PS-002 | Auth / identidad smoke **Bootstrap** | PASS — no cubre Supabase login |
+| PS-002 | Auth / identidad smoke **Bootstrap** | PASS — no cubría Supabase login |
 | PS-003 | Navigation smoke | PASS — [PS-003](./PS-003.md) |
 | FCR-002 | Render loop `can` | CLOSED |
+| FCR-007 | Login blocker Session | Causa cerrada — [FCR-008](../FCR008_CANONICAL_POST_LOGIN_SESSION.md) |
 
-## Residuales (no bloquean Flow Certification)
+## Residuales
 
 | ID | Descripción | Notas |
 |----|-------------|-------|
-| PS-010 | `animate-fade-in` en shells | Cosmético; no causa loop |
-| PS-011 | 401/404 Supabase bajo Bootstrap tokens | Esperado; no Auth prod |
-| PS-012 | Smoke Auth producción (email/password real) | **Ahora FCR-007** |
+| PS-010 | `animate-fade-in` en shells | Cosmético |
+| PS-011 | 401/404 bajo Bootstrap tokens | Esperado |
 
 ## Fuera
 
-Event Bus · Notifications · Jobs · Analytics · AI · FLOW-01 (bloqueado por FCR-007).
+Event Bus · Notifications · Jobs · Analytics · AI · FLOW-01 (hasta PS-002 real PASS).

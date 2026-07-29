@@ -15,6 +15,14 @@ export {
 } from "./session";
 
 export {
+  canonicalUserIdFromAuthData,
+  hasCanonicalSession,
+  logPostLoginStep,
+  stopPostLogin,
+} from "./post-login-pipeline";
+export type { AuthSuccessPayload, PostLoginStep } from "./post-login-pipeline";
+
+export {
   signInWithOAuth,
   toSupabaseOAuthProvider,
 } from "./oauth";

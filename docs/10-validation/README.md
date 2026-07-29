@@ -38,6 +38,7 @@ docs/10-validation/
 ├── ep-ops-003/                           ← EP-OPS-003 · Journeys COMPLETE
 ├── FCR002_FLICKER_INVESTIGATION.md       ← Render Stability Regression (CLOSED)
 ├── FCR007_LOGIN_BLOCKER_INVESTIGATION.md ← Login Blocker P0 · post-login no Navigate
+├── FCR008_CANONICAL_POST_LOGIN_SESSION.md ← Canonical session post-login (fix FCR-007)
 ├── platform-stabilization/               ← COMPLETE · PS-001/002/003 PASS · acta cierre
 ├── LOVABLE_DEPLOYMENT_AUDIT_BOOTSTRAP.md  ← Bootstrap #82 · DV-001 Lovable sync
 ├── POST_DEPLOY_SMOKE_OP001.md

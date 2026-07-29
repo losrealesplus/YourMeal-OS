@@ -12,6 +12,9 @@ import {
   signInWithPassword,
   signUp,
   verifyOtpSms,
+  canonicalUserIdFromAuthData,
+  logPostLoginStep,
+  stopPostLogin,
 } from "@/auth";
 import { resolveHomePath } from "@/lib/resolve-home-path";
 import { toast } from "sonner";
@@ -53,9 +56,13 @@ const authInputClass =
 async function goHome(
   navigate: ReturnType<typeof useNavigate>,
   userId: string,
+  source: "canonical_auth_response" | "cold_get_session",
 ) {
+  logPostLoginStep("BOOTSTRAP_START", { userId, source, route: "/auth" });
   const path = await resolveHomePath(userId);
+  logPostLoginStep("HOME_PATH", { userId, path, source });
   navigate({ to: path as "/app", replace: true });
+  logPostLoginStep("NAVIGATE", { userId, path, source });
 }
 
 function AuthPage() {
@@ -67,9 +74,10 @@ function AuthPage() {
   const [onboardingStep, setOnboardingStep] = useState(0);
 
   useEffect(() => {
+    // Cold start only — existing session from storage (not post-login race).
     getSession().then(async ({ data }) => {
       if (data.session?.user) {
-        await goHome(navigate, data.session.user.id);
+        await goHome(navigate, data.session.user.id, "cold_get_session");
       }
     });
   }, [navigate]);
@@ -316,12 +324,23 @@ function EmailForm() {
     setBusy(true);
     try {
       if (mode === "signin") {
-        const { error } = await signInWithPassword({ email, password });
+        const { data, error } = await signInWithPassword({ email, password });
         if (error) throw error;
-        const { data: sessionData } = await getSession();
-        const uid = sessionData.session?.user?.id;
-        if (uid) await goHome(navigate, uid);
-        else navigate({ to: "/app", replace: true });
+        logPostLoginStep("LOGIN_OK", { route: "/auth", mode: "signin" });
+        const uid = canonicalUserIdFromAuthData(data);
+        if (uid) {
+          logPostLoginStep("CANONICAL_SESSION", {
+            userId: uid,
+            hasSession: Boolean(data.session),
+            source: "signInWithPassword",
+          });
+          await goHome(navigate, uid, "canonical_auth_response");
+        } else {
+          stopPostLogin("canonical_session_missing_after_signin", {
+            route: "/auth",
+          });
+          navigate({ to: "/app", replace: true });
+        }
       } else {
         const { data, error } = await signUp({
           email,
@@ -339,8 +358,15 @@ function EmailForm() {
           toast.error(t("auth:emailAlreadyRegistered"));
           return;
         }
-        if (data.session?.user?.id) {
-          await goHome(navigate, data.session.user.id);
+        const uid = canonicalUserIdFromAuthData(data);
+        if (uid) {
+          logPostLoginStep("LOGIN_OK", { route: "/auth", mode: "signup" });
+          logPostLoginStep("CANONICAL_SESSION", {
+            userId: uid,
+            hasSession: Boolean(data.session),
+            source: "signUp",
+          });
+          await goHome(navigate, uid, "canonical_auth_response");
           return;
         }
         toast.success(t("auth:checkEmail"));
@@ -460,15 +486,24 @@ function PhoneForm() {
   async function verify() {
     setBusy(true);
     try {
-      const { error } = await verifyOtpSms({ phone, token: code });
+      const { data, error } = await verifyOtpSms({ phone, token: code });
       if (error) {
         toast.error(error.message);
         return;
       }
-      const { data: sessionData } = await getSession();
-      const uid = sessionData.session?.user?.id;
-      if (uid) await goHome(navigate, uid);
-      else navigate({ to: "/app", replace: true });
+      logPostLoginStep("LOGIN_OK", { route: "/auth", mode: "phone_otp" });
+      const uid = canonicalUserIdFromAuthData(data);
+      if (uid) {
+        logPostLoginStep("CANONICAL_SESSION", {
+          userId: uid,
+          hasSession: Boolean(data.session),
+          source: "verifyOtpSms",
+        });
+        await goHome(navigate, uid, "canonical_auth_response");
+      } else {
+        stopPostLogin("canonical_session_missing_after_otp", { route: "/auth" });
+        navigate({ to: "/app", replace: true });
+      }
     } finally {
       setBusy(false);
     }

@@ -15,6 +15,7 @@
 | [WORKSPACE_ENTRY_POLICY](./WORKSPACE_ENTRY_POLICY.md) | Dónde empieza cada rol (≠ RBAC; candidato ADR) |
 | [FCR002](./FCR002_FLICKER_INVESTIGATION.md) | Render Stability Regression |
 | [FCR007](./FCR007_LOGIN_BLOCKER_INVESTIGATION.md) | Login Blocker (post-login no Navigate) · P0 |
+| [FCR008](./FCR008_CANONICAL_POST_LOGIN_SESSION.md) | Canonical Post-Login Session · fix FCR-007 |
 | [platform-stabilization/](./platform-stabilization/PLATFORM_STABILIZATION_REPORT.md) | Platform Stabilization v1 · Pre-Flow |
 | [BOOTSTRAP_FCR_CHECKLIST](./BOOTSTRAP_FCR_CHECKLIST.md) | Checklist 7 perfiles |
 
@@ -60,7 +61,8 @@ Es **qué superficie** está administrando cada menú.
 |----|----------|-----------|------|--------|-------|
 | **FCR-001** | Ajustes de Tenant Surface muestran el mismo hub para quien también opera Platform — separación insuficiente Tenant vs Platform Surface | **P1** | Superficies | ✅ **CERTIFIED** (EP-OPS-002) | Hub = Tenant business settings; Platform = `/saas`. [RBAC_SURFACE_CERTIFICATION](./RBAC_SURFACE_CERTIFICATION.md) |
 | **FCR-002** | **Render Stability Regression** (síntoma: titileo/parpadeo en Ops) | **P1** | Render stability | ✅ **CLOSED** (PS-001 PASS) | Fix #99 + gate [PS-001](./platform-stabilization/PS-001.md) · acta [COMPLETE](./platform-stabilization/PLATFORM_STABILIZATION_COMPLETE.md) |
-| **FCR-007** | **Login Blocker** — tras auth real no navega a Ops ni Customer Portal | **P0** | Access pipeline | 🔍 Investigado · sin fix | [FCR007](./FCR007_LOGIN_BLOCKER_INVESTIGATION.md). PS-002 no cubrió auth Supabase. **No abrir FLOW-01** |
+| **FCR-007** | **Login Blocker** — tras auth real no navega a Ops ni Customer Portal | **P0** | Access pipeline | ✅ Causa cerrada por **FCR-008** | [FCR007](./FCR007_LOGIN_BLOCKER_INVESTIGATION.md) · fix [FCR008](./FCR008_CANONICAL_POST_LOGIN_SESSION.md) |
+| **FCR-008** | **Canonical Post-Login Session** — `data.session` como fuente de verdad post-login | **P0** | Access pipeline | ✅ Implemented | Sin reintroducir `getSession` en Identity Provider |
 | **FCR-003** | Superficie Ops (departamentos) validada visualmente | ✅ | Producto | Validado | Experiencia operacional coherente |
 | **FCR-004** | Workspace Entry Kitchen: esperado `/admin/kitchen-execution`; código → `/admin/kitchen` | **P2** | Workspace Entry | ✅ **CERTIFIED** (EP-OPS-002) | Canónico = `/admin/kitchen`; execution = pantalla secundaria |
 | **FCR-005** | Workspace Entry Support / Accounting → hoy `/admin` | **P2** | Workspace Entry | ✅ **CERTIFIED** (EP-OPS-002) | `/admin/support` · `/admin/accounting` |
