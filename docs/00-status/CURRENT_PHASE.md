@@ -1,9 +1,20 @@
 # CURRENT_PHASE
 
-**Última actualización:** 2026-07-28  
+**Última actualización:** 2026-07-29  
 **No sustituye** [MILESTONES](./MILESTONES.md) — tablero de “dónde estamos ahora”.
 
 ```text
+══════════════════════════════════════════════════
+OPERATIONAL CORE · DECLARED (2026-07-29)
+══════════════════════════════════════════════════
+Core: Foundation · Auth · Identity · Entry · Journey · Flow*
+*Flow entra al Core al certificar (Bloque G · NEXT)
+Consumidores: Notifications · Jobs · Analytics · AI · Reports · …
+Regla: módulos consumen el Core · no redefinen Identity/Membership/RBAC/Entry/Journey/Flow
+Principio: OPERATIONAL_LAYER_INDEPENDENCE.md (no modifica FOPEBA)
+Acta: OPERATIONAL_CORE_DECLARED.md
+══════════════════════════════════════════════════
+
 ══════════════════════════════════════════════════
 AUTH LAYER · FROZEN (2026-07-26)
 ══════════════════════════════════════════════════
@@ -11,6 +22,7 @@ FOUNDATION · INFRA · Identity · PO Bootstrap · Product Identity · Nav Decou
 Allowed: bug / security / OAuth·Phone activation · AUTH-A/B solo en Bloque H del backlog RI-001
 Forbidden: Auth refactor · RBAC redesign · Session redesign fuera de Bloque H
 Acta: IDENTITY_FREEZE_v1.md
+Identity Foundation Lock: IDENTITY_FOUNDATION_LOCK_v1.md (PR #92)
 ══════════════════════════════════════════════════
 
 ══════════════════════════════════════════════════
@@ -28,6 +40,7 @@ Siguiente:           **Capa Entry+Journey CLOSED** · Flow pendiente de apertura
                      · Acta capa: [OPERATIONAL_CERTIFICATION_LAYER_CLOSED](./OPERATIONAL_CERTIFICATION_LAYER_CLOSED.md)
                      · Journeys: [EP_OPS_003_JOURNEYS_COMPLETE](./EP_OPS_003_JOURNEYS_COMPLETE.md)
                      · Framing G (objeto = handoffs): [BLOCK_G_FLOW_FRAMING](../10-validation/ep-ops-003/BLOCK_G_FLOW_FRAMING.md)
+                     · Core: [OPERATIONAL_CORE_DECLARED](./OPERATIONAL_CORE_DECLARED.md)
 ══════════════════════════════════════════════════
 ```
 
@@ -35,9 +48,11 @@ Siguiente:           **Capa Entry+Journey CLOSED** · Flow pendiente de apertura
 
 ```text
 Siguiente artefacto activo:
+  [Operational Core DECLARED](./OPERATIONAL_CORE_DECLARED.md)
   [Operational Certification Layer CLOSED](./OPERATIONAL_CERTIFICATION_LAYER_CLOSED.md)
-  · Entry ✅ · Journey ✅ · Flow ⏳ (NOT STARTED)
+  · Entry ✅ · Journey ✅ · Flow ⏳ (NOT STARTED) — cierra el Core al certificar
   · Paradigma G: organización · transferencias · no pantallas
+  · Principio: [Operational Layer Independence](../05-architecture/OPERATIONAL_LAYER_INDEPENDENCE.md)
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████
