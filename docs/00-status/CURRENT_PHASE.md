@@ -1,9 +1,21 @@
 # CURRENT_PHASE
 
-**Última actualización:** 2026-07-28  
+**Última actualización:** 2026-07-29  
 **No sustituye** [MILESTONES](./MILESTONES.md) — tablero de “dónde estamos ahora”.
 
 ```text
+══════════════════════════════════════════════════
+IDENTITY FOUNDATION · LOCKED v1 (2026-07-29)
+══════════════════════════════════════════════════
+Pipeline: Identity → Profile → Membership → Role → Workspace
+Evidencia: PR #90 · PR #91 · Acta IDENTITY_FOUNDATION_LOCK_v1.md
+Allowed: capabilities compatibles · MFA/SSO/SCIM solo con ADR + evidencia
+Forbidden: rediseñar Identity / create≡access / multi-membership sin evidencia
+Auth Layer sigue Frozen: IDENTITY_FREEZE_v1.md
+Orden estratégico: STRATEGIC_ORDER_POST_IDENTITY_LOCK.md
+Siguiente foco de capa: Flow (no Identity · no Foundation)
+══════════════════════════════════════════════════
+
 ══════════════════════════════════════════════════
 AUTH LAYER · FROZEN (2026-07-26)
 ══════════════════════════════════════════════════
@@ -28,6 +40,7 @@ Siguiente:           **Capa Entry+Journey CLOSED** · Flow pendiente de apertura
                      · Acta capa: [OPERATIONAL_CERTIFICATION_LAYER_CLOSED](./OPERATIONAL_CERTIFICATION_LAYER_CLOSED.md)
                      · Journeys: [EP_OPS_003_JOURNEYS_COMPLETE](./EP_OPS_003_JOURNEYS_COMPLETE.md)
                      · Framing G (objeto = handoffs): [BLOCK_G_FLOW_FRAMING](../10-validation/ep-ops-003/BLOCK_G_FLOW_FRAMING.md)
+                     · Post-Identity: [STRATEGIC_ORDER_POST_IDENTITY_LOCK](./STRATEGIC_ORDER_POST_IDENTITY_LOCK.md)
 ══════════════════════════════════════════════════
 ```
 
@@ -35,9 +48,11 @@ Siguiente:           **Capa Entry+Journey CLOSED** · Flow pendiente de apertura
 
 ```text
 Siguiente artefacto activo:
+  [Identity Foundation LOCKED v1](./IDENTITY_FOUNDATION_LOCK_v1.md) ✅
   [Operational Certification Layer CLOSED](./OPERATIONAL_CERTIFICATION_LAYER_CLOSED.md)
   · Entry ✅ · Journey ✅ · Flow ⏳ (NOT STARTED)
   · Paradigma G: organización · transferencias · no pantallas
+  · Post-Identity order: [STRATEGIC_ORDER_POST_IDENTITY_LOCK](./STRATEGIC_ORDER_POST_IDENTITY_LOCK.md)
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████
