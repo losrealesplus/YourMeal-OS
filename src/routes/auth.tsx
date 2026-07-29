@@ -3,6 +3,7 @@ import { useEffect, useState, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 import { Lock, Mail, Phone } from "lucide-react";
 import {
+  beginPostLoginPipeline,
   getSession,
   isOAuthSocialEnabled,
   isPhoneAuthEnabled,
@@ -58,11 +59,18 @@ async function goHome(
   userId: string,
   source: "canonical_auth_response" | "cold_get_session",
 ) {
+  if (source === "cold_get_session") {
+    beginPostLoginPipeline("cold", { route: "/auth", source });
+  }
   logPostLoginStep("BOOTSTRAP_START", { userId, source, route: "/auth" });
   const path = await resolveHomePath(userId);
-  logPostLoginStep("HOME_PATH", { userId, path, source });
+  // resolveHomePath emits HOME_PATH_RESOLVED when canonical; cold path aliases here.
+  if (source === "cold_get_session") {
+    logPostLoginStep("HOME_PATH_RESOLVED", { userId, path, source });
+  }
   navigate({ to: path as "/app", replace: true });
   logPostLoginStep("NAVIGATE", { userId, path, source });
+  logPostLoginStep("DASHBOARD_RENDERED", { userId, path, source });
 }
 
 function AuthPage() {
@@ -324,6 +332,10 @@ function EmailForm() {
     setBusy(true);
     try {
       if (mode === "signin") {
+        beginPostLoginPipeline("canonical", {
+          route: "/auth",
+          mode: "signin",
+        });
         const { data, error } = await signInWithPassword({ email, password });
         if (error) throw error;
         logPostLoginStep("LOGIN_OK", { route: "/auth", mode: "signin" });
@@ -342,6 +354,10 @@ function EmailForm() {
           navigate({ to: "/app", replace: true });
         }
       } else {
+        beginPostLoginPipeline("canonical", {
+          route: "/auth",
+          mode: "signup",
+        });
         const { data, error } = await signUp({
           email,
           password,
@@ -355,6 +371,7 @@ function EmailForm() {
           Array.isArray(identities) &&
           identities.length === 0
         ) {
+          stopPostLogin("email_already_registered", { route: "/auth" });
           toast.error(t("auth:emailAlreadyRegistered"));
           return;
         }
@@ -369,10 +386,15 @@ function EmailForm() {
           await goHome(navigate, uid, "canonical_auth_response");
           return;
         }
+        stopPostLogin("awaiting_email_confirmation", { route: "/auth" });
         toast.success(t("auth:checkEmail"));
         setMode("signin");
       }
     } catch (err) {
+      stopPostLogin("auth_submit_error", {
+        route: "/auth",
+        message: err instanceof Error ? err.message : String(err),
+      });
       toast.error(err instanceof Error ? err.message : String(err));
     } finally {
       setBusy(false);
@@ -491,6 +513,10 @@ function PhoneForm() {
         toast.error(error.message);
         return;
       }
+      beginPostLoginPipeline("canonical", {
+        route: "/auth",
+        mode: "phone_otp",
+      });
       logPostLoginStep("LOGIN_OK", { route: "/auth", mode: "phone_otp" });
       const uid = canonicalUserIdFromAuthData(data);
       if (uid) {

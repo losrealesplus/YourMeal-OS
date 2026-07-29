@@ -2,7 +2,7 @@
 
 **Documento:** `FCR008_CANONICAL_POST_LOGIN_SESSION.md`  
 **Fecha:** 2026-07-29  
-**Estado:** ✅ Implemented (código) · revalidación PS-002 auth real pendiente  
+**Estado:** ✅ Implemented (código + validador PS-002) · **PS-002-C Auth real ⏳ PENDING**  
 **Cierra:** [FCR-007](./FCR007_LOGIN_BLOCKER_INVESTIGATION.md) (causa raíz)  
 **No reabre:** FCR-002 · Foundation · Identity · Core · FOPEBA
 
@@ -11,15 +11,19 @@
 ## Contrato
 
 ```text
-Una autenticación correcta
+signInWithPassword / signUp / verifyOtp
     ↓
-produce exactamente una sesión canónica  (data.session del auth API)
+data.session  (CANONICAL_SESSION)
     ↓
-bootstrap / home resolution
+Bootstrap
     ↓
-navigate
+Identity → Profile → Membership → Role
     ↓
-dashboard
+Home path resolved
+    ↓
+Navigate
+    ↓
+Dashboard rendered
 
 sin relecturas inmediatas de getSession() tras el login
 ```
@@ -28,43 +32,57 @@ sin relecturas inmediatas de getSession() tras el login
 
 > ¿Cuál es la fuente canónica de la sesión inmediatamente después del login?
 
-**Respuesta:** `data.session` (y si hace falta `data.user`) devuelto por `signInWithPassword` / `signUp` / `verifyOtpSms` — no un `await getSession()` inmediato.
+**Respuesta:** `data.session` (y si hace falta `data.user`) del auth API — no un `await getSession()` inmediato.
+
+## Pipeline de traza (PS-002-C)
+
+```text
+LOGIN
+LOGIN_OK
+CANONICAL_SESSION
+BOOTSTRAP_START
+IDENTITY_READY
+PROFILE_READY
+MEMBERSHIP_READY
+ROLE_READY
+HOME_PATH_RESOLVED
+NAVIGATE
+DASHBOARD_RENDERED
+(or STOP + reason)
+```
+
+Consola: `[FCR-008]` · cada paso **exactamente una vez**.  
+Validador: `validateCanonicalPipeline(observed)` · tabla de fallo: `formatPipelineComparisonTable`.
 
 ## Cambios
 
 | Archivo | Cambio |
 |---------|--------|
-| `src/auth/post-login-pipeline.ts` | Helper + logs `[FCR-008]` |
-| `src/routes/auth.tsx` | Sign-in / OTP / signup usan sesión canónica |
-| `src/routes/auth.admin.tsx` | Submit Ops usa sesión canónica |
-| `src/identity/supabase-identity-provider.tsx` | Comentario: **no** restaurar `getSession` de mount |
+| `src/auth/post-login-pipeline.ts` | Contrato, tracer, validador once-only |
+| `src/auth/post-login-pipeline.spec.ts` | Unit PASS + casos FAIL |
+| `src/routes/auth.tsx` / `auth.admin.tsx` | `beginPostLoginPipeline` + sesión canónica |
+| `src/lib/resolve-home-path.ts` | Emite IDENTITY…HOME_PATH_RESOLVED si pipeline activo |
+| `src/lib/admin-auth-bootstrap.ts` | Ídem en `enterOperationsCenter` |
+| `docs/10-validation/platform-stabilization/PS-002.md` | Canonical Session Validation |
 
-Cold start (`getSession` al montar `/auth` si ya hay sesión en storage) **sigue permitido** — no es la race post-`SIGNED_IN`.
-
-## Pipeline de traza
-
-```text
-LOGIN_OK
-CANONICAL_SESSION
-BOOTSTRAP_START
-HOME_PATH
-NAVIGATE
-(or STOP + reason)
-```
-
-Consola: prefijo `[FCR-008]`.
+Cold start (`getSession` al montar `/auth`) **sigue permitido**.
 
 ## Validación
 
 | Chequeo | Estado |
 |---------|--------|
-| Unit `post-login-pipeline.spec.ts` | PASS |
-| No `getSession` inmediato tras `signInWithPassword` en auth routes | ✅ |
-| Identity Provider sin `getSession` de mount (FCR-002 intacto) | ✅ |
-| PS-002 con auth Supabase real | ⏳ pendiente smoke humano / credenciales |
+| Unit pipeline + `validateCanonicalPipeline` | PASS |
+| No `getSession` inmediato tras login en auth routes | ✅ |
+| Identity Provider sin `getSession` de mount | ✅ |
+| PS-002-C Auth Supabase real | ⏳ pendiente |
 
 ## Flow
 
 ```text
-FLOW-01  ⏸ NO ABRIR hasta PS-002 real PASS
+PS-001 ∧ PS-002-C (real) ∧ PS-003 = PASS
+  → PLATFORM STABILIZATION COMPLETE (Flow-ready)
+  → FLOW CERTIFICATION READY
+  → PR FLOW-01
+
+FLOW-01  ⏸ NO ABRIR hasta PS-002-C PASS
 ```

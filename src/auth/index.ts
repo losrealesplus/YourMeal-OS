@@ -15,13 +15,26 @@ export {
 } from "./session";
 
 export {
+  PS002_CANONICAL_STEPS,
+  beginPostLoginPipeline,
   canonicalUserIdFromAuthData,
+  emitCanonicalReady,
+  formatPipelineComparisonTable,
+  getActivePostLoginPipeline,
+  getObservedPipelineSteps,
   hasCanonicalSession,
+  isCanonicalPostLoginActive,
   logPostLoginStep,
   stopPostLogin,
+  validateCanonicalPipeline,
 } from "./post-login-pipeline";
-export type { AuthSuccessPayload, PostLoginStep } from "./post-login-pipeline";
-
+export type {
+  AuthSuccessPayload,
+  CanonicalPipelineStep,
+  PipelineComparisonRow,
+  PipelineValidationResult,
+  PostLoginStep,
+} from "./post-login-pipeline";
 export {
   signInWithOAuth,
   toSupabaseOAuthProvider,

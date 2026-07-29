@@ -2,6 +2,11 @@
  * Platform Stabilization gates PS-001 / PS-002 / PS-003
  * Bootstrap Mode smoke (no Supabase login required for identity path).
  *
+ * PS-002 notes:
+ *   - Static + Bootstrap checks run here (PS-002-B / contract wiring).
+ *   - PS-002-C (Auth Supabase real · full canonical pipeline) requires
+ *     credentials and is NOT marked PASS by this script alone.
+ *
  * Usage:
  *   VITE_BOOTSTRAP_MODE=true npm run dev -- --host 127.0.0.1 --port 8080
  *   node scripts/platform-stabilization-gates.mjs [baseUrl]
@@ -35,18 +40,96 @@ function stripComments(src) {
   return src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
 }
 
+/**
+ * FCR-008: after signInWithPassword / signUp / verifyOtp in submit handlers,
+ * there must be no immediate getSession() before navigate/bootstrap.
+ * Cold-start getSession on mount (useEffect) remains allowed.
+ */
+function assertNoImmediateGetSessionAfterLogin(filePath, label) {
+  const raw = fs.readFileSync(filePath, "utf8");
+  const src = stripComments(raw);
+
+  const markers = ["signInWithPassword", "signUp(", "verifyOtpSms"];
+  let foundAuthCall = false;
+  for (const m of markers) {
+    let idx = 0;
+    while ((idx = src.indexOf(m, idx)) !== -1) {
+      foundAuthCall = true;
+      const window = src.slice(idx, idx + 2500);
+      if (/\bgetSession\s*\(/.test(window)) {
+        fail(
+          "ps002",
+          `${label}: getSession() appears within ~2.5k chars after ${m} (FCR-008 / PS-002-C)`,
+        );
+        return;
+      }
+      idx += m.length;
+    }
+  }
+  if (!foundAuthCall) {
+    note(
+      "ps002",
+      `${label}: no password/otp auth call found (skip immediate getSession check)`,
+    );
+  } else {
+    pass("ps002", `${label}: no immediate getSession() after login auth API`);
+  }
+}
+
+function assertCanonicalPipelineWiring() {
+  const pipeline = fs.readFileSync("src/auth/post-login-pipeline.ts", "utf8");
+  const required = [
+    "LOGIN",
+    "LOGIN_OK",
+    "CANONICAL_SESSION",
+    "BOOTSTRAP_START",
+    "IDENTITY_READY",
+    "PROFILE_READY",
+    "MEMBERSHIP_READY",
+    "ROLE_READY",
+    "HOME_PATH_RESOLVED",
+    "NAVIGATE",
+    "DASHBOARD_RENDERED",
+    "validateCanonicalPipeline",
+    "PS002_CANONICAL_STEPS",
+  ];
+  const missing = required.filter((s) => !pipeline.includes(s));
+  if (missing.length) {
+    fail("ps002", `post-login-pipeline missing: ${missing.join(", ")}`);
+  } else {
+    pass("ps002", "Canonical PS-002 pipeline steps + validator present");
+  }
+
+  const resolveHome = fs.readFileSync("src/lib/resolve-home-path.ts", "utf8");
+  if (!resolveHome.includes('emitCanonicalReady("IDENTITY_READY"')) {
+    fail("ps002", "resolveHomePath does not emit IDENTITY_READY");
+  } else {
+    pass("ps002", "resolveHomePath emits identity→home readiness steps");
+  }
+
+  const adminBoot = fs.readFileSync("src/lib/admin-auth-bootstrap.ts", "utf8");
+  if (!adminBoot.includes('emitCanonicalReady("ROLE_READY"')) {
+    fail("ps002", "enterOperationsCenter missing ROLE_READY emit");
+  } else {
+    pass("ps002", "enterOperationsCenter emits readiness steps");
+  }
+
+  note(
+    "ps002",
+    "PS-002-C (Auth Supabase real): NOT asserted by this Bootstrap gate — see PS-002.md",
+  );
+}
+
 async function enterAsCompanyAdmin(page) {
   await page.goto(`${BASE}/`, { waitUntil: "networkidle", timeout: 60_000 });
   await page.waitForTimeout(500);
 
-  // Already in app with DEV panel?
   if (await page.getByText("DEV MODE").count()) {
     await page.locator("select").first().selectOption("company_admin");
     await page.waitForTimeout(1000);
     return;
   }
 
-  // Profile selector: radio + Entrar
   const radio = page.locator('input[name="bootstrap-profile"][value="company_admin"]');
   if (await radio.count()) {
     await radio.check();
@@ -115,6 +198,10 @@ async function main() {
     pass("ps002", "Root skips TOKEN_REFRESHED for router.invalidate");
   }
 
+  assertNoImmediateGetSessionAfterLogin("src/routes/auth.tsx", "auth.tsx");
+  assertNoImmediateGetSessionAfterLogin("src/routes/auth.admin.tsx", "auth.admin.tsx");
+  assertCanonicalPipelineWiring();
+
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   const consoleErrors = [];
@@ -133,10 +220,9 @@ async function main() {
     if (!(await page.getByText("DEV MODE").count())) {
       fail("ps002", "DEV MODE panel not visible after Bootstrap Entrar");
     } else {
-      pass("ps002", "Bootstrap login → DEV MODE panel visible");
+      pass("ps002", "Bootstrap login → DEV MODE panel visible (PS-002-B only)");
     }
 
-    // Ensure we are on /admin
     await page.goto(`${BASE}/admin`, { waitUntil: "networkidle", timeout: 60_000 });
     await page.waitForTimeout(1500);
 
@@ -163,7 +249,6 @@ async function main() {
       fullPage: true,
     });
 
-    // Role switch via DEV select
     await page.locator("select").first().selectOption("kitchen");
     await page.waitForTimeout(1200);
     await page.screenshot({
@@ -178,7 +263,6 @@ async function main() {
     await page.waitForTimeout(800);
     pass("ps002", "Restored Company Admin + /admin");
 
-    // Logout analogue
     await page.getByRole("button", { name: /^Salir$/i }).click();
     await page.waitForTimeout(1000);
     if (await page.getByRole("button", { name: /^Entrar$/i }).count()) {
@@ -191,7 +275,6 @@ async function main() {
       fullPage: true,
     });
 
-    // Re-enter for navigation
     await enterAsCompanyAdmin(page);
     await page.goto(`${BASE}/admin`, { waitUntil: "networkidle", timeout: 60_000 });
 
@@ -219,15 +302,23 @@ async function main() {
       });
     }
 
-    // Bootstrap Mode uses synthetic tokens — Supabase REST 401/404 noise is expected.
     const jsErrors = consoleErrors.filter(
-      (e) => !/Failed to load resource: the server responded with a status of (401|403|404|400)/.test(e),
+      (e) =>
+        !/Failed to load resource: the server responded with a status of (401|403|404|400)/.test(
+          e,
+        ),
     );
     note("ps002", `console errors total=${consoleErrors.length} jsRelevant=${jsErrors.length}`);
     if (jsErrors.length > 5) {
-      fail("ps002", `Too many JS console errors (${jsErrors.length}): ${jsErrors.slice(0, 3).join(" | ")}`);
+      fail(
+        "ps002",
+        `Too many JS console errors (${jsErrors.length}): ${jsErrors.slice(0, 3).join(" | ")}`,
+      );
     } else {
-      pass("ps002", `JS console errors acceptable (${jsErrors.length}); network 401/404 ignored in Bootstrap`);
+      pass(
+        "ps002",
+        `JS console errors acceptable (${jsErrors.length}); network 401/404 ignored in Bootstrap`,
+      );
     }
   } catch (e) {
     fail("ps001", `Runtime error: ${e}`);

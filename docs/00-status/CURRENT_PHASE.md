@@ -7,11 +7,13 @@
 ══════════════════════════════════════════════════
 FCR-008 · CANONICAL POST-LOGIN SESSION
 ══════════════════════════════════════════════════
-Fix: data.session del auth API = fuente canónica (sin getSession inmediato)
-FCR-007 causa cerrada · FCR-002 intacto (sin getSession en Identity Provider)
-Pendiente: PS-002 con autenticación Supabase real
-FLOW-01: ⏸ NO ABRIR hasta PS-002 real PASS
+Contrato: LOGIN → … → DASHBOARD_RENDERED (cada paso ×1, sin getSession inmediato)
+Validador: validateCanonicalPipeline · PS-002-C
+FCR-007 causa cerrada · FCR-002 intacto
+PS-002-B Bootstrap = PASS · PS-002-C Auth real = ⏳ PENDING
+FLOW-01: ⏸ NO ABRIR hasta PS-001 ∧ PS-002-C ∧ PS-003 PASS
 Ver: ../10-validation/FCR008_CANONICAL_POST_LOGIN_SESSION.md
+     ../10-validation/platform-stabilization/PS-002.md
 ══════════════════════════════════════════════════
 
 ══════════════════════════════════════════════════

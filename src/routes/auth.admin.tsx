@@ -2,7 +2,15 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Lock, Mail } from "lucide-react";
-import { getSession, signInWithPassword, signOut, canonicalUserIdFromAuthData, logPostLoginStep, stopPostLogin } from "@/auth";
+import {
+  beginPostLoginPipeline,
+  getSession,
+  signInWithPassword,
+  signOut,
+  canonicalUserIdFromAuthData,
+  logPostLoginStep,
+  stopPostLogin,
+} from "@/auth";
 import { supabase } from "@/integrations/supabase/client";
 import type { AppRole } from "@/hooks/use-auth";
 import {
@@ -143,6 +151,7 @@ function AdminAuthPage() {
     setBusy(true);
     setBootstrapError(null);
     try {
+      beginPostLoginPipeline("canonical", { route: "/auth/admin" });
       const { data, error } = await signInWithPassword({
         email,
         password,
@@ -162,6 +171,7 @@ function AdminAuthPage() {
         source: "signInWithPassword",
         route: "/auth/admin",
       });
+      // FCR-008: no getSession() here — data.session is canonical.
       logPostLoginStep("BOOTSTRAP_START", { userId: uid, route: "/auth/admin" });
       const result = await tryEnterOperationsCenter(uid, returnTo);
       if (result.status === "not_staff") {
@@ -170,18 +180,23 @@ function AdminAuthPage() {
         toast.error(t("auth:adminNotStaff"));
         return;
       }
-      logPostLoginStep("HOME_PATH", {
-        userId: uid,
-        path: result.path,
-        route: "/auth/admin",
-      });
+      // HOME_PATH_RESOLVED emitted inside enterOperationsCenter when canonical.
       navigate({ to: result.path as "/admin", replace: true });
       logPostLoginStep("NAVIGATE", {
         userId: uid,
         path: result.path,
         route: "/auth/admin",
       });
+      logPostLoginStep("DASHBOARD_RENDERED", {
+        userId: uid,
+        path: result.path,
+        route: "/auth/admin",
+      });
     } catch (err) {
+      stopPostLogin("auth_admin_submit_error", {
+        route: "/auth/admin",
+        message: err instanceof Error ? err.message : String(err),
+      });
       const classified = classifyAdminAuthBootstrapError(err);
       reportAdminAuthBootstrapFailure(err, classified, {
         route: "/auth/admin",
