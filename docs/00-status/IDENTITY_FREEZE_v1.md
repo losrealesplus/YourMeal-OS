@@ -42,6 +42,8 @@ Forbidden:
 A partir de este momento **no se abren más PRs de autenticación** salvo bug real o activación de providers.  
 Siguiente foco: **dominio de negocio** (Tenants, Usuarios, Pedidos, Cocina, Producción, Rutas, Facturación, …).
 
+> **Complemento 2026-07-29:** el modelo Identity empresarial (Profile · Membership · Provisioning · Audit · Timeline) queda **LOCKED** en [IDENTITY_FOUNDATION_LOCK_v1](./IDENTITY_FOUNDATION_LOCK_v1.md). Esta Freeze sigue siendo la capa **Auth**; el Lock es la arquitectura Identity completa.
+
 ---
 
 ## Componentes congelados

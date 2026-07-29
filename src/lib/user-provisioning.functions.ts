@@ -1,9 +1,12 @@
 /**
  * Tenant user provisioning — Identity → Membership → Role pipeline.
- * Capability: users.create (provision/invite) · employee.manage (approve/assign role).
+ * Identity Hardening v1: identity_events, soft-archive, consistency, timeline.
  *
- * Create ≠ access: provisioning never writes user_roles.
+ * Create ≠ access. Prefer membership_id for operational refs (P1).
+ * FUTURE: multi-membership / SSO / SCIM / impersonation — not implemented.
+ *
  * @see docs/adr/0018-identity-membership-lifecycle.md
+ * @see docs/adr/0019-identity-hardening-v1.md
  */
 import { createServerFn } from "@tanstack/react-start";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -14,10 +17,20 @@ import { can } from "@/permissions";
 import type { AppRole } from "@/hooks/use-auth";
 import {
   MEMBERSHIP_TYPES,
-  assertCanTransitionMembership,
   assertCreateDoesNotGrantAccess,
+  assertAccessConsistency,
+  assertCanTransitionMembershipHardened,
+  assertInvitationHardened,
+  canResendInvitation,
+  membershipAuditPatch,
+  softArchivePatch,
   planProvision,
+  recordIdentityEvent,
+  recordIdentityEvents,
+  identityEventLabel,
   type MembershipType,
+  type MembershipStatus,
+  type IdentityEventType,
 } from "@/modules/user-provisioning";
 
 const MEMBERSHIP_TYPE_ENUM = z.enum(MEMBERSHIP_TYPES);
@@ -90,9 +103,10 @@ async function assertCapability(
   }
   const { data: membership, error } = await ctx.supabase
     .from("tenant_members")
-    .select("tenant_id, status")
+    .select("tenant_id, status, deleted_at")
     .eq("user_id", ctx.userId)
     .eq("tenant_id", ctx.tenantId)
+    .is("deleted_at", null)
     .maybeSingle();
   if (error) throw new Error(error.message);
   if (!membership) throw new Error("Forbidden: no membership in target tenant");
@@ -116,6 +130,31 @@ async function findUserIdByEmail(
   return found?.id ?? null;
 }
 
+async function loadMembershipRow(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  admin: any,
+  tenantId: string,
+  userId: string,
+) {
+  const { data, error } = await admin
+    .from("tenant_members")
+    .select(
+      "id, status, deleted_at, membership_type, approved_at, approved_by",
+    )
+    .eq("tenant_id", tenantId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  return data as {
+    id: string;
+    status: MembershipStatus;
+    deleted_at: string | null;
+    membership_type: string;
+    approved_at: string | null;
+    approved_by: string | null;
+  } | null;
+}
+
 /** Core provisioning (no HTTP). Safe to call from other server handlers. */
 export async function executeProvisionTenantUser(input: {
   actorId: string;
@@ -131,24 +170,44 @@ export async function executeProvisionTenantUser(input: {
     "@/integrations/supabase/client.server"
   );
 
+  const { data: tenant, error: tenantErr } = await supabaseAdmin
+    .from("tenants")
+    .select("id, status")
+    .eq("id", data.tenantId)
+    .maybeSingle();
+  if (tenantErr) throw new Error(tenantErr.message);
+  if (!tenant) throw new Error("Tenant does not exist");
+  if (tenant.status !== "active") {
+    throw new Error("Tenant is not active");
+  }
+
   const email = data.email.trim().toLowerCase();
   let userId = await findUserIdByEmail(supabaseAdmin, email);
   const emailExists = Boolean(userId);
 
+  // P7: never create duplicate identity for same email
   const { data: existingAny } = await supabaseAdmin
     .from("tenant_members")
-    .select("tenant_id, status")
+    .select("tenant_id, status, deleted_at")
     .eq("user_id", userId ?? "00000000-0000-0000-0000-000000000000")
+    .is("deleted_at", null)
     .maybeSingle();
 
   const { data: existingHere } = userId
     ? await supabaseAdmin
         .from("tenant_members")
-        .select("tenant_id, status")
+        .select("id, tenant_id, status, deleted_at")
         .eq("user_id", userId)
         .eq("tenant_id", data.tenantId)
         .maybeSingle()
     : { data: null };
+
+  if (existingHere && !(existingHere as { deleted_at?: string | null }).deleted_at) {
+    const status = (existingHere as { status?: string }).status;
+    if (status !== "revoked" && status !== "rejected") {
+      throw new Error("Membership already exists for this user in the tenant");
+    }
+  }
 
   const planned = planProvision({
     provision: {
@@ -167,20 +226,18 @@ export async function executeProvisionTenantUser(input: {
     emailExists,
     existingTenantId: existingAny?.tenant_id ?? null,
     targetTenantId: data.tenantId,
-    hasMembershipInTenant: Boolean(existingHere),
+    hasMembershipInTenant: Boolean(
+      existingHere && !(existingHere as { deleted_at?: string | null }).deleted_at,
+    ),
     currentMembershipStatus: (existingHere as { status?: string } | null)
-      ?.status as
-      | "pending"
-      | "approved"
-      | "rejected"
-      | "suspended"
-      | "revoked"
-      | undefined,
+      ?.status as MembershipStatus | undefined,
   });
   if (!planned.ok) throw new Error(planned.message);
 
   const createdIdentity = planned.plan.identityPath === "create_identity";
   let invitedAuth = false;
+  let membershipId: string | null =
+    (existingHere as { id?: string } | null)?.id ?? null;
 
   try {
     if (!userId) {
@@ -201,6 +258,8 @@ export async function executeProvisionTenantUser(input: {
     const profilePayload = {
       id: userId as string,
       full_name: planned.plan.fullName,
+      deleted_at: null,
+      deleted_by: null,
       ...(data.firstName ? { first_name: data.firstName } : {}),
       ...(data.lastName ? { last_name: data.lastName } : {}),
       ...(data.phone ? { phone: data.phone } : {}),
@@ -220,10 +279,12 @@ export async function executeProvisionTenantUser(input: {
       notes: data.notes ?? null,
       invited_by: actorId,
       created_at: new Date().toISOString(),
+      deleted_at: null,
+      deleted_by: null,
     };
 
     if (existingHere) {
-      const { error: memErr } = await supabaseAdmin
+      const { data: updated, error: memErr } = await supabaseAdmin
         .from("tenant_members")
         .update({
           membership_type: data.membershipType,
@@ -233,15 +294,28 @@ export async function executeProvisionTenantUser(input: {
           invited_by: actorId,
           approved_at: null,
           approved_by: null,
+          deleted_at: null,
+          deleted_by: null,
         })
         .eq("user_id", userId)
-        .eq("tenant_id", data.tenantId);
+        .eq("tenant_id", data.tenantId)
+        .select("id")
+        .maybeSingle();
       if (memErr) throw new Error(memErr.message);
+      membershipId = (updated as { id: string } | null)?.id ?? membershipId;
     } else {
-      const { error: memErr } = await supabaseAdmin
+      const { data: inserted, error: memErr } = await supabaseAdmin
         .from("tenant_members")
-        .insert(membershipRow);
+        .insert(membershipRow)
+        .select("id")
+        .maybeSingle();
       if (memErr) throw new Error(memErr.message);
+      membershipId = (inserted as { id: string } | null)?.id ?? null;
+    }
+
+    if (!membershipId) {
+      const row = await loadMembershipRow(supabaseAdmin, data.tenantId, userId);
+      membershipId = row?.id ?? null;
     }
 
     if (planned.plan.writeEmployment) {
@@ -251,9 +325,12 @@ export async function executeProvisionTenantUser(input: {
           {
             tenant_id: data.tenantId,
             user_id: userId,
+            membership_id: membershipId,
             department: data.department ?? null,
             position: data.position ?? null,
             updated_at: new Date().toISOString(),
+            deleted_at: null,
+            deleted_by: null,
           },
           { onConflict: "tenant_id,user_id" },
         );
@@ -267,6 +344,7 @@ export async function executeProvisionTenantUser(input: {
           tenant_id: data.tenantId,
           email,
           membership_type: data.membershipType,
+          membership_id: membershipId,
           intended_role: data.intendedRole ?? null,
           status: "pending",
           channel: data.channel,
@@ -277,14 +355,62 @@ export async function executeProvisionTenantUser(input: {
       if (inviteRowErr) throw new Error(inviteRowErr.message);
     }
 
+    const events = [];
+    if (createdIdentity) {
+      events.push({
+        tenantId: data.tenantId,
+        userId,
+        membershipId,
+        eventType: "USER_REGISTERED" as const,
+        performedBy: actorId,
+        metadata: { email, channel: data.channel },
+      });
+    }
+    events.push(
+      {
+        tenantId: data.tenantId,
+        userId,
+        membershipId,
+        eventType: "PROFILE_CREATED" as const,
+        performedBy: actorId,
+        metadata: { fullName: planned.plan.fullName },
+      },
+      {
+        tenantId: data.tenantId,
+        userId,
+        membershipId,
+        eventType: "MEMBERSHIP_CREATED" as const,
+        performedBy: actorId,
+        metadata: {
+          membershipType: data.membershipType,
+          status: "pending",
+        },
+      },
+    );
+    if (planned.plan.createInvitation) {
+      events.push({
+        tenantId: data.tenantId,
+        userId,
+        membershipId,
+        eventType: "INVITATION_SENT" as const,
+        performedBy: actorId,
+        metadata: {
+          email,
+          intendedRole: data.intendedRole ?? null,
+        },
+      });
+    }
+    await recordIdentityEvents(supabaseAdmin, events);
+
     await supabaseAdmin.from("audit_log").insert({
       tenant_id: data.tenantId,
       actor_id: actorId,
       entity_type: "membership",
-      entity_id: userId,
+      entity_id: membershipId ?? userId,
       action: "USER_PROVISIONED",
       new_data: {
         email,
+        membershipId,
         membershipType: data.membershipType,
         channel: data.channel,
         identityPath: planned.plan.identityPath,
@@ -295,6 +421,7 @@ export async function executeProvisionTenantUser(input: {
 
     return {
       userId,
+      membershipId,
       tenantId: data.tenantId,
       membershipStatus: "pending" as const,
       identityPath: planned.plan.identityPath,
@@ -302,26 +429,32 @@ export async function executeProvisionTenantUser(input: {
       roleAssigned: false as const,
     };
   } catch (err) {
+    // Soft-archive partial rows — never hard-delete profiles/memberships/employment (P3)
     if (userId) {
       await supabaseAdmin
         .from("user_invitations")
-        .delete()
+        .update({
+          status: "cancelled",
+          cancelled_at: new Date().toISOString(),
+          cancelled_by: actorId,
+        })
         .eq("tenant_id", data.tenantId)
         .eq("email", email)
         .eq("status", "pending");
       if (!existingHere) {
         await supabaseAdmin
           .from("tenant_members")
-          .delete()
+          .update(softArchivePatch(actorId))
           .eq("user_id", userId)
           .eq("tenant_id", data.tenantId)
           .eq("status", "pending");
       }
       await supabaseAdmin
         .from("employee_profiles")
-        .delete()
+        .update(softArchivePatch(actorId))
         .eq("user_id", userId)
         .eq("tenant_id", data.tenantId);
+      // Auth identity only removed if we created it in this failed call (orphan prevention)
       if (createdIdentity && invitedAuth) {
         try {
           await supabaseAdmin.auth.admin.deleteUser(userId);
@@ -334,11 +467,6 @@ export async function executeProvisionTenantUser(input: {
   }
 }
 
-/**
- * Provision or invite a user into the caller's tenant.
- * Creates Identity (if needed) + Profile + Membership(pending) + Invitation.
- * Does NOT assign Role.
- */
 export const provisionTenantUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
@@ -374,7 +502,6 @@ export const provisionTenantUser = createServerFn({ method: "POST" })
     });
   });
 
-/** Approve a pending membership. Role assignment remains optional and explicit. */
 export const approveTenantMembership = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
@@ -400,33 +527,24 @@ export const approveTenantMembership = createServerFn({ method: "POST" })
       "@/integrations/supabase/client.server"
     );
 
-    const { data: membership, error } = await supabaseAdmin
-      .from("tenant_members")
-      .select("status")
-      .eq("tenant_id", data.tenantId)
-      .eq("user_id", data.userId)
-      .maybeSingle();
-    if (error) throw new Error(error.message);
+    const membership = await loadMembershipRow(
+      supabaseAdmin,
+      data.tenantId,
+      data.userId,
+    );
     if (!membership) throw new Error("Membership not found");
 
-    const transition = assertCanTransitionMembership({
-      current: (membership as { status: string }).status as
-        | "pending"
-        | "approved"
-        | "rejected"
-        | "suspended"
-        | "revoked",
+    const transition = assertCanTransitionMembershipHardened({
+      current: membership.status,
       action: "approve",
+      archived: Boolean(membership.deleted_at),
     });
     if (!transition.ok) throw new Error(transition.message);
 
+    const patch = membershipAuditPatch("approve", context.userId);
     const { error: updErr } = await supabaseAdmin
       .from("tenant_members")
-      .update({
-        status: "approved",
-        approved_at: new Date().toISOString(),
-        approved_by: context.userId,
-      })
+      .update(patch as never)
       .eq("tenant_id", data.tenantId)
       .eq("user_id", data.userId);
     if (updErr) throw new Error(updErr.message);
@@ -443,29 +561,43 @@ export const approveTenantMembership = createServerFn({ method: "POST" })
       );
       if (roleErr) throw new Error(roleErr.message);
       roleAssigned = data.assignRole;
+      await recordIdentityEvent(supabaseAdmin, {
+        tenantId: data.tenantId,
+        userId: data.userId,
+        membershipId: membership.id,
+        eventType: "ROLE_ASSIGNED",
+        performedBy: context.userId,
+        metadata: { role: data.assignRole },
+      });
     }
+
+    await recordIdentityEvent(supabaseAdmin, {
+      tenantId: data.tenantId,
+      userId: data.userId,
+      membershipId: membership.id,
+      eventType: "MEMBERSHIP_APPROVED",
+      performedBy: context.userId,
+      metadata: { roleAssigned },
+    });
 
     await supabaseAdmin.from("audit_log").insert({
       tenant_id: data.tenantId,
       actor_id: context.userId,
       entity_type: "membership",
-      entity_id: data.userId,
+      entity_id: membership.id,
       action: "MEMBERSHIP_APPROVED",
-      new_data: {
-        status: "approved",
-        roleAssigned,
-      },
+      new_data: { status: "approved", roleAssigned, membershipId: membership.id },
     });
 
     return {
       userId: data.userId,
+      membershipId: membership.id,
       tenantId: data.tenantId,
       status: "approved" as const,
       roleAssigned,
     };
   });
 
-/** Assign a Role to an Approved membership. Access = Membership Approved + Role. */
 export const assignTenantRole = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
@@ -491,15 +623,16 @@ export const assignTenantRole = createServerFn({ method: "POST" })
       "@/integrations/supabase/client.server"
     );
 
-    const { data: membership, error } = await supabaseAdmin
-      .from("tenant_members")
-      .select("status")
-      .eq("tenant_id", data.tenantId)
-      .eq("user_id", data.userId)
-      .maybeSingle();
-    if (error) throw new Error(error.message);
+    const membership = await loadMembershipRow(
+      supabaseAdmin,
+      data.tenantId,
+      data.userId,
+    );
     if (!membership) throw new Error("Membership not found");
-    if ((membership as { status: string }).status !== "approved") {
+    if (membership.deleted_at) {
+      throw new Error("Cannot assign Role to archived membership");
+    }
+    if (membership.status !== "approved") {
       throw new Error(
         "Cannot assign Role without Approved membership (Identity → Membership → Role)",
       );
@@ -515,16 +648,369 @@ export const assignTenantRole = createServerFn({ method: "POST" })
     );
     if (roleErr) throw new Error(roleErr.message);
 
+    await recordIdentityEvent(supabaseAdmin, {
+      tenantId: data.tenantId,
+      userId: data.userId,
+      membershipId: membership.id,
+      eventType: "ROLE_ASSIGNED",
+      performedBy: context.userId,
+      metadata: { role: data.role },
+    });
+
     await supabaseAdmin.from("audit_log").insert({
       tenant_id: data.tenantId,
       actor_id: context.userId,
       entity_type: "user_role",
-      entity_id: data.userId,
+      entity_id: membership.id,
       action: "ROLE_ASSIGNED",
-      new_data: { role: data.role },
+      new_data: { role: data.role, membershipId: membership.id },
     });
 
-    return { userId: data.userId, tenantId: data.tenantId, role: data.role };
+    return {
+      userId: data.userId,
+      membershipId: membership.id,
+      tenantId: data.tenantId,
+      role: data.role,
+    };
+  });
+
+/** P5 · suspend / revoke / reactivate / reject */
+export const transitionTenantMembership = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z
+      .object({
+        tenantId: z.string().uuid(),
+        userId: z.string().uuid(),
+        action: z.enum(["reject", "suspend", "revoke", "reactivate"]),
+      })
+      .parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    await assertCapability(
+      {
+        supabase: context.supabase,
+        userId: context.userId,
+        tenantId: data.tenantId,
+      },
+      "employee.manage",
+    );
+
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+    const membership = await loadMembershipRow(
+      supabaseAdmin,
+      data.tenantId,
+      data.userId,
+    );
+    if (!membership) throw new Error("Membership not found");
+
+    const transition = assertCanTransitionMembershipHardened({
+      current: membership.status,
+      action: data.action,
+      archived: Boolean(membership.deleted_at),
+    });
+    if (!transition.ok) throw new Error(transition.message);
+
+    const patch = membershipAuditPatch(data.action, context.userId);
+    const { error } = await supabaseAdmin
+      .from("tenant_members")
+      .update(patch as never)
+      .eq("tenant_id", data.tenantId)
+      .eq("user_id", data.userId);
+    if (error) throw new Error(error.message);
+
+    const eventMap = {
+      reject: "MEMBERSHIP_REJECTED",
+      suspend: "MEMBERSHIP_SUSPENDED",
+      revoke: "MEMBERSHIP_REVOKED",
+      reactivate: "MEMBERSHIP_REACTIVATED",
+    } as const;
+
+    await recordIdentityEvent(supabaseAdmin, {
+      tenantId: data.tenantId,
+      userId: data.userId,
+      membershipId: membership.id,
+      eventType: eventMap[data.action],
+      performedBy: context.userId,
+      metadata: { from: membership.status, to: patch.status },
+    });
+
+    return {
+      userId: data.userId,
+      membershipId: membership.id,
+      status: patch.status,
+    };
+  });
+
+/** P3 · Archive membership (soft-delete). Never hard-delete. */
+export const archiveTenantMembership = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z
+      .object({
+        tenantId: z.string().uuid(),
+        userId: z.string().uuid(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    await assertCapability(
+      {
+        supabase: context.supabase,
+        userId: context.userId,
+        tenantId: data.tenantId,
+      },
+      "employee.manage",
+    );
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+    const membership = await loadMembershipRow(
+      supabaseAdmin,
+      data.tenantId,
+      data.userId,
+    );
+    if (!membership) throw new Error("Membership not found");
+    if (membership.deleted_at) throw new Error("Membership already archived");
+
+    const { error } = await supabaseAdmin
+      .from("tenant_members")
+      .update(softArchivePatch(context.userId))
+      .eq("tenant_id", data.tenantId)
+      .eq("user_id", data.userId);
+    if (error) throw new Error(error.message);
+
+    await supabaseAdmin
+      .from("employee_profiles")
+      .update(softArchivePatch(context.userId))
+      .eq("tenant_id", data.tenantId)
+      .eq("user_id", data.userId);
+
+    await recordIdentityEvent(supabaseAdmin, {
+      tenantId: data.tenantId,
+      userId: data.userId,
+      membershipId: membership.id,
+      eventType: "MEMBERSHIP_ARCHIVED",
+      performedBy: context.userId,
+    });
+
+    return { userId: data.userId, membershipId: membership.id, archived: true };
+  });
+
+/** P4 · Resend invitation */
+export const resendTenantInvitation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z
+      .object({
+        tenantId: z.string().uuid(),
+        invitationId: z.string().uuid(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    await assertCapability(
+      {
+        supabase: context.supabase,
+        userId: context.userId,
+        tenantId: data.tenantId,
+      },
+      "users.create",
+    );
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+
+    const { data: invitation, error } = await supabaseAdmin
+      .from("user_invitations")
+      .select("*")
+      .eq("id", data.invitationId)
+      .eq("tenant_id", data.tenantId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!invitation) throw new Error("Invitation not found");
+
+    const resendGate = canResendInvitation({
+      status: (invitation as { status: string }).status as
+        | "pending"
+        | "accepted"
+        | "expired"
+        | "cancelled"
+        | "revoked",
+    });
+    if (!resendGate.ok) throw new Error(resendGate.message);
+
+    const email = (invitation as { email: string }).email;
+    const { error: authErr } = await supabaseAdmin.auth.admin.inviteUserByEmail(
+      email,
+    );
+    if (authErr) throw new Error(authErr.message);
+
+    const { error: updErr } = await supabaseAdmin
+      .from("user_invitations")
+      .update({
+        status: "pending",
+        expires_at: new Date(
+          Date.now() + 14 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
+        resent_at: new Date().toISOString(),
+        resent_by: context.userId,
+        resent_count:
+          ((invitation as { resent_count?: number }).resent_count ?? 0) + 1,
+        cancelled_at: null,
+        cancelled_by: null,
+      })
+      .eq("id", data.invitationId);
+    if (updErr) throw new Error(updErr.message);
+
+    await recordIdentityEvent(supabaseAdmin, {
+      tenantId: data.tenantId,
+      userId: (invitation as { user_id?: string | null }).user_id ?? null,
+      membershipId:
+        (invitation as { membership_id?: string | null }).membership_id ?? null,
+      eventType: "INVITATION_RESENT",
+      performedBy: context.userId,
+      metadata: { email, invitationId: data.invitationId },
+    });
+
+    return { invitationId: data.invitationId, resent: true };
+  });
+
+/** P6 · Consistency check for a user in a tenant */
+export const checkUserAccessConsistency = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z
+      .object({
+        tenantId: z.string().uuid(),
+        userId: z.string().uuid(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    await assertCapability(
+      {
+        supabase: context.supabase,
+        userId: context.userId,
+        tenantId: data.tenantId,
+      },
+      "employee.manage",
+    );
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+
+    const { data: tenant } = await supabaseAdmin
+      .from("tenants")
+      .select("id, status")
+      .eq("id", data.tenantId)
+      .maybeSingle();
+
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("id, deleted_at")
+      .eq("id", data.userId)
+      .maybeSingle();
+
+    const membership = await loadMembershipRow(
+      supabaseAdmin,
+      data.tenantId,
+      data.userId,
+    );
+
+    const { count: roleCount } = await supabaseAdmin
+      .from("user_roles")
+      .select("id", { count: "exact", head: true })
+      .eq("tenant_id", data.tenantId)
+      .eq("user_id", data.userId);
+
+    const verdict = assertAccessConsistency({
+      hasIdentity: true,
+      hasProfile: Boolean(profile) && !(profile as { deleted_at?: string | null })?.deleted_at,
+      hasMembership: Boolean(membership),
+      membershipStatus: membership?.status ?? null,
+      membershipArchived: Boolean(membership?.deleted_at),
+      roleCount: roleCount ?? 0,
+      tenantExists: Boolean(tenant),
+      tenantActive: tenant?.status === "active",
+    });
+
+    if (!verdict.ok) {
+      await recordIdentityEvent(supabaseAdmin, {
+        tenantId: data.tenantId,
+        userId: data.userId,
+        membershipId: membership?.id ?? null,
+        eventType: "ACCESS_DENIED_INCONSISTENT",
+        performedBy: context.userId,
+        metadata: { code: verdict.code, message: verdict.message },
+      });
+    }
+
+    return {
+      ok: verdict.ok,
+      code: verdict.code,
+      message: verdict.message,
+      membershipId: membership?.id ?? null,
+    };
+  });
+
+/** P8 · Activity Timeline for Tenant Admin */
+export const listUserIdentityTimeline = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z
+      .object({
+        tenantId: z.string().uuid(),
+        userId: z.string().uuid(),
+        limit: z.number().int().min(1).max(200).optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    await assertCapability(
+      {
+        supabase: context.supabase,
+        userId: context.userId,
+        tenantId: data.tenantId,
+      },
+      "employee.manage",
+    );
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+
+    // identity_events is business audit (Identity Hardening v1)
+    const { data: events, error } = await (supabaseAdmin as any)
+      .from("identity_events")
+      .select(
+        "id, event_type, performed_by, performed_at, membership_id, metadata",
+      )
+      .eq("tenant_id", data.tenantId)
+      .eq("user_id", data.userId)
+      .order("performed_at", { ascending: false })
+      .limit(data.limit ?? 50);
+    if (error) throw new Error(error.message);
+
+    const rows = (events ?? []) as Array<{
+      id: string;
+      event_type: IdentityEventType;
+      performed_by: string | null;
+      performed_at: string;
+      membership_id: string | null;
+      metadata: Record<string, string | number | boolean | null> | null;
+    }>;
+
+    return rows.map((e) => ({
+      id: e.id,
+      eventType: e.event_type,
+      label: identityEventLabel(e.event_type),
+      performedBy: e.performed_by,
+      performedAt: e.performed_at,
+      membershipId: e.membership_id,
+      metadata: e.metadata ?? {},
+    }));
   });
 
 export { ASSIGNABLE_ROLES, MEMBERSHIP_TYPES };

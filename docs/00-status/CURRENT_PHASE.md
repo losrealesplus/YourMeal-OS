@@ -5,6 +5,7 @@
 
 ```text
 ══════════════════════════════════════════════════
+<<<<<<< HEAD
 PLATFORM STABILIZATION v1 · PRE-FLOW (ACTIVE)
 ══════════════════════════════════════════════════
 Objetivo: eliminar ruido / inestabilidad antes de Flow Certification
@@ -12,6 +13,17 @@ Acta: ../10-validation/platform-stabilization/PLATFORM_STABILIZATION_REPORT.md
 FCR-002: FIXED (código) · visual pending
 Prohibido: Event Bus · Notifications · Jobs · Analytics · AI · nuevos módulos
 Siguiente tras STABLE: FLOW-01 Kitchen → Delivery · Specification
+=======
+IDENTITY FOUNDATION · LOCKED v1 (2026-07-29)
+══════════════════════════════════════════════════
+Pipeline: Identity → Profile → Membership → Role → Workspace
+Evidencia: PR #90 · PR #91 · Acta IDENTITY_FOUNDATION_LOCK_v1.md
+Allowed: capabilities compatibles · MFA/SSO/SCIM solo con ADR + evidencia
+Forbidden: rediseñar Identity / create≡access / multi-membership sin evidencia
+Auth Layer sigue Frozen: IDENTITY_FREEZE_v1.md
+Orden estratégico: STRATEGIC_ORDER_POST_IDENTITY_LOCK.md
+Siguiente foco de capa: Flow (no Identity · no Foundation)
+>>>>>>> origin/main
 ══════════════════════════════════════════════════
 
 ══════════════════════════════════════════════════
@@ -38,6 +50,7 @@ Siguiente:           **Capa Entry+Journey CLOSED** · Flow pendiente de apertura
                      · Acta capa: [OPERATIONAL_CERTIFICATION_LAYER_CLOSED](./OPERATIONAL_CERTIFICATION_LAYER_CLOSED.md)
                      · Journeys: [EP_OPS_003_JOURNEYS_COMPLETE](./EP_OPS_003_JOURNEYS_COMPLETE.md)
                      · Framing G (objeto = handoffs): [BLOCK_G_FLOW_FRAMING](../10-validation/ep-ops-003/BLOCK_G_FLOW_FRAMING.md)
+                     · Post-Identity: [STRATEGIC_ORDER_POST_IDENTITY_LOCK](./STRATEGIC_ORDER_POST_IDENTITY_LOCK.md)
 ══════════════════════════════════════════════════
 ```
 
@@ -45,9 +58,11 @@ Siguiente:           **Capa Entry+Journey CLOSED** · Flow pendiente de apertura
 
 ```text
 Siguiente artefacto activo:
+  [Identity Foundation LOCKED v1](./IDENTITY_FOUNDATION_LOCK_v1.md) ✅
   [Operational Certification Layer CLOSED](./OPERATIONAL_CERTIFICATION_LAYER_CLOSED.md)
   · Entry ✅ · Journey ✅ · Flow ⏳ (NOT STARTED)
   · Paradigma G: organización · transferencias · no pantallas
+  · Post-Identity order: [STRATEGIC_ORDER_POST_IDENTITY_LOCK](./STRATEGIC_ORDER_POST_IDENTITY_LOCK.md)
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████

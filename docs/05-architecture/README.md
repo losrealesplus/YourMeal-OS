@@ -11,6 +11,10 @@
 | Doc | Why |
 |-----|-----|
 | [FOUNDATION_LOCK.md](./FOUNDATION_LOCK.md) | Close the platform before features |
+| [IDENTITY_LIFECYCLE.md](./IDENTITY_LIFECYCLE.md) | Identity → Profile → Membership → Role → Workspace |
+| [MEMBERSHIP_LIFECYCLE.md](./MEMBERSHIP_LIFECYCLE.md) | Membership states + audit stamps |
+| [IDENTITY_AUDIT.md](./IDENTITY_AUDIT.md) | identity_events · Activity Timeline |
+| [USER_PROVISIONING.md](./USER_PROVISIONING.md) | Invitation · Provisioning · create ≠ access |
 | [FOUR_LAYERS.md](./FOUR_LAYERS.md) | Knowledge · Platform · Materialization · Operational |
 | [TENANT_BRANDING.md](./TENANT_BRANDING.md) | BrandConfig · Tenant-Managed runtime · `brand.manage` |
 | [BRAND_CONTRACT.md](./BRAND_CONTRACT.md) | Límites logo/colores/WCAG |
