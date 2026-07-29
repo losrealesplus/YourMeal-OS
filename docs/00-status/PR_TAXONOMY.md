@@ -3,7 +3,8 @@
 **Documento:** `PR_TAXONOMY.md`  
 **Fecha:** 2026-07-29  
 **Estado:** Active  
-**Aplica desde:** [PLATFORM_BASELINE_v1](./PLATFORM_BASELINE_v1.md) · [PLATFORM_V1_CLOSED](./PLATFORM_V1_CLOSED.md)
+**Aplica desde:** [PLATFORM_BASELINE_v1](./PLATFORM_BASELINE_v1.md) · [PLATFORM_V1_CLOSED](./PLATFORM_V1_CLOSED.md)  
+**Política:** [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) — Regla 1 (no PRs huérfanas)
 
 ---
 
@@ -36,12 +37,13 @@ Toda Pull Request debe pertenecer a **exactamente una** de estas categorías:
 
 La plantilla `.github/pull_request_template.md` exige declarar la categoría.
 
-Además ([FLOW_FIRST](./FLOW_FIRST.md)):
+Además ([FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) · [FLOW_FIRST](./FLOW_FIRST.md)):
 
 0. ¿A qué Flow pertenece? *(o justificación de excepción / Flow nuevo)*  
+0b. Flow afectado · Journey implicado · Outcome esperado · ¿Qué Handoff mejora?  
 1. ¿Respeta la Baseline?  
 2. ¿Respeta el Core / Contract?  
-3. ¿Produce evidencia operacional?  
+3. ¿Produce evidencia operacional? *(evidencia del Flow, no de la pantalla)*  
 4. ¿Acerca Flow a certificación? *(o N/A justificado para Module/Service/Bug/Docs)*  
 
 ---

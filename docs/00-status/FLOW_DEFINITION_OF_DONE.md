@@ -47,6 +47,7 @@ Código sin handoff/evidencia puede existir en ramas de exploración, pero **no*
 
 ## Relación
 
+- Gobernanza: [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md)  
 - Disciplina: [FLOW_CERTIFICATION_OPEN](./FLOW_CERTIFICATION_OPEN.md)  
 - Jerarquía: [FLOW_WORK_HIERARCHY](./FLOW_WORK_HIERARCHY.md)  
 - Catálogo: [FLOW_CATALOG](./FLOW_CATALOG.md)

@@ -91,6 +91,7 @@ Un Flow está listo para certificación cuando:
 
 | Documento | Rol |
 |-----------|-----|
+| [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) | Política permanente del repositorio (6 reglas) |
 | [FLOW_FIRST](./FLOW_FIRST.md) | Toda feature → ¿a qué Flow pertenece? |
 | [FLOW_DEFINITION_OF_DONE](./FLOW_DEFINITION_OF_DONE.md) | Done = Handoff → Evidence → Certification → Merge |
 | [FLOW_WORK_HIERARCHY](./FLOW_WORK_HIERARCHY.md) | Spec → Execution → Evidence → Certification → Readiness |

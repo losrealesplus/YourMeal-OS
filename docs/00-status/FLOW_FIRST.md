@@ -4,6 +4,7 @@
 **Fecha:** 2026-07-29  
 **Estado:** Active  
 **Fase:** Flow Certification ([PLATFORM_V1_CLOSED](./PLATFORM_V1_CLOSED.md))  
+**Política permanente:** [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md)  
 **No modifica FOPEBA.**
 
 ---
@@ -55,3 +56,5 @@ Solo con justificación explícita en el PR:
 ```
 
 Solo se responde con evidencia de Flow — no con pantallas aisladas.
+
+Política de repositorio (6 reglas): [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md).

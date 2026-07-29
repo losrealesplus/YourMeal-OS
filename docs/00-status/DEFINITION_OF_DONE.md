@@ -60,4 +60,5 @@ Para trabajo de **Flow**, el Done de fase es [FLOW_DEFINITION_OF_DONE.md](./FLOW
 Handoff definido → Evidence obtenida → Flow certificado → Merge
 ```
 
-Regla diaria: [FLOW_FIRST.md](./FLOW_FIRST.md).
+Política: [FLOW_GOVERNANCE.md](./FLOW_GOVERNANCE.md) · Regla diaria: [FLOW_FIRST.md](./FLOW_FIRST.md).  
+Operational Readiness = Flows certificados, no número de features (Regla 6).

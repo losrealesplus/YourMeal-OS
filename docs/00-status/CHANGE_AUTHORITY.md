@@ -43,6 +43,8 @@ o intenta redefinirlo?
 
 Checklist en la [plantilla de Pull Request](../../.github/pull_request_template.md).
 
+Desarrollo operacional diario: además de este gate, aplica [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) (PRs no huérfanas · Feature → Flow/Handoff · evidencia del Flow · Readiness por certificaciones).
+
 ---
 
 ## Evidencia operacional (definición mínima)

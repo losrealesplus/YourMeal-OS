@@ -20,6 +20,8 @@ Target Journey / Workspace
 No: “Mejoras de Delivery”.  
 Sí: `FLOW-01 Kitchen → Delivery`.
 
+**Épicas futuras** se nombran y organizan por Flow (no por módulo): Spec → Implementation → Evidence → Certification — [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md).
+
 ---
 
 ## Catálogo inicial (propuesto)

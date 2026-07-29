@@ -4,18 +4,28 @@
 
 ## PR category (exactly one)
 
-> [PR_TAXONOMY](../docs/00-status/PR_TAXONOMY.md) — categorías ambiguas (“refactor general”, “mejoras varias”) → ❌
+> [FLOW_GOVERNANCE](../docs/00-status/FLOW_GOVERNANCE.md) Regla 1 · [PR_TAXONOMY](../docs/00-status/PR_TAXONOMY.md) — sin PRs huérfanas; categorías ambiguas → ❌
 
-- [ ] Flow Certification
+- [ ] Flow Certification (`FLOW-XX`)
 - [ ] Operational Module
 - [ ] Operational Service
 - [ ] Bug Fix
 - [ ] Documentation
 
+## Feature declaration (Reglas 2–3)
+
+| Campo | Valor |
+|-------|-------|
+| Flow afectado | `FLOW-NN` / nuevo / N/A justificado |
+| Journey implicado | p. ej. Kitchen → Delivery |
+| Outcome esperado | |
+| ¿Qué Handoff mejora? | *(si ninguno: justificar)* |
+
 ## Phase alignment (Flow Certification)
 
 - [ ] Respeta [PLATFORM_BASELINE_v1](../docs/00-status/PLATFORM_BASELINE_v1.md) / [PLATFORM_V1_CLOSED](../docs/00-status/PLATFORM_V1_CLOSED.md)
-- [ ] **Flow First:** declara Flow (`FLOW-NN`) o justifica excepción / Flow nuevo ([FLOW_FIRST](../docs/00-status/FLOW_FIRST.md) · [FLOW_CATALOG](../docs/00-status/FLOW_CATALOG.md))
+- [ ] Cumple [FLOW_GOVERNANCE](../docs/00-status/FLOW_GOVERNANCE.md) · [FLOW_FIRST](../docs/00-status/FLOW_FIRST.md) · [FLOW_CATALOG](../docs/00-status/FLOW_CATALOG.md)
+- [ ] Evidencia pertenece al **Flow**, no a la pantalla (Regla 5)
 - [ ] Produce o habilita evidencia operacional (o N/A justificado)
 - [ ] Acerca Flow a certificación (o N/A — Module/Service/Bug/Docs)
 

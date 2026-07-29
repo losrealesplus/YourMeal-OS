@@ -54,4 +54,5 @@ FLOW-02  Delivery → Support
 FLOW-03  Support → Accounting
 ```
 
-Ver [FLOW_CATALOG](./FLOW_CATALOG.md).
+Ver [FLOW_CATALOG](./FLOW_CATALOG.md).  
+Política permanente: [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md).
