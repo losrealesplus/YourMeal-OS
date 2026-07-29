@@ -208,13 +208,13 @@ export function validateCanonicalPipeline(
     (s) => !(PS002_CANONICAL_STEPS as readonly string[]).includes(s),
   );
 
-  const firstFailure =
+  const firstFailure: CanonicalPipelineStep | null =
     missing[0] ??
-    (duplicates.length
-      ? (duplicates[0] as CanonicalPipelineStep)
-      : null) ??
-    (unexpectedOrder ? filtered.find((s, i) => s !== PS002_CANONICAL_STEPS[i]) as CanonicalPipelineStep ?? null : null) ??
-    (extras.length ? null : null);
+    (duplicates.length ? (duplicates[0] as CanonicalPipelineStep) : null) ??
+    (unexpectedOrder
+      ? ((filtered.find((s, i) => s !== PS002_CANONICAL_STEPS[i]) ??
+          null) as CanonicalPipelineStep | null)
+      : null);
 
   const ok =
     missing.length === 0 &&
