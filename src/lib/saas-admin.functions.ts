@@ -343,7 +343,15 @@ export const createCompanyAdmin = createServerFn({ method: "POST" })
 
     await supabaseAdmin
       .from("tenant_members")
-      .upsert({ user_id: userId, tenant_id: data.tenantId });
+      .upsert({
+        user_id: userId,
+        tenant_id: data.tenantId,
+        membership_type: "employee",
+        status: "approved",
+        approved_at: new Date().toISOString(),
+        approved_by: context.userId,
+        provisioning_channel: "provisioning",
+      });
     await supabaseAdmin
       .from("user_roles")
       .upsert(

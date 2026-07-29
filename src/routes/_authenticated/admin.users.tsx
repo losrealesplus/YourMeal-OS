@@ -1,6 +1,7 @@
 /**
- * ADMIN · Usuarios — listado real + invite staff (OP-001 bootstrap).
- * Capability: employee.manage
+ * ADMIN · Usuarios — provisionamiento + aprobación + asignación de rol.
+ * Create ≠ access: Identity → Membership(Pending) → Approve → Role → Workspace
+ * Capabilities: users.create · employee.manage
  */
 import { createFileRoute } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
@@ -18,23 +19,31 @@ import {
 import type { Column } from "@/components/admin/data-table";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import { STAFF_INVITE_ROLES } from "@/lib/tenant-admin.functions";
 import {
-  inviteTenantStaff,
-  STAFF_INVITE_ROLES,
-} from "@/lib/tenant-admin.functions";
+  provisionTenantUser,
+  approveTenantMembership,
+  assignTenantRole,
+  ASSIGNABLE_ROLES,
+  MEMBERSHIP_TYPES,
+} from "@/lib/user-provisioning.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useCan } from "@/hooks/use-can";
 
 export const Route = createFileRoute("/_authenticated/admin/users")({
   beforeLoad: ({ context }) => {
-    assertCapabilityFromContext(context, "employee.manage");
+    assertCapabilityFromContext(context, ["employee.manage", "users.create"]);
   },
   component: AdminUsersPage,
   head: () => ({
     meta: [
       { title: "YourMeal OS — Usuarios" },
-      { name: "description", content: "Miembros del tenant y roles RBAC." },
+      {
+        name: "description",
+        content: "Provisionamiento de usuarios · Membership · Roles RBAC.",
+      },
     ],
   }),
 });
@@ -45,16 +54,44 @@ type UserRow = {
   email: string | null;
   roles: string[];
   joinedAt: string | null;
+  membershipStatus: string;
+  membershipType: string;
+};
+
+const TYPE_LABELS: Record<string, string> = {
+  customer: "Cliente",
+  employee: "Empleado",
+  supplier: "Proveedor",
+  company: "Cliente Empresa",
+  company_employee: "Empleado Empresa",
 };
 
 function AdminUsersPage() {
   const { tenantId } = useAuth();
+  const { can: canCap } = useCan();
+  const canCreate = canCap("users.create");
   const [rows, setRows] = useState<UserRow[]>([]);
   const [loading, setLoading] = useState(true);
+
   const [email, setEmail] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [role, setRole] = useState<(typeof STAFF_INVITE_ROLES)[number]>("kitchen");
-  const doInvite = useServerFn(inviteTenantStaff);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [membershipType, setMembershipType] =
+    useState<(typeof MEMBERSHIP_TYPES)[number]>("employee");
+  const [department, setDepartment] = useState("");
+  const [position, setPosition] = useState("");
+  const [notes, setNotes] = useState("");
+  const [intendedRole, setIntendedRole] = useState<
+    (typeof STAFF_INVITE_ROLES)[number] | ""
+  >("");
+  const [channel, setChannel] = useState<"provisioning" | "invitation">(
+    "provisioning",
+  );
+
+  const doProvision = useServerFn(provisionTenantUser);
+  const doApprove = useServerFn(approveTenantMembership);
+  const doAssign = useServerFn(assignTenantRole);
 
   async function load() {
     if (!tenantId) return;
@@ -63,12 +100,17 @@ function AdminUsersPage() {
       const db = supabase as any;
       const { data: members, error: mErr } = await db
         .from("tenant_members")
-        .select("user_id, joined_at")
+        .select(
+          "user_id, joined_at, status, membership_type, created_at",
+        )
         .eq("tenant_id", tenantId);
       if (mErr) throw mErr;
       const memberRows = (members ?? []) as Array<{
         user_id: string;
         joined_at: string;
+        status?: string;
+        membership_type?: string;
+        created_at?: string;
       }>;
       const ids = memberRows.map((m) => m.user_id);
       if (ids.length === 0) {
@@ -77,7 +119,7 @@ function AdminUsersPage() {
       }
 
       const [{ data: profiles }, { data: roleRows }] = await Promise.all([
-        db.from("profiles").select("id, full_name").in("id", ids),
+        db.from("profiles").select("id, full_name, first_name, last_name").in("id", ids),
         db
           .from("user_roles")
           .select("user_id, role")
@@ -86,9 +128,19 @@ function AdminUsersPage() {
       ]);
 
       const profileMap = new Map(
-        ((profiles ?? []) as Array<{ id: string; full_name: string | null }>).map(
-          (p) => [p.id, p.full_name],
-        ),
+        (
+          (profiles ?? []) as Array<{
+            id: string;
+            full_name: string | null;
+            first_name?: string | null;
+            last_name?: string | null;
+          }>
+        ).map((p) => [
+          p.id,
+          p.full_name ||
+            [p.first_name, p.last_name].filter(Boolean).join(" ") ||
+            null,
+        ]),
       );
       const rolesMap = new Map<string, string[]>();
       for (const r of (roleRows ?? []) as Array<{
@@ -106,7 +158,9 @@ function AdminUsersPage() {
           fullName: profileMap.get(m.user_id) ?? null,
           email: null,
           roles: rolesMap.get(m.user_id) ?? [],
-          joinedAt: m.joined_at,
+          joinedAt: m.created_at ?? m.joined_at,
+          membershipStatus: m.status ?? "approved",
+          membershipType: m.membership_type ?? "employee",
         })),
       );
     } catch (e) {
@@ -121,27 +175,79 @@ function AdminUsersPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenantId]);
 
-  const invite = useMutation({
+  const provision = useMutation({
     mutationFn: async () => {
       if (!tenantId) throw new Error("Missing tenant");
-      return doInvite({
+      return doProvision({
         data: {
           tenantId,
           email: email.trim(),
-          role,
-          fullName: fullName.trim() || undefined,
+          firstName: firstName.trim() || undefined,
+          lastName: lastName.trim() || undefined,
+          phone: phone.trim() || undefined,
+          membershipType,
+          channel,
+          department: department.trim() || undefined,
+          position: position.trim() || undefined,
+          notes: notes.trim() || undefined,
+          intendedRole: intendedRole || undefined,
         },
       });
     },
     onSuccess: () => {
-      toast.success("Invitación enviada");
+      toast.success(
+        "Usuario provisionado · Membership Pending (sin acceso hasta Approve + Role)",
+      );
       setEmail("");
-      setFullName("");
+      setFirstName("");
+      setLastName("");
+      setPhone("");
+      setDepartment("");
+      setPosition("");
+      setNotes("");
+      setIntendedRole("");
       load();
     },
     onError: (e) => {
       toast.error(e instanceof Error ? e.message : String(e));
     },
+  });
+
+  const approve = useMutation({
+    mutationFn: async (userId: string) => {
+      if (!tenantId) throw new Error("Missing tenant");
+      return doApprove({
+        data: {
+          tenantId,
+          userId,
+          // Role remains optional and explicit — not automatic on create
+          assignRole: undefined,
+        },
+      });
+    },
+    onSuccess: () => {
+      toast.success("Membership Approved — asigna un Role para conceder acceso");
+      load();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : String(e)),
+  });
+
+  const assign = useMutation({
+    mutationFn: async ({
+      userId,
+      role,
+    }: {
+      userId: string;
+      role: (typeof ASSIGNABLE_ROLES)[number];
+    }) => {
+      if (!tenantId) throw new Error("Missing tenant");
+      return doAssign({ data: { tenantId, userId, role } });
+    },
+    onSuccess: () => {
+      toast.success("Role asignado · acceso efectivo concedido");
+      load();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : String(e)),
   });
 
   const columns: Column<UserRow>[] = [
@@ -158,6 +264,34 @@ function AdminUsersPage() {
       ),
     },
     {
+      key: "type",
+      header: "Tipo",
+      render: (r) => (
+        <StatusChip
+          tone="neutral"
+          label={TYPE_LABELS[r.membershipType] ?? r.membershipType}
+        />
+      ),
+    },
+    {
+      key: "status",
+      header: "Membership",
+      render: (r) => {
+        const tone =
+          r.membershipStatus === "approved"
+            ? "positive"
+            : r.membershipStatus === "pending"
+              ? "warning"
+              : "danger";
+        return (
+          <StatusChip
+            tone={tone as "positive" | "warning" | "danger"}
+            label={r.membershipStatus}
+          />
+        );
+      },
+    },
+    {
       key: "roles",
       header: "Roles / RBAC",
       render: (r) =>
@@ -172,12 +306,39 @@ function AdminUsersPage() {
         ),
     },
     {
-      key: "joined",
-      header: "Vinculación",
+      key: "actions",
+      header: "Acciones",
       render: (r) => (
-        <span className="text-xs text-muted-foreground">
-          {r.joinedAt ? new Date(r.joinedAt).toLocaleDateString("es-ES") : "—"}
-        </span>
+        <div className="flex flex-wrap gap-2 items-center">
+          {r.membershipStatus === "pending" && (
+            <Button
+              size="sm"
+              variant="secondary"
+              disabled={approve.isPending}
+              onClick={() => approve.mutate(r.id)}
+            >
+              Aprobar
+            </Button>
+          )}
+          {r.membershipStatus === "approved" && r.roles.length === 0 && (
+            <select
+              className="h-8 rounded-md border border-input bg-background px-2 text-xs"
+              defaultValue=""
+              onChange={(e) => {
+                const role = e.target.value as (typeof ASSIGNABLE_ROLES)[number];
+                if (!role) return;
+                assign.mutate({ userId: r.id, role });
+              }}
+            >
+              <option value="">Asignar role…</option>
+              {ASSIGNABLE_ROLES.map((roleOption) => (
+                <option key={roleOption} value={roleOption}>
+                  {roleOption}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
       ),
     },
   ];
@@ -187,67 +348,158 @@ function AdminUsersPage() {
       <SectionTitle
         overline="Administración"
         title="Usuarios"
-        subtitle="Miembros del tenant y roles. Invita cocina y reparto sin SQL."
+        subtitle="Provisionamiento · Membership · Role. Crear usuario no concede acceso."
       />
       <AdminHeader
-        goal="Dotar de personal operativo"
-        capability="employee.manage"
-        object="TenantMember · UserRole"
+        goal="Incorporar personas al tenant sin saltarse RBAC"
+        capability="users.create · employee.manage"
+        object="Identity · Profile · Membership · Role"
       />
 
-      <PanelCard>
-        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
-          Invitar staff
-        </p>
-        <form
-          className="grid gap-3 sm:grid-cols-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            invite.mutate();
-          }}
-        >
-          <div className="space-y-1.5">
-            <Label htmlFor="staff-email">Email</Label>
-            <Input
-              id="staff-email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="staff-name">Nombre (opcional)</Label>
-            <Input
-              id="staff-name"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="staff-role">Rol</Label>
-            <select
-              id="staff-role"
-              className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
-              value={role}
-              onChange={(e) =>
-                setRole(e.target.value as (typeof STAFF_INVITE_ROLES)[number])
-              }
-            >
-              {STAFF_INVITE_ROLES.map((r) => (
-                <option key={r} value={r}>
-                  {r}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex items-end">
-            <Button type="submit" disabled={invite.isPending}>
-              Enviar invitación
-            </Button>
-          </div>
-        </form>
-      </PanelCard>
+      {canCreate && (
+        <PanelCard>
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">
+            Nuevo usuario
+          </p>
+          <p className="text-xs text-muted-foreground mb-3">
+            Canales: Provisioning o Invitation. El membership queda Pending; el
+            acceso requiere Approve + Role.
+          </p>
+          <form
+            className="grid gap-3 sm:grid-cols-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              provision.mutate();
+            }}
+          >
+            <div className="space-y-1.5">
+              <Label htmlFor="user-channel">Canal</Label>
+              <select
+                id="user-channel"
+                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                value={channel}
+                onChange={(e) =>
+                  setChannel(e.target.value as "provisioning" | "invitation")
+                }
+              >
+                <option value="provisioning">Provisioning</option>
+                <option value="invitation">Invitation</option>
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="user-type">Tipo</Label>
+              <select
+                id="user-type"
+                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                value={membershipType}
+                onChange={(e) =>
+                  setMembershipType(
+                    e.target.value as (typeof MEMBERSHIP_TYPES)[number],
+                  )
+                }
+              >
+                {MEMBERSHIP_TYPES.map((t) => (
+                  <option key={t} value={t}>
+                    {TYPE_LABELS[t] ?? t}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="user-first">Nombre</Label>
+              <Input
+                id="user-first"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="user-last">Apellidos</Label>
+              <Input
+                id="user-last"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="user-email">Email</Label>
+              <Input
+                id="user-email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="user-phone">Teléfono</Label>
+              <Input
+                id="user-phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            </div>
+            {(membershipType === "employee" ||
+              membershipType === "company_employee") && (
+              <>
+                <div className="space-y-1.5">
+                  <Label htmlFor="user-dept">Departamento</Label>
+                  <Input
+                    id="user-dept"
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="user-pos">Cargo</Label>
+                  <Input
+                    id="user-pos"
+                    value={position}
+                    onChange={(e) => setPosition(e.target.value)}
+                  />
+                </div>
+              </>
+            )}
+            <div className="space-y-1.5">
+              <Label htmlFor="user-intended-role">
+                Role previsto (opcional · no se asigna aún)
+              </Label>
+              <select
+                id="user-intended-role"
+                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                value={intendedRole}
+                onChange={(e) =>
+                  setIntendedRole(
+                    e.target.value as (typeof STAFF_INVITE_ROLES)[number] | "",
+                  )
+                }
+              >
+                <option value="">— ninguno —</option>
+                {STAFF_INVITE_ROLES.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="user-notes">Notas internas</Label>
+              <Input
+                id="user-notes"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+              />
+            </div>
+            <div className="flex items-end sm:col-span-2">
+              <Button type="submit" disabled={provision.isPending}>
+                {channel === "invitation"
+                  ? "Enviar invitación"
+                  : "Provisionar usuario"}
+              </Button>
+            </div>
+          </form>
+        </PanelCard>
+      )}
 
       <PanelCard>
         {loading ? (
