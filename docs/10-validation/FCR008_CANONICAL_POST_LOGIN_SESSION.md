@@ -79,10 +79,12 @@ Cold start (`getSession` al montar `/auth`) **sigue permitido**.
 ## Flow
 
 ```text
-PS-001 ∧ PS-002-C (real) ∧ PS-003 = PASS
-  → PLATFORM STABILIZATION COMPLETE (Flow-ready)
-  → FLOW CERTIFICATION READY
-  → PR FLOW-01
+PRIORIDAD: PS-002-C PASS (Auth real + evidencia)
+  → entonces resolver/rebase docs (#98 vs tip)
+  → entonces FLOW-01 Specification
 
-FLOW-01  ⏸ NO ABRIR hasta PS-002-C PASS
+HOLD ahora:
+  merge #98 · FLOW-01 · “parece que login funciona”
 ```
+
+Runner: `npm run test:ps002-canonical-auth` · ver [PRIORITY_PS002C_BEFORE_FLOW](./PRIORITY_PS002C_BEFORE_FLOW.md)

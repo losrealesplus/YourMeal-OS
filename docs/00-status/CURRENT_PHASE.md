@@ -5,14 +5,14 @@
 
 ```text
 ══════════════════════════════════════════════════
-FCR-008 · CANONICAL POST-LOGIN SESSION
+FCR-008 · CANONICAL POST-LOGIN · PRIORIDAD PS-002-C
 ══════════════════════════════════════════════════
-Contrato: LOGIN → … → DASHBOARD_RENDERED (cada paso ×1, sin getSession inmediato)
-Validador: validateCanonicalPipeline · PS-002-C
-FCR-007 causa cerrada · FCR-002 intacto
-PS-002-B Bootstrap = PASS · PS-002-C Auth real = ⏳ PENDING
-FLOW-01: ⏸ NO ABRIR hasta PS-001 ∧ PS-002-C ∧ PS-003 PASS
-Ver: ../10-validation/FCR008_CANONICAL_POST_LOGIN_SESSION.md
+Contrato: LOGIN → … → DASHBOARD_RENDERED (×1, sin getSession inmediato)
+Runner: npm run test:ps002-canonical-auth
+PS-002-B Bootstrap = PASS · PS-002-C Auth real = ⏳ PENDING (bloquea todo)
+HOLD merge #98 hasta PS-002-C PASS · FLOW-01 ⏸ NO ABRIR
+Ver: ../10-validation/PRIORITY_PS002C_BEFORE_FLOW.md
+     ../10-validation/FCR008_CANONICAL_POST_LOGIN_SESSION.md
      ../10-validation/platform-stabilization/PS-002.md
 ══════════════════════════════════════════════════
 
