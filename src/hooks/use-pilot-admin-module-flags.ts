@@ -22,6 +22,7 @@ export function usePilotAdminModuleFlags() {
   const { user, tenantId, roles } = useAuth();
   const [flags, setFlags] = useState<FlagMap>(ALL_OFF);
   const [ready, setReady] = useState(false);
+  const rolesKey = roles.slice().sort().join("|");
 
   useEffect(() => {
     let cancelled = false;
@@ -64,7 +65,8 @@ export function usePilotAdminModuleFlags() {
     return () => {
       cancelled = true;
     };
-  }, [user, tenantId, roles]);
+    // rolesKey: same role set must not refetch when array identity churns
+  }, [user, tenantId, rolesKey]);
 
   return { flags, ready };
 }

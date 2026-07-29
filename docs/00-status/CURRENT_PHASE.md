@@ -5,6 +5,16 @@
 
 ```text
 ══════════════════════════════════════════════════
+PLATFORM STABILIZATION v1 · COMPLETE
+══════════════════════════════════════════════════
+Acta: ../10-validation/platform-stabilization/PLATFORM_STABILIZATION_COMPLETE.md
+Gates: PS-001 PASS · PS-002 PASS · PS-003 PASS
+Platform Ready: FLOW CERTIFICATION
+FLOW-01: ⏸ no abrir automáticamente — PR dedicado Specification
+Prohibido prematuro: Event Bus · Notifications · Jobs · Analytics · AI
+══════════════════════════════════════════════════
+
+══════════════════════════════════════════════════
 IDENTITY FOUNDATION · LOCKED v1 (2026-07-29)
 ══════════════════════════════════════════════════
 Pipeline: Identity → Profile → Membership → Role → Workspace
@@ -13,7 +23,6 @@ Allowed: capabilities compatibles · MFA/SSO/SCIM solo con ADR + evidencia
 Forbidden: rediseñar Identity / create≡access / multi-membership sin evidencia
 Auth Layer sigue Frozen: IDENTITY_FREEZE_v1.md
 Orden estratégico: STRATEGIC_ORDER_POST_IDENTITY_LOCK.md
-Siguiente foco de capa: Flow (no Identity · no Foundation)
 ══════════════════════════════════════════════════
 
 ══════════════════════════════════════════════════
