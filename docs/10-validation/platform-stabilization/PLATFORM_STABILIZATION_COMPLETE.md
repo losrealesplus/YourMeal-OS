@@ -65,6 +65,7 @@ Bajo [FLOW_GOVERNANCE](../../00-status/FLOW_GOVERNANCE.md) / Operating Model v1 
 
 | Campo | Valor |
 |-------|-------|
-| Decisión | Platform Stabilization **COMPLETE** |
+| Decisión | Platform Stabilization **COMPLETE** *(gates Bootstrap)* |
 | Método | Bootstrap Mode + Playwright gates + estático FCR-002 |
-| Flow | Elegible para apertura · no iniciado |
+| Flow | ⏸ **NO** — bloqueado por [FCR-007 Login Blocker](../FCR007_LOGIN_BLOCKER_INVESTIGATION.md) |
+| Nota | PS-002 no validó `signInWithPassword` real; no declarar Platform Ready para Flow hasta cerrar FCR-007 |

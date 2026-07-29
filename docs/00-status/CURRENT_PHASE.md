@@ -5,13 +5,13 @@
 
 ```text
 ══════════════════════════════════════════════════
-PLATFORM STABILIZATION v1 · COMPLETE
+PLATFORM STABILIZATION · FCR-007 BLOCKER
 ══════════════════════════════════════════════════
-Acta: ../10-validation/platform-stabilization/PLATFORM_STABILIZATION_COMPLETE.md
-Gates: PS-001 PASS · PS-002 PASS · PS-003 PASS
-Platform Ready: FLOW CERTIFICATION
-FLOW-01: ⏸ no abrir automáticamente — PR dedicado Specification
-Prohibido prematuro: Event Bus · Notifications · Jobs · Analytics · AI
+Acta #100: gates Bootstrap PASS — insuficiente para auth real
+FCR-007: Login Blocker · Session post-login · INVESTIGATED (no fix)
+Platform Ready for FLOW: ❌ NO
+FLOW-01: ⏸ NO ABRIR
+Ver: ../10-validation/FCR007_LOGIN_BLOCKER_INVESTIGATION.md
 ══════════════════════════════════════════════════
 
 ══════════════════════════════════════════════════

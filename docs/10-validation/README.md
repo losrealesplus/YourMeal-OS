@@ -36,7 +36,8 @@ docs/10-validation/
 ├── SURFACE_NAVIGATION_REPORT.md          ← recorrido + casos negativos
 ├── EP_OPS_002_PRECHECK.md                ← EP-OPS-002 CERTIFIED · acta de ciclo P13
 ├── ep-ops-003/                           ← EP-OPS-003 · Journeys COMPLETE
-├── FCR002_FLICKER_INVESTIGATION.md       ← Render Stability Regression (FIXED código)
+├── FCR002_FLICKER_INVESTIGATION.md       ← Render Stability Regression (CLOSED)
+├── FCR007_LOGIN_BLOCKER_INVESTIGATION.md ← Login Blocker P0 · post-login no Navigate
 ├── platform-stabilization/               ← COMPLETE · PS-001/002/003 PASS · acta cierre
 ├── LOVABLE_DEPLOYMENT_AUDIT_BOOTSTRAP.md  ← Bootstrap #82 · DV-001 Lovable sync
 ├── POST_DEPLOY_SMOKE_OP001.md
