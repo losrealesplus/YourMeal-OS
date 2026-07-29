@@ -1177,10 +1177,19 @@ CREATE TRIGGER tenants_validate_branding
   BEFORE INSERT OR UPDATE ON public.tenants
   FOR EACH ROW EXECUTE FUNCTION public.validate_tenant_branding();
 
--- 3. Storage policies on tenant-branding bucket
+-- 3. Storage bucket + policies on tenant-branding
 --    Path convention: {tenant_id}/logo.<ext>
---    Read: any member of the tenant
---    Write: company_admin of that tenant, or saas_admin
+-- INFRA-011: idempotent bucket create before policies
+
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'tenant-branding',
+  'tenant-branding',
+  false,
+  5242880,
+  ARRAY['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml']::text[]
+)
+ON CONFLICT (id) DO NOTHING;
 
 DROP POLICY IF EXISTS "tenant_branding_read"          ON storage.objects;
 DROP POLICY IF EXISTS "tenant_branding_write_insert"  ON storage.objects;
