@@ -1,0 +1,33 @@
+{
+  "$schema_note": "Example envelope for PS-002-C evidence — not a real PASS. Replace by runner output.",
+  "status": "PENDING",
+  "gate": "PS-002-C",
+  "contract": "FCR-008",
+  "auth": "supabase_real",
+  "pipeline": [],
+  "duplicates": [],
+  "missing": [
+    "LOGIN",
+    "LOGIN_OK",
+    "CANONICAL_SESSION",
+    "BOOTSTRAP_START",
+    "IDENTITY_READY",
+    "PROFILE_READY",
+    "MEMBERSHIP_READY",
+    "ROLE_READY",
+    "HOME_PATH_RESOLVED",
+    "NAVIGATE",
+    "DASHBOARD_RENDERED"
+  ],
+  "out_of_order": [],
+  "firstFailure": "LOGIN",
+  "duration_ms": {
+    "login_to_session": null,
+    "session_to_bootstrap": null,
+    "bootstrap_to_dashboard": null
+  },
+  "notes": [
+    "Await PS002_EMAIL + PS002_PASSWORD against live Supabase",
+    "Do not mock Auth — credentials are part of the gate contract"
+  ]
+}

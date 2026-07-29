@@ -2,6 +2,7 @@
  * PS-002-C · Canonical Session Validation (Auth Supabase real)
  *
  * Priority gate for Flow Certification. Bootstrap Mode MUST be off.
+ * Credentials are part of the contract — do not simulate Auth.
  *
  * Required:
  *   PS002_EMAIL
@@ -13,21 +14,20 @@
  *   PS002_EXPECT_PATH    substring of post-login URL (default /admin)
  *
  * Usage:
- *   # terminal A (NO bootstrap):
  *   VITE_BOOTSTRAP_MODE=false npm run dev -- --host 127.0.0.1 --port 8080
- *
- *   # terminal B:
  *   PS002_EMAIL=… PS002_PASSWORD=… npm run test:ps002-canonical-auth
  *
- * Exit 0 only when validateCanonicalPipeline(observed).ok === true
- * and no getSession() appears in console after LOGIN_OK (heuristic).
+ * Evidence: docs/10-validation/platform-stabilization/evidence/ps002c-canonical-auth.json
  */
 import { chromium } from "playwright";
 import fs from "node:fs";
 import path from "node:path";
 import {
+  buildPs002cEvidenceReport,
+  computePipelineDurations,
   extractFcr008Steps,
   formatPipelineComparisonTable,
+  parseFcr008ConsoleEvent,
   PS002_CANONICAL_STEPS,
   validateCanonicalPipeline,
 } from "./lib/canonical-pipeline.mjs";
@@ -50,7 +50,8 @@ function failHard(msg) {
 if (!EMAIL || !PASSWORD) {
   failHard(
     "Set PS002_EMAIL and PS002_PASSWORD (real Supabase Auth credentials). " +
-      "Bootstrap Mode must stay false. See docs/10-validation/platform-stabilization/PS-002.md",
+      "Bootstrap Mode must stay false. Credentials are part of the PS-002-C contract — do not mock Auth. " +
+      "See docs/10-validation/platform-stabilization/PS-002.md",
   );
 }
 
@@ -59,15 +60,25 @@ async function main() {
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   const consoleLines = [];
   const pageErrors = [];
+  /** @type {Record<string, number>} first-seen wall clock per step */
+  const stepTimestamps = {};
 
   page.on("console", (msg) => {
     const text = msg.text();
+    const atMs = Date.now();
     consoleLines.push(text);
+    const ev = parseFcr008ConsoleEvent(text, atMs);
+    if (ev && stepTimestamps[ev.step] == null) {
+      stepTimestamps[ev.step] = ev.atMs;
+    }
   });
   page.on("pageerror", (e) => pageErrors.push(String(e)));
 
-  let result = null;
-  let screenshotPath = null;
+  const writeEvidence = (payload) => {
+    const evidencePath = path.join(OUT, "ps002c-canonical-auth.json");
+    fs.writeFileSync(evidencePath, JSON.stringify(payload, null, 2));
+    return evidencePath;
+  };
 
   try {
     await page.goto(`${BASE}${ROUTE}`, {
@@ -76,7 +87,6 @@ async function main() {
     });
     await page.waitForTimeout(800);
 
-    // Refuse if Bootstrap profile selector is showing
     if (await page.getByRole("button", { name: /^Entrar$/i }).count()) {
       if (await page.locator('input[name="bootstrap-profile"]').count()) {
         failHard(
@@ -91,13 +101,11 @@ async function main() {
     await emailInput.fill(EMAIL);
     await passwordInput.fill(PASSWORD);
 
-    // Prefer staff login submit on /auth/admin
     const submit = page
       .getByRole("button", { name: /entrar|sign in|iniciar|acceder/i })
       .first();
     await submit.click();
 
-    // Wait for either dashboard path or STOP in logs
     const deadline = Date.now() + 45_000;
     let navigated = false;
     while (Date.now() < deadline) {
@@ -117,53 +125,65 @@ async function main() {
     }
 
     await page.waitForTimeout(1000);
-    screenshotPath = path.join(OUT, "ps002c-after-login.png");
+    const screenshotPath = path.join(OUT, "ps002c-after-login.png");
     await page.screenshot({ path: screenshotPath, fullPage: true });
 
     const fcrLines = consoleLines.filter((l) => l.includes("[FCR-008]"));
-    const observed = extractFcr008Steps(fcrLines);
-    result = validateCanonicalPipeline(observed);
+    const pipeline = extractFcr008Steps(fcrLines);
+    const validation = validateCanonicalPipeline(pipeline);
+    const duration_ms = computePipelineDurations(stepTimestamps);
 
-    // Heuristic: after LOGIN_OK, console must not show a getSession call from our app
-    // (Supabase internals may still mention session — we only flag our tagged pipeline STOP reasons)
+    const status =
+      validation.ok && navigated
+        ? "PASS"
+        : validation.ok && !navigated
+          ? "FAIL"
+          : "FAIL";
+
     const postLoginGetSession = fcrLines.some((l) =>
       /getSession|canonical_session_missing/.test(l),
     );
 
-    const evidence = {
-      gate: "PS-002-C",
-      at: new Date().toISOString(),
-      base: BASE,
-      route: ROUTE,
-      email: EMAIL.replace(/(.{2}).+(@.+)/, "$1***$2"),
-      navigated,
-      finalUrl: page.url(),
-      expectPath: EXPECT_PATH,
-      observed,
-      expected: [...PS002_CANONICAL_STEPS],
-      validation: result,
-      comparisonTable: formatPipelineComparisonTable(result),
-      fcr008Logs: fcrLines,
-      pageErrors,
-      screenshot: screenshotPath,
-      notes: [
-        "Auth Supabase real (no Bootstrap)",
-        "Contract: each canonical step exactly once",
-        postLoginGetSession
-          ? "WARN: getSession/missing-session signal in FCR-008 logs"
-          : "No getSession failure signal in FCR-008 logs",
-      ],
-    };
+    const evidence = buildPs002cEvidenceReport({
+      status,
+      pipeline,
+      validation,
+      duration_ms,
+      meta: {
+        base: BASE,
+        route: ROUTE,
+        email: EMAIL.replace(/(.{2}).+(@.+)/, "$1***$2"),
+        navigated,
+        finalUrl: page.url(),
+        expectPath: EXPECT_PATH,
+        stepTimestamps,
+        comparisonTable: formatPipelineComparisonTable(validation),
+        fcr008Logs: fcrLines,
+        pageErrors,
+        screenshot: screenshotPath,
+        notes: [
+          "Auth Supabase real (no Bootstrap, no mock)",
+          "Contract: each canonical step exactly once",
+          "duration_ms is diagnostic only — not a performance gate",
+          postLoginGetSession
+            ? "WARN: getSession/missing-session signal in FCR-008 logs"
+            : "No getSession failure signal in FCR-008 logs",
+        ],
+      },
+    });
 
-    const evidencePath = path.join(OUT, "ps002c-canonical-auth.json");
-    fs.writeFileSync(evidencePath, JSON.stringify(evidence, null, 2));
+    const evidencePath = writeEvidence(evidence);
 
     console.log(evidence.comparisonTable);
     console.log(
       JSON.stringify(
         {
-          ok: result.ok,
-          firstFailure: result.firstFailure,
+          status: evidence.status,
+          firstFailure: evidence.firstFailure,
+          duplicates: evidence.duplicates,
+          missing: evidence.missing,
+          out_of_order: evidence.out_of_order,
+          duration_ms: evidence.duration_ms,
           navigated,
           finalUrl: page.url(),
           evidencePath,
@@ -173,39 +193,34 @@ async function main() {
       ),
     );
 
-    if (!result.ok) {
+    if (status !== "PASS") {
       console.error(
-        `\nPS-002-C FAIL — first blocked step: ${result.firstFailure ?? "unknown"}`,
+        `\nPS-002-C FAIL — first blocked step: ${evidence.firstFailure ?? (navigated ? "unknown" : "NAVIGATE/DASHBOARD")}`,
       );
       console.error(evidence.comparisonTable);
       process.exit(1);
     }
-    if (!navigated) {
-      failHard(
-        `Pipeline logs PASS but URL did not reach ${EXPECT_PATH} (url=${page.url()})`,
-      );
-    }
+
     console.log("PS-002-C PASS");
     process.exit(0);
   } catch (e) {
-    const evidencePath = path.join(OUT, "ps002c-canonical-auth.json");
-    fs.writeFileSync(
-      evidencePath,
-      JSON.stringify(
-        {
-          gate: "PS-002-C",
-          at: new Date().toISOString(),
-          ok: false,
+    const pipeline = extractFcr008Steps(
+      consoleLines.filter((l) => l.includes("[FCR-008]")),
+    );
+    const validation = validateCanonicalPipeline(pipeline);
+    writeEvidence(
+      buildPs002cEvidenceReport({
+        status: "FAIL",
+        pipeline,
+        validation,
+        duration_ms: computePipelineDurations(stepTimestamps),
+        meta: {
           error: String(e),
-          observed: extractFcr008Steps(
-            consoleLines.filter((l) => l.includes("[FCR-008]")),
-          ),
           fcr008Logs: consoleLines.filter((l) => l.includes("[FCR-008]")),
           pageErrors,
+          stepTimestamps,
         },
-        null,
-        2,
-      ),
+      }),
     );
     failHard(String(e));
   } finally {
