@@ -1,0 +1,58 @@
+{
+  "status": "FAIL",
+  "gate": "PS-002-C",
+  "contract": "FCR-008",
+  "auth": "supabase_real",
+  "at": "2026-07-29T17:02:00.000Z",
+  "pipeline": [],
+  "expected": [
+    "LOGIN",
+    "LOGIN_OK",
+    "CANONICAL_SESSION",
+    "BOOTSTRAP_START",
+    "IDENTITY_READY",
+    "PROFILE_READY",
+    "MEMBERSHIP_READY",
+    "ROLE_READY",
+    "HOME_PATH_RESOLVED",
+    "NAVIGATE",
+    "DASHBOARD_RENDERED"
+  ],
+  "duplicates": [],
+  "missing": [
+    "LOGIN",
+    "LOGIN_OK",
+    "CANONICAL_SESSION",
+    "BOOTSTRAP_START",
+    "IDENTITY_READY",
+    "PROFILE_READY",
+    "MEMBERSHIP_READY",
+    "ROLE_READY",
+    "HOME_PATH_RESOLVED",
+    "NAVIGATE",
+    "DASHBOARD_RENDERED"
+  ],
+  "out_of_order": [],
+  "firstFailure": "LOGIN",
+  "duration_ms": {
+    "login_to_session": null,
+    "session_to_bootstrap": null,
+    "bootstrap_to_dashboard": null
+  },
+  "pre_check": {
+    "branch": "cursor/fcr008-canonical-post-login-session-f54a",
+    "pr_100": "MERGED",
+    "pr_101": "CLOSED",
+    "pr_102": "OPEN",
+    "fcr002_useCan_stable": "VALID",
+    "identity_provider_no_getSession_hydrate": "VALID",
+    "no_immediate_getSession_after_signIn": "VALID",
+    "canonical_pipeline_source_of_truth": "VALID",
+    "credentials_ps002_email_password": "MISSING"
+  },
+  "notes": [
+    "Runner refused to start without PS002_EMAIL + PS002_PASSWORD",
+    "No Auth mock attempted — credentials are part of the PS-002-C contract",
+    "Re-run after exporting real Supabase credentials"
+  ]
+}
