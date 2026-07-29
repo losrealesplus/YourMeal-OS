@@ -39,6 +39,7 @@ export const INVITATION_STATUSES = [
   "pending",
   "accepted",
   "expired",
+  "cancelled",
   "revoked",
 ] as const;
 
@@ -147,6 +148,9 @@ export function assertInvitationUsable(input: {
   }
   if (input.status === "revoked") {
     return fail("INVITATION_REVOKED", "Invitation was revoked");
+  }
+  if (input.status === "cancelled") {
+    return fail("INVITATION_CANCELLED", "Invitation was cancelled");
   }
   if (input.status === "expired" || expires.getTime() < now.getTime()) {
     return fail("INVITATION_EXPIRED", "Invitation expired");
