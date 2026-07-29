@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { useRouter } from "@tanstack/react-router";
-import { getSession, onAuthStateChange } from "@/auth";
+import { onAuthStateChange } from "@/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { homePathForRoles } from "@/lib/home-path";
 import { tryEnsurePlatformOwnerSession } from "@/lib/ensure-platform-owner-session";
@@ -26,11 +26,10 @@ export function SupabaseIdentityProvider({ children }: { children: ReactNode }) 
   useEffect(() => {
     const { data: sub } = onAuthStateChange((_e, s) => {
       setSession(s);
-    });
-    getSession().then(({ data }) => {
-      setSession(data.session);
       setLoading(false);
     });
+    // INITIAL_SESSION from onAuthStateChange replaces a parallel getSession()
+    // (duplicate setSession caused an extra mount flash — Platform Stabilization).
     return () => sub.subscription.unsubscribe();
   }, []);
 

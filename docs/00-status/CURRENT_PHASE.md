@@ -1,9 +1,19 @@
 # CURRENT_PHASE
 
-**Última actualización:** 2026-07-28  
+**Última actualización:** 2026-07-29  
 **No sustituye** [MILESTONES](./MILESTONES.md) — tablero de “dónde estamos ahora”.
 
 ```text
+══════════════════════════════════════════════════
+PLATFORM STABILIZATION v1 · PRE-FLOW (ACTIVE)
+══════════════════════════════════════════════════
+Objetivo: eliminar ruido / inestabilidad antes de Flow Certification
+Acta: ../10-validation/platform-stabilization/PLATFORM_STABILIZATION_REPORT.md
+FCR-002: FIXED (código) · visual pending
+Prohibido: Event Bus · Notifications · Jobs · Analytics · AI · nuevos módulos
+Siguiente tras STABLE: FLOW-01 Kitchen → Delivery · Specification
+══════════════════════════════════════════════════
+
 ══════════════════════════════════════════════════
 AUTH LAYER · FROZEN (2026-07-26)
 ══════════════════════════════════════════════════
