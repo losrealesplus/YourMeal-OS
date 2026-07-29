@@ -51,3 +51,14 @@ Entidades: [ENTITY_GUIDELINES.md](../12-domain-model/ENTITY_GUIDELINES.md).
 
 Antes del DoD de módulo, cada entidad debe cumplir [DOMAIN_DONE.md](../12-domain-model/DOMAIN_DONE.md) y [ENTITY_GUIDELINES.md](../12-domain-model/ENTITY_GUIDELINES.md).  
 La UI no cierra el dominio. Repository / Application / Infrastructure son etapas posteriores.
+
+## Definition of Done — Flow Certification (fase actual)
+
+Para trabajo de **Flow**, el Done de fase es [FLOW_DEFINITION_OF_DONE.md](./FLOW_DEFINITION_OF_DONE.md):
+
+```text
+Handoff definido → Evidence obtenida → Flow certificado → Merge
+```
+
+Política: [FLOW_GOVERNANCE.md](./FLOW_GOVERNANCE.md) · Regla diaria: [FLOW_FIRST.md](./FLOW_FIRST.md).  
+Operational Readiness = Flows certificados, no número de features (Regla 6).

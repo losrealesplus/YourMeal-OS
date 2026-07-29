@@ -7,7 +7,8 @@
 **Plantilla Flow:** [FLOW_CERTIFICATION](../FLOW_CERTIFICATION.md)
 
 > Función de este documento: **fijar el objeto de certificación** de Flow.  
-> **No** ejecuta handoffs. **No** es Evidence Gate G.
+> **No** ejecuta handoffs. **No** es Evidence Gate G.  
+> Disciplina de apertura: [FLOW_CERTIFICATION_OPEN](../../00-status/FLOW_CERTIFICATION_OPEN.md) · Platform v1: [PLATFORM_V1_CLOSED](../../00-status/PLATFORM_V1_CLOSED.md)
 
 ---
 
