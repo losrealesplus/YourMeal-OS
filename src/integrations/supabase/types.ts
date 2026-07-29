@@ -901,12 +901,8 @@ export type Database = {
           country: string | null
           created_at: string
           currency: string | null
-          deleted_at: string | null
-          deleted_by: string | null
-          first_name: string | null
           full_name: string | null
           id: string
-          last_name: string | null
           locale: string
           phone: string | null
           time_format: string | null
@@ -922,12 +918,8 @@ export type Database = {
           country?: string | null
           created_at?: string
           currency?: string | null
-          deleted_at?: string | null
-          deleted_by?: string | null
-          first_name?: string | null
           full_name?: string | null
           id: string
-          last_name?: string | null
           locale?: string
           phone?: string | null
           time_format?: string | null
@@ -943,11 +935,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           currency?: string | null
-          deleted_at?: string | null
-          deleted_by?: string | null
-          first_name?: string | null
           full_name?: string | null
-          last_name?: string | null
           id?: string
           locale?: string
           phone?: string | null
@@ -1215,246 +1203,23 @@ export type Database = {
       }
       tenant_members: {
         Row: {
-          approved_at: string | null
-          approved_by: string | null
-          created_at: string
-          deleted_at: string | null
-          deleted_by: string | null
-          id: string
-          invited_by: string | null
           joined_at: string
-          membership_type: Database["public"]["Enums"]["membership_type"]
-          notes: string | null
-          provisioning_channel: Database["public"]["Enums"]["provisioning_channel"]
-          reactivated_at: string | null
-          reactivated_by: string | null
-          rejected_at: string | null
-          rejected_by: string | null
-          revoked_at: string | null
-          revoked_by: string | null
-          status: Database["public"]["Enums"]["membership_status"]
-          suspended_at: string | null
-          suspended_by: string | null
           tenant_id: string
           user_id: string
         }
         Insert: {
-          approved_at?: string | null
-          approved_by?: string | null
-          created_at?: string
-          deleted_at?: string | null
-          deleted_by?: string | null
-          id?: string
-          invited_by?: string | null
           joined_at?: string
-          membership_type?: Database["public"]["Enums"]["membership_type"]
-          notes?: string | null
-          provisioning_channel?: Database["public"]["Enums"]["provisioning_channel"]
-          reactivated_at?: string | null
-          reactivated_by?: string | null
-          rejected_at?: string | null
-          rejected_by?: string | null
-          revoked_at?: string | null
-          revoked_by?: string | null
-          status?: Database["public"]["Enums"]["membership_status"]
-          suspended_at?: string | null
-          suspended_by?: string | null
           tenant_id: string
           user_id: string
         }
         Update: {
-          approved_at?: string | null
-          approved_by?: string | null
-          created_at?: string
-          deleted_at?: string | null
-          deleted_by?: string | null
-          id?: string
-          invited_by?: string | null
           joined_at?: string
-          membership_type?: Database["public"]["Enums"]["membership_type"]
-          notes?: string | null
-          provisioning_channel?: Database["public"]["Enums"]["provisioning_channel"]
-          reactivated_at?: string | null
-          reactivated_by?: string | null
-          rejected_at?: string | null
-          rejected_by?: string | null
-          revoked_at?: string | null
-          revoked_by?: string | null
-          status?: Database["public"]["Enums"]["membership_status"]
-          suspended_at?: string | null
-          suspended_by?: string | null
           tenant_id?: string
           user_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "tenant_members_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      identity_events: {
-        Row: {
-          event_type: Database["public"]["Enums"]["identity_event_type"]
-          id: string
-          membership_id: string | null
-          metadata: Json
-          performed_at: string
-          performed_by: string | null
-          tenant_id: string | null
-          user_id: string | null
-        }
-        Insert: {
-          event_type: Database["public"]["Enums"]["identity_event_type"]
-          id?: string
-          membership_id?: string | null
-          metadata?: Json
-          performed_at?: string
-          performed_by?: string | null
-          tenant_id?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          event_type?: Database["public"]["Enums"]["identity_event_type"]
-          id?: string
-          membership_id?: string | null
-          metadata?: Json
-          performed_at?: string
-          performed_by?: string | null
-          tenant_id?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      employee_profiles: {
-        Row: {
-          created_at: string
-          deleted_at: string | null
-          deleted_by: string | null
-          department: string | null
-          employee_number: string | null
-          hire_date: string | null
-          id: string
-          manager_user_id: string | null
-          membership_id: string | null
-          position: string | null
-          tenant_id: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          deleted_at?: string | null
-          deleted_by?: string | null
-          department?: string | null
-          employee_number?: string | null
-          hire_date?: string | null
-          id?: string
-          manager_user_id?: string | null
-          membership_id?: string | null
-          position?: string | null
-          tenant_id: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          deleted_at?: string | null
-          deleted_by?: string | null
-          department?: string | null
-          employee_number?: string | null
-          hire_date?: string | null
-          id?: string
-          manager_user_id?: string | null
-          membership_id?: string | null
-          position?: string | null
-          tenant_id?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "employee_profiles_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      user_invitations: {
-        Row: {
-          accepted_at: string | null
-          cancelled_at: string | null
-          cancelled_by: string | null
-          channel: Database["public"]["Enums"]["provisioning_channel"]
-          created_at: string
-          email: string
-          expires_at: string
-          id: string
-          intended_role: Database["public"]["Enums"]["app_role"] | null
-          invited_by: string | null
-          membership_id: string | null
-          membership_type: Database["public"]["Enums"]["membership_type"]
-          notes: string | null
-          resent_at: string | null
-          resent_by: string | null
-          resent_count: number
-          status: Database["public"]["Enums"]["invitation_status"]
-          tenant_id: string
-          token: string
-          user_id: string | null
-        }
-        Insert: {
-          accepted_at?: string | null
-          cancelled_at?: string | null
-          cancelled_by?: string | null
-          channel?: Database["public"]["Enums"]["provisioning_channel"]
-          created_at?: string
-          email: string
-          expires_at?: string
-          id?: string
-          intended_role?: Database["public"]["Enums"]["app_role"] | null
-          invited_by?: string | null
-          membership_id?: string | null
-          membership_type: Database["public"]["Enums"]["membership_type"]
-          notes?: string | null
-          resent_at?: string | null
-          resent_by?: string | null
-          resent_count?: number
-          status?: Database["public"]["Enums"]["invitation_status"]
-          tenant_id: string
-          token?: string
-          user_id?: string | null
-        }
-        Update: {
-          accepted_at?: string | null
-          cancelled_at?: string | null
-          cancelled_by?: string | null
-          channel?: Database["public"]["Enums"]["provisioning_channel"]
-          created_at?: string
-          email?: string
-          expires_at?: string
-          id?: string
-          intended_role?: Database["public"]["Enums"]["app_role"] | null
-          invited_by?: string | null
-          membership_id?: string | null
-          membership_type?: Database["public"]["Enums"]["membership_type"]
-          notes?: string | null
-          resent_at?: string | null
-          resent_by?: string | null
-          resent_count?: number
-          status?: Database["public"]["Enums"]["invitation_status"]
-          tenant_id?: string
-          token?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_invitations_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -1649,7 +1414,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      current_membership_id: { Args: { _tenant_id: string }; Returns: string }
       current_user_tenants: { Args: never; Returns: string[] }
       ensure_individual_customer: {
         Args: {
@@ -1692,44 +1456,6 @@ export type Database = {
       }
     }
     Enums: {
-      identity_event_type:
-        | "USER_REGISTERED"
-        | "PROFILE_CREATED"
-        | "PROFILE_UPDATED"
-        | "INVITATION_SENT"
-        | "INVITATION_RESENT"
-        | "INVITATION_ACCEPTED"
-        | "INVITATION_EXPIRED"
-        | "INVITATION_CANCELLED"
-        | "INVITATION_REVOKED"
-        | "MEMBERSHIP_CREATED"
-        | "MEMBERSHIP_APPROVED"
-        | "MEMBERSHIP_REJECTED"
-        | "MEMBERSHIP_SUSPENDED"
-        | "MEMBERSHIP_REVOKED"
-        | "MEMBERSHIP_REACTIVATED"
-        | "MEMBERSHIP_ARCHIVED"
-        | "ROLE_ASSIGNED"
-        | "ROLE_REMOVED"
-        | "USER_LAST_LOGIN"
-        | "PASSWORD_RESET"
-        | "EMAIL_CHANGED"
-        | "PHONE_CHANGED"
-        | "ACCESS_DENIED_INCONSISTENT"
-      invitation_status: "pending" | "accepted" | "expired" | "cancelled" | "revoked"
-      membership_status:
-        | "pending"
-        | "approved"
-        | "rejected"
-        | "suspended"
-        | "revoked"
-      membership_type:
-        | "customer"
-        | "employee"
-        | "supplier"
-        | "company"
-        | "company_employee"
-      provisioning_channel: "self_registration" | "invitation" | "provisioning"
       app_role:
         | "saas_admin"
         | "company_admin"
@@ -1896,57 +1622,6 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      invitation_status: [
-        "pending",
-        "accepted",
-        "expired",
-        "cancelled",
-        "revoked",
-      ],
-      identity_event_type: [
-        "USER_REGISTERED",
-        "PROFILE_CREATED",
-        "PROFILE_UPDATED",
-        "INVITATION_SENT",
-        "INVITATION_RESENT",
-        "INVITATION_ACCEPTED",
-        "INVITATION_EXPIRED",
-        "INVITATION_CANCELLED",
-        "INVITATION_REVOKED",
-        "MEMBERSHIP_CREATED",
-        "MEMBERSHIP_APPROVED",
-        "MEMBERSHIP_REJECTED",
-        "MEMBERSHIP_SUSPENDED",
-        "MEMBERSHIP_REVOKED",
-        "MEMBERSHIP_REACTIVATED",
-        "MEMBERSHIP_ARCHIVED",
-        "ROLE_ASSIGNED",
-        "ROLE_REMOVED",
-        "USER_LAST_LOGIN",
-        "PASSWORD_RESET",
-        "EMAIL_CHANGED",
-        "PHONE_CHANGED",
-        "ACCESS_DENIED_INCONSISTENT",
-      ],
-      membership_status: [
-        "pending",
-        "approved",
-        "rejected",
-        "suspended",
-        "revoked",
-      ],
-      membership_type: [
-        "customer",
-        "employee",
-        "supplier",
-        "company",
-        "company_employee",
-      ],
-      provisioning_channel: [
-        "self_registration",
-        "invitation",
-        "provisioning",
-      ],
       app_role: [
         "saas_admin",
         "company_admin",
