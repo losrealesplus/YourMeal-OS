@@ -36,3 +36,9 @@ Aplicar en Supabase antes de usar el flujo en producción.
 ## Fuera de alcance (RI-001)
 
 Multi-membership (una identidad en varios tenants) permanece **gated** en aplicación.
+
+---
+
+## Cierre
+
+**2026-07-29:** Identity Foundation **LOCKED v1** — ver [IDENTITY_FOUNDATION_LOCK_v1](./IDENTITY_FOUNDATION_LOCK_v1.md) · hardening [PR #91](https://github.com/losrealesplus/YourMeal-OS/pull/91).

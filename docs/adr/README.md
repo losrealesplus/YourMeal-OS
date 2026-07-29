@@ -22,3 +22,4 @@ Permanent decisions for YourMeal OS. New ADRs are additive; do not silently reve
 | [0016](./0016-party-model-demand-actors.md) | Party Model for Demand Actors (semantic now · physical later) |
 | [0017](./0017-order-intake.md) | Order Intake — unified order capture (all channels) |
 | [0018](./0018-identity-membership-lifecycle.md) | Identity & Membership lifecycle (User Provisioning) |
+| [0019](./0019-identity-hardening-v1.md) | Identity Hardening v1 (architecture freeze / guarantees) |

@@ -12,6 +12,10 @@
 |-----|-----|
 | [FOUNDATION_LOCK.md](./FOUNDATION_LOCK.md) | Close the platform before features |
 | [OPERATIONAL_LAYER_INDEPENDENCE.md](./OPERATIONAL_LAYER_INDEPENDENCE.md) | Capas certificadas evolucionan sin invalidar inferiores |
+| [IDENTITY_LIFECYCLE.md](./IDENTITY_LIFECYCLE.md) | Identity → Profile → Membership → Role → Workspace |
+| [MEMBERSHIP_LIFECYCLE.md](./MEMBERSHIP_LIFECYCLE.md) | Membership states + audit stamps |
+| [IDENTITY_AUDIT.md](./IDENTITY_AUDIT.md) | identity_events · Activity Timeline |
+| [USER_PROVISIONING.md](./USER_PROVISIONING.md) | Invitation · Provisioning · create ≠ access |
 | [../00-status/OPERATIONAL_CORE_DECLARED.md](../00-status/OPERATIONAL_CORE_DECLARED.md) | Operational Core Declared — corazón del sistema |
 | [../00-status/OPERATIONAL_CORE_CONTRACT.md](../00-status/OPERATIONAL_CORE_CONTRACT.md) | Core Contract ACTIVE — 8 garantías a módulos |
 | [../00-status/CHANGE_AUTHORITY.md](../00-status/CHANGE_AUTHORITY.md) | Quién puede cambiar cada área del sistema |

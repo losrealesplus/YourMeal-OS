@@ -19,6 +19,7 @@ Flow Governance           🔒 ACTIVE
 Foundation                🔒 LOCKED
 Auth                      🔒 FROZEN
 Identity                  🔒 FOUNDATION LOCKED
+Platform Stabilization    ✅ COMPLETE (Bootstrap gates; Flow-ready ver PS-002-C)
 
 Entry                     ✅ CERTIFIED
 Journeys                  ✅ COMPLETE
@@ -35,6 +36,9 @@ Progress metric:
   Flows especificados · ejecutados · certificados
   (no pantallas · features · PRs)
 
+FLOW-01: ⏸ abrir solo con PR Specification dedicado
+         (tras PS-001 ∧ PS-002 Auth real ∧ PS-003 según acta de estabilización)
+Prohibido prematuro: Event Bus · Notifications · Jobs · Analytics · AI
 ══════════════════════════════════════════════════════════════
 ```
 
@@ -42,6 +46,10 @@ Progress metric:
 > La arquitectura ya no dirige el desarrollo; el **Flow** dirige el desarrollo sobre una arquitectura estable.
 
 **Pregunta del producto:** ¿Cómo **opera** YourMeal OS? → solo Flow puede responderla.
+
+**Locks vigentes (main):**  
+[IDENTITY_FOUNDATION_LOCK_v1](./IDENTITY_FOUNDATION_LOCK_v1.md) · [IDENTITY_FREEZE_v1](./IDENTITY_FREEZE_v1.md) · [STRATEGIC_ORDER_POST_IDENTITY_LOCK](./STRATEGIC_ORDER_POST_IDENTITY_LOCK.md)  
+**Stabilization:** [PLATFORM_STABILIZATION_COMPLETE](../10-validation/platform-stabilization/PLATFORM_STABILIZATION_COMPLETE.md)
 
 **Acta de transición:** [PLATFORM_FLOW_TRANSITION_DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) — COMPLETE  
 **Gobernanza:** [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) — política permanente (6 reglas)  
@@ -69,8 +77,9 @@ El bloque siguiente conserva contexto de fases anteriores.
 ```text
 Siguiente artefacto activo:
   Flow Certification (Bloque G)
-  · Entry ✅ · Journey ✅ · Flow ⏳ NOT STARTED
+  · Entry ✅ · Journey ✅ · Flow ⏳ NOT STARTED (elegible · Operating Model ACTIVE)
   · Paradigma G: organización · transferencias · no pantallas
+  · Post-Identity: STRATEGIC_ORDER_POST_IDENTITY_LOCK.md
 
 Mapa certificación (activo):
   A Foundation              □□□□□□□□□□  (platform lock; no reabrir)

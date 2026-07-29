@@ -14,6 +14,22 @@ export {
   employmentRequired,
   validateProvisionInput,
   resolveIdentityPath,
+  IDENTITY_EVENT_TYPES,
+  HARDENED_INVITATION_STATUSES,
+  assertAccessConsistency,
+  softArchivePatch,
+  isArchived,
+  assertNotArchived,
+  assertInvitationHardened,
+  canResendInvitation,
+  nextMembershipStatusHardened,
+  assertCanTransitionMembershipHardened,
+  membershipAuditPatch,
+  operationalActorRef,
+  identityEventLabel,
+  validateBulkInviteDraft,
+  validateBulkMembershipAction,
+  BULK_INVITE_EVENT_SEQUENCE,
 } from "./domain";
 export type {
   MembershipStatus,
@@ -22,6 +38,18 @@ export type {
   InvitationStatus,
   ProvisioningVerdict,
   ProvisionUserInput,
+  IdentityEventType,
+  HardenedInvitationStatus,
+  OperationalActorRef,
+  BulkInviteDraft,
+  BulkMembershipAction,
+  BulkRoleAssignment,
+  BulkUserProvisioningPort,
 } from "./domain";
 export { planProvision } from "./application/provision-plan";
 export type { ProvisionPlan } from "./application/provision-plan";
+export {
+  recordIdentityEvent,
+  recordIdentityEvents,
+} from "./application/identity-events";
+export type { IdentityEventInput } from "./application/identity-events";

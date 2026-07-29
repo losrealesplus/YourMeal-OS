@@ -133,26 +133,40 @@ function OpsCenterHome() {
     [roles, moduleFlags],
   );
 
-  const showKitchen =
-    can("kitchen.operate") ||
-    roles.includes("operations_manager") ||
-    roles.includes("company_admin") ||
-    can("saas.manage");
-  const showDelivery =
-    can("logistics.operate") ||
-    roles.includes("operations_manager") ||
-    roles.includes("company_admin") ||
-    can("saas.manage");
-  const showInventory =
-    (can("inventory.operate") ||
+  const showKitchen = useMemo(
+    () =>
+      can("kitchen.operate") ||
       roles.includes("operations_manager") ||
-      can("saas.manage")) &&
-    moduleFlags[PILOT_ADMIN_MODULE_FLAGS.inventory];
-  const showClients =
-    can("customers.read") ||
-    can("support.read") ||
-    roles.includes("operations_manager") ||
-    can("saas.manage");
+      roles.includes("company_admin") ||
+      can("saas.manage"),
+    [can, roles],
+  );
+  const showDelivery = useMemo(
+    () =>
+      can("logistics.operate") ||
+      roles.includes("operations_manager") ||
+      roles.includes("company_admin") ||
+      can("saas.manage"),
+    [can, roles],
+  );
+  const showInventory = useMemo(
+    () =>
+      (can("inventory.operate") ||
+        roles.includes("operations_manager") ||
+        can("saas.manage")) &&
+      moduleFlags[PILOT_ADMIN_MODULE_FLAGS.inventory],
+    [can, roles, moduleFlags],
+  );
+  const showClients = useMemo(
+    () =>
+      can("customers.read") ||
+      can("support.read") ||
+      roles.includes("operations_manager") ||
+      can("saas.manage"),
+    [can, roles],
+  );
+  const canReadOrders = useMemo(() => can("orders.read"), [can]);
+  const canReadSupport = useMemo(() => can("support.read"), [can]);
 
   useEffect(() => {
     let cancelled = false;
@@ -172,14 +186,14 @@ function OpsCenterHome() {
 
         const tasks: Promise<void>[] = [];
 
-        if (showKitchen && can("orders.read")) {
+        if (showKitchen && canReadOrders) {
           tasks.push(
             OperationsService.kitchenPendingCount(ctx, date).then((n) => {
               if (!cancelled) setKitchenCount(n);
             }),
           );
         }
-        if (showDelivery && can("orders.read")) {
+        if (showDelivery && canReadOrders) {
           tasks.push(
             OperationsService.deliveryPendingCount(ctx, date).then((n) => {
               if (!cancelled) setDeliveryCount(n);
@@ -211,16 +225,17 @@ function OpsCenterHome() {
     return () => {
       cancelled = true;
     };
+    // FCR-002: depend on stable capability booleans / roles — never on raw `can` identity.
   }, [
     user,
     tenantId,
     roles,
-    can,
     date,
     showKitchen,
     showDelivery,
     showInventory,
     showClients,
+    canReadOrders,
   ]);
 
   const items: AttentionItem[] = [
@@ -255,7 +270,7 @@ function OpsCenterHome() {
     },
     {
       id: "clients",
-      to: can("support.read") ? "/admin/support" : "/admin/customers",
+      to: canReadSupport ? "/admin/support" : "/admin/customers",
       title: "Clientes",
       icon: Users,
       count: clientsCount,
