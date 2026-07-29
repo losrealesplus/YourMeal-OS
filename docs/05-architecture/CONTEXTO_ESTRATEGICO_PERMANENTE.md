@@ -19,7 +19,7 @@ La arquitectura base se considera estable.
 
 Cualquier cambio estructural requiere un ADR.
 
-**2026-07-29 — Operational Core Declared.** El corazón operativo (Foundation → Auth → Identity → Entry → Journey → Flow*) se declara como **Operational Core**. Los módulos futuros (Notifications, Jobs, Analytics, AI, …) **consumen** el Core; no redefinen Identity, Membership, RBAC, Entry, Journey ni Flow. Principio: [Operational Layer Independence](./OPERATIONAL_LAYER_INDEPENDENCE.md) · Acta: [OPERATIONAL_CORE_DECLARED](../00-status/OPERATIONAL_CORE_DECLARED.md). \*Flow entra al Core al certificar.
+**2026-07-29 — Operational Core Declared + Contract ACTIVE.** El corazón operativo (Foundation → Auth → Identity → Entry → Journey → Flow*) se declara como **Operational Core** con [contrato de 8 garantías](../00-status/OPERATIONAL_CORE_CONTRACT.md). Los módulos futuros **consumen** el Core; no lo redefinen. Principio: [Operational Layer Independence](./OPERATIONAL_LAYER_INDEPENDENCE.md) · [Declared](../00-status/OPERATIONAL_CORE_DECLARED.md) · [Docs Core cerradas](../00-status/CORE_DOCUMENTATION_CLOSED.md). \*Flow entra al Core al certificar.
 
 Entramos oficialmente en:
 

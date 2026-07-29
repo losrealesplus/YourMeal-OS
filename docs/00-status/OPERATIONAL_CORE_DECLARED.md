@@ -147,5 +147,7 @@ ya no se rediscuten en cada módulo consumidor.
 | Decisión | Operational Core **Declared** |
 | Fecha | 2026-07-29 |
 | Principio | Operational Layer Independence |
+| Contrato | [OPERATIONAL_CORE_CONTRACT](./OPERATIONAL_CORE_CONTRACT.md) · **ACTIVE** |
+| Cierre documental | [CORE_DOCUMENTATION_CLOSED](./CORE_DOCUMENTATION_CLOSED.md) |
 | Siguiente cierre de capa Core | **Flow** (Bloque G) |
 | Fuera de alcance inmediato | Event Bus · Notifications · Jobs (consumidores futuros) |

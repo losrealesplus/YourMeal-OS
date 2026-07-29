@@ -5,14 +5,17 @@
 
 ```text
 ══════════════════════════════════════════════════
-OPERATIONAL CORE · DECLARED (2026-07-29)
+OPERATIONAL CORE · DECLARED + CONTRACT ACTIVE
 ══════════════════════════════════════════════════
 Core: Foundation · Auth · Identity · Entry · Journey · Flow*
 *Flow entra al Core al certificar (Bloque G · NEXT)
+Contract: OPERATIONAL_CORE_CONTRACT.md (8 garantías)
+Docs Core: CORE_DOCUMENTATION_CLOSED.md — no más docs Foundation/Identity/Core
 Consumidores: Notifications · Jobs · Analytics · AI · Reports · …
 Regla: módulos consumen el Core · no redefinen Identity/Membership/RBAC/Entry/Journey/Flow
 Principio: OPERATIONAL_LAYER_INDEPENDENCE.md (no modifica FOPEBA)
 Acta: OPERATIONAL_CORE_DECLARED.md
+Roadmap: Flow → Readiness → Event Bus(si hace falta) → Notifications → Jobs → …
 ══════════════════════════════════════════════════
 
 ══════════════════════════════════════════════════
@@ -48,11 +51,14 @@ Siguiente:           **Capa Entry+Journey CLOSED** · Flow pendiente de apertura
 
 ```text
 Siguiente artefacto activo:
+  [Operational Core CONTRACT ACTIVE](./OPERATIONAL_CORE_CONTRACT.md)
   [Operational Core DECLARED](./OPERATIONAL_CORE_DECLARED.md)
+  [Core documentation CLOSED](./CORE_DOCUMENTATION_CLOSED.md)
   [Operational Certification Layer CLOSED](./OPERATIONAL_CERTIFICATION_LAYER_CLOSED.md)
   · Entry ✅ · Journey ✅ · Flow ⏳ (NOT STARTED) — cierra el Core al certificar
   · Paradigma G: organización · transferencias · no pantallas
   · Principio: [Operational Layer Independence](../05-architecture/OPERATIONAL_LAYER_INDEPENDENCE.md)
+  · Post-Core: solo Flow · Modules · Bus · Notifications · Jobs · Analytics · AI
 
 Pilot Readiness (lectura)
   Arquitectura        ██████████

@@ -13,6 +13,8 @@
 | [FOUNDATION_LOCK.md](./FOUNDATION_LOCK.md) | Close the platform before features |
 | [OPERATIONAL_LAYER_INDEPENDENCE.md](./OPERATIONAL_LAYER_INDEPENDENCE.md) | Capas certificadas evolucionan sin invalidar inferiores |
 | [../00-status/OPERATIONAL_CORE_DECLARED.md](../00-status/OPERATIONAL_CORE_DECLARED.md) | Operational Core Declared — corazón del sistema |
+| [../00-status/OPERATIONAL_CORE_CONTRACT.md](../00-status/OPERATIONAL_CORE_CONTRACT.md) | Core Contract ACTIVE — 8 garantías a módulos |
+| [../00-status/CORE_DOCUMENTATION_CLOSED.md](../00-status/CORE_DOCUMENTATION_CLOSED.md) | Cierre documental Foundation / Identity / Core |
 | [FOUR_LAYERS.md](./FOUR_LAYERS.md) | Knowledge · Platform · Materialization · Operational |
 | [TENANT_BRANDING.md](./TENANT_BRANDING.md) | BrandConfig · Tenant-Managed runtime · `brand.manage` |
 | [BRAND_CONTRACT.md](./BRAND_CONTRACT.md) | Límites logo/colores/WCAG |

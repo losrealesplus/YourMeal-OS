@@ -91,7 +91,7 @@ Fallar o evolucionar una capa superior **no** invalida automáticamente las infe
 
 ## Relación con Operational Core
 
-Este principio protege el Core declarado en [OPERATIONAL_CORE_DECLARED](../00-status/OPERATIONAL_CORE_DECLARED.md):
+Este principio protege el Core declarado en [OPERATIONAL_CORE_DECLARED](../00-status/OPERATIONAL_CORE_DECLARED.md) y las garantías de [OPERATIONAL_CORE_CONTRACT](../00-status/OPERATIONAL_CORE_CONTRACT.md):
 
 ```text
 Consumer layers (Notifications · Jobs · Analytics · AI · …)

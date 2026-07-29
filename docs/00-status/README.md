@@ -1,18 +1,18 @@
 # Estado del proyecto
 
 **Última actualización:** 2026-07-29  
-**Operational Core:** ✅ **Declared** — [OPERATIONAL_CORE_DECLARED](./OPERATIONAL_CORE_DECLARED.md) · principio [Layer Independence](../05-architecture/OPERATIONAL_LAYER_INDEPENDENCE.md)  
+**Operational Core:** ✅ **Declared** + **Contract ACTIVE** — [CONTRACT](./OPERATIONAL_CORE_CONTRACT.md) · [DECLARED](./OPERATIONAL_CORE_DECLARED.md) · [docs closed](./CORE_DOCUMENTATION_CLOSED.md) · [Layer Independence](../05-architecture/OPERATIONAL_LAYER_INDEPENDENCE.md)  
 **Auth Layer:** ✅ **Frozen** — [IDENTITY_FREEZE_v1](./IDENTITY_FREEZE_v1.md) · PRODUCT-001 · BUGFIX-002 · [Closeout](../10-validation/IDENTITY_CLOSEOUT_REPORT.md)  
 **Identity Foundation:** ✅ **LOCKED v1** (PR #90–#92) — [IDENTITY_FOUNDATION_LOCK_v1](./IDENTITY_FOUNDATION_LOCK_v1.md)  
 **Dev Bootstrap:** [BOOTSTRAP_MODE](./BOOTSTRAP_MODE.md) · `VITE_BOOTSTRAP_MODE` default OFF (nunca producción)  
 **Order Intake:** [ORDER_INTAKE](./ORDER_INTAKE.md) · [ADR 0017](../adr/0017-order-intake.md) · CAP-008 scaffold  
 **RI-001:** **[PROGRAM FROZEN](./RI001_PROGRAM_FROZEN.md)** · [Backlog A–I](./RI001_OPERATIONAL_READINESS_BACKLOG.md) · Evidence Gates · [P13](../20-evidence-framework/12-certification-completeness-p13.md) · **[EP-OPS-003 Journeys](./EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md)** · **[Methodology FROZEN](./EP_OPS_003_METHODOLOGY_FROZEN.md)**  
-**Fase actual:** [CURRENT_PHASE](./CURRENT_PHASE.md) ← abrir primero · **Flow (Bloque G)** cierra el Operational Core  
+**Fase actual:** [CURRENT_PHASE](./CURRENT_PHASE.md) ← **Flow (Bloque G)** · Core documental cerrado  
 **Dominios:** [PROJECT_DOMAINS](./PROJECT_DOMAINS.md) — Knowledge · Engineering · Experience · Operations  
 **Engineering Phase:** [ENGINEERING_PHASE](./ENGINEERING_PHASE.md) — Complete (pending operational authorization)  
 **Última integración:** [IR-001](./IR-001_FIRST_ENGINEERING_INTEGRATION.md) · PR #22  
 **Pre-piloto:** [PRE_PILOT_AUDIT](./PRE_PILOT_AUDIT.md) · [ORR Party/B2B/B2C](./ORR_B2B_B2C_PARTY.md) · [**PILOT_ACCEPTANCE_CHECKLIST**](./PILOT_ACCEPTANCE_CHECKLIST.md) (G-02) · [**EP-OPS-001 Ops Center**](./EP_OPS_001_OPERATIONAL_CENTER_READINESS.md) · [**RI-001 Completeness Matrix**](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md) · [RI-001 Readiness](./RI001_READINESS_SPRINT.md) · [Functional Completeness Review](./EATCLEAN_PILOT_FUNCTIONAL_COMPLETENESS_REVIEW.md) · [**EP-001**](./EP001_FUNCTIONAL_COMPLETENESS_SPRINT.md) · [EP-002A](./EP002A_CUSTOMER_EXPERIENCE_COMPLETION.md) · [EP-002B](./EP002B_OPERATIONAL_EXECUTION.md) · [Operational Visibility](../20-evidence-framework/09-operational-visibility-principle.md) · [Pilot Security](../09-security/PILOT_SECURITY_CHECKLIST.md) · [Lovable decisions](./LOVABLE_FINDINGS_DECISIONS.md) · [Marketing Readiness](./MILESTONE_MARKETING_READINESS.md) *(aplazado)*  
-**Gobernanza:** [Acta — Fin construcción metodológica](./ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) **Cerrada** · [ACT-001 Experience Baseline Frozen](./ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) ✅ · [ACT-002 Materialization Frozen](./ACT-002_FOUNDATION_OF_MATERIALIZATION_FROZEN.md) ✅ · [**Identity Freeze v1**](./IDENTITY_FREEZE_v1.md) ✅ · [**Operational Core Declared**](./OPERATIONAL_CORE_DECLARED.md) ✅  
+**Gobernanza:** [Acta — Fin construcción metodológica](./ACTA_METHODOLOGY_CONSTRUCTION_CLOSED.md) **Cerrada** · [ACT-001 Experience Baseline Frozen](./ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) ✅ · [ACT-002 Materialization Frozen](./ACT-002_FOUNDATION_OF_MATERIALIZATION_FROZEN.md) ✅ · [**Identity Freeze v1**](./IDENTITY_FREEZE_v1.md) ✅ · [**Operational Core Declared**](./OPERATIONAL_CORE_DECLARED.md) ✅ · [**Core Contract ACTIVE**](./OPERATIONAL_CORE_CONTRACT.md) ✅  
  
 **Historia:** [MILESTONES](./MILESTONES.md)  
 **Auditoría ingeniería:** [ENGINEERING_REVIEW_SPRINT0](./ENGINEERING_REVIEW_SPRINT0.md)  
