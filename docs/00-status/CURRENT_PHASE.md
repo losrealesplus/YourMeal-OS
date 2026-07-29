@@ -8,17 +8,22 @@
 YOURMEAL OS · CURRENT GATE
 ═══════════════════════════════════════════════
 
-Foundation                  ✅
-Identity                    ✅
-Operational Core            ✅
-Governance                  ✅
-Operating Model             ✅  (#98 HOLD hasta integrar)
-Platform Stabilization      🟡
+Foundation                  ✅ COMPLETE
+Identity                    ✅ COMPLETE
+Operational Core            ✅ COMPLETE
+Governance                  ✅ COMPLETE
+Operating Model             ✅ COMPLETE (v1 ACTIVE)
+Platform Stabilization      🟡 IN PROGRESS
 
 PS-001                      ✅ PASS
 PS-002-B                    ✅ PASS
-PS-002-C                    ⏳ WAITING (Auth Supabase real)
+PS-002-C                    ⏳ WAITING / BLOCKED
+                             (Auth Supabase real · credenciales)
 PS-003                      ✅ PASS
+
+FCR-008                     ✅ Canonical session (código)
+FCR-009                     🔍 Auth E2E investigation
+                             (Toaster ausente · no fix aún)
 
 ═══════════════════════════════════════════════
 OPEN GATE
@@ -28,275 +33,87 @@ OPEN GATE
   → DASHBOARD_RENDERED
   Evidencia: npm run test:ps002-canonical-auth
   duration_ms = telemetría diagnóstica (no criterio PASS/FAIL)
+  BLOCKED ≠ FAIL (faltan PS002_EMAIL / PS002_PASSWORD)
 
 ═══════════════════════════════════════════════
 NEXT PHASE (solo tras OPEN GATE)
 
+  Platform Stabilization COMPLETE
+  ↓
   FLOW-01
   Kitchen → Delivery
   Specification
 
-  (+ integrar/revisar #98 o superseded · Stabilization COMPLETE real)
-
+Prohibido prematuro: Event Bus · Notifications · Jobs · Analytics · AI
 ═══════════════════════════════════════════════
 Ver: ../10-validation/PRIORITY_PS002C_BEFORE_FLOW.md
      ../10-validation/platform-stabilization/PS-002.md
      ../10-validation/FCR008_CANONICAL_POST_LOGIN_SESSION.md
+     ../10-validation/auth/AUTH_E2E_INVESTIGATION.md
 ═══════════════════════════════════════════════
 ```
 
-```text
-══════════════════════════════════════════════════
-IDENTITY FOUNDATION · LOCKED v1 (2026-07-29)
-══════════════════════════════════════════════════
-Pipeline: Identity → Profile → Membership → Role → Workspace
-Evidencia: PR #90 · PR #91 · Acta IDENTITY_FOUNDATION_LOCK_v1.md
-Allowed: capabilities compatibles · MFA/SSO/SCIM solo con ADR + evidencia
-Forbidden: rediseñar Identity / create≡access / multi-membership sin evidencia
-Auth Layer sigue Frozen: IDENTITY_FREEZE_v1.md
-Orden estratégico: STRATEGIC_ORDER_POST_IDENTITY_LOCK.md
-══════════════════════════════════════════════════
+**Constitución operativa:** [OPERATING_MODEL_v1](./OPERATING_MODEL_v1.md) — ACTIVE  
+> La arquitectura ya no dirige el desarrollo; el **Flow** dirige el desarrollo sobre una arquitectura estable.
 
-══════════════════════════════════════════════════
-AUTH LAYER · FROZEN (2026-07-26)
-══════════════════════════════════════════════════
-FOUNDATION · INFRA · Identity · PO Bootstrap · Product Identity · Nav Decoupling  ✅
-Allowed: bug / security / OAuth·Phone activation · AUTH-A/B solo en Bloque H del backlog RI-001
-Forbidden: Auth refactor · RBAC redesign · Session redesign fuera de Bloque H
-Acta: IDENTITY_FREEZE_v1.md
-══════════════════════════════════════════════════
+**Pregunta del producto:** ¿Cómo **opera** YourMeal OS? → solo Flow puede responderla.
 
-══════════════════════════════════════════════════
-PROJECT STATE · RI-001 · Operational Certification
-══════════════════════════════════════════════════
+**Locks vigentes:**  
+[IDENTITY_FOUNDATION_LOCK_v1](./IDENTITY_FOUNDATION_LOCK_v1.md) · [IDENTITY_FREEZE_v1](./IDENTITY_FREEZE_v1.md) · [STRATEGIC_ORDER_POST_IDENTITY_LOCK](./STRATEGIC_ORDER_POST_IDENTITY_LOCK.md)  
+**Stabilization:** [PLATFORM_STABILIZATION_COMPLETE](../10-validation/platform-stabilization/PLATFORM_STABILIZATION_COMPLETE.md) (Bootstrap PASS · Flow-ready = PS-002-C)
 
-Modo:                **PROGRAMA DE CERTIFICACIÓN · FROZEN** ([acta](./RI001_PROGRAM_FROZEN.md))
-Backlog:             [RI001_OPERATIONAL_READINESS_BACKLOG](./RI001_OPERATIONAL_READINESS_BACKLOG.md)
-                     Bloques A→I · Evidence Gates · P11–P13 · alcance cerrado
-DONE:                Progress 100% · Gates PASS · Report READY|RWO · evidencia reproducible
-Permitido en RI-001: ejecutar cert · fix de hallazgo de cert · reabrir gate aprobado
-Prohibido:           nuevas features / ampliar alcance bajo etiqueta RI-001
-Pregunta maestra:    ¿Qué evidencia falta para certificar que YM OS opera una empresa real?
-Siguiente:           **Capa Entry+Journey CLOSED** · Flow pendiente de apertura
-                     · Acta capa: [OPERATIONAL_CERTIFICATION_LAYER_CLOSED](./OPERATIONAL_CERTIFICATION_LAYER_CLOSED.md)
-                     · Journeys: [EP_OPS_003_JOURNEYS_COMPLETE](./EP_OPS_003_JOURNEYS_COMPLETE.md)
-                     · Framing G (objeto = handoffs): [BLOCK_G_FLOW_FRAMING](../10-validation/ep-ops-003/BLOCK_G_FLOW_FRAMING.md)
-                     · Post-Identity: [STRATEGIC_ORDER_POST_IDENTITY_LOCK](./STRATEGIC_ORDER_POST_IDENTITY_LOCK.md)
-══════════════════════════════════════════════════
-```
+**Acta de transición:** [PLATFORM_FLOW_TRANSITION_DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) — COMPLETE  
+**Gobernanza:** [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) — política permanente (6 reglas)  
+**Regla diaria:** [FLOW_FIRST](./FLOW_FIRST.md) — ¿A qué Flow pertenece?  
+**Done (fase):** [FLOW_DEFINITION_OF_DONE](./FLOW_DEFINITION_OF_DONE.md) — Handoff → Evidence → Certification → Merge  
+**Jerarquía:** [FLOW_WORK_HIERARCHY](./FLOW_WORK_HIERARCHY.md) · **Catálogo:** [FLOW_CATALOG](./FLOW_CATALOG.md) (FLOW-01…03)
 
-*(Secciones detalladas históricas debajo — el backlog A–I es la hoja de ruta activa de certificación.)*
+**Pregunta de fase (todo PR):**  
+¿A qué Flow pertenece? → ¿Qué Outcome? → ¿Qué Handoff? → ¿Qué evidencia? → ¿Respeta Baseline/Core?  
 
-```text
-Siguiente artefacto activo:
-  [Identity Foundation LOCKED v1](./IDENTITY_FOUNDATION_LOCK_v1.md) ✅
-  [Operational Certification Layer CLOSED](./OPERATIONAL_CERTIFICATION_LAYER_CLOSED.md)
-  · Entry ✅ · Journey ✅ · Flow ⏳ (NOT STARTED)
-  · Paradigma G: organización · transferencias · no pantallas
-  · Post-Identity order: [STRATEGIC_ORDER_POST_IDENTITY_LOCK](./STRATEGIC_ORDER_POST_IDENTITY_LOCK.md)
+**Categoría de PR (exactamente una):** [PR_TAXONOMY](./PR_TAXONOMY.md) — preferir títulos `FLOW-NN`  
 
-Pilot Readiness (lectura)
-  Arquitectura        ██████████
-  Gobernanza          ██████████
-  Modelo operacional  ██████████
-  Administración      ██████████
-  Customer App        █████████░
-  Operaciones         ██████████  ← capa Entry+Journey CLOSED
-  Data                ███████░░░
+**Actas:**  
+[OPERATING_MODEL_v1](./OPERATING_MODEL_v1.md) · [PLATFORM_FLOW_TRANSITION_DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) · [PLATFORM_V1_CLOSED](./PLATFORM_V1_CLOSED.md) · [PLATFORM_BASELINE_v1](./PLATFORM_BASELINE_v1.md) · [FLOW_CERTIFICATION_OPEN](./FLOW_CERTIFICATION_OPEN.md) · [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) · [FLOW_FIRST](./FLOW_FIRST.md) · [CHANGE_AUTHORITY](./CHANGE_AUTHORITY.md) · [OPERATIONAL_CORE_CONTRACT](./OPERATIONAL_CORE_CONTRACT.md)
 
-Mapa certificación (activo):
-  A Foundation              □□□□□□□□□□
-  B Surfaces                ██████████  CERTIFIED · PASS · EP-OPS-002
-  C Department Workspaces   ██████████  Journey COMPLETE · EP-OPS-003
-  D Operational Language    □□□□□□□□□□
-  E RBAC & Access           □□□□□□□□□□
-  F Observability Ready     □□□□□□□□□□
-  G Flow Certification      □□□□□□□□□□  elegible · NOT STARTED
-  H Auth Transition         □□□□□□□□□□
-  I Certification Report    □□□□□□□□□□
-
-Siguiente foco:            Apertura explícita Bloque G
-                           (handoffs operacionales · pregunta empresa E2E)
-
-Patrón permanente: Operational Representation (DICT-072)
-Madurez tenant:    Tenant Operational Autonomy (DICT-073)
-
-Riesgo principal: certificar sin evidencia de jornadas / flujos → CG-RI-001 NOT READY
-
-Primary Artifact:  [RI-001 Ops Readiness Backlog](./RI001_OPERATIONAL_READINESS_BACKLOG.md) · [ORC](../10-validation/OPERATIONAL_READINESS_CERTIFICATION.md) · [G-02](../20-evidence-framework/08-gate-g02-pilot-readiness.md)
-Visibilidad:       [Operational Visibility · DICT-071](../20-evidence-framework/09-operational-visibility-principle.md)
-Ops pattern:       [Operational Representation · DICT-072](../05-architecture/OPERATIONAL_REPRESENTATION_PATTERN.md)
-Tenant autonomy:   [Tenant Operational Autonomy · DICT-073](../05-architecture/TENANT_OPERATIONAL_AUTONOMY.md)
-Hoy (Certificación): [EP-OPS-003](./EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md) · [Backlog RI-001](./RI001_OPERATIONAL_READINESS_BACKLOG.md) · [ep-ops-003 evidence](../10-validation/ep-ops-003/README.md)
-Seguridad pre-piloto: [Pilot Security Checklist](../09-security/PILOT_SECURITY_CHECKLIST.md) (10 corregidos · 1 Accepted documentado)
-Antes de firmar G-02 PASSED: ORR firmados · cero humo · No Artificiality
-PR taxonomy (post G-02): Evidence · KU · Correction · Pilot Fix · Operational Finding
-Completitud UI:    [Matriz RI-001](./RI001_FUNCTIONAL_COMPLETENESS_MATRIX.md) · [EP-001](./EP001_FUNCTIONAL_COMPLETENESS_SPRINT.md) · [EP-002A](./EP002A_CUSTOMER_EXPERIENCE_COMPLETION.md) · [EP-002B](./EP002B_OPERATIONAL_EXECUTION.md)
-Hallazgos Lovable: [Decisiones](./LOVABLE_FINDINGS_DECISIONS.md) (contraste ✅ · GSC → [Marketing Readiness](./MILESTONE_MARKETING_READINESS.md) · Semrush draft)
-Last Baseline:     v0.2.0-engineering-baseline (IR-001)
-```
+**Certificación (detalle RI-001):** [RI001_OPERATIONAL_READINESS_BACKLOG](./RI001_OPERATIONAL_READINESS_BACKLOG.md) · [BLOCK_G_FLOW_FRAMING](../10-validation/ep-ops-003/BLOCK_G_FLOW_FRAMING.md)
 
 ---
 
 ## Continuación histórica (referencia)
 
-El bloque siguiente conserva contexto de fases anteriores (EP-OPS-001 WPs, FOV, etc.).  
-**Prioridad operativa:** backlog A–I arriba.
-
-Materialization: [ACT-002](./ACT-002_FOUNDATION_OF_MATERIALIZATION_FROZEN.md) ✅ Frozen v1.  
-Experiencia base: [ACT-001](./ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) ✅ Frozen.  
-Guía de validación: [PILOT_EXECUTION_GUIDE](../18-operational-validation/PILOT_EXECUTION_GUIDE.md).  
-Milestone abierto: [MILESTONE_EATCLEAN_PILOT_READY](./MILESTONE_EATCLEAN_PILOT_READY.md).  
-Mapa del sistema: [FOUR_LAYERS](../05-architecture/FOUR_LAYERS.md).
+El bloque siguiente conserva contexto de fases anteriores.  
+**Prioridad operativa:** cerrar PS-002-C · luego Flow Certification · Core sin cambios salvo evidencia.
 
 ```text
-Foundation ✅ → Methodology ✅ → Tenant Branding ✅ → Experience Baseline ✅
-→ Materialization ✅ Frozen (ACT-002 · #24→#31)
-───────────────
-Piloto: demostrar  ·  EP-001 ✅ → EP-002A (Weekly Cycle) → EP-002B (Ops) → RI-001 Evidence  ·  FOPEBA observa
+Siguiente artefacto activo:
+  PS-002-C (Auth Supabase real) → luego Flow Certification (Bloque G)
+  · Entry ✅ · Journey ✅ · Flow ⏳ NOT STARTED (elegible · Operating Model ACTIVE)
+  · Paradigma G: organización · transferencias · no pantallas
+  · Post-Identity: STRATEGIC_ORDER_POST_IDENTITY_LOCK.md
+
+Mapa certificación (activo):
+  A Foundation              □□□□□□□□□□  (platform lock; no reabrir)
+  B Surfaces                ██████████  CERTIFIED · PASS · EP-OPS-002
+  C Department Workspaces   ██████████  Journey COMPLETE · EP-OPS-003
+  D Operational Language    □□□□□□□□□□
+  E RBAC & Access           □□□□□□□□□□
+  F Observability Ready     □□□□□□□□□□
+  G Flow Certification      □□□□□□□□□□  elegible · NEXT (tras PS-002-C)
+  H Auth Transition         □□□□□□□□□□
+  I Certification Report    □□□□□□□□□□
+
+Auth Layer: IDENTITY_FREEZE_v1.md · Identity Foundation: IDENTITY_FOUNDATION_LOCK_v1.md
+Layer Independence: ../05-architecture/OPERATIONAL_LAYER_INDEPENDENCE.md
 ```
 
-> ❌ No diseñar / no polish estético (ACT-001 · ACT-002).  
-> ✅ EP-002A: ¿Qué necesita **saber** el cliente? (Customer Weekly Cycle)  
-> ✅ EP-002B: ¿Qué necesita **hacer** el equipo?  
-> ✅ Operational Visibility (DICT-071): lo visible existe; lo inexistente no se promete.  
-> ✅ Tenant Operational Autonomy (DICT-073): el tenant se autogestiona sin el proveedor SaaS.  
-> Motores de cambio: [PROJECT_DOMAINS](./PROJECT_DOMAINS.md).
+Materialization: [ACT-002](./ACT-002_FOUNDATION_OF_MATERIALIZATION_FROZEN.md) ✅  
+Experiencia base: [ACT-001](./ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) ✅  
+Capa Entry+Journey: [OPERATIONAL_CERTIFICATION_LAYER_CLOSED](./OPERATIONAL_CERTIFICATION_LAYER_CLOSED.md) ✅  
+Journeys: [EP_OPS_003_JOURNEYS_COMPLETE](./EP_OPS_003_JOURNEYS_COMPLETE.md) ✅  
 
----
+Programa RI-001: [RI001_PROGRAM_FROZEN](./RI001_PROGRAM_FROZEN.md) · Backlog A–I arriba.
 
-## Pregunta de éxito (Fase 2)
-
-> **¿Puede un negocio real operar durante una semana completa utilizando exclusivamente YourMeal OS y generar evidencia suficiente para que FOPEBA confirme, corrija o amplíe el conocimiento obtenido?**
-
----
-
-## Frozen v1 (no reabrir por preferencia)
-
-| Bloque | Acta / ancla |
-|--------|----------------|
-| Foundation | Foundation Lock |
-| Methodology | Acta metodología · FOPEBA · Dictionary · Knowledge Lifetime |
-| Tenant Branding | ADR-0014 · Brand Contract · PR #31 |
-| Experience Baseline | [ACT-001](./ACT-001_EATCLEAN_EXPERIENCE_BASELINE_FROZEN.md) |
-| Materialization | [ACT-002](./ACT-002_FOUNDATION_OF_MATERIALIZATION_FROZEN.md) · [FOUR_LAYERS](../05-architecture/FOUR_LAYERS.md) |
-
----
-
-## Dos líneas de trabajo (independientes)
-
-### Línea operativa (no se mueve)
-
-```text
-Migration → Smoke HP-001 → ORR → FOV
-```
-
-Pregunta: ¿Hay evidencia para ORR? Congelación funcional hasta ORR.
-
-### Línea de piloto — EatClean Pilot Ready 🟡
-
-```text
-EP-001 Weekly Experience
-        ↓
-EP-002 Kitchen Operations
-        ↓
-EP-003 Delivery Operations
-        ↓
-EP-004 Operational Close
-        ↓
-EP-005 Evidence Collection
-```
-
-Ejecución: [PILOT_EXECUTION_GUIDE](../18-operational-validation/PILOT_EXECUTION_GUIDE.md).
-
-FOPEBA en piloto:
-
-```text
-Construcción → Validación → Observación → Aprendizaje → Knowledge Update
-```
-
----
-
-## Dominios oficiales
-
-Mapa: [PROJECT_DOMAINS](./PROJECT_DOMAINS.md). Capas: [FOUR_LAYERS](../05-architecture/FOUR_LAYERS.md).
-
-| Dominio | Entregable | Estado |
-|---------|------------|--------|
-| **Knowledge** | Operational Model · FOPEBA | ✅ Frozen / Closed · observa en piloto |
-| **Engineering** | Código · Platform Layer | ✅ Implementado · Materialization Frozen |
-| **Experience** | CJ + OJ + identidad Tenant | ✅ ACT-001 · ✅ ACT-002 |
-| **Operations** | Evidencia · semana piloto | ⏳ Smoke → ORR → FOV · EP-001…005 |
-
----
-
-## Regla de congelación funcional
-
-> **Hasta que ORR emita un resultado, ningún commit puede modificar el comportamiento funcional del producto.**
-
-Admitido únicamente:
-
-* bloqueo descubierto en Smoke o en el piloto;  
-* corrección imprescindible para completar HP-001 / EP;  
-* documentación de evidencia.
-
-Cualquier “pequeña mejora” en el merge **espera** al siguiente ciclo.
-
----
-
-## Cadena (sin pasos intermedios)
-
-```text
-#31 / ACT-002 → main → Apply migration → Smoke HP-001 → ORR → PASSED → Ready for FOV → FOV-001
-                └── paralelo: semana piloto (PILOT_EXECUTION_GUIDE · EP-001…005)
-```
-
-| Evento | Estado |
-|--------|:------:|
-| PR #23 merge (hardening) | ✅ |
-| PR #24→#30 Experience + ACT-001 | ✅ / en curso según merge |
-| PR #31 Tenant-Managed + ACT-002 | ⏳ |
-| Migración `program_draft_order` | ⏳ |
-| Smoke HP-001 | ⏳ |
-| ORR | ⏳ |
-| Ready for FOV | ⏳ |
-| Semana piloto EatClean | ⏳ |
-
-### Recorrido a observar (Smoke / FOV / piloto)
-
-```text
-Login → Customer App → Weekly Menu → Seleccionar platos
-→ Programar pedido → Resumen → Confirmar
-→ Centro de Operaciones → Cocina → Reparto → Cierre
-→ Evidencia FOPEBA
-```
-
-Ese flujo ya no valida la arquitectura de materialización: **la da por congelada** y valida la **operación**.
-
----
-
-## Operational Confidence
-
-| Dimensión | Estado |
-|-----------|:------:|
-| Knowledge Confidence | 🟢 |
-| Engineering Confidence | 🟢 |
-| Materialization Confidence | 🟢 |
-| Operational Confidence | ⚪ |
-
----
-
-## Regla permanente (post-ORR / durante piloto)
-
-> **La FOV produce evidencia. El Gate decide cambios.**  
-> FOPEBA observa; no inventa metodología en caliente.
-
-## Lenguaje oficial
-
-[PROJECT_DICTIONARY](../99-reference/PROJECT_DICTIONARY.md) — autoridad semántica (`DICT-xxx` · Status · Madurez). Concepto Accepted → Dictionary **antes** de uso oficial.
-
-Ver [ENGINEERING_PHASE](./ENGINEERING_PHASE.md) · [FOV-001](../30-field-validation/FOV-001_HP-001.md).
-
----
-
-Checklists: [SMOKE_HP-001](./SMOKE_HP-001.md) · [ORR](../22-implementation/ORR.md) · [PILOT_EXECUTION_GUIDE](../18-operational-validation/PILOT_EXECUTION_GUIDE.md) · [FOV-001](../30-field-validation/FOV-001_HP-001.md) (solo tras ORR PASSED).
+> ❌ No reabrir Foundation / Auth / Identity / Core sin evidencia + ADR ([CHANGE_AUTHORITY](./CHANGE_AUTHORITY.md)).  
+> ✅ Primero evidencia PS-002-C · luego **Flow Certification**.  
+> Acta: [PLATFORM_FLOW_TRANSITION_DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) · COMPLETE.

@@ -11,10 +11,27 @@
 | Doc | Why |
 |-----|-----|
 | [FOUNDATION_LOCK.md](./FOUNDATION_LOCK.md) | Close the platform before features |
+| [OPERATIONAL_LAYER_INDEPENDENCE.md](./OPERATIONAL_LAYER_INDEPENDENCE.md) | Capas certificadas evolucionan sin invalidar inferiores |
 | [IDENTITY_LIFECYCLE.md](./IDENTITY_LIFECYCLE.md) | Identity → Profile → Membership → Role → Workspace |
 | [MEMBERSHIP_LIFECYCLE.md](./MEMBERSHIP_LIFECYCLE.md) | Membership states + audit stamps |
 | [IDENTITY_AUDIT.md](./IDENTITY_AUDIT.md) | identity_events · Activity Timeline |
 | [USER_PROVISIONING.md](./USER_PROVISIONING.md) | Invitation · Provisioning · create ≠ access |
+| [../00-status/OPERATIONAL_CORE_DECLARED.md](../00-status/OPERATIONAL_CORE_DECLARED.md) | Operational Core Declared — corazón del sistema |
+| [../00-status/OPERATIONAL_CORE_CONTRACT.md](../00-status/OPERATIONAL_CORE_CONTRACT.md) | Core Contract ACTIVE — 8 garantías a módulos |
+| [../00-status/CHANGE_AUTHORITY.md](../00-status/CHANGE_AUTHORITY.md) | Quién puede cambiar cada área del sistema |
+| [../00-status/PLATFORM_PHASE_COMPLETE.md](../00-status/PLATFORM_PHASE_COMPLETE.md) | Fase de Plataforma COMPLETE |
+| [../00-status/PLATFORM_BASELINE_v1.md](../00-status/PLATFORM_BASELINE_v1.md) | Baseline v1 — punto de partida de todo desarrollo futuro |
+| [../00-status/PLATFORM_V1_CLOSED.md](../00-status/PLATFORM_V1_CLOSED.md) | Cierre formal Plataforma v1 |
+| [../00-status/PLATFORM_FLOW_TRANSITION_DECLARED.md](../00-status/PLATFORM_FLOW_TRANSITION_DECLARED.md) | Acta: construcción → evidencia operacional |
+| [../00-status/OPERATING_MODEL_v1.md](../00-status/OPERATING_MODEL_v1.md) | Constitución operativa — Flow dirige sobre arquitectura estable |
+| [../00-status/FLOW_CERTIFICATION_OPEN.md](../00-status/FLOW_CERTIFICATION_OPEN.md) | Flow como certificación operacional (no pantallas) |
+| [../00-status/FLOW_GOVERNANCE.md](../00-status/FLOW_GOVERNANCE.md) | Política permanente: desarrollo nace desde Flow |
+| [../00-status/FLOW_FIRST.md](../00-status/FLOW_FIRST.md) | Regla diaria: feature → Flow |
+| [../00-status/FLOW_DEFINITION_OF_DONE.md](../00-status/FLOW_DEFINITION_OF_DONE.md) | Done = Handoff → Evidence → Certification |
+| [../00-status/FLOW_WORK_HIERARCHY.md](../00-status/FLOW_WORK_HIERARCHY.md) | Spec → Execution → Evidence → Certification → Readiness |
+| [../00-status/FLOW_CATALOG.md](../00-status/FLOW_CATALOG.md) | FLOW-01…03 (Kitchen → Delivery → Support → Accounting) |
+| [../00-status/PR_TAXONOMY.md](../00-status/PR_TAXONOMY.md) | Categorías obligatorias de PR |
+| [../00-status/CORE_DOCUMENTATION_CLOSED.md](../00-status/CORE_DOCUMENTATION_CLOSED.md) | Cierre documental Foundation / Identity / Core |
 | [FOUR_LAYERS.md](./FOUR_LAYERS.md) | Knowledge · Platform · Materialization · Operational |
 | [TENANT_BRANDING.md](./TENANT_BRANDING.md) | BrandConfig · Tenant-Managed runtime · `brand.manage` |
 | [BRAND_CONTRACT.md](./BRAND_CONTRACT.md) | Límites logo/colores/WCAG |

@@ -19,6 +19,8 @@ La arquitectura base se considera estable.
 
 Cualquier cambio estructural requiere un ADR.
 
+**2026-07-29 — Platform Baseline v1.** Fase de Plataforma **COMPLETE**. Fotografía oficial: [PLATFORM_BASELINE_v1](../00-status/PLATFORM_BASELINE_v1.md). Pregunta del producto: *¿cómo opera YourMeal OS?* Progreso = certificaciones. Objetivo actual: Flow Certification. Core / Baseline solo cambian con evidencia + [CHANGE_AUTHORITY](../00-status/CHANGE_AUTHORITY.md).
+
 Entramos oficialmente en:
 
 **Module 01 — Dish Library**
