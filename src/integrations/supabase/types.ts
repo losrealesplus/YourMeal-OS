@@ -571,6 +571,53 @@ export type Database = {
           },
         ]
       }
+      employee_profiles: {
+        Row: {
+          created_at: string
+          department: string | null
+          employee_number: string | null
+          hire_date: string | null
+          id: string
+          manager_user_id: string | null
+          position: string | null
+          tenant_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          department?: string | null
+          employee_number?: string | null
+          hire_date?: string | null
+          id?: string
+          manager_user_id?: string | null
+          position?: string | null
+          tenant_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          department?: string | null
+          employee_number?: string | null
+          hire_date?: string | null
+          id?: string
+          manager_user_id?: string | null
+          position?: string | null
+          tenant_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_profiles_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       feature_flags: {
         Row: {
           created_at: string
@@ -901,8 +948,10 @@ export type Database = {
           country: string | null
           created_at: string
           currency: string | null
+          first_name: string | null
           full_name: string | null
           id: string
+          last_name: string | null
           locale: string
           phone: string | null
           time_format: string | null
@@ -918,8 +967,10 @@ export type Database = {
           country?: string | null
           created_at?: string
           currency?: string | null
+          first_name?: string | null
           full_name?: string | null
           id: string
+          last_name?: string | null
           locale?: string
           phone?: string | null
           time_format?: string | null
@@ -935,8 +986,10 @@ export type Database = {
           country?: string | null
           created_at?: string
           currency?: string | null
+          first_name?: string | null
           full_name?: string | null
           id?: string
+          last_name?: string | null
           locale?: string
           phone?: string | null
           time_format?: string | null
@@ -1203,17 +1256,44 @@ export type Database = {
       }
       tenant_members: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          id: string
+          invited_by: string | null
           joined_at: string
+          membership_type: Database["public"]["Enums"]["membership_type"]
+          notes: string | null
+          provisioning_channel: Database["public"]["Enums"]["provisioning_channel"]
+          status: Database["public"]["Enums"]["membership_status"]
           tenant_id: string
           user_id: string
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          invited_by?: string | null
           joined_at?: string
+          membership_type?: Database["public"]["Enums"]["membership_type"]
+          notes?: string | null
+          provisioning_channel?: Database["public"]["Enums"]["provisioning_channel"]
+          status?: Database["public"]["Enums"]["membership_status"]
           tenant_id: string
           user_id: string
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          invited_by?: string | null
           joined_at?: string
+          membership_type?: Database["public"]["Enums"]["membership_type"]
+          notes?: string | null
+          provisioning_channel?: Database["public"]["Enums"]["provisioning_channel"]
+          status?: Database["public"]["Enums"]["membership_status"]
           tenant_id?: string
           user_id?: string
         }
@@ -1295,6 +1375,65 @@ export type Database = {
           unit_weight?: string | null
         }
         Relationships: []
+      }
+      user_invitations: {
+        Row: {
+          accepted_at: string | null
+          channel: Database["public"]["Enums"]["provisioning_channel"]
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          intended_role: Database["public"]["Enums"]["app_role"] | null
+          invited_by: string | null
+          membership_type: Database["public"]["Enums"]["membership_type"]
+          notes: string | null
+          status: Database["public"]["Enums"]["invitation_status"]
+          tenant_id: string
+          token: string
+          user_id: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          channel?: Database["public"]["Enums"]["provisioning_channel"]
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          intended_role?: Database["public"]["Enums"]["app_role"] | null
+          invited_by?: string | null
+          membership_type: Database["public"]["Enums"]["membership_type"]
+          notes?: string | null
+          status?: Database["public"]["Enums"]["invitation_status"]
+          tenant_id: string
+          token?: string
+          user_id?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          channel?: Database["public"]["Enums"]["provisioning_channel"]
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          intended_role?: Database["public"]["Enums"]["app_role"] | null
+          invited_by?: string | null
+          membership_type?: Database["public"]["Enums"]["membership_type"]
+          notes?: string | null
+          status?: Database["public"]["Enums"]["invitation_status"]
+          tenant_id?: string
+          token?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_invitations_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -1473,7 +1612,20 @@ export type Database = {
         | "delivery"
       customer_kind: "individual" | "company_employee"
       dish_status: "draft" | "active" | "archived" | "inactive"
+      invitation_status: "pending" | "accepted" | "expired" | "revoked"
       invoice_status: "pending" | "paid" | "overdue" | "void"
+      membership_status:
+        | "pending"
+        | "approved"
+        | "rejected"
+        | "suspended"
+        | "revoked"
+      membership_type:
+        | "customer"
+        | "employee"
+        | "supplier"
+        | "company"
+        | "company_employee"
       order_status:
         | "draft"
         | "confirmed"
@@ -1486,6 +1638,7 @@ export type Database = {
         | "delivery_issue"
       pay_mode: "employee_pays" | "company_pays" | "grouped" | "custom"
       promotion_scope: "global" | "group" | "personal"
+      provisioning_channel: "self_registration" | "invitation" | "provisioning"
       route_status: "planned" | "in_progress" | "completed" | "cancelled"
       support_kind:
         | "note"
@@ -1640,7 +1793,22 @@ export const Constants = {
       ],
       customer_kind: ["individual", "company_employee"],
       dish_status: ["draft", "active", "archived", "inactive"],
+      invitation_status: ["pending", "accepted", "expired", "revoked"],
       invoice_status: ["pending", "paid", "overdue", "void"],
+      membership_status: [
+        "pending",
+        "approved",
+        "rejected",
+        "suspended",
+        "revoked",
+      ],
+      membership_type: [
+        "customer",
+        "employee",
+        "supplier",
+        "company",
+        "company_employee",
+      ],
       order_status: [
         "draft",
         "confirmed",
@@ -1654,6 +1822,7 @@ export const Constants = {
       ],
       pay_mode: ["employee_pays", "company_pays", "grouped", "custom"],
       promotion_scope: ["global", "group", "personal"],
+      provisioning_channel: ["self_registration", "invitation", "provisioning"],
       route_status: ["planned", "in_progress", "completed", "cancelled"],
       support_kind: [
         "note",
