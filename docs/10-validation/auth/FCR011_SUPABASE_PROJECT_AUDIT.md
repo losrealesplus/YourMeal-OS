@@ -106,40 +106,53 @@ Cross-check: misma publishable key contra URL oficial → HTTP **401** `Invalid 
 
 ---
 
+## Tabla cutover (FCR-011 · SUPABASE CUTOVER AUDIT)
+
+| | Proyecto efectivo | Proyecto esperado |
+|--|-------------------|-------------------|
+| **Ref** | `cbeegcxkayybfncnuirg` | `djangucecsphnejplvic` |
+| **URL** | `https://cbeegcxkayybfncnuirg.supabase.co` | `https://djangucecsphnejplvic.supabase.co` |
+| **¿Coinciden?** | **No** | |
+| **Archivos / fuentes** | `.env` runtime (`VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID`); `src/integrations/supabase/client.ts`; respuestas GoTrue `sb-project-ref`; docs de evidencia FCR-010/011 / `SUPABASE_AUTH_VALIDATION.md` (legacy row) | `supabase/config.toml`; `.env.example`; `docs/10-validation/CUTOVER_REPORT.md`; `docs/00-status/IDENTITY_FREEZE_v1.md`; `package.json` `gen:types`; Dashboard docs `…/project/djangucecsphnejplvic` |
+| **Impacto operacional** | Login/Auth E2E y PS-002-C golpean Auth **legacy**; owners del Dashboard oficial no autentican; `invalid_credentials` / identidades distintas | Cutover INFRA-002 incompleto en runtime: repo declara oficial, entorno efectivo sigue en legacy |
+
+### Publishable key → Project Reference
+
+`VITE_SUPABASE_PUBLISHABLE_KEY` es `sb_publishable_*` **opaca** (no JWT): **no** embebe `ref`. Binding de la key al proyecto se demuestra por HTTP: aceptada solo por `cbeegcxkayybfncnuirg` (settings 200 / token 400); rechazada por `djangucecsphnejplvic` (401 Invalid API key).
+
+### Confirmación endpoints (re-probe cutover)
+
+| Endpoint | Host | HTTP | `sb-project-ref` |
+|----------|------|------|------------------|
+| `GET /auth/v1/settings` | legacy URL + key efectiva | 200 | `cbeegcxkayybfncnuirg` |
+| `POST /auth/v1/token?grant_type=password` | legacy URL + key efectiva | 400 `invalid_credentials` | `cbeegcxkayybfncnuirg` |
+| `GET /auth/v1/settings` | oficial URL + key efectiva | 401 Invalid API key | `djangucecsphnejplvic` |
+
 ## Resultado FCR-011 (formato requerido)
 
 ```
-Proyecto Supabase efectivo: cbeegcxkayybfncnuirg
-  (https://cbeegcxkayybfncnuirg.supabase.co)
+Proyecto efectivo: cbeegcxkayybfncnuirg
 
-Proyecto Supabase esperado: djangucecsphnejplvic
-  (docs cutover / config.toml / .env.example / Dashboard documentado)
+Proyecto esperado: djangucecsphnejplvic
 
-¿Coinciden?: No
+Coinciden: No
 
-Evidencias utilizadas:
-- .env / VITE_* (URL + publishable + project id alineados a legacy)
-- src/integrations/supabase/client.ts (lee VITE_SUPABASE_*)
-- Header sb-project-ref en /auth/v1/settings y /auth/v1/token
-- Cross-project 401 Invalid API key (oficial + key legacy)
-- supabase/config.toml, .env.example, CUTOVER_REPORT, IDENTITY_FREEZE_v1
-- op002 validation-run.json (owners en djangu…)
-- Probes signup/token 2026-07-29 (owners ≠ identidades legacy)
-- PR #103 / FCR-010
+Evidencias:
+- VITE_SUPABASE_URL=https://cbeegcxkayybfncnuirg.supabase.co → ref URL
+- VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_* (opaca; binding vía HTTP)
+- GET /auth/v1/settings → 200 sb-project-ref=cbeegcxkayybfncnuirg
+- POST /auth/v1/token → 400 invalid_credentials sb-project-ref=cbeegcxkayybfncnuirg
+- Oficial URL + misma key → 401; sb-project-ref=djangucecsphnejplvic
+- config.toml / .env.example / CUTOVER_REPORT / IDENTITY_FREEZE → djangu…
+- Dos refs en repo: legacy (runtime) vs oficial (docs/binding)
 
 Causa raíz demostrada:
-La aplicación autentica contra el proyecto legacy cbeegcxkayybfncnuirg
-mientras el origen de verdad documentado y el Dashboard oficial de
-plataforma es djangucecsphnejplvic. Cutover de binding en repo quedó
-incompleto en el .env runtime (keys legacy restauradas / no cutover
-operativo). Los owners alex1409h@ / alexhdezmtinez@ validados en el
-proyecto oficial no son las credenciales Auth del proyecto al que
-pega la app → invalid_credentials en el GoTrue legacy.
+Cutover incompleto: la app en runtime autentica contra legacy
+cbeegcxkayybfncnuirg mientras el proyecto oficial YourMeal OS es
+djangucecsphnejplvic. URL+key efectivas son consistentes entre sí
+pero no con el origen de verdad documentado / Dashboard oficial.
 
 Nivel de confianza: ALTA
-(Dashboard browser del operador no inspeccionable aquí; si el Dashboard
-abierto fuera legacy, coincidiría con la app pero seguiría divergiendo
-del proyecto esperado documentado.)
 ```
 
 ### Side-effect de investigación (no fix)
