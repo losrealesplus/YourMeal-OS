@@ -57,15 +57,11 @@ Experience
 | #93 / #94 | Core Declared · Contract · docs closed |
 | #95 | Governance: CURRENT_PHASE · CHANGE_AUTHORITY · PR template |
 | #96 | Platform Baseline v1 |
+| #97 | Platform v1 CLOSED · Flow open · PR taxonomy |
 
 ---
 
-## Baseline
+## Conclusión
 
-Fotografía oficial: [PLATFORM_BASELINE_v1](./PLATFORM_BASELINE_v1.md).  
-Todo desarrollo futuro parte de esa baseline.
-
-## Siguiente fase
-
-**Flow Certification** — única prioridad.  
-Core / Baseline sin cambios salvo [CHANGE_AUTHORITY](./CHANGE_AUTHORITY.md).
+Acta de cierre: [PLATFORM_V1_CLOSED](./PLATFORM_V1_CLOSED.md).  
+Pregunta abierta: ¿Cómo opera YourMeal OS? → [FLOW_CERTIFICATION_OPEN](./FLOW_CERTIFICATION_OPEN.md).

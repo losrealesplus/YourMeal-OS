@@ -164,6 +164,7 @@ Comparar v2 contra v1 debe ser posible leyendo este documento y el ADR supersedi
 | Baseline | **PLATFORM_BASELINE_v1** |
 | Status | BASELINE |
 | Fecha | 2026-07-29 |
-| Evidencia PR | #91 · #92 · #93 · #94 · #95 · #96 (esta) |
-| Objetivo actual | **Flow Certification** |
-| Último doc constitucional del Core | este (salvo evidencia) |
+| Cierre de fase | [PLATFORM_V1_CLOSED](./PLATFORM_V1_CLOSED.md) |
+| Evidencia PR | #91 · #92 · #93 · #94 · #95 · #96 · #97 |
+| Objetivo actual | **Flow Certification** · [FLOW_CERTIFICATION_OPEN](./FLOW_CERTIFICATION_OPEN.md) |
+| Último doc constitucional del Core | Baseline v1 (este) |

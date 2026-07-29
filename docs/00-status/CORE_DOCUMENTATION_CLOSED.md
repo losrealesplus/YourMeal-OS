@@ -29,7 +29,9 @@ Se cierra la producción de documentación constitucional sobre:
 
 Flow · Operational Modules · Event Bus (cuando corresponda) · Notifications · Jobs · Analytics · AI · evidencia FOPEBA / RI-001.
 
-**Último documento constitucional del Core:** [PLATFORM_BASELINE_v1](./PLATFORM_BASELINE_v1.md).
+**Último documento constitucional del Core:** [PLATFORM_BASELINE_v1](./PLATFORM_BASELINE_v1.md).  
+**Cierre de fase:** [PLATFORM_V1_CLOSED](./PLATFORM_V1_CLOSED.md).  
+**Apertura Flow:** [FLOW_CERTIFICATION_OPEN](./FLOW_CERTIFICATION_OPEN.md) · [PR_TAXONOMY](./PR_TAXONOMY.md).
 
 Gobierno: [CHANGE_AUTHORITY](./CHANGE_AUTHORITY.md) · [PLATFORM_PHASE_COMPLETE](./PLATFORM_PHASE_COMPLETE.md) · plantilla PR `.github/pull_request_template.md`
 

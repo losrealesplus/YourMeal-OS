@@ -4,11 +4,11 @@
 **No sustituye** [MILESTONES](./MILESTONES.md) — tablero de “dónde estamos ahora”.
 
 ```text
-═══════════════════════════════════════════════
-        YOURMEAL OS · PLATFORM BASELINE v1
-═══════════════════════════════════════════════
+══════════════════════════════════════════════════════════════
+YOURMEAL OS · PLATFORM BASELINE v1 · CLOSED
+══════════════════════════════════════════════════════════════
 
-Platform                  ✅ COMPLETE
+Platform                  ✅ CLOSED (v1)
 Baseline                  🔒 v1
 Operational Core          🔒 LOCKED
 Governance                🔒 COMPLETE
@@ -19,29 +19,30 @@ Identity                  🔒 FOUNDATION LOCKED
 
 Entry                     ✅ CERTIFIED
 Journeys                  ✅ COMPLETE
-Flow                      ▶ CURRENT
+Flow                      ▶ CURRENT  (certificación operacional)
 
-═══════════════════════════════════════════════
+══════════════════════════════════════════════════════════════
 CURRENT OBJECTIVE
 
   Flow Certification
-  (Bloque G · handoffs · no pantallas)
+  Outcome → Handoff → Outcome → Evidence → Certification
+  (nunca Pantalla → API → Componente → PASS)
 
 Progress metric:
   Certificaciones superadas
-  (no funcionalidades acumuladas)
 
-═══════════════════════════════════════════════
+══════════════════════════════════════════════════════════════
 ```
 
+**Pregunta del producto:** ¿Cómo **opera** YourMeal OS? → solo Flow puede responderla.
+
 **Pregunta de fase (todo PR):**  
-¿Respeta la Baseline? → ¿Respeta el Core? → ¿Produce evidencia operacional? → ¿Acerca Flow a certificación?  
+¿Respeta Baseline? → ¿Respeta Core? → ¿Produce evidencia? → ¿Acerca Flow a certificación?  
 
-**Pregunta Core:** ¿Consume el Operational Core o lo redefine? → Redefine = ❌  
-→ [PLATFORM_BASELINE_v1](./PLATFORM_BASELINE_v1.md) · [OPERATIONAL_CORE_CONTRACT](./OPERATIONAL_CORE_CONTRACT.md) · [CHANGE_AUTHORITY](./CHANGE_AUTHORITY.md) · plantilla PR
+**Categoría de PR (exactamente una):** [PR_TAXONOMY](./PR_TAXONOMY.md) — Flow · Module · Service · Bug Fix · Documentation  
 
-**Actas de plataforma:**  
-[PLATFORM_BASELINE_v1](./PLATFORM_BASELINE_v1.md) · [PLATFORM_PHASE_COMPLETE](./PLATFORM_PHASE_COMPLETE.md) · [OPERATIONAL_CORE_DECLARED](./OPERATIONAL_CORE_DECLARED.md) · [OPERATIONAL_CORE_CONTRACT](./OPERATIONAL_CORE_CONTRACT.md) · [CORE_DOCUMENTATION_CLOSED](./CORE_DOCUMENTATION_CLOSED.md)
+**Actas:**  
+[PLATFORM_V1_CLOSED](./PLATFORM_V1_CLOSED.md) · [PLATFORM_BASELINE_v1](./PLATFORM_BASELINE_v1.md) · [FLOW_CERTIFICATION_OPEN](./FLOW_CERTIFICATION_OPEN.md) · [CHANGE_AUTHORITY](./CHANGE_AUTHORITY.md) · [OPERATIONAL_CORE_CONTRACT](./OPERATIONAL_CORE_CONTRACT.md)
 
 **Certificación (detalle RI-001):** [RI001_OPERATIONAL_READINESS_BACKLOG](./RI001_OPERATIONAL_READINESS_BACKLOG.md) · [BLOCK_G_FLOW_FRAMING](../10-validation/ep-ops-003/BLOCK_G_FLOW_FRAMING.md)
 
