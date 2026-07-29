@@ -52,5 +52,5 @@ re-render → nueva `can` → loop
 | Campo | Valor |
 |-------|-------|
 | Código | ✅ Fix aplicado |
-| Confirmación visual idle `/admin` | ⏳ Pendiente (smoke humano / Bootstrap) |
-| Bloqueo Flow | Sí hasta confirmar ausencia de titileo en idle |
+| Confirmación visual idle `/admin` | ✅ PASS (PS-001 · childList=0) |
+| Bloqueo Flow | ❌ Levantado — ver [PLATFORM_STABILIZATION_COMPLETE](./PLATFORM_STABILIZATION_COMPLETE.md) |

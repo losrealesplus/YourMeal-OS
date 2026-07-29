@@ -3,8 +3,8 @@
 **Severidad:** P1  
 **Clasificación:** Render Stability Regression (no «solo titileo»)  
 **Síntoma visible:** titileo / parpadeo / vibración en Ops  
-**Estado:** ✅ **FIXED (código)** · ⏳ confirmación visual pendiente  
-**Fix:** Platform Stabilization v1 — [UI_STABILITY](./platform-stabilization/UI_STABILITY.md)  
+**Estado:** ✅ **CLOSED** — PS-001 PASS (Platform Stabilization Complete)  
+**Fix:** Platform Stabilization v1 — [UI_STABILITY](./platform-stabilization/UI_STABILITY.md) · [PS-001](./platform-stabilization/PS-001.md)  
 **Contexto:** Functional Review Mode · Centro de Operaciones
 
 ---
