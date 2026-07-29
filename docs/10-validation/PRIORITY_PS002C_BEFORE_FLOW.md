@@ -54,9 +54,28 @@ VITE_BOOTSTRAP_MODE=false npm run dev -- --host 127.0.0.1 --port 8080
 PS002_EMAIL=… PS002_PASSWORD=… npm run test:ps002-canonical-auth
 ```
 
-- **PASS** → integrar estabilización · revisar/rebase #98 (o superseded) · abrir FLOW-01 Spec  
-- **FAIL** → primer paso ⛔ del reporte = siguiente FCR (sin re-diagnosticar “bug genérico de login”)
+Condición de salida objetiva (PASS):
+
+```text
+status = PASS
+duplicates = []
+missing = []
+out_of_order = []
+pipeline → … → DASHBOARD_RENDERED
+```
+
+`duration_ms` (`login_to_session` · `session_to_bootstrap` · `bootstrap_to_dashboard`) es **telemetría diagnóstica**, no bloquea merge salvo umbrales futuros explícitos.
+
+Tras PASS:
+
+1. Platform Stabilization = COMPLETE (real, no solo Bootstrap)
+2. Decidir #98: integrar tal cual o superseded (solo docs vigentes)
+3. Abrir **FLOW-01 · Kitchen → Delivery · Specification**
+
+Tras FAIL: el primer paso ⛔ del reporte = siguiente FCR (sin “bug genérico de login”).
 
 Evidencia comparable: `status` · `pipeline` · `duplicates` · `missing` · `out_of_order` · `duration_ms`.
 
 Acta de gate: [PS-002.md](./platform-stabilization/PS-002.md) · contrato [FCR008](./FCR008_CANONICAL_POST_LOGIN_SESSION.md)
+
+> El proyecto no espera una decisión metodológica más: espera la **última evidencia operacional** (PS-002-C) para abrir la siguiente etapa.
