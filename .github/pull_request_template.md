@@ -14,12 +14,15 @@
 
 ## Feature declaration (Reglas 2–3)
 
+> [PLATFORM_FLOW_TRANSITION_DECLARED](../docs/00-status/PLATFORM_FLOW_TRANSITION_DECLARED.md) — antes de comenzar:
+
 | Campo | Valor |
 |-------|-------|
-| Flow afectado | `FLOW-NN` / nuevo / N/A justificado |
-| Journey implicado | p. ej. Kitchen → Delivery |
-| Outcome esperado | |
+| ¿A qué Flow pertenece? | `FLOW-NN` / nuevo / N/A justificado |
+| ¿Qué Outcome produce? | |
 | ¿Qué Handoff mejora? | *(si ninguno: justificar)* |
+| ¿Qué evidencia permitirá certificarlo? | |
+| Journey implicado | p. ej. Kitchen → Delivery |
 
 ## Phase alignment (Flow Certification)
 

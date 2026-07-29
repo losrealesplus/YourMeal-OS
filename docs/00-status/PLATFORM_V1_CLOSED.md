@@ -106,7 +106,8 @@ Categorías ambiguas (“refactor general”, “mejoras varias”) → ❌ rech
 | #93–#94 | Core Declared · Contract |
 | #95 | Governance |
 | #96 | Baseline v1 |
-| #97 (esta) | Platform v1 CLOSED · Flow open framing · PR taxonomy |
+| #97 | Platform v1 CLOSED · Flow open framing · PR taxonomy |
+| #98 | Flow Discipline · Flow Governance · [Platform → Flow Transition DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) |
 
 ---
 
@@ -118,3 +119,4 @@ Categorías ambiguas (“refactor general”, “mejoras varias”) → ❌ rech
 | Baseline | v1 |
 | Pregunta abierta | ¿Cómo opera YourMeal OS? → Flow |
 | Siguiente fase | Flow Certification ▶ CURRENT |
+| Transición institucional | [PLATFORM_FLOW_TRANSITION_DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) · COMPLETE |

@@ -15,6 +15,8 @@ Garantizar que todo desarrollo operacional nace desde un Flow certificado o cand
 
 Convierte en **política permanente** lo ya decidido en Platform v1 CLOSED → Flow Certification (#96–#98): el desarrollo está guiado por la operación, no por las pantallas.
 
+Acta institucional: [PLATFORM_FLOW_TRANSITION_DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) · COMPLETE.
+
 ---
 
 ## Reasoning (oficial)

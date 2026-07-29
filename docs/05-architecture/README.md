@@ -18,6 +18,7 @@
 | [../00-status/PLATFORM_PHASE_COMPLETE.md](../00-status/PLATFORM_PHASE_COMPLETE.md) | Fase de Plataforma COMPLETE |
 | [../00-status/PLATFORM_BASELINE_v1.md](../00-status/PLATFORM_BASELINE_v1.md) | Baseline v1 — punto de partida de todo desarrollo futuro |
 | [../00-status/PLATFORM_V1_CLOSED.md](../00-status/PLATFORM_V1_CLOSED.md) | Cierre formal Plataforma v1 |
+| [../00-status/PLATFORM_FLOW_TRANSITION_DECLARED.md](../00-status/PLATFORM_FLOW_TRANSITION_DECLARED.md) | Acta: construcción → evidencia operacional |
 | [../00-status/FLOW_CERTIFICATION_OPEN.md](../00-status/FLOW_CERTIFICATION_OPEN.md) | Flow como certificación operacional (no pantallas) |
 | [../00-status/FLOW_GOVERNANCE.md](../00-status/FLOW_GOVERNANCE.md) | Política permanente: desarrollo nace desde Flow |
 | [../00-status/FLOW_FIRST.md](../00-status/FLOW_FIRST.md) | Regla diaria: feature → Flow |

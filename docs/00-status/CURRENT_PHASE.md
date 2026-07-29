@@ -5,13 +5,15 @@
 
 ```text
 ══════════════════════════════════════════════════════════════
-YOURMEAL OS · PLATFORM BASELINE v1 · CLOSED
+YOURMEAL OS · PLATFORM → FLOW TRANSITION · COMPLETE
 ══════════════════════════════════════════════════════════════
 
 Platform                  ✅ CLOSED (v1)
+Transition                ✅ DECLARED (Platform → Flow)
 Baseline                  🔒 v1
 Operational Core          🔒 LOCKED
 Governance                🔒 COMPLETE
+Flow Governance           🔒 ACTIVE
 
 Foundation                🔒 LOCKED
 Auth                      🔒 FROZEN
@@ -29,25 +31,27 @@ CURRENT OBJECTIVE
   (nunca Pantalla → API → Componente → PASS)
 
 Progress metric:
-  Certificaciones superadas
+  Flows especificados · ejecutados · certificados
+  (no pantallas · features · PRs)
 
 ══════════════════════════════════════════════════════════════
 ```
 
 **Pregunta del producto:** ¿Cómo **opera** YourMeal OS? → solo Flow puede responderla.
 
+**Acta de transición:** [PLATFORM_FLOW_TRANSITION_DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) — COMPLETE  
 **Gobernanza:** [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) — política permanente (6 reglas)  
 **Regla diaria:** [FLOW_FIRST](./FLOW_FIRST.md) — ¿A qué Flow pertenece?  
 **Done (fase):** [FLOW_DEFINITION_OF_DONE](./FLOW_DEFINITION_OF_DONE.md) — Handoff → Evidence → Certification → Merge  
 **Jerarquía:** [FLOW_WORK_HIERARCHY](./FLOW_WORK_HIERARCHY.md) · **Catálogo:** [FLOW_CATALOG](./FLOW_CATALOG.md) (FLOW-01…03)
 
 **Pregunta de fase (todo PR):**  
-¿A qué Flow pertenece? → ¿Respeta Baseline? → ¿Respeta Core? → ¿Produce evidencia? → ¿Acerca Flow a certificación?  
+¿A qué Flow pertenece? → ¿Qué Outcome? → ¿Qué Handoff? → ¿Qué evidencia? → ¿Respeta Baseline/Core?  
 
 **Categoría de PR (exactamente una):** [PR_TAXONOMY](./PR_TAXONOMY.md) — preferir títulos `FLOW-NN`  
 
 **Actas:**  
-[PLATFORM_V1_CLOSED](./PLATFORM_V1_CLOSED.md) · [PLATFORM_BASELINE_v1](./PLATFORM_BASELINE_v1.md) · [FLOW_CERTIFICATION_OPEN](./FLOW_CERTIFICATION_OPEN.md) · [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) · [FLOW_FIRST](./FLOW_FIRST.md) · [CHANGE_AUTHORITY](./CHANGE_AUTHORITY.md) · [OPERATIONAL_CORE_CONTRACT](./OPERATIONAL_CORE_CONTRACT.md)
+[PLATFORM_FLOW_TRANSITION_DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) · [PLATFORM_V1_CLOSED](./PLATFORM_V1_CLOSED.md) · [PLATFORM_BASELINE_v1](./PLATFORM_BASELINE_v1.md) · [FLOW_CERTIFICATION_OPEN](./FLOW_CERTIFICATION_OPEN.md) · [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) · [FLOW_FIRST](./FLOW_FIRST.md) · [CHANGE_AUTHORITY](./CHANGE_AUTHORITY.md) · [OPERATIONAL_CORE_CONTRACT](./OPERATIONAL_CORE_CONTRACT.md)
 
 **Certificación (detalle RI-001):** [RI001_OPERATIONAL_READINESS_BACKLOG](./RI001_OPERATIONAL_READINESS_BACKLOG.md) · [BLOCK_G_FLOW_FRAMING](../10-validation/ep-ops-003/BLOCK_G_FLOW_FRAMING.md)
 
@@ -87,4 +91,5 @@ Journeys: [EP_OPS_003_JOURNEYS_COMPLETE](./EP_OPS_003_JOURNEYS_COMPLETE.md) ✅
 Programa RI-001: [RI001_PROGRAM_FROZEN](./RI001_PROGRAM_FROZEN.md) · Backlog A–I arriba.
 
 > ❌ No reabrir Foundation / Auth / Identity / Core sin evidencia + ADR ([CHANGE_AUTHORITY](./CHANGE_AUTHORITY.md)).  
-> ✅ Toda la energía en **Flow Certification**.
+> ✅ Toda la energía en **Flow Certification**.  
+> Acta: [PLATFORM_FLOW_TRANSITION_DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) · COMPLETE.

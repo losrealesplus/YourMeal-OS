@@ -66,6 +66,7 @@ Actor = **organización**, no un solo departamento.
 ## Relación con Platform v1
 
 Platform v1 está [CLOSED](./PLATFORM_V1_CLOSED.md).  
+Transición institucional: [PLATFORM_FLOW_TRANSITION_DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) · COMPLETE.  
 Flow **consume** Baseline + Core Contract; **no** los redefine.
 
 Garantías aplicables:
