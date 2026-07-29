@@ -28,6 +28,8 @@ Se cierra la producción de documentación constitucional sobre:
 
 Flow · Operational Modules · Event Bus (cuando corresponda) · Notifications · Jobs · Analytics · AI · evidencia FOPEBA / RI-001.
 
+Gobierno: [CHANGE_AUTHORITY](./CHANGE_AUTHORITY.md) · [PLATFORM_PHASE_COMPLETE](./PLATFORM_PHASE_COMPLETE.md) · plantilla PR `.github/pull_request_template.md`
+
 ## Reapertura
 
 Solo con evidencia operacional + ADR superseding + actualización explícita de este cierre.
