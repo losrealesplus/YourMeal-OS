@@ -19,6 +19,10 @@
 | [../00-status/PLATFORM_BASELINE_v1.md](../00-status/PLATFORM_BASELINE_v1.md) | Baseline v1 — punto de partida de todo desarrollo futuro |
 | [../00-status/PLATFORM_V1_CLOSED.md](../00-status/PLATFORM_V1_CLOSED.md) | Cierre formal Plataforma v1 |
 | [../00-status/FLOW_CERTIFICATION_OPEN.md](../00-status/FLOW_CERTIFICATION_OPEN.md) | Flow como certificación operacional (no pantallas) |
+| [../00-status/FLOW_FIRST.md](../00-status/FLOW_FIRST.md) | Regla diaria: feature → Flow |
+| [../00-status/FLOW_DEFINITION_OF_DONE.md](../00-status/FLOW_DEFINITION_OF_DONE.md) | Done = Handoff → Evidence → Certification |
+| [../00-status/FLOW_WORK_HIERARCHY.md](../00-status/FLOW_WORK_HIERARCHY.md) | Spec → Execution → Evidence → Certification → Readiness |
+| [../00-status/FLOW_CATALOG.md](../00-status/FLOW_CATALOG.md) | FLOW-01…03 (Kitchen → Delivery → Support → Accounting) |
 | [../00-status/PR_TAXONOMY.md](../00-status/PR_TAXONOMY.md) | Categorías obligatorias de PR |
 | [../00-status/CORE_DOCUMENTATION_CLOSED.md](../00-status/CORE_DOCUMENTATION_CLOSED.md) | Cierre documental Foundation / Identity / Core |
 | [FOUR_LAYERS.md](./FOUR_LAYERS.md) | Knowledge · Platform · Materialization · Operational |

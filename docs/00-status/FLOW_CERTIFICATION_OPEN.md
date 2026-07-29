@@ -87,6 +87,19 @@ Un Flow está listo para certificación cuando:
 
 ---
 
+## Disciplina diaria (Flow First)
+
+| Documento | Rol |
+|-----------|-----|
+| [FLOW_FIRST](./FLOW_FIRST.md) | Toda feature → ¿a qué Flow pertenece? |
+| [FLOW_DEFINITION_OF_DONE](./FLOW_DEFINITION_OF_DONE.md) | Done = Handoff → Evidence → Certification → Merge |
+| [FLOW_WORK_HIERARCHY](./FLOW_WORK_HIERARCHY.md) | Spec → Execution → Evidence → Certification → Readiness |
+| [FLOW_CATALOG](./FLOW_CATALOG.md) | FLOW-01 Kitchen→Delivery · FLOW-02 · FLOW-03 |
+
+No mezclar conceptos. No PRs “Mejoras de Delivery” — solo `FLOW-NN` + departamentos.
+
+---
+
 ## Siguiente paso de ejecución
 
 Abrir ejecución del Bloque G según [BLOCK_G_FLOW_FRAMING](../10-validation/ep-ops-003/BLOCK_G_FLOW_FRAMING.md) — sin cambiar este framing de disciplina.

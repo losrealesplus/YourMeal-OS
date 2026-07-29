@@ -15,6 +15,7 @@
 ## Phase alignment (Flow Certification)
 
 - [ ] Respeta [PLATFORM_BASELINE_v1](../docs/00-status/PLATFORM_BASELINE_v1.md) / [PLATFORM_V1_CLOSED](../docs/00-status/PLATFORM_V1_CLOSED.md)
+- [ ] **Flow First:** declara Flow (`FLOW-NN`) o justifica excepción / Flow nuevo ([FLOW_FIRST](../docs/00-status/FLOW_FIRST.md) · [FLOW_CATALOG](../docs/00-status/FLOW_CATALOG.md))
 - [ ] Produce o habilita evidencia operacional (o N/A justificado)
 - [ ] Acerca Flow a certificación (o N/A — Module/Service/Bug/Docs)
 
@@ -34,8 +35,9 @@
 ## Flow discipline (if category = Flow Certification)
 
 - [ ] Cadena Outcome → Handoff → Outcome → Evidence → Certification
+- [ ] Done = Handoff → Evidence → Certification ([FLOW_DEFINITION_OF_DONE](../docs/00-status/FLOW_DEFINITION_OF_DONE.md))
 - [ ] No certifica pantallas/APIs/componentes como PASS de Flow
-- [ ] Alinea con [FLOW_CERTIFICATION_OPEN](../docs/00-status/FLOW_CERTIFICATION_OPEN.md)
+- [ ] Alinea con [FLOW_CERTIFICATION_OPEN](../docs/00-status/FLOW_CERTIFICATION_OPEN.md) · jerarquía [FLOW_WORK_HIERARCHY](../docs/00-status/FLOW_WORK_HIERARCHY.md)
 
 ## Test plan
 

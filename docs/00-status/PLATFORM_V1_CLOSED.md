@@ -79,6 +79,8 @@ Fuera del día a día. Solo cambian con evidencia operacional + [CHANGE_AUTHORIT
 Flow **no** se abre como desarrollo técnico de pantallas/APIs.  
 Se abre como **certificación operacional** — ver [FLOW_CERTIFICATION_OPEN](./FLOW_CERTIFICATION_OPEN.md).
 
+Disciplina diaria: [FLOW_FIRST](./FLOW_FIRST.md) · Done: [FLOW_DEFINITION_OF_DONE](./FLOW_DEFINITION_OF_DONE.md) · Catálogo: [FLOW_CATALOG](./FLOW_CATALOG.md).
+
 ---
 
 ## Taxonomía de PRs (obligatoria)
