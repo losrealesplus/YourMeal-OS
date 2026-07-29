@@ -24,6 +24,8 @@ import {
   provisionTenantUser,
   approveTenantMembership,
   assignTenantRole,
+  transitionTenantMembership,
+  listUserIdentityTimeline,
   ASSIGNABLE_ROLES,
   MEMBERSHIP_TYPES,
 } from "@/lib/user-provisioning.functions";
@@ -50,12 +52,23 @@ export const Route = createFileRoute("/_authenticated/admin/users")({
 
 type UserRow = {
   id: string;
+  membershipId: string | null;
   fullName: string | null;
   email: string | null;
   roles: string[];
   joinedAt: string | null;
   membershipStatus: string;
   membershipType: string;
+};
+
+type TimelineItem = {
+  id: string;
+  eventType: string;
+  label: string;
+  performedBy: string | null;
+  performedAt: string;
+  membershipId: string | null;
+  metadata: Record<string, unknown>;
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -88,10 +101,15 @@ function AdminUsersPage() {
   const [channel, setChannel] = useState<"provisioning" | "invitation">(
     "provisioning",
   );
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [timeline, setTimeline] = useState<TimelineItem[]>([]);
+  const [timelineLoading, setTimelineLoading] = useState(false);
 
   const doProvision = useServerFn(provisionTenantUser);
   const doApprove = useServerFn(approveTenantMembership);
   const doAssign = useServerFn(assignTenantRole);
+  const doTransition = useServerFn(transitionTenantMembership);
+  const doTimeline = useServerFn(listUserIdentityTimeline);
 
   async function load() {
     if (!tenantId) return;
@@ -101,11 +119,13 @@ function AdminUsersPage() {
       const { data: members, error: mErr } = await db
         .from("tenant_members")
         .select(
-          "user_id, joined_at, status, membership_type, created_at",
+          "id, user_id, joined_at, status, membership_type, created_at, deleted_at",
         )
-        .eq("tenant_id", tenantId);
+        .eq("tenant_id", tenantId)
+        .is("deleted_at", null);
       if (mErr) throw mErr;
       const memberRows = (members ?? []) as Array<{
+        id?: string;
         user_id: string;
         joined_at: string;
         status?: string;
@@ -155,6 +175,7 @@ function AdminUsersPage() {
       setRows(
         memberRows.map((m) => ({
           id: m.user_id,
+          membershipId: m.id ?? null,
           fullName: profileMap.get(m.user_id) ?? null,
           email: null,
           roles: rolesMap.get(m.user_id) ?? [],
@@ -250,6 +271,41 @@ function AdminUsersPage() {
     onError: (e) => toast.error(e instanceof Error ? e.message : String(e)),
   });
 
+  async function loadTimeline(userId: string) {
+    if (!tenantId) return;
+    setSelectedUserId(userId);
+    setTimelineLoading(true);
+    try {
+      const items = await doTimeline({
+        data: { tenantId, userId, limit: 40 },
+      });
+      setTimeline(items as TimelineItem[]);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : String(e));
+    } finally {
+      setTimelineLoading(false);
+    }
+  }
+
+  const transition = useMutation({
+    mutationFn: async ({
+      userId,
+      action,
+    }: {
+      userId: string;
+      action: "suspend" | "reactivate" | "revoke" | "reject";
+    }) => {
+      if (!tenantId) throw new Error("Missing tenant");
+      return doTransition({ data: { tenantId, userId, action } });
+    },
+    onSuccess: (_data, vars) => {
+      toast.success(`Membership · ${vars.action}`);
+      load();
+      if (selectedUserId) loadTimeline(selectedUserId);
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : String(e)),
+  });
+
   const columns: Column<UserRow>[] = [
     {
       key: "name",
@@ -310,6 +366,13 @@ function AdminUsersPage() {
       header: "Acciones",
       render: (r) => (
         <div className="flex flex-wrap gap-2 items-center">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => loadTimeline(r.id)}
+          >
+            Timeline
+          </Button>
           {r.membershipStatus === "pending" && (
             <Button
               size="sm"
@@ -338,6 +401,30 @@ function AdminUsersPage() {
               ))}
             </select>
           )}
+          {r.membershipStatus === "approved" && (
+            <Button
+              size="sm"
+              variant="ghost"
+              disabled={transition.isPending}
+              onClick={() =>
+                transition.mutate({ userId: r.id, action: "suspend" })
+              }
+            >
+              Suspender
+            </Button>
+          )}
+          {r.membershipStatus === "suspended" && (
+            <Button
+              size="sm"
+              variant="secondary"
+              disabled={transition.isPending}
+              onClick={() =>
+                transition.mutate({ userId: r.id, action: "reactivate" })
+              }
+            >
+              Reactivar
+            </Button>
+          )}
         </div>
       ),
     },
@@ -348,7 +435,7 @@ function AdminUsersPage() {
       <SectionTitle
         overline="Administración"
         title="Usuarios"
-        subtitle="Provisionamiento · Membership · Role. Crear usuario no concede acceso."
+        subtitle="Provisionamiento · Membership · Role · Timeline. Crear usuario no concede acceso."
       />
       <AdminHeader
         goal="Incorporar personas al tenant sin saltarse RBAC"
@@ -512,6 +599,48 @@ function AdminUsersPage() {
             rows={rows}
             empty="No hay miembros en este tenant."
           />
+        )}
+      </PanelCard>
+
+      <PanelCard>
+        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">
+          Activity Timeline
+        </p>
+        <p className="text-xs text-muted-foreground mb-3">
+          Historial de negocio Identity · Membership · Role (no es log técnico).
+          {selectedUserId
+            ? ` Usuario ${selectedUserId.slice(0, 8)}…`
+            : " Selecciona Timeline en un usuario."}
+        </p>
+        {!selectedUserId ? (
+          <p className="text-sm text-muted-foreground py-6 text-center">
+            Sin usuario seleccionado.
+          </p>
+        ) : timelineLoading ? (
+          <p className="text-sm text-muted-foreground py-6 text-center">
+            Cargando timeline…
+          </p>
+        ) : timeline.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-6 text-center">
+            Sin eventos todavía.
+          </p>
+        ) : (
+          <ol className="space-y-3 border-l border-border pl-4">
+            {timeline.map((item) => (
+              <li key={item.id} className="relative">
+                <span className="absolute -left-[1.28rem] top-1.5 size-2 rounded-full bg-primary" />
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                  {new Date(item.performedAt).toLocaleString("es-ES")}
+                </p>
+                <p className="text-sm font-medium">{item.label}</p>
+                {item.metadata && Object.keys(item.metadata).length > 0 && (
+                  <p className="text-xs text-muted-foreground font-mono">
+                    {JSON.stringify(item.metadata)}
+                  </p>
+                )}
+              </li>
+            ))}
+          </ol>
         )}
       </PanelCard>
     </div>
