@@ -5,10 +5,13 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import {
   buildPs002cEvidenceReport,
+  checkPs002cPreconditions,
+  classifyPs002cOutcome,
   computePipelineDurations,
   extractFcr008Steps,
   formatPipelineComparisonTable,
   PS002_CANONICAL_STEPS,
+  PS002C_EXIT,
   validateCanonicalPipeline,
 } from "./canonical-pipeline.mjs";
 
@@ -83,6 +86,7 @@ describe("canonical-pipeline (PS-002-C)", () => {
     const validation = validateCanonicalPipeline(pipeline);
     const report = buildPs002cEvidenceReport({
       status: "PASS",
+      reason: "",
       pipeline,
       validation,
       duration_ms: {
@@ -90,13 +94,63 @@ describe("canonical-pipeline (PS-002-C)", () => {
         session_to_bootstrap: 24,
         bootstrap_to_dashboard: 163,
       },
+      code_status: "UNCHANGED",
     });
     assert.equal(report.status, "PASS");
+    assert.equal(report.code_status, "UNCHANGED");
     assert.deepEqual(report.pipeline, PS002_CANONICAL_STEPS);
     assert.deepEqual(report.duplicates, []);
     assert.deepEqual(report.missing, []);
     assert.deepEqual(report.out_of_order, []);
     assert.equal(report.duration_ms.login_to_session, 87);
     assert.equal(report.auth, "supabase_real");
+  });
+
+  it("checkPs002cPreconditions BLOCKED when credentials missing", () => {
+    const r = checkPs002cPreconditions({
+      email: "",
+      password: "",
+      serverReachable: true,
+    });
+    assert.equal(r.ok, false);
+    assert.match(r.reason, /PS002_EMAIL/);
+    assert.match(r.reason, /PS002_PASSWORD/);
+  });
+
+  it("classifyPs002cOutcome distinguishes PASS FAIL BLOCKED", () => {
+    assert.equal(
+      classifyPs002cOutcome({
+        preconditionOk: false,
+        preconditionReason: "PS002_EMAIL / PS002_PASSWORD missing",
+        pipelineStarted: false,
+        validationOk: false,
+        navigated: false,
+      }).status,
+      "BLOCKED",
+    );
+    assert.equal(
+      classifyPs002cOutcome({
+        preconditionOk: true,
+        pipelineStarted: true,
+        validationOk: true,
+        navigated: true,
+      }).status,
+      "PASS",
+    );
+    const fail = classifyPs002cOutcome({
+      preconditionOk: true,
+      pipelineStarted: true,
+      validationOk: false,
+      navigated: false,
+      firstFailure: "PROFILE_READY",
+    });
+    assert.equal(fail.status, "FAIL");
+    assert.equal(fail.stop, "PROFILE_READY");
+  });
+
+  it("PS002C_EXIT codes are distinct", () => {
+    assert.equal(PS002C_EXIT.PASS, 0);
+    assert.equal(PS002C_EXIT.FAIL, 1);
+    assert.equal(PS002C_EXIT.BLOCKED, 2);
   });
 });

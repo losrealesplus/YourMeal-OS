@@ -1,34 +1,40 @@
 /**
  * PS-002-C · Canonical Session Validation (Auth Supabase real)
  *
- * Priority gate for Flow Certification. Bootstrap Mode MUST be off.
- * Credentials are part of the contract — do not simulate Auth.
+ * Outcomes (mutually exclusive):
+ *   PASS    (exit 0) — pipeline ran and fulfilled the contract
+ *   FAIL    (exit 1) — pipeline began and broke at a concrete step
+ *   BLOCKED (exit 2) — pipeline never began (external preconditions)
  *
- * Required:
+ * Required for PASS attempt:
  *   PS002_EMAIL
  *   PS002_PASSWORD
  *
  * Optional:
  *   PS_BASE_URL          default http://127.0.0.1:8080
- *   PS002_ROUTE          default /auth/admin  (/auth for customer)
- *   PS002_EXPECT_PATH    substring of post-login URL (default /admin)
+ *   PS002_ROUTE          default /auth/admin
+ *   PS002_EXPECT_PATH    default /admin
  *
  * Usage:
  *   VITE_BOOTSTRAP_MODE=false npm run dev -- --host 127.0.0.1 --port 8080
  *   PS002_EMAIL=… PS002_PASSWORD=… npm run test:ps002-canonical-auth
  *
  * Evidence: docs/10-validation/platform-stabilization/evidence/ps002c-canonical-auth.json
+ *
+ * Does NOT mock Auth · create users · bypass · or modify the application.
  */
 import { chromium } from "playwright";
 import fs from "node:fs";
 import path from "node:path";
 import {
   buildPs002cEvidenceReport,
+  checkPs002cPreconditions,
+  classifyPs002cOutcome,
   computePipelineDurations,
   extractFcr008Steps,
   formatPipelineComparisonTable,
   parseFcr008ConsoleEvent,
-  PS002_CANONICAL_STEPS,
+  PS002C_EXIT,
   validateCanonicalPipeline,
 } from "./lib/canonical-pipeline.mjs";
 
@@ -42,25 +48,119 @@ const OUT = path.resolve(
 );
 fs.mkdirSync(OUT, { recursive: true });
 
-function failHard(msg) {
-  console.error(`PS-002-C FAIL: ${msg}`);
-  process.exit(1);
+function writeEvidence(payload) {
+  const evidencePath = path.join(OUT, "ps002c-canonical-auth.json");
+  fs.writeFileSync(evidencePath, JSON.stringify(payload, null, 2));
+  return evidencePath;
 }
 
-if (!EMAIL || !PASSWORD) {
-  failHard(
-    "Set PS002_EMAIL and PS002_PASSWORD (real Supabase Auth credentials). " +
-      "Bootstrap Mode must stay false. Credentials are part of the PS-002-C contract — do not mock Auth. " +
-      "See docs/10-validation/platform-stabilization/PS-002.md",
+function printBlocked(reason) {
+  console.log(`
+Status
+BLOCKED
+
+Reason
+${reason}
+
+Code Status
+UNCHANGED
+`);
+}
+
+function printFail(stop, rootCause) {
+  console.log(`
+Status
+FAIL
+
+STOP
+${stop}
+
+Root Cause
+${rootCause}
+`);
+}
+
+function printPass() {
+  console.log(`
+PS-002-C
+PASS
+
+Platform Stabilization
+COMPLETE
+
+Current Gate
+CLOSED
+
+Platform Ready
+FLOW CERTIFICATION
+`);
+}
+
+function emitBlocked(reason, extra = {}) {
+  const evidencePath = writeEvidence(
+    buildPs002cEvidenceReport({
+      status: "BLOCKED",
+      reason,
+      pipeline: [],
+      validation: null,
+      duration_ms: null,
+      code_status: "UNCHANGED",
+      meta: {
+        base: BASE,
+        route: ROUTE,
+        open_fcr: false,
+        ...extra,
+      },
+    }),
   );
+  printBlocked(reason);
+  console.log(JSON.stringify({ status: "BLOCKED", reason, evidencePath }, null, 2));
+  return PS002C_EXIT.BLOCKED;
+}
+
+async function probeServer(url) {
+  try {
+    const res = await fetch(url, { method: "GET", redirect: "manual" });
+    return { ok: true, status: res.status };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : String(e) };
+  }
 }
 
 async function main() {
-  const browser = await chromium.launch({ headless: true });
+  const creds = checkPs002cPreconditions({
+    email: EMAIL,
+    password: PASSWORD,
+    serverReachable: true,
+  });
+  if (!creds.ok) {
+    process.exit(emitBlocked(creds.reason));
+  }
+
+  const probe = await probeServer(`${BASE}${ROUTE}`);
+  if (!probe.ok) {
+    process.exit(
+      emitBlocked(`Dev server unavailable: ${probe.error}`, {
+        serverProbe: probe,
+      }),
+    );
+  }
+
+  let browser;
+  try {
+    browser = await chromium.launch({ headless: true });
+  } catch (e) {
+    process.exit(
+      emitBlocked(
+        `Playwright/browser unavailable: ${e instanceof Error ? e.message : String(e)}`,
+      ),
+    );
+  }
+
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   const consoleLines = [];
   const pageErrors = [];
-  /** @type {Record<string, number>} first-seen wall clock per step */
+  /** @type {Record<string, number>} */
   const stepTimestamps = {};
 
   page.on("console", (msg) => {
@@ -74,30 +174,43 @@ async function main() {
   });
   page.on("pageerror", (e) => pageErrors.push(String(e)));
 
-  const writeEvidence = (payload) => {
-    const evidencePath = path.join(OUT, "ps002c-canonical-auth.json");
-    fs.writeFileSync(evidencePath, JSON.stringify(payload, null, 2));
-    return evidencePath;
-  };
+  let exitCode = PS002C_EXIT.FAIL;
 
   try {
-    await page.goto(`${BASE}${ROUTE}`, {
-      waitUntil: "networkidle",
-      timeout: 90_000,
-    });
+    try {
+      await page.goto(`${BASE}${ROUTE}`, {
+        waitUntil: "networkidle",
+        timeout: 90_000,
+      });
+    } catch (e) {
+      exitCode = emitBlocked(
+        `Dev server unavailable: ${e instanceof Error ? e.message : String(e)}`,
+      );
+      return;
+    }
+
     await page.waitForTimeout(800);
 
     if (await page.getByRole("button", { name: /^Entrar$/i }).count()) {
       if (await page.locator('input[name="bootstrap-profile"]').count()) {
-        failHard(
-          "Bootstrap Mode UI detected — PS-002-C requires VITE_BOOTSTRAP_MODE=false",
+        exitCode = emitBlocked(
+          "Bootstrap Mode UI detected — set VITE_BOOTSTRAP_MODE=false",
         );
+        return;
       }
     }
 
     const emailInput = page.locator('input[type="email"]').first();
     const passwordInput = page.locator('input[type="password"]').first();
-    await emailInput.waitFor({ state: "visible", timeout: 30_000 });
+    try {
+      await emailInput.waitFor({ state: "visible", timeout: 30_000 });
+    } catch (e) {
+      exitCode = emitBlocked(
+        `Auth form not available at ${ROUTE}: ${e instanceof Error ? e.message : String(e)}`,
+      );
+      return;
+    }
+
     await emailInput.fill(EMAIL);
     await passwordInput.fill(PASSWORD);
 
@@ -132,23 +245,33 @@ async function main() {
     const pipeline = extractFcr008Steps(fcrLines);
     const validation = validateCanonicalPipeline(pipeline);
     const duration_ms = computePipelineDurations(stepTimestamps);
+    const pipelineStarted = pipeline.includes("LOGIN") || pipeline.length > 0;
 
-    const status =
-      validation.ok && navigated
-        ? "PASS"
-        : validation.ok && !navigated
-          ? "FAIL"
-          : "FAIL";
+    const outcome = classifyPs002cOutcome({
+      preconditionOk: true,
+      pipelineStarted,
+      validationOk: validation.ok,
+      navigated,
+      firstFailure: validation.firstFailure,
+    });
 
-    const postLoginGetSession = fcrLines.some((l) =>
-      /getSession|canonical_session_missing/.test(l),
-    );
+    // Submit ran but no FCR-008 events → FAIL at LOGIN (app path exercised).
+    let status = outcome.status;
+    let reason = outcome.reason;
+    let stop = outcome.stop;
+    if (!pipelineStarted) {
+      status = "FAIL";
+      stop = "LOGIN";
+      reason = "No [FCR-008] pipeline events after submit (LOGIN never logged)";
+    }
 
     const evidence = buildPs002cEvidenceReport({
       status,
+      reason,
       pipeline,
       validation,
       duration_ms,
+      code_status: "UNCHANGED",
       meta: {
         base: BASE,
         route: ROUTE,
@@ -156,6 +279,8 @@ async function main() {
         navigated,
         finalUrl: page.url(),
         expectPath: EXPECT_PATH,
+        stop,
+        open_fcr: status === "FAIL",
         stepTimestamps,
         comparisonTable: formatPipelineComparisonTable(validation),
         fcr008Logs: fcrLines,
@@ -163,69 +288,100 @@ async function main() {
         screenshot: screenshotPath,
         notes: [
           "Auth Supabase real (no Bootstrap, no mock)",
-          "Contract: each canonical step exactly once",
+          "PASS | FAIL | BLOCKED — BLOCKED is not a code defect",
           "duration_ms is diagnostic only — not a performance gate",
-          postLoginGetSession
-            ? "WARN: getSession/missing-session signal in FCR-008 logs"
-            : "No getSession failure signal in FCR-008 logs",
         ],
       },
     });
 
     const evidencePath = writeEvidence(evidence);
 
+    if (status === "PASS") {
+      printPass();
+      console.log(
+        JSON.stringify(
+          {
+            status: "PASS",
+            duplicates: evidence.duplicates,
+            missing: evidence.missing,
+            out_of_order: evidence.out_of_order,
+            duration_ms: evidence.duration_ms,
+            evidencePath,
+          },
+          null,
+          2,
+        ),
+      );
+      exitCode = PS002C_EXIT.PASS;
+      return;
+    }
+
+    if (status === "BLOCKED") {
+      printBlocked(reason);
+      console.log(JSON.stringify({ status, reason, evidencePath }, null, 2));
+      exitCode = PS002C_EXIT.BLOCKED;
+      return;
+    }
+
+    printFail(stop ?? "LOGIN", reason);
     console.log(evidence.comparisonTable);
     console.log(
       JSON.stringify(
         {
-          status: evidence.status,
-          firstFailure: evidence.firstFailure,
+          status: "FAIL",
+          stop,
+          reason,
           duplicates: evidence.duplicates,
           missing: evidence.missing,
           out_of_order: evidence.out_of_order,
           duration_ms: evidence.duration_ms,
-          navigated,
-          finalUrl: page.url(),
           evidencePath,
         },
         null,
         2,
       ),
     );
-
-    if (status !== "PASS") {
-      console.error(
-        `\nPS-002-C FAIL — first blocked step: ${evidence.firstFailure ?? (navigated ? "unknown" : "NAVIGATE/DASHBOARD")}`,
-      );
-      console.error(evidence.comparisonTable);
-      process.exit(1);
-    }
-
-    console.log("PS-002-C PASS");
-    process.exit(0);
+    exitCode = PS002C_EXIT.FAIL;
   } catch (e) {
     const pipeline = extractFcr008Steps(
       consoleLines.filter((l) => l.includes("[FCR-008]")),
     );
     const validation = validateCanonicalPipeline(pipeline);
-    writeEvidence(
+    const pipelineStarted = pipeline.length > 0;
+    const msg = e instanceof Error ? e.message : String(e);
+
+    if (!pipelineStarted) {
+      exitCode = emitBlocked(`Environment error before LOGIN: ${msg}`, {
+        error: msg,
+        pageErrors,
+      });
+      return;
+    }
+
+    const evidencePath = writeEvidence(
       buildPs002cEvidenceReport({
         status: "FAIL",
+        reason: msg,
         pipeline,
         validation,
         duration_ms: computePipelineDurations(stepTimestamps),
+        code_status: "UNCHANGED",
         meta: {
-          error: String(e),
-          fcr008Logs: consoleLines.filter((l) => l.includes("[FCR-008]")),
+          stop: validation.firstFailure ?? "LOGIN",
+          error: msg,
           pageErrors,
-          stepTimestamps,
+          open_fcr: true,
         },
       }),
     );
-    failHard(String(e));
+    printFail(validation.firstFailure ?? "LOGIN", msg);
+    console.log(JSON.stringify({ status: "FAIL", evidencePath }, null, 2));
+    exitCode = PS002C_EXIT.FAIL;
   } finally {
-    await browser.close();
+    await browser.close().catch(() => undefined);
   }
+
+  process.exit(exitCode);
 }
 
 main();

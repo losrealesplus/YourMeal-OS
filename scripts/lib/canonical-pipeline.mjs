@@ -99,32 +99,128 @@ export function computePipelineDurations(stepTimestamps) {
 
 /**
  * Canonical evidence envelope for regression comparison over time.
+ *
+ * status:
+ *   PASS    — pipeline ran and fulfilled the contract
+ *   FAIL    — pipeline began and broke at a concrete step
+ *   BLOCKED — pipeline never began (external preconditions)
  */
 export function buildPs002cEvidenceReport({
   status,
-  pipeline,
-  validation,
-  duration_ms,
+  reason = "",
+  pipeline = [],
+  validation = null,
+  duration_ms = null,
+  code_status = "UNCHANGED",
   meta = {},
 }) {
+  const emptyValidation = {
+    duplicates: [],
+    missing: [],
+    out_of_order: [],
+    firstFailure: null,
+  };
+  const v = validation ?? emptyValidation;
+
   return {
     status,
+    reason: reason || "",
     gate: "PS-002-C",
     contract: "FCR-008",
     auth: "supabase_real",
+    code_status,
     at: new Date().toISOString(),
     pipeline: [...pipeline],
     expected: [...PS002_CANONICAL_STEPS],
-    duplicates: [...(validation.duplicates ?? [])],
-    missing: [...(validation.missing ?? [])],
-    out_of_order: [...(validation.out_of_order ?? [])],
-    firstFailure: validation.firstFailure ?? null,
+    duplicates: [...(v.duplicates ?? [])],
+    missing: [...(v.missing ?? [])],
+    out_of_order: [...(v.out_of_order ?? [])],
+    firstFailure: v.firstFailure ?? null,
     duration_ms: {
       login_to_session: duration_ms?.login_to_session ?? null,
       session_to_bootstrap: duration_ms?.session_to_bootstrap ?? null,
       bootstrap_to_dashboard: duration_ms?.bootstrap_to_dashboard ?? null,
     },
     ...meta,
+  };
+}
+
+/** Exit codes: PASS=0 · FAIL=1 · BLOCKED=2 */
+export const PS002C_EXIT = Object.freeze({
+  PASS: 0,
+  FAIL: 1,
+  BLOCKED: 2,
+});
+
+/**
+ * External preconditions required before LOGIN may begin.
+ * Returns { ok: true } or { ok: false, reason }.
+ */
+export function checkPs002cPreconditions({
+  email,
+  password,
+  serverReachable,
+  serverError = "",
+}) {
+  const missing = [];
+  if (!email || !String(email).trim()) missing.push("PS002_EMAIL");
+  if (!password || !String(password).trim()) missing.push("PS002_PASSWORD");
+  if (missing.length) {
+    return {
+      ok: false,
+      reason: `${missing.join(" / ")} missing`,
+    };
+  }
+  if (serverReachable === false) {
+    return {
+      ok: false,
+      reason: serverError
+        ? `Dev server unavailable: ${serverError}`
+        : "Dev server unavailable",
+    };
+  }
+  return { ok: true, reason: "" };
+}
+
+/**
+ * Classify outcome after an attempted run.
+ * - BLOCKED only when pipeline never started (no LOGIN observed) due to env/infra
+ * - FAIL when pipeline started or validation broke mid-flight
+ * - PASS when contract satisfied and navigated
+ */
+export function classifyPs002cOutcome({
+  preconditionOk,
+  preconditionReason = "",
+  pipelineStarted,
+  validationOk,
+  navigated,
+  firstFailure = null,
+}) {
+  if (!preconditionOk) {
+    return {
+      status: "BLOCKED",
+      reason: preconditionReason || "External preconditions missing",
+      stop: null,
+    };
+  }
+  if (validationOk && navigated) {
+    return { status: "PASS", reason: "", stop: null };
+  }
+  if (!pipelineStarted) {
+    return {
+      status: "BLOCKED",
+      reason: preconditionReason || "Pipeline never started (environment)",
+      stop: null,
+    };
+  }
+  return {
+    status: "FAIL",
+    reason: firstFailure
+      ? `Pipeline stopped at ${firstFailure}`
+      : navigated
+        ? "Pipeline incomplete"
+        : "Pipeline incomplete or navigation missing",
+    stop: firstFailure ?? "LOGIN",
   };
 }
 
