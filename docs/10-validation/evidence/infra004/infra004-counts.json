@@ -1,0 +1,396 @@
+{
+  "A": {
+    "audit_log": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "companies": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "company_departments": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "company_employees": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "company_locations": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "customer_addresses": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "customer_allergies": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "customer_dish_favorites": {
+      "status": 404,
+      "count": null,
+      "err": "Could not find the table 'public.customer_dish_favorites' in the schema cache"
+    },
+    "customer_phones": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "customer_preferences": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "customers": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "delivery_groups": {
+      "status": 404,
+      "count": null,
+      "err": "Could not find the table 'public.delivery_groups' in the schema cache"
+    },
+    "dish_ingredients": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "dishes": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "employee_profiles": {
+      "status": 404,
+      "count": null,
+      "err": "Could not find the table 'public.employee_profiles' in the schema cache"
+    },
+    "feature_flags": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "financial_period_closures": {
+      "status": 404,
+      "count": null,
+      "err": "Could not find the table 'public.financial_period_closures' in the schema cache"
+    },
+    "identity_events": {
+      "status": 404,
+      "count": null,
+      "err": "Could not find the table 'public.identity_events' in the schema cache"
+    },
+    "ingredients": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "invoice_orders": {
+      "status": 404,
+      "count": null,
+      "err": "Could not find the table 'public.invoice_orders' in the schema cache"
+    },
+    "invoices": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "kitchen_production_batches": {
+      "status": 404,
+      "count": null,
+      "err": "Could not find the table 'public.kitchen_production_batches' in the schema cache"
+    },
+    "order_items": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "orders": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "payments": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "platform_owners": {
+      "status": 404,
+      "count": null,
+      "err": "Could not find the table 'public.platform_owners' in the schema cache"
+    },
+    "profiles": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "promotions": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "route_stops": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "routes": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "suppliers": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "support_notes": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "tenant_domains": {
+      "status": 401,
+      "count": null,
+      "err": "permission denied for function current_user_tenants"
+    },
+    "tenant_members": {
+      "status": 401,
+      "count": null,
+      "err": "permission denied for function is_saas_admin"
+    },
+    "tenants": {
+      "status": 401,
+      "count": null,
+      "err": "permission denied for function current_user_tenants"
+    },
+    "user_invitations": {
+      "status": 404,
+      "count": null,
+      "err": "Could not find the table 'public.user_invitations' in the schema cache"
+    },
+    "user_roles": {
+      "status": 401,
+      "count": null,
+      "err": "permission denied for function is_saas_admin"
+    },
+    "weekly_menu_slots": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "weekly_menus": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    }
+  },
+  "B": {
+    "audit_log": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "companies": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "company_departments": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "company_employees": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "company_locations": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "customer_addresses": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "customer_allergies": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "customer_dish_favorites": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "customer_phones": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "customer_preferences": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "customers": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "delivery_groups": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "dish_ingredients": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "dishes": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "employee_profiles": {
+      "status": 404,
+      "count": null,
+      "err": "Could not find the table 'public.employee_profiles' in the schema cache"
+    },
+    "feature_flags": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "financial_period_closures": {
+      "status": 404,
+      "count": null,
+      "err": "Could not find the table 'public.financial_period_closures' in the schema cache"
+    },
+    "identity_events": {
+      "status": 404,
+      "count": null,
+      "err": "Could not find the table 'public.identity_events' in the schema cache"
+    },
+    "ingredients": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "invoice_orders": {
+      "status": 404,
+      "count": null,
+      "err": "Could not find the table 'public.invoice_orders' in the schema cache"
+    },
+    "invoices": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "kitchen_production_batches": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "order_items": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "orders": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "payments": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "platform_owners": {
+      "status": 401,
+      "count": null,
+      "err": "permission denied for table platform_owners"
+    },
+    "profiles": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "promotions": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "route_stops": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "routes": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "suppliers": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "support_notes": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "tenant_domains": {
+      "status": 401,
+      "count": null,
+      "err": "permission denied for function current_user_tenants"
+    },
+    "tenant_members": {
+      "status": 401,
+      "count": null,
+      "err": "permission denied for function is_saas_admin"
+    },
+    "tenants": {
+      "status": 401,
+      "count": null,
+      "err": "permission denied for function current_user_tenants"
+    },
+    "user_invitations": {
+      "status": 404,
+      "count": null,
+      "err": "Could not find the table 'public.user_invitations' in the schema cache"
+    },
+    "user_roles": {
+      "status": 401,
+      "count": null,
+      "err": "permission denied for function is_saas_admin"
+    },
+    "weekly_menu_slots": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    },
+    "weekly_menus": {
+      "status": 200,
+      "count": 0,
+      "err": null
+    }
+  }
+}
