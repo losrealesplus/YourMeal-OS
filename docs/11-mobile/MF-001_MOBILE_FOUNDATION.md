@@ -2,7 +2,7 @@
 
 **Documento:** `MF-001_MOBILE_FOUNDATION.md`  
 **Fecha:** 2026-07-30  
-**Estado:** Proposed · **implementación congelada** hasta aprobación  
+**Estado:** Proposed · **aprobación conceptual** (arquitectura) · **freeze de implementación** hasta aprobación formal de MF-001  
 **Categoría PR:** Documentation (paquete de trabajo; sin código Capacitor aún)  
 **ADR:** [0032 Native Mobile Strategy](../adr/0032-native-mobile-strategy.md) · [0033 Platform Independence](../adr/0033-platform-independence.md)  
 **Evidencia / plan:** [NATIVE_MOBILE_INVESTIGATION](./NATIVE_MOBILE_INVESTIGATION.md) · [NATIVE_MOBILE_PLAN](./NATIVE_MOBILE_PLAN.md)
@@ -181,7 +181,19 @@ StorageProvider
 
 ### M-05 · DeviceCapabilities
 
-No modelar un servicio por plugin. Modelar un **catálogo de capacidades de dispositivo** (ports), con adapters por plataforma.
+No modelar un servicio por plugin. Modelar un **catálogo de capacidades** con negociación de estado ([ADR 0033 · Capability Negotiation](../adr/0033-platform-independence.md)).
+
+```text
+Domain
+      ↓
+Capability Contract
+      ↓
+Capability Registry
+      ↓
+Platform Adapter
+```
+
+Catálogo (extensible):
 
 ```text
 DeviceCapabilities
@@ -195,19 +207,33 @@ DeviceCapabilities
 ├── Contacts
 ├── Network
 ├── Sensors
-└── DeepLinks   (navegación / app links)
+└── DeepLinks
+```
+
+El dominio **nunca** pregunta la plataforma; pregunta el contrato:
+
+```ts
+if (capabilities.biometrics.isAvailable()) { ... }
+if (capabilities.camera.canCaptureImages()) { ... }
+```
+
+Estados negociables (ejemplos — contrato M-05):
+
+```text
+Camera      supported | unavailable | permissionDenied
+Location    supported | disabled | denied
+Biometrics  faceID | touchID | fingerprint | unsupported
+Network     online | offline | constrained
 ```
 
 | Regla | |
 |-------|--|
-| Dominio | Pregunta “¿hay Camera?” / usa el puerto — **nunca** `@capacitor/*` |
-| Web | Stubs / degradación / permisos browser donde existan |
-| Native | Adapter Capacitor (u otro runtime futuro) |
-| Escalabilidad | Añadir una capability = nuevo puerto + adapter, no un Service ad hoc en el dominio |
+| Dominio | Solo Capability Contract |
+| Registry | Resuelve adapter activo + cachea negotiation |
+| Web / Native | Adapters; degradación explícita por estado |
+| Prohibido | `getPlatform()`, `isAndroid`, imports `@capacitor/*` en dominio |
 
-Esto permite mañana Capacitor · Tauri · Electron · (incluso RN/Flutter como shell) sin tocar el OM ([ADR 0033](../adr/0033-platform-independence.md)).
-
-**DoD M-05:** interfaz `DeviceCapabilities` + stubs web · capabilities mínimas documentadas (Camera · Location · Notifications · Network · FileSystem) · resto deferred.
+**DoD M-05:** Contract + Registry + stubs web · capabilities mínimas (Camera · Location · Notifications · Network · FileSystem) con estados negociables documentados · resto deferred.
 
 ---
 
@@ -275,7 +301,16 @@ No adelantar a **PS-002-C** ni abrir **FLOW-01** “porque móvil”.
 - Offline cliente / admin  
 - Publicación App Store / Play (posterior)  
 - Reinterpretar o reabrir **PS-003 Navigation**  
-- FON-AI sync local (solo se reserva el puerto de reutilización de M-06)
+- FON-AI sync local (solo se reserva reutilización de M-06)  
+- **Background Execution** → paquete futuro [MF-002](./MF-002_BACKGROUND_EXECUTION.md) (registrado · no abrir ahora)
+
+---
+
+## Evolución registrada (no ahora)
+
+| ID | Tema | Estado |
+|----|------|--------|
+| [MF-002](./MF-002_BACKGROUND_EXECUTION.md) | Sync/retries/push en background | Deferred |
 
 ---
 
