@@ -52,6 +52,15 @@
 
 ---
 
+## Post-merge · bootstrap FOPEBA
+
+Tras merge de #111, el empty-DB reset fallaba porque las mirrors Lovable
+`20260729184828_*` / `20260729184916_*` re-creaban enums/tablas ya aplicadas por
+`20260729100000_*` / `20260729120000_*`. Fix: `CREATE TYPE` con
+`EXCEPTION WHEN duplicate_object` + `CREATE TABLE IF NOT EXISTS`.
+
+---
+
 ## Fuera de alcance
 
 Usuarios · Auth · OAuth · SMTP · Environment Variables · conexión Lovable

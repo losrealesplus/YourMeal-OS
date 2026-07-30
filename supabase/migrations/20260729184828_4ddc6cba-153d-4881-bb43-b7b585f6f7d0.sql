@@ -1,7 +1,25 @@
-CREATE TYPE public.membership_status AS ENUM ('pending','approved','rejected','suspended','revoked');
-CREATE TYPE public.membership_type AS ENUM ('customer','employee','supplier','company','company_employee');
-CREATE TYPE public.invitation_status AS ENUM ('pending','accepted','expired','revoked');
-CREATE TYPE public.provisioning_channel AS ENUM ('self_registration','invitation','provisioning');
+-- Lovable mirror of identity membership lifecycle.
+-- Idempotent: earlier curated migration 20260729100000 may already own these objects.
+
+DO $$ BEGIN
+  CREATE TYPE public.membership_status AS ENUM ('pending','approved','rejected','suspended','revoked');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE public.membership_type AS ENUM ('customer','employee','supplier','company','company_employee');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE public.invitation_status AS ENUM ('pending','accepted','expired','revoked');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE public.provisioning_channel AS ENUM ('self_registration','invitation','provisioning');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 ALTER TABLE public.profiles
   ADD COLUMN IF NOT EXISTS first_name text,
@@ -47,7 +65,7 @@ RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS
   ) OR public.is_saas_admin(auth.uid())
 $$;
 
-CREATE TABLE public.user_invitations (
+CREATE TABLE IF NOT EXISTS public.user_invitations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id uuid NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   email text NOT NULL,
@@ -80,7 +98,7 @@ CREATE POLICY user_invitations_admin_read ON public.user_invitations FOR SELECT
     OR public.has_role(auth.uid(), tenant_id, 'operations_manager')
   );
 
-CREATE TABLE public.employee_profiles (
+CREATE TABLE IF NOT EXISTS public.employee_profiles (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id uuid NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
   user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
