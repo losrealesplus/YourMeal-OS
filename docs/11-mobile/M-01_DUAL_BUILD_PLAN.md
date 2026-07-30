@@ -260,6 +260,6 @@ npm run build:mobile  # SPA shell · .output/public/index.html
 | M-01.1…M-01.6 definidos | ✅ |
 | `build:mobile` → `.output/public/index.html` | ✅ |
 | `npm run build` SSR intacto | ✅ |
-| Capacitor sync (M-01.3+) | ⏸ siguiente |
+| Capacitor sync (M-01.3+) | ✅ `sync:mobile` · android/ios scaffold |
 
-**Siguiente:** M-01.3 `capacitor.config` + `cap sync` con `webDir` → `.output/public`.
+**Hecho:** M-01.3–M-01.5 scaffold. **Siguiente:** M-01.6 CI · M-04/M-05 ports · builds store en máquina operador.
