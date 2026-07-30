@@ -20,6 +20,8 @@ Un solo código · sin React Native
 |-----------|-----|
 | [MF-001 · Mobile Foundation](./MF-001_MOBILE_FOUNDATION.md) | Paquete M-01…M-06 · **no es PS-003** · freeze hasta aprobación |
 | [M-01 Dual Build Plan](./M-01_DUAL_BUILD_PLAN.md) | Evidence + Design · Web SSR ≠ Mobile SPA · M-01.1…M-01.6 |
+| [M-01 Capacitor Audit](./M-01_CAPACITOR_AUDIT.md) | Auditoría pre-scaffold + checklist M-01.3…M-01.5 |
+| [Capacitor Workflow](./CAPACITOR_WORKFLOW.md) | `sync:mobile` · android/ios · convenciones Lovable |
 | [MF-002 · Background Execution](./MF-002_BACKGROUND_EXECUTION.md) | Evolución futura · **Deferred** (fuera de MF-001) |
 | [NATIVE_MOBILE_INVESTIGATION](./NATIVE_MOBILE_INVESTIGATION.md) | Evidencia TanStack Start · Nitro · Cloudflare · Capacitor |
 | [NATIVE_MOBILE_PLAN](./NATIVE_MOBILE_PLAN.md) | Plan técnico + lista de cambios · **pendiente aprobación** |

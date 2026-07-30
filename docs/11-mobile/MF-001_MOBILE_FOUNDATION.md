@@ -2,8 +2,8 @@
 
 **Documento:** `MF-001_MOBILE_FOUNDATION.md`  
 **Fecha:** 2026-07-30  
-**Estado:** Proposed · **aprobación conceptual** (arquitectura) · **freeze de implementación** hasta aprobación formal de MF-001  
-**Categoría PR:** Documentation (paquete de trabajo; sin código Capacitor aún)  
+**Estado:** Proposed · **M-01.1…M-01.5 scaffold en curso** (build + Capacitor 8) · M-03…M-06 / plugins aún diferidos  
+**Categoría PR:** Platform mobile foundation (sin cambios de negocio)  
 **ADR:** [0032 Native Mobile Strategy](../adr/0032-native-mobile-strategy.md) · [0033 Platform Independence](../adr/0033-platform-independence.md)  
 **Evidencia / plan:** [NATIVE_MOBILE_INVESTIGATION](./NATIVE_MOBILE_INVESTIGATION.md) · [NATIVE_MOBILE_PLAN](./NATIVE_MOBILE_PLAN.md) · [M-01 Dual Build](./M-01_DUAL_BUILD_PLAN.md)
 
@@ -105,7 +105,8 @@ M-01 Mobile Infrastructure
 
 **DoD M-01:** dual pipeline documentado + `build:mobile` produce shell; `cap sync` carga WebView; `npm run build` web intacto.
 
-**Freeze:** no editar `vite.config.ts` / no `cap sync` hasta aprobación formal MF-001.
+**Hecho (2026-07-30):** `capacitor.config.ts` · Capacitor 8 · `android/` · `ios/` · `npm run sync:mobile` PASS.  
+Ver [CAPACITOR_WORKFLOW](./CAPACITOR_WORKFLOW.md). Plugins nativos / offline siguen diferidos (M-05 / M-03 / M-06).
 
 ---
 

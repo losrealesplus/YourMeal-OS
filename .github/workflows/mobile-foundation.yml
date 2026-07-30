@@ -1,0 +1,99 @@
+name: Mobile Foundation Validation
+
+# FOPEBA · MF-001 / M-01 gate
+# Ensures Dual Build + Capacitor Hybrid Shell stay reproducible:
+#   - npm run build        → SSR (no SPA index.html required)
+#   - npm run sync:mobile  → SPA shell + cap sync (.output/public)
+#
+# Docs: docs/11-mobile/CAPACITOR_WORKFLOW.md · M-01_CAPACITOR_AUDIT.md
+
+on:
+  pull_request:
+    paths:
+      - "vite.config.ts"
+      - "capacitor.config.ts"
+      - "package.json"
+      - "package-lock.json"
+      - "src/**"
+      - "android/**"
+      - "ios/**"
+      - "scripts/verify-mobile-shell.mjs"
+      - ".github/workflows/mobile-foundation.yml"
+      - "docs/11-mobile/**"
+  push:
+    branches: [main]
+    paths:
+      - "vite.config.ts"
+      - "capacitor.config.ts"
+      - "package.json"
+      - "package-lock.json"
+      - "src/**"
+      - "android/**"
+      - "ios/**"
+      - "scripts/verify-mobile-shell.mjs"
+      - ".github/workflows/mobile-foundation.yml"
+
+concurrency:
+  group: mobile-foundation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web-ssr:
+    name: Web SSR build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Build SSR (must not require Capacitor webDir)
+        run: npm run build
+
+      - name: Assert SSR output has Nitro server entry
+        run: test -f .output/server/index.mjs
+
+  mobile-sync:
+    name: Mobile sync · SPA shell + cap sync
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Capacitor packages are declared (not extraneous)
+        run: |
+          out="$(npm ls @capacitor/core @capacitor/cli @capacitor/android @capacitor/ios)"
+          echo "$out"
+          if echo "$out" | grep -qi extraneous; then
+            echo "FAIL: Capacitor package marked extraneous"
+            exit 1
+          fi
+
+      - name: Clean output then sync:mobile
+        run: |
+          rm -rf .output dist
+          npm run sync:mobile
+
+      - name: Verify .output/public/{index.html,assets/}
+        run: npm run test:mobile-shell
+
+      - name: Assert capacitor.config has no server.url
+        run: |
+          # Only fail on an actual `server:` config key (ignore comments that mention it).
+          if grep -E '^\s*server\s*:' capacitor.config.ts; then
+            echo "FAIL: server.url / server block must not be set (ADR-0032)"
+            exit 1
+          fi
+          grep -q 'webDir: ".output/public"' capacitor.config.ts

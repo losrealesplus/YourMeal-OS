@@ -8,6 +8,11 @@
     "build": "vite build",
     "build:web": "vite build",
     "build:mobile": "CAPACITOR_BUILD=1 vite build",
+    "sync:mobile": "npm run build:mobile && npx cap sync",
+    "test:mobile-shell": "node scripts/verify-mobile-shell.mjs",
+    "cap:sync": "npx cap sync",
+    "cap:open:android": "npx cap open android",
+    "cap:open:ios": "npx cap open ios",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
@@ -28,6 +33,10 @@
     "gen:types": "supabase gen types typescript --project-id djangucecsphnejplvic --schema public > src/integrations/supabase/types.ts"
   },
   "dependencies": {
+    "@capacitor/android": "^8.4.2",
+    "@capacitor/cli": "^8.4.2",
+    "@capacitor/core": "^8.4.2",
+    "@capacitor/ios": "^8.4.2",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
