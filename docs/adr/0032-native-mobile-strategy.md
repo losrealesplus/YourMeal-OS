@@ -4,7 +4,9 @@
 
 **Accepted** — 2026-07-30  
 **Implementación:** **congelada** hasta aprobación del plan técnico  
-**Evidencia:** [NATIVE_MOBILE_INVESTIGATION](../11-mobile/NATIVE_MOBILE_INVESTIGATION.md) · [NATIVE_MOBILE_PLAN](../11-mobile/NATIVE_MOBILE_PLAN.md)
+**Evidencia:** [NATIVE_MOBILE_INVESTIGATION](../11-mobile/NATIVE_MOBILE_INVESTIGATION.md) · [NATIVE_MOBILE_PLAN](../11-mobile/NATIVE_MOBILE_PLAN.md)  
+**Paquete de trabajo:** [MF-001 · Mobile Foundation](../11-mobile/MF-001_MOBILE_FOUNDATION.md) (M-01…M-06)  
+**Principio derivado:** [ADR 0033 — Platform Independence](./0033-platform-independence.md)
 
 ## Principio canónico
 
@@ -131,17 +133,22 @@ Stack offline previsto (implementación futura, no ahora):
 | [0008](./0008-ai-offline-ready.md) | Intención offline; 0032 acota módulos y empaquetado |
 | [0013](./0013-implementation-is-knowledge-materialization.md) | Móvil materializa el mismo OM |
 | [0014](./0014-customer-application-is-tenant-branded.md) | Branding tenant también en shell nativo |
+| [0033](./0033-platform-independence.md) | Dominio agnóstico · ports/adapters |
 
 ## Criterio de apertura de implementación
 
 Implementación Capacitor solo cuando:
 
 1. Esta ADR permanece Accepted.
-2. El plan [NATIVE_MOBILE_PLAN](../11-mobile/NATIVE_MOBILE_PLAN.md) está **aprobado** explícitamente.
-3. El gate de producto vigente (hoy: PS-002-C → FLOW-01) no se salta por “móvil primero”.
+2. [ADR 0033](./0033-platform-independence.md) permanece Accepted.
+3. [MF-001](../11-mobile/MF-001_MOBILE_FOUNDATION.md) + [NATIVE_MOBILE_PLAN](../11-mobile/NATIVE_MOBILE_PLAN.md) están **aprobados** explícitamente.
+4. El gate de producto vigente (hoy: PS-002-C → FLOW-01) no se salta por “móvil primero”.
+
+> **PS-003** = Navigation Stability (Platform Stabilization). No es este trabajo móvil.
 
 ## Referencias
 
 - Investigación: [NATIVE_MOBILE_INVESTIGATION](../11-mobile/NATIVE_MOBILE_INVESTIGATION.md)
 - Plan + lista de cambios: [NATIVE_MOBILE_PLAN](../11-mobile/NATIVE_MOBILE_PLAN.md)
+- Paquete MF-001: [MF-001_MOBILE_FOUNDATION](../11-mobile/MF-001_MOBILE_FOUNDATION.md)
 - Mobile index: [docs/11-mobile](../11-mobile/README.md)
