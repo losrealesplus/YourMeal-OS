@@ -46,7 +46,8 @@
 | Push · Camera · Files · Biometrics · Deep Links | M-05 DeviceCapabilities (ports + adapters) |
 | Offline Queue · Sync Engine | M-03 / M-06 |
 | Iconos / splash por tenant | Branding Tenant-Managed + assets store |
-| CI Play / App Store | M-01.6 |
+| CI shell + sync gate | ✅ `.github/workflows/mobile-foundation.yml` (M-01.6 parcial) |
+| CI Play / App Store binaries | M-01.6 (operador / macOS) |
 | Background execution | MF-002 |
 
 Instalar todos los plugins nativos “por si acaso” **ahora** aumentaría superficie y acoplamiento sin contrato DeviceCapabilities.

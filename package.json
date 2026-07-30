@@ -9,6 +9,7 @@
     "build:web": "vite build",
     "build:mobile": "CAPACITOR_BUILD=1 vite build",
     "sync:mobile": "npm run build:mobile && npx cap sync",
+    "test:mobile-shell": "node scripts/verify-mobile-shell.mjs",
     "cap:sync": "npx cap sync",
     "cap:open:android": "npx cap open android",
     "cap:open:ios": "npx cap open ios",

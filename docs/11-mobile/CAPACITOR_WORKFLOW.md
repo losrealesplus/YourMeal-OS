@@ -60,6 +60,31 @@ Los assets en `android/.../public` e `ios/.../public` están **gitignored**; sie
 
 ---
 
+## Pre-merge checklist (2026-07-30)
+
+| Check | Resultado |
+|-------|-----------|
+| `npm ls @capacitor/core @capacitor/cli` · sin `extraneous` | ✅ PASS |
+| `capacitor.config.ts` · appId / webDir · sin `server.url` | ✅ PASS |
+| `rm -rf .output && npm install && npm run sync:mobile` | ✅ PASS |
+| CI `Mobile Foundation Validation` | ✅ workflow añadido |
+
+## CI
+
+Workflow: `.github/workflows/mobile-foundation.yml`
+
+```bash
+npm ci
+npm run build              # job web-ssr
+npm run sync:mobile        # job mobile-sync (+ test:mobile-shell)
+```
+
+Local:
+
+```bash
+npm run sync:mobile && npm run test:mobile-shell
+```
+
 ## Verificado 2026-07-30
 
 - `npm run build:mobile` → `.output/public/{index.html,assets/}`
