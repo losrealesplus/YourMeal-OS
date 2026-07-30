@@ -5,7 +5,7 @@
 **Estado:** Proposed · **aprobación conceptual** (arquitectura) · **freeze de implementación** hasta aprobación formal de MF-001  
 **Categoría PR:** Documentation (paquete de trabajo; sin código Capacitor aún)  
 **ADR:** [0032 Native Mobile Strategy](../adr/0032-native-mobile-strategy.md) · [0033 Platform Independence](../adr/0033-platform-independence.md)  
-**Evidencia / plan:** [NATIVE_MOBILE_INVESTIGATION](./NATIVE_MOBILE_INVESTIGATION.md) · [NATIVE_MOBILE_PLAN](./NATIVE_MOBILE_PLAN.md)
+**Evidencia / plan:** [NATIVE_MOBILE_INVESTIGATION](./NATIVE_MOBILE_INVESTIGATION.md) · [NATIVE_MOBILE_PLAN](./NATIVE_MOBILE_PLAN.md) · [M-01 Dual Build](./M-01_DUAL_BUILD_PLAN.md)
 
 ---
 
@@ -74,45 +74,70 @@ Cloudflare / Nitro
 
 Crear la infraestructura del contenedor nativo **sin** alterar el SSR web.
 
-| Entregable | Notas |
-|------------|-------|
-| Árbol `/mobile` (o convención equivalente documentada) | Config + scripts; no segundo frontend |
-| `capacitor.config.ts` | `webDir` → client bundle · **sin** `server.url` en prod |
-| Proyectos `ios/` · `android/` | Gobernados · fuera del alcance Lovable UI |
-| App IDs / bundle IDs | Por tenant distribution más adelante; spike con EatClean |
+Detalle de ingeniería (Evidence + Design): **[M-01 Dual Build Plan](./M-01_DUAL_BUILD_PLAN.md)**.
 
-**DoD M-01:** `cap sync` documentado; WebView carga shell local; web SSR intacto.
+```text
+M-01 Mobile Infrastructure
+├── M-01.1  Web Build (SSR)
+├── M-01.2  Mobile Build (SPA Shell)
+├── M-01.3  Capacitor Sync
+├── M-01.4  Android
+├── M-01.5  iOS
+└── M-01.6  CI/CD
+```
+
+| Subtarea | Entregable | Notas |
+|----------|------------|-------|
+| **M-01.1** | Pipeline web | `npm run build` / `build:web` · SSR Cloudflare · **sin** spa |
+| **M-01.2** | Pipeline móvil | `build:mobile` · `tanstackStart.spa.enabled` solo con env · shell HTML verificable |
+| **M-01.3** | Capacitor sync | Solo **después** de HTML de entrada (no `webDir` al azar) |
+| **M-01.4** | Android | `cap open android` / artifact CI |
+| **M-01.5** | iOS | `cap open ios` / artifact CI |
+| **M-01.6** | CI/CD | Jobs separados web ≠ mobile |
+
+| Entregable transversal | Notas |
+|------------------------|-------|
+| Árbol `/mobile` (o convención) | Config + scripts; no segundo frontend |
+| `capacitor.config.ts` | `webDir` → shell móvil · **sin** `server.url` en prod |
+| App IDs | Spike EatClean; multi-tenant más adelante |
+
+**Evidencia clave (ya confirmada):** el build SSR actual **no** emite `index.html`; Capacitor no puede sincronizar esa salida. El fallo es de artefacto, no de Android.
+
+**DoD M-01:** dual pipeline documentado + `build:mobile` produce shell; `cap sync` carga WebView; `npm run build` web intacto.
+
+**Freeze:** no editar `vite.config.ts` / no `cap sync` hasta aprobación formal MF-001.
 
 ---
 
 ### M-02 · Proceso de build
 
-Separar artefactos sin tocar el flujo SSR existente.
+Separar artefactos sin tocar el flujo SSR existente.  
+Contrato detallado: [M-01 Dual Build Plan](./M-01_DUAL_BUILD_PLAN.md) (M-01.1 / M-01.2).
 
-Hoy (conceptual):
+Hoy (confirmado 2026-07-30):
 
 ```text
 npm run build
         ↓
-.output/public   (o dist/client)
-.output/server   (Nitro / Cloudflare)
+.output/public     ← assets · sin index.html
+.output/server     ← Nitro / Cloudflare SSR
 ```
 
 Objetivo:
 
 ```text
-build:web      → SSR + worker (igual que hoy)
-build:mobile   → client shell para Capacitor
-sync:mobile    → cap copy / sync
+build:web      → SSR + worker (igual que hoy · M-01.1)
+build:mobile   → SPA Shell TanStack (M-01.2)
+sync:mobile    → cap copy / sync (M-01.3)
 ```
 
 | Regla | |
 |-------|--|
 | `build:web` | No se rompe · Lovable / Cloudflare |
-| `build:mobile` | Segundo artefacto del **mismo** código |
-| Prohibido | Convertir el producto entero en SPA |
+| `build:mobile` | Segundo artefacto del **mismo** código · spa solo con env |
+| Prohibido | Convertir el producto entero en SPA · HTML manual · mezclar pipelines |
 
-**DoD M-02:** CI o script local produce ambos artefactos; documentado en README mobile.
+**DoD M-02:** scripts estables; CI o script local produce ambos artefactos; documentado en README mobile.
 
 ---
 

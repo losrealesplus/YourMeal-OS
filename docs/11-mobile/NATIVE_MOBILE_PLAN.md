@@ -20,7 +20,7 @@ Integrar Capacitor como **contenedor nativo** de la app TanStack Start existente
 
 | Tarea MF-001 | Fase técnica | Resumen |
 |--------------|--------------|---------|
-| **M-01** | Fase 1 | `/mobile` · Capacitor · iOS/Android |
+| **M-01** | Fase 1 | Infra + **dual build** ([M-01 Dual Build](./M-01_DUAL_BUILD_PLAN.md): M-01.1…M-01.6) |
 | **M-02** | Fase 1–2 / Release prep | `build:web` · `build:mobile` · `sync:mobile` |
 | **M-03** | Fase 3 | Offline Engine / Queue (estados · retries · audit) |
 | **M-04** | Pre-Fase 3 | `StorageProvider` (no localStorage/IDB/SQLite directos) |
@@ -44,13 +44,16 @@ Orden preferido: **M-01 → M-02 → M-04 → M-05 → M-03 → M-06** (adapters
 
 ### Fase 1 — Spike controlado (M-01 · M-02)
 
-1. Añadir Capacitor en rama dedicada (`cursor/…-capacitor-spike-f54a`).
-2. Configurar `webDir` → salida **client** del build Start (no todo `dist` server).
-3. Scripts `build:web` / `build:mobile` / `sync:mobile` sin romper SSR.
-4. Verificar `npx cap sync` + WebView carga shell.
-5. Probar detección nativa **solo** en adapters + base URL absoluta a preview Cloudflare.
-6. Documentar CORS origins necesarios.
-7. **No** merge a main sin DoD del spike.
+Detalle: [M-01 Dual Build Plan](./M-01_DUAL_BUILD_PLAN.md).
+
+1. Rama dedicada `cursor/mobile-build-m01-f54a` (solo tras aprobación formal MF-001).
+2. **M-01.1** — preservar `build` / `build:web` SSR sin `spa`.
+3. **M-01.2** — `build:mobile` con `CAPACITOR_BUILD=1` → `tanstackStart.spa.enabled` (passthrough Lovable confirmado).
+4. Verificar HTML de entrada (default TanStack `_shell.html` vs `index.html` Capacitor — resolver en spike).
+5. **M-01.3** — `npx cap sync` solo si paso 4 PASS.
+6. **M-01.4 / M-01.5** — open android/ios.
+7. Documentar CORS / API base URL nativa.
+8. **No** merge a main sin DoD del spike.
 
 ### Fase 2 — Contrato de red nativa (sigue M-02)
 
@@ -126,14 +129,14 @@ La app **no** se reescribe como SPA. El shell nativo es un **segundo artefacto**
 
 ### Repo / tooling (M-01 · M-02)
 
-| Cambio | Tipo |
-|--------|------|
-| Árbol `/mobile` + deps `@capacitor/core` `cli` `ios` `android` | add |
-| `capacitor.config.ts` (`appId`, `webDir`, sin `server.url` prod) | add |
-| Scripts `build:web`, `build:mobile`, `sync:mobile`, `cap:open:*` | package.json |
-| `.gitignore` ajustes `android/` `ios/` locales si aplica | config |
-| CI job native shell smoke (opcional spike) | ci |
-| Convención Lovable: no editar proyectos nativos en Lovable | docs |
+| Cambio | Tipo | Subtarea |
+|--------|------|----------|
+| Env gate `CAPACITOR_BUILD` + `tanstackStart.spa` (solo móvil) | config | M-01.2 |
+| Scripts `build:web`, `build:mobile`, `sync:mobile` | package.json | M-01.1/2/3 |
+| Árbol `/mobile` + deps Capacitor | add | M-01.3+ |
+| `capacitor.config.ts` (`webDir`, sin `server.url` prod) | add | M-01.3 |
+| CI jobs web ≠ mobile | ci | M-01.6 |
+| Convención Lovable: no editar `ios/` `android/` en Lovable | docs | M-01 |
 
 ### Aplicación (después de spike · M-03…M-06)
 

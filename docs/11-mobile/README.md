@@ -19,6 +19,7 @@ Un solo código · sin React Native
 | Artefacto | Rol |
 |-----------|-----|
 | [MF-001 · Mobile Foundation](./MF-001_MOBILE_FOUNDATION.md) | Paquete M-01…M-06 · **no es PS-003** · freeze hasta aprobación |
+| [M-01 Dual Build Plan](./M-01_DUAL_BUILD_PLAN.md) | Evidence + Design · Web SSR ≠ Mobile SPA · M-01.1…M-01.6 |
 | [MF-002 · Background Execution](./MF-002_BACKGROUND_EXECUTION.md) | Evolución futura · **Deferred** (fuera de MF-001) |
 | [NATIVE_MOBILE_INVESTIGATION](./NATIVE_MOBILE_INVESTIGATION.md) | Evidencia TanStack Start · Nitro · Cloudflare · Capacitor |
 | [NATIVE_MOBILE_PLAN](./NATIVE_MOBILE_PLAN.md) | Plan técnico + lista de cambios · **pendiente aprobación** |

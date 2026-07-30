@@ -143,9 +143,11 @@ Cliente y Admin: **sin** outbox; fail-closed si no hay red.
 |----------|-----------|
 | ¿TanStack Start + Nitro + Cloudflare pueden convivir con Capacitor? | **Sí**, vía Hybrid Shell + API/SSR remoto |
 | ¿`server.url` es la estrategia de producción? | **No** (evidencia oficial Capacitor) |
-| ¿Hay que convertir el proyecto en SPA? | **No** |
+| ¿Hay que convertir el proyecto en SPA? | **No** — solo el **pipeline móvil** (SPA Mode) |
+| ¿El build SSR actual sirve a Capacitor? | **No** — no emite `index.html` (verificado 2026-07-30) |
+| ¿Lovable permite `spa.enabled`? | **Sí** — vía `tanstackStart: { spa: {…} }` (paquete 2.7.7) |
 | ¿React Native? | **No** |
 | ¿Offline global? | **No** — modular operativo |
-| ¿Código ahora? | **No** — ADR + plan primero |
+| ¿Código ahora? | **No** — ADR + plan + [M-01 Dual Build](./M-01_DUAL_BUILD_PLAN.md) primero |
 
-**Siguiente artefacto:** [NATIVE_MOBILE_PLAN](./NATIVE_MOBILE_PLAN.md) (aprobación humana antes de implementar).
+**Siguiente artefacto:** [NATIVE_MOBILE_PLAN](./NATIVE_MOBILE_PLAN.md) · [M-01_DUAL_BUILD_PLAN](./M-01_DUAL_BUILD_PLAN.md) (aprobación humana antes de implementar).
