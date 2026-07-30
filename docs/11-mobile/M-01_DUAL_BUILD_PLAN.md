@@ -2,7 +2,7 @@
 
 **Documento:** `M-01_DUAL_BUILD_PLAN.md`  
 **Fecha:** 2026-07-30  
-**Estado:** Evidence + Design · **código congelado** hasta aprobación formal MF-001  
+**Estado:** Evidence + Design · **M-01.1 / M-01.2 implementados** (`build` / `build:mobile`) · Capacitor sync aún pendiente  
 **Paquete:** [MF-001](./MF-001_MOBILE_FOUNDATION.md)  
 **ADR:** [0032](../adr/0032-native-mobile-strategy.md) · [0033](../adr/0033-platform-independence.md)  
 **Enfoque:** como un equipo de ingeniería antes de poner una app en producción — no “hacer que funcione”.
@@ -226,42 +226,26 @@ Relación con el orden MF-001 global: M-01 (este plan) → M-02 scripts estabili
 
 ---
 
-## 8. Configuración prevista (borrador · no aplicada)
+## 8. Configuración aplicada (M-01.2)
 
-```ts
-// vite.config.ts — BORRADOR; no merge hasta MF-001 Approved
-import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+Implementado en `vite.config.ts` + scripts `build:web` / `build:mobile`.
 
-const mobileSpa = process.env.CAPACITOR_BUILD === "1";
+| Detalle | Valor |
+|---------|-------|
+| Gate | `CAPACITOR_BUILD=1` |
+| SPA | `tanstackStart.spa.enabled: true` |
+| Shell file | `prerender.outputPath: "/index"` → `.output/public/index.html` |
+| Client outDir (móvil) | `.output/public` |
+| Nitro (móvil) | **`false`** — el preview de prerender SPA requiere `dist/server/server.js`; Nitro emite `.output/server/index.mjs` y rompe el shell |
+| Nitro (web) | Intacta (Cloudflare) |
 
-export default defineConfig({
-  tanstackStart: {
-    server: { entry: "server" },
-    ...(mobileSpa
-      ? {
-          spa: {
-            enabled: true,
-            // Definir outputPath / post-step en spike M-01.2
-          },
-        }
-      : {}),
-  },
-});
+```bash
+npm run build         # SSR · sin index.html
+npm run build:web     # alias SSR
+npm run build:mobile  # SPA shell · .output/public/index.html
 ```
 
-```json
-// package.json — BORRADOR
-{
-  "scripts": {
-    "build": "vite build",
-    "build:web": "vite build",
-    "build:mobile": "CAPACITOR_BUILD=1 vite build",
-    "sync:mobile": "…"
-  }
-}
-```
-
-**Último paso de validación (hecho en este documento):** inspección del paquete Lovable confirma el passthrough por `tanstackStart` → listo para editar `vite.config.ts` **cuando** se apruebe MF-001, sin depender de suposiciones.
+**Verificado 2026-07-30:** `build:mobile` PASS · `build` SSR PASS (sin `index.html`).
 
 ---
 
@@ -274,6 +258,8 @@ export default defineConfig({
 | Build actual sin `index.html` verificado | ✅ |
 | Pipelines Web/Mobile diseñados | ✅ |
 | M-01.1…M-01.6 definidos | ✅ |
-| Código / Capacitor sync | ⏸ freeze |
+| `build:mobile` → `.output/public/index.html` | ✅ |
+| `npm run build` SSR intacto | ✅ |
+| Capacitor sync (M-01.3+) | ⏸ siguiente |
 
-**Siguiente acción humana:** aprobación formal MF-001 → abrir rama `cursor/mobile-build-m01-f54a` e implementar M-01.1–M-01.2 primero.
+**Siguiente:** M-01.3 `capacitor.config` + `cap sync` con `webDir` → `.output/public`.
