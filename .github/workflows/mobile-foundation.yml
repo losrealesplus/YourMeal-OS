@@ -91,8 +91,9 @@ jobs:
 
       - name: Assert capacitor.config has no server.url
         run: |
-          if grep -q 'server\.url\|server:\s*{' capacitor.config.ts; then
-            echo "FAIL: server.url must not be set in production Capacitor config (ADR-0032)"
+          # Only fail on an actual `server:` config key (ignore comments that mention it).
+          if grep -E '^\s*server\s*:' capacitor.config.ts; then
+            echo "FAIL: server.url / server block must not be set (ADR-0032)"
             exit 1
           fi
           grep -q 'webDir: ".output/public"' capacitor.config.ts
