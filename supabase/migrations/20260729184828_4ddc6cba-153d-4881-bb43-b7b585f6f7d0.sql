@@ -72,6 +72,7 @@ GRANT SELECT ON public.user_invitations TO authenticated;
 GRANT ALL ON public.user_invitations TO service_role;
 ALTER TABLE public.user_invitations ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS user_invitations_admin_read ON public.user_invitations;
 CREATE POLICY user_invitations_admin_read ON public.user_invitations FOR SELECT
   USING (
     public.is_saas_admin(auth.uid())
@@ -97,6 +98,7 @@ GRANT SELECT ON public.employee_profiles TO authenticated;
 GRANT ALL ON public.employee_profiles TO service_role;
 ALTER TABLE public.employee_profiles ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS employee_profiles_self_or_admin_read ON public.employee_profiles;
 CREATE POLICY employee_profiles_self_or_admin_read ON public.employee_profiles FOR SELECT
   USING (
     user_id = auth.uid()

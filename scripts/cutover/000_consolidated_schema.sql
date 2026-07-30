@@ -591,14 +591,8 @@ CREATE POLICY sn_all ON public.support_notes FOR ALL TO authenticated
   WITH CHECK (public.has_any_staff_role(auth.uid(), tenant_id));
 
 -- ============ SEED: EATCLEAN TENERIFE ============
-INSERT INTO public.tenants (slug, name, brand, locale_default, status)
-VALUES (
-  'eatclean-tenerife',
-  'EatClean Tenerife',
-  jsonb_build_object('primary','#059669','logo_text','EatClean Tenerife','country','ES'),
-  'es',
-  'active'
-) ON CONFLICT (slug) DO NOTHING;
+-- Canonical minimal seed lives in scripts/cutover/010_seed_eatclean.sql
+-- (fixed UUIDs). Do not insert a second tenant here — avoids slug/id drift.
 
 -- ---------------------------------------------------------------------
 -- MIGRATION: 20260720164327_63fdc61e-1100-4fa6-ad62-e2a91eb9f2b1.sql
@@ -1179,7 +1173,9 @@ CREATE TRIGGER tenants_validate_branding
 
 -- 3. Storage bucket + policies on tenant-branding
 --    Path convention: {tenant_id}/logo.<ext>
--- INFRA-011: idempotent bucket create before policies
+--    Read: any member of the tenant
+--    Write: company_admin of that tenant, or saas_admin
+-- INFRA-009/011: idempotent bucket create before policies
 
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES (

@@ -110,6 +110,7 @@ GRANT SELECT ON public.identity_events TO authenticated;
 GRANT ALL ON public.identity_events TO service_role;
 ALTER TABLE public.identity_events ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS identity_events_admin_read ON public.identity_events;
 CREATE POLICY identity_events_admin_read ON public.identity_events FOR SELECT
   USING (
     public.is_saas_admin(auth.uid())

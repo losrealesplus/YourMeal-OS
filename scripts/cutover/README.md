@@ -23,8 +23,8 @@ Origen actual del runtime: backend gestionado por Lovable Cloud.
 
 Requieren acción manual en el proyecto destino:
 
-- **Storage**: crear el bucket privado `tenant-branding` y sus políticas sobre `storage.objects` (rutas `{tenant_id}/...`).
-- **Auth**: proveedor Google, plantillas de correo, URLs de redirección.
+- **Auth**: Site URL, Redirect URLs, plantillas de correo, SMTP (si aplica).
+- **Storage**: el bucket `tenant-branding` queda creado por `000_consolidated_schema.sql` (INFRA-009) y por la migration `20260729190000_infra009_tenant_branding_bucket.sql` si se usa `db push`.
 - **Secretos de servidor**: `LOVABLE_API_KEY` u otros que use el runtime.
 - **Datos ligados a `auth.users`**: `profiles`, `tenant_members`, `user_roles`, `customers`, `orders`. Se materializan al registrarse los usuarios reales. El primer administrador se otorga con:
 
