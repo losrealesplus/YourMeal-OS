@@ -67,9 +67,11 @@ Instalar todos los plugins nativos “por si acaso” **ahora** aumentaría supe
 ## 4. Criterio de éxito de esta pasada
 
 - [x] Auditoría escrita  
-- [ ] `capacitor.config.ts`  
-- [ ] deps Capacitor 8  
-- [ ] `android/` + `ios/`  
-- [ ] `build:mobile` + `cap sync` sin error  
-- [ ] `npm run build` SSR intacto  
-- [ ] Sin cambios de negocio  
+- [x] `capacitor.config.ts`  
+- [x] deps Capacitor 8 (`@8.4.2`)  
+- [x] `android/` + `ios/`  
+- [x] `build:mobile` + `cap sync` / `sync:mobile` sin error  
+- [x] `npm run build` SSR intacto  
+- [x] Sin cambios de negocio  
+
+Workflow: [CAPACITOR_WORKFLOW](./CAPACITOR_WORKFLOW.md)
