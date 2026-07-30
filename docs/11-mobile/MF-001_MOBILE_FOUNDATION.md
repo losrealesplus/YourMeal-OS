@@ -185,61 +185,10 @@ StorageProvider
 
 ---
 
-### M-05 · DeviceCapabilities
+### M-05 · (retirado · renumerado)
 
-No modelar un servicio por plugin. Modelar un **catálogo de capacidades** con negociación de estado ([ADR 0033 · Capability Negotiation](../adr/0033-platform-independence.md)).
-
-```text
-Domain
-      ↓
-Capability Contract
-      ↓
-Capability Registry
-      ↓
-Platform Adapter
-```
-
-Catálogo (extensible):
-
-```text
-DeviceCapabilities
-├── Camera
-├── Location
-├── Notifications
-├── Biometrics
-├── FileSystem
-├── Share
-├── Clipboard
-├── Contacts
-├── Network
-├── Sensors
-└── DeepLinks
-```
-
-El dominio **nunca** pregunta la plataforma; pregunta el contrato:
-
-```ts
-if (capabilities.biometrics.isAvailable()) { ... }
-if (capabilities.camera.canCaptureImages()) { ... }
-```
-
-Estados negociables (ejemplos — contrato M-05):
-
-```text
-Camera      supported | unavailable | permissionDenied
-Location    supported | disabled | denied
-Biometrics  faceID | touchID | fingerprint | unsupported
-Network     online | offline | constrained
-```
-
-| Regla | |
-|-------|--|
-| Dominio | Solo Capability Contract |
-| Registry | Resuelve adapter activo + cachea negotiation |
-| Web / Native | Adapters; degradación explícita por estado |
-| Prohibido | `getPlatform()`, `isAndroid`, imports `@capacitor/*` en dominio |
-
-**DoD M-05:** Contract + Registry + stubs web · capabilities mínimas (Camera · Location · Notifications · Network · FileSystem) con estados negociables documentados · resto deferred.
+El contenido de DeviceCapabilities vive ahora en **[M-02](./M-02_DEVICECAPABILITIES.md)** (tras el cierre de M-01).  
+No usar “M-05” para trabajo nuevo.
 
 ---
 
@@ -285,13 +234,13 @@ Supabase
 ## Orden de ejecución
 
 ```text
-Aprobar MF-001 + ADR 0032 + ADR 0033
+M-01 CLOSED (infra + dual build + CI)
         ↓
-M-01 → M-02        (spike infraestructura + build)
+M-02 DeviceCapabilities   ← OPEN (contrato + adapters)
         ↓
-M-04 → M-05        (StorageProvider + DeviceCapabilities)
+M-04 StorageProvider
         ↓
-M-03 → M-06        (Offline Queue → Sync Engine)
+M-03 → M-06               (Offline Queue → Sync Engine)
         ↓
 CAP piloto bajo Flow Kitchen (un comando)
 ```
