@@ -2,7 +2,7 @@
 
 **Estado:** Proposed — **pendiente de aprobación**  
 **ADR:** [0032](../adr/0032-native-mobile-strategy.md) · [0033](../adr/0033-platform-independence.md)  
-**Paquete:** [MF-001 · Mobile Foundation](./MF-001_MOBILE_FOUNDATION.md) (tareas **M-01…M-05**)  
+**Paquete:** [MF-001 · Mobile Foundation](./MF-001_MOBILE_FOUNDATION.md) (tareas **M-01…M-06**)  
 **Evidencia:** [NATIVE_MOBILE_INVESTIGATION](./NATIVE_MOBILE_INVESTIGATION.md)  
 **Regla:** no implementar hasta aprobación explícita  
 **Gate producto vigente:** no adelantar a PS-002-C / FLOW-01  
@@ -22,11 +22,12 @@ Integrar Capacitor como **contenedor nativo** de la app TanStack Start existente
 |--------------|--------------|---------|
 | **M-01** | Fase 1 | `/mobile` · Capacitor · iOS/Android |
 | **M-02** | Fase 1–2 / Release prep | `build:web` · `build:mobile` · `sync:mobile` |
-| **M-03** | Fase 3 | Offline Engine (SQLite · cola · estados · conflictos · retries · auditoría) |
-| **M-04** | Pre-Fase 3 | `StorageProvider` (no localStorage/IDB directos) |
-| **M-05** | Pre-Fase 4 | Native Services ports (Camera · Push · Biometric · GPS · Files · Share · Deep Links) |
+| **M-03** | Fase 3 | Offline Engine / Queue (estados · retries · audit) |
+| **M-04** | Pre-Fase 3 | `StorageProvider` (no localStorage/IDB/SQLite directos) |
+| **M-05** | Pre-Fase 4 | `DeviceCapabilities` (Camera · Location · Notifications · …) |
+| **M-06** | Fase 3 | **Sync Engine** (Supabase ↔ Conflict Resolver ↔ Queue) |
 
-Orden preferido: **M-01 → M-02 → M-04 → M-05 → M-03** (adapters antes del motor offline).
+Orden preferido: **M-01 → M-02 → M-04 → M-05 → M-03 → M-06** (adapters antes de cola; Sync Engine después de la cola).
 
 ---
 
@@ -36,7 +37,7 @@ Orden preferido: **M-01 → M-02 → M-04 → M-05 → M-03** (adapters antes de
 
 - [x] ADR 0032 Accepted (estrategia)
 - [x] ADR 0033 Platform Independence
-- [x] MF-001 documentado (M-01…M-05)
+- [x] MF-001 documentado (M-01…M-06)
 - [x] Investigación INV-NATIVE-001
 - [x] Plan + lista de cambios
 - [ ] Aprobación humana del plan / MF-001
@@ -59,18 +60,19 @@ Orden preferido: **M-01 → M-02 → M-04 → M-05 → M-03** (adapters antes de
 4. Auth: confirmar flujo password/OAuth en WebView; redirect URLs Supabase para custom schemes si aplica.
 5. Branding tenant (ADR 0014) verificado en shell.
 
-### Fase 3 — Offline modular (M-03; después M-04)
+### Fase 3 — Offline Queue + Sync Engine (M-03 · M-06; después M-04)
 
 1. Definir **Offline Capability Contract** por módulo (qué entidades, qué comandos).
-2. Outbox schema (id, tenant_id, command_type, payload, created_at, status, attempts).
-3. SQLite schema espejo **mínimo** (no clonar todo Supabase).
-4. Conflict policy por comando (OM / UL) · prioridades · retries · auditoría.
-5. Feature flags por módulo (`offline.kitchen`, etc. · ADR 0007).
-6. Implementar primero **un** comando piloto (p. ej. marcar plato preparado) bajo FLOW Kitchen.
+2. Outbox / Offline Queue: estados `pending → running → success | retry → conflict → resolved` (+ audit).
+3. SQLite schema espejo **mínimo** vía StorageProvider (no clonar todo Supabase).
+4. **Sync Engine** independiente: pull/push · Conflict Resolver · ack remoto · idempotencia.
+5. Conflict policy por comando (OM / UL) · prioridades · retries — **en Sync Engine**, no en UI.
+6. Feature flags por módulo (`offline.kitchen`, `sync.kitchen`, etc. · ADR 0007).
+7. Implementar primero **un** comando piloto (p. ej. marcar plato preparado) bajo FLOW Kitchen.
 
-### Fase 4 — Nativo de valor (M-05 → stores)
+### Fase 4 — DeviceCapabilities → stores (M-05)
 
-1. Adapters Capacitor detrás de puertos (Camera · Push · …).
+1. Catálogo `DeviceCapabilities` + adapters Capacitor (Camera · Location · Notifications · FileSystem · Network · …).
 2. Push notifications (cuando el Flow lo exija).
 3. Cámara / firmas delivery.
 4. Live Updates (OTA web layer) + política de canales.
@@ -95,17 +97,16 @@ Orden preferido: **M-01 → M-02 → M-04 → M-05 → M-03** (adapters antes de
 
 La app **no** se reescribe como SPA. El shell nativo es un **segundo artefacto** del mismo grafo de rutas/cliente.
 
-### 4.2 Offline stack (previsto)
+### 4.2 Offline + Sync stack (previsto)
 
-| Capa | Tecnología candidata | Notas |
+| Capa | Tecnología candidata | Tarea |
 |------|----------------------|-------|
-| Persistencia | `@capacitor-community/sqlite` (o evaluar) | Solo módulos offline · detrás de StorageProvider |
-| Cola | Outbox en SQLite | Idempotent command IDs |
-| Sync | Worker en cliente → Supabase REST/RPC | Reintentos + backoff |
-| Conflictos | Por dominio | Documentar en OM; no LWW global |
-| Auth | Supabase session + secure storage | Refresh online; cola pausa si 401 |
-| Push | `@capacitor/push-notifications` | Via PushService port (M-05) |
-| OTA | Capawesome / Capgo | Firma de bundles |
+| Persistencia | SQLite detrás de StorageProvider | M-04 |
+| Offline Queue | Outbox + estados de ciclo de vida | M-03 |
+| Sync Engine | Pull/push · Conflict Resolver · ack | M-06 |
+| Auth | Supabase session + secure storage | — |
+| DeviceCapabilities | Ports + Capacitor adapters | M-05 |
+| OTA | Capawesome / Capgo | Release |
 
 ### 4.3 Superficies
 
@@ -132,19 +133,20 @@ La app **no** se reescribe como SPA. El shell nativo es un **segundo artefacto**
 | CI job native shell smoke (opcional spike) | ci |
 | Convención Lovable: no editar proyectos nativos en Lovable | docs |
 
-### Aplicación (después de spike · M-03…M-05)
+### Aplicación (después de spike · M-03…M-06)
 
 | Cambio | Tipo | Tarea |
 |--------|------|-------|
 | `StorageProvider` + adapters web/native | new | M-04 |
-| Native Service ports + stubs | new | M-05 |
+| `DeviceCapabilities` + stubs web | new | M-05 |
+| Offline Queue (estados + audit) | new module | M-03 |
+| `SyncEngine` + Conflict Resolver | new module | M-06 |
 | Detect native **solo en adapters** + API base URL | `src/lib` / env | M-02/05 |
 | CORS / allowed origins en server entry | `src/server.ts` / CF | M-02 |
 | Supabase redirect URLs nativos | ops | M-02 |
-| Offline gateway + outbox (flagged) | new module | M-03 |
-| SQLite repositories por módulo operativo | new | M-03 |
-| Feature flags offline.* | DB + ADR 0007 | M-03 |
-| Tests: outbox idempotency · sync replay · storage contract | test | M-03/04 |
+| SQLite repositories por módulo operativo | new | M-03/04 |
+| Feature flags offline.* / sync.* | DB + ADR 0007 | M-03/06 |
+| Tests: queue lifecycle · sync replay · storage contract · capability stubs | test | M-03…06 |
 
 ### Docs
 
@@ -182,8 +184,8 @@ El plan se considera **aprobado** cuando un responsable de producto/CTO confirma
 
 1. Hybrid Shell = packaging baseline.
 2. Offline modular = Kitchen / Delivery / Warehouse only.
-3. Platform Independence (ADR 0033) = obligatorio en M-04/M-05.
-4. Paquete de trabajo = **MF-001** (no reutilizar PS-003).
+3. Platform Independence (ADR 0033) = obligatorio · `DeviceCapabilities` + `StorageProvider` + Sync Engine como ports.
+4. Paquete de trabajo = **MF-001** (M-01…**M-06**; no reutilizar PS-003).
 5. Implementación no arranca antes del gate de producto acordado.
 6. Spike M-01/M-02 puede abrirse en rama dedicada.
 

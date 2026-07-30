@@ -16,10 +16,19 @@
 | **PS-003** | Platform Stabilization · **Navigation Stability Gate** | ✅ PASS (histórico) |
 | **MF-001** | **Mobile Foundation** (este paquete) | Proposed |
 
-> **No reutilizar `PS-003`.** Ese ID ya certifica navegación Ops en Platform Stabilization.  
-> El paquete móvil se llama **MF-001 · Mobile Foundation**. Las tareas internas siguen el prefijo **M-0x** que proponías.
+```text
+Platform Stabilization (PS)
+        ≠
+Mobile Foundation (MF)
+```
 
-Alias informal aceptado en conversación: “PS Mobile / Mobile Foundation”.  
+- **PS** → estabiliza la plataforma (UI · Auth session · navegación).  
+- **MF** → introduce una capacidad arquitectónica nueva (contenedor nativo · offline · sync).
+
+> **No reutilizar `PS-003`.** Ese ID ya certifica navegación Ops.  
+> Las tareas internas usan el prefijo **M-0x**.
+
+Alias informal: “PS Mobile / Mobile Foundation”.  
 Alias **prohibido** en docs/CI: `PS-003` para móvil.
 
 ---
@@ -39,13 +48,21 @@ Cloudflare / Nitro
         │
  Bundle Web Local
         │
-SQLite + Storage + Queue
-        │
-Supabase Sync
+┌─────────────────────┐
+│  Sync Engine (M-06) │
+│  Offline Queue      │
+│  Conflict Resolver  │
+└──────────┬──────────┘
+           │
+   StorageProvider (M-04)
+           │
+        SQLite
+           │
+     Supabase (remoto)
 ```
 
 - Un repositorio · un frontend · un backend  
-- Capacitor = capa nativa (permisos, cámara, GPS, push, storage, SQLite)  
+- Capacitor = capa nativa vía **DeviceCapabilities** (M-05)  
 - Offline solo Kitchen · Delivery · Warehouse  
 - Dominio agnóstico de plataforma ([ADR 0033](../adr/0033-platform-independence.md))
 
@@ -99,21 +116,37 @@ sync:mobile    → cap copy / sync
 
 ---
 
-### M-03 · Offline Engine (diseño)
+### M-03 · Offline Engine (cola local)
 
-No es “guardar datos”. Es un motor con contrato explícito.
+No es “guardar datos”. Es el **ciclo de vida de la cola offline** — gran parte del valor diferencial operativo.
 
-Debe definir:
+```text
+Offline Queue
+      ↓
+  Pending
+      ↓
+  Running
+      ↓
+  Success ──→ Audit
+      ↓
+   Retry
+      ↓
+  Conflict
+      ↓
+  Resolved ──→ Audit
+```
 
 | Concepto | Contenido mínimo |
 |----------|------------------|
-| SQLite | Schema mínimo por módulo operativo |
-| Cola de sincronización (outbox) | command_id · tipo · payload · estado · attempts |
-| Estados | `pending` · `in_flight` · `acked` · `failed` · `dead` |
-| Conflictos | Política **por comando** (OM), no LWW global |
+| SQLite (vía StorageProvider) | Schema mínimo por módulo operativo |
+| Offline Queue (outbox) | command_id · tipo · payload · prioridad · attempts |
+| Estados | `pending` · `running` · `success` · `retry` · `conflict` · `resolved` · (+ `dead` si agota retries) |
 | Prioridades | p. ej. delivery complete > temp inventory adjust |
 | Retries | Backoff + tope · jitter |
 | Auditoría | Trazas alineadas con soft-delete/audit (ADR 0006) |
+
+**Límite M-03:** define cola, estados, persistencia local y reglas de transición.  
+**No** es el motor de sincronización remoto — eso es **M-06**.
 
 **DoD M-03:** documento de diseño aprobado + feature flags `offline.*` nombrados · **sin** implementación completa obligatoria en el mismo PR.
 
@@ -126,6 +159,8 @@ Prohibido acoplar dominio a:
 ```ts
 localStorage
 IndexedDB
+Capacitor Preferences
+SQLite (directo)
 ```
 
 Todo acceso pasa por:
@@ -137,43 +172,96 @@ StorageProvider
 | Implementación | Target |
 |----------------|--------|
 | `WebStorageAdapter` | Web (session/local/idb según política) |
-| `NativeStorageAdapter` | Capacitor Preferences / Filesystem / SQLite bridge |
-| Dominio / Services | Solo `StorageProvider` |
+| `NativeStorageAdapter` | Preferences / Filesystem / SQLite bridge |
+| Dominio / Services / Sync Engine | Solo `StorageProvider` |
 
-**DoD M-04:** interfaz + un adapter web stub · tests de contrato · sin calls directas nuevas en módulos operativos migrados.
+**DoD M-04:** interfaz + adapter web stub · tests de contrato · sin calls directas nuevas en módulos operativos migrados.
 
 ---
 
-### M-05 · Native Services
+### M-05 · DeviceCapabilities
 
-Interfaces de plataforma (ports), adapters Capacitor (adapters):
+No modelar un servicio por plugin. Modelar un **catálogo de capacidades de dispositivo** (ports), con adapters por plataforma.
 
-| Puerto | Capacidad |
-|--------|-----------|
-| `CameraService` | Foto / captura cocina-reparto |
-| `PushService` | Notificaciones |
-| `BiometricService` | Desbloqueo local (no Auth mock) |
-| `LocationService` | GPS rutas |
-| `FileService` | Adjuntos / firmas |
-| `ShareService` | Share sheet |
-| `DeepLinkService` | App links / custom schemes |
+```text
+DeviceCapabilities
+├── Camera
+├── Location
+├── Notifications
+├── Biometrics
+├── FileSystem
+├── Share
+├── Clipboard
+├── Contacts
+├── Network
+├── Sensors
+└── DeepLinks   (navegación / app links)
+```
 
-Regla ([ADR 0033](../adr/0033-platform-independence.md)): el dominio **nunca** importa `@capacitor/*` directamente.
+| Regla | |
+|-------|--|
+| Dominio | Pregunta “¿hay Camera?” / usa el puerto — **nunca** `@capacitor/*` |
+| Web | Stubs / degradación / permisos browser donde existan |
+| Native | Adapter Capacitor (u otro runtime futuro) |
+| Escalabilidad | Añadir una capability = nuevo puerto + adapter, no un Service ad hoc en el dominio |
 
-**DoD M-05:** interfaces + no-op / web stubs · Capacitor adapters solo detrás de flag nativo.
+Esto permite mañana Capacitor · Tauri · Electron · (incluso RN/Flutter como shell) sin tocar el OM ([ADR 0033](../adr/0033-platform-independence.md)).
+
+**DoD M-05:** interfaz `DeviceCapabilities` + stubs web · capabilities mínimas documentadas (Camera · Location · Notifications · Network · FileSystem) · resto deferred.
+
+---
+
+### M-06 · Sync Engine
+
+El verdadero valor del offline **no** es SQLite: es la **sincronización**.
+
+```text
+Supabase
+      ↓
+ Sync Engine
+      ↓
+ Conflict Resolver
+      ↓
+ Offline Queue   (M-03)
+      ↓
+ StorageProvider (M-04)
+      ↓
+ SQLite
+```
+
+| Responsabilidad | Contenido |
+|-----------------|-----------|
+| Pull / push | Snapshot + delta según contrato por módulo |
+| Orquestación | Consume Offline Queue; no embebe UI |
+| Conflict Resolver | Política **por comando** (OM / UL), no LWW global |
+| Idempotencia | command_id estable · replay seguro |
+| Observabilidad | Métricas de cola · fallos · lag de sync |
+| Reutilización | Kitchen · Delivery · Warehouse · auditoría · futuro FON-AI local |
+
+**Separación M-03 / M-06:**
+
+| | M-03 Offline Engine | M-06 Sync Engine |
+|--|---------------------|------------------|
+| Pregunta | ¿Qué pasa con un comando sin red? | ¿Cómo converge con Supabase? |
+| Artefacto | Cola + estados + persistencia | Transporte + conflictos + ack remoto |
+| Dependencias | StorageProvider | Offline Queue + StorageProvider + API remota |
+
+**DoD M-06:** diseño del Sync Engine aprobado · interfaz `SyncEngine` · un flujo piloto especificado (p. ej. `mark_prepared`) · **sin** implementación completa obligatoria en el mismo PR de docs.
 
 ---
 
 ## Orden de ejecución
 
 ```text
-Aprobar MF-001 + ADR 0033
+Aprobar MF-001 + ADR 0032 + ADR 0033
         ↓
-M-01 → M-02   (spike infraestructura + build)
+M-01 → M-02        (spike infraestructura + build)
         ↓
-M-04 → M-05   (ports/adapters antes de offline pesado)
+M-04 → M-05        (StorageProvider + DeviceCapabilities)
         ↓
-M-03          (Offline Engine diseño → CAP bajo Flow Kitchen)
+M-03 → M-06        (Offline Queue → Sync Engine)
+        ↓
+CAP piloto bajo Flow Kitchen (un comando)
 ```
 
 No adelantar a **PS-002-C** ni abrir **FLOW-01** “porque móvil”.
@@ -182,11 +270,12 @@ No adelantar a **PS-002-C** ni abrir **FLOW-01** “porque móvil”.
 
 ## Fuera de alcance (MF-001)
 
-- React Native  
+- React Native / Flutter como producto paralelo  
 - `server.url` como producción  
 - Offline cliente / admin  
-- Publicación App Store / Play (posterior a Fase 4 del plan)  
-- Reinterpretar o reabrir **PS-003 Navigation**
+- Publicación App Store / Play (posterior)  
+- Reinterpretar o reabrir **PS-003 Navigation**  
+- FON-AI sync local (solo se reserva el puerto de reutilización de M-06)
 
 ---
 
@@ -194,7 +283,7 @@ No adelantar a **PS-002-C** ni abrir **FLOW-01** “porque móvil”.
 
 1. ADR 0032 Accepted (merge)  
 2. ADR 0033 Accepted  
-3. MF-001 aprobado explícitamente  
+3. MF-001 aprobado explícitamente (incluye M-06)  
 4. Spike en rama `cursor/…-mobile-spike-f54a`  
 5. Gate producto vigente respetado  
 

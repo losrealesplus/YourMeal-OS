@@ -5,7 +5,7 @@
 **Accepted** — 2026-07-30  
 **Implementación:** **congelada** hasta aprobación del plan técnico  
 **Evidencia:** [NATIVE_MOBILE_INVESTIGATION](../11-mobile/NATIVE_MOBILE_INVESTIGATION.md) · [NATIVE_MOBILE_PLAN](../11-mobile/NATIVE_MOBILE_PLAN.md)  
-**Paquete de trabajo:** [MF-001 · Mobile Foundation](../11-mobile/MF-001_MOBILE_FOUNDATION.md) (M-01…M-05)  
+**Paquete de trabajo:** [MF-001 · Mobile Foundation](../11-mobile/MF-001_MOBILE_FOUNDATION.md) (M-01…M-06)  
 **Principio derivado:** [ADR 0033 — Platform Independence](./0033-platform-independence.md)
 
 ## Principio canónico
