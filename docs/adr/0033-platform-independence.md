@@ -26,10 +26,20 @@ YourMeal OS adopta **independencia de plataforma** como principio arquitectónic
 ### Consecuencias prácticas
 
 1. **Prohibido** importar `@capacitor/*` (u otro SDK nativo) desde Services, repositorios de dominio o reglas de negocio.
-2. Capacidades nativas se modelan como **puertos** (M-05) con adapters web (no-op o degradación) y native.
-3. Persistencia local pasa por **`StorageProvider`** (M-04) — no `localStorage` / IndexedDB / SQLite directos en dominio.
-4. Offline Engine (M-03) opera sobre el dominio compartido; la cola y SQLite son infraestructura detrás de puertos.
-5. Si mañana se añade escritorio (**Tauri** / **Electron**), se añaden adapters — no se bifurca el OM ni el frontend de negocio.
+2. Capacidades nativas se modelan como **`DeviceCapabilities`** (MF-001 · M-05): un catálogo de ports (Camera · Location · Notifications · …), no servicios ad hoc acoplados al dominio.
+3. Persistencia local pasa por **`StorageProvider`** (M-04) — no `localStorage` / IndexedDB / SQLite / Preferences directos en dominio.
+4. Offline Queue (M-03) y **Sync Engine** (M-06) operan sobre el dominio compartido; SQLite y transporte remoto viven detrás de puertos.
+5. Si mañana se añade escritorio (**Tauri** / **Electron**) u otro shell, se añaden adapters — no se bifurca el OM ni el frontend de negocio.
+
+```text
+Business
+      ↓
+Ports  (StorageProvider · DeviceCapabilities · SyncEngine · OfflineQueue)
+      ↓
+Adapters
+      ↓
+Web · iOS · Android · Desktop
+```
 
 ## Contexto
 
@@ -51,7 +61,7 @@ Este principio es el puente entre FOPEBA (“un conocimiento”) y multi-target 
 | [0032](./0032-native-mobile-strategy.md) | Estrategia móvil; 0033 es el principio de aislamiento |
 | [0005](./0005-services-layer.md) | Services siguen siendo el límite de negocio |
 | [0008](./0008-ai-offline-ready.md) | Offline plug-in sin acoplar UI a SQLite |
-| [MF-001](../11-mobile/MF-001_MOBILE_FOUNDATION.md) | M-04 / M-05 materializan este ADR |
+| [MF-001](../11-mobile/MF-001_MOBILE_FOUNDATION.md) | M-04 StorageProvider · M-05 DeviceCapabilities · M-06 Sync Engine materializan este ADR |
 
 ## No hacer
 
