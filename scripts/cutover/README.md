@@ -7,8 +7,10 @@ Origen actual del runtime: backend gestionado por Lovable Cloud.
 
 | Archivo | Propósito |
 |---------|-----------|
-| `000_consolidated_schema.sql` | Concatenación ordenada de las 29 migraciones de `supabase/migrations/`. Enums, tablas, GRANTs, RLS, funciones y triggers. |
+| `000_consolidated_schema.sql` | Concatenación ordenada de migraciones. Enums, tablas, GRANTs, RLS, funciones, triggers + bucket `tenant-branding`. |
 | `010_seed_eatclean.sql` | Semillas mínimas: tenant EatClean Tenerife, feature flags, catálogo de 3 platos y menú semanal publicado. |
+| `015_tenant_branding_bucket.sql` | INFRA-011 · create idempotente del bucket (SQL Editor / re-run safe). |
+| `verify_project_b.sql` | INFRA-011 · checks READ-ONLY: bucket, platform_owners, tenant, weekly_menu. |
 
 ## Orden de ejecución
 

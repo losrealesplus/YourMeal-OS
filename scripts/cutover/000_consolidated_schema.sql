@@ -1175,7 +1175,7 @@ CREATE TRIGGER tenants_validate_branding
 --    Path convention: {tenant_id}/logo.<ext>
 --    Read: any member of the tenant
 --    Write: company_admin of that tenant, or saas_admin
--- INFRA-009: bucket must exist before policies (idempotent)
+-- INFRA-009/011: idempotent bucket create before policies
 
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES (
