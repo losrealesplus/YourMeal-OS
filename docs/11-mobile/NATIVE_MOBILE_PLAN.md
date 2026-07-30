@@ -86,28 +86,28 @@ Orden preferido: **M-01 → M-02 → M-04 → M-05 → M-03** (adapters antes de
 
 ## 4. Diseño técnico resumido
 
-### 3.1 Targets de build
+### 4.1 Targets de build
 
 | Target | Comando (futuro) | Artefacto |
 |--------|------------------|-----------|
-| Web SSR | `npm run build` (actual) | Nitro/Cloudflare worker + assets |
-| Native shell | `build` + flag/env Capacitor | Client bundle → `android/` `ios/` |
+| Web SSR | `npm run build` / `build:web` (actual) | Nitro/Cloudflare worker + assets |
+| Native shell | `build:mobile` + sync | Client bundle → `android/` `ios/` |
 
 La app **no** se reescribe como SPA. El shell nativo es un **segundo artefacto** del mismo grafo de rutas/cliente.
 
-### 3.2 Offline stack (previsto)
+### 4.2 Offline stack (previsto)
 
 | Capa | Tecnología candidata | Notas |
 |------|----------------------|-------|
-| Persistencia | `@capacitor-community/sqlite` (o evaluar) | Solo módulos offline |
+| Persistencia | `@capacitor-community/sqlite` (o evaluar) | Solo módulos offline · detrás de StorageProvider |
 | Cola | Outbox en SQLite | Idempotent command IDs |
 | Sync | Worker en cliente → Supabase REST/RPC | Reintentos + backoff |
 | Conflictos | Por dominio | Documentar en OM; no LWW global |
 | Auth | Supabase session + secure storage | Refresh online; cola pausa si 401 |
-| Push | `@capacitor/push-notifications` | Fase 4 |
+| Push | `@capacitor/push-notifications` | Via PushService port (M-05) |
 | OTA | Capawesome / Capgo | Firma de bundles |
 
-### 3.3 Superficies
+### 4.3 Superficies
 
 | Módulo | Offline | Primeros comandos candidatos |
 |--------|---------|------------------------------|
