@@ -24,7 +24,7 @@ Integrar Capacitor como **contenedor nativo** de la app TanStack Start existente
 | **M-02** | Fase 1–2 / Release prep | `build:web` · `build:mobile` · `sync:mobile` |
 | **M-03** | Fase 3 | Offline Engine / Queue (estados · retries · audit) |
 | **M-04** | Pre-Fase 3 | `StorageProvider` (no localStorage/IDB/SQLite directos) |
-| **M-05** | Pre-Fase 4 | `DeviceCapabilities` (Camera · Location · Notifications · …) |
+| **M-05** | Pre-Fase 4 | `DeviceCapabilities` + **Capability Negotiation** (Contract → Registry → Adapter) |
 | **M-06** | Fase 3 | **Sync Engine** (Supabase ↔ Conflict Resolver ↔ Queue) |
 
 Orden preferido: **M-01 → M-02 → M-04 → M-05 → M-03 → M-06** (adapters antes de cola; Sync Engine después de la cola).
@@ -72,11 +72,13 @@ Orden preferido: **M-01 → M-02 → M-04 → M-05 → M-03 → M-06** (adapters
 
 ### Fase 4 — DeviceCapabilities → stores (M-05)
 
-1. Catálogo `DeviceCapabilities` + adapters Capacitor (Camera · Location · Notifications · FileSystem · Network · …).
-2. Push notifications (cuando el Flow lo exija).
-3. Cámara / firmas delivery.
-4. Live Updates (OTA web layer) + política de canales.
-5. Checklist App Store / Play (privacidad, permisos, no “website wrapper” vacío).
+1. Catálogo `DeviceCapabilities` con **Capability Negotiation** (Contract → Registry → Adapter).
+2. Estados por capability (`supported` / `permissionDenied` / …) — el dominio no pregunta el OS.
+3. Push notifications (cuando el Flow lo exija).
+4. Cámara / firmas delivery.
+5. Live Updates (OTA web layer) + política de canales.
+6. Checklist App Store / Play (privacidad, permisos, no “website wrapper” vacío).
+7. Background sync / BG tasks → **MF-002** (no MF-001).
 
 ### Fase 5 — Release
 
@@ -184,9 +186,10 @@ El plan se considera **aprobado** cuando un responsable de producto/CTO confirma
 
 1. Hybrid Shell = packaging baseline.
 2. Offline modular = Kitchen / Delivery / Warehouse only.
-3. Platform Independence (ADR 0033) = obligatorio · `DeviceCapabilities` + `StorageProvider` + Sync Engine como ports.
+3. Platform Independence + **Capability Negotiation** (ADR 0033) = obligatorio.
 4. Paquete de trabajo = **MF-001** (M-01…**M-06**; no reutilizar PS-003).
-5. Implementación no arranca antes del gate de producto acordado.
-6. Spike M-01/M-02 puede abrirse en rama dedicada.
+5. **MF-002 Background Execution** permanece Deferred (registrado, no en este alcance).
+6. Implementación no arranca antes del gate de producto acordado.
+7. Spike M-01/M-02 puede abrirse en rama dedicada tras aprobación formal de MF-001.
 
-Hasta entonces: **ADR Accepted · MF-001 Proposed · implementación Frozen**.
+Hasta entonces: **ADR Accepted · MF-001 Proposed (aprobación conceptual OK · freeze de código) · implementación Frozen**.
