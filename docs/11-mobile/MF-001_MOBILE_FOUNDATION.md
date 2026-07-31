@@ -122,37 +122,28 @@ Contrato + `getDeviceCapabilities()` + `WebAdapter` / `CapacitorAdapter` · Capa
 
 ### M-03 · Offline Engine (cola local)
 
-No es “guardar datos”. Es el **ciclo de vida de la cola offline** — gran parte del valor diferencial operativo.
+**Estado:** ✅ **CLOSED** (beta infra) — [M-03_OFFLINE_QUEUE](./M-03_OFFLINE_QUEUE.md) · [CLOSED](./M-03_CLOSED.md) · `src/platform/offline-queue/`
+
+Cola fiable de **intenciones** (outbox). No es sync offline completo.
 
 ```text
-Offline Queue
-      ↓
-  Pending
-      ↓
-  Running
-      ↓
-  Success ──→ Audit
-      ↓
-   Retry
-      ↓
-  Conflict
-      ↓
-  Resolved ──→ Audit
+UI → OfflineQueue → StorageProvider
+              ↓ (más adelante)
+         Sync / caso de uso → API
 ```
 
-| Concepto | Contenido mínimo |
-|----------|------------------|
-| SQLite (vía StorageProvider) | Schema mínimo por módulo operativo |
-| Offline Queue (outbox) | command_id · tipo · payload · prioridad · attempts |
-| Estados | `pending` · `running` · `success` · `retry` · `conflict` · `resolved` · (+ `dead` si agota retries) |
-| Prioridades | p. ej. delivery complete > temp inventory adjust |
-| Retries | Backoff + tope · jitter |
-| Auditoría | Trazas alineadas con soft-delete/audit (ADR 0006) |
+| Concepto | Beta |
+|----------|------|
+| Modelo | `QueueItem`: id · type · payload · createdAt · status · retryCount |
+| Estados | `pending` · `processing` · `completed` · `failed` |
+| Persistencia | **Solo** StorageProvider |
+| Retries | `fail` → `retry` (básico) |
+| Aislamiento | Sin Supabase / HTTP / prioridades / sync automático |
 
-**Límite M-03:** define cola, estados, persistencia local y reglas de transición.  
-**No** es el motor de sincronización remoto — eso es **M-06**.
+**Límite M-03:** almacenar y recuperar operaciones pendientes.  
+**No** ejecuta intenciones — eso es **M-06** / casos de uso.
 
-**DoD M-03:** documento de diseño aprobado + feature flags `offline.*` nombrados · **sin** implementación completa obligatoria en el mismo PR.
+**DoD M-03:** ✅ cola persistente + tests + docs · alcance beta reducido.
 
 ---
 
@@ -241,7 +232,9 @@ M-02 DeviceCapabilities   ✅ CLOSED
         ↓
 M-04 StorageProvider      ✅ CLOSED
         ↓
-M-03 → M-06               (Offline Queue → Sync Engine)  ← NEXT
+M-03 Offline Queue        ✅ CLOSED (infra)
+        ↓
+M-06 Sync Engine          ← NEXT
         ↓
 CAP piloto bajo Flow Kitchen (un comando)
 ```
