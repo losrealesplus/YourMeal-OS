@@ -65,7 +65,7 @@ Network
   └── constrained
 ```
 
-Los estados concretos por capability se fijan en MF-001 · M-05; aquí queda la **regla**: negociar, no ramificar por OS.
+Los estados concretos por capability se fijan en [M-02 DeviceCapabilities](../11-mobile/M-02_DEVICECAPABILITIES.md); aquí queda la **regla**: negociar, no ramificar por OS.
 
 ## Decisión
 
@@ -81,7 +81,7 @@ YourMeal OS adopta **independencia de plataforma** como principio arquitectónic
 ### Consecuencias prácticas
 
 1. **Prohibido** importar `@capacitor/*` (u otro SDK nativo) desde Services, repositorios de dominio o reglas de negocio.
-2. Capacidades nativas = catálogo **`DeviceCapabilities`** (MF-001 · M-05) detrás de Contract → Registry → Adapter.
+2. Capacidades nativas = catálogo **`DeviceCapabilities`** ([M-02](../11-mobile/M-02_DEVICECAPABILITIES.md)) detrás de Contract → Resolver → Adapter.
 3. Persistencia local = **`StorageProvider`** (M-04) — no `localStorage` / IndexedDB / SQLite / Preferences directos en dominio.
 4. Offline Queue (M-03) y **Sync Engine** (M-06) son ports del dominio compartido; transporte y SQLite viven en adapters.
 5. Targets futuros (Tauri · Electron · otro shell) = nuevos adapters; el OM no se bifurca.
@@ -117,7 +117,8 @@ Este principio es el puente entre FOPEBA (“un conocimiento”) y multi-target 
 | [0032](./0032-native-mobile-strategy.md) | Estrategia móvil; 0033 es el principio de aislamiento |
 | [0005](./0005-services-layer.md) | Services siguen siendo el límite de negocio |
 | [0008](./0008-ai-offline-ready.md) | Offline plug-in sin acoplar UI a SQLite |
-| [MF-001](../11-mobile/MF-001_MOBILE_FOUNDATION.md) | M-04 · M-05 (negotiation) · M-06 materializan este ADR |
+| [MF-001](../11-mobile/MF-001_MOBILE_FOUNDATION.md) | Contenedor móvil |
+| [M-02](../11-mobile/M-02_DEVICECAPABILITIES.md) | DeviceCapabilities · negotiation · adapters |
 | [MF-002](../11-mobile/MF-002_BACKGROUND_EXECUTION.md) | Evolución futura (fuera de MF-001) |
 
 ## No hacer
