@@ -2,10 +2,10 @@
 
 **Documento:** `MF-001_MOBILE_FOUNDATION.md`  
 **Fecha:** 2026-07-30  
-**Estado:** Active · **M-01 CLOSED** ([acta](./M-01_CLOSED.md)) · **M-02 DeviceCapabilities OPEN** ([spec](./M-02_DEVICECAPABILITIES.md))  
+**Estado:** Active · **M-01 CLOSED** · **M-02 DeviceCapabilities IMPLEMENTED** (infra)  
 **Categoría PR:** Platform mobile foundation (sin cambios de negocio)  
 **ADR:** [0032 Native Mobile Strategy](../adr/0032-native-mobile-strategy.md) · [0033 Platform Independence](../adr/0033-platform-independence.md)  
-**Evidencia / plan:** [NATIVE_MOBILE_INVESTIGATION](./NATIVE_MOBILE_INVESTIGATION.md) · [NATIVE_MOBILE_PLAN](./NATIVE_MOBILE_PLAN.md) · [M-01 Dual Build](./M-01_DUAL_BUILD_PLAN.md) · [Session close 2026-07-30](./SESSION_CLOSE_2026-07-30.md)
+**Evidencia / plan:** [NATIVE_MOBILE_INVESTIGATION](./NATIVE_MOBILE_INVESTIGATION.md) · [NATIVE_MOBILE_PLAN](./NATIVE_MOBILE_PLAN.md) · [M-01 Dual Build](./M-01_DUAL_BUILD_PLAN.md) · [Session close 2026-07-30](./SESSION_CLOSE_2026-07-30.md) · [M-02 Implementation](./M-02_IMPLEMENTATION.md)
 
 ---
 
@@ -114,11 +114,9 @@ El “proceso de build” (antes borrador M-02) quedó absorbido en **M-01.1 / M
 
 ### M-02 · DeviceCapabilities
 
-**Estado:** 🔓 OPEN · [especificación](./M-02_DEVICECAPABILITIES.md)
+**Estado:** ✅ IMPLEMENTED (infra) · [spec](./M-02_DEVICECAPABILITIES.md) · [guide](./M-02_IMPLEMENTATION.md) · `src/platform/device-capabilities/`
 
-Contrato + Registry + `WebAdapter` / `CapacitorAdapter` · Capability Negotiation · **sin** plugins de producto ni lógica de negocio.
-
-DoD: ver spec M-02.
+Contrato + `getDeviceCapabilities()` + `WebAdapter` / `CapacitorAdapter` · Capability Negotiation · **sin** plugins de producto ni lógica de negocio.
 
 ---
 
