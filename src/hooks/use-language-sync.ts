@@ -2,15 +2,20 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { getUser, onAuthStateChange } from "@/auth";
 import { supabase } from "@/integrations/supabase/client";
-import { isSupportedLanguage, LANG_STORAGE_KEY } from "@/i18n";
+import {
+  hydrateUiLanguage,
+  isSupportedLanguage,
+  persistUiLanguage,
+} from "@/i18n";
 import type { LanguageCode } from "@/i18n/languages";
 
 /**
  * Syncs the interface language with the authenticated user's profile.
  *
+ * - Hydrates stored language via StorageProvider (M-04).
  * - On sign-in, if the profile has a saved locale, apply it.
  * - If the profile has no locale, fall back to the user's tenant default.
- * - Keeps localStorage in sync so it survives sign-out.
+ * - Persists preference so it survives sign-out / app restart.
  *
  * Mount once at the root (inside providers). Safe to run on public routes.
  */
@@ -20,16 +25,14 @@ export function useLanguageSync() {
   useEffect(() => {
     let cancelled = false;
 
+    void hydrateUiLanguage((lng) => i18n.changeLanguage(lng));
+
     async function apply(code: string | null | undefined) {
       if (cancelled || !code || !isSupportedLanguage(code)) return;
       if (i18n.resolvedLanguage === code) return;
       await i18n.changeLanguage(code);
       document.documentElement.setAttribute("lang", code);
-      try {
-        window.localStorage.setItem(LANG_STORAGE_KEY, code);
-      } catch {
-        /* ignore */
-      }
+      await persistUiLanguage(code);
     }
 
     async function loadForUser(userId: string) {

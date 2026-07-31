@@ -158,6 +158,8 @@ Offline Queue
 
 ### M-04 · Abstracción Storage
 
+**Estado:** ✅ **CLOSED** — [M-04_STORAGEPROVIDER](./M-04_STORAGEPROVIDER.md) · [CLOSED](./M-04_CLOSED.md)
+
 Prohibido acoplar dominio a:
 
 ```ts
@@ -170,16 +172,17 @@ SQLite (directo)
 Todo acceso pasa por:
 
 ```ts
-StorageProvider
+getStorageProvider()  // StorageProvider
 ```
 
 | Implementación | Target |
 |----------------|--------|
-| `WebStorageAdapter` | Web (session/local/idb según política) |
-| `NativeStorageAdapter` | Preferences / Filesystem / SQLite bridge |
+| `createWebStorageProvider` | Web → localStorage |
+| `createCapacitorStorageProvider` | Native → `@capacitor/preferences` |
+| `createMemoryStorageProvider` | SSR / tests / fallback |
 | Dominio / Services / Sync Engine | Solo `StorageProvider` |
 
-**DoD M-04:** interfaz + adapter web stub · tests de contrato · sin calls directas nuevas en módulos operativos migrados.
+**DoD M-04:** ✅ contrato + adapters + resolver + migraciones call sites + tests + docs.
 
 ---
 
@@ -234,11 +237,11 @@ Supabase
 ```text
 M-01 CLOSED (infra + dual build + CI)
         ↓
-M-02 DeviceCapabilities   ← OPEN (contrato + adapters)
+M-02 DeviceCapabilities   ✅ CLOSED
         ↓
-M-04 StorageProvider
+M-04 StorageProvider      ✅ CLOSED
         ↓
-M-03 → M-06               (Offline Queue → Sync Engine)
+M-03 → M-06               (Offline Queue → Sync Engine)  ← NEXT
         ↓
 CAP piloto bajo Flow Kitchen (un comando)
 ```

@@ -31,6 +31,7 @@ import { brandConfig, tenantCopyEs } from "@/tenant/brand-config";
 import { PrimaryCTA } from "@/components/consumer";
 import splashImage from "@/assets/eatclean-splash.jpg";
 import { cn } from "@/lib/utils";
+import { getStorageProvider } from "@/platform/storage-provider";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -93,8 +94,11 @@ function AuthPage() {
   useEffect(() => {
     if (phase !== "splash") return;
     const id = window.setTimeout(() => {
-      const done = localStorage.getItem(ONBOARDING_KEY) === "1";
-      setPhase(done ? "login" : "onboarding");
+      void getStorageProvider()
+        .get(ONBOARDING_KEY)
+        .then((value) => {
+          setPhase(value === "1" ? "login" : "onboarding");
+        });
     }, 1600);
     return () => window.clearTimeout(id);
   }, [phase]);
@@ -199,8 +203,9 @@ function AuthPage() {
                     setOnboardingStep((s) => s + 1);
                     return;
                   }
-                  localStorage.setItem(ONBOARDING_KEY, "1");
-                  setPhase("login");
+                  void getStorageProvider()
+                    .set(ONBOARDING_KEY, "1")
+                    .then(() => setPhase("login"));
                 }}
               >
                 {onboardingStep < onboardingSlides.length - 1

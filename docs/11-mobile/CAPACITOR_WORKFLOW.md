@@ -1,8 +1,9 @@
 # Capacitor · Developer Workflow (MF-001 · M-01)
 
-**Estado:** Scaffold Capacitor 8 listo · plugins nativos diferidos (M-05)  
+**Estado:** Scaffold Capacitor 8 listo · `@capacitor/preferences` (M-04) · feature plugins diferidos  
 **Config:** `capacitor.config.ts`  
-**Auditoría:** [M-01_CAPACITOR_AUDIT](./M-01_CAPACITOR_AUDIT.md)
+**Auditoría:** [M-01_CAPACITOR_AUDIT](./M-01_CAPACITOR_AUDIT.md)  
+**Storage:** [M-04 StorageProvider](./M-04_STORAGEPROVIDER.md)
 
 ---
 

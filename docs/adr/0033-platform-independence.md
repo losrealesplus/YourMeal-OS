@@ -82,7 +82,7 @@ YourMeal OS adopta **independencia de plataforma** como principio arquitectónic
 
 1. **Prohibido** importar `@capacitor/*` (u otro SDK nativo) desde Services, repositorios de dominio o reglas de negocio.
 2. Capacidades nativas = catálogo **`DeviceCapabilities`** ([M-02](../11-mobile/M-02_DEVICECAPABILITIES.md)) detrás de Contract → Resolver → Adapter.
-3. Persistencia local = **`StorageProvider`** (M-04) — no `localStorage` / IndexedDB / SQLite / Preferences directos en dominio.
+3. Persistencia local = **`StorageProvider`** ([M-04](../11-mobile/M-04_STORAGEPROVIDER.md)) — no `localStorage` / IndexedDB / SQLite / Preferences directos en dominio.
 4. Offline Queue (M-03) y **Sync Engine** (M-06) son ports del dominio compartido; transporte y SQLite viven en adapters.
 5. Targets futuros (Tauri · Electron · otro shell) = nuevos adapters; el OM no se bifurca.
 

@@ -4,8 +4,9 @@ import { initReactI18next } from "react-i18next";
 
 import { resources } from "./locales";
 import { DEFAULT_LNG, SUPPORTED_LNGS } from "./languages";
+import { LANG_STORAGE_KEY } from "./ui-language-storage";
 
-export const LANG_STORAGE_KEY = "ymos.lang";
+export { LANG_STORAGE_KEY };
 
 if (!i18n.isInitialized) {
   i18n
@@ -21,9 +22,10 @@ if (!i18n.isInitialized) {
       ns: ["common", "auth", "customer", "admin", "branding"],
       interpolation: { escapeValue: false },
       detection: {
-        order: ["localStorage", "navigator", "htmlTag"],
-        lookupLocalStorage: LANG_STORAGE_KEY,
-        caches: ["localStorage"],
+        // Language persistence goes through StorageProvider (M-04), not localStorage.
+        // See hydrateUiLanguage / persistUiLanguage in ui-language-storage.ts.
+        order: ["navigator", "htmlTag"],
+        caches: [],
       },
     });
 }
@@ -37,3 +39,8 @@ export {
   getLanguage,
 } from "./languages";
 export type { LanguageCode, Language } from "./languages";
+export {
+  hydrateUiLanguage,
+  persistUiLanguage,
+  readStoredUiLanguage,
+} from "./ui-language-storage";
