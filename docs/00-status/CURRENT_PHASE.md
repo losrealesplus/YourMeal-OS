@@ -53,8 +53,10 @@ NEXT PHASE (solo tras OPEN GATE)
   Specification
 
 En paralelo (beta móvil EatClean):
-  Instalar shell · smoke jornada · no abrir M-06/MF-002
-  salvo bloqueador real de uso.
+  Lema: cada PR acerca la jornada completa del piloto.
+  P0 = PS-002-C · smoke nativo estricto · pedido real E2E
+  Checklist oficial: BETA_READINESS_CHECKPOINT.md §4
+  No abrir M-06/MF-002 / “de cara al futuro” salvo bloqueador real.
 
 Prohibido prematuro: Event Bus · Notifications · Jobs · Analytics · AI
 ═══════════════════════════════════════════════

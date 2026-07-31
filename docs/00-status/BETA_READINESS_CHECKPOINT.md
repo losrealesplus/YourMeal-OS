@@ -1,15 +1,21 @@
 # Checkpoint · Beta Readiness (EatClean Mobile)
 
 **Fecha:** 2026-07-31  
-**Tipo:** Revisión corta de fase (no auditoría)  
-**Pregunta rectora:** ¿Puede EatClean utilizar esta aplicación durante una jornada de trabajo?  
+**Tipo:** Revisión corta de fase (no auditoría) · **Accepted** como criterio de priorización  
+**Pregunta rectora (antes):** ¿Está preparada la arquitectura?  
+**Pregunta rectora (ahora):** ¿Puede EatClean empezar a trabajar con ella el lunes por la mañana?  
 **Contexto:** Cierre de infraestructura móvil MF-001 (M-01 → M-02 → M-04 → M-03).  
 
 **PRs infra móvil:** #117 (M-01) · #119 (M-02) · #120 (M-04) · #122 (M-03) — merged.
 
+**Lema del sprint:**
+
+> Cada PR debe acercar un poco más el momento en que EatClean pueda trabajar una jornada completa con la aplicación.  
+> Si no contribuye a eso → documentar, planificar, **posponer**.
+
 ---
 
-## 1. Módulos completados (cimientos)
+## 1. Infraestructura — CERRADA para la beta
 
 | Módulo | Estado | Qué habilita |
 |--------|--------|--------------|
@@ -19,7 +25,18 @@
 | M-04 StorageProvider | ✅ | Persistencia unificada (sesión, idioma, onboarding) |
 | M-03 Offline Queue | ✅ | Outbox de intenciones (sin ejecutar aún) |
 
-**Veredicto cimientos:** suficientes para dejar de construir plataforma y centrar el sprint en **uso real**.
+**Decisión:** no invertir más tiempo ahora en nuevas abstracciones, providers, capas u optimizaciones arquitectónicas. Base suficiente para un piloto controlado.
+
+### Evitar en el próximo sprint (scope creep)
+
+Cualquier tarea que empiece por:
+
+* “Sería interesante…”
+* “Podríamos preparar…”
+* “De cara al futuro…”
+* “Ya que estamos…”
+
+Esas frases se documentan y se posponen.
 
 ---
 
@@ -35,91 +52,125 @@
 
 ---
 
-## 3. Flujo cliente (Customer App)
+## 3. P0 — Bloqueadores reales
 
-| Paso | Ruta / superficie | ¿Usable en beta? |
-|------|-------------------|------------------|
-| Login | `/auth` | Sí (código); gate evidencia → PS-002-C |
-| Menú semanal | `/app/menu` | Sí · datos Supabase |
-| Programar pedido | `/app/schedule` | Sí · draft order |
-| Pedidos | `/app/orders` | Sí |
-| Métodos de pago | `/app/payment-methods` | Parcial · facturación tenant (no captura tarjeta) |
-| Favoritos / settings / addresses | `/app/*` | Presentes; validar en dispositivo |
+### P0-1 · PS-002-C — Auth real
 
-**Hueco crítico de evidencia:** sesión real Supabase en entorno piloto (**PS-002-C**).
+Sin autenticación real **no existe piloto**.  
+Credenciales piloto (`PS002_EMAIL` / `PS002_PASSWORD`) + evidencia de sesión estable.  
+Relacionado: FCR-009 (E2E auth) permanece abierto como investigación.
+
+### P0-2 · Smoke Test nativo (estricto)
+
+**No basta con que compile.** Debe ocurrir en **dispositivos reales**.
+
+#### Android
+
+- [ ] Instala correctamente  
+- [ ] Abre  
+- [ ] Login  
+- [ ] Navegar entre pantallas  
+- [ ] Cerrar la app  
+- [ ] Abrir de nuevo  
+- [ ] **Mantiene sesión**
+
+#### iPhone
+
+- [ ] Instala correctamente  
+- [ ] Abre  
+- [ ] Login  
+- [ ] Navegar entre pantallas  
+- [ ] Cerrar la app  
+- [ ] Abrir de nuevo  
+- [ ] **Mantiene sesión**
+
+Hasta que Android **e** iPhone no pasen esta lista, **no** se asume beta lista.
+
+Operador: `npm run sync:mobile` → Android Studio / Xcode (cloud no sustituye).
+
+### P0-3 · Flujo operativo completo
+
+No preguntar “¿funciona la pantalla?”.  
+Preguntar: **¿Puede EatClean completar un pedido real sin intervención del equipo técnico?**
+
+Ciclo acotado: pedido cliente → cocina → reparto → entrega (sin inventarios/compras placeholder).
 
 ---
 
-## 4. Flujo administrador (Centro de Operaciones)
+## 4. Criterio de aceptación de la Beta (oficial)
 
-| Superficie | Estado |
-|------------|--------|
-| Dashboard, kitchen, kitchen-execution, delivery, orders | Conectadas (ops) |
-| Production / routes / customers / dishes / menus | Presentes |
-| Inventory · purchasing · reports · promotions | Placeholder — **fuera de beta** o declarar no-uso |
+La beta **no** se da por conseguida hasta marcar **todos** estos puntos en verde en evidencia de dispositivo / jornada real.
 
-Beta EatClean puede acotar: **pedido cliente → cocina → reparto** sin inventarios/compras.
+### Instalación
+
+- [ ] Android instala  
+- [ ] iPhone instala  
+
+### Acceso
+
+- [ ] Login  
+- [ ] Logout  
+- [ ] Persistencia de sesión  
+
+### Cliente
+
+- [ ] Ver menú  
+- [ ] Crear pedido  
+- [ ] Editarlo  
+- [ ] Confirmarlo  
+- [ ] Consultar historial  
+
+### Administración
+
+- [ ] Ver pedido  
+- [ ] Preparación  
+- [ ] Cocina  
+- [ ] Reparto  
+- [ ] Entrega  
+
+### Estabilidad
+
+- [ ] Sin bloqueos  
+- [ ] Sin pérdida de datos  
+- [ ] Sin cierres inesperados  
+
+Cuando todo esté en verde → **beta funcional** (no promesa técnica).
 
 ---
 
-## 5. Android / iPhone
+## 5. Mapa rápido código ↔ criterios (orientación)
 
-| Check | Estado |
-|-------|--------|
-| `capacitor.config.ts` · sin `server.url` | ✅ |
-| `npm run sync:mobile` + CI mobile | ✅ |
-| `@capacitor/preferences` (vía StorageProvider) | ✅ |
-| Instalar en device (operador) | ☐ pendiente humano |
-| Probar login + menú + pedido en device | ☐ pendiente humano |
-| Probar admin kitchen/delivery en device o tablet | ☐ pendiente humano |
+| Criterio | Superficie típica |
+|----------|-------------------|
+| Login / logout / sesión | `/auth` · StorageProvider auth bridge |
+| Menú / pedido / historial | `/app/menu` · `/app/schedule` · `/app/orders` |
+| Ops pedido → cocina → reparto | `/admin/orders` · kitchen · kitchen-execution · delivery · routes |
+| Placeholders fuera de beta | inventory · purchasing · reports · promotions |
 
 ---
 
-## 6. Bloqueadores reales para la primera beta
+## 6. Prioridad del sprint
 
-Ordenados por impacto en “jornada de trabajo”:
-
-1. **PS-002-C** — Auth real con credenciales piloto (`PS002_EMAIL` / `PS002_PASSWORD`). Sin esto no hay evidencia de sesión estable.  
-2. **FCR-009** — E2E auth (toaster / permanencia en `/auth`); investigación abierta.  
-3. **Instalación nativa** — `sync:mobile` + open Android Studio / Xcode en máquina operador (cloud no sustituye).  
-4. **Smoke de punta a punta en device** — cliente confirma pedido; ops ve/produce/entrega el mismo pedido (criterio [MILESTONE_EATCLEAN_PILOT_READY](./MILESTONE_EATCLEAN_PILOT_READY.md)).  
-5. **No enganchar Offline Queue en UI** hasta exista ejecutor mínimo (o aceptar beta 100% online).
-
-**No son bloqueadores de beta acotada:** M-06, cámara, push, SQLite, Background Sync, inventarios admin.
+| Prioridad | Trabajo | Por qué |
+|-----------|---------|---------|
+| P0 | **PS-002-C** / auth usable en piloto | Sin entrar no hay jornada |
+| P0 | Smoke nativo estricto (Android + iPhone) | Compilar ≠ beta |
+| P0 | Pedido real de punta a punta sin ayuda técnica | Criterio definitivo |
+| P1 | Huecos que fallen en el checklist §4 | Solo si bloquean casillas |
+| Evitar | M-06 · MF-002 · plugins · “de cara al futuro” | Scope creep |
 
 ---
 
 ## 7. Decisión de fase
 
 ```text
-ANTES                          AHORA
-¿Arquitectura correcta?   →   ¿EatClean puede trabajar un día?
-Construcción de plataforma →   Preparación para validación
-MF-001 cimientos           →   Pilot smoke + gates de evidencia
+ANTES                              AHORA
+¿Arquitectura correcta?      →   ¿EatClean puede el lunes por la mañana?
+Construcción de plataforma   →   Demostrar valor al primer cliente
+Más cimientos                →   Casillas del §4 en verde
 ```
 
-**Siguiente sprint (recomendado):** solo trabajo que desbloquee instalación + jornada piloto.
-
-| Prioridad | Trabajo | Por qué |
-|-----------|---------|---------|
-| P0 | Completar **PS-002-C** / auth E2E en proyecto oficial | Sin sesión no hay jornada |
-| P0 | Smoke nativo EatClean (Android primero) | Demuestra app móvil, no solo web |
-| P1 | Cerrar huecos del ciclo pedido→cocina→reparto visibles en device | Criterio del milestone piloto |
-| P2 | Ejecutor mínimo de Offline Queue **solo si** un flujo offline operativo es imprescindible | Hoy el piloto cliente es online-only |
-| Evitar | M-06 completo · MF-002 · plugins · pulido no ligado al smoke | Complejidad sin valor inmediato |
-
----
-
-## 8. Definition of “beta usable” (esta fase)
-
-EatClean puede:
-
-1. Instalar el shell en un Android (o iPhone) de prueba.  
-2. Iniciar sesión con usuario piloto.  
-3. Ver menú, programar y confirmar un pedido.  
-4. Desde ops, ver y avanzar ese pedido en cocina/reparto **sin salir de la plataforma**.  
-
-Si falla cualquiera de 1–4, el siguiente PR se dedica a eso — no a más abstracciones.
+Si un cambio no acerca una casilla del §4 a verde → **fuera de este sprint**.
 
 ---
 
