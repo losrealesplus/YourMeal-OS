@@ -6,12 +6,15 @@
 **Pregunta rectora (ahora):** ¿Puede EatClean empezar a trabajar con ella el lunes por la mañana?  
 **Contexto:** Cierre de infraestructura móvil MF-001 (M-01 → M-02 → M-04 → M-03).  
 
-**PRs infra móvil:** #117 (M-01) · #119 (M-02) · #120 (M-04) · #122 (M-03) — merged.
+**PRs infra móvil:** #117 (M-01) · #119 (M-02) · #120 (M-04) · #122 (M-03) — merged.  
+**Acta de cierre de fase:** [INFRASTRUCTURE_PHASE_CLOSED](./INFRASTRUCTURE_PHASE_CLOSED.md) ✅  
 
 **Lema del sprint:**
 
 > Cada PR debe acercar un poco más el momento en que EatClean pueda trabajar una jornada completa con la aplicación.  
 > Si no contribuye a eso → documentar, planificar, **posponer**.
+
+**Rol de revisión vigente:** Product CTO — instalar · usar · completar flujo · estabilidad para cliente.
 
 ---
 
