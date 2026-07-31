@@ -6,7 +6,7 @@
  *   FAIL    (exit 1) — pipeline began and broke at a concrete step
  *   BLOCKED (exit 2) — pipeline never began (external preconditions)
  *
- * Required for PASS attempt:
+ * Required for PASS attempt (from `.env` or environment):
  *   PS002_EMAIL
  *   PS002_PASSWORD
  *
@@ -16,13 +16,15 @@
  *   PS002_EXPECT_PATH    default /admin
  *
  * Usage:
+ *   npm run bootstrap:e2e
  *   VITE_BOOTSTRAP_MODE=false npm run dev -- --host 127.0.0.1 --port 8080
- *   PS002_EMAIL=… PS002_PASSWORD=… npm run test:ps002-canonical-auth
+ *   npm run test:ps002-canonical-auth
  *
  * Evidence: docs/10-validation/platform-stabilization/evidence/ps002c-canonical-auth.json
  *
  * Does NOT mock Auth · create users · bypass · or modify the application.
  */
+import "dotenv/config";
 import { chromium } from "playwright";
 import fs from "node:fs";
 import path from "node:path";
@@ -150,9 +152,21 @@ async function main() {
   try {
     browser = await chromium.launch({ headless: true });
   } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    const looksMissingBrowser =
+      /Executable doesn't exist|browserType\.launch|chromium_headless_shell|Failed to launch/i.test(
+        msg,
+      );
     process.exit(
       emitBlocked(
-        `Playwright/browser unavailable: ${e instanceof Error ? e.message : String(e)}`,
+        looksMissingBrowser
+          ? [
+              "Playwright browser binaries are missing or incomplete.",
+              "Playwright 1.49+ may require chromium_headless_shell (not only chromium).",
+              "Fix: npm run bootstrap:e2e",
+              `Detail: ${msg}`,
+            ].join("\n")
+          : `Playwright/browser unavailable: ${msg}`,
       ),
     );
   }
