@@ -26,6 +26,8 @@ Un solo código · sin React Native
 | [M-04 Implementation](./M-04_IMPLEMENTATION.md) | Guía de uso / extensión adapters |
 | [M-03 Offline Queue](./M-03_OFFLINE_QUEUE.md) | ✅ CLOSED · outbox + retries (sin sync) |
 | [M-03 Implementation](./M-03_IMPLEMENTATION.md) | Guía de uso / estados / flags |
+| [Beta Readiness Checkpoint](../00-status/BETA_READINESS_CHECKPOINT.md) | Cambio de fase · bloqueadores piloto EatClean |
+| [Infrastructure Phase CLOSED](../00-status/INFRASTRUCTURE_PHASE_CLOSED.md) | ✅ Acta · no más cimientos para la beta |
 | [Session close 2026-07-30](./SESSION_CLOSE_2026-07-30.md) | Acta de cierre de sesión |
 | [M-01 Dual Build Plan](./M-01_DUAL_BUILD_PLAN.md) | Evidence + Design · Web SSR ≠ Mobile SPA · M-01.1…M-01.6 |
 | [M-01 Capacitor Audit](./M-01_CAPACITOR_AUDIT.md) | Auditoría pre-scaffold + checklist M-01.3…M-01.5 |

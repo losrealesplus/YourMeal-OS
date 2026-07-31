@@ -145,6 +145,10 @@ UI → OfflineQueue → StorageProvider
 
 **DoD M-03:** ✅ cola persistente + tests + docs · alcance beta reducido.
 
+**Cambio de fase (2026-07-31):** cimientos MF-001 (M-01…M-03/M-04) cerrados.  
+Foco → validación EatClean: [BETA_READINESS_CHECKPOINT](../00-status/BETA_READINESS_CHECKPOINT.md).  
+No abrir M-06 / MF-002 salvo bloqueador real de jornada piloto.
+
 ---
 
 ### M-04 · Abstracción Storage

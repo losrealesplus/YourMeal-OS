@@ -1,6 +1,6 @@
 # CURRENT_PHASE
 
-**Última actualización:** 2026-07-29  
+**Última actualización:** 2026-07-31  
 **No sustituye** [MILESTONES](./MILESTONES.md) — tablero de “dónde estamos ahora”.
 
 ```text
@@ -25,6 +25,19 @@ FCR-008                     ✅ Canonical session (código)
 FCR-009                     🔍 Auth E2E investigation
                              (Toaster ausente · no fix aún)
 
+Mobile Foundation (MF-001)  ✅ Cimientos CLOSED
+  M-01 Capacitor            ✅ #117
+  M-02 DeviceCapabilities   ✅ #119
+  M-04 StorageProvider      ✅ #120
+  M-03 Offline Queue        ✅ #122
+  → INFRASTRUCTURE_PHASE_CLOSED.md
+  → BETA_READINESS_CHECKPOINT.md
+  → Foco: Product CTO · jornada EatClean
+
+Sprint activo
+  P0-1 PS-002-C             ⏳ BLOCKED (credenciales + cutover runtime)
+  Kickoff: ../10-validation/PS002C_BETA_SPRINT_KICKOFF.md
+
 ═══════════════════════════════════════════════
 OPEN GATE
 
@@ -44,12 +57,19 @@ NEXT PHASE (solo tras OPEN GATE)
   Kitchen → Delivery
   Specification
 
+En paralelo (beta móvil EatClean):
+  Lema: cada PR acerca la jornada completa del piloto.
+  P0 = PS-002-C · smoke nativo estricto · pedido real E2E
+  Checklist oficial: BETA_READINESS_CHECKPOINT.md §4
+  No abrir M-06/MF-002 / “de cara al futuro” salvo bloqueador real.
+
 Prohibido prematuro: Event Bus · Notifications · Jobs · Analytics · AI
 ═══════════════════════════════════════════════
 Ver: ../10-validation/PRIORITY_PS002C_BEFORE_FLOW.md
      ../10-validation/platform-stabilization/PS-002.md
      ../10-validation/FCR008_CANONICAL_POST_LOGIN_SESSION.md
      ../10-validation/auth/AUTH_E2E_INVESTIGATION.md
+     ./BETA_READINESS_CHECKPOINT.md
 ═══════════════════════════════════════════════
 ```
 
