@@ -2,10 +2,10 @@
 
 **Documento:** `MF-001_MOBILE_FOUNDATION.md`  
 **Fecha:** 2026-07-30  
-**Estado:** Proposed · **M-01.1…M-01.5 scaffold en curso** (build + Capacitor 8) · M-03…M-06 / plugins aún diferidos  
+**Estado:** Active · **M-01 CLOSED** ([acta](./M-01_CLOSED.md)) · **M-02 DeviceCapabilities OPEN** ([spec](./M-02_DEVICECAPABILITIES.md))  
 **Categoría PR:** Platform mobile foundation (sin cambios de negocio)  
 **ADR:** [0032 Native Mobile Strategy](../adr/0032-native-mobile-strategy.md) · [0033 Platform Independence](../adr/0033-platform-independence.md)  
-**Evidencia / plan:** [NATIVE_MOBILE_INVESTIGATION](./NATIVE_MOBILE_INVESTIGATION.md) · [NATIVE_MOBILE_PLAN](./NATIVE_MOBILE_PLAN.md) · [M-01 Dual Build](./M-01_DUAL_BUILD_PLAN.md)
+**Evidencia / plan:** [NATIVE_MOBILE_INVESTIGATION](./NATIVE_MOBILE_INVESTIGATION.md) · [NATIVE_MOBILE_PLAN](./NATIVE_MOBILE_PLAN.md) · [M-01 Dual Build](./M-01_DUAL_BUILD_PLAN.md) · [Session close 2026-07-30](./SESSION_CLOSE_2026-07-30.md)
 
 ---
 
@@ -14,7 +14,7 @@
 | ID | Significado | Estado |
 |----|-------------|--------|
 | **PS-003** | Platform Stabilization · **Navigation Stability Gate** | ✅ PASS (histórico) |
-| **MF-001** | **Mobile Foundation** (este paquete) | Proposed |
+| **MF-001** | **Mobile Foundation** (este paquete) | Active · M-01 ✅ · M-02 🔓 |
 
 ```text
 Platform Stabilization (PS)
@@ -62,7 +62,7 @@ Cloudflare / Nitro
 ```
 
 - Un repositorio · un frontend · un backend  
-- Capacitor = capa nativa vía **DeviceCapabilities** (M-05)  
+- Capacitor = capa nativa vía **DeviceCapabilities** ([M-02](./M-02_DEVICECAPABILITIES.md))  
 - Offline solo Kitchen · Delivery · Warehouse  
 - Dominio agnóstico de plataforma ([ADR 0033](../adr/0033-platform-independence.md))
 
@@ -105,40 +105,20 @@ M-01 Mobile Infrastructure
 
 **DoD M-01:** dual pipeline documentado + `build:mobile` produce shell; `cap sync` carga WebView; `npm run build` web intacto.
 
-**Hecho (2026-07-30):** `capacitor.config.ts` · Capacitor 8 · `android/` · `ios/` · `npm run sync:mobile` PASS.  
-Ver [CAPACITOR_WORKFLOW](./CAPACITOR_WORKFLOW.md). Plugins nativos / offline siguen diferidos (M-05 / M-03 / M-06).
+**✅ CLOSED 2026-07-30** — [M-01_CLOSED](./M-01_CLOSED.md) · PR #117.  
+Ver [CAPACITOR_WORKFLOW](./CAPACITOR_WORKFLOW.md).
+
+El “proceso de build” (antes borrador M-02) quedó absorbido en **M-01.1 / M-01.2** y cerrado con M-01.
 
 ---
 
-### M-02 · Proceso de build
+### M-02 · DeviceCapabilities
 
-Separar artefactos sin tocar el flujo SSR existente.  
-Contrato detallado: [M-01 Dual Build Plan](./M-01_DUAL_BUILD_PLAN.md) (M-01.1 / M-01.2).
+**Estado:** 🔓 OPEN · [especificación](./M-02_DEVICECAPABILITIES.md)
 
-Hoy (confirmado 2026-07-30):
+Contrato + Registry + `WebAdapter` / `CapacitorAdapter` · Capability Negotiation · **sin** plugins de producto ni lógica de negocio.
 
-```text
-npm run build
-        ↓
-.output/public     ← assets · sin index.html
-.output/server     ← Nitro / Cloudflare SSR
-```
-
-Objetivo:
-
-```text
-build:web      → SSR + worker (igual que hoy · M-01.1)
-build:mobile   → SPA Shell TanStack (M-01.2)
-sync:mobile    → cap copy / sync (M-01.3)
-```
-
-| Regla | |
-|-------|--|
-| `build:web` | No se rompe · Lovable / Cloudflare |
-| `build:mobile` | Segundo artefacto del **mismo** código · spa solo con env |
-| Prohibido | Convertir el producto entero en SPA · HTML manual · mezclar pipelines |
-
-**DoD M-02:** scripts estables; CI o script local produce ambos artefactos; documentado en README mobile.
+DoD: ver spec M-02.
 
 ---
 
@@ -205,61 +185,10 @@ StorageProvider
 
 ---
 
-### M-05 · DeviceCapabilities
+### M-05 · (retirado · renumerado)
 
-No modelar un servicio por plugin. Modelar un **catálogo de capacidades** con negociación de estado ([ADR 0033 · Capability Negotiation](../adr/0033-platform-independence.md)).
-
-```text
-Domain
-      ↓
-Capability Contract
-      ↓
-Capability Registry
-      ↓
-Platform Adapter
-```
-
-Catálogo (extensible):
-
-```text
-DeviceCapabilities
-├── Camera
-├── Location
-├── Notifications
-├── Biometrics
-├── FileSystem
-├── Share
-├── Clipboard
-├── Contacts
-├── Network
-├── Sensors
-└── DeepLinks
-```
-
-El dominio **nunca** pregunta la plataforma; pregunta el contrato:
-
-```ts
-if (capabilities.biometrics.isAvailable()) { ... }
-if (capabilities.camera.canCaptureImages()) { ... }
-```
-
-Estados negociables (ejemplos — contrato M-05):
-
-```text
-Camera      supported | unavailable | permissionDenied
-Location    supported | disabled | denied
-Biometrics  faceID | touchID | fingerprint | unsupported
-Network     online | offline | constrained
-```
-
-| Regla | |
-|-------|--|
-| Dominio | Solo Capability Contract |
-| Registry | Resuelve adapter activo + cachea negotiation |
-| Web / Native | Adapters; degradación explícita por estado |
-| Prohibido | `getPlatform()`, `isAndroid`, imports `@capacitor/*` en dominio |
-
-**DoD M-05:** Contract + Registry + stubs web · capabilities mínimas (Camera · Location · Notifications · Network · FileSystem) con estados negociables documentados · resto deferred.
+El contenido de DeviceCapabilities vive ahora en **[M-02](./M-02_DEVICECAPABILITIES.md)** (tras el cierre de M-01).  
+No usar “M-05” para trabajo nuevo.
 
 ---
 
@@ -305,13 +234,13 @@ Supabase
 ## Orden de ejecución
 
 ```text
-Aprobar MF-001 + ADR 0032 + ADR 0033
+M-01 CLOSED (infra + dual build + CI)
         ↓
-M-01 → M-02        (spike infraestructura + build)
+M-02 DeviceCapabilities   ← OPEN (contrato + adapters)
         ↓
-M-04 → M-05        (StorageProvider + DeviceCapabilities)
+M-04 StorageProvider
         ↓
-M-03 → M-06        (Offline Queue → Sync Engine)
+M-03 → M-06               (Offline Queue → Sync Engine)
         ↓
 CAP piloto bajo Flow Kitchen (un comando)
 ```

@@ -18,7 +18,10 @@ Un solo código · sin React Native
 
 | Artefacto | Rol |
 |-----------|-----|
-| [MF-001 · Mobile Foundation](./MF-001_MOBILE_FOUNDATION.md) | Paquete M-01…M-06 · **no es PS-003** · freeze hasta aprobación |
+| [MF-001 · Mobile Foundation](./MF-001_MOBILE_FOUNDATION.md) | Paquete móvil · **no es PS-003** |
+| [M-01 CLOSED](./M-01_CLOSED.md) | Capacitor infra · PR #117 |
+| [M-02 DeviceCapabilities](./M-02_DEVICECAPABILITIES.md) | **OPEN** · contrato + adapters |
+| [Session close 2026-07-30](./SESSION_CLOSE_2026-07-30.md) | Acta de cierre de sesión |
 | [M-01 Dual Build Plan](./M-01_DUAL_BUILD_PLAN.md) | Evidence + Design · Web SSR ≠ Mobile SPA · M-01.1…M-01.6 |
 | [M-01 Capacitor Audit](./M-01_CAPACITOR_AUDIT.md) | Auditoría pre-scaffold + checklist M-01.3…M-01.5 |
 | [Capacitor Workflow](./CAPACITOR_WORKFLOW.md) | `sync:mobile` · android/ios · convenciones Lovable |
