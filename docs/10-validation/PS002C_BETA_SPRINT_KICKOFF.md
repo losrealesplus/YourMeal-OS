@@ -23,12 +23,13 @@ VITE_BOOTSTRAP_MODE=false npm run dev -- --host 127.0.0.1 --port 8080
 npm run test:ps002-canonical-auth
 ```
 
-`bootstrap:e2e` verifica Node · npm · dotenv · `.env` · credenciales PS002 · Playwright · **Chromium (new headless / `channel: chromium`)**.  
+`bootstrap:e2e` verifica Node · npm · dotenv · `.env` · credenciales PS002 · Playwright · **Chromium (new headless / `channel: chromium`)** · **integridad** (`INSTALLATION_COMPLETE` + Framework/resources).  
 **No** exige `chromium_headless_shell`.  
-Si falta algo → **BLOCKED** con el fix exacto (`npx playwright install chromium --no-shell`).  
+Binario presente pero Framework ausente → **BLOCKED** (`Chromium installation incomplete`).  
+Si falta algo → fix exacto (`npx playwright install chromium --no-shell`).  
 Nunca recomienda bare `npx playwright install` (puede colgarse).  
 
-Detalle: [PS002C_PLAYWRIGHT_HEADLESS_SHELL.md](./PS002C_PLAYWRIGHT_HEADLESS_SHELL.md)
+Detalle: [PS002C_PLAYWRIGHT_HEADLESS_SHELL.md](./PS002C_PLAYWRIGHT_HEADLESS_SHELL.md) · [PS002C_CHROMIUM_INTEGRITY.md](./PS002C_CHROMIUM_INTEGRITY.md)
 
 Solo comprobar (sin instalar): `npm run bootstrap:e2e:check`
 
