@@ -4,6 +4,7 @@
 **Tipo:** Certificación de flujo (sin nuevas funcionalidades)  
 **Precedente:** [BR-03.1 Admin Audit](./BR-03_ADMIN_AUDIT.md)  
 **Estrategia BR-03:** Certificar Admin (no construir Admin desde cero)  
+**Scope Decision:** **B adoptada** — [BR-03_SCOPE_DECISION.md](./BR-03_SCOPE_DECISION.md)  
 **Pregunta:** ¿Puede un administrador preparar una semana completa de EatClean?
 
 ---
@@ -72,7 +73,7 @@ Login admin
 | Causa | La UI de `/admin/dishes` **no** expone formulario de edición ni llama a `DishService.update` con campos de negocio (solo `update` para activar) |
 | Dominio | `UpdateDishUseCase` / `DishService.update` existen en módulo, **no cableados a la pantalla** |
 | Impacto | No se puede corregir nombre/precio/descripción tras el alta sin intervención técnica |
-| Propuesta mínima (BR-03.3) | Botón «Editar» en fila → mismo formulario de alta en modo patch (`name`, `description`, `price`, `kcal`) vía `DishService.update` · sin rediseño |
+| Propuesta mínima | Beta vNext · botón «Editar» → form patch (`name`, `description`, `price`, `kcal`) vía `DishService.update` |
 
 ---
 
@@ -84,9 +85,9 @@ Login admin
 | Activar | **PASS** — botón «Activar» si `status !== "active"` · `DishService.update({ status: "active" })` |
 | Desactivar | **FAIL** — no hay control UI; `DeactivateDishUseCase` existe solo en dominio |
 | Impacto | No se puede retirar un plato de la oferta operativa desde el panel (salvo no usarlo en el menú) |
-| Propuesta mínima (BR-03.3) | Botón «Desactivar» para filas `active` → `DishService.update({ status: "inactive" })` o use case UC-004 · filtrar `DishService.list` / selector de menú a platos activos (ya alineado en menús) |
+| Propuesta mínima | Beta vNext · botón «Desactivar» → `DishService.update({ status: "inactive" })` |
 
-**Workaround beta (sin BR-03.3):** crear platos ya activos y no depender de desactivar para preparar la semana.
+**Workaround Beta v1 (Decisión B):** crear platos ya activos y no depender de desactivar para preparar la semana.
 
 ---
 
@@ -108,7 +109,7 @@ Login admin
 | Evidencia | Selector día + plato → `WeeklyMenuService.addDishToDay` · días = `utcWeekDates(week_start)` |
 | Matiz | La UI añade **un slot por acción**; cubrir «todos los días» es repetición manual (lun–dom), no un botón «rellenar semana» |
 | Impacto | No bloquea la beta; solo DX |
-| Propuesta mínima | Ninguna obligatoria; opcional más adelante «copiar a resto de días» (fuera de BR-03.3 salvo que el smoke live lo declare bloqueante) |
+| Propuesta mínima | Ninguna obligatoria; opcional «copiar a resto de días» fuera de Beta v1 |
 
 ---
 
@@ -151,41 +152,40 @@ Login admin
 ## Veredicto de certificación
 
 ```text
-Administrador puede preparar una semana completa
-  → NO CERTIFICADO aún (criterio smoke estricto)
+Criterio smoke estricto (Edit + Disable)
+  → NO CERTIFICADO (FAIL G1/G2)
+
+Criterio Beta v1 acotado (Decisión B · 2026-07-31)
+  → Estructura OK para Create → Publish → Client
+  → CERTIFICACIÓN pendiente de runtime (G3)
 ```
 
-### Por qué
+### Decisión adoptada
 
-El smoke pide **Editar** y **Desactivar**. Ambos faltan en UI → **FAIL**.
+**B — Beta acotada** · formalizada en [BR-03_SCOPE_DECISION.md](./BR-03_SCOPE_DECISION.md).
 
-### Matiz de producto (beta acotada)
+Edit Dish y Disable Dish → **fuera de Beta v1** · backlog **Beta vNext** (G1/G2 no se eliminan).
 
-El camino **mínimo para publicar una semana**:
+El camino operativo de certificación:
 
 ```text
 Crear plato (ya activo) → Borrador semana → Añadir slots → Publicar → Cliente lee published
 ```
 
-está **estructuralmente PASS** (pasos 2, 5, 6, 7, 8).
-
-Si Product CTO acepta ese camino acotado **sin** editar/desactivar en la beta, BR-03.4 puede certificarse tras:
-
-1. Smoke **runtime** de login + create + publish + vista cliente (cierra BLOCKED), y  
-2. Declarar explícitamente fuera de alcance: editar / desactivar (o cerrarlos en BR-03.3).
+está **estructuralmente PASS** (pasos 2, 5, 6, 7, 8). Falta cerrar **BLOCKED runtime** en pasos 1 y 8.
 
 ---
 
-## Gaps para BR-03.3 (solo lo que desbloquea)
+## Gaps (tras Decisión B)
 
-| ID | Gap | Severidad beta | Fix mínimo |
-|----|-----|----------------|------------|
-| G1 | Sin editar plato en UI | Media (smoke estricto FAIL) | Form patch 4 campos |
-| G2 | Sin desactivar plato en UI | Media (smoke estricto FAIL) | Botón desactivar |
-| G3 | Smoke runtime no ejecutado | Alta para certificación real | Operador: login staff + recorrido live |
-| G4 | Rellenar todos los días manual | Baja | No obligatorio |
+| ID | Gap | ¿Bloquea Beta v1? | Destino |
+|----|-----|-------------------|---------|
+| G1 | Sin editar plato en UI | No | Beta vNext |
+| G2 | Sin desactivar plato en UI | No | Beta vNext |
+| G3 | Smoke runtime no ejecutado | **Sí** | **BR-03.3** |
+| G4 | Rellenar todos los días manual | No | Opcional / DX |
 
-**No priorizar en BR-03.3:** inventario, promociones, informes, quitar slot, unpublish, categorías.
+**No priorizar en Beta v1:** inventario, promociones, informes, quitar slot, unpublish, categorías.
 
 ---
 
@@ -193,10 +193,10 @@ Si Product CTO acepta ese camino acotado **sin** editar/desactivar en la beta, B
 
 | ID | Objetivo | Estado |
 |----|----------|--------|
-| BR-03.1 | Admin Audit | Documento (PR audit) |
-| **BR-03.2** | **Admin Smoke Test** | **Este documento** |
-| BR-03.3 | Gap Fixes (solo G1/G2/G3 si se exige smoke estricto) | Pendiente decisión Product CTO |
-| BR-03.4 | Admin Certified | Tras PASS runtime + política de gaps |
+| BR-03.1 | Admin Audit | ✅ |
+| **BR-03.2** | **Admin Smoke Test** | ✅ **Este documento** · Decisión B |
+| BR-03.3 | Runtime Validation (G3) | ➡ [BR-03_RUNTIME_VALIDATION.md](./BR-03_RUNTIME_VALIDATION.md) |
+| BR-03.4 | Admin Certified | Tras PASS runtime bajo flujo acotado |
 
 ---
 
@@ -212,14 +212,9 @@ Si Product CTO acepta ese camino acotado **sin** editar/desactivar en la beta, B
 
 ---
 
-## Decisión pedida (Product CTO)
+## Decisión Product CTO
 
-Elegir una:
-
-**A — Smoke estricto**  
-Exige Editar + Desactivar → abrir **BR-03.3** (G1+G2) → luego runtime → BR-03.4.
-
-**B — Beta acotada**  
-Aceptar alta-activa + publish sin editar/desactivar → solo **runtime smoke** (G3) → BR-03.4 con gaps declarados fuera de alcance.
-
-Recomendación alineada a «jornada EatClean»: **B**, salvo que el operador necesite corregir platos tras el alta en la primera semana piloto.
+| Opción | Estado |
+|--------|--------|
+| A — Smoke estricto (G1+G2) | Rechazada para Beta v1 |
+| **B — Beta acotada (solo G3 bloquea)** | **✅ Adoptada** · [Scope Decision](./BR-03_SCOPE_DECISION.md) |

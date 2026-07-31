@@ -177,8 +177,27 @@ Si un cambio no acerca una casilla del §4 a verde → **fuera de este sprint**.
 
 ---
 
+## 8. BR-03 · Admin certification (Fase 3)
+
+| ID | Estado |
+|----|--------|
+| BR-03.1 Audit | ✅ |
+| BR-03.2 Smoke | ✅ |
+| **Scope Decision B** | ✅ Edit / Disable Dish → **fuera de Beta v1** ([doc](../12-beta/BR-03_SCOPE_DECISION.md)) |
+| BR-03.3 Runtime (G3) | ➡ Siguiente · [checklist](../12-beta/BR-03_RUNTIME_VALIDATION.md) |
+| BR-03.4 Admin Certified | Tras PASS runtime del flujo acotado |
+| BR-04 Client Flow | Después |
+| BR-05 Pilot Day | Después |
+
+**Flujo operativo Beta v1 (admin):** Create Dish → Weekly Draft → Assign Slots → Publish → Client Consumption.
+
+**Regla FOPEBA (beta):** un FAIL solo bloquea la certificación si impide ese flujo ([DoD](./DEFINITION_OF_DONE.md)).
+
+---
+
 ## Referencias
 
 - [MF-001](../11-mobile/MF-001_MOBILE_FOUNDATION.md) · [M-01 CLOSED](../11-mobile/M-01_CLOSED.md) · [M-02](../11-mobile/M-02_CLOSED.md) · [M-04](../11-mobile/M-04_CLOSED.md) · [M-03](../11-mobile/M-03_CLOSED.md)  
 - [CURRENT_PHASE](./CURRENT_PHASE.md) · [MILESTONE_EATCLEAN_PILOT_READY](./MILESTONE_EATCLEAN_PILOT_READY.md)  
+- [12-beta · BR-03](../12-beta/README.md) · [BR-03 Scope Decision B](../12-beta/BR-03_SCOPE_DECISION.md)  
 - [PRIORITY_PS002C_BEFORE_FLOW](../10-validation/PRIORITY_PS002C_BEFORE_FLOW.md) · [CAPACITOR_WORKFLOW](../11-mobile/CAPACITOR_WORKFLOW.md)

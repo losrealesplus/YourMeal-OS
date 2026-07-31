@@ -45,6 +45,17 @@ Código sin handoff/evidencia puede existir en ramas de exploración, pero **no*
 
 ---
 
+## Regla auxiliar · Beta certification (FOPEBA)
+
+Cuando el objeto a certificar es un **flujo operativo de beta** (BR-*), aplica además:
+
+> **Un FAIL solo bloquea la certificación si impide completar el flujo operativo definido.**
+
+Así una capacidad útil pero no crítica no retrasa una beta funcional.  
+Detalle y ejemplo BR-03: [BR-03_SCOPE_DECISION](../12-beta/BR-03_SCOPE_DECISION.md) · [DEFINITION_OF_DONE](./DEFINITION_OF_DONE.md).
+
+---
+
 ## Relación
 
 - Gobernanza: [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md)  
