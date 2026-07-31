@@ -76,13 +76,15 @@ describe("runPs002cPreflight", () => {
       password: "secret",
       resolveBrowser: () => ({
         ok: false,
-        reason: "Chromium / headless_shell binary is not installed.\nFix: npm run bootstrap:e2e",
+        reason:
+          "Chromium binary is missing (required for channel: chromium).\nFix: npx playwright install chromium --no-shell",
       }),
       probeServer: async () => ({ ok: true }),
     });
     assert.equal(result.ok, false);
     if (!result.ok) {
-      assert.match(result.reason, /headless_shell|bootstrap:e2e/);
+      assert.match(result.reason, /Chromium|channel: chromium/);
+      assert.match(result.reason, /--no-shell|bootstrap:e2e|install chromium/);
     }
   });
 

@@ -40,6 +40,7 @@ import {
   validateCanonicalPipeline,
 } from "./lib/canonical-pipeline.mjs";
 import { runPs002cPreflight } from "./lib/ps002c-preflight.mjs";
+import { PS002C_BROWSER_POLICY } from "./lib/ps002c-playwright.mjs";
 
 const BASE = process.argv[2] || process.env.PS_BASE_URL || "http://127.0.0.1:8080";
 const EMAIL = process.env.PS002_EMAIL || "";
@@ -144,7 +145,9 @@ async function main() {
 
   let browser;
   try {
-    browser = await chromium.launch({ headless: true });
+    // Playwright 1.49+ new headless — no chromium_headless_shell required.
+    // See docs/10-validation/PS002C_PLAYWRIGHT_HEADLESS_SHELL.md
+    browser = await chromium.launch({ ...PS002C_BROWSER_POLICY.launchOptions });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     const looksMissingBrowser =
@@ -155,9 +158,12 @@ async function main() {
       emitBlocked(
         looksMissingBrowser
           ? [
-              "Playwright browser binaries are missing or incomplete.",
-              "Playwright 1.49+ may require chromium_headless_shell (not only chromium).",
-              "Fix: npm run bootstrap:e2e",
+              "Playwright Chromium binary is missing or incomplete.",
+              "PS-002-C uses Chromium new headless (channel: chromium) — not headless_shell.",
+              `Fix: ${PS002C_BROWSER_POLICY.installCommand}`,
+              "Or: npm run bootstrap:e2e",
+              "Do not run bare `npx playwright install` (may hang).",
+              "See: docs/10-validation/PS002C_PLAYWRIGHT_HEADLESS_SHELL.md",
               `Detail: ${msg}`,
             ].join("\n")
           : `Playwright/browser unavailable: ${msg}`,
