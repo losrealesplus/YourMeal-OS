@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { getUser } from "@/auth";
+import { persistUiLanguage } from "@/i18n";
 import { LANGUAGES, type LanguageCode, getLanguage } from "@/i18n/languages";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,7 @@ export function QuietLocaleSwitch({ className }: { className?: string }) {
     if (code === current) return;
     await i18n.changeLanguage(code);
     document.documentElement.setAttribute("lang", code);
+    await persistUiLanguage(code);
     const { data } = await getUser();
     if (data.user) {
       await supabase.from("profiles").update({ locale: code }).eq("id", data.user.id);

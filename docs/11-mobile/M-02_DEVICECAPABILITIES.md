@@ -66,6 +66,6 @@ Esas capacidades se **negociarán** como `unavailable` / `unsupported` hasta mó
 |----|------|--------|
 | M-01 | Capacitor infra | ✅ CLOSED |
 | **M-02** | **DeviceCapabilities** | ✅ IMPLEMENTED (infra) |
+| **M-04** | **StorageProvider** | ✅ IMPLEMENTED |
 | M-03 | Offline Queue | Pending |
-| M-04 | StorageProvider | Pending |
 | M-06 | Sync Engine | Pending |

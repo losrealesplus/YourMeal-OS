@@ -20,8 +20,10 @@ Un solo código · sin React Native
 |-----------|-----|
 | [MF-001 · Mobile Foundation](./MF-001_MOBILE_FOUNDATION.md) | Paquete móvil · **no es PS-003** |
 | [M-01 CLOSED](./M-01_CLOSED.md) | Capacitor infra · PR #117 |
-| [M-02 DeviceCapabilities](./M-02_DEVICECAPABILITIES.md) | ✅ Infra · contrato + adapters |
+| [M-02 DeviceCapabilities](./M-02_DEVICECAPABILITIES.md) | ✅ CLOSED · contrato + adapters |
 | [M-02 Implementation](./M-02_IMPLEMENTATION.md) | Guía de uso / extensión |
+| [M-04 StorageProvider](./M-04_STORAGEPROVIDER.md) | ✅ CLOSED · persistencia unificada |
+| [M-04 Implementation](./M-04_IMPLEMENTATION.md) | Guía de uso / extensión adapters |
 | [Session close 2026-07-30](./SESSION_CLOSE_2026-07-30.md) | Acta de cierre de sesión |
 | [M-01 Dual Build Plan](./M-01_DUAL_BUILD_PLAN.md) | Evidence + Design · Web SSR ≠ Mobile SPA · M-01.1…M-01.6 |
 | [M-01 Capacitor Audit](./M-01_CAPACITOR_AUDIT.md) | Auditoría pre-scaffold + checklist M-01.3…M-01.5 |

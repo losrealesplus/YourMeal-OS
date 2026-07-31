@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Check, Globe } from "lucide-react";
 import { getUser } from "@/auth";
+import { persistUiLanguage } from "@/i18n";
 import { LANGUAGES, type LanguageCode, getLanguage } from "@/i18n/languages";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -34,6 +35,7 @@ export function LanguageSelector({
     if (code === i18n.resolvedLanguage) return;
     await i18n.changeLanguage(code);
     document.documentElement.setAttribute("lang", code);
+    await persistUiLanguage(code);
     // Persist to profile if signed in — non-blocking, silent on failure.
     const { data } = await getUser();
     if (data.user) {
