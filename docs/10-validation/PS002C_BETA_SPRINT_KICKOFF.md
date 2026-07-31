@@ -14,7 +14,7 @@ cp .env.example .env
 # Rellena SUPABASE_* / VITE_SUPABASE_* y PS002_EMAIL / PS002_PASSWORD en .env (local · gitignored)
 
 npm install
-npm run bootstrap:e2e          # Playwright + chromium_headless_shell
+npm run bootstrap:e2e          # diagnóstico READY/BLOCKED + instala browsers si faltan
 
 # Terminal 1
 VITE_BOOTSTRAP_MODE=false npm run dev -- --host 127.0.0.1 --port 8080
@@ -22,6 +22,11 @@ VITE_BOOTSTRAP_MODE=false npm run dev -- --host 127.0.0.1 --port 8080
 # Terminal 2
 npm run test:ps002-canonical-auth
 ```
+
+`bootstrap:e2e` verifica Node · npm · dotenv · `.env` · credenciales PS002 · Playwright · Chromium · Headless Shell.  
+Si falta algo → **BLOCKED** con el fix exacto. Si todo ok → **Environment Ready**.
+
+Solo comprobar (sin instalar): `npm run bootstrap:e2e:check`
 
 Sin `export` manual. Sin instalaciones ad-hoc no documentadas.
 

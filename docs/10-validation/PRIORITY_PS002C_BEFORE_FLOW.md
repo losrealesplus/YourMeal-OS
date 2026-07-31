@@ -52,13 +52,14 @@ No abrir PRs metodológicas nuevas · no tocar FOPEBA / Core / Identity hasta PS
 ```bash
 cp .env.example .env   # rellena PS002_EMAIL / PS002_PASSWORD + Supabase oficial
 npm install
-npm run bootstrap:e2e
+npm run bootstrap:e2e          # READY/BLOCKED + instala browsers si faltan
 VITE_BOOTSTRAP_MODE=false npm run dev -- --host 127.0.0.1 --port 8080
 npm run test:ps002-canonical-auth
 ```
 
-El runner carga `.env` (`dotenv`) y ejecuta **preflight** (archivo · credenciales · Playwright/headless_shell · servidor).  
-Sin `export` manual. `.env` está **gitignored**.
+`bootstrap:e2e` es diagnóstico FOPEBA: dice exactamente qué falta (`.env`, credenciales, Chromium, Headless Shell, …).  
+Solo check: `npm run bootstrap:e2e:check`.  
+`.env` está **gitignored**.
 
 Condición de salida objetiva (PASS):
 
