@@ -122,6 +122,8 @@ Contrato + `getDeviceCapabilities()` + `WebAdapter` / `CapacitorAdapter` · Capa
 
 ### M-03 · Offline Engine (cola local)
 
+**Estado:** ✅ **CLOSED** (infra) — [M-03_OFFLINE_QUEUE](./M-03_OFFLINE_QUEUE.md) · [CLOSED](./M-03_CLOSED.md) · `src/platform/offline-queue/`
+
 No es “guardar datos”. Es el **ciclo de vida de la cola offline** — gran parte del valor diferencial operativo.
 
 ```text
@@ -129,30 +131,28 @@ Offline Queue
       ↓
   Pending
       ↓
-  Running
+  Processing
       ↓
-  Success ──→ Audit
+  Completed ──→ (audit futuro)
       ↓
-   Retry
+   Failed (+ backoff)
       ↓
-  Conflict
-      ↓
-  Resolved ──→ Audit
+  Dead (max attempts)
 ```
 
 | Concepto | Contenido mínimo |
 |----------|------------------|
-| SQLite (vía StorageProvider) | Schema mínimo por módulo operativo |
+| Persistencia | **StorageProvider** (`ymos.offline.queue.v1`) — SQLite operativo diferido |
 | Offline Queue (outbox) | command_id · tipo · payload · prioridad · attempts |
-| Estados | `pending` · `running` · `success` · `retry` · `conflict` · `resolved` · (+ `dead` si agota retries) |
-| Prioridades | p. ej. delivery complete > temp inventory adjust |
-| Retries | Backoff + tope · jitter |
-| Auditoría | Trazas alineadas con soft-delete/audit (ADR 0006) |
+| Estados | `pending` · `processing` · `completed` · `failed` · `dead` (+ `conflict`/`resolved` reservados M-06) |
+| Prioridades | mayor valor = drenado antes |
+| Retries | Backoff exponencial + jitter · tope |
+| Feature flags | `offline.queue.enabled` · `offline.queue.maxAttempts` · `offline.sync.drainEnabled` |
 
-**Límite M-03:** define cola, estados, persistencia local y reglas de transición.  
+**Límite M-03:** cola, estados, persistencia local y reglas de transición.  
 **No** es el motor de sincronización remoto — eso es **M-06**.
 
-**DoD M-03:** documento de diseño aprobado + feature flags `offline.*` nombrados · **sin** implementación completa obligatoria en el mismo PR.
+**DoD M-03:** ✅ implementación infra + flags nombrados + tests + docs.
 
 ---
 
@@ -241,7 +241,9 @@ M-02 DeviceCapabilities   ✅ CLOSED
         ↓
 M-04 StorageProvider      ✅ CLOSED
         ↓
-M-03 → M-06               (Offline Queue → Sync Engine)  ← NEXT
+M-03 Offline Queue        ✅ CLOSED (infra)
+        ↓
+M-06 Sync Engine          ← NEXT
         ↓
 CAP piloto bajo Flow Kitchen (un comando)
 ```

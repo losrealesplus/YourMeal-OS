@@ -32,5 +32,5 @@ Capa única de persistencia: el dominio no depende de localStorage ni de Capacit
 
 ## Siguiente
 
-**M-03 · Offline Queue** — se construye sobre StorageProvider.  
-Luego M-06 Sync Engine.
+**M-03 · Offline Queue** — ✅ CLOSED (infra) · se construye sobre StorageProvider.  
+Luego **M-06 Sync Engine**.
