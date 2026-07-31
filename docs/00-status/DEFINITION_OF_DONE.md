@@ -62,3 +62,22 @@ Handoff definido → Evidence obtenida → Flow certificado → Merge
 
 Política: [FLOW_GOVERNANCE.md](./FLOW_GOVERNANCE.md) · Regla diaria: [FLOW_FIRST.md](./FLOW_FIRST.md).  
 Operational Readiness = Flows certificados, no número de features (Regla 6).
+
+## Definition of Done — Beta certification gate
+
+Para tracks de **Beta Readiness** (BR-*) el criterio de bloqueo es:
+
+> **Un FAIL solo bloquea la certificación si impide completar el flujo operativo definido.**
+
+| Tipo de hallazgo | Efecto |
+|------------------|--------|
+| FAIL que rompe el flujo operativo acotado de la beta | Bloquea certificación · fix mínimo o documentar bloqueo |
+| FAIL de capacidad útil pero no necesaria para ese flujo | Backlog (p. ej. Beta vNext) · **no** retrasa la certificación |
+| BLOCKED por entorno / credenciales | No es FAIL de producto · resolver entorno y reintentar |
+
+Ejemplo aplicado (BR-03 Admin · Decisión B):
+
+- Editar / desactivar plato → FAIL en smoke estricto · **no** bloquea Beta v1  
+- Publicar menú roto · cliente no ve published → **sí** bloquea  
+
+Registro: [BR-03 Scope Decision](../12-beta/BR-03_SCOPE_DECISION.md) · índice [12-beta](../12-beta/README.md).

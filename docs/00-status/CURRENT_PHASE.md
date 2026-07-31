@@ -61,6 +61,9 @@ En paralelo (beta móvil EatClean):
   Lema: cada PR acerca la jornada completa del piloto.
   P0 = PS-002-C · smoke nativo estricto · pedido real E2E
   Checklist oficial: BETA_READINESS_CHECKPOINT.md §4
+  BR-03 Admin: Decisión B · Edit/Disable fuera de Beta v1
+  Siguiente BR: BR-03.3 Runtime Validation (G3)
+  → ../12-beta/BR-03_SCOPE_DECISION.md
   No abrir M-06/MF-002 / “de cara al futuro” salvo bloqueador real.
 
 Prohibido prematuro: Event Bus · Notifications · Jobs · Analytics · AI
