@@ -30,8 +30,13 @@ Mobile Foundation (MF-001)  ✅ Cimientos CLOSED
   M-02 DeviceCapabilities   ✅ #119
   M-04 StorageProvider      ✅ #120
   M-03 Offline Queue        ✅ #122
-  → Checkpoint: BETA_READINESS_CHECKPOINT.md
-  → Foco siguiente: validación EatClean (no más infra)
+  → INFRASTRUCTURE_PHASE_CLOSED.md
+  → BETA_READINESS_CHECKPOINT.md
+  → Foco: Product CTO · jornada EatClean
+
+Sprint activo
+  P0-1 PS-002-C             ⏳ BLOCKED (credenciales + cutover runtime)
+  Kickoff: ../10-validation/PS002C_BETA_SPRINT_KICKOFF.md
 
 ═══════════════════════════════════════════════
 OPEN GATE
