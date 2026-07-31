@@ -19,7 +19,10 @@ dist-ssr
 # Supabase CLI local link state (machine-specific)
 supabase/.temp/
 
-# Local env overrides (keep committed `.env` for Lovable sync if required)
+# Local environment — NEVER commit secrets.
+# Copy from `.env.example`: `cp .env.example .env`
+# Lovable Cloud: set the same keys in Project → Environment Variables.
+.env
 .env.local
 .env.*.local
 

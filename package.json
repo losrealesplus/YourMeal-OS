@@ -29,7 +29,8 @@
     "test:migration-bootstrap": "node scripts/migration-bootstrap.mjs",
     "test:platform-stabilization-gates": "node scripts/platform-stabilization-gates.mjs",
     "test:ps002-canonical-auth": "node scripts/ps002-canonical-auth.mjs",
-    "test:canonical-pipeline": "node --test scripts/lib/canonical-pipeline.spec.mjs",
+    "bootstrap:e2e": "npx playwright install",
+    "test:canonical-pipeline": "node --test scripts/lib/canonical-pipeline.spec.mjs scripts/lib/ps002c-preflight.spec.mjs",
     "gen:types": "supabase gen types typescript --project-id djangucecsphnejplvic --schema public > src/integrations/supabase/types.ts"
   },
   "dependencies": {
@@ -102,6 +103,7 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^5.2.0",
+    "dotenv": "^17.4.2",
     "eslint": "^9.32.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.6",
