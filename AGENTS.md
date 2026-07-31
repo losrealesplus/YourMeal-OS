@@ -180,3 +180,15 @@ Conflictos con `.lovable/plan.md` → **gana `docs/`**.
 - [DISH_USE_CASES](./docs/14-application/DISH_USE_CASES.md)
 - [CreateDishUseCase (diseño)](./docs/14-application/use-cases/CreateDishUseCase.md)
 - [Architecture Review](./docs/05-architecture/architecture-review.md) (histórico — ya aprobado)
+
+## Cursor Cloud specific instructions
+
+Durable, non-obvious notes for running this repo in a Cloud Agent VM (dependencies are installed automatically by the startup update script — `npm install`). Standard commands live in `package.json` `scripts`; only the gotchas are listed here.
+
+- **Package manager: `npm`.** Two lockfiles coexist (`package-lock.json` and `bun.lock`); npm is authoritative (it matches CI, which runs `npm ci`). Don't run `bun install` — pick one installer.
+- **App boots against a hosted Supabase.** A `.env` is committed with a hosted project URL + a *publishable* (public) key, so `npm run dev` works out of the box with no extra secrets. The web dev server is `npm run dev` → Vite on **port 8080** (SSR handled in-process; Nitro/Cloudflare only matters for the production `npm run build`).
+- **`npm run lint` fails on a clean checkout** due to a large number of pre-existing repo-wide `prettier/prettier` violations (not caused by your change). `npm run typecheck` (tsc) is clean. Judge lint by whether *your* files add new errors.
+- **`npm run test` (vitest) reports 2 failing "suites" even though 268 unit tests pass.** Vitest's default glob picks up `scripts/lib/*.spec.mjs`, which are Node `node --test` files, not Vitest. Run those with their intended runners instead: `npm run test:canonical-pipeline` and `npm run test:bootstrap-config`.
+- **Auth is real + email-gated + rate-limited.** Signup/sign-in hit the hosted Supabase Auth. New signups require email confirmation (no session is returned immediately), and the shared project **rate-limits auth emails** (HTTP 429 `over_email_send_rate_limit`) after a few attempts — expect flaky UI auth demos, not a bug.
+- **To exercise the product UI without login, use Bootstrap / "Functional Review" Mode.** Set `VITE_BOOTSTRAP_MODE="true"` in a gitignored `.env.local`, then **restart** `npm run dev` (Vite inlines `VITE_*` at startup, so a restart is required). The root screen becomes a profile selector (Customer / Kitchen / Company Admin / SaaS Admin / …) that injects a synthetic identity to navigate `/app`, `/admin`, and `/saas`. Data mutations needing a real JWT may fail (RLS). See [BOOTSTRAP_MODE](./docs/00-status/BOOTSTRAP_MODE.md). Never enable in production.
+- **Optional extras:** `npm run bootstrap:e2e` (installs Playwright browsers) for the smoke scripts under `scripts/`; `npm run seed` (Day-0 admin) and `gen:types` need `SUPABASE_SERVICE_ROLE_KEY` / Supabase CLI, which are not present by default. Capacitor (`build:mobile`, `sync:mobile`) is not needed to run the web product.
