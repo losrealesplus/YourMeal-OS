@@ -50,9 +50,14 @@ No abrir PRs metodológicas nuevas · no tocar FOPEBA / Core / Identity hasta PS
 ## Cómo desbloquear
 
 ```bash
+npm install
+npm run bootstrap:e2e
+# Rellena PS002_EMAIL / PS002_PASSWORD en `.env` (ver .env.example)
 VITE_BOOTSTRAP_MODE=false npm run dev -- --host 127.0.0.1 --port 8080
-PS002_EMAIL=… PS002_PASSWORD=… npm run test:ps002-canonical-auth
+npm run test:ps002-canonical-auth
 ```
+
+El runner carga `.env` automáticamente (`dotenv`) — no requiere `export` manual.
 
 Condición de salida objetiva (PASS):
 

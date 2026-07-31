@@ -1,6 +1,6 @@
 # PS-002-C · Beta Sprint Kickoff (Product CTO)
 
-**Fecha:** 2026-07-31  
+**Fecha:** 2026-07-31 · **Actualizado:** 2026-07-31 (Runtime Hardening)  
 **Prioridad:** **P0-1** (bloqueador principal de la beta)  
 **Gate técnico:** [PS-002.md](./platform-stabilization/PS-002.md) · [FCR-008](./FCR008_CANONICAL_POST_LOGIN_SESSION.md)  
 **Fase:** [INFRASTRUCTURE_PHASE_CLOSED](../00-status/INFRASTRUCTURE_PHASE_CLOSED.md)
@@ -27,32 +27,32 @@ LOGIN → … → DASHBOARD_RENDERED
 status=PASS · duplicates=[] · missing=[] · out_of_order=[]
 ```
 
+## Flujo reproducible (Runtime Hardening)
+
+Credenciales en **`.env`** (`PS002_EMAIL` / `PS002_PASSWORD`) — el runner carga `.env` vía `dotenv` (no hace falta `export` manual).
+
 ```bash
+npm install
+npm run bootstrap:e2e          # npx playwright install (chromium + headless_shell)
+# Asegura .env con proyecto oficial + PS002_EMAIL / PS002_PASSWORD
 VITE_BOOTSTRAP_MODE=false npm run dev -- --host 127.0.0.1 --port 8080
-PS002_EMAIL=… PS002_PASSWORD=… npm run test:ps002-canonical-auth
+npm run test:ps002-canonical-auth
 ```
 
 Evidencia: `docs/10-validation/platform-stabilization/evidence/ps002c-canonical-auth.json`
 
+Si falta el browser, el script sale **BLOCKED** con mensaje claro → `npm run bootstrap:e2e`.
+
 ---
 
-## Estado al arrancar este sprint (2026-07-31)
+## Estado al arrancar / hardening
 
-| Precondición | Estado | Nota |
-|--------------|--------|------|
-| Credenciales `PS002_EMAIL` / `PS002_PASSWORD` en el entorno del agente | ❌ **ausentes** | Gate = **BLOCKED** (≠ FAIL) hasta que el operador las aporte |
-| Proyecto Supabase en `.env` del workspace | ⚠️ **legacy** `cbeegcxkayybfncnuirg` | Oficial SoT: `djangucecsphnejplvic` (`.env.example`) — cutover incompleto en runtime local |
-| Sesión vía StorageProvider (M-04) | ✅ cableado | `createSupabaseAuthStorage()` · base para persistencia nativa |
-| Pipeline FCR-008 / runner | ✅ en repo | No mockear Auth |
-
-**Acción inmediata del operador (desbloqueo):**
-
-1. Alinear runtime al proyecto **oficial** (`djangucecsphnejplvic`) con publishable key válida.  
-2. Proveer usuario piloto real (`PS002_EMAIL` / `PS002_PASSWORD`) en ese proyecto.  
-3. Ejecutar el smoke canónico y adjuntar evidencia JSON.  
-4. En device: kill app → reopen → sesión intacta (criterio smoke nativo del checkpoint).
-
-Sin (1)+(2) el agente **no puede** cerrar PS-002-C por sí solo.
+| Precondición | Nota |
+|--------------|------|
+| `.env` → `PS002_*` | Plantilla en `.env.example` · rellenar localmente (no commitear passwords) |
+| Proyecto oficial | SoT `djangucecsphnejplvic` |
+| Sesión vía StorageProvider (M-04) | ✅ cableado |
+| Browser Playwright | `bootstrap:e2e` instala binaries (incl. `chromium_headless_shell` en 1.49+) |
 
 ---
 
