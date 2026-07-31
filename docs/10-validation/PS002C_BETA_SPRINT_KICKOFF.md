@@ -1,73 +1,69 @@
 # PS-002-C · Beta Sprint Kickoff (Product CTO)
 
-**Fecha:** 2026-07-31 · **Actualizado:** 2026-07-31 (Runtime Hardening)  
-**Prioridad:** **P0-1** (bloqueador principal de la beta)  
-**Gate técnico:** [PS-002.md](./platform-stabilization/PS-002.md) · [FCR-008](./FCR008_CANONICAL_POST_LOGIN_SESSION.md)  
-**Fase:** [INFRASTRUCTURE_PHASE_CLOSED](../00-status/INFRASTRUCTURE_PHASE_CLOSED.md)
+**Fecha:** 2026-07-31 · **Actualizado:** Runtime Hardening + preflight  
+**Prioridad:** **P0-1**  
+**Gate:** [PS-002.md](./platform-stabilization/PS-002.md) · [FCR-008](./FCR008_CANONICAL_POST_LOGIN_SESSION.md)  
+**Estándar FOPEBA:** cualquier desarrollador que clone el repo y siga este flujo obtiene el mismo resultado.
 
 ---
 
-## Objetivo de producto (no solo técnico)
-
-La autenticación debe:
-
-1. **Funcionar** con Auth Supabase real (contrato canónico PASS).  
-2. **Mantener sesión** tras cerrar y reabrir la app (Web + Android + iPhone).  
-3. Ser **consistente** entre plataformas (mismo StorageProvider / Preferences en nativo).  
-4. **No introducir fricción** innecesaria (login usable para EatClean el lunes).
-
-Elegancia del pipeline importa solo si sirve a 1–4.
-
----
-
-## Contrato técnico (sin cambio)
-
-```text
-LOGIN → … → DASHBOARD_RENDERED
-status=PASS · duplicates=[] · missing=[] · out_of_order=[]
-```
-
-## Flujo reproducible (Runtime Hardening)
-
-Credenciales en **`.env`** (`PS002_EMAIL` / `PS002_PASSWORD`) — el runner carga `.env` vía `dotenv` (no hace falta `export` manual).
+## Flujo único (máquina limpia)
 
 ```bash
+cp .env.example .env
+# Rellena SUPABASE_* / VITE_SUPABASE_* y PS002_EMAIL / PS002_PASSWORD en .env (local · gitignored)
+
 npm install
-npm run bootstrap:e2e          # npx playwright install (chromium + headless_shell)
-# Asegura .env con proyecto oficial + PS002_EMAIL / PS002_PASSWORD
+npm run bootstrap:e2e          # Playwright + chromium_headless_shell
+
+# Terminal 1
 VITE_BOOTSTRAP_MODE=false npm run dev -- --host 127.0.0.1 --port 8080
+
+# Terminal 2
 npm run test:ps002-canonical-auth
 ```
 
-Evidencia: `docs/10-validation/platform-stabilization/evidence/ps002c-canonical-auth.json`
-
-Si falta el browser, el script sale **BLOCKED** con mensaje claro → `npm run bootstrap:e2e`.
+Sin `export` manual. Sin instalaciones ad-hoc no documentadas.
 
 ---
 
-## Estado al arrancar / hardening
+## Credenciales
 
-| Precondición | Nota |
-|--------------|------|
-| `.env` → `PS002_*` | Plantilla en `.env.example` · rellenar localmente (no commitear passwords) |
-| Proyecto oficial | SoT `djangucecsphnejplvic` |
-| Sesión vía StorageProvider (M-04) | ✅ cableado |
-| Browser Playwright | `bootstrap:e2e` instala binaries (incl. `chromium_headless_shell` en 1.49+) |
+| Archivo | Contenido |
+|---------|-----------|
+| `.env.example` (versionado) | `PS002_EMAIL=` · `PS002_PASSWORD=` (vacíos) |
+| `.env` (gitignored) | Valores reales locales — **nunca** en git |
 
 ---
 
-## Orden tras PASS
+## Preflight (antes del test)
 
-1. Smoke Test dispositivos reales (Android + iPhone)  
-2. Flujo completo pedido → cocina → reparto  
-3. Entrega primera beta a EatClean  
+El runner comprueba, en orden, y sale **BLOCKED** con mensaje claro si falla:
 
-FLOW-01 sigue ⏸ hasta PS-002-C PASS ([PRIORITY_PS002C_BEFORE_FLOW](./PRIORITY_PS002C_BEFORE_FLOW.md)).
+1. Existe `.env`  
+2. `PS002_EMAIL`  
+3. `PS002_PASSWORD`  
+4. Playwright disponible  
+5. Chromium / `headless_shell` instalado (`npm run bootstrap:e2e`)  
+6. Dev server responde  
+
+No lanza stacks largos de Node por precondiciones de entorno.
 
 ---
 
-## Qué no hacer en este sprint
+## Objetivo de producto
 
-- Nuevas capas / providers / “sería interesante…”  
-- Abrir M-06 o MF-002  
-- Documentar metodologías nuevas mientras Auth real no pase
+1. Auth Supabase real (contrato PASS)  
+2. Sesión tras kill/reopen (Web + Android + iPhone)  
+3. Consistencia entre plataformas  
+4. Sin fricción innecesaria  
+
+---
+
+## Tras PASS
+
+1. Smoke nativo estricto  
+2. Pedido → cocina → reparto  
+3. Beta EatClean  
+
+FLOW-01 ⏸ hasta PS-002-C PASS.

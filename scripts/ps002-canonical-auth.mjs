@@ -39,6 +39,7 @@ import {
   PS002C_EXIT,
   validateCanonicalPipeline,
 } from "./lib/canonical-pipeline.mjs";
+import { runPs002cPreflight } from "./lib/ps002c-preflight.mjs";
 
 const BASE = process.argv[2] || process.env.PS_BASE_URL || "http://127.0.0.1:8080";
 const EMAIL = process.env.PS002_EMAIL || "";
@@ -120,16 +121,18 @@ function emitBlocked(reason, extra = {}) {
   return PS002C_EXIT.BLOCKED;
 }
 
-async function probeServer(url) {
-  try {
-    const res = await fetch(url, { method: "GET", redirect: "manual" });
-    return { ok: true, status: res.status };
-  } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : String(e) };
-  }
-}
-
 async function main() {
+  const preflight = await runPs002cPreflight({
+    email: EMAIL,
+    password: PASSWORD,
+    baseUrl: BASE,
+    route: ROUTE,
+  });
+  if (!preflight.ok) {
+    process.exit(emitBlocked(preflight.reason));
+  }
+
+  // Defensive: keep legacy precondition helper aligned with preflight.
   const creds = checkPs002cPreconditions({
     email: EMAIL,
     password: PASSWORD,
@@ -137,15 +140,6 @@ async function main() {
   });
   if (!creds.ok) {
     process.exit(emitBlocked(creds.reason));
-  }
-
-  const probe = await probeServer(`${BASE}${ROUTE}`);
-  if (!probe.ok) {
-    process.exit(
-      emitBlocked(`Dev server unavailable: ${probe.error}`, {
-        serverProbe: probe,
-      }),
-    );
   }
 
   let browser;
