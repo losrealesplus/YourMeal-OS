@@ -12,79 +12,65 @@ import { getOfflineQueue } from "@/platform/offline-queue";
 
 const queue = getOfflineQueue();
 
+// Encolar intención (UI / caso de uso) — sin llamar a la API todavía
 await queue.enqueue({
-  type: "kitchen.mark_prepared",
-  payload: { productionItemId: "…" },
-  priority: 10,
-  id: "stable-command-id", // optional · idempotent
+  type: "CrearPedido",
+  payload: { draftId: "…" },
+  id: "op-stable-id", // opcional · idempotente
 });
 
+// Más adelante (Sync Engine / worker):
 const next = await queue.dequeue();
-if (next) {
-  try {
-    // M-06 will perform remote sync here.
-    await queue.markCompleted(next.id);
-  } catch (err) {
-    await queue.markFailed(next.id, String(err));
-  }
+if (!next) return;
+
+try {
+  // El ejecutor conoce el type — la cola no
+  await executeIntent(next);
+  await queue.complete(next.id);
+  await queue.remove(next.id); // 200 OK → desaparece
+} catch {
+  await queue.fail(next.id);   // permanece para retry
 }
-```
 
-**Tests:**
-
-```ts
-import {
-  createOfflineQueue,
-  setOfflineQueueForTests,
-} from "@/platform/offline-queue";
-import { createMemoryStorageProvider } from "@/platform/storage-provider";
-
-const queue = createOfflineQueue(createMemoryStorageProvider());
-setOfflineQueueForTests(queue);
+// Reintento manual / ciclo posterior:
+const failed = await queue.list({ status: "failed" });
+for (const item of failed) {
+  await queue.retry(item.id);
+}
 ```
 
 ---
 
 ## Persistencia
 
-Clave por defecto: `ymos.offline.queue.v1` (JSON `{ version: 1, commands: [...] }`).
-
-Todo I/O pasa por `StorageProvider` — cambiar Web → Capacitor → futuro SQLite **no** cambia la API de la cola.
-
----
-
-## Retries
-
-Tras `markFailed`:
-
-1. Si `attempts < maxAttempts` → `failed` + `nextAttemptAt` (backoff exponencial + jitter).  
-2. Si no → `dead`.
-
-`retryNow(id)` limpia el backoff y vuelve a `pending`.
-
-Defaults: `maxAttempts=5`, `baseBackoffMs=1000`, `maxBackoffMs=60000`.
+Clave: `ymos.offline.queue.v1`  
+Formato: `{ version: 1, items: QueueItem[] }`  
+I/O: **solo** `StorageProvider`.
 
 ---
 
-## Relación con M-06
+## Separación de responsabilidades
 
-| M-03 | M-06 |
-|------|------|
-| Outbox + estados + retries | Transporte remoto + conflictos + ack |
-| `dequeue` / `mark*` | Loop de drain + policy por comando |
-| No conoce Supabase | Habla con API / Sync port |
+| Capa | Responsabilidad |
+|------|-----------------|
+| Offline Queue | *Qué* operación está pendiente |
+| Caso de uso / Sync (M-06) | *Cómo* se ejecuta contra API/Supabase |
 
----
-
-## Feature flags
+**Prohibido** dentro de `src/platform/offline-queue/`:
 
 ```ts
-import { OFFLINE_FEATURE_FLAGS } from "@/platform/offline-queue";
-// offline.queue.enabled · offline.queue.maxAttempts · offline.sync.drainEnabled
+supabase.from(...)
+fetch(...)
 ```
+
+---
+
+## Tests
+
+`offline-queue.spec.ts` cubre: enqueue · dequeue · remove · retry · persistencia · restauración.
 
 ---
 
 ## Fuera de alcance
 
-Sync remoto · conflictos · SQLite · encolar desde pantallas de producto · background.
+Sync automático · SW · Background Sync · conflictos · prioridades · WebSockets.

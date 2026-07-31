@@ -1,13 +1,11 @@
 export type {
-  EnqueueCommandInput,
-  OfflineCommand,
-  OfflineCommandExtendedStatus,
-  OfflineCommandPayload,
-  OfflineCommandStatus,
+  EnqueueInput,
   OfflineQueue,
   OfflineQueueListFilter,
   OfflineQueueOptions,
-  OfflineQueueStats,
+  QueueItem,
+  QueueItemPayload,
+  QueueItemStatus,
 } from "./types";
 
 export {
@@ -15,14 +13,7 @@ export {
   type OfflineFeatureFlagKey,
 } from "./flags";
 
-export {
-  DEFAULT_BASE_BACKOFF_MS,
-  DEFAULT_MAX_ATTEMPTS,
-  DEFAULT_MAX_BACKOFF_MS,
-  DEFAULT_STORAGE_KEY,
-  computeBackoffMs,
-} from "./backoff";
-
+export { DEFAULT_STORAGE_KEY } from "./options";
 export { createOfflineQueue } from "./queue";
 export {
   getOfflineQueue,

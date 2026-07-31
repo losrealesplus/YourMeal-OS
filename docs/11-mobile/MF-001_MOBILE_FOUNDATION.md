@@ -122,37 +122,28 @@ Contrato + `getDeviceCapabilities()` + `WebAdapter` / `CapacitorAdapter` · Capa
 
 ### M-03 · Offline Engine (cola local)
 
-**Estado:** ✅ **CLOSED** (infra) — [M-03_OFFLINE_QUEUE](./M-03_OFFLINE_QUEUE.md) · [CLOSED](./M-03_CLOSED.md) · `src/platform/offline-queue/`
+**Estado:** ✅ **CLOSED** (beta infra) — [M-03_OFFLINE_QUEUE](./M-03_OFFLINE_QUEUE.md) · [CLOSED](./M-03_CLOSED.md) · `src/platform/offline-queue/`
 
-No es “guardar datos”. Es el **ciclo de vida de la cola offline** — gran parte del valor diferencial operativo.
+Cola fiable de **intenciones** (outbox). No es sync offline completo.
 
 ```text
-Offline Queue
-      ↓
-  Pending
-      ↓
-  Processing
-      ↓
-  Completed ──→ (audit futuro)
-      ↓
-   Failed (+ backoff)
-      ↓
-  Dead (max attempts)
+UI → OfflineQueue → StorageProvider
+              ↓ (más adelante)
+         Sync / caso de uso → API
 ```
 
-| Concepto | Contenido mínimo |
-|----------|------------------|
-| Persistencia | **StorageProvider** (`ymos.offline.queue.v1`) — SQLite operativo diferido |
-| Offline Queue (outbox) | command_id · tipo · payload · prioridad · attempts |
-| Estados | `pending` · `processing` · `completed` · `failed` · `dead` (+ `conflict`/`resolved` reservados M-06) |
-| Prioridades | mayor valor = drenado antes |
-| Retries | Backoff exponencial + jitter · tope |
-| Feature flags | `offline.queue.enabled` · `offline.queue.maxAttempts` · `offline.sync.drainEnabled` |
+| Concepto | Beta |
+|----------|------|
+| Modelo | `QueueItem`: id · type · payload · createdAt · status · retryCount |
+| Estados | `pending` · `processing` · `completed` · `failed` |
+| Persistencia | **Solo** StorageProvider |
+| Retries | `fail` → `retry` (básico) |
+| Aislamiento | Sin Supabase / HTTP / prioridades / sync automático |
 
-**Límite M-03:** cola, estados, persistencia local y reglas de transición.  
-**No** es el motor de sincronización remoto — eso es **M-06**.
+**Límite M-03:** almacenar y recuperar operaciones pendientes.  
+**No** ejecuta intenciones — eso es **M-06** / casos de uso.
 
-**DoD M-03:** ✅ implementación infra + flags nombrados + tests + docs.
+**DoD M-03:** ✅ cola persistente + tests + docs · alcance beta reducido.
 
 ---
 

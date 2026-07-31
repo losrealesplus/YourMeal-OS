@@ -9,9 +9,7 @@ let testOverride: OfflineQueue | null = null;
 let cached: OfflineQueue | null = null;
 let cachedStorage: StorageProvider | null = null;
 
-/**
- * Test-only injection. Production code must not call this.
- */
+/** Test-only injection. Production code must not call this. */
 export function setOfflineQueueForTests(value: OfflineQueue | null): void {
   testOverride = value;
   cached = null;
