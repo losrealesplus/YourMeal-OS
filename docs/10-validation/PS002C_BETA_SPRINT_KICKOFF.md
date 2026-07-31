@@ -23,8 +23,12 @@ VITE_BOOTSTRAP_MODE=false npm run dev -- --host 127.0.0.1 --port 8080
 npm run test:ps002-canonical-auth
 ```
 
-`bootstrap:e2e` verifica Node · npm · dotenv · `.env` · credenciales PS002 · Playwright · Chromium · Headless Shell.  
-Si falta algo → **BLOCKED** con el fix exacto. Si todo ok → **Environment Ready**.
+`bootstrap:e2e` verifica Node · npm · dotenv · `.env` · credenciales PS002 · Playwright · **Chromium (new headless / `channel: chromium`)**.  
+**No** exige `chromium_headless_shell`.  
+Si falta algo → **BLOCKED** con el fix exacto (`npx playwright install chromium --no-shell`).  
+Nunca recomienda bare `npx playwright install` (puede colgarse).  
+
+Detalle: [PS002C_PLAYWRIGHT_HEADLESS_SHELL.md](./PS002C_PLAYWRIGHT_HEADLESS_SHELL.md)
 
 Solo comprobar (sin instalar): `npm run bootstrap:e2e:check`
 
@@ -49,7 +53,7 @@ El runner comprueba, en orden, y sale **BLOCKED** con mensaje claro si falla:
 2. `PS002_EMAIL`  
 3. `PS002_PASSWORD`  
 4. Playwright disponible  
-5. Chromium / `headless_shell` instalado (`npm run bootstrap:e2e`)  
+5. Chromium instalado para `channel: chromium` (`npm run bootstrap:e2e` · sin headless_shell)  
 6. Dev server responde  
 
 No lanza stacks largos de Node por precondiciones de entorno.

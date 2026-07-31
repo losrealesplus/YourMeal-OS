@@ -4,54 +4,11 @@
  */
 import fs from "node:fs";
 import path from "node:path";
-import { chromium } from "playwright";
+import { resolvePs002cBrowser } from "./ps002c-playwright.mjs";
 
 /**
  * @typedef {{ ok: true } | { ok: false, reason: string }} PreflightResult
  */
-
-function defaultResolveBrowser() {
-  if (typeof chromium?.launch !== "function") {
-    return {
-      ok: false,
-      reason: [
-        "Playwright is not available (chromium.launch missing).",
-        "Fix: npm install && npm run bootstrap:e2e",
-      ].join("\n"),
-    };
-  }
-
-  let executablePath = "";
-  try {
-    executablePath = chromium.executablePath();
-  } catch (e) {
-    return {
-      ok: false,
-      reason: [
-        "Playwright could not resolve a Chromium executable.",
-        "Playwright 1.49+ may need chromium_headless_shell (not only chromium).",
-        "Fix: npm run bootstrap:e2e",
-        `Detail: ${e instanceof Error ? e.message : String(e)}`,
-      ].join("\n"),
-    };
-  }
-
-  if (!executablePath || !fs.existsSync(executablePath)) {
-    return {
-      ok: false,
-      reason: [
-        "Chromium / headless_shell binary is not installed.",
-        executablePath
-          ? `Expected path: ${executablePath}`
-          : "Expected path: (unresolved)",
-        "Playwright 1.49+ often requires chromium_headless_shell-*, not only chromium-*.",
-        "Fix: npm run bootstrap:e2e",
-      ].join("\n"),
-    };
-  }
-
-  return { ok: true, executablePath };
-}
 
 /**
  * Ordered environment checks. First failure wins (clear BLOCKED message).
@@ -75,7 +32,7 @@ export async function runPs002cPreflight(opts = {}) {
   const baseUrl =
     opts.baseUrl ?? process.env.PS_BASE_URL ?? "http://127.0.0.1:8080";
   const route = opts.route ?? process.env.PS002_ROUTE ?? "/auth/admin";
-  const resolveBrowser = opts.resolveBrowser ?? defaultResolveBrowser;
+  const resolveBrowser = opts.resolveBrowser ?? resolvePs002cBrowser;
   const probe =
     opts.probeServer ??
     (async (url) => {

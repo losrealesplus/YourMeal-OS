@@ -14,6 +14,7 @@
 import { chromium } from "playwright";
 import fs from "node:fs";
 import path from "node:path";
+import { PS002C_BROWSER_POLICY } from "./lib/ps002c-playwright.mjs";
 
 const BASE = process.argv[2] || process.env.PS_BASE_URL || "http://127.0.0.1:8080";
 const OUT = path.resolve("docs/10-validation/platform-stabilization/evidence");
@@ -202,7 +203,9 @@ async function main() {
   assertNoImmediateGetSessionAfterLogin("src/routes/auth.admin.tsx", "auth.admin.tsx");
   assertCanonicalPipelineWiring();
 
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({
+    ...PS002C_BROWSER_POLICY.launchOptions,
+  });
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   const consoleErrors = [];
   page.on("pageerror", (e) => consoleErrors.push(String(e)));

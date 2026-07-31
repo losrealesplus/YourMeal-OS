@@ -5,6 +5,10 @@
  *   READY   — environment can run PS-002-C
  *   BLOCKED — prints exactly what is missing + the fix command
  *
+ * Browser policy (Playwright 1.49+): Chromium new headless via
+ * `channel: "chromium"` — does NOT require chromium_headless_shell.
+ * See docs/10-validation/PS002C_PLAYWRIGHT_HEADLESS_SHELL.md
+ *
  * Does not run the auth test. Does not change Auth / Supabase / routes.
  *
  * Usage:
@@ -15,10 +19,17 @@ import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
+import {
+  PS002C_BROWSER_POLICY,
+  getPlaywrightBrowsersCacheDir,
+  resolvePs002cBrowser,
+} from "./lib/ps002c-playwright.mjs";
 
 const require = createRequire(import.meta.url);
 const CHECK_ONLY = process.argv.includes("--check-only");
 const ROOT = process.cwd();
+const DOC =
+  "docs/10-validation/PS002C_PLAYWRIGHT_HEADLESS_SHELL.md";
 
 /** @typedef {{ id: string, label: string, ok: boolean, detail?: string, fix?: string }} Step */
 
@@ -151,119 +162,57 @@ function checkPlaywrightPackage() {
   }
 }
 
-/**
- * @param {string} dir
- * @param {string[]} names
- */
-function findFile(dir, names) {
-  if (!fs.existsSync(dir)) return "";
-  const stack = [dir];
-  let guard = 0;
-  while (stack.length && guard++ < 400) {
-    const cur = stack.pop();
-    let entries = [];
-    try {
-      entries = fs.readdirSync(cur, { withFileTypes: true });
-    } catch {
-      continue;
-    }
-    for (const ent of entries) {
-      const full = path.join(cur, ent.name);
-      if (ent.isFile() && names.includes(ent.name)) return full;
-      if (ent.isDirectory()) stack.push(full);
-    }
-  }
-  return "";
-}
-
-function inspectBrowsers() {
-  let chromiumPath = "";
-  let headlessPath = "";
-
-  try {
-    const { chromium } = require("playwright");
-    chromiumPath = chromium.executablePath();
-  } catch {
-    /* resolved via cache scan */
-  }
-
-  const cacheRoot =
-    process.env.PLAYWRIGHT_BROWSERS_PATH ||
-    path.join(
-      process.env.HOME || process.env.USERPROFILE || "",
-      ".cache",
-      "ms-playwright",
-    );
-
-  try {
-    if (fs.existsSync(cacheRoot)) {
-      const entries = fs.readdirSync(cacheRoot);
-      const headlessDir = entries.find((e) =>
-        e.startsWith("chromium_headless_shell-"),
-      );
-      if (headlessDir) {
-        headlessPath =
-          findFile(path.join(cacheRoot, headlessDir), [
-            "headless_shell",
-            "chrome-headless-shell",
-          ]) || "";
-      }
-      if (!chromiumPath) {
-        const chromiumDir = entries.find(
-          (e) => e.startsWith("chromium-") && !e.includes("headless"),
-        );
-        if (chromiumDir) {
-          chromiumPath =
-            findFile(path.join(cacheRoot, chromiumDir), [
-              "chrome",
-              "Chromium",
-              "chrome.exe",
-            ]) || "";
-        }
-      }
-    }
-  } catch {
-    /* ignore */
-  }
-
-  const chromiumOk = Boolean(chromiumPath && fs.existsSync(chromiumPath));
-  const pathLooksHeadless = /headless/i.test(chromiumPath);
-  const headlessOk =
-    Boolean(headlessPath && fs.existsSync(headlessPath)) ||
-    (chromiumOk && pathLooksHeadless);
-
-  return { chromiumOk, headlessOk, chromiumPath, headlessPath };
-}
-
-function recordBrowsers(info) {
-  record(
-    "chromium",
-    "Chromium",
-    info.chromiumOk,
-    info.chromiumOk
-      ? info.chromiumPath
-      : "chromium-* binary not found in Playwright cache",
-    "npx playwright install",
-  );
-  record(
-    "headless",
-    "Headless Shell",
-    info.headlessOk,
-    info.headlessOk
-      ? info.headlessPath || info.chromiumPath
-      : "chromium_headless_shell-* not found (Playwright 1.49+ needs this)",
-    "npx playwright install",
-  );
-}
-
 function installBrowsers() {
-  console.log("\n→ Installing Playwright browsers (npx playwright install)…\n");
-  const r = spawnSync("npx", ["playwright", "install"], {
+  const cmd = PS002C_BROWSER_POLICY.installCommand;
+  console.log(`\n→ Installing browsers for PS-002-C policy (${cmd})…\n`);
+  console.log(
+    "  Policy: Chromium new headless (channel: chromium) — no headless_shell\n",
+  );
+  const r = spawnSync("npx", ["playwright", ...PS002C_BROWSER_POLICY.installArgs], {
     cwd: ROOT,
     encoding: "utf8",
     stdio: "inherit",
+    env: {
+      ...process.env,
+      // Avoid GC remove→redownload loops that hang some operator installs
+      PLAYWRIGHT_SKIP_BROWSER_GC: process.env.PLAYWRIGHT_SKIP_BROWSER_GC || "1",
+    },
   });
   return r.status === 0;
+}
+
+function recordChromium() {
+  const resolved = resolvePs002cBrowser();
+  const cache = getPlaywrightBrowsersCacheDir();
+  if (resolved.ok) {
+    record(
+      "chromium",
+      "Chromium (new headless / channel: chromium)",
+      true,
+      resolved.executablePath,
+    );
+    record(
+      "policy",
+      "Browser policy",
+      true,
+      `${PS002C_BROWSER_POLICY.id} · headless_shell not required`,
+    );
+    return true;
+  }
+
+  record(
+    "chromium",
+    "Chromium (new headless / channel: chromium)",
+    false,
+    [
+      "Chromium binary missing or unresolved.",
+      `Cache inspected: ${cache}`,
+      "headless_shell is NOT required for PS-002-C.",
+      `Doc: ${DOC}`,
+    ].join(" "),
+    `${PS002C_BROWSER_POLICY.installCommand}\n\nDo NOT run bare: npx playwright install\n(that command may hang after Chromium 100% / headless_shell).`,
+  );
+  return false;
 }
 
 async function main() {
@@ -296,26 +245,46 @@ ${CHECK_ONLY ? "(check-only · no install)\n" : ""}`);
   checkPlaywrightPackage();
   stopIfFailed();
 
-  let info = inspectBrowsers();
-  if ((!info.chromiumOk || !info.headlessOk) && !CHECK_ONLY) {
+  let ok = recordChromium();
+  if (!ok && !CHECK_ONLY) {
     console.log(
-      "\n→ Browsers incomplete (need Chromium and/or Headless Shell).",
+      "\n→ Chromium incomplete for channel: chromium (new headless).",
     );
     if (!installBrowsers()) {
       record(
         "install",
         "Playwright install",
         false,
-        "npx playwright install exited non-zero",
-        "npx playwright install",
+        [
+          `${PS002C_BROWSER_POLICY.installCommand} exited non-zero.`,
+          "Bare `npx playwright install` is not the fix (may hang on headless_shell).",
+          `Doc: ${DOC}`,
+        ].join(" "),
+        PS002C_BROWSER_POLICY.installCommand,
       );
       printBanner(false);
       process.exit(2);
     }
-    info = inspectBrowsers();
+    // clear previous chromium failure so banner reflects re-check
+    const idx = steps.findIndex((s) => s.id === "chromium");
+    if (idx >= 0) steps.splice(idx, 1);
+    const policyIdx = steps.findIndex((s) => s.id === "policy");
+    if (policyIdx >= 0) steps.splice(policyIdx, 1);
+    ok = recordChromium();
+    if (!ok) {
+      record(
+        "install",
+        "Playwright install",
+        false,
+        [
+          "Install finished but Chromium still missing.",
+          `Cache: ${getPlaywrightBrowsersCacheDir()}`,
+          `Doc: ${DOC}`,
+        ].join(" "),
+        PS002C_BROWSER_POLICY.installCommand,
+      );
+    }
   }
-
-  recordBrowsers(info);
 
   const ready = steps.every((s) => s.ok);
   printBanner(ready);
