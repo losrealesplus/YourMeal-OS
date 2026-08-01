@@ -30,6 +30,7 @@ const CHECK_ONLY = process.argv.includes("--check-only");
 const ROOT = process.cwd();
 const DOC =
   "docs/10-validation/PS002C_PLAYWRIGHT_HEADLESS_SHELL.md";
+const INTEGRITY_DOC = "docs/10-validation/PS002C_CHROMIUM_INTEGRITY.md";
 
 /** @typedef {{ id: string, label: string, ok: boolean, detail?: string, fix?: string }} Step */
 
@@ -192,6 +193,12 @@ function recordChromium() {
       resolved.executablePath,
     );
     record(
+      "integrity",
+      "Chromium integrity",
+      true,
+      `INSTALLATION_COMPLETE + platform resources · ${resolved.integrity.browserDirectory}`,
+    );
+    record(
       "policy",
       "Browser policy",
       true,
@@ -200,17 +207,32 @@ function recordChromium() {
     return true;
   }
 
+  const incomplete = /Chromium installation incomplete/i.test(
+    resolved.reason || "",
+  );
   record(
     "chromium",
-    "Chromium (new headless / channel: chromium)",
+    incomplete
+      ? "Chromium integrity (installation incomplete)"
+      : "Chromium (new headless / channel: chromium)",
     false,
-    [
-      "Chromium binary missing or unresolved.",
-      `Cache inspected: ${cache}`,
-      "headless_shell is NOT required for PS-002-C.",
-      `Doc: ${DOC}`,
-    ].join(" "),
-    `${PS002C_BROWSER_POLICY.installCommand}\n\nDo NOT run bare: npx playwright install\n(that command may hang after Chromium 100% / headless_shell).`,
+    incomplete
+      ? resolved.reason
+      : [
+          "Chromium binary missing or unresolved.",
+          `Cache inspected: ${cache}`,
+          "headless_shell is NOT required for PS-002-C.",
+          `Doc: ${DOC}`,
+        ].join(" "),
+    incomplete
+      ? [
+          PS002C_BROWSER_POLICY.installCommand,
+          "",
+          "First remove the broken browser directory (see detail above),",
+          "then reinstall. Do NOT run bare: npx playwright install",
+          `Doc: ${INTEGRITY_DOC}`,
+        ].join("\n")
+      : `${PS002C_BROWSER_POLICY.installCommand}\n\nDo NOT run bare: npx playwright install\n(that command may hang after Chromium 100% / headless_shell).`,
   );
   return false;
 }
@@ -265,11 +287,11 @@ ${CHECK_ONLY ? "(check-only · no install)\n" : ""}`);
       printBanner(false);
       process.exit(2);
     }
-    // clear previous chromium failure so banner reflects re-check
-    const idx = steps.findIndex((s) => s.id === "chromium");
-    if (idx >= 0) steps.splice(idx, 1);
-    const policyIdx = steps.findIndex((s) => s.id === "policy");
-    if (policyIdx >= 0) steps.splice(policyIdx, 1);
+    // clear previous chromium/integrity failure so banner reflects re-check
+    for (const id of ["chromium", "integrity", "policy"]) {
+      const idx = steps.findIndex((s) => s.id === id);
+      if (idx >= 0) steps.splice(idx, 1);
+    }
     ok = recordChromium();
     if (!ok) {
       record(
@@ -277,9 +299,10 @@ ${CHECK_ONLY ? "(check-only · no install)\n" : ""}`);
         "Playwright install",
         false,
         [
-          "Install finished but Chromium still missing.",
+          "Install finished but Chromium still missing or incomplete.",
           `Cache: ${getPlaywrightBrowsersCacheDir()}`,
-          `Doc: ${DOC}`,
+          "If integrity fails after install, delete the chromium-<rev> directory and retry.",
+          `Doc: ${INTEGRITY_DOC}`,
         ].join(" "),
         PS002C_BROWSER_POLICY.installCommand,
       );
