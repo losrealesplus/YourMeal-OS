@@ -69,6 +69,8 @@ Si el formulario no aparece: el runner guarda evidencia de UI (`ps002c-form-time
 
 **HOME-PATH-002:** si el FAIL se corta en `HOME_PATH_RESOLVED`, la evidencia incluye `home_path_gap` (`ROLE_READY.roles` + `STOP.reason`). Ver [HOME_PATH_002_EVIDENCE.md](./HOME_PATH_002_EVIDENCE.md).
 
+**AUTH-SESSION-002:** si el form no aparece y UI = `checkingSession` / “Cargando…”, ver `auth_session_002` (qué `await` del cold mount quedó pendiente). [AUTH_SESSION_002_COLD_TIMING.md](./AUTH_SESSION_002_COLD_TIMING.md).
+
 ---
 
 ## Objetivo de producto
