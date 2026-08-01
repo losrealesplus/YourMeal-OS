@@ -17,7 +17,7 @@ import { brandConfig } from "@/tenant/brand-config";
  * Honors allowlisted `?next=` (PRODUCT-001) so recovery can reach `/reset-password`
  * after `exchangeCodeForSession`.
  */
-export const Route = createFileRoute("/auth/callback")({
+export const Route = createFileRoute("/auth_/callback")({
   ssr: false,
   head: () => ({
     meta: [

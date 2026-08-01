@@ -61,6 +61,8 @@ No lanza stacks largos de Node por precondiciones de entorno.
 
 Si el formulario no aparece: el runner guarda evidencia de UI (`ps002c-form-timeout.*`) — ver [PS002C_TIMEOUT_EVIDENCE.md](./PS002C_TIMEOUT_EVIDENCE.md).
 
+**AUTH-LAYOUT-001:** `/auth/admin` y `/auth/callback` son rutas hermanas de `/auth` (non-nested). Ver [AUTH_LAYOUT_001.md](./AUTH_LAYOUT_001.md).
+
 ---
 
 ## Objetivo de producto
