@@ -67,6 +67,8 @@ Si el formulario no aparece: el runner guarda evidencia de UI (`ps002c-form-time
 
 **AUTH-LAYOUT-001:** `/auth/admin` y `/auth/callback` son rutas hermanas de `/auth` (non-nested). Ver [AUTH_LAYOUT_001.md](./AUTH_LAYOUT_001.md).
 
+**HOME-PATH-002:** si el FAIL se corta en `HOME_PATH_RESOLVED`, la evidencia incluye `home_path_gap` (`ROLE_READY.roles` + `STOP.reason`). Ver [HOME_PATH_002_EVIDENCE.md](./HOME_PATH_002_EVIDENCE.md).
+
 ---
 
 ## Objetivo de producto
