@@ -17,11 +17,20 @@ describe("runPs002cPreflight", () => {
     }
   });
 
-  function tempCwd(withEnvFile) {
+  function tempCwd(withEnvFile, envBody) {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), "ps002c-preflight-"));
     temps.push(dir);
     if (withEnvFile) {
-      fs.writeFileSync(path.join(dir, ".env"), "PS002_EMAIL=x\n", "utf8");
+      fs.writeFileSync(
+        path.join(dir, ".env"),
+        envBody ??
+          [
+            "PS002_EMAIL=x",
+            // Non-placeholder shape for DX tests (not a real project key).
+            "VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_test_not_placeholder",
+          ].join("\n"),
+        "utf8",
+      );
     }
     return dir;
   }
@@ -39,6 +48,43 @@ describe("runPs002cPreflight", () => {
     if (!result.ok) {
       assert.match(result.reason, /\.env/);
       assert.match(result.reason, /cp \.env\.example \.env/);
+    }
+  });
+
+  it("BLOCKED when VITE_SUPABASE_PUBLISHABLE_KEY is REPLACE_ME", async () => {
+    const cwd = tempCwd(
+      true,
+      [
+        "PS002_EMAIL=x",
+        'VITE_SUPABASE_PUBLISHABLE_KEY="sb_publishable_REPLACE_ME"',
+      ].join("\n"),
+    );
+    const result = await runPs002cPreflight({
+      cwd,
+      email: "a@b.c",
+      password: "secret",
+      resolveBrowser: okBrowser,
+      probeServer: async () => ({ ok: true }),
+    });
+    assert.equal(result.ok, false);
+    if (!result.ok) {
+      assert.match(result.reason, /Invalid VITE_SUPABASE_PUBLISHABLE_KEY/);
+      assert.match(result.reason, /placeholder|REPLACE_ME/i);
+    }
+  });
+
+  it("BLOCKED when VITE_SUPABASE_PUBLISHABLE_KEY is empty", async () => {
+    const cwd = tempCwd(true, "PS002_EMAIL=x\nVITE_SUPABASE_PUBLISHABLE_KEY=\n");
+    const result = await runPs002cPreflight({
+      cwd,
+      email: "a@b.c",
+      password: "secret",
+      resolveBrowser: okBrowser,
+      probeServer: async () => ({ ok: true }),
+    });
+    assert.equal(result.ok, false);
+    if (!result.ok) {
+      assert.match(result.reason, /Invalid VITE_SUPABASE_PUBLISHABLE_KEY/);
     }
   });
 

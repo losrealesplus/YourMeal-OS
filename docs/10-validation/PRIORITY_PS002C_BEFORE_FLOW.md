@@ -50,16 +50,17 @@ No abrir PRs metodológicas nuevas · no tocar FOPEBA / Core / Identity hasta PS
 ## Cómo desbloquear
 
 ```bash
-cp .env.example .env   # rellena PS002_EMAIL / PS002_PASSWORD + Supabase oficial
+cp .env.example .env   # rellena VITE_SUPABASE_* (no REPLACE_ME) + PS002_* + Supabase oficial
 npm install
 npm run bootstrap:e2e          # READY/BLOCKED + instala browsers si faltan
 VITE_BOOTSTRAP_MODE=false npm run dev -- --host 127.0.0.1 --port 8080
 npm run test:ps002-canonical-auth
 ```
 
-`bootstrap:e2e` es diagnóstico FOPEBA: dice exactamente qué falta (`.env`, credenciales, Chromium, Headless Shell, …).  
+`bootstrap:e2e` es diagnóstico FOPEBA: dice exactamente qué falta (`.env`, **`VITE_SUPABASE_PUBLISHABLE_KEY`**, credenciales, Chromium, …).  
 Solo check: `npm run bootstrap:e2e:check`.  
-`.env` está **gitignored**.
+`.env` está **gitignored**.  
+Placeholder Vite → [AUTH_PIPELINE_002](./AUTH_PIPELINE_002_VITE_PUBLISHABLE_KEY.md).
 
 Condición de salida objetiva (PASS):
 

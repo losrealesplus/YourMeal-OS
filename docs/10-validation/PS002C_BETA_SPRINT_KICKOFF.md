@@ -11,7 +11,9 @@
 
 ```bash
 cp .env.example .env
-# Rellena SUPABASE_* / VITE_SUPABASE_* y PS002_EMAIL / PS002_PASSWORD en .env (local · gitignored)
+# Rellena VITE_SUPABASE_URL + VITE_SUPABASE_PUBLISHABLE_KEY (NO dejar REPLACE_ME),
+# SUPABASE_* en sync, y PS002_EMAIL / PS002_PASSWORD en .env (local · gitignored).
+# El browser Auth usa VITE_* — ver AUTH_PIPELINE_002_VITE_PUBLISHABLE_KEY.md
 
 npm install
 npm run bootstrap:e2e          # diagnóstico READY/BLOCKED + instala browsers si faltan
@@ -23,13 +25,14 @@ VITE_BOOTSTRAP_MODE=false npm run dev -- --host 127.0.0.1 --port 8080
 npm run test:ps002-canonical-auth
 ```
 
-`bootstrap:e2e` verifica Node · npm · dotenv · `.env` · credenciales PS002 · Playwright · **Chromium (new headless / `channel: chromium`)** · **integridad** (`INSTALLATION_COMPLETE` + Framework/resources).  
+`bootstrap:e2e` verifica Node · npm · dotenv · `.env` · **`VITE_SUPABASE_PUBLISHABLE_KEY` (no vacía / no `REPLACE_ME`)** · credenciales PS002 · Playwright · **Chromium (new headless / `channel: chromium`)** · **integridad** (`INSTALLATION_COMPLETE` + Framework/resources).  
 **No** exige `chromium_headless_shell`.  
 Binario presente pero Framework ausente → **BLOCKED** (`Chromium installation incomplete`).  
+Placeholder `sb_publishable_REPLACE_ME` en `VITE_SUPABASE_PUBLISHABLE_KEY` → **BLOCKED** (evitaría `Invalid API key` en login).  
 Si falta algo → fix exacto (`npx playwright install chromium --no-shell`).  
 Nunca recomienda bare `npx playwright install` (puede colgarse).  
 
-Detalle: [PS002C_PLAYWRIGHT_HEADLESS_SHELL.md](./PS002C_PLAYWRIGHT_HEADLESS_SHELL.md) · [PS002C_CHROMIUM_INTEGRITY.md](./PS002C_CHROMIUM_INTEGRITY.md)
+Detalle: [PS002C_PLAYWRIGHT_HEADLESS_SHELL.md](./PS002C_PLAYWRIGHT_HEADLESS_SHELL.md) · [PS002C_CHROMIUM_INTEGRITY.md](./PS002C_CHROMIUM_INTEGRITY.md) · [AUTH_PIPELINE_002_VITE_PUBLISHABLE_KEY.md](./AUTH_PIPELINE_002_VITE_PUBLISHABLE_KEY.md)
 
 Solo comprobar (sin instalar): `npm run bootstrap:e2e:check`
 
@@ -51,11 +54,12 @@ Sin `export` manual. Sin instalaciones ad-hoc no documentadas.
 El runner comprueba, en orden, y sale **BLOCKED** con mensaje claro si falla:
 
 1. Existe `.env`  
-2. `PS002_EMAIL`  
-3. `PS002_PASSWORD`  
-4. Playwright disponible  
-5. Chromium instalado para `channel: chromium` (`npm run bootstrap:e2e` · sin headless_shell)  
-6. Dev server responde  
+2. `VITE_SUPABASE_PUBLISHABLE_KEY` (no vacía · no `REPLACE_ME`)  
+3. `PS002_EMAIL`  
+4. `PS002_PASSWORD`  
+5. Playwright disponible  
+6. Chromium instalado para `channel: chromium` (`npm run bootstrap:e2e` · sin headless_shell)  
+7. Dev server responde  
 
 No lanza stacks largos de Node por precondiciones de entorno.
 

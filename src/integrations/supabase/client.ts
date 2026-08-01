@@ -29,8 +29,11 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
 
 
 function createSupabaseClient() {
-  // Use import.meta.env for client-side (Vite build-time replacement)
-  // Fall back to process.env for SSR (server-side rendering)
+  // Browser (Vite): ONLY VITE_SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY are
+  // injected into the SPA (import.meta.env). A real SUPABASE_PUBLISHABLE_KEY in
+  // .env does NOT reach the browser — leaving VITE_* as REPLACE_ME yields
+  // Supabase "Invalid API key". See AUTH-PIPELINE-002 / ps002c-vite-env.
+  // process.env.* is a Node/SSR fallback only.
   const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
   const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
 
