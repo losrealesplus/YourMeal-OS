@@ -200,7 +200,7 @@ async function main() {
   }
 
   assertNoImmediateGetSessionAfterLogin("src/routes/auth.tsx", "auth.tsx");
-  assertNoImmediateGetSessionAfterLogin("src/routes/auth.admin.tsx", "auth.admin.tsx");
+  assertNoImmediateGetSessionAfterLogin("src/routes/auth_.admin.tsx", "auth_.admin.tsx");
   assertCanonicalPipelineWiring();
 
   const browser = await chromium.launch({

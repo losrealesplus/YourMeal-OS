@@ -37,7 +37,7 @@ import { brandConfig, tenantCopyEs } from "@/tenant/brand-config";
  *
  * BUGFIX-001: bootstrap failures must never leave checkingSession stuck true.
  */
-export const Route = createFileRoute("/auth/admin")({
+export const Route = createFileRoute("/auth_/admin")({
   validateSearch: (search: Record<string, unknown>) =>
     parseOperationsAuthSearch(search),
   head: () => ({
