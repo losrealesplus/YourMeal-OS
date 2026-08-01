@@ -42,6 +42,12 @@ import {
 import { runPs002cPreflight } from "./lib/ps002c-preflight.mjs";
 import { PS002C_BROWSER_POLICY } from "./lib/ps002c-playwright.mjs";
 import { capturePs002cFormTimeoutEvidence } from "./lib/ps002c-ui-evidence.mjs";
+import {
+  buildHomePathGapEvidence,
+  formatHomePathGapReport,
+  parseFcr008Args,
+  readPlaywrightConsoleArgs,
+} from "./lib/ps002c-home-path-evidence.mjs";
 
 const BASE = process.argv[2] || process.env.PS_BASE_URL || "http://127.0.0.1:8080";
 const EMAIL = process.env.PS002_EMAIL || "";
@@ -177,15 +183,33 @@ async function main() {
   const pageErrors = [];
   /** @type {Record<string, number>} */
   const stepTimestamps = {};
+  /** @type {import("./lib/ps002c-home-path-evidence.mjs").Fcr008Event[]} */
+  const fcr008Events = [];
+  /** @type {Promise<void>[]} */
+  const consoleParsePending = [];
 
   page.on("console", (msg) => {
     const text = msg.text();
     const atMs = Date.now();
     consoleLines.push(text);
-    const ev = parseFcr008ConsoleEvent(text, atMs);
-    if (ev && stepTimestamps[ev.step] == null) {
-      stepTimestamps[ev.step] = ev.atMs;
+    // Legacy step timestamps from text (kept for duration_ms).
+    const evText = parseFcr008ConsoleEvent(text, atMs);
+    if (evText && stepTimestamps[evText.step] == null) {
+      stepTimestamps[evText.step] = evText.atMs;
     }
+    // HOME-PATH-002: capture structured payloads via jsonValue (Auth unchanged).
+    if (!text.includes("[FCR-008]")) return;
+    consoleParsePending.push(
+      (async () => {
+        const args = await readPlaywrightConsoleArgs(msg);
+        const ev = parseFcr008Args(args, text, atMs);
+        if (!ev) return;
+        fcr008Events.push(ev);
+        if (stepTimestamps[ev.step] == null) {
+          stepTimestamps[ev.step] = ev.atMs;
+        }
+      })(),
+    );
   });
   page.on("pageerror", (e) => pageErrors.push(String(e)));
 
@@ -278,14 +302,19 @@ async function main() {
     }
 
     await page.waitForTimeout(1000);
+    await Promise.all(consoleParsePending);
     const screenshotPath = path.join(OUT, "ps002c-after-login.png");
     await page.screenshot({ path: screenshotPath, fullPage: true });
 
     const fcrLines = consoleLines.filter((l) => l.includes("[FCR-008]"));
-    const pipeline = extractFcr008Steps(fcrLines);
+    const pipeline =
+      fcr008Events.length > 0
+        ? fcr008Events.map((e) => e.step)
+        : extractFcr008Steps(fcrLines);
     const validation = validateCanonicalPipeline(pipeline);
     const duration_ms = computePipelineDurations(stepTimestamps);
     const pipelineStarted = pipeline.includes("LOGIN") || pipeline.length > 0;
+    const home_path_gap = buildHomePathGapEvidence(fcr008Events);
 
     const outcome = classifyPs002cOutcome({
       preconditionOk: true,
@@ -324,12 +353,19 @@ async function main() {
         stepTimestamps,
         comparisonTable: formatPipelineComparisonTable(validation),
         fcr008Logs: fcrLines,
+        fcr008Events: fcr008Events.map((e) => ({
+          step: e.step,
+          detail: e.detail,
+          atMs: e.atMs,
+        })),
+        home_path_gap,
         pageErrors,
         screenshot: screenshotPath,
         notes: [
           "Auth Supabase real (no Bootstrap, no mock)",
           "PASS | FAIL | BLOCKED — BLOCKED is not a code defect",
           "duration_ms is diagnostic only — not a performance gate",
+          "HOME-PATH-002: home_path_gap captures ROLE_READY/STOP payloads (instrumentation only)",
         ],
       },
     });
@@ -365,6 +401,12 @@ async function main() {
 
     printFail(stop ?? "LOGIN", reason);
     console.log(evidence.comparisonTable);
+    if (
+      home_path_gap.diagnosis.gap === "ROLE_READY_WITHOUT_HOME_PATH_RESOLVED" ||
+      home_path_gap.stop
+    ) {
+      console.log(`\n${formatHomePathGapReport(home_path_gap)}\n`);
+    }
     console.log(
       JSON.stringify(
         {
@@ -375,6 +417,12 @@ async function main() {
           missing: evidence.missing,
           out_of_order: evidence.out_of_order,
           duration_ms: evidence.duration_ms,
+          home_path_gap: {
+            stop_reason: home_path_gap.diagnosis.stop_reason,
+            is_not_staff: home_path_gap.diagnosis.is_not_staff,
+            roles_at_role_ready: home_path_gap.diagnosis.roles_at_role_ready,
+            gap: home_path_gap.diagnosis.gap,
+          },
           evidencePath,
         },
         null,

@@ -31,7 +31,7 @@
     "test:ps002-canonical-auth": "node scripts/ps002-canonical-auth.mjs",
     "bootstrap:e2e": "node scripts/ps002c-env-verify.mjs",
     "bootstrap:e2e:check": "node scripts/ps002c-env-verify.mjs --check-only",
-    "test:canonical-pipeline": "node --test scripts/lib/canonical-pipeline.spec.mjs scripts/lib/ps002c-preflight.spec.mjs scripts/lib/ps002c-ui-evidence.spec.mjs scripts/lib/ps002c-vite-env.spec.mjs",
+    "test:canonical-pipeline": "node --test scripts/lib/canonical-pipeline.spec.mjs scripts/lib/ps002c-preflight.spec.mjs scripts/lib/ps002c-ui-evidence.spec.mjs scripts/lib/ps002c-vite-env.spec.mjs scripts/lib/ps002c-home-path-evidence.spec.mjs",
     "gen:types": "supabase gen types typescript --project-id djangucecsphnejplvic --schema public > src/integrations/supabase/types.ts"
   },
   "dependencies": {
