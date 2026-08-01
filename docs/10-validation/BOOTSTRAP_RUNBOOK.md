@@ -36,12 +36,12 @@ Tenant: `eatclean-tenerife`
 ### 2. Ejecutar seed (Auth Admin — flujo soportado)
 
 ```bash
-export SUPABASE_URL=https://djangucecsphnejplvic.supabase.co
-export SUPABASE_SERVICE_ROLE_KEY='…'   # secret — nunca VITE_*
-
-# Opcional: password inicial si el usuario aún no existe (min 8).
-# Si se omite, el script invita por email (inviteUserByEmail).
-export PLATFORM_OWNERS_PASSWORD='…'
+# `.env` en la raíz del repo es suficiente (AUTH-SEED-001: el script carga dotenv).
+# Requerido en .env:
+#   SUPABASE_URL (o VITE_SUPABASE_URL)
+#   SUPABASE_SERVICE_ROLE_KEY   # secret — nunca VITE_*
+# Opcional:
+#   PLATFORM_OWNERS_PASSWORD   # min 8; solo si hay que crear Auth users
 
 npm run seed:platform-owners
 ```

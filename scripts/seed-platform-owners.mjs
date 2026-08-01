@@ -20,7 +20,11 @@
  *
  * Usage:
  *   npm run seed:platform-owners
+ *
+ * Loads repository-root `.env` via dotenv (same pattern as PS-002-C scripts).
+ * Node does not inject Vite/env files automatically.
  */
+import "dotenv/config";
 import { createClient } from "@supabase/supabase-js";
 import { resolve } from "node:path";
 import {
