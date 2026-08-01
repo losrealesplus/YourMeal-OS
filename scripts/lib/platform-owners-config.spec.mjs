@@ -23,8 +23,12 @@ describe("loadPlatformOwnersConfig", () => {
       "bootstrap config should include the current Platform Owner emails",
     );
     assert.ok(
-      cfg.owners.some((o) => o.email === "alexhdezmtinez@gmail.com"),
+      cfg.owners.some((o) => o.email === "alex.hdez.mtinez@gmail.com"),
       "bootstrap config should include the current Platform Owner emails",
+    );
+    assert.ok(
+      !cfg.owners.some((o) => o.email === "alexhdezmtinez@gmail.com"),
+      "typo email without dots must not remain in bootstrap config",
     );
   });
 

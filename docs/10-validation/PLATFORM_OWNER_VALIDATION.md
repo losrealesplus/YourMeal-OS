@@ -65,7 +65,8 @@ Re-ejecución de `npm run seed:platform-owners` → `auth: reused` para ambos ·
 
 Las passwords usadas en el agente son efímeras (Auth Admin `updateUserById` solo para probes).  
 
-**Operador:** en `/auth` usar **Forgot password** para `alex1409h@gmail.com` y `alexhdezmtinez@gmail.com`, o volver a seedear con `PLATFORM_OWNERS_PASSWORD` conocido en un secret manager.
+**Operador:** en `/auth` usar **Forgot password** para `alex1409h@gmail.com` y `alex.hdez.mtinez@gmail.com`, o volver a seedear con `PLATFORM_OWNERS_PASSWORD` conocido en un secret manager.  
+(Config vigente: `alex.hdez.mtinez@gmail.com` — no el typo `alexhdezmtinez@gmail.com`.)
 
 ---
 
