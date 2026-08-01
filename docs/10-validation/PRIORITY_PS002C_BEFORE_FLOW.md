@@ -41,7 +41,7 @@ Los conflictos de #98 con `CURRENT_PHASE` / READMEs son síntoma de seguir docum
 | Platform Stabilization | 🟡 Pendiente de validación final |
 | PS-001 | ✅ PASS |
 | PS-002-B | ✅ PASS |
-| **PS-002-C** | ⏳ Pendiente (credenciales reales) |
+| **PS-002-C** | 🟡 Auth+pipeline OK hasta `ROLE_READY` · FAIL `not_staff` (roles vacíos) — [staff data gate](./PS002C_STAFF_DATA_GATE.md) |
 | PS-003 | ✅ PASS |
 | FLOW-01 | ⏸ Bloqueado correctamente |
 
