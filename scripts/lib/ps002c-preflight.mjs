@@ -5,6 +5,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import { resolvePs002cBrowser } from "./ps002c-playwright.mjs";
+import {
+  readVitePublishableKeyFromEnvFile,
+  validateVitePublishableKey,
+} from "./ps002c-vite-env.mjs";
 
 /**
  * @typedef {{ ok: true } | { ok: false, reason: string }} PreflightResult
@@ -17,6 +21,7 @@ import { resolvePs002cBrowser } from "./ps002c-playwright.mjs";
  *   cwd?: string,
  *   email?: string,
  *   password?: string,
+ *   vitePublishableKey?: string,
  *   baseUrl?: string,
  *   route?: string,
  *   probeServer?: (url: string) => Promise<{ ok: boolean, error?: string, status?: number }>,
@@ -57,6 +62,18 @@ export async function runPs002cPreflight(opts = {}) {
         "Never commit .env (it is gitignored).",
       ].join("\n"),
     };
+  }
+
+  const fromFile = readVitePublishableKeyFromEnvFile(envPath);
+  const viteKey =
+    opts.vitePublishableKey !== undefined
+      ? opts.vitePublishableKey
+      : fromFile !== null
+        ? fromFile
+        : (process.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? "");
+  const viteKeyCheck = validateVitePublishableKey(viteKey);
+  if (!viteKeyCheck.ok) {
+    return viteKeyCheck;
   }
 
   if (!email) {

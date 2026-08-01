@@ -24,6 +24,10 @@ import {
   getPlaywrightBrowsersCacheDir,
   resolvePs002cBrowser,
 } from "./lib/ps002c-playwright.mjs";
+import {
+  isInvalidVitePublishableKey,
+  readVitePublishableKeyFromEnvFile,
+} from "./lib/ps002c-vite-env.mjs";
 
 const require = createRequire(import.meta.url);
 const CHECK_ONLY = process.argv.includes("--check-only");
@@ -145,6 +149,32 @@ function checkCredentials() {
   );
 }
 
+function checkVitePublishableKey() {
+  const envPath = path.join(ROOT, ".env");
+  const fromFile = readVitePublishableKeyFromEnvFile(envPath);
+  const key =
+    fromFile !== null
+      ? fromFile
+      : (process.env.VITE_SUPABASE_PUBLISHABLE_KEY || "").trim();
+  const ok = !isInvalidVitePublishableKey(key);
+  record(
+    "vite_key",
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    ok,
+    ok
+      ? "set (non-placeholder)"
+      : key
+        ? "contains REPLACE_ME placeholder — browser would get Invalid API key"
+        : "missing or empty",
+    [
+      "Invalid VITE_SUPABASE_PUBLISHABLE_KEY. Replace placeholder with the project's real publishable key.",
+      "Set VITE_SUPABASE_PUBLISHABLE_KEY in .env (project djangucecsphnejplvic).",
+      "SUPABASE_PUBLISHABLE_KEY alone does NOT reach the Vite SPA — restart npm run dev after editing.",
+      "Never commit real keys.",
+    ].join("\n"),
+  );
+}
+
 function checkPlaywrightPackage() {
   try {
     const pkgPath = require.resolve("playwright/package.json");
@@ -252,8 +282,18 @@ ${CHECK_ONLY ? "(check-only · no install)\n" : ""}`);
   stopIfFailed();
 
   const hasEnv = checkEnvFile();
-  if (hasEnv) checkCredentials();
-  else {
+  if (hasEnv) {
+    checkVitePublishableKey();
+    stopIfFailed();
+    checkCredentials();
+  } else {
+    record(
+      "vite_key",
+      "VITE_SUPABASE_PUBLISHABLE_KEY",
+      false,
+      "skipped · .env missing",
+      "cp .env.example .env && set VITE_SUPABASE_PUBLISHABLE_KEY (not REPLACE_ME)",
+    );
     record(
       "ps002",
       "PS002 credentials",
