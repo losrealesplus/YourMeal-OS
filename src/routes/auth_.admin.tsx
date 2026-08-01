@@ -21,6 +21,7 @@ import {
 } from "@/lib/admin-auth-bootstrap";
 import { parseOperationsAuthSearch } from "@/lib/open-operations-center";
 import { ensurePlatformOwnerSession } from "@/lib/ensure-platform-owner-session";
+import { createAuthSession002Trace } from "@/lib/auth-session-002-trace";
 import { toast } from "sonner";
 import {
   PoweredByLine,
@@ -86,6 +87,11 @@ function AdminAuthPage() {
 
   useEffect(() => {
     let cancelled = false;
+    // AUTH-SESSION-002: timing only — same awaits / same control flow.
+    const trace = createAuthSession002Trace({
+      route: "/auth/admin",
+      source: "cold_mount",
+    });
 
     void (async () => {
       setCheckingSession(true);
@@ -94,16 +100,29 @@ function AdminAuthPage() {
 
       let userId: string | null = null;
       try {
-        const { data, error: sessionError } = await getSession();
+        const { data, error: sessionError } = await trace.time("getSession", () =>
+          getSession(),
+        );
         if (sessionError) throw sessionError;
 
         const user = data.session?.user;
         if (!user) {
+          trace.skip("ensurePlatformOwnerSession", "no_session");
+          trace.skip("loadRoles", "no_session");
           return;
         }
         userId = user.id;
 
-        const result = await tryEnterOperationsCenter(user.id, returnTo);
+        // Same enterOperationsCenter path; wrap deps so ensure/loadRoles are timed.
+        const result = await enterOperationsCenter({
+          userId: user.id,
+          returnTo,
+          ensurePlatformOwnerSession: () =>
+            trace.time("ensurePlatformOwnerSession", () =>
+              ensurePlatformOwnerSession(),
+            ),
+          loadRoles: (id) => trace.time("loadRoles", () => loadRoles(id)),
+        });
         if (cancelled) return;
 
         if (result.status === "not_staff") {
@@ -125,6 +144,11 @@ function AdminAuthPage() {
         if (!cancelled) {
           setCheckingSession(false);
         }
+        trace.summary({
+          cancelled,
+          checkingSessionCleared: !cancelled,
+          userId,
+        });
       }
     })();
 

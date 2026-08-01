@@ -56,7 +56,8 @@ docs/10-validation/
 Cutover plan (repo prep): [INFRA007_CUTOVER_PLAN](./INFRA007_CUTOVER_PLAN.md)  
 Cutover report (histórico INFRA-002): [CUTOVER_REPORT](./CUTOVER_REPORT.md)  
 Vite publishable key (no `REPLACE_ME` in SPA): [AUTH_PIPELINE_002_VITE_PUBLISHABLE_KEY](./AUTH_PIPELINE_002_VITE_PUBLISHABLE_KEY.md)  
-HOME path gap evidence (`ROLE_READY` / `STOP`): [HOME_PATH_002_EVIDENCE](./HOME_PATH_002_EVIDENCE.md)
+HOME path gap evidence (`ROLE_READY` / `STOP`): [HOME_PATH_002_EVIDENCE](./HOME_PATH_002_EVIDENCE.md)  
+Cold `checkingSession` timings: [AUTH_SESSION_002_COLD_TIMING](./AUTH_SESSION_002_COLD_TIMING.md)
 
 ## INFRA-005 · Identity validation
 

@@ -48,6 +48,11 @@ import {
   parseFcr008Args,
   readPlaywrightConsoleArgs,
 } from "./lib/ps002c-home-path-evidence.mjs";
+import {
+  buildAuthSession002Evidence,
+  formatAuthSession002Report,
+  parseAuthSession002Args,
+} from "./lib/ps002c-auth-session-evidence.mjs";
 
 const BASE = process.argv[2] || process.env.PS_BASE_URL || "http://127.0.0.1:8080";
 const EMAIL = process.env.PS002_EMAIL || "";
@@ -185,6 +190,8 @@ async function main() {
   const stepTimestamps = {};
   /** @type {import("./lib/ps002c-home-path-evidence.mjs").Fcr008Event[]} */
   const fcr008Events = [];
+  /** @type {import("./lib/ps002c-auth-session-evidence.mjs").AuthSession002ConsoleEvent[]} */
+  const authSession002Events = [];
   /** @type {Promise<void>[]} */
   const consoleParsePending = [];
 
@@ -197,16 +204,25 @@ async function main() {
     if (evText && stepTimestamps[evText.step] == null) {
       stepTimestamps[evText.step] = evText.atMs;
     }
-    // HOME-PATH-002: capture structured payloads via jsonValue (Auth unchanged).
-    if (!text.includes("[FCR-008]")) return;
+    const wantsFcr = text.includes("[FCR-008]");
+    const wantsSession002 = text.includes("[AUTH-SESSION-002]");
+    if (!wantsFcr && !wantsSession002) return;
+    // HOME-PATH-002 / AUTH-SESSION-002: jsonValue payloads (no Auth behavior change).
     consoleParsePending.push(
       (async () => {
         const args = await readPlaywrightConsoleArgs(msg);
-        const ev = parseFcr008Args(args, text, atMs);
-        if (!ev) return;
-        fcr008Events.push(ev);
-        if (stepTimestamps[ev.step] == null) {
-          stepTimestamps[ev.step] = ev.atMs;
+        if (wantsFcr) {
+          const ev = parseFcr008Args(args, text, atMs);
+          if (ev) {
+            fcr008Events.push(ev);
+            if (stepTimestamps[ev.step] == null) {
+              stepTimestamps[ev.step] = ev.atMs;
+            }
+          }
+        }
+        if (wantsSession002) {
+          const ev = parseAuthSession002Args(args, text, atMs);
+          if (ev) authSession002Events.push(ev);
         }
       })(),
     );
@@ -247,6 +263,9 @@ async function main() {
       // Instrumentation only — classify which auth.admin UI branch Playwright saw.
       // Does not change Auth / product behavior (FOPEBA: evidence before fix).
       const waitError = e instanceof Error ? e.message : String(e);
+      await Promise.all(consoleParsePending);
+      const auth_session_002 = buildAuthSession002Evidence(authSession002Events);
+      console.log(`\n${formatAuthSession002Report(auth_session_002)}\n`);
       let evidence;
       try {
         evidence = await capturePs002cFormTimeoutEvidence(page, {
@@ -262,7 +281,7 @@ async function main() {
             `UI evidence capture failed: ${captureErr instanceof Error ? captureErr.message : String(captureErr)}`,
             `Playwright: ${waitError}`,
           ].join("\n"),
-          { waitError },
+          { waitError, auth_session_002 },
         );
         return;
       }
@@ -271,6 +290,7 @@ async function main() {
         uiState: evidence.uiState,
         finalUrl: evidence.url,
         screenshot: evidence.screenshotPath,
+        auth_session_002,
       });
       return;
     }
@@ -315,6 +335,7 @@ async function main() {
     const duration_ms = computePipelineDurations(stepTimestamps);
     const pipelineStarted = pipeline.includes("LOGIN") || pipeline.length > 0;
     const home_path_gap = buildHomePathGapEvidence(fcr008Events);
+    const auth_session_002 = buildAuthSession002Evidence(authSession002Events);
 
     const outcome = classifyPs002cOutcome({
       preconditionOk: true,
@@ -359,6 +380,7 @@ async function main() {
           atMs: e.atMs,
         })),
         home_path_gap,
+        auth_session_002,
         pageErrors,
         screenshot: screenshotPath,
         notes: [
@@ -366,6 +388,7 @@ async function main() {
           "PASS | FAIL | BLOCKED — BLOCKED is not a code defect",
           "duration_ms is diagnostic only — not a performance gate",
           "HOME-PATH-002: home_path_gap captures ROLE_READY/STOP payloads (instrumentation only)",
+          "AUTH-SESSION-002: auth_session_002 cold-start timings (getSession/ensure/loadRoles)",
         ],
       },
     });
