@@ -82,7 +82,9 @@ Tras PASS:
 
 Tras FAIL: el primer paso ⛔ del reporte = siguiente FCR (sin “bug genérico de login”).
 
-Evidencia comparable: `status` · `pipeline` · `duplicates` · `missing` · `out_of_order` · `duration_ms`.
+**2026-08-01:** AUTH-SESSION-001 y HOME-PATH-001 **CLOSED**. Cold session OK; `STOP not_staff` con `roles=[]` es gate de **datos** (asignar staff / PO seed), no bug de Auth/nav. Ver [PS002C_STAFF_DATA_GATE](./PS002C_STAFF_DATA_GATE.md).
+
+Evidencia comparable: `status` · `pipeline` · `duplicates` · `missing` · `out_of_order` · `duration_ms` · `home_path_gap` · `auth_session_002`.
 
 Acta de gate: [PS-002.md](./platform-stabilization/PS-002.md) · contrato [FCR008](./FCR008_CANONICAL_POST_LOGIN_SESSION.md)
 
