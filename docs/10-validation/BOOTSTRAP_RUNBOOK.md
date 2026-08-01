@@ -28,8 +28,10 @@ cat config/bootstrap/platform-owners.json
 Owners actuales:
 
 - `alex1409h@gmail.com`
-- `alexhdezmtinez@gmail.com`  
+- `alex.hdez.mtinez@gmail.com`  
 Tenant: `eatclean-tenerife`
+
+> No usar `alexhdezmtinez@gmail.com` (sin puntos): no coincide con Auth (`74914617-…`).
 
 ### 2. Ejecutar seed (Auth Admin — flujo soportado)
 
