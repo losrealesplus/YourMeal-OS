@@ -59,6 +59,8 @@ El runner comprueba, en orden, y sale **BLOCKED** con mensaje claro si falla:
 
 No lanza stacks largos de Node por precondiciones de entorno.
 
+Si el formulario no aparece: el runner guarda evidencia de UI (`ps002c-form-timeout.*`) — ver [PS002C_TIMEOUT_EVIDENCE.md](./PS002C_TIMEOUT_EVIDENCE.md).
+
 ---
 
 ## Objetivo de producto

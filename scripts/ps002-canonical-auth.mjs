@@ -41,6 +41,7 @@ import {
 } from "./lib/canonical-pipeline.mjs";
 import { runPs002cPreflight } from "./lib/ps002c-preflight.mjs";
 import { PS002C_BROWSER_POLICY } from "./lib/ps002c-playwright.mjs";
+import { capturePs002cFormTimeoutEvidence } from "./lib/ps002c-ui-evidence.mjs";
 
 const BASE = process.argv[2] || process.env.PS_BASE_URL || "http://127.0.0.1:8080";
 const EMAIL = process.env.PS002_EMAIL || "";
@@ -219,9 +220,34 @@ async function main() {
     try {
       await emailInput.waitFor({ state: "visible", timeout: 30_000 });
     } catch (e) {
-      exitCode = emitBlocked(
-        `Auth form not available at ${ROUTE}: ${e instanceof Error ? e.message : String(e)}`,
-      );
+      // Instrumentation only — classify which auth.admin UI branch Playwright saw.
+      // Does not change Auth / product behavior (FOPEBA: evidence before fix).
+      const waitError = e instanceof Error ? e.message : String(e);
+      let evidence;
+      try {
+        evidence = await capturePs002cFormTimeoutEvidence(page, {
+          outDir: OUT,
+          route: ROUTE,
+          expectPath: EXPECT_PATH,
+          waitError,
+        });
+      } catch (captureErr) {
+        exitCode = emitBlocked(
+          [
+            `Auth form not available at ${ROUTE}.`,
+            `UI evidence capture failed: ${captureErr instanceof Error ? captureErr.message : String(captureErr)}`,
+            `Playwright: ${waitError}`,
+          ].join("\n"),
+          { waitError },
+        );
+        return;
+      }
+      exitCode = emitBlocked(evidence.reason, {
+        form_timeout: evidence.payload,
+        uiState: evidence.uiState,
+        finalUrl: evidence.url,
+        screenshot: evidence.screenshotPath,
+      });
       return;
     }
 
