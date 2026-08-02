@@ -1,0 +1,36 @@
+{
+  "status": "BLOCKED",
+  "reason": "RELEASE-CROSSFLOW segments not implemented (runner ready; Evidence before Implementation)",
+  "gate": "RELEASE-CROSSFLOW",
+  "contract": "RELEASE_CROSSFLOW_SPEC",
+  "level": "release",
+  "certifies": "chained_flow_handoffs",
+  "complements_flow_runners": true,
+  "principle": "Evidence before Implementation",
+  "code_status": "RUNNER_ONLY",
+  "at": "2026-08-02T17:46:31.906Z",
+  "pipeline": [],
+  "expected": [
+    "RELEASE_CROSSFLOW_C1_STARTED",
+    "RELEASE_CROSSFLOW_C1_COMPLETED",
+    "RELEASE_CROSSFLOW_C2_STARTED",
+    "RELEASE_CROSSFLOW_C2_COMPLETED",
+    "RELEASE_CROSSFLOW_C3_STARTED",
+    "RELEASE_CROSSFLOW_C3_COMPLETED",
+    "RELEASE_CROSSFLOW_C4_STARTED",
+    "RELEASE_CROSSFLOW_C4_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": "RELEASE_CROSSFLOW_C1_STARTED",
+  "certified_through": 0,
+  "blocked_at": "RELEASE_CROSSFLOW_C1_STARTED",
+  "delivery": "RELEASE-CROSSFLOW",
+  "delivery_status": "BLOCKED",
+  "gate_status": "BLOCKED",
+  "terminal": {
+    "segment": null
+  },
+  "evidence": {}
+}

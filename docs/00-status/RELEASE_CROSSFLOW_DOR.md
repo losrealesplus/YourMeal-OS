@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_CROSSFLOW_DOR.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **DoR CERTIFIED** (`main` · #178) · Spec ▶ [READY FOR FREEZE](./RELEASE_CROSSFLOW_SPEC.md)  
+**Estado:** ✅ **DoR CERTIFIED** (`main` · #178) · Spec ✅ [FROZEN](./RELEASE_CROSSFLOW_SPEC.md) · Runner ▶  
 **Nivel:** Release Track B · B-02 Cross-flow  
 **Pregunta operacional (borrador):** ¿Los contratos FLOW-01…04 encadenan de extremo a extremo sin romper handoffs?  
 **Estándar Flow Ready:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) (mismo ciclo FOPEBA)  
@@ -278,9 +278,9 @@ Hasta entonces: **prohibido** drivers de cadena · nuevos servicios de dominio �
 | Fase | Trabajo | Estado |
 |------|---------|--------|
 | 0 | DoR document | ✅ #178 · `e55e2a1` |
-| 1 | Spec | ▶ READY FOR FREEZE · RELEASE_CROSSFLOW_SPEC.md |
-| 2 | Freeze (merge Spec → main) | ⏳ |
-| 3 | Runner only · BLOCKED at C1 | ⏳ |
+| 1 | Spec | ✅ FROZEN #179 · `dbfe917` |
+| 2 | Freeze (merge Spec → main) | ✅ |
+| 3 | Runner only · BLOCKED at C1 | ▶ este PR |
 | 4 | Gate CROSSFLOW-001 (Land Check) | ⏳ |
 | 5 | CROSSFLOW-001…00n (un segmento / PR) | ⏳ |
 | 6 | FULL PASS · tag `release-crossflow-pass` | ⏳ |

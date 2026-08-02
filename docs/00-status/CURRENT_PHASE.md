@@ -50,10 +50,10 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    Track B › B-02 Cross-flow Spec
-                               → ./RELEASE_CROSSFLOW_SPEC.md (READY FOR FREEZE)
-                               DoR ✅ #178 · Smoke ✅ release-smoke-pass
-                               Roadmap: Spec → Freeze → Runner → crossflow-pass
+  Prioridad                    Track B › B-02 Cross-flow Runner
+                               → ../10-validation/release-crossflow/RELEASE_CROSSFLOW_RUNNER.md
+                               Spec FROZEN #179 · DoR ✅ · Smoke ✅
+                               Roadmap: Runner → Gate → 001… → crossflow-pass
                                         → e2e → deploy → rollback → beta
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)
