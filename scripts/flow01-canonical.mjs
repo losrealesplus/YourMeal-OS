@@ -136,7 +136,7 @@ async function main() {
     `status=${report.status} duplicates=${JSON.stringify(report.duplicates)} missing=${JSON.stringify(report.missing)} out_of_order=${JSON.stringify(report.out_of_order)}`,
   );
 
-  const out = await writeEvidence(report);
+  const out = await writeEvidence(report, mode === "pipeline" ? "pipeline" : "self-test");
   console.log(`evidence: ${path.relative(ROOT, out)}`);
 
   if (report.status === "PASS") {
