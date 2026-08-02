@@ -3,6 +3,7 @@
  * Spec: docs/00-status/FLOW_04_INVENTORY_CONSUMPTION_SPEC.md (FROZEN)
  *
  * FLOW04-001: planConsumptionFromProduction → status=planned (no stock mutation)
+ * FLOW04-002: applyConsumption → status=applied (+ stock · I2 / I3)
  */
 import type { ServiceContext } from "@/services/types";
 import { DomainError, permissionDenied } from "@/domain/errors";
@@ -12,6 +13,7 @@ import {
 } from "../domain/inventory-consumption";
 import { createInventoryRepository } from "../infrastructure/inventory-repository";
 import {
+  assertFlow04Prefix,
   beginFlow04Pipeline,
   logFlow04Step,
   stopFlow04,
@@ -130,6 +132,113 @@ export const InventoryService = {
         deliveryDate,
         error: e instanceof Error ? e.message : String(e),
       });
+      throw e;
+    }
+  },
+
+  /**
+   * T2 · Apply planned consumption to stock.
+   * Emits FLOW04_T2_* · status=applied · FLOW04-I2 Single Apply · FLOW04-I3 no negative stock.
+   */
+  async applyConsumption(
+    ctx: ServiceContext,
+    consumptionId: string,
+  ): Promise<InventoryConsumption> {
+    assertTenant(ctx);
+    assertInventory(ctx);
+
+    const repo = createInventoryRepository(ctx.supabase, ctx.tenantId);
+    const current = await repo.findById(ctx.tenantId, consumptionId);
+    if (!current) {
+      throw new DomainError("NOT_FOUND", `Consumption ${consumptionId}`);
+    }
+
+    // FLOW04-I2 · Single Apply — never double decrement
+    if (current.status === "applied" || current.status === "sealed") {
+      try {
+        assertFlow04Prefix(["FLOW04_T1_STARTED", "FLOW04_T1_COMPLETED"]);
+      } catch {
+        throw new DomainError(
+          "INVALID_STATE",
+          "FLOW04-002 requires T1 COMPLETED before applyConsumption",
+        );
+      }
+      logFlow04Step("FLOW04_T2_STARTED", {
+        consumptionId,
+        status: current.status,
+        reuse: true,
+      });
+      logFlow04Step("FLOW04_T2_COMPLETED", {
+        consumptionId,
+        status: current.status,
+        reuse: true,
+      });
+      return current;
+    }
+
+    if (current.status !== "planned") {
+      throw new DomainError(
+        "INVALID_STATE",
+        `FLOW04-002 requires status planned (got ${current.status})`,
+      );
+    }
+
+    try {
+      assertFlow04Prefix(["FLOW04_T1_STARTED", "FLOW04_T1_COMPLETED"]);
+    } catch {
+      throw new DomainError(
+        "INVALID_STATE",
+        "FLOW04-002 requires T1 COMPLETED before applyConsumption",
+      );
+    }
+
+    logFlow04Step("FLOW04_T2_STARTED", {
+      consumptionId,
+      status: current.status,
+      lineCount: current.lines.length,
+    });
+
+    try {
+      const applied = await repo.applyConsumption({
+        tenantId: ctx.tenantId,
+        consumptionId,
+      });
+
+      if (applied.status !== "applied") {
+        stopFlow04("T2_STATUS_DRIFT", {
+          consumptionId,
+          status: applied.status,
+        });
+        throw new DomainError(
+          "INVALID_STATE",
+          "FLOW04-002 invariant: status must be applied after applyConsumption",
+        );
+      }
+
+      logFlow04Step("FLOW04_T2_COMPLETED", {
+        consumptionId: applied.id,
+        status: applied.status,
+        lineCount: applied.lines.length,
+      });
+
+      return applied;
+    } catch (e) {
+      if (e instanceof DomainError) throw e;
+      const msg = e instanceof Error ? e.message : String(e);
+      if (msg === "insufficient_stock") {
+        stopFlow04("T2_INSUFFICIENT_STOCK", {
+          consumptionId,
+          ...(e instanceof Error &&
+          "details" in e &&
+          typeof (e as { details?: unknown }).details === "object"
+            ? { details: (e as { details: Record<string, unknown> }).details }
+            : {}),
+        });
+        throw new DomainError("INVALID_STATE", "insufficient_stock", {
+          consumptionId,
+        });
+      }
+      stopFlow04("T2_FAILED", { consumptionId, error: msg });
       throw e;
     }
   },
