@@ -422,7 +422,8 @@ Los **invariantes** deben ser assertions del runner.
 | Evidencia por transición | ✅ tabla + tokens |
 | Invariantes | ✅ 1–11 (I7 + review-as-event) |
 | PASS / BLOCKED / FAIL | ✅ tablas semánticas |
-| Eventos / tokens `FLOW03_*` | ✅ contrato T1–T3 |
+| Eventos / tokens `FLOW03_*` | ✅ contrato T1–T3 cerrado |
+| Gate FLOW03-001 (4 condiciones) | ✅ § Gate · Abrir FLOW03-001 |
 
 Si algún ítem quedara abierto → **no Freeze** · no runner.
 
@@ -450,9 +451,9 @@ FLOW03-001 (dominio T1) **solo** puede abrirse cuando se cumplen **las cuatro** 
 | # | Condición | Verificación |
 |---|-----------|--------------|
 | 1 | Spec mergeada en `main` | PR Spec = merged → **FLOW-03 FROZEN** |
-| 2 | Runner retarget/rebase sobre `main` y mergeado | `scripts/flow03-canonical.mjs` en `main` |
-| 3 | Runner desde `main` en estado inicial | ver salida canónica abajo |
-| 4 | Contrato `FLOW03_T*` sin cambios pendientes | tokens = esta Spec · sin PR de renegociación abierto |
+| 2 | Runner (#156) retarget/rebase a `main` **y** mergeado | `scripts/flow03-canonical.mjs` en `main` |
+| 3 | Runner desde `main` en estado inicial canónico | salida exacta abajo · exit **2** |
+| 4 | Contrato `FLOW03_T*` sin cambios pendientes | tokens T1–T3 = esta Spec · sin PR de renegociación |
 
 Salida canónica exigida en (3) — ejecutada **desde `main`**:
 

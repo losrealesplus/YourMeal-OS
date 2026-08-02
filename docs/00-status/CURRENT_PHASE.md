@@ -72,9 +72,11 @@ NEXT PHASE
   ↓
   FLOW-02 ✅ FULL PASS · tag flow02-pass
   ↓
-  FLOW-03 Spec ▶ READY FOR FREEZE
+  FLOW-03 Spec ▶ READY FOR FREEZE (#155) · merge = FROZEN
   ↓
-  Freeze → Runner (BLOCKED at T1) → FLOW03-001… → PASS
+  Runner (#156) → main · BLOCKED at T1
+  ↓
+  Gate FLOW03-001 (4 condiciones) → T1…T3 → flow03-pass
 
 En paralelo (beta móvil EatClean):
   Lema: cada PR acerca la jornada completa del piloto.
