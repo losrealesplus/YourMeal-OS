@@ -366,7 +366,7 @@ Los **invariantes** de este documento deben aparecer como assertions del runner 
 | 7 | Errores/desviaciones permitidas (nombradas) | ✅ este commit |
 | 8 | Aprobar / merge Spec (PR #141) = **SPEC FROZEN** | ✅ MERGED |
 | 9 | Runner `test:flow01-canonical` (Evidence before Implementation) | ▶ #142 |
-| 10 | Implementación incremental FLOW01-001…004 | ⏳ [DELIVERY_PLAN](./FLOW_01_DELIVERY_PLAN.md) |
+| 10 | Implementación incremental FLOW01-001…004 | ▶ T4 / PASS · [DELIVERY_PLAN](./FLOW_01_DELIVERY_PLAN.md) |
 
 ---
 

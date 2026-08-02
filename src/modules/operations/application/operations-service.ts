@@ -241,6 +241,104 @@ export const OperationsService = {
     return getDeliveryAssignment(ctx.tenantId, orderId);
   },
 
+  /**
+   * FLOW-01 T4 · Spec start of delivery
+   * ready_for_delivery → out_for_delivery. Emits FLOW01_T4_STARTED.
+   */
+  async startOutForDelivery(
+    ctx: ServiceContext,
+    orderId: string,
+  ): Promise<OperationalOrderStatus> {
+    requireCapability(ctx.roles, "logistics.operate");
+    if (!orderId) {
+      throw new DomainError("INVALID_STATE", "orderId required");
+    }
+
+    try {
+      assertFlow01Prefix([
+        "FLOW01_T1_STARTED",
+        "FLOW01_T1_COMPLETED",
+        "FLOW01_T2_STARTED",
+        "FLOW01_T2_COMPLETED",
+        "FLOW01_T3_STARTED",
+        "FLOW01_T3_COMPLETED",
+      ]);
+    } catch {
+      throw new DomainError(
+        "INVALID_STATE",
+        "FLOW01-004 requires T3 COMPLETED before out_for_delivery",
+      );
+    }
+
+    if (!getDeliveryAssignment(ctx.tenantId, orderId)) {
+      throw new DomainError(
+        "INVALID_STATE",
+        "FLOW01-004 requires DeliveryAssignment before out_for_delivery",
+      );
+    }
+
+    logFlow01Step("FLOW01_T4_STARTED", {
+      orderId,
+      from: "ready_for_delivery",
+      to: "out_for_delivery",
+    });
+
+    try {
+      return await this.transitionDelivery(ctx, orderId, "out_for_delivery");
+    } catch (e) {
+      stopFlow01("T4_START_FAILED", {
+        orderId,
+        message: e instanceof Error ? e.message : "transition failed",
+      });
+      throw e;
+    }
+  },
+
+  /**
+   * FLOW-01 T4 · Spec `completeDelivery`
+   * out_for_delivery → delivered. Emits FLOW01_T4_COMPLETED.
+   * Success criterion: orders.status = delivered.
+   */
+  async completeDelivery(
+    ctx: ServiceContext,
+    orderId: string,
+  ): Promise<OperationalOrderStatus> {
+    requireCapability(ctx.roles, "logistics.operate");
+    if (!orderId) {
+      throw new DomainError("INVALID_STATE", "orderId required");
+    }
+
+    if (!hasFlow01Step("FLOW01_T4_STARTED")) {
+      throw new DomainError(
+        "INVALID_STATE",
+        "FLOW01-004 requires startOutForDelivery (T4_STARTED) before completeDelivery",
+      );
+    }
+
+    try {
+      const status = await this.transitionDelivery(ctx, orderId, "delivered");
+      if (status !== "delivered") {
+        throw new DomainError(
+          "INVALID_STATE",
+          `completeDelivery expected delivered · got ${status}`,
+        );
+      }
+      logFlow01Step("FLOW01_T4_COMPLETED", {
+        orderId,
+        status,
+      });
+      return status;
+    } catch (e) {
+      if (!(e instanceof DomainError && String(e.message).includes("T4_STARTED"))) {
+        stopFlow01("T4_COMPLETE_FAILED", {
+          orderId,
+          message: e instanceof Error ? e.message : "transition failed",
+        });
+      }
+      throw e;
+    }
+  },
+
   async listKitchenOrders(
     ctx: ServiceContext,
     filters: Omit<OperationalOrderFilters, "statuses"> = {},

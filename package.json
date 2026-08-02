@@ -34,6 +34,7 @@
     "test:flow01-001": "node scripts/flow01-canonical.mjs --live --through=T1",
     "test:flow01-002": "node scripts/flow01-canonical.mjs --live --through=T2",
     "test:flow01-003": "node scripts/flow01-canonical.mjs --live --through=T3",
+    "test:flow01-004": "node scripts/flow01-canonical.mjs --live --through=T4",
     "bootstrap:e2e": "node scripts/ps002c-env-verify.mjs",
     "bootstrap:e2e:check": "node scripts/ps002c-env-verify.mjs --check-only",
     "test:canonical-pipeline": "node --test scripts/lib/canonical-pipeline.spec.mjs scripts/lib/flow01-canonical-pipeline.spec.mjs scripts/lib/ps002c-preflight.spec.mjs scripts/lib/ps002c-ui-evidence.spec.mjs scripts/lib/ps002c-vite-env.spec.mjs scripts/lib/ps002c-home-path-evidence.spec.mjs scripts/lib/ps002c-auth-session-evidence.spec.mjs scripts/lib/ps002c-network-evidence.spec.mjs",
