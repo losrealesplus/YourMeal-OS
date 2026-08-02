@@ -124,6 +124,10 @@ La conversación sobre beta se ancla a filas con evidencia (detalle vivo en
 Cada gate Track B sigue Spec → Freeze → Runner (BLOCKED) → impl → `-pass`.  
 Cross-flow complementa runners canónicos; no los sustituye.
 
+**Regla de nivel:** runners de Release certifican **capacidades de plataforma**  
+(`preflight`, `auth`, `bootstrap`, `dashboard`, `deploy`, `rollback`, …).  
+Runners de Flow certifican **entidades / estados de dominio**. No mezclar.
+
 ---
 
 ## Prohibido

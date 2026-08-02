@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_SMOKE_SPEC.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ **READY FOR FREEZE** (Spec only · sin Runner · sin implementación)  
+**Estado:** ✅ **FROZEN** (Spec) · Runner ▶ [ACTIVE · BLOCKED](../10-validation/release-smoke/RELEASE_SMOKE_RUNNER.md)  
 **Gate DoRl:** Smoke Tests · Track B · RELEASE-01  
 **Nivel:** Release Contract — **no** es un Flow  
 **Precondiciones:** FOUNDATION ✅ · `ps002c-pass` · `flow01-pass`…`flow04-pass`  
@@ -194,9 +194,9 @@ Reglas:
 | Artefacto | Ubicación (prevista) |
 |-----------|----------------------|
 | Spec (este) | `docs/00-status/RELEASE_SMOKE_SPEC.md` |
-| Runner doc | `docs/10-validation/release-01/RELEASE_SMOKE_RUNNER.md` *(PR siguiente)* |
-| Evidence JSON | `docs/10-validation/release-01/evidence/` *(tras Runner)* |
-| Acta parcial / PASS | `docs/10-validation/release-01/RELEASE_SMOKE_*_ACTA.md` |
+| Runner doc | `docs/10-validation/release-smoke/RELEASE_SMOKE_RUNNER.md` |
+| Evidence JSON | `docs/10-validation/release-smoke/evidence/` |
+| Acta parcial / PASS | `docs/10-validation/release-smoke/RELEASE_SMOKE_*_ACTA.md` |
 | Tag | `release-smoke-pass` |
 
 ---
@@ -205,11 +205,11 @@ Reglas:
 
 | Comando | Fase | Resultado esperado |
 |---------|------|-------------------|
-| *(ninguno)* | Este PR | Spec only |
-| `npm run test:release-smoke` | Tras Runner | Inicialmente **BLOCKED** |
-| `npm run test:release-smoke -- --live` | Tras impl. | PASS parcial / FULL PASS |
+| `npm run test:release-smoke` | Runner | Inicialmente **BLOCKED** · exit 2 |
+| `npm run test:release-smoke -- --self-test` | Runner | Contrato sintético PASS |
+| Drivers / `--live` | Tras RELEASE-SMOKE-001… | PASS parcial / FULL PASS |
 
-**Prohibido en este PR:** añadir script, runner, Playwright, CI, o driver de dominio.
+**Prohibido hasta Gate verde:** Playwright · browser · CI · Supabase drivers · dominio.
 
 ---
 
@@ -217,65 +217,59 @@ Reglas:
 
 ```text
 RELEASE-01 · B-01 Smoke
-□ Spec FROZEN en main                    ▶ este merge = Freeze candidate
-□ Runner + test:release-smoke            → PR siguiente · BLOCKED verificado
-□ Escenarios S1…S4 implementados         → PRs incrementales
+☑ Spec FROZEN                            → este documento
+☑ Runner + test:release-smoke            → BLOCKED at S1 (runner PR)
+□ Canonical BLOCKED verificado en main
+□ Escenarios S1…S4 implementados         → RELEASE-SMOKE-001… (tras Gate)
 □ duplicates=[] missing=[] out_of_order=[]
 □ Acta RELEASE_SMOKE_PASS
 □ Tag release-smoke-pass
 ```
 
-Sin Runner → **no** declarar Smoke PASS.  
 Sin `release-smoke-pass` → fila Smoke de DoRl permanece ⏳.
 
 ---
 
-## Gate before Runner
+## Regla de nivel (Release ≠ Flow)
 
-Antes del PR del Runner:
-
-1. Este Spec mergeado en `main` (**Freeze**).  
-2. Sin renegociar alcance (S1…S4 · exclusiones).  
-3. Runner responde solo: *¿el comando existe y queda BLOCKED en el primer escenario?*
+| Nivel | Certifica |
+|-------|-----------|
+| FLOW | Estados de **dominio** (`planned`, `applied`, `paid`, …) |
+| RELEASE | **Capacidades** de plataforma (`preflight`, `auth`, `bootstrap`, `dashboard`, …) |
 
 ---
 
-## Checklist Spec (READY FOR FREEZE)
+## Checklist Spec
 
 | Ítem | Estado |
 |------|--------|
-| Purpose | ✅ |
-| Scope in / out | ✅ |
-| Canonical scenarios S1…S4 | ✅ |
-| PASS / FAIL / BLOCKED | ✅ |
-| Evidence tokens + orden | ✅ |
-| Commands (contrato futuro) | ✅ |
-| Definition of Done | ✅ |
-| Gate before Runner | ✅ |
-| Runner / impl / Playwright / CI / dominio | ❌ fuera de este PR |
+| Purpose · Scope · S1…S4 · PASS/FAIL/BLOCKED | ✅ |
+| Evidence tokens · Commands · DoD | ✅ |
+| Runner BLOCKED | ▶ runner PR |
+| Scenario drivers / Playwright / CI / dominio | ❌ hasta Gate |
 
-**Estado del documento:** ▶ **READY FOR FREEZE**
+**Estado del documento:** ✅ **FROZEN** (con Spec merge)
 
 ---
 
 ## Prohibido
 
-- Implementar escenarios en este PR  
-- Crear `test:release-smoke` aquí  
+- Mezclar entidades de dominio en el runner Smoke  
 - Mezclar Cross-flow / E2E / Deploy / Rollback  
 - Abrir FLOW-05 “porque Smoke lo necesita” sin bloqueador demostrado  
-- Declarar `release-smoke-pass` o `release-01-beta` sin evidencia
+- Declarar `release-smoke-pass` o `release-01-beta` sin evidencia  
+- Abrir RELEASE-SMOKE-001 antes de Gate (Spec + Runner en `main` + BLOCKED verificado)
 
 ---
 
-## Next (fuera de este PR)
+## Next
 
 ```text
-Freeze (merge Spec)
+Runner BLOCKED verificado en main
     ↓
-RELEASE_SMOKE_RUNNER.md + npm run test:release-smoke → BLOCKED
+RELEASE-SMOKE-001 (solo S1 · preflight)
     ↓
-Implementación S1…S4 (una pregunta / PR)
+… S2…S4
     ↓
 release-smoke-pass
     ↓

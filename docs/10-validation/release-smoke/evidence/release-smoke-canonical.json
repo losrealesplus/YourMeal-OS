@@ -1,0 +1,43 @@
+{
+  "status": "BLOCKED",
+  "reason": "RELEASE-SMOKE scenarios not implemented (runner ready; Evidence before Implementation)",
+  "gate": "RELEASE-SMOKE",
+  "contract": "RELEASE_SMOKE_SPEC",
+  "level": "release",
+  "certifies": "platform_capabilities",
+  "not_domain_entities": true,
+  "principle": "Evidence before Implementation",
+  "code_status": "RUNNER_ONLY",
+  "at": "2026-08-02T16:39:00.744Z",
+  "pipeline": [],
+  "expected": [
+    "RELEASE_SMOKE_S1_STARTED",
+    "RELEASE_SMOKE_S1_COMPLETED",
+    "RELEASE_SMOKE_S2_STARTED",
+    "RELEASE_SMOKE_S2_COMPLETED",
+    "RELEASE_SMOKE_S3_STARTED",
+    "RELEASE_SMOKE_S3_COMPLETED",
+    "RELEASE_SMOKE_S4_STARTED",
+    "RELEASE_SMOKE_S4_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": "RELEASE_SMOKE_S1_STARTED",
+  "certified_through": 0,
+  "blocked_at": "RELEASE_SMOKE_S1_STARTED",
+  "delivery": "RELEASE-SMOKE",
+  "delivery_status": "BLOCKED",
+  "gate_status": "BLOCKED",
+  "terminal": {
+    "capability": null
+  },
+  "evidence": {},
+  "duration_ms": {
+    "s1_ms": null,
+    "s2_ms": null,
+    "s3_ms": null,
+    "s4_ms": null,
+    "smoke_total_ms": null
+  }
+}
