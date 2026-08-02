@@ -36,15 +36,15 @@ FLOW-01 / FLOW-02
         ▼
 FLOW-03 Billing
 delivered (billable)
-        │  T1
+        │  T1  createInvoiceFromOrders
         ▼
-invoice pending
-        │  T2
+invoice status=pending · reviewed_at=null
+        │  T2  reviewInvoice  (evento · no cambia status)
         ▼
-invoice reviewed
-        │  T3
+invoice status=pending · reviewed_at set
+        │  T3  recordPayment
         ▼
-invoice paid
+invoice status=paid
 ```
 
 FLOW-01/02 **producen** el input (`delivered`).  
@@ -59,8 +59,8 @@ FLOW-03 **certifica** el handoff financiero.
 | Incluye | Notas / as-built |
 |---------|------------------|
 | Selección de pedidos facturables | Solo `orders.status = delivered` |
-| Crear factura | `AccountingService.createInvoiceFromOrders` → invoice `pending` |
-| Revisar factura | `reviewInvoice` → lifecycle `review` / `reviewed_at` |
+| Crear factura | `AccountingService.createInvoiceFromOrders` → invoice `pending` · **idempotente** (FLOW03-I7) |
+| Revisar factura | `reviewInvoice` → **evento** auditado (`reviewed_at`) · status sigue `pending` |
 | Registrar cobro | `recordPayment` → invoice `paid` |
 | Evidencia `FLOW03_T*` | Once-only · orden T1→T3 |
 
@@ -74,7 +74,7 @@ FLOW-03 **certifica** el handoff financiero.
 | Inventory / stock | FLOW-04 |
 | Void / overdue como happy path | Desviaciones nombradas · no certificación v1 |
 | Reembolsos · notas de crédito · pagos parciales | Fuera de FLOW-03 v1 (ver Freeze Q&A) |
-| Reversión `review` → `pending` | Prohibida en el happy path certificado |
+| Borrado de `reviewed_at` / “unreview” | Prohibido en el happy path certificado (review = evento, no estado reversible) |
 | Cierre de periodo financiero (`closeFinancialPeriod`) | Follow-up / T4 opcional post-PASS |
 | Cobro en app del cliente / pasarela externa | Fuera de certificación operativa EatClean v1 |
 | Nueva entidad Billing aparte de `invoices`/`payments` | Usar as-built Accounting |
@@ -94,32 +94,80 @@ Estas respuestas **no** se reinterpretan en el runner ni en la implementación.
 | Efecto | Nace `Invoice` con `status=pending` · `reviewed_at=null` · `orderIds` trazables |
 | No es creación | Auto-factura al marcar `delivered` · UI “parece creada” sin persistencia |
 
-### ¿Un pedido puede tener varias facturas? (**Opción A — congelada**)
+### ¿Un pedido puede tener varias facturas? (**Opción A + FLOW03-I7 — congelada**)
 
 | Campo | Valor congelado |
 |-------|-----------------|
-| Regla | **1 pedido `delivered` → como máximo 1 factura activa** |
+| Regla | **1 pedido `delivered` (o conjunto facturado conjuntamente) → como máximo 1 factura activa** |
 | Factura activa | Cualquier invoice vinculada vía `invoice_orders` con `status ≠ void` |
-| Segunda llamada a `createInvoiceFromOrders` con el mismo `orderId` | **FAIL de dominio** (`INVALID_STATE` / ya facturado) — **no** crea duplicado · **no** es idempotent return |
+| Idempotencia | `createInvoiceFromOrders` es **idempotente** respecto al origen (ver FLOW03-I7) |
+| Segunda llamada con el mismo origen ya facturado | **No crea una nueva** · o bien **devuelve la existente**, o bien **falla** con `DomainError: invoice_already_exists` (o `INVALID_STATE` equivalente) |
+| Prohibido | Dos facturas activas para el mismo origen — nunca |
 | Billable set | `listBillableOrders` excluye pedidos ya vinculados a factura activa |
 | Void + refacturar | ❌ fuera de FLOW-03 v1 (void no es happy path) |
 
-Justificación: alineado con evidencia once-only y relación determinista pedido→factura en el contrato certificado.
+Justificación: evidencia única, transiciones deterministas y ausencia de duplicados. Varias facturas activas por el mismo pedido romperían FLOW-03, conciliación, inventario y auditoría.
 
-### ¿Quién puede poner una factura en review?
+#### FLOW03-I7 · Single Active Invoice
+
+```text
+FLOW03-I7 · Single Active Invoice
+
+Un pedido (o conjunto de pedidos facturados conjuntamente)
+no puede generar más de una factura activa.
+
+createInvoiceFromOrders es idempotente.
+
+Si ya existe una factura activa:
+- no crea una nueva,
+- devuelve la existente
+  (o falla con DomainError: invoice_already_exists).
+
+Nunca existen dos facturas activas para el mismo origen.
+```
+
+La implementación elige **una** de las dos salidas no-creadoras (return existing **o** DomainError). Ambas son válidas bajo Freeze; lo inválido es el duplicado activo.
+
+### ¿Qué significa “review”? (**evento, no estado**)
+
+| Campo | Valor congelado |
+|-------|-----------------|
+| ¿Es un `InvoiceStatus`? | **No** |
+| ¿Es un estado del spine? | **No** |
+| ¿Qué es? | Un **evento auditado**: `reviewInvoice()` persiste `reviewed_at` |
+| Status tras el evento | Permanece **`pending`** hasta T3 |
+| Contrato de status | `pending` → (`reviewed_at`) → `pending` → `paid` — **nunca** `pending` → `review` → `paid` |
+
+```text
+pending
+  ↓
+reviewInvoice()     ← evento auditado
+  ↓
+reviewed_at set
+  ↓
+pending             ← status no cambia
+```
+
+Review **no** representa un estado.  
+Review **representa un evento auditado**.  
+La factura permanece en `pending`.
+
+Ningún desarrollador debe introducir un valor de enum `review` / `reviewed` en `InvoiceStatus` para este Flow.
+
+### ¿Quién puede emitir el evento review?
 
 | Campo | Valor congelado |
 |-------|-----------------|
 | Actor | Usuario con capability **`accounting.operate`** (roles Accounting / company_admin según RBAC) |
 | Acción canónica | `AccountingService.reviewInvoice(invoiceId)` |
-| Efecto | Setea `reviewed_at` (ISO) · lifecycle stage `review` · **`status` permanece `pending`** |
-| Qué significa “review” | Ops confirma importes/líneas/periodo; **no** es cobro ni cambio a `paid` |
+| Efecto | Setea `reviewed_at` (ISO) · lifecycle derive puede mostrar stage `review` · **`status` permanece `pending`** |
+| Qué confirma Ops | Importes / líneas / periodo; **no** es cobro ni cambio a `paid` |
 
-### ¿Puede volver de review a pending?
+### ¿Puede “deshacer” review (borrar `reviewed_at`)?
 
 | Campo | Valor congelado |
 |-------|-----------------|
-| En FLOW-03 v1 | **No** — no hay transición certificada `reviewed` → “sin review” |
+| En FLOW-03 v1 | **No** — no hay transición certificada que borre `reviewed_at` |
 | Runner | Cualquier borrado de `reviewed_at` o retroceso = **FAIL** (si se observa en el pipeline) |
 | Producto futuro | Requeriría nueva Spec / Flow; no se abre en este contrato |
 
@@ -163,15 +211,29 @@ Si el producto necesita esos caminos → Flow/Spec aparte; **no** diluyen este c
 | `overdue` | ❌ no happy path |
 | `void` | ❌ no happy path |
 
-### Dimensión review (ortogonal al status)
+### Dimensión review (evento auditado · ortogonal al status)
 
-| `reviewed_at` | Lifecycle (derive) | Significado Freeze |
-|---------------|--------------------|--------------------|
-| `null` | `pending` | Creada · aún no revisada |
-| ISO timestamp | `review` | Revisada · lista para cobro (T2 DONE) |
+| `reviewed_at` | Lifecycle (derive, UI) | Significado Freeze |
+|---------------|------------------------|--------------------|
+| `null` | (sin review) | Creada · evento review aún no emitido |
+| ISO timestamp | label `review` (derive) | Evento review emitido · lista para cobro (T2 DONE) |
 
-**Importante:** tras T2, `status` sigue siendo `pending` hasta T3.  
-“Review” **no** es un valor de `InvoiceStatus`; es el flag `reviewed_at`.
+**Contrato de status (único válido en FLOW-03 v1):**
+
+```text
+T1  delivered → pending
+T2  pending + reviewed_at → pending   (evento; status no muda)
+T3  pending → paid
+```
+
+**Prohibido como contrato de status:**
+
+```text
+pending → review → paid     ❌ inventar estado "review"
+```
+
+Tras T2, `status` sigue siendo `pending` hasta T3.  
+“Review” **no** es un valor de `InvoiceStatus`; es el timestamp `reviewed_at` de un evento.
 
 As-built: `src/modules/accounting/` · UI `admin.accounting` · cap `accounting.operate`.
 
@@ -195,23 +257,23 @@ As-built: `src/modules/accounting/` · UI `admin.accounting` · cap `accounting.
 |----------|------------|
 | **Estado inicial** | Pedido(s) `delivered` · aún no facturados |
 | **Evento** | Ops Accounting selecciona pedidos y crea factura |
-| **Precondiciones** | Tenant activo · `accounting.operate` · `orders.read` · ≥1 order `delivered` · **ningún orderId con factura activa** (invariante 10) |
-| **Acción** | `AccountingService.createInvoiceFromOrders` |
+| **Precondiciones** | Tenant activo · `accounting.operate` · `orders.read` · ≥1 order `delivered` · **ningún orderId con factura activa** (FLOW03-I7 / invariante 10) |
+| **Acción** | `AccountingService.createInvoiceFromOrders` (**idempotente** · FLOW03-I7) |
 | **Estado final** | Invoice `status=pending` · `reviewed_at=null` · `orderIds` trazables |
 | **Evidencia** | `FLOW03_T1_STARTED` → `FLOW03_T1_COMPLETED` |
-| **Criterio PASS** | Tokens once-only; status ≠ `paid`; orders siguen `delivered` |
+| **Criterio PASS** | Tokens once-only; status ≠ `paid`; orders siguen `delivered`; **≤1 factura activa por origen** |
 
-### T2 · Revisar factura
+### T2 · Evento review (no transición de status)
 
 | Elemento | Definición |
 |----------|------------|
 | **Estado inicial** | Invoice `status=pending` · `reviewed_at=null` |
-| **Evento** | Ops con `accounting.operate` confirma revisión |
+| **Evento** | Ops con `accounting.operate` emite review (evento auditado) |
 | **Precondiciones** | T1 COMPLETED · invoice del pipeline · aún no revisada |
 | **Acción** | `AccountingService.reviewInvoice` |
-| **Estado final** | `reviewed_at` set · lifecycle `review` · **`status` sigue `pending`** |
+| **Estado final** | `reviewed_at` set · **`status` sigue `pending`** (no existe status `review`) |
 | **Evidencia** | `FLOW03_T2_STARTED` → `FLOW03_T2_COMPLETED` |
-| **Criterio PASS** | Tokens once-only; `reviewed_at != null`; status ≠ `paid`; sin retroceso a `reviewed_at=null` |
+| **Criterio PASS** | Tokens once-only; `reviewed_at != null`; **`status === pending`**; sin retroceso a `reviewed_at=null` |
 
 ### T3 · Registrar cobro
 
@@ -232,7 +294,7 @@ As-built: `src/modules/accounting/` · UI `admin.accounting` · cap `accounting.
 | Transición | Tokens obligatorios | Assertions mínimas |
 |------------|---------------------|--------------------|
 | **T1** | `FLOW03_T1_STARTED` → `FLOW03_T1_COMPLETED` | invoice `pending` · order_ids trazables · orders `delivered` |
-| **T2** | `FLOW03_T2_STARTED` → `FLOW03_T2_COMPLETED` | `reviewed_at` set · status ≠ `paid` |
+| **T2** | `FLOW03_T2_STARTED` → `FLOW03_T2_COMPLETED` | `reviewed_at` set · **`status === pending`** (evento, no estado) |
 | **T3** | `FLOW03_T3_STARTED` → `FLOW03_T3_COMPLETED` | invoice `paid` · payment record · sin cambio de order status |
 
 Cada token: **exactamente una vez**, en orden global T1→T2→T3.
@@ -250,7 +312,8 @@ Cada token: **exactamente una vez**, en orden global T1→T2→T3.
 7. Void / overdue / reembolso / nota de crédito / pago parcial **no** cuentan como PASS.  
 8. `paid` es terminal · no hay tokens FLOW-03 posteriores.  
 9. Tras T2, `reviewed_at` no vuelve a `null` en el pipeline certificado.  
-10. **1 pedido → 1 factura activa** · segunda creación sobre el mismo order = FAIL (no duplicar).
+10. **FLOW03-I7 · Single Active Invoice** — 1 origen → ≤1 factura activa · `createInvoiceFromOrders` idempotente (return existing **o** `invoice_already_exists`) · nunca dos activas.  
+11. **Review es evento, no estado** — T2 no introduce `InvoiceStatus=review`; tras T2 `status` permanece `pending`.
 
 ---
 
@@ -301,8 +364,9 @@ Opcional envoltura: `FLOW03_START` / `FLOW03_END` en el runner.
 | FAIL | Significa |
 |------|-----------|
 | Facturar order ≠ `delivered` | Violación invariante 1 |
-| Segunda factura sobre el mismo order | Violación invariante 10 (1:1) |
-| `FLOW03_T2_COMPLETED` con `reviewed_at=null` | Review no materializado |
+| Segunda factura activa sobre el mismo origen | Violación FLOW03-I7 / invariante 10 |
+| `FLOW03_T2_COMPLETED` con `reviewed_at=null` | Evento review no materializado |
+| `FLOW03_T2_COMPLETED` con `status` ≠ `pending` | Inventó estado “review” · violación invariante 11 |
 | `FLOW03_T3_COMPLETED` con status ≠ `paid` | Violación T3 |
 | T3 sin T2 / sin `reviewed_at` | Violación invariante 4 |
 | Mutación de order status en T1–T3 | Violación invariante 3 |
@@ -349,13 +413,14 @@ Los **invariantes** deben ser assertions del runner.
 
 | Elemento | Estado |
 |----------|--------|
-| Estados permitidos (order + invoice + review) | ✅ § Estados permitidos |
-| Qué significa “review” | ✅ `reviewed_at` · status sigue `pending` |
-| Q&A Freeze (crear / quién / reverse / paid / exclusiones) | ✅ § Decisiones congeladas |
+| Estados permitidos (order + invoice + review-as-event) | ✅ § Estados permitidos |
+| Qué significa “review” | ✅ **evento auditado** · no es `InvoiceStatus` · status sigue `pending` |
+| FLOW03-I7 · Single Active Invoice / idempotencia create | ✅ § Decisiones + invariante 10 |
+| Q&A Freeze (crear / I7 / review-evento / quién / reverse / paid / exclusiones) | ✅ § Decisiones congeladas |
 | Transiciones T1–T3 + precondiciones | ✅ plantilla canónica |
-| Estado final por transición | ✅ pending · reviewed · paid |
+| Estado final por transición | ✅ pending · pending+`reviewed_at` · paid |
 | Evidencia por transición | ✅ tabla + tokens |
-| Invariantes | ✅ 1–9 |
+| Invariantes | ✅ 1–11 (I7 + review-as-event) |
 | PASS / BLOCKED / FAIL | ✅ tablas semánticas |
 | Eventos / tokens `FLOW03_*` | ✅ contrato T1–T3 |
 
