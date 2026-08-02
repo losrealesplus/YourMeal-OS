@@ -36,7 +36,8 @@ FLOW-XX
 Sin todos los ítems → ❌ no abrir Implementation PRs del happy path.
 
 **Land check:** Spec y Runner deben estar en `main` (no solo “Merged” en una feature branch).  
-Ver [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) Regla 9.
+Procedimiento: [FOPEBA_LAND_CHECK](./FOPEBA_LAND_CHECK.md) · [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) Regla 9.  
+`Missing script` desde `main` ⇒ Gate NOT READY ⇒ no abrir `001`.
 
 ---
 
