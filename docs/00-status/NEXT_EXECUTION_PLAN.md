@@ -89,20 +89,26 @@ Convertir la beta en algo **verificable**. Matriz viva:
 | FLOW-02 | ✅ | Tag `flow02-pass` |
 | FLOW-03 | ✅ | Tag `flow03-pass` |
 | FLOW-04 | ✅ | Tag `flow04-pass` |
-| Smoke Tests | ⏳ | |
-| Cross-flow | ⏳ | |
-| E2E | ⏳ | |
-| Deployment | ⏳ | |
-| Rollback | ⏳ | |
-| Beta Acceptance | ⏳ | DoRl PASS → `release-01-beta` |
+| Smoke Tests | ⏳ | Spec ▶ [RELEASE_SMOKE_SPEC](./RELEASE_SMOKE_SPEC.md) → `release-smoke-pass` |
+| Cross-flow | ⏳ | → `release-crossflow-pass` |
+| E2E | ⏳ | → `release-e2e-pass` |
+| Deployment | ⏳ | → `release-deploy-pass` |
+| Rollback | ⏳ | → `release-rollback-pass` |
+| Beta Acceptance | ⏳ | → `release-01-beta` |
 
-Detalle y checklist completo: [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) · [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md).
+Detalle: [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) · [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md).
 
-**Próximo trabajo Track B (docs / evidencia, no dominio):**
+**Track B roadmap (orden fijo):**
 
-1. Nombrar el set de Flows beta aún pendientes (si los hay) sin Freeze prematuro.  
-2. Definir qué cuenta como Smoke / Cross-flow / E2E (artefacto + comando / acta).  
-3. Acumular evidencia gate a gate con la misma disciplina que un Flow.
+```text
+B-01 Smoke → B-02 Cross-flow → B-03 E2E
+→ B-04 Deployment → B-05 Rollback → B-06 Beta Acceptance
+→ release-01-beta
+```
+
+**Objetivo actual Track B:** B-01 Smoke Spec ▶ READY FOR FREEZE  
+([RELEASE_SMOKE_SPEC](./RELEASE_SMOKE_SPEC.md)). Siguiente PR: Runner → `test:release-smoke` → BLOCKED.  
+Do **not** open FLOW-05 unless Track B discovers a blocker that requires it.
 
 Cross-flow **no sustituye** runners canónicos: los runners certifican contratos;  
 el cross-flow demuestra que los contratos encadenan:
@@ -180,8 +186,9 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 ## Current Goal
 
 ```text
-Track B (prioridad): RELEASE-01 DoRl matrix → evidencia gate a gate
-Track A (paralelo):  FLOW-05 DoR only cuando no sea prematuro / sea bloqueador beta
+Track B (prioridad): B-01 Smoke Spec READY FOR FREEZE
+                     → next: Runner BLOCKED → release-smoke-pass
+Track A:             Do NOT open FLOW-05 unless Track B finds a blocker
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos
 ```
 
