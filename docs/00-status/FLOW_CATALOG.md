@@ -38,7 +38,7 @@ Sí: `FLOW-01 Kitchen → Delivery`.
 
 | ID | Handoff / alcance | Prioridad | Motivo | Estado |
 |----|-------------------|-----------|--------|--------|
-| **FLOW-03** | Billing | Alta | Facturación desacoplada del happy path | ⏳ DoR NOT STARTED |
+| **FLOW-03** | Billing | Alta | Facturación desacoplada del happy path | ▶ Spec · [SPEC](./FLOW_03_BILLING_SPEC.md) — READY FOR FREEZE · sin runner ni dominio |
 | **FLOW-04** | Inventory Consumption | Alta | Consumo de ingredientes tras producción | ⏳ DoR NOT STARTED |
 | **FLOW-05** | Customer Order Lifecycle | Media | Creación del pedido → `confirmed` | ⏳ DoR NOT STARTED |
 | **FLOW-06** | Kitchen Planning | Media | Planificación previa a T1 | ⏳ DoR NOT STARTED |

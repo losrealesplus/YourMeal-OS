@@ -72,7 +72,9 @@ NEXT PHASE
   ↓
   FLOW-02 ✅ FULL PASS · tag flow02-pass
   ↓
-  FLOW-03 Spec (Billing) — DoR · Freeze · Runner · luego FLOW03-001
+  FLOW-03 Spec ▶ READY FOR FREEZE
+  ↓
+  Freeze → Runner (BLOCKED at T1) → FLOW03-001… → PASS
 
 En paralelo (beta móvil EatClean):
   Lema: cada PR acerca la jornada completa del piloto.
