@@ -2,11 +2,10 @@
 
 **Documento:** `RELEASE_DEPLOY_GATE.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **READY** · Runner CERTIFIED · 001 ▶ este PR (D1)  
+**Estado:** ✅ **READY** · 001 CERTIFIED desde `main` · READY TO OPEN 002  
 **Nivel:** Release Track B · B-04 Deploy  
 **Spec:** [RELEASE_DEPLOY_SPEC](../../00-status/RELEASE_DEPLOY_SPEC.md) ✅ FROZEN #198  
 **Runner:** [RELEASE_DEPLOY_RUNNER](./RELEASE_DEPLOY_RUNNER.md) ✅ #200 · `1008ffd`  
-**001:** [RELEASE_DEPLOY_001_D1_ACTA](./RELEASE_DEPLOY_001_D1_ACTA.md)  
 **Land Check:** [FOPEBA_LAND_CHECK](../../00-status/FOPEBA_LAND_CHECK.md)
 
 > `main` certifica; las ramas solo proponen.
@@ -19,35 +18,34 @@
 ☑ DoR certified (#197 · e5bd8c5)
 ☑ Spec FROZEN (#198 · ef447e2 · freeze #199)
 ☑ Runner certified (#200 → 1008ffd)
-☑ Land Check from main: BLOCKED at RELEASE_DEPLOY_D1_STARTED · exit 2
-☑ duplicates=[] missing=[] out_of_order=[] evidence={}
+☑ Gate READY (#201 → 9de2893)
+☑ D1 certified (#202 → a0daf82)
+☑ Canonical PASS through D1 verified from main
+☑ runner-only BLOCKED at D1 verified from main
 ```
+
+### Land Check evidence (from `main` @ `a0daf82`)
+
+```bash
+git pull origin main
+npm run test:release-deploy-001
+npm run test:release-deploy
+npm run test:release-deploy:runner-only
+```
+
+| Comando | Resultado |
+|---------|-----------|
+| `test:release-deploy-001` | PASS through D1 · `blocked_at=RELEASE_DEPLOY_D2_STARTED` · exit 0 |
+| `test:release-deploy` | PASS through D1 · BLOCKED at D2 · exit 0 |
+| `test:release-deploy:runner-only` | BLOCKED at `RELEASE_DEPLOY_D1_STARTED` · exit 2 |
 
 ### Decision
 
 ```text
-RELEASE-DEPLOY-001 · D1 OPEN (este PR)
-PASS through D1 · BLOCKED at RELEASE_DEPLOY_D2_STARTED
-    ↓
-Land Check from main → READY TO OPEN 002
-```
-
-### Land Check evidence (from `main` @ `1008ffd`)
-
-```bash
-git pull origin main
-npm run test:release-deploy
-```
-
-```text
-RELEASE-DEPLOY
-BLOCKED
-blocked_at=RELEASE_DEPLOY_D1_STARTED
-duplicates=[]
-missing=[]
-out_of_order=[]
-evidence={}
-exit 2
+READY TO OPEN
+RELEASE-DEPLOY-002 · D2 only
+Publish / Apply
+Nothing beyond D2.
 ```
 
 ### Progress
@@ -57,9 +55,13 @@ exit 2
 | DoR | Ready framework | ✅ #197 |
 | Spec | Contract D1–D3 | ✅ FROZEN #198 |
 | Runner | BLOCKED at D1 | ✅ CERTIFIED #200 |
-| RELEASE-DEPLOY-001 | D1 Preflight | ▶ este PR |
-| RELEASE-DEPLOY-002…003 | D2…D3 | ⏳ |
+| Gate | READY | ✅ #201 |
+| RELEASE-DEPLOY-001 | D1 Preflight | ✅ CERTIFIED #202 |
+| RELEASE-DEPLOY-002 | D2 Publish / Apply | ⏳ READY TO OPEN |
+| RELEASE-DEPLOY-003 | D3 Post-deploy Verify | ⏳ |
 | `release-deploy-pass` | FULL PASS | ⏳ |
+
+Acta 001: [RELEASE_DEPLOY_001_D1_ACTA](./RELEASE_DEPLOY_001_D1_ACTA.md).
 
 ---
 
