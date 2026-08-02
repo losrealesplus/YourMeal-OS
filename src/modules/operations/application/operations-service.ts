@@ -26,6 +26,7 @@ import {
   stopFlow01,
 } from "./flow01-evidence";
 import {
+  assertFlow02Prefix,
   beginFlow02Pipeline,
   logFlow02Step,
   stopFlow02,
@@ -478,6 +479,12 @@ export const OperationsService = {
       current.status === "out_for_delivery" &&
       toStatus === "delivery_issue";
 
+    /** FLOW-02 T2 · delivery_issue → out_for_delivery (retry) */
+    const isFlow02T2 =
+      workspace === "delivery" &&
+      current.status === "delivery_issue" &&
+      toStatus === "out_for_delivery";
+
     if (isFlow01T1) {
       beginFlow01Pipeline({ orderId, tenantId: ctx.tenantId });
       logFlow01Step("FLOW01_T1_STARTED", {
@@ -512,6 +519,22 @@ export const OperationsService = {
       });
     }
 
+    if (isFlow02T2) {
+      try {
+        assertFlow02Prefix(["FLOW02_T1_STARTED", "FLOW02_T1_COMPLETED"]);
+      } catch {
+        throw new DomainError(
+          "INVALID_STATE",
+          "FLOW02-002 requires T1 COMPLETED before retry out_for_delivery",
+        );
+      }
+      logFlow02Step("FLOW02_T2_STARTED", {
+        orderId,
+        from: current.status,
+        to: toStatus,
+      });
+    }
+
     try {
       const next = await repo.transitionStatus(orderId, toStatus);
       try {
@@ -539,6 +562,12 @@ export const OperationsService = {
           status: next,
         });
       }
+      if (isFlow02T2) {
+        logFlow02Step("FLOW02_T2_COMPLETED", {
+          orderId,
+          status: next,
+        });
+      }
       return next;
     } catch (e) {
       if (isFlow01T1) {
@@ -553,6 +582,11 @@ export const OperationsService = {
         });
       } else if (isFlow02T1) {
         stopFlow02("T1_FAILED", {
+          orderId,
+          message: e instanceof Error ? e.message : "transition failed",
+        });
+      } else if (isFlow02T2) {
+        stopFlow02("T2_FAILED", {
           orderId,
           message: e instanceof Error ? e.message : "transition failed",
         });
