@@ -2,56 +2,62 @@
 
 **Documento:** `RELEASE_ROLLBACK_GATE.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ⛔ **NOT READY**  
-**Spec:** [RELEASE_ROLLBACK_SPEC](../../00-status/RELEASE_ROLLBACK_SPEC.md) (FROZEN)  
-**Runner:** [RELEASE_ROLLBACK_RUNNER](./RELEASE_ROLLBACK_RUNNER.md)  
-**Principio:** [FOPEBA Land Check](../../00-status/FOPEBA_LAND_CHECK.md) · Regla 9 — solo `main` certifica
+**Estado:** ✅ **READY** · Runner CERTIFIED desde `main` · BLOCKED at R1  
+**Nivel:** Release Track B · B-05 Rollback  
+**Spec:** [RELEASE_ROLLBACK_SPEC](../../00-status/RELEASE_ROLLBACK_SPEC.md) ✅ FROZEN #208  
+**Runner:** [RELEASE_ROLLBACK_RUNNER](./RELEASE_ROLLBACK_RUNNER.md) ✅ #210 · `a1fbdc3`  
+**Land Check:** [FOPEBA_LAND_CHECK](../../00-status/FOPEBA_LAND_CHECK.md)
+
+> `main` certifica; las ramas solo proponen.
 
 ---
 
-## Decision
+## Checklist
 
-| Campo | Valor |
-|-------|-------|
-| **Gate** | RELEASE-ROLLBACK |
-| **Status** | ⛔ **NOT READY** |
-| **Blocked reason** | Runner aún no Land-Checked desde `main` |
-| **Unblocks** | RELEASE-ROLLBACK-001 (R1 Detect/Decide only) |
+```text
+☑ DoR certified (#207 · e7f51a8)
+☑ Spec FROZEN (#208 · 4d109f7 · freeze #209)
+☑ Runner certified (#210 → a1fbdc3)
+☑ Land Check from main: BLOCKED at RELEASE_ROLLBACK_R1_STARTED · exit 2
+☑ duplicates=[] missing=[] out_of_order=[] evidence={}
+```
 
----
+### Decision
 
-## READY criteria (desde `main`)
+```text
+READY TO OPEN
+RELEASE-ROLLBACK-001 · R1 only
+```
+
+### Land Check evidence (from `main` @ `a1fbdc3`)
 
 ```bash
 git pull origin main
 npm run test:release-rollback
 ```
 
-Debe emitir:
-
 ```text
-status=BLOCKED
+RELEASE-ROLLBACK
+BLOCKED
 blocked_at=RELEASE_ROLLBACK_R1_STARTED
 duplicates=[]
 missing=[]
 out_of_order=[]
 evidence={}
+exit 2
 ```
 
-Exit code **2**.
+### Progress
 
-Solo entonces: Gate → **READY** · abrir **RELEASE-ROLLBACK-001**.
-
----
-
-## Prohibido mientras NOT READY
-
-- Abrir RELEASE-ROLLBACK-001 / 002 / 003  
-- Drivers de capacidad R*  
-- Ejecución de rollback / restore  
-- Tag `release-rollback-pass`  
-- RELEASE-01-BETA · FLOW-05
+| Delivery | Scope | Status |
+|----------|-------|--------|
+| DoR | Ready framework | ✅ #207 |
+| Spec | Contract R1–R3 | ✅ FROZEN #208 |
+| Runner | BLOCKED at R1 | ✅ CERTIFIED #210 |
+| RELEASE-ROLLBACK-001 | R1 Detect/Decide | ⏳ READY TO OPEN |
+| RELEASE-ROLLBACK-002…003 | R2…R3 | ⏳ |
+| `release-rollback-pass` | FULL PASS | ⏳ |
 
 ---
 
-## End of RELEASE ROLLBACK Gate
+## End of RELEASE-ROLLBACK Gate Report

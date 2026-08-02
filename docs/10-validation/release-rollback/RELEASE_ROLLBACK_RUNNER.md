@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_ROLLBACK_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ este PR · runner vacío → **BLOCKED** at R1 · Gate ⛔ NOT READY hasta Land Check desde `main`  
+**Estado:** ✅ Runner **CERTIFIED** desde `main` (#210 · `a1fbdc3`) · runner-only **BLOCKED** at R1 · Gate ✅ READY  
 **Spec:** [RELEASE_ROLLBACK_SPEC](../../00-status/RELEASE_ROLLBACK_SPEC.md) (FROZEN · #208 · `4d109f7`)  
 **DoR:** [RELEASE_ROLLBACK_DOR](../../00-status/RELEASE_ROLLBACK_DOR.md)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
@@ -82,7 +82,7 @@ npm run test:release-rollback:unit
 
 ## Gate
 
-Ver: [RELEASE_ROLLBACK_GATE](./RELEASE_ROLLBACK_GATE.md) · Decision: ⛔ **NOT READY** hasta Land Check desde `main`.
+Ver: [RELEASE_ROLLBACK_GATE](./RELEASE_ROLLBACK_GATE.md) · Decision: ✅ **READY TO OPEN** · RELEASE-ROLLBACK-001 (R1 only).
 
 ---
 
@@ -97,15 +97,16 @@ Ver: [RELEASE_ROLLBACK_GATE](./RELEASE_ROLLBACK_GATE.md) · Decision: ⛔ **NOT 
 
 ---
 
-## After merge
+## Land Check (certified)
 
 ```bash
 git pull origin main
 npm run test:release-rollback
 # → BLOCKED at RELEASE_ROLLBACK_R1_STARTED · exit 2 · evidence={}
+# verified from main @ a1fbdc3 (#210)
 ```
 
-Si cumple → Gate **READY** → abrir **RELEASE-ROLLBACK-001** (solo R1).
+Next: **RELEASE-ROLLBACK-001** (solo R1) · PASS through R1 · BLOCKED at R2.
 
 ---
 

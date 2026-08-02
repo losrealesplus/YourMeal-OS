@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_ROLLBACK_SPEC.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **FROZEN** (Spec · #208 · `4d109f7`) · DoR ✅ (#207 · `e7f51a8`) · Runner ▶ [RUNNER](../10-validation/release-rollback/RELEASE_ROLLBACK_RUNNER.md) · Gate ⛔ NOT READY  
+**Estado:** ✅ **FROZEN** (Spec · #208 · `4d109f7`) · DoR ✅ (#207 · `e7f51a8`) · Runner ✅ #210 · `a1fbdc3` · Gate ✅ [READY](../10-validation/release-rollback/RELEASE_ROLLBACK_GATE.md)  
 **Gate DoRl:** Rollback · Track B · RELEASE-01  
 **Nivel:** Release Contract — **no** es un Flow nuevo  
 **DoR:** [RELEASE_ROLLBACK_DOR](./RELEASE_ROLLBACK_DOR.md) ✅ en `main` (#207 · `e7f51a8`)  
@@ -315,8 +315,9 @@ tag (futuro): release-rollback-pass
 | Out of scope · Gate CLOSED until Runner | ✅ |
 | Spec READY FOR FREEZE | ✅ #208 |
 | Spec FROZEN | ✅ #208 · `4d109f7` · Land Check docs |
-| Runner BLOCKED at R1 | ▶ este PR · [RUNNER](../10-validation/release-rollback/RELEASE_ROLLBACK_RUNNER.md) |
-| RELEASE-ROLLBACK-001 | ⛔ CLOSED until Gate READY |
+| Runner BLOCKED at R1 | ✅ CERTIFIED #210 · `a1fbdc3` |
+| Gate READY | ✅ Land Check from main |
+| RELEASE-ROLLBACK-001 | ⏳ READY TO OPEN (R1 only) |
 
 **Estado del documento:** ✅ **FROZEN**
 
@@ -325,16 +326,14 @@ tag (futuro): release-rollback-pass
 ## 14. Next
 
 ```text
-Runner (este PR)
-npm run test:release-rollback
-→ BLOCKED at RELEASE_ROLLBACK_R1_STARTED · exit 2
+READY TO OPEN
+RELEASE-ROLLBACK-001 · R1 only
+PASS through R1 · BLOCKED at RELEASE_ROLLBACK_R2_STARTED
     ↓
-Land Check desde main → Gate READY
-    ↓
-001…003 → release-rollback-pass
+002 · 003 → release-rollback-pass
 ```
 
-**No** Rollback-001 · FLOW-05 · `release-01-beta` hasta Gate READY.
+**No** R2/R3 · FLOW-05 · `release-01-beta` en Rollback-001.
 
 ---
 
