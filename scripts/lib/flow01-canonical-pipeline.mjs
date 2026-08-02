@@ -185,13 +185,13 @@ export function formatFlow01ComparisonTable(result) {
   return lines.join("\n");
 }
 
-/** Extract ordered FLOW-01 step names from console / log lines. */
+/** Extract ordered FLOW-01 step names from console / log lines (canonical only). */
 export function extractFlow01Steps(consoleLines) {
   const steps = [];
   for (const line of consoleLines) {
     const text = typeof line === "string" ? line : String(line);
-    const m = text.match(/\[FLOW-01\]\s+(FLOW01_[A-Z0-9_]+)/);
-    if (m) steps.push(m[1]);
+    const m = text.match(/\[FLOW-01\]\s+(FLOW01_T[1-4]_(?:STARTED|COMPLETED))/);
+    if (m && FLOW01_CANONICAL_STEPS.includes(m[1])) steps.push(m[1]);
   }
   return steps;
 }

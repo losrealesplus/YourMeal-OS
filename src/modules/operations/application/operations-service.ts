@@ -18,8 +18,25 @@ import {
   canOperateDelivery,
   canOperateKitchen,
 } from "@/modules/bootstrap-integrity";
+import {
+  beginFlow01Pipeline,
+  logFlow01Step,
+  stopFlow01,
+} from "./flow01-evidence";
 
 export const OperationsService = {
+  /**
+   * FLOW-01 T1 · Spec `startProduction`
+   * Kitchen → Production: confirmed → in_production
+   * Emits FLOW01_T1_STARTED / FLOW01_T1_COMPLETED exactly once on success.
+   */
+  async startProduction(
+    ctx: ServiceContext,
+    orderId: string,
+  ): Promise<OperationalOrderStatus> {
+    return this.transitionKitchen(ctx, orderId, "in_production");
+  },
+
   async listKitchenOrders(
     ctx: ServiceContext,
     filters: Omit<OperationalOrderFilters, "statuses"> = {},
@@ -138,19 +155,50 @@ export const OperationsService = {
       );
     }
 
-    const next = await repo.transitionStatus(orderId, toStatus);
-    try {
-      await AuditService.write(ctx, {
-        entityType: "order",
-        entityId: orderId,
-        action: "status_change",
-        oldData: { status: current.status },
-        newData: { status: next, workspace },
+    const isFlow01T1 =
+      workspace === "kitchen" &&
+      current.status === "confirmed" &&
+      toStatus === "in_production";
+
+    if (isFlow01T1) {
+      beginFlow01Pipeline({ orderId, tenantId: ctx.tenantId });
+      logFlow01Step("FLOW01_T1_STARTED", {
+        orderId,
+        from: current.status,
+        to: toStatus,
       });
-    } catch (e) {
-      const message = e instanceof Error ? e.message : "Audit failed";
-      throw new DomainError("INVALID_STATE", message);
     }
-    return next;
+
+    try {
+      const next = await repo.transitionStatus(orderId, toStatus);
+      try {
+        await AuditService.write(ctx, {
+          entityType: "order",
+          entityId: orderId,
+          action: "status_change",
+          oldData: { status: current.status },
+          newData: { status: next, workspace },
+        });
+      } catch (e) {
+        const message = e instanceof Error ? e.message : "Audit failed";
+        throw new DomainError("INVALID_STATE", message);
+      }
+
+      if (isFlow01T1) {
+        logFlow01Step("FLOW01_T1_COMPLETED", {
+          orderId,
+          status: next,
+        });
+      }
+      return next;
+    } catch (e) {
+      if (isFlow01T1) {
+        stopFlow01("T1_FAILED", {
+          orderId,
+          message: e instanceof Error ? e.message : "transition failed",
+        });
+      }
+      throw e;
+    }
   },
 };

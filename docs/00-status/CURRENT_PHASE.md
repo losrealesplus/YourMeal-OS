@@ -36,15 +36,17 @@ Fase proyecto
                               → ./EVIDENCE_BEFORE_IMPLEMENTATION.md
 
 Sprint activo
-  FLOW-01 SPEC                 ✅ FROZEN (PR #141)
-  FLOW-01 Runner               ▶ #142 · progressive PASS/BLOCKED
-  Entregas dominio             FLOW01-001 → 004 (una transición / PR)
+  FLOW-01 SPEC                 ✅ FROZEN (#141)
+  FLOW-01 Runner               ✅ MERGED (#142)
+  FLOW01-001 T1                ▶ Kitchen → Production
+  FLOW01-002…004               ⏳ una transición / PR
   Plan: ./FLOW_01_DELIVERY_PLAN.md
-  Siguiente tras merge runner: FLOW01-001 (Kitchen → Production)
+  Live: npm run test:flow01-canonical -- --live
+        → PASS through T1 · BLOCKED at T2
   Acta PS-002-C: ../10-validation/platform-stabilization/PS002C_PASS_ACTA.md
   Tag restauración: ps002c-pass → 545bd19
   Beta paralelo: BR-03.3 Runtime Validation (G3)
-  Disciplina: no ampliar FLOW-01 hasta --live PASS completo
+  Disciplina: cada PR certifica exactamente una transición
 
 ═══════════════════════════════════════════════
 CLOSED GATE

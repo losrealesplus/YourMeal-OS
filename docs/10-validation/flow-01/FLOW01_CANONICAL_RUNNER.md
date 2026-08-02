@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW01_CANONICAL_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ Runner contract **ACTIVE** · Domain driver ⏳ PENDING  
+**Estado:** ✅ Runner contract **ACTIVE** · Domain driver T1 ▶ FLOW01-001  
 **Spec:** [FLOW_01_KITCHEN_DELIVERY_SPEC](../../00-status/FLOW_01_KITCHEN_DELIVERY_SPEC.md) **FROZEN** (PR #141)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)
 
@@ -53,14 +53,15 @@ npm run test:flow01-canonical
 npm run test:flow01-canonical -- --through=T1 --pipeline=FLOW01_T1_STARTED,FLOW01_T1_COMPLETED
 # → delivery PASS · flow BLOCKED at FLOW01_T2_STARTED
 
-# Live domain driver (progresivo: PASS through Tn · BLOCKED at T{n+1})
+# Live domain driver (FLOW01-001: PASS through T1 · BLOCKED at T2)
 npm run test:flow01-canonical -- --live
+npm run test:flow01-canonical -- --live --through=T1   # delivery exit 0
 
 # Unit tests del validador
 npm run test:flow01-canonical:unit
 ```
 
-Plan de entregas: [FLOW_01_DELIVERY_PLAN](../../00-status/FLOW_01_DELIVERY_PLAN.md).
+Plan: [FLOW_01_DELIVERY_PLAN](../../00-status/FLOW_01_DELIVERY_PLAN.md) · Acta T1: [FLOW01_001_T1_ACTA](./FLOW01_001_T1_ACTA.md).
 
 Evidencia escrita en: `docs/10-validation/flow-01/evidence/flow01-canonical.json`
 
