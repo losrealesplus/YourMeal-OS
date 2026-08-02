@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_DEPLOY_GATE.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **READY** · 001 CERTIFIED desde `main` · READY TO OPEN 002  
+**Estado:** ✅ **READY** · 001 CERTIFIED · 002 ▶ este PR (D2)  
 **Nivel:** Release Track B · B-04 Deploy  
 **Spec:** [RELEASE_DEPLOY_SPEC](../../00-status/RELEASE_DEPLOY_SPEC.md) ✅ FROZEN #198  
 **Runner:** [RELEASE_DEPLOY_RUNNER](./RELEASE_DEPLOY_RUNNER.md) ✅ #200 · `1008ffd`  
@@ -42,10 +42,10 @@ npm run test:release-deploy:runner-only
 ### Decision
 
 ```text
-READY TO OPEN
-RELEASE-DEPLOY-002 · D2 only
-Publish / Apply
-Nothing beyond D2.
+RELEASE-DEPLOY-002 · D2 OPEN (este PR)
+PASS through D2 · BLOCKED at RELEASE_DEPLOY_D3_STARTED
+    ↓
+Land Check from main → READY TO OPEN 003
 ```
 
 ### Progress
@@ -57,11 +57,12 @@ Nothing beyond D2.
 | Runner | BLOCKED at D1 | ✅ CERTIFIED #200 |
 | Gate | READY | ✅ #201 |
 | RELEASE-DEPLOY-001 | D1 Preflight | ✅ CERTIFIED #202 |
-| RELEASE-DEPLOY-002 | D2 Publish / Apply | ⏳ READY TO OPEN |
+| RELEASE-DEPLOY-002 | D2 Publish / Apply | ▶ este PR |
 | RELEASE-DEPLOY-003 | D3 Post-deploy Verify | ⏳ |
 | `release-deploy-pass` | FULL PASS | ⏳ |
 
-Acta 001: [RELEASE_DEPLOY_001_D1_ACTA](./RELEASE_DEPLOY_001_D1_ACTA.md).
+Acta 001: [RELEASE_DEPLOY_001_D1_ACTA](./RELEASE_DEPLOY_001_D1_ACTA.md) ·  
+Acta 002: [RELEASE_DEPLOY_002_D2_ACTA](./RELEASE_DEPLOY_002_D2_ACTA.md).
 
 ---
 

@@ -1,17 +1,19 @@
 {
   "status": "PASS",
-  "reason": "PASS through D1 · BLOCKED at RELEASE_DEPLOY_D2_STARTED for full RELEASE-DEPLOY",
+  "reason": "PASS through D2 · BLOCKED at RELEASE_DEPLOY_D3_STARTED for full RELEASE-DEPLOY",
   "gate": "RELEASE-DEPLOY",
   "contract": "RELEASE_DEPLOY_SPEC",
   "level": "release",
   "certifies": "reproducible_deployment",
   "complements_e2e_smoke_crossflow": true,
   "principle": "Evidence before Implementation",
-  "code_status": "CAPABILITY_DRIVER_D1",
-  "at": "2026-08-02T19:37:06.034Z",
+  "code_status": "CAPABILITY_DRIVER_D2",
+  "at": "2026-08-02T19:37:05.935Z",
   "pipeline": [
     "RELEASE_DEPLOY_D1_STARTED",
-    "RELEASE_DEPLOY_D1_COMPLETED"
+    "RELEASE_DEPLOY_D1_COMPLETED",
+    "RELEASE_DEPLOY_D2_STARTED",
+    "RELEASE_DEPLOY_D2_COMPLETED"
   ],
   "expected": [
     "RELEASE_DEPLOY_D1_STARTED",
@@ -25,13 +27,13 @@
   "missing": [],
   "out_of_order": [],
   "firstFailure": null,
-  "certified_through": 1,
-  "blocked_at": "RELEASE_DEPLOY_D2_STARTED",
-  "delivery": "RELEASE-DEPLOY-001",
+  "certified_through": 2,
+  "blocked_at": "RELEASE_DEPLOY_D3_STARTED",
+  "delivery": "RELEASE-DEPLOY-002",
   "delivery_status": "PASS",
   "gate_status": "BLOCKED",
   "terminal": {
-    "segment": "preflight"
+    "segment": "publish_apply"
   },
   "evidence": {
     "d1_checks": [
@@ -46,6 +48,17 @@
       "RELEASE_DEPLOY_D1_STARTED",
       "RELEASE_DEPLOY_D1_COMPLETED"
     ],
-    "d1_source": "release-e2e-pass + Deploy Spec/Gate (no D2+ · no publish/apply · no infra)"
+    "d1_source": "release-e2e-pass + Deploy Spec/Gate (no D2+ · no publish/apply · no infra)",
+    "d2_checks": [
+      "release_deploy_d1_acta_certified",
+      "release_deploy_publish_procedure_present",
+      "release_deploy_build_web_script_present",
+      "release_deploy_vite_config_present"
+    ],
+    "d2_mapped_tokens": [
+      "RELEASE_DEPLOY_D2_STARTED",
+      "RELEASE_DEPLOY_D2_COMPLETED"
+    ],
+    "d2_source": "D1 CERTIFIED + RELEASE_DEPLOY_PUBLISH + build:web (no D3 · no remote deploy · no infra)"
   }
 }
