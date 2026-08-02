@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW03_CANONICAL_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ Runner **ACTIVE** · Domain ▶ FLOW03-001 (T1) · full FLOW-03 BLOCKED at T2  
+**Estado:** ✅ Runner **ACTIVE** · Domain ▶ FLOW03-002 (T2) · full FLOW-03 BLOCKED at T3  
 **Spec:** [FLOW_03_BILLING_SPEC](../../00-status/FLOW_03_BILLING_SPEC.md) **FROZEN** (#155)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)
 
@@ -88,9 +88,13 @@ npm run test:flow03-canonical:unit
 ```
 
 ```bash
-# Live dominio (FLOW03-001…)
+# Live dominio
 npm run test:flow03-001
 # → PASS through T1 · BLOCKED at FLOW03_T2_STARTED · exit 0
+npm run test:flow03-002
+# → PASS through T2 · BLOCKED at FLOW03_T3_STARTED · exit 0
+npm run test:flow03-canonical -- --live
+# → PASS through T2 · BLOCKED at FLOW03_T3_STARTED · exit 0
 ```
 
 ---
@@ -110,8 +114,8 @@ Gate **verde** · FLOW03-001 abierto.
 
 | Entrega | Estado |
 |---------|--------|
-| FLOW03-001 T1 | ▶ `delivered` → invoice `pending` · [acta](./FLOW03_001_T1_ACTA.md) |
-| FLOW03-002 T2 | ⏳ evento `reviewed_at` · status sigue `pending` |
+| FLOW03-001 T1 | ✅ `delivered` → invoice `pending` · [acta](./FLOW03_001_T1_ACTA.md) |
+| FLOW03-002 T2 | ▶ evento `reviewed_at` · status sigue `pending` · [acta](./FLOW03_002_T2_ACTA.md) |
 | FLOW03-003 T3 | ⏳ `pending` → `paid` · FULL PASS |
 
 ---

@@ -38,7 +38,7 @@ Sí: `FLOW-01 Kitchen → Delivery`.
 
 | ID | Handoff / alcance | Prioridad | Motivo | Estado |
 |----|-------------------|-----------|--------|--------|
-| **FLOW-03** | Billing | Alta | Facturación desacoplada del happy path | ▶ Domain · Spec FROZEN · Runner ✅ · [FLOW03-001](../10-validation/flow-03/FLOW03_001_T1_ACTA.md) T1 |
+| **FLOW-03** | Billing | Alta | Facturación desacoplada del happy path | ▶ Domain · T1 ✅ · [FLOW03-002](../10-validation/flow-03/FLOW03_002_T2_ACTA.md) T2 |
 | **FLOW-04** | Inventory Consumption | Alta | Consumo de ingredientes tras producción | ⏳ DoR NOT STARTED |
 | **FLOW-05** | Customer Order Lifecycle | Media | Creación del pedido → `confirmed` | ⏳ DoR NOT STARTED |
 | **FLOW-06** | Kitchen Planning | Media | Planificación previa a T1 | ⏳ DoR NOT STARTED |
