@@ -277,8 +277,8 @@ Hasta entonces: **prohibido** drivers de cadena · nuevos servicios de dominio �
 
 | Fase | Trabajo | Estado |
 |------|---------|--------|
-| 0 | DoR document | ▶ este PR |
-| 1 | Spec | ⏳ READY FOR FREEZE |
+| 0 | DoR document | ✅ #178 · `e55e2a1` |
+| 1 | Spec | ▶ READY FOR FREEZE · RELEASE_CROSSFLOW_SPEC.md |
 | 2 | Freeze (merge Spec → main) | ⏳ |
 | 3 | Runner only · BLOCKED at C1 | ⏳ |
 | 4 | Gate CROSSFLOW-001 (Land Check) | ⏳ |
