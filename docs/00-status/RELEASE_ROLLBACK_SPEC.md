@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_ROLLBACK_SPEC.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ **READY FOR FREEZE** (Spec · docs only · este PR)  
+**Estado:** ✅ **FROZEN** (Spec · #208 · `4d109f7`) · DoR ✅ (#207 · `e7f51a8`) · Runner ⏳ · Gate ⛔ NOT READY  
 **Gate DoRl:** Rollback · Track B · RELEASE-01  
 **Nivel:** Release Contract — **no** es un Flow nuevo  
 **DoR:** [RELEASE_ROLLBACK_DOR](./RELEASE_ROLLBACK_DOR.md) ✅ en `main` (#207 · `e7f51a8`)  
@@ -313,29 +313,26 @@ tag (futuro): release-rollback-pass
 | Tokens · Transitions · Evidence | ✅ |
 | PASS · BLOCKED · Invariants | ✅ |
 | Out of scope · Gate CLOSED until Runner | ✅ |
-| Spec READY FOR FREEZE | ▶ este PR |
-| Spec FROZEN | ⏳ tras merge + Land Check docs |
-| Runner BLOCKED at R1 | ⏳ |
+| Spec READY FOR FREEZE | ✅ #208 |
+| Spec FROZEN | ✅ #208 · `4d109f7` · Land Check docs |
+| Runner BLOCKED at R1 | ⏳ READY TO OPEN |
 | RELEASE-ROLLBACK-001 | ⛔ CLOSED |
 
-**Estado del documento:** ▶ **READY FOR FREEZE**
+**Estado del documento:** ✅ **FROZEN**
 
 ---
 
 ## 14. Next
 
 ```text
-READY FOR FREEZE
-RELEASE-ROLLBACK Spec
-    ↓
-Land Check docs desde main → Spec FROZEN
-    ↓
 READY TO OPEN
 RELEASE-ROLLBACK Runner
 (BLOCKED at RELEASE_ROLLBACK_R1_STARTED · exit 2)
+    ↓
+Gate READY → 001…003 → release-rollback-pass
 ```
 
-**No** Rollback-001 · FLOW-05 · `release-01-beta` en el Spec / Freeze.
+**No** Rollback-001 · FLOW-05 · `release-01-beta` en el Runner PR.
 
 ---
 
