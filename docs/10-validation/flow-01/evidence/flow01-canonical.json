@@ -1,0 +1,44 @@
+{
+  "status": "PASS",
+  "reason": "Contract self-test",
+  "gate": "FLOW-01",
+  "contract": "FLOW_01_KITCHEN_DELIVERY_SPEC",
+  "principle": "Evidence before Implementation",
+  "code_status": "RUNNER_SELF_TEST",
+  "at": "2026-08-02T12:50:49.101Z",
+  "pipeline": [
+    "FLOW01_T1_STARTED",
+    "FLOW01_T1_COMPLETED",
+    "FLOW01_T2_STARTED",
+    "FLOW01_T2_COMPLETED",
+    "FLOW01_T3_STARTED",
+    "FLOW01_T3_COMPLETED",
+    "FLOW01_T4_STARTED",
+    "FLOW01_T4_COMPLETED"
+  ],
+  "expected": [
+    "FLOW01_T1_STARTED",
+    "FLOW01_T1_COMPLETED",
+    "FLOW01_T2_STARTED",
+    "FLOW01_T2_COMPLETED",
+    "FLOW01_T3_STARTED",
+    "FLOW01_T3_COMPLETED",
+    "FLOW01_T4_STARTED",
+    "FLOW01_T4_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": null,
+  "terminal": {
+    "order_status": "delivered",
+    "packaging_batch": "CLOSED"
+  },
+  "duration_ms": {
+    "t1_ms": 15,
+    "t2_ms": 15,
+    "t3_ms": 15,
+    "t4_ms": 15,
+    "flow_total_ms": 105
+  }
+}

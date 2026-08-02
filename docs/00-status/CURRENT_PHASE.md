@@ -36,9 +36,9 @@ Fase proyecto
                               → ./EVIDENCE_BEFORE_IMPLEMENTATION.md
 
 Sprint activo
-  1) Merge PR #141 = FLOW-01 SPEC FROZEN
-  2) Runner test:flow01-canonical
-  3) Implementation happy path (solo después)
+  FLOW-01 SPEC                 ✅ FROZEN (PR #141 merged)
+  FLOW-01 Runner               ▶ test:flow01-canonical (este track)
+  FLOW-01 Implementation       ⏳ después del runner
   Gaps Spec cerrados: PackagingBatch lifecycle · T4 = delivered
   Acta PS-002-C: ../10-validation/platform-stabilization/PS002C_PASS_ACTA.md
   Tag restauración: ps002c-pass → 545bd19

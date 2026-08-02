@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW_01_KITCHEN_DELIVERY_SPEC.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ **SPEC READY FOR FREEZE** — merge = freeze oficial · sin implementación de dominio en este PR  
+**Estado:** ✅ **SPEC FROZEN** (PR #141 merged · 2026-08-02) · runner canónico siguiente · sin happy-path de dominio hasta runner  
 **Fase de proyecto:** **Fase 1 · Domain / Flow Certification** (Fase 0 · Plataforma = COMPLETE)  
 **Principio:** [Evidence before Implementation](./EVIDENCE_BEFORE_IMPLEMENTATION.md) · [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) Regla 7  
 **Precondición de plataforma:** PS-002-C ✅ PASS · tag `ps002c-pass` → `545bd19` · [PS002C_PASS_ACTA](../10-validation/platform-stabilization/PS002C_PASS_ACTA.md)  
@@ -364,9 +364,9 @@ Los **invariantes** de este documento deben aparecer como assertions del runner 
 | 5 | Cerrar GAP Packaging lifecycle | ✅ este commit |
 | 6 | Cerrar GAP criterio T4 (`delivered`) | ✅ este commit |
 | 7 | Errores/desviaciones permitidas (nombradas) | ✅ este commit |
-| 8 | Aprobar / merge Spec (PR #141) = **SPEC FROZEN** | ⏳ merge humano |
-| 9 | Runner `test:flow01-canonical` (Evidence before Implementation) | ⏳ inmediatamente tras merge Spec |
-| 10 | Implementación happy path Kitchen → Delivery | ❌ solo tras Spec freeze + runner |
+| 8 | Aprobar / merge Spec (PR #141) = **SPEC FROZEN** | ✅ MERGED |
+| 9 | Runner `test:flow01-canonical` (Evidence before Implementation) | ▶ PR runner |
+| 10 | Implementación happy path Kitchen → Delivery | ❌ solo tras runner en main |
 
 ---
 
