@@ -87,24 +87,27 @@ npm run test:release-smoke-001
 npm run test:release-smoke-002
 # → PASS through S2 · BLOCKED at S3 · exit 0
 
-# Default live through max certified (S2)
+# RELEASE-SMOKE-003 · S3 Bootstrap (no Dashboard · no full Playwright E2E)
+npm run test:release-smoke-003
+# → PASS through S3 · BLOCKED at S4 · exit 0
+
+# Default live through max certified (S3)
 npm run test:release-smoke
 
 # Unit tests
 npm run test:release-smoke:unit
 ```
 
-`--live` sin `--through` = max certificado (`RELEASE_SMOKE_CERTIFIED_THROUGH`, hoy S2).
+`--live` sin `--through` = max certificado (`RELEASE_SMOKE_CERTIFIED_THROUGH`, hoy S3).
 
 ---
 
-## Fuera de alcance hasta S2+
+## Fuera de alcance hasta S3+
 
 - Playwright · browser · CI  
 - Deployment · Rollback  
-- Live Auth / Supabase session (S2)  
 - Domain logic / FLOW-05  
-- S3 Bootstrap · S4 Dashboard
+- S4 Dashboard  
 
 ---
 
