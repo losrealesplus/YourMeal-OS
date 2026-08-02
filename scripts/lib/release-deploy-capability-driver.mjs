@@ -3,10 +3,11 @@
  *
  * D1 = Deploy Preflight (release-e2e-pass + Spec/Gate)
  * D2 = Publish / Apply (D1 CERTIFIED + publish procedure + build:web)
- * D3 = Post-deploy Verify (future · RELEASE-DEPLOY-003)
+ * D3 = Post-deploy Verify (D2 CERTIFIED + verify procedure + preview)
  */
 import { runReleaseDeployD1Preflight } from "./release-deploy-d1-preflight.mjs";
 import { runReleaseDeployD2PublishApply } from "./release-deploy-d2-publish-apply.mjs";
+import { runReleaseDeployD3PostDeployVerify } from "./release-deploy-d3-post-deploy-verify.mjs";
 
 /**
  * @param {{ root: string, through?: 1|2|3 | null }} opts
@@ -75,11 +76,27 @@ export function runReleaseDeployCapabilityDriver({ root, through = null }) {
 
   if (max < 3) return { ok: true, steps, evidence };
 
-  return {
-    ok: false,
-    steps,
-    reason:
-      "D3 Post-deploy Verify driver not implemented (RELEASE-DEPLOY-003). Do not invent verify.",
-    evidence,
-  };
+  console.info("[RELEASE-DEPLOY]", "RELEASE_DEPLOY_D3_STARTED", {
+    segment: "post_deploy_verify",
+  });
+  steps.push("RELEASE_DEPLOY_D3_STARTED");
+
+  const d3 = runReleaseDeployD3PostDeployVerify({ cwd: root });
+  evidence.d3_checks = d3.checks;
+  if (!d3.ok) {
+    console.error("[RELEASE-DEPLOY] D3 FAIL:\n" + d3.reason);
+    return { ok: false, steps, reason: d3.reason, evidence };
+  }
+  evidence.d3_mapped_tokens = d3.mapped_tokens;
+  evidence.d3_source = d3.source;
+
+  console.info("[RELEASE-DEPLOY]", "RELEASE_DEPLOY_D3_COMPLETED", {
+    segment: "post_deploy_verify",
+    mapped_tokens: d3.mapped_tokens,
+    source: d3.source,
+    checks: d3.checks,
+  });
+  steps.push("RELEASE_DEPLOY_D3_COMPLETED");
+
+  return { ok: true, steps, evidence };
 }

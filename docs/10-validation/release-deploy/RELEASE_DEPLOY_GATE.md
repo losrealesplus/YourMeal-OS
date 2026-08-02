@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_DEPLOY_GATE.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **READY** · 002 CERTIFIED desde `main` · READY TO OPEN 003  
+**Estado:** ✅ **READY** · 002 CERTIFIED · 003 ▶ este PR (D3 · FULL PASS path)  
 **Nivel:** Release Track B · B-04 Deploy  
 **Spec:** [RELEASE_DEPLOY_SPEC](../../00-status/RELEASE_DEPLOY_SPEC.md) ✅ FROZEN #198  
 **Runner:** [RELEASE_DEPLOY_RUNNER](./RELEASE_DEPLOY_RUNNER.md) ✅ #200 · `1008ffd`  
@@ -21,32 +21,18 @@
 ☑ Gate READY (#201 → 9de2893)
 ☑ D1 certified (#202 → a0daf82)
 ☑ D2 certified (#204 → 28ddb83)
-☑ Canonical PASS through D2 verified from main
-☑ runner-only BLOCKED at D1 verified from main
+☑ D3 OPEN (#206 · este PR)
 ```
-
-### Land Check evidence (from `main` @ `28ddb83`)
-
-```bash
-git pull origin main
-npm run test:release-deploy-002
-npm run test:release-deploy
-npm run test:release-deploy:runner-only
-```
-
-| Comando | Resultado |
-|---------|-----------|
-| `test:release-deploy-002` | PASS through D2 · `blocked_at=RELEASE_DEPLOY_D3_STARTED` · exit 0 |
-| `test:release-deploy` | PASS through D2 · BLOCKED at D3 · exit 0 |
-| `test:release-deploy:runner-only` | BLOCKED at `RELEASE_DEPLOY_D1_STARTED` · exit 2 |
 
 ### Decision
 
 ```text
-READY TO OPEN
-RELEASE-DEPLOY-003 · D3 only
-Post-deploy Verify
-Nothing beyond D3.
+RELEASE-DEPLOY-003 · D3 OPEN (este PR)
+PASS through D3 · FULL PASS · blocked_at=—
+    ↓
+Land Check from main → tag release-deploy-pass
+    ↓
+READY TO OPEN RELEASE-ROLLBACK DoR
 ```
 
 ### Progress
@@ -59,11 +45,12 @@ Nothing beyond D3.
 | Gate | READY | ✅ #201 |
 | RELEASE-DEPLOY-001 | D1 Preflight | ✅ CERTIFIED #202 |
 | RELEASE-DEPLOY-002 | D2 Publish / Apply | ✅ CERTIFIED #204 |
-| RELEASE-DEPLOY-003 | D3 Post-deploy Verify | ⏳ READY TO OPEN |
-| `release-deploy-pass` | FULL PASS | ⏳ |
+| RELEASE-DEPLOY-003 | D3 Post-deploy Verify | ▶ este PR |
+| `release-deploy-pass` | FULL PASS | ⏳ tras Land Check |
 
 Acta 001: [RELEASE_DEPLOY_001_D1_ACTA](./RELEASE_DEPLOY_001_D1_ACTA.md) ·  
-Acta 002: [RELEASE_DEPLOY_002_D2_ACTA](./RELEASE_DEPLOY_002_D2_ACTA.md).
+Acta 002: [RELEASE_DEPLOY_002_D2_ACTA](./RELEASE_DEPLOY_002_D2_ACTA.md) ·  
+Acta 003: [RELEASE_DEPLOY_003_D3_ACTA](./RELEASE_DEPLOY_003_D3_ACTA.md).
 
 ---
 
