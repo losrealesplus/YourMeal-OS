@@ -97,9 +97,10 @@ RELEASE-ROLLBACK (B-05)
 ☑ READY TO OPEN RELEASE-ROLLBACK-001       → ✅ Gate READY #211
 ☑ RELEASE-ROLLBACK-001 CERTIFIED             → ✅ #212 · `9c52d01` · [ACTA](../10-validation/release-rollback/RELEASE_ROLLBACK_001_R1_ACTA.md)
 ☑ READY TO OPEN RELEASE-ROLLBACK-002         → ✅ Land Check R1 from main
+☑ RELEASE-ROLLBACK-002 (este PR)             → ▶ PASS through R2 · [ACTA](../10-validation/release-rollback/RELEASE_ROLLBACK_002_R2_ACTA.md)
 ```
 
-**DoR CERTIFIED** · Spec ✅ · Runner ✅ · Gate ✅ · **001 CERTIFIED** → READY TO OPEN 002 (R2 only).  
+**DoR CERTIFIED** · Spec ✅ · Runner ✅ · Gate ✅ · **001 CERTIFIED** · **002 ▶ este PR** (R2 only).  
 **No** R3 · FLOW-05 · `release-01-beta` en Rollback-002.
 
 ---
@@ -113,7 +114,7 @@ RELEASE-ROLLBACK (B-05)
 | 2 | Freeze (merge Spec → main) | ✅ |
 | 3 | Runner only · BLOCKED at R1 | ✅ #210 · `a1fbdc3` |
 | 4 | Gate | ✅ READY (Land Check `main`) |
-| 5 | Capacidades / PRs Rollback (001…003) | ✅ 001 · ⏳ READY TO OPEN 002 · 003 ⏳ |
+| 5 | Capacidades / PRs Rollback (001…003) | ✅ 001 · ▶ 002 este PR · 003 ⏳ |
 | 6 | FULL PASS · tag `release-rollback-pass` | ⏳ |
 
 ---

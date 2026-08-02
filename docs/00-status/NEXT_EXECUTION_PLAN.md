@@ -106,9 +106,9 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual Track B:** **RELEASE-ROLLBACK-002** (R2 Execute Rollback / Restore only).  
-001 ✅ CERTIFIED (#212 · `9c52d01`) · Land Check desde `main` OK.  
-Gate ✅ READY TO OPEN 002 · [GATE](../10-validation/release-rollback/RELEASE_ROLLBACK_GATE.md).  
+**Objetivo actual Track B:** **RELEASE-ROLLBACK-002** (R2 Execute Rollback / Restore · este PR).  
+001 ✅ CERTIFIED (#212 · `9c52d01`) · cert docs (#213 · `8dc7ce3`).  
+Contrato: `npm run test:release-rollback` → PASS through R2 · BLOCKED at `RELEASE_ROLLBACK_R3_STARTED` · exit 0.  
 Do **not** open R3 · FLOW-05 · RELEASE-01-BETA in 002.  
 **Reglas:** (1) Release gates ≠ Flow runners · (2) Land Check desde `main` (Regla 9).
 

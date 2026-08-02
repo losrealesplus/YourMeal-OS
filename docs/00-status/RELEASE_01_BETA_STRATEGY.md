@@ -114,7 +114,7 @@ RELEASE-01
 ├── Performance             ⏳  (o N/A documentado)
 ├── Security                ⏳  (o N/A documentado)
 ├── Deployment              ✅  tag release-deploy-pass → 7896a2a
-├── Rollback                ▶  001 CERTIFIED · READY TO OPEN 002 → release-rollback-pass
+├── Rollback                ▶  002 R2 · PASS through R2 · BLOCKED at R3 → release-rollback-pass
 ├── Documentation           ⏳  handoff · CURRENT_PHASE · ADRs
 └── Beta Acceptance         ⏳  DoRl PASS
         ↓

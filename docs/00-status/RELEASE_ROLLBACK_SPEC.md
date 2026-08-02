@@ -318,7 +318,7 @@ tag (futuro): release-rollback-pass
 | Runner BLOCKED at R1 | ✅ CERTIFIED #210 · `a1fbdc3` |
 | Gate READY | ✅ #211 · Land Check from main |
 | RELEASE-ROLLBACK-001 | ✅ CERTIFIED #212 · `9c52d01` |
-| RELEASE-ROLLBACK-002 | ⏳ READY TO OPEN (R2 only) |
+| RELEASE-ROLLBACK-002 | ▶ este PR · PASS through R2 |
 
 **Estado del documento:** ✅ **FROZEN**
 
@@ -327,11 +327,12 @@ tag (futuro): release-rollback-pass
 ## 14. Next
 
 ```text
-READY TO OPEN
-RELEASE-ROLLBACK-002 · R2 only
+RELEASE-ROLLBACK-002 · R2 OPEN (este PR)
 PASS through R2 · BLOCKED at RELEASE_ROLLBACK_R3_STARTED
     ↓
-003 → release-rollback-pass
+Land Check from main → READY TO OPEN 003 · R3 only
+    ↓
+release-rollback-pass
 ```
 
 **No** R3 · FLOW-05 · `release-01-beta` en Rollback-002.
