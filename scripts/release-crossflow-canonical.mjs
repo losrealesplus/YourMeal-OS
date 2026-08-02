@@ -16,7 +16,7 @@
  */
 
 /** Highest segment with a capability driver implemented. */
-const RELEASE_CROSSFLOW_CERTIFIED_THROUGH = 2;
+const RELEASE_CROSSFLOW_CERTIFIED_THROUGH = 3;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -223,6 +223,13 @@ async function main() {
     ) {
       console.log(
         "RELEASE-CROSSFLOW-002 · PASS through C2 · BLOCKED at C3 (expected)",
+      );
+    } else if (
+      progress.certified_through >= 3 &&
+      progress.blocked_at === "RELEASE_CROSSFLOW_C4_STARTED"
+    ) {
+      console.log(
+        "RELEASE-CROSSFLOW-003 · PASS through C3 · BLOCKED at C4 (expected)",
       );
     }
     process.exit(exitFor(progress));
