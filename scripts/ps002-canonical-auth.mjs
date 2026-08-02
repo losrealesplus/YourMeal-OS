@@ -53,6 +53,10 @@ import {
   formatAuthSession002Report,
   parseAuthSession002Args,
 } from "./lib/ps002c-auth-session-evidence.mjs";
+import {
+  attachPs002cNetworkCapture,
+  formatAuthNet003Report,
+} from "./lib/ps002c-network-evidence.mjs";
 
 const BASE = process.argv[2] || process.env.PS_BASE_URL || "http://127.0.0.1:8080";
 const EMAIL = process.env.PS002_EMAIL || "";
@@ -194,6 +198,8 @@ async function main() {
   const authSession002Events = [];
   /** @type {Promise<void>[]} */
   const consoleParsePending = [];
+  // AUTH-NET-003: capture Playwright network (esp. auth/v1/token) — no Auth changes.
+  const networkCapture = attachPs002cNetworkCapture(page);
 
   page.on("console", (msg) => {
     const text = msg.text();
@@ -301,6 +307,7 @@ async function main() {
     const submit = page
       .getByRole("button", { name: /entrar|sign in|iniciar|acceder/i })
       .first();
+    networkCapture.markPhase("post_submit");
     await submit.click();
 
     const deadline = Date.now() + 45_000;
@@ -323,6 +330,10 @@ async function main() {
 
     await page.waitForTimeout(1000);
     await Promise.all(consoleParsePending);
+    await networkCapture.flush();
+    const vite_env = await networkCapture.captureViteEnv(page);
+    const auth_net_003 = networkCapture.buildEvidence();
+    auth_net_003.vite_env = vite_env;
     const screenshotPath = path.join(OUT, "ps002c-after-login.png");
     await page.screenshot({ path: screenshotPath, fullPage: true });
 
@@ -381,6 +392,7 @@ async function main() {
         })),
         home_path_gap,
         auth_session_002,
+        auth_net_003,
         pageErrors,
         screenshot: screenshotPath,
         notes: [
@@ -389,6 +401,7 @@ async function main() {
           "duration_ms is diagnostic only — not a performance gate",
           "HOME-PATH-002: home_path_gap captures ROLE_READY/STOP payloads (instrumentation only)",
           "AUTH-SESSION-002: auth_session_002 cold-start timings (getSession/ensure/loadRoles)",
+          "AUTH-NET-003: auth_net_003 Playwright network (auth/v1/token URL/status/failure)",
         ],
       },
     });
@@ -430,6 +443,7 @@ async function main() {
     ) {
       console.log(`\n${formatHomePathGapReport(home_path_gap)}\n`);
     }
+    console.log(`\n${formatAuthNet003Report(auth_net_003)}\n`);
     console.log(
       JSON.stringify(
         {
@@ -445,6 +459,13 @@ async function main() {
             is_not_staff: home_path_gap.diagnosis.is_not_staff,
             roles_at_role_ready: home_path_gap.diagnosis.roles_at_role_ready,
             gap: home_path_gap.diagnosis.gap,
+          },
+          auth_net_003: {
+            authTokenHosts: auth_net_003.authTokenHosts,
+            wrongHost: auth_net_003.wrongHost,
+            diagnosis: auth_net_003.diagnosis,
+            vite_env: auth_net_003.vite_env,
+            authTokenRequests: auth_net_003.authTokenRequests,
           },
           evidencePath,
         },
