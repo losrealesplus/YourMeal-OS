@@ -319,7 +319,7 @@ tag (futuro): release-rollback-pass
 | Gate READY | ✅ #211 · Land Check from main |
 | RELEASE-ROLLBACK-001 | ✅ CERTIFIED #212 · `9c52d01` |
 | RELEASE-ROLLBACK-002 | ✅ CERTIFIED #214 · `2838138` |
-| RELEASE-ROLLBACK-003 | ⏳ READY TO OPEN (R3 only) |
+| RELEASE-ROLLBACK-003 | ▶ este PR · FULL PASS |
 
 **Estado del documento:** ✅ **FROZEN**
 
@@ -328,12 +328,15 @@ tag (futuro): release-rollback-pass
 ## 14. Next
 
 ```text
-READY TO OPEN
-RELEASE-ROLLBACK-003 · R3 only
-PASS through R3 · FULL PASS · tag release-rollback-pass
+RELEASE-ROLLBACK-003 · R3 OPEN (este PR)
+FULL PASS · certified_through=R3 · blocked_at=—
+    ↓
+Land Check from main → tag release-rollback-pass
+    ↓
+READY TO OPEN RELEASE-01-BETA DoR (docs only)
 ```
 
-**No** FLOW-05 · `release-01-beta` en Rollback-003.
+**No** FLOW-05 · `release-01-beta` · tag hasta Land Check desde `main`.
 
 ---
 

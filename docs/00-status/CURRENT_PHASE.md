@@ -50,11 +50,11 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    Track B › RELEASE-ROLLBACK-003 R3 only
-                               002 ✅ CERTIFIED #214 · 2838138
-                               → ../10-validation/release-rollback/RELEASE_ROLLBACK_002_R2_ACTA.md
-                               Gate ✅ READY TO OPEN 003 (Post-rollback Verify)
-                               No FLOW-05 · release-01-beta en 003
+  Prioridad                    Track B › RELEASE-ROLLBACK-003 (R3 · este PR)
+                               002 ✅ CERTIFIED #214 · 2838138 · cert #215
+                               npm run test:release-rollback → FULL PASS · R3 · blocked_at=—
+                               → ../10-validation/release-rollback/RELEASE_ROLLBACK_003_R3_ACTA.md
+                               No FLOW-05 · release-01-beta · tag hasta Land Check desde main
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)
   Land Check                   ./FOPEBA_LAND_CHECK.md (antes de cualquier 001)
