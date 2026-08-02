@@ -4,20 +4,21 @@
  *
  * Certifies controlled recovery (R1–R3). Complements Deploy + Smoke + Cross-flow + E2E.
  *
- * Default (CERTIFIED_THROUGH = 0): empty pipeline → BLOCKED at R1.
+ * Default (`npm run test:release-rollback`): --live through max certified (R1).
  * Modes:
- *   --runner-only    Empty pipeline → BLOCKED at R1 (Gate land-check).
+ *   --live           Drive certified segments (default through = max certified).
+ *   --runner-only    Empty pipeline → BLOCKED at R1 (historic Gate land-check).
  *   --self-test      Validate frozen full contract (synthetic PASS).
  *   --pipeline=a,b,c Validate an explicit observed step list.
- *   --through=R1|…   Scope delivery RELEASE-ROLLBACK-001..003 (no drivers yet).
+ *   --through=R1|…   Scope delivery RELEASE-ROLLBACK-001..003.
  *
  * Spec: docs/00-status/RELEASE_ROLLBACK_SPEC.md
  *
- * NO R1 capability driver in this PR · NO CI · NO infra · NO restore execution.
+ * NO R2/R3 drivers in this PR · NO CI · NO infra · NO restore execution.
  */
 
-/** Highest segment with a capability driver implemented (0 = runner-only). */
-const RELEASE_ROLLBACK_CERTIFIED_THROUGH = 0;
+/** Highest segment with a capability driver implemented. */
+const RELEASE_ROLLBACK_CERTIFIED_THROUGH = 1;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -25,18 +26,29 @@ import { fileURLToPath } from "node:url";
 import {
   RELEASE_ROLLBACK_CANONICAL_STEPS,
   RELEASE_ROLLBACK_EXIT,
+  RELEASE_ROLLBACK_SEGMENTS,
   buildReleaseRollbackEvidenceReport,
   evaluateReleaseRollbackProgress,
   formatReleaseRollbackComparisonTable,
   releaseRollbackStepsThrough,
   validateReleaseRollbackPipeline,
 } from "./lib/release-rollback-canonical-pipeline.mjs";
+import { runReleaseRollbackCapabilityDriver } from "./lib/release-rollback-capability-driver.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const EVIDENCE_DIR = path.join(ROOT, "docs/10-validation/release-rollback/evidence");
 
 function evidencePathFor(mode, through) {
+  if (mode === "live" && through) {
+    return path.join(
+      EVIDENCE_DIR,
+      `release-rollback-00${through}-canonical-live.json`,
+    );
+  }
+  if (mode === "live") {
+    return path.join(EVIDENCE_DIR, "release-rollback-canonical-live.json");
+  }
   if (mode === "runner-only") {
     return path.join(EVIDENCE_DIR, "release-rollback-canonical.json");
   }
@@ -53,8 +65,7 @@ function evidencePathFor(mode, through) {
 }
 
 function parseArgs(argv) {
-  // Until R1+ drivers exist, default = runner-only (BLOCKED at R1).
-  let mode = RELEASE_ROLLBACK_CERTIFIED_THROUGH === 0 ? "runner-only" : "live";
+  let mode = "live";
   /** @type {string[] | null} */
   let pipelineArg = null;
   /** @type {1|2|3 | null} */
@@ -76,8 +87,8 @@ function parseArgs(argv) {
       if (n >= 1 && n <= 3) through = /** @type {1|2|3} */ (n);
     }
   }
-  if (mode === "live" && RELEASE_ROLLBACK_CERTIFIED_THROUGH === 0) {
-    mode = "runner-only";
+  if (mode === "live" && through == null) {
+    through = /** @type {1|2|3} */ (RELEASE_ROLLBACK_CERTIFIED_THROUGH);
   }
   return { mode, pipelineArg, through };
 }
@@ -95,40 +106,6 @@ function exitFor(progress) {
   return RELEASE_ROLLBACK_EXIT.FAIL;
 }
 
-async function emitBlockedAtR1() {
-  const pipeline = [];
-  const progress = evaluateReleaseRollbackProgress(pipeline, { through: null });
-  const report = buildReleaseRollbackEvidenceReport({
-    status: progress.status,
-    reason: progress.reason,
-    pipeline,
-    validation: {
-      duplicates: progress.duplicates,
-      missing: progress.missing,
-      out_of_order: progress.out_of_order,
-      firstFailure: progress.firstFailure,
-    },
-    code_status: "RUNNER_ONLY",
-    progress,
-    evidence: {},
-  });
-
-  console.log("");
-  console.log("RELEASE-ROLLBACK");
-  console.log("");
-  console.log(report.status);
-  console.log("");
-  console.log(`blocked_at=${report.blocked_at}`);
-  console.log(`duplicates=${JSON.stringify(report.duplicates)}`);
-  console.log(`missing=${JSON.stringify(report.missing)}`);
-  console.log(`out_of_order=${JSON.stringify(report.out_of_order)}`);
-  console.log(`evidence=${JSON.stringify(report.evidence)}`);
-
-  const out = await writeEvidence(report, "runner-only", null);
-  console.log(`evidence_file: ${path.relative(ROOT, out)}`);
-  process.exit(exitFor(progress));
-}
-
 async function main() {
   const { mode, pipelineArg, through } = parseArgs(process.argv.slice(2));
 
@@ -140,14 +117,92 @@ async function main() {
   console.log("═══════════════════════════════════════════════");
 
   if (mode === "runner-only") {
-    await emitBlockedAtR1();
+    const pipeline = [];
+    const progress = evaluateReleaseRollbackProgress(pipeline, { through: null });
+    const report = buildReleaseRollbackEvidenceReport({
+      status: progress.status,
+      reason: progress.reason,
+      pipeline,
+      validation: {
+        duplicates: progress.duplicates,
+        missing: progress.missing,
+        out_of_order: progress.out_of_order,
+        firstFailure: progress.firstFailure,
+      },
+      code_status: "RUNNER_ONLY",
+      progress,
+      evidence: {},
+    });
+
+    console.log("");
+    console.log("RELEASE-ROLLBACK");
+    console.log("");
+    console.log(report.status);
+    console.log("");
+    console.log(`blocked_at=${report.blocked_at}`);
+    console.log(`duplicates=${JSON.stringify(report.duplicates)}`);
+    console.log(`missing=${JSON.stringify(report.missing)}`);
+    console.log(`out_of_order=${JSON.stringify(report.out_of_order)}`);
+    console.log(`evidence=${JSON.stringify(report.evidence)}`);
+
+    const out = await writeEvidence(report, "runner-only", null);
+    console.log(`evidence_file: ${path.relative(ROOT, out)}`);
+    process.exit(exitFor(progress));
   }
 
   if (mode === "live") {
-    console.error(
-      "LIVE mode requires CERTIFIED_THROUGH >= 1 (R1 driver). Not in this PR.",
+    const scope = through ?? RELEASE_ROLLBACK_CERTIFIED_THROUGH;
+    console.log(`Driving RELEASE-ROLLBACK segments (through=R${scope})…`);
+    const driver = runReleaseRollbackCapabilityDriver({
+      root: ROOT,
+      through: scope,
+    });
+    if (!driver.ok) {
+      console.error("Capability driver failed:");
+      console.error(driver.reason ?? "unknown");
+      const report = buildReleaseRollbackEvidenceReport({
+        status: "FAIL",
+        reason: driver.reason ?? "RELEASE-ROLLBACK capability driver failed",
+        pipeline: driver.steps,
+        code_status: "CAPABILITY_DRIVER_FAIL",
+        evidence: driver.evidence ?? {},
+      });
+      await writeEvidence(report, "live", through);
+      process.exit(RELEASE_ROLLBACK_EXIT.FAIL);
+    }
+
+    const observed = driver.steps;
+    const progress = evaluateReleaseRollbackProgress(observed, {
+      through: scope,
+    });
+    const report = buildReleaseRollbackEvidenceReport({
+      status: progress.status,
+      reason: progress.reason,
+      pipeline: observed,
+      validation: progress,
+      code_status: `CAPABILITY_DRIVER_R${progress.certified_through || 0}`,
+      progress,
+      evidence: driver.evidence ?? {},
+      meta: {
+        terminal: {
+          segment: RELEASE_ROLLBACK_SEGMENTS[progress.certified_through] ?? null,
+        },
+      },
+    });
+
+    console.log(formatReleaseRollbackComparisonTable(progress));
+    console.log("");
+    console.log(progress.reason);
+    console.log(
+      `certified_through=R${progress.certified_through || 0} · blocked_at=${progress.blocked_at ?? "—"}`,
     );
-    process.exit(RELEASE_ROLLBACK_EXIT.FAIL);
+    console.log(
+      `duplicates=${JSON.stringify(report.duplicates)} missing=${JSON.stringify(report.missing)} out_of_order=${JSON.stringify(report.out_of_order)}`,
+    );
+
+    const out = await writeEvidence(report, "live", through ?? scope);
+    console.log(`evidence_file: ${path.relative(ROOT, out)}`);
+    process.exit(exitFor(progress));
   }
 
   if (mode === "self-test") {

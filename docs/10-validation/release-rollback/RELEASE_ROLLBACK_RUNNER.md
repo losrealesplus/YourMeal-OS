@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_ROLLBACK_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ Runner **CERTIFIED** desde `main` (#210 · `a1fbdc3`) · runner-only **BLOCKED** at R1 · Gate ✅ READY  
+**Estado:** ✅ Runner **CERTIFIED** (#210 · `a1fbdc3`) · live through R1 · runner-only **BLOCKED** at R1 · Gate ✅ READY  
 **Spec:** [RELEASE_ROLLBACK_SPEC](../../00-status/RELEASE_ROLLBACK_SPEC.md) (FROZEN · #208 · `4d109f7`)  
 **DoR:** [RELEASE_ROLLBACK_DOR](../../00-status/RELEASE_ROLLBACK_DOR.md)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
@@ -53,26 +53,29 @@ PASS → tag release-rollback-pass
 ## Comandos
 
 ```bash
-# Default (CERTIFIED_THROUGH = 0) · empty pipeline
+# Default live through max certified (R1)
 npm run test:release-rollback
-# → BLOCKED · blocked_at=RELEASE_ROLLBACK_R1_STARTED
-#   duplicates=[] · missing=[] · out_of_order=[] · evidence={} · exit 2
+# → PASS through R1 · blocked_at=RELEASE_ROLLBACK_R2_STARTED · exit 0
 
-# Explicit Gate / Land Check
+# RELEASE-ROLLBACK-001
+npm run test:release-rollback-001
+# → PASS through R1 · BLOCKED at R2 · exit 0
+
+# Historic Gate / Land Check vacío
 npm run test:release-rollback:runner-only
-# → same BLOCKED at R1 · exit 2
+# → BLOCKED at RELEASE_ROLLBACK_R1_STARTED · exit 2 · evidence={}
 
-# Unit tests (pipeline only · no R1 driver)
+# Unit tests (pipeline + R1 · no R2 driver)
 npm run test:release-rollback:unit
 ```
 
-**BLOCKED (runner-only) no es defecto** — es el baseline Gate hasta RELEASE-ROLLBACK-001.
+**BLOCKED (runner-only) no es defecto** — conserva el baseline Gate histórico.
 
 ---
 
-## Fuera de alcance (este PR)
+## Fuera de alcance (001)
 
-- Drivers R1 / R2 / R3  
+- Drivers R2 / R3  
 - Ejecución de rollback / restore  
 - Infra · CI · GitHub Actions · secretos  
 - FLOW-05 · `release-01-beta`  
@@ -82,7 +85,7 @@ npm run test:release-rollback:unit
 
 ## Gate
 
-Ver: [RELEASE_ROLLBACK_GATE](./RELEASE_ROLLBACK_GATE.md) · Decision: ✅ **READY TO OPEN** · RELEASE-ROLLBACK-001 (R1 only).
+Ver: [RELEASE_ROLLBACK_GATE](./RELEASE_ROLLBACK_GATE.md) · Decision: ✅ READY · 001 ▶ [ACTA](./RELEASE_ROLLBACK_001_R1_ACTA.md).
 
 ---
 
@@ -92,21 +95,27 @@ Ver: [RELEASE_ROLLBACK_GATE](./RELEASE_ROLLBACK_GATE.md) · Decision: ✅ **READ
 |-----------|------|
 | CLI | `scripts/release-rollback-canonical.mjs` |
 | Pipeline | `scripts/lib/release-rollback-canonical-pipeline.mjs` |
-| Unit | `scripts/lib/release-rollback-canonical-pipeline.spec.mjs` |
+| Capability driver | `scripts/lib/release-rollback-capability-driver.mjs` |
+| R1 Detect/Decide | `scripts/lib/release-rollback-r1-detect-decide.mjs` |
+| Unit | `scripts/lib/release-rollback-*-pipeline.spec.mjs` · `release-rollback-r1-detect-decide.spec.mjs` |
+| 001 live evidence | `docs/10-validation/release-rollback/evidence/release-rollback-001-canonical-live.json` |
 | Runner-only evidence | `docs/10-validation/release-rollback/evidence/release-rollback-canonical.json` |
 
 ---
 
-## Land Check (certified)
+## Land Check (001 · from this PR)
 
 ```bash
 git pull origin main
+npm run test:release-rollback-001
+# → PASS through R1 · BLOCKED at RELEASE_ROLLBACK_R2_STARTED · exit 0
 npm run test:release-rollback
-# → BLOCKED at RELEASE_ROLLBACK_R1_STARTED · exit 2 · evidence={}
-# verified from main @ a1fbdc3 (#210)
+# → same
+npm run test:release-rollback:runner-only
+# → BLOCKED at RELEASE_ROLLBACK_R1_STARTED · exit 2
 ```
 
-Next: **RELEASE-ROLLBACK-001** (solo R1) · PASS through R1 · BLOCKED at R2.
+Next after 001 Land Check: **RELEASE-ROLLBACK-002** (solo R2).
 
 ---
 

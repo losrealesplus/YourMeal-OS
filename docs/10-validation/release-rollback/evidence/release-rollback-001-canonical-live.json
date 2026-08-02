@@ -1,0 +1,51 @@
+{
+  "status": "PASS",
+  "reason": "PASS through R1 · BLOCKED at RELEASE_ROLLBACK_R2_STARTED for full RELEASE-ROLLBACK",
+  "gate": "RELEASE-ROLLBACK",
+  "contract": "RELEASE_ROLLBACK_SPEC",
+  "level": "release",
+  "certifies": "controlled_recovery",
+  "complements_deploy_e2e_smoke_crossflow": true,
+  "principle": "Evidence before Implementation",
+  "code_status": "CAPABILITY_DRIVER_R1",
+  "at": "2026-08-02T20:08:41.534Z",
+  "pipeline": [
+    "RELEASE_ROLLBACK_R1_STARTED",
+    "RELEASE_ROLLBACK_R1_COMPLETED"
+  ],
+  "expected": [
+    "RELEASE_ROLLBACK_R1_STARTED",
+    "RELEASE_ROLLBACK_R1_COMPLETED",
+    "RELEASE_ROLLBACK_R2_STARTED",
+    "RELEASE_ROLLBACK_R2_COMPLETED",
+    "RELEASE_ROLLBACK_R3_STARTED",
+    "RELEASE_ROLLBACK_R3_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": null,
+  "certified_through": 1,
+  "blocked_at": "RELEASE_ROLLBACK_R2_STARTED",
+  "delivery": "RELEASE-ROLLBACK-001",
+  "delivery_status": "PASS",
+  "gate_status": "BLOCKED",
+  "terminal": {
+    "segment": "detect_decide"
+  },
+  "evidence": {
+    "r1_checks": [
+      "release_rollback_canonical_script_present",
+      "release_rollback_canonical_pipeline_intact",
+      "release_deploy_pass_tag_present",
+      "release_deploy_pass_acta_present",
+      "release_rollback_spec_present",
+      "release_rollback_gate_present"
+    ],
+    "r1_mapped_tokens": [
+      "RELEASE_ROLLBACK_R1_STARTED",
+      "RELEASE_ROLLBACK_R1_COMPLETED"
+    ],
+    "r1_source": "release-deploy-pass + Rollback Spec/Gate (no R2+ · no restore · no infra)"
+  }
+}
