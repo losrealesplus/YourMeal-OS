@@ -23,6 +23,14 @@
 
 ---
 
+## Goal
+
+Certificar que los Outcomes de FLOW-01…04 **encadenan** en una cadena operativa mínima  
+reproducible, con evidencia `RELEASE_CROSSFLOW_*` y sin inventar estados fuera de las Specs  
+ya FROZEN. Cross-flow es un gate DoRl de producto (Track B), no un Flow nuevo.
+
+---
+
 ## Pregunta de capability (borrador · Spec la congela)
 
 > Con FLOW-01…04 certificados de forma aislada,  
@@ -60,6 +68,20 @@ Un Cross-flow PASS no reabre ni renegocia un `flowNN-pass`.
 
 **Ancla:** Outcomes terminales de FLOW-01…04 como insumos.  
 **No reabre** RELEASE-SMOKE salvo regresión del tag `release-smoke-pass`.
+
+---
+
+## Out of scope (explícito · este capability y este PR)
+
+| Fuera | Motivo |
+|-------|--------|
+| Specification / Freeze / Runner / scripts / tests | Siguientes PRs FOPEBA |
+| Implementación de dominio · `src/` · migraciones · Supabase | Evidence before Implementation |
+| UI · Playwright E2E completo | B-03 E2E |
+| Deploy · Rollback | B-04 · B-05 |
+| `release-01-beta` | DoRl PASS de todos los gates |
+| FLOW-05 / FLOW-06 | Track A; solo si Track B lo bloquea |
+| Renegociar FLOW-01…04 o RELEASE-SMOKE | Ya certificados con tag `-pass` |
 
 ---
 
@@ -201,19 +223,40 @@ Tag: `release-crossflow-pass` — solo tras Land Check desde `main` + acta.
 
 ---
 
-## Evidence contract (ubicación)
+## Naming convention (Track B · igual que RELEASE-SMOKE)
 
-| Artefacto | Path / comando |
-|-----------|----------------|
-| Spec (siguiente) | `docs/00-status/RELEASE_CROSSFLOW_SPEC.md` |
-| Runner docs | `docs/10-validation/release-crossflow/RELEASE_CROSSFLOW_RUNNER.md` |
-| Gate report | `docs/10-validation/release-crossflow/RELEASE_CROSSFLOW_GATE.md` |
-| Actas Cₙ | `docs/10-validation/release-crossflow/RELEASE_CROSSFLOW_00N_C*_ACTA.md` |
-| PASS acta | `docs/10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md` |
-| Evidence JSON | `docs/10-validation/release-crossflow/evidence/` |
-| npm (futuro) | `test:release-crossflow` · `test:release-crossflow-001`… |
+Documentación futura — **no creada en este PR**:
+
+```text
+docs/00-status/RELEASE_CROSSFLOW_DOR.md          ← este documento
+docs/00-status/RELEASE_CROSSFLOW_SPEC.md
+
+docs/10-validation/release-crossflow/
+  RELEASE_CROSSFLOW_RUNNER.md
+  RELEASE_CROSSFLOW_GATE.md
+  RELEASE_CROSSFLOW_001_C1_ACTA.md
+  RELEASE_CROSSFLOW_002_C2_ACTA.md
+  RELEASE_CROSSFLOW_003_C3_ACTA.md
+  RELEASE_CROSSFLOW_004_C4_ACTA.md
+  RELEASE_CROSSFLOW_PASS_ACTA.md
+  evidence/
+
+tag: release-crossflow-pass
+npm (futuro): test:release-crossflow · test:release-crossflow-001…
+```
 
 ---
+
+## Evidence contract (ubicación)
+
+| Artefacto | Path |
+|-----------|------|
+| DoR (este) | `docs/00-status/RELEASE_CROSSFLOW_DOR.md` |
+| Spec (siguiente) | `docs/00-status/RELEASE_CROSSFLOW_SPEC.md` |
+| Runner / Gate / Actas | `docs/10-validation/release-crossflow/` (ver Naming) |
+
+---
+
 
 ## Gate · Abrir CROSSFLOW-001
 
