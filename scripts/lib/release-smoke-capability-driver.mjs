@@ -1,12 +1,13 @@
 /**
  * RELEASE-SMOKE · Capability driver (platform — not domain).
  *
- * S1 = preflight · S2 = Auth · S3 = Bootstrap
- * (PS-002-C mapped · no full Playwright E2E · no Dashboard in S3).
+ * S1 = preflight · S2 = Auth · S3 = Bootstrap · S4 = Dashboard
+ * (PS-002-C mapped · no Cross-flow · no full Playwright E2E).
  */
 import { runReleaseSmokeS1Preflight } from "./release-smoke-s1-preflight.mjs";
 import { runReleaseSmokeS2Auth } from "./release-smoke-s2-auth.mjs";
 import { runReleaseSmokeS3Bootstrap } from "./release-smoke-s3-bootstrap.mjs";
+import { runReleaseSmokeS4Dashboard } from "./release-smoke-s4-dashboard.mjs";
 
 /**
  * @param {{ root: string, through?: 1|2|3|4 | null }} opts
@@ -96,15 +97,30 @@ export function runReleaseSmokeCapabilityDriver({ root, through = null }) {
   });
   steps.push("RELEASE_SMOKE_S3_COMPLETED");
 
-  if (max >= 4) {
-    return {
-      ok: false,
-      steps,
-      reason:
-        "RELEASE-SMOKE S4 not implemented (RELEASE-SMOKE-003 scope is S3 only)",
-      evidence,
-    };
+  if (max < 4) return { ok: true, steps, evidence };
+
+  // —— S4 · Dashboard ——
+  console.info("[RELEASE-SMOKE]", "RELEASE_SMOKE_S4_STARTED", {
+    capability: "dashboard",
+  });
+  steps.push("RELEASE_SMOKE_S4_STARTED");
+
+  const s4 = runReleaseSmokeS4Dashboard({ cwd: root });
+  evidence.s4_checks = s4.checks;
+  if (!s4.ok) {
+    console.error("[RELEASE-SMOKE] S4 dashboard FAIL:\n" + s4.reason);
+    return { ok: false, steps, reason: s4.reason, evidence };
   }
+  evidence.s4_mapped_tokens = s4.mapped_tokens;
+  evidence.s4_source = s4.source;
+
+  console.info("[RELEASE-SMOKE]", "RELEASE_SMOKE_S4_COMPLETED", {
+    capability: "dashboard",
+    mapped_tokens: s4.mapped_tokens,
+    source: s4.source,
+    checks: s4.checks,
+  });
+  steps.push("RELEASE_SMOKE_S4_COMPLETED");
 
   return { ok: true, steps, evidence };
 }

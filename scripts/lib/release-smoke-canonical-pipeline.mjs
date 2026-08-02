@@ -344,7 +344,7 @@ export function evaluateReleaseSmokeProgress(observed, opts = {}) {
         reason:
           through < 4
             ? `PASS through S${through} · BLOCKED at ${RELEASE_SMOKE_CANONICAL_STEPS[through * 2]} for full RELEASE-SMOKE`
-            : "RELEASE-SMOKE complete",
+            : "PASS through S4 · RELEASE-SMOKE FULL PASS",
         ok: true,
         missing: [],
         firstFailure: null,

@@ -1,0 +1,103 @@
+{
+  "status": "PASS",
+  "reason": "PASS through S4 · RELEASE-SMOKE FULL PASS",
+  "gate": "RELEASE-SMOKE",
+  "contract": "RELEASE_SMOKE_SPEC",
+  "level": "release",
+  "certifies": "platform_capabilities",
+  "not_domain_entities": true,
+  "principle": "Evidence before Implementation",
+  "code_status": "CAPABILITY_DRIVER_S4",
+  "at": "2026-08-02T17:23:35.658Z",
+  "pipeline": [
+    "RELEASE_SMOKE_S1_STARTED",
+    "RELEASE_SMOKE_S1_COMPLETED",
+    "RELEASE_SMOKE_S2_STARTED",
+    "RELEASE_SMOKE_S2_COMPLETED",
+    "RELEASE_SMOKE_S3_STARTED",
+    "RELEASE_SMOKE_S3_COMPLETED",
+    "RELEASE_SMOKE_S4_STARTED",
+    "RELEASE_SMOKE_S4_COMPLETED"
+  ],
+  "expected": [
+    "RELEASE_SMOKE_S1_STARTED",
+    "RELEASE_SMOKE_S1_COMPLETED",
+    "RELEASE_SMOKE_S2_STARTED",
+    "RELEASE_SMOKE_S2_COMPLETED",
+    "RELEASE_SMOKE_S3_STARTED",
+    "RELEASE_SMOKE_S3_COMPLETED",
+    "RELEASE_SMOKE_S4_STARTED",
+    "RELEASE_SMOKE_S4_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": null,
+  "certified_through": 4,
+  "blocked_at": null,
+  "delivery": "RELEASE-SMOKE-004",
+  "delivery_status": "PASS",
+  "gate_status": "PASS",
+  "terminal": {
+    "capability": "dashboard"
+  },
+  "evidence": {
+    "s1_checks": [
+      "env_example_exists",
+      "official_project_id_documented",
+      "vite_supabase_keys_documented",
+      "no_invented_publishable_key_in_template",
+      "test_release_smoke_script_present"
+    ],
+    "s2_checks": [
+      "ps002_canonical_auth_script_present",
+      "fcr008_auth_prefix_intact",
+      "ps002c_pass_tag_present",
+      "ps002_credential_slots_documented",
+      "auth_surface_present"
+    ],
+    "s2_mapped_tokens": [
+      "LOGIN",
+      "LOGIN_OK",
+      "CANONICAL_SESSION"
+    ],
+    "s2_source": "ps002c-pass + FCR-008 Auth prefix (no full Playwright suite)",
+    "s3_checks": [
+      "ps002_canonical_auth_script_present",
+      "fcr008_bootstrap_segment_intact",
+      "ps002c_pass_tag_present",
+      "post_login_pipeline_emits_bootstrap_tokens",
+      "bootstrap_surface_present"
+    ],
+    "s3_mapped_tokens": [
+      "BOOTSTRAP_START",
+      "IDENTITY_READY",
+      "PROFILE_READY",
+      "MEMBERSHIP_READY",
+      "ROLE_READY"
+    ],
+    "s3_source": "ps002c-pass + FCR-008 bootstrap segment (no Dashboard / no full Playwright E2E)",
+    "s4_checks": [
+      "ps002_canonical_auth_script_present",
+      "fcr008_role_ready_precedes_dashboard",
+      "fcr008_dashboard_segment_intact",
+      "ps002c_pass_tag_present",
+      "post_login_pipeline_emits_dashboard_tokens",
+      "home_path_surface_present",
+      "dashboard_surface_present"
+    ],
+    "s4_mapped_tokens": [
+      "HOME_PATH_RESOLVED",
+      "NAVIGATE",
+      "DASHBOARD_RENDERED"
+    ],
+    "s4_source": "ps002c-pass + FCR-008 dashboard segment (no Cross-flow / no full Playwright E2E)"
+  },
+  "duration_ms": {
+    "s1_ms": 15,
+    "s2_ms": 15,
+    "s3_ms": 15,
+    "s4_ms": 15,
+    "smoke_total_ms": 105
+  }
+}

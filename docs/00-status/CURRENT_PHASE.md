@@ -50,9 +50,9 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    Track B › RELEASE-SMOKE-003 S3 Bootstrap
-                               → ../10-validation/release-smoke/RELEASE_SMOKE_003_S3_ACTA.md
-                               001–002 CERTIFIED (#174 · #175) · next S4 Dashboard
+  Prioridad                    Track B › RELEASE-SMOKE-004 S4 Dashboard
+                               → ../10-validation/release-smoke/RELEASE_SMOKE_004_S4_ACTA.md
+                               001–003 CERTIFIED (#174–#176) · Smoke → FULL PASS
                                Roadmap: smoke → crossflow → e2e → deploy
                                         → rollback → beta → release-01-beta
   Regla Release                capacidades plataforma ≠ entidades dominio
