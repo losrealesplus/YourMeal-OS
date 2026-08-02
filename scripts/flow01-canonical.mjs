@@ -185,7 +185,11 @@ async function main() {
         order_status:
           orderStatusForThrough[progress.certified_through] ?? null,
         packaging_batch:
-          progress.certified_through >= 2 ? "IN_PROGRESS" : null,
+          progress.certified_through >= 3
+            ? "CLOSED"
+            : progress.certified_through >= 2
+              ? "IN_PROGRESS"
+              : null,
       },
       progress,
     });
@@ -204,6 +208,11 @@ async function main() {
     console.log(`evidence: ${path.relative(ROOT, out)}`);
 
     if (
+      progress.certified_through >= 3 &&
+      progress.blocked_at === "FLOW01_T4_STARTED"
+    ) {
+      console.log("FLOW01-003 · PASS through T3 · BLOCKED at T4 (expected)");
+    } else if (
       progress.certified_through >= 2 &&
       progress.blocked_at === "FLOW01_T3_STARTED"
     ) {

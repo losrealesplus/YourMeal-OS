@@ -38,12 +38,13 @@ Fase proyecto
 Sprint activo
   FLOW-01 SPEC                 ✅ FROZEN (#141)
   FLOW-01 Runner               ✅ MERGED (#142)
-  FLOW01-001 T1                ✅ CERTIFIED
-  FLOW01-002 T2                ▶ Production → Packaging
-  FLOW01-003…004               ⏳ una transición / PR
+  FLOW01-001 T1                ✅ CERTIFIED (#143)
+  FLOW01-002 T2                ✅ CERTIFIED (#144)
+  FLOW01-003 T3                ▶ Packaging → Delivery handoff
+  FLOW01-004 T4                ⏳
   Plan: ./FLOW_01_DELIVERY_PLAN.md
   Live: npm run test:flow01-canonical -- --live
-        → PASS through T2 · BLOCKED at T3
+        → PASS through T3 · BLOCKED at T4
   Acta PS-002-C: ../10-validation/platform-stabilization/PS002C_PASS_ACTA.md
   Tag restauración: ps002c-pass → 545bd19
   Beta paralelo: BR-03.3 Runtime Validation (G3)
