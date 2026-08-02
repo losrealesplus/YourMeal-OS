@@ -106,10 +106,10 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual Track B:** **RELEASE-ROLLBACK-003** (R3 Post-rollback Verify only).  
-002 ✅ CERTIFIED (#214 · `2838138`) · Land Check desde `main` OK.  
-Gate ✅ READY TO OPEN 003 · [GATE](../10-validation/release-rollback/RELEASE_ROLLBACK_GATE.md).  
-Do **not** open FLOW-05 · RELEASE-01-BETA in 003.  
+**Objetivo actual Track B:** **RELEASE-ROLLBACK-003** (R3 Post-rollback Verify · este PR).  
+002 ✅ CERTIFIED (#214 · `2838138`) · cert docs (#215 · `b6eb2dd`).  
+Contrato: `npm run test:release-rollback` → FULL PASS · certified_through=R3 · `blocked_at=—` · exit 0.  
+Do **not** open FLOW-05 · RELEASE-01-BETA · tag hasta Land Check desde `main`.  
 **Reglas:** (1) Release gates ≠ Flow runners · (2) Land Check desde `main` (Regla 9).
 
 Cross-flow **no sustituye** runners canónicos: los runners certifican contratos;  
@@ -188,7 +188,7 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 ## Current Goal
 
 ```text
-Track B (prioridad): RELEASE-ROLLBACK-003 (R3) → Land Check → release-rollback-pass
+Track B (prioridad): RELEASE-ROLLBACK-003 (R3 FULL PASS) → Land Check → release-rollback-pass
 Track A:             Do NOT open FLOW-05 unless Track B finds a blocker
 FOPEBA_LAND_CHECK:   ACTIVE · before every 001 / tag
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos

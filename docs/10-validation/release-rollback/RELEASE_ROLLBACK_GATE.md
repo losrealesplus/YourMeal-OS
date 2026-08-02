@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_ROLLBACK_GATE.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **READY** · 002 CERTIFIED desde `main` · READY TO OPEN 003  
+**Estado:** ✅ **READY** · 002 CERTIFIED · 003 ▶ este PR (R3 · FULL PASS)  
 **Nivel:** Release Track B · B-05 Rollback  
 **Spec:** [RELEASE_ROLLBACK_SPEC](../../00-status/RELEASE_ROLLBACK_SPEC.md) ✅ FROZEN #208  
 **Runner:** [RELEASE_ROLLBACK_RUNNER](./RELEASE_ROLLBACK_RUNNER.md) ✅ #210 · `a1fbdc3`  
@@ -20,33 +20,35 @@
 ☑ Runner certified (#210 → a1fbdc3)
 ☑ Gate READY (#211 → 9e9c777)
 ☑ R1 certified (#212 → 9c52d01 · cert #213)
-☑ R2 certified (#214 → 2838138)
-☑ Canonical PASS through R2 verified from main
-☑ runner-only BLOCKED at R1 verified from main
+☑ R2 certified (#214 → 2838138 · cert #215)
+☑ R3 OPEN (este PR) · FULL PASS · blocked_at=—
+☑ runner-only BLOCKED at R1 (historic baseline)
 ```
 
-### Land Check evidence (from `main` @ `2838138`)
+### Land Check evidence (expected after 003 merge)
 
 ```bash
 git pull origin main
-npm run test:release-rollback-002
+npm run test:release-rollback-003
 npm run test:release-rollback
 npm run test:release-rollback:runner-only
 ```
 
 | Comando | Resultado |
 |---------|-----------|
-| `test:release-rollback-002` | PASS through R2 · `blocked_at=RELEASE_ROLLBACK_R3_STARTED` · exit 0 |
-| `test:release-rollback` | PASS through R2 · BLOCKED at R3 · exit 0 |
+| `test:release-rollback-003` | FULL PASS · `certified_through=R3` · `blocked_at=—` · exit 0 |
+| `test:release-rollback` | FULL PASS · certified_through=R3 · blocked_at=— · exit 0 |
 | `test:release-rollback:runner-only` | BLOCKED at `RELEASE_ROLLBACK_R1_STARTED` · exit 2 |
 
 ### Decision
 
 ```text
-READY TO OPEN
-RELEASE-ROLLBACK-003 · R3 only
-Post-rollback Verify
-Nothing beyond R3.
+RELEASE-ROLLBACK-003 · R3 OPEN (este PR)
+FULL PASS · blocked_at=—
+    ↓
+Land Check from main → tag release-rollback-pass
+    ↓
+READY TO OPEN RELEASE-01-BETA DoR (docs only)
 ```
 
 ### Progress
@@ -59,11 +61,12 @@ Nothing beyond R3.
 | Gate | READY | ✅ #211 |
 | RELEASE-ROLLBACK-001 | R1 Detect/Decide | ✅ CERTIFIED #212 |
 | RELEASE-ROLLBACK-002 | R2 Execute Rollback/Restore | ✅ CERTIFIED #214 |
-| RELEASE-ROLLBACK-003 | R3 Post-rollback Verify | ⏳ READY TO OPEN |
-| `release-rollback-pass` | FULL PASS | ⏳ |
+| RELEASE-ROLLBACK-003 | R3 Post-rollback Verify | ▶ este PR |
+| `release-rollback-pass` | FULL PASS | ⏳ after Land Check |
 
 Acta 001: [RELEASE_ROLLBACK_001_R1_ACTA](./RELEASE_ROLLBACK_001_R1_ACTA.md) ·  
-Acta 002: [RELEASE_ROLLBACK_002_R2_ACTA](./RELEASE_ROLLBACK_002_R2_ACTA.md).
+Acta 002: [RELEASE_ROLLBACK_002_R2_ACTA](./RELEASE_ROLLBACK_002_R2_ACTA.md) ·  
+Acta 003: [RELEASE_ROLLBACK_003_R3_ACTA](./RELEASE_ROLLBACK_003_R3_ACTA.md).
 
 ---
 

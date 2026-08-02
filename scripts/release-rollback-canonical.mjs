@@ -4,7 +4,7 @@
  *
  * Certifies controlled recovery (R1–R3). Complements Deploy + Smoke + Cross-flow + E2E.
  *
- * Default (`npm run test:release-rollback`): --live through max certified (R2).
+ * Default (`npm run test:release-rollback`): --live through max certified (R3).
  * Modes:
  *   --live           Drive certified segments (default through = max certified).
  *   --runner-only    Empty pipeline → BLOCKED at R1 (historic Gate land-check).
@@ -14,11 +14,11 @@
  *
  * Spec: docs/00-status/RELEASE_ROLLBACK_SPEC.md
  *
- * NO R3 driver in this PR · NO CI · NO infra · NO remote restore execution.
+ * NO remote restore · NO CI · NO infra · NO RELEASE-01-BETA · NO FLOW-05.
  */
 
 /** Highest segment with a capability driver implemented. */
-const RELEASE_ROLLBACK_CERTIFIED_THROUGH = 2;
+const RELEASE_ROLLBACK_CERTIFIED_THROUGH = 3;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -202,6 +202,25 @@ async function main() {
 
     const out = await writeEvidence(report, "live", through ?? scope);
     console.log(`evidence_file: ${path.relative(ROOT, out)}`);
+
+    if (
+      progress.certified_through >= 3 &&
+      progress.status === "PASS" &&
+      progress.blocked_at == null
+    ) {
+      const fullOut = path.join(
+        EVIDENCE_DIR,
+        "release-rollback-canonical-live.json",
+      );
+      await writeFile(fullOut, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+      console.log(`evidence_file: ${path.relative(ROOT, fullOut)}`);
+      console.log("RELEASE-ROLLBACK");
+      console.log("FULL PASS");
+      console.log(
+        "RELEASE-ROLLBACK-003 · PASS through R3 · certified_through=R3 · blocked_at=—",
+      );
+    }
+
     process.exit(exitFor(progress));
   }
 

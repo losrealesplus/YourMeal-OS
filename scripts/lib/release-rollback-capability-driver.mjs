@@ -3,10 +3,11 @@
  *
  * R1 = Detect / Decide (release-deploy-pass + Spec/Gate)
  * R2 = Execute Rollback / Restore (R1 CERTIFIED + execute procedure + deploy tip)
- * R3 = Post-rollback Verify (future · RELEASE-ROLLBACK-003)
+ * R3 = Post-rollback Verify (R2 CERTIFIED + verify procedure + preview surface)
  */
 import { runReleaseRollbackR1DetectDecide } from "./release-rollback-r1-detect-decide.mjs";
 import { runReleaseRollbackR2ExecuteRestore } from "./release-rollback-r2-execute-restore.mjs";
+import { runReleaseRollbackR3PostRollbackVerify } from "./release-rollback-r3-post-rollback-verify.mjs";
 
 /**
  * @param {{ root: string, through?: 1|2|3 | null }} opts
@@ -75,11 +76,27 @@ export function runReleaseRollbackCapabilityDriver({ root, through = null }) {
 
   if (max < 3) return { ok: true, steps, evidence };
 
-  return {
-    ok: false,
-    steps,
-    reason:
-      "R3 Post-rollback Verify driver not implemented (RELEASE-ROLLBACK-003). Do not invent verify.",
-    evidence,
-  };
+  console.info("[RELEASE-ROLLBACK]", "RELEASE_ROLLBACK_R3_STARTED", {
+    segment: "post_rollback_verify",
+  });
+  steps.push("RELEASE_ROLLBACK_R3_STARTED");
+
+  const r3 = runReleaseRollbackR3PostRollbackVerify({ cwd: root });
+  evidence.r3_checks = r3.checks;
+  if (!r3.ok) {
+    console.error("[RELEASE-ROLLBACK] R3 FAIL:\n" + r3.reason);
+    return { ok: false, steps, reason: r3.reason, evidence };
+  }
+  evidence.r3_mapped_tokens = r3.mapped_tokens;
+  evidence.r3_source = r3.source;
+
+  console.info("[RELEASE-ROLLBACK]", "RELEASE_ROLLBACK_R3_COMPLETED", {
+    segment: "post_rollback_verify",
+    mapped_tokens: r3.mapped_tokens,
+    source: r3.source,
+    checks: r3.checks,
+  });
+  steps.push("RELEASE_ROLLBACK_R3_COMPLETED");
+
+  return { ok: true, steps, evidence };
 }

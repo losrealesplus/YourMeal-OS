@@ -1,19 +1,21 @@
 {
   "status": "PASS",
-  "reason": "PASS through R2 · BLOCKED at RELEASE_ROLLBACK_R3_STARTED for full RELEASE-ROLLBACK",
+  "reason": "PASS through R3 · RELEASE-ROLLBACK FULL PASS",
   "gate": "RELEASE-ROLLBACK",
   "contract": "RELEASE_ROLLBACK_SPEC",
   "level": "release",
   "certifies": "controlled_recovery",
   "complements_deploy_e2e_smoke_crossflow": true,
   "principle": "Evidence before Implementation",
-  "code_status": "CAPABILITY_DRIVER_R2",
-  "at": "2026-08-02T20:26:28.433Z",
+  "code_status": "CAPABILITY_DRIVER_R3",
+  "at": "2026-08-02T20:26:28.235Z",
   "pipeline": [
     "RELEASE_ROLLBACK_R1_STARTED",
     "RELEASE_ROLLBACK_R1_COMPLETED",
     "RELEASE_ROLLBACK_R2_STARTED",
-    "RELEASE_ROLLBACK_R2_COMPLETED"
+    "RELEASE_ROLLBACK_R2_COMPLETED",
+    "RELEASE_ROLLBACK_R3_STARTED",
+    "RELEASE_ROLLBACK_R3_COMPLETED"
   ],
   "expected": [
     "RELEASE_ROLLBACK_R1_STARTED",
@@ -27,13 +29,13 @@
   "missing": [],
   "out_of_order": [],
   "firstFailure": null,
-  "certified_through": 2,
-  "blocked_at": "RELEASE_ROLLBACK_R3_STARTED",
-  "delivery": "RELEASE-ROLLBACK-002",
+  "certified_through": 3,
+  "blocked_at": null,
+  "delivery": "RELEASE-ROLLBACK-003",
   "delivery_status": "PASS",
-  "gate_status": "BLOCKED",
+  "gate_status": "PASS",
   "terminal": {
-    "segment": "execute_rollback_restore"
+    "segment": "post_rollback_verify"
   },
   "evidence": {
     "r1_checks": [
@@ -59,6 +61,18 @@
       "RELEASE_ROLLBACK_R2_STARTED",
       "RELEASE_ROLLBACK_R2_COMPLETED"
     ],
-    "r2_source": "R1 CERTIFIED + RELEASE_ROLLBACK_EXECUTE + release-deploy-pass (no R3 · no remote restore · no infra)"
+    "r2_source": "R1 CERTIFIED + RELEASE_ROLLBACK_EXECUTE + release-deploy-pass (no R3 · no remote restore · no infra)",
+    "r3_checks": [
+      "release_rollback_r2_acta_certified",
+      "release_rollback_verify_procedure_present",
+      "release_rollback_preview_script_present",
+      "release_rollback_app_entry_present",
+      "release_deploy_pass_tag_present"
+    ],
+    "r3_mapped_tokens": [
+      "RELEASE_ROLLBACK_R3_STARTED",
+      "RELEASE_ROLLBACK_R3_COMPLETED"
+    ],
+    "r3_source": "R2 CERTIFIED + RELEASE_ROLLBACK_VERIFY + preview + release-deploy-pass (no BETA · no E2E re-run · no infra)"
   }
 }
