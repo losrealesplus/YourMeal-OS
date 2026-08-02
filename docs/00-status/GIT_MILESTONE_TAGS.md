@@ -13,10 +13,12 @@
 |------|---------|---------|-----------|
 | **Platform** | `platform-*` o hitos Auth/PS | `ps002c-pass` · futuro `platform-stable` | Infraestructura, Auth, bootstrap, estabilización |
 | **Flow** | `flow*` / `flowNN-pass` | `flow01-pass` · `flow02-pass` | Flujos de negocio completamente certificados (PASS completo del runner) |
-| **Release** | `release-*` o `v*` semver | `release-v0.2.0` · `v0.2.0` | Versiones publicadas del producto |
+| **Release** | `release-*` o `v*` semver | `release-01-beta` · `release-v0.2.0` · `v0.2.0` | Producto como conjunto (beta / semver) |
 
 No cambia la metodología FOPEBA / Evidence before Implementation.  
 Hace legible el historial: **técnica** vs **dominio** vs **producto**.
+
+Gate de producto propuesto (aún DRAFT): [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) → futuro tag `release-01-beta` solo tras E2E Certification.
 
 ---
 

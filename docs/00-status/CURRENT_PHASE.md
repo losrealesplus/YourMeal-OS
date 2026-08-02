@@ -49,6 +49,8 @@ Sprint activo
   Activo                       FLOW-04 Inventory Consumption
                                ⏳ DoR NOT STARTED · sin Spec / runner / dominio
                                (no abrir implementación hasta Spec FROZEN + Runner)
+  Handoff                      ./PROJECT_HANDOFF.md (congelado 2026-08-02)
+  Release                      ./RELEASE_01_BETA_STRATEGY.md (DRAFT gate producto)
   Beta paralelo: BR-03.3 Runtime Validation (G3)
   Disciplina: una transición / PR · DoR antes de código
 
