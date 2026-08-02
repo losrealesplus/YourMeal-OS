@@ -50,9 +50,11 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    Track B › RELEASE-01 DoRl matrix (medible)
-                               → ./RELEASE_01_BETA_STRATEGY.md
-  Paralelo                     Track A · FLOW-05 DoR only si bloquea beta
+  Prioridad                    Track B › B-01 Smoke Spec READY FOR FREEZE
+                               → ./RELEASE_SMOKE_SPEC.md
+                               Roadmap: smoke → crossflow → e2e → deploy
+                                        → rollback → beta → release-01-beta
+  Paralelo                     Track A · FLOW-05 DoR only si Track B lo bloquea
                                (no abrir por inercia · mismo FOPEBA)
   Plan                         ./NEXT_EXECUTION_PLAN.md
   Metrics                      ./FOPEBA_METRICS.md (v0 · sin estimaciones)

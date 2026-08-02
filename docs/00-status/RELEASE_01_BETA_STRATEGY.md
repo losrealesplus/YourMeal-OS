@@ -64,20 +64,34 @@ Luego FLOW-06… según catálogo. Sin saltos. Sin features futuras en el PR del
 
 #### Matriz DoRl (viva · medible)
 
-| Gate DoRl | Estado | Evidencia |
-|-----------|--------|-----------|
+| Gate DoRl | Estado | Evidencia / hito |
+|-----------|--------|------------------|
 | FOUNDATION | ✅ | Platform / foundation locks |
 | PS-002C | ✅ | Tag `ps002c-pass` |
 | FLOW-01 | ✅ | Tag `flow01-pass` |
 | FLOW-02 | ✅ | Tag `flow02-pass` |
 | FLOW-03 | ✅ | Tag `flow03-pass` |
 | FLOW-04 | ✅ | Tag `flow04-pass` |
-| Smoke Tests | ⏳ | Artefacto + comando / acta (por definir) |
-| Cross-flow | ⏳ | Cadena multi-dominio (por definir) |
-| E2E | ⏳ | Jornada piloto (por definir) |
-| Deployment | ⏳ | Reproducible (por definir) |
-| Rollback | ⏳ | Procedimiento + prueba (por definir) |
-| Beta Acceptance | ⏳ | DoRl PASS → tag `release-01-beta` |
+| Smoke Tests | ⏳ | Spec ▶ [READY FOR FREEZE](./RELEASE_SMOKE_SPEC.md) → tag `release-smoke-pass` |
+| Cross-flow | ⏳ | Spec pendiente → tag `release-crossflow-pass` |
+| E2E | ⏳ | Spec pendiente → tag `release-e2e-pass` |
+| Deployment | ⏳ | Contract pendiente → tag `release-deploy-pass` |
+| Rollback | ⏳ | Contract pendiente → tag `release-rollback-pass` |
+| Beta Acceptance | ⏳ | Enlaza evidencia → tag `release-01-beta` |
+
+#### Roadmap Track B (mismo patrón FOPEBA · sin mezclar)
+
+```text
+B-01 Smoke        Spec → Freeze → Runner (BLOCKED) → impl → release-smoke-pass
+B-02 Cross-flow   Spec → Freeze → Runner (BLOCKED) → impl → release-crossflow-pass
+B-03 E2E          Spec → Freeze → Runner (BLOCKED) → impl → release-e2e-pass
+B-04 Deployment   DEPLOYMENT_CONTRACT → Runner → release-deploy-pass
+B-05 Rollback     Contract → Runner → release-rollback-pass
+B-06 Beta Accept. Solo al final → release-01-beta
+```
+
+Orden fijo. No abrir FLOW-05 salvo que Track B descubra un bloqueador que lo exija.  
+Convención de tags: homogénea con `flowNN-pass` — cada gate termina en `-pass`.
 
 Criterio de publicación: **todos los gates aplicables con evidencia**,  
 no “creemos que funciona”.
@@ -200,9 +214,9 @@ y cuándo un Flow adicional es bloqueador de beta (no “por inercia del catálo
 
 ## Next
 
-1. **Eje B (prioridad):** definir artefactos Smoke / Cross-flow / E2E; ir cerrando filas ⏳ de la matriz.  
-2. **Eje A:** FLOW-05 DoR only cuando sea bloqueador beta o el set Freeze lo exija.  
-3. Congelar DoRl RELEASE-01 (docs-only) cuando set + gates estén claros.  
+1. **B-01:** Freeze [RELEASE_SMOKE_SPEC](./RELEASE_SMOKE_SPEC.md) → Runner `test:release-smoke` → BLOCKED → impl → `release-smoke-pass`.  
+2. **B-02…B-06:** mismo patrón; Beta Acceptance solo al final.  
+3. **Eje A:** Do NOT open FLOW-05 unless Track B discovers a blocker that requires it.  
 4. Solo tras DoRl PASS → tag `release-01-beta`.
 
 ---

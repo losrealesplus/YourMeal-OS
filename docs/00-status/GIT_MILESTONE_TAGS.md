@@ -13,12 +13,26 @@
 |------|---------|---------|-----------|
 | **Platform** | `platform-*` o hitos Auth/PS | `ps002c-pass` · futuro `platform-stable` | Infraestructura, Auth, bootstrap, estabilización |
 | **Flow** | `flow*` / `flowNN-pass` | `flow01-pass` · `flow02-pass` | Flujos de negocio completamente certificados (PASS completo del runner) |
-| **Release** | `release-*` o `v*` semver | `release-01-beta` · `release-v0.2.0` · `v0.2.0` | Producto como conjunto (beta / semver) |
+| **Release gate** | `release-<gate>-pass` | `release-smoke-pass` · `release-crossflow-pass` | Gates DoRl de RELEASE-01 (mismo patrón `-pass` que Flows) |
+| **Release** | `release-01-beta` / `v*` semver | `release-01-beta` · `release-v0.2.0` | Producto como conjunto (beta / semver) |
 
 No cambia la metodología FOPEBA / Evidence before Implementation.  
-Hace legible el historial: **técnica** vs **dominio** vs **producto**.
+Hace legible el historial: **técnica** vs **dominio** vs **gates de producto** vs **release**.
 
-Gate de producto (aún DRAFT): [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) · [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md) (DoRl) → tag `release-01-beta` solo tras **DoRl PASS**.
+Cadena RELEASE-01 (planificada):
+
+```text
+release-smoke-pass
+release-crossflow-pass
+release-e2e-pass
+release-deploy-pass
+release-rollback-pass
+        ↓
+release-01-beta
+```
+
+Gate de producto: [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) · [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md) (DoRl) · Smoke Spec [RELEASE_SMOKE_SPEC](./RELEASE_SMOKE_SPEC.md).  
+Tag `release-01-beta` solo tras **DoRl PASS** (todos los gates aplicables con su `-pass`).
 
 ---
 
@@ -40,7 +54,8 @@ Gate de producto (aún DRAFT): [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRA
 |--------|-----|
 | Gate de plataforma cerrado con evidencia (PS / FCR) | `platform-*` o hito nombrado (`ps002c-pass`) |
 | Flow runner `--live` = PASS completo + acta | `flowNN-pass` |
-| RELEASE-01 beta gate PASS (flows críticos + E2E) | `release-01-beta` (ver [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md)) |
+| Gate DoRl RELEASE-01 PASS (Smoke / Cross-flow / …) | `release-<gate>-pass` (p. ej. `release-smoke-pass`) |
+| RELEASE-01 DoRl PASS (todos los gates aplicables) | `release-01-beta` |
 | Release desplegable / semver de producto | `release-vX.Y.Z` o `vX.Y.Z` |
 
 Reglas:
