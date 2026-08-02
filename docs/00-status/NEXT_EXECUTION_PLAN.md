@@ -106,10 +106,9 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual Track B:** cerrar [RELEASE_SMOKE_GATE](../10-validation/release-smoke/RELEASE_SMOKE_GATE.md) (**NOT READY**).  
-Checklist: #168 + #169 + #170 en `main` + `npm run test:release-smoke` verificado **desde main**.  
-Spec: [RELEASE_SMOKE_SPEC](./RELEASE_SMOKE_SPEC.md) · Runner: [RELEASE_SMOKE_RUNNER](../10-validation/release-smoke/RELEASE_SMOKE_RUNNER.md).  
-**RELEASE-SMOKE-001 MUST NOT be opened** hasta Gate verde.  
+**Objetivo actual Track B:** [RELEASE_SMOKE_GATE](../10-validation/release-smoke/RELEASE_SMOKE_GATE.md) ✅ **READY** (#172 · BLOCKED desde `main`).  
+Siguiente: **RELEASE-SMOKE-001** · S1 Preflight only · PASS through S1 · BLOCKED at S2.  
+Land Check institucional: [FOPEBA_LAND_CHECK](./FOPEBA_LAND_CHECK.md) (antes de cualquier `001`).  
 Do **not** open FLOW-05 unless Track B discovers a blocker that requires it.  
 **Reglas:** (1) Release = capacidades · Flow = dominio · (2) Gate cierra solo desde `main` (Regla 9).
 
@@ -189,9 +188,9 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 ## Current Goal
 
 ```text
-Track B (prioridad): B-01 Smoke Runner BLOCKED
-                     → Gate → RELEASE-SMOKE-001… → release-smoke-pass
+Track B (prioridad): RELEASE-SMOKE Gate READY → open RELEASE-SMOKE-001 (S1 only)
 Track A:             Do NOT open FLOW-05 unless Track B finds a blocker
+FOPEBA_LAND_CHECK:   ACTIVE · before every 001
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos
 ```
 

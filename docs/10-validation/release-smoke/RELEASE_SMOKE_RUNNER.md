@@ -106,18 +106,18 @@ npm run test:release-smoke:unit
 
 ## Gate · Abrir RELEASE-SMOKE-001
 
-**Reporte vivo:** [RELEASE_SMOKE_GATE](./RELEASE_SMOKE_GATE.md) · Decision actual: **NOT READY**.
+**Reporte vivo:** [RELEASE_SMOKE_GATE](./RELEASE_SMOKE_GATE.md) · Decision: ✅ **READY**.
 
 | # | Condición | Estado |
 |---|-----------|--------|
-| 1 | #168 · Track B priority en `main` | ⏳ OPEN |
-| 2 | Spec (#169) en `main` → FROZEN | ⏳ OPEN |
-| 3 | Runner (#170) en `main` | ⏳ OPEN |
-| 4 | Canonical BLOCKED verificado **desde `main`** | ⏳ |
+| 1 | #168 · Track B priority en `main` | ✅ |
+| 2 | Spec en `main` (vía #172) | ✅ |
+| 3 | Runner en `main` (vía #172) | ✅ |
+| 4 | Canonical BLOCKED verificado **desde `main`** | ✅ exit 2 |
 
-> Gate ≠ PR verde. Gate = comportamiento verificado en `main` ([FLOW_GOVERNANCE](../../00-status/FLOW_GOVERNANCE.md) Regla 9).
+> Gate ≠ PR verde. Gate = Land Check desde `main` ([FOPEBA_LAND_CHECK](../../00-status/FOPEBA_LAND_CHECK.md)).
 
-Tras Gate **verde** → READY TO OPEN **RELEASE-SMOKE-001** (solo S1 · preflight).
+**READY TO OPEN RELEASE-SMOKE-001** (solo S1 · preflight).
 
 ---
 

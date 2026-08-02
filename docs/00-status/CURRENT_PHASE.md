@@ -50,13 +50,14 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    Track B › RELEASE-SMOKE Gate NOT READY
+  Prioridad                    Track B › RELEASE-SMOKE Gate READY
                                → ../10-validation/release-smoke/RELEASE_SMOKE_GATE.md
-                               #168 · #169 · #170 aún OPEN · no 001
+                               Next: RELEASE-SMOKE-001 · S1 Preflight only
                                Roadmap: smoke → crossflow → e2e → deploy
                                         → rollback → beta → release-01-beta
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)
+  Land Check                   ./FOPEBA_LAND_CHECK.md (antes de cualquier 001)
   Paralelo                     Track A · FLOW-05 DoR only si Track B lo bloquea
                                (no abrir por inercia · mismo FOPEBA)
   Plan                         ./NEXT_EXECUTION_PLAN.md

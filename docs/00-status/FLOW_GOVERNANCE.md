@@ -187,46 +187,29 @@ main certifica
 las ramas solo proponen
 ```
 
-Aplicación:
+### FOPEBA Land Check (antes de cualquier `001`)
 
-| Artefacto | Gate cierra cuando… |
-|-----------|---------------------|
-| Flow Runner | `npm run test:flowNN-canonical` desde `main` → BLOCKED esperado |
-| Release Runner | `npm run test:release-*` desde `main` → BLOCKED esperado |
-| Implementation Tn / Sn | Spec + Runner **en `main`** + BLOCKED verificado |
-
-Antes de abrir el siguiente trabajo (p. ej. FLOWXX-001 / RELEASE-SMOKE-001), verificación obligatoria:
-
-```bash
-git pull origin main
-git log --oneline -5
-npm run test:<gate-script>
-```
-
-Si el commit o el script no aparecen en `main`, o el exit code / `blocked_at` no coinciden → el Gate **sigue cerrado**, aunque GitHub diga Merged.
-
-### Evidencia rápida de “no aterrizado”
+Procedimiento canónico: **[FOPEBA_LAND_CHECK](./FOPEBA_LAND_CHECK.md)**.
 
 ```bash
 git pull origin main
 npm run test:<gate-script>
 ```
 
-Si npm responde:
+| Resultado | Gate |
+|-----------|------|
+| `Missing script` / runner inexistente | 🔴 NOT READY |
+| Runner → BLOCKED esperado (primer paso) · exit 2 | 🟢 READY → abrir `001` |
+| FAIL / `blocked_at` incorrecto | 🔴 NOT READY |
 
-```text
-npm ERR! Missing script: "test:<gate-script>"
-```
-
-→ el contrato **no está en `main`**. Esa salida es evidencia FOPEBA válida de Gate rojo  
-(rápida, objetiva, independiente del estado MERGED en GitHub).
+Aplicación (Flows, Release, futuras capacidades): FLOW-05 · Cross-flow · E2E · Deploy · Rollback · releases posteriores.
 
 Incidentes de referencia:
 
-- FLOW-02 · #149 mergeado fuera de `main` · corregido por #150  
-- FLOW-03 · #156 → #157 (mismo patrón)  
-- RELEASE-SMOKE · #169–#171 Merged a stack · `Missing script: test:release-smoke` desde `main` · land PR  
-  · Gate report: [RELEASE_SMOKE_GATE](../10-validation/release-smoke/RELEASE_SMOKE_GATE.md)
+- FLOW-02 · #149 → #150  
+- FLOW-03 · #156 → #157  
+- RELEASE-SMOKE · #169–#171 → land #172 · luego BLOCKED desde `main`  
+  · [RELEASE_SMOKE_GATE](../10-validation/release-smoke/RELEASE_SMOKE_GATE.md) ✅ READY
 
 ---
 
