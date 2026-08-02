@@ -77,6 +77,32 @@ export function getPackagingBatch(
   return STORE.get(key(tenantId, orderId)) ?? null;
 }
 
+/**
+ * Spec completePackaging: IN_PROGRESS → READY → CLOSED (atomic handoff close).
+ */
+export function completePackagingBatch(input: {
+  tenantId: string;
+  orderId: string;
+}): PackagingBatch {
+  const batch = STORE.get(key(input.tenantId, input.orderId));
+  if (!batch) {
+    throw new Error("PackagingBatch not found");
+  }
+  if (batch.status === "CLOSED") {
+    return batch;
+  }
+  if (batch.status === "IN_PROGRESS") {
+    batch.status = "READY";
+  }
+  if (batch.status === "READY") {
+    batch.status = "CLOSED";
+  }
+  if (batch.status !== "CLOSED") {
+    throw new Error(`Cannot complete PackagingBatch from ${batch.status}`);
+  }
+  return batch;
+}
+
 /** @internal vitest */
 export function __resetPackagingBatchesForTests(): void {
   STORE.clear();

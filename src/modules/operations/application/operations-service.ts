@@ -26,10 +26,16 @@ import {
   stopFlow01,
 } from "./flow01-evidence";
 import {
+  completePackagingBatch,
   getPackagingBatch,
   startPackagingBatch,
   type PackagingBatch,
 } from "../domain/packaging-batch";
+import {
+  assignDeliveryOrder,
+  getDeliveryAssignment,
+  type DeliveryAssignment,
+} from "../domain/delivery-assignment";
 
 export const OperationsService = {
   /**
@@ -126,6 +132,113 @@ export const OperationsService = {
     orderId: string,
   ): PackagingBatch | null {
     return getPackagingBatch(ctx.tenantId, orderId);
+  },
+
+  /**
+   * FLOW-01 T3 · Spec `completePackaging`
+   * PackagingBatch IN_PROGRESS → READY → CLOSED. Emits FLOW01_T3_STARTED.
+   * (T3_COMPLETED follows assignDelivery — Spec: handoff to Delivery.)
+   */
+  async completePackaging(
+    ctx: ServiceContext,
+    orderId: string,
+  ): Promise<PackagingBatch> {
+    requireCapability(ctx.roles, "kitchen.operate");
+    if (!orderId) {
+      throw new DomainError("INVALID_STATE", "orderId required");
+    }
+
+    try {
+      assertFlow01Prefix([
+        "FLOW01_T1_STARTED",
+        "FLOW01_T1_COMPLETED",
+        "FLOW01_T2_STARTED",
+        "FLOW01_T2_COMPLETED",
+      ]);
+    } catch {
+      throw new DomainError(
+        "INVALID_STATE",
+        "FLOW01-003 requires T2 COMPLETED before completePackaging",
+      );
+    }
+
+    logFlow01Step("FLOW01_T3_STARTED", { orderId, tenantId: ctx.tenantId });
+
+    try {
+      const batch = completePackagingBatch({
+        tenantId: ctx.tenantId,
+        orderId,
+      });
+      if (batch.status !== "CLOSED") {
+        throw new Error(`expected CLOSED · got ${batch.status}`);
+      }
+      return batch;
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "completePackaging failed";
+      stopFlow01("T3_PACKAGING_FAILED", { orderId, message });
+      throw new DomainError("INVALID_STATE", message);
+    }
+  },
+
+  /**
+   * FLOW-01 T3 · Spec `assignDelivery`
+   * prepared → ready_for_delivery + DeliveryAssignment.
+   * Emits FLOW01_T3_COMPLETED. Does NOT emit out_for_delivery (that is T4).
+   */
+  async assignDelivery(
+    ctx: ServiceContext,
+    orderId: string,
+  ): Promise<{
+    status: OperationalOrderStatus;
+    assignment: DeliveryAssignment;
+    batch: PackagingBatch;
+  }> {
+    requireCapability(ctx.roles, "kitchen.operate");
+    if (!orderId) {
+      throw new DomainError("INVALID_STATE", "orderId required");
+    }
+
+    if (!hasFlow01Step("FLOW01_T3_STARTED")) {
+      throw new DomainError(
+        "INVALID_STATE",
+        "FLOW01-003 requires completePackaging (T3_STARTED) before assignDelivery",
+      );
+    }
+
+    const batch = getPackagingBatch(ctx.tenantId, orderId);
+    if (!batch || batch.status !== "CLOSED") {
+      throw new DomainError(
+        "INVALID_STATE",
+        "assignDelivery requires PackagingBatch CLOSED",
+      );
+    }
+
+    const status = await this.transitionKitchen(
+      ctx,
+      orderId,
+      "ready_for_delivery",
+    );
+
+    const assignment = assignDeliveryOrder({
+      tenantId: ctx.tenantId,
+      orderId,
+    });
+
+    logFlow01Step("FLOW01_T3_COMPLETED", {
+      orderId,
+      orderStatus: status,
+      packagingBatchStatus: batch.status,
+      assignmentId: assignment.id,
+    });
+
+    return { status, assignment, batch };
+  },
+
+  getDeliveryAssignmentForOrder(
+    ctx: ServiceContext,
+    orderId: string,
+  ): DeliveryAssignment | null {
+    return getDeliveryAssignment(ctx.tenantId, orderId);
   },
 
   async listKitchenOrders(

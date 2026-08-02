@@ -82,7 +82,7 @@ Igual filosofía que FCR-008 / PS-002-C:
 | Invariantes | ✅ en Spec |
 | Contrato `FLOW01_T*` | ✅ en Spec |
 | Runner `test:flow01-canonical` | ✅ [FLOW01_CANONICAL_RUNNER](../10-validation/flow-01/FLOW01_CANONICAL_RUNNER.md) |
-| Implementation | ✅ FLOW01-001 · ▶ FLOW01-002 T2 · [acta T2](../10-validation/flow-01/FLOW01_002_T2_ACTA.md) |
+| Implementation | ✅ T1 · ✅ T2 · ▶ FLOW01-003 T3 · [acta T3](../10-validation/flow-01/FLOW01_003_T3_ACTA.md) |
 
 ---
 

@@ -40,8 +40,8 @@ Contrato `FLOW01_T*` **inmutable** salvo necesidad real de cambiar la Spec.
 | ID | Transición | Tokens | Runner objetivo |
 |----|------------|--------|-----------------|
 | **FLOW01-001** | Kitchen → Production | `T1_STARTED` · `T1_COMPLETED` | ✅ CERTIFIED · [acta](../10-validation/flow-01/FLOW01_001_T1_ACTA.md) |
-| **FLOW01-002** | Production → Packaging | `T2_*` | ▶ **PASS through T2 · BLOCKED at T3** · [acta](../10-validation/flow-01/FLOW01_002_T2_ACTA.md) |
-| **FLOW01-003** | Packaging → Delivery handoff | `T3_*` | ⏳ PASS through T3 · BLOCKED at T4 |
+| **FLOW01-002** | Production → Packaging | `T2_*` | ✅ CERTIFIED (#144) · [acta](../10-validation/flow-01/FLOW01_002_T2_ACTA.md) |
+| **FLOW01-003** | Packaging → Delivery handoff | `T3_*` | ▶ **PASS through T3 · BLOCKED at T4** · [acta](../10-validation/flow-01/FLOW01_003_T3_ACTA.md) |
 | **FLOW01-004** | Delivery confirmado (`delivered`) | `T4_*` | ⏳ **FLOW-01 PASS** |
 
 ```text
@@ -97,6 +97,7 @@ FLOW-02 / FLOW-03 deben repetir el mismo patrón sin reinventar el proceso.
 | FLOW-01 SPEC | ✅ FROZEN (#141) |
 | FLOW-01 Runner | ✅ MERGED (#142) |
 | FLOW01-001 | ✅ CERTIFIED (#143) |
-| FLOW01-002 | ▶ este PR · `npm run test:flow01-002` |
-| FLOW01-003…004 | ⏳ secuencial (un PR / transición) |
+| FLOW01-002 | ✅ CERTIFIED (#144) |
+| FLOW01-003 | ▶ este PR · `npm run test:flow01-003` |
+| FLOW01-004 | ⏳ siguiente |
 | FLOW-01 PASS completo | ⏳ tras FLOW01-004 |

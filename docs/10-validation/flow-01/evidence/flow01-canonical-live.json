@@ -1,16 +1,18 @@
 {
   "status": "BLOCKED",
-  "reason": "PASS through T2 · BLOCKED at FLOW01_T3_STARTED",
+  "reason": "PASS through T3 · BLOCKED at FLOW01_T4_STARTED",
   "gate": "FLOW-01",
   "contract": "FLOW_01_KITCHEN_DELIVERY_SPEC",
   "principle": "Evidence before Implementation",
-  "code_status": "DOMAIN_DRIVER_T2",
-  "at": "2026-08-02T13:02:10.396Z",
+  "code_status": "DOMAIN_DRIVER_T3",
+  "at": "2026-08-02T13:05:21.694Z",
   "pipeline": [
     "FLOW01_T1_STARTED",
     "FLOW01_T1_COMPLETED",
     "FLOW01_T2_STARTED",
-    "FLOW01_T2_COMPLETED"
+    "FLOW01_T2_COMPLETED",
+    "FLOW01_T3_STARTED",
+    "FLOW01_T3_COMPLETED"
   ],
   "expected": [
     "FLOW01_T1_STARTED",
@@ -24,26 +26,24 @@
   ],
   "duplicates": [],
   "missing": [
-    "FLOW01_T3_STARTED",
-    "FLOW01_T3_COMPLETED",
     "FLOW01_T4_STARTED",
     "FLOW01_T4_COMPLETED"
   ],
   "out_of_order": [],
-  "firstFailure": "FLOW01_T3_STARTED",
-  "certified_through": 2,
-  "blocked_at": "FLOW01_T3_STARTED",
-  "delivery": "FLOW01-002",
+  "firstFailure": "FLOW01_T4_STARTED",
+  "certified_through": 3,
+  "blocked_at": "FLOW01_T4_STARTED",
+  "delivery": "FLOW01-003",
   "delivery_status": "PASS",
   "flow_status": "BLOCKED",
   "terminal": {
-    "order_status": "prepared",
-    "packaging_batch": "IN_PROGRESS"
+    "order_status": "ready_for_delivery",
+    "packaging_batch": "CLOSED"
   },
   "duration_ms": {
     "t1_ms": 15,
     "t2_ms": 15,
-    "t3_ms": null,
+    "t3_ms": 15,
     "t4_ms": null,
     "flow_total_ms": null
   }
