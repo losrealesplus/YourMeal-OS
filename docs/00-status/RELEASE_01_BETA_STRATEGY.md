@@ -73,7 +73,7 @@ Luego FLOW-06… según catálogo. Sin saltos. Sin features futuras en el PR del
 | FLOW-03 | ✅ | Tag `flow03-pass` |
 | FLOW-04 | ✅ | Tag `flow04-pass` |
 | Smoke Tests | ✅ | Tag `release-smoke-pass` · [PASS acta](../10-validation/release-smoke/RELEASE_SMOKE_PASS_ACTA.md) |
-| Cross-flow | ⏳ | 001–002 ✅ · 003 ▶ [C3 acta](../10-validation/release-crossflow/RELEASE_CROSSFLOW_003_C3_ACTA.md) → C4 → `release-crossflow-pass` |
+| Cross-flow | ▶ | 001–003 ✅ · 004 FULL PASS [C4](../10-validation/release-crossflow/RELEASE_CROSSFLOW_004_C4_ACTA.md) · [PASS](../10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md) → tag tras Land Check `main` |
 | E2E | ⏳ | Spec pendiente → tag `release-e2e-pass` |
 | Deployment | ⏳ | Contract pendiente → tag `release-deploy-pass` |
 | Rollback | ⏳ | Contract pendiente → tag `release-rollback-pass` |
@@ -83,7 +83,7 @@ Luego FLOW-06… según catálogo. Sin saltos. Sin features futuras en el PR del
 
 ```text
 B-01 Smoke        ✅ release-smoke-pass
-B-02 Cross-flow   DoR ✅ · Spec ✅ · Runner ✅ · 001–002 ✅ · 003 ▶ C3 → … → release-crossflow-pass
+B-02 Cross-flow   DoR ✅ · Spec ✅ · Runner ✅ · 001–003 ✅ · 004 ▶ FULL PASS → release-crossflow-pass
 B-03 E2E          Spec → Freeze → Runner (BLOCKED) → impl → release-e2e-pass
 B-04 Deployment   DEPLOYMENT_CONTRACT → Runner → release-deploy-pass
 B-05 Rollback     Contract → Runner → release-rollback-pass

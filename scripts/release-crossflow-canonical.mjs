@@ -16,7 +16,7 @@
  */
 
 /** Highest segment with a capability driver implemented. */
-const RELEASE_CROSSFLOW_CERTIFIED_THROUGH = 3;
+const RELEASE_CROSSFLOW_CERTIFIED_THROUGH = 4;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -211,6 +211,22 @@ async function main() {
     console.log(`evidence_file: ${path.relative(ROOT, out)}`);
 
     if (
+      progress.certified_through >= 4 &&
+      progress.status === "PASS" &&
+      progress.blocked_at == null
+    ) {
+      const fullOut = path.join(
+        EVIDENCE_DIR,
+        "release-crossflow-canonical-live.json",
+      );
+      await writeFile(fullOut, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+      console.log(`evidence_file: ${path.relative(ROOT, fullOut)}`);
+      console.log("RELEASE-CROSSFLOW");
+      console.log("FULL PASS");
+      console.log(
+        "RELEASE-CROSSFLOW-004 · PASS through C4 · certified_through=C4 · blocked_at=—",
+      );
+    } else if (
       progress.certified_through >= 1 &&
       progress.blocked_at === "RELEASE_CROSSFLOW_C2_STARTED"
     ) {
