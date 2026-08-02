@@ -103,7 +103,7 @@ certificando **capacidades de plataforma**, no entidades de dominio.
 > Un Gate nunca se cierra porque un PR pase.  
 > Un Gate solo se cierra cuando el comportamiento esperado se verifica desde `main`.
 
-Ver [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) Regla 9.
+Land Check obligatorio: [FOPEBA_LAND_CHECK](./FOPEBA_LAND_CHECK.md) · [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) Regla 9.
 
 ---
 

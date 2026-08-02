@@ -50,53 +50,47 @@ PASS → tag release-smoke-pass
 
 ---
 
-## Comando por defecto (runner-only · sin drivers)
+## Comando por defecto (post–001 · live through certified max)
 
 ```bash
 npm run test:release-smoke
 ```
 
-Resultado esperado:
+Resultado esperado (con S1 certificado):
 
 ```text
-RELEASE-SMOKE
-
-BLOCKED
-
-blocked_at=RELEASE_SMOKE_S1_STARTED
+PASS through S1
+blocked_at=RELEASE_SMOKE_S2_STARTED
 duplicates=[]
 missing=[]
 out_of_order=[]
-evidence={}
+exit 0
 ```
 
-Exit code: **2** (BLOCKED).  
-JSON: `docs/10-validation/release-smoke/evidence/release-smoke-canonical.json`
+### Runner-only (histórico Gate / Land Check vacío)
 
-**BLOCKED ≠ FAIL** — todavía no hay implementación de escenarios.
+```bash
+npm run test:release-smoke:runner-only
+# → BLOCKED at RELEASE_SMOKE_S1_STARTED · exit 2 · evidence={}
+```
 
 ---
 
-## Otros modos (sin implementación)
+## Otros modos
 
 ```bash
-# Self-test del contrato completo (sintético · sin drivers)
+# RELEASE-SMOKE-001 · S1 Preflight
+npm run test:release-smoke-001
+# → PASS through S1 · BLOCKED at RELEASE_SMOKE_S2_STARTED · exit 0
+
+# Self-test del contrato completo (sintético)
 npm run test:release-smoke -- --self-test
 
-# Pipeline explícito
-npm run test:release-smoke -- --pipeline=RELEASE_SMOKE_S1_STARTED,RELEASE_SMOKE_S1_COMPLETED --through=S1
-
-# Unit tests del validador
+# Unit tests
 npm run test:release-smoke:unit
 ```
 
-```bash
-# RELEASE-SMOKE-001 · S1 Preflight (capability driver · no Playwright)
-npm run test:release-smoke-001
-# → PASS through S1 · BLOCKED at RELEASE_SMOKE_S2_STARTED · exit 0
-```
-
-`--live` sin `--through` defaults a S1 mientras solo S1 esté certificado.
+`--live` sin `--through` = max certificado (`RELEASE_SMOKE_CERTIFIED_THROUGH`, hoy S1).
 
 ---
 
@@ -112,18 +106,18 @@ npm run test:release-smoke-001
 
 ## Gate · Abrir RELEASE-SMOKE-001
 
-**Reporte vivo:** [RELEASE_SMOKE_GATE](./RELEASE_SMOKE_GATE.md) · Decision actual: **NOT READY**.
+**Reporte vivo:** [RELEASE_SMOKE_GATE](./RELEASE_SMOKE_GATE.md) · Decision: ✅ **READY**.
 
 | # | Condición | Estado |
 |---|-----------|--------|
-| 1 | #168 · Track B priority en `main` | ⏳ OPEN |
-| 2 | Spec (#169) en `main` → FROZEN | ⏳ OPEN |
-| 3 | Runner (#170) en `main` | ⏳ OPEN |
-| 4 | Canonical BLOCKED verificado **desde `main`** | ⏳ |
+| 1 | #168 · Track B priority en `main` | ✅ |
+| 2 | Spec en `main` (vía #172) | ✅ |
+| 3 | Runner en `main` (vía #172) | ✅ |
+| 4 | Canonical BLOCKED verificado **desde `main`** | ✅ exit 2 |
 
-> Gate ≠ PR verde. Gate = comportamiento verificado en `main` ([FLOW_GOVERNANCE](../../00-status/FLOW_GOVERNANCE.md) Regla 9).
+> Gate ≠ PR verde. Gate = Land Check desde `main` ([FOPEBA_LAND_CHECK](../../00-status/FOPEBA_LAND_CHECK.md)).
 
-Tras Gate **verde** → READY TO OPEN **RELEASE-SMOKE-001** (solo S1 · preflight).
+**READY TO OPEN RELEASE-SMOKE-001** (solo S1 · preflight).
 
 ---
 

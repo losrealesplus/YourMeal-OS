@@ -5,19 +5,22 @@
  * Certifies platform capabilities (preflight · auth · bootstrap · dashboard).
  * Does NOT certify domain entity states (planned / applied / paid / …).
  *
- * Default (no drivers): BLOCKED at RELEASE_SMOKE_S1_STARTED.
+ * Default (`npm run test:release-smoke`): --live through max certified (S1+).
  * Modes:
- *   (default)     Empty pipeline → BLOCKED (runner-only).
- *   --live        Drive certified capabilities (S1+ progressive).
- *   --self-test   Validate frozen full contract (synthetic PASS).
- *   --pipeline=a,b,c   Validate an explicit observed step list.
- *   --through=S1|S2|S3|S4   Scope delivery RELEASE-SMOKE-001..004.
+ *   --live           Drive certified capabilities (default through = max certified).
+ *   --runner-only    Empty pipeline → BLOCKED at S1 (historic Gate land-check).
+ *   --self-test      Validate frozen full contract (synthetic PASS).
+ *   --pipeline=a,b,c Validate an explicit observed step list.
+ *   --through=S1|…   Scope delivery RELEASE-SMOKE-001..004.
  *
  *   npm run test:release-smoke
  *   npm run test:release-smoke-001
  *
  * Spec: docs/00-status/RELEASE_SMOKE_SPEC.md
  */
+
+/** Highest scenario with a capability driver implemented. */
+const RELEASE_SMOKE_CERTIFIED_THROUGH = 1;
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -51,6 +54,9 @@ function evidencePathFor(mode, through) {
   if (mode === "live") {
     return path.join(EVIDENCE_DIR, "release-smoke-canonical-live.json");
   }
+  if (mode === "runner-only") {
+    return path.join(EVIDENCE_DIR, "release-smoke-canonical.json");
+  }
   if (through) {
     return path.join(
       EVIDENCE_DIR,
@@ -67,13 +73,15 @@ function evidencePathFor(mode, through) {
 }
 
 function parseArgs(argv) {
-  let mode = "default";
+  // Default = live through certified max (post–001 contract on main).
+  let mode = "live";
   /** @type {string[] | null} */
   let pipelineArg = null;
   /** @type {1|2|3|4 | null} */
   let through = null;
   for (const a of argv) {
     if (a === "--live") mode = "live";
+    else if (a === "--runner-only") mode = "runner-only";
     else if (a === "--self-test") mode = "self-test";
     else if (a.startsWith("--pipeline=")) {
       mode = "pipeline";
@@ -87,6 +95,9 @@ function parseArgs(argv) {
       const n = Number(raw);
       if (n >= 1 && n <= 4) through = /** @type {1|2|3|4} */ (n);
     }
+  }
+  if (mode === "live" && through == null) {
+    through = /** @type {1|2|3|4} */ (RELEASE_SMOKE_CERTIFIED_THROUGH);
   }
   return { mode, pipelineArg, through };
 }
@@ -125,10 +136,10 @@ async function main() {
   console.log(`mode: ${mode}${through ? ` · through=S${through}` : ""}`);
   console.log("═══════════════════════════════════════════════");
 
-  // Default: executable contract with zero drivers → BLOCKED at S1
-  if (mode === "default") {
+  // Historic Gate land-check: empty pipeline → BLOCKED at S1
+  if (mode === "runner-only") {
     const pipeline = [];
-    const progress = evaluateReleaseSmokeProgress(pipeline, { through });
+    const progress = evaluateReleaseSmokeProgress(pipeline, { through: null });
     const report = buildReleaseSmokeEvidenceReport({
       status: progress.status,
       reason: progress.reason,
@@ -156,13 +167,13 @@ async function main() {
     console.log(`out_of_order=${JSON.stringify(report.out_of_order)}`);
     console.log(`evidence=${JSON.stringify(report.evidence)}`);
 
-    const out = await writeEvidence(report, mode, through);
+    const out = await writeEvidence(report, "runner-only", null);
     console.log(`evidence_file: ${path.relative(ROOT, out)}`);
     process.exit(exitFor(progress));
   }
 
   if (mode === "live") {
-    const scope = through ?? 1;
+    const scope = through ?? RELEASE_SMOKE_CERTIFIED_THROUGH;
     console.log(
       `Driving RELEASE-SMOKE capabilities (through=S${scope})…`,
     );

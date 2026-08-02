@@ -72,7 +72,7 @@ Luego FLOW-06… según catálogo. Sin saltos. Sin features futuras en el PR del
 | FLOW-02 | ✅ | Tag `flow02-pass` |
 | FLOW-03 | ✅ | Tag `flow03-pass` |
 | FLOW-04 | ✅ | Tag `flow04-pass` |
-| Smoke Tests | ⏳ | Gate READY · [001 S1](../10-validation/release-smoke/RELEASE_SMOKE_001_S1_ACTA.md) ▶ → S2… → `release-smoke-pass` |
+| Smoke Tests | ⏳ | Gate ✅ READY · [001 S1](../10-validation/release-smoke/RELEASE_SMOKE_001_S1_ACTA.md) ▶ → S2… → `release-smoke-pass` |
 | Cross-flow | ⏳ | Spec pendiente → tag `release-crossflow-pass` |
 | E2E | ⏳ | Spec pendiente → tag `release-e2e-pass` |
 | Deployment | ⏳ | Contract pendiente → tag `release-deploy-pass` |
