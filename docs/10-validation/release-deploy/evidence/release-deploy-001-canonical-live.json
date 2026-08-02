@@ -1,0 +1,51 @@
+{
+  "status": "PASS",
+  "reason": "PASS through D1 · BLOCKED at RELEASE_DEPLOY_D2_STARTED for full RELEASE-DEPLOY",
+  "gate": "RELEASE-DEPLOY",
+  "contract": "RELEASE_DEPLOY_SPEC",
+  "level": "release",
+  "certifies": "reproducible_deployment",
+  "complements_e2e_smoke_crossflow": true,
+  "principle": "Evidence before Implementation",
+  "code_status": "CAPABILITY_DRIVER_D1",
+  "at": "2026-08-02T19:29:56.181Z",
+  "pipeline": [
+    "RELEASE_DEPLOY_D1_STARTED",
+    "RELEASE_DEPLOY_D1_COMPLETED"
+  ],
+  "expected": [
+    "RELEASE_DEPLOY_D1_STARTED",
+    "RELEASE_DEPLOY_D1_COMPLETED",
+    "RELEASE_DEPLOY_D2_STARTED",
+    "RELEASE_DEPLOY_D2_COMPLETED",
+    "RELEASE_DEPLOY_D3_STARTED",
+    "RELEASE_DEPLOY_D3_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": null,
+  "certified_through": 1,
+  "blocked_at": "RELEASE_DEPLOY_D2_STARTED",
+  "delivery": "RELEASE-DEPLOY-001",
+  "delivery_status": "PASS",
+  "gate_status": "BLOCKED",
+  "terminal": {
+    "segment": "preflight"
+  },
+  "evidence": {
+    "d1_checks": [
+      "release_deploy_canonical_script_present",
+      "release_deploy_canonical_pipeline_intact",
+      "release_e2e_pass_tag_present",
+      "release_e2e_pass_acta_present",
+      "release_deploy_spec_present",
+      "release_deploy_gate_present"
+    ],
+    "d1_mapped_tokens": [
+      "RELEASE_DEPLOY_D1_STARTED",
+      "RELEASE_DEPLOY_D1_COMPLETED"
+    ],
+    "d1_source": "release-e2e-pass + Deploy Spec/Gate (no D2+ · no publish/apply · no infra)"
+  }
+}
