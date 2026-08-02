@@ -113,14 +113,24 @@ DoRl pasa a ser el instrumento para evaluar el **producto como sistema**.
 La conversación sobre beta se ancla a filas con evidencia (detalle vivo en  
 [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md)):
 
-| Gate DoRl | Estado típico post–FLOW-04 | Evidencia |
-|-----------|----------------------------|-----------|
+| Gate DoRl | Estado típico post–FLOW-04 | Hito |
+|-----------|----------------------------|------|
 | FOUNDATION · PS-002C · FLOW-01…04 | ✅ | Tags de milestone |
-| Smoke · Cross-flow · E2E | ⏳ | Acta + comando |
-| Deployment · Rollback | ⏳ | Procedimiento + prueba |
-| Beta Acceptance | ⏳ | DoRl PASS → `release-01-beta` |
+| Smoke | ⏳ Spec [READY FOR FREEZE](./RELEASE_SMOKE_SPEC.md) | `release-smoke-pass` |
+| Cross-flow · E2E | ⏳ | `release-crossflow-pass` · `release-e2e-pass` |
+| Deployment · Rollback | ⏳ | `release-deploy-pass` · `release-rollback-pass` |
+| Beta Acceptance | ⏳ | `release-01-beta` |
 
+Cada gate Track B sigue Spec → Freeze → Runner (BLOCKED) → impl → `-pass`.  
 Cross-flow complementa runners canónicos; no los sustituye.
+
+**Regla de nivel:** runners de Release certifican **capacidades de plataforma**  
+(`preflight`, `auth`, `bootstrap`, `dashboard`, `deploy`, `rollback`, …).  
+Runners de Flow certifican **entidades / estados de dominio**. No mezclar.
+
+**Regla de Gate (Regla 9):** un Gate nunca se cierra porque un PR pase;  
+solo cuando el comportamiento esperado se verifica desde `main`.  
+Ejemplo vivo: [RELEASE_SMOKE_GATE](../10-validation/release-smoke/RELEASE_SMOKE_GATE.md).
 
 ---
 
