@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW_02_DELIVERY_INCIDENTS_SPEC.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ **SPEC IN PROGRESS** — sin runner ni implementación de dominio en este PR  
+**Estado:** ▶ **SPEC READY FOR FREEZE** — checklist pre-Freeze completo · sin runner ni dominio en este PR  
 **Precondición:** FLOW-01 ✅ CERTIFIED · tag `flow01-pass` · [FLOW01_PASS_ACTA](../10-validation/flow-01/FLOW01_PASS_ACTA.md)  
 **DoR:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) · checklist parcial abajo  
 **Gobernanza:** [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) Regla 7–8 · [Evidence before Implementation](./EVIDENCE_BEFORE_IMPLEMENTATION.md)  
