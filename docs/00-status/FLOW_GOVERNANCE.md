@@ -143,7 +143,26 @@ Idea → Código → Pruebas → Correcciones   ❌
 ```
 
 Documento: [EVIDENCE_BEFORE_IMPLEMENTATION](./EVIDENCE_BEFORE_IMPLEMENTATION.md).  
-Referencia de calidad: PS-002-C / FCR-008 (Auth certificado con runner primero).
+Referencia de calidad: PS-002-C / FCR-008 (Auth) · FLOW-01 (dominio).
+
+---
+
+## REGLA 8 — Definition of Ready antes de Implementation
+
+Ningún Flow nuevo entra en código de dominio sin cumplir [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md):
+
+```text
+SPEC congelada · contrato FLOWNN_* · runner · estados · invariantes
+· PASS esperado · BLOCKED esperado · acta
+```
+
+Plantilla de ciclo (institucionalizada tras FLOW-01 CERTIFIED):
+
+```text
+SPEC → Freeze → Runner → Impl. mínima → PASS parcial → … → PASS completo → Acta
+```
+
+Una transición certificada por PR de implementación.
 
 ---
 
@@ -154,23 +173,20 @@ El backlog operacional se organiza por **valor operacional (Flow)**, no por mód
 ```text
 ❌  EP-Orders · EP-Kitchen · EP-Delivery
 
-✅  FLOW-01  Kitchen → Delivery
-✅  FLOW-02  Delivery → Support
-✅  FLOW-03  Support → Accounting
+✅  FLOW-01  Kitchen → Delivery     (CERTIFIED)
+✅  FLOW-02…  siguientes            (DoR antes de código)
 ```
 
-Bajo cada Flow (Fase 1):
+Bajo cada Flow (Fase 1+):
 
 ```text
-Spec (freeze)
+Definition of Ready
   ↓
-Contrato de evidencia
+Spec (freeze) → Runner
   ↓
-Runner canónico
+Implementation (una transición / PR)
   ↓
-Implementation (happy path)
-  ↓
-PASS / Certification
+PASS / Certification → Acta
 ```
 
 Catálogo: [FLOW_CATALOG](./FLOW_CATALOG.md).

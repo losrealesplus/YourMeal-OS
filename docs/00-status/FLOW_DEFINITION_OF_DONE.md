@@ -56,6 +56,13 @@ Detalle y ejemplo BR-03: [BR-03_SCOPE_DECISION](../12-beta/BR-03_SCOPE_DECISION.
 
 ---
 
+## Antes de empezar (Ready)
+
+Ningún Flow nuevo llega a Done sin haber cumplido primero  
+[FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md).
+
+---
+
 ## Relación
 
 - Gobernanza: [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md)  

@@ -31,22 +31,23 @@ Mobile Foundation (MF-001)  ✅ Cimientos CLOSED
 
 Fase proyecto
   0 · Plataforma              ✅ COMPLETE
-  1 · Domain / Flow           ▶ ACTIVA (FLOW-01)
+  1 · Domain / Flow           ▶ ACTIVA
+  Pregunta                    ¿El negocio cumple el contrato?
   Principio                   Evidence before Implementation
-                              → ./EVIDENCE_BEFORE_IMPLEMENTATION.md
+  Estándar                    Definition of Ready (FLOW-XX)
+                              → ./FLOW_DEFINITION_OF_READY.md
 
 Sprint activo
-  FLOW-01 SPEC                 ✅ FROZEN (#141)
-  FLOW-01 Runner               ✅ MERGED (#142)
-  FLOW01-001…003               ✅ CERTIFIED (#143–#145)
-  FLOW01-004 T4                ▶ Delivery → delivered · FLOW-01 PASS
-  Plan: ./FLOW_01_DELIVERY_PLAN.md
-  Live: npm run test:flow01-canonical -- --live
-        → FULL PASS (T1–T4)
-  Acta PS-002-C: ../10-validation/platform-stabilization/PS002C_PASS_ACTA.md
-  Tag restauración: ps002c-pass → 545bd19
+  FLOW-01                      ✅ CERTIFIED (#141–#146)
+  Live: npm run test:flow01-canonical -- --live → PASS
+  Acta: ../10-validation/flow-01/FLOW01_PASS_ACTA.md
+  Tags: ps002c-pass · flow01-pass
+        (taxonomía: ./GIT_MILESTONE_TAGS.md)
+  Siguiente                    Merge DoR (#147)
+                               luego FLOW-02 Spec (Delivery Incidents)
+                               — DoR → Spec → Runner → Impl. 00n
   Beta paralelo: BR-03.3 Runtime Validation (G3)
-  Disciplina: cada PR certifica exactamente una transición
+  Disciplina: una transición / PR · DoR antes de código
 
 ═══════════════════════════════════════════════
 CLOSED GATE
@@ -59,27 +60,27 @@ CLOSED GATE
 ═══════════════════════════════════════════════
 NEXT PHASE
 
-  Platform Stabilization COMPLETE
+  FLOW-01 CERTIFIED
   ↓
-  FLOW CERTIFICATION READY
+  FLOW Definition of Ready (estándar)
   ↓
-  FLOW-01
-  Kitchen → Delivery
-  Specification
-  (PR dedicado — no automático)
+  FLOW-02 Spec (Delivery Incidents) — DoR primero
+  ↓
+  Runner → Impl. transición a transición → PASS
 
 En paralelo (beta móvil EatClean):
   Lema: cada PR acerca la jornada completa del piloto.
-  Auth canónico certificado → BR-03.3 Runtime Validation
+  BR-03.3 Runtime Validation
   → ../12-beta/BR-03_SCOPE_DECISION.md
   No abrir M-06/MF-002 / “de cara al futuro” salvo bloqueador real.
 
 Prohibido prematuro: Event Bus · Notifications · Jobs · Analytics · AI
 ═══════════════════════════════════════════════
-Ver: ../10-validation/platform-stabilization/PS002C_PASS_ACTA.md
-     ../10-validation/platform-stabilization/PS-002.md
-     ../10-validation/FCR008_CANONICAL_POST_LOGIN_SESSION.md
-     ./BETA_READINESS_CHECKPOINT.md
+Ver: ../10-validation/flow-01/FLOW01_PASS_ACTA.md
+     ./FLOW_DEFINITION_OF_READY.md
+     ./EVIDENCE_BEFORE_IMPLEMENTATION.md
+     ./FLOW_CATALOG.md
+     ../10-validation/platform-stabilization/PS002C_PASS_ACTA.md
 ═══════════════════════════════════════════════
 ```
 

@@ -99,5 +99,5 @@ FLOW-02 / FLOW-03 deben repetir el mismo patrón sin reinventar el proceso.
 | FLOW01-001 | ✅ CERTIFIED (#143) |
 | FLOW01-002 | ✅ CERTIFIED (#144) |
 | FLOW01-003 | ✅ CERTIFIED (#145) |
-| FLOW01-004 | ▶ este PR · `npm run test:flow01-004` |
-| FLOW-01 PASS completo | ▶ `npm run test:flow01-canonical -- --live` |
+| FLOW01-004 | ✅ CERTIFIED (#146) |
+| FLOW-01 PASS completo | ✅ `npm run test:flow01-canonical -- --live` · tag `flow01-pass` |
