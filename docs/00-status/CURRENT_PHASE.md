@@ -44,9 +44,10 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Activo                       FLOW-02 Spec (Delivery Incidents)
-                               → ./FLOW_02_DELIVERY_INCIDENTS_SPEC.md
-                               Sin dominio · Runner después del Freeze
+  Activo                       FLOW-02 Runner (contrato ejecutable)
+                               Spec ✅ FROZEN · ./FLOW_02_DELIVERY_INCIDENTS_SPEC.md
+                               npm run test:flow02-canonical → BLOCKED at T1
+                               Sin dominio · FLOW02-001 después
   Beta paralelo: BR-03.3 Runtime Validation (G3)
   Disciplina: una transición / PR · DoR antes de código
 
@@ -65,9 +66,11 @@ NEXT PHASE
   ↓
   FLOW Definition of Ready ✅ (#147)
   ↓
-  FLOW-02 Spec ▶ (este sprint) — sin dominio
+  FLOW-02 Spec ✅ FROZEN (#148)
   ↓
-  Freeze → Runner → FLOW02-001… → PASS
+  FLOW-02 Runner ▶ — BLOCKED at T1 (sin dominio)
+  ↓
+  FLOW02-001… → PASS
 
 En paralelo (beta móvil EatClean):
   Lema: cada PR acerca la jornada completa del piloto.
