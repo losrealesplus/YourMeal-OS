@@ -1,0 +1,34 @@
+{
+  "status": "BLOCKED",
+  "reason": "RELEASE-ROLLBACK segments not implemented (runner ready; Evidence before Implementation)",
+  "gate": "RELEASE-ROLLBACK",
+  "contract": "RELEASE_ROLLBACK_SPEC",
+  "level": "release",
+  "certifies": "controlled_recovery",
+  "complements_deploy_e2e_smoke_crossflow": true,
+  "principle": "Evidence before Implementation",
+  "code_status": "RUNNER_ONLY",
+  "at": "2026-08-02T20:01:29.724Z",
+  "pipeline": [],
+  "expected": [
+    "RELEASE_ROLLBACK_R1_STARTED",
+    "RELEASE_ROLLBACK_R1_COMPLETED",
+    "RELEASE_ROLLBACK_R2_STARTED",
+    "RELEASE_ROLLBACK_R2_COMPLETED",
+    "RELEASE_ROLLBACK_R3_STARTED",
+    "RELEASE_ROLLBACK_R3_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": "RELEASE_ROLLBACK_R1_STARTED",
+  "certified_through": 0,
+  "blocked_at": "RELEASE_ROLLBACK_R1_STARTED",
+  "delivery": "RELEASE-ROLLBACK",
+  "delivery_status": "BLOCKED",
+  "gate_status": "BLOCKED",
+  "terminal": {
+    "segment": null
+  },
+  "evidence": {}
+}
