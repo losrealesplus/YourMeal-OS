@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_CROSSFLOW_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ Runner **ACTIVE** · live through C1 · runner-only **BLOCKED** at C1  
+**Estado:** ▶ Runner **ACTIVE** · live through C2 · runner-only **BLOCKED** at C1  
 **Spec:** [RELEASE_CROSSFLOW_SPEC](../../00-status/RELEASE_CROSSFLOW_SPEC.md) (FROZEN · #179)  
 **DoR:** [RELEASE_CROSSFLOW_DOR](../../00-status/RELEASE_CROSSFLOW_DOR.md)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
@@ -54,13 +54,17 @@ PASS → tag release-crossflow-pass
 ## Comandos
 
 ```bash
-# Default live through max certified (C1)
+# Default live through max certified (C2)
 npm run test:release-crossflow
-# → PASS through C1 · BLOCKED at C2 · exit 0
+# → PASS through C2 · BLOCKED at C3 · exit 0
 
 # RELEASE-CROSSFLOW-001 · C1 only
 npm run test:release-crossflow-001
 # → PASS through C1 · BLOCKED at C2 · exit 0
+
+# RELEASE-CROSSFLOW-002 · C2 only
+npm run test:release-crossflow-002
+# → PASS through C2 · BLOCKED at C3 · exit 0
 
 # Historic Gate / Land Check vacío
 npm run test:release-crossflow:runner-only
@@ -72,9 +76,9 @@ npm run test:release-crossflow:unit
 
 ---
 
-## Fuera de alcance hasta C1+
+## Fuera de alcance hasta C2+
 
-- Drivers C2–C4  
+- Drivers C3–C4  
 - Playwright · UI · Supabase · CI  
 - FLOW-05 · E2E · Deploy · Rollback  
 
