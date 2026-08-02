@@ -1,10 +1,12 @@
 # FCR-008 · Canonical Post-Login Session
 
 **Documento:** `FCR008_CANONICAL_POST_LOGIN_SESSION.md`  
-**Fecha:** 2026-07-29  
-**Estado:** ✅ Implemented (código + validador PS-002) · **PS-002-C Auth real ⏳ PENDING**  
+**Fecha:** 2026-07-29 · **Certificado:** 2026-08-02  
+**Estado:** ✅ **CERTIFIED** · **FROZEN** (PS-002-C PASS · tag `ps002c-pass`)  
 **Cierra:** [FCR-007](./FCR007_LOGIN_BLOCKER_INVESTIGATION.md) (causa raíz)  
-**No reabre:** FCR-002 · Foundation · Identity · Core · FOPEBA
+**Acta:** [PS002C_PASS_ACTA](./platform-stabilization/PS002C_PASS_ACTA.md)  
+**No reabre:** FCR-002 · Foundation · Identity · Core · FOPEBA  
+**Política post-PASS:** cualquier cambio en Auth / pipeline post-login se justifica como **regresión**, no como evolución funcional.
 
 ---
 

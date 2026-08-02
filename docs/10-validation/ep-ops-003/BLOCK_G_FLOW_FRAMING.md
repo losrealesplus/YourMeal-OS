@@ -1,6 +1,8 @@
 # Bloque G · Flow Framing (NOT STARTED)
 
-**Estado:** ⏳ **NOT STARTED** · elegible tras capa Entry+Journey cerrada  
+**Estado:** ⏳ **NOT STARTED** (ejecución) · Spec FLOW-01 ▶ abierta  
+**Plataforma:** PS-002-C ✅ PASS (2026-08-02) · elegible tras Entry+Journey + Auth canónico  
+
 **Capa cerrada:** [OPERATIONAL_CERTIFICATION_LAYER_CLOSED](../../00-status/OPERATIONAL_CERTIFICATION_LAYER_CLOSED.md)  
 **Acta Journeys:** [EP_OPS_003_JOURNEYS_COMPLETE](../../00-status/EP_OPS_003_JOURNEYS_COMPLETE.md)  
 **Metodología Journey:** FROZEN — este documento **no** la modifica  

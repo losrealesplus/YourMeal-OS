@@ -113,6 +113,40 @@ Jerarquía: [FLOW_WORK_HIERARCHY](./FLOW_WORK_HIERARCHY.md).
 
 ---
 
+## REGLA 7 — Evidence before Implementation (Fase 1 · Domain / Flow)
+
+**Principio operativo de Fase 1** (complementa FOPEBA; no lo sustituye):
+
+> Ningún Flow operativo (`FLOW-01`, `FLOW-02`, …) comienza su **implementación de dominio**  
+> sin haber congelado previamente: SPEC · estados · invariantes · contrato de evidencias · **runner canónico**.
+
+```text
+Observación
+    ↓
+FOPEBA
+    ↓
+SPEC (freeze)
+    ↓
+Contrato de evidencia
+    ↓
+Runner canónico
+    ↓
+Código de dominio
+    ↓
+PASS
+```
+
+Prohibido en Fase 1:
+
+```text
+Idea → Código → Pruebas → Correcciones   ❌
+```
+
+Documento: [EVIDENCE_BEFORE_IMPLEMENTATION](./EVIDENCE_BEFORE_IMPLEMENTATION.md).  
+Referencia de calidad: PS-002-C / FCR-008 (Auth certificado con runner primero).
+
+---
+
 ## Estructura de épicas (consecuencia)
 
 El backlog operacional se organiza por **valor operacional (Flow)**, no por módulo:
@@ -125,16 +159,18 @@ El backlog operacional se organiza por **valor operacional (Flow)**, no por mód
 ✅  FLOW-03  Support → Accounting
 ```
 
-Bajo cada Flow:
+Bajo cada Flow (Fase 1):
 
 ```text
-Spec
+Spec (freeze)
   ↓
-Implementation
+Contrato de evidencia
   ↓
-Evidence
+Runner canónico
   ↓
-Certification
+Implementation (happy path)
+  ↓
+PASS / Certification
 ```
 
 Catálogo: [FLOW_CATALOG](./FLOW_CATALOG.md).

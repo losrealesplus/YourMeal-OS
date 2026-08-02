@@ -2,9 +2,11 @@
 
 **Documento:** `FLOW_CATALOG.md`  
 **Fecha:** 2026-07-29  
-**Estado:** Draft catalog · Certification NOT STARTED per Flow  
+**Estado:** Draft catalog · FLOW-01 Spec ▶ **READY FOR FREEZE**  
 **Piloto:** EatClean  
-**Framing:** [BLOCK_G_FLOW_FRAMING](../10-validation/ep-ops-003/BLOCK_G_FLOW_FRAMING.md) · [FLOW_CERTIFICATION](../10-validation/FLOW_CERTIFICATION.md)
+**Fase:** 1 · Domain / Flow (Fase 0 · Plataforma COMPLETE)  
+**Plataforma:** PS-002-C ✅ PASS · tag `ps002c-pass` · FCR-008 FROZEN  
+**Framing:** [BLOCK_G_FLOW_FRAMING](../10-validation/ep-ops-003/BLOCK_G_FLOW_FRAMING.md) · [FLOW_CERTIFICATION](../10-validation/FLOW_CERTIFICATION.md) · [FLOW_01 Spec](./FLOW_01_KITCHEN_DELIVERY_SPEC.md)
 
 ---
 
@@ -28,7 +30,7 @@ Sí: `FLOW-01 Kitchen → Delivery`.
 
 | ID | Handoff | Pregunta operacional | Estado |
 |----|---------|----------------------|--------|
-| **FLOW-01** | Kitchen → Delivery | ¿Kitchen entrega correctamente a Delivery? | ⏳ NOT STARTED |
+| **FLOW-01** | Kitchen → Delivery | ¿Kitchen entrega correctamente a Delivery? | ▶ **SPEC READY FOR FREEZE** · Packaging lifecycle · T4=`delivered` · runner contract · [SPEC](./FLOW_01_KITCHEN_DELIVERY_SPEC.md) |
 | **FLOW-02** | Delivery → Support | ¿Delivery deja a Support con contexto usable? | ⏳ NOT STARTED |
 | **FLOW-03** | Support → Accounting | ¿Support cierra hacia registros financieros coherentes? | ⏳ NOT STARTED |
 

@@ -21,17 +21,28 @@ PS-002-C                    ✅ PASS (2026-08-02)
                              Auth Supabase real · FCR-008
 PS-003                      ✅ PASS
 
-FCR-008                     ✅ Canonical session CERTIFIED
+FCR-008                     ✅ CERTIFIED · FROZEN
+                             (solo reabrir por regresión)
 FCR-009                     🔍 Toaster ausente (no bloquea PS-002-C)
 
 Mobile Foundation (MF-001)  ✅ Cimientos CLOSED
   → BETA_READINESS_CHECKPOINT.md
   → Foco: Product CTO · jornada EatClean
 
+Fase proyecto
+  0 · Plataforma              ✅ COMPLETE
+  1 · Domain / Flow           ▶ ACTIVA (FLOW-01)
+  Principio                   Evidence before Implementation
+                              → ./EVIDENCE_BEFORE_IMPLEMENTATION.md
+
 Sprint activo
-  NEXT: FLOW CERTIFICATION / FLOW-01 Spec
+  1) Merge PR #141 = FLOW-01 SPEC FROZEN
+  2) Runner test:flow01-canonical
+  3) Implementation happy path (solo después)
+  Gaps Spec cerrados: PackagingBatch lifecycle · T4 = delivered
   Acta PS-002-C: ../10-validation/platform-stabilization/PS002C_PASS_ACTA.md
-  Beta: BR-03.3 Runtime Validation (G3)
+  Tag restauración: ps002c-pass → 545bd19
+  Beta paralelo: BR-03.3 Runtime Validation (G3)
 
 ═══════════════════════════════════════════════
 CLOSED GATE
