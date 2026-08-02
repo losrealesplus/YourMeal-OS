@@ -280,7 +280,7 @@ Si algún ítem quedara abierto → **no Freeze** · no runner.
 | 2 | Runner canónico (`test:flow02-canonical` · BLOCKED at T1) | ✅ (#150) |
 | 3 | FLOW02-001 T1 | ✅ (#151) |
 | 4 | FLOW02-002 T2 | ✅ (#152) |
-| 5 | FLOW02-003 T3 · FULL PASS | ▶ |
+| 5 | FLOW02-003 T3 · FULL PASS · tag `flow02-pass` | ✅ (#153) |
 
 ---
 
