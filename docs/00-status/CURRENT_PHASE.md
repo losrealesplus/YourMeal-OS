@@ -87,7 +87,9 @@ En paralelo (beta móvil EatClean):
 
 Prohibido prematuro: Event Bus · Notifications · Jobs · Analytics · AI
 ═══════════════════════════════════════════════
-Ver: ../10-validation/flow-01/FLOW01_PASS_ACTA.md
+Ver: ./PROJECT_HANDOFF.md
+     ./RELEASE_01_BETA_STRATEGY.md
+     ../10-validation/flow-03/FLOW03_PASS_ACTA.md
      ./FLOW_DEFINITION_OF_READY.md
      ./EVIDENCE_BEFORE_IMPLEMENTATION.md
      ./FLOW_CATALOG.md
