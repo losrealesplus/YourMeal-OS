@@ -2,11 +2,12 @@
 
 **Documento:** `FLOW_CATALOG.md`  
 **Fecha:** 2026-08-02  
-**Estado:** FLOW-01 ✅ · FLOW-02 ✅ · FLOW-03 ▶ Spec + Runner · DoR ✅ (#147)  
+**Estado:** FLOW-01 ✅ · FLOW-02 ✅ · FLOW-03 ✅ · FLOW-04 ▶ DoR · DoR estándar ✅ (#147)  
 **Piloto:** EatClean  
 **Fase:** 1 · Domain / Flow (Fase 0 · Plataforma COMPLETE)  
 **Plataforma:** PS-002-C ✅ · FCR-008 FROZEN · tag `ps002c-pass`  
-**Dominio:** FLOW-01 ✅ `flow01-pass` · FLOW-02 ✅ `flow02-pass`  
+**Dominio:** FLOW-01…03 ✅ `flow01-pass` · `flow02-pass` · `flow03-pass`  
+**Plan:** [NEXT_EXECUTION_PLAN](./NEXT_EXECUTION_PLAN.md)  
 **Estándar:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) · [Evidence before Implementation](./EVIDENCE_BEFORE_IMPLEMENTATION.md)
 
 ---
@@ -31,15 +32,15 @@ Sí: `FLOW-01 Kitchen → Delivery`.
 |----|---------|----------------------|--------|
 | **FLOW-01** | Kitchen → Delivery | ¿Kitchen entrega correctamente a Delivery? | ✅ **CERTIFIED** · [SPEC](./FLOW_01_KITCHEN_DELIVERY_SPEC.md) · [Plan](./FLOW_01_DELIVERY_PLAN.md) · [PASS acta](../10-validation/flow-01/FLOW01_PASS_ACTA.md) · `npm run test:flow01-canonical -- --live` |
 | **FLOW-02** | Delivery Incidents | ¿Un intento fallido queda operable y reintentable hasta `delivered`? | ✅ **CERTIFIED** · tag `flow02-pass` · [SPEC](./FLOW_02_DELIVERY_INCIDENTS_SPEC.md) · [PASS acta](../10-validation/flow-02/FLOW02_PASS_ACTA.md) · `npm run test:flow02-canonical -- --live` |
+| **FLOW-03** | Billing | ¿Pedidos entregados se facturan y cobran con contrato verificable? | ✅ **CERTIFIED** · tag `flow03-pass` → `67a2e66` · [SPEC](./FLOW_03_BILLING_SPEC.md) · [PASS acta](../10-validation/flow-03/FLOW03_PASS_ACTA.md) · `npm run test:flow03-canonical -- --live` |
 
 ---
 
-## Candidatos (prioridad · sin Implementation hasta DoR)
+## Activo / candidatos (sin Implementation hasta DoR completo)
 
 | ID | Handoff / alcance | Prioridad | Motivo | Estado |
 |----|-------------------|-----------|--------|--------|
-| **FLOW-03** | Billing | Alta | Facturación desacoplada del happy path | ▶ Domain · T1–T2 ✅ · [FLOW03-003](../10-validation/flow-03/FLOW03_003_T3_ACTA.md) T3 → FULL PASS |
-| **FLOW-04** | Inventory Consumption | Alta | Consumo de ingredientes tras producción | ⏳ DoR NOT STARTED |
+| **FLOW-04** | Inventory Consumption | Alta | Consumo de ingredientes tras producción | ▶ **DoR document** · [FLOW_04_INVENTORY_CONSUMPTION_DOR](./FLOW_04_INVENTORY_CONSUMPTION_DOR.md) · Spec/Runner ❌ |
 | **FLOW-05** | Customer Order Lifecycle | Media | Creación del pedido → `confirmed` | ⏳ DoR NOT STARTED |
 | **FLOW-06** | Kitchen Planning | Media | Planificación previa a T1 | ⏳ DoR NOT STARTED |
 
