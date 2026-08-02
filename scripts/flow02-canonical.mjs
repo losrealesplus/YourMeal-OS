@@ -198,7 +198,11 @@ async function main() {
     const out = await writeEvidence(report, "live", through);
     console.log(`evidence: ${path.relative(ROOT, out)}`);
 
-    if (progress.status === "PASS" && progress.certified_through >= 3) {
+    if (
+      progress.status === "PASS" &&
+      progress.flow_status === "PASS" &&
+      progress.certified_through >= 3
+    ) {
       console.log("FLOW-02 · FULL PASS · Delivery Incidents certified");
     } else if (
       progress.certified_through >= 2 &&

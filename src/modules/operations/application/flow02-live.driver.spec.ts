@@ -63,10 +63,9 @@ describe("FLOW-02 live domain driver", () => {
     vi.clearAllMocks();
   });
 
-  it("drives certified transitions up to FLOW02_LIVE_THROUGH (default T2)", async () => {
-    // Default = max certified transition (T2 after FLOW02-002; bump to 3 in FLOW02-003).
-    // Scoped: FLOW02_LIVE_THROUGH=1|2|3 via --through=
-    const through = Number(process.env.FLOW02_LIVE_THROUGH || "2");
+  it("drives certified transitions up to FLOW02_LIVE_THROUGH (default T3)", async () => {
+    // Default = max certified transition (T3 after FLOW02-003).
+    const through = Number(process.env.FLOW02_LIVE_THROUGH || "3");
 
     await DeliveryService.recordAttempt(ctx(), {
       orderId: "order-flow02",
@@ -82,12 +81,11 @@ describe("FLOW-02 live domain driver", () => {
       return;
     }
 
-    const retry = await OperationsService.transitionDelivery(
+    await OperationsService.transitionDelivery(
       ctx(),
       "order-flow02",
       "out_for_delivery",
     );
-    expect(retry).toBe("out_for_delivery");
     if (through < 3) {
       expect(getObservedFlow02Steps()).toEqual([
         "FLOW02_T1_STARTED",
@@ -98,9 +96,19 @@ describe("FLOW-02 live domain driver", () => {
       return;
     }
 
-    // T3 reserved for FLOW02-003 — not driven here yet.
-    expect(getObservedFlow02Steps().some((s) => s.startsWith("FLOW02_T3"))).toBe(
-      false,
-    );
+    const resolved = await DeliveryService.recordAttempt(ctx(), {
+      orderId: "order-flow02",
+      outcome: "delivered",
+      note: "delivered on retry",
+    });
+    expect(resolved.status).toBe("delivered");
+    expect(getObservedFlow02Steps()).toEqual([
+      "FLOW02_T1_STARTED",
+      "FLOW02_T1_COMPLETED",
+      "FLOW02_T2_STARTED",
+      "FLOW02_T2_COMPLETED",
+      "FLOW02_T3_STARTED",
+      "FLOW02_T3_COMPLETED",
+    ]);
   });
 });

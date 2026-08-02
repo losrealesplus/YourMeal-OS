@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW02_CANONICAL_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ Runner contract **ACTIVE** · Domain ▶ FLOW02-002 (T2)  
+**Estado:** ✅ Runner contract **ACTIVE** · Domain ▶ FLOW02-003 (T3 / FULL PASS)  
 **Spec:** [FLOW_02_DELIVERY_INCIDENTS_SPEC](../../00-status/FLOW_02_DELIVERY_INCIDENTS_SPEC.md) **FROZEN** (PR #148)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)
 
@@ -79,13 +79,15 @@ JSON: `docs/10-validation/flow-02/evidence/flow02-canonical.json`
 # Self-test del contrato completo (sintético · sin dominio)
 npm run test:flow02-canonical -- --self-test
 
-# Live dominio (FLOW02-001…002)
+# Live dominio (FLOW02-001…003)
 npm run test:flow02-001
 # → PASS through T1 · BLOCKED at FLOW02_T2_STARTED · exit 0
 npm run test:flow02-002
 # → PASS through T2 · BLOCKED at FLOW02_T3_STARTED · exit 0
+npm run test:flow02-003
+# → FULL PASS · exit 0
 npm run test:flow02-canonical -- --live
-# → PASS through T2 · BLOCKED at FLOW02_T3_STARTED · exit 2 (full flow incomplete)
+# → status=PASS · missing=[] · exit 0
 
 # Pipeline explícito
 npm run test:flow02-canonical -- --pipeline=FLOW02_T1_STARTED,FLOW02_T1_COMPLETED --through=T1
@@ -101,8 +103,8 @@ npm run test:flow02-canonical:unit
 | Entrega | Estado |
 |---------|--------|
 | FLOW02-001 T1 | ✅ `out_for_delivery` → `delivery_issue` |
-| FLOW02-002 T2 | ▶ `delivery_issue` → `out_for_delivery` |
-| FLOW02-003 T3 | ⏳ delivered |
+| FLOW02-002 T2 | ✅ `delivery_issue` → `out_for_delivery` |
+| FLOW02-003 T3 | ▶ `out_for_delivery` → `delivered` · FULL PASS |
 
 Sin redefinir el contrato del runner.
 
