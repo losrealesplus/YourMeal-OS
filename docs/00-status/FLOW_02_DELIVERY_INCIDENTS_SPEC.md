@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW_02_DELIVERY_INCIDENTS_SPEC.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ **SPEC READY FOR FREEZE** — checklist pre-Freeze completo · sin runner ni dominio en este PR  
+**Estado:** ✅ **SPEC FROZEN** (PR #148) · runner canónico ▶ · sin dominio hasta FLOW02-001  
 **Precondición:** FLOW-01 ✅ CERTIFIED · tag `flow01-pass` · [FLOW01_PASS_ACTA](../10-validation/flow-01/FLOW01_PASS_ACTA.md)  
 **DoR:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) · checklist parcial abajo  
 **Gobernanza:** [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) Regla 7–8 · [Evidence before Implementation](./EVIDENCE_BEFORE_IMPLEMENTATION.md)  
@@ -226,17 +226,17 @@ FLOW02_T3_COMPLETED
 PASS
 ```
 
-Comando previsto: `npm run test:flow02-canonical`  
-Comportamiento inicial esperado (contrato ejecutable · **sin** dominio):
+Comando: `npm run test:flow02-canonical`  
+Doc: [FLOW02_CANONICAL_RUNNER](../10-validation/flow-02/FLOW02_CANONICAL_RUNNER.md)  
+Comportamiento inicial (contrato ejecutable · **sin** dominio):
 
 ```text
-FLOW02
+FLOW-02
 BLOCKED
 blocked_at=FLOW02_T1_STARTED
 ```
 
-Los **invariantes** de este documento deben ser assertions del runner (no solo prosa).  
-**No se implementa en este PR** — solo tras merge = Spec FROZEN.
+Los **invariantes** de este documento deben ser assertions del runner (no solo prosa).
 
 ---
 
@@ -260,15 +260,15 @@ Si algún ítem quedara abierto → **no Freeze** · no runner.
 
 | Artefacto | Estado |
 |-----------|--------|
-| SPEC | ✅ listo para Freeze (merge de este PR) |
-| Contrato `FLOW02_*` | ✅ congelable |
-| Runner `test:flow02-canonical` | ⏳ PR siguiente (post-Freeze) |
+| SPEC | ✅ **FROZEN** (#148) |
+| Contrato `FLOW02_*` | ✅ congelado |
+| Runner `test:flow02-canonical` | ▶ activo (BLOCKED at T1 · sin dominio) |
 | Estados permitidos | ✅ |
 | Invariantes | ✅ |
 | PASS / BLOCKED esperados | ✅ |
-| Acta (path) | ⏳ `docs/10-validation/flow-02/` con runner |
+| Acta (path) | ⏳ tras FLOW02-001…003 |
 
-**Implementation de dominio:** ❌ prohibida hasta runner + DoR completo (Regla 8).
+**Implementation de dominio:** ❌ prohibida hasta DoR completo · siguiente = FLOW02-001 (Regla 8).
 
 ---
 
@@ -276,9 +276,9 @@ Si algún ítem quedara abierto → **no Freeze** · no runner.
 
 | Fase | Trabajo | Estado |
 |------|---------|--------|
-| 1 | Spec (este PR #148) | ▶ → merge = **FROZEN** |
-| 2 | Runner canónico (`test:flow02-canonical` · BLOCKED at T1) | ⏳ siguiente PR |
-| 3 | FLOW02-001…003 (una transición / PR) | ⏳ tras runner |
+| 1 | Spec (#148) | ✅ **FROZEN** |
+| 2 | Runner canónico (`test:flow02-canonical` · BLOCKED at T1) | ▶ |
+| 3 | FLOW02-001…003 (una transición / PR) | ⏳ |
 
 ---
 

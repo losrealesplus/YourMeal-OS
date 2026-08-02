@@ -34,6 +34,9 @@ FLOW-XX
 
 Sin todos los ítems → ❌ no abrir Implementation PRs del happy path.
 
+**Land check:** Spec y Runner deben estar en `main` (no solo “Merged” en una feature branch).  
+Ver [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) Regla 9.
+
 ---
 
 ## Ciclo institucionalizado (probado)

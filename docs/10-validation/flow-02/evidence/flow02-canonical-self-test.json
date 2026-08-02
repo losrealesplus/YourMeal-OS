@@ -1,0 +1,44 @@
+{
+  "status": "PASS",
+  "reason": "Contract self-test",
+  "gate": "FLOW-02",
+  "contract": "FLOW_02_DELIVERY_INCIDENTS_SPEC",
+  "principle": "Evidence before Implementation",
+  "code_status": "RUNNER_SELF_TEST",
+  "at": "2026-08-02T13:18:39.030Z",
+  "pipeline": [
+    "FLOW02_T1_STARTED",
+    "FLOW02_T1_COMPLETED",
+    "FLOW02_T2_STARTED",
+    "FLOW02_T2_COMPLETED",
+    "FLOW02_T3_STARTED",
+    "FLOW02_T3_COMPLETED"
+  ],
+  "expected": [
+    "FLOW02_T1_STARTED",
+    "FLOW02_T1_COMPLETED",
+    "FLOW02_T2_STARTED",
+    "FLOW02_T2_COMPLETED",
+    "FLOW02_T3_STARTED",
+    "FLOW02_T3_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": null,
+  "certified_through": 3,
+  "blocked_at": null,
+  "delivery": "FLOW-02",
+  "delivery_status": "PASS",
+  "flow_status": "PASS",
+  "terminal": {
+    "order_status": "delivered"
+  },
+  "evidence": {},
+  "duration_ms": {
+    "t1_ms": 15,
+    "t2_ms": 15,
+    "t3_ms": 15,
+    "flow_total_ms": 75
+  }
+}
