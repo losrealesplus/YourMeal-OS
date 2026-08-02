@@ -1,11 +1,11 @@
 # PLATFORM STABILIZATION COMPLETE
 
 **Documento:** `PLATFORM_STABILIZATION_COMPLETE.md`  
-**Fecha:** 2026-07-29  
-**Estado:** ✅ **COMPLETE**  
-**PR:** Platform Stabilization Completion (post #99)  
+**Fecha:** 2026-07-29 · **Flow-ready:** 2026-08-02  
+**Estado:** ✅ **COMPLETE (Flow-ready)**  
+**Acta PS-002-C:** [PS002C_PASS_ACTA](./PS002C_PASS_ACTA.md)  
 **No modifica:** Foundation · Auth contrato · Identity · Core · Governance · FOPEBA  
-**No abre:** FLOW-01 · Event Bus · Notifications · Jobs · Analytics · AI
+**No abre automáticamente:** FLOW-01 · Event Bus · Notifications · Jobs · Analytics · AI
 
 ---
 
@@ -28,12 +28,10 @@ FLOW-01
 |------|-----------|------|
 | **PS-001** UI Stability | ✅ PASS | [PS-001.md](./PS-001.md) |
 | **PS-002-B** Auth Bootstrap smoke | ✅ PASS | [PS-002.md](./PS-002.md) |
-| **PS-002-C** Canonical Session (Auth Supabase real) | ⏳ PENDING | [PS-002.md](./PS-002.md) · [FCR-008](../FCR008_CANONICAL_POST_LOGIN_SESSION.md) |
+| **PS-002-C** Canonical Session (Auth Supabase real) | ✅ **PASS** (2026-08-02) | [PS002C_PASS_ACTA](./PS002C_PASS_ACTA.md) · [FCR-008](../FCR008_CANONICAL_POST_LOGIN_SESSION.md) |
 | **PS-003** Navigation Smoke | ✅ PASS | [PS-003.md](./PS-003.md) |
 
-Evidencia reproducible: `evidence/gates-summary.json` · capturas PNG · `scripts/platform-stabilization-gates.mjs`
-
-> **Flow gate:** PS-002 para FLOW-01 = **PS-002-C** (contrato canónico con Auth real). Bootstrap PASS no basta.
+Evidencia: `evidence/ps002c-canonical-auth.json` · `evidence/gates-summary.json` · `npm run test:ps002-canonical-auth`
 
 ## Pre-check
 
@@ -53,7 +51,7 @@ PS-003 = PASS
 → PLATFORM STABILIZATION COMPLETE (Bootstrap)
 ```
 
-## Criterio Flow-ready (estricto — pendiente)
+## Criterio Flow-ready (estricto — ✅ cumplido 2026-08-02)
 
 ```text
 PS-001 = PASS
@@ -62,7 +60,7 @@ PS-002-C = PASS (Auth Supabase real · contrato canónico)
 AND
 PS-003 = PASS
 ↓
-PLATFORM STABILIZATION COMPLETE (Flow-ready)
+PLATFORM STABILIZATION COMPLETE (Flow-ready)   ← AQUÍ
 ↓
 FLOW CERTIFICATION READY
 ↓
@@ -72,11 +70,11 @@ PR FLOW-01 · Kitchen → Delivery · Specification
 ## Siguiente movimiento
 
 ```text
-1. Ejecutar PS-002-C (Auth real) — ver PS-002.md
-2. Solo entonces abrir PR FLOW-01
+1. PS-002-C PASS — cerrado (no re-instrumentar salvo regresión)
+2. Abrir PR FLOW-01 · Kitchen → Delivery · Specification
 ```
 
-Bajo [FLOW_GOVERNANCE](../../00-status/FLOW_GOVERNANCE.md) / Operating Model v1 — **no** abrir FLOW-01 con “parece que funciona”.
+Bajo [FLOW_GOVERNANCE](../../00-status/FLOW_GOVERNANCE.md) / Operating Model v1.
 
 ## Firma
 

@@ -1,12 +1,24 @@
 {
-  "status": "BLOCKED",
-  "reason": "PS002_EMAIL / PS002_PASSWORD missing",
+  "status": "PASS",
+  "reason": "",
   "gate": "PS-002-C",
   "contract": "FCR-008",
   "auth": "supabase_real",
   "code_status": "UNCHANGED",
-  "at": "2026-07-29T17:09:45.641Z",
-  "pipeline": [],
+  "at": "2026-08-02T00:00:00.000Z",
+  "pipeline": [
+    "LOGIN",
+    "LOGIN_OK",
+    "CANONICAL_SESSION",
+    "BOOTSTRAP_START",
+    "IDENTITY_READY",
+    "PROFILE_READY",
+    "MEMBERSHIP_READY",
+    "ROLE_READY",
+    "HOME_PATH_RESOLVED",
+    "NAVIGATE",
+    "DASHBOARD_RENDERED"
+  ],
   "expected": [
     "LOGIN",
     "LOGIN_OK",
@@ -25,11 +37,16 @@
   "out_of_order": [],
   "firstFailure": null,
   "duration_ms": {
-    "login_to_session": null,
-    "session_to_bootstrap": null,
-    "bootstrap_to_dashboard": null
+    "login_to_session": 531,
+    "session_to_bootstrap": 1,
+    "bootstrap_to_dashboard": 833
   },
   "base": "http://127.0.0.1:8080",
   "route": "/auth/admin",
-  "open_fcr": false
+  "open_fcr": false,
+  "notes": [
+    "Operator PASS 2026-08-02 — acta PS002C_PASS_ACTA.md",
+    "Platform Stabilization COMPLETE (Flow-ready)",
+    "duration_ms is diagnostic only"
+  ]
 }

@@ -39,7 +39,7 @@ docs/10-validation/
 ├── FCR002_FLICKER_INVESTIGATION.md       ← Render Stability Regression (CLOSED)
 ├── FCR007_LOGIN_BLOCKER_INVESTIGATION.md ← Login Blocker P0 · post-login no Navigate
 ├── FCR008_CANONICAL_POST_LOGIN_SESSION.md ← Canonical session post-login (fix FCR-007)
-├── platform-stabilization/               ← COMPLETE · PS-001/002/003 PASS · acta cierre
+├── platform-stabilization/               ← COMPLETE Flow-ready · PS-002-C PASS 2026-08-02
 ├── LOVABLE_DEPLOYMENT_AUDIT_BOOTSTRAP.md  ← Bootstrap #82 · DV-001 Lovable sync
 ├── POST_DEPLOY_SMOKE_OP001.md
 ├── RI001_CERTIFICATION_SPRINT.md
@@ -60,8 +60,8 @@ HOME path gap evidence (`ROLE_READY` / `STOP`): [HOME_PATH_002_EVIDENCE](./HOME_
 Cold `checkingSession` timings: [AUTH_SESSION_002_COLD_TIMING](./AUTH_SESSION_002_COLD_TIMING.md)  
 AUTH-SESSION-001 **CLOSED**: [AUTH_SESSION_001_CLOSED](./AUTH_SESSION_001_CLOSED.md)  
 HOME-PATH-001 **CLOSED**: [HOME_PATH_001_CLOSED](./HOME_PATH_001_CLOSED.md)  
-PS-002-C staff data gate: [PS002C_STAFF_DATA_GATE](./PS002C_STAFF_DATA_GATE.md)  
-Playwright Auth network capture: [AUTH_NET_003_PLAYWRIGHT_NETWORK](./AUTH_NET_003_PLAYWRIGHT_NETWORK.md)
+PS-002-C **PASS** (2026-08-02): [platform-stabilization/PS002C_PASS_ACTA](./platform-stabilization/PS002C_PASS_ACTA.md) · lock [RELEASED](./PRIORITY_PS002C_BEFORE_FLOW.md)  
+Playwright Auth network capture (histórico): [AUTH_NET_003_PLAYWRIGHT_NETWORK](./AUTH_NET_003_PLAYWRIGHT_NETWORK.md)
 
 ## INFRA-005 · Identity validation
 

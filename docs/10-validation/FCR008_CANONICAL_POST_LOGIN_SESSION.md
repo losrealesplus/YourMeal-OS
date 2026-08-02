@@ -74,17 +74,13 @@ Cold start (`getSession` al montar `/auth`) **sigue permitido**.
 | Unit pipeline + `validateCanonicalPipeline` | PASS |
 | No `getSession` inmediato tras login en auth routes | ✅ |
 | Identity Provider sin `getSession` de mount | ✅ |
-| PS-002-C Auth Supabase real | ⏳ pendiente |
+| PS-002-C Auth Supabase real | ✅ **PASS** (2026-08-02) · [PS002C_PASS_ACTA](./platform-stabilization/PS002C_PASS_ACTA.md) |
 
 ## Flow
 
 ```text
-PRIORIDAD: PS-002-C PASS (Auth real + evidencia)
-  → entonces resolver/rebase docs (#98 vs tip)
-  → entonces FLOW-01 Specification
-
-HOLD ahora:
-  merge #98 · FLOW-01 · “parece que login funciona”
+PS-002-C PASS → Platform Stabilization COMPLETE (Flow-ready)
+  → FLOW-01 Specification (PR dedicado)
 ```
 
 Runner: `npm run test:ps002-canonical-auth` · ver [PRIORITY_PS002C_BEFORE_FLOW](./PRIORITY_PS002C_BEFORE_FLOW.md)
