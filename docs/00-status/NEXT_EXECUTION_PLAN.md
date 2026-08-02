@@ -22,7 +22,8 @@ FLOW-02                       ✅  flow02-pass
 FLOW-03                       ✅  flow03-pass
 FLOW-04 DoR                   ✅  #162
 FLOW-04 Spec                  ✅  FROZEN #163 · 3d922ae
-FLOW-04 Runner                ▶  BLOCKED at T1 (sin dominio)
+FLOW-04 Runner                ✅  #164 · a99f6fd
+FLOW04-001                    ▶  T1 → planned
 RELEASE-01                    DRAFT  (eje B · #161 en main)
 Definition of Release         DRAFT  (DoRl)
 ```
@@ -146,10 +147,9 @@ No forma parte de este PR ni de la Spec.
 ## Current Goal
 
 ```text
-FLOW-04 Runner on main
-npm run test:flow04-canonical → BLOCKED at FLOW04_T1_STARTED
-Then Gate → FLOW04-001 (T1 only)
-No domain in the runner PR.
+FLOW04-001 · Is T1 certified?
+npm run test:flow04-001 → PASS through T1 · BLOCKED at T2 · exit 0
+No T2 · No T3 · No stock mutation.
 ```
 
 ---

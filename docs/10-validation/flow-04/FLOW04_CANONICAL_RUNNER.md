@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW04_CANONICAL_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ Runner **ACTIVE** · Domain ❌ not open (Gate FLOW04-001)  
+**Estado:** ✅ Runner **ACTIVE** · Domain ▶ FLOW04-001 T1 · Gate ✅  
 **Spec:** [FLOW_04_INVENTORY_CONSUMPTION_SPEC](../../00-status/FLOW_04_INVENTORY_CONSUMPTION_SPEC.md) **FROZEN** (#163 → `3d922ae`)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)
 
@@ -93,22 +93,26 @@ npm run test:flow04-canonical:unit
 | # | Condición | Estado |
 |---|-----------|--------|
 | 1 | Spec (#163) en `main` → FROZEN | ✅ `3d922ae` |
-| 2 | Runner en `main` | ▶ este PR |
-| 3 | Canonical BLOCKED verificado desde `main` | ⏳ tras merge |
+| 2 | Runner en `main` | ✅ #164 → `a99f6fd` |
+| 3 | Canonical BLOCKED verificado desde `main` | ✅ |
 | 4 | Contrato `FLOW04_T*` congelado | ✅ Spec |
 
-Cuando 1–4 verdes → **READY TO OPEN FLOW04-001**  
-Pregunta única de FLOW04-001: ¿T1 quedó certificada?  
-→ PASS through T1 · `blocked_at=FLOW04_T2_STARTED`
+Gate **verde** · FLOW04-001 abierto · [acta T1](./FLOW04_001_T1_ACTA.md).
 
 ---
 
-## Fuera de este PR
+## Dominio (incremental)
 
-- InventoryService · stock mutation · repositories  
-- Supabase · RPC · SQL · UI  
-- Domain driver · `--live` PASS  
-- FLOW04-001+  
+| Entrega | Estado |
+|---------|--------|
+| FLOW04-001 T1 | ▶ `→ planned` · [acta](./FLOW04_001_T1_ACTA.md) |
+| FLOW04-002 T2 | ⏳ `planned → applied` (+ stock · I2) |
+| FLOW04-003 T3 | ⏳ `applied → sealed` |
+
+```bash
+npm run test:flow04-001
+# → PASS through T1 · BLOCKED at FLOW04_T2_STARTED · exit 0
+```
 
 ---
 

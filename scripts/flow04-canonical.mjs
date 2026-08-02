@@ -8,10 +8,11 @@
  *   --self-test   Validate frozen full contract (synthetic PASS).
  *   --pipeline=a,b,c   Validate an explicit observed step list.
  *   --through=T1|T2|T3   Scope delivery FLOW04-001..003 (prefix PASS).
- *   --live        Not available until Gate FLOW04-001 (no domain driver).
+ *   --live        Evaluate domain observations (progressive BLOCKED/PASS/FAIL).
  *
  *   npm run test:flow04-canonical
- *   npm run test:flow04-canonical -- --self-test
+ *   npm run test:flow04-canonical -- --live --through=T1
+ *   npm run test:flow04-001
  *
  * Spec: docs/00-status/FLOW_04_INVENTORY_CONSUMPTION_SPEC.md
  */
@@ -28,6 +29,7 @@ import {
   formatFlow04ComparisonTable,
   validateFlow04Pipeline,
 } from "./lib/flow04-canonical-pipeline.mjs";
+import { runFlow04DomainDriver } from "./lib/flow04-domain-driver.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -147,20 +149,77 @@ async function main() {
   }
 
   if (mode === "live") {
-    console.error("");
-    console.error("FLOW-04 --live unavailable: domain Gate FLOW04-001 not open.");
-    console.error("No inventory driver · no stock mutation · no Supabase.");
-    console.error("Use: npm run test:flow04-canonical  (BLOCKED at T1)");
+    console.log("Driving FLOW-04 domain (certified transitions)…");
+    const driver = runFlow04DomainDriver({ root: ROOT, through });
+    if (!driver.ok) {
+      console.error("Domain driver failed (vitest):");
+      console.error(driver.output.slice(-4000));
+      const report = buildFlow04EvidenceReport({
+        status: "FAIL",
+        reason: "FLOW-04 domain driver failed",
+        pipeline: driver.steps,
+        code_status: "DOMAIN_DRIVER_FAIL",
+        terminal: { consumption_status: null },
+        evidence: {},
+      });
+      await writeEvidence(report, "live", through);
+      process.exit(FLOW04_EXIT.FAIL);
+    }
+
+    const observed = driver.steps;
+    const progress = evaluateFlow04Progress(observed, { through });
+    const duration_ms = computeFlow04Durations(syntheticTimestamps(observed));
+    const statusForThrough = {
+      1: "planned",
+      2: "applied",
+      3: "sealed",
+    };
     const report = buildFlow04EvidenceReport({
-      status: "FAIL",
-      reason: "FLOW-04 domain driver not present (runner-only PR)",
-      pipeline: [],
-      code_status: "DOMAIN_NOT_OPEN",
-      terminal: { consumption_status: null },
+      status: progress.status,
+      reason: progress.reason,
+      pipeline: observed,
+      validation: progress,
+      duration_ms,
+      code_status: `DOMAIN_DRIVER_T${progress.certified_through || 0}`,
+      terminal: {
+        consumption_status:
+          statusForThrough[progress.certified_through] ?? null,
+      },
+      progress,
       evidence: {},
     });
-    await writeEvidence(report, "live", through);
-    process.exit(FLOW04_EXIT.FAIL);
+
+    console.log(formatFlow04ComparisonTable(progress));
+    console.log("");
+    console.log(progress.reason);
+    console.log(
+      `certified_through=T${progress.certified_through || 0} · blocked_at=${progress.blocked_at ?? "—"}`,
+    );
+    console.log(
+      `duplicates=${JSON.stringify(report.duplicates)} missing=${JSON.stringify(report.missing)} out_of_order=${JSON.stringify(report.out_of_order)}`,
+    );
+
+    const out = await writeEvidence(report, "live", through);
+    console.log(`evidence_file: ${path.relative(ROOT, out)}`);
+
+    if (
+      progress.status === "PASS" &&
+      progress.flow_status === "PASS" &&
+      progress.certified_through >= 3
+    ) {
+      console.log("FLOW-04 · FULL PASS · Inventory Consumption certified");
+    } else if (
+      progress.certified_through >= 1 &&
+      progress.blocked_at === "FLOW04_T2_STARTED"
+    ) {
+      console.log("FLOW04-001 · PASS through T1 · BLOCKED at T2 (expected)");
+    } else if (
+      progress.certified_through >= 2 &&
+      progress.blocked_at === "FLOW04_T3_STARTED"
+    ) {
+      console.log("FLOW04-002 · PASS through T2 · BLOCKED at T3 (expected)");
+    }
+    process.exit(exitFor(progress));
   }
 
   if (mode === "self-test") {
