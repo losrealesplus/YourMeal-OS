@@ -117,8 +117,8 @@ La conversación sobre beta se ancla a filas con evidencia (detalle vivo en
 |-----------|----------------------------|------|
 | FOUNDATION · PS-002C · FLOW-01…04 | ✅ | Tags de milestone |
 | Smoke | ✅ | `release-smoke-pass` → `370628a` |
-| Cross-flow | ▶ FULL PASS (rama) · [PASS acta](../10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md) · tag tras Land Check `main` | `release-crossflow-pass` |
-| E2E | ⏳ | `release-e2e-pass` |
+| Cross-flow | ✅ | `release-crossflow-pass` → `0a0c51b` · [PASS](../10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md) |
+| E2E | ▶ DoR [RELEASE_E2E_DOR](./RELEASE_E2E_DOR.md) | `release-e2e-pass` |
 | Deployment · Rollback | ⏳ | `release-deploy-pass` · `release-rollback-pass` |
 | Beta Acceptance | ⏳ | `release-01-beta` |
 

@@ -73,8 +73,8 @@ Luego FLOW-06… según catálogo. Sin saltos. Sin features futuras en el PR del
 | FLOW-03 | ✅ | Tag `flow03-pass` |
 | FLOW-04 | ✅ | Tag `flow04-pass` |
 | Smoke Tests | ✅ | Tag `release-smoke-pass` · [PASS acta](../10-validation/release-smoke/RELEASE_SMOKE_PASS_ACTA.md) |
-| Cross-flow | ▶ | 001–003 ✅ · 004 FULL PASS [C4](../10-validation/release-crossflow/RELEASE_CROSSFLOW_004_C4_ACTA.md) · [PASS](../10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md) → tag tras Land Check `main` |
-| E2E | ⏳ | Spec pendiente → tag `release-e2e-pass` |
+| Cross-flow | ✅ | Tag `release-crossflow-pass` → `0a0c51b` · [PASS](../10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md) |
+| E2E | ▶ | DoR [RELEASE_E2E_DOR](./RELEASE_E2E_DOR.md) → Spec → tag `release-e2e-pass` |
 | Deployment | ⏳ | Contract pendiente → tag `release-deploy-pass` |
 | Rollback | ⏳ | Contract pendiente → tag `release-rollback-pass` |
 | Beta Acceptance | ⏳ | Enlaza evidencia → tag `release-01-beta` |
@@ -83,14 +83,14 @@ Luego FLOW-06… según catálogo. Sin saltos. Sin features futuras en el PR del
 
 ```text
 B-01 Smoke        ✅ release-smoke-pass
-B-02 Cross-flow   DoR ✅ · Spec ✅ · Runner ✅ · 001–003 ✅ · 004 ▶ FULL PASS → release-crossflow-pass
-B-03 E2E          Spec → Freeze → Runner (BLOCKED) → impl → release-e2e-pass
+B-02 Cross-flow   ✅ release-crossflow-pass → 0a0c51b
+B-03 E2E          ▶ DoR → Spec → Freeze → Runner (BLOCKED) → impl → release-e2e-pass
 B-04 Deployment   DEPLOYMENT_CONTRACT → Runner → release-deploy-pass
 B-05 Rollback     Contract → Runner → release-rollback-pass
 B-06 Beta Accept. Solo al final → release-01-beta
 ```
 
-Orden fijo. No abrir FLOW-05 salvo que Track B descubra un bloqueador que lo exija.  
+Orden fijo. No abrir FLOW-05 / Deploy / Rollback salvo que el ciclo E2E lo exija.  
 Convención de tags: homogénea con `flowNN-pass` — cada gate termina en `-pass`.
 
 Criterio de publicación: **todos los gates aplicables con evidencia**,  
@@ -109,7 +109,8 @@ RELEASE-01
 ├── FLOW-04                 ✅  tag flow04-pass
 ├── FLOW-05+                ⏳  solo si el set beta lo exige (DoR primero)
 ├── Smoke Tests             ✅  tag release-smoke-pass
-├── Cross-flow Tests        ⏳  001–002 ✅ · 003 ▶ C3 · then C4
+├── Cross-flow Tests        ✅  tag release-crossflow-pass → 0a0c51b
+├── E2E Tests               ▶  DoR → … → release-e2e-pass
 ├── Performance             ⏳  (o N/A documentado)
 ├── Security                ⏳  (o N/A documentado)
 ├── Deployment              ⏳  reproducible
