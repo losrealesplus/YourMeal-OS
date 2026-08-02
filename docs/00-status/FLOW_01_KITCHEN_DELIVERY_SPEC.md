@@ -364,9 +364,9 @@ Los **invariantes** de este documento deben aparecer como assertions del runner 
 | 5 | Cerrar GAP Packaging lifecycle | ✅ este commit |
 | 6 | Cerrar GAP criterio T4 (`delivered`) | ✅ este commit |
 | 7 | Errores/desviaciones permitidas (nombradas) | ✅ este commit |
-| 8 | Aprobar / merge Spec (PR #141) | ⏳ |
-| 9 | Runner `test:flow01-canonical` | ⏳ post-merge Spec |
-| 10 | Implementación happy path Kitchen → Delivery | ❌ tras freeze + runner contract |
+| 8 | Aprobar / merge Spec (PR #141) = **SPEC FROZEN** | ⏳ merge humano |
+| 9 | Runner `test:flow01-canonical` (Evidence before Implementation) | ⏳ inmediatamente tras merge Spec |
+| 10 | Implementación happy path Kitchen → Delivery | ❌ solo tras Spec freeze + runner |
 
 ---
 
