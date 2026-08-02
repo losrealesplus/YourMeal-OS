@@ -95,7 +95,10 @@ Ver: [RELEASE_ROLLBACK_GATE](./RELEASE_ROLLBACK_GATE.md) · Decision: ✅ READY 
 |-----------|------|
 | CLI | `scripts/release-rollback-canonical.mjs` |
 | Pipeline | `scripts/lib/release-rollback-canonical-pipeline.mjs` |
-| Unit | `scripts/lib/release-rollback-canonical-pipeline.spec.mjs` |
+| Capability driver | `scripts/lib/release-rollback-capability-driver.mjs` |
+| R1 Detect/Decide | `scripts/lib/release-rollback-r1-detect-decide.mjs` |
+| Unit | `scripts/lib/release-rollback-*-pipeline.spec.mjs` · `release-rollback-r1-detect-decide.spec.mjs` |
+| 001 live evidence | `docs/10-validation/release-rollback/evidence/release-rollback-001-canonical-live.json` |
 | Runner-only evidence | `docs/10-validation/release-rollback/evidence/release-rollback-canonical.json` |
 
 ---
