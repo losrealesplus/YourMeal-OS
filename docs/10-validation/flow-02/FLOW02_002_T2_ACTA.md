@@ -62,6 +62,13 @@ out_of_order=[]
 
 Exit code **0** (delivery PASS scoped).
 
+Live sin scope (max certificado = T2):
+
+```bash
+npm run test:flow02-canonical -- --live
+# PASS through T2 · blocked_at=FLOW02_T3_STARTED · exit 2
+```
+
 Regresión T1:
 
 ```bash

@@ -27,8 +27,9 @@ export function runFlow02DomainDriver({ root, through = null }) {
         ...process.env,
         FLOW02_LIVE_DRIVER: "1",
         FORCE_COLOR: "0",
-        // Default through=1 preserves FLOW02-001 when --live has no --through
-        FLOW02_LIVE_THROUGH: String(through ?? 1),
+        // Unscoped --live drives max certified transition (T2 until FLOW02-003).
+        // Scoped deliveries pass --through=T1|T2|T3 explicitly.
+        ...(through ? { FLOW02_LIVE_THROUGH: String(through) } : {}),
       },
       maxBuffer: 10 * 1024 * 1024,
     },

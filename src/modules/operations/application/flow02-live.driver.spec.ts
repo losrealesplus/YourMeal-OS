@@ -63,9 +63,10 @@ describe("FLOW-02 live domain driver", () => {
     vi.clearAllMocks();
   });
 
-  it("drives certified transitions up to FLOW02_LIVE_THROUGH (default T1)", async () => {
-    // Default T1 keeps FLOW02-001 behavior; FLOW02-002 sets THROUGH=2.
-    const through = Number(process.env.FLOW02_LIVE_THROUGH || "1");
+  it("drives certified transitions up to FLOW02_LIVE_THROUGH (default T2)", async () => {
+    // Default = max certified transition (T2 after FLOW02-002; bump to 3 in FLOW02-003).
+    // Scoped: FLOW02_LIVE_THROUGH=1|2|3 via --through=
+    const through = Number(process.env.FLOW02_LIVE_THROUGH || "2");
 
     await DeliveryService.recordAttempt(ctx(), {
       orderId: "order-flow02",

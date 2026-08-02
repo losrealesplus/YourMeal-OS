@@ -84,6 +84,8 @@ npm run test:flow02-001
 # → PASS through T1 · BLOCKED at FLOW02_T2_STARTED · exit 0
 npm run test:flow02-002
 # → PASS through T2 · BLOCKED at FLOW02_T3_STARTED · exit 0
+npm run test:flow02-canonical -- --live
+# → PASS through T2 · BLOCKED at FLOW02_T3_STARTED · exit 2 (full flow incomplete)
 
 # Pipeline explícito
 npm run test:flow02-canonical -- --pipeline=FLOW02_T1_STARTED,FLOW02_T1_COMPLETED --through=T1
