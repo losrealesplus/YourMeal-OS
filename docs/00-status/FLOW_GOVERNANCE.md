@@ -205,11 +205,28 @@ npm run test:<gate-script>
 
 Si el commit o el script no aparecen en `main`, o el exit code / `blocked_at` no coinciden → el Gate **sigue cerrado**, aunque GitHub diga Merged.
 
+### Evidencia rápida de “no aterrizado”
+
+```bash
+git pull origin main
+npm run test:<gate-script>
+```
+
+Si npm responde:
+
+```text
+npm ERR! Missing script: "test:<gate-script>"
+```
+
+→ el contrato **no está en `main`**. Esa salida es evidencia FOPEBA válida de Gate rojo  
+(rápida, objetiva, independiente del estado MERGED en GitHub).
+
 Incidentes de referencia:
 
 - FLOW-02 · #149 mergeado fuera de `main` · corregido por #150  
 - FLOW-03 · #156 → #157 (mismo patrón)  
-- RELEASE-SMOKE · Gate report: [RELEASE_SMOKE_GATE](../10-validation/release-smoke/RELEASE_SMOKE_GATE.md)
+- RELEASE-SMOKE · #169–#171 Merged a stack · `Missing script: test:release-smoke` desde `main` · land PR  
+  · Gate report: [RELEASE_SMOKE_GATE](../10-validation/release-smoke/RELEASE_SMOKE_GATE.md)
 
 ---
 
