@@ -91,15 +91,26 @@ npm run test:flow03-canonical:unit
 
 ---
 
+## Gate · Abrir FLOW03-001
+
+| # | Condición | Estado |
+|---|-----------|--------|
+| 1 | Spec (#155) en `main` → FROZEN | ✅ |
+| 2 | Este runner (#156) retarget/rebase a `main` y mergeado | ▶ |
+| 3 | Desde `main`: BLOCKED at `FLOW03_T1_STARTED` · arrays vacíos · `evidence={}` · exit 2 | ⏳ tras merge |
+| 4 | Contrato `FLOW03_T*` sin cambios pendientes | ✅ |
+
+FLOW03-001 permanece **cerrado** hasta Gate completo. Sin dominio en este PR.
+
 ## Dominio (incremental · fuera de este PR)
 
 | Entrega | Estado |
 |---------|--------|
-| FLOW03-001 T1 | ⏳ `delivered` → invoice `pending` |
+| FLOW03-001 T1 | ⏳ bloqueado por Gate · `delivered` → invoice `pending` |
 | FLOW03-002 T2 | ⏳ evento `reviewed_at` · status sigue `pending` |
 | FLOW03-003 T3 | ⏳ `pending` → `paid` · FULL PASS |
 
-Sin AccountingService / repos / Supabase / RPC / UI en este PR.
+Sin AccountingService / repos / Supabase / RPC / UI / OperationsService en este PR.
 
 ---
 
