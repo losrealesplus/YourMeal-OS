@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_SMOKE_GATE.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **READY** · Land Check PASS desde `main` (#172)  
+**Estado:** ✅ **READY** · Land Check PASS desde `main` (#172/#173) · RELEASE-SMOKE-001 en curso  
 **Nivel:** Release Track B · B-01 Smoke  
 **Spec:** [RELEASE_SMOKE_SPEC](../../00-status/RELEASE_SMOKE_SPEC.md)  
 **Runner:** [RELEASE_SMOKE_RUNNER](./RELEASE_SMOKE_RUNNER.md)  
@@ -18,25 +18,25 @@
 
 ### Track B · land history
 
-| PR | Contenido | GitHub | Landed on `main`? |
-|----|-----------|--------|-------------------|
-| **#168** | RELEASE-01 Track B priority | MERGED | ✅ |
-| **#169** | Spec (stack merge) | MERGED | vía **#172** ✅ |
-| **#170** | Runner (stack merge) | MERGED | vía **#172** ✅ |
-| **#171** | Gate docs (stack merge) | MERGED | vía **#172** ✅ |
-| **#172** | Land Spec+Runner+Gate → `main` | MERGED | ✅ `77dfaa8` |
+| PR | Contenido | Landed on `main`? |
+|----|-----------|-------------------|
+| **#168** | RELEASE-01 Track B priority | ✅ |
+| **#169–#171** | Spec · Runner · Gate (vía #172) | ✅ |
+| **#172** | Land → `main` | ✅ `77dfaa8` |
+| **#173** | FOPEBA Land Check · Gate READY docs | ✅ |
+| **#174** | RELEASE-SMOKE-001 S1 | 🟡 OPEN (este PR) |
 
 ### Gate checklist
 
 ```text
-☑ #168 merged into main
-☑ #169 content on main (via #172)
-☑ #170 content on main (via #172)
-☑ #171 content on main (via #172)
-☑ Canonical runner verified from main
+☑ #168 landed on main
+☑ #169–#171 content on main (via #172)
+☑ #172 landed on main
+☑ Canonical runner verified from main (BLOCKED at S1 · exit 2)
+☑ #173 Land Check institutionalizado
 ```
 
-### Verification from `main` (2026-08-02)
+### Verification that closed the Gate (from `main`)
 
 ```bash
 git pull origin main
@@ -45,9 +45,7 @@ npm run test:release-smoke
 
 ```text
 RELEASE-SMOKE
-
 BLOCKED
-
 blocked_at=RELEASE_SMOKE_S1_STARTED
 duplicates=[]
 missing=[]
@@ -56,32 +54,45 @@ evidence={}
 exit 2
 ```
 
-Merge tip: `77dfaa8` (Merge #172).
-
 ### Decision
 
 ```text
-READY TO OPEN
-RELEASE-SMOKE-001
-
-Scope:   S1 only (preflight)
-Contract:
-  PASS through S1
-  blocked_at=RELEASE_SMOKE_S2_STARTED
-No S2 · No S3 · No S4
-No Playwright completo · No drivers adicionales
+READY
+RELEASE-SMOKE-001 may now be opened / is in progress.
 ```
 
-### Previo (histórico · evidencia Land Check)
+### Progress
 
-Antes de #172, desde `main`:
+| Delivery | Scope | Status |
+|----------|-------|--------|
+| RELEASE-SMOKE-001 | S1 Preflight | ▶ este PR |
+| RELEASE-SMOKE-002 | S2 Auth | ⏳ |
+| RELEASE-SMOKE-003 | S3 Bootstrap | ⏳ |
+| RELEASE-SMOKE-004 | S4 Dashboard | ⏳ |
+| `release-smoke-pass` | FULL PASS | ⏳ |
+
+### Post–#174 verification (from `main`, after merge)
+
+```bash
+git pull origin main
+npm run test:release-smoke-001
+npm run test:release-smoke
+```
+
+Expected both:
 
 ```text
-npm ERR! Missing script: "test:release-smoke"
+PASS through S1
+blocked_at=RELEASE_SMOKE_S2_STARTED
+duplicates=[]
+missing=[]
+out_of_order=[]
+exit 0
 ```
 
-→ Gate NOT READY (contrato no aterrizado).  
-Esa señal está institucionalizada en [FOPEBA_LAND_CHECK](../../00-status/FOPEBA_LAND_CHECK.md).
+### Histórico Land Check
+
+Antes de #172: `npm ERR! Missing script: "test:release-smoke"` ⇒ NOT READY.
 
 ---
 

@@ -50,57 +50,57 @@ PASS → tag release-smoke-pass
 
 ---
 
-## Comando por defecto (runner-only · sin drivers)
+## Comando por defecto (post–001 · live through certified max)
 
 ```bash
 npm run test:release-smoke
 ```
 
-Resultado esperado:
+Resultado esperado (con S1 certificado):
 
 ```text
-RELEASE-SMOKE
-
-BLOCKED
-
-blocked_at=RELEASE_SMOKE_S1_STARTED
+PASS through S1
+blocked_at=RELEASE_SMOKE_S2_STARTED
 duplicates=[]
 missing=[]
 out_of_order=[]
-evidence={}
+exit 0
 ```
 
-Exit code: **2** (BLOCKED).  
-JSON: `docs/10-validation/release-smoke/evidence/release-smoke-canonical.json`
+### Runner-only (histórico Gate / Land Check vacío)
 
-**BLOCKED ≠ FAIL** — todavía no hay implementación de escenarios.
+```bash
+npm run test:release-smoke:runner-only
+# → BLOCKED at RELEASE_SMOKE_S1_STARTED · exit 2 · evidence={}
+```
 
 ---
 
-## Otros modos (sin implementación)
+## Otros modos
 
 ```bash
-# Self-test del contrato completo (sintético · sin drivers)
+# RELEASE-SMOKE-001 · S1 Preflight
+npm run test:release-smoke-001
+# → PASS through S1 · BLOCKED at RELEASE_SMOKE_S2_STARTED · exit 0
+
+# Self-test del contrato completo (sintético)
 npm run test:release-smoke -- --self-test
 
-# Pipeline explícito
-npm run test:release-smoke -- --pipeline=RELEASE_SMOKE_S1_STARTED,RELEASE_SMOKE_S1_COMPLETED --through=S1
-
-# Unit tests del validador
+# Unit tests
 npm run test:release-smoke:unit
 ```
 
-`--live` → **FAIL** en este PR (prohibido: Playwright / browser / Supabase / dominio).
+`--live` sin `--through` = max certificado (`RELEASE_SMOKE_CERTIFIED_THROUGH`, hoy S1).
 
 ---
 
-## Fuera de alcance (este PR)
+## Fuera de alcance hasta S2+
 
 - Playwright · browser · CI  
 - Deployment · Rollback  
-- Supabase / drivers de escenario  
+- Live Auth / Supabase session (S2)  
 - Domain logic / FLOW-05  
-- RELEASE-SMOKE-001 (solo tras Gate verde)
+- S3 Bootstrap · S4 Dashboard
 
 ---
 
