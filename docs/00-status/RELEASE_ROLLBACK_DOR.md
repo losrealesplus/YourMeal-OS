@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_ROLLBACK_DOR.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **DoR CERTIFIED** (`main` · #207 · `e7f51a8`) · Spec ▶ [READY FOR FREEZE](./RELEASE_ROLLBACK_SPEC.md) · Runner ⏳ · Gate ⏳  
+**Estado:** ✅ **DoR CERTIFIED** (`main` · #207 · `e7f51a8`) · Spec ✅ [FROZEN](./RELEASE_ROLLBACK_SPEC.md) (#208 · `4d109f7`) · Runner ⏳ READY TO OPEN · Gate ⏳  
 **Nivel:** Release Track B · B-05 Rollback  
 **Pregunta (única):** ¿Qué debe certificar RELEASE-ROLLBACK antes de considerar recuperable un fallo de publicación?  
 **Estándar Flow Ready:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) (mismo ciclo FOPEBA)  
@@ -92,13 +92,13 @@ RELEASE-ROLLBACK (B-05)
 ☑ Precondición release-deploy-pass         → ✅ → 7896a2a
 ☑ DoR CERTIFIED en main                    → #207 · `e7f51a8`
 ☑ SPEC lista (READY FOR FREEZE)            → [RELEASE_ROLLBACK_SPEC](./RELEASE_ROLLBACK_SPEC.md)
-□ Spec FROZEN en main                      → ⏳
-□ Runner creado (BLOCKED baseline)         → ⏳
+☑ Spec FROZEN en main                      → #208 · `4d109f7`
+□ Runner creado (BLOCKED baseline)         → ⏳ READY TO OPEN
 □ READY TO OPEN RELEASE-ROLLBACK-001       → ⏳
 ```
 
-**DoR CERTIFIED** → Spec ▶ READY FOR FREEZE.  
-**No** Runner · FLOW-05 · `release-01-beta` en el PR Spec.
+**DoR CERTIFIED** · Spec ✅ FROZEN → **READY TO OPEN Runner**.  
+**No** FLOW-05 · `release-01-beta` en el Runner PR.
 
 ---
 
@@ -107,9 +107,9 @@ RELEASE-ROLLBACK (B-05)
 | Fase | Trabajo | Estado |
 |------|---------|--------|
 | 0 | DoR document | ✅ #207 · `e7f51a8` |
-| 1 | Spec | ▶ READY FOR FREEZE |
-| 2 | Freeze (merge Spec → main) | ⏳ |
-| 3 | Runner only · BLOCKED at R1 | ⏳ |
+| 1 | Spec | ✅ FROZEN #208 · `4d109f7` |
+| 2 | Freeze (merge Spec → main) | ✅ |
+| 3 | Runner only · BLOCKED at R1 | ⏳ READY TO OPEN |
 | 4 | Gate | ⏳ |
 | 5 | Capacidades / PRs Rollback (001…003) | ⏳ |
 | 6 | FULL PASS · tag `release-rollback-pass` | ⏳ |
