@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW_03_BILLING_SPEC.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **FROZEN** (#155 · `main`) · I7 + review-as-event · runner ▶ #156 · sin dominio  
+**Estado:** ✅ **CERTIFIED** · tag `flow03-pass` → `67a2e66` · Spec FROZEN (#155) · FULL PASS (#160)  
 
 **Precondición:** FLOW-02 ✅ CERTIFIED · tag `flow02-pass` · [FLOW02_PASS_ACTA](../10-validation/flow-02/FLOW02_PASS_ACTA.md)  
 **DoR:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md)  

@@ -27,7 +27,7 @@ Hace legible el historial: **técnica** vs **dominio** vs **producto**.
 | `ps002c-pass` | Platform | PS-002-C PASS · FCR-008 · Platform Stabilization Flow-ready |
 | `flow01-pass` | Flow | FLOW-01 Kitchen → Delivery FULL PASS |
 | `flow02-pass` | Flow | FLOW-02 Delivery Incidents FULL PASS → `a1e8d1e` (#153) |
-| `flow03-pass` | Flow | FLOW-03 Billing FULL PASS (tras merge FLOW03-003) |
+| `flow03-pass` | Flow | FLOW-03 Billing FULL PASS → `67a2e66` (#160) |
 
 ---
 

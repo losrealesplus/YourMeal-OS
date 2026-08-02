@@ -3,7 +3,7 @@
 **Documento:** `FLOW03_PASS_ACTA.md`  
 **Fecha:** 2026-08-02  
 **Estado:** ✅ **FLOW-03 CERTIFIED** (Billing happy path)  
-**Tag:** `flow03-pass` (tras merge FLOW03-003)  
+**Tag:** `flow03-pass` → `67a2e66` (Merge #160)  
 **Comando:** `npm run test:flow03-canonical -- --live`  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
 **Spec:** [FLOW_03_BILLING_SPEC](../../00-status/FLOW_03_BILLING_SPEC.md)  
