@@ -18,7 +18,7 @@
 No cambia la metodología FOPEBA / Evidence before Implementation.  
 Hace legible el historial: **técnica** vs **dominio** vs **producto**.
 
-Gate de producto propuesto (aún DRAFT): [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) → futuro tag `release-01-beta` solo tras E2E Certification.
+Gate de producto (aún DRAFT): [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) · [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md) (DoRl) → tag `release-01-beta` solo tras **DoRl PASS**.
 
 ---
 

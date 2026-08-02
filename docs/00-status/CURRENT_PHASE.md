@@ -50,9 +50,11 @@ Sprint activo
                                ⏳ DoR NOT STARTED · sin Spec / runner / dominio
                                (no abrir implementación hasta Spec FROZEN + Runner)
   Handoff                      ./PROJECT_HANDOFF.md (congelado 2026-08-02)
-  Release                      ./RELEASE_01_BETA_STRATEGY.md (DRAFT gate producto)
+  Release                      ./RELEASE_01_BETA_STRATEGY.md (DRAFT · eje B)
+  DoRl                         ./DEFINITION_OF_RELEASE.md (DRAFT · gate de versión)
+  Ejes                         A: FLOW-04+ FOPEBA · B: RELEASE-01 DoRl
   Beta paralelo: BR-03.3 Runtime Validation (G3)
-  Disciplina: una transición / PR · DoR antes de código
+  Disciplina: una transición / PR · DoR antes de código · DoRl ≠ DoR
 
 ═══════════════════════════════════════════════
 CLOSED GATE
@@ -91,6 +93,7 @@ Prohibido prematuro: Event Bus · Notifications · Jobs · Analytics · AI
 ═══════════════════════════════════════════════
 Ver: ./PROJECT_HANDOFF.md
      ./RELEASE_01_BETA_STRATEGY.md
+     ./DEFINITION_OF_RELEASE.md
      ../10-validation/flow-03/FLOW03_PASS_ACTA.md
      ./FLOW_DEFINITION_OF_READY.md
      ./EVIDENCE_BEFORE_IMPLEMENTATION.md

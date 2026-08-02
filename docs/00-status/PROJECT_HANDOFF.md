@@ -203,7 +203,26 @@ Specification → Frozen contract → Executable runner
 
 Ningún flujo debe saltarse este ciclo.
 
-Nivel superior (producto): [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md).
+---
+
+## Product release governance (paralelo)
+
+Dos preguntas distintas:
+
+| Nivel | Pregunta |
+|-------|----------|
+| Flow | ¿Este flujo cumple su contrato? |
+| Release | ¿El producto completo está listo para una beta? |
+
+Dos ejes (no mezclar PRs):
+
+- **Eje A** — Certificar Flows (FOPEBA · DoR → … → `flowNN-pass`)  
+- **Eje B** — Completar [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md)  
+
+Pieza FOPEBA de producto: [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md) (DoRl) —  
+checklist de versión completa → futuro tag `release-01-beta`.
+
+DoRl está **DRAFT**. No declara beta. No abre implementación.
 
 ---
 
