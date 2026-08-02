@@ -2,15 +2,15 @@
 
 **Documento:** `RELEASE_E2E_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ Runner **CERTIFIED** · live through E1 · runner-only **BLOCKED** at E1  
+**Estado:** ✅ Runner **CERTIFIED** · live through E2 · runner-only **BLOCKED** at E1  
 **Spec:** [RELEASE_E2E_SPEC](../../00-status/RELEASE_E2E_SPEC.md) (FROZEN · #186 · `6d11ae8`)  
 **DoR:** [RELEASE_E2E_DOR](../../00-status/RELEASE_E2E_DOR.md)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
 **Nivel:** Release gate — pilot journey · **not** a Flow · **not** Smoke · **not** Cross-flow
 
-> Pregunta que responde este PR:  
+> Pregunta que responde este runner:  
 > **¿Existe un contrato ejecutable para RELEASE-E2E (RELEASE-01 · B-03)?**  
-> No: ¿Playwright? · ¿browser? · ¿dominio E1? · ¿Deploy? · ¿FLOW-05?
+> No: ¿Playwright? · ¿browser? · ¿dominio E3+? · ¿Deploy? · ¿FLOW-05?
 
 ---
 
@@ -55,19 +55,23 @@ PASS → tag release-e2e-pass
 ## Comandos
 
 ```bash
-# Default live through max certified (E1)
+# Default live through max certified (E2)
 npm run test:release-e2e
-# → PASS through E1 · BLOCKED at E2 · exit 0
+# → PASS through E2 · BLOCKED at E3 · exit 0
 
 # RELEASE-E2E-001 · E1 only
 npm run test:release-e2e-001
 # → PASS through E1 · BLOCKED at E2 · exit 0
 
+# RELEASE-E2E-002 · E2 only
+npm run test:release-e2e-002
+# → PASS through E2 · BLOCKED at E3 · exit 0
+
 # Historic Gate / Land Check vacío
 npm run test:release-e2e:runner-only
 # → BLOCKED at RELEASE_E2E_E1_STARTED · exit 2 · evidence={}
 
-# Unit tests (pipeline + E1 · no Playwright suite)
+# Unit tests (pipeline + E1 + E2 · no Playwright suite)
 npm run test:release-e2e:unit
 ```
 
@@ -75,16 +79,16 @@ npm run test:release-e2e:unit
 
 ---
 
-## Fuera de alcance (hasta E1+)
+## Fuera de alcance (hasta E2+)
 
-- Driver E2…E4 · Playwright E2E suite  
+- Driver E3…E4 · Playwright E2E suite  
 - Deploy · Rollback · FLOW-05 · `release-01-beta`  
 
 ---
 
 ## Gate
 
-Ver: [RELEASE_E2E_GATE](./RELEASE_E2E_GATE.md) · Decision: ✅ READY · 001 en curso.
+Ver: [RELEASE_E2E_GATE](./RELEASE_E2E_GATE.md) · Decision: ✅ READY · 002 en curso.
 
 ---
 
@@ -94,6 +98,7 @@ Ver: [RELEASE_E2E_GATE](./RELEASE_E2E_GATE.md) · Decision: ✅ READY · 001 en 
 |-----------|------|
 | CLI | `scripts/release-e2e-canonical.mjs` |
 | Pipeline | `scripts/lib/release-e2e-canonical-pipeline.mjs` |
+| E2 driver | `scripts/lib/release-e2e-e2-order-delivery.mjs` |
 | Default evidence | `docs/10-validation/release-e2e/evidence/release-e2e-canonical.json` |
 
 ---
