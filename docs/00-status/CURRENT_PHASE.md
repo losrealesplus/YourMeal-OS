@@ -41,11 +41,12 @@ Sprint activo
   FLOW-01                      ✅ CERTIFIED (#141–#146)
   Live: npm run test:flow01-canonical -- --live → PASS
   Acta: ../10-validation/flow-01/FLOW01_PASS_ACTA.md
+  FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Siguiente                    Merge DoR (#147)
-                               luego FLOW-02 Spec (Delivery Incidents)
-                               — DoR → Spec → Runner → Impl. 00n
+  Activo                       FLOW-02 Spec (Delivery Incidents)
+                               → ./FLOW_02_DELIVERY_INCIDENTS_SPEC.md
+                               Sin dominio · Runner después del Freeze
   Beta paralelo: BR-03.3 Runtime Validation (G3)
   Disciplina: una transición / PR · DoR antes de código
 
@@ -62,11 +63,11 @@ NEXT PHASE
 
   FLOW-01 CERTIFIED
   ↓
-  FLOW Definition of Ready (estándar)
+  FLOW Definition of Ready ✅ (#147)
   ↓
-  FLOW-02 Spec (Delivery Incidents) — DoR primero
+  FLOW-02 Spec ▶ (este sprint) — sin dominio
   ↓
-  Runner → Impl. transición a transición → PASS
+  Freeze → Runner → FLOW02-001… → PASS
 
 En paralelo (beta móvil EatClean):
   Lema: cada PR acerca la jornada completa del piloto.
