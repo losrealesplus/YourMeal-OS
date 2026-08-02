@@ -115,6 +115,7 @@ export function buildFlow01EvidenceReport({
   duration_ms = null,
   code_status = "RUNNER_ONLY",
   terminal = null,
+  progress = null,
   meta = {},
 }) {
   const emptyValidation = {
@@ -124,6 +125,7 @@ export function buildFlow01EvidenceReport({
     firstFailure: null,
   };
   const v = validation ?? emptyValidation;
+  const fullPass = status === "PASS" && (progress?.flow_status ?? status) === "PASS";
 
   return {
     status,
@@ -139,9 +141,14 @@ export function buildFlow01EvidenceReport({
     missing: [...(v.missing ?? [])],
     out_of_order: [...(v.out_of_order ?? [])],
     firstFailure: v.firstFailure ?? null,
+    certified_through: progress?.certified_through ?? (fullPass ? 4 : 0),
+    blocked_at: progress?.blocked_at ?? null,
+    delivery: progress?.delivery ?? null,
+    delivery_status: progress?.delivery_status ?? null,
+    flow_status: progress?.flow_status ?? status,
     terminal: terminal ?? {
-      order_status: status === "PASS" ? "delivered" : null,
-      packaging_batch: status === "PASS" ? "CLOSED" : null,
+      order_status: fullPass ? "delivered" : null,
+      packaging_batch: fullPass ? "CLOSED" : null,
     },
     duration_ms: {
       t1_ms: duration_ms?.t1_ms ?? null,
@@ -160,7 +167,7 @@ export function formatFlow01ComparisonTable(result) {
     "| ---- | -------- | --------- |",
     ...result.table.map(
       (row) =>
-        `| ${row.step.padEnd(22)} | ✅ | ${row.observed ? "✅" : "⛔"} |`,
+        `| ${row.step.padEnd(22)} | ${row.expected ? "✅" : "·"} | ${row.observed ? "✅" : "⛔"} |`,
     ),
   ];
   if (result.firstFailure) {
@@ -189,11 +196,204 @@ export function extractFlow01Steps(consoleLines) {
   return steps;
 }
 
+/** @param {1|2|3|4} n */
+export function flow01StepsThrough(n) {
+  return FLOW01_CANONICAL_STEPS.slice(0, n * 2);
+}
+
+/**
+ * Highest complete transition (1–4) in observed, or 0 if none.
+ * Requires contiguous COMPLETED pairs from T1 without gaps.
+ * @param {readonly string[]} observed
+ */
+export function certifiedThroughTransition(observed) {
+  const set = new Set(observed);
+  let through = 0;
+  for (let n = 1; n <= 4; n++) {
+    const started = `FLOW01_T${n}_STARTED`;
+    const completed = `FLOW01_T${n}_COMPLETED`;
+    if (set.has(started) && set.has(completed)) through = n;
+    else break;
+  }
+  return through;
+}
+
+/**
+ * Progressive evaluation for incremental deliveries FLOW01-001..004.
+ *
+ * - FAIL: duplicates / out-of-order / extras / scoped delivery incomplete
+ * - PASS: full contract, or `--through=Tn` prefix complete (delivery PASS)
+ * - BLOCKED: no impl yet, or clean prefix with later transitions pending
+ *
+ * @param {readonly string[]} observed
+ * @param {{ through?: 1|2|3|4 | null }} [opts]
+ */
+export function evaluateFlow01Progress(observed, opts = {}) {
+  const through = opts.through ?? null;
+  const expected = through
+    ? flow01StepsThrough(through)
+    : [...FLOW01_CANONICAL_STEPS];
+
+  const counts = new Map();
+  for (const s of observed) counts.set(s, (counts.get(s) ?? 0) + 1);
+
+  const duplicates = [...counts.entries()]
+    .filter(([, n]) => n > 1)
+    .map(([s]) => s);
+
+  const filtered = observed.filter((s) => FLOW01_CANONICAL_STEPS.includes(s));
+  const out_of_order = [];
+  for (let i = 0; i < filtered.length; i++) {
+    if (filtered[i] !== FLOW01_CANONICAL_STEPS[i]) {
+      out_of_order.push(filtered[i]);
+    }
+  }
+
+  const extras = observed.filter((s) => !FLOW01_CANONICAL_STEPS.includes(s));
+  const table = FLOW01_CANONICAL_STEPS.map((step) => ({
+    step,
+    expected: expected.includes(step),
+    observed: (counts.get(step) ?? 0) === 1,
+  }));
+
+  const missingExpected = expected.filter(
+    (step) => (counts.get(step) ?? 0) !== 1,
+  );
+  const certified_through = certifiedThroughTransition(observed);
+  const next_step =
+    certified_through >= 4
+      ? null
+      : (FLOW01_CANONICAL_STEPS[certified_through * 2] ?? "FLOW01_T1_STARTED");
+
+  const base = {
+    duplicates,
+    missing: missingExpected,
+    out_of_order,
+    extras,
+    table,
+    certified_through,
+    next_step,
+  };
+
+  if (duplicates.length || out_of_order.length || extras.length) {
+    return {
+      ...base,
+      status: "FAIL",
+      reason: "Pipeline violates FLOW01_* contract (duplicate / order / extras)",
+      ok: false,
+      firstFailure: duplicates[0] ?? out_of_order[0] ?? extras[0] ?? null,
+      delivery: through ? `FLOW01-00${through}` : "FLOW-01",
+      delivery_status: "FAIL",
+      flow_status: "FAIL",
+      blocked_at: null,
+    };
+  }
+
+  if (observed.length === 0) {
+    return {
+      ...base,
+      status: "BLOCKED",
+      reason:
+        "FLOW-01 domain driver not wired (runner ready; implementation pending)",
+      ok: false,
+      missing: [...expected],
+      firstFailure: expected[0],
+      delivery: through ? `FLOW01-00${through}` : "FLOW-01",
+      delivery_status: "BLOCKED",
+      flow_status: "BLOCKED",
+      blocked_at: expected[0],
+    };
+  }
+
+  // Scoped delivery (FLOW01-00n): require exact prefix
+  if (through) {
+    if (missingExpected.length === 0) {
+      return {
+        ...base,
+        status: "PASS",
+        reason:
+          through < 4
+            ? `PASS through T${through} · BLOCKED at ${FLOW01_CANONICAL_STEPS[through * 2]} for full FLOW-01`
+            : "FLOW-01 complete",
+        ok: true,
+        missing: [],
+        firstFailure: null,
+        certified_through: through,
+        next_step:
+          through < 4 ? FLOW01_CANONICAL_STEPS[through * 2] : null,
+        delivery: `FLOW01-00${through}`,
+        delivery_status: "PASS",
+        flow_status: through < 4 ? "BLOCKED" : "PASS",
+        blocked_at:
+          through < 4 ? FLOW01_CANONICAL_STEPS[through * 2] : null,
+      };
+    }
+    return {
+      ...base,
+      status: "FAIL",
+      reason: `Delivery FLOW01-00${through} incomplete · missing ${missingExpected[0]}`,
+      ok: false,
+      firstFailure: missingExpected[0],
+      delivery: `FLOW01-00${through}`,
+      delivery_status: "FAIL",
+      flow_status: "FAIL",
+      blocked_at: null,
+    };
+  }
+
+  // Full FLOW-01
+  if (missingExpected.length === 0) {
+    return {
+      ...base,
+      status: "PASS",
+      reason: "",
+      ok: true,
+      missing: [],
+      firstFailure: null,
+      certified_through: 4,
+      next_step: null,
+      delivery: "FLOW-01",
+      delivery_status: "PASS",
+      flow_status: "PASS",
+      blocked_at: null,
+    };
+  }
+
+  // Clean progressive progress: later steps missing → BLOCKED (not FAIL)
+  if (certified_through > 0) {
+    return {
+      ...base,
+      status: "BLOCKED",
+      reason: `PASS through T${certified_through} · BLOCKED at ${next_step}`,
+      ok: false,
+      missing: FLOW01_CANONICAL_STEPS.filter((s) => (counts.get(s) ?? 0) !== 1),
+      firstFailure: next_step,
+      delivery: `FLOW01-00${certified_through}`,
+      delivery_status: "PASS",
+      flow_status: "BLOCKED",
+      blocked_at: next_step,
+    };
+  }
+
+  // Started but T1 not completed → FAIL (implementation breached T1)
+  return {
+    ...base,
+    status: "FAIL",
+    reason: `Pipeline stopped at ${missingExpected[0]}`,
+    ok: false,
+    firstFailure: missingExpected[0],
+    delivery: "FLOW01-001",
+    delivery_status: "FAIL",
+    flow_status: "FAIL",
+    blocked_at: null,
+  };
+}
+
 /**
  * Classify runner outcome.
  * - PASS: contract satisfied
  * - FAIL: pipeline observed but broken
- * - BLOCKED: domain driver not wired / external preconditions
+ * - BLOCKED: domain driver not wired / later transition not implemented
  */
 export function classifyFlow01Outcome({
   mode,

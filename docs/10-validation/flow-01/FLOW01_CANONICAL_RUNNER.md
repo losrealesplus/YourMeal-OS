@@ -46,18 +46,21 @@ Criterios (igual que FCR-008 / PS-002-C):
 ## Comandos
 
 ```bash
-# Default — self-test del contrato (sin código de dominio)
+# Default — self-test del contrato completo (sin código de dominio)
 npm run test:flow01-canonical
 
-# Validar lista observada
-npm run test:flow01-canonical -- --pipeline=FLOW01_T1_STARTED,FLOW01_T1_COMPLETED,...
+# Entrega incremental (FLOW01-001..004)
+npm run test:flow01-canonical -- --through=T1 --pipeline=FLOW01_T1_STARTED,FLOW01_T1_COMPLETED
+# → delivery PASS · flow BLOCKED at FLOW01_T2_STARTED
 
-# Live domain driver (BLOCKED hasta Implementation)
+# Live domain driver (progresivo: PASS through Tn · BLOCKED at T{n+1})
 npm run test:flow01-canonical -- --live
 
 # Unit tests del validador
 npm run test:flow01-canonical:unit
 ```
+
+Plan de entregas: [FLOW_01_DELIVERY_PLAN](../../00-status/FLOW_01_DELIVERY_PLAN.md).
 
 Evidencia escrita en: `docs/10-validation/flow-01/evidence/flow01-canonical.json`
 

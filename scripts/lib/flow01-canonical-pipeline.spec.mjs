@@ -9,7 +9,9 @@ import {
   buildFlow01EvidenceReport,
   classifyFlow01Outcome,
   computeFlow01Durations,
+  evaluateFlow01Progress,
   extractFlow01Steps,
+  flow01StepsThrough,
   formatFlow01ComparisonTable,
   validateFlow01Pipeline,
 } from "./flow01-canonical-pipeline.mjs";
@@ -117,5 +119,27 @@ describe("flow01-canonical-pipeline", () => {
     });
     assert.equal(o.status, "PASS");
     assert.equal(FLOW01_EXIT.PASS, 0);
+  });
+
+  it("PASS through T1 · BLOCKED at T2 (progressive)", () => {
+    const r = evaluateFlow01Progress(flow01StepsThrough(1), {});
+    assert.equal(r.status, "BLOCKED");
+    assert.equal(r.delivery_status, "PASS");
+    assert.equal(r.certified_through, 1);
+    assert.equal(r.blocked_at, "FLOW01_T2_STARTED");
+  });
+
+  it("scoped --through=T1 PASSes delivery while flow BLOCKED", () => {
+    const r = evaluateFlow01Progress(flow01StepsThrough(1), { through: 1 });
+    assert.equal(r.status, "PASS");
+    assert.equal(r.delivery, "FLOW01-001");
+    assert.equal(r.flow_status, "BLOCKED");
+    assert.equal(r.blocked_at, "FLOW01_T2_STARTED");
+  });
+
+  it("empty live remains BLOCKED (not FAIL)", () => {
+    const r = evaluateFlow01Progress([]);
+    assert.equal(r.status, "BLOCKED");
+    assert.notEqual(r.status, "FAIL");
   });
 });

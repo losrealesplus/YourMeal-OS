@@ -5,7 +5,7 @@
   "contract": "FLOW_01_KITCHEN_DELIVERY_SPEC",
   "principle": "Evidence before Implementation",
   "code_status": "DOMAIN_DRIVER_PENDING",
-  "at": "2026-08-02T12:50:49.195Z",
+  "at": "2026-08-02T12:53:33.025Z",
   "pipeline": [],
   "expected": [
     "FLOW01_T1_STARTED",
@@ -18,9 +18,23 @@
     "FLOW01_T4_COMPLETED"
   ],
   "duplicates": [],
-  "missing": [],
+  "missing": [
+    "FLOW01_T1_STARTED",
+    "FLOW01_T1_COMPLETED",
+    "FLOW01_T2_STARTED",
+    "FLOW01_T2_COMPLETED",
+    "FLOW01_T3_STARTED",
+    "FLOW01_T3_COMPLETED",
+    "FLOW01_T4_STARTED",
+    "FLOW01_T4_COMPLETED"
+  ],
   "out_of_order": [],
-  "firstFailure": null,
+  "firstFailure": "FLOW01_T1_STARTED",
+  "certified_through": 0,
+  "blocked_at": "FLOW01_T1_STARTED",
+  "delivery": "FLOW-01",
+  "delivery_status": "BLOCKED",
+  "flow_status": "BLOCKED",
   "terminal": {
     "order_status": null,
     "packaging_batch": null
