@@ -44,9 +44,9 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Activo                       FLOW02-001 · T1 Delivery Incidents
-                               Spec ✅ FROZEN · Runner ✅ on main (#150)
-                               npm run test:flow02-001 → PASS T1 · BLOCKED T2
+  Activo                       FLOW02-002 · T2 retry
+                               FLOW02-001 ✅ (#151) · npm run test:flow02-001
+                               npm run test:flow02-002 → PASS T2 · BLOCKED T3
   Beta paralelo: BR-03.3 Runtime Validation (G3)
   Disciplina: una transición / PR · DoR antes de código
 
@@ -69,9 +69,11 @@ NEXT PHASE
   ↓
   FLOW-02 Runner ✅ (#150)
   ↓
-  FLOW02-001 ▶ T1 → PASS through T1 · BLOCKED at T2
+  FLOW02-001 ✅ T1
   ↓
-  FLOW02-002… → PASS
+  FLOW02-002 ▶ T2 → PASS through T2 · BLOCKED at T3
+  ↓
+  FLOW02-003 → FULL PASS
 
 En paralelo (beta móvil EatClean):
   Lema: cada PR acerca la jornada completa del piloto.

@@ -201,6 +201,11 @@ async function main() {
     if (progress.status === "PASS" && progress.certified_through >= 3) {
       console.log("FLOW-02 · FULL PASS · Delivery Incidents certified");
     } else if (
+      progress.certified_through >= 2 &&
+      progress.blocked_at === "FLOW02_T3_STARTED"
+    ) {
+      console.log("FLOW02-002 · PASS through T2 · BLOCKED at T3 (expected)");
+    } else if (
       progress.certified_through >= 1 &&
       progress.blocked_at === "FLOW02_T2_STARTED"
     ) {

@@ -1,11 +1,11 @@
 {
-  "status": "BLOCKED",
-  "reason": "PASS through T2 · BLOCKED at FLOW02_T3_STARTED",
+  "status": "PASS",
+  "reason": "PASS through T2 · BLOCKED at FLOW02_T3_STARTED for full FLOW-02",
   "gate": "FLOW-02",
   "contract": "FLOW_02_DELIVERY_INCIDENTS_SPEC",
   "principle": "Evidence before Implementation",
   "code_status": "DOMAIN_DRIVER_T2",
-  "at": "2026-08-02T14:04:20.197Z",
+  "at": "2026-08-02T14:04:18.693Z",
   "pipeline": [
     "FLOW02_T1_STARTED",
     "FLOW02_T1_COMPLETED",
@@ -21,12 +21,9 @@
     "FLOW02_T3_COMPLETED"
   ],
   "duplicates": [],
-  "missing": [
-    "FLOW02_T3_STARTED",
-    "FLOW02_T3_COMPLETED"
-  ],
+  "missing": [],
   "out_of_order": [],
-  "firstFailure": "FLOW02_T3_STARTED",
+  "firstFailure": null,
   "certified_through": 2,
   "blocked_at": "FLOW02_T3_STARTED",
   "delivery": "FLOW02-002",
