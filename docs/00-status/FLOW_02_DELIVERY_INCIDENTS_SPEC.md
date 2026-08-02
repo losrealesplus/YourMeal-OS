@@ -138,7 +138,19 @@ Misma estructura que FLOW-01:
 
 ---
 
-## Contrato de evidencias (propuesto · congelar antes del runner)
+## Evidencia requerida por transición
+
+| Transición | Tokens obligatorios | Assertions mínimas |
+|------------|---------------------|--------------------|
+| **T1** | `FLOW02_T1_STARTED` → `FLOW02_T1_COMPLETED` | status=`delivery_issue` · attempt auditado · **no** `delivered` |
+| **T2** | `FLOW02_T2_STARTED` → `FLOW02_T2_COMPLETED` | status=`out_for_delivery` · historial de attempts intacto |
+| **T3** | `FLOW02_T3_STARTED` → `FLOW02_T3_COMPLETED` | status=`delivered` · sin side-effects de Billing |
+
+Cada token: **exactamente una vez**, en orden global T1→T2→T3.
+
+---
+
+## Contrato de evidencias (listo para Freeze)
 
 ```text
 FLOW02_T1_STARTED
@@ -151,19 +163,96 @@ FLOW02_T3_STARTED
 FLOW02_T3_COMPLETED
 ```
 
-Reglas: `duplicates=[]` · `missing=[]` · `out_of_order=[]` · JSON de evidencia · `duration_ms` diagnóstico.
+Reglas (igual que FCR-008 / FLOW-01):
+
+- Cada paso **exactamente una vez**, en ese orden  
+- `STOP` + `reason` si falla precondición/invariante  
+- Evidencia JSON comparable en `docs/10-validation/flow-02/evidence/`  
+- PASS solo si `missing=[]` · `duplicates=[]` · `out_of_order=[]`  
+- Los nombres **no** cambian por refactors de UI/función  
 
 Opcional envoltura: `FLOW02_START` / `FLOW02_END` en el runner.
 
 ---
 
-## PASS / BLOCKED esperados (por entrega)
+## Semántica PASS / FAIL / BLOCKED
 
-| Entrega | Runner |
-|---------|--------|
-| FLOW02-001 (T1) | PASS through T1 · BLOCKED at T2 |
-| FLOW02-002 (T2) | PASS through T2 · BLOCKED at T3 |
-| FLOW02-003 (T3) | **FLOW-02 PASS** completo |
+| Resultado | Significa |
+|-----------|-----------|
+| **PASS** | Contrato cumplido hasta el `--through` pedido (o FLOW-02 completo en T3) |
+| **FAIL** | Brecha de contrato / invariante / evidencia (defecto) |
+| **BLOCKED** | Siguiente transición **aún no implementada** — no es defecto |
+
+### PASS / BLOCKED esperados por fase
+
+| Fase | Runner (sin dominio / parcial / completo) |
+|------|-------------------------------------------|
+| Runner recién creado · **0 dominio** | `flow_status=BLOCKED` · `blocked_at=FLOW02_T1_STARTED` |
+| FLOW02-001 (T1) | PASS through T1 · BLOCKED at `FLOW02_T2_STARTED` |
+| FLOW02-002 (T2) | PASS through T2 · BLOCKED at `FLOW02_T3_STARTED` |
+| FLOW02-003 (T3) | **FLOW-02 PASS** completo · status=`delivered` |
+
+### FAIL (ejemplos)
+
+| FAIL | Significa |
+|------|-----------|
+| `FLOW02_T1_COMPLETED` con status ≠ `delivery_issue` | Violación T1 |
+| `delivery_issue` contado como `delivered` | Violación invariante 1 |
+| Token `FLOW02_*` duplicado o fuera de orden | Violación evidencia |
+| T3 COMPLETED con side-effect de Billing | Fuera de alcance / invariante 3 |
+| Retry borra attempts previos | Violación invariante 4 |
+| Solo UI “parece bien” sin tokens | No Done de Flow |
+
+---
+
+## Runner canónico (objetivo post-Freeze · no en este PR)
+
+Equivalente a `test:flow01-canonical` / FCR-008:
+
+```text
+FLOW02
+FLOW02_T1_STARTED
+    ↓
+FLOW02_T1_COMPLETED
+    ↓
+FLOW02_T2_STARTED
+    ↓
+FLOW02_T2_COMPLETED
+    ↓
+FLOW02_T3_STARTED
+    ↓
+FLOW02_T3_COMPLETED
+    ↓
+PASS
+```
+
+Comando previsto: `npm run test:flow02-canonical`  
+Comportamiento inicial esperado (contrato ejecutable · **sin** dominio):
+
+```text
+FLOW02
+BLOCKED
+blocked_at=FLOW02_T1_STARTED
+```
+
+Los **invariantes** de este documento deben ser assertions del runner (no solo prosa).  
+**No se implementa en este PR** — solo tras merge = Spec FROZEN.
+
+---
+
+## Checklist pre-Freeze
+
+| Elemento | Estado |
+|----------|--------|
+| Estados del flujo | ✅ `out_for_delivery` · `delivery_issue` · `delivered` |
+| Transiciones T1–T3 | ✅ plantilla canónica |
+| Invariantes | ✅ § Invariantes (1–6) |
+| Eventos / tokens `FLOW02_*` | ✅ contrato T1–T3 STARTED/COMPLETED |
+| PASS esperado | ✅ por fase + FULL en T3 |
+| BLOCKED esperado | ✅ runner vacío en T1 · parcial en T2/T3 |
+| Evidencia requerida por transición | ✅ tabla dedicada |
+
+Si algún ítem quedara abierto → **no Freeze** · no runner.
 
 ---
 
@@ -171,15 +260,15 @@ Opcional envoltura: `FLOW02_START` / `FLOW02_END` en el runner.
 
 | Artefacto | Estado |
 |-----------|--------|
-| SPEC | ▶ este documento |
-| Contrato `FLOW02_*` | ▶ propuesto (congelar en follow-up Spec) |
-| Runner `test:flow02-canonical` | ⏳ Fase 2 |
-| Estados permitidos | ▶ documentados |
-| Invariantes | ▶ documentados |
-| PASS / BLOCKED esperados | ▶ documentados |
-| Acta (plantilla path) | ⏳ `docs/10-validation/flow-02/` tras runner |
+| SPEC | ✅ listo para Freeze (merge de este PR) |
+| Contrato `FLOW02_*` | ✅ congelable |
+| Runner `test:flow02-canonical` | ⏳ PR siguiente (post-Freeze) |
+| Estados permitidos | ✅ |
+| Invariantes | ✅ |
+| PASS / BLOCKED esperados | ✅ |
+| Acta (path) | ⏳ `docs/10-validation/flow-02/` con runner |
 
-**Implementation de dominio:** ❌ prohibida hasta DoR completo (Regla 8).
+**Implementation de dominio:** ❌ prohibida hasta runner + DoR completo (Regla 8).
 
 ---
 
@@ -187,9 +276,9 @@ Opcional envoltura: `FLOW02_START` / `FLOW02_END` en el runner.
 
 | Fase | Trabajo | Estado |
 |------|---------|--------|
-| 1 | Spec (este PR) | ▶ |
-| 2 | Runner canónico | ⏳ |
-| 3 | FLOW02-001…003 (una transición / PR) | ⏳ |
+| 1 | Spec (este PR #148) | ▶ → merge = **FROZEN** |
+| 2 | Runner canónico (`test:flow02-canonical` · BLOCKED at T1) | ⏳ siguiente PR |
+| 3 | FLOW02-001…003 (una transición / PR) | ⏳ tras runner |
 
 ---
 
@@ -197,4 +286,4 @@ Opcional envoltura: `FLOW02_START` / `FLOW02_END` en el runner.
 
 - Reabrir FLOW-01 / FCR-008 salvo regresión  
 - Billing · Support · Inventory  
-- Implementación de producto en este PR  
+- Runner código · implementación de producto en este PR  
