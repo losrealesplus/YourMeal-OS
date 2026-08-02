@@ -504,11 +504,11 @@ Separación de responsabilidades (sin mezclar en un mismo PR):
 
 | Fase | Trabajo | Estado |
 |------|---------|--------|
-| 1 | Spec (#155) | ✅ **FROZEN** en `main` |
-| 2 | Runner canónico (#156 · BLOCKED at T1 · sin dominio) | ▶ este PR |
-| 3 | **Gate FLOW03-001** (4 condiciones desde `main`) | ⏳ tras merge runner |
-| 4 | FLOW03-001…003 (una transición / PR) | ⏳ bloqueado por Gate |
-| 5 | FULL PASS · tag `flow03-pass` | ⏳ |
+| 1 | Spec (#155) | ✅ **FROZEN** |
+| 2 | Runner canónico (#157) | ✅ |
+| 3 | Gate FLOW03-001 | ✅ |
+| 4 | FLOW03-001…003 (#158–#160) | ✅ |
+| 5 | FULL PASS · tag `flow03-pass` → `67a2e66` | ✅ |
 
 ---
 
