@@ -1,0 +1,86 @@
+{
+  "status": "PASS",
+  "reason": "PASS through S3 · BLOCKED at RELEASE_SMOKE_S4_STARTED for full RELEASE-SMOKE",
+  "gate": "RELEASE-SMOKE",
+  "contract": "RELEASE_SMOKE_SPEC",
+  "level": "release",
+  "certifies": "platform_capabilities",
+  "not_domain_entities": true,
+  "principle": "Evidence before Implementation",
+  "code_status": "CAPABILITY_DRIVER_S3",
+  "at": "2026-08-02T17:18:02.171Z",
+  "pipeline": [
+    "RELEASE_SMOKE_S1_STARTED",
+    "RELEASE_SMOKE_S1_COMPLETED",
+    "RELEASE_SMOKE_S2_STARTED",
+    "RELEASE_SMOKE_S2_COMPLETED",
+    "RELEASE_SMOKE_S3_STARTED",
+    "RELEASE_SMOKE_S3_COMPLETED"
+  ],
+  "expected": [
+    "RELEASE_SMOKE_S1_STARTED",
+    "RELEASE_SMOKE_S1_COMPLETED",
+    "RELEASE_SMOKE_S2_STARTED",
+    "RELEASE_SMOKE_S2_COMPLETED",
+    "RELEASE_SMOKE_S3_STARTED",
+    "RELEASE_SMOKE_S3_COMPLETED",
+    "RELEASE_SMOKE_S4_STARTED",
+    "RELEASE_SMOKE_S4_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": null,
+  "certified_through": 3,
+  "blocked_at": "RELEASE_SMOKE_S4_STARTED",
+  "delivery": "RELEASE-SMOKE-003",
+  "delivery_status": "PASS",
+  "gate_status": "BLOCKED",
+  "terminal": {
+    "capability": "bootstrap"
+  },
+  "evidence": {
+    "s1_checks": [
+      "env_example_exists",
+      "official_project_id_documented",
+      "vite_supabase_keys_documented",
+      "no_invented_publishable_key_in_template",
+      "test_release_smoke_script_present"
+    ],
+    "s2_checks": [
+      "ps002_canonical_auth_script_present",
+      "fcr008_auth_prefix_intact",
+      "ps002c_pass_tag_present",
+      "ps002_credential_slots_documented",
+      "auth_surface_present"
+    ],
+    "s2_mapped_tokens": [
+      "LOGIN",
+      "LOGIN_OK",
+      "CANONICAL_SESSION"
+    ],
+    "s2_source": "ps002c-pass + FCR-008 Auth prefix (no full Playwright suite)",
+    "s3_checks": [
+      "ps002_canonical_auth_script_present",
+      "fcr008_bootstrap_segment_intact",
+      "ps002c_pass_tag_present",
+      "post_login_pipeline_emits_bootstrap_tokens",
+      "bootstrap_surface_present"
+    ],
+    "s3_mapped_tokens": [
+      "BOOTSTRAP_START",
+      "IDENTITY_READY",
+      "PROFILE_READY",
+      "MEMBERSHIP_READY",
+      "ROLE_READY"
+    ],
+    "s3_source": "ps002c-pass + FCR-008 bootstrap segment (no Dashboard / no full Playwright E2E)"
+  },
+  "duration_ms": {
+    "s1_ms": 15,
+    "s2_ms": 15,
+    "s3_ms": 15,
+    "s4_ms": null,
+    "smoke_total_ms": null
+  }
+}

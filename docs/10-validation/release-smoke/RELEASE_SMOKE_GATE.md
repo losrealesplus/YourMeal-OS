@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_SMOKE_GATE.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **READY** · 001 CERTIFIED desde `main` · 002 en curso  
+**Estado:** ✅ **READY** · 001–002 CERTIFIED desde `main` · 003 en curso  
 **Nivel:** Release Track B · B-01 Smoke  
 **Spec:** [RELEASE_SMOKE_SPEC](../../00-status/RELEASE_SMOKE_SPEC.md)  
 **Runner:** [RELEASE_SMOKE_RUNNER](./RELEASE_SMOKE_RUNNER.md)  
@@ -20,16 +20,18 @@
 ☑ FOPEBA Land Check (#173)
 ☑ RELEASE-SMOKE-001 landed (#174 → 8f0403b)
 ☑ PASS through S1 verified from main
-    npm run test:release-smoke-001 → PASS through S1 · exit 0
-    npm run test:release-smoke → PASS through S1 · exit 0
+☑ RELEASE-SMOKE-002 landed (#175 → aa26039)
+☑ PASS through S2 verified from main
+    npm run test:release-smoke-002 → PASS through S2 · exit 0
+    npm run test:release-smoke → PASS through S2 · exit 0
     npm run test:release-smoke:runner-only → BLOCKED at S1 · exit 2
 ```
 
-### Decision (post–001)
+### Decision (post–002)
 
 ```text
 READY TO OPEN / IN PROGRESS
-RELEASE-SMOKE-002 · S2 Auth only
+RELEASE-SMOKE-003 · S3 Bootstrap only
 ```
 
 ### Progress
@@ -37,8 +39,8 @@ RELEASE-SMOKE-002 · S2 Auth only
 | Delivery | Scope | Status |
 |----------|-------|--------|
 | RELEASE-SMOKE-001 | S1 Preflight | ✅ CERTIFIED · #174 |
-| RELEASE-SMOKE-002 | S2 Auth | ▶ este PR |
-| RELEASE-SMOKE-003 | S3 Bootstrap | ⏳ |
+| RELEASE-SMOKE-002 | S2 Auth | ✅ CERTIFIED · #175 |
+| RELEASE-SMOKE-003 | S3 Bootstrap | ▶ este PR |
 | RELEASE-SMOKE-004 | S4 Dashboard | ⏳ |
 | `release-smoke-pass` | FULL PASS | ⏳ |
 
