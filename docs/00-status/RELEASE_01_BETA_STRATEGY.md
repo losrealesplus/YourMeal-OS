@@ -76,7 +76,7 @@ Luego FLOW-06… según catálogo. Sin saltos. Sin features futuras en el PR del
 | Cross-flow | ✅ | Tag `release-crossflow-pass` → `0a0c51b` · [PASS](../10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md) |
 | E2E | ✅ | Tag `release-e2e-pass` → `73623ae` · [PASS](../10-validation/release-e2e/RELEASE_E2E_PASS_ACTA.md) |
 | Deployment | ✅ | Tag `release-deploy-pass` → `7896a2a` · [PASS](../10-validation/release-deploy/RELEASE_DEPLOY_PASS_ACTA.md) |
-| Rollback | ▶ | DoR ✅ · Spec ✅ · Runner ✅ · Gate ✅ · 001 ✅ · next 002 · [ACTA](../10-validation/release-rollback/RELEASE_ROLLBACK_001_R1_ACTA.md) → tag `release-rollback-pass` |
+| Rollback | ▶ | DoR ✅ · Spec ✅ · Runner ✅ · Gate ✅ · 001 ✅ · 002 ✅ · next 003 · [ACTA](../10-validation/release-rollback/RELEASE_ROLLBACK_002_R2_ACTA.md) → tag `release-rollback-pass` |
 | Beta Acceptance | ⏳ | Enlaza evidencia → tag `release-01-beta` |
 
 #### Roadmap Track B (mismo patrón FOPEBA · sin mezclar)
@@ -114,7 +114,7 @@ RELEASE-01
 ├── Performance             ⏳  (o N/A documentado)
 ├── Security                ⏳  (o N/A documentado)
 ├── Deployment              ✅  tag release-deploy-pass → 7896a2a
-├── Rollback                ▶  002 R2 · PASS through R2 · BLOCKED at R3 → release-rollback-pass
+├── Rollback                ▶  002 CERTIFIED · READY TO OPEN 003 → release-rollback-pass
 ├── Documentation           ⏳  handoff · CURRENT_PHASE · ADRs
 └── Beta Acceptance         ⏳  DoRl PASS
         ↓

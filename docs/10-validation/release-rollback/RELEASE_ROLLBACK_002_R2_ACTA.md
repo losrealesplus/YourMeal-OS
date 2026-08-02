@@ -2,7 +2,8 @@
 
 **Documento:** `RELEASE_ROLLBACK_002_R2_ACTA.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ este PR · PASS through R2 · BLOCKED at `RELEASE_ROLLBACK_R3_STARTED`  
+**Estado:** ✅ **CERTIFIED desde `main`** · PASS through R2 · BLOCKED at `RELEASE_ROLLBACK_R3_STARTED`  
+**Tip:** `2838138` (Merge #214)  
 **Precondición:** R1 CERTIFIED (#212 · `9c52d01`) · cert docs (#213 · `8dc7ce3`)  
 **Gate:** [RELEASE_ROLLBACK_GATE](./RELEASE_ROLLBACK_GATE.md)  
 **Execute:** [RELEASE_ROLLBACK_EXECUTE](./RELEASE_ROLLBACK_EXECUTE.md)  
@@ -75,12 +76,21 @@ Fuente: `R1 CERTIFIED + RELEASE_ROLLBACK_EXECUTE + release-deploy-pass (no R3 ·
 
 ---
 
+## Land Check (desde `main` @ `2838138`)
+
+| Comando | Resultado |
+|---------|-----------|
+| `test:release-rollback-002` | PASS through R2 · BLOCKED at R3 · exit 0 |
+| `test:release-rollback` | PASS through R2 · BLOCKED at R3 · exit 0 |
+| `test:release-rollback:runner-only` | BLOCKED at R1 · exit 2 |
+
 ## Next
 
 ```text
 READY TO OPEN
 RELEASE-ROLLBACK-003 · R3 only
-(after Land Check of 002 from main)
+Post-rollback Verify
+Nothing beyond R3.
 ```
 
 ---

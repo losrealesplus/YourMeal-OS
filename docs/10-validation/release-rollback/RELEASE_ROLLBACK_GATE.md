@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_ROLLBACK_GATE.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **READY** · 001 CERTIFIED · 002 ▶ este PR (R2)  
+**Estado:** ✅ **READY** · 002 CERTIFIED desde `main` · READY TO OPEN 003  
 **Nivel:** Release Track B · B-05 Rollback  
 **Spec:** [RELEASE_ROLLBACK_SPEC](../../00-status/RELEASE_ROLLBACK_SPEC.md) ✅ FROZEN #208  
 **Runner:** [RELEASE_ROLLBACK_RUNNER](./RELEASE_ROLLBACK_RUNNER.md) ✅ #210 · `a1fbdc3`  
@@ -20,12 +20,12 @@
 ☑ Runner certified (#210 → a1fbdc3)
 ☑ Gate READY (#211 → 9e9c777)
 ☑ R1 certified (#212 → 9c52d01 · cert #213)
-☑ Canonical PASS through R1 verified from main
+☑ R2 certified (#214 → 2838138)
+☑ Canonical PASS through R2 verified from main
 ☑ runner-only BLOCKED at R1 verified from main
-☑ R2 OPEN (este PR) · PASS through R2 · BLOCKED at R3
 ```
 
-### Land Check evidence (expected after 002 merge)
+### Land Check evidence (from `main` @ `2838138`)
 
 ```bash
 git pull origin main
@@ -43,10 +43,10 @@ npm run test:release-rollback:runner-only
 ### Decision
 
 ```text
-RELEASE-ROLLBACK-002 · R2 OPEN (este PR)
-PASS through R2 · BLOCKED at RELEASE_ROLLBACK_R3_STARTED
-    ↓
-Land Check from main → READY TO OPEN 003
+READY TO OPEN
+RELEASE-ROLLBACK-003 · R3 only
+Post-rollback Verify
+Nothing beyond R3.
 ```
 
 ### Progress
@@ -58,8 +58,8 @@ Land Check from main → READY TO OPEN 003
 | Runner | BLOCKED at R1 | ✅ CERTIFIED #210 |
 | Gate | READY | ✅ #211 |
 | RELEASE-ROLLBACK-001 | R1 Detect/Decide | ✅ CERTIFIED #212 |
-| RELEASE-ROLLBACK-002 | R2 Execute Rollback/Restore | ▶ este PR |
-| RELEASE-ROLLBACK-003 | R3 Post-rollback Verify | ⏳ |
+| RELEASE-ROLLBACK-002 | R2 Execute Rollback/Restore | ✅ CERTIFIED #214 |
+| RELEASE-ROLLBACK-003 | R3 Post-rollback Verify | ⏳ READY TO OPEN |
 | `release-rollback-pass` | FULL PASS | ⏳ |
 
 Acta 001: [RELEASE_ROLLBACK_001_R1_ACTA](./RELEASE_ROLLBACK_001_R1_ACTA.md) ·  
