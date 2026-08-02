@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW_CATALOG.md`  
 **Fecha:** 2026-08-02  
-**Estado:** FLOW-01 ✅ **CERTIFIED** · FLOW-02 ▶ Spec · DoR estándar ✅ (#147)  
+**Estado:** FLOW-01 ✅ **CERTIFIED** · FLOW-02 Spec ✅ FROZEN · Runner ▶ · DoR ✅ (#147)  
 **Piloto:** EatClean  
 **Fase:** 1 · Domain / Flow (Fase 0 · Plataforma COMPLETE)  
 **Plataforma:** PS-002-C ✅ · FCR-008 FROZEN · tag `ps002c-pass`  
@@ -37,7 +37,7 @@ Sí: `FLOW-01 Kitchen → Delivery`.
 
 | ID | Handoff / alcance | Prioridad | Motivo | Estado |
 |----|-------------------|-----------|--------|--------|
-| **FLOW-02** | Delivery Incidents | Muy alta | Excepciones reales justo después del happy path | ▶ Spec · [SPEC](./FLOW_02_DELIVERY_INCIDENTS_SPEC.md) — sin runner ni dominio |
+| **FLOW-02** | Delivery Incidents | Muy alta | Excepciones reales justo después del happy path | Spec ✅ FROZEN · [SPEC](./FLOW_02_DELIVERY_INCIDENTS_SPEC.md) · [Runner](../10-validation/flow-02/FLOW02_CANONICAL_RUNNER.md) ▶ · dominio ⏳ |
 | **FLOW-03** | Billing | Alta | Facturación desacoplada del happy path | ⏳ DoR NOT STARTED |
 | **FLOW-04** | Inventory Consumption | Alta | Consumo de ingredientes tras producción | ⏳ DoR NOT STARTED |
 | **FLOW-05** | Customer Order Lifecycle | Media | Creación del pedido → `confirmed` | ⏳ DoR NOT STARTED |
