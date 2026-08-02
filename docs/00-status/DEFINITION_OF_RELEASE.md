@@ -118,7 +118,7 @@ La conversación sobre beta se ancla a filas con evidencia (detalle vivo en
 | FOUNDATION · PS-002C · FLOW-01…04 | ✅ | Tags de milestone |
 | Smoke | ✅ | `release-smoke-pass` → `370628a` |
 | Cross-flow | ✅ | `release-crossflow-pass` → `0a0c51b` · [PASS](../10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md) |
-| E2E | ▶ Spec ✅ FROZEN #186 · Runner ⏳ · [SPEC](./RELEASE_E2E_SPEC.md) | `release-e2e-pass` |
+| E2E | ▶ Runner BLOCKED at E1 · Spec ✅ FROZEN · [RUNNER](../10-validation/release-e2e/RELEASE_E2E_RUNNER.md) | `release-e2e-pass` |
 | Deployment · Rollback | ⏳ | `release-deploy-pass` · `release-rollback-pass` |
 | Beta Acceptance | ⏳ | `release-01-beta` |
 

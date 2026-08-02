@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_E2E_SPEC.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **FROZEN** (Spec · #186 · `6d11ae8`) · Runner ⏳ READY TO OPEN  
+**Estado:** ✅ **FROZEN** (Spec · #186 · `6d11ae8`) · Runner ▶ ACTIVE (BLOCKED at E1)  
 **Gate DoRl:** E2E Tests · Track B · RELEASE-01  
 **Nivel:** Release Contract — **no** es un Flow nuevo  
 **DoR:** [RELEASE_E2E_DOR](./RELEASE_E2E_DOR.md) ✅ en `main` (#185 · `48e0c5c`)  
@@ -364,6 +364,7 @@ El Runner PR fijará el nombre del comando ejecutable. Este documento **no** añ
 RELEASE-01 · B-03 E2E
 ☑ DoR en main                              → #185 · `48e0c5c`
 ☑ Spec FROZEN en main                      → #186 · `6d11ae8`
+▶ Runner (BLOCKED at E1)                   → este ciclo
 □ Runner + BLOCKED at E1 verificado en main
 □ Gate READY → E2E-001…004
 □ duplicates=[] missing=[] out_of_order=[]
@@ -384,9 +385,10 @@ Sin `release-e2e-pass` → fila E2E de DoRl permanece ⏳.
 | PASS · BLOCKED · Invariants | ✅ |
 | Out of scope · Gate CLOSED until Runner | ✅ |
 | Spec READY FOR FREEZE | ✅ #186 |
-| Spec FROZEN | ✅ #186 · `6d11ae8` · Land Check docs PASSED |
-| Runner / Playwright / segment drivers | ▶ READY TO OPEN (siguiente PR) |
-| RELEASE-E2E-001 | ⛔ CLOSED (Gate NOT READY) |
+| Spec FROZEN | ✅ #186 · `6d11ae8` |
+| Runner BLOCKED at E1 | ▶ [RELEASE_E2E_RUNNER](../10-validation/release-e2e/RELEASE_E2E_RUNNER.md) |
+| Segment drivers / Playwright | ⛔ E2E-001+ |
+| RELEASE-E2E-001 | ⛔ CLOSED (Gate NOT READY until Land Check) |
 
 **Estado del documento:** ✅ **FROZEN**
 
@@ -395,19 +397,17 @@ Sin `release-e2e-pass` → fila E2E de DoRl permanece ⏳.
 ## 16. Next
 
 ```text
-READY TO OPEN
-RELEASE-E2E Runner
+Land Check Runner from main
 (BLOCKED at E1 · exit 2)
     ↓
-Gate Land Check from main
+Gate READY
     ↓
-READY → RELEASE-E2E-001…004
+RELEASE-E2E-001 · E1 only
     ↓
-release-e2e-pass
+…002…004 → release-e2e-pass
 ```
 
-Gate permanece **NOT READY** hasta Runner BLOCKED at E1 verificado desde `main`.  
-**No** Deploy · **no** Rollback · **no** FLOW-05 · **no** E2E-001.
+**No** Deploy · **no** Rollback · **no** FLOW-05 · **no** E2E-001 antes del Gate.
 
 ---
 
