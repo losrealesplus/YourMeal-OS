@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_E2E_DOR.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ **DoR OPEN** (este PR · documentation only)  
+**Estado:** ✅ **DoR CERTIFIED** (`main` · #185 · `48e0c5c`) · Spec ▶ [READY FOR FREEZE](./RELEASE_E2E_SPEC.md)  
 **Nivel:** Release Track B · B-03 E2E  
 **Pregunta (única):** ¿Qué debe certificar RELEASE-E2E antes de considerar la plataforma lista para Release?  
 **Estándar Flow Ready:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) (mismo ciclo FOPEBA)  
@@ -245,14 +245,14 @@ RELEASE-E2E (B-03)
 ☑ Estados canónicos propuestos             → este DoR
 ☑ Evidence policy                          → este DoR
 ☑ Gate antes de E2E-001                    → este DoR
-□ SPEC lista (READY FOR FREEZE)            → RELEASE_E2E_SPEC.md (siguiente PR)
+☑ SPEC lista (READY FOR FREEZE)            → [RELEASE_E2E_SPEC](./RELEASE_E2E_SPEC.md)
 □ Spec FROZEN en main
 □ Runner en main · BLOCKED at E1 verificado
 □ READY TO OPEN RELEASE-E2E-001
 ```
 
-**DoR CERTIFIED** (este documento en `main`) → único siguiente paso permitido:  
-**abrir `RELEASE_E2E_SPEC.md`**. Nada más.
+**DoR CERTIFIED** · Spec ▶ READY FOR FREEZE → tras Freeze + Land Check docs:  
+**abrir Runner** (BLOCKED at E1). Nada más.
 
 ---
 
@@ -294,8 +294,8 @@ tag (futuro): release-e2e-pass
 
 | Fase | Trabajo | Estado |
 |------|---------|--------|
-| 0 | DoR document | ▶ este PR |
-| 1 | Spec | ⏳ |
+| 0 | DoR document | ✅ #185 · `48e0c5c` |
+| 1 | Spec | ▶ READY FOR FREEZE · [RELEASE_E2E_SPEC](./RELEASE_E2E_SPEC.md) |
 | 2 | Freeze (merge Spec → main) | ⏳ |
 | 3 | Runner only · BLOCKED at E1 | ⏳ |
 | 4 | Gate E2E-001 (Land Check) | ⏳ |
