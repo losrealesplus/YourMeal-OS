@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW_04_INVENTORY_CONSUMPTION_DOR.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ **DoR DOCUMENT** · checklist Ready aún incompleto (Spec/Runner pendientes)  
+**Estado:** ✅ **DoR DOCUMENT** · Spec ▶ [READY FOR FREEZE](./FLOW_04_INVENTORY_CONSUMPTION_SPEC.md) · Runner pendiente  
 **Flow ID:** FLOW-04  
 **Handoff (catálogo):** Inventory Consumption  
 **Pregunta operacional (borrador):** ¿La producción consume inventario de forma trazable e idempotente?  
@@ -47,17 +47,16 @@ Plantilla institucional ([FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.m
 
 ```text
 FLOW-04
-□ SPEC congelada                          → siguiente PR (no este)
-□ Contrato de evidencias definido         ▶ propuesto abajo (no Freeze)
+□ SPEC congelada                          ▶ READY FOR FREEZE · merge = Freeze
+☑ Contrato de evidencias definido         → FLOW_04_INVENTORY_CONSUMPTION_SPEC.md
 □ Runner creado (test:flow04-canonical)   → tras Spec Freeze
-□ Estados permitidos / ciclo de vida      ▶ propuesto abajo (no Freeze)
-□ Invariantes                             ▶ propuestos abajo (no Freeze)
-□ PASS esperado                           ▶ propuesto
-□ BLOCKED esperado                        ▶ propuesto (baseline runner)
-□ Acta de certificación (plantilla path)  ▶ docs/10-validation/flow-04/
+☑ Estados permitidos / ciclo de vida      → planned → applied → sealed
+☑ Invariantes                             → Spec § Invariants (+ FLOW04-I2)
+☑ PASS esperado                           → Spec §7
+☑ BLOCKED esperado                        → Spec §8 (baseline runner)
+☑ Acta de certificación (plantilla path)  → docs/10-validation/flow-04/
 ```
 
-**Estado de este documento:** DoR **iniciado** · marco listo para Spec.  
 **Ready completo:** solo cuando Spec FROZEN + Runner en `main` + BLOCKED verificado.
 
 ---
@@ -189,8 +188,8 @@ Hasta entonces: **prohibido** repositories · services · OperationsService · R
 
 | Fase | Trabajo | Estado |
 |------|---------|--------|
-| 0 | DoR document (este) | ▶ este PR |
-| 1 | Spec | ⏳ |
+| 0 | DoR document | ✅ #162 · `9ce3feb` |
+| 1 | Spec | ▶ READY FOR FREEZE |
 | 2 | Freeze (merge Spec → main) | ⏳ |
 | 3 | Runner only · BLOCKED at T1 | ⏳ |
 | 4 | Gate FLOW04-001 | ⏳ |

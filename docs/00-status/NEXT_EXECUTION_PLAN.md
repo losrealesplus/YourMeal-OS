@@ -20,7 +20,8 @@ PS-002C                       ✅  ps002c-pass
 FLOW-01                       ✅  flow01-pass
 FLOW-02                       ✅  flow02-pass
 FLOW-03                       ✅  flow03-pass
-FLOW-04                       ▶  DoR document (#162)
+FLOW-04 DoR                   ✅  #162 · 9ce3feb
+FLOW-04 Spec                  ▶  READY FOR FREEZE
 RELEASE-01                    DRAFT  (eje B · #161 en main)
 Definition of Release         DRAFT  (DoRl)
 ```
@@ -54,23 +55,15 @@ This rule applies to every remaining FLOW.
 **Current status:** FLOW-04 · Inventory Consumption
 
 ```text
-First PR (this track):
-FLOW-04 Definition of Ready
-→ No Specification
-→ No Runner
-→ No Domain
-→ Only DoR
+DoR ✅ (#162)
+Spec ▶ READY FOR FREEZE  → FLOW_04_INVENTORY_CONSUMPTION_SPEC.md
 ```
 
-Doc: [FLOW_04_INVENTORY_CONSUMPTION_DOR](./FLOW_04_INVENTORY_CONSUMPTION_DOR.md)
+Docs: [DoR](./FLOW_04_INVENTORY_CONSUMPTION_DOR.md) · [SPEC](./FLOW_04_INVENTORY_CONSUMPTION_SPEC.md)
 
-After DoR:
+After Spec Freeze:
 
 ```text
-FLOW-04 Spec
-        ↓
-Freeze
-        ↓
 Runner
         ↓
 BLOCKED at FLOW04_T1_STARTED
@@ -156,8 +149,9 @@ No forma parte de este PR ni de la Spec.
 ## Current Goal
 
 ```text
-FLOW-04 DoR
-Nothing else.
+FLOW-04 Spec → READY FOR FREEZE
+(merge = Freeze · then Runner only)
+Nothing else (no domain).
 ```
 
 ---

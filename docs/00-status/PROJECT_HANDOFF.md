@@ -140,24 +140,25 @@ FOUNDATION → PS-002-C → FLOW-01 → FLOW-02 → FLOW-03
 
 | PR | Rol |
 |----|-----|
-| [#162](https://github.com/losrealesplus/YourMeal-OS/pull/162) | FLOW-04 DoR document · [NEXT_EXECUTION_PLAN](./NEXT_EXECUTION_PLAN.md) · **docs only** |
+| Spec FLOW-04 | ▶ READY FOR FREEZE · [FLOW_04_INVENTORY_CONSUMPTION_SPEC](./FLOW_04_INVENTORY_CONSUMPTION_SPEC.md) · **docs only** |
+| #162 | ✅ MERGED · FLOW-04 DoR · `9ce3feb` |
 | #161 | ✅ MERGED · handoff · RELEASE-01 · DoRl DRAFT |
 
 ---
 
 ## Next flow · FLOW-04
 
-**DoR document** ▶ [#162](https://github.com/losrealesplus/YourMeal-OS/pull/162) · [FLOW_04_INVENTORY_CONSUMPTION_DOR](./FLOW_04_INVENTORY_CONSUMPTION_DOR.md)  
+**DoR** ✅ · **Spec** ▶ READY FOR FREEZE · [SPEC](./FLOW_04_INVENTORY_CONSUMPTION_SPEC.md)  
 Implementation **forbidden** until Spec FROZEN + Runner BLOCKED verified.
 
 Gate:
 
 ```text
-Definition of Ready  (▶ #162)
+Definition of Ready  ✅ #162
         ↓
-Specification
+Specification  ▶ READY FOR FREEZE
         ↓
-Freeze
+Freeze (merge Spec → main)
         ↓
 Canonical Runner (BLOCKED at FLOW04_T1_STARTED)
         ↓
@@ -166,9 +167,9 @@ Gate verification from main
 FLOW04-001 (una transición)
 ```
 
-### Primer PR de FLOW-04 (DoR)
+### Tras Freeze · Runner only
 
-DoR · alcance · checklist · estados · invariantes · tokens canónicos · PASS/BLOCKED · evidencia · Gate.
+Sin dominio. Baseline: `BLOCKED at FLOW04_T1_STARTED`.
 
 ### Prohibido hasta Gate verde
 

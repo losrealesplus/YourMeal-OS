@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW_CATALOG.md`  
 **Fecha:** 2026-08-02  
-**Estado:** FLOW-01 ✅ · FLOW-02 ✅ · FLOW-03 ✅ · FLOW-04 ▶ DoR · DoR estándar ✅ (#147)  
+**Estado:** FLOW-01 ✅ · FLOW-02 ✅ · FLOW-03 ✅ · FLOW-04 ▶ Spec READY FOR FREEZE · DoR estándar ✅ (#147)  
 **Piloto:** EatClean  
 **Fase:** 1 · Domain / Flow (Fase 0 · Plataforma COMPLETE)  
 **Plataforma:** PS-002-C ✅ · FCR-008 FROZEN · tag `ps002c-pass`  
@@ -40,7 +40,7 @@ Sí: `FLOW-01 Kitchen → Delivery`.
 
 | ID | Handoff / alcance | Prioridad | Motivo | Estado |
 |----|-------------------|-----------|--------|--------|
-| **FLOW-04** | Inventory Consumption | Alta | Consumo de ingredientes tras producción | ▶ **DoR document** · [FLOW_04_INVENTORY_CONSUMPTION_DOR](./FLOW_04_INVENTORY_CONSUMPTION_DOR.md) · Spec/Runner ❌ |
+| **FLOW-04** | Inventory Consumption | Alta | Consumo de ingredientes tras producción | ▶ **Spec READY FOR FREEZE** · [SPEC](./FLOW_04_INVENTORY_CONSUMPTION_SPEC.md) · [DoR](./FLOW_04_INVENTORY_CONSUMPTION_DOR.md) · Runner ❌ |
 | **FLOW-05** | Customer Order Lifecycle | Media | Creación del pedido → `confirmed` | ⏳ DoR NOT STARTED |
 | **FLOW-06** | Kitchen Planning | Media | Planificación previa a T1 | ⏳ DoR NOT STARTED |
 
