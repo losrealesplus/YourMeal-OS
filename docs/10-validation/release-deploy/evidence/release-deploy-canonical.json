@@ -1,0 +1,34 @@
+{
+  "status": "BLOCKED",
+  "reason": "RELEASE-DEPLOY segments not implemented (runner ready; Evidence before Implementation)",
+  "gate": "RELEASE-DEPLOY",
+  "contract": "RELEASE_DEPLOY_SPEC",
+  "level": "release",
+  "certifies": "reproducible_deployment",
+  "complements_e2e_smoke_crossflow": true,
+  "principle": "Evidence before Implementation",
+  "code_status": "RUNNER_ONLY",
+  "at": "2026-08-02T19:20:58.915Z",
+  "pipeline": [],
+  "expected": [
+    "RELEASE_DEPLOY_D1_STARTED",
+    "RELEASE_DEPLOY_D1_COMPLETED",
+    "RELEASE_DEPLOY_D2_STARTED",
+    "RELEASE_DEPLOY_D2_COMPLETED",
+    "RELEASE_DEPLOY_D3_STARTED",
+    "RELEASE_DEPLOY_D3_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": "RELEASE_DEPLOY_D1_STARTED",
+  "certified_through": 0,
+  "blocked_at": "RELEASE_DEPLOY_D1_STARTED",
+  "delivery": "RELEASE-DEPLOY",
+  "delivery_status": "BLOCKED",
+  "gate_status": "BLOCKED",
+  "terminal": {
+    "segment": null
+  },
+  "evidence": {}
+}

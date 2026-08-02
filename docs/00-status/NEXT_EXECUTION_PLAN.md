@@ -106,10 +106,11 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual Track B:** **RELEASE-DEPLOY Runner** (siguiente PR).  
+**Objetivo actual Track B:** **RELEASE-DEPLOY Runner** (este PR).  
 DoR ✅ (#197) · Spec ✅ FROZEN (#198 · `ef447e2`).  
-Decision: **READY TO OPEN** Runner · BLOCKED at `RELEASE_DEPLOY_D1_STARTED` · exit 2.  
-Do **not** open Deploy-001 · Rollback · FLOW-05 · RELEASE-01-BETA in Runner.  
+Contrato: `npm run test:release-deploy` → BLOCKED at `RELEASE_DEPLOY_D1_STARTED` · exit 2 · `evidence={}`.  
+Gate ⛔ NOT READY hasta Land Check desde `main`.  
+Do **not** open Deploy-001 · Rollback · FLOW-05 · RELEASE-01-BETA hasta Gate READY.  
 **Reglas:** (1) Release gates ≠ Flow runners · (2) Land Check desde `main` (Regla 9).
 
 Cross-flow **no sustituye** runners canónicos: los runners certifican contratos;  
