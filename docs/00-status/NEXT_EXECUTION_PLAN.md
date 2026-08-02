@@ -106,9 +106,11 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual Track B:** B-01 Smoke Spec ▶ READY FOR FREEZE  
-([RELEASE_SMOKE_SPEC](./RELEASE_SMOKE_SPEC.md)). Siguiente PR: Runner → `test:release-smoke` → BLOCKED.  
-Do **not** open FLOW-05 unless Track B discovers a blocker that requires it.
+**Objetivo actual Track B:** B-01 Smoke Runner → `npm run test:release-smoke` → **BLOCKED**.  
+Spec: [RELEASE_SMOKE_SPEC](./RELEASE_SMOKE_SPEC.md) · Runner: [RELEASE_SMOKE_RUNNER](../10-validation/release-smoke/RELEASE_SMOKE_RUNNER.md).  
+Tras Gate verde → READY TO OPEN **RELEASE-SMOKE-001** (no antes).  
+Do **not** open FLOW-05 unless Track B discovers a blocker that requires it.  
+**Regla:** runners Release = capacidades de plataforma · runners Flow = entidades de dominio.
 
 Cross-flow **no sustituye** runners canónicos: los runners certifican contratos;  
 el cross-flow demuestra que los contratos encadenan:
@@ -186,8 +188,8 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 ## Current Goal
 
 ```text
-Track B (prioridad): B-01 Smoke Spec READY FOR FREEZE
-                     → next: Runner BLOCKED → release-smoke-pass
+Track B (prioridad): B-01 Smoke Runner BLOCKED
+                     → Gate → RELEASE-SMOKE-001… → release-smoke-pass
 Track A:             Do NOT open FLOW-05 unless Track B finds a blocker
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos
 ```

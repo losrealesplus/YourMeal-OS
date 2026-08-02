@@ -50,10 +50,12 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    Track B › B-01 Smoke Spec READY FOR FREEZE
-                               → ./RELEASE_SMOKE_SPEC.md
+  Prioridad                    Track B › B-01 Smoke Runner BLOCKED
+                               → ../10-validation/release-smoke/RELEASE_SMOKE_RUNNER.md
+                               npm run test:release-smoke → exit 2
                                Roadmap: smoke → crossflow → e2e → deploy
                                         → rollback → beta → release-01-beta
+  Regla Release                capacidades plataforma ≠ entidades dominio
   Paralelo                     Track A · FLOW-05 DoR only si Track B lo bloquea
                                (no abrir por inercia · mismo FOPEBA)
   Plan                         ./NEXT_EXECUTION_PLAN.md

@@ -72,7 +72,7 @@ Luego FLOW-06… según catálogo. Sin saltos. Sin features futuras en el PR del
 | FLOW-02 | ✅ | Tag `flow02-pass` |
 | FLOW-03 | ✅ | Tag `flow03-pass` |
 | FLOW-04 | ✅ | Tag `flow04-pass` |
-| Smoke Tests | ⏳ | Spec ▶ [READY FOR FREEZE](./RELEASE_SMOKE_SPEC.md) → tag `release-smoke-pass` |
+| Smoke Tests | ⏳ | Spec FROZEN · Runner ▶ [BLOCKED](../10-validation/release-smoke/RELEASE_SMOKE_RUNNER.md) → `release-smoke-pass` |
 | Cross-flow | ⏳ | Spec pendiente → tag `release-crossflow-pass` |
 | E2E | ⏳ | Spec pendiente → tag `release-e2e-pass` |
 | Deployment | ⏳ | Contract pendiente → tag `release-deploy-pass` |
@@ -214,7 +214,7 @@ y cuándo un Flow adicional es bloqueador de beta (no “por inercia del catálo
 
 ## Next
 
-1. **B-01:** Freeze [RELEASE_SMOKE_SPEC](./RELEASE_SMOKE_SPEC.md) → Runner `test:release-smoke` → BLOCKED → impl → `release-smoke-pass`.  
+1. **B-01:** Spec FROZEN · Runner `test:release-smoke` → BLOCKED → Gate → RELEASE-SMOKE-001… → `release-smoke-pass`.  
 2. **B-02…B-06:** mismo patrón; Beta Acceptance solo al final.  
 3. **Eje A:** Do NOT open FLOW-05 unless Track B discovers a blocker that requires it.  
 4. Solo tras DoRl PASS → tag `release-01-beta`.
