@@ -50,12 +50,12 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    Track B › RELEASE-CROSSFLOW-004 C4 FULL PASS
-                               → ../10-validation/release-crossflow/RELEASE_CROSSFLOW_004_C4_ACTA.md
+  Prioridad                    Track B › RELEASE-E2E DoR (B-03)
+                               → ./RELEASE_E2E_DOR.md
+                               Cross-flow ✅ tag release-crossflow-pass → 0a0c51b
                                → ../10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md
-                               001–003 CERTIFIED (#181…#183) · C4 este PR
-                               Tras Land Check main: tag release-crossflow-pass
-                               Luego: e2e → deploy → rollback → beta
+                               Roadmap: E2E → deploy → rollback → beta
+                               No abrir Deploy / Rollback / FLOW-05 en este PR
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)
   Land Check                   ./FOPEBA_LAND_CHECK.md (antes de cualquier 001)

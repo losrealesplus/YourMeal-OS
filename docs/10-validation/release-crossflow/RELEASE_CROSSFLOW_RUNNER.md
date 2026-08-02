@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_CROSSFLOW_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ Runner **ACTIVE** · live through C4 · FULL PASS · runner-only **BLOCKED** at C1  
+**Estado:** ✅ Runner **CERTIFIED** · FULL PASS · tag `release-crossflow-pass` → `0a0c51b` · runner-only **BLOCKED** at C1  
 **Spec:** [RELEASE_CROSSFLOW_SPEC](../../00-status/RELEASE_CROSSFLOW_SPEC.md) (FROZEN · #179)  
 **DoR:** [RELEASE_CROSSFLOW_DOR](../../00-status/RELEASE_CROSSFLOW_DOR.md)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
@@ -93,7 +93,7 @@ npm run test:release-crossflow:unit
 
 ## Gate
 
-Ver: [RELEASE_CROSSFLOW_GATE](./RELEASE_CROSSFLOW_GATE.md) · Decision: ▶ FULL PASS (rama) · tag tras Land Check `main`.
+Ver: [RELEASE_CROSSFLOW_GATE](./RELEASE_CROSSFLOW_GATE.md) · Decision: ✅ **CERTIFIED** · tag `release-crossflow-pass`.
 
 ---
 

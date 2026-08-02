@@ -90,8 +90,8 @@ Convertir la beta en algo **verificable**. Matriz viva:
 | FLOW-03 | ✅ | Tag `flow03-pass` |
 | FLOW-04 | ✅ | Tag `flow04-pass` |
 | Smoke Tests | ✅ | Tag `release-smoke-pass` · [PASS acta](../10-validation/release-smoke/RELEASE_SMOKE_PASS_ACTA.md) |
-| Cross-flow | ▶ | 004 FULL PASS [C4](../10-validation/release-crossflow/RELEASE_CROSSFLOW_004_C4_ACTA.md) · [PASS](../10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md) → tag tras Land Check `main` |
-| E2E | ⏳ | → `release-e2e-pass` |
+| Cross-flow | ✅ | Tag `release-crossflow-pass` → `0a0c51b` · [PASS](../10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md) |
+| E2E | ▶ | DoR [RELEASE_E2E_DOR](./RELEASE_E2E_DOR.md) → Spec → … → `release-e2e-pass` |
 | Deployment | ⏳ | → `release-deploy-pass` |
 | Rollback | ⏳ | → `release-rollback-pass` |
 | Beta Acceptance | ⏳ | → `release-01-beta` |
@@ -106,13 +106,12 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual Track B:** **RELEASE-CROSSFLOW-004** · C4 FULL PASS (este PR).  
-001–003 ✅ CERTIFIED (#181…#183 · tip C3 `a62943e`).  
-Acta 004: [RELEASE_CROSSFLOW_004_C4_ACTA](../10-validation/release-crossflow/RELEASE_CROSSFLOW_004_C4_ACTA.md).  
-Close-out: [RELEASE_CROSSFLOW_PASS_ACTA](../10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md).  
-Siguiente (tras merge + Land Check 004): tag `release-crossflow-pass` → B-03 RELEASE-E2E DoR.  
-Do **not** open FLOW-05 / E2E / Deploy / Rollback in this PR.  
-**Reglas:** (1) Release gates ≠ Flow runners · Cross-flow encadena handoffs · (2) Land Check desde `main` (Regla 9).
+**Objetivo actual Track B:** **RELEASE-E2E DoR** · documentation only (este PR).  
+Cross-flow ✅ CERTIFIED · tag `release-crossflow-pass` → `0a0c51b` (#184).  
+DoR: [RELEASE_E2E_DOR](./RELEASE_E2E_DOR.md).  
+Siguiente (tras Land Check DoR desde `main`): RELEASE-E2E Spec → Freeze → Runner.  
+Do **not** open Spec/Runner/Playwright · Deploy · Rollback · FLOW-05 in this PR.  
+**Reglas:** (1) Release gates ≠ Flow runners · (2) Land Check desde `main` (Regla 9).
 
 Cross-flow **no sustituye** runners canónicos: los runners certifican contratos;  
 el cross-flow demuestra que los contratos encadenan:
@@ -190,8 +189,7 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 ## Current Goal
 
 ```text
-Track B (prioridad): RELEASE-CROSSFLOW-004 C4 FULL PASS → Land Check → tag
-                     → B-03 RELEASE-E2E DoR (siguiente ciclo FOPEBA)
+Track B (prioridad): RELEASE-E2E DoR → Spec → Freeze → Runner → Gate → 001…
 Track A:             Do NOT open FLOW-05 unless Track B finds a blocker
 FOPEBA_LAND_CHECK:   ACTIVE · before every 001 / tag
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos

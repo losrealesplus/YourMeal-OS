@@ -2,13 +2,11 @@
 
 **Documento:** `RELEASE_CROSSFLOW_PASS_ACTA.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ **FULL PASS en rama** · tag `release-crossflow-pass` **pendiente Land Check desde `main`**  
+**Estado:** ✅ **RELEASE-CROSSFLOW CERTIFIED** · tag `release-crossflow-pass`  
+**Tip:** `0a0c51b` (Merge #184 · RELEASE-CROSSFLOW-004)  
 **Gate:** [RELEASE_CROSSFLOW_GATE](./RELEASE_CROSSFLOW_GATE.md)  
 **Spec:** [RELEASE_CROSSFLOW_SPEC](../../00-status/RELEASE_CROSSFLOW_SPEC.md)  
 **Principio:** [FOPEBA_LAND_CHECK](../../00-status/FOPEBA_LAND_CHECK.md)
-
-> `main` certifica; las ramas solo proponen.  
-> El tag se publica **solo** tras merge de 004 + Land Check desde `main`.
 
 ---
 
@@ -22,22 +20,23 @@ RELEASE-CROSSFLOW CLOSE-OUT
 ☑ Runner certified (#180)
 ☑ RELEASE_CROSSFLOW_001 certified (#181)
 ☑ RELEASE_CROSSFLOW_002 certified (#182)
-☑ RELEASE_CROSSFLOW_003 certified (#183 · a62943e)
-☑ RELEASE_CROSSFLOW_004 · PASS through C4 (este PR)
-☑ Canonical runner FULL PASS (rama · pending main)
+☑ RELEASE_CROSSFLOW_003 certified (#183)
+☑ RELEASE_CROSSFLOW_004 certified (#184 → 0a0c51b)
+☑ Canonical runner FULL PASS (desde main)
 ☑ runner-only historical BLOCKED preserved
-☐ tag release-crossflow-pass (tras Land Check desde main)
+☑ tag release-crossflow-pass publicado → 0a0c51b
 
-Decision (rama):
+Decision:
 
-READY FOR MERGE → Land Check → tag release-crossflow-pass
+RELEASE-CROSSFLOW CERTIFIED
 ```
 
 ---
 
-## Evidencia (este PR · pre–merge)
+## Evidencia Land Check (desde `main`)
 
 ```bash
+git pull origin main
 npm run test:release-crossflow-004
 npm run test:release-crossflow
 npm run test:release-crossflow:runner-only
@@ -53,26 +52,6 @@ Evidence:
 
 - `docs/10-validation/release-crossflow/evidence/release-crossflow-004-canonical-live.json`
 - `docs/10-validation/release-crossflow/evidence/release-crossflow-canonical-live.json`
-
----
-
-## Land Check (post–merge · desde `main`)
-
-```bash
-git pull origin main
-npm run test:release-crossflow-004
-npm run test:release-crossflow
-npm run test:release-crossflow:runner-only
-```
-
-Resultado esperado: idéntico a la tabla anterior.
-
-Tag (solo si Land Check PASS):
-
-```bash
-git tag -a release-crossflow-pass -m "RELEASE-CROSSFLOW FULL PASS"
-git push origin release-crossflow-pass
-```
 
 ---
 
@@ -93,10 +72,10 @@ Dos pilares de validación de release:
 
 ```text
 ✅ release-smoke-pass
-▶ release-crossflow-pass   (tras Land Check desde main)
+✅ release-crossflow-pass
 ```
 
-A partir de ahí el foco se desplaza a **RELEASE-E2E**, **Deploy** y **Rollback**  
+A partir de aquí el foco se desplaza a **RELEASE-E2E**, **Deploy** y **Rollback**  
 (mismo ciclo FOPEBA), que desbloquean `release-01-beta`.
 
 ---
@@ -108,7 +87,7 @@ B-03 RELEASE-E2E
 DoR → Spec → Freeze → Runner → Gate → 001… → release-e2e-pass
 ```
 
-Prohibido abrir E2E / Deploy / Rollback / FLOW-05 en este PR.
+DoR: [RELEASE_E2E_DOR](../../00-status/RELEASE_E2E_DOR.md).
 
 ---
 
