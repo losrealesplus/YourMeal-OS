@@ -300,7 +300,7 @@ tag (futuro): release-e2e-pass
 | 2 | Freeze (merge Spec → main) | ✅ |
 | 3 | Runner only · BLOCKED at E1 | ✅ #188 · `d2a4047` |
 | 4 | Gate E2E-001 (Land Check) | ✅ READY |
-| 5 | RELEASE-E2E-001…004 (un segmento / PR) | ⏳ READY TO OPEN 001 |
+| 5 | RELEASE-E2E-001…004 (un segmento / PR) | ▶ 001 E1 |
 | 6 | FULL PASS · tag `release-e2e-pass` | ⏳ |
 
 ---
