@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_E2E_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ Runner **CERTIFIED** (`main` · #188 · `d2a4047`) · **BLOCKED** at `RELEASE_E2E_E1_STARTED`  
+**Estado:** ✅ Runner **CERTIFIED** · live through E1 · runner-only **BLOCKED** at E1  
 **Spec:** [RELEASE_E2E_SPEC](../../00-status/RELEASE_E2E_SPEC.md) (FROZEN · #186 · `6d11ae8`)  
 **DoR:** [RELEASE_E2E_DOR](../../00-status/RELEASE_E2E_DOR.md)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
@@ -55,49 +55,36 @@ PASS → tag release-e2e-pass
 ## Comandos
 
 ```bash
-# Default (CERTIFIED_THROUGH = 0) → runner-only
+# Default live through max certified (E1)
 npm run test:release-e2e
-# → BLOCKED at RELEASE_E2E_E1_STARTED · evidence={} · exit 2
+# → PASS through E1 · BLOCKED at E2 · exit 0
 
-# Explicit historic Gate / Land Check
+# RELEASE-E2E-001 · E1 only
+npm run test:release-e2e-001
+# → PASS through E1 · BLOCKED at E2 · exit 0
+
+# Historic Gate / Land Check vacío
 npm run test:release-e2e:runner-only
-# → same BLOCKED contract · exit 2
+# → BLOCKED at RELEASE_E2E_E1_STARTED · exit 2 · evidence={}
 
-# Unit tests (pipeline only · no Playwright)
+# Unit tests (pipeline + E1 · no Playwright suite)
 npm run test:release-e2e:unit
 ```
 
-### Resultado esperado (este PR)
-
-```text
-RELEASE-E2E
-
-BLOCKED
-
-blocked_at=RELEASE_E2E_E1_STARTED
-duplicates=[]
-missing=[]
-out_of_order=[]
-evidence={}
-exit 2
-```
-
-**BLOCKED no es defecto.**
+**BLOCKED (runner-only) no es defecto.**
 
 ---
 
-## Fuera de alcance (este PR)
+## Fuera de alcance (hasta E1+)
 
-- Driver E1…E4 · Playwright · browser automation  
-- Dominio · UI · servicios · repositorios  
+- Driver E2…E4 · Playwright E2E suite  
 - Deploy · Rollback · FLOW-05 · `release-01-beta`  
-- Abrir RELEASE-E2E-001  
 
 ---
 
 ## Gate
 
-Ver: [RELEASE_E2E_GATE](./RELEASE_E2E_GATE.md) · Decision: ✅ **READY TO OPEN** RELEASE-E2E-001 · E1 only.
+Ver: [RELEASE_E2E_GATE](./RELEASE_E2E_GATE.md) · Decision: ✅ READY · 001 en curso.
 
 ---
 

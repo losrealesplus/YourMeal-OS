@@ -91,7 +91,7 @@ Convertir la beta en algo **verificable**. Matriz viva:
 | FLOW-04 | ✅ | Tag `flow04-pass` |
 | Smoke Tests | ✅ | Tag `release-smoke-pass` · [PASS acta](../10-validation/release-smoke/RELEASE_SMOKE_PASS_ACTA.md) |
 | Cross-flow | ✅ | Tag `release-crossflow-pass` → `0a0c51b` · [PASS](../10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md) |
-| E2E | ▶ | Gate ✅ READY · Runner ✅ #188 · next [E2E-001 E1](../10-validation/release-e2e/RELEASE_E2E_GATE.md) → `release-e2e-pass` |
+| E2E | ▶ | 001 ▶ [E1 acta](../10-validation/release-e2e/RELEASE_E2E_001_E1_ACTA.md) · Gate ✅ → `release-e2e-pass` |
 | Deployment | ⏳ | → `release-deploy-pass` |
 | Rollback | ⏳ | → `release-rollback-pass` |
 | Beta Acceptance | ⏳ | → `release-01-beta` |
@@ -106,11 +106,11 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual Track B:** **RELEASE-E2E-001** · E1 only (siguiente PR).  
-DoR ✅ · Spec ✅ FROZEN (#186) · Runner ✅ CERTIFIED (#188 · `d2a4047`).  
-Gate: [RELEASE_E2E_GATE](../10-validation/release-e2e/RELEASE_E2E_GATE.md) ✅ READY.  
-Land Check: BLOCKED at E1 · exit 2 verificado desde `main`.  
-Do **not** open E2/E3/E4 · Deploy · Rollback · FLOW-05 in E2E-001.  
+**Objetivo actual Track B:** **RELEASE-E2E-001** · E1 only (este PR).  
+DoR ✅ · Spec ✅ · Runner ✅ (#188) · Gate ✅ READY (#189 · `04ed791`).  
+Acta: [RELEASE_E2E_001_E1_ACTA](../10-validation/release-e2e/RELEASE_E2E_001_E1_ACTA.md).  
+Siguiente (tras Land Check 001): RELEASE-E2E-002 · E2 only.  
+Do **not** open E2/E3/E4 · Deploy · Rollback · FLOW-05 in this PR.  
 **Reglas:** (1) Release gates ≠ Flow runners · (2) Land Check desde `main` (Regla 9).
 
 Cross-flow **no sustituye** runners canónicos: los runners certifican contratos;  
@@ -189,7 +189,7 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 ## Current Goal
 
 ```text
-Track B (prioridad): RELEASE-E2E-001 E1 → 002…004 → release-e2e-pass
+Track B (prioridad): RELEASE-E2E-001 E1 → Land Check → 002…
 Track A:             Do NOT open FLOW-05 unless Track B finds a blocker
 FOPEBA_LAND_CHECK:   ACTIVE · before every 001 / tag
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos
