@@ -207,7 +207,9 @@ async function main() {
     const out = await writeEvidence(report, "live", through);
     console.log(`evidence: ${path.relative(ROOT, out)}`);
 
-    if (
+    if (progress.status === "PASS" && progress.certified_through >= 4) {
+      console.log("FLOW-01 · FULL PASS · Kitchen → Delivery certified");
+    } else if (
       progress.certified_through >= 3 &&
       progress.blocked_at === "FLOW01_T4_STARTED"
     ) {
