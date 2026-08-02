@@ -2,13 +2,15 @@
 
 **Documento:** `NEXT_EXECUTION_PLAN.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ACTIVE · plan de ejecución post–FLOW-03  
-**Baseline:** `main` · post–#161 governance · tags `ps002c-pass` · `flow01-pass` · `flow02-pass` · `flow03-pass`  
+**Estado:** ACTIVE · post–`flow04-pass`  
+**Baseline:** `main` · tags `ps002c-pass` · `flow01-pass` · `flow02-pass` · `flow03-pass` · `flow04-pass`  
 **Entrada canónica:** [PROJECT_HANDOFF](./PROJECT_HANDOFF.md) · [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) · [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md)  
-**DoR estándar:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md)
+**DoR estándar:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md)  
+**Métricas de proceso:** [FOPEBA_METRICS](./FOPEBA_METRICS.md) (v0 · sin estimaciones)
 
-> FLOW-03 is CLOSED.  
-> Gobierno de Flow y gobierno de Release son niveles distintos — no mezclar.
+> Hasta FLOW-04 la pregunta dominante era: *¿podemos certificar un flujo?*  
+> Con cuatro ciclos completos, esa pregunta ya tiene evidencia suficiente.  
+> La pregunta que empieza a dominar: *¿qué falta para una beta funcional?*
 
 ---
 
@@ -20,15 +22,40 @@ PS-002C                       ✅  ps002c-pass
 FLOW-01                       ✅  flow01-pass
 FLOW-02                       ✅  flow02-pass
 FLOW-03                       ✅  flow03-pass
-FLOW-04                       ✅  flow04-pass (FULL PASS)
-RELEASE-01                    DRAFT  (eje B · DoRl)
-FOPEBA_METRICS                ▶  ./FOPEBA_METRICS.md (v0)
-FLOW-05                       ⏳  DoR NOT STARTED
+FLOW-04                       ✅  flow04-pass
+PROJECT_HANDOFF               ✅
+RELEASE_01_BETA_STRATEGY      ✅  DRAFT
+DEFINITION_OF_RELEASE         ✅  DRAFT (DoRl)
+FOPEBA_METRICS                ✅  v0
+RELEASE-01                    🚧  Track B · acumular evidencia DoRl
+FLOW-05                       ⏳  DoR NOT STARTED (no abrir salvo bloqueador beta)
 ```
 
 ---
 
-## Execution Rule
+## Cambio de foco (post–FLOW-04 PASS)
+
+| Antes (FLOW-01…04) | Ahora |
+|--------------------|--------|
+| Validar que FOPEBA funciona | Evaluar el **producto como sistema** |
+| Una pregunta / Flow | DoRl medible + Flows solo si alimentan la beta |
+| Runners aislados | Runners + **cross-flow** (complementarios) |
+
+FOPEBA no se relaja. Cambia el **peso relativo** de los ejes.
+
+---
+
+## Prioridad
+
+**Track B tiene prioridad ligeramente mayor** que abrir FLOW-05.
+
+No abrir FLOW-05 de inmediato salvo que sea un **bloqueador directo** de la beta  
+(documentado en DoRl / estrategia RELEASE-01). Mientras tanto, Track A permanece  
+elegible con el patrón FOPEBA intacto — sin excepciones cuando se abra.
+
+---
+
+## Execution Rule (Track A · sin excepciones)
 
 Never open business implementation before completing:
 
@@ -50,50 +77,68 @@ This rule applies to every remaining FLOW.
 
 ---
 
-## Parallel Track A — Business Certification
+## Parallel Track B — RELEASE-01 (prioridad ligeramente mayor)
 
-**Current status:** FLOW-04 · Inventory Consumption
+Convertir la beta en algo **verificable**. Matriz viva:
+
+| Gate DoRl | Estado | Evidencia |
+|-----------|--------|-----------|
+| FOUNDATION | ✅ | Platform / foundation locks |
+| PS-002C | ✅ | Tag `ps002c-pass` |
+| FLOW-01 | ✅ | Tag `flow01-pass` |
+| FLOW-02 | ✅ | Tag `flow02-pass` |
+| FLOW-03 | ✅ | Tag `flow03-pass` |
+| FLOW-04 | ✅ | Tag `flow04-pass` |
+| Smoke Tests | ⏳ | |
+| Cross-flow | ⏳ | |
+| E2E | ⏳ | |
+| Deployment | ⏳ | |
+| Rollback | ⏳ | |
+| Beta Acceptance | ⏳ | DoRl PASS → `release-01-beta` |
+
+Detalle y checklist completo: [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) · [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md).
+
+**Próximo trabajo Track B (docs / evidencia, no dominio):**
+
+1. Nombrar el set de Flows beta aún pendientes (si los hay) sin Freeze prematuro.  
+2. Definir qué cuenta como Smoke / Cross-flow / E2E (artefacto + comando / acta).  
+3. Acumular evidencia gate a gate con la misma disciplina que un Flow.
+
+Cross-flow **no sustituye** runners canónicos: los runners certifican contratos;  
+el cross-flow demuestra que los contratos encadenan:
 
 ```text
-DoR ✅ · Spec ✅ FROZEN
-Runner ▶  → npm run test:flow04-canonical → BLOCKED at T1
+Pedido → Producción → Packaging → Entrega
+→ Incidencia → Facturación → Inventario → Cierre
 ```
-
-Docs: [DoR](./FLOW_04_INVENTORY_CONSUMPTION_DOR.md) · [SPEC](./FLOW_04_INVENTORY_CONSUMPTION_SPEC.md) · [Runner](../10-validation/flow-04/FLOW04_CANONICAL_RUNNER.md)
-
-After Runner on `main` + Gate:
-
-```text
-FLOW04-001 … → flow04-pass
-```
-
-Then FLOW-05 / FLOW-06 con el mismo ciclo.
 
 ---
 
-## Parallel Track B — RELEASE-01
+## Parallel Track A — Business Certification
 
-Work independently from FLOW implementation.
-
-Complete [Definition of Release](./DEFINITION_OF_RELEASE.md) progressively.
+**Current status:** FLOW-04 ✅ CERTIFIED · `flow04-pass`
 
 ```text
-RELEASE-01 DoRl checklist (DRAFT)
-□ Required FLOWs certified
-□ Smoke Tests
-□ Cross Flow Tests
-□ End-to-End Tests
-□ Deployment validation
-□ Rollback validation
-□ Documentation complete
-□ ADR synchronization
-□ CHANGELOG
-□ Version tag
-□ Beta Acceptance
+FLOW-05 (cuando proceda — no inmediato)
+DoR → Spec → Freeze → Runner → FLOW05-001… → flow05-pass
 ```
 
-No Release Freeze until every applicable item is complete.  
-Strategy: [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md).
+Sin excepciones. Sin features futuras. Una transición / PR.
+
+Catálogo: [FLOW_CATALOG](./FLOW_CATALOG.md) (FLOW-05 · Customer Order Lifecycle).
+
+---
+
+## FOPEBA_METRICS
+
+Marco v0 en [FOPEBA_METRICS](./FOPEBA_METRICS.md).
+
+**No** rellenar con estimaciones. Solo evidencia objetiva de ciclos reales:
+
+- Tiempo DoR → Freeze · Freeze → Runner · Runner → primer / FULL PASS  
+- Tiempo total por FLOW · # PRs por FLOW  
+- Regresiones detectadas · Spec post-Freeze (ideal: 0)  
+- Cobertura catálogo (`certificados / planificados`)
 
 ---
 
@@ -106,17 +151,18 @@ Strategy: [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md).
 - Keep runners deterministic  
 - Never implement future transitions  
 - Never implement future FLOWs  
+- DoRl ≠ DoR · `flowNN-pass` ≠ `release-01-beta`
 
 ---
 
-## Strategic milestones (after method has proven repeatable)
+## Strategic milestones
 
 ```text
-FLOW-04 PASS
+flow04-pass                              ✅
         ↓
-FLOW-05 PASS
-        ↓
-FLOW-06 PASS
+RELEASE-01 acumula evidencia DoRl        ▶  (prioridad)
+        +
+FLOW-05… solo si alimentan / no bloquean la beta
         ↓
 RELEASE-01 DoRl PASS
         ↓
@@ -127,27 +173,16 @@ Beta pública controlada
 release-1.0
 ```
 
-Goal: demonstrate that FOPEBA **scales**, not only that it works once.
-
-### Post–FLOW-04 (candidatos · no abrir ahora)
-
-Tras `flow04-pass`, valorar `FOPEBA_METRICS.md` — métricas del **proceso**, no del negocio:
-
-- Tiempo DoR → Freeze · Freeze → Runner · Runner → `flowNN-pass`  
-- PRs por FLOW · regresiones detectadas por runners  
-- Cambios de Spec post-Freeze (ideal: 0)  
-- Cobertura flows certificados / catálogo  
-
-No forma parte de este PR ni de la Spec.
+Goal: demostrar que FOPEBA **escala** y que el producto es certificable como conjunto.
 
 ---
 
 ## Current Goal
 
 ```text
-FLOW-04 CERTIFIED · tag flow04-pass
-Next Track A: FLOW-05 DoR (only)
-Next Track B: RELEASE-01 DoRl items + FOPEBA_METRICS rows
+Track B (prioridad): RELEASE-01 DoRl matrix → evidencia gate a gate
+Track A (paralelo):  FLOW-05 DoR only cuando no sea prematuro / sea bloqueador beta
+FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos
 ```
 
 ---

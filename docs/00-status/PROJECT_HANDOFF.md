@@ -217,15 +217,22 @@ Dos preguntas distintas:
 | Flow | ¿Este flujo cumple su contrato? |
 | Release | ¿El producto completo está listo para una beta? |
 
+Con `flow01`…`flow04-pass`, la primera pregunta ya tiene evidencia suficiente.  
+La segunda empieza a dominar el plan de ejecución.
+
 Dos ejes (no mezclar PRs):
 
 - **Eje A** — Certificar Flows (FOPEBA · DoR → … → `flowNN-pass`)  
 - **Eje B** — Completar [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md)  
 
+Post–`flow04-pass`: **Track B tiene prioridad ligeramente mayor** que abrir FLOW-05  
+(salvo bloqueador directo de beta). Matriz DoRl medible en la estrategia RELEASE-01.
+
 Pieza FOPEBA de producto: [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md) (DoRl) —  
 checklist de versión completa → futuro tag `release-01-beta`.
 
-DoRl está **DRAFT**. No declara beta. No abre implementación.
+DoRl está **DRAFT**. No declara beta. No abre implementación de dominio.  
+Métricas de proceso: [FOPEBA_METRICS](./FOPEBA_METRICS.md) (v0 · sin estimaciones).
 
 ---
 

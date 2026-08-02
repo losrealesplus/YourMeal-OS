@@ -3,7 +3,7 @@
 **Documento:** `FLOW04_PASS_ACTA.md`  
 **Fecha:** 2026-08-02  
 **Estado:** ✅ **FLOW-04 CERTIFIED** (Inventory Consumption happy path)  
-**Tag:** `flow04-pass` → *(merge commit de FLOW04-003)*  
+**Tag:** `flow04-pass` → `8be1c26` (Merge #167)  
 **Comando:** `npm run test:flow04-canonical -- --live`  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
 **Spec:** [FLOW_04_INVENTORY_CONSUMPTION_SPEC](../../00-status/FLOW_04_INVENTORY_CONSUMPTION_SPEC.md)  

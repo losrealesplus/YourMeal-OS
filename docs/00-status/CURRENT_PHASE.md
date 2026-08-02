@@ -31,33 +31,37 @@ Mobile Foundation (MF-001)  ✅ Cimientos CLOSED
 
 Fase proyecto
   0 · Plataforma              ✅ COMPLETE
-  1 · Domain / Flow           ▶ ACTIVA
-  Pregunta                    ¿El negocio cumple el contrato?
+  1 · Domain / Flow           ✅ FLOW-01…04 CERTIFIED (metodología probada)
+  2 · Product as system       ▶ ACTIVA · DoRl / RELEASE-01
+  Pregunta dominante          ¿Qué falta para una beta funcional?
+  Pregunta Flow (sigue)       ¿Este flujo cumple el contrato?
   Principio                   Evidence before Implementation
-  Estándar                    Definition of Ready (FLOW-XX)
-                              → ./FLOW_DEFINITION_OF_READY.md
+  Estándar Flow               Definition of Ready (FLOW-XX)
+  Estándar Release            Definition of Release (DoRl)
+                              → ./DEFINITION_OF_RELEASE.md
 
 Sprint activo
   FLOW-01                      ✅ CERTIFIED · tag flow01-pass
-  FLOW-02                      ✅ CERTIFIED · tag flow02-pass → a1e8d1e
+  FLOW-02                      ✅ CERTIFIED · tag flow02-pass
   FLOW-03                      ✅ CERTIFIED · tag flow03-pass → 67a2e66
-  Live: npm run test:flow03-canonical -- --live → FULL PASS
-  Acta: ../10-validation/flow-03/FLOW03_PASS_ACTA.md
+  FLOW-04                      ✅ CERTIFIED · tag flow04-pass → 8be1c26
+  Live: npm run test:flow04-canonical -- --live → FULL PASS
+  Acta: ../10-validation/flow-04/FLOW04_PASS_ACTA.md
   FLOW Governance              ✅ COMPLETE (#147)
-  Tags: ps002c-pass · flow01-pass · flow02-pass · flow03-pass
+  Tags: ps002c-pass · flow01…04-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Activo                       FLOW-04 Inventory Consumption
-                               ✅ FULL PASS · tag flow04-pass (este PR)
-                               → ../10-validation/flow-04/FLOW04_PASS_ACTA.md
-                               Next: FLOW-05 DoR · RELEASE-01 DoRl · FOPEBA_METRICS
-                               Plan: ./NEXT_EXECUTION_PLAN.md
-                               Metrics: ./FOPEBA_METRICS.md
-  Handoff                      ./PROJECT_HANDOFF.md (congelado 2026-08-02)
-  Release                      ./RELEASE_01_BETA_STRATEGY.md (DRAFT · eje B)
-  DoRl                         ./DEFINITION_OF_RELEASE.md (DRAFT · gate de versión)
-  Ejes                         A: FLOW-04+ FOPEBA · B: RELEASE-01 DoRl
+  Prioridad                    Track B › RELEASE-01 DoRl matrix (medible)
+                               → ./RELEASE_01_BETA_STRATEGY.md
+  Paralelo                     Track A · FLOW-05 DoR only si bloquea beta
+                               (no abrir por inercia · mismo FOPEBA)
+  Plan                         ./NEXT_EXECUTION_PLAN.md
+  Metrics                      ./FOPEBA_METRICS.md (v0 · sin estimaciones)
+  Handoff                      ./PROJECT_HANDOFF.md
+  DoRl                         ./DEFINITION_OF_RELEASE.md (DRAFT)
+  Ejes                         A: FLOW-05+ FOPEBA · B: RELEASE-01 (peso ↑)
   Beta paralelo: BR-03.3 Runtime Validation (G3)
   Disciplina: una transición / PR · DoR antes de código · DoRl ≠ DoR
+  Riesgo emergente: interacción entre Flows → Cross-flow / E2E
 
 ═══════════════════════════════════════════════
 CLOSED GATE
@@ -82,9 +86,11 @@ NEXT PHASE
   ↓
   FLOW-03 ✅ FULL PASS · tag flow03-pass → 67a2e66 (#160)
   ↓
-  FLOW-04 · Spec FROZEN → Runner (BLOCKED at T1) → Gate → FLOW04-001
+  FLOW-04 ✅ FULL PASS · tag flow04-pass → 8be1c26 (#167)
   ↓
-  FLOW04-001… (solo tras Gate)
+  ▶ RELEASE-01 · acumular evidencia DoRl (Track B · prioridad)
+  ↓
+  FLOW-05 DoR only cuando sea bloqueador beta (Track A · sin excepciones)
 
 En paralelo (beta móvil EatClean):
   Lema: cada PR acerca la jornada completa del piloto.
@@ -95,11 +101,11 @@ En paralelo (beta móvil EatClean):
 Prohibido prematuro: Event Bus · Notifications · Jobs · Analytics · AI
 ═══════════════════════════════════════════════
 Ver: ./NEXT_EXECUTION_PLAN.md
-     ./FLOW_04_INVENTORY_CONSUMPTION_DOR.md
-     ./PROJECT_HANDOFF.md
      ./RELEASE_01_BETA_STRATEGY.md
      ./DEFINITION_OF_RELEASE.md
-     ../10-validation/flow-03/FLOW03_PASS_ACTA.md
+     ./FOPEBA_METRICS.md
+     ./PROJECT_HANDOFF.md
+     ../10-validation/flow-04/FLOW04_PASS_ACTA.md
      ./FLOW_DEFINITION_OF_READY.md
      ./EVIDENCE_BEFORE_IMPLEMENTATION.md
      ./FLOW_CATALOG.md
@@ -120,7 +126,7 @@ Ver: ./NEXT_EXECUTION_PLAN.md
 **Gobernanza:** [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) — política permanente (6 reglas)  
 **Regla diaria:** [FLOW_FIRST](./FLOW_FIRST.md) — ¿A qué Flow pertenece?  
 **Done (fase):** [FLOW_DEFINITION_OF_DONE](./FLOW_DEFINITION_OF_DONE.md) — Handoff → Evidence → Certification → Merge  
-**Jerarquía:** [FLOW_WORK_HIERARCHY](./FLOW_WORK_HIERARCHY.md) · **Catálogo:** [FLOW_CATALOG](./FLOW_CATALOG.md) (FLOW-01…03)
+**Jerarquía:** [FLOW_WORK_HIERARCHY](./FLOW_WORK_HIERARCHY.md) · **Catálogo:** [FLOW_CATALOG](./FLOW_CATALOG.md) (FLOW-01…04 ✅ · FLOW-05 ⏳)
 
 **Pregunta de fase (todo PR):**  
 ¿A qué Flow pertenece? → ¿Qué Outcome? → ¿Qué Handoff? → ¿Qué evidencia? → ¿Respeta Baseline/Core?  
