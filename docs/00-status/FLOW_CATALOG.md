@@ -2,11 +2,11 @@
 
 **Documento:** `FLOW_CATALOG.md`  
 **Fecha:** 2026-08-02  
-**Estado:** FLOW-01 ✅ **CERTIFIED** · FLOW-02 ▶ FULL PASS (FLOW02-003) · DoR ✅ (#147)  
+**Estado:** FLOW-01 ✅ · FLOW-02 ✅ **CERTIFIED** · DoR ✅ (#147)  
 **Piloto:** EatClean  
 **Fase:** 1 · Domain / Flow (Fase 0 · Plataforma COMPLETE)  
 **Plataforma:** PS-002-C ✅ · FCR-008 FROZEN · tag `ps002c-pass`  
-**Dominio:** FLOW-01 ✅ · tag `flow01-pass`  
+**Dominio:** FLOW-01 ✅ `flow01-pass` · FLOW-02 ✅ `flow02-pass`  
 **Estándar:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) · [Evidence before Implementation](./EVIDENCE_BEFORE_IMPLEMENTATION.md)
 
 ---
@@ -30,7 +30,7 @@ Sí: `FLOW-01 Kitchen → Delivery`.
 | ID | Handoff | Pregunta operacional | Estado |
 |----|---------|----------------------|--------|
 | **FLOW-01** | Kitchen → Delivery | ¿Kitchen entrega correctamente a Delivery? | ✅ **CERTIFIED** · [SPEC](./FLOW_01_KITCHEN_DELIVERY_SPEC.md) · [Plan](./FLOW_01_DELIVERY_PLAN.md) · [PASS acta](../10-validation/flow-01/FLOW01_PASS_ACTA.md) · `npm run test:flow01-canonical -- --live` |
-| **FLOW-02** | Delivery Incidents | ¿Un intento fallido queda operable y reintentable hasta `delivered`? | ▶ **FULL PASS** (este PR) · [SPEC](./FLOW_02_DELIVERY_INCIDENTS_SPEC.md) · [PASS acta](../10-validation/flow-02/FLOW02_PASS_ACTA.md) · `npm run test:flow02-canonical -- --live` |
+| **FLOW-02** | Delivery Incidents | ¿Un intento fallido queda operable y reintentable hasta `delivered`? | ✅ **CERTIFIED** · tag `flow02-pass` · [SPEC](./FLOW_02_DELIVERY_INCIDENTS_SPEC.md) · [PASS acta](../10-validation/flow-02/FLOW02_PASS_ACTA.md) · `npm run test:flow02-canonical -- --live` |
 
 ---
 

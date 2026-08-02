@@ -38,15 +38,16 @@ Fase proyecto
                               → ./FLOW_DEFINITION_OF_READY.md
 
 Sprint activo
-  FLOW-01                      ✅ CERTIFIED (#141–#146)
-  Live: npm run test:flow01-canonical -- --live → PASS
-  Acta: ../10-validation/flow-01/FLOW01_PASS_ACTA.md
+  FLOW-01                      ✅ CERTIFIED · tag flow01-pass
+  FLOW-02                      ✅ CERTIFIED · tag flow02-pass → a1e8d1e
+  Live: npm run test:flow02-canonical -- --live → PASS
+  Acta: ../10-validation/flow-02/FLOW02_PASS_ACTA.md
   FLOW Governance              ✅ COMPLETE (#147)
-  Tags: ps002c-pass · flow01-pass
+  Tags: ps002c-pass · flow01-pass · flow02-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Activo                       FLOW02-003 · T3 delivered · FULL PASS
-                               FLOW02-001 ✅ · FLOW02-002 ✅ (#152)
-                               npm run test:flow02-003 → FULL PASS
+  Siguiente                    FLOW-03 Spec (Billing) — DoR primero
+                               Spec → Freeze → Runner → BLOCKED at T1
+                               sin dominio hasta DoR completo
   Beta paralelo: BR-03.3 Runtime Validation (G3)
   Disciplina: una transición / PR · DoR antes de código
 
@@ -69,11 +70,9 @@ NEXT PHASE
   ↓
   FLOW-02 Runner ✅ (#150)
   ↓
-  FLOW02-001 ✅ T1
+  FLOW-02 ✅ FULL PASS · tag flow02-pass
   ↓
-  FLOW02-002 ✅ T2
-  ↓
-  FLOW02-003 ▶ T3 → FULL PASS · tag flow02-pass (post-merge)
+  FLOW-03 Spec (Billing) — DoR · Freeze · Runner · luego FLOW03-001
 
 En paralelo (beta móvil EatClean):
   Lema: cada PR acerca la jornada completa del piloto.
