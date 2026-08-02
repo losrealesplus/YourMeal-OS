@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_CROSSFLOW_SPEC.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ **READY FOR FREEZE** · merge en `main` = Freeze  
+**Estado:** ✅ **FROZEN** (Spec · #179 · `dbfe917`) · Runner ▶ ACTIVE  
 **Gate DoRl:** Cross-flow Tests · Track B · RELEASE-01  
 **Nivel:** Release Contract — **no** es un Flow nuevo  
 **DoR:** [RELEASE_CROSSFLOW_DOR](./RELEASE_CROSSFLOW_DOR.md) ✅ en `main` (#178 · `e55e2a1`)  
@@ -334,8 +334,7 @@ Comando futuro (Runner PR · **no** este PR): nombre previsto `test:release-cros
 ```text
 RELEASE-01 · B-02 Cross-flow
 ☑ DoR en main                              → #178
-☑ Spec READY FOR FREEZE                    → este documento
-□ Spec FROZEN (merge main)
+☑ Spec FROZEN                              → #179 · `dbfe917`
 □ Runner + BLOCKED at C1 verificado en main
 □ Gate READY → CROSSFLOW-001…004
 □ duplicates=[] missing=[] out_of_order=[]
@@ -353,20 +352,19 @@ Sin `release-crossflow-pass` → fila Cross-flow de DoRl permanece ⏳.
 |------|--------|
 | Goal · Scope · Cadena · C1–C4 | ✅ |
 | Tokens · Invariants · PASS / BLOCKED | ✅ |
-| Out of scope · Gate CLOSED until Runner | ✅ |
-| Runner / scripts / domain / Playwright | ❌ este PR |
-| CROSSFLOW-001 | ❌ CLOSED |
+| Out of scope · Gate CLOSED until Land Check | ✅ |
+| Spec FROZEN | ✅ #179 |
+| Runner / segment drivers / Playwright | ▶ Runner PR · ⛔ 001 |
+| CROSSFLOW-001 | ⛔ CLOSED |
 
-**Estado del documento:** ▶ **READY FOR FREEZE** (merge = Freeze)
+**Estado del documento:** ✅ **FROZEN**
 
 ---
 
 ## 15. Next
 
 ```text
-Spec merge → FROZEN
-    ↓
-Runner (BLOCKED at C1) · RELEASE_CROSSFLOW_RUNNER.md
+Runner (BLOCKED at C1) · este ciclo
     ↓
 Gate Land Check from main
     ↓
