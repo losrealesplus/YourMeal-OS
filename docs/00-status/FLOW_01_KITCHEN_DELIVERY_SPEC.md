@@ -2,8 +2,9 @@
 
 **Documento:** `FLOW_01_KITCHEN_DELIVERY_SPEC.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ **SPEC READY FOR FREEZE** — sin implementación de producto en este PR  
+**Estado:** ▶ **SPEC READY FOR FREEZE** — merge = freeze oficial · sin implementación de dominio en este PR  
 **Fase de proyecto:** **Fase 1 · Domain / Flow Certification** (Fase 0 · Plataforma = COMPLETE)  
+**Principio:** [Evidence before Implementation](./EVIDENCE_BEFORE_IMPLEMENTATION.md) · [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) Regla 7  
 **Precondición de plataforma:** PS-002-C ✅ PASS · tag `ps002c-pass` → `545bd19` · [PS002C_PASS_ACTA](../10-validation/platform-stabilization/PS002C_PASS_ACTA.md)  
 **Auth:** [FCR-008](../10-validation/FCR008_CANONICAL_POST_LOGIN_SESSION.md) **FROZEN** (solo se reabre por regresión certificada)  
 **Gobernanza:** [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) · [FLOW_FIRST](./FLOW_FIRST.md) · [FLOW_DEFINITION_OF_DONE](./FLOW_DEFINITION_OF_DONE.md)  

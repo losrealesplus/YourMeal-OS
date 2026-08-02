@@ -32,11 +32,14 @@ Mobile Foundation (MF-001)  ✅ Cimientos CLOSED
 Fase proyecto
   0 · Plataforma              ✅ COMPLETE
   1 · Domain / Flow           ▶ ACTIVA (FLOW-01)
+  Principio                   Evidence before Implementation
+                              → ./EVIDENCE_BEFORE_IMPLEMENTATION.md
 
 Sprint activo
-  FLOW-01 Spec READY FOR FREEZE (PR #141)
-  Gaps cerrados: PackagingBatch lifecycle · T4 = delivered
-  Siguiente post-merge Spec: test:flow01-canonical
+  1) Merge PR #141 = FLOW-01 SPEC FROZEN
+  2) Runner test:flow01-canonical
+  3) Implementation happy path (solo después)
+  Gaps Spec cerrados: PackagingBatch lifecycle · T4 = delivered
   Acta PS-002-C: ../10-validation/platform-stabilization/PS002C_PASS_ACTA.md
   Tag restauración: ps002c-pass → 545bd19
   Beta paralelo: BR-03.3 Runtime Validation (G3)
