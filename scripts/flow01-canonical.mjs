@@ -28,13 +28,19 @@ import {
   formatFlow01ComparisonTable,
   validateFlow01Pipeline,
 } from "./lib/flow01-canonical-pipeline.mjs";
+import { runFlow01T1DomainDriver } from "./lib/flow01-t1-domain-driver.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const EVIDENCE_DIR = path.join(ROOT, "docs/10-validation/flow-01/evidence");
 
 function evidencePathFor(mode, through) {
-  if (mode === "live") return path.join(EVIDENCE_DIR, "flow01-canonical-live.json");
+  if (mode === "live" && through) {
+    return path.join(EVIDENCE_DIR, `flow01-00${through}-canonical-live.json`);
+  }
+  if (mode === "live") {
+    return path.join(EVIDENCE_DIR, "flow01-canonical-live.json");
+  }
   if (through) {
     return path.join(EVIDENCE_DIR, `flow01-00${through}-canonical.json`);
   }
@@ -143,27 +149,63 @@ async function main() {
   }
 
   if (mode === "live") {
-    // Domain driver hook — empty until Implementation wires observations
-    const observed = [];
+    console.log("Driving FLOW01-001 domain (startProduction)…");
+    const driver = runFlow01T1DomainDriver({ root: ROOT });
+    if (!driver.ok) {
+      console.error("Domain driver failed (vitest):");
+      console.error(driver.output.slice(-4000));
+      const report = buildFlow01EvidenceReport({
+        status: "FAIL",
+        reason: "FLOW01-001 domain driver failed",
+        pipeline: driver.steps,
+        code_status: "DOMAIN_DRIVER_FAIL",
+        terminal: { order_status: null, packaging_batch: null },
+      });
+      await writeEvidence(report, "live", through);
+      process.exit(FLOW01_EXIT.FAIL);
+    }
+
+    const observed = driver.steps;
     const progress = evaluateFlow01Progress(observed, { through });
+    const duration_ms = computeFlow01Durations(syntheticTimestamps(observed));
     const report = buildFlow01EvidenceReport({
       status: progress.status,
       reason: progress.reason,
       pipeline: observed,
       validation: progress,
-      code_status: "DOMAIN_DRIVER_PENDING",
-      terminal: { order_status: null, packaging_batch: null },
+      duration_ms,
+      code_status: "DOMAIN_DRIVER_T1",
+      terminal: {
+        order_status:
+          progress.certified_through >= 1 ? "in_production" : null,
+        packaging_batch: null,
+      },
       progress,
     });
+
+    console.log(formatFlow01ComparisonTable(progress));
+    console.log("");
     console.log(progress.reason);
-    if (progress.certified_through) {
-      console.log(
-        `certified_through=T${progress.certified_through} · blocked_at=${progress.blocked_at}`,
-      );
-    }
+    console.log(
+      `certified_through=T${progress.certified_through || 0} · blocked_at=${progress.blocked_at ?? "—"}`,
+    );
+    console.log(
+      `duplicates=${JSON.stringify(report.duplicates)} missing_t1=${JSON.stringify(
+        ["FLOW01_T1_STARTED", "FLOW01_T1_COMPLETED"].filter(
+          (s) => !observed.includes(s),
+        ),
+      )} out_of_order=${JSON.stringify(report.out_of_order)}`,
+    );
+
     const out = await writeEvidence(report, "live", through);
     console.log(`evidence: ${path.relative(ROOT, out)}`);
-    console.log("Next: FLOW01-001..004 Implementation PRs wire domain observations.");
+
+    if (
+      progress.certified_through >= 1 &&
+      progress.blocked_at === "FLOW01_T2_STARTED"
+    ) {
+      console.log("FLOW01-001 · PASS through T1 · BLOCKED at T2 (expected)");
+    }
     process.exit(exitFor(progress));
   }
 

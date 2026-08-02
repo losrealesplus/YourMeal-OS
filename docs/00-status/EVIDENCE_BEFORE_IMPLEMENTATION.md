@@ -81,8 +81,8 @@ Igual filosofía que FCR-008 / PS-002-C:
 | Estados + Packaging lifecycle + T4=`delivered` | ✅ en Spec |
 | Invariantes | ✅ en Spec |
 | Contrato `FLOW01_T*` | ✅ en Spec |
-| Runner `test:flow01-canonical` | ▶ [FLOW01_CANONICAL_RUNNER](../10-validation/flow-01/FLOW01_CANONICAL_RUNNER.md) |
-| Implementation | ⏳ después del runner en main |
+| Runner `test:flow01-canonical` | ✅ [FLOW01_CANONICAL_RUNNER](../10-validation/flow-01/FLOW01_CANONICAL_RUNNER.md) |
+| Implementation | ▶ FLOW01-001 T1 · [acta](../10-validation/flow-01/FLOW01_001_T1_ACTA.md) |
 
 ---
 

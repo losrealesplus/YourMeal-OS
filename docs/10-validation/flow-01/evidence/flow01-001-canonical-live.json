@@ -1,11 +1,11 @@
 {
-  "status": "BLOCKED",
-  "reason": "PASS through T1 · BLOCKED at FLOW01_T2_STARTED",
+  "status": "PASS",
+  "reason": "PASS through T1 · BLOCKED at FLOW01_T2_STARTED for full FLOW-01",
   "gate": "FLOW-01",
   "contract": "FLOW_01_KITCHEN_DELIVERY_SPEC",
   "principle": "Evidence before Implementation",
   "code_status": "DOMAIN_DRIVER_T1",
-  "at": "2026-08-02T12:57:49.281Z",
+  "at": "2026-08-02T12:57:50.770Z",
   "pipeline": [
     "FLOW01_T1_STARTED",
     "FLOW01_T1_COMPLETED"
@@ -21,16 +21,9 @@
     "FLOW01_T4_COMPLETED"
   ],
   "duplicates": [],
-  "missing": [
-    "FLOW01_T2_STARTED",
-    "FLOW01_T2_COMPLETED",
-    "FLOW01_T3_STARTED",
-    "FLOW01_T3_COMPLETED",
-    "FLOW01_T4_STARTED",
-    "FLOW01_T4_COMPLETED"
-  ],
+  "missing": [],
   "out_of_order": [],
-  "firstFailure": "FLOW01_T2_STARTED",
+  "firstFailure": null,
   "certified_through": 1,
   "blocked_at": "FLOW01_T2_STARTED",
   "delivery": "FLOW01-001",
