@@ -8,7 +8,7 @@
   "complements_e2e_smoke_crossflow": true,
   "principle": "Evidence before Implementation",
   "code_status": "RUNNER_ONLY",
-  "at": "2026-08-02T19:37:06.125Z",
+  "at": "2026-08-02T19:44:49.406Z",
   "pipeline": [],
   "expected": [
     "RELEASE_DEPLOY_D1_STARTED",

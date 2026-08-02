@@ -14,11 +14,11 @@
  *
  * Spec: docs/00-status/RELEASE_DEPLOY_SPEC.md
  *
- * NO D2/D3 drivers in this PR · NO CI · NO infra · NO Rollback.
+ * NO remote deploy · NO CI · NO infra · NO Rollback · NO FLOW-05.
  */
 
 /** Highest segment with a capability driver implemented. */
-const RELEASE_DEPLOY_CERTIFIED_THROUGH = 2;
+const RELEASE_DEPLOY_CERTIFIED_THROUGH = 3;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -202,6 +202,25 @@ async function main() {
 
     const out = await writeEvidence(report, "live", through ?? scope);
     console.log(`evidence_file: ${path.relative(ROOT, out)}`);
+
+    if (
+      progress.certified_through >= 3 &&
+      progress.status === "PASS" &&
+      progress.blocked_at == null
+    ) {
+      const fullOut = path.join(
+        EVIDENCE_DIR,
+        "release-deploy-canonical-live.json",
+      );
+      await writeFile(fullOut, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+      console.log(`evidence_file: ${path.relative(ROOT, fullOut)}`);
+      console.log("RELEASE-DEPLOY");
+      console.log("FULL PASS");
+      console.log(
+        "RELEASE-DEPLOY-003 · PASS through D3 · certified_through=D3 · blocked_at=—",
+      );
+    }
+
     process.exit(exitFor(progress));
   }
 

@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_DEPLOY_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ Runner **CERTIFIED** (#200 · `1008ffd`) · live through D2 · runner-only **BLOCKED** at D1 · Gate ✅ READY  
+**Estado:** ✅ Runner **CERTIFIED** (#200 · `1008ffd`) · live through D3 · **FULL PASS** · runner-only **BLOCKED** at D1 · Gate ✅ READY  
 **Spec:** [RELEASE_DEPLOY_SPEC](../../00-status/RELEASE_DEPLOY_SPEC.md) (FROZEN · #198 · `ef447e2`)  
 **DoR:** [RELEASE_DEPLOY_DOR](../../00-status/RELEASE_DEPLOY_DOR.md)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
@@ -52,19 +52,20 @@ PASS → tag release-deploy-pass
 ## Comandos
 
 ```bash
-# Default live through max certified (D2)
+# Default live through max certified (D3) · FULL PASS
 npm run test:release-deploy
-# → PASS through D2 · blocked_at=RELEASE_DEPLOY_D3_STARTED · exit 0
+# → FULL PASS · certified_through=D3 · blocked_at=— · exit 0
 
-# RELEASE-DEPLOY-001…002
+# RELEASE-DEPLOY-001…003
 npm run test:release-deploy-001   # PASS through D1 · BLOCKED at D2
 npm run test:release-deploy-002   # PASS through D2 · BLOCKED at D3
+npm run test:release-deploy-003   # PASS through D3 · FULL PASS · blocked_at=—
 
 # Historic Gate / Land Check vacío
 npm run test:release-deploy:runner-only
 # → BLOCKED at RELEASE_DEPLOY_D1_STARTED · exit 2 · evidence={}
 
-# Unit tests (pipeline + D1 + D2 · no D3 driver)
+# Unit tests (pipeline + D1 + D2 + D3)
 npm run test:release-deploy:unit
 ```
 
@@ -72,12 +73,11 @@ npm run test:release-deploy:unit
 
 ---
 
-## Fuera de alcance (002)
+## Fuera de alcance (003)
 
-- Driver D3 · verify post-deploy  
 - Infra · CI · GitHub Actions · secretos · deploy remoto  
 - Rollback · FLOW-05 · `release-01-beta`  
-- Tag `release-deploy-pass`
+- Tag `release-deploy-pass` (solo tras Land Check desde `main`)
 
 ---
 
@@ -86,7 +86,9 @@ npm run test:release-deploy:unit
 Ver: [RELEASE_DEPLOY_GATE](./RELEASE_DEPLOY_GATE.md) ·  
 001: [RELEASE_DEPLOY_001_D1_ACTA](./RELEASE_DEPLOY_001_D1_ACTA.md) ·  
 002: [RELEASE_DEPLOY_002_D2_ACTA](./RELEASE_DEPLOY_002_D2_ACTA.md) ·  
-Publish: [RELEASE_DEPLOY_PUBLISH](./RELEASE_DEPLOY_PUBLISH.md).
+003: [RELEASE_DEPLOY_003_D3_ACTA](./RELEASE_DEPLOY_003_D3_ACTA.md) ·  
+Publish: [RELEASE_DEPLOY_PUBLISH](./RELEASE_DEPLOY_PUBLISH.md) ·  
+Verify: [RELEASE_DEPLOY_VERIFY](./RELEASE_DEPLOY_VERIFY.md).
 
 ---
 
@@ -98,7 +100,8 @@ Publish: [RELEASE_DEPLOY_PUBLISH](./RELEASE_DEPLOY_PUBLISH.md).
 | Pipeline | `scripts/lib/release-deploy-canonical-pipeline.mjs` |
 | D1 driver | `scripts/lib/release-deploy-d1-preflight.mjs` |
 | D2 driver | `scripts/lib/release-deploy-d2-publish-apply.mjs` |
-| Live 002 | `docs/10-validation/release-deploy/evidence/release-deploy-002-canonical-live.json` |
+| D3 driver | `scripts/lib/release-deploy-d3-post-deploy-verify.mjs` |
+| Live FULL PASS | `docs/10-validation/release-deploy/evidence/release-deploy-canonical-live.json` |
 | Runner-only | `docs/10-validation/release-deploy/evidence/release-deploy-canonical.json` |
 
 ---

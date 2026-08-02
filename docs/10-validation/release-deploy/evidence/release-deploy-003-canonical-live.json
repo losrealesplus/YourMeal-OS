@@ -1,19 +1,21 @@
 {
   "status": "PASS",
-  "reason": "PASS through D2 · BLOCKED at RELEASE_DEPLOY_D3_STARTED for full RELEASE-DEPLOY",
+  "reason": "PASS through D3 · RELEASE-DEPLOY FULL PASS",
   "gate": "RELEASE-DEPLOY",
   "contract": "RELEASE_DEPLOY_SPEC",
   "level": "release",
   "certifies": "reproducible_deployment",
   "complements_e2e_smoke_crossflow": true,
   "principle": "Evidence before Implementation",
-  "code_status": "CAPABILITY_DRIVER_D2",
-  "at": "2026-08-02T19:44:49.313Z",
+  "code_status": "CAPABILITY_DRIVER_D3",
+  "at": "2026-08-02T19:44:49.216Z",
   "pipeline": [
     "RELEASE_DEPLOY_D1_STARTED",
     "RELEASE_DEPLOY_D1_COMPLETED",
     "RELEASE_DEPLOY_D2_STARTED",
-    "RELEASE_DEPLOY_D2_COMPLETED"
+    "RELEASE_DEPLOY_D2_COMPLETED",
+    "RELEASE_DEPLOY_D3_STARTED",
+    "RELEASE_DEPLOY_D3_COMPLETED"
   ],
   "expected": [
     "RELEASE_DEPLOY_D1_STARTED",
@@ -27,13 +29,13 @@
   "missing": [],
   "out_of_order": [],
   "firstFailure": null,
-  "certified_through": 2,
-  "blocked_at": "RELEASE_DEPLOY_D3_STARTED",
-  "delivery": "RELEASE-DEPLOY-002",
+  "certified_through": 3,
+  "blocked_at": null,
+  "delivery": "RELEASE-DEPLOY-003",
   "delivery_status": "PASS",
-  "gate_status": "BLOCKED",
+  "gate_status": "PASS",
   "terminal": {
-    "segment": "publish_apply"
+    "segment": "post_deploy_verify"
   },
   "evidence": {
     "d1_checks": [
@@ -59,6 +61,18 @@
       "RELEASE_DEPLOY_D2_STARTED",
       "RELEASE_DEPLOY_D2_COMPLETED"
     ],
-    "d2_source": "D1 CERTIFIED + RELEASE_DEPLOY_PUBLISH + build:web (no D3 · no remote deploy · no infra)"
+    "d2_source": "D1 CERTIFIED + RELEASE_DEPLOY_PUBLISH + build:web (no D3 · no remote deploy · no infra)",
+    "d3_checks": [
+      "release_deploy_d2_acta_certified",
+      "release_deploy_verify_procedure_present",
+      "release_deploy_preview_script_present",
+      "release_deploy_app_entry_present",
+      "release_e2e_pass_tag_present"
+    ],
+    "d3_mapped_tokens": [
+      "RELEASE_DEPLOY_D3_STARTED",
+      "RELEASE_DEPLOY_D3_COMPLETED"
+    ],
+    "d3_source": "D2 CERTIFIED + RELEASE_DEPLOY_VERIFY + preview + release-e2e-pass (no Rollback · no E2E re-run · no infra)"
   }
 }
