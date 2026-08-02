@@ -2,10 +2,11 @@
 
 **Documento:** `RELEASE_ROLLBACK_GATE.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **READY** · Runner CERTIFIED desde `main` · BLOCKED at R1  
+**Estado:** ✅ **READY** · Runner CERTIFIED · 001 ▶ este PR (R1)  
 **Nivel:** Release Track B · B-05 Rollback  
 **Spec:** [RELEASE_ROLLBACK_SPEC](../../00-status/RELEASE_ROLLBACK_SPEC.md) ✅ FROZEN #208  
 **Runner:** [RELEASE_ROLLBACK_RUNNER](./RELEASE_ROLLBACK_RUNNER.md) ✅ #210 · `a1fbdc3`  
+**001:** [RELEASE_ROLLBACK_001_R1_ACTA](./RELEASE_ROLLBACK_001_R1_ACTA.md)  
 **Land Check:** [FOPEBA_LAND_CHECK](../../00-status/FOPEBA_LAND_CHECK.md)
 
 > `main` certifica; las ramas solo proponen.
@@ -25,8 +26,10 @@
 ### Decision
 
 ```text
-READY TO OPEN
-RELEASE-ROLLBACK-001 · R1 only
+RELEASE-ROLLBACK-001 · R1 OPEN (este PR)
+PASS through R1 · BLOCKED at RELEASE_ROLLBACK_R2_STARTED
+    ↓
+Land Check from main → READY TO OPEN 002
 ```
 
 ### Land Check evidence (from `main` @ `a1fbdc3`)
@@ -54,7 +57,7 @@ exit 2
 | DoR | Ready framework | ✅ #207 |
 | Spec | Contract R1–R3 | ✅ FROZEN #208 |
 | Runner | BLOCKED at R1 | ✅ CERTIFIED #210 |
-| RELEASE-ROLLBACK-001 | R1 Detect/Decide | ⏳ READY TO OPEN |
+| RELEASE-ROLLBACK-001 | R1 Detect/Decide | ▶ este PR |
 | RELEASE-ROLLBACK-002…003 | R2…R3 | ⏳ |
 | `release-rollback-pass` | FULL PASS | ⏳ |
 
