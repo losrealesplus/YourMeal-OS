@@ -50,12 +50,12 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    Track B › RELEASE-E2E Spec (B-03)
-                               → ./RELEASE_E2E_SPEC.md (READY FOR FREEZE)
+  Prioridad                    Track B › RELEASE-E2E Runner (B-03)
+                               Spec ✅ FROZEN #186 · `6d11ae8` · ./RELEASE_E2E_SPEC.md
                                DoR ✅ #185 · `48e0c5c` · ./RELEASE_E2E_DOR.md
-                               Cross-flow ✅ release-crossflow-pass → 0a0c51b
-                               Tras Freeze: Runner BLOCKED at E1
-                               No abrir Runner / Deploy / Rollback / FLOW-05 aquí
+                               Decision: READY TO OPEN Runner (BLOCKED at E1)
+                               Gate NOT READY · E2E-001 CLOSED
+                               No abrir Deploy / Rollback / FLOW-05 / 001 aquí
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)
   Land Check                   ./FOPEBA_LAND_CHECK.md (antes de cualquier 001)
