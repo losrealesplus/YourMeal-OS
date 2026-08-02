@@ -20,8 +20,9 @@ PS-002C                       ✅  ps002c-pass
 FLOW-01                       ✅  flow01-pass
 FLOW-02                       ✅  flow02-pass
 FLOW-03                       ✅  flow03-pass
-FLOW-04 DoR                   ✅  #162 · 9ce3feb
-FLOW-04 Spec                  ▶  READY FOR FREEZE
+FLOW-04 DoR                   ✅  #162
+FLOW-04 Spec                  ✅  FROZEN #163 · 3d922ae
+FLOW-04 Runner                ▶  BLOCKED at T1 (sin dominio)
 RELEASE-01                    DRAFT  (eje B · #161 en main)
 Definition of Release         DRAFT  (DoRl)
 ```
@@ -55,19 +56,15 @@ This rule applies to every remaining FLOW.
 **Current status:** FLOW-04 · Inventory Consumption
 
 ```text
-DoR ✅ (#162)
-Spec ▶ READY FOR FREEZE  → FLOW_04_INVENTORY_CONSUMPTION_SPEC.md
+DoR ✅ · Spec ✅ FROZEN
+Runner ▶  → npm run test:flow04-canonical → BLOCKED at T1
 ```
 
-Docs: [DoR](./FLOW_04_INVENTORY_CONSUMPTION_DOR.md) · [SPEC](./FLOW_04_INVENTORY_CONSUMPTION_SPEC.md)
+Docs: [DoR](./FLOW_04_INVENTORY_CONSUMPTION_DOR.md) · [SPEC](./FLOW_04_INVENTORY_CONSUMPTION_SPEC.md) · [Runner](../10-validation/flow-04/FLOW04_CANONICAL_RUNNER.md)
 
-After Spec Freeze:
+After Runner on `main` + Gate:
 
 ```text
-Runner
-        ↓
-BLOCKED at FLOW04_T1_STARTED
-        ↓
 FLOW04-001 … → flow04-pass
 ```
 
@@ -149,9 +146,10 @@ No forma parte de este PR ni de la Spec.
 ## Current Goal
 
 ```text
-FLOW-04 Spec → READY FOR FREEZE
-(merge = Freeze · then Runner only)
-Nothing else (no domain).
+FLOW-04 Runner on main
+npm run test:flow04-canonical → BLOCKED at FLOW04_T1_STARTED
+Then Gate → FLOW04-001 (T1 only)
+No domain in the runner PR.
 ```
 
 ---
