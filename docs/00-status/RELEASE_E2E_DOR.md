@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_E2E_DOR.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **DoR CERTIFIED** (`main` · #185 · `48e0c5c`) · Spec ✅ [FROZEN](./RELEASE_E2E_SPEC.md) (#186 · `6d11ae8`) · Runner ⏳  
+**Estado:** ✅ **DoR CERTIFIED** (`main` · #185 · `48e0c5c`) · Spec ✅ [FROZEN](./RELEASE_E2E_SPEC.md) (#186) · Runner ▶  
 **Nivel:** Release Track B · B-03 E2E  
 **Pregunta (única):** ¿Qué debe certificar RELEASE-E2E antes de considerar la plataforma lista para Release?  
 **Estándar Flow Ready:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) (mismo ciclo FOPEBA)  
@@ -247,12 +247,13 @@ RELEASE-E2E (B-03)
 ☑ Gate antes de E2E-001                    → este DoR
 ☑ SPEC lista (READY FOR FREEZE)            → [RELEASE_E2E_SPEC](./RELEASE_E2E_SPEC.md)
 ☑ Spec FROZEN en main                      → #186 · `6d11ae8`
+▶ Runner creado (BLOCKED at E1)            → [RUNNER](../10-validation/release-e2e/RELEASE_E2E_RUNNER.md)
 □ Runner en main · BLOCKED at E1 verificado
 □ READY TO OPEN RELEASE-E2E-001
 ```
 
-**DoR CERTIFIED** · Spec ✅ FROZEN · Land Check docs PASSED →  
-**READY TO OPEN Runner** (BLOCKED at E1). Gate NOT READY · E2E-001 CLOSED.
+**DoR CERTIFIED** · Spec ✅ FROZEN · Runner ▶ → tras Land Check BLOCKED at E1 desde `main`:  
+Gate READY · abrir E2E-001. Nada más.
 
 ---
 
@@ -295,10 +296,10 @@ tag (futuro): release-e2e-pass
 | Fase | Trabajo | Estado |
 |------|---------|--------|
 | 0 | DoR document | ✅ #185 · `48e0c5c` |
-| 1 | Spec | ✅ FROZEN #186 · `6d11ae8` · [RELEASE_E2E_SPEC](./RELEASE_E2E_SPEC.md) |
-| 2 | Freeze (merge Spec → main) | ✅ Land Check docs PASSED |
-| 3 | Runner only · BLOCKED at E1 | ⏳ READY TO OPEN |
-| 4 | Gate E2E-001 (Land Check) | ⏳ |
+| 1 | Spec | ✅ FROZEN #186 · [RELEASE_E2E_SPEC](./RELEASE_E2E_SPEC.md) |
+| 2 | Freeze (merge Spec → main) | ✅ |
+| 3 | Runner only · BLOCKED at E1 | ▶ este ciclo |
+| 4 | Gate E2E-001 (Land Check) | ⏳ tras merge Runner |
 | 5 | RELEASE-E2E-001…004 (un segmento / PR) | ⏳ |
 | 6 | FULL PASS · tag `release-e2e-pass` | ⏳ |
 

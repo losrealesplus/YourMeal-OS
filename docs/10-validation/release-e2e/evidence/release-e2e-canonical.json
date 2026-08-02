@@ -1,0 +1,36 @@
+{
+  "status": "BLOCKED",
+  "reason": "RELEASE-E2E segments not implemented (runner ready; Evidence before Implementation)",
+  "gate": "RELEASE-E2E",
+  "contract": "RELEASE_E2E_SPEC",
+  "level": "release",
+  "certifies": "pilot_journey_as_system",
+  "complements_smoke_and_crossflow": true,
+  "principle": "Evidence before Implementation",
+  "code_status": "RUNNER_ONLY",
+  "at": "2026-08-02T18:20:38.343Z",
+  "pipeline": [],
+  "expected": [
+    "RELEASE_E2E_E1_STARTED",
+    "RELEASE_E2E_E1_COMPLETED",
+    "RELEASE_E2E_E2_STARTED",
+    "RELEASE_E2E_E2_COMPLETED",
+    "RELEASE_E2E_E3_STARTED",
+    "RELEASE_E2E_E3_COMPLETED",
+    "RELEASE_E2E_E4_STARTED",
+    "RELEASE_E2E_E4_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": "RELEASE_E2E_E1_STARTED",
+  "certified_through": 0,
+  "blocked_at": "RELEASE_E2E_E1_STARTED",
+  "delivery": "RELEASE-E2E",
+  "delivery_status": "BLOCKED",
+  "gate_status": "BLOCKED",
+  "terminal": {
+    "segment": null
+  },
+  "evidence": {}
+}

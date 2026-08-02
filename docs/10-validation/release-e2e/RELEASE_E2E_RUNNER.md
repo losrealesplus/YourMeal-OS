@@ -1,0 +1,115 @@
+# RELEASE-01 · B-03 · E2E · Canonical Runner
+
+**Documento:** `RELEASE_E2E_RUNNER.md`  
+**Fecha:** 2026-08-02  
+**Estado:** ▶ Runner **ACTIVE** · default **BLOCKED** at `RELEASE_E2E_E1_STARTED`  
+**Spec:** [RELEASE_E2E_SPEC](../../00-status/RELEASE_E2E_SPEC.md) (FROZEN · #186 · `6d11ae8`)  
+**DoR:** [RELEASE_E2E_DOR](../../00-status/RELEASE_E2E_DOR.md)  
+**Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
+**Nivel:** Release gate — pilot journey · **not** a Flow · **not** Smoke · **not** Cross-flow
+
+> Pregunta que responde este PR:  
+> **¿Existe un contrato ejecutable para RELEASE-E2E (RELEASE-01 · B-03)?**  
+> No: ¿Playwright? · ¿browser? · ¿dominio E1? · ¿Deploy? · ¿FLOW-05?
+
+---
+
+## Regla de nivel
+
+| Nivel | Certifica |
+|-------|-----------|
+| **FLOW** | Estados / transiciones de un dominio |
+| **RELEASE-SMOKE** | Capacidades de plataforma |
+| **RELEASE-CROSSFLOW** | Handoffs encadenados entre Flows |
+| **RELEASE-E2E** | Jornada piloto de la plataforma como un todo |
+
+E2E **complementa** Smoke y Cross-flow; **no los sustituye**.
+
+---
+
+## Contrato
+
+```text
+RELEASE-E2E
+RELEASE_E2E_E1_STARTED      → Platform Entry (Smoke)
+    ↓
+RELEASE_E2E_E1_COMPLETED
+    ↓
+RELEASE_E2E_E2_STARTED      → Order → Delivery (FLOW-01 / C1)
+    ↓
+RELEASE_E2E_E2_COMPLETED
+    ↓
+RELEASE_E2E_E3_STARTED      → Incident → Billing (FLOW-02…03 / C2…C3)
+    ↓
+RELEASE_E2E_E3_COMPLETED
+    ↓
+RELEASE_E2E_E4_STARTED      → Inventory → Close (FLOW-04 / C4)
+    ↓
+RELEASE_E2E_E4_COMPLETED
+    ↓
+PASS → tag release-e2e-pass
+```
+
+---
+
+## Comandos
+
+```bash
+# Default (CERTIFIED_THROUGH = 0) → runner-only
+npm run test:release-e2e
+# → BLOCKED at RELEASE_E2E_E1_STARTED · evidence={} · exit 2
+
+# Explicit historic Gate / Land Check
+npm run test:release-e2e:runner-only
+# → same BLOCKED contract · exit 2
+
+# Unit tests (pipeline only · no Playwright)
+npm run test:release-e2e:unit
+```
+
+### Resultado esperado (este PR)
+
+```text
+RELEASE-E2E
+
+BLOCKED
+
+blocked_at=RELEASE_E2E_E1_STARTED
+duplicates=[]
+missing=[]
+out_of_order=[]
+evidence={}
+exit 2
+```
+
+**BLOCKED no es defecto.**
+
+---
+
+## Fuera de alcance (este PR)
+
+- Driver E1…E4 · Playwright · browser automation  
+- Dominio · UI · servicios · repositorios  
+- Deploy · Rollback · FLOW-05 · `release-01-beta`  
+- Abrir RELEASE-E2E-001  
+
+---
+
+## Gate
+
+Ver: [RELEASE_E2E_GATE](./RELEASE_E2E_GATE.md).  
+Tras Land Check desde `main` con BLOCKED at E1 → Gate **READY** · entonces abrir E2E-001.
+
+---
+
+## Evidencia
+
+| Artefacto | Path |
+|-----------|------|
+| CLI | `scripts/release-e2e-canonical.mjs` |
+| Pipeline | `scripts/lib/release-e2e-canonical-pipeline.mjs` |
+| Default evidence | `docs/10-validation/release-e2e/evidence/release-e2e-canonical.json` |
+
+---
+
+## End of RELEASE E2E Runner
