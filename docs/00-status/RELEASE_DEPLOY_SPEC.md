@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_DEPLOY_SPEC.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **FROZEN** (Spec · #198 · `ef447e2`) · DoR ✅ (#197) · Runner ✅ #200 · Gate ✅ #201 · 001 ✅ #202 · 002 ✅ #204 · 003 ▶ [ACTA](../10-validation/release-deploy/RELEASE_DEPLOY_003_D3_ACTA.md)  
+**Estado:** ✅ **FROZEN** · ciclo B-04 **COMPLETE** · tag `release-deploy-pass` → `7896a2a` · [PASS](../10-validation/release-deploy/RELEASE_DEPLOY_PASS_ACTA.md)  
 **Gate DoRl:** Deployment · Track B · RELEASE-01  
 **Nivel:** Release Contract — **no** es un Flow nuevo  
 **DoR:** [RELEASE_DEPLOY_DOR](./RELEASE_DEPLOY_DOR.md) ✅ en `main` (#197 · `e5bd8c5`)  
@@ -320,24 +320,23 @@ tag (futuro): release-deploy-pass
 | Gate READY | ✅ #201 · Land Check from main |
 | RELEASE-DEPLOY-001 | ✅ CERTIFIED #202 · `a0daf82` |
 | RELEASE-DEPLOY-002 | ✅ CERTIFIED #204 · `28ddb83` |
-| RELEASE-DEPLOY-003 | ▶ este PR (D3 only · FULL PASS) |
+| RELEASE-DEPLOY-003 | ✅ CERTIFIED #206 · `7896a2a` |
+| Tag `release-deploy-pass` | ✅ → `7896a2a` |
 
-**Estado del documento:** ✅ **FROZEN**
+**Estado del documento:** ✅ **FROZEN** · ciclo **COMPLETE**
 
 ---
 
 ## 14. Next
 
 ```text
-RELEASE-DEPLOY-003 (este PR)
-PASS through D3 · FULL PASS · blocked_at=—
-    ↓
-Land Check main → tag release-deploy-pass
-    ↓
-READY TO OPEN RELEASE-ROLLBACK DoR
+READY TO OPEN
+RELEASE-ROLLBACK DoR
+Documentation only.
+→ ./RELEASE_ROLLBACK_DOR.md
 ```
 
-**No** Rollback · FLOW-05 · `release-01-beta` en Deploy-003.
+**No** Spec · Runner · impl · FLOW-05 · `release-01-beta` en el DoR Rollback.
 
 ---
 

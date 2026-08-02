@@ -91,9 +91,9 @@ Convertir la beta en algo **verificable**. Matriz viva:
 | FLOW-04 | ✅ | Tag `flow04-pass` |
 | Smoke Tests | ✅ | Tag `release-smoke-pass` · [PASS acta](../10-validation/release-smoke/RELEASE_SMOKE_PASS_ACTA.md) |
 | Cross-flow | ✅ | Tag `release-crossflow-pass` → `0a0c51b` · [PASS](../10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md) |
-| E2E | ▶ | 001 ✅ #190 · next 002 E2 · [E1 acta](../10-validation/release-e2e/RELEASE_E2E_001_E1_ACTA.md) → `release-e2e-pass` |
-| Deployment | ⏳ | → `release-deploy-pass` |
-| Rollback | ⏳ | → `release-rollback-pass` |
+| E2E | ✅ | Tag `release-e2e-pass` → `73623ae` · [PASS](../10-validation/release-e2e/RELEASE_E2E_PASS_ACTA.md) |
+| Deployment | ✅ | Tag `release-deploy-pass` → `7896a2a` · [PASS](../10-validation/release-deploy/RELEASE_DEPLOY_PASS_ACTA.md) |
+| Rollback | ▶ | DoR ▶ [RELEASE_ROLLBACK_DOR](./RELEASE_ROLLBACK_DOR.md) → `release-rollback-pass` |
 | Beta Acceptance | ⏳ | → `release-01-beta` |
 
 Detalle: [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) · [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md).
@@ -106,10 +106,10 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual Track B:** **RELEASE-DEPLOY-003** (D3 Post-deploy Verify · este PR).  
-002 ✅ CERTIFIED (#204 · `28ddb83`) · cert docs (#205 · `5a7e1ea`).  
-Contrato: `npm run test:release-deploy` → FULL PASS · certified_through=D3 · `blocked_at=—` · exit 0.  
-Do **not** open Rollback · FLOW-05 · RELEASE-01-BETA · tag hasta Land Check desde `main`.  
+**Objetivo actual Track B:** **RELEASE-ROLLBACK DoR** (docs only).  
+RELEASE-DEPLOY ✅ CERTIFIED · tag `release-deploy-pass` → `7896a2a` (#206).  
+DoR: [RELEASE_ROLLBACK_DOR](./RELEASE_ROLLBACK_DOR.md).  
+Do **not** open Spec · Runner · impl · FLOW-05 · RELEASE-01-BETA in Rollback DoR.  
 **Reglas:** (1) Release gates ≠ Flow runners · (2) Land Check desde `main` (Regla 9).
 
 Cross-flow **no sustituye** runners canónicos: los runners certifican contratos;  
@@ -188,7 +188,7 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 ## Current Goal
 
 ```text
-Track B (prioridad): RELEASE-DEPLOY-003 (D3 FULL PASS) → Land Check → release-deploy-pass
+Track B (prioridad): RELEASE-ROLLBACK DoR → Spec → Freeze → Runner → release-rollback-pass
 Track A:             Do NOT open FLOW-05 unless Track B finds a blocker
 FOPEBA_LAND_CHECK:   ACTIVE · before every 001 / tag
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos
