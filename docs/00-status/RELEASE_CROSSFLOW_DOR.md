@@ -282,7 +282,7 @@ Hasta entonces: **prohibido** drivers de cadena · nuevos servicios de dominio �
 | 2 | Freeze (merge Spec → main) | ✅ |
 | 3 | Runner only · BLOCKED at C1 | ✅ #180 · `73df12b` |
 | 4 | Gate CROSSFLOW-001 (Land Check) | ✅ READY |
-| 5 | CROSSFLOW-001…00n (un segmento / PR) | ✅ 001 · ▶ 002 C2 |
+| 5 | CROSSFLOW-001…00n (un segmento / PR) | ✅ 001–002 · ▶ 003 C3 |
 | 6 | FULL PASS · tag `release-crossflow-pass` | ⏳ |
 
 ---

@@ -3,10 +3,12 @@
  *
  * C1 = Kitchen → Delivery (FLOW-01)
  * C2 = Delivery incident → delivered (FLOW-02)
- * C3+ not implemented in RELEASE-CROSSFLOW-002.
+ * C3 = Delivered → billing paid (FLOW-03)
+ * C4 not implemented in RELEASE-CROSSFLOW-003.
  */
 import { runReleaseCrossflowC1KitchenDelivery } from "./release-crossflow-c1-kitchen-delivery.mjs";
 import { runReleaseCrossflowC2DeliveryIncident } from "./release-crossflow-c2-delivery-incident.mjs";
+import { runReleaseCrossflowC3Billing } from "./release-crossflow-c3-billing.mjs";
 
 /**
  * @param {{ root: string, through?: 1|2|3|4 | null }} opts
@@ -75,11 +77,35 @@ export function runReleaseCrossflowCapabilityDriver({ root, through = null }) {
 
   if (max < 3) return { ok: true, steps, evidence };
 
+  console.info("[RELEASE-CROSSFLOW]", "RELEASE_CROSSFLOW_C3_STARTED", {
+    segment: "billing",
+  });
+  steps.push("RELEASE_CROSSFLOW_C3_STARTED");
+
+  const c3 = runReleaseCrossflowC3Billing({ cwd: root });
+  evidence.c3_checks = c3.checks;
+  if (!c3.ok) {
+    console.error("[RELEASE-CROSSFLOW] C3 FAIL:\n" + c3.reason);
+    return { ok: false, steps, reason: c3.reason, evidence };
+  }
+  evidence.c3_mapped_tokens = c3.mapped_tokens;
+  evidence.c3_source = c3.source;
+
+  console.info("[RELEASE-CROSSFLOW]", "RELEASE_CROSSFLOW_C3_COMPLETED", {
+    segment: "billing",
+    mapped_tokens: c3.mapped_tokens,
+    source: c3.source,
+    checks: c3.checks,
+  });
+  steps.push("RELEASE_CROSSFLOW_C3_COMPLETED");
+
+  if (max < 4) return { ok: true, steps, evidence };
+
   return {
     ok: false,
     steps,
     reason:
-      "RELEASE-CROSSFLOW C3+ not implemented (RELEASE-CROSSFLOW-002 scope is C2 only)",
+      "RELEASE-CROSSFLOW C4 not implemented (RELEASE-CROSSFLOW-003 scope is C3 only)",
     evidence,
   };
 }
