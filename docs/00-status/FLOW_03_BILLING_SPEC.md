@@ -443,14 +443,61 @@ Emisión de evidencia en AccountingService = dominio → **después** del runner
 
 ---
 
+## Gate · Abrir FLOW03-001
+
+FLOW03-001 (dominio T1) **solo** puede abrirse cuando se cumplen **las cuatro** condiciones:
+
+| # | Condición | Verificación |
+|---|-----------|--------------|
+| 1 | Spec mergeada en `main` | PR Spec = merged → **FLOW-03 FROZEN** |
+| 2 | Runner retarget/rebase sobre `main` y mergeado | `scripts/flow03-canonical.mjs` en `main` |
+| 3 | Runner desde `main` en estado inicial | ver salida canónica abajo |
+| 4 | Contrato `FLOW03_T*` sin cambios pendientes | tokens = esta Spec · sin PR de renegociación abierto |
+
+Salida canónica exigida en (3) — ejecutada **desde `main`**:
+
+```bash
+npm run test:flow03-canonical
+```
+
+```text
+FLOW-03
+BLOCKED
+blocked_at=FLOW03_T1_STARTED
+duplicates=[]
+missing=[]
+out_of_order=[]
+evidence={}
+```
+
+Si falta cualquiera → **no abrir** FLOW03-001.
+
+Cuando el gate esté verde, el único objetivo de FLOW03-001 es:
+
+```text
+¿T1 quedó certificada?
+→ PASS through T1 · BLOCKED at FLOW03_T2_STARTED
+```
+
+Separación de responsabilidades (sin mezclar en un mismo PR):
+
+| PR / entrega | Pregunta que responde |
+|--------------|----------------------|
+| Spec (#155) | ¿Qué debe hacer el flujo? |
+| Runner (#156) | ¿Cómo verificamos ese contrato? |
+| FLOW03-001 | ¿La primera transición cumple el contrato? |
+
+---
+
 ## Plan de trabajo
 
 | Fase | Trabajo | Estado |
 |------|---------|--------|
 | 1 | Spec (este PR) | ▶ → merge = **FROZEN** |
 | 2 | Runner canónico (`test:flow03-canonical` · BLOCKED at T1) | ⏳ |
-| 3 | FLOW03-001…003 (una transición / PR) | ⏳ |
-| 4 | FULL PASS · tag `flow03-pass` | ⏳ |
+| 3 | **Gate FLOW03-001** (4 condiciones) | ⏳ |
+| 4 | FLOW03-001…003 (una transición / PR) | ⏳ bloqueado por Gate |
+| 5 | FULL PASS · tag `flow03-pass` | ⏳ |
 
 ---
 
