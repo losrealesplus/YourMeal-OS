@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_E2E_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ Runner **CERTIFIED** · live through E4 · **FULL PASS** · runner-only **BLOCKED** at E1  
+**Estado:** ✅ Runner **CERTIFIED** · live through E4 · **FULL PASS** · tag `release-e2e-pass` → `73623ae` · runner-only **BLOCKED** at E1  
 **Spec:** [RELEASE_E2E_SPEC](../../00-status/RELEASE_E2E_SPEC.md) (FROZEN · #186 · `6d11ae8`)  
 **DoR:** [RELEASE_E2E_DOR](../../00-status/RELEASE_E2E_DOR.md)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  

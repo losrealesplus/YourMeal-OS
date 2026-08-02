@@ -2,7 +2,8 @@
 
 **Documento:** `RELEASE_E2E_004_E4_ACTA.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **PASS through E4** · RELEASE-E2E **FULL PASS** · `blocked_at=—`  
+**Estado:** ✅ **CERTIFIED desde `main`** · PASS through E4 · RELEASE-E2E **FULL PASS** · `blocked_at=—`  
+**Tip:** `73623ae` (Merge #196) · tag `release-e2e-pass`  
 **Precondición:** 003 CERTIFIED (#194 · `773c72c`) · Land Check docs (#195 · `9046641`)  
 **Gate:** [RELEASE_E2E_GATE](./RELEASE_E2E_GATE.md)  
 **Spec:** [RELEASE_E2E_SPEC](../../00-status/RELEASE_E2E_SPEC.md)  
@@ -80,28 +81,22 @@ Fuente: `flow04-pass + FLOW-04 T1…T3 pipeline (no Deploy · Rollback · FLOW-0
 
 ---
 
-## Land Check (después de merge)
+## Land Check (desde `main` @ `73623ae`)
 
-```bash
-git pull origin main
-npm run test:release-e2e-004
-npm run test:release-e2e
-npm run test:release-e2e:runner-only
-```
-
-Si coincide → **READY TO TAG** `release-e2e-pass`.
+Verificado: FULL PASS · runner-only BLOCKED at E1.  
+Tag: `release-e2e-pass` → `73623ae`.  
+Close-out: [RELEASE_E2E_PASS_ACTA](./RELEASE_E2E_PASS_ACTA.md).
 
 ---
 
 ## Next
 
 ```text
-Land Check from main
+RELEASE-E2E CERTIFIED
     ↓
-READY TO TAG
-release-e2e-pass
-    ↓
-RELEASE-DEPLOY DoR (docs only)
+READY TO OPEN
+RELEASE-DEPLOY DoR
+Documentation only.
 ```
 
 ---

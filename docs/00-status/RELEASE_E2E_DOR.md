@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_E2E_DOR.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **DoR CERTIFIED** (`main` · #185 · `48e0c5c`) · Spec ✅ [FROZEN](./RELEASE_E2E_SPEC.md) (#186) · Runner ✅ #188 · Gate ✅ READY  
+**Estado:** ✅ **DoR CERTIFIED** (`main` · #185 · `48e0c5c`) · Spec ✅ [FROZEN](./RELEASE_E2E_SPEC.md) (#186) · Runner ✅ #188 · FULL PASS ✅ `release-e2e-pass` → `73623ae`  
 **Nivel:** Release Track B · B-03 E2E  
 **Pregunta (única):** ¿Qué debe certificar RELEASE-E2E antes de considerar la plataforma lista para Release?  
 **Estándar Flow Ready:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) (mismo ciclo FOPEBA)  
@@ -300,8 +300,8 @@ tag (futuro): release-e2e-pass
 | 2 | Freeze (merge Spec → main) | ✅ |
 | 3 | Runner only · BLOCKED at E1 | ✅ #188 · `d2a4047` |
 | 4 | Gate E2E-001 (Land Check) | ✅ READY |
-| 5 | RELEASE-E2E-001…004 (un segmento / PR) | ✅ 001–003 · ▶ 004 FULL PASS |
-| 6 | FULL PASS · tag `release-e2e-pass` | ⏳ after Land Check from main |
+| 5 | RELEASE-E2E-001…004 (un segmento / PR) | ✅ 001–004 |
+| 6 | FULL PASS · tag `release-e2e-pass` | ✅ → `73623ae` · [PASS ACTA](../10-validation/release-e2e/RELEASE_E2E_PASS_ACTA.md) |
 
 ---
 

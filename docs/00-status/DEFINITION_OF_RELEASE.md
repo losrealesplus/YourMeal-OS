@@ -118,8 +118,8 @@ La conversación sobre beta se ancla a filas con evidencia (detalle vivo en
 | FOUNDATION · PS-002C · FLOW-01…04 | ✅ | Tags de milestone |
 | Smoke | ✅ | `release-smoke-pass` → `370628a` |
 | Cross-flow | ✅ | `release-crossflow-pass` → `0a0c51b` · [PASS](../10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md) |
-| E2E | ▶ 001–003 ✅ · 004 ▶ FULL PASS · [E4 acta](../10-validation/release-e2e/RELEASE_E2E_004_E4_ACTA.md) | `release-e2e-pass` |
-| Deployment · Rollback | ⏳ | `release-deploy-pass` · `release-rollback-pass` |
+| E2E | ✅ [PASS acta](../10-validation/release-e2e/RELEASE_E2E_PASS_ACTA.md) · `73623ae` | `release-e2e-pass` |
+| Deployment · Rollback | ▶ Deploy DoR · [RELEASE_DEPLOY_DOR](./RELEASE_DEPLOY_DOR.md) | `release-deploy-pass` · `release-rollback-pass` |
 | Beta Acceptance | ⏳ | `release-01-beta` |
 
 Cada gate Track B sigue Spec → Freeze → Runner (BLOCKED) → impl → `-pass`.  

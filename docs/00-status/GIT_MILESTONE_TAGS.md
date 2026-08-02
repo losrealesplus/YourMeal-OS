@@ -47,7 +47,8 @@ Tag `release-01-beta` solo tras **DoRl PASS** (todos los gates aplicables con su
 | `flow04-pass` | Flow | FLOW-04 Inventory Consumption FULL PASS → `8be1c26` (#167) |
 | `release-smoke-pass` | Release gate | RELEASE-SMOKE FULL PASS (S1–S4) → `370628a` (#177) |
 | `release-crossflow-pass` | Release gate | RELEASE-CROSSFLOW FULL PASS (C1–C4) → `0a0c51b` (#184) |
-| `release-e2e-pass` | Release gate | ⏳ tras B-03 FULL PASS · DoR [RELEASE_E2E_DOR](./RELEASE_E2E_DOR.md) |
+| `release-e2e-pass` | Release gate | RELEASE-E2E FULL PASS (E1–E4) → `73623ae` (#196) · [PASS](../10-validation/release-e2e/RELEASE_E2E_PASS_ACTA.md) |
+| `release-deploy-pass` | Release gate | ⏳ tras B-04 · DoR [RELEASE_DEPLOY_DOR](./RELEASE_DEPLOY_DOR.md) |
 
 ---
 
