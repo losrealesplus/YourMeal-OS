@@ -2,8 +2,9 @@
  * FLOW-03 live domain driver (T1–T3 progressive).
  * Invoked by scripts/lib/flow03-domain-driver.mjs
  *
- * FLOW03-001: through=1 → createInvoiceFromOrders only.
- * T2/T3 land in later deliveries.
+ * FLOW03-001: through=1 → createInvoiceFromOrders
+ * FLOW03-002: through=2 → + reviewInvoice (event · status stays pending)
+ * T3 lands in FLOW03-003.
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ServiceContext } from "@/services/types";
@@ -15,16 +16,18 @@ import {
 
 const getOrdersByIds = vi.fn();
 const createInvoice = vi.fn();
+const getInvoice = vi.fn();
+const markInvoiceReviewed = vi.fn();
 
 vi.mock("../infrastructure/accounting-repository", () => ({
   createAccountingRepository: () => ({
     getOrdersByIds,
     createInvoice,
+    getInvoice,
+    markInvoiceReviewed,
     listBillableOrders: vi.fn(),
     listInvoices: vi.fn(),
     periodSummary: vi.fn(),
-    getInvoice: vi.fn(),
-    markInvoiceReviewed: vi.fn(),
     recordPayment: vi.fn(),
   }),
 }));
@@ -53,9 +56,9 @@ describe("FLOW-03 live domain driver", () => {
     vi.clearAllMocks();
   });
 
-  it("drives certified transitions up to FLOW03_LIVE_THROUGH (default T1 until 002/003)", async () => {
-    // Max certified transition until FLOW03-002/003 land.
-    const through = Number(process.env.FLOW03_LIVE_THROUGH || "1");
+  it("drives certified transitions up to FLOW03_LIVE_THROUGH (default T2 until 003)", async () => {
+    // Max certified transition until FLOW03-003 lands.
+    const through = Number(process.env.FLOW03_LIVE_THROUGH || "2");
 
     getOrdersByIds.mockResolvedValue([
       {
@@ -96,9 +99,55 @@ describe("FLOW-03 live domain driver", () => {
       return;
     }
 
-    // FLOW03-002 / FLOW03-003 will extend this driver.
+    getInvoice
+      .mockResolvedValueOnce({
+        id: "inv-flow03",
+        customerId: "cust-flow03",
+        customerName: null,
+        companyId: "co-flow03",
+        companyName: null,
+        amount: 100,
+        status: "pending",
+        billingPeriod: "2026-08",
+        createdAt: "2026-08-02T00:00:00Z",
+        reviewedAt: null,
+        orderIds: ["order-flow03"],
+        paidTotal: 0,
+        lifecycleStage: "pending",
+      })
+      .mockResolvedValueOnce({
+        id: "inv-flow03",
+        customerId: "cust-flow03",
+        customerName: null,
+        companyId: "co-flow03",
+        companyName: null,
+        amount: 100,
+        status: "pending",
+        billingPeriod: "2026-08",
+        createdAt: "2026-08-02T00:00:00Z",
+        reviewedAt: "2026-08-02T15:10:00.000Z",
+        orderIds: ["order-flow03"],
+        paidTotal: 0,
+        lifecycleStage: "review",
+      });
+    markInvoiceReviewed.mockResolvedValue(undefined);
+
+    const reviewed = await AccountingService.reviewInvoice(ctx(), "inv-flow03");
+    expect(reviewed.status).toBe("pending");
+    expect(reviewed.reviewedAt).toBeTruthy();
+
+    if (through < 3) {
+      expect(getObservedFlow03Steps()).toEqual([
+        "FLOW03_T1_STARTED",
+        "FLOW03_T1_COMPLETED",
+        "FLOW03_T2_STARTED",
+        "FLOW03_T2_COMPLETED",
+      ]);
+      return;
+    }
+
     throw new Error(
-      `FLOW03_LIVE_THROUGH=${through} not implemented yet (only T1 certified)`,
+      `FLOW03_LIVE_THROUGH=${through} not implemented yet (only T1–T2 certified)`,
     );
   });
 });

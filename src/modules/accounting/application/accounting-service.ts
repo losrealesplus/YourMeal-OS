@@ -11,6 +11,7 @@ import {
   type PeriodSummary,
 } from "../domain/accounting";
 import {
+  assertFlow03Prefix,
   beginFlow03Pipeline,
   logFlow03Step,
   stopFlow03,
@@ -163,7 +164,10 @@ export const AccountingService = {
     }
   },
 
-  /** Review step — Pending → Review (reviewed_at). */
+  /**
+   * FLOW03-002 · T2 — review as audited event (reviewed_at).
+   * Status remains `pending` (review is not an InvoiceStatus).
+   */
   async reviewInvoice(
     ctx: ServiceContext,
     invoiceId: string,
@@ -187,19 +191,72 @@ export const AccountingService = {
     if (current.lifecycleStage === "closed") {
       throw new DomainError("INVALID_STATE", "Period already closed");
     }
+    if (current.status !== "pending") {
+      throw new DomainError(
+        "INVALID_STATE",
+        `FLOW03-002 requires invoice status pending (got ${current.status})`,
+      );
+    }
 
-    await repo.markInvoiceReviewed(invoiceId);
-    await AuditService.write(ctx, {
-      entityType: "invoice",
-      entityId: invoiceId,
-      action: "status_change",
-      oldData: { lifecycleStage: "pending" },
-      newData: { lifecycleStage: "review", reviewedAt: true },
+    try {
+      assertFlow03Prefix(["FLOW03_T1_STARTED", "FLOW03_T1_COMPLETED"]);
+    } catch {
+      throw new DomainError(
+        "INVALID_STATE",
+        "FLOW03-002 requires T1 COMPLETED before reviewInvoice",
+      );
+    }
+
+    logFlow03Step("FLOW03_T2_STARTED", {
+      invoiceId,
+      status: current.status,
     });
 
-    const updated = await repo.getInvoice(invoiceId);
-    if (!updated) throw new DomainError("NOT_FOUND", invoiceId);
-    return updated;
+    try {
+      await repo.markInvoiceReviewed(invoiceId);
+      await AuditService.write(ctx, {
+        entityType: "invoice",
+        entityId: invoiceId,
+        action: "status_change",
+        oldData: { lifecycleStage: "pending" },
+        newData: { lifecycleStage: "review", reviewedAt: true },
+      });
+
+      const updated = await repo.getInvoice(invoiceId);
+      if (!updated) throw new DomainError("NOT_FOUND", invoiceId);
+      if (updated.status !== "pending") {
+        stopFlow03("T2_STATUS_DRIFT", {
+          invoiceId,
+          status: updated.status,
+        });
+        throw new DomainError(
+          "INVALID_STATE",
+          "FLOW03-002 invariant: status must remain pending after review",
+        );
+      }
+      if (!updated.reviewedAt) {
+        stopFlow03("T2_REVIEW_MISSING", { invoiceId });
+        throw new DomainError(
+          "INVALID_STATE",
+          "FLOW03-002: reviewed_at not set after reviewInvoice",
+        );
+      }
+
+      logFlow03Step("FLOW03_T2_COMPLETED", {
+        invoiceId: updated.id,
+        status: updated.status,
+        reviewedAt: updated.reviewedAt,
+      });
+
+      return updated;
+    } catch (e) {
+      if (e instanceof DomainError) throw e;
+      stopFlow03("T2_FAILED", {
+        invoiceId,
+        error: e instanceof Error ? e.message : String(e),
+      });
+      throw e;
+    }
   },
 
   async recordPayment(

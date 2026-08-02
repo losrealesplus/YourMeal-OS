@@ -27,7 +27,7 @@ export function runFlow03DomainDriver({ root, through = null }) {
         ...process.env,
         FLOW03_LIVE_DRIVER: "1",
         FORCE_COLOR: "0",
-        // Unscoped --live drives max certified transition (T1 until FLOW03-002).
+        // Unscoped --live drives max certified transition (T2 until FLOW03-003).
         ...(through ? { FLOW03_LIVE_THROUGH: String(through) } : {}),
       },
       maxBuffer: 10 * 1024 * 1024,
