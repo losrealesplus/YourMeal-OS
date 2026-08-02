@@ -1,0 +1,58 @@
+{
+  "status": "PASS",
+  "reason": "PASS through C1 · BLOCKED at RELEASE_CROSSFLOW_C2_STARTED for full RELEASE-CROSSFLOW",
+  "gate": "RELEASE-CROSSFLOW",
+  "contract": "RELEASE_CROSSFLOW_SPEC",
+  "level": "release",
+  "certifies": "chained_flow_handoffs",
+  "complements_flow_runners": true,
+  "principle": "Evidence before Implementation",
+  "code_status": "CAPABILITY_DRIVER_C1",
+  "at": "2026-08-02T17:51:49.032Z",
+  "pipeline": [
+    "RELEASE_CROSSFLOW_C1_STARTED",
+    "RELEASE_CROSSFLOW_C1_COMPLETED"
+  ],
+  "expected": [
+    "RELEASE_CROSSFLOW_C1_STARTED",
+    "RELEASE_CROSSFLOW_C1_COMPLETED",
+    "RELEASE_CROSSFLOW_C2_STARTED",
+    "RELEASE_CROSSFLOW_C2_COMPLETED",
+    "RELEASE_CROSSFLOW_C3_STARTED",
+    "RELEASE_CROSSFLOW_C3_COMPLETED",
+    "RELEASE_CROSSFLOW_C4_STARTED",
+    "RELEASE_CROSSFLOW_C4_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": null,
+  "certified_through": 1,
+  "blocked_at": "RELEASE_CROSSFLOW_C2_STARTED",
+  "delivery": "RELEASE-CROSSFLOW-001",
+  "delivery_status": "PASS",
+  "gate_status": "BLOCKED",
+  "terminal": {
+    "segment": "kitchen_delivery"
+  },
+  "evidence": {
+    "c1_checks": [
+      "flow01_canonical_script_present",
+      "flow01_canonical_pipeline_intact",
+      "flow01_pass_tag_present",
+      "flow01_pass_acta_present",
+      "flow01_spec_present"
+    ],
+    "c1_mapped_tokens": [
+      "FLOW01_T1_STARTED",
+      "FLOW01_T1_COMPLETED",
+      "FLOW01_T2_STARTED",
+      "FLOW01_T2_COMPLETED",
+      "FLOW01_T3_STARTED",
+      "FLOW01_T3_COMPLETED",
+      "FLOW01_T4_STARTED",
+      "FLOW01_T4_COMPLETED"
+    ],
+    "c1_source": "flow01-pass + FLOW-01 T1…T4 pipeline (no C2+ · no domain re-run)"
+  }
+}
