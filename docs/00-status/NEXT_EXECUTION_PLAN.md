@@ -188,7 +188,7 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 ## Current Goal
 
 ```text
-Track B (prioridad): RELEASE-DEPLOY Runner → Gate → 001…003 → release-deploy-pass
+Track B (prioridad): RELEASE-DEPLOY Gate READY → 001 (D1) → 002 → 003 → release-deploy-pass
 Track A:             Do NOT open FLOW-05 unless Track B finds a blocker
 FOPEBA_LAND_CHECK:   ACTIVE · before every 001 / tag
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos
