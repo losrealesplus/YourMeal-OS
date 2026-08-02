@@ -3,9 +3,11 @@
 **Documento:** `FLOW02_PASS_ACTA.md`  
 **Fecha:** 2026-08-02  
 **Estado:** ✅ **FLOW-02 CERTIFIED** (exception path)  
+**Tag:** `flow02-pass` → `a1e8d1e` (Merge #153)  
 **Comando:** `npm run test:flow02-canonical -- --live`  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
-**Spec:** [FLOW_02_DELIVERY_INCIDENTS_SPEC](../../00-status/FLOW_02_DELIVERY_INCIDENTS_SPEC.md)
+**Spec:** [FLOW_02_DELIVERY_INCIDENTS_SPEC](../../00-status/FLOW_02_DELIVERY_INCIDENTS_SPEC.md)  
+**Taxonomía:** [GIT_MILESTONE_TAGS](../../00-status/GIT_MILESTONE_TAGS.md)
 
 ---
 
@@ -60,6 +62,16 @@ terminal.order_status=delivered
 ## Significado
 
 Segundo flujo de negocio certificado con el mismo patrón que FLOW-01 / FCR-008:  
-**SPEC → Freeze → Runner → una transición/PR → FULL PASS**.
+**SPEC → Freeze → Runner → una transición/PR → FULL PASS → Tag**.
 
 Demuestra que la metodología es **repetible** y no dependía de un único caso.
+
+## Hitos Git
+
+```text
+ps002c-pass   · Platform
+flow01-pass   · FLOW-01 Kitchen → Delivery
+flow02-pass   · FLOW-02 Delivery Incidents  ← este hito
+```
+
+Siguiente ciclo: **FLOW-03 Spec → Freeze → Runner (BLOCKED at T1)** — sin dominio antes.

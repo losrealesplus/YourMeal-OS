@@ -12,7 +12,7 @@
 | Tipo | Prefijo | Ejemplo | Propósito |
 |------|---------|---------|-----------|
 | **Platform** | `platform-*` o hitos Auth/PS | `ps002c-pass` · futuro `platform-stable` | Infraestructura, Auth, bootstrap, estabilización |
-| **Flow** | `flow*` / `flowNN-pass` | `flow01-pass` | Flujos de negocio completamente certificados (PASS completo del runner) |
+| **Flow** | `flow*` / `flowNN-pass` | `flow01-pass` · `flow02-pass` | Flujos de negocio completamente certificados (PASS completo del runner) |
 | **Release** | `release-*` o `v*` semver | `release-v0.2.0` · `v0.2.0` | Versiones publicadas del producto |
 
 No cambia la metodología FOPEBA / Evidence before Implementation.  
@@ -26,6 +26,7 @@ Hace legible el historial: **técnica** vs **dominio** vs **producto**.
 |-----|------|----------------------|
 | `ps002c-pass` | Platform | PS-002-C PASS · FCR-008 · Platform Stabilization Flow-ready |
 | `flow01-pass` | Flow | FLOW-01 Kitchen → Delivery FULL PASS |
+| `flow02-pass` | Flow | FLOW-02 Delivery Incidents FULL PASS → `a1e8d1e` (#153) |
 
 ---
 
