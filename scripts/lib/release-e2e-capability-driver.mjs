@@ -2,9 +2,11 @@
  * RELEASE-E2E · Capability driver (pilot journey — not Smoke/Cross-flow re-run).
  *
  * E1 = Platform Entry (RELEASE-SMOKE)
- * E2…E4 = not implemented in RELEASE-E2E-001
+ * E2 = Order → Delivery (FLOW-01)
+ * E3…E4 = not implemented in RELEASE-E2E-002
  */
 import { runReleaseE2eE1PlatformEntry } from "./release-e2e-e1-platform-entry.mjs";
+import { runReleaseE2eE2OrderDelivery } from "./release-e2e-e2-order-delivery.mjs";
 
 /**
  * @param {{ root: string, through?: 1|2|3|4 | null }} opts
@@ -49,11 +51,35 @@ export function runReleaseE2eCapabilityDriver({ root, through = null }) {
 
   if (max < 2) return { ok: true, steps, evidence };
 
+  console.info("[RELEASE-E2E]", "RELEASE_E2E_E2_STARTED", {
+    segment: "order_delivery",
+  });
+  steps.push("RELEASE_E2E_E2_STARTED");
+
+  const e2 = runReleaseE2eE2OrderDelivery({ cwd: root });
+  evidence.e2_checks = e2.checks;
+  if (!e2.ok) {
+    console.error("[RELEASE-E2E] E2 FAIL:\n" + e2.reason);
+    return { ok: false, steps, reason: e2.reason, evidence };
+  }
+  evidence.e2_mapped_tokens = e2.mapped_tokens;
+  evidence.e2_source = e2.source;
+
+  console.info("[RELEASE-E2E]", "RELEASE_E2E_E2_COMPLETED", {
+    segment: "order_delivery",
+    mapped_tokens: e2.mapped_tokens,
+    source: e2.source,
+    checks: e2.checks,
+  });
+  steps.push("RELEASE_E2E_E2_COMPLETED");
+
+  if (max < 3) return { ok: true, steps, evidence };
+
   return {
     ok: false,
     steps,
     reason:
-      "RELEASE-E2E E2+ not implemented (E1 only · Evidence before Implementation)",
+      "RELEASE-E2E E3+ not implemented (E2 only · Evidence before Implementation)",
     evidence,
   };
 }

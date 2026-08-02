@@ -4,7 +4,7 @@
  *
  * Certifies the pilot journey (E1–E4). Complements Smoke + Cross-flow.
  *
- * Default (`npm run test:release-e2e`): --live through max certified (E1+).
+ * Default (`npm run test:release-e2e`): --live through max certified (E2+).
  * Modes:
  *   --live           Drive certified segments (default through = max certified).
  *   --runner-only    Empty pipeline → BLOCKED at E1 (historic Gate land-check).
@@ -16,7 +16,7 @@
  */
 
 /** Highest segment with a capability driver implemented. */
-const RELEASE_E2E_CERTIFIED_THROUGH = 1;
+const RELEASE_E2E_CERTIFIED_THROUGH = 2;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -202,6 +202,13 @@ async function main() {
     console.log(`evidence_file: ${path.relative(ROOT, out)}`);
 
     if (
+      progress.certified_through >= 2 &&
+      progress.blocked_at === "RELEASE_E2E_E3_STARTED"
+    ) {
+      console.log(
+        "RELEASE-E2E-002 · PASS through E2 · BLOCKED at E3 (expected)",
+      );
+    } else if (
       progress.certified_through >= 1 &&
       progress.blocked_at === "RELEASE_E2E_E2_STARTED"
     ) {

@@ -1,0 +1,78 @@
+{
+  "status": "PASS",
+  "reason": "PASS through E2 · BLOCKED at RELEASE_E2E_E3_STARTED for full RELEASE-E2E",
+  "gate": "RELEASE-E2E",
+  "contract": "RELEASE_E2E_SPEC",
+  "level": "release",
+  "certifies": "pilot_journey_as_system",
+  "complements_smoke_and_crossflow": true,
+  "principle": "Evidence before Implementation",
+  "code_status": "CAPABILITY_DRIVER_E2",
+  "at": "2026-08-02T18:46:08.103Z",
+  "pipeline": [
+    "RELEASE_E2E_E1_STARTED",
+    "RELEASE_E2E_E1_COMPLETED",
+    "RELEASE_E2E_E2_STARTED",
+    "RELEASE_E2E_E2_COMPLETED"
+  ],
+  "expected": [
+    "RELEASE_E2E_E1_STARTED",
+    "RELEASE_E2E_E1_COMPLETED",
+    "RELEASE_E2E_E2_STARTED",
+    "RELEASE_E2E_E2_COMPLETED",
+    "RELEASE_E2E_E3_STARTED",
+    "RELEASE_E2E_E3_COMPLETED",
+    "RELEASE_E2E_E4_STARTED",
+    "RELEASE_E2E_E4_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": null,
+  "certified_through": 2,
+  "blocked_at": "RELEASE_E2E_E3_STARTED",
+  "delivery": "RELEASE-E2E-002",
+  "delivery_status": "PASS",
+  "gate_status": "BLOCKED",
+  "terminal": {
+    "segment": "order_delivery"
+  },
+  "evidence": {
+    "e1_checks": [
+      "release_smoke_canonical_script_present",
+      "release_smoke_canonical_pipeline_intact",
+      "release_smoke_pass_tag_present",
+      "release_smoke_pass_acta_present",
+      "release_smoke_spec_present"
+    ],
+    "e1_mapped_tokens": [
+      "RELEASE_SMOKE_S1_STARTED",
+      "RELEASE_SMOKE_S1_COMPLETED",
+      "RELEASE_SMOKE_S2_STARTED",
+      "RELEASE_SMOKE_S2_COMPLETED",
+      "RELEASE_SMOKE_S3_STARTED",
+      "RELEASE_SMOKE_S3_COMPLETED",
+      "RELEASE_SMOKE_S4_STARTED",
+      "RELEASE_SMOKE_S4_COMPLETED"
+    ],
+    "e1_source": "release-smoke-pass + RELEASE-SMOKE S1…S4 pipeline (no E2+ · no Smoke re-run)",
+    "e2_checks": [
+      "flow01_canonical_script_present",
+      "flow01_canonical_pipeline_intact",
+      "flow01_pass_tag_present",
+      "flow01_pass_acta_present",
+      "flow01_spec_present"
+    ],
+    "e2_mapped_tokens": [
+      "FLOW01_T1_STARTED",
+      "FLOW01_T1_COMPLETED",
+      "FLOW01_T2_STARTED",
+      "FLOW01_T2_COMPLETED",
+      "FLOW01_T3_STARTED",
+      "FLOW01_T3_COMPLETED",
+      "FLOW01_T4_STARTED",
+      "FLOW01_T4_COMPLETED"
+    ],
+    "e2_source": "flow01-pass + FLOW-01 T1…T4 pipeline (no E3+ · no FLOW-01 domain re-run)"
+  }
+}
