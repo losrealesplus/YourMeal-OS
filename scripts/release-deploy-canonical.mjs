@@ -18,7 +18,7 @@
  */
 
 /** Highest segment with a capability driver implemented. */
-const RELEASE_DEPLOY_CERTIFIED_THROUGH = 1;
+const RELEASE_DEPLOY_CERTIFIED_THROUGH = 2;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
