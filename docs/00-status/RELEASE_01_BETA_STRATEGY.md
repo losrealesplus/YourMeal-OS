@@ -76,7 +76,7 @@ Luego FLOW-06… según catálogo. Sin saltos. Sin features futuras en el PR del
 | Cross-flow | ✅ | Tag `release-crossflow-pass` → `0a0c51b` · [PASS](../10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md) |
 | E2E | ✅ | Tag `release-e2e-pass` → `73623ae` · [PASS](../10-validation/release-e2e/RELEASE_E2E_PASS_ACTA.md) |
 | Deployment | ✅ | Tag `release-deploy-pass` → `7896a2a` · [PASS](../10-validation/release-deploy/RELEASE_DEPLOY_PASS_ACTA.md) |
-| Rollback | ▶ | DoR ✅ · Spec ✅ FROZEN · next Runner · [SPEC](./RELEASE_ROLLBACK_SPEC.md) → tag `release-rollback-pass` |
+| Rollback | ▶ | DoR ✅ · Spec ✅ FROZEN · Runner ▶ [RUNNER](../10-validation/release-rollback/RELEASE_ROLLBACK_RUNNER.md) · Gate NOT READY → tag `release-rollback-pass` |
 | Beta Acceptance | ⏳ | Enlaza evidencia → tag `release-01-beta` |
 
 #### Roadmap Track B (mismo patrón FOPEBA · sin mezclar)
@@ -86,7 +86,7 @@ B-01 Smoke        ✅ release-smoke-pass
 B-02 Cross-flow   ✅ release-crossflow-pass → 0a0c51b
 B-03 E2E          ✅ release-e2e-pass → 73623ae
 B-04 Deployment   ✅ release-deploy-pass → 7896a2a
-B-05 Rollback     DoR ✅ · Spec ✅ FROZEN · Runner ⏳ → release-rollback-pass
+B-05 Rollback     DoR ✅ · Spec ✅ FROZEN · Runner ▶ · Gate NOT READY → release-rollback-pass
 B-06 Beta Accept. Solo al final → release-01-beta
 ```
 
@@ -114,7 +114,7 @@ RELEASE-01
 ├── Performance             ⏳  (o N/A documentado)
 ├── Security                ⏳  (o N/A documentado)
 ├── Deployment              ✅  tag release-deploy-pass → 7896a2a
-├── Rollback                ▶  Spec FROZEN · READY TO OPEN Runner → release-rollback-pass
+├── Rollback                ▶  Runner BLOCKED at R1 · Gate NOT READY → release-rollback-pass
 ├── Documentation           ⏳  handoff · CURRENT_PHASE · ADRs
 └── Beta Acceptance         ⏳  DoRl PASS
         ↓

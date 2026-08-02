@@ -93,7 +93,7 @@ Convertir la beta en algo **verificable**. Matriz viva:
 | Cross-flow | ✅ | Tag `release-crossflow-pass` → `0a0c51b` · [PASS](../10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md) |
 | E2E | ✅ | Tag `release-e2e-pass` → `73623ae` · [PASS](../10-validation/release-e2e/RELEASE_E2E_PASS_ACTA.md) |
 | Deployment | ✅ | Tag `release-deploy-pass` → `7896a2a` · [PASS](../10-validation/release-deploy/RELEASE_DEPLOY_PASS_ACTA.md) |
-| Rollback | ▶ | DoR ✅ · Spec ✅ FROZEN · next Runner · [SPEC](./RELEASE_ROLLBACK_SPEC.md) → `release-rollback-pass` |
+| Rollback | ▶ | DoR ✅ · Spec ✅ FROZEN · Runner ▶ [RUNNER](../10-validation/release-rollback/RELEASE_ROLLBACK_RUNNER.md) · Gate NOT READY → `release-rollback-pass` |
 | Beta Acceptance | ⏳ | → `release-01-beta` |
 
 Detalle: [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) · [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md).
@@ -106,10 +106,11 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual Track B:** **RELEASE-ROLLBACK Runner** (siguiente PR).  
+**Objetivo actual Track B:** **RELEASE-ROLLBACK Runner** (este PR).  
 DoR ✅ (#207) · Spec ✅ FROZEN (#208 · `4d109f7`).  
-Decision: **READY TO OPEN** Runner · BLOCKED at `RELEASE_ROLLBACK_R1_STARTED` · exit 2.  
-Do **not** open Rollback-001 · FLOW-05 · RELEASE-01-BETA in Runner.  
+Contrato: `npm run test:release-rollback` → BLOCKED at `RELEASE_ROLLBACK_R1_STARTED` · exit 2 · `evidence={}`.  
+Gate ⛔ NOT READY hasta Land Check desde `main`.  
+Do **not** open Rollback-001 · FLOW-05 · RELEASE-01-BETA hasta Gate READY.  
 **Reglas:** (1) Release gates ≠ Flow runners · (2) Land Check desde `main` (Regla 9).
 
 Cross-flow **no sustituye** runners canónicos: los runners certifican contratos;  
@@ -188,7 +189,7 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 ## Current Goal
 
 ```text
-Track B (prioridad): RELEASE-ROLLBACK Runner → Gate → 001…003 → release-rollback-pass
+Track B (prioridad): RELEASE-ROLLBACK Runner (este PR) → Land Check → Gate READY → 001…003 → release-rollback-pass
 Track A:             Do NOT open FLOW-05 unless Track B finds a blocker
 FOPEBA_LAND_CHECK:   ACTIVE · before every 001 / tag
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos
