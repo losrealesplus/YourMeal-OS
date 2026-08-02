@@ -1,0 +1,54 @@
+{
+  "status": "PASS",
+  "reason": "PASS through S1 · BLOCKED at RELEASE_SMOKE_S2_STARTED for full RELEASE-SMOKE",
+  "gate": "RELEASE-SMOKE",
+  "contract": "RELEASE_SMOKE_SPEC",
+  "level": "release",
+  "certifies": "platform_capabilities",
+  "not_domain_entities": true,
+  "principle": "Evidence before Implementation",
+  "code_status": "CAPABILITY_DRIVER_S1",
+  "at": "2026-08-02T16:56:59.152Z",
+  "pipeline": [
+    "RELEASE_SMOKE_S1_STARTED",
+    "RELEASE_SMOKE_S1_COMPLETED"
+  ],
+  "expected": [
+    "RELEASE_SMOKE_S1_STARTED",
+    "RELEASE_SMOKE_S1_COMPLETED",
+    "RELEASE_SMOKE_S2_STARTED",
+    "RELEASE_SMOKE_S2_COMPLETED",
+    "RELEASE_SMOKE_S3_STARTED",
+    "RELEASE_SMOKE_S3_COMPLETED",
+    "RELEASE_SMOKE_S4_STARTED",
+    "RELEASE_SMOKE_S4_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": null,
+  "certified_through": 1,
+  "blocked_at": "RELEASE_SMOKE_S2_STARTED",
+  "delivery": "RELEASE-SMOKE-001",
+  "delivery_status": "PASS",
+  "gate_status": "BLOCKED",
+  "terminal": {
+    "capability": "preflight"
+  },
+  "evidence": {
+    "s1_checks": [
+      "env_example_exists",
+      "official_project_id_documented",
+      "vite_supabase_keys_documented",
+      "no_invented_publishable_key_in_template",
+      "test_release_smoke_script_present"
+    ]
+  },
+  "duration_ms": {
+    "s1_ms": 15,
+    "s2_ms": null,
+    "s3_ms": null,
+    "s4_ms": null,
+    "smoke_total_ms": null
+  }
+}

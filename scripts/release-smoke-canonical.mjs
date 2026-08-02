@@ -8,11 +8,13 @@
  * Default (no drivers): BLOCKED at RELEASE_SMOKE_S1_STARTED.
  * Modes:
  *   (default)     Empty pipeline → BLOCKED (runner-only).
+ *   --live        Drive certified capabilities (S1+ progressive).
  *   --self-test   Validate frozen full contract (synthetic PASS).
  *   --pipeline=a,b,c   Validate an explicit observed step list.
  *   --through=S1|S2|S3|S4   Scope delivery RELEASE-SMOKE-001..004.
  *
  *   npm run test:release-smoke
+ *   npm run test:release-smoke-001
  *
  * Spec: docs/00-status/RELEASE_SMOKE_SPEC.md
  */
@@ -30,6 +32,7 @@ import {
   releaseSmokeStepsThrough,
   validateReleaseSmokePipeline,
 } from "./lib/release-smoke-canonical-pipeline.mjs";
+import { runReleaseSmokeCapabilityDriver } from "./lib/release-smoke-capability-driver.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -39,6 +42,15 @@ const EVIDENCE_DIR = path.join(
 );
 
 function evidencePathFor(mode, through) {
+  if (mode === "live" && through) {
+    return path.join(
+      EVIDENCE_DIR,
+      `release-smoke-00${through}-canonical-live.json`,
+    );
+  }
+  if (mode === "live") {
+    return path.join(EVIDENCE_DIR, "release-smoke-canonical-live.json");
+  }
   if (through) {
     return path.join(
       EVIDENCE_DIR,
@@ -61,12 +73,8 @@ function parseArgs(argv) {
   /** @type {1|2|3|4 | null} */
   let through = null;
   for (const a of argv) {
-    if (a === "--live") {
-      console.error(
-        "RELEASE-SMOKE: --live not available (no Playwright / browser / Supabase / domain in runner PR).",
-      );
-      process.exit(RELEASE_SMOKE_EXIT.FAIL);
-    } else if (a === "--self-test") mode = "self-test";
+    if (a === "--live") mode = "live";
+    else if (a === "--self-test") mode = "self-test";
     else if (a.startsWith("--pipeline=")) {
       mode = "pipeline";
       pipelineArg = a
@@ -150,6 +158,74 @@ async function main() {
 
     const out = await writeEvidence(report, mode, through);
     console.log(`evidence_file: ${path.relative(ROOT, out)}`);
+    process.exit(exitFor(progress));
+  }
+
+  if (mode === "live") {
+    const scope = through ?? 1;
+    console.log(
+      `Driving RELEASE-SMOKE capabilities (through=S${scope})…`,
+    );
+    const driver = runReleaseSmokeCapabilityDriver({
+      root: ROOT,
+      through: scope,
+    });
+    if (!driver.ok) {
+      console.error("Capability driver failed:");
+      console.error(driver.reason ?? "unknown");
+      const report = buildReleaseSmokeEvidenceReport({
+        status: "FAIL",
+        reason: driver.reason ?? "RELEASE-SMOKE capability driver failed",
+        pipeline: driver.steps,
+        code_status: "CAPABILITY_DRIVER_FAIL",
+        terminal: { capability: null },
+        evidence: driver.evidence ?? {},
+      });
+      await writeEvidence(report, "live", through);
+      process.exit(RELEASE_SMOKE_EXIT.FAIL);
+    }
+
+    const observed = driver.steps;
+    const progress = evaluateReleaseSmokeProgress(observed, { through: scope });
+    const duration_ms = computeReleaseSmokeDurations(
+      syntheticTimestamps(observed),
+    );
+    const report = buildReleaseSmokeEvidenceReport({
+      status: progress.status,
+      reason: progress.reason,
+      pipeline: observed,
+      validation: progress,
+      duration_ms,
+      code_status: `CAPABILITY_DRIVER_S${progress.certified_through || 0}`,
+      terminal: {
+        capability:
+          RELEASE_SMOKE_CAPABILITIES[progress.certified_through] ?? null,
+      },
+      progress,
+      evidence: driver.evidence ?? {},
+    });
+
+    console.log(formatReleaseSmokeComparisonTable(progress));
+    console.log("");
+    console.log(progress.reason);
+    console.log(
+      `certified_through=S${progress.certified_through || 0} · blocked_at=${progress.blocked_at ?? "—"}`,
+    );
+    console.log(
+      `duplicates=${JSON.stringify(report.duplicates)} missing=${JSON.stringify(report.missing)} out_of_order=${JSON.stringify(report.out_of_order)}`,
+    );
+
+    const out = await writeEvidence(report, "live", through ?? scope);
+    console.log(`evidence_file: ${path.relative(ROOT, out)}`);
+
+    if (
+      progress.certified_through >= 1 &&
+      progress.blocked_at === "RELEASE_SMOKE_S2_STARTED"
+    ) {
+      console.log(
+        "RELEASE-SMOKE-001 · PASS through S1 · BLOCKED at S2 (expected)",
+      );
+    }
     process.exit(exitFor(progress));
   }
 

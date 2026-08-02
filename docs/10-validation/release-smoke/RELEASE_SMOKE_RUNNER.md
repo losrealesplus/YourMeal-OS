@@ -90,17 +90,23 @@ npm run test:release-smoke -- --pipeline=RELEASE_SMOKE_S1_STARTED,RELEASE_SMOKE_
 npm run test:release-smoke:unit
 ```
 
-`--live` → **FAIL** en este PR (prohibido: Playwright / browser / Supabase / dominio).
+```bash
+# RELEASE-SMOKE-001 · S1 Preflight (capability driver · no Playwright)
+npm run test:release-smoke-001
+# → PASS through S1 · BLOCKED at RELEASE_SMOKE_S2_STARTED · exit 0
+```
+
+`--live` sin `--through` defaults a S1 mientras solo S1 esté certificado.
 
 ---
 
-## Fuera de alcance (este PR)
+## Fuera de alcance hasta S2+
 
 - Playwright · browser · CI  
 - Deployment · Rollback  
-- Supabase / drivers de escenario  
+- Live Auth / Supabase session (S2)  
 - Domain logic / FLOW-05  
-- RELEASE-SMOKE-001 (solo tras Gate verde)
+- S3 Bootstrap · S4 Dashboard
 
 ---
 
