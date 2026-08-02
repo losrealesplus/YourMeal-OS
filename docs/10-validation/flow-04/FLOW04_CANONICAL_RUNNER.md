@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW04_CANONICAL_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ Runner **ACTIVE** · Domain ▶ FLOW04-001 T1 · Gate ✅  
+**Estado:** ✅ Runner **ACTIVE** · Domain ✅ FULL PASS · tag `flow04-pass`  
 **Spec:** [FLOW_04_INVENTORY_CONSUMPTION_SPEC](../../00-status/FLOW_04_INVENTORY_CONSUMPTION_SPEC.md) **FROZEN** (#163 → `3d922ae`)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)
 
@@ -106,14 +106,15 @@ Gate **verde** · FLOW04-001 abierto · [acta T1](./FLOW04_001_T1_ACTA.md).
 | Entrega | Estado |
 |---------|--------|
 | FLOW04-001 T1 | ✅ `→ planned` · [acta](./FLOW04_001_T1_ACTA.md) |
-| FLOW04-002 T2 | ▶ `planned → applied` (+ stock · I2/I3) · [acta](./FLOW04_002_T2_ACTA.md) |
-| FLOW04-003 T3 | ⏳ `applied → sealed` |
+| FLOW04-002 T2 | ✅ `planned → applied` · [acta](./FLOW04_002_T2_ACTA.md) |
+| FLOW04-003 T3 | ✅ `applied → sealed` · [acta](./FLOW04_003_T3_ACTA.md) |
+| FULL PASS | ✅ [FLOW04_PASS_ACTA](./FLOW04_PASS_ACTA.md) |
 
 ```bash
-npm run test:flow04-001
-# → PASS through T1 · BLOCKED at FLOW04_T2_STARTED · exit 0
-npm run test:flow04-002
-# → PASS through T2 · BLOCKED at FLOW04_T3_STARTED · exit 0
+npm run test:flow04-001   # PASS through T1 · exit 0
+npm run test:flow04-002   # PASS through T2 · exit 0
+npm run test:flow04-003   # FULL PASS · exit 0
+npm run test:flow04-canonical -- --live   # FULL PASS · exit 0
 ```
 
 ---

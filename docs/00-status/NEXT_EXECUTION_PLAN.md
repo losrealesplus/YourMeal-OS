@@ -20,13 +20,10 @@ PS-002C                       ✅  ps002c-pass
 FLOW-01                       ✅  flow01-pass
 FLOW-02                       ✅  flow02-pass
 FLOW-03                       ✅  flow03-pass
-FLOW-04 DoR                   ✅  #162
-FLOW-04 Spec                  ✅  FROZEN #163 · 3d922ae
-FLOW-04 Runner                ✅  #164 · a99f6fd
-FLOW04-001                    ✅  T1 → planned (#165)
-FLOW04-002                    ▶  T2 planned → applied
-RELEASE-01                    DRAFT  (eje B · #161 en main)
-Definition of Release         DRAFT  (DoRl)
+FLOW-04                       ✅  flow04-pass (FULL PASS)
+RELEASE-01                    DRAFT  (eje B · DoRl)
+FOPEBA_METRICS                ▶  ./FOPEBA_METRICS.md (v0)
+FLOW-05                       ⏳  DoR NOT STARTED
 ```
 
 ---
@@ -148,9 +145,9 @@ No forma parte de este PR ni de la Spec.
 ## Current Goal
 
 ```text
-FLOW04-002 · Is T2 certified?
-npm run test:flow04-002 → PASS through T2 · BLOCKED at T3 · exit 0
-I2 Single Apply · I3 no negative stock · No T3 / sealed.
+FLOW-04 CERTIFIED · tag flow04-pass
+Next Track A: FLOW-05 DoR (only)
+Next Track B: RELEASE-01 DoRl items + FOPEBA_METRICS rows
 ```
 
 ---

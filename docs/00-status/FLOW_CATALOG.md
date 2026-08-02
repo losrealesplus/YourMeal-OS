@@ -2,12 +2,12 @@
 
 **Documento:** `FLOW_CATALOG.md`  
 **Fecha:** 2026-08-02  
-**Estado:** FLOW-01 ✅ · FLOW-02 ✅ · FLOW-03 ✅ · FLOW-04 ▶ Runner · Spec FROZEN (#163) · DoR estándar ✅ (#147)  
+**Estado:** FLOW-01…04 ✅ CERTIFIED · DoR estándar ✅ (#147)  
 **Piloto:** EatClean  
 **Fase:** 1 · Domain / Flow (Fase 0 · Plataforma COMPLETE)  
 **Plataforma:** PS-002-C ✅ · FCR-008 FROZEN · tag `ps002c-pass`  
-**Dominio:** FLOW-01…03 ✅ `flow01-pass` · `flow02-pass` · `flow03-pass`  
-**Plan:** [NEXT_EXECUTION_PLAN](./NEXT_EXECUTION_PLAN.md)  
+**Dominio:** `flow01-pass` · `flow02-pass` · `flow03-pass` · `flow04-pass`  
+**Plan:** [NEXT_EXECUTION_PLAN](./NEXT_EXECUTION_PLAN.md) · [FOPEBA_METRICS](./FOPEBA_METRICS.md)  
 **Estándar:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) · [Evidence before Implementation](./EVIDENCE_BEFORE_IMPLEMENTATION.md)
 
 ---
@@ -33,14 +33,14 @@ Sí: `FLOW-01 Kitchen → Delivery`.
 | **FLOW-01** | Kitchen → Delivery | ¿Kitchen entrega correctamente a Delivery? | ✅ **CERTIFIED** · [SPEC](./FLOW_01_KITCHEN_DELIVERY_SPEC.md) · [Plan](./FLOW_01_DELIVERY_PLAN.md) · [PASS acta](../10-validation/flow-01/FLOW01_PASS_ACTA.md) · `npm run test:flow01-canonical -- --live` |
 | **FLOW-02** | Delivery Incidents | ¿Un intento fallido queda operable y reintentable hasta `delivered`? | ✅ **CERTIFIED** · tag `flow02-pass` · [SPEC](./FLOW_02_DELIVERY_INCIDENTS_SPEC.md) · [PASS acta](../10-validation/flow-02/FLOW02_PASS_ACTA.md) · `npm run test:flow02-canonical -- --live` |
 | **FLOW-03** | Billing | ¿Un pedido `delivered` queda facturable → revisado → cobrado? | ✅ **CERTIFIED** · tag `flow03-pass` → `67a2e66` · [SPEC](./FLOW_03_BILLING_SPEC.md) · [PASS acta](../10-validation/flow-03/FLOW03_PASS_ACTA.md) · `npm run test:flow03-canonical -- --live` |
+| **FLOW-04** | Inventory Consumption | ¿La producción consume inventario de forma trazable e idempotente? | ✅ **CERTIFIED** · tag `flow04-pass` · [SPEC](./FLOW_04_INVENTORY_CONSUMPTION_SPEC.md) · [PASS acta](../10-validation/flow-04/FLOW04_PASS_ACTA.md) · `npm run test:flow04-canonical -- --live` |
 
 ---
 
-## Activo / candidatos (sin Implementation hasta DoR completo)
+## Candidatos (sin Implementation hasta DoR completo)
 
 | ID | Handoff / alcance | Prioridad | Motivo | Estado |
 |----|-------------------|-----------|--------|--------|
-| **FLOW-04** | Inventory Consumption | Alta | Consumo de ingredientes tras producción | ▶ **FLOW04-002 T2** · T1 ✅ · [SPEC](./FLOW_04_INVENTORY_CONSUMPTION_SPEC.md) · [Acta T2](../10-validation/flow-04/FLOW04_002_T2_ACTA.md) |
 | **FLOW-05** | Customer Order Lifecycle | Media | Creación del pedido → `confirmed` | ⏳ DoR NOT STARTED |
 | **FLOW-06** | Kitchen Planning | Media | Planificación previa a T1 | ⏳ DoR NOT STARTED |
 

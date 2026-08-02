@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW_04_INVENTORY_CONSUMPTION_SPEC.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **FROZEN** (#163 → `3d922ae`) · Runner ▶ · Domain 🔒 Gate FLOW04-001  
+**Estado:** ✅ **CERTIFIED** · tag `flow04-pass` · Spec FROZEN (#163) · FULL PASS  
 **Baseline:** Spec merge · DoR [#162](https://github.com/losrealesplus/YourMeal-OS/pull/162)  
 **Precondición:** FLOW-01…03 ✅ CERTIFIED · tags `flow01-pass` · `flow02-pass` · `flow03-pass`  
 **DoR:** [FLOW_04_INVENTORY_CONSUMPTION_DOR](./FLOW_04_INVENTORY_CONSUMPTION_DOR.md) · [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md)  

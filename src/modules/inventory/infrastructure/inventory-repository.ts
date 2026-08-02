@@ -38,6 +38,11 @@ export type InventoryRepository = {
     tenantId: string;
     consumptionId: string;
   }) => Promise<InventoryConsumption>;
+  /** T3 · mark applied → sealed (no stock mutation). */
+  sealConsumption: (input: {
+    tenantId: string;
+    consumptionId: string;
+  }) => Promise<InventoryConsumption>;
 };
 
 const store = new Map<string, InventoryConsumption>();
@@ -166,6 +171,29 @@ export function createInventoryRepository(
       store.set(sourceKey(tenantId, current.deliveryDate), applied);
       byId.set(applied.id, applied);
       return applied;
+    },
+
+    async sealConsumption({ tenantId, consumptionId }) {
+      const current = byId.get(consumptionId);
+      if (!current || current.tenantId !== tenantId) {
+        throw new Error(`Consumption ${consumptionId} not found`);
+      }
+      if (current.status === "sealed") {
+        return current;
+      }
+      if (current.status !== "applied") {
+        throw new Error(
+          `sealConsumption requires status=applied (got ${current.status})`,
+        );
+      }
+      const sealed: InventoryConsumption = {
+        ...current,
+        status: "sealed",
+        lines: current.lines.map((l) => ({ ...l })),
+      };
+      store.set(sourceKey(tenantId, current.deliveryDate), sealed);
+      byId.set(sealed.id, sealed);
+      return sealed;
     },
   };
 }

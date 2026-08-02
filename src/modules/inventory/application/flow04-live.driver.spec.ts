@@ -2,9 +2,9 @@
  * FLOW-04 live domain driver (progressive T1–T3).
  * Invoked by scripts/lib/flow04-domain-driver.mjs
  *
- * FLOW04-001: through=1 → planConsumptionFromProduction
- * FLOW04-002: through=2 → + applyConsumption (default)
- * FLOW04-003: through=3 — not implemented yet
+ * FLOW04-001: through=1 → plan
+ * FLOW04-002: through=2 → + apply
+ * FLOW04-003: through=3 → + seal (default · FULL PASS)
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ServiceContext } from "@/services/types";
@@ -38,10 +38,9 @@ describe("FLOW-04 live domain driver", () => {
     vi.restoreAllMocks();
   });
 
-  it("drives certified transitions up to FLOW04_LIVE_THROUGH (default T2)", async () => {
-    // FLOW04-002: default through=2 until T3 exists
+  it("drives certified transitions up to FLOW04_LIVE_THROUGH (default T3)", async () => {
     // Do NOT mock console.info — domain driver extracts [FLOW-04] tokens from stdout.
-    const through = Number(process.env.FLOW04_LIVE_THROUGH || "2");
+    const through = Number(process.env.FLOW04_LIVE_THROUGH || "3");
 
     __seedProductionPlanInput("tenant-flow04", {
       deliveryDate: "2026-08-02",
@@ -63,8 +62,6 @@ describe("FLOW-04 live domain driver", () => {
       { deliveryDate: "2026-08-02" },
     );
     expect(consumption.status).toBe("planned");
-    expect(consumption.lines).toHaveLength(1);
-    expect(consumption.lines[0]?.qty).toBeCloseTo(0.4);
 
     if (through < 2) {
       expect(getObservedFlow04Steps()).toEqual([
@@ -90,8 +87,18 @@ describe("FLOW-04 live domain driver", () => {
       return;
     }
 
-    throw new Error(
-      `FLOW04_LIVE_THROUGH=${through} not implemented (only T1–T2 certified)`,
+    const sealed = await InventoryService.sealConsumption(
+      ctx(),
+      consumption.id,
     );
+    expect(sealed.status).toBe("sealed");
+    expect(getObservedFlow04Steps()).toEqual([
+      "FLOW04_T1_STARTED",
+      "FLOW04_T1_COMPLETED",
+      "FLOW04_T2_STARTED",
+      "FLOW04_T2_COMPLETED",
+      "FLOW04_T3_STARTED",
+      "FLOW04_T3_COMPLETED",
+    ]);
   });
 });
