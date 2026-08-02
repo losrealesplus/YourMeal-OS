@@ -1,0 +1,40 @@
+{
+  "status": "PASS",
+  "reason": "PASS through T1 · BLOCKED at FLOW03_T2_STARTED for full FLOW-03",
+  "gate": "FLOW-03",
+  "contract": "FLOW_03_BILLING_SPEC",
+  "principle": "Evidence before Implementation",
+  "code_status": "DOMAIN_DRIVER_T1",
+  "at": "2026-08-02T15:10:02.602Z",
+  "pipeline": [
+    "FLOW03_T1_STARTED",
+    "FLOW03_T1_COMPLETED"
+  ],
+  "expected": [
+    "FLOW03_T1_STARTED",
+    "FLOW03_T1_COMPLETED",
+    "FLOW03_T2_STARTED",
+    "FLOW03_T2_COMPLETED",
+    "FLOW03_T3_STARTED",
+    "FLOW03_T3_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": null,
+  "certified_through": 1,
+  "blocked_at": "FLOW03_T2_STARTED",
+  "delivery": "FLOW03-001",
+  "delivery_status": "PASS",
+  "flow_status": "BLOCKED",
+  "terminal": {
+    "invoice_status": "pending"
+  },
+  "evidence": {},
+  "duration_ms": {
+    "t1_ms": 15,
+    "t2_ms": null,
+    "t3_ms": null,
+    "flow_total_ms": null
+  }
+}

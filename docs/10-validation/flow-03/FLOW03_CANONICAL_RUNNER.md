@@ -2,8 +2,8 @@
 
 **Documento:** `FLOW03_CANONICAL_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ Runner contract **ACTIVE** · Domain ❌ not started (BLOCKED at T1)  
-**Spec:** [FLOW_03_BILLING_SPEC](../../00-status/FLOW_03_BILLING_SPEC.md) **FROZEN** (post-merge Spec PR)  
+**Estado:** ✅ Runner **ACTIVE** · Domain ▶ FLOW03-001 (T1) · full FLOW-03 BLOCKED at T2  
+**Spec:** [FLOW_03_BILLING_SPEC](../../00-status/FLOW_03_BILLING_SPEC.md) **FROZEN** (#155)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)
 
 ---
@@ -87,7 +87,11 @@ npm run test:flow03-canonical -- --pipeline=FLOW03_T1_STARTED,FLOW03_T1_COMPLETE
 npm run test:flow03-canonical:unit
 ```
 
-`--live` **no** está disponible en este PR (sin domain driver). Llega con FLOW03-001+.
+```bash
+# Live dominio (FLOW03-001…)
+npm run test:flow03-001
+# → PASS through T1 · BLOCKED at FLOW03_T2_STARTED · exit 0
+```
 
 ---
 
@@ -96,34 +100,27 @@ npm run test:flow03-canonical:unit
 | # | Condición | Estado |
 |---|-----------|--------|
 | 1 | Spec (#155) en `main` → FROZEN | ✅ |
-| 2 | Este runner (#156) retarget/rebase a `main` y mergeado | ▶ |
-| 3 | Desde `main`: BLOCKED at `FLOW03_T1_STARTED` · arrays vacíos · `evidence={}` · exit 2 | ⏳ tras merge |
-| 4 | Contrato `FLOW03_T*` sin cambios pendientes | ✅ |
+| 2 | Runner (#157) en `main` | ✅ |
+| 3 | Canonical BLOCKED verificado desde `main` | ✅ |
+| 4 | Contrato `FLOW03_T*` congelado | ✅ |
 
-FLOW03-001 permanece **cerrado** hasta Gate completo. Sin dominio en este PR.
+Gate **verde** · FLOW03-001 abierto.
 
-## Dominio (incremental · fuera de este PR)
+## Dominio (incremental)
 
 | Entrega | Estado |
 |---------|--------|
-| FLOW03-001 T1 | ⏳ bloqueado por Gate · `delivered` → invoice `pending` |
+| FLOW03-001 T1 | ▶ `delivered` → invoice `pending` · [acta](./FLOW03_001_T1_ACTA.md) |
 | FLOW03-002 T2 | ⏳ evento `reviewed_at` · status sigue `pending` |
 | FLOW03-003 T3 | ⏳ `pending` → `paid` · FULL PASS |
 
-Sin AccountingService / repos / Supabase / RPC / UI / OperationsService en este PR.
-
 ---
 
-## Definition of Done (este PR)
+## Definition of Done (runner base)
 
 | Verificación | Esperado |
 |--------------|----------|
 | Runner ejecuta | ✅ |
 | Reconoce contrato `FLOW03_*` | ✅ |
-| `duplicates` | `[]` |
-| `missing` | `[]` |
-| `out_of_order` | `[]` |
-| `evidence` | `{}` |
-| Estado | `BLOCKED` |
-| `blocked_at` | `FLOW03_T1_STARTED` |
-| Dominio | ❌ ausente |
+| Default sin dominio | `BLOCKED` at `FLOW03_T1_STARTED` |
+| FLOW03-001 live | PASS through T1 · BLOCKED at `FLOW03_T2_STARTED` |

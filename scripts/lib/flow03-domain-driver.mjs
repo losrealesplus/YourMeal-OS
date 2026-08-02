@@ -1,0 +1,46 @@
+/**
+ * FLOW-03 · Domain driver for `test:flow03-canonical --live`
+ *
+ * Runs the Vitest live driver (progressive T1–T3) and extracts
+ * `[FLOW-03] FLOW03_T*` tokens from process output.
+ */
+import { spawnSync } from "node:child_process";
+import path from "node:path";
+import { extractFlow03Steps } from "./flow03-canonical-pipeline.mjs";
+
+const DRIVER_SPEC =
+  "src/modules/accounting/application/flow03-live.driver.spec.ts";
+
+/**
+ * @param {{ root: string, through?: 1|2|3 | null }} opts
+ * @returns {{ ok: boolean, steps: string[], status: number, output: string }}
+ */
+export function runFlow03DomainDriver({ root, through = null }) {
+  const vitestBin = path.join(root, "node_modules", "vitest", "vitest.mjs");
+  const r = spawnSync(
+    process.execPath,
+    [vitestBin, "run", DRIVER_SPEC, "--reporter=verbose"],
+    {
+      cwd: root,
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        FLOW03_LIVE_DRIVER: "1",
+        FORCE_COLOR: "0",
+        // Unscoped --live drives max certified transition (T1 until FLOW03-002).
+        ...(through ? { FLOW03_LIVE_THROUGH: String(through) } : {}),
+      },
+      maxBuffer: 10 * 1024 * 1024,
+    },
+  );
+
+  const output = `${r.stdout ?? ""}\n${r.stderr ?? ""}`;
+  const steps = extractFlow03Steps(output.split("\n"));
+
+  return {
+    ok: r.status === 0,
+    steps,
+    status: r.status ?? 1,
+    output,
+  };
+}
