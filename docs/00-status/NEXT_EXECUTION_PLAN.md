@@ -91,7 +91,7 @@ Convertir la beta en algo **verificable**. Matriz viva:
 | FLOW-04 | ✅ | Tag `flow04-pass` |
 | Smoke Tests | ✅ | Tag `release-smoke-pass` · [PASS acta](../10-validation/release-smoke/RELEASE_SMOKE_PASS_ACTA.md) |
 | Cross-flow | ✅ | Tag `release-crossflow-pass` → `0a0c51b` · [PASS](../10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md) |
-| E2E | ▶ | 001 ▶ [E1 acta](../10-validation/release-e2e/RELEASE_E2E_001_E1_ACTA.md) · Gate ✅ → `release-e2e-pass` |
+| E2E | ▶ | 001 ✅ #190 · next 002 E2 · [E1 acta](../10-validation/release-e2e/RELEASE_E2E_001_E1_ACTA.md) → `release-e2e-pass` |
 | Deployment | ⏳ | → `release-deploy-pass` |
 | Rollback | ⏳ | → `release-rollback-pass` |
 | Beta Acceptance | ⏳ | → `release-01-beta` |
@@ -106,11 +106,11 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual Track B:** **RELEASE-E2E-001** · E1 only (este PR).  
-DoR ✅ · Spec ✅ · Runner ✅ (#188) · Gate ✅ READY (#189 · `04ed791`).  
+**Objetivo actual Track B:** **RELEASE-E2E-002** · E2 only (siguiente PR).  
+001 ✅ CERTIFIED (#190 · `514f325`) · Land Check PASS through E1 desde `main`.  
 Acta: [RELEASE_E2E_001_E1_ACTA](../10-validation/release-e2e/RELEASE_E2E_001_E1_ACTA.md).  
-Siguiente (tras Land Check 001): RELEASE-E2E-002 · E2 only.  
-Do **not** open E2/E3/E4 · Deploy · Rollback · FLOW-05 in this PR.  
+Decision: **READY TO OPEN** RELEASE-E2E-002 · anchor FLOW-01 / `flow01-pass`.  
+Do **not** open E3/E4 · Deploy · Rollback · FLOW-05 in 002.  
 **Reglas:** (1) Release gates ≠ Flow runners · (2) Land Check desde `main` (Regla 9).
 
 Cross-flow **no sustituye** runners canónicos: los runners certifican contratos;  
@@ -189,7 +189,7 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 ## Current Goal
 
 ```text
-Track B (prioridad): RELEASE-E2E-001 E1 → Land Check → 002…
+Track B (prioridad): RELEASE-E2E-002 E2 → 003…004 → release-e2e-pass
 Track A:             Do NOT open FLOW-05 unless Track B finds a blocker
 FOPEBA_LAND_CHECK:   ACTIVE · before every 001 / tag
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos

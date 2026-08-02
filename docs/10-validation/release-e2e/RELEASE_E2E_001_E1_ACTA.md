@@ -2,7 +2,8 @@
 
 **Documento:** `RELEASE_E2E_001_E1_ACTA.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **PASS through E1** · BLOCKED at `RELEASE_E2E_E2_STARTED`  
+**Estado:** ✅ **CERTIFIED desde `main`** · PASS through E1 · BLOCKED at `RELEASE_E2E_E2_STARTED`  
+**Tip:** `514f325` (Merge #190)  
 **Precondición:** Runner CERTIFIED (#188 · `d2a4047`) · Gate READY (#189 · `04ed791`)  
 **Gate:** [RELEASE_E2E_GATE](./RELEASE_E2E_GATE.md)  
 **Spec:** [RELEASE_E2E_SPEC](../../00-status/RELEASE_E2E_SPEC.md)  
@@ -72,11 +73,16 @@ Fuente: `release-smoke-pass + RELEASE-SMOKE S1…S4 pipeline (no E2+ · no Smoke
 
 ---
 
+## Land Check (desde `main` @ `514f325`)
+
+Verificado: PASS through E1 · runner-only BLOCKED at E1.
+
 ## Next
 
 ```text
+READY TO OPEN
 RELEASE-E2E-002 · E2 only
-(solo tras Land Check de 001 desde main)
+Anchor: FLOW-01 / flow01-pass
 ```
 
 ---
