@@ -265,15 +265,10 @@ Sin `release-smoke-pass` → fila Smoke de DoRl permanece ⏳.
 ## Next
 
 ```text
-Runner BLOCKED verificado en main
+release-smoke-pass ✅
     ↓
-RELEASE-SMOKE-001 (solo S1 · preflight)
-    ↓
-… S2…S4
-    ↓
-release-smoke-pass
-    ↓
-B-02 Cross-flow Spec
+B-02 Cross-flow DoR → Spec → Freeze → Runner → …
+→ RELEASE_CROSSFLOW_DOR.md
 ```
 
 ---

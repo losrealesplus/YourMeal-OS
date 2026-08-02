@@ -50,10 +50,10 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    Track B › RELEASE-SMOKE-004 S4 Dashboard
-                               → ../10-validation/release-smoke/RELEASE_SMOKE_004_S4_ACTA.md
-                               001–003 CERTIFIED (#174–#176) · Smoke → FULL PASS
-                               Roadmap: smoke → crossflow → e2e → deploy
+  Prioridad                    Track B › B-02 Cross-flow DoR
+                               → ./RELEASE_CROSSFLOW_DOR.md
+                               Smoke CERTIFIED · tag release-smoke-pass → 370628a
+                               Roadmap: crossflow → e2e → deploy
                                         → rollback → beta → release-01-beta
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)

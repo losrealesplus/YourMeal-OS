@@ -116,8 +116,9 @@ La conversación sobre beta se ancla a filas con evidencia (detalle vivo en
 | Gate DoRl | Estado típico post–FLOW-04 | Hito |
 |-----------|----------------------------|------|
 | FOUNDATION · PS-002C · FLOW-01…04 | ✅ | Tags de milestone |
-| Smoke | ⏳ Spec [READY FOR FREEZE](./RELEASE_SMOKE_SPEC.md) | `release-smoke-pass` |
-| Cross-flow · E2E | ⏳ | `release-crossflow-pass` · `release-e2e-pass` |
+| Smoke | ✅ | `release-smoke-pass` → `370628a` |
+| Cross-flow | ⏳ DoR [RELEASE_CROSSFLOW_DOR](./RELEASE_CROSSFLOW_DOR.md) | `release-crossflow-pass` |
+| E2E | ⏳ | `release-e2e-pass` |
 | Deployment · Rollback | ⏳ | `release-deploy-pass` · `release-rollback-pass` |
 | Beta Acceptance | ⏳ | `release-01-beta` |
 
