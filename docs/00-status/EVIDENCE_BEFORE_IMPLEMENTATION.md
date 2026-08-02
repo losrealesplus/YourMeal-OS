@@ -77,12 +77,12 @@ Igual filosofía que FCR-008 / PS-002-C:
 
 | Artefacto | Estado |
 |-----------|--------|
-| SPEC | ✅ READY FOR FREEZE · [FLOW_01_KITCHEN_DELIVERY_SPEC](./FLOW_01_KITCHEN_DELIVERY_SPEC.md) |
+| SPEC | ✅ **FROZEN** · [FLOW_01_KITCHEN_DELIVERY_SPEC](./FLOW_01_KITCHEN_DELIVERY_SPEC.md) · PR #141 |
 | Estados + Packaging lifecycle + T4=`delivered` | ✅ en Spec |
 | Invariantes | ✅ en Spec |
 | Contrato `FLOW01_T*` | ✅ en Spec |
-| Runner `test:flow01-canonical` | ⏳ siguiente tras merge Spec |
-| Implementation | ⏳ después del runner |
+| Runner `test:flow01-canonical` | ▶ [FLOW01_CANONICAL_RUNNER](../10-validation/flow-01/FLOW01_CANONICAL_RUNNER.md) |
+| Implementation | ⏳ después del runner en main |
 
 ---
 

@@ -1,0 +1,49 @@
+{
+  "status": "BLOCKED",
+  "reason": "FLOW-01 domain driver not wired (runner ready; implementation pending)",
+  "gate": "FLOW-01",
+  "contract": "FLOW_01_KITCHEN_DELIVERY_SPEC",
+  "principle": "Evidence before Implementation",
+  "code_status": "DOMAIN_DRIVER_PENDING",
+  "at": "2026-08-02T12:53:33.025Z",
+  "pipeline": [],
+  "expected": [
+    "FLOW01_T1_STARTED",
+    "FLOW01_T1_COMPLETED",
+    "FLOW01_T2_STARTED",
+    "FLOW01_T2_COMPLETED",
+    "FLOW01_T3_STARTED",
+    "FLOW01_T3_COMPLETED",
+    "FLOW01_T4_STARTED",
+    "FLOW01_T4_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [
+    "FLOW01_T1_STARTED",
+    "FLOW01_T1_COMPLETED",
+    "FLOW01_T2_STARTED",
+    "FLOW01_T2_COMPLETED",
+    "FLOW01_T3_STARTED",
+    "FLOW01_T3_COMPLETED",
+    "FLOW01_T4_STARTED",
+    "FLOW01_T4_COMPLETED"
+  ],
+  "out_of_order": [],
+  "firstFailure": "FLOW01_T1_STARTED",
+  "certified_through": 0,
+  "blocked_at": "FLOW01_T1_STARTED",
+  "delivery": "FLOW-01",
+  "delivery_status": "BLOCKED",
+  "flow_status": "BLOCKED",
+  "terminal": {
+    "order_status": null,
+    "packaging_batch": null
+  },
+  "duration_ms": {
+    "t1_ms": null,
+    "t2_ms": null,
+    "t3_ms": null,
+    "t4_ms": null,
+    "flow_total_ms": null
+  }
+}

@@ -36,13 +36,15 @@ Fase proyecto
                               → ./EVIDENCE_BEFORE_IMPLEMENTATION.md
 
 Sprint activo
-  1) Merge PR #141 = FLOW-01 SPEC FROZEN
-  2) Runner test:flow01-canonical
-  3) Implementation happy path (solo después)
-  Gaps Spec cerrados: PackagingBatch lifecycle · T4 = delivered
+  FLOW-01 SPEC                 ✅ FROZEN (PR #141)
+  FLOW-01 Runner               ▶ #142 · progressive PASS/BLOCKED
+  Entregas dominio             FLOW01-001 → 004 (una transición / PR)
+  Plan: ./FLOW_01_DELIVERY_PLAN.md
+  Siguiente tras merge runner: FLOW01-001 (Kitchen → Production)
   Acta PS-002-C: ../10-validation/platform-stabilization/PS002C_PASS_ACTA.md
   Tag restauración: ps002c-pass → 545bd19
   Beta paralelo: BR-03.3 Runtime Validation (G3)
+  Disciplina: no ampliar FLOW-01 hasta --live PASS completo
 
 ═══════════════════════════════════════════════
 CLOSED GATE
