@@ -13,10 +13,12 @@
 |------|---------|---------|-----------|
 | **Platform** | `platform-*` o hitos Auth/PS | `ps002c-pass` · futuro `platform-stable` | Infraestructura, Auth, bootstrap, estabilización |
 | **Flow** | `flow*` / `flowNN-pass` | `flow01-pass` · `flow02-pass` | Flujos de negocio completamente certificados (PASS completo del runner) |
-| **Release** | `release-*` o `v*` semver | `release-v0.2.0` · `v0.2.0` | Versiones publicadas del producto |
+| **Release** | `release-*` o `v*` semver | `release-01-beta` · `release-v0.2.0` · `v0.2.0` | Producto como conjunto (beta / semver) |
 
 No cambia la metodología FOPEBA / Evidence before Implementation.  
 Hace legible el historial: **técnica** vs **dominio** vs **producto**.
+
+Gate de producto (aún DRAFT): [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) · [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md) (DoRl) → tag `release-01-beta` solo tras **DoRl PASS**.
 
 ---
 
@@ -27,7 +29,7 @@ Hace legible el historial: **técnica** vs **dominio** vs **producto**.
 | `ps002c-pass` | Platform | PS-002-C PASS · FCR-008 · Platform Stabilization Flow-ready |
 | `flow01-pass` | Flow | FLOW-01 Kitchen → Delivery FULL PASS |
 | `flow02-pass` | Flow | FLOW-02 Delivery Incidents FULL PASS → `a1e8d1e` (#153) |
-| `flow03-pass` | Flow | FLOW-03 Billing FULL PASS (tras merge FLOW03-003) |
+| `flow03-pass` | Flow | FLOW-03 Billing FULL PASS → `67a2e66` (#160) |
 
 ---
 
@@ -37,6 +39,7 @@ Hace legible el historial: **técnica** vs **dominio** vs **producto**.
 |--------|-----|
 | Gate de plataforma cerrado con evidencia (PS / FCR) | `platform-*` o hito nombrado (`ps002c-pass`) |
 | Flow runner `--live` = PASS completo + acta | `flowNN-pass` |
+| RELEASE-01 beta gate PASS (flows críticos + E2E) | `release-01-beta` (ver [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md)) |
 | Release desplegable / semver de producto | `release-vX.Y.Z` o `vX.Y.Z` |
 
 Reglas:

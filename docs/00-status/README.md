@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-07-29  
+**Última actualización:** 2026-08-02  
 **Platform v1:** ✅ **CLOSED** — [PLATFORM_V1_CLOSED](./PLATFORM_V1_CLOSED.md) · Baseline [v1](./PLATFORM_BASELINE_v1.md) · Transición [Platform → Flow DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) · COMPLETE · [Operating Model v1](./OPERATING_MODEL_v1.md) · ACTIVE  
 **Operational Core:** ✅ **LOCKED** — [CONTRACT](./OPERATIONAL_CORE_CONTRACT.md) · [DECLARED](./OPERATIONAL_CORE_DECLARED.md) · [CHANGE_AUTHORITY](./CHANGE_AUTHORITY.md)  
 **Identity Foundation:** ✅ **LOCKED v1** — [IDENTITY_FOUNDATION_LOCK_v1](./IDENTITY_FOUNDATION_LOCK_v1.md) · PR #90 · PR #91 · [orden estratégico](./STRATEGIC_ORDER_POST_IDENTITY_LOCK.md)  
@@ -8,7 +8,7 @@
 **Dev Bootstrap:** [BOOTSTRAP_MODE](./BOOTSTRAP_MODE.md) · `VITE_BOOTSTRAP_MODE` default OFF (nunca producción)  
 **Order Intake:** [ORDER_INTAKE](./ORDER_INTAKE.md) · [ADR 0017](../adr/0017-order-intake.md) · CAP-008 scaffold  
 **RI-001:** **[PROGRAM FROZEN](./RI001_PROGRAM_FROZEN.md)** · [Backlog A–I](./RI001_OPERATIONAL_READINESS_BACKLOG.md) · Evidence Gates · [P13](../20-evidence-framework/12-certification-completeness-p13.md) · **[EP-OPS-003 Journeys](./EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md)** · **[Methodology FROZEN](./EP_OPS_003_METHODOLOGY_FROZEN.md)**  
-**Fase actual:** [CURRENT_PHASE](./CURRENT_PHASE.md) ← **Flow Certification ▶ CURRENT** · [FLOW_CERTIFICATION_OPEN](./FLOW_CERTIFICATION_OPEN.md) · [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) · [FLOW_FIRST](./FLOW_FIRST.md) · [FLOW_CATALOG](./FLOW_CATALOG.md) · [PR_TAXONOMY](./PR_TAXONOMY.md)  
+**Fase actual:** [CURRENT_PHASE](./CURRENT_PHASE.md) ← **Flow Certification ▶ CURRENT** · [**PROJECT_HANDOFF**](./PROJECT_HANDOFF.md) (congelado 2026-08-02) · [**RELEASE-01 Beta**](./RELEASE_01_BETA_STRATEGY.md) (DRAFT) · [**DoRl**](./DEFINITION_OF_RELEASE.md) (DRAFT) · [FLOW_CERTIFICATION_OPEN](./FLOW_CERTIFICATION_OPEN.md) · [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) · [FLOW_FIRST](./FLOW_FIRST.md) · [FLOW_CATALOG](./FLOW_CATALOG.md) · [PR_TAXONOMY](./PR_TAXONOMY.md)  
 **Dominios:** [PROJECT_DOMAINS](./PROJECT_DOMAINS.md) — Knowledge · Engineering · Experience · Operations  
 **Engineering Phase:** [ENGINEERING_PHASE](./ENGINEERING_PHASE.md) — Complete (pending operational authorization)  
 **Última integración:** [IR-001](./IR-001_FIRST_ENGINEERING_INTEGRATION.md) · PR #22  

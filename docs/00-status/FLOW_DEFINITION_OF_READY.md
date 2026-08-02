@@ -4,6 +4,7 @@
 **Fecha:** 2026-08-02  
 **Status:** **ACTIVE** · Estándar Fase 1+ tras FLOW-01 CERTIFIED  
 **Complementa:** [EVIDENCE_BEFORE_IMPLEMENTATION](./EVIDENCE_BEFORE_IMPLEMENTATION.md) · [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) Regla 7–8 · [FLOW_DEFINITION_OF_DONE](./FLOW_DEFINITION_OF_DONE.md)  
+**Nivel producto (no Flow):** [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md) (DoRl)  
 **Referencia viva:** FLOW-01 · [PASS acta](../10-validation/flow-01/FLOW01_PASS_ACTA.md)
 
 ---

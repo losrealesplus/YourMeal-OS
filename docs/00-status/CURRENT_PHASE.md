@@ -40,19 +40,21 @@ Fase proyecto
 Sprint activo
   FLOW-01                      ✅ CERTIFIED · tag flow01-pass
   FLOW-02                      ✅ CERTIFIED · tag flow02-pass → a1e8d1e
-  Live: npm run test:flow02-canonical -- --live → PASS
-  Acta: ../10-validation/flow-02/FLOW02_PASS_ACTA.md
+  FLOW-03                      ✅ CERTIFIED · tag flow03-pass → 67a2e66
+  Live: npm run test:flow03-canonical -- --live → FULL PASS
+  Acta: ../10-validation/flow-03/FLOW03_PASS_ACTA.md
   FLOW Governance              ✅ COMPLETE (#147)
-  Tags: ps002c-pass · flow01-pass · flow02-pass
+  Tags: ps002c-pass · flow01-pass · flow02-pass · flow03-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Activo                       FLOW-03 Billing
-                               Spec ✅ FROZEN (#155)
-                               Runner ✅ (#157) · Gate FLOW03-001 ✅
-                               Domain ▶ FLOW03-003 T3 (pending → paid)
-                               → ./FLOW_03_BILLING_SPEC.md
-                               → ../10-validation/flow-03/FLOW03_PASS_ACTA.md
+  Activo                       FLOW-04 Inventory Consumption
+                               ⏳ DoR NOT STARTED · sin Spec / runner / dominio
+                               (no abrir implementación hasta Spec FROZEN + Runner)
+  Handoff                      ./PROJECT_HANDOFF.md (congelado 2026-08-02)
+  Release                      ./RELEASE_01_BETA_STRATEGY.md (DRAFT · eje B)
+  DoRl                         ./DEFINITION_OF_RELEASE.md (DRAFT · gate de versión)
+  Ejes                         A: FLOW-04+ FOPEBA · B: RELEASE-01 DoRl
   Beta paralelo: BR-03.3 Runtime Validation (G3)
-  Disciplina: una transición / PR · DoR antes de código
+  Disciplina: una transición / PR · DoR antes de código · DoRl ≠ DoR
 
 ═══════════════════════════════════════════════
 CLOSED GATE
@@ -75,11 +77,11 @@ NEXT PHASE
   ↓
   FLOW-02 ✅ FULL PASS · tag flow02-pass
   ↓
-  FLOW-03 Spec ✅ FROZEN (#155)
+  FLOW-03 ✅ FULL PASS · tag flow03-pass → 67a2e66 (#160)
   ↓
-  Runner ✅ (#157) · Gate ✅
+  FLOW-04 · DoR → Spec → Freeze → Runner (BLOCKED at T1)
   ↓
-  FLOW03-001 ✅ · FLOW03-002 ✅ → FLOW03-003 ▶ T3 → tag flow03-pass
+  FLOW04-001… (solo tras Gate)
 
 En paralelo (beta móvil EatClean):
   Lema: cada PR acerca la jornada completa del piloto.
@@ -89,7 +91,10 @@ En paralelo (beta móvil EatClean):
 
 Prohibido prematuro: Event Bus · Notifications · Jobs · Analytics · AI
 ═══════════════════════════════════════════════
-Ver: ../10-validation/flow-01/FLOW01_PASS_ACTA.md
+Ver: ./PROJECT_HANDOFF.md
+     ./RELEASE_01_BETA_STRATEGY.md
+     ./DEFINITION_OF_RELEASE.md
+     ../10-validation/flow-03/FLOW03_PASS_ACTA.md
      ./FLOW_DEFINITION_OF_READY.md
      ./EVIDENCE_BEFORE_IMPLEMENTATION.md
      ./FLOW_CATALOG.md
