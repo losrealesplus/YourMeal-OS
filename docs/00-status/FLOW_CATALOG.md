@@ -32,7 +32,7 @@ Sí: `FLOW-01 Kitchen → Delivery`.
 |----|---------|----------------------|--------|
 | **FLOW-01** | Kitchen → Delivery | ¿Kitchen entrega correctamente a Delivery? | ✅ **CERTIFIED** · [SPEC](./FLOW_01_KITCHEN_DELIVERY_SPEC.md) · [Plan](./FLOW_01_DELIVERY_PLAN.md) · [PASS acta](../10-validation/flow-01/FLOW01_PASS_ACTA.md) · `npm run test:flow01-canonical -- --live` |
 | **FLOW-02** | Delivery Incidents | ¿Un intento fallido queda operable y reintentable hasta `delivered`? | ✅ **CERTIFIED** · tag `flow02-pass` · [SPEC](./FLOW_02_DELIVERY_INCIDENTS_SPEC.md) · [PASS acta](../10-validation/flow-02/FLOW02_PASS_ACTA.md) · `npm run test:flow02-canonical -- --live` |
-| **FLOW-03** | Billing | ¿Pedidos entregados se facturan y cobran con contrato verificable? | ✅ **CERTIFIED** · tag `flow03-pass` → `67a2e66` · [SPEC](./FLOW_03_BILLING_SPEC.md) · [PASS acta](../10-validation/flow-03/FLOW03_PASS_ACTA.md) · `npm run test:flow03-canonical -- --live` |
+| **FLOW-03** | Billing | ¿Un pedido `delivered` queda facturable → revisado → cobrado? | ✅ **CERTIFIED** · tag `flow03-pass` → `67a2e66` · [SPEC](./FLOW_03_BILLING_SPEC.md) · [PASS acta](../10-validation/flow-03/FLOW03_PASS_ACTA.md) · `npm run test:flow03-canonical -- --live` |
 
 ---
 

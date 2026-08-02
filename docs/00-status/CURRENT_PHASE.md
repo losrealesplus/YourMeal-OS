@@ -50,7 +50,10 @@ Sprint activo
                                ▶ DoR document · ./FLOW_04_INVENTORY_CONSUMPTION_DOR.md
                                Spec ❌ · Runner ❌ · Domain ❌
                                Plan: ./NEXT_EXECUTION_PLAN.md
-  Ejes                         A: FLOW-04+ FOPEBA · B: RELEASE-01 DoRl (DRAFT)
+  Handoff                      ./PROJECT_HANDOFF.md (congelado 2026-08-02)
+  Release                      ./RELEASE_01_BETA_STRATEGY.md (DRAFT · eje B)
+  DoRl                         ./DEFINITION_OF_RELEASE.md (DRAFT · gate de versión)
+  Ejes                         A: FLOW-04+ FOPEBA · B: RELEASE-01 DoRl
   Beta paralelo: BR-03.3 Runtime Validation (G3)
   Disciplina: una transición / PR · DoR antes de código · DoRl ≠ DoR
 
@@ -75,11 +78,11 @@ NEXT PHASE
   ↓
   FLOW-02 ✅ FULL PASS · tag flow02-pass
   ↓
-  FLOW-03 Spec ✅ FROZEN (#155)
+  FLOW-03 ✅ FULL PASS · tag flow03-pass → 67a2e66 (#160)
   ↓
-  Runner ✅ (#157) · Gate ✅
+  FLOW-04 · DoR (#162) → Spec → Freeze → Runner (BLOCKED at T1)
   ↓
-  FLOW03-001 ✅ · FLOW03-002 ✅ → FLOW03-003 ▶ T3 → tag flow03-pass
+  FLOW04-001… (solo tras Gate)
 
 En paralelo (beta móvil EatClean):
   Lema: cada PR acerca la jornada completa del piloto.
@@ -89,7 +92,12 @@ En paralelo (beta móvil EatClean):
 
 Prohibido prematuro: Event Bus · Notifications · Jobs · Analytics · AI
 ═══════════════════════════════════════════════
-Ver: ../10-validation/flow-01/FLOW01_PASS_ACTA.md
+Ver: ./NEXT_EXECUTION_PLAN.md
+     ./FLOW_04_INVENTORY_CONSUMPTION_DOR.md
+     ./PROJECT_HANDOFF.md
+     ./RELEASE_01_BETA_STRATEGY.md
+     ./DEFINITION_OF_RELEASE.md
+     ../10-validation/flow-03/FLOW03_PASS_ACTA.md
      ./FLOW_DEFINITION_OF_READY.md
      ./EVIDENCE_BEFORE_IMPLEMENTATION.md
      ./FLOW_CATALOG.md

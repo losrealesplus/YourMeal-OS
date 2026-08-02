@@ -90,6 +90,13 @@ Igual filosofía que FCR-008 / PS-002-C:
 
 ---
 
+## Nivel producto
+
+Evidence before Implementation aplica a **Flows**.  
+Para versiones de producto (beta / release), ver [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md) (DoRl) — pregunta distinta, checklist distinto.
+
+---
+
 ## END
 
 | Campo | Valor |

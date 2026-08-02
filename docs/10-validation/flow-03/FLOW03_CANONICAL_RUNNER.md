@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW03_CANONICAL_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ Runner **ACTIVE** · Domain ▶ FLOW03-003 (T3) · FULL PASS target  
+**Estado:** ✅ Runner **ACTIVE** · Domain ✅ FULL PASS · tag `flow03-pass`  
 **Spec:** [FLOW_03_BILLING_SPEC](../../00-status/FLOW_03_BILLING_SPEC.md) **FROZEN** (#155)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)
 
@@ -118,7 +118,7 @@ Gate **verde** · FLOW03-001 abierto.
 |---------|--------|
 | FLOW03-001 T1 | ✅ `delivered` → invoice `pending` · [acta](./FLOW03_001_T1_ACTA.md) |
 | FLOW03-002 T2 | ✅ evento `reviewed_at` · status sigue `pending` · [acta](./FLOW03_002_T2_ACTA.md) |
-| FLOW03-003 T3 | ▶ `pending` → `paid` · [acta](./FLOW03_003_T3_ACTA.md) · [PASS](./FLOW03_PASS_ACTA.md) |
+| FLOW03-003 T3 | ✅ `pending` → `paid` · [acta](./FLOW03_003_T3_ACTA.md) · [PASS](./FLOW03_PASS_ACTA.md) |
 
 ---
 

@@ -3,8 +3,8 @@
 **Documento:** `NEXT_EXECUTION_PLAN.md`  
 **Fecha:** 2026-08-02  
 **Estado:** ACTIVE · plan de ejecución post–FLOW-03  
-**Baseline:** `main` · `67a2e66` · tags `ps002c-pass` · `flow01-pass` · `flow02-pass` · `flow03-pass`  
-**Entrada canónica (cuando esté en main):** [PROJECT_HANDOFF](./PROJECT_HANDOFF.md) · [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) · [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md)  
+**Baseline:** `main` · post–#161 governance · tags `ps002c-pass` · `flow01-pass` · `flow02-pass` · `flow03-pass`  
+**Entrada canónica:** [PROJECT_HANDOFF](./PROJECT_HANDOFF.md) · [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) · [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md)  
 **DoR estándar:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md)
 
 > FLOW-03 is CLOSED.  
@@ -20,8 +20,8 @@ PS-002C                       ✅  ps002c-pass
 FLOW-01                       ✅  flow01-pass
 FLOW-02                       ✅  flow02-pass
 FLOW-03                       ✅  flow03-pass
-FLOW-04                       ⏳  DoR (este track)
-RELEASE-01                    DRAFT  (eje B · docs #161+)
+FLOW-04                       ▶  DoR document (#162)
+RELEASE-01                    DRAFT  (eje B · #161 en main)
 Definition of Release         DRAFT  (DoRl)
 ```
 
@@ -139,6 +139,17 @@ release-1.0
 ```
 
 Goal: demonstrate that FOPEBA **scales**, not only that it works once.
+
+### Post–FLOW-04 (candidatos · no abrir ahora)
+
+Tras `flow04-pass`, valorar `FOPEBA_METRICS.md` — métricas del **proceso**, no del negocio:
+
+- Tiempo DoR → Freeze · Freeze → Runner · Runner → `flowNN-pass`  
+- PRs por FLOW · regresiones detectadas por runners  
+- Cambios de Spec post-Freeze (ideal: 0)  
+- Cobertura flows certificados / catálogo  
+
+No forma parte de este PR ni de la Spec.
 
 ---
 

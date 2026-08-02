@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW_03_BILLING_SPEC.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **FROZEN** (#155 · `main`) · I7 + review-as-event · runner ▶ #156 · sin dominio  
+**Estado:** ✅ **CERTIFIED** · tag `flow03-pass` → `67a2e66` · Spec FROZEN (#155) · FULL PASS (#160)  
 
 **Precondición:** FLOW-02 ✅ CERTIFIED · tag `flow02-pass` · [FLOW02_PASS_ACTA](../10-validation/flow-02/FLOW02_PASS_ACTA.md)  
 **DoR:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md)  
@@ -504,11 +504,11 @@ Separación de responsabilidades (sin mezclar en un mismo PR):
 
 | Fase | Trabajo | Estado |
 |------|---------|--------|
-| 1 | Spec (#155) | ✅ **FROZEN** en `main` |
-| 2 | Runner canónico (#156 · BLOCKED at T1 · sin dominio) | ▶ este PR |
-| 3 | **Gate FLOW03-001** (4 condiciones desde `main`) | ⏳ tras merge runner |
-| 4 | FLOW03-001…003 (una transición / PR) | ⏳ bloqueado por Gate |
-| 5 | FULL PASS · tag `flow03-pass` | ⏳ |
+| 1 | Spec (#155) | ✅ **FROZEN** |
+| 2 | Runner canónico (#157) | ✅ |
+| 3 | Gate FLOW03-001 | ✅ |
+| 4 | FLOW03-001…003 (#158–#160) | ✅ |
+| 5 | FULL PASS · tag `flow03-pass` → `67a2e66` | ✅ |
 
 ---
 
