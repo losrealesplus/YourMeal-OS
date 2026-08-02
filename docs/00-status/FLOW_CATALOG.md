@@ -30,7 +30,7 @@ Sí: `FLOW-01 Kitchen → Delivery`.
 
 | ID | Handoff | Pregunta operacional | Estado |
 |----|---------|----------------------|--------|
-| **FLOW-01** | Kitchen → Delivery | ¿Kitchen entrega correctamente a Delivery? | ✅ Spec FROZEN · ✅ Runner · ▶ **FLOW01-001 T1 PASS** (BLOCKED at T2) · [SPEC](./FLOW_01_KITCHEN_DELIVERY_SPEC.md) · [Plan](./FLOW_01_DELIVERY_PLAN.md) |
+| **FLOW-01** | Kitchen → Delivery | ¿Kitchen entrega correctamente a Delivery? | ✅ Spec · ✅ Runner · ✅ T1 · ▶ **T2 PASS** (BLOCKED at T3) · [SPEC](./FLOW_01_KITCHEN_DELIVERY_SPEC.md) · [Plan](./FLOW_01_DELIVERY_PLAN.md) |
 | **FLOW-02** | Delivery → Support | ¿Delivery deja a Support con contexto usable? | ⏳ NOT STARTED |
 | **FLOW-03** | Support → Accounting | ¿Support cierra hacia registros financieros coherentes? | ⏳ NOT STARTED |
 

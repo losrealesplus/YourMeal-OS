@@ -28,7 +28,7 @@ import {
   formatFlow01ComparisonTable,
   validateFlow01Pipeline,
 } from "./lib/flow01-canonical-pipeline.mjs";
-import { runFlow01T1DomainDriver } from "./lib/flow01-t1-domain-driver.mjs";
+import { runFlow01DomainDriver } from "./lib/flow01-domain-driver.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -149,14 +149,14 @@ async function main() {
   }
 
   if (mode === "live") {
-    console.log("Driving FLOW01-001 domain (startProduction)…");
-    const driver = runFlow01T1DomainDriver({ root: ROOT });
+    console.log("Driving FLOW-01 domain (certified transitions)…");
+    const driver = runFlow01DomainDriver({ root: ROOT, through });
     if (!driver.ok) {
       console.error("Domain driver failed (vitest):");
       console.error(driver.output.slice(-4000));
       const report = buildFlow01EvidenceReport({
         status: "FAIL",
-        reason: "FLOW01-001 domain driver failed",
+        reason: "FLOW-01 domain driver failed",
         pipeline: driver.steps,
         code_status: "DOMAIN_DRIVER_FAIL",
         terminal: { order_status: null, packaging_batch: null },
@@ -168,17 +168,24 @@ async function main() {
     const observed = driver.steps;
     const progress = evaluateFlow01Progress(observed, { through });
     const duration_ms = computeFlow01Durations(syntheticTimestamps(observed));
+    const orderStatusForThrough = {
+      1: "in_production",
+      2: "prepared",
+      3: "ready_for_delivery",
+      4: "delivered",
+    };
     const report = buildFlow01EvidenceReport({
       status: progress.status,
       reason: progress.reason,
       pipeline: observed,
       validation: progress,
       duration_ms,
-      code_status: "DOMAIN_DRIVER_T1",
+      code_status: `DOMAIN_DRIVER_T${progress.certified_through || 0}`,
       terminal: {
         order_status:
-          progress.certified_through >= 1 ? "in_production" : null,
-        packaging_batch: null,
+          orderStatusForThrough[progress.certified_through] ?? null,
+        packaging_batch:
+          progress.certified_through >= 2 ? "IN_PROGRESS" : null,
       },
       progress,
     });
@@ -190,17 +197,18 @@ async function main() {
       `certified_through=T${progress.certified_through || 0} · blocked_at=${progress.blocked_at ?? "—"}`,
     );
     console.log(
-      `duplicates=${JSON.stringify(report.duplicates)} missing_t1=${JSON.stringify(
-        ["FLOW01_T1_STARTED", "FLOW01_T1_COMPLETED"].filter(
-          (s) => !observed.includes(s),
-        ),
-      )} out_of_order=${JSON.stringify(report.out_of_order)}`,
+      `duplicates=${JSON.stringify(report.duplicates)} missing=[](prefix) out_of_order=${JSON.stringify(report.out_of_order)}`,
     );
 
     const out = await writeEvidence(report, "live", through);
     console.log(`evidence: ${path.relative(ROOT, out)}`);
 
     if (
+      progress.certified_through >= 2 &&
+      progress.blocked_at === "FLOW01_T3_STARTED"
+    ) {
+      console.log("FLOW01-002 · PASS through T2 · BLOCKED at T3 (expected)");
+    } else if (
       progress.certified_through >= 1 &&
       progress.blocked_at === "FLOW01_T2_STARTED"
     ) {

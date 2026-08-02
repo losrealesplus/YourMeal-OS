@@ -19,10 +19,17 @@ import {
   canOperateKitchen,
 } from "@/modules/bootstrap-integrity";
 import {
+  assertFlow01Prefix,
   beginFlow01Pipeline,
+  hasFlow01Step,
   logFlow01Step,
   stopFlow01,
 } from "./flow01-evidence";
+import {
+  getPackagingBatch,
+  startPackagingBatch,
+  type PackagingBatch,
+} from "../domain/packaging-batch";
 
 export const OperationsService = {
   /**
@@ -35,6 +42,90 @@ export const OperationsService = {
     orderId: string,
   ): Promise<OperationalOrderStatus> {
     return this.transitionKitchen(ctx, orderId, "in_production");
+  },
+
+  /**
+   * FLOW-01 T2 · Spec `completeProduction`
+   * Production complete: in_production → prepared
+   * Emits FLOW01_T2_STARTED (T2_COMPLETED follows startPackaging).
+   */
+  async completeProduction(
+    ctx: ServiceContext,
+    orderId: string,
+  ): Promise<OperationalOrderStatus> {
+    return this.transitionKitchen(ctx, orderId, "prepared");
+  },
+
+  /**
+   * FLOW-01 T2 · Spec `startPackaging`
+   * Opens PackagingBatch IN_PROGRESS for a prepared order.
+   * Emits FLOW01_T2_COMPLETED. Requires T1 + T2_STARTED.
+   */
+  async startPackaging(
+    ctx: ServiceContext,
+    orderId: string,
+  ): Promise<{ status: OperationalOrderStatus; batch: PackagingBatch }> {
+    requireCapability(ctx.roles, "kitchen.operate");
+    if (!orderId) {
+      throw new DomainError("INVALID_STATE", "orderId required");
+    }
+
+    try {
+      assertFlow01Prefix(["FLOW01_T1_STARTED", "FLOW01_T1_COMPLETED"]);
+    } catch {
+      throw new DomainError(
+        "INVALID_STATE",
+        "FLOW01-002 requires T1 COMPLETED before packaging",
+      );
+    }
+
+    if (!hasFlow01Step("FLOW01_T2_STARTED")) {
+      throw new DomainError(
+        "INVALID_STATE",
+        "FLOW01-002 requires completeProduction (T2_STARTED) before startPackaging",
+      );
+    }
+
+    const repo = createOperationsRepository(ctx.supabase, ctx.tenantId);
+    const current = await repo.getOrder(orderId);
+    if (!current) {
+      throw new DomainError("NOT_FOUND", `Order not found: ${orderId}`);
+    }
+    if (current.status !== "prepared") {
+      throw new DomainError(
+        "INVALID_STATE",
+        `startPackaging requires prepared · got ${current.status}`,
+      );
+    }
+
+    let batch: PackagingBatch;
+    try {
+      batch = startPackagingBatch({
+        tenantId: ctx.tenantId,
+        orderId,
+      });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "packaging failed";
+      stopFlow01("T2_PACKAGING_FAILED", { orderId, message });
+      throw new DomainError("INVALID_STATE", message);
+    }
+
+    logFlow01Step("FLOW01_T2_COMPLETED", {
+      orderId,
+      orderStatus: current.status,
+      packagingBatchId: batch.id,
+      packagingBatchStatus: batch.status,
+    });
+
+    return { status: current.status, batch };
+  },
+
+  /** Read-only helper for tests / evidence. */
+  getPackagingBatchForOrder(
+    ctx: ServiceContext,
+    orderId: string,
+  ): PackagingBatch | null {
+    return getPackagingBatch(ctx.tenantId, orderId);
   },
 
   async listKitchenOrders(
@@ -160,9 +251,30 @@ export const OperationsService = {
       current.status === "confirmed" &&
       toStatus === "in_production";
 
+    const isFlow01T2Start =
+      workspace === "kitchen" &&
+      current.status === "in_production" &&
+      toStatus === "prepared";
+
     if (isFlow01T1) {
       beginFlow01Pipeline({ orderId, tenantId: ctx.tenantId });
       logFlow01Step("FLOW01_T1_STARTED", {
+        orderId,
+        from: current.status,
+        to: toStatus,
+      });
+    }
+
+    if (isFlow01T2Start) {
+      try {
+        assertFlow01Prefix(["FLOW01_T1_STARTED", "FLOW01_T1_COMPLETED"]);
+      } catch {
+        throw new DomainError(
+          "INVALID_STATE",
+          "FLOW01-002 requires T1 COMPLETED before completeProduction",
+        );
+      }
+      logFlow01Step("FLOW01_T2_STARTED", {
         orderId,
         from: current.status,
         to: toStatus,
@@ -194,6 +306,11 @@ export const OperationsService = {
     } catch (e) {
       if (isFlow01T1) {
         stopFlow01("T1_FAILED", {
+          orderId,
+          message: e instanceof Error ? e.message : "transition failed",
+        });
+      } else if (isFlow01T2Start) {
+        stopFlow01("T2_FAILED", {
           orderId,
           message: e instanceof Error ? e.message : "transition failed",
         });
