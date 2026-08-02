@@ -298,9 +298,9 @@ tag (futuro): release-e2e-pass
 | 0 | DoR document | ✅ #185 · `48e0c5c` |
 | 1 | Spec | ✅ FROZEN #186 · [RELEASE_E2E_SPEC](./RELEASE_E2E_SPEC.md) |
 | 2 | Freeze (merge Spec → main) | ✅ |
-| 3 | Runner only · BLOCKED at E1 | ▶ este ciclo |
-| 4 | Gate E2E-001 (Land Check) | ⏳ tras merge Runner |
-| 5 | RELEASE-E2E-001…004 (un segmento / PR) | ⏳ |
+| 3 | Runner only · BLOCKED at E1 | ✅ #188 · `d2a4047` |
+| 4 | Gate E2E-001 (Land Check) | ✅ READY |
+| 5 | RELEASE-E2E-001…004 (un segmento / PR) | ⏳ READY TO OPEN 001 |
 | 6 | FULL PASS · tag `release-e2e-pass` | ⏳ |
 
 ---
