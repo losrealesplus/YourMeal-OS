@@ -6,15 +6,15 @@
  * Modes:
  *   (default)     Empty pipeline → BLOCKED (runner-only, no domain).
  *   --self-test   Validate frozen full contract (synthetic PASS).
+ *   --live        Evaluate domain observations (progressive BLOCKED/PASS/FAIL).
  *   --pipeline=a,b,c   Validate an explicit observed step list.
  *   --through=T1|T2|T3   Scope delivery FLOW02-001..003 (prefix PASS).
  *
  *   npm run test:flow02-canonical
- *   npm run test:flow02-canonical -- --self-test
- *   npm run test:flow02-canonical -- --pipeline=FLOW02_T1_STARTED,FLOW02_T1_COMPLETED --through=T1
+ *   npm run test:flow02-canonical -- --live --through=T1
+ *   npm run test:flow02-001
  *
  * Spec: docs/00-status/FLOW_02_DELIVERY_INCIDENTS_SPEC.md
- * No domain / repositories / UI in this runner PR.
  */
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -29,12 +29,19 @@ import {
   formatFlow02ComparisonTable,
   validateFlow02Pipeline,
 } from "./lib/flow02-canonical-pipeline.mjs";
+import { runFlow02DomainDriver } from "./lib/flow02-domain-driver.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const EVIDENCE_DIR = path.join(ROOT, "docs/10-validation/flow-02/evidence");
 
 function evidencePathFor(mode, through) {
+  if (mode === "live" && through) {
+    return path.join(EVIDENCE_DIR, `flow02-00${through}-canonical-live.json`);
+  }
+  if (mode === "live") {
+    return path.join(EVIDENCE_DIR, "flow02-canonical-live.json");
+  }
   if (through) {
     return path.join(EVIDENCE_DIR, `flow02-00${through}-canonical.json`);
   }
@@ -51,7 +58,8 @@ function parseArgs(argv) {
   /** @type {1|2|3 | null} */
   let through = null;
   for (const a of argv) {
-    if (a === "--self-test") mode = "self-test";
+    if (a === "--live") mode = "live";
+    else if (a === "--self-test") mode = "self-test";
     else if (a.startsWith("--pipeline=")) {
       mode = "pipeline";
       pipelineArg = a
@@ -133,6 +141,71 @@ async function main() {
 
     const out = await writeEvidence(report, mode, through);
     console.log(`evidence: ${path.relative(ROOT, out)}`);
+    process.exit(exitFor(progress));
+  }
+
+  if (mode === "live") {
+    console.log("Driving FLOW-02 domain (certified transitions)…");
+    const driver = runFlow02DomainDriver({ root: ROOT, through });
+    if (!driver.ok) {
+      console.error("Domain driver failed (vitest):");
+      console.error(driver.output.slice(-4000));
+      const report = buildFlow02EvidenceReport({
+        status: "FAIL",
+        reason: "FLOW-02 domain driver failed",
+        pipeline: driver.steps,
+        code_status: "DOMAIN_DRIVER_FAIL",
+        terminal: { order_status: null },
+        evidence: {},
+      });
+      await writeEvidence(report, "live", through);
+      process.exit(FLOW02_EXIT.FAIL);
+    }
+
+    const observed = driver.steps;
+    const progress = evaluateFlow02Progress(observed, { through });
+    const duration_ms = computeFlow02Durations(syntheticTimestamps(observed));
+    const orderStatusForThrough = {
+      1: "delivery_issue",
+      2: "out_for_delivery",
+      3: "delivered",
+    };
+    const report = buildFlow02EvidenceReport({
+      status: progress.status,
+      reason: progress.reason,
+      pipeline: observed,
+      validation: progress,
+      duration_ms,
+      code_status: `DOMAIN_DRIVER_T${progress.certified_through || 0}`,
+      terminal: {
+        order_status:
+          orderStatusForThrough[progress.certified_through] ?? null,
+      },
+      progress,
+      evidence: {},
+    });
+
+    console.log(formatFlow02ComparisonTable(progress));
+    console.log("");
+    console.log(progress.reason);
+    console.log(
+      `certified_through=T${progress.certified_through || 0} · blocked_at=${progress.blocked_at ?? "—"}`,
+    );
+    console.log(
+      `duplicates=${JSON.stringify(report.duplicates)} missing=${JSON.stringify(report.missing)} out_of_order=${JSON.stringify(report.out_of_order)}`,
+    );
+
+    const out = await writeEvidence(report, "live", through);
+    console.log(`evidence: ${path.relative(ROOT, out)}`);
+
+    if (progress.status === "PASS" && progress.certified_through >= 3) {
+      console.log("FLOW-02 · FULL PASS · Delivery Incidents certified");
+    } else if (
+      progress.certified_through >= 1 &&
+      progress.blocked_at === "FLOW02_T2_STARTED"
+    ) {
+      console.log("FLOW02-001 · PASS through T1 · BLOCKED at T2 (expected)");
+    }
     process.exit(exitFor(progress));
   }
 

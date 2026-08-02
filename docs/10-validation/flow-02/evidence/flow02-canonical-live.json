@@ -1,0 +1,45 @@
+{
+  "status": "BLOCKED",
+  "reason": "PASS through T1 · BLOCKED at FLOW02_T2_STARTED",
+  "gate": "FLOW-02",
+  "contract": "FLOW_02_DELIVERY_INCIDENTS_SPEC",
+  "principle": "Evidence before Implementation",
+  "code_status": "DOMAIN_DRIVER_T1",
+  "at": "2026-08-02T13:56:04.291Z",
+  "pipeline": [
+    "FLOW02_T1_STARTED",
+    "FLOW02_T1_COMPLETED"
+  ],
+  "expected": [
+    "FLOW02_T1_STARTED",
+    "FLOW02_T1_COMPLETED",
+    "FLOW02_T2_STARTED",
+    "FLOW02_T2_COMPLETED",
+    "FLOW02_T3_STARTED",
+    "FLOW02_T3_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [
+    "FLOW02_T2_STARTED",
+    "FLOW02_T2_COMPLETED",
+    "FLOW02_T3_STARTED",
+    "FLOW02_T3_COMPLETED"
+  ],
+  "out_of_order": [],
+  "firstFailure": "FLOW02_T2_STARTED",
+  "certified_through": 1,
+  "blocked_at": "FLOW02_T2_STARTED",
+  "delivery": "FLOW02-001",
+  "delivery_status": "PASS",
+  "flow_status": "BLOCKED",
+  "terminal": {
+    "order_status": "delivery_issue"
+  },
+  "evidence": {},
+  "duration_ms": {
+    "t1_ms": 15,
+    "t2_ms": null,
+    "t3_ms": null,
+    "flow_total_ms": null
+  }
+}

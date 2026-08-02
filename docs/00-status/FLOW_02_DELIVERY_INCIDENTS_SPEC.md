@@ -277,8 +277,9 @@ Si algún ítem quedara abierto → **no Freeze** · no runner.
 | Fase | Trabajo | Estado |
 |------|---------|--------|
 | 1 | Spec (#148) | ✅ **FROZEN** |
-| 2 | Runner canónico (`test:flow02-canonical` · BLOCKED at T1) | ▶ |
-| 3 | FLOW02-001…003 (una transición / PR) | ⏳ |
+| 2 | Runner canónico (`test:flow02-canonical` · BLOCKED at T1) | ✅ (#150) |
+| 3 | FLOW02-001 T1 | ▶ |
+| 4 | FLOW02-002…003 | ⏳ |
 
 ---
 

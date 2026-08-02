@@ -37,7 +37,7 @@ Sí: `FLOW-01 Kitchen → Delivery`.
 
 | ID | Handoff / alcance | Prioridad | Motivo | Estado |
 |----|-------------------|-----------|--------|--------|
-| **FLOW-02** | Delivery Incidents | Muy alta | Excepciones reales justo después del happy path | Spec ✅ FROZEN · [SPEC](./FLOW_02_DELIVERY_INCIDENTS_SPEC.md) · [Runner](../10-validation/flow-02/FLOW02_CANONICAL_RUNNER.md) ▶ · dominio ⏳ |
+| **FLOW-02** | Delivery Incidents | Muy alta | Excepciones reales justo después del happy path | Spec ✅ · Runner ✅ · [SPEC](./FLOW_02_DELIVERY_INCIDENTS_SPEC.md) · dominio ▶ FLOW02-001 T1 |
 | **FLOW-03** | Billing | Alta | Facturación desacoplada del happy path | ⏳ DoR NOT STARTED |
 | **FLOW-04** | Inventory Consumption | Alta | Consumo de ingredientes tras producción | ⏳ DoR NOT STARTED |
 | **FLOW-05** | Customer Order Lifecycle | Media | Creación del pedido → `confirmed` | ⏳ DoR NOT STARTED |

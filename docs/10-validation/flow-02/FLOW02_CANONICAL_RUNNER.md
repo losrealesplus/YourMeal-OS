@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW02_CANONICAL_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ Runner contract **ACTIVE** · Domain ⏳ (FLOW02-001…)  
+**Estado:** ✅ Runner contract **ACTIVE** · Domain ▶ FLOW02-001 (T1)  
 **Spec:** [FLOW_02_DELIVERY_INCIDENTS_SPEC](../../00-status/FLOW_02_DELIVERY_INCIDENTS_SPEC.md) **FROZEN** (PR #148)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)
 
@@ -79,7 +79,12 @@ JSON: `docs/10-validation/flow-02/evidence/flow02-canonical.json`
 # Self-test del contrato completo (sintético · sin dominio)
 npm run test:flow02-canonical -- --self-test
 
-# Entrega incremental (FLOW02-001..003) — cuando exista dominio
+# Live dominio (FLOW02-001…)
+npm run test:flow02-001
+npm run test:flow02-canonical -- --live --through=T1
+# → PASS through T1 · BLOCKED at FLOW02_T2_STARTED · exit 0
+
+# Pipeline explícito
 npm run test:flow02-canonical -- --pipeline=FLOW02_T1_STARTED,FLOW02_T1_COMPLETED --through=T1
 
 # Unit tests del validador
@@ -88,13 +93,15 @@ npm run test:flow02-canonical:unit
 
 ---
 
-## Fuera de este runner
+## Dominio (incremental)
 
-- DeliveryIssueRepository · RPC · tablas nuevas  
-- UI · formularios · mutations  
-- Casos de negocio / dominio  
+| Entrega | Estado |
+|---------|--------|
+| FLOW02-001 T1 | ▶ `out_for_delivery` → `delivery_issue` |
+| FLOW02-002 T2 | ⏳ retry |
+| FLOW02-003 T3 | ⏳ delivered |
 
-→ pertenecen a **FLOW02-001** en adelante.
+Sin redefinir el contrato del runner.
 
 ---
 

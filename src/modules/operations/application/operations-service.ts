@@ -26,6 +26,11 @@ import {
   stopFlow01,
 } from "./flow01-evidence";
 import {
+  beginFlow02Pipeline,
+  logFlow02Step,
+  stopFlow02,
+} from "./flow02-evidence";
+import {
   completePackagingBatch,
   getPackagingBatch,
   startPackagingBatch,
@@ -467,6 +472,12 @@ export const OperationsService = {
       current.status === "in_production" &&
       toStatus === "prepared";
 
+    /** FLOW-02 T1 · out_for_delivery → delivery_issue */
+    const isFlow02T1 =
+      workspace === "delivery" &&
+      current.status === "out_for_delivery" &&
+      toStatus === "delivery_issue";
+
     if (isFlow01T1) {
       beginFlow01Pipeline({ orderId, tenantId: ctx.tenantId });
       logFlow01Step("FLOW01_T1_STARTED", {
@@ -486,6 +497,15 @@ export const OperationsService = {
         );
       }
       logFlow01Step("FLOW01_T2_STARTED", {
+        orderId,
+        from: current.status,
+        to: toStatus,
+      });
+    }
+
+    if (isFlow02T1) {
+      beginFlow02Pipeline({ orderId, tenantId: ctx.tenantId });
+      logFlow02Step("FLOW02_T1_STARTED", {
         orderId,
         from: current.status,
         to: toStatus,
@@ -513,6 +533,12 @@ export const OperationsService = {
           status: next,
         });
       }
+      if (isFlow02T1) {
+        logFlow02Step("FLOW02_T1_COMPLETED", {
+          orderId,
+          status: next,
+        });
+      }
       return next;
     } catch (e) {
       if (isFlow01T1) {
@@ -522,6 +548,11 @@ export const OperationsService = {
         });
       } else if (isFlow01T2Start) {
         stopFlow01("T2_FAILED", {
+          orderId,
+          message: e instanceof Error ? e.message : "transition failed",
+        });
+      } else if (isFlow02T1) {
+        stopFlow02("T1_FAILED", {
           orderId,
           message: e instanceof Error ? e.message : "transition failed",
         });
