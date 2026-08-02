@@ -140,18 +140,20 @@ FOUNDATION → PS-002-C → FLOW-01 → FLOW-02 → FLOW-03
 
 | PR | Rol |
 |----|-----|
-| [#161](https://github.com/losrealesplus/YourMeal-OS/pull/161) | Roadmap consolidation · FLOW-03 CERTIFIED · preparar FLOW-04 DoR · **docs only** |
+| [#162](https://github.com/losrealesplus/YourMeal-OS/pull/162) | FLOW-04 DoR document · [NEXT_EXECUTION_PLAN](./NEXT_EXECUTION_PLAN.md) · **docs only** |
+| #161 | ✅ MERGED · handoff · RELEASE-01 · DoRl DRAFT |
 
 ---
 
 ## Next flow · FLOW-04
 
-**NOT OPEN** · Implementation **forbidden**.
+**DoR document** ▶ [#162](https://github.com/losrealesplus/YourMeal-OS/pull/162) · [FLOW_04_INVENTORY_CONSUMPTION_DOR](./FLOW_04_INVENTORY_CONSUMPTION_DOR.md)  
+Implementation **forbidden** until Spec FROZEN + Runner BLOCKED verified.
 
 Gate:
 
 ```text
-Definition of Ready
+Definition of Ready  (▶ #162)
         ↓
 Specification
         ↓
@@ -164,7 +166,7 @@ Gate verification from main
 FLOW04-001 (una transición)
 ```
 
-### Primer PR de FLOW-04 (permitido)
+### Primer PR de FLOW-04 (DoR)
 
 DoR · alcance · checklist · estados · invariantes · tokens canónicos · PASS/BLOCKED · evidencia · Gate.
 

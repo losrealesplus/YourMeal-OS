@@ -2,11 +2,12 @@
 
 **Documento:** `FLOW_CATALOG.md`  
 **Fecha:** 2026-08-02  
-**Estado:** FLOW-01 ✅ · FLOW-02 ✅ · FLOW-03 ✅ · FLOW-04 ⏳ DoR · DoR ✅ (#147)  
+**Estado:** FLOW-01 ✅ · FLOW-02 ✅ · FLOW-03 ✅ · FLOW-04 ▶ DoR · DoR estándar ✅ (#147)  
 **Piloto:** EatClean  
 **Fase:** 1 · Domain / Flow (Fase 0 · Plataforma COMPLETE)  
 **Plataforma:** PS-002-C ✅ · FCR-008 FROZEN · tag `ps002c-pass`  
-**Dominio:** FLOW-01 ✅ `flow01-pass` · FLOW-02 ✅ `flow02-pass` · FLOW-03 ✅ `flow03-pass`  
+**Dominio:** FLOW-01…03 ✅ `flow01-pass` · `flow02-pass` · `flow03-pass`  
+**Plan:** [NEXT_EXECUTION_PLAN](./NEXT_EXECUTION_PLAN.md)  
 **Estándar:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) · [Evidence before Implementation](./EVIDENCE_BEFORE_IMPLEMENTATION.md)
 
 ---
@@ -35,11 +36,11 @@ Sí: `FLOW-01 Kitchen → Delivery`.
 
 ---
 
-## Candidatos (prioridad · sin Implementation hasta DoR)
+## Activo / candidatos (sin Implementation hasta DoR completo)
 
 | ID | Handoff / alcance | Prioridad | Motivo | Estado |
 |----|-------------------|-----------|--------|--------|
-| **FLOW-04** | Inventory Consumption | Alta | Consumo de ingredientes tras producción | ⏳ DoR NOT STARTED |
+| **FLOW-04** | Inventory Consumption | Alta | Consumo de ingredientes tras producción | ▶ **DoR document** · [FLOW_04_INVENTORY_CONSUMPTION_DOR](./FLOW_04_INVENTORY_CONSUMPTION_DOR.md) · Spec/Runner ❌ |
 | **FLOW-05** | Customer Order Lifecycle | Media | Creación del pedido → `confirmed` | ⏳ DoR NOT STARTED |
 | **FLOW-06** | Kitchen Planning | Media | Planificación previa a T1 | ⏳ DoR NOT STARTED |
 

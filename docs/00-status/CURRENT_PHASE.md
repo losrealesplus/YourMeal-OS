@@ -47,8 +47,9 @@ Sprint activo
   Tags: ps002c-pass · flow01-pass · flow02-pass · flow03-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
   Activo                       FLOW-04 Inventory Consumption
-                               ⏳ DoR NOT STARTED · sin Spec / runner / dominio
-                               (no abrir implementación hasta Spec FROZEN + Runner)
+                               ▶ DoR document · ./FLOW_04_INVENTORY_CONSUMPTION_DOR.md
+                               Spec ❌ · Runner ❌ · Domain ❌
+                               Plan: ./NEXT_EXECUTION_PLAN.md
   Handoff                      ./PROJECT_HANDOFF.md (congelado 2026-08-02)
   Release                      ./RELEASE_01_BETA_STRATEGY.md (DRAFT · eje B)
   DoRl                         ./DEFINITION_OF_RELEASE.md (DRAFT · gate de versión)
@@ -79,7 +80,7 @@ NEXT PHASE
   ↓
   FLOW-03 ✅ FULL PASS · tag flow03-pass → 67a2e66 (#160)
   ↓
-  FLOW-04 · DoR → Spec → Freeze → Runner (BLOCKED at T1)
+  FLOW-04 · DoR (#162) → Spec → Freeze → Runner (BLOCKED at T1)
   ↓
   FLOW04-001… (solo tras Gate)
 
@@ -91,7 +92,9 @@ En paralelo (beta móvil EatClean):
 
 Prohibido prematuro: Event Bus · Notifications · Jobs · Analytics · AI
 ═══════════════════════════════════════════════
-Ver: ./PROJECT_HANDOFF.md
+Ver: ./NEXT_EXECUTION_PLAN.md
+     ./FLOW_04_INVENTORY_CONSUMPTION_DOR.md
+     ./PROJECT_HANDOFF.md
      ./RELEASE_01_BETA_STRATEGY.md
      ./DEFINITION_OF_RELEASE.md
      ../10-validation/flow-03/FLOW03_PASS_ACTA.md
