@@ -29,8 +29,14 @@ Mobile Foundation (MF-001)  ✅ Cimientos CLOSED
   → BETA_READINESS_CHECKPOINT.md
   → Foco: Product CTO · jornada EatClean
 
+Fase proyecto
+  0 · Plataforma              ✅ COMPLETE
+  1 · Domain / Flow           ▶ ACTIVA (FLOW-01)
+
 Sprint activo
-  NEXT: FLOW-01 Spec freeze (PR #141)
+  FLOW-01 Spec READY FOR FREEZE (PR #141)
+  Gaps cerrados: PackagingBatch lifecycle · T4 = delivered
+  Siguiente post-merge Spec: test:flow01-canonical
   Acta PS-002-C: ../10-validation/platform-stabilization/PS002C_PASS_ACTA.md
   Tag restauración: ps002c-pass → 545bd19
   Beta paralelo: BR-03.3 Runtime Validation (G3)
