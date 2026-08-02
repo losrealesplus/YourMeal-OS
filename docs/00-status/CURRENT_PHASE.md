@@ -50,13 +50,12 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    Track B › RELEASE-DEPLOY-001 (D1 only)
+  Prioridad                    Track B › RELEASE-DEPLOY-001 (D1 · este PR)
                                RELEASE-E2E ✅ CERTIFIED · tag release-e2e-pass → 73623ae
-                               DoR ✅ #197 · Spec ✅ FROZEN #198 · Runner ✅ #200 → 1008ffd
-                               Gate ✅ READY · Land Check BLOCKED at D1 from main
-                               → ../10-validation/release-deploy/RELEASE_DEPLOY_GATE.md
-                               READY TO OPEN Deploy-001 only (no D2/D3)
-                               No Rollback · FLOW-05 · release-01-beta
+                               DoR ✅ #197 · Spec ✅ · Runner ✅ #200 · Gate ✅ #201
+                               npm run test:release-deploy → PASS through D1 · BLOCKED at D2
+                               → ../10-validation/release-deploy/RELEASE_DEPLOY_001_D1_ACTA.md
+                               No D2/D3 · Rollback · FLOW-05 · release-01-beta
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)
   Land Check                   ./FOPEBA_LAND_CHECK.md (antes de cualquier 001)

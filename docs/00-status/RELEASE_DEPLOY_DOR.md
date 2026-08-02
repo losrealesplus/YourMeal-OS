@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_DEPLOY_DOR.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **DoR CERTIFIED** (`main` · #197 · `e5bd8c5`) · Spec ✅ [FROZEN](./RELEASE_DEPLOY_SPEC.md) (#198 · `ef447e2`) · Runner ✅ #200 · `1008ffd` · Gate ✅ [READY](../10-validation/release-deploy/RELEASE_DEPLOY_GATE.md)  
+**Estado:** ✅ **DoR CERTIFIED** (`main` · #197 · `e5bd8c5`) · Spec ✅ [FROZEN](./RELEASE_DEPLOY_SPEC.md) (#198) · Runner ✅ #200 · Gate ✅ #201 · 001 ▶ [ACTA](../10-validation/release-deploy/RELEASE_DEPLOY_001_D1_ACTA.md)  
 **Nivel:** Release Track B · B-04 Deployment  
 **Pregunta (única):** ¿Qué debe certificar RELEASE-DEPLOY antes de considerar el despliegue reproducible y listo para Rollback?  
 **Estándar Flow Ready:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) (mismo ciclo FOPEBA)  
@@ -93,10 +93,10 @@ RELEASE-DEPLOY (B-04)
 ☑ SPEC lista (READY FOR FREEZE)            → [RELEASE_DEPLOY_SPEC](./RELEASE_DEPLOY_SPEC.md)
 ☑ Spec FROZEN en main                      → #198 · `ef447e2`
 ☑ Runner creado (BLOCKED baseline)         → ✅ #200 · `1008ffd` · [RUNNER](../10-validation/release-deploy/RELEASE_DEPLOY_RUNNER.md)
-☑ READY TO OPEN RELEASE-DEPLOY-001         → ✅ Gate READY · [GATE](../10-validation/release-deploy/RELEASE_DEPLOY_GATE.md)
+☑ READY TO OPEN RELEASE-DEPLOY-001         → ✅ Gate READY #201 · 001 ▶ [ACTA](../10-validation/release-deploy/RELEASE_DEPLOY_001_D1_ACTA.md)
 ```
 
-**DoR CERTIFIED** · Spec ✅ FROZEN · Runner ✅ · Gate ✅ READY → **OPEN Deploy-001 (D1 only)**.  
+**DoR CERTIFIED** · Spec ✅ · Runner ✅ · Gate ✅ · **001 D1 ▶ este PR**.  
 **No** D2/D3 · Rollback · FLOW-05 · `release-01-beta` en Deploy-001.
 
 ---
@@ -110,7 +110,7 @@ RELEASE-DEPLOY (B-04)
 | 2 | Freeze (merge Spec → main) | ✅ |
 | 3 | Runner only · BLOCKED at D1 | ✅ #200 · `1008ffd` |
 | 4 | Gate | ✅ READY (Land Check `main`) |
-| 5 | Capacidades / PRs de Deploy (001…003) | ⏳ READY TO OPEN 001 |
+| 5 | Capacidades / PRs de Deploy (001…003) | ▶ 001 este PR · 002…003 ⏳ |
 | 6 | FULL PASS · tag `release-deploy-pass` | ⏳ |
 
 ---

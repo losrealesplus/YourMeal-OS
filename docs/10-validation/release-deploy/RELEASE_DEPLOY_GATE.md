@@ -2,10 +2,11 @@
 
 **Documento:** `RELEASE_DEPLOY_GATE.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **READY** · Runner CERTIFIED desde `main` · BLOCKED at D1  
+**Estado:** ✅ **READY** · Runner CERTIFIED · 001 ▶ este PR (D1)  
 **Nivel:** Release Track B · B-04 Deploy  
 **Spec:** [RELEASE_DEPLOY_SPEC](../../00-status/RELEASE_DEPLOY_SPEC.md) ✅ FROZEN #198  
 **Runner:** [RELEASE_DEPLOY_RUNNER](./RELEASE_DEPLOY_RUNNER.md) ✅ #200 · `1008ffd`  
+**001:** [RELEASE_DEPLOY_001_D1_ACTA](./RELEASE_DEPLOY_001_D1_ACTA.md)  
 **Land Check:** [FOPEBA_LAND_CHECK](../../00-status/FOPEBA_LAND_CHECK.md)
 
 > `main` certifica; las ramas solo proponen.
@@ -25,8 +26,10 @@
 ### Decision
 
 ```text
-READY TO OPEN
-RELEASE-DEPLOY-001 · D1 only
+RELEASE-DEPLOY-001 · D1 OPEN (este PR)
+PASS through D1 · BLOCKED at RELEASE_DEPLOY_D2_STARTED
+    ↓
+Land Check from main → READY TO OPEN 002
 ```
 
 ### Land Check evidence (from `main` @ `1008ffd`)
@@ -54,7 +57,7 @@ exit 2
 | DoR | Ready framework | ✅ #197 |
 | Spec | Contract D1–D3 | ✅ FROZEN #198 |
 | Runner | BLOCKED at D1 | ✅ CERTIFIED #200 |
-| RELEASE-DEPLOY-001 | D1 Preflight | ⏳ READY TO OPEN |
+| RELEASE-DEPLOY-001 | D1 Preflight | ▶ este PR |
 | RELEASE-DEPLOY-002…003 | D2…D3 | ⏳ |
 | `release-deploy-pass` | FULL PASS | ⏳ |
 

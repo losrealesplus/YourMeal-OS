@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_DEPLOY_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ Runner **CERTIFIED** desde `main` (#200 · `1008ffd`) · runner-only **BLOCKED** at D1 · Gate ✅ READY  
+**Estado:** ✅ Runner **CERTIFIED** (#200 · `1008ffd`) · live through D1 · runner-only **BLOCKED** at D1 · Gate ✅ READY  
 **Spec:** [RELEASE_DEPLOY_SPEC](../../00-status/RELEASE_DEPLOY_SPEC.md) (FROZEN · #198 · `ef447e2`)  
 **DoR:** [RELEASE_DEPLOY_DOR](../../00-status/RELEASE_DEPLOY_DOR.md)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
@@ -52,26 +52,29 @@ PASS → tag release-deploy-pass
 ## Comandos
 
 ```bash
-# Default (CERTIFIED_THROUGH = 0) · empty pipeline
+# Default live through max certified (D1)
 npm run test:release-deploy
-# → BLOCKED · blocked_at=RELEASE_DEPLOY_D1_STARTED
-#   duplicates=[] · missing=[] · out_of_order=[] · evidence={} · exit 2
+# → PASS through D1 · blocked_at=RELEASE_DEPLOY_D2_STARTED · exit 0
 
-# Explicit Gate / Land Check
+# RELEASE-DEPLOY-001
+npm run test:release-deploy-001
+# → PASS through D1 · BLOCKED at D2 · exit 0
+
+# Historic Gate / Land Check vacío
 npm run test:release-deploy:runner-only
-# → same BLOCKED at D1 · exit 2
+# → BLOCKED at RELEASE_DEPLOY_D1_STARTED · exit 2 · evidence={}
 
-# Unit tests (pipeline only · no D1 driver)
+# Unit tests (pipeline + D1 · no D2 driver)
 npm run test:release-deploy:unit
 ```
 
-**BLOCKED (runner-only) no es defecto** — es el baseline Gate hasta RELEASE-DEPLOY-001.
+**BLOCKED (runner-only) no es defecto** — conserva el baseline Gate histórico.
 
 ---
 
-## Fuera de alcance (este PR)
+## Fuera de alcance (001)
 
-- Drivers D1 / D2 / D3  
+- Drivers D2 / D3 · publish/apply real  
 - Infra · CI · GitHub Actions · secretos  
 - Rollback · FLOW-05 · `release-01-beta`  
 - Tag `release-deploy-pass`
@@ -80,7 +83,7 @@ npm run test:release-deploy:unit
 
 ## Gate
 
-Ver: [RELEASE_DEPLOY_GATE](./RELEASE_DEPLOY_GATE.md) · Decision: ✅ **READY TO OPEN** · RELEASE-DEPLOY-001 (D1 only).
+Ver: [RELEASE_DEPLOY_GATE](./RELEASE_DEPLOY_GATE.md) · 001 acta: [RELEASE_DEPLOY_001_D1_ACTA](./RELEASE_DEPLOY_001_D1_ACTA.md).
 
 ---
 
@@ -90,21 +93,9 @@ Ver: [RELEASE_DEPLOY_GATE](./RELEASE_DEPLOY_GATE.md) · Decision: ✅ **READY TO
 |-----------|------|
 | CLI | `scripts/release-deploy-canonical.mjs` |
 | Pipeline | `scripts/lib/release-deploy-canonical-pipeline.mjs` |
-| Unit | `scripts/lib/release-deploy-canonical-pipeline.spec.mjs` |
-| Runner-only evidence | `docs/10-validation/release-deploy/evidence/release-deploy-canonical.json` |
-
----
-
-## Land Check (certified)
-
-```bash
-git pull origin main
-npm run test:release-deploy
-# → BLOCKED at RELEASE_DEPLOY_D1_STARTED · exit 2 · evidence={}
-# verified from main @ 1008ffd (#200)
-```
-
-Next: **RELEASE-DEPLOY-001** (solo D1) · PASS through D1 · BLOCKED at D2.
+| D1 driver | `scripts/lib/release-deploy-d1-preflight.mjs` |
+| Live 001 | `docs/10-validation/release-deploy/evidence/release-deploy-001-canonical-live.json` |
+| Runner-only | `docs/10-validation/release-deploy/evidence/release-deploy-canonical.json` |
 
 ---
 

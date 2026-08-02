@@ -4,20 +4,21 @@
  *
  * Certifies reproducible deployment (D1–D3). Complements Smoke + Cross-flow + E2E.
  *
- * Default (CERTIFIED_THROUGH = 0): empty pipeline → BLOCKED at D1.
+ * Default (`npm run test:release-deploy`): --live through max certified (D1).
  * Modes:
- *   --runner-only    Empty pipeline → BLOCKED at D1 (Gate land-check).
+ *   --live           Drive certified segments (default through = max certified).
+ *   --runner-only    Empty pipeline → BLOCKED at D1 (historic Gate land-check).
  *   --self-test      Validate frozen full contract (synthetic PASS).
  *   --pipeline=a,b,c Validate an explicit observed step list.
- *   --through=D1|…   Scope delivery RELEASE-DEPLOY-001..003 (no drivers yet).
+ *   --through=D1|…   Scope delivery RELEASE-DEPLOY-001..003.
  *
  * Spec: docs/00-status/RELEASE_DEPLOY_SPEC.md
  *
- * NO D1 capability driver in this PR · NO CI · NO infra · NO Rollback.
+ * NO D2/D3 drivers in this PR · NO CI · NO infra · NO Rollback.
  */
 
-/** Highest segment with a capability driver implemented (0 = runner-only). */
-const RELEASE_DEPLOY_CERTIFIED_THROUGH = 0;
+/** Highest segment with a capability driver implemented. */
+const RELEASE_DEPLOY_CERTIFIED_THROUGH = 1;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -25,18 +26,29 @@ import { fileURLToPath } from "node:url";
 import {
   RELEASE_DEPLOY_CANONICAL_STEPS,
   RELEASE_DEPLOY_EXIT,
+  RELEASE_DEPLOY_SEGMENTS,
   buildReleaseDeployEvidenceReport,
   evaluateReleaseDeployProgress,
   formatReleaseDeployComparisonTable,
   releaseDeployStepsThrough,
   validateReleaseDeployPipeline,
 } from "./lib/release-deploy-canonical-pipeline.mjs";
+import { runReleaseDeployCapabilityDriver } from "./lib/release-deploy-capability-driver.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const EVIDENCE_DIR = path.join(ROOT, "docs/10-validation/release-deploy/evidence");
 
 function evidencePathFor(mode, through) {
+  if (mode === "live" && through) {
+    return path.join(
+      EVIDENCE_DIR,
+      `release-deploy-00${through}-canonical-live.json`,
+    );
+  }
+  if (mode === "live") {
+    return path.join(EVIDENCE_DIR, "release-deploy-canonical-live.json");
+  }
   if (mode === "runner-only") {
     return path.join(EVIDENCE_DIR, "release-deploy-canonical.json");
   }
@@ -53,8 +65,7 @@ function evidencePathFor(mode, through) {
 }
 
 function parseArgs(argv) {
-  // Until D1+ drivers exist, default = runner-only (BLOCKED at D1).
-  let mode = RELEASE_DEPLOY_CERTIFIED_THROUGH === 0 ? "runner-only" : "live";
+  let mode = "live";
   /** @type {string[] | null} */
   let pipelineArg = null;
   /** @type {1|2|3 | null} */
@@ -76,8 +87,8 @@ function parseArgs(argv) {
       if (n >= 1 && n <= 3) through = /** @type {1|2|3} */ (n);
     }
   }
-  if (mode === "live" && RELEASE_DEPLOY_CERTIFIED_THROUGH === 0) {
-    mode = "runner-only";
+  if (mode === "live" && through == null) {
+    through = /** @type {1|2|3} */ (RELEASE_DEPLOY_CERTIFIED_THROUGH);
   }
   return { mode, pipelineArg, through };
 }
@@ -95,40 +106,6 @@ function exitFor(progress) {
   return RELEASE_DEPLOY_EXIT.FAIL;
 }
 
-async function emitBlockedAtD1() {
-  const pipeline = [];
-  const progress = evaluateReleaseDeployProgress(pipeline, { through: null });
-  const report = buildReleaseDeployEvidenceReport({
-    status: progress.status,
-    reason: progress.reason,
-    pipeline,
-    validation: {
-      duplicates: progress.duplicates,
-      missing: progress.missing,
-      out_of_order: progress.out_of_order,
-      firstFailure: progress.firstFailure,
-    },
-    code_status: "RUNNER_ONLY",
-    progress,
-    evidence: {},
-  });
-
-  console.log("");
-  console.log("RELEASE-DEPLOY");
-  console.log("");
-  console.log(report.status);
-  console.log("");
-  console.log(`blocked_at=${report.blocked_at}`);
-  console.log(`duplicates=${JSON.stringify(report.duplicates)}`);
-  console.log(`missing=${JSON.stringify(report.missing)}`);
-  console.log(`out_of_order=${JSON.stringify(report.out_of_order)}`);
-  console.log(`evidence=${JSON.stringify(report.evidence)}`);
-
-  const out = await writeEvidence(report, "runner-only", null);
-  console.log(`evidence_file: ${path.relative(ROOT, out)}`);
-  process.exit(exitFor(progress));
-}
-
 async function main() {
   const { mode, pipelineArg, through } = parseArgs(process.argv.slice(2));
 
@@ -140,14 +117,92 @@ async function main() {
   console.log("═══════════════════════════════════════════════");
 
   if (mode === "runner-only") {
-    await emitBlockedAtD1();
+    const pipeline = [];
+    const progress = evaluateReleaseDeployProgress(pipeline, { through: null });
+    const report = buildReleaseDeployEvidenceReport({
+      status: progress.status,
+      reason: progress.reason,
+      pipeline,
+      validation: {
+        duplicates: progress.duplicates,
+        missing: progress.missing,
+        out_of_order: progress.out_of_order,
+        firstFailure: progress.firstFailure,
+      },
+      code_status: "RUNNER_ONLY",
+      progress,
+      evidence: {},
+    });
+
+    console.log("");
+    console.log("RELEASE-DEPLOY");
+    console.log("");
+    console.log(report.status);
+    console.log("");
+    console.log(`blocked_at=${report.blocked_at}`);
+    console.log(`duplicates=${JSON.stringify(report.duplicates)}`);
+    console.log(`missing=${JSON.stringify(report.missing)}`);
+    console.log(`out_of_order=${JSON.stringify(report.out_of_order)}`);
+    console.log(`evidence=${JSON.stringify(report.evidence)}`);
+
+    const out = await writeEvidence(report, "runner-only", null);
+    console.log(`evidence_file: ${path.relative(ROOT, out)}`);
+    process.exit(exitFor(progress));
   }
 
   if (mode === "live") {
-    console.error(
-      "LIVE mode requires CERTIFIED_THROUGH >= 1 (D1 driver). Not in this PR.",
+    const scope = through ?? RELEASE_DEPLOY_CERTIFIED_THROUGH;
+    console.log(`Driving RELEASE-DEPLOY segments (through=D${scope})…`);
+    const driver = runReleaseDeployCapabilityDriver({
+      root: ROOT,
+      through: scope,
+    });
+    if (!driver.ok) {
+      console.error("Capability driver failed:");
+      console.error(driver.reason ?? "unknown");
+      const report = buildReleaseDeployEvidenceReport({
+        status: "FAIL",
+        reason: driver.reason ?? "RELEASE-DEPLOY capability driver failed",
+        pipeline: driver.steps,
+        code_status: "CAPABILITY_DRIVER_FAIL",
+        evidence: driver.evidence ?? {},
+      });
+      await writeEvidence(report, "live", through);
+      process.exit(RELEASE_DEPLOY_EXIT.FAIL);
+    }
+
+    const observed = driver.steps;
+    const progress = evaluateReleaseDeployProgress(observed, {
+      through: scope,
+    });
+    const report = buildReleaseDeployEvidenceReport({
+      status: progress.status,
+      reason: progress.reason,
+      pipeline: observed,
+      validation: progress,
+      code_status: `CAPABILITY_DRIVER_D${progress.certified_through || 0}`,
+      progress,
+      evidence: driver.evidence ?? {},
+      meta: {
+        terminal: {
+          segment: RELEASE_DEPLOY_SEGMENTS[progress.certified_through] ?? null,
+        },
+      },
+    });
+
+    console.log(formatReleaseDeployComparisonTable(progress));
+    console.log("");
+    console.log(progress.reason);
+    console.log(
+      `certified_through=D${progress.certified_through || 0} · blocked_at=${progress.blocked_at ?? "—"}`,
     );
-    process.exit(RELEASE_DEPLOY_EXIT.FAIL);
+    console.log(
+      `duplicates=${JSON.stringify(report.duplicates)} missing=${JSON.stringify(report.missing)} out_of_order=${JSON.stringify(report.out_of_order)}`,
+    );
+
+    const out = await writeEvidence(report, "live", through ?? scope);
+    console.log(`evidence_file: ${path.relative(ROOT, out)}`);
+    process.exit(exitFor(progress));
   }
 
   if (mode === "self-test") {
