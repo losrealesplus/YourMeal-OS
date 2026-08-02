@@ -2,7 +2,8 @@
 
 **Documento:** `RELEASE_DEPLOY_003_D3_ACTA.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ este PR · PASS through D3 · **FULL PASS** · `blocked_at=—`  
+**Estado:** ✅ **CERTIFIED desde `main`** · PASS through D3 · **FULL PASS** · `blocked_at=—`  
+**Tip:** `7896a2a` (Merge #206) · tag `release-deploy-pass`  
 **Precondición:** D2 CERTIFIED (#204 · `28ddb83`) · cert docs (#205 · `5a7e1ea`)  
 **Gate:** [RELEASE_DEPLOY_GATE](./RELEASE_DEPLOY_GATE.md)  
 **Verify:** [RELEASE_DEPLOY_VERIFY](./RELEASE_DEPLOY_VERIFY.md)  
@@ -81,13 +82,19 @@ Fuente: `D2 CERTIFIED + RELEASE_DEPLOY_VERIFY + preview + release-e2e-pass (no R
 
 ---
 
+## Land Check (desde `main` @ `7896a2a`)
+
+| Comando | Resultado |
+|---------|-----------|
+| `test:release-deploy-003` | FULL PASS · blocked_at=— · exit 0 |
+| `test:release-deploy` | FULL PASS · certified_through=D3 · exit 0 |
+| `test:release-deploy:runner-only` | BLOCKED at D1 · exit 2 |
+
+Tag: `release-deploy-pass` → `7896a2a`.
+
 ## Next
 
 ```text
-Land Check from main
-    ↓
-tag release-deploy-pass
-    ↓
 READY TO OPEN
 RELEASE-ROLLBACK DoR
 Documentation only.

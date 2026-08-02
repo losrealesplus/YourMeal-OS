@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_DEPLOY_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ Runner **CERTIFIED** (#200 · `1008ffd`) · live through D3 · **FULL PASS** · runner-only **BLOCKED** at D1 · Gate ✅ READY  
+**Estado:** ✅ Runner **CERTIFIED** · live through D3 · **FULL PASS** · tag `release-deploy-pass` → `7896a2a` · runner-only **BLOCKED** at D1  
 **Spec:** [RELEASE_DEPLOY_SPEC](../../00-status/RELEASE_DEPLOY_SPEC.md) (FROZEN · #198 · `ef447e2`)  
 **DoR:** [RELEASE_DEPLOY_DOR](../../00-status/RELEASE_DEPLOY_DOR.md)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
@@ -73,11 +73,10 @@ npm run test:release-deploy:unit
 
 ---
 
-## Fuera de alcance (003)
+## Fuera de alcance (histórico 003)
 
 - Infra · CI · GitHub Actions · secretos · deploy remoto  
-- Rollback · FLOW-05 · `release-01-beta`  
-- Tag `release-deploy-pass` (solo tras Land Check desde `main`)
+- Rollback · FLOW-05 · `release-01-beta` (ciclo siguiente)
 
 ---
 
