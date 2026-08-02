@@ -39,6 +39,7 @@ Gate de producto propuesto (aún DRAFT): [RELEASE_01_BETA_STRATEGY](./RELEASE_01
 |--------|-----|
 | Gate de plataforma cerrado con evidencia (PS / FCR) | `platform-*` o hito nombrado (`ps002c-pass`) |
 | Flow runner `--live` = PASS completo + acta | `flowNN-pass` |
+| RELEASE-01 beta gate PASS (flows críticos + E2E) | `release-01-beta` (ver [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md)) |
 | Release desplegable / semver de producto | `release-vX.Y.Z` o `vX.Y.Z` |
 
 Reglas:
