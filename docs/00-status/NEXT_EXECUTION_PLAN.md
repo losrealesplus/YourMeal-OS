@@ -106,11 +106,11 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual Track B:** **RELEASE-SMOKE-001** · S1 Preflight (este PR).  
-Gate ✅ READY (#172/#173 · Land Check desde `main`).  
-Acta: [RELEASE_SMOKE_001_S1_ACTA](../10-validation/release-smoke/RELEASE_SMOKE_001_S1_ACTA.md).  
-Land Check: [FOPEBA_LAND_CHECK](./FOPEBA_LAND_CHECK.md).  
-Siguiente: RELEASE-SMOKE-002 · S2 Auth only.  
+**Objetivo actual Track B:** **RELEASE-SMOKE-002** · S2 Auth (este PR).  
+001 ✅ CERTIFIED desde `main` (#174 · `8f0403b`).  
+Acta 001: [RELEASE_SMOKE_001_S1_ACTA](../10-validation/release-smoke/RELEASE_SMOKE_001_S1_ACTA.md).  
+Acta 002: [RELEASE_SMOKE_002_S2_ACTA](../10-validation/release-smoke/RELEASE_SMOKE_002_S2_ACTA.md).  
+Siguiente: RELEASE-SMOKE-003 · S3 Bootstrap only.  
 Do **not** open FLOW-05 unless Track B discovers a blocker that requires it.  
 **Reglas:** (1) Release = capacidades · Flow = dominio · (2) Land Check desde `main` (Regla 9).
 
@@ -190,7 +190,7 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 ## Current Goal
 
 ```text
-Track B (prioridad): RELEASE-SMOKE-001 S1 Preflight → then S2…
+Track B (prioridad): RELEASE-SMOKE-002 S2 Auth → then S3…
 Track A:             Do NOT open FLOW-05 unless Track B finds a blocker
 FOPEBA_LAND_CHECK:   ACTIVE · before every 001
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos

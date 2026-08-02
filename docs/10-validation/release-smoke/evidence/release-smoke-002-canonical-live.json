@@ -1,0 +1,69 @@
+{
+  "status": "PASS",
+  "reason": "PASS through S2 · BLOCKED at RELEASE_SMOKE_S3_STARTED for full RELEASE-SMOKE",
+  "gate": "RELEASE-SMOKE",
+  "contract": "RELEASE_SMOKE_SPEC",
+  "level": "release",
+  "certifies": "platform_capabilities",
+  "not_domain_entities": true,
+  "principle": "Evidence before Implementation",
+  "code_status": "CAPABILITY_DRIVER_S2",
+  "at": "2026-08-02T17:09:40.633Z",
+  "pipeline": [
+    "RELEASE_SMOKE_S1_STARTED",
+    "RELEASE_SMOKE_S1_COMPLETED",
+    "RELEASE_SMOKE_S2_STARTED",
+    "RELEASE_SMOKE_S2_COMPLETED"
+  ],
+  "expected": [
+    "RELEASE_SMOKE_S1_STARTED",
+    "RELEASE_SMOKE_S1_COMPLETED",
+    "RELEASE_SMOKE_S2_STARTED",
+    "RELEASE_SMOKE_S2_COMPLETED",
+    "RELEASE_SMOKE_S3_STARTED",
+    "RELEASE_SMOKE_S3_COMPLETED",
+    "RELEASE_SMOKE_S4_STARTED",
+    "RELEASE_SMOKE_S4_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": null,
+  "certified_through": 2,
+  "blocked_at": "RELEASE_SMOKE_S3_STARTED",
+  "delivery": "RELEASE-SMOKE-002",
+  "delivery_status": "PASS",
+  "gate_status": "BLOCKED",
+  "terminal": {
+    "capability": "auth"
+  },
+  "evidence": {
+    "s1_checks": [
+      "env_example_exists",
+      "official_project_id_documented",
+      "vite_supabase_keys_documented",
+      "no_invented_publishable_key_in_template",
+      "test_release_smoke_script_present"
+    ],
+    "s2_checks": [
+      "ps002_canonical_auth_script_present",
+      "fcr008_auth_prefix_intact",
+      "ps002c_pass_tag_present",
+      "ps002_credential_slots_documented",
+      "auth_surface_present"
+    ],
+    "s2_mapped_tokens": [
+      "LOGIN",
+      "LOGIN_OK",
+      "CANONICAL_SESSION"
+    ],
+    "s2_source": "ps002c-pass + FCR-008 Auth prefix (no full Playwright suite)"
+  },
+  "duration_ms": {
+    "s1_ms": 15,
+    "s2_ms": 15,
+    "s3_ms": null,
+    "s4_ms": null,
+    "smoke_total_ms": null
+  }
+}
