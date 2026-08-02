@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_DEPLOY_DOR.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **DoR CERTIFIED** (`main` · #197 · `e5bd8c5`) · Spec ▶ [READY FOR FREEZE](./RELEASE_DEPLOY_SPEC.md) · Runner ⏳ · Gate ⏳  
+**Estado:** ✅ **DoR CERTIFIED** (`main` · #197 · `e5bd8c5`) · Spec ✅ [FROZEN](./RELEASE_DEPLOY_SPEC.md) (#198 · `ef447e2`) · Runner ⏳ READY TO OPEN · Gate ⏳  
 **Nivel:** Release Track B · B-04 Deployment  
 **Pregunta (única):** ¿Qué debe certificar RELEASE-DEPLOY antes de considerar el despliegue reproducible y listo para Rollback?  
 **Estándar Flow Ready:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) (mismo ciclo FOPEBA)  
@@ -91,13 +91,13 @@ RELEASE-DEPLOY (B-04)
 ☑ Gate antes de Spec / Runner              → este DoR
 ☑ DoR CERTIFIED en main                    → #197 · `e5bd8c5`
 ☑ SPEC lista (READY FOR FREEZE)            → [RELEASE_DEPLOY_SPEC](./RELEASE_DEPLOY_SPEC.md)
-□ Spec FROZEN en main                      → ⏳
-□ Runner creado (BLOCKED baseline)         → ⏳
+☑ Spec FROZEN en main                      → #198 · `ef447e2`
+□ Runner creado (BLOCKED baseline)         → ⏳ READY TO OPEN
 □ READY TO OPEN RELEASE-DEPLOY-001         → ⏳
 ```
 
-**DoR CERTIFIED** → Spec ▶ READY FOR FREEZE.  
-**No** Runner · Rollback · FLOW-05 en el PR Spec.
+**DoR CERTIFIED** · Spec ✅ FROZEN → **READY TO OPEN Runner**.  
+**No** Rollback · FLOW-05 · `release-01-beta` en el Runner PR.
 
 ---
 
@@ -106,9 +106,9 @@ RELEASE-DEPLOY (B-04)
 | Fase | Trabajo | Estado |
 |------|---------|--------|
 | 0 | DoR document | ✅ #197 · `e5bd8c5` |
-| 1 | Spec | ▶ READY FOR FREEZE |
-| 2 | Freeze (merge Spec → main) | ⏳ |
-| 3 | Runner only · BLOCKED at D1 | ⏳ |
+| 1 | Spec | ✅ FROZEN #198 · `ef447e2` |
+| 2 | Freeze (merge Spec → main) | ✅ |
+| 3 | Runner only · BLOCKED at D1 | ⏳ READY TO OPEN |
 | 4 | Gate | ⏳ |
 | 5 | Capacidades / PRs de Deploy (001…003) | ⏳ |
 | 6 | FULL PASS · tag `release-deploy-pass` | ⏳ |

@@ -106,11 +106,10 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual Track B:** **RELEASE-DEPLOY Spec** (docs only · este PR).  
-RELEASE-E2E ✅ CERTIFIED · tag `release-e2e-pass` → `73623ae`.  
-DoR ✅ CERTIFIED (#197 · `e5bd8c5`) · Spec ▶ [RELEASE_DEPLOY_SPEC](./RELEASE_DEPLOY_SPEC.md).  
-Después de Freeze: READY TO OPEN **Runner** (BLOCKED at D1).  
-Do **not** open Runner+impl · Rollback · FLOW-05 · RELEASE-01-BETA en Spec.  
+**Objetivo actual Track B:** **RELEASE-DEPLOY Runner** (siguiente PR).  
+DoR ✅ (#197) · Spec ✅ FROZEN (#198 · `ef447e2`).  
+Decision: **READY TO OPEN** Runner · BLOCKED at `RELEASE_DEPLOY_D1_STARTED` · exit 2.  
+Do **not** open Deploy-001 · Rollback · FLOW-05 · RELEASE-01-BETA in Runner.  
 **Reglas:** (1) Release gates ≠ Flow runners · (2) Land Check desde `main` (Regla 9).
 
 Cross-flow **no sustituye** runners canónicos: los runners certifican contratos;  
@@ -189,7 +188,7 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 ## Current Goal
 
 ```text
-Track B (prioridad): RELEASE-DEPLOY Spec (este PR) → Freeze → Runner → 001… → release-deploy-pass
+Track B (prioridad): RELEASE-DEPLOY Runner → Gate → 001…003 → release-deploy-pass
 Track A:             Do NOT open FLOW-05 unless Track B finds a blocker
 FOPEBA_LAND_CHECK:   ACTIVE · before every 001 / tag
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos

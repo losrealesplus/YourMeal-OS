@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_DEPLOY_SPEC.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ **READY FOR FREEZE** (este PR) · DoR ✅ (#197 · `e5bd8c5`) · Runner ⏳ · Gate ⏳  
+**Estado:** ✅ **FROZEN** (Spec · #198 · `ef447e2`) · DoR ✅ (#197 · `e5bd8c5`) · Runner ⏳ · Gate ⛔ NOT READY  
 **Gate DoRl:** Deployment · Track B · RELEASE-01  
 **Nivel:** Release Contract — **no** es un Flow nuevo  
 **DoR:** [RELEASE_DEPLOY_DOR](./RELEASE_DEPLOY_DOR.md) ✅ en `main` (#197 · `e5bd8c5`)  
@@ -314,20 +314,18 @@ tag (futuro): release-deploy-pass
 | Tokens · Transitions · Evidence | ✅ |
 | PASS · BLOCKED · Invariants | ✅ |
 | Out of scope · Gate CLOSED until Runner | ✅ |
-| Spec READY FOR FREEZE | ▶ este PR |
-| Spec FROZEN | ⏳ tras merge + Land Check docs |
-| Runner BLOCKED at D1 | ⏳ |
+| Spec READY FOR FREEZE | ✅ #198 |
+| Spec FROZEN | ✅ #198 · `ef447e2` · Land Check docs |
+| Runner BLOCKED at D1 | ⏳ READY TO OPEN |
 | RELEASE-DEPLOY-001 | ⛔ CLOSED |
 
-**Estado del documento:** ▶ **READY FOR FREEZE**
+**Estado del documento:** ✅ **FROZEN**
 
 ---
 
 ## 14. Next
 
 ```text
-Freeze (merge Spec → main)
-    ↓
 READY TO OPEN
 RELEASE-DEPLOY Runner
 (BLOCKED at RELEASE_DEPLOY_D1_STARTED · exit 2)
@@ -335,7 +333,7 @@ RELEASE-DEPLOY Runner
 Gate READY → 001…003 → release-deploy-pass
 ```
 
-**No** Runner · Rollback · FLOW-05 · `release-01-beta` en este PR.
+**No** Deploy-001 · Rollback · FLOW-05 · `release-01-beta` en el Runner PR.
 
 ---
 
