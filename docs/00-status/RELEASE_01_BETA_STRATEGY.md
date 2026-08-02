@@ -164,8 +164,8 @@ RELEASE-01
 □ DoRl documentado
 □ FLOW requeridos con tag flowNN-pass (set beta — por congelar)
 □ Sin PR abiertos de dominio incompletos del set
-□ Smoke Tests PASS
-□ Cross-flow PASS
+☑ Smoke Tests PASS
+☑ Cross-flow PASS
 □ E2E PASS
 □ Performance / Security (PASS o N/A documentado)
 □ Deployment reproducible · Rollback validado
