@@ -1,0 +1,44 @@
+{
+  "status": "PASS",
+  "reason": "",
+  "gate": "FLOW-04",
+  "contract": "FLOW_04_INVENTORY_CONSUMPTION_SPEC",
+  "principle": "Evidence before Implementation",
+  "code_status": "DOMAIN_DRIVER_T3",
+  "at": "2026-08-02T16:26:43.920Z",
+  "pipeline": [
+    "FLOW04_T1_STARTED",
+    "FLOW04_T1_COMPLETED",
+    "FLOW04_T2_STARTED",
+    "FLOW04_T2_COMPLETED",
+    "FLOW04_T3_STARTED",
+    "FLOW04_T3_COMPLETED"
+  ],
+  "expected": [
+    "FLOW04_T1_STARTED",
+    "FLOW04_T1_COMPLETED",
+    "FLOW04_T2_STARTED",
+    "FLOW04_T2_COMPLETED",
+    "FLOW04_T3_STARTED",
+    "FLOW04_T3_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": null,
+  "certified_through": 3,
+  "blocked_at": null,
+  "delivery": "FLOW-04",
+  "delivery_status": "PASS",
+  "flow_status": "PASS",
+  "terminal": {
+    "consumption_status": "sealed"
+  },
+  "evidence": {},
+  "duration_ms": {
+    "t1_ms": 15,
+    "t2_ms": 15,
+    "t3_ms": 15,
+    "flow_total_ms": 75
+  }
+}

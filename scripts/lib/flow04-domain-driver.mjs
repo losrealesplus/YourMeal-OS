@@ -27,7 +27,7 @@ export function runFlow04DomainDriver({ root, through = null }) {
         ...process.env,
         FLOW04_LIVE_DRIVER: "1",
         FORCE_COLOR: "0",
-        // Unscoped --live defaults to max certified transition in the driver (T2).
+        // Unscoped --live defaults to max certified transition in the driver (T3).
         ...(through ? { FLOW04_LIVE_THROUGH: String(through) } : {}),
       },
       maxBuffer: 10 * 1024 * 1024,

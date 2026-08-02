@@ -4,6 +4,7 @@
  *
  * FLOW04-001: planConsumptionFromProduction → status=planned (no stock mutation)
  * FLOW04-002: applyConsumption → status=applied (+ stock · I2 / I3)
+ * FLOW04-003: sealConsumption → status=sealed (terminal · no stock mutation)
  */
 import type { ServiceContext } from "@/services/types";
 import { DomainError, permissionDenied } from "@/domain/errors";
@@ -239,6 +240,112 @@ export const InventoryService = {
         });
       }
       stopFlow04("T2_FAILED", { consumptionId, error: msg });
+      throw e;
+    }
+  },
+
+  /**
+   * T3 · Seal applied consumption (terminal).
+   * Emits FLOW04_T3_* · status=sealed · no stock mutation.
+   */
+  async sealConsumption(
+    ctx: ServiceContext,
+    consumptionId: string,
+  ): Promise<InventoryConsumption> {
+    assertTenant(ctx);
+    assertInventory(ctx);
+
+    const repo = createInventoryRepository(ctx.supabase, ctx.tenantId);
+    const current = await repo.findById(ctx.tenantId, consumptionId);
+    if (!current) {
+      throw new DomainError("NOT_FOUND", `Consumption ${consumptionId}`);
+    }
+
+    // Terminal: idempotent return (pipeline may already be closed after T3_COMPLETED)
+    if (current.status === "sealed") {
+      return current;
+    }
+
+    if (current.status !== "applied") {
+      throw new DomainError(
+        "INVALID_STATE",
+        `FLOW04-003 requires status applied (got ${current.status})`,
+      );
+    }
+
+    try {
+      assertFlow04Prefix([
+        "FLOW04_T1_STARTED",
+        "FLOW04_T1_COMPLETED",
+        "FLOW04_T2_STARTED",
+        "FLOW04_T2_COMPLETED",
+      ]);
+    } catch {
+      throw new DomainError(
+        "INVALID_STATE",
+        "FLOW04-003 requires T2 COMPLETED before sealConsumption",
+      );
+    }
+
+    logFlow04Step("FLOW04_T3_STARTED", {
+      consumptionId,
+      status: current.status,
+    });
+
+    try {
+      const stockSnapshot = await Promise.all(
+        current.lines.map(async (line) => ({
+          ingredientId: line.ingredientId,
+          stock: await repo.getStock(ctx.tenantId, line.ingredientId),
+        })),
+      );
+
+      const sealed = await repo.sealConsumption({
+        tenantId: ctx.tenantId,
+        consumptionId,
+      });
+
+      if (sealed.status !== "sealed") {
+        stopFlow04("T3_STATUS_DRIFT", {
+          consumptionId,
+          status: sealed.status,
+        });
+        throw new DomainError(
+          "INVALID_STATE",
+          "FLOW04-003 invariant: status must be sealed after sealConsumption",
+        );
+      }
+
+      // Stock must remain stable vs T2 (no mutation in T3)
+      for (const snap of stockSnapshot) {
+        const after = await repo.getStock(ctx.tenantId, snap.ingredientId);
+        if (after !== snap.stock) {
+          stopFlow04("T3_STOCK_MUTATION", {
+            consumptionId,
+            ingredientId: snap.ingredientId,
+            before: snap.stock,
+            after,
+          });
+          throw new DomainError(
+            "INVALID_STATE",
+            "FLOW04-003 forbids stock mutation during seal",
+          );
+        }
+      }
+
+      logFlow04Step("FLOW04_T3_COMPLETED", {
+        consumptionId: sealed.id,
+        status: sealed.status,
+        lineCount: sealed.lines.length,
+      });
+
+      return sealed;
+    } catch (e) {
+      if (e instanceof DomainError) throw e;
+      stopFlow04("T3_FAILED", {
+        consumptionId,
+        error: e instanceof Error ? e.message : String(e),
+      });
       throw e;
     }
   },
