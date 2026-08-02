@@ -27,7 +27,10 @@ En Fase 1 el mismo estándar aplica a Kitchen → Delivery y a los Flows siguien
 
 ## Checklist obligatorio antes de Implementation PRs
 
-Para cada `FLOW-NN`:
+Checklist completo (incluye PASS/BLOCKED esperados y acta):  
+**[FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md)**.
+
+Mínimo:
 
 | # | Artefacto | Congelado |
 |---|-----------|-----------|
@@ -36,8 +39,9 @@ Para cada `FLOW-NN`:
 | 3 | Invariantes | ☐ |
 | 4 | Contrato de evidencias (`FLOWNN_*` tokens) | ☐ |
 | 5 | Runner canónico (`test:flownn-canonical`) | ☐ |
+| 6 | PASS / BLOCKED esperados + acta | ☐ |
 
-Sin los cinco → ❌ no abrir Implementation del happy path.
+Sin Definition of Ready → ❌ no abrir Implementation del happy path.
 
 ---
 
@@ -82,7 +86,7 @@ Igual filosofía que FCR-008 / PS-002-C:
 | Invariantes | ✅ en Spec |
 | Contrato `FLOW01_T*` | ✅ en Spec |
 | Runner `test:flow01-canonical` | ✅ [FLOW01_CANONICAL_RUNNER](../10-validation/flow-01/FLOW01_CANONICAL_RUNNER.md) |
-| Implementation | ✅ T1–T3 · ▶ FLOW01-004 T4 · [PASS acta](../10-validation/flow-01/FLOW01_PASS_ACTA.md) |
+| Implementation | ✅ T1–T4 · FLOW-01 **CERTIFIED** · [PASS acta](../10-validation/flow-01/FLOW01_PASS_ACTA.md) · tag `flow01-pass` |
 
 ---
 

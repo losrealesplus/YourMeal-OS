@@ -1,12 +1,13 @@
-# Flow Catalog · EatClean (initial)
+# Flow Catalog · EatClean
 
 **Documento:** `FLOW_CATALOG.md`  
-**Fecha:** 2026-07-29  
-**Estado:** Draft catalog · FLOW-01 Spec ✅ **FROZEN** · Runner ▶  
+**Fecha:** 2026-08-02  
+**Estado:** FLOW-01 ✅ **CERTIFIED** · siguientes ⏳ DoR  
 **Piloto:** EatClean  
 **Fase:** 1 · Domain / Flow (Fase 0 · Plataforma COMPLETE)  
-**Plataforma:** PS-002-C ✅ PASS · tag `ps002c-pass` · FCR-008 FROZEN  
-**Framing:** [BLOCK_G_FLOW_FRAMING](../10-validation/ep-ops-003/BLOCK_G_FLOW_FRAMING.md) · [FLOW_CERTIFICATION](../10-validation/FLOW_CERTIFICATION.md) · [FLOW_01 Spec](./FLOW_01_KITCHEN_DELIVERY_SPEC.md)
+**Plataforma:** PS-002-C ✅ · FCR-008 FROZEN · tag `ps002c-pass`  
+**Dominio:** FLOW-01 ✅ · tag `flow01-pass`  
+**Estándar:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) · [Evidence before Implementation](./EVIDENCE_BEFORE_IMPLEMENTATION.md)
 
 ---
 
@@ -22,32 +23,41 @@ Target Journey / Workspace
 No: “Mejoras de Delivery”.  
 Sí: `FLOW-01 Kitchen → Delivery`.
 
-**Épicas futuras** se nombran y organizan por Flow (no por módulo): Spec → Implementation → Evidence → Certification — [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md).
-
 ---
 
-## Catálogo inicial (propuesto)
+## Certificados
 
 | ID | Handoff | Pregunta operacional | Estado |
 |----|---------|----------------------|--------|
-| **FLOW-01** | Kitchen → Delivery | ¿Kitchen entrega correctamente a Delivery? | ▶ **T4 / FULL PASS** (T1–T3 ✅) · [SPEC](./FLOW_01_KITCHEN_DELIVERY_SPEC.md) · [Plan](./FLOW_01_DELIVERY_PLAN.md) · [PASS acta](../10-validation/flow-01/FLOW01_PASS_ACTA.md) |
-| **FLOW-02** | Delivery → Support | ¿Delivery deja a Support con contexto usable? | ⏳ NOT STARTED |
-| **FLOW-03** | Support → Accounting | ¿Support cierra hacia registros financieros coherentes? | ⏳ NOT STARTED |
+| **FLOW-01** | Kitchen → Delivery | ¿Kitchen entrega correctamente a Delivery? | ✅ **CERTIFIED** · [SPEC](./FLOW_01_KITCHEN_DELIVERY_SPEC.md) · [Plan](./FLOW_01_DELIVERY_PLAN.md) · [PASS acta](../10-validation/flow-01/FLOW01_PASS_ACTA.md) · `npm run test:flow01-canonical -- --live` |
 
-> Lista **inicial** alineada a Journeys certificados (Kitchen · Delivery · Support · Accounting).  
-> Ampliar solo con Flow First: ¿pertenece a un Flow? ¿hace falta uno nuevo?
+---
+
+## Candidatos (prioridad · sin Implementation hasta DoR)
+
+| ID | Handoff / alcance | Prioridad | Motivo | Estado |
+|----|-------------------|-----------|--------|--------|
+| **FLOW-02** | Delivery Incidents | Muy alta | Excepciones reales justo después del happy path | ⏳ DoR NOT STARTED |
+| **FLOW-03** | Billing | Alta | Facturación desacoplada del happy path | ⏳ DoR NOT STARTED |
+| **FLOW-04** | Inventory Consumption | Alta | Consumo de ingredientes tras producción | ⏳ DoR NOT STARTED |
+| **FLOW-05** | Customer Order Lifecycle | Media | Creación del pedido → `confirmed` | ⏳ DoR NOT STARTED |
+| **FLOW-06** | Kitchen Planning | Media | Planificación previa a T1 | ⏳ DoR NOT STARTED |
+
+> Orden recomendado: cada Flow aprovecha el anterior sin mezclar responsabilidades.  
+> Antes de Spec/código: completar [Definition of Ready](./FLOW_DEFINITION_OF_READY.md).
+
+**Nota:** El catálogo inicial nombraba FLOW-02 Delivery→Support y FLOW-03 Support→Accounting.  
+Los candidatos de la tabla superior son la **prioridad operativa EatClean** post–FLOW-01; Support/Accounting siguen elegibles vía Flow First cuando el piloto lo exija.
 
 ---
 
 ## Plantilla por Flow
 
-Para cada FLOW-NN:
-
-1. **Specification** — Outcomes A/B · handoff · criterios FAIL  
-2. **Execution** — cómo ocurre el traspaso en YM OS  
-3. **Evidence** — evidencia reproducible  
-4. **Certification** — veredicto  
-5. Contribuye a **Operational Readiness** cuando el conjunto E2E esté listo  
+1. **Definition of Ready** — checklist completo  
+2. **Specification** — Outcomes · handoff · FAIL  
+3. **Runner** — contrato `FLOWNN_*`  
+4. **Implementation** — una transición / PR  
+5. **Evidence → Certification → Acta**  
 
 Jerarquía: [FLOW_WORK_HIERARCHY](./FLOW_WORK_HIERARCHY.md).
 
@@ -55,4 +65,4 @@ Jerarquía: [FLOW_WORK_HIERARCHY](./FLOW_WORK_HIERARCHY.md).
 
 ## Añadir un Flow
 
-Solo si [FLOW_FIRST](./FLOW_FIRST.md) responde que la funcionalidad **debe** crear uno nuevo — con Outcome A/B certificados o elegibles.
+Solo si [FLOW_FIRST](./FLOW_FIRST.md) responde que la funcionalidad **debe** crear uno nuevo — y solo tras DoR.
