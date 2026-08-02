@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_E2E_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ Runner **ACTIVE** · default **BLOCKED** at `RELEASE_E2E_E1_STARTED`  
+**Estado:** ✅ Runner **CERTIFIED** (`main` · #188 · `d2a4047`) · **BLOCKED** at `RELEASE_E2E_E1_STARTED`  
 **Spec:** [RELEASE_E2E_SPEC](../../00-status/RELEASE_E2E_SPEC.md) (FROZEN · #186 · `6d11ae8`)  
 **DoR:** [RELEASE_E2E_DOR](../../00-status/RELEASE_E2E_DOR.md)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
@@ -97,8 +97,7 @@ exit 2
 
 ## Gate
 
-Ver: [RELEASE_E2E_GATE](./RELEASE_E2E_GATE.md).  
-Tras Land Check desde `main` con BLOCKED at E1 → Gate **READY** · entonces abrir E2E-001.
+Ver: [RELEASE_E2E_GATE](./RELEASE_E2E_GATE.md) · Decision: ✅ **READY TO OPEN** RELEASE-E2E-001 · E1 only.
 
 ---
 

@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_E2E_DOR.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **DoR CERTIFIED** (`main` · #185 · `48e0c5c`) · Spec ✅ [FROZEN](./RELEASE_E2E_SPEC.md) (#186) · Runner ▶  
+**Estado:** ✅ **DoR CERTIFIED** (`main` · #185 · `48e0c5c`) · Spec ✅ [FROZEN](./RELEASE_E2E_SPEC.md) (#186) · Runner ✅ #188 · Gate ✅ READY  
 **Nivel:** Release Track B · B-03 E2E  
 **Pregunta (única):** ¿Qué debe certificar RELEASE-E2E antes de considerar la plataforma lista para Release?  
 **Estándar Flow Ready:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) (mismo ciclo FOPEBA)  
@@ -247,13 +247,13 @@ RELEASE-E2E (B-03)
 ☑ Gate antes de E2E-001                    → este DoR
 ☑ SPEC lista (READY FOR FREEZE)            → [RELEASE_E2E_SPEC](./RELEASE_E2E_SPEC.md)
 ☑ Spec FROZEN en main                      → #186 · `6d11ae8`
-▶ Runner creado (BLOCKED at E1)            → [RUNNER](../10-validation/release-e2e/RELEASE_E2E_RUNNER.md)
-□ Runner en main · BLOCKED at E1 verificado
-□ READY TO OPEN RELEASE-E2E-001
+☑ Runner creado (BLOCKED at E1)            → [RUNNER](../10-validation/release-e2e/RELEASE_E2E_RUNNER.md)
+☑ Runner en main · BLOCKED at E1 verificado → #188 · `d2a4047`
+☑ READY TO OPEN RELEASE-E2E-001            → [GATE](../10-validation/release-e2e/RELEASE_E2E_GATE.md)
 ```
 
-**DoR CERTIFIED** · Spec ✅ FROZEN · Runner ▶ → tras Land Check BLOCKED at E1 desde `main`:  
-Gate READY · abrir E2E-001. Nada más.
+**DoR CERTIFIED** · Spec ✅ FROZEN · Runner ✅ · Gate ✅ READY →  
+**abrir RELEASE-E2E-001 (E1 only)**. Nada más.
 
 ---
 

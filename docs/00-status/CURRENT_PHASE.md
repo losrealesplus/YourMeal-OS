@@ -50,12 +50,11 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    Track B › RELEASE-E2E Runner (B-03)
-                               → ../10-validation/release-e2e/RELEASE_E2E_RUNNER.md
-                               Spec ✅ FROZEN #186 · BLOCKED at E1 expected
-                               Gate NOT READY · E2E-001 CLOSED
-                               Tras Land Check main: OPEN E2E-001 only
-                               No Deploy / Rollback / FLOW-05 / Playwright E1
+  Prioridad                    Track B › RELEASE-E2E-001 E1 only
+                               Gate ✅ READY · ../10-validation/release-e2e/RELEASE_E2E_GATE.md
+                               Runner ✅ #188 · d2a4047 · BLOCKED at E1 from main
+                               Siguiente: E1 Platform Entry (Smoke ancla)
+                               No E2/E3/E4 · Deploy · Rollback · FLOW-05
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)
   Land Check                   ./FOPEBA_LAND_CHECK.md (antes de cualquier 001)
