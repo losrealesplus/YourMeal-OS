@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_E2E_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ Runner **CERTIFIED** · live through E3 · runner-only **BLOCKED** at E1  
+**Estado:** ✅ Runner **CERTIFIED** · live through E4 · **FULL PASS** · runner-only **BLOCKED** at E1  
 **Spec:** [RELEASE_E2E_SPEC](../../00-status/RELEASE_E2E_SPEC.md) (FROZEN · #186 · `6d11ae8`)  
 **DoR:** [RELEASE_E2E_DOR](../../00-status/RELEASE_E2E_DOR.md)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
@@ -10,7 +10,7 @@
 
 > Pregunta que responde este runner:  
 > **¿Existe un contrato ejecutable para RELEASE-E2E (RELEASE-01 · B-03)?**  
-> No: ¿Playwright? · ¿browser? · ¿dominio E4? · ¿Deploy? · ¿FLOW-05?
+> No: ¿Playwright? · ¿browser? · ¿Deploy? · ¿FLOW-05?
 
 ---
 
@@ -55,27 +55,21 @@ PASS → tag release-e2e-pass
 ## Comandos
 
 ```bash
-# Default live through max certified (E3)
+# Default live through max certified (E4) · FULL PASS
 npm run test:release-e2e
-# → PASS through E3 · BLOCKED at E4 · exit 0
+# → FULL PASS · certified_through=E4 · blocked_at=— · exit 0
 
-# RELEASE-E2E-001 · E1 only
-npm run test:release-e2e-001
-# → PASS through E1 · BLOCKED at E2 · exit 0
-
-# RELEASE-E2E-002 · E2 only
-npm run test:release-e2e-002
-# → PASS through E2 · BLOCKED at E3 · exit 0
-
-# RELEASE-E2E-003 · E3 only
-npm run test:release-e2e-003
-# → PASS through E3 · BLOCKED at E4 · exit 0
+# RELEASE-E2E-001…004
+npm run test:release-e2e-001   # PASS through E1 · BLOCKED at E2
+npm run test:release-e2e-002   # PASS through E2 · BLOCKED at E3
+npm run test:release-e2e-003   # PASS through E3 · BLOCKED at E4
+npm run test:release-e2e-004   # PASS through E4 · FULL PASS · blocked_at=—
 
 # Historic Gate / Land Check vacío
 npm run test:release-e2e:runner-only
 # → BLOCKED at RELEASE_E2E_E1_STARTED · exit 2 · evidence={}
 
-# Unit tests (pipeline + E1…E3 · no Playwright suite)
+# Unit tests (pipeline + E1…E4 · no Playwright suite)
 npm run test:release-e2e:unit
 ```
 
@@ -83,16 +77,16 @@ npm run test:release-e2e:unit
 
 ---
 
-## Fuera de alcance (hasta E3+)
+## Fuera de alcance
 
-- Driver E4 · Playwright E2E suite  
 - Deploy · Rollback · FLOW-05 · `release-01-beta`  
+- Playwright E2E suite  
 
 ---
 
 ## Gate
 
-Ver: [RELEASE_E2E_GATE](./RELEASE_E2E_GATE.md) · Decision: ✅ READY · 003 en curso.
+Ver: [RELEASE_E2E_GATE](./RELEASE_E2E_GATE.md) · Decision: ✅ READY · 004 en curso · FULL PASS on branch.
 
 ---
 
@@ -102,8 +96,8 @@ Ver: [RELEASE_E2E_GATE](./RELEASE_E2E_GATE.md) · Decision: ✅ READY · 003 en 
 |-----------|------|
 | CLI | `scripts/release-e2e-canonical.mjs` |
 | Pipeline | `scripts/lib/release-e2e-canonical-pipeline.mjs` |
-| E3 driver | `scripts/lib/release-e2e-e3-incident-billing.mjs` |
-| Default evidence | `docs/10-validation/release-e2e/evidence/release-e2e-canonical.json` |
+| E4 driver | `scripts/lib/release-e2e-e4-inventory-close.mjs` |
+| Live FULL PASS | `docs/10-validation/release-e2e/evidence/release-e2e-canonical-live.json` |
 
 ---
 

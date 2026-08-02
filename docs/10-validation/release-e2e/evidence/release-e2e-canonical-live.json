@@ -1,0 +1,125 @@
+{
+  "status": "PASS",
+  "reason": "PASS through E4 · RELEASE-E2E FULL PASS",
+  "gate": "RELEASE-E2E",
+  "contract": "RELEASE_E2E_SPEC",
+  "level": "release",
+  "certifies": "pilot_journey_as_system",
+  "complements_smoke_and_crossflow": true,
+  "principle": "Evidence before Implementation",
+  "code_status": "CAPABILITY_DRIVER_E4",
+  "at": "2026-08-02T19:08:03.884Z",
+  "pipeline": [
+    "RELEASE_E2E_E1_STARTED",
+    "RELEASE_E2E_E1_COMPLETED",
+    "RELEASE_E2E_E2_STARTED",
+    "RELEASE_E2E_E2_COMPLETED",
+    "RELEASE_E2E_E3_STARTED",
+    "RELEASE_E2E_E3_COMPLETED",
+    "RELEASE_E2E_E4_STARTED",
+    "RELEASE_E2E_E4_COMPLETED"
+  ],
+  "expected": [
+    "RELEASE_E2E_E1_STARTED",
+    "RELEASE_E2E_E1_COMPLETED",
+    "RELEASE_E2E_E2_STARTED",
+    "RELEASE_E2E_E2_COMPLETED",
+    "RELEASE_E2E_E3_STARTED",
+    "RELEASE_E2E_E3_COMPLETED",
+    "RELEASE_E2E_E4_STARTED",
+    "RELEASE_E2E_E4_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": null,
+  "certified_through": 4,
+  "blocked_at": null,
+  "delivery": "RELEASE-E2E-004",
+  "delivery_status": "PASS",
+  "gate_status": "PASS",
+  "terminal": {
+    "segment": "inventory_close"
+  },
+  "evidence": {
+    "e1_checks": [
+      "release_smoke_canonical_script_present",
+      "release_smoke_canonical_pipeline_intact",
+      "release_smoke_pass_tag_present",
+      "release_smoke_pass_acta_present",
+      "release_smoke_spec_present"
+    ],
+    "e1_mapped_tokens": [
+      "RELEASE_SMOKE_S1_STARTED",
+      "RELEASE_SMOKE_S1_COMPLETED",
+      "RELEASE_SMOKE_S2_STARTED",
+      "RELEASE_SMOKE_S2_COMPLETED",
+      "RELEASE_SMOKE_S3_STARTED",
+      "RELEASE_SMOKE_S3_COMPLETED",
+      "RELEASE_SMOKE_S4_STARTED",
+      "RELEASE_SMOKE_S4_COMPLETED"
+    ],
+    "e1_source": "release-smoke-pass + RELEASE-SMOKE S1…S4 pipeline (no E2+ · no Smoke re-run)",
+    "e2_checks": [
+      "flow01_canonical_script_present",
+      "flow01_canonical_pipeline_intact",
+      "flow01_pass_tag_present",
+      "flow01_pass_acta_present",
+      "flow01_spec_present"
+    ],
+    "e2_mapped_tokens": [
+      "FLOW01_T1_STARTED",
+      "FLOW01_T1_COMPLETED",
+      "FLOW01_T2_STARTED",
+      "FLOW01_T2_COMPLETED",
+      "FLOW01_T3_STARTED",
+      "FLOW01_T3_COMPLETED",
+      "FLOW01_T4_STARTED",
+      "FLOW01_T4_COMPLETED"
+    ],
+    "e2_source": "flow01-pass + FLOW-01 T1…T4 pipeline (no E3+ · no FLOW-01 domain re-run)",
+    "e3_checks": [
+      "flow02_canonical_script_present",
+      "flow03_canonical_script_present",
+      "flow02_canonical_pipeline_intact",
+      "flow03_canonical_pipeline_intact",
+      "flow02_pass_tag_present",
+      "flow03_pass_tag_present",
+      "flow02_pass_acta_present",
+      "flow03_pass_acta_present",
+      "flow02_spec_present",
+      "flow03_spec_present"
+    ],
+    "e3_mapped_tokens": [
+      "FLOW02_T1_STARTED",
+      "FLOW02_T1_COMPLETED",
+      "FLOW02_T2_STARTED",
+      "FLOW02_T2_COMPLETED",
+      "FLOW02_T3_STARTED",
+      "FLOW02_T3_COMPLETED",
+      "FLOW03_T1_STARTED",
+      "FLOW03_T1_COMPLETED",
+      "FLOW03_T2_STARTED",
+      "FLOW03_T2_COMPLETED",
+      "FLOW03_T3_STARTED",
+      "FLOW03_T3_COMPLETED"
+    ],
+    "e3_source": "flow02-pass + flow03-pass · FLOW-02 T1…T3 + FLOW-03 T1…T3 (no E4 · no domain re-run)",
+    "e4_checks": [
+      "flow04_canonical_script_present",
+      "flow04_canonical_pipeline_intact",
+      "flow04_pass_tag_present",
+      "flow04_pass_acta_present",
+      "flow04_spec_present"
+    ],
+    "e4_mapped_tokens": [
+      "FLOW04_T1_STARTED",
+      "FLOW04_T1_COMPLETED",
+      "FLOW04_T2_STARTED",
+      "FLOW04_T2_COMPLETED",
+      "FLOW04_T3_STARTED",
+      "FLOW04_T3_COMPLETED"
+    ],
+    "e4_source": "flow04-pass + FLOW-04 T1…T3 pipeline (no Deploy · Rollback · FLOW-05 · no domain re-run)"
+  }
+}

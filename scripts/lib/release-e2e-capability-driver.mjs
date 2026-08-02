@@ -4,11 +4,12 @@
  * E1 = Platform Entry (RELEASE-SMOKE)
  * E2 = Order → Delivery (FLOW-01)
  * E3 = Incident → Billing (FLOW-02 + FLOW-03)
- * E4 = not implemented in RELEASE-E2E-003
+ * E4 = Inventory → Close (FLOW-04)
  */
 import { runReleaseE2eE1PlatformEntry } from "./release-e2e-e1-platform-entry.mjs";
 import { runReleaseE2eE2OrderDelivery } from "./release-e2e-e2-order-delivery.mjs";
 import { runReleaseE2eE3IncidentBilling } from "./release-e2e-e3-incident-billing.mjs";
+import { runReleaseE2eE4InventoryClose } from "./release-e2e-e4-inventory-close.mjs";
 
 /**
  * @param {{ root: string, through?: 1|2|3|4 | null }} opts
@@ -101,11 +102,27 @@ export function runReleaseE2eCapabilityDriver({ root, through = null }) {
 
   if (max < 4) return { ok: true, steps, evidence };
 
-  return {
-    ok: false,
-    steps,
-    reason:
-      "RELEASE-E2E E4+ not implemented (E3 only · Evidence before Implementation)",
-    evidence,
-  };
+  console.info("[RELEASE-E2E]", "RELEASE_E2E_E4_STARTED", {
+    segment: "inventory_close",
+  });
+  steps.push("RELEASE_E2E_E4_STARTED");
+
+  const e4 = runReleaseE2eE4InventoryClose({ cwd: root });
+  evidence.e4_checks = e4.checks;
+  if (!e4.ok) {
+    console.error("[RELEASE-E2E] E4 FAIL:\n" + e4.reason);
+    return { ok: false, steps, reason: e4.reason, evidence };
+  }
+  evidence.e4_mapped_tokens = e4.mapped_tokens;
+  evidence.e4_source = e4.source;
+
+  console.info("[RELEASE-E2E]", "RELEASE_E2E_E4_COMPLETED", {
+    segment: "inventory_close",
+    mapped_tokens: e4.mapped_tokens,
+    source: e4.source,
+    checks: e4.checks,
+  });
+  steps.push("RELEASE_E2E_E4_COMPLETED");
+
+  return { ok: true, steps, evidence };
 }
