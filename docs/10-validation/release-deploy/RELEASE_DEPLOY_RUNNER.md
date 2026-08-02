@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_DEPLOY_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ este PR · runner vacío → **BLOCKED** at D1 · Gate ⛔ NOT READY hasta Land Check desde `main`  
+**Estado:** ✅ Runner **CERTIFIED** desde `main` (#200 · `1008ffd`) · runner-only **BLOCKED** at D1 · Gate ✅ READY  
 **Spec:** [RELEASE_DEPLOY_SPEC](../../00-status/RELEASE_DEPLOY_SPEC.md) (FROZEN · #198 · `ef447e2`)  
 **DoR:** [RELEASE_DEPLOY_DOR](../../00-status/RELEASE_DEPLOY_DOR.md)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
@@ -80,7 +80,7 @@ npm run test:release-deploy:unit
 
 ## Gate
 
-Ver: [RELEASE_DEPLOY_GATE](./RELEASE_DEPLOY_GATE.md) · Decision: ⛔ **NOT READY** hasta Land Check desde `main`.
+Ver: [RELEASE_DEPLOY_GATE](./RELEASE_DEPLOY_GATE.md) · Decision: ✅ **READY TO OPEN** · RELEASE-DEPLOY-001 (D1 only).
 
 ---
 
@@ -95,15 +95,16 @@ Ver: [RELEASE_DEPLOY_GATE](./RELEASE_DEPLOY_GATE.md) · Decision: ⛔ **NOT READ
 
 ---
 
-## After merge
+## Land Check (certified)
 
 ```bash
 git pull origin main
 npm run test:release-deploy
 # → BLOCKED at RELEASE_DEPLOY_D1_STARTED · exit 2 · evidence={}
+# verified from main @ 1008ffd (#200)
 ```
 
-Si cumple → Gate **READY** → abrir **RELEASE-DEPLOY-001** (solo D1).
+Next: **RELEASE-DEPLOY-001** (solo D1) · PASS through D1 · BLOCKED at D2.
 
 ---
 
