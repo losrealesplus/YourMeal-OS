@@ -2,12 +2,14 @@
 
 **Documento:** `RELEASE_01_BETA_STRATEGY.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ **DRAFT · Gate concept** (no es un Flow · no abre implementación)  
-**Precondición:** FLOW-01…FLOW-03 ✅ CERTIFIED · FOPEBA institucionalizado  
+**Estado:** ▶ **DRAFT · Gate concept** (no es un Flow · no abre implementación de dominio)  
+**Precondición:** FLOW-01…FLOW-04 ✅ CERTIFIED · FOPEBA institucionalizado · `flow04-pass`  
 **DoRl:** [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md)  
+**Plan:** [NEXT_EXECUTION_PLAN](./NEXT_EXECUTION_PLAN.md)  
 **Handoff:** [PROJECT_HANDOFF](./PROJECT_HANDOFF.md)
 
-> Hasta ahora se certifican **flujos**.  
+> Hasta FLOW-04 se certificaban **flujos** (¿podemos certificar un flujo?).  
+> Con cuatro ciclos, esa pregunta ya tiene evidencia suficiente.  
 > El siguiente nivel es certificar el **producto como conjunto**  
 > antes de declarar una beta usable por un cliente real.
 
@@ -19,8 +21,8 @@
 |-------|--------|
 | Foundation | ✅ Cerrada |
 | Platform Stabilization (PS-002-C) | ✅ Certificada · `ps002c-pass` |
-| Business Flow Certification (FLOW-01 → FLOW-03) | ✅ En producción metodológica · `flow01/02/03-pass` |
-| Product Release Governance (RELEASE-01) | 🚧 Iniciada · DoRl DRAFT |
+| Business Flow Certification (FLOW-01 → FLOW-04) | ✅ Cuatro ciclos · `flow01`…`flow04-pass` |
+| Product Release Governance (RELEASE-01) | 🚧 Prioridad · DoRl DRAFT · matriz medible |
 
 ---
 
@@ -36,27 +38,51 @@ Una beta BLOCKED no implica que un Flow falle.
 
 ---
 
-## Dos ejes paralelos (siguiente fase)
+## Prioridad post–`flow04-pass`
 
-### Eje A — Continuar certificando flujos
+**Track B (este documento / DoRl)** tiene prioridad ligeramente mayor que abrir FLOW-05.
 
-Patrón consolidado (sin saltos):
+FLOW-05 sigue el patrón FOPEBA sin excepciones **cuando se abra**;  
+no se abre de inmediato salvo bloqueador directo de la beta.
+
+---
+
+## Dos ejes paralelos
+
+### Eje A — Continuar certificando flujos (sin romper el patrón)
 
 ```text
-FLOW-04
+FLOW-05 (cuando proceda)
 DoR → Spec → Freeze → Runner
-→ FLOW04-001 → FLOW04-002 → …
-→ flow04-pass
+→ FLOW05-001 → …
+→ flow05-pass
 ```
 
-Luego FLOW-05 / FLOW-06 según catálogo, cada uno con el mismo ciclo.
+Luego FLOW-06… según catálogo. Sin saltos. Sin features futuras en el PR del Flow.
 
-**Intención de fase:** FLOW-04 como último gran cambio estructural del set beta;  
-después, completar cobertura funcional con el proceso ya demostrado.
+### Eje B — Acumular evidencia RELEASE-01 (prioridad ligeramente mayor)
 
-### Eje B — Construir el contrato RELEASE-01
+#### Matriz DoRl (viva · medible)
 
-Mientras se certifican Flows, completar el gate de producto:
+| Gate DoRl | Estado | Evidencia |
+|-----------|--------|-----------|
+| FOUNDATION | ✅ | Platform / foundation locks |
+| PS-002C | ✅ | Tag `ps002c-pass` |
+| FLOW-01 | ✅ | Tag `flow01-pass` |
+| FLOW-02 | ✅ | Tag `flow02-pass` |
+| FLOW-03 | ✅ | Tag `flow03-pass` |
+| FLOW-04 | ✅ | Tag `flow04-pass` |
+| Smoke Tests | ⏳ | Artefacto + comando / acta (por definir) |
+| Cross-flow | ⏳ | Cadena multi-dominio (por definir) |
+| E2E | ⏳ | Jornada piloto (por definir) |
+| Deployment | ⏳ | Reproducible (por definir) |
+| Rollback | ⏳ | Procedimiento + prueba (por definir) |
+| Beta Acceptance | ⏳ | DoRl PASS → tag `release-01-beta` |
+
+Criterio de publicación: **todos los gates aplicables con evidencia**,  
+no “creemos que funciona”.
+
+Árbol de composición (referencia):
 
 ```text
 RELEASE-01
@@ -66,22 +92,49 @@ RELEASE-01
 ├── FLOW-01                 ✅  tag flow01-pass
 ├── FLOW-02                 ✅  tag flow02-pass
 ├── FLOW-03                 ✅  tag flow03-pass
-├── FLOW-04                 ⏳  Inventory (DoR → … → flow04-pass)
-├── FLOW-05                 ⏳  (catálogo · DoR primero)
-├── FLOW-06                 ⏳  (catálogo · DoR primero)
+├── FLOW-04                 ✅  tag flow04-pass
+├── FLOW-05+                ⏳  solo si el set beta lo exige (DoR primero)
 ├── Smoke Tests             ⏳
 ├── Cross-flow Tests        ⏳
 ├── Performance             ⏳  (o N/A documentado)
 ├── Security                ⏳  (o N/A documentado)
 ├── Deployment              ⏳  reproducible
+├── Rollback                ⏳
 ├── Documentation           ⏳  handoff · CURRENT_PHASE · ADRs
 └── Beta Acceptance         ⏳  DoRl PASS
         ↓
    release-01-beta
 ```
 
-Criterio de publicación: **todos los gates de Release aplicables certificados**,  
-no “creemos que funciona”.
+---
+
+## Cross-flow (complementa runners; no los sustituye)
+
+Hasta FLOW-04 cada Flow se certificó de forma aislada.  
+A medida que crece la cobertura, el riesgo dominante pasa a ser la **interacción**:
+
+```text
+Pedido
+  ↓
+Producción
+  ↓
+Packaging
+  ↓
+Entrega
+  ↓
+Incidencia
+  ↓
+Facturación
+  ↓
+Inventario
+  ↓
+Cierre
+```
+
+- Runners canónicos → contrato individual  
+- Cross-flow / E2E → contratos encadenados  
+
+Ambos son necesarios para DoRl PASS.
 
 ---
 
@@ -107,7 +160,8 @@ RELEASE-01
    DoRl PASS → tag release-01-beta
 ```
 
-Freeze de DoRl RELEASE-01 = PR docs-only cuando el set de Flows beta esté cerrado.
+Freeze de DoRl RELEASE-01 = PR docs-only cuando el set de Flows beta y los  
+gates de producto estén cerrados en documento.
 
 ---
 
@@ -115,7 +169,7 @@ Freeze de DoRl RELEASE-01 = PR docs-only cuando el set de Flows beta esté cerra
 
 | # | Criterio | Notas |
 |---|----------|-------|
-| 1 | Flows críticos del piloto EatClean con tag `flowNN-pass` | Mínimo: catálogo priorizado |
+| 1 | Flows críticos del piloto EatClean con tag `flowNN-pass` | Mínimo: catálogo priorizado · FLOW-01…04 ✅ |
 | 2 | Integración entre flujos (estados de uno alimentan al siguiente) | Cross-flow + E2E |
 | 3 | Experiencia cliente + ops + admin operable E2E | No solo dominio |
 | 4 | Escenarios con datos reales / desviaciones nombradas | Fuera del happy path Spec |
@@ -124,28 +178,33 @@ Freeze de DoRl RELEASE-01 = PR docs-only cuando el set de Flows beta esté cerra
 
 ---
 
-## Relación con FLOW-04
+## Relación con FLOW-05+
 
-FLOW-04 **no** se abre desde este documento.  
-Arranca solo con DoR → Spec → Freeze → Runner (ver handoff).
+FLOW-05+ **no** se abren desde este documento.  
+Arrancan solo con DoR → Spec → Freeze → Runner.
 
-Este Release Strategy contextualiza **por qué** el siguiente Flow importa para la beta  
-y mantiene el eje B vivo en paralelo (docs / gates), sin mezclar dominio.
+Este Release Strategy fija **por qué** Track B acumula evidencia ahora  
+y cuándo un Flow adicional es bloqueador de beta (no “por inercia del catálogo”).
 
 ---
 
 ## Prohibido
 
 - Declarar “beta ready” sin DoRl PASS  
-- Mezclar implementación de producto en este doc  
+- Mezclar implementación de dominio de Flow en PRs de Release  
 - Saltar FOPEBA “porque ya vamos a beta”  
-- Confundir `flowNN-pass` con `release-01-beta`
+- Confundir `flowNN-pass` con `release-01-beta`  
+- Abrir FLOW-05 solo por momentum tras `flow04-pass`
 
 ---
 
 ## Next
 
-1. Merge docs close-out (#161 · handoff · RELEASE-01 · DoRl).  
-2. **Eje A:** FLOW-04 DoR / Spec (sin dominio).  
-3. **Eje B:** ir cerrando ítems DoRl documentales; Freeze cuando el set beta esté claro.  
+1. **Eje B (prioridad):** definir artefactos Smoke / Cross-flow / E2E; ir cerrando filas ⏳ de la matriz.  
+2. **Eje A:** FLOW-05 DoR only cuando sea bloqueador beta o el set Freeze lo exija.  
+3. Congelar DoRl RELEASE-01 (docs-only) cuando set + gates estén claros.  
 4. Solo tras DoRl PASS → tag `release-01-beta`.
+
+---
+
+## End of RELEASE-01 Beta Strategy

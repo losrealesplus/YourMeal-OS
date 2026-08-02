@@ -4,11 +4,12 @@
 **Fecha:** 2026-08-02  
 **Status:** ▶ **DRAFT · Estándar de producto** (no abre implementación de dominio)  
 **Nivel:** Producto / versión — **no** es un Flow  
-**Complementa:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) · [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) · [GIT_MILESTONE_TAGS](./GIT_MILESTONE_TAGS.md)  
+**Complementa:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) · [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) · [GIT_MILESTONE_TAGS](./GIT_MILESTONE_TAGS.md) · [NEXT_EXECUTION_PLAN](./NEXT_EXECUTION_PLAN.md)  
 **Handoff:** [PROJECT_HANDOFF](./PROJECT_HANDOFF.md)
 
 > DoR responde: *¿este Flow puede empezar a implementarse?*  
-> DoRl responde: *¿esta versión del producto puede etiquetarse y publicarse?*
+> DoRl responde: *¿esta versión del producto puede etiquetarse y publicarse?*  
+> Post–`flow04-pass`: la segunda pregunta empieza a dominar el plan (Track B).
 
 Son preguntas distintas. No mezclar.
 
@@ -97,11 +98,29 @@ Un Flow puede estar CERTIFIED y la Release seguir BLOCKED por E2E o documentaci�
 
 ---
 
-## Relación con FLOW-04+
+## Relación con FLOW-04+ (post–`flow04-pass`)
 
-- FLOW-04… siguen **DoR → Spec → Freeze → Runner → T1… → flowNN-pass**.  
+Con FLOW-01…04 certificados, la metodología de Flow ya tiene evidencia suficiente.  
+DoRl pasa a ser el instrumento para evaluar el **producto como sistema**.
+
+- FLOW-05+ siguen **DoR → Spec → Freeze → Runner → T1… → flowNN-pass** (sin excepciones).  
 - Completar Flows **alimenta** el eje B; no “abre” la beta por sí solo.  
-- Declarar `release-01-beta` exige **DoRl PASS**, no solo el último `flowNN-pass`.
+- Declarar `release-01-beta` exige **DoRl PASS**, no solo el último `flowNN-pass`.  
+- Abrir el siguiente Flow solo si alimenta / desbloquea la beta — no por inercia.
+
+### Matriz medible (instancia RELEASE-01)
+
+La conversación sobre beta se ancla a filas con evidencia (detalle vivo en  
+[RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md)):
+
+| Gate DoRl | Estado típico post–FLOW-04 | Evidencia |
+|-----------|----------------------------|-----------|
+| FOUNDATION · PS-002C · FLOW-01…04 | ✅ | Tags de milestone |
+| Smoke · Cross-flow · E2E | ⏳ | Acta + comando |
+| Deployment · Rollback | ⏳ | Procedimiento + prueba |
+| Beta Acceptance | ⏳ | DoRl PASS → `release-01-beta` |
+
+Cross-flow complementa runners canónicos; no los sustituye.
 
 ---
 
@@ -110,7 +129,8 @@ Un Flow puede estar CERTIFIED y la Release seguir BLOCKED por E2E o documentaci�
 - Usar DoRl para saltarse DoR / Spec / Runner de un Flow  
 - Mezclar PRs de dominio de Flow con cierre de Release  
 - Declarar “beta ready” por intuición o por número de PRs mergeados  
-- Congelar DoRl de RELEASE-01 antes de cerrar el set de Flows críticos (aún DRAFT)
+- Congelar DoRl de RELEASE-01 antes de cerrar el set de Flows críticos (aún DRAFT)  
+- Tratar `flowNN-pass` como equivalente a `release-01-beta`
 
 ---
 
@@ -118,7 +138,7 @@ Un Flow puede estar CERTIFIED y la Release seguir BLOCKED por E2E o documentaci�
 
 | Release | Doc de estrategia | Estado DoRl |
 |---------|-------------------|-------------|
-| RELEASE-01 (Beta) | [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) | ▶ DRAFT · checklist no Freeze |
+| RELEASE-01 (Beta) | [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) | ▶ DRAFT · matriz medible · no Freeze |
 
 Freeze de DoRl para RELEASE-01 = cuando el set de Flows beta y los gates de producto estén cerrados en documento (PR docs-only).
 

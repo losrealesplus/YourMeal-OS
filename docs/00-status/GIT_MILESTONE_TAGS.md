@@ -30,7 +30,7 @@ Gate de producto (aún DRAFT): [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRA
 | `flow01-pass` | Flow | FLOW-01 Kitchen → Delivery FULL PASS |
 | `flow02-pass` | Flow | FLOW-02 Delivery Incidents FULL PASS → `a1e8d1e` (#153) |
 | `flow03-pass` | Flow | FLOW-03 Billing FULL PASS → `67a2e66` (#160) |
-| `flow04-pass` | Flow | FLOW-04 Inventory Consumption FULL PASS (FLOW04-003) |
+| `flow04-pass` | Flow | FLOW-04 Inventory Consumption FULL PASS → `8be1c26` (#167) |
 
 ---
 

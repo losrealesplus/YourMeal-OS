@@ -41,7 +41,7 @@ Sí: `FLOW-01 Kitchen → Delivery`.
 
 | ID | Handoff / alcance | Prioridad | Motivo | Estado |
 |----|-------------------|-----------|--------|--------|
-| **FLOW-05** | Customer Order Lifecycle | Media | Creación del pedido → `confirmed` | ⏳ DoR NOT STARTED |
+| **FLOW-05** | Customer Order Lifecycle | Media | Creación del pedido → `confirmed` | ⏳ DoR NOT STARTED · no abrir por inercia post–`flow04-pass` (Track B DoRl primero salvo bloqueador beta) |
 | **FLOW-06** | Kitchen Planning | Media | Planificación previa a T1 | ⏳ DoR NOT STARTED |
 
 > Orden recomendado: cada Flow aprovecha el anterior sin mezclar responsabilidades.  

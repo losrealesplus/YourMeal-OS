@@ -57,12 +57,32 @@ Tras cada `flowNN-pass`, añadir una fila en la tabla de abajo (manual o script 
 | FLOW-03 | — | — | — | — | 0 | I7 + review event |
 | FLOW-04 | corto (DoR #162 → Spec #163) | corto (#163 → #164) | T1–T3 (#165–#167) | ~6 | 0 | DoR como artefacto |
 
-*(Rellenar SHAs/días en la siguiente pasada de auditoría — v0 congela el marco.)*
+*(Rellenar SHAs/días solo con evidencia objetiva de git/PRs/tags — v0 congela el marco.)*
+
+---
+
+## Regla de relleno
+
+**No estimaciones.** Esperar evidencia objetiva de ciclos reales antes de poblar números.
+
+Medir, cuando haya datos:
+
+- Tiempo DoR → Freeze  
+- Tiempo Freeze → Runner  
+- Tiempo Runner → primer PASS / FULL PASS  
+- Tiempo total por FLOW  
+- Número de PR por FLOW  
+- Número de regresiones detectadas  
+- Número de cambios de SPEC tras Freeze (idealmente **0**)  
+- Cobertura del catálogo (`flows certificados / flows planificados`)
+
+Las métricas deben describir el **proceso real**, no un objetivo teórico.
 
 ---
 
 ## Prohibido
 
+- Rellenar filas con estimaciones o targets inventados  
 - Usar estas métricas para “acelerar” saltándose DoR / Spec / Runner  
 - Optimizar el número de PRs a costa de una pregunta por PR  
 - Declarar mejora metodológica sin actualizar esta tabla tras un `flowNN-pass`
