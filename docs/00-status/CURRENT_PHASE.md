@@ -21,7 +21,8 @@ PS-002-C                    ✅ PASS (2026-08-02)
                              Auth Supabase real · FCR-008
 PS-003                      ✅ PASS
 
-FCR-008                     ✅ Canonical session CERTIFIED
+FCR-008                     ✅ CERTIFIED · FROZEN
+                             (solo reabrir por regresión)
 FCR-009                     🔍 Toaster ausente (no bloquea PS-002-C)
 
 Mobile Foundation (MF-001)  ✅ Cimientos CLOSED
@@ -29,9 +30,10 @@ Mobile Foundation (MF-001)  ✅ Cimientos CLOSED
   → Foco: Product CTO · jornada EatClean
 
 Sprint activo
-  NEXT: FLOW CERTIFICATION / FLOW-01 Spec
+  NEXT: FLOW-01 Spec freeze (PR #141)
   Acta PS-002-C: ../10-validation/platform-stabilization/PS002C_PASS_ACTA.md
-  Beta: BR-03.3 Runtime Validation (G3)
+  Tag restauración: ps002c-pass → 545bd19
+  Beta paralelo: BR-03.3 Runtime Validation (G3)
 
 ═══════════════════════════════════════════════
 CLOSED GATE
