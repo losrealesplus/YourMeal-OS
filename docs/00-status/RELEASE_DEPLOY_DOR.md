@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_DEPLOY_DOR.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **DoR CERTIFIED** (`main` · #197 · `e5bd8c5`) · Spec ✅ [FROZEN](./RELEASE_DEPLOY_SPEC.md) (#198) · Runner ✅ #200 · Gate ✅ #201 · 001 ✅ #202 · 002 ▶ [ACTA](../10-validation/release-deploy/RELEASE_DEPLOY_002_D2_ACTA.md)  
+**Estado:** ✅ **DoR CERTIFIED** (`main` · #197 · `e5bd8c5`) · Spec ✅ [FROZEN](./RELEASE_DEPLOY_SPEC.md) (#198) · Runner ✅ #200 · Gate ✅ #201 · 001 ✅ #202 · 002 ✅ CERTIFIED #204 · `28ddb83` · next 003  
 **Nivel:** Release Track B · B-04 Deployment  
 **Pregunta (única):** ¿Qué debe certificar RELEASE-DEPLOY antes de considerar el despliegue reproducible y listo para Rollback?  
 **Estándar Flow Ready:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) (mismo ciclo FOPEBA)  
@@ -96,11 +96,12 @@ RELEASE-DEPLOY (B-04)
 ☑ READY TO OPEN RELEASE-DEPLOY-001         → ✅ Gate READY #201
 ☑ RELEASE-DEPLOY-001 CERTIFIED             → ✅ #202 · `a0daf82` · [ACTA](../10-validation/release-deploy/RELEASE_DEPLOY_001_D1_ACTA.md)
 ☑ READY TO OPEN RELEASE-DEPLOY-002         → ✅ Land Check D1 from main
-☑ RELEASE-DEPLOY-002 OPEN                  → ▶ este PR · [ACTA](../10-validation/release-deploy/RELEASE_DEPLOY_002_D2_ACTA.md)
+☑ RELEASE-DEPLOY-002 CERTIFIED             → ✅ #204 · `28ddb83` · [ACTA](../10-validation/release-deploy/RELEASE_DEPLOY_002_D2_ACTA.md)
+☑ READY TO OPEN RELEASE-DEPLOY-003         → ✅ Land Check D2 from main
 ```
 
-**DoR CERTIFIED** · Spec ✅ · Runner ✅ · Gate ✅ · 001 ✅ · **002 D2 ▶ este PR**.  
-**No** D3 · Rollback · FLOW-05 · `release-01-beta` en Deploy-002.
+**DoR CERTIFIED** · Spec ✅ · Runner ✅ · Gate ✅ · 001 ✅ · **002 CERTIFIED** → READY TO OPEN 003 (D3 only).  
+**No** Rollback · FLOW-05 · `release-01-beta` en Deploy-003.
 
 ---
 
@@ -113,7 +114,7 @@ RELEASE-DEPLOY (B-04)
 | 2 | Freeze (merge Spec → main) | ✅ |
 | 3 | Runner only · BLOCKED at D1 | ✅ #200 · `1008ffd` |
 | 4 | Gate | ✅ READY (Land Check `main`) |
-| 5 | Capacidades / PRs de Deploy (001…003) | ✅ 001 · ▶ 002 este PR · 003 ⏳ |
+| 5 | Capacidades / PRs de Deploy (001…003) | ✅ 001 · ✅ 002 · ⏳ READY TO OPEN 003 |
 | 6 | FULL PASS · tag `release-deploy-pass` | ⏳ |
 
 ---

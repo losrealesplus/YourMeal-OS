@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_DEPLOY_GATE.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **READY** · 001 CERTIFIED · 002 ▶ este PR (D2)  
+**Estado:** ✅ **READY** · 002 CERTIFIED desde `main` · READY TO OPEN 003  
 **Nivel:** Release Track B · B-04 Deploy  
 **Spec:** [RELEASE_DEPLOY_SPEC](../../00-status/RELEASE_DEPLOY_SPEC.md) ✅ FROZEN #198  
 **Runner:** [RELEASE_DEPLOY_RUNNER](./RELEASE_DEPLOY_RUNNER.md) ✅ #200 · `1008ffd`  
@@ -20,32 +20,33 @@
 ☑ Runner certified (#200 → 1008ffd)
 ☑ Gate READY (#201 → 9de2893)
 ☑ D1 certified (#202 → a0daf82)
-☑ Canonical PASS through D1 verified from main
+☑ D2 certified (#204 → 28ddb83)
+☑ Canonical PASS through D2 verified from main
 ☑ runner-only BLOCKED at D1 verified from main
 ```
 
-### Land Check evidence (from `main` @ `a0daf82`)
+### Land Check evidence (from `main` @ `28ddb83`)
 
 ```bash
 git pull origin main
-npm run test:release-deploy-001
+npm run test:release-deploy-002
 npm run test:release-deploy
 npm run test:release-deploy:runner-only
 ```
 
 | Comando | Resultado |
 |---------|-----------|
-| `test:release-deploy-001` | PASS through D1 · `blocked_at=RELEASE_DEPLOY_D2_STARTED` · exit 0 |
-| `test:release-deploy` | PASS through D1 · BLOCKED at D2 · exit 0 |
+| `test:release-deploy-002` | PASS through D2 · `blocked_at=RELEASE_DEPLOY_D3_STARTED` · exit 0 |
+| `test:release-deploy` | PASS through D2 · BLOCKED at D3 · exit 0 |
 | `test:release-deploy:runner-only` | BLOCKED at `RELEASE_DEPLOY_D1_STARTED` · exit 2 |
 
 ### Decision
 
 ```text
-RELEASE-DEPLOY-002 · D2 OPEN (este PR)
-PASS through D2 · BLOCKED at RELEASE_DEPLOY_D3_STARTED
-    ↓
-Land Check from main → READY TO OPEN 003
+READY TO OPEN
+RELEASE-DEPLOY-003 · D3 only
+Post-deploy Verify
+Nothing beyond D3.
 ```
 
 ### Progress
@@ -57,8 +58,8 @@ Land Check from main → READY TO OPEN 003
 | Runner | BLOCKED at D1 | ✅ CERTIFIED #200 |
 | Gate | READY | ✅ #201 |
 | RELEASE-DEPLOY-001 | D1 Preflight | ✅ CERTIFIED #202 |
-| RELEASE-DEPLOY-002 | D2 Publish / Apply | ▶ este PR |
-| RELEASE-DEPLOY-003 | D3 Post-deploy Verify | ⏳ |
+| RELEASE-DEPLOY-002 | D2 Publish / Apply | ✅ CERTIFIED #204 |
+| RELEASE-DEPLOY-003 | D3 Post-deploy Verify | ⏳ READY TO OPEN |
 | `release-deploy-pass` | FULL PASS | ⏳ |
 
 Acta 001: [RELEASE_DEPLOY_001_D1_ACTA](./RELEASE_DEPLOY_001_D1_ACTA.md) ·  

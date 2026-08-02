@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_DEPLOY_SPEC.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **FROZEN** (Spec · #198 · `ef447e2`) · DoR ✅ (#197) · Runner ✅ #200 · Gate ✅ #201 · 001 ✅ #202 · 002 ▶ [ACTA](../10-validation/release-deploy/RELEASE_DEPLOY_002_D2_ACTA.md)  
+**Estado:** ✅ **FROZEN** (Spec · #198 · `ef447e2`) · DoR ✅ (#197) · Runner ✅ #200 · Gate ✅ #201 · 001 ✅ #202 · 002 ✅ CERTIFIED #204 · `28ddb83` · next 003  
 **Gate DoRl:** Deployment · Track B · RELEASE-01  
 **Nivel:** Release Contract — **no** es un Flow nuevo  
 **DoR:** [RELEASE_DEPLOY_DOR](./RELEASE_DEPLOY_DOR.md) ✅ en `main` (#197 · `e5bd8c5`)  
@@ -319,7 +319,8 @@ tag (futuro): release-deploy-pass
 | Runner BLOCKED at D1 | ✅ CERTIFIED #200 · `1008ffd` |
 | Gate READY | ✅ #201 · Land Check from main |
 | RELEASE-DEPLOY-001 | ✅ CERTIFIED #202 · `a0daf82` |
-| RELEASE-DEPLOY-002 | ▶ este PR (D2 only) |
+| RELEASE-DEPLOY-002 | ✅ CERTIFIED #204 · `28ddb83` |
+| RELEASE-DEPLOY-003 | ⏳ READY TO OPEN (D3 only) |
 
 **Estado del documento:** ✅ **FROZEN**
 
@@ -328,15 +329,14 @@ tag (futuro): release-deploy-pass
 ## 14. Next
 
 ```text
-RELEASE-DEPLOY-002 (este PR)
-PASS through D2 · BLOCKED at RELEASE_DEPLOY_D3_STARTED
-    ↓
-Land Check main → READY TO OPEN 003
+READY TO OPEN
+RELEASE-DEPLOY-003 · D3 only
+PASS through D3 · FULL PASS · blocked_at=—
     ↓
 release-deploy-pass
 ```
 
-**No** D3 · Rollback · FLOW-05 · `release-01-beta` en Deploy-002.
+**No** Rollback · FLOW-05 · `release-01-beta` en Deploy-003.
 
 ---
 

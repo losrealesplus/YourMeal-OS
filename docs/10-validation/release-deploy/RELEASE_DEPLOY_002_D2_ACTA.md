@@ -2,7 +2,8 @@
 
 **Documento:** `RELEASE_DEPLOY_002_D2_ACTA.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ este PR · PASS through D2 · BLOCKED at `RELEASE_DEPLOY_D3_STARTED`  
+**Estado:** ✅ **CERTIFIED desde `main`** · PASS through D2 · BLOCKED at `RELEASE_DEPLOY_D3_STARTED`  
+**Tip:** `28ddb83` (Merge #204)  
 **Precondición:** D1 CERTIFIED (#202 · `a0daf82`) · cert docs (#203 · `8e1fc8e`)  
 **Gate:** [RELEASE_DEPLOY_GATE](./RELEASE_DEPLOY_GATE.md)  
 **Publish:** [RELEASE_DEPLOY_PUBLISH](./RELEASE_DEPLOY_PUBLISH.md)  
@@ -75,12 +76,21 @@ Fuente: `D1 CERTIFIED + RELEASE_DEPLOY_PUBLISH + build:web (no D3 · no remote d
 
 ---
 
+## Land Check (desde `main` @ `28ddb83`)
+
+| Comando | Resultado |
+|---------|-----------|
+| `test:release-deploy-002` | PASS through D2 · BLOCKED at D3 · exit 0 |
+| `test:release-deploy` | PASS through D2 · BLOCKED at D3 · exit 0 |
+| `test:release-deploy:runner-only` | BLOCKED at D1 · exit 2 |
+
 ## Next
 
 ```text
 READY TO OPEN
 RELEASE-DEPLOY-003 · D3 only
-(after Land Check of 002 from main)
+Post-deploy Verify
+Nothing beyond D3.
 ```
 
 ---
