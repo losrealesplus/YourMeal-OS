@@ -94,6 +94,18 @@ Estas respuestas **no** se reinterpretan en el runner ni en la implementación.
 | Efecto | Nace `Invoice` con `status=pending` · `reviewed_at=null` · `orderIds` trazables |
 | No es creación | Auto-factura al marcar `delivered` · UI “parece creada” sin persistencia |
 
+### ¿Un pedido puede tener varias facturas? (**Opción A — congelada**)
+
+| Campo | Valor congelado |
+|-------|-----------------|
+| Regla | **1 pedido `delivered` → como máximo 1 factura activa** |
+| Factura activa | Cualquier invoice vinculada vía `invoice_orders` con `status ≠ void` |
+| Segunda llamada a `createInvoiceFromOrders` con el mismo `orderId` | **FAIL de dominio** (`INVALID_STATE` / ya facturado) — **no** crea duplicado · **no** es idempotent return |
+| Billable set | `listBillableOrders` excluye pedidos ya vinculados a factura activa |
+| Void + refacturar | ❌ fuera de FLOW-03 v1 (void no es happy path) |
+
+Justificación: alineado con evidencia once-only y relación determinista pedido→factura en el contrato certificado.
+
 ### ¿Quién puede poner una factura en review?
 
 | Campo | Valor congelado |
@@ -183,7 +195,7 @@ As-built: `src/modules/accounting/` · UI `admin.accounting` · cap `accounting.
 |----------|------------|
 | **Estado inicial** | Pedido(s) `delivered` · aún no facturados |
 | **Evento** | Ops Accounting selecciona pedidos y crea factura |
-| **Precondiciones** | Tenant activo · `accounting.operate` · `orders.read` · ≥1 order `delivered` · orders no ya facturados en el pipeline |
+| **Precondiciones** | Tenant activo · `accounting.operate` · `orders.read` · ≥1 order `delivered` · **ningún orderId con factura activa** (invariante 10) |
 | **Acción** | `AccountingService.createInvoiceFromOrders` |
 | **Estado final** | Invoice `status=pending` · `reviewed_at=null` · `orderIds` trazables |
 | **Evidencia** | `FLOW03_T1_STARTED` → `FLOW03_T1_COMPLETED` |
@@ -237,7 +249,8 @@ Cada token: **exactamente una vez**, en orden global T1→T2→T3.
 6. Sin bridge manual (Excel/chat) para cerrar el happy path de Billing.  
 7. Void / overdue / reembolso / nota de crédito / pago parcial **no** cuentan como PASS.  
 8. `paid` es terminal · no hay tokens FLOW-03 posteriores.  
-9. Tras T2, `reviewed_at` no vuelve a `null` en el pipeline certificado.
+9. Tras T2, `reviewed_at` no vuelve a `null` en el pipeline certificado.  
+10. **1 pedido → 1 factura activa** · segunda creación sobre el mismo order = FAIL (no duplicar).
 
 ---
 
@@ -288,6 +301,7 @@ Opcional envoltura: `FLOW03_START` / `FLOW03_END` en el runner.
 | FAIL | Significa |
 |------|-----------|
 | Facturar order ≠ `delivered` | Violación invariante 1 |
+| Segunda factura sobre el mismo order | Violación invariante 10 (1:1) |
 | `FLOW03_T2_COMPLETED` con `reviewed_at=null` | Review no materializado |
 | `FLOW03_T3_COMPLETED` con status ≠ `paid` | Violación T3 |
 | T3 sin T2 / sin `reviewed_at` | Violación invariante 4 |
