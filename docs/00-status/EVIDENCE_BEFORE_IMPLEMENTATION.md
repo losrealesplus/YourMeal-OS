@@ -95,6 +95,16 @@ Igual filosofía que FCR-008 / PS-002-C:
 Evidence before Implementation aplica a **Flows**.  
 Para versiones de producto (beta / release), ver [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md) (DoRl) — pregunta distinta, checklist distinto.
 
+Los gates de Release (p. ej. [RELEASE_SMOKE_GATE](../10-validation/release-smoke/RELEASE_SMOKE_GATE.md)) siguen el mismo ciclo Spec → Freeze → Runner → BLOCKED → 001…,  
+certificando **capacidades de plataforma**, no entidades de dominio.
+
+### Regla de cierre de Gate
+
+> Un Gate nunca se cierra porque un PR pase.  
+> Un Gate solo se cierra cuando el comportamiento esperado se verifica desde `main`.
+
+Ver [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) Regla 9.
+
 ---
 
 ## END
