@@ -170,23 +170,46 @@ Una transición certificada por PR de implementación.
 
 Un PR **Merged** no implica que el artefacto esté en `main` si la **base** del PR era otra rama.
 
-Para Spec / Runner / Flow Certification:
+Para Spec / Runner / Flow Certification **y** gates de Release (Track B):
 
 ```text
 base: main   ✅
 base: cursor/…-f54a   ❌  (solo stacking; no sustituye land en main)
 ```
 
-Antes de abrir el siguiente trabajo (p. ej. dominio tras Runner), verificación obligatoria en local:
+### Principio institucional (Gate)
+
+> **Un Gate nunca se cierra porque un PR pase.**  
+> **Un Gate solo se cierra cuando el comportamiento esperado se verifica desde `main`.**
+
+```text
+main certifica
+las ramas solo proponen
+```
+
+Aplicación:
+
+| Artefacto | Gate cierra cuando… |
+|-----------|---------------------|
+| Flow Runner | `npm run test:flowNN-canonical` desde `main` → BLOCKED esperado |
+| Release Runner | `npm run test:release-*` desde `main` → BLOCKED esperado |
+| Implementation Tn / Sn | Spec + Runner **en `main`** + BLOCKED verificado |
+
+Antes de abrir el siguiente trabajo (p. ej. FLOWXX-001 / RELEASE-SMOKE-001), verificación obligatoria:
 
 ```bash
 git pull origin main
 git log --oneline -5
-npm run | grep flowNN   # o el script del Flow
+npm run test:<gate-script>
 ```
 
-Si el commit o el script no aparecen en `main` → el cambio **no ha aterrizado**, aunque GitHub diga Merged.  
-Incidente de referencia: #149 mergeado en `cursor/flow-02-specification-f54a` · corregido por #150 → `main`.
+Si el commit o el script no aparecen en `main`, o el exit code / `blocked_at` no coinciden → el Gate **sigue cerrado**, aunque GitHub diga Merged.
+
+Incidentes de referencia:
+
+- FLOW-02 · #149 mergeado fuera de `main` · corregido por #150  
+- FLOW-03 · #156 → #157 (mismo patrón)  
+- RELEASE-SMOKE · Gate report: [RELEASE_SMOKE_GATE](../10-validation/release-smoke/RELEASE_SMOKE_GATE.md)
 
 ---
 

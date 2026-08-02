@@ -106,12 +106,16 @@ npm run test:release-smoke:unit
 
 ## Gate · Abrir RELEASE-SMOKE-001
 
+**Reporte vivo:** [RELEASE_SMOKE_GATE](./RELEASE_SMOKE_GATE.md) · Decision actual: **NOT READY**.
+
 | # | Condición | Estado |
 |---|-----------|--------|
-| 1 | Spec (#169) en `main` → FROZEN | ⏳ / stack |
-| 2 | Runner en `main` | ▶ este PR |
-| 3 | Canonical BLOCKED verificado desde `main` | ⏳ post-merge |
-| 4 | Contrato `RELEASE_SMOKE_S*` congelado | ✅ Spec |
+| 1 | #168 · Track B priority en `main` | ⏳ OPEN |
+| 2 | Spec (#169) en `main` → FROZEN | ⏳ OPEN |
+| 3 | Runner (#170) en `main` | ⏳ OPEN |
+| 4 | Canonical BLOCKED verificado **desde `main`** | ⏳ |
+
+> Gate ≠ PR verde. Gate = comportamiento verificado en `main` ([FLOW_GOVERNANCE](../../00-status/FLOW_GOVERNANCE.md) Regla 9).
 
 Tras Gate **verde** → READY TO OPEN **RELEASE-SMOKE-001** (solo S1 · preflight).
 

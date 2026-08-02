@@ -128,6 +128,10 @@ Cross-flow complementa runners canónicos; no los sustituye.
 (`preflight`, `auth`, `bootstrap`, `dashboard`, `deploy`, `rollback`, …).  
 Runners de Flow certifican **entidades / estados de dominio**. No mezclar.
 
+**Regla de Gate (Regla 9):** un Gate nunca se cierra porque un PR pase;  
+solo cuando el comportamiento esperado se verifica desde `main`.  
+Ejemplo vivo: [RELEASE_SMOKE_GATE](../10-validation/release-smoke/RELEASE_SMOKE_GATE.md).
+
 ---
 
 ## Prohibido

@@ -106,11 +106,12 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual Track B:** B-01 Smoke Runner → `npm run test:release-smoke` → **BLOCKED**.  
+**Objetivo actual Track B:** cerrar [RELEASE_SMOKE_GATE](../10-validation/release-smoke/RELEASE_SMOKE_GATE.md) (**NOT READY**).  
+Checklist: #168 + #169 + #170 en `main` + `npm run test:release-smoke` verificado **desde main**.  
 Spec: [RELEASE_SMOKE_SPEC](./RELEASE_SMOKE_SPEC.md) · Runner: [RELEASE_SMOKE_RUNNER](../10-validation/release-smoke/RELEASE_SMOKE_RUNNER.md).  
-Tras Gate verde → READY TO OPEN **RELEASE-SMOKE-001** (no antes).  
+**RELEASE-SMOKE-001 MUST NOT be opened** hasta Gate verde.  
 Do **not** open FLOW-05 unless Track B discovers a blocker that requires it.  
-**Regla:** runners Release = capacidades de plataforma · runners Flow = entidades de dominio.
+**Reglas:** (1) Release = capacidades · Flow = dominio · (2) Gate cierra solo desde `main` (Regla 9).
 
 Cross-flow **no sustituye** runners canónicos: los runners certifican contratos;  
 el cross-flow demuestra que los contratos encadenan:
