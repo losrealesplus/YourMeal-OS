@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW_03_BILLING_SPEC.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ **SPEC READY FOR FREEZE** — checklist pre-Freeze · sin runner ni dominio en este PR  
+**Estado:** ✅ **READY FOR FREEZE** — I7 + review-as-event aprobados · **merge de este PR = FROZEN** · sin runner ni dominio aquí  
 **Precondición:** FLOW-02 ✅ CERTIFIED · tag `flow02-pass` · [FLOW02_PASS_ACTA](../10-validation/flow-02/FLOW02_PASS_ACTA.md)  
 **DoR:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md)  
 **Gobernanza:** [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) Regla 7–9 · [Evidence before Implementation](./EVIDENCE_BEFORE_IMPLEMENTATION.md)  
@@ -432,9 +432,9 @@ Si algún ítem quedara abierto → **no Freeze** · no runner.
 
 | Artefacto | Estado |
 |-----------|--------|
-| SPEC | ✅ listo para Freeze (merge de este PR) |
-| Contrato `FLOW03_*` | ✅ congelable |
-| Runner `test:flow03-canonical` | ⏳ PR siguiente (post-Freeze) |
+| SPEC | ✅ **READY FOR FREEZE** (I7 · review-as-event) · merge = **FROZEN** |
+| Contrato `FLOW03_*` | ✅ congelado en Spec |
+| Runner `test:flow03-canonical` | ⏳ PR siguiente (post-Freeze) · BLOCKED at T1 · sin dominio |
 | Estados / invariantes / PASS·BLOCKED | ✅ |
 | Acta (path) | ⏳ `docs/10-validation/flow-03/` con runner |
 
