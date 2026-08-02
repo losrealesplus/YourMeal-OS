@@ -4,7 +4,7 @@
  *
  * Certifies controlled recovery (R1–R3). Complements Deploy + Smoke + Cross-flow + E2E.
  *
- * Default (`npm run test:release-rollback`): --live through max certified (R1).
+ * Default (`npm run test:release-rollback`): --live through max certified (R2).
  * Modes:
  *   --live           Drive certified segments (default through = max certified).
  *   --runner-only    Empty pipeline → BLOCKED at R1 (historic Gate land-check).
@@ -14,11 +14,11 @@
  *
  * Spec: docs/00-status/RELEASE_ROLLBACK_SPEC.md
  *
- * NO R2/R3 drivers in this PR · NO CI · NO infra · NO restore execution.
+ * NO R3 driver in this PR · NO CI · NO infra · NO remote restore execution.
  */
 
 /** Highest segment with a capability driver implemented. */
-const RELEASE_ROLLBACK_CERTIFIED_THROUGH = 1;
+const RELEASE_ROLLBACK_CERTIFIED_THROUGH = 2;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";

@@ -2,10 +2,11 @@
  * RELEASE-ROLLBACK · Capability driver (controlled recovery — not Deploy/E2E re-run).
  *
  * R1 = Detect / Decide (release-deploy-pass + Spec/Gate)
- * R2 = Execute Rollback / Restore (future · RELEASE-ROLLBACK-002)
+ * R2 = Execute Rollback / Restore (R1 CERTIFIED + execute procedure + deploy tip)
  * R3 = Post-rollback Verify (future · RELEASE-ROLLBACK-003)
  */
 import { runReleaseRollbackR1DetectDecide } from "./release-rollback-r1-detect-decide.mjs";
+import { runReleaseRollbackR2ExecuteRestore } from "./release-rollback-r2-execute-restore.mjs";
 
 /**
  * @param {{ root: string, through?: 1|2|3 | null }} opts
@@ -50,11 +51,35 @@ export function runReleaseRollbackCapabilityDriver({ root, through = null }) {
 
   if (max < 2) return { ok: true, steps, evidence };
 
+  console.info("[RELEASE-ROLLBACK]", "RELEASE_ROLLBACK_R2_STARTED", {
+    segment: "execute_rollback_restore",
+  });
+  steps.push("RELEASE_ROLLBACK_R2_STARTED");
+
+  const r2 = runReleaseRollbackR2ExecuteRestore({ cwd: root });
+  evidence.r2_checks = r2.checks;
+  if (!r2.ok) {
+    console.error("[RELEASE-ROLLBACK] R2 FAIL:\n" + r2.reason);
+    return { ok: false, steps, reason: r2.reason, evidence };
+  }
+  evidence.r2_mapped_tokens = r2.mapped_tokens;
+  evidence.r2_source = r2.source;
+
+  console.info("[RELEASE-ROLLBACK]", "RELEASE_ROLLBACK_R2_COMPLETED", {
+    segment: "execute_rollback_restore",
+    mapped_tokens: r2.mapped_tokens,
+    source: r2.source,
+    checks: r2.checks,
+  });
+  steps.push("RELEASE_ROLLBACK_R2_COMPLETED");
+
+  if (max < 3) return { ok: true, steps, evidence };
+
   return {
     ok: false,
     steps,
     reason:
-      "R2 Execute Rollback/Restore driver not implemented (RELEASE-ROLLBACK-002). Do not invent restore.",
+      "R3 Post-rollback Verify driver not implemented (RELEASE-ROLLBACK-003). Do not invent verify.",
     evidence,
   };
 }
