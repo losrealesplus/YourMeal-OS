@@ -106,12 +106,12 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual Track B:** **RELEASE-E2E-003** · E3 only (este PR).  
-001 ✅ CERTIFIED (#190 · `514f325`) · 002 ✅ CERTIFIED (#192 · `a1b7456` · #193).  
-003 ▶ PASS through E3 · BLOCKED at E4 · anchors FLOW-02 + FLOW-03.  
+**Objetivo actual Track B:** **RELEASE-E2E-004** · E4 only (siguiente PR).  
+001–002 ✅ · 003 ✅ CERTIFIED (#194 · `773c72c`).  
+Land Check PASS through E3 desde `main`.  
 Acta: [RELEASE_E2E_003_E3_ACTA](../10-validation/release-e2e/RELEASE_E2E_003_E3_ACTA.md).  
-Después de merge: Land Check desde `main` → **READY TO OPEN** 004 (E4 only · FLOW-04).  
-Do **not** open E4 · Deploy · Rollback · FLOW-05 in 003.  
+Decision: **READY TO OPEN** RELEASE-E2E-004 · anchor FLOW-04 / `flow04-pass`.  
+Do **not** open Deploy · Rollback · FLOW-05 in 004.  
 **Reglas:** (1) Release gates ≠ Flow runners · (2) Land Check desde `main` (Regla 9).
 
 Cross-flow **no sustituye** runners canónicos: los runners certifican contratos;  
@@ -190,7 +190,7 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 ## Current Goal
 
 ```text
-Track B (prioridad): RELEASE-E2E-003 (este PR) → Land Check → 004 → release-e2e-pass
+Track B (prioridad): RELEASE-E2E-004 E4 → release-e2e-pass
 Track A:             Do NOT open FLOW-05 unless Track B finds a blocker
 FOPEBA_LAND_CHECK:   ACTIVE · before every 001 / tag
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos
