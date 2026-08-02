@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_ROLLBACK_SPEC.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **FROZEN** (Spec · #208 · `4d109f7`) · DoR ✅ (#207) · Runner ✅ #210 · Gate ✅ #211 · 001 ▶ [ACTA](../10-validation/release-rollback/RELEASE_ROLLBACK_001_R1_ACTA.md)  
+**Estado:** ✅ **FROZEN** (Spec · #208 · `4d109f7`) · DoR ✅ (#207) · Runner ✅ #210 · Gate ✅ #211 · 001 ✅ CERTIFIED #212 · `9c52d01` · next 002  
 **Gate DoRl:** Rollback · Track B · RELEASE-01  
 **Nivel:** Release Contract — **no** es un Flow nuevo  
 **DoR:** [RELEASE_ROLLBACK_DOR](./RELEASE_ROLLBACK_DOR.md) ✅ en `main` (#207 · `e7f51a8`)  
@@ -317,7 +317,8 @@ tag (futuro): release-rollback-pass
 | Spec FROZEN | ✅ #208 · `4d109f7` · Land Check docs |
 | Runner BLOCKED at R1 | ✅ CERTIFIED #210 · `a1fbdc3` |
 | Gate READY | ✅ #211 · Land Check from main |
-| RELEASE-ROLLBACK-001 | ▶ este PR (R1 only) |
+| RELEASE-ROLLBACK-001 | ✅ CERTIFIED #212 · `9c52d01` |
+| RELEASE-ROLLBACK-002 | ⏳ READY TO OPEN (R2 only) |
 
 **Estado del documento:** ✅ **FROZEN**
 
@@ -326,15 +327,14 @@ tag (futuro): release-rollback-pass
 ## 14. Next
 
 ```text
-RELEASE-ROLLBACK-001 (este PR)
-PASS through R1 · BLOCKED at RELEASE_ROLLBACK_R2_STARTED
-    ↓
-Land Check main → READY TO OPEN 002
+READY TO OPEN
+RELEASE-ROLLBACK-002 · R2 only
+PASS through R2 · BLOCKED at RELEASE_ROLLBACK_R3_STARTED
     ↓
 003 → release-rollback-pass
 ```
 
-**No** R2/R3 · FLOW-05 · `release-01-beta` en Rollback-001.
+**No** R3 · FLOW-05 · `release-01-beta` en Rollback-002.
 
 ---
 

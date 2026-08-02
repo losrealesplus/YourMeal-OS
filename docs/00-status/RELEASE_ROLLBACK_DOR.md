@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_ROLLBACK_DOR.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **DoR CERTIFIED** (`main` · #207 · `e7f51a8`) · Spec ✅ [FROZEN](./RELEASE_ROLLBACK_SPEC.md) (#208) · Runner ✅ #210 · Gate ✅ #211 · 001 ▶ [ACTA](../10-validation/release-rollback/RELEASE_ROLLBACK_001_R1_ACTA.md)  
+**Estado:** ✅ **DoR CERTIFIED** (`main` · #207 · `e7f51a8`) · Spec ✅ [FROZEN](./RELEASE_ROLLBACK_SPEC.md) (#208) · Runner ✅ #210 · Gate ✅ #211 · 001 ✅ CERTIFIED #212 · `9c52d01` · next 002  
 **Nivel:** Release Track B · B-05 Rollback  
 **Pregunta (única):** ¿Qué debe certificar RELEASE-ROLLBACK antes de considerar recuperable un fallo de publicación?  
 **Estándar Flow Ready:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) (mismo ciclo FOPEBA)  
@@ -94,11 +94,13 @@ RELEASE-ROLLBACK (B-05)
 ☑ SPEC lista (READY FOR FREEZE)            → [RELEASE_ROLLBACK_SPEC](./RELEASE_ROLLBACK_SPEC.md)
 ☑ Spec FROZEN en main                      → #208 · `4d109f7`
 ☑ Runner creado (BLOCKED baseline)         → ✅ #210 · `a1fbdc3` · [RUNNER](../10-validation/release-rollback/RELEASE_ROLLBACK_RUNNER.md)
-☑ READY TO OPEN RELEASE-ROLLBACK-001       → ✅ Gate READY #211 · 001 ▶ [ACTA](../10-validation/release-rollback/RELEASE_ROLLBACK_001_R1_ACTA.md)
+☑ READY TO OPEN RELEASE-ROLLBACK-001       → ✅ Gate READY #211
+☑ RELEASE-ROLLBACK-001 CERTIFIED             → ✅ #212 · `9c52d01` · [ACTA](../10-validation/release-rollback/RELEASE_ROLLBACK_001_R1_ACTA.md)
+☑ READY TO OPEN RELEASE-ROLLBACK-002         → ✅ Land Check R1 from main
 ```
 
-**DoR CERTIFIED** · Spec ✅ · Runner ✅ · Gate ✅ · **001 R1 ▶ este PR**.  
-**No** R2/R3 · FLOW-05 · `release-01-beta` en Rollback-001.
+**DoR CERTIFIED** · Spec ✅ · Runner ✅ · Gate ✅ · **001 CERTIFIED** → READY TO OPEN 002 (R2 only).  
+**No** R3 · FLOW-05 · `release-01-beta` en Rollback-002.
 
 ---
 
@@ -111,7 +113,7 @@ RELEASE-ROLLBACK (B-05)
 | 2 | Freeze (merge Spec → main) | ✅ |
 | 3 | Runner only · BLOCKED at R1 | ✅ #210 · `a1fbdc3` |
 | 4 | Gate | ✅ READY (Land Check `main`) |
-| 5 | Capacidades / PRs Rollback (001…003) | ▶ 001 este PR · 002…003 ⏳ |
+| 5 | Capacidades / PRs Rollback (001…003) | ✅ 001 · ⏳ READY TO OPEN 002 · 003 ⏳ |
 | 6 | FULL PASS · tag `release-rollback-pass` | ⏳ |
 
 ---
