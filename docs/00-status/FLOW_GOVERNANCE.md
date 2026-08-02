@@ -166,6 +166,30 @@ Una transición certificada por PR de implementación.
 
 ---
 
+## REGLA 9 — Land on `main` (Merged ≠ en main)
+
+Un PR **Merged** no implica que el artefacto esté en `main` si la **base** del PR era otra rama.
+
+Para Spec / Runner / Flow Certification:
+
+```text
+base: main   ✅
+base: cursor/…-f54a   ❌  (solo stacking; no sustituye land en main)
+```
+
+Antes de abrir el siguiente trabajo (p. ej. dominio tras Runner), verificación obligatoria en local:
+
+```bash
+git pull origin main
+git log --oneline -5
+npm run | grep flowNN   # o el script del Flow
+```
+
+Si el commit o el script no aparecen en `main` → el cambio **no ha aterrizado**, aunque GitHub diga Merged.  
+Incidente de referencia: #149 mergeado en `cursor/flow-02-specification-f54a` · corregido por #150 → `main`.
+
+---
+
 ## Estructura de épicas (consecuencia)
 
 El backlog operacional se organiza por **valor operacional (Flow)**, no por módulo:
