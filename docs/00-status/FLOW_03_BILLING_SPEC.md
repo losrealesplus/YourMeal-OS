@@ -395,17 +395,25 @@ FLOW03_T3_COMPLETED
 PASS
 ```
 
-Comando previsto: `npm run test:flow03-canonical`  
-Comportamiento inicial (sin dominio):
+Comando previsto (PR runner #156 · **no** en este PR Spec): `npm run test:flow03-canonical`  
+
+Comportamiento inicial (sin dominio) — Gate condición 3:
 
 ```text
 FLOW-03
 BLOCKED
 blocked_at=FLOW03_T1_STARTED
+duplicates=[]
+missing=[]
+out_of_order=[]
+evidence={}
 ```
 
+Exit code esperado: **2** (BLOCKED).  
+
 Los **invariantes** deben ser assertions del runner.  
-**No se implementa en este PR.**
+Acta: `docs/10-validation/flow-03/FLOW03_CANONICAL_RUNNER.md` llega con #156.  
+**No se implementa runner ni dominio en este PR.**
 
 ---
 
@@ -434,13 +442,14 @@ Si algún ítem quedara abierto → **no Freeze** · no runner.
 | Artefacto | Estado |
 |-----------|--------|
 | SPEC | ✅ **READY FOR FREEZE** (I7 · review-as-event) · merge = **FROZEN** |
-| Contrato `FLOW03_*` | ✅ congelado en Spec |
-| Runner `test:flow03-canonical` | ⏳ PR siguiente (post-Freeze) · BLOCKED at T1 · sin dominio |
+| Contrato `FLOW03_*` | ✅ congelado en Spec (sin renegociación abierta) |
+| Runner `test:flow03-canonical` | ⏳ PR #156 (post-Freeze) · objetivo BLOCKED at T1 · sin dominio |
+| Gate FLOW03-001 | ✅ documentado · dominio bloqueado hasta 4 condiciones en `main` |
 | Estados / invariantes / PASS·BLOCKED | ✅ |
-| Acta (path) | ⏳ `docs/10-validation/flow-03/` con runner |
+| Acta runner | ⏳ path con PR #156 · no en este PR |
 
-**Implementation de dominio:** ❌ prohibida hasta runner + DoR completo (Regla 8).  
-Emisión de evidencia en AccountingService = dominio → **después** del runner.
+**Implementation de dominio:** ❌ prohibida hasta Gate FLOW03-001 verde (Regla 8).  
+Emisión de evidencia en AccountingService = dominio → **después** del runner en `main`.
 
 ---
 
@@ -494,9 +503,9 @@ Separación de responsabilidades (sin mezclar en un mismo PR):
 
 | Fase | Trabajo | Estado |
 |------|---------|--------|
-| 1 | Spec (este PR) | ▶ → merge = **FROZEN** |
-| 2 | Runner canónico (`test:flow03-canonical` · BLOCKED at T1) | ⏳ |
-| 3 | **Gate FLOW03-001** (4 condiciones) | ⏳ |
+| 1 | Spec (este PR #155) | ✅ READY FOR FREEZE → merge = **FROZEN** |
+| 2 | Runner canónico (#156 · BLOCKED at T1 · sin dominio) | ⏳ post-Freeze |
+| 3 | **Gate FLOW03-001** (4 condiciones desde `main`) | ⏳ |
 | 4 | FLOW03-001…003 (una transición / PR) | ⏳ bloqueado por Gate |
 | 5 | FULL PASS · tag `flow03-pass` | ⏳ |
 
