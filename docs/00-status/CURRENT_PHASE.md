@@ -50,12 +50,12 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    Track B › RELEASE-E2E-002 E2 only (este PR)
+  Prioridad                    Track B › RELEASE-E2E-003 E3 only
                                001 ✅ CERTIFIED #190 · 514f325
-                               → ../10-validation/release-e2e/RELEASE_E2E_001_E1_ACTA.md
-                               002 ▶ E2 · FLOW-01 / flow01-pass
+                               002 ✅ CERTIFIED #192 · a1b7456
                                → ../10-validation/release-e2e/RELEASE_E2E_002_E2_ACTA.md
-                               No E3/E4 · Billing · Inventory · Deploy · Rollback · FLOW-05
+                               Gate ✅ READY TO OPEN 003 (FLOW-02+03 ancla)
+                               No E4 · Deploy · Rollback · FLOW-05 en 003
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)
   Land Check                   ./FOPEBA_LAND_CHECK.md (antes de cualquier 001)
