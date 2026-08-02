@@ -47,8 +47,9 @@ Sprint activo
   Tags: ps002c-pass · flow01-pass · flow02-pass · flow03-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
   Activo                       FLOW-04 Inventory Consumption
-                               ▶ DoR document · ./FLOW_04_INVENTORY_CONSUMPTION_DOR.md
-                               Spec ❌ · Runner ❌ · Domain ❌
+                               DoR ✅ · Spec ▶ READY FOR FREEZE
+                               → ./FLOW_04_INVENTORY_CONSUMPTION_SPEC.md
+                               Runner ❌ · Domain ❌
                                Plan: ./NEXT_EXECUTION_PLAN.md
   Handoff                      ./PROJECT_HANDOFF.md (congelado 2026-08-02)
   Release                      ./RELEASE_01_BETA_STRATEGY.md (DRAFT · eje B)
@@ -80,7 +81,7 @@ NEXT PHASE
   ↓
   FLOW-03 ✅ FULL PASS · tag flow03-pass → 67a2e66 (#160)
   ↓
-  FLOW-04 · DoR (#162) → Spec → Freeze → Runner (BLOCKED at T1)
+  FLOW-04 · DoR ✅ → Spec READY FOR FREEZE → Freeze → Runner (BLOCKED at T1)
   ↓
   FLOW04-001… (solo tras Gate)
 
