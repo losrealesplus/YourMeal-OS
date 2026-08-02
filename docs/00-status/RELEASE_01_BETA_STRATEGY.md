@@ -86,7 +86,7 @@ B-01 Smoke        ✅ release-smoke-pass
 B-02 Cross-flow   ✅ release-crossflow-pass → 0a0c51b
 B-03 E2E          ✅ release-e2e-pass → 73623ae
 B-04 Deployment   ✅ release-deploy-pass → 7896a2a
-B-05 Rollback     DoR ✅ · Spec ✅ · Runner ✅ · Gate ✅ · 001 ✅ · next 002 → release-rollback-pass
+B-05 Rollback     DoR ✅ · Spec ✅ · Runner ✅ · Gate ✅ · 001 ✅ · 002 ✅ · next 003 → release-rollback-pass
 B-06 Beta Accept. Solo al final → release-01-beta
 ```
 
