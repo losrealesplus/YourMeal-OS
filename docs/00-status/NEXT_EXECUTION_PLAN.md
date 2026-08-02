@@ -23,7 +23,8 @@ FLOW-03                       ✅  flow03-pass
 FLOW-04 DoR                   ✅  #162
 FLOW-04 Spec                  ✅  FROZEN #163 · 3d922ae
 FLOW-04 Runner                ✅  #164 · a99f6fd
-FLOW04-001                    ▶  T1 → planned
+FLOW04-001                    ✅  T1 → planned (#165)
+FLOW04-002                    ▶  T2 planned → applied
 RELEASE-01                    DRAFT  (eje B · #161 en main)
 Definition of Release         DRAFT  (DoRl)
 ```
@@ -147,9 +148,9 @@ No forma parte de este PR ni de la Spec.
 ## Current Goal
 
 ```text
-FLOW04-001 · Is T1 certified?
-npm run test:flow04-001 → PASS through T1 · BLOCKED at T2 · exit 0
-No T2 · No T3 · No stock mutation.
+FLOW04-002 · Is T2 certified?
+npm run test:flow04-002 → PASS through T2 · BLOCKED at T3 · exit 0
+I2 Single Apply · I3 no negative stock · No T3 / sealed.
 ```
 
 ---

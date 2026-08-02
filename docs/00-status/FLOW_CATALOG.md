@@ -40,7 +40,7 @@ Sí: `FLOW-01 Kitchen → Delivery`.
 
 | ID | Handoff / alcance | Prioridad | Motivo | Estado |
 |----|-------------------|-----------|--------|--------|
-| **FLOW-04** | Inventory Consumption | Alta | Consumo de ingredientes tras producción | ▶ **FLOW04-001 T1** · Spec ✅ · Runner ✅ · [SPEC](./FLOW_04_INVENTORY_CONSUMPTION_SPEC.md) · [Acta T1](../10-validation/flow-04/FLOW04_001_T1_ACTA.md) |
+| **FLOW-04** | Inventory Consumption | Alta | Consumo de ingredientes tras producción | ▶ **FLOW04-002 T2** · T1 ✅ · [SPEC](./FLOW_04_INVENTORY_CONSUMPTION_SPEC.md) · [Acta T2](../10-validation/flow-04/FLOW04_002_T2_ACTA.md) |
 | **FLOW-05** | Customer Order Lifecycle | Media | Creación del pedido → `confirmed` | ⏳ DoR NOT STARTED |
 | **FLOW-06** | Kitchen Planning | Media | Planificación previa a T1 | ⏳ DoR NOT STARTED |
 

@@ -2,8 +2,9 @@
  * FLOW-04 live domain driver (progressive T1–T3).
  * Invoked by scripts/lib/flow04-domain-driver.mjs
  *
- * FLOW04-001: through=1 → planConsumptionFromProduction (default)
- * FLOW04-002+: through=2|3 — not implemented yet
+ * FLOW04-001: through=1 → planConsumptionFromProduction
+ * FLOW04-002: through=2 → + applyConsumption (default)
+ * FLOW04-003: through=3 — not implemented yet
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ServiceContext } from "@/services/types";
@@ -15,6 +16,7 @@ import {
 import {
   __resetInventoryStoreForTests,
   __seedProductionPlanInput,
+  __seedStock,
 } from "../infrastructure/inventory-repository";
 
 function ctx(): ServiceContext {
@@ -36,10 +38,10 @@ describe("FLOW-04 live domain driver", () => {
     vi.restoreAllMocks();
   });
 
-  it("drives certified transitions up to FLOW04_LIVE_THROUGH (default T1)", async () => {
-    // FLOW04-001: default through=1 until T2/T3 exist
+  it("drives certified transitions up to FLOW04_LIVE_THROUGH (default T2)", async () => {
+    // FLOW04-002: default through=2 until T3 exists
     // Do NOT mock console.info — domain driver extracts [FLOW-04] tokens from stdout.
-    const through = Number(process.env.FLOW04_LIVE_THROUGH || "1");
+    const through = Number(process.env.FLOW04_LIVE_THROUGH || "2");
 
     __seedProductionPlanInput("tenant-flow04", {
       deliveryDate: "2026-08-02",
@@ -54,6 +56,7 @@ describe("FLOW-04 live domain driver", () => {
         },
       ],
     });
+    __seedStock("tenant-flow04", "ing-flow04", 100);
 
     const consumption = await InventoryService.planConsumptionFromProduction(
       ctx(),
@@ -71,8 +74,24 @@ describe("FLOW-04 live domain driver", () => {
       return;
     }
 
+    const applied = await InventoryService.applyConsumption(
+      ctx(),
+      consumption.id,
+    );
+    expect(applied.status).toBe("applied");
+
+    if (through < 3) {
+      expect(getObservedFlow04Steps()).toEqual([
+        "FLOW04_T1_STARTED",
+        "FLOW04_T1_COMPLETED",
+        "FLOW04_T2_STARTED",
+        "FLOW04_T2_COMPLETED",
+      ]);
+      return;
+    }
+
     throw new Error(
-      `FLOW04_LIVE_THROUGH=${through} not implemented (only T1 certified)`,
+      `FLOW04_LIVE_THROUGH=${through} not implemented (only T1–T2 certified)`,
     );
   });
 });

@@ -48,9 +48,10 @@ Sprint activo
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
   Activo                       FLOW-04 Inventory Consumption
                                DoR ✅ · Spec ✅ FROZEN · Runner ✅ (#164)
-                               Gate ✅ · Domain ▶ FLOW04-001 T1 (→ planned)
+                               Gate ✅ · Domain ▶ FLOW04-002 T2 (planned → applied)
+                               T1 ✅ (#165) · T3 ❌
                                → ./FLOW_04_INVENTORY_CONSUMPTION_SPEC.md
-                               → ../10-validation/flow-04/FLOW04_001_T1_ACTA.md
+                               → ../10-validation/flow-04/FLOW04_002_T2_ACTA.md
                                Plan: ./NEXT_EXECUTION_PLAN.md
   Handoff                      ./PROJECT_HANDOFF.md (congelado 2026-08-02)
   Release                      ./RELEASE_01_BETA_STRATEGY.md (DRAFT · eje B)

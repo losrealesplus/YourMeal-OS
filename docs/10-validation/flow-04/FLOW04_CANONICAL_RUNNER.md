@@ -105,13 +105,15 @@ Gate **verde** · FLOW04-001 abierto · [acta T1](./FLOW04_001_T1_ACTA.md).
 
 | Entrega | Estado |
 |---------|--------|
-| FLOW04-001 T1 | ▶ `→ planned` · [acta](./FLOW04_001_T1_ACTA.md) |
-| FLOW04-002 T2 | ⏳ `planned → applied` (+ stock · I2) |
+| FLOW04-001 T1 | ✅ `→ planned` · [acta](./FLOW04_001_T1_ACTA.md) |
+| FLOW04-002 T2 | ▶ `planned → applied` (+ stock · I2/I3) · [acta](./FLOW04_002_T2_ACTA.md) |
 | FLOW04-003 T3 | ⏳ `applied → sealed` |
 
 ```bash
 npm run test:flow04-001
 # → PASS through T1 · BLOCKED at FLOW04_T2_STARTED · exit 0
+npm run test:flow04-002
+# → PASS through T2 · BLOCKED at FLOW04_T3_STARTED · exit 0
 ```
 
 ---
