@@ -42,9 +42,10 @@ Sprint activo
   Live: npm run test:flow01-canonical -- --live → PASS
   Acta: ../10-validation/flow-01/FLOW01_PASS_ACTA.md
   Tags: ps002c-pass · flow01-pass
-  Siguiente                    Consolidar DoR (este track)
+        (taxonomía: ./GIT_MILESTONE_TAGS.md)
+  Siguiente                    Merge DoR (#147)
                                luego FLOW-02 Spec (Delivery Incidents)
-                               — sin Implementation hasta DoR
+                               — DoR → Spec → Runner → Impl. 00n
   Beta paralelo: BR-03.3 Runtime Validation (G3)
   Disciplina: una transición / PR · DoR antes de código
 

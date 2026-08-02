@@ -63,6 +63,8 @@ Demostrado en:
 | Plataforma | FCR-008 · PS-002-C · tag `ps002c-pass` |
 | Dominio | FLOW-01 · T1–T4 · tag `flow01-pass` |
 
+Taxonomía de hitos Git: [GIT_MILESTONE_TAGS](./GIT_MILESTONE_TAGS.md).
+
 ---
 
 ## Semántica del runner (inmutable)
