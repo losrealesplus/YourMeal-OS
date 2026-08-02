@@ -2,37 +2,33 @@
 
 **Documento:** `RELEASE_CROSSFLOW_GATE.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ⛔ **NOT READY** · Runner propuesto · Land Check pendiente desde `main`  
+**Estado:** ✅ **READY** · Runner CERTIFIED desde `main` · 001 en curso  
 **Nivel:** Release Track B · B-02 Cross-flow  
 **Spec:** [RELEASE_CROSSFLOW_SPEC](../../00-status/RELEASE_CROSSFLOW_SPEC.md)  
 **Runner:** [RELEASE_CROSSFLOW_RUNNER](./RELEASE_CROSSFLOW_RUNNER.md)  
 **Land Check:** [FOPEBA_LAND_CHECK](../../00-status/FOPEBA_LAND_CHECK.md)
 
-> `main` certifica; las ramas solo proponen.  
-> CROSSFLOW-001 permanece **CLOSED**.
+> `main` certifica; las ramas solo proponen.
 
 ---
 
 ## Checklist
 
 ```text
-☑ DoR landed (#178)
+☑ DoR certified (#178)
 ☑ Spec FROZEN (#179 → dbfe917)
-☑ Runner PR opened (este PR)
-□ Runner landed on main
-□ Canonical BLOCKED verified from main
-    npm run test:release-crossflow
+☑ Runner merged (#180 → 73df12b)
+☑ Canonical BLOCKED verified from main
+    npm run test:release-crossflow   (pre-001 default)
     → BLOCKED at RELEASE_CROSSFLOW_C1_STARTED · exit 2
-□ Gate → READY
+    duplicates=[] missing=[] out_of_order=[] evidence={}
 ```
 
-### Decision (hoy)
+### Decision (post–Runner Land Check)
 
 ```text
-NOT READY TO OPEN CROSSFLOW-001
-
-After this Runner merges + Land Check from main:
-READY TO OPEN RELEASE-CROSSFLOW-001 · C1 only
+READY TO OPEN / IN PROGRESS
+RELEASE-CROSSFLOW-001 · C1 only
 ```
 
 ### Progress
@@ -41,8 +37,9 @@ READY TO OPEN RELEASE-CROSSFLOW-001 · C1 only
 |----------|-------|--------|
 | DoR | Ready framework | ✅ #178 |
 | Spec | Contract C1–C4 | ✅ FROZEN #179 |
-| Runner | BLOCKED at C1 | ▶ este PR |
-| CROSSFLOW-001…004 | Segment drivers | ⛔ CLOSED |
+| Runner | BLOCKED at C1 | ✅ CERTIFIED #180 |
+| RELEASE-CROSSFLOW-001 | C1 Kitchen→Delivery | ▶ este PR |
+| RELEASE-CROSSFLOW-002…004 | C2–C4 | ⏳ |
 | `release-crossflow-pass` | FULL PASS | ⏳ |
 
 ---

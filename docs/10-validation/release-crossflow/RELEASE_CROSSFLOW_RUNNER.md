@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_CROSSFLOW_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ Runner **ACTIVE** · default **BLOCKED** at `RELEASE_CROSSFLOW_C1_STARTED`  
+**Estado:** ▶ Runner **ACTIVE** · live through C1 · runner-only **BLOCKED** at C1  
 **Spec:** [RELEASE_CROSSFLOW_SPEC](../../00-status/RELEASE_CROSSFLOW_SPEC.md) (FROZEN · #179)  
 **DoR:** [RELEASE_CROSSFLOW_DOR](../../00-status/RELEASE_CROSSFLOW_DOR.md)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
@@ -51,65 +51,38 @@ PASS → tag release-crossflow-pass
 
 ---
 
-## Comando por defecto (este PR)
+## Comandos
 
 ```bash
+# Default live through max certified (C1)
 npm run test:release-crossflow
-```
+# → PASS through C1 · BLOCKED at C2 · exit 0
 
-Resultado esperado (sin drivers de segmento):
+# RELEASE-CROSSFLOW-001 · C1 only
+npm run test:release-crossflow-001
+# → PASS through C1 · BLOCKED at C2 · exit 0
 
-```text
-RELEASE-CROSSFLOW
+# Historic Gate / Land Check vacío
+npm run test:release-crossflow:runner-only
+# → BLOCKED at RELEASE_CROSSFLOW_C1_STARTED · exit 2 · evidence={}
 
-BLOCKED
-
-blocked_at=RELEASE_CROSSFLOW_C1_STARTED
-duplicates=[]
-missing=[]
-out_of_order=[]
-evidence={}
-
-exit 2
-```
-
-### Unit tests (pipeline only)
-
-```bash
+# Unit tests
 npm run test:release-crossflow:unit
 ```
 
-### Self-test (synthetic full contract)
-
-```bash
-npm run test:release-crossflow -- --self-test
-# → PASS through C4 · blocked_at=— · exit 0
-```
-
 ---
 
-## Fuera de alcance (este PR)
+## Fuera de alcance hasta C1+
 
-- Drivers C1–C4 / dominio / repositories / services  
+- Drivers C2–C4  
 - Playwright · UI · Supabase · CI  
 - FLOW-05 · E2E · Deploy · Rollback  
-- Abrir CROSSFLOW-001  
 
 ---
 
-## Gate · CROSSFLOW-001
+## Gate
 
-**CLOSED** hasta Land Check del runner **desde `main`**:
-
-| # | Condición |
-|---|-----------|
-| 1 | Spec FROZEN en `main` | ✅ #179 |
-| 2 | Runner en `main` | ▶ este PR |
-| 3 | `npm run test:release-crossflow` → BLOCKED at C1 · exit 2 | ⏳ desde main |
-| 4 | Gate report READY | ⏳ |
-
-Ver: [RELEASE_CROSSFLOW_GATE](./RELEASE_CROSSFLOW_GATE.md).
-
+Ver: [RELEASE_CROSSFLOW_GATE](./RELEASE_CROSSFLOW_GATE.md) · Decision: ✅ **READY** · 001 en curso.
 ---
 
 ## Evidencia
