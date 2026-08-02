@@ -4,7 +4,7 @@
  *
  * FLOW03-001: through=1 → createInvoiceFromOrders
  * FLOW03-002: through=2 → + reviewInvoice (event · status stays pending)
- * T3 lands in FLOW03-003.
+ * FLOW03-003: through=3 → + recordPayment → paid (FULL PASS)
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ServiceContext } from "@/services/types";
@@ -18,6 +18,8 @@ const getOrdersByIds = vi.fn();
 const createInvoice = vi.fn();
 const getInvoice = vi.fn();
 const markInvoiceReviewed = vi.fn();
+const insertPayment = vi.fn();
+const updateInvoiceStatus = vi.fn();
 
 vi.mock("../infrastructure/accounting-repository", () => ({
   createAccountingRepository: () => ({
@@ -25,10 +27,11 @@ vi.mock("../infrastructure/accounting-repository", () => ({
     createInvoice,
     getInvoice,
     markInvoiceReviewed,
+    insertPayment,
+    updateInvoiceStatus,
     listBillableOrders: vi.fn(),
     listInvoices: vi.fn(),
     periodSummary: vi.fn(),
-    recordPayment: vi.fn(),
   }),
 }));
 
@@ -56,9 +59,8 @@ describe("FLOW-03 live domain driver", () => {
     vi.clearAllMocks();
   });
 
-  it("drives certified transitions up to FLOW03_LIVE_THROUGH (default T2 until 003)", async () => {
-    // Max certified transition until FLOW03-003 lands.
-    const through = Number(process.env.FLOW03_LIVE_THROUGH || "2");
+  it("drives certified transitions up to FLOW03_LIVE_THROUGH (default T3)", async () => {
+    const through = Number(process.env.FLOW03_LIVE_THROUGH || "3");
 
     getOrdersByIds.mockResolvedValue([
       {
@@ -146,8 +148,58 @@ describe("FLOW-03 live domain driver", () => {
       return;
     }
 
-    throw new Error(
-      `FLOW03_LIVE_THROUGH=${through} not implemented yet (only T1–T2 certified)`,
-    );
+    getInvoice
+      .mockResolvedValueOnce({
+        id: "inv-flow03",
+        customerId: "cust-flow03",
+        customerName: null,
+        companyId: "co-flow03",
+        companyName: null,
+        amount: 100,
+        status: "pending",
+        billingPeriod: "2026-08",
+        createdAt: "2026-08-02T00:00:00Z",
+        reviewedAt: "2026-08-02T15:10:00.000Z",
+        orderIds: ["order-flow03"],
+        paidTotal: 0,
+        lifecycleStage: "review",
+      })
+      .mockResolvedValueOnce({
+        id: "inv-flow03",
+        customerId: "cust-flow03",
+        customerName: null,
+        companyId: "co-flow03",
+        companyName: null,
+        amount: 100,
+        status: "paid",
+        billingPeriod: "2026-08",
+        createdAt: "2026-08-02T00:00:00Z",
+        reviewedAt: "2026-08-02T15:10:00.000Z",
+        orderIds: ["order-flow03"],
+        paidTotal: 100,
+        lifecycleStage: "processed",
+      });
+    insertPayment.mockResolvedValue({
+      id: "pay-flow03",
+      invoiceId: "inv-flow03",
+      amount: 100,
+      method: "manual",
+      paidAt: "2026-08-02T15:30:00.000Z",
+      status: "completed",
+    });
+    updateInvoiceStatus.mockResolvedValue(undefined);
+
+    const { invoice: paid } = await AccountingService.recordPayment(ctx(), {
+      invoiceId: "inv-flow03",
+    });
+    expect(paid.status).toBe("paid");
+    expect(getObservedFlow03Steps()).toEqual([
+      "FLOW03_T1_STARTED",
+      "FLOW03_T1_COMPLETED",
+      "FLOW03_T2_STARTED",
+      "FLOW03_T2_COMPLETED",
+      "FLOW03_T3_STARTED",
+      "FLOW03_T3_COMPLETED",
+    ]);
   });
 });

@@ -48,9 +48,9 @@ Sprint activo
   Activo                       FLOW-03 Billing
                                Spec ✅ FROZEN (#155)
                                Runner ✅ (#157) · Gate FLOW03-001 ✅
-                               Domain ▶ FLOW03-002 T2 (review-as-event)
+                               Domain ▶ FLOW03-003 T3 (pending → paid)
                                → ./FLOW_03_BILLING_SPEC.md
-                               → ../10-validation/flow-03/FLOW03_002_T2_ACTA.md
+                               → ../10-validation/flow-03/FLOW03_PASS_ACTA.md
   Beta paralelo: BR-03.3 Runtime Validation (G3)
   Disciplina: una transición / PR · DoR antes de código
 
@@ -79,7 +79,7 @@ NEXT PHASE
   ↓
   Runner ✅ (#157) · Gate ✅
   ↓
-  FLOW03-001 ✅ (#158) → FLOW03-002 ▶ T2 → 003 → tag flow03-pass
+  FLOW03-001 ✅ · FLOW03-002 ✅ → FLOW03-003 ▶ T3 → tag flow03-pass
 
 En paralelo (beta móvil EatClean):
   Lema: cada PR acerca la jornada completa del piloto.

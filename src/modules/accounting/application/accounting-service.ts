@@ -259,6 +259,10 @@ export const AccountingService = {
     }
   },
 
+  /**
+   * FLOW03-003 · T3 — record full payment → invoice `paid` (terminal).
+   * Partial payments / refunds / void are out of FLOW-03 v1 happy path.
+   */
   async recordPayment(
     ctx: ServiceContext,
     input: { invoiceId: string; amount?: number | null; method?: string | null },
@@ -285,6 +289,26 @@ export const AccountingService = {
         "Invoice must be reviewed before payment (Pending → Review → Processed)",
       );
     }
+    if (current.status !== "pending") {
+      throw new DomainError(
+        "INVALID_STATE",
+        `FLOW03-003 requires invoice status pending (got ${current.status})`,
+      );
+    }
+
+    try {
+      assertFlow03Prefix([
+        "FLOW03_T1_STARTED",
+        "FLOW03_T1_COMPLETED",
+        "FLOW03_T2_STARTED",
+        "FLOW03_T2_COMPLETED",
+      ]);
+    } catch {
+      throw new DomainError(
+        "INVALID_STATE",
+        "FLOW03-003 requires T1+T2 COMPLETED before recordPayment",
+      );
+    }
 
     const remaining = Math.max(0, current.amount - current.paidTotal);
     const amount = input.amount != null ? Number(input.amount) : remaining;
@@ -297,35 +321,75 @@ export const AccountingService = {
         "Payment exceeds remaining invoice balance",
       );
     }
+    // FLOW-03 v1: T3 = cobro completo → paid (no parciales en happy path)
+    if (amount + 0.001 < remaining) {
+      throw new DomainError(
+        "INVALID_STATE",
+        "FLOW03-003 requires full payment (partial payments out of v1)",
+      );
+    }
 
-    const payment = await repo.insertPayment({
+    logFlow03Step("FLOW03_T3_STARTED", {
       invoiceId: current.id,
+      status: current.status,
       amount,
-      method: input.method?.trim() || "manual",
     });
 
-    const newPaid = current.paidTotal + amount;
-    if (newPaid + 0.001 >= current.amount) {
-      await repo.updateInvoiceStatus(current.id, "paid");
-    }
-
-    await AuditService.write(ctx, {
-      entityType: "payment",
-      entityId: payment.id,
-      action: "create",
-      newData: {
+    try {
+      const payment = await repo.insertPayment({
         invoiceId: current.id,
-        amount: payment.amount,
-        method: payment.method,
-        lifecycleStage: "processed",
-      },
-    });
+        amount,
+        method: input.method?.trim() || "manual",
+      });
 
-    const updated = await repo.getInvoice(current.id);
-    if (!updated) {
-      throw new DomainError("NOT_FOUND", `Invoice ${current.id} after payment`);
+      const newPaid = current.paidTotal + amount;
+      if (newPaid + 0.001 >= current.amount) {
+        await repo.updateInvoiceStatus(current.id, "paid");
+      }
+
+      await AuditService.write(ctx, {
+        entityType: "payment",
+        entityId: payment.id,
+        action: "create",
+        newData: {
+          invoiceId: current.id,
+          amount: payment.amount,
+          method: payment.method,
+          lifecycleStage: "processed",
+        },
+      });
+
+      const updated = await repo.getInvoice(current.id);
+      if (!updated) {
+        throw new DomainError("NOT_FOUND", `Invoice ${current.id} after payment`);
+      }
+      if (updated.status !== "paid") {
+        stopFlow03("T3_NOT_PAID", {
+          invoiceId: updated.id,
+          status: updated.status,
+        });
+        throw new DomainError(
+          "INVALID_STATE",
+          "FLOW03-003 invariant: invoice must be paid after recordPayment",
+        );
+      }
+
+      logFlow03Step("FLOW03_T3_COMPLETED", {
+        invoiceId: updated.id,
+        status: updated.status,
+        paymentId: payment.id,
+        amount: payment.amount,
+      });
+
+      return { invoice: updated, payment };
+    } catch (e) {
+      if (e instanceof DomainError) throw e;
+      stopFlow03("T3_FAILED", {
+        invoiceId: current.id,
+        error: e instanceof Error ? e.message : String(e),
+      });
+      throw e;
     }
-    return { invoice: updated, payment };
   },
 
   async voidInvoice(ctx: ServiceContext, invoiceId: string): Promise<InvoiceRecord> {

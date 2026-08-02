@@ -1,11 +1,11 @@
 {
   "status": "PASS",
-  "reason": "",
+  "reason": "FLOW-03 complete",
   "gate": "FLOW-03",
   "contract": "FLOW_03_BILLING_SPEC",
   "principle": "Evidence before Implementation",
   "code_status": "DOMAIN_DRIVER_T3",
-  "at": "2026-08-02T15:45:58.596Z",
+  "at": "2026-08-02T15:45:57.168Z",
   "pipeline": [
     "FLOW03_T1_STARTED",
     "FLOW03_T1_COMPLETED",
@@ -28,7 +28,7 @@
   "firstFailure": null,
   "certified_through": 3,
   "blocked_at": null,
-  "delivery": "FLOW-03",
+  "delivery": "FLOW03-003",
   "delivery_status": "PASS",
   "flow_status": "PASS",
   "terminal": {
