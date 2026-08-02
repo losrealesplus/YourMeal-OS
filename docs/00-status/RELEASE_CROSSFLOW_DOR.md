@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_CROSSFLOW_DOR.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **DoR DOCUMENT** · Spec pendiente · Runner pendiente  
+**Estado:** ✅ **DoR CERTIFIED** (`main` · #178) · Spec ▶ [READY FOR FREEZE](./RELEASE_CROSSFLOW_SPEC.md)  
 **Nivel:** Release Track B · B-02 Cross-flow  
 **Pregunta operacional (borrador):** ¿Los contratos FLOW-01…04 encadenan de extremo a extremo sin romper handoffs?  
 **Estándar Flow Ready:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) (mismo ciclo FOPEBA)  
@@ -91,8 +91,8 @@ Adaptación del estándar Flow Ready al gate de producto:
 
 ```text
 RELEASE-CROSSFLOW (B-02)
-□ SPEC congelada                          → siguiente PR (READY FOR FREEZE)
-☑ Contrato de evidencias (skeleton)       → este DoR § Tokens
+☑ SPEC lista (READY FOR FREEZE)           → RELEASE_CROSSFLOW_SPEC.md
+☑ Contrato de evidencias (skeleton)       → este DoR § Tokens · Spec congela
 □ Runner creado (test:release-crossflow)  → tras Spec Freeze
 ☑ Cadena / handoffs propuestos            → este DoR § Cadena
 ☑ Invariantes propuestos                  → este DoR § Invariantes
