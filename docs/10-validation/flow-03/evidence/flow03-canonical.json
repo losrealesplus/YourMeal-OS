@@ -1,0 +1,37 @@
+{
+  "status": "BLOCKED",
+  "reason": "FLOW-03 domain not implemented (runner ready; Evidence before Implementation)",
+  "gate": "FLOW-03",
+  "contract": "FLOW_03_BILLING_SPEC",
+  "principle": "Evidence before Implementation",
+  "code_status": "RUNNER_ONLY",
+  "at": "2026-08-02T14:41:30.359Z",
+  "pipeline": [],
+  "expected": [
+    "FLOW03_T1_STARTED",
+    "FLOW03_T1_COMPLETED",
+    "FLOW03_T2_STARTED",
+    "FLOW03_T2_COMPLETED",
+    "FLOW03_T3_STARTED",
+    "FLOW03_T3_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": "FLOW03_T1_STARTED",
+  "certified_through": 0,
+  "blocked_at": "FLOW03_T1_STARTED",
+  "delivery": "FLOW-03",
+  "delivery_status": "BLOCKED",
+  "flow_status": "BLOCKED",
+  "terminal": {
+    "invoice_status": null
+  },
+  "evidence": {},
+  "duration_ms": {
+    "t1_ms": null,
+    "t2_ms": null,
+    "t3_ms": null,
+    "flow_total_ms": null
+  }
+}

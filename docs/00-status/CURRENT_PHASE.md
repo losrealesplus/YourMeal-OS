@@ -45,9 +45,12 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01-pass · flow02-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Activo                       FLOW-03 Spec (Billing)
+  Activo                       FLOW-03 Billing
+                               Spec ✅ FROZEN (#155)
+                               Runner ▶ #156 · test:flow03-canonical (BLOCKED at T1)
                                → ./FLOW_03_BILLING_SPEC.md
-                               READY FOR FREEZE · sin runner ni dominio
+                               → ../10-validation/flow-03/FLOW03_CANONICAL_RUNNER.md
+                               sin dominio · Gate FLOW03-001 cerrado
   Beta paralelo: BR-03.3 Runtime Validation (G3)
   Disciplina: una transición / PR · DoR antes de código
 
@@ -72,11 +75,11 @@ NEXT PHASE
   ↓
   FLOW-02 ✅ FULL PASS · tag flow02-pass
   ↓
-  FLOW-03 Spec ▶ READY FOR FREEZE (#155) · merge = FROZEN
+  FLOW-03 Spec ✅ FROZEN (#155)
   ↓
   Runner (#156) → main · BLOCKED at T1
   ↓
-  Gate FLOW03-001 (4 condiciones) → T1…T3 → flow03-pass
+  Gate FLOW03-001 (4 condiciones) → T1…T3 → tag flow03-pass
 
 En paralelo (beta móvil EatClean):
   Lema: cada PR acerca la jornada completa del piloto.
