@@ -2,8 +2,8 @@
 
 **Documento:** `FLOW_04_INVENTORY_CONSUMPTION_SPEC.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ **READY FOR FREEZE** · Spec only · sin runner · sin dominio  
-**Baseline:** `main` · `9ce3feb` · DoR [#162](https://github.com/losrealesplus/YourMeal-OS/pull/162)  
+**Estado:** ✅ **FROZEN** (#163 → `3d922ae`) · Runner ▶ · Domain 🔒 Gate FLOW04-001  
+**Baseline:** Spec merge · DoR [#162](https://github.com/losrealesplus/YourMeal-OS/pull/162)  
 **Precondición:** FLOW-01…03 ✅ CERTIFIED · tags `flow01-pass` · `flow02-pass` · `flow03-pass`  
 **DoR:** [FLOW_04_INVENTORY_CONSUMPTION_DOR](./FLOW_04_INVENTORY_CONSUMPTION_DOR.md) · [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md)  
 **Gobernanza:** [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) Regla 7–9 · [Evidence before Implementation](./EVIDENCE_BEFORE_IMPLEMENTATION.md)  
@@ -413,12 +413,12 @@ Si algún ítem quedara abierto → **no Freeze** · no runner.
 | Artefacto | Estado |
 |-----------|--------|
 | DoR document | ✅ [#162](https://github.com/losrealesplus/YourMeal-OS/pull/162) · `9ce3feb` |
-| SPEC | ▶ **READY FOR FREEZE** (este PR) |
-| Contrato `FLOW04_*` | ✅ cerrado en este doc (Freeze = merge a `main`) |
-| Runner `test:flow04-canonical` | ⏳ siguiente PR tras Freeze |
-| Gate FLOW04-001 | ✅ documentado · dominio bloqueado hasta 4 condiciones |
+| SPEC | ✅ **FROZEN** (#163 → `3d922ae`) |
+| Contrato `FLOW04_*` | ✅ congelado |
+| Runner `test:flow04-canonical` | ▶ [FLOW04_CANONICAL_RUNNER](../10-validation/flow-04/FLOW04_CANONICAL_RUNNER.md) |
+| Gate FLOW04-001 | ▶ tras Runner en `main` + BLOCKED verificado |
 | Estados / invariantes / PASS·BLOCKED | ✅ |
-| Acta runner | ⏳ `docs/10-validation/flow-04/FLOW04_CANONICAL_RUNNER.md` |
+| Acta runner | ▶ `docs/10-validation/flow-04/FLOW04_CANONICAL_RUNNER.md` |
 
 **Implementation de dominio:** ❌ prohibida hasta Gate FLOW04-001 verde.
 
@@ -429,9 +429,9 @@ Si algún ítem quedara abierto → **no Freeze** · no runner.
 | Fase | Trabajo | Estado |
 |------|---------|--------|
 | 0 | DoR document (#162) | ✅ |
-| 1 | Spec (este PR) | ▶ **READY FOR FREEZE** |
-| 2 | Freeze (merge Spec → `main`) | ⏳ |
-| 3 | Runner only · BLOCKED at T1 | ⏳ |
+| 1 | Spec | ✅ FROZEN (#163) |
+| 2 | Freeze (merge Spec → `main`) | ✅ `3d922ae` |
+| 3 | Runner only · BLOCKED at T1 | ▶ |
 | 4 | Gate FLOW04-001 | ⏳ |
 | 5 | FLOW04-001…003 (una transición / PR) | ⏳ |
 | 6 | FULL PASS · tag `flow04-pass` | ⏳ |

@@ -45,9 +45,14 @@
     "test:flow03-001": "node scripts/flow03-canonical.mjs --live --through=T1",
     "test:flow03-002": "node scripts/flow03-canonical.mjs --live --through=T2",
     "test:flow03-003": "node scripts/flow03-canonical.mjs --live --through=T3",
+    "test:flow04-canonical": "node scripts/flow04-canonical.mjs",
+    "test:flow04-canonical:unit": "node --test scripts/lib/flow04-canonical-pipeline.spec.mjs",
+    "test:flow04-001": "node scripts/flow04-canonical.mjs --live --through=T1",
+    "test:flow04-002": "node scripts/flow04-canonical.mjs --live --through=T2",
+    "test:flow04-003": "node scripts/flow04-canonical.mjs --live --through=T3",
     "bootstrap:e2e": "node scripts/ps002c-env-verify.mjs",
     "bootstrap:e2e:check": "node scripts/ps002c-env-verify.mjs --check-only",
-    "test:canonical-pipeline": "node --test scripts/lib/canonical-pipeline.spec.mjs scripts/lib/flow01-canonical-pipeline.spec.mjs scripts/lib/flow02-canonical-pipeline.spec.mjs scripts/lib/flow03-canonical-pipeline.spec.mjs scripts/lib/ps002c-preflight.spec.mjs scripts/lib/ps002c-ui-evidence.spec.mjs scripts/lib/ps002c-vite-env.spec.mjs scripts/lib/ps002c-home-path-evidence.spec.mjs scripts/lib/ps002c-auth-session-evidence.spec.mjs scripts/lib/ps002c-network-evidence.spec.mjs",
+    "test:canonical-pipeline": "node --test scripts/lib/canonical-pipeline.spec.mjs scripts/lib/flow01-canonical-pipeline.spec.mjs scripts/lib/flow02-canonical-pipeline.spec.mjs scripts/lib/flow03-canonical-pipeline.spec.mjs scripts/lib/flow04-canonical-pipeline.spec.mjs scripts/lib/ps002c-preflight.spec.mjs scripts/lib/ps002c-ui-evidence.spec.mjs scripts/lib/ps002c-vite-env.spec.mjs scripts/lib/ps002c-home-path-evidence.spec.mjs scripts/lib/ps002c-auth-session-evidence.spec.mjs scripts/lib/ps002c-network-evidence.spec.mjs",
     "gen:types": "supabase gen types typescript --project-id djangucecsphnejplvic --schema public > src/integrations/supabase/types.ts"
   },
   "dependencies": {
