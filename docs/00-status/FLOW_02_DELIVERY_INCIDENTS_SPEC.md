@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW_02_DELIVERY_INCIDENTS_SPEC.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **SPEC FROZEN** (PR #148) · runner canónico ▶ · sin dominio hasta FLOW02-001  
+**Estado:** ✅ **SPEC FROZEN** · Runner ✅ · Domain ▶ FLOW02-003 FULL PASS  
 **Precondición:** FLOW-01 ✅ CERTIFIED · tag `flow01-pass` · [FLOW01_PASS_ACTA](../10-validation/flow-01/FLOW01_PASS_ACTA.md)  
 **DoR:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) · checklist parcial abajo  
 **Gobernanza:** [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) Regla 7–8 · [Evidence before Implementation](./EVIDENCE_BEFORE_IMPLEMENTATION.md)  
@@ -279,8 +279,8 @@ Si algún ítem quedara abierto → **no Freeze** · no runner.
 | 1 | Spec (#148) | ✅ **FROZEN** |
 | 2 | Runner canónico (`test:flow02-canonical` · BLOCKED at T1) | ✅ (#150) |
 | 3 | FLOW02-001 T1 | ✅ (#151) |
-| 4 | FLOW02-002 T2 | ▶ |
-| 5 | FLOW02-003 T3 | ⏳ |
+| 4 | FLOW02-002 T2 | ✅ (#152) |
+| 5 | FLOW02-003 T3 · FULL PASS | ▶ |
 
 ---
 

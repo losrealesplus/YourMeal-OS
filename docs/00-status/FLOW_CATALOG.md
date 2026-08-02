@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW_CATALOG.md`  
 **Fecha:** 2026-08-02  
-**Estado:** FLOW-01 ✅ **CERTIFIED** · FLOW-02 Spec ✅ FROZEN · Runner ▶ · DoR ✅ (#147)  
+**Estado:** FLOW-01 ✅ **CERTIFIED** · FLOW-02 ▶ FULL PASS (FLOW02-003) · DoR ✅ (#147)  
 **Piloto:** EatClean  
 **Fase:** 1 · Domain / Flow (Fase 0 · Plataforma COMPLETE)  
 **Plataforma:** PS-002-C ✅ · FCR-008 FROZEN · tag `ps002c-pass`  
@@ -30,6 +30,7 @@ Sí: `FLOW-01 Kitchen → Delivery`.
 | ID | Handoff | Pregunta operacional | Estado |
 |----|---------|----------------------|--------|
 | **FLOW-01** | Kitchen → Delivery | ¿Kitchen entrega correctamente a Delivery? | ✅ **CERTIFIED** · [SPEC](./FLOW_01_KITCHEN_DELIVERY_SPEC.md) · [Plan](./FLOW_01_DELIVERY_PLAN.md) · [PASS acta](../10-validation/flow-01/FLOW01_PASS_ACTA.md) · `npm run test:flow01-canonical -- --live` |
+| **FLOW-02** | Delivery Incidents | ¿Un intento fallido queda operable y reintentable hasta `delivered`? | ▶ **FULL PASS** (este PR) · [SPEC](./FLOW_02_DELIVERY_INCIDENTS_SPEC.md) · [PASS acta](../10-validation/flow-02/FLOW02_PASS_ACTA.md) · `npm run test:flow02-canonical -- --live` |
 
 ---
 
@@ -37,7 +38,6 @@ Sí: `FLOW-01 Kitchen → Delivery`.
 
 | ID | Handoff / alcance | Prioridad | Motivo | Estado |
 |----|-------------------|-----------|--------|--------|
-| **FLOW-02** | Delivery Incidents | Muy alta | Excepciones reales justo después del happy path | Spec ✅ · Runner ✅ · dominio ▶ FLOW02-002 T2 · [SPEC](./FLOW_02_DELIVERY_INCIDENTS_SPEC.md) |
 | **FLOW-03** | Billing | Alta | Facturación desacoplada del happy path | ⏳ DoR NOT STARTED |
 | **FLOW-04** | Inventory Consumption | Alta | Consumo de ingredientes tras producción | ⏳ DoR NOT STARTED |
 | **FLOW-05** | Customer Order Lifecycle | Media | Creación del pedido → `confirmed` | ⏳ DoR NOT STARTED |
