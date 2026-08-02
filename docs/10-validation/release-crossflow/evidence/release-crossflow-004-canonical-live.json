@@ -1,0 +1,112 @@
+{
+  "status": "PASS",
+  "reason": "PASS through C4 · RELEASE-CROSSFLOW FULL PASS",
+  "gate": "RELEASE-CROSSFLOW",
+  "contract": "RELEASE_CROSSFLOW_SPEC",
+  "level": "release",
+  "certifies": "chained_flow_handoffs",
+  "complements_flow_runners": true,
+  "principle": "Evidence before Implementation",
+  "code_status": "CAPABILITY_DRIVER_C4",
+  "at": "2026-08-02T18:02:03.900Z",
+  "pipeline": [
+    "RELEASE_CROSSFLOW_C1_STARTED",
+    "RELEASE_CROSSFLOW_C1_COMPLETED",
+    "RELEASE_CROSSFLOW_C2_STARTED",
+    "RELEASE_CROSSFLOW_C2_COMPLETED",
+    "RELEASE_CROSSFLOW_C3_STARTED",
+    "RELEASE_CROSSFLOW_C3_COMPLETED",
+    "RELEASE_CROSSFLOW_C4_STARTED",
+    "RELEASE_CROSSFLOW_C4_COMPLETED"
+  ],
+  "expected": [
+    "RELEASE_CROSSFLOW_C1_STARTED",
+    "RELEASE_CROSSFLOW_C1_COMPLETED",
+    "RELEASE_CROSSFLOW_C2_STARTED",
+    "RELEASE_CROSSFLOW_C2_COMPLETED",
+    "RELEASE_CROSSFLOW_C3_STARTED",
+    "RELEASE_CROSSFLOW_C3_COMPLETED",
+    "RELEASE_CROSSFLOW_C4_STARTED",
+    "RELEASE_CROSSFLOW_C4_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": null,
+  "certified_through": 4,
+  "blocked_at": null,
+  "delivery": "RELEASE-CROSSFLOW-004",
+  "delivery_status": "PASS",
+  "gate_status": "PASS",
+  "terminal": {
+    "segment": "inventory_consumption"
+  },
+  "evidence": {
+    "c1_checks": [
+      "flow01_canonical_script_present",
+      "flow01_canonical_pipeline_intact",
+      "flow01_pass_tag_present",
+      "flow01_pass_acta_present",
+      "flow01_spec_present"
+    ],
+    "c1_mapped_tokens": [
+      "FLOW01_T1_STARTED",
+      "FLOW01_T1_COMPLETED",
+      "FLOW01_T2_STARTED",
+      "FLOW01_T2_COMPLETED",
+      "FLOW01_T3_STARTED",
+      "FLOW01_T3_COMPLETED",
+      "FLOW01_T4_STARTED",
+      "FLOW01_T4_COMPLETED"
+    ],
+    "c1_source": "flow01-pass + FLOW-01 T1…T4 pipeline (no C2+ · no domain re-run)",
+    "c2_checks": [
+      "flow02_canonical_script_present",
+      "flow02_canonical_pipeline_intact",
+      "flow02_pass_tag_present",
+      "flow02_pass_acta_present",
+      "flow02_spec_present"
+    ],
+    "c2_mapped_tokens": [
+      "FLOW02_T1_STARTED",
+      "FLOW02_T1_COMPLETED",
+      "FLOW02_T2_STARTED",
+      "FLOW02_T2_COMPLETED",
+      "FLOW02_T3_STARTED",
+      "FLOW02_T3_COMPLETED"
+    ],
+    "c2_source": "flow02-pass + FLOW-02 T1…T3 pipeline (no C3+ · no domain re-run)",
+    "c3_checks": [
+      "flow03_canonical_script_present",
+      "flow03_canonical_pipeline_intact",
+      "flow03_pass_tag_present",
+      "flow03_pass_acta_present",
+      "flow03_spec_present"
+    ],
+    "c3_mapped_tokens": [
+      "FLOW03_T1_STARTED",
+      "FLOW03_T1_COMPLETED",
+      "FLOW03_T2_STARTED",
+      "FLOW03_T2_COMPLETED",
+      "FLOW03_T3_STARTED",
+      "FLOW03_T3_COMPLETED"
+    ],
+    "c3_source": "flow03-pass + FLOW-03 T1…T3 pipeline (no C4 · no domain re-run)",
+    "c4_checks": [
+      "flow04_canonical_script_present",
+      "flow04_canonical_pipeline_intact",
+      "flow04_pass_tag_present",
+      "flow04_pass_acta_present",
+      "flow04_spec_present"
+    ],
+    "c4_mapped_tokens": [
+      "FLOW04_T1_STARTED",
+      "FLOW04_T1_COMPLETED",
+      "FLOW04_T2_STARTED",
+      "FLOW04_T2_COMPLETED",
+      "FLOW04_T3_STARTED",
+      "FLOW04_T3_COMPLETED"
+    ],
+    "c4_source": "flow04-pass + FLOW-04 T1…T3 pipeline (no E2E / Deploy / Rollback · no domain re-run)"
+  }
+}

@@ -2,15 +2,15 @@
 
 **Documento:** `RELEASE_CROSSFLOW_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ Runner **ACTIVE** · live through C3 · runner-only **BLOCKED** at C1  
+**Estado:** ▶ Runner **ACTIVE** · live through C4 · FULL PASS · runner-only **BLOCKED** at C1  
 **Spec:** [RELEASE_CROSSFLOW_SPEC](../../00-status/RELEASE_CROSSFLOW_SPEC.md) (FROZEN · #179)  
 **DoR:** [RELEASE_CROSSFLOW_DOR](../../00-status/RELEASE_CROSSFLOW_DOR.md)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
 **Nivel:** Release gate — chained handoffs · **not** a Flow · **not** Smoke
 
-> Pregunta que responde este PR:  
-> **¿Existe un contrato ejecutable para Cross-flow (RELEASE-01 · B-02)?**  
-> No: ¿dominio C1? · ¿Playwright? · ¿Supabase? · ¿FLOW-05? · ¿CI?
+> Pregunta que responde este runner:  
+> **¿Los handoffs certificados de FLOW-01…04 encadenan sin gaps?**  
+> No: ¿Playwright? · ¿Supabase? · ¿FLOW-05? · ¿E2E / Deploy / Rollback?
 
 ---
 
@@ -54,9 +54,9 @@ PASS → tag release-crossflow-pass
 ## Comandos
 
 ```bash
-# Default live through max certified (C3)
+# Default live through max certified (C4)
 npm run test:release-crossflow
-# → PASS through C3 · BLOCKED at C4 · exit 0
+# → FULL PASS · certified_through=C4 · blocked_at=— · exit 0
 
 # RELEASE-CROSSFLOW-001 · C1 only
 npm run test:release-crossflow-001
@@ -70,6 +70,10 @@ npm run test:release-crossflow-002
 npm run test:release-crossflow-003
 # → PASS through C3 · BLOCKED at C4 · exit 0
 
+# RELEASE-CROSSFLOW-004 · C4 only / FULL PASS
+npm run test:release-crossflow-004
+# → PASS through C4 · certified_through=C4 · blocked_at=— · exit 0
+
 # Historic Gate / Land Check vacío
 npm run test:release-crossflow:runner-only
 # → BLOCKED at RELEASE_CROSSFLOW_C1_STARTED · exit 2 · evidence={}
@@ -80,9 +84,8 @@ npm run test:release-crossflow:unit
 
 ---
 
-## Fuera de alcance hasta C3+
+## Fuera de alcance
 
-- Driver C4  
 - Playwright · UI · Supabase · CI  
 - FLOW-05 · E2E · Deploy · Rollback  
 
@@ -90,7 +93,8 @@ npm run test:release-crossflow:unit
 
 ## Gate
 
-Ver: [RELEASE_CROSSFLOW_GATE](./RELEASE_CROSSFLOW_GATE.md) · Decision: ✅ **READY** · 001 en curso.
+Ver: [RELEASE_CROSSFLOW_GATE](./RELEASE_CROSSFLOW_GATE.md) · Decision: ▶ FULL PASS (rama) · tag tras Land Check `main`.
+
 ---
 
 ## Evidencia
@@ -99,7 +103,9 @@ Ver: [RELEASE_CROSSFLOW_GATE](./RELEASE_CROSSFLOW_GATE.md) · Decision: ✅ **RE
 |-----------|------|
 | CLI | `scripts/release-crossflow-canonical.mjs` |
 | Pipeline | `scripts/lib/release-crossflow-canonical-pipeline.mjs` |
+| C4 driver | `scripts/lib/release-crossflow-c4-inventory.mjs` |
 | Default evidence | `docs/10-validation/release-crossflow/evidence/release-crossflow-canonical.json` |
+| Live FULL PASS | `docs/10-validation/release-crossflow/evidence/release-crossflow-canonical-live.json` |
 
 ---
 

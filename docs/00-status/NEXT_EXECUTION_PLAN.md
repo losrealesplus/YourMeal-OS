@@ -90,7 +90,7 @@ Convertir la beta en algo **verificable**. Matriz viva:
 | FLOW-03 | ✅ | Tag `flow03-pass` |
 | FLOW-04 | ✅ | Tag `flow04-pass` |
 | Smoke Tests | ✅ | Tag `release-smoke-pass` · [PASS acta](../10-validation/release-smoke/RELEASE_SMOKE_PASS_ACTA.md) |
-| Cross-flow | ⏳ | 003 ▶ [RELEASE_CROSSFLOW_003_C3_ACTA](../10-validation/release-crossflow/RELEASE_CROSSFLOW_003_C3_ACTA.md) → `release-crossflow-pass` |
+| Cross-flow | ▶ | 004 FULL PASS [C4](../10-validation/release-crossflow/RELEASE_CROSSFLOW_004_C4_ACTA.md) · [PASS](../10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md) → tag tras Land Check `main` |
 | E2E | ⏳ | → `release-e2e-pass` |
 | Deployment | ⏳ | → `release-deploy-pass` |
 | Rollback | ⏳ | → `release-rollback-pass` |
@@ -106,12 +106,12 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual Track B:** **RELEASE-CROSSFLOW-003** · C3 only (este PR).  
-001 ✅ CERTIFIED (#181 · `ab476cf`).  
-002 ✅ CERTIFIED (#182 · `6083a11`).  
-Acta 003: [RELEASE_CROSSFLOW_003_C3_ACTA](../10-validation/release-crossflow/RELEASE_CROSSFLOW_003_C3_ACTA.md).  
-Siguiente (tras Land Check 003): RELEASE-CROSSFLOW-004 · C4 only.  
-Do **not** open FLOW-05 unless Track B discovers a blocker that requires it.  
+**Objetivo actual Track B:** **RELEASE-CROSSFLOW-004** · C4 FULL PASS (este PR).  
+001–003 ✅ CERTIFIED (#181…#183 · tip C3 `a62943e`).  
+Acta 004: [RELEASE_CROSSFLOW_004_C4_ACTA](../10-validation/release-crossflow/RELEASE_CROSSFLOW_004_C4_ACTA.md).  
+Close-out: [RELEASE_CROSSFLOW_PASS_ACTA](../10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md).  
+Siguiente (tras merge + Land Check 004): tag `release-crossflow-pass` → B-03 RELEASE-E2E DoR.  
+Do **not** open FLOW-05 / E2E / Deploy / Rollback in this PR.  
 **Reglas:** (1) Release gates ≠ Flow runners · Cross-flow encadena handoffs · (2) Land Check desde `main` (Regla 9).
 
 Cross-flow **no sustituye** runners canónicos: los runners certifican contratos;  
@@ -190,9 +190,10 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 ## Current Goal
 
 ```text
-Track B (prioridad): RELEASE-CROSSFLOW-003 C3 → then C4…
+Track B (prioridad): RELEASE-CROSSFLOW-004 C4 FULL PASS → Land Check → tag
+                     → B-03 RELEASE-E2E DoR (siguiente ciclo FOPEBA)
 Track A:             Do NOT open FLOW-05 unless Track B finds a blocker
-FOPEBA_LAND_CHECK:   ACTIVE · before every 001
+FOPEBA_LAND_CHECK:   ACTIVE · before every 001 / tag
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos
 ```
 
