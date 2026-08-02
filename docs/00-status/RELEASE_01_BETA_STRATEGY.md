@@ -74,7 +74,7 @@ Luego FLOW-06… según catálogo. Sin saltos. Sin features futuras en el PR del
 | FLOW-04 | ✅ | Tag `flow04-pass` |
 | Smoke Tests | ✅ | Tag `release-smoke-pass` · [PASS acta](../10-validation/release-smoke/RELEASE_SMOKE_PASS_ACTA.md) |
 | Cross-flow | ✅ | Tag `release-crossflow-pass` → `0a0c51b` · [PASS](../10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md) |
-| E2E | ▶ | Runner BLOCKED at E1 · Spec ✅ FROZEN · [RUNNER](../10-validation/release-e2e/RELEASE_E2E_RUNNER.md) → tag `release-e2e-pass` |
+| E2E | ▶ | Gate ✅ READY · Runner ✅ #188 · next E2E-001 E1 · [GATE](../10-validation/release-e2e/RELEASE_E2E_GATE.md) → tag `release-e2e-pass` |
 | Deployment | ⏳ | Contract pendiente → tag `release-deploy-pass` |
 | Rollback | ⏳ | Contract pendiente → tag `release-rollback-pass` |
 | Beta Acceptance | ⏳ | Enlaza evidencia → tag `release-01-beta` |
@@ -84,7 +84,7 @@ Luego FLOW-06… según catálogo. Sin saltos. Sin features futuras en el PR del
 ```text
 B-01 Smoke        ✅ release-smoke-pass
 B-02 Cross-flow   ✅ release-crossflow-pass → 0a0c51b
-B-03 E2E          DoR ✅ · Spec ✅ FROZEN · Runner ▶ BLOCKED at E1 → Gate → 001… → release-e2e-pass
+B-03 E2E          DoR ✅ · Spec ✅ · Runner ✅ · Gate ✅ READY → 001 E1… → release-e2e-pass
 B-04 Deployment   DEPLOYMENT_CONTRACT → Runner → release-deploy-pass
 B-05 Rollback     Contract → Runner → release-rollback-pass
 B-06 Beta Accept. Solo al final → release-01-beta
@@ -110,7 +110,7 @@ RELEASE-01
 ├── FLOW-05+                ⏳  solo si el set beta lo exige (DoR primero)
 ├── Smoke Tests             ✅  tag release-smoke-pass
 ├── Cross-flow Tests        ✅  tag release-crossflow-pass → 0a0c51b
-├── E2E Tests               ▶  Runner BLOCKED at E1 → … → release-e2e-pass
+├── E2E Tests               ▶  Gate READY → E2E-001… → release-e2e-pass
 ├── Performance             ⏳  (o N/A documentado)
 ├── Security                ⏳  (o N/A documentado)
 ├── Deployment              ⏳  reproducible
