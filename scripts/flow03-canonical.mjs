@@ -6,16 +6,15 @@
  * Modes:
  *   (default)     Empty pipeline → BLOCKED (runner-only, no domain).
  *   --self-test   Validate frozen full contract (synthetic PASS).
+ *   --live        Evaluate domain observations (progressive BLOCKED/PASS/FAIL).
  *   --pipeline=a,b,c   Validate an explicit observed step list.
  *   --through=T1|T2|T3   Scope delivery FLOW03-001..003 (prefix PASS).
  *
  *   npm run test:flow03-canonical
- *   npm run test:flow03-canonical:unit
+ *   npm run test:flow03-canonical -- --live --through=T1
+ *   npm run test:flow03-001
  *
  * Spec: docs/00-status/FLOW_03_BILLING_SPEC.md
- *
- * No domain / AccountingService / Supabase / UI / RPC in this runner PR.
- * --live lands with FLOW03-001+.
  */
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -30,12 +29,19 @@ import {
   formatFlow03ComparisonTable,
   validateFlow03Pipeline,
 } from "./lib/flow03-canonical-pipeline.mjs";
+import { runFlow03DomainDriver } from "./lib/flow03-domain-driver.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const EVIDENCE_DIR = path.join(ROOT, "docs/10-validation/flow-03/evidence");
 
 function evidencePathFor(mode, through) {
+  if (mode === "live" && through) {
+    return path.join(EVIDENCE_DIR, `flow03-00${through}-canonical-live.json`);
+  }
+  if (mode === "live") {
+    return path.join(EVIDENCE_DIR, "flow03-canonical-live.json");
+  }
   if (through) {
     return path.join(EVIDENCE_DIR, `flow03-00${through}-canonical.json`);
   }
@@ -55,13 +61,8 @@ function parseArgs(argv) {
   /** @type {1|2|3 | null} */
   let through = null;
   for (const a of argv) {
-    if (a === "--live") {
-      console.error(
-        "FLOW-03 --live is not available yet (no domain driver). " +
-          "Use default / --self-test / --pipeline= until FLOW03-001.",
-      );
-      process.exit(FLOW03_EXIT.FAIL);
-    } else if (a === "--self-test") mode = "self-test";
+    if (a === "--live") mode = "live";
+    else if (a === "--self-test") mode = "self-test";
     else if (a.startsWith("--pipeline=")) {
       mode = "pipeline";
       pipelineArg = a
@@ -144,6 +145,80 @@ async function main() {
 
     const out = await writeEvidence(report, mode, through);
     console.log(`evidence_file: ${path.relative(ROOT, out)}`);
+    process.exit(exitFor(progress));
+  }
+
+  if (mode === "live") {
+    console.log("Driving FLOW-03 domain (certified transitions)…");
+    const driver = runFlow03DomainDriver({ root: ROOT, through });
+    if (!driver.ok) {
+      console.error("Domain driver failed (vitest):");
+      console.error(driver.output.slice(-4000));
+      const report = buildFlow03EvidenceReport({
+        status: "FAIL",
+        reason: "FLOW-03 domain driver failed",
+        pipeline: driver.steps,
+        code_status: "DOMAIN_DRIVER_FAIL",
+        terminal: { invoice_status: null },
+        evidence: {},
+      });
+      await writeEvidence(report, "live", through);
+      process.exit(FLOW03_EXIT.FAIL);
+    }
+
+    const observed = driver.steps;
+    const progress = evaluateFlow03Progress(observed, { through });
+    const duration_ms = computeFlow03Durations(syntheticTimestamps(observed));
+    const invoiceStatusForThrough = {
+      1: "pending",
+      2: "pending",
+      3: "paid",
+    };
+    const report = buildFlow03EvidenceReport({
+      status: progress.status,
+      reason: progress.reason,
+      pipeline: observed,
+      validation: progress,
+      duration_ms,
+      code_status: `DOMAIN_DRIVER_T${progress.certified_through || 0}`,
+      terminal: {
+        invoice_status:
+          invoiceStatusForThrough[progress.certified_through] ?? null,
+      },
+      progress,
+      evidence: {},
+    });
+
+    console.log(formatFlow03ComparisonTable(progress));
+    console.log("");
+    console.log(progress.reason);
+    console.log(
+      `certified_through=T${progress.certified_through || 0} · blocked_at=${progress.blocked_at ?? "—"}`,
+    );
+    console.log(
+      `duplicates=${JSON.stringify(report.duplicates)} missing=${JSON.stringify(report.missing)} out_of_order=${JSON.stringify(report.out_of_order)}`,
+    );
+
+    const out = await writeEvidence(report, "live", through);
+    console.log(`evidence_file: ${path.relative(ROOT, out)}`);
+
+    if (
+      progress.status === "PASS" &&
+      progress.flow_status === "PASS" &&
+      progress.certified_through >= 3
+    ) {
+      console.log("FLOW-03 · FULL PASS · Billing certified");
+    } else if (
+      progress.certified_through >= 1 &&
+      progress.blocked_at === "FLOW03_T2_STARTED"
+    ) {
+      console.log("FLOW03-001 · PASS through T1 · BLOCKED at T2 (expected)");
+    } else if (
+      progress.certified_through >= 2 &&
+      progress.blocked_at === "FLOW03_T3_STARTED"
+    ) {
+      console.log("FLOW03-002 · PASS through T2 · BLOCKED at T3 (expected)");
+    }
     process.exit(exitFor(progress));
   }
 

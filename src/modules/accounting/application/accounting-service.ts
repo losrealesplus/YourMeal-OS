@@ -10,6 +10,11 @@ import {
   type PaymentRecord,
   type PeriodSummary,
 } from "../domain/accounting";
+import {
+  beginFlow03Pipeline,
+  logFlow03Step,
+  stopFlow03,
+} from "./flow03-evidence";
 
 function assertTenant(ctx: ServiceContext): void {
   if (!ctx.tenantId || !ctx.userId) {
@@ -106,6 +111,15 @@ export const AccountingService = {
 
     const billingPeriod =
       input.billingPeriod?.trim() || currentBillingPeriod();
+    const orderIds = orders.map((o) => o.id);
+
+    // FLOW03-001 · T1 — delivered → invoice pending (evidence before return)
+    beginFlow03Pipeline({
+      orderIds,
+      tenantId: ctx.tenantId,
+      billingPeriod,
+    });
+    logFlow03Step("FLOW03_T1_STARTED", { orderIds, billingPeriod });
 
     try {
       const invoice = await repo.createInvoice({
@@ -113,7 +127,7 @@ export const AccountingService = {
         companyId: companyIds[0] ?? null,
         amount,
         billingPeriod,
-        orderIds: orders.map((o) => o.id),
+        orderIds,
       });
 
       await AuditService.write(ctx, {
@@ -128,8 +142,19 @@ export const AccountingService = {
         },
       });
 
+      logFlow03Step("FLOW03_T1_COMPLETED", {
+        invoiceId: invoice.id,
+        status: invoice.status,
+        reviewedAt: invoice.reviewedAt,
+        orderIds: invoice.orderIds,
+      });
+
       return invoice;
     } catch (e) {
+      stopFlow03("T1_FAILED", {
+        orderIds,
+        error: e instanceof Error ? e.message : String(e),
+      });
       const msg = e instanceof Error ? e.message : String(e);
       if (msg.includes("already closed")) {
         throw new DomainError("INVALID_STATE", msg);
