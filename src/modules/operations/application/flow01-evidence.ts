@@ -52,8 +52,26 @@ export function getObservedFlow01Steps(): string[] {
   return active ? [...active.steps] : [];
 }
 
+export function hasFlow01Step(step: Flow01EvidenceStep | string): boolean {
+  return Boolean(active && !active.closed && active.steps.includes(step));
+}
+
 export function isFlow01PipelineActive(): boolean {
   return Boolean(active && !active.closed);
+}
+
+/** Ensure prior tokens exist before emitting the next transition. */
+export function assertFlow01Prefix(
+  required: readonly Flow01EvidenceStep[],
+): void {
+  if (!active || active.closed) {
+    throw new Error("FLOW-01 pipeline not active");
+  }
+  for (const step of required) {
+    if (!active.steps.includes(step)) {
+      throw new Error(`FLOW-01 missing prefix step ${step}`);
+    }
+  }
 }
 
 /**

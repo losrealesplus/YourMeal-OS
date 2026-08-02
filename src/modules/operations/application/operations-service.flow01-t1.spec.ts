@@ -76,13 +76,18 @@ describe("FLOW01-001 · OperationsService.startProduction", () => {
   it("does not emit T1 for non-T1 kitchen transitions", async () => {
     vi.spyOn(console, "info").mockImplementation(() => {});
     countByStatuses.mockResolvedValue(1);
+    // prepared → ready_for_delivery is kitchen but not T1 (T1 = confirmed→in_production)
     getOrder.mockResolvedValue({
       id: "order-1",
-      status: "in_production",
+      status: "prepared",
     });
-    transitionStatus.mockResolvedValue("prepared");
+    transitionStatus.mockResolvedValue("ready_for_delivery");
 
-    await OperationsService.transitionKitchen(ctx(), "order-1", "prepared");
+    await OperationsService.transitionKitchen(
+      ctx(),
+      "order-1",
+      "ready_for_delivery",
+    );
     expect(getObservedFlow01Steps()).toEqual([]);
   });
 

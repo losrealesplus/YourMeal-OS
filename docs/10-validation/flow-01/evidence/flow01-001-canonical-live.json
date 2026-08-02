@@ -5,7 +5,7 @@
   "contract": "FLOW_01_KITCHEN_DELIVERY_SPEC",
   "principle": "Evidence before Implementation",
   "code_status": "DOMAIN_DRIVER_T1",
-  "at": "2026-08-02T12:57:50.770Z",
+  "at": "2026-08-02T13:02:00.892Z",
   "pipeline": [
     "FLOW01_T1_STARTED",
     "FLOW01_T1_COMPLETED"
