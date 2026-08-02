@@ -2,7 +2,8 @@
 
 **Documento:** `RELEASE_DEPLOY_001_D1_ACTA.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ este PR · PASS through D1 · BLOCKED at `RELEASE_DEPLOY_D2_STARTED`  
+**Estado:** ✅ **CERTIFIED desde `main`** · PASS through D1 · BLOCKED at `RELEASE_DEPLOY_D2_STARTED`  
+**Tip:** `a0daf82` (Merge #202)  
 **Precondición:** Runner CERTIFIED (#200 · `1008ffd`) · Gate READY (#201 · `9de2893`)  
 **Gate:** [RELEASE_DEPLOY_GATE](./RELEASE_DEPLOY_GATE.md)  
 **Spec:** [RELEASE_DEPLOY_SPEC](../../00-status/RELEASE_DEPLOY_SPEC.md)  
@@ -73,12 +74,21 @@ Fuente: `release-e2e-pass + Deploy Spec/Gate (no D2+ · no publish/apply · no i
 
 ---
 
+## Land Check (desde `main` @ `a0daf82`)
+
+| Comando | Resultado |
+|---------|-----------|
+| `test:release-deploy-001` | PASS through D1 · BLOCKED at D2 · exit 0 |
+| `test:release-deploy` | PASS through D1 · BLOCKED at D2 · exit 0 |
+| `test:release-deploy:runner-only` | BLOCKED at D1 · exit 2 |
+
 ## Next
 
 ```text
 READY TO OPEN
 RELEASE-DEPLOY-002 · D2 only
-(after Land Check of 001 from main)
+Publish / Apply
+Nothing beyond D2.
 ```
 
 ---
