@@ -30,7 +30,7 @@ Sí: `FLOW-01 Kitchen → Delivery`.
 
 | ID | Handoff | Pregunta operacional | Estado |
 |----|---------|----------------------|--------|
-| **FLOW-01** | Kitchen → Delivery | ¿Kitchen entrega correctamente a Delivery? | ▶ **SPEC IN PROGRESS** (plantilla T1–T4 · evidencias `FLOW01_T*` · invariantes) · [SPEC](./FLOW_01_KITCHEN_DELIVERY_SPEC.md) |
+| **FLOW-01** | Kitchen → Delivery | ¿Kitchen entrega correctamente a Delivery? | ▶ **SPEC READY FOR FREEZE** · Packaging lifecycle · T4=`delivered` · runner contract · [SPEC](./FLOW_01_KITCHEN_DELIVERY_SPEC.md) |
 | **FLOW-02** | Delivery → Support | ¿Delivery deja a Support con contexto usable? | ⏳ NOT STARTED |
 | **FLOW-03** | Support → Accounting | ¿Support cierra hacia registros financieros coherentes? | ⏳ NOT STARTED |
 
