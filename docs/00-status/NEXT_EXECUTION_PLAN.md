@@ -190,7 +190,7 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 ## Current Goal
 
 ```text
-Track B (prioridad): RELEASE-SMOKE-001 S1 Preflight → then S2…
+Track B (prioridad): RELEASE-SMOKE-002 S2 Auth → then S3…
 Track A:             Do NOT open FLOW-05 unless Track B finds a blocker
 FOPEBA_LAND_CHECK:   ACTIVE · before every 001
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos

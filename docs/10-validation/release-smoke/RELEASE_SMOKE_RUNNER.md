@@ -81,16 +81,20 @@ npm run test:release-smoke:runner-only
 ```bash
 # RELEASE-SMOKE-001 · S1 Preflight
 npm run test:release-smoke-001
-# → PASS through S1 · BLOCKED at RELEASE_SMOKE_S2_STARTED · exit 0
+# → PASS through S1 · BLOCKED at S2 · exit 0
 
-# Self-test del contrato completo (sintético)
-npm run test:release-smoke -- --self-test
+# RELEASE-SMOKE-002 · S2 Auth (PS-002-C mapped · no full Playwright)
+npm run test:release-smoke-002
+# → PASS through S2 · BLOCKED at S3 · exit 0
+
+# Default live through max certified (S2)
+npm run test:release-smoke
 
 # Unit tests
 npm run test:release-smoke:unit
 ```
 
-`--live` sin `--through` = max certificado (`RELEASE_SMOKE_CERTIFIED_THROUGH`, hoy S1).
+`--live` sin `--through` = max certificado (`RELEASE_SMOKE_CERTIFIED_THROUGH`, hoy S2).
 
 ---
 

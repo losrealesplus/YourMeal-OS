@@ -20,7 +20,7 @@
  */
 
 /** Highest scenario with a capability driver implemented. */
-const RELEASE_SMOKE_CERTIFIED_THROUGH = 1;
+const RELEASE_SMOKE_CERTIFIED_THROUGH = 2;
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -235,6 +235,13 @@ async function main() {
     ) {
       console.log(
         "RELEASE-SMOKE-001 · PASS through S1 · BLOCKED at S2 (expected)",
+      );
+    } else if (
+      progress.certified_through >= 2 &&
+      progress.blocked_at === "RELEASE_SMOKE_S3_STARTED"
+    ) {
+      console.log(
+        "RELEASE-SMOKE-002 · PASS through S2 · BLOCKED at S3 (expected)",
       );
     }
     process.exit(exitFor(progress));
