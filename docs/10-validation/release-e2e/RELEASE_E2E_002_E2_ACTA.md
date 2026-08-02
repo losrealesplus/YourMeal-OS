@@ -2,7 +2,8 @@
 
 **Documento:** `RELEASE_E2E_002_E2_ACTA.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ **PASS through E2** · BLOCKED at `RELEASE_E2E_E3_STARTED`  
+**Estado:** ✅ **CERTIFIED desde `main`** · PASS through E2 · BLOCKED at `RELEASE_E2E_E3_STARTED`  
+**Tip:** `a1b7456` (Merge #192)  
 **Precondición:** 001 CERTIFIED (#190 · `514f325`) · Land Check docs (#191 · `130acac`)  
 **Gate:** [RELEASE_E2E_GATE](./RELEASE_E2E_GATE.md)  
 **Spec:** [RELEASE_E2E_SPEC](../../00-status/RELEASE_E2E_SPEC.md)  
@@ -76,27 +77,18 @@ Fuente: `flow01-pass + FLOW-01 T1…T4 pipeline (no E3+ · no FLOW-01 domain re-
 
 ---
 
-## Land Check (después de merge)
+## Land Check (desde `main` @ `a1b7456`)
 
-```bash
-git pull origin main
-npm run test:release-e2e-002
-npm run test:release-e2e
-npm run test:release-e2e:runner-only
-```
-
-Si coincide → **READY TO OPEN RELEASE-E2E-003** (E3 only · FLOW-02 + FLOW-03).
+Verificado: PASS through E2 · runner-only BLOCKED at E1.
 
 ---
 
 ## Next
 
 ```text
-Land Check from main
-    ↓
 READY TO OPEN
 RELEASE-E2E-003 · E3 only
-Anchor: FLOW-02 + FLOW-03
+Anchor: FLOW-02 + FLOW-03 / flow02-pass + flow03-pass
 ```
 
 ---
