@@ -15,11 +15,11 @@
  *
  * Spec: docs/00-status/CAPACITOR_SPEC.md
  *
- * NO C4+ drivers · NO APK/Play · NO stores · Core Integrity.
+ * NO C5 driver · NO IPA/App Store · NO stores · Core Integrity.
  */
 
 /** Highest block with a capability driver implemented. */
-const CAPACITOR_CERTIFIED_THROUGH = 3;
+const CAPACITOR_CERTIFIED_THROUGH = 4;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
