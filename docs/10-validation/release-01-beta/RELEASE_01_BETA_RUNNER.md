@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_01_BETA_RUNNER.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ▶ este PR · runner vacío → **BLOCKED** at B1 · Gate ⛔ NOT READY hasta Land Check desde `main`  
+**Estado:** ✅ Runner **CERTIFIED** desde `main` (#219 · `3994833`) · runner-only **BLOCKED** at B1 · Gate ✅ READY  
 **Spec:** [RELEASE_01_BETA_SPEC](../../00-status/RELEASE_01_BETA_SPEC.md) (FROZEN · #218 · `ed98b3b`)  
 **DoR:** [RELEASE_01_BETA_DOR](../../00-status/RELEASE_01_BETA_DOR.md)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
@@ -75,7 +75,7 @@ npm run test:release-01-beta:unit
 
 ---
 
-## Fuera de alcance (este PR)
+## Fuera de alcance (Runner baseline)
 
 - Drivers B1 / B2 / B3 / B4 / B5  
 - Implementación de plataforma · Playwright · dominio  
@@ -87,7 +87,7 @@ npm run test:release-01-beta:unit
 
 ## Gate
 
-Ver: [RELEASE_01_BETA_GATE](./RELEASE_01_BETA_GATE.md) · Decision: ⛔ **NOT READY** hasta Land Check desde `main`.
+Ver: [RELEASE_01_BETA_GATE](./RELEASE_01_BETA_GATE.md) · Decision: ✅ **READY** · READY TO OPEN **RELEASE-01-BETA-001** (B1 only).
 
 ---
 
@@ -102,7 +102,7 @@ Ver: [RELEASE_01_BETA_GATE](./RELEASE_01_BETA_GATE.md) · Decision: ⛔ **NOT RE
 
 ---
 
-## After merge
+## Land Check (certified from `main` @ `3994833`)
 
 ```bash
 git pull origin main
@@ -111,7 +111,7 @@ npm run test:release-01-beta
 # → BLOCKED at RELEASE_01_BETA_B1_STARTED · exit 2
 ```
 
-Solo entonces: Gate → **READY** · abrir **RELEASE-01-BETA-001** (B1 only).
+Gate ✅ READY → open **RELEASE-01-BETA-001** (B1 only).
 
 ---
 

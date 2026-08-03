@@ -2,11 +2,7 @@
 
 **Documento:** `RELEASE_01_BETA_SPEC.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **FROZEN** (Spec · #218 · `ed98b3b`) · DoR ✅ (#217) · Runner ▶ este PR · Gate ⛔ NOT READY  
-**Gate DoRl:** Beta Acceptance · Track B · RELEASE-01  
-**Nivel:** Release Contract — **no** es un Flow nuevo · **no** inventa capacidades  
-**DoR:** [RELEASE_01_BETA_DOR](./RELEASE_01_BETA_DOR.md) ✅ en `main` (#217 · `740b843`)  
-**Runner:** [RELEASE_01_BETA_RUNNER](../10-validation/release-01-beta/RELEASE_01_BETA_RUNNER.md)  
+**Estado:** ✅ **FROZEN** (Spec · #218 · `ed98b3b`) · DoR ✅ (#217) · Runner ✅ #219 · `3994833` · Gate ✅ [READY](../10-validation/release-01-beta/RELEASE_01_BETA_GATE.md)  
 **Precondiciones:** FOUNDATION ✅ · `ps002c-pass` · `flow01-pass`…`flow04-pass` · `release-smoke-pass` · `release-crossflow-pass` · `release-e2e-pass` · `release-deploy-pass` · `release-rollback-pass` → `0ba856e`  
 **DoRl:** [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md)  
 **Estrategia:** [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md)  
@@ -14,8 +10,8 @@
 **Tags:** `release-01-beta` · [GIT_MILESTONE_TAGS](./GIT_MILESTONE_TAGS.md)  
 **Principio:** [Evidence before Implementation](./EVIDENCE_BEFORE_IMPLEMENTATION.md) · [FOPEBA_LAND_CHECK](./FOPEBA_LAND_CHECK.md)
 
-> Contrato FROZEN. Runner baseline BLOCKED at B1 (este PR).  
-> **No** drivers B1–B5. **No** FLOW-05. **No** tag `release-01-beta`.
+> Contrato FROZEN. Runner CERTIFIED desde `main`. Gate ✅ READY.  
+> READY TO OPEN **RELEASE-01-BETA-001** (B1 only). **No** B2–B5 · FLOW-05 · tag.
 
 ---
 
@@ -357,9 +353,9 @@ tag (futuro): release-01-beta
 | Out of scope · Gate CLOSED until Runner | ✅ |
 | Spec READY FOR FREEZE | ✅ #218 |
 | Spec FROZEN | ✅ #218 · `ed98b3b` |
-| Runner BLOCKED at B1 | ▶ este PR |
-| Gate READY | ⏳ Land Check desde `main` |
-| RELEASE-01-BETA-001 | ⛔ CLOSED |
+| Runner BLOCKED at B1 | ✅ #219 · `3994833` |
+| Gate READY | ✅ Land Check from main |
+| RELEASE-01-BETA-001 | ⏳ READY TO OPEN (B1 only) |
 
 **Estado del documento:** ✅ **FROZEN**
 
@@ -368,14 +364,14 @@ tag (futuro): release-01-beta
 ## 14. Next
 
 ```text
-Runner BLOCKED at RELEASE_01_BETA_B1_STARTED · exit 2
+OPEN RELEASE-01-BETA-001 (B1 Foundation only)
     ↓
-Land Check from main → Gate READY
+blocked_at=RELEASE_01_BETA_B2_STARTED · exit 0
     ↓
-OPEN RELEASE-01-BETA-001 (B1 only)
+002…005 → FULL PASS → tag release-01-beta
 ```
 
-**No** B1–B5 drivers · FLOW-05 · tag en Runner.
+**No** B2–B5 in 001 · FLOW-05 · tag hasta FULL PASS.
 
 ---
 
