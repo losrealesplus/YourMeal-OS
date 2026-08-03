@@ -33,7 +33,7 @@ Fase proyecto
   0 · Plataforma              ✅ COMPLETE
   1 · Domain / Flow           ✅ FLOW-01…04 CERTIFIED (metodología probada)
   2 · Product as system       ▶ ACTIVA · DoRl / RELEASE-01
-  Pregunta dominante          ¿Qué falta para una beta funcional?
+  Pregunta dominante          ¿YourMeal OS opera como plataforma SaaS?
   Pregunta Flow (sigue)       ¿Este flujo cumple el contrato?
   Principio                   Evidence before Implementation
   Estándar Flow               Definition of Ready (FLOW-XX)
@@ -50,12 +50,11 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    Track B › RELEASE-01-BETA-005 (B5 · este PR)
-                               B1–B4 ✅ CERTIFIED #222…#225 · a75efb1
-                               npm run test:release-01-beta → FULL PASS · certified_through=B5
-                               → ../10-validation/release-01-beta/RELEASE_01_BETA_005_B5_ACTA.md
-                               No FLOW-05 · no tag en este PR (tag post Land Check)
-                               Track B operativo completo (Smoke…Rollback)
+  Prioridad                    RELEASE-01 DoR ▶ (producto SaaS · este PR)
+                               tag release-01-beta → facb917 (framework cerrado)
+                               → ./RELEASE_01_DOR.md · ./RELEASE_01_STRATEGY.md
+                               Docs only · No Spec · No Runner · No Gate · No FLOW-05
+                               Pipeline Track B reutilizable · no re-certificar
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)
   Land Check                   ./FOPEBA_LAND_CHECK.md (antes de cualquier 001)
@@ -95,9 +94,13 @@ NEXT PHASE
   ↓
   FLOW-04 ✅ FULL PASS · tag flow04-pass → 8be1c26 (#167)
   ↓
-  ▶ RELEASE-01 · acumular evidencia DoRl (Track B · prioridad)
+  RELEASE-01-BETA ✅ · tag release-01-beta
   ↓
-  FLOW-05 DoR only cuando sea bloqueador beta (Track A · sin excepciones)
+  ▶ RELEASE-01 DoR (producto SaaS · docs only)
+  ↓
+  RELEASE-01 Spec (siguiente · contract only)
+  ↓
+  FLOW-05 solo como criterio de RELEASE-01 (no por inercia)
 
 En paralelo (beta móvil EatClean):
   Lema: cada PR acerca la jornada completa del piloto.

@@ -4,13 +4,13 @@
 **Fecha:** 2026-08-02  
 **Estado:** ACTIVE · post–`flow04-pass`  
 **Baseline:** `main` · tags `ps002c-pass` · `flow01-pass` · `flow02-pass` · `flow03-pass` · `flow04-pass`  
-**Entrada canónica:** [PROJECT_HANDOFF](./PROJECT_HANDOFF.md) · [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) · [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md)  
+**Entrada canónica:** [PROJECT_HANDOFF](./PROJECT_HANDOFF.md) · [RELEASE_01_DOR](./RELEASE_01_DOR.md) · [RELEASE_01_STRATEGY](./RELEASE_01_STRATEGY.md) · [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md)  
 **DoR estándar:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md)  
 **Métricas de proceso:** [FOPEBA_METRICS](./FOPEBA_METRICS.md) (v0 · sin estimaciones)
 
-> Hasta FLOW-04 la pregunta dominante era: *¿podemos certificar un flujo?*  
-> Con cuatro ciclos completos, esa pregunta ya tiene evidencia suficiente.  
-> La pregunta que empieza a dominar: *¿qué falta para una beta funcional?*
+> Hasta `release-01-beta` la pregunta era: *¿podemos certificar cómo liberar?*  
+> Esa pregunta ya tiene evidencia (tag `release-01-beta`).  
+> La pregunta que empieza a dominar: *¿YourMeal OS opera como plataforma SaaS?*
 
 ---
 
@@ -94,7 +94,7 @@ Convertir la beta en algo **verificable**. Matriz viva:
 | E2E | ✅ | Tag `release-e2e-pass` → `73623ae` · [PASS](../10-validation/release-e2e/RELEASE_E2E_PASS_ACTA.md) |
 | Deployment | ✅ | Tag `release-deploy-pass` → `7896a2a` · [PASS](../10-validation/release-deploy/RELEASE_DEPLOY_PASS_ACTA.md) |
 | Rollback | ✅ | Tag `release-rollback-pass` → `0ba856e` · [PASS](../10-validation/release-rollback/RELEASE_ROLLBACK_PASS_ACTA.md) |
-| Beta Acceptance | ▶ | DoR ✅ · Spec ✅ · Runner ✅ · Gate ✅ · B1–B4 ✅ · 005 ▶ B5 · [ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_005_B5_ACTA.md) → `release-01-beta` |
+| Beta Acceptance | ✅ | tag `release-01-beta` → `facb917` (framework) · producto → [RELEASE_01_DOR](./RELEASE_01_DOR.md) |
 
 Detalle: [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) · [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md).
 
@@ -106,11 +106,11 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual Track B:** **RELEASE-01-BETA-005** (B5 Acceptance · este PR).  
-DoR ✅ · Spec ✅ · Runner ✅ · Gate ✅ · B1–B4 ✅ (#225 · `a75efb1`).  
-Contrato: `npm run test:release-01-beta` → FULL PASS · `certified_through=B5` · `blocked_at=—` · exit 0.  
-Do **not** open FLOW-05 · create tag `release-01-beta` in 005 (tag solo post Land Check).  
-**Reglas:** (1) Release gates ≠ Flow runners · (2) Land Check desde `main` (Regla 9) · (3) `git fetch --tags --prune` antes de runners.  
+**Objetivo actual:** **RELEASE-01 DoR** (producto SaaS · este PR · docs only).  
+Framework cerrado: tag `release-01-beta` → `facb917`.  
+Artefactos: [RELEASE_01_DOR](./RELEASE_01_DOR.md) · [RELEASE_01_STRATEGY](./RELEASE_01_STRATEGY.md).  
+Do **not** open Spec · Runner · Gate · FLOW-05 · scripts · tests en este PR.  
+**Reglas:** (1) Producto ≠ framework · (2) Land Check desde `main` (Regla 9) · (3) un bloque / PR cuando existan Spec+Runner.  
 **Nota:** restaurar `docs/10-validation/**/evidence/*.json` antes de Land Check si bloquean `git pull`.
 
 Cross-flow **no sustituye** runners canónicos: los runners certifican contratos;  
@@ -189,8 +189,8 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 ## Current Goal
 
 ```text
-Track B (prioridad): RELEASE-01-BETA-005 (B5) → Land Check → tag release-01-beta
-Track A:             Do NOT open FLOW-05 until release-01-beta exists
+Track B (prioridad): RELEASE-01 DoR ▶ · Strategy P1–P5 · luego Spec
+Track A:             FLOW-05 no por inercia · candidato como criterio de RELEASE-01
 FOPEBA_LAND_CHECK:   ACTIVE · pull + fetch --tags --prune before every runner
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos
 ```
