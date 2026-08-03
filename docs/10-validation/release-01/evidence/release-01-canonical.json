@@ -1,0 +1,38 @@
+{
+  "status": "BLOCKED",
+  "reason": "RELEASE-01 product segments not implemented (runner ready; Evidence before Implementation)",
+  "gate": "RELEASE-01",
+  "contract": "RELEASE_01_SPEC",
+  "level": "release",
+  "certifies": "product_acceptance",
+  "composes_track_b_pass_tags": true,
+  "principle": "Evidence before Implementation",
+  "code_status": "RUNNER_ONLY",
+  "at": "2026-08-03T15:08:41.435Z",
+  "pipeline": [],
+  "expected": [
+    "RELEASE_01_P1_STARTED",
+    "RELEASE_01_P1_COMPLETED",
+    "RELEASE_01_P2_STARTED",
+    "RELEASE_01_P2_COMPLETED",
+    "RELEASE_01_P3_STARTED",
+    "RELEASE_01_P3_COMPLETED",
+    "RELEASE_01_P4_STARTED",
+    "RELEASE_01_P4_COMPLETED",
+    "RELEASE_01_P5_STARTED",
+    "RELEASE_01_P5_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": "RELEASE_01_P1_STARTED",
+  "certified_through": 0,
+  "blocked_at": "RELEASE_01_P1_STARTED",
+  "delivery": "RELEASE-01",
+  "delivery_status": "BLOCKED",
+  "gate_status": "BLOCKED",
+  "terminal": {
+    "segment": null
+  },
+  "evidence": {}
+}

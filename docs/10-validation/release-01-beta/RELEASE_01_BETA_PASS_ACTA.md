@@ -94,9 +94,8 @@ A partir de aquí el foco se desplaza a **RELEASE-01** (validación del producto
 
 ```text
 OPEN
-RELEASE-01 DoR · #228
-Documentation only.
-No Spec · No Runner · No implementation · No FLOW-05.
+RELEASE-01 Spec · Runner · Gate READY
+Next: RELEASE-01-001 · P1 only
 ```
 
 ---

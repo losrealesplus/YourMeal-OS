@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_01_STRATEGY.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ▶ **DRAFT · Strategy** (docs only · sin Spec · sin Runner)  
+**Estado:** ✅ **ACTIVE** · Spec FROZEN · Runner BLOCKED at P1 · Gate READY  
 **Nivel:** Product Release · certificación SaaS de YourMeal OS  
 **DoR:** [RELEASE_01_DOR](./RELEASE_01_DOR.md)  
 **DoRl:** [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md)  
@@ -157,9 +157,9 @@ P5 **compone** outcomes P1–P4.
 
 ---
 
-## Fuera de esta Strategy
+## Fuera de esta Strategy (sigue vigente para capacidades)
 
-- Spec · Runner · Gate · scripts · tests  
+- Drivers P1–P5 · UI de producto · migraciones  
 - FLOW-05 · Capacitor · Play Store · App Store  
 - Reabrir Smoke / Cross-flow / E2E / Deploy / Rollback / Beta  
 - CI/CD adicional · producción real · semver `v*` · marketing  
@@ -169,10 +169,9 @@ P5 **compone** outcomes P1–P4.
 ## Next
 
 ```text
-RELEASE-01 DoR OPEN
+Spec FROZEN · Runner · Gate READY
     ↓
-READY TO OPEN RELEASE-01 Spec
-(contract only · bloques P1–P5)
+READY TO OPEN RELEASE-01-001 · P1 only
 ```
 
 ---

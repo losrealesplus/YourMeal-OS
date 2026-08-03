@@ -4,7 +4,7 @@
 **Fecha:** 2026-08-02  
 **Estado:** ACTIVE · post–`flow04-pass`  
 **Baseline:** `main` · tags `ps002c-pass` · `flow01-pass` · `flow02-pass` · `flow03-pass` · `flow04-pass`  
-**Entrada canónica:** [PROJECT_HANDOFF](./PROJECT_HANDOFF.md) · [RELEASE_01_DOR](./RELEASE_01_DOR.md) · [RELEASE_01_STRATEGY](./RELEASE_01_STRATEGY.md) · [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md)  
+**Entrada canónica:** [PROJECT_HANDOFF](./PROJECT_HANDOFF.md) · [RELEASE_01_SPEC](./RELEASE_01_SPEC.md) · [RELEASE_01_DOR](./RELEASE_01_DOR.md) · [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md)  
 **DoR estándar:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md)  
 **Métricas de proceso:** [FOPEBA_METRICS](./FOPEBA_METRICS.md) (v0 · sin estimaciones)
 
@@ -28,7 +28,7 @@ RELEASE_01_BETA_STRATEGY      ✅  DRAFT
 DEFINITION_OF_RELEASE         ✅  DRAFT (DoRl)
 FOPEBA_METRICS                ✅  v0
 RELEASE-01-BETA               ✅  tag release-01-beta → facb917
-RELEASE-01                    ▶  DoR OPEN · [DOR](./RELEASE_01_DOR.md) · [STRATEGY](./RELEASE_01_STRATEGY.md)
+RELEASE-01                    ▶  Spec FROZEN · Runner · Gate READY · next 001 (P1)
 FLOW-05                       ⏳  no por inercia · candidato como criterio RELEASE-01
 ```
 
@@ -107,11 +107,12 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual:** **RELEASE-01 DoR** (producto SaaS · este PR · docs only).  
-Framework cerrado: tag `release-01-beta` → `facb917` · [PASS](../10-validation/release-01-beta/RELEASE_01_BETA_PASS_ACTA.md).  
-Artefactos: [RELEASE_01_DOR](./RELEASE_01_DOR.md) · [RELEASE_01_STRATEGY](./RELEASE_01_STRATEGY.md).  
-Do **not** open Spec · Runner · Gate · FLOW-05 · scripts · tests en este PR.  
-**Reglas:** (1) Producto ≠ framework · (2) Land Check desde `main` (Regla 9) · (3) un bloque / PR cuando existan Spec+Runner.  
+**Objetivo actual:** **RELEASE-01 Gate READY** · Spec FROZEN · Runner BLOCKED at P1.  
+Framework cerrado: tag `release-01-beta` → `facb917`.  
+Artefactos: [SPEC](./RELEASE_01_SPEC.md) · [RUNNER](../10-validation/release-01/RELEASE_01_RUNNER.md) · [GATE](../10-validation/release-01/RELEASE_01_GATE.md).  
+**Siguiente:** READY TO OPEN **RELEASE-01-001** (P1 only).  
+Do **not** open P2+ · FLOW-05 · Capacitor · Track B re-cert en 001.  
+**Reglas:** (1) Producto ≠ framework · (2) Land Check desde `main` (Regla 9) · (3) un bloque / PR.  
 **Nota:** restaurar `docs/10-validation/**/evidence/*.json` antes de Land Check si bloquean `git pull`.
 
 Cross-flow **no sustituye** runners canónicos: los runners certifican contratos;  
@@ -190,7 +191,7 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 ## Current Goal
 
 ```text
-Track B (prioridad): RELEASE-01 DoR ▶ · Strategy P1–P5 · luego Spec
+Track B (prioridad): RELEASE-01-001 ▶ P1 · tras Gate READY
 Track A:             FLOW-05 no por inercia · candidato como criterio de RELEASE-01
 FOPEBA_LAND_CHECK:   ACTIVE · pull + fetch --tags --prune before every runner
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos
