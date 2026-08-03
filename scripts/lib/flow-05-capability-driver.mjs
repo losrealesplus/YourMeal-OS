@@ -3,13 +3,15 @@
  *
  * B1 = Registration (FLOW05-001)
  * B2 = Authentication (FLOW05-002)
- * B3…B8 = not implemented in this delivery
+ * B3 = Order Creation (FLOW05-003)
+ * B4…B8 = not implemented in this delivery
  *
  * Tenant-agnostic — EatClean is the first tenant, not the contract.
  */
 import { FLOW05_SEGMENTS } from "./flow-05-canonical-pipeline.mjs";
 import { runFlow05B1Registration } from "./flow-05-b1-registration.mjs";
 import { runFlow05B2Authentication } from "./flow-05-b2-authentication.mjs";
+import { runFlow05B3OrderCreation } from "./flow-05-b3-order-creation.mjs";
 
 /**
  * @param {{ root: string, through?: 1|2|3|4|5|6|7|8 | 0 | null }} opts
@@ -81,11 +83,35 @@ export function runFlow05CapabilityDriver({ root, through = null }) {
 
   if (max < 3) return { ok: true, steps, evidence };
 
+  console.info("[FLOW-05]", "FLOW05_B3_STARTED", {
+    segment: FLOW05_SEGMENTS[3],
+  });
+  steps.push("FLOW05_B3_STARTED");
+
+  const b3 = runFlow05B3OrderCreation({ cwd: root });
+  evidence.b3_checks = b3.checks;
+  if (!b3.ok) {
+    console.error("[FLOW-05] B3 FAIL:\n" + b3.reason);
+    return { ok: false, steps, reason: b3.reason, evidence };
+  }
+  evidence.b3_mapped_tokens = b3.mapped_tokens;
+  evidence.b3_source = b3.source;
+
+  console.info("[FLOW-05]", "FLOW05_B3_COMPLETED", {
+    segment: FLOW05_SEGMENTS[3],
+    mapped_tokens: b3.mapped_tokens,
+    source: b3.source,
+    checks: b3.checks,
+  });
+  steps.push("FLOW05_B3_COMPLETED");
+
+  if (max < 4) return { ok: true, steps, evidence };
+
   return {
     ok: false,
     steps,
     reason:
-      "B3+ block drivers are not implemented — stop at FLOW05-002 (B2 Authentication only).",
+      "B4+ block drivers are not implemented — stop at FLOW05-003 (B3 Order Creation only).",
     evidence,
   };
 }

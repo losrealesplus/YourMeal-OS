@@ -8,7 +8,7 @@
   "tenant_agnostic": true,
   "principle": "Evidence before Implementation",
   "code_status": "CAPABILITY_DRIVER_B2",
-  "at": "2026-08-03T16:14:24.510Z",
+  "at": "2026-08-03T16:18:41.822Z",
   "pipeline": [
     "FLOW05_B1_STARTED",
     "FLOW05_B1_COMPLETED",
