@@ -1,0 +1,46 @@
+{
+  "delivery": "MR01-003",
+  "segment": "android_signing",
+  "applicationId": "com.yourmealos.eatclean",
+  "versionCode": 1,
+  "versionName": "1.0",
+  "signing": "release_signed",
+  "key_alias": "yourmeal_upload",
+  "certificate_dn": "CN=YourMeal OS MR01-003 Certification, OU=Mobile Release, O=YourMeal OS, L=Local, ST=NA, C=ES",
+  "certificate_sha256": "f6c47e1f19eb2f08c57471d0eb962df98b92b1cc59771c76bbeba8e994be9644",
+  "certifies": [
+    "signing_config_prepared",
+    "keystore_policy",
+    "secrets_outside_git",
+    "release_signing_validation",
+    "signed_artifact_verification"
+  ],
+  "does_not_certify": [
+    "google_play",
+    "play_console",
+    "play_app_signing",
+    "internal_testing_publish",
+    "ios",
+    "ci_cd"
+  ],
+  "note": "Keystore and passwords are NOT in Git. Binaries are gitignored. Evidence JSON is the certified fingerprint. Certification keystore ≠ production tenant keystore.",
+  "recorded_at": "2026-08-03T20:16:59.196Z",
+  "artifacts": {
+    "release_apk": {
+      "relative_path": "android/app/build/outputs/apk/release/app-release.apk",
+      "bytes": 4327622,
+      "sha256": "9c64758a6ae37964d985ddcb4a1042a0db0725200e4e2d6e085d268fc60d4446",
+      "variant": "release",
+      "kind": "apk",
+      "signed": true
+    },
+    "release_aab": {
+      "relative_path": "android/app/build/outputs/bundle/release/app-release.aab",
+      "bytes": 4181231,
+      "sha256": "38d7bf4ca2c3ee9dcd50ef040d0f1f4a6bb565bc057ece6a0e4a3b43222b3602",
+      "variant": "release",
+      "kind": "aab",
+      "signed": true
+    }
+  }
+}
