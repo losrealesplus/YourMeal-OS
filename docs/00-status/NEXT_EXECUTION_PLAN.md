@@ -107,9 +107,9 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual:** **FLOW-05 DoR** (Customer Experience Lifecycle · documentación only).  
+**Objetivo actual:** **FLOW-05 DoR** (Customer Experience Lifecycle · este PR · docs only).  
 RELEASE-01 ✅ CERTIFIED · tag `release-01-pass` → `8e91a49` · Gate CLOSED.  
-Contrato histórico: `npm run test:release-01` → FULL PASS · `certified_through=P5` · `blocked_at=—` · exit 0.  
+DoR: [FLOW_05_CUSTOMER_EXPERIENCE_DOR](./FLOW_05_CUSTOMER_EXPERIENCE_DOR.md).  
 Do **not** abrir Spec · Runner · Capacitor · App Store en el DoR.  
 **Reglas:** (1) Producto ≠ framework · (2) Land Check desde `main` (Regla 9) · (3) un bloque / PR.  
 **Nota:** restaurar `docs/10-validation/**/evidence/*.json` antes de Land Check si bloquean `git pull`.
@@ -191,7 +191,7 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 
 ```text
 Track B (cerrado):   RELEASE-01 ✅ · tag release-01-pass → 8e91a49
-Track A (prioridad): FLOW-05 DoR ▶ Customer Experience Lifecycle → Spec
+Track A (prioridad): FLOW-05 DoR ▶ este PR → Spec READY FOR FREEZE
 FOPEBA_LAND_CHECK:   ACTIVE · pull + fetch --tags --prune before every runner
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos
 ```
