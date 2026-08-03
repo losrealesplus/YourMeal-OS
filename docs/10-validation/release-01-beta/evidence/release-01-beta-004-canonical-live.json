@@ -1,21 +1,23 @@
 {
   "status": "PASS",
-  "reason": "PASS through B3 · BLOCKED at RELEASE_01_BETA_B4_STARTED for full RELEASE-01-BETA",
+  "reason": "PASS through B4 · BLOCKED at RELEASE_01_BETA_B5_STARTED for full RELEASE-01-BETA",
   "gate": "RELEASE-01-BETA",
   "contract": "RELEASE_01_BETA_SPEC",
   "level": "release",
   "certifies": "beta_acceptance",
   "composes_track_b_pass_tags": true,
   "principle": "Evidence before Implementation",
-  "code_status": "CAPABILITY_DRIVER_B3",
-  "at": "2026-08-03T14:34:33.490Z",
+  "code_status": "CAPABILITY_DRIVER_B4",
+  "at": "2026-08-03T14:34:33.375Z",
   "pipeline": [
     "RELEASE_01_BETA_B1_STARTED",
     "RELEASE_01_BETA_B1_COMPLETED",
     "RELEASE_01_BETA_B2_STARTED",
     "RELEASE_01_BETA_B2_COMPLETED",
     "RELEASE_01_BETA_B3_STARTED",
-    "RELEASE_01_BETA_B3_COMPLETED"
+    "RELEASE_01_BETA_B3_COMPLETED",
+    "RELEASE_01_BETA_B4_STARTED",
+    "RELEASE_01_BETA_B4_COMPLETED"
   ],
   "expected": [
     "RELEASE_01_BETA_B1_STARTED",
@@ -33,13 +35,13 @@
   "missing": [],
   "out_of_order": [],
   "firstFailure": null,
-  "certified_through": 3,
-  "blocked_at": "RELEASE_01_BETA_B4_STARTED",
-  "delivery": "RELEASE-01-BETA-003",
+  "certified_through": 4,
+  "blocked_at": "RELEASE_01_BETA_B5_STARTED",
+  "delivery": "RELEASE-01-BETA-004",
   "delivery_status": "PASS",
   "gate_status": "BLOCKED",
   "terminal": {
-    "segment": "platform_capabilities"
+    "segment": "release_stack"
   },
   "evidence": {
     "b1_checks": [
@@ -85,6 +87,18 @@
       "RELEASE_01_BETA_B3_STARTED",
       "RELEASE_01_BETA_B3_COMPLETED"
     ],
-    "b3_source": "smoke · crossflow · e2e-pass + PASS actas · B2 CERTIFIED (no B4+ · no Deploy/Rollback · no FLOW-05)"
+    "b3_source": "smoke · crossflow · e2e-pass + PASS actas · B2 CERTIFIED (no B4+ · no Deploy/Rollback · no FLOW-05)",
+    "b4_checks": [
+      "release_01_beta_b3_acta_certified",
+      "release_deploy_pass_tag_present",
+      "release_rollback_pass_tag_present",
+      "release_deploy_pass_acta_present",
+      "release_rollback_pass_acta_present"
+    ],
+    "b4_mapped_tokens": [
+      "RELEASE_01_BETA_B4_STARTED",
+      "RELEASE_01_BETA_B4_COMPLETED"
+    ],
+    "b4_source": "deploy · rollback-pass + PASS actas · B3 CERTIFIED (no B5 · no FLOW-05 · no Deploy/Rollback re-run)"
   }
 }
