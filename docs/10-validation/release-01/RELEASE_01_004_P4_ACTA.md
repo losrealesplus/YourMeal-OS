@@ -2,7 +2,8 @@
 
 **Documento:** `RELEASE_01_004_P4_ACTA.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ▶ este PR · PASS through P4 · BLOCKED at `RELEASE_01_P5_STARTED`  
+**Estado:** ✅ **CERTIFIED desde `main`** · PASS through P4 · BLOCKED at `RELEASE_01_P5_STARTED`  
+**Tip:** `f1c83cd` (Merge #233)  
 **Precondición:** P3 CERTIFIED (#232 · `ddf4027`)  
 **Gate:** [RELEASE_01_GATE](./RELEASE_01_GATE.md)  
 **Spec:** [RELEASE_01_SPEC](../../00-status/RELEASE_01_SPEC.md)  
@@ -83,9 +84,9 @@ Fuente: `Billing · Reports · Notifications · Audit · Configuration · P3 CER
 ## Next
 
 ```text
-READY TO OPEN
-RELEASE-01-005 · P5 only
-(after Land Check of 004 from main)
+CERTIFIED desde main
+    ↓
+RELEASE-01-005 · P5 OPEN (este track)
 ```
 
 ---

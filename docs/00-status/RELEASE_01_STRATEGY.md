@@ -169,9 +169,9 @@ P5 **compone** outcomes P1–P4.
 ## Next
 
 ```text
-RELEASE-01-004 · P4 OPEN
+RELEASE-01-005 · P5 OPEN
     ↓
-READY TO OPEN RELEASE-01-005 · P5 only (tras Land Check)
+Land Check → tag release-01-pass · PASS acta · Gate CLOSED
 ```
 
 ---
