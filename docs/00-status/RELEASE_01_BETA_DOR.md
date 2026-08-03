@@ -121,8 +121,8 @@ Track A:             FLOW-05 no por inercia · candidato como criterio de RELEAS
 RELEASE-01-BETA CERTIFIED
 tag release-01-beta → facb917
     ↓
-READY TO OPEN
-RELEASE-01 DoR
+OPEN
+RELEASE-01 DoR · este PR (#228)
 Documentation only.
 ```
 

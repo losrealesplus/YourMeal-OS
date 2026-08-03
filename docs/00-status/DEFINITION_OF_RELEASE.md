@@ -4,7 +4,7 @@
 **Fecha:** 2026-08-02  
 **Status:** ▶ **DRAFT · Estándar de producto** (no abre implementación de dominio)  
 **Nivel:** Producto / versión — **no** es un Flow  
-**Complementa:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) · [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) · [GIT_MILESTONE_TAGS](./GIT_MILESTONE_TAGS.md) · [NEXT_EXECUTION_PLAN](./NEXT_EXECUTION_PLAN.md)  
+**Complementa:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) · [RELEASE_01_DOR](./RELEASE_01_DOR.md) · [RELEASE_01_STRATEGY](./RELEASE_01_STRATEGY.md) · [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) · [GIT_MILESTONE_TAGS](./GIT_MILESTONE_TAGS.md) · [NEXT_EXECUTION_PLAN](./NEXT_EXECUTION_PLAN.md)  
 **Handoff:** [PROJECT_HANDOFF](./PROJECT_HANDOFF.md)
 
 > DoR responde: *¿este Flow puede empezar a implementarse?*  

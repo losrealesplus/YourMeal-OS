@@ -93,8 +93,8 @@ A partir de aquí el foco se desplaza a **RELEASE-01** (validación del producto
 ## Next
 
 ```text
-READY TO OPEN
-RELEASE-01 DoR
+OPEN
+RELEASE-01 DoR · #228
 Documentation only.
 No Spec · No Runner · No implementation · No FLOW-05.
 ```
