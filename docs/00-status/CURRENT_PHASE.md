@@ -50,13 +50,12 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    Track B › RELEASE-01-BETA-001 (B1 only)
-                               Spec ✅ FROZEN #218 · Runner ✅ #219 → 3994833
-                               Gate ✅ READY · Land Check BLOCKED at B1 from main
-                               → ../10-validation/release-01-beta/RELEASE_01_BETA_GATE.md
-                               READY TO OPEN BETA-001 only (no B2–B5)
+  Prioridad                    Track B › RELEASE-01-BETA-001 (B1 · este PR)
+                               DoR ✅ #217 · Spec ✅ · Runner ✅ #219 · Gate ✅ #220
+                               npm run test:release-01-beta → PASS through B1 · BLOCKED at B2
+                               → ../10-validation/release-01-beta/RELEASE_01_BETA_001_B1_ACTA.md
+                               No B2–B5 · FLOW-05 · tag release-01-beta
                                Track B operativo completo (Smoke…Rollback)
-                               No FLOW-05 · tag release-01-beta
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)
   Land Check                   ./FOPEBA_LAND_CHECK.md (antes de cualquier 001)

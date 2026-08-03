@@ -2,10 +2,11 @@
 
 **Documento:** `RELEASE_01_BETA_GATE.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **READY** · Runner CERTIFIED desde `main` · BLOCKED at B1  
+**Estado:** ✅ **READY** · Runner CERTIFIED · 001 ▶ este PR (B1)  
 **Nivel:** Release Track B · B-06 Beta Acceptance  
 **Spec:** [RELEASE_01_BETA_SPEC](../../00-status/RELEASE_01_BETA_SPEC.md) ✅ FROZEN #218  
 **Runner:** [RELEASE_01_BETA_RUNNER](./RELEASE_01_BETA_RUNNER.md) ✅ #219 · `3994833`  
+**001:** [RELEASE_01_BETA_001_B1_ACTA](./RELEASE_01_BETA_001_B1_ACTA.md)  
 **Land Check:** [FOPEBA_LAND_CHECK](../../00-status/FOPEBA_LAND_CHECK.md)
 
 > `main` certifica; las ramas solo proponen.
@@ -25,8 +26,10 @@
 ### Decision
 
 ```text
-READY TO OPEN
-RELEASE-01-BETA-001 · B1 only
+RELEASE-01-BETA-001 · B1 OPEN (este PR)
+PASS through B1 · BLOCKED at RELEASE_01_BETA_B2_STARTED
+    ↓
+Land Check from main → READY TO OPEN 002
 ```
 
 ### Land Check evidence (from `main` @ `3994833`)
@@ -55,7 +58,7 @@ exit 2
 | DoR | Ready framework | ✅ #217 |
 | Spec | Contract B1–B5 | ✅ FROZEN #218 |
 | Runner | BLOCKED at B1 | ✅ CERTIFIED #219 |
-| RELEASE-01-BETA-001 | B1 Foundation | ⏳ READY TO OPEN |
+| RELEASE-01-BETA-001 | B1 Foundation | ▶ este PR |
 | RELEASE-01-BETA-002…005 | B2…B5 | ⏳ |
 | `release-01-beta` | FULL PASS | ⏳ |
 
