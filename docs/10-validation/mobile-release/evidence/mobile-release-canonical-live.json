@@ -1,0 +1,40 @@
+{
+  "status": "BLOCKED",
+  "reason": "Mobile Release blocks not implemented (runner ready; Evidence before Implementation)",
+  "gate": "MOBILE-RELEASE",
+  "contract": "MOBILE_RELEASE_01_SPEC",
+  "level": "distribution",
+  "certifies": "private_mobile_delivery_pipeline",
+  "tenant_agnostic": true,
+  "core_integrity": true,
+  "principle": "Evidence before Implementation",
+  "architecture": "Core SaaS → Capacitor → MOBILE-RELEASE → Internal Testing",
+  "code_status": "CERTIFIED_THROUGH_0",
+  "at": "2026-08-03T19:50:33.813Z",
+  "pipeline": [],
+  "expected": [
+    "MOBILE_RELEASE_MR1_STARTED",
+    "MOBILE_RELEASE_MR1_COMPLETED",
+    "MOBILE_RELEASE_MR2_STARTED",
+    "MOBILE_RELEASE_MR2_COMPLETED",
+    "MOBILE_RELEASE_MR3_STARTED",
+    "MOBILE_RELEASE_MR3_COMPLETED",
+    "MOBILE_RELEASE_MR4_STARTED",
+    "MOBILE_RELEASE_MR4_COMPLETED",
+    "MOBILE_RELEASE_MR5_STARTED",
+    "MOBILE_RELEASE_MR5_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": "MOBILE_RELEASE_MR1_STARTED",
+  "certified_through": 0,
+  "blocked_at": "MOBILE_RELEASE_MR1_STARTED",
+  "delivery": "MOBILE-RELEASE",
+  "delivery_status": "BLOCKED",
+  "domain_status": "BLOCKED",
+  "terminal": {
+    "segment": null
+  },
+  "evidence": {}
+}
