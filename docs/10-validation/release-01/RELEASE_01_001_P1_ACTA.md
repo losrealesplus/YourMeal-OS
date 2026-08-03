@@ -2,7 +2,8 @@
 
 **Documento:** `RELEASE_01_001_P1_ACTA.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ▶ este PR · PASS through P1 · BLOCKED at `RELEASE_01_P2_STARTED`  
+**Estado:** ✅ **CERTIFIED desde `main`** · PASS through P1 · BLOCKED at `RELEASE_01_P2_STARTED`  
+**Tip:** `391fdd8` (Merge #230)  
 **Precondición:** Gate READY (#229 · `f86645b`) · Spec FROZEN  
 **Gate:** [RELEASE_01_GATE](./RELEASE_01_GATE.md)  
 **Spec:** [RELEASE_01_SPEC](../../00-status/RELEASE_01_SPEC.md)  
@@ -64,7 +65,16 @@ Fuente: `Authentication · Tenant · RBAC · Profiles · Localization · Setting
 
 ---
 
-## Contratos FOPEBA (este PR)
+## Land Check (desde `main` @ `391fdd8`)
+
+```bash
+git restore docs/10-validation/release-01/evidence/ 2>/dev/null || true
+git pull origin main
+git fetch --tags --prune
+npm run test:release-01-001
+npm run test:release-01
+npm run test:release-01:runner-only
+```
 
 | Comando | Resultado |
 |---------|-----------|
@@ -77,9 +87,8 @@ Fuente: `Authentication · Tenant · RBAC · Profiles · Localization · Setting
 ## Next
 
 ```text
-READY TO OPEN
-RELEASE-01-002 · P2 only
-(after Land Check of 001 from main)
+OPEN
+RELEASE-01-002 · P2 only · este PR
 ```
 
 ---

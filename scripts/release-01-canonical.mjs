@@ -13,11 +13,11 @@
  *
  * Spec: docs/00-status/RELEASE_01_SPEC.md
  *
- * NO P2–P5 drivers in this PR · NO FLOW-05 · NO Capacitor · NO Track B re-cert.
+ * NO P3–P5 drivers in this PR · NO FLOW-05 · NO Capacitor · NO Track B re-cert.
  */
 
 /** Highest segment with a capability driver implemented. */
-const RELEASE_01_CERTIFIED_THROUGH = 1;
+const RELEASE_01_CERTIFIED_THROUGH = 2;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";

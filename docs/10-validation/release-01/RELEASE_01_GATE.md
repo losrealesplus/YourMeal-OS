@@ -2,13 +2,14 @@
 
 **Documento:** `RELEASE_01_GATE.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **READY** · Spec FROZEN · Runner live through P1 · DoR ✅ (#228) · 001 ▶ este PR  
+**Estado:** ✅ **READY** · Spec FROZEN · Runner live through P2 · DoR ✅ (#228) · P1 ✅ · 002 ▶ este PR  
 **Nivel:** Product Release · YourMeal OS como SaaS  
 **Spec:** [RELEASE_01_SPEC](../../00-status/RELEASE_01_SPEC.md) ✅ FROZEN  
 **Runner:** [RELEASE_01_RUNNER](./RELEASE_01_RUNNER.md)  
 **DoR:** [RELEASE_01_DOR](../../00-status/RELEASE_01_DOR.md)  
 **Strategy:** [RELEASE_01_STRATEGY](../../00-status/RELEASE_01_STRATEGY.md)  
-**001:** [RELEASE_01_001_P1_ACTA](./RELEASE_01_001_P1_ACTA.md)  
+**001:** [RELEASE_01_001_P1_ACTA](./RELEASE_01_001_P1_ACTA.md) ✅ CERTIFIED #230  
+**002:** [RELEASE_01_002_P2_ACTA](./RELEASE_01_002_P2_ACTA.md)  
 **Land Check:** [FOPEBA_LAND_CHECK](../../00-status/FOPEBA_LAND_CHECK.md)
 
 > `main` certifica; las ramas solo proponen.  
@@ -25,8 +26,9 @@
 ☑ Runner BLOCKED at P1 (este PR · CERTIFIED_THROUGH = 0)
 ☑ Gate READY (#229 → f86645b)
 ☑ duplicates=[] missing=[] out_of_order=[]
-☑ RELEASE-01-001 OPEN → ▶ este PR (P1)
-☐ RELEASE-01-002…005
+☑ RELEASE-01-001 CERTIFIED → #230 · `391fdd8`
+☑ RELEASE-01-002 OPEN → ▶ este PR (P2)
+☐ RELEASE-01-003…005
 ☐ RELEASE-01 PASS / tag de producto
 ```
 
@@ -48,10 +50,10 @@ npm run test:release-01:unit
 ### Decision
 
 ```text
-RELEASE-01-001 · P1 OPEN (este PR)
-PASS through P1 · BLOCKED at RELEASE_01_P2_STARTED
+RELEASE-01-002 · P2 OPEN (este PR)
+PASS through P2 · BLOCKED at RELEASE_01_P3_STARTED
     ↓
-Land Check from main → READY TO OPEN 002
+Land Check from main → READY TO OPEN 003
 ```
 
 ### Progress
@@ -62,8 +64,8 @@ Land Check from main → READY TO OPEN 002
 | Spec | Contract P1–P5 | ✅ FROZEN |
 | Runner | BLOCKED at P1 | ✅ este PR |
 | Gate | READY | ✅ este PR |
-| RELEASE-01-001 | P1 Platform Foundation | ▶ este PR |
-| RELEASE-01-002 | P2 Core Business | ⏳ |
+| RELEASE-01-001 | P1 Platform Foundation | ✅ CERTIFIED #230 |
+| RELEASE-01-002 | P2 Core Business | ▶ este PR |
 | RELEASE-01-003 | P3 Operations | ⏳ |
 | RELEASE-01-004 | P4 Administration | ⏳ |
 | RELEASE-01-005 | P5 Product Acceptance | ⏳ |
