@@ -48,6 +48,7 @@ Tag `release-01-pass` = bloques P1–P5 CERTIFIED · Gate CLOSED.
 | `flow02-pass` | Flow | FLOW-02 Delivery Incidents FULL PASS → `a1e8d1e` (#153) |
 | `flow03-pass` | Flow | FLOW-03 Billing FULL PASS → `67a2e66` (#160) |
 | `flow04-pass` | Flow | FLOW-04 Inventory Consumption FULL PASS → `8be1c26` (#167) |
+| `flow05-pass` | Flow | FLOW-05 Customer Experience Lifecycle FULL PASS (B1–B8) · [PASS](../10-validation/flow-05/FLOW_05_PASS_ACTA.md) |
 | `release-smoke-pass` | Release gate | RELEASE-SMOKE FULL PASS (S1–S4) → `370628a` (#177) |
 | `release-crossflow-pass` | Release gate | RELEASE-CROSSFLOW FULL PASS (C1–C4) → `0a0c51b` (#184) |
 | `release-e2e-pass` | Release gate | RELEASE-E2E FULL PASS (E1–E4) → `73623ae` (#196) · [PASS](../10-validation/release-e2e/RELEASE_E2E_PASS_ACTA.md) |

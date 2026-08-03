@@ -2,51 +2,48 @@
 
 **Documento:** `FLOW_05_GATE.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **READY** · FLOW05-001 ✅ · FLOW05-002 ✅ · FLOW05-003 ✅ · FLOW05-004 ✅ · FLOW05-005 ✅ · FLOW05-006 ✅ · FLOW05-007 ▶ CERTIFIED (este PR)  
+**Estado:** ✅ **CLOSED** · FLOW-05 **CERTIFIED** · tag `flow05-pass`  
 **Nivel:** Flow · YourMeal OS (tenant-agnostic · no EatClean-only)  
 **Spec:** [FLOW_05_SPEC](../../00-status/FLOW_05_SPEC.md) ✅ FROZEN (#237)  
-**Runner:** [FLOW_05_RUNNER](./FLOW_05_RUNNER.md) · CERTIFIED_THROUGH=7  
-**Acta 001:** [FLOW05_001_B1_ACTA](./FLOW05_001_B1_ACTA.md) ✅  
-**Acta 002:** [FLOW05_002_B2_ACTA](./FLOW05_002_B2_ACTA.md) ✅  
-**Acta 003:** [FLOW05_003_B3_ACTA](./FLOW05_003_B3_ACTA.md) ✅  
-**Acta 004:** [FLOW05_004_B4_ACTA](./FLOW05_004_B4_ACTA.md) ✅  
-**Acta 005:** [FLOW05_005_B5_ACTA](./FLOW05_005_B5_ACTA.md) ✅  
-**Acta 006:** [FLOW05_006_B6_ACTA](./FLOW05_006_B6_ACTA.md) ✅ (#245 → `7c17569`)  
-**Acta 007:** [FLOW05_007_B7_ACTA](./FLOW05_007_B7_ACTA.md)  
+**Runner:** [FLOW_05_RUNNER](./FLOW_05_RUNNER.md) · CERTIFIED_THROUGH=8 · FULL PASS  
+**PASS Acta:** [FLOW_05_PASS_ACTA](./FLOW_05_PASS_ACTA.md)  
+**Actas:** [001](./FLOW05_001_B1_ACTA.md) · [002](./FLOW05_002_B2_ACTA.md) · [003](./FLOW05_003_B3_ACTA.md) · [004](./FLOW05_004_B4_ACTA.md) · [005](./FLOW05_005_B5_ACTA.md) · [006](./FLOW05_006_B6_ACTA.md) · [007](./FLOW05_007_B7_ACTA.md) · [008](./FLOW05_008_B8_ACTA.md)  
 **Land Check:** [FOPEBA_LAND_CHECK](../../00-status/FOPEBA_LAND_CHECK.md)
 
-> Cada bloque certifica **exactamente una** transición de estado.  
+> Cada bloque certificó **exactamente una** transición de estado.  
 > Order States (FLOW-05) ≠ Operational States (internos).  
-> UI no es el contrato — la máquina de estados sí.
+> UI ≠ contrato. B8 termina en **Archived**.
 
 ---
 
 ## Checklist
 
 ```text
-☑ DoR · Spec · Runner · Gate READY
+☑ DoR · Spec · Runner · Gate READY → CLOSED
 ☑ FLOW05-001 · B1 Registration
 ☑ FLOW05-002 · B2 Authentication
 ☑ FLOW05-003 · B3 Order Creation
 ☑ FLOW05-004 · B4 Production
 ☑ FLOW05-005 · B5 Route Planning
-☑ FLOW05-006 · B6 Delivery (#245 → 7c17569)
-☑ FLOW05-007 · B7 Delivery Confirmation (este PR)
-☐ FLOW05-008 · B8 History
-☐ flow05-pass / Capacitor
+☑ FLOW05-006 · B6 Delivery
+☑ FLOW05-007 · B7 Delivery Confirmation
+☑ FLOW05-008 · B8 History
+☑ flow05-pass · FULL PASS · Gate CLOSED
+☐ Capacitor DoR (siguiente milestone · fuera de FLOW-05)
 ```
 
 ### Decision
 
 ```text
-FLOW05-007 · B7 Delivery Confirmation · CERTIFIED
+FLOW-05 · Customer Experience Lifecycle · CERTIFIED
     ↓
-PASS through B7 · blocked_at=FLOW05_B8_STARTED · exit 0
+PASS through B8 · FLOW-05 FULL PASS · blocked_at=— · exit 0
     ↓
-NEXT · FLOW05-008 · B8 History only
+tag flow05-pass · FLOW_05_PASS_ACTA · Gate CLOSED
+    ↓
+NEXT · Capacitor DoR only
+    (Web SaaS → Shell nativo → Build reproducible → Android → iOS)
 ```
-
-B7 termina en **Confirmed**.
 
 ### Progress
 
@@ -57,14 +54,14 @@ B7 termina en **Confirmed**.
 | FLOW05-003 | B3 Order Creation | ✅ |
 | FLOW05-004 | B4 Production | ✅ |
 | FLOW05-005 | B5 Route Planning | ✅ |
-| FLOW05-006 | B6 Delivery | ✅ #245 · `7c17569` |
-| **FLOW05-007** | **B7 Delivery Confirmation** | ✅ **este PR** |
-| FLOW05-008 | B8 History | ⏳ next |
-| `flow05-pass` | FULL PASS | ⏳ |
+| FLOW05-006 | B6 Delivery | ✅ |
+| FLOW05-007 | B7 Delivery Confirmation | ✅ |
+| FLOW05-008 | B8 History | ✅ |
+| `flow05-pass` | FULL PASS ritual | ✅ **CLOSED** |
 
-### Permanecen cerrados
+### Permanecen cerrados (siguiente ciclo)
 
-B8 History (next) · Capacitor · Stores · Deploy
+Capacitor · Stores · Push · Deep Links · Biometría · Deploy analytics · Billing extras
 
 ---
 
