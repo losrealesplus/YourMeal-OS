@@ -2,9 +2,10 @@
 
 **Documento:** `FLOW_05_SPEC.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **FROZEN** (merge #237 · `deba9f6`) · Runner ▶ este PR · Gate ⏳  
+**Estado:** ✅ **FROZEN** (merge #237 · `deba9f6`) · Runner ✅ · Gate ✅ READY · autoriza FLOW05-001  
 **DoR:** [FLOW_05_CUSTOMER_EXPERIENCE_DOR](./FLOW_05_CUSTOMER_EXPERIENCE_DOR.md)  
 **Runner:** [FLOW_05_RUNNER](../10-validation/flow-05/FLOW_05_RUNNER.md)  
+**Gate:** [FLOW_05_GATE](../10-validation/flow-05/FLOW_05_GATE.md)  
 **Estándar:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) · [Evidence before Implementation](./EVIDENCE_BEFORE_IMPLEMENTATION.md)  
 **Gobernanza:** [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) Regla 7–9  
 **Plan:** [NEXT_EXECUTION_PLAN](./NEXT_EXECUTION_PLAN.md) · [FLOW_CATALOG](./FLOW_CATALOG.md)  
@@ -328,10 +329,11 @@ Hasta entonces: **prohibido** implementación de dominio · Capacitor · Gate de
 
 ```text
 Spec FROZEN ✅
+Runner ✅
+Gate ✅ READY
     ↓
-FLOW-05 Runner ▶ (BLOCKED at FLOW05_B1_STARTED)
-    ↓
-READY TO OPEN Gate (tras Land Check desde main)
+READY TO OPEN
+FLOW05-001 · B1 Registration only
 ```
 
 ---

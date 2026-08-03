@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW_05_CUSTOMER_EXPERIENCE_DOR.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **DoR DOCUMENT** · Spec ✅ [FROZEN](./FLOW_05_SPEC.md) · Runner ▶ [FLOW_05_RUNNER](../10-validation/flow-05/FLOW_05_RUNNER.md)  
+**Estado:** ✅ **DoR DOCUMENT** · Spec ✅ [FROZEN](./FLOW_05_SPEC.md) · Runner ✅ · Gate ✅ [READY](../10-validation/flow-05/FLOW_05_GATE.md)  
 **Flow ID:** FLOW-05  
 **Handoff (catálogo):** Customer Experience Lifecycle  
 **Pregunta operacional (borrador):** ¿Un cliente completa el ciclo Registro → Pedido → Entrega → Historial con evidencia reproducible?  
@@ -283,9 +283,9 @@ Hasta entonces: **prohibido** repositories · services · OperationsService · R
 | 0 | DoR document | ✅ #236 |
 | 1 | Spec | ✅ FROZEN #237 · [FLOW_05_SPEC](./FLOW_05_SPEC.md) |
 | 2 | Freeze (merge Spec → main) | ✅ #237 · `deba9f6` |
-| 3 | Runner only · BLOCKED at B1 | ▶ este PR |
-| 4 | Gate FLOW05-001 | ⏳ |
-| 5 | FLOW05-001…008 (un bloque / PR) | ⏳ |
+| 3 | Runner only · BLOCKED at B1 | ✅ #238 · `7381ff2` |
+| 4 | Gate FLOW05-001 | ✅ READY · este PR |
+| 5 | FLOW05-001…008 (un bloque / PR) | ⏳ READY TO OPEN 001 |
 | 6 | FULL PASS · tag `flow05-pass` | ⏳ |
 | 7 | Capacitor / build móvil EatClean | ⏳ **solo tras** `flow05-pass` |
 

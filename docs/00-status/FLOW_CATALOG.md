@@ -42,7 +42,7 @@ Sí: `FLOW-01 Kitchen → Delivery`.
 
 | ID | Handoff / alcance | Prioridad | Motivo | Estado |
 |----|-------------------|-----------|--------|--------|
-| **FLOW-05** | Customer Experience Lifecycle | Alta | Registro → … → Historial (B1–B8) | ▶ **Runner** · BLOCKED at B1 · [FLOW_05_RUNNER](../10-validation/flow-05/FLOW_05_RUNNER.md) · Spec ✅ [FROZEN](./FLOW_05_SPEC.md) |
+| **FLOW-05** | Customer Experience Lifecycle | Alta | Registro → … → Historial (B1–B8) | ▶ **Gate READY** · [FLOW_05_GATE](../10-validation/flow-05/FLOW_05_GATE.md) · autoriza FLOW05-001 · Spec ✅ [FROZEN](./FLOW_05_SPEC.md) |
 | **FLOW-06** | Kitchen Planning | Media | Planificación previa a T1 | ⏳ DoR NOT STARTED |
 
 > Orden recomendado: cada Flow aprovecha el anterior sin mezclar responsabilidades.  

@@ -2,9 +2,10 @@
 
 **Documento:** `FLOW_05_RUNNER.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ Runner **ACTIVE** · CERTIFIED_THROUGH = 0 · BLOCKED at B1 · Spec ✅ FROZEN  
+**Estado:** ✅ Runner **CERTIFIED** (#238 · `7381ff2`) · CERTIFIED_THROUGH = 0 · BLOCKED at B1 · Gate ✅ READY  
 **Spec:** [FLOW_05_SPEC](../../00-status/FLOW_05_SPEC.md) **FROZEN**  
 **DoR:** [FLOW_05_CUSTOMER_EXPERIENCE_DOR](../../00-status/FLOW_05_CUSTOMER_EXPERIENCE_DOR.md)  
+**Gate:** [FLOW_05_GATE](./FLOW_05_GATE.md)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)
 
 > Pregunta que responde este PR:  
@@ -126,7 +127,7 @@ npm run test:flow-05:runner-only
 # → same
 ```
 
-Next after Runner Land Check: **FLOW-05 Gate** (NOT READY hasta BLOCKED verificado desde `main`) → luego FLOW05-001 (B1 only).
+Next after Runner Land Check: **FLOW-05 Gate** ✅ READY · autoriza **FLOW05-001** (B1 only).
 
 ---
 
