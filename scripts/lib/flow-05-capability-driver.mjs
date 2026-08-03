@@ -8,7 +8,7 @@
  * B5 = Route Planning (FLOW05-005)
  * B6 = Delivery (FLOW05-006)
  * B7 = Delivery Confirmation (FLOW05-007)
- * B8 = not implemented in this delivery
+ * B8 = History (FLOW05-008)
  *
  * Tenant-agnostic — EatClean is the first tenant, not the contract.
  * Rule: each block certifies exactly one state transition.
@@ -21,6 +21,7 @@ import { runFlow05B4Production } from "./flow-05-b4-production.mjs";
 import { runFlow05B5RoutePlanning } from "./flow-05-b5-route-planning.mjs";
 import { runFlow05B6Delivery } from "./flow-05-b6-delivery.mjs";
 import { runFlow05B7DeliveryConfirmation } from "./flow-05-b7-delivery-confirmation.mjs";
+import { runFlow05B8History } from "./flow-05-b8-history.mjs";
 
 /**
  * @param {{ root: string, through?: 1|2|3|4|5|6|7|8 | 0 | null }} opts
@@ -212,11 +213,27 @@ export function runFlow05CapabilityDriver({ root, through = null }) {
 
   if (max < 8) return { ok: true, steps, evidence };
 
-  return {
-    ok: false,
-    steps,
-    reason:
-      "B8 block driver is not implemented — stop at FLOW05-007 (B7 Delivery Confirmation only).",
-    evidence,
-  };
+  console.info("[FLOW-05]", "FLOW05_B8_STARTED", {
+    segment: FLOW05_SEGMENTS[8],
+  });
+  steps.push("FLOW05_B8_STARTED");
+
+  const b8 = runFlow05B8History({ cwd: root });
+  evidence.b8_checks = b8.checks;
+  if (!b8.ok) {
+    console.error("[FLOW-05] B8 FAIL:\n" + b8.reason);
+    return { ok: false, steps, reason: b8.reason, evidence };
+  }
+  evidence.b8_mapped_tokens = b8.mapped_tokens;
+  evidence.b8_source = b8.source;
+
+  console.info("[FLOW-05]", "FLOW05_B8_COMPLETED", {
+    segment: FLOW05_SEGMENTS[8],
+    mapped_tokens: b8.mapped_tokens,
+    source: b8.source,
+    checks: b8.checks,
+  });
+  steps.push("FLOW05_B8_COMPLETED");
+
+  return { ok: true, steps, evidence };
 }

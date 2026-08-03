@@ -11,15 +11,15 @@
  *   --runner-only        Empty pipeline → BLOCKED at B1 (Gate baseline).
  *   --self-test          Validate frozen full contract (synthetic PASS).
  *   --pipeline=a,b,c     Validate an explicit observed step list.
- *   --through=B1|…|B8    Scope delivery FLOW05-001..008 (future).
+ *   --through=B1|…|B8    Scope delivery FLOW05-001..008.
  *
  * Spec: docs/00-status/FLOW_05_SPEC.md
  *
- * NO B8 driver · NO Capacitor · NO EatClean-only coupling.
+ * NO Capacitor · NO flow05-pass ritual · NO EatClean-only coupling.
  */
 
 /** Highest block with a capability driver implemented. */
-const FLOW05_CERTIFIED_THROUGH = 7;
+const FLOW05_CERTIFIED_THROUGH = 8;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
