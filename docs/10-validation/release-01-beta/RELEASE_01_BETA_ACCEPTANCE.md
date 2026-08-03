@@ -8,7 +8,7 @@
 
 > Acceptance **compone** outcomes B1–B4 ya certificados.  
 > No reabre Foundation · Flows · Platform · Deploy/Rollback.  
-> No abre FLOW-05. Tag `release-01-beta` solo tras Land Check desde `main`.
+> No abre FLOW-05. Tag `release-01-beta` → `facb917` (Land Check desde `main`).
 
 ---
 
@@ -20,7 +20,7 @@
 ☑ B3 Platform Capabilities   → RELEASE_01_BETA_003_B3_ACTA · CERTIFIED desde main
 ☑ B4 Release Stack           → RELEASE_01_BETA_004_B4_ACTA · CERTIFIED desde main
 ☑ Gate + Runner documents    → RELEASE_01_BETA_GATE · RELEASE_01_BETA_RUNNER
-☐ Tag release-01-beta        → solo tras FULL PASS Land Check desde main
+☑ Tag release-01-beta        → facb917 · [PASS ACTA](./RELEASE_01_BETA_PASS_ACTA.md)
 ```
 
 Tokens B5:
