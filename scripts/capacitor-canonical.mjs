@@ -7,19 +7,19 @@
  * Tenant-agnostic — Core SaaS → Capacitor → Android / iOS.
  *
  * Modes:
- *   (default) / --live   Through CERTIFIED_THROUGH (0 = empty → BLOCKED at C1).
- *   --runner-only        Empty pipeline → BLOCKED at C1 (Gate baseline).
- *   --self-test          Validate frozen full contract (synthetic PASS).
- *   --pipeline=a,b,c     Validate an explicit observed step list.
- *   --through=C1|…|C5    Scope delivery CAPACITOR-001..005 (future).
+ *   (default) / --runner-only  Empty pipeline → BLOCKED at C1 (Gate baseline).
+ *   --live                     Through CERTIFIED_THROUGH (0 = BLOCKED at C1).
+ *   --self-test                Validate frozen full contract (synthetic PASS).
+ *   --pipeline=a,b,c           Validate an explicit observed step list.
+ *   --through=C1|…|C5          Scope delivery CAPACITOR-001..005.
  *
  * Spec: docs/00-status/CAPACITOR_SPEC.md
  *
- * NO C1–C5 drivers · NO Capacitor install · NO Android/iOS builds · NO stores.
+ * NO C2+ drivers · NO android/ios certify · NO stores · Core Integrity.
  */
 
 /** Highest block with a capability driver implemented. */
-const CAPACITOR_CERTIFIED_THROUGH = 0;
+const CAPACITOR_CERTIFIED_THROUGH = 1;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -34,6 +34,7 @@ import {
   formatCapacitorComparisonTable,
   validateCapacitorPipeline,
 } from "./lib/capacitor-canonical-pipeline.mjs";
+import { runCapacitorCapabilityDriver } from "./lib/capacitor-capability-driver.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -140,19 +141,7 @@ async function main() {
   );
   console.log("═══════════════════════════════════════════════");
 
-  if (mode === "runner-only" || mode === "default" || mode === "live") {
-    // CERTIFIED_THROUGH=0 → institutionalize contract only (empty → BLOCKED at C1).
-    // No capability drivers yet — live with through=null also BLOCKED at C1.
-    if (mode === "live" && through != null && through >= 1) {
-      console.error(
-        "Capability drivers for C1+ are not implemented — CERTIFIED_THROUGH=0.",
-      );
-      console.error(
-        "Use default / --runner-only for Gate baseline, or --self-test for synthetic PASS.",
-      );
-      process.exit(CAPACITOR_EXIT.FAIL);
-    }
-
+  if (mode === "runner-only" || mode === "default") {
     const pipeline = [];
     const progress = evaluateCapacitorProgress(pipeline, { through: null });
     const report = buildCapacitorEvidenceReport({
@@ -165,20 +154,88 @@ async function main() {
         out_of_order: progress.out_of_order,
         firstFailure: progress.firstFailure,
       },
-      code_status:
-        mode === "live" ? "CERTIFIED_THROUGH_0" : "RUNNER_ONLY",
+      code_status: "RUNNER_ONLY",
       progress,
       evidence: {},
     });
 
     const code = printBlocked(report, progress);
-    const out = await writeEvidence(
-      report,
-      mode === "live" ? "live" : mode === "default" ? "runner-only" : mode,
-      null,
-    );
+    const out = await writeEvidence(report, mode, null);
     console.log(`evidence_file: ${path.relative(ROOT, out)}`);
     process.exit(code);
+  }
+
+  if (mode === "live") {
+    const scope = through ?? CAPACITOR_CERTIFIED_THROUGH;
+
+    if (scope < 1) {
+      const pipeline = [];
+      const progress = evaluateCapacitorProgress(pipeline, { through: null });
+      const report = buildCapacitorEvidenceReport({
+        status: progress.status,
+        reason: progress.reason,
+        pipeline,
+        validation: {
+          duplicates: progress.duplicates,
+          missing: progress.missing,
+          out_of_order: progress.out_of_order,
+          firstFailure: progress.firstFailure,
+        },
+        code_status: "CERTIFIED_THROUGH_0",
+        progress,
+        evidence: {},
+      });
+      const code = printBlocked(report, progress);
+      const out = await writeEvidence(report, "live", null);
+      console.log(`evidence_file: ${path.relative(ROOT, out)}`);
+      process.exit(code);
+    }
+
+    console.log(`Driving CAPACITOR blocks (through=C${scope})…`);
+    const driver = runCapacitorCapabilityDriver({
+      root: ROOT,
+      through: scope,
+    });
+    if (!driver.ok) {
+      console.error("Capability driver failed:");
+      console.error(driver.reason ?? "unknown");
+      const report = buildCapacitorEvidenceReport({
+        status: "FAIL",
+        reason: driver.reason ?? "CAPACITOR capability driver failed",
+        pipeline: driver.steps,
+        code_status: "CAPABILITY_DRIVER_FAIL",
+        evidence: driver.evidence ?? {},
+      });
+      await writeEvidence(report, "live", through);
+      process.exit(CAPACITOR_EXIT.FAIL);
+    }
+
+    const observed = driver.steps;
+    const progress = evaluateCapacitorProgress(observed, { through: scope });
+    const report = buildCapacitorEvidenceReport({
+      status: progress.status,
+      reason: progress.reason,
+      pipeline: observed,
+      validation: progress,
+      code_status: `CAPABILITY_DRIVER_C${progress.certified_through || 0}`,
+      progress,
+      evidence: driver.evidence ?? {},
+      meta: {
+        terminal: {
+          segment: CAPACITOR_SEGMENTS[progress.certified_through] ?? null,
+        },
+      },
+    });
+
+    console.log(formatCapacitorComparisonTable(progress));
+    console.log("");
+    console.log(progress.reason);
+    console.log(
+      `certified_through=C${progress.certified_through || 0} · blocked_at=${progress.blocked_at ?? "—"}`,
+    );
+    const out = await writeEvidence(report, "live", through ?? scope);
+    console.log(`evidence_file: ${path.relative(ROOT, out)}`);
+    process.exit(exitFor(progress));
   }
 
   if (mode === "self-test") {

@@ -2,7 +2,7 @@
 
 **Documento:** `CAPACITOR_SPEC.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **FROZEN** (on merge to `main` · #250+) · DoR ✅ · Runner ✅ · Gate ✅ READY · CERTIFIED_THROUGH=0 · BLOCKED at C1  
+**Estado:** ✅ **FROZEN** (#250) · DoR ✅ · Runner ✅ · Gate ✅ READY · CAPACITOR-001 ▶ C1 · CERTIFIED_THROUGH=1 · BLOCKED at C2  
 **Dominio:** **Distribution**  
 **Nivel:** Infraestructura de distribución · YourMeal OS (tenant-agnostic)  
 **Pregunta (única):** ¿YourMeal OS puede distribuirse como shell nativo (Android + iOS) sin modificar el Core SaaS certificado?  

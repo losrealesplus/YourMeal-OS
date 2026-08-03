@@ -10,7 +10,7 @@
   "principle": "Evidence before Implementation",
   "architecture": "Core SaaS → Capacitor → Android / iOS",
   "code_status": "RUNNER_ONLY",
-  "at": "2026-08-03T17:46:00.042Z",
+  "at": "2026-08-03T17:51:42.526Z",
   "pipeline": [],
   "expected": [
     "CAPACITOR_C1_STARTED",
