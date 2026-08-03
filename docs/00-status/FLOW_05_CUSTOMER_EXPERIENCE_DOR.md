@@ -287,8 +287,9 @@ Hasta entonces: **prohibido** repositories · services · OperationsService · R
 | 4 | Gate FLOW05-001 | ✅ READY #239 · `eb07a1a` |
 | 5 | FLOW05-001 · B1 Registration | ✅ #240 · `07a19b4` |
 | 5b | FLOW05-002 · B2 Authentication | ✅ #241 · `5933f96` |
-| 5c | FLOW05-003 · B3 Order Creation | ✅ este PR |
-| 5d | FLOW05-004…008 (un bloque / PR) | ⏳ next · 004 |
+| 5c | FLOW05-003 · B3 Order Creation | ✅ #242 · `ae8764d` |
+| 5d | FLOW05-004 · B4 Production | ✅ este PR |
+| 5e | FLOW05-005…008 (un bloque / PR) | ⏳ next · 005 |
 | 6 | FULL PASS · tag `flow05-pass` | ⏳ |
 | 7 | Capacitor / build móvil EatClean | ⏳ **solo tras** `flow05-pass` |
 
