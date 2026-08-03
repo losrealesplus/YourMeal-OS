@@ -15,11 +15,11 @@
  *
  * Spec: docs/00-status/FLOW_05_SPEC.md
  *
- * NO B7–B8 drivers · NO Capacitor · NO EatClean-only coupling.
+ * NO B8 driver · NO Capacitor · NO EatClean-only coupling.
  */
 
 /** Highest block with a capability driver implemented. */
-const FLOW05_CERTIFIED_THROUGH = 6;
+const FLOW05_CERTIFIED_THROUGH = 7;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";

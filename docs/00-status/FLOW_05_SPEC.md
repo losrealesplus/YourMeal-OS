@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW_05_SPEC.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **FROZEN** (merge #237 · `deba9f6`) · Runner ✅ · Gate ✅ · 001…005 ✅ · FLOW05-006 ▶ B6 CERTIFIED · CERTIFIED_THROUGH=6  
+**Estado:** ✅ **FROZEN** (merge #237 · `deba9f6`) · Runner ✅ · Gate ✅ · 001…006 ✅ · FLOW05-007 ▶ B7 CERTIFIED · CERTIFIED_THROUGH=7  
 **DoR:** [FLOW_05_CUSTOMER_EXPERIENCE_DOR](./FLOW_05_CUSTOMER_EXPERIENCE_DOR.md)  
 **Runner:** [FLOW_05_RUNNER](../10-validation/flow-05/FLOW_05_RUNNER.md)  
 **Gate:** [FLOW_05_GATE](../10-validation/flow-05/FLOW_05_GATE.md)  
@@ -280,7 +280,7 @@ Exit code canónico: **2** (BLOCKED).
 | DoR | `docs/00-status/FLOW_05_CUSTOMER_EXPERIENCE_DOR.md` |
 | Spec (este) | `docs/00-status/FLOW_05_SPEC.md` |
 | Runner docs | `docs/10-validation/flow-05/FLOW_05_RUNNER.md` |
-| Actas Bₙ | `docs/10-validation/flow-05/FLOW05_00N_B*_ACTA.md` · [001](../10-validation/flow-05/FLOW05_001_B1_ACTA.md) · [002](../10-validation/flow-05/FLOW05_002_B2_ACTA.md) · [003](../10-validation/flow-05/FLOW05_003_B3_ACTA.md) · [004](../10-validation/flow-05/FLOW05_004_B4_ACTA.md) · [005](../10-validation/flow-05/FLOW05_005_B5_ACTA.md) · [006](../10-validation/flow-05/FLOW05_006_B6_ACTA.md) |
+| Actas Bₙ | `docs/10-validation/flow-05/FLOW05_00N_B*_ACTA.md` · [001](../10-validation/flow-05/FLOW05_001_B1_ACTA.md) · [002](../10-validation/flow-05/FLOW05_002_B2_ACTA.md) · [003](../10-validation/flow-05/FLOW05_003_B3_ACTA.md) · [004](../10-validation/flow-05/FLOW05_004_B4_ACTA.md) · [005](../10-validation/flow-05/FLOW05_005_B5_ACTA.md) · [006](../10-validation/flow-05/FLOW05_006_B6_ACTA.md) · [007](../10-validation/flow-05/FLOW05_007_B7_ACTA.md) |
 | PASS acta | `docs/10-validation/flow-05/FLOW05_PASS_ACTA.md` |
 | Evidence JSON | `docs/10-validation/flow-05/evidence/` |
 
@@ -315,8 +315,9 @@ Hasta entonces: **prohibido** implementación de dominio · Capacitor · Gate de
 | 5c | FLOW05-003 · B3 Order Creation | ✅ #242 · `ae8764d` |
 | 5d | FLOW05-004 · B4 Production | ✅ #243 · `1181c21` |
 | 5e | FLOW05-005 · B5 Route Planning | ✅ #244 · `f0e1ebc` |
-| 5f | FLOW05-006 · B6 Delivery | ✅ este PR · CERTIFIED_THROUGH=6 |
-| 5g | FLOW05-007…008 (un bloque / PR) | ⏳ next · 007 |
+| 5f | FLOW05-006 · B6 Delivery | ✅ #245 · `7c17569` |
+| 5g | FLOW05-007 · B7 Delivery Confirmation | ✅ este PR · CERTIFIED_THROUGH=7 |
+| 5h | FLOW05-008 · B8 History | ⏳ next · 008 |
 | 6 | FULL PASS · tag `flow05-pass` | ⏳ |
 | 7 | Capacitor / build móvil EatClean | ⏳ **solo tras** `flow05-pass` |
 
