@@ -2,10 +2,12 @@
 
 **Documento:** `RELEASE_01_005_P5_ACTA.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ▶ este PR · FULL PASS · `certified_through=P5` · `blocked_at=—`  
+**Estado:** ✅ **CERTIFIED desde `main`** · FULL PASS · `certified_through=P5` · `blocked_at=—`  
+**Tip:** `8e91a49` (Merge #234) · tag `release-01-pass`  
 **Precondición:** P4 CERTIFIED (#233 · `f1c83cd`)  
 **Gate:** [RELEASE_01_GATE](./RELEASE_01_GATE.md)  
 **Spec:** [RELEASE_01_SPEC](../../00-status/RELEASE_01_SPEC.md)  
+**Pass acta:** [RELEASE_01_PASS_ACTA](./RELEASE_01_PASS_ACTA.md)  
 **Comando:** `npm run test:release-01-005`  
 **Principio:** [FOPEBA_LAND_CHECK](../../00-status/FOPEBA_LAND_CHECK.md)
 
@@ -86,12 +88,12 @@ Fuente: `P1–P4 CERTIFIED · product acceptance (no FLOW-05 · no Capacitor · 
 ## Next
 
 ```text
-READY TO OPEN (después de Land Check desde main)
-tag release-01-pass
-RELEASE_01_PASS_ACTA
-Gate CLOSED
+CERTIFIED desde main
     ↓
-FLOW-05 DoR (no en este PR)
+tag release-01-pass → 8e91a49
+RELEASE_01_PASS_ACTA · Gate CLOSED
+    ↓
+READY TO OPEN FLOW-05 DoR
 ```
 
 ---

@@ -32,8 +32,8 @@ Mobile Foundation (MF-001)  ✅ Cimientos CLOSED
 Fase proyecto
   0 · Plataforma              ✅ COMPLETE
   1 · Domain / Flow           ✅ FLOW-01…04 CERTIFIED (metodología probada)
-  2 · Product as system       ▶ ACTIVA · DoRl / RELEASE-01
-  Pregunta dominante          ¿YourMeal OS opera como plataforma SaaS?
+  2 · Product as system       ✅ RELEASE-01 CERTIFIED · tag release-01-pass
+  Pregunta dominante          ¿La experiencia completa de negocio es certificable? (FLOW-05)
   Pregunta Flow (sigue)       ¿Este flujo cumple el contrato?
   Principio                   Evidence before Implementation
   Estándar Flow               Definition of Ready (FLOW-XX)
@@ -48,13 +48,12 @@ Sprint activo
   Live: npm run test:flow04-canonical -- --live → FULL PASS
   Acta: ../10-validation/flow-04/FLOW04_PASS_ACTA.md
   FLOW Governance              ✅ COMPLETE (#147)
-  Tags: ps002c-pass · flow01…04-pass
+  Tags: ps002c-pass · flow01…04-pass · release-01-beta · release-01-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    RELEASE-01-005 (P5 · este PR)
-                               P1–P4 ✅ · P4 CERTIFIED #233 · f1c83cd · framework release-01-beta ✅
-                               npm run test:release-01 → FULL PASS · certified_through=P5 · blocked_at=—
-                               → ../10-validation/release-01/RELEASE_01_005_P5_ACTA.md
-                               No FLOW-05 · Capacitor · Deploy · tag release-01-pass en este PR
+  Prioridad                    FLOW-05 DoR (Customer Experience Lifecycle)
+                               RELEASE-01 ✅ CERTIFIED · tag release-01-pass → 8e91a49
+                               → ../10-validation/release-01/RELEASE_01_PASS_ACTA.md
+                               No Spec · Runner · Capacitor · App Store en DoR
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)
   Land Check                   ./FOPEBA_LAND_CHECK.md (antes de cualquier 001)
@@ -96,13 +95,13 @@ NEXT PHASE
   ↓
   RELEASE-01-BETA ✅ · tag release-01-beta
   ↓
-  RELEASE-01 DoR ✅ · Spec FROZEN · Runner · Gate READY
+  RELEASE-01 ✅ CERTIFIED · tag release-01-pass → 8e91a49
   ↓
-  P1 ✅ · P2 ✅ · P3 ✅ · P4 ✅ · ▶ RELEASE-01-005 · P5 Product Acceptance (este PR)
+  ▶ FLOW-05 DoR (Customer Experience Lifecycle)
   ↓
-  Land Check → tag release-01-pass · PASS acta · Gate CLOSED
+  FLOW-05 Spec → Freeze → Runner → 001…
   ↓
-  FLOW-05 / Capacitor solo cuando el plan lo abra (no por inercia)
+  Capacitor solo cuando flow05-pass exista (no por inercia)
 
 En paralelo (beta móvil EatClean):
   Lema: cada PR acerca la jornada completa del piloto.
