@@ -50,9 +50,10 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass · release-01-beta · release-01-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    FLOW-05 DoR (Customer Experience Lifecycle)
-                               RELEASE-01 ✅ CERTIFIED · tag release-01-pass → 8e91a49
-                               → ../10-validation/release-01/RELEASE_01_PASS_ACTA.md
+  Prioridad                    FLOW-05 DoR ▶ este PR
+                               Customer Experience Lifecycle
+                               → ./FLOW_05_CUSTOMER_EXPERIENCE_DOR.md
+                               RELEASE-01 ✅ · tag release-01-pass → 8e91a49
                                No Spec · Runner · Capacitor · App Store en DoR
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)
@@ -97,7 +98,7 @@ NEXT PHASE
   ↓
   RELEASE-01 ✅ CERTIFIED · tag release-01-pass → 8e91a49
   ↓
-  ▶ FLOW-05 DoR (Customer Experience Lifecycle)
+  ▶ FLOW-05 DoR (este PR) · Customer Experience Lifecycle
   ↓
   FLOW-05 Spec → Freeze → Runner → 001…
   ↓

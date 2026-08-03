@@ -2,11 +2,12 @@
 
 **Documento:** `FLOW_CATALOG.md`  
 **Fecha:** 2026-08-02  
-**Estado:** FLOW-01…04 ✅ CERTIFIED · DoR estándar ✅ (#147)  
+**Estado:** FLOW-01…04 ✅ CERTIFIED · FLOW-05 ▶ DoR · DoR estándar ✅ (#147)  
 **Piloto:** EatClean  
-**Fase:** 1 · Domain / Flow (Fase 0 · Plataforma COMPLETE)  
+**Fase:** 1 · Domain / Flow (Fase 0 · Plataforma COMPLETE · Fase 2 · RELEASE-01 CERTIFIED)  
 **Plataforma:** PS-002-C ✅ · FCR-008 FROZEN · tag `ps002c-pass`  
 **Dominio:** `flow01-pass` · `flow02-pass` · `flow03-pass` · `flow04-pass`  
+**Producto:** `release-01-pass` → `8e91a49`  
 **Plan:** [NEXT_EXECUTION_PLAN](./NEXT_EXECUTION_PLAN.md) · [FOPEBA_METRICS](./FOPEBA_METRICS.md)  
 **Estándar:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) · [Evidence before Implementation](./EVIDENCE_BEFORE_IMPLEMENTATION.md)
 
@@ -41,11 +42,12 @@ Sí: `FLOW-01 Kitchen → Delivery`.
 
 | ID | Handoff / alcance | Prioridad | Motivo | Estado |
 |----|-------------------|-----------|--------|--------|
-| **FLOW-05** | Customer Order Lifecycle | Media | Creación del pedido → `confirmed` | ⏳ DoR NOT STARTED · no abrir por inercia post–`flow04-pass` (Track B DoRl primero salvo bloqueador beta) |
+| **FLOW-05** | Customer Experience Lifecycle | Alta | Registro → Login → Pedido → Producción → Ruta → Entrega → Confirmación → Historial | ▶ **DoR** · [FLOW_05_CUSTOMER_EXPERIENCE_DOR](./FLOW_05_CUSTOMER_EXPERIENCE_DOR.md) · post `release-01-pass` |
 | **FLOW-06** | Kitchen Planning | Media | Planificación previa a T1 | ⏳ DoR NOT STARTED |
 
 > Orden recomendado: cada Flow aprovecha el anterior sin mezclar responsabilidades.  
-> Antes de Spec/código: completar [Definition of Ready](./FLOW_DEFINITION_OF_READY.md).
+> Antes de Spec/código: completar [Definition of Ready](./FLOW_DEFINITION_OF_READY.md).  
+> Capacitor / build móvil EatClean solo tras `flow05-pass`.
 
 **Nota:** El catálogo inicial nombraba FLOW-02 Delivery→Support y FLOW-03 Support→Accounting.  
 Los candidatos de la tabla superior son la **prioridad operativa EatClean** post–FLOW-01; Support/Accounting siguen elegibles vía Flow First cuando el piloto lo exija.

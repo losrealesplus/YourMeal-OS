@@ -91,9 +91,10 @@ no a reabrir RELEASE-01 ni a adelantar Capacitor.
 
 ```text
 OPEN
-FLOW-05 DoR (Customer Experience Lifecycle)
-Documentation only.
-No Spec · No Runner · No Capacitor.
+FLOW-05 DoR ✅ · [FLOW_05_CUSTOMER_EXPERIENCE_DOR](../../00-status/FLOW_05_CUSTOMER_EXPERIENCE_DOR.md)
+    ↓
+READY TO OPEN FLOW-05 Spec (READY FOR FREEZE)
+No Runner · No Capacitor.
 ```
 
 ---
