@@ -50,10 +50,10 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    RELEASE-01 DoR ▶ (producto SaaS · este PR)
-                               tag release-01-beta → facb917 · Gate Beta CLOSED
-                               → ./RELEASE_01_DOR.md · ./RELEASE_01_STRATEGY.md
-                               Docs only · No Spec · No Runner · No Gate · No FLOW-05
+  Prioridad                    RELEASE-01 › Spec FROZEN · Runner · Gate READY
+                               tag release-01-beta → facb917 (framework cerrado)
+                               → ./RELEASE_01_SPEC.md · ../10-validation/release-01/
+                               Next: RELEASE-01-001 · P1 only · No FLOW-05 · No Capacitor
                                Pipeline Track B reutilizable · no re-certificar
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)
@@ -96,11 +96,13 @@ NEXT PHASE
   ↓
   RELEASE-01-BETA ✅ · tag release-01-beta
   ↓
-  ▶ RELEASE-01 DoR (producto SaaS · docs only)
+  RELEASE-01 DoR ✅ · Spec FROZEN · Runner · Gate READY
   ↓
-  RELEASE-01 Spec (siguiente · contract only)
+  ▶ RELEASE-01-001 · P1 Platform Foundation
   ↓
-  FLOW-05 solo como criterio de RELEASE-01 (no por inercia)
+  P2…P5 · PASS
+  ↓
+  FLOW-05 / Capacitor solo cuando el plan lo abra (no por inercia)
 
 En paralelo (beta móvil EatClean):
   Lema: cada PR acerca la jornada completa del piloto.
