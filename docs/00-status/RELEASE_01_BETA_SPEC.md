@@ -2,14 +2,15 @@
 
 **Documento:** `RELEASE_01_BETA_SPEC.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **FROZEN** (Spec · #218 · `ed98b3b`) · DoR ✅ (#217) · Runner ✅ #219 · Gate ✅ #220 · B1 ✅ #222 · B2 ✅ #223 · 003 ▶ B3  
+**Estado:** ✅ **FROZEN** (Spec · #218 · `ed98b3b`) · DoR ✅ (#217) · Runner ✅ #219 · Gate ✅ #220 · B1–B3 ✅ · 004 ▶ B4  
 **Gate DoRl:** Beta Acceptance · Track B · RELEASE-01  
 **Nivel:** Release Contract — **no** es un Flow nuevo · **no** inventa capacidades  
 **DoR:** [RELEASE_01_BETA_DOR](./RELEASE_01_BETA_DOR.md) ✅ en `main` (#217 · `740b843`)  
 **Runner:** [RELEASE_01_BETA_RUNNER](../10-validation/release-01-beta/RELEASE_01_BETA_RUNNER.md) ✅ #219 · `3994833`  
 **001:** [RELEASE_01_BETA_001_B1_ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_001_B1_ACTA.md) ✅ CERTIFIED #222  
 **002:** [RELEASE_01_BETA_002_B2_ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_002_B2_ACTA.md) ✅ CERTIFIED #223  
-**003:** [RELEASE_01_BETA_003_B3_ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_003_B3_ACTA.md)  
+**003:** [RELEASE_01_BETA_003_B3_ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_003_B3_ACTA.md) ✅ CERTIFIED #224  
+**004:** [RELEASE_01_BETA_004_B4_ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_004_B4_ACTA.md)  
 **Precondiciones:** FOUNDATION ✅ · `ps002c-pass` · `flow01-pass`…`flow04-pass` · `release-smoke-pass` · `release-crossflow-pass` · `release-e2e-pass` · `release-deploy-pass` · `release-rollback-pass` → `0ba856e`  
 **DoRl:** [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md)  
 **Estrategia:** [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md)  
@@ -17,9 +18,9 @@
 **Tags:** `release-01-beta` · [GIT_MILESTONE_TAGS](./GIT_MILESTONE_TAGS.md)  
 **Principio:** [Evidence before Implementation](./EVIDENCE_BEFORE_IMPLEMENTATION.md) · [FOPEBA_LAND_CHECK](./FOPEBA_LAND_CHECK.md)
 
-> Contrato FROZEN. 003 ▶ B3 Platform Capabilities (este PR).  
-> **No** B4–B5 · Deploy/Rollback · FLOW-05 · tag.  
-> Spec B3 anclas = Smoke · Cross-flow · E2E (Deploy/Rollback = B4).
+> Contrato FROZEN. 004 ▶ B4 Release Stack (este PR).  
+> **No** B5 · Acceptance · FLOW-05 · tag.  
+> Spec B4 anclas = Deploy · Rollback.
 
 ---
 
@@ -365,7 +366,8 @@ tag (futuro): release-01-beta
 | Gate READY | ✅ #220 |
 | RELEASE-01-BETA-001 | ✅ CERTIFIED #222 |
 | RELEASE-01-BETA-002 | ✅ CERTIFIED #223 |
-| RELEASE-01-BETA-003 | ▶ este PR (B3 only) |
+| RELEASE-01-BETA-003 | ✅ CERTIFIED #224 |
+| RELEASE-01-BETA-004 | ▶ este PR (B4 only) |
 
 **Estado del documento:** ✅ **FROZEN**
 
@@ -374,12 +376,12 @@ tag (futuro): release-01-beta
 ## 14. Next
 
 ```text
-Land Check 003 from main
+Land Check 004 from main
     ↓
-READY TO OPEN RELEASE-01-BETA-004 (B4 only)
+READY TO OPEN RELEASE-01-BETA-005 (B5 only)
 ```
 
-**No** B4–B5 in 003 · FLOW-05 · tag hasta FULL PASS.
+**No** B5 in 004 · FLOW-05 · tag hasta FULL PASS.
 
 ---
 

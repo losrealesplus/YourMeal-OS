@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_01_BETA_STRATEGY.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ▶ **DRAFT · Gate concept** · Track B operativo ✅ · DoR Beta ✅ · Spec ✅ · Runner ✅ · Gate ✅ · B1–B2 ✅ · 003 ▶ B3  
+**Estado:** ▶ **DRAFT · Gate concept** · Track B operativo ✅ · DoR Beta ✅ · Spec ✅ · Runner ✅ · Gate ✅ · B1–B3 ✅ · 004 ▶ B4  
 **Precondición:** FLOW-01…FLOW-04 ✅ · Track B Smoke…Rollback ✅ · `release-rollback-pass`  
 **DoRl:** [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md)  
 **DoR Beta:** [RELEASE_01_BETA_DOR](./RELEASE_01_BETA_DOR.md)  
@@ -80,7 +80,7 @@ Luego FLOW-06… según catálogo. Sin saltos. Sin features futuras en el PR del
 | E2E | ✅ | Tag `release-e2e-pass` → `73623ae` · [PASS](../10-validation/release-e2e/RELEASE_E2E_PASS_ACTA.md) |
 | Deployment | ✅ | Tag `release-deploy-pass` → `7896a2a` · [PASS](../10-validation/release-deploy/RELEASE_DEPLOY_PASS_ACTA.md) |
 | Rollback | ✅ | Tag `release-rollback-pass` → `0ba856e` · [PASS](../10-validation/release-rollback/RELEASE_ROLLBACK_PASS_ACTA.md) |
-| Beta Acceptance | ▶ | Spec ✅ · Runner ✅ · Gate ✅ · B1–B2 ✅ · 003 ▶ B3 · [ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_003_B3_ACTA.md) → tag `release-01-beta` |
+| Beta Acceptance | ▶ | Spec ✅ · Runner ✅ · Gate ✅ · B1–B3 ✅ · 004 ▶ B4 · [ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_004_B4_ACTA.md) → tag `release-01-beta` |
 
 #### Roadmap Track B (mismo patrón FOPEBA · sin mezclar)
 
@@ -90,7 +90,7 @@ B-02 Cross-flow   ✅ release-crossflow-pass → 0a0c51b
 B-03 E2E          ✅ release-e2e-pass → 73623ae
 B-04 Deployment   ✅ release-deploy-pass → 7896a2a
 B-05 Rollback     ✅ release-rollback-pass → 0ba856e
-B-06 Beta Accept. DoR ✅ · Spec ✅ · Runner ✅ · Gate ✅ · B1–B2 ✅ · 003 ▶ B3 → release-01-beta
+B-06 Beta Accept. DoR ✅ · Spec ✅ · Runner ✅ · Gate ✅ · B1–B3 ✅ · 004 ▶ B4 → release-01-beta
 ```
 
 Orden fijo. **No** abrir FLOW-05 hasta existir `release-01-beta`.  

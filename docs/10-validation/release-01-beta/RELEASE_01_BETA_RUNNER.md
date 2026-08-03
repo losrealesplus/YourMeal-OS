@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_01_BETA_RUNNER.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ Runner **CERTIFIED** (#219) · live through B3 · runner-only **BLOCKED** at B1 · Gate ✅ READY  
+**Estado:** ✅ Runner **CERTIFIED** (#219) · live through B4 · runner-only **BLOCKED** at B1 · Gate ✅ READY  
 **Spec:** [RELEASE_01_BETA_SPEC](../../00-status/RELEASE_01_BETA_SPEC.md) (FROZEN · #218 · `ed98b3b`)  
 **DoR:** [RELEASE_01_BETA_DOR](../../00-status/RELEASE_01_BETA_DOR.md)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
@@ -58,23 +58,23 @@ PASS → tag release-01-beta
 ## Comandos
 
 ```bash
-# Default live through max certified (B3)
+# Default live through max certified (B4)
 npm run test:release-01-beta
-# → PASS through B3 · blocked_at=RELEASE_01_BETA_B4_STARTED · exit 0
+# → PASS through B4 · blocked_at=RELEASE_01_BETA_B5_STARTED · exit 0
 
-# RELEASE-01-BETA-003
+# RELEASE-01-BETA-004
+npm run test:release-01-beta-004
+# → PASS through B4 · BLOCKED at B5 · exit 0
+
+# RELEASE-01-BETA-003 (scoped)
 npm run test:release-01-beta-003
 # → PASS through B3 · BLOCKED at B4 · exit 0
-
-# RELEASE-01-BETA-002 (scoped)
-npm run test:release-01-beta-002
-# → PASS through B2 · BLOCKED at B3 · exit 0
 
 # Historic Gate / Land Check vacío
 npm run test:release-01-beta:runner-only
 # → BLOCKED at RELEASE_01_BETA_B1_STARTED · exit 2 · evidence={}
 
-# Unit tests (pipeline + B1–B3 · no B4 driver)
+# Unit tests (pipeline + B1–B4 · no B5 driver)
 npm run test:release-01-beta:unit
 ```
 
@@ -82,19 +82,17 @@ npm run test:release-01-beta:unit
 
 ---
 
-## Fuera de alcance (003)
+## Fuera de alcance (004)
 
-- Drivers B4 / B5  
-- Deploy · Rollback (B4) · FLOW-05  
-- Re-ejecución Smoke/Cross-flow/E2E  
+- Driver B5 · Acceptance · tag `release-01-beta`  
+- FLOW-05 · re-ejecución Deploy/Rollback  
 - Infra · CI · GitHub Actions · secretos · business logic  
-- Tag `release-01-beta`
 
 ---
 
 ## Gate
 
-Ver: [RELEASE_01_BETA_GATE](./RELEASE_01_BETA_GATE.md) · Decision: ✅ READY · 003 ▶ [ACTA](./RELEASE_01_BETA_003_B3_ACTA.md).
+Ver: [RELEASE_01_BETA_GATE](./RELEASE_01_BETA_GATE.md) · Decision: ✅ READY · 004 ▶ [ACTA](./RELEASE_01_BETA_004_B4_ACTA.md).
 
 ---
 
@@ -105,29 +103,29 @@ Ver: [RELEASE_01_BETA_GATE](./RELEASE_01_BETA_GATE.md) · Decision: ✅ READY ·
 | CLI | `scripts/release-01-beta-canonical.mjs` |
 | Pipeline | `scripts/lib/release-01-beta-canonical-pipeline.mjs` |
 | Capability driver | `scripts/lib/release-01-beta-capability-driver.mjs` |
-| B1 Foundation | `scripts/lib/release-01-beta-b1-foundation.mjs` |
-| B2 Canonical Flows | `scripts/lib/release-01-beta-b2-canonical-flows.mjs` |
-| B3 Platform Capabilities | `scripts/lib/release-01-beta-b3-platform-capabilities.mjs` |
-| Unit | `scripts/lib/release-01-beta-*-pipeline.spec.mjs` · `*-b1-*.spec.mjs` · `*-b2-*.spec.mjs` · `*-b3-*.spec.mjs` |
-| 003 live evidence | `docs/10-validation/release-01-beta/evidence/release-01-beta-003-canonical-live.json` |
+| B1–B3 | `scripts/lib/release-01-beta-b{1,2,3}-*.mjs` |
+| B4 Release Stack | `scripts/lib/release-01-beta-b4-release-stack.mjs` |
+| Unit | `scripts/lib/release-01-beta-*-pipeline.spec.mjs` · `*-b1-*.spec.mjs` … `*-b4-*.spec.mjs` |
+| 004 live evidence | `docs/10-validation/release-01-beta/evidence/release-01-beta-004-canonical-live.json` |
 | Runner-only evidence | `docs/10-validation/release-01-beta/evidence/release-01-beta-canonical.json` |
 
 ---
 
-## Land Check (003 · from this PR)
+## Land Check (004 · from this PR)
 
 ```bash
+git restore docs/10-validation/release-01-beta/evidence/ 2>/dev/null || true
 git pull origin main
 git fetch --tags --prune
-npm run test:release-01-beta-003
-# → PASS through B3 · BLOCKED at RELEASE_01_BETA_B4_STARTED · exit 0
+npm run test:release-01-beta-004
+# → PASS through B4 · BLOCKED at RELEASE_01_BETA_B5_STARTED · exit 0
 npm run test:release-01-beta
 # → same
 npm run test:release-01-beta:runner-only
 # → BLOCKED at RELEASE_01_BETA_B1_STARTED · exit 2
 ```
 
-Next after 003 Land Check: **RELEASE-01-BETA-004** (solo B4).
+Next after 004 Land Check: **RELEASE-01-BETA-005** (solo B5).
 
 ---
 
