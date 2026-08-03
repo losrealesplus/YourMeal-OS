@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_01_RUNNER.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ Runner **CERTIFIED** (#229) · live through P3 · runner-only **BLOCKED** at P1 · Gate ✅ READY  
+**Estado:** ✅ Runner **CERTIFIED** (#229) · live through P4 · runner-only **BLOCKED** at P1 · Gate ✅ READY  
 **Spec:** [RELEASE_01_SPEC](../../00-status/RELEASE_01_SPEC.md) ✅ FROZEN  
 **DoR:** [RELEASE_01_DOR](../../00-status/RELEASE_01_DOR.md)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
@@ -58,11 +58,15 @@ PASS → RELEASE-01 PASS acta / tag de producto
 ## Comandos
 
 ```bash
-# Default live through max certified (P3)
+# Default live through max certified (P4)
 npm run test:release-01
-# → PASS through P3 · blocked_at=RELEASE_01_P4_STARTED · exit 0
+# → PASS through P4 · blocked_at=RELEASE_01_P5_STARTED · exit 0
 
-# RELEASE-01-003
+# RELEASE-01-004
+npm run test:release-01-004
+# → PASS through P4 · BLOCKED at P5 · exit 0
+
+# RELEASE-01-003 (scoped)
 npm run test:release-01-003
 # → PASS through P3 · BLOCKED at P4 · exit 0
 
@@ -77,28 +81,28 @@ npm run test:release-01-001
 npm run test:release-01:runner-only
 # → BLOCKED at RELEASE_01_P1_STARTED · exit 2 · evidence={}
 
-# Unit tests (pipeline + P1–P3)
+# Unit tests (pipeline + P1–P4)
 npm run test:release-01:unit
 ```
 
 **BLOCKED (runner-only) no es defecto** — baseline Gate / Evidence before Implementation.
 
-`CERTIFIED_THROUGH = 3` · drivers P1–P3. No P4–P5.
+`CERTIFIED_THROUGH = 4` · drivers P1–P4. No P5.
 
 ---
 
-## Fuera de alcance (003)
+## Fuera de alcance (004)
 
-- Drivers P4–P5 · actas 004…005  
-- FLOW-05 · Capacitor · Stores · producción real  
+- Driver P5 · acta 005  
+- FLOW-05 · Capacitor · Stores · facturación/reportes/emails reales  
 - Re-certificar Track B  
-- Nueva lógica de negocio / ejecución operativa  
+- Nueva lógica de negocio / ejecución administrativa  
 
 ---
 
 ## Gate
 
-Ver: [RELEASE_01_GATE](./RELEASE_01_GATE.md) · Decision: ✅ READY · 003 ▶ [ACTA](./RELEASE_01_003_P3_ACTA.md).
+Ver: [RELEASE_01_GATE](./RELEASE_01_GATE.md) · Decision: ✅ READY · 004 ▶ [ACTA](./RELEASE_01_004_P4_ACTA.md).
 
 ---
 
@@ -112,8 +116,9 @@ Ver: [RELEASE_01_GATE](./RELEASE_01_GATE.md) · Decision: ✅ READY · 003 ▶ [
 | P1 Platform Foundation | `scripts/lib/release-01-p1-platform-foundation.mjs` |
 | P2 Core Business | `scripts/lib/release-01-p2-core-business.mjs` |
 | P3 Operations | `scripts/lib/release-01-p3-operations.mjs` |
-| Unit | `scripts/lib/release-01-*-pipeline.spec.mjs` · `*-p1-*.spec.mjs` · `*-p2-*.spec.mjs` · `*-p3-*.spec.mjs` |
-| 003 live evidence | `docs/10-validation/release-01/evidence/release-01-003-canonical-live.json` |
+| P4 Administration | `scripts/lib/release-01-p4-administration.mjs` |
+| Unit | `scripts/lib/release-01-*-pipeline.spec.mjs` · `*-p1-*.spec.mjs` · `*-p2-*.spec.mjs` · `*-p3-*.spec.mjs` · `*-p4-*.spec.mjs` |
+| 004 live evidence | `docs/10-validation/release-01/evidence/release-01-004-canonical-live.json` |
 | Runner-only evidence | `docs/10-validation/release-01/evidence/release-01-canonical.json` |
 
 ---
@@ -124,15 +129,15 @@ Ver: [RELEASE_01_GATE](./RELEASE_01_GATE.md) · Decision: ✅ READY · 003 ▶ [
 git restore docs/10-validation/release-01/evidence/ 2>/dev/null || true
 git pull origin main
 git fetch --tags --prune
-npm run test:release-01-003
-# → PASS through P3 · BLOCKED at RELEASE_01_P4_STARTED · exit 0
+npm run test:release-01-004
+# → PASS through P4 · BLOCKED at RELEASE_01_P5_STARTED · exit 0
 npm run test:release-01
 # → same
 npm run test:release-01:runner-only
 # → BLOCKED at RELEASE_01_P1_STARTED · exit 2
 ```
 
-Next after 003 Land Check: **RELEASE-01-004** (solo P4).
+Next after 004 Land Check: **RELEASE-01-005** (solo P5).
 
 ---
 
