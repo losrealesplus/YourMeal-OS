@@ -130,12 +130,14 @@ Pedido → Producción → Packaging → Entrega
 
 ## Parallel Track A — Business Certification
 
-**Current status:** FLOW-05 ✅ CERTIFIED · `flow05-pass` · Gate CLOSED → Capacitor DoR next
+**Current status:** CAPACITOR ✅ CERTIFIED · `capacitor-pass` → `400a010` · Gate CLOSED → capacidades de distribución reales next
 
 ```text
 FLOW-05 ✅ B1…B8 · FULL PASS · flow05-pass
         ↓
-Capacitor DoR → Spec → Runner → Gate → 001…
+CAPACITOR ✅ C1…C5 · FULL PASS · capacitor-pass
+        ↓
+Stores / firma / CI móvil (DoR por capacidad)
 ```
 
 Sin excepciones. Sin features futuras. Una transición / PR.
