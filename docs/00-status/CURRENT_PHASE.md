@@ -50,11 +50,11 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass · release-01-beta · release-01-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    FLOW-05 DoR ▶ este PR
-                               Customer Experience Lifecycle
-                               → ./FLOW_05_CUSTOMER_EXPERIENCE_DOR.md
-                               RELEASE-01 ✅ · tag release-01-pass → 8e91a49
-                               No Spec · Runner · Capacitor · App Store en DoR
+  Prioridad                    FLOW-05 Spec ▶ este PR · READY FOR FREEZE
+                               Customer Experience Lifecycle · B1–B8
+                               → ./FLOW_05_SPEC.md
+                               DoR ✅ #236 · release-01-pass → 8e91a49
+                               No Runner · Gate · Capacitor · código en Spec
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)
   Land Check                   ./FOPEBA_LAND_CHECK.md (antes de cualquier 001)
@@ -98,9 +98,11 @@ NEXT PHASE
   ↓
   RELEASE-01 ✅ CERTIFIED · tag release-01-pass → 8e91a49
   ↓
-  ▶ FLOW-05 DoR (este PR) · Customer Experience Lifecycle
+  FLOW-05 DoR ✅ (#236)
   ↓
-  FLOW-05 Spec → Freeze → Runner → 001…
+  ▶ FLOW-05 Spec (este PR) · READY FOR FREEZE · B1–B8 contract
+  ↓
+  Freeze → Runner → FLOW05-001…
   ↓
   Capacitor solo cuando flow05-pass exista (no por inercia)
 
@@ -138,7 +140,7 @@ Ver: ./NEXT_EXECUTION_PLAN.md
 **Gobernanza:** [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) — política permanente (6 reglas)  
 **Regla diaria:** [FLOW_FIRST](./FLOW_FIRST.md) — ¿A qué Flow pertenece?  
 **Done (fase):** [FLOW_DEFINITION_OF_DONE](./FLOW_DEFINITION_OF_DONE.md) — Handoff → Evidence → Certification → Merge  
-**Jerarquía:** [FLOW_WORK_HIERARCHY](./FLOW_WORK_HIERARCHY.md) · **Catálogo:** [FLOW_CATALOG](./FLOW_CATALOG.md) (FLOW-01…04 ✅ · FLOW-05 ⏳)
+**Jerarquía:** [FLOW_WORK_HIERARCHY](./FLOW_WORK_HIERARCHY.md) · **Catálogo:** [FLOW_CATALOG](./FLOW_CATALOG.md) (FLOW-01…04 ✅ · FLOW-05 Spec ▶)
 
 **Pregunta de fase (todo PR):**  
 ¿A qué Flow pertenece? → ¿Qué Outcome? → ¿Qué Handoff? → ¿Qué evidencia? → ¿Respeta Baseline/Core?  

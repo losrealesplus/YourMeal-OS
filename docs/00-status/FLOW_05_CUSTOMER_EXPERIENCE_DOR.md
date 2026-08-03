@@ -2,12 +2,12 @@
 
 **Documento:** `FLOW_05_CUSTOMER_EXPERIENCE_DOR.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **DoR DOCUMENT** · Spec ⏳ NOT STARTED · Runner ⏳  
+**Estado:** ✅ **DoR DOCUMENT** · Spec ▶ [READY FOR FREEZE](./FLOW_05_SPEC.md) · Runner ⏳  
 **Flow ID:** FLOW-05  
 **Handoff (catálogo):** Customer Experience Lifecycle  
 **Pregunta operacional (borrador):** ¿Un cliente completa el ciclo Registro → Pedido → Entrega → Historial con evidencia reproducible?  
 **Estándar:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) · [EVIDENCE_BEFORE_IMPLEMENTATION](./EVIDENCE_BEFORE_IMPLEMENTATION.md)  
-**Plan:** [NEXT_EXECUTION_PLAN](./NEXT_EXECUTION_PLAN.md) · [FLOW_CATALOG](./FLOW_CATALOG.md)  
+**Plan:** [NEXT_EXECUTION_PLAN](./NEXT_EXECUTION_PLAN.md) · [FLOW_CATALOG](./FLOW_CATALOG.md) · [Spec](./FLOW_05_SPEC.md)  
 **Precondiciones certificadas:** FLOW-01…04 ✅ · RELEASE-01 ✅ · tags `flow01-pass`…`flow04-pass` · `release-01-pass` → `8e91a49`
 
 > Este PR responde **solo**: ¿queda definido el marco Ready de FLOW-05?  
@@ -127,13 +127,13 @@ Plantilla institucional ([FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.m
 
 ```text
 FLOW-05
-□ SPEC congelada                          → siguiente PR (READY FOR FREEZE)
-☑ Contrato de evidencias definido         → este DoR (skeleton) · Spec fija Tn
+□ SPEC congelada                          ▶ READY FOR FREEZE · [FLOW_05_SPEC](./FLOW_05_SPEC.md)
+☑ Contrato de evidencias definido         → FLOW_05_SPEC.md · tokens FLOW05_B1…B8
 □ Runner creado (test:flow05-canonical)   → tras Spec Freeze
-☑ Estados permitidos / ciclo de vida      → borrador abajo · Spec congela
-☑ Invariantes                             → borrador abajo · Spec congela
-☑ PASS esperado                            → Spec § PASS
-☑ BLOCKED esperado                        → baseline runner (tras Spec + Runner)
+☑ Estados permitidos / ciclo de vida      → Spec §3 B1–B8 recibe/transforma/entrega
+☑ Invariantes                             → DoR · Spec boundary Freeze
+☑ PASS esperado                            → Spec §7
+☑ BLOCKED esperado                        → Spec §8 (baseline runner futuro)
 ☑ Acta de certificación (plantilla path)  → docs/10-validation/flow-05/
 ```
 
@@ -280,12 +280,12 @@ Hasta entonces: **prohibido** repositories · services · OperationsService · R
 
 | Fase | Trabajo | Estado |
 |------|---------|--------|
-| 0 | DoR document | ▶ este PR |
-| 1 | Spec | ⏳ READY FOR FREEZE (siguiente) |
+| 0 | DoR document | ✅ #236 |
+| 1 | Spec | ▶ READY FOR FREEZE · [FLOW_05_SPEC](./FLOW_05_SPEC.md) |
 | 2 | Freeze (merge Spec → main) | ⏳ |
-| 3 | Runner only · BLOCKED at T1 | ⏳ |
+| 3 | Runner only · BLOCKED at B1 | ⏳ |
 | 4 | Gate FLOW05-001 | ⏳ |
-| 5 | FLOW05-001…00n (una transición / PR) | ⏳ |
+| 5 | FLOW05-001…008 (un bloque / PR) | ⏳ |
 | 6 | FULL PASS · tag `flow05-pass` | ⏳ |
 | 7 | Capacitor / build móvil EatClean | ⏳ **solo tras** `flow05-pass` |
 
