@@ -4,14 +4,17 @@
  * B1 = Registration (FLOW05-001)
  * B2 = Authentication (FLOW05-002)
  * B3 = Order Creation (FLOW05-003)
- * B4…B8 = not implemented in this delivery
+ * B4 = Production (FLOW05-004)
+ * B5…B8 = not implemented in this delivery
  *
  * Tenant-agnostic — EatClean is the first tenant, not the contract.
+ * Rule: each block certifies exactly one state transition.
  */
 import { FLOW05_SEGMENTS } from "./flow-05-canonical-pipeline.mjs";
 import { runFlow05B1Registration } from "./flow-05-b1-registration.mjs";
 import { runFlow05B2Authentication } from "./flow-05-b2-authentication.mjs";
 import { runFlow05B3OrderCreation } from "./flow-05-b3-order-creation.mjs";
+import { runFlow05B4Production } from "./flow-05-b4-production.mjs";
 
 /**
  * @param {{ root: string, through?: 1|2|3|4|5|6|7|8 | 0 | null }} opts
@@ -107,11 +110,35 @@ export function runFlow05CapabilityDriver({ root, through = null }) {
 
   if (max < 4) return { ok: true, steps, evidence };
 
+  console.info("[FLOW-05]", "FLOW05_B4_STARTED", {
+    segment: FLOW05_SEGMENTS[4],
+  });
+  steps.push("FLOW05_B4_STARTED");
+
+  const b4 = runFlow05B4Production({ cwd: root });
+  evidence.b4_checks = b4.checks;
+  if (!b4.ok) {
+    console.error("[FLOW-05] B4 FAIL:\n" + b4.reason);
+    return { ok: false, steps, reason: b4.reason, evidence };
+  }
+  evidence.b4_mapped_tokens = b4.mapped_tokens;
+  evidence.b4_source = b4.source;
+
+  console.info("[FLOW-05]", "FLOW05_B4_COMPLETED", {
+    segment: FLOW05_SEGMENTS[4],
+    mapped_tokens: b4.mapped_tokens,
+    source: b4.source,
+    checks: b4.checks,
+  });
+  steps.push("FLOW05_B4_COMPLETED");
+
+  if (max < 5) return { ok: true, steps, evidence };
+
   return {
     ok: false,
     steps,
     reason:
-      "B4+ block drivers are not implemented — stop at FLOW05-003 (B3 Order Creation only).",
+      "B5+ block drivers are not implemented — stop at FLOW05-004 (B4 Production only).",
     evidence,
   };
 }
