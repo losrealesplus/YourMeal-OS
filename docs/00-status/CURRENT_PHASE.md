@@ -50,11 +50,11 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass · release-01-beta · release-01-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    FLOW-05 Runner ▶ este PR · CERTIFIED_THROUGH=0
-                               BLOCKED at FLOW05_B1_STARTED · exit 2
-                               → ../10-validation/flow-05/FLOW_05_RUNNER.md
-                               Spec ✅ FROZEN #237 · DoR ✅ #236
-                               No Gate · 001 · Capacitor · código de dominio
+  Prioridad                    FLOW-05 Gate ✅ READY · este PR
+                               Autoriza FLOW05-001 · B1 Registration only
+                               → ../10-validation/flow-05/FLOW_05_GATE.md
+                               Runner ✅ #238 · Spec FROZEN · release-01-pass
+                               B2…B8 · Capacitor · Stores cerrados
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)
   Land Check                   ./FOPEBA_LAND_CHECK.md (antes de cualquier 001)
@@ -102,9 +102,11 @@ NEXT PHASE
   ↓
   FLOW-05 Spec ✅ FROZEN (#237)
   ↓
-  ▶ FLOW-05 Runner (este PR) · BLOCKED at B1
+  FLOW-05 Runner ✅ (#238)
   ↓
-  Gate → FLOW05-001…
+  ▶ FLOW-05 Gate READY (este PR) · autoriza FLOW05-001
+  ↓
+  FLOW05-001 · B1 Registration only
   ↓
   Capacitor solo cuando flow05-pass exista (no por inercia)
 
@@ -142,7 +144,7 @@ Ver: ./NEXT_EXECUTION_PLAN.md
 **Gobernanza:** [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) — política permanente (6 reglas)  
 **Regla diaria:** [FLOW_FIRST](./FLOW_FIRST.md) — ¿A qué Flow pertenece?  
 **Done (fase):** [FLOW_DEFINITION_OF_DONE](./FLOW_DEFINITION_OF_DONE.md) — Handoff → Evidence → Certification → Merge  
-**Jerarquía:** [FLOW_WORK_HIERARCHY](./FLOW_WORK_HIERARCHY.md) · **Catálogo:** [FLOW_CATALOG](./FLOW_CATALOG.md) (FLOW-01…04 ✅ · FLOW-05 Runner ▶)
+**Jerarquía:** [FLOW_WORK_HIERARCHY](./FLOW_WORK_HIERARCHY.md) · **Catálogo:** [FLOW_CATALOG](./FLOW_CATALOG.md) (FLOW-01…04 ✅ · FLOW-05 Gate READY ▶)
 
 **Pregunta de fase (todo PR):**  
 ¿A qué Flow pertenece? → ¿Qué Outcome? → ¿Qué Handoff? → ¿Qué evidencia? → ¿Respeta Baseline/Core?  
