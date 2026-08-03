@@ -74,6 +74,24 @@ NO se amplía durante certificación.
 
 Si una capacidad no aparece en §2 ni en START→END, **no entra** en Capacitor v1 sin renegociar el Freeze.
 
+### Core Integrity Rule
+
+```text
+Todo cambio realizado durante Distribution deberá demostrar que el
+comportamiento funcional del Core SaaS permanece inalterado.
+
+Distribution puede añadir infraestructura.
+Distribution no puede modificar el comportamiento certificado del producto.
+```
+
+| Implica | |
+|---------|---|
+| Sí | Shell · config de empaquetado · bridges mínimos · artefactos de build |
+| No | Cambiar contratos FLOW-05 / RELEASE-01 · alterar lógica Business · “versión móvil” del Core |
+| Si un cambio altera el Core | **Deja de pertenecer a Distribution** — requiere dominio Platform / Business / Experience |
+
+Esta regla es **inmutable** tras Freeze junto con el Contract Boundary.
+
 ---
 
 ## 2. Distribution Journey (secuencia a congelar)
