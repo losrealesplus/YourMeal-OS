@@ -1,0 +1,68 @@
+{
+  "status": "PASS",
+  "reason": "PASS through C1 · BLOCKED at CAPACITOR_C2_STARTED for full CAPACITOR",
+  "gate": "CAPACITOR",
+  "contract": "CAPACITOR_SPEC",
+  "level": "distribution",
+  "certifies": "native_shell_reproducible_builds",
+  "tenant_agnostic": true,
+  "core_integrity": true,
+  "principle": "Evidence before Implementation",
+  "architecture": "Core SaaS → Capacitor → Android / iOS",
+  "code_status": "CAPABILITY_DRIVER_C1",
+  "at": "2026-08-03T17:51:42.434Z",
+  "pipeline": [
+    "CAPACITOR_C1_STARTED",
+    "CAPACITOR_C1_COMPLETED"
+  ],
+  "expected": [
+    "CAPACITOR_C1_STARTED",
+    "CAPACITOR_C1_COMPLETED",
+    "CAPACITOR_C2_STARTED",
+    "CAPACITOR_C2_COMPLETED",
+    "CAPACITOR_C3_STARTED",
+    "CAPACITOR_C3_COMPLETED",
+    "CAPACITOR_C4_STARTED",
+    "CAPACITOR_C4_COMPLETED",
+    "CAPACITOR_C5_STARTED",
+    "CAPACITOR_C5_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": null,
+  "certified_through": 1,
+  "blocked_at": "CAPACITOR_C2_STARTED",
+  "delivery": "CAPACITOR-001",
+  "delivery_status": "PASS",
+  "domain_status": "BLOCKED",
+  "terminal": {
+    "segment": "platform_preparation"
+  },
+  "evidence": {
+    "segments": {
+      "1": "platform_preparation",
+      "2": "native_shell",
+      "3": "android_build",
+      "4": "ios_build",
+      "5": "acceptance"
+    },
+    "c1_checks": [
+      "capacitor_gate_authorizes_001",
+      "capacitor_core_dependency_present",
+      "capacitor_cli_dependency_present",
+      "capacitor_config_present",
+      "app_id_defined",
+      "app_name_defined",
+      "web_dir_defined",
+      "vite_mobile_build_compat_present",
+      "web_build_script_intact",
+      "ready_for_native_shell_spec_present"
+    ],
+    "c1_mapped_tokens": [
+      "CAPACITOR_C1_STARTED",
+      "CAPACITOR_C1_COMPLETED"
+    ],
+    "c1_source": "@capacitor/core+cli · capacitor.config.ts (appId·appName·webDir) · Vite CAPACITOR_BUILD · web build intact · Ready for Native Shell · Gate READY (no C2 · no android/ios certify · no stores · Core Integrity)"
+  }
+}
