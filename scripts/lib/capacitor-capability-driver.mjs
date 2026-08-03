@@ -5,7 +5,7 @@
  * C2 = Native Shell (CAPACITOR-002)
  * C3 = Android Platform (CAPACITOR-003)
  * C4 = iOS Platform (CAPACITOR-004)
- * C5 = not implemented in this delivery
+ * C5 = Acceptance / Distribution Certified (CAPACITOR-005)
  *
  * Tenant-agnostic — Core SaaS → Capacitor → Android / iOS.
  * Core Integrity Rule: Distribution does not alter Core SaaS behavior.
@@ -16,6 +16,7 @@ import { runCapacitorC1PlatformPreparation } from "./capacitor-c1-platform-prepa
 import { runCapacitorC2NativeShell } from "./capacitor-c2-native-shell.mjs";
 import { runCapacitorC3AndroidPlatform } from "./capacitor-c3-android-platform.mjs";
 import { runCapacitorC4IosPlatform } from "./capacitor-c4-ios-platform.mjs";
+import { runCapacitorC5Acceptance } from "./capacitor-c5-acceptance.mjs";
 
 /**
  * @param {{ root: string, through?: 1|2|3|4|5 | 0 | null }} opts
@@ -135,11 +136,27 @@ export function runCapacitorCapabilityDriver({ root, through = null }) {
 
   if (max < 5) return { ok: true, steps, evidence };
 
-  return {
-    ok: false,
-    steps,
-    reason:
-      "C5 block driver is not implemented — stop at CAPACITOR-004 (C4 iOS Platform only).",
-    evidence,
-  };
+  console.info("[CAPACITOR]", "CAPACITOR_C5_STARTED", {
+    segment: CAPACITOR_SEGMENTS[5],
+  });
+  steps.push("CAPACITOR_C5_STARTED");
+
+  const c5 = runCapacitorC5Acceptance({ cwd: root });
+  evidence.c5_checks = c5.checks;
+  if (!c5.ok) {
+    console.error("[CAPACITOR] C5 FAIL:\n" + c5.reason);
+    return { ok: false, steps, reason: c5.reason, evidence };
+  }
+  evidence.c5_mapped_tokens = c5.mapped_tokens;
+  evidence.c5_source = c5.source;
+
+  console.info("[CAPACITOR]", "CAPACITOR_C5_COMPLETED", {
+    segment: CAPACITOR_SEGMENTS[5],
+    mapped_tokens: c5.mapped_tokens,
+    source: c5.source,
+    checks: c5.checks,
+  });
+  steps.push("CAPACITOR_C5_COMPLETED");
+
+  return { ok: true, steps, evidence };
 }

@@ -15,11 +15,11 @@
  *
  * Spec: docs/00-status/CAPACITOR_SPEC.md
  *
- * NO C5 driver · NO IPA/App Store · NO stores · Core Integrity.
+ * C5 = operational Acceptance · FULL PASS · NO IPA/App Store · Core Integrity.
  */
 
 /** Highest block with a capability driver implemented. */
-const CAPACITOR_CERTIFIED_THROUGH = 4;
+const CAPACITOR_CERTIFIED_THROUGH = 5;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
