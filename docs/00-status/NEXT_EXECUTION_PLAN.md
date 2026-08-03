@@ -107,15 +107,15 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual:** **FLOW05-005 · B5 Route Planning** (este PR) · PASS through B5 · BLOCKED at B6.  
-DoR ✅ · Spec ✅ · Runner ✅ · Gate ✅ · B1…B4 ✅ (#243 · `1181c21`) · CERTIFIED_THROUGH=5.  
-Acta: [FLOW05_005_B5_ACTA](../10-validation/flow-05/FLOW05_005_B5_ACTA.md).  
-Do **not** abrir B6…B8 · Capacitor · Stores · Deploy en este PR.  
-**Siguiente:** Land Check desde `main` → **FLOW05-006** (B6 Delivery only).  
+**Objetivo actual:** **FLOW05-006 · B6 Delivery** (este PR) · PASS through B6 · BLOCKED at B7.  
+DoR ✅ · Spec ✅ · Runner ✅ · Gate ✅ · B1…B5 ✅ (#244 · `f0e1ebc`) · CERTIFIED_THROUGH=6.  
+Acta: [FLOW05_006_B6_ACTA](../10-validation/flow-05/FLOW05_006_B6_ACTA.md).  
+Do **not** abrir B7…B8 · Capacitor · Stores · Deploy en este PR.  
+**Siguiente:** Land Check desde `main` → **FLOW05-007** (B7 Delivery Confirmation only).  
 **Reglas:** (1) Producto ≠ framework · (2) Land Check desde `main` · (3) un bloque / PR · (4) **una transición de estado / bloque**.  
 **Nota:** restaurar `docs/10-validation/**/evidence/*.json` antes de Land Check si bloquean `git pull`.  
 **Principio:** Identity → YourMeal OS · Brand/rules → Tenant · Journey → Flow.  
-**B5:** Ready for Route Planning → **Ready for Delivery**.  
+**B6:** Ready for Delivery → **Delivered**.  
 **Estados:** Identity / Order (FLOW-05) / Operational (internos · no reabren Spec).
 
 Cross-flow **no sustituye** runners canónicos: los runners certifican contratos;  
@@ -130,11 +130,11 @@ Pedido → Producción → Packaging → Entrega
 
 ## Parallel Track A — Business Certification
 
-**Current status:** FLOW05-005 ▶ B5 Route Planning · CERTIFIED_THROUGH=5 · BLOCKED at B6
+**Current status:** FLOW05-006 ▶ B6 Delivery · CERTIFIED_THROUGH=6 · BLOCKED at B7
 
 ```text
-FLOW-05 ▶ FLOW05-005 (este PR) → Land Check → FLOW05-006 (B6 only)
-001…004 ✅ → 005 ▶ → … → flow05-pass
+FLOW-05 ▶ FLOW05-006 (este PR) → Land Check → FLOW05-007 (B7 only)
+001…005 ✅ → 006 ▶ → … → flow05-pass
 ```
 
 Sin excepciones. Sin features futuras. Una transición / PR.
@@ -195,7 +195,7 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 
 ```text
 Track B (cerrado):   RELEASE-01 ✅ · tag release-01-pass → 8e91a49
-Track A (prioridad): FLOW05-005 ▶ B5 → Land Check → FLOW05-006 (B6)
+Track A (prioridad): FLOW05-006 ▶ B6 → Land Check → FLOW05-007 (B7)
 FOPEBA_LAND_CHECK:   ACTIVE · pull + fetch --tags --prune before every runner
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos
 ```
