@@ -254,6 +254,7 @@ Con entregas parciales: PASS through Cn · BLOCKED at C(n+1)_STARTED.
 | I5 | Builds Android e iOS parten del mismo artefacto web certificado |
 | I6 | Evidence tokens once-only · en orden · sin duplicates |
 | I7 | Stores · push · device APIs fuera de v1 |
+| I8 | **Core Integrity** — Distribution no altera comportamiento funcional del Core SaaS |
 
 ---
 
