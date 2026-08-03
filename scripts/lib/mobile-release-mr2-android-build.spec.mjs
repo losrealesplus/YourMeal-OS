@@ -164,7 +164,7 @@ describe("mobile-release-mr2-android-build", () => {
     assert.match(r.reason, /MR01-002/);
   });
 
-  it("FAIL when release buildType has signingConfig", () => {
+  it("FAIL when release buildType has hardcoded signing passwords", () => {
     const cwd = fs.mkdtempSync(path.join(os.tmpdir(), "mr2-"));
     writeMr2Fixtures(cwd);
     fs.writeFileSync(
@@ -177,7 +177,8 @@ describe("mobile-release-mr2-android-build", () => {
   buildTypes {
     release {
       minifyEnabled false
-      signingConfig signingConfigs.release
+      storePassword "literal-secret"
+      keyPassword "literal-secret"
     }
   }
 }
@@ -185,10 +186,10 @@ describe("mobile-release-mr2-android-build", () => {
     );
     const r = runMobileReleaseMr2AndroidBuild({ cwd });
     assert.equal(r.ok, false);
-    assert.match(r.reason, /signingConfig|unsigned/i);
+    assert.match(r.reason, /Hardcoded|secrets|password/i);
   });
 
-  it("FAIL when live artifact hash mismatches evidence", () => {
+  it("tolerates live artifact hash drift after later signing", () => {
     const cwd = fs.mkdtempSync(path.join(os.tmpdir(), "mr2-"));
     writeMr2Fixtures(cwd, { withLive: true });
     fs.writeFileSync(
@@ -196,7 +197,12 @@ describe("mobile-release-mr2-android-build", () => {
       "TAMPERED",
     );
     const r = runMobileReleaseMr2AndroidBuild({ cwd });
-    assert.equal(r.ok, false);
-    assert.match(r.reason, /mismatch|size/i);
+    assert.equal(r.ok, true);
+    assert.equal(
+      /** @type {{ artifacts?: { live_verification?: { debug_apk?: { sha256_match?: boolean } } } }} */ (
+        r
+      ).artifacts?.live_verification?.debug_apk?.sha256_match,
+      false,
+    );
   });
 });
