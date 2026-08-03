@@ -50,12 +50,12 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass · release-01-beta · release-01-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    FLOW05-001 · B1 Registration ▶ este PR
-                               PASS through B1 · blocked_at=FLOW05_B2_STARTED
-                               → ../10-validation/flow-05/FLOW05_001_B1_ACTA.md
-                               Gate ✅ #239 · Runner CERTIFIED_THROUGH=1
-                               Next: Land Check → FLOW05-002 (B2 only)
-                               B3…B8 · Capacitor · Stores cerrados
+  Prioridad                    FLOW05-002 · B2 Authentication ▶ este PR
+                               PASS through B2 · blocked_at=FLOW05_B3_STARTED
+                               → ../10-validation/flow-05/FLOW05_002_B2_ACTA.md
+                               B1 ✅ #240 · Gate ✅ · CERTIFIED_THROUGH=2
+                               Next: Land Check → FLOW05-003 (B3 only)
+                               B4…B8 · Capacitor · Stores cerrados
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)
   Land Check                   ./FOPEBA_LAND_CHECK.md (antes de cualquier 001)
