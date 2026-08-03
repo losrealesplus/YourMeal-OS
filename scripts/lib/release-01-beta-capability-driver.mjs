@@ -5,12 +5,13 @@
  * B2 = Canonical Flows (flow01–04-pass · B1 CERTIFIED)
  * B3 = Platform Capabilities (smoke · crossflow · e2e-pass · B2 CERTIFIED)
  * B4 = Release Stack (deploy · rollback-pass · B3 CERTIFIED)
- * B5 = Beta Acceptance (future · RELEASE-01-BETA-005)
+ * B5 = Beta Acceptance (B1–B4 CERTIFIED · acceptance checklist)
  */
 import { runRelease01BetaB1Foundation } from "./release-01-beta-b1-foundation.mjs";
 import { runRelease01BetaB2CanonicalFlows } from "./release-01-beta-b2-canonical-flows.mjs";
 import { runRelease01BetaB3PlatformCapabilities } from "./release-01-beta-b3-platform-capabilities.mjs";
 import { runRelease01BetaB4ReleaseStack } from "./release-01-beta-b4-release-stack.mjs";
+import { runRelease01BetaB5Acceptance } from "./release-01-beta-b5-acceptance.mjs";
 
 /**
  * @param {{ root: string, through?: 1|2|3|4|5 | null }} opts
@@ -127,11 +128,27 @@ export function runRelease01BetaCapabilityDriver({ root, through = null }) {
 
   if (max < 5) return { ok: true, steps, evidence };
 
-  return {
-    ok: false,
-    steps,
-    reason:
-      "B5 Beta Acceptance driver not implemented (RELEASE-01-BETA-005). Do not invent Acceptance.",
-    evidence,
-  };
+  console.info("[RELEASE-01-BETA]", "RELEASE_01_BETA_B5_STARTED", {
+    segment: "beta_acceptance",
+  });
+  steps.push("RELEASE_01_BETA_B5_STARTED");
+
+  const b5 = runRelease01BetaB5Acceptance({ cwd: root });
+  evidence.b5_checks = b5.checks;
+  if (!b5.ok) {
+    console.error("[RELEASE-01-BETA] B5 FAIL:\n" + b5.reason);
+    return { ok: false, steps, reason: b5.reason, evidence };
+  }
+  evidence.b5_mapped_tokens = b5.mapped_tokens;
+  evidence.b5_source = b5.source;
+
+  console.info("[RELEASE-01-BETA]", "RELEASE_01_BETA_B5_COMPLETED", {
+    segment: "beta_acceptance",
+    mapped_tokens: b5.mapped_tokens,
+    source: b5.source,
+    checks: b5.checks,
+  });
+  steps.push("RELEASE_01_BETA_B5_COMPLETED");
+
+  return { ok: true, steps, evidence };
 }

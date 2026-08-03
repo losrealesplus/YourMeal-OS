@@ -13,11 +13,11 @@
  *
  * Spec: docs/00-status/RELEASE_01_BETA_SPEC.md
  *
- * NO B5 driver in this PR · NO CI · NO infra · NO FLOW-05 · NO tag.
+ * NO FLOW-05 · NO tag creation in this PR (tag after Land Check from main).
  */
 
 /** Highest segment with a capability driver implemented. */
-const RELEASE_01_BETA_CERTIFIED_THROUGH = 4;
+const RELEASE_01_BETA_CERTIFIED_THROUGH = 5;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
