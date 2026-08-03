@@ -2,12 +2,13 @@
 
 **Documento:** `RELEASE_01_BETA_SPEC.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **FROZEN** (Spec · #218 · `ed98b3b`) · DoR ✅ (#217) · Runner ✅ #219 · Gate ✅ #220 · 001 ▶ B1  
+**Estado:** ✅ **FROZEN** (Spec · #218 · `ed98b3b`) · DoR ✅ (#217) · Runner ✅ #219 · Gate ✅ #220 · B1 ✅ #222 · 002 ▶ B2  
 **Gate DoRl:** Beta Acceptance · Track B · RELEASE-01  
 **Nivel:** Release Contract — **no** es un Flow nuevo · **no** inventa capacidades  
 **DoR:** [RELEASE_01_BETA_DOR](./RELEASE_01_BETA_DOR.md) ✅ en `main` (#217 · `740b843`)  
 **Runner:** [RELEASE_01_BETA_RUNNER](../10-validation/release-01-beta/RELEASE_01_BETA_RUNNER.md) ✅ #219 · `3994833`  
-**001:** [RELEASE_01_BETA_001_B1_ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_001_B1_ACTA.md)  
+**001:** [RELEASE_01_BETA_001_B1_ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_001_B1_ACTA.md) ✅ CERTIFIED #222  
+**002:** [RELEASE_01_BETA_002_B2_ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_002_B2_ACTA.md)  
 **Precondiciones:** FOUNDATION ✅ · `ps002c-pass` · `flow01-pass`…`flow04-pass` · `release-smoke-pass` · `release-crossflow-pass` · `release-e2e-pass` · `release-deploy-pass` · `release-rollback-pass` → `0ba856e`  
 **DoRl:** [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md)  
 **Estrategia:** [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md)  
@@ -15,8 +16,8 @@
 **Tags:** `release-01-beta` · [GIT_MILESTONE_TAGS](./GIT_MILESTONE_TAGS.md)  
 **Principio:** [Evidence before Implementation](./EVIDENCE_BEFORE_IMPLEMENTATION.md) · [FOPEBA_LAND_CHECK](./FOPEBA_LAND_CHECK.md)
 
-> Contrato FROZEN. 001 ▶ B1 Foundation (este PR).  
-> **No** B2–B5 · FLOW-05 · tag.
+> Contrato FROZEN. 002 ▶ B2 Canonical Flows (este PR).  
+> **No** B3–B5 · FLOW-05 · tag.
 
 ---
 
@@ -360,7 +361,8 @@ tag (futuro): release-01-beta
 | Spec FROZEN | ✅ #218 · `ed98b3b` |
 | Runner BLOCKED at B1 | ✅ #219 · `3994833` |
 | Gate READY | ✅ #220 |
-| RELEASE-01-BETA-001 | ▶ este PR (B1 only) |
+| RELEASE-01-BETA-001 | ✅ CERTIFIED #222 |
+| RELEASE-01-BETA-002 | ▶ este PR (B2 only) |
 
 **Estado del documento:** ✅ **FROZEN**
 
@@ -369,12 +371,12 @@ tag (futuro): release-01-beta
 ## 14. Next
 
 ```text
-Land Check 001 from main
+Land Check 002 from main
     ↓
-READY TO OPEN RELEASE-01-BETA-002 (B2 only)
+READY TO OPEN RELEASE-01-BETA-003 (B3 only)
 ```
 
-**No** B2–B5 in 001 · FLOW-05 · tag hasta FULL PASS.
+**No** B3–B5 in 002 · FLOW-05 · tag hasta FULL PASS.
 
 ---
 
