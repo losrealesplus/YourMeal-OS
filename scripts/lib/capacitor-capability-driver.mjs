@@ -4,7 +4,8 @@
  * C1 = Platform Preparation (CAPACITOR-001)
  * C2 = Native Shell (CAPACITOR-002)
  * C3 = Android Platform (CAPACITOR-003)
- * C4…C5 = not implemented in this delivery
+ * C4 = iOS Platform (CAPACITOR-004)
+ * C5 = not implemented in this delivery
  *
  * Tenant-agnostic — Core SaaS → Capacitor → Android / iOS.
  * Core Integrity Rule: Distribution does not alter Core SaaS behavior.
@@ -14,6 +15,7 @@ import { CAPACITOR_SEGMENTS } from "./capacitor-canonical-pipeline.mjs";
 import { runCapacitorC1PlatformPreparation } from "./capacitor-c1-platform-preparation.mjs";
 import { runCapacitorC2NativeShell } from "./capacitor-c2-native-shell.mjs";
 import { runCapacitorC3AndroidPlatform } from "./capacitor-c3-android-platform.mjs";
+import { runCapacitorC4IosPlatform } from "./capacitor-c4-ios-platform.mjs";
 
 /**
  * @param {{ root: string, through?: 1|2|3|4|5 | 0 | null }} opts
@@ -109,11 +111,35 @@ export function runCapacitorCapabilityDriver({ root, through = null }) {
 
   if (max < 4) return { ok: true, steps, evidence };
 
+  console.info("[CAPACITOR]", "CAPACITOR_C4_STARTED", {
+    segment: CAPACITOR_SEGMENTS[4],
+  });
+  steps.push("CAPACITOR_C4_STARTED");
+
+  const c4 = runCapacitorC4IosPlatform({ cwd: root });
+  evidence.c4_checks = c4.checks;
+  if (!c4.ok) {
+    console.error("[CAPACITOR] C4 FAIL:\n" + c4.reason);
+    return { ok: false, steps, reason: c4.reason, evidence };
+  }
+  evidence.c4_mapped_tokens = c4.mapped_tokens;
+  evidence.c4_source = c4.source;
+
+  console.info("[CAPACITOR]", "CAPACITOR_C4_COMPLETED", {
+    segment: CAPACITOR_SEGMENTS[4],
+    mapped_tokens: c4.mapped_tokens,
+    source: c4.source,
+    checks: c4.checks,
+  });
+  steps.push("CAPACITOR_C4_COMPLETED");
+
+  if (max < 5) return { ok: true, steps, evidence };
+
   return {
     ok: false,
     steps,
     reason:
-      "C4+ block drivers are not implemented — stop at CAPACITOR-003 (C3 Android Platform only).",
+      "C5 block driver is not implemented — stop at CAPACITOR-004 (C4 iOS Platform only).",
     evidence,
   };
 }
