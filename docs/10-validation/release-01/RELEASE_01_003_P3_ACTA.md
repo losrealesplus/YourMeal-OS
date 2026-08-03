@@ -2,7 +2,8 @@
 
 **Documento:** `RELEASE_01_003_P3_ACTA.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ▶ este PR · PASS through P3 · BLOCKED at `RELEASE_01_P4_STARTED`  
+**Estado:** ✅ **CERTIFIED desde `main`** · PASS through P3 · BLOCKED at `RELEASE_01_P4_STARTED`  
+**Tip:** `ddf4027` (Merge #232)  
 **Precondición:** P2 CERTIFIED (#231 · `caad4c3`)  
 **Gate:** [RELEASE_01_GATE](./RELEASE_01_GATE.md)  
 **Spec:** [RELEASE_01_SPEC](../../00-status/RELEASE_01_SPEC.md)  
@@ -82,9 +83,9 @@ Fuente: `Production · Calendar · Routes · Deliveries · Inventory · P2 CERTI
 ## Next
 
 ```text
-READY TO OPEN
-RELEASE-01-004 · P4 only
-(after Land Check of 003 from main)
+CERTIFIED desde main
+    ↓
+RELEASE-01-004 · P4 OPEN (este track)
 ```
 
 ---

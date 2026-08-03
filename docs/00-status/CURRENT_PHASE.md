@@ -50,11 +50,11 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    RELEASE-01-003 (P3 · este PR)
-                               P1 ✅ #230 · P2 ✅ CERTIFIED #231 · caad4c3 · framework release-01-beta ✅
-                               npm run test:release-01 → PASS through P3 · BLOCKED at P4
-                               → ../10-validation/release-01/RELEASE_01_003_P3_ACTA.md
-                               No P4+ · FLOW-05 · Capacitor · Track B re-cert
+  Prioridad                    RELEASE-01-004 (P4 · este PR)
+                               P1–P3 ✅ · P3 CERTIFIED #232 · ddf4027 · framework release-01-beta ✅
+                               npm run test:release-01 → PASS through P4 · BLOCKED at P5
+                               → ../10-validation/release-01/RELEASE_01_004_P4_ACTA.md
+                               No P5 · FLOW-05 · Capacitor · Track B re-cert
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)
   Land Check                   ./FOPEBA_LAND_CHECK.md (antes de cualquier 001)
@@ -98,9 +98,9 @@ NEXT PHASE
   ↓
   RELEASE-01 DoR ✅ · Spec FROZEN · Runner · Gate READY
   ↓
-  P1 ✅ · P2 ✅ · ▶ RELEASE-01-003 · P3 Operations (este PR)
+  P1 ✅ · P2 ✅ · P3 ✅ · ▶ RELEASE-01-004 · P4 Administration (este PR)
   ↓
-  P4…P5 · PASS
+  P5 · PASS
   ↓
   FLOW-05 / Capacitor solo cuando el plan lo abra (no por inercia)
 

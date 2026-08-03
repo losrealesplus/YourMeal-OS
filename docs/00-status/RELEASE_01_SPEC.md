@@ -233,8 +233,9 @@ Gate nunca se cierra solo porque un PR pase.
 | Gate READY | ✅ #229 |
 | RELEASE-01-001 | ✅ CERTIFIED #230 (P1) |
 | RELEASE-01-002 | ✅ CERTIFIED #231 (P2) |
-| RELEASE-01-003 | ▶ este PR (P3 only) |
-| RELEASE-01-004…005 | ⏳ |
+| RELEASE-01-003 | ✅ CERTIFIED #232 (P3) |
+| RELEASE-01-004 | ▶ este PR (P4 only) |
+| RELEASE-01-005 | ⏳ |
 
 **Estado del documento:** ✅ **FROZEN**
 
@@ -243,12 +244,12 @@ Gate nunca se cierra solo porque un PR pase.
 ## 10. Next
 
 ```text
-RELEASE-01-003 · P3 OPEN
+RELEASE-01-004 · P4 OPEN
     ↓
 Land Check from main
     ↓
 READY TO OPEN
-RELEASE-01-004 · P4 only
+RELEASE-01-005 · P5 only
 ```
 
 ---

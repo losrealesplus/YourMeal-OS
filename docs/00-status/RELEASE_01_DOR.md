@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_01_DOR.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **DoR CERTIFIED** (`main` · #228 · `c13f2b8`) · Spec ✅ FROZEN · Runner ✅ · Gate ✅ READY · P1 ✅ · P2 ✅ · 003 ▶ P3  
+**Estado:** ✅ **DoR CERTIFIED** (`main` · #228 · `c13f2b8`) · Spec ✅ FROZEN · Runner ✅ · Gate ✅ READY · P1–P3 ✅ · 004 ▶ P4  
 **Nivel:** Product Release · primera certificación del **producto** (no del framework)  
 **Pregunta (única):** ¿Qué debe demostrar YourMeal OS para certificarse como plataforma SaaS operable?  
 **Estrategia:** [RELEASE_01_STRATEGY](./RELEASE_01_STRATEGY.md)  
@@ -29,8 +29,9 @@ RELEASE-01 puede abrirse cuando:
 ☑ Runner / Gate                      → BLOCKED at P1 · Gate READY
 ☑ RELEASE-01-001 OPEN                 → ✅ CERTIFIED #230 · [ACTA](../10-validation/release-01/RELEASE_01_001_P1_ACTA.md)
 ☑ RELEASE-01-002 OPEN                 → ✅ CERTIFIED #231 · [ACTA](../10-validation/release-01/RELEASE_01_002_P2_ACTA.md)
-☑ RELEASE-01-003 OPEN                 → ▶ este PR · [ACTA](../10-validation/release-01/RELEASE_01_003_P3_ACTA.md)
-☐ Capacidades P4…P5                  → 004…005
+☑ RELEASE-01-003 OPEN                 → ✅ CERTIFIED #232 · [ACTA](../10-validation/release-01/RELEASE_01_003_P3_ACTA.md)
+☑ RELEASE-01-004 OPEN                 → ▶ este PR · [ACTA](../10-validation/release-01/RELEASE_01_004_P4_ACTA.md)
+☐ Capacidades P5                     → 005
 ```
 
 Este documento **no** abre Spec, Runner, Gate ni implementación.
@@ -125,9 +126,9 @@ No P2+ · No FLOW-05 · No Capacitor · No Track B re-cert.
 ## Next
 
 ```text
-RELEASE-01-003 · P3 OPEN
+RELEASE-01-004 · P4 OPEN
     ↓
-Land Check → READY TO OPEN RELEASE-01-004 (P4 only)
+Land Check → READY TO OPEN RELEASE-01-005 (P5 only)
 ```
 
 ---

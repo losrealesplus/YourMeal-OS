@@ -3,12 +3,14 @@
  *
  * P1 = Platform Foundation
  * P2 = Core Business
- * P3 = Operations (Production · Calendar · Routes · Deliveries · Inventory)
- * P4…P5 = not implemented in this delivery
+ * P3 = Operations
+ * P4 = Administration (Billing · Reports · Notifications · Audit · Configuration)
+ * P5 = not implemented in this delivery
  */
 import { runRelease01P1PlatformFoundation } from "./release-01-p1-platform-foundation.mjs";
 import { runRelease01P2CoreBusiness } from "./release-01-p2-core-business.mjs";
 import { runRelease01P3Operations } from "./release-01-p3-operations.mjs";
+import { runRelease01P4Administration } from "./release-01-p4-administration.mjs";
 
 /**
  * @param {{ root: string, through?: 1|2|3|4|5 | null }} opts
@@ -101,11 +103,35 @@ export function runRelease01CapabilityDriver({ root, through = null }) {
 
   if (max < 4) return { ok: true, steps, evidence };
 
+  console.info("[RELEASE-01]", "RELEASE_01_P4_STARTED", {
+    segment: "administration",
+  });
+  steps.push("RELEASE_01_P4_STARTED");
+
+  const p4 = runRelease01P4Administration({ cwd: root });
+  evidence.p4_checks = p4.checks;
+  if (!p4.ok) {
+    console.error("[RELEASE-01] P4 FAIL:\n" + p4.reason);
+    return { ok: false, steps, reason: p4.reason, evidence };
+  }
+  evidence.p4_mapped_tokens = p4.mapped_tokens;
+  evidence.p4_source = p4.source;
+
+  console.info("[RELEASE-01]", "RELEASE_01_P4_COMPLETED", {
+    segment: "administration",
+    mapped_tokens: p4.mapped_tokens,
+    source: p4.source,
+    checks: p4.checks,
+  });
+  steps.push("RELEASE_01_P4_COMPLETED");
+
+  if (max < 5) return { ok: true, steps, evidence };
+
   return {
     ok: false,
     steps,
     reason:
-      "P4+ capability drivers are not implemented — stop at RELEASE-01-003 (P3 only).",
+      "P5+ capability drivers are not implemented — stop at RELEASE-01-004 (P4 only).",
     evidence,
   };
 }
