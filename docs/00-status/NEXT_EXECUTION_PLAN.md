@@ -28,7 +28,7 @@ RELEASE_01_BETA_STRATEGY      ✅  DRAFT
 DEFINITION_OF_RELEASE         ✅  DRAFT (DoRl)
 FOPEBA_METRICS                ✅  v0
 RELEASE-01-BETA               ✅  tag release-01-beta → facb917
-RELEASE-01                    ▶  Spec FROZEN · Runner · Gate READY · next 001 (P1)
+RELEASE-01                    ▶  001 P1 OPEN · Gate READY · Spec FROZEN
 FLOW-05                       ⏳  no por inercia · candidato como criterio RELEASE-01
 ```
 
@@ -107,10 +107,9 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual:** **RELEASE-01 Gate READY** · Spec FROZEN · Runner BLOCKED at P1.  
-Framework cerrado: tag `release-01-beta` → `facb917`.  
-Artefactos: [SPEC](./RELEASE_01_SPEC.md) · [RUNNER](../10-validation/release-01/RELEASE_01_RUNNER.md) · [GATE](../10-validation/release-01/RELEASE_01_GATE.md).  
-**Siguiente:** READY TO OPEN **RELEASE-01-001** (P1 only).  
+**Objetivo actual:** **RELEASE-01-001** (P1 Platform Foundation · este PR).  
+Gate READY (#229) · Spec FROZEN · tag `release-01-beta` → `facb917`.  
+Contrato: `npm run test:release-01` → PASS through P1 · BLOCKED at `RELEASE_01_P2_STARTED` · exit 0.  
 Do **not** open P2+ · FLOW-05 · Capacitor · Track B re-cert en 001.  
 **Reglas:** (1) Producto ≠ framework · (2) Land Check desde `main` (Regla 9) · (3) un bloque / PR.  
 **Nota:** restaurar `docs/10-validation/**/evidence/*.json` antes de Land Check si bloquean `git pull`.
@@ -191,7 +190,7 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 ## Current Goal
 
 ```text
-Track B (prioridad): RELEASE-01-001 ▶ P1 · tras Gate READY
+Track B (prioridad): RELEASE-01-001 ▶ P1 · este PR → Land Check → 002
 Track A:             FLOW-05 no por inercia · candidato como criterio de RELEASE-01
 FOPEBA_LAND_CHECK:   ACTIVE · pull + fetch --tags --prune before every runner
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos

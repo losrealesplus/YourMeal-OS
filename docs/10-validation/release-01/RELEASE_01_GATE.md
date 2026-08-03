@@ -2,12 +2,13 @@
 
 **Documento:** `RELEASE_01_GATE.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **READY** · Spec FROZEN · Runner BLOCKED at P1 · DoR ✅ (#228)  
+**Estado:** ✅ **READY** · Spec FROZEN · Runner live through P1 · DoR ✅ (#228) · 001 ▶ este PR  
 **Nivel:** Product Release · YourMeal OS como SaaS  
 **Spec:** [RELEASE_01_SPEC](../../00-status/RELEASE_01_SPEC.md) ✅ FROZEN  
 **Runner:** [RELEASE_01_RUNNER](./RELEASE_01_RUNNER.md)  
 **DoR:** [RELEASE_01_DOR](../../00-status/RELEASE_01_DOR.md)  
 **Strategy:** [RELEASE_01_STRATEGY](../../00-status/RELEASE_01_STRATEGY.md)  
+**001:** [RELEASE_01_001_P1_ACTA](./RELEASE_01_001_P1_ACTA.md)  
 **Land Check:** [FOPEBA_LAND_CHECK](../../00-status/FOPEBA_LAND_CHECK.md)
 
 > `main` certifica; las ramas solo proponen.  
@@ -22,9 +23,10 @@
 ☑ Strategy P1–P5 documentada
 ☑ Spec FROZEN (este PR)
 ☑ Runner BLOCKED at P1 (este PR · CERTIFIED_THROUGH = 0)
-☑ Gate READY (este PR)
-☑ duplicates=[] missing=[] out_of_order=[] (runner-only)
-☐ RELEASE-01-001…005
+☑ Gate READY (#229 → f86645b)
+☑ duplicates=[] missing=[] out_of_order=[]
+☑ RELEASE-01-001 OPEN → ▶ este PR (P1)
+☐ RELEASE-01-002…005
 ☐ RELEASE-01 PASS / tag de producto
 ```
 
@@ -46,12 +48,10 @@ npm run test:release-01:unit
 ### Decision
 
 ```text
-RELEASE-01 Gate READY
-Runner BLOCKED at RELEASE_01_P1_STARTED
+RELEASE-01-001 · P1 OPEN (este PR)
+PASS through P1 · BLOCKED at RELEASE_01_P2_STARTED
     ↓
-READY TO OPEN
-RELEASE-01-001 · P1 Platform Foundation only
-No P2+ · No FLOW-05 · No Capacitor · No Track B re-cert
+Land Check from main → READY TO OPEN 002
 ```
 
 ### Progress
@@ -62,7 +62,7 @@ No P2+ · No FLOW-05 · No Capacitor · No Track B re-cert
 | Spec | Contract P1–P5 | ✅ FROZEN |
 | Runner | BLOCKED at P1 | ✅ este PR |
 | Gate | READY | ✅ este PR |
-| RELEASE-01-001 | P1 Platform Foundation | ⏳ |
+| RELEASE-01-001 | P1 Platform Foundation | ▶ este PR |
 | RELEASE-01-002 | P2 Core Business | ⏳ |
 | RELEASE-01-003 | P3 Operations | ⏳ |
 | RELEASE-01-004 | P4 Administration | ⏳ |
