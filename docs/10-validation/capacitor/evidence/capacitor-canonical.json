@@ -1,0 +1,40 @@
+{
+  "status": "BLOCKED",
+  "reason": "Capacitor Distribution blocks not implemented (runner ready; Evidence before Implementation)",
+  "gate": "CAPACITOR",
+  "contract": "CAPACITOR_SPEC",
+  "level": "distribution",
+  "certifies": "native_shell_reproducible_builds",
+  "tenant_agnostic": true,
+  "core_integrity": true,
+  "principle": "Evidence before Implementation",
+  "architecture": "Core SaaS → Capacitor → Android / iOS",
+  "code_status": "RUNNER_ONLY",
+  "at": "2026-08-03T17:46:00.042Z",
+  "pipeline": [],
+  "expected": [
+    "CAPACITOR_C1_STARTED",
+    "CAPACITOR_C1_COMPLETED",
+    "CAPACITOR_C2_STARTED",
+    "CAPACITOR_C2_COMPLETED",
+    "CAPACITOR_C3_STARTED",
+    "CAPACITOR_C3_COMPLETED",
+    "CAPACITOR_C4_STARTED",
+    "CAPACITOR_C4_COMPLETED",
+    "CAPACITOR_C5_STARTED",
+    "CAPACITOR_C5_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": "CAPACITOR_C1_STARTED",
+  "certified_through": 0,
+  "blocked_at": "CAPACITOR_C1_STARTED",
+  "delivery": "CAPACITOR",
+  "delivery_status": "BLOCKED",
+  "domain_status": "BLOCKED",
+  "terminal": {
+    "segment": null
+  },
+  "evidence": {}
+}
