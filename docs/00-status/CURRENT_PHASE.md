@@ -50,12 +50,12 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass · release-01-beta · release-01-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    FLOW05-005 · B5 Route Planning ▶ este PR
-                               PASS through B5 · blocked_at=FLOW05_B6_STARTED
-                               → ../10-validation/flow-05/FLOW05_005_B5_ACTA.md
-                               B1…B4 ✅ · CERTIFIED_THROUGH=5
-                               Next: Land Check → FLOW05-006 (B6 only)
-                               B7…B8 · Capacitor · Stores cerrados
+  Prioridad                    FLOW05-006 · B6 Delivery ▶ este PR
+                               PASS through B6 · blocked_at=FLOW05_B7_STARTED
+                               → ../10-validation/flow-05/FLOW05_006_B6_ACTA.md
+                               B1…B5 ✅ · CERTIFIED_THROUGH=6
+                               Next: Land Check → FLOW05-007 (B7 only)
+                               B8 · Capacitor · Stores cerrados
                                Regla: un bloque = una transición de estado
                                Order States ≠ Operational States
   Regla Release                capacidades plataforma ≠ entidades dominio
