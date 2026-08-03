@@ -2,7 +2,8 @@
 
 **Documento:** `RELEASE_01_002_P2_ACTA.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ▶ este PR · PASS through P2 · BLOCKED at `RELEASE_01_P3_STARTED`  
+**Estado:** ✅ **CERTIFIED desde `main`** · PASS through P2 · BLOCKED at `RELEASE_01_P3_STARTED`  
+**Tip:** `caad4c3` (Merge #231)  
 **Precondición:** P1 CERTIFIED (#230 · `391fdd8`)  
 **Gate:** [RELEASE_01_GATE](./RELEASE_01_GATE.md)  
 **Spec:** [RELEASE_01_SPEC](../../00-status/RELEASE_01_SPEC.md)  
@@ -79,9 +80,9 @@ Fuente: `Dish Library · Ingredients · Recipes · Customers · Orders · P1 CER
 ## Next
 
 ```text
-READY TO OPEN
-RELEASE-01-003 · P3 only
-(after Land Check of 002 from main)
+CERTIFIED desde main
+    ↓
+RELEASE-01-003 · P3 OPEN (este track)
 ```
 
 ---

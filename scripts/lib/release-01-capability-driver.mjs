@@ -1,12 +1,14 @@
 /**
  * RELEASE-01 · Capability driver (product SaaS — blocks P1–P5).
  *
- * P1 = Platform Foundation (Auth · Tenant · RBAC · Profiles · Localization · Settings)
- * P2 = Core Business (Dish Library · Ingredients · Recipes · Customers · Orders)
- * P3…P5 = not implemented in this delivery
+ * P1 = Platform Foundation
+ * P2 = Core Business
+ * P3 = Operations (Production · Calendar · Routes · Deliveries · Inventory)
+ * P4…P5 = not implemented in this delivery
  */
 import { runRelease01P1PlatformFoundation } from "./release-01-p1-platform-foundation.mjs";
 import { runRelease01P2CoreBusiness } from "./release-01-p2-core-business.mjs";
+import { runRelease01P3Operations } from "./release-01-p3-operations.mjs";
 
 /**
  * @param {{ root: string, through?: 1|2|3|4|5 | null }} opts
@@ -75,11 +77,35 @@ export function runRelease01CapabilityDriver({ root, through = null }) {
 
   if (max < 3) return { ok: true, steps, evidence };
 
+  console.info("[RELEASE-01]", "RELEASE_01_P3_STARTED", {
+    segment: "operations",
+  });
+  steps.push("RELEASE_01_P3_STARTED");
+
+  const p3 = runRelease01P3Operations({ cwd: root });
+  evidence.p3_checks = p3.checks;
+  if (!p3.ok) {
+    console.error("[RELEASE-01] P3 FAIL:\n" + p3.reason);
+    return { ok: false, steps, reason: p3.reason, evidence };
+  }
+  evidence.p3_mapped_tokens = p3.mapped_tokens;
+  evidence.p3_source = p3.source;
+
+  console.info("[RELEASE-01]", "RELEASE_01_P3_COMPLETED", {
+    segment: "operations",
+    mapped_tokens: p3.mapped_tokens,
+    source: p3.source,
+    checks: p3.checks,
+  });
+  steps.push("RELEASE_01_P3_COMPLETED");
+
+  if (max < 4) return { ok: true, steps, evidence };
+
   return {
     ok: false,
     steps,
     reason:
-      "P3+ capability drivers are not implemented — stop at RELEASE-01-002 (P2 only).",
+      "P4+ capability drivers are not implemented — stop at RELEASE-01-003 (P3 only).",
     evidence,
   };
 }
