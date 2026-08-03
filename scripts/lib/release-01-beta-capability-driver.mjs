@@ -2,12 +2,13 @@
  * RELEASE-01-BETA · Capability driver (beta acceptance — composes Track B).
  *
  * B1 = Foundation (locks · ps002c-pass · Spec/Gate)
- * B2 = Canonical Flows (future · RELEASE-01-BETA-002)
+ * B2 = Canonical Flows (flow01–04-pass · B1 CERTIFIED)
  * B3 = Platform Capabilities (future · RELEASE-01-BETA-003)
  * B4 = Release Stack (future · RELEASE-01-BETA-004)
  * B5 = Beta Acceptance (future · RELEASE-01-BETA-005)
  */
 import { runRelease01BetaB1Foundation } from "./release-01-beta-b1-foundation.mjs";
+import { runRelease01BetaB2CanonicalFlows } from "./release-01-beta-b2-canonical-flows.mjs";
 
 /**
  * @param {{ root: string, through?: 1|2|3|4|5 | null }} opts
@@ -52,11 +53,35 @@ export function runRelease01BetaCapabilityDriver({ root, through = null }) {
 
   if (max < 2) return { ok: true, steps, evidence };
 
+  console.info("[RELEASE-01-BETA]", "RELEASE_01_BETA_B2_STARTED", {
+    segment: "canonical_flows",
+  });
+  steps.push("RELEASE_01_BETA_B2_STARTED");
+
+  const b2 = runRelease01BetaB2CanonicalFlows({ cwd: root });
+  evidence.b2_checks = b2.checks;
+  if (!b2.ok) {
+    console.error("[RELEASE-01-BETA] B2 FAIL:\n" + b2.reason);
+    return { ok: false, steps, reason: b2.reason, evidence };
+  }
+  evidence.b2_mapped_tokens = b2.mapped_tokens;
+  evidence.b2_source = b2.source;
+
+  console.info("[RELEASE-01-BETA]", "RELEASE_01_BETA_B2_COMPLETED", {
+    segment: "canonical_flows",
+    mapped_tokens: b2.mapped_tokens,
+    source: b2.source,
+    checks: b2.checks,
+  });
+  steps.push("RELEASE_01_BETA_B2_COMPLETED");
+
+  if (max < 3) return { ok: true, steps, evidence };
+
   return {
     ok: false,
     steps,
     reason:
-      "B2 Canonical Flows driver not implemented (RELEASE-01-BETA-002). Do not invent Flow re-runs.",
+      "B3 Platform Capabilities driver not implemented (RELEASE-01-BETA-003). Do not invent Smoke/E2E re-runs.",
     evidence,
   };
 }

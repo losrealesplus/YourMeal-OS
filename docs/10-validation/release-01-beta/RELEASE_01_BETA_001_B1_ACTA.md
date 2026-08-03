@@ -2,9 +2,9 @@
 
 **Documento:** `RELEASE_01_BETA_001_B1_ACTA.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ▶ este PR · PASS through B1 · BLOCKED at `RELEASE_01_BETA_B2_STARTED`  
-**Precondición:** Runner CERTIFIED (#219 · `3994833`) · Gate READY (#220 → `main` @ `2997031`)  
-**Nota:** #221 se mergeó por error en la rama Gate (no en `main`); este PR relanza B1 sobre `main`.  
+**Estado:** ✅ **CERTIFIED desde `main`** · PASS through B1 · BLOCKED at `RELEASE_01_BETA_B2_STARTED`  
+**Tip:** `edc6acf` (Merge #222)  
+**Precondición:** Runner CERTIFIED (#219 · `3994833`) · Gate READY (#220 → `2997031`)  
 **Gate:** [RELEASE_01_BETA_GATE](./RELEASE_01_BETA_GATE.md)  
 **Spec:** [RELEASE_01_BETA_SPEC](../../00-status/RELEASE_01_BETA_SPEC.md)  
 **Comando:** `npm run test:release-01-beta-001`  
@@ -66,10 +66,19 @@ Fuente: `foundation locks · ps002c-pass · Beta Spec/Gate (no B2+ · no FLOW-05
 
 ---
 
-## Canonical / runner-only (mismo PR)
+## Land Check (desde `main` @ `edc6acf`)
+
+```bash
+git pull origin main
+git fetch --tags --prune
+npm run test:release-01-beta-001
+npm run test:release-01-beta
+npm run test:release-01-beta:runner-only
+```
 
 | Comando | Resultado |
 |---------|-----------|
+| `test:release-01-beta-001` | PASS through B1 · BLOCKED at B2 · exit 0 |
 | `test:release-01-beta` | PASS through B1 · BLOCKED at B2 · exit 0 |
 | `test:release-01-beta:runner-only` | BLOCKED at `RELEASE_01_BETA_B1_STARTED` · exit 2 |
 
@@ -80,7 +89,6 @@ Fuente: `foundation locks · ps002c-pass · Beta Spec/Gate (no B2+ · no FLOW-05
 ```text
 READY TO OPEN
 RELEASE-01-BETA-002 · B2 only
-(after Land Check of 001 from main)
 ```
 
 ---
