@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW_05_SPEC.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **FROZEN** (merge #237 · `deba9f6`) · Runner ✅ · Gate ✅ · FLOW05-001 ✅ · FLOW05-002 ▶ B2 CERTIFIED · CERTIFIED_THROUGH=2  
+**Estado:** ✅ **FROZEN** (merge #237 · `deba9f6`) · Runner ✅ · Gate ✅ · 001 ✅ · 002 ✅ · FLOW05-003 ▶ B3 CERTIFIED · CERTIFIED_THROUGH=3  
 **DoR:** [FLOW_05_CUSTOMER_EXPERIENCE_DOR](./FLOW_05_CUSTOMER_EXPERIENCE_DOR.md)  
 **Runner:** [FLOW_05_RUNNER](../10-validation/flow-05/FLOW_05_RUNNER.md)  
 **Gate:** [FLOW_05_GATE](../10-validation/flow-05/FLOW_05_GATE.md)  
@@ -280,7 +280,7 @@ Exit code canónico: **2** (BLOCKED).
 | DoR | `docs/00-status/FLOW_05_CUSTOMER_EXPERIENCE_DOR.md` |
 | Spec (este) | `docs/00-status/FLOW_05_SPEC.md` |
 | Runner docs | `docs/10-validation/flow-05/FLOW_05_RUNNER.md` |
-| Actas Bₙ | `docs/10-validation/flow-05/FLOW05_00N_B*_ACTA.md` · [001](../10-validation/flow-05/FLOW05_001_B1_ACTA.md) · [002](../10-validation/flow-05/FLOW05_002_B2_ACTA.md) |
+| Actas Bₙ | `docs/10-validation/flow-05/FLOW05_00N_B*_ACTA.md` · [001](../10-validation/flow-05/FLOW05_001_B1_ACTA.md) · [002](../10-validation/flow-05/FLOW05_002_B2_ACTA.md) · [003](../10-validation/flow-05/FLOW05_003_B3_ACTA.md) |
 | PASS acta | `docs/10-validation/flow-05/FLOW05_PASS_ACTA.md` |
 | Evidence JSON | `docs/10-validation/flow-05/evidence/` |
 
@@ -311,8 +311,9 @@ Hasta entonces: **prohibido** implementación de dominio · Capacitor · Gate de
 | 3 | Runner only · BLOCKED at B1 | ✅ #238 · `7381ff2` |
 | 4 | Gate FLOW05-001 | ✅ READY #239 · `eb07a1a` |
 | 5 | FLOW05-001 · B1 Registration | ✅ #240 · `07a19b4` |
-| 5b | FLOW05-002 · B2 Authentication | ✅ este PR · CERTIFIED_THROUGH=2 |
-| 5c | FLOW05-003…008 (un bloque / PR) | ⏳ next · 003 |
+| 5b | FLOW05-002 · B2 Authentication | ✅ #241 · `5933f96` |
+| 5c | FLOW05-003 · B3 Order Creation | ✅ este PR · CERTIFIED_THROUGH=3 |
+| 5d | FLOW05-004…008 (un bloque / PR) | ⏳ next · 004 |
 | 6 | FULL PASS · tag `flow05-pass` | ⏳ |
 | 7 | Capacitor / build móvil EatClean | ⏳ **solo tras** `flow05-pass` |
 

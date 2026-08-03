@@ -107,14 +107,15 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual:** **FLOW05-002 · B2 Authentication** (este PR) · PASS through B2 · BLOCKED at B3.  
-DoR ✅ · Spec ✅ FROZEN · Runner ✅ · Gate ✅ · B1 ✅ (#240 · `07a19b4`) · CERTIFIED_THROUGH=2.  
-Acta: [FLOW05_002_B2_ACTA](../10-validation/flow-05/FLOW05_002_B2_ACTA.md).  
-Do **not** abrir B3…B8 · Capacitor · Stores · Deploy en este PR.  
-**Siguiente:** Land Check desde `main` → **FLOW05-003** (B3 Order Creation only).  
+**Objetivo actual:** **FLOW05-003 · B3 Order Creation** (este PR) · PASS through B3 · BLOCKED at B4.  
+DoR ✅ · Spec ✅ · Runner ✅ · Gate ✅ · B1 ✅ · B2 ✅ (#241 · `5933f96`) · CERTIFIED_THROUGH=3.  
+Acta: [FLOW05_003_B3_ACTA](../10-validation/flow-05/FLOW05_003_B3_ACTA.md).  
+Do **not** abrir B4…B8 · Capacitor · Stores · Deploy en este PR.  
+**Siguiente:** Land Check desde `main` → **FLOW05-004** (B4 Production only).  
 **Reglas:** (1) Producto ≠ framework · (2) Land Check desde `main` (Regla 9) · (3) un bloque / PR.  
 **Nota:** restaurar `docs/10-validation/**/evidence/*.json` antes de Land Check si bloquean `git pull`.  
-**Principio:** Identity → YourMeal OS · Brand/rules → Tenant · Journey → Flow.
+**Principio:** Identity → YourMeal OS · Brand/rules → Tenant · Journey → Flow.  
+**B3:** transición de estado → **Ready for Production** (no pantalla).
 
 Cross-flow **no sustituye** runners canónicos: los runners certifican contratos;  
 el cross-flow demuestra que los contratos encadenan:
@@ -128,11 +129,11 @@ Pedido → Producción → Packaging → Entrega
 
 ## Parallel Track A — Business Certification
 
-**Current status:** FLOW05-002 ▶ B2 Authentication · CERTIFIED_THROUGH=2 · BLOCKED at B3
+**Current status:** FLOW05-003 ▶ B3 Order Creation · CERTIFIED_THROUGH=3 · BLOCKED at B4
 
 ```text
-FLOW-05 ▶ FLOW05-002 (este PR) → Land Check → FLOW05-003 (B3 only)
-DoR ✅ → Spec ✅ → Runner ✅ → Gate ✅ → 001 ✅ → 002 ▶ → … → flow05-pass
+FLOW-05 ▶ FLOW05-003 (este PR) → Land Check → FLOW05-004 (B4 only)
+DoR ✅ → Spec ✅ → Runner ✅ → Gate ✅ → 001 ✅ → 002 ✅ → 003 ▶ → … → flow05-pass
 ```
 
 Sin excepciones. Sin features futuras. Una transición / PR.
@@ -193,7 +194,7 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 
 ```text
 Track B (cerrado):   RELEASE-01 ✅ · tag release-01-pass → 8e91a49
-Track A (prioridad): FLOW05-002 ▶ B2 → Land Check → FLOW05-003 (B3)
+Track A (prioridad): FLOW05-003 ▶ B3 → Land Check → FLOW05-004 (B4)
 FOPEBA_LAND_CHECK:   ACTIVE · pull + fetch --tags --prune before every runner
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos
 ```
