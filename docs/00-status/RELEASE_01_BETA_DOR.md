@@ -2,10 +2,11 @@
 
 **Documento:** `RELEASE_01_BETA_DOR.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **DoR CERTIFIED** (`main` · #217 · `740b843`) · Spec ▶ [READY FOR FREEZE](./RELEASE_01_BETA_SPEC.md) · Gate **CLOSED** antes de Runner / BETA-001  
+**Estado:** ✅ **DoR CERTIFIED** (`main` · #217 · `740b843`) · Spec ✅ [FROZEN](./RELEASE_01_BETA_SPEC.md) (#218 · `ed98b3b`) · Runner ▶ [RUNNER](../10-validation/release-01-beta/RELEASE_01_BETA_RUNNER.md) · Gate ⛔ NOT READY  
 **Nivel:** Release Track B · B-06 Beta Acceptance  
 **Pregunta (única):** ¿Qué debe demostrar YourMeal OS para que la primera Beta pueda considerarse certificada?  
 **Spec:** [RELEASE_01_BETA_SPEC](./RELEASE_01_BETA_SPEC.md)  
+**Runner:** [RELEASE_01_BETA_RUNNER](../10-validation/release-01-beta/RELEASE_01_BETA_RUNNER.md)  
 **Estrategia:** [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md)  
 **DoRl:** [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md)  
 **Land Check:** [FOPEBA_LAND_CHECK](./FOPEBA_LAND_CHECK.md)  
@@ -23,9 +24,8 @@
 | RELEASE-DEPLOY | `release-deploy-pass` |
 | RELEASE-ROLLBACK | `release-rollback-pass` → `0ba856e` |
 
-> Este documento responde **solo** la pregunta de Ready.  
-> Spec: [RELEASE_01_BETA_SPEC](./RELEASE_01_BETA_SPEC.md).  
-> **No** Runner. **No** FLOW-05. **No** tag `release-01-beta` en este ciclo DoR/Spec.
+> Ciclo DoR → Spec **COMPLETO**. Runner baseline BLOCKED at B1 (este PR).  
+> **No** drivers B* · FLOW-05 · tag `release-01-beta`.
 
 ---
 
@@ -76,15 +76,15 @@ RELEASE-01-BETA (B-06)
 ☑ Gate CLOSED antes de Runner / BETA-001   → Spec §11
 ☑ DoR CERTIFIED en main                    → #217 · `740b843`
 ☑ SPEC lista (READY FOR FREEZE)            → [RELEASE_01_BETA_SPEC](./RELEASE_01_BETA_SPEC.md)
-☐ Spec FROZEN en main                      → ⏳ tras merge Spec
-☐ Runner creado (BLOCKED baseline)         → ⏳
-☐ Gate READY                               → ⏳
+☑ Spec FROZEN en main                      → #218 · `ed98b3b`
+☑ Runner creado (BLOCKED baseline)         → ▶ este PR · [RUNNER](../10-validation/release-01-beta/RELEASE_01_BETA_RUNNER.md)
+☐ Gate READY                               → ⏳ Land Check desde `main`
 ☐ BETA-001… OPEN                           → ⏳
 ☐ tag release-01-beta                      → ⏳
 ```
 
-**DoR CERTIFIED** · Spec ▶ READY FOR FREEZE.  
-**No** Runner · impl · FLOW-05 en Spec.
+**DoR CERTIFIED** · Spec ✅ FROZEN · Runner ▶ BLOCKED at B1.  
+**No** drivers B* · FLOW-05 · tag en Runner.
 
 ---
 
@@ -93,9 +93,9 @@ RELEASE-01-BETA (B-06)
 | Fase | Trabajo | Estado |
 |------|---------|--------|
 | 0 | DoR document | ✅ #217 · `740b843` |
-| 1 | Spec | ▶ READY FOR FREEZE (este PR) |
-| 2 | Freeze | ⏳ |
-| 3 | Runner only · BLOCKED at B1 | ⏳ |
+| 1 | Spec | ✅ FROZEN #218 · `ed98b3b` |
+| 2 | Freeze | ✅ |
+| 3 | Runner only · BLOCKED at B1 | ▶ este PR |
 | 4 | Gate READY (Land Check `main`) | ⏳ |
 | 5 | Capacidades / PRs Beta (001…005) | ⏳ |
 | 6 | FULL PASS · tag `release-01-beta` | ⏳ |
@@ -114,10 +114,11 @@ Track A:             FLOW-05 CLOSED hasta existir release-01-beta
 ## Next
 
 ```text
-READY FOR FREEZE
-RELEASE-01-BETA Spec
+Runner BLOCKED at B1
     ↓
-Freeze → Runner → Gate → BETA-001…
+Land Check from main → Gate READY
+    ↓
+OPEN RELEASE-01-BETA-001 (B1 only)
 ```
 
 ---
