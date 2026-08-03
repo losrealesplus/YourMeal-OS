@@ -14,12 +14,12 @@
 | **Platform** | `platform-*` o hitos Auth/PS | `ps002c-pass` · futuro `platform-stable` | Infraestructura, Auth, bootstrap, estabilización |
 | **Flow** | `flow*` / `flowNN-pass` | `flow01-pass` · `flow02-pass` | Flujos de negocio completamente certificados (PASS completo del runner) |
 | **Release gate** | `release-<gate>-pass` | `release-smoke-pass` · `release-crossflow-pass` | Gates DoRl de RELEASE-01 (mismo patrón `-pass` que Flows) |
-| **Release** | `release-01-beta` / `v*` semver | `release-01-beta` · `release-v0.2.0` | Producto como conjunto (beta / semver) |
+| **Release** | `release-01-beta` / `release-01-pass` / `v*` | `release-01-beta` · `release-01-pass` · `release-v0.2.0` | Framework beta · producto SaaS · semver |
 
 No cambia la metodología FOPEBA / Evidence before Implementation.  
 Hace legible el historial: **técnica** vs **dominio** vs **gates de producto** vs **release**.
 
-Cadena RELEASE-01 (planificada):
+Cadena RELEASE-01 (certificada):
 
 ```text
 release-smoke-pass
@@ -28,11 +28,14 @@ release-e2e-pass
 release-deploy-pass
 release-rollback-pass
         ↓
-release-01-beta
+release-01-beta          (framework de validación)
+        ↓
+release-01-pass          (producto SaaS certificado)
 ```
 
-Gate de producto: [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) · [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md) (DoRl) · Smoke Spec [RELEASE_SMOKE_SPEC](./RELEASE_SMOKE_SPEC.md).  
-Tag `release-01-beta` solo tras **DoRl PASS** (todos los gates aplicables con su `-pass`).
+Gate de producto: [RELEASE_01_STRATEGY](./RELEASE_01_STRATEGY.md) · [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md) (DoRl).  
+Tag `release-01-beta` = pipeline Track B cerrado.  
+Tag `release-01-pass` = bloques P1–P5 CERTIFIED · Gate CLOSED.
 
 ---
 
@@ -51,6 +54,7 @@ Tag `release-01-beta` solo tras **DoRl PASS** (todos los gates aplicables con su
 | `release-deploy-pass` | Release gate | RELEASE-DEPLOY FULL PASS (D1–D3) → `7896a2a` (#206) · [PASS](../10-validation/release-deploy/RELEASE_DEPLOY_PASS_ACTA.md) |
 | `release-rollback-pass` | Release gate | ✅ → `0ba856e` · [PASS](../10-validation/release-rollback/RELEASE_ROLLBACK_PASS_ACTA.md) |
 | `release-01-beta` | Release | ✅ → `facb917` · [PASS](../10-validation/release-01-beta/RELEASE_01_BETA_PASS_ACTA.md) |
+| `release-01-pass` | Release | ✅ → `8e91a49` · [PASS](../10-validation/release-01/RELEASE_01_PASS_ACTA.md) |
 
 ---
 
@@ -62,6 +66,7 @@ Tag `release-01-beta` solo tras **DoRl PASS** (todos los gates aplicables con su
 | Flow runner `--live` = PASS completo + acta | `flowNN-pass` |
 | Gate DoRl RELEASE-01 PASS (Smoke / Cross-flow / …) | `release-<gate>-pass` (p. ej. `release-smoke-pass`) |
 | RELEASE-01 DoRl PASS (todos los gates aplicables) | ✅ `release-01-beta` → `facb917` · Gate CLOSED · B1–B5 CERTIFIED |
+| RELEASE-01 Product PASS (P1–P5) | ✅ `release-01-pass` → `8e91a49` · Gate CLOSED · P1–P5 CERTIFIED |
 | Release desplegable / semver de producto | `release-vX.Y.Z` o `vX.Y.Z` |
 
 Reglas:
