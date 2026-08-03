@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_01_BETA_SPEC.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **FROZEN** (Spec · #218 · `ed98b3b`) · DoR ✅ (#217) · Runner ✅ #219 · Gate ✅ #220 · B1–B4 ✅ · 005 ▶ B5  
+**Estado:** ✅ **FROZEN** (Spec · #218 · `ed98b3b`) · DoR ✅ (#217) · Runner ✅ #219 · Gate ✅ CLOSED · FULL PASS ✅ tag `release-01-beta` → `facb917`  
 **Gate DoRl:** Beta Acceptance · Track B · RELEASE-01  
 **Nivel:** Release Contract — **no** es un Flow nuevo · **no** inventa capacidades  
 **DoR:** [RELEASE_01_BETA_DOR](./RELEASE_01_BETA_DOR.md) ✅ en `main` (#217 · `740b843`)  
@@ -11,7 +11,8 @@
 **002:** [RELEASE_01_BETA_002_B2_ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_002_B2_ACTA.md) ✅ CERTIFIED #223  
 **003:** [RELEASE_01_BETA_003_B3_ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_003_B3_ACTA.md) ✅ CERTIFIED #224  
 **004:** [RELEASE_01_BETA_004_B4_ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_004_B4_ACTA.md) ✅ #225  
-**005:** [RELEASE_01_BETA_005_B5_ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_005_B5_ACTA.md)  
+**005:** [RELEASE_01_BETA_005_B5_ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_005_B5_ACTA.md) ✅ #226  
+**PASS:** [RELEASE_01_BETA_PASS_ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_PASS_ACTA.md) · tag `release-01-beta` → `facb917`  
 **Precondiciones:** FOUNDATION ✅ · `ps002c-pass` · `flow01-pass`…`flow04-pass` · `release-smoke-pass` · `release-crossflow-pass` · `release-e2e-pass` · `release-deploy-pass` · `release-rollback-pass` → `0ba856e`  
 **DoRl:** [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md)  
 **Estrategia:** [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md)  
@@ -19,8 +20,8 @@
 **Tags:** `release-01-beta` · [GIT_MILESTONE_TAGS](./GIT_MILESTONE_TAGS.md)  
 **Principio:** [Evidence before Implementation](./EVIDENCE_BEFORE_IMPLEMENTATION.md) · [FOPEBA_LAND_CHECK](./FOPEBA_LAND_CHECK.md)
 
-> Contrato FROZEN. 005 ▶ B5 Acceptance (este PR).  
-> **No** FLOW-05 · tag en este PR.  
+> Contrato FROZEN. RELEASE-01-BETA **CERTIFIED**.  
+> Tag `release-01-beta` → `facb917`.  
 > Spec B5 anclas = Outcomes B1–B4 CERTIFIED · checklist · Gate/Runner.
 
 ---
@@ -348,7 +349,7 @@ docs/10-validation/release-01-beta/          ← tras Freeze / Runner
   RELEASE_01_BETA_PASS_ACTA.md
   evidence/
 
-tag (futuro): release-01-beta
+tag: release-01-beta → facb917
 ```
 
 ---
@@ -369,7 +370,8 @@ tag (futuro): release-01-beta
 | RELEASE-01-BETA-002 | ✅ CERTIFIED #223 |
 | RELEASE-01-BETA-003 | ✅ CERTIFIED #224 |
 | RELEASE-01-BETA-004 | ✅ CERTIFIED #225 (B4) |
-| RELEASE-01-BETA-005 | ▶ este PR (B5 only) |
+| RELEASE-01-BETA-005 | ✅ CERTIFIED #226 (B5) |
+| `release-01-beta` | ✅ → `facb917` · [PASS](../10-validation/release-01-beta/RELEASE_01_BETA_PASS_ACTA.md) |
 
 **Estado del documento:** ✅ **FROZEN**
 
@@ -378,12 +380,13 @@ tag (futuro): release-01-beta
 ## 14. Next
 
 ```text
-Land Check 005 from main
+RELEASE-01-BETA CERTIFIED
+tag release-01-beta → facb917
     ↓
-RELEASE-01-BETA CERTIFIED → tag release-01-beta
+READY TO OPEN
+RELEASE-01 DoR
+Documentation only.
 ```
-
-**No** FLOW-05 · tag en 005 · tag solo tras Land Check FULL PASS.
 
 ---
 

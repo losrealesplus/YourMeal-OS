@@ -74,13 +74,13 @@ Esta Strategy **no** escribe implementación ni contratos ejecutables.
 
 ## P1 · Platform Foundation
 
-Incluye únicamente:
+Incluye únicamente (plataforma base · sin módulos de negocio):
 
 - Authentication  
 - Tenant  
 - RBAC  
-- Localization  
 - Profiles  
+- Localization  
 - Settings  
 
 Pregunta del bloque: ¿la plataforma admite identidad, aislamiento y configuración de tenant?
@@ -89,14 +89,13 @@ Pregunta del bloque: ¿la plataforma admite identidad, aislamiento y configuraci
 
 ## P2 · Core Business Modules
 
-Incluye únicamente:
+Incluye únicamente (núcleo funcional · todavía sin operaciones):
 
 - Dish Library  
 - Ingredients  
 - Recipes  
-- Orders  
-- Production  
 - Customers  
+- Orders  
 
 Pregunta del bloque: ¿el núcleo de negocio del SaaS es operable de extremo a extremo?
 
@@ -104,15 +103,15 @@ Pregunta del bloque: ¿el núcleo de negocio del SaaS es operable de extremo a e
 
 ## P3 · Operations
 
-Incluye únicamente:
+Incluye únicamente (operación diaria):
 
-- Deliveries  
-- Routes  
+- Production  
 - Production Calendar  
+- Routes  
+- Deliveries  
 - Inventory  
-- Stock  
 
-Pregunta del bloque: ¿las operaciones diarias (entrega, rutas, inventario) sostienen el producto?
+Pregunta del bloque: ¿las operaciones diarias (producción, rutas, entrega, inventario) sostienen el producto?
 
 ---
 
@@ -132,15 +131,19 @@ Pregunta del bloque: ¿administración, cobro y gobernanza son suficientes para 
 
 ## P5 · Product Acceptance
 
-Incluye únicamente:
+Cierre de RELEASE-01. Incluye únicamente:
 
 - Acceptance checklist  
-- Cross-module verification  
-- Platform readiness  
+- Cross-module verification (coherencia entre módulos)  
+- Navegación principal  
+- Consistencia SaaS  
+- Platform readiness / criterios funcionales del producto  
 
 Pregunta del bloque: ¿el producto como conjunto está listo para declararse RELEASE-01 PASS?
 
-P5 **compone** outcomes P1–P4. No reabre módulos ni re-certifica Track B.
+P5 **compone** outcomes P1–P4.  
+**No** reabre módulos.  
+**No** re-ejecuta Smoke · Cross-flow · E2E · Deploy · Rollback (pipeline ya certificado).
 
 ---
 
@@ -157,8 +160,9 @@ P5 **compone** outcomes P1–P4. No reabre módulos ni re-certifica Track B.
 ## Fuera de esta Strategy
 
 - Spec · Runner · Gate · scripts · tests  
-- Reabrir Smoke / Deploy / Rollback / Beta  
-- Semver `v*` · marketing · despliegue productivo masivo  
+- FLOW-05 · Capacitor · Play Store · App Store  
+- Reabrir Smoke / Cross-flow / E2E / Deploy / Rollback / Beta  
+- CI/CD adicional · producción real · semver `v*` · marketing  
 
 ---
 

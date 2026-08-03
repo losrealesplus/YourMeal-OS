@@ -51,7 +51,7 @@ Sprint activo
   Tags: ps002c-pass · flow01…04-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
   Prioridad                    RELEASE-01 DoR ▶ (producto SaaS · este PR)
-                               tag release-01-beta → facb917 (framework cerrado)
+                               tag release-01-beta → facb917 · Gate Beta CLOSED
                                → ./RELEASE_01_DOR.md · ./RELEASE_01_STRATEGY.md
                                Docs only · No Spec · No Runner · No Gate · No FLOW-05
                                Pipeline Track B reutilizable · no re-certificar

@@ -2,12 +2,13 @@
 
 **Documento:** `RELEASE_01_BETA_005_B5_ACTA.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **PASS** (en PR; CERTIFIED tras Land Check desde `main`) · FULL PASS · `certified_through=B5` · `blocked_at=—`  
-**Tip:** *pendiente de merge*  
+**Estado:** ✅ **CERTIFIED desde `main`** · FULL PASS · `certified_through=B5` · `blocked_at=—`  
+**Tip:** `facb917` (Merge #226) · tag `release-01-beta`  
 **Precondición:** B4 CERTIFIED (#225 · `a75efb1`)  
 **Gate:** [RELEASE_01_BETA_GATE](./RELEASE_01_BETA_GATE.md)  
 **Spec:** [RELEASE_01_BETA_SPEC](../../00-status/RELEASE_01_BETA_SPEC.md)  
 **Checklist:** [RELEASE_01_BETA_ACCEPTANCE](./RELEASE_01_BETA_ACCEPTANCE.md)  
+**Pass acta:** [RELEASE_01_BETA_PASS_ACTA](./RELEASE_01_BETA_PASS_ACTA.md)  
 **Comando:** `npm run test:release-01-beta-005`  
 **Principio:** [FOPEBA_LAND_CHECK](../../00-status/FOPEBA_LAND_CHECK.md)
 
@@ -18,7 +19,7 @@
 > ¿El producto como conjunto cumple Acceptance de la primera beta (RELEASE-01 · B-06)?
 
 Segmento: **B5** · ancla Outcomes B1–B4 CERTIFIED · checklist · Gate/Runner.  
-Sin FLOW-05 · nueva funcionalidad · re-ejecución Deploy/Rollback · tag `release-01-beta` **en este PR**.
+Sin FLOW-05 · nueva funcionalidad · re-ejecución Deploy/Rollback en el incremento 005.
 
 ---
 
@@ -57,11 +58,11 @@ RELEASE_01_BETA_B5_COMPLETED
 - `RELEASE_01_BETA_ACCEPTANCE.md` presente (B1–B4 + tokens B5)  
 - Gate + Runner presentes  
 
-Fuente: `B1–B4 CERTIFIED · acceptance checklist · Gate/Runner (no FLOW-05 · no tag in this PR)`.
+Fuente: `B1–B4 CERTIFIED · acceptance checklist · Gate/Runner (no FLOW-05 · no tag in 005 PR)`.
 
-### Fuera de alcance
+### Fuera de alcance (005)
 
-- FLOW-05 · tag `release-01-beta` en este PR  
+- FLOW-05 · tag `release-01-beta` **en el PR 005** (tag publicado en close-out PASS)  
 - Re-ejecución Smoke / Cross-flow / E2E / Deploy / Rollback · business logic  
 
 ---
@@ -72,7 +73,16 @@ Fuente: `B1–B4 CERTIFIED · acceptance checklist · Gate/Runner (no FLOW-05 ·
 
 ---
 
-## Contratos FOPEBA (este PR)
+## Land Check (desde `main` @ `facb917`)
+
+```bash
+git restore docs/10-validation/release-01-beta/evidence/ 2>/dev/null || true
+git pull origin main
+git fetch --tags --prune
+npm run test:release-01-beta-005
+npm run test:release-01-beta
+npm run test:release-01-beta:runner-only
+```
 
 | Comando | Resultado |
 |---------|-----------|
@@ -82,14 +92,14 @@ Fuente: `B1–B4 CERTIFIED · acceptance checklist · Gate/Runner (no FLOW-05 ·
 
 ---
 
-## Next (post merge)
+## Next
 
 ```text
-Land Check from main
-→ FULL PASS
-→ RELEASE-01-BETA CERTIFIED
-→ tag release-01-beta (fuera de este PR)
-→ FLOW-05 elegible
+RELEASE-01-BETA CERTIFIED
+tag release-01-beta → facb917
+    ↓
+READY TO OPEN
+RELEASE-01 DoR
 ```
 
 ---
