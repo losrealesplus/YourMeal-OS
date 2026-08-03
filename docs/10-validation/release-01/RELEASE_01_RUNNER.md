@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_01_RUNNER.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ Runner **CERTIFIED** (este PR) · runner-only **BLOCKED** at P1 · Gate ✅ READY · **sin** drivers P1–P5  
+**Estado:** ✅ Runner **CERTIFIED** (#229) · live through P1 · runner-only **BLOCKED** at P1 · Gate ✅ READY  
 **Spec:** [RELEASE_01_SPEC](../../00-status/RELEASE_01_SPEC.md) ✅ FROZEN  
 **DoR:** [RELEASE_01_DOR](../../00-status/RELEASE_01_DOR.md)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
@@ -58,36 +58,39 @@ PASS → RELEASE-01 PASS acta / tag de producto
 ## Comandos
 
 ```bash
-# Default = runner-only mientras CERTIFIED_THROUGH = 0
+# Default live through max certified (P1)
 npm run test:release-01
-# → BLOCKED at RELEASE_01_P1_STARTED · exit 2
+# → PASS through P1 · blocked_at=RELEASE_01_P2_STARTED · exit 0
+
+# RELEASE-01-001
+npm run test:release-01-001
+# → PASS through P1 · BLOCKED at P2 · exit 0
 
 npm run test:release-01:runner-only
 # → BLOCKED at RELEASE_01_P1_STARTED · exit 2 · evidence={}
 
-# Unit tests (pipeline only · no drivers)
+# Unit tests (pipeline + P1)
 npm run test:release-01:unit
 ```
 
 **BLOCKED (runner-only) no es defecto** — baseline Gate / Evidence before Implementation.
 
-`CERTIFIED_THROUGH = 0` en este PR: **no** hay drivers P1–P5.  
-LIVE / `--through=P1…` requieren drivers en entregas `RELEASE-01-001…`.
+`CERTIFIED_THROUGH = 1` · driver P1 only. No P2–P5.
 
 ---
 
-## Fuera de alcance (este PR)
+## Fuera de alcance (001)
 
-- Drivers P1–P5 · actas 001…005  
+- Drivers P2–P5 · actas 002…005  
 - FLOW-05 · Capacitor · Stores · producción  
 - Re-certificar Track B  
-- UI / migraciones / business logic de producto  
+- Nueva lógica de negocio  
 
 ---
 
 ## Gate
 
-Ver: [RELEASE_01_GATE](./RELEASE_01_GATE.md) · Decision: ✅ READY · next **RELEASE-01-001** (P1 only).
+Ver: [RELEASE_01_GATE](./RELEASE_01_GATE.md) · Decision: ✅ READY · 001 ▶ [ACTA](./RELEASE_01_001_P1_ACTA.md).
 
 ---
 
@@ -97,7 +100,10 @@ Ver: [RELEASE_01_GATE](./RELEASE_01_GATE.md) · Decision: ✅ READY · next **RE
 |-----------|------|
 | CLI | `scripts/release-01-canonical.mjs` |
 | Pipeline | `scripts/lib/release-01-canonical-pipeline.mjs` |
-| Unit | `scripts/lib/release-01-canonical-pipeline.spec.mjs` |
+| Capability driver | `scripts/lib/release-01-capability-driver.mjs` |
+| P1 Platform Foundation | `scripts/lib/release-01-p1-platform-foundation.mjs` |
+| Unit | `scripts/lib/release-01-*-pipeline.spec.mjs` · `*-p1-*.spec.mjs` |
+| 001 live evidence | `docs/10-validation/release-01/evidence/release-01-001-canonical-live.json` |
 | Runner-only evidence | `docs/10-validation/release-01/evidence/release-01-canonical.json` |
 
 ---
@@ -108,13 +114,15 @@ Ver: [RELEASE_01_GATE](./RELEASE_01_GATE.md) · Decision: ✅ READY · next **RE
 git restore docs/10-validation/release-01/evidence/ 2>/dev/null || true
 git pull origin main
 git fetch --tags --prune
+npm run test:release-01-001
+# → PASS through P1 · BLOCKED at RELEASE_01_P2_STARTED · exit 0
+npm run test:release-01
+# → same
 npm run test:release-01:runner-only
 # → BLOCKED at RELEASE_01_P1_STARTED · exit 2
-npm run test:release-01:unit
-# → pass
 ```
 
-Next: **RELEASE-01-001** (P1 Platform Foundation only).
+Next after 001 Land Check: **RELEASE-01-002** (solo P2).
 
 ---
 

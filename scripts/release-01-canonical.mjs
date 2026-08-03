@@ -2,22 +2,22 @@
 /**
  * RELEASE-01 · Product SaaS canonical runner — Evidence before Implementation.
  *
- * Certifies the product as a whole (P1–P5) by composing product blocks P1–P5 (SaaS).
+ * Certifies YourMeal OS as operable SaaS (P1–P5).
  *
- * Default (CERTIFIED_THROUGH = 0): empty pipeline → BLOCKED at P1.
  * Modes:
- *   --runner-only    Empty pipeline → BLOCKED at P1 (Gate land-check).
+ *   --live           Drive capability segments through CERTIFIED_THROUGH (or --through).
+ *   --runner-only    Empty pipeline → BLOCKED at P1 (historic Gate baseline).
  *   --self-test      Validate frozen full contract (synthetic PASS).
  *   --pipeline=a,b,c Validate an explicit observed step list.
- *   --through=P1|P2|P3|P4|P5   Scope delivery RELEASE-01-001..005 (no drivers yet).
+ *   --through=P1|…   Scope delivery RELEASE-01-001..005.
  *
  * Spec: docs/00-status/RELEASE_01_SPEC.md
  *
- * NO P1–P5 capability drivers in this PR · NO CI · NO infra · NO FLOW-05.
+ * NO P2–P5 drivers in this PR · NO FLOW-05 · NO Capacitor · NO Track B re-cert.
  */
 
-/** Highest segment with a capability driver implemented (0 = runner-only). */
-const RELEASE_01_CERTIFIED_THROUGH = 0;
+/** Highest segment with a capability driver implemented. */
+const RELEASE_01_CERTIFIED_THROUGH = 1;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -25,12 +25,14 @@ import { fileURLToPath } from "node:url";
 import {
   RELEASE_01_CANONICAL_STEPS,
   RELEASE_01_EXIT,
+  RELEASE_01_SEGMENTS,
   buildRelease01EvidenceReport,
   evaluateRelease01Progress,
   formatRelease01ComparisonTable,
   release01StepsThrough,
   validateRelease01Pipeline,
 } from "./lib/release-01-canonical-pipeline.mjs";
+import { runRelease01CapabilityDriver } from "./lib/release-01-capability-driver.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -40,14 +42,20 @@ const EVIDENCE_DIR = path.join(
 );
 
 function evidencePathFor(mode, through) {
+  if (mode === "live" && through) {
+    return path.join(
+      EVIDENCE_DIR,
+      `release-01-00${through}-canonical-live.json`,
+    );
+  }
+  if (mode === "live") {
+    return path.join(EVIDENCE_DIR, "release-01-canonical-live.json");
+  }
   if (mode === "runner-only") {
     return path.join(EVIDENCE_DIR, "release-01-canonical.json");
   }
   if (through) {
-    return path.join(
-      EVIDENCE_DIR,
-      `release-01-00${through}-canonical.json`,
-    );
+    return path.join(EVIDENCE_DIR, `release-01-00${through}-canonical.json`);
   }
   if (mode === "self-test") {
     return path.join(EVIDENCE_DIR, "release-01-canonical-self-test.json");
@@ -59,8 +67,7 @@ function evidencePathFor(mode, through) {
 }
 
 function parseArgs(argv) {
-  // Until B1+ drivers exist, default = runner-only (BLOCKED at P1).
-  let mode = RELEASE_01_CERTIFIED_THROUGH === 0 ? "runner-only" : "live";
+  let mode = "live";
   /** @type {string[] | null} */
   let pipelineArg = null;
   /** @type {1|2|3|4|5 | null} */
@@ -82,8 +89,8 @@ function parseArgs(argv) {
       if (n >= 1 && n <= 5) through = /** @type {1|2|3|4|5} */ (n);
     }
   }
-  if (mode === "live" && RELEASE_01_CERTIFIED_THROUGH === 0) {
-    mode = "runner-only";
+  if (mode === "live" && through == null) {
+    through = /** @type {1|2|3|4|5} */ (RELEASE_01_CERTIFIED_THROUGH);
   }
   return { mode, pipelineArg, through };
 }
@@ -101,40 +108,6 @@ function exitFor(progress) {
   return RELEASE_01_EXIT.FAIL;
 }
 
-async function emitBlockedAtB1() {
-  const pipeline = [];
-  const progress = evaluateRelease01Progress(pipeline, { through: null });
-  const report = buildRelease01EvidenceReport({
-    status: progress.status,
-    reason: progress.reason,
-    pipeline,
-    validation: {
-      duplicates: progress.duplicates,
-      missing: progress.missing,
-      out_of_order: progress.out_of_order,
-      firstFailure: progress.firstFailure,
-    },
-    code_status: "RUNNER_ONLY",
-    progress,
-    evidence: {},
-  });
-
-  console.log("");
-  console.log("RELEASE-01");
-  console.log("");
-  console.log(report.status);
-  console.log("");
-  console.log(`blocked_at=${report.blocked_at}`);
-  console.log(`duplicates=${JSON.stringify(report.duplicates)}`);
-  console.log(`missing=${JSON.stringify(report.missing)}`);
-  console.log(`out_of_order=${JSON.stringify(report.out_of_order)}`);
-  console.log(`evidence=${JSON.stringify(report.evidence)}`);
-
-  const out = await writeEvidence(report, "runner-only", null);
-  console.log(`evidence_file: ${path.relative(ROOT, out)}`);
-  process.exit(exitFor(progress));
-}
-
 async function main() {
   const { mode, pipelineArg, through } = parseArgs(process.argv.slice(2));
 
@@ -148,14 +121,92 @@ async function main() {
   console.log("═══════════════════════════════════════════════");
 
   if (mode === "runner-only") {
-    await emitBlockedAtB1();
+    const pipeline = [];
+    const progress = evaluateRelease01Progress(pipeline, { through: null });
+    const report = buildRelease01EvidenceReport({
+      status: progress.status,
+      reason: progress.reason,
+      pipeline,
+      validation: {
+        duplicates: progress.duplicates,
+        missing: progress.missing,
+        out_of_order: progress.out_of_order,
+        firstFailure: progress.firstFailure,
+      },
+      code_status: "RUNNER_ONLY",
+      progress,
+      evidence: {},
+    });
+
+    console.log("");
+    console.log("RELEASE-01");
+    console.log("");
+    console.log(report.status);
+    console.log("");
+    console.log(`blocked_at=${report.blocked_at}`);
+    console.log(`duplicates=${JSON.stringify(report.duplicates)}`);
+    console.log(`missing=${JSON.stringify(report.missing)}`);
+    console.log(`out_of_order=${JSON.stringify(report.out_of_order)}`);
+    console.log(`evidence=${JSON.stringify(report.evidence)}`);
+
+    const out = await writeEvidence(report, "runner-only", null);
+    console.log(`evidence_file: ${path.relative(ROOT, out)}`);
+    process.exit(exitFor(progress));
   }
 
   if (mode === "live") {
-    console.error(
-      "LIVE mode requires CERTIFIED_THROUGH >= 1 (P1 driver). Not in this PR.",
+    const scope = through ?? RELEASE_01_CERTIFIED_THROUGH;
+    console.log(`Driving RELEASE-01 segments (through=P${scope})…`);
+    const driver = runRelease01CapabilityDriver({
+      root: ROOT,
+      through: scope,
+    });
+    if (!driver.ok) {
+      console.error("Capability driver failed:");
+      console.error(driver.reason ?? "unknown");
+      const report = buildRelease01EvidenceReport({
+        status: "FAIL",
+        reason: driver.reason ?? "RELEASE-01 capability driver failed",
+        pipeline: driver.steps,
+        code_status: "CAPABILITY_DRIVER_FAIL",
+        evidence: driver.evidence ?? {},
+      });
+      await writeEvidence(report, "live", through);
+      process.exit(RELEASE_01_EXIT.FAIL);
+    }
+
+    const observed = driver.steps;
+    const progress = evaluateRelease01Progress(observed, {
+      through: scope,
+    });
+    const report = buildRelease01EvidenceReport({
+      status: progress.status,
+      reason: progress.reason,
+      pipeline: observed,
+      validation: progress,
+      code_status: `CAPABILITY_DRIVER_P${progress.certified_through || 0}`,
+      progress,
+      evidence: driver.evidence ?? {},
+      meta: {
+        terminal: {
+          segment: RELEASE_01_SEGMENTS[progress.certified_through] ?? null,
+        },
+      },
+    });
+
+    console.log(formatRelease01ComparisonTable(progress));
+    console.log("");
+    console.log(progress.reason);
+    console.log(
+      `certified_through=P${progress.certified_through || 0} · blocked_at=${progress.blocked_at ?? "—"}`,
     );
-    process.exit(RELEASE_01_EXIT.FAIL);
+    console.log(
+      `duplicates=${JSON.stringify(report.duplicates)} missing=${JSON.stringify(report.missing)} out_of_order=${JSON.stringify(report.out_of_order)}`,
+    );
+
+    const out = await writeEvidence(report, "live", through ?? scope);
+    console.log(`evidence_file: ${path.relative(ROOT, out)}`);
+    process.exit(exitFor(progress));
   }
 
   if (mode === "self-test") {

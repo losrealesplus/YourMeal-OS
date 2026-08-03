@@ -50,11 +50,11 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    RELEASE-01 › Spec FROZEN · Runner · Gate READY
-                               tag release-01-beta → facb917 (framework cerrado)
-                               → ./RELEASE_01_SPEC.md · ../10-validation/release-01/
-                               Next: RELEASE-01-001 · P1 only · No FLOW-05 · No Capacitor
-                               Pipeline Track B reutilizable · no re-certificar
+  Prioridad                    RELEASE-01-001 (P1 · este PR)
+                               Gate READY #229 · Spec FROZEN · framework release-01-beta ✅
+                               npm run test:release-01 → PASS through P1 · BLOCKED at P2
+                               → ../10-validation/release-01/RELEASE_01_001_P1_ACTA.md
+                               No P2+ · FLOW-05 · Capacitor · Track B re-cert
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)
   Land Check                   ./FOPEBA_LAND_CHECK.md (antes de cualquier 001)
@@ -98,7 +98,7 @@ NEXT PHASE
   ↓
   RELEASE-01 DoR ✅ · Spec FROZEN · Runner · Gate READY
   ↓
-  ▶ RELEASE-01-001 · P1 Platform Foundation
+  ▶ RELEASE-01-001 · P1 Platform Foundation (este PR)
   ↓
   P2…P5 · PASS
   ↓

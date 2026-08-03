@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_01_DOR.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **DoR CERTIFIED** (`main` · #228 · `c13f2b8`) · Spec ✅ FROZEN · Runner ✅ · Gate ✅ READY  
+**Estado:** ✅ **DoR CERTIFIED** (`main` · #228 · `c13f2b8`) · Spec ✅ FROZEN · Runner ✅ · Gate ✅ READY · 001 ▶ P1  
 **Nivel:** Product Release · primera certificación del **producto** (no del framework)  
 **Pregunta (única):** ¿Qué debe demostrar YourMeal OS para certificarse como plataforma SaaS operable?  
 **Estrategia:** [RELEASE_01_STRATEGY](./RELEASE_01_STRATEGY.md)  
@@ -27,7 +27,8 @@ RELEASE-01 puede abrirse cuando:
 ☑ Estrategia de bloques documentada  → RELEASE_01_STRATEGY.md
 ☑ Spec FROZEN                        → [RELEASE_01_SPEC](./RELEASE_01_SPEC.md)
 ☑ Runner / Gate                      → BLOCKED at P1 · Gate READY
-☐ Capacidades P1…P5                  → 001…005
+☑ RELEASE-01-001 OPEN                 → ▶ este PR · [ACTA](../10-validation/release-01/RELEASE_01_001_P1_ACTA.md)
+☐ Capacidades P2…P5                  → 002…005
 ```
 
 Este documento **no** abre Spec, Runner, Gate ni implementación.
@@ -122,10 +123,9 @@ No P2+ · No FLOW-05 · No Capacitor · No Track B re-cert.
 ## Next
 
 ```text
-DoR CERTIFIED · Spec FROZEN · Runner BLOCKED · Gate READY
+RELEASE-01-001 · P1 OPEN
     ↓
-READY TO OPEN
-RELEASE-01-001 · P1 only
+Land Check → READY TO OPEN RELEASE-01-002 (P2 only)
 ```
 
 ---
