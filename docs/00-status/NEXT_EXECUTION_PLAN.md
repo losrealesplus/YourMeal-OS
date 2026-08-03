@@ -107,17 +107,15 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual:** **FLOW05-008 · B8 History** (este PR) · FULL PASS · certified_through=B8 · blocked_at=—.  
-DoR ✅ · Spec ✅ · Runner ✅ · Gate ✅ · B1…B7 ✅ · CERTIFIED_THROUGH=8.  
-Acta: [FLOW05_008_B8_ACTA](../10-validation/flow-05/FLOW05_008_B8_ACTA.md).  
-Do **not** abrir Capacitor · Stores · Deploy · analytics · billing · `flow05-pass` ritual en este PR.  
-**Siguiente:** Merge B7 (#246) → merge B8 → Land Check desde `main` → tag **`flow05-pass`** · `FLOW_05_PASS_ACTA`.  
-**Reglas:** (1) Producto ≠ framework · (2) Land Check desde `main` · (3) un bloque / PR · (4) **una transición de estado / bloque**.  
-**Nota:** restaurar `docs/10-validation/**/evidence/*.json` antes de Land Check si bloquean `git pull`.  
-**Principio:** Identity → YourMeal OS · Brand/rules → Tenant · Journey → Flow.  
-**B8:** Confirmed → **Archived** (memoria del sistema · historial = vista).  
-**Estados:** Identity / Order (FLOW-05) / Operational (internos · no reabren Spec).  
-**UI ≠ contrato** — web / Capacitor / API consumen la misma máquina de estados.
+**Objetivo actual:** **Milestone operativo · Capacitor DoR** (siguiente ciclo) · post–`flow05-pass`.  
+FLOW-05 ✅ CERTIFIED · Gate CLOSED · FULL PASS · certified_through=B8 · blocked_at=—.  
+PASS Acta: [FLOW_05_PASS_ACTA](../10-validation/flow-05/FLOW_05_PASS_ACTA.md).  
+Do **not** abrir Stores · Push · Deep Links · Biometría · GPS · Background en el primer ciclo Capacitor.  
+**Siguiente:** Capacitor DoR → Spec → Runner → Gate → 001… → PASS.  
+**Alcance Capacitor v1:** Web SaaS → Shell nativo → Build reproducible → Android → iOS.  
+**Reglas:** (1) Distribución ≠ producto · (2) Land Check desde `main` · (3) FOPEBA intacto · (4) consolidar.  
+**Principio:** Identity → YourMeal OS · Brand/rules → Tenant · Journey → Flow · Channel → Capacitor.  
+**UI ≠ contrato** — web / Capacitor / API consumen la misma máquina de estados FLOW-05.
 
 Cross-flow **no sustituye** runners canónicos: los runners certifican contratos;  
 el cross-flow demuestra que los contratos encadenan:
@@ -131,11 +129,12 @@ Pedido → Producción → Packaging → Entrega
 
 ## Parallel Track A — Business Certification
 
-**Current status:** FLOW05-008 ▶ B8 History · CERTIFIED_THROUGH=8 · FULL PASS
+**Current status:** FLOW-05 ✅ CERTIFIED · `flow05-pass` · Gate CLOSED → Capacitor DoR next
 
 ```text
-FLOW-05 ▶ FLOW05-008 (este PR) → Land Check → flow05-pass
-001…007 ✅ → 008 ▶ → flow05-pass
+FLOW-05 ✅ B1…B8 · FULL PASS · flow05-pass
+        ↓
+Capacitor DoR → Spec → Runner → Gate → 001…
 ```
 
 Sin excepciones. Sin features futuras. Una transición / PR.
@@ -196,7 +195,7 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 
 ```text
 Track B (cerrado):   RELEASE-01 ✅ · tag release-01-pass → 8e91a49
-Track A (prioridad): FLOW05-008 ▶ B8 → Land Check → flow05-pass
+Track A (prioridad): Capacitor DoR (post–flow05-pass) · distribución · no Stores/Push
 FOPEBA_LAND_CHECK:   ACTIVE · pull + fetch --tags --prune before every runner
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos
 ```

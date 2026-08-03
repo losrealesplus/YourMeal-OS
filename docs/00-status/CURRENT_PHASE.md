@@ -33,7 +33,7 @@ Fase proyecto
   0 · Plataforma              ✅ COMPLETE
   1 · Domain / Flow           ✅ FLOW-01…04 CERTIFIED (metodología probada)
   2 · Product as system       ✅ RELEASE-01 CERTIFIED · tag release-01-pass
-  Pregunta dominante          ¿La experiencia completa de negocio es certificable? (FLOW-05)
+  Pregunta dominante          ¿Cómo llevamos el SaaS certificado a una app instalable?
   Pregunta Flow (sigue)       ¿Este flujo cumple el contrato?
   Principio                   Evidence before Implementation
   Estándar Flow               Definition of Ready (FLOW-XX)
@@ -45,33 +45,31 @@ Sprint activo
   FLOW-02                      ✅ CERTIFIED · tag flow02-pass
   FLOW-03                      ✅ CERTIFIED · tag flow03-pass → 67a2e66
   FLOW-04                      ✅ CERTIFIED · tag flow04-pass → 8be1c26
-  Live: npm run test:flow04-canonical -- --live → FULL PASS
-  Acta: ../10-validation/flow-04/FLOW04_PASS_ACTA.md
+  FLOW-05                      ✅ CERTIFIED · tag flow05-pass
+                               FULL PASS · certified_through=B8 · blocked_at=—
+                               Acta: ../10-validation/flow-05/FLOW_05_PASS_ACTA.md
+                               Gate CLOSED · B1…B8
+  Live: npm run test:flow-05 → FULL PASS
   FLOW Governance              ✅ COMPLETE (#147)
-  Tags: ps002c-pass · flow01…04-pass · release-01-beta · release-01-pass
+  Tags: ps002c-pass · flow01…05-pass · release-01-beta · release-01-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    FLOW05-008 · B8 History ▶ este PR
-                               PASS through B8 · FLOW-05 FULL PASS · blocked_at=—
-                               → ../10-validation/flow-05/FLOW05_008_B8_ACTA.md
-                               B1…B8 ✅ · CERTIFIED_THROUGH=8
-                               Next: merge B7+#246 then B8 → Land Check → flow05-pass
-                               Capacitor · Stores cerrados (hasta flow05-pass)
-                               Regla: un bloque = una transición de estado
-                               B8: Confirmed → Archived (historial = vista)
-                               Order States ≠ Operational States · UI ≠ contrato
+  Prioridad                    Milestone operativo · Capacitor DoR
+                               (distribución · no feature de producto)
+                               Web SaaS → Shell nativo → Build → Android → iOS
+                               NO Stores · Push · Deep Links · Biometría
+                               Regla: consolidar · UI ≠ contrato
+                               Order States ≠ Operational States
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)
   Land Check                   ./FOPEBA_LAND_CHECK.md (antes de cualquier 001)
-  Paralelo                     Track A · FLOW-05 DoR only si Track B lo bloquea
-                               (no abrir por inercia · mismo FOPEBA)
+  Paralelo                     Track A · Capacitor FOPEBA (DoR primero)
   Plan                         ./NEXT_EXECUTION_PLAN.md
   Metrics                      ./FOPEBA_METRICS.md (v0 · sin estimaciones)
   Handoff                      ./PROJECT_HANDOFF.md
   DoRl                         ./DEFINITION_OF_RELEASE.md (DRAFT)
-  Ejes                         A: FLOW-05+ FOPEBA · B: RELEASE-01 (peso ↑)
-  Beta paralelo: BR-03.3 Runtime Validation (G3)
-  Disciplina: una transición / PR · DoR antes de código · DoRl ≠ DoR
-  Riesgo emergente: interacción entre Flows → Cross-flow / E2E
+  Ejes                         A: Capacitor (post–flow05-pass) · B: RELEASE-01 ✅
+  Disciplina: un milestone / ciclo · DoR antes de código · consolidar ≠ correr
+  Riesgo emergente: confundir distribución (Capacitor) con producto (FLOW-05)
 
 ═══════════════════════════════════════════════
 CLOSED GATE
