@@ -27,6 +27,63 @@ Sí: *¿el ciclo cliente es un flujo transversal certificable?*
 
 ---
 
+## Contract boundary (referencia para Spec)
+
+Antes de Freeze, Spec debe respetar estos cuatro anclajes.  
+Si Spec los cambia, debe ser un acta explícita — no crecimiento implícito.
+
+### 1. Dónde empieza
+
+```text
+START = Cliente no autenticado inicia Registro
+        (o identidad cliente creada / vinculada al tenant)
+```
+
+Primer token del contrato (borrador): `FLOW05_T1_*` · Registro / identidad operable.  
+No empieza en Pedido. No empieza en cocina. No empieza en Capacitor.
+
+### 2. Dónde termina
+
+```text
+END = Pedido entregado confirmado y visible en Historial del cliente
+```
+
+Último token del contrato (borrador): `FLOW05_T5_*` · Confirmación → Historial.  
+No termina en “app publicada”. No termina en facturación completa (FLOW-03 ya certificado).  
+No termina en incidencia de entrega (FLOW-02 ya certificado).
+
+### 3. Capacidades que deben existir para considerarlo completo
+
+| Capacidad | Rol en FLOW-05 | Origen certificado |
+|-----------|----------------|--------------------|
+| Registro / identidad cliente | Entrada al ciclo | Platform · P1 Auth / Profiles · Customers (P2) |
+| Login / sesión | Autenticación operable | P1 Auth · PS-002-C |
+| Pedido confirmado | Intención de compra | P2 Orders |
+| Producción | Ejecución de cocina | P3 Production · FLOW-01 |
+| Ruta | Asignación logística | P3 Routes · FLOW-01 |
+| Entrega | Outcome `delivered` | P3 Deliveries · FLOW-01 |
+| Confirmación | Cierre del tramo entrega | FLOW-01 / ops handoff |
+| Historial | Lectura del ciclo por el cliente | Orders + sesión autenticada |
+
+FLOW-05 **encadena** estas capacidades; no las re-implementa ni las re-certifica como módulos sueltos.
+
+### 4. Fuera de alcance explícito (no crece el Flow)
+
+| Fuera | Motivo |
+|-------|--------|
+| Capacitor · App Store · Google Play | Solo tras `flow05-pass` |
+| Billing / cobro / factura | FLOW-03 ya CERTIFIED |
+| Incidencias de entrega / reintentos | FLOW-02 ya CERTIFIED |
+| Consumo de inventario | FLOW-04 ya CERTIFIED |
+| Re-certificar RELEASE-01 / P1–P5 | Producto ya `release-01-pass` |
+| Smoke · Cross-flow · E2E · Deploy · Rollback | Framework Track B cerrado |
+| Marketing · semver `v*` · producción masiva | Fuera de certificación de Flow |
+| Nueva lógica de negocio “porque el piloto lo pide” | Solo vía Spec Freeze / nueva entrega |
+
+**Regla anti-crecimiento:** si una capacidad no aparece en la tabla §3 ni en la cadena START→END, **no entra** en FLOW-05 sin renegociar el Freeze.
+
+---
+
 ## Scope (permitido en DoR)
 
 | Incluye (propuesto) | Excluye (explícito) |
