@@ -1,19 +1,21 @@
 {
   "status": "PASS",
-  "reason": "PASS through B2 · BLOCKED at RELEASE_01_BETA_B3_STARTED for full RELEASE-01-BETA",
+  "reason": "PASS through B3 · BLOCKED at RELEASE_01_BETA_B4_STARTED for full RELEASE-01-BETA",
   "gate": "RELEASE-01-BETA",
   "contract": "RELEASE_01_BETA_SPEC",
   "level": "release",
   "certifies": "beta_acceptance",
   "composes_track_b_pass_tags": true,
   "principle": "Evidence before Implementation",
-  "code_status": "CAPABILITY_DRIVER_B2",
-  "at": "2026-08-03T14:18:31.866Z",
+  "code_status": "CAPABILITY_DRIVER_B3",
+  "at": "2026-08-03T14:18:31.755Z",
   "pipeline": [
     "RELEASE_01_BETA_B1_STARTED",
     "RELEASE_01_BETA_B1_COMPLETED",
     "RELEASE_01_BETA_B2_STARTED",
-    "RELEASE_01_BETA_B2_COMPLETED"
+    "RELEASE_01_BETA_B2_COMPLETED",
+    "RELEASE_01_BETA_B3_STARTED",
+    "RELEASE_01_BETA_B3_COMPLETED"
   ],
   "expected": [
     "RELEASE_01_BETA_B1_STARTED",
@@ -31,13 +33,13 @@
   "missing": [],
   "out_of_order": [],
   "firstFailure": null,
-  "certified_through": 2,
-  "blocked_at": "RELEASE_01_BETA_B3_STARTED",
-  "delivery": "RELEASE-01-BETA-002",
+  "certified_through": 3,
+  "blocked_at": "RELEASE_01_BETA_B4_STARTED",
+  "delivery": "RELEASE-01-BETA-003",
   "delivery_status": "PASS",
   "gate_status": "BLOCKED",
   "terminal": {
-    "segment": "canonical_flows"
+    "segment": "platform_capabilities"
   },
   "evidence": {
     "b1_checks": [
@@ -69,6 +71,20 @@
       "RELEASE_01_BETA_B2_STARTED",
       "RELEASE_01_BETA_B2_COMPLETED"
     ],
-    "b2_source": "flow01–04-pass + PASS actas · B1 CERTIFIED (no B3+ · no FLOW-05 · no Flow re-run)"
+    "b2_source": "flow01–04-pass + PASS actas · B1 CERTIFIED (no B3+ · no FLOW-05 · no Flow re-run)",
+    "b3_checks": [
+      "release_01_beta_b2_acta_certified",
+      "release_smoke_pass_tag_present",
+      "release_crossflow_pass_tag_present",
+      "release_e2e_pass_tag_present",
+      "release_smoke_pass_acta_present",
+      "release_crossflow_pass_acta_present",
+      "release_e2e_pass_acta_present"
+    ],
+    "b3_mapped_tokens": [
+      "RELEASE_01_BETA_B3_STARTED",
+      "RELEASE_01_BETA_B3_COMPLETED"
+    ],
+    "b3_source": "smoke · crossflow · e2e-pass + PASS actas · B2 CERTIFIED (no B4+ · no Deploy/Rollback · no FLOW-05)"
   }
 }

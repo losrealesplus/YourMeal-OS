@@ -2,7 +2,8 @@
 
 **Documento:** `RELEASE_01_BETA_002_B2_ACTA.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ▶ este PR · PASS through B2 · BLOCKED at `RELEASE_01_BETA_B3_STARTED`  
+**Estado:** ✅ **CERTIFIED desde `main`** · PASS through B2 · BLOCKED at `RELEASE_01_BETA_B3_STARTED`  
+**Tip:** `3b837c5` (Merge #223)  
 **Precondición:** B1 CERTIFIED (#222 · `edc6acf`)  
 **Gate:** [RELEASE_01_BETA_GATE](./RELEASE_01_BETA_GATE.md)  
 **Spec:** [RELEASE_01_BETA_SPEC](../../00-status/RELEASE_01_BETA_SPEC.md)  
@@ -63,13 +64,20 @@ Fuente: `flow01–04-pass + PASS actas · B1 CERTIFIED (no B3+ · no FLOW-05 · 
 
 ---
 
-## Canonical / runner-only (mismo PR)
+## Land Check (desde `main` @ `3b837c5`)
+
+```bash
+git pull origin main
+git fetch --tags --prune
+npm run test:release-01-beta-002
+npm run test:release-01-beta
+npm run test:release-01-beta:runner-only
+```
 
 | Comando | Resultado |
 |---------|-----------|
 | `test:release-01-beta-002` | PASS through B2 · BLOCKED at B3 · exit 0 |
 | `test:release-01-beta` | PASS through B2 · BLOCKED at B3 · exit 0 |
-| `test:release-01-beta-001` | PASS through B1 · BLOCKED at B2 · exit 0 |
 | `test:release-01-beta:runner-only` | BLOCKED at `RELEASE_01_BETA_B1_STARTED` · exit 2 |
 
 ---
@@ -79,7 +87,6 @@ Fuente: `flow01–04-pass + PASS actas · B1 CERTIFIED (no B3+ · no FLOW-05 · 
 ```text
 READY TO OPEN
 RELEASE-01-BETA-003 · B3 only
-(after Land Check of 002 from main)
 ```
 
 ---
