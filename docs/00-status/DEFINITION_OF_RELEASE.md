@@ -120,8 +120,8 @@ La conversación sobre beta se ancla a filas con evidencia (detalle vivo en
 | Cross-flow | ✅ | `release-crossflow-pass` → `0a0c51b` · [PASS](../10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md) |
 | E2E | ✅ [PASS acta](../10-validation/release-e2e/RELEASE_E2E_PASS_ACTA.md) · `73623ae` | `release-e2e-pass` |
 | Deployment | ✅ [PASS](../10-validation/release-deploy/RELEASE_DEPLOY_PASS_ACTA.md) · `7896a2a` | `release-deploy-pass` |
-| Rollback | ▶ 003 · FULL PASS · [ACTA](../10-validation/release-rollback/RELEASE_ROLLBACK_003_R3_ACTA.md) | `release-rollback-pass` |
-| Beta Acceptance | ⏳ | `release-01-beta` |
+| Rollback | ✅ [PASS](../10-validation/release-rollback/RELEASE_ROLLBACK_PASS_ACTA.md) · `0ba856e` | `release-rollback-pass` |
+| Beta Acceptance | ▶ DoR ▶ [RELEASE_01_BETA_DOR](./RELEASE_01_BETA_DOR.md) | `release-01-beta` |
 
 Cada gate Track B sigue Spec → Freeze → Runner (BLOCKED) → impl → `-pass`.  
 Cross-flow complementa runners canónicos; no los sustituye.
