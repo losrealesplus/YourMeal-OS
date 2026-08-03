@@ -1,0 +1,120 @@
+{
+  "status": "PASS",
+  "reason": "PASS through B5 · RELEASE-01-BETA FULL PASS",
+  "gate": "RELEASE-01-BETA",
+  "contract": "RELEASE_01_BETA_SPEC",
+  "level": "release",
+  "certifies": "beta_acceptance",
+  "composes_track_b_pass_tags": true,
+  "principle": "Evidence before Implementation",
+  "code_status": "CAPABILITY_DRIVER_B5",
+  "at": "2026-08-03T14:43:44.226Z",
+  "pipeline": [
+    "RELEASE_01_BETA_B1_STARTED",
+    "RELEASE_01_BETA_B1_COMPLETED",
+    "RELEASE_01_BETA_B2_STARTED",
+    "RELEASE_01_BETA_B2_COMPLETED",
+    "RELEASE_01_BETA_B3_STARTED",
+    "RELEASE_01_BETA_B3_COMPLETED",
+    "RELEASE_01_BETA_B4_STARTED",
+    "RELEASE_01_BETA_B4_COMPLETED",
+    "RELEASE_01_BETA_B5_STARTED",
+    "RELEASE_01_BETA_B5_COMPLETED"
+  ],
+  "expected": [
+    "RELEASE_01_BETA_B1_STARTED",
+    "RELEASE_01_BETA_B1_COMPLETED",
+    "RELEASE_01_BETA_B2_STARTED",
+    "RELEASE_01_BETA_B2_COMPLETED",
+    "RELEASE_01_BETA_B3_STARTED",
+    "RELEASE_01_BETA_B3_COMPLETED",
+    "RELEASE_01_BETA_B4_STARTED",
+    "RELEASE_01_BETA_B4_COMPLETED",
+    "RELEASE_01_BETA_B5_STARTED",
+    "RELEASE_01_BETA_B5_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": null,
+  "certified_through": 5,
+  "blocked_at": null,
+  "delivery": "RELEASE-01-BETA-005",
+  "delivery_status": "PASS",
+  "gate_status": "PASS",
+  "terminal": {
+    "segment": "beta_acceptance"
+  },
+  "evidence": {
+    "b1_checks": [
+      "release_01_beta_canonical_script_present",
+      "release_01_beta_canonical_pipeline_intact",
+      "foundation_locks_present",
+      "ps002c_pass_tag_present",
+      "ps002c_pass_acta_present",
+      "release_01_beta_spec_present",
+      "release_01_beta_gate_present"
+    ],
+    "b1_mapped_tokens": [
+      "RELEASE_01_BETA_B1_STARTED",
+      "RELEASE_01_BETA_B1_COMPLETED"
+    ],
+    "b1_source": "foundation locks · ps002c-pass · Beta Spec/Gate (no B2+ · no FLOW-05 · no tag)",
+    "b2_checks": [
+      "release_01_beta_b1_acta_certified",
+      "flow01_pass_tag_present",
+      "flow02_pass_tag_present",
+      "flow03_pass_tag_present",
+      "flow04_pass_tag_present",
+      "flow01_pass_acta_present",
+      "flow02_pass_acta_present",
+      "flow03_pass_acta_present",
+      "flow04_pass_acta_present"
+    ],
+    "b2_mapped_tokens": [
+      "RELEASE_01_BETA_B2_STARTED",
+      "RELEASE_01_BETA_B2_COMPLETED"
+    ],
+    "b2_source": "flow01–04-pass + PASS actas · B1 CERTIFIED (no B3+ · no FLOW-05 · no Flow re-run)",
+    "b3_checks": [
+      "release_01_beta_b2_acta_certified",
+      "release_smoke_pass_tag_present",
+      "release_crossflow_pass_tag_present",
+      "release_e2e_pass_tag_present",
+      "release_smoke_pass_acta_present",
+      "release_crossflow_pass_acta_present",
+      "release_e2e_pass_acta_present"
+    ],
+    "b3_mapped_tokens": [
+      "RELEASE_01_BETA_B3_STARTED",
+      "RELEASE_01_BETA_B3_COMPLETED"
+    ],
+    "b3_source": "smoke · crossflow · e2e-pass + PASS actas · B2 CERTIFIED (no B4+ · no Deploy/Rollback · no FLOW-05)",
+    "b4_checks": [
+      "release_01_beta_b3_acta_certified",
+      "release_deploy_pass_tag_present",
+      "release_rollback_pass_tag_present",
+      "release_deploy_pass_acta_present",
+      "release_rollback_pass_acta_present"
+    ],
+    "b4_mapped_tokens": [
+      "RELEASE_01_BETA_B4_STARTED",
+      "RELEASE_01_BETA_B4_COMPLETED"
+    ],
+    "b4_source": "deploy · rollback-pass + PASS actas · B3 CERTIFIED (no B5 · no FLOW-05 · no Deploy/Rollback re-run)",
+    "b5_checks": [
+      "release_01_beta_b4_acta_certified",
+      "release_01_beta_b1_acta_certified",
+      "release_01_beta_b2_acta_certified",
+      "release_01_beta_b3_acta_certified",
+      "release_01_beta_acceptance_checklist_present",
+      "release_01_beta_gate_present",
+      "release_01_beta_runner_present"
+    ],
+    "b5_mapped_tokens": [
+      "RELEASE_01_BETA_B5_STARTED",
+      "RELEASE_01_BETA_B5_COMPLETED"
+    ],
+    "b5_source": "B1–B4 CERTIFIED · acceptance checklist · Gate/Runner (no FLOW-05 · no tag in this PR)"
+  }
+}
