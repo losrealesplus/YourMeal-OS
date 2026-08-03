@@ -2,16 +2,19 @@
 
 **Documento:** `FLOW_05_GATE.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **READY** · 001…003 ✅ · FLOW05-004 ▶ CERTIFIED (este PR)  
+**Estado:** ✅ **READY** · FLOW05-001 ✅ · FLOW05-002 ✅ · FLOW05-003 ✅ · FLOW05-004 ✅ · FLOW05-005 ▶ CERTIFIED (este PR)  
 **Nivel:** Flow · YourMeal OS (tenant-agnostic · no EatClean-only)  
-**DoR:** [FLOW_05_CUSTOMER_EXPERIENCE_DOR](../../00-status/FLOW_05_CUSTOMER_EXPERIENCE_DOR.md)  
 **Spec:** [FLOW_05_SPEC](../../00-status/FLOW_05_SPEC.md) ✅ FROZEN (#237)  
-**Runner:** [FLOW_05_RUNNER](./FLOW_05_RUNNER.md) · CERTIFIED_THROUGH=4  
-**Acta 003:** [FLOW05_003_B3_ACTA](./FLOW05_003_B3_ACTA.md) ✅ (#242 → `ae8764d`)  
-**Acta 004:** [FLOW05_004_B4_ACTA](./FLOW05_004_B4_ACTA.md)  
+**Runner:** [FLOW_05_RUNNER](./FLOW_05_RUNNER.md) · CERTIFIED_THROUGH=5  
+**Acta 001:** [FLOW05_001_B1_ACTA](./FLOW05_001_B1_ACTA.md) ✅  
+**Acta 002:** [FLOW05_002_B2_ACTA](./FLOW05_002_B2_ACTA.md) ✅  
+**Acta 003:** [FLOW05_003_B3_ACTA](./FLOW05_003_B3_ACTA.md) ✅  
+**Acta 004:** [FLOW05_004_B4_ACTA](./FLOW05_004_B4_ACTA.md) ✅ (#243 → `1181c21`)  
+**Acta 005:** [FLOW05_005_B5_ACTA](./FLOW05_005_B5_ACTA.md)  
 **Land Check:** [FOPEBA_LAND_CHECK](../../00-status/FOPEBA_LAND_CHECK.md)
 
-> Cada bloque certifica **exactamente una** transición de estado.
+> Cada bloque certifica **exactamente una** transición de estado.  
+> Order States (FLOW-05) ≠ Operational States (internos).
 
 ---
 
@@ -21,23 +24,26 @@
 ☑ DoR · Spec · Runner · Gate READY
 ☑ FLOW05-001 · B1 Registration
 ☑ FLOW05-002 · B2 Authentication
-☑ FLOW05-003 · B3 Order Creation (#242 → ae8764d)
-☑ FLOW05-004 · B4 Production (este PR)
-☐ FLOW05-005…008
+☑ FLOW05-003 · B3 Order Creation
+☑ FLOW05-004 · B4 Production (#243 → 1181c21)
+☑ FLOW05-005 · B5 Route Planning (este PR)
+☐ FLOW05-006 · B6 Delivery
+☐ FLOW05-007 · B7 Delivery Confirmation
+☐ FLOW05-008 · B8 History
 ☐ flow05-pass / Capacitor
 ```
 
 ### Decision
 
 ```text
-FLOW05-004 · B4 Production · CERTIFIED
+FLOW05-005 · B5 Route Planning · CERTIFIED
     ↓
-PASS through B4 · blocked_at=FLOW05_B5_STARTED · exit 0
+PASS through B5 · blocked_at=FLOW05_B6_STARTED · exit 0
     ↓
-NEXT · FLOW05-005 · B5 Route Planning only
+NEXT · FLOW05-006 · B6 Delivery only
 ```
 
-B4 termina en **Ready for Route Planning**.
+B5 termina en **Ready for Delivery**.
 
 ### Progress
 
@@ -45,15 +51,17 @@ B4 termina en **Ready for Route Planning**.
 |----------|-------|--------|
 | FLOW05-001 | B1 Registration | ✅ |
 | FLOW05-002 | B2 Authentication | ✅ |
-| FLOW05-003 | B3 Order Creation | ✅ #242 · `ae8764d` |
-| **FLOW05-004** | **B4 Production** | ✅ **este PR** |
-| FLOW05-005 | B5 Route Planning | ⏳ next |
-| FLOW05-006…008 | B6…B8 | 🔒 |
+| FLOW05-003 | B3 Order Creation | ✅ |
+| FLOW05-004 | B4 Production | ✅ #243 · `1181c21` |
+| **FLOW05-005** | **B5 Route Planning** | ✅ **este PR** |
+| FLOW05-006 | B6 Delivery | ⏳ next |
+| FLOW05-007 | B7 Delivery Confirmation | 🔒 |
+| FLOW05-008 | B8 History | 🔒 |
 | `flow05-pass` | FULL PASS | ⏳ |
 
 ### Permanecen cerrados
 
-B5 Route Planning (next) · B6…B8 · Capacitor · Stores · Deploy
+B6 Delivery (next) · B7 Confirmation · B8 History · Capacitor · Stores · Deploy
 
 ---
 
