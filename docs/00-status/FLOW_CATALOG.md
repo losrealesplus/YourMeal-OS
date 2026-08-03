@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW_CATALOG.md`  
 **Fecha:** 2026-08-02  
-**Estado:** FLOW-01…04 ✅ CERTIFIED · FLOW-05 ▶ FLOW05-004 (B4) · DoR estándar ✅ (#147)  
+**Estado:** FLOW-01…04 ✅ CERTIFIED · FLOW-05 ▶ FLOW05-005 (B5) · DoR estándar ✅ (#147)  
 **Piloto:** EatClean  
 **Fase:** 1 · Domain / Flow (Fase 0 · Plataforma COMPLETE · Fase 2 · RELEASE-01 CERTIFIED)  
 **Plataforma:** PS-002-C ✅ · FCR-008 FROZEN · tag `ps002c-pass`  
@@ -42,7 +42,7 @@ Sí: `FLOW-01 Kitchen → Delivery`.
 
 | ID | Handoff / alcance | Prioridad | Motivo | Estado |
 |----|-------------------|-----------|--------|--------|
-| **FLOW-05** | Customer Experience Lifecycle | Alta | Registro → … → Historial (B1–B8) | ▶ **FLOW05-004 B4** · [Acta](../10-validation/flow-05/FLOW05_004_B4_ACTA.md) · CERTIFIED_THROUGH=4 · BLOCKED at B5 · Spec ✅ [FROZEN](./FLOW_05_SPEC.md) |
+| **FLOW-05** | Customer Experience Lifecycle | Alta | Registro → … → Historial (B1–B8) | ▶ **FLOW05-005 B5** · [Acta](../10-validation/flow-05/FLOW05_005_B5_ACTA.md) · CERTIFIED_THROUGH=5 · BLOCKED at B6 · Spec ✅ [FROZEN](./FLOW_05_SPEC.md) |
 | **FLOW-06** | Kitchen Planning | Media | Planificación previa a T1 | ⏳ DoR NOT STARTED |
 
 > Orden recomendado: cada Flow aprovecha el anterior sin mezclar responsabilidades.  
