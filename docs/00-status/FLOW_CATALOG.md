@@ -42,7 +42,7 @@ Sí: `FLOW-01 Kitchen → Delivery`.
 
 | ID | Handoff / alcance | Prioridad | Motivo | Estado |
 |----|-------------------|-----------|--------|--------|
-| **FLOW-05** | Customer Experience Lifecycle | Alta | Registro → Login → Pedido → Producción → Ruta → Entrega → Confirmación → Historial | ▶ **DoR** · [FLOW_05_CUSTOMER_EXPERIENCE_DOR](./FLOW_05_CUSTOMER_EXPERIENCE_DOR.md) · post `release-01-pass` |
+| **FLOW-05** | Customer Experience Lifecycle | Alta | Registro → … → Historial (B1–B8) | ▶ **Spec READY FOR FREEZE** · [FLOW_05_SPEC](./FLOW_05_SPEC.md) · [DoR](./FLOW_05_CUSTOMER_EXPERIENCE_DOR.md) |
 | **FLOW-06** | Kitchen Planning | Media | Planificación previa a T1 | ⏳ DoR NOT STARTED |
 
 > Orden recomendado: cada Flow aprovecha el anterior sin mezclar responsabilidades.  

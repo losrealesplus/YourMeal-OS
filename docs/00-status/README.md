@@ -8,7 +8,7 @@
 **Dev Bootstrap:** [BOOTSTRAP_MODE](./BOOTSTRAP_MODE.md) · `VITE_BOOTSTRAP_MODE` default OFF (nunca producción)  
 **Order Intake:** [ORDER_INTAKE](./ORDER_INTAKE.md) · [ADR 0017](../adr/0017-order-intake.md) · CAP-008 scaffold  
 **RI-001:** **[PROGRAM FROZEN](./RI001_PROGRAM_FROZEN.md)** · [Backlog A–I](./RI001_OPERATIONAL_READINESS_BACKLOG.md) · Evidence Gates · [P13](../20-evidence-framework/12-certification-completeness-p13.md) · **[EP-OPS-003 Journeys](./EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md)** · **[Methodology FROZEN](./EP_OPS_003_METHODOLOGY_FROZEN.md)**  
-**Fase actual:** [CURRENT_PHASE](./CURRENT_PHASE.md) ← **FLOW-05 DoR ▶** · [FLOW_05_CUSTOMER_EXPERIENCE_DOR](./FLOW_05_CUSTOMER_EXPERIENCE_DOR.md) · RELEASE-01 ✅ [`release-01-pass`](./GIT_MILESTONE_TAGS.md) · [**PASS acta](../10-validation/release-01/RELEASE_01_PASS_ACTA.md)** · [**FOPEBA Land Check](./FOPEBA_LAND_CHECK.md)** · [FLOW_CATALOG](./FLOW_CATALOG.md)  
+**Fase actual:** [CURRENT_PHASE](./CURRENT_PHASE.md) ← **FLOW-05 Spec ▶** · [FLOW_05_SPEC](./FLOW_05_SPEC.md) READY FOR FREEZE · DoR [FLOW_05](./FLOW_05_CUSTOMER_EXPERIENCE_DOR.md) ✅ · RELEASE-01 ✅ [`release-01-pass`](./GIT_MILESTONE_TAGS.md) · [FLOW_CATALOG](./FLOW_CATALOG.md)  
 **Dominios:** [PROJECT_DOMAINS](./PROJECT_DOMAINS.md) — Knowledge · Engineering · Experience · Operations  
 **Engineering Phase:** [ENGINEERING_PHASE](./ENGINEERING_PHASE.md) — Complete (pending operational authorization)  
 **Última integración:** [IR-001](./IR-001_FIRST_ENGINEERING_INTEGRATION.md) · PR #22  
