@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_01_GATE.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **READY** · Spec FROZEN · Runner live through P4 · DoR ✅ (#228) · P1–P3 ✅ · 004 ▶ este PR  
+**Estado:** ✅ **READY** · Spec FROZEN · Runner live through P5 · DoR ✅ (#228) · P1–P4 ✅ · 005 ▶ este PR  
 **Nivel:** Product Release · YourMeal OS como SaaS  
 **Spec:** [RELEASE_01_SPEC](../../00-status/RELEASE_01_SPEC.md) ✅ FROZEN  
 **Runner:** [RELEASE_01_RUNNER](./RELEASE_01_RUNNER.md)  
@@ -11,7 +11,8 @@
 **001:** [RELEASE_01_001_P1_ACTA](./RELEASE_01_001_P1_ACTA.md) ✅ CERTIFIED #230  
 **002:** [RELEASE_01_002_P2_ACTA](./RELEASE_01_002_P2_ACTA.md) ✅ CERTIFIED #231  
 **003:** [RELEASE_01_003_P3_ACTA](./RELEASE_01_003_P3_ACTA.md) ✅ CERTIFIED #232  
-**004:** [RELEASE_01_004_P4_ACTA](./RELEASE_01_004_P4_ACTA.md)  
+**004:** [RELEASE_01_004_P4_ACTA](./RELEASE_01_004_P4_ACTA.md) ✅ CERTIFIED #233  
+**005:** [RELEASE_01_005_P5_ACTA](./RELEASE_01_005_P5_ACTA.md)  
 **Land Check:** [FOPEBA_LAND_CHECK](../../00-status/FOPEBA_LAND_CHECK.md)
 
 > `main` certifica; las ramas solo proponen.  
@@ -31,9 +32,9 @@
 ☑ RELEASE-01-001 CERTIFIED → #230 · `391fdd8`
 ☑ RELEASE-01-002 CERTIFIED → #231 · `caad4c3`
 ☑ RELEASE-01-003 CERTIFIED → #232 · `ddf4027`
-☑ RELEASE-01-004 OPEN → ▶ este PR (P4)
-☐ RELEASE-01-005
-☐ RELEASE-01 PASS / tag de producto
+☑ RELEASE-01-004 CERTIFIED → #233 · `f1c83cd`
+☑ RELEASE-01-005 OPEN → ▶ este PR (P5)
+☐ RELEASE-01 PASS / tag de producto (tras Land Check 005)
 ```
 
 ### Land Check evidence (runner-only)
@@ -54,10 +55,10 @@ npm run test:release-01:unit
 ### Decision
 
 ```text
-RELEASE-01-004 · P4 OPEN (este PR)
-PASS through P4 · BLOCKED at RELEASE_01_P5_STARTED
+RELEASE-01-005 · P5 OPEN (este PR)
+FULL PASS · certified_through=P5 · blocked_at=—
     ↓
-Land Check from main → READY TO OPEN 005
+Land Check from main → READY TO OPEN tag release-01-pass / PASS acta
 ```
 
 ### Progress
@@ -71,9 +72,9 @@ Land Check from main → READY TO OPEN 005
 | RELEASE-01-001 | P1 Platform Foundation | ✅ CERTIFIED #230 |
 | RELEASE-01-002 | P2 Core Business | ✅ CERTIFIED #231 |
 | RELEASE-01-003 | P3 Operations | ✅ CERTIFIED #232 |
-| RELEASE-01-004 | P4 Administration | ▶ este PR |
-| RELEASE-01-005 | P5 Product Acceptance | ⏳ |
-| RELEASE-01 PASS | Product certified | ⏳ |
+| RELEASE-01-004 | P4 Administration | ✅ CERTIFIED #233 |
+| RELEASE-01-005 | P5 Product Acceptance | ▶ este PR |
+| RELEASE-01 PASS | Product certified | ⏳ tras Land Check |
 
 ---
 

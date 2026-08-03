@@ -107,10 +107,10 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual:** **RELEASE-01-004** (P4 Administration · este PR).  
-P1–P3 ✅ CERTIFIED (#230…#232 · `ddf4027`) · Gate READY · Spec FROZEN.  
-Contrato: `npm run test:release-01` → PASS through P4 · BLOCKED at `RELEASE_01_P5_STARTED` · exit 0.  
-Do **not** open P5 · FLOW-05 · Capacitor · Track B re-cert en 004.  
+**Objetivo actual:** **RELEASE-01-005** (P5 Product Acceptance · este PR).  
+P1–P4 ✅ CERTIFIED (#230…#233 · `f1c83cd`) · Gate READY · Spec FROZEN.  
+Contrato: `npm run test:release-01` → FULL PASS · `certified_through=P5` · `blocked_at=—` · exit 0.  
+Do **not** open FLOW-05 · Capacitor · Deploy · tag `release-01-pass` en 005.  
 **Reglas:** (1) Producto ≠ framework · (2) Land Check desde `main` (Regla 9) · (3) un bloque / PR.  
 **Nota:** restaurar `docs/10-validation/**/evidence/*.json` antes de Land Check si bloquean `git pull`.
 
@@ -190,8 +190,8 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 ## Current Goal
 
 ```text
-Track B (prioridad): RELEASE-01-004 ▶ P4 · este PR → Land Check → 005
-Track A:             FLOW-05 no por inercia · candidato como criterio de RELEASE-01
+Track B (prioridad): RELEASE-01-005 ▶ P5 · este PR → Land Check → tag release-01-pass
+Track A:             FLOW-05 no por inercia · candidato post RELEASE-01 PASS
 FOPEBA_LAND_CHECK:   ACTIVE · pull + fetch --tags --prune before every runner
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos
 ```

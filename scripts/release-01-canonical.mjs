@@ -13,11 +13,11 @@
  *
  * Spec: docs/00-status/RELEASE_01_SPEC.md
  *
- * NO P5 driver in this PR · NO FLOW-05 · NO Capacitor · NO Track B re-cert.
+ * NO FLOW-05 · NO Capacitor · NO Track B re-cert · NO functional change in P5.
  */
 
 /** Highest segment with a capability driver implemented. */
-const RELEASE_01_CERTIFIED_THROUGH = 4;
+const RELEASE_01_CERTIFIED_THROUGH = 5;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -197,6 +197,9 @@ async function main() {
     console.log(formatRelease01ComparisonTable(progress));
     console.log("");
     console.log(progress.reason);
+    if (progress.status === "PASS" && progress.certified_through >= 5) {
+      console.log("FULL PASS");
+    }
     console.log(
       `certified_through=P${progress.certified_through || 0} · blocked_at=${progress.blocked_at ?? "—"}`,
     );
