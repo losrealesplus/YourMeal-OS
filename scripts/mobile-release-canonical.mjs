@@ -15,11 +15,11 @@
  *
  * Spec: docs/00-status/MOBILE_RELEASE_01_SPEC.md
  *
- * CERTIFIED_THROUGH=1 — MR1 Preparation only · NO APK · NO signing · NO stores.
+ * CERTIFIED_THROUGH=2 — MR1+MR2 (Preparation + Android Build unsigned) · NO signing · NO stores.
  */
 
 /** Highest block with a capability driver implemented. */
-const MOBILE_RELEASE_CERTIFIED_THROUGH = 1;
+const MOBILE_RELEASE_CERTIFIED_THROUGH = 2;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";

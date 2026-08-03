@@ -30,6 +30,9 @@ supabase/.temp/
 .wrangler/
 .dev.vars
 
+# Local Android SDK (machine-specific · Native Tool Artifacts)
+.android-sdk/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
