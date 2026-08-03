@@ -99,6 +99,32 @@ Nunca empieces directamente implementando.
 
 ---
 
+## Native Tool Artifacts Rule
+
+Los archivos generados automáticamente por Android Studio, Xcode, Gradle o Swift Package Manager **no** se consideran cambios del producto hasta que hayan sido revisados y aceptados explícitamente.
+
+```text
+IDE sync / cache / metadata
+        ≠
+cambio de producto versionable
+```
+
+Ejemplos típicos (locales · no producto hasta revisión):
+
+- `android/gradle/gradle-daemon-jvm.properties`
+- `*.xcworkspace/xcshareddata/swiftpm/`
+- regeneraciones locales de `capacitor.build.gradle` / `Package.swift` sin decisión de producto
+
+Reglas:
+
+1. Ningún Land Check ni tag `-pass` con artefactos locales pendientes de evaluación.
+2. Antes de `git pull origin main` tras abrir Android Studio / Xcode: `git status` → `git restore` / limpieza de artefactos IDE si aplica → working tree clean → pull → Land Check.
+3. Solo versionar lo que forme parte del contrato Distribution (config Capacitor, manifiestos, scripts, drivers, actas).
+
+YourMeal OS: ver también [FOPEBA_LAND_CHECK](./docs/00-status/FOPEBA_LAND_CHECK.md) · tag `capacitor-pass`.
+
+---
+
 ## Responsabilidad
 
 Cada componente debe tener una única responsabilidad.

@@ -33,7 +33,8 @@ Fase proyecto
   0 · Plataforma              ✅ COMPLETE
   1 · Domain / Flow           ✅ FLOW-01…04 CERTIFIED (metodología probada)
   2 · Product as system       ✅ RELEASE-01 CERTIFIED · tag release-01-pass
-  Pregunta dominante          ¿Cómo llevamos el SaaS certificado a una app instalable?
+  Pregunta dominante          ¿Qué capacidades de distribución reales añadimos
+                              sobre el Core ya certificable en Web · Android · iOS?
   Pregunta Flow (sigue)       ¿Este flujo cumple el contrato?
   Principio                   Evidence before Implementation
   Estándar Flow               Definition of Ready (FLOW-XX)
@@ -50,26 +51,32 @@ Sprint activo
                                Acta: ../10-validation/flow-05/FLOW_05_PASS_ACTA.md
                                Gate CLOSED · B1…B8
   Live: npm run test:flow-05 → FULL PASS
+  CAPACITOR                    ✅ CERTIFIED · tag capacitor-pass → 400a010 (#256)
+                               FULL PASS · certified_through=C5 · blocked_at=—
+                               Acta: ../10-validation/capacitor/CAPACITOR_PASS_ACTA.md
+                               Gate CLOSED · C1…C5 · Distribution Certified
+  Live: npm run test:capacitor → FULL PASS
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…05-pass · release-01-beta · release-01-pass
+        · capacitor-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    Milestone operativo · Capacitor DoR
-                               (distribución · no feature de producto)
-                               Web SaaS → Shell nativo → Build → Android → iOS
-                               NO Stores · Push · Deep Links · Biometría
-                               Regla: consolidar · UI ≠ contrato
+  Prioridad                    MOBILE-RELEASE-01 · Mobile Production Readiness
+                               (DoR primero · no abrir stores sin contrato)
+                               firma · Play Internal · TestFlight · CI builds
+                               NO reabrir C1–C5 · Core Integrity intacta
+                               Regla: Native Tool Artifacts (FOUNDATION.md)
                                Order States ≠ Operational States
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)
   Land Check                   ./FOPEBA_LAND_CHECK.md (antes de cualquier 001)
-  Paralelo                     Track A · Capacitor FOPEBA (DoR primero)
+  Paralelo                     Track A · device APIs solo cuando aporten valor
   Plan                         ./NEXT_EXECUTION_PLAN.md
   Metrics                      ./FOPEBA_METRICS.md (v0 · sin estimaciones)
   Handoff                      ./PROJECT_HANDOFF.md
   DoRl                         ./DEFINITION_OF_RELEASE.md (DRAFT)
-  Ejes                         A: Capacitor (post–flow05-pass) · B: RELEASE-01 ✅
+  Ejes                         A: MOBILE-RELEASE-01 · B: RELEASE-01 ✅
   Disciplina: un milestone / ciclo · DoR antes de código · consolidar ≠ correr
-  Riesgo emergente: confundir distribución (Capacitor) con producto (FLOW-05)
+  Riesgo emergente: confundir publicación en stores con reabrir Capacitor v1
 
 ═══════════════════════════════════════════════
 CLOSED GATE
@@ -110,7 +117,13 @@ NEXT PHASE
   ↓
   FLOW05-001 · B1 Registration only
   ↓
-  Capacitor solo cuando flow05-pass exista (no por inercia)
+  FLOW-05 ✅ FULL PASS · tag flow05-pass
+  ↓
+  Capacitor DoR → Spec → Runner → C1…C5
+  ↓
+  ▶ CAPACITOR ✅ CERTIFIED · tag capacitor-pass → 400a010
+  ↓
+  Next · MOBILE-RELEASE-01 DoR (Internal Testing · firma · CI)
 
 En paralelo (beta móvil EatClean):
   Lema: cada PR acerca la jornada completa del piloto.
