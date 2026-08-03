@@ -15,11 +15,11 @@
  *
  * Spec: docs/00-status/MOBILE_RELEASE_01_SPEC.md
  *
- * CERTIFIED_THROUGH=0 — no MR drivers yet · NO APK · NO signing · NO stores.
+ * CERTIFIED_THROUGH=1 — MR1 Preparation only · NO APK · NO signing · NO stores.
  */
 
 /** Highest block with a capability driver implemented. */
-const MOBILE_RELEASE_CERTIFIED_THROUGH = 0;
+const MOBILE_RELEASE_CERTIFIED_THROUGH = 1;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -27,12 +27,14 @@ import { fileURLToPath } from "node:url";
 import {
   MOBILE_RELEASE_CANONICAL_STEPS,
   MOBILE_RELEASE_EXIT,
+  MOBILE_RELEASE_SEGMENTS,
   buildMobileReleaseEvidenceReport,
   evaluateMobileReleaseProgress,
   formatMobileReleaseComparisonTable,
   mobileReleaseStepsThrough,
   validateMobileReleasePipeline,
 } from "./lib/mobile-release-canonical-pipeline.mjs";
+import { runMobileReleaseCapabilityDriver } from "./lib/mobile-release-capability-driver.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -45,7 +47,7 @@ function evidencePathFor(mode, through) {
   if (mode === "live" && through) {
     return path.join(
       EVIDENCE_DIR,
-      `mobile-release-0${through}-canonical-live.json`,
+      `mobile-release-00${through}-canonical-live.json`,
     );
   }
   if (mode === "live") {
@@ -55,7 +57,10 @@ function evidencePathFor(mode, through) {
     return path.join(EVIDENCE_DIR, "mobile-release-canonical.json");
   }
   if (through) {
-    return path.join(EVIDENCE_DIR, `mobile-release-0${through}-canonical.json`);
+    return path.join(
+      EVIDENCE_DIR,
+      `mobile-release-00${through}-canonical.json`,
+    );
   }
   if (mode === "self-test") {
     return path.join(EVIDENCE_DIR, "mobile-release-canonical-self-test.json");
@@ -209,11 +214,54 @@ async function main() {
       process.exit(code);
     }
 
-    console.error(
-      "MOBILE-RELEASE capability drivers are not implemented yet (CERTIFIED_THROUGH=0).",
+    console.log(`Driving MOBILE-RELEASE blocks (through=MR${scope})…`);
+    const driver = runMobileReleaseCapabilityDriver({
+      root: ROOT,
+      through: scope,
+    });
+    if (!driver.ok) {
+      console.error("Capability driver failed:");
+      console.error(driver.reason ?? "unknown");
+      const report = buildMobileReleaseEvidenceReport({
+        status: "FAIL",
+        reason: driver.reason ?? "MOBILE-RELEASE capability driver failed",
+        pipeline: driver.steps,
+        code_status: "CAPABILITY_DRIVER_FAIL",
+        evidence: driver.evidence ?? {},
+      });
+      await writeEvidence(report, "live", through);
+      process.exit(MOBILE_RELEASE_EXIT.FAIL);
+    }
+
+    const observed = driver.steps;
+    const progress = evaluateMobileReleaseProgress(observed, {
+      through: scope,
+    });
+    const report = buildMobileReleaseEvidenceReport({
+      status: progress.status,
+      reason: progress.reason,
+      pipeline: observed,
+      validation: progress,
+      code_status: `CAPABILITY_DRIVER_MR${progress.certified_through || 0}`,
+      progress,
+      evidence: driver.evidence ?? {},
+      meta: {
+        terminal: {
+          segment:
+            MOBILE_RELEASE_SEGMENTS[progress.certified_through] ?? null,
+        },
+      },
+    });
+
+    console.log(formatMobileReleaseComparisonTable(progress));
+    console.log("");
+    console.log(progress.reason);
+    console.log(
+      `certified_through=MR${progress.certified_through || 0} · blocked_at=${progress.blocked_at ?? "—"}`,
     );
-    console.error("Open MR01-001 · Preparation only after Gate READY.");
-    process.exit(MOBILE_RELEASE_EXIT.FAIL);
+    const out = await writeEvidence(report, "live", through ?? scope);
+    console.log(`evidence_file: ${path.relative(ROOT, out)}`);
+    process.exit(exitFor(progress));
   }
 
   if (mode === "self-test") {
