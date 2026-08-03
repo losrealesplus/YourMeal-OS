@@ -2,18 +2,15 @@
 
 **Documento:** `FLOW_05_RUNNER.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ Runner **CERTIFIED** (#238 · `7381ff2`) · CERTIFIED_THROUGH = 0 · BLOCKED at B1 · Gate ✅ READY  
+**Estado:** ✅ Runner **CERTIFIED** · CERTIFIED_THROUGH = **1** (B1) · BLOCKED at B2 · Gate ✅  
 **Spec:** [FLOW_05_SPEC](../../00-status/FLOW_05_SPEC.md) **FROZEN**  
 **DoR:** [FLOW_05_CUSTOMER_EXPERIENCE_DOR](../../00-status/FLOW_05_CUSTOMER_EXPERIENCE_DOR.md)  
 **Gate:** [FLOW_05_GATE](./FLOW_05_GATE.md)  
+**Acta:** [FLOW05_001_B1_ACTA](./FLOW05_001_B1_ACTA.md)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)
 
-> Pregunta que responde este PR:  
-> **¿Existe un contrato ejecutable para FLOW-05?**  
-> No: ¿Registro? · ¿Pedido? · ¿Capacitor? · ¿EatClean-only?
-
-FLOW-05 certifica el **recorrido completo del cliente** (tenant-agnostic).  
-EatClean será la primera implementación — no el contrato.
+> FLOW-05 certifica el **recorrido completo del cliente** (tenant-agnostic).  
+> EatClean será la primera implementación — no el contrato.
 
 ---
 
@@ -21,50 +18,30 @@ EatClean será la primera implementación — no el contrato.
 
 ```text
 FLOW-05
-FLOW05_B1_STARTED      → Registration
+FLOW05_B1_STARTED      → Registration          ✅ CERTIFIED (FLOW05-001)
     ↓
 FLOW05_B1_COMPLETED
     ↓
-FLOW05_B2_STARTED      → Authentication
+FLOW05_B2_STARTED      → Authentication        ⏳ next
     ↓
-FLOW05_B2_COMPLETED
-    ↓
-FLOW05_B3_STARTED      → Order Creation
-    ↓
-FLOW05_B3_COMPLETED
-    ↓
-FLOW05_B4_STARTED      → Production
-    ↓
-FLOW05_B4_COMPLETED
-    ↓
-FLOW05_B5_STARTED      → Route Planning
-    ↓
-FLOW05_B5_COMPLETED
-    ↓
-FLOW05_B6_STARTED      → Delivery
-    ↓
-FLOW05_B6_COMPLETED
-    ↓
-FLOW05_B7_STARTED      → Delivery Confirmation
-    ↓
-FLOW05_B7_COMPLETED
-    ↓
-FLOW05_B8_STARTED      → History
-    ↓
+…
 FLOW05_B8_COMPLETED
     ↓
 PASS → tag flow05-pass (futuro)
 ```
 
-`CERTIFIED_THROUGH = 0` — ningún bloque ejecutado. Solo institucionaliza el contrato.
+`CERTIFIED_THROUGH = 1` — B1 Registration PASS · full journey BLOCKED at B2.
 
 ---
 
 ## Comandos
 
 ```bash
+npm run test:flow05-001
+# → PASS through B1 · blocked_at=FLOW05_B2_STARTED · exit 0
+
 npm run test:flow-05
-# → BLOCKED at FLOW05_B1_STARTED · exit 2
+# → PASS through B1 · blocked_at=FLOW05_B2_STARTED · exit 0
 
 npm run test:flow-05:runner-only
 # → BLOCKED at FLOW05_B1_STARTED · exit 2 · evidence={}
@@ -72,34 +49,35 @@ npm run test:flow-05:runner-only
 npm run test:flow-05:unit
 ```
 
-Resultado esperado (ambos):
+Resultado esperado (`test:flow05-001` / `test:flow-05`):
 
 ```text
-FLOW-05
-
-BLOCKED
-
-blocked_at=FLOW05_B1_STARTED
-duplicates=[]
-missing=[]
-out_of_order=[]
-evidence={}
+PASS through B1 · BLOCKED at FLOW05_B2_STARTED for full FLOW-05
+certified_through=B1 · blocked_at=FLOW05_B2_STARTED
 ```
 
-Exit code: **2** (BLOCKED).  
-JSON: `docs/10-validation/flow-05/evidence/flow-05-canonical.json`
+Exit code: **0** (delivery PASS).  
+JSON: `docs/10-validation/flow-05/evidence/flow-05-001-canonical-live.json`  
+Aggregate: `docs/10-validation/flow-05/evidence/flow-05-canonical-live.json`
 
-**BLOCKED ≠ FAIL** — todavía no hay drivers B1–B8.
+Runner-only (contrato vacío, sin drivers):
+
+```text
+BLOCKED
+blocked_at=FLOW05_B1_STARTED
+duplicates=[] missing=[] out_of_order=[] evidence={}
+```
+
+Exit code: **2** (BLOCKED).
 
 ---
 
-## Fuera de alcance (este PR)
+## Fuera de alcance (FLOW05-001)
 
-- Gate · FLOW05-001…008  
-- Drivers B1–B8 · lógica de negocio  
+- B2 Login · JWT · sesión · dashboard  
+- B3…B8 · pedidos · producción · rutas · entregas · historial  
 - Capacitor · App Store · Google Play  
-- Billing · Inventory · Incidents (Flows 02–04)  
-- Acoplar el contrato a EatClean  
+- UX avanzada · negocio EatClean-only  
 
 ---
 
@@ -107,27 +85,32 @@ JSON: `docs/10-validation/flow-05/evidence/flow-05-canonical.json`
 
 | Artefacto | Path |
 |-----------|------|
-| CLI | `scripts/flow-05-canonical.mjs` |
+| CLI | `scripts/flow-05-canonical.mjs` · `CERTIFIED_THROUGH=1` |
 | Pipeline | `scripts/lib/flow-05-canonical-pipeline.mjs` |
-| Capability driver | `scripts/lib/flow-05-capability-driver.mjs` (stub · CERTIFIED_THROUGH=0) |
-| Unit | `scripts/lib/flow-05-canonical-pipeline.spec.mjs` |
-| Runner-only evidence | `docs/10-validation/flow-05/evidence/flow-05-canonical.json` |
+| B1 driver | `scripts/lib/flow-05-b1-registration.mjs` |
+| Capability driver | `scripts/lib/flow-05-capability-driver.mjs` |
+| Unit | `scripts/lib/flow-05-*-*.spec.mjs` |
+| Live 001 | `docs/10-validation/flow-05/evidence/flow-05-001-canonical-live.json` |
+| Live aggregate | `docs/10-validation/flow-05/evidence/flow-05-canonical-live.json` |
+| Runner-only | `docs/10-validation/flow-05/evidence/flow-05-canonical.json` |
 
 ---
 
-## Land Check (from this PR / after merge)
+## Land Check (after merge to `main`)
 
 ```bash
 git restore docs/10-validation/flow-05/evidence/ 2>/dev/null || true
 git pull origin main
 git fetch --tags --prune
+npm run test:flow05-001
+# → PASS through B1 · blocked_at=FLOW05_B2_STARTED · exit 0
 npm run test:flow-05
-# → BLOCKED at FLOW05_B1_STARTED · exit 2
-npm run test:flow-05:runner-only
 # → same
+npm run test:flow-05:runner-only
+# → BLOCKED at FLOW05_B1_STARTED · exit 2
 ```
 
-Next after Runner Land Check: **FLOW-05 Gate** ✅ READY · autoriza **FLOW05-001** (B1 only).
+Next after Land Check: **FLOW05-002 · B2 Authentication** only.
 
 ---
 

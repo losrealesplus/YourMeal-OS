@@ -15,11 +15,11 @@
  *
  * Spec: docs/00-status/FLOW_05_SPEC.md
  *
- * NO B1–B8 drivers · NO Gate · NO Capacitor · NO EatClean-only coupling.
+ * NO B2–B8 drivers · NO Capacitor · NO EatClean-only coupling.
  */
 
 /** Highest block with a capability driver implemented. */
-const FLOW05_CERTIFIED_THROUGH = 0;
+const FLOW05_CERTIFIED_THROUGH = 1;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -93,8 +93,14 @@ function parseArgs(argv) {
 
 async function writeEvidence(report, mode, through) {
   await mkdir(EVIDENCE_DIR, { recursive: true });
+  const payload = `${JSON.stringify(report, null, 2)}\n`;
   const target = evidencePathFor(mode, through);
-  await writeFile(target, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  await writeFile(target, payload, "utf8");
+  // Keep aggregate live evidence when scoped deliveries advance CERTIFIED_THROUGH.
+  if (mode === "live" && through != null && through === FLOW05_CERTIFIED_THROUGH) {
+    const aggregate = path.join(EVIDENCE_DIR, "flow-05-canonical-live.json");
+    if (aggregate !== target) await writeFile(aggregate, payload, "utf8");
+  }
   return target;
 }
 

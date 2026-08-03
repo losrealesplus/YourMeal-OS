@@ -2,11 +2,12 @@
 
 **Documento:** `FLOW_05_GATE.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **READY** · DoR ✅ · Spec ✅ FROZEN · Runner ✅ CERTIFIED · autoriza FLOW05-001 only  
+**Estado:** ✅ **READY** · DoR ✅ · Spec ✅ FROZEN · Runner ✅ · FLOW05-001 ▶ CERTIFIED (este PR)  
 **Nivel:** Flow · YourMeal OS (tenant-agnostic · no EatClean-only)  
 **DoR:** [FLOW_05_CUSTOMER_EXPERIENCE_DOR](../../00-status/FLOW_05_CUSTOMER_EXPERIENCE_DOR.md)  
 **Spec:** [FLOW_05_SPEC](../../00-status/FLOW_05_SPEC.md) ✅ FROZEN (#237)  
-**Runner:** [FLOW_05_RUNNER](./FLOW_05_RUNNER.md) ✅ (#238 → `7381ff2`)  
+**Runner:** [FLOW_05_RUNNER](./FLOW_05_RUNNER.md) ✅ (#238 → `7381ff2`) · CERTIFIED_THROUGH=1  
+**Acta 001:** [FLOW05_001_B1_ACTA](./FLOW05_001_B1_ACTA.md)  
 **Land Check:** [FOPEBA_LAND_CHECK](../../00-status/FOPEBA_LAND_CHECK.md)  
 **Precondiciones:** FLOW-01…04 ✅ · RELEASE-01 ✅ · tag `release-01-pass` → `8e91a49`
 
@@ -20,61 +21,25 @@
 ```text
 ☑ DoR certified (#236)
 ☑ Spec FROZEN (#237 · deba9f6)
-☑ Runner CERTIFIED (#238 → 7381ff2) · CERTIFIED_THROUGH=0
-☑ Land Check from main · BLOCKED at FLOW05_B1_STARTED · exit 2
-☑ duplicates=[] missing=[] out_of_order=[] evidence={}
-☑ Gate READY (este PR)
-☐ FLOW05-001 · B1 Registration
+☑ Runner CERTIFIED (#238 → 7381ff2)
+☑ Gate READY (#239 → eb07a1a)
+☑ FLOW05-001 · B1 Registration (este PR)
 ☐ FLOW05-002…008
 ☐ flow05-pass / Capacitor
 ```
 
-### Land Check evidence (from `main` @ `7381ff2`)
-
-```bash
-git restore docs/10-validation/flow-05/evidence/ 2>/dev/null || true
-git pull origin main
-git fetch --tags --prune
-npm run test:flow-05
-npm run test:flow-05:runner-only
-```
-
-| Comando | Resultado |
-|---------|-----------|
-| `test:flow-05` | BLOCKED at `FLOW05_B1_STARTED` · exit 2 |
-| `test:flow-05:runner-only` | BLOCKED at `FLOW05_B1_STARTED` · exit 2 |
-
 ### Decision
 
 ```text
-FLOW-05 Gate READY
+FLOW05-001 · B1 Registration · CERTIFIED
     ↓
-READY TO OPEN
-FLOW05-001 · B1 Registration only
+PASS through B1 · blocked_at=FLOW05_B2_STARTED · exit 0
+    ↓
+NEXT · FLOW05-002 · B2 Authentication only
 ```
 
-No certifica negocio · UX · pantallas · Capacitor.  
-Únicamente autoriza abrir la **primera** entrega de dominio del recorrido.
-
-### Apertura autorizada
-
-| Delivery | Bloque | Estado |
-|----------|--------|--------|
-| **FLOW05-001** | B1 Registration | ⏳ **autorizado** |
-
-### Permanecen cerrados
-
-| Bloque / tema | Estado |
-|---------------|--------|
-| B2 Authentication | 🔒 cerrado |
-| B3 Order Creation | 🔒 cerrado |
-| B4 Production | 🔒 cerrado |
-| B5 Route Planning | 🔒 cerrado |
-| B6 Delivery | 🔒 cerrado |
-| B7 Delivery Confirmation | 🔒 cerrado |
-| B8 History | 🔒 cerrado |
-| Capacitor · App Store · Google Play | 🔒 cerrado |
-| Deploy · Stores | 🔒 cerrado |
+No certifica login · sesión · dashboard · pedidos · Capacitor.  
+B1 termina en **Ready for Authentication**.
 
 ### Progress
 
@@ -82,10 +47,10 @@ No certifica negocio · UX · pantallas · Capacitor.
 |----------|-------|--------|
 | DoR | Ready framework | ✅ #236 |
 | Spec | Contract B1–B8 | ✅ FROZEN #237 |
-| Runner | BLOCKED at B1 · CERTIFIED_THROUGH=0 | ✅ #238 · `7381ff2` |
-| Gate | READY | ✅ este PR |
-| FLOW05-001 | B1 Registration | ⏳ READY TO OPEN |
-| FLOW05-002 | B2 Authentication | 🔒 |
+| Runner | Contract executable | ✅ #238 · `7381ff2` |
+| Gate | READY | ✅ #239 · `eb07a1a` |
+| **FLOW05-001** | **B1 Registration** | ✅ **este PR** |
+| FLOW05-002 | B2 Authentication | ⏳ next |
 | FLOW05-003 | B3 Order Creation | 🔒 |
 | FLOW05-004 | B4 Production | 🔒 |
 | FLOW05-005 | B5 Route Planning | 🔒 |
@@ -94,18 +59,24 @@ No certifica negocio · UX · pantallas · Capacitor.
 | FLOW05-008 | B8 History | 🔒 |
 | `flow05-pass` | FULL PASS | ⏳ |
 
+### Permanecen cerrados
+
+| Bloque / tema | Estado |
+|---------------|--------|
+| B2 Authentication | ⏳ next (solo tras Land Check) |
+| B3…B8 | 🔒 cerrado |
+| Capacitor · App Store · Google Play | 🔒 cerrado |
+| Deploy · Stores | 🔒 cerrado |
+
 ---
 
 ## Arquitectura (recordatorio Gate)
 
 ```text
 YourMeal OS
-├── Core Platform (RELEASE-01 CERTIFIED)
-├── FLOW-01…04 CERTIFIED
-├── FLOW-05 ▶ Customer Experience Lifecycle (este Gate)
-└── Multi-Tenant
-    ├── EatClean (primer tenant · no el Flow)
-    └── … futuros tenants
+├── Core Flows (FLOW-01…05…)
+├── Business Modules (Dish · Orders · Inventory · Billing…)
+└── Tenant Configuration (EatClean · Singular · …)
 ```
 
 FLOW05-001 implementa **Registration** del contrato SaaS — no “el registro de EatClean”.

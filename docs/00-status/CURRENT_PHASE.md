@@ -1,6 +1,6 @@
 # CURRENT_PHASE
 
-**Última actualización:** 2026-08-02  
+**Última actualización:** 2026-08-03  
 **No sustituye** [MILESTONES](./MILESTONES.md) — tablero de “dónde estamos ahora”.
 
 ```text
@@ -50,11 +50,12 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass · release-01-beta · release-01-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    FLOW-05 Gate ✅ READY · este PR
-                               Autoriza FLOW05-001 · B1 Registration only
-                               → ../10-validation/flow-05/FLOW_05_GATE.md
-                               Runner ✅ #238 · Spec FROZEN · release-01-pass
-                               B2…B8 · Capacitor · Stores cerrados
+  Prioridad                    FLOW05-001 · B1 Registration ▶ este PR
+                               PASS through B1 · blocked_at=FLOW05_B2_STARTED
+                               → ../10-validation/flow-05/FLOW05_001_B1_ACTA.md
+                               Gate ✅ #239 · Runner CERTIFIED_THROUGH=1
+                               Next: Land Check → FLOW05-002 (B2 only)
+                               B3…B8 · Capacitor · Stores cerrados
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)
   Land Check                   ./FOPEBA_LAND_CHECK.md (antes de cualquier 001)

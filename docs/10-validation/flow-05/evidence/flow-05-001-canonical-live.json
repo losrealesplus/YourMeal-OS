@@ -1,0 +1,71 @@
+{
+  "status": "PASS",
+  "reason": "PASS through B1 · BLOCKED at FLOW05_B2_STARTED for full FLOW-05",
+  "gate": "FLOW-05",
+  "contract": "FLOW_05_SPEC",
+  "level": "flow",
+  "certifies": "customer_experience_lifecycle",
+  "tenant_agnostic": true,
+  "principle": "Evidence before Implementation",
+  "code_status": "CAPABILITY_DRIVER_B1",
+  "at": "2026-08-03T16:06:02.583Z",
+  "pipeline": [
+    "FLOW05_B1_STARTED",
+    "FLOW05_B1_COMPLETED"
+  ],
+  "expected": [
+    "FLOW05_B1_STARTED",
+    "FLOW05_B1_COMPLETED",
+    "FLOW05_B2_STARTED",
+    "FLOW05_B2_COMPLETED",
+    "FLOW05_B3_STARTED",
+    "FLOW05_B3_COMPLETED",
+    "FLOW05_B4_STARTED",
+    "FLOW05_B4_COMPLETED",
+    "FLOW05_B5_STARTED",
+    "FLOW05_B5_COMPLETED",
+    "FLOW05_B6_STARTED",
+    "FLOW05_B6_COMPLETED",
+    "FLOW05_B7_STARTED",
+    "FLOW05_B7_COMPLETED",
+    "FLOW05_B8_STARTED",
+    "FLOW05_B8_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": null,
+  "certified_through": 1,
+  "blocked_at": "FLOW05_B2_STARTED",
+  "delivery": "FLOW05-001",
+  "delivery_status": "PASS",
+  "flow_status": "BLOCKED",
+  "terminal": {
+    "segment": "registration"
+  },
+  "evidence": {
+    "segments": {
+      "1": "registration",
+      "2": "authentication",
+      "3": "order_creation",
+      "4": "production",
+      "5": "route_planning",
+      "6": "delivery",
+      "7": "delivery_confirmation",
+      "8": "history"
+    },
+    "b1_checks": [
+      "flow_05_gate_ready",
+      "registration_entry_present",
+      "account_creation_present",
+      "profile_bootstrap_present",
+      "tenant_association_present",
+      "ready_for_authentication_present"
+    ],
+    "b1_mapped_tokens": [
+      "FLOW05_B1_STARTED",
+      "FLOW05_B1_COMPLETED"
+    ],
+    "b1_source": "Registration entry · account · profile · tenant · ready for auth · Gate READY (no B2+ · no session · no Capacitor)"
+  }
+}

@@ -107,10 +107,11 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual:** **FLOW-05 Gate READY** (este PR) · autoriza **FLOW05-001** (B1 Registration only).  
-DoR ✅ · Spec ✅ FROZEN · Runner ✅ (#238 · `7381ff2`) · Land Check BLOCKED at B1.  
-Gate: [FLOW_05_GATE](../10-validation/flow-05/FLOW_05_GATE.md).  
-Do **not** abrir B2…B8 · Capacitor · Stores · Deploy en Gate.  
+**Objetivo actual:** **FLOW05-001 · B1 Registration** (este PR) · PASS through B1 · BLOCKED at B2.  
+DoR ✅ · Spec ✅ FROZEN · Runner ✅ · Gate ✅ (#239 · `eb07a1a`) · CERTIFIED_THROUGH=1.  
+Acta: [FLOW05_001_B1_ACTA](../10-validation/flow-05/FLOW05_001_B1_ACTA.md).  
+Do **not** abrir B2…B8 · Capacitor · Stores · Deploy en este PR.  
+**Siguiente:** Land Check desde `main` → **FLOW05-002** (B2 Authentication only).  
 **Reglas:** (1) Producto ≠ framework · (2) Land Check desde `main` (Regla 9) · (3) un bloque / PR.  
 **Nota:** restaurar `docs/10-validation/**/evidence/*.json` antes de Land Check si bloquean `git pull`.
 
@@ -126,11 +127,11 @@ Pedido → Producción → Packaging → Entrega
 
 ## Parallel Track A — Business Certification
 
-**Current status:** FLOW-05 Spec ✅ FROZEN · Runner ✅ · Gate ▶ READY
+**Current status:** FLOW05-001 ▶ B1 Registration · CERTIFIED_THROUGH=1 · BLOCKED at B2
 
 ```text
-FLOW-05 ▶ Gate READY (este PR) → FLOW05-001 (B1 only)
-DoR ✅ → Spec ✅ → Runner ✅ → Gate ▶ → FLOW05-001… → flow05-pass
+FLOW-05 ▶ FLOW05-001 (este PR) → Land Check → FLOW05-002 (B2 only)
+DoR ✅ → Spec ✅ → Runner ✅ → Gate ✅ → FLOW05-001 ▶ → … → flow05-pass
 ```
 
 Sin excepciones. Sin features futuras. Una transición / PR.
@@ -191,7 +192,7 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 
 ```text
 Track B (cerrado):   RELEASE-01 ✅ · tag release-01-pass → 8e91a49
-Track A (prioridad): FLOW-05 Gate READY ▶ → FLOW05-001 (B1 Registration)
+Track A (prioridad): FLOW05-001 ▶ B1 → Land Check → FLOW05-002 (B2)
 FOPEBA_LAND_CHECK:   ACTIVE · pull + fetch --tags --prune before every runner
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos
 ```
