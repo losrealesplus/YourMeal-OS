@@ -1,0 +1,70 @@
+{
+  "status": "PASS",
+  "reason": "PASS through P2 · BLOCKED at RELEASE_01_P3_STARTED for full RELEASE-01",
+  "gate": "RELEASE-01",
+  "contract": "RELEASE_01_SPEC",
+  "level": "release",
+  "certifies": "product_acceptance",
+  "composes_track_b_pass_tags": true,
+  "principle": "Evidence before Implementation",
+  "code_status": "CAPABILITY_DRIVER_P2",
+  "at": "2026-08-03T15:20:03.505Z",
+  "pipeline": [
+    "RELEASE_01_P1_STARTED",
+    "RELEASE_01_P1_COMPLETED",
+    "RELEASE_01_P2_STARTED",
+    "RELEASE_01_P2_COMPLETED"
+  ],
+  "expected": [
+    "RELEASE_01_P1_STARTED",
+    "RELEASE_01_P1_COMPLETED",
+    "RELEASE_01_P2_STARTED",
+    "RELEASE_01_P2_COMPLETED",
+    "RELEASE_01_P3_STARTED",
+    "RELEASE_01_P3_COMPLETED",
+    "RELEASE_01_P4_STARTED",
+    "RELEASE_01_P4_COMPLETED",
+    "RELEASE_01_P5_STARTED",
+    "RELEASE_01_P5_COMPLETED"
+  ],
+  "duplicates": [],
+  "missing": [],
+  "out_of_order": [],
+  "firstFailure": null,
+  "certified_through": 2,
+  "blocked_at": "RELEASE_01_P3_STARTED",
+  "delivery": "RELEASE-01-002",
+  "delivery_status": "PASS",
+  "gate_status": "BLOCKED",
+  "terminal": {
+    "segment": "core_business"
+  },
+  "evidence": {
+    "p1_checks": [
+      "authentication_present",
+      "tenant_system_present",
+      "rbac_present",
+      "profiles_present",
+      "localization_present",
+      "settings_present"
+    ],
+    "p1_mapped_tokens": [
+      "RELEASE_01_P1_STARTED",
+      "RELEASE_01_P1_COMPLETED"
+    ],
+    "p1_source": "Authentication · Tenant · RBAC · Profiles · Localization · Settings (no P2+ · no FLOW-05 · no Capacitor)",
+    "p2_checks": [
+      "release_01_p1_acta_certified",
+      "dish_library_present",
+      "ingredients_present",
+      "recipes_present",
+      "customers_present",
+      "orders_present"
+    ],
+    "p2_mapped_tokens": [
+      "RELEASE_01_P2_STARTED",
+      "RELEASE_01_P2_COMPLETED"
+    ],
+    "p2_source": "Dish Library · Ingredients · Recipes · Customers · Orders · P1 CERTIFIED (no P3+ · no ops · no FLOW-05)"
+  }
+}

@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_01_SPEC.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **FROZEN** (Spec · #229) · DoR ✅ (#228) · Runner ✅ · Gate ✅ READY · 001 ▶ P1  
+**Estado:** ✅ **FROZEN** (Spec · #229) · DoR ✅ (#228) · Runner ✅ · Gate ✅ READY · P1 ✅ · 002 ▶ P2  
 **Nivel:** Product Release Contract — certifica **YourMeal OS como SaaS** · **no** el framework  
 **DoR:** [RELEASE_01_DOR](./RELEASE_01_DOR.md) ✅ en `main` (#228 · `c13f2b8`)  
 **Strategy:** [RELEASE_01_STRATEGY](./RELEASE_01_STRATEGY.md)  
@@ -231,8 +231,9 @@ Gate nunca se cierra solo porque un PR pase.
 | Spec FROZEN | ✅ este PR |
 | Runner live through P1 | ✅ #229…001 |
 | Gate READY | ✅ #229 |
-| RELEASE-01-001 | ▶ este PR (P1 only) |
-| RELEASE-01-002…005 | ⏳ |
+| RELEASE-01-001 | ✅ CERTIFIED #230 (P1) |
+| RELEASE-01-002 | ▶ este PR (P2 only) |
+| RELEASE-01-003…005 | ⏳ |
 
 **Estado del documento:** ✅ **FROZEN**
 
@@ -241,12 +242,12 @@ Gate nunca se cierra solo porque un PR pase.
 ## 10. Next
 
 ```text
-RELEASE-01-001 · P1 OPEN
+RELEASE-01-002 · P2 OPEN
     ↓
 Land Check from main
     ↓
 READY TO OPEN
-RELEASE-01-002 · P2 only
+RELEASE-01-003 · P3 only
 ```
 
 ---

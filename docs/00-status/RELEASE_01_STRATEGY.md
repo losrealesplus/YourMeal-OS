@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_01_STRATEGY.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **ACTIVE** · Spec FROZEN · Runner through P1 · Gate READY · 001 ▶  
+**Estado:** ✅ **ACTIVE** · Spec FROZEN · Runner through P2 · Gate READY · 002 ▶  
 **Nivel:** Product Release · certificación SaaS de YourMeal OS  
 **DoR:** [RELEASE_01_DOR](./RELEASE_01_DOR.md)  
 **DoRl:** [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md)  
@@ -169,9 +169,9 @@ P5 **compone** outcomes P1–P4.
 ## Next
 
 ```text
-RELEASE-01-001 · P1 OPEN
+RELEASE-01-002 · P2 OPEN
     ↓
-READY TO OPEN RELEASE-01-002 · P2 only (tras Land Check)
+READY TO OPEN RELEASE-01-003 · P3 only (tras Land Check)
 ```
 
 ---
