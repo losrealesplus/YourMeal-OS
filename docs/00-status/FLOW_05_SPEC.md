@@ -158,9 +158,11 @@ Spec congela el contrato; Runner e implementación solo evidencian estos handoff
 | | Contrato |
 |---|----------|
 | **¿Qué recibe?** | Entrega confirmada (outcome B7) · sesión del cliente autenticado |
-| **¿Qué transforma?** | Pedido visible y legible en Historial del cliente |
-| **¿Qué entrega?** | Ciclo cerrado — **END** del Flow |
+| **¿Qué transforma?** | Pedido archivado · persistido · consultable · visible en Historial |
+| **¿Qué entrega?** | Ciclo cerrado — **END** · Order State **Archived** |
 | **Tokens** | `FLOW05_B8_STARTED` · `FLOW05_B8_COMPLETED` |
+
+> Historial es la vista. El contrato termina en **Archived** (memoria del sistema, fuera de operación).
 
 ---
 
