@@ -34,7 +34,13 @@ FOPEBA Land Check
 
 Antes de cualquier certificación / 001 / tag:
 
-1. git pull origin main
+0. (Si hubo Android Studio / Xcode)
+   Cerrar IDE si sigue escribiendo archivos · git status
+   → restore / limpiar Native Tool Artifacts (FOUNDATION.md)
+   → working tree clean
+
+1. git restore docs/**/evidence/*.json   (si aplica)
+   git pull origin main
 
 2. git fetch --tags --prune
    (sincroniza anchors -pass remotos; evita falsos negativos
@@ -55,9 +61,18 @@ Solo cuando el runner existe y produce exactamente el estado esperado
 puede abrirse el incremento 001.
 ```
 
+### Native Tool Artifacts (Distribution)
+
+Tras Capacitor (`capacitor-pass`), Android Studio y Xcode pueden dejar diffs locales
+(Gradle sync, SwiftPM). Esos archivos **no** bloquean el producto, pero **sí** bloquean
+`git pull` y un Land Check limpio hasta evaluarlos.
+
+Ver: [FOUNDATION.md](../../FOUNDATION.md) · **Native Tool Artifacts Rule**.
+
 ### Comandos
 
 ```bash
+git restore docs/**/evidence/*.json 2>/dev/null || true
 git pull origin main
 git fetch --tags --prune
 npm run test:<gate-script>

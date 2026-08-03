@@ -3,7 +3,7 @@
 **Documento:** `CAPACITOR_PASS_ACTA.md`  
 **Fecha:** 2026-08-03  
 **Estado:** ✅ **CAPACITOR CERTIFIED** (Distribution · C1–C5)  
-**Tag:** `capacitor-pass` → *(annotated tag on merge commit to `main` — Terminal after Land Check)*  
+**Tag:** `capacitor-pass` → `400a010` (merge [#256](https://github.com/losrealesplus/YourMeal-OS/pull/256) · annotated)  
 **Comandos:**
 
 ```bash

@@ -15,9 +15,10 @@
 | **Flow** | `flow*` / `flowNN-pass` | `flow01-pass` · `flow02-pass` | Flujos de negocio completamente certificados (PASS completo del runner) |
 | **Release gate** | `release-<gate>-pass` | `release-smoke-pass` · `release-crossflow-pass` | Gates DoRl de RELEASE-01 (mismo patrón `-pass` que Flows) |
 | **Release** | `release-01-beta` / `release-01-pass` / `v*` | `release-01-beta` · `release-01-pass` · `release-v0.2.0` | Framework beta · producto SaaS · semver |
+| **Distribution** | `capacitor-pass` | `capacitor-pass` | Shell nativo Web→Android/iOS · Distribution Certified |
 
 No cambia la metodología FOPEBA / Evidence before Implementation.  
-Hace legible el historial: **técnica** vs **dominio** vs **gates de producto** vs **release**.
+Hace legible el historial: **técnica** vs **dominio** vs **gates de producto** vs **release** vs **distribution**.
 
 Cadena RELEASE-01 (certificada):
 
@@ -56,6 +57,7 @@ Tag `release-01-pass` = bloques P1–P5 CERTIFIED · Gate CLOSED.
 | `release-rollback-pass` | Release gate | ✅ → `0ba856e` · [PASS](../10-validation/release-rollback/RELEASE_ROLLBACK_PASS_ACTA.md) |
 | `release-01-beta` | Release | ✅ → `facb917` · [PASS](../10-validation/release-01-beta/RELEASE_01_BETA_PASS_ACTA.md) |
 | `release-01-pass` | Release | ✅ → `8e91a49` · [PASS](../10-validation/release-01/RELEASE_01_PASS_ACTA.md) |
+| `capacitor-pass` | Distribution | ✅ → `400a010` (#256) · C1–C5 FULL PASS · [PASS](../10-validation/capacitor/CAPACITOR_PASS_ACTA.md) |
 
 ---
 
@@ -68,13 +70,15 @@ Tag `release-01-pass` = bloques P1–P5 CERTIFIED · Gate CLOSED.
 | Gate DoRl RELEASE-01 PASS (Smoke / Cross-flow / …) | `release-<gate>-pass` (p. ej. `release-smoke-pass`) |
 | RELEASE-01 DoRl PASS (todos los gates aplicables) | ✅ `release-01-beta` → `facb917` · Gate CLOSED · B1–B5 CERTIFIED |
 | RELEASE-01 Product PASS (P1–P5) | ✅ `release-01-pass` → `8e91a49` · Gate CLOSED · P1–P5 CERTIFIED |
+| Capacitor Distribution PASS (C1–C5) | ✅ `capacitor-pass` → `400a010` · Gate CLOSED · Distribution Certified |
 | Release desplegable / semver de producto | `release-vX.Y.Z` o `vX.Y.Z` |
 
 Reglas:
 
 - Preferir **annotated tags** con mensaje que apunte al acta.  
-- No force-push / no reescribir tags ya publicados (Lovable / historial compartido).  
+- No force-push / no reescribir tags ya publicados (Lovable / historial compartido), salvo corrección inmediata de un tag mal apuntado tras Land Check (p. ej. `capacitor-pass` retarget a merge C5).  
 - Un Flow parcial (PASS through Tn · BLOCKED) **no** genera tag `flowNN-pass`.
+- **Native Tool Artifacts** pendientes → no tag / no Land Check (FOUNDATION.md).
 
 ---
 

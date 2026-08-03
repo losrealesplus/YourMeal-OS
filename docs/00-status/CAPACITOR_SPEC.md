@@ -242,7 +242,7 @@ blocked_at=—
 
 Significado: Distribution Certified — Android + iOS builds reproducibles sin modificar el Core.
 
-Tag de cierre (nombre a fijar en Runner / PASS acta): p. ej. `capacitor-pass` (no creado en este PR).
+Tag de cierre: **`capacitor-pass`** → `400a010` (#256) · [PASS](../10-validation/capacitor/CAPACITOR_PASS_ACTA.md).
 
 ---
 
