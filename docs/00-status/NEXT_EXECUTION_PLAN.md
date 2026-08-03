@@ -107,12 +107,29 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual:** **Capacidades de distribución reales** (post–`capacitor-pass`) · stores / firma / CI móvil.  
+**Objetivo actual:** **MOBILE-RELEASE-01** (post–`capacitor-pass`) · Mobile Production Readiness.  
 CAPACITOR ✅ CERTIFIED · Gate CLOSED · FULL PASS · certified_through=C5 · blocked_at=— · tag `capacitor-pass` → `400a010`.  
 PASS Acta: [CAPACITOR_PASS_ACTA](../10-validation/capacitor/CAPACITOR_PASS_ACTA.md).  
 FLOW-05 ✅ CERTIFIED · tag `flow05-pass`.  
 Do **not** reabrir C1–C5 · Core Integrity intacta.  
-**Siguiente:** Google Play · App Store · TestFlight · signing · CI builds móviles (DoR por capacidad).  
+
+**Siguiente ciclo (propuesto · DoR primero):**
+
+```text
+MOBILE-RELEASE-01
+START  Distribution Certified (capacitor-pass)
+END    Internal Testing operativo
+       (TestFlight + Google Play Internal Testing)
+
+Incluye (candidato):
+  firma Android/iOS · Play Console / App Store Connect
+  TestFlight · Play Internal Testing · CI/CD builds
+  versionado · secretos / certificados
+
+Fuera (sigue cerrado):
+  Push · Deep Links · Biometría · GPS · Cámara · Notificaciones
+```
+
 **Alcance Capacitor v1 (cerrado):** Web SaaS → Shell nativo → Android → iOS → Acceptance.  
 **Reglas:** (1) Distribución ≠ producto · (2) Land Check desde `main` · (3) Native Tool Artifacts · (4) consolidar.  
 **Principio:** Identity → YourMeal OS · Brand/rules → Tenant · Journey → Flow · Channel → Capacitor.  
@@ -137,7 +154,7 @@ FLOW-05 ✅ B1…B8 · FULL PASS · flow05-pass
         ↓
 CAPACITOR ✅ C1…C5 · FULL PASS · capacitor-pass
         ↓
-Stores / firma / CI móvil (DoR por capacidad)
+MOBILE-RELEASE-01 · DoR (Internal Testing · firma · CI)
 ```
 
 Sin excepciones. Sin features futuras. Una transición / PR.

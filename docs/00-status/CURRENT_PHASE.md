@@ -60,20 +60,21 @@ Sprint activo
   Tags: ps002c-pass · flow01…05-pass · release-01-beta · release-01-pass
         · capacitor-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    Capacidades de distribución reales (post–v1)
-                               Play · App Store · TestFlight · firma · CI móvil
+  Prioridad                    MOBILE-RELEASE-01 · Mobile Production Readiness
+                               (DoR primero · no abrir stores sin contrato)
+                               firma · Play Internal · TestFlight · CI builds
                                NO reabrir C1–C5 · Core Integrity intacta
                                Regla: Native Tool Artifacts (FOUNDATION.md)
                                Order States ≠ Operational States
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)
   Land Check                   ./FOPEBA_LAND_CHECK.md (antes de cualquier 001)
-  Paralelo                     Track A · stores / device APIs cuando aporten valor
+  Paralelo                     Track A · device APIs solo cuando aporten valor
   Plan                         ./NEXT_EXECUTION_PLAN.md
   Metrics                      ./FOPEBA_METRICS.md (v0 · sin estimaciones)
   Handoff                      ./PROJECT_HANDOFF.md
   DoRl                         ./DEFINITION_OF_RELEASE.md (DRAFT)
-  Ejes                         A: Distribution post–capacitor-pass · B: RELEASE-01 ✅
+  Ejes                         A: MOBILE-RELEASE-01 · B: RELEASE-01 ✅
   Disciplina: un milestone / ciclo · DoR antes de código · consolidar ≠ correr
   Riesgo emergente: confundir publicación en stores con reabrir Capacitor v1
 
@@ -122,7 +123,7 @@ NEXT PHASE
   ↓
   ▶ CAPACITOR ✅ CERTIFIED · tag capacitor-pass → 400a010
   ↓
-  Next · capacidades de distribución reales (stores · firma · CI móvil)
+  Next · MOBILE-RELEASE-01 DoR (Internal Testing · firma · CI)
 
 En paralelo (beta móvil EatClean):
   Lema: cada PR acerca la jornada completa del piloto.
