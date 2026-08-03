@@ -50,12 +50,11 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    Track B › RELEASE-01-BETA-005 (B5 · este PR)
-                               B1–B4 ✅ CERTIFIED #222…#225 · a75efb1
-                               npm run test:release-01-beta → FULL PASS · certified_through=B5
-                               → ../10-validation/release-01-beta/RELEASE_01_BETA_005_B5_ACTA.md
-                               No FLOW-05 · no tag en este PR (tag post Land Check)
-                               Track B operativo completo (Smoke…Rollback)
+  Prioridad                    Track B › RELEASE-01-BETA ✅ CERTIFIED
+                               tag release-01-beta → facb917 · Gate CLOSED
+                               → ../10-validation/release-01-beta/RELEASE_01_BETA_PASS_ACTA.md
+                               Next: RELEASE-01 DoR (docs only)
+                               No FLOW-05 por inercia · Track B validación cerrado
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)
   Land Check                   ./FOPEBA_LAND_CHECK.md (antes de cualquier 001)

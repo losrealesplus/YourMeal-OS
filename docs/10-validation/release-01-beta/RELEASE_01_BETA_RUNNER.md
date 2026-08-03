@@ -2,9 +2,10 @@
 
 **Documento:** `RELEASE_01_BETA_RUNNER.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ Runner **CERTIFIED** (#219) · live through B5 · runner-only **BLOCKED** at B1 · Gate ✅ READY  
+**Estado:** ✅ Runner **CERTIFIED** (#219) · live through B5 · **FULL PASS** · tag `release-01-beta` → `facb917` · runner-only **BLOCKED** at B1 · Gate ✅ CLOSED  
 **Spec:** [RELEASE_01_BETA_SPEC](../../00-status/RELEASE_01_BETA_SPEC.md) (FROZEN · #218 · `ed98b3b`)  
 **DoR:** [RELEASE_01_BETA_DOR](../../00-status/RELEASE_01_BETA_DOR.md)  
+**Pass acta:** [RELEASE_01_BETA_PASS_ACTA](./RELEASE_01_BETA_PASS_ACTA.md)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
 **Nivel:** Release gate — beta acceptance · **not** a Flow · **not** Smoke · **not** Cross-flow · **not** E2E · **not** Deploy · **not** Rollback
 
@@ -82,17 +83,16 @@ npm run test:release-01-beta:unit
 
 ---
 
-## Fuera de alcance (005)
+## Fuera de alcance (histórico · 005)
 
 - FLOW-05 · re-ejecución Deploy/Rollback / Smoke / Cross-flow / E2E  
-- Tag `release-01-beta` **en este PR** (solo post Land Check FULL PASS desde `main`)  
 - Infra · CI · GitHub Actions · secretos · business logic  
 
 ---
 
 ## Gate
 
-Ver: [RELEASE_01_BETA_GATE](./RELEASE_01_BETA_GATE.md) · Decision: ✅ READY · 005 ▶ [ACTA](./RELEASE_01_BETA_005_B5_ACTA.md).
+Ver: [RELEASE_01_BETA_GATE](./RELEASE_01_BETA_GATE.md) · Decision: ✅ **CLOSED** · PASS [ACTA](./RELEASE_01_BETA_PASS_ACTA.md).
 
 ---
 
@@ -112,7 +112,7 @@ Ver: [RELEASE_01_BETA_GATE](./RELEASE_01_BETA_GATE.md) · Decision: ✅ READY ·
 
 ---
 
-## Land Check (005 · from this PR)
+## Land Check (PASS · from `main` @ `facb917`)
 
 ```bash
 git restore docs/10-validation/release-01-beta/evidence/ 2>/dev/null || true
@@ -126,7 +126,7 @@ npm run test:release-01-beta:runner-only
 # → BLOCKED at RELEASE_01_BETA_B1_STARTED · exit 2
 ```
 
-Next after 005 Land Check FULL PASS: tag **`release-01-beta`** (fuera de este PR) · FLOW-05 elegible.
+Tag **`release-01-beta` → `facb917`**. Next: **RELEASE-01 DoR** (docs only).
 
 ---
 

@@ -27,7 +27,8 @@ PROJECT_HANDOFF               ✅
 RELEASE_01_BETA_STRATEGY      ✅  DRAFT
 DEFINITION_OF_RELEASE         ✅  DRAFT (DoRl)
 FOPEBA_METRICS                ✅  v0
-RELEASE-01                    🚧  Track B · acumular evidencia DoRl
+RELEASE-01-BETA               ✅  tag release-01-beta → facb917
+RELEASE-01                    ▶  siguiente · DoR (docs only)
 FLOW-05                       ⏳  DoR NOT STARTED (no abrir salvo bloqueador beta)
 ```
 
@@ -94,7 +95,7 @@ Convertir la beta en algo **verificable**. Matriz viva:
 | E2E | ✅ | Tag `release-e2e-pass` → `73623ae` · [PASS](../10-validation/release-e2e/RELEASE_E2E_PASS_ACTA.md) |
 | Deployment | ✅ | Tag `release-deploy-pass` → `7896a2a` · [PASS](../10-validation/release-deploy/RELEASE_DEPLOY_PASS_ACTA.md) |
 | Rollback | ✅ | Tag `release-rollback-pass` → `0ba856e` · [PASS](../10-validation/release-rollback/RELEASE_ROLLBACK_PASS_ACTA.md) |
-| Beta Acceptance | ▶ | DoR ✅ · Spec ✅ · Runner ✅ · Gate ✅ · B1–B4 ✅ · 005 ▶ B5 · [ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_005_B5_ACTA.md) → `release-01-beta` |
+| Beta Acceptance | ✅ | CERTIFIED · tag `release-01-beta` → `facb917` · [PASS](../10-validation/release-01-beta/RELEASE_01_BETA_PASS_ACTA.md) |
 
 Detalle: [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) · [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md).
 
@@ -106,10 +107,9 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual Track B:** **RELEASE-01-BETA-005** (B5 Acceptance · este PR).  
-DoR ✅ · Spec ✅ · Runner ✅ · Gate ✅ · B1–B4 ✅ (#225 · `a75efb1`).  
-Contrato: `npm run test:release-01-beta` → FULL PASS · `certified_through=B5` · `blocked_at=—` · exit 0.  
-Do **not** open FLOW-05 · create tag `release-01-beta` in 005 (tag solo post Land Check).  
+**Objetivo actual Track B:** **RELEASE-01-BETA CERTIFIED** · tag `release-01-beta` → `facb917`.  
+Close-out: [PASS ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_PASS_ACTA.md) · Gate CLOSED.  
+**Siguiente:** READY TO OPEN **RELEASE-01 DoR** (docs only · no Spec/Runner/impl/FLOW-05).  
 **Reglas:** (1) Release gates ≠ Flow runners · (2) Land Check desde `main` (Regla 9) · (3) `git fetch --tags --prune` antes de runners.  
 **Nota:** restaurar `docs/10-validation/**/evidence/*.json` antes de Land Check si bloquean `git pull`.
 
@@ -169,17 +169,17 @@ Marco v0 en [FOPEBA_METRICS](./FOPEBA_METRICS.md).
 ```text
 flow04-pass                              ✅
         ↓
-RELEASE-01 acumula evidencia DoRl        ▶  (prioridad)
-        +
-FLOW-05… solo si alimentan / no bloquean la beta
+RELEASE-01-BETA                          ✅  tag release-01-beta → facb917
         ↓
-RELEASE-01 DoRl PASS
+RELEASE-01 DoR                           ▶  (siguiente · docs only)
         ↓
-release-01-beta
+RELEASE-01 Spec → Runner → Gate → 001…
         ↓
-Beta pública controlada
+FLOW-05 solo como criterio de RELEASE-01 (no por inercia)
         ↓
-release-1.0
+RELEASE-01 PASS
+        ↓
+Beta pública controlada / release-1.0
 ```
 
 Goal: demostrar que FOPEBA **escala** y que el producto es certificable como conjunto.
@@ -189,8 +189,8 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 ## Current Goal
 
 ```text
-Track B (prioridad): RELEASE-01-BETA-005 (B5) → Land Check → tag release-01-beta
-Track A:             Do NOT open FLOW-05 until release-01-beta exists
+Track B (prioridad): RELEASE-01 DoR (docs only) · post release-01-beta
+Track A:             FLOW-05 no por inercia · candidato como criterio de RELEASE-01
 FOPEBA_LAND_CHECK:   ACTIVE · pull + fetch --tags --prune before every runner
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos
 ```

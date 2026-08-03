@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_01_BETA_STRATEGY.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ▶ **DRAFT · Gate concept** · Track B operativo ✅ · DoR Beta ✅ · Spec ✅ · Runner ✅ · Gate ✅ · B1–B4 ✅ · 005 ▶ B5  
+**Estado:** ✅ **RELEASE-01-BETA CERTIFIED** · tag `release-01-beta` → `facb917` · Gate CLOSED · Track B validación completo  
 **Precondición:** FLOW-01…FLOW-04 ✅ · Track B Smoke…Rollback ✅ · `release-rollback-pass`  
 **DoRl:** [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md)  
 **DoR Beta:** [RELEASE_01_BETA_DOR](./RELEASE_01_BETA_DOR.md)  
@@ -80,7 +80,7 @@ Luego FLOW-06… según catálogo. Sin saltos. Sin features futuras en el PR del
 | E2E | ✅ | Tag `release-e2e-pass` → `73623ae` · [PASS](../10-validation/release-e2e/RELEASE_E2E_PASS_ACTA.md) |
 | Deployment | ✅ | Tag `release-deploy-pass` → `7896a2a` · [PASS](../10-validation/release-deploy/RELEASE_DEPLOY_PASS_ACTA.md) |
 | Rollback | ✅ | Tag `release-rollback-pass` → `0ba856e` · [PASS](../10-validation/release-rollback/RELEASE_ROLLBACK_PASS_ACTA.md) |
-| Beta Acceptance | ▶ | Spec ✅ · Runner ✅ · Gate ✅ · B1–B4 ✅ · 005 ▶ B5 · [ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_005_B5_ACTA.md) → tag `release-01-beta` |
+| Beta Acceptance | ✅ | CERTIFIED · tag `release-01-beta` → `facb917` · [PASS](../10-validation/release-01-beta/RELEASE_01_BETA_PASS_ACTA.md) |
 
 #### Roadmap Track B (mismo patrón FOPEBA · sin mezclar)
 
@@ -90,10 +90,10 @@ B-02 Cross-flow   ✅ release-crossflow-pass → 0a0c51b
 B-03 E2E          ✅ release-e2e-pass → 73623ae
 B-04 Deployment   ✅ release-deploy-pass → 7896a2a
 B-05 Rollback     ✅ release-rollback-pass → 0ba856e
-B-06 Beta Accept. DoR ✅ · Spec ✅ · Runner ✅ · Gate ✅ · B1–B4 ✅ · 005 ▶ B5 → release-01-beta
+B-06 Beta Accept. ✅ CERTIFIED · tag release-01-beta → facb917
 ```
 
-Orden fijo. **No** abrir FLOW-05 hasta existir `release-01-beta`.  
+Orden fijo. `release-01-beta` existe → siguiente fase: **RELEASE-01 DoR**. FLOW-05 no por inercia.  
 Convención de tags: homogénea con `flowNN-pass` — cada gate termina en `-pass` / `release-01-beta`.
 
 Criterio de publicación: **todos los gates aplicables con evidencia**,  
@@ -110,7 +110,7 @@ RELEASE-01
 ├── FLOW-02                 ✅  tag flow02-pass
 ├── FLOW-03                 ✅  tag flow03-pass
 ├── FLOW-04                 ✅  tag flow04-pass
-├── FLOW-05+                ⏳  CLOSED hasta release-01-beta
+├── FLOW-05+                ⏳  no por inercia · candidato RELEASE-01
 ├── Smoke Tests             ✅  tag release-smoke-pass
 ├── Cross-flow Tests        ✅  tag release-crossflow-pass → 0a0c51b
 ├── E2E Tests               ✅  tag release-e2e-pass → 73623ae
@@ -119,9 +119,7 @@ RELEASE-01
 ├── Deployment              ✅  tag release-deploy-pass → 7896a2a
 ├── Rollback                ✅  tag release-rollback-pass → 0ba856e
 ├── Documentation           ✅  Spec Beta FROZEN
-└── Beta Acceptance         ▶  Runner ▶ BLOCKED at B1
-        ↓
-   release-01-beta
+└── Beta Acceptance         ✅  tag release-01-beta → facb917
 ```
 
 ---
@@ -218,10 +216,9 @@ y cuándo un Flow adicional es bloqueador de beta (no “por inercia del catálo
 
 ## Next
 
-1. **B-01:** Spec FROZEN · Runner `test:release-smoke` → BLOCKED → Gate → RELEASE-SMOKE-001… → `release-smoke-pass`.  
-2. **B-02…B-06:** mismo patrón; Beta Acceptance solo al final.  
-3. **Eje A:** Do NOT open FLOW-05 unless Track B discovers a blocker that requires it.  
-4. Solo tras DoRl PASS → tag `release-01-beta`.
+1. **RELEASE-01-BETA** ✅ CERTIFIED · tag `release-01-beta` → `facb917`.  
+2. **READY TO OPEN:** RELEASE-01 DoR (docs only).  
+3. FLOW-05 no por inercia · candidato como criterio de RELEASE-01.
 
 ---
 
