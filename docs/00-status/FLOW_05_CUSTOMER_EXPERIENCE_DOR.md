@@ -284,8 +284,9 @@ Hasta entonces: **prohibido** repositories · services · OperationsService · R
 | 1 | Spec | ✅ FROZEN #237 · [FLOW_05_SPEC](./FLOW_05_SPEC.md) |
 | 2 | Freeze (merge Spec → main) | ✅ #237 · `deba9f6` |
 | 3 | Runner only · BLOCKED at B1 | ✅ #238 · `7381ff2` |
-| 4 | Gate FLOW05-001 | ✅ READY · este PR |
-| 5 | FLOW05-001…008 (un bloque / PR) | ⏳ READY TO OPEN 001 |
+| 4 | Gate FLOW05-001 | ✅ READY #239 · `eb07a1a` |
+| 5 | FLOW05-001 · B1 Registration | ✅ este PR |
+| 5b | FLOW05-002…008 (un bloque / PR) | ⏳ next · 002 |
 | 6 | FULL PASS · tag `flow05-pass` | ⏳ |
 | 7 | Capacitor / build móvil EatClean | ⏳ **solo tras** `flow05-pass` |
 

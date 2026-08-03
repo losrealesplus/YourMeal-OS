@@ -2,7 +2,7 @@
 
 **Documento:** `FLOW_05_SPEC.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **FROZEN** (merge #237 · `deba9f6`) · Runner ✅ · Gate ✅ READY · autoriza FLOW05-001  
+**Estado:** ✅ **FROZEN** (merge #237 · `deba9f6`) · Runner ✅ · Gate ✅ · FLOW05-001 ▶ B1 CERTIFIED · CERTIFIED_THROUGH=1  
 **DoR:** [FLOW_05_CUSTOMER_EXPERIENCE_DOR](./FLOW_05_CUSTOMER_EXPERIENCE_DOR.md)  
 **Runner:** [FLOW_05_RUNNER](../10-validation/flow-05/FLOW_05_RUNNER.md)  
 **Gate:** [FLOW_05_GATE](../10-validation/flow-05/FLOW_05_GATE.md)  
@@ -279,8 +279,8 @@ Exit code canónico: **2** (BLOCKED).
 |-----------|------|
 | DoR | `docs/00-status/FLOW_05_CUSTOMER_EXPERIENCE_DOR.md` |
 | Spec (este) | `docs/00-status/FLOW_05_SPEC.md` |
-| Runner docs | `docs/10-validation/flow-05/FLOW05_CANONICAL_RUNNER.md` |
-| Actas Bₙ | `docs/10-validation/flow-05/FLOW05_00N_B*_ACTA.md` |
+| Runner docs | `docs/10-validation/flow-05/FLOW_05_RUNNER.md` |
+| Actas Bₙ | `docs/10-validation/flow-05/FLOW05_00N_B*_ACTA.md` · [001](../10-validation/flow-05/FLOW05_001_B1_ACTA.md) |
 | PASS acta | `docs/10-validation/flow-05/FLOW05_PASS_ACTA.md` |
 | Evidence JSON | `docs/10-validation/flow-05/evidence/` |
 
@@ -306,11 +306,12 @@ Hasta entonces: **prohibido** implementación de dominio · Capacitor · Gate de
 | Fase | Trabajo | Estado |
 |------|---------|--------|
 | 0 | DoR | ✅ #236 |
-| 1 | Spec (contract only) | ▶ este PR · READY FOR FREEZE |
-| 2 | Freeze (merge Spec → main) | ⏳ |
-| 3 | Runner only · BLOCKED at B1 | ⏳ |
-| 4 | Gate FLOW05-001 | ⏳ |
-| 5 | FLOW05-001…008 (un bloque / PR) | ⏳ |
+| 1 | Spec (contract only) | ✅ FROZEN #237 |
+| 2 | Freeze (merge Spec → main) | ✅ #237 · `deba9f6` |
+| 3 | Runner only · BLOCKED at B1 | ✅ #238 · `7381ff2` |
+| 4 | Gate FLOW05-001 | ✅ READY #239 · `eb07a1a` |
+| 5 | FLOW05-001 · B1 Registration | ✅ este PR · CERTIFIED_THROUGH=1 |
+| 5b | FLOW05-002…008 (un bloque / PR) | ⏳ next · 002 |
 | 6 | FULL PASS · tag `flow05-pass` | ⏳ |
 | 7 | Capacitor / build móvil EatClean | ⏳ **solo tras** `flow05-pass` |
 
