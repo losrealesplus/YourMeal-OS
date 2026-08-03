@@ -2,11 +2,13 @@
 
 **Documento:** `CAPACITOR_SPEC.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ▶ **READY FOR FREEZE** (este PR) · DoR ✅ [CAPACITOR_DOR](./CAPACITOR_DOR.md) · `main` (#249 · `e2d31c3`) · Runner 🔒 · Gate 🔒 · código 🔒  
+**Estado:** ✅ **FROZEN** (on merge to `main` · #250+) · DoR ✅ · Runner ✅ · Gate ✅ READY · CERTIFIED_THROUGH=0 · BLOCKED at C1  
 **Dominio:** **Distribution**  
 **Nivel:** Infraestructura de distribución · YourMeal OS (tenant-agnostic)  
 **Pregunta (única):** ¿YourMeal OS puede distribuirse como shell nativo (Android + iOS) sin modificar el Core SaaS certificado?  
 **DoR:** [CAPACITOR_DOR](./CAPACITOR_DOR.md)  
+**Runner:** [CAPACITOR_RUNNER](../10-validation/capacitor/CAPACITOR_RUNNER.md)  
+**Gate:** [CAPACITOR_GATE](../10-validation/capacitor/CAPACITOR_GATE.md)  
 **Estándar:** [Evidence before Implementation](./EVIDENCE_BEFORE_IMPLEMENTATION.md) · [FOPEBA_LAND_CHECK](./FOPEBA_LAND_CHECK.md)  
 **Precondiciones:** tag `flow05-pass` · tag `release-01-pass` · FLOW-05 Gate CLOSED  
 **Plan:** [NEXT_EXECUTION_PLAN](./NEXT_EXECUTION_PLAN.md) · [CURRENT_PHASE](./CURRENT_PHASE.md)
@@ -14,7 +16,7 @@
 > Capacitor **no** es funcionalidad de negocio.  
 > Capacitor **no** reescribe el Core.  
 > Capacitor certifica **Distribution**: el mismo SaaS web, empaquetado en shell nativo.  
-> Este documento es **contrato únicamente** — sin Runner · sin Gate · sin install · sin `package.json` · sin código.
+> **Core Integrity Rule** · Evidence before Implementation.
 
 ---
 
@@ -312,15 +314,11 @@ No crear estos paths en este PR.
 ## Next
 
 ```text
-Merge este Spec → Freeze en main
+Gate READY · Runner BLOCKED at C1
     ↓
-Land Check
+Land Check from main
     ↓
-Capacitor Runner only
-    ↓
-Gate READY
-    ↓
-CAPACITOR-001 · C1 only
+CAPACITOR-001 · C1 Platform Preparation only
 ```
 
 ---
