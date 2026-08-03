@@ -2,7 +2,7 @@
 
 **Documento:** `RELEASE_01_BETA_DOR.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **DoR CERTIFIED** (`main` · #217 · `740b843`) · Spec ✅ [FROZEN](./RELEASE_01_BETA_SPEC.md) (#218) · Runner ✅ · Gate ✅ · B1 ✅ · 002 ▶ B2  
+**Estado:** ✅ **DoR CERTIFIED** (`main` · #217 · `740b843`) · Spec ✅ [FROZEN](./RELEASE_01_BETA_SPEC.md) (#218) · Runner ✅ · Gate ✅ · B1–B2 ✅ · 003 ▶ B3  
 **Nivel:** Release Track B · B-06 Beta Acceptance  
 **Pregunta (única):** ¿Qué debe demostrar YourMeal OS para que la primera Beta pueda considerarse certificada?  
 **Spec:** [RELEASE_01_BETA_SPEC](./RELEASE_01_BETA_SPEC.md)  
@@ -24,8 +24,8 @@
 | RELEASE-DEPLOY | `release-deploy-pass` |
 | RELEASE-ROLLBACK | `release-rollback-pass` → `0ba856e` |
 
-> Ciclo DoR → Spec → Runner → Gate · B1 **COMPLETO**. 002 ▶ B2 Canonical Flows.  
-> **No** B3–B5 · FLOW-05 · tag.
+> Ciclo DoR → Spec → Runner → Gate · B1–B2 **COMPLETO**. 003 ▶ B3 Platform.  
+> **No** B4–B5 · Deploy/Rollback · FLOW-05 · tag.
 
 ---
 
@@ -80,13 +80,14 @@ RELEASE-01-BETA (B-06)
 ☑ Runner creado (BLOCKED baseline)         → #219 · `3994833` · [RUNNER](../10-validation/release-01-beta/RELEASE_01_BETA_RUNNER.md)
 ☑ Gate READY                               → #220 · [GATE](../10-validation/release-01-beta/RELEASE_01_BETA_GATE.md)
 ☑ BETA-001 OPEN                            → ✅ CERTIFIED #222 · [ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_001_B1_ACTA.md)
-☑ BETA-002 OPEN                            → ▶ este PR · [ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_002_B2_ACTA.md)
-☐ BETA-003… OPEN                           → ⏳
+☑ BETA-002 OPEN                            → ✅ CERTIFIED #223 · [ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_002_B2_ACTA.md)
+☑ BETA-003 OPEN                            → ▶ este PR · [ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_003_B3_ACTA.md)
+☐ BETA-004… OPEN                           → ⏳
 ☐ tag release-01-beta                      → ⏳
 ```
 
-**DoR CERTIFIED** · Spec ✅ FROZEN · Runner ✅ · Gate ✅ · B1 ✅ · 002 ▶ B2.  
-**No** B3–B5 · FLOW-05 · tag.
+**DoR CERTIFIED** · Spec ✅ FROZEN · Runner ✅ · Gate ✅ · B1–B2 ✅ · 003 ▶ B3.  
+**No** B4–B5 · Deploy/Rollback · FLOW-05 · tag.
 
 ---
 
@@ -99,7 +100,7 @@ RELEASE-01-BETA (B-06)
 | 2 | Freeze | ✅ |
 | 3 | Runner only · BLOCKED at B1 | ✅ #219 · `3994833` |
 | 4 | Gate READY (Land Check `main`) | ✅ #220 |
-| 5 | Capacidades / PRs Beta (001…005) | ✅ 001 · ▶ 002 B2 · este PR |
+| 5 | Capacidades / PRs Beta (001…005) | ✅ 001–002 · ▶ 003 B3 · este PR |
 | 6 | FULL PASS · tag `release-01-beta` | ⏳ |
 
 ---
@@ -116,9 +117,9 @@ Track A:             FLOW-05 CLOSED hasta existir release-01-beta
 ## Next
 
 ```text
-Land Check 002 from main
+Land Check 003 from main
     ↓
-READY TO OPEN RELEASE-01-BETA-003 (B3 only)
+READY TO OPEN RELEASE-01-BETA-004 (B4 only)
 ```
 
 ---

@@ -60,7 +60,7 @@ Tag `release-01-beta` solo tras **DoRl PASS** (todos los gates aplicables con su
 | Gate de plataforma cerrado con evidencia (PS / FCR) | `platform-*` o hito nombrado (`ps002c-pass`) |
 | Flow runner `--live` = PASS completo + acta | `flowNN-pass` |
 | Gate DoRl RELEASE-01 PASS (Smoke / Cross-flow / …) | `release-<gate>-pass` (p. ej. `release-smoke-pass`) |
-| RELEASE-01 DoRl PASS (todos los gates aplicables) | `release-01-beta` · Spec ✅ · Runner ✅ · Gate ✅ · B1 ✅ · 002 ▶ B2 |
+| RELEASE-01 DoRl PASS (todos los gates aplicables) | `release-01-beta` · Spec ✅ · Runner ✅ · Gate ✅ · B1–B2 ✅ · 003 ▶ B3 |
 | Release desplegable / semver de producto | `release-vX.Y.Z` o `vX.Y.Z` |
 
 Reglas:

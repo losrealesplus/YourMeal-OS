@@ -94,7 +94,7 @@ Convertir la beta en algo **verificable**. Matriz viva:
 | E2E | ✅ | Tag `release-e2e-pass` → `73623ae` · [PASS](../10-validation/release-e2e/RELEASE_E2E_PASS_ACTA.md) |
 | Deployment | ✅ | Tag `release-deploy-pass` → `7896a2a` · [PASS](../10-validation/release-deploy/RELEASE_DEPLOY_PASS_ACTA.md) |
 | Rollback | ✅ | Tag `release-rollback-pass` → `0ba856e` · [PASS](../10-validation/release-rollback/RELEASE_ROLLBACK_PASS_ACTA.md) |
-| Beta Acceptance | ▶ | DoR ✅ · Spec ✅ · Runner ✅ · Gate ✅ · B1 ✅ · 002 ▶ B2 · [ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_002_B2_ACTA.md) → `release-01-beta` |
+| Beta Acceptance | ▶ | DoR ✅ · Spec ✅ · Runner ✅ · Gate ✅ · B1–B2 ✅ · 003 ▶ B3 · [ACTA](../10-validation/release-01-beta/RELEASE_01_BETA_003_B3_ACTA.md) → `release-01-beta` |
 
 Detalle: [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) · [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md).
 
@@ -106,11 +106,12 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual Track B:** **RELEASE-01-BETA-002** (B2 Canonical Flows · este PR).  
-DoR ✅ · Spec ✅ · Runner ✅ · Gate ✅ · B1 ✅ (#222 · `edc6acf`).  
-Contrato: `npm run test:release-01-beta` → PASS through B2 · BLOCKED at `RELEASE_01_BETA_B3_STARTED` · exit 0.  
-Do **not** open B3–B5 · FLOW-05 · tag in 002.  
-**Reglas:** (1) Release gates ≠ Flow runners · (2) Land Check desde `main` (Regla 9) · (3) `git fetch --tags --prune` antes de runners.
+**Objetivo actual Track B:** **RELEASE-01-BETA-003** (B3 Platform Capabilities · este PR).  
+DoR ✅ · Spec ✅ · Runner ✅ · Gate ✅ · B1 ✅ · B2 ✅ (#223 · `3b837c5`).  
+Contrato: `npm run test:release-01-beta` → PASS through B3 · BLOCKED at `RELEASE_01_BETA_B4_STARTED` · exit 0.  
+Do **not** open B4–B5 · Deploy/Rollback · FLOW-05 · tag in 003.  
+**Reglas:** (1) Release gates ≠ Flow runners · (2) Land Check desde `main` (Regla 9) · (3) `git fetch --tags --prune` antes de runners.  
+**Nota:** evidencia bajo `docs/10-validation/**/evidence/` es generada — restaurar/descartar antes de Land Check si bloquea `git pull`.
 
 Cross-flow **no sustituye** runners canónicos: los runners certifican contratos;  
 el cross-flow demuestra que los contratos encadenan:
@@ -188,7 +189,7 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 ## Current Goal
 
 ```text
-Track B (prioridad): RELEASE-01-BETA-002 (B2) → Land Check → 003…005 → release-01-beta
+Track B (prioridad): RELEASE-01-BETA-003 (B3) → Land Check → 004…005 → release-01-beta
 Track A:             Do NOT open FLOW-05 until release-01-beta exists
 FOPEBA_LAND_CHECK:   ACTIVE · pull + fetch --tags --prune before every runner
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos

@@ -13,11 +13,11 @@
  *
  * Spec: docs/00-status/RELEASE_01_BETA_SPEC.md
  *
- * NO B3–B5 drivers in this PR · NO CI · NO infra · NO FLOW-05.
+ * NO B4–B5 drivers in this PR · NO CI · NO infra · NO FLOW-05.
  */
 
 /** Highest segment with a capability driver implemented. */
-const RELEASE_01_BETA_CERTIFIED_THROUGH = 2;
+const RELEASE_01_BETA_CERTIFIED_THROUGH = 3;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
