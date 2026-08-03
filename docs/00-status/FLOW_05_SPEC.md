@@ -2,8 +2,9 @@
 
 **Documento:** `FLOW_05_SPEC.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ▶ **READY FOR FREEZE** (este PR · contract only)  
+**Estado:** ✅ **FROZEN** (merge #237 · `deba9f6`) · Runner ▶ este PR · Gate ⏳  
 **DoR:** [FLOW_05_CUSTOMER_EXPERIENCE_DOR](./FLOW_05_CUSTOMER_EXPERIENCE_DOR.md)  
+**Runner:** [FLOW_05_RUNNER](../10-validation/flow-05/FLOW_05_RUNNER.md)  
 **Estándar:** [FLOW_DEFINITION_OF_READY](./FLOW_DEFINITION_OF_READY.md) · [Evidence before Implementation](./EVIDENCE_BEFORE_IMPLEMENTATION.md)  
 **Gobernanza:** [FLOW_GOVERNANCE](./FLOW_GOVERNANCE.md) Regla 7–9  
 **Plan:** [NEXT_EXECUTION_PLAN](./NEXT_EXECUTION_PLAN.md) · [FLOW_CATALOG](./FLOW_CATALOG.md)  
@@ -326,10 +327,11 @@ Hasta entonces: **prohibido** implementación de dominio · Capacitor · Gate de
 ## 13. Next
 
 ```text
-Merge este Spec → FLOW-05 FROZEN
+Spec FROZEN ✅
     ↓
-READY TO OPEN
-FLOW-05 Runner (BLOCKED at FLOW05_B1_STARTED)
+FLOW-05 Runner ▶ (BLOCKED at FLOW05_B1_STARTED)
+    ↓
+READY TO OPEN Gate (tras Land Check desde main)
 ```
 
 ---

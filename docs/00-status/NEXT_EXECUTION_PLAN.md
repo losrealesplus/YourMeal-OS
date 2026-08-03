@@ -107,10 +107,10 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual:** **FLOW-05 Spec** (Customer Experience Lifecycle · este PR · contract only).  
-DoR ✅ (#236) · RELEASE-01 ✅ · tag `release-01-pass` → `8e91a49`.  
-Spec: [FLOW_05_SPEC](./FLOW_05_SPEC.md) · READY FOR FREEZE · B1–B8.  
-Do **not** abrir Runner · Gate · Capacitor · `src/` en el Spec.  
+**Objetivo actual:** **FLOW-05 Runner** (este PR · CERTIFIED_THROUGH=0).  
+Spec ✅ FROZEN (#237) · DoR ✅ (#236) · RELEASE-01 ✅ `release-01-pass`.  
+Contrato: `npm run test:flow-05` → BLOCKED at `FLOW05_B1_STARTED` · exit 2.  
+Do **not** abrir Gate · FLOW05-001 · Capacitor · dominio en Runner.  
 **Reglas:** (1) Producto ≠ framework · (2) Land Check desde `main` (Regla 9) · (3) un bloque / PR.  
 **Nota:** restaurar `docs/10-validation/**/evidence/*.json` antes de Land Check si bloquean `git pull`.
 
@@ -126,11 +126,11 @@ Pedido → Producción → Packaging → Entrega
 
 ## Parallel Track A — Business Certification
 
-**Current status:** FLOW-04 ✅ CERTIFIED · `flow04-pass` · RELEASE-01 ✅ `release-01-pass` · FLOW-05 DoR ✅
+**Current status:** FLOW-04 ✅ · RELEASE-01 ✅ · FLOW-05 Spec ✅ FROZEN · Runner ▶
 
 ```text
-FLOW-05 ▶ Spec READY FOR FREEZE (este PR)
-DoR ✅ → Spec ▶ → Freeze → Runner → FLOW05-001… → flow05-pass
+FLOW-05 ▶ Runner BLOCKED at B1 (este PR)
+DoR ✅ → Spec ✅ FROZEN → Runner ▶ → Gate → FLOW05-001… → flow05-pass
 ```
 
 Sin excepciones. Sin features futuras. Una transición / PR.
@@ -191,7 +191,7 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 
 ```text
 Track B (cerrado):   RELEASE-01 ✅ · tag release-01-pass → 8e91a49
-Track A (prioridad): FLOW-05 Spec ▶ este PR → Freeze → Runner
+Track A (prioridad): FLOW-05 Runner ▶ este PR → Gate → FLOW05-001
 FOPEBA_LAND_CHECK:   ACTIVE · pull + fetch --tags --prune before every runner
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos
 ```
