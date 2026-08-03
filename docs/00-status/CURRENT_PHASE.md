@@ -50,11 +50,10 @@ Sprint activo
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…04-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    Track B › RELEASE-01-BETA DoR (docs only)
-                               RELEASE-ROLLBACK ✅ CERTIFIED · tag release-rollback-pass → 0ba856e
-                               → ../10-validation/release-rollback/RELEASE_ROLLBACK_PASS_ACTA.md
-                               → ./RELEASE_01_BETA_DOR.md
-                               No Spec · Runner · impl · FLOW-05 en DoR
+  Prioridad                    Track B › RELEASE-01-BETA Spec (docs only)
+                               DoR ✅ #217 · 740b843
+                               Spec ▶ ./RELEASE_01_BETA_SPEC.md (READY FOR FREEZE)
+                               No Runner · impl · FLOW-05 en Spec
                                Track B operativo completo (Smoke…Rollback)
   Regla Release                capacidades plataforma ≠ entidades dominio
   Regla Gate                   cierra solo verificado desde main (Regla 9)

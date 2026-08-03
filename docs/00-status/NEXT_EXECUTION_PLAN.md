@@ -94,7 +94,7 @@ Convertir la beta en algo **verificable**. Matriz viva:
 | E2E | ✅ | Tag `release-e2e-pass` → `73623ae` · [PASS](../10-validation/release-e2e/RELEASE_E2E_PASS_ACTA.md) |
 | Deployment | ✅ | Tag `release-deploy-pass` → `7896a2a` · [PASS](../10-validation/release-deploy/RELEASE_DEPLOY_PASS_ACTA.md) |
 | Rollback | ✅ | Tag `release-rollback-pass` → `0ba856e` · [PASS](../10-validation/release-rollback/RELEASE_ROLLBACK_PASS_ACTA.md) |
-| Beta Acceptance | ▶ | DoR ▶ [RELEASE_01_BETA_DOR](./RELEASE_01_BETA_DOR.md) → `release-01-beta` |
+| Beta Acceptance | ▶ | DoR ✅ · Spec ▶ [RELEASE_01_BETA_SPEC](./RELEASE_01_BETA_SPEC.md) → `release-01-beta` |
 
 Detalle: [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) · [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md).
 
@@ -106,10 +106,10 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual Track B:** **RELEASE-01-BETA DoR** (docs only).  
-RELEASE-ROLLBACK ✅ CERTIFIED · tag `release-rollback-pass` → `0ba856e` (#216).  
-DoR: [RELEASE_01_BETA_DOR](./RELEASE_01_BETA_DOR.md).  
-Do **not** open Spec · Runner · impl · FLOW-05 in Beta DoR.  
+**Objetivo actual Track B:** **RELEASE-01-BETA Spec** (docs only · este PR · READY FOR FREEZE).  
+DoR ✅ CERTIFIED (#217 · `740b843`).  
+Spec: [RELEASE_01_BETA_SPEC](./RELEASE_01_BETA_SPEC.md).  
+Do **not** open Runner · impl · FLOW-05 in Spec.  
 **Reglas:** (1) Release gates ≠ Flow runners · (2) Land Check desde `main` (Regla 9) · (3) `git fetch --tags --prune` antes de runners.
 
 Cross-flow **no sustituye** runners canónicos: los runners certifican contratos;  
@@ -188,7 +188,7 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 ## Current Goal
 
 ```text
-Track B (prioridad): RELEASE-01-BETA DoR → Spec → Freeze → Runner → release-01-beta
+Track B (prioridad): RELEASE-01-BETA Spec (este PR) → Freeze → Runner → Gate → release-01-beta
 Track A:             Do NOT open FLOW-05 until release-01-beta exists
 FOPEBA_LAND_CHECK:   ACTIVE · pull + fetch --tags --prune before every runner
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos
