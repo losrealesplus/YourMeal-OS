@@ -4,20 +4,20 @@
  *
  * Certifies the product as a whole (B1–B5) by composing Track B `-pass` anchors.
  *
- * Default (CERTIFIED_THROUGH = 0): empty pipeline → BLOCKED at B1.
  * Modes:
- *   --runner-only    Empty pipeline → BLOCKED at B1 (Gate land-check).
+ *   --live           Drive capability segments through CERTIFIED_THROUGH (or --through).
+ *   --runner-only    Empty pipeline → BLOCKED at B1 (historic Gate baseline).
  *   --self-test      Validate frozen full contract (synthetic PASS).
  *   --pipeline=a,b,c Validate an explicit observed step list.
- *   --through=B1|…   Scope delivery RELEASE-01-BETA-001..005 (no drivers yet).
+ *   --through=B1|…   Scope delivery RELEASE-01-BETA-001..005.
  *
  * Spec: docs/00-status/RELEASE_01_BETA_SPEC.md
  *
- * NO B1–B5 capability drivers in this PR · NO CI · NO infra · NO FLOW-05.
+ * NO B2–B5 drivers in this PR · NO CI · NO infra · NO FLOW-05.
  */
 
-/** Highest segment with a capability driver implemented (0 = runner-only). */
-const RELEASE_01_BETA_CERTIFIED_THROUGH = 0;
+/** Highest segment with a capability driver implemented. */
+const RELEASE_01_BETA_CERTIFIED_THROUGH = 1;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -25,12 +25,14 @@ import { fileURLToPath } from "node:url";
 import {
   RELEASE_01_BETA_CANONICAL_STEPS,
   RELEASE_01_BETA_EXIT,
+  RELEASE_01_BETA_SEGMENTS,
   buildRelease01BetaEvidenceReport,
   evaluateRelease01BetaProgress,
   formatRelease01BetaComparisonTable,
   release01BetaStepsThrough,
   validateRelease01BetaPipeline,
 } from "./lib/release-01-beta-canonical-pipeline.mjs";
+import { runRelease01BetaCapabilityDriver } from "./lib/release-01-beta-capability-driver.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -40,6 +42,15 @@ const EVIDENCE_DIR = path.join(
 );
 
 function evidencePathFor(mode, through) {
+  if (mode === "live" && through) {
+    return path.join(
+      EVIDENCE_DIR,
+      `release-01-beta-00${through}-canonical-live.json`,
+    );
+  }
+  if (mode === "live") {
+    return path.join(EVIDENCE_DIR, "release-01-beta-canonical-live.json");
+  }
   if (mode === "runner-only") {
     return path.join(EVIDENCE_DIR, "release-01-beta-canonical.json");
   }
@@ -59,8 +70,7 @@ function evidencePathFor(mode, through) {
 }
 
 function parseArgs(argv) {
-  // Until B1+ drivers exist, default = runner-only (BLOCKED at B1).
-  let mode = RELEASE_01_BETA_CERTIFIED_THROUGH === 0 ? "runner-only" : "live";
+  let mode = "live";
   /** @type {string[] | null} */
   let pipelineArg = null;
   /** @type {1|2|3|4|5 | null} */
@@ -82,8 +92,8 @@ function parseArgs(argv) {
       if (n >= 1 && n <= 5) through = /** @type {1|2|3|4|5} */ (n);
     }
   }
-  if (mode === "live" && RELEASE_01_BETA_CERTIFIED_THROUGH === 0) {
-    mode = "runner-only";
+  if (mode === "live" && through == null) {
+    through = /** @type {1|2|3|4|5} */ (RELEASE_01_BETA_CERTIFIED_THROUGH);
   }
   return { mode, pipelineArg, through };
 }
@@ -101,40 +111,6 @@ function exitFor(progress) {
   return RELEASE_01_BETA_EXIT.FAIL;
 }
 
-async function emitBlockedAtB1() {
-  const pipeline = [];
-  const progress = evaluateRelease01BetaProgress(pipeline, { through: null });
-  const report = buildRelease01BetaEvidenceReport({
-    status: progress.status,
-    reason: progress.reason,
-    pipeline,
-    validation: {
-      duplicates: progress.duplicates,
-      missing: progress.missing,
-      out_of_order: progress.out_of_order,
-      firstFailure: progress.firstFailure,
-    },
-    code_status: "RUNNER_ONLY",
-    progress,
-    evidence: {},
-  });
-
-  console.log("");
-  console.log("RELEASE-01-BETA");
-  console.log("");
-  console.log(report.status);
-  console.log("");
-  console.log(`blocked_at=${report.blocked_at}`);
-  console.log(`duplicates=${JSON.stringify(report.duplicates)}`);
-  console.log(`missing=${JSON.stringify(report.missing)}`);
-  console.log(`out_of_order=${JSON.stringify(report.out_of_order)}`);
-  console.log(`evidence=${JSON.stringify(report.evidence)}`);
-
-  const out = await writeEvidence(report, "runner-only", null);
-  console.log(`evidence_file: ${path.relative(ROOT, out)}`);
-  process.exit(exitFor(progress));
-}
-
 async function main() {
   const { mode, pipelineArg, through } = parseArgs(process.argv.slice(2));
 
@@ -148,14 +124,92 @@ async function main() {
   console.log("═══════════════════════════════════════════════");
 
   if (mode === "runner-only") {
-    await emitBlockedAtB1();
+    const pipeline = [];
+    const progress = evaluateRelease01BetaProgress(pipeline, { through: null });
+    const report = buildRelease01BetaEvidenceReport({
+      status: progress.status,
+      reason: progress.reason,
+      pipeline,
+      validation: {
+        duplicates: progress.duplicates,
+        missing: progress.missing,
+        out_of_order: progress.out_of_order,
+        firstFailure: progress.firstFailure,
+      },
+      code_status: "RUNNER_ONLY",
+      progress,
+      evidence: {},
+    });
+
+    console.log("");
+    console.log("RELEASE-01-BETA");
+    console.log("");
+    console.log(report.status);
+    console.log("");
+    console.log(`blocked_at=${report.blocked_at}`);
+    console.log(`duplicates=${JSON.stringify(report.duplicates)}`);
+    console.log(`missing=${JSON.stringify(report.missing)}`);
+    console.log(`out_of_order=${JSON.stringify(report.out_of_order)}`);
+    console.log(`evidence=${JSON.stringify(report.evidence)}`);
+
+    const out = await writeEvidence(report, "runner-only", null);
+    console.log(`evidence_file: ${path.relative(ROOT, out)}`);
+    process.exit(exitFor(progress));
   }
 
   if (mode === "live") {
-    console.error(
-      "LIVE mode requires CERTIFIED_THROUGH >= 1 (B1 driver). Not in this PR.",
+    const scope = through ?? RELEASE_01_BETA_CERTIFIED_THROUGH;
+    console.log(`Driving RELEASE-01-BETA segments (through=B${scope})…`);
+    const driver = runRelease01BetaCapabilityDriver({
+      root: ROOT,
+      through: scope,
+    });
+    if (!driver.ok) {
+      console.error("Capability driver failed:");
+      console.error(driver.reason ?? "unknown");
+      const report = buildRelease01BetaEvidenceReport({
+        status: "FAIL",
+        reason: driver.reason ?? "RELEASE-01-BETA capability driver failed",
+        pipeline: driver.steps,
+        code_status: "CAPABILITY_DRIVER_FAIL",
+        evidence: driver.evidence ?? {},
+      });
+      await writeEvidence(report, "live", through);
+      process.exit(RELEASE_01_BETA_EXIT.FAIL);
+    }
+
+    const observed = driver.steps;
+    const progress = evaluateRelease01BetaProgress(observed, {
+      through: scope,
+    });
+    const report = buildRelease01BetaEvidenceReport({
+      status: progress.status,
+      reason: progress.reason,
+      pipeline: observed,
+      validation: progress,
+      code_status: `CAPABILITY_DRIVER_B${progress.certified_through || 0}`,
+      progress,
+      evidence: driver.evidence ?? {},
+      meta: {
+        terminal: {
+          segment: RELEASE_01_BETA_SEGMENTS[progress.certified_through] ?? null,
+        },
+      },
+    });
+
+    console.log(formatRelease01BetaComparisonTable(progress));
+    console.log("");
+    console.log(progress.reason);
+    console.log(
+      `certified_through=B${progress.certified_through || 0} · blocked_at=${progress.blocked_at ?? "—"}`,
     );
-    process.exit(RELEASE_01_BETA_EXIT.FAIL);
+    console.log(
+      `duplicates=${JSON.stringify(report.duplicates)} missing=${JSON.stringify(report.missing)} out_of_order=${JSON.stringify(report.out_of_order)}`,
+    );
+
+    const out = await writeEvidence(report, "live", through ?? scope);
+    console.log(`evidence_file: ${path.relative(ROOT, out)}`);
+    process.exit(exitFor(progress));
   }
 
   if (mode === "self-test") {
