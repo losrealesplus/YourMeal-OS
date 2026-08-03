@@ -2,7 +2,8 @@
  * Capacitor · Capability driver (Distribution C1–C5).
  *
  * C1 = Platform Preparation (CAPACITOR-001)
- * C2…C5 = not implemented in this delivery
+ * C2 = Native Shell (CAPACITOR-002)
+ * C3…C5 = not implemented in this delivery
  *
  * Tenant-agnostic — Core SaaS → Capacitor → Android / iOS.
  * Core Integrity Rule: Distribution does not alter Core SaaS behavior.
@@ -10,6 +11,7 @@
  */
 import { CAPACITOR_SEGMENTS } from "./capacitor-canonical-pipeline.mjs";
 import { runCapacitorC1PlatformPreparation } from "./capacitor-c1-platform-preparation.mjs";
+import { runCapacitorC2NativeShell } from "./capacitor-c2-native-shell.mjs";
 
 /**
  * @param {{ root: string, through?: 1|2|3|4|5 | 0 | null }} opts
@@ -57,11 +59,35 @@ export function runCapacitorCapabilityDriver({ root, through = null }) {
 
   if (max < 2) return { ok: true, steps, evidence };
 
+  console.info("[CAPACITOR]", "CAPACITOR_C2_STARTED", {
+    segment: CAPACITOR_SEGMENTS[2],
+  });
+  steps.push("CAPACITOR_C2_STARTED");
+
+  const c2 = runCapacitorC2NativeShell({ cwd: root });
+  evidence.c2_checks = c2.checks;
+  if (!c2.ok) {
+    console.error("[CAPACITOR] C2 FAIL:\n" + c2.reason);
+    return { ok: false, steps, reason: c2.reason, evidence };
+  }
+  evidence.c2_mapped_tokens = c2.mapped_tokens;
+  evidence.c2_source = c2.source;
+
+  console.info("[CAPACITOR]", "CAPACITOR_C2_COMPLETED", {
+    segment: CAPACITOR_SEGMENTS[2],
+    mapped_tokens: c2.mapped_tokens,
+    source: c2.source,
+    checks: c2.checks,
+  });
+  steps.push("CAPACITOR_C2_COMPLETED");
+
+  if (max < 3) return { ok: true, steps, evidence };
+
   return {
     ok: false,
     steps,
     reason:
-      "C2+ block drivers are not implemented — stop at CAPACITOR-001 (C1 Platform Preparation only).",
+      "C3+ block drivers are not implemented — stop at CAPACITOR-002 (C2 Native Shell only).",
     evidence,
   };
 }
