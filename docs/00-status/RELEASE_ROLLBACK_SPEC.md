@@ -319,24 +319,25 @@ tag (futuro): release-rollback-pass
 | Gate READY | ✅ #211 · Land Check from main |
 | RELEASE-ROLLBACK-001 | ✅ CERTIFIED #212 · `9c52d01` |
 | RELEASE-ROLLBACK-002 | ✅ CERTIFIED #214 · `2838138` |
-| RELEASE-ROLLBACK-003 | ▶ este PR · FULL PASS |
+| RELEASE-ROLLBACK-003 | ✅ CERTIFIED #216 · `0ba856e` |
+| tag `release-rollback-pass` | ✅ → `0ba856e` |
 
-**Estado del documento:** ✅ **FROZEN**
+**Estado del documento:** ✅ **FROZEN** · ciclo B-05 **COMPLETO**
 
 ---
 
 ## 14. Next
 
 ```text
-RELEASE-ROLLBACK-003 · R3 OPEN (este PR)
-FULL PASS · certified_through=R3 · blocked_at=—
+RELEASE-ROLLBACK CERTIFIED
+tag release-rollback-pass → 0ba856e
     ↓
-Land Check from main → tag release-rollback-pass
-    ↓
-READY TO OPEN RELEASE-01-BETA DoR (docs only)
+READY TO OPEN
+RELEASE-01-BETA DoR
+Documentation only.
 ```
 
-**No** FLOW-05 · `release-01-beta` · tag hasta Land Check desde `main`.
+**No** Spec · Runner · impl · FLOW-05 en el DoR de Beta.
 
 ---
 

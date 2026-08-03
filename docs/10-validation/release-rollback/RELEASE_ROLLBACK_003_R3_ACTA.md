@@ -2,7 +2,8 @@
 
 **Documento:** `RELEASE_ROLLBACK_003_R3_ACTA.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ▶ este PR · PASS through R3 · **FULL PASS** · `blocked_at=—`  
+**Estado:** ✅ **CERTIFIED desde `main`** · PASS through R3 · **FULL PASS** · `blocked_at=—`  
+**Tip:** `0ba856e` (Merge #216) · tag `release-rollback-pass`  
 **Precondición:** R2 CERTIFIED (#214 · `2838138`) · cert docs (#215 · `b6eb2dd`)  
 **Gate:** [RELEASE_ROLLBACK_GATE](./RELEASE_ROLLBACK_GATE.md)  
 **Verify:** [RELEASE_ROLLBACK_VERIFY](./RELEASE_ROLLBACK_VERIFY.md)  
@@ -81,13 +82,19 @@ Fuente: `R2 CERTIFIED + RELEASE_ROLLBACK_VERIFY + preview + release-deploy-pass 
 
 ---
 
+## Land Check (desde `main` @ `0ba856e`)
+
+| Comando | Resultado |
+|---------|-----------|
+| `test:release-rollback-003` | FULL PASS · blocked_at=— · exit 0 |
+| `test:release-rollback` | FULL PASS · certified_through=R3 · exit 0 |
+| `test:release-rollback:runner-only` | BLOCKED at R1 · exit 2 |
+
+Tag: `release-rollback-pass` → `0ba856e`.
+
 ## Next
 
 ```text
-Land Check from main
-    ↓
-tag release-rollback-pass
-    ↓
 READY TO OPEN
 RELEASE-01-BETA DoR
 Documentation only.

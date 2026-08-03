@@ -93,8 +93,8 @@ Convertir la beta en algo **verificable**. Matriz viva:
 | Cross-flow | ✅ | Tag `release-crossflow-pass` → `0a0c51b` · [PASS](../10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md) |
 | E2E | ✅ | Tag `release-e2e-pass` → `73623ae` · [PASS](../10-validation/release-e2e/RELEASE_E2E_PASS_ACTA.md) |
 | Deployment | ✅ | Tag `release-deploy-pass` → `7896a2a` · [PASS](../10-validation/release-deploy/RELEASE_DEPLOY_PASS_ACTA.md) |
-| Rollback | ▶ | DoR ✅ · Spec ✅ · Runner ✅ · Gate ✅ · 001 ✅ · next 002 · [ACTA](../10-validation/release-rollback/RELEASE_ROLLBACK_001_R1_ACTA.md) → `release-rollback-pass` |
-| Beta Acceptance | ⏳ | → `release-01-beta` |
+| Rollback | ✅ | Tag `release-rollback-pass` → `0ba856e` · [PASS](../10-validation/release-rollback/RELEASE_ROLLBACK_PASS_ACTA.md) |
+| Beta Acceptance | ▶ | DoR ▶ [RELEASE_01_BETA_DOR](./RELEASE_01_BETA_DOR.md) → `release-01-beta` |
 
 Detalle: [RELEASE_01_BETA_STRATEGY](./RELEASE_01_BETA_STRATEGY.md) · [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md).
 
@@ -106,11 +106,11 @@ B-01 Smoke → B-02 Cross-flow → B-03 E2E
 → release-01-beta
 ```
 
-**Objetivo actual Track B:** **RELEASE-ROLLBACK-003** (R3 Post-rollback Verify · este PR).  
-002 ✅ CERTIFIED (#214 · `2838138`) · cert docs (#215 · `b6eb2dd`).  
-Contrato: `npm run test:release-rollback` → FULL PASS · certified_through=R3 · `blocked_at=—` · exit 0.  
-Do **not** open FLOW-05 · RELEASE-01-BETA · tag hasta Land Check desde `main`.  
-**Reglas:** (1) Release gates ≠ Flow runners · (2) Land Check desde `main` (Regla 9).
+**Objetivo actual Track B:** **RELEASE-01-BETA DoR** (docs only).  
+RELEASE-ROLLBACK ✅ CERTIFIED · tag `release-rollback-pass` → `0ba856e` (#216).  
+DoR: [RELEASE_01_BETA_DOR](./RELEASE_01_BETA_DOR.md).  
+Do **not** open Spec · Runner · impl · FLOW-05 in Beta DoR.  
+**Reglas:** (1) Release gates ≠ Flow runners · (2) Land Check desde `main` (Regla 9) · (3) `git fetch --tags --prune` antes de runners.
 
 Cross-flow **no sustituye** runners canónicos: los runners certifican contratos;  
 el cross-flow demuestra que los contratos encadenan:
@@ -188,9 +188,9 @@ Goal: demostrar que FOPEBA **escala** y que el producto es certificable como con
 ## Current Goal
 
 ```text
-Track B (prioridad): RELEASE-ROLLBACK-003 (R3 FULL PASS) → Land Check → release-rollback-pass
-Track A:             Do NOT open FLOW-05 unless Track B finds a blocker
-FOPEBA_LAND_CHECK:   ACTIVE · before every 001 / tag
+Track B (prioridad): RELEASE-01-BETA DoR → Spec → Freeze → Runner → release-01-beta
+Track A:             Do NOT open FLOW-05 until release-01-beta exists
+FOPEBA_LAND_CHECK:   ACTIVE · pull + fetch --tags --prune before every runner
 FOPEBA_METRICS:      v0 marco; filas cuantitativas solo con datos objetivos
 ```
 

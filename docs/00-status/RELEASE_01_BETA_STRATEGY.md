@@ -1,10 +1,11 @@
 # RELEASE-01 · Beta Strategy
 
 **Documento:** `RELEASE_01_BETA_STRATEGY.md`  
-**Fecha:** 2026-08-02  
-**Estado:** ▶ **DRAFT · Gate concept** (no es un Flow · no abre implementación de dominio)  
-**Precondición:** FLOW-01…FLOW-04 ✅ CERTIFIED · FOPEBA institucionalizado · `flow04-pass`  
+**Fecha:** 2026-08-03  
+**Estado:** ▶ **DRAFT · Gate concept** · Track B operativo ✅ · DoR Beta ▶ [RELEASE_01_BETA_DOR](./RELEASE_01_BETA_DOR.md)  
+**Precondición:** FLOW-01…FLOW-04 ✅ · Track B Smoke…Rollback ✅ · `release-rollback-pass`  
 **DoRl:** [DEFINITION_OF_RELEASE](./DEFINITION_OF_RELEASE.md)  
+**DoR Beta:** [RELEASE_01_BETA_DOR](./RELEASE_01_BETA_DOR.md)  
 **Plan:** [NEXT_EXECUTION_PLAN](./NEXT_EXECUTION_PLAN.md)  
 **Handoff:** [PROJECT_HANDOFF](./PROJECT_HANDOFF.md)
 
@@ -76,8 +77,8 @@ Luego FLOW-06… según catálogo. Sin saltos. Sin features futuras en el PR del
 | Cross-flow | ✅ | Tag `release-crossflow-pass` → `0a0c51b` · [PASS](../10-validation/release-crossflow/RELEASE_CROSSFLOW_PASS_ACTA.md) |
 | E2E | ✅ | Tag `release-e2e-pass` → `73623ae` · [PASS](../10-validation/release-e2e/RELEASE_E2E_PASS_ACTA.md) |
 | Deployment | ✅ | Tag `release-deploy-pass` → `7896a2a` · [PASS](../10-validation/release-deploy/RELEASE_DEPLOY_PASS_ACTA.md) |
-| Rollback | ▶ | DoR ✅ · Spec ✅ · Runner ✅ · Gate ✅ · 001 ✅ · 002 ✅ · 003 ▶ FULL PASS · [ACTA](../10-validation/release-rollback/RELEASE_ROLLBACK_003_R3_ACTA.md) → tag `release-rollback-pass` |
-| Beta Acceptance | ⏳ | Enlaza evidencia → tag `release-01-beta` |
+| Rollback | ✅ | Tag `release-rollback-pass` → `0ba856e` · [PASS](../10-validation/release-rollback/RELEASE_ROLLBACK_PASS_ACTA.md) |
+| Beta Acceptance | ▶ | DoR ▶ [RELEASE_01_BETA_DOR](./RELEASE_01_BETA_DOR.md) → tag `release-01-beta` |
 
 #### Roadmap Track B (mismo patrón FOPEBA · sin mezclar)
 
@@ -86,11 +87,11 @@ B-01 Smoke        ✅ release-smoke-pass
 B-02 Cross-flow   ✅ release-crossflow-pass → 0a0c51b
 B-03 E2E          ✅ release-e2e-pass → 73623ae
 B-04 Deployment   ✅ release-deploy-pass → 7896a2a
-B-05 Rollback     DoR ✅ · Spec ✅ · Runner ✅ · Gate ✅ · 001 ✅ · 002 ✅ · 003 ▶ FULL PASS → release-rollback-pass
-B-06 Beta Accept. Solo al final → release-01-beta
+B-05 Rollback     ✅ release-rollback-pass → 0ba856e
+B-06 Beta Accept. ▶ DoR ▶ RELEASE_01_BETA_DOR → release-01-beta
 ```
 
-Orden fijo. No abrir FLOW-05 / Deploy / Rollback salvo que el ciclo E2E lo exija.  
+Orden fijo. **No** abrir FLOW-05 hasta existir `release-01-beta`.  
 Convención de tags: homogénea con `flowNN-pass` — cada gate termina en `-pass`.
 
 Criterio de publicación: **todos los gates aplicables con evidencia**,  
@@ -107,16 +108,16 @@ RELEASE-01
 ├── FLOW-02                 ✅  tag flow02-pass
 ├── FLOW-03                 ✅  tag flow03-pass
 ├── FLOW-04                 ✅  tag flow04-pass
-├── FLOW-05+                ⏳  solo si el set beta lo exige (DoR primero)
+├── FLOW-05+                ⏳  CLOSED hasta release-01-beta
 ├── Smoke Tests             ✅  tag release-smoke-pass
 ├── Cross-flow Tests        ✅  tag release-crossflow-pass → 0a0c51b
 ├── E2E Tests               ✅  tag release-e2e-pass → 73623ae
 ├── Performance             ⏳  (o N/A documentado)
 ├── Security                ⏳  (o N/A documentado)
 ├── Deployment              ✅  tag release-deploy-pass → 7896a2a
-├── Rollback                ▶  003 R3 · FULL PASS · blocked_at=— → release-rollback-pass
-├── Documentation           ⏳  handoff · CURRENT_PHASE · ADRs
-└── Beta Acceptance         ⏳  DoRl PASS
+├── Rollback                ✅  tag release-rollback-pass → 0ba856e
+├── Documentation           ▶  DoR Beta · handoff · CURRENT_PHASE
+└── Beta Acceptance         ▶  DoR ▶ RELEASE_01_BETA_DOR
         ↓
    release-01-beta
 ```

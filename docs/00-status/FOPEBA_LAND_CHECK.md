@@ -32,11 +32,15 @@ Aplica a:
 ```text
 FOPEBA Land Check
 
-Antes de abrir cualquier 001:
+Antes de cualquier certificación / 001 / tag:
 
 1. git pull origin main
 
-2. Ejecutar el runner canónico desde main.
+2. git fetch --tags --prune
+   (sincroniza anchors -pass remotos; evita falsos negativos
+    cuando el tag existe en origin pero no localmente)
+
+3. Ejecutar el runner canónico desde main.
 
 Si ocurre cualquiera de estas dos situaciones:
 
@@ -55,9 +59,9 @@ puede abrirse el incremento 001.
 
 ```bash
 git pull origin main
+git fetch --tags --prune
 npm run test:<gate-script>
 ```
-
 ### Lectura de resultados
 
 | Resultado desde `main` | Significado | Gate |

@@ -2,7 +2,8 @@
 
 **Documento:** `RELEASE_ROLLBACK_RUNNER.md`  
 **Fecha:** 2026-08-02  
-**Estado:** ✅ Runner **CERTIFIED** (#210 · `a1fbdc3`) · live through R3 · **FULL PASS** · runner-only **BLOCKED** at R1 · Gate ✅ READY  
+**Estado:** ✅ Runner **CERTIFIED** (#210 · `a1fbdc3`) · live through R3 · **FULL PASS** · tag `release-rollback-pass` → `0ba856e` · runner-only **BLOCKED** at R1 · Gate ✅ CLOSED  
+**Pass acta:** [RELEASE_ROLLBACK_PASS_ACTA](./RELEASE_ROLLBACK_PASS_ACTA.md)  
 **Spec:** [RELEASE_ROLLBACK_SPEC](../../00-status/RELEASE_ROLLBACK_SPEC.md) (FROZEN · #208 · `4d109f7`)  
 **DoR:** [RELEASE_ROLLBACK_DOR](../../00-status/RELEASE_ROLLBACK_DOR.md)  
 **Principio:** [Evidence before Implementation](../../00-status/EVIDENCE_BEFORE_IMPLEMENTATION.md)  
@@ -122,7 +123,7 @@ npm run test:release-rollback:runner-only
 # → BLOCKED at RELEASE_ROLLBACK_R1_STARTED · exit 2
 ```
 
-Next after 003 Land Check: tag **`release-rollback-pass`** → READY TO OPEN **RELEASE-01-BETA DoR** (docs only).
+Next after 003 Land Check: tag **`release-rollback-pass`** ✅ → READY TO OPEN **RELEASE-01-BETA DoR** (docs only).
 
 ---
 
