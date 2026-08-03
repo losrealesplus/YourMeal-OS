@@ -60,9 +60,9 @@ Sprint activo
   Tags: ps002c-pass · flow01…05-pass · release-01-beta · release-01-pass
         · capacitor-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    MOBILE-RELEASE-01 · Mobile Production Readiness
-                               (DoR primero · no abrir stores sin contrato)
-                               firma · Play Internal · TestFlight · CI builds
+  Prioridad                    MOBILE-RELEASE-01 · MR01-002 Android Build ▶
+                               (MR1 ✅ · unsigned APK/AAB · Ready for Signing)
+                               NO signing / Play / CI en este bloque
                                NO reabrir C1–C5 · Core Integrity intacta
                                Regla: Native Tool Artifacts (FOUNDATION.md)
                                Order States ≠ Operational States
@@ -123,7 +123,11 @@ NEXT PHASE
   ↓
   ▶ CAPACITOR ✅ CERTIFIED · tag capacitor-pass → 400a010
   ↓
-  Next · MOBILE-RELEASE-01 DoR (Internal Testing · firma · CI)
+  MOBILE-RELEASE-01 DoR ✅ · Spec ✅ · Runner ✅ · Gate READY
+  ↓
+  MR01-001 ✅ Preparation · MR01-002 ▶ Android Build (unsigned)
+  ↓
+  Next · MR01-003 Android Signing only
 
 En paralelo (beta móvil EatClean):
   Lema: cada PR acerca la jornada completa del piloto.

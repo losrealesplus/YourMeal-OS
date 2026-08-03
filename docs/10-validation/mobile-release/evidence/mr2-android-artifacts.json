@@ -1,0 +1,58 @@
+{
+  "delivery": "MR01-002",
+  "segment": "android_build",
+  "applicationId": "com.yourmealos.eatclean",
+  "versionCode": 1,
+  "versionName": "1.0",
+  "signing": "unsigned",
+  "certifies": [
+    "android_debug_apk",
+    "android_release_apk_unsigned",
+    "android_release_aab",
+    "reproducible_gradle_build"
+  ],
+  "does_not_certify": [
+    "signing",
+    "keystore",
+    "google_play",
+    "play_console",
+    "internal_testing",
+    "ios",
+    "ci_cd"
+  ],
+  "gradle_tasks": [
+    ":app:assembleDebug",
+    ":app:assembleRelease",
+    ":app:bundleRelease"
+  ],
+  "output_layout": {
+    "apk": "android/app/build/outputs/apk/",
+    "bundle": "android/app/build/outputs/bundle/"
+  },
+  "note": "Binaries are gitignored under android/**/build/. Evidence JSON is the certified fingerprint. Operational copies may live outside the repo (e.g. artifacts store).",
+  "recorded_at": "2026-08-03T20:04:52.350Z",
+  "artifacts": {
+    "debug_apk": {
+      "relative_path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 5332866,
+      "sha256": "8996d9d76faa5dc49b5adfa65ef041ae7eaee5d296c547eb63466bc3322d4945",
+      "variant": "debug",
+      "kind": "apk"
+    },
+    "release_apk": {
+      "relative_path": "android/app/build/outputs/apk/release/app-release-unsigned.apk",
+      "bytes": 4319430,
+      "sha256": "535aae726580566d7b642e2415eec468dd921f3284767a3f22b22bd9cfad27a5",
+      "variant": "release",
+      "kind": "apk",
+      "unsigned": true
+    },
+    "release_aab": {
+      "relative_path": "android/app/build/outputs/bundle/release/app-release.aab",
+      "bytes": 4137749,
+      "sha256": "2e761e55a787d2efe33e18430edce1b5a64975602745e6fd19d9b87f4ece68a2",
+      "variant": "release",
+      "kind": "aab"
+    }
+  }
+}
