@@ -58,6 +58,7 @@ Tag `release-01-pass` = bloques P1–P5 CERTIFIED · Gate CLOSED.
 | `release-01-beta` | Release | ✅ → `facb917` · [PASS](../10-validation/release-01-beta/RELEASE_01_BETA_PASS_ACTA.md) |
 | `release-01-pass` | Release | ✅ → `8e91a49` · [PASS](../10-validation/release-01/RELEASE_01_PASS_ACTA.md) |
 | `capacitor-pass` | Distribution | ✅ → `400a010` (#256) · C1–C5 FULL PASS · [PASS](../10-validation/capacitor/CAPACITOR_PASS_ACTA.md) |
+| `mobile-release-01-pass` | Distribution | ⏳ tras Land Check en `main` · MR1–MR5 FULL PASS · [PASS](../10-validation/mobile-release/MOBILE_RELEASE_01_PASS_ACTA.md) |
 
 ---
 
@@ -71,6 +72,7 @@ Tag `release-01-pass` = bloques P1–P5 CERTIFIED · Gate CLOSED.
 | RELEASE-01 DoRl PASS (todos los gates aplicables) | ✅ `release-01-beta` → `facb917` · Gate CLOSED · B1–B5 CERTIFIED |
 | RELEASE-01 Product PASS (P1–P5) | ✅ `release-01-pass` → `8e91a49` · Gate CLOSED · P1–P5 CERTIFIED |
 | Capacitor Distribution PASS (C1–C5) | ✅ `capacitor-pass` → `400a010` · Gate CLOSED · Distribution Certified |
+| MOBILE-RELEASE-01 PASS (MR1–MR5) | ⏳ `mobile-release-01-pass` tras Land Check · Gate CLOSED · Ready for Internal Testing |
 | Release desplegable / semver de producto | `release-vX.Y.Z` o `vX.Y.Z` |
 
 Reglas:
