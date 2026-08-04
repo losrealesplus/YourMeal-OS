@@ -1,0 +1,51 @@
+{
+  "delivery": "MR01-004",
+  "segment": "ios_archive",
+  "marketing_version": "1.0",
+  "current_project_version": "1",
+  "product_bundle_identifier": "com.yourmealos.eatclean",
+  "project_pbxproj_sha256": "7c7285ca7a066db576ebd1920a890f5b2b8cebd6002d77fd88ecaeed24f763ff",
+  "git_commit": "7010e2b50fbc749ad332f19ce8d4791f5265204a",
+  "recorded_at": "2026-08-04T07:01:01.564Z",
+  "host": {
+    "platform": "linux",
+    "xcodebuild_available": false
+  },
+  "archive_recipe": {
+    "scheme": "App",
+    "configuration": "Release",
+    "workspace_or_project": "ios/App/App.xcodeproj",
+    "xcodebuild": [
+      "xcodebuild",
+      "-project",
+      "ios/App/App.xcodeproj",
+      "-scheme",
+      "App",
+      "-configuration",
+      "Release",
+      "-archivePath",
+      "ios/build/App.xcarchive",
+      "archive"
+    ]
+  },
+  "xcarchive_relative_path": "ios/build/App.xcarchive",
+  "xcarchive_status": "contract_ready_pending_macos",
+  "xcarchive": null,
+  "certifies": [
+    "ios_project_valid",
+    "release_configuration",
+    "signing_identity_prepared",
+    "archive_recipe_reproducible",
+    "archive_metadata_fingerprint",
+    "core_integrity_during_archive_contract"
+  ],
+  "does_not_certify": [
+    "ipa",
+    "testflight",
+    "app_store_connect",
+    "distribution",
+    "fastlane",
+    "ci_cd"
+  ],
+  "note": "No live .xcarchive on this host. Project fingerprint + xcodebuild recipe certified; produce Archive on macOS and re-run this script."
+}

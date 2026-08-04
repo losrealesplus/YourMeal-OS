@@ -15,11 +15,11 @@
  *
  * Spec: docs/00-status/MOBILE_RELEASE_01_SPEC.md
  *
- * CERTIFIED_THROUGH=3 — MR1–MR3 (Preparation · Android Build · Android Signing) · NO Play · NO CI.
+ * CERTIFIED_THROUGH=4 — MR1–MR4 · NO IPA · NO TestFlight · NO stores · NO CI.
  */
 
 /** Highest block with a capability driver implemented. */
-const MOBILE_RELEASE_CERTIFIED_THROUGH = 3;
+const MOBILE_RELEASE_CERTIFIED_THROUGH = 4;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";

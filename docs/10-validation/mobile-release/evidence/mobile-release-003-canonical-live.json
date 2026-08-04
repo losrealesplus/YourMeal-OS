@@ -10,7 +10,7 @@
   "principle": "Evidence before Implementation",
   "architecture": "Core SaaS → Capacitor → MOBILE-RELEASE → Internal Testing",
   "code_status": "CAPABILITY_DRIVER_MR3",
-  "at": "2026-08-03T20:17:25.269Z",
+  "at": "2026-08-04T07:01:02.185Z",
   "pipeline": [
     "MOBILE_RELEASE_MR1_STARTED",
     "MOBILE_RELEASE_MR1_COMPLETED",
@@ -104,9 +104,8 @@
           "note": "gitignored build output; evidence manifest is source of truth"
         },
         "release_aab": {
-          "present": true,
-          "sha256_match": false,
-          "note": "live output differs from MR2 fingerprint (e.g. MR3 signing) — committed evidence remains authoritative"
+          "present": false,
+          "note": "gitignored build output; evidence manifest is source of truth"
         }
       },
       "entries": {
