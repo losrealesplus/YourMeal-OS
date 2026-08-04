@@ -1,0 +1,32 @@
+{
+  "delivery": "MR01-005",
+  "segment": "internal_testing_acceptance",
+  "status": "READY_FOR_INTERNAL_TESTING",
+  "android_private_ready": true,
+  "ios_archive_ready": true,
+  "core_integrity": true,
+  "question": "Can the team privately install and test YourMeal OS on Android and iOS without modifying the Core?",
+  "answer": true,
+  "evidence_refs": {
+    "mr2": "docs/10-validation/mobile-release/evidence/mr2-android-artifacts.json",
+    "mr3": "docs/10-validation/mobile-release/evidence/mr3-android-signing.json",
+    "mr4": "docs/10-validation/mobile-release/evidence/mr4-ios-archive.json"
+  },
+  "certifies": [
+    "android_private_delivery_ready",
+    "ios_archive_ready_for_private_testing",
+    "core_integrity_preserved",
+    "artifact_evidence_complete",
+    "mobile_release_01_pass"
+  ],
+  "does_not_certify": [
+    "google_play_internal_testing",
+    "google_play_closed_testing",
+    "google_play_production",
+    "testflight",
+    "app_store_review",
+    "publication"
+  ],
+  "next_domain": "STORE-RELEASE-01",
+  "recorded_at": "2026-08-04T07:05:00.000Z"
+}

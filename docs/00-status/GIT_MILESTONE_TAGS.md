@@ -15,7 +15,7 @@
 | **Flow** | `flow*` / `flowNN-pass` | `flow01-pass` · `flow02-pass` | Flujos de negocio completamente certificados (PASS completo del runner) |
 | **Release gate** | `release-<gate>-pass` | `release-smoke-pass` · `release-crossflow-pass` | Gates DoRl de RELEASE-01 (mismo patrón `-pass` que Flows) |
 | **Release** | `release-01-beta` / `release-01-pass` / `v*` | `release-01-beta` · `release-01-pass` · `release-v0.2.0` | Framework beta · producto SaaS · semver |
-| **Distribution** | `capacitor-pass` | `capacitor-pass` | Shell nativo Web→Android/iOS · Distribution Certified |
+| **Distribution** | `capacitor-pass` · `mobile-release-01-pass` | `capacitor-pass` · `mobile-release-01-pass` | Shell nativo · private mobile delivery pipeline |
 
 No cambia la metodología FOPEBA / Evidence before Implementation.  
 Hace legible el historial: **técnica** vs **dominio** vs **gates de producto** vs **release** vs **distribution**.
