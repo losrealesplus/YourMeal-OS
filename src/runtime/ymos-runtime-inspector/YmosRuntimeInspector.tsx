@@ -5,7 +5,7 @@
  * Tabs: General · Runtime · Assets · i18n · Router · Supabase · Network · Storage · Clipboard · Device · Errors
  * ANDROID-ASSETS-001 contributes the Assets tab.
  */
-import { useEffect, useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/use-auth";
@@ -125,6 +125,7 @@ export function YmosRuntimeInspector() {
   console.log("[YMOS] Inspector component rendered");
 
   const enabled = useInspectorEnabled();
+  const rootRef = useRef<HTMLDivElement | null>(null);
 
   ymosTrace("enabled =", enabled);
   console.log("[YMOS] Inspector enabled =", enabled);
@@ -184,6 +185,66 @@ export function YmosRuntimeInspector() {
     }
     const id = window.setInterval(() => setTick((n) => n + 1), 1200);
     return () => window.clearInterval(id);
+  }, [enabled]);
+
+  // ANDROID-RUNTIME-006 — DOM / CSS visibility probe (after paint).
+  useEffect(() => {
+    if (!enabled) return;
+
+    const probe = (phase: string) => {
+      const el =
+        document.getElementById("ymos-runtime-inspector") ?? rootRef.current;
+      const cs = el ? getComputedStyle(el) : null;
+      const rect = el?.getBoundingClientRect();
+      const payload = {
+        phase,
+        exists: Boolean(el),
+        inDocument: el ? document.documentElement.contains(el) : false,
+        parentTag: el?.parentElement?.tagName ?? null,
+        rect: rect
+          ? {
+              x: rect.x,
+              y: rect.y,
+              width: rect.width,
+              height: rect.height,
+              top: rect.top,
+              left: rect.left,
+              bottom: rect.bottom,
+              right: rect.right,
+            }
+          : null,
+        zIndex: cs?.zIndex ?? null,
+        display: cs?.display ?? null,
+        visibility: cs?.visibility ?? null,
+        opacity: cs?.opacity ?? null,
+        position: cs?.position ?? null,
+        transform: cs?.transform ?? null,
+        pointerEvents: cs?.pointerEvents ?? null,
+        backgroundColor: cs?.backgroundColor ?? null,
+        viewport: {
+          w: window.innerWidth,
+          h: window.innerHeight,
+        },
+      };
+      console.log("[YMOS-DOM]", payload);
+      ymosTrace("YMOS-DOM", payload);
+    };
+
+    probe("sync");
+    const raf1 = requestAnimationFrame(() => {
+      probe("raf1");
+      requestAnimationFrame(() => probe("raf2"));
+    });
+    const t0 = window.setTimeout(() => probe("t+50ms"), 50);
+    const t1 = window.setTimeout(() => probe("t+250ms"), 250);
+    const t2 = window.setTimeout(() => probe("t+1000ms"), 1000);
+
+    return () => {
+      cancelAnimationFrame(raf1);
+      window.clearTimeout(t0);
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+    };
   }, [enabled]);
 
   const diagnostic = useMemo(() => {
@@ -247,17 +308,37 @@ export function YmosRuntimeInspector() {
 
   return (
     <div
-      className="fixed bottom-4 right-4 z-[110] w-[min(100vw-2rem,24rem)] max-h-[min(78vh,40rem)] flex flex-col rounded-xl border border-white/15 bg-zinc-950/95 text-[11px] text-zinc-100 shadow-2xl backdrop-blur-md"
+      ref={rootRef}
+      id="ymos-runtime-inspector"
+      className="flex flex-col text-[11px] text-zinc-100"
       data-ymos-runtime-inspector="1"
       role="complementary"
       aria-label="YMOS Runtime Inspector"
+      /* ANDROID-RUNTIME-006 temporary ultra-visible shell — prove DOM paint */
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+        background: "rgba(255,0,0,.35)",
+        zIndex: 2147483647,
+        pointerEvents: "none",
+        overflow: "auto",
+      }}
     >
+      <div
+        className="m-4 max-h-[min(78vh,40rem)] w-[min(100vw-2rem,24rem)] self-end overflow-auto rounded-xl border-4 border-yellow-300 bg-zinc-950 text-[11px] text-zinc-100 shadow-2xl"
+        style={{ pointerEvents: "auto" }}
+      >
       <div className="flex items-center justify-between gap-2 p-3 pb-2">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-sky-300">
-            YMOS Runtime
+          <p className="text-[10px] font-bold uppercase tracking-widest text-yellow-300">
+            YMOS Runtime · DOM PROBE
           </p>
-          <p className="text-[9px] text-zinc-500">Inspector · observe only</p>
+          <p className="text-[9px] text-zinc-500">
+            ANDROID-RUNTIME-006 · red fullscreen = node is in DOM
+          </p>
         </div>
         <button
           type="button"
@@ -605,6 +686,7 @@ export function YmosRuntimeInspector() {
         >
           {copied ? "Copied ✓" : "Copy Diagnostic"}
         </button>
+      </div>
       </div>
     </div>
   );
