@@ -4,7 +4,8 @@
  * MR1 = Preparation (MR01-001)
  * MR2 = Android Build (MR01-002)
  * MR3 = Android Signing (MR01-003)
- * MR4…MR5 = not implemented in this delivery
+ * MR4 = iOS Archive (MR01-004)
+ * MR5 = not implemented in this delivery
  *
  * Tenant-agnostic — Core SaaS → Capacitor → private delivery.
  * Core Integrity Rule: Mobile Release does not alter Core SaaS behavior.
@@ -13,6 +14,7 @@ import { MOBILE_RELEASE_SEGMENTS } from "./mobile-release-canonical-pipeline.mjs
 import { runMobileReleaseMr1Preparation } from "./mobile-release-mr1-preparation.mjs";
 import { runMobileReleaseMr2AndroidBuild } from "./mobile-release-mr2-android-build.mjs";
 import { runMobileReleaseMr3AndroidSigning } from "./mobile-release-mr3-android-signing.mjs";
+import { runMobileReleaseMr4IosArchive } from "./mobile-release-mr4-ios-archive.mjs";
 
 /**
  * @param {{ root: string, through?: 1|2|3|4|5 | 0 | null }} opts
@@ -110,11 +112,36 @@ export function runMobileReleaseCapabilityDriver({ root, through = null }) {
 
   if (max < 4) return { ok: true, steps, evidence };
 
+  console.info("[MOBILE-RELEASE]", "MOBILE_RELEASE_MR4_STARTED", {
+    segment: MOBILE_RELEASE_SEGMENTS[4],
+  });
+  steps.push("MOBILE_RELEASE_MR4_STARTED");
+
+  const mr4 = runMobileReleaseMr4IosArchive({ cwd: root });
+  evidence.mr4_checks = mr4.checks;
+  if (!mr4.ok) {
+    console.error("[MOBILE-RELEASE] MR4 FAIL:\n" + mr4.reason);
+    return { ok: false, steps, reason: mr4.reason, evidence };
+  }
+  evidence.mr4_mapped_tokens = mr4.mapped_tokens;
+  evidence.mr4_source = mr4.source;
+  evidence.mr4_archive = mr4.archive ?? null;
+
+  console.info("[MOBILE-RELEASE]", "MOBILE_RELEASE_MR4_COMPLETED", {
+    segment: MOBILE_RELEASE_SEGMENTS[4],
+    mapped_tokens: mr4.mapped_tokens,
+    source: mr4.source,
+    checks: mr4.checks,
+  });
+  steps.push("MOBILE_RELEASE_MR4_COMPLETED");
+
+  if (max < 5) return { ok: true, steps, evidence };
+
   return {
     ok: false,
     steps,
     reason:
-      "MR4 block driver is not implemented — stop at MR01-003 (Android Signing only).",
+      "MR5 block driver is not implemented — stop at MR01-004 (iOS Archive only).",
     evidence,
   };
 }
