@@ -22,9 +22,16 @@ import {
   YmosRuntimeMountProbe,
   ymosRuntimeLog,
 } from "@/runtime/ymos-runtime-audit";
+import { YmosRuntimeInspector } from "@/runtime/ymos-runtime-inspector";
+import {
+  markYmosRuntimeRootImported,
+  recordYmosRuntimeException,
+  recordYmosRuntimeRedirect,
+} from "@/runtime/ymos-runtime-status";
 
 // ANDROID-RUNTIME-001 — module load sensor
 ymosRuntimeLog("__root imported");
+markYmosRuntimeRootImported();
 
 // Hard dependency on the singleton store so production DCE cannot drop resources (BUG-001).
 // Prefer options.resources over isInitialized — init() resolves asynchronously.
@@ -62,9 +69,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
-    ymosRuntimeLog(
-      `mount exception captured name=${error?.name} message=${error?.message}`,
-    );
+    const msg = `mount exception captured name=${error?.name} message=${error?.message}`;
+    ymosRuntimeLog(msg);
+    recordYmosRuntimeException(msg);
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
@@ -212,10 +219,11 @@ function RootComponent() {
   // Observe navigations/redirects without changing router behavior.
   useEffect(() => {
     const unsub = router.subscribe("onResolved", ({ pathChanged, toLocation, fromLocation }) => {
-      if (!pathChanged) return;
+      if (!pathChanged || !fromLocation || !toLocation) return;
       ymosRuntimeLog(
         `redirect/nav from=${fromLocation.pathname} to=${toLocation.pathname}`,
       );
+      recordYmosRuntimeRedirect(fromLocation.pathname, toLocation.pathname);
     });
     return unsub;
   }, [router]);
@@ -228,6 +236,8 @@ function RootComponent() {
             <YmosRuntimeMountProbe label="Outlet rendered">
               <Outlet />
             </YmosRuntimeMountProbe>
+            {/* YMOS Runtime Inspector — observe-only; gated by flag */}
+            <YmosRuntimeInspector />
           </AppProviders>
         </I18nextProvider>
       </YmosRuntimeMountProbe>
