@@ -15,7 +15,7 @@
 | **Flow** | `flow*` / `flowNN-pass` | `flow01-pass` · `flow02-pass` | Flujos de negocio completamente certificados (PASS completo del runner) |
 | **Release gate** | `release-<gate>-pass` | `release-smoke-pass` · `release-crossflow-pass` | Gates DoRl de RELEASE-01 (mismo patrón `-pass` que Flows) |
 | **Release** | `release-01-beta` / `release-01-pass` / `v*` | `release-01-beta` · `release-01-pass` · `release-v0.2.0` | Framework beta · producto SaaS · semver |
-| **Distribution** | `capacitor-pass` · `mobile-release-01-pass` | `capacitor-pass` · `mobile-release-01-pass` | Shell nativo · private mobile delivery pipeline |
+| **Distribution** | `capacitor-pass` · `mobile-release-01-pass` · `store-release-*-pass` | `capacitor-pass` · `mobile-release-01-pass` | Shell · private mobile delivery · store distribution |
 
 No cambia la metodología FOPEBA / Evidence before Implementation.  
 Hace legible el historial: **técnica** vs **dominio** vs **gates de producto** vs **release** vs **distribution**.
@@ -58,7 +58,8 @@ Tag `release-01-pass` = bloques P1–P5 CERTIFIED · Gate CLOSED.
 | `release-01-beta` | Release | ✅ → `facb917` · [PASS](../10-validation/release-01-beta/RELEASE_01_BETA_PASS_ACTA.md) |
 | `release-01-pass` | Release | ✅ → `8e91a49` · [PASS](../10-validation/release-01/RELEASE_01_PASS_ACTA.md) |
 | `capacitor-pass` | Distribution | ✅ → `400a010` (#256) · C1–C5 FULL PASS · [PASS](../10-validation/capacitor/CAPACITOR_PASS_ACTA.md) |
-| `mobile-release-01-pass` | Distribution | ⏳ tras Land Check en `main` · MR1–MR5 FULL PASS · [PASS](../10-validation/mobile-release/MOBILE_RELEASE_01_PASS_ACTA.md) |
+| `mobile-release-01-pass` | Distribution | ✅ → `ca3e823` · MR1–MR5 FULL PASS · [PASS](../10-validation/mobile-release/MOBILE_RELEASE_01_PASS_ACTA.md) |
+| `store-release-01-pass` | Distribution | 🔒 pendiente · tras STORE-RELEASE-01 FULL PASS |
 
 ---
 
@@ -72,7 +73,8 @@ Tag `release-01-pass` = bloques P1–P5 CERTIFIED · Gate CLOSED.
 | RELEASE-01 DoRl PASS (todos los gates aplicables) | ✅ `release-01-beta` → `facb917` · Gate CLOSED · B1–B5 CERTIFIED |
 | RELEASE-01 Product PASS (P1–P5) | ✅ `release-01-pass` → `8e91a49` · Gate CLOSED · P1–P5 CERTIFIED |
 | Capacitor Distribution PASS (C1–C5) | ✅ `capacitor-pass` → `400a010` · Gate CLOSED · Distribution Certified |
-| MOBILE-RELEASE-01 PASS (MR1–MR5) | ⏳ `mobile-release-01-pass` tras Land Check · Gate CLOSED · Ready for Internal Testing |
+| MOBILE-RELEASE-01 PASS (MR1–MR5) | ✅ `mobile-release-01-pass` → `ca3e823` · Gate CLOSED · Ready for Internal Testing |
+| STORE-RELEASE-01 PASS (SR1–SR5) | 🔒 `store-release-01-pass` tras ciclo completo · Production Readiness |
 | Release desplegable / semver de producto | `release-vX.Y.Z` o `vX.Y.Z` |
 
 Reglas:
