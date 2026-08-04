@@ -15,11 +15,11 @@
  *
  * Spec: docs/00-status/MOBILE_RELEASE_01_SPEC.md
  *
- * CERTIFIED_THROUGH=4 — MR1–MR4 · NO IPA · NO TestFlight · NO stores · NO CI.
+ * CERTIFIED_THROUGH=5 — MOBILE-RELEASE-01 FULL PASS · Ready for Internal Testing · NO stores.
  */
 
 /** Highest block with a capability driver implemented. */
-const MOBILE_RELEASE_CERTIFIED_THROUGH = 4;
+const MOBILE_RELEASE_CERTIFIED_THROUGH = 5;
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";

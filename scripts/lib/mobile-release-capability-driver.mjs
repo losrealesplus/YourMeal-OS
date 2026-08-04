@@ -5,7 +5,7 @@
  * MR2 = Android Build (MR01-002)
  * MR3 = Android Signing (MR01-003)
  * MR4 = iOS Archive (MR01-004)
- * MR5 = not implemented in this delivery
+ * MR5 = Internal Testing Acceptance (MR01-005)
  *
  * Tenant-agnostic — Core SaaS → Capacitor → private delivery.
  * Core Integrity Rule: Mobile Release does not alter Core SaaS behavior.
@@ -15,6 +15,7 @@ import { runMobileReleaseMr1Preparation } from "./mobile-release-mr1-preparation
 import { runMobileReleaseMr2AndroidBuild } from "./mobile-release-mr2-android-build.mjs";
 import { runMobileReleaseMr3AndroidSigning } from "./mobile-release-mr3-android-signing.mjs";
 import { runMobileReleaseMr4IosArchive } from "./mobile-release-mr4-ios-archive.mjs";
+import { runMobileReleaseMr5InternalTestingAcceptance } from "./mobile-release-mr5-internal-testing-acceptance.mjs";
 
 /**
  * @param {{ root: string, through?: 1|2|3|4|5 | 0 | null }} opts
@@ -137,11 +138,28 @@ export function runMobileReleaseCapabilityDriver({ root, through = null }) {
 
   if (max < 5) return { ok: true, steps, evidence };
 
-  return {
-    ok: false,
-    steps,
-    reason:
-      "MR5 block driver is not implemented — stop at MR01-004 (iOS Archive only).",
-    evidence,
-  };
+  console.info("[MOBILE-RELEASE]", "MOBILE_RELEASE_MR5_STARTED", {
+    segment: MOBILE_RELEASE_SEGMENTS[5],
+  });
+  steps.push("MOBILE_RELEASE_MR5_STARTED");
+
+  const mr5 = runMobileReleaseMr5InternalTestingAcceptance({ cwd: root });
+  evidence.mr5_checks = mr5.checks;
+  if (!mr5.ok) {
+    console.error("[MOBILE-RELEASE] MR5 FAIL:\n" + mr5.reason);
+    return { ok: false, steps, reason: mr5.reason, evidence };
+  }
+  evidence.mr5_mapped_tokens = mr5.mapped_tokens;
+  evidence.mr5_source = mr5.source;
+  evidence.mr5_acceptance = mr5.acceptance ?? null;
+
+  console.info("[MOBILE-RELEASE]", "MOBILE_RELEASE_MR5_COMPLETED", {
+    segment: MOBILE_RELEASE_SEGMENTS[5],
+    mapped_tokens: mr5.mapped_tokens,
+    source: mr5.source,
+    checks: mr5.checks,
+  });
+  steps.push("MOBILE_RELEASE_MR5_COMPLETED");
+
+  return { ok: true, steps, evidence };
 }
