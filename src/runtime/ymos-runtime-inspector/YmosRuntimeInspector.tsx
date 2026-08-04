@@ -109,7 +109,32 @@ function shortUrl(url: string): string {
  * Reads only — never mutates app state, providers, router, or i18n.
  */
 export function YmosRuntimeInspector() {
+  console.log("[YMOS] Inspector component rendered");
+
   const enabled = useInspectorEnabled();
+
+  console.log("[YMOS] Inspector enabled =", enabled);
+  console.log(
+    "[YMOS] env=",
+    import.meta.env.VITE_YMOS_RUNTIME_OVERLAY,
+  );
+  console.log(
+    "[YMOS] href=",
+    typeof window !== "undefined" ? window.location.href : "(ssr)",
+  );
+  console.log(
+    "[YMOS] session=",
+    typeof sessionStorage !== "undefined"
+      ? sessionStorage.getItem("ymos.runtime-inspector")
+      : "(ssr)",
+  );
+  console.log(
+    "[YMOS] local=",
+    typeof localStorage !== "undefined"
+      ? localStorage.getItem("ymos.runtime-inspector")
+      : "(ssr)",
+  );
+
   const [copied, setCopied] = useState(false);
   const [tab, setTab] = useState<Tab>("Assets");
   const [tick, setTick] = useState(0);
