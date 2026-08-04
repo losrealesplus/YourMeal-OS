@@ -2,7 +2,7 @@
 
 **Documento:** `STORE_RELEASE_01_DOR.md`  
 **Fecha:** 2026-08-04  
-**Estado:** ▶ **DoR DOCUMENT** (este PR) · Spec 🔒 · Runner 🔒 · Gate 🔒 · stores 🔒 · CI 🔒  
+**Estado:** ✅ **DoR** (#269) · Spec ▶ FROZEN (siguiente) · Runner 🔒 · Gate 🔒 · stores 🔒 · CI 🔒  
 **Dominio:** **Store Distribution** · operación real de plataformas (no producto · no binarios)  
 **Nivel:** Store Distribution Readiness · YourMeal OS (tenant-agnostic)  
 **Pregunta (única):** ¿Qué debe cumplir el proyecto para certificar **publicación y rollouts** en Google Play y App Store Connect (Internal → Closed → Production readiness)?  
@@ -260,13 +260,13 @@ No Runner · No Gate · No SR1 · No uploads · No CI · No Production
 STORE-RELEASE-01
 ☑ Precondición mobile-release-01-pass       ✅
 ☑ Precondiciones capacitor-pass · release-01 · flow05 ✅
-☑ DoR documental                           ▶ este PR · STORE_RELEASE_01_DOR.md
-□ Spec congelada                           → siguiente PR
-□ Contrato de evidencias definido          → Spec
-□ Runner creado                            → tras Spec FROZEN
+☑ DoR documental                           ✅ (#269) · STORE_RELEASE_01_DOR.md
+☑ Spec congelada                           ▶ este PR · STORE_RELEASE_01_SPEC.md
+□ Contrato de evidencias definido          → Spec (declarado) · Runner institucionaliza
+□ Runner creado                            → tras Spec FROZEN en main
 □ Gate READY                               → tras Runner en main
-□ PASS / BLOCKED esperados                 → Spec
-□ Acta / evidence paths                    → Spec · docs/10-validation/
+□ PASS / BLOCKED esperados                 → Spec (declarado)
+□ Acta / evidence paths                    → Spec · docs/10-validation/store-release/
 ```
 
 Sin Spec FROZEN + Runner en `main` + Gate READY → ❌ no abrir `SR1` ni subir a consolas.
@@ -285,16 +285,28 @@ STORE-RELEASE-01 Spec only
 Freeze → Runner → Gate
     ↓
 SR1 Preparation
+```
+
+*(Actualizado tras Spec: Next operativo = Runner only.)*
+
+```text
+Spec FROZEN en main
     ↓
-SR2 Google Play Internal Testing
+STORE-RELEASE-01 Runner only
     ↓
-SR3 Google Play Closed Testing
+Gate READY
     ↓
-SR4 Apple TestFlight
+SR01-001 · SR1 Preparation only
     ↓
-SR5 Production Readiness
+SR01-002 Google Play Internal Testing
     ↓
-PASS · store-release-01-pass (nombre a fijar)
+SR01-003 Google Play Closed Testing
+    ↓
+SR01-004 Apple TestFlight
+    ↓
+SR01-005 Production Readiness
+    ↓
+PASS · store-release-01-pass
 ```
 
 **Después (fuera de este ciclo):** capacidades nativas (`MOBILE-CAPABILITIES-*`) · OPS de monitoring/recovery · tenants adicionales reutilizando el mismo pipeline.

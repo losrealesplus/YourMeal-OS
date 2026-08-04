@@ -60,8 +60,8 @@ Sprint activo
   Tags: ps002c-pass · flow01…05-pass · release-01-beta · release-01-pass
         · capacitor-pass · mobile-release-01-pass
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    STORE-RELEASE-01 · DoR ▶ (este ciclo)
-                               Spec 🔒 · Runner 🔒 · Gate 🔒 · no uploads
+  Prioridad                    STORE-RELEASE-01 · Spec FROZEN ▶ (este ciclo)
+                               DoR ✅ · Runner 🔒 · Gate 🔒 · no uploads
                                MOBILE-RELEASE-01 ✅ · tag mobile-release-01-pass
                                NO reabrir MR1–MR5 / C1–C5 · Core Integrity intacta
                                Regla: Native Tool Artifacts (FOUNDATION.md)
@@ -129,10 +129,12 @@ NEXT PHASE
   ↓
   tag mobile-release-01-pass → ca3e823
   ↓
-  ▶ STORE-RELEASE-01 DoR (este PR)
+  ▶ STORE-RELEASE-01 DoR ✅ (#269)
   ↓
-  Next · STORE-RELEASE-01 Spec only
-  (Play Internal → Closed → TestFlight → Production Readiness)
+  ▶ STORE-RELEASE-01 Spec FROZEN (este PR)
+  ↓
+  Next · STORE-RELEASE-01 Runner only
+  (baseline BLOCKED at STORE_RELEASE_SR1_STARTED)
   Separación: MOBILE-RELEASE = binarios · STORE-RELEASE = distribución en stores
 
 En paralelo (beta móvil EatClean):
