@@ -26,6 +26,9 @@ if (!i18n.isInitialized) {
       defaultNS: "common",
       ns: ["common", "auth", "customer", "admin", "branding"],
       interpolation: { escapeValue: false },
+      // Sync resource store for first paint (Capacitor SPA has no SSR HTML).
+      initImmediate: true,
+      react: { useSuspense: false },
       detection: {
         // Language persistence goes through StorageProvider (M-04), not localStorage.
         // See hydrateUiLanguage / persistUiLanguage in ui-language-storage.ts.
