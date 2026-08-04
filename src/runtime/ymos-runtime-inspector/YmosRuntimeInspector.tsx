@@ -77,10 +77,21 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 }
 
 function useInspectorEnabled() {
+  console.log("[YMOS-TRACE] useInspectorEnabled() entered");
   const [enabled, setEnabled] = useState(false);
+  console.log("[YMOS-TRACE] useInspectorEnabled initial state =", enabled);
 
   useEffect(() => {
-    const sync = () => setEnabled(isYmosRuntimeInspectorEnabled());
+    console.log("[YMOS-TRACE] useInspectorEnabled effect run");
+    const sync = () => {
+      console.log("[YMOS-TRACE] env");
+      console.log("[YMOS-TRACE] query");
+      console.log("[YMOS-TRACE] sessionStorage");
+      console.log("[YMOS-TRACE] localStorage");
+      const next = isYmosRuntimeInspectorEnabled();
+      console.log("[YMOS-TRACE] useInspectorEnabled sync →", next);
+      setEnabled(next);
+    };
     sync();
     const unGesture = installYmosRuntimeInspectorGestureToggle();
     window.addEventListener("ymos-runtime-inspector-toggle", sync);
@@ -109,10 +120,12 @@ function shortUrl(url: string): string {
  * Reads only — never mutates app state, providers, router, or i18n.
  */
 export function YmosRuntimeInspector() {
+  console.log("[YMOS-TRACE] component function entered");
   console.log("[YMOS] Inspector component rendered");
 
   const enabled = useInspectorEnabled();
 
+  console.log("[YMOS-TRACE] enabled =", enabled);
   console.log("[YMOS] Inspector enabled =", enabled);
   console.log(
     "[YMOS] env=",
@@ -162,7 +175,12 @@ export function YmosRuntimeInspector() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) {
+      console.log(
+        "[YMOS-TRACE] returning null because enabled=false (skip refresh interval)",
+      );
+      return;
+    }
     const id = window.setInterval(() => setTick((n) => n + 1), 1200);
     return () => window.clearInterval(id);
   }, [enabled]);
@@ -192,7 +210,14 @@ export function YmosRuntimeInspector() {
     assets,
   ]);
 
-  if (!enabled) return null;
+  if (!enabled) {
+    console.log(
+      "[YMOS-TRACE] returning null because enabled=false (overlay gated off)",
+    );
+    return null;
+  }
+
+  console.log("[YMOS-TRACE] rendering overlay");
 
   const nsList = Array.isArray(diagnostic.i18n.namespaces)
     ? (diagnostic.i18n.namespaces as string[])

@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { I18nextProvider } from "react-i18next";
+import { Capacitor } from "@capacitor/core";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -227,6 +228,32 @@ function RootComponent() {
     });
     return unsub;
   }, [router]);
+
+  console.log("[YMOS-TRACE] __root render");
+  console.log("[YMOS-TRACE] before RuntimeInspector");
+  try {
+    console.log(
+      "[YMOS-TRACE] platform =",
+      Capacitor.getPlatform?.() ?? Capacitor.getPlatform(),
+    );
+  } catch {
+    console.log("[YMOS-TRACE] platform = (unavailable)");
+  }
+  console.log(
+    "[YMOS-TRACE] pathname =",
+    typeof window !== "undefined" ? window.location.pathname : "(ssr)",
+  );
+  console.log(
+    "[YMOS-TRACE] search =",
+    typeof window !== "undefined" ? window.location.search : "(ssr)",
+  );
+  console.log(
+    "[YMOS-TRACE] VITE_YMOS_RUNTIME_OVERLAY =",
+    import.meta.env.VITE_YMOS_RUNTIME_OVERLAY,
+  );
+  console.log(
+    "[YMOS-TRACE] overlay will mount unconditionally in JSX; gate is inside component",
+  );
 
   return (
     <QueryClientProvider client={queryClient}>
