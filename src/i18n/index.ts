@@ -5,6 +5,7 @@ import { initReactI18next } from "react-i18next";
 import { resources } from "./locales";
 import { DEFAULT_LNG, SUPPORTED_LNGS } from "./languages";
 import { LANG_STORAGE_KEY } from "./ui-language-storage";
+import { scheduleI18nRuntimeDiagnostics } from "./runtime-diagnostics";
 
 export { LANG_STORAGE_KEY };
 
@@ -37,6 +38,9 @@ if (!i18n.isInitialized) {
       },
     });
 }
+
+// Observe-only: one-shot runtime sensors for Android QA (BUG-001). No behavior change.
+scheduleI18nRuntimeDiagnostics(i18n);
 
 export default i18n;
 export {
