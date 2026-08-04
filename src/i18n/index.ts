@@ -8,6 +8,11 @@ import { LANG_STORAGE_KEY } from "./ui-language-storage";
 
 export { LANG_STORAGE_KEY };
 
+/**
+ * Client SPA (Capacitor) and browser must always run this init.
+ * Marked as a package sideEffect (see package.json) so production
+ * tree-shaking cannot drop resources / fallbackLng from the client bundle.
+ */
 if (!i18n.isInitialized) {
   i18n
     .use(LanguageDetector)

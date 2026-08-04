@@ -8,13 +8,14 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { I18nextProvider } from "react-i18next";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { onAuthStateChange } from "@/auth";
 import { BootstrapShell } from "@/bootstrap/BootstrapShell";
 import { IdentityProvider } from "@/identity/identity-provider";
-import "@/i18n";
+import i18n from "@/i18n";
 import { useLanguageSync } from "@/hooks/use-language-sync";
 import { LocalizationProvider } from "@/i18n/localization-provider";
 
@@ -165,13 +166,15 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <LocalizationProvider>
-        <IdentityProvider>
-          <BootstrapShell>
-            <Outlet />
-          </BootstrapShell>
-        </IdentityProvider>
-      </LocalizationProvider>
+      <I18nextProvider i18n={i18n}>
+        <LocalizationProvider>
+          <IdentityProvider>
+            <BootstrapShell>
+              <Outlet />
+            </BootstrapShell>
+          </IdentityProvider>
+        </LocalizationProvider>
+      </I18nextProvider>
     </QueryClientProvider>
   );
 }
