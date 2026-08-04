@@ -36,7 +36,16 @@ const store: Store = {
 
 const listeners = new Set<Listener>();
 
+/**
+ * REACT-185 FIX-001 — Cached getSnapshot for useSyncExternalStore.
+ * React requires: while the store is unchanged, getSnapshot must return the
+ * same value by Object.is. Building a fresh object every call causes an
+ * infinite re-render loop (minified React error #185).
+ */
+let cachedSnapshot: YmosAssetAuditSnapshot | null = null;
+
 function notify() {
+  cachedSnapshot = null;
   for (const l of listeners) l();
 }
 
@@ -166,6 +175,10 @@ export function readYmosAssetEnv(): YmosAssetEnv {
 }
 
 export function getYmosAssetAuditSnapshot(): YmosAssetAuditSnapshot {
+  if (cachedSnapshot !== null) {
+    return cachedSnapshot;
+  }
+
   const entries = store.entries.slice();
   const firstFailure =
     entries.find((e) => e.id === store.firstFailureId) ??
@@ -177,12 +190,14 @@ export function getYmosAssetAuditSnapshot(): YmosAssetAuditSnapshot {
     error: entries.filter((e) => e.status === "error").length,
     loading: entries.filter((e) => e.status === "loading").length,
   };
-  return {
+
+  cachedSnapshot = {
     env: readYmosAssetEnv(),
     entries,
     firstFailure,
     counts,
   };
+  return cachedSnapshot;
 }
 
 export function getYmosAssetAuditInstalled(): boolean {
