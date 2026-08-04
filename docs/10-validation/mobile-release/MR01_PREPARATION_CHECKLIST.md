@@ -34,8 +34,8 @@
 
 - [x] `buildTypes { release { … } }` presente  
 - [x] Versionado en `defaultConfig`  
-- [ ] Signing config de release (pertenece a **MR3**)  
-- [ ] APK/AAB generados (pertenece a **MR2**)
+- [x] Signing config de release (condicional · **MR3** · secrets fuera de Git)  
+- [x] APK/AAB generados (**MR2** unsigned · **MR3** signed)
 
 ### Preparación para Signing (policy)
 

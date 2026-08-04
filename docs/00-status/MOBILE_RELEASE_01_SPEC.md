@@ -2,7 +2,7 @@
 
 **Documento:** `MOBILE_RELEASE_01_SPEC.md`  
 **Fecha:** 2026-08-03  
-**Estado:** ✅ **FROZEN** (#260) · DoR ✅ · Runner ✅ · Gate ✅ READY · MR01-001 ✅ · MR01-002 ▶ · CERTIFIED_THROUGH=2 · BLOCKED at MR3  
+**Estado:** ✅ **FROZEN** (#260) · DoR ✅ · Runner ✅ · Gate ✅ READY · MR01-001 ✅ · MR01-002 ✅ · MR01-003 ▶ · CERTIFIED_THROUGH=3 · BLOCKED at MR4  
 **Dominio:** **Distribution** · operación real (pipeline de entrega móvil)  
 **Nivel:** Mobile Production Readiness · YourMeal OS (tenant-agnostic)  
 **Pregunta (única):** ¿YourMeal OS puede distribuirse de forma privada (Internal Testing) con builds reproducibles, firmados y versionados, sin modificar el Core SaaS certificado?  
