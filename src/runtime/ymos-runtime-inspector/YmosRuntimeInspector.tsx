@@ -5,7 +5,7 @@
  * Tabs: General · Runtime · Assets · i18n · Router · Supabase · Network · Storage · Clipboard · Device · Errors
  * ANDROID-ASSETS-001 contributes the Assets tab.
  */
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/use-auth";
@@ -176,6 +176,17 @@ export function YmosRuntimeInspector() {
   });
   const queryClient = useQueryClient();
 
+  // ANDROID-RUNTIME-007 — prove whether React completes commit.
+  useLayoutEffect(() => {
+    console.log("[YMOS-LAYOUT] committed");
+    ymosTrace("YMOS-LAYOUT committed");
+  }, []);
+
+  useEffect(() => {
+    console.log("[YMOS-EFFECT] mounted");
+    ymosTrace("YMOS-EFFECT mounted");
+  }, []);
+
   useEffect(() => {
     if (!enabled) {
       ymosTrace(
@@ -308,7 +319,11 @@ export function YmosRuntimeInspector() {
 
   return (
     <div
-      ref={rootRef}
+      ref={(el) => {
+        console.log("[YMOS-REF]", !!el);
+        ymosTrace("YMOS-REF", !!el);
+        rootRef.current = el;
+      }}
       id="ymos-runtime-inspector"
       className="flex flex-col text-[11px] text-zinc-100"
       data-ymos-runtime-inspector="1"
