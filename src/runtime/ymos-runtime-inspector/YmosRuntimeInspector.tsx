@@ -25,6 +25,7 @@ import {
   setYmosRuntimeInspectorEnabled,
 } from "./enable";
 import { collectYmosRuntimeDiagnostic } from "./collect";
+import { ymosTrace } from "../ymos-trace";
 
 const TABS = [
   "General",
@@ -77,19 +78,19 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 }
 
 function useInspectorEnabled() {
-  console.log("[YMOS-TRACE] useInspectorEnabled() entered");
+  ymosTrace("useInspectorEnabled() entered");
   const [enabled, setEnabled] = useState(false);
-  console.log("[YMOS-TRACE] useInspectorEnabled initial state =", enabled);
+  ymosTrace("useInspectorEnabled initial state =", enabled);
 
   useEffect(() => {
-    console.log("[YMOS-TRACE] useInspectorEnabled effect run");
+    ymosTrace("useInspectorEnabled effect run");
     const sync = () => {
-      console.log("[YMOS-TRACE] env");
-      console.log("[YMOS-TRACE] query");
-      console.log("[YMOS-TRACE] sessionStorage");
-      console.log("[YMOS-TRACE] localStorage");
+      ymosTrace("env");
+      ymosTrace("query");
+      ymosTrace("sessionStorage");
+      ymosTrace("localStorage");
       const next = isYmosRuntimeInspectorEnabled();
-      console.log("[YMOS-TRACE] useInspectorEnabled sync →", next);
+      ymosTrace("useInspectorEnabled sync →", next);
       setEnabled(next);
     };
     sync();
@@ -120,12 +121,12 @@ function shortUrl(url: string): string {
  * Reads only — never mutates app state, providers, router, or i18n.
  */
 export function YmosRuntimeInspector() {
-  console.log("[YMOS-TRACE] component function entered");
+  ymosTrace("component function entered");
   console.log("[YMOS] Inspector component rendered");
 
   const enabled = useInspectorEnabled();
 
-  console.log("[YMOS-TRACE] enabled =", enabled);
+  ymosTrace("enabled =", enabled);
   console.log("[YMOS] Inspector enabled =", enabled);
   console.log(
     "[YMOS] env=",
@@ -176,8 +177,8 @@ export function YmosRuntimeInspector() {
 
   useEffect(() => {
     if (!enabled) {
-      console.log(
-        "[YMOS-TRACE] returning null because enabled=false (skip refresh interval)",
+      ymosTrace(
+        "returning null because enabled=false (skip refresh interval)",
       );
       return;
     }
@@ -211,13 +212,13 @@ export function YmosRuntimeInspector() {
   ]);
 
   if (!enabled) {
-    console.log(
-      "[YMOS-TRACE] returning null because enabled=false (overlay gated off)",
+    ymosTrace(
+      "returning null because enabled=false (overlay gated off)",
     );
     return null;
   }
 
-  console.log("[YMOS-TRACE] rendering overlay");
+  ymosTrace("rendering overlay");
 
   const nsList = Array.isArray(diagnostic.i18n.namespaces)
     ? (diagnostic.i18n.namespaces as string[])
@@ -518,10 +519,33 @@ export function YmosRuntimeInspector() {
         )}
 
         {tab === "Clipboard" && (
-          <p className="text-zinc-400">
-            Use <span className="text-sky-300 font-semibold">Copy Diagnostic</span>{" "}
-            below to export the full JSON snapshot for remote QA.
-          </p>
+          <div className="space-y-2 text-zinc-400">
+            <p>
+              Use{" "}
+              <span className="text-sky-300 font-semibold">Copy Diagnostic</span>{" "}
+              below to export the full JSON snapshot (includes{" "}
+              <span className="font-mono text-zinc-200">trace</span>).
+            </p>
+            <p>
+              WebView DevTools:
+              <span className="font-mono text-zinc-200"> window.__YMOS_TRACE__</span>
+            </p>
+            <p>
+              Dump:
+              <span className="font-mono text-zinc-200">
+                {" "}
+                window.__YMOS_TRACE_DUMP__()
+              </span>
+            </p>
+            <Row
+              label="buffer"
+              value={
+                typeof window !== "undefined" && window.__YMOS_TRACE__
+                  ? `${window.__YMOS_TRACE__.length} events`
+                  : "0 events"
+              }
+            />
+          </div>
         )}
 
         {tab === "Device" && (
