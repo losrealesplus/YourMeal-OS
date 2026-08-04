@@ -19,6 +19,14 @@ import i18n from "@/i18n";
 import { useLanguageSync } from "@/hooks/use-language-sync";
 import { LocalizationProvider } from "@/i18n/localization-provider";
 
+// Hard dependency on the singleton store so production DCE cannot drop resources (BUG-001).
+// Prefer options.resources over isInitialized — init() resolves asynchronously.
+if (!i18n.options.resources) {
+  throw new Error(
+    "i18n resources missing — client translations will show raw keys",
+  );
+}
+
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -145,10 +153,24 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * Hooks that call useTranslation must run under I18nextProvider so they
+ * share the single instance from src/i18n (BUG-001).
+ */
+function AppProviders({ children }: { children: ReactNode }) {
+  useLanguageSync();
+  return (
+    <LocalizationProvider>
+      <IdentityProvider>
+        <BootstrapShell>{children}</BootstrapShell>
+      </IdentityProvider>
+    </LocalizationProvider>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
-  useLanguageSync();
 
   useEffect(() => {
     const { data: sub } = onAuthStateChange((event) => {
@@ -167,13 +189,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <I18nextProvider i18n={i18n}>
-        <LocalizationProvider>
-          <IdentityProvider>
-            <BootstrapShell>
-              <Outlet />
-            </BootstrapShell>
-          </IdentityProvider>
-        </LocalizationProvider>
+        <AppProviders>
+          <Outlet />
+        </AppProviders>
       </I18nextProvider>
     </QueryClientProvider>
   );
