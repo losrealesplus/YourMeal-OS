@@ -4,6 +4,8 @@
 import { Capacitor } from "@capacitor/core";
 import type { i18n as I18nInstance } from "i18next";
 import { getYmosRuntimeStatus } from "../ymos-runtime-status";
+import { getYmosAssetAuditSnapshot } from "../ymos-runtime-assets";
+import type { YmosAssetAuditSnapshot } from "../ymos-runtime-assets";
 
 const EXPECTED_NS = ["common", "auth", "customer", "admin", "branding"] as const;
 
@@ -53,6 +55,7 @@ export type YmosRuntimeDiagnostic = {
     lastException: string | null;
     lastRedirect: string | null;
   };
+  assets: YmosAssetAuditSnapshot;
   capturedAt: string;
 };
 
@@ -181,6 +184,7 @@ export function collectYmosRuntimeDiagnostic(input: {
       lastException: status.lastException,
       lastRedirect: status.lastRedirect,
     },
+    assets: getYmosAssetAuditSnapshot(),
     capturedAt: new Date().toISOString(),
   };
 }
