@@ -15,3 +15,5 @@ export {
   installYmosAssetResolutionAudit,
   getYmosAssetAuditSnapshot,
 } from "../ymos-runtime-assets";
+export { ymosTrace, getYmosTrace } from "../ymos-trace";
+export type { YmosTraceEntry } from "../ymos-trace";

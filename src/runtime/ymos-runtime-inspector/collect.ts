@@ -6,6 +6,8 @@ import type { i18n as I18nInstance } from "i18next";
 import { getYmosRuntimeStatus } from "../ymos-runtime-status";
 import { getYmosAssetAuditSnapshot } from "../ymos-runtime-assets";
 import type { YmosAssetAuditSnapshot } from "../ymos-runtime-assets";
+import { getYmosTrace } from "../ymos-trace";
+import type { YmosTraceEntry } from "../ymos-trace";
 
 const EXPECTED_NS = ["common", "auth", "customer", "admin", "branding"] as const;
 
@@ -56,6 +58,7 @@ export type YmosRuntimeDiagnostic = {
     lastRedirect: string | null;
   };
   assets: YmosAssetAuditSnapshot;
+  trace: YmosTraceEntry[];
   capturedAt: string;
 };
 
@@ -185,6 +188,7 @@ export function collectYmosRuntimeDiagnostic(input: {
       lastRedirect: status.lastRedirect,
     },
     assets: getYmosAssetAuditSnapshot(),
+    trace: [...getYmosTrace()],
     capturedAt: new Date().toISOString(),
   };
 }

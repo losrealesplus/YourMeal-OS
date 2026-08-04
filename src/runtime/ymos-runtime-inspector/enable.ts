@@ -8,6 +8,8 @@
  * - long-press (800ms) bottom-right corner toggle (client only)
  */
 
+import { ymosTrace } from "../ymos-trace";
+
 const STORAGE_KEY = "ymos.runtime-inspector";
 const QUERY_FLAG = "debug-runtime";
 
@@ -65,7 +67,7 @@ function applyQueryParam(): void {
 /** Snapshot whether the overlay should mount (call on client). */
 export function isYmosRuntimeInspectorEnabled(): boolean {
   if (typeof window === "undefined") {
-    console.log("[YMOS-TRACE] isEnabled: window undefined → false");
+    ymosTrace("isEnabled: window undefined → false");
     return false;
   }
   applyQueryParam();
@@ -95,13 +97,13 @@ export function isYmosRuntimeInspectorEnabled(): boolean {
   }
   const storage = storageEnabled();
 
-  console.log("[YMOS-TRACE] env", envRaw, "→", env);
-  console.log("[YMOS-TRACE] query", queryRaw);
-  console.log("[YMOS-TRACE] sessionStorage", sessionRaw);
-  console.log("[YMOS-TRACE] localStorage", localRaw);
+  ymosTrace("env", envRaw, "→", env);
+  ymosTrace("query", queryRaw);
+  ymosTrace("sessionStorage", sessionRaw);
+  ymosTrace("localStorage", localRaw);
 
   const result = env || storage;
-  console.log("[YMOS-TRACE] isEnabled result =", result, { env, storage });
+  ymosTrace("isEnabled result =", result, { env, storage });
   return result;
 }
 
