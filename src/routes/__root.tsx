@@ -68,10 +68,11 @@ function NotFoundComponent() {
 }
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
-  console.error(error);
+  console.error("[YMOS-ERROR-BOUNDARY]", error);
   const router = useRouter();
   useEffect(() => {
     const msg = `mount exception captured name=${error?.name} message=${error?.message}`;
+    console.error("[YMOS-ERROR-BOUNDARY]", msg, error);
     ymosRuntimeLog(msg);
     recordYmosRuntimeException(msg);
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
