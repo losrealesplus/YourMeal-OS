@@ -58,12 +58,12 @@ Sprint activo
   Live: npm run test:capacitor → FULL PASS
   FLOW Governance              ✅ COMPLETE (#147)
   Tags: ps002c-pass · flow01…05-pass · release-01-beta · release-01-pass
-        · capacitor-pass
+        · capacitor-pass · mobile-release-01-pass (tras Land Check)
         (taxonomía: ./GIT_MILESTONE_TAGS.md)
-  Prioridad                    MOBILE-RELEASE-01 · MR01-004 iOS Archive ▶
-                               (MR1–MR3 ✅ · Archive contract · Ready for ITA)
-                               NO IPA / TestFlight / App Store / CI en este bloque
-                               NO reabrir C1–C5 · Core Integrity intacta
+  Prioridad                    STORE-RELEASE-01 · Store Distribution Ready
+                               (DoR primero · Play Console · App Store Connect)
+                               MOBILE-RELEASE-01 ✅ FULL PASS · Gate CLOSED
+                               NO reabrir MR1–MR5 · Core Integrity intacta
                                Regla: Native Tool Artifacts (FOUNDATION.md)
                                Order States ≠ Operational States
   Regla Release                capacidades plataforma ≠ entidades dominio
@@ -74,9 +74,9 @@ Sprint activo
   Metrics                      ./FOPEBA_METRICS.md (v0 · sin estimaciones)
   Handoff                      ./PROJECT_HANDOFF.md
   DoRl                         ./DEFINITION_OF_RELEASE.md (DRAFT)
-  Ejes                         A: MOBILE-RELEASE-01 · B: RELEASE-01 ✅
+  Ejes                         A: STORE-RELEASE-01 · B: RELEASE-01 ✅ · C: MOBILE-RELEASE-01 ✅
   Disciplina: un milestone / ciclo · DoR antes de código · consolidar ≠ correr
-  Riesgo emergente: confundir publicación en stores con reabrir Capacitor v1
+  Riesgo emergente: confundir store upload con reabrir MOBILE-RELEASE / Capacitor
 
 ═══════════════════════════════════════════════
 CLOSED GATE
@@ -123,11 +123,15 @@ NEXT PHASE
   ↓
   ▶ CAPACITOR ✅ CERTIFIED · tag capacitor-pass → 400a010
   ↓
-  MOBILE-RELEASE-01 DoR ✅ · Spec ✅ · Runner ✅ · Gate READY
+  MOBILE-RELEASE-01 DoR ✅ · Spec ✅ · Runner ✅ · Gate CLOSED
   ↓
-  MR01-001…003 ✅ · MR01-004 ▶ iOS Archive
+  MR01-001…005 ✅ · FULL PASS · Ready for Internal Testing
   ↓
-  Next · MR01-005 Internal Testing Acceptance only
+  tag mobile-release-01-pass (tras Land Check en main)
+  ↓
+  Next · STORE-RELEASE-01 DoR
+  (Play Console · App Store Connect · Internal → Closed → Production)
+  Separación: MOBILE-RELEASE = binarios · STORE-RELEASE = distribución en stores
 
 En paralelo (beta móvil EatClean):
   Lema: cada PR acerca la jornada completa del piloto.
