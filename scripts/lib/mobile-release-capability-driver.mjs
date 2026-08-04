@@ -3,7 +3,8 @@
  *
  * MR1 = Preparation (MR01-001)
  * MR2 = Android Build (MR01-002)
- * MR3…MR5 = not implemented in this delivery
+ * MR3 = Android Signing (MR01-003)
+ * MR4…MR5 = not implemented in this delivery
  *
  * Tenant-agnostic — Core SaaS → Capacitor → private delivery.
  * Core Integrity Rule: Mobile Release does not alter Core SaaS behavior.
@@ -11,6 +12,7 @@
 import { MOBILE_RELEASE_SEGMENTS } from "./mobile-release-canonical-pipeline.mjs";
 import { runMobileReleaseMr1Preparation } from "./mobile-release-mr1-preparation.mjs";
 import { runMobileReleaseMr2AndroidBuild } from "./mobile-release-mr2-android-build.mjs";
+import { runMobileReleaseMr3AndroidSigning } from "./mobile-release-mr3-android-signing.mjs";
 
 /**
  * @param {{ root: string, through?: 1|2|3|4|5 | 0 | null }} opts
@@ -83,11 +85,36 @@ export function runMobileReleaseCapabilityDriver({ root, through = null }) {
 
   if (max < 3) return { ok: true, steps, evidence };
 
+  console.info("[MOBILE-RELEASE]", "MOBILE_RELEASE_MR3_STARTED", {
+    segment: MOBILE_RELEASE_SEGMENTS[3],
+  });
+  steps.push("MOBILE_RELEASE_MR3_STARTED");
+
+  const mr3 = runMobileReleaseMr3AndroidSigning({ cwd: root });
+  evidence.mr3_checks = mr3.checks;
+  if (!mr3.ok) {
+    console.error("[MOBILE-RELEASE] MR3 FAIL:\n" + mr3.reason);
+    return { ok: false, steps, reason: mr3.reason, evidence };
+  }
+  evidence.mr3_mapped_tokens = mr3.mapped_tokens;
+  evidence.mr3_source = mr3.source;
+  evidence.mr3_signing = mr3.signing ?? null;
+
+  console.info("[MOBILE-RELEASE]", "MOBILE_RELEASE_MR3_COMPLETED", {
+    segment: MOBILE_RELEASE_SEGMENTS[3],
+    mapped_tokens: mr3.mapped_tokens,
+    source: mr3.source,
+    checks: mr3.checks,
+  });
+  steps.push("MOBILE_RELEASE_MR3_COMPLETED");
+
+  if (max < 4) return { ok: true, steps, evidence };
+
   return {
     ok: false,
     steps,
     reason:
-      "MR3 block driver is not implemented — stop at MR01-002 (Android Build only).",
+      "MR4 block driver is not implemented — stop at MR01-003 (Android Signing only).",
     evidence,
   };
 }

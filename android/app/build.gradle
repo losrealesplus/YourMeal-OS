@@ -1,5 +1,24 @@
 apply plugin: 'com.android.application'
 
+// MOBILE-RELEASE · MR01-003 — Release signing from env or local props.
+// NEVER commit keystores or keystore.properties. Secrets stay outside Git.
+def yourmealKeystorePropertiesFile = rootProject.file("keystore.properties")
+def yourmealKeystoreProperties = new Properties()
+if (yourmealKeystorePropertiesFile.exists()) {
+    yourmealKeystoreProperties.load(new FileInputStream(yourmealKeystorePropertiesFile))
+}
+
+def yourmealStoreFilePath = System.getenv("YOURMEAL_UPLOAD_STORE_FILE") ?: yourmealKeystoreProperties["storeFile"]
+def yourmealStorePassword = System.getenv("YOURMEAL_UPLOAD_STORE_PASSWORD") ?: yourmealKeystoreProperties["storePassword"]
+def yourmealKeyAlias = System.getenv("YOURMEAL_UPLOAD_KEY_ALIAS") ?: yourmealKeystoreProperties["keyAlias"]
+def yourmealKeyPassword = System.getenv("YOURMEAL_UPLOAD_KEY_PASSWORD") ?: yourmealKeystoreProperties["keyPassword"]
+def yourmealHasReleaseSigning =
+    yourmealStoreFilePath != null &&
+    yourmealStoreFilePath.toString().trim() &&
+    yourmealStorePassword != null &&
+    yourmealKeyAlias != null &&
+    yourmealKeyPassword != null
+
 android {
     namespace = "com.yourmealos.eatclean"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -16,10 +35,23 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    if (yourmealHasReleaseSigning) {
+        signingConfigs {
+            release {
+                storeFile file(yourmealStoreFilePath)
+                storePassword yourmealStorePassword
+                keyAlias yourmealKeyAlias
+                keyPassword yourmealKeyPassword
+            }
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (yourmealHasReleaseSigning) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 }
