@@ -5,11 +5,13 @@ import {
   installYmosRuntimeErrorTraps,
   logYmosRuntimeMainStart,
 } from "./runtime/ymos-runtime-audit";
+import { installYmosAssetResolutionAudit } from "./runtime/ymos-runtime-assets";
 
-// ANDROID-RUNTIME-001 — client boot sensor (no main.tsx in TanStack Start).
+// ANDROID-RUNTIME-001 / ANDROID-ASSETS-001 — client boot sensors (observe-only).
 if (typeof window !== "undefined") {
   logYmosRuntimeMainStart();
   installYmosRuntimeErrorTraps();
+  installYmosAssetResolutionAudit();
 }
 
 export const getRouter = () => {
