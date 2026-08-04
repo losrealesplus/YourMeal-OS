@@ -18,6 +18,13 @@ import { IdentityProvider } from "@/identity/identity-provider";
 import i18n from "@/i18n";
 import { useLanguageSync } from "@/hooks/use-language-sync";
 import { LocalizationProvider } from "@/i18n/localization-provider";
+import {
+  YmosRuntimeMountProbe,
+  ymosRuntimeLog,
+} from "@/runtime/ymos-runtime-audit";
+
+// ANDROID-RUNTIME-001 — module load sensor
+ymosRuntimeLog("__root imported");
 
 // Hard dependency on the singleton store so production DCE cannot drop resources (BUG-001).
 // Prefer options.resources over isInitialized — init() resolves asynchronously.
@@ -55,6 +62,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
+    ymosRuntimeLog(
+      `mount exception captured name=${error?.name} message=${error?.message}`,
+    );
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
@@ -156,14 +166,25 @@ function RootShell({ children }: { children: ReactNode }) {
 /**
  * Hooks that call useTranslation must run under I18nextProvider so they
  * share the single instance from src/i18n (BUG-001).
+ *
+ * ANDROID-RUNTIME-001 probes sit around existing providers — providers themselves
+ * are not modified.
  */
 function AppProviders({ children }: { children: ReactNode }) {
   useLanguageSync();
   return (
     <LocalizationProvider>
-      <IdentityProvider>
-        <BootstrapShell>{children}</BootstrapShell>
-      </IdentityProvider>
+      <YmosRuntimeMountProbe label="LocalizationProvider mounted">
+        <IdentityProvider>
+          <YmosRuntimeMountProbe label="IdentityProvider mounted">
+            <BootstrapShell>
+              <YmosRuntimeMountProbe label="BootstrapShell mounted">
+                {children}
+              </YmosRuntimeMountProbe>
+            </BootstrapShell>
+          </YmosRuntimeMountProbe>
+        </IdentityProvider>
+      </YmosRuntimeMountProbe>
     </LocalizationProvider>
   );
 }
@@ -171,6 +192,8 @@ function AppProviders({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+
+  ymosRuntimeLog("RootComponent render");
 
   useEffect(() => {
     const { data: sub } = onAuthStateChange((event) => {
@@ -186,13 +209,28 @@ function RootComponent() {
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
 
+  // Observe navigations/redirects without changing router behavior.
+  useEffect(() => {
+    const unsub = router.subscribe("onResolved", ({ pathChanged, toLocation, fromLocation }) => {
+      if (!pathChanged) return;
+      ymosRuntimeLog(
+        `redirect/nav from=${fromLocation.pathname} to=${toLocation.pathname}`,
+      );
+    });
+    return unsub;
+  }, [router]);
+
   return (
     <QueryClientProvider client={queryClient}>
-      <I18nextProvider i18n={i18n}>
-        <AppProviders>
-          <Outlet />
-        </AppProviders>
-      </I18nextProvider>
+      <YmosRuntimeMountProbe label="QueryClientProvider mounted">
+        <I18nextProvider i18n={i18n}>
+          <AppProviders>
+            <YmosRuntimeMountProbe label="Outlet rendered">
+              <Outlet />
+            </YmosRuntimeMountProbe>
+          </AppProviders>
+        </I18nextProvider>
+      </YmosRuntimeMountProbe>
     </QueryClientProvider>
   );
 }
