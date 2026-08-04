@@ -64,9 +64,45 @@ function applyQueryParam(): void {
 
 /** Snapshot whether the overlay should mount (call on client). */
 export function isYmosRuntimeInspectorEnabled(): boolean {
-  if (typeof window === "undefined") return false;
+  if (typeof window === "undefined") {
+    console.log("[YMOS-TRACE] isEnabled: window undefined → false");
+    return false;
+  }
   applyQueryParam();
-  return envEnabled() || storageEnabled();
+
+  let envRaw: unknown;
+  try {
+    envRaw = import.meta.env.VITE_YMOS_RUNTIME_OVERLAY;
+  } catch {
+    envRaw = "(unavailable)";
+  }
+  const env = envEnabled();
+
+  let queryRaw: string | null = null;
+  try {
+    queryRaw = new URL(window.location.href).searchParams.get(QUERY_FLAG);
+  } catch {
+    queryRaw = null;
+  }
+
+  let sessionRaw: string | null = null;
+  let localRaw: string | null = null;
+  try {
+    sessionRaw = sessionStorage.getItem(STORAGE_KEY);
+    localRaw = localStorage.getItem(STORAGE_KEY);
+  } catch {
+    /* private mode */
+  }
+  const storage = storageEnabled();
+
+  console.log("[YMOS-TRACE] env", envRaw, "→", env);
+  console.log("[YMOS-TRACE] query", queryRaw);
+  console.log("[YMOS-TRACE] sessionStorage", sessionRaw);
+  console.log("[YMOS-TRACE] localStorage", localRaw);
+
+  const result = env || storage;
+  console.log("[YMOS-TRACE] isEnabled result =", result, { env, storage });
+  return result;
 }
 
 export function setYmosRuntimeInspectorEnabled(on: boolean): void {
