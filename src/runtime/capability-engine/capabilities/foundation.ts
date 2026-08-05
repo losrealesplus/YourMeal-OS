@@ -16,6 +16,7 @@ import {
   recoverRuntimeCapability,
   verifyRuntimeCapability,
 } from "../runtime-recovery";
+import { registerDevelopmentEnvironmentCapability, resetDevelopmentEnvironmentCapabilityFlag } from "./development-environment";
 
 export const FOUNDATION_CAPABILITIES: RuntimeCapability[] = [
   createCapabilityFromChecks({
@@ -65,11 +66,13 @@ export function registerBuiltinCapabilities(): void {
   for (const cap of FOUNDATION_CAPABILITIES) {
     if (!getCapability(cap.id)) registerCapability(cap);
   }
+  registerDevelopmentEnvironmentCapability();
   installed = true;
 }
 
 export function resetBuiltinCapabilitiesFlag(): void {
   installed = false;
+  resetDevelopmentEnvironmentCapabilityFlag();
 }
 
 export const FOUNDATION_CAPABILITY_IDS = FOUNDATION_CAPABILITIES.map(

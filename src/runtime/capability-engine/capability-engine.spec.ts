@@ -37,10 +37,13 @@ describe("Capability Engine", () => {
     registerBuiltinCapabilities();
     registerBuiltinCapabilities();
     expect(listCapabilities().map((c) => c.id).sort()).toEqual(
-      [...FOUNDATION_CAPABILITY_IDS].sort(),
+      [...FOUNDATION_CAPABILITY_IDS, "development-environment"].sort(),
     );
     expect(getCapability("assets")?.name).toBe("Assets");
     expect(getCapability("supabase")?.name).toBe("Supabase");
+    expect(getCapability("development-environment")?.name).toBe(
+      "Development Environment",
+    );
   });
 
   it("diagnose updates lifecycle Idle → Diagnosing → Healthy|Warning|Error", async () => {
@@ -72,7 +75,7 @@ describe("Capability Engine", () => {
       runAt: new Date().toISOString(),
     });
     expect(runs.map((r) => r.capability.id).sort()).toEqual(
-      [...FOUNDATION_CAPABILITY_IDS].sort(),
+      [...FOUNDATION_CAPABILITY_IDS, "development-environment"].sort(),
     );
   });
 
