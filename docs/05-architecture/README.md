@@ -40,6 +40,7 @@
 | [TENANT_IMPLEMENTATION_EATCLEAN.md](./TENANT_IMPLEMENTATION_EATCLEAN.md) | Implementación específica EatClean |
 | [RUNTIME_SECRET_GATEWAY.md](./RUNTIME_SECRET_GATEWAY.md) | Command Palette oculta · YMOS Horus → Runtime Suite |
 | [RUNTIME_SUITE.md](./RUNTIME_SUITE.md) | Runtime Suite · Lifecycle RUNTIME-SUITE-001 |
+| [DEVELOPER_PORTAL.md](./DEVELOPER_PORTAL.md) | Developer Portal · triple-tap · passphrase · HORUS |
 | [RUNTIME_CORE.md](./RUNTIME_CORE.md) | Runtime Core · Developer Platform v1.0 kernel |
 | [DEVELOPER_PLATFORM_HOST.md](./DEVELOPER_PLATFORM_HOST.md) | Runtime Host · shell dinámico · DEVELOPER-PLATFORM-003 |
 | [DEVELOPER_PLATFORM.md](./DEVELOPER_PLATFORM.md) | Vocabulario · Portal / Platform / Runtime Engine |
