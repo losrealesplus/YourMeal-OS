@@ -24,7 +24,7 @@ import { runDoctor } from "./DoctorRunner";
 const doctorModule: RuntimeModule = {
   id: "doctor",
   title: "Doctor",
-  description: "Full-app diagnostics · Health Score · FOPEBA evidence",
+  description: "Developer Health glance · Checks · Incidents · Evidence",
   icon: "stethoscope",
   category: "Health",
   version: DOCTOR_ENGINE_VERSION,

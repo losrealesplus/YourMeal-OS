@@ -53,6 +53,12 @@ export {
 } from "./register-doctor-module";
 export { DoctorPanel } from "./DoctorPanel";
 export {
+  DOCTOR_UI_VERSION,
+  buildCapabilityRows,
+  countByStatus,
+  healthToneFromScore,
+} from "./ui/doctor-ui-helpers";
+export {
   setLastDoctorReportJson,
   getLastDoctorReportJson,
   resetLastDoctorReportJson,
