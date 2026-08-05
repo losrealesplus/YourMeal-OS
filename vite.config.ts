@@ -35,9 +35,20 @@ export default defineConfig({
         }
       : {}),
   },
-  ...(mobileSpa
-    ? {
-        vite: {
+  vite: {
+    // node:test suites under scripts/ run via dedicated npm scripts
+    // (test:doctor:unit, test:capacitor:unit, …) — keep them out of vitest.
+    test: {
+      exclude: [
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/cypress/**",
+        "**/.{idea,git,cache,output,temp}/**",
+        "**/scripts/**",
+      ],
+    },
+    ...(mobileSpa
+      ? {
           environments: {
             client: {
               build: {
@@ -45,7 +56,7 @@ export default defineConfig({
               },
             },
           },
-        },
-      }
-    : {}),
+        }
+      : {}),
+  },
 });
