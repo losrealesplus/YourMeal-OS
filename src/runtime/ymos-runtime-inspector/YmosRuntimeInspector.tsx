@@ -102,11 +102,18 @@ function useInspectorEnabled() {
     };
     sync();
     const unGesture = installYmosRuntimeInspectorGestureToggle();
+    /** Secret Gateway → same enable path as storage / gesture (no duplicated open logic). */
+    const onSecretOpen = () => {
+      setYmosRuntimeInspectorEnabled(true);
+      sync();
+    };
     window.addEventListener("ymos-runtime-inspector-toggle", sync);
+    window.addEventListener("ymos-runtime-open", onSecretOpen);
     window.addEventListener("storage", sync);
     return () => {
       unGesture();
       window.removeEventListener("ymos-runtime-inspector-toggle", sync);
+      window.removeEventListener("ymos-runtime-open", onSecretOpen);
       window.removeEventListener("storage", sync);
     };
   }, []);

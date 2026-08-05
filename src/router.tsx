@@ -6,12 +6,15 @@ import {
   logYmosRuntimeMainStart,
 } from "./runtime/ymos-runtime-audit";
 import { installYmosAssetResolutionAudit } from "./runtime/ymos-runtime-assets";
+import { installRuntimeSecretGateway } from "./runtime/runtime-secret-gateway";
 
 // ANDROID-RUNTIME-001 / ANDROID-ASSETS-001 — client boot sensors (observe-only).
+// Secret Gateway — hidden keystroke command palette (no UI).
 if (typeof window !== "undefined") {
   logYmosRuntimeMainStart();
   installYmosRuntimeErrorTraps();
   installYmosAssetResolutionAudit();
+  installRuntimeSecretGateway();
 }
 
 export const getRouter = () => {

@@ -25,3 +25,4 @@ Permanent decisions for YourMeal OS. New ADRs are additive; do not silently reve
 | [0019](./0019-identity-hardening-v1.md) | Identity Hardening v1 (architecture freeze / guarantees) |
 | [0032](./0032-native-mobile-strategy.md) | Native Mobile Strategy (Capacitor · un código · offline modular) |
 | [0033](./0033-platform-independence.md) | Platform Independence (ports/adapters · dominio agnóstico) |
+| [0034](./0034-runtime-secret-gateway.md) | Runtime Secret Gateway (hidden command palette · YMOS Horus) |
