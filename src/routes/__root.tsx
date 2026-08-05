@@ -25,6 +25,7 @@ import {
   ymosRuntimeLog,
 } from "@/runtime/ymos-runtime-audit";
 import { YmosRuntimeInspector } from "@/runtime/ymos-runtime-inspector";
+import { DeveloperPortal } from "@/runtime/developer-portal";
 import {
   markYmosRuntimeRootImported,
   recordYmosRuntimeException,
@@ -267,6 +268,8 @@ function RootComponent() {
             </YmosRuntimeMountProbe>
             {/* YMOS Runtime Inspector — observe-only; gated by flag */}
             <YmosRuntimeInspector />
+            {/* Developer Portal — triple-tap logo → passphrase → Suite toggle */}
+            <DeveloperPortal />
           </AppProviders>
         </I18nextProvider>
       </YmosRuntimeMountProbe>
