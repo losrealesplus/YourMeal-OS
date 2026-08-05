@@ -57,6 +57,13 @@ export {
 } from "./capabilities/foundation";
 
 export {
+  registerDevelopmentEnvironmentCapability,
+  resetDevelopmentEnvironmentCapabilityFlag,
+  developmentEnvironmentCapability,
+  DEVELOPMENT_ENVIRONMENT_CAPABILITY_ID,
+} from "./capabilities/development-environment";
+
+export {
   registerCapabilitiesModule,
   resetCapabilitiesModuleFlags,
 } from "./register-capabilities-module";

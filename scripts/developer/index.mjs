@@ -17,10 +17,12 @@
  *   npm run doctor:ci
  *   npm run doctor:json
  *   npm run doctor:verbose
+ *   npm run doctor:env   → scripts/development (toolchain-only)
  */
 import { runDoctorAndroidSdk } from "./doctor-android-sdk.mjs";
 import { runDoctorAssets } from "./doctor-assets.mjs";
 import { runDoctorCapacitor } from "./doctor-capacitor.mjs";
+import { runDoctorDevelopmentEnvironment } from "./doctor-development-environment.mjs";
 import { runDoctorEnvironment } from "./doctor-environment.mjs";
 import { runDoctorGit } from "./doctor-git.mjs";
 import { runDoctorGradle } from "./doctor-gradle.mjs";
@@ -34,6 +36,7 @@ import { runDoctorSupabase } from "./doctor-supabase.mjs";
 import { runDoctorVite } from "./doctor-vite.mjs";
 
 export const DOCTOR_MODULES = [
+  { name: "development-environment", run: runDoctorDevelopmentEnvironment },
   { name: "environment", run: runDoctorEnvironment },
   { name: "node", run: runDoctorNode },
   { name: "java", run: runDoctorJava },

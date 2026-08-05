@@ -12,6 +12,7 @@ describe("developer-doctor-runner", () => {
   it("registers all canonical doctor modules", () => {
     const names = DOCTOR_MODULES.map((m) => m.name);
     assert.deepEqual(names, [
+      "development-environment",
       "environment",
       "node",
       "java",
@@ -35,7 +36,7 @@ describe("developer-doctor-runner", () => {
       requireAndroid: false,
     });
     assert.equal(summary.ok, true);
-    assert.equal(summary.modules.length, 12);
+    assert.equal(summary.modules.length, 13);
   });
 
   it("FAIL when fixture lacks package.json module anchors", async () => {
