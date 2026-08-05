@@ -40,6 +40,7 @@
 | [TENANT_IMPLEMENTATION_EATCLEAN.md](./TENANT_IMPLEMENTATION_EATCLEAN.md) | Implementación específica EatClean |
 | [RUNTIME_SECRET_GATEWAY.md](./RUNTIME_SECRET_GATEWAY.md) | Command Palette oculta · YMOS Horus → Runtime Suite |
 | [RUNTIME_SUITE.md](./RUNTIME_SUITE.md) | Runtime Suite · Lifecycle RUNTIME-SUITE-001 |
+| [DEVELOPER_PORTAL.md](./DEVELOPER_PORTAL.md) | Developer Portal · triple-tap · passphrase · HORUS |
 | [../07-experience/CUSTOMER_JOURNEYS.md](../07-experience/CUSTOMER_JOURNEYS.md) | Experience First · CJ-001 Pedido semanal |
 | [architecture-review.md](./architecture-review.md) | As-built senior review |
 | [MODULE_CONVENTION.md](./MODULE_CONVENTION.md) | `src/modules/...` layout |
