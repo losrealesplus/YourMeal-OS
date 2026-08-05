@@ -68,6 +68,11 @@ export type RuntimeCoreEventName =
   | "doctor-start"
   | "doctor-finish"
   | "doctor-check-registered"
+  | "incident-reported"
+  | "incident-updated"
+  | "incident-dismissed"
+  | "incident-resolved"
+  | "incident-recovery-stub"
   | "asset-failure"
   | "network-request"
   | "host-module-selected";

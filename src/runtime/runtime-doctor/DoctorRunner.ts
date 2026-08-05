@@ -31,6 +31,10 @@ import {
   type DoctorExecutedCheck,
   type DoctorReport,
 } from "./DoctorReport";
+import {
+  markDoctorRunOnTimeline,
+  reportIncidentFromDoctorCheck,
+} from "../incident-engine/doctor-bridge";
 
 export type RunDoctorOptions = {
   platform?: RuntimePlatform;
@@ -156,6 +160,7 @@ export async function runDoctor(
   const started = Date.now();
 
   emitRuntimeCoreEvent("doctor-start", { platform, runAt });
+  markDoctorRunOnTimeline(runAt, platform);
 
   const ctx: DoctorCheckContext = {
     platform,
@@ -193,15 +198,21 @@ export async function runDoctor(
       recommendations.push(...result.recommendations);
     }
     if (shouldEmitDoctorEvidence(result) && result.status !== "pass") {
-      evidences.push(
-        evidenceFromDoctorCheck({
-          check,
-          result,
-          platform,
-          runAt,
-          device: options.device,
-        }),
-      );
+      const evidence = evidenceFromDoctorCheck({
+        check,
+        result,
+        platform,
+        runAt,
+        device: options.device,
+      });
+      evidences.push(evidence);
+      // Incident Platform: Doctor reports incidents — does not build objects itself.
+      reportIncidentFromDoctorCheck({
+        check,
+        result,
+        evidence,
+        runAt,
+      });
     }
   }
 

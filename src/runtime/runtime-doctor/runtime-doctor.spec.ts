@@ -8,6 +8,11 @@ import {
 import { resetBuiltinRegistrationFlag } from "../runtime-core/register-builtins";
 import { resetModuleRenderers } from "../runtime-host";
 import {
+  resetIncidentRegistry,
+  resetIncidentTimeline,
+  resetIncidentsModuleFlags,
+} from "../incident-engine";
+import {
   BUILTIN_DOCTOR_CHECK_IDS,
   computeHealthScore,
   getChecks,
@@ -29,6 +34,9 @@ afterEach(() => {
   resetBuiltinDoctorChecksFlag();
   resetDoctorModuleFlags();
   resetModuleRenderers();
+  resetIncidentRegistry();
+  resetIncidentTimeline();
+  resetIncidentsModuleFlags();
 });
 
 describe("Doctor Engine", () => {
