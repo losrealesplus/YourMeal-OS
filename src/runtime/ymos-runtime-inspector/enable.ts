@@ -1,17 +1,24 @@
 /**
- * YMOS Runtime Inspector — enable gates (observe-only).
+ * YMOS Runtime Inspector / Suite — enable gates (observe-only).
  *
- * Active when ANY of:
+ * Active when ANY of (unless explicitly dismissed this session):
  * - VITE_YMOS_RUNTIME_OVERLAY=true
  * - ?debug-runtime=1 (persists to sessionStorage)
  * - localStorage / sessionStorage ymos.runtime-inspector=1
  * - long-press (800ms) bottom-right corner toggle (client only)
+ * - YMOS Horus → ymos-runtime-toggle (RUNTIME-SUITE-001)
+ *
+ * RUNTIME-SUITE-001: sessionStorage "0" is an explicit dismiss that overrides
+ * env force-on for the rest of the session (so ✕ / ESC / Horus toggle can close).
  */
 
 import { ymosTrace } from "../ymos-trace";
 
 const STORAGE_KEY = "ymos.runtime-inspector";
 const QUERY_FLAG = "debug-runtime";
+
+/** Emitted exactly once when Suite transitions open → closed (RUNTIME-SUITE-001). */
+export const YMOS_RUNTIME_CLOSE_EVENT = "ymos-runtime-close";
 
 function readFlag(value: unknown): boolean | undefined {
   if (value === undefined || value === null || value === "") return undefined;
@@ -35,11 +42,21 @@ function envEnabled(): boolean {
   return false;
 }
 
+/** Explicit session dismiss (RUNTIME-SUITE-001) overrides env / local on. */
+function sessionExplicitOff(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return readFlag(window.sessionStorage.getItem(STORAGE_KEY)) === false;
+  } catch {
+    return false;
+  }
+}
+
 function storageEnabled(): boolean {
   if (typeof window === "undefined") return false;
   try {
-    if (readFlag(sessionStorage.getItem(STORAGE_KEY))) return true;
-    if (readFlag(localStorage.getItem(STORAGE_KEY))) return true;
+    if (readFlag(window.sessionStorage.getItem(STORAGE_KEY))) return true;
+    if (readFlag(window.localStorage.getItem(STORAGE_KEY))) return true;
   } catch {
     /* private mode */
   }
@@ -54,10 +71,10 @@ function applyQueryParam(): void {
     if (raw === null) return;
     const on = (readFlag(raw) ?? (raw === "" || raw === "1")) === true;
     if (on) {
-      sessionStorage.setItem(STORAGE_KEY, "1");
+      window.sessionStorage.setItem(STORAGE_KEY, "1");
     } else {
-      sessionStorage.removeItem(STORAGE_KEY);
-      localStorage.removeItem(STORAGE_KEY);
+      window.sessionStorage.setItem(STORAGE_KEY, "0");
+      window.localStorage.removeItem(STORAGE_KEY);
     }
   } catch {
     /* ignore */
@@ -90,35 +107,46 @@ export function isYmosRuntimeInspectorEnabled(): boolean {
   let sessionRaw: string | null = null;
   let localRaw: string | null = null;
   try {
-    sessionRaw = sessionStorage.getItem(STORAGE_KEY);
-    localRaw = localStorage.getItem(STORAGE_KEY);
+    sessionRaw = window.sessionStorage.getItem(STORAGE_KEY);
+    localRaw = window.localStorage.getItem(STORAGE_KEY);
   } catch {
     /* private mode */
   }
+
+  const dismissed = sessionExplicitOff();
   const storage = storageEnabled();
+  const result = dismissed ? false : env || storage;
 
   ymosTrace("env", envRaw, "→", env);
   ymosTrace("query", queryRaw);
   ymosTrace("sessionStorage", sessionRaw);
   ymosTrace("localStorage", localRaw);
-
-  const result = env || storage;
-  ymosTrace("isEnabled result =", result, { env, storage });
+  ymosTrace("isEnabled result =", result, { env, storage, dismissed });
   return result;
 }
 
+/**
+ * Open / close the Runtime Suite.
+ * Close path sets sessionStorage "0" (explicit dismiss) and emits ymos-runtime-close once.
+ */
 export function setYmosRuntimeInspectorEnabled(on: boolean): void {
   if (typeof window === "undefined") return;
+  const wasEnabled = isYmosRuntimeInspectorEnabled();
   try {
-    if (on) sessionStorage.setItem(STORAGE_KEY, "1");
-    else {
-      sessionStorage.removeItem(STORAGE_KEY);
-      localStorage.removeItem(STORAGE_KEY);
+    if (on) {
+      window.sessionStorage.setItem(STORAGE_KEY, "1");
+    } else {
+      // Explicit dismiss — overrides VITE_YMOS_RUNTIME_OVERLAY for this session.
+      window.sessionStorage.setItem(STORAGE_KEY, "0");
+      window.localStorage.removeItem(STORAGE_KEY);
     }
   } catch {
     /* ignore */
   }
   window.dispatchEvent(new Event("ymos-runtime-inspector-toggle"));
+  if (!on && wasEnabled) {
+    window.dispatchEvent(new CustomEvent(YMOS_RUNTIME_CLOSE_EVENT));
+  }
 }
 
 /**

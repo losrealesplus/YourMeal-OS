@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { RuntimeSecretBuffer } from "./runtime-secret-buffer";
 import {
   YMOS_RUNTIME_OPEN_EVENT,
+  YMOS_RUNTIME_TOGGLE_EVENT,
   YMOS_SECRET_GATEWAY_TRIGGERED_EVENT,
 } from "./runtime-secret-events";
 import {
@@ -124,10 +125,12 @@ describe("installRuntimeSecretGateway", () => {
     vi.unstubAllGlobals();
   });
 
-  it("dispatches ymos-runtime-open when phrase is typed", () => {
+  it("dispatches ymos-runtime-toggle when phrase is typed (RUNTIME-SUITE-001)", () => {
     installFakeWindow();
+    const toggles: Event[] = [];
     const opens: Event[] = [];
     const triggered: Event[] = [];
+    window.addEventListener(YMOS_RUNTIME_TOGGLE_EVENT, (e) => toggles.push(e));
     window.addEventListener(YMOS_RUNTIME_OPEN_EVENT, (e) => opens.push(e));
     window.addEventListener(YMOS_SECRET_GATEWAY_TRIGGERED_EVENT, (e) =>
       triggered.push(e),
@@ -140,7 +143,8 @@ describe("installRuntimeSecretGateway", () => {
       );
     }
 
-    expect(opens).toHaveLength(1);
+    expect(toggles).toHaveLength(1);
+    expect(opens).toHaveLength(0);
     expect(triggered).toHaveLength(1);
     expect((triggered[0] as CustomEvent).detail).toEqual({
       command: "ymos horus",
@@ -150,7 +154,7 @@ describe("installRuntimeSecretGateway", () => {
   it("does not fire on partial phrase", () => {
     installFakeWindow();
     const spy = vi.fn();
-    window.addEventListener(YMOS_RUNTIME_OPEN_EVENT, spy);
+    window.addEventListener(YMOS_RUNTIME_TOGGLE_EVENT, spy);
     installRuntimeSecretGateway();
     for (const ch of "ymos hor") {
       window.dispatchEvent(

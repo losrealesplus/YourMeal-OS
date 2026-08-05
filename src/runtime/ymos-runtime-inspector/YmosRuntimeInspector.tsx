@@ -102,18 +102,41 @@ function useInspectorEnabled() {
     };
     sync();
     const unGesture = installYmosRuntimeInspectorGestureToggle();
-    /** Secret Gateway → same enable path as storage / gesture (no duplicated open logic). */
+    /** Compat: still accept open-only. */
     const onSecretOpen = () => {
       setYmosRuntimeInspectorEnabled(true);
       sync();
     };
+    /** RUNTIME-SUITE-001 — YMOS Horus toggles open ↔ closed. */
+    const onSecretToggle = () => {
+      setYmosRuntimeInspectorEnabled(!isYmosRuntimeInspectorEnabled());
+      sync();
+    };
+    /** Web only — ESC closes Suite. */
+    const onEscape = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (!isYmosRuntimeInspectorEnabled()) return;
+      let platform = "web";
+      try {
+        platform = Capacitor.getPlatform?.() ?? Capacitor.getPlatform();
+      } catch {
+        platform = "web";
+      }
+      if (platform !== "web") return;
+      setYmosRuntimeInspectorEnabled(false);
+      sync();
+    };
     window.addEventListener("ymos-runtime-inspector-toggle", sync);
     window.addEventListener("ymos-runtime-open", onSecretOpen);
+    window.addEventListener("ymos-runtime-toggle", onSecretToggle);
+    window.addEventListener("keydown", onEscape);
     window.addEventListener("storage", sync);
     return () => {
       unGesture();
       window.removeEventListener("ymos-runtime-inspector-toggle", sync);
       window.removeEventListener("ymos-runtime-open", onSecretOpen);
+      window.removeEventListener("ymos-runtime-toggle", onSecretToggle);
+      window.removeEventListener("keydown", onEscape);
       window.removeEventListener("storage", sync);
     };
   }, []);
@@ -393,7 +416,7 @@ export function YmosRuntimeInspector() {
       className="flex flex-col text-[11px] text-zinc-100"
       data-ymos-runtime-inspector="1"
       role="complementary"
-      aria-label="YMOS Runtime Inspector"
+      aria-label="YourMeal OS Runtime Suite"
       /* ANDROID-RUNTIME-006 temporary ultra-visible shell — prove DOM paint */
       style={{
         position: "fixed",
@@ -414,18 +437,20 @@ export function YmosRuntimeInspector() {
       <div className="flex items-center justify-between gap-2 p-3 pb-2">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-yellow-300">
-            YMOS Runtime · DOM PROBE
+            Runtime Suite
           </p>
           <p className="text-[9px] text-zinc-500">
-            ANDROID-RUNTIME-006 · red fullscreen = node is in DOM
+            YourMeal OS · YMOS Horus toggles · ✕ closes
           </p>
         </div>
         <button
           type="button"
-          className="rounded-md border border-white/20 px-2 py-1 text-[10px] text-zinc-300 hover:bg-white/10"
+          aria-label="Close Runtime Suite"
+          title="Close"
+          className="rounded-md border border-white/20 px-2 py-0.5 text-[14px] leading-none text-zinc-300 hover:bg-white/10"
           onClick={() => setYmosRuntimeInspectorEnabled(false)}
         >
-          Close
+          ✕
         </button>
       </div>
 
