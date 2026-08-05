@@ -41,22 +41,22 @@ Todo lo que se construya forma parte de una **plataforma de ingeniería**, no de
 
 ---
 
-## Fase 1 — Incident Platform (v1.2+)
+## Fase 1 — Incident Platform + Doctor UI
 
 | PR | Entrega | Notas |
 |----|---------|-------|
-| #299 | Doctor UI (v1.1) | UX: Score · Capabilities · Checks · Recommendations · Evidence · Timeline · Run Again · Copy — **sin nuevos checks** |
-| #300 | **Incident Engine** | Evidence → Incident estructurado (este track = DEVELOPER-PLATFORM-005) |
-| #301 | Timeline Engine | Historia automática por incidente (puede vivir en Incident Engine v1 y expandirse) |
-| #302 | Recommendation Engine | Qué / por qué / cómo / evidencia / confianza |
-| #303 | Recovery Engine | `diagnose()` · `recover()` · `verify()` — contrato primero |
-| #304 | Export Engine | `diagnostic-*.zip` — idioma común soporte ↔ desarrollo |
-| #305 | Knowledge Engine | Patrones · recovery recomendado · confidence |
+| #298 | Doctor Engine | ✅ v1.1 |
+| #299 | **Incident Engine** | ✅ v1.2 (GitHub #299) |
+| **Doctor UI** | **DEVELOPER-PLATFORM-006 · v1.3** | Glance diagnostics · este track |
+| next | Recommendation Engine | Motor real (qué / por qué / cómo / confianza) |
+| next | Recovery Engine | `diagnose` · `recover` · `verify` |
+| next | Export ZIP | `diagnostic-*.zip` |
+| next | Knowledge Engine | Patrones · confidence |
 
 Cadena oficial:
 
 ```text
-Doctor → Evidence → Incident → Timeline → Recovery → Export → Knowledge → Product Core → EatClean
+Doctor UI → Doctor → Evidence → Incident → Timeline → Recovery → Export → Knowledge → Product Core → EatClean
 ```
 
 ---
@@ -138,7 +138,8 @@ EatClean
 ## Documentos
 
 - [DEVELOPER_PLATFORM](./DEVELOPER_PLATFORM.md) — vocabulario  
-- [DOCTOR_ENGINE](./DOCTOR_ENGINE.md) · ADR 0040  
-- [INCIDENT_ENGINE](./INCIDENT_ENGINE.md) · ADR 0041  
 - [DEVELOPER_PLATFORM_HOST](./DEVELOPER_PLATFORM_HOST.md) · ADR 0039  
 - [RUNTIME_CORE](./RUNTIME_CORE.md) · ADR 0038  
+- [DOCTOR_ENGINE](./DOCTOR_ENGINE.md) · ADR 0040  
+- [INCIDENT_ENGINE](./INCIDENT_ENGINE.md) · ADR 0041  
+- [DOCTOR_UI](./DOCTOR_UI.md) · ADR 0042  
