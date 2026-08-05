@@ -7,7 +7,7 @@
 
 import { RuntimeSecretBuffer } from "./runtime-secret-buffer";
 import {
-  dispatchRuntimeOpen,
+  dispatchRuntimeToggle,
   dispatchSecretGatewayTriggered,
 } from "./runtime-secret-events";
 import { ymosTrace } from "../ymos-trace";
@@ -22,7 +22,8 @@ type SecretCommandHandler = () => void;
  */
 export const SECRET_COMMANDS: Record<string, SecretCommandHandler> = {
   "ymos horus": () => {
-    dispatchRuntimeOpen();
+    // RUNTIME-SUITE-001 — Horus toggles Suite open/closed.
+    dispatchRuntimeToggle();
   },
   // "ymos doctor": () => { … },
   // "ymos assets": () => { … },

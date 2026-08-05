@@ -17,8 +17,11 @@ export {
 export { RuntimeSecretBuffer } from "./runtime-secret-buffer";
 export {
   YMOS_RUNTIME_OPEN_EVENT,
+  YMOS_RUNTIME_TOGGLE_EVENT,
+  YMOS_RUNTIME_CLOSE_EVENT,
   YMOS_SECRET_GATEWAY_TRIGGERED_EVENT,
   dispatchRuntimeOpen,
+  dispatchRuntimeToggle,
   dispatchSecretGatewayTriggered,
 } from "./runtime-secret-events";
 export type { YmosSecretGatewayTriggeredDetail } from "./runtime-secret-events";

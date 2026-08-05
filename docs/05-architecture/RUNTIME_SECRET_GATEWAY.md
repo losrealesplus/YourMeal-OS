@@ -45,13 +45,13 @@ RuntimeSecretBuffer  (últimos 32 chars · RAM)
 matchSecretCommand("ymos horus")
       │
       ▼
-CustomEvent("ymos-runtime-open")
+CustomEvent("ymos-runtime-toggle")
       │
       ▼
-YmosRuntimeInspector listener
+YmosRuntimeInspector listener (flip enabled)
       │
       ▼
-setYmosRuntimeInspectorEnabled(true)   ← mismo flujo que hoy
+setYmosRuntimeInspectorEnabled(!enabled)   ← mismo path storage / gesture
 ```
 
 ### Módulo
@@ -75,18 +75,20 @@ Instalación en boot cliente (`src/router.tsx`), junto a otros sensores observe-
 
 ---
 
-## Flujo (v1)
+## Flujo (v1 · RUNTIME-SUITE-001)
 
 1. Usuario escribe en cualquier pantalla (sin campo secreto visible).
 2. El gateway acumula teclas imprimibles (ignora Ctrl/Meta/Alt; no `preventDefault`).
 3. Buffer normalizado (`trim` + `lowercase`) coincide con `ymos horus` (igualdad o sufijo exacto del comando registrado).
 4. Se limpia el buffer.
 5. Se emite `ymos-secret-gateway-triggered` (detail: `{ command }` — nunca el buffer crudo).
-6. Se emite `ymos-runtime-open`.
-7. El Inspector habilita el overlay con el mismo path que storage / gesture.
+6. Se emite `ymos-runtime-toggle` (camino canónico).
+7. El Suite hace flip de `setYmosRuntimeInspectorEnabled(!enabled)`.
 
 Frases aceptadas: `YMOS Horus` · `ymos horus` · `YMOS HORUS` · `Ymos Horus`.  
 Rechazadas: coincidencias parciales (`ymos`, `horus`, `ymos hor`).
+
+Compatibilidad: `ymos-runtime-open` sigue aceptado (solo abre).
 
 ---
 
@@ -105,9 +107,11 @@ Rechazadas: coincidencias parciales (`ymos`, `horus`, `ymos hor`).
 
 | Evento | Quién emite | Quién escucha |
 |--------|-------------|---------------|
-| `ymos-runtime-open` | Gateway | Inspector → `setYmosRuntimeInspectorEnabled(true)` |
-| `ymos-secret-gateway-triggered` | Gateway | Futuros observadores internos (command id only) |
-| `ymos-runtime-inspector-toggle` | `enable.ts` (sin cambio) | Inspector (existente) |
+| `ymos-runtime-toggle` | Gateway (Horus) | Suite → flip enabled |
+| `ymos-runtime-open` | Compat | Suite → open |
+| `ymos-runtime-close` | enable.ts on close | Futuros cleanup hooks |
+| `ymos-secret-gateway-triggered` | Gateway | Observadores internos (command id only) |
+| `ymos-runtime-inspector-toggle` | `enable.ts` | Inspector sync (existente) |
 
 ---
 
@@ -115,7 +119,7 @@ Rechazadas: coincidencias parciales (`ymos`, `horus`, `ymos hor`).
 
 ```ts
 const SECRET_COMMANDS = {
-  "ymos horus": () => dispatchRuntimeOpen(),
+  "ymos horus": () => dispatchRuntimeToggle(),
   // "ymos doctor": () => { … },
   // "ymos assets": () => { … },
   // "ymos consistency": () => { … },

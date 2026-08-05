@@ -8,6 +8,7 @@ export {
   isYmosRuntimeInspectorEnabled,
   setYmosRuntimeInspectorEnabled,
   installYmosRuntimeInspectorGestureToggle,
+  YMOS_RUNTIME_CLOSE_EVENT,
 } from "./enable";
 export { collectYmosRuntimeDiagnostic } from "./collect";
 export type { YmosRuntimeDiagnostic } from "./collect";
