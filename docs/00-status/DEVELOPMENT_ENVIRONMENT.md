@@ -94,9 +94,15 @@ Contrato: ver `scripts/development/shared.mjs`.
 
 ---
 
-## Siguiente (HOUSEKEEPING-003)
+## Siguiente (PRODUCT-CORE)
 
-`.env.development.example` como contrato de variables + `doctor:env` comparado contra ese archivo.
+Infraestructura de entorno cerrada (002 + 003).  
+Siguiente foco: **PRODUCT-CORE-001 · Authentication & Bootstrap Stabilization**.
+
+### Histórico HOUSEKEEPING-003
+
+Completado: `.env.development.example` + Environment Contract (`doctor:env` ✔/✖).  
+Ver [ENVIRONMENT_CONTRACT](./ENVIRONMENT_CONTRACT.md) · ADR 0049.
 
 ---
 
