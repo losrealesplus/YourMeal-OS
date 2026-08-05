@@ -2,7 +2,7 @@
 
 **Documento:** `DEVELOPER_PLATFORM.md`  
 **Producto de ingeniería** (no UX cliente)  
-**Versión foundation:** v1.0 · **Doctor:** v1.1 · **Incidents:** v1.2 · **Doctor UI:** v1.3 · **Knowledge:** v1.4 · **Recommendations:** v1.5
+**Versión foundation:** v1.0 · … · **Recommendations:** v1.5 · **Capabilities:** v1.6
 **Roadmap congelado:** [DEVELOPER_PLATFORM_ROADMAP](./DEVELOPER_PLATFORM_ROADMAP.md)
 
 > El objetivo del Developer Platform no es ayudar a los desarrolladores.  
@@ -40,6 +40,7 @@ YourMeal OS
 | **Incident Engine** | Incidencias estructuradas (`incident-engine`) |
 | **Knowledge Engine** | Modelo de conocimiento declarativo (`knowledge-engine`) |
 | **Recommendation Engine** | Decisiones priorizadas desde Knowledge (`recommendation-engine`) |
+| **Capability Engine** | Contrato único Diagnose/Recover/Verify (`capability-engine`) |
 
 “Runtime Suite” es el overlay histórico; el nombre de producto es **Developer Platform**.
 
@@ -55,15 +56,17 @@ YourMeal OS
 | **v1.3** | **Doctor UI** (dashboard · capabilities · incidents · evidence) |
 | **v1.4** | **Knowledge Engine** (Diagnostic Knowledge Model) |
 | **v1.5** | **Recommendation Engine** (decisiones priorizadas) |
-| **v1.6+** | Recovery · Export ZIP · Telemetry · modules |
+| **v1.6** | **Capability Engine** (contrato único de capacidades) |
+| **v1.7+** | Recovery · Export ZIP · Telemetry · modules |
 
 ### Principio permanente — Engines unidireccionales
 
 ```text
-Check → Evidence → Incident → Knowledge → Recommendation → Recovery
+Capability → Checks → Evidence → Incident → Knowledge → Recommendation → Recovery
 ```
 
-Un Engine **nunca** depende de otro situado más arriba. Solo consume contratos de niveles anteriores.
+Un Engine **nunca** depende de otro situado más arriba. Solo consume contratos de niveles anteriores.  
+Módulos futuros = **`RuntimeCapability`** únicamente.
 
 Ver secuencia completa de PRs en [DEVELOPER_PLATFORM_ROADMAP](./DEVELOPER_PLATFORM_ROADMAP.md).
 
@@ -79,4 +82,5 @@ Ver secuencia completa de PRs en [DEVELOPER_PLATFORM_ROADMAP](./DEVELOPER_PLATFO
 - [DOCTOR_UI](./DOCTOR_UI.md) · ADR 0042  
 - [KNOWLEDGE_ENGINE](./KNOWLEDGE_ENGINE.md) · ADR 0043  
 - [RECOMMENDATION_ENGINE](./RECOMMENDATION_ENGINE.md) · ADR 0044  
+- [CAPABILITY_ENGINE](./CAPABILITY_ENGINE.md) · ADR 0045  
 - [RUNTIME_SUITE](./RUNTIME_SUITE.md) · Lifecycle ADR 0036  

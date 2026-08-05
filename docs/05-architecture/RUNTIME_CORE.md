@@ -102,7 +102,7 @@ type RuntimeModule = {
 }
 ```
 
-Categorías Host: `Health` · `Application` · `Network` · `System` · `Security` · `Developer` · `Knowledge` · `Recommendations`.  
+Categorías Host: `Health` · `Capabilities` · `Application` · `Network` · `System` · `Security` · `Developer` · `Knowledge` · `Recommendations`.  
 API: `getModules()` · `getModulesSorted(categoryOrder)`.
 
 Phase 1: Assets / DOM / Consistency se registran como **bridges** (metadata + health/export stubs). La UI de paneles legacy permanece en el Suite; la navegación la dirige el [Developer Platform Host](./DEVELOPER_PLATFORM_HOST.md).

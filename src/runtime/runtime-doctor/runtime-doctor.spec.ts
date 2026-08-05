@@ -13,6 +13,12 @@ import {
   resetIncidentsModuleFlags,
 } from "../incident-engine";
 import {
+  resetBuiltinCapabilitiesFlag,
+  resetCapabilityLifecycle,
+  resetCapabilityRegistry,
+  resetCapabilitiesModuleFlags,
+} from "../capability-engine";
+import {
   BUILTIN_DOCTOR_CHECK_IDS,
   computeHealthScore,
   getChecks,
@@ -37,6 +43,10 @@ afterEach(() => {
   resetIncidentRegistry();
   resetIncidentTimeline();
   resetIncidentsModuleFlags();
+  resetCapabilityRegistry();
+  resetCapabilityLifecycle();
+  resetBuiltinCapabilitiesFlag();
+  resetCapabilitiesModuleFlags();
 });
 
 describe("Doctor Engine", () => {

@@ -34,3 +34,4 @@ Permanent decisions for YourMeal OS. New ADRs are additive; do not silently reve
 | [0042](./0042-doctor-ui.md) | Doctor UI (Developer Platform v1.3 · glance diagnostics) |
 | [0043](./0043-diagnostic-knowledge-model.md) | Diagnostic Knowledge Model (Developer Platform v1.4) |
 | [0044](./0044-recommendation-engine.md) | Recommendation Engine (Developer Platform v1.5 · via Knowledge) |
+| [0045](./0045-capability-engine.md) | Capability Engine (Developer Platform v1.6 · Diagnose/Recover/Verify) |

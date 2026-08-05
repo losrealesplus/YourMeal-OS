@@ -35,6 +35,12 @@ import {
   markDoctorRunOnTimeline,
   reportIncidentFromDoctorCheck,
 } from "../incident-engine/doctor-bridge";
+import {
+  listCapabilities,
+  registerBuiltinCapabilities,
+  runAllCapabilities,
+  type RuntimeCheckResult,
+} from "../capability-engine";
 
 export type RunDoctorOptions = {
   platform?: RuntimePlatform;
@@ -151,6 +157,32 @@ function summarizeCapabilities(
   });
 }
 
+function doctorResultFromCapability(
+  result: RuntimeCheckResult,
+): DoctorCheckResult {
+  return {
+    status: result.status,
+    message: result.message,
+    payload: result.payload,
+    recommendations: result.recommendations,
+    severity: result.severity,
+  };
+}
+
+function checkStubFromCapabilityResult(
+  capabilityId: string,
+  result: RuntimeCheckResult,
+): DoctorCheck {
+  return {
+    id: result.checkId,
+    name: result.checkName,
+    capability: capabilityId as DoctorCapabilityId,
+    severity: result.severity ?? "error",
+    soft: result.soft,
+    run: () => doctorResultFromCapability(result),
+  };
+}
+
 /** Run all registered checks (or filtered) and build a DoctorReport. */
 export async function runDoctor(
   options: RunDoctorOptions = {},
@@ -168,56 +200,152 @@ export async function runDoctor(
     signal: options.signal,
   };
 
-  let queue = getChecks().filter((c) => supportsPlatform(c, platform));
-  if (options.capabilities?.length) {
-    const allow = new Set(options.capabilities);
-    queue = queue.filter((c) => allow.has(c.capability));
-  }
-  queue = queue.slice().sort((a, b) => a.id.localeCompare(b.id));
+  // Prefer Capability Engine — Doctor no longer owns check discovery.
+  registerBuiltinCapabilities();
+  const caps = listCapabilities();
 
   const executed: DoctorExecutedCheck[] = [];
   const evidences: RuntimeEvidence[] = [];
   const recommendations: string[] = [];
 
-  for (const check of queue) {
-    const t0 = Date.now();
-    const result = await safeRun(check, ctx);
-    const durationMs = Date.now() - t0;
-    executed.push({
-      id: check.id,
-      name: check.name,
-      capability: check.capability,
-      status: result.status,
-      message: result.message,
-      severity: result.severity ?? check.severity,
-      recommendations: result.recommendations ?? [],
-      soft: check.soft,
-      durationMs,
+  if (caps.length > 0) {
+    const runs = await runAllCapabilities(ctx, {
+      capabilityIds: options.capabilities,
     });
-    if (result.recommendations?.length) {
-      recommendations.push(...result.recommendations);
+    const covered = new Set<string>();
+    for (const run of runs) {
+      for (const result of run.results) {
+        covered.add(result.checkId);
+        executed.push({
+          id: result.checkId,
+          name: result.checkName,
+          capability: run.capability.id as DoctorCapabilityId,
+          status: result.status,
+          message: result.message,
+          severity: result.severity,
+          recommendations: result.recommendations ?? [],
+          soft: result.soft,
+          durationMs: result.durationMs ?? 0,
+        });
+        if (result.recommendations?.length) {
+          recommendations.push(...result.recommendations);
+        }
+        const doctorResult = doctorResultFromCapability(result);
+        if (
+          shouldEmitDoctorEvidence(doctorResult) &&
+          result.status !== "pass"
+        ) {
+          const check = checkStubFromCapabilityResult(
+            run.capability.id,
+            result,
+          );
+          const evidence = evidenceFromDoctorCheck({
+            check,
+            result: doctorResult,
+            platform,
+            runAt,
+            device: options.device,
+          });
+          evidences.push(evidence);
+          reportIncidentFromDoctorCheck({
+            check,
+            result: doctorResult,
+            evidence,
+            runAt,
+          });
+        }
+      }
     }
-    if (shouldEmitDoctorEvidence(result) && result.status !== "pass") {
-      const evidence = evidenceFromDoctorCheck({
-        check,
-        result,
-        platform,
-        runAt,
-        device: options.device,
+
+    // Orphan DoctorRegistry checks not owned by a Capability (experimental / tests).
+    let orphans = getChecks().filter(
+      (c) => !covered.has(c.id) && supportsPlatform(c, platform),
+    );
+    if (options.capabilities?.length) {
+      const allow = new Set(options.capabilities);
+      orphans = orphans.filter((c) => allow.has(c.capability));
+    }
+    orphans = orphans.slice().sort((a, b) => a.id.localeCompare(b.id));
+    for (const check of orphans) {
+      const t0 = Date.now();
+      const result = await safeRun(check, ctx);
+      const durationMs = Date.now() - t0;
+      executed.push({
+        id: check.id,
+        name: check.name,
+        capability: check.capability,
+        status: result.status,
+        message: result.message,
+        severity: result.severity ?? check.severity,
+        recommendations: result.recommendations ?? [],
+        soft: check.soft,
+        durationMs,
       });
-      evidences.push(evidence);
-      // Incident Platform: Doctor reports incidents — does not build objects itself.
-      reportIncidentFromDoctorCheck({
-        check,
-        result,
-        evidence,
-        runAt,
+      if (result.recommendations?.length) {
+        recommendations.push(...result.recommendations);
+      }
+      if (shouldEmitDoctorEvidence(result) && result.status !== "pass") {
+        const evidence = evidenceFromDoctorCheck({
+          check,
+          result,
+          platform,
+          runAt,
+          device: options.device,
+        });
+        evidences.push(evidence);
+        reportIncidentFromDoctorCheck({
+          check,
+          result,
+          evidence,
+          runAt,
+        });
+      }
+    }
+  } else {
+    // Legacy fallback — direct DoctorRegistry (tests / empty capability registry).
+    let queue = getChecks().filter((c) => supportsPlatform(c, platform));
+    if (options.capabilities?.length) {
+      const allow = new Set(options.capabilities);
+      queue = queue.filter((c) => allow.has(c.capability));
+    }
+    queue = queue.slice().sort((a, b) => a.id.localeCompare(b.id));
+
+    for (const check of queue) {
+      const t0 = Date.now();
+      const result = await safeRun(check, ctx);
+      const durationMs = Date.now() - t0;
+      executed.push({
+        id: check.id,
+        name: check.name,
+        capability: check.capability,
+        status: result.status,
+        message: result.message,
+        severity: result.severity ?? check.severity,
+        recommendations: result.recommendations ?? [],
+        soft: check.soft,
+        durationMs,
       });
+      if (result.recommendations?.length) {
+        recommendations.push(...result.recommendations);
+      }
+      if (shouldEmitDoctorEvidence(result) && result.status !== "pass") {
+        const evidence = evidenceFromDoctorCheck({
+          check,
+          result,
+          platform,
+          runAt,
+          device: options.device,
+        });
+        evidences.push(evidence);
+        reportIncidentFromDoctorCheck({
+          check,
+          result,
+          evidence,
+          runAt,
+        });
+      }
     }
   }
-
-  // Also emit evidence for info that requested it via shouldEmit — already handled.
-  // Pass never emits.
 
   const healthScore = computeHealthScore(executed);
   const ok = executed.every(

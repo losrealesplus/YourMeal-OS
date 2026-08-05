@@ -25,6 +25,7 @@
 | #299 | Incident Engine | ✅ |
 | #300 | Doctor UI | ✅ |
 | #301 | Knowledge Engine | ✅ |
+| #302 | Recommendation Engine | ✅ |
 
 ```text
 Portal → Host → Registry → Modules → Doctor → Evidence → Incident → Timeline
@@ -44,28 +45,27 @@ Todo lo que se construya forma parte de una **plataforma de ingeniería**, no de
 
 ---
 
-## Fase 1b — Knowledge → Recommendation → Recovery
+## Fase 1c — Capability before Recovery
 
 | PR | Entrega | Notas |
 |----|---------|-------|
-| #301 | **Knowledge Engine** | ✅ v1.4 (GitHub #301) |
-| ⭐ **Recommendation Engine** | **DEVELOPER-PLATFORM-008 · v1.5** | Decisiones desde Knowledge · este track |
-| #303 | Recovery Engine | `diagnose` · `recover` · `verify` |
-| #304 | Diagnostic Export ZIP | `diagnostic-*.zip` |
-| #305 | Telemetry Engine | Observabilidad de plataforma |
-
-Cadena oficial:
+| #301 | Knowledge Engine | ✅ v1.4 |
+| #302 | Recommendation Engine | ✅ v1.5 |
+| ⭐ **Capability Engine** | **DEVELOPER-PLATFORM-009 · v1.6** | Contrato único Diagnose/Recover/Verify · este track |
+| #303 | Recovery Engine | Orquesta `Capability.recover/verify` — sin conocer Assets/Network |
+| #304 | Diagnostic Export ZIP | |
+| #305 | Telemetry Engine | |
 
 ```text
-Check → Evidence → Incident → Knowledge → Recommendation → Recovery → Export → Product Core → EatClean
+Capability → Checks → Evidence → Incident → Knowledge → Recommendation → Recovery
 ```
+
+**Por qué Capability antes que Recovery:** Recovery no debe conocer Assets/Android/Storage. Cada capability declara `diagnose/recover/verify`; Recovery solo orquesta.
 
 ### Principio permanente — dependencia unidireccional
 
 > Un Engine nunca depende de otro Engine situado *más arriba* en la cadena.  
 > Cada Engine solo consume contratos de los niveles anteriores.
-
-Esto mantiene la plataforma desacoplada, facilita tests unitarios y permite sustituir Engines (Telemetry, ZIP, IA) sin cascadas.
 
 ---
 
@@ -83,8 +83,8 @@ Esto mantiene la plataforma desacoplada, facilita tests unitarios y permite sust
 | #313 | Remote Support |
 | #314 | AI Assistant |
 
-Contrato: `registerModule()` + `registerCheck()` + `registerKnowledge()` cuando aplique.  
-Sin tocar Host · Portal · Doctor Engine · Incident Engine · Knowledge Engine.
+Contrato obligatorio: **`RuntimeCapability`** (+ `registerKnowledge` cuando aplique).  
+Sin lógica de recovery fuera del contrato.
 
 ---
 
@@ -116,6 +116,9 @@ Modules
         │
         ▼
 Doctor Engine
+        │
+        ▼
+Capability Engine
         │
         ▼
 Incident Engine
@@ -151,3 +154,4 @@ EatClean
 - [DOCTOR_UI](./DOCTOR_UI.md) · ADR 0042  
 - [KNOWLEDGE_ENGINE](./KNOWLEDGE_ENGINE.md) · ADR 0043  
 - [RECOMMENDATION_ENGINE](./RECOMMENDATION_ENGINE.md) · ADR 0044  
+- [CAPABILITY_ENGINE](./CAPABILITY_ENGINE.md) · ADR 0045  
