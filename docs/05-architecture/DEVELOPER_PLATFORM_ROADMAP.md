@@ -3,14 +3,14 @@
 **Documento:** `DEVELOPER_PLATFORM_ROADMAP.md`  
 **Track:** DEVELOPER-PLATFORM-ROADMAP-001  
 **Producto:** YourMeal OS **Developer Platform**  
-**Estado:** Foundation Complete · Roadmap frozen 2026-08-05
+**Estado:** **v1.0.0 LANDED on `main`** · tag `developer-platform-v1.0.0` · 2026-08-05
 
 > El objetivo del Developer Platform no es ayudar a los desarrolladores.  
 > El objetivo es **reducir el riesgo operativo del Product Core** para que los tenants trabajen sobre una plataforma estable.
 
 ---
 
-## Estado actual — Foundation + Incident + Doctor UI
+## Fase 1 — COMPLETE ✅
 
 | PR | Entrega | Estado |
 |----|---------|--------|
@@ -19,19 +19,27 @@
 | #293 | Runtime Suite | ✅ |
 | #294 | Runtime Lifecycle | ✅ |
 | #295 | Developer Portal | ✅ |
-| #296 | Runtime Core | ✅ |
-| #297 | Runtime Host | ✅ |
-| #298 | Doctor Engine | ✅ |
-| #299 | Incident Engine | ✅ |
-| #300 | Doctor UI | ✅ |
-| #301 | Knowledge Engine | ✅ |
-| #302 | Recommendation Engine | ✅ |
+| #296 | Runtime Core | ✅ merged |
+| #297 | Runtime Host | ✅ merged |
+| #298 | Doctor Engine | ✅ merged |
+| #299 | Incident Engine | ✅ merged |
+| #300 | Doctor UI | ✅ merged |
+| #301 | Knowledge Engine | ✅ merged |
+| #302 | Recommendation Engine | ✅ merged |
+| #303 | Capability Engine | ✅ merged |
+| #304 | Recovery Engine | ✅ merged |
+| #305 | Platform Freeze (v1.0) | ✅ merged |
 
 ```text
-Portal → Host → Registry → Modules → Doctor → Evidence → Incident → Timeline
+Portal → Host → Core → Capability → Doctor → Evidence → Incident
+  → Knowledge → Recommendation → Recovery → Verify
 ```
 
-A partir de aquí, módulos nuevos = contratos (`registerModule` · `registerCheck` · `reportIncident` · `registerKnowledge`).
+**Tag interno:** `developer-platform-v1.0.0`  
+**Constitución:** [DEVELOPER_PLATFORM_v1.md](./DEVELOPER_PLATFORM_v1.md) · ADR 0047
+
+A partir de aquí: engines **congelados** (solo bugfix / rendimiento / nuevos `RuntimeCapability`).  
+ZIP · Telemetry · AI = **diferidos**.
 
 ---
 
@@ -45,7 +53,27 @@ Todo lo que se construya forma parte de una **plataforma de ingeniería**, no de
 
 ---
 
-## Fase 1c — Capability before Recovery
+## Fase 2 — Product Core Stabilization ⬅️ AQUÍ
+
+Foco del proyecto: **≈20% Developer Platform / ≈80% Product Core**.
+
+Primer sprint propuesto:
+
+**PRODUCT-CORE-001 · Authentication & Bootstrap Stabilization**
+
+```text
+Icon → Splash → Session → Bootstrap → Permissions → Localization → Brand → Dashboard
+```
+
+Debe ser 100% determinista, medible y sin errores — usando la Developer Platform v1.0 como instrumento de evidencia.
+
+Roadmap de módulos (no pantallas):
+
+Authentication → Bootstrap → Navigation → Orders → Kitchen → Production → Routes → Customers → Settings → Offline → Crash Recovery
+
+---
+
+## Fase 1c — Capability before Recovery (histórico)
 
 | PR | Entrega | Notas |
 |----|---------|-------|
@@ -53,7 +81,7 @@ Todo lo que se construya forma parte de una **plataforma de ingeniería**, no de
 | #302 | Recommendation Engine | ✅ v1.5 |
 | ✅ **Capability Engine** | **DEVELOPER-PLATFORM-009 · v1.6** | Contrato único Diagnose/Recover/Verify |
 | ✅ **#304 Recovery Engine** | **DEVELOPER-PLATFORM-010 · v1.7** | Orquesta `Capability.recover/verify` |
-| ⭐ **Platform Stabilization** | **DEVELOPER-PLATFORM-011 · v1.0 Freeze** | Contratos · contract tests · docs · baseline · este track |
+| ✅ **#305 Platform Stabilization** | **DEVELOPER-PLATFORM-011 · v1.0 Freeze** | Contratos · contract tests · docs · baseline |
 | — | Diagnostic Export ZIP | diferido post-freeze |
 | — | Telemetry Engine | diferido post-freeze |
 
