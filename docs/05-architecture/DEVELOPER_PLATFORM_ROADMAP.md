@@ -51,10 +51,10 @@ Todo lo que se construya forma parte de una **plataforma de ingeniería**, no de
 |----|---------|-------|
 | #301 | Knowledge Engine | ✅ v1.4 |
 | #302 | Recommendation Engine | ✅ v1.5 |
-| ⭐ **Capability Engine** | **DEVELOPER-PLATFORM-009 · v1.6** | Contrato único Diagnose/Recover/Verify |
-| ⭐ **Recovery Engine** | **DEVELOPER-PLATFORM-010 · v1.7** | Orquesta `Capability.recover/verify` — este track |
-| #304 | Diagnostic Export ZIP | |
-| #305 | Telemetry Engine | |
+| ✅ **Capability Engine** | **DEVELOPER-PLATFORM-009 · v1.6** | Contrato único Diagnose/Recover/Verify |
+| ✅ **#304 Recovery Engine** | **DEVELOPER-PLATFORM-010 · v1.7** | Orquesta `Capability.recover/verify` |
+| — | Diagnostic Export ZIP | siguiente |
+| — | Telemetry Engine | |
 
 ```text
 Capability → Checks → Evidence → Incident → Knowledge → Recommendation → Recovery
