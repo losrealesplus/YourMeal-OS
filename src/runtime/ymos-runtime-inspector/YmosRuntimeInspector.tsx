@@ -2,8 +2,8 @@
  * YMOS Runtime Inspector — visual observe-only overlay.
  * Gate: VITE_YMOS_RUNTIME_OVERLAY | ?debug-runtime=1 | storage | corner long-press.
  *
- * Tabs: General · Runtime · Assets · DOM · i18n · Router · Supabase · Network · Storage · Clipboard · Device · Errors
- * ANDROID-ASSETS-001 → Assets · ANDROID-DOM-001 → DOM (document.images)
+ * Tabs: … · Assets · DOM · Consistency · …
+ * ANDROID-ASSETS-001 · ANDROID-DOM-001 · RUNTIME-CONSISTENCY-002
  */
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { useRouterState } from "@tanstack/react-router";
@@ -20,6 +20,10 @@ import {
   subscribeYmosAssetAudit,
 } from "../ymos-runtime-assets";
 import {
+  buildConsistencyContext,
+  runRuntimeConsistencyEngine,
+} from "../ymos-runtime-consistency";
+import {
   installYmosRuntimeInspectorGestureToggle,
   isYmosRuntimeInspectorEnabled,
   setYmosRuntimeInspectorEnabled,
@@ -33,6 +37,7 @@ const TABS = [
   "Runtime",
   "Assets",
   "DOM",
+  "Consistency",
   "i18n",
   "Router",
   "Supabase",
@@ -154,8 +159,9 @@ export function YmosRuntimeInspector() {
 
   const [copied, setCopied] = useState(false);
   const [copiedDom, setCopiedDom] = useState(false);
-  /** ANDROID-DOM-001 — land on DOM tab to resolve APK vs Inspector contradiction. */
-  const [tab, setTab] = useState<Tab>("DOM");
+  const [copiedConsistency, setCopiedConsistency] = useState(false);
+  /** RUNTIME-CONSISTENCY-002 — land on Consistency to surface ledger vs DOM. */
+  const [tab, setTab] = useState<Tab>("Consistency");
   const [tick, setTick] = useState(0);
 
   const status = useSyncExternalStore(
@@ -293,6 +299,17 @@ export function YmosRuntimeInspector() {
     return collectDomImages();
   }, [tick]);
 
+  // RUNTIME-CONSISTENCY-002 — pure validation report (no store mutation).
+  const consistency = useMemo(() => {
+    void tick;
+    const ctx = buildConsistencyContext({
+      domImages,
+      ledger: assets,
+      route: routerState.pathname,
+    });
+    return runRuntimeConsistencyEngine(ctx);
+  }, [tick, domImages, assets, routerState.pathname]);
+
   if (!enabled) {
     ymosTrace(
       "returning null because enabled=false (overlay gated off)",
@@ -338,6 +355,12 @@ export function YmosRuntimeInspector() {
     window.setTimeout(() => setCopiedDom(false), 2000);
   }
 
+  async function copyConsistency() {
+    await writeClipboard(JSON.stringify(consistency, null, 2));
+    setCopiedConsistency(true);
+    window.setTimeout(() => setCopiedConsistency(false), 2000);
+  }
+
   const failures = diagnostic.assets.entries.filter((e) => e.status === "error");
   const networkEntries = diagnostic.assets.entries.filter(
     (e) => e.source === "fetch" || e.source === "xhr",
@@ -346,6 +369,11 @@ export function YmosRuntimeInspector() {
     (img) =>
       img.currentSrc.includes("/__l5e/") || img.src.includes("/__l5e/"),
   );
+  const consistencyErrors = consistency.summary.error;
+  const firstFailureIsHistorical =
+    consistency.firstFailureLifecycle === "HISTORICAL" ||
+    consistency.firstFailureLifecycle === "ORPHAN" ||
+    consistency.firstFailureLifecycle === "STALE";
 
   return (
     <div
@@ -415,6 +443,14 @@ export function YmosRuntimeInspector() {
                 ({domImages.length})
               </span>
             ) : null}
+            {name === "Consistency" && consistencyErrors > 0 ? (
+              <span className="ml-1 text-rose-200">({consistencyErrors})</span>
+            ) : null}
+            {name === "Consistency" && consistencyErrors === 0 ? (
+              <span className="ml-1 text-emerald-400/80">
+                {consistency.score}/{consistency.maxScore}
+              </span>
+            ) : null}
           </button>
         ))}
       </div>
@@ -467,8 +503,25 @@ export function YmosRuntimeInspector() {
             <Section title="First failure">
               {diagnostic.assets.firstFailure ? (
                 <div className="space-y-1">
-                  <Mark ok={false} label={diagnostic.assets.firstFailure.kind} />
+                  <Mark
+                    ok={firstFailureIsHistorical ? null : false}
+                    label={
+                      firstFailureIsHistorical
+                        ? `${diagnostic.assets.firstFailure.kind} · ${consistency.firstFailureLifecycle ?? "HISTORICAL"}`
+                        : diagnostic.assets.firstFailure.kind
+                    }
+                  />
+                  {firstFailureIsHistorical ? (
+                    <p className="text-[10px] text-amber-300/90 leading-snug py-1">
+                      Not current — {consistency.firstFailureReason ?? "absent from document.images."}{" "}
+                      Ignored for live diagnostics. See Consistency tab.
+                    </p>
+                  ) : null}
                   <Row label="URL" value={diagnostic.assets.firstFailure.url} />
+                  <Row
+                    label="lifecycle"
+                    value={consistency.firstFailureLifecycle ?? "UNKNOWN"}
+                  />
                   <Row
                     label="HTTP"
                     value={
@@ -608,6 +661,140 @@ export function YmosRuntimeInspector() {
               className="mt-3 w-full rounded-lg border border-yellow-300/60 bg-yellow-300/10 py-2 text-center text-[11px] font-bold text-yellow-200 hover:bg-yellow-300/20"
             >
               {copiedDom ? "DOM Images Copied ✓" : "Copy DOM Images"}
+            </button>
+          </>
+        )}
+
+        {tab === "Consistency" && (
+          <>
+            <p className="text-[9px] text-zinc-500 mb-2">
+              RUNTIME-CONSISTENCY-002 · validate DOM ↔ ledger ↔ Performance (observe-only)
+            </p>
+            <Row
+              label="Score"
+              value={`${consistency.score} / ${consistency.maxScore}`}
+            />
+            <Row
+              label="summary"
+              value={`✓ ${consistency.summary.ok} · ! ${consistency.summary.warning} · ✗ ${consistency.summary.error}`}
+            />
+            <Mark
+              ok={consistency.summary.error === 0}
+              label={
+                consistency.summary.error === 0
+                  ? "No consistency errors"
+                  : `${consistency.summary.error} consistency error(s)`
+              }
+            />
+
+            <Section title="Rules">
+              <ul className="space-y-2">
+                {consistency.results.map((r) => (
+                  <li
+                    key={r.ruleId}
+                    className="rounded-md border border-white/10 bg-white/5 p-2"
+                  >
+                    <div className="flex justify-between gap-2">
+                      <span className="font-mono text-[10px] text-zinc-400">
+                        {r.ruleId}
+                      </span>
+                      <span
+                        className={`font-mono text-[10px] ${
+                          r.severity === "ok"
+                            ? "text-emerald-400"
+                            : r.severity === "warning"
+                              ? "text-amber-300"
+                              : "text-rose-400"
+                        }`}
+                      >
+                        {r.severity === "ok"
+                          ? "✓ PASS"
+                          : r.severity === "warning"
+                            ? "! WARNING"
+                            : "✗ ERROR"}
+                      </span>
+                    </div>
+                    <div className="text-zinc-100 mt-0.5">{r.title}</div>
+                    <div className="text-[10px] text-zinc-400 mt-0.5 leading-snug">
+                      {r.description}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </Section>
+
+            <Section title="FirstFailure lifecycle">
+              {diagnostic.assets.firstFailure ? (
+                <>
+                  <Row
+                    label="lifecycle"
+                    value={consistency.firstFailureLifecycle ?? "UNKNOWN"}
+                  />
+                  <Row
+                    label="reason"
+                    value={consistency.firstFailureReason ?? "—"}
+                  />
+                  <Row label="URL" value={diagnostic.assets.firstFailure.url} />
+                </>
+              ) : (
+                <Mark ok={true} label="No firstFailure" />
+              )}
+            </Section>
+
+            <Section title="Consistency Timeline">
+              {consistency.timeline.length === 0 ? (
+                <p className="text-zinc-500">No timeline events.</p>
+              ) : (
+                <ul className="space-y-2">
+                  {consistency.timeline.map((ev, i) => (
+                    <li
+                      key={`tl-${i}-${ev.at}`}
+                      className="border-l-2 border-sky-500/40 pl-2"
+                    >
+                      <div className="text-[9px] text-zinc-500 font-mono">
+                        {ev.at}
+                      </div>
+                      <div className="text-zinc-200">{ev.label}</div>
+                      <div className="text-[10px] text-zinc-400 break-all leading-snug">
+                        {ev.detail}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Section>
+
+            <Section title="Annotated image ledger (sample)">
+              <ul className="space-y-1">
+                {consistency.annotatedEntries
+                  .filter((e) => e.kind === "image" || e.source === "img")
+                  .slice(-8)
+                  .reverse()
+                  .map((e) => (
+                    <li key={e.id} className="py-1 border-b border-white/5">
+                      <div className="flex justify-between gap-2">
+                        <span className="font-mono text-[10px] text-zinc-400">
+                          {e.lifecycle}
+                        </span>
+                        <span className="font-mono text-[10px] text-zinc-500">
+                          {e.status}
+                        </span>
+                      </div>
+                      <div className="font-mono text-[10px] text-zinc-300 break-all">
+                        {shortUrl(e.url)}
+                      </div>
+                      <div className="text-[9px] text-zinc-500">{e.lifecycleReason}</div>
+                    </li>
+                  ))}
+              </ul>
+            </Section>
+
+            <button
+              type="button"
+              onClick={() => void copyConsistency()}
+              className="mt-3 w-full rounded-lg border border-sky-400/50 bg-sky-500/10 py-2 text-center text-[11px] font-bold text-sky-200 hover:bg-sky-500/20"
+            >
+              {copiedConsistency ? "Consistency Copied ✓" : "Copy Consistency Report"}
             </button>
           </>
         )}
