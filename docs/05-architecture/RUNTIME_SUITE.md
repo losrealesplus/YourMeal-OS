@@ -61,20 +61,21 @@ Así el Suite no queda atrapado en `enabled=true` cuando el env force-on estaba 
 
 ---
 
-## Fases
+## Fases · Developer Platform
 
-| Fase | Entrega | Estado |
-|------|---------|--------|
-| **1** | Horus + shell | Done (#292+) |
-| **001** | Lifecycle toggle / ✕ / ESC / close event | **NOW** |
-| **2** | Doctor · Tenant | Planned |
-| **3** | State · Performance · Flags · Telemetry | Planned |
-| **4** | Export `diagnostic-*.zip` | Planned |
-| **5** | Envío consentido a soporte | Planned |
+| Versión | Entrega | Estado |
+|---------|---------|--------|
+| **v1.0** Foundation | Portal · Suite · **Runtime Core** · Assets · DOM · Consistency | Core = DEVELOPER-PLATFORM-002 |
+| **v1.1** | Doctor · Logs · Storage · Session | Planned |
+| **v1.2** | Performance · Network · API | Planned |
+| **v1.3** | Branding · Feature Flags · Tenant | Planned |
+| **v1.4+** | Export ZIP · Knowledge · Support package | Planned |
+
+Ver [RUNTIME_CORE](./RUNTIME_CORE.md).
 
 ---
 
-## Non-goals (este PR)
+## Non-goals (lifecycle PR histórico)
 
 - Assets / Consistency / Doctor / Capacitor / Android engines
 - ZIP export · tap-outside close (opcional futuro)

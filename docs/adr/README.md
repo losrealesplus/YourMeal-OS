@@ -27,3 +27,4 @@ Permanent decisions for YourMeal OS. New ADRs are additive; do not silently reve
 | [0033](./0033-platform-independence.md) | Platform Independence (ports/adapters · dominio agnóstico) |
 | [0034](./0034-runtime-secret-gateway.md) | Runtime Secret Gateway (hidden command palette · YMOS Horus) |
 | [0036](./0036-runtime-suite-lifecycle.md) | Runtime Suite Lifecycle (toggle · close · ESC · dismiss) |
+| [0038](./0038-runtime-core.md) | Runtime Core (Developer Platform v1.0 kernel · Registry) |
