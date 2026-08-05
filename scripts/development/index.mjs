@@ -5,6 +5,10 @@
 import { runAdbDriver } from "./adb-driver.mjs";
 import { runAndroidSdkDriver } from "./android-sdk-driver.mjs";
 import { runCapacitorDriver } from "./capacitor-driver.mjs";
+import {
+  formatContractChecklist,
+  runContractDriver,
+} from "./contract-driver.mjs";
 import { runEnvironmentDriver } from "./environment-driver.mjs";
 import { runGitDriver } from "./git-driver.mjs";
 import { runGradleDriver } from "./gradle-driver.mjs";
@@ -13,6 +17,7 @@ import { runNodeDriver } from "./node-driver.mjs";
 import { runNpmDriver } from "./npm-driver.mjs";
 
 export const DEVELOPMENT_DRIVERS = [
+  { id: "environment-contract", run: runContractDriver },
   { id: "java", run: runJavaDriver },
   { id: "android-sdk", run: runAndroidSdkDriver },
   { id: "adb", run: runAdbDriver },
@@ -106,8 +111,15 @@ export function printDevelopmentReport(report, opts = {}) {
   for (const d of report.drivers) {
     const dots = ".".repeat(Math.max(2, pad + 2 - d.name.length));
     console.log(`${d.name} ${dots} ${d.status}`);
+    if (d.id === "environment-contract") {
+      for (const line of formatContractChecklist(d)) {
+        console.log(`   ${line}`);
+      }
+    }
     if (opts.verbose || d.status !== "PASS") {
-      console.log(`   ${d.message}`);
+      if (d.id !== "environment-contract" || opts.verbose) {
+        console.log(`   ${d.message}`);
+      }
       for (const r of d.recommendations) console.log(`   → ${r}`);
       for (const h of d.recoveryHints) console.log(`   $ ${h}`);
     }
