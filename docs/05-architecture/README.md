@@ -47,6 +47,7 @@
 | [DOCTOR_ENGINE.md](./DOCTOR_ENGINE.md) | Doctor Engine · checks · Health Score · v1.1 |
 | [INCIDENT_ENGINE.md](./INCIDENT_ENGINE.md) | Incident Engine · FOPEBA Incident Objects · v1.2 |
 | [DOCTOR_UI.md](./DOCTOR_UI.md) | Doctor UI · glance diagnostics · v1.3 |
+| [KNOWLEDGE_ENGINE.md](./KNOWLEDGE_ENGINE.md) | Knowledge Engine · Diagnostic Knowledge Model · v1.4 |
 | [../07-experience/CUSTOMER_JOURNEYS.md](../07-experience/CUSTOMER_JOURNEYS.md) | Experience First · CJ-001 Pedido semanal |
 | [architecture-review.md](./architecture-review.md) | As-built senior review |
 | [MODULE_CONVENTION.md](./MODULE_CONVENTION.md) | `src/modules/...` layout |
