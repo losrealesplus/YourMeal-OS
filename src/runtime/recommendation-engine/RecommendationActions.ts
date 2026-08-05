@@ -1,9 +1,23 @@
 /**
- * Build actions from Knowledge — Recovery unsupported for now.
+ * Build actions from Knowledge — recovery supported when a linked Capability has recover().
  */
 
+import {
+  getCapability,
+  registerBuiltinCapabilities,
+} from "../capability-engine";
 import type { RuntimeKnowledge } from "../knowledge-engine";
 import type { RuntimeRecommendationAction } from "./recommendation.types";
+
+export function knowledgeHasRecoverableCapability(
+  article: RuntimeKnowledge,
+): boolean {
+  registerBuiltinCapabilities();
+  return article.capabilities.some((id) => {
+    const cap = getCapability(id);
+    return typeof cap?.recover === "function";
+  });
+}
 
 export function buildRecommendationActions(
   article: RuntimeKnowledge,
@@ -42,11 +56,12 @@ export function buildRecommendationActions(
     supported: true,
   });
 
+  const recoverySupported = knowledgeHasRecoverableCapability(article);
   actions.push({
     id: `recovery-${article.id}`,
-    label: "Run Recovery",
+    label: recoverySupported ? "Run Recovery" : "Manual Action",
     type: "recovery",
-    supported: false,
+    supported: recoverySupported,
   });
 
   return actions;

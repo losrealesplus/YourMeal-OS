@@ -21,7 +21,9 @@ export type CreateCapabilityFromChecksInput = {
   version?: string;
   supportedPlatforms?: CapabilityPlatform[];
   checks: DoctorCheck[];
-  /** When true, expose recover/verify stubs that return NOT_SUPPORTED (panel shows YES for contract presence — user wants YES/NO for recover supported). */
+  recover?: RuntimeCapability["recover"];
+  verify?: RuntimeCapability["verify"];
+  /** When true, expose recover/verify stubs that return NOT_SUPPORTED. */
   exposeRecoverStub?: boolean;
   exposeVerifyStub?: boolean;
 };
@@ -98,7 +100,9 @@ export function createCapabilityFromChecks(
     },
   };
 
-  if (input.exposeRecoverStub) {
+  if (input.recover) {
+    capability.recover = input.recover;
+  } else if (input.exposeRecoverStub) {
     capability.recover = async (): Promise<RuntimeRecoveryResult> => ({
       ok: false,
       code: "NOT_IMPLEMENTED",
@@ -107,7 +111,9 @@ export function createCapabilityFromChecks(
     });
   }
 
-  if (input.exposeVerifyStub) {
+  if (input.verify) {
+    capability.verify = input.verify;
+  } else if (input.exposeVerifyStub) {
     capability.verify = async (): Promise<RuntimeVerificationResult> => ({
       ok: false,
       code: "NOT_IMPLEMENTED",

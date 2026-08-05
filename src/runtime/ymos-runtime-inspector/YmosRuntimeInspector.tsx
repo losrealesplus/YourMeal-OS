@@ -36,6 +36,7 @@ import { registerIncidentsModule } from "../incident-engine";
 import { registerKnowledgeModule } from "../knowledge-engine";
 import { registerRecommendationsModule } from "../recommendation-engine";
 import { registerCapabilitiesModule } from "../capability-engine";
+import { registerRecoveryModule } from "../recovery-engine";
 import {
   installYmosRuntimeInspectorGestureToggle,
   isYmosRuntimeInspectorEnabled,
@@ -217,6 +218,7 @@ export function YmosRuntimeInspector() {
     registerKnowledgeModule();
     registerRecommendationsModule();
     registerCapabilitiesModule();
+    registerRecoveryModule();
   }, []);
 
   const status = useSyncExternalStore(

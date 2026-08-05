@@ -54,8 +54,15 @@ describe("Capability Engine", () => {
     expect(result!.results.length).toBeGreaterThan(0);
     const state = getCapabilityState("runtime");
     expect(["healthy", "warning", "error"]).toContain(state);
-    expect(capabilityHealth(result!.capability).recoverSupported).toBe(false);
-    expect(capabilityHealth(result!.capability).verifySupported).toBe(false);
+    expect(capabilityHealth(result!.capability).recoverSupported).toBe(true);
+    expect(capabilityHealth(result!.capability).verifySupported).toBe(true);
+  });
+
+  it("assets capability still has no recover/verify", () => {
+    registerBuiltinCapabilities();
+    const assets = getCapability("assets")!;
+    expect(capabilityHealth(assets).recoverSupported).toBe(false);
+    expect(capabilityHealth(assets).verifySupported).toBe(false);
   });
 
   it("runAllCapabilities returns all foundation results", async () => {

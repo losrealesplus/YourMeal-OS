@@ -2,7 +2,7 @@
 
 **Documento:** `DEVELOPER_PLATFORM.md`  
 **Producto de ingeniería** (no UX cliente)  
-**Versión foundation:** v1.0 · … · **Recommendations:** v1.5 · **Capabilities:** v1.6
+**Versión foundation:** v1.0 · … · **Capabilities:** v1.6 · **Recovery:** v1.7
 **Roadmap congelado:** [DEVELOPER_PLATFORM_ROADMAP](./DEVELOPER_PLATFORM_ROADMAP.md)
 
 > El objetivo del Developer Platform no es ayudar a los desarrolladores.  
@@ -41,6 +41,7 @@ YourMeal OS
 | **Knowledge Engine** | Modelo de conocimiento declarativo (`knowledge-engine`) |
 | **Recommendation Engine** | Decisiones priorizadas desde Knowledge (`recommendation-engine`) |
 | **Capability Engine** | Contrato único Diagnose/Recover/Verify (`capability-engine`) |
+| **Recovery Engine** | Orquesta `Capability.recover` → `verify` (`recovery-engine`) |
 
 “Runtime Suite” es el overlay histórico; el nombre de producto es **Developer Platform**.
 
@@ -57,7 +58,8 @@ YourMeal OS
 | **v1.4** | **Knowledge Engine** (Diagnostic Knowledge Model) |
 | **v1.5** | **Recommendation Engine** (decisiones priorizadas) |
 | **v1.6** | **Capability Engine** (contrato único de capacidades) |
-| **v1.7+** | Recovery · Export ZIP · Telemetry · modules |
+| **v1.7** | **Recovery Engine** (orquestación recover → verify) |
+| **v1.8+** | Export ZIP · Telemetry · modules |
 
 ### Principio permanente — Engines unidireccionales
 
@@ -83,4 +85,5 @@ Ver secuencia completa de PRs en [DEVELOPER_PLATFORM_ROADMAP](./DEVELOPER_PLATFO
 - [KNOWLEDGE_ENGINE](./KNOWLEDGE_ENGINE.md) · ADR 0043  
 - [RECOMMENDATION_ENGINE](./RECOMMENDATION_ENGINE.md) · ADR 0044  
 - [CAPABILITY_ENGINE](./CAPABILITY_ENGINE.md) · ADR 0045  
+- [RECOVERY_ENGINE](./RECOVERY_ENGINE.md) · ADR 0046  
 - [RUNTIME_SUITE](./RUNTIME_SUITE.md) · Lifecycle ADR 0036  

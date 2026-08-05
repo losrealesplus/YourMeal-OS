@@ -37,4 +37,7 @@ export {
   RECOMMENDATION_PRIORITY_ORDER,
 } from "./RecommendationPriority";
 
-export { clearRecommendationStore } from "./RecommendationRegistry";
+export {
+  clearRecommendationStore,
+  getRecommendation,
+} from "./RecommendationRegistry";

@@ -14,7 +14,7 @@ export type RuntimeRecommendationAction = {
   id: string;
   label: string;
   type: RecommendationActionType;
-  /** Recovery actions stay unsupported until Recovery Engine. */
+  /** Recovery Engine resolves Capability.recover() via capabilityIds. */
   supported: boolean;
 };
 
@@ -27,6 +27,8 @@ export type RuntimeRecommendation = {
   confidence: number;
   incidentIds: string[];
   knowledgeIds: string[];
+  /** Capability ids from Knowledge — Recovery resolves recover() here. */
+  capabilityIds: string[];
   evidenceIds: string[];
   actions: RuntimeRecommendationAction[];
 };
