@@ -2,8 +2,8 @@
  * YMOS Runtime Inspector — visual observe-only overlay.
  * Gate: VITE_YMOS_RUNTIME_OVERLAY | ?debug-runtime=1 | storage | corner long-press.
  *
- * Tabs: General · Runtime · Assets · i18n · Router · Supabase · Network · Storage · Clipboard · Device · Errors
- * ANDROID-ASSETS-001 contributes the Assets tab.
+ * Tabs: General · Runtime · Assets · DOM · i18n · Router · Supabase · Network · Storage · Clipboard · Device · Errors
+ * ANDROID-ASSETS-001 → Assets · ANDROID-DOM-001 → DOM (document.images)
  */
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { useRouterState } from "@tanstack/react-router";
@@ -25,12 +25,14 @@ import {
   setYmosRuntimeInspectorEnabled,
 } from "./enable";
 import { collectYmosRuntimeDiagnostic } from "./collect";
+import { collectDomImages } from "./dom-images";
 import { ymosTrace } from "../ymos-trace";
 
 const TABS = [
   "General",
   "Runtime",
   "Assets",
+  "DOM",
   "i18n",
   "Router",
   "Supabase",
@@ -151,7 +153,9 @@ export function YmosRuntimeInspector() {
   );
 
   const [copied, setCopied] = useState(false);
-  const [tab, setTab] = useState<Tab>("Assets");
+  const [copiedDom, setCopiedDom] = useState(false);
+  /** ANDROID-DOM-001 — land on DOM tab to resolve APK vs Inspector contradiction. */
+  const [tab, setTab] = useState<Tab>("DOM");
   const [tick, setTick] = useState(0);
 
   const status = useSyncExternalStore(
@@ -283,6 +287,12 @@ export function YmosRuntimeInspector() {
     assets,
   ]);
 
+  // ANDROID-DOM-001 — live document.images (refreshed with tick).
+  const domImages = useMemo(() => {
+    void tick;
+    return collectDomImages();
+  }, [tick]);
+
   if (!enabled) {
     ymosTrace(
       "returning null because enabled=false (overlay gated off)",
@@ -296,25 +306,45 @@ export function YmosRuntimeInspector() {
     ? (diagnostic.i18n.namespaces as string[])
     : [];
 
-  async function copyDiagnostic() {
-    const json = JSON.stringify(diagnostic, null, 2);
+  async function writeClipboard(text: string): Promise<void> {
     try {
-      await navigator.clipboard.writeText(json);
+      await navigator.clipboard.writeText(text);
     } catch {
       const ta = document.createElement("textarea");
-      ta.value = json;
+      ta.value = text;
       document.body.appendChild(ta);
       ta.select();
       document.execCommand("copy");
       document.body.removeChild(ta);
     }
+  }
+
+  async function copyDiagnostic() {
+    await writeClipboard(JSON.stringify(diagnostic, null, 2));
     setCopied(true);
     window.setTimeout(() => setCopied(false), 2000);
+  }
+
+  async function copyDomImages() {
+    const payload = {
+      tool: "YMOS Runtime Inspector · DOM",
+      capturedAt: new Date().toISOString(),
+      href: typeof window !== "undefined" ? window.location.href : "",
+      count: domImages.length,
+      images: domImages,
+    };
+    await writeClipboard(JSON.stringify(payload, null, 2));
+    setCopiedDom(true);
+    window.setTimeout(() => setCopiedDom(false), 2000);
   }
 
   const failures = diagnostic.assets.entries.filter((e) => e.status === "error");
   const networkEntries = diagnostic.assets.entries.filter(
     (e) => e.source === "fetch" || e.source === "xhr",
+  );
+  const domHasL5e = domImages.some(
+    (img) =>
+      img.currentSrc.includes("/__l5e/") || img.src.includes("/__l5e/"),
   );
 
   return (
@@ -379,6 +409,11 @@ export function YmosRuntimeInspector() {
             {name}
             {name === "Assets" && failures.length > 0 ? (
               <span className="ml-1 text-rose-200">({failures.length})</span>
+            ) : null}
+            {name === "DOM" ? (
+              <span className={`ml-1 ${domHasL5e ? "text-rose-200" : "text-zinc-500"}`}>
+                ({domImages.length})
+              </span>
             ) : null}
           </button>
         ))}
@@ -493,6 +528,87 @@ export function YmosRuntimeInspector() {
                 </ul>
               )}
             </Section>
+          </>
+        )}
+
+        {tab === "DOM" && (
+          <>
+            <p className="text-[9px] text-zinc-500 mb-2">
+              ANDROID-DOM-001 · live{" "}
+              <span className="font-mono text-zinc-300">document.images</span>
+              {" "}(WebView truth — not the asset ledger)
+            </p>
+            <Mark
+              ok={domImages.length === 0 ? null : !domHasL5e}
+              label={
+                domHasL5e
+                  ? "__l5e present in DOM"
+                  : "no __l5e in document.images"
+              }
+            />
+            <Row label="count" value={String(domImages.length)} />
+            <Section title="Images">
+              {domImages.length === 0 ? (
+                <p className="text-zinc-500">No HTMLImageElement in document.images.</p>
+              ) : (
+                <ul className="space-y-2">
+                  {domImages.map((img) => {
+                    const broken = img.complete && img.naturalWidth === 0;
+                    const hasL5e =
+                      img.currentSrc.includes("/__l5e/") ||
+                      img.src.includes("/__l5e/");
+                    return (
+                      <li
+                        key={`dom-img-${img.index}`}
+                        className="rounded-md border border-white/10 bg-white/5 p-2"
+                      >
+                        <div className="flex justify-between gap-2">
+                          <span className="font-mono text-zinc-300">
+                            #{img.index} · {img.ownerHint}
+                          </span>
+                          <span
+                            className={`font-mono ${
+                              hasL5e || broken
+                                ? "text-rose-400"
+                                : img.naturalWidth > 0
+                                  ? "text-emerald-400"
+                                  : "text-zinc-400"
+                            }`}
+                          >
+                            {hasL5e
+                              ? "✗ __l5e"
+                              : broken
+                                ? "✗ broken"
+                                : img.naturalWidth > 0
+                                  ? "✓ ok"
+                                  : "· loading"}
+                          </span>
+                        </div>
+                        <Row label="currentSrc" value={img.currentSrc || "—"} />
+                        <Row label="src" value={img.src || "—"} />
+                        <Row label="alt" value={img.alt || "—"} />
+                        <Row
+                          label="size"
+                          value={`${img.width}×${img.height} css · ${img.naturalWidth}×${img.naturalHeight} natural`}
+                        />
+                        <Row label="complete" value={String(img.complete)} />
+                        {img.className ? (
+                          <Row label="class" value={img.className.slice(0, 80)} />
+                        ) : null}
+                        {img.id ? <Row label="id" value={img.id} /> : null}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </Section>
+            <button
+              type="button"
+              onClick={() => void copyDomImages()}
+              className="mt-3 w-full rounded-lg border border-yellow-300/60 bg-yellow-300/10 py-2 text-center text-[11px] font-bold text-yellow-200 hover:bg-yellow-300/20"
+            >
+              {copiedDom ? "DOM Images Copied ✓" : "Copy DOM Images"}
+            </button>
           </>
         )}
 
