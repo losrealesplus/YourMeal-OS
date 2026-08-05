@@ -43,6 +43,26 @@ YourMeal OS
 | **v1.1** | **Doctor Engine** (+ foundation checks + panel mínimo) |
 | **v1.2+** | Checks Session/Storage · Network · Performance · Export ZIP · Knowledge |
 
+### Roadmap de PRs (secuencia)
+
+| PR | Entrega |
+|----|---------|
+| ✅ #297 | Host · Registry · Modules |
+| ⭐ #298 | **Doctor Engine** (este track) |
+| #299 | Doctor UI (experiencia Host enriquecida) |
+| #300 | Assets Checks (ampliación) |
+| #301 | Branding Checks (ampliación) |
+| #302 | Network Checks |
+| #303 | Storage Checks |
+| #304 | Session Checks |
+| #305 | Performance Checks |
+| #306 | Export Diagnostic ZIP |
+| #307 | Knowledge Engine |
+| #308 | Issue Timeline |
+| #309 | Auto Recovery Suggestions |
+
+A partir de #298, cada capability nueva = `registerCheck()` — sin tocar el Engine.
+
 ---
 
 ## Documentos

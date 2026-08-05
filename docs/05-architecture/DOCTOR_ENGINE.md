@@ -108,13 +108,19 @@ Base para Issue Registry / Knowledge Engine posteriores.
 
 ---
 
-## Relación con CLI Doctor
+## Relación con el roadmap
 
-`npm run doctor` (scripts/developer) sigue siendo el doctor de **toolchain** (Node, Vite, Gradle, SDK).
+| Track | Qué aporta |
+|-------|------------|
+| **#298 Doctor Engine** | Registry · Runner · Health Score · FOPEBA · módulo `doctor` · panel mínimo |
+| **#299 Doctor UI** | Experiencia Host más rica (filtros, timeline, drill-down) — sin cambiar el Engine |
+| **#300–305** | Suites de checks por capability (`registerCheck` only) |
+| **#306** | Export `diagnostic.zip` desde Evidence |
+| **#307–309** | Knowledge · Issue Timeline · Auto Recovery |
 
-El **Doctor Engine** es el doctor de **runtime de aplicación** dentro del Host.
+Foundation checks en #298: Runtime, Assets, Branding, Android (probe), Supabase (env).  
+Ampliaciones posteriores **no** editan `DoctorRunner`.
 
-Complementarios · no sustitutos.
 
 ---
 
