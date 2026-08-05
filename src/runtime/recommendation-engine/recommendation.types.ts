@@ -14,7 +14,7 @@ export type RuntimeRecommendationAction = {
   id: string;
   label: string;
   type: RecommendationActionType;
-  /** Recovery Engine resolves Capability.recover() via capabilityIds. */
+  /** Recovery action declared; executability owned by Recovery Engine. */
   supported: boolean;
 };
 

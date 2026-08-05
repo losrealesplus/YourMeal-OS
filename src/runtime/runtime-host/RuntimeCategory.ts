@@ -4,6 +4,9 @@
  */
 
 import type { RuntimeModule, RuntimeModuleCategory, RuntimePlatform } from "../runtime-core";
+import { detectRuntimePlatform } from "../runtime-core";
+
+export { detectRuntimePlatform };
 
 export const RUNTIME_HOST_CATEGORIES: readonly RuntimeModuleCategory[] = [
   "Health",
@@ -68,17 +71,4 @@ export function moduleSupportsPlatform(
 ): boolean {
   if (!module.supports || module.supports.length === 0) return true;
   return module.supports.includes(platform);
-}
-
-export function detectRuntimePlatform(): RuntimePlatform {
-  try {
-    // Lazy string check avoids hard Capacitor import in pure helpers/tests.
-    const cap = (globalThis as { Capacitor?: { getPlatform?: () => string } })
-      .Capacitor;
-    const p = cap?.getPlatform?.() ?? "web";
-    if (p === "android" || p === "ios" || p === "web") return p;
-    return "web";
-  } catch {
-    return "web";
-  }
 }

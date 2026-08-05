@@ -53,8 +53,9 @@ Todo lo que se construya forma parte de una **plataforma de ingeniería**, no de
 | #302 | Recommendation Engine | ✅ v1.5 |
 | ✅ **Capability Engine** | **DEVELOPER-PLATFORM-009 · v1.6** | Contrato único Diagnose/Recover/Verify |
 | ✅ **#304 Recovery Engine** | **DEVELOPER-PLATFORM-010 · v1.7** | Orquesta `Capability.recover/verify` |
-| — | Diagnostic Export ZIP | siguiente |
-| — | Telemetry Engine | |
+| ⭐ **Platform Stabilization** | **DEVELOPER-PLATFORM-011 · v1.0 Freeze** | Contratos · contract tests · docs · baseline · este track |
+| — | Diagnostic Export ZIP | diferido post-freeze |
+| — | Telemetry Engine | diferido post-freeze |
 
 ```text
 Capability → Checks → Evidence → Incident → Knowledge → Recommendation → Recovery
@@ -156,3 +157,4 @@ EatClean
 - [RECOMMENDATION_ENGINE](./RECOMMENDATION_ENGINE.md) · ADR 0044  
 - [CAPABILITY_ENGINE](./CAPABILITY_ENGINE.md) · ADR 0045  
 - [RECOVERY_ENGINE](./RECOVERY_ENGINE.md) · ADR 0046  
+- [DEVELOPER_PLATFORM_v1](./DEVELOPER_PLATFORM_v1.md) · ADR 0047  

@@ -195,7 +195,8 @@ export function resolveIncident(id: string): RuntimeIncident | undefined {
 }
 
 /**
- * Recovery stub — NOT_IMPLEMENTED until Recovery Engine (#303).
+ * Incident.recover stub — orchestration lives in Recovery Engine (ADR-0046).
+ * recoverIncident() returns NOT_IMPLEMENTED; use runRecovery() instead.
  */
 export function recoverIncident(id: string): RecoverIncidentResult {
   const result = recoverIncidentNotImplemented(id);

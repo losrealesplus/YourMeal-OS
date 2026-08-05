@@ -2,14 +2,16 @@
 
 **Documento:** `RUNTIME_SUITE.md`  
 **Dominio:** Platform · Self-diagnostic instrument  
-**Estado:** Phase 1 shell + Lifecycle + **Runtime Host** (DEVELOPER-PLATFORM-003) · 2026-08-05  
+**Estado:** **Developer Platform v1.0 FROZEN** (ADR 0047) · shell histórico del Host  
+**Constitución:** [DEVELOPER_PLATFORM_v1.md](./DEVELOPER_PLATFORM_v1.md)  
 **Entrada:** `YMOS Horus` → [Secret Gateway](./RUNTIME_SECRET_GATEWAY.md)  
 **Kernel:** [RUNTIME_CORE](./RUNTIME_CORE.md) · **Host:** [DEVELOPER_PLATFORM_HOST](./DEVELOPER_PLATFORM_HOST.md)  
-**ADR:** [0036 Lifecycle](../adr/0036-runtime-suite-lifecycle.md) · [0038 Core](../adr/0038-runtime-core.md) · [0039 Host](../adr/0039-developer-platform-host.md)  
+**ADR:** [0036 Lifecycle](../adr/0036-runtime-suite-lifecycle.md) · [0038 Core](../adr/0038-runtime-core.md) · [0039 Host](../adr/0039-developer-platform-host.md) · [0047 Freeze](../adr/0047-developer-platform-v1-freeze.md)  
 **Estándar:** Evidence before Implementation · FOPEBA
 
-> No es un menú de debug.  
-> Es el instrumento permanente con el que YourMeal OS se observa a sí mismo.
+> “Runtime Suite” es el nombre histórico del overlay.  
+> El producto de ingeniería es **Developer Platform**; el Suite monta el **Runtime Host**.  
+> No eliminar el Inspector shell en v1.0 — es el vehículo del Host.
 
 ---
 

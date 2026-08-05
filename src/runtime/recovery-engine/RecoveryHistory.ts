@@ -33,11 +33,6 @@ export function getRecoveryHistory(): RuntimeRecovery[] {
   return history.slice().sort((a, b) => b.startedAt - a.startedAt);
 }
 
-/** @deprecated Prefer getRecoveryHistory */
-export function listRecoveryHistory(): RuntimeRecovery[] {
-  return getRecoveryHistory();
-}
-
 export function listRunningRecoveries(): RuntimeRecovery[] {
   return [...running.values()];
 }

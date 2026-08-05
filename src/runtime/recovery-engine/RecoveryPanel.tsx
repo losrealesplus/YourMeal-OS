@@ -12,6 +12,7 @@ import {
 import { getRecommendations } from "../recommendation-engine";
 import { RECOVERY_ENGINE_VERSION } from "./recovery.types";
 import { registerBuiltinCapabilities } from "../capability-engine";
+import { recommendationSupportsRecovery } from "./RecoveryPolicy";
 
 async function writeClipboard(text: string): Promise<void> {
   try {
@@ -47,7 +48,7 @@ export function RecoveryPanel() {
   const recoverableRecs = useMemo(() => {
     void tick;
     return getRecommendations().filter((r) =>
-      r.actions.some((a) => a.type === "recovery" && a.supported),
+      recommendationSupportsRecovery(r),
     );
   }, [tick]);
 
