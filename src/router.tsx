@@ -12,12 +12,14 @@ import {
 } from "./runtime/runtime-core";
 import { registerLegacyHostModules } from "./runtime/runtime-host";
 import { registerDoctorModule } from "./runtime/runtime-doctor";
+import { registerIncidentsModule } from "./runtime/incident-engine";
 
 // ANDROID-RUNTIME-001 / ANDROID-ASSETS-001 — client boot sensors (observe-only).
 // Secret Gateway — hidden keystroke command palette (no UI).
 // Runtime Core — register Suite builtins (Assets / DOM / Consistency) metadata only.
 // Runtime Host — register legacy Suite panels into Registry for dynamic sidebar.
 // Doctor Engine — register Doctor module + foundation checks (DEVELOPER-PLATFORM-004).
+// Incident Engine — structured incidents from Doctor evidence (DEVELOPER-PLATFORM-005).
 if (typeof window !== "undefined") {
   logYmosRuntimeMainStart();
   installYmosRuntimeErrorTraps();
@@ -26,6 +28,7 @@ if (typeof window !== "undefined") {
   registerBuiltinRuntimeModules();
   registerLegacyHostModules();
   registerDoctorModule();
+  registerIncidentsModule();
 }
 
 export const getRouter = () => {
