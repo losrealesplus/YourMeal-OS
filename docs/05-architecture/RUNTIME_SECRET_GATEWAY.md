@@ -14,9 +14,11 @@
 
 ## Objetivo
 
-Dar acceso deliberado y silencioso al **YMOS Runtime Inspector** (y, en el futuro, a otras herramientas de ingeniería) sin contaminar la experiencia de producto.
+Dar acceso deliberado y silencioso al **YourMeal OS Runtime Suite**
+sin contaminar la experiencia de producto.
 
 La firma de YourMeal OS: una **Command Palette oculta** activada por frase secreta, no por UI.
+Producto abierto en v1: Runtime Suite ([RUNTIME_SUITE](./RUNTIME_SUITE.md)).
 
 ---
 
@@ -83,7 +85,7 @@ Instalación en boot cliente (`src/router.tsx`), junto a otros sensores observe-
 4. Se limpia el buffer.
 5. Se emite `ymos-secret-gateway-triggered` (detail: `{ command }` — nunca el buffer crudo).
 6. Se emite `ymos-runtime-open`.
-7. El Inspector habilita el overlay con el mismo path que storage / gesture.
+7. El Runtime Suite se habilita con el mismo path que storage / gesture (`setYmosRuntimeInspectorEnabled(true)`).
 
 Frases aceptadas: `YMOS Horus` · `ymos horus` · `YMOS HORUS` · `Ymos Horus`.  
 Rechazadas: coincidencias parciales (`ymos`, `horus`, `ymos hor`).
@@ -105,7 +107,7 @@ Rechazadas: coincidencias parciales (`ymos`, `horus`, `ymos hor`).
 
 | Evento | Quién emite | Quién escucha |
 |--------|-------------|---------------|
-| `ymos-runtime-open` | Gateway | Inspector → `setYmosRuntimeInspectorEnabled(true)` |
+| `ymos-runtime-open` | Gateway | Runtime Suite shell → `setYmosRuntimeInspectorEnabled(true)` |
 | `ymos-secret-gateway-triggered` | Gateway | Futuros observadores internos (command id only) |
 | `ymos-runtime-inspector-toggle` | `enable.ts` (sin cambio) | Inspector (existente) |
 

@@ -1,11 +1,11 @@
 /**
- * Runtime Secret Gateway — hidden command palette for YMOS Runtime tooling.
+ * Runtime Secret Gateway — hidden command palette for YMOS Runtime Suite.
  *
  * Public API (only):
  *   installRuntimeSecretGateway()
  *   disposeRuntimeSecretGateway()
  *
- * Phrase (v1): "YMOS Horus" (case-insensitive) → opens Runtime Inspector via event.
+ * Phrase (v1): "YMOS Horus" (case-insensitive) → opens Runtime Suite via event.
  * No UI · No buttons · No localStorage · RAM only.
  */
 export {
