@@ -12,6 +12,7 @@ export const RUNTIME_HOST_CATEGORIES: readonly RuntimeModuleCategory[] = [
   "System",
   "Security",
   "Developer",
+  "Knowledge",
 ] as const;
 
 export const RUNTIME_HOST_CATEGORY_LABELS: Record<RuntimeModuleCategory, string> =
@@ -22,6 +23,7 @@ export const RUNTIME_HOST_CATEGORY_LABELS: Record<RuntimeModuleCategory, string>
     System: "System",
     Security: "Security",
     Developer: "Developer",
+    Knowledge: "Knowledge",
   };
 
 export type HostModuleGroup = {

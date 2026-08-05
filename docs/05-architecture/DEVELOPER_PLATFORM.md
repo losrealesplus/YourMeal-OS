@@ -2,7 +2,7 @@
 
 **Documento:** `DEVELOPER_PLATFORM.md`  
 **Producto de ingeniería** (no UX cliente)  
-**Versión foundation:** v1.0 · **Doctor:** v1.1 · **Incidents:** v1.2 · **Doctor UI:** v1.3  
+**Versión foundation:** v1.0 · **Doctor:** v1.1 · **Incidents:** v1.2 · **Doctor UI:** v1.3 · **Knowledge:** v1.4
 **Roadmap congelado:** [DEVELOPER_PLATFORM_ROADMAP](./DEVELOPER_PLATFORM_ROADMAP.md)
 
 > El objetivo del Developer Platform no es ayudar a los desarrolladores.  
@@ -38,6 +38,7 @@ YourMeal OS
 | **Doctor Engine** | Salud de la aplicación (`runtime-doctor`) |
 | **Doctor UI** | Consola visual glance (`DoctorPanel` · v1.3) |
 | **Incident Engine** | Incidencias estructuradas (`incident-engine`) |
+| **Knowledge Engine** | Modelo de conocimiento declarativo (`knowledge-engine`) |
 
 “Runtime Suite” es el overlay histórico; el nombre de producto es **Developer Platform**.
 
@@ -51,7 +52,8 @@ YourMeal OS
 | **v1.1** | Doctor Engine (+ foundation checks + panel mínimo) |
 | **v1.2** | **Incident Engine** (+ timeline · panel · export JSON) |
 | **v1.3** | **Doctor UI** (dashboard · capabilities · incidents · evidence) |
-| **v1.4+** | Recommendation · Recovery · Export ZIP · Knowledge · modules |
+| **v1.4** | **Knowledge Engine** (Diagnostic Knowledge Model) |
+| **v1.5+** | Recommendation · Recovery · Export ZIP · Telemetry · modules |
 
 Ver secuencia completa de PRs en [DEVELOPER_PLATFORM_ROADMAP](./DEVELOPER_PLATFORM_ROADMAP.md).
 
@@ -65,4 +67,5 @@ Ver secuencia completa de PRs en [DEVELOPER_PLATFORM_ROADMAP](./DEVELOPER_PLATFO
 - [DOCTOR_ENGINE](./DOCTOR_ENGINE.md) · ADR 0040  
 - [INCIDENT_ENGINE](./INCIDENT_ENGINE.md) · ADR 0041  
 - [DOCTOR_UI](./DOCTOR_UI.md) · ADR 0042  
+- [KNOWLEDGE_ENGINE](./KNOWLEDGE_ENGINE.md) · ADR 0043  
 - [RUNTIME_SUITE](./RUNTIME_SUITE.md) · Lifecycle ADR 0036  

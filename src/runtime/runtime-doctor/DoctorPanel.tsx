@@ -14,6 +14,11 @@ import {
   getIncidentTimeline,
   getOpenIncidents,
 } from "../incident-engine";
+import {
+  matchManyIncidents,
+  registerFoundationKnowledge,
+  type KnowledgeMatchInput,
+} from "../knowledge-engine";
 import type { DoctorReport } from "./DoctorReport";
 import { runDoctor } from "./DoctorRunner";
 import {
@@ -25,6 +30,7 @@ import { DoctorCapabilities } from "./ui/DoctorCapabilities";
 import { DoctorDashboard } from "./ui/DoctorDashboard";
 import { DoctorEvidenceSection } from "./ui/DoctorEvidenceSection";
 import { DoctorIncidentsSection } from "./ui/DoctorIncidentsSection";
+import { DoctorKnowledgeSection } from "./ui/DoctorKnowledgeSection";
 import { DoctorRecommendations } from "./ui/DoctorRecommendations";
 import { DoctorTimelineSection } from "./ui/DoctorTimelineSection";
 import {
@@ -71,8 +77,32 @@ export function DoctorPanel() {
     return [...fromReport, ...fromIncidents];
   }, [report, incidents]);
 
+  const knowledgeMatches = useMemo(() => {
+    void tick;
+    registerFoundationKnowledge();
+    const inputs: KnowledgeMatchInput[] = [
+      ...incidents.map((i) => ({
+        title: i.title,
+        description: i.description,
+        capability: i.capability,
+        category: i.category,
+        checkId: i.checkId,
+      })),
+      ...(report?.checks
+        .filter((c) => c.status === "fail" || c.status === "warning")
+        .map((c) => ({
+          title: c.name,
+          description: c.message,
+          capability: String(c.capability),
+          checkId: c.id,
+        })) ?? []),
+    ];
+    return matchManyIncidents(inputs);
+  }, [tick, report, incidents]);
+
   useEffect(() => {
     // Refresh incident/timeline views when panel mounts after a prior Doctor run.
+    registerFoundationKnowledge();
     setTick((n) => n + 1);
   }, []);
 
@@ -108,6 +138,12 @@ export function DoctorPanel() {
       doctor: report,
       incidents: exportIncidents(),
       timeline: getIncidentTimeline(),
+      knowledge: knowledgeMatches.map((m) => ({
+        id: m.article.id,
+        title: m.article.title,
+        score: m.score,
+        matchedOn: m.matchedOn,
+      })),
     };
     await writeClipboard(JSON.stringify(payload, null, 2));
     setCopiedExport(true);
@@ -152,6 +188,8 @@ export function DoctorPanel() {
           setTick((n) => n + 1);
         }}
       />
+
+      <DoctorKnowledgeSection matches={knowledgeMatches} />
 
       <DoctorRecommendations items={recommendations} />
 

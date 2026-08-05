@@ -20,7 +20,8 @@ export type RuntimeModuleCategory =
   | "Network"
   | "System"
   | "Security"
-  | "Developer";
+  | "Developer"
+  | "Knowledge";
 
 /** Platforms a module may declare support for (filter prepared · not enforced yet). */
 export type RuntimePlatform = "web" | "android" | "ios";
@@ -73,6 +74,7 @@ export type RuntimeCoreEventName =
   | "incident-dismissed"
   | "incident-resolved"
   | "incident-recovery-stub"
+  | "knowledge-registered"
   | "asset-failure"
   | "network-request"
   | "host-module-selected";

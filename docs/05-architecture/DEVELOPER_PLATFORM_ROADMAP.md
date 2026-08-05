@@ -10,7 +10,7 @@
 
 ---
 
-## Estado actual — Foundation Complete
+## Estado actual — Foundation + Incident + Doctor UI
 
 | PR | Entrega | Estado |
 |----|---------|--------|
@@ -22,12 +22,14 @@
 | #296 | Runtime Core | ✅ |
 | #297 | Runtime Host | ✅ |
 | #298 | Doctor Engine | ✅ |
+| #299 | Incident Engine | ✅ |
+| #300 | Doctor UI | ✅ |
 
 ```text
-Portal → Host → Registry → Modules → Doctor Engine → Checks → Evidence
+Portal → Host → Registry → Modules → Doctor → Evidence → Incident → Timeline
 ```
 
-A partir de aquí, **ningún módulo nuevo** debería requerir modificar el Host ni el Doctor Engine — solo contratos (`registerModule` · `registerCheck` · `reportIncident`).
+A partir de aquí, módulos nuevos = contratos (`registerModule` · `registerCheck` · `reportIncident` · `registerKnowledge`).
 
 ---
 
@@ -41,44 +43,42 @@ Todo lo que se construya forma parte de una **plataforma de ingeniería**, no de
 
 ---
 
-## Fase 1 — Incident Platform + Doctor UI
+## Fase 1b — Knowledge before Recommendation
 
 | PR | Entrega | Notas |
 |----|---------|-------|
-| #298 | Doctor Engine | ✅ v1.1 |
-| #299 | **Incident Engine** | ✅ v1.2 (GitHub #299) |
-| **Doctor UI** | **DEVELOPER-PLATFORM-006 · v1.3** | Glance diagnostics · este track |
-| next | Recommendation Engine | Motor real (qué / por qué / cómo / confianza) |
-| next | Recovery Engine | `diagnose` · `recover` · `verify` |
-| next | Export ZIP | `diagnostic-*.zip` |
-| next | Knowledge Engine | Patrones · confidence |
+| ⭐ **Knowledge Engine** | **DEVELOPER-PLATFORM-007 · v1.4** | Modelo de conocimiento · este track |
+| #302 | Recommendation Engine | Lee Knowledge · no inventa texto |
+| #303 | Recovery Engine | `diagnose` · `recover` · `verify` |
+| #304 | Diagnostic Export ZIP | `diagnostic-*.zip` |
+| #305 | Telemetry | Observabilidad de plataforma |
 
 Cadena oficial:
 
 ```text
-Doctor UI → Doctor → Evidence → Incident → Timeline → Recovery → Export → Knowledge → Product Core → EatClean
+Check → Evidence → Incident → Knowledge → Recommendation → Recovery → Export → Product Core → EatClean
 ```
+
+**Por qué Knowledge antes que Recommendation:** sin un lenguaje común, cada check nuevo acumularía `if` y consejos duplicados. Recommendation / Recovery / IA / Remote Support deben consumir el mismo origen de verdad.
 
 ---
 
 ## Fase 2 — Capability modules
-
-Solo **después** de la infraestructura de incidencias:
 
 | PR | Módulo |
 |----|--------|
 | #306 | Network |
 | #307 | Storage |
 | #308 | Session |
-| #309 | Performance |
-| #310 | API |
+| #309 | API |
+| #310 | Performance |
 | #311 | Feature Flags |
-| #312 | Branding |
-| #313 | Tenant |
-| #314 | Experimental Features |
+| #312 | Tenant Diagnostics |
+| #313 | Remote Support |
+| #314 | AI Assistant |
 
-Contrato único: `registerModule()` + `registerCheck()`.  
-Sin tocar Host · Portal · Doctor · Incident Engine.
+Contrato: `registerModule()` + `registerCheck()` + `registerKnowledge()` cuando aplique.  
+Sin tocar Host · Portal · Doctor Engine · Incident Engine · Knowledge Engine.
 
 ---
 
@@ -115,16 +115,16 @@ Doctor Engine
 Incident Engine
         │
         ▼
-Timeline Engine
+Knowledge Engine
+        │
+        ▼
+Recommendation Engine
         │
         ▼
 Recovery Engine
         │
         ▼
 Export Engine
-        │
-        ▼
-Knowledge Engine
         │
         ▼
 Product Core
@@ -143,3 +143,4 @@ EatClean
 - [DOCTOR_ENGINE](./DOCTOR_ENGINE.md) · ADR 0040  
 - [INCIDENT_ENGINE](./INCIDENT_ENGINE.md) · ADR 0041  
 - [DOCTOR_UI](./DOCTOR_UI.md) · ADR 0042  
+- [KNOWLEDGE_ENGINE](./KNOWLEDGE_ENGINE.md) · ADR 0043  
