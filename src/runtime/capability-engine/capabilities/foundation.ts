@@ -12,6 +12,10 @@ import { supabaseChecks } from "../../runtime-doctor/checks/supabase-checks";
 import { createCapabilityFromChecks } from "../createCapabilityFromChecks";
 import { registerCapability, getCapability } from "../CapabilityRegistry";
 import type { RuntimeCapability } from "../capability.types";
+import {
+  recoverRuntimeCapability,
+  verifyRuntimeCapability,
+} from "../runtime-recovery";
 
 export const FOUNDATION_CAPABILITIES: RuntimeCapability[] = [
   createCapabilityFromChecks({
@@ -32,8 +36,10 @@ export const FOUNDATION_CAPABILITIES: RuntimeCapability[] = [
     id: "runtime",
     name: "Runtime",
     category: "system",
-    description: "Registry · modules · suite gate",
+    description: "Registry · modules · suite gate · recoverable dismiss",
     checks: runtimeChecks,
+    recover: recoverRuntimeCapability,
+    verify: verifyRuntimeCapability,
   }),
   createCapabilityFromChecks({
     id: "android",

@@ -51,10 +51,10 @@ Todo lo que se construya forma parte de una **plataforma de ingeniería**, no de
 |----|---------|-------|
 | #301 | Knowledge Engine | ✅ v1.4 |
 | #302 | Recommendation Engine | ✅ v1.5 |
-| ⭐ **Capability Engine** | **DEVELOPER-PLATFORM-009 · v1.6** | Contrato único Diagnose/Recover/Verify · este track |
-| #303 | Recovery Engine | Orquesta `Capability.recover/verify` — sin conocer Assets/Network |
-| #304 | Diagnostic Export ZIP | |
-| #305 | Telemetry Engine | |
+| ✅ **Capability Engine** | **DEVELOPER-PLATFORM-009 · v1.6** | Contrato único Diagnose/Recover/Verify |
+| ✅ **#304 Recovery Engine** | **DEVELOPER-PLATFORM-010 · v1.7** | Orquesta `Capability.recover/verify` |
+| — | Diagnostic Export ZIP | siguiente |
+| — | Telemetry Engine | |
 
 ```text
 Capability → Checks → Evidence → Incident → Knowledge → Recommendation → Recovery
@@ -155,3 +155,4 @@ EatClean
 - [KNOWLEDGE_ENGINE](./KNOWLEDGE_ENGINE.md) · ADR 0043  
 - [RECOMMENDATION_ENGINE](./RECOMMENDATION_ENGINE.md) · ADR 0044  
 - [CAPABILITY_ENGINE](./CAPABILITY_ENGINE.md) · ADR 0045  
+- [RECOVERY_ENGINE](./RECOVERY_ENGINE.md) · ADR 0046  

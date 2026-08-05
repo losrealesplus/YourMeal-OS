@@ -22,10 +22,13 @@ Developer Platform
 ```
 
 ```text
-Recovery Engine (futuro)
+Recovery Engine
   → Capability.recover()
   → Capability.verify()
 ```
+
+Foundation: Assets / Branding / Android / Supabase omiten `recover`/`verify`.  
+**Runtime** implementa recover/verify (clear dismiss · verify overlay gate) — primera capability recuperable (v1.7).
 
 ---
 

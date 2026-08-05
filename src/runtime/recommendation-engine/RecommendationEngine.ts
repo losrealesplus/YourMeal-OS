@@ -119,6 +119,7 @@ function toRecommendation(bucket: GroupBucket): RuntimeRecommendation {
     confidence,
     incidentIds: bucket.incidentIds,
     knowledgeIds: [bucket.article.id],
+    capabilityIds: [...bucket.article.capabilities],
     evidenceIds: bucket.evidenceIds,
     actions: buildRecommendationActions(bucket.article),
   };

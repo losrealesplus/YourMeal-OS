@@ -23,7 +23,8 @@ export type RuntimeModuleCategory =
   | "Developer"
   | "Knowledge"
   | "Recommendations"
-  | "Capabilities";
+  | "Capabilities"
+  | "Recovery";
 
 /** Platforms a module may declare support for (filter prepared · not enforced yet). */
 export type RuntimePlatform = "web" | "android" | "ios";
@@ -82,6 +83,9 @@ export type RuntimeCoreEventName =
   | "capability-registered"
   | "capability-diagnose-start"
   | "capability-diagnose-finish"
+  | "recovery-started"
+  | "recovery-finished"
+  | "recovery-cancelled"
   | "asset-failure"
   | "network-request"
   | "host-module-selected";

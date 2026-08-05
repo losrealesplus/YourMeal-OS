@@ -24,6 +24,7 @@ import {
   exportRecommendations,
   type RuntimeRecommendation,
 } from "../recommendation-engine";
+import { runRecovery } from "../recovery-engine";
 import type { DoctorReport } from "./DoctorReport";
 import { runDoctor } from "./DoctorRunner";
 import {
@@ -64,9 +65,11 @@ export function DoctorPanel() {
   const [copiedReport, setCopiedReport] = useState(false);
   const [copiedExport, setCopiedExport] = useState(false);
   const [recFocus, setRecFocus] = useState<{
-    kind: "knowledge" | "incident";
+    kind: "knowledge" | "incident" | "recovery";
     item: RuntimeRecommendation;
   } | null>(null);
+  const [recoveryBusyId, setRecoveryBusyId] = useState<string | null>(null);
+  const [recoveryMessage, setRecoveryMessage] = useState<string | null>(null);
 
   const incidents = useMemo(() => {
     void tick;
@@ -204,6 +207,7 @@ export function DoctorPanel() {
 
       <DoctorRecommendations
         items={recommendations}
+        recoveryBusyId={recoveryBusyId}
         onCopy={(item) => {
           void writeClipboard(JSON.stringify(item, null, 2));
         }}
@@ -216,13 +220,44 @@ export function DoctorPanel() {
             setSelectedIncident(item.incidentIds[0]);
           }
         }}
+        onRunRecovery={(item) => {
+          void (async () => {
+            setRecoveryBusyId(item.id);
+            setRecoveryMessage(null);
+            try {
+              const result = await runRecovery({ recommendationId: item.id });
+              setRecFocus({ kind: "recovery", item });
+              setRecoveryMessage(
+                `${result.status} · ${result.capabilityId}` +
+                  (result.verifyResult
+                    ? ` · verify ${result.verifyResult.ok ? "PASS" : "FAIL"}`
+                    : ""),
+              );
+              setTick((n) => n + 1);
+            } catch (err) {
+              setRecoveryMessage(
+                err instanceof Error ? err.message : String(err),
+              );
+            } finally {
+              setRecoveryBusyId(null);
+            }
+          })();
+        }}
       />
 
       {recFocus ? (
         <p className="rounded-md border border-white/10 bg-black/30 px-2 py-1.5 font-mono text-[9px] text-zinc-400">
           {recFocus.kind === "knowledge"
             ? `Knowledge: ${recFocus.item.knowledgeIds.join(", ")}`
-            : `Incidents: ${recFocus.item.incidentIds.join(", ")}`}
+            : recFocus.kind === "incident"
+              ? `Incidents: ${recFocus.item.incidentIds.join(", ")}`
+              : `Recovery: ${recFocus.item.id}`}
+        </p>
+      ) : null}
+
+      {recoveryMessage ? (
+        <p className="rounded-md border border-emerald-500/20 bg-emerald-500/5 px-2 py-1.5 font-mono text-[9px] text-emerald-300/90">
+          {recoveryMessage}
         </p>
       ) : null}
 

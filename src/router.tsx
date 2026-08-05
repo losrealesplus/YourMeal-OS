@@ -16,6 +16,7 @@ import { registerIncidentsModule } from "./runtime/incident-engine";
 import { registerKnowledgeModule } from "./runtime/knowledge-engine";
 import { registerRecommendationsModule } from "./runtime/recommendation-engine";
 import { registerCapabilitiesModule } from "./runtime/capability-engine";
+import { registerRecoveryModule } from "./runtime/recovery-engine";
 
 // ANDROID-RUNTIME-001 / ANDROID-ASSETS-001 — client boot sensors (observe-only).
 // Secret Gateway — hidden keystroke command palette (no UI).
@@ -26,6 +27,7 @@ import { registerCapabilitiesModule } from "./runtime/capability-engine";
 // Knowledge Engine — diagnostic knowledge model (DEVELOPER-PLATFORM-007).
 // Recommendation Engine — decisions from Knowledge (DEVELOPER-PLATFORM-008).
 // Capability Engine — RuntimeCapability contract (DEVELOPER-PLATFORM-009).
+// Recovery Engine — orchestrate Capability.recover → verify (DEVELOPER-PLATFORM-010).
 if (typeof window !== "undefined") {
   logYmosRuntimeMainStart();
   installYmosRuntimeErrorTraps();
@@ -38,6 +40,7 @@ if (typeof window !== "undefined") {
   registerKnowledgeModule();
   registerRecommendationsModule();
   registerCapabilitiesModule();
+  registerRecoveryModule();
 }
 
 export const getRouter = () => {
