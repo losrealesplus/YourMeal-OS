@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import logoAsset from "@/assets/eatclean-logo.png.asset.json";
 import { brandConfig } from "@/tenant/brand-config";
 import { cn } from "@/lib/utils";
@@ -10,6 +11,8 @@ const FALLBACK_LOGO = logoAsset.url;
  *
  * Falls back to the bundled default when the tenant has not uploaded a logo
  * yet, or before the query resolves. Ratio is always preserved.
+ *
+ * ANDROID-ASSET-002 — observe-only [YMOS-ASSET] logs (no behavior change).
  */
 export function TenantLogo({
   className,
@@ -21,6 +24,26 @@ export function TenantLogo({
 }) {
   const { logoUrl } = useTenantBrand();
   const src = logoUrl ?? FALLBACK_LOGO;
+
+  useEffect(() => {
+    const origin =
+      typeof window !== "undefined" ? window.location.origin : "(ssr)";
+    const absolute =
+      typeof window !== "undefined"
+        ? new URL(src, window.location.href).href
+        : src;
+    console.log("[YMOS-ASSET] original import", FALLBACK_LOGO);
+    console.log("[YMOS-ASSET] brandConfig.assets.logo", brandConfig.assets.logo);
+    console.log("[YMOS-ASSET] logoUrl from useTenantBrand", logoUrl);
+    console.log("[YMOS-ASSET] image src", src);
+    console.log("[YMOS-ASSET] resolved absolute", absolute);
+    console.log("[YMOS-ASSET] origin", origin);
+    console.log(
+      "[YMOS-ASSET] isLovableVirtualPath",
+      typeof FALLBACK_LOGO === "string" && FALLBACK_LOGO.includes("/__l5e/"),
+    );
+  }, [logoUrl, src]);
+
   return (
     <img
       src={src}
