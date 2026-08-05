@@ -67,12 +67,12 @@ Así el Suite no queda atrapado en `enabled=true` cuando el env force-on estaba 
 | Versión | Entrega | Estado |
 |---------|---------|--------|
 | **v1.0** Foundation | Portal · Suite · Runtime Core · **Runtime Host** · Assets · DOM · Consistency | Host = DEVELOPER-PLATFORM-003 |
-| **v1.1** | Doctor · Issue Registry (mínimo) | Planned |
-| **v1.2** | Session · Storage | Planned |
-| **v1.3** | Network | Planned |
+| **v1.1** | **Doctor Engine** · foundation checks · Host panel | Doctor = DEVELOPER-PLATFORM-004 |
+| **v1.2** | Session · Storage checks | Planned |
+| **v1.3** | Network checks | Planned |
 | **v1.4+** | Performance · Export ZIP · Knowledge | Planned |
 
-Ver [RUNTIME_CORE](./RUNTIME_CORE.md) · [DEVELOPER_PLATFORM_HOST](./DEVELOPER_PLATFORM_HOST.md).
+Ver [RUNTIME_CORE](./RUNTIME_CORE.md) · [DEVELOPER_PLATFORM_HOST](./DEVELOPER_PLATFORM_HOST.md) · [DOCTOR_ENGINE](./DOCTOR_ENGINE.md) · [DEVELOPER_PLATFORM](./DEVELOPER_PLATFORM.md).
 
 ---
 

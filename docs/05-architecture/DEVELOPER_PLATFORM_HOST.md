@@ -129,9 +129,9 @@ Módulos específicos (APK Inspector, Xcode Logs) filtrarán cuando existan.
 
 | Versión | Pieza |
 |---------|-------|
-| v1.1 | Doctor como Runtime Module |
-| v1.2 | Session · Storage |
-| v1.3 | Network |
-| v1.4 | Performance |
+| v1.1 | **Doctor Engine** (DEVELOPER-PLATFORM-004) |
+| v1.2 | Session · Storage checks |
+| v1.3 | Network checks |
+| v1.4 | Performance checks |
 | v1.5 | Export (`diagnostic.zip`) |
 | later | Issue Registry → Knowledge Engine |

@@ -42,6 +42,8 @@
 | [RUNTIME_SUITE.md](./RUNTIME_SUITE.md) | Runtime Suite · Lifecycle RUNTIME-SUITE-001 |
 | [RUNTIME_CORE.md](./RUNTIME_CORE.md) | Runtime Core · Developer Platform v1.0 kernel |
 | [DEVELOPER_PLATFORM_HOST.md](./DEVELOPER_PLATFORM_HOST.md) | Runtime Host · shell dinámico · DEVELOPER-PLATFORM-003 |
+| [DEVELOPER_PLATFORM.md](./DEVELOPER_PLATFORM.md) | Vocabulario · Portal · Platform · Runtime Engine |
+| [DOCTOR_ENGINE.md](./DOCTOR_ENGINE.md) | Doctor Engine · v1.1 · registerCheck · FOPEBA |
 | [../07-experience/CUSTOMER_JOURNEYS.md](../07-experience/CUSTOMER_JOURNEYS.md) | Experience First · CJ-001 Pedido semanal |
 | [architecture-review.md](./architecture-review.md) | As-built senior review |
 | [MODULE_CONVENTION.md](./MODULE_CONVENTION.md) | `src/modules/...` layout |

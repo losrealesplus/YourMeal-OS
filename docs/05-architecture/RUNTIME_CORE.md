@@ -143,11 +143,11 @@ Boot: `registerBuiltinRuntimeModules()` en `src/router.tsx`.
 | Versión | Contenido |
 |---------|-----------|
 | **v1.0** Foundation | Portal · Suite · **Core** · **Host** · Assets · DOM · Consistency |
-| **v1.1** | Doctor (Runtime Module) · Issue Registry (mínimo) |
-| **v1.2** | Session · Storage |
-| **v1.3** | Network |
-| **v1.4** | Performance |
-| **v1.5+** | Export ZIP · Knowledge Engine · Support package |
+| **v1.1** | **Doctor Engine** · foundation checks (Runtime/Assets/Branding/…) |
+| **v1.2** | Session · Storage checks |
+| **v1.3** | Network checks |
+| **v1.4** | Performance checks |
+| **v1.5+** | Export ZIP · Knowledge Engine · Issue Registry |
 
 Cada módulo futuro = PR independiente que **solo se enchufa** al Registry.
 
@@ -156,6 +156,9 @@ Cada módulo futuro = PR independiente que **solo se enchufa** al Registry.
 ## Non-goals (este PR)
 
 Doctor · Network · Logs · ZIP · Telemetry · nuevas pestañas · cambios Assets/DOM/Consistency engines · Android · Capacitor.
+
+→ Doctor Engine: ver [DOCTOR_ENGINE](./DOCTOR_ENGINE.md) / ADR 0040 (entregado en DEVELOPER-PLATFORM-004).
+
 
 ---
 
