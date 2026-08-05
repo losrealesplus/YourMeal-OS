@@ -24,6 +24,7 @@
 | #298 | Doctor Engine | ✅ |
 | #299 | Incident Engine | ✅ |
 | #300 | Doctor UI | ✅ |
+| #301 | Knowledge Engine | ✅ |
 
 ```text
 Portal → Host → Registry → Modules → Doctor → Evidence → Incident → Timeline
@@ -43,15 +44,15 @@ Todo lo que se construya forma parte de una **plataforma de ingeniería**, no de
 
 ---
 
-## Fase 1b — Knowledge before Recommendation
+## Fase 1b — Knowledge → Recommendation → Recovery
 
 | PR | Entrega | Notas |
 |----|---------|-------|
-| ⭐ **Knowledge Engine** | **DEVELOPER-PLATFORM-007 · v1.4** | Modelo de conocimiento · este track |
-| #302 | Recommendation Engine | Lee Knowledge · no inventa texto |
+| #301 | **Knowledge Engine** | ✅ v1.4 (GitHub #301) |
+| ⭐ **Recommendation Engine** | **DEVELOPER-PLATFORM-008 · v1.5** | Decisiones desde Knowledge · este track |
 | #303 | Recovery Engine | `diagnose` · `recover` · `verify` |
 | #304 | Diagnostic Export ZIP | `diagnostic-*.zip` |
-| #305 | Telemetry | Observabilidad de plataforma |
+| #305 | Telemetry Engine | Observabilidad de plataforma |
 
 Cadena oficial:
 
@@ -59,7 +60,12 @@ Cadena oficial:
 Check → Evidence → Incident → Knowledge → Recommendation → Recovery → Export → Product Core → EatClean
 ```
 
-**Por qué Knowledge antes que Recommendation:** sin un lenguaje común, cada check nuevo acumularía `if` y consejos duplicados. Recommendation / Recovery / IA / Remote Support deben consumir el mismo origen de verdad.
+### Principio permanente — dependencia unidireccional
+
+> Un Engine nunca depende de otro Engine situado *más arriba* en la cadena.  
+> Cada Engine solo consume contratos de los niveles anteriores.
+
+Esto mantiene la plataforma desacoplada, facilita tests unitarios y permite sustituir Engines (Telemetry, ZIP, IA) sin cascadas.
 
 ---
 
@@ -144,3 +150,4 @@ EatClean
 - [INCIDENT_ENGINE](./INCIDENT_ENGINE.md) · ADR 0041  
 - [DOCTOR_UI](./DOCTOR_UI.md) · ADR 0042  
 - [KNOWLEDGE_ENGINE](./KNOWLEDGE_ENGINE.md) · ADR 0043  
+- [RECOMMENDATION_ENGINE](./RECOMMENDATION_ENGINE.md) · ADR 0044  
