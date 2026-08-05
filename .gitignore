@@ -43,3 +43,20 @@ supabase/.temp/
 *.njsproj
 *.sln
 *.sw?
+
+# ------------------------------------------------------------
+# Apple / Xcode / Swift Package Manager
+# Machine-generated artifacts (do not commit)
+# ------------------------------------------------------------
+
+# Swift Package Manager
+**/xcshareddata/swiftpm/
+**/Package.resolved
+
+# Xcode user state
+*.xcuserstate
+xcuserdata/
+
+# macOS
+.AppleDouble
+.LSOverride
