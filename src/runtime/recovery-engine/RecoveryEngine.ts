@@ -7,14 +7,13 @@
  * Never modifies: Doctor · Incident · Knowledge.
  */
 
-import { createEvidence, emitRuntimeCoreEvent } from "../runtime-core";
+import { createEvidence, emitRuntimeCoreEvent, detectRuntimePlatform } from "../runtime-core";
 import {
   getCapability,
   registerBuiltinCapabilities,
   type CapabilityContext,
   type RuntimeVerificationResult,
 } from "../capability-engine";
-import { detectRuntimePlatform } from "../runtime-host";
 import {
   getRecommendation,
   type RuntimeRecommendation,

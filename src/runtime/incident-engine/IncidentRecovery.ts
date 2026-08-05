@@ -1,10 +1,14 @@
 /**
- * Recovery contract — implementation deferred (Roadmap #303).
- * recoverIncident() returns NOT_IMPLEMENTED to preserve future API.
+ * Incident-level recover() stub — orchestration lives in Recovery Engine.
+ * DEVELOPER-PLATFORM-011: keep API; point callers to Recovery Engine.
  */
 
 import type { RecoverIncidentResult } from "./incident.types";
 
+/**
+ * Not the Recovery Engine. Incidents do not self-recover.
+ * Use `runRecovery({ recommendationId })` from recovery-engine.
+ */
 export function recoverIncidentNotImplemented(
   incidentId: string,
 ): RecoverIncidentResult {
@@ -12,7 +16,7 @@ export function recoverIncidentNotImplemented(
     ok: false,
     code: "NOT_IMPLEMENTED",
     message:
-      "Recovery Engine not implemented yet (Developer Platform roadmap #303).",
+      "Incident.recover is not implemented. Use Recovery Engine runRecovery() via a Recommendation.",
     incidentId,
   };
 }

@@ -51,6 +51,7 @@
 | [RECOMMENDATION_ENGINE.md](./RECOMMENDATION_ENGINE.md) | Recommendation Engine · decisiones · v1.5 |
 | [CAPABILITY_ENGINE.md](./CAPABILITY_ENGINE.md) | Capability Engine · RuntimeCapability · v1.6 |
 | [RECOVERY_ENGINE.md](./RECOVERY_ENGINE.md) | Recovery Engine · orchestrate recover/verify · v1.7 |
+| [DEVELOPER_PLATFORM_v1.md](./DEVELOPER_PLATFORM_v1.md) | Constitución Developer Platform v1.0 · FROZEN |
 | [../07-experience/CUSTOMER_JOURNEYS.md](../07-experience/CUSTOMER_JOURNEYS.md) | Experience First · CJ-001 Pedido semanal |
 | [architecture-review.md](./architecture-review.md) | As-built senior review |
 | [MODULE_CONVENTION.md](./MODULE_CONVENTION.md) | `src/modules/...` layout |

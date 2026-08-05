@@ -1,23 +1,11 @@
 /**
- * Build actions from Knowledge — recovery supported when a linked Capability has recover().
+ * Build actions from Knowledge.
+ * Recovery executability is resolved by Recovery Engine (not Capability lookup here).
+ * DEVELOPER-PLATFORM-011 — Recommendation must not import Capability.
  */
 
-import {
-  getCapability,
-  registerBuiltinCapabilities,
-} from "../capability-engine";
 import type { RuntimeKnowledge } from "../knowledge-engine";
 import type { RuntimeRecommendationAction } from "./recommendation.types";
-
-export function knowledgeHasRecoverableCapability(
-  article: RuntimeKnowledge,
-): boolean {
-  registerBuiltinCapabilities();
-  return article.capabilities.some((id) => {
-    const cap = getCapability(id);
-    return typeof cap?.recover === "function";
-  });
-}
 
 export function buildRecommendationActions(
   article: RuntimeKnowledge,
@@ -56,12 +44,12 @@ export function buildRecommendationActions(
     supported: true,
   });
 
-  const recoverySupported = knowledgeHasRecoverableCapability(article);
+  // Recovery action is always declared; executability is owned by Recovery Engine.
   actions.push({
     id: `recovery-${article.id}`,
-    label: recoverySupported ? "Run Recovery" : "Manual Action",
+    label: "Run Recovery",
     type: "recovery",
-    supported: recoverySupported,
+    supported: false,
   });
 
   return actions;

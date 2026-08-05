@@ -1,9 +1,10 @@
 /**
- * Doctor Recommendations — renders Recommendation Engine output (not hardcoded).
- * DEVELOPER-PLATFORM-008 · Recovery CTA DEVELOPER-PLATFORM-010
+ * Doctor Recommendations — Recommendation Engine output + Recovery CTA.
+ * DEVELOPER-PLATFORM-008 · Recovery DEVELOPER-PLATFORM-010 · Freeze DEVELOPER-PLATFORM-011
  */
 
 import type { RuntimeRecommendation } from "../../recommendation-engine";
+import { recommendationSupportsRecovery } from "../../recovery-engine";
 
 function priorityClass(p: string): string {
   switch (p) {
@@ -16,10 +17,6 @@ function priorityClass(p: string): string {
     default:
       return "text-zinc-400";
   }
-}
-
-function recoveryAction(item: RuntimeRecommendation) {
-  return item.actions.find((a) => a.type === "recovery");
 }
 
 export function DoctorRecommendations({
@@ -49,8 +46,7 @@ export function DoctorRecommendations({
       ) : (
         <ul className="space-y-1.5">
           {items.map((r) => {
-            const recovery = recoveryAction(r);
-            const supported = Boolean(recovery?.supported);
+            const supported = recommendationSupportsRecovery(r);
             return (
               <li
                 key={r.id}

@@ -36,3 +36,4 @@ Permanent decisions for YourMeal OS. New ADRs are additive; do not silently reve
 | [0044](./0044-recommendation-engine.md) | Recommendation Engine (Developer Platform v1.5 · via Knowledge) |
 | [0045](./0045-capability-engine.md) | Capability Engine (Developer Platform v1.6 · Diagnose/Recover/Verify) |
 | [0046](./0046-recovery-engine.md) | Recovery Engine (Developer Platform v1.7 · orchestrate recover/verify) |
+| [0047](./0047-developer-platform-v1-freeze.md) | Developer Platform v1.0 Freeze (stabilization · contracts · dependency rules) |

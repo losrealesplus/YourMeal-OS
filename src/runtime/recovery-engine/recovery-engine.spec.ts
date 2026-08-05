@@ -105,9 +105,9 @@ describe("Recovery Engine", () => {
       r.knowledgeIds.some((k) => k.includes("logo")),
     );
     expect(assetsRec).toBeTruthy();
-    expect(
-      assetsRec!.actions.some((a) => a.type === "recovery" && !a.supported),
-    ).toBe(true);
+    expect(assetsRec!.actions.some((a) => a.type === "recovery")).toBe(true);
+    const { recommendationSupportsRecovery } = await import("./RecoveryPolicy");
+    expect(recommendationSupportsRecovery(assetsRec!)).toBe(false);
 
     const result = await runRecovery({ recommendationId: assetsRec!.id });
     expect(result.status).toBe("failed");
@@ -131,9 +131,8 @@ describe("Recovery Engine", () => {
     const recs = buildRecommendations();
     const runtimeRec = recs.find((r) => r.capabilityIds.includes("runtime"));
     expect(runtimeRec).toBeTruthy();
-    expect(
-      runtimeRec!.actions.some((a) => a.type === "recovery" && a.supported),
-    ).toBe(true);
+    const { recommendationSupportsRecovery } = await import("./RecoveryPolicy");
+    expect(recommendationSupportsRecovery(runtimeRec!)).toBe(true);
 
     const result = await runRecovery({ recommendationId: runtimeRec!.id });
     expect(result.status).toBe("success");

@@ -58,3 +58,8 @@ export type {
   RuntimeCoreEvent,
   RuntimeHealthReport,
 } from "./types";
+export { detectRuntimePlatform } from "./detectRuntimePlatform";
+export {
+  DEVELOPER_PLATFORM_VERSION,
+  DEVELOPER_PLATFORM_FREEZE,
+} from "./platform-version";

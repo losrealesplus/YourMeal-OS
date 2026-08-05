@@ -2,8 +2,8 @@
 
 **Documento:** `DEVELOPER_PLATFORM.md`  
 **Producto de ingeniería** (no UX cliente)  
-**Versión foundation:** v1.0 · … · **Capabilities:** v1.6 · **Recovery:** v1.7
-**Roadmap congelado:** [DEVELOPER_PLATFORM_ROADMAP](./DEVELOPER_PLATFORM_ROADMAP.md)
+**Versión:** **1.0.0 FROZEN** · Constitución: [DEVELOPER_PLATFORM_v1.md](./DEVELOPER_PLATFORM_v1.md)  
+**Roadmap:** [DEVELOPER_PLATFORM_ROADMAP](./DEVELOPER_PLATFORM_ROADMAP.md)
 
 > El objetivo del Developer Platform no es ayudar a los desarrolladores.  
 > El objetivo es **reducir el riesgo operativo del Product Core**.
@@ -42,6 +42,7 @@ YourMeal OS
 | **Recommendation Engine** | Decisiones priorizadas desde Knowledge (`recommendation-engine`) |
 | **Capability Engine** | Contrato único Diagnose/Recover/Verify (`capability-engine`) |
 | **Recovery Engine** | Orquesta `Capability.recover` → `verify` (`recovery-engine`) |
+| **v1.0 Freeze** | Contratos + dependency rules + constitución (`platform-contracts`) |
 
 “Runtime Suite” es el overlay histórico; el nombre de producto es **Developer Platform**.
 
@@ -59,7 +60,8 @@ YourMeal OS
 | **v1.5** | **Recommendation Engine** (decisiones priorizadas) |
 | **v1.6** | **Capability Engine** (contrato único de capacidades) |
 | **v1.7** | **Recovery Engine** (orquestación recover → verify) |
-| **v1.8+** | Export ZIP · Telemetry · modules |
+| **v1.0** | **Platform Stabilization / Freeze** (ADR 0047) |
+| **post-freeze** | Product Core focus · Capability modules · ZIP/Telemetry diferidos |
 
 ### Principio permanente — Engines unidireccionales
 
@@ -86,4 +88,5 @@ Ver secuencia completa de PRs en [DEVELOPER_PLATFORM_ROADMAP](./DEVELOPER_PLATFO
 - [RECOMMENDATION_ENGINE](./RECOMMENDATION_ENGINE.md) · ADR 0044  
 - [CAPABILITY_ENGINE](./CAPABILITY_ENGINE.md) · ADR 0045  
 - [RECOVERY_ENGINE](./RECOVERY_ENGINE.md) · ADR 0046  
+- [DEVELOPER_PLATFORM_v1](./DEVELOPER_PLATFORM_v1.md) · ADR 0047 (Freeze)  
 - [RUNTIME_SUITE](./RUNTIME_SUITE.md) · Lifecycle ADR 0036  

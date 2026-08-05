@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "capturedAt": "2026-08-05T19:25:14.125Z",
+  "doctorMs": 7.15,
+  "recoveryMs": 0.444,
+  "hostLookupMs": 0.025,
+  "hostModuleCount": 19,
+  "capabilityCount": 5,
+  "knowledgeCount": 6,
+  "note": "Baseline only — do not regress without ADR. Not an SLA."
+}

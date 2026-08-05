@@ -66,6 +66,7 @@ describe("Recommendation Engine", () => {
     expect(list[0].actions.some((a) => a.type === "recovery" && !a.supported)).toBe(
       true,
     );
+    expect(list[0].capabilityIds.length).toBeGreaterThan(0);
   });
 
   it("groups multiple incidents into one recommendation per knowledge", () => {

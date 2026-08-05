@@ -218,10 +218,18 @@ function Detail({
         {item.actions.map((a) => (
           <li
             key={a.id}
-            className={`text-[10px] ${a.supported ? "text-zinc-300" : "text-zinc-600 line-through"}`}
+            className={`text-[10px] ${
+              a.type === "recovery" || a.supported
+                ? "text-zinc-300"
+                : "text-zinc-600 line-through"
+            }`}
           >
             [{a.type}] {a.label}
-            {!a.supported ? " · not supported" : ""}
+            {a.type === "recovery"
+              ? " · via Recovery Engine"
+              : !a.supported
+                ? " · not supported"
+                : ""}
           </li>
         ))}
       </ul>
