@@ -1,11 +1,13 @@
 /**
  * Built-in Suite bridges — register Assets / DOM / Consistency metadata only.
- * Does NOT change module behavior or UI. DEVELOPER-PLATFORM-002.
+ * DEVELOPER-PLATFORM-002 · categories updated for Host (DEVELOPER-PLATFORM-003).
  */
 
 import type { RuntimeModule } from "./RuntimeModule";
 import { findModule, registerModule } from "./RuntimeRegistry";
 import { createEvidence } from "./RuntimeEvidence";
+
+const ALL_PLATFORMS = ["web", "android", "ios"] as const;
 
 const BUILTINS: RuntimeModule[] = [
   {
@@ -13,11 +15,12 @@ const BUILTINS: RuntimeModule[] = [
     title: "Assets",
     description: "Asset resolution ledger · logo · __l5e detection",
     icon: "package",
-    category: "Diagnostics",
+    category: "Health",
     version: "1.0.0",
     experimental: false,
     visible: true,
     permissions: "ENGINEERING",
+    supports: [...ALL_PLATFORMS],
     health: () => ({ ok: true, detail: "bridged · UI in Runtime Suite" }),
     export: () =>
       createEvidence({
@@ -32,11 +35,12 @@ const BUILTINS: RuntimeModule[] = [
     title: "DOM",
     description: "Live document.images probe",
     icon: "layout",
-    category: "Diagnostics",
+    category: "Health",
     version: "1.0.0",
     experimental: false,
     visible: true,
     permissions: "ENGINEERING",
+    supports: [...ALL_PLATFORMS],
     health: () => ({ ok: true, detail: "bridged · UI in Runtime Suite" }),
     export: () =>
       createEvidence({
@@ -51,11 +55,12 @@ const BUILTINS: RuntimeModule[] = [
     title: "Consistency",
     description: "LIVE / HISTORICAL / ORPHAN / STALE lifecycle engine",
     icon: "git-compare",
-    category: "Diagnostics",
+    category: "Health",
     version: "1.0.0",
     experimental: false,
     visible: true,
     permissions: "ENGINEERING",
+    supports: [...ALL_PLATFORMS],
     health: () => ({ ok: true, detail: "bridged · UI in Runtime Suite" }),
     export: () =>
       createEvidence({

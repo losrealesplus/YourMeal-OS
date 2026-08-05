@@ -1,6 +1,6 @@
 /**
  * Runtime Core — shared types (kernel · no module knowledge).
- * DEVELOPER-PLATFORM-002
+ * DEVELOPER-PLATFORM-002 · extended DEVELOPER-PLATFORM-003 (Host categories + platforms)
  */
 
 /** Module permission levels (architecture only — not enforced yet). */
@@ -10,17 +10,20 @@ export type RuntimePermissionLevel =
   | "EXPERIMENTAL"
   | "INTERNAL";
 
-/** Module taxonomy for registry / future UI. */
+/**
+ * Host / Registry taxonomy (Developer Platform Host).
+ * Modules declare one category; Host groups automatically.
+ */
 export type RuntimeModuleCategory =
-  | "Core"
-  | "Diagnostics"
-  | "Performance"
+  | "Health"
+  | "Application"
   | "Network"
-  | "Storage"
-  | "Session"
-  | "Branding"
-  | "Experimental"
+  | "System"
+  | "Security"
   | "Developer";
+
+/** Platforms a module may declare support for (filter prepared · not enforced yet). */
+export type RuntimePlatform = "web" | "android" | "ios";
 
 export type RuntimeSeverity = "info" | "warning" | "error" | "critical";
 
@@ -35,6 +38,11 @@ export type RuntimeModuleMeta = {
   experimental?: boolean;
   visible?: boolean;
   permissions: RuntimePermissionLevel;
+  /**
+   * Platforms where this module is available.
+   * Omit / empty → treat as all platforms (Host default).
+   */
+  supports?: RuntimePlatform[];
 };
 
 /** Common evidence contract (no storage yet). */
@@ -60,7 +68,8 @@ export type RuntimeCoreEventName =
   | "doctor-start"
   | "doctor-finish"
   | "asset-failure"
-  | "network-request";
+  | "network-request"
+  | "host-module-selected";
 
 export type RuntimeCoreEvent<T = unknown> = {
   name: RuntimeCoreEventName | (string & {});

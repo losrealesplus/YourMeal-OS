@@ -96,12 +96,16 @@ Metadata obligatoria: `id` · `title` · `category` · `version` · `permissions
 type RuntimeModule = {
   id, title, description?, icon?, version, category,
   experimental?, visible?, permissions,
+  supports?: ("web" | "android" | "ios")[],
   mount?, unmount?, dispose?,
-  export?, health?
+  export?, health?, diagnostics?
 }
 ```
 
-Phase 1: Assets / DOM / Consistency se registran como **bridges** (metadata + health/export stubs). La UI permanece en el Suite actual — **sin cambio funcional**.
+Categorías Host: `Health` · `Application` · `Network` · `System` · `Security` · `Developer`.  
+API: `getModules()` · `getModulesSorted(categoryOrder)`.
+
+Phase 1: Assets / DOM / Consistency se registran como **bridges** (metadata + health/export stubs). La UI de paneles legacy permanece en el Suite; la navegación la dirige el [Developer Platform Host](./DEVELOPER_PLATFORM_HOST.md).
 
 ---
 
@@ -126,9 +130,9 @@ Suscripción vía `onRuntimeCoreEvent` — no listeners globales fuera del Core.
 
 | id | title | category |
 |----|-------|----------|
-| `assets` | Assets | Diagnostics |
-| `dom` | DOM | Diagnostics |
-| `consistency` | Consistency | Diagnostics |
+| `assets` | Assets | Health |
+| `dom` | DOM | Health |
+| `consistency` | Consistency | Health |
 
 Boot: `registerBuiltinRuntimeModules()` en `src/router.tsx`.
 
@@ -138,11 +142,12 @@ Boot: `registerBuiltinRuntimeModules()` en `src/router.tsx`.
 
 | Versión | Contenido |
 |---------|-----------|
-| **v1.0** Foundation | Portal · Suite · **Core** · Assets · DOM · Consistency |
-| **v1.1** | Doctor · Logs · Storage · Session |
-| **v1.2** | Performance · Network · API |
-| **v1.3** | Branding · Feature Flags · Tenant |
-| **v1.4+** | Export ZIP · Knowledge · Support package · FOPEBA evidence packs |
+| **v1.0** Foundation | Portal · Suite · **Core** · **Host** · Assets · DOM · Consistency |
+| **v1.1** | Doctor (Runtime Module) · Issue Registry (mínimo) |
+| **v1.2** | Session · Storage |
+| **v1.3** | Network |
+| **v1.4** | Performance |
+| **v1.5+** | Export ZIP · Knowledge Engine · Support package |
 
 Cada módulo futuro = PR independiente que **solo se enchufa** al Registry.
 

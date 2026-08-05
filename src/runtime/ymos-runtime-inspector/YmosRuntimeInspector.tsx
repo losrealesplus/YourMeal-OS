@@ -24,6 +24,14 @@ import {
   runRuntimeConsistencyEngine,
 } from "../ymos-runtime-consistency";
 import {
+  registerBuiltinRuntimeModules,
+} from "../runtime-core";
+import {
+  RuntimeHost,
+  legacyTabForModuleId,
+  registerLegacyHostModules,
+} from "../runtime-host";
+import {
   installYmosRuntimeInspectorGestureToggle,
   isYmosRuntimeInspectorEnabled,
   setYmosRuntimeInspectorEnabled,
@@ -32,6 +40,7 @@ import { collectYmosRuntimeDiagnostic } from "./collect";
 import { collectDomImages } from "./dom-images";
 import { ymosTrace } from "../ymos-trace";
 
+/** Legacy Suite panel ids — kept for existing tab bodies (Host drives navigation). */
 const TABS = [
   "General",
   "Runtime",
@@ -190,9 +199,15 @@ export function YmosRuntimeInspector() {
   const [copied, setCopied] = useState(false);
   const [copiedDom, setCopiedDom] = useState(false);
   const [copiedConsistency, setCopiedConsistency] = useState(false);
-  /** RUNTIME-CONSISTENCY-002 — land on Consistency to surface ledger vs DOM. */
-  const [tab, setTab] = useState<Tab>("Consistency");
+  /** DEVELOPER-PLATFORM-003 — Host drives navigation; panels stay legacy. */
+  const [moduleId, setModuleId] = useState("consistency");
+  const tab = (legacyTabForModuleId(moduleId) ?? "Consistency") as Tab;
   const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    registerBuiltinRuntimeModules();
+    registerLegacyHostModules();
+  }, []);
 
   const status = useSyncExternalStore(
     subscribeYmosRuntimeStatus,
@@ -431,16 +446,16 @@ export function YmosRuntimeInspector() {
       }}
     >
       <div
-        className="m-4 max-h-[min(78vh,40rem)] w-[min(100vw-2rem,24rem)] self-end overflow-auto rounded-xl border-4 border-yellow-300 bg-zinc-950 text-[11px] text-zinc-100 shadow-2xl"
+        className="m-4 max-h-[min(82vh,44rem)] w-[min(100vw-2rem,52rem)] self-end overflow-hidden rounded-xl border-4 border-yellow-300 bg-zinc-950 text-[11px] text-zinc-100 shadow-2xl"
         style={{ pointerEvents: "auto" }}
       >
       <div className="flex items-center justify-between gap-2 p-3 pb-2">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-yellow-300">
-            Runtime Suite
+            Developer Platform
           </p>
           <p className="text-[9px] text-zinc-500">
-            YourMeal OS · YMOS Horus toggles · ✕ closes
+            Runtime Host · modules from Registry · ✕ closes
           </p>
         </div>
         <button
@@ -454,40 +469,14 @@ export function YmosRuntimeInspector() {
         </button>
       </div>
 
-      <div className="flex gap-1 overflow-x-auto px-2 pb-2 border-b border-white/10">
-        {TABS.map((name) => (
-          <button
-            key={name}
-            type="button"
-            onClick={() => setTab(name)}
-            className={`shrink-0 rounded-md px-2 py-1 text-[10px] font-semibold ${
-              tab === name
-                ? "bg-sky-500/90 text-zinc-950"
-                : "bg-white/5 text-zinc-400 hover:bg-white/10"
-            }`}
-          >
-            {name}
-            {name === "Assets" && failures.length > 0 ? (
-              <span className="ml-1 text-rose-200">({failures.length})</span>
-            ) : null}
-            {name === "DOM" ? (
-              <span className={`ml-1 ${domHasL5e ? "text-rose-200" : "text-zinc-500"}`}>
-                ({domImages.length})
-              </span>
-            ) : null}
-            {name === "Consistency" && consistencyErrors > 0 ? (
-              <span className="ml-1 text-rose-200">({consistencyErrors})</span>
-            ) : null}
-            {name === "Consistency" && consistencyErrors === 0 ? (
-              <span className="ml-1 text-emerald-400/80">
-                {consistency.score}/{consistency.maxScore}
-              </span>
-            ) : null}
-          </button>
-        ))}
-      </div>
+      <div className="flex min-h-[22rem] max-h-[min(68vh,36rem)] border-t border-white/10 px-2 pb-2 pt-2">
+        <RuntimeHost
+          selectedId={moduleId}
+          onSelect={setModuleId}
+          legacyPanel={
+            <div className="space-y-1 p-1">
+        {/* legacy Suite panels — Assets/DOM/Consistency engines unchanged */}
 
-      <div className="flex-1 overflow-auto p-3">
         {tab === "General" && (
           <>
             <Mark
@@ -1026,6 +1015,9 @@ export function YmosRuntimeInspector() {
             </Section>
           </>
         )}
+            </div>
+          }
+        />
       </div>
 
       <div className="p-3 pt-2 border-t border-white/10">

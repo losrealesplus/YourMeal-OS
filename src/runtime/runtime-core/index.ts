@@ -15,6 +15,7 @@ export {
   registerModule,
   unregisterModule,
   getModules,
+  getModulesSorted,
   findModule,
   isEnabled,
   enable,
@@ -49,6 +50,7 @@ export {
 export type {
   RuntimePermissionLevel,
   RuntimeModuleCategory,
+  RuntimePlatform,
   RuntimeSeverity,
   RuntimeModuleMeta,
   RuntimeEvidence,

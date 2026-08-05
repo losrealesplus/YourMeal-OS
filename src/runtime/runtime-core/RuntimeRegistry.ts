@@ -37,6 +37,22 @@ export function getModules(): RuntimeModule[] {
   return [...state.modules.values()];
 }
 
+/**
+ * Modules sorted by Host category order then title.
+ * Category order is defined by the Host; Core accepts an order list.
+ */
+export function getModulesSorted(
+  categoryOrder: readonly string[],
+): RuntimeModule[] {
+  const rank = new Map(categoryOrder.map((c, i) => [c, i]));
+  return getModules().slice().sort((a, b) => {
+    const ra = rank.get(a.category) ?? 999;
+    const rb = rank.get(b.category) ?? 999;
+    if (ra !== rb) return ra - rb;
+    return a.title.localeCompare(b.title);
+  });
+}
+
 export function findModule(id: string): RuntimeModule | undefined {
   return state.modules.get(id);
 }

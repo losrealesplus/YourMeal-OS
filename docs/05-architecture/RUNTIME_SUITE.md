@@ -2,9 +2,10 @@
 
 **Documento:** `RUNTIME_SUITE.md`  
 **Dominio:** Platform · Self-diagnostic instrument  
-**Estado:** Phase 1 shell + **RUNTIME-SUITE-001 Lifecycle** · 2026-08-05  
+**Estado:** Phase 1 shell + Lifecycle + **Runtime Host** (DEVELOPER-PLATFORM-003) · 2026-08-05  
 **Entrada:** `YMOS Horus` → [Secret Gateway](./RUNTIME_SECRET_GATEWAY.md)  
-**ADR:** [0036 — Runtime Suite Lifecycle](../adr/0036-runtime-suite-lifecycle.md)  
+**Kernel:** [RUNTIME_CORE](./RUNTIME_CORE.md) · **Host:** [DEVELOPER_PLATFORM_HOST](./DEVELOPER_PLATFORM_HOST.md)  
+**ADR:** [0036 Lifecycle](../adr/0036-runtime-suite-lifecycle.md) · [0038 Core](../adr/0038-runtime-core.md) · [0039 Host](../adr/0039-developer-platform-host.md)  
 **Estándar:** Evidence before Implementation · FOPEBA
 
 > No es un menú de debug.  
@@ -65,13 +66,13 @@ Así el Suite no queda atrapado en `enabled=true` cuando el env force-on estaba 
 
 | Versión | Entrega | Estado |
 |---------|---------|--------|
-| **v1.0** Foundation | Portal · Suite · **Runtime Core** · Assets · DOM · Consistency | Core = DEVELOPER-PLATFORM-002 |
-| **v1.1** | Doctor · Logs · Storage · Session | Planned |
-| **v1.2** | Performance · Network · API | Planned |
-| **v1.3** | Branding · Feature Flags · Tenant | Planned |
-| **v1.4+** | Export ZIP · Knowledge · Support package | Planned |
+| **v1.0** Foundation | Portal · Suite · Runtime Core · **Runtime Host** · Assets · DOM · Consistency | Host = DEVELOPER-PLATFORM-003 |
+| **v1.1** | Doctor · Issue Registry (mínimo) | Planned |
+| **v1.2** | Session · Storage | Planned |
+| **v1.3** | Network | Planned |
+| **v1.4+** | Performance · Export ZIP · Knowledge | Planned |
 
-Ver [RUNTIME_CORE](./RUNTIME_CORE.md).
+Ver [RUNTIME_CORE](./RUNTIME_CORE.md) · [DEVELOPER_PLATFORM_HOST](./DEVELOPER_PLATFORM_HOST.md).
 
 ---
 

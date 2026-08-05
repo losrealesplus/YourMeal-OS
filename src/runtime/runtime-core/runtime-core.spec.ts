@@ -34,7 +34,7 @@ describe("Runtime Core Foundation", () => {
     registerModule({
       id: "demo",
       title: "Demo",
-      category: "Experimental",
+      category: "Developer",
       version: "0.0.1",
       permissions: "EXPERIMENTAL",
     });
@@ -50,6 +50,7 @@ describe("Runtime Core Foundation", () => {
     for (const id of BUILTIN_MODULE_IDS) {
       expect(findModule(id)).toBeTruthy();
       expect(isEnabled(id)).toBe(true);
+      expect(findModule(id)?.category).toBe("Health");
     }
     expect(getModules()).toHaveLength(3);
   });
@@ -62,7 +63,7 @@ describe("Runtime Core Foundation", () => {
     registerModule({
       id: "x",
       title: "X",
-      category: "Core",
+      category: "System",
       version: "1",
       permissions: "INTERNAL",
     });
