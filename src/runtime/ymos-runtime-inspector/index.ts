@@ -1,7 +1,8 @@
 /**
- * YMOS Runtime Inspector — Core engineering diagnostic overlay.
- * Product name: YMOS Runtime Inspector
- * Delivery tracks: ANDROID-RUNTIME-002 · ANDROID-ASSETS-001 · ANDROID-DOM-001 · RUNTIME-CONSISTENCY-002
+ * YourMeal OS Runtime Suite — Core engineering diagnostic overlay (Phase 1 shell).
+ * Product name: YourMeal OS Runtime Suite
+ * Implementation bridge: ymos-runtime-inspector
+ * Delivery tracks: ANDROID-RUNTIME-002 · ANDROID-ASSETS-001 · ANDROID-DOM-001 · RUNTIME-CONSISTENCY-002 · RUNTIME-SUITE-001
  */
 export { YmosRuntimeInspector } from "./YmosRuntimeInspector";
 export {

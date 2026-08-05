@@ -1,9 +1,10 @@
 /**
- * YMOS Runtime Inspector — visual observe-only overlay.
- * Gate: VITE_YMOS_RUNTIME_OVERLAY | ?debug-runtime=1 | storage | corner long-press.
+ * YourMeal OS Runtime Suite — visual observe-only overlay (Phase 1 shell).
+ * Product: Runtime Suite · Entry: YMOS Horus (Secret Gateway)
+ * Gate: VITE_YMOS_RUNTIME_OVERLAY | ?debug-runtime=1 | storage | corner long-press | Horus
  *
- * Tabs: … · Assets · DOM · Consistency · …
- * ANDROID-ASSETS-001 · ANDROID-DOM-001 · RUNTIME-CONSISTENCY-002
+ * Tabs: Suite · … · Assets · DOM · Consistency · …
+ * ANDROID-ASSETS-001 · ANDROID-DOM-001 · RUNTIME-CONSISTENCY-002 · RUNTIME-SUITE-001
  */
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { useRouterState } from "@tanstack/react-router";
@@ -24,6 +25,11 @@ import {
   runRuntimeConsistencyEngine,
 } from "../ymos-runtime-consistency";
 import {
+  RUNTIME_SUITE_MODULES,
+  RUNTIME_SUITE_NAME,
+  RUNTIME_SUITE_SHORT,
+} from "../ymos-runtime-suite";
+import {
   installYmosRuntimeInspectorGestureToggle,
   isYmosRuntimeInspectorEnabled,
   setYmosRuntimeInspectorEnabled,
@@ -33,6 +39,7 @@ import { collectDomImages } from "./dom-images";
 import { ymosTrace } from "../ymos-trace";
 
 const TABS = [
+  "Suite",
   "General",
   "Runtime",
   "Assets",
@@ -167,8 +174,8 @@ export function YmosRuntimeInspector() {
   const [copied, setCopied] = useState(false);
   const [copiedDom, setCopiedDom] = useState(false);
   const [copiedConsistency, setCopiedConsistency] = useState(false);
-  /** RUNTIME-CONSISTENCY-002 — land on Consistency to surface ledger vs DOM. */
-  const [tab, setTab] = useState<Tab>("Consistency");
+  /** RUNTIME-SUITE-001 — land on Suite catalog (Horus entry). */
+  const [tab, setTab] = useState<Tab>("Suite");
   const [tick, setTick] = useState(0);
 
   const status = useSyncExternalStore(
@@ -351,7 +358,7 @@ export function YmosRuntimeInspector() {
 
   async function copyDomImages() {
     const payload = {
-      tool: "YMOS Runtime Inspector · DOM",
+      tool: "YMOS Runtime Suite · DOM",
       capturedAt: new Date().toISOString(),
       href: typeof window !== "undefined" ? window.location.href : "",
       count: domImages.length,
@@ -392,8 +399,9 @@ export function YmosRuntimeInspector() {
       id="ymos-runtime-inspector"
       className="flex flex-col text-[11px] text-zinc-100"
       data-ymos-runtime-inspector="1"
+      data-ymos-runtime-suite="1"
       role="complementary"
-      aria-label="YMOS Runtime Inspector"
+      aria-label={RUNTIME_SUITE_NAME}
       /* ANDROID-RUNTIME-006 temporary ultra-visible shell — prove DOM paint */
       style={{
         position: "fixed",
@@ -414,10 +422,10 @@ export function YmosRuntimeInspector() {
       <div className="flex items-center justify-between gap-2 p-3 pb-2">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-yellow-300">
-            YMOS Runtime · DOM PROBE
+            {RUNTIME_SUITE_SHORT}
           </p>
           <p className="text-[9px] text-zinc-500">
-            ANDROID-RUNTIME-006 · red fullscreen = node is in DOM
+            YourMeal OS · observe-only · entry: YMOS Horus
           </p>
         </div>
         <button
@@ -463,6 +471,72 @@ export function YmosRuntimeInspector() {
       </div>
 
       <div className="flex-1 overflow-auto p-3">
+        {tab === "Suite" && (
+          <div className="space-y-3">
+            <Section title={RUNTIME_SUITE_NAME}>
+              <p className="text-zinc-400 text-[10px] leading-relaxed">
+                Self-diagnostic platform surface. Phase 1 bridges existing
+                probes; Doctor, Performance, and Export ZIP arrive in later
+                phases. FOPEBA — evidence over opinion.
+              </p>
+            </Section>
+            <Section title="Modules">
+              <ul className="space-y-1.5">
+                {RUNTIME_SUITE_MODULES.map((mod) => {
+                  const canOpen = mod.status === "available" && mod.legacyTab;
+                  return (
+                    <li key={mod.id}>
+                      <button
+                        type="button"
+                        disabled={!canOpen}
+                        onClick={() => {
+                          if (mod.legacyTab) {
+                            setTab(mod.legacyTab as Tab);
+                          }
+                        }}
+                        className={`flex w-full items-start justify-between gap-2 rounded-md px-2 py-1.5 text-left ${
+                          canOpen
+                            ? "bg-white/5 hover:bg-white/10 text-zinc-100"
+                            : "bg-transparent text-zinc-500 cursor-default"
+                        }`}
+                      >
+                        <span>
+                          <span className="font-semibold">{mod.label}</span>
+                          <span className="block text-[9px] text-zinc-500">
+                            {mod.summary}
+                          </span>
+                        </span>
+                        <span className="shrink-0 font-mono text-[9px] uppercase tracking-wide">
+                          {mod.status === "available" ? (
+                            <span className="text-emerald-400">ready</span>
+                          ) : (
+                            <span className="text-zinc-500">
+                              ph{mod.phase}
+                            </span>
+                          )}
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </Section>
+            <Section title="Export Diagnostic">
+              <p className="text-[9px] text-zinc-500 mb-2">
+                Phase 4 — ZIP pack (doctor · network · assets · …). Phase 1:
+                copy live JSON snapshot.
+              </p>
+              <button
+                type="button"
+                className="rounded-md border border-sky-400/40 bg-sky-500/20 px-2 py-1.5 text-[10px] font-semibold text-sky-100 hover:bg-sky-500/30"
+                onClick={() => void copyDiagnostic()}
+              >
+                {copied ? "Copied ✓" : "Copy Diagnostic JSON"}
+              </button>
+            </Section>
+          </div>
+        )}
+
         {tab === "General" && (
           <>
             <Mark

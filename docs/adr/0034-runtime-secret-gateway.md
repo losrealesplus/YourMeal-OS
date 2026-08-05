@@ -11,9 +11,9 @@ YourMeal OS necesita un Runtime Developer Suite (Inspector) para diagnóstico en
 
 ## Decisión
 
-Acceso al Inspector (y futuras herramientas) mediante una **Command Palette oculta**: frase secreta por teclado, sin UI, sin persistencia del secreto, desacoplada del Inspector vía `CustomEvent`.
+Acceso al **YourMeal OS Runtime Suite** (y futuras herramientas) mediante una **Command Palette oculta**: frase secreta por teclado, sin UI, sin persistencia del secreto, desacoplada vía `CustomEvent`.
 
-Comando v1: **`YMOS Horus`** (case-insensitive) → `ymos-runtime-open`.
+Comando v1: **`YMOS Horus`** (case-insensitive) → `ymos-runtime-open` → Runtime Suite.
 
 ## Consecuencias
 
