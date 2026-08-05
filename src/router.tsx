@@ -14,6 +14,7 @@ import { registerLegacyHostModules } from "./runtime/runtime-host";
 import { registerDoctorModule } from "./runtime/runtime-doctor";
 import { registerIncidentsModule } from "./runtime/incident-engine";
 import { registerKnowledgeModule } from "./runtime/knowledge-engine";
+import { registerRecommendationsModule } from "./runtime/recommendation-engine";
 
 // ANDROID-RUNTIME-001 / ANDROID-ASSETS-001 — client boot sensors (observe-only).
 // Secret Gateway — hidden keystroke command palette (no UI).
@@ -22,6 +23,7 @@ import { registerKnowledgeModule } from "./runtime/knowledge-engine";
 // Doctor Engine — register Doctor module + foundation checks (DEVELOPER-PLATFORM-004).
 // Incident Engine — structured incidents from Doctor evidence (DEVELOPER-PLATFORM-005).
 // Knowledge Engine — diagnostic knowledge model (DEVELOPER-PLATFORM-007).
+// Recommendation Engine — decisions from Knowledge (DEVELOPER-PLATFORM-008).
 if (typeof window !== "undefined") {
   logYmosRuntimeMainStart();
   installYmosRuntimeErrorTraps();
@@ -32,6 +34,7 @@ if (typeof window !== "undefined") {
   registerDoctorModule();
   registerIncidentsModule();
   registerKnowledgeModule();
+  registerRecommendationsModule();
 }
 
 export const getRouter = () => {

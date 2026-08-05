@@ -19,6 +19,11 @@ import {
   registerFoundationKnowledge,
   type KnowledgeMatchInput,
 } from "../knowledge-engine";
+import {
+  buildRecommendations,
+  exportRecommendations,
+  type RuntimeRecommendation,
+} from "../recommendation-engine";
 import type { DoctorReport } from "./DoctorReport";
 import { runDoctor } from "./DoctorRunner";
 import {
@@ -58,6 +63,10 @@ export function DoctorPanel() {
   const [selectedIncident, setSelectedIncident] = useState<string | null>(null);
   const [copiedReport, setCopiedReport] = useState(false);
   const [copiedExport, setCopiedExport] = useState(false);
+  const [recFocus, setRecFocus] = useState<{
+    kind: "knowledge" | "incident";
+    item: RuntimeRecommendation;
+  } | null>(null);
 
   const incidents = useMemo(() => {
     void tick;
@@ -70,12 +79,13 @@ export function DoctorPanel() {
   }, [tick, report]);
 
   const recommendations = useMemo(() => {
-    const fromReport = report?.recommendations ?? [];
-    const fromIncidents = incidents
-      .map((i) => i.recommendation)
-      .filter((r): r is string => Boolean(r));
-    return [...fromReport, ...fromIncidents];
-  }, [report, incidents]);
+    void tick;
+    registerFoundationKnowledge();
+    return buildRecommendations({
+      incidents,
+      ensureFoundation: true,
+    });
+  }, [tick, report, incidents]);
 
   const knowledgeMatches = useMemo(() => {
     void tick;
@@ -144,6 +154,7 @@ export function DoctorPanel() {
         score: m.score,
         matchedOn: m.matchedOn,
       })),
+      recommendations: exportRecommendations(),
     };
     await writeClipboard(JSON.stringify(payload, null, 2));
     setCopiedExport(true);
@@ -191,7 +202,29 @@ export function DoctorPanel() {
 
       <DoctorKnowledgeSection matches={knowledgeMatches} />
 
-      <DoctorRecommendations items={recommendations} />
+      <DoctorRecommendations
+        items={recommendations}
+        onCopy={(item) => {
+          void writeClipboard(JSON.stringify(item, null, 2));
+        }}
+        onOpenKnowledge={(item) =>
+          setRecFocus({ kind: "knowledge", item })
+        }
+        onViewIncident={(item) => {
+          setRecFocus({ kind: "incident", item });
+          if (item.incidentIds[0]) {
+            setSelectedIncident(item.incidentIds[0]);
+          }
+        }}
+      />
+
+      {recFocus ? (
+        <p className="rounded-md border border-white/10 bg-black/30 px-2 py-1.5 font-mono text-[9px] text-zinc-400">
+          {recFocus.kind === "knowledge"
+            ? `Knowledge: ${recFocus.item.knowledgeIds.join(", ")}`
+            : `Incidents: ${recFocus.item.incidentIds.join(", ")}`}
+        </p>
+      ) : null}
 
       <DoctorTimelineSection events={timeline} />
 
