@@ -29,3 +29,4 @@ Permanent decisions for YourMeal OS. New ADRs are additive; do not silently reve
 | [0036](./0036-runtime-suite-lifecycle.md) | Runtime Suite Lifecycle (toggle · close · ESC · dismiss) |
 | [0038](./0038-runtime-core.md) | Runtime Core (Developer Platform v1.0 kernel · Registry) |
 | [0039](./0039-developer-platform-host.md) | Developer Platform Host (dynamic module shell · DEVELOPER-PLATFORM-003) |
+| [0040](./0040-doctor-engine.md) | Doctor Engine (Developer Platform v1.1 · registerCheck · FOPEBA) |

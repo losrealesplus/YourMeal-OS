@@ -31,6 +31,7 @@ import {
   legacyTabForModuleId,
   registerLegacyHostModules,
 } from "../runtime-host";
+import { registerDoctorModule } from "../runtime-doctor";
 import {
   installYmosRuntimeInspectorGestureToggle,
   isYmosRuntimeInspectorEnabled,
@@ -199,14 +200,15 @@ export function YmosRuntimeInspector() {
   const [copied, setCopied] = useState(false);
   const [copiedDom, setCopiedDom] = useState(false);
   const [copiedConsistency, setCopiedConsistency] = useState(false);
-  /** DEVELOPER-PLATFORM-003 — Host drives navigation; panels stay legacy. */
-  const [moduleId, setModuleId] = useState("consistency");
+  /** DEVELOPER-PLATFORM-003/004 — Host drives navigation; Doctor is Health default. */
+  const [moduleId, setModuleId] = useState("doctor");
   const tab = (legacyTabForModuleId(moduleId) ?? "Consistency") as Tab;
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
     registerBuiltinRuntimeModules();
     registerLegacyHostModules();
+    registerDoctorModule();
   }, []);
 
   const status = useSyncExternalStore(

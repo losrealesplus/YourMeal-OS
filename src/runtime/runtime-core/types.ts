@@ -67,6 +67,7 @@ export type RuntimeCoreEventName =
   | "module-disabled"
   | "doctor-start"
   | "doctor-finish"
+  | "doctor-check-registered"
   | "asset-failure"
   | "network-request"
   | "host-module-selected";
