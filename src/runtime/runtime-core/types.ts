@@ -22,7 +22,8 @@ export type RuntimeModuleCategory =
   | "Security"
   | "Developer"
   | "Knowledge"
-  | "Recommendations";
+  | "Recommendations"
+  | "Capabilities";
 
 /** Platforms a module may declare support for (filter prepared · not enforced yet). */
 export type RuntimePlatform = "web" | "android" | "ios";
@@ -78,6 +79,9 @@ export type RuntimeCoreEventName =
   | "knowledge-registered"
   | "recommendations-built"
   | "recommendations-cleared"
+  | "capability-registered"
+  | "capability-diagnose-start"
+  | "capability-diagnose-finish"
   | "asset-failure"
   | "network-request"
   | "host-module-selected";

@@ -7,6 +7,7 @@ import type { RuntimeModule, RuntimeModuleCategory, RuntimePlatform } from "../r
 
 export const RUNTIME_HOST_CATEGORIES: readonly RuntimeModuleCategory[] = [
   "Health",
+  "Capabilities",
   "Application",
   "Network",
   "System",
@@ -19,6 +20,7 @@ export const RUNTIME_HOST_CATEGORIES: readonly RuntimeModuleCategory[] = [
 export const RUNTIME_HOST_CATEGORY_LABELS: Record<RuntimeModuleCategory, string> =
   {
     Health: "Health",
+    Capabilities: "Capabilities",
     Application: "Application",
     Network: "Network",
     System: "System",

@@ -12,6 +12,7 @@ import {
 } from "../runtime-core";
 import { registerModuleRenderer } from "../runtime-host";
 import { registerBuiltinDoctorChecks } from "./checks/register-builtin-checks";
+import { registerBuiltinCapabilities } from "../capability-engine";
 import { DoctorPanel } from "./DoctorPanel";
 import { getChecks } from "./DoctorRegistry";
 import { DOCTOR_ENGINE_VERSION } from "./DoctorReport";
@@ -75,8 +76,9 @@ const doctorModule: RuntimeModule = {
 let moduleInstalled = false;
 let rendererInstalled = false;
 
-/** Idempotent — register checks + Doctor module + Host UI. */
+/** Idempotent — register capabilities + checks + Doctor module + Host UI. */
 export function registerDoctorModule(): void {
+  registerBuiltinCapabilities();
   registerBuiltinDoctorChecks();
 
   if (!moduleInstalled) {
