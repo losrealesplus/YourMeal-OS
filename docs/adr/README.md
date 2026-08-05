@@ -28,3 +28,13 @@ Permanent decisions for YourMeal OS. New ADRs are additive; do not silently reve
 | [0034](./0034-runtime-secret-gateway.md) | Runtime Secret Gateway (hidden command palette · YMOS Horus) |
 | [0036](./0036-runtime-suite-lifecycle.md) | Runtime Suite Lifecycle (toggle · close · ESC · dismiss) |
 | [0037](./0037-developer-portal.md) | Developer Portal (triple-tap · passphrase · discovery) |
+| [0038](./0038-runtime-core.md) | Runtime Core (Developer Platform v1.0 kernel · Registry) |
+| [0039](./0039-developer-platform-host.md) | Developer Platform Host (dynamic module shell · DEVELOPER-PLATFORM-003) |
+| [0040](./0040-doctor-engine.md) | Doctor Engine (Developer Platform v1.1 · registerCheck · FOPEBA) |
+| [0041](./0041-incident-engine.md) | Incident Engine (Developer Platform v1.2 · Evidence → Incident) |
+| [0042](./0042-doctor-ui.md) | Doctor UI (Developer Platform v1.3 · glance diagnostics) |
+| [0043](./0043-diagnostic-knowledge-model.md) | Diagnostic Knowledge Model (Developer Platform v1.4) |
+| [0044](./0044-recommendation-engine.md) | Recommendation Engine (Developer Platform v1.5 · via Knowledge) |
+| [0045](./0045-capability-engine.md) | Capability Engine (Developer Platform v1.6 · Diagnose/Recover/Verify) |
+| [0046](./0046-recovery-engine.md) | Recovery Engine (Developer Platform v1.7 · orchestrate recover/verify) |
+| [0047](./0047-developer-platform-v1-freeze.md) | Developer Platform v1.0 Freeze (stabilization · contracts · dependency rules) |

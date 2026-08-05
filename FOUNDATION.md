@@ -293,3 +293,50 @@ En **YourMeal OS**, este archivo se complementa con:
 - `AGENTS.md` — constitución operativa específica del proyecto
 - `docs/` — arquitectura, dominio, roadmap y ADRs
 - `docs/05-architecture/CONTEXTO_CTO.md` — contexto permanente para sesiones de Cursor como CTO
+
+---
+
+## Developer Platform (producto de ingeniería)
+
+YourMeal OS tiene **dos productos** bajo el mismo repositorio:
+
+```text
+YourMeal OS
+│
+├── User Experience          → producto cliente (pedidos, cocina, entrega)
+│
+└── Developer Platform       → producto ingeniería (autodiagnóstico + evidencia)
+      │
+      ├── Developer Portal   → discovery + autenticación (triple-tap / passphrase)
+      │
+      └── Runtime Suite      → sistema operativo técnico
+            │
+            └── Runtime Core → kernel (Registry · Events · Evidence · Export · Permissions)
+                  │
+                  └── Modules (Assets · DOM · Consistency · futuros…)
+```
+
+### Qué es
+
+Instrumento permanente para que el equipo (y, con consentimiento, soporte) observe el runtime, produzca evidencia FOPEBA y no dependa de capturas o videollamadas.
+
+### Cómo funciona
+
+1. **Portal** autentica el acceso de ingeniería (sin chrome visible para usuarios).
+2. **Suite** abre/cierra (lifecycle) y presenta módulos.
+3. **Core** registra módulos con un contrato común; el Core no conoce Doctor/Network/etc. por nombre.
+4. Cada módulo futuro se **enchufa** vía Registry — PR independiente, sin modificar el kernel.
+
+### Para qué es
+
+- Separar UX de cliente vs herramientas de ingeniería.
+- Versionar la plataforma interna (`Developer Platform v1.0`, `v1.1`, …).
+- Evitar acoplamiento al crecer a 15–20 módulos.
+
+### Fuente de verdad
+
+- [RUNTIME_CORE](./docs/05-architecture/RUNTIME_CORE.md)
+- [RUNTIME_SUITE](./docs/05-architecture/RUNTIME_SUITE.md)
+- [ADR 0038](./docs/adr/0038-runtime-core.md)
+
+**Regla:** framework first, tools second. No añadir Doctor/Network/Export hasta que el Core esté estable.

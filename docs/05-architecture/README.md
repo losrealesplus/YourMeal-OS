@@ -41,6 +41,18 @@
 | [RUNTIME_SECRET_GATEWAY.md](./RUNTIME_SECRET_GATEWAY.md) | Command Palette oculta · YMOS Horus → Runtime Suite |
 | [RUNTIME_SUITE.md](./RUNTIME_SUITE.md) | Runtime Suite · Lifecycle RUNTIME-SUITE-001 |
 | [DEVELOPER_PORTAL.md](./DEVELOPER_PORTAL.md) | Developer Portal · triple-tap · passphrase · HORUS |
+| [RUNTIME_CORE.md](./RUNTIME_CORE.md) | Runtime Core · Developer Platform v1.0 kernel |
+| [DEVELOPER_PLATFORM_HOST.md](./DEVELOPER_PLATFORM_HOST.md) | Runtime Host · shell dinámico · DEVELOPER-PLATFORM-003 |
+| [DEVELOPER_PLATFORM.md](./DEVELOPER_PLATFORM.md) | Vocabulario · Portal / Platform / Runtime Engine |
+| [DEVELOPER_PLATFORM_ROADMAP.md](./DEVELOPER_PLATFORM_ROADMAP.md) | Roadmap congelado · riesgo Product Core |
+| [DOCTOR_ENGINE.md](./DOCTOR_ENGINE.md) | Doctor Engine · checks · Health Score · v1.1 |
+| [INCIDENT_ENGINE.md](./INCIDENT_ENGINE.md) | Incident Engine · FOPEBA Incident Objects · v1.2 |
+| [DOCTOR_UI.md](./DOCTOR_UI.md) | Doctor UI · glance diagnostics · v1.3 |
+| [KNOWLEDGE_ENGINE.md](./KNOWLEDGE_ENGINE.md) | Knowledge Engine · Diagnostic Knowledge Model · v1.4 |
+| [RECOMMENDATION_ENGINE.md](./RECOMMENDATION_ENGINE.md) | Recommendation Engine · decisiones · v1.5 |
+| [CAPABILITY_ENGINE.md](./CAPABILITY_ENGINE.md) | Capability Engine · RuntimeCapability · v1.6 |
+| [RECOVERY_ENGINE.md](./RECOVERY_ENGINE.md) | Recovery Engine · orchestrate recover/verify · v1.7 |
+| [DEVELOPER_PLATFORM_v1.md](./DEVELOPER_PLATFORM_v1.md) | Constitución Developer Platform v1.0 · FROZEN |
 | [../07-experience/CUSTOMER_JOURNEYS.md](../07-experience/CUSTOMER_JOURNEYS.md) | Experience First · CJ-001 Pedido semanal |
 | [architecture-review.md](./architecture-review.md) | As-built senior review |
 | [MODULE_CONVENTION.md](./MODULE_CONVENTION.md) | `src/modules/...` layout |

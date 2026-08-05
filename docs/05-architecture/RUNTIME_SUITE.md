@@ -2,13 +2,16 @@
 
 **Documento:** `RUNTIME_SUITE.md`  
 **Dominio:** Platform · Self-diagnostic instrument  
-**Estado:** Phase 1 shell + **RUNTIME-SUITE-001 Lifecycle** · 2026-08-05  
+**Estado:** **Developer Platform v1.0 FROZEN** (ADR 0047) · shell histórico del Host  
+**Constitución:** [DEVELOPER_PLATFORM_v1.md](./DEVELOPER_PLATFORM_v1.md)  
 **Entrada:** `YMOS Horus` → [Secret Gateway](./RUNTIME_SECRET_GATEWAY.md)  
-**ADR:** [0036 — Runtime Suite Lifecycle](../adr/0036-runtime-suite-lifecycle.md)  
+**Kernel:** [RUNTIME_CORE](./RUNTIME_CORE.md) · **Host:** [DEVELOPER_PLATFORM_HOST](./DEVELOPER_PLATFORM_HOST.md)  
+**ADR:** [0036 Lifecycle](../adr/0036-runtime-suite-lifecycle.md) · [0038 Core](../adr/0038-runtime-core.md) · [0039 Host](../adr/0039-developer-platform-host.md) · [0047 Freeze](../adr/0047-developer-platform-v1-freeze.md)  
 **Estándar:** Evidence before Implementation · FOPEBA
 
-> No es un menú de debug.  
-> Es el instrumento permanente con el que YourMeal OS se observa a sí mismo.
+> “Runtime Suite” es el nombre histórico del overlay.  
+> El producto de ingeniería es **Developer Platform**; el Suite monta el **Runtime Host**.  
+> No eliminar el Inspector shell en v1.0 — es el vehículo del Host.
 
 ---
 
@@ -61,20 +64,21 @@ Así el Suite no queda atrapado en `enabled=true` cuando el env force-on estaba 
 
 ---
 
-## Fases
+## Fases · Developer Platform
 
-| Fase | Entrega | Estado |
-|------|---------|--------|
-| **1** | Horus + shell | Done (#292+) |
-| **001** | Lifecycle toggle / ✕ / ESC / close event | **NOW** |
-| **2** | Doctor · Tenant | Planned |
-| **3** | State · Performance · Flags · Telemetry | Planned |
-| **4** | Export `diagnostic-*.zip` | Planned |
-| **5** | Envío consentido a soporte | Planned |
+| Versión | Entrega | Estado |
+|---------|---------|--------|
+| **v1.0** Foundation | Portal · Suite · Runtime Core · **Runtime Host** · Assets · DOM · Consistency | Host = DEVELOPER-PLATFORM-003 |
+| **v1.1** | **Doctor Engine** · foundation checks · Host panel | Doctor = DEVELOPER-PLATFORM-004 |
+| **v1.2** | Session · Storage checks | Planned |
+| **v1.3** | Network checks | Planned |
+| **v1.4+** | Performance · Export ZIP · Knowledge | Planned |
+
+Ver [RUNTIME_CORE](./RUNTIME_CORE.md) · [DEVELOPER_PLATFORM_HOST](./DEVELOPER_PLATFORM_HOST.md) · [DOCTOR_ENGINE](./DOCTOR_ENGINE.md) · [DEVELOPER_PLATFORM](./DEVELOPER_PLATFORM.md).
 
 ---
 
-## Non-goals (este PR)
+## Non-goals (lifecycle PR histórico)
 
 - Assets / Consistency / Doctor / Capacitor / Android engines
 - ZIP export · tap-outside close (opcional futuro)
