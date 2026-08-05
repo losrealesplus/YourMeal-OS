@@ -1,9 +1,13 @@
-import logoAsset from "@/assets/eatclean-logo.png.asset.json";
+/**
+ * ANDROID-ASSET-003 — fallback logo is a real Vite-bundled PNG.
+ * Do not use Lovable `__l5e` / `*.asset.json` URLs (absent on Capacitor).
+ */
+import fallbackLogoUrl from "@/tenant/resources/logo.png";
 import { brandConfig } from "@/tenant/brand-config";
 import { cn } from "@/lib/utils";
 import { useTenantBrand } from "@/hooks/use-tenant-brand";
 
-const FALLBACK_LOGO = logoAsset.url;
+const FALLBACK_LOGO = fallbackLogoUrl;
 
 /**
  * Tenant logo — reads live from BrandingService via useTenantBrand.
