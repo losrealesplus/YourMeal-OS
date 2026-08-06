@@ -1,13 +1,18 @@
 # Order Capability
 
-**OPERATIONAL-003 · Phase 2 — Facade**  
-**ADR:** [0062 — Order Capability](../adr/0062-order-capability.md) · [0063 — Order Facade](../adr/0063-order-facade.md)  
-**Status:** **Facade** (process API — no Product UI / routing in this phase)  
+**OPERATIONAL-003 · Phase 3 — Validation · Engineering Certified**  
+**ADR:** [0062](../adr/0062-order-capability.md) · [0063](../adr/0063-order-facade.md) · [0064](../adr/0064-order-validation.md)  
+**Status:** **Engineering Certified** (process API validated — no Product UI in this phase)  
 **Depends on:** Identity (ADR 0055–0057) · Customers (ADR 0058–0061) · Order Intake (ADR 0017)  
 **EatClean lens:** weekly meal prep · commitment for a concrete week · production · delivery · billing handoff  
 **Type:** Operational Process  
-**Maturity:** Architecture → **Facade** → Engineering Certified → Field Validated → Production Ready  
-**Completeness:** Architecture → Facade → Validation → Capability Demo → Product UI → Field → Production
+**Maturity:** Architecture → Facade → **Engineering Certified** → Field Validated → Production Ready  
+**Completeness:** Architecture → Facade → Validation → Capability Demo → Product UI → Field → Production  
+**Validation:** [ORDER_VALIDATION_REPORT](../10-validation/ORDER_VALIDATION_REPORT.md) · 15 PASS · 2 UNIMPLEMENTED · 0 FAIL
+
+```text
+Order = compromiso operativo del tenant para una semana concreta.
+```
 
 ---
 
@@ -422,16 +427,16 @@ Phase 1 does **not** move or rewrite these — Freeze only.
 
 ---
 
-## Gaps → Facade / Validate / Demo phases
+## Gaps → Demo / Production phases
 
 | Gap | Plan |
 |-----|------|
-| OrderFacade + Commands/Queries | OPERATIONAL-003 Phase 2 |
+| CloseOrder / CancelOrder substrate | Honest UNIMPLEMENTED until lifecycle settle |
+| DuplicateWeek · Clone · Split · Merge | Intent frozen on Facade |
 | Explicit `orders.confirm` cap | Freeze with Identity matrix |
 | Billing facet wiring | With Billing Capability |
 | Inventory hold on confirm | Future Inventory |
-| Merge duplicate drafts | Business rule later |
-| Capability Demo | Minimal Order Workspace after Validate |
+| Capability Demo | Order Workspace (next) |
 
 ---
 
@@ -445,15 +450,14 @@ Phase 1 does **not** move or rewrite these — Freeze only.
 
 ---
 
-## Acceptance (Phase 1)
+## Acceptance (Phase 3 — Validation)
 
-- [x] Canonical definition: Order = weekly operational commitment  
-- [x] Responsibilities · lifecycle · state machine  
-- [x] Contracts (`OrderContext`, `OrderSummary`, `OrderDetails`, `OrderStatus`, `OrderWeek`, `OrderDeliverySlot`, `OrderError`, lifecycle names)  
-- [x] Sequence diagrams · permission model · relationships  
-- [x] EatClean lens · Order Intake boundary · Demand Channel ≠ Order Source  
-- [x] ADR 0062 · Capability Registry entry  
-- [x] **No UI · no CRUD · no DB changes · no implementation**
+- [x] Validation matrix automated (`order-validation.spec.ts`)  
+- [x] Process commands Plan→Complete PASS  
+- [x] CloseOrder / CancelOrder expected UNIMPLEMENTED  
+- [x] Week / Delivery Day / Customer / Identity / Laws PASS  
+- [x] ADR 0064 · Registry Engineering Certified  
+- [x] **No UI · no CRUD · no feature work**
 
 ---
 
@@ -461,8 +465,8 @@ Phase 1 does **not** move or rewrite these — Freeze only.
 
 ```text
 OPERATIONAL-003 Phase 1  Architecture   ✅ ADR 0062
-OPERATIONAL-003 Phase 2  Facade         ✅ ADR 0063 / this PR
-OPERATIONAL-003 Phase 3  Validate
+OPERATIONAL-003 Phase 2  Facade         ✅ ADR 0063
+OPERATIONAL-003 Phase 3  Validate       ✅ ADR 0064 · Engineering Certified
 OPERATIONAL-003 Phase 4  Capability Demo (Order Workspace · LAW 003/004)
-Then Production / Kitchen / Delivery consume Order language
+Then Production Capability Architecture (authorized)
 ```

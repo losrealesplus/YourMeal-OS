@@ -14,6 +14,10 @@ Operational Capabilities
         │
 Operational Experience   ← we are here
         │
+Operational Validation
+        │
+Production
+        │
 Tenant Success
 ```
 
@@ -31,8 +35,8 @@ We may still touch Foundation. It is no longer the protagonist.
 | Identity | Engineering Certified |
 | Customers | Engineering Certified |
 | Customer Workspace | Capability Demo (LAW 003) |
-| Orders | Architecture freeze (ADR 0062) |
-| Production / Delivery / Billing | Pending |
+| Orders | **Engineering Certified** (ADR 0064) |
+| Production / Kitchen / Delivery / Billing | Pending (Production authorized) |
 
 ---
 
