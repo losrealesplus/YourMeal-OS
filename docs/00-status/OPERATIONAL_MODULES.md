@@ -1,7 +1,7 @@
 # Operational Modules
 
-**Phase:** Operational Engine exists · Kitchen Execution Architecture frozen  
-**Board:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [GITHUB_HOUSEKEEPING](./GITHUB_HOUSEKEEPING.md)
+**Phase:** Operational Engine exists · Engine Completion · Kitchen Execution Facade  
+**Board:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md)
 
 ```text
 Platform / Foundation           Stable
@@ -11,28 +11,27 @@ Operational Planning
   Orders                        Engineering Certified + Demo
   Production                    Engineering Certified + Demo
 Operational Execution
-  Kitchen Execution             Architecture (ADR 0070)
+  Kitchen Execution             Facade (ADR 0071)
   Delivery                      Pending
 Operational Outcome
   Billing                       Pending
 ```
 
-## Rhythm
+## Engine Completion
 
 ```text
-Architecture → Facade → Engineering Certification → Capability Demo
+Context                 ████████████████
+Business Entity         ████████████████
+Operational Planning    ████████████████
+Operational Execution   ████░░░░░░░░░░░░
+Operational Outcome     ░░░░░░░░░░░░░░░░
 ```
 
-## Separation (LAW 005)
+## Separation (LAW 005 · 006)
 
 ```text
-Production → planifica   (Operational Planning)
-Kitchen Execution → orquesta ejecución   (Operational Execution)
+Production → planifica · Batches
+Kitchen Execution → orquesta · ExecutionUnits
 ```
 
-```text
-Kitchen = coordinar · priorizar · confirmar · pausar · reanudar · terminar
-Kitchen never cooks.
-```
-
-Next: **OPERATIONAL-005 Phase 2 · Kitchen Execution Facade**.
+Next: **OPERATIONAL-005 Phase 3 · Kitchen Execution Engineering Certification**.

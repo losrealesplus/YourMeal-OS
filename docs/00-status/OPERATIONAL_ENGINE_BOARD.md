@@ -1,6 +1,6 @@
 # Operational Engine — Official Board
 
-**Frozen:** 2026-08-06 · Operational Engine **exists** · LAW 005 · ADR [0070](../adr/0070-kitchen-execution-capability.md)  
+**Frozen:** 2026-08-06 · Operational Engine **exists** · Engine Completion framing · LAW 005–006 · ADR [0071](../adr/0071-kitchen-execution-facade.md)  
 **Companions:** [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) · [OPERATIONAL_DEPENDENCY_GRAPH](./OPERATIONAL_DEPENDENCY_GRAPH.md) · [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [FOUNDATION_STATUS](./FOUNDATION_STATUS.md)
 
 ```text
@@ -18,63 +18,62 @@ Stable
 
 ══════════════════════════════════════════════
 
-Operational Engine
+Operational Engine · Completion
 
 Context
-──────────────
+██████████████████████████
 
+Business Entity
+██████████████████████████
+
+Operational Planning
+██████████████████████████
+
+Operational Execution
+████░░░░░░░░░░░░░░░░░░░░░░
+
+Operational Outcome
+░░░░░░░░░░░░░░░░░░░░░░░░░░
+```
+
+---
+
+## Capability detail
+
+```text
+Context
+──────────────
 Identity
 ██████████████████████████
 Engineering Certified
 
-──────────────────────────────
-
 Business Entity
 ──────────────
-
 Customers
 ██████████████████████████
-Engineering Certified
-
-Capability Demo
-██████████████████████████
-
-──────────────────────────────
+Engineering Certified + Demo
 
 Operational Planning
 ──────────────
-
 Orders
 ██████████████████████████
-Engineering Certified
-
-Capability Demo
-██████████████████████████
+Engineering Certified + Demo
 
 Production
 ██████████████████████████
-Engineering Certified
-
-Capability Demo
-██████████████████████████
-
-──────────────────────────────
+Engineering Certified + Demo
 
 Operational Execution
 ──────────────
-
 Kitchen Execution
-████░░░░░░░░░░░░░░░░░░░░░░
-Architecture
+████████░░░░░░░░░░░░░░░░░░
+Facade (ADR 0071)
 
 Delivery
 ░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-──────────────────────────────
-
 Operational Outcome
 ──────────────
-
 Billing
 ░░░░░░░░░░░░░░░░░░░░░░░░░░
 ```
@@ -88,31 +87,34 @@ Operational Engine ya existe.
 
 No está completo.
 Pero ya existe.
+
+Engine Completion = fill Execution + Outcome.
 ```
 
-Planning (Orders + Production) is consumable.  
-Execution begins with Kitchen Execution Architecture (ADR 0070).  
-**Operational Engine v1.0** still requires Kitchen · Delivery · Billing Engineering Certified.
+---
+
+## Operational Grammar (LAW 006)
+
+| Layer | Capability | Question |
+|-------|------------|----------|
+| Context | Identity | ¿Quién opera? |
+| Business Entity | Customer | ¿Quién genera la demanda? |
+| Operational Planning | Order | ¿Qué prometimos? |
+| Operational Planning | Production | ¿Qué trabajo debemos generar? |
+| Operational Execution | Kitchen Execution | ¿Qué trabajo debe ejecutarse ahora? |
+| Operational Execution | Delivery | ¿Qué trabajo debe entregarse ahora? |
+| Operational Outcome | Billing | ¿Qué trabajo puede cerrarse y facturarse? |
 
 ---
 
 ## Fixed layers (permanent · LAW 005)
 
-Every new capability **must** declare its layer before Architecture starts:
-
 ```text
-Context
-    ↓
-Business Entity
-    ↓
-Operational Planning
-    ↓
-Operational Execution
-    ↓
-Operational Outcome
+Context → Business Entity → Operational Planning
+        → Operational Execution → Operational Outcome
 ```
 
-One Capability · one layer. Cross-layer only via Facade.
+One Capability · one layer · one question · cross-layer only via Facade.
 
 ---
 
@@ -122,11 +124,8 @@ One Capability · one layer. Cross-layer only via Facade.
 Architecture → Facade → Engineering Certification → Capability Demo
 ```
 
-One capability cycle at a time.
-
 ---
 
-## Next capability
+## Next
 
-**OPERATIONAL-005 · Kitchen Execution** — Architecture frozen (ADR 0070).  
-Facade next. Never plans. Consumes **ProductionFacade** only.
+**OPERATIONAL-005 Phase 3 · Kitchen Execution Engineering Certification**

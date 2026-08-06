@@ -65,6 +65,7 @@ Context → Business Entity → Operational Planning
 ```
 
 **FOUNDATION LAW 005:** one Capability · one layer · cross-layer only via Facade.  
+**FOUNDATION LAW 006:** one Capability · one canonical business question.  
 This taxonomy is the **business map**, not only a software label.
 
 | Maturity | Meaning |
@@ -88,7 +89,7 @@ Functional consumers — not import graphs.
 | Customer | Business Entity | Engineering Certified + Demo | Orders |
 | Orders | Operational Planning | Engineering Certified + Demo | Production |
 | Production | Operational Planning | **Engineering Certified + Demo** | Kitchen Execution |
-| Kitchen Execution | Operational Execution | **Architecture** | Delivery |
+| Kitchen Execution | Operational Execution | **Facade** | Delivery |
 | Delivery | Operational Execution | Pending | Billing |
 | Billing | Operational Outcome | Pending | — |
 
@@ -220,29 +221,31 @@ Production never cooks. Kitchen executes.
 
 | Field | Value |
 |-------|--------|
-| **Maturity** | **Architecture** |
+| **Maturity** | **Facade** |
 | **Type** | Operational Execution |
-| Completeness | Architecture ✅ · Facade ⏳ · Engineering Certification ⏳ · Capability Demo ⏳ |
+| Completeness | Architecture ✅ · **Facade ✅** · Engineering Certification ⏳ · Capability Demo ⏳ |
 | Consumida por | Delivery (canonical) |
 | Depends on | ProductionFacade only |
-| Version | 0.1 (Architecture freeze) |
-| ADRs | [0070](../adr/0070-kitchen-execution-capability.md) |
+| Version | 0.2 (Facade) |
+| ADRs | [0070](../adr/0070-kitchen-execution-capability.md) · [0071](../adr/0071-kitchen-execution-facade.md) |
 | Contract | [KITCHEN_EXECUTION_CAPABILITY](../05-architecture/KITCHEN_EXECUTION_CAPABILITY.md) |
-| Notes | ¿Qué trabajo debe ejecutarse ahora? · Never plans · never cooks · never mutates Orders |
+| Facade | `src/kitchen/KitchenExecutionFacade.ts` · `useKitchenExecution()` · ExecutionUnit Commands / Queries |
+| Notes | ¿Qué trabajo debe ejecutarse ahora? · Never plans · never cooks · ExecutionUnit (not KitchenBatch) |
 
 ```text
 Kitchen Execution
 ████ Architecture
-░░░░ Facade · Engineering Certified · Demo
+████ Facade
+░░░░ Engineering Certified · Demo
 
 Kitchen = coordinar · priorizar · confirmar
           · pausar · reanudar · terminar
+ExecutionUnit · never KitchenBatch
 Kitchen never cooks. Production never cooks.
-The physical kitchen cooks.
 ```
 
-First **Operational Execution** Capability — Architecture frozen.  
-Facade next (OPERATIONAL-005 Phase 2).
+First **Operational Execution** Capability — Facade implemented.  
+Engineering Certification next (OPERATIONAL-005 Phase 3).
 
 ---
 
@@ -304,10 +307,11 @@ Facade next (OPERATIONAL-005 Phase 2).
 | Orders | ¿Qué compromiso operativo tiene el tenant esta semana? |
 | Production | ¿Qué trabajo debe ejecutarse para cumplir los compromisos? |
 | Kitchen Execution | ¿Qué trabajo debe ejecutarse ahora? |
-| Delivery | ¿Qué hay que entregar? |
-| Billing | ¿Qué hay que cobrar? |
+| Delivery | ¿Qué trabajo debe entregarse ahora? |
+| Billing | ¿Qué trabajo puede cerrarse y facturarse? |
 
-Screens will change. These questions are the product core.
+Screens will change. These questions are the product core (**LAW 006**).
 
-**Exists:** [Operational Engine](./OPERATIONAL_ENGINE.md) (Planning complete · Execution started).  
+**Exists:** [Operational Engine](./OPERATIONAL_ENGINE.md) (Planning complete · Execution Facade).  
+**Engine Completion:** Execution + Outcome still open → [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md).  
 **Milestone v1.0:** full chain Identity→Billing Engineering Certified.

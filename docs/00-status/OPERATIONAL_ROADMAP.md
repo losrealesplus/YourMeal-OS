@@ -38,7 +38,7 @@ Operational Planning
 ────────────────────────────
 
 Operational Execution
-  Kitchen Execution     ✅ Architecture (ADR 0070)
+  Kitchen Execution     ✅ Facade (ADR 0071)
   Delivery              Pending
 
 ────────────────────────────
@@ -59,7 +59,7 @@ Operational Outcome
 | Customers | Business Entity | Engineering Certified + Demo |
 | Orders | Operational Planning | Engineering Certified + Demo |
 | **Production** | **Operational Planning** | **Engineering Certified + Demo** |
-| **Kitchen Execution** | **Operational Execution** | **Architecture** (ADR 0070) |
+| **Kitchen Execution** | **Operational Execution** | **Facade** (ADR 0071) |
 | Delivery | Operational Execution | Pending |
 | Billing | Operational Outcome | Pending |
 
@@ -87,12 +87,13 @@ Language: **certify** capabilities — not “develop screens”.
 
 ```text
 Architecture (ADR 0070)              ✅
-Facade                               ← next
-Engineering Certification
+Facade (ADR 0071)                    ✅ src/kitchen/
+Engineering Certification            ← next
 Capability Demo
 ```
 
-**Operational Engine exists.** Planning consumable. Execution Architecture frozen.
+**Operational Engine exists.** Engine Completion = Execution + Outcome.  
+**LAW 006** · ExecutionUnit language · ProductionFacade only.
 
 ---
 
@@ -101,8 +102,9 @@ Capability Demo
 1. ~~Production Engineering Certification~~ ✅ ADR 0068  
 2. ~~Production Workspace Demo~~ ✅ ADR 0069  
 3. ~~Kitchen Execution Capability Architecture~~ ✅ ADR 0070  
-4. **Kitchen Execution Facade** (OPERATIONAL-005 Phase 2)  
-5. Delivery · Billing → [Operational Engine v1.0](./OPERATIONAL_ENGINE.md)
+4. ~~Kitchen Execution Facade~~ ✅ ADR 0071  
+5. **Kitchen Execution Engineering Certification** (OPERATIONAL-005 Phase 3)  
+6. Delivery · Billing → [Operational Engine v1.0](./OPERATIONAL_ENGINE.md)
 
 Official board: [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)
 

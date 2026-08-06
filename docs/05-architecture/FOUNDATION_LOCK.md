@@ -311,3 +311,80 @@ LAW 005 keeps the chain clean for every tenant — starting with EatClean.
 | Billing mutates Orders to “fix” invoices | Belongs in Orders + Billing Facades separately |
 
 Source panel: [FOUNDATION_STATUS](../00-status/FOUNDATION_STATUS.md) · Board: [OPERATIONAL_ENGINE_BOARD](../00-status/OPERATIONAL_ENGINE_BOARD.md)
+
+---
+
+## Operational Grammar (permanente · YourMeal OS)
+
+```text
+Context
+────────────────────
+Identity
+¿Quién opera?
+
+↓
+
+Business Entity
+────────────────────
+Customer
+¿Quién genera la demanda?
+
+↓
+
+Operational Planning
+────────────────────
+Order
+¿Qué prometimos?
+
+↓
+
+Production
+¿Qué trabajo debemos generar?
+
+↓
+
+Operational Execution
+────────────────────
+Kitchen Execution
+¿Qué trabajo debe ejecutarse ahora?
+
+↓
+
+Delivery
+¿Qué trabajo debe entregarse ahora?
+
+↓
+
+Operational Outcome
+────────────────────
+Billing
+¿Qué trabajo puede cerrarse y facturarse?
+```
+
+This is the **language** of YourMeal OS — not only its architecture.  
+EatClean is the first tenant of this grammar, not the product.
+
+---
+
+## FOUNDATION LAW 006 (permanente · Domain)
+
+```text
+Every Capability
+must answer exactly one canonical business question.
+
+If a Capability answers more than one question,
+the domain boundary is incorrect.
+```
+
+| Capability | Canonical question (only) |
+|------------|---------------------------|
+| Identity | ¿Quién opera? |
+| Customer | ¿Quién genera la demanda? |
+| Order | ¿Qué prometimos? |
+| Production | ¿Qué trabajo debemos generar? |
+| Kitchen Execution | ¿Qué trabajo debe ejecutarse ahora? |
+| Delivery | ¿Qué trabajo debe entregarse ahora? |
+| Billing | ¿Qué trabajo puede cerrarse y facturarse? |
+
+**Never** a Capability that both plans and executes, or both executes and bills.  
+LAW 005 (layer) + LAW 006 (question) prevent giant modules as the product grows.
