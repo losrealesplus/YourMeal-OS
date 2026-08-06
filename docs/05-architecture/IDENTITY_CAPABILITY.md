@@ -444,9 +444,9 @@ Phase 1 freezes contracts only.
 
 ```text
 OPERATIONAL-001 Phase 1  Architecture   ✅ ADR 0055
-OPERATIONAL-001 Phase 2  Facade         ✅ / ADR 0056 · IdentityFacade + useIdentity
-OPERATIONAL-001 Phase 3  Validate       ⏳
-OPERATIONAL-002          Customers Capability (same 5 phases)
+OPERATIONAL-001 Phase 2  Facade         ✅ ADR 0056
+OPERATIONAL-001 Phase 3  Validate       ✅ ADR 0057 · engineering certified
+OPERATIONAL-002          Customers Capability (Observe → Design → Freeze)
 ```
 
 ### Facade entry (Phase 2)
@@ -457,3 +457,9 @@ src/identity/useIdentity.ts
 ```
 
 Modules: `identity.tenant` · `identity.permissions` · `identity.workspace` — never `supabase.auth.*`.
+
+### Validation (Phase 3)
+
+- Acta: [IDENTITY_VALIDATION_REPORT](../10-validation/IDENTITY_VALIDATION_REPORT.md) · ADR 0057  
+- Runner: `src/identity/identity-validation.spec.ts`  
+- Smoke: [IDENTITY_SMOKE_CHECKLIST](../10-validation/IDENTITY_SMOKE_CHECKLIST.md)
