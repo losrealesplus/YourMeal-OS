@@ -10,13 +10,40 @@ Platform → Foundation → Operational Modules → Capabilities → Validation 
 
 ---
 
+## Capability Maturity
+
+Not every capability is equally advanced. Track maturity, not % complete:
+
+```text
+Architecture
+    ↓
+Facade
+    ↓
+Engineering Certified
+    ↓
+Field Validated
+    ↓
+Production Ready
+```
+
+| Maturity | Meaning |
+|----------|---------|
+| Pending | Not started |
+| Architecture | Observe → Design → Freeze complete (contracts locked) |
+| Facade | Public business API implemented; storage never exposed |
+| Engineering Certified | Validation matrix PASS (WARNINGs allowed, FAIL = 0) |
+| Field Validated | Device / operator smoke PASS |
+| Production Ready | In production use for EatClean |
+
+---
+
 ## Registry
 
 ### 001 · Identity
 
 | Field | Value |
 |-------|--------|
-| **Status** | **Engineering Certified** |
+| **Maturity** | **Engineering Certified** |
 | Field Validation | Pending (OPPO checklist) |
 | Version | 1.0 |
 | ADRs | [0055](../adr/0055-identity-capability.md) · [0056](../adr/0056-identity-facade.md) · [0057](../adr/0057-identity-validation.md) |
@@ -36,18 +63,21 @@ Identity
 
 | Field | Value |
 |-------|--------|
-| **Status** | **Observe → Design → Freeze** (this PR) |
+| **Maturity** | **Facade** |
 | Field Validation | — |
-| Version | 0.1 (architecture) |
-| ADRs | [0058](../adr/0058-customer-capability.md) |
+| Version | 0.2 (facade) |
+| ADRs | [0058](../adr/0058-customer-capability.md) · [0059](../adr/0059-customer-facade.md) |
 | Contract | [CUSTOMER_CAPABILITY](../05-architecture/CUSTOMER_CAPABILITY.md) |
-| Facade | Not yet |
+| Facade | `src/customer/CustomerFacade.ts` · `useCustomer()` · Commands / Queries |
 | Validation | Not yet |
 
 ```text
 Customers
-████░░░░░░░░░░░░░░ Architecture freeze
+████████░░░░░░░░░░ Facade
+                    next: Validate
 ```
+
+Business question: **¿Quién genera la demanda?** (Demand Party — not “cliente CRUD”)
 
 ---
 
@@ -55,8 +85,8 @@ Customers
 
 | Field | Value |
 |-------|--------|
-| **Status** | Pending |
-| Notes | Depends on Identity + Customers |
+| **Maturity** | Pending |
+| Notes | Depends on Identity + Customers · question: ¿Qué hay que preparar? |
 
 ---
 
@@ -64,7 +94,8 @@ Customers
 
 | Field | Value |
 |-------|--------|
-| **Status** | Pending |
+| **Maturity** | Pending |
+| Notes | ¿Qué hay que cocinar? |
 
 ---
 
@@ -72,7 +103,7 @@ Customers
 
 | Field | Value |
 |-------|--------|
-| **Status** | Pending |
+| **Maturity** | Pending |
 
 ---
 
@@ -80,7 +111,7 @@ Customers
 
 | Field | Value |
 |-------|--------|
-| **Status** | Pending |
+| **Maturity** | Pending |
 
 ---
 
@@ -88,7 +119,8 @@ Customers
 
 | Field | Value |
 |-------|--------|
-| **Status** | Pending |
+| **Maturity** | Pending |
+| Notes | ¿Qué hay que entregar? |
 
 ---
 
@@ -96,7 +128,8 @@ Customers
 
 | Field | Value |
 |-------|--------|
-| **Status** | Pending |
+| **Maturity** | Pending |
+| Notes | ¿Qué hay que cobrar? |
 
 ---
 
@@ -104,7 +137,7 @@ Customers
 
 | Field | Value |
 |-------|--------|
-| **Status** | Pending |
+| **Maturity** | Pending |
 
 ---
 
@@ -112,20 +145,7 @@ Customers
 
 | Field | Value |
 |-------|--------|
-| **Status** | Pending |
-
----
-
-## Status vocabulary
-
-| Status | Meaning |
-|--------|---------|
-| Pending | Not started |
-| Observe / Design / Freeze | Architecture in progress or frozen |
-| Facade | Public API implemented |
-| Engineering Certified | Validation matrix PASS (WARNINGs allowed, FAIL = 0) |
-| Field Validated | Device/operator smoke PASS |
-| Released | In production use for EatClean |
+| **Maturity** | Pending |
 
 ---
 
@@ -135,3 +155,16 @@ Customers
 > Sí → entra. No → espera.
 
 Not the best generic CRM — the best flow for a catering company that prep, cooks, and delivers every week.
+
+## Language of the business
+
+| Capability | Question |
+|------------|----------|
+| Identity | ¿Quién está operando? |
+| Customer | ¿Quién genera la demanda? |
+| Orders | ¿Qué hay que preparar? |
+| Production | ¿Qué hay que cocinar? |
+| Delivery | ¿Qué hay que entregar? |
+| Billing | ¿Qué hay que cobrar? |
+
+Screens will change. These questions are the product core.

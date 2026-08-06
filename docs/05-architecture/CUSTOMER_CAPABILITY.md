@@ -1,10 +1,11 @@
 # Customer Capability
 
-**OPERATIONAL-002 · Phase 1 — Observe → Design → Freeze**  
-**ADR:** [0058 — Customer Capability](../adr/0058-customer-capability.md)  
-**Status:** **FROZEN** (architecture only — no implementation in this phase)  
+**OPERATIONAL-002 · Phase 2 — Facade**  
+**ADR:** [0058 — Customer Capability](../adr/0058-customer-capability.md) · [0059 — Customer Facade](../adr/0059-customer-facade.md)  
+**Status:** **Facade** (public API implemented — no CRUD screens / routing in this phase)  
 **Depends on:** Identity Capability (ADR 0055–0057 · Engineering Certified)  
-**EatClean lens:** weekly meal prep · particulares + empresas · delivery locations · production grouping
+**EatClean lens:** weekly meal prep · particulares + empresas · delivery locations · production grouping  
+**Maturity:** Architecture → **Facade** → Engineering Certified → Field Validated → Production Ready
 
 ---
 
@@ -278,15 +279,19 @@ export type CustomerResult = {
 
 Company Account detail contracts remain those in ADR 0015 / `CompanyAccount` domain types — Customer Capability **references** them; it does not fork a parallel company CRM.
 
-### Facade (contract only — Implement later)
+### Facade (ADR 0059 — implemented)
 
 ```ts
-interface CustomerFacade {
-  getContext(partyRef: { kind: "individual" | "company_account"; id: string }): Promise<CustomerResult>;
-  search(query: string): Promise<CustomerSummary[]>;
-  // mutate APIs in Facade phase — not this ADR
-}
+// src/customer/CustomerFacade.ts · useCustomer()
+// Commands (write intent) — not customer.save()
+CreateCustomer | UpdateCustomer | ArchiveCustomer | RestoreCustomer | MergeCustomer
+
+// Queries (read intent) — not customer.search()
+GetCustomer | SearchCustomers | ListRecentCustomers | GetDeliveryLocations | GetCompanyAccounts
 ```
+
+Operational Modules consume **only** `CustomerFacade` / `useCustomer`.  
+UI never imports repositories, Supabase, or infrastructure (FOUNDATION LAW 002).
 
 ---
 
@@ -312,7 +317,7 @@ sequenceDiagram
   autonumber
   participant UI as Ops UI
   participant Id as IdentityFacade
-  participant Cust as CustomerFacade (future)
+  participant Cust as CustomerFacade
   participant Dir as CustomerDirectoryService
 
   UI->>Id: useIdentity()
@@ -372,7 +377,9 @@ Phase 1 does **not** move or rewrite these — Freeze only.
 | Comms preferences | Persist opt-in · quiet hours |
 | `customers.self` | Freeze self-service caps with Identity |
 | `membershipId` on writes | Close Identity V10 WARNING |
-| CustomerFacade | OPERATIONAL-002 Phase 2 |
+| CustomerFacade | ✅ ADR 0059 (`src/customer/`) |
+| UpdateCustomer / RestoreCustomer substrate | UNIMPLEMENTED intent frozen — wire in Validate / UI |
+| Individual delivery addresses (CJ-002) | GetDeliveryLocations individual gap |
 
 ---
 
@@ -396,15 +403,23 @@ Phase 1 does **not** move or rewrite these — Freeze only.
 - [x] EatClean operational lens  
 - [x] Extension points  
 - [x] ADR 0058 · Capability Registry entry  
-- [ ] **No UI · no CRUD · no DB changes · no implementation**
+- [x] **No UI · no CRUD · no DB changes · no implementation** (Phase 1)
+
+## Acceptance (Phase 2 — Facade)
+
+- [x] `CustomerFacade` · `useCustomer` · Commands · Queries  
+- [x] Compose Directory + CompanyAccount — no storage exposure  
+- [x] FOUNDATION LAW 002 · Capability Maturity in Registry  
+- [x] ADR 0059  
+- [x] **No CRUD screens · no routing · no business workflow rewrite**
 
 ---
 
 ## Next
 
 ```text
-OPERATIONAL-002 Phase 1  Architecture   ✅ / this PR
-OPERATIONAL-002 Phase 2  Facade         (compose Directory + CompanyAccount)
+OPERATIONAL-002 Phase 1  Architecture   ✅ ADR 0058
+OPERATIONAL-002 Phase 2  Facade         ✅ ADR 0059 / this PR
 OPERATIONAL-002 Phase 3  Validate
 Then UI / smoke for EatClean directory & CJ-001 links
 ```
