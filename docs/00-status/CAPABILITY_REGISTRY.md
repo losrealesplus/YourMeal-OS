@@ -3,12 +3,14 @@
 **YourMeal OS · Product control panel**  
 **Permanent quartet + board:** [PLATFORM_STATUS](./PLATFORM_STATUS.md) · [FOUNDATION_STATUS](./FOUNDATION_STATUS.md) · this Registry · [OPERATIONAL_ROADMAP](./OPERATIONAL_ROADMAP.md) · **[OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)**  
 **Rule:** We track **Capabilities certified**, not “PRs merged”.  
-**Methodology:** Observe → Design → Freeze → Facade → **Engineering Certification** → Capability Demo → Operational Experience → Field → Production Ready
+**Methodology:** Observe → Design → Freeze → Facade → **Engineering Certification** → Capability Demo → Field Validation → **Cross-Platform Validation** → Production Ready
 
 ```text
 Platform → Foundation → Operational Capabilities → Operational Experience
-→ Operational Validation → Production
+→ Operational Validation → Cross-Platform Validation → Production
 ```
+
+**Expansion era:** [OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md) · first module OPERATIONAL-006 Delivery (Architecture)
 
 **Graph:** [OPERATIONAL_DEPENDENCY_GRAPH](./OPERATIONAL_DEPENDENCY_GRAPH.md) · **Board:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)
 
@@ -90,7 +92,7 @@ Functional consumers — not import graphs.
 | Orders | Operational Planning | Engineering Certified + Demo | Production |
 | Production | Operational Planning | **Engineering Certified + Demo** | Kitchen Execution |
 | Kitchen Execution | Operational Execution | **Engineering Certified + Demo** | Delivery |
-| Delivery | Operational Execution | Pending | Billing |
+| Delivery | Operational Execution | **Architecture** | Billing |
 | Billing | Operational Outcome | Pending | — |
 
 **Discipline:** Never open two new operational capabilities at once.  
@@ -249,39 +251,53 @@ Final isolated Capability Demo before Phase B.
 ```
 
 First **Operational Execution** Capability — Engineering Certified + Demo.  
-**Phase A complete.** Next: **OPERATIONAL-FLOW-001** (Orders → Production → Kitchen).
+**Phase A complete.** FLOW-001 Engineering Certified.  
+**Expansion:** OPERATIONAL-006 Delivery · Architecture Freeze (ADR 0078).
 
 ---
 
-### 006 · Inventory
+### 006 · Delivery
 
 | Field | Value |
 |-------|--------|
-| **Maturity** | Pending |
-
----
-
-### 007 · Delivery
-
-| Field | Value |
-|-------|--------|
-| **Maturity** | Pending |
+| **Maturity** | **Architecture** |
 | **Type** | Operational Execution |
-| Notes | ¿Qué hay que entregar? |
+| Completeness | **Architecture ✅** · Facade ⏳ · Validation ⏳ · Demo ⏳ · Field ⏳ |
+| Consumida por | Billing (canonical) · FLOW-002 |
+| Depends on | KitchenExecutionFacade · OrderFacade (commitment facts) |
+| Version | 0.1 (contracts frozen) |
+| ADRs | [0078](../adr/0078-delivery-capability.md) |
+| Contract | [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) |
+| Facade | — Phase 2 |
+| Notes | OPERATIONAL-006 · LAW 006 question below · never drives / cooks / bills |
+
+```text
+Delivery
+████ Architecture
+░░░░ Facade · Certification · Demo · Field
+
+Question: ¿Qué compromisos operativos deben entregarse ahora
+          y cómo confirmamos su ejecución?
+
+Delivery = asignar · rutear · confirmar · evidenciar · exceptuar
+```
+
+Second **Operational Execution** Capability — Architecture Freeze only.  
+**No implementation in this phase.**
 
 ---
 
-### 008 · Billing
+### 007 · Billing
 
 | Field | Value |
 |-------|--------|
 | **Maturity** | Pending |
 | **Type** | Operational Outcome |
-| Notes | ¿Qué hay que cobrar? |
+| Notes | ¿Qué trabajo puede cerrarse y facturarse? · after Delivery |
 
 ---
 
-### 009 · Analytics
+### 008 · Inventory
 
 | Field | Value |
 |-------|--------|
@@ -289,7 +305,23 @@ First **Operational Execution** Capability — Engineering Certified + Demo.
 
 ---
 
-### 010 · Administration
+### 009 · Procurement
+
+| Field | Value |
+|-------|--------|
+| **Maturity** | Pending |
+
+---
+
+### 010 · Analytics
+
+| Field | Value |
+|-------|--------|
+| **Maturity** | Pending |
+
+---
+
+### 011 · Administration
 
 | Field | Value |
 |-------|--------|
@@ -311,14 +343,15 @@ First **Operational Execution** Capability — Engineering Certified + Demo.
 | Orders | ¿Qué compromiso operativo tiene el tenant esta semana? |
 | Production | ¿Qué trabajo debe ejecutarse para cumplir los compromisos? |
 | Kitchen Execution | ¿Qué trabajo debe ejecutarse ahora? |
-| Delivery | ¿Qué trabajo debe entregarse ahora? |
+| Delivery | ¿Qué compromisos operativos deben entregarse ahora y cómo confirmamos su ejecución? |
 | Billing | ¿Qué trabajo puede cerrarse y facturarse? |
 
 Screens will change. These questions are the product core (**LAW 006**).
 
 **Exists / v0.8:** [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) — Identity→Kitchen + FLOW-001 certified.  
-**Flows:** [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md) — FLOW-001 Engineering Certified.  
-**Review:** [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) — after Flow Demo.  
-**Phases:** [OPERATIONAL_CERTIFICATION_PHASES](./OPERATIONAL_CERTIFICATION_PHASES.md) — Validation era.  
+**Expansion:** [OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md) — Delivery Architecture → …  
+**Flows:** [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md) — FLOW-001 Engineering Certified · FLOW-002 Pending.  
+**Review:** [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md).  
+**Phases:** [OPERATIONAL_CERTIFICATION_PHASES](./OPERATIONAL_CERTIFICATION_PHASES.md).  
 **Engine Completion:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md).  
 **Milestone v1.0:** full chain Identity→Billing + flows certified.

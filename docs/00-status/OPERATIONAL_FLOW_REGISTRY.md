@@ -12,9 +12,10 @@ Flows own lawful collaboration between Capabilities.
 ```
 
 **Rule:** We track **Flows certified**, not “integrations shipped”.  
-**Method (unchanged):** Observe → Design → Freeze → **Harness** → Engineering Certification → Flow Demo  
+**Method:** Observe → Design → Freeze → **Harness** → Engineering Certification → Flow Demo → Field → **Cross-Platform Validation** → Production  
 **Law:** [FOUNDATION LAW 007](../05-architecture/FOUNDATION_LOCK.md) — Flows never bypass Capabilities / Facades.  
-**Naming:** Flow Phase 2 = **Harness** (not Facade) — orchestration only.
+**Naming:** Flow Phase 2 = **Harness** (not Facade) — orchestration only.  
+**Expansion:** [OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md)
 
 ```text
 Capability owns business behaviour.
@@ -80,9 +81,9 @@ Order ──Facade──▶ Production ──Facade──▶ Kitchen
 | Field | Value |
 |-------|--------|
 | **Maturity** | Pending |
-| **Canonical question** | ¿Puede el trabajo ejecutado convertirse en trabajo entregable? |
+| **Canonical question** | ¿Puede el trabajo ejecutado convertirse en trabajo entregable y confirmado? |
 | **Chain** | Production → Kitchen → Delivery |
-| **Notes** | Begins only after FLOW-001 cycle (prefer Demo). Requires Delivery Capability. |
+| **Notes** | Requires Delivery **Facade** (ADR 0078 Architecture only today). Prefer FLOW-001 Demo first. |
 
 ---
 
@@ -100,7 +101,8 @@ Order ──Facade──▶ Production ──Facade──▶ Kitchen
 ## Discipline
 
 Never open two new Operational Flows at once.  
-Complete **Architecture → Harness → Certification → Demo** for FLOW-001 before FLOW-002 Architecture.
+Complete **Architecture → Harness → Certification → Demo** for FLOW-001 before FLOW-002 Architecture.  
+Delivery Capability Architecture (OPERATIONAL-006) may freeze before FLOW-002.
 
 ---
 

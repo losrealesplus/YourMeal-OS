@@ -81,7 +81,7 @@ Each capability records:
 | Orders | Operational Planning | Engineering Certified + Demo | Identity · Customer | Production |
 | Production | Operational Planning | **Engineering Certified + Demo** | Identity · Orders | Kitchen Execution |
 | Kitchen Execution | Operational Execution | **Engineering Certified + Demo** | ProductionFacade only | Delivery |
-| Delivery | Operational Execution | Pending | Kitchen Execution | Billing |
+| Delivery | Operational Execution | **Architecture** | KitchenExecutionFacade · OrderFacade (facts) | Billing |
 | Billing | Operational Outcome | Pending | Delivery | — |
 
 ---
@@ -95,7 +95,7 @@ Each capability records:
 | Orders | ¿Qué prometimos? |
 | Production | ¿Qué trabajo debemos generar? |
 | Kitchen Execution | ¿Qué trabajo debe ejecutarse ahora? |
-| Delivery | ¿Qué trabajo debe entregarse ahora? |
+| Delivery | ¿Qué compromisos operativos deben entregarse ahora y cómo confirmamos su ejecución? |
 | Billing | ¿Qué trabajo puede cerrarse y facturarse? |
 
 ---

@@ -383,7 +383,7 @@ the domain boundary is incorrect.
 | Order | ¿Qué prometimos? |
 | Production | ¿Qué trabajo debemos generar? |
 | Kitchen Execution | ¿Qué trabajo debe ejecutarse ahora? |
-| Delivery | ¿Qué trabajo debe entregarse ahora? |
+| Delivery | ¿Qué compromisos operativos deben entregarse ahora y cómo confirmamos su ejecución? |
 | Billing | ¿Qué trabajo puede cerrarse y facturarse? |
 
 **Never** a Capability that both plans and executes, or both executes and bills.  
