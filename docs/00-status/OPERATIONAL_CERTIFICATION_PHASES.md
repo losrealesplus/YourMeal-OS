@@ -14,8 +14,8 @@ Identity → Customers → Orders → Production → Kitchen
 
 PHASE B
 Operational Flow Validation
-████░░░░░░░░░░░░░░░
-OPERATIONAL-FLOW-001  Architecture ✅ (ADR 0074)
+████████░░░░░░░░░░░
+OPERATIONAL-FLOW-001  Harness ✅ (ADR 0075)
 OPERATIONAL-FLOW-002  Pending
 OPERATIONAL-FLOW-003  Pending
 
@@ -40,15 +40,17 @@ Registry: [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md)
 
 | Flow | Chain | Status | Canonical question |
 |------|-------|--------|--------------------|
-| **001** | Orders → Production → Kitchen | **Architecture** | ¿Puede un compromiso operativo convertirse en trabajo ejecutado sin romper ninguna Foundation Law? |
+| **001** | Orders → Production → Kitchen | **Harness** | ¿Puede un compromiso operativo convertirse en trabajo ejecutado sin romper ninguna Foundation Law? |
 | **002** | Production → Kitchen → Delivery | Pending | ¿Puede el trabajo ejecutado convertirse en trabajo entregable? |
 | **003** | Delivery → Billing | Pending | ¿Puede el trabajo entregado convertirse en resultado económico? |
 
 Flow method (unchanged from Capability rhythm):
 
 ```text
-Observe → Design → Freeze → Facade → Engineering Certification → Flow Demo
+Observe → Design → Freeze → Harness → Engineering Certification → Flow Demo
 ```
+
+Constitution stable: **no new Foundation Laws** unless tenant evidence proves insufficiency (001–007 complete).
 
 ## Phase C — EatClean as first tenant of the pattern
 

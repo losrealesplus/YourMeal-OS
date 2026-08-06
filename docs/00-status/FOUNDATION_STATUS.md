@@ -34,6 +34,9 @@ Foundation is **complete as the project center**. Era center moved to **Operatio
 
 Source: [FOUNDATION_LOCK](../05-architecture/FOUNDATION_LOCK.md)
 
+**Constitution note:** LAW 001–007 form a complete system. Do not add Foundation Laws unless real tenant evidence proves the current set insufficient.
+
+
 ---
 
 ## Operational Model (permanent)

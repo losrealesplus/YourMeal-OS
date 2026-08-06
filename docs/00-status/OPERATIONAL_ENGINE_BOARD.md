@@ -1,7 +1,7 @@
 # Operational Engine — Official Board
 
-**Frozen:** 2026-08-06 · Phase A COMPLETE · FLOW-001 Architecture · ADR [0074](../adr/0074-operational-flow-001.md)  
-**Companions:** [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) · [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md) · [OPERATIONAL_CERTIFICATION_PHASES](./OPERATIONAL_CERTIFICATION_PHASES.md) · [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md)
+**Frozen:** 2026-08-06 · FLOW-001 Harness · ADR [0075](../adr/0075-operational-flow-001-harness.md)  
+**Companions:** [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md) · [OPERATIONAL_JOURNEY_REGISTRY](./OPERATIONAL_JOURNEY_REGISTRY.md) (reserved) · [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md)
 
 ```text
 YOURMEAL OS
@@ -10,7 +10,7 @@ YOURMEAL OS
 
 Platform / Foundation
 ██████████████████████████
-Stable
+Stable · LAW 001–007 frozen
 
 ══════════════════════════════════════════════
 
@@ -19,8 +19,8 @@ PHASE A · Capability Certification
 COMPLETE
 
 PHASE B · Operational Flow Validation
-████░░░░░░░░░░░░░░░░░░░░░░
-FLOW-001 Architecture
+████████░░░░░░░░░░░░░░░░░░
+FLOW-001 Harness
 
 PHASE C · Real Tenant Validation
 ░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -74,8 +74,8 @@ Orders
 Production
     ↓
 Kitchen
-████░░░░░░░░░░░░░░░░
-Architecture (ADR 0074)
+████████░░░░░░░░░░░░
+Harness (ADR 0075)
 
 FLOW-002
 Production
@@ -93,23 +93,13 @@ Billing
 ────────────────────
 ```
 
-Two perspectives, one engine:
-
-* **Capabilities** — certified pieces  
-* **Flows** — certified collaborations  
-
----
-
-## FLOW-001 question
-
 ```text
-¿Puede un compromiso operativo convertirse en trabajo
-ejecutado sin romper ninguna Foundation Law?
+FLOW validates transitions.
+NOT validate Capabilities.
 ```
 
 ---
 
 ## Next
 
-**OPERATIONAL-FLOW-001 Phase 2** — Facade / harness (same method rhythm).  
-No Delivery Capability Architecture until FLOW-001 cycle prefers Demo.
+**OPERATIONAL-FLOW-001 Phase 3 — Engineering Certification**

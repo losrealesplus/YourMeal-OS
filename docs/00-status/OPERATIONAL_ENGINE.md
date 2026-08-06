@@ -94,7 +94,7 @@ Operational Outcome     ░░░░░░░░░░░░░░░░
 
 ```text
 PHASE A · Capability Certification     ████████████████  COMPLETE
-PHASE B · Operational Flow Validation  ████░░░░░░░░░░░░  FLOW-001 Architecture
+PHASE B · Operational Flow Validation  ████████░░░░░░░░  FLOW-001 Harness
 PHASE C · Real Tenant Validation       ░░░░░░░░░░░░░░░░
 ```
 

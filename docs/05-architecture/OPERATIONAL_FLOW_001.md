@@ -1,20 +1,43 @@
 # OPERATIONAL-FLOW-001
 
 **Orders → Production → Kitchen**  
-**Phase 1 — Observe → Design → Freeze**  
-**ADR:** [0074](../adr/0074-operational-flow-001.md)  
-**Status:** **Architecture** (frozen)  
+**Phase 2 — Operational Flow Harness**  
+**ADR:** [0074](../adr/0074-operational-flow-001.md) · [0075](../adr/0075-operational-flow-001-harness.md)  
+**Status:** **Harness** (Architecture frozen · Harness implemented)  
 **Phase:** B · Operational Flow Validation  
 **Laws:** 001–007 · [FOUNDATION_LOCK](./FOUNDATION_LOCK.md)  
-**Registry:** [OPERATIONAL_FLOW_REGISTRY](../00-status/OPERATIONAL_FLOW_REGISTRY.md)
+**Registry:** [OPERATIONAL_FLOW_REGISTRY](../00-status/OPERATIONAL_FLOW_REGISTRY.md)  
+**Package:** `src/flows/flow-001/` · `Flow001Harness` · `useFlow001`
 
 ```text
 This is NOT a Capability.
 
 It is an Operational Flow.
 
+FLOW validates transitions.
+NOT validate Capabilities.
+
 It validates collaboration between certified Capabilities.
 It never owns business logic.
+```
+
+### Official definitions
+
+```text
+Capability
+owns business behaviour.
+
+Operational Flow
+owns capability collaboration.
+
+Business behaviour never migrates
+from Capability to Flow.
+```
+
+```text
+Capabilities own business logic.
+Flows own transitions.
+Harnesses orchestrate certified Facades.
 ```
 
 ---
@@ -188,19 +211,47 @@ Same certified method — applied to a Flow, not a Capability:
 ```text
 Observe → Design → Freeze
     ↓
-Facade (Flow composition / harness — not a new business Facade)
+Operational Flow Harness   ← not a business Facade
     ↓
 Engineering Certification
     ↓
 Flow Demo
 ```
 
-No new methodology. No new phases beyond Phase B already frozen.
+**Naming:** Phase 2 is **Harness**, not Facade — so the Flow is never mistaken for owning business logic.
+
+No new methodology. No new Foundation Laws in this era (001–007 complete the constitution).
+
+---
+
+## Operational Flow Harness (Phase 2 · ADR 0075)
+
+```text
+src/flows/flow-001/
+  Flow001Harness.ts
+  Flow001Context.ts
+  Flow001Result.ts
+  useFlow001.ts
+```
+
+| Responsibility | Harness |
+|----------------|---------|
+| Invoke OrderFacade · ProductionFacade · KitchenExecutionFacade | ✅ |
+| Propagate tenant · permissions · operator · evidence | ✅ |
+| Business logic · replace Facades · repos · Supabase | ❌ |
+
+```text
+runCommitmentToExecutedWork(day)
+  IdentityGate
+  → OrderHop          (OrderFacade.getOrdersByDeliveryDay)
+  → ProductionHop     (ProductionFacade.generateProductionPlan)
+  → KitchenHop        (KitchenExecutionFacade.getExecutionQueue)
+  → ExecutionComplete (MarkExecutionReady + CompleteExecution)
+```
 
 ---
 
 ## Sequence (conceptual)
-
 ```text
 Operator (Identity)
   → OrderFacade: commitment for week/day
@@ -226,7 +277,9 @@ FLOW-001 must freeze before FLOW-002 Architecture starts.
 
 ---
 
-## Acceptance (Phase 1)
+## Acceptance
+
+### Phase 1 (Architecture) ✅
 
 - [x] Canonical definition: Flow ≠ Capability  
 - [x] Canonical question frozen  
@@ -235,6 +288,14 @@ FLOW-001 must freeze before FLOW-002 Architecture starts.
 - [x] ADR 0074 · Flow Registry entry  
 - [x] Board shows Capabilities + Operational Flows  
 - [x] **No UI · no implementation · no Delivery · no Billing**
+
+### Phase 2 (Harness) ✅
+
+- [x] `Flow001Harness` · `useFlow001`  
+- [x] Compose OrderFacade → ProductionFacade → KitchenExecutionFacade only  
+- [x] Evidence continuity per hop  
+- [x] ADR 0075  
+- [x] **No UI · no routing · no business logic in Flow**
 
 ---
 
@@ -246,6 +307,9 @@ There is exactly one canonical definition answering:
 "How does an operational commitment become executed work?"
 
 without violating any Foundation Law.
+
+FLOW-001 Harness is the canonical orchestration layer between
+Order · Production · Kitchen.
 ```
 
 ---
@@ -254,7 +318,7 @@ without violating any Foundation Law.
 
 ```text
 OPERATIONAL-FLOW-001 Phase 1  Architecture     ✅ ADR 0074
-OPERATIONAL-FLOW-001 Phase 2  Facade / harness  ← next
-OPERATIONAL-FLOW-001 Phase 3  Engineering Certification
+OPERATIONAL-FLOW-001 Phase 2  Harness          ✅ ADR 0075
+OPERATIONAL-FLOW-001 Phase 3  Engineering Certification ← next
 OPERATIONAL-FLOW-001 Phase 4  Flow Demo
 ```
