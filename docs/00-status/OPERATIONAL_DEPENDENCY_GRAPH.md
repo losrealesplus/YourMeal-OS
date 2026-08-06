@@ -1,7 +1,7 @@
 # Operational Dependency Graph
 
-**Permanent · updated 2026-08-06 with ADR [0070](../adr/0070-kitchen-execution-capability.md) · LAW 005**  
-**Companions:** [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) · [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [OPERATIONAL_ROADMAP](./OPERATIONAL_ROADMAP.md)
+**Permanent · updated 2026-08-06 with ADR [0081](../adr/0081-operational-flow-002.md) · LAW 005 · LAW 007**  
+**Companions:** [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md) · [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) · [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [OPERATIONAL_ROADMAP](./OPERATIONAL_ROADMAP.md)
 
 ---
 
@@ -24,7 +24,25 @@ Customer       Orders
               Delivery
                   │
                   ▼
-               Billing
+          Confirmation  ← FLOW-002 ends here
+                  │
+                  ▼
+               Billing  ← FLOW-003 / Outcome
+```
+
+---
+
+## Operational Flows (LAW 007)
+
+```text
+FLOW-001  Order → Production → Kitchen → Execution Completed
+          (Engineering Certified)
+
+FLOW-002  Order → Production → Kitchen → Delivery → Confirmation
+          (Architecture · Operational Fulfillment Flow)
+
+FLOW-003  Confirmation → Billing
+          (Pending)
 ```
 
 ---

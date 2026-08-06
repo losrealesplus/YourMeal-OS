@@ -59,11 +59,12 @@ Observe
 ```text
 OPERATIONAL-006  Delivery          ← Architecture ✅ · Facade ✅ · Engineering Certified ✅
         ↓
-FLOW-002         Kitchen → Delivery   (after Delivery Demo preferido)
+FLOW-002         Operational Fulfillment   ← Architecture ✅ (ADR 0081)
+                 Order → … → Confirmation
         ↓
 OPERATIONAL-007  Billing
         ↓
-FLOW-003         Delivery → Billing
+FLOW-003         Confirmation → Billing
         ↓
 OPERATIONAL-008  Inventory
         ↓
@@ -85,14 +86,14 @@ IOS-READY-001 / FIELD-VALIDATION-002
 
 ## First mission status
 
-**OPERATIONAL-006 · Delivery**  
-Phase 1 Architecture ✅ · Phase 2 Facade ✅ · Phase 3 Certification ✅ · Phase 4 Demo ◀ next
+**OPERATIONAL-006 · Delivery** — Engineering Certified ✅ · Demo preferido  
+**OPERATIONAL-FLOW-002** — Architecture Freeze ✅ · Harness gated
 
-Canonical question:
+Canonical Flow question:
 
-> ¿Qué compromisos operativos deben entregarse ahora y cómo confirmamos su ejecución?
+> ¿Puede un compromiso operativo convertirse en una entrega confirmada sin romper ninguna Foundation Law?
 
-Contract: [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) · Facade: `src/delivery/` · Report: [DELIVERY_VALIDATION_REPORT](../10-validation/DELIVERY_VALIDATION_REPORT.md)
+Contract: [OPERATIONAL_FLOW_002](../05-architecture/OPERATIONAL_FLOW_002.md) · Delivery: [DELIVERY_VALIDATION_REPORT](../10-validation/DELIVERY_VALIDATION_REPORT.md)
 
 ---
 
@@ -100,7 +101,7 @@ Contract: [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) · Fa
 
 | Item | Lock |
 |------|------|
-| Delivery Product UI / DB | Until Phase 4+ |
-| FLOW-002 Harness | Until Delivery Certification (prefer Demo) |
-| Billing Architecture | Prefer after Delivery Demo |
+| Delivery Product UI / DB | Until Demo+ |
+| FLOW-002 Harness | Prefer Delivery Demo · FLOW-001 Demo |
+| Billing Architecture | After FLOW-002 (prefer Demo) |
 | Claiming Engine **FIELD VALIDATED** | Until iPhone PASS + Android PASS |

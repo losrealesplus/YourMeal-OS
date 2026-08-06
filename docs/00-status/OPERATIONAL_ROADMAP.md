@@ -32,10 +32,11 @@ Roadmap Review (Engine Review) — continuous with Expansion
 1. OPERATIONAL-006 Delivery · Architecture ✅ (ADR 0078)
 2. Delivery Facade (Phase 2) ✅ (ADR 0079)
 3. Delivery Engineering Certification (Phase 3) ✅ (ADR 0080)
-4. Delivery Capability Demo (Phase 4) ◀ next
-5. FLOW-002 Architecture 🔒 after Delivery Certification (prefer Demo)
-6. OPERATIONAL-007 Billing …
-7. FLOW-003 …
+4. FLOW-002 Architecture ✅ (ADR 0081) · Operational Fulfillment Flow
+5. Delivery Capability Demo / FLOW-001 Demo (prefer before Harness) ◀ parallel
+6. FLOW-002 Harness (Phase 2) 🔒 prefer Demos
+7. OPERATIONAL-007 Billing … (after FLOW-002)
+8. FLOW-003 …
 ```
 
 ### Method (permanent)
@@ -51,7 +52,7 @@ Observe → Design → Freeze → Facade/Harness → Engineering Certification
 
 ```text
 PHASE A · Capability Certification     ████████████████ COMPLETE
-PHASE B · Operational Flow Validation  ████████████░░░░ FLOW-001 Certified · Demo next
+PHASE B · Operational Flow Validation  ████████████░░░░ FLOW-001 Certified · FLOW-002 Architecture
 PHASE C · Real Tenant Validation       ░░░░░░░░░░░░░░░░
 ```
 
@@ -63,7 +64,19 @@ PHASE C · Real Tenant Validation       ░░░░░░░░░░░░░�
 Architecture (ADR 0074)              ✅
 Harness (ADR 0075)                   ✅
 Engineering Certification (ADR 0076) ✅
-Flow Demo                            ← next
+Flow Demo                            ← parallel prefer
+```
+
+---
+
+## FLOW-002 track · Operational Fulfillment Flow
+
+```text
+Architecture (ADR 0081)              ✅
+Harness                              ← next (prefer Demos)
+Engineering Certification
+Flow Demo
+Ends at: Delivery Confirmation (not Billing)
 ```
 
 ---
