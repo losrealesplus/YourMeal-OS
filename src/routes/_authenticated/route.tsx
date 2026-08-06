@@ -5,12 +5,18 @@ import { ensureApplicationReady } from "@/bootstrap/ready";
 /**
  * Product Core entry — blocked until Application Ready Gate says READY (ADR 0053).
  * Public auth/landing routes are outside this layout and remain ungated.
+ *
+ * Route context contract: `beforeLoad` MUST return `{ user }` so child layouts
+ * (`/admin`, `/saas`, `/driver`) can read `context.user` without re-fetching.
+ * Discarding the return of `requireAuthenticatedUser()` leaves `context.user`
+ * undefined and triggers `Missing auth context` on those children.
  */
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async () => {
-    await requireAuthenticatedUser();
+    const { user } = await requireAuthenticatedUser();
     await ensureApplicationReady();
+    return { user };
   },
   component: () => <Outlet />,
 });
