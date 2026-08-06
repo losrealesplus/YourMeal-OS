@@ -5,7 +5,7 @@
 **Status:** **Engineering Certified + Capability Demo** (`/admin/production-workspace`)  
 **Depends on:** Identity · Customers · Orders (Engineering Certified + Capability Demos)  
 **EatClean lens:** weekly meal prep · transform confirmed commitments into daily executable work  
-**Type:** **Operational Execution** (first of its kind)  
+**Type:** **Operational Planning** (layer · LAW 005)  
 **Maturity:** Architecture → Facade → Engineering Certified → Field Validated → Production Ready  
 **Completeness:** Architecture → Facade → Engineering Certification → **Capability Demo** → Product UI → Field → Production  
 **Validation:** [PRODUCTION_VALIDATION_REPORT](../10-validation/PRODUCTION_VALIDATION_REPORT.md) · 13 PASS · 4 UNIMPLEMENTED · 0 FAIL  
@@ -61,19 +61,19 @@ EatClean needs Production to **plan the day** so Kitchen can cook without invent
 |------------|------|--------------|
 | **Orders** | Operational commitment for a week | Planning batches / capacity |
 | **Production** | Planning · batches · queue · load · schedule · readiness | Cooking / plating / labels as craft |
-| **Kitchen** | Executing the plan · advancing batch work · prep states | Re-deriving “what was ordered” |
+| **Kitchen Execution** | Executes the plan · queue · start/pause/resume/complete · never cooks | Recipes · replanning Orders · generating Production |
 | **Delivery** | Routes · POD · logistics | Production schedule |
 | **Billing** | Invoices · settlement | Production load |
 
 ```text
-Order          →  ¿Qué compromiso existe?
-Production     →  ¿Qué trabajo debe hacerse?
-Kitchen        →  ¿Qué se está ejecutando ahora?
-Delivery       →  ¿Qué hay que entregar?
-Billing        →  ¿Qué hay que cobrar?
+Order               →  ¿Qué compromiso existe?
+Production          →  ¿Qué trabajo debe hacerse?
+Kitchen Execution   →  ¿Qué trabajo debe ejecutarse ahora?
+Delivery            →  ¿Qué hay que entregar?
+Billing             →  ¿Qué hay que cobrar?
 ```
 
-If a feature makes Production “cook”, it belongs in **Kitchen**.
+If a feature makes Production “cook”, it belongs in **Kitchen Execution**.
 
 ---
 
@@ -467,8 +467,10 @@ OPERATIONAL-004 Phase 1  Architecture              ✅ ADR 0066
 OPERATIONAL-004 Phase 2  Facade                    ✅ ADR 0067
 OPERATIONAL-004 Phase 3  Engineering Certification ✅ ADR 0068
 OPERATIONAL-004 Phase 4  Capability Demo           ✅ ADR 0069 · /admin/production-workspace
-OPERATIONAL-005          Kitchen Execution Architecture
+OPERATIONAL-005 Phase 1  Kitchen Execution Architecture ✅ ADR 0070
+OPERATIONAL-005 Phase 2  Kitchen Execution Facade  ← next
 ```
 
 Operational Planning is fully consumable.  
+**Operational Engine exists.**  
 **Operational Engine v1.0** requires Identity · Customers · Orders · Production · Kitchen Execution · Delivery · Billing certified.

@@ -38,7 +38,7 @@ We may still touch Foundation. It is no longer the protagonist.
 | Orders | **Engineering Certified** (ADR 0064) |
 | Order Workspace | **Capability Demo** (ADR 0065 · LAW 003 · 004) |
 | Production | **Engineering Certified + Demo** (ADR 0068–0069) |
-| Kitchen Execution / Delivery / Billing | Pending (Kitchen Execution authorized) |
+| Kitchen Execution / Delivery / Billing | Kitchen Execution **Architecture** (ADR 0070) · Delivery / Billing Pending |
 
 ---
 

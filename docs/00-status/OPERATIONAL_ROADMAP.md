@@ -38,7 +38,8 @@ Operational Planning
 ────────────────────────────
 
 Operational Execution
-  Kitchen → Delivery    Pending
+  Kitchen Execution     ✅ Architecture (ADR 0070)
+  Delivery              Pending
 
 ────────────────────────────
 
@@ -46,17 +47,19 @@ Operational Outcome
   Billing               Pending
 ```
 
+**Operational Engine exists** (incomplete). LAW 005 protects layer boundaries.
+
 ---
 
-## Capability Type map
+## Capability Type map (LAW 005)
 
-| Capability | Type | Maturity |
-|------------|------|----------|
+| Capability | Layer / Type | Maturity |
+|------------|--------------|----------|
 | Identity | Context | Engineering Certified |
 | Customers | Business Entity | Engineering Certified + Demo |
-| Orders | Operational Process | Engineering Certified + Demo |
-| **Production** | **Operational Execution** | **Engineering Certified** |
-| Kitchen | Operational Execution | Pending |
+| Orders | Operational Planning | Engineering Certified + Demo |
+| **Production** | **Operational Planning** | **Engineering Certified + Demo** |
+| **Kitchen Execution** | **Operational Execution** | **Architecture** (ADR 0070) |
 | Delivery | Operational Execution | Pending |
 | Billing | Operational Outcome | Pending |
 
@@ -80,17 +83,16 @@ Language: **certify** capabilities — not “develop screens”.
 
 ---
 
-## Production track (OPERATIONAL-004)
+## Kitchen Execution track (OPERATIONAL-005)
 
 ```text
-Architecture (ADR 0066)              ✅
-Facade (ADR 0067)                    ✅
-Engineering Certification (ADR 0068) ✅
-Capability Demo (ADR 0069)           ✅ /admin/production-workspace
-Kitchen Execution Capability         ← next (OPERATIONAL-005)
+Architecture (ADR 0070)              ✅
+Facade                               ← next
+Engineering Certification
+Capability Demo
 ```
 
-Operational Planning is **fully consumable**.
+**Operational Engine exists.** Planning consumable. Execution Architecture frozen.
 
 ---
 
@@ -98,8 +100,9 @@ Operational Planning is **fully consumable**.
 
 1. ~~Production Engineering Certification~~ ✅ ADR 0068  
 2. ~~Production Workspace Demo~~ ✅ ADR 0069  
-3. **Kitchen Execution Capability Architecture** (OPERATIONAL-005)  
-4. Delivery · Billing → [Operational Engine v1.0](./OPERATIONAL_ENGINE.md)
+3. ~~Kitchen Execution Capability Architecture~~ ✅ ADR 0070  
+4. **Kitchen Execution Facade** (OPERATIONAL-005 Phase 2)  
+5. Delivery · Billing → [Operational Engine v1.0](./OPERATIONAL_ENGINE.md)
 
 Official board: [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)
 

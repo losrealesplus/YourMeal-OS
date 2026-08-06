@@ -25,7 +25,7 @@ Production
 
 | Layer | Status |
 |-------|--------|
-| Platform v1 | **CLOSED** · baseline frozen |
+| Platform v1 | **CLOSED** · **Stable** · baseline frozen |
 | Developer Platform | **v1.0 FROZEN** · tag `developer-platform-v1.0.0` |
 | Environment Contract | ADR 0049 · `npm run doctor:env` |
 | Bootstrap Pipeline | ADR 0050–0053 · Ready Gate landed |

@@ -1,71 +1,102 @@
 # Operational Engine — Official Board
 
-**Frozen:** 2026-08-06 · with ADR [0069](../adr/0069-production-workspace-demo.md)  
-**Companions:** [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) · [OPERATIONAL_DEPENDENCY_GRAPH](./OPERATIONAL_DEPENDENCY_GRAPH.md) · [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md)
+**Frozen:** 2026-08-06 · Operational Engine **exists** · LAW 005 · ADR [0070](../adr/0070-kitchen-execution-capability.md)  
+**Companions:** [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) · [OPERATIONAL_DEPENDENCY_GRAPH](./OPERATIONAL_DEPENDENCY_GRAPH.md) · [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [FOUNDATION_STATUS](./FOUNDATION_STATUS.md)
 
 ```text
-═══════════════════════════════════════════════
 YOURMEAL OS
-Operational Engine Roadmap
-═══════════════════════════════════════════════
+
+══════════════════════════════════════════════
 
 Platform
 ██████████████████████████
-100%
+Stable
 
 Foundation
 ██████████████████████████
-100%
+Stable
 
-───────────────────────────────────────────────
+══════════════════════════════════════════════
+
+Operational Engine
 
 Context
+──────────────
 
 Identity
 ██████████████████████████
 Engineering Certified
 
-───────────────────────────────────────────────
+──────────────────────────────
 
 Business Entity
+──────────────
 
 Customers
 ██████████████████████████
 Engineering Certified
 
-───────────────────────────────────────────────
+Capability Demo
+██████████████████████████
+
+──────────────────────────────
 
 Operational Planning
+──────────────
 
 Orders
 ██████████████████████████
-Engineering Certified + Demo
+Engineering Certified
+
+Capability Demo
+██████████████████████████
 
 Production
 ██████████████████████████
-Engineering Certified + Demo
+Engineering Certified
 
-───────────────────────────────────────────────
+Capability Demo
+██████████████████████████
+
+──────────────────────────────
 
 Operational Execution
+──────────────
 
 Kitchen Execution
-░░░░░░░░░░░░░░░░░░░░░░░░░
+████░░░░░░░░░░░░░░░░░░░░░░
+Architecture
 
 Delivery
-░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-───────────────────────────────────────────────
+──────────────────────────────
 
 Operational Outcome
+──────────────
 
 Billing
-░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░
 ```
 
 ---
 
-## Fixed layers (permanent)
+## Declaration
+
+```text
+Operational Engine ya existe.
+
+No está completo.
+Pero ya existe.
+```
+
+Planning (Orders + Production) is consumable.  
+Execution begins with Kitchen Execution Architecture (ADR 0070).  
+**Operational Engine v1.0** still requires Kitchen · Delivery · Billing Engineering Certified.
+
+---
+
+## Fixed layers (permanent · LAW 005)
 
 Every new capability **must** declare its layer before Architecture starts:
 
@@ -81,7 +112,7 @@ Operational Execution
 Operational Outcome
 ```
 
-No hybrid modules (planning+execution, execution+billing).
+One Capability · one layer. Cross-layer only via Facade.
 
 ---
 
@@ -97,4 +128,5 @@ One capability cycle at a time.
 
 ## Next capability
 
-**OPERATIONAL-005 · Kitchen Execution** — executes Production plans. Never replans Orders.
+**OPERATIONAL-005 · Kitchen Execution** — Architecture frozen (ADR 0070).  
+Facade next. Never plans. Consumes **ProductionFacade** only.
