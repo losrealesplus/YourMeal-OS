@@ -52,3 +52,47 @@ Errores tipados (`PermissionDenied`, `DishNotFound`, …).
 1. Tag `v0.1.0` aplicado / documentado.
 2. Module 01: **entidades de dominio primero**; UI al final.
 3. Orden congelado: Dish → Ingredient → Recipe → … → UI → CRUD.
+
+---
+
+## Capability Pattern (permanente · OPERATIONAL-001)
+
+Toda Operational Module sigue esta dirección — **nunca al revés**:
+
+```text
+Capability
+    ↓
+Contract (ADR)
+    ↓
+Facade
+    ↓
+Services
+    ↓
+Store
+    ↓
+UI
+```
+
+**Prohibido** como camino de diseño:
+
+```text
+UI → Service → Database
+```
+
+(La UI puede *llamar* Services vía Facade; no *posee* el ciclo de vida ni el contrato.)
+
+Ejemplo Identity:
+
+```text
+Identity Capability (ADR 0055)
+    ↓
+IdentityFacade / useIdentity (ADR 0056)
+    ↓
+Bootstrap Stages + Auth services (unchanged)
+    ↓
+BootstrapIdentityStore / AuthState
+    ↓
+Shells / modules (observe · consume)
+```
+
+Regla: Operational Modules **nunca** importan Supabase Auth ni coordinan carga de identidad; consumen `IdentityFacade`.

@@ -46,3 +46,4 @@ Permanent decisions for YourMeal OS. New ADRs are additive; do not silently reve
 | [0053](./0053-application-ready-gate.md) | Application Ready Gate (PRODUCT-CORE-004 · lifecycle latch) |
 | [0054](./0054-product-core-foundation.md) | Product Core Foundation declared (engineering-validated) |
 | [0055](./0055-identity-capability.md) | Identity Capability (OPERATIONAL-001 · compose operational user) |
+| [0056](./0056-identity-facade.md) | Identity Facade (OPERATIONAL-001 Phase 2 · public API) |

@@ -2,6 +2,8 @@
  * Public auth hook — consumes IdentityProvider context.
  * Do not branch on Bootstrap Mode in feature screens; identity origin is swapped
  * at the provider layer (EP-BOOTSTRAP-001).
+ *
+ * New Operational Modules should prefer `useIdentity()` / IdentityFacade (ADR 0056).
  */
 export type {
   ActiveTenant,
