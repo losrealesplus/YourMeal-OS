@@ -1,11 +1,13 @@
 # Operational Capability Registry
 
 **YourMeal OS · Product control panel**  
+**Permanent quartet:** [PLATFORM_STATUS](./PLATFORM_STATUS.md) · [FOUNDATION_STATUS](./FOUNDATION_STATUS.md) · this Registry · [OPERATIONAL_ROADMAP](./OPERATIONAL_ROADMAP.md)  
 **Rule:** We track **Capabilities certified**, not “PRs merged”.  
-**Methodology:** Observe → Design → Freeze → Facade → Validate → UI → Smoke → Release
+**Methodology:** Observe → Design → Freeze → Facade → Validate → Capability Demo → Operational Experience → Field → Production
 
 ```text
-Platform → Foundation → Operational Modules → Capabilities → Validation → Product
+Platform → Foundation → Operational Capabilities → Operational Experience
+→ Operational Validation → Production
 ```
 
 ---
@@ -122,26 +124,29 @@ First **writable** Operational Capability. Method certified via Capability Demo.
 
 | Field | Value |
 |-------|--------|
-| **Maturity** | **Facade** |
+| **Maturity** | **Engineering Certified** |
 | **Type** | Operational Process |
-| Completeness | Architecture ✅ · Facade ✅ · Validation ⏳ · Demo ⏳ |
-| Field Validation | — |
-| Version | 0.2 (facade) |
-| ADRs | [0062](../adr/0062-order-capability.md) · [0063](../adr/0063-order-facade.md) · Intake [0017](../adr/0017-order-intake.md) |
+| Completeness | Architecture ✅ · Facade ✅ · Validation ✅ · Demo ⏳ · Field ⏳ |
+| Field Validation | Pending ([ORDER_SMOKE_CHECKLIST](../10-validation/ORDER_SMOKE_CHECKLIST.md)) |
+| Version | 1.0 |
+| ADRs | [0062](../adr/0062-order-capability.md) · [0063](../adr/0063-order-facade.md) · [0064](../adr/0064-order-validation.md) · Intake [0017](../adr/0017-order-intake.md) |
 | Contract | [ORDER_CAPABILITY](../05-architecture/ORDER_CAPABILITY.md) |
 | Facade | `src/order/OrderFacade.ts` · `useOrder()` · process Commands / Queries |
-| Validation | Not yet |
+| Validation | [ORDER_VALIDATION_REPORT](../10-validation/ORDER_VALIDATION_REPORT.md) · 15 PASS · 2 UNIMPLEMENTED · 0 FAIL |
 
 ```text
 Orders
-████████░░░░░░░░░░ Facade
-                    next: Validate
+██████████████████ Engineering Certified
+░░░░ Capability Demo · Field Validation
 Question: ¿Qué compromiso operativo ha adquirido
           la empresa para una semana concreta?
+
+Order = compromiso operativo del tenant para una semana concreta.
 ```
 
-First **Operational Process** Capability. Process language — not CRUD.  
-Production · Kitchen · Delivery · Billing must consume `OrderFacade` only.
+First **Operational Process** Capability — Engineering Certified. Process language — not CRUD.  
+Production · Kitchen · Delivery · Billing must consume `OrderFacade` only.  
+**Production Capability may begin.**
 
 ---
 
@@ -151,7 +156,7 @@ Production · Kitchen · Delivery · Billing must consume `OrderFacade` only.
 |-------|--------|
 | **Maturity** | Pending |
 | **Type** | Operational Execution |
-| Notes | ¿Qué hay que cocinar? |
+| Notes | ¿Qué hay que cocinar? · **Authorized to start** after Order Validation (ADR 0064) |
 
 ---
 
@@ -219,7 +224,7 @@ Production · Kitchen · Delivery · Billing must consume `OrderFacade` only.
 |------------|----------|
 | Identity | ¿Quién está operando? |
 | Customer | ¿Quién genera la demanda? |
-| Orders | ¿Qué hay que preparar? |
+| Orders | ¿Qué compromiso operativo tiene el tenant esta semana? |
 | Production | ¿Qué hay que cocinar? |
 | Delivery | ¿Qué hay que entregar? |
 | Billing | ¿Qué hay que cobrar? |
