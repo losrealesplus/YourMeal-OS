@@ -17,7 +17,6 @@
 | [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) | Engine meaning · v0.8 / v1.0 |
 | [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) | **v0.8 freeze declaration** |
 | [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) | **Official frozen board** |
-| [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) | Mandatory after FLOW-001 Demo |
 | [OPERATIONAL_DEPENDENCY_GRAPH](./OPERATIONAL_DEPENDENCY_GRAPH.md) | Permanent dependency graph · layers |
 
 > Success = **¿Qué capacidades operativas están certificadas y cuáles usa un negocio real?**

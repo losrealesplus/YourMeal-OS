@@ -41,8 +41,8 @@ Registry: [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md)
 | Flow | Chain | Status | Canonical question |
 |------|-------|--------|--------------------|
 | **001** | Orders → Production → Kitchen | **Engineering Certified** | ¿Puede un compromiso operativo convertirse en trabajo ejecutado sin romper ninguna Foundation Law? |
-| **002** | Production → Kitchen → Delivery | Pending | ¿Puede el trabajo ejecutado convertirse en trabajo entregable? |
-| **003** | Delivery → Billing | Pending | ¿Puede el trabajo entregado convertirse en resultado económico? |
+| **002** | Production → Kitchen → Delivery | **GATED** | ¿Puede el trabajo ejecutado convertirse en trabajo entregable? |
+| **003** | Delivery → Billing | **GATED** | ¿Puede el trabajo entregado convertirse en resultado económico? |
 
 Flow method (unchanged from Capability rhythm):
 
@@ -51,6 +51,8 @@ Observe → Design → Freeze → Harness → Engineering Certification → Flow
 ```
 
 Constitution stable: **no new Foundation Laws** unless tenant evidence proves insufficiency (001–007 complete).
+
+**Era:** Validation — [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md).
 
 ## Phase C — EatClean as first tenant of the pattern
 
