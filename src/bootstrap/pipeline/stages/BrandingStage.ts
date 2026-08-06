@@ -1,21 +1,34 @@
 import type { BootstrapStageHandler } from "./BootstrapStage";
+import { resolveBootstrapBranding } from "../services/BrandingBootstrapService";
+import { getBootstrapIdentitySnapshot } from "../BootstrapIdentityStore";
 
 /**
- * Branding — NON-BLOCKING. Application of theme/logo stays in shells /
- * TenantBrandScope. Fallback provenance recorded for timeline evidence.
+ * BrandingStage — owns when brand provenance is resolved (NON-BLOCKING).
+ * CSS application remains in TenantBrandScope (Provider/paint).
+ * Who starts Branding resolve? → BrandingStage (ADR 0052).
  */
 export const BrandingStage: BootstrapStageHandler = {
   id: "branding",
   blocking: false,
-  async run() {
+  async run(ctx) {
+    const tenantId =
+      ctx.tenantId ?? getBootstrapIdentitySnapshot().tenant?.id ?? null;
+
+    const result = await resolveBootstrapBranding(tenantId);
+
     return {
-      status: "degraded",
+      status: result.remoteOk ? "ok" : "degraded",
       notes: [
-        "branding:delegated_to_tenant_brand_scope",
-        "branding:fallback_static_until_remote_applied",
+        "branding:owned_by_branding_stage",
+        `branding:provenance_${result.provenance}`,
+        "branding:paint_delegated_to_tenant_brand_scope",
       ],
-      evidence: { provenance: "fallback" },
-      patch: { brandProvenance: "fallback" },
+      evidence: {
+        provenance: result.provenance,
+        slug: result.slug,
+        tenantId,
+      },
+      patch: { brandProvenance: result.provenance },
     };
   },
 };
