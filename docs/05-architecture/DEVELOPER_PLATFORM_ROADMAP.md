@@ -59,11 +59,16 @@ Foco del proyecto: **≈20% Developer Platform / ≈80% Product Core**.
 
 Primer sprint propuesto:
 
-**PRODUCT-CORE-001 · Authentication & Bootstrap Stabilization**
+**PRODUCT-CORE-001 · Authentication & Bootstrap Stabilization** ⬅️ AQUÍ
+
+Contrato congelado (ADR [0050](../adr/0050-bootstrap-pipeline.md)):
 
 ```text
-Icon → Splash → Session → Bootstrap → Permissions → Localization → Brand → Dashboard
+App Launch → Environment → Services → Authentication
+→ Session → Tenant → Branding → Navigation → Application Ready
 ```
+
+Detalle: [BOOTSTRAP_PIPELINE](./BOOTSTRAP_PIPELINE.md) · estado: [PRODUCT_CORE_001](../00-status/PRODUCT_CORE_001.md)
 
 Debe ser 100% determinista, medible y sin errores — usando la Developer Platform v1.0 como instrumento de evidencia.
 

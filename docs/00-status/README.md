@@ -1,14 +1,17 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-08-03  
+**Última actualización:** 2026-08-06  
 **Platform v1:** ✅ **CLOSED** — [PLATFORM_V1_CLOSED](./PLATFORM_V1_CLOSED.md) · Baseline [v1](./PLATFORM_BASELINE_v1.md) · Transición [Platform → Flow DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) · COMPLETE · [Operating Model v1](./OPERATING_MODEL_v1.md) · ACTIVE  
+**Developer Platform:** ✅ **v1.0 FROZEN** · tag `developer-platform-v1.0.0` · Infra: HOUSEKEEPING-001…003 ✅  
+**Product Core:** ▶ **[PRODUCT-CORE-001](./PRODUCT_CORE_001.md)** — Bootstrap Architecture freeze (ADR 0050)  
 **Operational Core:** ✅ **LOCKED** — [CONTRACT](./OPERATIONAL_CORE_CONTRACT.md) · [DECLARED](./OPERATIONAL_CORE_DECLARED.md) · [CHANGE_AUTHORITY](./CHANGE_AUTHORITY.md)  
 **Identity Foundation:** ✅ **LOCKED v1** — [IDENTITY_FOUNDATION_LOCK_v1](./IDENTITY_FOUNDATION_LOCK_v1.md) · PR #90 · PR #91 · [orden estratégico](./STRATEGIC_ORDER_POST_IDENTITY_LOCK.md)  
 **Auth Layer:** ✅ **Frozen** — [IDENTITY_FREEZE_v1](./IDENTITY_FREEZE_v1.md) · PRODUCT-001 · BUGFIX-002 · [Closeout](../10-validation/IDENTITY_CLOSEOUT_REPORT.md)  
 **Dev Bootstrap:** [BOOTSTRAP_MODE](./BOOTSTRAP_MODE.md) · `VITE_BOOTSTRAP_MODE` default OFF (nunca producción)  
+**Environment Contract:** [ENVIRONMENT_CONTRACT](./ENVIRONMENT_CONTRACT.md) · ADR 0049 · `npm run doctor:env`  
 **Order Intake:** [ORDER_INTAKE](./ORDER_INTAKE.md) · [ADR 0017](../adr/0017-order-intake.md) · CAP-008 scaffold  
 **RI-001:** **[PROGRAM FROZEN](./RI001_PROGRAM_FROZEN.md)** · [Backlog A–I](./RI001_OPERATIONAL_READINESS_BACKLOG.md) · Evidence Gates · [P13](../20-evidence-framework/12-certification-completeness-p13.md) · **[EP-OPS-003 Journeys](./EP_OPS_003_WORKSPACE_OPERATIONAL_JOURNEY.md)** · **[Methodology FROZEN](./EP_OPS_003_METHODOLOGY_FROZEN.md)**  
-**Fase actual:** [CURRENT_PHASE](./CURRENT_PHASE.md) ← **CAPACITOR ✅ CERTIFIED** · [PASS](../10-validation/capacitor/CAPACITOR_PASS_ACTA.md) · tag `capacitor-pass` → `400a010` · Gate CLOSED · Next: **MOBILE-RELEASE-01 DoR** · FLOW-05 ✅ [`flow05-pass`](./GIT_MILESTONE_TAGS.md) · RELEASE-01 ✅ [`release-01-pass`](./GIT_MILESTONE_TAGS.md) · [FLOW_CATALOG](./FLOW_CATALOG.md)  
+**Fase actual:** [CURRENT_PHASE](./CURRENT_PHASE.md) ← **PRODUCT-CORE-001** ▶ · CAPACITOR ✅ · FLOW-05 ✅ · RELEASE-01 ✅ · [FLOW_CATALOG](./FLOW_CATALOG.md)  
 **Dominios:** [PROJECT_DOMAINS](./PROJECT_DOMAINS.md) — Knowledge · Engineering · Experience · Operations  
 **Engineering Phase:** [ENGINEERING_PHASE](./ENGINEERING_PHASE.md) — Complete (pending operational authorization)  
 **Última integración:** [IR-001](./IR-001_FIRST_ENGINEERING_INTEGRATION.md) · PR #22  

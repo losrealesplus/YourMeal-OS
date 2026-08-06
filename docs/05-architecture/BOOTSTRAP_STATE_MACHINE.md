@@ -10,7 +10,9 @@
 
 YourMeal OS must not only *allow* forward motion. It must **refuse impossible states** for a new tenant.
 
-This document is the FOPEBA-facing model of operational bootstrap.
+This document is the FOPEBA-facing model of **operational** bootstrap (tenant Day-0 ladder).
+
+> **Not** the application startup pipeline. For App Launch → Ready see [BOOTSTRAP_PIPELINE](./BOOTSTRAP_PIPELINE.md) (PRODUCT-CORE-001 · ADR 0050).
 
 ---
 

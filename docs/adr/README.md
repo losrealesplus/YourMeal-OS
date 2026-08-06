@@ -40,3 +40,4 @@ Permanent decisions for YourMeal OS. New ADRs are additive; do not silently reve
 | [0047](./0047-developer-platform-v1-freeze.md) | Developer Platform v1.0 Freeze (stabilization · contracts · dependency rules) |
 | [0048](./0048-development-environment.md) | Development Environment (JDK 21 · Capability Drivers · FOPEBA tooling) |
 | [0049](./0049-environment-contract.md) | Environment Contract (.env.development.example · doctor:env checklist) |
+| [0050](./0050-bootstrap-pipeline.md) | Bootstrap Pipeline (PRODUCT-CORE-001 · App Launch → Ready freeze) |

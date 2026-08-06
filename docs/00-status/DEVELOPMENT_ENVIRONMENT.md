@@ -97,7 +97,7 @@ Contrato: ver `scripts/development/shared.mjs`.
 ## Siguiente (PRODUCT-CORE)
 
 Infraestructura de entorno cerrada (002 + 003).  
-Siguiente foco: **PRODUCT-CORE-001 · Authentication & Bootstrap Stabilization**.
+Siguiente foco: **PRODUCT-CORE-001** — [PRODUCT_CORE_001](./PRODUCT_CORE_001.md) · contrato [BOOTSTRAP_PIPELINE](../05-architecture/BOOTSTRAP_PIPELINE.md).
 
 ### Histórico HOUSEKEEPING-003
 

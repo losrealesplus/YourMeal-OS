@@ -82,4 +82,4 @@ Ambos se ejecutan en `npm run doctor:env`.
 
 ## Después de este PR
 
-Infraestructura cerrada → foco **PRODUCT-CORE-001** (Authentication → Bootstrap → jornada EatClean estable).
+Infraestructura cerrada → foco **[PRODUCT-CORE-001](./PRODUCT_CORE_001.md)** (Bootstrap Pipeline ADR 0050 → Auth → jornada EatClean estable).
