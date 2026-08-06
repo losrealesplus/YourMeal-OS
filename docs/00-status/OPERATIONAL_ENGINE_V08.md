@@ -4,7 +4,8 @@
 **ADR:** [0077](../adr/0077-operational-engine-v08.md)  
 **Board:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)  
 **Sprint:** [OPERATIONAL_VALIDATION_SPRINT](./OPERATIONAL_VALIDATION_SPRINT.md)  
-**Field log:** [FIELD_VALIDATION_LOG](../10-validation/FIELD_VALIDATION_LOG.md)  
+**Field:** [FIELD_VALIDATION_MILESTONE](../10-validation/FIELD_VALIDATION_MILESTONE.md) · [ANDROID_FIELD_VALIDATION_REPORT](../10-validation/ANDROID_FIELD_VALIDATION_REPORT.md) · [FIELD_VALIDATION_LOG](../10-validation/FIELD_VALIDATION_LOG.md)  
+**Android field:** ✅ **PASS** (OPPO · 2026-08-06) · iPhone ⏳ · Delivery 🔒  
 **Era:** Construction → **Validation**
 
 ```text
@@ -124,14 +125,16 @@ More valuable than ten new screens.
 ## Immediate roadmap (frozen · do not reorder)
 
 ```text
-1. FLOW-001 Demo
-2. Operational Engine Review
-3. Android Build
-4. OPPO Field Validation
-5. iPhone Build
+1. FLOW-001 Demo              ✅
+2. Operational Engine Review  ✅
+3. Android Build              ✅
+4. OPPO Field Validation      ✅ PASS · 2026-08-06
+5. iPhone Build               ← next
 6. iPhone Field Validation
-7. Delivery Architecture
+7. Delivery Architecture      LOCKED
 ```
+
+Field artefact: [ANDROID_FIELD_VALIDATION_REPORT](../10-validation/ANDROID_FIELD_VALIDATION_REPORT.md)
 
 ---
 

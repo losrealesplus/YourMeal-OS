@@ -19,27 +19,28 @@ Do not reorder. Do not open Delivery early.
 
 ```text
 1. FLOW-001 Demo
-██████████
+██████████ DONE
 
 ↓
 
 2. Operational Engine Review
-██████████
+██████████ DONE
 
 ↓
 
 3. Android Build
-██████████
+██████████ DONE
 
 ↓
 
 4. OPPO Field Validation
-██████████
+██████████ PASS · 2026-08-06
+           → docs/10-validation/ANDROID_FIELD_VALIDATION_REPORT.md
 
 ↓
 
 5. iPhone Build
-██████████
+██████████ ← next (FIELD-VALIDATION-002)
 
 ↓
 
@@ -49,6 +50,7 @@ Do not reorder. Do not open Delivery early.
 ↓
 
 7. Delivery Architecture
+          LOCKED until Android + iOS PASS
 ```
 
 ---
