@@ -1,7 +1,8 @@
 # Identity Lifecycle
 
 **Estado:** Hardened v1 · Architecture stable  
-**ADR:** [0018](../adr/0018-identity-membership-lifecycle.md) · [0019](../adr/0019-identity-hardening-v1.md)
+**ADR:** [0018](../adr/0018-identity-membership-lifecycle.md) · [0019](../adr/0019-identity-hardening-v1.md)  
+**Operational Capability:** [IDENTITY_CAPABILITY](./IDENTITY_CAPABILITY.md) · ADR [0055](../adr/0055-identity-capability.md) (compose Auth → Operational Context)
 
 ## Pipeline canónico
 

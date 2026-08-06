@@ -53,31 +53,27 @@ Todo lo que se construya forma parte de una **plataforma de ingeniería**, no de
 
 ---
 
-## Fase 2 — Product Core Stabilization
+## Fase 2 — Product Core Foundation ✅
 
-**Product Core Foundation** — engineering-validated (ADR [0054](../adr/0054-product-core-foundation.md)).
-
-```text
-Architecture → Orchestrator → Ownership → Ready Gate → Validation
-```
-
+Engineering-validated (ADR [0054](../adr/0054-product-core-foundation.md)).  
 Acta: [PRODUCT_CORE_FOUNDATION_001](../00-status/PRODUCT_CORE_FOUNDATION_001.md)
 
-**Siguiente foco de producto:** EatClean Core (Authentication → Orders → Kitchen → …)  
-Developer Platform = instrumento de evidencia, no el roadmap.
+## Fase 3 — Operational Modules ⬅️ AQUÍ
 
-Contrato de arranque (ADR [0050](../adr/0050-bootstrap-pipeline.md)…[0053](../adr/0053-application-ready-gate.md)):
+Nomenclatura:
 
 ```text
-App Launch → Environment → Services → Authentication
-→ Session → Tenant → Branding → Navigation → Application Ready
+YourMeal OS → Platform · Foundation · Operational Modules
 ```
 
-Código: `src/bootstrap/pipeline/` · `src/bootstrap/ready/` · `isApplicationReady()`
+Primera capability: **OPERATIONAL-001 Identity** (ADR [0055](../adr/0055-identity-capability.md)).
 
-Roadmap de módulos (no pantallas):
+Detalle: [OPERATIONAL_MODULES](../00-status/OPERATIONAL_MODULES.md) · [IDENTITY_CAPABILITY](./IDENTITY_CAPABILITY.md)
 
-Authentication → Bootstrap → Navigation → Orders → Kitchen → Production → Routes → Customers → Settings → Offline → Crash Recovery
+Regla: Observe → Design → Freeze → Implement → Validate (toda capability).  
+Golden rule: ¿EatClean tarda menos? Si no → espera.
+
+Roadmap: Identity → Customers → Orders → Production → Kitchen → Inventory → Delivery → Billing → Analytics → Administration
 
 ---
 
