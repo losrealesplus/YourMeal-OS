@@ -200,6 +200,7 @@ Consumes `OrderFacade` only. Kitchen consumes Production.
 |-------|--------|
 | **Maturity** | Pending |
 | **Type** | Operational Execution |
+| Notes | ¿Qué se está ejecutando ahora? · Consumes Production · never replans Orders |
 
 ---
 
