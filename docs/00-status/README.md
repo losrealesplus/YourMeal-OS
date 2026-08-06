@@ -3,8 +3,10 @@
 **Última actualización:** 2026-08-06  
 **Platform v1:** ✅ **CLOSED** — [PLATFORM_V1_CLOSED](./PLATFORM_V1_CLOSED.md) · Baseline [v1](./PLATFORM_BASELINE_v1.md) · Transición [Platform → Flow DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) · COMPLETE · [Operating Model v1](./OPERATING_MODEL_v1.md) · ACTIVE  
 **Product Core:** ✅ **[Foundation engineering-validated](./PRODUCT_CORE_FOUNDATION_001.md)** (ADR 0054) · Field smoke OPPO ⏳  
-**Operational Modules:** ▶ **[OPERATIONAL_MODULES](./OPERATIONAL_MODULES.md)** · Identity ✅ engineering certified (ADR 0057) · next: Customers  
+**Operational Modules:** ▶ **[CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md)** · Identity ✅ Engineering Certified · Customers ▶ Architecture (ADR 0058)  
 **Identity Validation:** [IDENTITY_VALIDATION_REPORT](../10-validation/IDENTITY_VALIDATION_REPORT.md) · smoke [checklist](../10-validation/IDENTITY_SMOKE_CHECKLIST.md)  
+**Customer Capability:** [CUSTOMER_CAPABILITY](../05-architecture/CUSTOMER_CAPABILITY.md) · ADR 0058  
+**Modules index:** [OPERATIONAL_MODULES](./OPERATIONAL_MODULES.md)  
 **Developer Platform:** ✅ **v1.0 FROZEN** · tag `developer-platform-v1.0.0` · Infra: HOUSEKEEPING-001…003 ✅  
 **Product Core track:** [PRODUCT_CORE_001](./PRODUCT_CORE_001.md) — Architecture…Ready Gate landed  
 **Operational Core:** ✅ **LOCKED** — [CONTRACT](./OPERATIONAL_CORE_CONTRACT.md) · [DECLARED](./OPERATIONAL_CORE_DECLARED.md) · [CHANGE_AUTHORITY](./CHANGE_AUTHORITY.md)  
