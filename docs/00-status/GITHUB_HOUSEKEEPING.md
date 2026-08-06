@@ -1,57 +1,55 @@
 # GitHub Housekeeping Report
 
-**Date:** 2026-08-06 (updated · Production Workspace Demo)  
+**Date:** 2026-08-06 (final · after `main` FF to ADR 0069)  
 **Rule:** Tips already on `main` → **Close without merging**. Never duplicate commits.  
-**Agent limit:** Cannot close/merge PRs via API (403 / tool). Human must apply actions below.
+**Agent limit:** Cannot close PRs via GitHub API (403). Human must bulk-close.
 
 ---
 
-## Merge report
+## Status
 
-### A · Orphans (tip already on `main`) → Close without merging
-
-| PR | Title | Action | Reason |
-|----|-------|--------|--------|
-| #310 | PRODUCT-CORE-002 Orchestrator | **Close without merging** | Tip on main |
-| #311 | PRODUCT-CORE-003 Stage ownership | **Close without merging** | Tip on main |
-| #312 | PRODUCT-CORE-004 Ready Gate | **Close without merging** | Tip on main |
-| #314 | Identity Capability ADR 0055 | **Close without merging** | Tip on main |
-| #315 | Identity Facade ADR 0056 | **Close without merging** | Tip on main |
-| #316 | Identity Validation ADR 0057 | **Close without merging** | Tip on main |
-| #317 | Customer Capability ADR 0058 | **Close without merging** | Tip on main |
-| #318 | Customer Facade ADR 0059 | **Close without merging** | Tip on main |
-| #321 | Order Capability ADR 0062 | **Close without merging** | Tip on main |
-
-### B · Active stack (required · not yet on `main`) → Merge in order
-
-| Order | PR | Title | Base |
-|-------|-----|-------|------|
-| 1 | **#322** | Order Facade ADR 0063 | `main` |
-| 2 | **#323** | Order Validation ADR 0064 | #322 branch |
-| 3 | **#324** | Order Workspace Demo ADR 0065 | #323 branch |
-| 4 | **#325** | Production Architecture ADR 0066 | #324 branch |
-| 5 | **#326** | Production Facade ADR 0067 | #325 branch |
-| 6 | **#327** | Production Engineering Certification ADR 0068 | #326 branch |
-| 7 | **#328** | Production Workspace Demo ADR 0069 | #327 branch |
-
-**Preferred clean land:** FF `main` to tip of #328, then **Close without merging** all of #322–#328 (tips become ancestors of main — no duplicate commits).
+`main` tip: **`9b55d39`** — Production Workspace Demo (ADR 0069)  
+Entire Operational Planning stack is on `main`.
 
 ---
 
-## Repository health summary
+## Action required (human) — Close without merging
+
+| PR | Title | Why |
+|----|-------|-----|
+| #310 | PRODUCT-CORE-002 | Tip on main (orphan stack) |
+| #311 | PRODUCT-CORE-003 | Tip on main |
+| #312 | PRODUCT-CORE-004 | Tip on main |
+| #314 | Identity Capability | Tip on main |
+| #315 | Identity Facade | Tip on main |
+| #316 | Identity Validation | Tip on main |
+| #317 | Customer Capability | Tip on main |
+| #318 | Customer Facade | Tip on main |
+| #321 | Order Capability | Tip on main |
+| #322 | Order Facade | Tip on main (FF 2026-08-06) |
+| #323 | Order Validation | Tip on main |
+| #324 | Order Workspace Demo | Tip on main |
+| #325 | Production Architecture | Tip on main |
+| #326 | Production Facade | Tip on main |
+| #327 | Production Certification | Tip on main |
+| #328 | Production Workspace Demo | Tip on main |
+
+**Do not merge any of these** — commits already exist on `main`. Close only.
+
+---
+
+## Repository health
 
 | Check | Status |
 |-------|--------|
-| Open orphan drafts | 9 (#310–318, #321) — close without merging |
-| Active stack | #322–#328 Operational Planning chain |
-| Capability maturity | Identity ✅ · Customers ✅ · Orders ✅+Demo · Production ✅+Demo |
-| Next | Kitchen Execution (OPERATIONAL-005) |
-| Agent PR write | Blocked — human close/merge required |
+| `main` | Clean · Operational Planning complete |
+| Open drafts | Close list above |
+| Identity · Customers · Orders · Production | Engineering Certified (+ Demos) |
+| Next | OPERATIONAL-005 · Kitchen Execution |
+| Board | [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) FROZEN |
 
 ```text
-Git status (conceptual)
-──────────────────────
-main: still at ADR 0062 until stack lands
-stack tip: Production Workspace Demo (ADR 0069)
-board: docs/00-status/OPERATIONAL_ENGINE_BOARD.md FROZEN
+Platform / Foundation     100%
+Operational Planning      Orders + Production ✅
+Operational Execution     Kitchen Execution next
 ```
