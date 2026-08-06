@@ -1,8 +1,9 @@
 # Operational Validation Sprint
 
-**Status:** ▶ **ACTIVE** (declared 2026-08-06)  
-**Prerequisite:** Operational Engine v0.8 landed on `main`  
-**Companions:** [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) · [OPERATIONAL_ROADMAP](./OPERATIONAL_ROADMAP.md) · [FIELD_VALIDATION_LOG](../10-validation/FIELD_VALIDATION_LOG.md)
+**Status:** ▶ **ACTIVE** — Android PASS · iPhone next  
+**Declared:** 2026-08-06  
+**Prerequisite:** Operational Engine v0.8 on `main`  
+**Companions:** [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) · [OPERATIONAL_ROADMAP](./OPERATIONAL_ROADMAP.md) · [FIELD_VALIDATION_MILESTONE](../10-validation/FIELD_VALIDATION_MILESTONE.md) · [ANDROID_FIELD_VALIDATION_REPORT](../10-validation/ANDROID_FIELD_VALIDATION_REPORT.md) · [FIELD_VALIDATION_LOG](../10-validation/FIELD_VALIDATION_LOG.md)
 
 ```text
 ══════════════════════════════════════════════
@@ -12,17 +13,17 @@ Operational Validation Sprint
 
 Objetivo
 
-□ FLOW-001 Demo
-□ Operational Engine Review
-□ Android APK
-□ OPPO Validation
+☑ FLOW-001 Demo
+☑ Operational Engine Review
+☑ Android APK
+☑ OPPO Validation          ← PASS 2026-08-06
 □ iPhone Build
-□ iPhone Validation
+□ iPhone Validation        ← FIELD-VALIDATION-002
 
 Definition of Done
 
 The Operational Engine has been successfully
-used on real mobile devices.
+used on real mobile devices (Android + iOS).
 
 No new architecture.
 No new Capabilities.
@@ -39,19 +40,19 @@ Focus exclusively on validation and experience.
 ```text
 Developer Platform
 ██████████████████
-Stable
+Stable · 100%
 
 ↓
 
 Product Core Foundation
 ██████████████████
-Stable
+Stable · 100%
 
 ↓
 
 Operational Engine v0.8
-██████████████████
-Stable
+████████████████░░
+Stable · Android field PASS
 
 ↓
 
@@ -62,8 +63,8 @@ Complete
 ↓
 
 Validation
-████░░░░░░░░░░░░░
-Current Phase
+████████████░░░░░░
+Android PASS · iPhone next
 ```
 
 ---
@@ -74,18 +75,25 @@ Current Phase
 | ------------------ | --------------- |
 | Architecture → Code → Tests | **Experience → Validation → Iteration** |
 
+Method proven on OPPO:
+
+```text
+Evidence → Hypothesis → Validation → Minimal Fix → Regression Tests → Field PASS
+```
+
 ---
 
 ## Sprint order (do not reorder)
 
-1. **FLOW-001 Demo** — close the last engineering gap (~95% done).
-2. **Operational Engine Review** — Registry, Flows, Foundation, naming, debt, performance, UX. Declare `REVIEWED`. No new code required.
-3. **Android APK** — `git pull` → `doctor:env` → `doctor` → `build` → `cap sync android` → assemble → install.
-4. **OPPO Validation** — field experience (clarity, navigation, trust, friction). Log in [FIELD_VALIDATION_LOG](../10-validation/FIELD_VALIDATION_LOG.md).
-5. **iPhone Build** — same checklist when Android is stable.
-6. **iPhone Validation** — same field questions.
+1. **FLOW-001 Demo** — ✅
+2. **Operational Engine Review** — ✅
+3. **Android APK** — ✅
+4. **OPPO Validation** — ✅ [report](../10-validation/ANDROID_FIELD_VALIDATION_REPORT.md)
+5. **iPhone Build** — next
+6. **iPhone Validation** — FIELD-VALIDATION-002 (same discipline)
 
-**After that:** open Delivery Architecture. Not before.
+**After Android + iOS PASS:** declare Operational Engine v0.8 **FIELD VALIDATED**.  
+**Then** open Delivery Architecture. Not before.
 
 ---
 
@@ -103,3 +111,5 @@ Current Phase
 
 > An EatClean operator on OPPO (then iPhone) can complete a real operational path and say:  
 > *“Esto me ahorra tiempo y entiendo perfectamente qué tengo que hacer.”*
+
+Android side of that question: **answered with evidence** (2026-08-06).
