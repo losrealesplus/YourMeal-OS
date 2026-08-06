@@ -44,8 +44,8 @@ Capability Demos (LAW 003 · 004) expected along the path; Field Validation for 
 Identity     ██████████████████████  Engineering Certified
 Customers    ██████████████████████  Engineering Certified + Demo
 Orders       ██████████████████████  Engineering Certified + Demo
-Production   ██████████████████████  Engineering Certified
-Kitchen      ░░░░░░░░░░░░░░░░░░░░░░  Pending
+Production   ██████████████████████  Engineering Certified + Demo
+Kitchen Exec ░░░░░░░░░░░░░░░░░░░░░░  Pending (authorized)
 Delivery     ░░░░░░░░░░░░░░░░░░░░░░  Pending
 Billing      ░░░░░░░░░░░░░░░░░░░░░░  Pending
 ```

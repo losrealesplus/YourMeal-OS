@@ -1,41 +1,33 @@
 # Operational Modules
 
-**Phase:** Operational Planning certified · Execution next  
-**Panel:** [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [OPERATIONAL_DEPENDENCY_GRAPH](./OPERATIONAL_DEPENDENCY_GRAPH.md) · [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md)
+**Phase:** Operational Planning consumable · Kitchen Execution next  
+**Board:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [GITHUB_HOUSEKEEPING](./GITHUB_HOUSEKEEPING.md)
 
 ```text
-YourMeal OS
-══════════════════════════════════════
 Platform / Foundation           100%
-Operational Capabilities
-  Identity                      Engineering Certified
-  Customers                     Engineering Certified + Demo
+Context · Identity              Engineering Certified
+Business Entity · Customers     Engineering Certified + Demo
+Operational Planning
   Orders                        Engineering Certified + Demo
-  Production                    Engineering Certified
-══════════════════════════════════════
-Operational Planning            ✅ Orders → Production
-Operational Execution           Kitchen → Delivery (pending)
-Operational Outcome             Billing (pending)
-══════════════════════════════════════
+  Production                    Engineering Certified + Demo
+Operational Execution
+  Kitchen Execution             Pending (authorized)
+  Delivery                      Pending
+Operational Outcome
+  Billing                       Pending
 ```
 
 ## Rhythm
 
 ```text
-Architecture → Facade → Engineering Certification
-→ Capability Demo → Operational Experience
+Architecture → Facade → Engineering Certification → Capability Demo
 ```
 
 ## Separation
 
 ```text
-Order → compromiso · Production → trabajo planificado · Kitchen → ejecución
-Production never cooks. Kitchen executes.
+Production → planifica
+Kitchen Execution → ejecuta
 ```
 
-## Discipline
-
-One capability cycle at a time. Kitchen after Production Demo preferred.
-
-Next: **Production Workspace Demo**.  
-Milestone: [Operational Engine v1.0](./OPERATIONAL_ENGINE.md).
+Next: **OPERATIONAL-005 · Kitchen Execution**.

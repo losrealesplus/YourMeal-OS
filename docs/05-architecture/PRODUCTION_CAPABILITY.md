@@ -1,14 +1,15 @@
 # Production Capability
 
-**OPERATIONAL-004 · Phase 3 — Engineering Certification**  
-**ADR:** [0066](../adr/0066-production-capability.md) · [0067](../adr/0067-production-facade.md) · [0068](../adr/0068-production-engineering-certification.md)  
-**Status:** **Engineering Certified** (work planning API validated — no Product UI in this phase)  
+**OPERATIONAL-004 · Phase 4 — Capability Demo · Engineering Certified + Demo**  
+**ADR:** [0066](../adr/0066-production-capability.md) · [0067](../adr/0067-production-facade.md) · [0068](../adr/0068-production-engineering-certification.md) · [0069](../adr/0069-production-workspace-demo.md)  
+**Status:** **Engineering Certified + Capability Demo** (`/admin/production-workspace`)  
 **Depends on:** Identity · Customers · Orders (Engineering Certified + Capability Demos)  
 **EatClean lens:** weekly meal prep · transform confirmed commitments into daily executable work  
 **Type:** **Operational Execution** (first of its kind)  
-**Maturity:** Architecture → Facade → **Engineering Certified** → Field Validated → Production Ready  
-**Completeness:** Architecture → Facade → Engineering Certification → Capability Demo → Product UI → Field → Production  
-**Validation:** [PRODUCTION_VALIDATION_REPORT](../10-validation/PRODUCTION_VALIDATION_REPORT.md) · 13 PASS · 4 UNIMPLEMENTED · 0 FAIL
+**Maturity:** Architecture → Facade → Engineering Certified → Field Validated → Production Ready  
+**Completeness:** Architecture → Facade → Engineering Certification → **Capability Demo** → Product UI → Field → Production  
+**Validation:** [PRODUCTION_VALIDATION_REPORT](../10-validation/PRODUCTION_VALIDATION_REPORT.md) · 13 PASS · 4 UNIMPLEMENTED · 0 FAIL  
+**Demo:** `/admin/production-workspace` — LAW 003 · LAW 004
 
 ```text
 Production = planificación operativa que transforma compromisos (Orders)
@@ -465,8 +466,9 @@ Freeze names; do not implement in Phase 1.
 OPERATIONAL-004 Phase 1  Architecture              ✅ ADR 0066
 OPERATIONAL-004 Phase 2  Facade                    ✅ ADR 0067
 OPERATIONAL-004 Phase 3  Engineering Certification ✅ ADR 0068
-OPERATIONAL-004 Phase 4  Capability Demo
-Then Kitchen Capability Architecture (after Demo · one cycle)
+OPERATIONAL-004 Phase 4  Capability Demo           ✅ ADR 0069 · /admin/production-workspace
+OPERATIONAL-005          Kitchen Execution Architecture
 ```
 
-**Operational Engine v1.0** requires Identity · Customers · Orders · Production · Kitchen · Delivery · Billing certified.
+Operational Planning is fully consumable.  
+**Operational Engine v1.0** requires Identity · Customers · Orders · Production · Kitchen Execution · Delivery · Billing certified.

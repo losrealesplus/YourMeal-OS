@@ -71,8 +71,8 @@ Each capability records:
 | Identity | Context | Engineering Certified | — | Customer · Orders · Production |
 | Customer | Business Entity | Engineering Certified + Demo | Identity | Orders |
 | Orders | Operational Process | Engineering Certified + Demo | Identity · Customer | Production |
-| Production | Operational Execution | **Engineering Certified** | Identity · Orders | Kitchen |
-| Kitchen | Operational Execution | Pending | Production | Delivery |
+| Production | Operational Execution | **Engineering Certified + Demo** | Identity · Orders | Kitchen Execution |
+| Kitchen Execution | Operational Execution | Pending | Production | Delivery |
 | Delivery | Operational Execution | Pending | Kitchen | Billing |
 | Billing | Operational Outcome | Pending | Delivery | — |
 

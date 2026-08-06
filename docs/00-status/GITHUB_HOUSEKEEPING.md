@@ -1,36 +1,40 @@
 # GitHub Housekeeping Report
 
-**Date:** 2026-08-06  
-**Context:** OPERATIONAL-003 Order Facade · stacked PR cleanup  
-**Rule:** Tips already on `main` → **Close without merging**. Never duplicate commits.
+**Date:** 2026-08-06 (updated · Production Workspace Demo)  
+**Rule:** Tips already on `main` → **Close without merging**. Never duplicate commits.  
+**Agent limit:** Cannot close/merge PRs via API (403 / tool). Human must apply actions below.
 
 ---
 
 ## Merge report
 
-| PR | Title (short) | Tip on main? | Action | Reason |
-|----|---------------|--------------|--------|--------|
-| #310 | PRODUCT-CORE-002 Orchestrator | **Yes** | Close without merging | Stacked draft; commits FF'd earlier |
-| #311 | PRODUCT-CORE-003 Stage ownership | **Yes** | Close without merging | Same |
-| #312 | PRODUCT-CORE-004 Ready Gate | **Yes** | Close without merging | Same (CI was red; tip already landed) |
-| #314 | Identity Capability ADR 0055 | **Yes** | Close without merging | Stacked draft |
-| #315 | Identity Facade ADR 0056 | **Yes** | Close without merging | Stacked draft |
-| #316 | Identity Validation ADR 0057 | **Yes** | Close without merging | Stacked draft |
-| #317 | Customer Capability ADR 0058 | **Yes** | Close without merging | Stacked draft |
-| #318 | Customer Facade ADR 0059 | **Yes** | Close without merging | Stacked draft |
-| #319 | Customer Validation ADR 0060 | Merged | — | Auto-closed when tip hit `main` |
-| #320 | Customer Workspace ADR 0061 | Merged via FF | Close if still open | Tip on `main` (`cea7ff4`) |
-| #321 | Order Capability ADR 0062 | **Yes** (FF) | Close without merging | Tip on `main` (`2ea0037`) |
+### A · Orphans (tip already on `main`) → Close without merging
 
-**Agent note:** GitHub PR close API is not available to this agent (403 / tool mismatch). Human: bulk **Close without merging** on the Open rows above.
+| PR | Title | Action | Reason |
+|----|-------|--------|--------|
+| #310 | PRODUCT-CORE-002 Orchestrator | **Close without merging** | Tip on main |
+| #311 | PRODUCT-CORE-003 Stage ownership | **Close without merging** | Tip on main |
+| #312 | PRODUCT-CORE-004 Ready Gate | **Close without merging** | Tip on main |
+| #314 | Identity Capability ADR 0055 | **Close without merging** | Tip on main |
+| #315 | Identity Facade ADR 0056 | **Close without merging** | Tip on main |
+| #316 | Identity Validation ADR 0057 | **Close without merging** | Tip on main |
+| #317 | Customer Capability ADR 0058 | **Close without merging** | Tip on main |
+| #318 | Customer Facade ADR 0059 | **Close without merging** | Tip on main |
+| #321 | Order Capability ADR 0062 | **Close without merging** | Tip on main |
 
----
+### B · Active stack (required · not yet on `main`) → Merge in order
 
-## Recommended merge order (if anything remains required)
+| Order | PR | Title | Base |
+|-------|-----|-------|------|
+| 1 | **#322** | Order Facade ADR 0063 | `main` |
+| 2 | **#323** | Order Validation ADR 0064 | #322 branch |
+| 3 | **#324** | Order Workspace Demo ADR 0065 | #323 branch |
+| 4 | **#325** | Production Architecture ADR 0066 | #324 branch |
+| 5 | **#326** | Production Facade ADR 0067 | #325 branch |
+| 6 | **#327** | Production Engineering Certification ADR 0068 | #326 branch |
+| 7 | **#328** | Production Workspace Demo ADR 0069 | #327 branch |
 
-Nothing remaining in the stack needs merge-by-PR: all tips are already ancestors of `main`.
-
-New work (Order Facade) opens as a **fresh PR → `main`**.
+**Preferred clean land:** FF `main` to tip of #328, then **Close without merging** all of #322–#328 (tips become ancestors of main — no duplicate commits).
 
 ---
 
@@ -38,25 +42,16 @@ New work (Order Facade) opens as a **fresh PR → `main`**.
 
 | Check | Status |
 |-------|--------|
-| `main` tip | `2ea0037` Order Capability architecture (+ Workspace Demo + Customers certified) |
-| Open orphan drafts | ~8–9 (tips on main — close housekeeping) |
-| Capability maturity | Identity ✅ · Customers ✅ · Orders Architecture → **Facade (this PR)** |
-| Pending capabilities | Production · Kitchen · Delivery · Billing |
-| Cleanliness | Code clean on `main`; GitHub UI desynced by stacking |
+| Open orphan drafts | 9 (#310–318, #321) — close without merging |
+| Active stack | #322–#328 Operational Planning chain |
+| Capability maturity | Identity ✅ · Customers ✅ · Orders ✅+Demo · Production ✅+Demo |
+| Next | Kitchen Execution (OPERATIONAL-005) |
+| Agent PR write | Blocked — human close/merge required |
 
 ```text
 Git status (conceptual)
 ──────────────────────
-main: clean operational stack through ADR 0062
-Open PRs: housekeeping only (close without merge)
-Next land: Order Facade (ADR 0063)
+main: still at ADR 0062 until stack lands
+stack tip: Production Workspace Demo (ADR 0069)
+board: docs/00-status/OPERATIONAL_ENGINE_BOARD.md FROZEN
 ```
-
----
-
-## Acceptance
-
-- [x] Analyzed open PRs vs `main`  
-- [x] Merge report produced  
-- [x] No business code changed for analysis alone  
-- [ ] Human closes orphan drafts in GitHub UI  

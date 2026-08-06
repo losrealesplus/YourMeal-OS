@@ -86,23 +86,22 @@ Language: **certify** capabilities — not “develop screens”.
 Architecture (ADR 0066)              ✅
 Facade (ADR 0067)                    ✅
 Engineering Certification (ADR 0068) ✅
-Capability Demo                      ← next
-Kitchen Capability                   after Demo (discipline)
+Capability Demo (ADR 0069)           ✅ /admin/production-workspace
+Kitchen Execution Capability         ← next (OPERATIONAL-005)
 ```
 
-```text
-GenerateProductionPlan → ProductionQueue → ProductionLoad
-Production never cooks. Kitchen executes.
-```
+Operational Planning is **fully consumable**.
 
 ---
 
 ## Near-term sequence
 
 1. ~~Production Engineering Certification~~ ✅ ADR 0068  
-2. **Production Workspace Demo**  
-3. Kitchen Capability Architecture  
+2. ~~Production Workspace Demo~~ ✅ ADR 0069  
+3. **Kitchen Execution Capability Architecture** (OPERATIONAL-005)  
 4. Delivery · Billing → [Operational Engine v1.0](./OPERATIONAL_ENGINE.md)
+
+Official board: [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)
 
 ```text
 YourMeal OS → Capability → Operational Pattern → Tenant → EatClean
