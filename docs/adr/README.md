@@ -49,3 +49,4 @@ Permanent decisions for YourMeal OS. New ADRs are additive; do not silently reve
 | [0056](./0056-identity-facade.md) | Identity Facade (OPERATIONAL-001 Phase 2 · public API) |
 | [0057](./0057-identity-validation.md) | Identity Validation (OPERATIONAL-001 Phase 3 · certified) |
 | [0058](./0058-customer-capability.md) | Customer Capability (OPERATIONAL-002 · demand Party freeze) |
+| [0059](./0059-customer-facade.md) | Customer Facade (OPERATIONAL-002 Phase 2 · Commands / Queries) |

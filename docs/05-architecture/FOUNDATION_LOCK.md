@@ -96,3 +96,50 @@ Shells / modules (observe · consume)
 ```
 
 Regla: Operational Modules **nunca** importan Supabase Auth ni coordinan carga de identidad; consumen `IdentityFacade`.
+
+---
+
+## FOUNDATION LAW 002 (permanente · OPERATIONAL-002)
+
+```text
+Every Operational Capability
+owns exactly one Facade.
+Capabilities never expose storage.
+Capabilities expose business concepts.
+```
+
+```text
+UI
+ ↓
+CustomerFacade   (only public API)
+ ↓
+Services
+ ↓
+Repositories
+ ↓
+Supabase
+```
+
+**Nunca:**
+
+```text
+UI → Supabase
+UI → Repository
+UI → raw tables
+```
+
+Ejemplo Customer (ADR 0058 · 0059):
+
+```text
+Customer Capability
+    ↓
+CustomerFacade / useCustomer
+    ↓
+CustomerDirectoryService · CompanyAccountService
+    ↓
+Repositories
+    ↓
+Ops screens (consume Facade only)
+```
+
+No exponemos tablas. Exponemos lenguaje de negocio (`CreateCustomerCommand`, `SearchCustomersQuery`, …).
