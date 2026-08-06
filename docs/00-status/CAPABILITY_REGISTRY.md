@@ -53,9 +53,16 @@ A **Capability Demo** proves LAW 003 before the definitive product screen.
 |------|---------|----------|
 | **Context** | Who is operating · tenant · permissions | Identity |
 | **Business Entity** | Demand / master data actors | Customer |
-| **Operational Process** | Weekly commitments that cross the org | **Orders** |
-| **Operational Execution** | Doing the work | Production · Kitchen · Delivery |
+| **Operational Process** | Weekly commitments that cross the org | Orders |
+| **Operational Execution** | Planning and doing the physical work | **Production** · Kitchen · Delivery |
 | **Operational Outcome** | Settling the work | Billing |
+
+```text
+Context → Business Entity → Operational Process
+        → Operational Execution → Operational Outcome
+```
+
+This taxonomy is the **business map**, not only a software label.
 
 | Maturity | Meaning |
 |----------|---------|
@@ -148,8 +155,10 @@ Order = compromiso operativo del tenant para una semana concreta.
 
 First **Operational Process** Capability — Engineering Certified + Capability Demo.  
 Operational Experience officially consumes Order.  
-Production · Kitchen · Delivery · Billing must consume `OrderFacade` only.  
-**Production Capability may begin.**
+Production · Kitchen · Delivery · Billing must consume `OrderFacade` only for commitment facts.  
+Production Capability (ADR 0066) transforms those commitments into executable work.  
+**Production Architecture frozen — Facade next.**
+
 
 ---
 
@@ -157,9 +166,31 @@ Production · Kitchen · Delivery · Billing must consume `OrderFacade` only.
 
 | Field | Value |
 |-------|--------|
-| **Maturity** | Pending |
+| **Maturity** | **Architecture** |
 | **Type** | Operational Execution |
-| Notes | ¿Qué hay que cocinar? · **Authorized to start** after Order Validation (ADR 0064) |
+| Completeness | Architecture ✅ · Facade ⏳ · Validation ⏳ · Demo ⏳ |
+| Field Validation | — |
+| Version | 0.1 (architecture) |
+| ADRs | [0066](../adr/0066-production-capability.md) |
+| Contract | [PRODUCTION_CAPABILITY](../05-architecture/PRODUCTION_CAPABILITY.md) |
+| Facade | Not yet |
+| Validation | Not yet |
+
+```text
+Production
+████░░░░░░░░░░░░░░ Architecture
+                    next: Facade
+Question: ¿Qué trabajo debe ejecutarse para
+          cumplir los compromisos operativos?
+
+Production = planificación que transforma Orders
+             en trabajo ejecutable.
+Production never cooks. Kitchen executes.
+```
+
+First **Operational Execution** Capability. Planning — not cooking.  
+Consumes `OrderFacade` only. Kitchen consumes Production.
+
 
 ---
 
@@ -228,8 +259,11 @@ Production · Kitchen · Delivery · Billing must consume `OrderFacade` only.
 | Identity | ¿Quién está operando? |
 | Customer | ¿Quién genera la demanda? |
 | Orders | ¿Qué compromiso operativo tiene el tenant esta semana? |
-| Production | ¿Qué hay que cocinar? |
+| Production | ¿Qué trabajo debe ejecutarse para cumplir los compromisos? |
+| Kitchen | ¿Qué se está ejecutando ahora en cocina? |
 | Delivery | ¿Qué hay que entregar? |
 | Billing | ¿Qué hay que cobrar? |
 
 Screens will change. These questions are the product core.
+
+**Milestone:** [Operational Engine v1.0](./OPERATIONAL_ENGINE.md) — full chain Identity→Billing certified.
