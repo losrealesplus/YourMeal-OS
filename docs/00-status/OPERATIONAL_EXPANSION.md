@@ -15,9 +15,9 @@ Core frozen · Android field PASS
 ↓
 
 Operational Expansion
-████░░░░░░░░░░░░░░░░
+████████░░░░░░░░░░░░
 First module: OPERATIONAL-006 Delivery
-(Facade · ADR 0078 · 0079)
+(Engineering Certified · ADR 0078 · 0079 · 0080)
 ══════════════════════════════════════════════
 ```
 
@@ -57,9 +57,9 @@ Observe
 ## Expansion order (dependencies)
 
 ```text
-OPERATIONAL-006  Delivery          ← Architecture ✅ · Facade ✅
+OPERATIONAL-006  Delivery          ← Architecture ✅ · Facade ✅ · Engineering Certified ✅
         ↓
-FLOW-002         Kitchen → Delivery   (after Delivery Certification)
+FLOW-002         Kitchen → Delivery   (after Delivery Demo preferido)
         ↓
 OPERATIONAL-007  Billing
         ↓
@@ -86,13 +86,13 @@ IOS-READY-001 / FIELD-VALIDATION-002
 ## First mission status
 
 **OPERATIONAL-006 · Delivery**  
-Phase 1 Architecture ✅ · Phase 2 Facade ✅ · Phase 3 Certification ◀ next
+Phase 1 Architecture ✅ · Phase 2 Facade ✅ · Phase 3 Certification ✅ · Phase 4 Demo ◀ next
 
 Canonical question:
 
 > ¿Qué compromisos operativos deben entregarse ahora y cómo confirmamos su ejecución?
 
-Contract: [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) · Facade: `src/delivery/`
+Contract: [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) · Facade: `src/delivery/` · Report: [DELIVERY_VALIDATION_REPORT](../10-validation/DELIVERY_VALIDATION_REPORT.md)
 
 ---
 
@@ -100,7 +100,7 @@ Contract: [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) · Fa
 
 | Item | Lock |
 |------|------|
-| Delivery UI / DB / Demo | Until Phase 3–4 |
-| FLOW-002 Harness | Until Delivery Certification |
+| Delivery Product UI / DB | Until Phase 4+ |
+| FLOW-002 Harness | Until Delivery Certification (prefer Demo) |
 | Billing Architecture | Prefer after Delivery Demo |
 | Claiming Engine **FIELD VALIDATED** | Until iPhone PASS + Android PASS |
