@@ -1,30 +1,50 @@
 # Operational Roadmap
 
 **Permanent control panel · frozen structure 2026-08-06**  
-**Companions:** [PLATFORM_STATUS](./PLATFORM_STATUS.md) · [FOUNDATION_STATUS](./FOUNDATION_STATUS.md) · [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md)
+**Companions:** [PLATFORM_STATUS](./PLATFORM_STATUS.md) · [FOUNDATION_STATUS](./FOUNDATION_STATUS.md) · [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) · [OPERATIONAL_DEPENDENCY_GRAPH](./OPERATIONAL_DEPENDENCY_GRAPH.md)
 
 ---
 
-## Product stack (current drawing)
+## Product stack
 
 ```text
 YourMeal OS
-
-Platform
-        │
-Foundation
-        │
-Operational Capabilities
-        │
-Operational Experience
-        │
-Operational Validation
-        │
-Production (execution layer · then Kitchen · Delivery · Billing)
+Platform → Foundation → Operational Capabilities
+→ Operational Experience → Operational Validation → Production Ready
 ```
 
-We no longer draw Developer Platform → Product Core → EatClean as the main spine.  
-Those exist. The spine is **capabilities that a real business uses**.
+---
+
+## Operational model (not just a roadmap)
+
+```text
+Identity → ¿Quién opera?
+Customer → ¿Quién genera la demanda?
+Orders → ¿Qué prometimos?
+Production → ¿Qué trabajo debemos generar?
+Kitchen → ¿Qué trabajo estoy ejecutando?
+Delivery → ¿Qué trabajo debo entregar?
+Billing → ¿Qué trabajo puedo facturar?
+```
+
+---
+
+## Layers
+
+```text
+Operational Planning
+  Orders → Production   ✅ Certified
+
+────────────────────────────
+
+Operational Execution
+  Kitchen → Delivery    Pending
+
+────────────────────────────
+
+Operational Outcome
+  Billing               Pending
+```
 
 ---
 
@@ -35,80 +55,61 @@ Those exist. The spine is **capabilities that a real business uses**.
 | Identity | Context | Engineering Certified |
 | Customers | Business Entity | Engineering Certified + Demo |
 | Orders | Operational Process | Engineering Certified + Demo |
-| **Production** | **Operational Execution** | **Facade (ADR 0067)** |
+| **Production** | **Operational Execution** | **Engineering Certified** |
 | Kitchen | Operational Execution | Pending |
 | Delivery | Operational Execution | Pending |
 | Billing | Operational Outcome | Pending |
 
 ---
 
-## Orders track (pattern certified)
+## Official rhythm (repeat forever)
 
 ```text
-Order Architecture → Facade → Validate → Workspace Demo
-✅ Engineering Certified + Operational Experience consumes Order
+Architecture
+    ↓
+Facade
+    ↓
+Engineering Certification
+    ↓
+Capability Demo
+    ↓
+Operational Experience
 ```
+
+Language: **certify** capabilities — not “develop screens”.
 
 ---
 
 ## Production track (OPERATIONAL-004)
 
 ```text
-Production Architecture (ADR 0066)   ✅
-        ↓
-Production Facade (ADR 0067)         ✅ Work language
-        ↓
-Production Validation                ← next
-        ↓
-Production Workspace Demo
-        ↓
-Kitchen Capability Architecture      (only after Production cycle)
+Architecture (ADR 0066)              ✅
+Facade (ADR 0067)                    ✅
+Engineering Certification (ADR 0068) ✅
+Capability Demo                      ← next
+Kitchen Capability                   after Demo (discipline)
 ```
 
 ```text
-GenerateProductionPlan · GetProductionQueue · ProductionLoad
-— never GetOrders / UpdateOrder / CreateOrder
+GenerateProductionPlan → ProductionQueue → ProductionLoad
+Production never cooks. Kitchen executes.
 ```
-
-```text
-Production never cooks.
-Kitchen executes.
-```
-
-**Discipline:** Never open two new operational capabilities at once.
 
 ---
 
-## Operational Engine v1.0 (named milestone)
+## Near-term sequence
 
-See [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md).
+1. ~~Production Engineering Certification~~ ✅ ADR 0068  
+2. **Production Workspace Demo**  
+3. Kitchen Capability Architecture  
+4. Delivery · Billing → [Operational Engine v1.0](./OPERATIONAL_ENGINE.md)
 
-Declared when Identity · Customers · Orders · Production · Kitchen · Delivery · Billing are Engineering Certified.
-
-That is when YourMeal OS models a catering operation **end to end**.
+```text
+YourMeal OS → Capability → Operational Pattern → Tenant → EatClean
+```
 
 ---
 
 ## Success question
 
 > **¿Qué capacidades operativas están certificadas y cuáles están siendo utilizadas por un negocio real?**
-
----
-
-## Near-term sequence
-
-1. ~~Order Workspace Demo~~ ✅ ADR 0065  
-2. ~~Production Capability Architecture~~ ✅ ADR 0066  
-3. ~~Production Facade~~ ✅ ADR 0067  
-4. **Production Validation** (OPERATIONAL-004 Phase 3)  
-5. Production Workspace Demo  
-6. Kitchen Capability Architecture (execution)  
-7. Delivery · Billing → [Operational Engine v1.0](./OPERATIONAL_ENGINE.md)
-
-```text
-YourMeal OS → Capability → Operational Pattern → Tenant → EatClean
-```
-
-EatClean is the first consumer — not the product.
-
-Detail panel: [OPERATIONAL_MODULES](./OPERATIONAL_MODULES.md) · [OPERATIONAL_EXPERIENCE](./OPERATIONAL_EXPERIENCE.md)
