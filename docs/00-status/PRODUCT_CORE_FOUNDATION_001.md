@@ -87,24 +87,17 @@ Field Smoke (OPPO)        ✅
 Foundation                STABLE (full)
 ```
 
-Until then, **engineering foundation is validated**; EatClean feature work may start with awareness that field smoke is the final confidence gate.
+Field Smoke (OPPO) remains operator handoff. Next track: **Operational Modules** (Identity Capability ADR 0055).
 
 ---
 
-## Roadmap shift (authorized after this acta)
+## Tag recommendation (after OPPO PASS)
 
 ```text
-FASE 0
-  Developer Platform v1.0     ████ 100%
-  Product Core Foundation     ████ 100% (engineering)
-  Field Smoke                 ░░░░ operator
-──────────────────────────────────────
-NEXT FOCUS → EatClean Core
-  Authentication · Users · Orders · Production
-  Inventory · Kitchen · Routes · Delivery · Billing
+product-core-foundation-v1.0
 ```
 
-Developer Platform remains the instrument of evidence — not the product roadmap.
+Create when field smoke is evidenced — not before.
 
 ---
 
