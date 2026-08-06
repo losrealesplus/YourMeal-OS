@@ -29,6 +29,7 @@ Foundation is **complete as the project center**. Era center moved to **Operatio
 | **004** | Operational Experience consumes Capabilities |
 | **005** | Each Capability belongs to exactly one Operational Model layer; cross-layer only via Facade |
 | **006** | Each Capability answers exactly one canonical business question |
+| **006-A** | Capabilities never answer the question of another Capability |
 
 Source: [FOUNDATION_LOCK](../05-architecture/FOUNDATION_LOCK.md)
 

@@ -1,6 +1,6 @@
 /**
  * Kitchen Execution Capability package — OPERATIONAL-005 Phase 2 (Facade).
- * Public API for Operational Execution. LAW 001–006.
+ * Public API for Operational Execution. LAW 001–006-A.
  * Kitchen never cooks. Kitchen never plans. Consumes ProductionFacade only.
  */
 

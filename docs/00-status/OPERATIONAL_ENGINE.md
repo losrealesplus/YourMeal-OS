@@ -73,7 +73,7 @@ Identity           ████████████████████�
 Customers          ██████████████████████  Engineering Certified + Demo
 Orders             ██████████████████████  Engineering Certified + Demo
 Production         ██████████████████████  Engineering Certified + Demo
-Kitchen Execution  ████████░░░░░░░░░░░░  Facade (ADR 0071)
+Kitchen Execution  ██████████████████████  Engineering Certified (ADR 0072)
 Delivery           ░░░░░░░░░░░░░░░░░░░░░░  Pending
 Billing            ░░░░░░░░░░░░░░░░░░░░░░  Pending
 ```
@@ -86,11 +86,13 @@ Billing            ░░░░░░░░░░░░░░░░░░░░�
 Context                 ████████████████
 Business Entity         ████████████████
 Operational Planning    ████████████████
-Operational Execution   ████░░░░░░░░░░░░
+Operational Execution   ████████░░░░░░░░  (Kitchen Certified)
 Operational Outcome     ░░░░░░░░░░░░░░░░
 ```
 
 Prefer **Engine Completion** language over a feature roadmap when communicating product status.
+
+After Kitchen Demo → **Operational Flow Validation** (Production → Kitchen → Delivery).
 
 ---
 
