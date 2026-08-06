@@ -1,8 +1,9 @@
 # Bootstrap Pipeline
 
-**PRODUCT-CORE-001 · Phase 1 — Architecture Freeze**  
-**ADR:** [0050 — Bootstrap Pipeline](../adr/0050-bootstrap-pipeline.md)  
-**Status:** **FROZEN** (contract only — no implementation in this phase)  
+**PRODUCT-CORE-001 · Architecture Freeze** · **PRODUCT-CORE-002 · Orchestrator**  
+**ADR:** [0050 — Bootstrap Pipeline](../adr/0050-bootstrap-pipeline.md) · [0051 — Bootstrap Orchestrator](../adr/0051-bootstrap-orchestrator.md)  
+**Status:** **EXECUTABLE** — contract frozen; orchestrator owns startup **order**  
+**Code:** `src/bootstrap/pipeline/` (`BootstrapPipeline.ts` = single sequence definition)  
 **Audience:** Product Core · EatClean daily operations · Developer Platform (observe only)
 
 ---
@@ -53,31 +54,28 @@ The word **bootstrap** already means four different things in this repo. Product
 
 | Term | Meaning | Location |
 |------|---------|----------|
-| **App Bootstrap Pipeline** *(this document)* | Ordered app startup → Application Ready | Future `src/` orchestrator (not yet) |
+| **App Bootstrap Pipeline** *(this document)* | Ordered app startup → Application Ready | `src/bootstrap/pipeline/*` |
 | **Post-Login Pipeline (FCR-008 / PS-002)** | Ordered milestones after a successful auth API call | `src/auth/post-login-pipeline.ts` |
-| **Dev Bootstrap Mode** | Synthetic identity for local UX (`VITE_BOOTSTRAP_MODE`) | `src/bootstrap/*` |
+| **Dev Bootstrap Mode** | Synthetic identity for local UX (`VITE_BOOTSTRAP_MODE`) | `src/bootstrap/*` (siblings; not `pipeline/`) |
 | **Operational Bootstrap (OP-001)** | Tenant Day-0 ladder (dishes → menu → orders…) | `src/modules/bootstrap-integrity/*` · [BOOTSTRAP_STATE_MACHINE](./BOOTSTRAP_STATE_MACHINE.md) |
 
 **App Bootstrap** may *invoke* Post-Login milestones. It must never be confused with Operational Bootstrap or Dev Bootstrap Mode.
 
 ---
 
-## Observed as-built (today)
+## Observed as-built (orchestration)
 
-There is **no single orchestrator**. Startup is distributed:
+| Concern | Ownership |
+|---------|-----------|
+| **Startup order** | **`src/bootstrap/pipeline/BootstrapPipeline.ts`** (only place) |
+| Process entry | Vite / TanStack Start · Capacitor SPA · `startBootstrapPipeline` from `router.tsx` |
+| Providers | `__root.tsx` → Query · i18n · Localization · Identity · optional BootstrapShell (**unchanged**) |
+| Auth / Session / Tenant enrichment | IdentityProvider + auth facade (stages **delegate** / peek) |
+| Branding | TenantBrandScope / shells (stage NON-BLOCKING · delegated) |
+| Navigation | `resolveHomePath` / route guards (stage delegated) |
+| UI Ready gate | **Not yet** — orchestrator does not block paint (PRODUCT-CORE-002) |
 
-| Concern | Today |
-|---------|--------|
-| Process entry | Vite / TanStack Start · Capacitor SPA (`src/server.ts`, `src/start.ts`, `src/router.tsx`) |
-| Providers | `__root.tsx` → Query · i18n · Localization · Identity · optional BootstrapShell |
-| Auth | Supabase Auth + route guards · customer `/auth` · ops `/auth/admin` |
-| Session | Supabase `Session` + IdentityProvider enrichment (roles, profile, membership) |
-| Tenant | First `tenant_members` row (RI-001: one user → one tenant) |
-| Branding | Static EatClean `BrandConfig` + async `TenantBrandRepository` in shells |
-| Navigation | `resolveHomePath` / role guards — not a global Ready gate |
-| Ready | **Absent** — dashboards can paint while auth is still `loading` |
-
-Developer Platform Runtime Suite registers early in `router.tsx` for diagnostics. It is **not** a Product Core Ready gate and must not be modified for this track.
+Developer Platform Runtime Suite registers early in `router.tsx` for diagnostics. It is **orthogonal** to Product Core Ready and must not be modified for this track.
 
 ---
 
@@ -461,16 +459,15 @@ interface BootstrapPipeline {
 
 ---
 
-## Missing services (to implement in later PRODUCT-CORE-001 phases)
+## Missing services (post PRODUCT-CORE-002)
 
 | Gap | Why it matters |
 |-----|----------------|
-| **Bootstrap Orchestrator** | Single owner of stage order and Ready latch |
-| **In-app Environment gate** | Today env fails lazily; Doctor CLI is external |
-| **Service init registry** | Explicit ordered init + health, not import side-effects |
+| **Full ownership in Session/Tenant stages** | Still delegated to IdentityProvider — migrate without Provider rewrite |
+| **In-app Environment gate UI** | Orchestrator records failure; UI not yet blocked on it |
 | **`ApplicationReady` gate in UI** | Prevent workspace paint while auth/tenant still loading |
 | **Unified cold vs login convergence** | Cold hydrate and FCR-008 must produce the same `BootstrapResult` shape |
-| **Bootstrap Doctor Capability** | Product-facing stage checklist (✔/✖) without changing frozen engines’ contracts |
+| **Bootstrap Doctor Capability** | Subscribe to `bootstrap:*` lifecycle events (no Doctor change in 002) |
 | **Explicit Permissions stage (optional v1.1)** | Roadmap listed Permissions; v1 folds capability checks into Session + Navigation |
 | **Host-based tenant resolution** | Deferred; membership-only for EatClean pilot |
 
@@ -511,7 +508,7 @@ Cold start uses `mode: "cold"` and **must** still emit a `BootstrapResult` with 
 
 ---
 
-## Acceptance for Phase 1
+## Acceptance for Phase 1–2
 
 - [x] Stages described with purpose / inputs / outputs / failure / recovery / Doctor.
 - [x] Blocking policy frozen.
@@ -519,19 +516,20 @@ Cold start uses `mode: "cold"` and **must** still emit a `BootstrapResult` with 
 - [x] Existing vs missing participants listed.
 - [x] Public types `BootstrapResult` · `BootstrapStage` · `BootstrapStatus` · `BootstrapError` frozen.
 - [x] ADR 0050 accepted.
-- [ ] **No product code** in this phase.
+- [x] Bootstrap Orchestrator executable (`src/bootstrap/pipeline/`) — ADR 0051.
+- [x] Single sequence definition: `BootstrapPipeline.ts`.
+- [x] Lifecycle events published (no Doctor/UI changes).
+- [x] No Provider / FCR / branding / routing refactor.
 
 ---
 
-## Next phases (PRODUCT-CORE-001)
+## Next phases
 
 ```text
-001 Architecture (this doc)     ✅ / in PR
-002 Implement Orchestrator      ← next after freeze land
-003 Wire Identity / Session
-004 Tenant + Branding stages
-005 Navigation + Ready gate
+001 Architecture              ✅
+002 Bootstrap Orchestrator    ✅ / in PR
+003 Own Session/Tenant stages (still no Provider rewrite)
+004 Application Ready UI gate
+005 Navigation ownership
 006 Smoke Test (web + OPPO)
 ```
-
-Until Architecture is landed and accepted, no implementation PRs for the pipeline.

@@ -61,13 +61,14 @@ Primer sprint propuesto:
 
 **PRODUCT-CORE-001 · Authentication & Bootstrap Stabilization** ⬅️ AQUÍ
 
-Contrato congelado (ADR [0050](../adr/0050-bootstrap-pipeline.md)):
+Contrato congelado (ADR [0050](../adr/0050-bootstrap-pipeline.md)) · Orquestador ejecutable (ADR [0051](../adr/0051-bootstrap-orchestrator.md)):
 
 ```text
 App Launch → Environment → Services → Authentication
 → Session → Tenant → Branding → Navigation → Application Ready
 ```
 
+Código: `src/bootstrap/pipeline/` · secuencia única: `BootstrapPipeline.ts`  
 Detalle: [BOOTSTRAP_PIPELINE](./BOOTSTRAP_PIPELINE.md) · estado: [PRODUCT_CORE_001](../00-status/PRODUCT_CORE_001.md)
 
 Debe ser 100% determinista, medible y sin errores — usando la Developer Platform v1.0 como instrumento de evidencia.

@@ -25,17 +25,12 @@ Un solo Happy Path. No veinte pantallas.
 
 | Block | Focus | Status |
 |-------|--------|--------|
-| **001** | Bootstrap Architecture (Observe → Design → Freeze) | ▶ This PR |
-| **002** | Authentication (stable identity entry) | ⏳ |
-| **003** | Bootstrap Orchestrator implementation | ⏳ |
-| **004** | Tenant Loading | ⏳ |
-| **005** | Session | ⏳ |
-| **006** | Navigation + Application Ready | ⏳ |
-| **007** | Smoke Test (web + OPPO) | ⏳ |
-
-Until Architecture is accepted, **no implementation** of the orchestrator.
-
-> User plan shorthand: `001 Auth → 002 Bootstrap → …` maps to implementation after this architecture freeze. Architecture is the mandatory first gate (same methodology as Developer Platform).
+| **001** | Bootstrap Architecture (Observe → Design → Freeze) | ✅ ADR 0050 |
+| **002** | Bootstrap Orchestrator (order only) | ▶ ADR 0051 |
+| **003** | Session / Tenant stage ownership (delegate → own) | ⏳ |
+| **004** | Branding stage (still NON-BLOCKING) | ⏳ |
+| **005** | Navigation + Application Ready UI gate | ⏳ |
+| **006** | Smoke Test (web + OPPO) | ⏳ |
 
 ---
 
@@ -44,7 +39,9 @@ Until Architecture is accepted, **no implementation** of the orchestrator.
 | Artifact | Path |
 |----------|------|
 | Pipeline contract | [BOOTSTRAP_PIPELINE.md](../05-architecture/BOOTSTRAP_PIPELINE.md) |
-| ADR | [0050-bootstrap-pipeline.md](../adr/0050-bootstrap-pipeline.md) |
+| ADR (contract) | [0050-bootstrap-pipeline.md](../adr/0050-bootstrap-pipeline.md) |
+| ADR (orchestrator) | [0051-bootstrap-orchestrator.md](../adr/0051-bootstrap-orchestrator.md) |
+| Code | `src/bootstrap/pipeline/` · sequence: `BootstrapPipeline.ts` |
 
 Canonical flow:
 
