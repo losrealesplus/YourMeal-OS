@@ -110,6 +110,7 @@ Do not open Delivery / FLOW-002 Architecture before this gate is complete.
 
 ---
 
-## Immediate next step
+**Immediate next step**
 
-**FIELD-VALIDATION-002 · iPhone Validation** — same discipline; then declare Engine v0.8 **FIELD VALIDATED**.
+**FIELD-VALIDATION-002 · iOS** — official guide: [FIELD_VALIDATION_002_IOS](../10-validation/FIELD_VALIDATION_002_IOS.md)  
+Audit verdict: **NOT READY** for install today · clear signing + Preferences SPM + `sync:mobile`, then physical iPhone session.

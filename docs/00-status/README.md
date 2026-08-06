@@ -20,6 +20,7 @@
 | [OPERATIONAL_VALIDATION_SPRINT](./OPERATIONAL_VALIDATION_SPRINT.md) | **Active sprint** · Android PASS · iPhone next |
 | [FIELD_VALIDATION_MILESTONE](../10-validation/FIELD_VALIDATION_MILESTONE.md) | **OPPO PASS** · first physical Engine run |
 | [ANDROID_FIELD_VALIDATION_REPORT](../10-validation/ANDROID_FIELD_VALIDATION_REPORT.md) | Android evidence · bug #340 · checklist |
+| [FIELD_VALIDATION_002_IOS](../10-validation/FIELD_VALIDATION_002_IOS.md) | **iOS audit** · NOT READY · field guide |
 | [FIELD_VALIDATION_LOG](../10-validation/FIELD_VALIDATION_LOG.md) | Real-device evidence log (OPPO · iPhone) |
 | [OPERATIONAL_DEPENDENCY_GRAPH](./OPERATIONAL_DEPENDENCY_GRAPH.md) | Permanent dependency graph · layers |
 

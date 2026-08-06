@@ -3,7 +3,7 @@
 **Status:** ▶ **ACTIVE** — Android PASS · iPhone next  
 **Declared:** 2026-08-06  
 **Prerequisite:** Operational Engine v0.8 on `main`  
-**Companions:** [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) · [OPERATIONAL_ROADMAP](./OPERATIONAL_ROADMAP.md) · [FIELD_VALIDATION_MILESTONE](../10-validation/FIELD_VALIDATION_MILESTONE.md) · [ANDROID_FIELD_VALIDATION_REPORT](../10-validation/ANDROID_FIELD_VALIDATION_REPORT.md) · [FIELD_VALIDATION_LOG](../10-validation/FIELD_VALIDATION_LOG.md)
+**Companions:** [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) · [OPERATIONAL_ROADMAP](./OPERATIONAL_ROADMAP.md) · [FIELD_VALIDATION_MILESTONE](../10-validation/FIELD_VALIDATION_MILESTONE.md) · [ANDROID_FIELD_VALIDATION_REPORT](../10-validation/ANDROID_FIELD_VALIDATION_REPORT.md) · [FIELD_VALIDATION_002_IOS](../10-validation/FIELD_VALIDATION_002_IOS.md) · [FIELD_VALIDATION_LOG](../10-validation/FIELD_VALIDATION_LOG.md)
 
 ```text
 ══════════════════════════════════════════════
@@ -89,8 +89,8 @@ Evidence → Hypothesis → Validation → Minimal Fix → Regression Tests → 
 2. **Operational Engine Review** — ✅
 3. **Android APK** — ✅
 4. **OPPO Validation** — ✅ [report](../10-validation/ANDROID_FIELD_VALIDATION_REPORT.md)
-5. **iPhone Build** — next
-6. **iPhone Validation** — FIELD-VALIDATION-002 (same discipline)
+5. **iPhone Build** — next · follow [FIELD_VALIDATION_002_IOS](../10-validation/FIELD_VALIDATION_002_IOS.md) (audit: **NOT READY** until signing + Preferences SPM + sync)
+6. **iPhone Validation** — FIELD-VALIDATION-002 field session (same discipline as OPPO)
 
 **After Android + iOS PASS:** declare Operational Engine v0.8 **FIELD VALIDATED**.  
 **Then** open Delivery Architecture. Not before.
