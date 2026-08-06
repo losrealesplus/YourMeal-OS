@@ -37,8 +37,8 @@ We may still touch Foundation. It is no longer the protagonist.
 | Customer Workspace | Capability Demo (LAW 003) |
 | Orders | **Engineering Certified** (ADR 0064) |
 | Order Workspace | **Capability Demo** (ADR 0065 · LAW 003 · 004) |
-| Production | **Architecture** (ADR 0066) — planning, not cooking |
-| Kitchen / Delivery / Billing | Pending |
+| Production | **Facade** (ADR 0067) — work language, not Order CRUD |
+| Kitchen / Delivery / Billing | Pending (Kitchen after Production cycle) |
 
 ---
 

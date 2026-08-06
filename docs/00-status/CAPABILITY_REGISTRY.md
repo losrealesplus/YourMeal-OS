@@ -75,6 +75,25 @@ This taxonomy is the **business map**, not only a software label.
 
 ---
 
+## Dependency map (Consumida por)
+
+Functional consumers — not import graphs.
+
+| Capability | Tipo | Estado | Consumida por |
+|------------|------|--------|---------------|
+| Identity | Context | Engineering Certified | Customer · Orders · Production |
+| Customer | Business Entity | Engineering Certified + Demo | Orders |
+| Orders | Operational Process | Engineering Certified + Demo | Production |
+| Production | Operational Execution | **Facade** | Kitchen |
+| Kitchen | Operational Execution | Pending | Delivery |
+| Delivery | Operational Execution | Pending | Billing |
+| Billing | Operational Outcome | Pending | — |
+
+**Discipline:** Never open two new operational capabilities at once.  
+Complete **Architecture → Facade → Validation → Demo** before the next.
+
+---
+
 ## Registry
 
 ### 001 · Identity
@@ -166,20 +185,21 @@ Production Capability (ADR 0066) transforms those commitments into executable wo
 
 | Field | Value |
 |-------|--------|
-| **Maturity** | **Architecture** |
+| **Maturity** | **Facade** |
 | **Type** | Operational Execution |
-| Completeness | Architecture ✅ · Facade ⏳ · Validation ⏳ · Demo ⏳ |
+| Completeness | Architecture ✅ · Facade ✅ · Validation ⏳ · Demo ⏳ |
+| Consumida por | Kitchen (canonical) |
 | Field Validation | — |
-| Version | 0.1 (architecture) |
-| ADRs | [0066](../adr/0066-production-capability.md) |
+| Version | 0.2 (facade) |
+| ADRs | [0066](../adr/0066-production-capability.md) · [0067](../adr/0067-production-facade.md) |
 | Contract | [PRODUCTION_CAPABILITY](../05-architecture/PRODUCTION_CAPABILITY.md) |
-| Facade | Not yet |
+| Facade | `src/production/ProductionFacade.ts` · `useProduction()` · work Commands / Queries |
 | Validation | Not yet |
 
 ```text
 Production
-████░░░░░░░░░░░░░░ Architecture
-                    next: Facade
+████████░░░░░░░░░░ Facade
+                    next: Validate
 Question: ¿Qué trabajo debe ejecutarse para
           cumplir los compromisos operativos?
 
@@ -188,8 +208,8 @@ Production = planificación que transforma Orders
 Production never cooks. Kitchen executes.
 ```
 
-First **Operational Execution** Capability. Planning — not cooking.  
-Consumes `OrderFacade` only. Kitchen consumes Production.
+First **Operational Execution** Capability — Facade. Work language — not Order CRUD.  
+Consumes `OrderFacade` (calendar / commitments). Kitchen · Delivery · Billing consume `ProductionFacade`.
 
 
 ---

@@ -24,7 +24,7 @@
 **Identity Validation:** [IDENTITY_VALIDATION_REPORT](../10-validation/IDENTITY_VALIDATION_REPORT.md) · smoke [checklist](../10-validation/IDENTITY_SMOKE_CHECKLIST.md)  
 **Customer Capability:** [CUSTOMER_CAPABILITY](../05-architecture/CUSTOMER_CAPABILITY.md) · ADR 0058–0061 · Demo `/admin/customer-workspace`  
 **Order Capability:** [ORDER_CAPABILITY](../05-architecture/ORDER_CAPABILITY.md) · ADR 0062–0065 · Demo `/admin/order-workspace`  
-**Production Capability:** [PRODUCTION_CAPABILITY](../05-architecture/PRODUCTION_CAPABILITY.md) · ADR 0066 · planning ≠ cooking  
+**Production Capability:** [PRODUCTION_CAPABILITY](../05-architecture/PRODUCTION_CAPABILITY.md) · ADR 0066–0067 · Facade `useProduction()`  
 
 **Modules index:** [OPERATIONAL_MODULES](./OPERATIONAL_MODULES.md)  
 **Developer Platform:** ✅ **v1.0 FROZEN** · tag `developer-platform-v1.0.0` · Infra: HOUSEKEEPING-001…003 ✅  
