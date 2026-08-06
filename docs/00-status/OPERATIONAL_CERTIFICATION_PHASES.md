@@ -1,23 +1,23 @@
 # Operational Certification Phases
 
-**Permanent · declared with ADR [0073](../adr/0073-kitchen-workspace-demo.md)**  
-**Companions:** [OPERATIONAL_ROADMAP](./OPERATIONAL_ROADMAP.md) · [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [FOUNDATION_LOCK](../05-architecture/FOUNDATION_LOCK.md) LAW 007
+**Permanent · Phase A COMPLETE · FLOW-001 Architecture ADR [0074](../adr/0074-operational-flow-001.md)**  
+**Companions:** [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md) · [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [FOUNDATION_LOCK](../05-architecture/FOUNDATION_LOCK.md) LAW 007
 
 ```text
 PHASE A
 Capability Certification
 ████████████████████
+COMPLETE
 Identity → Customers → Orders → Production → Kitchen
-(Architecture → Facade → Certification → Demo)
 
 ↓
 
 PHASE B
 Operational Flow Validation
 ████░░░░░░░░░░░░░░░
-OPERATIONAL-FLOW-001  Orders → Production → Kitchen
-OPERATIONAL-FLOW-002  Production → Kitchen → Delivery
-OPERATIONAL-FLOW-003  Delivery → Billing
+OPERATIONAL-FLOW-001  Architecture ✅ (ADR 0074)
+OPERATIONAL-FLOW-002  Pending
+OPERATIONAL-FLOW-003  Pending
 
 ↓
 
@@ -29,19 +29,26 @@ EatClean field / OPPO / daily operations
 
 ---
 
-## Phase A — complete through Kitchen Demo
+## Phase A — COMPLETE
 
-Individual capabilities certified in isolation. Pattern proven. No longer needs re-demonstration.
+Individual capabilities certified in isolation. Pattern proven. Era of isolated Capability Certification is closed.
 
-## Phase B — begins after Kitchen Demo
+## Phase B — in progress
 
-Validate **chains**, not pieces. LAW 007: every stage transition via certified Facades.
+Validate **chains**, not pieces. LAW 007: every stage transition via certified Facades.  
+Registry: [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md)
 
-| Flow | Chain | Canonical question |
-|------|-------|--------------------|
-| **001** | Orders → Production → Kitchen | ¿Puede un compromiso operativo convertirse en trabajo ejecutado sin romper ninguna ley? |
-| **002** | Production → Kitchen → Delivery | ¿Puede el trabajo ejecutado convertirse en trabajo entregable? |
-| **003** | Delivery → Billing | ¿Puede el trabajo entregado convertirse en resultado económico? |
+| Flow | Chain | Status | Canonical question |
+|------|-------|--------|--------------------|
+| **001** | Orders → Production → Kitchen | **Architecture** | ¿Puede un compromiso operativo convertirse en trabajo ejecutado sin romper ninguna Foundation Law? |
+| **002** | Production → Kitchen → Delivery | Pending | ¿Puede el trabajo ejecutado convertirse en trabajo entregable? |
+| **003** | Delivery → Billing | Pending | ¿Puede el trabajo entregado convertirse en resultado económico? |
+
+Flow method (unchanged from Capability rhythm):
+
+```text
+Observe → Design → Freeze → Facade → Engineering Certification → Flow Demo
+```
 
 ## Phase C — EatClean as first tenant of the pattern
 
