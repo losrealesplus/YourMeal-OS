@@ -528,7 +528,7 @@ Cold start uses `mode: "cold"` and **must** still emit a `BootstrapResult` with 
 ```text
 001 Architecture              ✅
 002 Bootstrap Orchestrator    ✅
-003 Stage Ownership           ✅ / in PR
-004 Application Ready UI gate
-005 Smoke Test (web + OPPO)
+003 Stage Ownership           ✅
+004 Application Ready Gate    ✅ / in PR
+005 Smoke Test (web + OPPO) → Product Core Foundation
 ```

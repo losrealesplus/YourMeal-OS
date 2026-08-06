@@ -16,6 +16,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { onAuthStateChange } from "@/auth";
 import { BootstrapShell } from "@/bootstrap/BootstrapShell";
+import { ApplicationReadyGate } from "@/bootstrap/ready";
 import { IdentityProvider } from "@/identity/identity-provider";
 import i18n from "@/i18n";
 import { useLanguageSync } from "@/hooks/use-language-sync";
@@ -190,7 +191,7 @@ function AppProviders({ children }: { children: ReactNode }) {
           <YmosRuntimeMountProbe label="IdentityProvider mounted">
             <BootstrapShell>
               <YmosRuntimeMountProbe label="BootstrapShell mounted">
-                {children}
+                <ApplicationReadyGate>{children}</ApplicationReadyGate>
               </YmosRuntimeMountProbe>
             </BootstrapShell>
           </YmosRuntimeMountProbe>

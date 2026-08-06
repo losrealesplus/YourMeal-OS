@@ -43,3 +43,4 @@ Permanent decisions for YourMeal OS. New ADRs are additive; do not silently reve
 | [0050](./0050-bootstrap-pipeline.md) | Bootstrap Pipeline (PRODUCT-CORE-001 · App Launch → Ready freeze) |
 | [0051](./0051-bootstrap-orchestrator.md) | Bootstrap Orchestrator (PRODUCT-CORE-002 · executable order) |
 | [0052](./0052-stage-ownership.md) | Stage Ownership Migration (PRODUCT-CORE-003 · Stages coordinate) |
+| [0053](./0053-application-ready-gate.md) | Application Ready Gate (PRODUCT-CORE-004 · lifecycle latch) |
