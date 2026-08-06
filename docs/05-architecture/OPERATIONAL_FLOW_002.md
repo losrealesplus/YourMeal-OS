@@ -2,14 +2,15 @@
 
 **Operational Fulfillment Flow**  
 **Order → Production → Kitchen → Delivery → Confirmation**  
-**Phase 2 — Harness**  
-**ADR:** [0081](../adr/0081-operational-flow-002.md) · [0082](../adr/0082-operational-flow-002-harness.md)  
-**Status:** **Harness** (Architecture → Harness)  
-**Behaviour:** [BH-001 Fulfill Weekly Commitment](./OPERATIONAL_BEHAVIOURS.md)  
-**Phase:** B · Operational Flow Validation  
+**Phase 3 — Engineering Certification**  
+**ADR:** [0081](../adr/0081-operational-flow-002.md) · [0082](../adr/0082-operational-flow-002-harness.md) · [0083](../adr/0083-operational-flow-002-engineering-certification.md)  
+**Status:** **Engineering Certified**  
+**Behaviour:** [BH-001 Fulfill Weekly Commitment](./OPERATIONAL_BEHAVIOURS.md) · [Board](../00-status/OPERATIONAL_BEHAVIOUR_BOARD.md)  
+**Phase:** B · Operational Flow Validation · ERA 4 Behaviours  
 **Laws:** 001–007 · [FOUNDATION_LOCK](./FOUNDATION_LOCK.md)  
 **Registry:** [OPERATIONAL_FLOW_REGISTRY](../00-status/OPERATIONAL_FLOW_REGISTRY.md)  
 **Package:** `src/flows/flow-002/` · `Flow002Harness` · `useFlow002`  
+**Validation:** [FLOW_002_VALIDATION_REPORT](../10-validation/FLOW_002_VALIDATION_REPORT.md) · 15 PASS · 0 FAIL  
 **Depends on:** FLOW-001 Engineering Certified · Delivery Engineering Certified (ADR 0080)
 
 ```text
@@ -335,22 +336,24 @@ FLOW-003 answers: confirmation → economic outcome
 - [x] Behaviour BH-001 named (semantic)  
 - [x] **No UI · no business logic in Flow**
 
-### Phase 3 (Engineering Certification) 🔒
+### Phase 3 (Engineering Certification) ✅
 
-- [ ] Validation matrix · FAIL = 0  
-- [ ] Expected gaps remain UNIMPLEMENTED  
-- [ ] Report · smoke checklist  
-- [ ] **No UI · no Billing**
+- [x] Validation matrix F01–F15 · FAIL = 0  
+- [x] Capability UNIMPLEMENTED surfaced as TRANSITION_FAILED at hop  
+- [x] ADR 0083 · report · smoke checklist  
+- [x] BH-001 certified on Behaviour Board  
+- [x] Scenarios reserved  
+- [x] **No UI · no Billing**
 
 ---
 
-## Definition of Done (Phase 2)
+## Definition of Done (Phase 3)
 
 ```text
-FLOW-002 Harness orchestrates four Facades only.
-Evidence answers which transition failed.
-Behaviour BH-001 names the achievement.
-Billing remains Outcome / FLOW-003.
+FLOW-002 is Engineering Certified.
+BH-001 Fulfill Weekly Commitment is Engineering Certified.
+FLOW validates transitions — never individual Capabilities.
+Billing / FLOW-003 / Scenarios remain gated or reserved.
 ```
 
 ---
@@ -360,6 +363,6 @@ Billing remains Outcome / FLOW-003.
 ```text
 OPERATIONAL-FLOW-002 Phase 1  Architecture              ✅ ADR 0081
 OPERATIONAL-FLOW-002 Phase 2  Harness                   ✅ ADR 0082
-OPERATIONAL-FLOW-002 Phase 3  Engineering Certification ← next
-OPERATIONAL-FLOW-002 Phase 4  Flow Demo
+OPERATIONAL-FLOW-002 Phase 3  Engineering Certification ✅ ADR 0083
+OPERATIONAL-FLOW-002 Phase 4  Flow Demo                 ← next
 ```

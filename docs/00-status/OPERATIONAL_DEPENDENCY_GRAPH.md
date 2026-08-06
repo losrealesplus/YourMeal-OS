@@ -39,10 +39,12 @@ FLOW-001  Order → Production → Kitchen → Execution Completed
           (Engineering Certified)
 
 FLOW-002  Order → Production → Kitchen → Delivery → Confirmation
-          (Harness · Operational Fulfillment · BH-001)
+          (Engineering Certified · BH-001)
 
 FLOW-003  Confirmation → Billing
           (Pending)
+
+Scenarios  Weekly Catering Cycle · RESERVED
 ```
 
 ---

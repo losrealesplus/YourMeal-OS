@@ -178,10 +178,18 @@ They never invent a parallel “fulfillment” outside BH-001.
 
 ---
 
+## Board
+
+Track maturity on [OPERATIONAL_BEHAVIOUR_BOARD](../00-status/OPERATIONAL_BEHAVIOUR_BOARD.md).  
+Scenarios (future): [OPERATIONAL_SCENARIO_REGISTRY](../00-status/OPERATIONAL_SCENARIO_REGISTRY.md) · RESERVED.
+
+---
+
 ## Next
 
 ```text
-BH-001 expressed by FLOW-002 Harness (ADR 0082)
-BH-001 certified when FLOW-002 Engineering Certification PASS
-BH-003 waits for FLOW-002 cycle + Billing Architecture
+BH-001 Engineering Certified ✅ (ADR 0083 · FLOW-002)
+BH-001 Flow Demo ← next
+BH-003 waits for FLOW-002 Demo + Billing Architecture
+Scenarios reserved until multi-Behaviour tenant evidence
 ```

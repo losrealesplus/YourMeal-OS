@@ -32,12 +32,12 @@ Roadmap Review (Engine Review) — continuous with Expansion
 1. OPERATIONAL-006 Delivery · Architecture ✅ (ADR 0078)
 2. Delivery Facade (Phase 2) ✅ (ADR 0079)
 3. Delivery Engineering Certification (Phase 3) ✅ (ADR 0080)
-4. FLOW-002 Architecture ✅ (ADR 0081) · Operational Fulfillment Flow
-5. FLOW-002 Harness ✅ (ADR 0082) · BH-001 Fulfill Weekly Commitment
-6. FLOW-002 Engineering Certification ◀ next
-7. Delivery / FLOW-001 Demos (parallel)
-8. OPERATIONAL-007 Billing … (after FLOW-002)
-9. FLOW-003 …
+4. FLOW-002 Architecture ✅ (ADR 0081)
+5. FLOW-002 Harness ✅ (ADR 0082) · BH-001
+6. FLOW-002 Engineering Certification ✅ (ADR 0083) · 15 PASS · 0 FAIL
+7. FLOW-002 Flow Demo ◀ next
+8. OPERATIONAL-007 Billing … (after FLOW-002 Demo preferido)
+9. FLOW-003 · Scenarios (reserved) …
 ```
 
 ### Method (permanent)
@@ -53,7 +53,8 @@ Observe → Design → Freeze → Facade/Harness → Engineering Certification
 
 ```text
 PHASE A · Capability Certification     ████████████████ COMPLETE
-PHASE B · Operational Flow Validation  ████████████░░░░ FLOW-001 Certified · FLOW-002 Harness
+PHASE B · Operational Flow Validation  ████████████████ FLOW-001 + FLOW-002 Certified
+ERA 4  · Operational Behaviours        ████████░░░░░░░░ BH-001 Certified
 PHASE C · Real Tenant Validation       ░░░░░░░░░░░░░░░░
 ```
 
@@ -75,9 +76,9 @@ Flow Demo                            ← parallel prefer
 ```text
 Architecture (ADR 0081)              ✅
 Harness (ADR 0082)                   ✅
-Engineering Certification            ← next
-Flow Demo
-Behaviour: BH-001 Fulfill Weekly Commitment
+Engineering Certification (ADR 0083) ✅
+Flow Demo                            ← next
+Behaviour: BH-001 Fulfill Weekly Commitment ✅
 Ends at: Delivery Confirmation (not Billing)
 ```
 
