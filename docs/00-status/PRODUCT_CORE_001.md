@@ -27,9 +27,9 @@ Un solo Happy Path. No veinte pantallas.
 |-------|--------|--------|
 | **001** | Bootstrap Architecture (Observe → Design → Freeze) | ✅ ADR 0050 |
 | **002** | Bootstrap Orchestrator (order only) | ✅ ADR 0051 |
-| **003** | Stage Ownership Migration (Stages coordinate · Providers observe) | ▶ ADR 0052 |
-| **004** | Application Ready UI gate | ⏳ |
-| **005** | Smoke Test (web + OPPO) | ⏳ |
+| **003** | Stage Ownership Migration (Stages coordinate · Providers observe) | ✅ ADR 0052 |
+| **004** | Application Ready Gate (lifecycle latch) | ▶ ADR 0053 |
+| **005** | Smoke Test (web + OPPO) → Product Core Foundation | ⏳ |
 
 ---
 
@@ -42,7 +42,8 @@ Un solo Happy Path. No veinte pantallas.
 | ADR (orchestrator) | [0051-bootstrap-orchestrator.md](../adr/0051-bootstrap-orchestrator.md) |
 | ADR (ownership) | [0052-stage-ownership.md](../adr/0052-stage-ownership.md) |
 | Ownership matrix | [BOOTSTRAP_OWNERSHIP.md](../05-architecture/BOOTSTRAP_OWNERSHIP.md) |
-| Code | `src/bootstrap/pipeline/` · sequence: `BootstrapPipeline.ts` |
+| Ready Gate | [APPLICATION_READY_GATE.md](../05-architecture/APPLICATION_READY_GATE.md) · ADR 0053 |
+| Code | `src/bootstrap/pipeline/` · `src/bootstrap/ready/` |
 
 Canonical flow:
 

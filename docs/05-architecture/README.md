@@ -55,6 +55,7 @@
 | [DEVELOPER_PLATFORM_v1.md](./DEVELOPER_PLATFORM_v1.md) | Constitución Developer Platform v1.0 · FROZEN |
 | [BOOTSTRAP_PIPELINE.md](./BOOTSTRAP_PIPELINE.md) | App Bootstrap Pipeline · PRODUCT-CORE-001/002 · executable contract |
 | [BOOTSTRAP_OWNERSHIP.md](./BOOTSTRAP_OWNERSHIP.md) | Stage ownership matrix · PRODUCT-CORE-003 · Providers observe |
+| [APPLICATION_READY_GATE.md](./APPLICATION_READY_GATE.md) | Application Ready Gate · PRODUCT-CORE-004 · lifecycle latch |
 | [BOOTSTRAP_STATE_MACHINE.md](./BOOTSTRAP_STATE_MACHINE.md) | Operational Bootstrap OP-001 (Day-0 ladder · distinto del App Bootstrap) |
 | [../07-experience/CUSTOMER_JOURNEYS.md](../07-experience/CUSTOMER_JOURNEYS.md) | Experience First · CJ-001 Pedido semanal |
 | [architecture-review.md](./architecture-review.md) | As-built senior review |
