@@ -56,3 +56,5 @@ Permanent decisions for YourMeal OS. New ADRs are additive; do not silently reve
 | [0061](./0061-customer-workspace-demo.md) | Customer Workspace Demo (OPERATIONAL-002.5 · LAW 003 proof) |
 
 | [0062](./0062-order-capability.md) | Order Capability (OPERATIONAL-003 · weekly operational commitment) |
+
+| [0063](./0063-order-facade.md) | Order Facade (OPERATIONAL-003 Phase 2 · process API) |

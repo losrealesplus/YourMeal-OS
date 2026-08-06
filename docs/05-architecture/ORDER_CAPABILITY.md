@@ -1,11 +1,12 @@
 # Order Capability
 
-**OPERATIONAL-003 · Phase 1 — Observe → Design → Freeze**  
-**ADR:** [0062 — Order Capability](../adr/0062-order-capability.md)  
-**Status:** **FROZEN** (architecture only — no Facade / UI / DB / implementation in this phase)  
+**OPERATIONAL-003 · Phase 2 — Facade**  
+**ADR:** [0062 — Order Capability](../adr/0062-order-capability.md) · [0063 — Order Facade](../adr/0063-order-facade.md)  
+**Status:** **Facade** (process API — no Product UI / routing in this phase)  
 **Depends on:** Identity (ADR 0055–0057) · Customers (ADR 0058–0061) · Order Intake (ADR 0017)  
 **EatClean lens:** weekly meal prep · commitment for a concrete week · production · delivery · billing handoff  
-**Maturity:** **Architecture** → Facade → Engineering Certified → Field Validated → Production Ready  
+**Type:** Operational Process  
+**Maturity:** Architecture → **Facade** → Engineering Certified → Field Validated → Production Ready  
 **Completeness:** Architecture → Facade → Validation → Capability Demo → Product UI → Field → Production
 
 ---
@@ -334,19 +335,19 @@ export type OrderLifecycleCommandName =
   | "ReportDeliveryIssue";
 ```
 
-### Facade (contract only — Implement later)
+### Facade (ADR 0063 — implemented)
 
 ```ts
-interface OrderFacade {
-  getContext(orderId: string): Promise<OrderResult>;
-  search(query: {
-    weekStart?: string;
-    status?: OrderStatus | OrderStatus[];
-    partyId?: string;
-  }): Promise<OrderSummary[]>;
-  // mutate via named commands in Facade phase — not this ADR
-}
+// src/order/OrderFacade.ts · useOrder()
+// Process commands — not CreateOrder/UpdateOrder/DeleteOrder
+PlanWeeklyOrder | ConfirmOrder | ScheduleProduction | ReadyForKitchen
+ReadyForDelivery | CompleteDelivery | CloseOrder | CancelOrder
+
+// Queries
+GetOrder | SearchOrders | GetOrdersByWeek | GetKitchenQueue | …
 ```
+
+Operational Modules (Production · Kitchen · Delivery · Billing) consume **only** `OrderFacade` / `useOrder`.
 
 ---
 
@@ -459,8 +460,8 @@ Phase 1 does **not** move or rewrite these — Freeze only.
 ## Next
 
 ```text
-OPERATIONAL-003 Phase 1  Architecture   ✅ / this PR
-OPERATIONAL-003 Phase 2  Facade         (compose Intake + Order services)
+OPERATIONAL-003 Phase 1  Architecture   ✅ ADR 0062
+OPERATIONAL-003 Phase 2  Facade         ✅ ADR 0063 / this PR
 OPERATIONAL-003 Phase 3  Validate
 OPERATIONAL-003 Phase 4  Capability Demo (Order Workspace · LAW 003/004)
 Then Production / Kitchen / Delivery consume Order language

@@ -1,79 +1,37 @@
 # Operational Modules
 
-**Phase:** OPERATIONAL EXPERIENCE (post Platform + Foundation)  
-**Methodology (permanent):** Observe → Design → Freeze → Facade → Validate → **Capability Demo** → UI → Smoke → Release  
-**Panel:** [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) — Maturity + Completeness  
+**Phase:** OPERATIONAL EXPERIENCE  
+**Panel:** [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [GITHUB_HOUSEKEEPING](./GITHUB_HOUSEKEEPING.md)  
 **Era center:** [OPERATIONAL_EXPERIENCE](./OPERATIONAL_EXPERIENCE.md) → Tenant Success
 
-**Certified:** Identity · Customers (+ Workspace Demo)  
-**In architecture:** [Orders](../05-architecture/ORDER_CAPABILITY.md) · ADR [0062](../adr/0062-order-capability.md)
-
----
-
-## Era map
-
 ```text
-Platform              ██████████████████  100%
-Foundation            ██████████████████  100%  (center closed)
-Identity              ██████████████████  Engineering Certified
-Customers             ██████████████████  Engineering Certified
-Customers Workspace   ████░░░░░░░░░░░░░░  Capability Demo (method certified)
-Orders                ████░░░░░░░░░░░░░░  Architecture freeze
-Production            ░░░░░░░░░░░░░░░░░░  Pending
+Identity     Context                Engineering Certified
+Customers    Business Entity        Engineering Certified + Demo
+Orders       Operational Process    Facade (ADR 0063)
+Production   Operational Execution  Pending
+Kitchen      Operational Execution  Pending
+Delivery     Operational Execution  Pending
+Billing      Operational Outcome    Pending
 ```
 
-Four assets:
+## Method (permanent)
 
 ```text
-Developer Platform · Foundation · Capabilities · Operational Experience
+Observe → Design → Freeze → Facade → Validate → Capability Demo
+→ Operational Experience → Field Validation → Production
 ```
 
----
-
-## Nomenclature
+## Order process language
 
 ```text
-YourMeal OS
-├── Platform
-├── Foundation              (no longer the center)
-├── Operational Modules     Capabilities
-└── Operational Experience  Demos → Product UI → Tenant Success
+PlanWeeklyOrder → ConfirmOrder → ScheduleProduction
+→ ReadyForKitchen → ReadyForDelivery → CompleteDelivery
 ```
 
-| Avoid | Prefer |
-|-------|--------|
-| Orders Screen | Order Capability |
-| ecommerce Order | Weekly operational commitment |
-| Kitchen Page | Production / Kitchen Capability |
-
----
-
-## Golden rule
-
-> **¿Hace que EatClean tarde menos en hacer su trabajo?**  
-> Sí → entra. No → espera.
-
----
-
-## Language of the business
-
-| Capability | Question |
-|------------|----------|
-| Identity | ¿Quién está operando? |
-| Customer | ¿Quién genera la demanda? |
-| **Orders** | **¿Qué compromiso operativo hay esta semana?** |
-| Production | ¿Qué hay que cocinar? |
-| Delivery | ¿Qué hay que entregar? |
-| Billing | ¿Qué hay que cobrar? |
-
-Orders is the first **process** Capability — it crosses kitchen, routes, and invoices.
-
----
+Not `CreateOrder` / `UpdateOrder` / `DeleteOrder`.
 
 ## Laws
 
-- **LAW 002:** one Facade per capability; never expose storage.  
-- **LAW 003:** screens never own business logic.  
-- **LAW 004:** Operational Experience consumes Capabilities; UI owns interaction only.
+LAW 001–004 · see [FOUNDATION_LOCK](../05-architecture/FOUNDATION_LOCK.md)
 
-Next: Order Facade · then Capability Demo · Production Architecture.
+Next: Order Validate · then Capability Demo · Production Architecture.

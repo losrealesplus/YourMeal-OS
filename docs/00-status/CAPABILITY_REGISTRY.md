@@ -45,6 +45,16 @@ Production
 A capability can be perfectly designed and validated **without UI**.  
 A **Capability Demo** proves LAW 003 before the definitive product screen.
 
+### Capability Type (product taxonomy)
+
+| Type | Meaning | Examples |
+|------|---------|----------|
+| **Context** | Who is operating · tenant · permissions | Identity |
+| **Business Entity** | Demand / master data actors | Customer |
+| **Operational Process** | Weekly commitments that cross the org | **Orders** |
+| **Operational Execution** | Doing the work | Production · Kitchen · Delivery |
+| **Operational Outcome** | Settling the work | Billing |
+
 | Maturity | Meaning |
 |----------|---------|
 | Pending | Not started |
@@ -63,6 +73,7 @@ A **Capability Demo** proves LAW 003 before the definitive product screen.
 | Field | Value |
 |-------|--------|
 | **Maturity** | **Engineering Certified** |
+| **Type** | Context |
 | Completeness | Validation ✅ · UI (shells observe) · Field ⏳ |
 | Field Validation | Pending (OPPO checklist) |
 | Version | 1.0 |
@@ -85,6 +96,7 @@ Question: ¿Quién está operando?
 | Field | Value |
 |-------|--------|
 | **Maturity** | **Engineering Certified** |
+| **Type** | Business Entity |
 | Completeness | Architecture ✅ · Facade ✅ · Validation ✅ · **Capability Demo ✅** · Product UI ⏳ · Field ⏳ |
 | Field Validation | Pending ([CUSTOMER_SMOKE_CHECKLIST](../10-validation/CUSTOMER_SMOKE_CHECKLIST.md)) |
 | Version | 1.0 |
@@ -110,25 +122,26 @@ First **writable** Operational Capability. Method certified via Capability Demo.
 
 | Field | Value |
 |-------|--------|
-| **Maturity** | **Architecture** |
-| Completeness | Architecture ✅ · Facade ⏳ · Validation ⏳ · Demo ⏳ |
+| **Maturity** | **Facade** |
+| **Type** | Operational Process |
+| Completeness | Architecture ✅ · Facade ✅ · Validation ⏳ · Demo ⏳ |
 | Field Validation | — |
-| Version | 0.1 (architecture) |
-| ADRs | [0062](../adr/0062-order-capability.md) · Intake [0017](../adr/0017-order-intake.md) |
+| Version | 0.2 (facade) |
+| ADRs | [0062](../adr/0062-order-capability.md) · [0063](../adr/0063-order-facade.md) · Intake [0017](../adr/0017-order-intake.md) |
 | Contract | [ORDER_CAPABILITY](../05-architecture/ORDER_CAPABILITY.md) |
-| Facade | Not yet |
+| Facade | `src/order/OrderFacade.ts` · `useOrder()` · process Commands / Queries |
 | Validation | Not yet |
 
 ```text
 Orders
-████░░░░░░░░░░░░░░ Architecture freeze
-                    next: Facade
+████████░░░░░░░░░░ Facade
+                    next: Validate
 Question: ¿Qué compromiso operativo ha adquirido
           la empresa para una semana concreta?
 ```
 
-First **process** Capability — connects Production · Kitchen · Delivery · Billing.  
-Order ≠ ecommerce. Order = weekly operational commitment.
+First **Operational Process** Capability. Process language — not CRUD.  
+Production · Kitchen · Delivery · Billing must consume `OrderFacade` only.
 
 ---
 
@@ -137,6 +150,7 @@ Order ≠ ecommerce. Order = weekly operational commitment.
 | Field | Value |
 |-------|--------|
 | **Maturity** | Pending |
+| **Type** | Operational Execution |
 | Notes | ¿Qué hay que cocinar? |
 
 ---
@@ -146,6 +160,7 @@ Order ≠ ecommerce. Order = weekly operational commitment.
 | Field | Value |
 |-------|--------|
 | **Maturity** | Pending |
+| **Type** | Operational Execution |
 
 ---
 
@@ -162,6 +177,7 @@ Order ≠ ecommerce. Order = weekly operational commitment.
 | Field | Value |
 |-------|--------|
 | **Maturity** | Pending |
+| **Type** | Operational Execution |
 | Notes | ¿Qué hay que entregar? |
 
 ---
@@ -171,6 +187,7 @@ Order ≠ ecommerce. Order = weekly operational commitment.
 | Field | Value |
 |-------|--------|
 | **Maturity** | Pending |
+| **Type** | Operational Outcome |
 | Notes | ¿Qué hay que cobrar? |
 
 ---
