@@ -133,6 +133,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
       visible: can("orders.read") || showAllOps,
     },
     {
+      to: "/admin/production-workspace",
+      labelKey: "ops.nav.productionWorkspace",
+      icon: FlaskConical,
+      visible: can("kitchen.operate") || showAllOps,
+    },
+    {
       to: "/admin/commercial",
       labelKey: "commercial",
       icon: LineChart,
@@ -270,6 +276,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
               ? "Customer Workspace"
               : item.labelKey === "ops.nav.orderWorkspace"
                 ? "Order Workspace"
+                : item.labelKey === "ops.nav.productionWorkspace"
+                  ? "Production Workspace"
               : item.labelKey === "ops.nav.companyClients"
               ? "Clientes Empresa"
               : item.labelKey === "commercial"

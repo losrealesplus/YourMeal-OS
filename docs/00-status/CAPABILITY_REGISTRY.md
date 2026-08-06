@@ -1,7 +1,7 @@
 # Operational Capability Registry
 
 **YourMeal OS · Product control panel**  
-**Permanent quartet:** [PLATFORM_STATUS](./PLATFORM_STATUS.md) · [FOUNDATION_STATUS](./FOUNDATION_STATUS.md) · this Registry · [OPERATIONAL_ROADMAP](./OPERATIONAL_ROADMAP.md)  
+**Permanent quartet + board:** [PLATFORM_STATUS](./PLATFORM_STATUS.md) · [FOUNDATION_STATUS](./FOUNDATION_STATUS.md) · this Registry · [OPERATIONAL_ROADMAP](./OPERATIONAL_ROADMAP.md) · **[OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)**  
 **Rule:** We track **Capabilities certified**, not “PRs merged”.  
 **Methodology:** Observe → Design → Freeze → Facade → **Engineering Certification** → Capability Demo → Operational Experience → Field → Production Ready
 
@@ -10,7 +10,7 @@ Platform → Foundation → Operational Capabilities → Operational Experience
 → Operational Validation → Production
 ```
 
-**Graph:** [OPERATIONAL_DEPENDENCY_GRAPH](./OPERATIONAL_DEPENDENCY_GRAPH.md)
+**Graph:** [OPERATIONAL_DEPENDENCY_GRAPH](./OPERATIONAL_DEPENDENCY_GRAPH.md) · **Board:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)
 
 ---
 
@@ -86,8 +86,8 @@ Functional consumers — not import graphs.
 | Identity | Context | Engineering Certified | Customer · Orders · Production |
 | Customer | Business Entity | Engineering Certified + Demo | Orders |
 | Orders | Operational Process | Engineering Certified + Demo | Production |
-| Production | Operational Execution | **Engineering Certified** | Kitchen |
-| Kitchen | Operational Execution | Pending | Delivery |
+| Production | Operational Execution | **Engineering Certified + Demo** | Kitchen Execution |
+| Kitchen Execution | Operational Execution | Pending | Delivery |
 | Delivery | Operational Execution | Pending | Billing |
 | Billing | Operational Outcome | Pending | — |
 
@@ -189,19 +189,21 @@ Production Capability (ADR 0066) transforms those commitments into executable wo
 |-------|--------|
 | **Maturity** | **Engineering Certified** |
 | **Type** | Operational Execution |
-| Completeness | Architecture ✅ · Facade ✅ · Engineering Certification ✅ · Demo ⏳ · Field ⏳ |
-| Consumida por | Kitchen (canonical) |
+| Completeness | Architecture ✅ · Facade ✅ · Engineering Certification ✅ · **Capability Demo ✅** · Product UI ⏳ · Field ⏳ |
+| Consumida por | Kitchen Execution (canonical) |
 | Field Validation | Pending ([PRODUCTION_SMOKE_CHECKLIST](../10-validation/PRODUCTION_SMOKE_CHECKLIST.md)) |
 | Version | 1.0 |
-| ADRs | [0066](../adr/0066-production-capability.md) · [0067](../adr/0067-production-facade.md) · [0068](../adr/0068-production-engineering-certification.md) |
+| ADRs | [0066](../adr/0066-production-capability.md) · [0067](../adr/0067-production-facade.md) · [0068](../adr/0068-production-engineering-certification.md) · [0069](../adr/0069-production-workspace-demo.md) |
 | Contract | [PRODUCTION_CAPABILITY](../05-architecture/PRODUCTION_CAPABILITY.md) |
 | Facade | `src/production/ProductionFacade.ts` · `useProduction()` · work Commands / Queries |
+| Demo | `/admin/production-workspace` — LAW 003 · LAW 004 proof |
 | Validation | [PRODUCTION_VALIDATION_REPORT](../10-validation/PRODUCTION_VALIDATION_REPORT.md) · 13 PASS · 4 UNIMPLEMENTED · 0 FAIL |
 
 ```text
 Production
 ██████████████████ Engineering Certified
-░░░░ Capability Demo · Field Validation
+████ Capability Demo (Workspace)
+░░░░ Product UI · Field Validation
 Question: ¿Qué trabajo debe ejecutarse para
           cumplir los compromisos operativos?
 
@@ -210,20 +212,20 @@ Production = planificación que transforma Orders
 Production never cooks. Kitchen executes.
 ```
 
-First **Operational Execution** Capability — Engineering Certified. Work language — not Order CRUD.  
-Consumes `OrderFacade`. Kitchen · Delivery · Billing consume `ProductionFacade`.  
-**Kitchen Capability may begin after Demo preferred** (one cycle discipline).
+First **Operational Execution** Capability — Engineering Certified + Capability Demo.  
+Operational Planning (Orders + Production) is **fully consumable**.  
+**OPERATIONAL-005 · Kitchen Execution** may begin.
 
 
 ---
 
-### 005 · Kitchen
+### 005 · Kitchen Execution
 
 | Field | Value |
 |-------|--------|
 | **Maturity** | Pending |
 | **Type** | Operational Execution |
-| Notes | ¿Qué se está ejecutando ahora? · Consumes Production · never replans Orders |
+| Notes | ¿Qué trabajo estoy ejecutando ahora? · Consumes Production · never replans Orders · **authorized after ADR 0069** |
 
 ---
 
