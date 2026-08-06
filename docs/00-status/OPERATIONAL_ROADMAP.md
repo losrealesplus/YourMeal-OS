@@ -1,117 +1,79 @@
 # Operational Roadmap
 
-**Permanent control panel · frozen structure 2026-08-06**  
-**Companions:** [PLATFORM_STATUS](./PLATFORM_STATUS.md) · [FOUNDATION_STATUS](./FOUNDATION_STATUS.md) · [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) · [OPERATIONAL_DEPENDENCY_GRAPH](./OPERATIONAL_DEPENDENCY_GRAPH.md)
+**Permanent · Operational Engine v0.8 frozen · ADR [0077](../adr/0077-operational-engine-v08.md)**  
+**Companions:** [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) · [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md)
 
 ---
 
-## Product stack
+## Era
 
 ```text
-YourMeal OS
-Platform → Foundation → Operational Capabilities
-→ Operational Experience → Operational Validation → Production Ready
+Construction  →  Validation
+```
+
+Do not reorder. Do not open Delivery early.
+
+---
+
+## Immediate roadmap (frozen)
+
+```text
+1. FLOW-001 Demo
+██████████
+
+↓
+
+2. Operational Engine Review
+██████████
+
+↓
+
+3. Android Build
+██████████
+
+↓
+
+4. OPPO Field Validation
+██████████
+
+↓
+
+5. iPhone Build
+██████████
+
+↓
+
+6. iPhone Field Validation
+██████████
+
+↓
+
+7. Delivery Architecture
 ```
 
 ---
 
-## Operational model (not just a roadmap)
+## Certification phases
 
 ```text
-Identity → ¿Quién opera?
-Customer → ¿Quién genera la demanda?
-Orders → ¿Qué prometimos?
-Production → ¿Qué trabajo debemos generar?
-Kitchen → ¿Qué trabajo estoy ejecutando?
-Delivery → ¿Qué trabajo debo entregar?
-Billing → ¿Qué trabajo puedo facturar?
+PHASE A · Capability Certification     ████████████████ COMPLETE
+PHASE B · Operational Flow Validation  ████████████░░░░ FLOW-001 Certified · Demo next
+PHASE C · Real Tenant Validation       ░░░░░░░░░░░░░░░░
 ```
 
 ---
 
-## Layers
+## FLOW-001 track
 
 ```text
-Operational Planning
-  Orders → Production   ✅ Certified
-
-────────────────────────────
-
-Operational Execution
-  Kitchen Execution     ✅ Architecture (ADR 0070)
-  Delivery              Pending
-
-────────────────────────────
-
-Operational Outcome
-  Billing               Pending
-```
-
-**Operational Engine exists** (incomplete). LAW 005 protects layer boundaries.
-
----
-
-## Capability Type map (LAW 005)
-
-| Capability | Layer / Type | Maturity |
-|------------|--------------|----------|
-| Identity | Context | Engineering Certified |
-| Customers | Business Entity | Engineering Certified + Demo |
-| Orders | Operational Planning | Engineering Certified + Demo |
-| **Production** | **Operational Planning** | **Engineering Certified + Demo** |
-| **Kitchen Execution** | **Operational Execution** | **Architecture** (ADR 0070) |
-| Delivery | Operational Execution | Pending |
-| Billing | Operational Outcome | Pending |
-
----
-
-## Official rhythm (repeat forever)
-
-```text
-Architecture
-    ↓
-Facade
-    ↓
-Engineering Certification
-    ↓
-Capability Demo
-    ↓
-Operational Experience
-```
-
-Language: **certify** capabilities — not “develop screens”.
-
----
-
-## Kitchen Execution track (OPERATIONAL-005)
-
-```text
-Architecture (ADR 0070)              ✅
-Facade                               ← next
-Engineering Certification
-Capability Demo
-```
-
-**Operational Engine exists.** Planning consumable. Execution Architecture frozen.
-
----
-
-## Near-term sequence
-
-1. ~~Production Engineering Certification~~ ✅ ADR 0068  
-2. ~~Production Workspace Demo~~ ✅ ADR 0069  
-3. ~~Kitchen Execution Capability Architecture~~ ✅ ADR 0070  
-4. **Kitchen Execution Facade** (OPERATIONAL-005 Phase 2)  
-5. Delivery · Billing → [Operational Engine v1.0](./OPERATIONAL_ENGINE.md)
-
-Official board: [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)
-
-```text
-YourMeal OS → Capability → Operational Pattern → Tenant → EatClean
+Architecture (ADR 0074)              ✅
+Harness (ADR 0075)                   ✅
+Engineering Certification (ADR 0076) ✅
+Flow Demo                            ← next
 ```
 
 ---
 
-## Success question
+## Success question (field)
 
-> **¿Qué capacidades operativas están certificadas y cuáles están siendo utilizadas por un negocio real?**
+> **¿Una persona de EatClean puede recorrer un flujo completo en Android y en iPhone y decir: “Esto me ahorra tiempo y entiendo perfectamente qué tengo que hacer”?**

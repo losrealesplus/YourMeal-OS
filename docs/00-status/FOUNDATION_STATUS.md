@@ -28,8 +28,16 @@ Foundation is **complete as the project center**. Era center moved to **Operatio
 | **003** | Screens never own business logic |
 | **004** | Operational Experience consumes Capabilities |
 | **005** | Each Capability belongs to exactly one Operational Model layer; cross-layer only via Facade |
+| **006** | Each Capability answers exactly one canonical business question |
+| **006-A** | Capabilities never answer the question of another Capability |
+| **007** | Operational Flows never bypass Capabilities; stage transitions only via Facades |
 
 Source: [FOUNDATION_LOCK](../05-architecture/FOUNDATION_LOCK.md)
+
+**Constitution note:** LAW 001–007 form a complete system. Do not add Foundation Laws unless real tenant evidence proves the current set insufficient.
+
+**Era:** Operational Engine **v0.8** frozen — Validation, not more architecture. See [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md).
+
 
 ---
 
@@ -51,7 +59,7 @@ Operational Execution
 Operational Outcome
 ```
 
-Protected by **FOUNDATION LAW 005**.  
+Protected by **FOUNDATION LAW 005** · Grammar by **LAW 006**.  
 Board: [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)
 
 ---

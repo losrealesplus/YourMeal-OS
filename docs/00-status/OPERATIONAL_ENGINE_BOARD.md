@@ -1,10 +1,14 @@
 # Operational Engine — Official Board
 
-**Frozen:** 2026-08-06 · Operational Engine **exists** · LAW 005 · ADR [0070](../adr/0070-kitchen-execution-capability.md)  
-**Companions:** [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) · [OPERATIONAL_DEPENDENCY_GRAPH](./OPERATIONAL_DEPENDENCY_GRAPH.md) · [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [FOUNDATION_STATUS](./FOUNDATION_STATUS.md)
+**Frozen:** 2026-08-06 · **Operational Engine v0.8** · ADR [0077](../adr/0077-operational-engine-v08.md)  
+**Detail:** [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) · [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) · [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md)
 
 ```text
+══════════════════════════════════════════════
+
 YOURMEAL OS
+
+Operational Engine v0.8
 
 ══════════════════════════════════════════════
 
@@ -16,117 +20,94 @@ Foundation
 ██████████████████████████
 Stable
 
-══════════════════════════════════════════════
-
-Operational Engine
-
-Context
-──────────────
+Capabilities
 
 Identity
 ██████████████████████████
 Engineering Certified
 
-──────────────────────────────
-
-Business Entity
-──────────────
-
 Customers
 ██████████████████████████
 Engineering Certified
-
-Capability Demo
-██████████████████████████
-
-──────────────────────────────
-
-Operational Planning
-──────────────
 
 Orders
 ██████████████████████████
 Engineering Certified
 
-Capability Demo
-██████████████████████████
-
 Production
 ██████████████████████████
 Engineering Certified
 
-Capability Demo
+Kitchen
 ██████████████████████████
+Engineering Certified
 
-──────────────────────────────
+Operational Flow
 
-Operational Execution
-──────────────
+FLOW-001
+██████████████████████████
+Engineering Certified
 
-Kitchen Execution
-████░░░░░░░░░░░░░░░░░░░░░░
-Architecture
+══════════════════════════════════════════════
+
+NEXT
+
+FLOW Demo
+
+↓
+
+Operational Engine Review
+
+↓
+
+Android
+
+↓
+
+OPPO
+
+↓
+
+iPhone
+
+↓
+
+Real Tenant Validation
+
+↓
 
 Delivery
-░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-──────────────────────────────
-
-Operational Outcome
-──────────────
-
-Billing
-░░░░░░░░░░░░░░░░░░░░░░░░░░
+══════════════════════════════════════════════
 ```
 
 ---
 
-## Declaration
+## Era
 
 ```text
-Operational Engine ya existe.
-
-No está completo.
-Pero ya existe.
+Construction  →  Validation
 ```
 
-Planning (Orders + Production) is consumable.  
-Execution begins with Kitchen Execution Architecture (ADR 0070).  
-**Operational Engine v1.0** still requires Kitchen · Delivery · Billing Engineering Certified.
+Question until now: *¿Está bien diseñada?*  
+Question from now: *¿Funciona bien cuando alguien la usa?*
 
 ---
 
-## Fixed layers (permanent · LAW 005)
-
-Every new capability **must** declare its layer before Architecture starts:
+## No Delivery until
 
 ```text
-Context
-    ↓
-Business Entity
-    ↓
-Operational Planning
-    ↓
-Operational Execution
-    ↓
-Operational Outcome
+FLOW-001 Demo
+Roadmap Review (Engine Review)
+Android APK
+OPPO Field Validation
+iPhone Field Validation
 ```
 
-One Capability · one layer. Cross-layer only via Facade.
+Do not open Delivery / FLOW-002 Architecture before this gate is complete.
 
 ---
 
-## Official rhythm
+## Immediate next step
 
-```text
-Architecture → Facade → Engineering Certification → Capability Demo
-```
-
-One capability cycle at a time.
-
----
-
-## Next capability
-
-**OPERATIONAL-005 · Kitchen Execution** — Architecture frozen (ADR 0070).  
-Facade next. Never plans. Consumes **ProductionFacade** only.
+**FLOW-001 Flow Demo** — first time the user sees a complete process, not a single Capability.

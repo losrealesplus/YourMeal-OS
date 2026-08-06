@@ -65,6 +65,7 @@ Context → Business Entity → Operational Planning
 ```
 
 **FOUNDATION LAW 005:** one Capability · one layer · cross-layer only via Facade.  
+**FOUNDATION LAW 006:** one Capability · one canonical business question.  
 This taxonomy is the **business map**, not only a software label.
 
 | Maturity | Meaning |
@@ -88,7 +89,7 @@ Functional consumers — not import graphs.
 | Customer | Business Entity | Engineering Certified + Demo | Orders |
 | Orders | Operational Planning | Engineering Certified + Demo | Production |
 | Production | Operational Planning | **Engineering Certified + Demo** | Kitchen Execution |
-| Kitchen Execution | Operational Execution | **Architecture** | Delivery |
+| Kitchen Execution | Operational Execution | **Engineering Certified + Demo** | Delivery |
 | Delivery | Operational Execution | Pending | Billing |
 | Billing | Operational Outcome | Pending | — |
 
@@ -212,7 +213,8 @@ Production never cooks. Kitchen executes.
 ```
 
 **Operational Planning** (Orders + Production) is **fully consumable** · LAW 005.  
-**Kitchen Execution** Architecture frozen (ADR 0070) — Facade next.
+**Kitchen Execution** Engineering Certified + Capability Demo (ADR 0072 · 0073).  
+**Phase A complete through Kitchen.** Next: OPERATIONAL-FLOW-001.
 
 ---
 
@@ -220,29 +222,34 @@ Production never cooks. Kitchen executes.
 
 | Field | Value |
 |-------|--------|
-| **Maturity** | **Architecture** |
+| **Maturity** | **Engineering Certified + Demo** |
 | **Type** | Operational Execution |
-| Completeness | Architecture ✅ · Facade ⏳ · Engineering Certification ⏳ · Capability Demo ⏳ |
-| Consumida por | Delivery (canonical) |
+| Completeness | Architecture ✅ · Facade ✅ · Engineering Certification ✅ · **Capability Demo ✅** · Product UI ⏳ · Field ⏳ |
+| Consumida por | Delivery (canonical) · OPERATIONAL-FLOW-001 |
 | Depends on | ProductionFacade only |
-| Version | 0.1 (Architecture freeze) |
-| ADRs | [0070](../adr/0070-kitchen-execution-capability.md) |
+| Field Validation | Pending ([KITCHEN_EXECUTION_SMOKE_CHECKLIST](../10-validation/KITCHEN_EXECUTION_SMOKE_CHECKLIST.md)) |
+| Version | 1.0 |
+| ADRs | [0070](../adr/0070-kitchen-execution-capability.md) · [0071](../adr/0071-kitchen-execution-facade.md) · [0072](../adr/0072-kitchen-execution-engineering-certification.md) · [0073](../adr/0073-kitchen-workspace-demo.md) |
 | Contract | [KITCHEN_EXECUTION_CAPABILITY](../05-architecture/KITCHEN_EXECUTION_CAPABILITY.md) |
-| Notes | ¿Qué trabajo debe ejecutarse ahora? · Never plans · never cooks · never mutates Orders |
+| Facade | `src/kitchen/KitchenExecutionFacade.ts` · `useKitchenExecution()` · ExecutionUnit Commands / Queries |
+| Demo | `/admin/kitchen-workspace` — LAW 003–006-A proof · **final isolated Capability Demo** |
+| Validation | [KITCHEN_EXECUTION_VALIDATION_REPORT](../10-validation/KITCHEN_EXECUTION_VALIDATION_REPORT.md) · 12 PASS · 6 UNIMPLEMENTED · 0 FAIL |
+| Notes | ¿Qué trabajo debe ejecutarse ahora? · ExecutionUnit · LAW 006-A · LAW 007 unlocks flows |
 
 ```text
 Kitchen Execution
-████ Architecture
-░░░░ Facade · Engineering Certified · Demo
+██████████████████ Engineering Certified
+████ Capability Demo (Workspace)
+░░░░ Product UI · Field Validation
 
 Kitchen = coordinar · priorizar · confirmar
           · pausar · reanudar · terminar
-Kitchen never cooks. Production never cooks.
-The physical kitchen cooks.
+ExecutionUnit · never KitchenBatch
+Final isolated Capability Demo before Phase B.
 ```
 
-First **Operational Execution** Capability — Architecture frozen.  
-Facade next (OPERATIONAL-005 Phase 2).
+First **Operational Execution** Capability — Engineering Certified + Demo.  
+**Phase A complete.** Next: **OPERATIONAL-FLOW-001** (Orders → Production → Kitchen).
 
 ---
 
@@ -304,10 +311,14 @@ Facade next (OPERATIONAL-005 Phase 2).
 | Orders | ¿Qué compromiso operativo tiene el tenant esta semana? |
 | Production | ¿Qué trabajo debe ejecutarse para cumplir los compromisos? |
 | Kitchen Execution | ¿Qué trabajo debe ejecutarse ahora? |
-| Delivery | ¿Qué hay que entregar? |
-| Billing | ¿Qué hay que cobrar? |
+| Delivery | ¿Qué trabajo debe entregarse ahora? |
+| Billing | ¿Qué trabajo puede cerrarse y facturarse? |
 
-Screens will change. These questions are the product core.
+Screens will change. These questions are the product core (**LAW 006**).
 
-**Exists:** [Operational Engine](./OPERATIONAL_ENGINE.md) (Planning complete · Execution started).  
-**Milestone v1.0:** full chain Identity→Billing Engineering Certified.
+**Exists / v0.8:** [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) — Identity→Kitchen + FLOW-001 certified.  
+**Flows:** [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md) — FLOW-001 Engineering Certified.  
+**Review:** [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) — after Flow Demo.  
+**Phases:** [OPERATIONAL_CERTIFICATION_PHASES](./OPERATIONAL_CERTIFICATION_PHASES.md) — Validation era.  
+**Engine Completion:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md).  
+**Milestone v1.0:** full chain Identity→Billing + flows certified.
