@@ -25,11 +25,11 @@ Un solo Happy Path. No veinte pantallas.
 
 | Block | Focus | Status |
 |-------|--------|--------|
-| **001** | Bootstrap Architecture (Observe → Design → Freeze) | ✅ ADR 0050 |
-| **002** | Bootstrap Orchestrator (order only) | ✅ ADR 0051 |
-| **003** | Stage Ownership Migration (Stages coordinate · Providers observe) | ✅ ADR 0052 |
-| **004** | Application Ready Gate (lifecycle latch) | ▶ ADR 0053 |
-| **005** | Smoke Test (web + OPPO) → Product Core Foundation | ⏳ |
+| **001** | Bootstrap Architecture (Observe → Design → Freeze) | ✅ ADR 0050 · on `main` |
+| **002** | Bootstrap Orchestrator (order only) | ✅ ADR 0051 · on `main` |
+| **003** | Stage Ownership Migration | ✅ ADR 0052 · on `main` |
+| **004** | Application Ready Gate | ✅ ADR 0053 · on `main` |
+| **FOUNDATION-001** | Validation (Doctor → APK) | ▶ [PRODUCT_CORE_FOUNDATION_001](./PRODUCT_CORE_FOUNDATION_001.md) · ADR 0054 |
 
 ---
 

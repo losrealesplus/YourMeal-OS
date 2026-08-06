@@ -56,6 +56,7 @@
 | [BOOTSTRAP_PIPELINE.md](./BOOTSTRAP_PIPELINE.md) | App Bootstrap Pipeline · PRODUCT-CORE-001/002 · executable contract |
 | [BOOTSTRAP_OWNERSHIP.md](./BOOTSTRAP_OWNERSHIP.md) | Stage ownership matrix · PRODUCT-CORE-003 · Providers observe |
 | [APPLICATION_READY_GATE.md](./APPLICATION_READY_GATE.md) | Application Ready Gate · PRODUCT-CORE-004 · lifecycle latch |
+| [../00-status/PRODUCT_CORE_FOUNDATION_001.md](../00-status/PRODUCT_CORE_FOUNDATION_001.md) | Foundation validation acta · ADR 0054 |
 | [BOOTSTRAP_STATE_MACHINE.md](./BOOTSTRAP_STATE_MACHINE.md) | Operational Bootstrap OP-001 (Day-0 ladder · distinto del App Bootstrap) |
 | [../07-experience/CUSTOMER_JOURNEYS.md](../07-experience/CUSTOMER_JOURNEYS.md) | Experience First · CJ-001 Pedido semanal |
 | [architecture-review.md](./architecture-review.md) | As-built senior review |

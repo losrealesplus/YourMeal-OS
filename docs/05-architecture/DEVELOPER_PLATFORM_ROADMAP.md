@@ -53,25 +53,27 @@ Todo lo que se construya forma parte de una **plataforma de ingeniería**, no de
 
 ---
 
-## Fase 2 — Product Core Stabilization ⬅️ AQUÍ
+## Fase 2 — Product Core Stabilization
 
-Foco del proyecto: **≈20% Developer Platform / ≈80% Product Core**.
+**Product Core Foundation** — engineering-validated (ADR [0054](../adr/0054-product-core-foundation.md)).
 
-Primer sprint propuesto:
+```text
+Architecture → Orchestrator → Ownership → Ready Gate → Validation
+```
 
-**PRODUCT-CORE-001 · Authentication & Bootstrap Stabilization** ⬅️ AQUÍ
+Acta: [PRODUCT_CORE_FOUNDATION_001](../00-status/PRODUCT_CORE_FOUNDATION_001.md)
 
-Contrato congelado (ADR [0050](../adr/0050-bootstrap-pipeline.md)) · Orquestador ejecutable (ADR [0051](../adr/0051-bootstrap-orchestrator.md)):
+**Siguiente foco de producto:** EatClean Core (Authentication → Orders → Kitchen → …)  
+Developer Platform = instrumento de evidencia, no el roadmap.
+
+Contrato de arranque (ADR [0050](../adr/0050-bootstrap-pipeline.md)…[0053](../adr/0053-application-ready-gate.md)):
 
 ```text
 App Launch → Environment → Services → Authentication
 → Session → Tenant → Branding → Navigation → Application Ready
 ```
 
-Código: `src/bootstrap/pipeline/` · secuencia única: `BootstrapPipeline.ts`  
-Detalle: [BOOTSTRAP_PIPELINE](./BOOTSTRAP_PIPELINE.md) · estado: [PRODUCT_CORE_001](../00-status/PRODUCT_CORE_001.md)
-
-Debe ser 100% determinista, medible y sin errores — usando la Developer Platform v1.0 como instrumento de evidencia.
+Código: `src/bootstrap/pipeline/` · `src/bootstrap/ready/` · `isApplicationReady()`
 
 Roadmap de módulos (no pantallas):
 

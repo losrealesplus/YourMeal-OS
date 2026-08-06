@@ -44,3 +44,4 @@ Permanent decisions for YourMeal OS. New ADRs are additive; do not silently reve
 | [0051](./0051-bootstrap-orchestrator.md) | Bootstrap Orchestrator (PRODUCT-CORE-002 · executable order) |
 | [0052](./0052-stage-ownership.md) | Stage Ownership Migration (PRODUCT-CORE-003 · Stages coordinate) |
 | [0053](./0053-application-ready-gate.md) | Application Ready Gate (PRODUCT-CORE-004 · lifecycle latch) |
+| [0054](./0054-product-core-foundation.md) | Product Core Foundation declared (engineering-validated) |
