@@ -408,3 +408,43 @@ of another Capability.
 | Orders | ¿Quién genera la demanda? (Customer) |
 
 Each question has exactly one owner. Crossing questions = broken domain boundary.
+
+---
+
+## FOUNDATION LAW 007 (permanente · Operational Flows)
+
+```text
+Operational Flows
+never bypass Capabilities.
+
+Every transition between business stages
+must occur through certified Capability Facades.
+```
+
+```text
+Orders
+  ↓
+ProductionFacade
+  ↓
+KitchenExecutionFacade
+  ↓
+DeliveryFacade (future)
+  ↓
+BillingFacade (future)
+```
+
+**Never:**
+
+```text
+Orders → Kitchen
+Kitchen → Billing
+Production → Delivery
+```
+
+| Flow | Transition | Via |
+|------|------------|-----|
+| OPERATIONAL-FLOW-001 | Orders → Production → Kitchen | OrderFacade · ProductionFacade · KitchenExecutionFacade |
+| OPERATIONAL-FLOW-002 | Production → Kitchen → Delivery | ProductionFacade · KitchenExecutionFacade · DeliveryFacade |
+| OPERATIONAL-FLOW-003 | Delivery → Billing | DeliveryFacade · BillingFacade |
+
+LAW 007 is the bridge from **Capability Certification** (Phase A) to **Operational Flow Validation** (Phase B).

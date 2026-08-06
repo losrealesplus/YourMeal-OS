@@ -89,7 +89,7 @@ Functional consumers — not import graphs.
 | Customer | Business Entity | Engineering Certified + Demo | Orders |
 | Orders | Operational Planning | Engineering Certified + Demo | Production |
 | Production | Operational Planning | **Engineering Certified + Demo** | Kitchen Execution |
-| Kitchen Execution | Operational Execution | **Engineering Certified** | Delivery |
+| Kitchen Execution | Operational Execution | **Engineering Certified + Demo** | Delivery |
 | Delivery | Operational Execution | Pending | Billing |
 | Billing | Operational Outcome | Pending | — |
 
@@ -213,8 +213,8 @@ Production never cooks. Kitchen executes.
 ```
 
 **Operational Planning** (Orders + Production) is **fully consumable** · LAW 005.  
-**Kitchen Execution** Facade + Engineering Certification (ADR 0071 · 0072).  
-Capability Demo next — then Delivery may begin.
+**Kitchen Execution** Engineering Certified + Capability Demo (ADR 0072 · 0073).  
+**Phase A complete through Kitchen.** Next: OPERATIONAL-FLOW-001.
 
 ---
 
@@ -222,33 +222,34 @@ Capability Demo next — then Delivery may begin.
 
 | Field | Value |
 |-------|--------|
-| **Maturity** | **Engineering Certified** |
+| **Maturity** | **Engineering Certified + Demo** |
 | **Type** | Operational Execution |
-| Completeness | Architecture ✅ · Facade ✅ · **Engineering Certification ✅** · Capability Demo ⏳ |
-| Consumida por | Delivery (canonical) |
+| Completeness | Architecture ✅ · Facade ✅ · Engineering Certification ✅ · **Capability Demo ✅** · Product UI ⏳ · Field ⏳ |
+| Consumida por | Delivery (canonical) · OPERATIONAL-FLOW-001 |
 | Depends on | ProductionFacade only |
 | Field Validation | Pending ([KITCHEN_EXECUTION_SMOKE_CHECKLIST](../10-validation/KITCHEN_EXECUTION_SMOKE_CHECKLIST.md)) |
 | Version | 1.0 |
-| ADRs | [0070](../adr/0070-kitchen-execution-capability.md) · [0071](../adr/0071-kitchen-execution-facade.md) · [0072](../adr/0072-kitchen-execution-engineering-certification.md) |
+| ADRs | [0070](../adr/0070-kitchen-execution-capability.md) · [0071](../adr/0071-kitchen-execution-facade.md) · [0072](../adr/0072-kitchen-execution-engineering-certification.md) · [0073](../adr/0073-kitchen-workspace-demo.md) |
 | Contract | [KITCHEN_EXECUTION_CAPABILITY](../05-architecture/KITCHEN_EXECUTION_CAPABILITY.md) |
 | Facade | `src/kitchen/KitchenExecutionFacade.ts` · `useKitchenExecution()` · ExecutionUnit Commands / Queries |
+| Demo | `/admin/kitchen-workspace` — LAW 003–006-A proof · **final isolated Capability Demo** |
 | Validation | [KITCHEN_EXECUTION_VALIDATION_REPORT](../10-validation/KITCHEN_EXECUTION_VALIDATION_REPORT.md) · 12 PASS · 6 UNIMPLEMENTED · 0 FAIL |
-| Notes | ¿Qué trabajo debe ejecutarse ahora? · ExecutionUnit · LAW 006-A |
+| Notes | ¿Qué trabajo debe ejecutarse ahora? · ExecutionUnit · LAW 006-A · LAW 007 unlocks flows |
 
 ```text
 Kitchen Execution
 ██████████████████ Engineering Certified
-░░░░ Capability Demo · Field Validation
+████ Capability Demo (Workspace)
+░░░░ Product UI · Field Validation
 
 Kitchen = coordinar · priorizar · confirmar
           · pausar · reanudar · terminar
 ExecutionUnit · never KitchenBatch
-Kitchen never cooks. Production never cooks.
+Final isolated Capability Demo before Phase B.
 ```
 
-First **Operational Execution** Capability — Engineering Certified.  
-**OPERATIONAL-005 Phase 4 · Capability Demo** next.  
-Delivery may begin only after Kitchen Demo preferred (one cycle).
+First **Operational Execution** Capability — Engineering Certified + Demo.  
+**Phase A complete.** Next: **OPERATIONAL-FLOW-001** (Orders → Production → Kitchen).
 
 ---
 
@@ -315,6 +316,7 @@ Delivery may begin only after Kitchen Demo preferred (one cycle).
 
 Screens will change. These questions are the product core (**LAW 006**).
 
-**Exists:** [Operational Engine](./OPERATIONAL_ENGINE.md) (Planning complete · Execution Facade).  
-**Engine Completion:** Execution + Outcome still open → [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md).  
-**Milestone v1.0:** full chain Identity→Billing Engineering Certified.
+**Exists:** [Operational Engine](./OPERATIONAL_ENGINE.md) · Kitchen Demo complete.  
+**Phases:** [OPERATIONAL_CERTIFICATION_PHASES](./OPERATIONAL_CERTIFICATION_PHASES.md) — Phase A ✅ · Phase B next.  
+**Engine Completion:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md).  
+**Milestone v1.0:** full chain Identity→Billing Engineering Certified + flows.

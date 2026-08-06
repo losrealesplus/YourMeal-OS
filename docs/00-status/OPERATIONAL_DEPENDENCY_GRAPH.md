@@ -80,7 +80,7 @@ Each capability records:
 | Customer | Business Entity | Engineering Certified + Demo | Identity | Orders |
 | Orders | Operational Planning | Engineering Certified + Demo | Identity · Customer | Production |
 | Production | Operational Planning | **Engineering Certified + Demo** | Identity · Orders | Kitchen Execution |
-| Kitchen Execution | Operational Execution | **Engineering Certified** | ProductionFacade only | Delivery |
+| Kitchen Execution | Operational Execution | **Engineering Certified + Demo** | ProductionFacade only | Delivery |
 | Delivery | Operational Execution | Pending | Kitchen Execution | Billing |
 | Billing | Operational Outcome | Pending | Delivery | — |
 

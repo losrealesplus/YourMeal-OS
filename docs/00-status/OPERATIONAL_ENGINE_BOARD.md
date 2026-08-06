@@ -1,24 +1,35 @@
 # Operational Engine — Official Board
 
-**Frozen:** 2026-08-06 · Engine Completion · LAW 005–006-A · ADR [0072](../adr/0072-kitchen-execution-engineering-certification.md)  
-**Companions:** [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) · [OPERATIONAL_DEPENDENCY_GRAPH](./OPERATIONAL_DEPENDENCY_GRAPH.md) · [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [FOUNDATION_STATUS](./FOUNDATION_STATUS.md)
+**Frozen:** 2026-08-06 · Kitchen Demo · Phase A complete through Kitchen · LAW 007 · ADR [0073](../adr/0073-kitchen-workspace-demo.md)  
+**Companions:** [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) · [OPERATIONAL_CERTIFICATION_PHASES](./OPERATIONAL_CERTIFICATION_PHASES.md) · [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md)
 
 ```text
 YOURMEAL OS
 
 ══════════════════════════════════════════════
 
-Platform
-██████████████████████████
-Stable
-
-Foundation
+Platform / Foundation
 ██████████████████████████
 Stable
 
 ══════════════════════════════════════════════
 
-Operational Engine · Completion
+Certification Phases
+
+PHASE A · Capability Certification
+██████████████████████████
+Complete through Kitchen Demo
+
+PHASE B · Operational Flow Validation
+████░░░░░░░░░░░░░░░░░░░░░░
+Authorized (FLOW-001 next)
+
+PHASE C · Real Tenant Validation
+░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+══════════════════════════════════════════════
+
+Engine Completion
 
 Context
 ██████████████████████████
@@ -30,7 +41,8 @@ Operational Planning
 ██████████████████████████
 
 Operational Execution
-████████░░░░░░░░░░░░░░░░░░
+████████████████░░░░░░░░░░
+Kitchen Demo · Delivery pending
 
 Operational Outcome
 ░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -41,95 +53,26 @@ Operational Outcome
 ## Capability detail
 
 ```text
-Context
-──────────────
-Identity
-██████████████████████████
-Engineering Certified
-
-Business Entity
-──────────────
-Customers
-██████████████████████████
-Engineering Certified + Demo
-
-Operational Planning
-──────────────
-Orders
-██████████████████████████
-Engineering Certified + Demo
-
-Production
-██████████████████████████
-Engineering Certified + Demo
-
-Operational Execution
-──────────────
-Kitchen Execution
-██████████████████████████
-Engineering Certified
-
-Delivery
-░░░░░░░░░░░░░░░░░░░░░░░░░░
-
-Operational Outcome
-──────────────
-Billing
-░░░░░░░░░░░░░░░░░░░░░░░░░░
+Identity        Engineering Certified
+Customers       Engineering Certified + Demo
+Orders          Engineering Certified + Demo
+Production      Engineering Certified + Demo
+Kitchen Exec.   Engineering Certified + Demo   ← final isolated demo
+Delivery        Pending (via FLOW-002)
+Billing         Pending (via FLOW-003)
 ```
 
 ---
 
-## Declaration
+## Next milestone
+
+**OPERATIONAL-FLOW-001**
 
 ```text
-Operational Engine ya existe.
+Orders → Production → Kitchen
 
-Kitchen Execution is Engineering Certified.
-Operational Execution layer certified up to Kitchen.
-
-Engine Completion continues with Kitchen Demo → Delivery.
+¿Puede un compromiso operativo convertirse en trabajo
+ejecutado sin romper ninguna ley arquitectónica?
 ```
 
----
-
-## Operational Grammar (LAW 006 · 006-A)
-
-| Layer | Capability | Question | Never answers |
-|-------|------------|----------|---------------|
-| Context | Identity | ¿Quién opera? | — |
-| Business Entity | Customer | ¿Quién genera la demanda? | — |
-| Operational Planning | Order | ¿Qué prometimos? | Demand ownership |
-| Operational Planning | Production | ¿Qué trabajo debemos generar? | Kitchen “now” |
-| Operational Execution | Kitchen Execution | ¿Qué trabajo debe ejecutarse ahora? | Production plan |
-| Operational Execution | Delivery | ¿Qué trabajo debe entregarse ahora? | Kitchen status |
-| Operational Outcome | Billing | ¿Qué trabajo puede cerrarse y facturarse? | Delivery routes |
-
----
-
-## After Kitchen Demo
-
-```text
-Operational Planning            ████████████████
-Operational Execution (Phase 1) ████████████████  (Kitchen Demo)
-
-→ open: Operational Flow Validation
-  Production → Kitchen → Delivery
-```
-
-Kitchen is the last capability certified in isolation.  
-Delivery begins **flow** certification.
-
----
-
-## Official rhythm
-
-```text
-Architecture → Facade → Engineering Certification → Capability Demo
-```
-
----
-
-## Next
-
-**OPERATIONAL-005 Phase 4 · Kitchen Execution Capability Demo**
+LAW 007: every transition via certified Facades only.

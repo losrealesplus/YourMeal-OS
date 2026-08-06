@@ -73,9 +73,9 @@ Identity           ████████████████████�
 Customers          ██████████████████████  Engineering Certified + Demo
 Orders             ██████████████████████  Engineering Certified + Demo
 Production         ██████████████████████  Engineering Certified + Demo
-Kitchen Execution  ██████████████████████  Engineering Certified (ADR 0072)
-Delivery           ░░░░░░░░░░░░░░░░░░░░░░  Pending
-Billing            ░░░░░░░░░░░░░░░░░░░░░░  Pending
+Kitchen Execution  ██████████████████████  Engineering Certified + Demo (ADR 0073)
+Delivery           ░░░░░░░░░░░░░░░░░░░░░░  Pending (FLOW-002)
+Billing            ░░░░░░░░░░░░░░░░░░░░░░  Pending (FLOW-003)
 ```
 
 ---
@@ -86,13 +86,19 @@ Billing            ░░░░░░░░░░░░░░░░░░░░�
 Context                 ████████████████
 Business Entity         ████████████████
 Operational Planning    ████████████████
-Operational Execution   ████████░░░░░░░░  (Kitchen Certified)
+Operational Execution   ████████████░░░░  (Kitchen Demo · Delivery open)
 Operational Outcome     ░░░░░░░░░░░░░░░░
 ```
 
-Prefer **Engine Completion** language over a feature roadmap when communicating product status.
+## Certification phases
 
-After Kitchen Demo → **Operational Flow Validation** (Production → Kitchen → Delivery).
+```text
+PHASE A · Capability Certification     ████████████████  through Kitchen Demo
+PHASE B · Operational Flow Validation  ████░░░░░░░░░░░░  FLOW-001 next
+PHASE C · Real Tenant Validation       ░░░░░░░░░░░░░░░░
+```
+
+See [OPERATIONAL_CERTIFICATION_PHASES](./OPERATIONAL_CERTIFICATION_PHASES.md).
 
 ---
 

@@ -1,16 +1,17 @@
 # Kitchen Execution Capability
 
-**OPERATIONAL-005 · Phase 3 — Engineering Certification**  
-**ADR:** [0070](../adr/0070-kitchen-execution-capability.md) · [0071](../adr/0071-kitchen-execution-facade.md) · [0072](../adr/0072-kitchen-execution-engineering-certification.md)  
-**Status:** **Engineering Certified**  
+**OPERATIONAL-005 · Phase 4 — Capability Demo**  
+**ADR:** [0070](../adr/0070-kitchen-execution-capability.md) · [0071](../adr/0071-kitchen-execution-facade.md) · [0072](../adr/0072-kitchen-execution-engineering-certification.md) · [0073](../adr/0073-kitchen-workspace-demo.md)  
+**Status:** **Engineering Certified + Capability Demo** (`/admin/kitchen-workspace`)  
 **Depends on:** Production (Engineering Certified + Capability Demo)  
 **EatClean lens:** weekly meal prep · coordinate execution units on the production floor  
 **Layer / Type:** **Operational Execution** (first of its kind)  
-**Maturity:** Architecture → Facade → **Engineering Certified** → Field Validated → Production Ready  
-**Completeness:** Architecture → Facade → **Engineering Certification** → Capability Demo → Product UI → Field → Production  
-**Laws:** 001–006-A · [FOUNDATION_LOCK](./FOUNDATION_LOCK.md)  
+**Maturity:** Architecture → Facade → Engineering Certified → Field Validated → Production Ready  
+**Completeness:** Architecture → Facade → Engineering Certification → **Capability Demo** → Product UI → Field → Production  
+**Laws:** 001–007 · [FOUNDATION_LOCK](./FOUNDATION_LOCK.md)  
 **Package:** `src/kitchen/` · `KitchenExecutionFacade` · `useKitchenExecution`  
-**Validation:** [KITCHEN_EXECUTION_VALIDATION_REPORT](../10-validation/KITCHEN_EXECUTION_VALIDATION_REPORT.md) · 12 PASS · 6 UNIMPLEMENTED · 0 FAIL
+**Validation:** [KITCHEN_EXECUTION_VALIDATION_REPORT](../10-validation/KITCHEN_EXECUTION_VALIDATION_REPORT.md) · 12 PASS · 6 UNIMPLEMENTED · 0 FAIL  
+**Demo:** `/admin/kitchen-workspace` — LAW 003–006-A · **final isolated Capability Demo**
 
 ```text
 Kitchen Execution = coordinar · priorizar · confirmar · pausar · reanudar · terminar
@@ -223,6 +224,14 @@ src/kitchen/
 - [x] FAIL = 0  
 - [x] **No Product UI · no Delivery · no Billing**
 
+### Phase 4 (Capability Demo) ✅
+
+- [x] `/admin/kitchen-workspace` · `useKitchenExecution()` only  
+- [x] LAW 003–006-A demonstrated  
+- [x] ADR 0073 · final isolated Capability Demo  
+- [x] LAW 007 · Phase A/B/C roadmap frozen  
+- [x] **No Delivery · no Billing · no production execution engine**
+
 ---
 
 ## Definition of Done
@@ -233,7 +242,8 @@ Kitchen answers one question only:
 
 Kitchen consumes only ProductionFacade.
 KitchenExecutionFacade is the canonical execution API.
-Kitchen Execution is Engineering Certified.
+Kitchen Execution is Engineering Certified + Demo.
+Phase A complete through Kitchen.
 ```
 
 ---
@@ -241,10 +251,9 @@ Kitchen Execution is Engineering Certified.
 ## Next
 
 ```text
-OPERATIONAL-005 Phase 1  Architecture              ✅ ADR 0070
-OPERATIONAL-005 Phase 2  Facade                    ✅ ADR 0071
-OPERATIONAL-005 Phase 3  Engineering Certification ✅ ADR 0072
-OPERATIONAL-005 Phase 4  Capability Demo           ← next
+OPERATIONAL-005 Phase 1–4          ✅ CLOSED
+OPERATIONAL-FLOW-001               ← next
+  Orders → Production → Kitchen
 ```
 
-After Kitchen Demo → **Operational Flow Validation** (Production → Kitchen → Delivery).
+**Operational Flow Validation (Phase B)** begins. Delivery is not opened as an isolated Capability Demo first.
