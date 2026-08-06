@@ -2,18 +2,19 @@
 
 **Date:** 2026-08-06 (final · after `main` FF to ADR 0069)  
 **Rule:** Tips already on `main` → **Close without merging**. Never duplicate commits.  
-**Agent limit:** Cannot close PRs via GitHub API (403). Human must bulk-close.
+**Agent limit:** Cannot close PRs via GitHub API (403). Human must bulk-close.  
+**Also:** After closing, **Delete branch** for integrated branches so the repo stays clean.
 
 ---
 
 ## Status
 
-`main` tip: **`9b55d39`** — Production Workspace Demo (ADR 0069)  
-Entire Operational Planning stack is on `main`.
+`main` tip includes Production Workspace Demo (ADR 0069) and Operational Planning stack.  
+**Operational Engine exists** (incomplete). Kitchen Execution Architecture is on branch → merge via ADR 0070 PR.
 
 ---
 
-## Action required (human) — Close without merging
+## Action required (human) — Close without merging + Delete branch
 
 | PR | Title | Why |
 |----|-------|-----|
@@ -34,7 +35,7 @@ Entire Operational Planning stack is on `main`.
 | #327 | Production Certification | Tip on main |
 | #328 | Production Workspace Demo | Tip on main |
 
-**Do not merge any of these** — commits already exist on `main`. Close only.
+**Do not merge any of these** — commits already exist on `main`. Close only, then delete branches.
 
 ---
 
@@ -45,11 +46,12 @@ Entire Operational Planning stack is on `main`.
 | `main` | Clean · Operational Planning complete |
 | Open drafts | Close list above |
 | Identity · Customers · Orders · Production | Engineering Certified (+ Demos) |
-| Next | OPERATIONAL-005 · Kitchen Execution |
-| Board | [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) FROZEN |
+| Kitchen Execution | Architecture (ADR 0070) |
+| Board | [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) — Engine **exists** |
+| LAW 005 | One Capability · one Operational Model layer |
 
 ```text
-Platform / Foundation     100%
+Platform / Foundation     Stable
 Operational Planning      Orders + Production ✅
-Operational Execution     Kitchen Execution next
+Operational Execution     Kitchen Execution Architecture ✅ · Facade next
 ```

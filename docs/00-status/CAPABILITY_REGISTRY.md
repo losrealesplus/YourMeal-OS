@@ -49,21 +49,22 @@ Production
 A capability can be perfectly designed and validated **without UI**.  
 A **Capability Demo** proves LAW 003 before the definitive product screen.
 
-### Capability Type (product taxonomy)
+### Capability Type = Operational Model layer (LAW 005)
 
-| Type | Meaning | Examples |
-|------|---------|----------|
+| Type / Layer | Meaning | Examples |
+|--------------|---------|----------|
 | **Context** | Who is operating · tenant · permissions | Identity |
 | **Business Entity** | Demand / master data actors | Customer |
-| **Operational Process** | Weekly commitments that cross the org | Orders |
-| **Operational Execution** | Planning and doing the physical work | **Production** · Kitchen · Delivery |
+| **Operational Planning** | Commitments and executable work plans | Orders · **Production** |
+| **Operational Execution** | Coordinating work in progress | **Kitchen Execution** · Delivery |
 | **Operational Outcome** | Settling the work | Billing |
 
 ```text
-Context → Business Entity → Operational Process
+Context → Business Entity → Operational Planning
         → Operational Execution → Operational Outcome
 ```
 
+**FOUNDATION LAW 005:** one Capability · one layer · cross-layer only via Facade.  
 This taxonomy is the **business map**, not only a software label.
 
 | Maturity | Meaning |
@@ -85,9 +86,9 @@ Functional consumers — not import graphs.
 |------------|------|--------|---------------|
 | Identity | Context | Engineering Certified | Customer · Orders · Production |
 | Customer | Business Entity | Engineering Certified + Demo | Orders |
-| Orders | Operational Process | Engineering Certified + Demo | Production |
-| Production | Operational Execution | **Engineering Certified + Demo** | Kitchen Execution |
-| Kitchen Execution | Operational Execution | Pending | Delivery |
+| Orders | Operational Planning | Engineering Certified + Demo | Production |
+| Production | Operational Planning | **Engineering Certified + Demo** | Kitchen Execution |
+| Kitchen Execution | Operational Execution | **Architecture** | Delivery |
 | Delivery | Operational Execution | Pending | Billing |
 | Billing | Operational Outcome | Pending | — |
 
@@ -153,7 +154,7 @@ First **writable** Operational Capability. Method certified via Capability Demo.
 | Field | Value |
 |-------|--------|
 | **Maturity** | **Engineering Certified** |
-| **Type** | Operational Process |
+| **Type** | Operational Planning |
 | Completeness | Architecture ✅ · Facade ✅ · Validation ✅ · **Capability Demo ✅** · Product UI ⏳ · Field ⏳ |
 | Field Validation | Pending ([ORDER_SMOKE_CHECKLIST](../10-validation/ORDER_SMOKE_CHECKLIST.md)) |
 | Version | 1.0 |
@@ -174,12 +175,10 @@ Question: ¿Qué compromiso operativo ha adquirido
 Order = compromiso operativo del tenant para una semana concreta.
 ```
 
-First **Operational Process** Capability — Engineering Certified + Capability Demo.  
+First **Operational Planning** commitment Capability — Engineering Certified + Capability Demo.  
 Operational Experience officially consumes Order.  
 Production · Kitchen · Delivery · Billing must consume `OrderFacade` only for commitment facts.  
-Production Capability (ADR 0066) transforms those commitments into executable work.  
-**Production Architecture frozen — Facade next.**
-
+Production Capability (ADR 0066) transforms those commitments into executable work.
 
 ---
 
@@ -188,7 +187,7 @@ Production Capability (ADR 0066) transforms those commitments into executable wo
 | Field | Value |
 |-------|--------|
 | **Maturity** | **Engineering Certified** |
-| **Type** | Operational Execution |
+| **Type** | Operational Planning |
 | Completeness | Architecture ✅ · Facade ✅ · Engineering Certification ✅ · **Capability Demo ✅** · Product UI ⏳ · Field ⏳ |
 | Consumida por | Kitchen Execution (canonical) |
 | Field Validation | Pending ([PRODUCTION_SMOKE_CHECKLIST](../10-validation/PRODUCTION_SMOKE_CHECKLIST.md)) |
@@ -212,10 +211,8 @@ Production = planificación que transforma Orders
 Production never cooks. Kitchen executes.
 ```
 
-First **Operational Execution** Capability — Engineering Certified + Capability Demo.  
-Operational Planning (Orders + Production) is **fully consumable**.  
-**OPERATIONAL-005 · Kitchen Execution** may begin.
-
+**Operational Planning** (Orders + Production) is **fully consumable** · LAW 005.  
+**Kitchen Execution** Architecture frozen (ADR 0070) — Facade next.
 
 ---
 
@@ -223,9 +220,29 @@ Operational Planning (Orders + Production) is **fully consumable**.
 
 | Field | Value |
 |-------|--------|
-| **Maturity** | Pending |
+| **Maturity** | **Architecture** |
 | **Type** | Operational Execution |
-| Notes | ¿Qué trabajo estoy ejecutando ahora? · Consumes Production · never replans Orders · **authorized after ADR 0069** |
+| Completeness | Architecture ✅ · Facade ⏳ · Engineering Certification ⏳ · Capability Demo ⏳ |
+| Consumida por | Delivery (canonical) |
+| Depends on | ProductionFacade only |
+| Version | 0.1 (Architecture freeze) |
+| ADRs | [0070](../adr/0070-kitchen-execution-capability.md) |
+| Contract | [KITCHEN_EXECUTION_CAPABILITY](../05-architecture/KITCHEN_EXECUTION_CAPABILITY.md) |
+| Notes | ¿Qué trabajo debe ejecutarse ahora? · Never plans · never cooks · never mutates Orders |
+
+```text
+Kitchen Execution
+████ Architecture
+░░░░ Facade · Engineering Certified · Demo
+
+Kitchen = coordinar · priorizar · confirmar
+          · pausar · reanudar · terminar
+Kitchen never cooks. Production never cooks.
+The physical kitchen cooks.
+```
+
+First **Operational Execution** Capability — Architecture frozen.  
+Facade next (OPERATIONAL-005 Phase 2).
 
 ---
 
@@ -286,10 +303,11 @@ Operational Planning (Orders + Production) is **fully consumable**.
 | Customer | ¿Quién genera la demanda? |
 | Orders | ¿Qué compromiso operativo tiene el tenant esta semana? |
 | Production | ¿Qué trabajo debe ejecutarse para cumplir los compromisos? |
-| Kitchen | ¿Qué se está ejecutando ahora en cocina? |
+| Kitchen Execution | ¿Qué trabajo debe ejecutarse ahora? |
 | Delivery | ¿Qué hay que entregar? |
 | Billing | ¿Qué hay que cobrar? |
 
 Screens will change. These questions are the product core.
 
-**Milestone:** [Operational Engine v1.0](./OPERATIONAL_ENGINE.md) — full chain Identity→Billing certified.
+**Exists:** [Operational Engine](./OPERATIONAL_ENGINE.md) (Planning complete · Execution started).  
+**Milestone v1.0:** full chain Identity→Billing Engineering Certified.

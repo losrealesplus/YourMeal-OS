@@ -27,8 +27,32 @@ Foundation is **complete as the project center**. Era center moved to **Operatio
 | **002** | UI → Facade → Services → Repositories → Infrastructure |
 | **003** | Screens never own business logic |
 | **004** | Operational Experience consumes Capabilities |
+| **005** | Each Capability belongs to exactly one Operational Model layer; cross-layer only via Facade |
 
 Source: [FOUNDATION_LOCK](../05-architecture/FOUNDATION_LOCK.md)
+
+---
+
+## Operational Model (permanent)
+
+```text
+Context
+        │
+        ▼
+Business Entity
+        │
+        ▼
+Operational Planning
+        │
+        ▼
+Operational Execution
+        │
+        ▼
+Operational Outcome
+```
+
+Protected by **FOUNDATION LAW 005**.  
+Board: [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)
 
 ---
 

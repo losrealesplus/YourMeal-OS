@@ -233,3 +233,81 @@ Operational Experience → invent business rules
 Operational Experience → bypass Facade
 Capability → depend on a specific screen
 ```
+
+---
+
+## Operational Model (permanente · YourMeal OS)
+
+```text
+Context
+        │
+        ▼
+Business Entity
+        │
+        ▼
+Operational Planning
+        │
+        ▼
+Operational Execution
+        │
+        ▼
+Operational Outcome
+```
+
+| Layer | Owns | Examples |
+|-------|------|----------|
+| **Context** | Who operates · tenant · permissions | Identity |
+| **Business Entity** | Demand actors / master entities | Customers |
+| **Operational Planning** | Commitments and executable work plans | Orders · Production |
+| **Operational Execution** | Coordinating work in progress | Kitchen Execution · Delivery |
+| **Operational Outcome** | Settling completed work | Billing |
+
+This model is permanent. New capabilities declare their layer before Architecture starts.
+
+---
+
+## FOUNDATION LAW 005 (permanente · Operational Model)
+
+```text
+Each Capability belongs to exactly one layer
+of the Operational Model.
+
+A Capability must not mix responsibilities
+from two different layers.
+
+If it needs information from another layer,
+it consumes that layer exclusively through
+its Facade.
+```
+
+```text
+Kitchen Execution  (Operational Execution)
+        │
+        │  consumes only
+        ▼
+ProductionFacade   (Operational Planning)
+```
+
+**Never:**
+
+```text
+Kitchen → invent Production batches from Orders
+Kitchen → plan work
+Production → cook / start / pause batches
+Orders → invoice
+Billing → replan Production
+```
+
+**Why this law exists**
+
+Growth pressure will tempt Execution capabilities to plan, and Planning capabilities to settle money.  
+LAW 005 keeps the chain clean for every tenant — starting with EatClean.
+
+| Violation | Correction |
+|-----------|------------|
+| Kitchen starts generating plans | Belongs in Production |
+| Production starts/pauses batches as craft ownership | Belongs in Kitchen Execution |
+| Delivery invents kitchen queues | Belongs in Kitchen Execution |
+| Billing mutates Orders to “fix” invoices | Belongs in Orders + Billing Facades separately |
+
+Source panel: [FOUNDATION_STATUS](../00-status/FOUNDATION_STATUS.md) · Board: [OPERATIONAL_ENGINE_BOARD](../00-status/OPERATIONAL_ENGINE_BOARD.md)

@@ -1,7 +1,7 @@
 # Operational Dependency Graph
 
-**Permanent · declared 2026-08-06 with ADR [0068](../adr/0068-production-engineering-certification.md)**  
-**Companions:** [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) · [OPERATIONAL_ROADMAP](./OPERATIONAL_ROADMAP.md)
+**Permanent · updated 2026-08-06 with ADR [0070](../adr/0070-kitchen-execution-capability.md) · LAW 005**  
+**Companions:** [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) · [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [OPERATIONAL_ROADMAP](./OPERATIONAL_ROADMAP.md)
 
 ---
 
@@ -18,7 +18,7 @@ Customer       Orders
              Production
                   │
                   ▼
-              Kitchen
+         Kitchen Execution
                   │
                   ▼
               Delivery
@@ -29,16 +29,24 @@ Customer       Orders
 
 ---
 
-## Layers
+## Layers (LAW 005)
 
 ```text
+Context
+  Identity
+
+Business Entity
+  Customer
+
+────────────────────────────
+
 Operational Planning
   Orders → Production
 
 ────────────────────────────
 
 Operational Execution
-  Kitchen → Delivery
+  Kitchen Execution → Delivery
 
 ────────────────────────────
 
@@ -46,7 +54,7 @@ Operational Outcome
   Billing
 ```
 
-Context (Identity) and Business Entity (Customer) feed Planning.
+One Capability · one layer · cross-layer only via Facade.
 
 ---
 
@@ -56,7 +64,7 @@ Each capability records:
 
 | Field | Meaning |
 |-------|---------|
-| **Tipo** | Context · Business Entity · Operational Process · Execution · Outcome |
+| **Tipo** | Context · Business Entity · Operational Planning · Operational Execution · Operational Outcome |
 | **Estado / Madurez** | Pending → Architecture → Facade → Engineering Certified → … |
 | **Certificación** | Validation report link when certified |
 | **Dependencias** | What it consumes |
@@ -70,10 +78,10 @@ Each capability records:
 |------------|------|--------|--------------|---------------|
 | Identity | Context | Engineering Certified | — | Customer · Orders · Production |
 | Customer | Business Entity | Engineering Certified + Demo | Identity | Orders |
-| Orders | Operational Process | Engineering Certified + Demo | Identity · Customer | Production |
-| Production | Operational Execution | **Engineering Certified + Demo** | Identity · Orders | Kitchen Execution |
-| Kitchen Execution | Operational Execution | Pending | Production | Delivery |
-| Delivery | Operational Execution | Pending | Kitchen | Billing |
+| Orders | Operational Planning | Engineering Certified + Demo | Identity · Customer | Production |
+| Production | Operational Planning | **Engineering Certified + Demo** | Identity · Orders | Kitchen Execution |
+| Kitchen Execution | Operational Execution | **Architecture** | ProductionFacade only | Delivery |
+| Delivery | Operational Execution | Pending | Kitchen Execution | Billing |
 | Billing | Operational Outcome | Pending | Delivery | — |
 
 ---
@@ -86,7 +94,7 @@ Each capability records:
 | Customer | ¿Quién genera la demanda? |
 | Orders | ¿Qué prometimos? |
 | Production | ¿Qué trabajo debemos generar? |
-| Kitchen | ¿Qué trabajo estoy ejecutando? |
+| Kitchen Execution | ¿Qué trabajo debe ejecutarse ahora? |
 | Delivery | ¿Qué trabajo debo entregar? |
 | Billing | ¿Qué trabajo puedo facturar? |
 
