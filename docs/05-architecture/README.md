@@ -14,6 +14,7 @@
 | [OPERATIONAL_LAYER_INDEPENDENCE.md](./OPERATIONAL_LAYER_INDEPENDENCE.md) | Capas certificadas evolucionan sin invalidar inferiores |
 | [IDENTITY_LIFECYCLE.md](./IDENTITY_LIFECYCLE.md) | Identity → Profile → Membership → Role → Workspace |
 | [IDENTITY_CAPABILITY.md](./IDENTITY_CAPABILITY.md) | Identity Capability · OPERATIONAL-001 · FROZEN contract |
+| [CUSTOMER_CAPABILITY.md](./CUSTOMER_CAPABILITY.md) | Customer Capability · OPERATIONAL-002 · FROZEN contract |
 | [MEMBERSHIP_LIFECYCLE.md](./MEMBERSHIP_LIFECYCLE.md) | Membership states + audit stamps |
 | [IDENTITY_AUDIT.md](./IDENTITY_AUDIT.md) | identity_events · Activity Timeline |
 | [USER_PROVISIONING.md](./USER_PROVISIONING.md) | Invitation · Provisioning · create ≠ access |

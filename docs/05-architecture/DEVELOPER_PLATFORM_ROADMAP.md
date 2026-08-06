@@ -66,9 +66,10 @@ Nomenclatura:
 YourMeal OS → Platform · Foundation · Operational Modules
 ```
 
-Primera capability: **OPERATIONAL-001 Identity** (ADR [0055](../adr/0055-identity-capability.md)).
+Primera capability: **OPERATIONAL-001 Identity** (Engineering Certified · ADR 0055–0057).  
+Segunda: **OPERATIONAL-002 Customers** (Architecture freeze · ADR [0058](../adr/0058-customer-capability.md)).
 
-Detalle: [OPERATIONAL_MODULES](../00-status/OPERATIONAL_MODULES.md) · [IDENTITY_CAPABILITY](./IDENTITY_CAPABILITY.md)
+Detalle: [CAPABILITY_REGISTRY](../00-status/CAPABILITY_REGISTRY.md) · [OPERATIONAL_MODULES](../00-status/OPERATIONAL_MODULES.md) · [CUSTOMER_CAPABILITY](./CUSTOMER_CAPABILITY.md)
 
 Regla: Observe → Design → Freeze → Implement → Validate (toda capability).  
 Golden rule: ¿EatClean tarda menos? Si no → espera.

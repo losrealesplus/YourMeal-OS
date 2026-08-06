@@ -446,7 +446,8 @@ Phase 1 freezes contracts only.
 OPERATIONAL-001 Phase 1  Architecture   ✅ ADR 0055
 OPERATIONAL-001 Phase 2  Facade         ✅ ADR 0056
 OPERATIONAL-001 Phase 3  Validate       ✅ ADR 0057 · engineering certified
-OPERATIONAL-002          Customers Capability (Observe → Design → Freeze)
+OPERATIONAL-002          Customers Capability ✅ Architecture (ADR 0058)
+OPERATIONAL-002 Phase 2  Customer Facade
 ```
 
 ### Facade entry (Phase 2)

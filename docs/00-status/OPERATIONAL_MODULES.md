@@ -40,7 +40,8 @@ Operational Modules
                     field smoke ░░ OPPO checklist
 
 002 Customers
-░░░░░░░░░░░░░░░░  next (Observe → Design → Freeze)
+████░░░░░░░░░░░░░░ Architecture freeze (ADR 0058)
+                    next: Facade
 
 003 Orders
 ░░░░░░░░░░░░░░░░
@@ -66,6 +67,8 @@ Each module follows:
 ```text
 Observe → Design → Freeze → Facade → Validate → UI → Smoke → Release
 ```
+
+EatClean lens: save time and reduce errors in weekly catering ops — not a generic CRM.
 
 ---
 
