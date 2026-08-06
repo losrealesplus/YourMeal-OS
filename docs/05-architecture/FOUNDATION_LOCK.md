@@ -99,6 +99,27 @@ Regla: Operational Modules **nunca** importan Supabase Auth ni coordinan carga d
 
 ---
 
+## FOUNDATION LAW 001 (permanente · Operational Capabilities)
+
+```text
+Capability
+    ↓
+Contract
+    ↓
+Facade
+    ↓
+Services
+    ↓
+Store / Repositories
+    ↓
+UI (consumes Facade only)
+```
+
+Every Operational Capability follows this stack.  
+Architecture freezes the Contract; Facade implements the public API; UI never skips layers.
+
+---
+
 ## FOUNDATION LAW 002 (permanente · OPERATIONAL-002)
 
 ```text

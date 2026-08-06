@@ -1,57 +1,41 @@
 # Operational Modules
 
-**Phase:** OPERATIONAL EXPERIENCE · Operational Execution begins  
-**Panel:** [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [OPERATIONAL_ROADMAP](./OPERATIONAL_ROADMAP.md) · [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) · [PLATFORM_STATUS](./PLATFORM_STATUS.md) · [FOUNDATION_STATUS](./FOUNDATION_STATUS.md)
+**Phase:** Operational Planning certified · Execution next  
+**Panel:** [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [OPERATIONAL_DEPENDENCY_GRAPH](./OPERATIONAL_DEPENDENCY_GRAPH.md) · [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md)
 
 ```text
 YourMeal OS
 ══════════════════════════════════════
-Platform                        100%
-Foundation                      100%
+Platform / Foundation           100%
 Operational Capabilities
-  001 Identity                  Engineering Certified
-  002 Customers                 Engineering Certified + Demo
-  003 Orders                    Engineering Certified + Demo
-  004 Production                Facade (ADR 0067)
+  Identity                      Engineering Certified
+  Customers                     Engineering Certified + Demo
+  Orders                        Engineering Certified + Demo
+  Production                    Engineering Certified
 ══════════════════════════════════════
-Operational Experience
-  Customer Workspace            Capability Demo
-  Order Workspace               Capability Demo
+Operational Planning            ✅ Orders → Production
+Operational Execution           Kitchen → Delivery (pending)
+Operational Outcome             Billing (pending)
 ══════════════════════════════════════
-Operational Execution
-  Production                    Facade (planning API)
-  Kitchen                       Pending (after Production Validate+Demo)
-  Delivery                      Pending
-  Billing                       Pending (Outcome)
 ```
 
-## Work language (not Order CRUD)
+## Rhythm
 
 ```text
-GenerateProductionPlan → GetProductionQueue → ProductionLoad
-MarkBatchReady → CloseBatch
+Architecture → Facade → Engineering Certification
+→ Capability Demo → Operational Experience
 ```
 
 ## Separation
 
 ```text
-Order        → compromiso
-Production   → trabajo planificado
-Kitchen      → trabajo ejecutado
-```
-
-```text
-Production never cooks.
-Kitchen executes.
+Order → compromiso · Production → trabajo planificado · Kitchen → ejecución
+Production never cooks. Kitchen executes.
 ```
 
 ## Discipline
 
-Complete Architecture → Facade → Validation → Demo **before** opening Kitchen.
+One capability cycle at a time. Kitchen after Production Demo preferred.
 
-## Laws
-
-LAW 001–004 · see [FOUNDATION_LOCK](../05-architecture/FOUNDATION_LOCK.md)
-
-Next: **certify Production Validation** (OPERATIONAL-004 Phase 3).  
+Next: **Production Workspace Demo**.  
 Milestone: [Operational Engine v1.0](./OPERATIONAL_ENGINE.md).

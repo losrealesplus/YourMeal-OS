@@ -1,13 +1,14 @@
 # Production Capability
 
-**OPERATIONAL-004 · Phase 2 — Facade**  
-**ADR:** [0066 — Production Capability](../adr/0066-production-capability.md) · [0067 — Production Facade](../adr/0067-production-facade.md)  
-**Status:** **Facade** (work planning API — no Product UI / routing in this phase)  
+**OPERATIONAL-004 · Phase 3 — Engineering Certification**  
+**ADR:** [0066](../adr/0066-production-capability.md) · [0067](../adr/0067-production-facade.md) · [0068](../adr/0068-production-engineering-certification.md)  
+**Status:** **Engineering Certified** (work planning API validated — no Product UI in this phase)  
 **Depends on:** Identity · Customers · Orders (Engineering Certified + Capability Demos)  
 **EatClean lens:** weekly meal prep · transform confirmed commitments into daily executable work  
 **Type:** **Operational Execution** (first of its kind)  
-**Maturity:** Architecture → **Facade** → Engineering Certified → Field Validated → Production Ready  
-**Completeness:** Architecture → Facade → Validation → Capability Demo → Product UI → Field → Production
+**Maturity:** Architecture → Facade → **Engineering Certified** → Field Validated → Production Ready  
+**Completeness:** Architecture → Facade → Engineering Certification → Capability Demo → Product UI → Field → Production  
+**Validation:** [PRODUCTION_VALIDATION_REPORT](../10-validation/PRODUCTION_VALIDATION_REPORT.md) · 13 PASS · 4 UNIMPLEMENTED · 0 FAIL
 
 ```text
 Production = planificación operativa que transforma compromisos (Orders)
@@ -461,13 +462,11 @@ Freeze names; do not implement in Phase 1.
 ## Next
 
 ```text
-OPERATIONAL-004 Phase 1  Architecture   ✅ ADR 0066
-OPERATIONAL-004 Phase 2  Facade         ✅ ADR 0067 / this document
-OPERATIONAL-004 Phase 3  Validate
+OPERATIONAL-004 Phase 1  Architecture              ✅ ADR 0066
+OPERATIONAL-004 Phase 2  Facade                    ✅ ADR 0067
+OPERATIONAL-004 Phase 3  Engineering Certification ✅ ADR 0068
 OPERATIONAL-004 Phase 4  Capability Demo
-Then Kitchen Capability Architecture (execution) — after Production cycle closes
+Then Kitchen Capability Architecture (after Demo · one cycle)
 ```
 
-**Discipline:** one operational capability cycle at a time.
-
-**Operational Engine v1.0** (future milestone) requires Identity · Customers · Orders · Production · Kitchen · Delivery · Billing certified.
+**Operational Engine v1.0** requires Identity · Customers · Orders · Production · Kitchen · Delivery · Billing certified.

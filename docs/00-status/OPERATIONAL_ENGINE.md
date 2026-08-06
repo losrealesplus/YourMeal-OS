@@ -44,7 +44,7 @@ Capability Demos (LAW 003 · 004) expected along the path; Field Validation for 
 Identity     ██████████████████████  Engineering Certified
 Customers    ██████████████████████  Engineering Certified + Demo
 Orders       ██████████████████████  Engineering Certified + Demo
-Production   ████████░░░░░░░░░░░░░░  Facade (ADR 0067)
+Production   ██████████████████████  Engineering Certified
 Kitchen      ░░░░░░░░░░░░░░░░░░░░░░  Pending
 Delivery     ░░░░░░░░░░░░░░░░░░░░░░  Pending
 Billing      ░░░░░░░░░░░░░░░░░░░░░░  Pending

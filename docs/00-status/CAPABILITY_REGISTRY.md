@@ -3,12 +3,14 @@
 **YourMeal OS · Product control panel**  
 **Permanent quartet:** [PLATFORM_STATUS](./PLATFORM_STATUS.md) · [FOUNDATION_STATUS](./FOUNDATION_STATUS.md) · this Registry · [OPERATIONAL_ROADMAP](./OPERATIONAL_ROADMAP.md)  
 **Rule:** We track **Capabilities certified**, not “PRs merged”.  
-**Methodology:** Observe → Design → Freeze → Facade → Validate → Capability Demo → Operational Experience → Field → Production
+**Methodology:** Observe → Design → Freeze → Facade → **Engineering Certification** → Capability Demo → Operational Experience → Field → Production Ready
 
 ```text
 Platform → Foundation → Operational Capabilities → Operational Experience
 → Operational Validation → Production
 ```
+
+**Graph:** [OPERATIONAL_DEPENDENCY_GRAPH](./OPERATIONAL_DEPENDENCY_GRAPH.md)
 
 ---
 
@@ -84,7 +86,7 @@ Functional consumers — not import graphs.
 | Identity | Context | Engineering Certified | Customer · Orders · Production |
 | Customer | Business Entity | Engineering Certified + Demo | Orders |
 | Orders | Operational Process | Engineering Certified + Demo | Production |
-| Production | Operational Execution | **Facade** | Kitchen |
+| Production | Operational Execution | **Engineering Certified** | Kitchen |
 | Kitchen | Operational Execution | Pending | Delivery |
 | Delivery | Operational Execution | Pending | Billing |
 | Billing | Operational Outcome | Pending | — |
@@ -185,21 +187,21 @@ Production Capability (ADR 0066) transforms those commitments into executable wo
 
 | Field | Value |
 |-------|--------|
-| **Maturity** | **Facade** |
+| **Maturity** | **Engineering Certified** |
 | **Type** | Operational Execution |
-| Completeness | Architecture ✅ · Facade ✅ · Validation ⏳ · Demo ⏳ |
+| Completeness | Architecture ✅ · Facade ✅ · Engineering Certification ✅ · Demo ⏳ · Field ⏳ |
 | Consumida por | Kitchen (canonical) |
-| Field Validation | — |
-| Version | 0.2 (facade) |
-| ADRs | [0066](../adr/0066-production-capability.md) · [0067](../adr/0067-production-facade.md) |
+| Field Validation | Pending ([PRODUCTION_SMOKE_CHECKLIST](../10-validation/PRODUCTION_SMOKE_CHECKLIST.md)) |
+| Version | 1.0 |
+| ADRs | [0066](../adr/0066-production-capability.md) · [0067](../adr/0067-production-facade.md) · [0068](../adr/0068-production-engineering-certification.md) |
 | Contract | [PRODUCTION_CAPABILITY](../05-architecture/PRODUCTION_CAPABILITY.md) |
 | Facade | `src/production/ProductionFacade.ts` · `useProduction()` · work Commands / Queries |
-| Validation | Not yet |
+| Validation | [PRODUCTION_VALIDATION_REPORT](../10-validation/PRODUCTION_VALIDATION_REPORT.md) · 13 PASS · 4 UNIMPLEMENTED · 0 FAIL |
 
 ```text
 Production
-████████░░░░░░░░░░ Facade
-                    next: Validate
+██████████████████ Engineering Certified
+░░░░ Capability Demo · Field Validation
 Question: ¿Qué trabajo debe ejecutarse para
           cumplir los compromisos operativos?
 
@@ -208,8 +210,9 @@ Production = planificación que transforma Orders
 Production never cooks. Kitchen executes.
 ```
 
-First **Operational Execution** Capability — Facade. Work language — not Order CRUD.  
-Consumes `OrderFacade` (calendar / commitments). Kitchen · Delivery · Billing consume `ProductionFacade`.
+First **Operational Execution** Capability — Engineering Certified. Work language — not Order CRUD.  
+Consumes `OrderFacade`. Kitchen · Delivery · Billing consume `ProductionFacade`.  
+**Kitchen Capability may begin after Demo preferred** (one cycle discipline).
 
 
 ---
