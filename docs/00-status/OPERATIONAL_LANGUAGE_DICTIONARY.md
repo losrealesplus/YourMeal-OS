@@ -133,7 +133,9 @@ Can an operational commitment become a confirmed delivery
 without violating any Foundation Law?
 ```
 
-Ends at: **Delivery Confirmation** — never Invoice.
+Ends at: **Delivery Confirmation** — never Invoice.  
+Behaviour: **BH-001 Fulfill Weekly Commitment** → Outcome: Operational Commitment Fulfilled.  
+See [OPERATIONAL_BEHAVIOURS](../05-architecture/OPERATIONAL_BEHAVIOURS.md).
 
 ### FLOW-003 · Confirmation → Outcome (future)
 

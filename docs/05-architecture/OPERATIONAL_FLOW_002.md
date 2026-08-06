@@ -2,12 +2,14 @@
 
 **Operational Fulfillment Flow**  
 **Order → Production → Kitchen → Delivery → Confirmation**  
-**Phase 1 — Architecture Freeze**  
-**ADR:** [0081](../adr/0081-operational-flow-002.md)  
-**Status:** **Architecture** (Harness gated)  
+**Phase 2 — Harness**  
+**ADR:** [0081](../adr/0081-operational-flow-002.md) · [0082](../adr/0082-operational-flow-002-harness.md)  
+**Status:** **Harness** (Architecture → Harness)  
+**Behaviour:** [BH-001 Fulfill Weekly Commitment](./OPERATIONAL_BEHAVIOURS.md)  
 **Phase:** B · Operational Flow Validation  
 **Laws:** 001–007 · [FOUNDATION_LOCK](./FOUNDATION_LOCK.md)  
 **Registry:** [OPERATIONAL_FLOW_REGISTRY](../00-status/OPERATIONAL_FLOW_REGISTRY.md)  
+**Package:** `src/flows/flow-002/` · `Flow002Harness` · `useFlow002`  
 **Depends on:** FLOW-001 Engineering Certified · Delivery Engineering Certified (ADR 0080)
 
 ```text
@@ -263,10 +265,10 @@ No new methodology. No new Foundation Laws (001–007 remain the constitution).
 
 ---
 
-## Operational Flow Harness (Phase 2 · gated)
+## Operational Flow Harness (Phase 2 · ADR 0082)
 
 ```text
-src/flows/flow-002/          ← Phase 2 only
+src/flows/flow-002/
   Flow002Harness.ts
   Flow002Context.ts
   Flow002Result.ts
@@ -277,23 +279,20 @@ src/flows/flow-002/          ← Phase 2 only
 |----------------|---------|
 | Invoke OrderFacade · ProductionFacade · KitchenExecutionFacade · DeliveryFacade | ✅ |
 | Propagate tenant · permissions · operator · evidence | ✅ |
+| Report which transition failed (`errors[].transition`) | ✅ |
 | Business logic · replace Facades · repos · Supabase · Billing | ❌ |
-
-Conceptual sequence (not implemented in Phase 1):
 
 ```text
 runCommitmentToConfirmedDelivery(day)
   IdentityGate
-  → OrderHop          (OrderFacade)
-  → ProductionHop     (ProductionFacade)
-  → KitchenHop        (KitchenExecutionFacade)
-  → DeliveryHop       (DeliveryFacade context / assignments)
-  → ConfirmationHop   (DeliveryFacade.ConfirmDelivery)
+  → OrderHop          (OrderFacade.getOrdersByDeliveryDay)
+  → ProductionHop     (ProductionFacade.generateProductionPlan)
+  → KitchenHop        (KitchenExecutionFacade.getExecutionQueue)
+  → ExecutionComplete (MarkExecutionReady + CompleteExecution)
+  → DeliveryHop       (DeliveryFacade.getDeliveryContext)
+  → ConfirmationHop   (DeliveryFacade.confirmDelivery)
   → Confirmed
 ```
-
-Prefer completing Delivery Capability Demo and/or FLOW-001 Flow Demo before opening Harness — discipline unlock.  
-Hard unlock for Architecture: Delivery Engineering Certified ✅.
 
 ---
 
@@ -327,13 +326,14 @@ FLOW-003 answers: confirmation → economic outcome
 - [x] Board / Roadmap / Dependency Graph updated  
 - [x] **No UI · no implementation · no Capability mutations · no Billing**
 
-### Phase 2 (Harness) 🔒
+### Phase 2 (Harness) ✅
 
-- [ ] `Flow002Harness` · `useFlow002`  
-- [ ] Compose four Facades only  
-- [ ] Evidence continuity per hop  
-- [ ] ADR (Harness)  
-- [ ] **No UI · no business logic in Flow**
+- [x] `Flow002Harness` · `useFlow002`  
+- [x] Compose four Facades only  
+- [x] Evidence continuity per hop  
+- [x] ADR 0082  
+- [x] Behaviour BH-001 named (semantic)  
+- [x] **No UI · no business logic in Flow**
 
 ### Phase 3 (Engineering Certification) 🔒
 
@@ -344,13 +344,12 @@ FLOW-003 answers: confirmation → economic outcome
 
 ---
 
-## Definition of Done (Phase 1)
+## Definition of Done (Phase 2)
 
 ```text
-FLOW-002 Architecture is frozen.
-
-FLOW validates transitions — never individual Capabilities.
-Harness is gated.
+FLOW-002 Harness orchestrates four Facades only.
+Evidence answers which transition failed.
+Behaviour BH-001 names the achievement.
 Billing remains Outcome / FLOW-003.
 ```
 
@@ -360,7 +359,7 @@ Billing remains Outcome / FLOW-003.
 
 ```text
 OPERATIONAL-FLOW-002 Phase 1  Architecture              ✅ ADR 0081
-OPERATIONAL-FLOW-002 Phase 2  Harness                   ← next (prefer Demos)
-OPERATIONAL-FLOW-002 Phase 3  Engineering Certification
+OPERATIONAL-FLOW-002 Phase 2  Harness                   ✅ ADR 0082
+OPERATIONAL-FLOW-002 Phase 3  Engineering Certification ← next
 OPERATIONAL-FLOW-002 Phase 4  Flow Demo
 ```

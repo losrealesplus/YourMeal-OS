@@ -18,7 +18,8 @@
 | [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) | **v0.8 freeze declaration** |
 | [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) | **Official frozen board** + Expansion |
 | [OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md) | **Era** · Delivery Certified · FLOW-002 Architecture → … |
-| [OPERATIONAL_FLOW_002](../05-architecture/OPERATIONAL_FLOW_002.md) | **FLOW-002** · Operational Fulfillment · ADR 0081 |
+| [OPERATIONAL_FLOW_002](../05-architecture/OPERATIONAL_FLOW_002.md) | **FLOW-002** · Operational Fulfillment · Harness · ADR 0081–0082 |
+| [OPERATIONAL_BEHAVIOURS](../05-architecture/OPERATIONAL_BEHAVIOURS.md) | **Behaviours** · BH-001 Fulfill Weekly Commitment |
 | [OPERATIONAL_LANGUAGE_DICTIONARY](./OPERATIONAL_LANGUAGE_DICTIONARY.md) | **LAW 006** domain questions |
 | [OPERATIONAL_VALIDATION_SPRINT](./OPERATIONAL_VALIDATION_SPRINT.md) | **Active sprint** · Android PASS · iPhone next |
 | [FIELD_VALIDATION_MILESTONE](../10-validation/FIELD_VALIDATION_MILESTONE.md) | **OPPO PASS** · first physical Engine run |
@@ -36,7 +37,7 @@
 **Operational Experience:** ▶ **[OPERATIONAL_EXPERIENCE](./OPERATIONAL_EXPERIENCE.md)** · Tenant Success  
 **Operational Modules:** ▶ **[OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md)** · Delivery **Engineering Certified** (ADR 0078–0080) · Engine [v0.8](./OPERATIONAL_ENGINE_V08.md)  
 **Delivery Capability:** [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) · `src/delivery/` · `useDelivery()` · [Validation Report](../10-validation/DELIVERY_VALIDATION_REPORT.md)  
-**FLOW-002:** [OPERATIONAL_FLOW_002](../05-architecture/OPERATIONAL_FLOW_002.md) · **Operational Fulfillment** · Architecture (ADR 0081)  
+**FLOW-002:** [OPERATIONAL_FLOW_002](../05-architecture/OPERATIONAL_FLOW_002.md) · **Operational Fulfillment** · Harness (ADR 0081–0082) · [Behaviours](../05-architecture/OPERATIONAL_BEHAVIOURS.md)  
 **Language:** [OPERATIONAL_LANGUAGE_DICTIONARY](./OPERATIONAL_LANGUAGE_DICTIONARY.md) 
 **Operational Engine:** 🎯 [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) · Board: [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · Review: [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) · Flows: [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md)
 **Identity Validation:** [IDENTITY_VALIDATION_REPORT](../10-validation/IDENTITY_VALIDATION_REPORT.md) · smoke [checklist](../10-validation/IDENTITY_SMOKE_CHECKLIST.md)  
