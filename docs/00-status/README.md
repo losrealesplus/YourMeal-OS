@@ -11,6 +11,7 @@
 | [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) | Certified capabilities (product map) |
 | [OPERATIONAL_ROADMAP](./OPERATIONAL_ROADMAP.md) | Phase A/B/C · flows · method |
 | [OPERATIONAL_CERTIFICATION_PHASES](./OPERATIONAL_CERTIFICATION_PHASES.md) | Capability → Flow → Tenant |
+| [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md) | FLOW-001 · 002 · 003 |
 | [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) | Target milestone · full chain Identity→Billing |
 | [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) | **Official frozen board** |
 | [OPERATIONAL_DEPENDENCY_GRAPH](./OPERATIONAL_DEPENDENCY_GRAPH.md) | Permanent dependency graph · layers |
