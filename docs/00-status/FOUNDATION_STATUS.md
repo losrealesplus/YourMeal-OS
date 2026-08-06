@@ -30,6 +30,7 @@ Foundation is **complete as the project center**. Era center moved to **Operatio
 | **005** | Each Capability belongs to exactly one Operational Model layer; cross-layer only via Facade |
 | **006** | Each Capability answers exactly one canonical business question |
 | **006-A** | Capabilities never answer the question of another Capability |
+| **007** | Operational Flows never bypass Capabilities; stage transitions only via Facades |
 
 Source: [FOUNDATION_LOCK](../05-architecture/FOUNDATION_LOCK.md)
 

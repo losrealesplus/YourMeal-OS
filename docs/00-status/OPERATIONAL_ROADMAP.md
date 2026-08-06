@@ -1,30 +1,43 @@
 # Operational Roadmap
 
-**Permanent control panel · frozen structure 2026-08-06**  
-**Companions:** [PLATFORM_STATUS](./PLATFORM_STATUS.md) · [FOUNDATION_STATUS](./FOUNDATION_STATUS.md) · [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) · [OPERATIONAL_DEPENDENCY_GRAPH](./OPERATIONAL_DEPENDENCY_GRAPH.md)
+**Permanent control panel · updated 2026-08-06 with ADR [0073](../adr/0073-kitchen-workspace-demo.md)**  
+**Companions:** [OPERATIONAL_CERTIFICATION_PHASES](./OPERATIONAL_CERTIFICATION_PHASES.md) · [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [FOUNDATION_STATUS](./FOUNDATION_STATUS.md)
 
 ---
 
-## Product stack
+## Certification phases (project language)
 
 ```text
-YourMeal OS
-Platform → Foundation → Operational Capabilities
-→ Operational Experience → Operational Validation → Production Ready
+PHASE A · Capability Certification
+████████████████████
+Complete through Kitchen Demo
+
+↓
+
+PHASE B · Operational Flow Validation
+████░░░░░░░░░░░░░░░
+OPERATIONAL-FLOW-001 next
+
+↓
+
+PHASE C · Real Tenant Validation
+░░░░░░░░░░░░░░░░░░░
 ```
+
+Full detail: [OPERATIONAL_CERTIFICATION_PHASES](./OPERATIONAL_CERTIFICATION_PHASES.md)
 
 ---
 
-## Operational model (not just a roadmap)
+## Operational Grammar (LAW 006)
 
 ```text
 Identity → ¿Quién opera?
 Customer → ¿Quién genera la demanda?
 Orders → ¿Qué prometimos?
 Production → ¿Qué trabajo debemos generar?
-Kitchen → ¿Qué trabajo estoy ejecutando?
-Delivery → ¿Qué trabajo debo entregar?
-Billing → ¿Qué trabajo puedo facturar?
+Kitchen → ¿Qué trabajo debe ejecutarse ahora?
+Delivery → ¿Qué trabajo debe entregarse ahora?
+Billing → ¿Qué trabajo puede cerrarse y facturarse?
 ```
 
 ---
@@ -33,21 +46,19 @@ Billing → ¿Qué trabajo puedo facturar?
 
 ```text
 Operational Planning
-  Orders → Production   ✅ Certified
+  Orders → Production   ✅ Certified + Demo
 
 ────────────────────────────
 
 Operational Execution
-  Kitchen Execution     ✅ Engineering Certified (ADR 0072)
-  Delivery              Pending
+  Kitchen Execution     ✅ Certified + Demo (final isolated)
+  Delivery              Pending (via FLOW-002)
 
 ────────────────────────────
 
 Operational Outcome
-  Billing               Pending
+  Billing               Pending (via FLOW-003)
 ```
-
-**Operational Engine exists** (incomplete). LAW 005 protects layer boundaries.
 
 ---
 
@@ -58,52 +69,44 @@ Operational Outcome
 | Identity | Context | Engineering Certified |
 | Customers | Business Entity | Engineering Certified + Demo |
 | Orders | Operational Planning | Engineering Certified + Demo |
-| **Production** | **Operational Planning** | **Engineering Certified + Demo** |
-| **Kitchen Execution** | **Operational Execution** | **Engineering Certified** (ADR 0072) |
+| Production | Operational Planning | Engineering Certified + Demo |
+| **Kitchen Execution** | **Operational Execution** | **Engineering Certified + Demo** |
 | Delivery | Operational Execution | Pending |
 | Billing | Operational Outcome | Pending |
 
 ---
 
-## Official rhythm (repeat forever)
-
-```text
-Architecture
-    ↓
-Facade
-    ↓
-Engineering Certification
-    ↓
-Capability Demo
-    ↓
-Operational Experience
-```
-
-Language: **certify** capabilities — not “develop screens”.
-
----
-
-## Kitchen Execution track (OPERATIONAL-005)
+## Kitchen Execution track (OPERATIONAL-005) · CLOSED
 
 ```text
 Architecture (ADR 0070)              ✅
-Facade (ADR 0071)                    ✅ src/kitchen/
-Engineering Certification (ADR 0072) ✅ 12 PASS · 6 UNIMPLEMENTED · 0 FAIL
-Capability Demo                      ← next
+Facade (ADR 0071)                    ✅
+Engineering Certification (ADR 0072) ✅
+Capability Demo (ADR 0073)           ✅ /admin/kitchen-workspace
 ```
 
-**Operational Engine exists.** Kitchen Engineering Certified.  
-After Demo → **Operational Flow Validation** (Production → Kitchen → Delivery).
+**Phase A complete through Kitchen.** Pattern no longer needs re-demonstration.
+
+---
+
+## Phase B · Operational Flows (LAW 007)
+
+| Flow | Chain | Question |
+|------|-------|----------|
+| **OPERATIONAL-FLOW-001** | Orders → Production → Kitchen | ¿Puede un compromiso convertirse en trabajo ejecutado sin romper leyes? |
+| **OPERATIONAL-FLOW-002** | Production → Kitchen → Delivery | ¿Puede el trabajo ejecutado convertirse en entregable? |
+| **OPERATIONAL-FLOW-003** | Delivery → Billing | ¿Puede lo entregado convertirse en resultado económico? |
+
+Every transition via certified Facades only — never bypass.
 
 ---
 
 ## Near-term sequence
 
-1. ~~Kitchen Execution Capability Architecture~~ ✅ ADR 0070  
-2. ~~Kitchen Execution Facade~~ ✅ ADR 0071  
-3. ~~Kitchen Execution Engineering Certification~~ ✅ ADR 0072  
-4. **Kitchen Execution Capability Demo** (OPERATIONAL-005 Phase 4)  
-5. Operational Flow Validation · Delivery · Billing → [Operational Engine v1.0](./OPERATIONAL_ENGINE.md)
+1. ~~Kitchen Capability Demo~~ ✅ ADR 0073  
+2. **OPERATIONAL-FLOW-001** (Orders → Production → Kitchen)  
+3. Delivery Capability (inside FLOW-002)  
+4. OPERATIONAL-FLOW-002 · 003 → Engine v1.0 · Phase C
 
 Official board: [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)
 
@@ -115,4 +118,4 @@ YourMeal OS → Capability → Operational Pattern → Tenant → EatClean
 
 ## Success question
 
-> **¿Qué capacidades operativas están certificadas y cuáles están siendo utilizadas por un negocio real?**
+> **¿Qué capacidades están certificadas y qué flujos operativos colaboran sin romper las Foundation Laws?**
