@@ -35,7 +35,7 @@ Those exist. The spine is **capabilities that a real business uses**.
 | Identity | Context | Engineering Certified |
 | Customers | Business Entity | Engineering Certified + Demo |
 | Orders | Operational Process | Engineering Certified + Demo |
-| **Production** | **Operational Execution** | **Architecture (ADR 0066)** |
+| **Production** | **Operational Execution** | **Facade (ADR 0067)** |
 | Kitchen | Operational Execution | Pending |
 | Delivery | Operational Execution | Pending |
 | Billing | Operational Outcome | Pending |
@@ -54,26 +54,28 @@ Order Architecture → Facade → Validate → Workspace Demo
 ## Production track (OPERATIONAL-004)
 
 ```text
-Production Architecture (ADR 0066)   ✅ Freeze
+Production Architecture (ADR 0066)   ✅
         ↓
-Production Facade
+Production Facade (ADR 0067)         ✅ Work language
         ↓
-Production Validation
+Production Validation                ← next
         ↓
 Production Workspace Demo
         ↓
-Kitchen Capability Architecture
+Kitchen Capability Architecture      (only after Production cycle)
 ```
 
 ```text
-Production = planificación que transforma Orders en trabajo ejecutable.
+GenerateProductionPlan · GetProductionQueue · ProductionLoad
+— never GetOrders / UpdateOrder / CreateOrder
+```
+
+```text
 Production never cooks.
 Kitchen executes.
 ```
 
-Canonical question: **¿Qué trabajo debe ejecutarse para cumplir los compromisos operativos?**
-
-Language: **certify Production Capability** — not “develop Production”.
+**Discipline:** Never open two new operational capabilities at once.
 
 ---
 
@@ -97,10 +99,11 @@ That is when YourMeal OS models a catering operation **end to end**.
 
 1. ~~Order Workspace Demo~~ ✅ ADR 0065  
 2. ~~Production Capability Architecture~~ ✅ ADR 0066  
-3. **Production Facade** (OPERATIONAL-004 Phase 2)  
-4. Kitchen Capability Architecture (execution)  
-5. Delivery · Billing  
-6. Field Validation (EatClean as first tenant of the pattern)
+3. ~~Production Facade~~ ✅ ADR 0067  
+4. **Production Validation** (OPERATIONAL-004 Phase 3)  
+5. Production Workspace Demo  
+6. Kitchen Capability Architecture (execution)  
+7. Delivery · Billing → [Operational Engine v1.0](./OPERATIONAL_ENGINE.md)
 
 ```text
 YourMeal OS → Capability → Operational Pattern → Tenant → EatClean

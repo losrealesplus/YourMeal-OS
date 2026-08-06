@@ -12,27 +12,25 @@ Operational Capabilities
   001 Identity                  Engineering Certified
   002 Customers                 Engineering Certified + Demo
   003 Orders                    Engineering Certified + Demo
-  004 Production                Architecture (ADR 0066)
+  004 Production                Facade (ADR 0067)
 ══════════════════════════════════════
 Operational Experience
   Customer Workspace            Capability Demo
   Order Workspace               Capability Demo
 ══════════════════════════════════════
 Operational Execution
-  Production                    Architecture (planning)
-  Kitchen                       Pending (execution)
+  Production                    Facade (planning API)
+  Kitchen                       Pending (after Production Validate+Demo)
   Delivery                      Pending
   Billing                       Pending (Outcome)
 ```
 
-## Method (certified — type-independent)
+## Work language (not Order CRUD)
 
 ```text
-Observe → Design → Freeze → Facade → Validate → Engineering Certified
-→ Capability Demo → Operational Experience → Field → Production Ready
+GenerateProductionPlan → GetProductionQueue → ProductionLoad
+MarkBatchReady → CloseBatch
 ```
-
-Works for Context · Business Entity · Operational Process · now Execution.
 
 ## Separation
 
@@ -47,9 +45,13 @@ Production never cooks.
 Kitchen executes.
 ```
 
+## Discipline
+
+Complete Architecture → Facade → Validation → Demo **before** opening Kitchen.
+
 ## Laws
 
 LAW 001–004 · see [FOUNDATION_LOCK](../05-architecture/FOUNDATION_LOCK.md)
 
-Next: **certify Production Facade** (OPERATIONAL-004 Phase 2).  
+Next: **certify Production Validation** (OPERATIONAL-004 Phase 3).  
 Milestone: [Operational Engine v1.0](./OPERATIONAL_ENGINE.md).
