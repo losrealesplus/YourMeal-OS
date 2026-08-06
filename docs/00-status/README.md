@@ -18,10 +18,10 @@
 **Platform v1:** ✅ **CLOSED** — [PLATFORM_V1_CLOSED](./PLATFORM_V1_CLOSED.md) · Baseline [v1](./PLATFORM_BASELINE_v1.md) · Transición [Platform → Flow DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) · COMPLETE · [Operating Model v1](./OPERATING_MODEL_v1.md) · ACTIVE  
 **Product Core:** ✅ **[Foundation engineering-validated](./PRODUCT_CORE_FOUNDATION_001.md)** (ADR 0054) · Field smoke OPPO ⏳ · **Era Foundation center CLOSED**  
 **Operational Experience:** ▶ **[OPERATIONAL_EXPERIENCE](./OPERATIONAL_EXPERIENCE.md)** · Tenant Success  
-**Operational Modules:** ▶ **[CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md)** · Identity ✅ · Customers ✅ · **Orders ✅ Engineering Certified** (ADR 0064)  
+**Operational Modules:** ▶ **[CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md)** · Identity ✅ · Customers ✅ · **Orders ✅ Certified + Demo** (ADR 0064–0065)  
 **Identity Validation:** [IDENTITY_VALIDATION_REPORT](../10-validation/IDENTITY_VALIDATION_REPORT.md) · smoke [checklist](../10-validation/IDENTITY_SMOKE_CHECKLIST.md)  
 **Customer Capability:** [CUSTOMER_CAPABILITY](../05-architecture/CUSTOMER_CAPABILITY.md) · ADR 0058–0061 · Demo `/admin/customer-workspace`  
-**Order Capability:** [ORDER_CAPABILITY](../05-architecture/ORDER_CAPABILITY.md) · ADR 0062–0064 · [ORDER_VALIDATION_REPORT](../10-validation/ORDER_VALIDATION_REPORT.md)  
+**Order Capability:** [ORDER_CAPABILITY](../05-architecture/ORDER_CAPABILITY.md) · ADR 0062–0065 · Demo `/admin/order-workspace` · [ORDER_VALIDATION_REPORT](../10-validation/ORDER_VALIDATION_REPORT.md)  
 
 **Modules index:** [OPERATIONAL_MODULES](./OPERATIONAL_MODULES.md)  
 **Developer Platform:** ✅ **v1.0 FROZEN** · tag `developer-platform-v1.0.0` · Infra: HOUSEKEEPING-001…003 ✅  

@@ -2,7 +2,7 @@
  * Pedidos — lista operativa mínima (lectura + timeline).
  * PR-034
  */
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -93,6 +93,15 @@ function AdminOrdersPage() {
         title="Pedidos"
         subtitle="Vista de pedidos operativos con timeline."
       />
+      <p className="text-xs text-muted-foreground -mt-2">
+        Capability Demo (LAW 003 · 004):{" "}
+        <Link
+          to="/admin/order-workspace"
+          className="underline underline-offset-2 hover:text-foreground"
+        >
+          /admin/order-workspace
+        </Link>
+      </p>
 
       {loading ? (
         <Skeleton className="h-48 w-full" />

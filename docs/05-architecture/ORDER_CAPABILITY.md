@@ -1,14 +1,15 @@
 # Order Capability
 
-**OPERATIONAL-003 · Phase 3 — Validation · Engineering Certified**  
-**ADR:** [0062](../adr/0062-order-capability.md) · [0063](../adr/0063-order-facade.md) · [0064](../adr/0064-order-validation.md)  
-**Status:** **Engineering Certified** (process API validated — no Product UI in this phase)  
+**OPERATIONAL-003 · Phase 4 — Capability Demo · Engineering Certified + Demo**  
+**ADR:** [0062](../adr/0062-order-capability.md) · [0063](../adr/0063-order-facade.md) · [0064](../adr/0064-order-validation.md) · [0065](../adr/0065-order-workspace-demo.md)  
+**Status:** **Engineering Certified + Capability Demo** (`/admin/order-workspace`)  
 **Depends on:** Identity (ADR 0055–0057) · Customers (ADR 0058–0061) · Order Intake (ADR 0017)  
 **EatClean lens:** weekly meal prep · commitment for a concrete week · production · delivery · billing handoff  
 **Type:** Operational Process  
-**Maturity:** Architecture → Facade → **Engineering Certified** → Field Validated → Production Ready  
-**Completeness:** Architecture → Facade → Validation → Capability Demo → Product UI → Field → Production  
-**Validation:** [ORDER_VALIDATION_REPORT](../10-validation/ORDER_VALIDATION_REPORT.md) · 15 PASS · 2 UNIMPLEMENTED · 0 FAIL
+**Maturity:** Architecture → Facade → Engineering Certified → Field Validated → Production Ready  
+**Completeness:** Architecture → Facade → Validation → **Capability Demo** → Product UI → Field → Production  
+**Validation:** [ORDER_VALIDATION_REPORT](../10-validation/ORDER_VALIDATION_REPORT.md) · 15 PASS · 2 UNIMPLEMENTED · 0 FAIL  
+**Demo:** `/admin/order-workspace` — LAW 003 · LAW 004
 
 ```text
 Order = compromiso operativo del tenant para una semana concreta.
@@ -467,6 +468,6 @@ Phase 1 does **not** move or rewrite these — Freeze only.
 OPERATIONAL-003 Phase 1  Architecture   ✅ ADR 0062
 OPERATIONAL-003 Phase 2  Facade         ✅ ADR 0063
 OPERATIONAL-003 Phase 3  Validate       ✅ ADR 0064 · Engineering Certified
-OPERATIONAL-003 Phase 4  Capability Demo (Order Workspace · LAW 003/004)
-Then Production Capability Architecture (authorized)
+OPERATIONAL-003 Phase 4  Capability Demo ✅ ADR 0065 · /admin/order-workspace
+OPERATIONAL-004          Production Capability Architecture
 ```

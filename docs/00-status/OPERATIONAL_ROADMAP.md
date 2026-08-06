@@ -51,14 +51,14 @@ Order Facade (ADR 0063)
         ↓
 Order Validation (ADR 0064)     ✅ Engineering Certified
         ↓
-Order Workspace Demo            ← next
+Order Workspace Demo (ADR 0065) ✅ Operational Experience consumes Order
         ↓
-Engineering Certified + Demo
-        ↓
-Production Capability
+Production Capability           ← next (OPERATIONAL-004)
 ```
 
 Same pattern as Identity and Customers. Consistency is an advantage.
+
+Language: **certify Production Capability** — not “develop Production”.
 
 ---
 
@@ -85,10 +85,16 @@ Then YourMeal OS stops being “order software” and becomes **the operating sy
 
 ## Near-term sequence
 
-1. Order Workspace Demo (LAW 003 proof for process Capability)  
-2. Production Capability Architecture  
+1. ~~Order Workspace Demo~~ ✅ ADR 0065  
+2. **Production Capability Architecture** (OPERATIONAL-004)  
 3. Kitchen · Delivery · Billing (consume OrderFacade only)  
-4. Field Validation (EatClean)  
+4. Field Validation (EatClean as first tenant)  
 5. Production Ready
+
+```text
+YourMeal OS → Capability → Operational Pattern → Tenant → EatClean
+```
+
+EatClean is the first consumer — not the only one.
 
 Detail panel: [OPERATIONAL_MODULES](./OPERATIONAL_MODULES.md) · [OPERATIONAL_EXPERIENCE](./OPERATIONAL_EXPERIENCE.md)
