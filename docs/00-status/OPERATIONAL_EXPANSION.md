@@ -17,7 +17,7 @@ Core frozen · Android field PASS
 Operational Expansion
 ████░░░░░░░░░░░░░░░░
 First module: OPERATIONAL-006 Delivery
-(Architecture Freeze only)
+(Facade · ADR 0078 · 0079)
 ══════════════════════════════════════════════
 ```
 
@@ -33,6 +33,8 @@ We are **expanding a motor** that already has engineering certification and Andr
 | Prove the Engine exists | Add Execution / Outcome modules |
 | Identity → Kitchen + FLOW-001 | Delivery → FLOW-002 → Billing → … |
 | “Operational Modules” (loose) | **Operational Expansion** (named era) |
+
+**Language:** [OPERATIONAL_LANGUAGE_DICTIONARY](./OPERATIONAL_LANGUAGE_DICTIONARY.md)
 
 ---
 
@@ -50,17 +52,14 @@ Observe
   → Production
 ```
 
-Cross-Platform Validation stays mandatory for claiming a module is **device-independent**.  
-Architecture Freeze may precede iPhone PASS; **Facade+ implementation** should not outrun field discipline without cause.
-
 ---
 
 ## Expansion order (dependencies)
 
 ```text
-OPERATIONAL-006  Delivery          ← Architecture NOW (ADR 0078)
+OPERATIONAL-006  Delivery          ← Architecture ✅ · Facade ✅
         ↓
-FLOW-002         Kitchen → Delivery   (after Delivery Facade)
+FLOW-002         Kitchen → Delivery   (after Delivery Certification)
         ↓
 OPERATIONAL-007  Billing
         ↓
@@ -73,8 +72,6 @@ OPERATIONAL-009  Procurement
 OPERATIONAL-010  Analytics
 ```
 
-Do not reorder. Delivery before Billing. Confirmation before settlement.
-
 ---
 
 ## Parallel track (not Expansion code)
@@ -84,19 +81,18 @@ IOS-READY-001 / FIELD-VALIDATION-002
   Xcode Team · Preferences SPM · sync · iPhone PASS
 ```
 
-Operator path for iOS remains open in parallel.  
-It does **not** authorize skipping LAW 001–007 on Delivery.
-
 ---
 
-## First mission
+## First mission status
 
-**OPERATIONAL-006 · Delivery Capability · Phase 1**  
+**OPERATIONAL-006 · Delivery**  
+Phase 1 Architecture ✅ · Phase 2 Facade ✅ · Phase 3 Certification ◀ next
+
 Canonical question:
 
 > ¿Qué compromisos operativos deben entregarse ahora y cómo confirmamos su ejecución?
 
-Contract: [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md)
+Contract: [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) · Facade: `src/delivery/`
 
 ---
 
@@ -104,7 +100,7 @@ Contract: [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md)
 
 | Item | Lock |
 |------|------|
-| Delivery Facade / UI / DB | Until Phase 2 intentionally opened |
-| FLOW-002 Harness | Until Delivery Facade |
-| Billing Architecture | Until Delivery Architecture cycle complete (prefer Facade+) |
+| Delivery UI / DB / Demo | Until Phase 3–4 |
+| FLOW-002 Harness | Until Delivery Certification |
+| Billing Architecture | Prefer after Delivery Demo |
 | Claiming Engine **FIELD VALIDATED** | Until iPhone PASS + Android PASS |
