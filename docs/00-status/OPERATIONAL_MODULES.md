@@ -1,26 +1,25 @@
 # Operational Modules
 
-**Phase:** FLOW-001 Engineering Certified · Flow Demo next · Delivery GATED  
-**Board:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md)
+**Phase:** Operational Engine **v0.8** · Validation era  
+**Board:** [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) · [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)
 
 ```text
-PHASE A · Capability Certification     ████████████████ COMPLETE
-PHASE B · Operational Flow Validation  ████████████░░░░ FLOW-001 Certified
-PHASE C · Real Tenant Validation       ░░░░░░░░░░░░░░░░
+Platform / Foundation           Stable
+Identity → Kitchen              Engineering Certified
+FLOW-001                        Engineering Certified
+Delivery / Billing              GATED
 ```
 
-## Near-term (frozen)
+## Next (do not reorder)
 
 ```text
-FLOW-001 Demo → Roadmap Review → Android → OPPO → iPhone
-→ only then Delivery / FLOW-002
+FLOW Demo → Engine Review → Android → OPPO → iPhone → Delivery
 ```
 
-## Definitions
+## Era
 
 ```text
-FLOW validates transitions. NOT validate Capabilities.
-No Delivery until field path completes.
+Construction → Validation
 ```
 
-Next: **OPERATIONAL-FLOW-001 Phase 4 · Flow Demo**.
+Question: *¿Funciona bien cuando alguien la usa?*
