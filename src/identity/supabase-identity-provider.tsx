@@ -3,8 +3,14 @@ import type { Session } from "@supabase/supabase-js";
 import { useRouter } from "@tanstack/react-router";
 import { onAuthStateChange } from "@/auth";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  clearBootstrapIdentitySnapshot,
+  getBootstrapIdentitySnapshot,
+  subscribeBootstrapIdentitySnapshot,
+  type BootstrapIdentitySnapshot,
+} from "@/bootstrap/pipeline/BootstrapIdentityStore";
+import { runOwnedIdentityStages } from "@/bootstrap/pipeline/runOwnedIdentityStages";
 import { homePathForRoles } from "@/lib/home-path";
-import { tryEnsurePlatformOwnerSession } from "@/lib/ensure-platform-owner-session";
 import {
   deriveAuthFlags,
   type ActiveTenant,
@@ -14,85 +20,88 @@ import {
 } from "@/hooks/use-auth-types";
 import { AuthContext } from "./auth-context";
 
-/** Production identity — unchanged Supabase Auth + RBAC load. */
+function applySnapshot(
+  snap: BootstrapIdentitySnapshot,
+  setters: {
+    setRoles: (r: AppRole[]) => void;
+    setProfile: (p: UserProfile | null) => void;
+    setTenant: (t: ActiveTenant | null) => void;
+    setHomePath: (h: string | null) => void;
+  },
+) {
+  setters.setRoles(snap.roles);
+  setters.setProfile(snap.profile);
+  setters.setTenant(snap.tenant);
+  setters.setHomePath(snap.homePath);
+}
+
+/**
+ * Production identity Provider — PRODUCT-CORE-003 observer.
+ *
+ * Owns: session subscription, context exposure, realtime role refresh, render.
+ * Does NOT own: startup load of roles/profile/tenant (SessionStage / TenantStage).
+ */
 export function SupabaseIdentityProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [tenant, setTenant] = useState<ActiveTenant | null>(null);
+  const [homePath, setHomePath] = useState<string | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    return subscribeBootstrapIdentitySnapshot((snap) => {
+      if (snap.status === "cleared" || snap.status === "idle") {
+        setRoles([]);
+        setProfile(null);
+        setTenant(null);
+        setHomePath(null);
+        return;
+      }
+      applySnapshot(snap, { setRoles, setProfile, setTenant, setHomePath });
+    });
+  }, []);
 
   useEffect(() => {
     const { data: sub } = onAuthStateChange((_e, s) => {
       setSession(s);
       setLoading(false);
+      // FCR-008: do NOT call getSession() here — INITIAL_SESSION / SIGNED_IN
+      // deliver the session. Identity ladder ownership → Stages.
+      if (!s?.user) {
+        clearBootstrapIdentitySnapshot();
+        return;
+      }
+      const current = getBootstrapIdentitySnapshot();
+      if (
+        current.status === "ready" &&
+        current.userId === s.user.id &&
+        current.updatedAt > Date.now() - 5_000
+      ) {
+        applySnapshot(current, { setRoles, setProfile, setTenant, setHomePath });
+        return;
+      }
+      void runOwnedIdentityStages({ userId: s.user.id, mode: "cold" });
     });
-    // FCR-008: do NOT restore parallel getSession() here — that reopened FCR-002
-    // flicker and raced post-login. Canonical session after login comes from
-    // signInWithPassword / verifyOtp `data.session` (see auth.tsx / auth.admin.tsx).
-    // Cold hydrate relies on INITIAL_SESSION from onAuthStateChange.
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  // Realtime RBAC — react to role changes (not startup orchestration).
   useEffect(() => {
-    if (!session?.user) {
-      setRoles([]);
-      setProfile(null);
-      setTenant(null);
-      return;
-    }
-    let cancelled = false;
+    if (!session?.user) return;
     const uid = session.user.id;
+    let cancelled = false;
 
-    async function loadRoles() {
+    async function refreshRoles() {
       const { data } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", uid);
       if (cancelled) return;
       setRoles((data ?? []).map((r) => r.role as AppRole));
+      void router.invalidate();
     }
-
-    void (async () => {
-      await tryEnsurePlatformOwnerSession();
-      if (cancelled) return;
-
-      const [rolesRes, profileRes, memberRes] = await Promise.all([
-        supabase.from("user_roles").select("role").eq("user_id", uid),
-        supabase
-          .from("profiles")
-          .select("id, full_name, avatar_url, locale, phone")
-          .eq("id", uid)
-          .maybeSingle(),
-        supabase
-          .from("tenant_members")
-          .select("tenant_id, tenants:tenant_id(id, name, slug)")
-          .eq("user_id", uid)
-          .limit(1)
-          .maybeSingle(),
-      ]);
-      if (cancelled) return;
-
-      setRoles((rolesRes.data ?? []).map((r) => r.role as AppRole));
-
-      const p = profileRes.data;
-      setProfile(
-        p
-          ? {
-              id: p.id,
-              fullName: p.full_name,
-              avatarUrl: p.avatar_url,
-              locale: p.locale,
-              phone: p.phone,
-            }
-          : null,
-      );
-
-      const t = (memberRes.data as { tenants?: ActiveTenant | null } | null)
-        ?.tenants;
-      setTenant(t ? { id: t.id, name: t.name, slug: t.slug ?? null } : null);
-    })();
 
     const channel = supabase
       .channel(`rbac:${uid}:${crypto.randomUUID()}`)
@@ -105,9 +114,7 @@ export function SupabaseIdentityProvider({ children }: { children: ReactNode }) 
           filter: `user_id=eq.${uid}`,
         },
         () => {
-          void loadRoles().then(() => {
-            void router.invalidate();
-          });
+          void refreshRoles();
         },
       )
       .subscribe();
@@ -129,9 +136,9 @@ export function SupabaseIdentityProvider({ children }: { children: ReactNode }) 
       tenantId: tenant?.id ?? null,
       tenant,
       ...flags,
-      homePath: homePathForRoles(roles),
+      homePath: homePath ?? homePathForRoles(roles),
     };
-  }, [session, loading, roles, profile, tenant]);
+  }, [session, loading, roles, profile, tenant, homePath]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

@@ -26,11 +26,10 @@ Un solo Happy Path. No veinte pantallas.
 | Block | Focus | Status |
 |-------|--------|--------|
 | **001** | Bootstrap Architecture (Observe → Design → Freeze) | ✅ ADR 0050 |
-| **002** | Bootstrap Orchestrator (order only) | ▶ ADR 0051 |
-| **003** | Session / Tenant stage ownership (delegate → own) | ⏳ |
-| **004** | Branding stage (still NON-BLOCKING) | ⏳ |
-| **005** | Navigation + Application Ready UI gate | ⏳ |
-| **006** | Smoke Test (web + OPPO) | ⏳ |
+| **002** | Bootstrap Orchestrator (order only) | ✅ ADR 0051 |
+| **003** | Stage Ownership Migration (Stages coordinate · Providers observe) | ▶ ADR 0052 |
+| **004** | Application Ready UI gate | ⏳ |
+| **005** | Smoke Test (web + OPPO) | ⏳ |
 
 ---
 
@@ -41,6 +40,8 @@ Un solo Happy Path. No veinte pantallas.
 | Pipeline contract | [BOOTSTRAP_PIPELINE.md](../05-architecture/BOOTSTRAP_PIPELINE.md) |
 | ADR (contract) | [0050-bootstrap-pipeline.md](../adr/0050-bootstrap-pipeline.md) |
 | ADR (orchestrator) | [0051-bootstrap-orchestrator.md](../adr/0051-bootstrap-orchestrator.md) |
+| ADR (ownership) | [0052-stage-ownership.md](../adr/0052-stage-ownership.md) |
+| Ownership matrix | [BOOTSTRAP_OWNERSHIP.md](../05-architecture/BOOTSTRAP_OWNERSHIP.md) |
 | Code | `src/bootstrap/pipeline/` · sequence: `BootstrapPipeline.ts` |
 
 Canonical flow:

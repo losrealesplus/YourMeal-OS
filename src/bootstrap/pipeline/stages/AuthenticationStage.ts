@@ -1,8 +1,9 @@
 import type { BootstrapStageHandler } from "./BootstrapStage";
 
 /**
- * Authentication — peek identity presence via existing session facade.
- * Does not render auth UI, change FCR-008, or alter IdentityProvider.
+ * Authentication — owns cold identity peek via existing session facade.
+ * Who starts Authentication? → AuthenticationStage (ADR 0052).
+ * Does not render auth UI, change FCR-008, or load the identity ladder.
  */
 export const AuthenticationStage: BootstrapStageHandler = {
   id: "authentication",
@@ -34,7 +35,7 @@ export const AuthenticationStage: BootstrapStageHandler = {
       if (!session?.user) {
         return {
           status: "auth_required",
-          notes: [modeNote, "authentication:anonymous"],
+          notes: [modeNote, "authentication:owned_by_authentication_stage", "authentication:anonymous"],
           evidence: { hasSession: false },
           patch: { hasSession: false, userId: null },
         };
@@ -42,7 +43,11 @@ export const AuthenticationStage: BootstrapStageHandler = {
 
       return {
         status: "ok",
-        notes: [modeNote, "authentication:session_present"],
+        notes: [
+          modeNote,
+          "authentication:owned_by_authentication_stage",
+          "authentication:session_present",
+        ],
         evidence: { hasSession: true },
         patch: { hasSession: true, userId },
       };

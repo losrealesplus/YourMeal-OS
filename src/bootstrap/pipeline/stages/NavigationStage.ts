@@ -1,14 +1,20 @@
 import type { BootstrapStageHandler } from "./BootstrapStage";
+import { resolveBootstrapHomePath } from "../services/NavigationBootstrapService";
+import {
+  getBootstrapIdentitySnapshot,
+  publishBootstrapIdentitySnapshot,
+} from "../BootstrapIdentityStore";
 
 /**
- * Navigation — homePath resolution remains in resolveHomePath / route guards.
- * Stage marks sequence position only (no router imports).
+ * NavigationStage — owns first homePath resolution for startup.
+ * Route guards / login UX still navigate; this stage owns the decision value.
+ * Who starts Navigation homePath? → NavigationStage (ADR 0052).
  */
 export const NavigationStage: BootstrapStageHandler = {
   id: "navigation",
   blocking: true,
   async run(ctx) {
-    if (!ctx.hasSession) {
+    if (!ctx.hasSession || !ctx.userId) {
       return {
         status: "failed",
         error: {
@@ -20,13 +26,27 @@ export const NavigationStage: BootstrapStageHandler = {
       };
     }
 
+    const snap = getBootstrapIdentitySnapshot();
+    const roles = snap.userId === ctx.userId ? snap.roles : [];
+    const homePath = resolveBootstrapHomePath(roles);
+
+    publishBootstrapIdentitySnapshot({
+      userId: ctx.userId,
+      homePath,
+      roles,
+      profile: snap.profile,
+      tenant: snap.tenant,
+      status: "ready",
+    });
+
     return {
       status: "ok",
       notes: [
-        "navigation:home_path_delegated_to_resolveHomePath",
-        "navigation:guards_unchanged",
+        "navigation:owned_by_navigation_stage",
+        "navigation:policy_home_path_for_roles",
       ],
-      evidence: { delegated: true },
+      evidence: { homePath, roleCount: roles.length },
+      patch: { homePath },
     };
   },
 };

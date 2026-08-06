@@ -45,3 +45,22 @@ export {
   startBootstrapPipeline,
   type BootstrapRunOptions,
 } from "./BootstrapOrchestrator";
+
+export {
+  getBootstrapIdentitySnapshot,
+  publishBootstrapIdentitySnapshot,
+  clearBootstrapIdentitySnapshot,
+  subscribeBootstrapIdentitySnapshot,
+  resetBootstrapIdentitySnapshot,
+  type BootstrapIdentitySnapshot,
+} from "./BootstrapIdentityStore";
+
+export {
+  runOwnedIdentityStages,
+  resetOwnedIdentityStagesInflight,
+} from "./runOwnedIdentityStages";
+
+export { loadSessionIdentity } from "./services/SessionBootstrapService";
+export { resolveTenantFromSessionIdentity } from "./services/TenantBootstrapService";
+export { resolveBootstrapBranding } from "./services/BrandingBootstrapService";
+export { resolveBootstrapHomePath } from "./services/NavigationBootstrapService";
