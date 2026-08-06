@@ -14,8 +14,10 @@
 | [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md) | FLOW-001 · 002 · 003 |
 | [OPERATIONAL_JOURNEY_REGISTRY](./OPERATIONAL_JOURNEY_REGISTRY.md) | Reserved (future) |
 | [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) | Mandatory after FLOW-001 Demo |
-| [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) | Target milestone · full chain Identity→Billing |
+| [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) | Engine meaning · v0.8 / v1.0 |
+| [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) | **v0.8 freeze declaration** |
 | [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) | **Official frozen board** |
+| [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) | Mandatory after FLOW-001 Demo |
 | [OPERATIONAL_DEPENDENCY_GRAPH](./OPERATIONAL_DEPENDENCY_GRAPH.md) | Permanent dependency graph · layers |
 
 > Success = **¿Qué capacidades operativas están certificadas y cuáles usa un negocio real?**
@@ -25,8 +27,8 @@
 **Platform v1:** ✅ **CLOSED** — [PLATFORM_V1_CLOSED](./PLATFORM_V1_CLOSED.md) · Baseline [v1](./PLATFORM_BASELINE_v1.md) · Transición [Platform → Flow DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) · COMPLETE · [Operating Model v1](./OPERATING_MODEL_v1.md) · ACTIVE  
 **Product Core:** ✅ **[Foundation engineering-validated](./PRODUCT_CORE_FOUNDATION_001.md)** (ADR 0054) · Field smoke OPPO ⏳ · **Era Foundation center CLOSED**  
 **Operational Experience:** ▶ **[OPERATIONAL_EXPERIENCE](./OPERATIONAL_EXPERIENCE.md)** · Tenant Success  
-**Operational Modules:** ▶ **[OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)** · Phase A COMPLETE · FLOW-001 **Certified** · Delivery **GATED**  
-**Operational Engine:** 🎯 [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) · Flows: [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md) · Review: [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) · Phases: [OPERATIONAL_CERTIFICATION_PHASES](./OPERATIONAL_CERTIFICATION_PHASES.md)
+**Operational Modules:** ▶ **[OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md)** · **v0.8 FROZEN** · Validation era · Delivery **GATED**  
+**Operational Engine:** 🎯 [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) · Board: [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · Review: [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) · Flows: [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md)
 **Identity Validation:** [IDENTITY_VALIDATION_REPORT](../10-validation/IDENTITY_VALIDATION_REPORT.md) · smoke [checklist](../10-validation/IDENTITY_SMOKE_CHECKLIST.md)  
 **Customer Capability:** [CUSTOMER_CAPABILITY](../05-architecture/CUSTOMER_CAPABILITY.md) · ADR 0058–0061 · Demo `/admin/customer-workspace`  
 **Order Capability:** [ORDER_CAPABILITY](../05-architecture/ORDER_CAPABILITY.md) · ADR 0062–0065 · Demo `/admin/order-workspace`  

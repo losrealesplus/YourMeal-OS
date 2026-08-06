@@ -1,7 +1,7 @@
 # Operational Certification Phases
 
-**Permanent · Phase A COMPLETE · FLOW-001 Architecture ADR [0074](../adr/0074-operational-flow-001.md)**  
-**Companions:** [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md) · [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [FOUNDATION_LOCK](../05-architecture/FOUNDATION_LOCK.md) LAW 007
+**Permanent · Operational Engine v0.8 · FLOW-001 Certified · ADR [0077](../adr/0077-operational-engine-v08.md)**  
+**Companions:** [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) · [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md) · [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)
 
 ```text
 PHASE A

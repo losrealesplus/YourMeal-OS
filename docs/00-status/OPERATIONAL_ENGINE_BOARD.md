@@ -1,89 +1,113 @@
 # Operational Engine — Official Board
 
-**Frozen:** 2026-08-06 · FLOW-001 Engineering Certified · ADR [0076](../adr/0076-operational-flow-001-engineering-certification.md)  
-**Companions:** [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md) · [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) · [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md)
+**Frozen:** 2026-08-06 · **Operational Engine v0.8** · ADR [0077](../adr/0077-operational-engine-v08.md)  
+**Detail:** [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) · [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) · [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md)
 
 ```text
+══════════════════════════════════════════════
+
 YOURMEAL OS
 
-══════════════════════════════════════════════
-
-Platform / Foundation
-██████████████████████████
-Stable · LAW 001–007 frozen
+Operational Engine v0.8
 
 ══════════════════════════════════════════════
 
-PHASE A · Capability Certification
+Platform
 ██████████████████████████
-COMPLETE
+Stable
 
-PHASE B · Operational Flow Validation
-████████████░░░░░░░░░░░░░░
-FLOW-001 Engineering Certified
+Foundation
+██████████████████████████
+Stable
 
-PHASE C · Real Tenant Validation
-░░░░░░░░░░░░░░░░░░░░░░░░░░
-```
+Capabilities
 
----
+Identity
+██████████████████████████
+Engineering Certified
 
-## Capabilities
+Customers
+██████████████████████████
+Engineering Certified
 
-```text
-────────────────────
-Identity · Customers · Orders · Production · Kitchen
-████████████████████  Certified (+ Demos where applicable)
+Orders
+██████████████████████████
+Engineering Certified
+
+Production
+██████████████████████████
+Engineering Certified
+
+Kitchen
+██████████████████████████
+Engineering Certified
+
+Operational Flow
+
+FLOW-001
+██████████████████████████
+Engineering Certified
+
+══════════════════════════════════════════════
+
+NEXT
+
+FLOW Demo
+
+↓
+
+Operational Engine Review
+
+↓
+
+Android
+
+↓
+
+OPPO
+
+↓
+
+iPhone
+
+↓
+
+Real Tenant Validation
+
+↓
 
 Delivery
-░░░░░░░░░░░░░░░░░░░░  GATED
 
-Billing
-░░░░░░░░░░░░░░░░░░░░  GATED
-────────────────────
+══════════════════════════════════════════════
 ```
 
 ---
 
-## Operational Flows
+## Era
 
 ```text
-────────────────────
-FLOW-001
-Orders → Production → Kitchen
-████████████████████
-Engineering Certified (ADR 0076)
-Demo ⏳
-
-FLOW-002 / FLOW-003
-░░░░░░░░░░░░░░░░░░░░
-GATED
-────────────────────
+Construction  →  Validation
 ```
 
-```text
-FLOW validates transitions.
-NOT validate Capabilities.
-```
+Question until now: *¿Está bien diseñada?*  
+Question from now: *¿Funciona bien cuando alguien la usa?*
 
 ---
 
 ## No Delivery until
 
 ```text
-FLOW-001 Demo              ████░░░░░░░░░░░░░░░░
-Roadmap Review (Engine v0.8)░░░░░░░░░░░░░░░░░░░░
-Android APK                ░░░░░░░░░░░░░░░░░░░░
-OPPO Field Validation      ░░░░░░░░░░░░░░░░░░░░
-iPhone Field Validation    ░░░░░░░░░░░░░░░░░░░░
+FLOW-001 Demo
+Roadmap Review (Engine Review)
+Android APK
+OPPO Field Validation
+iPhone Field Validation
 ```
 
-**Do not open Delivery Capability or FLOW-002 Architecture until this gate is 100%.**
+Do not open Delivery / FLOW-002 Architecture before this gate is complete.
 
 ---
 
-## Next
+## Immediate next step
 
-1. **FLOW-001 Flow Demo**  
-2. **Operational Engine Review** ([OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md))  
-3. Android → OPPO → iPhone  
+**FLOW-001 Flow Demo** — first time the user sees a complete process, not a single Capability.
