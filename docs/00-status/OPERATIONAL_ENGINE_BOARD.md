@@ -1,7 +1,7 @@
 # Operational Engine — Official Board
 
-**Frozen:** 2026-08-06 · Kitchen Demo · Phase A complete through Kitchen · LAW 007 · ADR [0073](../adr/0073-kitchen-workspace-demo.md)  
-**Companions:** [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) · [OPERATIONAL_CERTIFICATION_PHASES](./OPERATIONAL_CERTIFICATION_PHASES.md) · [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md)
+**Frozen:** 2026-08-06 · Phase A COMPLETE · FLOW-001 Architecture · ADR [0074](../adr/0074-operational-flow-001.md)  
+**Companions:** [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) · [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md) · [OPERATIONAL_CERTIFICATION_PHASES](./OPERATIONAL_CERTIFICATION_PHASES.md) · [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md)
 
 ```text
 YOURMEAL OS
@@ -14,65 +14,102 @@ Stable
 
 ══════════════════════════════════════════════
 
-Certification Phases
-
 PHASE A · Capability Certification
 ██████████████████████████
-Complete through Kitchen Demo
+COMPLETE
 
 PHASE B · Operational Flow Validation
 ████░░░░░░░░░░░░░░░░░░░░░░
-Authorized (FLOW-001 next)
+FLOW-001 Architecture
 
 PHASE C · Real Tenant Validation
 ░░░░░░░░░░░░░░░░░░░░░░░░░░
-
-══════════════════════════════════════════════
-
-Engine Completion
-
-Context
-██████████████████████████
-
-Business Entity
-██████████████████████████
-
-Operational Planning
-██████████████████████████
-
-Operational Execution
-████████████████░░░░░░░░░░
-Kitchen Demo · Delivery pending
-
-Operational Outcome
-░░░░░░░░░░░░░░░░░░░░░░░░░░
 ```
 
 ---
 
-## Capability detail
+## Capabilities
 
 ```text
-Identity        Engineering Certified
-Customers       Engineering Certified + Demo
-Orders          Engineering Certified + Demo
-Production      Engineering Certified + Demo
-Kitchen Exec.   Engineering Certified + Demo   ← final isolated demo
-Delivery        Pending (via FLOW-002)
-Billing         Pending (via FLOW-003)
+────────────────────
+Identity
+████████████████████
+Engineering Certified
+
+Customers
+████████████████████
+Engineering Certified + Demo
+
+Orders
+████████████████████
+Engineering Certified + Demo
+
+Production
+████████████████████
+Engineering Certified + Demo
+
+Kitchen Execution
+████████████████████
+Engineering Certified + Demo
+
+Delivery
+░░░░░░░░░░░░░░░░░░░░
+Pending (FLOW-002)
+
+Billing
+░░░░░░░░░░░░░░░░░░░░
+Pending (FLOW-003)
+────────────────────
 ```
 
 ---
 
-## Next milestone
-
-**OPERATIONAL-FLOW-001**
+## Operational Flows
 
 ```text
-Orders → Production → Kitchen
+────────────────────
+FLOW-001
+Orders
+    ↓
+Production
+    ↓
+Kitchen
+████░░░░░░░░░░░░░░░░
+Architecture (ADR 0074)
 
+FLOW-002
+Production
+    ↓
+Kitchen
+    ↓
+Delivery
+░░░░░░░░░░░░░░░░░░░░
+
+FLOW-003
+Delivery
+    ↓
+Billing
+░░░░░░░░░░░░░░░░░░░░
+────────────────────
+```
+
+Two perspectives, one engine:
+
+* **Capabilities** — certified pieces  
+* **Flows** — certified collaborations  
+
+---
+
+## FLOW-001 question
+
+```text
 ¿Puede un compromiso operativo convertirse en trabajo
-ejecutado sin romper ninguna ley arquitectónica?
+ejecutado sin romper ninguna Foundation Law?
 ```
 
-LAW 007: every transition via certified Facades only.
+---
+
+## Next
+
+**OPERATIONAL-FLOW-001 Phase 2** — Facade / harness (same method rhythm).  
+No Delivery Capability Architecture until FLOW-001 cycle prefers Demo.

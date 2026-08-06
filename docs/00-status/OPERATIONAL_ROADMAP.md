@@ -10,13 +10,13 @@
 ```text
 PHASE A · Capability Certification
 ████████████████████
-Complete through Kitchen Demo
+COMPLETE
 
 ↓
 
 PHASE B · Operational Flow Validation
 ████░░░░░░░░░░░░░░░
-OPERATIONAL-FLOW-001 next
+FLOW-001 Architecture ✅ · Facade next
 
 ↓
 
@@ -24,7 +24,7 @@ PHASE C · Real Tenant Validation
 ░░░░░░░░░░░░░░░░░░░
 ```
 
-Full detail: [OPERATIONAL_CERTIFICATION_PHASES](./OPERATIONAL_CERTIFICATION_PHASES.md)
+Full detail: [OPERATIONAL_CERTIFICATION_PHASES](./OPERATIONAL_CERTIFICATION_PHASES.md) · [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md)
 
 ---
 
@@ -91,27 +91,38 @@ Capability Demo (ADR 0073)           ✅ /admin/kitchen-workspace
 
 ## Phase B · Operational Flows (LAW 007)
 
-| Flow | Chain | Question |
-|------|-------|----------|
-| **OPERATIONAL-FLOW-001** | Orders → Production → Kitchen | ¿Puede un compromiso convertirse en trabajo ejecutado sin romper leyes? |
-| **OPERATIONAL-FLOW-002** | Production → Kitchen → Delivery | ¿Puede el trabajo ejecutado convertirse en entregable? |
-| **OPERATIONAL-FLOW-003** | Delivery → Billing | ¿Puede lo entregado convertirse en resultado económico? |
+| Flow | Chain | Status | Question |
+|------|-------|--------|----------|
+| **OPERATIONAL-FLOW-001** | Orders → Production → Kitchen | **Architecture** (ADR 0074) | ¿Puede un compromiso convertirse en trabajo ejecutado sin romper leyes? |
+| **OPERATIONAL-FLOW-002** | Production → Kitchen → Delivery | Pending | ¿Puede el trabajo ejecutado convertirse en entregable? |
+| **OPERATIONAL-FLOW-003** | Delivery → Billing | Pending | ¿Puede lo entregado convertirse en resultado económico? |
 
 Every transition via certified Facades only — never bypass.
+
+### FLOW-001 track
+
+```text
+Architecture (ADR 0074)              ✅
+Facade / harness                     ← next
+Engineering Certification
+Flow Demo
+```
+
+Contract: [OPERATIONAL_FLOW_001](../05-architecture/OPERATIONAL_FLOW_001.md)
 
 ---
 
 ## Near-term sequence
 
-1. ~~Kitchen Capability Demo~~ ✅ ADR 0073  
-2. **OPERATIONAL-FLOW-001** (Orders → Production → Kitchen)  
-3. Delivery Capability (inside FLOW-002)  
-4. OPERATIONAL-FLOW-002 · 003 → Engine v1.0 · Phase C
+1. ~~Kitchen Capability Demo~~ ✅ ADR 0073 · Phase A COMPLETE  
+2. ~~OPERATIONAL-FLOW-001 Architecture~~ ✅ ADR 0074  
+3. **OPERATIONAL-FLOW-001 Facade / harness**  
+4. FLOW-001 Certification → Demo → FLOW-002 / Delivery  
 
 Official board: [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)
 
 ```text
-YourMeal OS → Capability → Operational Pattern → Tenant → EatClean
+YourMeal OS → Capability → Flow → Operational Pattern → Tenant → EatClean
 ```
 
 ---

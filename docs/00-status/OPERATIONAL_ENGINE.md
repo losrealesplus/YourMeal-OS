@@ -93,12 +93,12 @@ Operational Outcome     ░░░░░░░░░░░░░░░░
 ## Certification phases
 
 ```text
-PHASE A · Capability Certification     ████████████████  through Kitchen Demo
-PHASE B · Operational Flow Validation  ████░░░░░░░░░░░░  FLOW-001 next
+PHASE A · Capability Certification     ████████████████  COMPLETE
+PHASE B · Operational Flow Validation  ████░░░░░░░░░░░░  FLOW-001 Architecture
 PHASE C · Real Tenant Validation       ░░░░░░░░░░░░░░░░
 ```
 
-See [OPERATIONAL_CERTIFICATION_PHASES](./OPERATIONAL_CERTIFICATION_PHASES.md).
+See [OPERATIONAL_CERTIFICATION_PHASES](./OPERATIONAL_CERTIFICATION_PHASES.md) · [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md).
 
 ---
 
