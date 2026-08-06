@@ -24,7 +24,7 @@ From this phase onward, the most valuable evidence is **experience on device**, 
 | Fecha | Dispositivo | Flujo | Resultado | Observaciones |
 | ----- | ----------- | ----- | --------- | ------------- |
 | 2026-08-06 | OPPO | Login → Post Login → authenticated surface (Ops) | PASS | After #340 (`return { user }`). Pre-fix: Missing auth context → "This page didn't load". Report: [ANDROID_FIELD_VALIDATION_REPORT](./ANDROID_FIELD_VALIDATION_REPORT.md) |
-| — | iPhone | — | — | *FIELD-VALIDATION-002 pending* |
+| — | iPhone | — | — | *FIELD-VALIDATION-002 · guide: [FIELD_VALIDATION_002_IOS](./FIELD_VALIDATION_002_IOS.md) · audit NOT READY* |
 
 ---
 

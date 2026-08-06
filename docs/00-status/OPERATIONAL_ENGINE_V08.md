@@ -129,12 +129,12 @@ More valuable than ten new screens.
 2. Operational Engine Review  ✅
 3. Android Build              ✅
 4. OPPO Field Validation      ✅ PASS · 2026-08-06
-5. iPhone Build               ← next
+5. iPhone Build               ← FIELD-VALIDATION-002 ([guide](../10-validation/FIELD_VALIDATION_002_IOS.md) · audit NOT READY)
 6. iPhone Field Validation
 7. Delivery Architecture      LOCKED
 ```
 
-Field artefact: [ANDROID_FIELD_VALIDATION_REPORT](../10-validation/ANDROID_FIELD_VALIDATION_REPORT.md)
+Field artefacts: [ANDROID_FIELD_VALIDATION_REPORT](../10-validation/ANDROID_FIELD_VALIDATION_REPORT.md) · [FIELD_VALIDATION_002_IOS](../10-validation/FIELD_VALIDATION_002_IOS.md)
 
 ---
 

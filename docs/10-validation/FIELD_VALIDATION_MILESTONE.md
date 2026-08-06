@@ -94,6 +94,12 @@ FIELD-VALIDATION-002
 
 iPhone Validation
 
+Official guide (audit · no code):
+  docs/10-validation/FIELD_VALIDATION_002_IOS.md
+
+Verdict of audit: NOT READY for install today
+(Architecture READY · Operator path incomplete)
+
 When Android PASS + iOS PASS:
   Operational Engine v0.8 → FIELD VALIDATED
 ```
