@@ -126,25 +126,28 @@ First **writable** Operational Capability. Method certified via Capability Demo.
 |-------|--------|
 | **Maturity** | **Engineering Certified** |
 | **Type** | Operational Process |
-| Completeness | Architecture ✅ · Facade ✅ · Validation ✅ · Demo ⏳ · Field ⏳ |
+| Completeness | Architecture ✅ · Facade ✅ · Validation ✅ · **Capability Demo ✅** · Product UI ⏳ · Field ⏳ |
 | Field Validation | Pending ([ORDER_SMOKE_CHECKLIST](../10-validation/ORDER_SMOKE_CHECKLIST.md)) |
 | Version | 1.0 |
-| ADRs | [0062](../adr/0062-order-capability.md) · [0063](../adr/0063-order-facade.md) · [0064](../adr/0064-order-validation.md) · Intake [0017](../adr/0017-order-intake.md) |
+| ADRs | [0062](../adr/0062-order-capability.md) · [0063](../adr/0063-order-facade.md) · [0064](../adr/0064-order-validation.md) · [0065](../adr/0065-order-workspace-demo.md) · Intake [0017](../adr/0017-order-intake.md) |
 | Contract | [ORDER_CAPABILITY](../05-architecture/ORDER_CAPABILITY.md) |
 | Facade | `src/order/OrderFacade.ts` · `useOrder()` · process Commands / Queries |
+| Demo | `/admin/order-workspace` — LAW 003 · LAW 004 proof |
 | Validation | [ORDER_VALIDATION_REPORT](../10-validation/ORDER_VALIDATION_REPORT.md) · 15 PASS · 2 UNIMPLEMENTED · 0 FAIL |
 
 ```text
 Orders
 ██████████████████ Engineering Certified
-░░░░ Capability Demo · Field Validation
+████ Capability Demo (Workspace)
+░░░░ Product UI · Field Validation
 Question: ¿Qué compromiso operativo ha adquirido
           la empresa para una semana concreta?
 
 Order = compromiso operativo del tenant para una semana concreta.
 ```
 
-First **Operational Process** Capability — Engineering Certified. Process language — not CRUD.  
+First **Operational Process** Capability — Engineering Certified + Capability Demo.  
+Operational Experience officially consumes Order.  
 Production · Kitchen · Delivery · Billing must consume `OrderFacade` only.  
 **Production Capability may begin.**
 

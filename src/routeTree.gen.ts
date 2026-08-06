@@ -35,6 +35,7 @@ import { Route as AuthenticatedAdminInventoryRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminKitchenRouteImport } from './routes/_authenticated/admin.kitchen'
 import { Route as AuthenticatedAdminKitchenExecutionRouteImport } from './routes/_authenticated/admin.kitchen-execution'
 import { Route as AuthenticatedAdminMenusRouteImport } from './routes/_authenticated/admin.menus'
+import { Route as AuthenticatedAdminOrderWorkspaceRouteImport } from './routes/_authenticated/admin.order-workspace'
 import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin.orders'
 import { Route as AuthenticatedAdminProductionRouteImport } from './routes/_authenticated/admin.production'
 import { Route as AuthenticatedAdminProductionSheetRouteImport } from './routes/_authenticated/admin.production-sheet'
@@ -233,6 +234,12 @@ const AuthenticatedAdminMenusRoute = AuthenticatedAdminMenusRouteImport.update({
   path: '/menus',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminOrderWorkspaceRoute =
+  AuthenticatedAdminOrderWorkspaceRouteImport.update({
+    id: '/order-workspace',
+    path: '/order-workspace',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminOrdersRoute =
   AuthenticatedAdminOrdersRouteImport.update({
     id: '/orders',
@@ -587,6 +594,7 @@ export interface FileRoutesByFullPath {
   '/admin/kitchen': typeof AuthenticatedAdminKitchenRoute
   '/admin/kitchen-execution': typeof AuthenticatedAdminKitchenExecutionRoute
   '/admin/menus': typeof AuthenticatedAdminMenusRoute
+  '/admin/order-workspace': typeof AuthenticatedAdminOrderWorkspaceRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/production': typeof AuthenticatedAdminProductionRouteWithChildren
   '/admin/production-sheet': typeof AuthenticatedAdminProductionSheetRoute
@@ -666,6 +674,7 @@ export interface FileRoutesByTo {
   '/admin/kitchen': typeof AuthenticatedAdminKitchenRoute
   '/admin/kitchen-execution': typeof AuthenticatedAdminKitchenExecutionRoute
   '/admin/menus': typeof AuthenticatedAdminMenusRoute
+  '/admin/order-workspace': typeof AuthenticatedAdminOrderWorkspaceRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/production-sheet': typeof AuthenticatedAdminProductionSheetRoute
   '/admin/promotions': typeof AuthenticatedAdminPromotionsRoute
@@ -749,6 +758,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/kitchen': typeof AuthenticatedAdminKitchenRoute
   '/_authenticated/admin/kitchen-execution': typeof AuthenticatedAdminKitchenExecutionRoute
   '/_authenticated/admin/menus': typeof AuthenticatedAdminMenusRoute
+  '/_authenticated/admin/order-workspace': typeof AuthenticatedAdminOrderWorkspaceRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/_authenticated/admin/production': typeof AuthenticatedAdminProductionRouteWithChildren
   '/_authenticated/admin/production-sheet': typeof AuthenticatedAdminProductionSheetRoute
@@ -834,6 +844,7 @@ export interface FileRouteTypes {
     | '/admin/kitchen'
     | '/admin/kitchen-execution'
     | '/admin/menus'
+    | '/admin/order-workspace'
     | '/admin/orders'
     | '/admin/production'
     | '/admin/production-sheet'
@@ -913,6 +924,7 @@ export interface FileRouteTypes {
     | '/admin/kitchen'
     | '/admin/kitchen-execution'
     | '/admin/menus'
+    | '/admin/order-workspace'
     | '/admin/orders'
     | '/admin/production-sheet'
     | '/admin/promotions'
@@ -995,6 +1007,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/kitchen'
     | '/_authenticated/admin/kitchen-execution'
     | '/_authenticated/admin/menus'
+    | '/_authenticated/admin/order-workspace'
     | '/_authenticated/admin/orders'
     | '/_authenticated/admin/production'
     | '/_authenticated/admin/production-sheet'
@@ -1246,6 +1259,13 @@ declare module '@tanstack/react-router' {
       path: '/menus'
       fullPath: '/admin/menus'
       preLoaderRoute: typeof AuthenticatedAdminMenusRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/order-workspace': {
+      id: '/_authenticated/admin/order-workspace'
+      path: '/order-workspace'
+      fullPath: '/admin/order-workspace'
+      preLoaderRoute: typeof AuthenticatedAdminOrderWorkspaceRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/orders': {
@@ -1739,6 +1759,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminKitchenRoute: typeof AuthenticatedAdminKitchenRoute
   AuthenticatedAdminKitchenExecutionRoute: typeof AuthenticatedAdminKitchenExecutionRoute
   AuthenticatedAdminMenusRoute: typeof AuthenticatedAdminMenusRoute
+  AuthenticatedAdminOrderWorkspaceRoute: typeof AuthenticatedAdminOrderWorkspaceRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
   AuthenticatedAdminProductionRoute: typeof AuthenticatedAdminProductionRouteWithChildren
   AuthenticatedAdminProductionSheetRoute: typeof AuthenticatedAdminProductionSheetRoute
@@ -1770,6 +1791,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminKitchenExecutionRoute:
     AuthenticatedAdminKitchenExecutionRoute,
   AuthenticatedAdminMenusRoute: AuthenticatedAdminMenusRoute,
+  AuthenticatedAdminOrderWorkspaceRoute: AuthenticatedAdminOrderWorkspaceRoute,
   AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
   AuthenticatedAdminProductionRoute:
     AuthenticatedAdminProductionRouteWithChildren,

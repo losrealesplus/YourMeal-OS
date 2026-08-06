@@ -203,7 +203,7 @@ Tenant Success
 ```
 
 Customer Workspace was the first official **consumer** of a certified Capability.  
-Order Capability will be the first **process** Capability — Operational Experience will consume it the same way (LAW 003 · LAW 004).
+Order Workspace is the first official **consumer** of an Operational Process Capability (LAW 003 · LAW 004).
 
 Prohibido:
 
