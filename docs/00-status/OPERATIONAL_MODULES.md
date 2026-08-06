@@ -36,7 +36,7 @@ We do **not** ship “screens”. We ship **capabilities**.
 
 | ID | Capability | Status |
 |----|------------|--------|
-| **001** | Identity | ▶ Architecture freeze (this PR) |
+| **001** | Identity | ✅ Architecture (ADR 0055) · ▶ Facade (ADR 0056) |
 | 002 | Customers | ⏳ |
 | 003 | Orders | ⏳ |
 | 004 | Production | ⏳ |
