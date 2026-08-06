@@ -1,122 +1,102 @@
-# INFRA-005 · IDENTITY_VALIDATION_REPORT
+# OPERATIONAL-001 · Identity Validation Report
 
-**Fecha:** 2026-07-26  
-**Proyecto Supabase:** `djangucecsphnejplvic`  
-**Branch:** `cursor/infra-005-identity-validation-f54a`  
-**Alcance:** Identidad nativa email/password · OAuth UI suspendido (código conservado)
-
----
-
-## 1. Cambios de código
-
-| Cambio | Detalle |
-|--------|---------|
-| Flag | `VITE_AUTH_OAUTH_SOCIAL_ENABLED` (default **false**) vía `src/auth/features.ts` → `isOAuthSocialEnabled()` |
-| UI | `src/routes/auth.tsx` — bloque Google/Apple + separador “or” solo si el flag es true |
-| Conservado | `src/auth/oauth.ts`, `signInWithOAuth`, `/auth/callback`, PKCE — **sin eliminar** |
-| Config | `.env` / `.env.example` documentan el flag |
-
-**Reactivar OAuth UI:** `VITE_AUTH_OAUTH_SOCIAL_ENABLED=true` + rebuild (+ providers Dashboard ON).
+**Track:** OPERATIONAL-001 · Phase 3  
+**Date:** 2026-08-06  
+**ADR:** [0057 — Identity Validation](../adr/0057-identity-validation.md)  
+**Status:** **ENGINEERING CERTIFIED** · Field smoke (OPPO) → operator handoff
 
 ---
 
-## 2. Evidencia automatizada (API · 2026-07-26)
+## Declaration
 
-| Check | Resultado | Evidencia |
-|-------|-----------|-----------|
-| Auth settings | PASS | `email=true`, `google=false`, `apple=false`, `phone=false`, `mailer_autoconfirm=false` |
-| Admin createUser + password login | PASS | session JWT válida |
-| `getUser(jwt)` | PASS | email del probe |
-| `refreshSession` | PASS | nuevo access_token |
-| `signOut` | PASS | OK |
-| Profile auto-create | PASS | `profiles` fila con `full_name` / `locale=es` tras Auth user |
-| `user_roles` al alta | PASS (vacío) | `count=0` — cliente por defecto en runtime |
-| `tenant_members` al alta | PASS (vacío) | `count=0` hasta onboarding / ensure_individual |
-| Public `signUp` | PASS | user creado, `session=false` (confirmación email requerida) |
-| `resetPasswordForEmail` @example.com | FAIL | GoTrue: email inválido — usar dominio real / mailinator |
-| Platform Owner en Auth | **FAIL** | `alex1409h@gmail.com` y `alexhdezmtinez@gmail.com` **no** existen en Auth |
-| Tenant seed | PASS | `eatclean-tenerife` presente |
-| Unit `isOAuthSocialEnabled` | PASS | vitest 3/3 |
-| Unit `homePathForRoles` | PASS | vitest 8/8 |
+```text
+Identity Capability
+──────────────────────────────────────
+Architecture (ADR 0055)     ✅
+Facade (ADR 0056)           ✅
+Validation matrix           ✅ ENGINEERING
+Field smoke (OPPO)          ⏳ Operator checklist
+──────────────────────────────────────
+Operational Modules may begin after this engineering certification.
+Field smoke remains recommended before production EatClean cutover.
+```
 
-Probes usaron Auth Admin / Auth client (flujos definidos). Usuarios de prueba **eliminados** tras la corrida. No se insertó SQL directo en `user_roles`.
+Identity is certified for **engineering use by Operational Modules**.  
+We do **not** invent a device PASS.
 
 ---
 
-## 3. Flujos producto (estado)
+## Validation matrix
 
-### 3.1 Registro email/password
+| ID | Case | Expected | Observed | Evidence | Verdict |
+|----|------|----------|----------|----------|---------|
+| V01 | Unauthenticated user | anonymous · AUTH_REQUIRED | state=anonymous · AUTH_REQUIRED | `composeIdentity` | **PASS** |
+| V02 | Authenticated user | operational_ready · tenant bound | ok · tenant=t1 | `composeIdentity(authed)` | **PASS** |
+| V03 | Session restoration | Restore from BootstrapIdentityStore | tenant+roles from snapshot | store + Facade | **PASS** |
+| V04 | Tenant resolution | ActiveTenant + membership.tenantId | slug=eatclean · tenantId=t1 | compose | **PASS** |
+| V05 | Workspace resolution | homePath → surface | /admin→admin · /saas→saas · /app→app · /driver→driver | compose | **PASS** |
+| V06 | Permission loading | roles → capabilities | kitchen → kitchen.operate | `capabilitiesFor` | **PASS** |
+| V07 | Branding resolution | provenance + tenantSlug | static · eatclean | compose + brandConfig | **PASS** |
+| V08 | Locale loading | profile.locale | es | compose | **PASS** |
+| V09 | Feature Flags | Snapshot bag on context | bag present · 0 keys | Contract only; live eval deferred | **WARNING** |
+| V10 | Membership | membership context · membershipId | status=approved · membershipId=null | ADR 0019 field pending wire | **WARNING** |
+| V11 | Logout | anonymous after clear | anonymous · no session | clear store + compose | **PASS** |
+| V12 | Expired Session | absent session ≡ anonymous | anonymous · !ok | compositional; JWT field smoke | **PASS** |
+| V13 | Bootstrap interaction | Facade consumes store · Bootstrap owns load | surface=app · tenant bound | Facade ← store | **PASS** |
+| V14 | Ready Gate interaction | identity ready ⇒ App Ready | AUTH_REQUIRED → isReady | `deriveApplicationReadySnapshot` | **PASS** |
+| V15 | Developer Platform | identity:* events observe-only | identity:operational_ready emitted | IdentityEvents | **PASS** |
+| V16 | Doctor interaction | No Doctor contract change | observe-only certified | ADR 0055/0056 | **PASS** |
 
-1. UI `/auth` → Sign up → `signUp()` (`src/auth/credentials.ts`).  
-2. Con `mailer_autoconfirm=false` el usuario debe confirmar email antes de sesión durable.  
-3. Trigger crea `profiles`.  
-4. Sin roles → `useAuth().isCustomer` → `resolveHomePath` → `/app`.
+**Summary:** PASS **14** · WARNING **2** · FAIL **0**
 
-**Bloqueador ops:** configurar SMTP (o habilitar autoconfirm solo en entornos no-prod) para completar signup E2E en UI.
-
-### 3.2 Login / logout / persistencia
-
-| Paso | Código | API probe |
-|------|--------|-----------|
-| Login | `signInWithPassword` | PASS |
-| Persistencia | `persistSession: true` + localStorage | Diseño PASS · UI reload = checklist operador |
-| Refresh | `autoRefreshToken: true` + probe `refreshSession` | PASS |
-| Logout | `signOut` en settings / admin / saas | API PASS |
-
-### 3.3 Recuperación
-
-Ruta `/reset-password` + `resetPasswordForEmail` / `updatePassword`.  
-Probe con `@example.com` rechazado por GoTrue — validar con mailbox real en checklist.
-
----
-
-## 4. Perfiles objetivo
-
-| Perfil | Cómo se obtiene (flujo definido) | Home esperado | Estado validación |
-|--------|----------------------------------|---------------|-------------------|
-| Customer | Signup / login sin roles staff | `/app` | API: alta + redirect map PASS · UI checklist |
-| Employee | Invite / vínculo company (`employee` / customer B2B) | `/app` (salvo staff) | Código mapeado · E2E **PENDING** operador |
-| EatClean Tenant Admin | `company_admin` via invite tenant/SaaS | `/admin` | Código + unit redirect PASS · E2E **PENDING** |
-| SaaS Platform Owner | Email en `config/bootstrap/platform-owners.json` + login → RPC `ensure_platform_owner_session` | `/admin` (saas+company) o `/saas` si solo saas | **BLOCKED** — owners no están en Auth |
+Automated runner: `src/identity/identity-validation.spec.ts` (17 tests green).
 
 ---
 
-## 5. Redirecciones (mapa código)
+## WARNING backlog (non-blocking for module start)
 
-Fuente: `src/lib/home-path.ts` + `resolveHomePath` (llama `ensurePlatformOwnerSession` antes de leer roles).
+| Item | Follow-up |
+|------|-----------|
+| V09 Feature flags empty | Wire FeatureFlagService into compose when first module needs flags |
+| V10 membershipId null | Expose `tenant_members.id` from SessionBootstrapService |
 
-| Roles | Path |
-|-------|------|
-| (vacío) / customer | `/app` |
-| `company_admin` / `operations_manager` | `/admin` |
-| solo `saas_admin` | `/saas` |
-| `saas_admin` + staff | `/admin` (SaaS entry secundaria) |
-| solo `kitchen` | `/admin/kitchen` |
-| solo delivery/logistics | `/admin/delivery` |
-| `driver` | `/driver` |
-
-Staff entry dedicado: `/auth/admin` (email/password only — sin OAuth).
+These do **not** block OPERATIONAL-002 Customers architecture — they must be closed before modules that audit by `membershipId` or evaluate flags at identity layer.
 
 ---
 
-## 6. Criterio de cierre INFRA-005
+## Smoke checklist (operator · OPPO / web)
 
-| Ítem | Estado |
-|------|--------|
-| OAuth UI oculto sin borrar código | ✅ DONE |
-| Flag de reactivación | ✅ DONE |
-| Login/refresh/logout API | ✅ PASS |
-| Signup público + confirm policy documentada | ✅ PASS (session null hasta confirm) |
-| Platform Owner E2E | ⛔ BLOCKED (crear Auth users allowlisted) |
-| Employee / Tenant Admin E2E UI | ⬜ PENDING operador |
-| OAuth re-enable | ⬜ Post-INFRA-005 (providers OFF hoy) |
+| # | Step | Pass? |
+|---|------|-------|
+| S1 | Cold launch unauthenticated → auth/landing | ☐ |
+| S2 | Login EatClean → workspace after Ready | ☐ |
+| S3 | Kill app · restore session → same tenant/workspace | ☐ |
+| S4 | Admin vs customer homePath correct | ☐ |
+| S5 | Permissions: staff sees admin surfaces | ☐ |
+| S6 | Branding / locale visible on shell | ☐ |
+| S7 | Logout → anonymous | ☐ |
+| S8 | Optional: force token expiry → re-auth | ☐ |
+
+When S1–S7 PASS, append to this acta:
+
+```text
+Field smoke (OPPO)   ✅
+Identity             FULLY CERTIFIED
+```
 
 ---
 
-## 7. Próximos pasos operador
+## Rule unlocked
 
-1. Crear usuarios Auth (signup o invite) para emails de `platform-owners.json`.  
-2. Login → verificar grants `saas_admin` + `company_admin` + membership `eatclean-tenerife`.  
-3. Completar checklist UI: [CHECKLIST_IDENTITY_VALIDATION.md](./CHECKLIST_IDENTITY_VALIDATION.md).  
-4. Ver [RBAC_VALIDATION.md](./RBAC_VALIDATION.md) y [TENANT_ISOLATION_REPORT.md](./TENANT_ISOLATION_REPORT.md).  
-5. Cuando identidad email/password sea PASS → reactivar OAuth (flag + Dashboard).
+Operational Modules **may begin** (Observe → Design → Freeze…) after this engineering certification.
+
+Still recommended: complete OPPO smoke before EatClean production cutover.
+
+---
+
+## Non-goals (honored)
+
+- No feature work  
+- No Product Module implementation  
+- No Provider / routing refactors  
+- No Doctor engine changes  

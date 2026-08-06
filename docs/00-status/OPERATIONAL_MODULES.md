@@ -2,7 +2,7 @@
 
 **Phase:** OPERATIONAL (post Platform + Foundation)  
 **Methodology (permanent):** Observe → Design → Freeze → Implement → Validate  
-**First capability:** [OPERATIONAL-001 Identity](../05-architecture/IDENTITY_CAPABILITY.md) · ADR [0055](../adr/0055-identity-capability.md)
+**First capability:** [OPERATIONAL-001 Identity](../05-architecture/IDENTITY_CAPABILITY.md) · ADR [0055](../adr/0055-identity-capability.md)–[0057](../adr/0057-identity-validation.md) · [Validation Report](../10-validation/IDENTITY_VALIDATION_REPORT.md)
 
 ---
 
@@ -32,22 +32,40 @@ We do **not** ship “screens”. We ship **capabilities**.
 
 ---
 
-## Roadmap
+```text
+Operational Modules
 
-| ID | Capability | Status |
-|----|------------|--------|
-| **001** | Identity | ✅ Architecture (ADR 0055) · ▶ Facade (ADR 0056) |
-| 002 | Customers | ⏳ |
-| 003 | Orders | ⏳ |
-| 004 | Production | ⏳ |
-| 005 | Kitchen | ⏳ |
-| 006 | Inventory | ⏳ |
-| 007 | Delivery | ⏳ |
-| 008 | Billing | ⏳ |
-| 009 | Analytics | ⏳ |
-| 010 | Administration | ⏳ |
+001 Identity
+██████████████████  engineering certified (ADR 0057)
+                    field smoke ░░ OPPO checklist
 
-Each capability gets: ADR · contract · states · lifecycle · tests · smoke — **before** UI.
+002 Customers
+░░░░░░░░░░░░░░░░  next (Observe → Design → Freeze)
+
+003 Orders
+░░░░░░░░░░░░░░░░
+
+004 Production
+░░░░░░░░░░░░░░░░
+
+005 Kitchen
+░░░░░░░░░░░░░░░░
+
+006 Inventory
+░░░░░░░░░░░░░░░░
+
+007 Delivery
+░░░░░░░░░░░░░░░░
+
+008 Billing
+░░░░░░░░░░░░░░░░
+```
+
+Each module follows:
+
+```text
+Observe → Design → Freeze → Facade → Validate → UI → Smoke → Release
+```
 
 ---
 
