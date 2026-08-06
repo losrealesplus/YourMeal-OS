@@ -31,7 +31,21 @@ We may still touch Foundation. It is no longer the protagonist.
 | Identity | Engineering Certified |
 | Customers | Engineering Certified |
 | Customer Workspace | Capability Demo (LAW 003) |
-| Orders | Pending |
+| Orders | Architecture freeze (ADR 0062) |
+| Production / Delivery / Billing | Pending |
+
+---
+
+## Four assets
+
+```text
+Developer Platform
+Foundation
+Capabilities
+Operational Experience   ← fourth asset (declared)
+```
+
+**FOUNDATION LAW 004:** Operational Experience consumes Capabilities. UI owns interaction only.
 
 ---
 

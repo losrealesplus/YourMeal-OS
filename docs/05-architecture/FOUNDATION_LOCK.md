@@ -176,3 +176,39 @@ Screen → Repository
 Screen → Supabase
 Screen → “business rules” inline
 ```
+
+---
+
+## FOUNDATION LAW 004 (permanente · OPERATIONAL-003 / Operational Experience)
+
+```text
+Operational Experience
+consumes Capabilities.
+
+Capabilities own business behaviour.
+
+The UI owns interaction only.
+```
+
+```text
+Platform
+    ↓
+Foundation
+    ↓
+Capabilities (Identity · Customers · Orders · …)
+    ↓
+Operational Experience (Capability Demos · Product UI)
+    ↓
+Tenant Success
+```
+
+Customer Workspace was the first official **consumer** of a certified Capability.  
+Order Capability will be the first **process** Capability — Operational Experience will consume it the same way (LAW 003 · LAW 004).
+
+Prohibido:
+
+```text
+Operational Experience → invent business rules
+Operational Experience → bypass Facade
+Capability → depend on a specific screen
+```

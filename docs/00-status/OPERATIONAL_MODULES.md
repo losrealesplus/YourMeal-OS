@@ -5,8 +5,8 @@
 **Panel:** [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) — Maturity + Completeness  
 **Era center:** [OPERATIONAL_EXPERIENCE](./OPERATIONAL_EXPERIENCE.md) → Tenant Success
 
-**First capability:** [OPERATIONAL-001 Identity](../05-architecture/IDENTITY_CAPABILITY.md) · ADR [0055](../adr/0055-identity-capability.md)–[0057](../adr/0057-identity-validation.md) · **Engineering Certified**  
-**Second:** [OPERATIONAL-002 Customers](../05-architecture/CUSTOMER_CAPABILITY.md) · ADR [0058](../adr/0058-customer-capability.md)–[0061](../adr/0061-customer-workspace-demo.md) · **Engineering Certified** + Capability Demo
+**Certified:** Identity · Customers (+ Workspace Demo)  
+**In architecture:** [Orders](../05-architecture/ORDER_CAPABILITY.md) · ADR [0062](../adr/0062-order-capability.md)
 
 ---
 
@@ -14,11 +14,18 @@
 
 ```text
 Platform              ██████████████████  100%
-Foundation            ██████████████████  100%  (no longer the center)
+Foundation            ██████████████████  100%  (center closed)
 Identity              ██████████████████  Engineering Certified
 Customers             ██████████████████  Engineering Certified
-Customers Workspace   ████░░░░░░░░░░░░░░  Capability Demo
-Orders                ░░░░░░░░░░░░░░░░░░  Pending
+Customers Workspace   ████░░░░░░░░░░░░░░  Capability Demo (method certified)
+Orders                ████░░░░░░░░░░░░░░  Architecture freeze
+Production            ░░░░░░░░░░░░░░░░░░  Pending
+```
+
+Four assets:
+
+```text
+Developer Platform · Foundation · Capabilities · Operational Experience
 ```
 
 ---
@@ -27,19 +34,17 @@ Orders                ░░░░░░░░░░░░░░░░░░  Pe
 
 ```text
 YourMeal OS
-├── Platform              Developer Platform v1.0 (frozen)
-├── Foundation            engineering-validated (center closed)
-├── Operational Modules   Capabilities (Identity · Customers · …)
-└── Operational Experience  Capability Demos → Product UI → Tenant Success
+├── Platform
+├── Foundation              (no longer the center)
+├── Operational Modules     Capabilities
+└── Operational Experience  Demos → Product UI → Tenant Success
 ```
-
-We do **not** ship “screens”. We ship **capabilities** — then demos that prove LAW 003.
 
 | Avoid | Prefer |
 |-------|--------|
-| Orders Screen | Order Capability → Capability Demo → Product UI |
+| Orders Screen | Order Capability |
+| ecommerce Order | Weekly operational commitment |
 | Kitchen Page | Production / Kitchen Capability |
-| Delivery UI | Delivery Capability |
 
 ---
 
@@ -50,34 +55,25 @@ We do **not** ship “screens”. We ship **capabilities** — then demos that p
 
 ---
 
-## Capability Maturity + Completeness
+## Language of the business
 
-```text
-Maturity:     Architecture → Facade → Engineering Certified → Field Validated → Production Ready
-Completeness: Architecture → Facade → Validation → Capability Demo → Product UI → Field → Production
-```
+| Capability | Question |
+|------------|----------|
+| Identity | ¿Quién está operando? |
+| Customer | ¿Quién genera la demanda? |
+| **Orders** | **¿Qué compromiso operativo hay esta semana?** |
+| Production | ¿Qué hay que cocinar? |
+| Delivery | ¿Qué hay que entregar? |
+| Billing | ¿Qué hay que cobrar? |
 
-```text
-Operational Modules
-
-001 Identity
-██████████████████  Engineering Certified (ADR 0057)
-
-002 Customers
-██████████████████  Engineering Certified (ADR 0060)
-████ Capability Demo · /admin/customer-workspace (ADR 0061)
-
-003 Orders
-░░░░░░░░░░░░░░░░  Pending · ¿Qué hay que preparar?
-```
-
-EatClean lens: save time and reduce errors in weekly catering ops — not a generic CRM.
+Orders is the first **process** Capability — it crosses kitchen, routes, and invoices.
 
 ---
 
 ## Laws
 
 - **LAW 002:** one Facade per capability; never expose storage.  
-- **LAW 003:** screens never own business logic — Customer Workspace Demo proves it.
+- **LAW 003:** screens never own business logic.  
+- **LAW 004:** Operational Experience consumes Capabilities; UI owns interaction only.
 
-Next: Orders Architecture · field smoke · Tenant Success conversations.
+Next: Order Facade · then Capability Demo · Production Architecture.

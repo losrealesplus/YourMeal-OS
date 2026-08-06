@@ -110,9 +110,25 @@ First **writable** Operational Capability. Method certified via Capability Demo.
 
 | Field | Value |
 |-------|--------|
-| **Maturity** | Pending |
-| Completeness | — |
-| Notes | Depends on Identity + Customers · question: ¿Qué hay que preparar? |
+| **Maturity** | **Architecture** |
+| Completeness | Architecture ✅ · Facade ⏳ · Validation ⏳ · Demo ⏳ |
+| Field Validation | — |
+| Version | 0.1 (architecture) |
+| ADRs | [0062](../adr/0062-order-capability.md) · Intake [0017](../adr/0017-order-intake.md) |
+| Contract | [ORDER_CAPABILITY](../05-architecture/ORDER_CAPABILITY.md) |
+| Facade | Not yet |
+| Validation | Not yet |
+
+```text
+Orders
+████░░░░░░░░░░░░░░ Architecture freeze
+                    next: Facade
+Question: ¿Qué compromiso operativo ha adquirido
+          la empresa para una semana concreta?
+```
+
+First **process** Capability — connects Production · Kitchen · Delivery · Billing.  
+Order ≠ ecommerce. Order = weekly operational commitment.
 
 ---
 
