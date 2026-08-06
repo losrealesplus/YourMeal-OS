@@ -48,23 +48,25 @@ Production Ready
 
 | Field | Value |
 |-------|--------|
-| **Maturity** | **Harness** |
+| **Maturity** | **Engineering Certified** |
 | **Canonical question** | ¿Puede un compromiso operativo convertirse en trabajo ejecutado sin romper ninguna Foundation Law? |
 | **Chain** | Order → Production → Kitchen → Execution Completed |
 | **Context** | Identity · Customer |
 | **Facades** | OrderFacade · ProductionFacade · KitchenExecutionFacade |
 | **Harness** | `src/flows/flow-001/Flow001Harness.ts` · `useFlow001()` |
 | **Contract** | [OPERATIONAL_FLOW_001](../05-architecture/OPERATIONAL_FLOW_001.md) |
-| **ADR** | [0074](../adr/0074-operational-flow-001.md) · [0075](../adr/0075-operational-flow-001-harness.md) |
+| **ADR** | [0074](../adr/0074-operational-flow-001.md) · [0075](../adr/0075-operational-flow-001-harness.md) · [0076](../adr/0076-operational-flow-001-engineering-certification.md) |
+| **Validation** | [FLOW_001_VALIDATION_REPORT](../10-validation/FLOW_001_VALIDATION_REPORT.md) · 12 PASS · 0 FAIL |
 | **Owns** | Transitions · context · integrity · evidence · lifecycle consistency |
 | **Never owns** | Business logic · UI · Delivery · Billing |
-| **Next** | Engineering Certification (Phase 3) |
+| **Next** | Flow Demo → Roadmap Review (Delivery gated) |
 
 ```text
 FLOW-001
 ████ Architecture
 ████ Harness
-░░░░ Certification · Demo
+████ Engineering Certified
+░░░░ Flow Demo
 
 Order ──Facade──▶ Production ──Facade──▶ Kitchen
          ▲              ▲                    ▲

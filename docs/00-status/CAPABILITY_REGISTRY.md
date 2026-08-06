@@ -317,7 +317,8 @@ First **Operational Execution** Capability — Engineering Certified + Demo.
 Screens will change. These questions are the product core (**LAW 006**).
 
 **Exists:** [Operational Engine](./OPERATIONAL_ENGINE.md) · Phase A COMPLETE.  
-**Flows:** [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md) — FLOW-001 Harness.  
+**Flows:** [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md) — FLOW-001 Engineering Certified.  
+**Review:** [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) — after Flow Demo.  
 **Phases:** [OPERATIONAL_CERTIFICATION_PHASES](./OPERATIONAL_CERTIFICATION_PHASES.md) — Phase B in progress.  
 **Engine Completion:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md).  
 **Milestone v1.0:** full chain Identity→Billing + flows certified.

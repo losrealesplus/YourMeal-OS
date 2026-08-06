@@ -1,40 +1,26 @@
 # Operational Modules
 
-**Phase:** Phase A COMPLETE · FLOW-001 Harness (Phase B)  
-**Board:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md)
+**Phase:** FLOW-001 Engineering Certified · Flow Demo next · Delivery GATED  
+**Board:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md)
 
 ```text
 PHASE A · Capability Certification     ████████████████ COMPLETE
-PHASE B · Operational Flow Validation  ████████░░░░░░░░ FLOW-001 Harness
+PHASE B · Operational Flow Validation  ████████████░░░░ FLOW-001 Certified
 PHASE C · Real Tenant Validation       ░░░░░░░░░░░░░░░░
 ```
 
-## Capabilities
+## Near-term (frozen)
 
 ```text
-Identity · Customers · Orders · Production · Kitchen   Certified (+ Demos)
-Delivery · Billing                                     Pending (via flows)
-```
-
-## Operational Flows
-
-```text
-FLOW-001  Orders → Production → Kitchen     Harness (ADR 0075)
-FLOW-002  Production → Kitchen → Delivery   Pending
-FLOW-003  Delivery → Billing                Pending
+FLOW-001 Demo → Roadmap Review → Android → OPPO → iPhone
+→ only then Delivery / FLOW-002
 ```
 
 ## Definitions
 
 ```text
 FLOW validates transitions. NOT validate Capabilities.
-Harnesses orchestrate certified Facades — never business logic.
+No Delivery until field path completes.
 ```
 
-## Method (unchanged)
-
-```text
-Observe → Design → Freeze → Harness → Engineering Certification → Demo
-```
-
-Next: **OPERATIONAL-FLOW-001 Phase 3 · Engineering Certification**.
+Next: **OPERATIONAL-FLOW-001 Phase 4 · Flow Demo**.
