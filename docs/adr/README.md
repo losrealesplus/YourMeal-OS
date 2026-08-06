@@ -52,3 +52,5 @@ Permanent decisions for YourMeal OS. New ADRs are additive; do not silently reve
 | [0059](./0059-customer-facade.md) | Customer Facade (OPERATIONAL-002 Phase 2 · Commands / Queries) |
 
 | [0060](./0060-customer-validation.md) | Customer Validation (OPERATIONAL-002 Phase 3 · Engineering Certified) |
+
+| [0061](./0061-customer-workspace-demo.md) | Customer Workspace Demo (OPERATIONAL-002.5 · LAW 003 proof) |

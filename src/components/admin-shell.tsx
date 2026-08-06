@@ -29,6 +29,7 @@ import {
   LineChart,
   Shield,
   ScrollText,
+  FlaskConical,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
@@ -119,6 +120,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
   ].filter((i) => i.visible);
 
   const moreItems: NavItem[] = [
+    {
+      to: "/admin/customer-workspace",
+      labelKey: "ops.nav.customerWorkspace",
+      icon: FlaskConical,
+      visible: can("customers.read") || showAllOps,
+    },
     {
       to: "/admin/commercial",
       labelKey: "commercial",
@@ -253,7 +260,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
           ? "Cocina"
           : item.labelKey === "ops.nav.delivery"
             ? "Reparto"
-            : item.labelKey === "ops.nav.companyClients"
+            : item.labelKey === "ops.nav.customerWorkspace"
+              ? "Customer Workspace"
+              : item.labelKey === "ops.nav.companyClients"
               ? "Clientes Empresa"
               : item.labelKey === "commercial"
                 ? "Dashboard Comercial"

@@ -35,7 +35,7 @@ Facade
     ↓
 Validation
     ↓
-UI
+UI (Capability Demo → Product UI)
     ↓
 Field Validation
     ↓
@@ -43,7 +43,7 @@ Production
 ```
 
 A capability can be perfectly designed and validated **without UI**.  
-That means it is not yet *consumable by operators* — not that it is incomplete as a capability.
+A **Capability Demo** proves LAW 003 before the definitive product screen.
 
 | Maturity | Meaning |
 |----------|---------|
@@ -85,22 +85,24 @@ Question: ¿Quién está operando?
 | Field | Value |
 |-------|--------|
 | **Maturity** | **Engineering Certified** |
-| Completeness | Architecture ✅ · Facade ✅ · Validation ✅ · UI ⏳ · Field ⏳ |
+| Completeness | Architecture ✅ · Facade ✅ · Validation ✅ · **Capability Demo ✅** · Product UI ⏳ · Field ⏳ |
 | Field Validation | Pending ([CUSTOMER_SMOKE_CHECKLIST](../10-validation/CUSTOMER_SMOKE_CHECKLIST.md)) |
 | Version | 1.0 |
-| ADRs | [0058](../adr/0058-customer-capability.md) · [0059](../adr/0059-customer-facade.md) · [0060](../adr/0060-customer-validation.md) |
+| ADRs | [0058](../adr/0058-customer-capability.md) · [0059](../adr/0059-customer-facade.md) · [0060](../adr/0060-customer-validation.md) · [0061](../adr/0061-customer-workspace-demo.md) |
 | Contract | [CUSTOMER_CAPABILITY](../05-architecture/CUSTOMER_CAPABILITY.md) |
 | Facade | `src/customer/CustomerFacade.ts` · `useCustomer()` · Commands / Queries |
+| Demo | `/admin/customer-workspace` — LAW 003 proof |
 | Validation | [CUSTOMER_VALIDATION_REPORT](../10-validation/CUSTOMER_VALIDATION_REPORT.md) · 14 PASS · 2 UNIMPLEMENTED · 0 FAIL |
 
 ```text
 Customers
 ██████████████████ Engineering Certified
-░░░░ UI · Field Validation
+████ Capability Demo (Workspace)
+░░░░ Product UI · Field Validation
 Question: ¿Quién genera la demanda?
 ```
 
-First **writable** Operational Capability. Screens next — under FOUNDATION LAW 003.
+First **writable** Operational Capability. Method certified via Capability Demo.
 
 ---
 

@@ -1,11 +1,25 @@
 # Operational Modules
 
-**Phase:** OPERATIONAL (post Platform + Foundation)  
-**Methodology (permanent):** Observe → Design → Freeze → Facade → Validate → UI → Smoke → Release  
-**Panel:** [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) — Maturity + Completeness
+**Phase:** OPERATIONAL EXPERIENCE (post Platform + Foundation)  
+**Methodology (permanent):** Observe → Design → Freeze → Facade → Validate → **Capability Demo** → UI → Smoke → Release  
+**Panel:** [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) — Maturity + Completeness  
+**Era center:** [OPERATIONAL_EXPERIENCE](./OPERATIONAL_EXPERIENCE.md) → Tenant Success
 
-**First capability:** [OPERATIONAL-001 Identity](../05-architecture/IDENTITY_CAPABILITY.md) · ADR [0055](../adr/0055-identity-capability.md)–[0057](../adr/0057-identity-validation.md) · [Validation Report](../10-validation/IDENTITY_VALIDATION_REPORT.md)  
-**Second:** [OPERATIONAL-002 Customers](../05-architecture/CUSTOMER_CAPABILITY.md) · ADR [0058](../adr/0058-customer-capability.md)–[0060](../adr/0060-customer-validation.md) · [Validation Report](../10-validation/CUSTOMER_VALIDATION_REPORT.md) · **Engineering Certified**
+**First capability:** [OPERATIONAL-001 Identity](../05-architecture/IDENTITY_CAPABILITY.md) · ADR [0055](../adr/0055-identity-capability.md)–[0057](../adr/0057-identity-validation.md) · **Engineering Certified**  
+**Second:** [OPERATIONAL-002 Customers](../05-architecture/CUSTOMER_CAPABILITY.md) · ADR [0058](../adr/0058-customer-capability.md)–[0061](../adr/0061-customer-workspace-demo.md) · **Engineering Certified** + Capability Demo
+
+---
+
+## Era map
+
+```text
+Platform              ██████████████████  100%
+Foundation            ██████████████████  100%  (no longer the center)
+Identity              ██████████████████  Engineering Certified
+Customers             ██████████████████  Engineering Certified
+Customers Workspace   ████░░░░░░░░░░░░░░  Capability Demo
+Orders                ░░░░░░░░░░░░░░░░░░  Pending
+```
 
 ---
 
@@ -14,15 +28,16 @@
 ```text
 YourMeal OS
 ├── Platform              Developer Platform v1.0 (frozen)
-├── Foundation            Product Core Foundation (engineering-validated)
-└── Operational Modules   Business capabilities (this phase)
+├── Foundation            engineering-validated (center closed)
+├── Operational Modules   Capabilities (Identity · Customers · …)
+└── Operational Experience  Capability Demos → Product UI → Tenant Success
 ```
 
-We do **not** ship “screens”. We ship **capabilities**.
+We do **not** ship “screens”. We ship **capabilities** — then demos that prove LAW 003.
 
 | Avoid | Prefer |
 |-------|--------|
-| Orders Screen | Order Capability |
+| Orders Screen | Order Capability → Capability Demo → Product UI |
 | Kitchen Page | Production / Kitchen Capability |
 | Delivery UI | Delivery Capability |
 
@@ -39,7 +54,7 @@ We do **not** ship “screens”. We ship **capabilities**.
 
 ```text
 Maturity:     Architecture → Facade → Engineering Certified → Field Validated → Production Ready
-Completeness: Architecture → Facade → Validation → UI → Field → Production
+Completeness: Architecture → Facade → Validation → Capability Demo → Product UI → Field → Production
 ```
 
 ```text
@@ -47,54 +62,22 @@ Operational Modules
 
 001 Identity
 ██████████████████  Engineering Certified (ADR 0057)
-                    field smoke ░░ OPPO checklist
 
 002 Customers
 ██████████████████  Engineering Certified (ADR 0060)
-                    UI ░░ next (Law 003) · field smoke ░░
+████ Capability Demo · /admin/customer-workspace (ADR 0061)
 
 003 Orders
-████░░░░░░░░░░░░  Pending · ¿Qué hay que preparar?
-
-004 Production
-██░░░░░░░░░░░░░░
-
-005 Kitchen
-░░░░░░░░░░░░░░░░
-
-006 Inventory
-░░░░░░░░░░░░░░░░
-
-007 Delivery
-░░░░░░░░░░░░░░░░
-
-008 Billing
-░░░░░░░░░░░░░░░░
-```
-
-Each module follows:
-
-```text
-Observe → Design → Freeze → Facade → Validate → UI → Smoke → Release
+░░░░░░░░░░░░░░░░  Pending · ¿Qué hay que preparar?
 ```
 
 EatClean lens: save time and reduce errors in weekly catering ops — not a generic CRM.
 
 ---
 
-## Why Identity first
+## Laws
 
-Authentication asks: *who are you?*  
-Identity asks: *who / tenant / permissions / workspace / branding / locale / flags / preferences / operational actor?*
+- **LAW 002:** one Facade per capability; never expose storage.  
+- **LAW 003:** screens never own business logic — Customer Workspace Demo proves it.
 
-Everything else depends on that answer.
-
-## Why Customer second
-
-Customer asks: *who generates demand?* (Demand Party — particular, empresa, gimnasio, partner…)  
-Not: *how do we store a client row?*
-
-- **FOUNDATION LAW 002:** one Facade per capability; never expose storage.  
-- **FOUNDATION LAW 003:** screens never own business logic.
-
-Next: Customer UI on Facade · then Orders Architecture.
+Next: Orders Architecture · field smoke · Tenant Success conversations.

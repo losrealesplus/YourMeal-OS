@@ -333,6 +333,19 @@ function AdminCustomersPage() {
         object="Customer · Company Account"
       />
 
+      <div className="mb-6 rounded-md border border-dashed border-border bg-muted/20 px-4 py-3 text-sm">
+        <span className="font-semibold">Capability Demo:</span>{" "}
+        <Link
+          to="/admin/customer-workspace"
+          className="underline underline-offset-2 hover:text-foreground"
+        >
+          Customer Workspace
+        </Link>{" "}
+        — construido solo con{" "}
+        <code className="text-xs">useCustomer()</code> (LAW 003). Esta pantalla
+        legacy aún habla con Services directo.
+      </div>
+
       <div className="grid gap-3 md:grid-cols-4 mb-6">
         <KpiCard
           label="Particulares"
