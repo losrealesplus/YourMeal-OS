@@ -1,11 +1,12 @@
 # Customer Capability
 
-**OPERATIONAL-002 · Phase 2 — Facade**  
-**ADR:** [0058 — Customer Capability](../adr/0058-customer-capability.md) · [0059 — Customer Facade](../adr/0059-customer-facade.md)  
-**Status:** **Facade** (public API implemented — no CRUD screens / routing in this phase)  
+**OPERATIONAL-002 · Phase 3 — Validation (Engineering Certified)**  
+**ADR:** [0058 — Customer Capability](../adr/0058-customer-capability.md) · [0059 — Customer Facade](../adr/0059-customer-facade.md) · [0060 — Customer Validation](../adr/0060-customer-validation.md)  
+**Status:** **Engineering Certified** (14 PASS · 2 UNIMPLEMENTED · 0 FAIL — no Product UI in this phase)  
 **Depends on:** Identity Capability (ADR 0055–0057 · Engineering Certified)  
 **EatClean lens:** weekly meal prep · particulares + empresas · delivery locations · production grouping  
-**Maturity:** Architecture → **Facade** → Engineering Certified → Field Validated → Production Ready
+**Maturity:** Architecture → Facade → **Engineering Certified** → Field Validated → Production Ready  
+**Completeness:** Architecture → Facade → Validation → **UI next** → Field → Production
 
 ---
 
@@ -413,13 +414,23 @@ Phase 1 does **not** move or rewrite these — Freeze only.
 - [x] ADR 0059  
 - [x] **No CRUD screens · no routing · no business workflow rewrite**
 
+## Acceptance (Phase 3 — Validation)
+
+- [x] Validation matrix · Expected / Observed / Evidence  
+- [x] Customer Validation Report · Smoke Checklist  
+- [x] ADR 0060 · Engineering Certified  
+- [x] FOUNDATION LAW 003  
+- [x] Capability Completeness dimension  
+- [x] **No Product UI · no routing · no feature work**
+
 ---
 
 ## Next
 
 ```text
 OPERATIONAL-002 Phase 1  Architecture   ✅ ADR 0058
-OPERATIONAL-002 Phase 2  Facade         ✅ ADR 0059 / this PR
-OPERATIONAL-002 Phase 3  Validate
-Then UI / smoke for EatClean directory & CJ-001 links
+OPERATIONAL-002 Phase 2  Facade         ✅ ADR 0059
+OPERATIONAL-002 Phase 3  Validate       ✅ ADR 0060 / this PR
+OPERATIONAL-002 Phase 4  UI             (Law 003 — screens orchestrate only)
+Then field smoke · Orders Architecture
 ```

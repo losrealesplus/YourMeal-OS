@@ -143,3 +143,36 @@ Ops screens (consume Facade only)
 ```
 
 No exponemos tablas. Exponemos lenguaje de negocio (`CreateCustomerCommand`, `SearchCustomersQuery`, …).
+
+---
+
+## FOUNDATION LAW 003 (permanente · OPERATIONAL-002 Validate)
+
+```text
+A screen never owns business logic.
+Screens orchestrate user interaction.
+Capabilities own business behaviour.
+```
+
+```text
+Screen (UI)
+    ↓  orchestrates interaction only
+Capability Facade
+    ↓  owns behaviour (commands · queries)
+Application Services
+    ↓
+Repositories
+    ↓
+Infrastructure
+```
+
+Una pantalla de Clientes puede desaparecer mañana y sustituirse por otra.  
+**Customer Capability** sigue siendo exactamente la misma.
+
+Prohibido:
+
+```text
+Screen → Repository
+Screen → Supabase
+Screen → “business rules” inline
+```

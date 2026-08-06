@@ -10,9 +10,9 @@ Platform → Foundation → Operational Modules → Capabilities → Validation 
 
 ---
 
-## Capability Maturity
+## Two dimensions
 
-Not every capability is equally advanced. Track maturity, not % complete:
+### Capability Maturity (certification depth)
 
 ```text
 Architecture
@@ -26,12 +26,31 @@ Field Validated
 Production Ready
 ```
 
+### Capability Completeness (consumability)
+
+```text
+Architecture
+    ↓
+Facade
+    ↓
+Validation
+    ↓
+UI
+    ↓
+Field Validation
+    ↓
+Production
+```
+
+A capability can be perfectly designed and validated **without UI**.  
+That means it is not yet *consumable by operators* — not that it is incomplete as a capability.
+
 | Maturity | Meaning |
 |----------|---------|
 | Pending | Not started |
 | Architecture | Observe → Design → Freeze complete (contracts locked) |
 | Facade | Public business API implemented; storage never exposed |
-| Engineering Certified | Validation matrix PASS (WARNINGs allowed, FAIL = 0) |
+| Engineering Certified | Validation matrix PASS (WARNINGs / expected UNIMPLEMENTED allowed, FAIL = 0) |
 | Field Validated | Device / operator smoke PASS |
 | Production Ready | In production use for EatClean |
 
@@ -44,6 +63,7 @@ Production Ready
 | Field | Value |
 |-------|--------|
 | **Maturity** | **Engineering Certified** |
+| Completeness | Validation ✅ · UI (shells observe) · Field ⏳ |
 | Field Validation | Pending (OPPO checklist) |
 | Version | 1.0 |
 | ADRs | [0055](../adr/0055-identity-capability.md) · [0056](../adr/0056-identity-facade.md) · [0057](../adr/0057-identity-validation.md) |
@@ -55,6 +75,7 @@ Production Ready
 Identity
 ██████████████████ Engineering Certified
 ░░░░ Field Validation
+Question: ¿Quién está operando?
 ```
 
 ---
@@ -63,21 +84,23 @@ Identity
 
 | Field | Value |
 |-------|--------|
-| **Maturity** | **Facade** |
-| Field Validation | — |
-| Version | 0.2 (facade) |
-| ADRs | [0058](../adr/0058-customer-capability.md) · [0059](../adr/0059-customer-facade.md) |
+| **Maturity** | **Engineering Certified** |
+| Completeness | Architecture ✅ · Facade ✅ · Validation ✅ · UI ⏳ · Field ⏳ |
+| Field Validation | Pending ([CUSTOMER_SMOKE_CHECKLIST](../10-validation/CUSTOMER_SMOKE_CHECKLIST.md)) |
+| Version | 1.0 |
+| ADRs | [0058](../adr/0058-customer-capability.md) · [0059](../adr/0059-customer-facade.md) · [0060](../adr/0060-customer-validation.md) |
 | Contract | [CUSTOMER_CAPABILITY](../05-architecture/CUSTOMER_CAPABILITY.md) |
 | Facade | `src/customer/CustomerFacade.ts` · `useCustomer()` · Commands / Queries |
-| Validation | Not yet |
+| Validation | [CUSTOMER_VALIDATION_REPORT](../10-validation/CUSTOMER_VALIDATION_REPORT.md) · 14 PASS · 2 UNIMPLEMENTED · 0 FAIL |
 
 ```text
 Customers
-████████░░░░░░░░░░ Facade
-                    next: Validate
+██████████████████ Engineering Certified
+░░░░ UI · Field Validation
+Question: ¿Quién genera la demanda?
 ```
 
-Business question: **¿Quién genera la demanda?** (Demand Party — not “cliente CRUD”)
+First **writable** Operational Capability. Screens next — under FOUNDATION LAW 003.
 
 ---
 
@@ -86,6 +109,7 @@ Business question: **¿Quién genera la demanda?** (Demand Party — not “clie
 | Field | Value |
 |-------|--------|
 | **Maturity** | Pending |
+| Completeness | — |
 | Notes | Depends on Identity + Customers · question: ¿Qué hay que preparar? |
 
 ---
@@ -153,8 +177,6 @@ Business question: **¿Quién genera la demanda?** (Demand Party — not “clie
 
 > **¿Hace que EatClean tarde menos en hacer su trabajo?**  
 > Sí → entra. No → espera.
-
-Not the best generic CRM — the best flow for a catering company that prep, cooks, and delivers every week.
 
 ## Language of the business
 

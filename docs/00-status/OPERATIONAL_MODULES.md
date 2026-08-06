@@ -2,10 +2,10 @@
 
 **Phase:** OPERATIONAL (post Platform + Foundation)  
 **Methodology (permanent):** Observe → Design → Freeze → Facade → Validate → UI → Smoke → Release  
-**Panel:** [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) — track **Capability Maturity**, not PRs.
+**Panel:** [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) — Maturity + Completeness
 
 **First capability:** [OPERATIONAL-001 Identity](../05-architecture/IDENTITY_CAPABILITY.md) · ADR [0055](../adr/0055-identity-capability.md)–[0057](../adr/0057-identity-validation.md) · [Validation Report](../10-validation/IDENTITY_VALIDATION_REPORT.md)  
-**Second:** [OPERATIONAL-002 Customers](../05-architecture/CUSTOMER_CAPABILITY.md) · ADR [0058](../adr/0058-customer-capability.md)–[0059](../adr/0059-customer-facade.md) · Facade `useCustomer()`
+**Second:** [OPERATIONAL-002 Customers](../05-architecture/CUSTOMER_CAPABILITY.md) · ADR [0058](../adr/0058-customer-capability.md)–[0060](../adr/0060-customer-validation.md) · [Validation Report](../10-validation/CUSTOMER_VALIDATION_REPORT.md) · **Engineering Certified**
 
 ---
 
@@ -35,10 +35,11 @@ We do **not** ship “screens”. We ship **capabilities**.
 
 ---
 
-## Capability Maturity
+## Capability Maturity + Completeness
 
 ```text
-Architecture → Facade → Engineering Certified → Field Validated → Production Ready
+Maturity:     Architecture → Facade → Engineering Certified → Field Validated → Production Ready
+Completeness: Architecture → Facade → Validation → UI → Field → Production
 ```
 
 ```text
@@ -49,14 +50,14 @@ Operational Modules
                     field smoke ░░ OPPO checklist
 
 002 Customers
-████████░░░░░░░░░░  Facade (ADR 0059)
-                    next: Validate
+██████████████████  Engineering Certified (ADR 0060)
+                    UI ░░ next (Law 003) · field smoke ░░
 
 003 Orders
-░░░░░░░░░░░░░░░░  Pending · ¿Qué hay que preparar?
+████░░░░░░░░░░░░  Pending · ¿Qué hay que preparar?
 
 004 Production
-░░░░░░░░░░░░░░░░
+██░░░░░░░░░░░░░░
 
 005 Kitchen
 ░░░░░░░░░░░░░░░░
@@ -93,4 +94,7 @@ Everything else depends on that answer.
 Customer asks: *who generates demand?* (Demand Party — particular, empresa, gimnasio, partner…)  
 Not: *how do we store a client row?*
 
-FOUNDATION LAW 002: one Facade per capability; never expose storage — expose business concepts.
+- **FOUNDATION LAW 002:** one Facade per capability; never expose storage.  
+- **FOUNDATION LAW 003:** screens never own business logic.
+
+Next: Customer UI on Facade · then Orders Architecture.
