@@ -5,8 +5,9 @@
 **Board:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)  
 **Sprint:** [OPERATIONAL_VALIDATION_SPRINT](./OPERATIONAL_VALIDATION_SPRINT.md)  
 **Field:** [FIELD_VALIDATION_MILESTONE](../10-validation/FIELD_VALIDATION_MILESTONE.md) · [ANDROID_FIELD_VALIDATION_REPORT](../10-validation/ANDROID_FIELD_VALIDATION_REPORT.md) · [FIELD_VALIDATION_LOG](../10-validation/FIELD_VALIDATION_LOG.md)  
-**Android field:** ✅ **PASS** (OPPO · 2026-08-06) · iPhone ⏳ · Delivery 🔒  
-**Era:** Construction → **Validation**
+**Android field:** ✅ **PASS** (OPPO · 2026-08-06) · iPhone ⏳ · Engine FIELD VALIDATED 🔒  
+**Expansion:** [OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md) · Delivery Architecture ✅ (ADR 0078) · Facade 🔒  
+**Era:** Construction → Validation → **Operational Expansion**
 
 ```text
 ══════════════════════════════════════════════
