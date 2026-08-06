@@ -15,8 +15,8 @@ COMPLETE
 ↓
 
 PHASE B · Operational Flow Validation
-████░░░░░░░░░░░░░░░
-FLOW-001 Architecture ✅ · Facade next
+████████░░░░░░░░░░░
+FLOW-001 Harness ✅ · Certification next
 
 ↓
 
@@ -93,7 +93,7 @@ Capability Demo (ADR 0073)           ✅ /admin/kitchen-workspace
 
 | Flow | Chain | Status | Question |
 |------|-------|--------|----------|
-| **OPERATIONAL-FLOW-001** | Orders → Production → Kitchen | **Architecture** (ADR 0074) | ¿Puede un compromiso convertirse en trabajo ejecutado sin romper leyes? |
+| **OPERATIONAL-FLOW-001** | Orders → Production → Kitchen | **Harness** (ADR 0075) | ¿Puede un compromiso convertirse en trabajo ejecutado sin romper leyes? |
 | **OPERATIONAL-FLOW-002** | Production → Kitchen → Delivery | Pending | ¿Puede el trabajo ejecutado convertirse en entregable? |
 | **OPERATIONAL-FLOW-003** | Delivery → Billing | Pending | ¿Puede lo entregado convertirse en resultado económico? |
 
@@ -103,8 +103,8 @@ Every transition via certified Facades only — never bypass.
 
 ```text
 Architecture (ADR 0074)              ✅
-Facade / harness                     ← next
-Engineering Certification
+Harness (ADR 0075)                   ✅ src/flows/flow-001/
+Engineering Certification            ← next
 Flow Demo
 ```
 
@@ -114,10 +114,10 @@ Contract: [OPERATIONAL_FLOW_001](../05-architecture/OPERATIONAL_FLOW_001.md)
 
 ## Near-term sequence
 
-1. ~~Kitchen Capability Demo~~ ✅ ADR 0073 · Phase A COMPLETE  
-2. ~~OPERATIONAL-FLOW-001 Architecture~~ ✅ ADR 0074  
-3. **OPERATIONAL-FLOW-001 Facade / harness**  
-4. FLOW-001 Certification → Demo → FLOW-002 / Delivery  
+1. ~~OPERATIONAL-FLOW-001 Architecture~~ ✅ ADR 0074  
+2. ~~OPERATIONAL-FLOW-001 Harness~~ ✅ ADR 0075  
+3. **OPERATIONAL-FLOW-001 Engineering Certification**  
+4. FLOW-001 Demo → FLOW-002 / Delivery  
 
 Official board: [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)
 
