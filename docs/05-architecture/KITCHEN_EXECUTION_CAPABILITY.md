@@ -1,14 +1,17 @@
 # Kitchen Execution Capability
 
-**OPERATIONAL-005 · Phase 1 — Observe → Design → Freeze**  
-**ADR:** [0070](../adr/0070-kitchen-execution-capability.md)  
-**Status:** **Architecture** (frozen)  
+**OPERATIONAL-005 · Phase 4 — Capability Demo**  
+**ADR:** [0070](../adr/0070-kitchen-execution-capability.md) · [0071](../adr/0071-kitchen-execution-facade.md) · [0072](../adr/0072-kitchen-execution-engineering-certification.md) · [0073](../adr/0073-kitchen-workspace-demo.md)  
+**Status:** **Engineering Certified + Capability Demo** (`/admin/kitchen-workspace`)  
 **Depends on:** Production (Engineering Certified + Capability Demo)  
-**EatClean lens:** weekly meal prep · coordinate batch execution on the production floor  
+**EatClean lens:** weekly meal prep · coordinate execution units on the production floor  
 **Layer / Type:** **Operational Execution** (first of its kind)  
 **Maturity:** Architecture → Facade → Engineering Certified → Field Validated → Production Ready  
-**Completeness:** Architecture → Facade → Engineering Certification → Capability Demo → Product UI → Field → Production  
-**Laws:** 001–005 · [FOUNDATION_LOCK](./FOUNDATION_LOCK.md)
+**Completeness:** Architecture → Facade → Engineering Certification → **Capability Demo** → Product UI → Field → Production  
+**Laws:** 001–007 · [FOUNDATION_LOCK](./FOUNDATION_LOCK.md)  
+**Package:** `src/kitchen/` · `KitchenExecutionFacade` · `useKitchenExecution`  
+**Validation:** [KITCHEN_EXECUTION_VALIDATION_REPORT](../10-validation/KITCHEN_EXECUTION_VALIDATION_REPORT.md) · 12 PASS · 6 UNIMPLEMENTED · 0 FAIL  
+**Demo:** `/admin/kitchen-workspace` — LAW 003–006-A · **final isolated Capability Demo**
 
 ```text
 Kitchen Execution = coordinar · priorizar · confirmar · pausar · reanudar · terminar
@@ -35,10 +38,10 @@ Kitchen Execution is the operational coordination that takes
 Production Work and decides what must run now:
 
 execution queue · workstation queues · operator assignment ·
-batch start / pause / resume / complete · progress · visibility.
+execution unit start / pause / resume / complete · progress · visibility.
 ```
 
-**Canonical question:**
+**Canonical question (LAW 006 — one only):**
 
 ```text
 ¿Qué trabajo debe ejecutarse ahora?
@@ -57,9 +60,9 @@ EatClean needs Kitchen OS to **orchestrate the floor** so operators execute the 
 
 | Capability | Layer | Owns | Does not own |
 |------------|-------|------|--------------|
-| **Orders** | Planning | Operational commitment for a week | Batches / execution |
+| **Orders** | Planning | Operational commitment for a week | Execution units |
 | **Production** | Planning | Planning · batches · queue · load · schedule · readiness | Start / pause / craft progress |
-| **Kitchen Execution** | Execution | Queue orchestration · status · progress · operator · batch lifecycle | Recipes · ingredients · replanning Orders |
+| **Kitchen Execution** | Execution | Queue orchestration · status · progress · operator · **ExecutionUnit** lifecycle | Recipes · ingredients · replanning Orders · Production batches as plan artifacts |
 | **Delivery** | Execution | Routes · POD · logistics | Kitchen queues |
 | **Billing** | Outcome | Invoices · settlement | Kitchen state |
 
@@ -67,8 +70,8 @@ EatClean needs Kitchen OS to **orchestrate the floor** so operators execute the 
 Order               →  ¿Qué compromiso existe?
 Production          →  ¿Qué trabajo debemos generar?
 Kitchen Execution   →  ¿Qué trabajo debe ejecutarse ahora?
-Delivery            →  ¿Qué hay que entregar?
-Billing             →  ¿Qué hay que cobrar?
+Delivery            →  ¿Qué trabajo debe entregarse ahora?
+Billing             →  ¿Qué trabajo puede cerrarse y facturarse?
 ```
 
 If a feature makes Kitchen “plan the day”, it belongs in **Production**.  
@@ -76,15 +79,27 @@ If a feature makes Kitchen “choose ingredients / recipes”, it belongs in the
 
 ---
 
-## Kitchen does NOT cook
+## Kitchen does NOT cook · does NOT own batches
 
 Same discipline as Production:
 
 ```text
-Production never cooks.     Production plans.
-Kitchen never cooks.        Kitchen orchestrates.
+Production never cooks.     Production plans · owns Batches.
+Kitchen never cooks.        Kitchen orchestrates · owns ExecutionUnits.
 The physical kitchen cooks.
 ```
+
+**Why ExecutionUnit (not KitchenBatch)?**
+
+A kitchen does not always execute a full Production batch. It may execute:
+
+* a station  
+* a line  
+* a block  
+* a prep slice  
+
+`ExecutionUnit` stays abstract for a chef, an oven, or a robot years from now.  
+Production **Batches** remain planning artifacts. Kitchen maps them into execution units.
 
 | Kitchen owns | Kitchen never owns |
 |--------------|--------------------|
@@ -92,7 +107,7 @@ The physical kitchen cooks.
 | Workstation Queue | Ingredients |
 | Execution Status | Pans / ovens / tools |
 | Execution Progress | Gastronomic craft steps |
-| Batch Start / Pause / Resume / Complete | Replanning Orders |
+| ExecutionUnit Start / Pause / Resume / Complete | Replanning Orders |
 | Operator Assignment | Generating Production batches |
 | Operational visibility | Mutating Order commitments |
 
@@ -106,12 +121,9 @@ Kitchen owns:
 |---------|---------|
 | **Execution Queue** | Ordered work ready to run now (from Production readiness) |
 | **Workstation Queue** | Work sliced by station / line |
-| **Execution Status** | Lifecycle of each batch under execution |
-| **Execution Progress** | How far a batch has advanced operationally |
-| **Batch Start** | Accept work into IN_PROGRESS |
-| **Batch Pause** | Hold work without completing |
-| **Batch Resume** | Continue paused work |
-| **Batch Complete** | Mark work COMPLETED for downstream |
+| **Execution Status** | Lifecycle of each ExecutionUnit |
+| **Execution Progress** | How far a unit has advanced operationally |
+| **Start / Pause / Resume / Complete** | ExecutionUnit lifecycle |
 | **Operator Assignment** | Who is responsible for this execution unit |
 | **Operational visibility** | Floor-readable view of what runs now |
 
@@ -125,7 +137,7 @@ Kitchen owns:
 ProductionFacade only
 ```
 
-Kitchen never reads Order tables, never invents batches from raw Orders, never bypasses Production readiness.
+Kitchen never reads Order tables, never invents work from raw Orders, never bypasses Production readiness.
 
 ### Provides
 
@@ -139,241 +151,99 @@ DeliveryCapability  (downstream: completed / releasable work)
 Never plans work.
 Never modifies Orders.
 Never generates Production.
+Never touches storage (Facade composes ProductionFacade only).
 ```
 
-Protected by **FOUNDATION LAW 005**.
-
-```text
-        Identity
-           │
-        Customers
-           │
-         Orders
-           │
-       Production  ←── Planning
-           │
-           │  ProductionFacade
-           ▼
-   Kitchen Execution  ←── Execution (this capability)
-           │
-        Delivery
-           │
-        Billing
-```
+Protected by **FOUNDATION LAW 005** · **LAW 006**.
 
 ---
 
-## Contracts (frozen · Phase 1)
+## Contracts (frozen)
 
 | Contract | Role |
 |----------|------|
-| **KitchenContext** | Tenant · operator · permissions · active day / shift scope |
-| **KitchenQueue** | Prioritized execution queue for “now” |
-| **KitchenBatch** | One executable unit consumed from Production |
-| **KitchenExecution** | Active orchestration record (who · where · status) |
-| **KitchenStatus** | Lifecycle enum projection |
-| **KitchenOperator** | Assigned operator identity for a batch / station |
-| **KitchenProgress** | Progress signals (not recipe steps) |
-| **KitchenError** | Domain errors (blocked · unauthorized · not ready · conflict) |
+| **KitchenContext** | Tenant · permissions · day scope · queue |
+| **ExecutionQueue** | Prioritized execution queue for “now” |
+| **ExecutionUnit** | One executable unit (not a Production Batch) |
+| **ExecutionStatus** | Lifecycle enum |
+| **ExecutionOperator** | Assigned operator identity |
+| **ExecutionProgress** | Progress signals (not recipe steps) |
+| **KitchenError** | Domain errors |
 
-### Sketch (architecture only — not implemented)
-
-```ts
-type KitchenStatus =
-  | "READY"
-  | "IN_PROGRESS"
-  | "PAUSED"
-  | "BLOCKED"
-  | "COMPLETED";
-
-interface KitchenContext {
-  tenantId: string;
-  operatorId: string;
-  capabilities: string[];
-  day: string; // operational day
-}
-
-interface KitchenBatch {
-  id: string;
-  productionBatchId: string; // from ProductionFacade
-  workstationId?: string;
-  status: KitchenStatus;
-  assignedOperatorId?: string;
-}
-
-interface KitchenQueue {
-  day: string;
-  items: KitchenBatch[];
-}
-
-interface KitchenExecution {
-  batchId: string;
-  status: KitchenStatus;
-  startedAt?: string;
-  pausedAt?: string;
-  completedAt?: string;
-  blockedReason?: string;
-}
-
-interface KitchenOperator {
-  id: string;
-  displayName: string;
-  stationIds: string[];
-}
-
-interface KitchenProgress {
-  batchId: string;
-  percent?: number; // operational, not culinary
-  lastEventAt: string;
-}
-
-type KitchenError =
-  | { code: "NOT_READY"; message: string }
-  | { code: "UNAUTHORIZED"; message: string }
-  | { code: "CONFLICT"; message: string }
-  | { code: "BLOCKED"; message: string };
-```
-
----
-
-## Lifecycle
+### Lifecycle
 
 ```text
-READY
-  → IN_PROGRESS
-  → PAUSED
-  → IN_PROGRESS
-  → COMPLETED
-
-READY | IN_PROGRESS | PAUSED
-  → BLOCKED
-  → IN_PROGRESS | PAUSED | READY   (after unblock)
+READY → IN_PROGRESS → PAUSED → IN_PROGRESS → COMPLETED
+      ↘ BLOCKED ↗
 ```
 
-### State machine
+---
+
+## Facade (Phase 2 · ADR 0071)
 
 ```text
-                  start
-  READY ──────────────────▶ IN_PROGRESS
-    ▲                            │
-    │                     pause  │  resume
-    │                            ▼
-    │                         PAUSED
-    │                            │
-    │         unblock            │ complete
-    │◀──────── BLOCKED ◀─────────┤
-    │              ▲             │
-    │              │ block       ▼
-    └──────────────┴──────── COMPLETED
+src/kitchen/
+  KitchenExecutionFacade.ts
+  useKitchenExecution.ts
+  KitchenCommands.ts
+  KitchenQueries.ts
+  KitchenContext.ts
 ```
 
-| Status | Meaning |
-|--------|---------|
-| **READY** | Production released work; Kitchen may start |
-| **IN_PROGRESS** | Operator actively executing |
-| **PAUSED** | Intentionally held; not failed |
-| **BLOCKED** | Cannot proceed (ops reason); needs visibility |
-| **COMPLETED** | Finished; visible to Delivery |
+| Intent | Substrate |
+|--------|-----------|
+| MarkExecutionReady | ProductionFacade.markBatchReady |
+| CompleteExecution | ProductionFacade.closeBatch |
+| GetExecutionQueue / Units / Progress / Blocked / Completed | ProductionFacade.getProductionPlan → ExecutionUnit |
+| Start / Pause / Resume / Block / Assign / Reassign | UNIMPLEMENTED |
+| GetOperatorAssignments | UNIMPLEMENTED |
 
 ---
 
-## Sequence diagrams
+## Acceptance
 
-### Pull execution queue (now)
+### Phase 1 (Architecture) ✅
 
-```text
-Operator → KitchenFacade: GetExecutionQueue(day)
-KitchenFacade → ProductionFacade: GetProductionQueue / readiness
-ProductionFacade → KitchenFacade: released batches
-KitchenFacade → Operator: KitchenQueue (READY items)
-```
+- [x] Canonical definition · LAW 006 question  
+- [x] Contracts · lifecycle · sequences  
+- [x] ADR 0070 · no UI / CRUD / DB  
 
-### Start → pause → resume → complete
+### Phase 2 (Facade) ✅
 
-```text
-Op → Kitchen: StartBatch(batchId)
-Kitchen → validates READY + Production still released
-Kitchen → IN_PROGRESS + KitchenExecution
+- [x] `KitchenExecutionFacade` + `useKitchenExecution`  
+- [x] ExecutionUnit language  
+- [x] Compose ProductionFacade only  
+- [x] ADR 0071 · unit tests  
+- [x] **No UI · no CRUD · no DB · no routing**
 
-Op → Kitchen: PauseBatch(batchId)
-Kitchen → PAUSED
+### Phase 3 (Engineering Certification) ✅
 
-Op → Kitchen: ResumeBatch(batchId)
-Kitchen → IN_PROGRESS
+- [x] Validation matrix · Expected / Observed / Evidence  
+- [x] ADR 0072 · report · smoke checklist  
+- [x] LAW 006-A documented  
+- [x] FAIL = 0  
+- [x] **No Product UI · no Delivery · no Billing**
 
-Op → Kitchen: CompleteBatch(batchId)
-Kitchen → COMPLETED
-Note: Delivery may consume completion facts later
-```
+### Phase 4 (Capability Demo) ✅
 
-### Forbidden paths
-
-```text
-Kitchen ──X──▶ OrderFacade (mutate)
-Kitchen ──X──▶ invent ProductionBatch
-Kitchen ──X──▶ “plan tomorrow’s load”
-```
+- [x] `/admin/kitchen-workspace` · `useKitchenExecution()` only  
+- [x] LAW 003–006-A demonstrated  
+- [x] ADR 0073 · final isolated Capability Demo  
+- [x] LAW 007 · Phase A/B/C roadmap frozen  
+- [x] **No Delivery · no Billing · no production execution engine**
 
 ---
 
-## Permission model (architecture)
-
-| Permission (illustrative) | Who | Allows |
-|---------------------------|-----|--------|
-| `kitchen.queue.read` | Ops / Kitchen | See execution queue |
-| `kitchen.batch.start` | Kitchen | Start READY → IN_PROGRESS |
-| `kitchen.batch.pause` | Kitchen | Pause / resume |
-| `kitchen.batch.complete` | Kitchen | Complete |
-| `kitchen.batch.block` | Lead | Mark BLOCKED / unblock |
-| `kitchen.operator.assign` | Lead | Assign operators |
-| `kitchen.operate` | Kitchen role | Bundle for floor operation |
-
-Exact keys freeze at Facade phase; Architecture only names the model.
-
----
-
-## Extension points (Future — not Phase 1)
-
-| Extension | Notes |
-|-----------|-------|
-| Real-time kitchen screens | Consumers of KitchenFacade |
-| Kitchen displays | Read-only Operational Experience |
-| IoT devices | Signal progress / blockers via Facade |
-| Barcode / QR batches | Identify KitchenBatch · never redefine plan |
-| AI workload balancing | Suggest priority — never invent Production |
-
----
-
-## Language (internal)
-
-| Use | Avoid |
-|-----|-------|
-| StartBatch · PauseBatch · ResumeBatch · CompleteBatch | CookDish · Stir · Bake |
-| GetExecutionQueue · AssignOperator | GetOrders · UpdateOrder · GeneratePlan |
-| KitchenStatus · KitchenProgress | RecipeStep · IngredientList |
-
----
-
-## Acceptance (Phase 1)
-
-- [x] Canonical definition: Kitchen orchestrates execution; does not cook / plan  
-- [x] Canonical question: *¿Qué trabajo debe ejecutarse ahora?*  
-- [x] Responsibilities · lifecycle · state machine  
-- [x] Contracts (`KitchenContext`, `KitchenQueue`, `KitchenBatch`, `KitchenExecution`, `KitchenStatus`, `KitchenOperator`, `KitchenProgress`, `KitchenError`)  
-- [x] Sequence diagrams · permission model · relationships  
-- [x] Consumes **ProductionFacade** only · LAW 005  
-- [x] ADR 0070 · Capability Registry update  
-- [x] **No UI · no CRUD · no DB changes · no implementation**
-
----
-
-## Definition of Done (Architecture)
+## Definition of Done
 
 ```text
 Kitchen answers one question only:
 "What work should the kitchen execute now?"
 
 Kitchen consumes only ProductionFacade.
+KitchenExecutionFacade is the canonical execution API.
+Kitchen Execution is Engineering Certified + Demo.
+Phase A complete through Kitchen.
 ```
 
 ---
@@ -381,11 +251,9 @@ Kitchen consumes only ProductionFacade.
 ## Next
 
 ```text
-OPERATIONAL-005 Phase 1  Architecture              ✅ ADR 0070
-OPERATIONAL-005 Phase 2  Facade                    ← next
-OPERATIONAL-005 Phase 3  Engineering Certification
-OPERATIONAL-005 Phase 4  Capability Demo
+OPERATIONAL-005 Phase 1–4          ✅ CLOSED
+OPERATIONAL-FLOW-001               ← next
+  Orders → Production → Kitchen
 ```
 
-**Operational Engine exists.**  
-**Operational Engine v1.0** still requires Kitchen Execution · Delivery · Billing certified.
+**Operational Flow Validation (Phase B)** begins. Delivery is not opened as an isolated Capability Demo first.

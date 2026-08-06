@@ -1,38 +1,25 @@
 # Operational Modules
 
-**Phase:** Operational Engine exists · Kitchen Execution Architecture frozen  
-**Board:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [GITHUB_HOUSEKEEPING](./GITHUB_HOUSEKEEPING.md)
+**Phase:** Operational Engine **v0.8** · Validation era  
+**Board:** [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) · [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)
 
 ```text
 Platform / Foundation           Stable
-Context · Identity              Engineering Certified
-Business Entity · Customers     Engineering Certified + Demo
-Operational Planning
-  Orders                        Engineering Certified + Demo
-  Production                    Engineering Certified + Demo
-Operational Execution
-  Kitchen Execution             Architecture (ADR 0070)
-  Delivery                      Pending
-Operational Outcome
-  Billing                       Pending
+Identity → Kitchen              Engineering Certified
+FLOW-001                        Engineering Certified
+Delivery / Billing              GATED
 ```
 
-## Rhythm
+## Next (do not reorder)
 
 ```text
-Architecture → Facade → Engineering Certification → Capability Demo
+FLOW Demo → Engine Review → Android → OPPO → iPhone → Delivery
 ```
 
-## Separation (LAW 005)
+## Era
 
 ```text
-Production → planifica   (Operational Planning)
-Kitchen Execution → orquesta ejecución   (Operational Execution)
+Construction → Validation
 ```
 
-```text
-Kitchen = coordinar · priorizar · confirmar · pausar · reanudar · terminar
-Kitchen never cooks.
-```
-
-Next: **OPERATIONAL-005 Phase 2 · Kitchen Execution Facade**.
+Question: *¿Funciona bien cuando alguien la usa?*
