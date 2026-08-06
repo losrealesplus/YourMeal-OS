@@ -38,7 +38,7 @@ We may still touch Foundation. It is no longer the protagonist.
 | Orders | **Engineering Certified** (ADR 0064) |
 | Order Workspace | **Capability Demo** (ADR 0065 · LAW 003 · 004) |
 | Production | **Engineering Certified + Demo** (ADR 0068–0069) |
-| Kitchen Execution / Delivery / Billing | Kitchen Demo ✅ · FLOW-001 **Harness** (ADR 0075) · Certification next |
+| Kitchen Execution / Delivery / Billing | FLOW-001 **Certified** · Demo next · Delivery **GATED** until Review·Android·OPPO·iPhone |
 
 ---
 

@@ -1,13 +1,14 @@
 # OPERATIONAL-FLOW-001
 
 **Orders → Production → Kitchen**  
-**Phase 2 — Operational Flow Harness**  
-**ADR:** [0074](../adr/0074-operational-flow-001.md) · [0075](../adr/0075-operational-flow-001-harness.md)  
-**Status:** **Harness** (Architecture frozen · Harness implemented)  
+**Phase 3 — Engineering Certification**  
+**ADR:** [0074](../adr/0074-operational-flow-001.md) · [0075](../adr/0075-operational-flow-001-harness.md) · [0076](../adr/0076-operational-flow-001-engineering-certification.md)  
+**Status:** **Engineering Certified**  
 **Phase:** B · Operational Flow Validation  
 **Laws:** 001–007 · [FOUNDATION_LOCK](./FOUNDATION_LOCK.md)  
 **Registry:** [OPERATIONAL_FLOW_REGISTRY](../00-status/OPERATIONAL_FLOW_REGISTRY.md)  
-**Package:** `src/flows/flow-001/` · `Flow001Harness` · `useFlow001`
+**Package:** `src/flows/flow-001/` · `Flow001Harness` · `useFlow001`  
+**Validation:** [FLOW_001_VALIDATION_REPORT](../10-validation/FLOW_001_VALIDATION_REPORT.md) · 12 PASS · 0 FAIL
 
 ```text
 This is NOT a Capability.
@@ -297,19 +298,23 @@ FLOW-001 must freeze before FLOW-002 Architecture starts.
 - [x] ADR 0075  
 - [x] **No UI · no routing · no business logic in Flow**
 
+### Phase 3 (Engineering Certification) ✅
+
+- [x] Validation matrix F01–F12 · FAIL = 0  
+- [x] ADR 0076 · report · smoke checklist  
+- [x] Delivery gate frozen  
+- [x] **No UI · no Delivery · no Billing**
+
 ---
 
 ## Definition of Done
 
 ```text
-There is exactly one canonical definition answering:
+FLOW-001 is Engineering Certified.
 
-"How does an operational commitment become executed work?"
-
-without violating any Foundation Law.
-
-FLOW-001 Harness is the canonical orchestration layer between
-Order · Production · Kitchen.
+FLOW validates transitions — never individual Capabilities.
+Roadmap Review is the mandatory milestone after Flow Demo.
+No Delivery until Demo · Review · Android · OPPO · iPhone.
 ```
 
 ---
@@ -317,8 +322,9 @@ Order · Production · Kitchen.
 ## Next
 
 ```text
-OPERATIONAL-FLOW-001 Phase 1  Architecture     ✅ ADR 0074
-OPERATIONAL-FLOW-001 Phase 2  Harness          ✅ ADR 0075
-OPERATIONAL-FLOW-001 Phase 3  Engineering Certification ← next
-OPERATIONAL-FLOW-001 Phase 4  Flow Demo
+OPERATIONAL-FLOW-001 Phase 1  Architecture              ✅ ADR 0074
+OPERATIONAL-FLOW-001 Phase 2  Harness                   ✅ ADR 0075
+OPERATIONAL-FLOW-001 Phase 3  Engineering Certification ✅ ADR 0076
+OPERATIONAL-FLOW-001 Phase 4  Flow Demo                 ← next
+Operational Engine Review (v0.8)                        ← after Demo
 ```

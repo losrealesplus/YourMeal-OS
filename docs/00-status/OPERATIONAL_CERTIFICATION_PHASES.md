@@ -15,9 +15,9 @@ Identity → Customers → Orders → Production → Kitchen
 PHASE B
 Operational Flow Validation
 ████████░░░░░░░░░░░
-OPERATIONAL-FLOW-001  Harness ✅ (ADR 0075)
-OPERATIONAL-FLOW-002  Pending
-OPERATIONAL-FLOW-003  Pending
+OPERATIONAL-FLOW-001  Engineering Certified ✅ (ADR 0076) · Demo next
+OPERATIONAL-FLOW-002  GATED
+OPERATIONAL-FLOW-003  GATED
 
 ↓
 
@@ -40,7 +40,7 @@ Registry: [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md)
 
 | Flow | Chain | Status | Canonical question |
 |------|-------|--------|--------------------|
-| **001** | Orders → Production → Kitchen | **Harness** | ¿Puede un compromiso operativo convertirse en trabajo ejecutado sin romper ninguna Foundation Law? |
+| **001** | Orders → Production → Kitchen | **Engineering Certified** | ¿Puede un compromiso operativo convertirse en trabajo ejecutado sin romper ninguna Foundation Law? |
 | **002** | Production → Kitchen → Delivery | Pending | ¿Puede el trabajo ejecutado convertirse en trabajo entregable? |
 | **003** | Delivery → Billing | Pending | ¿Puede el trabajo entregado convertirse en resultado económico? |
 
