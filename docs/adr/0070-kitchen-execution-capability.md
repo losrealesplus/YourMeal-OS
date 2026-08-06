@@ -29,7 +29,8 @@ Además se congela el **Operational Model** permanente y **FOUNDATION LAW 005**:
 9. Declarar **Operational Engine exists**; v1.0 sigue requiriendo Kitchen · Delivery · Billing certificados.  
 10. Adoptar **FOUNDATION LAW 005** y el Operational Model permanente en Foundation Lock / Status.  
 11. Reclasificar Production (y Orders) bajo capa **Operational Planning** en Registry / Board / Graph.  
-12. Phase 1 = solo arquitectura (sin UI / CRUD / DB / implementación).
+12. Phase 1 = solo arquitectura (sin UI / CRUD / DB / implementación).  
+13. Vocabulario de ejecución: **ExecutionUnit** (no KitchenBatch) — congelado con Facade ADR 0071.
 
 ## Consecuencias
 

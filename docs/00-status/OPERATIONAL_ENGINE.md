@@ -73,10 +73,24 @@ Identity           ████████████████████�
 Customers          ██████████████████████  Engineering Certified + Demo
 Orders             ██████████████████████  Engineering Certified + Demo
 Production         ██████████████████████  Engineering Certified + Demo
-Kitchen Execution  ████░░░░░░░░░░░░░░░░░░  Architecture (ADR 0070)
+Kitchen Execution  ████████░░░░░░░░░░░░  Facade (ADR 0071)
 Delivery           ░░░░░░░░░░░░░░░░░░░░░░  Pending
 Billing            ░░░░░░░░░░░░░░░░░░░░░░  Pending
 ```
+
+---
+
+## Engine Completion (framing)
+
+```text
+Context                 ████████████████
+Business Entity         ████████████████
+Operational Planning    ████████████████
+Operational Execution   ████░░░░░░░░░░░░
+Operational Outcome     ░░░░░░░░░░░░░░░░
+```
+
+Prefer **Engine Completion** language over a feature roadmap when communicating product status.
 
 ---
 
