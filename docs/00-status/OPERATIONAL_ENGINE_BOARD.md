@@ -1,6 +1,6 @@
 # Operational Engine — Official Board
 
-**Frozen:** 2026-08-06 · Operational Engine **exists** · Engine Completion framing · LAW 005–006 · ADR [0071](../adr/0071-kitchen-execution-facade.md)  
+**Frozen:** 2026-08-06 · Engine Completion · LAW 005–006-A · ADR [0072](../adr/0072-kitchen-execution-engineering-certification.md)  
 **Companions:** [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) · [OPERATIONAL_DEPENDENCY_GRAPH](./OPERATIONAL_DEPENDENCY_GRAPH.md) · [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [FOUNDATION_STATUS](./FOUNDATION_STATUS.md)
 
 ```text
@@ -30,7 +30,7 @@ Operational Planning
 ██████████████████████████
 
 Operational Execution
-████░░░░░░░░░░░░░░░░░░░░░░
+████████░░░░░░░░░░░░░░░░░░
 
 Operational Outcome
 ░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -66,8 +66,8 @@ Engineering Certified + Demo
 Operational Execution
 ──────────────
 Kitchen Execution
-████████░░░░░░░░░░░░░░░░░░
-Facade (ADR 0071)
+██████████████████████████
+Engineering Certified
 
 Delivery
 ░░░░░░░░░░░░░░░░░░░░░░░░░░
@@ -85,36 +85,40 @@ Billing
 ```text
 Operational Engine ya existe.
 
-No está completo.
-Pero ya existe.
+Kitchen Execution is Engineering Certified.
+Operational Execution layer certified up to Kitchen.
 
-Engine Completion = fill Execution + Outcome.
+Engine Completion continues with Kitchen Demo → Delivery.
 ```
 
 ---
 
-## Operational Grammar (LAW 006)
+## Operational Grammar (LAW 006 · 006-A)
 
-| Layer | Capability | Question |
-|-------|------------|----------|
-| Context | Identity | ¿Quién opera? |
-| Business Entity | Customer | ¿Quién genera la demanda? |
-| Operational Planning | Order | ¿Qué prometimos? |
-| Operational Planning | Production | ¿Qué trabajo debemos generar? |
-| Operational Execution | Kitchen Execution | ¿Qué trabajo debe ejecutarse ahora? |
-| Operational Execution | Delivery | ¿Qué trabajo debe entregarse ahora? |
-| Operational Outcome | Billing | ¿Qué trabajo puede cerrarse y facturarse? |
+| Layer | Capability | Question | Never answers |
+|-------|------------|----------|---------------|
+| Context | Identity | ¿Quién opera? | — |
+| Business Entity | Customer | ¿Quién genera la demanda? | — |
+| Operational Planning | Order | ¿Qué prometimos? | Demand ownership |
+| Operational Planning | Production | ¿Qué trabajo debemos generar? | Kitchen “now” |
+| Operational Execution | Kitchen Execution | ¿Qué trabajo debe ejecutarse ahora? | Production plan |
+| Operational Execution | Delivery | ¿Qué trabajo debe entregarse ahora? | Kitchen status |
+| Operational Outcome | Billing | ¿Qué trabajo puede cerrarse y facturarse? | Delivery routes |
 
 ---
 
-## Fixed layers (permanent · LAW 005)
+## After Kitchen Demo
 
 ```text
-Context → Business Entity → Operational Planning
-        → Operational Execution → Operational Outcome
+Operational Planning            ████████████████
+Operational Execution (Phase 1) ████████████████  (Kitchen Demo)
+
+→ open: Operational Flow Validation
+  Production → Kitchen → Delivery
 ```
 
-One Capability · one layer · one question · cross-layer only via Facade.
+Kitchen is the last capability certified in isolation.  
+Delivery begins **flow** certification.
 
 ---
 
@@ -128,4 +132,4 @@ Architecture → Facade → Engineering Certification → Capability Demo
 
 ## Next
 
-**OPERATIONAL-005 Phase 3 · Kitchen Execution Engineering Certification**
+**OPERATIONAL-005 Phase 4 · Kitchen Execution Capability Demo**

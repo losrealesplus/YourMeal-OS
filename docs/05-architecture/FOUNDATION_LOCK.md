@@ -388,3 +388,23 @@ the domain boundary is incorrect.
 
 **Never** a Capability that both plans and executes, or both executes and bills.  
 LAW 005 (layer) + LAW 006 (question) prevent giant modules as the product grows.
+
+---
+
+## FOUNDATION LAW 006-A (permanente · Domain boundary)
+
+```text
+Capabilities
+never answer the question
+of another Capability.
+```
+
+| Capability | Must never answer |
+|------------|-------------------|
+| Kitchen Execution | ¿Qué debemos producir? (Production) |
+| Delivery | ¿Qué está ejecutándose en cocina? (Kitchen) |
+| Billing | ¿Qué debemos entregar? (Delivery) |
+| Production | ¿Qué trabajo debe ejecutarse ahora? (Kitchen) |
+| Orders | ¿Quién genera la demanda? (Customer) |
+
+Each question has exactly one owner. Crossing questions = broken domain boundary.

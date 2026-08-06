@@ -89,7 +89,7 @@ Functional consumers — not import graphs.
 | Customer | Business Entity | Engineering Certified + Demo | Orders |
 | Orders | Operational Planning | Engineering Certified + Demo | Production |
 | Production | Operational Planning | **Engineering Certified + Demo** | Kitchen Execution |
-| Kitchen Execution | Operational Execution | **Facade** | Delivery |
+| Kitchen Execution | Operational Execution | **Engineering Certified** | Delivery |
 | Delivery | Operational Execution | Pending | Billing |
 | Billing | Operational Outcome | Pending | — |
 
@@ -213,7 +213,8 @@ Production never cooks. Kitchen executes.
 ```
 
 **Operational Planning** (Orders + Production) is **fully consumable** · LAW 005.  
-**Kitchen Execution** Architecture frozen (ADR 0070) — Facade next.
+**Kitchen Execution** Facade + Engineering Certification (ADR 0071 · 0072).  
+Capability Demo next — then Delivery may begin.
 
 ---
 
@@ -221,22 +222,23 @@ Production never cooks. Kitchen executes.
 
 | Field | Value |
 |-------|--------|
-| **Maturity** | **Facade** |
+| **Maturity** | **Engineering Certified** |
 | **Type** | Operational Execution |
-| Completeness | Architecture ✅ · **Facade ✅** · Engineering Certification ⏳ · Capability Demo ⏳ |
+| Completeness | Architecture ✅ · Facade ✅ · **Engineering Certification ✅** · Capability Demo ⏳ |
 | Consumida por | Delivery (canonical) |
 | Depends on | ProductionFacade only |
-| Version | 0.2 (Facade) |
-| ADRs | [0070](../adr/0070-kitchen-execution-capability.md) · [0071](../adr/0071-kitchen-execution-facade.md) |
+| Field Validation | Pending ([KITCHEN_EXECUTION_SMOKE_CHECKLIST](../10-validation/KITCHEN_EXECUTION_SMOKE_CHECKLIST.md)) |
+| Version | 1.0 |
+| ADRs | [0070](../adr/0070-kitchen-execution-capability.md) · [0071](../adr/0071-kitchen-execution-facade.md) · [0072](../adr/0072-kitchen-execution-engineering-certification.md) |
 | Contract | [KITCHEN_EXECUTION_CAPABILITY](../05-architecture/KITCHEN_EXECUTION_CAPABILITY.md) |
 | Facade | `src/kitchen/KitchenExecutionFacade.ts` · `useKitchenExecution()` · ExecutionUnit Commands / Queries |
-| Notes | ¿Qué trabajo debe ejecutarse ahora? · Never plans · never cooks · ExecutionUnit (not KitchenBatch) |
+| Validation | [KITCHEN_EXECUTION_VALIDATION_REPORT](../10-validation/KITCHEN_EXECUTION_VALIDATION_REPORT.md) · 12 PASS · 6 UNIMPLEMENTED · 0 FAIL |
+| Notes | ¿Qué trabajo debe ejecutarse ahora? · ExecutionUnit · LAW 006-A |
 
 ```text
 Kitchen Execution
-████ Architecture
-████ Facade
-░░░░ Engineering Certified · Demo
+██████████████████ Engineering Certified
+░░░░ Capability Demo · Field Validation
 
 Kitchen = coordinar · priorizar · confirmar
           · pausar · reanudar · terminar
@@ -244,8 +246,9 @@ ExecutionUnit · never KitchenBatch
 Kitchen never cooks. Production never cooks.
 ```
 
-First **Operational Execution** Capability — Facade implemented.  
-Engineering Certification next (OPERATIONAL-005 Phase 3).
+First **Operational Execution** Capability — Engineering Certified.  
+**OPERATIONAL-005 Phase 4 · Capability Demo** next.  
+Delivery may begin only after Kitchen Demo preferred (one cycle).
 
 ---
 

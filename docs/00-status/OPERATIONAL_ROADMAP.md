@@ -38,7 +38,7 @@ Operational Planning
 ────────────────────────────
 
 Operational Execution
-  Kitchen Execution     ✅ Facade (ADR 0071)
+  Kitchen Execution     ✅ Engineering Certified (ADR 0072)
   Delivery              Pending
 
 ────────────────────────────
@@ -59,7 +59,7 @@ Operational Outcome
 | Customers | Business Entity | Engineering Certified + Demo |
 | Orders | Operational Planning | Engineering Certified + Demo |
 | **Production** | **Operational Planning** | **Engineering Certified + Demo** |
-| **Kitchen Execution** | **Operational Execution** | **Facade** (ADR 0071) |
+| **Kitchen Execution** | **Operational Execution** | **Engineering Certified** (ADR 0072) |
 | Delivery | Operational Execution | Pending |
 | Billing | Operational Outcome | Pending |
 
@@ -88,23 +88,22 @@ Language: **certify** capabilities — not “develop screens”.
 ```text
 Architecture (ADR 0070)              ✅
 Facade (ADR 0071)                    ✅ src/kitchen/
-Engineering Certification            ← next
-Capability Demo
+Engineering Certification (ADR 0072) ✅ 12 PASS · 6 UNIMPLEMENTED · 0 FAIL
+Capability Demo                      ← next
 ```
 
-**Operational Engine exists.** Engine Completion = Execution + Outcome.  
-**LAW 006** · ExecutionUnit language · ProductionFacade only.
+**Operational Engine exists.** Kitchen Engineering Certified.  
+After Demo → **Operational Flow Validation** (Production → Kitchen → Delivery).
 
 ---
 
 ## Near-term sequence
 
-1. ~~Production Engineering Certification~~ ✅ ADR 0068  
-2. ~~Production Workspace Demo~~ ✅ ADR 0069  
-3. ~~Kitchen Execution Capability Architecture~~ ✅ ADR 0070  
-4. ~~Kitchen Execution Facade~~ ✅ ADR 0071  
-5. **Kitchen Execution Engineering Certification** (OPERATIONAL-005 Phase 3)  
-6. Delivery · Billing → [Operational Engine v1.0](./OPERATIONAL_ENGINE.md)
+1. ~~Kitchen Execution Capability Architecture~~ ✅ ADR 0070  
+2. ~~Kitchen Execution Facade~~ ✅ ADR 0071  
+3. ~~Kitchen Execution Engineering Certification~~ ✅ ADR 0072  
+4. **Kitchen Execution Capability Demo** (OPERATIONAL-005 Phase 4)  
+5. Operational Flow Validation · Delivery · Billing → [Operational Engine v1.0](./OPERATIONAL_ENGINE.md)
 
 Official board: [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)
 
