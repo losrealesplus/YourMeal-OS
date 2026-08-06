@@ -41,3 +41,4 @@ Permanent decisions for YourMeal OS. New ADRs are additive; do not silently reve
 | [0048](./0048-development-environment.md) | Development Environment (JDK 21 · Capability Drivers · FOPEBA tooling) |
 | [0049](./0049-environment-contract.md) | Environment Contract (.env.development.example · doctor:env checklist) |
 | [0050](./0050-bootstrap-pipeline.md) | Bootstrap Pipeline (PRODUCT-CORE-001 · App Launch → Ready freeze) |
+| [0051](./0051-bootstrap-orchestrator.md) | Bootstrap Orchestrator (PRODUCT-CORE-002 · executable order) |
