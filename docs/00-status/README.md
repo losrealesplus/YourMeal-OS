@@ -17,6 +17,8 @@
 | [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) | Engine meaning · v0.8 / v1.0 |
 | [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) | **v0.8 freeze declaration** |
 | [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) | **Official frozen board** |
+| [OPERATIONAL_VALIDATION_SPRINT](./OPERATIONAL_VALIDATION_SPRINT.md) | **Active sprint** · FLOW Demo → field devices |
+| [FIELD_VALIDATION_LOG](../10-validation/FIELD_VALIDATION_LOG.md) | Real-device evidence log (OPPO · iPhone) |
 | [OPERATIONAL_DEPENDENCY_GRAPH](./OPERATIONAL_DEPENDENCY_GRAPH.md) | Permanent dependency graph · layers |
 
 > Success = **¿Qué capacidades operativas están certificadas y cuáles usa un negocio real?**

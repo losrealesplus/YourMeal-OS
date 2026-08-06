@@ -3,6 +3,8 @@
 **Status:** ✅ **DECLARED / FROZEN** — 2026-08-06  
 **ADR:** [0077](../adr/0077-operational-engine-v08.md)  
 **Board:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)  
+**Sprint:** [OPERATIONAL_VALIDATION_SPRINT](./OPERATIONAL_VALIDATION_SPRINT.md)  
+**Field log:** [FIELD_VALIDATION_LOG](../10-validation/FIELD_VALIDATION_LOG.md)  
 **Era:** Construction → **Validation**
 
 ```text
