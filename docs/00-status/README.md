@@ -41,14 +41,14 @@
 **Product Core:** ✅ **[Foundation engineering-validated](./PRODUCT_CORE_FOUNDATION_001.md)** (ADR 0054) · Field smoke OPPO ⏳ · **Era Foundation center CLOSED**  
 **Operational Experience:** ▶ **[OPERATIONAL_EXPERIENCE](./OPERATIONAL_EXPERIENCE.md)** · Tenant Success  
 **Product Direction:** ▶ **[PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md)** · PRODUCT LAW 001 · ADR [0084](../adr/0084-product-law-001.md) · [Time Savings Backlog](./TENANT_TIME_SAVINGS_BACKLOG.md)  
-**Operational Modules:** ▶ **[OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md)** · Delivery **Engineering Certified** (ADR 0078–0080) · Engine [v0.8](./OPERATIONAL_ENGINE_V08.md)  
+**Operational Modules:** ▶ Expansion complete for Engine v1.0 · [OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md) · Engine [v1.0](./OPERATIONAL_ENGINE_V1.md)  
 **Delivery Capability:** [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) · ADR 0078–0080 · **0086** · Demo `/admin/delivery-workspace` · `useDelivery()` · [Validation Report](../10-validation/DELIVERY_VALIDATION_REPORT.md)  
+**Operational Engine:** ✅ **v1.0 DECLARED** — [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) · ADR 0090 · Board: [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · Review: [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) · Flows: [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md)  
 **Billing Capability:** [BILLING_CAPABILITY](../05-architecture/BILLING_CAPABILITY.md) · ADR **0087–0089** · **Engineering Certified** · `useBilling()` · [Validation Report](../10-validation/BILLING_VALIDATION_REPORT.md)  
-**Engine v1.0 Declaration:** [OPERATIONAL_ENGINE_001_RESERVED](./OPERATIONAL_ENGINE_001_RESERVED.md)  
+**Engine v1.0 Declaration:** [OPERATIONAL_ENGINE_001](./OPERATIONAL_ENGINE_001_RESERVED.md) · ✅ DECLARED  
 **FLOW-002:** [OPERATIONAL_FLOW_002](../05-architecture/OPERATIONAL_FLOW_002.md) · **Engineering Certified** (ADR 0083) · [Report](../10-validation/FLOW_002_VALIDATION_REPORT.md)  
 **Behaviours:** [Board](./OPERATIONAL_BEHAVIOUR_BOARD.md) · BH-001 Certified · [Scenarios](./OPERATIONAL_SCENARIO_REGISTRY.md) RESERVED  
-**Language:** [OPERATIONAL_LANGUAGE_DICTIONARY](./OPERATIONAL_LANGUAGE_DICTIONARY.md) 
-**Operational Engine:** 🎯 [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) · Board: [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · Review: [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) · Flows: [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md)
+**Language:** [OPERATIONAL_LANGUAGE_DICTIONARY](./OPERATIONAL_LANGUAGE_DICTIONARY.md)
 **Identity Validation:** [IDENTITY_VALIDATION_REPORT](../10-validation/IDENTITY_VALIDATION_REPORT.md) · smoke [checklist](../10-validation/IDENTITY_SMOKE_CHECKLIST.md)  
 **Customer Capability:** [CUSTOMER_CAPABILITY](../05-architecture/CUSTOMER_CAPABILITY.md) · ADR 0058–0061 · Demo `/admin/customer-workspace`  
 **Order Capability:** [ORDER_CAPABILITY](../05-architecture/ORDER_CAPABILITY.md) · ADR 0062–0065 · Demo `/admin/order-workspace`  
