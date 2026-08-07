@@ -93,7 +93,7 @@ Functional consumers — not import graphs.
 | Production | Operational Planning | **Engineering Certified + Demo** | Kitchen Execution |
 | Kitchen Execution | Operational Execution | **Engineering Certified + Demo** | Delivery |
 | Delivery | Operational Execution | **Capability Demo** | Billing |
-| Billing | Operational Outcome | **Architecture Freeze** | FLOW-003 · Engine v1.0 |
+| Billing | Operational Outcome | **Facade** | FLOW-003 · Engine v1.0 |
 
 **Discipline:** Never open two new operational capabilities at once.  
 Complete **Architecture → Facade → Validation → Demo** before the next.
@@ -290,7 +290,7 @@ never drives · never cooks · never bills
 ```
 
 Second **Operational Execution** Capability — Engineering Certified + Capability Demo.  
-**Next Engine block:** Billing Facade → Certification → Demo → **OPERATIONAL-ENGINE-001**.  
+**Next Engine block:** Billing Certification → Demo → **OPERATIONAL-ENGINE-001**.  
 Delivery is **closed** — do not reopen Architecture / Facade / Demo.
 
 ---
@@ -299,20 +299,22 @@ Delivery is **closed** — do not reopen Architecture / Facade / Demo.
 
 | Field | Value |
 |-------|--------|
-| **Maturity** | **Architecture Freeze** |
+| **Maturity** | **Facade** |
 | **Type** | Operational Outcome |
-| Completeness | **Architecture ✅** · Facade ⏳ · Engineering Certification ⏳ · Capability Demo ⏳ · Product UI ⏳ · Field ⏳ |
+| Completeness | Architecture ✅ · **Facade ✅** · Engineering Certification ⏳ · Capability Demo ⏳ · Product UI ⏳ · Field ⏳ |
 | Consumida por | FLOW-003 · OPERATIONAL-ENGINE-001 |
-| Depends on | Identity · Customer · Orders · Production · Kitchen · Delivery (Facades only) |
-| Version | 0.1 (contracts) |
-| ADRs | [0087](../adr/0087-billing-capability.md) |
-| Contract | [BILLING_CAPABILITY](../05-architecture/BILLING_CAPABILITY.md) · `src/billing/contracts/` |
-| Notes | **Final Engine Capability** · closes Outcome layer · never ERP/ledger/bank |
+| Depends on | OrderFacade · DeliveryFacade · CustomerFacade · ProductionFacade · KitchenExecutionFacade |
+| Version | 0.2 (Facade) |
+| ADRs | [0087](../adr/0087-billing-capability.md) · [0088](../adr/0088-billing-facade.md) |
+| Contract | [BILLING_CAPABILITY](../05-architecture/BILLING_CAPABILITY.md) · [BILLING_FACADE](../05-architecture/BILLING_FACADE.md) |
+| Facade | `src/billing/BillingFacade.ts` · `useBilling()` · `commands/` · `queries/` |
+| Notes | **Final Engine Capability** · passive Outcome · PrepareBilling composed · Issue/Payment EXPECTED GAP |
 
 ```text
 Billing
 ████ Architecture Freeze
-░░░░ Facade · Certification · Demo · Field
+████ Facade
+░░░░ Certification · Demo · Field
 
 Question: What financial outcome must be produced
           from successfully completed operational work?
@@ -320,10 +322,11 @@ Question: What financial outcome must be produced
 Billing = prepare · invoice · credit · payment status · evidence
 never creates demand · never plans · never executes
 = Operational Outcome (Engine ends here)
+Billing does not initiate — it certifies cycle completion.
 ```
 
-Final **Operational Outcome** Capability — Architecture Frozen.  
-**Next:** Billing Facade → Certification → Demo → **OPERATIONAL-ENGINE-001** (v1.0 Declaration).  
+Final **Operational Outcome** Capability — Facade.  
+**Next:** Engineering Certification → Demo → **OPERATIONAL-ENGINE-001** (v1.0 Declaration).  
 See [OPERATIONAL_ENGINE_001_RESERVED](./OPERATIONAL_ENGINE_001_RESERVED.md).
 
 ---

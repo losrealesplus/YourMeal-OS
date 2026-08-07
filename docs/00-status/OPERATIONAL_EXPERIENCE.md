@@ -39,7 +39,7 @@ We may still touch Foundation. It is no longer the protagonist.
 | Production | **Engineering Certified + Demo** (ADR 0068–0069) |
 | Kitchen Execution | **Engineering Certified + Demo** (ADR 0072–0073) |
 | Delivery | **Capability Demo** (ADR 0086 · `/admin/delivery-workspace`) |
-| Billing | **Architecture Freeze** (ADR 0087 · Outcome · Engine-closing) |
+| Billing | **Facade** (ADR 0088 · passive Outcome · closes cycle) |
 | Engine v1.0 Declaration | RESERVED · [OPERATIONAL_ENGINE_001](./OPERATIONAL_ENGINE_001_RESERVED.md) |
 
 ---

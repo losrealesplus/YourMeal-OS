@@ -1,8 +1,8 @@
 # Billing Capability
 
-**OPERATIONAL-007 · Phase 1 — Architecture Freeze**  
-**ADR:** [0087](../adr/0087-billing-capability.md)  
-**Status:** **Architecture Freeze** · Facade ⏳ · Certification ⏳ · Demo ⏳  
+**OPERATIONAL-007 · Phase 2 — Facade · Phase 3 Certification next**  
+**ADR:** [0087](../adr/0087-billing-capability.md) · [0088](../adr/0088-billing-facade.md)  
+**Status:** **Facade** · Certification ⏳ · Demo ⏳  
 **Product Direction:** [PRODUCT_DIRECTION](../00-status/PRODUCT_DIRECTION.md) · PRODUCT LAW 001  
 **Role in Engine:** **Final Capability** — closes Operational Engine structural chain  
 **Depends on:** Identity · Customer · Orders · Production · Kitchen Execution · **Delivery** (all Architecture+; Delivery Demo ✅)  
@@ -10,10 +10,10 @@
 **Tenant lens:** any meal-prep / catering tenant that must settle completed operational work financially  
 **EatClean lens:** weekly catering cycle → invoice / payment outcome after fulfillment  
 **Layer / Type:** **Operational Outcome** (sole Outcome capability in Engine v1.0)  
-**Maturity:** **Architecture** → Facade → Engineering Certified → Capability Demo → Field → Production Ready  
-**Completeness:** **Architecture ✅** · Facade ⏳ · Engineering Certification ⏳ · Capability Demo ⏳ · Product UI ⏳ · Field ⏳  
+**Maturity:** Architecture → **Facade** → Engineering Certified → Capability Demo → Field → Production Ready  
+**Completeness:** Architecture ✅ · **Facade ✅** · Engineering Certification ⏳ · Capability Demo ⏳ · Product UI ⏳ · Field ⏳  
 **Laws:** 001–007 · PRODUCT LAW 001 · [FOUNDATION_LOCK](./FOUNDATION_LOCK.md)  
-**Package:** `src/billing/contracts/` · (Facade deferred to Phase 2)  
+**Package:** `src/billing/` · `BillingFacade` · `useBilling` · [BILLING_FACADE](./BILLING_FACADE.md)  
 **Dictionary:** [OPERATIONAL_LANGUAGE_DICTIONARY](../00-status/OPERATIONAL_LANGUAGE_DICTIONARY.md)
 
 ```text
@@ -230,11 +230,11 @@ Billing composes certified Facades only (when Facade phase opens).
 
 | Phase | Output | Status |
 |-------|--------|--------|
-| **1 · Architecture Freeze** | This document · ADR 0087 · contracts · Registry | ✅ **This PR** |
-| 2 · Facade | `BillingFacade` · Commands / Queries · `useBilling` | ⏳ |
+| **1 · Architecture Freeze** | This document · ADR 0087 · contracts · Registry | ✅ |
+| **2 · Facade** | `BillingFacade` · Commands / Queries · `useBilling` · ADR 0088 | ✅ |
 | 3 · Engineering Certification | Validation matrix · ADR | ⏳ |
 | 4 · Capability Demo | `/admin/billing-workspace` · `useBilling` only | ⏳ |
-| **OPERATIONAL-ENGINE-001** | Engine v1.0 Declaration (docs only · institutional) | ⏳ After Billing Demo (+ FLOW-003 as required) |
+| **OPERATIONAL-ENGINE-001** | Engine v1.0 Declaration (docs only · institutional ceremony) | ⏳ After Billing Demo (+ FLOW-003 as required) |
 
 ---
 
