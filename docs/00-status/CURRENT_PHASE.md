@@ -1,8 +1,8 @@
 # CURRENT_PHASE
 
 **Última actualización:** 2026-08-07  
-**Institutional:** [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) · **Construction COMPLETE** · focus **Tenant Success**  
-**Playbook:** [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md)  
+**Institutional:** [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) · **Construction COMPLETE** · **Era 2: Return Time**  
+**Playbook:** [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md) · Operational Evidence Loop  
 **No sustituye** [MILESTONES](./MILESTONES.md) — tablero de “dónde estamos ahora”.
 
 ```text
@@ -10,15 +10,18 @@
 YOURMEAL OS · CURRENT GATE
 ═══════════════════════════════════════════════
 
+ERA 1 · Build the Engine    ✅ COMPLETE
 Operational Engine v1.0     ✅ DECLARED (OPERATIONAL-ENGINE-001)
-Construction                ✅ COMPLETE
 Architecture                ✅ FROZEN
+
+ERA 2 · Return Time         ▶ STARTS TODAY
 Primary Product Focus       Tenant Success (PRODUCT LAW 001)
+Identity                    Operational First
 
 Next measurements
-  · Tiempo ahorrado
+  · Tiempo recuperado (evidence-guided backlog)
+  · Beta = Discover Friction
   · Field / Cross-platform
-  · Beta usability
 ```
 
 ---
