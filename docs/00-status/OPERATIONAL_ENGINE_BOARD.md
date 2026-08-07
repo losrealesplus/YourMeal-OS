@@ -2,7 +2,7 @@
 
 **Engine v1.0:** ✅ **DECLARED / CERTIFIED / ARCHITECTURE FROZEN** — [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) · ADR [0090](../adr/0090-operational-engine-v1-declaration.md) · **OPERATIONAL-ENGINE-001**  
 **Historic v0.8:** [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) · ADR [0077](../adr/0077-operational-engine-v08.md)  
-**Product Direction:** [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md) · **PRODUCT LAW 001** · ADR [0084](../adr/0084-product-law-001.md) · [Time Savings Backlog](./TENANT_TIME_SAVINGS_BACKLOG.md)  
+**Product Direction:** [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md) · **PRODUCT LAW 001** · ADR [0084](../adr/0084-product-law-001.md) · [Time Savings Backlog](./TENANT_TIME_SAVINGS_BACKLOG.md) · **[Tenant Success Playbook](./TENANT_SUCCESS_PLAYBOOK.md)**  
 **Behaviours:** [OPERATIONAL_BEHAVIOUR_BOARD](./OPERATIONAL_BEHAVIOUR_BOARD.md) · BH-001 Certified  
 **Scenarios:** [OPERATIONAL_SCENARIO_REGISTRY](./OPERATIONAL_SCENARIO_REGISTRY.md) · RESERVED  
 **Language:** [OPERATIONAL_LANGUAGE_DICTIONARY](./OPERATIONAL_LANGUAGE_DICTIONARY.md)  
@@ -100,6 +100,6 @@ Architecture reopen only if: Foundation Law broken · production blocked · meas
 ## Immediate next steps (Tenant Success)
 
 1. **Cross-platform / Field** — iPhone FIELD-VALIDATION-002 · Operational Evidence  
-2. **Time savings** — [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md) · Beta usability  
+2. **Time savings** — [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md) · [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md) · Beta usability  
 3. **Validation demos** — Billing / Flow Demos as experience proofs (optional path · not Construction)  
-4. **Tag after merge** — `operational-engine-v1.0`
+4. **Observe Isabella** — friction log → backlog (Playbook protocol)
