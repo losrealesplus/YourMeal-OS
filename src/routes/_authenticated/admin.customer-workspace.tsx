@@ -1,9 +1,9 @@
 /**
- * CUSTOMER EXPERIENCE 002 · Zero Friction Customer Search
- * (+ CX001 Create retained on the same surface)
+ * CUSTOMER EXPERIENCE 003 · Zero Friction Customer Edit
+ * (+ CX001 Create · CX002 Search on the same surface)
  *
  * Experience above useCustomer() only — no Capability / Facade edits.
- * Mission KPI: TTF < 10s · EXPERIENCE MANIFESTO 001
+ * Mission KPI: TTE < 20s · EXPERIENCE MANIFESTO 001
  */
 
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -42,6 +42,8 @@ import {
   customerTypeLabel,
   rankSearchHits,
 } from "@/customer-experience/search-rank";
+import { applyOperationalCorrection } from "@/customer-experience/operational-corrections";
+import { CustomerEditPanel } from "@/customer-experience/CustomerEditPanel";
 import { cn } from "@/lib/utils";
 
 /** Silent origin for altas from this Experience surface. */
@@ -64,11 +66,11 @@ export const Route = createFileRoute(
   head: () => ({
     meta: [
       {
-        title: "YourMeal OS — Zero Friction Customer Search",
+        title: "YourMeal OS — Zero Friction Customer Edit",
       },
       {
         name: "description",
-        content: "TTF < 10s · CX002 · useCustomer only",
+        content: "TTE < 20s · CX003 · useCustomer only",
       },
     ],
   }),
@@ -221,7 +223,7 @@ function CustomerExperiencePage() {
           setSelected(null);
           return;
         }
-        setSelected(result.context);
+        setSelected(applyOperationalCorrection(result.context));
       } catch (e) {
         toast.error(e instanceof Error ? e.message : String(e));
       } finally {
@@ -387,33 +389,25 @@ function CustomerExperiencePage() {
     }
   }
 
-  const profile = selected?.profile;
-  const isEmployee = selected?.summary.tags.some((t) =>
-    t.includes("company_employee"),
-  );
-  const primaryPhone =
-    profile?.phones?.[0]?.e164?.trim() ||
-    null;
-
   return (
     <div className="animate-fade-in max-w-5xl">
       <SectionTitle
-        overline="CUSTOMER EXPERIENCE 002 · Phase 002 Search"
-        title="Zero Friction Customer Search"
-        subtitle="TTF < 10s · Create (CX001) sigue disponible · el software desaparece"
+        overline="CUSTOMER EXPERIENCE 003 · Phase 003 Edit"
+        title="Zero Friction Customer Edit"
+        subtitle="TTE < 20s · corregir y seguir · el software desaparece"
       />
 
       <div className="mb-4 grid gap-2 rounded-md border border-foreground/15 bg-foreground/[0.03] px-4 py-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Kpi label="TTF · Find" value="< 10 s" primary />
+        <Kpi label="TTE · Edit" value="< 20 s" primary />
+        <Kpi label="Resume operation" value="< 5 s" />
+        <Kpi label="TTF · Find" value="< 10 s" />
         <Kpi label="TTC · Create" value="< 30 s" />
-        <Kpi label="TTO · Open" value="< 3 s" />
-        <Kpi label="Order from Customer" value="< 5 s" />
       </div>
 
       <AdminHeader
-        goal="Que Isabella piense «Juan» — y el cliente ya esté ahí"
+        goal="Corregir un dato frecuente y volver a la operación — sin abrir un dossier"
         capability="customers.read / customers.write"
-        object="Nombre · Teléfono · Empresa · Empleado · Recientes"
+        object="Inline edit · Basic · Delivery · Notes · Progressive Completion"
       />
 
       {!creating ? (
@@ -541,105 +535,39 @@ function CustomerExperiencePage() {
 
         <section>
           <p className="mb-2 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-            Cliente · sin callejón sin salida
+            Cliente · editar sin interrumpir · TTE &lt; 20s
           </p>
           {!selected ? (
             <p className="rounded-md border border-dashed border-border px-4 py-12 text-center text-sm text-muted-foreground">
-              Identifica en la lista · abre solo cuando haga falta
+              Busca · abre · corrige solo lo necesario · sigue
             </p>
           ) : (
-            <div className="space-y-4 rounded-md border border-border p-4">
-              {justCreated ? (
-                <NextBestAction
-                  primaryRef={nextActionRef}
-                  createdFromLabel={createdFromLabel}
-                  onCreateOrder={() => {}}
-                  onOpenCustomer={() => {
-                    setJustCreated(false);
-                  }}
-                  onCreateAnother={() => {
-                    startCreate();
-                  }}
-                  onBack={goBackFromCreated}
-                />
-              ) : null}
-              <div>
-                <h3 className="text-lg font-semibold">
-                  {selected.summary.displayName}
-                </h3>
-                <p className="text-xs text-muted-foreground">
-                  {selected.summary.partyKind === "individual"
-                    ? isEmployee
-                      ? "Empleado de empresa"
-                      : "Particular"
-                    : "Empresa"}
-                  {createdFromLabel && justCreated
-                    ? ` · origen ${createdFromLabel}`
-                    : ""}
-                </p>
-              </div>
-
-              {!justCreated ? (
-                <OperationalActions
-                  phone={primaryPhone}
-                  displayName={selected.summary.displayName}
-                />
-              ) : null}
-
-              <dl className="grid grid-cols-2 gap-2 text-xs">
-                <div>
-                  <dt className="text-muted-foreground">Estado</dt>
-                  <dd className="font-semibold">{selected.summary.status}</dd>
-                </div>
-                <div>
-                  <dt className="text-muted-foreground">Canal</dt>
-                  <dd className="font-semibold">
-                    {selected.summary.demandChannelDefault}
-                  </dd>
-                </div>
-                {profile?.email ? (
-                  <div className="col-span-2">
-                    <dt className="text-muted-foreground">Email</dt>
-                    <dd className="font-semibold">{profile.email}</dd>
-                  </div>
-                ) : null}
-                {primaryPhone ? (
-                  <div className="col-span-2">
-                    <dt className="text-muted-foreground">Teléfono</dt>
-                    <dd className="font-semibold">{primaryPhone}</dd>
-                  </div>
-                ) : null}
-              </dl>
-              <FacetBlock
-                title="Dirección"
-                empty="Sin dirección · se puede completar después"
-                items={
-                  profile?.addresses?.map(
-                    (a) =>
-                      `${a.line1}${a.city ? `, ${a.city}` : ""}`,
-                  ) ?? []
-                }
-              />
-              <FacetBlock
-                title="Preferencias / alergias"
-                empty="Más adelante · Progressive Completion"
-                items={profile?.allergens?.map((a) => a.code) ?? []}
-              />
-              <div className="flex flex-wrap gap-2 border-t border-dashed border-border pt-2">
-                <button
-                  type="button"
-                  disabled={
-                    busy ||
-                    !selected.permissions.canWrite ||
-                    selected.summary.partyKind !== "individual"
-                  }
-                  onClick={() => void onArchive()}
-                  className="min-h-10 rounded-md border border-border px-3 py-2 text-xs font-semibold disabled:opacity-40"
-                >
-                  Archivar
-                </button>
-              </div>
-            </div>
+            <CustomerEditPanel
+              context={selected}
+              busy={busy}
+              canWrite={canWrite && selected.permissions.canWrite}
+              justCreated={justCreated}
+              createdFromLabel={createdFromLabel}
+              onContext={setSelected}
+              onBusy={setBusy}
+              onArchive={() => void onArchive()}
+              nextBestAction={
+                justCreated ? (
+                  <NextBestAction
+                    primaryRef={nextActionRef}
+                    createdFromLabel={createdFromLabel}
+                    onCreateOrder={() => {}}
+                    onOpenCustomer={() => {
+                      setJustCreated(false);
+                    }}
+                    onCreateAnother={() => {
+                      startCreate();
+                    }}
+                    onBack={goBackFromCreated}
+                  />
+                ) : null
+              }
+            />
           )}
         </section>
       </div>
@@ -1012,60 +940,6 @@ function NextBestAction(props: {
   );
 }
 
-function OperationalActions(props: {
-  phone: string | null;
-  displayName: string;
-}) {
-  const phoneHref = props.phone
-    ? `tel:${props.phone.replace(/[^\d+]/g, "")}`
-    : null;
-  const waHref = props.phone
-    ? `https://wa.me/${props.phone.replace(/\D/g, "")}`
-    : null;
-  const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(props.displayName)}`;
-
-  return (
-    <div className="flex flex-wrap gap-2">
-      <Link
-        to="/admin/order-workspace"
-        className="inline-flex min-h-11 items-center rounded-md bg-foreground px-3 py-2 text-sm font-semibold text-background"
-      >
-        Crear pedido
-      </Link>
-      {phoneHref ? (
-        <a
-          href={phoneHref}
-          className="inline-flex min-h-11 items-center rounded-md border border-border px-3 py-2 text-sm font-semibold"
-        >
-          Llamar
-        </a>
-      ) : (
-        <span className="inline-flex min-h-11 items-center rounded-md border border-dashed border-border px-3 py-2 text-xs text-muted-foreground">
-          Llamar · sin teléfono
-        </span>
-      )}
-      {waHref ? (
-        <a
-          href={waHref}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex min-h-11 items-center rounded-md border border-dashed border-border px-3 py-2 text-xs font-semibold text-muted-foreground"
-        >
-          WhatsApp · pronto
-        </a>
-      ) : null}
-      <a
-        href={mapsHref}
-        target="_blank"
-        rel="noreferrer"
-        className="inline-flex min-h-11 items-center rounded-md border border-dashed border-border px-3 py-2 text-xs font-semibold text-muted-foreground"
-      >
-        Mapas · pronto
-      </a>
-    </div>
-  );
-}
-
 function Kpi(props: { label: string; value: string; primary?: boolean }) {
   return (
     <div className={props.primary ? "sm:col-span-1" : undefined}>
@@ -1081,29 +955,6 @@ function Kpi(props: { label: string; value: string; primary?: boolean }) {
       >
         {props.value}
       </p>
-    </div>
-  );
-}
-
-function FacetBlock(props: {
-  title: string;
-  empty: string;
-  items: string[];
-}) {
-  return (
-    <div className="rounded-md border border-dashed border-border/80 px-3 py-2">
-      <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-        {props.title}
-      </p>
-      {props.items.length === 0 ? (
-        <p className="mt-1 text-xs text-muted-foreground">{props.empty}</p>
-      ) : (
-        <ul className="mt-1 space-y-0.5 text-xs font-medium">
-          {props.items.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      )}
     </div>
   );
 }

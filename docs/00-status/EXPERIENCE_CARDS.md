@@ -54,39 +54,38 @@ Name
 Customer Experience
 
 Mission
-Zero Friction Customer Search
+Zero Friction Customer Edit
 
 Phase
-002 Search
+003 Edit
 
 Primary User
 Tenant Operator
 
 Primary KPI
-Time-to-Find Customer <10 s
+Time-to-Edit Customer <20 s
 
 Secondary KPIs
+Time-to-Resume Operation <5 s
+Time-to-Find Customer <10 s
 Time-to-Create Customer <30 s
-Time-to-Open Customer <3 s
-Create Order from Customer <5 s
 
 Operational Time Saved
 Estimated
-10–35 seconds per search
-(Create path: 60–150 s · CX001)
+25–70 seconds per frequent edit
 
 Status
-In Progress · Phase 002
+In Progress · Phase 003
 ```
 
-Detail: [CUSTOMER_EXPERIENCE_002](./CUSTOMER_EXPERIENCE_002.md) · [001 Create](./CUSTOMER_EXPERIENCE_001.md)
+Detail: [CUSTOMER_EXPERIENCE_003](./CUSTOMER_EXPERIENCE_003.md) · [002 Search](./CUSTOMER_EXPERIENCE_002.md) · [001 Create](./CUSTOMER_EXPERIENCE_001.md)
 
 **Customer Experience sequence** (Orders wait until Customer is fluid):
 
 ```text
 001 Create     ✅
-002 Search     ← active
-003 Edit
+002 Search     ✅
+003 Edit       ← active
 004 Company Management
 005 Preferences
 006 Bulk Operations
