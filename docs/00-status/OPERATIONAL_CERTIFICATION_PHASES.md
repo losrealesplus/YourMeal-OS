@@ -16,7 +16,7 @@ PHASE B
 Operational Flow Validation
 ████████████░░░░░░░
 OPERATIONAL-FLOW-001  Engineering Certified ✅ (ADR 0076) · Demo prefer
-OPERATIONAL-FLOW-002  Harness ✅ (ADR 0082) · Certification next
+OPERATIONAL-FLOW-002  Engineering Certified ✅ (ADR 0083) · Demo next · BH-001
 OPERATIONAL-FLOW-003  GATED (Billing / Outcome)
 
 ↓
