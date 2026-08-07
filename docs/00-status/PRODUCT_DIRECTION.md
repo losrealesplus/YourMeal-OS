@@ -384,14 +384,16 @@ Delivery Facade ✅ · Validation ✅ · **Demo ✅** (ADR 0086)
 
 ### Block 2 — Finish Billing Capability
 
-Billing Architecture → Facade → Validation → Demo ◀ next structural block
+Billing **Architecture ✅** (ADR 0087) → Facade → Validation → Demo ◀ in progress
 
 ### Block 3 — Declare Engine v1.0
 
 ```text
-Operational Engine v1.0
-Architecture Frozen
+OPERATIONAL-ENGINE-001
+Operational Engine v1.0 Declaration
 ```
+
+Institutional milestone ([reserved](./OPERATIONAL_ENGINE_001_RESERVED.md)) — docs only · phase change Construction → Validation → Tenant Success.
 
 No more architectural work by default.
 
@@ -479,11 +481,12 @@ We are **closing Operational Engine v1.0**.
 |------------|-------------|----------------------|
 | Identity → Kitchen | Certified (+ Demos where applicable) | Usability under PRODUCT LAW 001 |
 | **Delivery** | **Capability Demo** (ADR 0078–0080 · 0086) | Product UI later · Field |
-| **Billing** | Pending | Architecture → … → Demo ◀ next |
+| **Billing** | **Architecture Freeze** (ADR 0087) | Facade → Cert → Demo ◀ next |
 | FLOW-002 | Engineering Certified | Flow Demo |
-| FLOW-003 | Pending | After Billing |
+| FLOW-003 | Pending | After Billing Facade |
+| **OPERATIONAL-ENGINE-001** | RESERVED | After Billing Demo |
 
-See [ADR 0085](../adr/0085-delivery-engine-v1-alignment.md) · [ADR 0086](../adr/0086-delivery-workspace-demo.md) — Delivery as controlled transfer of responsibility · Demo complete.
+See [ADR 0087](../adr/0087-billing-capability.md) — Billing closes Outcome · [OPERATIONAL_ENGINE_001_RESERVED](./OPERATIONAL_ENGINE_001_RESERVED.md).
 
 ---
 
@@ -491,6 +494,9 @@ See [ADR 0085](../adr/0085-delivery-engine-v1-alignment.md) · [ADR 0086](../adr
 
 * [ADR 0084](../adr/0084-product-law-001.md) · PRODUCT LAW 001  
 * [ADR 0085](../adr/0085-delivery-engine-v1-alignment.md) · Delivery → Engine v1.0  
+* [ADR 0086](../adr/0086-delivery-workspace-demo.md) · Delivery Demo  
+* [ADR 0087](../adr/0087-billing-capability.md) · Billing Architecture  
+* [OPERATIONAL_ENGINE_001_RESERVED](./OPERATIONAL_ENGINE_001_RESERVED.md) · v1.0 Declaration  
 * [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md)  
 * [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)  
 * [OPERATIONAL_EXPERIENCE](./OPERATIONAL_EXPERIENCE.md)

@@ -109,7 +109,7 @@ v0.8 core remains frozen. Expansion finishes Delivery Demo + Billing for **Engin
 
 ## No Delivery until
 
-Delivery is **Engineering Certified** (ADR 0080). FLOW-002 is **Engineering Certified** (ADR 0083). Remaining gate before Product UI / Billing / Scenarios:
+Delivery is **Capability Demo** (ADR 0086). FLOW-002 is **Engineering Certified** (ADR 0083). Remaining gate before Delivery **Product UI** / Scenarios:
 
 ```text
 FLOW-002 Flow Demo (prefer)
@@ -119,7 +119,8 @@ Android APK / OPPO Field Validation ✅
 iPhone Field Validation (parallel · not blocking Certification)
 ```
 
-**No Delivery until** Demo preferido for Product UI — do not open Delivery Product UI, Billing Architecture, or Scenarios before FLOW-002 Flow Demo (prefer).
+**No Delivery Product UI until** Flow Demo preferido.  
+**Billing Architecture** is unlocked by Delivery Demo + PRODUCT LAW 001 (ADR 0087) — do not reopen Delivery.
 
 ---
 
@@ -136,7 +137,12 @@ iPhone Field Validation (parallel · not blocking Certification)
 | FLOW-002 **Engineering Certification** | ✅ ADR 0083 · FAIL=0 |
 | BH-001 **Behaviour Certified** | ✅ via FLOW-002 |
 | FLOW-002 **Flow Demo** | 🔒 Phase 4 |
-| FLOW-003 / Billing Architecture | 🔒 After FLOW-002 Demo preferido |
+| Billing **Architecture Freeze** | ✅ ADR 0087 · `src/billing/contracts/` |
+| Billing **Facade** | 🔒 Phase 2 |
+| Billing **Engineering Certification** | 🔒 Phase 3 |
+| Billing **Capability Demo** | 🔒 Phase 4 |
+| FLOW-003 | 🔒 After Billing Facade preferido |
+| **OPERATIONAL-ENGINE-001** (v1.0 Declaration) | 🔒 RESERVED · after Billing Demo |
 | Scenarios | 🔒 RESERVED |
 | Engine **FIELD VALIDATED** | 🔒 | Android + iPhone PASS |
 | Claiming Production Authorization | 🔒 | Governance |
@@ -145,7 +151,7 @@ iPhone Field Validation (parallel · not blocking Certification)
 
 ## Immediate next steps (parallel)
 
-1. **Finish Engine path** — Delivery Demo ✅ · **Billing Capability** (Architecture → Facade → Cert → Demo) · Engine v1.0 freeze ([PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md))  
+1. **Finish Engine path** — Billing **Facade → Cert → Demo** · then **OPERATIONAL-ENGINE-001** ([reserved](./OPERATIONAL_ENGINE_001_RESERVED.md))  
 2. **FLOW-002 Phase 4** — Flow Demo (`useFlow002` only)  
 3. **Tenant time savings** — [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md) · Beta 1 usability  
 4. **IOS-READY / FIELD-VALIDATION-002** — [guide](../10-validation/FIELD_VALIDATION_002_IOS.md)

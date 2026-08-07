@@ -99,12 +99,19 @@ Avoid: Shipment · Parcel · Package · Courier.
 ### Billing
 
 ```text
-What operational outcome must be recorded?
-¿Qué trabajo puede cerrarse y facturarse?
+What financial outcome must be produced
+from successfully completed operational work?
+
+¿Qué resultado financiero debe producirse
+a partir del trabajo operativo completado con éxito?
 ```
 
-Owns: settlement · invoices (when Architecture opens).  
-Never owns: delivery status · kitchen units.
+Owns: Invoice · Credit Note · Payment Status · Billing Evidence · Financial Outcome  
+([BILLING_CAPABILITY](../05-architecture/BILLING_CAPABILITY.md) · ADR 0087 · Architecture Freeze).  
+Never owns: delivery status · kitchen units · ERP ledger · bank rails.
+
+**Final Operational Engine Capability** — Engine ends at Outcome.  
+Institutional close: [OPERATIONAL_ENGINE_001_RESERVED](./OPERATIONAL_ENGINE_001_RESERVED.md).
 
 ---
 
