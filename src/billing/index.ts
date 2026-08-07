@@ -1,31 +1,72 @@
 /**
- * Billing Capability — public contracts only (OPERATIONAL-007 · Phase 1).
+ * Billing Capability package — OPERATIONAL-007 Phase 2 (Facade).
+ * Public API for Operational Outcome settlement. LAW 002 · 003 · 006 · 007 · PRODUCT LAW 001.
  *
- * Architecture Freeze. No Facade · Commands · Queries · Services · Repositories · UI.
- * Final Operational Outcome Capability — closes the Operational Engine chain.
- *
- * @see docs/05-architecture/BILLING_CAPABILITY.md
- * @see docs/adr/0087-billing-capability.md
+ * Billing does not initiate the operational cycle.
+ * Billing certifies the financial outcome of completed work.
  */
 
-export type { BillingStatus } from "./contracts/BillingStatus";
-export type { PaymentStatus } from "./contracts/PaymentStatus";
-export type { InvoiceReference } from "./contracts/InvoiceReference";
 export type {
+  BillingStatus,
+  PaymentStatus,
+  InvoiceReference,
   BillingDocumentKind,
   InvoiceLine,
   BillingEvidence,
   BillingDocument,
-} from "./contracts/BillingDocument";
-export type { BillingSummary } from "./contracts/BillingSummary";
-export type {
+  BillingSummary,
   BillingCapabilityBits,
   FinancialOutcome,
   BillingContext,
-} from "./contracts/BillingContext";
-export type {
   BillingErrorCode,
   BillingError,
   BillingResult,
   BillingCommandResult,
-} from "./contracts/BillingResult";
+} from "./BillingContext";
+
+export type {
+  PrepareBillingCommand,
+  IssueInvoiceCommand,
+  CancelInvoiceCommand,
+  RegisterPaymentCommand,
+  MarkPaymentReceivedCommand,
+  ReopenBillingCommand,
+  BillingCommand,
+} from "./commands";
+
+export {
+  prepareBillingCommand,
+  issueInvoiceCommand,
+  cancelInvoiceCommand,
+  registerPaymentCommand,
+  markPaymentReceivedCommand,
+  reopenBillingCommand,
+} from "./commands";
+
+export type {
+  GetBillingQuery,
+  ListBillingsQuery,
+  SearchBillingsQuery,
+  GetInvoiceQuery,
+  GetPaymentStatusQuery,
+  ListPendingBillingQuery,
+  BillingQuery,
+} from "./queries";
+
+export {
+  getBillingQuery,
+  listBillingsQuery,
+  searchBillingsQuery,
+  getInvoiceQuery,
+  getPaymentStatusQuery,
+  listPendingBillingQuery,
+} from "./queries";
+
+export {
+  BillingFacade,
+  getBillingFacade,
+  resetBillingFacade,
+  type BillingFacadeDeps,
+} from "./BillingFacade";
+
+export { useBilling, type BillingFacadeApi } from "./useBilling";

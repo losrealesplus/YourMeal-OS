@@ -45,10 +45,11 @@ Roadmap Review (Engine Review) — continuous with Expansion
 2. FLOW-002 Engineering Certified ✅ (ADR 0083) · BH-001
 3. Delivery Capability Demo ✅ (ADR 0086 · `/admin/delivery-workspace`)
 4. Billing Architecture Freeze ✅ (ADR 0087 · `src/billing/contracts/`)
-5. Billing Facade → Certification → Demo ◀ next structural work
-6. FLOW-002 Flow Demo (parallel)
-7. FLOW-003 · **OPERATIONAL-ENGINE-001** Engine v1.0 Declaration ([reserved](./OPERATIONAL_ENGINE_001_RESERVED.md))
-8. Tenant Success / Beta 1 usability ([Time Savings Backlog](./TENANT_TIME_SAVINGS_BACKLOG.md))
+5. Billing Facade ✅ (ADR 0088 · `useBilling`)
+6. Billing Certification → Demo ◀ next structural work
+7. FLOW-002 Flow Demo (parallel)
+8. FLOW-003 · **OPERATIONAL-ENGINE-001** Engine v1.0 Declaration ([reserved](./OPERATIONAL_ENGINE_001_RESERVED.md))
+9. Tenant Success / Beta 1 usability ([Time Savings Backlog](./TENANT_TIME_SAVINGS_BACKLOG.md))
 ```
 
 We are not “starting Delivery”. We are **closing the Operational Engine**.

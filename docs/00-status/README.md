@@ -43,7 +43,7 @@
 **Product Direction:** ▶ **[PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md)** · PRODUCT LAW 001 · ADR [0084](../adr/0084-product-law-001.md) · [Time Savings Backlog](./TENANT_TIME_SAVINGS_BACKLOG.md)  
 **Operational Modules:** ▶ **[OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md)** · Delivery **Engineering Certified** (ADR 0078–0080) · Engine [v0.8](./OPERATIONAL_ENGINE_V08.md)  
 **Delivery Capability:** [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) · ADR 0078–0080 · **0086** · Demo `/admin/delivery-workspace` · `useDelivery()` · [Validation Report](../10-validation/DELIVERY_VALIDATION_REPORT.md)  
-**Billing Capability:** [BILLING_CAPABILITY](../05-architecture/BILLING_CAPABILITY.md) · ADR **0087** · Architecture Freeze · `src/billing/contracts/`  
+**Billing Capability:** [BILLING_CAPABILITY](../05-architecture/BILLING_CAPABILITY.md) · ADR **0087–0088** · Facade · `useBilling()` · [BILLING_FACADE](../05-architecture/BILLING_FACADE.md)  
 **Engine v1.0 Declaration:** [OPERATIONAL_ENGINE_001_RESERVED](./OPERATIONAL_ENGINE_001_RESERVED.md)  
 **FLOW-002:** [OPERATIONAL_FLOW_002](../05-architecture/OPERATIONAL_FLOW_002.md) · **Engineering Certified** (ADR 0083) · [Report](../10-validation/FLOW_002_VALIDATION_REPORT.md)  
 **Behaviours:** [Board](./OPERATIONAL_BEHAVIOUR_BOARD.md) · BH-001 Certified · [Scenarios](./OPERATIONAL_SCENARIO_REGISTRY.md) RESERVED  
