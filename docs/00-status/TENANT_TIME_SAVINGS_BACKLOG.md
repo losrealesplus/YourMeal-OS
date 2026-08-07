@@ -65,6 +65,7 @@ Every row must answer: **Does it save tenant time? How much? Which Beta?**
 | Nutrition Engine | Medium | High | Registered · GM | System calculates macros |
 | Route optimization | High | High | Registered · later | After Delivery Experience |
 | AI Assistant | High | High | GM | Only if laws proven |
+| **Universal Command Bar (⌘K)** | Very High | High | Registered · post-CX | Platform accelerator · not a Capability · open / order / call / history from one keystroke |
 
 ---
 

@@ -22,12 +22,14 @@ If PRODUCT LAW 001 returns time, every Experience has official KPIs in **seconds
 
 | Experience | Mission | Primary TTA |
 |------------|---------|-------------|
-| **Customer** | Zero Friction Customer Management | Create &lt; 30s |
+| **Customer** | Zero Friction Search (phase 002) | Find &lt; 10s |
 | **Order** | Create an operational commitment | &lt; 45s |
 | **Menu** | Plan one operational week | &lt; 2 min |
 | **Production** | Generate today's work | &lt; 1 min |
 | **Kitchen** | Know what to execute | &lt; 10s |
 | **Delivery** | Prepare today's routes | &lt; 2 min |
+
+Each Customer phase answers **one** measurable question — frequency first (Search before Edit).
 
 ---
 
@@ -61,24 +63,24 @@ If no → later.
 
 ## Active mission
 
-▶ [CUSTOMER_EXPERIENCE_001](./CUSTOMER_EXPERIENCE_001.md) · Zero Friction Customer Management · Create
+▶ [CUSTOMER_EXPERIENCE_002](./CUSTOMER_EXPERIENCE_002.md) · Zero Friction Customer Search  
+
+Prior: [CUSTOMER_EXPERIENCE_001](./CUSTOMER_EXPERIENCE_001.md) · Create ✅
 
 ## Customer Experience sequence
 
-Orders wait until Customer is fluid. Search is next — it runs far more often than create.
-
 ```text
-001 Create          ← active
+001 Create          ✅  ¿crear < 30s?
 ↓
-002 Search          ← next
+002 Search          ← active  ¿encontrar < 10s?
 ↓
-003 Edit
+003 Edit                ¿editar frecuente < 20s?
 ↓
-004 Company Management
+004 Company Management  ¿empresas sin duplicar?
 ↓
-005 Preferences
+005 Preferences         ¿completar ficha sin parar?
 ↓
-006 Bulk Operations
+006 Bulk Operations     ¿masivo sin reescribir?
 ↓
 then Order Experience
 ```

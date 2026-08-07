@@ -139,9 +139,12 @@ Production Timeline
 Preparation Inventory
 Order Templates
 Smart Suggestions
+Universal Command Bar (⌘K)   ← registered · platform-wide · not Customer-only
 ```
 
 They do not change the domain. They accelerate work. That is the essence of Era 2.
+
+**Universal Command Bar** (idea for after Customer is fluid / CX006 horizon): type a fragment → Open · Create Order · Call · History. Belongs to the **platform**, not one Capability.
 
 ---
 
