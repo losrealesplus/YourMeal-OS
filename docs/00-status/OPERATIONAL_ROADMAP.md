@@ -1,106 +1,82 @@
 # Operational Roadmap
 
-**Permanent · Operational Engine v0.8 frozen · ADR [0077](../adr/0077-operational-engine-v08.md)**  
+**Permanent · Operational Engine v1.0 DECLARED** · ADR [0090](../adr/0090-operational-engine-v1-declaration.md) · [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md)  
 **Product Direction:** [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md) · **PRODUCT LAW 001** · ADR [0084](../adr/0084-product-law-001.md) · [Time Savings Backlog](./TENANT_TIME_SAVINGS_BACKLOG.md)  
-**Companions:** [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) · [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) · [OPERATIONAL_VALIDATION_SPRINT](./OPERATIONAL_VALIDATION_SPRINT.md) · [OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md) · [FIELD_VALIDATION_LOG](../10-validation/FIELD_VALIDATION_LOG.md) · [FIELD_VALIDATION_002_IOS](../10-validation/FIELD_VALIDATION_002_IOS.md)
+**Companions:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) · [FIELD_VALIDATION_LOG](../10-validation/FIELD_VALIDATION_LOG.md) · [FIELD_VALIDATION_002_IOS](../10-validation/FIELD_VALIDATION_002_IOS.md)
 
 ---
 
 ## Era
 
 ```text
-Construction → Validation → Operational Expansion → Tenant Success
+Construction  →  COMPLETE (OPERATIONAL-ENGINE-001)
+Validation    →  ACTIVE
+Tenant Success → PRIMARY PRODUCT FOCUS
 ```
 
-From 2026-08-07 the governing product question is:
+Governing product question:
 
 > **¿Esto ayuda al tenant a trabajar mejor y más rápido?**
 
-Do not reorder Expansion modules for novelty. Architecture reopen only if Foundation broken · Production blocked · or measurable time savings require it.
+Architecture reopen only if Foundation broken · Production blocked · or measurable time savings require it (PRODUCT LAW 001).
 
 ---
 
-## Immediate roadmap
-
-### Product Direction (active)
+## Immediate roadmap (Tenant Success)
 
 ```text
-PRODUCT LAW 001 ACTIVE
-Finish Engine → v1.0 freeze → Tenant Success / Beta usability
+Android
+  ↓
+OPPO
+  ↓
+iPhone
+  ↓
+Isabella
+  ↓
+Tiempo ahorrado
+  ↓
+Beta 1
+  ↓
+Beta 2
+  ↓
+Golden Master
 ```
 
-### Validation / Cross-Platform (parallel)
+### Validation / Cross-Platform
 
 ```text
 Android / OPPO Field Validation ✅ PASS
 iPhone FIELD-VALIDATION-002 ⏳
 Engine FIELD VALIDATED 🔒 until both
-Roadmap Review (Engine Review) — continuous with Expansion
+Operational Evidence · Tenant Time Savings ◀ primary KPI
 ```
 
-### Operational Expansion → Engine v1.0
+### Construction history (complete)
 
 ```text
-1. Delivery Engineering Certified ✅ (ADR 0078–0080)
-2. FLOW-002 Engineering Certified ✅ (ADR 0083) · BH-001
-3. Delivery Capability Demo ✅ (ADR 0086 · `/admin/delivery-workspace`)
-4. Billing Architecture Freeze ✅ (ADR 0087 · `src/billing/contracts/`)
-5. Billing Facade ✅ (ADR 0088 · `useBilling`)
-6. Billing Engineering Certification ✅ (ADR 0089 · Capability Layer 100%)
-7. Billing Capability Demo ◀ next
-8. **OPERATIONAL-ENGINE-001** Engine v1.0 Declaration (after Demo · docs only)
-9. FLOW-002 Flow Demo (parallel)
-10. Tenant Success / Beta 1 usability ([Time Savings Backlog](./TENANT_TIME_SAVINGS_BACKLOG.md))
+1. Delivery Engineering Certified ✅
+2. FLOW-002 Engineering Certified ✅ · BH-001
+3. Delivery Capability Demo ✅
+4. Billing Architecture → Facade → Certification ✅
+5. Capability Layer 100% ✅
+6. OPERATIONAL-ENGINE-001 · Engine v1.0 Declaration ✅
 ```
 
-We are not “starting Delivery”. We are **closing the Operational Engine**.
+Remaining Demo / FLOW-003 items are **Validation & Experience**, not new Engine Construction.
 
-### Method (permanent)
+---
+
+## Method (permanent)
 
 ```text
 Observe → Design → Freeze → Facade/Harness → Engineering Certification
 → Demo → Field Validation → Cross-Platform Validation → Production
 ```
 
----
-
-## Certification phases
+For Product Core after v1.0:
 
 ```text
-PHASE A · Capability Certification     ████████████████ COMPLETE
-PHASE B · Operational Flow Validation  ████████████████ FLOW-001 + FLOW-002 Certified
-ERA 4  · Operational Behaviours        ████████░░░░░░░░ BH-001 Certified
-PHASE C · Real Tenant Validation       ░░░░░░░░░░░░░░░░
+Problem → Time lost → Solution → Time recovered → Evidence
 ```
 
----
-
-## FLOW-001 track
-
-```text
-Architecture (ADR 0074)              ✅
-Harness (ADR 0075)                   ✅
-Engineering Certification (ADR 0076) ✅
-Flow Demo                            ← parallel prefer
-```
-
----
-
-## FLOW-002 track · Operational Fulfillment Flow
-
-```text
-Architecture (ADR 0081)              ✅
-Harness (ADR 0082)                   ✅
-Engineering Certification (ADR 0083) ✅
-Flow Demo                            ← next
-Behaviour: BH-001 Fulfill Weekly Commitment ✅
-Ends at: Delivery Confirmation (not Billing)
-```
-
----
-
-## Success question (field)
-
-> **¿Una persona de EatClean puede recorrer un flujo completo en Android y en iPhone y decir: “Esto me ahorra tiempo y entiendo perfectamente qué tengo que hacer”?**
-
-Product Law: [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md) · ADR [0084](../adr/0084-product-law-001.md).
+See [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md) · Operational Impact on PRs.

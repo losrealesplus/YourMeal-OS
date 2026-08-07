@@ -36,7 +36,7 @@ Source: [FOUNDATION_LOCK](../05-architecture/FOUNDATION_LOCK.md)
 
 **Constitution note:** LAW 001–007 form a complete system. Do not add Foundation Laws unless real tenant evidence proves the current set insufficient.
 
-**Era:** Operational Engine **v0.8** frozen — Validation, not more architecture. See [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md).
+**Era:** Operational Engine **v1.0** DECLARED — Construction COMPLETE · focus **Tenant Success**. See [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md).
 
 
 ---

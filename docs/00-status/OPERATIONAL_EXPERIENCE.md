@@ -40,7 +40,7 @@ We may still touch Foundation. It is no longer the protagonist.
 | Kitchen Execution | **Engineering Certified + Demo** (ADR 0072–0073) |
 | Delivery | **Capability Demo** (ADR 0086 · `/admin/delivery-workspace`) |
 | Billing | **Engineering Certified** (ADR 0089 · Outcome · Capability Layer 100%) |
-| Engine v1.0 Declaration | RESERVED · [OPERATIONAL_ENGINE_001](./OPERATIONAL_ENGINE_001_RESERVED.md) |
+| Engine v1.0 Declaration | ✅ DECLARED · [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) |
 
 ---
 

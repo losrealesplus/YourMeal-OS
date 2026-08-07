@@ -1,24 +1,32 @@
 # Operational Engine
 
-**v0.8:** ✅ **DECLARED** — [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) · ADR [0077](../adr/0077-operational-engine-v08.md)  
-**v1.0 status:** Target milestone — not yet achieved (requires Delivery · Billing + flows)  
-**Panel:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md)
+**v1.0:** ✅ **DECLARED / CERTIFIED / ARCHITECTURE FROZEN** — [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) · ADR [0090](../adr/0090-operational-engine-v1-declaration.md) · OPERATIONAL-ENGINE-001  
+**v0.8:** Historic — [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) · ADR [0077](../adr/0077-operational-engine-v08.md)  
+**Panel:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md)  
+**Product focus:** **Tenant Success** · [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md)
 
 ---
 
-## Official declaration (v0.8)
+## Official declaration (v1.0)
 
 ```text
-Operational Engine v0.8 is frozen.
+Construction Phase
+COMPLETE
 
-The certified operational core exists:
-Identity → Customer → Orders → Production → Kitchen
-+ FLOW-001
+Operational Engine
+CERTIFIED
 
-Not complete.
-Complete enough to validate on real devices.
+Architecture
+FROZEN
 
-Era: Validation — not more architecture.
+Primary Product Focus
+Tenant Success
+```
+
+```text
+The motor exists.
+We no longer build the Engine as the project center.
+We validate it and return operational time to tenants.
 ```
 
 ---
@@ -31,21 +39,29 @@ Customers          ████████████████████�
 Orders             ██████████████████████  Engineering Certified + Demo
 Production         ██████████████████████  Engineering Certified + Demo
 Kitchen Execution  ██████████████████████  Engineering Certified + Demo
+Delivery           ██████████████████████  Engineering Certified + Demo
+Billing            ██████████████████████  Engineering Certified
 FLOW-001           ██████████████████████  Engineering Certified
-Delivery           ░░░░░░░░░░░░░░░░░░░░░░  GATED
-Billing            ░░░░░░░░░░░░░░░░░░░░░░  GATED
+FLOW-002           ██████████████████████  Engineering Certified · BH-001
+```
+
+```text
+Operational Engine
+Capability Completion
+████████████████████
+100%
 ```
 
 ---
 
-## Engine Completion
+## Engine Completion (layers)
 
 ```text
 Context                 ████████████████
 Business Entity         ████████████████
 Operational Planning    ████████████████
-Operational Execution   ████████████░░░░  (Kitchen · Delivery gated)
-Operational Outcome     ░░░░░░░░░░░░░░░░
+Operational Execution   ████████████████
+Operational Outcome     ████████████████
 ```
 
 ---
@@ -53,21 +69,22 @@ Operational Outcome     ░░░░░░░░░░░░░░░░
 ## Certification phases
 
 ```text
-PHASE A · Capability Certification     ████████████████  COMPLETE
-PHASE B · Operational Flow Validation  ████████████░░░░  FLOW-001 Certified · Demo next
-PHASE C · Real Tenant Validation       ░░░░░░░░░░░░░░░░
+PHASE A · Capability Certification     ████████████████  COMPLETE (Identity→Billing)
+PHASE B · Operational Flow Validation  ████████████░░░░  FLOW-001/002 Certified · Demos / FLOW-003 → Validation era
+PHASE C · Real Tenant Validation       ░░░░░░░░░░░░░░░░  Tenant Success era
 ```
 
 ---
 
-## Immediate roadmap (do not reorder)
+## Immediate roadmap (Tenant Success)
 
 ```text
-FLOW Demo → Engine Review → Android → OPPO → iPhone
-→ Real Tenant Validation → Delivery
+Android → OPPO → iPhone → Isabella → Time saved → Beta 1 → Beta 2 → Golden Master
 ```
 
-See [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md).
+Architecture reopen only: Foundation broken · production blocked · PRODUCT LAW 001 time savings.
+
+See [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) · [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md).
 
 ---
 
@@ -76,5 +93,5 @@ See [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md).
 | Declaration | When |
 |-------------|------|
 | **Engine exists** | Planning certified (historic) |
-| **Engine v0.8** | Identity→Kitchen + FLOW-001 Engineering Certified (✅ now) |
-| **Engine v1.0** | Full chain through Billing + flows certified · FAIL = 0 |
+| **Engine v0.8** | Identity→Kitchen + FLOW-001 Engineering Certified (historic) |
+| **Engine v1.0** | ✅ Identity→Billing Engineering Certified · FLOW-001/002 Certified · Construction COMPLETE (this declaration) |
