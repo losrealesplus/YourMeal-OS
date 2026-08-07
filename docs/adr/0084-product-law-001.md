@@ -26,14 +26,19 @@ If it does not save operational time, it is not Product Core.
 4. Mantener Foundation Laws 001–007 congeladas (sin nuevas Laws salvo evidencia tenant / insuficiencia objetiva).  
 5. Arquitectura solo se reabre si: Foundation Law rota · Production bloqueada · o un ahorro medible de tiempo lo exige.  
 6. Tras Operational Engine v1.0 (Delivery Demo + Billing + Flow completion): **Architecture Frozen** — foco Tenant Success / usabilidad / field.  
-7. Métrica de éxito pasa de “Engineering Certified” a “tenant saves time / fewer mistakes / finishes earlier”.
+7. Métrica de éxito pasa de “Engineering Certified” a “tenant saves time / fewer mistakes / finishes earlier”.  
+8. Declarar las **tres constituciones**: Developer Platform · Foundation Laws · PRODUCT LAW 001.  
+9. Exigir sección **Operational Impact** en PRs de Product Core.  
+10. Introducir **Operational Review** (“¿el operador termina antes?”) junto a Engineering Review.  
+11. Alinear Delivery al cierre de Engine v1.0 (ADR [0085](./0085-delivery-engine-v1-alignment.md)) — Demo next, no reinicio de Architecture.
 
 ## Consecuencias
 
 - Ideas interesantes sin ahorro de tiempo no entran a Product Core.  
 - Engineering Certification sigue siendo necesario — ya no es suficiente.  
 - Beta mide fricción operativa, no solo bugs.  
-- EatClean valida; el diseño permanece multi-tenant.
+- EatClean valida; el diseño permanece multi-tenant.  
+- GitHub habla el idioma del producto (tiempo recuperado).
 
 ## Referencias
 

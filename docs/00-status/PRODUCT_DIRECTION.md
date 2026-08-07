@@ -68,8 +68,142 @@ If it does not save operational time,
 it is not Product Core.
 ```
 
+```text
+Time is the primary currency of the tenant.
+YourMeal OS exists to return that currency.
+```
+
 This Law sits **above** feature taste and **beside** Foundation Laws 001–007.  
 Foundation remains the engineering constitution. PRODUCT LAW 001 is the product constitution.
+
+---
+
+## Three constitutions
+
+YourMeal OS now has three complementary constitutions:
+
+```text
+1. Developer Constitution
+   Developer Platform
+   → How we develop
+
+2. Engineering Constitution
+   Foundation Laws 001–007
+   → How we design
+
+3. Product Constitution
+   PRODUCT LAW 001
+   → Why we develop
+```
+
+```text
+Developer Platform
+        ↓
+Foundation
+        ↓
+Product Direction
+        ↓
+Operational Engine
+        ↓
+Tenant Success
+```
+
+That stack is no longer only a roadmap. It is a **company philosophy**.
+
+---
+
+## How PRs must justify themselves
+
+Before PRODUCT LAW 001, a PR could be justified as:
+
+```text
+New screen · New CRUD · New table
+```
+
+From today, Product Core PRs should answer:
+
+```text
+Problem
+  ↓
+Time lost
+  ↓
+Solution
+  ↓
+Time recovered
+  ↓
+Evidence
+```
+
+See GitHub PR template · **Operational Impact** section.
+
+---
+
+## Operational Evidence (new evidence class)
+
+Engineering evidence remains required:
+
+```text
+PASS · Tests · Coverage · Engineering Certification
+```
+
+A second class now exists:
+
+```text
+Operational Evidence
+```
+
+Example:
+
+```text
+Customer creation
+Before   2m 15s
+After      28s
+Evidence OPPO Validation / operator stopwatch
+```
+
+Operational Evidence is more valuable for SaaS product decisions than coverage alone.
+
+---
+
+## Operational Review
+
+Alongside Engineering Review, the project adopts **Operational Review**.
+
+| Review | Question |
+|--------|----------|
+| Engineering Review | Is the code / architecture correct? |
+| **Operational Review** | **Does the operator finish earlier?** |
+
+---
+
+## Beta release notes (future format)
+
+When Beta 1 ships, prefer **Tenant Time Saved** over traditional feature lists:
+
+```text
+Tenant Time Saved · Beta 1
+✓ Customer creation     -82%
+✓ Weekly planning       -71%
+✓ Order editing         -68%
+✓ Production planning   -55%
+```
+
+Not:
+
+```text
+Added Orders API
+Fixed issue #432
+```
+
+---
+
+## Final principle (product)
+
+```text
+We do not build features.
+We remove operational friction.
+Time saved is the product.
+```
 
 ---
 
@@ -316,6 +450,12 @@ any train will take us there.
 We do know where we are going.
 ```
 
+```text
+We do not build features.
+We remove operational friction.
+Time saved is the product.
+```
+
 We are not building software for its own sake.
 
 We are building the **operating system that allows food businesses to recover time, reduce mistakes, and scale their operation**.
@@ -330,9 +470,27 @@ Every line of code from today forward must contribute to that mission.
 
 ---
 
+## Closing the Operational Engine (honest next steps)
+
+We are **not** “starting Delivery”.  
+We are **closing Operational Engine v1.0**.
+
+| Capability | Engineering | Next for Engine v1.0 |
+|------------|-------------|----------------------|
+| Identity → Kitchen | Certified (+ Demos where applicable) | Usability under PRODUCT LAW 001 |
+| **Delivery** | **Engineering Certified** (ADR 0078–0080) | **Capability Demo** · Product UI later |
+| **Billing** | Pending | Architecture → … → Demo |
+| FLOW-002 | Engineering Certified | Flow Demo |
+| FLOW-003 | Pending | After Billing |
+
+See [ADR 0085](../adr/0085-delivery-engine-v1-alignment.md) — Delivery as controlled transfer of responsibility · Demo unlocks Engine path.
+
+---
+
 ## Related
 
 * [ADR 0084](../adr/0084-product-law-001.md) · PRODUCT LAW 001  
+* [ADR 0085](../adr/0085-delivery-engine-v1-alignment.md) · Delivery → Engine v1.0  
 * [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md)  
 * [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)  
 * [OPERATIONAL_EXPERIENCE](./OPERATIONAL_EXPERIENCE.md)

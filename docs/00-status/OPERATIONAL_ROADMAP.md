@@ -41,14 +41,16 @@ Roadmap Review (Engine Review) — continuous with Expansion
 ### Operational Expansion → Engine v1.0
 
 ```text
-1. OPERATIONAL-006 Delivery · Architecture ✅ · Facade ✅ · Certification ✅
-2. FLOW-002 · Architecture ✅ · Harness ✅ · Certification ✅ (ADR 0083)
-3. Delivery Capability Demo ◀ remaining for Delivery completeness
-4. FLOW-002 Flow Demo ◀ next
+1. Delivery Engineering Certified ✅ (ADR 0078–0080)
+2. FLOW-002 Engineering Certified ✅ (ADR 0083) · BH-001
+3. Delivery Capability Demo ◀ next (ADR 0085 · close Engine path)
+4. FLOW-002 Flow Demo (parallel)
 5. OPERATIONAL-007 Billing (Architecture → Demo)
-6. FLOW-003 · Engine v1.0 Architecture Frozen
+6. FLOW-003 · declare Operational Engine v1.0 Architecture Frozen
 7. Tenant Success / Beta 1 usability ([Time Savings Backlog](./TENANT_TIME_SAVINGS_BACKLOG.md))
 ```
+
+We are not “starting Delivery”. We are **closing the Operational Engine**.
 
 ### Method (permanent)
 

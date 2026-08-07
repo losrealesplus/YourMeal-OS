@@ -145,7 +145,7 @@ iPhone Field Validation (parallel · not blocking Certification)
 
 ## Immediate next steps (parallel)
 
-1. **Finish Engine path** — Delivery Demo · Billing · Engine v1.0 freeze ([PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md))  
+1. **Finish Engine path** — Delivery **Demo** (ADR 0085) · Billing · Engine v1.0 freeze ([PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md))  
 2. **FLOW-002 Phase 4** — Flow Demo (`useFlow002` only)  
 3. **Tenant time savings** — [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md) · Beta 1 usability  
 4. **IOS-READY / FIELD-VALIDATION-002** — [guide](../10-validation/FIELD_VALIDATION_002_IOS.md)
