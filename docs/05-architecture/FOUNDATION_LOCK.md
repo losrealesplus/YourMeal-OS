@@ -448,3 +448,13 @@ Production → Delivery
 | OPERATIONAL-FLOW-003 | Delivery → Billing | DeliveryFacade · BillingFacade |
 
 LAW 007 is the bridge from **Capability Certification** (Phase A) to **Operational Flow Validation** (Phase B).
+
+---
+
+## Product constitution (not a Foundation Law)
+
+Foundation Laws 001–007 remain the engineering constitution and stay frozen.
+
+Product decisions additionally obey **PRODUCT LAW 001** (tenant operational time):
+
+→ [PRODUCT_DIRECTION](../00-status/PRODUCT_DIRECTION.md) · ADR [0084](../adr/0084-product-law-001.md) · [TENANT_TIME_SAVINGS_BACKLOG](../00-status/TENANT_TIME_SAVINGS_BACKLOG.md)

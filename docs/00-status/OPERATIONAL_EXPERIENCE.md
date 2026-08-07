@@ -1,7 +1,8 @@
 # Operational Experience
 
 **Declared:** 2026-08-06 · ADR [0061](../adr/0061-customer-workspace-demo.md)  
-**Center of the project (from today):**
+**Product Direction (from 2026-08-07):** [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md) · PRODUCT LAW 001 · Tenant Success  
+**Center of the project:**
 
 ```text
 YourMeal OS
@@ -10,15 +11,13 @@ Platform
         │
 Foundation
         │
-Operational Capabilities
+Operational Capabilities / Flows / Behaviours
         │
-Operational Experience   ← we are here
+Operational Experience   ← usability lives here
         │
 Operational Validation
         │
-Production
-        │
-Tenant Success
+Tenant Success           ← product success metric
 ```
 
 ---
