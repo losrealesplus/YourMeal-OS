@@ -1,135 +1,107 @@
 # Sprint 001 · Tenant Success
 
-**Status:** ▶ **ACTIVE** — first Era 2 sprint (hybrid)  
-**Declared:** 2026-08-07  
-**Observation:** [OBSERVATION_FRAMEWORK](../tenant-success/OBSERVATION_FRAMEWORK.md) · TENANT-SUCCESS-001 · ADR [0095](../adr/0095-tenant-success-001-observation-framework.md)  
+**Status:** ▶ **ACTIVE** — Era 2 · Experience Sprint mode  
+**Declared:** 2026-08-07 · corrected same day (LAW 001-A)  
+**Active epic:** [CUSTOMER_EXPERIENCE_001](./CUSTOMER_EXPERIENCE_001.md)  
+**Observation instrument (ready, sessions deferred):** [OBSERVATION_FRAMEWORK](../tenant-success/OBSERVATION_FRAMEWORK.md) · ADR [0095](../adr/0095-tenant-success-001-observation-framework.md)  
+**LAW 001-A:** ADR [0096](../adr/0096-tenant-success-law-001a.md)  
 **Discovery:** [ERA2_PRODUCT_DISCOVERY_001](./ERA2_PRODUCT_DISCOVERY_001.md)  
-**Laws:** PRODUCT LAW 001 · PRODUCT LAW 002 · TENANT SUCCESS LAW 001 · TEAM LAW 001  
-**Prompt header:** [ERA2_CURSOR_PROMPT](./ERA2_CURSOR_PROMPT.md)  
-**Playbook:** [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md)
+**Prompt:** [ERA2_CURSOR_PROMPT](./ERA2_CURSOR_PROMPT.md)
 
 ```text
-We will not rush.
-We will not try to do ten things in a day.
-We will build the best product possible.
-
-Architecture is frozen.
-This sprint designs better workdays.
+Experience Sprint = build
+Observation Sprint = learn
+Never mixed.
 ```
 
 ---
 
-## Strict order (Era 2)
+## Era 2 roadmap (corrected)
 
 ```text
-1. Operational Observation Framework     ▶ TENANT-SUCCESS-001
-2. Isabella Observation Session          (scheduled — not yet)
-3. Sara Observation Session
-4. Tenant Success Backlog (evidence)
-5. Experience sprints with Measure Again
+Framework                         ✅ TENANT-SUCCESS-001
+↓
+Customer Experience               ▶ CUSTOMER EXPERIENCE 001
+↓
+Order Experience
+↓
+Menu Experience
+↓
+Production Experience
+↓
+Kitchen Experience
+↓
+Delivery Experience
+↓
+Android APK
+↓
+OPPO
+↓
+Internal Dogfooding
+↓
+Isabella Observation              ⏸ after usable workflows (LAW 001-A)
+↓
+Sara Observation
+↓
+Tenant Backlog (evidence)
 ```
 
-TENANT SUCCESS LAW 001: we do **not** pretend ideas are evidence.  
-We still may develop in parallel on **known daily jobs** (hybrid).
+---
+
+## Two sprint types
+
+| Type | Purpose | Example |
+|------|---------|---------|
+| **Experience Sprint** | Build a coherent, usable workflow with a time metric | CUSTOMER EXPERIENCE 001 · &lt; 30s |
+| **Observation Sprint** | Measure real operator friction on usable workflows | Isabella · Sara sessions |
+
+Never run both as one sprint. Building + observing together invites intuition-justified changes.
 
 ---
 
-## Hybrid tracks (2026-08-07)
-
-| Track | Owner | Status |
-|-------|-------|--------|
-| **A · Observation Framework** | Product methodology | ▶ ACTIVE · docs/tenant-success/ |
-| **B · Customer Experience** | Development (Facade UI) | ▶ PARALLEL · known daily alta/mantenimiento |
-
-Track B does **not** claim observation evidence until Isabella sessions are measured.
-
----
-
-## Sprint goal
-
-1. Institutionalize **one official way** to discover where tenants lose time.  
-2. In parallel, improve **Customer Experience** on existing CustomerFacade (create / search / segment / honest gaps for edit·prefs·restrictions).  
-
-Not Accelerators. Not AI. Not Import Pipeline.
-
----
-
-## Definition of Done (Era 2)
+## Active metric (Customer)
 
 ```text
-Before                         Now
-Tests PASS                     The operator finishes earlier
+Objetivo
+
+Reducir el tiempo de alta y gestión de clientes
+por debajo de 30 segundos
+para las tareas más frecuentes.
 ```
 
-Framework DoD: every future product decision can use measurable operational evidence.  
-Experience DoD: intuitive · fewer steps · less doubt · time saved (+ Engineering Evidence).
+---
+
+## Experience time targets (chain)
+
+| Experience | Target |
+|------------|--------|
+| Customer | &lt; 30 seconds |
+| Order | &lt; 45 seconds |
+| Menu | &lt; 2 minutes |
+| Production | &lt; 1 minute |
+| Kitchen | &lt; 10 seconds |
+| Delivery (route ready) | &lt; 2 minutes |
 
 ---
 
 ## What we will not touch
 
-Unless observation proves that changing it returns more operational time than it costs — and still passes the Laws:
-
-* Foundation  
-* Developer Platform  
-* Operational Engine  
-* Capabilities (new)  
-* Flows (new Construction)  
+* Foundation · Developer Platform · Operational Engine Construction  
+* New Capabilities  
+* Isabella Observation until LAW 001-A gate passes  
+* Accelerators as primary work  
 
 ---
 
-## Epics
+## Definition of Done
 
-### Epic 0 · Observation Framework (TENANT-SUCCESS-001)
-
-**Objective:** Create the instrument that discovers the correct features.
-
-Deliverables: OBSERVATION_FRAMEWORK · TENANT_OBSERVATION_TEMPLATE · FRICTION_CATALOG · TIME_SAVINGS_SCORE.
-
----
-
-### Epic 1 · Customer Experience (parallel)
-
-**Objective:** Create and manage customers without thinking about the database.
-
-Stories:
-
-* Create customer (session ensure · company provision via Facade)  
-* Edit customer (honest UNIMPLEMENTED until substrate — do not fake)  
-* Search customer  
-* Segment customer (Individual · Company · tags / employee)  
-* Addresses / Preferences / Restrictions — surface what exists; no Architecture reopen  
-* Operational notes (when available)  
-* Company · Employees  
-
----
-
-### Epic 2–6 · Order · Menu · Production · Kitchen · Delivery
-
-Deferred until observation evidence or an explicit hybrid decision. Objectives unchanged from Discovery 001.
-
----
-
-## Registered for later (Accelerators)
-
-See [ERA2_PRODUCT_DISCOVERY_001](./ERA2_PRODUCT_DISCOVERY_001.md).
-
----
-
-## Working rhythm
-
-```text
-Observe Tenant → Measure → Understand → Prototype
-→ Validate → Measure Again → Ship
-```
-
-Mandatory prompt: [ERA2_CURSOR_PROMPT](./ERA2_CURSOR_PROMPT.md).
+Experience Sprint: coherent usable path + visible time objective + Engineering Evidence.  
+Observation Sprint (later): measured friction on **finished** workflows only.
 
 ---
 
 ## Related
 
+* [CUSTOMER_EXPERIENCE_001](./CUSTOMER_EXPERIENCE_001.md)  
 * [CURRENT_PHASE](./CURRENT_PHASE.md)  
-* [OBSERVATION_FRAMEWORK](../tenant-success/OBSERVATION_FRAMEWORK.md)  
-* [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md)  
-* [ERA_DECLARATION](./ERA_DECLARATION.md)
+* [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md)

@@ -37,6 +37,11 @@ PRODUCT LAW 002
 TENANT SUCCESS LAW 001
 TEAM LAW 001
 
+Also respect when observing:
+
+TENANT SUCCESS LAW 001-A
+Never observe unfinished workflows.
+
 The question is no longer:
 
 "How do we build this?"
@@ -45,6 +50,9 @@ The question is:
 
 "How does this save operational time?"
 ```
+
+Experience Sprints carry a visible time metric (e.g. Customer &lt; 30s).  
+Observation Sprints wait until workflows are realistically usable.
 
 ---
 

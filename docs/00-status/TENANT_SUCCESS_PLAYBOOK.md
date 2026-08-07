@@ -125,14 +125,38 @@ until the improvement has been measured again.
 
 **ADR:** [0092](../adr/0092-tenant-success-law-001.md)
 
+### TENANT SUCCESS LAW 001-A
+
+```text
+Never observe unfinished workflows.
+
+Observe only workflows
+that are realistically usable.
+
+Otherwise,
+you measure missing implementation,
+not operational friction.
+```
+
+**ADR:** [0096](../adr/0096-tenant-success-law-001a.md)
+
 Natural extension of the Operational Evidence Loop.  
-Belief is not enough. Improvement must be demonstrated.
+Belief is not enough. Improvement must be demonstrated.  
+Unfinished workflows are not valid observation subjects.
+
+Era 2 sprint types:
+
+* **Experience Sprint** — build a usable workflow with a time metric  
+* **Observation Sprint** — learn from a realistically usable workflow  
+
+Never mixed.
 
 Era 1 taught us to build correctly.  
-Era 2 demands something harder: **decide what not to build.**
+Era 2 demands something harder: **decide what not to build** — and **when not to observe yet**.
 
 PRODUCT LAW 001 forbids Product Core features by intuition alone.  
-TENANT SUCCESS LAW 001 forbids accepting claims without measurement.
+TENANT SUCCESS LAW 001 forbids accepting claims without measurement.  
+TENANT SUCCESS LAW 001-A forbids observing missing implementation as if it were operational friction.
 
 Every Product Core decision must answer with evidence:
 
@@ -142,6 +166,8 @@ Every Product Core decision must answer with evidence:
 * How will we measure again afterwards?
 
 If a change cannot answer those questions, it does not belong in Product Core.
+
+Active Experience Sprint: [CUSTOMER_EXPERIENCE_001](./CUSTOMER_EXPERIENCE_001.md) · alta/gestión **&lt; 30 seconds**.
 
 ---
 
