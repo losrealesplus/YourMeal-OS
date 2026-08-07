@@ -11,6 +11,8 @@
 | **[ERA2_PRODUCT_DISCOVERY_001](./ERA2_PRODUCT_DISCOVERY_001.md)** | **First Discovery** · Accelerators registered |
 | **[SPRINT_001_TENANT_SUCCESS](./SPRINT_001_TENANT_SUCCESS.md)** | Era 2 sprint board · Experience vs Observation |
 | **[CUSTOMER_EXPERIENCE_001](./CUSTOMER_EXPERIENCE_001.md)** | **Active** · Zero Friction · TTC &lt; 30s |
+| [CUSTOMER_EXPERIENCE_001_PHASE1](./CUSTOMER_EXPERIENCE_001_PHASE1.md) | Phase 1 implementation · Experience only |
+| [EXPERIENCE_CARDS](./EXPERIENCE_CARDS.md) | User-facing product map (30s cards) |
 | [EXPERIENCE_MISSIONS](./EXPERIENCE_MISSIONS.md) | Era 2 missions · TTA KPIs · EXPERIENCE LAW 001 |
 | [EXPERIENCE_MANIFESTO](./EXPERIENCE_MANIFESTO.md) | **Invisible software** · ADR 0099 |
 | [ERA2_EXPERIENCE_PROMPT](./ERA2_EXPERIENCE_PROMPT.md) | Experience mission prompt header |
