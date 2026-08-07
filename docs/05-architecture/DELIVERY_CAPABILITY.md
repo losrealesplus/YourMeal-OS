@@ -1,17 +1,18 @@
 # Delivery Capability
 
-**OPERATIONAL-006 · Phase 2 — Facade**  
-**ADR:** [0078](../adr/0078-delivery-capability.md) · [0079](../adr/0079-delivery-facade.md)  
-**Status:** **Facade** (Architecture → Facade)  
+**OPERATIONAL-006 · Phase 3 — Engineering Certification**  
+**ADR:** [0078](../adr/0078-delivery-capability.md) · [0079](../adr/0079-delivery-facade.md) · [0080](../adr/0080-delivery-engineering-certification.md)  
+**Status:** **Engineering Certified** (Architecture → Facade → Certification)  
 **Depends on:** Kitchen Execution (Engineering Certified + Demo) · Orders (Engineering Certified + Demo)  
 **Provides toward:** Billing · FLOW-002  
 **Tenant lens:** any meal-prep / catering tenant with operational commitments to fulfill physically  
 **EatClean lens:** weekly meal prep · confirm that prepared work reaches the right stop  
 **Layer / Type:** **Operational Execution** (second Execution capability after Kitchen)  
-**Maturity:** Architecture → **Facade** → Engineering Certified → Field Validated → Production Ready  
-**Completeness:** Architecture ✅ · **Facade ✅** · Engineering Certification ⏳ · Capability Demo ⏳ · Product UI ⏳ · Field ⏳  
+**Maturity:** Architecture → Facade → **Engineering Certified** → Field Validated → Production Ready  
+**Completeness:** Architecture ✅ · Facade ✅ · **Engineering Certification ✅** · Capability Demo ⏳ · Product UI ⏳ · Field ⏳  
 **Laws:** 001–007 · [FOUNDATION_LOCK](./FOUNDATION_LOCK.md)  
 **Package:** `src/delivery/` · `DeliveryFacade` · `useDelivery`  
+**Validation:** [DELIVERY_VALIDATION_REPORT](../10-validation/DELIVERY_VALIDATION_REPORT.md) · [DELIVERY_SMOKE_CHECKLIST](../10-validation/DELIVERY_SMOKE_CHECKLIST.md)  
 **Dictionary:** [OPERATIONAL_LANGUAGE_DICTIONARY](../00-status/OPERATIONAL_LANGUAGE_DICTIONARY.md)
 
 ```text
@@ -364,9 +365,9 @@ If a feature does not reduce “lost deliveries”, confirmation time, or operat
 |-------|--------|--------|
 | **1 · Architecture Freeze** | This document · ADR 0078 · Registry | ✅ |
 | **2 · Facade** | `DeliveryFacade` · Commands / Queries · ADR 0079 | ✅ |
-| 3 · Engineering Certification | Validation matrix | Next |
-| 4 · Capability Demo | `/admin/delivery-workspace` (name TBD) | After Certification |
-| 5 · FLOW-002 | Production → Kitchen → Delivery Harness | After Delivery Certification (+ prefer Demo) |
+| **3 · Engineering Certification** | Validation matrix · ADR 0080 | ✅ |
+| 4 · Capability Demo | `/admin/delivery-workspace` (name TBD) | Next |
+| 5 · FLOW-002 | Order → Production → Kitchen → Delivery → Confirmation | After Certification (+ prefer Demo) |
 
 ### Facade substrate (Phase 2)
 
@@ -394,14 +395,18 @@ If a feature does not reduce “lost deliveries”, confirmation time, or operat
 
 | Panel | Change |
 |-------|--------|
-| Capability Registry | Delivery → **Facade** · OPERATIONAL-006 · ADR 0079 |
-| Dependency Graph | Delivery node Facade · deps OrderFacade + KitchenExecutionFacade |
-| Operational Expansion | Facade Soft-Live · Certification next |
+| Capability Registry | Delivery → **Engineering Certified** · OPERATIONAL-006 · ADR 0080 |
+| Dependency Graph | Delivery node Engineering Certified |
+| Operational Expansion | Certification ✅ · Demo next |
 | Language Dictionary | Delivery question locked |
-| FLOW-002 | Remains Pending until Certification |
+| FLOW-002 | Unlocked for design after Certification · prefer Demo |
 | Engine v0.8 | Unchanged core freeze · Expansion is additive |
 
 ---
+
+## Success of Phase 3
+
+Phase 3 succeeds when the validation matrix is FAIL=0, expected gaps are UNIMPLEMENTED (not FAIL), and Registry maturity is Engineering Certified.
 
 ## Success of Phase 2
 
