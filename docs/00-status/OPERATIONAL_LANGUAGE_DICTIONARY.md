@@ -107,11 +107,12 @@ a partir del trabajo operativo completado con éxito?
 ```
 
 Owns: Invoice · Credit Note · Payment Status · Billing Evidence · Financial Outcome  
-([BILLING_CAPABILITY](../05-architecture/BILLING_CAPABILITY.md) · [BILLING_FACADE](../05-architecture/BILLING_FACADE.md) · ADR 0087–0088 · **Facade**).  
+([BILLING_CAPABILITY](../05-architecture/BILLING_CAPABILITY.md) · [BILLING_FACADE](../05-architecture/BILLING_FACADE.md) · ADR 0087–0089 · **Engineering Certified**).  
 Never owns: delivery status · kitchen units · ERP ledger · bank rails.
 
 **Final Operational Engine Capability** — Engine ends at Outcome.  
-**Passive:** Billing does not initiate — it certifies cycle completion.  
+**Passive / backward:** Billing does not initiate — it certifies cycle completion.  
+**Capability Layer:** 100% (Identity→Billing Engineering Certified).  
 Institutional close: [OPERATIONAL_ENGINE_001_RESERVED](./OPERATIONAL_ENGINE_001_RESERVED.md).
 
 ---

@@ -139,10 +139,10 @@ iPhone Field Validation (parallel · not blocking Certification)
 | FLOW-002 **Flow Demo** | 🔒 Phase 4 |
 | Billing **Architecture Freeze** | ✅ ADR 0087 · `src/billing/contracts/` |
 | Billing **Facade** | ✅ ADR 0088 · `BillingFacade` · `useBilling()` |
-| Billing **Engineering Certification** | 🔒 Phase 3 |
+| Billing **Engineering Certification** | ✅ ADR 0089 · FAIL=0 · Capability Layer 100% |
 | Billing **Capability Demo** | 🔒 Phase 4 |
-| FLOW-003 | 🔒 After Billing Certification preferido |
-| **OPERATIONAL-ENGINE-001** (v1.0 Declaration) | 🔒 RESERVED · ceremonial certification docs |
+| FLOW-003 | 🔒 After Billing Demo preferido |
+| **OPERATIONAL-ENGINE-001** (v1.0 Declaration) | 🔒 After Billing Demo · ceremonial docs only |
 | Scenarios | 🔒 RESERVED |
 | Engine **FIELD VALIDATED** | 🔒 | Android + iPhone PASS |
 | Claiming Production Authorization | 🔒 | Governance |
@@ -151,7 +151,7 @@ iPhone Field Validation (parallel · not blocking Certification)
 
 ## Immediate next steps (parallel)
 
-1. **Finish Engine path** — Billing **Certification → Demo** · then **OPERATIONAL-ENGINE-001** ([reserved](./OPERATIONAL_ENGINE_001_RESERVED.md))  
+1. **Finish Engine path** — Billing **Demo** · then **OPERATIONAL-ENGINE-001** ([reserved](./OPERATIONAL_ENGINE_001_RESERVED.md))  
 2. **FLOW-002 Phase 4** — Flow Demo (`useFlow002` only)  
 3. **Tenant time savings** — [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md) · Beta 1 usability  
 4. **IOS-READY / FIELD-VALIDATION-002** — [guide](../10-validation/FIELD_VALIDATION_002_IOS.md)

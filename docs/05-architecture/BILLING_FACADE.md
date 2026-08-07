@@ -2,9 +2,10 @@
 
 **OPERATIONAL-007 · Phase 2**  
 **ADR:** [0088](../adr/0088-billing-facade.md) · Architecture [0087](../adr/0087-billing-capability.md)  
-**Status:** **Facade** · Certification ⏳ · Demo ⏳  
+**Status:** **Engineering Certified** · Demo ⏳  
 **Package:** `src/billing/` · `BillingFacade` · `useBilling()`  
-**Capability:** `accounting.operate` (prepare may use `orders.read`)
+**Capability:** `accounting.operate` (prepare may use `orders.read`)  
+**Validation:** [BILLING_VALIDATION_REPORT](../10-validation/BILLING_VALIDATION_REPORT.md) · ADR [0089](../adr/0089-billing-engineering-certification.md)
 
 ```text
 Operational Experience / Flows
