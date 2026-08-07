@@ -16,7 +16,7 @@ Delivery Capability
 Architecture (ADR 0078)     ✅
 Facade (ADR 0079)           ✅
 Engineering Certification   ✅
-Capability Demo             ⏳ After certification (Law 003 · 004)
+Capability Demo             ✅ ADR 0086 · `/admin/delivery-workspace`
 Field smoke                 ⏳ Operator checklist
 FLOW-002                    🔒 After Certification (prefer Demo)
 ──────────────────────────────────────
@@ -115,7 +115,7 @@ See [DELIVERY_SMOKE_CHECKLIST](./DELIVERY_SMOKE_CHECKLIST.md).
 FLOW-002 may begin only after Delivery Engineering Certification passes.
 ```
 
-Still prefer completing Delivery Capability Demo before opening FLOW-002 (discipline: one cycle at a time).
+Delivery Capability Demo complete (ADR 0086). FLOW-002 already Engineering Certified — remaining: Flow Demo (prefer) before Product UI / Billing Architecture.
 
 FLOW-002 ends at Confirmation — Billing belongs to FLOW-003 / Outcome.
 

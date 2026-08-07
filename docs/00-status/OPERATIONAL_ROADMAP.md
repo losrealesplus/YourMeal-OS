@@ -43,9 +43,9 @@ Roadmap Review (Engine Review) — continuous with Expansion
 ```text
 1. Delivery Engineering Certified ✅ (ADR 0078–0080)
 2. FLOW-002 Engineering Certified ✅ (ADR 0083) · BH-001
-3. Delivery Capability Demo ◀ next (ADR 0085 · close Engine path)
+3. Delivery Capability Demo ✅ (ADR 0086 · `/admin/delivery-workspace`)
 4. FLOW-002 Flow Demo (parallel)
-5. OPERATIONAL-007 Billing (Architecture → Demo)
+5. OPERATIONAL-007 Billing (Architecture → Demo) ◀ next structural block
 6. FLOW-003 · declare Operational Engine v1.0 Architecture Frozen
 7. Tenant Success / Beta 1 usability ([Time Savings Backlog](./TENANT_TIME_SAVINGS_BACKLOG.md))
 ```

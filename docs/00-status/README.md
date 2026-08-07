@@ -42,7 +42,7 @@
 **Operational Experience:** ▶ **[OPERATIONAL_EXPERIENCE](./OPERATIONAL_EXPERIENCE.md)** · Tenant Success  
 **Product Direction:** ▶ **[PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md)** · PRODUCT LAW 001 · ADR [0084](../adr/0084-product-law-001.md) · [Time Savings Backlog](./TENANT_TIME_SAVINGS_BACKLOG.md)  
 **Operational Modules:** ▶ **[OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md)** · Delivery **Engineering Certified** (ADR 0078–0080) · Engine [v0.8](./OPERATIONAL_ENGINE_V08.md)  
-**Delivery Capability:** [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) · `src/delivery/` · `useDelivery()` · [Validation Report](../10-validation/DELIVERY_VALIDATION_REPORT.md)  
+**Delivery Capability:** [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) · ADR 0078–0080 · **0086** · Demo `/admin/delivery-workspace` · `useDelivery()` · [Validation Report](../10-validation/DELIVERY_VALIDATION_REPORT.md)  
 **FLOW-002:** [OPERATIONAL_FLOW_002](../05-architecture/OPERATIONAL_FLOW_002.md) · **Engineering Certified** (ADR 0083) · [Report](../10-validation/FLOW_002_VALIDATION_REPORT.md)  
 **Behaviours:** [Board](./OPERATIONAL_BEHAVIOUR_BOARD.md) · BH-001 Certified · [Scenarios](./OPERATIONAL_SCENARIO_REGISTRY.md) RESERVED  
 **Language:** [OPERATIONAL_LANGUAGE_DICTIONARY](./OPERATIONAL_LANGUAGE_DICTIONARY.md) 
@@ -51,6 +51,7 @@
 **Customer Capability:** [CUSTOMER_CAPABILITY](../05-architecture/CUSTOMER_CAPABILITY.md) · ADR 0058–0061 · Demo `/admin/customer-workspace`  
 **Order Capability:** [ORDER_CAPABILITY](../05-architecture/ORDER_CAPABILITY.md) · ADR 0062–0065 · Demo `/admin/order-workspace`  
 **Production Capability:** [PRODUCTION_CAPABILITY](../05-architecture/PRODUCTION_CAPABILITY.md) · ADR 0066–0069 · Demo `/admin/production-workspace`  
+**Kitchen Capability:** [KITCHEN_EXECUTION_CAPABILITY](../05-architecture/KITCHEN_EXECUTION_CAPABILITY.md) · ADR 0070–0073 · Demo `/admin/kitchen-workspace`  
 
 **Modules index:** [OPERATIONAL_MODULES](./OPERATIONAL_MODULES.md)  
 **Developer Platform:** ✅ **v1.0 FROZEN** · tag `developer-platform-v1.0.0` · Infra: HOUSEKEEPING-001…003 ✅  

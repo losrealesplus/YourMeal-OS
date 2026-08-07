@@ -130,7 +130,7 @@ iPhone Field Validation (parallel · not blocking Certification)
 | Delivery **Architecture Freeze** | ✅ ADR 0078 |
 | Delivery **Facade** | ✅ ADR 0079 · `src/delivery/` |
 | Delivery **Engineering Certification** | ✅ ADR 0080 · FAIL=0 |
-| Delivery **Capability Demo** | 🔒 Phase 4 |
+| Delivery **Capability Demo** | ✅ ADR 0086 · `/admin/delivery-workspace` |
 | FLOW-002 **Architecture Freeze** | ✅ ADR 0081 |
 | FLOW-002 **Harness** | ✅ ADR 0082 · `src/flows/flow-002/` |
 | FLOW-002 **Engineering Certification** | ✅ ADR 0083 · FAIL=0 |
@@ -145,7 +145,7 @@ iPhone Field Validation (parallel · not blocking Certification)
 
 ## Immediate next steps (parallel)
 
-1. **Finish Engine path** — Delivery **Demo** (ADR 0085) · Billing · Engine v1.0 freeze ([PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md))  
+1. **Finish Engine path** — Delivery Demo ✅ · **Billing Capability** (Architecture → Facade → Cert → Demo) · Engine v1.0 freeze ([PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md))  
 2. **FLOW-002 Phase 4** — Flow Demo (`useFlow002` only)  
 3. **Tenant time savings** — [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md) · Beta 1 usability  
 4. **IOS-READY / FIELD-VALIDATION-002** — [guide](../10-validation/FIELD_VALIDATION_002_IOS.md)

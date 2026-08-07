@@ -2,7 +2,7 @@
 
 **OPERATIONAL-006 · Phase 3 — Engineering Certification · Phase 4 Demo next**  
 **ADR:** [0078](../adr/0078-delivery-capability.md) · [0079](../adr/0079-delivery-facade.md) · [0080](../adr/0080-delivery-engineering-certification.md) · [0085](../adr/0085-delivery-engine-v1-alignment.md)  
-**Status:** **Engineering Certified** · Capability Demo ⏳ (Engine v1.0 path)  
+**Status:** **Capability Demo** · Product UI ⏳ (Engine v1.0 path)  
 **Product Direction:** [PRODUCT_DIRECTION](../00-status/PRODUCT_DIRECTION.md) · PRODUCT LAW 001  
 **Depends on:** Kitchen Execution (Engineering Certified + Demo) · Orders (Engineering Certified + Demo)  
 **Provides toward:** Billing · FLOW-002 (already Certified) · Engine v1.0  
@@ -10,7 +10,7 @@
 **EatClean lens:** weekly meal prep · confirm that prepared work reaches the right stop  
 **Layer / Type:** **Operational Execution** (second Execution capability after Kitchen)  
 **Maturity:** Architecture → Facade → **Engineering Certified** → Field Validated → Production Ready  
-**Completeness:** Architecture ✅ · Facade ✅ · **Engineering Certification ✅** · Capability Demo ⏳ · Product UI ⏳ · Field ⏳  
+**Completeness:** Architecture ✅ · Facade ✅ · Engineering Certification ✅ · **Capability Demo ✅** · Product UI ⏳ · Field ⏳  
 **Laws:** 001–007 · [FOUNDATION_LOCK](./FOUNDATION_LOCK.md)  
 **Package:** `src/delivery/` · `DeliveryFacade` · `useDelivery`  
 **Validation:** [DELIVERY_VALIDATION_REPORT](../10-validation/DELIVERY_VALIDATION_REPORT.md) · [DELIVERY_SMOKE_CHECKLIST](../10-validation/DELIVERY_SMOKE_CHECKLIST.md)  
@@ -381,7 +381,7 @@ If a feature does not reduce “lost deliveries”, confirmation time, or operat
 | **1 · Architecture Freeze** | This document · ADR 0078 · Registry | ✅ |
 | **2 · Facade** | `DeliveryFacade` · Commands / Queries · ADR 0079 | ✅ |
 | **3 · Engineering Certification** | Validation matrix · ADR 0080 | ✅ |
-| 4 · Capability Demo | `/admin/delivery-workspace` (name TBD) · `useDelivery` only | **Next** · ADR 0085 |
+| 4 · Capability Demo | `/admin/delivery-workspace` · `useDelivery` only | ✅ ADR 0086 · [DELIVERY_WORKSPACE](./DELIVERY_WORKSPACE.md) |
 | 5 · FLOW-002 | Order → Production → Kitchen → Delivery → Confirmation | ✅ Engineering Certified (ADR 0083) |
 
 ### Facade substrate (Phase 2)

@@ -313,7 +313,7 @@ Operational Engine     ██████████████████░
 
 Remaining for **Operational Engine v1.0**:
 
-* Delivery Capability Demo (engineering already Certified)
+* Delivery Capability Demo ✅ (ADR 0086)
 * Billing Capability (Architecture → … → Demo)
 * Flow completion (FLOW-002 Demo · FLOW-003 with Billing)
 * Declare **Operational Engine v1.0 · Architecture Frozen**
@@ -380,11 +380,11 @@ Every new idea enters one bucket:
 
 ### Block 1 — Finish Delivery Capability
 
-Delivery Facade ✅ · Validation ✅ · **Demo** ◀ remaining
+Delivery Facade ✅ · Validation ✅ · **Demo ✅** (ADR 0086)
 
 ### Block 2 — Finish Billing Capability
 
-Billing Architecture → Facade → Validation → Demo
+Billing Architecture → Facade → Validation → Demo ◀ next structural block
 
 ### Block 3 — Declare Engine v1.0
 
@@ -478,12 +478,12 @@ We are **closing Operational Engine v1.0**.
 | Capability | Engineering | Next for Engine v1.0 |
 |------------|-------------|----------------------|
 | Identity → Kitchen | Certified (+ Demos where applicable) | Usability under PRODUCT LAW 001 |
-| **Delivery** | **Engineering Certified** (ADR 0078–0080) | **Capability Demo** · Product UI later |
-| **Billing** | Pending | Architecture → … → Demo |
+| **Delivery** | **Capability Demo** (ADR 0078–0080 · 0086) | Product UI later · Field |
+| **Billing** | Pending | Architecture → … → Demo ◀ next |
 | FLOW-002 | Engineering Certified | Flow Demo |
 | FLOW-003 | Pending | After Billing |
 
-See [ADR 0085](../adr/0085-delivery-engine-v1-alignment.md) — Delivery as controlled transfer of responsibility · Demo unlocks Engine path.
+See [ADR 0085](../adr/0085-delivery-engine-v1-alignment.md) · [ADR 0086](../adr/0086-delivery-workspace-demo.md) — Delivery as controlled transfer of responsibility · Demo complete.
 
 ---
 
