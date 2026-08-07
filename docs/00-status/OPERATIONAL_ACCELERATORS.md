@@ -46,6 +46,7 @@ Then open Accelerators until it is **extremely fast**.
 | ACCELERATOR-005 | Smart Suggestions | Registered | After evidence |
 | — | Quick Repeat | Registered | Last week · last order · templates |
 | — | Templates | Registered | Preference / order templates |
+| — | **Organization Templates** | Registered · future | Org → workers → menu · schedule · billing · after CX004 mature |
 | — | Timeline | Registered | Guide the operator |
 | — | Preparation Inventory | Registered | Lots · expiry · consumption |
 

@@ -55,9 +55,9 @@ export function rankSearchHits<T extends RankableHit>(
 }
 
 export function customerTypeLabel(summary: CustomerSummary): string {
-  if (summary.partyKind === "company_account") return "Empresa";
+  if (summary.partyKind === "company_account") return "Organización";
   if (summary.tags.some((t) => t.includes("company_employee"))) {
-    return "Empleado";
+    return "Trabajador";
   }
   return "Particular";
 }

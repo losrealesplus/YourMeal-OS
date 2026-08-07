@@ -1,6 +1,6 @@
 # CUSTOMER EXPERIENCE 003
 
-**Status:** ▶ **ACTIVE** — Era 2 Experience Sprint  
+**Status:** ✅ **COMPLETE** — active mission is [CX004 Organization](./CUSTOMER_EXPERIENCE_004.md)  
 **Type:** Experience Sprint (build) — **not** Observation Sprint  
 **Mission:** **Zero Friction Customer Edit**  
 **Declared:** 2026-08-07  
