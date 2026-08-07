@@ -1,10 +1,27 @@
 # Tenant Success Playbook
 
-**Status:** ▶ **ACTIVE** — constitution of the Tenant Success era  
+**Status:** ▶ **ACTIVE** — constitution of Era 2 · Return Time  
 **Declared:** 2026-08-07 · after [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) · OPERATIONAL-ENGINE-001  
 **Product law:** [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md) · **PRODUCT LAW 001** · ADR [0084](../adr/0084-product-law-001.md)  
 **Companion backlog:** [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md)  
 **Engineering constitution (frozen):** [FOUNDATION_LOCK](../05-architecture/FOUNDATION_LOCK.md)
+
+```text
+We do not start with software.
+We start with operational friction.
+Software is only one possible solution.
+```
+
+```text
+ERA 1 · Build the Engine
+████████████████████
+COMPLETE
+
+────────────────────────────
+
+ERA 2 · Return Time
+STARTS TODAY
+```
 
 ```text
 Foundation answers: How do we design?
@@ -12,6 +29,25 @@ Developer Platform answers: How do we develop?
 PRODUCT LAW 001 answers: Why do we develop?
 This Playbook answers: How do we prove we returned time?
 ```
+
+---
+
+## Product identity
+
+```text
+YourMeal OS is an Operational SaaS
+that systematically returns time
+to food businesses.
+```
+
+Not “an app for EatClean.”  
+Not “SaaS for catering” as a category slogan.
+
+**Operational First** — not AI First, not Cloud Native as the identity.
+
+Everything orbits the **operation**, not the technology stack.
+
+Serves EatClean today. Tomorrow it can serve restaurants · dark kitchens · caterings · collective dining · franchises — because it names the **problem**, not a single vertical costume.
 
 ```text
 YourMeal OS no longer competes on having more features.
@@ -23,14 +59,18 @@ It competes on returning time.
 ## Era change
 
 ```text
-Until OPERATIONAL-ENGINE-001
+ERA 1 — until OPERATIONAL-ENGINE-001
   Ingeniería → Arquitectura → Software
+  Backlog fed by ideas
 
-From this Playbook
+ERA 2 — from this Playbook
   Operaciones → Tiempo → Negocio
+  Backlog fed by evidence
 ```
 
-The Operational Engine exists.  
+The Operational Engine exists. Supabase · RBAC · TanStack · Foundation · Developer Platform · Doctor · Capability Pattern were **means**.  
+The **destination** is time returned.
+
 We do not ask first: *How do we design this?*  
 We ask first: *How does Isabella finish earlier?*
 
@@ -46,7 +86,7 @@ Single filter:
 > **¿Esto les devuelve tiempo?**
 
 If yes — it may belong in Product Core.  
-If no — it probably does not.
+If no — it probably does not — even if the feature is spectacular.
 
 ---
 
@@ -63,8 +103,92 @@ YourMeal OS exists to return that currency.
 Time saved is the product.
 ```
 
-Spectacular features that do not return time **do not enter**.  
-Small improvements that return hours per week **do enter**.
+PRODUCT LAW 001 is the filter for the entire future of the product.
+
+---
+
+## Evidence-guided development
+
+The backlog is no longer fed by ideas alone.
+
+```text
+Before                         From today
+Idea → Feature                 Observation
+                                 ↓
+                               Friction
+                                 ↓
+                               Time lost
+                                 ↓
+                               Evidence
+                                 ↓
+                               Prioritization
+                                 ↓
+                               Implementation
+                                 ↓
+                               Time recovered
+```
+
+That is **desarrollo guiado por evidencia**.
+
+Not every observation becomes a feature. Sometimes the best answer is:
+
+* a flow change  
+* a clearer screen  
+* a small automation  
+* a configuration decision  
+* training / operating agreement  
+
+Software is only **one** possible solution.
+
+---
+
+## Operational Evidence Loop (official Product Core cycle)
+
+```text
+Observe
+  ↓
+Measure
+  ↓
+Understand
+  ↓
+Design
+  ↓
+Implement
+  ↓
+Validate
+  ↓
+Measure Again
+  ↓
+Time Saved
+  ↓
+Repeat
+```
+
+This is the official Product Core cycle.
+
+We do not merely develop.  
+We **learn**.
+
+Success of a sprint is not “PRs closed” or “Capabilities added.”  
+Success is: **Isabella works better at the end of her day.**
+
+---
+
+## Beta means Discover Friction
+
+Beta is **not** primarily for finding software bugs.
+
+```text
+Beta
+  ↓
+Discover Friction
+```
+
+If Isabella needs five more clicks than necessary — **that is a bug**,  
+even when the software “works perfectly.”
+
+Engineering defects still matter.  
+Operational friction is now a first-class defect class.
 
 ---
 
@@ -147,7 +271,7 @@ Friction is a first-class product input.
 | Friction | What slowed or confused |
 | Cost | Time · error · rework · trust |
 | Severity | Low · Medium · High · Blocker |
-| Candidate fix | One sentence |
+| Candidate fix | One sentence (feature · flow · config · other) |
 | PRODUCT LAW 001 | Time recoverable? Y/N · estimate |
 
 Store links in validation notes, field reports, or the Time Savings Backlog — not only in chat.
@@ -177,7 +301,8 @@ No friction → no Product Core ticket by default.
 3. Classify **Time Saved** · **Complexity** · **Target Version**.  
 4. Apply PRODUCT LAW 001 — reject or defer if no time returned.  
 5. Prefer a measured session before promoting to “must ship”.  
-6. PR must include **Operational Impact** (see GitHub PR template).
+6. PR must include **Operational Impact** (see GitHub PR template).  
+7. Ask whether software is required — or flow / config / clarity is enough.
 
 Priority:
 
@@ -186,6 +311,24 @@ Time Saved (desc) → Beta urgency → Complexity (asc)
 ```
 
 Never reorder solely for architectural elegance.
+
+---
+
+## Roadmap by time recovered (not by modules)
+
+Do not divide the roadmap by modules first.  
+Divide it by **tiempo recuperado** the client understands.
+
+| Objetivo | Tiempo recuperado esperado |
+|----------|----------------------------:|
+| Alta rápida de clientes | 20–30 min/semana |
+| Edición rápida de pedidos | 1–2 h/semana |
+| Importación de Excel | 2–4 h/semana |
+| Copiar planificación semanal | 30–60 min/semana |
+| Flujo móvil optimizado | Menos errores · menos interrupciones |
+
+Concrete candidates live in [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md).  
+Every sprint should name the minutes it intends to return.
 
 ---
 
@@ -206,6 +349,7 @@ How many minutes per week?
 What evidence do we have (or will we collect)?
 What breaks if we ship this unfinished?
 Does this reopen frozen Architecture without a reopen gate?
+Is software the right solution — or is flow/config enough?
 ```
 
 Architecture reopen remains exceptional (Foundation broken · production blocked · measurable time savings). See [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md).
@@ -251,6 +395,8 @@ Engineering Evidence alone is not enough to claim product success.
 Operational Evidence alone is not enough to ship unsafe software.  
 Tenant Success needs **both**.
 
+The Operational Evidence Loop closes only when we **Measure Again** and can state Time Saved.
+
 ---
 
 ## Working with engineering (Cursor / agents)
@@ -264,7 +410,7 @@ Current duration: …
 Friction: …
 Desired duration: …
 Constraint: do not reopen Engine Architecture unless …
-Success: Operational Evidence …
+Success: Operational Evidence (Measure Again) …
 ```
 
 Avoid prompts that only say “add a module” without time returned.
@@ -278,9 +424,9 @@ Avoid prompts that only say “add a module” without time returned.
 | Developer Platform | How do we develop safely? |
 | FOUNDATION_LOCK | How do we design Capabilities? |
 | PRODUCT_DIRECTION | Why do we build Product Core? |
-| OPERATIONAL_ENGINE_V1 | What motor is frozen? |
-| **TENANT_SUCCESS_PLAYBOOK** | **How do we prove we returned time?** |
-| TENANT_TIME_SAVINGS_BACKLOG | Which jobs are candidates? |
+| OPERATIONAL_ENGINE_V1 | What motor is frozen? (Era 1 complete) |
+| **TENANT_SUCCESS_PLAYBOOK** | **How do we return time? (Era 2)** |
+| TENANT_TIME_SAVINGS_BACKLOG | Which jobs return how many minutes? |
 
 ---
 
@@ -293,5 +439,10 @@ Avoid prompts that only say “add a module” without time returned.
 > **From this point forward, every improvement must help a tenant finish work faster, make fewer mistakes, and operate with greater confidence.**
 >
 > **Time saved is the product.**
+
+```text
+ERA 1 ended building a motor.
+ERA 2 begins returning time.
+```
 
 This Playbook is the prologue of that company — not a feature list.

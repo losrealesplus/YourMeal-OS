@@ -9,19 +9,25 @@ import { describe, expect, it } from "vitest";
 const ROOT = process.cwd();
 
 describe("Tenant Success Playbook", () => {
-  it("defines observation, measurement, friction, and Beta gates under PRODUCT LAW 001", () => {
+  it("defines Era 2 · Operational Evidence Loop · Operational First identity", () => {
     const playbook = readFileSync(
       resolve(ROOT, "docs/00-status/TENANT_SUCCESS_PLAYBOOK.md"),
       "utf8",
     );
-    expect(playbook).toContain("Tenant Success Playbook");
-    expect(playbook).toContain("PRODUCT LAW 001");
-    expect(playbook).toContain("How to observe an operator");
-    expect(playbook).toContain("How to measure real task time");
+    expect(playbook).toContain("We do not start with software");
     expect(playbook).toContain("operational friction");
-    expect(playbook).toContain("Beta / GM decision gate");
+    expect(playbook).toContain("Operational Evidence Loop");
+    expect(playbook).toContain("Observe");
+    expect(playbook).toContain("Measure Again");
+    expect(playbook).toContain("Discover Friction");
+    expect(playbook).toContain("Operational First");
+    expect(playbook).toContain("Operational SaaS");
+    expect(playbook).toContain("systematically returns time");
+    expect(playbook).toContain("ERA 2");
+    expect(playbook).toContain("Return Time");
+    expect(playbook).toContain("PRODUCT LAW 001");
     expect(playbook).toContain("Isabella");
     expect(playbook).toContain("Time saved is the product");
-    expect(playbook).toContain("Operational Evidence");
+    expect(playbook).toContain("Tiempo recuperado esperado");
   });
 });
