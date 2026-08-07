@@ -83,14 +83,17 @@ Operator often remembers one fragment (Juan · 622… · Adeje).
 Facade already matches name / phone / company / city partially.  
 Richer ranking (exact → frequent → recent) remains progressive.
 
-### Universal Command Bar (CX006 accelerator idea)
+### Operational Command Center (ACCELERATOR-001) — Reserved
+
+Formerly floated as “Universal Command Bar / CX006.” **Superseded.**
 
 ```text
-⌘ K → Juan → Open · Create Order · Call · History
+ACCELERATOR-001
+Operational Command Center
+Status: Reserved
 ```
 
-Platform-wide **Operational Accelerator** — not a Capability.  
-Registered in [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md).
+Not Customer Search. Not this sprint. Platform entry point later — [ACCELERATOR_001](./ACCELERATOR_001_OPERATIONAL_COMMAND_CENTER.md).
 
 ---
 

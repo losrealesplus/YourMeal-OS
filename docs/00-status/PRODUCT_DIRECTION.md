@@ -347,6 +347,23 @@ Business behaviour **never** migrates into Flows.
 
 ---
 
+## Era 2 product layers (Return Time)
+
+```text
+Capabilities              — what the business is
+Experiences               — how the operator works (measurable TTA)
+Operational Accelerators  — how work becomes faster
+```
+
+Accelerators do **not** change the domain or Engine. They accelerate work.  
+**ACCELERATOR-001 · Operational Command Center (OCC)** is 🔒 **Reserved** — maximum strategic priority · **zero implementation** until Experiences mature.  
+See [OPERATIONAL_ACCELERATORS](./OPERATIONAL_ACCELERATORS.md) · [ACCELERATOR_001](./ACCELERATOR_001_OPERATIONAL_COMMAND_CENTER.md).
+
+First make the product excellent (Experiences).  
+Then make it extremely fast (Accelerators).
+
+---
+
 ## Current engineering position (honest)
 
 ```text

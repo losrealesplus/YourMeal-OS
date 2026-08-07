@@ -16,6 +16,8 @@
 | [EXPERIENCE_CARDS](./EXPERIENCE_CARDS.md) | User-facing product map (30s cards) |
 | [EXPERIENCE_MISSIONS](./EXPERIENCE_MISSIONS.md) | Era 2 missions · TTA KPIs · EXPERIENCE LAW 001 |
 | [EXPERIENCE_MANIFESTO](./EXPERIENCE_MANIFESTO.md) | **Invisible software** · ADR 0099 |
+| **[OPERATIONAL_ACCELERATORS](./OPERATIONAL_ACCELERATORS.md)** | **Third layer** · accelerate work without changing domain |
+| **[ACCELERATOR_001 · OCC](./ACCELERATOR_001_OPERATIONAL_COMMAND_CENTER.md)** | 🔒 **Reserved** · Operational Command Center · no code |
 | [ERA2_EXPERIENCE_PROMPT](./ERA2_EXPERIENCE_PROMPT.md) | Experience mission prompt header |
 | [PR_REVIEW_PROTOCOL](./PR_REVIEW_PROTOCOL.md) | **Cursor gate before merge** · READY / WARNINGS / BLOCKED · ADR 0097 |
 | [PR_REVIEW_REPORT_TEMPLATE](./PR_REVIEW_REPORT_TEMPLATE.md) | Automatic review report shape |
