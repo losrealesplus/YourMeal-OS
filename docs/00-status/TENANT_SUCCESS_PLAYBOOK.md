@@ -108,6 +108,76 @@ PRODUCT LAW 001 is the filter for the entire future of the product.
 
 ---
 
+## TENANT SUCCESS LAW 001
+
+```text
+TENANT SUCCESS LAW 001
+
+No observation is accepted
+until it has been measured.
+
+No solution is accepted
+until the improvement has been measured again.
+```
+
+**ADR:** [0092](../adr/0092-tenant-success-law-001.md)
+
+Natural extension of the Operational Evidence Loop.  
+Belief is not enough. Improvement must be demonstrated.
+
+Era 1 taught us to build correctly.  
+Era 2 demands something harder: **decide what not to build.**
+
+PRODUCT LAW 001 forbids Product Core features by intuition alone.  
+TENANT SUCCESS LAW 001 forbids accepting claims without measurement.
+
+Every Product Core decision must answer with evidence:
+
+* Where does the friction exist?  
+* How much time is lost?  
+* How much time will we recover?  
+* How will we measure again afterwards?
+
+If a change cannot answer those questions, it does not belong in Product Core.
+
+---
+
+## The true MVP
+
+The MVP is no longer “the application.”
+
+The MVP is this cycle:
+
+```text
+Isabella
+  ↓
+Observation
+  ↓
+Friction
+  ↓
+Product
+  ↓
+Time recovered
+```
+
+If that cycle works, YourMeal OS can evolve for years without losing direction.
+
+---
+
+## First objective of Era 2
+
+Not Delivery. Not Billing. Not AI. Not Telemetry.
+
+Something more concrete:
+
+> **Sit with Isabella and discover where she loses time today.**
+
+That is the first real Tenant Success sprint.  
+It does not start on GitHub.  
+It starts by observing.
+
+---
+
 ## Evidence-guided development
 
 The backlog is no longer fed by ideas alone.
@@ -427,20 +497,26 @@ Avoid prompts that only say “add a module” without time returned.
 | PRODUCT_DIRECTION | Why do we build Product Core? |
 | OPERATIONAL_ENGINE_V1 | What motor is frozen? (Era 1 complete) |
 | **ERA_DECLARATION** | **Acta institucional · Era 1 CLOSED · Era 2 OPEN** |
-| **TENANT_SUCCESS_PLAYBOOK** | **How do we return time? (Era 2)** |
+| **TENANT_SUCCESS_PLAYBOOK** | **How do we return time? (Era 2)** · TENANT SUCCESS LAW 001 |
 | TENANT_TIME_SAVINGS_BACKLOG | Which jobs return how many minutes? |
 
 ---
 
 ## Closing principle
 
+> **Great software is not measured by the amount of code it contains.**
+>
+> **Great operational software is measured by the amount of time it gives back to the people who use it.**
+>
+> **Time saved is not a consequence of the product.**
+>
+> **Time saved is the product.**
+
 > **The Operational Engine is no longer our competitive advantage.**
 >
 > **What we build on top of it is.**
 >
 > **From this point forward, every improvement must help a tenant finish work faster, make fewer mistakes, and operate with greater confidence.**
->
-> **Time saved is the product.**
 
 ```text
 ERA 1 ended building a motor.
