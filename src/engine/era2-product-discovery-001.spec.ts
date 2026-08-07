@@ -41,7 +41,7 @@ describe("Era 2 Product Discovery 001", () => {
     expect(discovery).toContain("Order Templates");
     expect(discovery).toContain("Preparation Inventory");
     expect(discovery).toContain("Operational Accelerators");
-    expect(discovery).toContain("adopts existing work");
+    expect(discovery).toContain("least friction possible");
 
     expect(sprint).toContain("Sprint 001");
     expect(sprint).toContain("Customer Experience");
@@ -57,6 +57,7 @@ describe("Era 2 Product Discovery 001", () => {
 
     expect(law002).toContain("Accepted");
     expect(law002).toContain("Existing operational knowledge");
+    expect(law002).toContain("never forces tenants");
     expect(teamLaw).toContain("Engineering time is an investment");
     expect(direction).toContain("PRODUCT LAW 002");
     expect(direction).toContain("TEAM LAW 001");
