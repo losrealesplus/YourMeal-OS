@@ -31,7 +31,15 @@ import type {
   PartyKind,
   PartyRef,
 } from "@/customer/CustomerContext";
+import {
+  CUSTOMER_CREATION_ORIGIN_LABEL,
+  recordCustomerCreationOrigin,
+  type CustomerCreationOrigin,
+} from "@/customer-experience/creation-origin";
 import { cn } from "@/lib/utils";
+
+/** Silent origin for altas from this Experience surface. */
+const CREATE_ORIGIN: CustomerCreationOrigin = "customer_workspace";
 
 export const Route = createFileRoute(
   "/_authenticated/admin/customer-workspace",
@@ -86,9 +94,11 @@ function CustomerExperiencePage() {
   const [partyChoice, setPartyChoice] = useState<PartyChoice>(null);
   const [draft, setDraft] = useState<CreateDraft>(emptyDraft);
   const [justCreated, setJustCreated] = useState(false);
+  const [createdFromLabel, setCreatedFromLabel] = useState<string | null>(null);
   const nameRef = useRef<HTMLInputElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const newCustomerRef = useRef<HTMLButtonElement>(null);
+  const nextActionRef = useRef<HTMLAnchorElement>(null);
   const caps = identity.permissions.capabilities;
   const canWrite = caps.includes("customers.write");
 
@@ -162,12 +172,31 @@ function CustomerExperiencePage() {
     setDraft(emptyDraft());
     setSelected(null);
     setJustCreated(false);
+    setCreatedFromLabel(null);
   }
 
   function cancelCreate() {
     setCreating(false);
     setPartyChoice(null);
     setDraft(emptyDraft());
+  }
+
+  function finishCreateSuccess(input: {
+    partyRef: PartyRef;
+    segment: Segment;
+    toastMessage: string;
+  }) {
+    const event = recordCustomerCreationOrigin({
+      origin: CREATE_ORIGIN,
+      partyKind: input.partyRef.kind,
+      partyId: input.partyRef.id,
+    });
+    setCreatedFromLabel(CUSTOMER_CREATION_ORIGIN_LABEL[event.origin]);
+    cancelCreate();
+    setJustCreated(true);
+    setSegment(input.segment);
+    toast.success(input.toastMessage);
+    window.setTimeout(() => nextActionRef.current?.focus(), 0);
   }
 
   async function onSaveCreate() {
@@ -195,16 +224,20 @@ function CustomerExperiencePage() {
           toast.error(result.errors[0]?.message ?? "No se pudo crear");
           return;
         }
+        if (!result.partyRef) {
+          toast.error("Cliente creado sin referencia");
+          return;
+        }
         const ms = Math.round(performance.now() - started);
-        toast.success(
-          partyChoice === "company_employee"
-            ? `Empleado creado · ${ms} ms · vinculación a empresa: Progressive Completion`
-            : `Cliente creado · ${ms} ms (objetivo TTC < 30s)`,
-        );
-        cancelCreate();
-        setJustCreated(true);
-        setSegment("individual");
-        if (result.partyRef) await openParty(result.partyRef);
+        finishCreateSuccess({
+          partyRef: result.partyRef,
+          segment: "individual",
+          toastMessage:
+            partyChoice === "company_employee"
+              ? `Empleado creado · ${ms} ms · vinculación a empresa: Progressive Completion`
+              : `Cliente creado · ${ms} ms (objetivo TTC < 30s)`,
+        });
+        await openParty(result.partyRef);
         await loadList(query, "individual");
         return;
       }
@@ -229,16 +262,28 @@ function CustomerExperiencePage() {
         toast.error(result.errors[0]?.message ?? "No se pudo crear");
         return;
       }
+      if (!result.partyRef) {
+        toast.error("Empresa creada sin referencia");
+        return;
+      }
       const ms = Math.round(performance.now() - started);
-      toast.success(`Empresa creada · ${ms} ms (objetivo TTC < 30s)`);
-      cancelCreate();
-      setJustCreated(true);
-      setSegment("company_account");
-      if (result.partyRef) await openParty(result.partyRef);
+      finishCreateSuccess({
+        partyRef: result.partyRef,
+        segment: "company_account",
+        toastMessage: `Empresa creada · ${ms} ms (objetivo TTC < 30s)`,
+      });
+      await openParty(result.partyRef);
       await loadList(query, "company_account");
     } finally {
       setBusy(false);
     }
+  }
+
+  function goBackFromCreated() {
+    setJustCreated(false);
+    setCreatedFromLabel(null);
+    setSelected(null);
+    window.setTimeout(() => searchRef.current?.focus(), 0);
   }
 
   async function onArchive() {
@@ -262,6 +307,7 @@ function CustomerExperiencePage() {
       toast.success("Cliente archivado");
       setSelected(null);
       setJustCreated(false);
+      setCreatedFromLabel(null);
       await loadList(query, segment);
     } finally {
       setBusy(false);
@@ -284,10 +330,11 @@ function CustomerExperiencePage() {
         subtitle="Experience above Facade · TTC < 30s · el software desaparece"
       />
 
-      <div className="mb-4 grid gap-2 rounded-md border border-foreground/15 bg-foreground/[0.03] px-4 py-3 sm:grid-cols-3">
+      <div className="mb-4 grid gap-2 rounded-md border border-foreground/15 bg-foreground/[0.03] px-4 py-3 sm:grid-cols-2 lg:grid-cols-4">
         <Kpi label="TTC · Create" value="< 30 s" />
         <Kpi label="TTF · Find" value="< 10 s" />
-        <Kpi label="Clicks to Create" value="≤ 6" />
+        <Kpi label="TTO · Open" value="< 3 s" />
+        <Kpi label="Order from Customer" value="< 5 s" />
       </div>
 
       <AdminHeader
@@ -440,9 +487,20 @@ function CustomerExperiencePage() {
           ) : (
             <div className="space-y-4 rounded-md border border-border p-4">
               {justCreated ? (
-                <p className="rounded-md bg-foreground/[0.06] px-3 py-2 text-xs font-medium">
-                  Listo · cliente creado. Siguiente acción operativa ↓
-                </p>
+                <NextBestAction
+                  primaryRef={nextActionRef}
+                  createdFromLabel={createdFromLabel}
+                  onCreateOrder={() => {
+                    /* Link handles navigation; keep for focus contract */
+                  }}
+                  onOpenCustomer={() => {
+                    setJustCreated(false);
+                  }}
+                  onCreateAnother={() => {
+                    startCreate();
+                  }}
+                  onBack={goBackFromCreated}
+                />
               ) : null}
               <div>
                 <h3 className="text-lg font-semibold">
@@ -454,13 +512,18 @@ function CustomerExperiencePage() {
                       ? "Empleado de empresa"
                       : "Particular"
                     : "Empresa"}
+                  {createdFromLabel && justCreated
+                    ? ` · origen ${createdFromLabel}`
+                    : ""}
                 </p>
               </div>
 
-              <OperationalActions
-                phone={primaryPhone}
-                displayName={selected.summary.displayName}
-              />
+              {!justCreated ? (
+                <OperationalActions
+                  phone={primaryPhone}
+                  displayName={selected.summary.displayName}
+                />
+              ) : null}
 
               <dl className="grid grid-cols-2 gap-2 text-xs">
                 <div>
@@ -679,6 +742,64 @@ function CreateWizard(props: {
           </div>
         </form>
       )}
+    </div>
+  );
+}
+
+function NextBestAction(props: {
+  primaryRef: React.RefObject<HTMLAnchorElement | null>;
+  createdFromLabel: string | null;
+  onCreateOrder: () => void;
+  onOpenCustomer: () => void;
+  onCreateAnother: () => void;
+  onBack: () => void;
+}) {
+  return (
+    <div
+      className="rounded-md border border-foreground/20 bg-foreground/[0.04] px-3 py-3 space-y-3"
+      role="region"
+      aria-label="Siguiente mejor acción"
+    >
+      <div>
+        <p className="text-sm font-semibold">Cliente creado</p>
+        <p className="text-xs text-muted-foreground">
+          ¿Qué quieres hacer ahora?
+          {props.createdFromLabel
+            ? ` · alta desde ${props.createdFromLabel}`
+            : ""}
+        </p>
+      </div>
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+        <Link
+          ref={props.primaryRef}
+          to="/admin/order-workspace"
+          className="inline-flex min-h-11 items-center justify-center rounded-md bg-foreground px-4 py-2.5 text-sm font-semibold text-background"
+          onClick={props.onCreateOrder}
+        >
+          Crear pedido
+        </Link>
+        <button
+          type="button"
+          onClick={props.onOpenCustomer}
+          className="min-h-11 rounded-md border border-border px-4 py-2.5 text-sm font-semibold"
+        >
+          Abrir cliente
+        </button>
+        <button
+          type="button"
+          onClick={props.onCreateAnother}
+          className="min-h-11 rounded-md border border-border px-4 py-2.5 text-sm font-semibold"
+        >
+          Crear otro cliente
+        </button>
+        <button
+          type="button"
+          onClick={props.onBack}
+          className="min-h-11 rounded-md border border-dashed border-border px-4 py-2.5 text-sm font-semibold text-muted-foreground"
+        >
+          Volver
+        </button>
+      </div>
     </div>
   );
 }

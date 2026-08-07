@@ -48,16 +48,18 @@ in under 30 seconds?"
 
 We do not measure screens. We measure work.
 
-| KPI | Target |
-|-----|--------|
-| **Time-to-Create Customer (TTC)** | **&lt; 30 seconds** |
-| Time-to-Find Customer | &lt; 10 seconds |
-| Time-to-Edit Frequent Data | &lt; 20 seconds |
-| Clicks to Create | ≤ 6 |
-| Keyboard-only completion | Yes |
-| Mouse travel | Minimum |
+| KPI | Target | Role |
+|-----|--------|------|
+| **Time-to-Create Customer (TTC)** | **&lt; 30 seconds** | Primary |
+| Time-to-Find Customer | &lt; 10 seconds | Secondary |
+| Time-to-Open Customer | &lt; 3 seconds | Secondary |
+| Create Order from Customer | &lt; 5 seconds | Secondary |
+| Time-to-Edit Frequent Data | &lt; 20 seconds | Secondary |
+| Clicks to Create | ≤ 6 | Guardrail |
 
 None of these mention React or Supabase. All mention the job.
+
+Card: [EXPERIENCE_CARDS](./EXPERIENCE_CARDS.md) · Operational KPIs comparable across Experiences.
 
 ---
 
@@ -75,7 +77,8 @@ The screen does **not** open empty. It opens with one question:
 Then:
 
 ```text
-Name → Phone → Delivery Address → Save → Done
+Name → Phone → Delivery Address → Save
+→ Next Best Action (Create Order · Open · Another · Back)
 ```
 
 Target: **&lt; 30 seconds**. Only fields relevant to the chosen type.
@@ -83,6 +86,8 @@ Target: **&lt; 30 seconds**. Only fields relevant to the chosen type.
 Later (Progressive Completion): preferences · allergies · notes · billing · employees · tags.
 
 Do **not** load the operator with a full dossier on first contact.
+
+Creation origin is registered **silently** (`customer_workspace` today) — evidence for PRODUCT LAW 001, never a form field.
 
 ---
 

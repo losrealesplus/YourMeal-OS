@@ -7,6 +7,8 @@
 
 Not an ADR. Not a Law. A **30-second card** anyone on the team can understand.
 
+The card does **not** describe a screen. It describes **success** — comparable Operational KPIs across Experiences.
+
 When Customer · Orders · Menus · Production · Kitchen · Delivery each have a card, the product map is from the **operator’s** point of view — not Architecture.
 
 ---
@@ -22,21 +24,24 @@ Name
 Mission
 …
 
-Success KPI
-…
-
 Primary User
 …
 
-Primary Outcome
+Primary KPI
 …
 
-Time Saved
-Measured during Observation Sprint
+Secondary KPIs
+…
+
+Operational Time Saved
+Estimated | Measured
+…
 
 Status
 Planned | In Progress | Dogfood | Observation-ready
 ```
+
+Every Experience uses the same shape so metrics are comparable.
 
 ---
 
@@ -51,23 +56,42 @@ Customer Experience
 Mission
 Zero Friction Customer Management
 
-Success KPI
+Primary User
+Tenant Operator
+
+Primary KPI
 Time-to-Create Customer <30 s
 
-Primary User
-Tenant Operator (Isabella)
+Secondary KPIs
+Time-to-Find Customer <10 s
+Time-to-Open Customer <3 s
+Create Order from Customer <5 s
 
-Primary Outcome
-Customer ready to receive orders
-
-Time Saved
-Measured during Observation Sprint
+Operational Time Saved
+Estimated
+60–150 seconds
 
 Status
-In Progress · Phase 1
+In Progress
 ```
 
 Detail: [CUSTOMER_EXPERIENCE_001](./CUSTOMER_EXPERIENCE_001.md) · [Phase 1](./CUSTOMER_EXPERIENCE_001_PHASE1.md)
+
+**Customer Experience sequence** (Orders wait until Customer is fluid):
+
+```text
+001 Create
+↓
+002 Search
+↓
+003 Edit
+↓
+004 Company Management
+↓
+005 Preferences
+↓
+006 Bulk Operations
+```
 
 ---
 
@@ -82,17 +106,19 @@ Order Experience
 Mission
 Create an operational commitment in less than 45 seconds
 
-Success KPI
+Primary User
+Tenant Operator
+
+Primary KPI
 Time-to-Create Order <45 s
 
-Primary User
-Tenant Operator (Isabella)
+Secondary KPIs
+Time-to-Find Order <10 s
+Time-to-Confirm Commitment <15 s
 
-Primary Outcome
-Operational commitment ready for Production
-
-Time Saved
-Measured during Observation Sprint
+Operational Time Saved
+Estimated
+TBD
 
 Status
 Planned
@@ -111,17 +137,18 @@ Menu Experience
 Mission
 Plan one operational week in less than two minutes
 
-Success KPI
-Time-to-Plan Week <2 min
-
 Primary User
 Tenant Operator / Menu planner
 
-Primary Outcome
-Week ready to sell and produce
+Primary KPI
+Time-to-Plan Week <2 min
 
-Time Saved
-Measured during Observation Sprint
+Secondary KPIs
+Time-to-Publish Week <30 s
+
+Operational Time Saved
+Estimated
+TBD
 
 Status
 Planned
@@ -140,17 +167,18 @@ Production Experience
 Mission
 Generate today's work in less than one minute
 
-Success KPI
-Time-to-Generate Work <1 min
-
 Primary User
 Production lead
 
-Primary Outcome
-Today's production plan ready
+Primary KPI
+Time-to-Generate Work <1 min
 
-Time Saved
-Measured during Observation Sprint
+Secondary KPIs
+Time-to-Know Today's Plan <10 s
+
+Operational Time Saved
+Estimated
+TBD
 
 Status
 Planned
@@ -169,17 +197,18 @@ Kitchen Experience
 Mission
 Know what to execute in less than ten seconds
 
-Success KPI
-Time-to-Know Work <10 s
-
 Primary User
 Kitchen operator
 
-Primary Outcome
-Work list ready to execute
+Primary KPI
+Time-to-Know Work <10 s
 
-Time Saved
-Measured during Observation Sprint
+Secondary KPIs
+Time-to-Mark Done <3 s
+
+Operational Time Saved
+Estimated
+TBD
 
 Status
 Planned
@@ -198,17 +227,18 @@ Delivery Experience
 Mission
 Prepare today's routes in less than two minutes
 
-Success KPI
-Time-to-Prepare Routes <2 min
-
 Primary User
 Delivery / logistics
 
-Primary Outcome
-Routes ready to leave
+Primary KPI
+Time-to-Prepare Routes <2 min
 
-Time Saved
-Measured during Observation Sprint
+Secondary KPIs
+Time-to-Dispatch Route <30 s
+
+Operational Time Saved
+Estimated
+TBD
 
 Status
 Planned
