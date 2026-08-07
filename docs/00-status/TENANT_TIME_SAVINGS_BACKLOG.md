@@ -37,7 +37,7 @@ Every row must answer: **Does it save tenant time? How much? Which Beta?**
 | Menu create / edit / duplicate / archive | High | Medium | Beta 1 | Core catering loop |
 | Production quick workflow | High | Medium | Beta 1 | Less clicks to releasable work |
 | Kitchen quick execution | High | Medium | Beta 1 | Queue → ready → complete |
-| Delivery Capability Demo | Medium | Low | Beta 1 | LAW 003 proof · already Certified |
+| Delivery Capability Demo | Medium | Low | Beta 1 | ✅ LAW 003 proof · ADR 0086 |
 | Copy last week (orders / menu) | Very High | Medium | Beta 2 | Repeatable weekly cycle |
 | Bulk Excel import | Very High | High | Beta 2 | Replace multi-hour spreadsheet work |
 | Billing Capability (Architecture→Demo) | High | High | Beta 2 | Engine v1.0 Outcome · after Confirmation |

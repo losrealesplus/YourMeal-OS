@@ -37,7 +37,9 @@ We may still touch Foundation. It is no longer the protagonist.
 | Orders | **Engineering Certified** (ADR 0064) |
 | Order Workspace | **Capability Demo** (ADR 0065 · LAW 003 · 004) |
 | Production | **Engineering Certified + Demo** (ADR 0068–0069) |
-| Kitchen Execution / Delivery / Billing | **Engine v0.8** · FLOW-001 Certified · Demo → Review → Android → OPPO → iPhone · Delivery **GATED** |
+| Kitchen Execution | **Engineering Certified + Demo** (ADR 0072–0073) |
+| Delivery | **Capability Demo** (ADR 0086 · `/admin/delivery-workspace`) |
+| Billing | Pending · next structural Engine block |
 
 ---
 

@@ -260,35 +260,37 @@ First **Operational Execution** Capability — Engineering Certified + Demo.
 
 | Field | Value |
 |-------|--------|
-| **Maturity** | **Engineering Certified** |
+| **Maturity** | **Capability Demo** |
 | **Type** | Operational Execution |
-| Completeness | Architecture ✅ · Facade ✅ · **Engineering Certification ✅** · Demo ⏳ · Field ⏳ |
+| Completeness | Architecture ✅ · Facade ✅ · Engineering Certification ✅ · **Capability Demo ✅** · Product UI ⏳ · Field ⏳ |
 | Consumida por | Billing (canonical) · FLOW-002 |
 | Depends on | OrderFacade · KitchenExecutionFacade |
 | Version | 1.0 |
-| ADRs | [0078](../adr/0078-delivery-capability.md) · [0079](../adr/0079-delivery-facade.md) · [0080](../adr/0080-delivery-engineering-certification.md) · [0085](../adr/0085-delivery-engine-v1-alignment.md) |
-| Contract | [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) |
+| ADRs | [0078](../adr/0078-delivery-capability.md) · [0079](../adr/0079-delivery-facade.md) · [0080](../adr/0080-delivery-engineering-certification.md) · [0085](../adr/0085-delivery-engine-v1-alignment.md) · [0086](../adr/0086-delivery-workspace-demo.md) |
+| Contract | [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) · [DELIVERY_WORKSPACE](../05-architecture/DELIVERY_WORKSPACE.md) |
 | Facade | `src/delivery/DeliveryFacade.ts` · `useDelivery()` · Commands / Queries |
 | Validation | [DELIVERY_VALIDATION_REPORT](../10-validation/DELIVERY_VALIDATION_REPORT.md) · 13 PASS · 5 UNIMPLEMENTED · 0 FAIL |
-| Notes | ConfirmDelivery composed · Assign/Start/Exception/Close/Routes EXPECTED GAP |
+| Demo | `/admin/delivery-workspace` — LAW 003 · 006 · 007 · PRODUCT LAW 001 |
+| Notes | ConfirmDelivery composed · Assign/Start/Exception/Close/Routes EXPECTED GAP (honest in Demo) |
 
 ```text
 Delivery
 ████ Architecture
 ████ Facade
 ████ Engineering Certified
-░░░░ Demo · Field
+████ Capability Demo (Workspace)
+░░░░ Product UI · Field
 
 Question: ¿Qué compromisos operativos deben entregarse ahora
           y cómo confirmamos su ejecución?
 
 Delivery = asignar · rutear · confirmar · evidenciar · exceptuar
 never drives · never cooks · never bills
+= controlled transfer of responsibility
 ```
 
-Second **Operational Execution** Capability — Engineering Certified.  
-**Next:** Capability Demo (ADR 0085) — close Engine v1.0 path. Not a new Architecture Freeze.  
-Delivery = controlled transfer of responsibility (never courier / GPS / Billing).
+Second **Operational Execution** Capability — Engineering Certified + Capability Demo.  
+**Next Engine block:** Billing Capability (Architecture → … → Demo) → Operational Engine v1.0.
 
 ---
 
