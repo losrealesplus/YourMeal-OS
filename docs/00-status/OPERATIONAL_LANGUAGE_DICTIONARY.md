@@ -113,6 +113,39 @@ Pending — must not steal Execution or Outcome questions.
 
 ---
 
+## Operational Flows (collaboration · LAW 007)
+
+Flows do not own business questions. They own lawful transitions between certified Capabilities.
+
+### FLOW-001 · Commitment → Executed Work
+
+```text
+Can an operational commitment become executed work
+without violating any Foundation Law?
+```
+
+Ends at: Kitchen Execution Completed.
+
+### FLOW-002 · Operational Fulfillment
+
+```text
+Can an operational commitment become a confirmed delivery
+without violating any Foundation Law?
+```
+
+Ends at: **Delivery Confirmation** — never Invoice.
+
+### FLOW-003 · Confirmation → Outcome (future)
+
+```text
+What economic outcome must be recorded
+after an operational commitment has been confirmed?
+```
+
+Billing’s question — after FLOW-002.
+
+---
+
 ## Anti-patterns (forbidden)
 
 | Forbidden | Why |

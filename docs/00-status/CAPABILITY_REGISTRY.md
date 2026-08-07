@@ -287,7 +287,7 @@ never drives · never cooks · never bills
 ```
 
 Second **Operational Execution** Capability — Engineering Certified.  
-**Next:** Capability Demo (no FLOW-002 until Demo preferido).
+**Next:** Capability Demo (prefer before FLOW-002 Harness). FLOW-002 Architecture ✅ ADR 0081.
 
 ---
 
@@ -355,7 +355,7 @@ Screens will change. These questions are the product core (**LAW 006**).
 **Exists / v0.8:** [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) — Identity→Kitchen + FLOW-001 certified.  
 **Expansion:** [OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md) — Delivery Engineering Certified → Demo → …  
 **Language:** [OPERATIONAL_LANGUAGE_DICTIONARY](./OPERATIONAL_LANGUAGE_DICTIONARY.md) — LAW 006 questions.  
-**Flows:** [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md) — FLOW-001 Engineering Certified · FLOW-002 Pending.  
+**Flows:** [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md) — FLOW-001 Engineering Certified · FLOW-002 Architecture (ADR 0081).  
 **Review:** [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md).  
 **Phases:** [OPERATIONAL_CERTIFICATION_PHASES](./OPERATIONAL_CERTIFICATION_PHASES.md).  
 **Engine Completion:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md).  

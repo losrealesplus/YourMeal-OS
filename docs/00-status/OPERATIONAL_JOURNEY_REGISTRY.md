@@ -21,9 +21,10 @@ Weekly Catering Journey
 
 FLOW-001  Orders → Production → Kitchen
     ↓
-FLOW-002  Production → Kitchen → Delivery
+FLOW-002  Operational Fulfillment
+          Order → Production → Kitchen → Delivery → Confirmation
     ↓
-FLOW-003  Delivery → Billing
+FLOW-003  Confirmation → Billing (Outcome)
 ```
 
 ---

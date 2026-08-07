@@ -271,10 +271,10 @@ Each arrow is a **Facade call**. None is a table join across domains.
 | Flow | Extends | Adds |
 |------|---------|------|
 | **FLOW-001** (this) | — | Commitment → executed work |
-| **FLOW-002** | Kitchen completion | → Delivery |
-| **FLOW-003** | Delivery | → Billing |
+| **FLOW-002** | Full chain through Delivery | → **Confirmation** (Operational Fulfillment) |
+| **FLOW-003** | Confirmation | → Billing (Outcome) |
 
-FLOW-001 must freeze before FLOW-002 Architecture starts.
+FLOW-002 Architecture: [OPERATIONAL_FLOW_002](./OPERATIONAL_FLOW_002.md) · ADR 0081.
 
 ---
 
