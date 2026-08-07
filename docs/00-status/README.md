@@ -1,11 +1,13 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-08-06  
+**Última actualización:** 2026-08-07  
 
 ## Permanent control panel (frozen)
 
 | Document | Role |
 |----------|------|
+| **[PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md)** | **North star** · PRODUCT LAW 001 · Tenant Success |
+| [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md) | Ideas prioritized by operational time saved |
 | [PLATFORM_STATUS](./PLATFORM_STATUS.md) | Platform layer verdict |
 | [FOUNDATION_STATUS](./FOUNDATION_STATUS.md) | Foundation + Laws 001–004 |
 | [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) | Certified capabilities (product map) |
@@ -30,13 +32,15 @@
 | [FIELD_VALIDATION_LOG](../10-validation/FIELD_VALIDATION_LOG.md) | Real-device evidence log (OPPO · iPhone) |
 | [OPERATIONAL_DEPENDENCY_GRAPH](./OPERATIONAL_DEPENDENCY_GRAPH.md) | Permanent dependency graph · layers |
 
-> Success = **¿Qué capacidades operativas están certificadas y cuáles usa un negocio real?**
+> Engineering success = certified Capabilities / Flows / Behaviours.  
+> **Product success = ¿El tenant trabaja mejor y más rápido?** · [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md) · ADR [0084](../adr/0084-product-law-001.md)
 
 ---
 
 **Platform v1:** ✅ **CLOSED** — [PLATFORM_V1_CLOSED](./PLATFORM_V1_CLOSED.md) · Baseline [v1](./PLATFORM_BASELINE_v1.md) · Transición [Platform → Flow DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) · COMPLETE · [Operating Model v1](./OPERATING_MODEL_v1.md) · ACTIVE  
 **Product Core:** ✅ **[Foundation engineering-validated](./PRODUCT_CORE_FOUNDATION_001.md)** (ADR 0054) · Field smoke OPPO ⏳ · **Era Foundation center CLOSED**  
 **Operational Experience:** ▶ **[OPERATIONAL_EXPERIENCE](./OPERATIONAL_EXPERIENCE.md)** · Tenant Success  
+**Product Direction:** ▶ **[PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md)** · PRODUCT LAW 001 · ADR [0084](../adr/0084-product-law-001.md) · [Time Savings Backlog](./TENANT_TIME_SAVINGS_BACKLOG.md)  
 **Operational Modules:** ▶ **[OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md)** · Delivery **Engineering Certified** (ADR 0078–0080) · Engine [v0.8](./OPERATIONAL_ENGINE_V08.md)  
 **Delivery Capability:** [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) · `src/delivery/` · `useDelivery()` · [Validation Report](../10-validation/DELIVERY_VALIDATION_REPORT.md)  
 **FLOW-002:** [OPERATIONAL_FLOW_002](../05-architecture/OPERATIONAL_FLOW_002.md) · **Engineering Certified** (ADR 0083) · [Report](../10-validation/FLOW_002_VALIDATION_REPORT.md)  

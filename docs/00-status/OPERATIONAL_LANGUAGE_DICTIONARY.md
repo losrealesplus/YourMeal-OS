@@ -82,8 +82,15 @@ What commitments must be delivered now, and how do we confirm fulfillment?
 ¿Qué compromisos operativos deben entregarse ahora y cómo confirmamos su ejecución?
 ```
 
+```text
+Delivery is the controlled transfer of responsibility
+from internal tenant operations to the customer.
+Not the courier. Not GPS. Not Billing.
+```
+
 Owns: Assignment · Route · Stop · Confirmation · Evidence · Exception.  
-Never owns: GPS navigation · cooking · billing. **Delivery never drives / cooks / bills.**
+Never owns: GPS navigation · cooking · billing. **Delivery never drives / cooks / bills.**  
+Avoid: Shipment · Parcel · Package · Courier.
 
 ---
 

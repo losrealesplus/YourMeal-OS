@@ -1,10 +1,11 @@
 # Delivery Capability
 
-**OPERATIONAL-006 · Phase 3 — Engineering Certification**  
-**ADR:** [0078](../adr/0078-delivery-capability.md) · [0079](../adr/0079-delivery-facade.md) · [0080](../adr/0080-delivery-engineering-certification.md)  
-**Status:** **Engineering Certified** (Architecture → Facade → Certification)  
+**OPERATIONAL-006 · Phase 3 — Engineering Certification · Phase 4 Demo next**  
+**ADR:** [0078](../adr/0078-delivery-capability.md) · [0079](../adr/0079-delivery-facade.md) · [0080](../adr/0080-delivery-engineering-certification.md) · [0085](../adr/0085-delivery-engine-v1-alignment.md)  
+**Status:** **Engineering Certified** · Capability Demo ⏳ (Engine v1.0 path)  
+**Product Direction:** [PRODUCT_DIRECTION](../00-status/PRODUCT_DIRECTION.md) · PRODUCT LAW 001  
 **Depends on:** Kitchen Execution (Engineering Certified + Demo) · Orders (Engineering Certified + Demo)  
-**Provides toward:** Billing · FLOW-002  
+**Provides toward:** Billing · FLOW-002 (already Certified) · Engine v1.0  
 **Tenant lens:** any meal-prep / catering tenant with operational commitments to fulfill physically  
 **EatClean lens:** weekly meal prep · confirm that prepared work reaches the right stop  
 **Layer / Type:** **Operational Execution** (second Execution capability after Kitchen)  
@@ -18,9 +19,14 @@
 ```text
 Delivery = asignar · rutear · confirmar · evidenciar · exceptuar
 
-Delivery does NOT drive.
-The physical courier / fleet drives.
-Delivery OS orchestrates fulfillment confirmation.
+Delivery is NOT the courier.
+Delivery is the controlled transfer of responsibility
+from internal tenant operations to the customer.
+
+Delivery never plans.
+Delivery never cooks.
+Delivery never drives.
+Delivery never bills.
 ```
 
 ---
@@ -36,9 +42,9 @@ Delivery is a **business capability**, not a navigation app and not a billing mo
 **One canonical answer:**
 
 ```text
-Delivery is the operational coordination that takes
+Delivery is the controlled transfer of responsibility:
 releasable / completed Kitchen work (and Order commitment facts)
-and decides what must be fulfilled now:
+must leave the tenant and reach the customer correctly.
 
 assignments · routes · stops · confirmation · evidence · exceptions.
 ```
@@ -51,12 +57,21 @@ y cómo confirmamos su ejecución?
 ```
 
 ```text
-Which operational commitments must be fulfilled now,
-and how do we confirm that fulfillment?
+Which operational commitments must leave the tenant
+to reach the customer correctly,
+and how do we confirm that transfer?
+```
+
+```text
+Kitchen  → What work am I executing now?     (internal responsibility)
+Delivery → What must leave the tenant, and
+           how do we ensure it arrives?      (transfer of responsibility)
 ```
 
 EatClean does not need Delivery OS to own GPS turn-by-turn.  
 EatClean needs Delivery OS to **know what leaves, where it goes, and whether it arrived**.
+
+**Avoid domain nouns:** Shipment · Parcel · Package · Courier (external logistics systems).
 
 ---
 
@@ -366,8 +381,8 @@ If a feature does not reduce “lost deliveries”, confirmation time, or operat
 | **1 · Architecture Freeze** | This document · ADR 0078 · Registry | ✅ |
 | **2 · Facade** | `DeliveryFacade` · Commands / Queries · ADR 0079 | ✅ |
 | **3 · Engineering Certification** | Validation matrix · ADR 0080 | ✅ |
-| 4 · Capability Demo | `/admin/delivery-workspace` (name TBD) | Next |
-| 5 · FLOW-002 | Order → Production → Kitchen → Delivery → Confirmation | After Certification (+ prefer Demo) |
+| 4 · Capability Demo | `/admin/delivery-workspace` (name TBD) · `useDelivery` only | **Next** · ADR 0085 |
+| 5 · FLOW-002 | Order → Production → Kitchen → Delivery → Confirmation | ✅ Engineering Certified (ADR 0083) |
 
 ### Facade substrate (Phase 2)
 

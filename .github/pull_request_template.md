@@ -2,6 +2,25 @@
 
 <!-- What changed and why (1–3 sentences). -->
 
+## Operational Impact (PRODUCT LAW 001)
+
+> [PRODUCT_DIRECTION](../docs/00-status/PRODUCT_DIRECTION.md) · ADR [0084](../docs/adr/0084-product-law-001.md)  
+> Product Core PRs must show time recovered — not only code shipped.
+
+| Field | Value |
+|-------|-------|
+| Problem (operator friction) | |
+| Current workflow | |
+| Estimated duration (before) | |
+| Workflow after this PR | |
+| Estimated duration (after) | |
+| Expected time saved | |
+| Affected tenant roles | e.g. Admin · Kitchen · Logistics · Support |
+| Evidence planned / captured | stopwatch · field · OPPO · N/A docs-only |
+
+- [ ] Saves tenant operational time (or N/A: docs / infra / Foundation / non-Product-Core justified)
+- [ ] Does **not** invent Product Core without time-savings rationale
+
 ## PR category (exactly one)
 
 > [FLOW_GOVERNANCE](../docs/00-status/FLOW_GOVERNANCE.md) Regla 1 · [PR_TAXONOMY](../docs/00-status/PR_TAXONOMY.md) — sin PRs huérfanas; categorías ambiguas → ❌

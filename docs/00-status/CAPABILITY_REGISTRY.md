@@ -266,7 +266,7 @@ First **Operational Execution** Capability — Engineering Certified + Demo.
 | Consumida por | Billing (canonical) · FLOW-002 |
 | Depends on | OrderFacade · KitchenExecutionFacade |
 | Version | 1.0 |
-| ADRs | [0078](../adr/0078-delivery-capability.md) · [0079](../adr/0079-delivery-facade.md) · [0080](../adr/0080-delivery-engineering-certification.md) |
+| ADRs | [0078](../adr/0078-delivery-capability.md) · [0079](../adr/0079-delivery-facade.md) · [0080](../adr/0080-delivery-engineering-certification.md) · [0085](../adr/0085-delivery-engine-v1-alignment.md) |
 | Contract | [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) |
 | Facade | `src/delivery/DeliveryFacade.ts` · `useDelivery()` · Commands / Queries |
 | Validation | [DELIVERY_VALIDATION_REPORT](../10-validation/DELIVERY_VALIDATION_REPORT.md) · 13 PASS · 5 UNIMPLEMENTED · 0 FAIL |
@@ -287,7 +287,8 @@ never drives · never cooks · never bills
 ```
 
 Second **Operational Execution** Capability — Engineering Certified.  
-**Next:** Capability Demo (prefer before FLOW-002 Harness). FLOW-002 Architecture ✅ ADR 0081.
+**Next:** Capability Demo (ADR 0085) — close Engine v1.0 path. Not a new Architecture Freeze.  
+Delivery = controlled transfer of responsibility (never courier / GPS / Billing).
 
 ---
 

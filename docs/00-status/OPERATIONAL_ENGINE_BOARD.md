@@ -1,6 +1,7 @@
 # Operational Engine — Official Board
 
 **Core frozen:** 2026-08-06 · **Operational Engine v0.8** · ADR [0077](../adr/0077-operational-engine-v08.md)  
+**Product Direction:** [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md) · **PRODUCT LAW 001** · ADR [0084](../adr/0084-product-law-001.md) · [Time Savings Backlog](./TENANT_TIME_SAVINGS_BACKLOG.md)  
 **Expansion:** [OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md) · FLOW-002 **Engineering Certified** · ADR [0083](../adr/0083-operational-flow-002-engineering-certification.md)  
 **Behaviours:** [OPERATIONAL_BEHAVIOUR_BOARD](./OPERATIONAL_BEHAVIOUR_BOARD.md) · BH-001 Certified  
 **Scenarios:** [OPERATIONAL_SCENARIO_REGISTRY](./OPERATIONAL_SCENARIO_REGISTRY.md) · RESERVED  
@@ -96,14 +97,13 @@ PARALLEL TRACKS
 ## Era
 
 ```text
-Construction → Validation → Operational Expansion
+Construction → Validation → Operational Expansion → Tenant Success
 ```
 
-v0.8 core remains frozen. Expansion adds Execution/Outcome modules **without** rewriting Foundation.
+**Product question (from 2026-08-07):** *¿Esto ayuda al tenant a trabajar mejor y más rápido?*  
+North star: [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md) · PRODUCT LAW 001 · ADR [0084](../adr/0084-product-law-001.md).
 
-Android (OPPO): field evidence — [ANDROID_FIELD_VALIDATION_REPORT](../10-validation/ANDROID_FIELD_VALIDATION_REPORT.md).  
-Delivery Certification: [DELIVERY_VALIDATION_REPORT](../10-validation/DELIVERY_VALIDATION_REPORT.md) · ADR 0080.  
-FLOW-002 Architecture: [OPERATIONAL_FLOW_002](../05-architecture/OPERATIONAL_FLOW_002.md) · ADR 0081.
+v0.8 core remains frozen. Expansion finishes Delivery Demo + Billing for **Engine v1.0**, then Architecture Frozen unless PRODUCT LAW 001 / Foundation gates reopen it.
 
 ---
 
@@ -145,6 +145,7 @@ iPhone Field Validation (parallel · not blocking Certification)
 
 ## Immediate next steps (parallel)
 
-1. **FLOW-002 Phase 4** — Flow Demo (`useFlow002` only)  
-2. **IOS-READY / FIELD-VALIDATION-002** — [guide](../10-validation/FIELD_VALIDATION_002_IOS.md)  
-3. **FLOW-003 / Billing** — only after FLOW-002 Demo preferido
+1. **Finish Engine path** — Delivery **Demo** (ADR 0085) · Billing · Engine v1.0 freeze ([PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md))  
+2. **FLOW-002 Phase 4** — Flow Demo (`useFlow002` only)  
+3. **Tenant time savings** — [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md) · Beta 1 usability  
+4. **IOS-READY / FIELD-VALIDATION-002** — [guide](../10-validation/FIELD_VALIDATION_002_IOS.md)
