@@ -39,7 +39,7 @@ FLOW-001  Order → Production → Kitchen → Execution Completed
           (Engineering Certified)
 
 FLOW-002  Order → Production → Kitchen → Delivery → Confirmation
-          (Architecture · Operational Fulfillment Flow)
+          (Harness · Operational Fulfillment · BH-001)
 
 FLOW-003  Confirmation → Billing
           (Pending)

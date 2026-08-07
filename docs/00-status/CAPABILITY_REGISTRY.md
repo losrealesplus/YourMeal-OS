@@ -355,7 +355,8 @@ Screens will change. These questions are the product core (**LAW 006**).
 **Exists / v0.8:** [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) — Identity→Kitchen + FLOW-001 certified.  
 **Expansion:** [OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md) — Delivery Engineering Certified → Demo → …  
 **Language:** [OPERATIONAL_LANGUAGE_DICTIONARY](./OPERATIONAL_LANGUAGE_DICTIONARY.md) — LAW 006 questions.  
-**Flows:** [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md) — FLOW-001 Engineering Certified · FLOW-002 Architecture (ADR 0081).  
+**Flows:** [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md) — FLOW-001 Engineering Certified · FLOW-002 Harness (ADR 0082).  
+**Behaviours:** [OPERATIONAL_BEHAVIOURS](../05-architecture/OPERATIONAL_BEHAVIOURS.md) — BH-001 Fulfill Weekly Commitment.  
 **Review:** [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md).  
 **Phases:** [OPERATIONAL_CERTIFICATION_PHASES](./OPERATIONAL_CERTIFICATION_PHASES.md).  
 **Engine Completion:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md).  

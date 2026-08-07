@@ -59,8 +59,8 @@ Observe
 ```text
 OPERATIONAL-006  Delivery          ← Architecture ✅ · Facade ✅ · Engineering Certified ✅
         ↓
-FLOW-002         Operational Fulfillment   ← Architecture ✅ (ADR 0081)
-                 Order → … → Confirmation
+FLOW-002         Operational Fulfillment   ← Architecture ✅ · Harness ✅
+                 Order → … → Confirmation · BH-001
         ↓
 OPERATIONAL-007  Billing
         ↓
@@ -87,13 +87,14 @@ IOS-READY-001 / FIELD-VALIDATION-002
 ## First mission status
 
 **OPERATIONAL-006 · Delivery** — Engineering Certified ✅ · Demo preferido  
-**OPERATIONAL-FLOW-002** — Architecture Freeze ✅ · Harness gated
+**OPERATIONAL-FLOW-002** — Architecture ✅ · Harness ✅ · Certification ◀ next  
+**Behaviour:** [BH-001 Fulfill Weekly Commitment](../05-architecture/OPERATIONAL_BEHAVIOURS.md)
 
 Canonical Flow question:
 
 > ¿Puede un compromiso operativo convertirse en una entrega confirmada sin romper ninguna Foundation Law?
 
-Contract: [OPERATIONAL_FLOW_002](../05-architecture/OPERATIONAL_FLOW_002.md) · Delivery: [DELIVERY_VALIDATION_REPORT](../10-validation/DELIVERY_VALIDATION_REPORT.md)
+Contract: [OPERATIONAL_FLOW_002](../05-architecture/OPERATIONAL_FLOW_002.md) · Package: `src/flows/flow-002/`
 
 ---
 
@@ -102,6 +103,6 @@ Contract: [OPERATIONAL_FLOW_002](../05-architecture/OPERATIONAL_FLOW_002.md) · 
 | Item | Lock |
 |------|------|
 | Delivery Product UI / DB | Until Demo+ |
-| FLOW-002 Harness | Prefer Delivery Demo · FLOW-001 Demo |
+| FLOW-002 Flow Demo / UI | Until Engineering Certification |
 | Billing Architecture | After FLOW-002 (prefer Demo) |
 | Claiming Engine **FIELD VALIDATED** | Until iPhone PASS + Android PASS |

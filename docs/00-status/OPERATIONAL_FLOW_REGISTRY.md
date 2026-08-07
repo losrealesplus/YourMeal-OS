@@ -80,28 +80,30 @@ Order ──Facade──▶ Production ──Facade──▶ Kitchen
 
 | Field | Value |
 |-------|--------|
-| **Maturity** | **Architecture** |
+| **Maturity** | **Harness** |
 | **Name** | Operational Fulfillment Flow |
+| **Behaviour** | [BH-001 Fulfill Weekly Commitment](../05-architecture/OPERATIONAL_BEHAVIOURS.md) |
 | **Canonical question** | ¿Puede un compromiso operativo convertirse en una entrega confirmada sin romper ninguna Foundation Law? |
 | **Chain** | Order → Production → Kitchen → Delivery → **Confirmation** |
 | **Context** | Identity · Customer |
 | **Facades** | OrderFacade · ProductionFacade · KitchenExecutionFacade · DeliveryFacade |
-| **Harness** | — Phase 2 (gated) |
+| **Harness** | `src/flows/flow-002/Flow002Harness.ts` · `useFlow002()` |
 | **Contract** | [OPERATIONAL_FLOW_002](../05-architecture/OPERATIONAL_FLOW_002.md) |
-| **ADR** | [0081](../adr/0081-operational-flow-002.md) |
+| **ADR** | [0081](../adr/0081-operational-flow-002.md) · [0082](../adr/0082-operational-flow-002-harness.md) |
 | **Owns** | Transitions · context · integrity · evidence · lifecycle consistency |
 | **Never owns** | Business logic · UI · Billing · GPS |
 | **Ends at** | Delivery Confirmation (not Invoice) |
-| **Next** | Harness (prefer Delivery Demo · FLOW-001 Demo) |
+| **Next** | Engineering Certification |
 
 ```text
 FLOW-002
 ████ Architecture
-░░░░ Harness · Certification · Demo
+████ Harness
+░░░░ Certification · Demo
 
 Order ──▶ Production ──▶ Kitchen ──▶ Delivery ──▶ Confirmation
                     ▲
-                    └── Flow002Harness (Phase 2)
+                    └── Flow002Harness
 ```
 
 ---
