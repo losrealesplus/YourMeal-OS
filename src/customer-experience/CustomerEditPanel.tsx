@@ -13,6 +13,7 @@ import {
   saveOperationalCorrection,
   type OperationalCorrection,
 } from "@/customer-experience/operational-corrections";
+import { ProfileGrowthPanel } from "@/customer-experience/ProfileGrowthPanel";
 import { cn } from "@/lib/utils";
 
 type SectionId = "basic" | "delivery" | "notes";
@@ -387,7 +388,7 @@ export function CustomerEditPanel(props: {
       </EditSection>
 
       <EditSection
-        title="Notas operativas"
+        title="Notas operativas (rápido)"
         editing={editing === "notes"}
         canWrite={props.canWrite}
         busy={props.busy}
@@ -410,20 +411,17 @@ export function CustomerEditPanel(props: {
           </label>
         ) : (
           <p className="text-xs text-muted-foreground">
-            {notes.trim() || "Sin notas · Progressive Completion"}
+            {notes.trim() || "Sin notas · enriquece abajo cuando aporte valor"}
           </p>
         )}
       </EditSection>
 
-      <div className="rounded-md border border-dashed border-border/80 px-3 py-2 space-y-1">
-        <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-          Clasificación · empresa · preferencias
-        </p>
-        <p className="text-xs text-muted-foreground">
-          CX004 Company · CX005 Progressive Completion — no interrumpen la
-          operación ahora.
-        </p>
-      </div>
+      <ProfileGrowthPanel
+        context={context}
+        canWrite={props.canWrite}
+        busy={props.busy}
+        onBusy={props.onBusy}
+      />
 
       <div className="flex flex-wrap gap-2 border-t border-dashed border-border pt-2">
         <button

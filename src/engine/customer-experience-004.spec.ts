@@ -22,10 +22,6 @@ describe("CUSTOMER EXPERIENCE 004 · Zero Friction Organization", () => {
       resolve(ROOT, "docs/00-status/EXPERIENCE_CARDS.md"),
       "utf8",
     );
-    const missions = readFileSync(
-      resolve(ROOT, "docs/00-status/EXPERIENCE_MISSIONS.md"),
-      "utf8",
-    );
     const accelerators = readFileSync(
       resolve(ROOT, "docs/00-status/OPERATIONAL_ACCELERATORS.md"),
       "utf8",
@@ -46,19 +42,14 @@ describe("CUSTOMER EXPERIENCE 004 · Zero Friction Organization", () => {
     expect(doc).toContain("No Capability / Facade / Engine changes");
     expect(doc).toContain("Organization Templates");
     expect(doc).toContain("Organización → Trabajadores → Pedidos");
+    expect(doc).toContain("COMPLETE");
 
     expect(cards).toContain("004 Organization");
     expect(cards).toContain("Time-to-Organization <45 s");
-    expect(cards).toContain("In Progress · Phase 004");
-
-    expect(missions).toContain("CUSTOMER_EXPERIENCE_004");
-    expect(missions).toContain("004 Organization");
-    expect(missions).toContain("organización < 45s");
+    expect(cards).toContain("005 Growth");
 
     expect(accelerators).toContain("Organization Templates");
 
-    expect(ui).toContain("CUSTOMER EXPERIENCE 004");
-    expect(ui).toContain("Zero Friction Organization Management");
     expect(ui).toContain("Nueva organización");
     expect(ui).toContain("OrganizationPanel");
     expect(ui).toContain("from \"@/customer/useCustomer\"");

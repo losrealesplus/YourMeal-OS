@@ -10,7 +10,9 @@
 | **[ERA_DECLARATION](./ERA_DECLARATION.md)** | **Acta de eras** · Era 1 CLOSED · Era 2 OPEN · ADR 0091 |
 | **[ERA2_PRODUCT_DISCOVERY_001](./ERA2_PRODUCT_DISCOVERY_001.md)** | **First Discovery** · Accelerators registered |
 | **[SPRINT_001_TENANT_SUCCESS](./SPRINT_001_TENANT_SUCCESS.md)** | Era 2 sprint board · Experience vs Observation |
-| **[CUSTOMER_EXPERIENCE_004](./CUSTOMER_EXPERIENCE_004.md)** | **Active** · Zero Friction Organization · TTO &lt; 45s |
+| **[CUSTOMER_EXPERIENCE_005](./CUSTOMER_EXPERIENCE_005.md)** | **Active** · Zero Friction Growth · Living Profile |
+| [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md) | Mini UX freeze before CX006 |
+| [CUSTOMER_EXPERIENCE_004](./CUSTOMER_EXPERIENCE_004.md) | Organization · TTO &lt; 45s |
 | [CUSTOMER_EXPERIENCE_003](./CUSTOMER_EXPERIENCE_003.md) | Edit · TTE &lt; 20s |
 | [CUSTOMER_EXPERIENCE_002](./CUSTOMER_EXPERIENCE_002.md) | Search · TTF &lt; 10s |
 | [CUSTOMER_EXPERIENCE_001](./CUSTOMER_EXPERIENCE_001.md) | Create · TTC &lt; 30s |
@@ -59,7 +61,7 @@
 **Operational Experience:** ▶ **[OPERATIONAL_EXPERIENCE](./OPERATIONAL_EXPERIENCE.md)** · Tenant Success  
 **Product Direction:** ▶ **[PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md)** · PRODUCT LAW 001 · ADR [0084](../adr/0084-product-law-001.md) · [Time Savings Backlog](./TENANT_TIME_SAVINGS_BACKLOG.md) · **[Tenant Success Playbook](./TENANT_SUCCESS_PLAYBOOK.md)**  
 **Era Declaration:** ✅ **[ERA_DECLARATION](./ERA_DECLARATION.md)** · ADR [0091](../adr/0091-era-declaration.md) · **Era 1 CLOSED · Era 2 OPEN** (2026-08-07)  
-**Era 2 Discovery / Sprint:** ▶ **[CUSTOMER_EXPERIENCE_004](./CUSTOMER_EXPERIENCE_004.md)** · [003 Edit](./CUSTOMER_EXPERIENCE_003.md) · [002 Search](./CUSTOMER_EXPERIENCE_002.md) · [001 Create](./CUSTOMER_EXPERIENCE_001.md) · [SPRINT_001_TENANT_SUCCESS](./SPRINT_001_TENANT_SUCCESS.md) · Prompt [ERA2_CURSOR_PROMPT](./ERA2_CURSOR_PROMPT.md) · LAW 002 ADR [0093](../adr/0093-product-law-002.md) · TEAM LAW 001 ADR [0094](../adr/0094-team-law-001.md) · LAW 001-A ADR [0096](../adr/0096-tenant-success-law-001a.md)  
+**Era 2 Discovery / Sprint:** ▶ **[CUSTOMER_EXPERIENCE_005](./CUSTOMER_EXPERIENCE_005.md)** · [Review](./CUSTOMER_EXPERIENCE_REVIEW.md) · [004](./CUSTOMER_EXPERIENCE_004.md) · [003](./CUSTOMER_EXPERIENCE_003.md) · [002](./CUSTOMER_EXPERIENCE_002.md) · [001](./CUSTOMER_EXPERIENCE_001.md) · [SPRINT_001_TENANT_SUCCESS](./SPRINT_001_TENANT_SUCCESS.md) · Prompt [ERA2_CURSOR_PROMPT](./ERA2_CURSOR_PROMPT.md) · LAW 002 ADR [0093](../adr/0093-product-law-002.md) · TEAM LAW 001 ADR [0094](../adr/0094-team-law-001.md) · LAW 001-A ADR [0096](../adr/0096-tenant-success-law-001a.md)  
 **Observation Framework:** ✅ READY · sessions ⏸ — [OBSERVATION_FRAMEWORK](../tenant-success/OBSERVATION_FRAMEWORK.md) · TENANT-SUCCESS-001 · ADR [0095](../adr/0095-tenant-success-001-observation-framework.md)  
 **PR Review Protocol:** ▶ **[PR_REVIEW_PROTOCOL](./PR_REVIEW_PROTOCOL.md)** · ADR [0097](../adr/0097-pr-review-protocol.md) · Cursor gate before `main`  
 **Operational Modules:** ▶ Expansion complete for Engine v1.0 · [OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md) · Engine [v1.0](./OPERATIONAL_ENGINE_V1.md)  

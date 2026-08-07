@@ -41,12 +41,12 @@ describe("CUSTOMER EXPERIENCE 001 · Phase 1", () => {
     expect(cards).toContain("Time-to-Create Customer <30 s");
     expect(cards).toContain("Time-to-Find Customer <10 s");
     expect(cards).toContain("Time-to-Edit Customer <20 s");
-    expect(cards).toContain("Time-to-Organization <45 s");
+    expect(cards).toContain("Time-to-Complete Frequent Customer Information <30 s");
     expect(cards).toContain("Operational Time Saved");
-    expect(cards).toContain("004 Organization");
-    expect(cards).toContain("In Progress · Phase 004");
+    expect(cards).toContain("005 Growth");
+    expect(cards).toContain("In Progress · Phase 005");
 
-    expect(ui).toContain("Phase 004");
+    expect(ui).toContain("Phase 005");
     expect(ui).toContain("Cliente creado");
     expect(ui).toContain("¿Qué quieres hacer ahora?");
     expect(ui).toContain("Crear pedido");

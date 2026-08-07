@@ -54,42 +54,50 @@ Name
 Customer Experience
 
 Mission
-Zero Friction Organization Management
+Zero Friction Customer Growth
 
 Phase
-004 Organization
+005 Growth
 
 Primary User
 Tenant Operator
 
 Primary KPI
-Time-to-Organization <45 s
+Time-to-Complete Frequent Customer Information <30 s
 
 Secondary KPIs
-Time-to-Add Worker <15 s
+Time-to-Resume Operation <5 s
+Time-to-Organization <45 s
 Time-to-Edit Customer <20 s
 Time-to-Find Customer <10 s
 Time-to-Create Customer <30 s
 
 Operational Time Saved
 Estimated
-45–135 seconds per organization
+30–90 seconds per enrichment
 
 Status
-In Progress · Phase 004
+In Progress · Phase 005
 ```
 
-Detail: [CUSTOMER_EXPERIENCE_004](./CUSTOMER_EXPERIENCE_004.md) · [003 Edit](./CUSTOMER_EXPERIENCE_003.md) · [002](./CUSTOMER_EXPERIENCE_002.md) · [001](./CUSTOMER_EXPERIENCE_001.md)
+Detail: [CUSTOMER_EXPERIENCE_005](./CUSTOMER_EXPERIENCE_005.md) · [004](./CUSTOMER_EXPERIENCE_004.md) · [003](./CUSTOMER_EXPERIENCE_003.md) · [002](./CUSTOMER_EXPERIENCE_002.md) · [001](./CUSTOMER_EXPERIENCE_001.md)
 
-**Customer Experience sequence** (Orders wait until Customer is fluid):
+**Living Customer Profile:** *A customer profile should grow with the relationship, never before it.*
+
+**Customer Experience sequence:**
 
 ```text
 001 Create     ✅
 002 Search     ✅
 003 Edit       ✅
-004 Organization  ← active
-005 Progressive Completion
+004 Organization  ✅
+005 Growth     ← active
+↓
+Experience Review
+↓
 006 Bulk Operations
+↓
+ORDER EXPERIENCE
 ```
 
 Measurable questions:
@@ -100,7 +108,8 @@ Measurable questions:
 | 002 | ¿Puedo encontrar un cliente en menos de 10 segundos? |
 | 003 | ¿Puedo modificar un cliente frecuente en menos de 20 segundos? |
 | 004 | ¿Puedo crear una organización y empezar a trabajar en menos de 45 segundos? |
-| 005 | ¿Puedo completar la ficha sin interrumpir la operación? |
+| 005 | ¿Puedo enriquecer la ficha en menos de 30 segundos sin parar la operación? |
+| Review | ¿Customer Experience funciona como un lunes cualquiera? |
 | 006 | ¿Puedo realizar operaciones masivas sin reescribir información? |
 
 ---

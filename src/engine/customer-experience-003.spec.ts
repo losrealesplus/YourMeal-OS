@@ -44,16 +44,16 @@ describe("CUSTOMER EXPERIENCE 003 · Zero Friction Edit", () => {
     expect(doc).toContain("UNIMPLEMENTED");
     expect(doc).toContain("operational corrections");
 
-    expect(cards).toContain("004 Organization");
-    expect(cards).toContain("Time-to-Organization <45 s");
-    expect(cards).toContain("In Progress · Phase 004");
+    expect(cards).toContain("005 Growth");
+    expect(cards).toContain("Time-to-Complete Frequent Customer Information <30 s");
+    expect(cards).toContain("In Progress · Phase 005");
 
-    expect(missions).toContain("CUSTOMER_EXPERIENCE_004");
-    expect(missions).toContain("004 Organization");
-    expect(missions).toContain("organización < 45s");
+    expect(missions).toContain("CUSTOMER_EXPERIENCE_005");
+    expect(missions).toContain("005 Growth");
+    expect(missions).toContain("enriquecer < 30s");
 
-    expect(ui).toContain("CUSTOMER EXPERIENCE 004");
-    expect(ui).toContain("Zero Friction Organization Management");
+    expect(ui).toContain("CUSTOMER EXPERIENCE 005");
+    expect(ui).toContain("Zero Friction Customer Growth");
     expect(ui).toContain("CustomerEditPanel");
     expect(ui).toContain("from \"@/customer/useCustomer\"");
     expect(ui).not.toMatch(/from ["']@\/integrations\/supabase/);
