@@ -102,8 +102,10 @@ Contract: [OPERATIONAL_FLOW_002](../05-architecture/OPERATIONAL_FLOW_002.md) · 
 
 | Item | Lock |
 |------|------|
-| Delivery Product UI / DB | Until Demo+ |
+| Delivery Product UI / DB | Until Demo+ / Flow Demo preferido |
 | FLOW-002 Flow Demo | Next (useFlow002 only) |
-| Billing Architecture | After FLOW-002 Demo preferido |
+| Billing Architecture | ✅ ADR 0087 — unlocked by Delivery Demo |
+| Billing Facade → Demo | Next structural Engine work |
+| OPERATIONAL-ENGINE-001 | RESERVED — after Billing Demo |
 | Scenarios | RESERVED |
 | Claiming Engine **FIELD VALIDATED** | Until iPhone PASS + Android PASS |
