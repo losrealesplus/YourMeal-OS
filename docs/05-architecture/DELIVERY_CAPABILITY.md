@@ -1,17 +1,19 @@
 # Delivery Capability
 
-**OPERATIONAL-006 · Phase 1 — Architecture Freeze**  
-**ADR:** [0078](../adr/0078-delivery-capability.md)  
-**Status:** **Architecture** (Observe → Design → Freeze)  
-**Depends on:** Kitchen Execution (Engineering Certified + Demo) · Orders (commitment facts via Facade)  
+**OPERATIONAL-006 · Phase 3 — Engineering Certification**  
+**ADR:** [0078](../adr/0078-delivery-capability.md) · [0079](../adr/0079-delivery-facade.md) · [0080](../adr/0080-delivery-engineering-certification.md)  
+**Status:** **Engineering Certified** (Architecture → Facade → Certification)  
+**Depends on:** Kitchen Execution (Engineering Certified + Demo) · Orders (Engineering Certified + Demo)  
 **Provides toward:** Billing · FLOW-002  
 **Tenant lens:** any meal-prep / catering tenant with operational commitments to fulfill physically  
 **EatClean lens:** weekly meal prep · confirm that prepared work reaches the right stop  
 **Layer / Type:** **Operational Execution** (second Execution capability after Kitchen)  
-**Maturity:** **Architecture** → Facade → Engineering Certified → Field Validated → Production Ready  
-**Completeness:** **Architecture** → Facade → Engineering Certification → Capability Demo → Product UI → Field → Production  
+**Maturity:** Architecture → Facade → **Engineering Certified** → Field Validated → Production Ready  
+**Completeness:** Architecture ✅ · Facade ✅ · **Engineering Certification ✅** · Capability Demo ⏳ · Product UI ⏳ · Field ⏳  
 **Laws:** 001–007 · [FOUNDATION_LOCK](./FOUNDATION_LOCK.md)  
-**Package (future):** `src/delivery/` · `DeliveryFacade` · `useDelivery` — **not created in Phase 1**
+**Package:** `src/delivery/` · `DeliveryFacade` · `useDelivery`  
+**Validation:** [DELIVERY_VALIDATION_REPORT](../10-validation/DELIVERY_VALIDATION_REPORT.md) · [DELIVERY_SMOKE_CHECKLIST](../10-validation/DELIVERY_SMOKE_CHECKLIST.md)  
+**Dictionary:** [OPERATIONAL_LANGUAGE_DICTIONARY](../00-status/OPERATIONAL_LANGUAGE_DICTIONARY.md)
 
 ```text
 Delivery = asignar · rutear · confirmar · evidenciar · exceptuar
@@ -361,17 +363,25 @@ If a feature does not reduce “lost deliveries”, confirmation time, or operat
 
 | Phase | Output | Status |
 |-------|--------|--------|
-| **1 · Architecture Freeze** | This document · ADR 0078 · Registry | **NOW** |
-| 2 · Facade | `DeliveryFacade` · Commands / Queries | Gated — no implementation in this PR |
-| 3 · Engineering Certification | Validation matrix | After Facade |
-| 4 · Capability Demo | `/admin/delivery-workspace` (name TBD) | After Certification |
-| 5 · FLOW-002 | Production → Kitchen → Delivery Harness | After Delivery Facade (+ prefer FLOW-001 Demo) |
+| **1 · Architecture Freeze** | This document · ADR 0078 · Registry | ✅ |
+| **2 · Facade** | `DeliveryFacade` · Commands / Queries · ADR 0079 | ✅ |
+| **3 · Engineering Certification** | Validation matrix · ADR 0080 | ✅ |
+| 4 · Capability Demo | `/admin/delivery-workspace` (name TBD) | Next |
+| 5 · FLOW-002 | Order → Production → Kitchen → Delivery → Confirmation | After Certification (+ prefer Demo) |
+
+### Facade substrate (Phase 2)
+
+| Intent | Composition |
+|--------|-------------|
+| ConfirmDelivery | `OrderFacade.completeDelivery` |
+| GetDeliveryContext / Assignments / Stops | `OrderFacade.getOrdersReadyForDelivery` |
+| GetCompletedDeliveries | `OrderFacade.searchOrders(delivered)` + Kitchen completed touch |
+| Assign / Start / Exception / Close / Routes | **UNIMPLEMENTED** (visible gaps) |
 
 ---
 
-## Explicit non-goals (Phase 1)
+## Explicit non-goals (Phase 2 still)
 
-- No `src/delivery/` package  
 - No UI / CRUD screens  
 - No database migrations  
 - No GPS / maps SDK  
@@ -385,13 +395,22 @@ If a feature does not reduce “lost deliveries”, confirmation time, or operat
 
 | Panel | Change |
 |-------|--------|
-| Capability Registry | Delivery → **Architecture** · OPERATIONAL-006 |
-| Dependency Graph | Delivery node Architecture · deps Kitchen + Order facts |
-| Operational Expansion | Era declared |
-| FLOW-002 | Remains Pending until Facade |
+| Capability Registry | Delivery → **Engineering Certified** · OPERATIONAL-006 · ADR 0080 |
+| Dependency Graph | Delivery node Engineering Certified |
+| Operational Expansion | Certification ✅ · Demo next |
+| Language Dictionary | Delivery question locked |
+| FLOW-002 | Unlocked for design after Certification · prefer Demo |
 | Engine v0.8 | Unchanged core freeze · Expansion is additive |
 
 ---
+
+## Success of Phase 3
+
+Phase 3 succeeds when the validation matrix is FAIL=0, expected gaps are UNIMPLEMENTED (not FAIL), and Registry maturity is Engineering Certified.
+
+## Success of Phase 2
+
+Phase 2 succeeds when consumers call `DeliveryFacade` / `useDelivery()` only, commands speak operational language, and unimplemented gaps stay visible.
 
 ## Success of Phase 1
 

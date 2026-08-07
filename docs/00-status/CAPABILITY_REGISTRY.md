@@ -10,7 +10,7 @@ Platform → Foundation → Operational Capabilities → Operational Experience
 → Operational Validation → Cross-Platform Validation → Production
 ```
 
-**Expansion era:** [OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md) · first module OPERATIONAL-006 Delivery (Architecture)
+**Expansion era:** [OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md) · first module OPERATIONAL-006 Delivery (**Engineering Certified**) · [Language Dictionary](./OPERATIONAL_LANGUAGE_DICTIONARY.md)
 
 **Graph:** [OPERATIONAL_DEPENDENCY_GRAPH](./OPERATIONAL_DEPENDENCY_GRAPH.md) · **Board:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)
 
@@ -92,7 +92,7 @@ Functional consumers — not import graphs.
 | Orders | Operational Planning | Engineering Certified + Demo | Production |
 | Production | Operational Planning | **Engineering Certified + Demo** | Kitchen Execution |
 | Kitchen Execution | Operational Execution | **Engineering Certified + Demo** | Delivery |
-| Delivery | Operational Execution | **Architecture** | Billing |
+| Delivery | Operational Execution | **Engineering Certified** | Billing |
 | Billing | Operational Outcome | Pending | — |
 
 **Discipline:** Never open two new operational capabilities at once.  
@@ -252,7 +252,7 @@ Final isolated Capability Demo before Phase B.
 
 First **Operational Execution** Capability — Engineering Certified + Demo.  
 **Phase A complete.** FLOW-001 Engineering Certified.  
-**Expansion:** OPERATIONAL-006 Delivery · Architecture Freeze (ADR 0078).
+**Expansion:** OPERATIONAL-006 Delivery · **Engineering Certified** (ADR 0078 · 0079 · 0080).
 
 ---
 
@@ -260,30 +260,34 @@ First **Operational Execution** Capability — Engineering Certified + Demo.
 
 | Field | Value |
 |-------|--------|
-| **Maturity** | **Architecture** |
+| **Maturity** | **Engineering Certified** |
 | **Type** | Operational Execution |
-| Completeness | **Architecture ✅** · Facade ⏳ · Validation ⏳ · Demo ⏳ · Field ⏳ |
+| Completeness | Architecture ✅ · Facade ✅ · **Engineering Certification ✅** · Demo ⏳ · Field ⏳ |
 | Consumida por | Billing (canonical) · FLOW-002 |
-| Depends on | KitchenExecutionFacade · OrderFacade (commitment facts) |
-| Version | 0.1 (contracts frozen) |
-| ADRs | [0078](../adr/0078-delivery-capability.md) |
+| Depends on | OrderFacade · KitchenExecutionFacade |
+| Version | 1.0 |
+| ADRs | [0078](../adr/0078-delivery-capability.md) · [0079](../adr/0079-delivery-facade.md) · [0080](../adr/0080-delivery-engineering-certification.md) |
 | Contract | [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) |
-| Facade | — Phase 2 |
-| Notes | OPERATIONAL-006 · LAW 006 question below · never drives / cooks / bills |
+| Facade | `src/delivery/DeliveryFacade.ts` · `useDelivery()` · Commands / Queries |
+| Validation | [DELIVERY_VALIDATION_REPORT](../10-validation/DELIVERY_VALIDATION_REPORT.md) · 13 PASS · 5 UNIMPLEMENTED · 0 FAIL |
+| Notes | ConfirmDelivery composed · Assign/Start/Exception/Close/Routes EXPECTED GAP |
 
 ```text
 Delivery
 ████ Architecture
-░░░░ Facade · Certification · Demo · Field
+████ Facade
+████ Engineering Certified
+░░░░ Demo · Field
 
 Question: ¿Qué compromisos operativos deben entregarse ahora
           y cómo confirmamos su ejecución?
 
 Delivery = asignar · rutear · confirmar · evidenciar · exceptuar
+never drives · never cooks · never bills
 ```
 
-Second **Operational Execution** Capability — Architecture Freeze only.  
-**No implementation in this phase.**
+Second **Operational Execution** Capability — Engineering Certified.  
+**Next:** Capability Demo (no FLOW-002 until Demo preferido).
 
 ---
 
@@ -349,7 +353,8 @@ Second **Operational Execution** Capability — Architecture Freeze only.
 Screens will change. These questions are the product core (**LAW 006**).
 
 **Exists / v0.8:** [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) — Identity→Kitchen + FLOW-001 certified.  
-**Expansion:** [OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md) — Delivery Architecture → …  
+**Expansion:** [OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md) — Delivery Engineering Certified → Demo → …  
+**Language:** [OPERATIONAL_LANGUAGE_DICTIONARY](./OPERATIONAL_LANGUAGE_DICTIONARY.md) — LAW 006 questions.  
 **Flows:** [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md) — FLOW-001 Engineering Certified · FLOW-002 Pending.  
 **Review:** [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md).  
 **Phases:** [OPERATIONAL_CERTIFICATION_PHASES](./OPERATIONAL_CERTIFICATION_PHASES.md).  

@@ -20,19 +20,22 @@ Do not reorder Expansion modules. Architecture Freeze may precede iPhone PASS; F
 ### Validation / Cross-Platform (parallel)
 
 ```text
-Android PASS ✅
+Android / OPPO Field Validation ✅ PASS
 iPhone FIELD-VALIDATION-002 ⏳
 Engine FIELD VALIDATED 🔒 until both
+Roadmap Review (Engine Review) — continuous with Expansion
 ```
 
 ### Operational Expansion
 
 ```text
 1. OPERATIONAL-006 Delivery · Architecture ✅ (ADR 0078)
-2. Delivery Facade (Phase 2) 🔒 until opened
-3. FLOW-002 Architecture 🔒 after Delivery Facade
-4. OPERATIONAL-007 Billing …
-5. FLOW-003 …
+2. Delivery Facade (Phase 2) ✅ (ADR 0079)
+3. Delivery Engineering Certification (Phase 3) ✅ (ADR 0080)
+4. Delivery Capability Demo (Phase 4) ◀ next
+5. FLOW-002 Architecture 🔒 after Delivery Certification (prefer Demo)
+6. OPERATIONAL-007 Billing …
+7. FLOW-003 …
 ```
 
 ### Method (permanent)
