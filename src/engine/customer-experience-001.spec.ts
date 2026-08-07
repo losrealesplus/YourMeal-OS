@@ -58,7 +58,7 @@ describe("CUSTOMER EXPERIENCE 001 · Zero Friction TTA", () => {
     expect(prompt).toContain("Cognitive load");
     expect(prompt).toContain("EXPERIENCE MANIFESTO 001");
 
-    expect(ui).toContain("Zero Friction Customer Search");
+    expect(ui).toContain("Zero Friction Customer Edit");
     expect(ui).toContain("staff_create");
     expect(ui).toContain("Nuevo cliente");
     expect(ui).toContain("Particular");

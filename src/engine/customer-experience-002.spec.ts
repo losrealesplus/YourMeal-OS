@@ -60,19 +60,19 @@ describe("CUSTOMER EXPERIENCE 002 · Zero Friction Search", () => {
     expect(doc).toContain("Recientes");
 
     expect(cards).toContain("Phase");
-    expect(cards).toContain("002 Search");
-    expect(cards).toContain("Time-to-Find Customer <10 s");
-    expect(cards).toContain("In Progress · Phase 002");
+    expect(cards).toContain("003 Edit");
+    expect(cards).toContain("Time-to-Edit Customer <20 s");
+    expect(cards).toContain("In Progress · Phase 003");
 
-    expect(missions).toContain("CUSTOMER_EXPERIENCE_002");
-    expect(missions).toContain("002 Search");
-    expect(missions).toContain("encontrar < 10s");
+    expect(missions).toContain("CUSTOMER_EXPERIENCE_003");
+    expect(missions).toContain("003 Edit");
+    expect(missions).toContain("editar frecuente < 20s");
 
     expect(backlog).toContain("Operational Command Center");
     expect(backlog).toContain("ACCELERATOR-001");
 
-    expect(ui).toContain("CUSTOMER EXPERIENCE 002");
-    expect(ui).toContain("Zero Friction Customer Search");
+    expect(ui).toContain("CUSTOMER EXPERIENCE 003");
+    expect(ui).toContain("Zero Friction Customer Edit");
     expect(ui).toContain("sin botón");
     expect(ui).toContain("No se encontró el cliente");
     expect(ui).toContain("Crear cliente");

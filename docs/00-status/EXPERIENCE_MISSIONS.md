@@ -22,14 +22,14 @@ If PRODUCT LAW 001 returns time, every Experience has official KPIs in **seconds
 
 | Experience | Mission | Primary TTA |
 |------------|---------|-------------|
-| **Customer** | Zero Friction Search (phase 002) | Find &lt; 10s |
+| **Customer** | Zero Friction Edit (phase 003) | Edit &lt; 20s |
 | **Order** | Create an operational commitment | &lt; 45s |
 | **Menu** | Plan one operational week | &lt; 2 min |
 | **Production** | Generate today's work | &lt; 1 min |
 | **Kitchen** | Know what to execute | &lt; 10s |
 | **Delivery** | Prepare today's routes | &lt; 2 min |
 
-Each Customer phase answers **one** measurable question — frequency first (Search before Edit).
+Each Customer phase answers **one** measurable question — frequency first (Search before Edit; Edit before Orders).
 
 ---
 
@@ -63,18 +63,18 @@ If no → later.
 
 ## Active mission
 
-▶ [CUSTOMER_EXPERIENCE_002](./CUSTOMER_EXPERIENCE_002.md) · Zero Friction Customer Search  
+▶ [CUSTOMER_EXPERIENCE_003](./CUSTOMER_EXPERIENCE_003.md) · Zero Friction Customer Edit  
 
-Prior: [CUSTOMER_EXPERIENCE_001](./CUSTOMER_EXPERIENCE_001.md) · Create ✅
+Prior: [002 Search](./CUSTOMER_EXPERIENCE_002.md) ✅ · [001 Create](./CUSTOMER_EXPERIENCE_001.md) ✅
 
 ## Customer Experience sequence
 
 ```text
 001 Create          ✅  ¿crear < 30s?
 ↓
-002 Search          ← active  ¿encontrar < 10s?
+002 Search          ✅  ¿encontrar < 10s?
 ↓
-003 Edit                ¿editar frecuente < 20s?
+003 Edit            ← active  ¿editar frecuente < 20s?
 ↓
 004 Company Management  ¿empresas sin duplicar?
 ↓

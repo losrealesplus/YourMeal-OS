@@ -1,6 +1,6 @@
 # CUSTOMER EXPERIENCE 002
 
-**Status:** ▶ **ACTIVE** — Era 2 Experience Sprint  
+**Status:** ✅ **COMPLETE** (Create + Search retained on surface) — active mission is [CX003 Edit](./CUSTOMER_EXPERIENCE_003.md)  
 **Type:** Experience Sprint (build) — **not** Observation Sprint  
 **Mission:** **Zero Friction Customer Search**  
 **Declared:** 2026-08-07  
