@@ -22,14 +22,14 @@ If PRODUCT LAW 001 returns time, every Experience has official KPIs in **seconds
 
 | Experience | Mission | Primary TTA |
 |------------|---------|-------------|
-| **Customer** | Zero Friction Edit (phase 003) | Edit &lt; 20s |
+| **Customer** | Zero Friction Organization (phase 004) | Organization &lt; 45s |
 | **Order** | Create an operational commitment | &lt; 45s |
 | **Menu** | Plan one operational week | &lt; 2 min |
 | **Production** | Generate today's work | &lt; 1 min |
 | **Kitchen** | Know what to execute | &lt; 10s |
 | **Delivery** | Prepare today's routes | &lt; 2 min |
 
-Each Customer phase answers **one** measurable question — frequency first (Search before Edit; Edit before Orders).
+Each Customer phase answers **one** measurable question — Create → Search → Edit → Organization → Completion → Bulk → then Orders.
 
 ---
 
@@ -63,9 +63,9 @@ If no → later.
 
 ## Active mission
 
-▶ [CUSTOMER_EXPERIENCE_003](./CUSTOMER_EXPERIENCE_003.md) · Zero Friction Customer Edit  
+▶ [CUSTOMER_EXPERIENCE_004](./CUSTOMER_EXPERIENCE_004.md) · Zero Friction Organization Management  
 
-Prior: [002 Search](./CUSTOMER_EXPERIENCE_002.md) ✅ · [001 Create](./CUSTOMER_EXPERIENCE_001.md) ✅
+Prior: [003 Edit](./CUSTOMER_EXPERIENCE_003.md) ✅ · [002 Search](./CUSTOMER_EXPERIENCE_002.md) ✅ · [001 Create](./CUSTOMER_EXPERIENCE_001.md) ✅
 
 ## Customer Experience sequence
 
@@ -74,20 +74,21 @@ Prior: [002 Search](./CUSTOMER_EXPERIENCE_002.md) ✅ · [001 Create](./CUSTOMER
 ↓
 002 Search          ✅  ¿encontrar < 10s?
 ↓
-003 Edit            ← active  ¿editar frecuente < 20s?
+003 Edit            ✅  ¿editar frecuente < 20s?
 ↓
-004 Company Management  ¿empresas sin duplicar?
+004 Organization    ← active  ¿organización < 45s?
 ↓
-005 Preferences         ¿completar ficha sin parar?
+005 Progressive Completion  ¿completar ficha sin parar?
 ↓
-006 Bulk Operations     ¿masivo sin reescribir?
+006 Bulk Operations         ¿masivo sin reescribir?
 ↓
 then Order Experience
 ```
 
 Cards: [EXPERIENCE_CARDS](./EXPERIENCE_CARDS.md)
 
-**Accelerators:** do **not** open yet. [ACCELERATOR-001 OCC](./ACCELERATOR_001_OPERATIONAL_COMMAND_CENTER.md) is 🔒 Reserved — [OPERATIONAL_ACCELERATORS](./OPERATIONAL_ACCELERATORS.md).
+**Accelerators:** do **not** open yet. [ACCELERATOR-001 OCC](./ACCELERATOR_001_OPERATIONAL_COMMAND_CENTER.md) is 🔒 Reserved — [OPERATIONAL_ACCELERATORS](./OPERATIONAL_ACCELERATORS.md).  
+**Organization Templates:** registered, not open.
 
 ---
 

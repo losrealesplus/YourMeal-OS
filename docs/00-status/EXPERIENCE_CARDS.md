@@ -54,40 +54,41 @@ Name
 Customer Experience
 
 Mission
-Zero Friction Customer Edit
+Zero Friction Organization Management
 
 Phase
-003 Edit
+004 Organization
 
 Primary User
 Tenant Operator
 
 Primary KPI
-Time-to-Edit Customer <20 s
+Time-to-Organization <45 s
 
 Secondary KPIs
-Time-to-Resume Operation <5 s
+Time-to-Add Worker <15 s
+Time-to-Edit Customer <20 s
 Time-to-Find Customer <10 s
 Time-to-Create Customer <30 s
 
 Operational Time Saved
 Estimated
-25–70 seconds per frequent edit
+45–135 seconds per organization
 
 Status
-In Progress · Phase 003
+In Progress · Phase 004
 ```
 
-Detail: [CUSTOMER_EXPERIENCE_003](./CUSTOMER_EXPERIENCE_003.md) · [002 Search](./CUSTOMER_EXPERIENCE_002.md) · [001 Create](./CUSTOMER_EXPERIENCE_001.md)
+Detail: [CUSTOMER_EXPERIENCE_004](./CUSTOMER_EXPERIENCE_004.md) · [003 Edit](./CUSTOMER_EXPERIENCE_003.md) · [002](./CUSTOMER_EXPERIENCE_002.md) · [001](./CUSTOMER_EXPERIENCE_001.md)
 
 **Customer Experience sequence** (Orders wait until Customer is fluid):
 
 ```text
 001 Create     ✅
 002 Search     ✅
-003 Edit       ← active
-004 Company Management
-005 Preferences
+003 Edit       ✅
+004 Organization  ← active
+005 Progressive Completion
 006 Bulk Operations
 ```
 
@@ -98,7 +99,7 @@ Measurable questions:
 | 001 | ¿Puedo crear un cliente en menos de 30 segundos? |
 | 002 | ¿Puedo encontrar un cliente en menos de 10 segundos? |
 | 003 | ¿Puedo modificar un cliente frecuente en menos de 20 segundos? |
-| 004 | ¿Puedo gestionar empresas sin duplicar trabajo? |
+| 004 | ¿Puedo crear una organización y empezar a trabajar en menos de 45 segundos? |
 | 005 | ¿Puedo completar la ficha sin interrumpir la operación? |
 | 006 | ¿Puedo realizar operaciones masivas sin reescribir información? |
 
