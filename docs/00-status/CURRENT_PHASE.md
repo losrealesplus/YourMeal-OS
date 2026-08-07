@@ -1,7 +1,8 @@
 # CURRENT_PHASE
 
 **Última actualización:** 2026-08-07  
-**Institutional:** [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) · **Construction COMPLETE** · **Era 2: Return Time**  
+**Acta de eras:** [ERA_DECLARATION](./ERA_DECLARATION.md) · ADR [0091](../adr/0091-era-declaration.md) · **Era 1 CLOSED · Era 2 OPEN**  
+**Institutional:** [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) · **Construction COMPLETE**  
 **Playbook:** [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md) · Operational Evidence Loop  
 **No sustituye** [MILESTONES](./MILESTONES.md) — tablero de “dónde estamos ahora”.
 
@@ -10,13 +11,16 @@
 YOURMEAL OS · CURRENT GATE
 ═══════════════════════════════════════════════
 
-ERA 1 · Build the Engine    ✅ COMPLETE
+ERA 1 · Build the Engine    ✅ COMPLETE (ERA_DECLARATION · ADR 0091)
 Operational Engine v1.0     ✅ DECLARED (OPERATIONAL-ENGINE-001)
 Architecture                ✅ FROZEN
 
-ERA 2 · Return Time         ▶ STARTS TODAY
+ERA 2 · Return Time         ▶ OPEN
 Primary Product Focus       Tenant Success (PRODUCT LAW 001)
 Identity                    Operational First
+
+First question
+  · ¿Dónde pierde tiempo Isabella hoy?
 
 Next measurements
   · Tiempo recuperado (evidence-guided backlog)

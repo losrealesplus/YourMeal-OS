@@ -7,6 +7,8 @@
 | Document | Role |
 |----------|------|
 | **[PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md)** | **North star** · PRODUCT LAW 001 · Tenant Success |
+| **[ERA_DECLARATION](./ERA_DECLARATION.md)** | **Acta de eras** · Era 1 CLOSED · Era 2 OPEN · ADR 0091 |
+| [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md) | How we prove we returned time |
 | [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md) | Ideas prioritized by operational time saved |
 | [PLATFORM_STATUS](./PLATFORM_STATUS.md) | Platform layer verdict |
 | [FOUNDATION_STATUS](./FOUNDATION_STATUS.md) | Foundation + Laws 001–004 |
@@ -41,6 +43,7 @@
 **Product Core:** ✅ **[Foundation engineering-validated](./PRODUCT_CORE_FOUNDATION_001.md)** (ADR 0054) · Field smoke OPPO ⏳ · **Era Foundation center CLOSED**  
 **Operational Experience:** ▶ **[OPERATIONAL_EXPERIENCE](./OPERATIONAL_EXPERIENCE.md)** · Tenant Success  
 **Product Direction:** ▶ **[PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md)** · PRODUCT LAW 001 · ADR [0084](../adr/0084-product-law-001.md) · [Time Savings Backlog](./TENANT_TIME_SAVINGS_BACKLOG.md) · **[Tenant Success Playbook](./TENANT_SUCCESS_PLAYBOOK.md)**  
+**Era Declaration:** ✅ **[ERA_DECLARATION](./ERA_DECLARATION.md)** · ADR [0091](../adr/0091-era-declaration.md) · **Era 1 CLOSED · Era 2 OPEN** (2026-08-07)  
 **Operational Modules:** ▶ Expansion complete for Engine v1.0 · [OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md) · Engine [v1.0](./OPERATIONAL_ENGINE_V1.md)  
 **Delivery Capability:** [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) · ADR 0078–0080 · **0086** · Demo `/admin/delivery-workspace` · `useDelivery()` · [Validation Report](../10-validation/DELIVERY_VALIDATION_REPORT.md)  
 **Operational Engine:** ✅ **v1.0 DECLARED** — [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) · ADR 0090 · Board: [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · Review: [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) · Flows: [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md)  

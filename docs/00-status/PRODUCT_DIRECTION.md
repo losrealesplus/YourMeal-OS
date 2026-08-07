@@ -487,6 +487,8 @@ Every line of code from today forward must contribute to that mission.
 
 ## Era 2 · Operational Evidence Loop
 
+**Acta:** [ERA_DECLARATION](./ERA_DECLARATION.md) · ADR [0091](../adr/0091-era-declaration.md) · Era 1 CLOSED · Era 2 OPEN (7 August 2026).
+
 Product identity for the next era:
 
 ```text
@@ -503,6 +505,12 @@ Observe → Measure → Understand → Design → Implement
 ```
 
 Not develop. **Learn.** Backlog fed by evidence, not by ideas.
+
+First question of every product conversation:
+
+```text
+¿Dónde pierde tiempo Isabella hoy?
+```
 
 ---
 
@@ -533,6 +541,7 @@ See [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) — *Time saved is the p
 * [ADR 0089](../adr/0089-billing-engineering-certification.md) · Billing Certification  
 * [ADR 0090](../adr/0090-operational-engine-v1-declaration.md) · **Engine v1.0 Declaration**  
 * [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) · Construction COMPLETE  
+* [ERA_DECLARATION](./ERA_DECLARATION.md) · ADR [0091](../adr/0091-era-declaration.md) · **Era 1 CLOSED · Era 2 OPEN**  
 * [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md) · **How we prove we returned time**  
 * [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md)  
 * [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)  
