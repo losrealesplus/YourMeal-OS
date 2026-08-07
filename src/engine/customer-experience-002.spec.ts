@@ -61,10 +61,10 @@ describe("CUSTOMER EXPERIENCE 002 · Zero Friction Search", () => {
 
     expect(cards).toContain("005 Growth");
     expect(cards).toContain("Time-to-Complete Frequent Customer Information <30 s");
-    expect(cards).toContain("In Progress · Phase 005");
+    expect(cards).toContain("Frozen · READY WITH IMPROVEMENTS");
 
     expect(missions).toContain("CUSTOMER_EXPERIENCE_005");
-    expect(missions).toContain("005 Growth");
+    expect(missions).toContain("Frozen");
     expect(missions).toContain("enriquecer < 30s");
 
     expect(backlog).toContain("Operational Command Center");

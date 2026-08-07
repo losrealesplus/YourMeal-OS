@@ -14,6 +14,8 @@ Accelerators **do not** change the domain.
 Accelerators **do not** change the Engine.  
 Accelerators **accelerate work**.
 
+**Rule:** When an idea leaves a module and serves the whole platform, it is an Accelerator — not an Experience.
+
 ---
 
 ## Stack
@@ -39,29 +41,27 @@ Then open Accelerators until it is **extremely fast**.
 
 | Code | Name | Status | Notes |
 |------|------|--------|-------|
-| **ACCELERATOR-001** | **Operational Command Center (OCC)** | 🔒 **Reserved** | Entry point to the OS · not a Customer searcher · [detail](./ACCELERATOR_001_OPERATIONAL_COMMAND_CENTER.md) |
-| ACCELERATOR-002 | Operational Import Pipeline | Registered | One pipeline · many formats · LAW 002 |
-| ACCELERATOR-003 | Quick Capture | Registered | Becomes **OCC → Quick Capture Mode** (not a separate product) |
-| ACCELERATOR-004 | Bulk Operations | Registered | Mass work without retyping |
+| **ACCELERATOR-001** | **Operational Command Center (OCC)** | 🔒 **Reserved** | Platform entry · [detail](./ACCELERATOR_001_OPERATIONAL_COMMAND_CENTER.md) |
+| **ACCELERATOR-002** | **Operational Bulk Operations** | 📋 **Registered** | Ex-CX006 · platform-wide · [detail](./ACCELERATOR_002_OPERATIONAL_BULK.md) · open after Orders |
+| ACCELERATOR-003 | Operational Import Pipeline | Registered | One pipeline · many formats · LAW 002 |
+| ACCELERATOR-004 | Quick Capture | Registered | Becomes **OCC → Quick Capture Mode** |
 | ACCELERATOR-005 | Smart Suggestions | Registered | After evidence |
 | — | Quick Repeat | Registered | Last week · last order · templates |
 | — | Templates | Registered | Preference / order templates |
-| — | **Organization Templates** | Registered · future | Org → workers → menu · schedule · billing · after CX004 mature |
+| — | **Organization Templates** | Registered · future | After org Experience mature |
 | — | Timeline | Registered | Guide the operator |
 | — | Preparation Inventory | Registered | Lots · expiry · consumption |
 
-Family (conceptual):
+Family:
 
 ```text
 Operational Accelerators
-  Quick Capture          → mode inside OCC (when OCC opens)
-  Operational Import Pipeline
-  Operational Command Center   ← ACCELERATOR-001 Reserved
-  Quick Repeat
-  Templates
-  Bulk Operations
-  Timeline
-  Smart Suggestions
+  ACCELERATOR-001 OCC                 Reserved
+  ACCELERATOR-002 Operational Bulk    Registered (ex-CX006)
+  ACCELERATOR-003 Import Pipeline
+  ACCELERATOR-004 Quick Capture       → OCC mode
+  ACCELERATOR-005 Smart Suggestions
+  Quick Repeat · Templates · Timeline · …
 ```
 
 ---
@@ -71,9 +71,9 @@ Operational Accelerators
 ```text
 Experiences first (excellent)
 
-Customer Experience
-Orders Experience
-Menus Experience
+Customer Experience     ✅ MVP · Reviewed · Frozen
+Order Experience        ← NEXT
+Menu Experience
 Production Experience
 Kitchen Experience
 Delivery Experience
@@ -82,10 +82,10 @@ Delivery Experience
 
 Operational Accelerators (incredible speed)
 
-001 Operational Command Center   ← Reserved · do not implement yet
-002 Operational Import Pipeline
-003 Quick Capture                ← as OCC mode
-004 Bulk Operations
+001 OCC                         Reserved
+002 Operational Bulk            Registered · after Orders
+003 Import Pipeline
+004 Quick Capture
 005 Smart Suggestions
 ```
 
@@ -96,14 +96,17 @@ Operational Accelerators (incredible speed)
 1. An Accelerator never invents a new domain Capability.  
 2. An Accelerator never bypasses Facades (FOUNDATION LAW 007).  
 3. An Accelerator is measured in **seconds returned**, not features shipped.  
-4. **Reserved** means: vision locked · code forbidden · Customer-only scope forbidden.  
-5. Opening a Reserved Accelerator requires an explicit Product decision.
+4. **Reserved** means: vision locked · code forbidden · single-module scope forbidden.  
+5. Opening a Reserved / Registered Accelerator requires an explicit Product decision.  
+6. **Bulk is not a Customer mission.**
 
 ---
 
 ## Related
 
 * [ACCELERATOR_001_OPERATIONAL_COMMAND_CENTER](./ACCELERATOR_001_OPERATIONAL_COMMAND_CENTER.md)  
+* [ACCELERATOR_002_OPERATIONAL_BULK](./ACCELERATOR_002_OPERATIONAL_BULK.md)  
+* [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md)  
 * [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md)  
 * [ERA2_PRODUCT_DISCOVERY_001](./ERA2_PRODUCT_DISCOVERY_001.md)  
 * [EXPERIENCE_MISSIONS](./EXPERIENCE_MISSIONS.md)  

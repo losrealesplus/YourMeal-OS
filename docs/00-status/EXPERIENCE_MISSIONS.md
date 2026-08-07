@@ -1,10 +1,11 @@
 # Experience Missions (Era 2)
 
-**Status:** ▶ **ACTIVE**  
+**Status:** ▶ **ACTIVE** — next: **Order Experience**  
 **Declared:** 2026-08-07  
 **Laws:** PRODUCT LAW 001 · 002 · EXPERIENCE LAW 001 (ADR [0098](../adr/0098-experience-law-001.md)) · **EXPERIENCE MANIFESTO 001** (ADR [0099](../adr/0099-experience-manifesto-001.md)) · TENANT SUCCESS 001 / 001-A · TEAM LAW 001  
 **Pattern:** Progressive Completion · Living Customer Profile · Time-to-Action (TTA)  
-**Manifesto:** [EXPERIENCE_MANIFESTO](./EXPERIENCE_MANIFESTO.md)
+**Manifesto:** [EXPERIENCE_MANIFESTO](./EXPERIENCE_MANIFESTO.md)  
+**Customer Review:** [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md) · Verdict **READY WITH IMPROVEMENTS** · **Frozen**
 
 ```text
 We do not build screens.
@@ -18,18 +19,14 @@ A great Experience is invisible.
 
 ## Time-to-Action (TTA)
 
-If PRODUCT LAW 001 returns time, every Experience has official KPIs in **seconds** — not React, not Supabase.
-
-| Experience | Mission | Primary TTA |
-|------------|---------|-------------|
-| **Customer** | Zero Friction Customer Growth (phase 005) | Enrich &lt; 30s |
-| **Order** | Create an operational commitment | &lt; 45s |
-| **Menu** | Plan one operational week | &lt; 2 min |
-| **Production** | Generate today's work | &lt; 1 min |
-| **Kitchen** | Know what to execute | &lt; 10s |
-| **Delivery** | Prepare today's routes | &lt; 2 min |
-
-Each Customer phase answers **one** measurable question — then **Experience Review** — then Bulk — then Orders.
+| Experience | Mission | Primary TTA | Status |
+|------------|---------|-------------|--------|
+| **Customer** | Zero Friction (001–005) · includes **CUSTOMER_EXPERIENCE_005** Growth | Create <30s · Find <10s · Edit <20s · Org <45s · enriquecer < 30s | ✅ **Frozen** |
+| **Order** | Create an operational commitment | < 45s | ◀ **NEXT** |
+| **Menu** | Plan one operational week | &lt; 2 min | Planned |
+| **Production** | Generate today's work | &lt; 1 min | Planned |
+| **Kitchen** | Know what to execute | &lt; 10s | Planned |
+| **Delivery** | Prepare today's routes | &lt; 2 min | Planned |
 
 ---
 
@@ -53,49 +50,67 @@ A customer profile should grow with the relationship,
 never before it.
 ```
 
-Day 1: name · phone · save  
-Later: preferences · allergies · billing · tags  
+---
 
-Never force a giant dossier to start working.
+## Customer Experience — MVP COMPLETE · FROZEN
+
+```text
+001 Create          ✅
+002 Search          ✅
+003 Edit            ✅
+004 Organization    ✅
+005 Growth          ✅
+↓
+Review              ✅ READY WITH IMPROVEMENTS
+↓
+Freeze              ← no new Customer missions
+↓
+ORDER EXPERIENCE    ← NEXT
+```
+
+Detail: [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md)
+
+**CX006 withdrawn** → [ACCELERATOR-002 Operational Bulk](./ACCELERATOR_002_OPERATIONAL_BULK.md)
 
 ---
 
 ## Active mission
 
-▶ [CUSTOMER_EXPERIENCE_005](./CUSTOMER_EXPERIENCE_005.md) · Zero Friction Customer Growth  
+▶ **Order Experience** (open next)  
 
-Prior: [004 Organization](./CUSTOMER_EXPERIENCE_004.md) ✅ · [003](./CUSTOMER_EXPERIENCE_003.md) ✅ · [002](./CUSTOMER_EXPERIENCE_002.md) ✅ · [001](./CUSTOMER_EXPERIENCE_001.md) ✅
+Customer: frozen · [EXPERIENCE_CARDS](./EXPERIENCE_CARDS.md)
 
-## Customer Experience sequence
+---
+
+## Platform roadmap
 
 ```text
-001 Create          ✅  ¿crear < 30s?
+Customer Experience     ✅ MVP · Reviewed · Frozen
 ↓
-002 Search          ✅  ¿encontrar < 10s?
+Order Experience        ← NEXT
 ↓
-003 Edit            ✅  ¿editar frecuente < 20s?
+Menu Experience
 ↓
-004 Organization    ✅  ¿organización < 45s?
+Production Experience
 ↓
-005 Growth          ← active  ¿enriquecer < 30s sin parar?
+Kitchen Experience
 ↓
-Experience Review   ← [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md)
+Delivery Experience
 ↓
-006 Bulk Operations
-↓
-then Order Experience
+Operational Accelerators
+  001 OCC                 Reserved
+  002 Operational Bulk    Registered (ex-CX006)
+  003 Import Pipeline
+  004 Quick Capture
+  …
 ```
-
-Cards: [EXPERIENCE_CARDS](./EXPERIENCE_CARDS.md)
-
-**Accelerators:** do **not** open yet. [ACCELERATOR-001 OCC](./ACCELERATOR_001_OPERATIONAL_COMMAND_CENTER.md) is 🔒 Reserved — [OPERATIONAL_ACCELERATORS](./OPERATIONAL_ACCELERATORS.md).
 
 ---
 
 ## Related
 
-* [SPRINT_001_TENANT_SUCCESS](./SPRINT_001_TENANT_SUCCESS.md)  
-* [ERA2_EXPERIENCE_PROMPT](./ERA2_EXPERIENCE_PROMPT.md)  
-* [PR_REVIEW_PROTOCOL](./PR_REVIEW_PROTOCOL.md)  
+* [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md)  
 * [OPERATIONAL_ACCELERATORS](./OPERATIONAL_ACCELERATORS.md)  
-* [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md)
+* [ACCELERATOR_002_OPERATIONAL_BULK](./ACCELERATOR_002_OPERATIONAL_BULK.md)  
+* [SPRINT_001_TENANT_SUCCESS](./SPRINT_001_TENANT_SUCCESS.md)  
+* [PR_REVIEW_PROTOCOL](./PR_REVIEW_PROTOCOL.md)
