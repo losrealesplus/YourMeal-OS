@@ -40,7 +40,7 @@ Every row must answer: **Does it save tenant time? How much? Which Beta?**
 | Delivery Capability Demo | Medium | Low | Beta 1 | ✅ LAW 003 proof · ADR 0086 |
 | Copy last week (orders / menu) | Very High | Medium | Beta 2 | Repeatable weekly cycle |
 | Bulk Excel import | Very High | High | Beta 2 | Replace multi-hour spreadsheet work |
-| Billing Capability (Architecture→Demo) | High | High | Beta 2 | Architecture ✅ ADR 0087 · Facade next · Engine Outcome |
+| Billing Capability (Architecture→Demo) | High | High | Beta 2 | Certified ✅ ADR 0089 · Demo next · Engine Outcome |
 | FLOW-003 Confirmation → Billing | High | Medium | Beta 2 | After Billing Facade |
 | OPERATIONAL-ENGINE-001 Declaration | — | Low | After Billing Demo | Institutional freeze · docs only |
 | Mobile UX pack (gestures · sheets · haptics · empty/loading) | High | Medium | Beta 1–2 | Native feel · fewer mistakes |

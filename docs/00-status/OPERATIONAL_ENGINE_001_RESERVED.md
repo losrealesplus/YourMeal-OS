@@ -8,6 +8,24 @@ OPERATIONAL-ENGINE-001
 Operational Engine v1.0 Declaration
 ```
 
+## Final Engine close sequence
+
+```text
+Billing Capability Demo (useBilling only)
+        ↓
+OPERATIONAL-ENGINE-001
+Operational Engine v1.0 Declaration
+(docs + evidence only · no feature code)
+```
+
+The declaration PR answers one question:
+
+> **¿Podemos afirmar, con evidencia, que el Operational Engine v1.0 está completo y listo para que el foco del producto pase definitivamente a Tenant Success?**
+
+After YES: every sprint justifies itself by **minutes returned to the tenant** (PRODUCT LAW 001) — not by Capabilities added.
+
+---
+
 ## Purpose
 
 This is **not** “another feature PR”.

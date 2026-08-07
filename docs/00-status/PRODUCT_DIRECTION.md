@@ -384,16 +384,18 @@ Delivery Facade ✅ · Validation ✅ · **Demo ✅** (ADR 0086)
 
 ### Block 2 — Finish Billing Capability
 
-Billing **Architecture ✅** (ADR 0087) · **Facade ✅** (ADR 0088) → Validation → Demo ◀ in progress
+Billing **Architecture ✅** · **Facade ✅** · **Certification ✅** (ADR 0089) → Demo ◀ next
 
 ### Block 3 — Declare Engine v1.0
 
 ```text
+Billing Demo
+    ↓
 OPERATIONAL-ENGINE-001
 Operational Engine v1.0 Declaration
 ```
 
-Institutional milestone ([reserved](./OPERATIONAL_ENGINE_001_RESERVED.md)) — docs only · phase change Construction → Validation → Tenant Success.
+Institutional milestone ([reserved](./OPERATIONAL_ENGINE_001_RESERVED.md)) — docs/evidence only · Construction COMPLETE · Engine CERTIFIED · Focus Tenant Success.
 
 No more architectural work by default.
 
@@ -481,7 +483,7 @@ We are **closing Operational Engine v1.0**.
 |------------|-------------|----------------------|
 | Identity → Kitchen | Certified (+ Demos where applicable) | Usability under PRODUCT LAW 001 |
 | **Delivery** | **Capability Demo** (ADR 0078–0080 · 0086) | Product UI later · Field |
-| **Billing** | **Facade** (ADR 0087–0088) | Certification → Demo ◀ next |
+| **Billing** | **Engineering Certified** (ADR 0087–0089) | Demo → OPERATIONAL-ENGINE-001 |
 | FLOW-002 | Engineering Certified | Flow Demo |
 | FLOW-003 | Pending | After Billing Facade |
 | **OPERATIONAL-ENGINE-001** | RESERVED | After Billing Demo |
@@ -497,6 +499,7 @@ See [ADR 0087](../adr/0087-billing-capability.md) — Billing closes Outcome · 
 * [ADR 0086](../adr/0086-delivery-workspace-demo.md) · Delivery Demo  
 * [ADR 0087](../adr/0087-billing-capability.md) · Billing Architecture  
 * [ADR 0088](../adr/0088-billing-facade.md) · Billing Facade  
+* [ADR 0089](../adr/0089-billing-engineering-certification.md) · Billing Certification  
 * [OPERATIONAL_ENGINE_001_RESERVED](./OPERATIONAL_ENGINE_001_RESERVED.md) · v1.0 Declaration  
 * [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md)  
 * [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)  
