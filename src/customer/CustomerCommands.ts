@@ -18,6 +18,16 @@ export type CreateCustomerCommand =
     }
   | {
       type: "CreateCustomer";
+      partyKind: "individual";
+      /** CX-001 — staff alta mínima (TTC &lt; 30s · EXPERIENCE LAW 001). */
+      mode: "staff_create";
+      displayName: string;
+      phone?: string | null;
+      street?: string | null;
+      city?: string | null;
+    }
+  | {
+      type: "CreateCustomer";
       partyKind: "company_account";
       mode: "provision";
       name: string;
@@ -75,6 +85,14 @@ export function createCustomerCommand(
         partyKind: "individual";
         mode: "ensure_for_session";
         displayName?: string | null;
+      }
+    | {
+        partyKind: "individual";
+        mode: "staff_create";
+        displayName: string;
+        phone?: string | null;
+        street?: string | null;
+        city?: string | null;
       }
     | {
         partyKind: "company_account";

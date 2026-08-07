@@ -2,121 +2,127 @@
 
 **Status:** ▶ **ACTIVE** — first Experience Sprint of Era 2  
 **Type:** Experience Sprint (build) — **not** Observation Sprint  
+**Mission:** **Zero Friction Customer Management**  
 **Declared:** 2026-08-07  
-**Laws:** PRODUCT LAW 001 · 002 · TENANT SUCCESS LAW 001 · **001-A** · TEAM LAW 001  
-**ADR:** [0096](../adr/0096-tenant-success-law-001a.md)  
+**Laws:** PRODUCT LAW 001 · 002 · **EXPERIENCE LAW 001** · TENANT SUCCESS LAW 001 · **001-A** · TEAM LAW 001  
+**ADR:** [0096](../adr/0096-tenant-success-law-001a.md) · [0098](../adr/0098-experience-law-001.md)  
+**Missions board:** [EXPERIENCE_MISSIONS](./EXPERIENCE_MISSIONS.md)  
+**Prompt:** [ERA2_EXPERIENCE_PROMPT](./ERA2_EXPERIENCE_PROMPT.md)  
 **Surface:** `/admin/customer-workspace` · `useCustomer()` only (LAW 003)  
 **Capability (frozen):** Customer · Engineering Certified — we improve **Experience**, not Architecture
 
 ```text
-Objetivo
+Mission
 
-Reducir el tiempo de alta y gestión de clientes
-por debajo de 30 segundos
-para las tareas más frecuentes.
+Zero Friction Customer Management
+
+The objective is not a beautiful dossier.
+The objective is that Isabella does not have to think.
 ```
 
 ```text
 The question is not:
-"How do we manage customers?"
+"How do we manage customers?" / "What fields are missing?"
 
 The question is:
+"What is the minimum so the operator can keep working?"
 "How do we get an operator to register a customer
 in under 30 seconds?"
 ```
 
 ---
 
-## Why this sprint exists now
+## Time-to-Action (TTA) KPIs
 
-TENANT SUCCESS LAW **001-A**: never observe unfinished workflows.
+We do not measure screens. We measure work.
 
-Isabella Observation waits until Customer · Order · Menu · Production · Kitchen · Delivery are **realistically usable**.  
-Observing today would measure missing edit/menu/import — not operational friction.
+| KPI | Target |
+|-----|--------|
+| **Time-to-Create Customer (TTC)** | **&lt; 30 seconds** |
+| Time-to-Find Customer | &lt; 10 seconds |
+| Time-to-Edit Frequent Data | &lt; 20 seconds |
+| Clicks to Create | ≤ 6 |
+| Keyboard-only completion | Yes |
+| Mouse travel | Minimum |
 
-This sprint **builds** a coherent Customer Experience so later observation measures the real job.
+None of these mention React or Supabase. All mention the job.
 
 ---
 
-## Time objective (visible metric)
+## Ideal create flow (EXPERIENCE LAW 001)
 
-| Job | Target |
-|-----|--------|
-| Alta / gestión frecuente de cliente | **&lt; 30 seconds** |
+```text
+Nuevo Cliente
+  ↓
+Particular / Empresa
+  ↓
+Nombre
+  ↓
+Teléfono
+  ↓
+Dirección
+  ↓
+Guardar
+  ↓
+Listo
+```
 
-Future Experience metrics (not this sprint):
+Target: **&lt; 30 seconds**.
 
-| Experience | Target |
-|------------|--------|
-| Order | &lt; 45 seconds |
-| Menu | &lt; 2 minutes |
-| Production | &lt; 1 minute |
-| Kitchen | &lt; 10 seconds |
-| Delivery (route ready) | &lt; 2 minutes |
+Later (Progressive Completion): preferences · allergies · notes · billing · employees.
+
+Do **not** load the operator with a full dossier on first contact.
+
+---
+
+## Why this sprint exists now
+
+TENANT SUCCESS LAW **001-A**: never observe unfinished workflows.  
+Isabella Observation waits until the Experience chain is realistically usable.
+
+This sprint **builds** Zero Friction Customer Management so later observation measures real work.
 
 ---
 
 ## In scope
 
-* Search / list with segment (Individual · Company · all)  
-* Alta empresa (CreateCustomer · provision) via Facade  
-* Asegurar cliente de sesión (individual)  
-* Ficha legible: estado · canal · email · tags · direcciones/prefs/alérgenos cuando existan  
-* Honest UI for Edit / Restore while UNIMPLEMENTED (do not fake)  
-* Reduce clicks / screens / doubt on the happy path toward &lt; 30s  
+* Minimal create wizard (Particular / Empresa → name → phone → address → save)  
+* Search / find toward &lt; 10s  
+* Segment filter (Individual · Company)  
+* Progressive Completion — later fields deferred  
+* Honest UI for Edit while substrate catches up  
+* Facade-only (LAW 003)  
 
 ---
 
 ## Out of scope
 
 * New Capability · Foundation · Engine reopen  
-* Inventing UpdateCustomer substrate without a deliberate Experience decision  
-* Isabella / Sara Observation sessions  
-* Orders · Menus · Accelerators · Import Pipeline · AI  
+* Full CRM dossier on create  
+* Isabella / Sara Observation  
+* Orders · Menus · Accelerators · AI  
 * Mixing Observation Sprint into this Experience Sprint  
 
 ---
 
 ## Definition of Done
 
-Engineering Evidence: Facade-only · LAW 003 · tests for integrity.  
+Engineering Evidence: Facade-only · LAW 003 · integrity specs.  
 
-Operational Evidence (internal / dogfood first):
+TTA Evidence (dogfood / stopwatch):
 
-* Frequent alta/gestión path timed toward **&lt; 30s**  
-* Operator does not need to “think about the database”  
-* Unfinished actions remain visibly unfinished (no false completion)
+* TTC toward **&lt; 30s** on the minimal path  
+* Clicks to Create ≤ 6 on happy path  
+* Keyboard-only path possible  
+* Operator does not need a full dossier to continue working  
 
-Full tenant observation evidence waits for LAW 001-A gate (usable workflow chain).
-
----
-
-## Prompt header (this sprint)
-
-```text
-CUSTOMER EXPERIENCE 001
-
-Strategic Freeze is active.
-Foundation · Developer Platform · Operational Engine are frozen.
-Do not introduce new Capabilities.
-Do not modify Foundation Laws.
-
-PRODUCT LAW 001 · 002
-TENANT SUCCESS LAW 001 · 001-A
-TEAM LAW 001
-
-Question:
-How does this help an operator register or manage a customer
-in under 30 seconds?
-
-Surface: /admin/customer-workspace · useCustomer() only.
-```
+Full tenant Observation evidence waits for LAW 001-A gate.
 
 ---
 
 ## Related
 
+* [EXPERIENCE_MISSIONS](./EXPERIENCE_MISSIONS.md)  
 * [SPRINT_001_TENANT_SUCCESS](./SPRINT_001_TENANT_SUCCESS.md)  
 * [OBSERVATION_FRAMEWORK](../tenant-success/OBSERVATION_FRAMEWORK.md)  
-* [ERA2_CURSOR_PROMPT](./ERA2_CURSOR_PROMPT.md)  
 * [CUSTOMER_CAPABILITY](../05-architecture/CUSTOMER_CAPABILITY.md)
