@@ -2,8 +2,10 @@
 
 **Última actualización:** 2026-08-07  
 **Acta de eras:** [ERA_DECLARATION](./ERA_DECLARATION.md) · ADR [0091](../adr/0091-era-declaration.md) · **Era 1 CLOSED · Era 2 OPEN**  
+**Discovery:** [ERA2_PRODUCT_DISCOVERY_001](./ERA2_PRODUCT_DISCOVERY_001.md) · **Sprint:** [SPRINT_001_TENANT_SUCCESS](./SPRINT_001_TENANT_SUCCESS.md)  
 **Institutional:** [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) · **Construction COMPLETE**  
 **Playbook:** [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md) · Operational Evidence Loop  
+**Prompt:** [ERA2_CURSOR_PROMPT](./ERA2_CURSOR_PROMPT.md)  
 **No sustituye** [MILESTONES](./MILESTONES.md) — tablero de “dónde estamos ahora”.
 
 ```text
@@ -16,15 +18,21 @@ Operational Engine v1.0     ✅ DECLARED (OPERATIONAL-ENGINE-001)
 Architecture                ✅ FROZEN
 
 ERA 2 · Return Time         ▶ OPEN
-Primary Product Focus       Tenant Success (PRODUCT LAW 001)
+Sprint 001 · Tenant Success ▶ ACTIVE
+Primary Product Focus       Customer → Order → Menu → Production → Kitchen → Delivery
 Identity                    Operational First
+
+Laws
+  · PRODUCT LAW 001
+  · PRODUCT LAW 002 (ADR 0093) — reuse existing knowledge
+  · TENANT SUCCESS LAW 001 (ADR 0092)
+  · TEAM LAW 001 (ADR 0094)
 
 First question
   · ¿Dónde pierde tiempo Isabella hoy?
 
-Laws
-  · PRODUCT LAW 001
-  · TENANT SUCCESS LAW 001 (ADR 0092)
+Do not open yet
+  · Operational Capture · Import Pipeline · AI · Nutrition Engine
 
 Next measurements
   · Tiempo recuperado (evidence-guided backlog)
