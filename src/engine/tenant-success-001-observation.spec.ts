@@ -44,8 +44,8 @@ describe("TENANT-SUCCESS-001 Observation Framework", () => {
     expect(framework).toContain("Never teach");
     expect(framework).toContain("Where does the tenant lose operational time?");
 
-    expect(template).toContain("Number of Clicks");
-    expect(template).toContain("External tools");
+    expect(template).toContain("Number of clicks");
+    expect(template).toContain("External tools used");
     expect(template).toContain("Excel");
 
     expect(catalog).toContain("Repeated typing");
@@ -53,7 +53,7 @@ describe("TENANT-SUCCESS-001 Observation Framework", () => {
     expect(catalog).toContain("Knowledge in people's heads");
 
     expect(score).toContain("Operational frequency");
-    expect(score).toContain("Estimated Time Saved");
+    expect(score).toContain("Estimated time saved");
     expect(score).toContain("Beta 1");
     expect(score).toContain("Golden Master");
 
