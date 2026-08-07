@@ -18,8 +18,10 @@ Operational Engine v1.0     ✅ DECLARED (OPERATIONAL-ENGINE-001)
 Architecture                ✅ FROZEN
 
 ERA 2 · Return Time         ▶ OPEN
-Sprint 001 · Tenant Success ▶ ACTIVE
-Primary Product Focus       Customer → Order → Menu → Production → Kitchen → Delivery
+Sprint 001 · Tenant Success ▶ ACTIVE (hybrid)
+  · Epic 0 Observation Framework  ▶ TENANT-SUCCESS-001
+  · Epic 1 Customer Experience    ▶ PARALLEL (Facade UI)
+Primary Product Focus       Observe first · develop known daily jobs in parallel
 Identity                    Operational First
 
 Laws
@@ -31,10 +33,15 @@ Laws
 First question
   · ¿Dónde pierde tiempo Isabella hoy?
 
+Instrument
+  · docs/tenant-success/OBSERVATION_FRAMEWORK.md
+
 Do not open yet
   · Operational Capture · Import Pipeline · AI · Nutrition Engine
+  · Orders/Menus as “evidence-complete” without sessions
 
 Next measurements
+  · Isabella Observation Session
   · Tiempo recuperado (evidence-guided backlog)
   · Beta = Discover Friction
   · Field / Cross-platform
