@@ -140,14 +140,15 @@ Preparation Inventory
 Order Templates
 Smart Suggestions
 Operational Command Center (OCC)   ← ACCELERATOR-001 · RESERVED · do not implement
+Operational Bulk Operations        ← ACCELERATOR-002 · Registered · ex-CX006 · after Orders
 ```
 
 They do not change the domain. They accelerate work. That is the essence of Era 2.
 
 **ACCELERATOR-001 · Operational Command Center** (formerly “Universal Command Bar”): strategic maximum priority · **implementation priority none**.  
-The tenant speaks with the system here — Customer · Orders · Menus · Production · Kitchen · Delivery · Billing · Everything.  
-**Not** a Customer-only searcher. Quick Capture becomes **OCC → Quick Capture Mode**.  
-Detail: [ACCELERATOR_001](./ACCELERATOR_001_OPERATIONAL_COMMAND_CENTER.md) · Layer: [OPERATIONAL_ACCELERATORS](./OPERATIONAL_ACCELERATORS.md).
+**ACCELERATOR-002 · Operational Bulk Operations** (formerly CX006): platform-wide · not a Customer Experience · open after Orders show real mass work.  
+
+Detail: [ACCELERATOR_001](./ACCELERATOR_001_OPERATIONAL_COMMAND_CENTER.md) · [ACCELERATOR_002](./ACCELERATOR_002_OPERATIONAL_BULK.md) · Layer: [OPERATIONAL_ACCELERATORS](./OPERATIONAL_ACCELERATORS.md).
 
 ---
 
