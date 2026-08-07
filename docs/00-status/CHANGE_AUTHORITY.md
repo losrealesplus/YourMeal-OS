@@ -38,6 +38,13 @@ o intenta redefinirlo?
 
 | Respuesta | Acción |
 |-----------|--------|
+| Consume | Continuar con el [PR Review Protocol](./PR_REVIEW_PROTOCOL.md) |
+| Redefine | ❌ BLOQUEADO salvo evidencia + ADR + CHANGE_AUTHORITY |
+
+Antes de merge a `main`: ejecutar [PR_REVIEW_PROTOCOL](./PR_REVIEW_PROTOCOL.md) (Cursor gate). Actions es validación segunda.
+
+| Respuesta | Acción |
+|-----------|--------|
 | Redefine Foundation / Auth / Identity / Membership / RBAC / Entry / Journey / Flow | ❌ Rechazado |
 | Consume el Core y respeta el Contract | ✅ Continúa revisión técnica |
 

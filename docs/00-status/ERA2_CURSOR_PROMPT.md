@@ -51,6 +51,8 @@ The question is:
 "How does this save operational time?"
 ```
 
+Before merge to `main`, run [PR_REVIEW_PROTOCOL](./PR_REVIEW_PROTOCOL.md) and emit a PR Review Report (READY FOR MERGE · READY WITH WARNINGS · BLOCKED). GitHub Actions is second validation.
+
 Experience Sprints carry a visible time metric (e.g. Customer &lt; 30s).  
 Observation Sprints wait until workflows are realistically usable.
 
