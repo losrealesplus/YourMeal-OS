@@ -184,7 +184,7 @@ Every Product Core decision must answer with evidence:
 
 If a change cannot answer those questions, it does not belong in Product Core.
 
-Active Experience Sprint: [CUSTOMER_EXPERIENCE_001](./CUSTOMER_EXPERIENCE_001.md) · alta/gestión **&lt; 30 seconds**.
+Active Experience Sprint: [CUSTOMER_EXPERIENCE_001](./CUSTOMER_EXPERIENCE_001.md) · Zero Friction · [EXPERIENCE_MANIFESTO](./EXPERIENCE_MANIFESTO.md).
 
 ---
 
