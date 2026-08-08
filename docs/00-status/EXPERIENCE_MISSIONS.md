@@ -119,7 +119,7 @@ Temporal model: **Semana → Día → Menú → Platos**
 
 ▶ **KITCHEN-EXPERIENCE-002** · Zero Friction Kitchen Execution Search  
 Surface: `/admin/kitchen-today` · mode **search** · [KITCHEN_EXPERIENCE_002](./KITCHEN_EXPERIENCE_002.md)  
-KE001 ✅ · [KITCHEN_EXPERIENCE_001](./KITCHEN_EXPERIENCE_001.md) · Input: Production Handoff · **PRODUCTION JOURNEY CERTIFIED · FROZEN**
+**KITCHEN EXPERIENCE 001** ✅ · [KITCHEN_EXPERIENCE_001](./KITCHEN_EXPERIENCE_001.md) · Input: Production Handoff · **PRODUCTION JOURNEY CERTIFIED · FROZEN**
 
 ```text
 KE001 Today's Work ✅ → KE002 Search ▶ → KE003 Adaptation → KE004 Labels → KE005 Progress → KE006 Completion → Review → Journey Certification → Freeze
