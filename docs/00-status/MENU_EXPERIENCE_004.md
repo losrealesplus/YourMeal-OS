@@ -1,6 +1,6 @@
 # MENU EXPERIENCE 004 · Zero Friction Dish Library Integration
 
-**Status:** ▶ **IN PROGRESS**  
+**Status:** ✅ **COMPLETE** (superseded as active by ME005 · surface retained)  
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/menu-planning` (Planning · Adaptation · Dish Library picker)  
@@ -91,8 +91,8 @@ Empty: **Crear plato** · **Volver a planificación**
 001 Weekly Planning          ✅
 002 Menu Search              ✅
 003 Weekly Adaptation        ✅
-004 Dish Library Integration ▶ THIS
-005 Publish & Preview
+004 Dish Library Integration ✅
+005 Publish & Preview        ▶ next
 ↓
 Review → Journey Certification → Freeze
 ```

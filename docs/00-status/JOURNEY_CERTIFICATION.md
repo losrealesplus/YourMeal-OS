@@ -54,7 +54,7 @@ Verdicts that authorize certification: **READY** or **READY WITH IMPROVEMENTS**.
 |---------|--------|--------|-------|
 | **Customer Journey** | ✅ **Certified** | [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · Frozen |
 | **Order Journey** | ✅ **Certified** | [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · Frozen |
-| **Menu Journey** | ⏳ In progress (ME004) | — | Timeline · Adaptation · Dish Library reuse |
+| **Menu Journey** | ⏳ In progress (ME005) | — | Timeline · Adaptation · Dish Library · Publish |
 | **Production Journey** | ⏳ Pending | — | After Menu |
 | **Kitchen Journey** | ⏳ Pending | — | After Production |
 | **Delivery Journey** | ⏳ Pending | — | After Kitchen |
@@ -63,7 +63,7 @@ Verdicts that authorize certification: **READY** or **READY WITH IMPROVEMENTS**.
 ```text
 Customer Journey      ✅ Certified
 Order Journey         ✅ Certified
-Menu Journey          ⏳ ME004 Dish Library (ME001–003 ✅)
+Menu Journey          ⏳ ME005 Publish & Preview (ME001–004 ✅)
 Production Journey    ⏳
 Kitchen Journey       ⏳
 Delivery Journey      ⏳

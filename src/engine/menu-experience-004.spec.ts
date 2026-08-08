@@ -86,7 +86,8 @@ describe("MENU EXPERIENCE 004 · Zero Friction Dish Library Integration", () => 
 
     expect(missions).toContain("MENU-EXPERIENCE-004");
     expect(missions).toContain("TTFID <15s");
-    expect(missions).toContain("ME004 Dish Library ▶");
+    expect(missions).toContain("ME004 Dish Library ✅");
+    expect(missions).toContain("MENU-EXPERIENCE-005");
 
     expect(ui).toContain("MENU EXPERIENCE 004");
     expect(ui).toContain("dishRowToLibraryItem");

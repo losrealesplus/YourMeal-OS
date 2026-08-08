@@ -4,17 +4,20 @@
  * Reuse before creation. Duplicate → adapt → preview → publish.
  */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { StatusChip } from "@/components/admin";
 import { DishLibraryPicker } from "@/menu-experience/DishLibraryPicker";
 import type { DishLibraryItem } from "@/menu-experience/dish-library";
+import { MenuPublishPreviewPanel } from "@/menu-experience/MenuPublishPreviewPanel";
+import type { ReadinessIssue } from "@/menu-experience/week-readiness";
 import { CONVERSATION_DISHES } from "@/order-experience/conversation-catalog";
 import {
   activeSlots,
   createEmptyWeek,
   dayLabel,
+  duplicateSlot,
   duplicateWeekPlan,
   formatWeekLabel,
   getWeekPlan,
@@ -111,7 +114,8 @@ export function MenuPlanningPanel({
   const [step, setStep] = useState<Step>(startInPreview ? "preview" : "plan");
   const [tick, setTick] = useState(0);
   const [pickDay, setPickDay] = useState<string | null>(null);
-  const publishRef = useRef<HTMLButtonElement>(null);
+  const [replaceSlotId, setReplaceSlotId] = useState<string | null>(null);
+  const [publishing, setPublishing] = useState(false);
 
   useEffect(() => {
     if (!focusWeekStart) return;
@@ -273,23 +277,56 @@ export function MenuPlanningPanel({
       return;
     }
 
-    const durableIds = activeSlots(p).every((s) => !s.dishId.startsWith("exp:"));
-    if (durableIds && onPublishDurable) {
-      const result = await onPublishDurable(p);
-      if (result.ok) {
-        markPublished(weekStart, "published_durable", result.menuId);
-        refresh();
-        setStep("done");
-        toast.success("Menú publicado");
-        return;
+    setPublishing(true);
+    try {
+      const durableIds = activeSlots(p).every(
+        (s) => !s.dishId.startsWith("exp:"),
+      );
+      if (durableIds && onPublishDurable) {
+        const result = await onPublishDurable(p);
+        if (result.ok) {
+          markPublished(weekStart, "published_durable", result.menuId);
+          refresh();
+          setStep("done");
+          toast.success("Semana publicada · lista para Orders y Production");
+          return;
+        }
+        toast.message(result.message ?? "Publicación durable no disponible");
       }
-      toast.message(result.message ?? "Publicación durable no disponible");
-    }
 
-    markPublished(weekStart, "published_session");
+      markPublished(weekStart, "published_session");
+      refresh();
+      setStep("done");
+      toast.success("Semana lista (sesión · Orders/Production con honestidad)");
+    } finally {
+      setPublishing(false);
+    }
+  }
+
+  function onFixFromPreview(issue: ReadinessIssue) {
+    setStep("plan");
+    if (issue.dayDate) {
+      setPickDay(issue.dayDate);
+      if (issue.slotId) setReplaceSlotId(issue.slotId);
+    }
+  }
+
+  function onDuplicateDay(dayDate: string) {
+    if (!canWrite || !plan) return;
+    const first = (byDay?.[dayDate] ?? []).find((s) => !s.disabled);
+    if (!first) {
+      toast.error("Nada que duplicar en este día");
+      return;
+    }
+    duplicateSlot(weekStart, first.id, dayDate);
     refresh();
-    setStep("done");
-    toast.success("Menú listo (sesión · Menu Facade pendiente)");
+    toast.success(`Día duplicado · ${dayLabel(dayDate)}`);
+  }
+
+  function onReplaceFromPreview(dayDate: string, slotId: string) {
+    setStep("plan");
+    setPickDay(dayDate);
+    setReplaceSlotId(slotId);
   }
 
   function importDurableSeed() {
@@ -317,14 +354,17 @@ export function MenuPlanningPanel({
             ? "Publicado (durable)"
             : "Publicado en sesión"}
         </p>
-        <StatusChip
-          tone={plan.status === "published_durable" ? "positive" : "warning"}
-          label={
-            plan.status === "published_durable"
-              ? "Listo para pedidos"
-              : "Sesión · Facade pendiente"
-          }
-        />
+        <div className="flex flex-wrap gap-2">
+          <StatusChip
+            tone={plan.status === "published_durable" ? "positive" : "warning"}
+            label={
+              plan.status === "published_durable"
+                ? "Listo para Orders"
+                : "Sesión · Facade pendiente"
+            }
+          />
+          <StatusChip tone="positive" label="Listo para Production" />
+        </div>
         <div className="space-y-2">
           <p className="text-sm font-medium">¿Qué quieres hacer ahora?</p>
           <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
@@ -347,7 +387,7 @@ export function MenuPlanningPanel({
               }}
               className="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-4 text-sm"
             >
-              Ir a pedidos
+              Ir a Orders
             </Link>
             <Link
               to="/admin/menus"
@@ -355,6 +395,13 @@ export function MenuPlanningPanel({
             >
               Menús (bootstrap)
             </Link>
+            <button
+              type="button"
+              onClick={() => setStep("preview")}
+              className="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-4 text-sm"
+            >
+              Revisar de nuevo
+            </button>
             <button
               type="button"
               onClick={() => setStep("plan")}
@@ -372,64 +419,17 @@ export function MenuPlanningPanel({
   }
 
   if (step === "preview" && plan) {
-    const grouped = slotsByDay(plan);
     return (
-      <section className="space-y-4" aria-labelledby="me-preview">
-        <div className="flex flex-wrap items-start justify-between gap-2">
-          <div>
-            <h2 id="me-preview" className="text-sm font-semibold tracking-wide">
-              Vista previa
-            </h2>
-            <p className="text-lg font-medium">{formatWeekLabel(plan.weekStart)}</p>
-            <p className="text-xs text-muted-foreground">
-              Revisa · publica · sigue trabajando
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => setStep("plan")}
-            className="text-xs underline-offset-2 hover:underline"
-          >
-            Volver a editar
-          </button>
-        </div>
-        <ul className="space-y-3">
-          {days.map((day) => (
-            <li key={day}>
-              <p className="text-xs font-semibold text-muted-foreground">
-                {dayLabel(day)} · {day}
-              </p>
-              <ul className="mt-1 space-y-1">
-                {(grouped[day] ?? [])
-                  .filter((s) => !s.disabled)
-                  .map((s) => (
-                    <li key={s.id} className="text-sm">
-                      {s.dishLabel}
-                      {s.allergenHint ? (
-                        <span className="text-xs text-muted-foreground">
-                          {" "}
-                          · {s.allergenHint}
-                        </span>
-                      ) : null}
-                    </li>
-                  ))}
-                {(grouped[day] ?? []).filter((s) => !s.disabled).length === 0 ? (
-                  <li className="text-xs text-muted-foreground">Sin platos</li>
-                ) : null}
-              </ul>
-            </li>
-          ))}
-        </ul>
-        <button
-          ref={publishRef}
-          type="button"
-          disabled={!canWrite}
-          onClick={() => void onPublish()}
-          className="min-h-12 w-full rounded-md bg-foreground px-4 text-sm font-medium text-background disabled:opacity-40"
-        >
-          Publicar semana
-        </button>
-      </section>
+      <MenuPublishPreviewPanel
+        plan={plan}
+        canWrite={canWrite}
+        publishing={publishing}
+        onBack={() => setStep("plan")}
+        onPublish={onPublish}
+        onFixIssue={onFixFromPreview}
+        onDuplicateDay={onDuplicateDay}
+        onReplaceDish={onReplaceFromPreview}
+      />
     );
   }
 
@@ -629,15 +629,26 @@ export function MenuPlanningPanel({
                 {pickDay === day ? (
                   <DishLibraryPicker
                     items={library}
-                    mode={(byDay?.[day] ?? []).length > 0 ? "replace" : "insert"}
+                    mode={
+                      replaceSlotId || (byDay?.[day] ?? []).length > 0
+                        ? "replace"
+                        : "insert"
+                    }
                     canWrite={canWrite}
                     onPick={(dish) => {
-                      const existing = (byDay?.[day] ?? [])[0];
+                      const existing =
+                        (byDay?.[day] ?? []).find(
+                          (s) => s.id === replaceSlotId,
+                        ) ?? (byDay?.[day] ?? [])[0];
                       if (existing) onReplace(existing, dish);
                       else onAddDish(day, dish);
                       setPickDay(null);
+                      setReplaceSlotId(null);
                     }}
-                    onClose={() => setPickDay(null)}
+                    onClose={() => {
+                      setPickDay(null);
+                      setReplaceSlotId(null);
+                    }}
                   />
                 ) : null}
               </div>
@@ -651,15 +662,17 @@ export function MenuPlanningPanel({
               onClick={onPreview}
               className="min-h-12 flex-1 rounded-md bg-foreground px-4 text-sm font-medium text-background disabled:opacity-40"
             >
-              Vista previa
+              Revisar y Publicar
             </button>
             <button
               type="button"
               disabled={!canWrite}
-              onClick={() => void onPublish()}
+              onClick={() => {
+                onPreview();
+              }}
               className="min-h-12 rounded-md border border-border px-4 text-sm disabled:opacity-40"
             >
-              Publicar
+              Vista previa
             </button>
           </div>
         </>
