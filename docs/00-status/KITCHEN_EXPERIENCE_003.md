@@ -1,6 +1,6 @@
 # KITCHEN EXPERIENCE 003 · Zero Friction Kitchen Execution Adaptation
 
-**Status:** ✅ **COMPLETE** (superseded as active by KE004 · surface retained)  
+**Status:** ✅ **COMPLETE** (superseded as active by KE005 · surface retained)  
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/kitchen-today` (mode **adapt**)  
@@ -104,8 +104,8 @@ No new routing substrates. Notify / Block → Future.
 001 Today's Work               ✅
 002 Execution Search           ✅
 003 Execution Adaptation       ✅
-004 Labels & Special Info      ▶ next
-005 Execution Progress
+004 Labels & Special Info      ✅
+005 Execution Progress         ▶ next
 006 Completion / Handoff
 ↓
 Review → Journey Certification → Freeze

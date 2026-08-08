@@ -1,6 +1,6 @@
 # KITCHEN EXPERIENCE 001 · Zero Friction Kitchen Execution
 
-**Status:** ✅ **COMPLETE** (superseded as active by KE004 · surface retained)  
+**Status:** ✅ **COMPLETE** (superseded as active by KE005 · surface retained)  
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/kitchen-today` (mode **today**)  

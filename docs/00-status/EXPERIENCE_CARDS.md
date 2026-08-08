@@ -360,18 +360,20 @@ Name
 Kitchen Experience
 
 Phase
-004 Labels & Special Info
+005 Execution Progress
 
 Mission
-Zero Friction Kitchen Labels & Special Information
+Zero Friction Kitchen Execution Progress
 
 Primary User
 Kitchen Operator
 
 Primary KPI
-Time-to-Identify-Label-Context <10 s
+Time-to-Understand-Execution-Progress <5 s
 
 Secondary KPIs
+Time-to-Identify-Remaining-Work <5 s
+Time-to-Identify-Label-Context <10 s
 Time-to-Understand-Special-Information <5 s
 Time-to-Adapt-Execution <30 s
 Time-to-Resume-Execution <5 s
@@ -381,6 +383,7 @@ Time-to-Start-Execution <2 min
 
 Operational Time Saved
 Estimated
+Progress check ≈ 25–110 s
 Label / special-info check ≈ 40–180 s
 Adapt execution ≈ 90–420 s
 Find execution work ≈ 20–80 s
@@ -391,7 +394,7 @@ Status
 In Progress
 ```
 
-Detail: [KITCHEN_EXPERIENCE_004](./KITCHEN_EXPERIENCE_004.md) · [003 Execution Adaptation · Zero Friction Kitchen Execution Adaptation](./KITCHEN_EXPERIENCE_003.md) · [002 Execution Search · Zero Friction Kitchen Execution Search](./KITCHEN_EXPERIENCE_002.md) · [001 Today's Work · Zero Friction Kitchen Execution](./KITCHEN_EXPERIENCE_001.md) · Surface `/admin/kitchen-today` · Input: Production Handoff  
+Detail: [KITCHEN_EXPERIENCE_005](./KITCHEN_EXPERIENCE_005.md) · [004 Labels & Special Info · Zero Friction Kitchen Labels & Special Information](./KITCHEN_EXPERIENCE_004.md) · [003 Execution Adaptation · Zero Friction Kitchen Execution Adaptation](./KITCHEN_EXPERIENCE_003.md) · [002 Execution Search · Zero Friction Kitchen Execution Search](./KITCHEN_EXPERIENCE_002.md) · [001 Today's Work · Zero Friction Kitchen Execution](./KITCHEN_EXPERIENCE_001.md) · Surface `/admin/kitchen-today` · Input: Production Handoff  
 
 **Sequence (daily execution — not Production planning):**
 
@@ -399,8 +402,8 @@ Detail: [KITCHEN_EXPERIENCE_004](./KITCHEN_EXPERIENCE_004.md) · [003 Execution 
 001 Today's Work               ✅
 002 Execution Search           ✅
 003 Execution Adaptation       ✅
-004 Labels & Special Info      ▶ In Progress
-005 Execution Progress
+004 Labels & Special Info      ✅
+005 Execution Progress         ▶ In Progress
 006 Completion / Handoff
 ↓
 Review → Journey Certification → Freeze
@@ -411,11 +414,11 @@ Review → Journey Certification → Freeze
 | 001 | ¿Sé qué ejecutar ahora en &lt;10s? | ✅ |
 | 002 | ¿Encuentro cualquier trabajo de ejecución en &lt;10s? | ✅ |
 | 003 | ¿Adapto la ejecución del día sin replanificar Production? | ✅ |
-| 004 | ¿Veo etiquetas e info especial a tiempo? | ▶ |
-| 005 | ¿Sigo el progreso sin Capability inventada? | Planned |
+| 004 | ¿Veo etiquetas e info especial a tiempo? | ✅ |
+| 005 | ¿Sigo el progreso sin Capability inventada? | ▶ |
 | 006 | ¿Cierro y entrego el día con claridad? | Planned |
 
-Kitchen executes transferred work — does not re-plan Production. Search never becomes Order/Menu/Production planning. Adaptation is local execution only (session honesty · no durable ExecutionUnit simulation). Labels consume substrate — never invent Customer/Order · physical labels → Future.
+Kitchen executes transferred work — does not re-plan Production. Search never becomes Order/Menu/Production planning. Adaptation is local execution only (session honesty · no durable ExecutionUnit simulation). Labels consume substrate — never invent Customer/Order · physical labels → Future. Progress uses session marks + handoff totals — never invents durable Start/Complete.
 
 ---
 
