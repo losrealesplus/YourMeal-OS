@@ -1,9 +1,9 @@
 /**
- * CUSTOMER EXPERIENCE 004 · Zero Friction Organization Management
- * (+ CX001–003 Create · Search · Edit on the same surface)
+ * CUSTOMER EXPERIENCE 005 · Zero Friction Customer Growth
+ * (+ CX001–004 Create · Search · Edit · Organization on the same surface)
  *
  * Experience above useCustomer() only — no Capability / Facade edits.
- * Mission KPI: TTO < 45s · EXPERIENCE MANIFESTO 001
+ * Mission KPI: frequent enrichment < 30s · Living Customer Profile
  */
 
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -67,11 +67,11 @@ export const Route = createFileRoute(
   head: () => ({
     meta: [
       {
-        title: "YourMeal OS — Zero Friction Organization Management",
+        title: "YourMeal OS — Zero Friction Customer Growth",
       },
       {
         name: "description",
-        content: "TTO < 45s · CX004 · useCustomer only",
+        content: "Living Customer Profile · CX005 · useCustomer only",
       },
     ],
   }),
@@ -409,22 +409,22 @@ function CustomerExperiencePage() {
   return (
     <div className="animate-fade-in max-w-5xl">
       <SectionTitle
-        overline="CUSTOMER EXPERIENCE 004 · Phase 004 Organization"
-        title="Zero Friction Organization Management"
-        subtitle="TTO < 45s · organización → trabajadores → pedidos"
+        overline="CUSTOMER EXPERIENCE 005 · Phase 005 Growth"
+        title="Zero Friction Customer Growth"
+        subtitle="El perfil crece con la relación — nunca antes"
       />
 
       <div className="mb-4 grid gap-2 rounded-md border border-foreground/15 bg-foreground/[0.03] px-4 py-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Kpi label="TTO · Organization" value="< 45 s" primary />
-        <Kpi label="Add worker" value="< 15 s" />
+        <Kpi label="Enrich profile" value="< 30 s" primary />
+        <Kpi label="Resume operation" value="< 5 s" />
+        <Kpi label="TTO · Organization" value="< 45 s" />
         <Kpi label="TTE · Edit" value="< 20 s" />
-        <Kpi label="TTF · Find" value="< 10 s" />
       </div>
 
       <AdminHeader
-        goal="Crear una organización y empezar a trabajar — sin pensar en Membership"
+        goal="Enriquecer cuando aporte valor — nunca bloquear por incompleto"
         capability="customers.read / customers.write"
-        object="Organización · Contacto · Teléfono · Dirección · Trabajadores"
+        object="Living Profile · Preferencias · Alergias · Facturación · Tags"
       />
 
       {!creating && !organizing ? (
