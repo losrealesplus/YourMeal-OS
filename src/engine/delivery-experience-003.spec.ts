@@ -94,7 +94,7 @@ describe("DELIVERY EXPERIENCE 003 · Zero Friction Delivery Adaptation", () => {
     expect(cards).toContain("Time-to-Adapt-Delivery <30 s");
 
     expect(missions).toContain("DELIVERY-EXPERIENCE-003");
-    expect(missions).toContain("DE003 Adaptation ▶");
+    expect(missions).toContain("DE003 Adaptation ✅");
     expect(missions).toContain("TTAD");
 
     expect(ui).toContain("DELIVERY EXPERIENCE 003");

@@ -1,6 +1,6 @@
 /**
- * DELIVERY EXPERIENCE 001–003
- * Today's Delivery Day · Search · Adaptation
+ * DELIVERY EXPERIENCE 001–004
+ * Today's Delivery Day · Search · Adaptation · Responsibility
  *
  * Experience only — no Delivery Capability invent · no routes · no maps ·
  * no navigation · no ConfirmDelivery · no durable assignment simulation.
@@ -11,14 +11,20 @@ import { useState } from "react";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { AdminHeader, SectionTitle, StatusChip } from "@/components/admin";
 import { DeliveryAdaptationPanel } from "@/delivery-experience/DeliveryAdaptationPanel";
+import { DeliveryResponsibilityPanel } from "@/delivery-experience/DeliveryResponsibilityPanel";
 import { DeliverySearchPanel } from "@/delivery-experience/DeliverySearchPanel";
 import { DeliveryTodayPanel } from "@/delivery-experience/DeliveryTodayPanel";
 import { utcDateOnly } from "@/menu-experience/week-plan";
 
-type ExperienceMode = "today" | "search" | "adapt";
+type ExperienceMode = "today" | "search" | "adapt" | "responsibility";
 
 function isExperienceMode(value: unknown): value is ExperienceMode {
-  return value === "today" || value === "search" || value === "adapt";
+  return (
+    value === "today" ||
+    value === "search" ||
+    value === "adapt" ||
+    value === "responsibility"
+  );
 }
 
 export const Route = createFileRoute("/_authenticated/admin/delivery-today")({
@@ -36,12 +42,12 @@ export const Route = createFileRoute("/_authenticated/admin/delivery-today")({
     meta: [
       {
         title:
-          "YourMeal OS — Delivery Experience · Adaptation · Search · Today's Day",
+          "YourMeal OS — Delivery Experience · Responsibility · Adaptation · Search · Day",
       },
       {
         name: "description",
         content:
-          "DELIVERY EXPERIENCE 003 Adaptation · TTAD <30s · 002 Search · 001 Today's Delivery Day · no routes",
+          "DELIVERY EXPERIENCE 004 Responsibility · TTDR <10s · 003 Adaptation · 002 Search · 001 Day · no fake AssignDelivery",
       },
     ],
   }),
@@ -102,6 +108,14 @@ function DeliveryTodayExperiencePage() {
       kpi: "TTAD < 30 s",
       goal: "Adaptar en <30s · volver a la jornada en <5s · Order intacto",
     },
+    responsibility: {
+      overline: "DELIVERY EXPERIENCE 004 · Delivery Responsibility",
+      title: "Zero Friction Delivery Responsibility",
+      subtitle:
+        "Quién es responsable · qué falta · sin simular AssignDelivery · Route Preparation NEXT",
+      kpi: "TTDR < 10 s",
+      goal: "Entender responsabilidad en <10s · identificar unassigned / unavailable en <10s",
+    },
   };
 
   const m = meta[mode];
@@ -139,6 +153,15 @@ function DeliveryTodayExperiencePage() {
         >
           Adaptación
         </button>
+        <button
+          type="button"
+          className="text-xs underline-offset-2 hover:underline"
+          onClick={() =>
+            goMode("responsibility", dayDate, focusDeliveryId ?? undefined)
+          }
+        >
+          Responsabilidad
+        </button>
         <Link
           to="/admin/kitchen-today"
           search={{ mode: "completion", day: dayDate, workId: undefined }}
@@ -168,10 +191,19 @@ function DeliveryTodayExperiencePage() {
       <AdminHeader
         goal={m.goal}
         capability="logistics.operate · Delivery Facade (read) · Order (consume)"
-        object="Adaptation · search · today's deliveries · session honesty · no routes · no Order invent"
+        object="Responsibility · adaptation · search · day · session honesty · no AssignDelivery invent · no routes"
       />
 
-      {mode === "adapt" ? (
+      {mode === "responsibility" ? (
+        <DeliveryResponsibilityPanel
+          dayDate={dayDate}
+          focusDeliveryId={focusDeliveryId}
+          onOpenDelivery={(day, deliveryId) =>
+            goMode("today", day, deliveryId)
+          }
+          onBackToToday={() => goMode("today", dayDate)}
+        />
+      ) : mode === "adapt" ? (
         <DeliveryAdaptationPanel
           dayDate={dayDate}
           focusDeliveryId={focusDeliveryId}
