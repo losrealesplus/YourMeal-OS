@@ -6,9 +6,9 @@
  */
 
 import { utcDateOnly } from "@/menu-experience/week-plan";
+import { listAdaptedExecutionCards } from "@/kitchen-experience/adapt-execution";
 import {
   kitchenWorkStatusLabel,
-  listExecutionCards,
   type KitchenExecutionCard,
 } from "@/kitchen-experience/today-work";
 
@@ -167,5 +167,5 @@ export function searchExecutionWork(
   query: string,
   today: string = utcDateOnly(),
 ): KitchenSearchHit[] {
-  return rankExecutionWork(listExecutionCards(null, today), query, today);
+  return rankExecutionWork(listAdaptedExecutionCards(null, today), query, today);
 }

@@ -37,8 +37,14 @@ export type KitchenExecutionCard = {
   productionDay: string;
   dayLabel: string;
   dishLabel: string;
+  /** Production / handoff commitment — Kitchen must not mutate this substrate */
   quantity: number;
   quantityEstimated: boolean;
+  /**
+   * Session execution quantity when adapted (KE003).
+   * null/undefined = execute Production quantity.
+   */
+  executionQuantity?: number | null;
   batchKey: string;
   cookingDeadline: string;
   priority: "high" | "normal" | "low";
@@ -54,6 +60,8 @@ export type KitchenExecutionCard = {
   specialInstruction: string | null;
   handoffReady: boolean;
   urgent: boolean;
+  /** True when KE003 session adaptation overlay is present */
+  executionAdapted?: boolean;
 };
 
 export type TodaysKitchenWork = {

@@ -14,12 +14,15 @@ import {
   printKitchenWork,
 } from "@/kitchen-experience/export-kitchen-work";
 import {
+  buildAdaptedTodaysKitchenWork,
+  effectiveExecutionQuantity,
+} from "@/kitchen-experience/adapt-execution";
+import {
   rememberKitchenWorkAccess,
   searchExecutionWork,
   type KitchenSearchHit,
 } from "@/kitchen-experience/execution-search-rank";
 import {
-  buildTodaysKitchenWork,
   kitchenWorkStatusLabel,
   listHandedOffPlans,
 } from "@/kitchen-experience/today-work";
@@ -157,7 +160,7 @@ export function KitchenSearchPanel({
           type="button"
           className="text-xs underline-offset-2 hover:underline"
           onClick={() => {
-            const view = buildTodaysKitchenWork(today);
+            const view = buildAdaptedTodaysKitchenWork(today);
             printKitchenWork(view);
           }}
         >
@@ -167,7 +170,7 @@ export function KitchenSearchPanel({
           type="button"
           className="text-xs underline-offset-2 hover:underline"
           onClick={() => {
-            const view = buildTodaysKitchenWork(today);
+            const view = buildAdaptedTodaysKitchenWork(today);
             downloadKitchenWorkCsv(view);
             toast.success("CSV de hoy descargado");
           }}
@@ -227,7 +230,7 @@ export function KitchenSearchPanel({
                   <p className="text-sm font-semibold">
                     {hit.dishLabel}{" "}
                     <span className="font-normal text-muted-foreground">
-                      · {hit.quantity}
+                      · {effectiveExecutionQuantity(hit)}
                       {hit.quantityEstimated ? "*" : ""} · {hit.batchKey}
                     </span>
                   </p>
