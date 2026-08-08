@@ -106,11 +106,10 @@ describe("KITCHEN EXPERIENCE 003 · Zero Friction Kitchen Execution Adaptation",
     expect(cards).toContain("003 Execution Adaptation");
     expect(cards).toContain("Zero Friction Kitchen Execution Adaptation");
     expect(cards).toContain("Time-to-Adapt-Execution <30 s");
-    expect(cards).toContain("In Progress");
 
     expect(missions).toContain("KITCHEN-EXPERIENCE-003");
-    expect(missions).toContain("KE003 Adaptation ▶");
-    expect(missions).toContain("TTAE");
+    expect(missions).toContain("KE003 Adaptation ✅");
+    expect(doc).toContain("COMPLETE");
 
     expect(ui).toContain("KITCHEN EXPERIENCE 003");
     expect(ui).toContain("KitchenAdaptationPanel");
