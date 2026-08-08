@@ -1,9 +1,9 @@
 /**
- * KITCHEN EXPERIENCE 001 · 002 · 003
- * Today's Work · Execution Search · Execution Adaptation
+ * KITCHEN EXPERIENCE 001 · 002 · 003 · 004
+ * Today's Work · Search · Adaptation · Labels & Special Info
  *
  * Experience only — no Kitchen / Production Capability · Facade · Engine changes.
- * Start / Pause / Resume / Block / Assign / Notify → Future.
+ * Start / Pause / Resume / Block / Assign / Notify / Physical labels → Future.
  */
 
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -12,14 +12,20 @@ import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { AdminHeader, SectionTitle, StatusChip } from "@/components/admin";
 import { useCan } from "@/hooks/use-can";
 import { KitchenAdaptationPanel } from "@/kitchen-experience/KitchenAdaptationPanel";
+import { KitchenLabelsPanel } from "@/kitchen-experience/KitchenLabelsPanel";
 import { KitchenSearchPanel } from "@/kitchen-experience/KitchenSearchPanel";
 import { KitchenTodayPanel } from "@/kitchen-experience/KitchenTodayPanel";
 import { utcDateOnly } from "@/menu-experience/week-plan";
 
-type ExperienceMode = "today" | "search" | "adapt";
+type ExperienceMode = "today" | "search" | "adapt" | "labels";
 
 function isExperienceMode(value: unknown): value is ExperienceMode {
-  return value === "today" || value === "search" || value === "adapt";
+  return (
+    value === "today" ||
+    value === "search" ||
+    value === "adapt" ||
+    value === "labels"
+  );
 }
 
 export const Route = createFileRoute("/_authenticated/admin/kitchen-today")({
@@ -36,12 +42,12 @@ export const Route = createFileRoute("/_authenticated/admin/kitchen-today")({
     meta: [
       {
         title:
-          "YourMeal OS — Kitchen Experience · Adaptation · Search · Today's Work",
+          "YourMeal OS — Kitchen Experience · Labels · Adaptation · Search · Today's Work",
       },
       {
         name: "description",
         content:
-          "KITCHEN EXPERIENCE 003 Execution Adaptation · TTAE <30s · 002 Search · 001 Today's Work",
+          "KITCHEN EXPERIENCE 004 Labels & Special Info · TILC <10s · 003 Adaptation · 002 Search · 001 Today's Work",
       },
     ],
   }),
@@ -78,38 +84,58 @@ function KitchenTodayExperiencePage() {
   }
 
   const overline =
-    mode === "adapt"
-      ? "KITCHEN EXPERIENCE 003 · Execution Adaptation"
-      : mode === "search"
-        ? "KITCHEN EXPERIENCE 002 · Execution Search"
-        : "KITCHEN EXPERIENCE 001 · Today's Work";
+    mode === "labels"
+      ? "KITCHEN EXPERIENCE 004 · Labels & Special Info"
+      : mode === "adapt"
+        ? "KITCHEN EXPERIENCE 003 · Execution Adaptation"
+        : mode === "search"
+          ? "KITCHEN EXPERIENCE 002 · Execution Search"
+          : "KITCHEN EXPERIENCE 001 · Today's Work";
 
   const title =
-    mode === "adapt"
-      ? "Zero Friction Kitchen Execution Adaptation"
-      : mode === "search"
-        ? "Zero Friction Kitchen Execution Search"
-        : "Zero Friction Kitchen Execution";
+    mode === "labels"
+      ? "Zero Friction Kitchen Labels & Special Information"
+      : mode === "adapt"
+        ? "Zero Friction Kitchen Execution Adaptation"
+        : mode === "search"
+          ? "Zero Friction Kitchen Execution Search"
+          : "Zero Friction Kitchen Execution";
 
   const subtitle =
-    mode === "adapt"
-      ? "Adapta la ejecución sin replanificar Production"
-      : mode === "search"
-        ? "Encuentra trabajo de ejecución sin salir del contexto"
-        : "Recibe el handoff — entiende qué ejecutar ahora";
+    mode === "labels"
+      ? "Identifica el trabajo y la info especial sin inventar substrate"
+      : mode === "adapt"
+        ? "Adapta la ejecución sin replanificar Production"
+        : mode === "search"
+          ? "Encuentra trabajo de ejecución sin salir del contexto"
+          : "Recibe el handoff — entiende qué ejecutar ahora";
+
+  const kpiChip =
+    mode === "labels" ? (
+      <StatusChip tone="warning" label="TILC < 10 s" />
+    ) : mode === "adapt" ? (
+      <StatusChip tone="warning" label="TTAE < 30 s" />
+    ) : mode === "search" ? (
+      <StatusChip tone="warning" label="TTFEW < 10 s" />
+    ) : (
+      <StatusChip tone="warning" label="TTUKW < 10 s" />
+    );
+
+  const goal =
+    mode === "labels"
+      ? "Identificar contexto de etiqueta en <10s · info especial en <5s"
+      : mode === "adapt"
+        ? "Adaptar ejecución en <30s y volver a ejecutar en <5s"
+        : mode === "search"
+          ? "Encontrar trabajo de ejecución en <10s"
+          : "Entender el trabajo de cocina de hoy en <10s";
 
   return (
     <div className="animate-fade-in mx-auto max-w-3xl pb-24">
       <SectionTitle overline={overline} title={title} subtitle={subtitle} />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        {mode === "adapt" ? (
-          <StatusChip tone="warning" label="TTAE < 30 s" />
-        ) : mode === "search" ? (
-          <StatusChip tone="warning" label="TTFEW < 10 s" />
-        ) : (
-          <StatusChip tone="warning" label="TTUKW < 10 s" />
-        )}
+        {kpiChip}
         <StatusChip tone="info" label="Handoff → Ejecución" />
         <StatusChip tone="info" label="Experience only" />
         <button
@@ -132,6 +158,13 @@ function KitchenTodayExperiencePage() {
           onClick={() => goMode("adapt", dayDate, focusWorkId ?? undefined)}
         >
           Adaptación
+        </button>
+        <button
+          type="button"
+          className="text-xs underline-offset-2 hover:underline"
+          onClick={() => goMode("labels", dayDate, focusWorkId ?? undefined)}
+        >
+          Etiquetas
         </button>
         <Link
           to="/admin/production-planning"
@@ -156,18 +189,18 @@ function KitchenTodayExperiencePage() {
       </div>
 
       <AdminHeader
-        goal={
-          mode === "adapt"
-            ? "Adaptar ejecución en <30s y volver a ejecutar en <5s"
-            : mode === "search"
-              ? "Encontrar trabajo de ejecución en <10s"
-              : "Entender el trabajo de cocina de hoy en <10s"
-        }
+        goal={goal}
         capability="kitchen.operate · production handoff (read)"
-        object="Execution adaptation · search · today's work · session honesty · no Capability Start"
+        object="Labels · adaptation · search · today's work · session honesty · no Capability invent"
       />
 
-      {mode === "adapt" ? (
+      {mode === "labels" ? (
+        <KitchenLabelsPanel
+          dayDate={dayDate}
+          focusWorkId={focusWorkId}
+          onBackToToday={() => goMode("today", dayDate)}
+        />
+      ) : mode === "adapt" ? (
         <KitchenAdaptationPanel
           canWrite={canWrite}
           dayDate={dayDate}
