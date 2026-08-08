@@ -258,7 +258,9 @@ describe("OPERATIONAL-002 Customer Validation Matrix", () => {
   });
 
   it("V03 ArchiveCustomer", async () => {
-    const archive = vi.fn(async () => undefined);
+    const archive = vi.fn(
+      async (_ctx: ServiceContext, _customerId: string) => undefined,
+    );
     const facade = facadeWith({
       directory: { archiveCustomer: archive },
     });

@@ -28,7 +28,11 @@ import {
 } from "./OrderQueries";
 import type { OrderRuntimeIdentity } from "./orderServiceContext";
 import type { ServiceContext } from "@/services/types";
-import type { OperationalOrderListItem } from "@/modules/operations";
+import type {
+  OperationalOrderFilters,
+  OperationalOrderListItem,
+  OperationalOrderStatus,
+} from "@/modules/operations";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
@@ -222,7 +226,12 @@ describe("OPERATIONAL-003 Order Validation Matrix", () => {
   });
 
   it("V02 ConfirmOrder", async () => {
-    const confirm = vi.fn(async () => ({ id: "o1", status: "confirmed" }));
+    const confirm = vi.fn(
+      async (_ctx: ServiceContext, _orderId: string) => ({
+        id: "o1",
+        status: "confirmed",
+      }),
+    );
     const getOrder = vi.fn(async () => listItem({ status: "confirmed" }));
     const facade = facadeWith({
       orders: { confirm },
@@ -297,7 +306,13 @@ describe("OPERATIONAL-003 Order Validation Matrix", () => {
   });
 
   it("V05 ReadyForDelivery", async () => {
-    const transitionKitchen = vi.fn(async () => "ready_for_delivery");
+    const transitionKitchen = vi.fn(
+      async (
+        _ctx: ServiceContext,
+        _orderId: string,
+        _toStatus: OperationalOrderStatus,
+      ) => "ready_for_delivery",
+    );
     const getOrder = vi.fn(async () =>
       listItem({ status: "ready_for_delivery" }),
     );
@@ -426,7 +441,12 @@ describe("OPERATIONAL-003 Order Validation Matrix", () => {
 
   it("V10 Delivery Day", async () => {
     const row = listItem({ deliveryDates: ["2026-08-05"] });
-    const listKitchen = vi.fn(async () => [row]);
+    const listKitchen = vi.fn(
+      async (
+        _ctx: ServiceContext,
+        _filters: Omit<OperationalOrderFilters, "statuses"> = {},
+      ) => [row],
+    );
     const listDelivery = vi.fn(async () => [row]);
     const facade = facadeWith({
       operations: {
