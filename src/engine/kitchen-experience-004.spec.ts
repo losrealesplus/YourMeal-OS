@@ -118,11 +118,10 @@ describe("KITCHEN EXPERIENCE 004 · Labels & Special Information", () => {
       "Zero Friction Kitchen Labels & Special Information",
     );
     expect(cards).toContain("Time-to-Identify-Label-Context <10 s");
-    expect(cards).toContain("In Progress");
 
     expect(missions).toContain("KITCHEN-EXPERIENCE-004");
-    expect(missions).toContain("KE004 Labels ▶");
-    expect(missions).toContain("TILC");
+    expect(missions).toContain("KE004 Labels ✅");
+    expect(doc).toContain("COMPLETE");
 
     expect(ui).toContain("KITCHEN EXPERIENCE 004");
     expect(ui).toContain("KitchenLabelsPanel");

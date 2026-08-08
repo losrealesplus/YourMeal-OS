@@ -1,6 +1,6 @@
 # KITCHEN EXPERIENCE 004 · Zero Friction Kitchen Labels & Special Information
 
-**Status:** ▶ **IN PROGRESS**  
+**Status:** ✅ **COMPLETE** (superseded as active by KE005 · surface retained)  
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/kitchen-today` (mode **labels**)  
@@ -78,8 +78,8 @@ Print / export supports correct identification + available special info.
 001 Today's Work               ✅
 002 Execution Search           ✅
 003 Execution Adaptation       ✅
-004 Labels & Special Info      ▶ THIS
-005 Execution Progress
+004 Labels & Special Info      ✅
+005 Execution Progress         ▶ next
 006 Completion / Handoff
 ↓
 Review → Journey Certification → Freeze

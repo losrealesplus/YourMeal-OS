@@ -26,7 +26,8 @@
 | [EXPERIENCE_CARDS](./EXPERIENCE_CARDS.md) | User-facing product map (30s cards) |
 | [EXPERIENCE_MISSIONS](./EXPERIENCE_MISSIONS.md) | Era 2 missions · TTA KPIs · EXPERIENCE LAW 001 |
 | [EXPERIENCE_MANIFESTO](./EXPERIENCE_MANIFESTO.md) | **Invisible software** · ADR 0099 |
-| **[KITCHEN_EXPERIENCE_004](./KITCHEN_EXPERIENCE_004.md)** | ▶ **In Progress** · Labels & Special Info · TILC &lt;10s |
+| **[KITCHEN_EXPERIENCE_005](./KITCHEN_EXPERIENCE_005.md)** | ▶ **In Progress** · Execution Progress · TTEP &lt;5s |
+| [KITCHEN_EXPERIENCE_004](./KITCHEN_EXPERIENCE_004.md) | ✅ Labels & Special Info · TILC &lt;10s |
 | [KITCHEN_EXPERIENCE_003](./KITCHEN_EXPERIENCE_003.md) | ✅ Execution Adaptation · TTAE &lt;30s |
 | [KITCHEN_EXPERIENCE_002](./KITCHEN_EXPERIENCE_002.md) | ✅ Execution Search · TTFEW &lt;10s |
 | [KITCHEN_EXPERIENCE_001](./KITCHEN_EXPERIENCE_001.md) | ✅ Today's Work · TTUKW &lt;10s |
