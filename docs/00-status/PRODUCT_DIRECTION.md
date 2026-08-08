@@ -512,6 +512,15 @@ First question of every product conversation:
 ¿Dónde pierde tiempo Isabella hoy?
 ```
 
+**TENANT SUCCESS LAW 001** (ADR [0092](../adr/0092-tenant-success-law-001.md)):
+
+```text
+No observation is accepted until it has been measured.
+No solution is accepted until the improvement has been measured again.
+```
+
+Detail: [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md).
+
 ---
 
 ## Closing the Operational Engine (declared)
@@ -540,6 +549,8 @@ See [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) — *Time saved is the p
 * [ADR 0088](../adr/0088-billing-facade.md) · Billing Facade  
 * [ADR 0089](../adr/0089-billing-engineering-certification.md) · Billing Certification  
 * [ADR 0090](../adr/0090-operational-engine-v1-declaration.md) · **Engine v1.0 Declaration**  
+* [ADR 0091](../adr/0091-era-declaration.md) · **Era 1 CLOSED · Era 2 OPEN**  
+* [ADR 0092](../adr/0092-tenant-success-law-001.md) · **TENANT SUCCESS LAW 001**  
 * [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) · Construction COMPLETE  
 * [ERA_DECLARATION](./ERA_DECLARATION.md) · ADR [0091](../adr/0091-era-declaration.md) · **Era 1 CLOSED · Era 2 OPEN**  
 * [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md) · **How we prove we returned time**  

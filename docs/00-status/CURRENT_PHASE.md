@@ -22,6 +22,10 @@ Identity                    Operational First
 First question
   · ¿Dónde pierde tiempo Isabella hoy?
 
+Laws
+  · PRODUCT LAW 001
+  · TENANT SUCCESS LAW 001 (ADR 0092)
+
 Next measurements
   · Tiempo recuperado (evidence-guided backlog)
   · Beta = Discover Friction

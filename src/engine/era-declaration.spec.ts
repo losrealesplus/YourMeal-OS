@@ -35,9 +35,26 @@ describe("Era Declaration", () => {
     expect(declaration).toContain("Developer Platform");
     expect(declaration).toContain("Tenant Success Playbook");
 
+    expect(declaration).toContain("found its identity");
+    expect(declaration).toContain("Decide what not to build");
+    expect(declaration).toContain("TENANT SUCCESS LAW 001");
+    expect(declaration).toContain("four commitments");
+    expect(declaration).toContain("Sit with Isabella");
+
     expect(adr).toContain("Accepted");
     expect(adr).toContain("Era 1");
     expect(adr).toContain("Era 2");
     expect(adr).toContain("ERA_DECLARATION");
+  });
+
+  it("accepts TENANT SUCCESS LAW 001 (ADR 0092)", () => {
+    const lawAdr = readFileSync(
+      resolve(ROOT, "docs/adr/0092-tenant-success-law-001.md"),
+      "utf8",
+    );
+    expect(lawAdr).toContain("TENANT SUCCESS LAW 001");
+    expect(lawAdr).toContain("No observation is accepted");
+    expect(lawAdr).toContain("measured again");
+    expect(lawAdr).toContain("Accepted");
   });
 });

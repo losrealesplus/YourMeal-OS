@@ -26,8 +26,14 @@ describe("Tenant Success Playbook", () => {
     expect(playbook).toContain("ERA 2");
     expect(playbook).toContain("Return Time");
     expect(playbook).toContain("PRODUCT LAW 001");
+    expect(playbook).toContain("TENANT SUCCESS LAW 001");
+    expect(playbook).toContain("No observation is accepted");
+    expect(playbook).toContain("measured again");
+    expect(playbook).toContain("Great operational software");
+    expect(playbook).toContain("Time saved is not a consequence");
     expect(playbook).toContain("Isabella");
     expect(playbook).toContain("Time saved is the product");
     expect(playbook).toContain("Tiempo recuperado esperado");
+    expect(playbook).toContain("decide what not to build");
   });
 });
