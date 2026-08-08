@@ -39,6 +39,7 @@ type Props = {
   onClose: () => void;
   onSaved: (hit: OrderSearchHit) => void;
   onSaveAsTemplate?: (hit: OrderSearchHit) => void;
+  onReportIncident?: (hit: OrderSearchHit) => void;
 };
 
 function blockedReason(hit: OrderSearchHit): string | null {
@@ -57,6 +58,7 @@ export function OrderEditPanel({
   onClose,
   onSaved,
   onSaveAsTemplate,
+  onReportIncident,
 }: Props) {
   const blocked = blockedReason(hit);
   const resumeRef = useRef<HTMLButtonElement>(null);
@@ -433,6 +435,15 @@ export function OrderEditPanel({
               Guardar como plantilla
             </button>
           ) : null}
+          {onReportIncident ? (
+            <button
+              type="button"
+              onClick={() => onReportIncident(hit)}
+              className="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-4 text-sm"
+            >
+              Reportar incidencia
+            </button>
+          ) : null}
           <Link
             to="/admin/customer-workspace"
             className="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-4 text-sm"
@@ -445,9 +456,6 @@ export function OrderEditPanel({
           >
             Generar producción
           </Link>
-          <span className="inline-flex min-h-11 items-center px-2 text-xs text-muted-foreground">
-            Similar · Incidencia → OE004 / OE005
-          </span>
         </div>
       </div>
     </section>

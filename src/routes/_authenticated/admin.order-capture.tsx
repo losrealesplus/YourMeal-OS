@@ -1,5 +1,5 @@
 /**
- * ORDER EXPERIENCE · Capture · Search · Edit · Templates (001–004)
+ * ORDER EXPERIENCE · Capture · Search · Edit · Templates · Incident (001–005)
  *
  * Conversation speed — not CRUD.
  * useCustomer + useOrder only. No Capability / Facade / Engine changes.
@@ -62,13 +62,14 @@ import {
 } from "@/order-experience/OrderSearchPanel";
 import { OrderEditPanel } from "@/order-experience/OrderEditPanel";
 import { OrderTemplatesPanel } from "@/order-experience/OrderTemplatesPanel";
+import { OrderIncidentPanel } from "@/order-experience/OrderIncidentPanel";
 import {
   saveOrderTemplate,
   type OrderTemplate,
 } from "@/order-experience/order-templates";
 import { cn } from "@/lib/utils";
 
-type ExperienceMode = "search" | "capture" | "edit" | "templates";
+type ExperienceMode = "search" | "capture" | "edit" | "templates" | "incident";
 
 export const Route = createFileRoute("/_authenticated/admin/order-capture")({
   beforeLoad: ({ context }) => {
@@ -85,19 +86,20 @@ export const Route = createFileRoute("/_authenticated/admin/order-capture")({
     mode:
       search.mode === "capture" ||
       search.mode === "edit" ||
-      search.mode === "templates"
+      search.mode === "templates" ||
+      search.mode === "incident"
         ? (search.mode as ExperienceMode)
         : ("search" as const),
   }),
   head: () => ({
     meta: [
       {
-        title: "YourMeal OS — Order Experience · Templates · Search · Capture",
+        title: "YourMeal OS — Order Experience · Incident · Templates · Search · Capture",
       },
       {
         name: "description",
         content:
-          "ORDER EXPERIENCE 004 Templates · 003 Edit · 002 Search · 001 Capture",
+          "ORDER EXPERIENCE 005 Incident · 004 Templates · 003 Edit · 002 Search · 001 Capture",
       },
     ],
   }),
@@ -125,11 +127,14 @@ function OrderCaptureExperiencePage() {
   const [mode, setMode] = useState<ExperienceMode>(
     searchParams.mode === "capture" || searchParams.customerId
       ? "capture"
-      : searchParams.mode === "edit" || searchParams.mode === "templates"
+      : searchParams.mode === "edit" ||
+          searchParams.mode === "templates" ||
+          searchParams.mode === "incident"
         ? searchParams.mode
         : "search",
   );
   const [editHit, setEditHit] = useState<OrderSearchHit | null>(null);
+  const [incidentHit, setIncidentHit] = useState<OrderSearchHit | null>(null);
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<SearchHit[]>([]);
   const [loadingSearch, setLoadingSearch] = useState(false);
@@ -418,13 +423,20 @@ function OrderCaptureExperiencePage() {
     setSelected(null);
     setQuery("");
     setEditHit(null);
+    setIncidentHit(null);
     deepLinked.current = false;
     setMode("search");
+  }
+
+  function openIncident(hit: OrderSearchHit) {
+    setIncidentHit(hit);
+    setMode("incident");
   }
 
   async function applyTemplate(t: OrderTemplate) {
     setCreated(null);
     setEditHit(null);
+    setIncidentHit(null);
     setLines(t.items.map((i) => ({ ...i })));
     setInstructions(
       [t.instructions, t.dietaryNotes].filter(Boolean).join(" · "),
@@ -486,36 +498,44 @@ function OrderCaptureExperiencePage() {
     <div className="animate-fade-in mx-auto max-w-3xl pb-24">
       <SectionTitle
         overline={
-          mode === "templates"
-            ? "ORDER EXPERIENCE 004 · Phase 004 Templates"
-            : mode === "edit"
-              ? "ORDER EXPERIENCE 003 · Phase 003 Edit"
-              : mode === "search"
-                ? "ORDER EXPERIENCE 002 · Phase 002 Search"
-                : "ORDER EXPERIENCE 001 · Phase 001 Capture"
+          mode === "incident"
+            ? "ORDER EXPERIENCE 005 · Phase 005 Incident"
+            : mode === "templates"
+              ? "ORDER EXPERIENCE 004 · Phase 004 Templates"
+              : mode === "edit"
+                ? "ORDER EXPERIENCE 003 · Phase 003 Edit"
+                : mode === "search"
+                  ? "ORDER EXPERIENCE 002 · Phase 002 Search"
+                  : "ORDER EXPERIENCE 001 · Phase 001 Capture"
         }
         title={
-          mode === "templates"
-            ? "Zero Friction Order Templates"
-            : mode === "edit"
-              ? "Zero Friction Order Edit"
-              : mode === "search"
-                ? "Zero Friction Order Search"
-                : "Zero Friction Order Capture"
+          mode === "incident"
+            ? "Zero Friction Operational Incident"
+            : mode === "templates"
+              ? "Zero Friction Order Templates"
+              : mode === "edit"
+                ? "Zero Friction Order Edit"
+                : mode === "search"
+                  ? "Zero Friction Order Search"
+                  : "Zero Friction Order Capture"
         }
         subtitle={
-          mode === "templates"
-            ? "Partir de un patrón conocido — nunca desde cero"
-            : mode === "edit"
-              ? "Corregir un compromiso en vivo — sin perder el hilo"
-              : mode === "search"
-                ? "Encuentra el compromiso en segundos — gente, días, situaciones"
-                : "Registrar el pedido mientras hablas — el software desaparece"
+          mode === "incident"
+            ? "Registra la excepción y derívala — sin inventar un workaround"
+            : mode === "templates"
+              ? "Partir de un patrón conocido — nunca desde cero"
+              : mode === "edit"
+                ? "Corregir un compromiso en vivo — sin perder el hilo"
+                : mode === "search"
+                  ? "Encuentra el compromiso en segundos — gente, días, situaciones"
+                  : "Registrar el pedido mientras hablas — el software desaparece"
         }
       />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        {mode === "templates" ? (
+        {mode === "incident" ? (
+          <StatusChip tone="warning" label="TTRI < 30 s" />
+        ) : mode === "templates" ? (
           <StatusChip tone="warning" label="Reuse < 10 s" />
         ) : mode === "edit" ? (
           <StatusChip tone="warning" label="TTEO < 20 s" />
@@ -546,6 +566,13 @@ function OrderCaptureExperiencePage() {
         >
           Plantillas
         </button>
+        <button
+          type="button"
+          className="text-xs underline-offset-2 hover:underline"
+          onClick={() => setMode("incident")}
+        >
+          Incidencia
+        </button>
         <Link
           to="/admin/customer-workspace"
           className="text-xs underline-offset-2 hover:underline"
@@ -556,16 +583,18 @@ function OrderCaptureExperiencePage() {
 
       <AdminHeader
         goal={
-          mode === "templates"
-            ? "Crear pedido frecuente <20s · reutilizar patrón <10s"
-            : mode === "edit"
-              ? "Corregir un compromiso frecuente en <20s · resume <5s"
-              : mode === "search"
-                ? "Encontrar cualquier compromiso operativo en <10s"
-                : "Crear compromiso operativo en <45s durante la llamada"
+          mode === "incident"
+            ? "Registrar incidencia <30s · derivar <10s · sin callejón sin salida"
+            : mode === "templates"
+              ? "Crear pedido frecuente <20s · reutilizar patrón <10s"
+              : mode === "edit"
+                ? "Corregir un compromiso frecuente en <20s · resume <5s"
+                : mode === "search"
+                  ? "Encontrar cualquier compromiso operativo en <10s"
+                  : "Crear compromiso operativo en <45s durante la llamada"
         }
         capability="orders.read / orders.write · customers.read"
-        object="Order templates · operational patterns · session honesty"
+        object="Operational incidents · order templates · session honesty"
       />
 
       {mode === "templates" && !created ? (
@@ -623,6 +652,23 @@ function OrderCaptureExperiencePage() {
             });
             toast.success("Plantilla guardada (sesión)");
           }}
+          onReportIncident={openIncident}
+        />
+      ) : null}
+
+      {mode === "incident" && !created ? (
+        <OrderIncidentPanel
+          hit={incidentHit}
+          canWrite={canWrite}
+          onClose={goToSearch}
+          onOpenOrder={
+            incidentHit
+              ? () => {
+                  setEditHit(incidentHit);
+                  setMode("edit");
+                }
+              : undefined
+          }
         />
       ) : null}
 
@@ -636,6 +682,7 @@ function OrderCaptureExperiencePage() {
             setEditHit(hit);
             setMode("edit");
           }}
+          onReportIncident={openIncident}
         />
       ) : null}
 
