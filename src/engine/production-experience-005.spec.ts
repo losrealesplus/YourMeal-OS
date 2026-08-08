@@ -71,8 +71,9 @@ describe("PRODUCTION EXPERIENCE 005 · Zero Friction Production Alerts & Deadlin
     expect(cards).toContain("In Progress");
 
     expect(missions).toContain("PRODUCTION-EXPERIENCE-005");
+    expect(missions).toContain("PRODUCTION-EXPERIENCE-006");
     expect(missions).toContain("TTPR <10s");
-    expect(missions).toContain("PE005 Alerts ▶");
+    expect(missions).toContain("PE005 Alerts ✅");
 
     expect(ui).toContain("PRODUCTION EXPERIENCE 005");
     expect(ui).toContain("ProductionAlertsPanel");

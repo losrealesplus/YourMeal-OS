@@ -71,7 +71,7 @@ describe("PRODUCTION EXPERIENCE 003 · Zero Friction Production Adaptation", () 
     expect(missions).toContain("PRODUCTION-EXPERIENCE-003");
     expect(missions).toContain("TAPP <5 min");
     expect(missions).toContain("PE003 Adaptation ✅");
-    expect(missions).toContain("PRODUCTION-EXPERIENCE-005");
+    expect(missions).toContain("PRODUCTION-EXPERIENCE-006");
 
     expect(ui).toContain("PRODUCTION EXPERIENCE 003");
     expect(ui).toContain("ProductionAdaptationPanel");
