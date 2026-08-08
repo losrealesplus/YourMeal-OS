@@ -62,12 +62,13 @@ Never run both as one sprint. Building + observing together invites intuition-ju
 ## Active metric (Customer)
 
 ```text
-Objetivo
-
-Reducir el tiempo de alta y gestión de clientes
-por debajo de 30 segundos
-para las tareas más frecuentes.
+Mission: Zero Friction Customer Management
+TTA: Time-to-Create Customer < 30 seconds
+TTF: Time-to-Find < 10 seconds
+Clicks to Create ≤ 6
 ```
+
+See [CUSTOMER_EXPERIENCE_001](./CUSTOMER_EXPERIENCE_001.md) · [EXPERIENCE_MISSIONS](./EXPERIENCE_MISSIONS.md) · EXPERIENCE LAW 001.
 
 ---
 

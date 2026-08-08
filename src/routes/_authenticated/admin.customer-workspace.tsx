@@ -1,16 +1,13 @@
 /**
- * Sprint 001 · Epic 1 · Customer Experience (parallel track)
+ * CUSTOMER EXPERIENCE 001 · Zero Friction Customer Management
  *
- * Experience layer on CustomerFacade only (FOUNDATION LAW 003).
- * Not Architecture · not a new Capability.
- *
- * Honest gaps: UpdateCustomer / RestoreCustomer / some facets remain UNIMPLEMENTED.
- * Observation evidence still required (TENANT SUCCESS LAW 001) — this track is hybrid.
+ * Mission: Time-to-Create Customer < 30s · EXPERIENCE LAW 001
+ * Surface: useCustomer() only (FOUNDATION LAW 003)
  */
 
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
-import { useCallback, useEffect, useState, useEffectEvent } from "react";
+import { useCallback, useEffect, useRef, useState, useEffectEvent } from "react";
 import { toast } from "sonner";
 import {
   AdminHeader,
@@ -47,34 +44,35 @@ export const Route = createFileRoute(
   component: CustomerExperiencePage,
   head: () => ({
     meta: [
-      { title: "YourMeal OS — Customer Experience" },
+      {
+        title: "YourMeal OS — Zero Friction Customer Management",
+      },
       {
         name: "description",
-        content:
-          "Customer Experience: Demand Party via CustomerFacade (LAW 003).",
+        content: "TTC < 30s · EXPERIENCE LAW 001 · CustomerFacade only",
       },
     ],
   }),
 });
 
 type Segment = "all" | PartyKind;
+type PartyChoice = "individual" | "company_account" | null;
 
-type CompanyForm = {
+type CreateDraft = {
   name: string;
-  contactName: string;
+  phone: string;
+  address: string;
+  city: string;
+  /** Company-only progressive: contact email when needed by substrate */
   contactEmail: string;
-  contactPhone: string;
-  fiscalAddress: string;
-  deliveryAddress: string;
 };
 
-const emptyCompanyForm = (): CompanyForm => ({
+const emptyDraft = (): CreateDraft => ({
   name: "",
-  contactName: "",
+  phone: "",
+  address: "",
+  city: "",
   contactEmail: "",
-  contactPhone: "",
-  fiscalAddress: "",
-  deliveryAddress: "",
 });
 
 function CustomerExperiencePage() {
@@ -86,9 +84,10 @@ function CustomerExperiencePage() {
   const [selected, setSelected] = useState<CustomerContext | null>(null);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [showCompanyForm, setShowCompanyForm] = useState(false);
-  const [companyForm, setCompanyForm] = useState<CompanyForm>(emptyCompanyForm);
-  const [quickName, setQuickName] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [partyChoice, setPartyChoice] = useState<PartyChoice>(null);
+  const [draft, setDraft] = useState<CreateDraft>(emptyDraft);
+  const nameRef = useRef<HTMLInputElement>(null);
   const caps = identity.permissions.capabilities;
   const canWrite = caps.includes("customers.write");
 
@@ -128,6 +127,12 @@ function CustomerExperiencePage() {
     return () => window.clearTimeout(handle);
   }, [query, segment, customer.isReady]);
 
+  useEffect(() => {
+    if (creating && partyChoice) {
+      nameRef.current?.focus();
+    }
+  }, [creating, partyChoice]);
+
   const openParty = useCallback(
     async (partyRef: PartyRef) => {
       setBusy(true);
@@ -150,15 +155,91 @@ function CustomerExperiencePage() {
     [customer],
   );
 
+  function startCreate() {
+    setCreating(true);
+    setPartyChoice(null);
+    setDraft(emptyDraft());
+    setSelected(null);
+  }
+
+  function cancelCreate() {
+    setCreating(false);
+    setPartyChoice(null);
+    setDraft(emptyDraft());
+  }
+
+  async function onSaveCreate() {
+    if (!customer.isReady || !canWrite || !partyChoice) return;
+    if (!draft.name.trim()) {
+      toast.error("Nombre es imprescindible para seguir trabajando");
+      nameRef.current?.focus();
+      return;
+    }
+    setBusy(true);
+    const started = performance.now();
+    try {
+      if (partyChoice === "individual") {
+        const result = await customer.createCustomer(
+          createCustomerCommand({
+            partyKind: "individual",
+            mode: "staff_create",
+            displayName: draft.name.trim(),
+            phone: draft.phone.trim() || null,
+            street: draft.address.trim() || null,
+            city: draft.city.trim() || null,
+          }),
+        );
+        if (!result.ok) {
+          toast.error(result.errors[0]?.message ?? "No se pudo crear");
+          return;
+        }
+        const ms = Math.round(performance.now() - started);
+        toast.success(`Cliente creado · ${ms} ms (objetivo TTC < 30s)`);
+        cancelCreate();
+        setSegment("individual");
+        if (result.partyRef) await openParty(result.partyRef);
+        await loadList(query, "individual");
+        return;
+      }
+
+      // Empresa — mínimo + email requerido por substrate (Progressive: default contact = name)
+      const email =
+        draft.contactEmail.trim() ||
+        `pending+${Date.now()}@customer.local`;
+      const result = await customer.createCustomer(
+        createCustomerCommand({
+          partyKind: "company_account",
+          mode: "provision",
+          name: draft.name.trim(),
+          contactName: draft.name.trim(),
+          contactEmail: email,
+          contactPhone: draft.phone.trim() || null,
+          fiscalAddress: draft.address.trim() || "Por completar",
+          deliveryAddress: draft.address.trim() || null,
+        }),
+      );
+      if (!result.ok) {
+        toast.error(result.errors[0]?.message ?? "No se pudo crear");
+        return;
+      }
+      const ms = Math.round(performance.now() - started);
+      toast.success(`Empresa creada · ${ms} ms (objetivo TTC < 30s)`);
+      cancelCreate();
+      setSegment("company_account");
+      if (result.partyRef) await openParty(result.partyRef);
+      await loadList(query, "company_account");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function onArchive() {
     if (!selected || selected.summary.partyKind !== "individual") return;
     if (!selected.permissions.canWrite) {
       toast.error("Missing customers.write");
       return;
     }
-    if (!window.confirm("¿Archivar este cliente individual?")) {
-      return;
-    }
+    if (!window.confirm("¿Archivar este cliente individual?")) return;
     setBusy(true);
     try {
       const result = await customer.archiveCustomer(
@@ -173,74 +254,6 @@ function CustomerExperiencePage() {
       toast.success("Cliente archivado");
       setSelected(null);
       await loadList(query, segment);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function onEnsureSession() {
-    if (!customer.isReady || !canWrite) return;
-    setBusy(true);
-    try {
-      const result = await customer.createCustomer(
-        createCustomerCommand({
-          partyKind: "individual",
-          mode: "ensure_for_session",
-          displayName: quickName.trim() || null,
-        }),
-      );
-      if (!result.ok) {
-        toast.error(result.errors[0]?.message ?? "Create failed");
-        return;
-      }
-      toast.success(
-        quickName.trim()
-          ? `Cliente listo · ${quickName.trim()}`
-          : "Cliente individual listo para esta sesión",
-      );
-      setQuickName("");
-      if (result.partyRef) await openParty(result.partyRef);
-      await loadList(query, segment);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function onProvisionCompany() {
-    if (!customer.isReady || !canWrite) return;
-    if (
-      !companyForm.name.trim() ||
-      !companyForm.contactName.trim() ||
-      !companyForm.contactEmail.trim() ||
-      !companyForm.fiscalAddress.trim()
-    ) {
-      toast.error("Nombre, contacto, email y dirección fiscal son obligatorios");
-      return;
-    }
-    setBusy(true);
-    try {
-      const result = await customer.createCustomer(
-        createCustomerCommand({
-          partyKind: "company_account",
-          mode: "provision",
-          name: companyForm.name.trim(),
-          contactName: companyForm.contactName.trim(),
-          contactEmail: companyForm.contactEmail.trim(),
-          contactPhone: companyForm.contactPhone.trim() || null,
-          fiscalAddress: companyForm.fiscalAddress.trim(),
-          deliveryAddress: companyForm.deliveryAddress.trim() || null,
-        }),
-      );
-      if (!result.ok) {
-        toast.error(result.errors[0]?.message ?? "Provision failed");
-        return;
-      }
-      toast.success("Empresa creada");
-      setCompanyForm(emptyCompanyForm());
-      setShowCompanyForm(false);
-      if (result.partyRef) await openParty(result.partyRef);
-      await loadList(query, "company_account");
-      setSegment("company_account");
     } finally {
       setBusy(false);
     }
@@ -267,8 +280,10 @@ function CustomerExperiencePage() {
             );
       const code = result.errors[0]?.code ?? "UNKNOWN";
       toast.message(
-        kind === "update" ? "Edición aún no disponible" : "Restaurar aún no disponible",
-        { description: `Honestidad Facade: ${code}` },
+        kind === "update"
+          ? "Edición frecuente · pendiente (TTA < 20s)"
+          : "Restaurar · pendiente",
+        { description: `Facade: ${code}` },
       );
     } finally {
       setBusy(false);
@@ -283,52 +298,66 @@ function CustomerExperiencePage() {
   return (
     <div className="animate-fade-in max-w-5xl">
       <SectionTitle
-        overline="CUSTOMER EXPERIENCE 001 · Experience Sprint"
-        title="Clientes"
-        subtitle="¿Cómo conseguimos que un operador dé de alta un cliente en menos de 30 segundos?"
+        overline="CUSTOMER EXPERIENCE 001 · Mission"
+        title="Zero Friction Customer Management"
+        subtitle="Time-to-Create Customer < 30s · mínimo imprescindible · Progressive Completion"
       />
 
-      <div className="mb-4 rounded-md border border-foreground/20 bg-foreground/[0.03] px-4 py-3">
-        <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-          Objetivo de tiempo
-        </p>
-        <p className="text-sm font-semibold text-foreground">
-          Alta y gestión frecuente &lt; 30 segundos
-        </p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Observation Sprint con Isabella: después de la cadena de Experiences
-          usable (LAW 001-A). Este sprint solo construye.
-        </p>
+      <div className="mb-4 grid gap-2 rounded-md border border-foreground/15 bg-foreground/[0.03] px-4 py-3 sm:grid-cols-3">
+        <Kpi label="TTC · Create" value="< 30 s" />
+        <Kpi label="TTF · Find" value="< 10 s" />
+        <Kpi label="Clicks to Create" value="≤ 6" />
       </div>
 
       <AdminHeader
-        goal="Alta y mantenimiento de demand parties en menos de 30s"
+        goal="Que Isabella no tenga que pensar para dar de alta un cliente"
         capability="customers.read / customers.write"
-        object="Individual · Company · Company Employee (tags)"
+        object="Particular · Empresa · Progressive Completion"
       />
 
-      <div className="mb-6 rounded-lg border border-border bg-muted/20 px-4 py-3 text-sm">
-        <p className="text-muted-foreground">
-          Tenant: {identity.tenant?.slug ?? "—"} · Operator:{" "}
-          {identity.currentUser?.fullName ?? identity.session.userId ?? "—"} ·
-          Ready: {customer.isReady ? "yes" : "no"}
-        </p>
-        <p className="mt-2 text-xs text-muted-foreground">
-          Experience Sprint · no Observation Sprint.{" "}
+      {!creating ? (
+        <div className="mb-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            disabled={!canWrite || busy}
+            onClick={startCreate}
+            className="rounded-md bg-foreground px-4 py-2 text-sm font-semibold text-background disabled:opacity-40"
+          >
+            Nuevo cliente
+          </button>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => void loadList(query, segment)}
+            className="rounded-md border border-border px-3 py-2 text-xs font-semibold"
+          >
+            Actualizar
+          </button>
           <Link
             to="/admin/customers"
-            className="underline underline-offset-2 hover:text-foreground"
+            className="self-center text-xs text-muted-foreground underline underline-offset-2"
           >
             Directorio legacy
           </Link>
-        </p>
-      </div>
+        </div>
+      ) : (
+        <CreateWizard
+          partyChoice={partyChoice}
+          draft={draft}
+          busy={busy}
+          nameRef={nameRef}
+          onChoose={setPartyChoice}
+          onDraft={setDraft}
+          onCancel={cancelCreate}
+          onSave={() => void onSaveCreate()}
+        />
+      )}
 
       <div className="mb-4 flex flex-wrap gap-2">
         {(
           [
             ["all", "Todos"],
-            ["individual", "Individual"],
+            ["individual", "Particular"],
             ["company_account", "Empresa"],
           ] as const
         ).map(([value, label]) => (
@@ -348,98 +377,15 @@ function CustomerExperiencePage() {
         ))}
       </div>
 
-      <div className="mb-4 flex flex-wrap items-end gap-2">
-        <label className="min-w-[12rem] flex-1 text-xs">
-          <span className="mb-1 block text-muted-foreground">
-            Nombre rápido (opcional)
-          </span>
-          <input
-            value={quickName}
-            onChange={(e) => setQuickName(e.target.value)}
-            placeholder="Ej. Juan Pérez"
-            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                void onEnsureSession();
-              }
-            }}
-          />
-        </label>
-        <button
-          type="button"
-          disabled={!customer.isReady || busy || !canWrite}
-          onClick={() => void onEnsureSession()}
-          className="rounded-md bg-foreground px-3 py-2 text-xs font-semibold text-background disabled:opacity-40"
-        >
-          Alta rápida individual
-        </button>
-        <button
-          type="button"
-          disabled={!canWrite || busy}
-          onClick={() => setShowCompanyForm((v) => !v)}
-          className="rounded-md border border-border px-3 py-2 text-xs font-semibold disabled:opacity-40"
-        >
-          {showCompanyForm ? "Cerrar alta empresa" : "Nueva empresa"}
-        </button>
-        <button
-          type="button"
-          disabled={busy}
-          onClick={() => void loadList(query, segment)}
-          className="rounded-md border border-border px-3 py-2 text-xs font-semibold"
-        >
-          Actualizar
-        </button>
-      </div>
-
-      {showCompanyForm ? (
-        <div className="mb-6 grid gap-3 rounded-md border border-border p-4 sm:grid-cols-2">
-          <p className="sm:col-span-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Alta empresa · CreateCustomer · provision
-          </p>
-          {(
-            [
-              ["name", "Nombre empresa *"],
-              ["contactName", "Contacto *"],
-              ["contactEmail", "Email contacto *"],
-              ["contactPhone", "Teléfono"],
-              ["fiscalAddress", "Dirección fiscal *"],
-              ["deliveryAddress", "Dirección entrega"],
-            ] as const
-          ).map(([key, label]) => (
-            <label key={key} className="block text-xs">
-              <span className="mb-1 block text-muted-foreground">{label}</span>
-              <input
-                value={companyForm[key]}
-                onChange={(e) =>
-                  setCompanyForm((f) => ({ ...f, [key]: e.target.value }))
-                }
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-              />
-            </label>
-          ))}
-          <div className="sm:col-span-2">
-            <button
-              type="button"
-              disabled={busy || !canWrite}
-              onClick={() => void onProvisionCompany()}
-              className="rounded-md bg-foreground px-3 py-1.5 text-xs font-semibold text-background disabled:opacity-40"
-            >
-              Crear empresa
-            </button>
-          </div>
-        </div>
-      ) : null}
-
       <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
         <section>
           <label className="mb-2 block text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-            Buscar cliente
+            Buscar · TTF &lt; 10s
           </label>
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Nombre, email, código…"
+            placeholder="Nombre, teléfono, código…"
             className="mb-3 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
           />
           {loading ? (
@@ -471,10 +417,9 @@ function CustomerExperiencePage() {
                       <p className="text-[11px] text-muted-foreground">
                         {s.partyKind === "individual"
                           ? s.tags.some((t) => t.includes("company_employee"))
-                            ? "Empleado empresa"
-                            : "Individual"
+                            ? "Empleado"
+                            : "Particular"
                           : "Empresa"}
-                        {s.tags.length > 0 ? ` · ${s.tags.slice(0, 2).join(" · ")}` : ""}
                       </p>
                     </div>
                     <StatusChip
@@ -494,14 +439,14 @@ function CustomerExperiencePage() {
 
         <section>
           <p className="mb-2 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-            Ficha
+            Ficha · Progressive Completion
           </p>
           {!selected ? (
             <p className="rounded-md border border-dashed border-border px-4 py-12 text-center text-sm text-muted-foreground">
-              Selecciona un cliente
+              Selecciona un cliente · el resto se completa después
             </p>
           ) : (
-            <div className="rounded-md border border-border p-4 space-y-4">
+            <div className="space-y-4 rounded-md border border-border p-4">
               <div>
                 <h3 className="text-lg font-semibold">
                   {selected.summary.displayName}
@@ -510,14 +455,10 @@ function CustomerExperiencePage() {
                   {selected.summary.partyKind === "individual"
                     ? isEmployee
                       ? "Empleado de empresa"
-                      : "Individual"
+                      : "Particular"
                     : "Empresa"}
-                  {selected.companyAccountId
-                    ? ` · company ${selected.companyAccountId.slice(0, 8)}…`
-                    : ""}
                 </p>
               </div>
-
               <dl className="grid grid-cols-2 gap-2 text-xs">
                 <div>
                   <dt className="text-muted-foreground">Estado</dt>
@@ -537,49 +478,31 @@ function CustomerExperiencePage() {
                 ) : null}
                 {profile?.phones?.length ? (
                   <div className="col-span-2">
-                    <dt className="text-muted-foreground">Teléfonos</dt>
+                    <dt className="text-muted-foreground">Teléfono</dt>
                     <dd className="font-semibold">
                       {profile.phones.map((p) => p.e164).join(" · ")}
                     </dd>
                   </div>
                 ) : null}
               </dl>
-
               <FacetBlock
-                title="Direcciones / entrega"
-                empty="Sin direcciones en ficha (individual delivery locations: pendiente)."
+                title="Dirección"
+                empty="Sin dirección · se puede completar después"
                 items={
                   profile?.addresses?.map(
                     (a) =>
-                      `${a.label ?? "Dir"}: ${a.line1}${a.city ? `, ${a.city}` : ""}`,
+                      `${a.line1}${a.city ? `, ${a.city}` : ""}`,
                   ) ?? []
                 }
-                extra={
-                  selected.deliveryLocation
-                    ? `Delivery ref: ${selected.deliveryLocation.kind}`
-                    : null
-                }
               />
-
               <FacetBlock
-                title="Preferencias"
-                empty="Sin preferencias cargadas en Facade aún."
-                items={Object.keys(profile?.preferences ?? {}).map(
-                  (k) => `${k}: ${String((profile?.preferences ?? {})[k])}`,
-                )}
-              />
-
-              <FacetBlock
-                title="Restricciones / alérgenos"
-                empty="Sin alérgenos en ficha (CRUD admin pendiente — no inventar)."
+                title="Preferencias / alergias"
+                empty="Más adelante · Progressive Completion"
                 items={
-                  profile?.allergens?.map(
-                    (a) => `${a.code}${a.note ? ` — ${a.note}` : ""}`,
-                  ) ?? []
+                  profile?.allergens?.map((a) => a.code) ?? []
                 }
               />
-
-              <div className="flex flex-wrap gap-2 pt-2 border-t border-dashed border-border">
+              <div className="flex flex-wrap gap-2 border-t border-dashed border-border pt-2">
                 <button
                   type="button"
                   disabled={
@@ -598,15 +521,7 @@ function CustomerExperiencePage() {
                   onClick={() => void onProbeUnimplemented("update")}
                   className="rounded-md border border-dashed border-border px-3 py-1.5 text-xs text-muted-foreground"
                 >
-                  Editar (aún no)
-                </button>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => void onProbeUnimplemented("restore")}
-                  className="rounded-md border border-dashed border-border px-3 py-1.5 text-xs text-muted-foreground"
-                >
-                  Restaurar (aún no)
+                  Editar frecuente (TTA &lt; 20s · pendiente)
                 </button>
               </div>
             </div>
@@ -617,11 +532,158 @@ function CustomerExperiencePage() {
   );
 }
 
+function CreateWizard(props: {
+  partyChoice: PartyChoice;
+  draft: CreateDraft;
+  busy: boolean;
+  nameRef: React.RefObject<HTMLInputElement | null>;
+  onChoose: (p: PartyChoice) => void;
+  onDraft: (fn: (d: CreateDraft) => CreateDraft) => void;
+  onCancel: () => void;
+  onSave: () => void;
+}) {
+  const { partyChoice, draft, busy, nameRef, onChoose, onDraft, onCancel, onSave } =
+    props;
+
+  return (
+    <div className="mb-6 rounded-md border border-border p-4 space-y-4">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm font-semibold">Nuevo cliente · alta mínima</p>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="text-xs text-muted-foreground underline underline-offset-2"
+        >
+          Cancelar
+        </button>
+      </div>
+
+      {!partyChoice ? (
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => onChoose("individual")}
+            className="rounded-md bg-foreground px-4 py-2 text-sm font-semibold text-background"
+          >
+            Particular
+          </button>
+          <button
+            type="button"
+            onClick={() => onChoose("company_account")}
+            className="rounded-md border border-border px-4 py-2 text-sm font-semibold"
+          >
+            Empresa
+          </button>
+        </div>
+      ) : (
+        <form
+          className="grid gap-3 sm:grid-cols-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            onSave();
+          }}
+        >
+          <p className="sm:col-span-2 text-xs text-muted-foreground">
+            {partyChoice === "individual" ? "Particular" : "Empresa"} · solo lo
+            imprescindible (EXPERIENCE LAW 001)
+          </p>
+          <label className="sm:col-span-2 block text-xs">
+            <span className="mb-1 block text-muted-foreground">Nombre *</span>
+            <input
+              ref={nameRef}
+              value={draft.name}
+              onChange={(e) =>
+                onDraft((d) => ({ ...d, name: e.target.value }))
+              }
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+              autoComplete="name"
+            />
+          </label>
+          <label className="block text-xs">
+            <span className="mb-1 block text-muted-foreground">Teléfono</span>
+            <input
+              value={draft.phone}
+              onChange={(e) =>
+                onDraft((d) => ({ ...d, phone: e.target.value }))
+              }
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+              autoComplete="tel"
+            />
+          </label>
+          <label className="block text-xs">
+            <span className="mb-1 block text-muted-foreground">Ciudad</span>
+            <input
+              value={draft.city}
+              onChange={(e) =>
+                onDraft((d) => ({ ...d, city: e.target.value }))
+              }
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+            />
+          </label>
+          <label className="sm:col-span-2 block text-xs">
+            <span className="mb-1 block text-muted-foreground">Dirección</span>
+            <input
+              value={draft.address}
+              onChange={(e) =>
+                onDraft((d) => ({ ...d, address: e.target.value }))
+              }
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+              autoComplete="street-address"
+            />
+          </label>
+          {partyChoice === "company_account" ? (
+            <label className="sm:col-span-2 block text-xs">
+              <span className="mb-1 block text-muted-foreground">
+                Email contacto (opcional ahora · Progressive)
+              </span>
+              <input
+                value={draft.contactEmail}
+                onChange={(e) =>
+                  onDraft((d) => ({ ...d, contactEmail: e.target.value }))
+                }
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                autoComplete="email"
+                type="email"
+              />
+            </label>
+          ) : null}
+          <div className="sm:col-span-2 flex flex-wrap gap-2">
+            <button
+              type="submit"
+              disabled={busy}
+              className="rounded-md bg-foreground px-4 py-2 text-sm font-semibold text-background disabled:opacity-40"
+            >
+              Guardar
+            </button>
+            <button
+              type="button"
+              onClick={() => onChoose(null)}
+              className="rounded-md border border-border px-3 py-2 text-xs font-semibold"
+            >
+              Cambiar tipo
+            </button>
+          </div>
+        </form>
+      )}
+    </div>
+  );
+}
+
+function Kpi(props: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+        {props.label}
+      </p>
+      <p className="text-sm font-semibold">{props.value}</p>
+    </div>
+  );
+}
+
 function FacetBlock(props: {
   title: string;
   empty: string;
   items: string[];
-  extra?: string | null;
 }) {
   return (
     <div className="rounded-md border border-dashed border-border/80 px-3 py-2">
@@ -637,9 +699,6 @@ function FacetBlock(props: {
           ))}
         </ul>
       )}
-      {props.extra ? (
-        <p className="mt-1 text-[11px] text-muted-foreground">{props.extra}</p>
-      ) : null}
     </div>
   );
 }

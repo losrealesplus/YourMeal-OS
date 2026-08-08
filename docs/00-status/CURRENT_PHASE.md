@@ -19,26 +19,26 @@ ERA 1 · Build the Engine    ✅ COMPLETE
 Operational Engine v1.0     ✅ DECLARED · Architecture FROZEN
 
 ERA 2 · Return Time         ▶ OPEN
-Sprint type                 Experience Sprint (not Observation)
+Sprint type                 Experience Sprint
 Active                      CUSTOMER EXPERIENCE 001
-Metric                      Alta/gestión cliente < 30 seconds
+Mission                     Zero Friction Customer Management
+TTA                         Time-to-Create Customer < 30 seconds
+
+EXPERIENCE LAW 001          Minimum first interaction (ADR 0098)
+Progressive Completion      Rest later
 
 Observation Framework       ✅ READY (instrument)
 Isabella / Sara sessions    ⏸ After usable Experience chain (LAW 001-A)
 
 Laws
   · PRODUCT LAW 001 · 002
-  · TENANT SUCCESS LAW 001 · 001-A (ADR 0096)
+  · EXPERIENCE LAW 001 (ADR 0098)
+  · TENANT SUCCESS LAW 001 · 001-A
   · TEAM LAW 001
 
-Roadmap
-  Framework → Customer → Order → Menu → Production
-  → Kitchen → Delivery → Android → OPPO → Dogfood
-  → Isabella Observation → Sara → Backlog
-
-Do not open yet
-  · Isabella Observation
-  · Operational Capture · Import Pipeline · AI
+Roadmap (missions)
+  Customer → Order → Menu → Production → Kitchen → Delivery
+  → Android → OPPO → Dogfood → Isabella → Backlog
 ```
 
 ---

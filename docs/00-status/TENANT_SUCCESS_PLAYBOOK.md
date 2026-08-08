@@ -111,6 +111,23 @@ PRODUCT LAW 001 is the filter for the entire future of the product.
 
 ---
 
+## EXPERIENCE LAW 001
+
+```text
+The first interaction
+must require the minimum information
+needed to continue working.
+
+Everything else
+can be completed later.
+```
+
+**ADR:** [0098](../adr/0098-experience-law-001.md) · Missions: [EXPERIENCE_MISSIONS](./EXPERIENCE_MISSIONS.md)
+
+Experience epics use **Time-to-Action (TTA)** KPIs — not CRUD field counts.
+
+---
+
 ## TENANT SUCCESS LAW 001
 
 ```text
