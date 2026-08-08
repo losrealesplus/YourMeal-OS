@@ -2,23 +2,46 @@
 
 **Status:** ▶ **ACTIVE** — mandatory preamble for Experience Sprints  
 **Declared:** 2026-08-07  
+**Manifesto:** [EXPERIENCE_MANIFESTO](./EXPERIENCE_MANIFESTO.md) · ADR [0099](../adr/0099-experience-manifesto-001.md)  
 **Missions:** [EXPERIENCE_MISSIONS](./EXPERIENCE_MISSIONS.md)  
 **Law:** EXPERIENCE LAW 001 · ADR [0098](../adr/0098-experience-law-001.md)
 
-Every Experience development prompt should start with:
+Every Experience development prompt should be a **mission**, not a task list.
+
+---
+
+## Mandatory header
 
 ```text
 Context
 
 Strategic Freeze is active.
 
+Developer Platform is frozen.
+
+Foundation is frozen.
+
 Operational Engine v1.0 is frozen.
 
-This sprint belongs to Era 2.
+No architectural changes.
 
-The objective is not to add functionality.
+No new Capabilities.
 
-The objective is to reduce operational time.
+No changes to Operational Flows.
+
+No changes to Foundation Laws.
+
+Era 2 is active.
+
+The objective is not feature completeness.
+
+The objective is operational speed.
+
+EXPERIENCE MANIFESTO 001
+A great Experience is invisible.
+The operator should think about the customer,
+not about the software.
+The software succeeds when it disappears.
 
 Every UX decision must minimize:
 
@@ -30,28 +53,66 @@ Every UX decision must minimize:
 Mission Success is measured in seconds,
 not in lines of code.
 
-EXPERIENCE LAW 001:
-The first interaction must require the minimum information
-needed to continue working. Everything else can be completed later.
+EXPERIENCE LAW 001
+The first interaction must require only the minimum
+information necessary to continue working.
+Progressive Completion is mandatory.
 
-Also satisfy:
-PRODUCT LAW 001 · 002
-TENANT SUCCESS LAW 001 · 001-A
 TEAM LAW 001
+Engineering time is an investment.
+Tenant time is the product.
 
-Do not introduce new Capabilities.
-Do not modify Foundation Laws.
-Do not reopen Operational Engine Construction.
+PRODUCT LAW 001
+Every Product Core improvement must demonstrably
+reduce tenant operational time.
+
+PRODUCT LAW 002
+Never force tenants to recreate information
+they already own.
+
+TENANT SUCCESS LAW 001
+Measure before deciding.
 ```
 
-Then add the mission block (example · Customer):
+---
+
+## Mission block (Customer example)
 
 ```text
-Mission: Zero Friction Customer Management
-TTA: Time-to-Create Customer < 30 seconds
-Also: Time-to-Find < 10s · Time-to-Edit Frequent < 20s
-Clicks to Create ≤ 6 · Keyboard-only completion: Yes
-Surface: useCustomer() only (LAW 003)
+CUSTOMER-EXPERIENCE-001
+
+Mission
+Zero Friction Customer Management
+
+Mission KPI
+Time-to-Create Customer
+Target
+<30 seconds
+
+Do not think about CRUD.
+Think about an operator who has thirty seconds.
+
+Primary Flow
+New Customer → Individual / Company / Company Employee
+→ Name → Phone → Delivery Address → Save → Done.
+
+Progressive Completion
+Never require Preferences · Billing · Allergies
+· Company Employees · Tags · Operational Notes on first create.
+
+Acceptance
+The operator never feels blocked.
+The screen minimizes typing, navigation, decisions,
+mouse travel, repeated work.
+
+Definition of Done
+Customer creation is demonstrably faster.
+The experience feels natural.
+The operator thinks about the customer,
+not about the software.
+
+PR must include Operational Time Saved
+(current ≈ · new ≈ · saving ≈ · measurement method).
 ```
 
 Also see [ERA2_CURSOR_PROMPT](./ERA2_CURSOR_PROMPT.md) · [PR_REVIEW_PROTOCOL](./PR_REVIEW_PROTOCOL.md).

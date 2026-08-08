@@ -43,7 +43,9 @@ describe("CUSTOMER EXPERIENCE 001 · Zero Friction TTA", () => {
     expect(cx).toContain("Time-to-Create Customer");
     expect(cx).toContain("30 seconds");
     expect(cx).toContain("EXPERIENCE LAW 001");
+    expect(cx).toContain("EXPERIENCE MANIFESTO 001");
     expect(cx).toContain("Progressive Completion");
+    expect(cx).toContain("Operational Time Saved");
 
     expect(missions).toContain("Time-to-Action");
     expect(missions).toContain("Create an operational commitment");
@@ -54,6 +56,7 @@ describe("CUSTOMER EXPERIENCE 001 · Zero Friction TTA", () => {
 
     expect(prompt).toContain("Mission Success is measured in seconds");
     expect(prompt).toContain("Cognitive load");
+    expect(prompt).toContain("EXPERIENCE MANIFESTO 001");
 
     expect(ui).toContain("Zero Friction Customer Management");
     expect(ui).toContain("staff_create");

@@ -56,7 +56,7 @@ export const Route = createFileRoute(
 });
 
 type Segment = "all" | PartyKind;
-type PartyChoice = "individual" | "company_account" | null;
+type PartyChoice = "individual" | "company_account" | "company_employee" | null;
 
 type CreateDraft = {
   name: string;
@@ -178,7 +178,7 @@ function CustomerExperiencePage() {
     setBusy(true);
     const started = performance.now();
     try {
-      if (partyChoice === "individual") {
+      if (partyChoice === "individual" || partyChoice === "company_employee") {
         const result = await customer.createCustomer(
           createCustomerCommand({
             partyKind: "individual",
@@ -194,7 +194,11 @@ function CustomerExperiencePage() {
           return;
         }
         const ms = Math.round(performance.now() - started);
-        toast.success(`Cliente creado · ${ms} ms (objetivo TTC < 30s)`);
+        toast.success(
+          partyChoice === "company_employee"
+            ? `Empleado creado · ${ms} ms · vinculación a empresa: Progressive Completion`
+            : `Cliente creado · ${ms} ms (objetivo TTC < 30s)`,
+        );
         cancelCreate();
         setSegment("individual");
         if (result.partyRef) await openParty(result.partyRef);
@@ -559,21 +563,37 @@ function CreateWizard(props: {
       </div>
 
       {!partyChoice ? (
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => onChoose("individual")}
-            className="rounded-md bg-foreground px-4 py-2 text-sm font-semibold text-background"
-          >
-            Particular
-          </button>
-          <button
-            type="button"
-            onClick={() => onChoose("company_account")}
-            className="rounded-md border border-border px-4 py-2 text-sm font-semibold"
-          >
-            Empresa
-          </button>
+        <div className="space-y-3">
+          <p className="text-sm font-medium text-foreground">
+            ¿Qué tipo de cliente vas a crear?
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => onChoose("individual")}
+              className="rounded-md bg-foreground px-4 py-2 text-sm font-semibold text-background"
+            >
+              Particular
+            </button>
+            <button
+              type="button"
+              onClick={() => onChoose("company_account")}
+              className="rounded-md border border-border px-4 py-2 text-sm font-semibold"
+            >
+              Empresa
+            </button>
+            <button
+              type="button"
+              onClick={() => onChoose("company_employee")}
+              className="rounded-md border border-border px-4 py-2 text-sm font-semibold"
+            >
+              Empleado de empresa
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Una pregunta. El formulario solo muestra lo relevante (Manifesto ·
+            carga cognitiva mínima).
+          </p>
         </div>
       ) : (
         <form
@@ -584,8 +604,15 @@ function CreateWizard(props: {
           }}
         >
           <p className="sm:col-span-2 text-xs text-muted-foreground">
-            {partyChoice === "individual" ? "Particular" : "Empresa"} · solo lo
-            imprescindible (EXPERIENCE LAW 001)
+            {partyChoice === "individual"
+              ? "Particular"
+              : partyChoice === "company_account"
+                ? "Empresa"
+                : "Empleado de empresa"}{" "}
+            · solo lo imprescindible (EXPERIENCE LAW 001)
+            {partyChoice === "company_employee"
+              ? " · vinculación a empresa después (Progressive Completion)"
+              : ""}
           </p>
           <label className="sm:col-span-2 block text-xs">
             <span className="mb-1 block text-muted-foreground">Nombre *</span>

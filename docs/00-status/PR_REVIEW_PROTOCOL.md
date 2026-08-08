@@ -111,7 +111,8 @@ Era 2 also requires PRODUCT LAW 001 / 002 · TENANT SUCCESS LAW 001 / 001-A · T
 - [ ] PRODUCT LAW 001 — time returned stated or N/A justified  
 - [ ] PRODUCT LAW 002 — reuse existing knowledge considered  
 - [ ] TENANT SUCCESS LAW 001 / 001-A — no fake observation evidence  
-- [ ] Experience Sprint metric visible if Experience PR  
+- [ ] Experience Sprint metric / Operational Time Saved present if Experience PR  
+- [ ] EXPERIENCE MANIFESTO 001 considered (software disappears)  
 - [ ] Operational Impact section filled on PR  
 
 ### Web

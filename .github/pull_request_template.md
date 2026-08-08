@@ -30,6 +30,22 @@
 - [ ] Saves tenant operational time (or N/A: docs / infra / Foundation / non-Product-Core justified)
 - [ ] Does **not** invent Product Core without time-savings rationale
 
+## Operational Time Saved (Experience PRs — required)
+
+> [EXPERIENCE_MANIFESTO](../docs/00-status/EXPERIENCE_MANIFESTO.md) · ADR [0099](../docs/adr/0099-experience-manifesto-001.md)  
+> “This screen is better” is not enough — state seconds returned.
+
+| Field | Value |
+|-------|-------|
+| Current workflow | ≈ __ seconds |
+| New workflow | ≈ __ seconds |
+| Estimated saving | ≈ __ seconds |
+| Measurement method | How validated in Observation Sprint |
+| Mission / TTA KPI | e.g. TTC &lt; 30s |
+
+- [ ] N/A — not an Experience PR (docs / infra / Foundation justified)
+- [ ] Experience PR — Operational Time Saved filled
+
 ## PR category (exactly one)
 
 > [FLOW_GOVERNANCE](../docs/00-status/FLOW_GOVERNANCE.md) Regla 1 · [PR_TAXONOMY](../docs/00-status/PR_TAXONOMY.md) — sin PRs huérfanas; categorías ambiguas → ❌

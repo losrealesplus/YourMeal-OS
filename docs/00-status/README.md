@@ -12,7 +12,8 @@
 | **[SPRINT_001_TENANT_SUCCESS](./SPRINT_001_TENANT_SUCCESS.md)** | Era 2 sprint board · Experience vs Observation |
 | **[CUSTOMER_EXPERIENCE_001](./CUSTOMER_EXPERIENCE_001.md)** | **Active** · Zero Friction · TTC &lt; 30s |
 | [EXPERIENCE_MISSIONS](./EXPERIENCE_MISSIONS.md) | Era 2 missions · TTA KPIs · EXPERIENCE LAW 001 |
-| [ERA2_EXPERIENCE_PROMPT](./ERA2_EXPERIENCE_PROMPT.md) | Experience sprint prompt header |
+| [EXPERIENCE_MANIFESTO](./EXPERIENCE_MANIFESTO.md) | **Invisible software** · ADR 0099 |
+| [ERA2_EXPERIENCE_PROMPT](./ERA2_EXPERIENCE_PROMPT.md) | Experience mission prompt header |
 | [PR_REVIEW_PROTOCOL](./PR_REVIEW_PROTOCOL.md) | **Cursor gate before merge** · READY / WARNINGS / BLOCKED · ADR 0097 |
 | [PR_REVIEW_REPORT_TEMPLATE](./PR_REVIEW_REPORT_TEMPLATE.md) | Automatic review report shape |
 | [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md) | How we prove we returned time |

@@ -2,13 +2,16 @@
 
 **Status:** ▶ **ACTIVE**  
 **Declared:** 2026-08-07  
-**Laws:** PRODUCT LAW 001 · 002 · EXPERIENCE LAW 001 (ADR [0098](../adr/0098-experience-law-001.md)) · TENANT SUCCESS 001 / 001-A · TEAM LAW 001  
-**Pattern:** Progressive Completion · Time-to-Action (TTA)
+**Laws:** PRODUCT LAW 001 · 002 · EXPERIENCE LAW 001 (ADR [0098](../adr/0098-experience-law-001.md)) · **EXPERIENCE MANIFESTO 001** (ADR [0099](../adr/0099-experience-manifesto-001.md)) · TENANT SUCCESS 001 / 001-A · TEAM LAW 001  
+**Pattern:** Progressive Completion · Time-to-Action (TTA)  
+**Manifesto:** [EXPERIENCE_MANIFESTO](./EXPERIENCE_MANIFESTO.md)
 
 ```text
 We do not build screens.
 We do not build forms.
 We build measurable experiences.
+
+A great Experience is invisible.
 ```
 
 ---
