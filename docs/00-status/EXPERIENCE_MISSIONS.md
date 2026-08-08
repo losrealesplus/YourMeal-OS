@@ -1,14 +1,15 @@
 # Experience Missions (Era 2)
 
-**Status:** ▶ **ACTIVE** — **ORDER EXPERIENCE 005** Incident  
+**Status:** ▶ **ACTIVE** — **MENU EXPERIENCE** next · Order Frozen  
 
 
 **Declared:** 2026-08-07  
 **Laws:** PRODUCT LAW 001 · 002 · EXPERIENCE LAW 001 (ADR [0098](../adr/0098-experience-law-001.md)) · **EXPERIENCE MANIFESTO 001** (ADR [0099](../adr/0099-experience-manifesto-001.md)) · TENANT SUCCESS 001 / 001-A · TEAM LAW 001  
 **Pattern:** Progressive Completion · Living Customer Profile · Time-to-Action (TTA)  
-**Lifecycle:** [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)  
+**Lifecycle:** [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md) · [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)  
 **Manifesto:** [EXPERIENCE_MANIFESTO](./EXPERIENCE_MANIFESTO.md)  
-**Customer Review:** [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md) · Verdict **READY WITH IMPROVEMENTS** · **Frozen**
+**Customer Review:** [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md) · Verdict **READY WITH IMPROVEMENTS** · **Frozen** · Journey Certified  
+**Order Review:** [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md) · Verdict **READY WITH IMPROVEMENTS** · **Frozen** · Journey Certified
 
 ```text
 We do not build screens.
@@ -24,9 +25,9 @@ A great Experience is invisible.
 
 | Experience | Mission | Primary TTA | Status |
 |------------|---------|-------------|--------|
-| **Customer** | Zero Friction (001–005) · includes **CUSTOMER_EXPERIENCE_005** Growth | Create <30s · Find <10s · Edit <20s · Org <45s · enriquecer < 30s | ✅ **Frozen** |
-| **Order** | Zero Friction Capture · Search · Edit · Templates · Incident (001–005) | TTO <45s · TTFO <10s · TTEO <20s · Reuse <10s · TTRI <30s | ▶ **005 Incident** |
-| **Menu** | Plan one operational week | &lt; 2 min | Planned |
+| **Customer** | Zero Friction (001–005) · includes **CUSTOMER_EXPERIENCE_005** Growth | Create <30s · Find <10s · Edit <20s · Org <45s · enriquecer < 30s | ✅ **Frozen** · Journey Certified |
+| **Order** | Zero Friction Capture · Search · Edit · Templates · Incident (001–005) | TTO <45s · TTFO <10s · TTEO <20s · Reuse <10s · TTRI <30s | ✅ **Frozen** · Journey Certified |
+| **Menu** | Plan one operational week | &lt; 2 min | ▶ **NEXT** |
 | **Production** | Generate today's work | &lt; 1 min | Planned |
 | **Kitchen** | Know what to execute | &lt; 10s | Planned |
 | **Delivery** | Prepare today's routes | &lt; 2 min | Planned |
@@ -55,7 +56,7 @@ never before it.
 
 ---
 
-## Customer Experience — MVP COMPLETE · FROZEN
+## Customer Experience — MVP COMPLETE · FROZEN · JOURNEY CERTIFIED
 
 ```text
 001 Create          ✅
@@ -66,9 +67,11 @@ never before it.
 ↓
 Review              ✅ READY WITH IMPROVEMENTS
 ↓
+Journey Certification ✅ Customer Journey
+↓
 Freeze              ← no new Customer missions
 ↓
-ORDER EXPERIENCE    ▶ active (see below)
+ORDER EXPERIENCE    ✅ Frozen (below)
 ```
 
 Detail: [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md)
@@ -77,34 +80,56 @@ Detail: [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md)
 
 ---
 
-## Active mission
-
-▶ **ORDER-EXPERIENCE-005** · Zero Friction Operational Incident  
-Surface: `/admin/order-capture` · [ORDER_EXPERIENCE_005](./ORDER_EXPERIENCE_005.md)  
-001–004 ✅ · [004](./ORDER_EXPERIENCE_004.md) · [003](./ORDER_EXPERIENCE_003.md) · [002](./ORDER_EXPERIENCE_002.md) · [001](./ORDER_EXPERIENCE_001.md)
+## Order Experience — MVP COMPLETE · FROZEN · JOURNEY CERTIFIED
 
 ```text
-OE001 Capture ✅ → OE002 Search ✅ → OE003 Edit ✅ → OE004 Templates ✅ → OE005 Incident ▶ → Review → Freeze
+OE001 Capture ✅ → OE002 Search ✅ → OE003 Edit ✅ → OE004 Templates ✅ → OE005 Incident ✅
+↓
+Review ✅ READY WITH IMPROVEMENTS
+↓
+Journey Certification ✅ Order Journey
+↓
+Freeze ← no new Order missions
+↓
+MENU EXPERIENCE ← NEXT
 ```
 
-Customer: frozen · [EXPERIENCE_CARDS](./EXPERIENCE_CARDS.md) · [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)
+Detail: [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md) · [ORDER-EXPERIENCE-005](./ORDER_EXPERIENCE_005.md) complete · [004](./ORDER_EXPERIENCE_004.md) · [003](./ORDER_EXPERIENCE_003.md) · [002](./ORDER_EXPERIENCE_002.md) · [001](./ORDER_EXPERIENCE_001.md)
+
+Surface retained: `/admin/order-capture`
+
+---
+
+## Active mission
+
+▶ **MENU EXPERIENCE** — prepare Mission 001 (not opened in this PR)  
+Order: frozen · [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md)  
+Customer: frozen · [EXPERIENCE_CARDS](./EXPERIENCE_CARDS.md) · [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md) · [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)
+
+Historical id retained for gates: **ORDER-EXPERIENCE-005** (complete · not active)
 
 ---
 
 ## Platform roadmap
 
 ```text
-Customer Experience     ✅ MVP · Reviewed · Frozen
+Customer Experience     ✅ MVP · Reviewed · Journey Certified · Frozen
 ↓
-Order Experience        ▶ 005 Incident (001–004 ✅)
+Order Experience        ✅ MVP · Reviewed · Journey Certified · Frozen
 ↓
-Menu Experience
+Menu Experience         ← NEXT
 ↓
 Production Experience
 ↓
 Kitchen Experience
 ↓
 Delivery Experience
+↓
+Operational Journey Review
+↓
+Observation Sprint
+↓
+Evidence
 ↓
 Operational Accelerators
   001 OCC                 Reserved
@@ -119,6 +144,8 @@ Operational Accelerators
 ## Related
 
 * [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)  
+* [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)  
+* [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md)  
 * [ORDER_EXPERIENCE_005](./ORDER_EXPERIENCE_005.md)  
 * [ORDER_EXPERIENCE_004](./ORDER_EXPERIENCE_004.md)  
 * [ORDER_EXPERIENCE_003](./ORDER_EXPERIENCE_003.md)  

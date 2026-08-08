@@ -3,7 +3,8 @@
 **Status:** ▶ **ACTIVE** — user-facing product map for Era 2  
 **Declared:** 2026-08-07  
 **Manifesto:** [EXPERIENCE_MANIFESTO](./EXPERIENCE_MANIFESTO.md) · ADR [0099](../adr/0099-experience-manifesto-001.md)  
-**Missions:** [EXPERIENCE_MISSIONS](./EXPERIENCE_MISSIONS.md)
+**Missions:** [EXPERIENCE_MISSIONS](./EXPERIENCE_MISSIONS.md)  
+**Journeys:** [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)
 
 Not an ADR. Not a Law. A **30-second card** anyone on the team can understand.
 
@@ -38,7 +39,7 @@ Estimated | Measured
 …
 
 Status
-Planned | In Progress | Dogfood | Observation-ready
+Planned | In Progress | READY | READY WITH IMPROVEMENTS | BLOCKED | Frozen | Journey Certified
 ```
 
 Every Experience uses the same shape so metrics are comparable.
@@ -78,11 +79,11 @@ Estimated (see mission docs)
 Observation pending
 
 Status
-Frozen · READY WITH IMPROVEMENTS
+Frozen · READY WITH IMPROVEMENTS · Journey Certified
 (Review 001)
 ```
 
-Detail: [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md) · [005 Growth](./CUSTOMER_EXPERIENCE_005.md) · [004](./CUSTOMER_EXPERIENCE_004.md) · [003](./CUSTOMER_EXPERIENCE_003.md) · [002](./CUSTOMER_EXPERIENCE_002.md) · [001](./CUSTOMER_EXPERIENCE_001.md)
+Detail: [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md) · [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md) · [005 Growth](./CUSTOMER_EXPERIENCE_005.md) · [004](./CUSTOMER_EXPERIENCE_004.md) · [003](./CUSTOMER_EXPERIENCE_003.md) · [002](./CUSTOMER_EXPERIENCE_002.md) · [001](./CUSTOMER_EXPERIENCE_001.md)
 
 **Living Customer Profile:** *A customer profile should grow with the relationship, never before it.*
 
@@ -95,9 +96,11 @@ Detail: [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md) · [005 Gr
 004 Organization  ✅
 005 Growth     ✅
 ↓
-Review ✅ · Freeze
+Review ✅ · Journey Certification ✅ · Freeze
 ↓
-ORDER EXPERIENCE  ← NEXT
+ORDER EXPERIENCE  ✅ Frozen
+↓
+MENU EXPERIENCE   ← NEXT
 ```
 
 **Bulk Operations** is **not** CX006 — see [ACCELERATOR-002](./ACCELERATOR_002_OPERATIONAL_BULK.md).
@@ -124,35 +127,37 @@ Name
 Order Experience
 
 Phase
-005 Incident
+Review · Freeze
 
 Mission
-Zero Friction Operational Incident
+Order Journey Certified — Zero Friction Capture → Incident
 
 Primary User
 Tenant Operator
 
 Primary KPI
-Time-to-Record Operational Incident <30 s
+Time-to-Create Order <45 s
 
 Secondary KPIs
-Time-to-Route Incident <10 s
-Time-to-Create Order <45 s
 Time-to-Find Order <10 s
 Time-to-Edit Order <20 s
 Time-to-Create a Frequent Order <20 s
+Time-to-Record Operational Incident <30 s
+Time-to-Route Incident <10 s
 
 Operational Time Saved
 Estimated
-Incident ≈ 30–150 s per exception
-Capture · Search · Edit · Templates ≈ 25–100 s per reuse
+Capture · Search · Edit · Templates · Incident
+≈ 15–40 min / operational day (illustrative)
 Observation pending
 
 Status
-In Progress
+READY WITH IMPROVEMENTS
+Frozen
+Journey Certified
 ```
 
-Detail: [ORDER_EXPERIENCE_005](./ORDER_EXPERIENCE_005.md) · [004 Templates · Zero Friction Order Templates](./ORDER_EXPERIENCE_004.md) · [003 Edit · Zero Friction Order Edit](./ORDER_EXPERIENCE_003.md) · [002 Search](./ORDER_EXPERIENCE_002.md) · [001 Capture · Zero Friction Order Capture](./ORDER_EXPERIENCE_001.md) · Surface `/admin/order-capture`  
+Detail: [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md) · [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md) · [005 Incident](./ORDER_EXPERIENCE_005.md) · [004 Templates · Zero Friction Order Templates](./ORDER_EXPERIENCE_004.md) · [003 Edit · Zero Friction Order Edit](./ORDER_EXPERIENCE_003.md) · [002 Search](./ORDER_EXPERIENCE_002.md) · [001 Capture · Zero Friction Order Capture](./ORDER_EXPERIENCE_001.md) · Surface `/admin/order-capture`  
 
 Lifecycle: [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)
 
@@ -163,13 +168,15 @@ Lifecycle: [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)
 002 Search                  ✅
 003 Edit                    ✅
 004 Order Templates         ✅
-005 Operational Incident    ▶ In Progress
+005 Operational Incident    ✅
 ↓
-Experience Review
+Experience Review           ✅ READY WITH IMPROVEMENTS
 ↓
-Freeze
+Journey Certification       ✅ Order Journey Certified
 ↓
-Menu Experience
+Freeze                      ← no new Order missions
+↓
+Menu Experience             ← NEXT
 ```
 
 | Phase | Question | Status |
@@ -178,7 +185,8 @@ Menu Experience
 | 002 | ¿Puedo encontrar cualquier compromiso en &lt;10s? | ✅ |
 | 003 | ¿Puedo corregir un pedido frecuente en &lt;20s? | ✅ |
 | 004 | ¿Puedo reutilizar un patrón frecuente en &lt;20s? | ✅ |
-| 005 | ¿Puedo registrar y derivar una incidencia en &lt;30s? | ▶ |
+| 005 | ¿Puedo registrar y derivar una incidencia en &lt;30s? | ✅ |
+| Review | ¿Order Experience funciona como un lunes cualquiera? | READY WITH IMPROVEMENTS |
 
 ---
 
@@ -207,7 +215,7 @@ Estimated
 TBD
 
 Status
-Planned
+▶ NEXT (after Order Freeze)
 ```
 
 ---

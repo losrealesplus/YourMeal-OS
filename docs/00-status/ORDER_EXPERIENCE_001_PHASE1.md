@@ -1,6 +1,6 @@
 # ORDER EXPERIENCE 001 · Phase 1
 
-**Status:** ▶ **IN PROGRESS**  
+**Status:** ✅ **COMPLETE** — rolled into OE001 · journey frozen  
 **Parent:** [ORDER_EXPERIENCE_001](./ORDER_EXPERIENCE_001.md)  
 **Card:** [EXPERIENCE_CARDS](./EXPERIENCE_CARDS.md) · Order · Phase **001 Capture**  
 **Surface:** `/admin/order-capture`  

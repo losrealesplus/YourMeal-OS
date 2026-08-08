@@ -1,6 +1,6 @@
 # ORDER EXPERIENCE 005 · Zero Friction Operational Incident
 
-**Status:** ▶ **IN PROGRESS**  
+**Status:** ✅ **COMPLETE** — Review · Journey Certification · Freeze ([ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md))  
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/order-capture` (mode **incident**)  
@@ -101,13 +101,15 @@ Never invent Kitchen/Delivery writes — route is Experience classification + CT
 002 Search                  ✅
 003 Edit                    ✅
 004 Order Templates         ✅
-005 Operational Incident    ▶ THIS
+005 Operational Incident    ✅
 ↓
-Experience Review
+Experience Review           ✅
 ↓
-Freeze
+Journey Certification       ✅
 ↓
-Menu Experience
+Freeze                      ✅
+↓
+Menu Experience             ← NEXT
 ```
 
 ---
