@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { resolveAuthenticatedRouteUser } from "@/auth/resolve-authenticated-route-user";
 import { PlaceholderPanel } from "@/components/placeholder-panel";
 import { assertDriverRoute } from "@/permissions/route-guards";
 
 export const Route = createFileRoute("/_authenticated/driver")({
   beforeLoad: async ({ context }) => {
-    const user = (context as { user?: { id: string } }).user;
-    if (!user?.id) throw new Error("Missing auth context");
+    const user = await resolveAuthenticatedRouteUser(context, "/driver");
     const roles = await assertDriverRoute(user.id);
-    return { roles };
+    return { roles, user };
   },
   component: DriverHome,
   head: () => ({

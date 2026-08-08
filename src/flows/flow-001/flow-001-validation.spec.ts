@@ -384,7 +384,13 @@ describe("OPERATIONAL-FLOW-001 Engineering Certification Matrix", () => {
     });
   });
 
-  it("F10 Delivery gate documented (no Delivery until field path)", async () => {
+  it("F10 Delivery / field gate documented (Validation evidence path)", async () => {
+    // Original F10 (FLOW-001 certification) gated Delivery Capability until
+    // Demo · Roadmap Review · Android · OPPO · iPhone. Engine v1.0 + Delivery
+    // Engineering / Journey Certification superseded that Construction gate.
+    // Authoritative remainder: board + roadmap still require the field path
+    // (Android / OPPO / iPhone) and gate Delivery/Billing Product UI on
+    // Validation evidence until Engine FIELD VALIDATED.
     const board = readFileSync(
       resolve(process.cwd(), "docs/00-status/OPERATIONAL_ENGINE_BOARD.md"),
       "utf8",
@@ -394,16 +400,19 @@ describe("OPERATIONAL-FLOW-001 Engineering Certification Matrix", () => {
       "utf8",
     );
     const ok =
-      board.includes("No Delivery until") &&
-      roadmap.includes("Roadmap Review") &&
+      board.includes("No Delivery / Billing Product UI until") &&
+      board.includes("FIELD VALIDATED") &&
+      board.includes("Android") &&
+      (board.includes("iPhone") || board.includes("iOS")) &&
       roadmap.includes("Android") &&
       roadmap.includes("OPPO") &&
       (roadmap.includes("iPhone") || roadmap.includes("iOS"));
     record({
       id: "F10",
-      name: "Delivery gate",
-      expected: "Delivery blocked until FLOW-001 Demo · Review · Android · OPPO · iPhone",
-      observed: `boardGate=${board.includes("No Delivery until")} review=${roadmap.includes("Roadmap Review")}`,
+      name: "Delivery / field gate",
+      expected:
+        "Field path documented · Android/OPPO/iPhone · Delivery/Billing Product UI gated on Validation evidence · FIELD VALIDATED",
+      observed: `uiGate=${board.includes("No Delivery / Billing Product UI until")} fieldValidated=${board.includes("FIELD VALIDATED")} oppo=${roadmap.includes("OPPO")} iphone=${roadmap.includes("iPhone")}`,
       evidence: "OPERATIONAL_ENGINE_BOARD · OPERATIONAL_ROADMAP",
       verdict: ok ? "PASS" : "FAIL",
     });

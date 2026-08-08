@@ -68,6 +68,11 @@ export {
 } from "./guards";
 
 export {
+  resolveAuthenticatedRouteUser,
+  type AuthenticatedRouteUser,
+} from "./resolve-authenticated-route-user";
+
+export {
   AUTH_ALLOWED_NEXT_PATHS,
   AUTH_CALLBACK_PATH,
   AUTH_LOGIN_PATH,

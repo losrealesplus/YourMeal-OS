@@ -263,7 +263,6 @@ export function MenuPlanningPanel({
     markPreview(weekStart);
     refresh();
     setStep("preview");
-    window.setTimeout(() => publishRef.current?.focus(), 0);
   }
 
   async function onPublish() {
@@ -380,7 +379,7 @@ export function MenuPlanningPanel({
             </button>
             <Link
               to="/admin/production-planning"
-              search={{ weekStart: plan.weekStart }}
+              search={{ mode: "planning", weekStart: plan.weekStart }}
               className="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-4 text-sm"
             >
               Ir a Production

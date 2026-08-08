@@ -116,7 +116,6 @@ describe("Performance baseline (measure only)", () => {
     const doctorMs = await ms(async () => {
       await runDoctor({
         platform: "web",
-        runAt: new Date().toISOString(),
       });
     });
 

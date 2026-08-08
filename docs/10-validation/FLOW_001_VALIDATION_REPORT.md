@@ -50,7 +50,7 @@ sin romper ninguna Foundation Law?
 | F07 | Hop integrity | Identity→Order→Production→Kitchen→Complete | ordered steps | full run | **PASS** |
 | F08 | Foundation Laws 001–007 | compose-only · LAW 007 · Flow≠Capability | no storage · definitions | source + lock | **PASS** |
 | F09 | Operational Flow integrity | transitions only · never Capability re-test | report language | report + arch | **PASS** |
-| F10 | Delivery gate | No Delivery until Demo·Review·Android·OPPO·iPhone | board + roadmap | status docs | **PASS** |
+| F10 | Delivery / field gate | Delivery/Billing Product UI gated on Validation evidence · FIELD VALIDATED needs Android+iPhone · field path on roadmap | board + roadmap | status docs | **PASS** |
 | F11 | Hop failure integrity | Production fail → TRANSITION_FAILED | ProductionHop | fail path | **PASS** |
 | F12 | Empty execution honesty | empty queue ok · no Complete call | completeCalls=0 | empty path | **PASS** |
 
@@ -80,16 +80,20 @@ Architecture ✅ → Harness ✅ → Engineering Certification ✅ → Flow Demo
 
 ---
 
-## Strategic gate (frozen)
+## Strategic gate (evolved)
+
+Construction-era F10 gated **Delivery Capability** until Demo · Roadmap Review · Android · OPPO · iPhone.  
+That Construction gate was superseded when Delivery Engineering / FLOW-002 / Delivery Journey were certified under Engine v1.0.
+
+**Current F10 (Validation era)** — still enforced by board + roadmap:
 
 ```text
-No Delivery until:
+No Delivery / Billing Product UI until Validation evidence
+(under PRODUCT LAW 001)
 
-FLOW-001 Demo          ████░░░░░░░░░░░░░░░░
-Roadmap Review         ░░░░░░░░░░░░░░░░░░░░
-Android APK            ░░░░░░░░░░░░░░░░░░░░
-OPPO Field Validation  ░░░░░░░░░░░░░░░░░░░░
-iPhone Field Validation░░░░░░░░░░░░░░░░░░░░
+Android / OPPO Field Validation ✅ PASS
+iPhone FIELD-VALIDATION-002     ⏳
+Engine FIELD VALIDATED          🔒 until both
 ```
 
 ---

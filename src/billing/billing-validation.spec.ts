@@ -420,7 +420,7 @@ describe("OPERATIONAL-007 Billing Engineering Certification Matrix", () => {
     const readOnly = await facade().getBilling(
       identity({
         permissions: {
-          roles: ["viewer"],
+          roles: ["support"],
           capabilities: ["orders.read"],
         },
       }),
