@@ -39,9 +39,14 @@ export type OrderSearchHit = RankableOrderHit & {
 type Props = {
   onCreateOrder: () => void;
   onEditOrder: (hit: OrderSearchHit) => void;
+  onReportIncident: (hit: OrderSearchHit) => void;
 };
 
-export function OrderSearchPanel({ onCreateOrder, onEditOrder }: Props) {
+export function OrderSearchPanel({
+  onCreateOrder,
+  onEditOrder,
+  onReportIncident,
+}: Props) {
   const order = useOrder();
   const customer = useCustomer();
   const [query, setQuery] = useState("");
@@ -357,6 +362,13 @@ export function OrderSearchPanel({ onCreateOrder, onEditOrder }: Props) {
                   >
                     Editar
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => onReportIncident(hit)}
+                    className="inline-flex min-h-10 items-center rounded-md border border-border px-3 text-xs font-semibold"
+                  >
+                    Incidencia
+                  </button>
                   <Link
                     to="/admin/customer-workspace"
                     className="inline-flex min-h-10 items-center rounded-md border border-border px-3 text-xs font-semibold"
@@ -371,9 +383,6 @@ export function OrderSearchPanel({ onCreateOrder, onEditOrder }: Props) {
                       Llamar
                     </a>
                   ) : null}
-                  <span className="inline-flex min-h-10 items-center px-2 text-[11px] text-muted-foreground">
-                    Similar · Incidencia → próximas fases
-                  </span>
                 </div>
               )}
             </article>

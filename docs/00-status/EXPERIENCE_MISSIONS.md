@@ -1,6 +1,6 @@
 # Experience Missions (Era 2)
 
-**Status:** ▶ **ACTIVE** — **ORDER EXPERIENCE 004** Templates  
+**Status:** ▶ **ACTIVE** — **ORDER EXPERIENCE 005** Incident  
 
 
 **Declared:** 2026-08-07  
@@ -25,7 +25,7 @@ A great Experience is invisible.
 | Experience | Mission | Primary TTA | Status |
 |------------|---------|-------------|--------|
 | **Customer** | Zero Friction (001–005) · includes **CUSTOMER_EXPERIENCE_005** Growth | Create <30s · Find <10s · Edit <20s · Org <45s · enriquecer < 30s | ✅ **Frozen** |
-| **Order** | Zero Friction Capture · Search · Edit · Templates (001–004) | TTO <45s · TTFO <10s · TTEO <20s · Reuse <10s | ▶ **004 Templates** |
+| **Order** | Zero Friction Capture · Search · Edit · Templates · Incident (001–005) | TTO <45s · TTFO <10s · TTEO <20s · Reuse <10s · TTRI <30s | ▶ **005 Incident** |
 | **Menu** | Plan one operational week | &lt; 2 min | Planned |
 | **Production** | Generate today's work | &lt; 1 min | Planned |
 | **Kitchen** | Know what to execute | &lt; 10s | Planned |
@@ -79,12 +79,12 @@ Detail: [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md)
 
 ## Active mission
 
-▶ **ORDER-EXPERIENCE-004** · Zero Friction Order Templates  
-Surface: `/admin/order-capture` · [ORDER_EXPERIENCE_004](./ORDER_EXPERIENCE_004.md)  
-001–003 ✅ · [003](./ORDER_EXPERIENCE_003.md) · [002](./ORDER_EXPERIENCE_002.md) · [001](./ORDER_EXPERIENCE_001.md)
+▶ **ORDER-EXPERIENCE-005** · Zero Friction Operational Incident  
+Surface: `/admin/order-capture` · [ORDER_EXPERIENCE_005](./ORDER_EXPERIENCE_005.md)  
+001–004 ✅ · [004](./ORDER_EXPERIENCE_004.md) · [003](./ORDER_EXPERIENCE_003.md) · [002](./ORDER_EXPERIENCE_002.md) · [001](./ORDER_EXPERIENCE_001.md)
 
 ```text
-OE001 Capture ✅ → OE002 Search ✅ → OE003 Edit ✅ → OE004 Templates ▶ → OE005 Incident → Review → Freeze
+OE001 Capture ✅ → OE002 Search ✅ → OE003 Edit ✅ → OE004 Templates ✅ → OE005 Incident ▶ → Review → Freeze
 ```
 
 Customer: frozen · [EXPERIENCE_CARDS](./EXPERIENCE_CARDS.md) · [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)
@@ -96,7 +96,7 @@ Customer: frozen · [EXPERIENCE_CARDS](./EXPERIENCE_CARDS.md) · [EXPERIENCE_LIF
 ```text
 Customer Experience     ✅ MVP · Reviewed · Frozen
 ↓
-Order Experience        ▶ 004 Templates (001–003 ✅)
+Order Experience        ▶ 005 Incident (001–004 ✅)
 ↓
 Menu Experience
 ↓
@@ -119,6 +119,7 @@ Operational Accelerators
 ## Related
 
 * [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)  
+* [ORDER_EXPERIENCE_005](./ORDER_EXPERIENCE_005.md)  
 * [ORDER_EXPERIENCE_004](./ORDER_EXPERIENCE_004.md)  
 * [ORDER_EXPERIENCE_003](./ORDER_EXPERIENCE_003.md)  
 * [ORDER_EXPERIENCE_002](./ORDER_EXPERIENCE_002.md)  

@@ -1,6 +1,6 @@
 # ORDER EXPERIENCE 004 · Zero Friction Order Templates
 
-**Status:** ▶ **IN PROGRESS**  
+**Status:** ✅ **COMPLETE** (superseded as active by OE005 · surface retained)  
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/order-capture` (mode **templates**)  

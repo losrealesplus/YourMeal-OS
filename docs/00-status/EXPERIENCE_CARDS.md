@@ -124,25 +124,27 @@ Name
 Order Experience
 
 Phase
-004 Templates
+005 Incident
 
 Mission
-Zero Friction Order Templates
+Zero Friction Operational Incident
 
 Primary User
 Tenant Operator
 
 Primary KPI
-Time-to-Create a Frequent Order <20 s
+Time-to-Record Operational Incident <30 s
 
 Secondary KPIs
-Time-to-Reuse an Existing Pattern <10 s
+Time-to-Route Incident <10 s
 Time-to-Create Order <45 s
 Time-to-Find Order <10 s
 Time-to-Edit Order <20 s
+Time-to-Create a Frequent Order <20 s
 
 Operational Time Saved
 Estimated
+Incident ≈ 30–150 s per exception
 Capture · Search · Edit · Templates ≈ 25–100 s per reuse
 Observation pending
 
@@ -150,7 +152,7 @@ Status
 In Progress
 ```
 
-Detail: [ORDER_EXPERIENCE_004](./ORDER_EXPERIENCE_004.md) · [003 Edit · Zero Friction Order Edit](./ORDER_EXPERIENCE_003.md) · [002 Search](./ORDER_EXPERIENCE_002.md) · [001 Capture · Zero Friction Order Capture](./ORDER_EXPERIENCE_001.md) · Surface `/admin/order-capture`  
+Detail: [ORDER_EXPERIENCE_005](./ORDER_EXPERIENCE_005.md) · [004 Templates · Zero Friction Order Templates](./ORDER_EXPERIENCE_004.md) · [003 Edit · Zero Friction Order Edit](./ORDER_EXPERIENCE_003.md) · [002 Search](./ORDER_EXPERIENCE_002.md) · [001 Capture · Zero Friction Order Capture](./ORDER_EXPERIENCE_001.md) · Surface `/admin/order-capture`  
 
 Lifecycle: [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)
 
@@ -160,8 +162,8 @@ Lifecycle: [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)
 001 Capture                 ✅
 002 Search                  ✅
 003 Edit                    ✅
-004 Order Templates         ▶ In Progress
-005 Operational Incident
+004 Order Templates         ✅
+005 Operational Incident    ▶ In Progress
 ↓
 Experience Review
 ↓
@@ -175,7 +177,8 @@ Menu Experience
 | 001 | ¿Puedo crear un pedido mientras hablo en &lt;45s? | ✅ |
 | 002 | ¿Puedo encontrar cualquier compromiso en &lt;10s? | ✅ |
 | 003 | ¿Puedo corregir un pedido frecuente en &lt;20s? | ✅ |
-| 004 | ¿Puedo reutilizar un patrón frecuente en &lt;20s? | ▶ |
+| 004 | ¿Puedo reutilizar un patrón frecuente en &lt;20s? | ✅ |
+| 005 | ¿Puedo registrar y derivar una incidencia en &lt;30s? | ▶ |
 
 ---
 
