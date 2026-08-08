@@ -2,7 +2,8 @@
 
 **Permanent · PRODUCT LAW 001**  
 **Declared:** 2026-08-07 · ADR [0084](../adr/0084-product-law-001.md)  
-**North star:** [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md)
+**North star:** [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md)  
+**How we work now:** [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md)
 
 ```text
 Ideas enter by operational impact — not by novelty.
@@ -42,7 +43,7 @@ Every row must answer: **Does it save tenant time? How much? Which Beta?**
 | Bulk Excel import | Very High | High | Beta 2 | Replace multi-hour spreadsheet work |
 | Billing Capability (Architecture→Demo) | High | High | Beta 2 | Certified ✅ ADR 0089 · Demo next · Engine Outcome |
 | FLOW-003 Confirmation → Billing | High | Medium | Beta 2 | After Billing Facade |
-| OPERATIONAL-ENGINE-001 Declaration | — | Low | After Billing Demo | Institutional freeze · docs only |
+| OPERATIONAL-ENGINE-001 Declaration | — | Low | ✅ Done | ADR 0090 · tag `operational-engine-v1.0` |
 | Mobile UX pack (gestures · sheets · haptics · empty/loading) | High | Medium | Beta 1–2 | Native feel · fewer mistakes |
 | Android Doctor / sync / APK field loop | Medium | Medium | Beta 1 | Keep OPPO evidence fresh |
 | iOS build + field validation | High | High | Beta 1 | Cross-platform PASS |
@@ -70,13 +71,13 @@ Never reorder solely because an idea is architecturally elegant.
 
 ---
 
-## Link to Engine completion
+## Link to Engine (complete)
 
-Still required before Architecture Freeze v1.0 (engineering path):
+**Operational Engine v1.0 is DECLARED** — [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md).
 
-1. Delivery Demo  
-2. Billing Capability cycle  
-3. Flow completion (FLOW-002 Demo · FLOW-003 with Billing)  
-4. Declare **Operational Engine v1.0 · Architecture Frozen**
+This backlog no longer drives Engine Construction.  
+It drives **Tenant Success** under [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md).
+
+Remaining Demo / Field / FLOW-003 items are Validation & Experience — measured by time returned, not by modules added.
 
 Then backlog above becomes the main product driver.

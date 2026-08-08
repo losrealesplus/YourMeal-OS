@@ -7,7 +7,8 @@
 **Board:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)  
 **Registry:** [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) · [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md)  
 **Product:** [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md) · PRODUCT LAW 001 · ADR [0084](../adr/0084-product-law-001.md)  
-**Tag (after merge to main):** `operational-engine-v1.0`
+**Tenant Success:** [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md) · [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md)  
+**Tag:** `operational-engine-v1.0`
 
 ```text
 ════════════════════════════════════════════════════════════
@@ -232,6 +233,8 @@ Otherwise: work belongs in **Tenant Success** (experience, validation, time savi
 ---
 
 ## Next Era · Validation → Tenant Success
+
+Playbook: [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md)
 
 ```text
 Validation

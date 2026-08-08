@@ -1,7 +1,7 @@
 # Operational Roadmap
 
 **Permanent · Operational Engine v1.0 DECLARED** · ADR [0090](../adr/0090-operational-engine-v1-declaration.md) · [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md)  
-**Product Direction:** [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md) · **PRODUCT LAW 001** · ADR [0084](../adr/0084-product-law-001.md) · [Time Savings Backlog](./TENANT_TIME_SAVINGS_BACKLOG.md)  
+**Product Direction:** [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md) · **PRODUCT LAW 001** · ADR [0084](../adr/0084-product-law-001.md) · [Time Savings Backlog](./TENANT_TIME_SAVINGS_BACKLOG.md) · [Tenant Success Playbook](./TENANT_SUCCESS_PLAYBOOK.md)  
 **Companions:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) · [FIELD_VALIDATION_LOG](../10-validation/FIELD_VALIDATION_LOG.md) · [FIELD_VALIDATION_002_IOS](../10-validation/FIELD_VALIDATION_002_IOS.md)
 
 ---

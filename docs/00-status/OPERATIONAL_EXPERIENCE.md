@@ -2,6 +2,7 @@
 
 **Declared:** 2026-08-06 · ADR [0061](../adr/0061-customer-workspace-demo.md)  
 **Product Direction (from 2026-08-07):** [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md) · PRODUCT LAW 001 · Tenant Success  
+**Playbook:** [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md)  
 **Center of the project:**
 
 ```text
