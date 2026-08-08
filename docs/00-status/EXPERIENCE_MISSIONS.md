@@ -1,6 +1,6 @@
 # Experience Missions (Era 2)
 
-**Status:** ▶ **ACTIVE** — **DELIVERY EXPERIENCE 003** Delivery Adaptation · Kitchen Journey **Certified · Frozen**
+**Status:** ▶ **ACTIVE** — **DELIVERY EXPERIENCE 004** Delivery Responsibility · Kitchen Journey **Certified · Frozen**
 
 
 **Declared:** 2026-08-07  
@@ -30,7 +30,7 @@ A great Experience is invisible.
 | **Menu** | Zero Friction Planning · Search · Adaptation · Dish Library · Publish (001–005) | TTWM <10 min · TTFM <10s · TTAW <5 min · TTFID <15s · TTRP <5 min | ✅ **Certified** |
 | **Production** | Zero Friction Planning · Search · Adaptation · Preps · Alerts · Handoff (001–006) | TPP <10 min · TTFPW <10s · TAPP <5 min · TIRP <15s · TTPR <10s · TPKH <5 min | ✅ **Frozen** · Journey Certified |
 | **Kitchen** | Zero Friction Today's Work → Completion (001–006) | TTUKW <10s · TTFEW <10s · TTAE <30s · TILC <10s · TTEP <5s · TTUC <5s · Next <10s | ✅ **Frozen** · Journey Certified |
-| **Delivery** | Zero Friction Day · Search · Adaptation (001–003…) | TTUDD &lt;2 min · TTFD &lt;10s · TTAD &lt;30s | ▶ **003 In Progress** |
+| **Delivery** | Zero Friction Day · Search · Adaptation · Responsibility (001–004…) | TTUDD &lt;2 min · TTFD &lt;10s · TTAD &lt;30s · TTDR &lt;10s | ▶ **004 In Progress** |
 
 ---
 
@@ -117,13 +117,13 @@ Temporal model: **Semana → Día → Menú → Platos**
 
 ## Active mission
 
-▶ **DELIVERY EXPERIENCE 003** · Zero Friction Delivery Adaptation · [DELIVERY_EXPERIENCE_003](./DELIVERY_EXPERIENCE_003.md)  
-**DELIVERY EXPERIENCE 002** ✅ · [DELIVERY_EXPERIENCE_002](./DELIVERY_EXPERIENCE_002.md) · **001** ✅ · [DELIVERY_EXPERIENCE_001](./DELIVERY_EXPERIENCE_001.md)  
+▶ **DELIVERY EXPERIENCE 004** · Zero Friction Delivery Responsibility · [DELIVERY_EXPERIENCE_004](./DELIVERY_EXPERIENCE_004.md)  
+**DELIVERY EXPERIENCE 003** ✅ · [DELIVERY_EXPERIENCE_003](./DELIVERY_EXPERIENCE_003.md) · **002** ✅ · **001** ✅  
 Surface `/admin/delivery-today` · Input: Orders `ready_for_delivery` via Delivery Facade · Kitchen Frozen  
 **KITCHEN JOURNEY** ✅ **CERTIFIED · FROZEN** · [KITCHEN_JOURNEY_CERTIFICATION](../tenant-success/KITCHEN_JOURNEY_CERTIFICATION.md)  
 
 ```text
-DE001 Today's Delivery Day ✅ → DE002 Search ✅ → DE003 Adaptation ▶ → DE004 Responsibility → DE005 Route Preparation → DE006 Completion → Review → Certification → Freeze
+DE001 Today's Delivery Day ✅ → DE002 Search ✅ → DE003 Adaptation ✅ → DE004 Responsibility ▶ → DE005 Route Preparation → DE006 Completion → Review → Certification → Freeze
 ```
 
 Kitchen remains frozen:
@@ -141,13 +141,13 @@ PE001 Production Planning ✅ → PE002 Search ✅ → PE003 Adaptation ✅ → 
 Kitchen temporal model: **Día → Cola → Trabajo → Cantidad → Deadline → Ejecutar → Cierre**  
 Boundary: Production prepares · Handoff transfers · Kitchen executes / adapts / labels / tracks session progress / closes honestly (no replan · no invent durable Complete · no Delivery acceptance).  
 OTS: **Estimated ≠ Measured** — Observation Sprint pending (LAW 001-A).  
-Delivery temporal model: **Día → Cola de entregas → Readiness · Avisos → (Responsibility Future) → Ready for Route (Future)**  
-Boundary: Kitchen executes · Delivery prepares controlled transfer · no route invent · no AssignDelivery simulation · no ConfirmDelivery UX in 001.  
+Delivery temporal model: **Día → Cola de entregas → Search → Adaptation → Responsibility → Ready for Route (Future · Route Preparation)**  
+Boundary: Kitchen executes · Delivery prepares controlled transfer · Responsibility honesty (AssignDelivery UNIMPLEMENTED) · no route invent · no ConfirmDelivery UX.  
 OTS: **Estimated ≠ Measured** — Observation Sprint pending (LAW 001-A).  
 Kitchen: ✅ Certified · Frozen · [KITCHEN_JOURNEY_CERTIFICATION](../tenant-success/KITCHEN_JOURNEY_CERTIFICATION.md)  
 Production: ✅ Certified · Frozen · [PRODUCTION_JOURNEY_CERTIFICATION](../tenant-success/PRODUCTION_JOURNEY_CERTIFICATION.md)  
 Menu: ✅ Certified · Order: frozen · Customer: frozen  
-Historical ids: **DELIVERY-EXPERIENCE-003** · **DELIVERY-EXPERIENCE-002** · **DELIVERY-EXPERIENCE-001** · **KITCHEN-EXPERIENCE-001** · **KITCHEN-EXPERIENCE-002** · **KITCHEN-EXPERIENCE-003** · **KITCHEN-EXPERIENCE-004** · **KITCHEN-EXPERIENCE-005** · **KITCHEN-EXPERIENCE-006** · **KITCHEN-EXPERIENCE-REVIEW** · **KITCHEN-JOURNEY-CERTIFICATION** · **PRODUCTION-EXPERIENCE-001** · **PRODUCTION-EXPERIENCE-002** · **PRODUCTION-EXPERIENCE-003** · **PRODUCTION-EXPERIENCE-004** · **PRODUCTION-EXPERIENCE-005** · **PRODUCTION-EXPERIENCE-006** · **PRODUCTION-EXPERIENCE-REVIEW** · **PRODUCTION-JOURNEY-CERTIFICATION** · **MENU-EXPERIENCE-001** · **MENU-EXPERIENCE-002** · **MENU-EXPERIENCE-003** · **MENU-EXPERIENCE-004** · **MENU-EXPERIENCE-005**
+Historical ids: **DELIVERY-EXPERIENCE-004** · **DELIVERY-EXPERIENCE-003** · **DELIVERY-EXPERIENCE-002** · **DELIVERY-EXPERIENCE-001** · **KITCHEN-EXPERIENCE-001** · **KITCHEN-EXPERIENCE-002** · **KITCHEN-EXPERIENCE-003** · **KITCHEN-EXPERIENCE-004** · **KITCHEN-EXPERIENCE-005** · **KITCHEN-EXPERIENCE-006** · **KITCHEN-EXPERIENCE-REVIEW** · **KITCHEN-JOURNEY-CERTIFICATION** · **PRODUCTION-EXPERIENCE-001** · **PRODUCTION-EXPERIENCE-002** · **PRODUCTION-EXPERIENCE-003** · **PRODUCTION-EXPERIENCE-004** · **PRODUCTION-EXPERIENCE-005** · **PRODUCTION-EXPERIENCE-006** · **PRODUCTION-EXPERIENCE-REVIEW** · **PRODUCTION-JOURNEY-CERTIFICATION** · **MENU-EXPERIENCE-001** · **MENU-EXPERIENCE-002** · **MENU-EXPERIENCE-003** · **MENU-EXPERIENCE-004** · **MENU-EXPERIENCE-005**
 
 ---
 
@@ -164,7 +164,7 @@ Production Experience   ✅ Journey Certified · Frozen (001–006 ✅)
 ↓
 Kitchen Experience      ✅ Journey Certified · Frozen (001–006 ✅)
 ↓
-Delivery Experience     ▶ 003 Delivery Adaptation (001–002 ✅)
+Delivery Experience     ▶ 004 Delivery Responsibility (001–003 ✅)
 ↓
 Operational Journey Review
 ↓
@@ -186,6 +186,7 @@ Operational Accelerators
 
 * [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)  
 * [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)  
+* [DELIVERY_EXPERIENCE_004](./DELIVERY_EXPERIENCE_004.md)  
 * [DELIVERY_EXPERIENCE_003](./DELIVERY_EXPERIENCE_003.md)  
 * [DELIVERY_EXPERIENCE_002](./DELIVERY_EXPERIENCE_002.md)  
 * [DELIVERY_EXPERIENCE_001](./DELIVERY_EXPERIENCE_001.md)  

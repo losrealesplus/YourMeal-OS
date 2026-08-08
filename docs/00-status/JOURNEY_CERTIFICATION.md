@@ -57,7 +57,7 @@ Verdicts that authorize certification: **READY** or **READY WITH IMPROVEMENTS**.
 | **Menu Journey** | ✅ **Certified** | [MENU_EXPERIENCE_005](./MENU_EXPERIENCE_005.md) | ME001–005 · published week handoff |
 | **Production Journey** | ✅ **Certified** | [PRODUCTION_JOURNEY_CERTIFICATION](../tenant-success/PRODUCTION_JOURNEY_CERTIFICATION.md) · [Review](../tenant-success/PRODUCTION_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · **Frozen** · PE001–006 |
 | **Kitchen Journey** | ✅ **Certified** | [KITCHEN_JOURNEY_CERTIFICATION](../tenant-success/KITCHEN_JOURNEY_CERTIFICATION.md) · [Review](../tenant-success/KITCHEN_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · **Frozen** · KE001–006 |
-| **Delivery Journey** | ⏳ In progress (DE003) | [DELIVERY_EXPERIENCE_003](./DELIVERY_EXPERIENCE_003.md) · [002](./DELIVERY_EXPERIENCE_002.md) · [001](./DELIVERY_EXPERIENCE_001.md) | After Kitchen Freeze · Experience opened |
+| **Delivery Journey** | ⏳ In progress (DE004) | [DELIVERY_EXPERIENCE_004](./DELIVERY_EXPERIENCE_004.md) · [003](./DELIVERY_EXPERIENCE_003.md) · [002](./DELIVERY_EXPERIENCE_002.md) · [001](./DELIVERY_EXPERIENCE_001.md) | After Kitchen Freeze · Experience opened |
 | **Operational Journey** | ⏳ Pending | — | Cross-domain review after Delivery |
 
 ```text
@@ -66,7 +66,7 @@ Order Journey         ✅ Certified · Frozen
 Menu Journey          ✅ Certified
 Production Journey    ✅ Certified · Frozen
 Kitchen Journey       ✅ Certified · Frozen
-Delivery Journey      ⏳ DE003 Delivery Adaptation ▶ (DE001–002 ✅)
+Delivery Journey      ⏳ DE004 Delivery Responsibility ▶ (DE001–003 ✅)
 ↓
 Operational Journey Review
 ↓

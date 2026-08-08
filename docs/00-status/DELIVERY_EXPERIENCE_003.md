@@ -1,6 +1,6 @@
 # DELIVERY EXPERIENCE 003 · Zero Friction Delivery Adaptation
 
-**Status:** ▶ **IN PROGRESS**  
+**Status:** ✅ **COMPLETE** (superseded as active by DE004 · surface retained)  
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/delivery-today` (mode **adapt**)  
@@ -84,8 +84,8 @@ Persistence labeled **session**.
 ```text
 001 Today's Delivery Day       ✅
 002 Delivery Search            ✅
-003 Delivery Adaptation        ▶ THIS
-004 Driver / Responsibility
+003 Delivery Adaptation        ✅ THIS (complete)
+004 Delivery Responsibility    ▶ next
 005 Route Preparation          ← not Route Optimization
 006 Delivery Completion
 ↓

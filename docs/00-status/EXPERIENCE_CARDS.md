@@ -336,7 +336,7 @@ Journey Certification          ✅ CERTIFIED
 Freeze                         ✅
 ↓
 Kitchen Experience             ✅ Journey Certified · Frozen
-Delivery Experience            ▶ 003 Delivery Adaptation
+Delivery Experience            ▶ 004 Delivery Responsibility
 ```
 
 | Phase | Question | Status |
@@ -414,7 +414,7 @@ Journey Certification          ✅ CERTIFIED
 ↓
 Freeze                         ✅
 ↓
-Delivery Experience            ▶ 003 Delivery Adaptation
+Delivery Experience            ▶ 004 Delivery Responsibility
 ```
 
 | Phase | Question | Status |
@@ -441,10 +441,10 @@ Name
 Delivery Experience
 
 Phase
-003 Delivery Adaptation · In Progress
+004 Delivery Responsibility · In Progress
 
 Mission
-Zero Friction Delivery Adaptation (001–003)
+Zero Friction Delivery Responsibility (001–004)
 
 Primary User
 Delivery Operator
@@ -453,30 +453,31 @@ Secondary User
 Driver
 
 Primary KPI
-Time-to-Adapt-Delivery <30 s
+Time-to-Understand-Delivery-Responsibility <10 s
 
 Secondary KPIs
-Time-to-Resume-Delivery-Day <5 s
+Time-to-Identify-Unassigned-Delivery <10 s
+Time-to-Adapt-Delivery <30 s
 Time-to-Find-Delivery <10 s
 Time-to-Understand-Delivery-Day <2 min
 
 Operational Time Saved
 Estimated
-Illustrative adapt ≈ 90–570 s saved
-Find ≈ 20–80 s · Day ≈ 3–18 min
-(see DELIVERY_EXPERIENCE_003 / 002 / 001 — Estimated ≠ Measured)
+Illustrative responsibility ≈ 50–170 s saved
+Adapt ≈ 90–570 s · Find ≈ 20–80 s · Day ≈ 3–18 min
+(see DELIVERY_EXPERIENCE_004 / 003 / 002 / 001 — Estimated ≠ Measured)
 Observation pending
 
 Status
-In Progress · 003 Delivery Adaptation
+In Progress · 004 Delivery Responsibility
 ```
 
-Detail: [003 Delivery Adaptation · Zero Friction Delivery Adaptation](./DELIVERY_EXPERIENCE_003.md) · [002 Delivery Search · Zero Friction Delivery Search](./DELIVERY_EXPERIENCE_002.md) · [001 Today's Delivery Day · Zero Friction Delivery Day](./DELIVERY_EXPERIENCE_001.md) · Surface `/admin/delivery-today` · Input: Kitchen completion honesty + Orders ready_for_delivery · **No routes · no maps · no ConfirmDelivery invent** · Kitchen Journey ✅ Certified · Frozen  
+Detail: [004 Delivery Responsibility · Zero Friction Delivery Responsibility](./DELIVERY_EXPERIENCE_004.md) · [003 Delivery Adaptation · Zero Friction Delivery Adaptation](./DELIVERY_EXPERIENCE_003.md) · [002 Delivery Search · Zero Friction Delivery Search](./DELIVERY_EXPERIENCE_002.md) · [001 Today's Delivery Day · Zero Friction Delivery Day](./DELIVERY_EXPERIENCE_001.md) · Surface `/admin/delivery-today` · Input: Kitchen completion honesty + Orders ready_for_delivery · **No routes · no maps · no ConfirmDelivery invent** · Kitchen Journey ✅ Certified · Frozen  
 
 **Mental model (controlled transfer — not route maps):**
 
 ```text
-Work ready → Today's Deliveries → Search → Review · Assign (when supported) → Ready for Route (Future)
+Work ready → Today's Deliveries → Search → Adaptation → Responsibility → Route Preparation (NEXT)
 ```
 
 **Sequence (hypothesis — Observation may reshape):**
@@ -484,8 +485,8 @@ Work ready → Today's Deliveries → Search → Review · Assign (when supporte
 ```text
 001 Today's Delivery Day       ✅
 002 Delivery Search            ✅
-003 Delivery Adaptation        ▶
-004 Driver / Responsibility
+003 Delivery Adaptation        ✅
+004 Delivery Responsibility    ▶
 005 Route Preparation          ← not Route Optimization
 006 Delivery Completion
 ↓
@@ -500,12 +501,12 @@ Freeze
 |-------|----------|--------|
 | 001 | ¿Entiendo la jornada de entregas de hoy en &lt;2 min? | ✅ |
 | 002 | ¿Encuentro cualquier entrega en &lt;10s? | ✅ |
-| 003 | ¿Adapto la jornada sin romper el compromiso? | ▶ |
-| 004 | ¿Asigno responsabilidad con substrate real? | Planned |
+| 003 | ¿Adapto la jornada sin romper el compromiso? | ✅ |
+| 004 | ¿Entiendo responsabilidad / unassigned / unavailable en &lt;10s? | ▶ |
 | 005 | ¿Preparo la ruta con lo que Observation evidencie? | Planned |
 | 006 | ¿Cierro la entrega con resultado verificable? | Planned |
 
-Delivery receives completed work — does not create the Order commitment. Search finds **deliveries**, not Customer/Order entities. Does not invent driver assignment, routes, maps, or ConfirmDelivery. Address / window / zone labeled absent when substrate missing.
+Delivery receives completed work — does not create the Order commitment. Search finds **deliveries**, not Customer/Order entities. Responsibility shows Assigned / Unassigned / **Assignment unavailable** honestly — never invents AssignDelivery. Does not invent routes, maps, or ConfirmDelivery. Address / window / zone labeled absent when substrate missing.
 
 ---
 
