@@ -20,6 +20,7 @@ Un módulo se considera **DONE** solo si se cumple todo lo siguiente:
 | ✓ | Documentación actualizada (español) |
 | ✓ | Tests pasando (cuando existan en el flujo) |
 | ✓ | Pull Request fusionado |
+| ✓ | **Cursor PR Review Protocol PASS** ([PR_REVIEW_PROTOCOL](./PR_REVIEW_PROTOCOL.md) · ADR [0097](../adr/0097-pr-review-protocol.md)) — READY FOR MERGE o READY WITH WARNINGS documentado |
 | ✓ | Roadmap y estado actualizados |
 
 ## Principio de Intencionalidad

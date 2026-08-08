@@ -2,6 +2,15 @@
 
 <!-- What changed and why (1–3 sentences). -->
 
+## Cursor PR Review Gate
+
+> [PR_REVIEW_PROTOCOL](../docs/00-status/PR_REVIEW_PROTOCOL.md) · ADR [0097](../docs/adr/0097-pr-review-protocol.md)  
+> GitHub Actions is the **second** validation. Cursor review is the **first**.
+
+- [ ] PR Review Report attached / commented ([template](../docs/00-status/PR_REVIEW_REPORT_TEMPLATE.md))
+- [ ] Verdict: READY FOR MERGE · READY WITH WARNINGS · BLOCKED
+- [ ] Not recommending merge while BLOCKED
+
 ## Operational Impact (PRODUCT LAW 001)
 
 > [PRODUCT_DIRECTION](../docs/00-status/PRODUCT_DIRECTION.md) · ADR [0084](../docs/adr/0084-product-law-001.md)  

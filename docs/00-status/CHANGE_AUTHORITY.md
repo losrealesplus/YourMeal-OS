@@ -38,8 +38,10 @@ o intenta redefinirlo?
 
 | Respuesta | Acción |
 |-----------|--------|
-| Redefine Foundation / Auth / Identity / Membership / RBAC / Entry / Journey / Flow | ❌ Rechazado |
-| Consume el Core y respeta el Contract | ✅ Continúa revisión técnica |
+| Redefine Foundation / Auth / Identity / Membership / RBAC / Entry / Journey / Flow | ❌ Rechazado (salvo evidencia + ADR + CHANGE_AUTHORITY) |
+| Consume el Core y respeta el Contract | ✅ Continuar con [PR Review Protocol](./PR_REVIEW_PROTOCOL.md) |
+
+Antes de merge a `main`: ejecutar [PR_REVIEW_PROTOCOL](./PR_REVIEW_PROTOCOL.md) (Cursor gate). Actions es validación segunda.
 
 Checklist en la [plantilla de Pull Request](../../.github/pull_request_template.md).
 
