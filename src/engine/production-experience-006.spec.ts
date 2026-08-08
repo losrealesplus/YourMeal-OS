@@ -36,7 +36,7 @@ describe("PRODUCTION EXPERIENCE 006 · Zero Friction Kitchen Handoff", () => {
     clearResolvedRisksForTests();
   });
 
-  it("documents TPKH · boundary · Experience-only · Card In Progress", () => {
+  it("documents TPKH · boundary · Experience-only · Card READY WITH IMPROVEMENTS", () => {
     const doc = readFileSync(
       resolve(ROOT, "docs/00-status/PRODUCTION_EXPERIENCE_006.md"),
       "utf8",
@@ -70,11 +70,12 @@ describe("PRODUCTION EXPERIENCE 006 · Zero Friction Kitchen Handoff", () => {
     expect(cards).toContain("006 Kitchen Handoff");
     expect(cards).toContain("Zero Friction Kitchen Handoff");
     expect(cards).toContain("Time-to-Prepare-Kitchen-Handoff <5 min");
-    expect(cards).toContain("In Progress");
+    expect(cards).toContain("READY WITH IMPROVEMENTS");
 
     expect(missions).toContain("PRODUCTION-EXPERIENCE-006");
     expect(missions).toContain("TPKH <5 min");
-    expect(missions).toContain("PE006 Kitchen Handoff ▶");
+    expect(missions).toContain("PE006 Kitchen Handoff ✅");
+    expect(missions).toContain("PRODUCTION-EXPERIENCE-REVIEW");
 
     expect(ui).toContain("PRODUCTION EXPERIENCE 006");
     expect(ui).toContain("ProductionHandoffPanel");

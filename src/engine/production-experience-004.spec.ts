@@ -33,7 +33,7 @@ describe("PRODUCTION EXPERIENCE 004 · Zero Friction Production Pre-Preparations
     clearProductionPlansForTests();
   });
 
-  it("documents TIRP · prep bridge · Experience-only · Card In Progress", () => {
+  it("documents TIRP · prep bridge · Experience-only · Card READY WITH IMPROVEMENTS", () => {
     const doc = readFileSync(
       resolve(ROOT, "docs/00-status/PRODUCTION_EXPERIENCE_004.md"),
       "utf8",
@@ -66,10 +66,10 @@ describe("PRODUCTION EXPERIENCE 004 · Zero Friction Production Pre-Preparations
     expect(cards).toContain("004 Pre-Preparations");
     expect(cards).toContain("Zero Friction Production Pre-Preparations");
     expect(cards).toContain("Time-to-Identify-Required-Preps <15 s");
-    expect(cards).toContain("In Progress");
+    expect(cards).toContain("READY WITH IMPROVEMENTS");
 
     expect(missions).toContain("PRODUCTION-EXPERIENCE-004");
-    expect(missions).toContain("PRODUCTION-EXPERIENCE-006");
+    expect(missions).toContain("PRODUCTION-EXPERIENCE-REVIEW");
     expect(missions).toContain("TIRP <15s");
     expect(missions).toContain("PE004 Pre-Preparations ✅");
 
