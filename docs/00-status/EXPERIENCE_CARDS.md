@@ -502,7 +502,7 @@ Journey Certification          ✅ CERTIFIED
 Freeze                         ✅
 ↓
 Operational Journeys           ✅ COMPLETE
-Observation / Organism Review  ← NEXT
+Observation / Organism Review  ▶ ACTIVE · [ORGANISM_REVIEW](../tenant-success/ORGANISM_REVIEW.md)
 ```
 
 | Phase | Question | Status |

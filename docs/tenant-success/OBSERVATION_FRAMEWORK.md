@@ -5,7 +5,7 @@
 **Declared:** 2026-08-07  
 **Laws:** PRODUCT LAW 001 · PRODUCT LAW 002 · TENANT SUCCESS LAW 001 · **001-A** · TEAM LAW 001  
 **Playbook:** [TENANT_SUCCESS_PLAYBOOK](../00-status/TENANT_SUCCESS_PLAYBOOK.md)  
-**Companions:** [TENANT_OBSERVATION_TEMPLATE](./TENANT_OBSERVATION_TEMPLATE.md) · [FRICTION_CATALOG](./FRICTION_CATALOG.md) · [TIME_SAVINGS_SCORE](./TIME_SAVINGS_SCORE.md)  
+**Companions:** [ORGANISM_REVIEW](./ORGANISM_REVIEW.md) · [ORGANISM_OBSERVATION_TEMPLATE](./ORGANISM_OBSERVATION_TEMPLATE.md) · [TENANT_OBSERVATION_TEMPLATE](./TENANT_OBSERVATION_TEMPLATE.md) · [FRICTION_CATALOG](./FRICTION_CATALOG.md) · [TIME_SAVINGS_SCORE](./TIME_SAVINGS_SCORE.md)  
 **ADR:** [0095](../adr/0095-tenant-success-001-observation-framework.md) · [0096](../adr/0096-tenant-success-law-001a.md) (LAW 001-A)
 
 ```text
@@ -39,17 +39,21 @@ It is **not** a Capability. It does not touch Foundation, Developer Platform, or
 1. Operational Observation Framework     ✅ READY (instrument)
 2. Experience chain
    Customer → Order → Menu → Production → Kitchen → Delivery
-3. Android APK → OPPO → Internal Dogfooding
-4. Isabella Observation Session          ⏸ after usable workflows
-5. Sara Observation Session
-6. Tenant Success Backlog (evidence-ranked)
+   ✅ ALL JOURNEYS CERTIFIED · FROZEN
+3. Organism Review instrument            ✅ READY (OBSERVATION-ORGANISM-001)
+4. Android APK → OPPO → Internal Dogfooding (when mobile-touched)
+5. Isabella / Sara Organism Observation  ▶ NEXT — real workdays
+6. Evidence · Product Decision Queue
+7. Tenant Success Backlog (evidence-ranked)
 ```
 
 **Experience Sprints** build. **Observation Sprints** learn. Never mixed.
 
 Do **not** observe Isabella on unfinished edit/order/menu paths — that measures missing implementation, not operational friction (TENANT SUCCESS LAW 001-A).
 
-Active now: [CUSTOMER_EXPERIENCE_001](../00-status/CUSTOMER_EXPERIENCE_001.md).
+LAW 001-A gate for the organism: Operational Journeys are complete — observation is now valid.
+
+**Active now:** [ORGANISM_REVIEW](./ORGANISM_REVIEW.md) · Observation Sprint · **not** a new Experience.
 
 ---
 
@@ -93,11 +97,17 @@ Additional rules:
 
 | Artefact | Template |
 |----------|----------|
-| Observation record | [TENANT_OBSERVATION_TEMPLATE](./TENANT_OBSERVATION_TEMPLATE.md) |
-| Friction entries | [FRICTION_CATALOG](./FRICTION_CATALOG.md) classes |
-| Scored opportunities | [TIME_SAVINGS_SCORE](./TIME_SAVINGS_SCORE.md) |
+| Work-transfer record (organism) | [ORGANISM_OBSERVATION_TEMPLATE](./ORGANISM_OBSERVATION_TEMPLATE.md) |
+| Single-task deep dive | [TENANT_OBSERVATION_TEMPLATE](./TENANT_OBSERVATION_TEMPLATE.md) |
+| Friction entries | [FRICTION_CATALOG](./FRICTION_CATALOG.md) classes + organism categories |
+| Organism continuity | PASS · FRICTION · BREAK · UNKNOWN per transfer ([ORGANISM_REVIEW](./ORGANISM_REVIEW.md)) |
+| Scored opportunities | [TIME_SAVINGS_SCORE](./TIME_SAVINGS_SCORE.md) — **after** measurement only |
 
 No backlog item from observation is “accepted” until duration / frequency / tools are recorded (TENANT SUCCESS LAW 001).
+
+Prefer organism transfer records when asking:
+
+> Where does continuity break when Isabella and Sara cross the whole system?
 
 ---
 
@@ -115,24 +125,26 @@ No backlog item from observation is “accepted” until duration / frequency / 
 ## Relationship to Product Core
 
 ```text
-Observation
+Observation (organism work transfers)
   ↓
-Friction (catalogued)
+Measurement (full operational task time)
   ↓
-Time lost (measured)
+Pattern (candidate only)
   ↓
-Time Savings Score
+Evidence
   ↓
-Prioritization (Beta / GM)
+Product Decision
   ↓
-Experience sprint
+Experience · Capability · Accelerator · Do Nothing
   ↓
 Measure Again
   ↓
 Time recovered
 ```
 
-Accelerators (Operational Capture · Import Pipeline · …) enter only through this path — registered ideas are not evidence.
+Accelerators (Operational Capture · Import Pipeline · OCC · Bulk · …) enter only through this path — registered ideas are not evidence.
+
+An idea that dies in observation is method success.
 
 ---
 

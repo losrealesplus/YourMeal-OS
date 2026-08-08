@@ -169,13 +169,17 @@ Kitchen Experience      ✅ Journey Certified · Frozen (001–006 ✅)
 ↓
 Delivery Experience     ✅ Journey Certified · Frozen (001–006 ✅)
 ↓
-Operational Journey Review
+Operational Journeys       ✅ COMPLETE
 ↓
-Observation Sprint
+Observation Sprint         ▶ ACTIVE
+↓
+Organism Review            ▶ [ORGANISM_REVIEW](../tenant-success/ORGANISM_REVIEW.md)
 ↓
 Evidence
 ↓
-Operational Accelerators
+Product Decision
+↓
+Operational Accelerators (candidates only — not opened)
   001 OCC                 Reserved
   002 Operational Bulk    Registered (ex-CX006) — weeks may reveal need
   003 Import Pipeline     Reserved — Excel/PDF heritage likely
@@ -183,10 +187,14 @@ Operational Accelerators
   …
 ```
 
+Do **not** open another Experience block until Observation → Evidence → Product Decision says so.
+
 ---
 
 ## Related
 
+* [ORGANISM_REVIEW](../tenant-success/ORGANISM_REVIEW.md)  
+* [ORGANISM_OBSERVATION_TEMPLATE](../tenant-success/ORGANISM_OBSERVATION_TEMPLATE.md)  
 * [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)  
 * [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)  
 * [DELIVERY_JOURNEY_CERTIFICATION](../tenant-success/DELIVERY_JOURNEY_CERTIFICATION.md)  
