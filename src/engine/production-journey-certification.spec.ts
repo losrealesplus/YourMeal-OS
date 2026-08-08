@@ -49,22 +49,35 @@ describe("PRODUCTION JOURNEY CERTIFICATION 001", () => {
     expect(journeys).toContain("✅ **Certified**");
     expect(journeys).toContain("PRODUCTION_JOURNEY_CERTIFICATION");
     expect(journeys).toContain(
-      "Kitchen Journey       ⏳ Review ✅ READY WITH IMPROVEMENTS → Certification next",
+      "Kitchen Journey       ✅ Certified · Frozen",
+    );
+    expect(journeys).toMatch(
+      /Delivery Journey\s+⏳ (NEXT \(eligible\)|DE001 Today's Delivery Day ▶)/,
     );
 
     expect(lifecycle).toContain("Production Journey ✅ CERTIFIED");
     expect(lifecycle).toContain("Production Frozen");
+    expect(lifecycle).toContain("Kitchen Journey ✅ CERTIFIED");
+    expect(lifecycle).toContain("Kitchen Frozen");
 
     expect(cards).toContain("Journey Certified · Frozen");
     expect(cards).toContain("CERTIFIED");
     expect(cards).toContain(
-      "Kitchen Experience             ✅ Review · READY WITH IMPROVEMENTS → Certification next",
+      "Kitchen Experience             ✅ Journey Certified · Frozen",
+    );
+    expect(cards).toMatch(
+      /Delivery Experience\s+(← NEXT \(eligible\)|▶ 001 Today's Delivery Day)/,
     );
     expect(cards).toContain("READY WITH IMPROVEMENTS");
 
-    expect(missions).toContain("PRODUCTION JOURNEY CERTIFIED");
-    expect(missions).toContain("KITCHEN EXPERIENCE 001");
+    expect(missions).toContain("Production: ✅ Certified · Frozen");
     expect(missions).toContain("PRODUCTION-JOURNEY-CERTIFICATION");
     expect(missions).toContain("Journey Certified");
+    expect(missions).toContain(
+      "Kitchen Experience      ✅ Journey Certified · Frozen",
+    );
+    expect(missions).toMatch(
+      /Delivery Experience\s+(⏳ NEXT \(eligible\)|▶ 001 Today's Delivery Day)/,
+    );
   });
 });

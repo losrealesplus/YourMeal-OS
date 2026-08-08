@@ -26,7 +26,9 @@
 | [EXPERIENCE_CARDS](./EXPERIENCE_CARDS.md) | User-facing product map (30s cards) |
 | [EXPERIENCE_MISSIONS](./EXPERIENCE_MISSIONS.md) | Era 2 missions · TTA KPIs · EXPERIENCE LAW 001 |
 | [EXPERIENCE_MANIFESTO](./EXPERIENCE_MANIFESTO.md) | **Invisible software** · ADR 0099 |
-| **[KITCHEN_EXPERIENCE_REVIEW](../tenant-success/KITCHEN_EXPERIENCE_REVIEW.md)** | ✅ **READY WITH IMPROVEMENTS** · Journey Review · Certification next |
+| **[DELIVERY_EXPERIENCE_001](./DELIVERY_EXPERIENCE_001.md)** | ▶ **In Progress** · Today's Delivery Day · TTUDD &lt;2 min |
+| **[KITCHEN_JOURNEY_CERTIFICATION](../tenant-success/KITCHEN_JOURNEY_CERTIFICATION.md)** | ✅ **CERTIFIED** · Kitchen Journey Frozen |
+| [KITCHEN_EXPERIENCE_REVIEW](../tenant-success/KITCHEN_EXPERIENCE_REVIEW.md) | ✅ Review · READY WITH IMPROVEMENTS |
 | [KITCHEN_EXPERIENCE_006](./KITCHEN_EXPERIENCE_006.md) | ✅ Completion & Handoff · TTUC &lt;5s |
 | [KITCHEN_EXPERIENCE_005](./KITCHEN_EXPERIENCE_005.md) | ✅ Execution Progress · TTEP &lt;5s |
 | [KITCHEN_EXPERIENCE_004](./KITCHEN_EXPERIENCE_004.md) | ✅ Labels & Special Info · TILC &lt;10s |

@@ -335,7 +335,8 @@ Journey Certification          ✅ CERTIFIED
 ↓
 Freeze                         ✅
 ↓
-Kitchen Experience             ✅ Review · READY WITH IMPROVEMENTS → Certification next
+Kitchen Experience             ✅ Journey Certified · Frozen
+Delivery Experience            ▶ 001 Today's Delivery Day
 ```
 
 | Phase | Question | Status |
@@ -360,7 +361,7 @@ Name
 Kitchen Experience
 
 Phase
-MVP Complete · Review
+MVP Complete · Journey Certified · Frozen
 
 Mission
 Zero Friction Kitchen Execution (001–006)
@@ -369,7 +370,7 @@ Primary User
 Kitchen Operator
 
 Primary KPI
-Journey ready for Certification
+Journey Certified
 
 Secondary KPIs
 Time-to-Understand-Completion <5 s
@@ -388,14 +389,14 @@ TTUKW <10 s · TTFEW <10 s · TTAE <30 s · TILC <10 s · TTEP <5 s · TTUC <5 s
 Operational Time Saved
 Estimated
 Illustrative ≈ 20–75 min / Kitchen day
-(see Review — Estimated ≠ Measured)
+(see Certification / Review — Estimated ≠ Measured)
 Observation pending
 
 Status
-READY WITH IMPROVEMENTS
+Journey Certified · Frozen · READY WITH IMPROVEMENTS
 ```
 
-Detail: [KITCHEN_EXPERIENCE_REVIEW](../tenant-success/KITCHEN_EXPERIENCE_REVIEW.md) · [006 Completion & Handoff · Zero Friction Kitchen Completion & Handoff](./KITCHEN_EXPERIENCE_006.md) · [005 Execution Progress · Zero Friction Kitchen Execution Progress](./KITCHEN_EXPERIENCE_005.md) · [004 Labels & Special Info · Zero Friction Kitchen Labels & Special Information](./KITCHEN_EXPERIENCE_004.md) · [003 Execution Adaptation · Zero Friction Kitchen Execution Adaptation](./KITCHEN_EXPERIENCE_003.md) · [002 Search · Zero Friction Kitchen Execution Search](./KITCHEN_EXPERIENCE_002.md) · [001 Today's Work · Zero Friction Kitchen Execution](./KITCHEN_EXPERIENCE_001.md) · Surface `/admin/kitchen-today` · Input: Production Handoff  
+Detail: [KITCHEN_JOURNEY_CERTIFICATION](../tenant-success/KITCHEN_JOURNEY_CERTIFICATION.md) · [KITCHEN_EXPERIENCE_REVIEW](../tenant-success/KITCHEN_EXPERIENCE_REVIEW.md) · [006 Completion & Handoff · Zero Friction Kitchen Completion & Handoff](./KITCHEN_EXPERIENCE_006.md) · [005 Execution Progress · Zero Friction Kitchen Execution Progress](./KITCHEN_EXPERIENCE_005.md) · [004 Labels & Special Info · Zero Friction Kitchen Labels & Special Information](./KITCHEN_EXPERIENCE_004.md) · [003 Execution Adaptation · Zero Friction Kitchen Execution Adaptation](./KITCHEN_EXPERIENCE_003.md) · [002 Search · Zero Friction Kitchen Execution Search](./KITCHEN_EXPERIENCE_002.md) · [001 Today's Work · Zero Friction Kitchen Execution](./KITCHEN_EXPERIENCE_001.md) · Surface `/admin/kitchen-today` · Input: Production Handoff  
 
 **Sequence (daily execution — not Production planning):**
 
@@ -409,9 +410,11 @@ Detail: [KITCHEN_EXPERIENCE_REVIEW](../tenant-success/KITCHEN_EXPERIENCE_REVIEW.
 ↓
 Kitchen Experience Review      ✅ READY WITH IMPROVEMENTS
 ↓
-Journey Certification          ◀ NEXT
+Journey Certification          ✅ CERTIFIED
 ↓
-Freeze
+Freeze                         ✅
+↓
+Delivery Experience            ▶ 001 Today's Delivery Day
 ```
 
 | Phase | Question | Status |
@@ -423,6 +426,7 @@ Freeze
 | 005 | ¿Sigo el progreso sin Capability inventada? | ✅ |
 | 006 | ¿Cierro y entrego el día con claridad? | ✅ |
 | Review | ¿El viaje completo está listo para certificar? | ✅ READY WITH IMPROVEMENTS |
+| Certification | ¿El Journey Kitchen está certificado? | ✅ CERTIFIED · Frozen |
 
 Kitchen executes transferred work — does not re-plan Production. Search never becomes Order/Menu/Production planning. Adaptation is local execution only (session honesty · no durable ExecutionUnit simulation). Labels consume substrate — never invent Customer/Order · physical labels → Future. Progress / Completion use session marks + handoff totals — never invent durable Start/Complete or Delivery acceptance.
 
@@ -436,25 +440,69 @@ EXPERIENCE CARD
 Name
 Delivery Experience
 
+Phase
+001 Today's Delivery Day · In Progress
+
 Mission
-Prepare today's routes in less than two minutes
+Zero Friction Delivery Day
 
 Primary User
-Delivery / logistics
+Delivery Operator
+
+Secondary User
+Driver
 
 Primary KPI
-Time-to-Prepare Routes <2 min
+Time-to-Understand-Delivery-Day <2 min
 
 Secondary KPIs
-Time-to-Dispatch Route <30 s
+Time-to-Identify-Next-Delivery <10 s
 
 Operational Time Saved
 Estimated
-TBD
+Illustrative ≈ 3–18 min / delivery day
+(see DELIVERY_EXPERIENCE_001 — Estimated ≠ Measured)
+Observation pending
 
 Status
-Planned
+In Progress · 001 Today's Delivery Day
 ```
+
+Detail: [001 Today's Delivery Day · Zero Friction Delivery Day](./DELIVERY_EXPERIENCE_001.md) · Surface `/admin/delivery-today` · Input: Kitchen completion honesty + Orders ready_for_delivery · **No routes · no maps · no ConfirmDelivery invent** · Kitchen Journey ✅ Certified · Frozen  
+
+**Mental model (controlled transfer — not route maps):**
+
+```text
+Work ready → Today's Deliveries → Review · Assign (when supported) → Ready for Route (Future)
+```
+
+**Sequence (hypothesis — Observation may reshape):**
+
+```text
+001 Today's Delivery Day       ▶
+002 Delivery Search
+003 Delivery Adaptation
+004 Driver / Responsibility
+005 Route Preparation          ← not Route Optimization
+006 Delivery Completion
+↓
+Experience Review
+↓
+Journey Certification
+↓
+Freeze
+```
+
+| Phase | Question | Status |
+|-------|----------|--------|
+| 001 | ¿Entiendo la jornada de entregas de hoy en &lt;2 min? | ▶ |
+| 002 | ¿Encuentro cualquier entrega en &lt;10s? | Planned |
+| 003 | ¿Adapto la jornada sin romper el compromiso? | Planned |
+| 004 | ¿Asigno responsabilidad con substrate real? | Planned |
+| 005 | ¿Preparo la ruta con lo que Observation evidencie? | Planned |
+| 006 | ¿Cierro la entrega con resultado verificable? | Planned |
+
+Delivery receives completed work — does not create the Order commitment. Does not invent driver assignment, routes, maps, or ConfirmDelivery. Address / window / zone labeled absent when substrate missing.
 
 ---
 

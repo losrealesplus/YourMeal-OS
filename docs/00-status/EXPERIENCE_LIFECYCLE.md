@@ -88,8 +88,8 @@ OCC · Quick Capture · Import · Bulk appeared because friction repeated across
 | Edit / Adapt | CX003 Edit | **OE003 Edit** | **ME003 Weekly Adaptation** |
 | Domain phases | Org · Growth | Templates · Incident | Dish Library ✅ · Publish ✅ |
 | Review | CX Review ✅ | Order Review ✅ | Menu Review ✅ |
-| Journey Certification | Customer Journey ✅ | Order Journey ✅ | Menu Journey ✅ · Production Journey ✅ · Kitchen ⏳ Certification next |
-| Freeze | Customer Frozen | Order Frozen | Menu Freeze · Production Frozen · Kitchen Freeze |
+| Journey Certification | Customer Journey ✅ | Order Journey ✅ | Menu Journey ✅ · Production Journey ✅ · Kitchen Journey ✅ |
+| Freeze | Customer Frozen | Order Frozen | Menu Freeze · Production Frozen · Kitchen Frozen |
 
 | Lifecycle step | Production (physical work) |
 |----------------|----------------------------|
@@ -108,8 +108,18 @@ OCC · Quick Capture · Import · Bulk appeared because friction repeated across
 | Edit / Adapt | **KE003 Execution Adaptation** ✅ |
 | Domain phases | KE004 Labels ✅ · KE005 Progress ✅ · KE006 Completion ✅ |
 | Review | **Kitchen Review ✅** · READY WITH IMPROVEMENTS |
-| Journey Certification | Kitchen Journey ⏳ Certification next |
-| Freeze | Kitchen Freeze (after Certification) |
+| Journey Certification | **Kitchen Journey ✅ CERTIFIED** |
+| Freeze | **Kitchen Frozen** |
+
+| Lifecycle step | Delivery (controlled transfer) |
+|----------------|--------------------------------|
+| Create / Capture | **DE001 Today's Delivery Day** ▶ (receives ready work) |
+| Search | DE002 Delivery Search (hypothesis) |
+| Edit / Adapt | DE003 Delivery Adaptation (hypothesis) |
+| Domain phases | DE004 Responsibility · DE005 Route Preparation · DE006 Completion (hypothesis) |
+| Review | Pending |
+| Journey Certification | Pending |
+| Freeze | Pending |
 
 Order does **not** need Company or Growth.  
 Order needs **Templates** and **Operational Incident**.  
@@ -118,7 +128,9 @@ Menu needs the **weekly planning cycle**: reuse → adapt → publish.
 Production does **not** administer Orders.  
 Production transforms a **published week** into executable work.  
 Kitchen does **not** re-plan Production.  
-Kitchen executes transferred work and closes honestly.
+Kitchen executes transferred work and closes honestly.  
+Delivery does **not** create the commitment — it prepares controlled transfer.  
+Delivery Day comes before routes / maps / optimization.
 
 ---
 
