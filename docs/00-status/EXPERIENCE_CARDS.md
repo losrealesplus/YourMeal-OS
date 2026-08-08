@@ -336,7 +336,7 @@ Journey Certification          ✅ CERTIFIED
 Freeze                         ✅
 ↓
 Kitchen Experience             ✅ Journey Certified · Frozen
-Delivery Experience            ← NEXT (eligible)
+Delivery Experience            ▶ 001 Today's Delivery Day
 ```
 
 | Phase | Question | Status |
@@ -414,7 +414,7 @@ Journey Certification          ✅ CERTIFIED
 ↓
 Freeze                         ✅
 ↓
-Delivery Experience            ← NEXT (eligible)
+Delivery Experience            ▶ 001 Today's Delivery Day
 ```
 
 | Phase | Question | Status |
@@ -440,27 +440,69 @@ EXPERIENCE CARD
 Name
 Delivery Experience
 
+Phase
+001 Today's Delivery Day · In Progress
+
 Mission
-Prepare today's routes in less than two minutes
+Zero Friction Delivery Day
 
 Primary User
-Delivery / logistics
+Delivery Operator
+
+Secondary User
+Driver
 
 Primary KPI
-Time-to-Prepare Routes <2 min
+Time-to-Understand-Delivery-Day <2 min
 
 Secondary KPIs
-Time-to-Dispatch Route <30 s
+Time-to-Identify-Next-Delivery <10 s
 
 Operational Time Saved
 Estimated
-TBD
+Illustrative ≈ 3–18 min / delivery day
+(see DELIVERY_EXPERIENCE_001 — Estimated ≠ Measured)
+Observation pending
 
 Status
-Planned · Eligible (Kitchen Frozen) · NEXT
+In Progress · 001 Today's Delivery Day
 ```
 
-Detail: Kitchen Journey ✅ Certified · Frozen — Delivery Experience 001 may open next (operator day first — not route maps).
+Detail: [001 Today's Delivery Day · Zero Friction Delivery Day](./DELIVERY_EXPERIENCE_001.md) · Surface `/admin/delivery-today` · Input: Kitchen completion honesty + Orders ready_for_delivery · **No routes · no maps · no ConfirmDelivery invent** · Kitchen Journey ✅ Certified · Frozen  
+
+**Mental model (controlled transfer — not route maps):**
+
+```text
+Work ready → Today's Deliveries → Review · Assign (when supported) → Ready for Route (Future)
+```
+
+**Sequence (hypothesis — Observation may reshape):**
+
+```text
+001 Today's Delivery Day       ▶
+002 Delivery Search
+003 Delivery Adaptation
+004 Driver / Responsibility
+005 Route Preparation          ← not Route Optimization
+006 Delivery Completion
+↓
+Experience Review
+↓
+Journey Certification
+↓
+Freeze
+```
+
+| Phase | Question | Status |
+|-------|----------|--------|
+| 001 | ¿Entiendo la jornada de entregas de hoy en &lt;2 min? | ▶ |
+| 002 | ¿Encuentro cualquier entrega en &lt;10s? | Planned |
+| 003 | ¿Adapto la jornada sin romper el compromiso? | Planned |
+| 004 | ¿Asigno responsabilidad con substrate real? | Planned |
+| 005 | ¿Preparo la ruta con lo que Observation evidencie? | Planned |
+| 006 | ¿Cierro la entrega con resultado verificable? | Planned |
+
+Delivery receives completed work — does not create the Order commitment. Does not invent driver assignment, routes, maps, or ConfirmDelivery. Address / window / zone labeled absent when substrate missing.
 
 ---
 

@@ -55,8 +55,8 @@ describe("KITCHEN JOURNEY CERTIFICATION 001", () => {
     expect(journeys).toContain(
       "Kitchen Journey       ✅ Certified · Frozen",
     );
-    expect(journeys).toContain(
-      "Delivery Journey      ⏳ NEXT (eligible)",
+    expect(journeys).toMatch(
+      /Delivery Journey\s+⏳ (NEXT \(eligible\)|DE001 Today's Delivery Day ▶)/,
     );
     expect(journeys).toContain(
       "Kitchen: 001–006 ✅ → Review ✅ → Certification ✅ CERTIFIED · Frozen",
@@ -67,8 +67,8 @@ describe("KITCHEN JOURNEY CERTIFICATION 001", () => {
 
     expect(cards).toContain("Journey Certified · Frozen");
     expect(cards).toContain("CERTIFIED");
-    expect(cards).toContain(
-      "Delivery Experience            ← NEXT (eligible)",
+    expect(cards).toMatch(
+      /Delivery Experience\s+(← NEXT \(eligible\)|▶ 001 Today's Delivery Day)/,
     );
     expect(cards).toContain("READY WITH IMPROVEMENTS");
     expect(cards).toContain(
@@ -78,7 +78,9 @@ describe("KITCHEN JOURNEY CERTIFICATION 001", () => {
     expect(missions).toContain("KITCHEN JOURNEY");
     expect(missions).toContain("CERTIFIED · FROZEN");
     expect(missions).toContain("KITCHEN-JOURNEY-CERTIFICATION");
-    expect(missions).toContain("Delivery Experience     ⏳ NEXT (eligible)");
+    expect(missions).toMatch(
+      /Delivery Experience\s+(⏳ NEXT \(eligible\)|▶ 001 Today's Delivery Day)/,
+    );
     expect(missions).toContain("Journey Certification ✅ CERTIFIED → Freeze ✅");
   });
 
