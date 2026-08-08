@@ -485,6 +485,27 @@ Every line of code from today forward must contribute to that mission.
 
 ---
 
+## Era 2 · Operational Evidence Loop
+
+Product identity for the next era:
+
+```text
+Operational First.
+YourMeal OS is an Operational SaaS
+that systematically returns time to food businesses.
+```
+
+Official Product Core cycle (detail in [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md)):
+
+```text
+Observe → Measure → Understand → Design → Implement
+→ Validate → Measure Again → Time Saved → Repeat
+```
+
+Not develop. **Learn.** Backlog fed by evidence, not by ideas.
+
+---
+
 ## Closing the Operational Engine (declared)
 
 **OPERATIONAL-ENGINE-001 is complete.** Construction of the Engine has ended.
