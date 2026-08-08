@@ -1,12 +1,60 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-08-07  
+**Última actualización:** 2026-08-08  
 
 ## Permanent control panel (frozen)
 
 | Document | Role |
 |----------|------|
-| **[PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md)** | **North star** · PRODUCT LAW 001 · Tenant Success |
+| **[PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md)** | **North star** · PRODUCT LAW 001 · 002 · TEAM LAW 001 |
+| **[ERA_DECLARATION](./ERA_DECLARATION.md)** | **Acta de eras** · Era 1 CLOSED · Era 2 OPEN · ADR 0091 |
+| **[ERA2_PRODUCT_DISCOVERY_001](./ERA2_PRODUCT_DISCOVERY_001.md)** | **First Discovery** · Accelerators registered |
+| **[SPRINT_001_TENANT_SUCCESS](./SPRINT_001_TENANT_SUCCESS.md)** | Era 2 sprint board · Experience vs Observation |
+| **[EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)** | Era 2 Experience standard · Review → Freeze → Observation |
+| **[ORDER_EXPERIENCE_004](./ORDER_EXPERIENCE_004.md)** | ▶ **In Progress** · Order Templates · Frequent &lt;20s |
+| [ORDER_EXPERIENCE_003](./ORDER_EXPERIENCE_003.md) | ✅ Edit · TTEO &lt;20s |
+| [ORDER_EXPERIENCE_002](./ORDER_EXPERIENCE_002.md) | ✅ Search · TTFO &lt;10s |
+| [ORDER_EXPERIENCE_001](./ORDER_EXPERIENCE_001.md) | ✅ Capture · TTO &lt;45s |
+| [ORDER_EXPERIENCE_001_PHASE1](./ORDER_EXPERIENCE_001_PHASE1.md) | Capture Phase 1 · `/admin/order-capture` |
+| [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md) | ✅ READY WITH IMPROVEMENTS · Customer Frozen |
+| [CUSTOMER_EXPERIENCE_005](./CUSTOMER_EXPERIENCE_005.md) | Growth · Living Profile |
+| [CUSTOMER_EXPERIENCE_004](./CUSTOMER_EXPERIENCE_004.md) | Organization · TTO &lt; 45s |
+| [CUSTOMER_EXPERIENCE_003](./CUSTOMER_EXPERIENCE_003.md) | Edit · TTE &lt; 20s |
+| [CUSTOMER_EXPERIENCE_002](./CUSTOMER_EXPERIENCE_002.md) | Search · TTF &lt; 10s |
+| [CUSTOMER_EXPERIENCE_001](./CUSTOMER_EXPERIENCE_001.md) | Create · TTC &lt; 30s |
+| [CUSTOMER_EXPERIENCE_001_PHASE1](./CUSTOMER_EXPERIENCE_001_PHASE1.md) | Phase 1 Create implementation · Experience only |
+| [EXPERIENCE_CARDS](./EXPERIENCE_CARDS.md) | User-facing product map (30s cards) |
+| [EXPERIENCE_MISSIONS](./EXPERIENCE_MISSIONS.md) | Era 2 missions · TTA KPIs · EXPERIENCE LAW 001 |
+| [EXPERIENCE_MANIFESTO](./EXPERIENCE_MANIFESTO.md) | **Invisible software** · ADR 0099 |
+| **[DELIVERY_EXPERIENCE_003](./DELIVERY_EXPERIENCE_003.md)** | ▶ **In Progress** · Delivery Adaptation · TTAD &lt;30s |
+| [DELIVERY_EXPERIENCE_002](./DELIVERY_EXPERIENCE_002.md) | ✅ Delivery Search · TTFD &lt;10s |
+| [DELIVERY_EXPERIENCE_001](./DELIVERY_EXPERIENCE_001.md) | ✅ Today's Delivery Day · TTUDD &lt;2 min |
+| **[KITCHEN_JOURNEY_CERTIFICATION](../tenant-success/KITCHEN_JOURNEY_CERTIFICATION.md)** | ✅ **CERTIFIED** · Kitchen Journey Frozen |
+| [KITCHEN_EXPERIENCE_REVIEW](../tenant-success/KITCHEN_EXPERIENCE_REVIEW.md) | ✅ Review · READY WITH IMPROVEMENTS |
+| [KITCHEN_EXPERIENCE_006](./KITCHEN_EXPERIENCE_006.md) | ✅ Completion & Handoff · TTUC &lt;5s |
+| [KITCHEN_EXPERIENCE_005](./KITCHEN_EXPERIENCE_005.md) | ✅ Execution Progress · TTEP &lt;5s |
+| [KITCHEN_EXPERIENCE_004](./KITCHEN_EXPERIENCE_004.md) | ✅ Labels & Special Info · TILC &lt;10s |
+| [KITCHEN_EXPERIENCE_003](./KITCHEN_EXPERIENCE_003.md) | ✅ Execution Adaptation · TTAE &lt;30s |
+| [KITCHEN_EXPERIENCE_002](./KITCHEN_EXPERIENCE_002.md) | ✅ Execution Search · TTFEW &lt;10s |
+| [KITCHEN_EXPERIENCE_001](./KITCHEN_EXPERIENCE_001.md) | ✅ Today's Work · TTUKW &lt;10s |
+| [PRODUCTION_JOURNEY_CERTIFICATION](../tenant-success/PRODUCTION_JOURNEY_CERTIFICATION.md) | ✅ **CERTIFIED** · Production Journey Frozen |
+| [PRODUCTION_EXPERIENCE_REVIEW](../tenant-success/PRODUCTION_EXPERIENCE_REVIEW.md) | ✅ Review · READY WITH IMPROVEMENTS |
+| [PRODUCTION_EXPERIENCE_006](./PRODUCTION_EXPERIENCE_006.md) | ✅ Kitchen Handoff · TPKH &lt;5 min |
+| [PRODUCTION_EXPERIENCE_005](./PRODUCTION_EXPERIENCE_005.md) | ✅ Alerts & Deadlines · TTPR &lt;10s |
+| [PRODUCTION_EXPERIENCE_004](./PRODUCTION_EXPERIENCE_004.md) | ✅ Pre-Preparations · TIRP &lt;15s |
+| [PRODUCTION_EXPERIENCE_003](./PRODUCTION_EXPERIENCE_003.md) | ✅ Production Adaptation · TAPP &lt;5 min |
+| [PRODUCTION_EXPERIENCE_002](./PRODUCTION_EXPERIENCE_002.md) | ✅ Production Search · TTFPW &lt;10s |
+| [PRODUCTION_EXPERIENCE_001](./PRODUCTION_EXPERIENCE_001.md) | ✅ Production Planning · TPP &lt;10 min |
+| [MENU_EXPERIENCE_005](./MENU_EXPERIENCE_005.md) | ✅ Publish & Preview · Menu Journey Certified |
+| [MENU_EXPERIENCE_004](./MENU_EXPERIENCE_004.md) | ✅ Dish Library · TTFID &lt;15s |
+| **[OPERATIONAL_LIBRARIES](./OPERATIONAL_LIBRARIES.md)** | Reusable operational knowledge (Dish · Customer · …) — not admin workplaces |
+| **[OPERATIONAL_ACCELERATORS](./OPERATIONAL_ACCELERATORS.md)** | **Third layer** · accelerate work without changing domain |
+| **[ACCELERATOR_001 · OCC](./ACCELERATOR_001_OPERATIONAL_COMMAND_CENTER.md)** | 🔒 **Reserved** · Operational Command Center · no code |
+| **[ACCELERATOR_002 · Bulk](./ACCELERATOR_002_OPERATIONAL_BULK.md)** | 📋 Registered · ex-CX006 · open after Orders |
+| [ERA2_EXPERIENCE_PROMPT](./ERA2_EXPERIENCE_PROMPT.md) | Experience mission prompt header |
+| [PR_REVIEW_PROTOCOL](./PR_REVIEW_PROTOCOL.md) | **Cursor gate before merge** · READY / WARNINGS / BLOCKED · ADR 0097 |
+| [PR_REVIEW_REPORT_TEMPLATE](./PR_REVIEW_REPORT_TEMPLATE.md) | Automatic review report shape |
+| [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md) | How we prove we returned time |
 | [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md) | Ideas prioritized by operational time saved |
 | [PLATFORM_STATUS](./PLATFORM_STATUS.md) | Platform layer verdict |
 | [FOUNDATION_STATUS](./FOUNDATION_STATUS.md) | Foundation + Laws 001–004 |
@@ -41,6 +89,10 @@
 **Product Core:** ✅ **[Foundation engineering-validated](./PRODUCT_CORE_FOUNDATION_001.md)** (ADR 0054) · Field smoke OPPO ⏳ · **Era Foundation center CLOSED**  
 **Operational Experience:** ▶ **[OPERATIONAL_EXPERIENCE](./OPERATIONAL_EXPERIENCE.md)** · Tenant Success  
 **Product Direction:** ▶ **[PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md)** · PRODUCT LAW 001 · ADR [0084](../adr/0084-product-law-001.md) · [Time Savings Backlog](./TENANT_TIME_SAVINGS_BACKLOG.md) · **[Tenant Success Playbook](./TENANT_SUCCESS_PLAYBOOK.md)**  
+**Era Declaration:** ✅ **[ERA_DECLARATION](./ERA_DECLARATION.md)** · ADR [0091](../adr/0091-era-declaration.md) · **Era 1 CLOSED · Era 2 OPEN** (2026-08-07)  
+**Era 2 Discovery / Sprint:** ▶ **[ORDER EXPERIENCE 004](./ORDER_EXPERIENCE_004.md)** Templates · [003](./ORDER_EXPERIENCE_003.md) Edit ✅ · [002](./ORDER_EXPERIENCE_002.md) Search ✅ · [001](./ORDER_EXPERIENCE_001.md) Capture ✅ · Lifecycle [LIFECYCLE](./EXPERIENCE_LIFECYCLE.md) · Customer ✅ [Review](./CUSTOMER_EXPERIENCE_REVIEW.md) · [005](./CUSTOMER_EXPERIENCE_005.md) · [004](./CUSTOMER_EXPERIENCE_004.md) · [003](./CUSTOMER_EXPERIENCE_003.md) · [002](./CUSTOMER_EXPERIENCE_002.md) · [001](./CUSTOMER_EXPERIENCE_001.md) · [SPRINT_001_TENANT_SUCCESS](./SPRINT_001_TENANT_SUCCESS.md) · Prompt [ERA2_CURSOR_PROMPT](./ERA2_CURSOR_PROMPT.md) · LAW 002 ADR [0093](../adr/0093-product-law-002.md) · TEAM LAW 001 ADR [0094](../adr/0094-team-law-001.md) · LAW 001-A ADR [0096](../adr/0096-tenant-success-law-001a.md)  
+**Observation Framework:** ✅ READY · sessions ⏸ — [OBSERVATION_FRAMEWORK](../tenant-success/OBSERVATION_FRAMEWORK.md) · TENANT-SUCCESS-001 · ADR [0095](../adr/0095-tenant-success-001-observation-framework.md)  
+**PR Review Protocol:** ▶ **[PR_REVIEW_PROTOCOL](./PR_REVIEW_PROTOCOL.md)** · ADR [0097](../adr/0097-pr-review-protocol.md) · Cursor gate before `main`  
 **Operational Modules:** ▶ Expansion complete for Engine v1.0 · [OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md) · Engine [v1.0](./OPERATIONAL_ENGINE_V1.md)  
 **Delivery Capability:** [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) · ADR 0078–0080 · **0086** · Demo `/admin/delivery-workspace` · `useDelivery()` · [Validation Report](../10-validation/DELIVERY_VALIDATION_REPORT.md)  
 **Operational Engine:** ✅ **v1.0 DECLARED** — [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) · ADR 0090 · Board: [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · Review: [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) · Flows: [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md)  

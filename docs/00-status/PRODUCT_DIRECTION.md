@@ -2,8 +2,8 @@
 
 **Strategic Freeze — August 2026**  
 **Status:** ▶ **ACTIVE** · permanent north star  
-**ADR:** [0084 — PRODUCT LAW 001](../adr/0084-product-law-001.md)  
-**Companions:** [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md) · [FOUNDATION_LOCK](../05-architecture/FOUNDATION_LOCK.md) · [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [OPERATIONAL_BEHAVIOUR_BOARD](./OPERATIONAL_BEHAVIOUR_BOARD.md)
+**ADR:** [0084 — PRODUCT LAW 001](../adr/0084-product-law-001.md) · [0093 — PRODUCT LAW 002](../adr/0093-product-law-002.md) · [0094 — TEAM LAW 001](../adr/0094-team-law-001.md)  
+**Companions:** [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md) · [ERA2_PRODUCT_DISCOVERY_001](./ERA2_PRODUCT_DISCOVERY_001.md) · [SPRINT_001_TENANT_SUCCESS](./SPRINT_001_TENANT_SUCCESS.md) · [FOUNDATION_LOCK](../05-architecture/FOUNDATION_LOCK.md) · [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [OPERATIONAL_BEHAVIOUR_BOARD](./OPERATIONAL_BEHAVIOUR_BOARD.md)
 
 ```text
 This document decides how we take decisions for years.
@@ -78,9 +78,50 @@ Foundation remains the engineering constitution. PRODUCT LAW 001 is the product 
 
 ---
 
+## PRODUCT LAW 002
+
+```text
+YourMeal OS never forces tenants
+to recreate information
+they already own.
+
+Existing operational knowledge
+must be reusable whenever possible.
+```
+
+**ADR:** [0093](../adr/0093-product-law-002.md)
+
+Companion to PRODUCT LAW 001.  
+We are not building an ERP from scratch.  
+We are building the system that **adopts existing work with the least friction possible**.
+
+Applies to customers · menus · recipes · Excel · PDF · labels · routes · production — any operational knowledge the tenant already has.
+
+Framing is not “Excel module.” Framing is **reuse existing knowledge**.
+
+---
+
+## TEAM LAW 001
+
+```text
+We never optimize our development time.
+
+We optimize the tenant's operational time.
+
+Engineering time is an investment.
+
+Tenant time is the product.
+```
+
+**ADR:** [0094](../adr/0094-team-law-001.md)
+
+Three hours designing a screen that saves Isabella one hour a day for years is an extraordinary investment.
+
+---
+
 ## Three constitutions
 
-YourMeal OS now has three complementary constitutions:
+YourMeal OS now has complementary constitutions:
 
 ```text
 1. Developer Constitution
@@ -92,10 +133,13 @@ YourMeal OS now has three complementary constitutions:
    → How we design
 
 3. Product Constitution
-   PRODUCT LAW 001
-   → Why we develop
-```
+   PRODUCT LAW 001 · PRODUCT LAW 002
+   → Why we develop · How we respect existing knowledge
 
+4. Tenant Success Constitution
+   TENANT SUCCESS LAW 001 · TEAM LAW 001
+   → How we prove value · How we invest engineering time
+```
 ```text
 Developer Platform
         ↓
@@ -303,6 +347,23 @@ Business behaviour **never** migrates into Flows.
 
 ---
 
+## Era 2 product layers (Return Time)
+
+```text
+Capabilities              — what the business is
+Experiences               — how the operator works (measurable TTA)
+Operational Accelerators  — how work becomes faster
+```
+
+Accelerators do **not** change the domain or Engine. They accelerate work.  
+**ACCELERATOR-001 · Operational Command Center (OCC)** is 🔒 **Reserved** — maximum strategic priority · **zero implementation** until Experiences mature.  
+See [OPERATIONAL_ACCELERATORS](./OPERATIONAL_ACCELERATORS.md) · [ACCELERATOR_001](./ACCELERATOR_001_OPERATIONAL_COMMAND_CENTER.md).
+
+First make the product excellent (Experiences).  
+Then make it extremely fast (Accelerators).
+
+---
+
 ## Current engineering position (honest)
 
 ```text
@@ -485,6 +546,54 @@ Every line of code from today forward must contribute to that mission.
 
 ---
 
+## Era 2 · Operational Evidence Loop
+
+**Acta:** [ERA_DECLARATION](./ERA_DECLARATION.md) · ADR [0091](../adr/0091-era-declaration.md) · Era 1 CLOSED · Era 2 OPEN (7 August 2026).
+
+Product identity for the next era:
+
+```text
+Operational First.
+YourMeal OS is an Operational SaaS
+that systematically returns time to food businesses.
+```
+
+Official Product Core cycle (detail in [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md)):
+
+```text
+Observe → Measure → Understand → Design → Implement
+→ Validate → Measure Again → Time Saved → Repeat
+```
+
+Not develop. **Learn.** Backlog fed by evidence, not by ideas.
+
+First question of every product conversation:
+
+```text
+¿Dónde pierde tiempo Isabella hoy?
+```
+
+**TENANT SUCCESS LAW 001** (ADR [0092](../adr/0092-tenant-success-law-001.md)):
+
+```text
+No observation is accepted until it has been measured.
+No solution is accepted until the improvement has been measured again.
+```
+
+**PRODUCT LAW 002** (ADR [0093](../adr/0093-product-law-002.md)) · **TEAM LAW 001** (ADR [0094](../adr/0094-team-law-001.md)).
+
+First Discovery: [ERA2_PRODUCT_DISCOVERY_001](./ERA2_PRODUCT_DISCOVERY_001.md) · Sprint: [SPRINT_001_TENANT_SUCCESS](./SPRINT_001_TENANT_SUCCESS.md) · Prompt: [ERA2_CURSOR_PROMPT](./ERA2_CURSOR_PROMPT.md).
+
+Detail: [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md).
+
+```text
+We are not going to develop screens.
+We are going to design better workdays.
+```
+
+
+---
+
 ## Closing the Operational Engine (declared)
 
 **OPERATIONAL-ENGINE-001 is complete.** Construction of the Engine has ended.
@@ -505,13 +614,21 @@ See [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) — *Time saved is the p
 ## Related
 
 * [ADR 0084](../adr/0084-product-law-001.md) · PRODUCT LAW 001  
+* [ADR 0093](../adr/0093-product-law-002.md) · **PRODUCT LAW 002**  
+* [ADR 0094](../adr/0094-team-law-001.md) · **TEAM LAW 001**  
 * [ADR 0085](../adr/0085-delivery-engine-v1-alignment.md) · Delivery → Engine v1.0  
 * [ADR 0086](../adr/0086-delivery-workspace-demo.md) · Delivery Demo  
 * [ADR 0087](../adr/0087-billing-capability.md) · Billing Architecture  
 * [ADR 0088](../adr/0088-billing-facade.md) · Billing Facade  
 * [ADR 0089](../adr/0089-billing-engineering-certification.md) · Billing Certification  
 * [ADR 0090](../adr/0090-operational-engine-v1-declaration.md) · **Engine v1.0 Declaration**  
+* [ADR 0091](../adr/0091-era-declaration.md) · **Era 1 CLOSED · Era 2 OPEN**  
+* [ADR 0092](../adr/0092-tenant-success-law-001.md) · **TENANT SUCCESS LAW 001**  
 * [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) · Construction COMPLETE  
+* [ERA_DECLARATION](./ERA_DECLARATION.md) · ADR [0091](../adr/0091-era-declaration.md) · **Era 1 CLOSED · Era 2 OPEN**  
+* [ERA2_PRODUCT_DISCOVERY_001](./ERA2_PRODUCT_DISCOVERY_001.md) · First Discovery  
+* [SPRINT_001_TENANT_SUCCESS](./SPRINT_001_TENANT_SUCCESS.md) · Active sprint  
+* [ERA2_CURSOR_PROMPT](./ERA2_CURSOR_PROMPT.md) · Mandatory prompt header  
 * [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md) · **How we prove we returned time**  
 * [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md)  
 * [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md)  

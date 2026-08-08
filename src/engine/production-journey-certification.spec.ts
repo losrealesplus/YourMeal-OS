@@ -1,0 +1,83 @@
+/**
+ * PRODUCTION JOURNEY CERTIFICATION 001 · docs only (no implementation).
+ */
+
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { describe, expect, it } from "vitest";
+
+const ROOT = process.cwd();
+
+describe("PRODUCTION JOURNEY CERTIFICATION 001", () => {
+  it("records CERTIFIED · freezes Production · Kitchen eligible · Estimated ≠ Measured", () => {
+    const cert = readFileSync(
+      resolve(
+        ROOT,
+        "docs/tenant-success/PRODUCTION_JOURNEY_CERTIFICATION.md",
+      ),
+      "utf8",
+    );
+    const journeys = readFileSync(
+      resolve(ROOT, "docs/00-status/JOURNEY_CERTIFICATION.md"),
+      "utf8",
+    );
+    const lifecycle = readFileSync(
+      resolve(ROOT, "docs/00-status/EXPERIENCE_LIFECYCLE.md"),
+      "utf8",
+    );
+    const cards = readFileSync(
+      resolve(ROOT, "docs/00-status/EXPERIENCE_CARDS.md"),
+      "utf8",
+    );
+    const missions = readFileSync(
+      resolve(ROOT, "docs/00-status/EXPERIENCE_MISSIONS.md"),
+      "utf8",
+    );
+
+    expect(cert).toContain("CERTIFIED");
+    expect(cert).not.toContain("NOT CERTIFIED");
+    expect(cert).toContain("FAIL count:** **0**");
+    expect(cert).toContain("Required before certification: **NONE**");
+    expect(cert).toContain("Estimated OTS");
+    expect(cert).toContain("Measured Time Saved");
+    expect(cert).toContain("40–155 min/week");
+    expect(cert).toContain("No application code");
+    expect(cert).toContain("Kitchen Experience 001 is now **eligible**");
+    expect(cert).toContain("Production does not execute Kitchen work");
+
+    expect(journeys).toContain("Production Journey");
+    expect(journeys).toContain("✅ **Certified**");
+    expect(journeys).toContain("PRODUCTION_JOURNEY_CERTIFICATION");
+    expect(journeys).toContain(
+      "Kitchen Journey       ✅ Certified · Frozen",
+    );
+    expect(journeys).toMatch(
+      /Delivery Journey\s+(✅ Certified · Frozen|⏳ (NEXT \(eligible\)|DE001 Today's Delivery Day ▶|DE002 Delivery Search ▶|DE003 Delivery Adaptation ▶|DE004 Delivery Responsibility ▶|DE005 Route Preparation ▶|DE006 Delivery Completion ▶|Review ✅ READY WITH IMPROVEMENTS))/,
+    );
+
+    expect(lifecycle).toContain("Production Journey ✅ CERTIFIED");
+    expect(lifecycle).toContain("Production Frozen");
+    expect(lifecycle).toContain("Kitchen Journey ✅ CERTIFIED");
+    expect(lifecycle).toContain("Kitchen Frozen");
+
+    expect(cards).toContain("Journey Certified · Frozen");
+    expect(cards).toContain("CERTIFIED");
+    expect(cards).toContain(
+      "Kitchen Experience             ✅ Journey Certified · Frozen",
+    );
+    expect(cards).toMatch(
+      /Delivery Experience\s+(← NEXT \(eligible\)|▶ 001 Today's Delivery Day|▶ 002 Delivery Search|▶ 003 Delivery Adaptation|▶ 004 Delivery Responsibility|▶ 005 Route Preparation|▶ 006 Delivery Completion|▶ Review · READY WITH IMPROVEMENTS|✅ Journey Certified · Frozen)/,
+    );
+    expect(cards).toContain("READY WITH IMPROVEMENTS");
+
+    expect(missions).toContain("Production: ✅ Certified · Frozen");
+    expect(missions).toContain("PRODUCTION-JOURNEY-CERTIFICATION");
+    expect(missions).toContain("Journey Certified");
+    expect(missions).toContain(
+      "Kitchen Experience      ✅ Journey Certified · Frozen",
+    );
+    expect(missions).toMatch(
+      /Delivery Experience\s+(⏳ NEXT \(eligible\)|▶ 001 Today's Delivery Day|▶ 002 Delivery Search|▶ 003 Delivery Adaptation|▶ 004 Delivery Responsibility|▶ 005 Route Preparation|▶ 006 Delivery Completion|✅ Review READY WITH IMPROVEMENTS|✅ Journey Certified · Frozen)/,
+    );
+  });
+});

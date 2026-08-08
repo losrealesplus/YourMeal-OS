@@ -2,6 +2,15 @@
 
 <!-- What changed and why (1–3 sentences). -->
 
+## Cursor PR Review Gate
+
+> [PR_REVIEW_PROTOCOL](../docs/00-status/PR_REVIEW_PROTOCOL.md) · ADR [0097](../docs/adr/0097-pr-review-protocol.md)  
+> GitHub Actions is the **second** validation. Cursor review is the **first**.
+
+- [ ] PR Review Report attached / commented ([template](../docs/00-status/PR_REVIEW_REPORT_TEMPLATE.md))
+- [ ] Verdict: READY FOR MERGE · READY WITH WARNINGS · BLOCKED
+- [ ] Not recommending merge while BLOCKED
+
 ## Operational Impact (PRODUCT LAW 001)
 
 > [PRODUCT_DIRECTION](../docs/00-status/PRODUCT_DIRECTION.md) · ADR [0084](../docs/adr/0084-product-law-001.md)  
@@ -20,6 +29,22 @@
 
 - [ ] Saves tenant operational time (or N/A: docs / infra / Foundation / non-Product-Core justified)
 - [ ] Does **not** invent Product Core without time-savings rationale
+
+## Operational Time Saved (Experience PRs — required)
+
+> [EXPERIENCE_MANIFESTO](../docs/00-status/EXPERIENCE_MANIFESTO.md) · ADR [0099](../docs/adr/0099-experience-manifesto-001.md)  
+> “This screen is better” is not enough — state seconds returned.
+
+| Field | Value |
+|-------|-------|
+| Current workflow | ≈ __ seconds |
+| New workflow | ≈ __ seconds |
+| Estimated saving | ≈ __ seconds |
+| Measurement method | How validated in Observation Sprint |
+| Mission / TTA KPI | e.g. TTC &lt; 30s |
+
+- [ ] N/A — not an Experience PR (docs / infra / Foundation justified)
+- [ ] Experience PR — Operational Time Saved filled
 
 ## PR category (exactly one)
 

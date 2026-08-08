@@ -503,6 +503,60 @@ export function createCustomerDirectoryRepository(
       if (error) throw error;
     },
 
+    /**
+     * Staff alta mínima (EXPERIENCE LAW 001) — name required;
+     * phone / address optional (Progressive Completion).
+     */
+    async insertIndividualWithContact(input: {
+      displayName: string;
+      phone?: string | null;
+      street?: string | null;
+      city?: string | null;
+    }): Promise<string> {
+      const name = input.displayName.trim();
+      if (!name) {
+        throw new Error("displayName is required");
+      }
+      const { data, error } = await db
+        .from("customers")
+        .insert({
+          tenant_id: tenantId,
+          display_name: name,
+          kind: "individual",
+          user_id: null,
+        })
+        .select("id")
+        .single();
+      if (error) throw error;
+      const customerId = String(data.id);
+
+      const phone = input.phone?.trim();
+      if (phone) {
+        const { error: phoneErr } = await db.from("customer_phones").insert({
+          tenant_id: tenantId,
+          customer_id: customerId,
+          phone,
+          is_primary: true,
+        });
+        if (phoneErr) throw phoneErr;
+      }
+
+      const street = input.street?.trim();
+      if (street) {
+        const { error: addrErr } = await db.from("customer_addresses").insert({
+          tenant_id: tenantId,
+          customer_id: customerId,
+          street,
+          city: input.city?.trim() || null,
+          is_default: true,
+          label: "Principal",
+        });
+        if (addrErr) throw addrErr;
+      }
+
+      return customerId;
+    },
+
     async commercialMetrics(): Promise<CommercialDashboardMetrics> {
       const [customers, companies, memberships, orders] = await Promise.all([
         loadCustomers(),

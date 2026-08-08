@@ -232,6 +232,39 @@ export const CustomerDirectoryService = {
     });
   },
 
+  /**
+   * Zero Friction staff create — minimum fields to keep working
+   * (EXPERIENCE LAW 001 · Progressive Completion).
+   */
+  async createIndividualStaff(
+    ctx: ServiceContext,
+    input: {
+      displayName: string;
+      phone?: string | null;
+      street?: string | null;
+      city?: string | null;
+    },
+  ): Promise<string> {
+    assertTenant(ctx);
+    assertCanWriteCustomers(ctx);
+    if (!input.displayName.trim()) {
+      throw new DomainError("INVALID_STATE", "Nombre es obligatorio");
+    }
+    const repo = createCustomerDirectoryRepository(ctx.supabase, ctx.tenantId);
+    const id = await repo.insertIndividualWithContact({
+      displayName: input.displayName,
+      phone: input.phone,
+      street: input.street,
+      city: input.city,
+    });
+    await AuditService.write(ctx, {
+      entityType: "customer",
+      entityId: id,
+      action: "create",
+    });
+    return id;
+  },
+
   async commercialDashboard(
     ctx: ServiceContext,
   ): Promise<CommercialDashboardMetrics> {

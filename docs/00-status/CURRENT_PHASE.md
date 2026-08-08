@@ -1,8 +1,13 @@
 # CURRENT_PHASE
 
 **Última actualización:** 2026-08-07  
-**Institutional:** [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) · **Construction COMPLETE** · focus **Tenant Success**  
+**Acta de eras:** [ERA_DECLARATION](./ERA_DECLARATION.md) · ADR [0091](../adr/0091-era-declaration.md) · **Era 1 CLOSED · Era 2 OPEN**  
+**Active Experience:** ▶ **[CUSTOMER_EXPERIENCE_001](./CUSTOMER_EXPERIENCE_001.md)** · alta/gestión **&lt; 30s**  
+**Sprint board:** [SPRINT_001_TENANT_SUCCESS](./SPRINT_001_TENANT_SUCCESS.md)  
+**Observation instrument (sessions deferred · LAW 001-A):** [OBSERVATION_FRAMEWORK](../tenant-success/OBSERVATION_FRAMEWORK.md) · ADR [0096](../adr/0096-tenant-success-law-001a.md)  
+**Institutional:** [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) · **Construction COMPLETE**  
 **Playbook:** [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md)  
+**Prompt:** [ERA2_CURSOR_PROMPT](./ERA2_CURSOR_PROMPT.md)  
 **No sustituye** [MILESTONES](./MILESTONES.md) — tablero de “dónde estamos ahora”.
 
 ```text
@@ -10,15 +15,31 @@
 YOURMEAL OS · CURRENT GATE
 ═══════════════════════════════════════════════
 
-Operational Engine v1.0     ✅ DECLARED (OPERATIONAL-ENGINE-001)
-Construction                ✅ COMPLETE
-Architecture                ✅ FROZEN
-Primary Product Focus       Tenant Success (PRODUCT LAW 001)
+ERA 1 · Build the Engine    ✅ COMPLETE
+Operational Engine v1.0     ✅ DECLARED · Architecture FROZEN
 
-Next measurements
-  · Tiempo ahorrado
-  · Field / Cross-platform
-  · Beta usability
+ERA 2 · Return Time         ▶ OPEN
+Sprint type                 Experience Sprint
+Active                      CUSTOMER EXPERIENCE 001 · Phase 1
+Mission                     Zero Friction Customer Management
+TTA                         Time-to-Create Customer < 30 seconds
+Card                        EXPERIENCE_CARDS.md
+
+EXPERIENCE LAW 001          Minimum first interaction (ADR 0098)
+Progressive Completion      Rest later
+
+Observation Framework       ✅ READY (instrument)
+Isabella / Sara sessions    ⏸ After usable Experience chain (LAW 001-A)
+
+Laws
+  · PRODUCT LAW 001 · 002
+  · EXPERIENCE LAW 001 (ADR 0098)
+  · TENANT SUCCESS LAW 001 · 001-A
+  · TEAM LAW 001
+
+Roadmap (missions)
+  Customer → Order → Menu → Production → Kitchen → Delivery
+  → Android → OPPO → Dogfood → Isabella → Backlog
 ```
 
 ---

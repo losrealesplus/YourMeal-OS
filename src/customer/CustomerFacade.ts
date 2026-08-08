@@ -111,6 +111,29 @@ export class CustomerFacade {
 
     try {
       if (command.partyKind === "individual") {
+        if (command.mode === "staff_create") {
+          const id = await this.deps.directory.createIndividualStaff(
+            resolved.ctx,
+            {
+              displayName: command.displayName,
+              phone: command.phone,
+              street: command.street,
+              city: command.city,
+            },
+          );
+          const partyRef: PartyRef = { kind: "individual", id };
+          const got = await this.getCustomer(identity, {
+            type: "GetCustomer",
+            partyRef,
+          });
+          return {
+            ok: got.ok,
+            partyRef,
+            context: got.context,
+            errors: got.errors,
+          };
+        }
+
         const displayName =
           command.displayName ??
           identity.currentUser?.fullName ??

@@ -36,7 +36,7 @@ Source: [FOUNDATION_LOCK](../05-architecture/FOUNDATION_LOCK.md)
 
 **Constitution note:** LAW 001–007 form a complete system. Do not add Foundation Laws unless real tenant evidence proves the current set insufficient.
 
-**Era:** Operational Engine **v1.0** DECLARED — Construction COMPLETE · focus **Tenant Success**. See [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md).
+**Era:** [ERA_DECLARATION](./ERA_DECLARATION.md) · ADR 0091 · **Era 1 CLOSED · Era 2 OPEN**. Operational Engine **v1.0** DECLARED — Construction COMPLETE · focus **Tenant Success**. See [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md).
 
 
 ---

@@ -127,6 +127,18 @@ export function AdminShell({ children }: { children: ReactNode }) {
       visible: can("customers.read") || showAllOps,
     },
     {
+      to: "/admin/order-capture",
+      labelKey: "ops.nav.orderCapture",
+      icon: ClipboardList,
+      visible: can("orders.read") || showAllOps,
+    },
+    {
+      to: "/admin/menu-planning",
+      labelKey: "ops.nav.menuPlanning",
+      icon: CalendarDays,
+      visible: can("menus.read") || showAllOps,
+    },
+    {
       to: "/admin/order-workspace",
       labelKey: "ops.nav.orderWorkspace",
       icon: ClipboardList,
@@ -286,7 +298,11 @@ export function AdminShell({ children }: { children: ReactNode }) {
             ? "Reparto"
             : item.labelKey === "ops.nav.customerWorkspace"
               ? "Customer Workspace"
-              : item.labelKey === "ops.nav.orderWorkspace"
+              : item.labelKey === "ops.nav.orderCapture"
+                ? "Order Experience"
+              : item.labelKey === "ops.nav.menuPlanning"
+                ? "Menu Experience"
+                : item.labelKey === "ops.nav.orderWorkspace"
                 ? "Order Workspace"
                 : item.labelKey === "ops.nav.productionWorkspace"
                   ? "Production Workspace"
