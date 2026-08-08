@@ -49,7 +49,7 @@ describe("PRODUCTION JOURNEY CERTIFICATION 001", () => {
     expect(journeys).toContain("✅ **Certified**");
     expect(journeys).toContain("PRODUCTION_JOURNEY_CERTIFICATION");
     expect(journeys).toContain(
-      "Kitchen Journey       ⏳ KE003 Adaptation (KE001–002 ✅)",
+      "Kitchen Journey       ⏳ KE004 Labels (KE001–003 ✅)",
     );
 
     expect(lifecycle).toContain("Production Journey ✅ CERTIFIED");
