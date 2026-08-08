@@ -1,6 +1,7 @@
 # ORDER EXPERIENCE 003 · Zero Friction Order Edit
 
-**Status:** ▶ **IN PROGRESS**  
+**Status:** ✅ **COMPLETE** — next [OE004 Templates](./ORDER_EXPERIENCE_004.md)  
+
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/order-capture` (mode **edit**)  
@@ -88,8 +89,8 @@ If an order cannot be edited (e.g. cancelled) — explain why + Next Best Action
 ```text
 001 Capture                 ✅
 002 Search                  ✅
-003 Edit                    ▶ THIS
-004 Order Templates
+003 Edit                    ✅ THIS
+004 Order Templates         ▶ next
 005 Operational Incident
 ↓
 Review · Freeze

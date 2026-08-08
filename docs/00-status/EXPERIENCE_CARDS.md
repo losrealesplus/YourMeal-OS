@@ -124,32 +124,34 @@ Name
 Order Experience
 
 Phase
-003 Edit
+004 Templates
 
 Mission
-Zero Friction Order Edit
+Zero Friction Order Templates
 
 Primary User
 Tenant Operator
 
 Primary KPI
-Time-to-Edit Order <20 s
+Time-to-Create a Frequent Order <20 s
 
 Secondary KPIs
+Time-to-Reuse an Existing Pattern <10 s
 Time-to-Create Order <45 s
 Time-to-Find Order <10 s
-Time-to-Resume Operation <5 s
+Time-to-Edit Order <20 s
 
 Operational Time Saved
 Estimated
-Capture ≈ 45–135 s · Search ≈ 20–50 s · Edit ≈ 20–70 s
+Capture · Search · Edit · Templates ≈ 25–100 s per reuse
 Observation pending
 
 Status
 In Progress
 ```
 
-Detail: [ORDER_EXPERIENCE_003](./ORDER_EXPERIENCE_003.md) · [002 Search](./ORDER_EXPERIENCE_002.md) · [001 Capture · Zero Friction Order Capture](./ORDER_EXPERIENCE_001.md) · Surface `/admin/order-capture`  
+Detail: [ORDER_EXPERIENCE_004](./ORDER_EXPERIENCE_004.md) · [003 Edit · Zero Friction Order Edit](./ORDER_EXPERIENCE_003.md) · [002 Search](./ORDER_EXPERIENCE_002.md) · [001 Capture · Zero Friction Order Capture](./ORDER_EXPERIENCE_001.md) · Surface `/admin/order-capture`  
+
 Lifecycle: [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)
 
 **Sequence (adapted — not a Customer clone):**
@@ -157,8 +159,8 @@ Lifecycle: [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)
 ```text
 001 Capture                 ✅
 002 Search                  ✅
-003 Edit                    ▶ In Progress
-004 Order Templates
+003 Edit                    ✅
+004 Order Templates         ▶ In Progress
 005 Operational Incident
 ↓
 Experience Review
@@ -172,7 +174,8 @@ Menu Experience
 |-------|----------|--------|
 | 001 | ¿Puedo crear un pedido mientras hablo en &lt;45s? | ✅ |
 | 002 | ¿Puedo encontrar cualquier compromiso en &lt;10s? | ✅ |
-| 003 | ¿Puedo corregir un pedido frecuente en &lt;20s? | ▶ |
+| 003 | ¿Puedo corregir un pedido frecuente en &lt;20s? | ✅ |
+| 004 | ¿Puedo reutilizar un patrón frecuente en &lt;20s? | ▶ |
 
 ---
 

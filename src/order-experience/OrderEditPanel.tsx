@@ -38,6 +38,7 @@ type Props = {
   canWrite: boolean;
   onClose: () => void;
   onSaved: (hit: OrderSearchHit) => void;
+  onSaveAsTemplate?: (hit: OrderSearchHit) => void;
 };
 
 function blockedReason(hit: OrderSearchHit): string | null {
@@ -50,7 +51,13 @@ function blockedReason(hit: OrderSearchHit): string | null {
   return null;
 }
 
-export function OrderEditPanel({ hit, canWrite, onClose, onSaved }: Props) {
+export function OrderEditPanel({
+  hit,
+  canWrite,
+  onClose,
+  onSaved,
+  onSaveAsTemplate,
+}: Props) {
   const blocked = blockedReason(hit);
   const resumeRef = useRef<HTMLButtonElement>(null);
   const [editing, setEditing] = useState<Section>(null);
@@ -417,6 +424,15 @@ export function OrderEditPanel({ hit, canWrite, onClose, onSaved }: Props) {
           >
             Volver a búsqueda
           </button>
+          {onSaveAsTemplate ? (
+            <button
+              type="button"
+              onClick={() => onSaveAsTemplate(hit)}
+              className="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-4 text-sm"
+            >
+              Guardar como plantilla
+            </button>
+          ) : null}
           <Link
             to="/admin/customer-workspace"
             className="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-4 text-sm"
