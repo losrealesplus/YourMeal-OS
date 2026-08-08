@@ -31,7 +31,6 @@ import {
   type DeliveryDayFilter,
   type DeliveryDayWarning,
   type DeliveryReadiness,
-  type TodaysDeliveryDay,
 } from "@/delivery-experience/today-delivery";
 import { utcDateOnly } from "@/menu-experience/week-plan";
 import { useOrder } from "@/order/useOrder";
@@ -207,27 +206,26 @@ export function DeliveryTodayPanel({
     };
   }, [dayDate, delivery, order]);
 
-  const view: TodaysDeliveryDay & { cards: AdaptedDeliveryDayCard[] } =
-    useMemo(
-      () =>
-        buildAdaptedTodaysDeliveryDay({
-          dayDate,
-          context,
-          completedContext,
-          summariesById,
-          detailsById,
-          loadError,
-          assignmentSupported: false,
-        }),
-      [
+  const view = useMemo(
+    () =>
+      buildAdaptedTodaysDeliveryDay({
         dayDate,
         context,
         completedContext,
         summariesById,
         detailsById,
         loadError,
-      ],
-    );
+        assignmentSupported: false,
+      }),
+    [
+      dayDate,
+      context,
+      completedContext,
+      summariesById,
+      detailsById,
+      loadError,
+    ],
+  );
 
   const filtered = useMemo(
     () => filterDeliveryCards(view.cards, filter),
