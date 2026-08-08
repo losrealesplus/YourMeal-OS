@@ -70,11 +70,10 @@ describe("KITCHEN EXPERIENCE 001 · Zero Friction Kitchen Execution", () => {
     expect(cards).toContain("001 Today's Work");
     expect(cards).toContain("Zero Friction Kitchen Execution");
     expect(cards).toContain("Time-to-Understand-Kitchen-Work <10 s");
-    expect(cards).toContain("In Progress");
 
     expect(missions).toContain("KITCHEN-EXPERIENCE-001");
     expect(missions).toContain("KITCHEN-EXPERIENCE-002");
-    expect(missions).toContain("TTUKW <10s");
+    expect(missions).toContain("KITCHEN-EXPERIENCE-003");
     expect(missions).toContain("KE001 Today's Work ✅");
 
     expect(ui).toContain("KITCHEN EXPERIENCE 001");

@@ -360,23 +360,26 @@ Name
 Kitchen Experience
 
 Phase
-002 Execution Search
+003 Execution Adaptation
 
 Mission
-Zero Friction Kitchen Execution Search
+Zero Friction Kitchen Execution Adaptation
 
 Primary User
 Kitchen Operator
 
 Primary KPI
-Time-to-Find-Execution-Work <10 s
+Time-to-Adapt-Execution <30 s
 
 Secondary KPIs
+Time-to-Resume-Execution <5 s
+Time-to-Find-Execution-Work <10 s
 Time-to-Understand-Kitchen-Work <10 s
 Time-to-Start-Execution <2 min
 
 Operational Time Saved
 Estimated
+Adapt execution ≈ 90–420 s
 Find execution work ≈ 20–80 s
 Understand kitchen work ≈ 50–170 s
 Observation pending
@@ -385,14 +388,14 @@ Status
 In Progress
 ```
 
-Detail: [KITCHEN_EXPERIENCE_002](./KITCHEN_EXPERIENCE_002.md) · [001 Today's Work · Zero Friction Kitchen Execution](./KITCHEN_EXPERIENCE_001.md) · Surface `/admin/kitchen-today` · Input: Production Handoff  
+Detail: [KITCHEN_EXPERIENCE_003](./KITCHEN_EXPERIENCE_003.md) · [002 Execution Search · Zero Friction Kitchen Execution Search](./KITCHEN_EXPERIENCE_002.md) · [001 Today's Work · Zero Friction Kitchen Execution](./KITCHEN_EXPERIENCE_001.md) · Surface `/admin/kitchen-today` · Input: Production Handoff  
 
 **Sequence (daily execution — not Production planning):**
 
 ```text
 001 Today's Work               ✅
-002 Execution Search           ▶ In Progress
-003 Execution Adaptation
+002 Execution Search           ✅
+003 Execution Adaptation       ▶ In Progress
 004 Labels & Special Info
 005 Execution Progress
 006 Completion / Handoff
@@ -403,13 +406,13 @@ Review → Journey Certification → Freeze
 | Phase | Question | Status |
 |-------|----------|--------|
 | 001 | ¿Sé qué ejecutar ahora en &lt;10s? | ✅ |
-| 002 | ¿Encuentro cualquier trabajo de ejecución en &lt;10s? | ▶ |
-| 003 | ¿Adapto la ejecución del día sin replanificar Production? | Planned |
+| 002 | ¿Encuentro cualquier trabajo de ejecución en &lt;10s? | ✅ |
+| 003 | ¿Adapto la ejecución del día sin replanificar Production? | ▶ |
 | 004 | ¿Veo etiquetas e info especial a tiempo? | Planned |
 | 005 | ¿Sigo el progreso sin Capability inventada? | Planned |
 | 006 | ¿Cierro y entrego el día con claridad? | Planned |
 
-Kitchen executes transferred work — does not re-plan Production. Search never becomes Order/Menu/Production planning.
+Kitchen executes transferred work — does not re-plan Production. Search never becomes Order/Menu/Production planning. Adaptation is local execution only (session honesty · no durable ExecutionUnit simulation).
 
 ---
 

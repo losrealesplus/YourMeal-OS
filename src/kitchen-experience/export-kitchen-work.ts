@@ -25,7 +25,8 @@ export function kitchenWorkToCsv(view: TodaysKitchenWork): string {
   const header = [
     "day",
     "dish",
-    "quantity",
+    "production_quantity",
+    "execution_quantity",
     "batch",
     "deadline",
     "priority",
@@ -38,12 +39,16 @@ export function kitchenWorkToCsv(view: TodaysKitchenWork): string {
     "customer",
     "order_ref",
     "special_instruction",
+    "execution_adapted",
   ];
   const rows = view.cards.map((c) =>
     [
       c.productionDay,
       c.dishLabel,
       String(c.quantity) + (c.quantityEstimated ? "*" : ""),
+      String(
+        c.executionQuantity != null ? c.executionQuantity : c.quantity,
+      ),
       c.batchKey,
       c.cookingDeadline,
       c.priority,
@@ -56,6 +61,7 @@ export function kitchenWorkToCsv(view: TodaysKitchenWork): string {
       c.customerLabel ?? "",
       c.orderRef ?? "",
       c.specialInstruction ?? "",
+      c.executionAdapted ? "session" : "",
     ]
       .map(csvEscape)
       .join(","),
@@ -80,7 +86,7 @@ export function kitchenWorkPrintHtml(view: TodaysKitchenWork): string {
       (c: KitchenExecutionCard) =>
         `<tr>
           <td>${escapeHtml(c.dishLabel)}</td>
-          <td>${c.quantity}${c.quantityEstimated ? "*" : ""}</td>
+          <td>${c.executionQuantity != null ? c.executionQuantity : c.quantity}${c.quantityEstimated ? "*" : ""}${c.executionQuantity != null && c.executionQuantity !== c.quantity ? ` (Prod ${c.quantity})` : ""}</td>
           <td>${escapeHtml(c.batchKey)}</td>
           <td>${escapeHtml(c.cookingDeadline)}</td>
           <td>${escapeHtml(kitchenWorkStatusLabel(c.status))}</td>

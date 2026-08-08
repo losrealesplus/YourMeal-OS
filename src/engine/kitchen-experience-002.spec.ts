@@ -69,11 +69,10 @@ describe("KITCHEN EXPERIENCE 002 · Zero Friction Kitchen Execution Search", () 
     expect(cards).toContain("002 Execution Search");
     expect(cards).toContain("Zero Friction Kitchen Execution Search");
     expect(cards).toContain("Time-to-Find-Execution-Work <10 s");
-    expect(cards).toContain("In Progress");
 
     expect(missions).toContain("KITCHEN-EXPERIENCE-002");
-    expect(missions).toContain("TTFEW <10s");
-    expect(missions).toContain("KE002 Search ▶");
+    expect(missions).toContain("KE002 Search ✅");
+    expect(doc).toContain("COMPLETE");
 
     expect(ui).toContain("KITCHEN EXPERIENCE 002");
     expect(ui).toContain("KitchenSearchPanel");
