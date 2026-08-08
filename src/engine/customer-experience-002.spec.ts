@@ -55,7 +55,8 @@ describe("CUSTOMER EXPERIENCE 002 · Zero Friction Search", () => {
     expect(doc).toContain("Operational Time Saved");
     expect(doc).toContain("10–35 s");
     expect(doc).toContain("No Facade changes");
-    expect(doc).toContain("Universal Command Bar");
+    expect(doc).toContain("ACCELERATOR-001");
+    expect(doc).toContain("Operational Command Center");
     expect(doc).toContain("Recientes");
 
     expect(cards).toContain("Phase");
@@ -67,7 +68,8 @@ describe("CUSTOMER EXPERIENCE 002 · Zero Friction Search", () => {
     expect(missions).toContain("002 Search");
     expect(missions).toContain("encontrar < 10s");
 
-    expect(backlog).toContain("Universal Command Bar");
+    expect(backlog).toContain("Operational Command Center");
+    expect(backlog).toContain("ACCELERATOR-001");
 
     expect(ui).toContain("CUSTOMER EXPERIENCE 002");
     expect(ui).toContain("Zero Friction Customer Search");

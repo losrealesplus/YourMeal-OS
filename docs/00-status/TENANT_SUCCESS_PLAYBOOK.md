@@ -251,7 +251,7 @@ Mandatory prompt preamble: [ERA2_CURSOR_PROMPT](./ERA2_CURSOR_PROMPT.md).
 | Track | Role |
 |-------|------|
 | **Operational Core** | Experiences that make the business work (Sprint 001) |
-| **Operational Accelerators** | Capture · Import Pipeline · Templates · Timeline · Preparation Inventory · … |
+| **Operational Accelerators** | Capture · Import · **OCC (Reserved)** · Templates · Timeline · … · [OPERATIONAL_ACCELERATORS](./OPERATIONAL_ACCELERATORS.md) |
 
 Accelerators do not change the domain. They accelerate work. Recorded in [ERA2_PRODUCT_DISCOVERY_001](./ERA2_PRODUCT_DISCOVERY_001.md).
 

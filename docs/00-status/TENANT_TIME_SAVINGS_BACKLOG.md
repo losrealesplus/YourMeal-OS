@@ -20,7 +20,7 @@ Every row must answer: **Does it save tenant time? How much? Which Beta?**
 | Track | Meaning |
 |-------|---------|
 | **Operational Core** | Experiences that make the business work (Sprint 001 epics) |
-| **Operational Accelerators** | Return time without changing domain — registered, not all open |
+| **Operational Accelerators** | Return time without changing domain — see [OPERATIONAL_ACCELERATORS](./OPERATIONAL_ACCELERATORS.md) |
 
 ---
 
@@ -65,7 +65,8 @@ Every row must answer: **Does it save tenant time? How much? Which Beta?**
 | Nutrition Engine | Medium | High | Registered · GM | System calculates macros |
 | Route optimization | High | High | Registered · later | After Delivery Experience |
 | AI Assistant | High | High | GM | Only if laws proven |
-| **Universal Command Bar (⌘K)** | Very High | High | Registered · post-CX | Platform accelerator · not a Capability · open / order / call / history from one keystroke |
+| **Universal Command Bar (⌘K)** | ~~superseded~~ | — | — | → **ACCELERATOR-001 Operational Command Center** |
+| **Operational Command Center (OCC)** | Very High | High | 🔒 **Reserved** · ACCELERATOR-001 | Platform entry point · **not** Customer search · [reservation](./ACCELERATOR_001_OPERATIONAL_COMMAND_CENTER.md) · no code until Experiences mature |
 
 ---
 
