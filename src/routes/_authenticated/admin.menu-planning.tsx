@@ -1,9 +1,10 @@
 /**
- * MENU EXPERIENCE 001 · MENU EXPERIENCE 002 · MENU EXPERIENCE 003 · MENU EXPERIENCE 004
- * Planning · Search · Adaptation · Dish Library
+ * MENU EXPERIENCE 001 · MENU EXPERIENCE 002 · MENU EXPERIENCE 003 · MENU EXPERIENCE 004 · MENU EXPERIENCE 005
+ * Planning · Search · Adaptation · Dish Library · Publish & Preview
  *
  * Temporal hierarchy: Week → Day → Menu → Dishes.
  * Dish Library = operational memory consumed by planning (not dish CRUD).
+ * Publish closes the weekly cycle — ready for Orders and Production.
  * Experience working set in session; OP-001 WeeklyMenuService for seed/publish when durable.
  * No Menu / Dish Capability / Facade / Engine changes.
  */
@@ -40,10 +41,11 @@ import {
   mondayIso,
   nextWeekStart,
   prevWeekStart,
+  saveWeekPlan,
   type WeekPlan,
 } from "@/menu-experience/week-plan";
 
-type ExperienceMode = "search" | "planning" | "adapt";
+type ExperienceMode = "search" | "planning" | "adapt" | "publish";
 
 export const Route = createFileRoute("/_authenticated/admin/menu-planning")({
   beforeLoad: ({ context }) => {
@@ -54,7 +56,8 @@ export const Route = createFileRoute("/_authenticated/admin/menu-planning")({
     mode:
       search.mode === "planning" ||
       search.mode === "search" ||
-      search.mode === "adapt"
+      search.mode === "adapt" ||
+      search.mode === "publish"
         ? (search.mode as ExperienceMode)
         : ("search" as const),
     weekStart:
@@ -64,12 +67,12 @@ export const Route = createFileRoute("/_authenticated/admin/menu-planning")({
     meta: [
       {
         title:
-          "YourMeal OS — Menu Experience · Adaptation · Search · Planning",
+          "YourMeal OS — Menu Experience · Publish · Adaptation · Planning",
       },
       {
         name: "description",
         content:
-          "MENU EXPERIENCE 004 Dish Library · 003 Adaptation · 002 Search · 001 Planning",
+          "MENU EXPERIENCE 005 Publish & Preview · 004 Dish Library · 003 Adaptation · 002 Search · 001 Planning",
       },
     ],
   }),
@@ -104,15 +107,22 @@ function MenuPlanningExperiencePage() {
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
 
-  const [mode, setMode] = useState<ExperienceMode>(
-    searchParams.mode === "planning" || searchParams.mode === "adapt"
-      ? searchParams.mode
-      : "search",
-  );
+  const [mode, setMode] = useState<ExperienceMode>(() => {
+    if (
+      searchParams.mode === "planning" ||
+      searchParams.mode === "adapt" ||
+      searchParams.mode === "publish"
+    ) {
+      return searchParams.mode;
+    }
+    return "search";
+  });
   const [focusWeekStart, setFocusWeekStart] = useState<string | null>(
     searchParams.weekStart ?? mondayIso(),
   );
-  const [startInPreview, setStartInPreview] = useState(false);
+  const [startInPreview, setStartInPreview] = useState(
+    () => searchParams.mode === "publish",
+  );
   const [focusNonce, setFocusNonce] = useState(0);
   const [durableMenus, setDurableMenus] = useState<DurableMenuSeed[]>([]);
   const [dishPicks, setDishPicks] = useState<DishPick[]>([]);
@@ -197,7 +207,22 @@ function MenuPlanningExperiencePage() {
     setFocusWeekStart(weekStart);
     setStartInPreview(preview);
     setFocusNonce((n) => n + 1);
-    goMode("planning", weekStart);
+    goMode(preview ? "publish" : "planning", weekStart);
+  }
+
+  function openPublish(weekStart: string) {
+    if (!getWeekPlan(weekStart)) {
+      const seed = durableMenus.find((m) => m.weekStart === weekStart);
+      if (seed) {
+        saveWeekPlan({ ...seedToPlan(seed), status: "draft" });
+      } else {
+        createEmptyWeek(weekStart);
+      }
+    }
+    setFocusWeekStart(weekStart);
+    setStartInPreview(true);
+    setFocusNonce((n) => n + 1);
+    goMode("publish", weekStart);
   }
 
   function openAdapt(weekStart: string) {
@@ -312,38 +337,46 @@ function MenuPlanningExperiencePage() {
     <div className="animate-fade-in mx-auto max-w-3xl pb-24">
       <SectionTitle
         overline={
-          mode === "adapt"
-            ? "MENU EXPERIENCE 004 · Dish Library · 003 Weekly Adaptation"
-            : mode === "search"
-              ? "MENU EXPERIENCE 002 · Phase 002 Search"
-              : "MENU EXPERIENCE 004 · Dish Library · 001 Weekly Planning"
+          mode === "publish"
+            ? "MENU EXPERIENCE 005 · Publish & Preview"
+            : mode === "adapt"
+              ? "MENU EXPERIENCE 004 · Dish Library · 003 Weekly Adaptation"
+              : mode === "search"
+                ? "MENU EXPERIENCE 002 · Phase 002 Search"
+                : "MENU EXPERIENCE 005 · Publish · 001 Weekly Planning"
         }
         title={
-          mode === "adapt"
-            ? "Zero Friction Weekly Adaptation"
-            : mode === "search"
-              ? "Zero Friction Menu Search"
-              : "Zero Friction Weekly Menu Planning"
+          mode === "publish"
+            ? "Zero Friction Publish & Preview"
+            : mode === "adapt"
+              ? "Zero Friction Weekly Adaptation"
+              : mode === "search"
+                ? "Zero Friction Menu Search"
+                : "Zero Friction Weekly Menu Planning"
         }
         subtitle={
-          mode === "adapt"
-            ? "Reutiliza la Dish Library · adapta sin reconstruir"
-            : mode === "search"
-              ? "Encuentra cualquier elemento de la planificación en segundos"
-              : "Duplica · inserta desde la biblioteca · publica · sigue"
+          mode === "publish"
+            ? "Revisa la semana · valida · publica con confianza"
+            : mode === "adapt"
+              ? "Reutiliza la Dish Library · adapta sin reconstruir"
+              : mode === "search"
+                ? "Encuentra cualquier elemento de la planificación en segundos"
+                : "Duplica · inserta desde la biblioteca · revisa · publica"
         }
       />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        {mode === "adapt" ? (
+        {mode === "publish" ? (
+          <StatusChip tone="warning" label="TTRP < 5 min" />
+        ) : mode === "adapt" ? (
           <StatusChip tone="warning" label="TTFID < 15 s" />
         ) : mode === "search" ? (
           <StatusChip tone="warning" label="TTFM < 10 s" />
         ) : (
-          <StatusChip tone="warning" label="TTFID < 15 s" />
+          <StatusChip tone="warning" label="TTWM < 10 min" />
         )}
         <StatusChip tone="info" label="Semana → Día → Menú → Platos" />
-        <StatusChip tone="info" label="Dish Library · reuse" />
+        <StatusChip tone="info" label="Listo para Orders · Production" />
         <button
           type="button"
           className="text-xs underline-offset-2 hover:underline"
@@ -354,7 +387,10 @@ function MenuPlanningExperiencePage() {
         <button
           type="button"
           className="text-xs underline-offset-2 hover:underline"
-          onClick={() => goMode("planning", week)}
+          onClick={() => {
+            setStartInPreview(false);
+            goMode("planning", week);
+          }}
         >
           Planificación
         </button>
@@ -364,6 +400,13 @@ function MenuPlanningExperiencePage() {
           onClick={() => goMode("adapt", week)}
         >
           Adaptación
+        </button>
+        <button
+          type="button"
+          className="text-xs underline-offset-2 hover:underline"
+          onClick={() => openPublish(week)}
+        >
+          Publicar
         </button>
         <Link
           to="/admin/menus"
@@ -386,14 +429,16 @@ function MenuPlanningExperiencePage() {
 
       <AdminHeader
         goal={
-          mode === "adapt"
-            ? "Encontrar e insertar/reemplazar un plato desde la biblioteca en <15s"
-            : mode === "search"
-              ? "Encontrar cualquier elemento de planificación en <10s"
-              : "Preparar la semana reutilizando la Dish Library · TTFID <15s"
+          mode === "publish"
+            ? "Revisar y publicar la semana operativa en <5 min"
+            : mode === "adapt"
+              ? "Encontrar e insertar/reemplazar un plato desde la biblioteca en <15s"
+              : mode === "search"
+                ? "Encontrar cualquier elemento de planificación en <10s"
+                : "Preparar la semana · revisar · publicar · TTRP <5 min"
         }
         capability="menus.read / menus.write · dishes.read"
-        object="Dish Library integration · weekly adaptation · session honesty"
+        object="Publish & Preview · Dish Library · weekly cycle · session honesty"
       />
 
       {loading ? (
@@ -405,7 +450,7 @@ function MenuPlanningExperiencePage() {
           onOpenWeek={(weekStart) => openWeek(weekStart, false)}
           onAdaptWeek={openAdapt}
           onDuplicateWeek={duplicateWeek}
-          onPreviewWeek={(weekStart) => openWeek(weekStart, true)}
+          onPreviewWeek={(weekStart) => openPublish(weekStart)}
           onCreateWeek={createWeek}
         />
       ) : mode === "adapt" ? (
@@ -416,19 +461,19 @@ function MenuPlanningExperiencePage() {
           durableMenus={durableMenus}
           dishPicks={dishPicks}
           libraryItems={libraryItems}
-          onPreview={() => openWeek(week, true)}
+          onPreview={() => openPublish(week)}
           onPublish={publishAdaptation}
           onBackToSearch={() => goMode("search")}
         />
       ) : (
         <MenuPlanningPanel
-          key={`${week}-${focusNonce}`}
+          key={`${week}-${focusNonce}-${mode}`}
           canWrite={canWrite}
           durableMenus={durableMenus}
           dishPicks={dishPicks}
           libraryItems={libraryItems}
           focusWeekStart={focusWeekStart}
-          startInPreview={startInPreview}
+          startInPreview={mode === "publish" || startInPreview}
           onPublishDurable={publishDurable}
         />
       )}

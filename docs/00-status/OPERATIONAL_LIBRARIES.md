@@ -29,7 +29,7 @@ With it:
 | Library | Role | Status |
 |---------|------|--------|
 | **Customer Library** | Who we serve — reusable party knowledge | Lived via Customer Experience |
-| **Dish Library** | Culinary memory — reusable dishes for weekly plans | ▶ ME004 integration |
+| **Dish Library** | Culinary memory — reusable dishes for weekly plans | ✅ ME004 · consumed in ME005 publish |
 | **Recipe Library** | Future — preparation knowledge | Future |
 | **Address Library** | Future — delivery points | Future |
 | **Route Library** | Future — logistics patterns | Future |

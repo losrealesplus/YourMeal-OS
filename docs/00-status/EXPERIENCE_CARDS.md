@@ -199,18 +199,19 @@ Name
 Menu Experience
 
 Phase
-004 Dish Library
+005 Publish & Preview
 
 Mission
-Zero Friction Dish Library Integration
+Zero Friction Publish & Preview
 
 Primary User
 Tenant Operator
 
 Primary KPI
-Time-to-Find-and-Insert Dish <15 s
+Time-to-Review-and-Publish-Weekly-Menu <5 min
 
 Secondary KPIs
+Time-to-Find-and-Insert Dish <15 s
 Time-to-Replace Dish <20 s
 Time-to-Adapt Weekly Menu <5 min
 Time-to-Find Menu Item <10 s
@@ -218,6 +219,7 @@ Time-to-Prepare Weekly Menu <10 min
 
 Operational Time Saved
 Estimated
+Review→publish ≈ 10–35 min per weekly cycle
 Dish insert/replace ≈ 30–105 s
 Adaptation ≈ 10–35 min per cycle
 Observation pending
@@ -226,7 +228,7 @@ Status
 In Progress
 ```
 
-Detail: [MENU_EXPERIENCE_004](./MENU_EXPERIENCE_004.md) · [003 Weekly Adaptation · Zero Friction Weekly Adaptation](./MENU_EXPERIENCE_003.md) · [002 Search · Zero Friction Menu Search](./MENU_EXPERIENCE_002.md) · [001 Weekly Planning · Zero Friction Weekly Menu Planning](./MENU_EXPERIENCE_001.md) · Surface `/admin/menu-planning` · [OPERATIONAL_LIBRARIES](./OPERATIONAL_LIBRARIES.md)  
+Detail: [MENU_EXPERIENCE_005](./MENU_EXPERIENCE_005.md) · [004 Dish Library · Zero Friction Dish Library Integration](./MENU_EXPERIENCE_004.md) · [003 Weekly Adaptation · Zero Friction Weekly Adaptation](./MENU_EXPERIENCE_003.md) · [002 Search · Zero Friction Menu Search](./MENU_EXPERIENCE_002.md) · [001 Weekly Planning · Zero Friction Weekly Menu Planning](./MENU_EXPERIENCE_001.md) · Surface `/admin/menu-planning` · [OPERATIONAL_LIBRARIES](./OPERATIONAL_LIBRARIES.md)  
 
 Lifecycle: [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md) · [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)
 
@@ -242,8 +244,8 @@ Semana → Día → Menú → Platos
 001 Weekly Planning         ✅
 002 Menu Search             ✅
 003 Weekly Adaptation       ✅
-004 Dish Library Integration ▶ In Progress
-005 Publish & Preview
+004 Dish Library Integration ✅
+005 Publish & Preview       ▶ In Progress
 ↓
 Experience Review
 ↓
@@ -257,8 +259,8 @@ Freeze
 | 001 | ¿Puedo preparar la semana sin empezar desde cero en &lt;10 min? | ✅ |
 | 002 | ¿Puedo encontrar cualquier elemento de planificación en &lt;10s? | ✅ |
 | 003 | ¿Puedo adaptar la planificación en &lt;5 min sin reconstruirla? | ✅ |
-| 004 | ¿Encuentro e inserto un plato de la biblioteca en &lt;15s? | ▶ |
-| 005 | ¿Puedo previsualizar y publicar con confianza? | Planned |
+| 004 | ¿Encuentro e inserto un plato de la biblioteca en &lt;15s? | ✅ |
+| 005 | ¿Puedo revisar y publicar la semana en &lt;5 min con confianza? | ▶ |
 
 ---
 

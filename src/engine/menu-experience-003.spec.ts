@@ -63,7 +63,7 @@ describe("MENU EXPERIENCE 003 · Zero Friction Weekly Adaptation", () => {
     expect(cards).toContain("In Progress");
 
     expect(missions).toContain("MENU-EXPERIENCE-003");
-    expect(missions).toContain("MENU-EXPERIENCE-004");
+    expect(missions).toContain("MENU-EXPERIENCE-005");
     expect(missions).toContain("TTAW <5 min");
     expect(missions).toContain("ME003 Weekly Adaptation ✅");
 
