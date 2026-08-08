@@ -1,6 +1,7 @@
 # Tenant Success Playbook
 
 **Status:** ▶ **ACTIVE** — constitution of Era 2 · Return Time  
+**Era acta:** [ERA_DECLARATION](./ERA_DECLARATION.md) · ADR [0091](../adr/0091-era-declaration.md) · Era 1 CLOSED · Era 2 OPEN  
 **Declared:** 2026-08-07 · after [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) · OPERATIONAL-ENGINE-001  
 **Product law:** [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md) · **PRODUCT LAW 001** · ADR [0084](../adr/0084-product-law-001.md)  
 **Companion backlog:** [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md)  
@@ -425,6 +426,7 @@ Avoid prompts that only say “add a module” without time returned.
 | FOUNDATION_LOCK | How do we design Capabilities? |
 | PRODUCT_DIRECTION | Why do we build Product Core? |
 | OPERATIONAL_ENGINE_V1 | What motor is frozen? (Era 1 complete) |
+| **ERA_DECLARATION** | **Acta institucional · Era 1 CLOSED · Era 2 OPEN** |
 | **TENANT_SUCCESS_PLAYBOOK** | **How do we return time? (Era 2)** |
 | TENANT_TIME_SAVINGS_BACKLOG | Which jobs return how many minutes? |
 
