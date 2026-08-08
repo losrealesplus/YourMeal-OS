@@ -69,8 +69,9 @@ describe("PRODUCTION EXPERIENCE 004 · Zero Friction Production Pre-Preparations
     expect(cards).toContain("In Progress");
 
     expect(missions).toContain("PRODUCTION-EXPERIENCE-004");
+    expect(missions).toContain("PRODUCTION-EXPERIENCE-005");
     expect(missions).toContain("TIRP <15s");
-    expect(missions).toContain("PE004 Pre-Preparations ▶");
+    expect(missions).toContain("PE004 Pre-Preparations ✅");
 
     expect(ui).toContain("PRODUCTION EXPERIENCE 004");
     expect(ui).toContain("ProductionPrepsPanel");

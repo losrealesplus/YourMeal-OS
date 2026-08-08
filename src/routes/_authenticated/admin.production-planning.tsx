@@ -1,6 +1,6 @@
 /**
- * PRODUCTION EXPERIENCE 001 · 002 · 003 · 004
- * Planning · Search · Adaptation · Pre-Preparations
+ * PRODUCTION EXPERIENCE 001 · 002 · 003 · 004 · 005
+ * Planning · Search · Adaptation · Pre-Preparations · Alerts & Deadlines
  *
  * Grammar: Semana → Día → Trabajo → Cantidad → Deadline → Kitchen
  * Source: published operational week (Menu Experience).
@@ -13,11 +13,23 @@ import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { AdminHeader, SectionTitle, StatusChip } from "@/components/admin";
 import { useCan } from "@/hooks/use-can";
 import { ProductionAdaptationPanel } from "@/production-experience/ProductionAdaptationPanel";
+import { ProductionAlertsPanel } from "@/production-experience/ProductionAlertsPanel";
 import { ProductionPlanningPanel } from "@/production-experience/ProductionPlanningPanel";
 import { ProductionPrepsPanel } from "@/production-experience/ProductionPrepsPanel";
 import { ProductionSearchPanel } from "@/production-experience/ProductionSearchPanel";
+import type { RiskNextAction } from "@/production-experience/alerts-view";
 
-type ExperienceMode = "search" | "planning" | "adapt" | "preps";
+type ExperienceMode = "search" | "planning" | "adapt" | "preps" | "alerts";
+
+function isExperienceMode(value: unknown): value is ExperienceMode {
+  return (
+    value === "planning" ||
+    value === "search" ||
+    value === "adapt" ||
+    value === "preps" ||
+    value === "alerts"
+  );
+}
 
 export const Route = createFileRoute(
   "/_authenticated/admin/production-planning",
@@ -27,13 +39,9 @@ export const Route = createFileRoute(
   },
   component: ProductionPlanningExperiencePage,
   validateSearch: (search: Record<string, unknown>) => ({
-    mode:
-      search.mode === "planning" ||
-      search.mode === "search" ||
-      search.mode === "adapt" ||
-      search.mode === "preps"
-        ? (search.mode as ExperienceMode)
-        : ("search" as const),
+    mode: isExperienceMode(search.mode)
+      ? search.mode
+      : ("search" as const),
     weekStart:
       typeof search.weekStart === "string" ? search.weekStart : undefined,
   }),
@@ -41,12 +49,12 @@ export const Route = createFileRoute(
     meta: [
       {
         title:
-          "YourMeal OS — Production Experience · Preps · Adaptation · Search",
+          "YourMeal OS — Production Experience · Alerts · Preps · Adaptation",
       },
       {
         name: "description",
         content:
-          "PRODUCTION EXPERIENCE 004 Pre-Preparations · 003 Adaptation · 002 Search · 001 Planning · TIRP <15s",
+          "PRODUCTION EXPERIENCE 005 Alerts & Deadlines · 004 Preps · 003 Adaptation · 002 Search · 001 Planning · TTPR <10s",
       },
     ],
   }),
@@ -58,17 +66,9 @@ function ProductionPlanningExperiencePage() {
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
 
-  const [mode, setMode] = useState<ExperienceMode>(() => {
-    if (
-      searchParams.mode === "planning" ||
-      searchParams.mode === "adapt" ||
-      searchParams.mode === "search" ||
-      searchParams.mode === "preps"
-    ) {
-      return searchParams.mode;
-    }
-    return "search";
-  });
+  const [mode, setMode] = useState<ExperienceMode>(() =>
+    isExperienceMode(searchParams.mode) ? searchParams.mode : "search",
+  );
   const [focusWeekStart, setFocusWeekStart] = useState<string | null>(
     searchParams.weekStart ?? null,
   );
@@ -80,45 +80,59 @@ function ProductionPlanningExperiencePage() {
       to: "/admin/production-planning",
       search: {
         mode: next,
-        weekStart: weekStart ?? focusWeekStart ?? undefined,
+        weekStart: weekStart || focusWeekStart || undefined,
       },
     });
+  }
+
+  function onAlertNavigate(action: RiskNextAction, weekStart: string) {
+    if (action === "adapt") goMode("adapt", weekStart || undefined);
+    else if (action === "preps") goMode("preps", weekStart || undefined);
+    else goMode("planning", weekStart || undefined);
   }
 
   return (
     <div className="animate-fade-in mx-auto max-w-3xl pb-24">
       <SectionTitle
         overline={
-          mode === "preps"
-            ? "PRODUCTION EXPERIENCE 004 · Pre-Preparations"
-            : mode === "adapt"
-              ? "PRODUCTION EXPERIENCE 003 · Production Adaptation"
-              : mode === "search"
-                ? "PRODUCTION EXPERIENCE 002 · Production Search"
-                : "PRODUCTION EXPERIENCE 001 · Production Planning"
+          mode === "alerts"
+            ? "PRODUCTION EXPERIENCE 005 · Alerts & Deadlines"
+            : mode === "preps"
+              ? "PRODUCTION EXPERIENCE 004 · Pre-Preparations"
+              : mode === "adapt"
+                ? "PRODUCTION EXPERIENCE 003 · Production Adaptation"
+                : mode === "search"
+                  ? "PRODUCTION EXPERIENCE 002 · Production Search"
+                  : "PRODUCTION EXPERIENCE 001 · Production Planning"
         }
         title={
-          mode === "preps"
-            ? "Zero Friction Production Pre-Preparations"
-            : mode === "adapt"
-              ? "Zero Friction Production Adaptation"
-              : mode === "search"
-                ? "Zero Friction Production Search"
-                : "Zero Friction Production Planning"
+          mode === "alerts"
+            ? "Zero Friction Production Alerts & Deadlines"
+            : mode === "preps"
+              ? "Zero Friction Production Pre-Preparations"
+              : mode === "adapt"
+                ? "Zero Friction Production Adaptation"
+                : mode === "search"
+                  ? "Zero Friction Production Search"
+                  : "Zero Friction Production Planning"
         }
         subtitle={
-          mode === "preps"
-            ? "Qué debe prepararse antes del día de cocina — sin sorpresas"
-            : mode === "adapt"
-              ? "Ajusta el plan vivo sin regenerarlo desde cero"
-              : mode === "search"
-                ? "Encuentra día · carga · lote · alerta · prep en segundos"
-                : "Semana publicada → trabajo ejecutable → Kitchen"
+          mode === "alerts"
+            ? "Riesgos y deadlines visibles antes de Kitchen"
+            : mode === "preps"
+              ? "Qué debe prepararse antes del día de cocina — sin sorpresas"
+              : mode === "adapt"
+                ? "Ajusta el plan vivo sin regenerarlo desde cero"
+                : mode === "search"
+                  ? "Encuentra día · carga · lote · alerta · prep en segundos"
+                  : "Semana publicada → trabajo ejecutable → Kitchen"
         }
       />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        {mode === "preps" ? (
+        {mode === "alerts" ? (
+          <StatusChip tone="warning" label="TTPR < 10 s" />
+        ) : mode === "preps" ? (
           <StatusChip tone="warning" label="TIRP < 15 s" />
         ) : mode === "adapt" ? (
           <StatusChip tone="warning" label="TAPP < 5 min" />
@@ -160,6 +174,13 @@ function ProductionPlanningExperiencePage() {
         >
           Preps
         </button>
+        <button
+          type="button"
+          className="text-xs underline-offset-2 hover:underline"
+          onClick={() => goMode("alerts", focusWeekStart ?? undefined)}
+        >
+          Alertas
+        </button>
         <Link
           to="/admin/menu-planning"
           search={{ mode: "publish", weekStart: undefined }}
@@ -177,16 +198,18 @@ function ProductionPlanningExperiencePage() {
 
       <AdminHeader
         goal={
-          mode === "preps"
-            ? "Identificar pre-preparaciones requeridas en <15s"
-            : mode === "adapt"
-              ? "Adaptar el plan de producción en <5 min sin regenerarlo"
-              : mode === "search"
-                ? "Localizar el bloque de producción correcto en <10s"
-                : "Transformar una semana publicada en plan de producción en <10 min"
+          mode === "alerts"
+            ? "Detectar riesgos de producción en <10s"
+            : mode === "preps"
+              ? "Identificar pre-preparaciones requeridas en <15s"
+              : mode === "adapt"
+                ? "Adaptar el plan de producción en <5 min sin regenerarlo"
+                : mode === "search"
+                  ? "Localizar el bloque de producción correcto en <10s"
+                  : "Transformar una semana publicada en plan de producción en <10 min"
         }
         capability="production.operate · menus (published source)"
-        object="Production preps · adaptation · search · planning · session honesty"
+        object="Production alerts · preps · adaptation · search · planning · session honesty"
       />
 
       {mode === "search" ? (
@@ -210,6 +233,13 @@ function ProductionPlanningExperiencePage() {
           weekStart={focusWeekStart}
           onOpenRelatedWork={(weekStart) => goMode("adapt", weekStart)}
           onBackToPlanning={() => goMode("planning")}
+        />
+      ) : mode === "alerts" ? (
+        <ProductionAlertsPanel
+          key={`alerts-${focusWeekStart ?? "x"}`}
+          canWrite={canWrite}
+          weekStart={focusWeekStart}
+          onNavigate={onAlertNavigate}
         />
       ) : (
         <ProductionPlanningPanel
