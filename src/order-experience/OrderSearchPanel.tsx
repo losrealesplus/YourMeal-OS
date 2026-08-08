@@ -25,6 +25,10 @@ import {
   statusTone,
   type RankableOrderHit,
 } from "@/order-experience/order-search-rank";
+import {
+  facadeEditKey,
+  getOrderEdit,
+} from "@/order-experience/operational-order-edits";
 import { cn } from "@/lib/utils";
 
 export type OrderSearchHit = RankableOrderHit & {
@@ -34,9 +38,10 @@ export type OrderSearchHit = RankableOrderHit & {
 
 type Props = {
   onCreateOrder: () => void;
+  onEditOrder: (hit: OrderSearchHit) => void;
 };
 
-export function OrderSearchPanel({ onCreateOrder }: Props) {
+export function OrderSearchPanel({ onCreateOrder, onEditOrder }: Props) {
   const order = useOrder();
   const customer = useCustomer();
   const [query, setQuery] = useState("");
@@ -99,16 +104,20 @@ export function OrderSearchPanel({ onCreateOrder }: Props) {
             /* ignore */
           }
 
+          const overlay = getOrderEdit(facadeEditKey(s.id));
           return {
             id: s.id,
             customerName: s.partyRef.displayName,
             organizationLabel,
             phone,
-            area,
-            deliveryDay: s.deliveryDayPrimary,
+            area: overlay?.addressNote || area,
+            deliveryDay: overlay?.deliveryDay ?? s.deliveryDayPrimary,
             status: s.status,
-            itemCount: s.itemCount,
-            hasInstructions,
+            itemCount: overlay?.items
+              ? overlay.items.reduce((n, i) => n + i.qty, 0)
+              : s.itemCount,
+            hasInstructions:
+              hasInstructions || Boolean(overlay?.instructions?.trim()),
             source: "facade" as const,
             createdAt: null,
             facadeSummary: s,
@@ -341,12 +350,13 @@ export function OrderSearchPanel({ onCreateOrder }: Props) {
                       Abrir pedido
                     </Link>
                   )}
-                  <Link
-                    to="/admin/order-workspace"
+                  <button
+                    type="button"
+                    onClick={() => onEditOrder(hit)}
                     className="inline-flex min-h-10 items-center rounded-md border border-border px-3 text-xs font-semibold"
                   >
                     Editar
-                  </Link>
+                  </button>
                   <Link
                     to="/admin/customer-workspace"
                     className="inline-flex min-h-10 items-center rounded-md border border-border px-3 text-xs font-semibold"

@@ -108,6 +108,26 @@ export function listOperationalCommitments(
   return all.filter((c) => c.customerId === customerId);
 }
 
+/** OE003 — update a session commitment in place (Experience honesty). */
+export function updateOperationalCommitment(
+  id: string,
+  patch: Partial<
+    Pick<
+      OperationalCommitment,
+      "deliveryDay" | "instructions" | "items" | "weekStart"
+    >
+  >,
+): OperationalCommitment | null {
+  const rows = readAll();
+  const idx = rows.findIndex((r) => r.id === id);
+  if (idx < 0) return null;
+  const updated: OperationalCommitment = { ...rows[idx]!, ...patch };
+  const next = [...rows];
+  next[idx] = updated;
+  writeAll(next);
+  return updated;
+}
+
 export function clearOperationalCommitmentsForTests() {
   memory = [];
   if (typeof sessionStorage !== "undefined") {

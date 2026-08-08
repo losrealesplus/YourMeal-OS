@@ -1,6 +1,7 @@
 # ORDER EXPERIENCE 002 · Zero Friction Order Search
 
-**Status:** ▶ **IN PROGRESS**  
+**Status:** ✅ **COMPLETE** — next [OE003 Edit](./ORDER_EXPERIENCE_003.md)  
+
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/order-capture` (Order Experience · Search entry)  
@@ -86,8 +87,8 @@ Area / phone enrichment via `useCustomer` when available — never invent fields
 
 ```text
 001 Capture                 ✅
-002 Search                  ▶ THIS
-003 Edit
+002 Search                  ✅ THIS
+003 Edit                    ▶ next
 004 Order Templates
 005 Operational Incident
 ↓

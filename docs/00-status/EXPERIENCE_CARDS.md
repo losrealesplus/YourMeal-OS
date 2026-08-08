@@ -124,39 +124,40 @@ Name
 Order Experience
 
 Phase
-002 Search
+003 Edit
 
 Mission
-Zero Friction Order Search
+Zero Friction Order Edit
 
 Primary User
 Tenant Operator
 
 Primary KPI
-Time-to-Find Order <10 s
+Time-to-Edit Order <20 s
 
 Secondary KPIs
 Time-to-Create Order <45 s
-Time-to-Edit Order <20 s (OE003)
+Time-to-Find Order <10 s
+Time-to-Resume Operation <5 s
 
 Operational Time Saved
 Estimated
-Capture ≈ 45–135 s · Search ≈ 20–50 s per find
+Capture ≈ 45–135 s · Search ≈ 20–50 s · Edit ≈ 20–70 s
 Observation pending
 
 Status
 In Progress
 ```
 
-Detail: [ORDER_EXPERIENCE_002](./ORDER_EXPERIENCE_002.md) · [001 Capture · Zero Friction Order Capture](./ORDER_EXPERIENCE_001.md) · Surface `/admin/order-capture`  
+Detail: [ORDER_EXPERIENCE_003](./ORDER_EXPERIENCE_003.md) · [002 Search](./ORDER_EXPERIENCE_002.md) · [001 Capture · Zero Friction Order Capture](./ORDER_EXPERIENCE_001.md) · Surface `/admin/order-capture`  
 Lifecycle: [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)
 
 **Sequence (adapted — not a Customer clone):**
 
 ```text
 001 Capture                 ✅
-002 Search                  ▶ In Progress
-003 Edit
+002 Search                  ✅
+003 Edit                    ▶ In Progress
 004 Order Templates
 005 Operational Incident
 ↓
@@ -170,7 +171,8 @@ Menu Experience
 | Phase | Question | Status |
 |-------|----------|--------|
 | 001 | ¿Puedo crear un pedido mientras hablo en &lt;45s? | ✅ |
-| 002 | ¿Puedo encontrar cualquier compromiso en &lt;10s? | ▶ |
+| 002 | ¿Puedo encontrar cualquier compromiso en &lt;10s? | ✅ |
+| 003 | ¿Puedo corregir un pedido frecuente en &lt;20s? | ▶ |
 
 ---
 
