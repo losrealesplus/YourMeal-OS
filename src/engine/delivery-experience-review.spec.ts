@@ -46,32 +46,42 @@ describe("DELIVERY EXPERIENCE REVIEW 001 · Readiness Review", () => {
     expect(review).toContain("ReportDeliveryException");
     expect(review).toContain("Billing outcome");
     expect(review).toContain("Route Preparation ≠ Route Optimization");
-    expect(review).toContain("Journey Certification       ← NEXT");
+    expect(review).toContain("Journey Certification");
+    expect(review).toContain("DELIVERY_JOURNEY_CERTIFICATION");
+    expect(review).toContain("CERTIFIED");
     expect(review).not.toContain("createInvoice");
 
     expect(journeys).toContain("READY WITH IMPROVEMENTS");
     expect(journeys).toContain("DELIVERY_EXPERIENCE_REVIEW");
-    expect(journeys).toMatch(
-      /Delivery Journey\s+⏳ Review ✅ READY WITH IMPROVEMENTS/,
+    expect(journeys).toContain("DELIVERY_JOURNEY_CERTIFICATION");
+    expect(journeys).toContain(
+      "Delivery Journey      ✅ Certified · Frozen",
     );
 
     expect(lifecycle).toContain("Delivery Review ✅");
     expect(lifecycle).toContain("READY WITH IMPROVEMENTS");
-    expect(lifecycle).toContain("Journey Certification | Pending ← NEXT");
+    expect(lifecycle).toContain("Delivery Journey ✅ CERTIFIED");
+    expect(lifecycle).toContain("Delivery Frozen");
 
     expect(cards).toContain("READY WITH IMPROVEMENTS");
     expect(cards).toContain("DELIVERY_EXPERIENCE_REVIEW");
-    expect(cards).toContain("Eligible for Journey Certification");
+    expect(cards).toContain("DELIVERY_JOURNEY_CERTIFICATION");
     expect(cards).toMatch(
-      /Delivery Experience\s+▶ Review · READY WITH IMPROVEMENTS/,
+      /Delivery Experience\s+✅ Journey Certified · Frozen/,
     );
     expect(cards).toContain(
       "¿El viaje completo está listo para certificar? | ✅ READY WITH IMPROVEMENTS",
+    );
+    expect(cards).toContain(
+      "¿El Journey Delivery está certificado? | ✅ CERTIFIED · Frozen",
     );
 
     expect(missions).toContain("DELIVERY-EXPERIENCE-REVIEW");
     expect(missions).toContain("READY WITH IMPROVEMENTS");
     expect(missions).toContain("DE006 Completion ✅");
-    expect(missions).toContain("Journey Certification ▶");
+    expect(missions).toContain("DELIVERY-JOURNEY-CERTIFICATION");
+    expect(missions).toContain(
+      "Journey Certification ✅ CERTIFIED → Freeze ✅",
+    );
   });
 });

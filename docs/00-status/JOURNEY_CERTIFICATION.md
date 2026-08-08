@@ -57,7 +57,7 @@ Verdicts that authorize certification: **READY** or **READY WITH IMPROVEMENTS**.
 | **Menu Journey** | ✅ **Certified** | [MENU_EXPERIENCE_005](./MENU_EXPERIENCE_005.md) | ME001–005 · published week handoff |
 | **Production Journey** | ✅ **Certified** | [PRODUCTION_JOURNEY_CERTIFICATION](../tenant-success/PRODUCTION_JOURNEY_CERTIFICATION.md) · [Review](../tenant-success/PRODUCTION_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · **Frozen** · PE001–006 |
 | **Kitchen Journey** | ✅ **Certified** | [KITCHEN_JOURNEY_CERTIFICATION](../tenant-success/KITCHEN_JOURNEY_CERTIFICATION.md) · [Review](../tenant-success/KITCHEN_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · **Frozen** · KE001–006 |
-| **Delivery Journey** | ⏳ Review ✅ READY WITH IMPROVEMENTS | [DELIVERY_EXPERIENCE_REVIEW](../tenant-success/DELIVERY_EXPERIENCE_REVIEW.md) · [006](./DELIVERY_EXPERIENCE_006.md) · [005](./DELIVERY_EXPERIENCE_005.md) · [004](./DELIVERY_EXPERIENCE_004.md) · [003](./DELIVERY_EXPERIENCE_003.md) · [002](./DELIVERY_EXPERIENCE_002.md) · [001](./DELIVERY_EXPERIENCE_001.md) | Certification NEXT · Required before Cert: None |
+| **Delivery Journey** | ✅ **Certified** | [DELIVERY_JOURNEY_CERTIFICATION](../tenant-success/DELIVERY_JOURNEY_CERTIFICATION.md) · [Review](../tenant-success/DELIVERY_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · **Frozen** · DE001–006 |
 | **Operational Journey** | ⏳ Pending | — | Cross-domain review after Delivery |
 
 ```text
@@ -66,13 +66,17 @@ Order Journey         ✅ Certified · Frozen
 Menu Journey          ✅ Certified
 Production Journey    ✅ Certified · Frozen
 Kitchen Journey       ✅ Certified · Frozen
-Delivery Journey      ⏳ Review ✅ READY WITH IMPROVEMENTS (DE001–006 ✅) · Certification ▶
+Delivery Journey      ✅ Certified · Frozen
 ↓
-Operational Journey Review
+Operational Journeys  ✅ COMPLETE
 ↓
 Observation Sprint
 ↓
+Organism Review
+↓
 Evidence
+↓
+Product Decision
 ↓
 Operational Accelerators
 ```
@@ -80,7 +84,8 @@ Operational Accelerators
 Menu Experience is structured by the **weekly operational cycle**, not CRUD.  
 Production Experience transforms the **published week** into work — not order admin.  
 Kitchen Experience executes transferred work — it does not re-plan Production.  
-Kitchen Journey is **Certified and Frozen** — Delivery Experience 001 is eligible.
+Delivery Experience transfers the prepared commitment — it does not own Billing.  
+Delivery Journey is **Certified and Frozen** — Operational Journeys complete · Observation next.
 
 ```text
 MENU
@@ -100,6 +105,7 @@ See [OPERATIONAL_LIBRARIES](./OPERATIONAL_LIBRARIES.md) · [PRODUCTION_JOURNEY_C
 Menu: 001 → 002 → 003 → 004 → 005 ✅ Certified
 Production: 001–006 ✅ → Review ✅ → Certification ✅ CERTIFIED · Frozen
 Kitchen: 001–006 ✅ → Review ✅ → Certification ✅ CERTIFIED · Frozen
+Delivery: 001–006 ✅ → Review ✅ → Certification ✅ CERTIFIED · Frozen
 ```
 
 ---

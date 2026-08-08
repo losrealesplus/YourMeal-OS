@@ -393,9 +393,9 @@ Delivery Experience
 ↓
 Review                      ✅ THIS DOCUMENT · READY WITH IMPROVEMENTS
 ↓
-Journey Certification       ← NEXT
+Journey Certification       ✅ [DELIVERY_JOURNEY_CERTIFICATION](./DELIVERY_JOURNEY_CERTIFICATION.md) · CERTIFIED
 ↓
-Freeze Delivery Experience
+Freeze Delivery Experience   ✅
 ↓
 Observe the full organism
 Customer → Order → Menu → Production → Kitchen → Delivery → Billing
