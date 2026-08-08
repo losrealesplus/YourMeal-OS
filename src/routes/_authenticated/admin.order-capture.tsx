@@ -1,12 +1,10 @@
 /**
- * ORDER EXPERIENCE · Capture (001) + Search (002) + Edit (003)
+ * ORDER EXPERIENCE · Capture · Search · Edit · Templates (001–004)
  *
  * Conversation speed — not CRUD.
  * useCustomer + useOrder only. No Capability / Facade / Engine changes.
  *
- * Staff intake with targetCustomerId is UNIMPLEMENTED (CAP-008) —
- * Experience-layer operational commitment keeps the call moving.
- * No UpdateOrder — OE003 uses session operational order edits.
+ * Staff intake UNIMPLEMENTED · no UpdateOrder · templates = session patterns.
  */
 
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -63,7 +61,14 @@ import {
   type OrderSearchHit,
 } from "@/order-experience/OrderSearchPanel";
 import { OrderEditPanel } from "@/order-experience/OrderEditPanel";
+import { OrderTemplatesPanel } from "@/order-experience/OrderTemplatesPanel";
+import {
+  saveOrderTemplate,
+  type OrderTemplate,
+} from "@/order-experience/order-templates";
 import { cn } from "@/lib/utils";
+
+type ExperienceMode = "search" | "capture" | "edit" | "templates";
 
 export const Route = createFileRoute("/_authenticated/admin/order-capture")({
   beforeLoad: ({ context }) => {
@@ -78,17 +83,21 @@ export const Route = createFileRoute("/_authenticated/admin/order-capture")({
         ? (search.kind as PartyKind)
         : undefined,
     mode:
-      search.mode === "capture" || search.mode === "edit"
-        ? (search.mode as "capture" | "edit")
+      search.mode === "capture" ||
+      search.mode === "edit" ||
+      search.mode === "templates"
+        ? (search.mode as ExperienceMode)
         : ("search" as const),
   }),
   head: () => ({
     meta: [
-      { title: "YourMeal OS — Order Experience · Search · Capture · Edit" },
+      {
+        title: "YourMeal OS — Order Experience · Templates · Search · Capture",
+      },
       {
         name: "description",
         content:
-          "ORDER EXPERIENCE 003 Edit · 002 Search · 001 Capture · Facades only",
+          "ORDER EXPERIENCE 004 Templates · 003 Edit · 002 Search · 001 Capture",
       },
     ],
   }),
@@ -113,11 +122,11 @@ function OrderCaptureExperiencePage() {
   const caps = identity.permissions.capabilities;
   const canWrite = caps.includes("orders.write");
 
-  const [mode, setMode] = useState<"search" | "capture" | "edit">(
+  const [mode, setMode] = useState<ExperienceMode>(
     searchParams.mode === "capture" || searchParams.customerId
       ? "capture"
-      : searchParams.mode === "edit"
-        ? "edit"
+      : searchParams.mode === "edit" || searchParams.mode === "templates"
+        ? searchParams.mode
         : "search",
   );
   const [editHit, setEditHit] = useState<OrderSearchHit | null>(null);
@@ -413,6 +422,54 @@ function OrderCaptureExperiencePage() {
     setMode("search");
   }
 
+  async function applyTemplate(t: OrderTemplate) {
+    setCreated(null);
+    setEditHit(null);
+    setLines(t.items.map((i) => ({ ...i })));
+    setInstructions(
+      [t.instructions, t.dietaryNotes].filter(Boolean).join(" · "),
+    );
+    if (t.preferredDeliveryDay) {
+      setDeliveryDay(t.preferredDeliveryDay);
+    }
+    setMode("capture");
+    await selectCustomer({
+      partyKind: t.customerKind,
+      id: t.customerId,
+      displayName: t.customerName,
+      status: "active",
+      demandChannelDefault: "individual",
+      tenantId: identity.tenant?.id ?? "",
+      tags: [],
+      userId: null,
+    });
+    // Re-apply after selectCustomer may prefill instructions from living profile
+    setLines(t.items.map((i) => ({ ...i })));
+    setInstructions(
+      [t.instructions, t.dietaryNotes].filter(Boolean).join(" · "),
+    );
+    if (t.preferredDeliveryDay) setDeliveryDay(t.preferredDeliveryDay);
+  }
+
+  function saveTemplateFromCommitment(c: OperationalCommitment) {
+    if (!canWrite) {
+      toast.error("Sin permiso de escritura");
+      return;
+    }
+    const name = `${c.customerName} · ${c.items.map((i) => i.label).slice(0, 2).join(" · ")}`;
+    saveOrderTemplate({
+      name,
+      customerId: c.customerId,
+      customerKind: c.customerKind,
+      customerName: c.customerName,
+      preferredDeliveryDay: c.deliveryDay,
+      items: c.items,
+      instructions: c.instructions,
+      source: "from_order",
+    });
+    toast.success("Plantilla guardada (sesión)");
+  }
+
   const address = selected?.profile?.addresses?.[0]?.line1 ?? null;
   const phone = selected?.profile?.phones?.[0]?.e164 ?? null;
   const growth = selected
@@ -429,30 +486,38 @@ function OrderCaptureExperiencePage() {
     <div className="animate-fade-in mx-auto max-w-3xl pb-24">
       <SectionTitle
         overline={
-          mode === "edit"
-            ? "ORDER EXPERIENCE 003 · Phase 003 Edit"
-            : mode === "search"
-              ? "ORDER EXPERIENCE 002 · Phase 002 Search"
-              : "ORDER EXPERIENCE 001 · Phase 001 Capture"
+          mode === "templates"
+            ? "ORDER EXPERIENCE 004 · Phase 004 Templates"
+            : mode === "edit"
+              ? "ORDER EXPERIENCE 003 · Phase 003 Edit"
+              : mode === "search"
+                ? "ORDER EXPERIENCE 002 · Phase 002 Search"
+                : "ORDER EXPERIENCE 001 · Phase 001 Capture"
         }
         title={
-          mode === "edit"
-            ? "Zero Friction Order Edit"
-            : mode === "search"
-              ? "Zero Friction Order Search"
-              : "Zero Friction Order Capture"
+          mode === "templates"
+            ? "Zero Friction Order Templates"
+            : mode === "edit"
+              ? "Zero Friction Order Edit"
+              : mode === "search"
+                ? "Zero Friction Order Search"
+                : "Zero Friction Order Capture"
         }
         subtitle={
-          mode === "edit"
-            ? "Corregir un compromiso en vivo — sin perder el hilo"
-            : mode === "search"
-              ? "Encuentra el compromiso en segundos — gente, días, situaciones"
-              : "Registrar el pedido mientras hablas — el software desaparece"
+          mode === "templates"
+            ? "Partir de un patrón conocido — nunca desde cero"
+            : mode === "edit"
+              ? "Corregir un compromiso en vivo — sin perder el hilo"
+              : mode === "search"
+                ? "Encuentra el compromiso en segundos — gente, días, situaciones"
+                : "Registrar el pedido mientras hablas — el software desaparece"
         }
       />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        {mode === "edit" ? (
+        {mode === "templates" ? (
+          <StatusChip tone="warning" label="Reuse < 10 s" />
+        ) : mode === "edit" ? (
           <StatusChip tone="warning" label="TTEO < 20 s" />
         ) : mode === "search" ? (
           <StatusChip tone="warning" label="TTFO < 10 s" />
@@ -460,23 +525,27 @@ function OrderCaptureExperiencePage() {
           <StatusChip tone="warning" label="TTO < 45 s" />
         )}
         <StatusChip tone="info" label="Conversation · not CRUD" />
-        {mode !== "edit" ? (
-          <button
-            type="button"
-            className="text-xs underline-offset-2 hover:underline"
-            onClick={() => setMode(mode === "search" ? "capture" : "search")}
-          >
-            {mode === "search" ? "Ir a captura" : "Ir a búsqueda"}
-          </button>
-        ) : (
-          <button
-            type="button"
-            className="text-xs underline-offset-2 hover:underline"
-            onClick={goToSearch}
-          >
-            Ir a búsqueda
-          </button>
-        )}
+        <button
+          type="button"
+          className="text-xs underline-offset-2 hover:underline"
+          onClick={goToSearch}
+        >
+          Búsqueda
+        </button>
+        <button
+          type="button"
+          className="text-xs underline-offset-2 hover:underline"
+          onClick={() => setMode("capture")}
+        >
+          Captura
+        </button>
+        <button
+          type="button"
+          className="text-xs underline-offset-2 hover:underline"
+          onClick={() => setMode("templates")}
+        >
+          Plantillas
+        </button>
         <Link
           to="/admin/customer-workspace"
           className="text-xs underline-offset-2 hover:underline"
@@ -487,15 +556,28 @@ function OrderCaptureExperiencePage() {
 
       <AdminHeader
         goal={
-          mode === "edit"
-            ? "Corregir un compromiso frecuente en <20s · resume <5s"
-            : mode === "search"
-              ? "Encontrar cualquier compromiso operativo en <10s"
-              : "Crear compromiso operativo en <45s durante la llamada"
+          mode === "templates"
+            ? "Crear pedido frecuente <20s · reutilizar patrón <10s"
+            : mode === "edit"
+              ? "Corregir un compromiso frecuente en <20s · resume <5s"
+              : mode === "search"
+                ? "Encontrar cualquier compromiso operativo en <10s"
+                : "Crear compromiso operativo en <45s durante la llamada"
         }
         capability="orders.read / orders.write · customers.read"
-        object="Operational commitment · inline edit · session honesty"
+        object="Order templates · operational patterns · session honesty"
       />
+
+      {mode === "templates" && !created ? (
+        <OrderTemplatesPanel
+          customerId={selected?.summary.id}
+          customerName={selected?.summary.displayName}
+          canWrite={canWrite}
+          onApply={(t) => void applyTemplate(t)}
+          onCreateOrder={() => setMode("capture")}
+          onBack={goToSearch}
+        />
+      ) : null}
 
       {mode === "edit" && editHit && !created ? (
         <OrderEditPanel
@@ -503,6 +585,44 @@ function OrderCaptureExperiencePage() {
           canWrite={canWrite}
           onClose={goToSearch}
           onSaved={(next) => setEditHit(next)}
+          onSaveAsTemplate={(hit) => {
+            if (!canWrite) {
+              toast.error("Sin permiso de escritura");
+              return;
+            }
+            const customerId =
+              hit.session?.customerId ?? hit.facadeSummary?.partyRef.id;
+            if (!customerId) {
+              toast.error("No se pudo asociar la plantilla a un cliente");
+              return;
+            }
+            const items =
+              hit.session?.items ??
+              (hit.itemCount
+                ? [
+                    {
+                      dishId: "exp:from-facade",
+                      label: `${hit.itemCount} ítem(s)`,
+                      qty: hit.itemCount,
+                    },
+                  ]
+                : []);
+            saveOrderTemplate({
+              name: `${hit.customerName} · patrón`,
+              customerId,
+              customerKind:
+                hit.session?.customerKind ??
+                hit.facadeSummary?.partyRef.kind ??
+                "individual",
+              customerName: hit.customerName,
+              preferredDeliveryDay: hit.deliveryDay,
+              items,
+              instructions: hit.session?.instructions ?? "",
+              addressNote: hit.area ?? undefined,
+              source: "from_order",
+            });
+            toast.success("Plantilla guardada (sesión)");
+          }}
         />
       ) : null}
 
@@ -525,6 +645,8 @@ function OrderCaptureExperiencePage() {
           nextActionRef={nextActionRef}
           onAnother={resetForAnother}
           onSearch={goToSearch}
+          onSaveTemplate={() => saveTemplateFromCommitment(created)}
+          onTemplates={() => setMode("templates")}
         />
       ) : mode === "capture" ? (
         <>
@@ -797,11 +919,15 @@ function CreatedPanel({
   nextActionRef,
   onAnother,
   onSearch,
+  onSaveTemplate,
+  onTemplates,
 }: {
   commitment: OperationalCommitment;
   nextActionRef: RefObject<HTMLButtonElement | null>;
   onAnother: () => void;
   onSearch: () => void;
+  onSaveTemplate: () => void;
+  onTemplates: () => void;
 }) {
   return (
     <section className="space-y-4" aria-labelledby="oe-created" aria-live="polite">
@@ -844,6 +970,20 @@ function CreatedPanel({
           </button>
           <button
             type="button"
+            onClick={onSaveTemplate}
+            className="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-4 text-sm"
+          >
+            Guardar como plantilla
+          </button>
+          <button
+            type="button"
+            onClick={onTemplates}
+            className="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-4 text-sm"
+          >
+            Ver plantillas
+          </button>
+          <button
+            type="button"
             onClick={onSearch}
             className="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-4 text-sm"
           >
@@ -854,12 +994,6 @@ function CreatedPanel({
             className="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-4 text-sm"
           >
             Abrir cliente
-          </Link>
-          <Link
-            to="/admin/order-workspace"
-            className="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-4 text-sm"
-          >
-            Editar pedido
           </Link>
         </div>
       </div>

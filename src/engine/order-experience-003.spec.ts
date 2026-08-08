@@ -59,7 +59,7 @@ describe("ORDER EXPERIENCE 003 · Zero Friction Order Edit", () => {
     expect(cards).toContain("Time-to-Edit Order <20 s");
     expect(cards).toContain("In Progress");
 
-    expect(missions).toContain("ORDER-EXPERIENCE-003");
+    expect(missions).toContain("ORDER-EXPERIENCE-004");
     expect(missions).toContain("TTEO <20s");
 
     expect(ui).toContain("ORDER EXPERIENCE 003");
