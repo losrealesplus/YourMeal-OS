@@ -1,6 +1,6 @@
 # DELIVERY EXPERIENCE 001 · Zero Friction Delivery Day
 
-**Status:** ▶ **IN PROGRESS**  
+**Status:** ✅ **COMPLETE** (superseded as active by DE002 · surface retained)  
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/delivery-today`  
@@ -110,8 +110,8 @@ Next: Review Kitchen · Review Orders · Review Production Handoff.
 ## Sequence (hypothesis — Observation may reshape)
 
 ```text
-001 Today's Delivery Day       ▶ THIS
-002 Delivery Search
+001 Today's Delivery Day       ✅ THIS (complete)
+002 Delivery Search            ▶ next
 003 Delivery Adaptation
 004 Driver / Responsibility
 005 Route Preparation          ← not Route Optimization

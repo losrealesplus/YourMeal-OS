@@ -181,7 +181,7 @@ Order Journey          ✅ Certified · Frozen
 Menu Journey           ✅ Certified
 Production Journey     ✅ CERTIFIED · Frozen   ← THIS
 Kitchen Journey        ✅ Certified · Frozen
-Delivery Journey       ⏳ DE001 Today's Delivery Day ▶
+Delivery Journey       ⏳ DE002 Delivery Search ▶ (DE001 ✅)
 Delivery Journey       ⏳
 ```
 

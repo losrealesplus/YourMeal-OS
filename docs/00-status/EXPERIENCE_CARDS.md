@@ -336,7 +336,7 @@ Journey Certification          ✅ CERTIFIED
 Freeze                         ✅
 ↓
 Kitchen Experience             ✅ Journey Certified · Frozen
-Delivery Experience            ▶ 001 Today's Delivery Day
+Delivery Experience            ▶ 002 Delivery Search
 ```
 
 | Phase | Question | Status |
@@ -414,7 +414,7 @@ Journey Certification          ✅ CERTIFIED
 ↓
 Freeze                         ✅
 ↓
-Delivery Experience            ▶ 001 Today's Delivery Day
+Delivery Experience            ▶ 002 Delivery Search
 ```
 
 | Phase | Question | Status |
@@ -441,10 +441,10 @@ Name
 Delivery Experience
 
 Phase
-001 Today's Delivery Day · In Progress
+002 Delivery Search · In Progress
 
 Mission
-Zero Friction Delivery Day
+Zero Friction Delivery Search (001 Day · 002 Search)
 
 Primary User
 Delivery Operator
@@ -453,34 +453,36 @@ Secondary User
 Driver
 
 Primary KPI
-Time-to-Understand-Delivery-Day <2 min
+Time-to-Find-Delivery <10 s
 
 Secondary KPIs
+Time-to-Understand-Delivery-Day <2 min
 Time-to-Identify-Next-Delivery <10 s
 
 Operational Time Saved
 Estimated
-Illustrative ≈ 3–18 min / delivery day
-(see DELIVERY_EXPERIENCE_001 — Estimated ≠ Measured)
+Illustrative find ≈ 20–80 s saved
+Day ≈ 3–18 min / delivery day
+(see DELIVERY_EXPERIENCE_002 / 001 — Estimated ≠ Measured)
 Observation pending
 
 Status
-In Progress · 001 Today's Delivery Day
+In Progress · 002 Delivery Search
 ```
 
-Detail: [001 Today's Delivery Day · Zero Friction Delivery Day](./DELIVERY_EXPERIENCE_001.md) · Surface `/admin/delivery-today` · Input: Kitchen completion honesty + Orders ready_for_delivery · **No routes · no maps · no ConfirmDelivery invent** · Kitchen Journey ✅ Certified · Frozen  
+Detail: [002 Delivery Search · Zero Friction Delivery Search](./DELIVERY_EXPERIENCE_002.md) · [001 Today's Delivery Day · Zero Friction Delivery Day](./DELIVERY_EXPERIENCE_001.md) · Surface `/admin/delivery-today` · Input: Kitchen completion honesty + Orders ready_for_delivery · **No routes · no maps · no ConfirmDelivery invent** · Kitchen Journey ✅ Certified · Frozen  
 
 **Mental model (controlled transfer — not route maps):**
 
 ```text
-Work ready → Today's Deliveries → Review · Assign (when supported) → Ready for Route (Future)
+Work ready → Today's Deliveries → Search → Review · Assign (when supported) → Ready for Route (Future)
 ```
 
 **Sequence (hypothesis — Observation may reshape):**
 
 ```text
-001 Today's Delivery Day       ▶
-002 Delivery Search
+001 Today's Delivery Day       ✅
+002 Delivery Search            ▶
 003 Delivery Adaptation
 004 Driver / Responsibility
 005 Route Preparation          ← not Route Optimization
@@ -495,14 +497,14 @@ Freeze
 
 | Phase | Question | Status |
 |-------|----------|--------|
-| 001 | ¿Entiendo la jornada de entregas de hoy en &lt;2 min? | ▶ |
-| 002 | ¿Encuentro cualquier entrega en &lt;10s? | Planned |
+| 001 | ¿Entiendo la jornada de entregas de hoy en &lt;2 min? | ✅ |
+| 002 | ¿Encuentro cualquier entrega en &lt;10s? | ▶ |
 | 003 | ¿Adapto la jornada sin romper el compromiso? | Planned |
 | 004 | ¿Asigno responsabilidad con substrate real? | Planned |
 | 005 | ¿Preparo la ruta con lo que Observation evidencie? | Planned |
 | 006 | ¿Cierro la entrega con resultado verificable? | Planned |
 
-Delivery receives completed work — does not create the Order commitment. Does not invent driver assignment, routes, maps, or ConfirmDelivery. Address / window / zone labeled absent when substrate missing.
+Delivery receives completed work — does not create the Order commitment. Search finds **deliveries**, not Customer/Order entities. Does not invent driver assignment, routes, maps, or ConfirmDelivery. Address / window / zone labeled absent when substrate missing.
 
 ---
 

@@ -1,6 +1,6 @@
 # Experience Missions (Era 2)
 
-**Status:** ▶ **ACTIVE** — **DELIVERY EXPERIENCE 001** Today's Delivery Day · Kitchen Journey **Certified · Frozen**
+**Status:** ▶ **ACTIVE** — **DELIVERY EXPERIENCE 002** Delivery Search · Kitchen Journey **Certified · Frozen**
 
 
 **Declared:** 2026-08-07  
@@ -30,7 +30,7 @@ A great Experience is invisible.
 | **Menu** | Zero Friction Planning · Search · Adaptation · Dish Library · Publish (001–005) | TTWM <10 min · TTFM <10s · TTAW <5 min · TTFID <15s · TTRP <5 min | ✅ **Certified** |
 | **Production** | Zero Friction Planning · Search · Adaptation · Preps · Alerts · Handoff (001–006) | TPP <10 min · TTFPW <10s · TAPP <5 min · TIRP <15s · TTPR <10s · TPKH <5 min | ✅ **Frozen** · Journey Certified |
 | **Kitchen** | Zero Friction Today's Work → Completion (001–006) | TTUKW <10s · TTFEW <10s · TTAE <30s · TILC <10s · TTEP <5s · TTUC <5s · Next <10s | ✅ **Frozen** · Journey Certified |
-| **Delivery** | Zero Friction Delivery Day (001…) | TTUDD &lt;2 min · Next delivery &lt;10s | ▶ **001 In Progress** |
+| **Delivery** | Zero Friction Delivery Day · Search (001–002…) | TTUDD &lt;2 min · TTFD &lt;10s | ▶ **002 In Progress** |
 
 ---
 
@@ -117,12 +117,13 @@ Temporal model: **Semana → Día → Menú → Platos**
 
 ## Active mission
 
-▶ **DELIVERY EXPERIENCE 001** · Zero Friction Delivery Day · [DELIVERY_EXPERIENCE_001](./DELIVERY_EXPERIENCE_001.md)  
-Surface `/admin/delivery-today` · Input: Orders `ready_for_delivery` via Delivery Facade · Kitchen Frozen  
+▶ **DELIVERY EXPERIENCE 002** · Zero Friction Delivery Search · [DELIVERY_EXPERIENCE_002](./DELIVERY_EXPERIENCE_002.md)  
+**DELIVERY EXPERIENCE 001** ✅ · [DELIVERY_EXPERIENCE_001](./DELIVERY_EXPERIENCE_001.md) · Surface `/admin/delivery-today`  
+Input: Orders `ready_for_delivery` via Delivery Facade · Kitchen Frozen  
 **KITCHEN JOURNEY** ✅ **CERTIFIED · FROZEN** · [KITCHEN_JOURNEY_CERTIFICATION](../tenant-success/KITCHEN_JOURNEY_CERTIFICATION.md)  
 
 ```text
-DE001 Today's Delivery Day ▶ → DE002 Search → DE003 Adaptation → DE004 Responsibility → DE005 Route Preparation → DE006 Completion → Review → Certification → Freeze
+DE001 Today's Delivery Day ✅ → DE002 Search ▶ → DE003 Adaptation → DE004 Responsibility → DE005 Route Preparation → DE006 Completion → Review → Certification → Freeze
 ```
 
 Kitchen remains frozen:
@@ -146,7 +147,7 @@ OTS: **Estimated ≠ Measured** — Observation Sprint pending (LAW 001-A).
 Kitchen: ✅ Certified · Frozen · [KITCHEN_JOURNEY_CERTIFICATION](../tenant-success/KITCHEN_JOURNEY_CERTIFICATION.md)  
 Production: ✅ Certified · Frozen · [PRODUCTION_JOURNEY_CERTIFICATION](../tenant-success/PRODUCTION_JOURNEY_CERTIFICATION.md)  
 Menu: ✅ Certified · Order: frozen · Customer: frozen  
-Historical ids: **DELIVERY-EXPERIENCE-001** · **KITCHEN-EXPERIENCE-001** · **KITCHEN-EXPERIENCE-002** · **KITCHEN-EXPERIENCE-003** · **KITCHEN-EXPERIENCE-004** · **KITCHEN-EXPERIENCE-005** · **KITCHEN-EXPERIENCE-006** · **KITCHEN-EXPERIENCE-REVIEW** · **KITCHEN-JOURNEY-CERTIFICATION** · **PRODUCTION-EXPERIENCE-001** · **PRODUCTION-EXPERIENCE-002** · **PRODUCTION-EXPERIENCE-003** · **PRODUCTION-EXPERIENCE-004** · **PRODUCTION-EXPERIENCE-005** · **PRODUCTION-EXPERIENCE-006** · **PRODUCTION-EXPERIENCE-REVIEW** · **PRODUCTION-JOURNEY-CERTIFICATION** · **MENU-EXPERIENCE-001** · **MENU-EXPERIENCE-002** · **MENU-EXPERIENCE-003** · **MENU-EXPERIENCE-004** · **MENU-EXPERIENCE-005**
+Historical ids: **DELIVERY-EXPERIENCE-002** · **DELIVERY-EXPERIENCE-001** · **KITCHEN-EXPERIENCE-001** · **KITCHEN-EXPERIENCE-002** · **KITCHEN-EXPERIENCE-003** · **KITCHEN-EXPERIENCE-004** · **KITCHEN-EXPERIENCE-005** · **KITCHEN-EXPERIENCE-006** · **KITCHEN-EXPERIENCE-REVIEW** · **KITCHEN-JOURNEY-CERTIFICATION** · **PRODUCTION-EXPERIENCE-001** · **PRODUCTION-EXPERIENCE-002** · **PRODUCTION-EXPERIENCE-003** · **PRODUCTION-EXPERIENCE-004** · **PRODUCTION-EXPERIENCE-005** · **PRODUCTION-EXPERIENCE-006** · **PRODUCTION-EXPERIENCE-REVIEW** · **PRODUCTION-JOURNEY-CERTIFICATION** · **MENU-EXPERIENCE-001** · **MENU-EXPERIENCE-002** · **MENU-EXPERIENCE-003** · **MENU-EXPERIENCE-004** · **MENU-EXPERIENCE-005**
 
 ---
 
@@ -163,7 +164,7 @@ Production Experience   ✅ Journey Certified · Frozen (001–006 ✅)
 ↓
 Kitchen Experience      ✅ Journey Certified · Frozen (001–006 ✅)
 ↓
-Delivery Experience     ▶ 001 Today's Delivery Day
+Delivery Experience     ▶ 002 Delivery Search (001 ✅)
 ↓
 Operational Journey Review
 ↓
@@ -185,6 +186,7 @@ Operational Accelerators
 
 * [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)  
 * [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)  
+* [DELIVERY_EXPERIENCE_002](./DELIVERY_EXPERIENCE_002.md)  
 * [DELIVERY_EXPERIENCE_001](./DELIVERY_EXPERIENCE_001.md)  
 * [KITCHEN_JOURNEY_CERTIFICATION](../tenant-success/KITCHEN_JOURNEY_CERTIFICATION.md)  
 * [KITCHEN_EXPERIENCE_REVIEW](../tenant-success/KITCHEN_EXPERIENCE_REVIEW.md)  
