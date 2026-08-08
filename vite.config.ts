@@ -1,52 +1,82 @@
-// @lovable.dev/vite-tanstack-config already includes the following — do NOT add them manually
-// or the app will break with duplicate plugins:
-//   - TanStack devtools (dev-only, first), tanstackStart, viteReact, tailwindcss, tsConfigPaths,
-//     nitro (build-only using cloudflare as a default target), VITE_* env injection, @ path alias,
-//     React/TanStack dedupe, error logger plugins, and sandbox detection (port/host/strictPort).
-// You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
-//
-// Dual build (MF-001 · M-01):
-//   npm run build         → SSR (Cloudflare/Nitro) — spa OFF
-//   npm run build:mobile  → CAPACITOR_BUILD=1 → TanStack SPA shell → .output/public/index.html
-//
-// Mobile disables Nitro: SPA prerender needs Vite's dist/server entry; Nitro's
-// .output/server/index.mjs is not loadable by tanstack-start preview-server.
-import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import path from "node:path";
+import tailwindcss from "@tailwindcss/vite";
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import react from "@vitejs/plugin-react";
+import { defineConfig, loadEnv } from "vite";
+import tsconfigPaths from "vite-tsconfig-paths";
+import { nitro } from "nitro/vite";
 
 const mobileSpa = process.env.CAPACITOR_BUILD === "1";
 
-export default defineConfig({
-  // Skip Nitro only for the Capacitor/SPA pipeline; web SSR keeps Cloudflare Nitro.
-  ...(mobileSpa ? { nitro: false as const } : {}),
-  tanstackStart: {
-    // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-    // nitro/vite builds from this
-    server: { entry: "server" },
-    // Mobile-only: SPA Mode prerenders a static shell for Capacitor (does not alter web SSR).
-    // outputPath '/index' → file index.html (TanStack appends .html for the SPA shell).
-    ...(mobileSpa
-      ? {
-          spa: {
-            enabled: true,
-            prerender: {
-              outputPath: "/index",
-            },
-          },
-        }
-      : {}),
-  },
-  vite: {
-    // node:test suites under scripts/ run via dedicated npm scripts
-    // (test:doctor:unit, test:capacitor:unit, …) — keep them out of vitest.
-    test: {
-      exclude: [
-        "**/node_modules/**",
-        "**/dist/**",
-        "**/cypress/**",
-        "**/.{idea,git,cache,output,temp}/**",
-        "**/scripts/**",
+/**
+ * Native Vite + TanStack Start configuration.
+ * Lovable wrapper removed — development toolchain is Cursor / Vite / Vitest.
+ *
+ * Dual build (MF-001 · M-01):
+ *   npm run build         → SSR (Cloudflare/Nitro) — spa OFF
+ *   npm run build:mobile  → CAPACITOR_BUILD=1 → TanStack SPA shell → .output/public/index.html
+ *
+ * Mobile disables Nitro: SPA prerender needs Vite's dist/server entry; Nitro's
+ * .output/server/index.mjs is not loadable by tanstack-start preview-server.
+ */
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), "");
+  const viteEnvDefines = Object.fromEntries(
+    Object.entries(env)
+      .filter(([key]) => key.startsWith("VITE_"))
+      .map(([key, value]) => [`import.meta.env.${key}`, JSON.stringify(value)]),
+  );
+
+  return {
+    envPrefix: ["VITE_", "NEXT_PUBLIC_"],
+    define: viteEnvDefines,
+    resolve: {
+      alias: {
+        "@": path.resolve(process.cwd(), "./src"),
+      },
+      dedupe: [
+        "react",
+        "react-dom",
+        "@tanstack/react-query",
+        "@tanstack/query-core",
       ],
     },
+    server: {
+      host: "::",
+      port: 8080,
+      hmr: {
+        overlay: false,
+      },
+    },
+    plugins: [
+      tsconfigPaths({ projects: ["./tsconfig.json"] }),
+      tailwindcss(),
+      tanstackStart({
+        // Redirect TanStack Start's bundled server entry to src/server.ts.
+        server: { entry: "server" },
+        // Mobile-only: SPA Mode prerenders a static shell for Capacitor.
+        // outputPath '/index' → file index.html (TanStack appends .html).
+        ...(mobileSpa
+          ? {
+              spa: {
+                enabled: true,
+                prerender: {
+                  outputPath: "/index",
+                },
+              },
+            }
+          : {}),
+      }),
+      ...(mobileSpa
+        ? []
+        : [
+            nitro({
+              // Cloudflare Workers deployment target for the SSR/edge server.
+              preset: "cloudflare-module",
+            }),
+          ]),
+      react(),
+    ],
     ...(mobileSpa
       ? {
           environments: {
@@ -58,5 +88,5 @@ export default defineConfig({
           },
         }
       : {}),
-  },
+  };
 });

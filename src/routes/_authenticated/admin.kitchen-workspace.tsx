@@ -354,9 +354,10 @@ function KitchenWorkspaceDemoPage() {
                       <span className="font-semibold text-foreground">
                         {unit.label}
                       </span>
-                      <StatusChip tone={unitTone(unit.status)}>
-                        {unit.status}
-                      </StatusChip>
+                      <StatusChip
+                        label={unit.status}
+                        tone={unitTone(unit.status)}
+                      />
                     </div>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {unit.id} · portions {unit.portionCount} · from{" "}

@@ -96,8 +96,14 @@ See [CUSTOMER_EXPERIENCE_001](./CUSTOMER_EXPERIENCE_001.md) · [EXPERIENCE_MISSI
 
 ## Definition of Done
 
+```text
+Before                         Now
+Tests PASS                     The operator finishes earlier
+```
+
 Experience Sprint: coherent usable path + visible time objective + Engineering Evidence.  
-Observation Sprint (later): measured friction on **finished** workflows only.
+Observation Sprint (later): measured friction on **finished** workflows only.  
+Aligned with [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md) · Era 2 Definition of Done.
 
 ---
 

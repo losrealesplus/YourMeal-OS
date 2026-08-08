@@ -47,9 +47,12 @@ describe("CUSTOMER EXPERIENCE 001 · Zero Friction TTA", () => {
     expect(cx).toContain("Progressive Completion");
     expect(cx).toContain("Operational Time Saved");
 
+    // EXPERIENCE_MISSIONS matured from early Sprint mission names
+    // ("Create an operational commitment" / "Know what to execute")
+    // to Zero Friction domain missions — assert the current authoritative table.
     expect(missions).toContain("Time-to-Action");
-    expect(missions).toContain("Create an operational commitment");
-    expect(missions).toContain("Know what to execute");
+    expect(missions).toContain("Zero Friction Capture");
+    expect(missions).toContain("Today's Work");
 
     expect(law).toContain("minimum information");
     expect(law).toContain("Accepted");

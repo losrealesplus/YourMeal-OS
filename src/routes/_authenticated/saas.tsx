@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, Link, useNavigate } from "@tanstack/react-rout
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { signOut } from "@/auth";
+import { resolveAuthenticatedRouteUser } from "@/auth/resolve-authenticated-route-user";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { assertSaasRoute } from "@/permissions/route-guards";
@@ -9,10 +10,9 @@ import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/_authenticated/saas")({
   beforeLoad: async ({ context }) => {
-    const user = (context as { user?: { id: string } }).user;
-    if (!user?.id) throw new Error("Missing auth context");
+    const user = await resolveAuthenticatedRouteUser(context, "/saas");
     const roles = await assertSaasRoute(user.id);
-    return { roles };
+    return { roles, user };
   },
   component: SaasShell,
   head: () => ({

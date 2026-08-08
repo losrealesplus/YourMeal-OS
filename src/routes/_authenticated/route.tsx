@@ -9,7 +9,8 @@ import { ensureApplicationReady } from "@/bootstrap/ready";
  * Route context contract: `beforeLoad` MUST return `{ user }` so child layouts
  * (`/admin`, `/saas`, `/driver`) can read `context.user` without re-fetching.
  * Discarding the return of `requireAuthenticatedUser()` leaves `context.user`
- * undefined and triggers `Missing auth context` on those children.
+ * undefined — children then re-resolve via `resolveAuthenticatedRouteUser`
+ * (same auth gate; Capacitor SPA cold-start safety).
  */
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,

@@ -222,6 +222,11 @@ function ProductionPlanningExperiencePage() {
         </Link>
         <Link
           to="/admin/kitchen-today"
+          search={{
+            mode: "today",
+            day: undefined,
+            workId: undefined,
+          }}
           className="text-xs underline-offset-2 hover:underline"
         >
           Kitchen Today
