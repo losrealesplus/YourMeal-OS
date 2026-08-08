@@ -1,6 +1,6 @@
 # MENU EXPERIENCE 005 · Zero Friction Publish & Preview
 
-**Status:** ▶ **IN PROGRESS**  
+**Status:** ✅ **COMPLETE** (Menu phases 001–005 done · formal Review next · Production Experience active)  
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/menu-planning` (mode **publish** · preview step in Planning)  
@@ -102,11 +102,11 @@ Future: Schedule publish · Rollback last publish
 002 Menu Search              ✅
 003 Weekly Adaptation        ✅
 004 Dish Library Integration ✅
-005 Publish & Preview        ▶ THIS
+005 Publish & Preview        ✅
 ↓
 Review → Journey Certification → Freeze
 ↓
-Production Journey
+Production Experience ▶ [PRODUCTION_EXPERIENCE_001](./PRODUCTION_EXPERIENCE_001.md)
 ```
 
 ---

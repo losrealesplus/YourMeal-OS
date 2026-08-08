@@ -68,7 +68,8 @@ describe("MENU EXPERIENCE 005 · Zero Friction Publish & Preview", () => {
 
     expect(missions).toContain("MENU-EXPERIENCE-005");
     expect(missions).toContain("TTRP <5 min");
-    expect(missions).toContain("ME005 Publish & Preview ▶");
+    expect(missions).toContain("ME005 Publish & Preview ✅");
+    expect(missions).toContain("PRODUCTION-EXPERIENCE-001");
 
     expect(ui).toContain("MENU EXPERIENCE 005");
     expect(ui).toContain('mode === "publish"');

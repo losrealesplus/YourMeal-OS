@@ -225,7 +225,7 @@ Adaptation ≈ 10–35 min per cycle
 Observation pending
 
 Status
-In Progress
+Phases complete · Review pending
 ```
 
 Detail: [MENU_EXPERIENCE_005](./MENU_EXPERIENCE_005.md) · [004 Dish Library · Zero Friction Dish Library Integration](./MENU_EXPERIENCE_004.md) · [003 Weekly Adaptation · Zero Friction Weekly Adaptation](./MENU_EXPERIENCE_003.md) · [002 Search · Zero Friction Menu Search](./MENU_EXPERIENCE_002.md) · [001 Weekly Planning · Zero Friction Weekly Menu Planning](./MENU_EXPERIENCE_001.md) · Surface `/admin/menu-planning` · [OPERATIONAL_LIBRARIES](./OPERATIONAL_LIBRARIES.md)  
@@ -245,13 +245,15 @@ Semana → Día → Menú → Platos
 002 Menu Search             ✅
 003 Weekly Adaptation       ✅
 004 Dish Library Integration ✅
-005 Publish & Preview       ▶ In Progress
+005 Publish & Preview       ✅
 ↓
-Experience Review
+Experience Review           ← formal close
 ↓
 Journey Certification
 ↓
 Freeze
+↓
+Production Experience ▶
 ```
 
 | Phase | Question | Status |
@@ -260,7 +262,7 @@ Freeze
 | 002 | ¿Puedo encontrar cualquier elemento de planificación en &lt;10s? | ✅ |
 | 003 | ¿Puedo adaptar la planificación en &lt;5 min sin reconstruirla? | ✅ |
 | 004 | ¿Encuentro e inserto un plato de la biblioteca en &lt;15s? | ✅ |
-| 005 | ¿Puedo revisar y publicar la semana en &lt;5 min con confianza? | ▶ |
+| 005 | ¿Puedo revisar y publicar la semana en &lt;5 min con confianza? | ✅ |
 
 ---
 
@@ -272,25 +274,67 @@ EXPERIENCE CARD
 Name
 Production Experience
 
+Phase
+001 Production Planning
+
 Mission
-Generate today's work in less than one minute
+Zero Friction Production Planning
 
 Primary User
-Production lead
+Tenant Operator
 
 Primary KPI
-Time-to-Generate Work <1 min
+Time-to-Prepare-Production-Plan <10 min
 
 Secondary KPIs
-Time-to-Know Today's Plan <10 s
+Kitchen handoff clarity
+Workload visibility
+Alert visibility
 
 Operational Time Saved
 Estimated
-TBD
+Production planning ≈ 15–50 min per weekly cycle
+Observation pending
 
 Status
-Planned
+In Progress
 ```
+
+Detail: [PRODUCTION_EXPERIENCE_001](./PRODUCTION_EXPERIENCE_001.md) · Surface `/admin/production-planning` · Source: published Menu week  
+
+Lifecycle: [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md) · [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)
+
+**Mental model (physical work — not order admin):**
+
+```text
+Semana → Día → Trabajo → Cantidad → Deadline → Kitchen
+```
+
+**Sequence (adapted to physical work):**
+
+```text
+001 Production Planning        ▶ In Progress
+002 Production Search
+003 Production Adaptation
+004 Pre-Preparations
+005 Alerts & Deadlines
+006 Kitchen Handoff
+↓
+Experience Review
+↓
+Journey Certification
+↓
+Freeze
+```
+
+| Phase | Question | Status |
+|-------|----------|--------|
+| 001 | ¿Transformo una semana publicada en plan de producción en &lt;10 min? | ▶ |
+| 002 | ¿Encuentro cualquier trabajo de producción rápido? | Planned |
+| 003 | ¿Adapto el plan sin reconstruirlo? | Planned |
+| 004 | ¿Gestiono pre-preparaciones con claridad? | Planned |
+| 005 | ¿Veo alertas y deadlines a tiempo? | Planned |
+| 006 | ¿Kitchen recibe un handoff claro? | Planned |
 
 ---
 
