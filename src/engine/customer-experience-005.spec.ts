@@ -50,20 +50,23 @@ describe("CUSTOMER EXPERIENCE 005 · Zero Friction Customer Growth", () => {
     expect(doc).toContain("Time-to-Complete Frequent Customer Information < 30 seconds");
     expect(doc).toContain("30–90 s");
     expect(doc).toContain("Experience Review");
+    expect(doc).toContain("COMPLETE");
+    expect(doc).toContain("ACCELERATOR-002");
     expect(doc).toContain("No Capability / Facade / Engine changes");
 
-    expect(review).toContain("Experience Review");
-    expect(review).toContain("before CX006");
+    expect(review).toContain("READY WITH IMPROVEMENTS");
+    expect(review).toContain("ACCELERATOR-002");
+    expect(review).toContain("ORDER EXPERIENCE");
 
     expect(cards).toContain("005 Growth");
-    expect(cards).toContain("Zero Friction Customer Growth");
-    expect(cards).toContain("In Progress · Phase 005");
-    expect(cards).toContain("Experience Review");
+    expect(cards).toContain("Frozen · READY WITH IMPROVEMENTS");
+    expect(cards).toContain("ORDER EXPERIENCE");
 
     expect(missions).toContain("CUSTOMER_EXPERIENCE_005");
-    expect(missions).toContain("005 Growth");
-    expect(missions).toContain("enriquecer < 30s");
+    expect(missions).toContain("Frozen");
+    expect(missions).toContain("Order Experience");
     expect(missions).toContain("CUSTOMER_EXPERIENCE_REVIEW");
+    expect(missions).toContain("ACCELERATOR-002");
 
     expect(ui).toContain("CUSTOMER EXPERIENCE 005");
     expect(ui).toContain("Zero Friction Customer Growth");

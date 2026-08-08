@@ -68,6 +68,7 @@ Every row must answer: **Does it save tenant time? How much? Which Beta?**
 | AI Assistant | High | High | GM | Only if laws proven |
 | **Universal Command Bar (⌘K)** | ~~superseded~~ | — | — | → **ACCELERATOR-001 Operational Command Center** |
 | **Operational Command Center (OCC)** | Very High | High | 🔒 **Reserved** · ACCELERATOR-001 | Platform entry point · **not** Customer search · [reservation](./ACCELERATOR_001_OPERATIONAL_COMMAND_CENTER.md) · no code until Experiences mature |
+| **Operational Bulk Operations** | Very High | High | 📋 Registered · ACCELERATOR-002 | Ex-CX006 · platform-wide · open after Orders · [detail](./ACCELERATOR_002_OPERATIONAL_BULK.md) |
 
 ---
 

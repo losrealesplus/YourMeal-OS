@@ -1,6 +1,6 @@
 # CUSTOMER EXPERIENCE 005
 
-**Status:** ▶ **ACTIVE** — Era 2 Experience Sprint  
+**Status:** ✅ **COMPLETE** — Customer MVP · see [Review](./CUSTOMER_EXPERIENCE_REVIEW.md) · Frozen  
 **Type:** Experience Sprint (build) — **not** Observation Sprint  
 **Mission:** **Zero Friction Customer Growth**  
 **Declared:** 2026-08-07  
@@ -99,23 +99,25 @@ Label: **Estimated**.
 
 ---
 
-## After CX005 — Experience Review (before CX006)
+## After CX005 — Experience Review · Freeze · Orders
 
 ```text
 001 Create ✅
 002 Search ✅
 003 Edit ✅
 004 Organization ✅
-005 Growth ← this PR
+005 Growth ✅
 ↓
-Customer Experience Review   ← mini UX freeze
+Customer Experience Review   ✅ READY WITH IMPROVEMENTS
 ↓
-006 Bulk Operations
+Freeze Customer Experience
 ↓
-ORDER EXPERIENCE
+ORDER EXPERIENCE             ← NEXT
 ```
 
-Do **not** jump to Bulk immediately. Review the five Experiences as one whole first.
+**CX006 withdrawn** → [ACCELERATOR-002 Operational Bulk](./ACCELERATOR_002_OPERATIONAL_BULK.md).
+
+Do **not** open Bulk under Customer. Do **not** open OCC / Capture / Import.
 
 ---
 
@@ -123,7 +125,8 @@ Do **not** jump to Bulk immediately. Review the five Experiences as one whole fi
 
 * Do **not** open OCC / Quick Capture / Import / Organization Templates  
 * Do **not** modify Facade / Capability / Engine  
-* Do **not** open CX006 or Orders in this PR  
+* Do **not** open Bulk as a Customer mission  
+* Do **not** open Orders in the Growth PR (Orders is next after Review)  
 
 ---
 

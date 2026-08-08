@@ -54,63 +54,64 @@ Name
 Customer Experience
 
 Mission
-Zero Friction Customer Growth
+Zero Friction Customer Management (001–005)
 
 Phase
-005 Growth
+MVP Complete · Frozen
 
 Primary User
 Tenant Operator
 
 Primary KPI
-Time-to-Complete Frequent Customer Information <30 s
+Journey ready for Orders
 
 Secondary KPIs
-Time-to-Resume Operation <5 s
-Time-to-Organization <45 s
-Time-to-Edit Customer <20 s
-Time-to-Find Customer <10 s
+TTC <30 s · TTF <10 s · TTE <20 s · TTO <45 s · Enrich <30 s
 Time-to-Create Customer <30 s
+Time-to-Find Customer <10 s
+Time-to-Edit Customer <20 s
+Time-to-Organization <45 s
+Time-to-Complete Frequent Customer Information <30 s
 
 Operational Time Saved
-Estimated
-30–90 seconds per enrichment
+Estimated (see mission docs)
+Observation pending
 
 Status
-In Progress · Phase 005
+Frozen · READY WITH IMPROVEMENTS
+(Review 001)
 ```
 
-Detail: [CUSTOMER_EXPERIENCE_005](./CUSTOMER_EXPERIENCE_005.md) · [004](./CUSTOMER_EXPERIENCE_004.md) · [003](./CUSTOMER_EXPERIENCE_003.md) · [002](./CUSTOMER_EXPERIENCE_002.md) · [001](./CUSTOMER_EXPERIENCE_001.md)
+Detail: [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md) · [005 Growth](./CUSTOMER_EXPERIENCE_005.md) · [004](./CUSTOMER_EXPERIENCE_004.md) · [003](./CUSTOMER_EXPERIENCE_003.md) · [002](./CUSTOMER_EXPERIENCE_002.md) · [001](./CUSTOMER_EXPERIENCE_001.md)
 
 **Living Customer Profile:** *A customer profile should grow with the relationship, never before it.*
 
-**Customer Experience sequence:**
+**Sequence (closed):**
 
 ```text
 001 Create     ✅
 002 Search     ✅
 003 Edit       ✅
 004 Organization  ✅
-005 Growth     ← active
+005 Growth     ✅
 ↓
-Experience Review
+Review ✅ · Freeze
 ↓
-006 Bulk Operations
-↓
-ORDER EXPERIENCE
+ORDER EXPERIENCE  ← NEXT
 ```
 
-Measurable questions:
+**Bulk Operations** is **not** CX006 — see [ACCELERATOR-002](./ACCELERATOR_002_OPERATIONAL_BULK.md).
 
-| Phase | Question |
-|-------|----------|
-| 001 | ¿Puedo crear un cliente en menos de 30 segundos? |
-| 002 | ¿Puedo encontrar un cliente en menos de 10 segundos? |
-| 003 | ¿Puedo modificar un cliente frecuente en menos de 20 segundos? |
-| 004 | ¿Puedo crear una organización y empezar a trabajar en menos de 45 segundos? |
-| 005 | ¿Puedo enriquecer la ficha en menos de 30 segundos sin parar la operación? |
-| Review | ¿Customer Experience funciona como un lunes cualquiera? |
-| 006 | ¿Puedo realizar operaciones masivas sin reescribir información? |
+Measurable questions (answered):
+
+| Phase | Question | Status |
+|-------|----------|--------|
+| 001 | ¿Puedo crear un cliente en menos de 30 segundos? | ✅ |
+| 002 | ¿Puedo encontrar un cliente en menos de 10 segundos? | ✅ |
+| 003 | ¿Puedo modificar un cliente frecuente en menos de 20 segundos? | ✅ |
+| 004 | ¿Puedo crear una organización y empezar a trabajar en menos de 45 segundos? | ✅ |
+| 005 | ¿Puedo enriquecer la ficha en menos de 30 segundos sin parar la operación? | ✅ |
+| Review | ¿Customer Experience funciona como un lunes cualquiera? | READY WITH IMPROVEMENTS |
 
 ---
 
