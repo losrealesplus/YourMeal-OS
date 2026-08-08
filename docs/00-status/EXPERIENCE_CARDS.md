@@ -275,24 +275,26 @@ Name
 Production Experience
 
 Phase
-003 Production Adaptation
+004 Pre-Preparations
 
 Mission
-Zero Friction Production Adaptation
+Zero Friction Production Pre-Preparations
 
 Primary User
 Tenant Operator
 
 Primary KPI
-Time-to-Adapt-Production-Plan <5 min
+Time-to-Identify-Required-Preps <15 s
 
 Secondary KPIs
-Time-to-Resume-Production-Confidence <5 s
+Time-to-Understand-Prep-Deadline <10 s
+Time-to-Adapt-Production-Plan <5 min
 Time-to-Find-Production-Work <10 s
 Time-to-Prepare-Production-Plan <10 min
 
 Operational Time Saved
 Estimated
+Prep discovery ≈ 30–105 s
 Adaptation ≈ 5–20 min per cycle
 Find production work ≈ 20–80 s
 Production planning ≈ 15–50 min per weekly cycle
@@ -302,7 +304,7 @@ Status
 In Progress
 ```
 
-Detail: [PRODUCTION_EXPERIENCE_003](./PRODUCTION_EXPERIENCE_003.md) · [002 Search · Zero Friction Production Search](./PRODUCTION_EXPERIENCE_002.md) · [001 Production Planning · Zero Friction Production Planning](./PRODUCTION_EXPERIENCE_001.md) · Surface `/admin/production-planning` · Source: published Menu week  
+Detail: [PRODUCTION_EXPERIENCE_004](./PRODUCTION_EXPERIENCE_004.md) · [003 Adaptation · Zero Friction Production Adaptation](./PRODUCTION_EXPERIENCE_003.md) · [002 Search · Zero Friction Production Search](./PRODUCTION_EXPERIENCE_002.md) · [001 Production Planning · Zero Friction Production Planning](./PRODUCTION_EXPERIENCE_001.md) · Surface `/admin/production-planning` · Source: published Menu week  
 
 Lifecycle: [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md) · [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)
 
@@ -317,8 +319,8 @@ Semana → Día → Trabajo → Cantidad → Deadline → Kitchen
 ```text
 001 Production Planning        ✅
 002 Production Search          ✅
-003 Production Adaptation      ▶ In Progress
-004 Pre-Preparations
+003 Production Adaptation      ✅
+004 Pre-Preparations           ▶ In Progress
 005 Alerts & Deadlines
 006 Kitchen Handoff
 ↓
@@ -333,8 +335,8 @@ Freeze
 |-------|----------|--------|
 | 001 | ¿Transformo una semana publicada en plan de producción en &lt;10 min? | ✅ |
 | 002 | ¿Localizo el trabajo de producción correcto en &lt;10s? | ✅ |
-| 003 | ¿Adapto el plan en &lt;5 min sin regenerarlo? | ▶ |
-| 004 | ¿Gestiono pre-preparaciones con claridad? | Planned |
+| 003 | ¿Adapto el plan en &lt;5 min sin regenerarlo? | ✅ |
+| 004 | ¿Veo las pre-preparaciones requeridas en &lt;15s? | ▶ |
 | 005 | ¿Veo alertas y deadlines a tiempo? | Planned |
 | 006 | ¿Kitchen recibe un handoff claro? | Planned |
 

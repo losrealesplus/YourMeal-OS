@@ -252,8 +252,15 @@ function prepHit(
     quantity: 0,
     loadLabel: p.status,
     deadline: p.requiredUseDate,
-    alertStatus: p.status === "pending" ? "warn" : "none",
-    alertCount: p.status === "pending" ? 1 : 0,
+    alertStatus:
+      p.status === "pending" ||
+      p.status === "scheduled" ||
+      p.status === "overdue" ||
+      p.status === "blocked"
+        ? "warn"
+        : "none",
+    alertCount:
+      p.status === "ready" || p.status === "done" ? 0 : 1,
     prepCount: 1,
     planStatus: plan.status,
     kitchenReady: plan.status === "ready_for_kitchen",

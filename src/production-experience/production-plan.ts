@@ -24,10 +24,23 @@ export type PrepKind =
   | "base"
   | "sauce"
   | "protein"
+  | "vegetable"
   | "defrost"
   | "cutting"
   | "assembly"
+  | "packaging"
   | "other";
+
+/** PE004 — prep lifecycle (Experience). */
+export type PrepStatus =
+  | "pending"
+  | "scheduled"
+  | "ready"
+  | "overdue"
+  | "blocked"
+  | "done";
+
+export type PrepPriority = "high" | "normal" | "low";
 
 export type ProductionAlertCode =
   | "missing_production_data"
@@ -54,8 +67,11 @@ export type PrePreparation = {
   label: string;
   preparationDate: string;
   requiredUseDate: string;
-  status: "pending" | "ready" | "done";
+  status: PrepStatus;
   workId: string;
+  /** Portions / units tied to related work (Experience honesty). */
+  requiredQuantity?: number;
+  priority?: PrepPriority;
 };
 
 export type ProductionWorkItem = {

@@ -131,13 +131,13 @@ function syncPrepsForWork(
         ...p,
         preparationDate: addDaysIso(dayDeltaHint.to, days),
         requiredUseDate: work.productionDay,
-        status: "pending" as const,
+        status: "scheduled" as const,
       };
     }
     return {
       ...p,
       requiredUseDate: work.productionDay,
-      status: "pending" as const,
+      status: "scheduled" as const,
     };
   });
   return { ...plan, preparations };
@@ -381,7 +381,14 @@ export function reschedulePrep(
   if (!impact) return null;
   const preparations = plan.preparations.map((p) =>
     p.id === prepId
-      ? { ...p, preparationDate, status: "pending" as const }
+      ? {
+          ...p,
+          preparationDate,
+          status:
+            preparationDate > p.requiredUseDate
+              ? ("blocked" as const)
+              : ("scheduled" as const),
+        }
       : p,
   );
   const next = recomputePlanDerived({ ...plan, preparations });
