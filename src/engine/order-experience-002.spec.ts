@@ -58,7 +58,7 @@ describe("ORDER EXPERIENCE 002 · Zero Friction Order Search", () => {
     expect(cards).toContain("Order Templates");
     expect(cards).toContain("Operational Incident");
 
-    expect(missions).toContain("ORDER-EXPERIENCE-002");
+    expect(missions).toContain("ORDER-EXPERIENCE-003");
     expect(missions).toContain("TTFO <10s");
     expect(missions).toContain("EXPERIENCE_LIFECYCLE");
 

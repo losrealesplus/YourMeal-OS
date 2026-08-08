@@ -1,11 +1,12 @@
 /**
- * ORDER EXPERIENCE · Capture (001) + Search (002)
+ * ORDER EXPERIENCE · Capture (001) + Search (002) + Edit (003)
  *
  * Conversation speed — not CRUD.
  * useCustomer + useOrder only. No Capability / Facade / Engine changes.
  *
  * Staff intake with targetCustomerId is UNIMPLEMENTED (CAP-008) —
  * Experience-layer operational commitment keeps the call moving.
+ * No UpdateOrder — OE003 uses session operational order edits.
  */
 
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -57,7 +58,11 @@ import {
   type CommitmentItem,
   type OperationalCommitment,
 } from "@/order-experience/operational-commitments";
-import { OrderSearchPanel } from "@/order-experience/OrderSearchPanel";
+import {
+  OrderSearchPanel,
+  type OrderSearchHit,
+} from "@/order-experience/OrderSearchPanel";
+import { OrderEditPanel } from "@/order-experience/OrderEditPanel";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/order-capture")({
@@ -72,15 +77,18 @@ export const Route = createFileRoute("/_authenticated/admin/order-capture")({
       search.kind === "company_account" || search.kind === "individual"
         ? (search.kind as PartyKind)
         : undefined,
-    mode: search.mode === "capture" ? ("capture" as const) : ("search" as const),
+    mode:
+      search.mode === "capture" || search.mode === "edit"
+        ? (search.mode as "capture" | "edit")
+        : ("search" as const),
   }),
   head: () => ({
     meta: [
-      { title: "YourMeal OS — Order Experience · Search & Capture" },
+      { title: "YourMeal OS — Order Experience · Search · Capture · Edit" },
       {
         name: "description",
         content:
-          "ORDER EXPERIENCE 002 Search · 001 Capture · TTFO <10s · TTO <45s · Facades only",
+          "ORDER EXPERIENCE 003 Edit · 002 Search · 001 Capture · Facades only",
       },
     ],
   }),
@@ -105,11 +113,14 @@ function OrderCaptureExperiencePage() {
   const caps = identity.permissions.capabilities;
   const canWrite = caps.includes("orders.write");
 
-  const [mode, setMode] = useState<"search" | "capture">(
+  const [mode, setMode] = useState<"search" | "capture" | "edit">(
     searchParams.mode === "capture" || searchParams.customerId
       ? "capture"
-      : "search",
+      : searchParams.mode === "edit"
+        ? "edit"
+        : "search",
   );
+  const [editHit, setEditHit] = useState<OrderSearchHit | null>(null);
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<SearchHit[]>([]);
   const [loadingSearch, setLoadingSearch] = useState(false);
@@ -397,6 +408,7 @@ function OrderCaptureExperiencePage() {
     setInstructions("");
     setSelected(null);
     setQuery("");
+    setEditHit(null);
     deepLinked.current = false;
     setMode("search");
   }
@@ -417,36 +429,54 @@ function OrderCaptureExperiencePage() {
     <div className="animate-fade-in mx-auto max-w-3xl pb-24">
       <SectionTitle
         overline={
-          mode === "search"
-            ? "ORDER EXPERIENCE 002 · Phase 002 Search"
-            : "ORDER EXPERIENCE 001 · Phase 001 Capture"
+          mode === "edit"
+            ? "ORDER EXPERIENCE 003 · Phase 003 Edit"
+            : mode === "search"
+              ? "ORDER EXPERIENCE 002 · Phase 002 Search"
+              : "ORDER EXPERIENCE 001 · Phase 001 Capture"
         }
         title={
-          mode === "search"
-            ? "Zero Friction Order Search"
-            : "Zero Friction Order Capture"
+          mode === "edit"
+            ? "Zero Friction Order Edit"
+            : mode === "search"
+              ? "Zero Friction Order Search"
+              : "Zero Friction Order Capture"
         }
         subtitle={
-          mode === "search"
-            ? "Encuentra el compromiso en segundos — gente, días, situaciones"
-            : "Registrar el pedido mientras hablas — el software desaparece"
+          mode === "edit"
+            ? "Corregir un compromiso en vivo — sin perder el hilo"
+            : mode === "search"
+              ? "Encuentra el compromiso en segundos — gente, días, situaciones"
+              : "Registrar el pedido mientras hablas — el software desaparece"
         }
       />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        {mode === "search" ? (
+        {mode === "edit" ? (
+          <StatusChip tone="warning" label="TTEO < 20 s" />
+        ) : mode === "search" ? (
           <StatusChip tone="warning" label="TTFO < 10 s" />
         ) : (
           <StatusChip tone="warning" label="TTO < 45 s" />
         )}
         <StatusChip tone="info" label="Conversation · not CRUD" />
-        <button
-          type="button"
-          className="text-xs underline-offset-2 hover:underline"
-          onClick={() => setMode(mode === "search" ? "capture" : "search")}
-        >
-          {mode === "search" ? "Ir a captura" : "Ir a búsqueda"}
-        </button>
+        {mode !== "edit" ? (
+          <button
+            type="button"
+            className="text-xs underline-offset-2 hover:underline"
+            onClick={() => setMode(mode === "search" ? "capture" : "search")}
+          >
+            {mode === "search" ? "Ir a captura" : "Ir a búsqueda"}
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="text-xs underline-offset-2 hover:underline"
+            onClick={goToSearch}
+          >
+            Ir a búsqueda
+          </button>
+        )}
         <Link
           to="/admin/customer-workspace"
           className="text-xs underline-offset-2 hover:underline"
@@ -457,19 +487,34 @@ function OrderCaptureExperiencePage() {
 
       <AdminHeader
         goal={
-          mode === "search"
-            ? "Encontrar cualquier compromiso operativo en <10s"
-            : "Crear compromiso operativo en <45s durante la llamada"
+          mode === "edit"
+            ? "Corregir un compromiso frecuente en <20s · resume <5s"
+            : mode === "search"
+              ? "Encontrar cualquier compromiso operativo en <10s"
+              : "Crear compromiso operativo en <45s durante la llamada"
         }
         capability="orders.read / orders.write · customers.read"
-        object="Operational commitment · SearchOrders · session honesty"
+        object="Operational commitment · inline edit · session honesty"
       />
+
+      {mode === "edit" && editHit && !created ? (
+        <OrderEditPanel
+          hit={editHit}
+          canWrite={canWrite}
+          onClose={goToSearch}
+          onSaved={(next) => setEditHit(next)}
+        />
+      ) : null}
 
       {mode === "search" && !created ? (
         <OrderSearchPanel
           onCreateOrder={() => {
             setMode("capture");
             window.setTimeout(() => searchRef.current?.focus(), 0);
+          }}
+          onEditOrder={(hit) => {
+            setEditHit(hit);
+            setMode("edit");
           }}
         />
       ) : null}
