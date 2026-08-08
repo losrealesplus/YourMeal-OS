@@ -65,7 +65,7 @@ function identity(
     tenant: { id: "t1", name: "EatClean", slug: "eatclean" },
     permissions: {
       roles: ["kitchen", "company_admin"],
-      capabilities: ["kitchen.operate", "production.read"],
+      capabilities: ["kitchen.operate"],
     },
     currentUser: {
       id: "u1",
@@ -507,26 +507,41 @@ describe("OPERATIONAL-005 Kitchen Execution Engineering Certification Matrix", (
     const facade = new KitchenExecutionFacade({
       production: mockProduction(),
     });
+    const operator = identity({
+      permissions: {
+        roles: ["kitchen"],
+        capabilities: ["kitchen.operate"],
+      },
+    });
     const reader = identity({
       permissions: {
         roles: ["support"],
-        capabilities: ["production.read"],
+        capabilities: ["orders.read"],
       },
     });
-    const queue = await facade.getExecutionQueue(
+    const withOperate = await facade.getExecutionQueue(
+      operator,
+      getExecutionQueueQuery({ dayDate: "2026-08-05" }),
+    );
+    const withoutOperate = await facade.getExecutionQueue(
       reader,
       getExecutionQueueQuery({ dayDate: "2026-08-05" }),
     );
     const ok =
-      queue.ok &&
-      queue.context?.permissions.canReadQueue === true &&
-      queue.context.permissions.canOperate === false &&
-      queue.context.permissions.canAssign === false;
+      withOperate.ok &&
+      withOperate.context?.permissions.canReadQueue === true &&
+      withOperate.context.permissions.canOperate === true &&
+      withOperate.context.permissions.canAssign === true &&
+      withoutOperate.ok &&
+      withoutOperate.context?.permissions.canReadQueue === false &&
+      withoutOperate.context.permissions.canOperate === false &&
+      withoutOperate.context.permissions.canAssign === false;
     record({
       id: "V13",
       name: "Permission model",
-      expected: "canReadQueue / canOperate / canAssign from Identity caps",
-      observed: `read=${queue.context?.permissions.canReadQueue} operate=${queue.context?.permissions.canOperate} assign=${queue.context?.permissions.canAssign}`,
+      expected:
+        "kitchen.operate → all bits; without kitchen.operate → none (canonical)",
+      observed: `operateBits=${JSON.stringify(withOperate.context?.permissions)} supportBits=${JSON.stringify(withoutOperate.context?.permissions)}`,
       evidence: "kitchenCapabilityBitsFromIdentity",
       verdict: ok ? "PASS" : "FAIL",
     });

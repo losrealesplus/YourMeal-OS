@@ -50,8 +50,7 @@ function identity(
       capabilities: [
         "orders.read",
         "kitchen.operate",
-        "production.read",
-        "production.plan",
+        "production.operate",
       ],
     },
     currentUser: {
