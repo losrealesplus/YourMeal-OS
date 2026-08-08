@@ -38,7 +38,11 @@ import {
   getOrdersByWeekQuery,
   searchOrdersQuery,
 } from "@/order/OrderQueries";
-import type { OrderContext, OrderSummary } from "@/order/OrderContext";
+import type {
+  OrderCommandResult,
+  OrderContext,
+  OrderSummary,
+} from "@/order/OrderContext";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute(
@@ -208,7 +212,7 @@ function OrderWorkspaceDemoPage() {
 
   async function runProcess(
     label: string,
-    run: () => Promise<{ ok: boolean; status?: string; errors: { code: string; message: string }[] }>,
+    run: () => Promise<OrderCommandResult>,
   ) {
     if (!selected) return;
     setBusy(true);
