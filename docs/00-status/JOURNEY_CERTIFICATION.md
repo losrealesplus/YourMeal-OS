@@ -56,7 +56,7 @@ Verdicts that authorize certification: **READY** or **READY WITH IMPROVEMENTS**.
 | **Order Journey** | ✅ **Certified** | [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · Frozen |
 | **Menu Journey** | ✅ **Certified** | [MENU_EXPERIENCE_005](./MENU_EXPERIENCE_005.md) | ME001–005 · published week handoff |
 | **Production Journey** | ✅ **Certified** | [PRODUCTION_JOURNEY_CERTIFICATION](../tenant-success/PRODUCTION_JOURNEY_CERTIFICATION.md) · [Review](../tenant-success/PRODUCTION_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · **Frozen** · PE001–006 |
-| **Kitchen Journey** | ⏳ In progress (KE005) | — | Today's Work ✅ · Search ✅ · Adaptation ✅ · Labels ✅ · Progress ▶ |
+| **Kitchen Journey** | ⏳ In progress (KE006) | — | Today's Work ✅ · Search ✅ · Adaptation ✅ · Labels ✅ · Progress ✅ · Completion ▶ |
 | **Delivery Journey** | ⏳ Pending | — | After Kitchen |
 | **Operational Journey** | ⏳ Pending | — | Cross-domain review after Delivery |
 
@@ -67,7 +67,7 @@ Customer Journey      ✅ Certified
 Order Journey         ✅ Certified
 Menu Journey          ✅ Certified
 Production Journey    ✅ Certified · Frozen
-Kitchen Journey       ⏳ KE005 Progress (KE001–004 ✅)
+Kitchen Journey       ⏳ KE006 Completion (KE001–005 ✅)
 Delivery Journey      ⏳
 ↓
 Operational Journey Review

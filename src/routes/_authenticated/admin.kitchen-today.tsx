@@ -1,9 +1,9 @@
 /**
- * KITCHEN EXPERIENCE 001–005
- * Today's Work · Search · Adaptation · Labels · Progress
+ * KITCHEN EXPERIENCE 001–006
+ * Today's Work · Search · Adaptation · Labels · Progress · Completion
  *
- * Experience only — no Kitchen / Production Capability · Facade · Engine changes.
- * Start / Pause / Resume / Block / Assign / Notify / Physical labels → Future.
+ * Experience only — no Kitchen / Production / Delivery Capability invent.
+ * Start / Pause / Resume / Block / Assign / Complete durable / Delivery → Future.
  */
 
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -12,13 +12,20 @@ import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { AdminHeader, SectionTitle, StatusChip } from "@/components/admin";
 import { useCan } from "@/hooks/use-can";
 import { KitchenAdaptationPanel } from "@/kitchen-experience/KitchenAdaptationPanel";
+import { KitchenCompletionPanel } from "@/kitchen-experience/KitchenCompletionPanel";
 import { KitchenLabelsPanel } from "@/kitchen-experience/KitchenLabelsPanel";
 import { KitchenProgressPanel } from "@/kitchen-experience/KitchenProgressPanel";
 import { KitchenSearchPanel } from "@/kitchen-experience/KitchenSearchPanel";
 import { KitchenTodayPanel } from "@/kitchen-experience/KitchenTodayPanel";
 import { utcDateOnly } from "@/menu-experience/week-plan";
 
-type ExperienceMode = "today" | "search" | "adapt" | "labels" | "progress";
+type ExperienceMode =
+  | "today"
+  | "search"
+  | "adapt"
+  | "labels"
+  | "progress"
+  | "completion";
 
 function isExperienceMode(value: unknown): value is ExperienceMode {
   return (
@@ -26,7 +33,8 @@ function isExperienceMode(value: unknown): value is ExperienceMode {
     value === "search" ||
     value === "adapt" ||
     value === "labels" ||
-    value === "progress"
+    value === "progress" ||
+    value === "completion"
   );
 }
 
@@ -44,12 +52,12 @@ export const Route = createFileRoute("/_authenticated/admin/kitchen-today")({
     meta: [
       {
         title:
-          "YourMeal OS — Kitchen Experience · Progress · Labels · Adaptation · Search · Today's Work",
+          "YourMeal OS — Kitchen Experience · Completion · Progress · Labels · Adaptation · Search · Today's Work",
       },
       {
         name: "description",
         content:
-          "KITCHEN EXPERIENCE 005 Execution Progress · TTEP <5s · 004 Labels · 003 Adaptation · 002 Search · 001 Today's Work",
+          "KITCHEN EXPERIENCE 006 Completion & Handoff · TTUC <5s · 005 Progress · 004 Labels · 003 Adaptation · 002 Search · 001 Today's Work",
       },
     ],
   }),
@@ -85,69 +93,66 @@ function KitchenTodayExperiencePage() {
     });
   }
 
-  const overline =
-    mode === "progress"
-      ? "KITCHEN EXPERIENCE 005 · Execution Progress"
-      : mode === "labels"
-        ? "KITCHEN EXPERIENCE 004 · Labels & Special Info"
-        : mode === "adapt"
-          ? "KITCHEN EXPERIENCE 003 · Execution Adaptation"
-          : mode === "search"
-            ? "KITCHEN EXPERIENCE 002 · Execution Search"
-            : "KITCHEN EXPERIENCE 001 · Today's Work";
+  const meta: Record<
+    ExperienceMode,
+    { overline: string; title: string; subtitle: string; kpi: string; goal: string }
+  > = {
+    today: {
+      overline: "KITCHEN EXPERIENCE 001 · Today's Work",
+      title: "Zero Friction Kitchen Execution",
+      subtitle: "Recibe el handoff — entiende qué ejecutar ahora",
+      kpi: "TTUKW < 10 s",
+      goal: "Entender el trabajo de cocina de hoy en <10s",
+    },
+    search: {
+      overline: "KITCHEN EXPERIENCE 002 · Execution Search",
+      title: "Zero Friction Kitchen Execution Search",
+      subtitle: "Encuentra trabajo de ejecución sin salir del contexto",
+      kpi: "TTFEW < 10 s",
+      goal: "Encontrar trabajo de ejecución en <10s",
+    },
+    adapt: {
+      overline: "KITCHEN EXPERIENCE 003 · Execution Adaptation",
+      title: "Zero Friction Kitchen Execution Adaptation",
+      subtitle: "Adapta la ejecución sin replanificar Production",
+      kpi: "TTAE < 30 s",
+      goal: "Adaptar ejecución en <30s y volver a ejecutar en <5s",
+    },
+    labels: {
+      overline: "KITCHEN EXPERIENCE 004 · Labels & Special Info",
+      title: "Zero Friction Kitchen Labels & Special Information",
+      subtitle: "Identifica el trabajo y la info especial sin inventar substrate",
+      kpi: "TILC < 10 s",
+      goal: "Identificar contexto de etiqueta en <10s · info especial en <5s",
+    },
+    progress: {
+      overline: "KITCHEN EXPERIENCE 005 · Execution Progress",
+      title: "Zero Friction Kitchen Execution Progress",
+      subtitle: "Entiende qué queda sin inventar estado durable",
+      kpi: "TTEP < 5 s",
+      goal: "Entender progreso y trabajo restante en <5s",
+    },
+    completion: {
+      overline: "KITCHEN EXPERIENCE 006 · Completion & Handoff",
+      title: "Zero Friction Kitchen Completion & Handoff",
+      subtitle: "Cierra el día con honestidad — Delivery → Future",
+      kpi: "TTUC < 5 s",
+      goal: "Entender cierre en <5s · preparar siguiente paso en <10s",
+    },
+  };
 
-  const title =
-    mode === "progress"
-      ? "Zero Friction Kitchen Execution Progress"
-      : mode === "labels"
-        ? "Zero Friction Kitchen Labels & Special Information"
-        : mode === "adapt"
-          ? "Zero Friction Kitchen Execution Adaptation"
-          : mode === "search"
-            ? "Zero Friction Kitchen Execution Search"
-            : "Zero Friction Kitchen Execution";
-
-  const subtitle =
-    mode === "progress"
-      ? "Entiende qué queda sin inventar estado durable"
-      : mode === "labels"
-        ? "Identifica el trabajo y la info especial sin inventar substrate"
-        : mode === "adapt"
-          ? "Adapta la ejecución sin replanificar Production"
-          : mode === "search"
-            ? "Encuentra trabajo de ejecución sin salir del contexto"
-            : "Recibe el handoff — entiende qué ejecutar ahora";
-
-  const kpiChip =
-    mode === "progress" ? (
-      <StatusChip tone="warning" label="TTEP < 5 s" />
-    ) : mode === "labels" ? (
-      <StatusChip tone="warning" label="TILC < 10 s" />
-    ) : mode === "adapt" ? (
-      <StatusChip tone="warning" label="TTAE < 30 s" />
-    ) : mode === "search" ? (
-      <StatusChip tone="warning" label="TTFEW < 10 s" />
-    ) : (
-      <StatusChip tone="warning" label="TTUKW < 10 s" />
-    );
-
-  const goal =
-    mode === "progress"
-      ? "Entender progreso y trabajo restante en <5s"
-      : mode === "labels"
-        ? "Identificar contexto de etiqueta en <10s · info especial en <5s"
-        : mode === "adapt"
-          ? "Adaptar ejecución en <30s y volver a ejecutar en <5s"
-          : mode === "search"
-            ? "Encontrar trabajo de ejecución en <10s"
-            : "Entender el trabajo de cocina de hoy en <10s";
+  const m = meta[mode];
 
   return (
     <div className="animate-fade-in mx-auto max-w-3xl pb-24">
-      <SectionTitle overline={overline} title={title} subtitle={subtitle} />
+      <SectionTitle
+        overline={m.overline}
+        title={m.title}
+        subtitle={m.subtitle}
+      />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        {kpiChip}
+        <StatusChip tone="warning" label={m.kpi} />
         <StatusChip tone="info" label="Handoff → Ejecución" />
         <StatusChip tone="info" label="Experience only" />
         <button
@@ -185,6 +190,15 @@ function KitchenTodayExperiencePage() {
         >
           Progreso
         </button>
+        <button
+          type="button"
+          className="text-xs underline-offset-2 hover:underline"
+          onClick={() =>
+            goMode("completion", dayDate, focusWorkId ?? undefined)
+          }
+        >
+          Cierre
+        </button>
         <Link
           to="/admin/production-planning"
           search={{ mode: "handoff", weekStart: undefined }}
@@ -208,12 +222,20 @@ function KitchenTodayExperiencePage() {
       </div>
 
       <AdminHeader
-        goal={goal}
+        goal={m.goal}
         capability="kitchen.operate · production handoff (read)"
-        object="Progress · labels · adaptation · search · today's work · session honesty · no Capability invent"
+        object="Completion · progress · labels · adaptation · search · today's work · session honesty · no Delivery invent"
       />
 
-      {mode === "progress" ? (
+      {mode === "completion" ? (
+        <KitchenCompletionPanel
+          dayDate={dayDate}
+          focusWorkId={focusWorkId}
+          onOpenWork={(day, workId) => goMode("today", day, workId)}
+          onBackToToday={() => goMode("today", dayDate)}
+          onOpenProgress={() => goMode("progress", dayDate)}
+        />
+      ) : mode === "progress" ? (
         <KitchenProgressPanel
           dayDate={dayDate}
           focusWorkId={focusWorkId}
