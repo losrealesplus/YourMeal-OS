@@ -1,9 +1,9 @@
 /**
- * DELIVERY EXPERIENCE 001–005
- * Today's Delivery Day · Search · Adaptation · Responsibility · Route Preparation
+ * DELIVERY EXPERIENCE 001–006
+ * Day · Search · Adaptation · Responsibility · Route Preparation · Completion
  *
- * Experience only — no Delivery Capability invent · no route optimization ·
- * no maps · no navigation · no ConfirmDelivery · no durable assignment simulation.
+ * Experience only — no Capability invent · Route Preparation ≠ Optimization ·
+ * ConfirmDelivery only via existing Facade · no POD / Billing invent.
  */
 
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -11,6 +11,7 @@ import { useState } from "react";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { AdminHeader, SectionTitle, StatusChip } from "@/components/admin";
 import { DeliveryAdaptationPanel } from "@/delivery-experience/DeliveryAdaptationPanel";
+import { DeliveryCompletionPanel } from "@/delivery-experience/DeliveryCompletionPanel";
 import { DeliveryResponsibilityPanel } from "@/delivery-experience/DeliveryResponsibilityPanel";
 import { DeliveryRoutePreparationPanel } from "@/delivery-experience/DeliveryRoutePreparationPanel";
 import { DeliverySearchPanel } from "@/delivery-experience/DeliverySearchPanel";
@@ -22,7 +23,8 @@ type ExperienceMode =
   | "search"
   | "adapt"
   | "responsibility"
-  | "route";
+  | "route"
+  | "completion";
 
 function isExperienceMode(value: unknown): value is ExperienceMode {
   return (
@@ -30,7 +32,8 @@ function isExperienceMode(value: unknown): value is ExperienceMode {
     value === "search" ||
     value === "adapt" ||
     value === "responsibility" ||
-    value === "route"
+    value === "route" ||
+    value === "completion"
   );
 }
 
@@ -49,12 +52,12 @@ export const Route = createFileRoute("/_authenticated/admin/delivery-today")({
     meta: [
       {
         title:
-          "YourMeal OS — Delivery Experience · Route Preparation · Responsibility · Day",
+          "YourMeal OS — Delivery Experience · Completion · Route Prep · Day",
       },
       {
         name: "description",
         content:
-          "DELIVERY EXPERIENCE 005 Route Preparation · TPDD <5 min · TTUR <10s · not optimization · no maps · no AssignDelivery invent",
+          "DELIVERY EXPERIENCE 006 Completion · TTDO <5s · ConfirmDelivery via Facade · no POD/Billing invent",
       },
     ],
   }),
@@ -131,6 +134,14 @@ function DeliveryTodayExperiencePage() {
       kpi: "TPDD < 5 min",
       goal: "Preparar jornada en <5 min · entender secuencia en <10s · Observation valida el KPI",
     },
+    completion: {
+      overline: "DELIVERY EXPERIENCE 006 · Delivery Completion",
+      title: "Zero Friction Delivery Completion",
+      subtitle:
+        "Qué se entregó · qué queda · qué falla · siguiente responsabilidad — sin POD/Billing invent",
+      kpi: "TTDO < 5 s",
+      goal: "Entender outcome en <5s · preparar siguiente acción en <10s",
+    },
   };
 
   const m = meta[mode];
@@ -186,6 +197,15 @@ function DeliveryTodayExperiencePage() {
         >
           Preparación de jornada
         </button>
+        <button
+          type="button"
+          className="text-xs underline-offset-2 hover:underline"
+          onClick={() =>
+            goMode("completion", dayDate, focusDeliveryId ?? undefined)
+          }
+        >
+          Cierre
+        </button>
         <Link
           to="/admin/kitchen-today"
           search={{ mode: "completion", day: dayDate, workId: undefined }}
@@ -214,11 +234,24 @@ function DeliveryTodayExperiencePage() {
 
       <AdminHeader
         goal={m.goal}
-        capability="logistics.operate · Delivery Facade (read) · Order (consume)"
-        object="Route prep (session sequence) · responsibility · adaptation · search · day · no optimization · no AssignDelivery invent"
+        capability="logistics.operate · Delivery Facade (read + ConfirmDelivery) · Order (consume)"
+        object="Completion · route prep (session) · responsibility · adaptation · search · day · no POD/Billing invent"
       />
 
-      {mode === "route" ? (
+      {mode === "completion" ? (
+        <DeliveryCompletionPanel
+          dayDate={dayDate}
+          focusDeliveryId={focusDeliveryId}
+          onOpenDelivery={(day, deliveryId) =>
+            goMode("today", day, deliveryId)
+          }
+          onOpenRoute={(day) => goMode("route", day)}
+          onOpenResponsibility={(day, deliveryId) =>
+            goMode("responsibility", day, deliveryId)
+          }
+          onBackToToday={() => goMode("today", dayDate)}
+        />
+      ) : mode === "route" ? (
         <DeliveryRoutePreparationPanel
           dayDate={dayDate}
           focusDeliveryId={focusDeliveryId}
@@ -229,6 +262,7 @@ function DeliveryTodayExperiencePage() {
             goMode("responsibility", day, deliveryId)
           }
           onBackToToday={() => goMode("today", dayDate)}
+          onContinueToCompletion={(day) => goMode("completion", day)}
         />
       ) : mode === "responsibility" ? (
         <DeliveryResponsibilityPanel

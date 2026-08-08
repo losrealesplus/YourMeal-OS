@@ -1,6 +1,6 @@
 # DELIVERY EXPERIENCE 005 · Zero Friction Route Preparation
 
-**Status:** ▶ **IN PROGRESS**  
+**Status:** ✅ **COMPLETE** (superseded as active by DE006 · surface retained)  
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/delivery-today` (mode **route**)  
@@ -32,7 +32,7 @@ Time-to-Understand-Route (TTUR) < 10 seconds
 * Delivery Capability · Facade · **frozen**  
 * **AssignDelivery** · **UNIMPLEMENTED** — do not invent  
 * Experience only · session sequence  
-* Optimization · maps · navigation · ConfirmDelivery · **Future**  
+* Optimization · maps · navigation · **Future** · ConfirmDelivery → **DE006** (Facade)  
 * Accelerators · **Reserved**  
 
 ---
@@ -72,8 +72,8 @@ Yes: ordenar · imprimir · exportar · avisos honestos · plan de sesión
 002 Delivery Search            ✅
 003 Delivery Adaptation        ✅
 004 Delivery Responsibility    ✅
-005 Route Preparation          ▶ THIS
-006 Delivery Completion
+005 Route Preparation          ✅ THIS (complete)
+006 Delivery Completion        ▶ next
 ↓
 Review → Journey Certification → Freeze
 ```

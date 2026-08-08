@@ -60,7 +60,7 @@ describe("DELIVERY EXPERIENCE 005 · Zero Friction Route Preparation", () => {
     clearRoutePreparationForTests();
   });
 
-  it("documents TPDD · not optimization · session sequence · Card In Progress", () => {
+  it("documents TPDD · not optimization · session sequence · Card retained", () => {
     const doc = readFileSync(
       resolve(ROOT, "docs/00-status/DELIVERY_EXPERIENCE_005.md"),
       "utf8",
@@ -103,7 +103,7 @@ describe("DELIVERY EXPERIENCE 005 · Zero Friction Route Preparation", () => {
     expect(cards).toContain("Time-to-Prepare-Delivery-Day <5 min");
 
     expect(missions).toContain("DELIVERY-EXPERIENCE-005");
-    expect(missions).toContain("DE005 Route Preparation ▶");
+    expect(missions).toContain("DE005 Route Preparation ✅");
     expect(missions).toContain("TPDD");
 
     expect(ui).toContain("DELIVERY EXPERIENCE 005");
