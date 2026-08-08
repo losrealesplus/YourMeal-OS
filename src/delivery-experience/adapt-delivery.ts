@@ -573,7 +573,7 @@ export function buildAdaptedTodaysDeliveryDay(input: {
   detailsById?: Record<string, OrderDetails>;
   loadError?: string | null;
   assignmentSupported?: boolean;
-}): TodaysDeliveryDay & { cards: AdaptedDeliveryDayCard[] } {
+}): Omit<TodaysDeliveryDay, "cards"> & { cards: AdaptedDeliveryDayCard[] } {
   const base = buildTodaysDeliveryDay(input);
   const cards = base.cards
     .map(applyDeliveryAdaptation)

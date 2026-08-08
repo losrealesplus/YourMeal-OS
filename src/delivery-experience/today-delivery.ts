@@ -486,10 +486,10 @@ function dedupeWarnings(list: DeliveryDayWarning[]): DeliveryDayWarning[] {
   return [...byId.values()];
 }
 
-export function filterDeliveryCards(
-  cards: DeliveryDayCard[],
+export function filterDeliveryCards<T extends DeliveryDayCard>(
+  cards: T[],
   filter: DeliveryDayFilter,
-): DeliveryDayCard[] {
+): T[] {
   switch (filter) {
     case "ready":
       return cards.filter(
