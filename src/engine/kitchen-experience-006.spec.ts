@@ -114,14 +114,15 @@ describe("KITCHEN EXPERIENCE 006 · Completion & Handoff", () => {
     expect(doc).toContain("Delivery");
     expect(doc).toContain("No Kitchen / Production / Order / Delivery Capability");
 
-    expect(cards).toContain("006 Completion & Handoff");
+    expect(cards).toContain("006 Completion");
     expect(cards).toContain("Zero Friction Kitchen Completion & Handoff");
     expect(cards).toContain("Time-to-Understand-Completion <5 s");
-    expect(cards).toContain("In Progress");
+    expect(cards).toContain("READY WITH IMPROVEMENTS");
 
     expect(missions).toContain("KITCHEN-EXPERIENCE-006");
-    expect(missions).toContain("KE006 Completion ▶");
-    expect(missions).toContain("TTUC");
+    expect(missions).toContain("KE006 Completion ✅");
+    expect(doc).toContain("COMPLETE");
+    expect(missions).toContain("KITCHEN-EXPERIENCE-REVIEW");
 
     expect(ui).toContain("KITCHEN EXPERIENCE 006");
     expect(ui).toContain("KitchenCompletionPanel");

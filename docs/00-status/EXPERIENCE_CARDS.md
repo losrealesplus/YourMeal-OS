@@ -335,7 +335,7 @@ Journey Certification          ✅ CERTIFIED
 ↓
 Freeze                         ✅
 ↓
-Kitchen Experience             ← NEXT (eligible)
+Kitchen Experience             ✅ Review · READY WITH IMPROVEMENTS → Certification next
 ```
 
 | Phase | Question | Status |
@@ -360,18 +360,19 @@ Name
 Kitchen Experience
 
 Phase
-006 Completion & Handoff
+MVP Complete · Review
 
 Mission
-Zero Friction Kitchen Completion & Handoff
+Zero Friction Kitchen Execution (001–006)
 
 Primary User
 Kitchen Operator
 
 Primary KPI
-Time-to-Understand-Completion <5 s
+Journey ready for Certification
 
 Secondary KPIs
+Time-to-Understand-Completion <5 s
 Time-to-Prepare-Next-Step <10 s
 Time-to-Understand-Execution-Progress <5 s
 Time-to-Identify-Remaining-Work <5 s
@@ -382,22 +383,19 @@ Time-to-Resume-Execution <5 s
 Time-to-Find-Execution-Work <10 s
 Time-to-Understand-Kitchen-Work <10 s
 Time-to-Start-Execution <2 min
+TTUKW <10 s · TTFEW <10 s · TTAE <30 s · TILC <10 s · TTEP <5 s · TTUC <5 s
 
 Operational Time Saved
 Estimated
-Day close ≈ 45–270 s
-Progress check ≈ 25–110 s
-Label / special-info check ≈ 40–180 s
-Adapt execution ≈ 90–420 s
-Find execution work ≈ 20–80 s
-Understand kitchen work ≈ 50–170 s
+Illustrative ≈ 20–75 min / Kitchen day
+(see Review — Estimated ≠ Measured)
 Observation pending
 
 Status
-In Progress
+READY WITH IMPROVEMENTS
 ```
 
-Detail: [KITCHEN_EXPERIENCE_006](./KITCHEN_EXPERIENCE_006.md) · [005 Execution Progress · Zero Friction Kitchen Execution Progress](./KITCHEN_EXPERIENCE_005.md) · [004 Labels & Special Info · Zero Friction Kitchen Labels & Special Information](./KITCHEN_EXPERIENCE_004.md) · [003 Execution Adaptation · Zero Friction Kitchen Execution Adaptation](./KITCHEN_EXPERIENCE_003.md) · [002 Execution Search · Zero Friction Kitchen Execution Search](./KITCHEN_EXPERIENCE_002.md) · [001 Today's Work · Zero Friction Kitchen Execution](./KITCHEN_EXPERIENCE_001.md) · Surface `/admin/kitchen-today` · Input: Production Handoff  
+Detail: [KITCHEN_EXPERIENCE_REVIEW](../tenant-success/KITCHEN_EXPERIENCE_REVIEW.md) · [006 Completion & Handoff · Zero Friction Kitchen Completion & Handoff](./KITCHEN_EXPERIENCE_006.md) · [005 Execution Progress · Zero Friction Kitchen Execution Progress](./KITCHEN_EXPERIENCE_005.md) · [004 Labels & Special Info · Zero Friction Kitchen Labels & Special Information](./KITCHEN_EXPERIENCE_004.md) · [003 Execution Adaptation · Zero Friction Kitchen Execution Adaptation](./KITCHEN_EXPERIENCE_003.md) · [002 Search · Zero Friction Kitchen Execution Search](./KITCHEN_EXPERIENCE_002.md) · [001 Today's Work · Zero Friction Kitchen Execution](./KITCHEN_EXPERIENCE_001.md) · Surface `/admin/kitchen-today` · Input: Production Handoff  
 
 **Sequence (daily execution — not Production planning):**
 
@@ -407,9 +405,13 @@ Detail: [KITCHEN_EXPERIENCE_006](./KITCHEN_EXPERIENCE_006.md) · [005 Execution 
 003 Execution Adaptation       ✅
 004 Labels & Special Info      ✅
 005 Execution Progress         ✅
-006 Completion / Handoff       ▶ In Progress
+006 Completion / Handoff       ✅
 ↓
-Kitchen Experience Review → Journey Certification → Freeze
+Kitchen Experience Review      ✅ READY WITH IMPROVEMENTS
+↓
+Journey Certification          ◀ NEXT
+↓
+Freeze
 ```
 
 | Phase | Question | Status |
@@ -419,7 +421,8 @@ Kitchen Experience Review → Journey Certification → Freeze
 | 003 | ¿Adapto la ejecución del día sin replanificar Production? | ✅ |
 | 004 | ¿Veo etiquetas e info especial a tiempo? | ✅ |
 | 005 | ¿Sigo el progreso sin Capability inventada? | ✅ |
-| 006 | ¿Cierro y entrego el día con claridad? | ▶ |
+| 006 | ¿Cierro y entrego el día con claridad? | ✅ |
+| Review | ¿El viaje completo está listo para certificar? | ✅ READY WITH IMPROVEMENTS |
 
 Kitchen executes transferred work — does not re-plan Production. Search never becomes Order/Menu/Production planning. Adaptation is local execution only (session honesty · no durable ExecutionUnit simulation). Labels consume substrate — never invent Customer/Order · physical labels → Future. Progress / Completion use session marks + handoff totals — never invent durable Start/Complete or Delivery acceptance.
 
