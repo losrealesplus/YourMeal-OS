@@ -1,6 +1,6 @@
 # Experience Missions (Era 2)
 
-**Status:** ▶ **ACTIVE** — **MENU EXPERIENCE 001** Weekly Planning  
+**Status:** ▶ **ACTIVE** — **MENU EXPERIENCE 002** Search  
 
 
 **Declared:** 2026-08-07  
@@ -27,7 +27,7 @@ A great Experience is invisible.
 |------------|---------|-------------|--------|
 | **Customer** | Zero Friction (001–005) · includes **CUSTOMER_EXPERIENCE_005** Growth | Create <30s · Find <10s · Edit <20s · Org <45s · enriquecer < 30s | ✅ **Frozen** · Journey Certified |
 | **Order** | Zero Friction Capture · Search · Edit · Templates · Incident (001–005) | TTO <45s · TTFO <10s · TTEO <20s · Reuse <10s · TTRI <30s | ✅ **Frozen** · Journey Certified |
-| **Menu** | Zero Friction Weekly Planning (001–005 · weekly cycle) | TTWM <10 min | ▶ **001 Weekly Planning** |
+| **Menu** | Zero Friction Weekly Planning · Search (001–005 · weekly cycle) | TTWM <10 min · TTFM <10s | ▶ **002 Search** |
 | **Production** | Generate today's work | &lt; 1 min | Planned |
 | **Kitchen** | Know what to execute | &lt; 10s | Planned |
 | **Delivery** | Prepare today's routes | &lt; 2 min | Planned |
@@ -102,16 +102,18 @@ Surface retained: `/admin/order-capture`
 
 ## Active mission
 
-▶ **MENU-EXPERIENCE-001** · Zero Friction Weekly Menu Planning  
-Surface: `/admin/menu-planning` · [MENU_EXPERIENCE_001](./MENU_EXPERIENCE_001.md)
+▶ **MENU-EXPERIENCE-002** · Zero Friction Menu Search  
+Surface: `/admin/menu-planning` · [MENU_EXPERIENCE_002](./MENU_EXPERIENCE_002.md)  
+ME001 ✅ · [MENU_EXPERIENCE_001](./MENU_EXPERIENCE_001.md)
 
 ```text
-ME001 Weekly Planning ▶ → ME002 Search → ME003 Edit → ME004 Dish Library → ME005 Publish & Preview → Review → Journey Certification → Freeze
+ME001 Weekly Planning ✅ → ME002 Search ▶ → ME003 Edit → ME004 Dish Library → ME005 Publish & Preview → Review → Journey Certification → Freeze
 ```
 
+Temporal model: **Semana → Día → Menú → Platos**  
 Order: frozen · [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md)  
 Customer: frozen · [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)  
-Historical id retained for gates: **ORDER-EXPERIENCE-005** (complete · not active) · **MENU EXPERIENCE** active
+Historical ids: **ORDER-EXPERIENCE-005** · **MENU-EXPERIENCE-001** (complete) · **MENU EXPERIENCE** active
 
 ---
 
@@ -122,7 +124,7 @@ Customer Experience     ✅ MVP · Reviewed · Journey Certified · Frozen
 ↓
 Order Experience        ✅ MVP · Reviewed · Journey Certified · Frozen
 ↓
-Menu Experience         ▶ 001 Weekly Planning
+Menu Experience         ▶ 002 Search (001 ✅)
 ↓
 Production Experience
 ↓
@@ -150,6 +152,7 @@ Operational Accelerators
 
 * [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)  
 * [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)  
+* [MENU_EXPERIENCE_002](./MENU_EXPERIENCE_002.md)  
 * [MENU_EXPERIENCE_001](./MENU_EXPERIENCE_001.md)  
 * [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md)  
 * [ORDER_EXPERIENCE_005](./ORDER_EXPERIENCE_005.md)  

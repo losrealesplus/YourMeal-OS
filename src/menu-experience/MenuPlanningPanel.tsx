@@ -4,7 +4,7 @@
  * Reuse before creation. Duplicate → adapt → preview → publish.
  */
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { StatusChip } from "@/components/admin";
@@ -60,6 +60,10 @@ type Props = {
   canWrite: boolean;
   durableMenus: DurableMenuSeed[];
   dishPicks: DishPick[];
+  /** Open a specific week (from ME002 search). */
+  focusWeekStart?: string | null;
+  /** Jump to preview when opening from search. */
+  startInPreview?: boolean;
   onPublishDurable?: (plan: WeekPlan) => Promise<{
     ok: boolean;
     menuId?: string | null;
@@ -93,13 +97,23 @@ export function MenuPlanningPanel({
   canWrite,
   durableMenus,
   dishPicks,
+  focusWeekStart = null,
+  startInPreview = false,
   onPublishDurable,
 }: Props) {
-  const [weekStart, setWeekStart] = useState(() => mondayIso());
-  const [step, setStep] = useState<Step>("plan");
+  const [weekStart, setWeekStart] = useState(
+    () => focusWeekStart ?? mondayIso(),
+  );
+  const [step, setStep] = useState<Step>(startInPreview ? "preview" : "plan");
   const [tick, setTick] = useState(0);
   const [pickDay, setPickDay] = useState<string | null>(null);
   const publishRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!focusWeekStart) return;
+    setWeekStart(focusWeekStart);
+    setStep(startInPreview ? "preview" : "plan");
+  }, [focusWeekStart, startInPreview]);
 
   const picks = useMemo(() => {
     if (dishPicks.length > 0) return dishPicks;

@@ -1,6 +1,6 @@
 # MENU EXPERIENCE 001 · Zero Friction Weekly Menu Planning
 
-**Status:** ▶ **IN PROGRESS**  
+**Status:** ✅ **COMPLETE** (superseded as active by ME002 · surface retained)  
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/menu-planning`  
@@ -66,8 +66,8 @@ Ready for Orders
 ## Sequence (weekly cycle — not CRUD)
 
 ```text
-001 Weekly Planning         ▶ THIS
-002 Menu Search
+001 Weekly Planning         ✅
+002 Menu Search             ▶
 003 Menu Edit
 004 Dish Library Integration
 005 Publish & Preview

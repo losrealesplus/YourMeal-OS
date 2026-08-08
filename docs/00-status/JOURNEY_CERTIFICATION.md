@@ -54,7 +54,7 @@ Verdicts that authorize certification: **READY** or **READY WITH IMPROVEMENTS**.
 |---------|--------|--------|-------|
 | **Customer Journey** | ✅ **Certified** | [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · Frozen |
 | **Order Journey** | ✅ **Certified** | [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · Frozen |
-| **Menu Journey** | ⏳ In progress (ME001) | — | Weekly cycle · not CRUD |
+| **Menu Journey** | ⏳ In progress (ME002) | — | Timeline Semana → Día → Menú → Platos |
 | **Production Journey** | ⏳ Pending | — | After Menu |
 | **Kitchen Journey** | ⏳ Pending | — | After Production |
 | **Delivery Journey** | ⏳ Pending | — | After Kitchen |
@@ -63,7 +63,7 @@ Verdicts that authorize certification: **READY** or **READY WITH IMPROVEMENTS**.
 ```text
 Customer Journey      ✅ Certified
 Order Journey         ✅ Certified
-Menu Journey          ⏳ ME001 Weekly Planning
+Menu Journey          ⏳ ME002 Search (ME001 ✅)
 Production Journey    ⏳
 Kitchen Journey       ⏳
 Delivery Journey      ⏳
@@ -77,7 +77,12 @@ Evidence
 Operational Accelerators
 ```
 
-Menu Experience is structured by the **weekly operational cycle**, not CRUD:
+Menu Experience is structured by the **weekly operational cycle**, not CRUD.  
+Mental model for the whole Menu → Production chain:
+
+```text
+Semana → Día → Menú → Platos
+```
 
 ```text
 001 Weekly Planning → 002 Search → 003 Edit → 004 Dish Library → 005 Publish & Preview
