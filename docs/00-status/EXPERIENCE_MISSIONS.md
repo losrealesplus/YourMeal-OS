@@ -1,6 +1,6 @@
 # Experience Missions (Era 2)
 
-**Status:** ▶ **ACTIVE** — **PRODUCTION EXPERIENCE 005** Alerts & Deadlines  
+**Status:** ▶ **ACTIVE** — **PRODUCTION EXPERIENCE 006** Kitchen Handoff  
 
 
 **Declared:** 2026-08-07  
@@ -28,7 +28,7 @@ A great Experience is invisible.
 | **Customer** | Zero Friction (001–005) · includes **CUSTOMER_EXPERIENCE_005** Growth | Create <30s · Find <10s · Edit <20s · Org <45s · enriquecer < 30s | ✅ **Frozen** · Journey Certified |
 | **Order** | Zero Friction Capture · Search · Edit · Templates · Incident (001–005) | TTO <45s · TTFO <10s · TTEO <20s · Reuse <10s · TTRI <30s | ✅ **Frozen** · Journey Certified |
 | **Menu** | Zero Friction Planning · Search · Adaptation · Dish Library · Publish (001–005) | TTWM <10 min · TTFM <10s · TTAW <5 min · TTFID <15s · TTRP <5 min | ✅ **Certified** |
-| **Production** | Zero Friction Planning · Search · Adaptation · Preps · Alerts (001…) | TPP <10 min · TTFPW <10s · TAPP <5 min · TIRP <15s · TTPR <10s | ▶ **005 Alerts & Deadlines** |
+| **Production** | Zero Friction Planning · Search · Adaptation · Preps · Alerts · Handoff (001–006) | TPP <10 min · TTFPW <10s · TAPP <5 min · TIRP <15s · TTPR <10s · TPKH <5 min | ▶ **006 Kitchen Handoff** |
 | **Kitchen** | Know what to execute | &lt; 10s | Planned |
 | **Delivery** | Prepare today's routes | &lt; 2 min | Planned |
 
@@ -117,20 +117,21 @@ Temporal model: **Semana → Día → Menú → Platos**
 
 ## Active mission
 
-▶ **PRODUCTION-EXPERIENCE-005** · Zero Friction Production Alerts & Deadlines  
-Surface: `/admin/production-planning` · mode **alerts** · [PRODUCTION_EXPERIENCE_005](./PRODUCTION_EXPERIENCE_005.md)  
-PE001–004 ✅ · [004](./PRODUCTION_EXPERIENCE_004.md) · [003](./PRODUCTION_EXPERIENCE_003.md) · [002](./PRODUCTION_EXPERIENCE_002.md) · [001](./PRODUCTION_EXPERIENCE_001.md)
+▶ **PRODUCTION-EXPERIENCE-006** · Zero Friction Kitchen Handoff  
+Surface: `/admin/production-planning` · mode **handoff** · [PRODUCTION_EXPERIENCE_006](./PRODUCTION_EXPERIENCE_006.md)  
+PE001–005 ✅ · [005](./PRODUCTION_EXPERIENCE_005.md) · [004](./PRODUCTION_EXPERIENCE_004.md) · [003](./PRODUCTION_EXPERIENCE_003.md) · [002](./PRODUCTION_EXPERIENCE_002.md) · [001](./PRODUCTION_EXPERIENCE_001.md)
 
 ```text
-PE001 Production Planning ✅ → PE002 Search ✅ → PE003 Adaptation ✅ → PE004 Pre-Preparations ✅ → PE005 Alerts ▶ → PE006 Kitchen Handoff → Review → Journey Certification → Freeze
+PE001 Production Planning ✅ → PE002 Search ✅ → PE003 Adaptation ✅ → PE004 Pre-Preparations ✅ → PE005 Alerts ✅ → PE006 Kitchen Handoff ▶ → Review → Journey Certification → Freeze
 ```
 
 Temporal model: **Semana → Día → Trabajo → Cantidad → Deadline → Kitchen**  
 Source: published operational week (never invent from incomplete Menu).  
+Boundary: Production prepares · Kitchen executes · Handoff transfers responsibility.  
 Menu: ✅ Certified · [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)  
 Order: frozen · [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md)  
 Customer: frozen · [OPERATIONAL_LIBRARIES](./OPERATIONAL_LIBRARIES.md)  
-Historical ids: **PRODUCTION-EXPERIENCE-001** · **PRODUCTION-EXPERIENCE-002** · **PRODUCTION-EXPERIENCE-003** · **PRODUCTION-EXPERIENCE-004** (complete) · **MENU-EXPERIENCE-001** · **MENU-EXPERIENCE-002** · **MENU-EXPERIENCE-003** · **MENU-EXPERIENCE-004** · **MENU-EXPERIENCE-005** · **PRODUCTION EXPERIENCE** active
+Historical ids: **PRODUCTION-EXPERIENCE-001** · **PRODUCTION-EXPERIENCE-002** · **PRODUCTION-EXPERIENCE-003** · **PRODUCTION-EXPERIENCE-004** · **PRODUCTION-EXPERIENCE-005** (complete) · **MENU-EXPERIENCE-001** · **MENU-EXPERIENCE-002** · **MENU-EXPERIENCE-003** · **MENU-EXPERIENCE-004** · **MENU-EXPERIENCE-005** · **PRODUCTION EXPERIENCE** active
 
 ---
 
@@ -143,7 +144,7 @@ Order Experience        ✅ MVP · Reviewed · Journey Certified · Frozen
 ↓
 Menu Experience         ✅ MVP · Journey Certified
 ↓
-Production Experience   ▶ 005 Alerts & Deadlines (001–004 ✅)
+Production Experience   ▶ 006 Kitchen Handoff (001–005 ✅)
 ↓
 Kitchen Experience
 ↓
@@ -169,6 +170,7 @@ Operational Accelerators
 
 * [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)  
 * [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)  
+* [PRODUCTION_EXPERIENCE_006](./PRODUCTION_EXPERIENCE_006.md)  
 * [PRODUCTION_EXPERIENCE_005](./PRODUCTION_EXPERIENCE_005.md)  
 * [PRODUCTION_EXPERIENCE_004](./PRODUCTION_EXPERIENCE_004.md)  
 * [PRODUCTION_EXPERIENCE_003](./PRODUCTION_EXPERIENCE_003.md)  
