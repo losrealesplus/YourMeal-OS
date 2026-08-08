@@ -26,7 +26,8 @@
 | [EXPERIENCE_CARDS](./EXPERIENCE_CARDS.md) | User-facing product map (30s cards) |
 | [EXPERIENCE_MISSIONS](./EXPERIENCE_MISSIONS.md) | Era 2 missions · TTA KPIs · EXPERIENCE LAW 001 |
 | [EXPERIENCE_MANIFESTO](./EXPERIENCE_MANIFESTO.md) | **Invisible software** · ADR 0099 |
-| **[PRODUCTION_EXPERIENCE_004](./PRODUCTION_EXPERIENCE_004.md)** | ▶ **In Progress** · Pre-Preparations · TIRP &lt;15s |
+| **[PRODUCTION_EXPERIENCE_005](./PRODUCTION_EXPERIENCE_005.md)** | ▶ **In Progress** · Alerts & Deadlines · TTPR &lt;10s |
+| [PRODUCTION_EXPERIENCE_004](./PRODUCTION_EXPERIENCE_004.md) | ✅ Pre-Preparations · TIRP &lt;15s |
 | [PRODUCTION_EXPERIENCE_003](./PRODUCTION_EXPERIENCE_003.md) | ✅ Production Adaptation · TAPP &lt;5 min |
 | [PRODUCTION_EXPERIENCE_002](./PRODUCTION_EXPERIENCE_002.md) | ✅ Production Search · TTFPW &lt;10s |
 | [PRODUCTION_EXPERIENCE_001](./PRODUCTION_EXPERIENCE_001.md) | ✅ Production Planning · TPP &lt;10 min |
