@@ -29,6 +29,7 @@ import { Route as AuthenticatedAdminCompaniesRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminCustomerWorkspaceRouteImport } from './routes/_authenticated/admin.customer-workspace'
 import { Route as AuthenticatedAdminCustomersRouteImport } from './routes/_authenticated/admin.customers'
 import { Route as AuthenticatedAdminDeliveryRouteImport } from './routes/_authenticated/admin.delivery'
+import { Route as AuthenticatedAdminDeliveryTodayRouteImport } from './routes/_authenticated/admin.delivery-today'
 import { Route as AuthenticatedAdminDeliveryWorkspaceRouteImport } from './routes/_authenticated/admin.delivery-workspace'
 import { Route as AuthenticatedAdminDesignSystemRouteImport } from './routes/_authenticated/admin.design-system'
 import { Route as AuthenticatedAdminDishesRouteImport } from './routes/_authenticated/admin.dishes'
@@ -204,6 +205,12 @@ const AuthenticatedAdminDeliveryRoute =
   AuthenticatedAdminDeliveryRouteImport.update({
     id: '/delivery',
     path: '/delivery',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminDeliveryTodayRoute =
+  AuthenticatedAdminDeliveryTodayRouteImport.update({
+    id: '/delivery-today',
+    path: '/delivery-today',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminDeliveryWorkspaceRoute =
@@ -637,6 +644,7 @@ export interface FileRoutesByFullPath {
   '/admin/customer-workspace': typeof AuthenticatedAdminCustomerWorkspaceRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/admin/delivery': typeof AuthenticatedAdminDeliveryRoute
+  '/admin/delivery-today': typeof AuthenticatedAdminDeliveryTodayRoute
   '/admin/delivery-workspace': typeof AuthenticatedAdminDeliveryWorkspaceRoute
   '/admin/design-system': typeof AuthenticatedAdminDesignSystemRouteWithChildren
   '/admin/dishes': typeof AuthenticatedAdminDishesRoute
@@ -725,6 +733,7 @@ export interface FileRoutesByTo {
   '/admin/customer-workspace': typeof AuthenticatedAdminCustomerWorkspaceRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/admin/delivery': typeof AuthenticatedAdminDeliveryRoute
+  '/admin/delivery-today': typeof AuthenticatedAdminDeliveryTodayRoute
   '/admin/delivery-workspace': typeof AuthenticatedAdminDeliveryWorkspaceRoute
   '/admin/dishes': typeof AuthenticatedAdminDishesRoute
   '/admin/inventory': typeof AuthenticatedAdminInventoryRoute
@@ -815,6 +824,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/customer-workspace': typeof AuthenticatedAdminCustomerWorkspaceRoute
   '/_authenticated/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/_authenticated/admin/delivery': typeof AuthenticatedAdminDeliveryRoute
+  '/_authenticated/admin/delivery-today': typeof AuthenticatedAdminDeliveryTodayRoute
   '/_authenticated/admin/delivery-workspace': typeof AuthenticatedAdminDeliveryWorkspaceRoute
   '/_authenticated/admin/design-system': typeof AuthenticatedAdminDesignSystemRouteWithChildren
   '/_authenticated/admin/dishes': typeof AuthenticatedAdminDishesRoute
@@ -908,6 +918,7 @@ export interface FileRouteTypes {
     | '/admin/customer-workspace'
     | '/admin/customers'
     | '/admin/delivery'
+    | '/admin/delivery-today'
     | '/admin/delivery-workspace'
     | '/admin/design-system'
     | '/admin/dishes'
@@ -996,6 +1007,7 @@ export interface FileRouteTypes {
     | '/admin/customer-workspace'
     | '/admin/customers'
     | '/admin/delivery'
+    | '/admin/delivery-today'
     | '/admin/delivery-workspace'
     | '/admin/dishes'
     | '/admin/inventory'
@@ -1085,6 +1097,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/customer-workspace'
     | '/_authenticated/admin/customers'
     | '/_authenticated/admin/delivery'
+    | '/_authenticated/admin/delivery-today'
     | '/_authenticated/admin/delivery-workspace'
     | '/_authenticated/admin/design-system'
     | '/_authenticated/admin/dishes'
@@ -1308,6 +1321,13 @@ declare module '@tanstack/react-router' {
       path: '/delivery'
       fullPath: '/admin/delivery'
       preLoaderRoute: typeof AuthenticatedAdminDeliveryRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/delivery-today': {
+      id: '/_authenticated/admin/delivery-today'
+      path: '/delivery-today'
+      fullPath: '/admin/delivery-today'
+      preLoaderRoute: typeof AuthenticatedAdminDeliveryTodayRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/delivery-workspace': {
@@ -1893,6 +1913,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminCustomerWorkspaceRoute: typeof AuthenticatedAdminCustomerWorkspaceRoute
   AuthenticatedAdminCustomersRoute: typeof AuthenticatedAdminCustomersRoute
   AuthenticatedAdminDeliveryRoute: typeof AuthenticatedAdminDeliveryRoute
+  AuthenticatedAdminDeliveryTodayRoute: typeof AuthenticatedAdminDeliveryTodayRoute
   AuthenticatedAdminDeliveryWorkspaceRoute: typeof AuthenticatedAdminDeliveryWorkspaceRoute
   AuthenticatedAdminDesignSystemRoute: typeof AuthenticatedAdminDesignSystemRouteWithChildren
   AuthenticatedAdminDishesRoute: typeof AuthenticatedAdminDishesRoute
@@ -1930,6 +1951,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
     AuthenticatedAdminCustomerWorkspaceRoute,
   AuthenticatedAdminCustomersRoute: AuthenticatedAdminCustomersRoute,
   AuthenticatedAdminDeliveryRoute: AuthenticatedAdminDeliveryRoute,
+  AuthenticatedAdminDeliveryTodayRoute: AuthenticatedAdminDeliveryTodayRoute,
   AuthenticatedAdminDeliveryWorkspaceRoute:
     AuthenticatedAdminDeliveryWorkspaceRoute,
   AuthenticatedAdminDesignSystemRoute:

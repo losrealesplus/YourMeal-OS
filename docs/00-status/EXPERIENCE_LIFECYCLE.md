@@ -111,6 +111,16 @@ OCC · Quick Capture · Import · Bulk appeared because friction repeated across
 | Journey Certification | **Kitchen Journey ✅ CERTIFIED** |
 | Freeze | **Kitchen Frozen** |
 
+| Lifecycle step | Delivery (controlled transfer) |
+|----------------|--------------------------------|
+| Create / Capture | **DE001 Today's Delivery Day** ▶ (receives ready work) |
+| Search | DE002 Delivery Search (hypothesis) |
+| Edit / Adapt | DE003 Delivery Adaptation (hypothesis) |
+| Domain phases | DE004 Responsibility · DE005 Route Preparation · DE006 Completion (hypothesis) |
+| Review | Pending |
+| Journey Certification | Pending |
+| Freeze | Pending |
+
 Order does **not** need Company or Growth.  
 Order needs **Templates** and **Operational Incident**.  
 Menu does **not** need CRUD of “menus as entities”.  
@@ -118,7 +128,9 @@ Menu needs the **weekly planning cycle**: reuse → adapt → publish.
 Production does **not** administer Orders.  
 Production transforms a **published week** into executable work.  
 Kitchen does **not** re-plan Production.  
-Kitchen executes transferred work and closes honestly.
+Kitchen executes transferred work and closes honestly.  
+Delivery does **not** create the commitment — it prepares controlled transfer.  
+Delivery Day comes before routes / maps / optimization.
 
 ---
 
