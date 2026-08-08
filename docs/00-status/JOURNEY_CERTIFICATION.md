@@ -54,8 +54,8 @@ Verdicts that authorize certification: **READY** or **READY WITH IMPROVEMENTS**.
 |---------|--------|--------|-------|
 | **Customer Journey** | ✅ **Certified** | [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · Frozen |
 | **Order Journey** | ✅ **Certified** | [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · Frozen |
-| **Menu Journey** | ⏳ Phases complete · Review pending | — | ME001–005 ✅ · formal Review next |
-| **Production Journey** | ⏳ In progress (PE001) | — | Published week → executable work |
+| **Menu Journey** | ✅ **Certified** | [MENU_EXPERIENCE_005](./MENU_EXPERIENCE_005.md) | ME001–005 · published week handoff |
+| **Production Journey** | ⏳ In progress (PE002) | — | Planning ✅ · Search ▶ |
 | **Kitchen Journey** | ⏳ Pending | — | After Production |
 | **Delivery Journey** | ⏳ Pending | — | After Kitchen |
 | **Operational Journey** | ⏳ Pending | — | Cross-domain review after Delivery |
@@ -63,8 +63,10 @@ Verdicts that authorize certification: **READY** or **READY WITH IMPROVEMENTS**.
 ```text
 Customer Journey      ✅ Certified
 Order Journey         ✅ Certified
-Menu Journey          ⏳ Phases ME001–005 ✅ · Review pending
-Production Journey    ⏳ PE001 Production Planning
+Customer Journey      ✅ Certified
+Order Journey         ✅ Certified
+Menu Journey          ✅ Certified
+Production Journey    ⏳ PE002 Search (PE001 ✅)
 Kitchen Journey       ⏳
 Delivery Journey      ⏳
 ↓
@@ -89,11 +91,11 @@ Semana → Día → Trabajo → Cantidad → Deadline → Kitchen
 ```
 
 Dish Library is an **Operational Library** — consumed in planning, not administered as the day’s work.  
-See [OPERATIONAL_LIBRARIES](./OPERATIONAL_LIBRARIES.md) · [PRODUCTION_EXPERIENCE_001](./PRODUCTION_EXPERIENCE_001.md).
+See [OPERATIONAL_LIBRARIES](./OPERATIONAL_LIBRARIES.md) · [PRODUCTION_EXPERIENCE_002](./PRODUCTION_EXPERIENCE_002.md) · [PRODUCTION_EXPERIENCE_001](./PRODUCTION_EXPERIENCE_001.md).
 
 ```text
-Menu: 001 → 002 → 003 → 004 → 005 ✅ → Review
-Production: 001 Planning ▶ → 002 Search → 003 Adaptation → 004 Preps → 005 Alerts → 006 Handoff
+Menu: 001 → 002 → 003 → 004 → 005 ✅ Certified
+Production: 001 Planning ✅ → 002 Search ▶ → 003 Adaptation → 004 Preps → 005 Alerts → 006 Handoff
 ```
 
 ---

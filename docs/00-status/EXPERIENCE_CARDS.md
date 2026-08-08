@@ -275,24 +275,26 @@ Name
 Production Experience
 
 Phase
-001 Production Planning
+002 Production Search
 
 Mission
-Zero Friction Production Planning
+Zero Friction Production Search
 
 Primary User
 Tenant Operator
 
 Primary KPI
-Time-to-Prepare-Production-Plan <10 min
+Time-to-Find-Production-Work <10 s
 
 Secondary KPIs
+Time-to-Prepare-Production-Plan <10 min
 Kitchen handoff clarity
 Workload visibility
 Alert visibility
 
 Operational Time Saved
 Estimated
+Find production work ≈ 20–80 s
 Production planning ≈ 15–50 min per weekly cycle
 Observation pending
 
@@ -300,7 +302,7 @@ Status
 In Progress
 ```
 
-Detail: [PRODUCTION_EXPERIENCE_001](./PRODUCTION_EXPERIENCE_001.md) · Surface `/admin/production-planning` · Source: published Menu week  
+Detail: [PRODUCTION_EXPERIENCE_002](./PRODUCTION_EXPERIENCE_002.md) · [001 Production Planning · Zero Friction Production Planning](./PRODUCTION_EXPERIENCE_001.md) · Surface `/admin/production-planning` · Source: published Menu week  
 
 Lifecycle: [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md) · [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)
 
@@ -313,8 +315,8 @@ Semana → Día → Trabajo → Cantidad → Deadline → Kitchen
 **Sequence (adapted to physical work):**
 
 ```text
-001 Production Planning        ▶ In Progress
-002 Production Search
+001 Production Planning        ✅
+002 Production Search          ▶ In Progress
 003 Production Adaptation
 004 Pre-Preparations
 005 Alerts & Deadlines
@@ -329,8 +331,8 @@ Freeze
 
 | Phase | Question | Status |
 |-------|----------|--------|
-| 001 | ¿Transformo una semana publicada en plan de producción en &lt;10 min? | ▶ |
-| 002 | ¿Encuentro cualquier trabajo de producción rápido? | Planned |
+| 001 | ¿Transformo una semana publicada en plan de producción en &lt;10 min? | ✅ |
+| 002 | ¿Localizo el trabajo de producción correcto en &lt;10s? | ▶ |
 | 003 | ¿Adapto el plan sin reconstruirlo? | Planned |
 | 004 | ¿Gestiono pre-preparaciones con claridad? | Planned |
 | 005 | ¿Veo alertas y deadlines a tiempo? | Planned |

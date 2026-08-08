@@ -26,8 +26,9 @@
 | [EXPERIENCE_CARDS](./EXPERIENCE_CARDS.md) | User-facing product map (30s cards) |
 | [EXPERIENCE_MISSIONS](./EXPERIENCE_MISSIONS.md) | Era 2 missions · TTA KPIs · EXPERIENCE LAW 001 |
 | [EXPERIENCE_MANIFESTO](./EXPERIENCE_MANIFESTO.md) | **Invisible software** · ADR 0099 |
-| **[PRODUCTION_EXPERIENCE_001](./PRODUCTION_EXPERIENCE_001.md)** | ▶ **In Progress** · Production Planning · TPP &lt;10 min |
-| [MENU_EXPERIENCE_005](./MENU_EXPERIENCE_005.md) | ✅ Publish & Preview · TTRP &lt;5 min · Review pending |
+| **[PRODUCTION_EXPERIENCE_002](./PRODUCTION_EXPERIENCE_002.md)** | ▶ **In Progress** · Production Search · TTFPW &lt;10s |
+| [PRODUCTION_EXPERIENCE_001](./PRODUCTION_EXPERIENCE_001.md) | ✅ Production Planning · TPP &lt;10 min |
+| [MENU_EXPERIENCE_005](./MENU_EXPERIENCE_005.md) | ✅ Publish & Preview · Menu Journey Certified |
 | [MENU_EXPERIENCE_004](./MENU_EXPERIENCE_004.md) | ✅ Dish Library · TTFID &lt;15s |
 | **[OPERATIONAL_LIBRARIES](./OPERATIONAL_LIBRARIES.md)** | Reusable operational knowledge (Dish · Customer · …) — not admin workplaces |
 | **[OPERATIONAL_ACCELERATORS](./OPERATIONAL_ACCELERATORS.md)** | **Third layer** · accelerate work without changing domain |
