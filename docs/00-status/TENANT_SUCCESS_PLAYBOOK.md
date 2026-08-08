@@ -3,7 +3,10 @@
 **Status:** ▶ **ACTIVE** — constitution of Era 2 · Return Time  
 **Era acta:** [ERA_DECLARATION](./ERA_DECLARATION.md) · ADR [0091](../adr/0091-era-declaration.md) · Era 1 CLOSED · Era 2 OPEN  
 **Declared:** 2026-08-07 · after [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) · OPERATIONAL-ENGINE-001  
-**Product law:** [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md) · **PRODUCT LAW 001** · ADR [0084](../adr/0084-product-law-001.md)  
+**Product law:** [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md) · **PRODUCT LAW 001** · **PRODUCT LAW 002** · ADR [0084](../adr/0084-product-law-001.md) · [0093](../adr/0093-product-law-002.md)  
+**Team law:** **TEAM LAW 001** · ADR [0094](../adr/0094-team-law-001.md)  
+**Sprint:** [SPRINT_001_TENANT_SUCCESS](./SPRINT_001_TENANT_SUCCESS.md) · Discovery: [ERA2_PRODUCT_DISCOVERY_001](./ERA2_PRODUCT_DISCOVERY_001.md)  
+**Cursor header:** [ERA2_CURSOR_PROMPT](./ERA2_CURSOR_PROMPT.md)  
 **Companion backlog:** [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md)  
 **Engineering constitution (frozen):** [FOUNDATION_LOCK](../05-architecture/FOUNDATION_LOCK.md)
 
@@ -139,6 +142,75 @@ Every Product Core decision must answer with evidence:
 * How will we measure again afterwards?
 
 If a change cannot answer those questions, it does not belong in Product Core.
+
+---
+
+## PRODUCT LAW 002
+
+```text
+YourMeal OS never forces tenants
+to recreate information
+they already own.
+
+Existing operational knowledge
+must be reusable whenever possible.
+```
+
+**ADR:** [0093](../adr/0093-product-law-002.md)
+
+Tenants already have information. Our job is to give them solutions — not force recreation.
+
+---
+
+## TEAM LAW 001
+
+```text
+We never optimize our development time.
+
+We optimize the tenant's operational time.
+
+Engineering time is an investment.
+
+Tenant time is the product.
+```
+
+**ADR:** [0094](../adr/0094-team-law-001.md)
+
+---
+
+## Era 2 Definition of Done
+
+```text
+Before                         Now
+Tests PASS                     The operator finishes earlier
+```
+
+Done means: intuitive · fewer steps · less doubt · time saved.  
+Engineering Evidence + Operational Evidence.
+
+---
+
+## Era 2 working rhythm
+
+```text
+Observe Tenant → Measure → Understand → Prototype
+→ Validate → Measure Again → Ship
+```
+
+Centre: experience — not code.
+
+Mandatory prompt preamble: [ERA2_CURSOR_PROMPT](./ERA2_CURSOR_PROMPT.md).
+
+---
+
+## Operational Core vs Accelerators
+
+| Track | Role |
+|-------|------|
+| **Operational Core** | Experiences that make the business work (Sprint 001) |
+| **Operational Accelerators** | Capture · Import Pipeline · Templates · Timeline · Preparation Inventory · … |
+
+Accelerators do not change the domain. They accelerate work. Recorded in [ERA2_PRODUCT_DISCOVERY_001](./ERA2_PRODUCT_DISCOVERY_001.md).
 
 ---
 
@@ -472,7 +544,9 @@ The Operational Evidence Loop closes only when we **Measure Again** and can stat
 
 ## Working with engineering (Cursor / agents)
 
-Prefer prompts of the form:
+Start every Product Core prompt with [ERA2_CURSOR_PROMPT](./ERA2_CURSOR_PROMPT.md).
+
+Then:
 
 ```text
 Role: Isabella / Kitchen / Delivery / Admin
@@ -494,11 +568,14 @@ Avoid prompts that only say “add a module” without time returned.
 |----------|----------------|
 | Developer Platform | How do we develop safely? |
 | FOUNDATION_LOCK | How do we design Capabilities? |
-| PRODUCT_DIRECTION | Why do we build Product Core? |
+| PRODUCT_DIRECTION | Why · PRODUCT LAW 001 + 002 · TEAM LAW 001 |
 | OPERATIONAL_ENGINE_V1 | What motor is frozen? (Era 1 complete) |
 | **ERA_DECLARATION** | **Acta institucional · Era 1 CLOSED · Era 2 OPEN** |
+| **ERA2_PRODUCT_DISCOVERY_001** | **First Discovery · Accelerators registered** |
+| **SPRINT_001_TENANT_SUCCESS** | **Active Era 2 sprint · six epics** |
 | **TENANT_SUCCESS_PLAYBOOK** | **How do we return time? (Era 2)** · TENANT SUCCESS LAW 001 |
 | TENANT_TIME_SAVINGS_BACKLOG | Which jobs return how many minutes? |
+| ERA2_CURSOR_PROMPT | Mandatory Era 2 prompt header |
 
 ---
 
@@ -522,5 +599,9 @@ Avoid prompts that only say “add a module” without time returned.
 ERA 1 ended building a motor.
 ERA 2 begins returning time.
 ```
+
+> **We are not going to develop screens.**
+>
+> **We are going to design better workdays.**
 
 This Playbook is the prologue of that company — not a feature list.
