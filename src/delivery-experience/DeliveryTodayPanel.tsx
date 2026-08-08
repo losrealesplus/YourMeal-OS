@@ -20,12 +20,14 @@ import {
   printDeliveryDay,
 } from "@/delivery-experience/export-delivery-day";
 import {
+  buildAdaptedTodaysDeliveryDay,
+  type AdaptedDeliveryDayCard,
+} from "@/delivery-experience/adapt-delivery";
+import {
   absentOr,
-  buildTodaysDeliveryDay,
   deliveryReadinessLabel,
   deliveryStatusLabel,
   filterDeliveryCards,
-  type DeliveryDayCard,
   type DeliveryDayFilter,
   type DeliveryDayWarning,
   type DeliveryReadiness,
@@ -205,26 +207,34 @@ export function DeliveryTodayPanel({
     };
   }, [dayDate, delivery, order]);
 
-  const view: TodaysDeliveryDay = useMemo(
-    () =>
-      buildTodaysDeliveryDay({
+  const view: TodaysDeliveryDay & { cards: AdaptedDeliveryDayCard[] } =
+    useMemo(
+      () =>
+        buildAdaptedTodaysDeliveryDay({
+          dayDate,
+          context,
+          completedContext,
+          summariesById,
+          detailsById,
+          loadError,
+          assignmentSupported: false,
+        }),
+      [
         dayDate,
         context,
         completedContext,
         summariesById,
         detailsById,
         loadError,
-        assignmentSupported: false,
-      }),
-    [dayDate, context, completedContext, summariesById, detailsById, loadError],
-  );
+      ],
+    );
 
   const filtered = useMemo(
     () => filterDeliveryCards(view.cards, filter),
     [view.cards, filter],
   );
 
-  async function openDelivery(card: DeliveryDayCard) {
+  async function openDelivery(card: AdaptedDeliveryDayCard) {
     setOpenId(openId === card.id ? null : card.id);
     if (openId === card.id) return;
     if (detailsById[card.commitmentRef] || !order.isReady) return;
@@ -498,6 +508,11 @@ export function DeliveryTodayPanel({
                     ? absentOr(c.driverLabel)
                     : "no disponible en este substrate"}
                 </p>
+                {c.addressClarification ? (
+                  <p className="text-xs text-muted-foreground">
+                    Aclaración operativa: {c.addressClarification}
+                  </p>
+                ) : null}
               </div>
               <div className="flex flex-wrap gap-1">
                 <StatusChip
@@ -508,6 +523,9 @@ export function DeliveryTodayPanel({
                   tone="neutral"
                   label={deliveryStatusLabel(c.deliveryStatus)}
                 />
+                {c.deliveryAdapted ? (
+                  <StatusChip tone="info" label="Adaptado (sesión)" />
+                ) : null}
               </div>
             </div>
             <div className="mt-2 flex flex-wrap gap-2">

@@ -1,6 +1,6 @@
 /**
- * DELIVERY EXPERIENCE 001–002
- * Today's Delivery Day · Delivery Search
+ * DELIVERY EXPERIENCE 001–003
+ * Today's Delivery Day · Search · Adaptation
  *
  * Experience only — no Delivery Capability invent · no routes · no maps ·
  * no navigation · no ConfirmDelivery · no durable assignment simulation.
@@ -10,14 +10,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { AdminHeader, SectionTitle, StatusChip } from "@/components/admin";
+import { DeliveryAdaptationPanel } from "@/delivery-experience/DeliveryAdaptationPanel";
 import { DeliverySearchPanel } from "@/delivery-experience/DeliverySearchPanel";
 import { DeliveryTodayPanel } from "@/delivery-experience/DeliveryTodayPanel";
 import { utcDateOnly } from "@/menu-experience/week-plan";
 
-type ExperienceMode = "today" | "search";
+type ExperienceMode = "today" | "search" | "adapt";
 
 function isExperienceMode(value: unknown): value is ExperienceMode {
-  return value === "today" || value === "search";
+  return value === "today" || value === "search" || value === "adapt";
 }
 
 export const Route = createFileRoute("/_authenticated/admin/delivery-today")({
@@ -35,12 +36,12 @@ export const Route = createFileRoute("/_authenticated/admin/delivery-today")({
     meta: [
       {
         title:
-          "YourMeal OS — Delivery Experience · Search · Today's Delivery Day",
+          "YourMeal OS — Delivery Experience · Adaptation · Search · Today's Day",
       },
       {
         name: "description",
         content:
-          "DELIVERY EXPERIENCE 002 Search · TTFD <10s · 001 Today's Delivery Day · TTUDD <2 min · no routes yet",
+          "DELIVERY EXPERIENCE 003 Adaptation · TTAD <30s · 002 Search · 001 Today's Delivery Day · no routes",
       },
     ],
   }),
@@ -93,6 +94,14 @@ function DeliveryTodayExperiencePage() {
       kpi: "TTFD < 10 s",
       goal: "Encontrar la entrega correcta en <10s sin reconstruir Customer/Order",
     },
+    adapt: {
+      overline: "DELIVERY EXPERIENCE 003 · Delivery Adaptation",
+      title: "Zero Friction Delivery Adaptation",
+      subtitle:
+        "Adapta el día cuando cambia la realidad — sin reescribir Order ni inventar rutas",
+      kpi: "TTAD < 30 s",
+      goal: "Adaptar en <30s · volver a la jornada en <5s · Order intacto",
+    },
   };
 
   const m = meta[mode];
@@ -123,6 +132,13 @@ function DeliveryTodayExperiencePage() {
         >
           Búsqueda
         </button>
+        <button
+          type="button"
+          className="text-xs underline-offset-2 hover:underline"
+          onClick={() => goMode("adapt", dayDate, focusDeliveryId ?? undefined)}
+        >
+          Adaptación
+        </button>
         <Link
           to="/admin/kitchen-today"
           search={{ mode: "completion", day: dayDate, workId: undefined }}
@@ -147,21 +163,21 @@ function DeliveryTodayExperiencePage() {
         >
           Delivery Workspace (Demo)
         </Link>
-        <Link
-          to="/admin/delivery"
-          className="text-xs underline-offset-2 hover:underline"
-        >
-          Delivery (legacy)
-        </Link>
       </div>
 
       <AdminHeader
         goal={m.goal}
         capability="logistics.operate · Delivery Facade (read) · Order (consume)"
-        object="Search · today's deliveries · readiness · warnings · no routes · no assignment invent"
+        object="Adaptation · search · today's deliveries · session honesty · no routes · no Order invent"
       />
 
-      {mode === "search" ? (
+      {mode === "adapt" ? (
+        <DeliveryAdaptationPanel
+          dayDate={dayDate}
+          focusDeliveryId={focusDeliveryId}
+          onBackToToday={() => goMode("today", dayDate)}
+        />
+      ) : mode === "search" ? (
         <DeliverySearchPanel
           dayDate={dayDate}
           onOpenDelivery={(day, deliveryId) =>

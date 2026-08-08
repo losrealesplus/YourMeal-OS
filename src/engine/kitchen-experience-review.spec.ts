@@ -62,7 +62,7 @@ describe("KITCHEN EXPERIENCE REVIEW 001 · Readiness Review", () => {
     expect(cards).toContain("Journey Certification");
     expect(cards).toContain("Journey Certified · Frozen");
     expect(cards).toMatch(
-      /Delivery Experience\s+(← NEXT \(eligible\)|▶ 001 Today's Delivery Day|▶ 002 Delivery Search)/,
+      /Delivery Experience\s+(← NEXT \(eligible\)|▶ 001 Today's Delivery Day|▶ 002 Delivery Search|▶ 003 Delivery Adaptation)/,
     );
 
     expect(missions).toContain("KITCHEN-EXPERIENCE-REVIEW");

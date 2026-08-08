@@ -114,8 +114,8 @@ OCC · Quick Capture · Import · Bulk appeared because friction repeated across
 | Lifecycle step | Delivery (controlled transfer) |
 |----------------|--------------------------------|
 | Create / Capture | **DE001 Today's Delivery Day** ✅ (receives ready work) |
-| Search | **DE002 Delivery Search** ▶ |
-| Edit / Adapt | DE003 Delivery Adaptation (hypothesis) |
+| Search | **DE002 Delivery Search** ✅ |
+| Edit / Adapt | **DE003 Delivery Adaptation** ▶ |
 | Domain phases | DE004 Responsibility · DE005 Route Preparation · DE006 Completion (hypothesis) |
 | Review | Pending |
 | Journey Certification | Pending |

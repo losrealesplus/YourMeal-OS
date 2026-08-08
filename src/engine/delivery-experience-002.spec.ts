@@ -116,7 +116,7 @@ describe("DELIVERY EXPERIENCE 002 · Zero Friction Delivery Search", () => {
     expect(cards).toContain("Time-to-Find-Delivery <10 s");
 
     expect(missions).toContain("DELIVERY-EXPERIENCE-002");
-    expect(missions).toContain("DE002 Search ▶");
+    expect(missions).toContain("DE002 Search ✅");
     expect(missions).toContain("TTFD");
 
     expect(ui).toContain("DELIVERY EXPERIENCE 002");
