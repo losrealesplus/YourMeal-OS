@@ -55,8 +55,8 @@ Verdicts that authorize certification: **READY** or **READY WITH IMPROVEMENTS**.
 | **Customer Journey** | ✅ **Certified** | [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · Frozen |
 | **Order Journey** | ✅ **Certified** | [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · Frozen |
 | **Menu Journey** | ✅ **Certified** | [MENU_EXPERIENCE_005](./MENU_EXPERIENCE_005.md) | ME001–005 · published week handoff |
-| **Production Journey** | ⏳ Review complete · Certification next | [PRODUCTION_EXPERIENCE_REVIEW](../tenant-success/PRODUCTION_EXPERIENCE_REVIEW.md) | PE001–006 ✅ · Verdict **READY WITH IMPROVEMENTS** |
-| **Kitchen Journey** | ⏳ Pending | — | After Production |
+| **Production Journey** | ✅ **Certified** | [PRODUCTION_JOURNEY_CERTIFICATION](../tenant-success/PRODUCTION_JOURNEY_CERTIFICATION.md) · [Review](../tenant-success/PRODUCTION_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · **Frozen** · PE001–006 |
+| **Kitchen Journey** | ⏳ Pending · **eligible** | — | After Production Certification |
 | **Delivery Journey** | ⏳ Pending | — | After Kitchen |
 | **Operational Journey** | ⏳ Pending | — | Cross-domain review after Delivery |
 
@@ -66,8 +66,8 @@ Order Journey         ✅ Certified
 Customer Journey      ✅ Certified
 Order Journey         ✅ Certified
 Menu Journey          ✅ Certified
-Production Journey    ⏳ Review ✅ · READY WITH IMPROVEMENTS · Certification next
-Kitchen Journey       ⏳
+Production Journey    ✅ Certified · Frozen
+Kitchen Journey       ⏳ eligible
 Delivery Journey      ⏳
 ↓
 Operational Journey Review
@@ -80,7 +80,8 @@ Operational Accelerators
 ```
 
 Menu Experience is structured by the **weekly operational cycle**, not CRUD.  
-Production Experience transforms the **published week** into work — not order admin.
+Production Experience transforms the **published week** into work — not order admin.  
+Kitchen Experience executes transferred work — it does not re-plan Production.
 
 ```text
 MENU
@@ -88,14 +89,18 @@ Semana → Día → Menú → Platos
 
 PRODUCTION
 Semana → Día → Trabajo → Cantidad → Deadline → Kitchen
+
+HANDOFF
+Responsibility transfer (Ready · warnings · Blocked)
 ```
 
 Dish Library is an **Operational Library** — consumed in planning, not administered as the day’s work.  
-See [OPERATIONAL_LIBRARIES](./OPERATIONAL_LIBRARIES.md) · [PRODUCTION_EXPERIENCE_002](./PRODUCTION_EXPERIENCE_002.md) · [PRODUCTION_EXPERIENCE_001](./PRODUCTION_EXPERIENCE_001.md).
+See [OPERATIONAL_LIBRARIES](./OPERATIONAL_LIBRARIES.md) · [PRODUCTION_JOURNEY_CERTIFICATION](../tenant-success/PRODUCTION_JOURNEY_CERTIFICATION.md).
 
 ```text
 Menu: 001 → 002 → 003 → 004 → 005 ✅ Certified
-Production: 001 Planning ✅ → 002 Search ✅ → 003 Adaptation ✅ → 004 Preps ✅ → 005 Alerts ✅ → 006 Handoff ✅ → Review ✅ → Certification ←
+Production: 001–006 ✅ → Review ✅ → Certification ✅ CERTIFIED · Frozen
+Kitchen: ← NEXT
 ```
 
 ---
@@ -113,6 +118,8 @@ Production: 001 Planning ✅ → 002 Search ✅ → 003 Adaptation ✅ → 004 P
 ## Related
 
 * [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)  
+* [PRODUCTION_JOURNEY_CERTIFICATION](../tenant-success/PRODUCTION_JOURNEY_CERTIFICATION.md)  
+* [PRODUCTION_EXPERIENCE_REVIEW](../tenant-success/PRODUCTION_EXPERIENCE_REVIEW.md)  
 * [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md)  
 * [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md)  
 * [OPERATIONAL_ACCELERATORS](./OPERATIONAL_ACCELERATORS.md)
