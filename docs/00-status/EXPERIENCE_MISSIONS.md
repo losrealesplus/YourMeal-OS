@@ -61,7 +61,29 @@ If no → later.
 
 ## Active mission
 
-▶ [CUSTOMER_EXPERIENCE_001](./CUSTOMER_EXPERIENCE_001.md) · Zero Friction Customer Management
+▶ [CUSTOMER_EXPERIENCE_001](./CUSTOMER_EXPERIENCE_001.md) · Zero Friction Customer Management · Create
+
+## Customer Experience sequence
+
+Orders wait until Customer is fluid. Search is next — it runs far more often than create.
+
+```text
+001 Create          ← active
+↓
+002 Search          ← next
+↓
+003 Edit
+↓
+004 Company Management
+↓
+005 Preferences
+↓
+006 Bulk Operations
+↓
+then Order Experience
+```
+
+Cards: [EXPERIENCE_CARDS](./EXPERIENCE_CARDS.md)
 
 ---
 

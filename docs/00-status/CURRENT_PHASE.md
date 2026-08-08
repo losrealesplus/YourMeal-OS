@@ -20,9 +20,10 @@ Operational Engine v1.0     ✅ DECLARED · Architecture FROZEN
 
 ERA 2 · Return Time         ▶ OPEN
 Sprint type                 Experience Sprint
-Active                      CUSTOMER EXPERIENCE 001
+Active                      CUSTOMER EXPERIENCE 001 · Phase 1
 Mission                     Zero Friction Customer Management
 TTA                         Time-to-Create Customer < 30 seconds
+Card                        EXPERIENCE_CARDS.md
 
 EXPERIENCE LAW 001          Minimum first interaction (ADR 0098)
 Progressive Completion      Rest later

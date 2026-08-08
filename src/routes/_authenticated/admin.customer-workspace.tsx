@@ -1,8 +1,8 @@
 /**
- * CUSTOMER EXPERIENCE 001 · Zero Friction Customer Management
+ * CUSTOMER EXPERIENCE 001 · Phase 1 · Zero Friction Customer Management
  *
- * Mission: Time-to-Create Customer < 30s · EXPERIENCE LAW 001
- * Surface: useCustomer() only (FOUNDATION LAW 003)
+ * Experience above existing useCustomer() only — no Capability / Facade edits here.
+ * Mission: TTC < 30s · EXPERIENCE MANIFESTO 001
  */
 
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -19,8 +19,6 @@ import { useIdentity } from "@/identity/useIdentity";
 import {
   archiveCustomerCommand,
   createCustomerCommand,
-  restoreCustomerCommand,
-  updateCustomerCommand,
 } from "@/customer/CustomerCommands";
 import {
   getCustomerQuery,
@@ -33,7 +31,15 @@ import type {
   PartyKind,
   PartyRef,
 } from "@/customer/CustomerContext";
+import {
+  CUSTOMER_CREATION_ORIGIN_LABEL,
+  recordCustomerCreationOrigin,
+  type CustomerCreationOrigin,
+} from "@/customer-experience/creation-origin";
 import { cn } from "@/lib/utils";
+
+/** Silent origin for altas from this Experience surface. */
+const CREATE_ORIGIN: CustomerCreationOrigin = "customer_workspace";
 
 export const Route = createFileRoute(
   "/_authenticated/admin/customer-workspace",
@@ -49,7 +55,7 @@ export const Route = createFileRoute(
       },
       {
         name: "description",
-        content: "TTC < 30s · EXPERIENCE LAW 001 · CustomerFacade only",
+        content: "TTC < 30s · EXPERIENCE LAW 001 · useCustomer only",
       },
     ],
   }),
@@ -87,7 +93,12 @@ function CustomerExperiencePage() {
   const [creating, setCreating] = useState(false);
   const [partyChoice, setPartyChoice] = useState<PartyChoice>(null);
   const [draft, setDraft] = useState<CreateDraft>(emptyDraft);
+  const [justCreated, setJustCreated] = useState(false);
+  const [createdFromLabel, setCreatedFromLabel] = useState<string | null>(null);
   const nameRef = useRef<HTMLInputElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+  const newCustomerRef = useRef<HTMLButtonElement>(null);
+  const nextActionRef = useRef<HTMLAnchorElement>(null);
   const caps = identity.permissions.capabilities;
   const canWrite = caps.includes("customers.write");
 
@@ -160,12 +171,32 @@ function CustomerExperiencePage() {
     setPartyChoice(null);
     setDraft(emptyDraft());
     setSelected(null);
+    setJustCreated(false);
+    setCreatedFromLabel(null);
   }
 
   function cancelCreate() {
     setCreating(false);
     setPartyChoice(null);
     setDraft(emptyDraft());
+  }
+
+  function finishCreateSuccess(input: {
+    partyRef: PartyRef;
+    segment: Segment;
+    toastMessage: string;
+  }) {
+    const event = recordCustomerCreationOrigin({
+      origin: CREATE_ORIGIN,
+      partyKind: input.partyRef.kind,
+      partyId: input.partyRef.id,
+    });
+    setCreatedFromLabel(CUSTOMER_CREATION_ORIGIN_LABEL[event.origin]);
+    cancelCreate();
+    setJustCreated(true);
+    setSegment(input.segment);
+    toast.success(input.toastMessage);
+    window.setTimeout(() => nextActionRef.current?.focus(), 0);
   }
 
   async function onSaveCreate() {
@@ -193,15 +224,20 @@ function CustomerExperiencePage() {
           toast.error(result.errors[0]?.message ?? "No se pudo crear");
           return;
         }
+        if (!result.partyRef) {
+          toast.error("Cliente creado sin referencia");
+          return;
+        }
         const ms = Math.round(performance.now() - started);
-        toast.success(
-          partyChoice === "company_employee"
-            ? `Empleado creado · ${ms} ms · vinculación a empresa: Progressive Completion`
-            : `Cliente creado · ${ms} ms (objetivo TTC < 30s)`,
-        );
-        cancelCreate();
-        setSegment("individual");
-        if (result.partyRef) await openParty(result.partyRef);
+        finishCreateSuccess({
+          partyRef: result.partyRef,
+          segment: "individual",
+          toastMessage:
+            partyChoice === "company_employee"
+              ? `Empleado creado · ${ms} ms · vinculación a empresa: Progressive Completion`
+              : `Cliente creado · ${ms} ms (objetivo TTC < 30s)`,
+        });
+        await openParty(result.partyRef);
         await loadList(query, "individual");
         return;
       }
@@ -226,15 +262,28 @@ function CustomerExperiencePage() {
         toast.error(result.errors[0]?.message ?? "No se pudo crear");
         return;
       }
+      if (!result.partyRef) {
+        toast.error("Empresa creada sin referencia");
+        return;
+      }
       const ms = Math.round(performance.now() - started);
-      toast.success(`Empresa creada · ${ms} ms (objetivo TTC < 30s)`);
-      cancelCreate();
-      setSegment("company_account");
-      if (result.partyRef) await openParty(result.partyRef);
+      finishCreateSuccess({
+        partyRef: result.partyRef,
+        segment: "company_account",
+        toastMessage: `Empresa creada · ${ms} ms (objetivo TTC < 30s)`,
+      });
+      await openParty(result.partyRef);
       await loadList(query, "company_account");
     } finally {
       setBusy(false);
     }
+  }
+
+  function goBackFromCreated() {
+    setJustCreated(false);
+    setCreatedFromLabel(null);
+    setSelected(null);
+    window.setTimeout(() => searchRef.current?.focus(), 0);
   }
 
   async function onArchive() {
@@ -257,38 +306,9 @@ function CustomerExperiencePage() {
       }
       toast.success("Cliente archivado");
       setSelected(null);
+      setJustCreated(false);
+      setCreatedFromLabel(null);
       await loadList(query, segment);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function onProbeUnimplemented(kind: "update" | "restore") {
-    if (!selected) return;
-    const partyRef: PartyRef = {
-      kind: selected.summary.partyKind,
-      id: selected.summary.id,
-    };
-    setBusy(true);
-    try {
-      const result =
-        kind === "update"
-          ? await customer.updateCustomer(
-              updateCustomerCommand({
-                partyRef,
-                patch: { displayName: "probe" },
-              }),
-            )
-          : await customer.restoreCustomer(
-              restoreCustomerCommand({ partyRef }),
-            );
-      const code = result.errors[0]?.code ?? "UNKNOWN";
-      toast.message(
-        kind === "update"
-          ? "Edición frecuente · pendiente (TTA < 20s)"
-          : "Restaurar · pendiente",
-        { description: `Facade: ${code}` },
-      );
     } finally {
       setBusy(false);
     }
@@ -298,51 +318,53 @@ function CustomerExperiencePage() {
   const isEmployee = selected?.summary.tags.some((t) =>
     t.includes("company_employee"),
   );
+  const primaryPhone =
+    profile?.phones?.[0]?.e164?.trim() ||
+    null;
 
   return (
     <div className="animate-fade-in max-w-5xl">
       <SectionTitle
-        overline="CUSTOMER EXPERIENCE 001 · Mission"
+        overline="CUSTOMER EXPERIENCE 001 · Phase 1"
         title="Zero Friction Customer Management"
-        subtitle="Time-to-Create Customer < 30s · mínimo imprescindible · Progressive Completion"
+        subtitle="Experience above Facade · TTC < 30s · el software desaparece"
       />
 
-      <div className="mb-4 grid gap-2 rounded-md border border-foreground/15 bg-foreground/[0.03] px-4 py-3 sm:grid-cols-3">
+      <div className="mb-4 grid gap-2 rounded-md border border-foreground/15 bg-foreground/[0.03] px-4 py-3 sm:grid-cols-2 lg:grid-cols-4">
         <Kpi label="TTC · Create" value="< 30 s" />
         <Kpi label="TTF · Find" value="< 10 s" />
-        <Kpi label="Clicks to Create" value="≤ 6" />
+        <Kpi label="TTO · Open" value="< 3 s" />
+        <Kpi label="Order from Customer" value="< 5 s" />
       </div>
 
       <AdminHeader
-        goal="Que Isabella no tenga que pensar para dar de alta un cliente"
+        goal="Que Isabella no piense en el software — solo en el cliente"
         capability="customers.read / customers.write"
-        object="Particular · Empresa · Progressive Completion"
+        object="Particular · Empresa · Empleado · Progressive Completion"
       />
 
       {!creating ? (
         <div className="mb-4 flex flex-wrap gap-2">
           <button
+            ref={newCustomerRef}
             type="button"
             disabled={!canWrite || busy}
             onClick={startCreate}
-            className="rounded-md bg-foreground px-4 py-2 text-sm font-semibold text-background disabled:opacity-40"
+            className="min-h-11 rounded-md bg-foreground px-4 py-2.5 text-sm font-semibold text-background disabled:opacity-40"
           >
             Nuevo cliente
           </button>
           <button
             type="button"
             disabled={busy}
-            onClick={() => void loadList(query, segment)}
-            className="rounded-md border border-border px-3 py-2 text-xs font-semibold"
+            onClick={() => {
+              searchRef.current?.focus();
+              void loadList(query, segment);
+            }}
+            className="min-h-11 rounded-md border border-border px-3 py-2.5 text-sm font-semibold"
           >
             Actualizar
           </button>
-          <Link
-            to="/admin/customers"
-            className="self-center text-xs text-muted-foreground underline underline-offset-2"
-          >
-            Directorio legacy
-          </Link>
         </div>
       ) : (
         <CreateWizard
@@ -357,7 +379,7 @@ function CustomerExperiencePage() {
         />
       )}
 
-      <div className="mb-4 flex flex-wrap gap-2">
+      <div className="mb-4 flex flex-wrap gap-2" role="tablist" aria-label="Segmento">
         {(
           [
             ["all", "Todos"],
@@ -368,9 +390,11 @@ function CustomerExperiencePage() {
           <button
             key={value}
             type="button"
+            role="tab"
+            aria-selected={segment === value}
             onClick={() => setSegment(value)}
             className={cn(
-              "rounded-md border px-3 py-1.5 text-xs font-semibold",
+              "min-h-10 rounded-md border px-3 py-2 text-sm font-semibold",
               segment === value
                 ? "border-foreground bg-foreground text-background"
                 : "border-border",
@@ -384,13 +408,16 @@ function CustomerExperiencePage() {
       <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
         <section>
           <label className="mb-2 block text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-            Buscar · TTF &lt; 10s
+            Buscar · nombre · teléfono · empresa · recientes
           </label>
           <input
+            ref={searchRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Nombre, teléfono, código…"
-            className="mb-3 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+            placeholder="Buscar ahora…"
+            className="mb-3 min-h-11 w-full rounded-md border border-border bg-background px-3 py-2.5 text-base sm:text-sm"
+            autoComplete="off"
+            enterKeyHint="search"
           />
           {loading ? (
             <p className="py-8 text-center text-sm text-muted-foreground">
@@ -398,7 +425,9 @@ function CustomerExperiencePage() {
             </p>
           ) : summaries.length === 0 ? (
             <p className="py-8 text-center text-sm text-muted-foreground">
-              Sin resultados
+              {query.trim()
+                ? "Sin resultados"
+                : "Recientes · escribe para buscar"}
             </p>
           ) : (
             <ul className="divide-y divide-border rounded-md border border-border">
@@ -406,11 +435,12 @@ function CustomerExperiencePage() {
                 <li key={`${s.partyKind}:${s.id}`}>
                   <button
                     type="button"
-                    onClick={() =>
-                      void openParty({ kind: s.partyKind, id: s.id })
-                    }
+                    onClick={() => {
+                      setJustCreated(false);
+                      void openParty({ kind: s.partyKind, id: s.id });
+                    }}
                     className={cn(
-                      "flex w-full items-start justify-between gap-3 px-3 py-2.5 text-left hover:bg-muted/40",
+                      "flex min-h-12 w-full items-start justify-between gap-3 px-3 py-3 text-left hover:bg-muted/40",
                       selected?.summary.id === s.id && "bg-muted/50",
                     )}
                   >
@@ -424,6 +454,11 @@ function CustomerExperiencePage() {
                             ? "Empleado"
                             : "Particular"
                           : "Empresa"}
+                        {s.tags
+                          .filter((t) => t.startsWith("code:"))
+                          .slice(0, 1)
+                          .map((t) => ` · ${t.replace("code:", "")}`)
+                          .join("")}
                       </p>
                     </div>
                     <StatusChip
@@ -443,14 +478,30 @@ function CustomerExperiencePage() {
 
         <section>
           <p className="mb-2 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-            Ficha · Progressive Completion
+            Cliente · sin callejón sin salida
           </p>
           {!selected ? (
             <p className="rounded-md border border-dashed border-border px-4 py-12 text-center text-sm text-muted-foreground">
-              Selecciona un cliente · el resto se completa después
+              Selecciona o crea un cliente · Progressive Completion para el resto
             </p>
           ) : (
             <div className="space-y-4 rounded-md border border-border p-4">
+              {justCreated ? (
+                <NextBestAction
+                  primaryRef={nextActionRef}
+                  createdFromLabel={createdFromLabel}
+                  onCreateOrder={() => {
+                    /* Link handles navigation; keep for focus contract */
+                  }}
+                  onOpenCustomer={() => {
+                    setJustCreated(false);
+                  }}
+                  onCreateAnother={() => {
+                    startCreate();
+                  }}
+                  onBack={goBackFromCreated}
+                />
+              ) : null}
               <div>
                 <h3 className="text-lg font-semibold">
                   {selected.summary.displayName}
@@ -461,8 +512,19 @@ function CustomerExperiencePage() {
                       ? "Empleado de empresa"
                       : "Particular"
                     : "Empresa"}
+                  {createdFromLabel && justCreated
+                    ? ` · origen ${createdFromLabel}`
+                    : ""}
                 </p>
               </div>
+
+              {!justCreated ? (
+                <OperationalActions
+                  phone={primaryPhone}
+                  displayName={selected.summary.displayName}
+                />
+              ) : null}
+
               <dl className="grid grid-cols-2 gap-2 text-xs">
                 <div>
                   <dt className="text-muted-foreground">Estado</dt>
@@ -480,12 +542,10 @@ function CustomerExperiencePage() {
                     <dd className="font-semibold">{profile.email}</dd>
                   </div>
                 ) : null}
-                {profile?.phones?.length ? (
+                {primaryPhone ? (
                   <div className="col-span-2">
                     <dt className="text-muted-foreground">Teléfono</dt>
-                    <dd className="font-semibold">
-                      {profile.phones.map((p) => p.e164).join(" · ")}
-                    </dd>
+                    <dd className="font-semibold">{primaryPhone}</dd>
                   </div>
                 ) : null}
               </dl>
@@ -502,9 +562,7 @@ function CustomerExperiencePage() {
               <FacetBlock
                 title="Preferencias / alergias"
                 empty="Más adelante · Progressive Completion"
-                items={
-                  profile?.allergens?.map((a) => a.code) ?? []
-                }
+                items={profile?.allergens?.map((a) => a.code) ?? []}
               />
               <div className="flex flex-wrap gap-2 border-t border-dashed border-border pt-2">
                 <button
@@ -515,17 +573,9 @@ function CustomerExperiencePage() {
                     selected.summary.partyKind !== "individual"
                   }
                   onClick={() => void onArchive()}
-                  className="rounded-md border border-border px-3 py-1.5 text-xs font-semibold disabled:opacity-40"
+                  className="min-h-10 rounded-md border border-border px-3 py-2 text-xs font-semibold disabled:opacity-40"
                 >
                   Archivar
-                </button>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => void onProbeUnimplemented("update")}
-                  className="rounded-md border border-dashed border-border px-3 py-1.5 text-xs text-muted-foreground"
-                >
-                  Editar frecuente (TTA &lt; 20s · pendiente)
                 </button>
               </div>
             </div>
@@ -571,21 +621,21 @@ function CreateWizard(props: {
             <button
               type="button"
               onClick={() => onChoose("individual")}
-              className="rounded-md bg-foreground px-4 py-2 text-sm font-semibold text-background"
+              className="min-h-11 rounded-md bg-foreground px-4 py-2.5 text-sm font-semibold text-background"
             >
               Particular
             </button>
             <button
               type="button"
               onClick={() => onChoose("company_account")}
-              className="rounded-md border border-border px-4 py-2 text-sm font-semibold"
+              className="min-h-11 rounded-md border border-border px-4 py-2.5 text-sm font-semibold"
             >
               Empresa
             </button>
             <button
               type="button"
               onClick={() => onChoose("company_employee")}
-              className="rounded-md border border-border px-4 py-2 text-sm font-semibold"
+              className="min-h-11 rounded-md border border-border px-4 py-2.5 text-sm font-semibold"
             >
               Empleado de empresa
             </button>
@@ -622,7 +672,7 @@ function CreateWizard(props: {
               onChange={(e) =>
                 onDraft((d) => ({ ...d, name: e.target.value }))
               }
-              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+              className="min-h-11 w-full rounded-md border border-border bg-background px-3 py-2.5 text-base sm:text-sm"
               autoComplete="name"
             />
           </label>
@@ -633,7 +683,7 @@ function CreateWizard(props: {
               onChange={(e) =>
                 onDraft((d) => ({ ...d, phone: e.target.value }))
               }
-              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+              className="min-h-11 w-full rounded-md border border-border bg-background px-3 py-2.5 text-base sm:text-sm"
               autoComplete="tel"
             />
           </label>
@@ -644,7 +694,7 @@ function CreateWizard(props: {
               onChange={(e) =>
                 onDraft((d) => ({ ...d, city: e.target.value }))
               }
-              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+              className="min-h-11 w-full rounded-md border border-border bg-background px-3 py-2.5 text-base sm:text-sm"
             />
           </label>
           <label className="sm:col-span-2 block text-xs">
@@ -654,7 +704,7 @@ function CreateWizard(props: {
               onChange={(e) =>
                 onDraft((d) => ({ ...d, address: e.target.value }))
               }
-              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+              className="min-h-11 w-full rounded-md border border-border bg-background px-3 py-2.5 text-base sm:text-sm"
               autoComplete="street-address"
             />
           </label>
@@ -668,7 +718,7 @@ function CreateWizard(props: {
                 onChange={(e) =>
                   onDraft((d) => ({ ...d, contactEmail: e.target.value }))
                 }
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                className="min-h-11 w-full rounded-md border border-border bg-background px-3 py-2.5 text-base sm:text-sm"
                 autoComplete="email"
                 type="email"
               />
@@ -678,20 +728,132 @@ function CreateWizard(props: {
             <button
               type="submit"
               disabled={busy}
-              className="rounded-md bg-foreground px-4 py-2 text-sm font-semibold text-background disabled:opacity-40"
+              className="min-h-11 rounded-md bg-foreground px-4 py-2.5 text-sm font-semibold text-background disabled:opacity-40"
             >
               Guardar
             </button>
             <button
               type="button"
               onClick={() => onChoose(null)}
-              className="rounded-md border border-border px-3 py-2 text-xs font-semibold"
+              className="min-h-11 rounded-md border border-border px-3 py-2.5 text-sm font-semibold"
             >
               Cambiar tipo
             </button>
           </div>
         </form>
       )}
+    </div>
+  );
+}
+
+function NextBestAction(props: {
+  primaryRef: React.RefObject<HTMLAnchorElement | null>;
+  createdFromLabel: string | null;
+  onCreateOrder: () => void;
+  onOpenCustomer: () => void;
+  onCreateAnother: () => void;
+  onBack: () => void;
+}) {
+  return (
+    <div
+      className="rounded-md border border-foreground/20 bg-foreground/[0.04] px-3 py-3 space-y-3"
+      role="region"
+      aria-label="Siguiente mejor acción"
+    >
+      <div>
+        <p className="text-sm font-semibold">Cliente creado</p>
+        <p className="text-xs text-muted-foreground">
+          ¿Qué quieres hacer ahora?
+          {props.createdFromLabel
+            ? ` · alta desde ${props.createdFromLabel}`
+            : ""}
+        </p>
+      </div>
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+        <Link
+          ref={props.primaryRef}
+          to="/admin/order-workspace"
+          className="inline-flex min-h-11 items-center justify-center rounded-md bg-foreground px-4 py-2.5 text-sm font-semibold text-background"
+          onClick={props.onCreateOrder}
+        >
+          Crear pedido
+        </Link>
+        <button
+          type="button"
+          onClick={props.onOpenCustomer}
+          className="min-h-11 rounded-md border border-border px-4 py-2.5 text-sm font-semibold"
+        >
+          Abrir cliente
+        </button>
+        <button
+          type="button"
+          onClick={props.onCreateAnother}
+          className="min-h-11 rounded-md border border-border px-4 py-2.5 text-sm font-semibold"
+        >
+          Crear otro cliente
+        </button>
+        <button
+          type="button"
+          onClick={props.onBack}
+          className="min-h-11 rounded-md border border-dashed border-border px-4 py-2.5 text-sm font-semibold text-muted-foreground"
+        >
+          Volver
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function OperationalActions(props: {
+  phone: string | null;
+  displayName: string;
+}) {
+  const phoneHref = props.phone
+    ? `tel:${props.phone.replace(/[^\d+]/g, "")}`
+    : null;
+  const waHref = props.phone
+    ? `https://wa.me/${props.phone.replace(/\D/g, "")}`
+    : null;
+  const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(props.displayName)}`;
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      <Link
+        to="/admin/order-workspace"
+        className="inline-flex min-h-11 items-center rounded-md bg-foreground px-3 py-2 text-sm font-semibold text-background"
+      >
+        Crear pedido
+      </Link>
+      {phoneHref ? (
+        <a
+          href={phoneHref}
+          className="inline-flex min-h-11 items-center rounded-md border border-border px-3 py-2 text-sm font-semibold"
+        >
+          Llamar
+        </a>
+      ) : (
+        <span className="inline-flex min-h-11 items-center rounded-md border border-dashed border-border px-3 py-2 text-xs text-muted-foreground">
+          Llamar · sin teléfono
+        </span>
+      )}
+      {waHref ? (
+        <a
+          href={waHref}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex min-h-11 items-center rounded-md border border-dashed border-border px-3 py-2 text-xs font-semibold text-muted-foreground"
+        >
+          WhatsApp · pronto
+        </a>
+      ) : null}
+      <a
+        href={mapsHref}
+        target="_blank"
+        rel="noreferrer"
+        className="inline-flex min-h-11 items-center rounded-md border border-dashed border-border px-3 py-2 text-xs font-semibold text-muted-foreground"
+      >
+        Mapas · pronto
+      </a>
     </div>
   );
 }
