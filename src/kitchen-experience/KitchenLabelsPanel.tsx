@@ -22,7 +22,6 @@ import { buildAdaptedTodaysKitchenWork } from "@/kitchen-experience/adapt-execut
 import {
   LABEL_ABSENT_COPY,
   LABEL_NO_SPECIAL_COPY,
-  buildLabelContext,
   labelFieldDisplay,
   listLabelContexts,
   sortedSpecial,
@@ -461,6 +460,3 @@ export function KitchenLabelsPanel({
     </section>
   );
 }
-
-/** Re-export for tests / deep links */
-export { buildLabelContext };
