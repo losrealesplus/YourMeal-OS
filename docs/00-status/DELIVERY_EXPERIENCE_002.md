@@ -1,6 +1,6 @@
 # DELIVERY EXPERIENCE 002 · Zero Friction Delivery Search
 
-**Status:** ▶ **IN PROGRESS**  
+**Status:** ✅ **COMPLETE** (superseded as active by DE003 · surface retained)  
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/delivery-today` (mode **search**)  
@@ -71,8 +71,8 @@ Primary: Return to Today's Deliveries · Review Orders · Review Production Hand
 
 ```text
 001 Today's Delivery Day       ✅
-002 Delivery Search            ▶ THIS
-003 Delivery Adaptation
+002 Delivery Search            ✅ THIS (complete)
+003 Delivery Adaptation        ▶ next
 004 Driver / Responsibility
 005 Route Preparation          ← not Route Optimization
 006 Delivery Completion

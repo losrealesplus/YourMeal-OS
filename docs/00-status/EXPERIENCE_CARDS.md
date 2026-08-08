@@ -336,7 +336,7 @@ Journey Certification          ✅ CERTIFIED
 Freeze                         ✅
 ↓
 Kitchen Experience             ✅ Journey Certified · Frozen
-Delivery Experience            ▶ 002 Delivery Search
+Delivery Experience            ▶ 003 Delivery Adaptation
 ```
 
 | Phase | Question | Status |
@@ -414,7 +414,7 @@ Journey Certification          ✅ CERTIFIED
 ↓
 Freeze                         ✅
 ↓
-Delivery Experience            ▶ 002 Delivery Search
+Delivery Experience            ▶ 003 Delivery Adaptation
 ```
 
 | Phase | Question | Status |
@@ -441,10 +441,10 @@ Name
 Delivery Experience
 
 Phase
-002 Delivery Search · In Progress
+003 Delivery Adaptation · In Progress
 
 Mission
-Zero Friction Delivery Search (001 Day · 002 Search)
+Zero Friction Delivery Adaptation (001–003)
 
 Primary User
 Delivery Operator
@@ -453,24 +453,25 @@ Secondary User
 Driver
 
 Primary KPI
-Time-to-Find-Delivery <10 s
+Time-to-Adapt-Delivery <30 s
 
 Secondary KPIs
+Time-to-Resume-Delivery-Day <5 s
+Time-to-Find-Delivery <10 s
 Time-to-Understand-Delivery-Day <2 min
-Time-to-Identify-Next-Delivery <10 s
 
 Operational Time Saved
 Estimated
-Illustrative find ≈ 20–80 s saved
-Day ≈ 3–18 min / delivery day
-(see DELIVERY_EXPERIENCE_002 / 001 — Estimated ≠ Measured)
+Illustrative adapt ≈ 90–570 s saved
+Find ≈ 20–80 s · Day ≈ 3–18 min
+(see DELIVERY_EXPERIENCE_003 / 002 / 001 — Estimated ≠ Measured)
 Observation pending
 
 Status
-In Progress · 002 Delivery Search
+In Progress · 003 Delivery Adaptation
 ```
 
-Detail: [002 Delivery Search · Zero Friction Delivery Search](./DELIVERY_EXPERIENCE_002.md) · [001 Today's Delivery Day · Zero Friction Delivery Day](./DELIVERY_EXPERIENCE_001.md) · Surface `/admin/delivery-today` · Input: Kitchen completion honesty + Orders ready_for_delivery · **No routes · no maps · no ConfirmDelivery invent** · Kitchen Journey ✅ Certified · Frozen  
+Detail: [003 Delivery Adaptation · Zero Friction Delivery Adaptation](./DELIVERY_EXPERIENCE_003.md) · [002 Delivery Search · Zero Friction Delivery Search](./DELIVERY_EXPERIENCE_002.md) · [001 Today's Delivery Day · Zero Friction Delivery Day](./DELIVERY_EXPERIENCE_001.md) · Surface `/admin/delivery-today` · Input: Kitchen completion honesty + Orders ready_for_delivery · **No routes · no maps · no ConfirmDelivery invent** · Kitchen Journey ✅ Certified · Frozen  
 
 **Mental model (controlled transfer — not route maps):**
 
@@ -482,8 +483,8 @@ Work ready → Today's Deliveries → Search → Review · Assign (when supporte
 
 ```text
 001 Today's Delivery Day       ✅
-002 Delivery Search            ▶
-003 Delivery Adaptation
+002 Delivery Search            ✅
+003 Delivery Adaptation        ▶
 004 Driver / Responsibility
 005 Route Preparation          ← not Route Optimization
 006 Delivery Completion
@@ -498,8 +499,8 @@ Freeze
 | Phase | Question | Status |
 |-------|----------|--------|
 | 001 | ¿Entiendo la jornada de entregas de hoy en &lt;2 min? | ✅ |
-| 002 | ¿Encuentro cualquier entrega en &lt;10s? | ▶ |
-| 003 | ¿Adapto la jornada sin romper el compromiso? | Planned |
+| 002 | ¿Encuentro cualquier entrega en &lt;10s? | ✅ |
+| 003 | ¿Adapto la jornada sin romper el compromiso? | ▶ |
 | 004 | ¿Asigno responsabilidad con substrate real? | Planned |
 | 005 | ¿Preparo la ruta con lo que Observation evidencie? | Planned |
 | 006 | ¿Cierro la entrega con resultado verificable? | Planned |

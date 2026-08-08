@@ -20,13 +20,15 @@ import {
   printDeliveryDay,
 } from "@/delivery-experience/export-delivery-day";
 import {
+  buildAdaptedTodaysDeliveryDay,
+} from "@/delivery-experience/adapt-delivery";
+import {
   rememberDeliveryAccess,
   searchDeliveries,
   type DeliverySearchHit,
 } from "@/delivery-experience/delivery-search-rank";
 import {
   absentOr,
-  buildTodaysDeliveryDay,
   deliveryReadinessLabel,
   deliveryStatusLabel,
   type DeliveryReadiness,
@@ -153,7 +155,7 @@ export function DeliverySearchPanel({
 
   const view: TodaysDeliveryDay = useMemo(
     () =>
-      buildTodaysDeliveryDay({
+      buildAdaptedTodaysDeliveryDay({
         dayDate,
         context,
         completedContext,
