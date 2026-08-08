@@ -64,8 +64,9 @@ describe("MENU EXPERIENCE 001 · Zero Friction Weekly Menu Planning", () => {
     expect(cards).toContain("Dish Library Integration");
 
     expect(missions).toContain("MENU-EXPERIENCE-001");
+    expect(missions).toContain("MENU-EXPERIENCE-002");
     expect(missions).toContain("TTWM <10 min");
-    expect(missions).toContain("Weekly Planning");
+    expect(missions).toContain("ME001 Weekly Planning ✅");
 
     expect(lifecycle).toContain("ME001 Weekly Planning");
     expect(lifecycle).toContain("weekly planning cycle");
