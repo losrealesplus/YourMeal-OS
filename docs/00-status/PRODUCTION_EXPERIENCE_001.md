@@ -1,9 +1,9 @@
 # PRODUCTION EXPERIENCE 001 · Zero Friction Production Planning
 
-**Status:** ▶ **IN PROGRESS**  
+**Status:** ✅ **COMPLETE** (superseded as active by PE002 · surface retained)  
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
-**Surface:** `/admin/production-planning`  
+**Surface:** `/admin/production-planning` (mode **planning**)  
 **Card:** [EXPERIENCE_CARDS](./EXPERIENCE_CARDS.md) · Production · Phase **001 Production Planning**  
 **Laws:** PRODUCT LAW 001 · EXPERIENCE LAW 001 · EXPERIENCE MANIFESTO 001 · TENANT SUCCESS 001 / 001-A  
 
@@ -112,8 +112,8 @@ Executable work documents — not decorative reports.
 ## Sequence (Production — physical work, not CRUD copy)
 
 ```text
-001 Production Planning        ▶ THIS
-002 Production Search
+001 Production Planning        ✅
+002 Production Search          ▶ next
 003 Production Adaptation
 004 Pre-Preparations
 005 Alerts & Deadlines
