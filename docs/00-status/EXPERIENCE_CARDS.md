@@ -275,18 +275,20 @@ Name
 Production Experience
 
 Phase
-004 Pre-Preparations
+005 Alerts & Deadlines
 
 Mission
-Zero Friction Production Pre-Preparations
+Zero Friction Production Alerts & Deadlines
 
 Primary User
 Tenant Operator
 
 Primary KPI
-Time-to-Identify-Required-Preps <15 s
+Time-to-Detect-Production-Risk <10 s
 
 Secondary KPIs
+Time-to-Understand-Deadline <5 s
+Time-to-Identify-Required-Preps <15 s
 Time-to-Understand-Prep-Deadline <10 s
 Time-to-Adapt-Production-Plan <5 min
 Time-to-Find-Production-Work <10 s
@@ -294,6 +296,7 @@ Time-to-Prepare-Production-Plan <10 min
 
 Operational Time Saved
 Estimated
+Risk detection ≈ 50–170 s
 Prep discovery ≈ 30–105 s
 Adaptation ≈ 5–20 min per cycle
 Find production work ≈ 20–80 s
@@ -304,7 +307,7 @@ Status
 In Progress
 ```
 
-Detail: [PRODUCTION_EXPERIENCE_004](./PRODUCTION_EXPERIENCE_004.md) · [003 Adaptation · Zero Friction Production Adaptation](./PRODUCTION_EXPERIENCE_003.md) · [002 Search · Zero Friction Production Search](./PRODUCTION_EXPERIENCE_002.md) · [001 Production Planning · Zero Friction Production Planning](./PRODUCTION_EXPERIENCE_001.md) · Surface `/admin/production-planning` · Source: published Menu week  
+Detail: [PRODUCTION_EXPERIENCE_005](./PRODUCTION_EXPERIENCE_005.md) · [004 Pre-Preparations · Zero Friction Production Pre-Preparations](./PRODUCTION_EXPERIENCE_004.md) · [003 Adaptation · Zero Friction Production Adaptation](./PRODUCTION_EXPERIENCE_003.md) · [002 Search · Zero Friction Production Search](./PRODUCTION_EXPERIENCE_002.md) · [001 Production Planning · Zero Friction Production Planning](./PRODUCTION_EXPERIENCE_001.md) · Surface `/admin/production-planning` · Source: published Menu week  
 
 Lifecycle: [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md) · [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)
 
@@ -320,8 +323,8 @@ Semana → Día → Trabajo → Cantidad → Deadline → Kitchen
 001 Production Planning        ✅
 002 Production Search          ✅
 003 Production Adaptation      ✅
-004 Pre-Preparations           ▶ In Progress
-005 Alerts & Deadlines
+004 Pre-Preparations           ✅
+005 Alerts & Deadlines         ▶ In Progress
 006 Kitchen Handoff
 ↓
 Experience Review
@@ -336,8 +339,8 @@ Freeze
 | 001 | ¿Transformo una semana publicada en plan de producción en &lt;10 min? | ✅ |
 | 002 | ¿Localizo el trabajo de producción correcto en &lt;10s? | ✅ |
 | 003 | ¿Adapto el plan en &lt;5 min sin regenerarlo? | ✅ |
-| 004 | ¿Veo las pre-preparaciones requeridas en &lt;15s? | ▶ |
-| 005 | ¿Veo alertas y deadlines a tiempo? | Planned |
+| 004 | ¿Veo las pre-preparaciones requeridas en &lt;15s? | ✅ |
+| 005 | ¿Veo alertas y deadlines a tiempo (&lt;10s)? | ▶ |
 | 006 | ¿Kitchen recibe un handoff claro? | Planned |
 
 ---

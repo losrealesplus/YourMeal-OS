@@ -1,6 +1,6 @@
 # PRODUCTION EXPERIENCE 004 · Zero Friction Production Pre-Preparations
 
-**Status:** ▶ **IN PROGRESS**  
+**Status:** ✅ **COMPLETE** (superseded as active by PE005 · surface retained)  
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/production-planning` (mode **preps**)  
@@ -99,8 +99,8 @@ Future: Bulk mark ready
 001 Production Planning        ✅
 002 Production Search          ✅
 003 Production Adaptation      ✅
-004 Pre-Preparations           ▶ THIS
-005 Alerts & Deadlines
+004 Pre-Preparations           ✅ THIS (complete)
+005 Alerts & Deadlines         ▶ next
 006 Kitchen Handoff
 ↓
 Review → Journey Certification → Freeze
