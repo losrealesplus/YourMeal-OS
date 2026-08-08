@@ -25,7 +25,10 @@ import {
 } from "./ProductionQueries";
 import type { ProductionRuntimeIdentity } from "./productionServiceContext";
 import type { ServiceContext } from "@/services/types";
-import type { ProductionReportModel } from "@/modules/operations";
+import type {
+  KitchenBatchTransitionCommand,
+  ProductionReportModel,
+} from "@/modules/operations";
 import type { OrderFacade } from "@/order/OrderFacade";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -343,7 +346,12 @@ describe("OPERATIONAL-004 Production Engineering Certification Matrix", () => {
   });
 
   it("V09 MarkBatchReady", async () => {
-    const transitionBatch = vi.fn(async () => "preparing");
+    const transitionBatch = vi.fn(
+      async (
+        _ctx: ServiceContext,
+        _command: KitchenBatchTransitionCommand,
+      ) => "preparing",
+    );
     const buildForDay = vi.fn(async () =>
       report({
         standardDishes: [
@@ -374,7 +382,12 @@ describe("OPERATIONAL-004 Production Engineering Certification Matrix", () => {
   });
 
   it("V10 CloseBatch", async () => {
-    const transitionBatch = vi.fn(async () => "finished");
+    const transitionBatch = vi.fn(
+      async (
+        _ctx: ServiceContext,
+        _command: KitchenBatchTransitionCommand,
+      ) => "finished",
+    );
     const buildForDay = vi.fn(async () =>
       report({
         standardDishes: [
