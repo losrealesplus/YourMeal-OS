@@ -72,11 +72,12 @@ Operational Accelerators
 Experiences first (excellent)
 
 Customer Experience     ✅ MVP · Reviewed · Frozen
-Order Experience        ← NEXT
-Menu Experience
+Order Experience        ▶ 001–002 · then Templates · Incident · Review · Freeze
+Menu Experience         ← after Order Freeze
 Production Experience
 Kitchen Experience
 Delivery Experience
+Observation Sprint      ← after Experiences frozen
 
 ↓ then
 

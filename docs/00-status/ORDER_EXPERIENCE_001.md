@@ -1,6 +1,7 @@
 # ORDER EXPERIENCE 001 · Zero Friction Order Capture
 
-**Status:** ▶ **IN PROGRESS** — Phase 1  
+**Status:** ✅ **COMPLETE** — Phase 1 · next [OE002 Search](./ORDER_EXPERIENCE_002.md)  
+
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/order-capture`  

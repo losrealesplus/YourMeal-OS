@@ -293,7 +293,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
             : item.labelKey === "ops.nav.customerWorkspace"
               ? "Customer Workspace"
               : item.labelKey === "ops.nav.orderCapture"
-                ? "Order Capture"
+                ? "Order Experience"
                 : item.labelKey === "ops.nav.orderWorkspace"
                 ? "Order Workspace"
                 : item.labelKey === "ops.nav.productionWorkspace"
