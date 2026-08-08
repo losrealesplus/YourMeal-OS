@@ -116,9 +116,9 @@ OCC · Quick Capture · Import · Bulk appeared because friction repeated across
 | Create / Capture | **DE001 Today's Delivery Day** ✅ (receives ready work) |
 | Search | **DE002 Delivery Search** ✅ |
 | Edit / Adapt | **DE003 Delivery Adaptation** ✅ |
-| Domain phases | DE004 Responsibility ✅ · DE005 Route Preparation ✅ · **DE006 Completion** ▶ |
-| Review | Pending |
-| Journey Certification | Pending |
+| Domain phases | DE004 Responsibility ✅ · DE005 Route Preparation ✅ · DE006 Completion ✅ |
+| Review | **Delivery Review ✅** · READY WITH IMPROVEMENTS |
+| Journey Certification | Pending ← NEXT |
 | Freeze | Pending |
 
 Order does **not** need Company or Growth.  

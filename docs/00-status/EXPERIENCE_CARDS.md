@@ -336,7 +336,7 @@ Journey Certification          ✅ CERTIFIED
 Freeze                         ✅
 ↓
 Kitchen Experience             ✅ Journey Certified · Frozen
-Delivery Experience            ▶ 006 Delivery Completion
+Delivery Experience            ▶ Review · READY WITH IMPROVEMENTS
 ```
 
 | Phase | Question | Status |
@@ -414,7 +414,7 @@ Journey Certification          ✅ CERTIFIED
 ↓
 Freeze                         ✅
 ↓
-Delivery Experience            ▶ 006 Delivery Completion
+Delivery Experience            ▶ Review · READY WITH IMPROVEMENTS
 ```
 
 | Phase | Question | Status |
@@ -441,10 +441,10 @@ Name
 Delivery Experience
 
 Phase
-006 Delivery Completion · In Progress
+Review · READY WITH IMPROVEMENTS
 
 Mission
-Zero Friction Delivery Completion (001–006)
+Zero Friction Delivery Journey (001–006) · Review
 
 Primary User
 Delivery Operator
@@ -453,9 +453,10 @@ Secondary User
 Driver
 
 Primary KPI
-Time-to-Understand-Delivery-Outcome <5 s
+Journey ready for Certification
 
 Secondary KPIs
+Time-to-Understand-Delivery-Outcome <5 s
 Time-to-Prepare-Next-Action <10 s
 Time-to-Prepare-Delivery-Day <5 min (hypothesis)
 Time-to-Understand-Route <10 s (hypothesis)
@@ -467,24 +468,24 @@ Time-to-Understand-Delivery-Day <2 min
 
 Operational Time Saved
 Estimated
-Illustrative completion ≈ 25–115 s / outcome check
-Route prep ≈ 2–15 min / day · Responsibility ≈ 50–170 s · Adapt ≈ 90–570 s
-(see DELIVERY_EXPERIENCE_006 / 005 / 004 / 003 / 002 / 001 — Estimated ≠ Measured)
+Illustrative ≈ 15–55 min / Delivery day
+(see DELIVERY_EXPERIENCE_REVIEW — Estimated ≠ Measured)
 Observation pending
 
 Status
-In Progress · 006 Delivery Completion
+READY WITH IMPROVEMENTS
+Eligible for Journey Certification
 ```
 
-Detail: [006 Delivery Completion · Zero Friction Delivery Completion](./DELIVERY_EXPERIENCE_006.md) · [005 Route Preparation · Zero Friction Route Preparation](./DELIVERY_EXPERIENCE_005.md) · [004 Delivery Responsibility · Zero Friction Delivery Responsibility](./DELIVERY_EXPERIENCE_004.md) · [003 Delivery Adaptation · Zero Friction Delivery Adaptation](./DELIVERY_EXPERIENCE_003.md) · [002 Delivery Search · Zero Friction Delivery Search](./DELIVERY_EXPERIENCE_002.md) · [001 Today's Delivery Day · Zero Friction Delivery Day](./DELIVERY_EXPERIENCE_001.md) · Surface `/admin/delivery-today` · Input: Kitchen completion honesty + Orders ready_for_delivery · **No routes · no maps · ConfirmDelivery vía Facade · no POD/Billing invent** · Kitchen Journey ✅ Certified · Frozen  
+Detail: [DELIVERY EXPERIENCE REVIEW · READY WITH IMPROVEMENTS](../tenant-success/DELIVERY_EXPERIENCE_REVIEW.md) · [006 Delivery Completion · Zero Friction Delivery Completion](./DELIVERY_EXPERIENCE_006.md) · [005 Route Preparation · Zero Friction Route Preparation](./DELIVERY_EXPERIENCE_005.md) · [004 Delivery Responsibility · Zero Friction Delivery Responsibility](./DELIVERY_EXPERIENCE_004.md) · [003 Delivery Adaptation · Zero Friction Delivery Adaptation](./DELIVERY_EXPERIENCE_003.md) · [002 Delivery Search · Zero Friction Delivery Search](./DELIVERY_EXPERIENCE_002.md) · [001 Today's Delivery Day · Zero Friction Delivery Day](./DELIVERY_EXPERIENCE_001.md) · Surface `/admin/delivery-today` · Input: Kitchen completion honesty + Orders ready_for_delivery · **No routes · no maps · ConfirmDelivery vía Facade · no POD/Billing invent** · Kitchen Journey ✅ Certified · Frozen  
 
 **Mental model (controlled transfer — not route maps):**
 
 ```text
-Work ready → Today's Deliveries → Search → Adaptation → Responsibility → Route Preparation → Completion → Review
+Work ready → Today's Deliveries → Search → Adaptation → Responsibility → Route Preparation → Completion → Review → Certification
 ```
 
-**Sequence (hypothesis — Observation may reshape):**
+**Sequence:**
 
 ```text
 001 Today's Delivery Day       ✅
@@ -492,11 +493,11 @@ Work ready → Today's Deliveries → Search → Adaptation → Responsibility �
 003 Delivery Adaptation        ✅
 004 Delivery Responsibility    ✅
 005 Route Preparation          ✅
-006 Delivery Completion        ▶
+006 Delivery Completion        ✅
 ↓
-Experience Review
+Experience Review              ✅ READY WITH IMPROVEMENTS
 ↓
-Journey Certification
+Journey Certification          ← NEXT
 ↓
 Freeze
 ```
@@ -508,9 +509,10 @@ Freeze
 | 003 | ¿Adapto la jornada sin romper el compromiso? | ✅ |
 | 004 | ¿Entiendo responsabilidad / unassigned / unavailable en &lt;10s? | ✅ |
 | 005 | ¿Preparo una secuencia ejecutable (no optimización) en &lt;5 min? | ✅ |
-| 006 | ¿Entiendo el outcome / remaining / unresolved en &lt;5s? | ▶ |
+| 006 | ¿Entiendo el outcome / remaining / unresolved en &lt;5s? | ✅ |
+| Review | ¿El viaje completo está listo para certificar? | ✅ READY WITH IMPROVEMENTS |
 
-Delivery receives completed work — does not create the Order commitment. Search finds **deliveries**, not Customer/Order entities. Responsibility shows Assigned / Unassigned / **Assignment unavailable** honestly — never invents AssignDelivery. Route Preparation is **manual session sequence** — never automatic optimization, maps, or navigation. Completion exposes **ConfirmDelivery** via existing Facade — never invents POD, ReportDeliveryException, or Billing outcomes. Address / window / zone labeled absent when substrate missing.
+Delivery receives completed work — does not create the Order commitment. Search finds **deliveries**, not Customer/Order entities. Responsibility shows Assigned / Unassigned / **Assignment unavailable** honestly — never invents AssignDelivery. Route Preparation is **manual session sequence** — never automatic optimization, maps, or navigation. Completion exposes **ConfirmDelivery** via existing Facade — never invents POD, ReportDeliveryException, or Billing outcomes. Address / window / zone labeled absent when substrate missing. Review verdict: **READY WITH IMPROVEMENTS** · Required before Certification: **None**.
 
 ---
 

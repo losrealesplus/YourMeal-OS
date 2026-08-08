@@ -65,7 +65,7 @@ describe("DELIVERY EXPERIENCE 006 · Zero Friction Delivery Completion", () => {
     clearDeliveryCompletionSessionForTests();
   });
 
-  it("documents TTDO · ConfirmDelivery Facade · no POD/Billing invent · Card In Progress", () => {
+  it("documents TTDO · ConfirmDelivery Facade · no POD/Billing invent · Card retained", () => {
     const doc = readFileSync(
       resolve(ROOT, "docs/00-status/DELIVERY_EXPERIENCE_006.md"),
       "utf8",
@@ -107,7 +107,7 @@ describe("DELIVERY EXPERIENCE 006 · Zero Friction Delivery Completion", () => {
     expect(cards).toContain("Time-to-Understand-Delivery-Outcome <5 s");
 
     expect(missions).toContain("DELIVERY-EXPERIENCE-006");
-    expect(missions).toContain("DE006 Completion ▶");
+    expect(missions).toContain("DE006 Completion ✅");
     expect(missions).toContain("TTDO");
 
     expect(ui).toContain("DELIVERY EXPERIENCE 006");
