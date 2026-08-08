@@ -275,18 +275,23 @@ Name
 Production Experience
 
 Phase
-005 Alerts & Deadlines
+006 Kitchen Handoff
 
 Mission
-Zero Friction Production Alerts & Deadlines
+Zero Friction Kitchen Handoff
 
 Primary User
-Tenant Operator
+Production Operator
+
+Secondary User
+Kitchen Operator
 
 Primary KPI
-Time-to-Detect-Production-Risk <10 s
+Time-to-Prepare-Kitchen-Handoff <5 min
 
 Secondary KPIs
+Time-to-Understand-Kitchen-Work <10 s
+Time-to-Detect-Production-Risk <10 s
 Time-to-Understand-Deadline <5 s
 Time-to-Identify-Required-Preps <15 s
 Time-to-Understand-Prep-Deadline <10 s
@@ -296,6 +301,7 @@ Time-to-Prepare-Production-Plan <10 min
 
 Operational Time Saved
 Estimated
+Kitchen handoff ≈ 10–35 min per weekly cycle
 Risk detection ≈ 50–170 s
 Prep discovery ≈ 30–105 s
 Adaptation ≈ 5–20 min per cycle
@@ -307,7 +313,7 @@ Status
 In Progress
 ```
 
-Detail: [PRODUCTION_EXPERIENCE_005](./PRODUCTION_EXPERIENCE_005.md) · [004 Pre-Preparations · Zero Friction Production Pre-Preparations](./PRODUCTION_EXPERIENCE_004.md) · [003 Adaptation · Zero Friction Production Adaptation](./PRODUCTION_EXPERIENCE_003.md) · [002 Search · Zero Friction Production Search](./PRODUCTION_EXPERIENCE_002.md) · [001 Production Planning · Zero Friction Production Planning](./PRODUCTION_EXPERIENCE_001.md) · Surface `/admin/production-planning` · Source: published Menu week  
+Detail: [PRODUCTION_EXPERIENCE_006](./PRODUCTION_EXPERIENCE_006.md) · [005 Alerts · Zero Friction Production Alerts & Deadlines](./PRODUCTION_EXPERIENCE_005.md) · [004 Pre-Preparations · Zero Friction Production Pre-Preparations](./PRODUCTION_EXPERIENCE_004.md) · [003 Adaptation · Zero Friction Production Adaptation](./PRODUCTION_EXPERIENCE_003.md) · [002 Search · Zero Friction Production Search](./PRODUCTION_EXPERIENCE_002.md) · [001 Production Planning · Zero Friction Production Planning](./PRODUCTION_EXPERIENCE_001.md) · Surface `/admin/production-planning` · Source: published Menu week  
 
 Lifecycle: [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md) · [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)
 
@@ -324,8 +330,8 @@ Semana → Día → Trabajo → Cantidad → Deadline → Kitchen
 002 Production Search          ✅
 003 Production Adaptation      ✅
 004 Pre-Preparations           ✅
-005 Alerts & Deadlines         ▶ In Progress
-006 Kitchen Handoff
+005 Alerts & Deadlines         ✅
+006 Kitchen Handoff            ▶ In Progress
 ↓
 Experience Review
 ↓
@@ -340,8 +346,8 @@ Freeze
 | 002 | ¿Localizo el trabajo de producción correcto en &lt;10s? | ✅ |
 | 003 | ¿Adapto el plan en &lt;5 min sin regenerarlo? | ✅ |
 | 004 | ¿Veo las pre-preparaciones requeridas en &lt;15s? | ✅ |
-| 005 | ¿Veo alertas y deadlines a tiempo (&lt;10s)? | ▶ |
-| 006 | ¿Kitchen recibe un handoff claro? | Planned |
+| 005 | ¿Veo alertas y deadlines a tiempo (&lt;10s)? | ✅ |
+| 006 | ¿Kitchen recibe un handoff claro (&lt;5 min)? | ▶ |
 
 ---
 

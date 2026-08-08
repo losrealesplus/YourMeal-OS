@@ -1,6 +1,6 @@
 # PRODUCTION EXPERIENCE 005 · Zero Friction Production Alerts & Deadlines
 
-**Status:** ▶ **IN PROGRESS**  
+**Status:** ✅ **COMPLETE** (superseded as active by PE006 · surface retained)  
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/production-planning` (mode **alerts**)  
@@ -93,8 +93,8 @@ Clear. No noise. Planning continuity preserved.
 002 Production Search          ✅
 003 Production Adaptation      ✅
 004 Pre-Preparations           ✅
-005 Alerts & Deadlines         ▶ THIS
-006 Kitchen Handoff
+005 Alerts & Deadlines         ✅ THIS (complete)
+006 Kitchen Handoff            ▶ next
 ↓
 Review → Journey Certification → Freeze
 ```
