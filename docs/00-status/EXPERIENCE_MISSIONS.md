@@ -1,6 +1,6 @@
 # Experience Missions (Era 2)
 
-**Status:** ▶ **ACTIVE** — **MENU EXPERIENCE 003** Weekly Adaptation  
+**Status:** ▶ **ACTIVE** — **MENU EXPERIENCE 004** Dish Library  
 
 
 **Declared:** 2026-08-07  
@@ -27,7 +27,7 @@ A great Experience is invisible.
 |------------|---------|-------------|--------|
 | **Customer** | Zero Friction (001–005) · includes **CUSTOMER_EXPERIENCE_005** Growth | Create <30s · Find <10s · Edit <20s · Org <45s · enriquecer < 30s | ✅ **Frozen** · Journey Certified |
 | **Order** | Zero Friction Capture · Search · Edit · Templates · Incident (001–005) | TTO <45s · TTFO <10s · TTEO <20s · Reuse <10s · TTRI <30s | ✅ **Frozen** · Journey Certified |
-| **Menu** | Zero Friction Planning · Search · Adaptation (001–005 · weekly cycle) | TTWM <10 min · TTFM <10s · TTAW <5 min | ▶ **003 Adaptation** |
+| **Menu** | Zero Friction Planning · Search · Adaptation · Dish Library (001–005) | TTWM <10 min · TTFM <10s · TTAW <5 min · TTFID <15s | ▶ **004 Dish Library** |
 | **Production** | Generate today's work | &lt; 1 min | Planned |
 | **Kitchen** | Know what to execute | &lt; 10s | Planned |
 | **Delivery** | Prepare today's routes | &lt; 2 min | Planned |
@@ -102,19 +102,19 @@ Surface retained: `/admin/order-capture`
 
 ## Active mission
 
-▶ **MENU-EXPERIENCE-003** · Zero Friction Weekly Adaptation  
-Surface: `/admin/menu-planning` · [MENU_EXPERIENCE_003](./MENU_EXPERIENCE_003.md)  
-ME001–002 ✅ · [002](./MENU_EXPERIENCE_002.md) · [001](./MENU_EXPERIENCE_001.md)
+▶ **MENU-EXPERIENCE-004** · Zero Friction Dish Library Integration  
+Surface: `/admin/menu-planning` · [MENU_EXPERIENCE_004](./MENU_EXPERIENCE_004.md)  
+ME001–003 ✅ · [003](./MENU_EXPERIENCE_003.md) · [002](./MENU_EXPERIENCE_002.md) · [001](./MENU_EXPERIENCE_001.md)
 
 ```text
-ME001 Weekly Planning ✅ → ME002 Search ✅ → ME003 Weekly Adaptation ▶ → ME004 Dish Library → ME005 Publish & Preview → Review → Journey Certification → Freeze
+ME001 Weekly Planning ✅ → ME002 Search ✅ → ME003 Weekly Adaptation ✅ → ME004 Dish Library ▶ → ME005 Publish & Preview → Review → Journey Certification → Freeze
 ```
 
 Temporal model: **Semana → Día → Menú → Platos**  
-Adaptation ≠ Edit — living planning adjustments.  
+Dish Library = operational memory (reuse, not recreate).  
 Order: frozen · [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md)  
-Customer: frozen · [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)  
-Historical ids: **MENU-EXPERIENCE-002** · **MENU-EXPERIENCE-001** (complete) · **MENU EXPERIENCE** active
+Customer: frozen · [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md) · [OPERATIONAL_LIBRARIES](./OPERATIONAL_LIBRARIES.md)  
+Historical ids: **MENU-EXPERIENCE-001** · **MENU-EXPERIENCE-002** · **MENU-EXPERIENCE-003** (complete) · **MENU EXPERIENCE** active
 
 ---
 
@@ -125,7 +125,7 @@ Customer Experience     ✅ MVP · Reviewed · Journey Certified · Frozen
 ↓
 Order Experience        ✅ MVP · Reviewed · Journey Certified · Frozen
 ↓
-Menu Experience         ▶ 003 Adaptation (001–002 ✅)
+Menu Experience         ▶ 004 Dish Library (001–003 ✅)
 ↓
 Production Experience
 ↓
@@ -153,6 +153,8 @@ Operational Accelerators
 
 * [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)  
 * [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)  
+* [MENU_EXPERIENCE_004](./MENU_EXPERIENCE_004.md)  
+* [OPERATIONAL_LIBRARIES](./OPERATIONAL_LIBRARIES.md)  
 * [MENU_EXPERIENCE_003](./MENU_EXPERIENCE_003.md)  
 * [MENU_EXPERIENCE_002](./MENU_EXPERIENCE_002.md)  
 * [MENU_EXPERIENCE_001](./MENU_EXPERIENCE_001.md)  

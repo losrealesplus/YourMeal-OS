@@ -1,6 +1,6 @@
 # MENU EXPERIENCE 003 · Zero Friction Weekly Adaptation
 
-**Status:** ▶ **IN PROGRESS**  
+**Status:** ✅ **COMPLETE** (superseded as active by ME004 · surface retained)  
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/menu-planning` (mode **adapt**)  
@@ -80,8 +80,8 @@ Context always visible: week · day · affected dishes · publication status.
 ```text
 001 Weekly Planning          ✅
 002 Menu Search              ✅
-003 Weekly Adaptation        ▶ THIS
-004 Dish Library Integration
+003 Weekly Adaptation        ✅
+004 Dish Library Integration ▶
 005 Publish & Preview
 ↓
 Review → Journey Certification → Freeze

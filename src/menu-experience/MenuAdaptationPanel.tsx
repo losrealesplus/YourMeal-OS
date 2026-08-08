@@ -9,6 +9,8 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { StatusChip } from "@/components/admin";
 import { CONVERSATION_DISHES } from "@/order-experience/conversation-catalog";
+import { DishLibraryPicker } from "@/menu-experience/DishLibraryPicker";
+import type { DishLibraryItem } from "@/menu-experience/dish-library";
 import type { DishPick, DurableMenuSeed } from "@/menu-experience/MenuPlanningPanel";
 import {
   dayLabel,
@@ -35,6 +37,7 @@ type Props = {
   weekStart: string;
   durableMenus: DurableMenuSeed[];
   dishPicks: DishPick[];
+  libraryItems: DishLibraryItem[];
   onPreview: () => void;
   onPublish: (plan: WeekPlan) => Promise<void>;
   onBackToSearch: () => void;
@@ -76,6 +79,7 @@ export function MenuAdaptationPanel({
   weekStart,
   durableMenus,
   dishPicks,
+  libraryItems,
   onPreview,
   onPublish,
   onBackToSearch,
@@ -100,6 +104,25 @@ export function MenuAdaptationPanel({
       allergenHint: null as string | null,
     }));
   }, [dishPicks]);
+
+  const library = useMemo(() => {
+    if (libraryItems.length > 0) return libraryItems;
+    return picks.map((p) => ({
+      id: p.id,
+      label: p.label,
+      durable: p.durable,
+      macrosHint: p.macrosHint ?? null,
+      allergenHint: p.allergenHint ?? null,
+      categoryHint: null,
+      description: null,
+      tags: [] as string[],
+      availability: "available" as const,
+      macrosComplete: "unknown" as const,
+      allergenComplete: "unknown" as const,
+      useCount: 0,
+      lastUsedAt: null,
+    }));
+  }, [libraryItems, picks]);
 
   const plan = useMemo(() => {
     void tick;
@@ -305,18 +328,13 @@ export function MenuAdaptationPanel({
             </ul>
 
             {addDay === day ? (
-              <div className="flex flex-wrap gap-2">
-                {picks.slice(0, 12).map((dish) => (
-                  <button
-                    key={dish.id}
-                    type="button"
-                    onClick={() => onAdd(day, dish)}
-                    className="min-h-10 rounded-md border border-border px-3 text-xs"
-                  >
-                    {dish.label}
-                  </button>
-                ))}
-              </div>
+              <DishLibraryPicker
+                items={library}
+                mode="insert"
+                canWrite={canWrite}
+                onPick={(dish) => onAdd(day, dish)}
+                onClose={() => setAddDay(null)}
+              />
             ) : null}
           </div>
         ))}
@@ -389,18 +407,13 @@ export function MenuAdaptationPanel({
           </div>
 
           {action === "replace" ? (
-            <div className="flex flex-wrap gap-2">
-              {picks.slice(0, 12).map((dish) => (
-                <button
-                  key={dish.id}
-                  type="button"
-                  onClick={() => onReplace(dish)}
-                  className="min-h-10 rounded-md border border-border px-3 text-xs"
-                >
-                  {dish.label}
-                </button>
-              ))}
-            </div>
+            <DishLibraryPicker
+              items={library}
+              mode="replace"
+              canWrite={canWrite}
+              onPick={(dish) => onReplace(dish)}
+              onClose={() => setAction(null)}
+            />
           ) : null}
 
           {action === "move" || action === "copy" ? (

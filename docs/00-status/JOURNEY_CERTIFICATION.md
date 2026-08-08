@@ -54,7 +54,7 @@ Verdicts that authorize certification: **READY** or **READY WITH IMPROVEMENTS**.
 |---------|--------|--------|-------|
 | **Customer Journey** | ✅ **Certified** | [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · Frozen |
 | **Order Journey** | ✅ **Certified** | [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · Frozen |
-| **Menu Journey** | ⏳ In progress (ME003) | — | Timeline Semana → Día → Menú → Platos · Adaptation |
+| **Menu Journey** | ⏳ In progress (ME004) | — | Timeline · Adaptation · Dish Library reuse |
 | **Production Journey** | ⏳ Pending | — | After Menu |
 | **Kitchen Journey** | ⏳ Pending | — | After Production |
 | **Delivery Journey** | ⏳ Pending | — | After Kitchen |
@@ -63,7 +63,7 @@ Verdicts that authorize certification: **READY** or **READY WITH IMPROVEMENTS**.
 ```text
 Customer Journey      ✅ Certified
 Order Journey         ✅ Certified
-Menu Journey          ⏳ ME003 Weekly Adaptation (ME001–002 ✅)
+Menu Journey          ⏳ ME004 Dish Library (ME001–003 ✅)
 Production Journey    ⏳
 Kitchen Journey       ⏳
 Delivery Journey      ⏳
@@ -83,6 +83,9 @@ Mental model for the whole Menu → Production chain:
 ```text
 Semana → Día → Menú → Platos
 ```
+
+Dish Library is an **Operational Library** — consumed in planning, not administered as the day’s work.  
+See [OPERATIONAL_LIBRARIES](./OPERATIONAL_LIBRARIES.md).
 
 ```text
 001 Weekly Planning → 002 Search → 003 Weekly Adaptation → 004 Dish Library → 005 Publish & Preview

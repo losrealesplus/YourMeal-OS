@@ -8,6 +8,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { StatusChip } from "@/components/admin";
+import { DishLibraryPicker } from "@/menu-experience/DishLibraryPicker";
+import type { DishLibraryItem } from "@/menu-experience/dish-library";
 import { CONVERSATION_DISHES } from "@/order-experience/conversation-catalog";
 import {
   activeSlots,
@@ -60,6 +62,7 @@ type Props = {
   canWrite: boolean;
   durableMenus: DurableMenuSeed[];
   dishPicks: DishPick[];
+  libraryItems?: DishLibraryItem[];
   /** Open a specific week (from ME002 search). */
   focusWeekStart?: string | null;
   /** Jump to preview when opening from search. */
@@ -97,6 +100,7 @@ export function MenuPlanningPanel({
   canWrite,
   durableMenus,
   dishPicks,
+  libraryItems = [],
   focusWeekStart = null,
   startInPreview = false,
   onPublishDurable,
@@ -125,6 +129,25 @@ export function MenuPlanningPanel({
       allergenHint: null,
     }));
   }, [dishPicks]);
+
+  const library = useMemo(() => {
+    if (libraryItems.length > 0) return libraryItems;
+    return picks.map((p) => ({
+      id: p.id,
+      label: p.label,
+      durable: p.durable,
+      macrosHint: p.macrosHint ?? null,
+      allergenHint: p.allergenHint ?? null,
+      categoryHint: null,
+      description: null,
+      tags: [] as string[],
+      availability: "available" as const,
+      macrosComplete: "unknown" as const,
+      allergenComplete: "unknown" as const,
+      useCount: 0,
+      lastUsedAt: null,
+    }));
+  }, [libraryItems, picks]);
 
   const plan = useMemo(() => {
     void tick;
@@ -604,22 +627,18 @@ export function MenuPlanningPanel({
                   ) : null}
                 </ul>
                 {pickDay === day ? (
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    {picks.slice(0, 12).map((dish) => (
-                      <button
-                        key={dish.id}
-                        type="button"
-                        onClick={() => {
-                          const existing = (byDay?.[day] ?? [])[0];
-                          if (existing) onReplace(existing, dish);
-                          else onAddDish(day, dish);
-                        }}
-                        className="min-h-10 rounded-md border border-border px-3 text-xs"
-                      >
-                        {dish.label}
-                      </button>
-                    ))}
-                  </div>
+                  <DishLibraryPicker
+                    items={library}
+                    mode={(byDay?.[day] ?? []).length > 0 ? "replace" : "insert"}
+                    canWrite={canWrite}
+                    onPick={(dish) => {
+                      const existing = (byDay?.[day] ?? [])[0];
+                      if (existing) onReplace(existing, dish);
+                      else onAddDish(day, dish);
+                      setPickDay(null);
+                    }}
+                    onClose={() => setPickDay(null)}
+                  />
                 ) : null}
               </div>
             ))}
