@@ -1,6 +1,7 @@
 # Experience Missions (Era 2)
 
-**Status:** ▶ **ACTIVE** — next: **Order Experience**  
+**Status:** ▶ **ACTIVE** — **ORDER EXPERIENCE 001** Capture  
+
 **Declared:** 2026-08-07  
 **Laws:** PRODUCT LAW 001 · 002 · EXPERIENCE LAW 001 (ADR [0098](../adr/0098-experience-law-001.md)) · **EXPERIENCE MANIFESTO 001** (ADR [0099](../adr/0099-experience-manifesto-001.md)) · TENANT SUCCESS 001 / 001-A · TEAM LAW 001  
 **Pattern:** Progressive Completion · Living Customer Profile · Time-to-Action (TTA)  
@@ -22,7 +23,7 @@ A great Experience is invisible.
 | Experience | Mission | Primary TTA | Status |
 |------------|---------|-------------|--------|
 | **Customer** | Zero Friction (001–005) · includes **CUSTOMER_EXPERIENCE_005** Growth | Create <30s · Find <10s · Edit <20s · Org <45s · enriquecer < 30s | ✅ **Frozen** |
-| **Order** | Create an operational commitment | < 45s | ◀ **NEXT** |
+| **Order** | Zero Friction Order Capture (001) | TTO < 45s | ▶ **In Progress** |
 | **Menu** | Plan one operational week | &lt; 2 min | Planned |
 | **Production** | Generate today's work | &lt; 1 min | Planned |
 | **Kitchen** | Know what to execute | &lt; 10s | Planned |
@@ -76,7 +77,8 @@ Detail: [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md)
 
 ## Active mission
 
-▶ **Order Experience** (open next)  
+▶ **ORDER-EXPERIENCE-001** · Zero Friction Order Capture  
+Surface: `/admin/order-capture` · [ORDER_EXPERIENCE_001](./ORDER_EXPERIENCE_001.md) · [Phase 1](./ORDER_EXPERIENCE_001_PHASE1.md)
 
 Customer: frozen · [EXPERIENCE_CARDS](./EXPERIENCE_CARDS.md)
 
@@ -87,7 +89,7 @@ Customer: frozen · [EXPERIENCE_CARDS](./EXPERIENCE_CARDS.md)
 ```text
 Customer Experience     ✅ MVP · Reviewed · Frozen
 ↓
-Order Experience        ← NEXT
+Order Experience        ▶ 001 Capture (In Progress)
 ↓
 Menu Experience
 ↓

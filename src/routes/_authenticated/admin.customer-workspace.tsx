@@ -621,6 +621,8 @@ function CustomerExperiencePage() {
                   <NextBestAction
                     primaryRef={nextActionRef}
                     createdFromLabel={createdFromLabel}
+                    customerId={selected?.summary.id}
+                    customerKind={selected?.summary.partyKind}
                     onCreateOrder={() => {}}
                     onOpenCustomer={() => {
                       setJustCreated(false);
@@ -895,7 +897,14 @@ function SearchResultCard(props: {
           Abrir
         </button>
         <Link
-          to="/admin/order-workspace"
+          to="/admin/order-capture"
+          search={{
+            customerId: hit.summary.id,
+            kind:
+              hit.summary.partyKind === "company_account"
+                ? "company_account"
+                : "individual",
+          }}
           className="inline-flex min-h-10 items-center rounded-md bg-foreground px-2.5 py-1.5 text-xs font-semibold text-background"
         >
           Crear pedido
@@ -950,11 +959,17 @@ function SearchResultCard(props: {
 function NextBestAction(props: {
   primaryRef: React.RefObject<HTMLAnchorElement | null>;
   createdFromLabel: string | null;
+  customerId?: string;
+  customerKind?: PartyKind;
   onCreateOrder: () => void;
   onOpenCustomer: () => void;
   onCreateAnother: () => void;
   onBack: () => void;
 }) {
+  const orderKind =
+    props.customerKind === "company_account"
+      ? "company_account"
+      : "individual";
   return (
     <div
       className="rounded-md border border-foreground/20 bg-foreground/[0.04] px-3 py-3 space-y-3"
@@ -973,7 +988,11 @@ function NextBestAction(props: {
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         <Link
           ref={props.primaryRef}
-          to="/admin/order-workspace"
+          to="/admin/order-capture"
+          search={{
+            customerId: props.customerId,
+            kind: orderKind,
+          }}
           className="inline-flex min-h-11 items-center justify-center rounded-md bg-foreground px-4 py-2.5 text-sm font-semibold text-background"
           onClick={props.onCreateOrder}
         >

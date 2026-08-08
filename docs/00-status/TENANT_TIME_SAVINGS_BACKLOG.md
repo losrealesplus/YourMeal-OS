@@ -44,7 +44,7 @@ Every row must answer: **Does it save tenant time? How much? Which Beta?**
 | Idea | Time Saved | Complexity | Target | Notes |
 |------|------------|------------|--------|-------|
 | Customer Experience (create/edit/search/segment/prefs) | High | Medium | Beta 1 · Epic 1 | Avoid later calls |
-| Order Experience (create/edit/duplicate/templates/incidents) | Very High | Medium | Beta 1 · Epic 2 | Under 1 minute create |
+| Order Experience (create/edit/duplicate/templates/incidents) | Very High | Medium | ▶ OE001 Capture In Progress | TTO &lt;45s · [ORDER_EXPERIENCE_001](./ORDER_EXPERIENCE_001.md) |
 | Menu Experience (week manage/copy/allergens) | High | Medium | Beta 1 · Epic 3 | Import later |
 | Production Experience (timeline/prep inventory/export) | High | Medium | Beta 1 · Epic 4 | Prep ≠ Kitchen |
 | Kitchen Experience (work list/labels/allergies/print) | High | Medium | Beta 1 · Epic 5 | Work not orders |

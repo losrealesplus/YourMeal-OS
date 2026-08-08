@@ -123,8 +123,11 @@ EXPERIENCE CARD
 Name
 Order Experience
 
+Phase
+001 Capture
+
 Mission
-Create an operational commitment in less than 45 seconds
+Zero Friction Order Capture
 
 Primary User
 Tenant Operator
@@ -138,11 +141,26 @@ Time-to-Confirm Commitment <15 s
 
 Operational Time Saved
 Estimated
-TBD
+≈ 45–135 s per pedido (see Phase 1)
+Observation pending
 
 Status
-Planned
+In Progress
 ```
+
+Detail: [ORDER_EXPERIENCE_001](./ORDER_EXPERIENCE_001.md) · [Phase 1](./ORDER_EXPERIENCE_001_PHASE1.md) · Surface `/admin/order-capture`
+
+**Sequence:**
+
+```text
+001 Capture     ▶ In Progress
+↓
+002 Find / Edit (planned)
+↓
+003 Confirm (planned)
+```
+
+Measurable question (001): ¿Puedo crear un pedido completo mientras hablo con el cliente en menos de 45 segundos?
 
 ---
 
