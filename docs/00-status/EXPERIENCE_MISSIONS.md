@@ -1,6 +1,6 @@
 # Experience Missions (Era 2)
 
-**Status:** ▶ **ACTIVE** — **MENU EXPERIENCE** next · Order Frozen  
+**Status:** ▶ **ACTIVE** — **MENU EXPERIENCE 001** Weekly Planning  
 
 
 **Declared:** 2026-08-07  
@@ -27,7 +27,7 @@ A great Experience is invisible.
 |------------|---------|-------------|--------|
 | **Customer** | Zero Friction (001–005) · includes **CUSTOMER_EXPERIENCE_005** Growth | Create <30s · Find <10s · Edit <20s · Org <45s · enriquecer < 30s | ✅ **Frozen** · Journey Certified |
 | **Order** | Zero Friction Capture · Search · Edit · Templates · Incident (001–005) | TTO <45s · TTFO <10s · TTEO <20s · Reuse <10s · TTRI <30s | ✅ **Frozen** · Journey Certified |
-| **Menu** | Plan one operational week | &lt; 2 min | ▶ **NEXT** |
+| **Menu** | Zero Friction Weekly Planning (001–005 · weekly cycle) | TTWM <10 min | ▶ **001 Weekly Planning** |
 | **Production** | Generate today's work | &lt; 1 min | Planned |
 | **Kitchen** | Know what to execute | &lt; 10s | Planned |
 | **Delivery** | Prepare today's routes | &lt; 2 min | Planned |
@@ -102,11 +102,16 @@ Surface retained: `/admin/order-capture`
 
 ## Active mission
 
-▶ **MENU EXPERIENCE** — prepare Mission 001 (not opened in this PR)  
-Order: frozen · [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md)  
-Customer: frozen · [EXPERIENCE_CARDS](./EXPERIENCE_CARDS.md) · [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md) · [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)
+▶ **MENU-EXPERIENCE-001** · Zero Friction Weekly Menu Planning  
+Surface: `/admin/menu-planning` · [MENU_EXPERIENCE_001](./MENU_EXPERIENCE_001.md)
 
-Historical id retained for gates: **ORDER-EXPERIENCE-005** (complete · not active)
+```text
+ME001 Weekly Planning ▶ → ME002 Search → ME003 Edit → ME004 Dish Library → ME005 Publish & Preview → Review → Journey Certification → Freeze
+```
+
+Order: frozen · [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md)  
+Customer: frozen · [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)  
+Historical id retained for gates: **ORDER-EXPERIENCE-005** (complete · not active) · **MENU EXPERIENCE** active
 
 ---
 
@@ -117,7 +122,7 @@ Customer Experience     ✅ MVP · Reviewed · Journey Certified · Frozen
 ↓
 Order Experience        ✅ MVP · Reviewed · Journey Certified · Frozen
 ↓
-Menu Experience         ← NEXT
+Menu Experience         ▶ 001 Weekly Planning
 ↓
 Production Experience
 ↓
@@ -133,9 +138,9 @@ Evidence
 ↓
 Operational Accelerators
   001 OCC                 Reserved
-  002 Operational Bulk    Registered (ex-CX006)
-  003 Import Pipeline
-  004 Quick Capture
+  002 Operational Bulk    Registered (ex-CX006) — weeks may reveal need
+  003 Import Pipeline     Reserved — Excel/PDF heritage likely
+  004 Quick Capture       Reserved — natural-language menus if evidenced
   …
 ```
 
@@ -145,6 +150,7 @@ Operational Accelerators
 
 * [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)  
 * [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)  
+* [MENU_EXPERIENCE_001](./MENU_EXPERIENCE_001.md)  
 * [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md)  
 * [ORDER_EXPERIENCE_005](./ORDER_EXPERIENCE_005.md)  
 * [ORDER_EXPERIENCE_004](./ORDER_EXPERIENCE_004.md)  

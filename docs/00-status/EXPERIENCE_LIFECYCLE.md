@@ -81,18 +81,20 @@ OCC · Quick Capture · Import · Bulk appeared because friction repeated across
 
 ## Domain adaptation
 
-| Lifecycle step | Customer | Order (adapted) |
-|----------------|----------|-----------------|
-| Create | CX001 Create | **OE001 Capture** |
-| Search | CX002 Search | **OE002 Search** |
-| Edit | CX003 Edit | **OE003 Edit** |
-| Domain phases | Org · Growth | **OE004 Order Templates · OE005 Operational Incident** |
-| Review | CX Review ✅ | Order Review ✅ |
-| Journey Certification | Customer Journey ✅ | Order Journey ✅ |
-| Freeze | Customer Frozen | Order Frozen |
+| Lifecycle step | Customer | Order (adapted) | Menu (weekly cycle) |
+|----------------|----------|-----------------|---------------------|
+| Create / Capture | CX001 Create | **OE001 Capture** | **ME001 Weekly Planning** |
+| Search | CX002 Search | **OE002 Search** | ME002 Menu Search |
+| Edit | CX003 Edit | **OE003 Edit** | ME003 Menu Edit |
+| Domain phases | Org · Growth | Templates · Incident | Dish Library · Publish & Preview |
+| Review | CX Review ✅ | Order Review ✅ | Menu Review |
+| Journey Certification | Customer Journey ✅ | Order Journey ✅ | Menu Journey ⏳ |
+| Freeze | Customer Frozen | Order Frozen | Menu Freeze |
 
 Order does **not** need Company or Growth.  
-Order needs **Templates** (preferences that assist — not auto-create) and **Operational Incident** (created in Orders; may resolve in Kitchen · Delivery · CS · Billing).
+Order needs **Templates** and **Operational Incident**.  
+Menu does **not** need CRUD of “menus as entities”.  
+Menu needs the **weekly planning cycle**: reuse → adapt → publish.
 
 ---
 

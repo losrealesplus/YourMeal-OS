@@ -198,25 +198,57 @@ EXPERIENCE CARD
 Name
 Menu Experience
 
+Phase
+001 Weekly Planning
+
 Mission
-Plan one operational week in less than two minutes
+Zero Friction Weekly Menu Planning
 
 Primary User
-Tenant Operator / Menu planner
+Tenant Operator
 
 Primary KPI
-Time-to-Plan Week <2 min
+Time-to-Prepare Weekly Menu <10 min
 
 Secondary KPIs
 Time-to-Publish Week <30 s
 
 Operational Time Saved
 Estimated
-TBD
+≈ 35–80 min per weekly planning cycle
+Observation pending
 
 Status
-▶ NEXT (after Order Freeze)
+In Progress
 ```
+
+Detail: [MENU_EXPERIENCE_001](./MENU_EXPERIENCE_001.md) · Surface `/admin/menu-planning`  
+
+Lifecycle: [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md) · [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)
+
+**Sequence (weekly cycle — not CRUD):**
+
+```text
+001 Weekly Planning         ▶ In Progress
+002 Menu Search
+003 Menu Edit
+004 Dish Library Integration
+005 Publish & Preview
+↓
+Experience Review
+↓
+Journey Certification
+↓
+Freeze
+```
+
+| Phase | Question | Status |
+|-------|----------|--------|
+| 001 | ¿Puedo preparar la semana sin empezar desde cero en &lt;10 min? | ▶ |
+| 002 | ¿Puedo encontrar un menú / semana rápido? | Planned |
+| 003 | ¿Puedo corregir solo lo que cambió? | Planned |
+| 004 | ¿La biblioteca de platos alimenta la planificación? | Planned |
+| 005 | ¿Puedo previsualizar y publicar con confianza? | Planned |
 
 ---
 
