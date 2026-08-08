@@ -1,6 +1,6 @@
 # KITCHEN EXPERIENCE 002 · Zero Friction Kitchen Execution Search
 
-**Status:** ✅ **COMPLETE** (superseded as active by KE004 · surface retained)  
+**Status:** ✅ **COMPLETE** (superseded as active by KE005 · surface retained)  
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/kitchen-today` (mode **search**)  
@@ -66,8 +66,8 @@ Primary: Return to Today's Work · Review Production Handoff · Review Productio
 001 Today's Work               ✅
 002 Execution Search           ✅
 003 Execution Adaptation       ✅
-004 Labels & Special Info      ▶ next
-005 Execution Progress
+004 Labels & Special Info      ✅
+005 Execution Progress         ▶ next
 006 Completion / Handoff
 ↓
 Review → Journey Certification → Freeze
