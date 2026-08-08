@@ -85,7 +85,7 @@ OCC · Quick Capture · Import · Bulk appeared because friction repeated across
 |----------------|----------|-----------------|---------------------|
 | Create / Capture | CX001 Create | **OE001 Capture** | **ME001 Weekly Planning** |
 | Search | CX002 Search | **OE002 Search** | ME002 Menu Search |
-| Edit | CX003 Edit | **OE003 Edit** | ME003 Menu Edit |
+| Edit / Adapt | CX003 Edit | **OE003 Edit** | **ME003 Weekly Adaptation** |
 | Domain phases | Org · Growth | Templates · Incident | Dish Library · Publish & Preview |
 | Review | CX Review ✅ | Order Review ✅ | Menu Review |
 | Journey Certification | Customer Journey ✅ | Order Journey ✅ | Menu Journey ⏳ |

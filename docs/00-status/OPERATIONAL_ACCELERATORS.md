@@ -46,6 +46,7 @@ Then open Accelerators until it is **extremely fast**.
 | ACCELERATOR-003 | Operational Import Pipeline | Registered | One pipeline · many formats · LAW 002 |
 | ACCELERATOR-004 | Quick Capture | Registered | Becomes **OCC → Quick Capture Mode** |
 | ACCELERATOR-005 | Smart Suggestions | Registered | After evidence |
+| **ACCELERATOR-006** | **Planning Templates** | 🌱 **Candidate** | Menu week reuse · **only after Observation** · not ME003 |
 | — | Quick Repeat | Registered | Last week · last order · templates |
 | — | Templates | Registered | Preference / order templates |
 | — | **Organization Templates** | Registered · future | After org Experience mature |
@@ -61,6 +62,7 @@ Operational Accelerators
   ACCELERATOR-003 Import Pipeline
   ACCELERATOR-004 Quick Capture       → OCC mode
   ACCELERATOR-005 Smart Suggestions
+  ACCELERATOR-006 Planning Templates   Candidate (Menu evidence)
   Quick Repeat · Templates · Timeline · …
 ```
 

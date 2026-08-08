@@ -199,23 +199,25 @@ Name
 Menu Experience
 
 Phase
-002 Search
+003 Weekly Adaptation
 
 Mission
-Zero Friction Menu Search
+Zero Friction Weekly Adaptation
 
 Primary User
 Tenant Operator
 
 Primary KPI
-Time-to-Find Menu Item <10 s
+Time-to-Adapt Weekly Menu <5 min
 
 Secondary KPIs
+Time-to-Find Menu Item <10 s
 Time-to-Prepare Weekly Menu <10 min
 Time-to-Publish Week <30 s
 
 Operational Time Saved
 Estimated
+Adaptation ≈ 10–35 min per cycle
 Search ≈ 20–80 s per find
 Planning ≈ 35–80 min per weekly cycle
 Observation pending
@@ -224,7 +226,7 @@ Status
 In Progress
 ```
 
-Detail: [MENU_EXPERIENCE_002](./MENU_EXPERIENCE_002.md) · [001 Weekly Planning · Zero Friction Weekly Menu Planning](./MENU_EXPERIENCE_001.md) · Surface `/admin/menu-planning`  
+Detail: [MENU_EXPERIENCE_003](./MENU_EXPERIENCE_003.md) · [002 Search · Zero Friction Menu Search](./MENU_EXPERIENCE_002.md) · [001 Weekly Planning · Zero Friction Weekly Menu Planning](./MENU_EXPERIENCE_001.md) · Surface `/admin/menu-planning`  
 
 Lifecycle: [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md) · [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)
 
@@ -238,8 +240,8 @@ Semana → Día → Menú → Platos
 
 ```text
 001 Weekly Planning         ✅
-002 Menu Search             ▶ In Progress
-003 Menu Edit
+002 Menu Search             ✅
+003 Weekly Adaptation       ▶ In Progress
 004 Dish Library Integration
 005 Publish & Preview
 ↓
@@ -253,8 +255,8 @@ Freeze
 | Phase | Question | Status |
 |-------|----------|--------|
 | 001 | ¿Puedo preparar la semana sin empezar desde cero en &lt;10 min? | ✅ |
-| 002 | ¿Puedo encontrar cualquier elemento de planificación en &lt;10s? | ▶ |
-| 003 | ¿Puedo corregir solo lo que cambió? | Planned |
+| 002 | ¿Puedo encontrar cualquier elemento de planificación en &lt;10s? | ✅ |
+| 003 | ¿Puedo adaptar la planificación en &lt;5 min sin reconstruirla? | ▶ |
 | 004 | ¿La biblioteca de platos alimenta la planificación? | Planned |
 | 005 | ¿Puedo previsualizar y publicar con confianza? | Planned |
 

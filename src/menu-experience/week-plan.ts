@@ -212,6 +212,74 @@ export function setSlotDisabled(
   });
 }
 
+/** ME003 — move a dish to another day in the same week. */
+export function moveSlot(
+  weekStart: string,
+  slotId: string,
+  toDayDate: string,
+): WeekPlan | null {
+  const plan = getWeekPlan(weekStart);
+  if (!plan) return null;
+  const slot = plan.slots.find((s) => s.id === slotId);
+  if (!slot) return null;
+  return saveWeekPlan({
+    ...plan,
+    status: "draft",
+    slots: plan.slots.map((s) =>
+      s.id === slotId ? { ...s, dayDate: toDayDate, disabled: false } : s,
+    ),
+  });
+}
+
+/** ME003 — duplicate a dish onto a day (same day by default). */
+export function duplicateSlot(
+  weekStart: string,
+  slotId: string,
+  toDayDate?: string,
+): WeekPlan | null {
+  const plan = getWeekPlan(weekStart);
+  if (!plan) return null;
+  const slot = plan.slots.find((s) => s.id === slotId);
+  if (!slot) return null;
+  const copy: WeekDishSlot = {
+    ...slot,
+    id: `slot_${Math.random().toString(36).slice(2, 9)}`,
+    dayDate: toDayDate ?? slot.dayDate,
+    disabled: false,
+  };
+  return saveWeekPlan({
+    ...plan,
+    status: "draft",
+    slots: [...plan.slots, copy],
+  });
+}
+
+/** ME003 — replace dish identity on a slot. */
+export function replaceSlotDish(
+  weekStart: string,
+  slotId: string,
+  dish: { dishId: string; dishLabel: string; macrosHint?: string | null; allergenHint?: string | null },
+): WeekPlan | null {
+  const plan = getWeekPlan(weekStart);
+  if (!plan) return null;
+  return saveWeekPlan({
+    ...plan,
+    status: "draft",
+    slots: plan.slots.map((s) =>
+      s.id === slotId
+        ? {
+            ...s,
+            dishId: dish.dishId,
+            dishLabel: dish.dishLabel,
+            macrosHint: dish.macrosHint ?? null,
+            allergenHint: dish.allergenHint ?? null,
+            disabled: false,
+          }
+        : s,
+    ),
+  });
+}
+
 export function markPreview(weekStart: string): WeekPlan | null {
   const plan = getWeekPlan(weekStart);
   if (!plan) return null;

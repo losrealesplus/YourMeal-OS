@@ -67,8 +67,8 @@ Ready for Orders
 
 ```text
 001 Weekly Planning         ✅
-002 Menu Search             ▶
-003 Menu Edit
+002 Menu Search             ✅
+003 Weekly Adaptation       ▶
 004 Dish Library Integration
 005 Publish & Preview
 ↓
