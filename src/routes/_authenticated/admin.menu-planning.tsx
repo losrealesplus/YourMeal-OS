@@ -1,9 +1,11 @@
 /**
- * MENU EXPERIENCE · Planning · Search · Adaptation (001–003)
+ * MENU EXPERIENCE 001 · MENU EXPERIENCE 002 · MENU EXPERIENCE 003 · MENU EXPERIENCE 004
+ * Planning · Search · Adaptation · Dish Library
  *
  * Temporal hierarchy: Week → Day → Menu → Dishes.
+ * Dish Library = operational memory consumed by planning (not dish CRUD).
  * Experience working set in session; OP-001 WeeklyMenuService for seed/publish when durable.
- * No Menu Capability / Facade / Engine changes.
+ * No Menu / Dish Capability / Facade / Engine changes.
  */
 
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -24,6 +26,10 @@ import {
 } from "@/menu-experience/MenuPlanningPanel";
 import { MenuSearchPanel } from "@/menu-experience/MenuSearchPanel";
 import { MenuAdaptationPanel } from "@/menu-experience/MenuAdaptationPanel";
+import {
+  dishRowToLibraryItem,
+  type DishLibraryItem,
+} from "@/menu-experience/dish-library";
 import {
   activeSlots,
   createEmptyWeek,
@@ -63,7 +69,7 @@ export const Route = createFileRoute("/_authenticated/admin/menu-planning")({
       {
         name: "description",
         content:
-          "MENU EXPERIENCE 003 Adaptation · 002 Search · 001 Weekly Planning",
+          "MENU EXPERIENCE 004 Dish Library · 003 Adaptation · 002 Search · 001 Planning",
       },
     ],
   }),
@@ -110,6 +116,7 @@ function MenuPlanningExperiencePage() {
   const [focusNonce, setFocusNonce] = useState(0);
   const [durableMenus, setDurableMenus] = useState<DurableMenuSeed[]>([]);
   const [dishPicks, setDishPicks] = useState<DishPick[]>([]);
+  const [libraryItems, setLibraryItems] = useState<DishLibraryItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -133,12 +140,14 @@ function MenuPlanningExperiencePage() {
         ]);
         if (cancelled) return;
 
-        const picks: DishPick[] = dishes.map((d) => ({
+        const library = dishes.map(dishRowToLibraryItem);
+        setLibraryItems(library);
+        const picks: DishPick[] = library.map((d) => ({
           id: d.id,
-          label: d.name,
-          durable: true,
-          macrosHint: null,
-          allergenHint: null,
+          label: d.label,
+          durable: d.durable,
+          macrosHint: d.macrosHint,
+          allergenHint: d.allergenHint,
         }));
         setDishPicks(picks);
 
@@ -304,10 +313,10 @@ function MenuPlanningExperiencePage() {
       <SectionTitle
         overline={
           mode === "adapt"
-            ? "MENU EXPERIENCE 003 · Phase 003 Weekly Adaptation"
+            ? "MENU EXPERIENCE 004 · Dish Library · 003 Weekly Adaptation"
             : mode === "search"
               ? "MENU EXPERIENCE 002 · Phase 002 Search"
-              : "MENU EXPERIENCE 001 · Phase 001 Weekly Planning"
+              : "MENU EXPERIENCE 004 · Dish Library · 001 Weekly Planning"
         }
         title={
           mode === "adapt"
@@ -318,22 +327,23 @@ function MenuPlanningExperiencePage() {
         }
         subtitle={
           mode === "adapt"
-            ? "Ajusta la planificación viva — sin reconstruir la semana"
+            ? "Reutiliza la Dish Library · adapta sin reconstruir"
             : mode === "search"
               ? "Encuentra cualquier elemento de la planificación en segundos"
-              : "Duplica la semana anterior · adapta los cambios · publica · sigue"
+              : "Duplica · inserta desde la biblioteca · publica · sigue"
         }
       />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
         {mode === "adapt" ? (
-          <StatusChip tone="warning" label="TTAW < 5 min" />
+          <StatusChip tone="warning" label="TTFID < 15 s" />
         ) : mode === "search" ? (
           <StatusChip tone="warning" label="TTFM < 10 s" />
         ) : (
-          <StatusChip tone="warning" label="TTWM < 10 min" />
+          <StatusChip tone="warning" label="TTFID < 15 s" />
         )}
         <StatusChip tone="info" label="Semana → Día → Menú → Platos" />
+        <StatusChip tone="info" label="Dish Library · reuse" />
         <button
           type="button"
           className="text-xs underline-offset-2 hover:underline"
@@ -377,13 +387,13 @@ function MenuPlanningExperiencePage() {
       <AdminHeader
         goal={
           mode === "adapt"
-            ? "Adaptar la planificación semanal en <5 min sin reconstruirla"
+            ? "Encontrar e insertar/reemplazar un plato desde la biblioteca en <15s"
             : mode === "search"
               ? "Encontrar cualquier elemento de planificación en <10s"
-              : "Preparar el menú semanal en <10 min sin empezar desde cero"
+              : "Preparar la semana reutilizando la Dish Library · TTFID <15s"
         }
-        capability="menus.read / menus.write"
-        object="Weekly adaptation · search · planning · session honesty"
+        capability="menus.read / menus.write · dishes.read"
+        object="Dish Library integration · weekly adaptation · session honesty"
       />
 
       {loading ? (
@@ -405,6 +415,7 @@ function MenuPlanningExperiencePage() {
           weekStart={week}
           durableMenus={durableMenus}
           dishPicks={dishPicks}
+          libraryItems={libraryItems}
           onPreview={() => openWeek(week, true)}
           onPublish={publishAdaptation}
           onBackToSearch={() => goMode("search")}
@@ -415,6 +426,7 @@ function MenuPlanningExperiencePage() {
           canWrite={canWrite}
           durableMenus={durableMenus}
           dishPicks={dishPicks}
+          libraryItems={libraryItems}
           focusWeekStart={focusWeekStart}
           startInPreview={startInPreview}
           onPublishDurable={publishDurable}

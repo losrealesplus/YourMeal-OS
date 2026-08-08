@@ -86,7 +86,7 @@ OCC · Quick Capture · Import · Bulk appeared because friction repeated across
 | Create / Capture | CX001 Create | **OE001 Capture** | **ME001 Weekly Planning** |
 | Search | CX002 Search | **OE002 Search** | ME002 Menu Search |
 | Edit / Adapt | CX003 Edit | **OE003 Edit** | **ME003 Weekly Adaptation** |
-| Domain phases | Org · Growth | Templates · Incident | Dish Library · Publish & Preview |
+| Domain phases | Org · Growth | Templates · Incident | **Dish Library (Operational Library)** · Publish & Preview |
 | Review | CX Review ✅ | Order Review ✅ | Menu Review |
 | Journey Certification | Customer Journey ✅ | Order Journey ✅ | Menu Journey ⏳ |
 | Freeze | Customer Frozen | Order Frozen | Menu Freeze |
@@ -116,4 +116,5 @@ Menu needs the **weekly planning cycle**: reuse → adapt → publish.
 * [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md) — first lifecycle completion  
 * [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md) — second lifecycle completion  
 * [ORDER_EXPERIENCE_001](./ORDER_EXPERIENCE_001.md) · [ORDER_EXPERIENCE_002](./ORDER_EXPERIENCE_002.md)  
+* [OPERATIONAL_LIBRARIES](./OPERATIONAL_LIBRARIES.md) — reuse catalogs, not admin workplaces  
 * [OPERATIONAL_ACCELERATORS](./OPERATIONAL_ACCELERATORS.md)

@@ -88,8 +88,8 @@ No matching planning element → **Crear menú / semana** · **Duplicar semana a
 ```text
 001 Weekly Planning         ✅
 002 Menu Search             ✅
-003 Weekly Adaptation       ▶
-004 Dish Library Integration
+003 Weekly Adaptation       ✅
+004 Dish Library Integration ▶
 005 Publish & Preview
 ↓
 Review → Journey Certification → Freeze
