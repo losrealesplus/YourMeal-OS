@@ -27,6 +27,8 @@ READY WITH IMPROVEMENTS
 
 **Customer Experience is ready to freeze as an operational journey** and to open **Order Experience**.  
 
+**Journey Certification (retroactive):** Customer Journey ✅ **Certified** — see [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md).  
+
 Improvements below are **not** blockers for Orders.  
 They are known honesty gaps (Facade substrate / session continuity) and polish — to be addressed when Product opens write paths, or during Observation.
 
@@ -139,17 +141,25 @@ Customer Experience
 ↓
 Review                      ✅ THIS DOCUMENT
 ↓
+Journey Certification       ✅ Customer Journey (retroactive)
+↓
 Freeze Customer Experience  ← no new Customer missions
 ↓
-ORDER EXPERIENCE            ← NEXT
+ORDER EXPERIENCE            ✅ Reviewed · Certified · Frozen
 ↓
-Menu Experience
+Menu Experience             ← NEXT after Order Freeze
 ↓
 Production Experience
 ↓
 Kitchen Experience
 ↓
 Delivery Experience
+↓
+Operational Journey Review
+↓
+Observation Sprint
+↓
+Evidence
 ↓
 Operational Accelerators
   ACCELERATOR-001 OCC                 Reserved

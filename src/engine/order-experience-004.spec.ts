@@ -53,10 +53,12 @@ describe("ORDER EXPERIENCE 004 · Zero Friction Order Templates", () => {
     expect(cards).toContain("004 Templates");
     expect(cards).toContain("Zero Friction Order Templates");
     expect(cards).toContain("Time-to-Create a Frequent Order <20 s");
-    expect(cards).toContain("In Progress");
+    expect(cards).toContain("READY WITH IMPROVEMENTS");
+    expect(cards).toContain("Frozen");
 
     expect(missions).toContain("ORDER-EXPERIENCE-005");
     expect(missions).toContain("OE004 Templates ✅");
+    expect(missions).toContain("OE005 Incident ✅");
 
     expect(ui).toContain("ORDER EXPERIENCE 004");
     expect(ui).toContain("OrderTemplatesPanel");

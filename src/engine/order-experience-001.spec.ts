@@ -63,9 +63,12 @@ describe("ORDER EXPERIENCE 001 · Zero Friction Order Capture", () => {
     expect(cards).toContain("Zero Friction Order Capture");
     expect(cards).toContain("Time-to-Create Order <45 s");
     expect(cards).toContain("002 Search");
-    expect(cards).toContain("In Progress");
+    expect(cards).toContain("READY WITH IMPROVEMENTS");
+    expect(cards).toContain("Journey Certified");
 
     expect(missions).toContain("ORDER-EXPERIENCE-005");
+    expect(missions).toContain("Journey Certified");
+    expect(missions).toContain("MENU EXPERIENCE");
     expect(missions).toContain("TTO <45s");
     expect(missions).toContain("order-capture");
 

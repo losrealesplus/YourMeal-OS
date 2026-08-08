@@ -20,7 +20,7 @@ describe("ORDER EXPERIENCE 005 · Zero Friction Operational Incident", () => {
     clearOperationalIncidentsForTests();
   });
 
-  it("documents TTRI · route · Experience-only · Card In Progress", () => {
+  it("documents TTRI · route · Experience-only · Card Frozen · Review", () => {
     const doc = readFileSync(
       resolve(ROOT, "docs/00-status/ORDER_EXPERIENCE_005.md"),
       "utf8",
@@ -50,12 +50,13 @@ describe("ORDER EXPERIENCE 005 · Zero Friction Operational Incident", () => {
     expect(doc).toContain("OCC remains **Reserved**");
 
     expect(cards).toContain("005 Incident");
-    expect(cards).toContain("Zero Friction Operational Incident");
     expect(cards).toContain("Time-to-Record Operational Incident <30 s");
-    expect(cards).toContain("In Progress");
+    expect(cards).toContain("READY WITH IMPROVEMENTS");
+    expect(cards).toContain("Journey Certified");
 
     expect(missions).toContain("ORDER-EXPERIENCE-005");
-    expect(missions).toContain("OE005 Incident ▶");
+    expect(missions).toContain("OE005 Incident ✅");
+    expect(missions).toContain("ORDER_EXPERIENCE_REVIEW");
 
     expect(ui).toContain("ORDER EXPERIENCE 005");
     expect(ui).toContain("OrderIncidentPanel");
