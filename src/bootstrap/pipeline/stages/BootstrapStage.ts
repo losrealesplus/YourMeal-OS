@@ -3,8 +3,8 @@
  * The Orchestrator must not import Supabase / Router / Branding / Doctor.
  */
 
-import type { BootstrapContext } from "./BootstrapContext";
-import type { BootstrapStageId, BootstrapStageOutcome } from "./types";
+import type { BootstrapContext } from "../BootstrapContext";
+import type { BootstrapStageId, BootstrapStageOutcome } from "../types";
 
 export type BootstrapStageHandler = {
   readonly id: BootstrapStageId;

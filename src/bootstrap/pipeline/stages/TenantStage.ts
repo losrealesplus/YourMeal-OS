@@ -26,22 +26,24 @@ export const TenantStage: BootstrapStageHandler = {
       };
     }
 
+    const userId = ctx.userId;
+
     try {
       const snap = getBootstrapIdentitySnapshot();
       const data =
-        snap.userId === ctx.userId && snap.status !== "idle"
+        snap.userId === userId && snap.status !== "idle"
           ? {
-              userId: snap.userId,
+              userId,
               roles: snap.roles,
               profile: snap.profile,
               tenant: snap.tenant,
             }
-          : await loadSessionIdentity(ctx.userId);
+          : await loadSessionIdentity(userId);
 
       const { tenant, tenantId } = resolveTenantFromSessionIdentity(data);
 
       publishBootstrapIdentitySnapshot({
-        userId: ctx.userId,
+        userId,
         tenant,
         status: "loading",
       });
