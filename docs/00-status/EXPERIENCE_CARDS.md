@@ -275,7 +275,7 @@ Name
 Production Experience
 
 Phase
-Review complete · Journey Certification next
+Journey Certified · Frozen
 
 Mission
 Zero Friction Production Journey (PE001–PE006)
@@ -303,14 +303,13 @@ Time-to-Prepare-Production-Plan <10 min
 Operational Time Saved
 Estimated — not measured
 Illustrative weekly return ≈ 40–155 min
-(see PRODUCTION_EXPERIENCE_REVIEW)
 Observation Sprint pending
 
 Status
-READY WITH IMPROVEMENTS
+Journey Certified · Frozen · READY WITH IMPROVEMENTS
 ```
 
-Detail: [PRODUCTION_EXPERIENCE_REVIEW](../tenant-success/PRODUCTION_EXPERIENCE_REVIEW.md) · [006 Kitchen Handoff · Zero Friction Kitchen Handoff](./PRODUCTION_EXPERIENCE_006.md) · [005 Alerts · Zero Friction Production Alerts & Deadlines](./PRODUCTION_EXPERIENCE_005.md) · [004 Pre-Preparations · Zero Friction Production Pre-Preparations](./PRODUCTION_EXPERIENCE_004.md) · [003 Adaptation · Zero Friction Production Adaptation](./PRODUCTION_EXPERIENCE_003.md) · [002 Search · Zero Friction Production Search](./PRODUCTION_EXPERIENCE_002.md) · [001 Production Planning · Zero Friction Production Planning](./PRODUCTION_EXPERIENCE_001.md) · Surface `/admin/production-planning` · Source: published Menu week  
+Detail: [PRODUCTION_JOURNEY_CERTIFICATION](../tenant-success/PRODUCTION_JOURNEY_CERTIFICATION.md) · [PRODUCTION_EXPERIENCE_REVIEW](../tenant-success/PRODUCTION_EXPERIENCE_REVIEW.md) · [006 Kitchen Handoff · Zero Friction Kitchen Handoff](./PRODUCTION_EXPERIENCE_006.md) · [005 Alerts · Zero Friction Production Alerts & Deadlines](./PRODUCTION_EXPERIENCE_005.md) · [004 Pre-Preparations · Zero Friction Production Pre-Preparations](./PRODUCTION_EXPERIENCE_004.md) · [003 Adaptation · Zero Friction Production Adaptation](./PRODUCTION_EXPERIENCE_003.md) · [002 Search · Zero Friction Production Search](./PRODUCTION_EXPERIENCE_002.md) · [001 Production Planning · Zero Friction Production Planning](./PRODUCTION_EXPERIENCE_001.md) · Surface `/admin/production-planning` · Source: published Menu week  
 
 Lifecycle: [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md) · [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)
 
@@ -332,11 +331,11 @@ Semana → Día → Trabajo → Cantidad → Deadline → Kitchen
 ↓
 Experience Review              ✅ READY WITH IMPROVEMENTS
 ↓
-Journey Certification          ← NEXT
+Journey Certification          ✅ CERTIFIED
 ↓
-Freeze
+Freeze                         ✅
 ↓
-Kitchen Experience
+Kitchen Experience             ← NEXT (eligible)
 ```
 
 | Phase | Question | Status |
@@ -348,6 +347,7 @@ Kitchen Experience
 | 005 | ¿Veo alertas y deadlines a tiempo (&lt;10s)? | ✅ |
 | 006 | ¿Kitchen recibe un handoff claro (&lt;5 min)? | ✅ |
 | Review | ¿El viaje completo está listo para certificar? | ✅ READY WITH IMPROVEMENTS |
+| Certification | ¿El Journey Production está certificado? | ✅ CERTIFIED · Frozen |
 
 ---
 
@@ -376,8 +376,10 @@ Estimated
 TBD
 
 Status
-Planned
+Eligible · NEXT after Production Certification
 ```
+
+Input: Production Kitchen Handoff (Ready / Ready with warnings) — Kitchen executes, does not re-plan.
 
 ---
 

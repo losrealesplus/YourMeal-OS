@@ -9,7 +9,7 @@ import { describe, expect, it } from "vitest";
 const ROOT = process.cwd();
 
 describe("PRODUCTION EXPERIENCE REVIEW 001 · Readiness Review", () => {
-  it("records READY WITH IMPROVEMENTS · Estimated ≠ Measured · Certification next", () => {
+  it("records READY WITH IMPROVEMENTS · Estimated ≠ Measured · leads to Certification", () => {
     const review = readFileSync(
       resolve(ROOT, "docs/tenant-success/PRODUCTION_EXPERIENCE_REVIEW.md"),
       "utf8",
@@ -40,22 +40,21 @@ describe("PRODUCTION EXPERIENCE REVIEW 001 · Readiness Review", () => {
     expect(review).toContain("*None.*");
     expect(review).toContain("Planning / Execution Boundary");
     expect(review).toContain("Kitchen Handoff");
-    expect(review).not.toContain("Order Journey · CERTIFIED");
+    expect(review).toContain("PRODUCTION_JOURNEY_CERTIFICATION");
 
     expect(journeys).toContain("READY WITH IMPROVEMENTS");
-    expect(journeys).toContain("Certification next");
     expect(journeys).toContain("PRODUCTION_EXPERIENCE_REVIEW");
+    expect(journeys).toContain("PRODUCTION_JOURNEY_CERTIFICATION");
 
     expect(lifecycle).toContain("Production Review ✅");
     expect(lifecycle).toContain("READY WITH IMPROVEMENTS");
 
     expect(cards).toContain("READY WITH IMPROVEMENTS");
     expect(cards).toContain("PRODUCTION_EXPERIENCE_REVIEW");
-    expect(cards).toContain("Journey Certification          ← NEXT");
+    expect(cards).toContain("Journey Certified");
 
     expect(missions).toContain("PRODUCTION-EXPERIENCE-REVIEW");
     expect(missions).toContain("READY WITH IMPROVEMENTS");
-    expect(missions).toContain("Journey Certification");
     expect(missions).toContain("PE006 Kitchen Handoff ✅");
   });
 });

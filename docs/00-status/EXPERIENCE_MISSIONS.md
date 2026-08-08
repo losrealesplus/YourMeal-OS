@@ -1,6 +1,6 @@
 # Experience Missions (Era 2)
 
-**Status:** ▶ **ACTIVE** — **PRODUCTION EXPERIENCE REVIEW** complete · Journey Certification next  
+**Status:** ▶ **ACTIVE** — **KITCHEN EXPERIENCE** eligible · Production Journey **Certified · Frozen**  
 
 
 **Declared:** 2026-08-07  
@@ -28,8 +28,8 @@ A great Experience is invisible.
 | **Customer** | Zero Friction (001–005) · includes **CUSTOMER_EXPERIENCE_005** Growth | Create <30s · Find <10s · Edit <20s · Org <45s · enriquecer < 30s | ✅ **Frozen** · Journey Certified |
 | **Order** | Zero Friction Capture · Search · Edit · Templates · Incident (001–005) | TTO <45s · TTFO <10s · TTEO <20s · Reuse <10s · TTRI <30s | ✅ **Frozen** · Journey Certified |
 | **Menu** | Zero Friction Planning · Search · Adaptation · Dish Library · Publish (001–005) | TTWM <10 min · TTFM <10s · TTAW <5 min · TTFID <15s · TTRP <5 min | ✅ **Certified** |
-| **Production** | Zero Friction Planning · Search · Adaptation · Preps · Alerts · Handoff (001–006) | TPP <10 min · TTFPW <10s · TAPP <5 min · TIRP <15s · TTPR <10s · TPKH <5 min | ✅ Review · **READY WITH IMPROVEMENTS** · Certification next |
-| **Kitchen** | Know what to execute | &lt; 10s | Planned |
+| **Production** | Zero Friction Planning · Search · Adaptation · Preps · Alerts · Handoff (001–006) | TPP <10 min · TTFPW <10s · TAPP <5 min · TIRP <15s · TTPR <10s · TPKH <5 min | ✅ **Frozen** · Journey Certified |
+| **Kitchen** | Know what to execute | &lt; 10s | ▶ **Eligible** (after Production Certification) |
 | **Delivery** | Prepare today's routes | &lt; 2 min | Planned |
 
 ---
@@ -117,23 +117,23 @@ Temporal model: **Semana → Día → Menú → Platos**
 
 ## Active mission
 
-▶ **PRODUCTION-EXPERIENCE-REVIEW** · Production Experience Readiness Review  
-Verdict: **READY WITH IMPROVEMENTS** · [PRODUCTION_EXPERIENCE_REVIEW](../tenant-success/PRODUCTION_EXPERIENCE_REVIEW.md)  
+✅ **PRODUCTION JOURNEY CERTIFIED · FROZEN**  
+[PRODUCTION_JOURNEY_CERTIFICATION](../tenant-success/PRODUCTION_JOURNEY_CERTIFICATION.md) · Review [PRODUCTION_EXPERIENCE_REVIEW](../tenant-success/PRODUCTION_EXPERIENCE_REVIEW.md) · Verdict **READY WITH IMPROVEMENTS**  
 Surface retained: `/admin/production-planning` · PE001–PE006 ✅  
-Next: **Journey Certification** (do not open Kitchen yet)
+
+▶ **Next active:** **KITCHEN EXPERIENCE 001** · Zero Friction Kitchen Execution (eligible)  
+Do not reopen Production unless Observation proves friction.
 
 ```text
-PE001 Production Planning ✅ → PE002 Search ✅ → PE003 Adaptation ✅ → PE004 Pre-Preparations ✅ → PE005 Alerts ✅ → PE006 Kitchen Handoff ✅ → Review ✅ → Journey Certification ← NEXT → Freeze → Kitchen Experience
+PE001 Production Planning ✅ → PE002 Search ✅ → PE003 Adaptation ✅ → PE004 Pre-Preparations ✅ → PE005 Alerts ✅ → PE006 Kitchen Handoff ✅ → Review ✅ → Journey Certification ✅ CERTIFIED → Freeze ✅ → Kitchen Experience ← NEXT
 ```
 
 Temporal model: **Semana → Día → Trabajo → Cantidad → Deadline → Kitchen**  
-Source: published operational week (never invent from incomplete Menu).  
-Boundary: Production prepares · Handoff transfers · Kitchen executes (later).  
+Boundary: Production prepares · Handoff transfers · Kitchen executes.  
 OTS: **Estimated ≠ Measured** — Observation Sprint pending (LAW 001-A).  
-Menu: ✅ Certified · [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)  
-Order: frozen · [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md)  
-Customer: frozen · [OPERATIONAL_LIBRARIES](./OPERATIONAL_LIBRARIES.md)  
-Historical ids: **PRODUCTION-EXPERIENCE-001** · **PRODUCTION-EXPERIENCE-002** · **PRODUCTION-EXPERIENCE-003** · **PRODUCTION-EXPERIENCE-004** · **PRODUCTION-EXPERIENCE-005** · **PRODUCTION-EXPERIENCE-006** (complete) · **PRODUCTION-EXPERIENCE-REVIEW** · **MENU-EXPERIENCE-001** … **005**
+Production: ✅ Certified · Frozen · [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)  
+Menu: ✅ Certified · Order: frozen · Customer: frozen  
+Historical ids: **PRODUCTION-EXPERIENCE-001** · **PRODUCTION-EXPERIENCE-002** · **PRODUCTION-EXPERIENCE-003** · **PRODUCTION-EXPERIENCE-004** · **PRODUCTION-EXPERIENCE-005** · **PRODUCTION-EXPERIENCE-006** · **PRODUCTION-EXPERIENCE-REVIEW** · **PRODUCTION-JOURNEY-CERTIFICATION** · **MENU-EXPERIENCE-001** · **MENU-EXPERIENCE-002** · **MENU-EXPERIENCE-003** · **MENU-EXPERIENCE-004** · **MENU-EXPERIENCE-005**
 
 ---
 
@@ -146,9 +146,9 @@ Order Experience        ✅ MVP · Reviewed · Journey Certified · Frozen
 ↓
 Menu Experience         ✅ MVP · Journey Certified
 ↓
-Production Experience   ✅ Review · READY WITH IMPROVEMENTS (001–006 ✅) · Certification next
+Production Experience   ✅ Journey Certified · Frozen (001–006 ✅)
 ↓
-Kitchen Experience
+Kitchen Experience      ▶ eligible
 ↓
 Delivery Experience
 ↓
@@ -172,6 +172,7 @@ Operational Accelerators
 
 * [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)  
 * [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)  
+* [PRODUCTION_JOURNEY_CERTIFICATION](../tenant-success/PRODUCTION_JOURNEY_CERTIFICATION.md)  
 * [PRODUCTION_EXPERIENCE_REVIEW](../tenant-success/PRODUCTION_EXPERIENCE_REVIEW.md)  
 * [PRODUCTION_EXPERIENCE_006](./PRODUCTION_EXPERIENCE_006.md)  
 * [PRODUCTION_EXPERIENCE_005](./PRODUCTION_EXPERIENCE_005.md)  
