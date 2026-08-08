@@ -22,7 +22,7 @@ function identity(
     tenant: { id: "t1", name: "EatClean", slug: "eatclean" },
     permissions: {
       roles: ["kitchen", "company_admin"],
-      capabilities: ["orders.read", "kitchen.operate", "production.read"],
+      capabilities: ["orders.read", "kitchen.operate", "production.operate"],
     },
     currentUser: {
       id: "u1",

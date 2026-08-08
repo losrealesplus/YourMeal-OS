@@ -74,12 +74,15 @@ export function productionCapabilityBitsFromIdentity(
   identity: ProductionRuntimeIdentity,
 ): ProductionCapabilityBits {
   const caps = new Set(identity.permissions.capabilities);
+  // Canonical RBAC: production.operate + pilot kitchen.operate mapping
+  // (PRODUCTION_CAPABILITY.md). Fine-grained production.read/plan/release
+  // are not Capability literals — do not reintroduce them.
+  const canProduction = caps.has("production.operate");
   const canKitchen = caps.has("kitchen.operate");
   return {
-    canRead:
-      caps.has("production.read") || canKitchen || caps.has("orders.read"),
-    canPlan: caps.has("production.plan") || canKitchen,
-    canRelease: caps.has("production.release") || canKitchen,
+    canRead: canProduction || canKitchen || caps.has("orders.read"),
+    canPlan: canProduction || canKitchen,
+    canRelease: canProduction || canKitchen,
     canViewKitchen: canKitchen,
   };
 }

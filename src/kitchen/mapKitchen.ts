@@ -98,15 +98,14 @@ export function kitchenCapabilityBitsFromIdentity(
   identity: KitchenRuntimeIdentity,
 ): KitchenCapabilityBits {
   const caps = new Set(identity.permissions.capabilities);
+  // Canonical RBAC: kitchen.operate only (CAPABILITY_MATRIX).
+  // Fine-grained kitchen.*/production.read strings are not Capability literals.
   const operate = caps.has("kitchen.operate");
   return {
-    canReadQueue:
-      operate ||
-      caps.has("production.read") ||
-      caps.has("kitchen.queue.read"),
-    canOperate: operate || caps.has("kitchen.batch.start"),
-    canAssign: operate || caps.has("kitchen.operator.assign"),
-    canBlock: operate || caps.has("kitchen.batch.block"),
+    canReadQueue: operate,
+    canOperate: operate,
+    canAssign: operate,
+    canBlock: operate,
   };
 }
 

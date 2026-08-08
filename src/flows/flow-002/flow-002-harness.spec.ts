@@ -27,7 +27,7 @@ function identity(
         "orders.read",
         "orders.write",
         "kitchen.operate",
-        "production.read",
+        "production.operate",
         "logistics.operate",
       ],
     },

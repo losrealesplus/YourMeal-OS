@@ -83,7 +83,7 @@ function ProductionWorkspaceDemoPage() {
   const [busy, setBusy] = useState(false);
   const canPlan =
     identity.permissions.capabilities.includes("kitchen.operate") ||
-    identity.permissions.capabilities.includes("production.plan");
+    identity.permissions.capabilities.includes("production.operate");
 
   const refresh = useEffectEvent(async () => {
     if (!production.isReady) return;
@@ -232,7 +232,7 @@ function ProductionWorkspaceDemoPage() {
 
       <AdminHeader
         goal="Probar planificación operativa vía Facade (Work — no Orders CRUD)"
-        capability="kitchen.operate / production.plan"
+        capability="kitchen.operate / production.operate"
         object="ProductionPlan · ProductionQueue · ProductionLoad · Batch"
       />
 
