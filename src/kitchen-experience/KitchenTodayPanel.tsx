@@ -14,7 +14,10 @@ import {
   printKitchenWork,
 } from "@/kitchen-experience/export-kitchen-work";
 import {
-  buildTodaysKitchenWork,
+  buildAdaptedTodaysKitchenWork,
+  effectiveExecutionQuantity,
+} from "@/kitchen-experience/adapt-execution";
+import {
   filterKitchenCards,
   kitchenWorkStatusLabel,
   setKitchenWorkStatus,
@@ -53,7 +56,7 @@ export function KitchenTodayPanel({
 
   const view = useMemo(() => {
     void tick;
-    return buildTodaysKitchenWork(dayDate);
+    return buildAdaptedTodaysKitchenWork(dayDate);
   }, [dayDate, tick]);
 
   const filtered = useMemo(
@@ -258,8 +261,14 @@ export function KitchenTodayPanel({
                 <p className="text-sm font-semibold">
                   {c.dishLabel}{" "}
                   <span className="font-normal text-muted-foreground">
-                    · {c.quantity}
-                    {c.quantityEstimated ? "*" : ""} uds · {c.batchKey}
+                    · {effectiveExecutionQuantity(c)}
+                    {c.quantityEstimated ? "*" : ""} uds
+                    {c.executionQuantity != null &&
+                    c.executionQuantity !== c.quantity
+                      ? ` (Prod ${c.quantity})`
+                      : ""}{" "}
+                    · {c.batchKey}
+                    {c.executionAdapted ? " · adaptado" : ""}
                   </span>
                 </p>
                 <p className="text-xs text-muted-foreground">
@@ -349,8 +358,10 @@ export function KitchenTodayPanel({
                   <span className="font-medium">Qué:</span> {c.dishLabel}
                 </p>
                 <p>
-                  <span className="font-medium">Cuánto:</span> {c.quantity}
-                  {c.quantityEstimated ? "*" : ""} · batch {c.batchKey}
+                  <span className="font-medium">Cuánto:</span>{" "}
+                  {effectiveExecutionQuantity(c)}
+                  {c.quantityEstimated ? "*" : ""} · Production{" "}
+                  {c.quantity} · batch {c.batchKey}
                 </p>
                 <p>
                   <span className="font-medium">Cuándo:</span>{" "}

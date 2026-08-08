@@ -1,9 +1,9 @@
 /**
- * KITCHEN EXPERIENCE 001 · 002
- * Today's Work · Execution Search
+ * KITCHEN EXPERIENCE 001 · 002 · 003
+ * Today's Work · Execution Search · Execution Adaptation
  *
  * Experience only — no Kitchen / Production Capability · Facade · Engine changes.
- * Start / Pause / Resume / Block / Assign → Future.
+ * Start / Pause / Resume / Block / Assign / Notify → Future.
  */
 
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -11,14 +11,15 @@ import { useState } from "react";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { AdminHeader, SectionTitle, StatusChip } from "@/components/admin";
 import { useCan } from "@/hooks/use-can";
+import { KitchenAdaptationPanel } from "@/kitchen-experience/KitchenAdaptationPanel";
 import { KitchenSearchPanel } from "@/kitchen-experience/KitchenSearchPanel";
 import { KitchenTodayPanel } from "@/kitchen-experience/KitchenTodayPanel";
 import { utcDateOnly } from "@/menu-experience/week-plan";
 
-type ExperienceMode = "today" | "search";
+type ExperienceMode = "today" | "search" | "adapt";
 
 function isExperienceMode(value: unknown): value is ExperienceMode {
-  return value === "today" || value === "search";
+  return value === "today" || value === "search" || value === "adapt";
 }
 
 export const Route = createFileRoute("/_authenticated/admin/kitchen-today")({
@@ -34,12 +35,13 @@ export const Route = createFileRoute("/_authenticated/admin/kitchen-today")({
   head: () => ({
     meta: [
       {
-        title: "YourMeal OS — Kitchen Experience · Search · Today's Work",
+        title:
+          "YourMeal OS — Kitchen Experience · Adaptation · Search · Today's Work",
       },
       {
         name: "description",
         content:
-          "KITCHEN EXPERIENCE 002 Execution Search · 001 Today's Work · TTFEW <10s",
+          "KITCHEN EXPERIENCE 003 Execution Adaptation · TTAE <30s · 002 Search · 001 Today's Work",
       },
     ],
   }),
@@ -75,28 +77,35 @@ function KitchenTodayExperiencePage() {
     });
   }
 
+  const overline =
+    mode === "adapt"
+      ? "KITCHEN EXPERIENCE 003 · Execution Adaptation"
+      : mode === "search"
+        ? "KITCHEN EXPERIENCE 002 · Execution Search"
+        : "KITCHEN EXPERIENCE 001 · Today's Work";
+
+  const title =
+    mode === "adapt"
+      ? "Zero Friction Kitchen Execution Adaptation"
+      : mode === "search"
+        ? "Zero Friction Kitchen Execution Search"
+        : "Zero Friction Kitchen Execution";
+
+  const subtitle =
+    mode === "adapt"
+      ? "Adapta la ejecución sin replanificar Production"
+      : mode === "search"
+        ? "Encuentra trabajo de ejecución sin salir del contexto"
+        : "Recibe el handoff — entiende qué ejecutar ahora";
+
   return (
     <div className="animate-fade-in mx-auto max-w-3xl pb-24">
-      <SectionTitle
-        overline={
-          mode === "search"
-            ? "KITCHEN EXPERIENCE 002 · Execution Search"
-            : "KITCHEN EXPERIENCE 001 · Today's Work"
-        }
-        title={
-          mode === "search"
-            ? "Zero Friction Kitchen Execution Search"
-            : "Zero Friction Kitchen Execution"
-        }
-        subtitle={
-          mode === "search"
-            ? "Encuentra trabajo de ejecución sin salir del contexto"
-            : "Recibe el handoff — entiende qué ejecutar ahora"
-        }
-      />
+      <SectionTitle overline={overline} title={title} subtitle={subtitle} />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        {mode === "search" ? (
+        {mode === "adapt" ? (
+          <StatusChip tone="warning" label="TTAE < 30 s" />
+        ) : mode === "search" ? (
           <StatusChip tone="warning" label="TTFEW < 10 s" />
         ) : (
           <StatusChip tone="warning" label="TTUKW < 10 s" />
@@ -116,6 +125,13 @@ function KitchenTodayExperiencePage() {
           onClick={() => goMode("search", dayDate)}
         >
           Búsqueda
+        </button>
+        <button
+          type="button"
+          className="text-xs underline-offset-2 hover:underline"
+          onClick={() => goMode("adapt", dayDate, focusWorkId ?? undefined)}
+        >
+          Adaptación
         </button>
         <Link
           to="/admin/production-planning"
@@ -141,15 +157,24 @@ function KitchenTodayExperiencePage() {
 
       <AdminHeader
         goal={
-          mode === "search"
-            ? "Encontrar trabajo de ejecución en <10s"
-            : "Entender el trabajo de cocina de hoy en <10s"
+          mode === "adapt"
+            ? "Adaptar ejecución en <30s y volver a ejecutar en <5s"
+            : mode === "search"
+              ? "Encontrar trabajo de ejecución en <10s"
+              : "Entender el trabajo de cocina de hoy en <10s"
         }
         capability="kitchen.operate · production handoff (read)"
-        object="Execution search · today's work · session honesty · no Capability Start"
+        object="Execution adaptation · search · today's work · session honesty · no Capability Start"
       />
 
-      {mode === "search" ? (
+      {mode === "adapt" ? (
+        <KitchenAdaptationPanel
+          canWrite={canWrite}
+          dayDate={dayDate}
+          focusWorkId={focusWorkId}
+          onBackToToday={() => goMode("today", dayDate)}
+        />
+      ) : mode === "search" ? (
         <KitchenSearchPanel
           dayDate={dayDate}
           onOpenWork={(day, workId) => goMode("today", day, workId)}
