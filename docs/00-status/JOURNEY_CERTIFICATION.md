@@ -58,7 +58,7 @@ Verdicts that authorize certification: **READY** or **READY WITH IMPROVEMENTS**.
 | **Production Journey** | ✅ **Certified** | [PRODUCTION_JOURNEY_CERTIFICATION](../tenant-success/PRODUCTION_JOURNEY_CERTIFICATION.md) · [Review](../tenant-success/PRODUCTION_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · **Frozen** · PE001–006 |
 | **Kitchen Journey** | ✅ **Certified** | [KITCHEN_JOURNEY_CERTIFICATION](../tenant-success/KITCHEN_JOURNEY_CERTIFICATION.md) · [Review](../tenant-success/KITCHEN_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · **Frozen** · KE001–006 |
 | **Delivery Journey** | ✅ **Certified** | [DELIVERY_JOURNEY_CERTIFICATION](../tenant-success/DELIVERY_JOURNEY_CERTIFICATION.md) · [Review](../tenant-success/DELIVERY_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · **Frozen** · DE001–006 |
-| **Operational Journey** | ⏳ Pending | — | Cross-domain review after Delivery |
+| **Operational Journey** | ▶ **Organism Review** | [ORGANISM_REVIEW](../tenant-success/ORGANISM_REVIEW.md) | Cross-domain observation instrumented · sessions pending |
 
 ```text
 Customer Journey      ✅ Certified · Frozen
@@ -70,22 +70,22 @@ Delivery Journey      ✅ Certified · Frozen
 ↓
 Operational Journeys  ✅ COMPLETE
 ↓
-Observation Sprint
+Observation Sprint    ▶ ACTIVE
 ↓
-Organism Review
+Organism Review       ▶ INSTRUMENTED · [ORGANISM_REVIEW](../tenant-success/ORGANISM_REVIEW.md)
 ↓
 Evidence
 ↓
 Product Decision
 ↓
-Operational Accelerators
+Operational Accelerators (only with evidence)
 ```
 
 Menu Experience is structured by the **weekly operational cycle**, not CRUD.  
 Production Experience transforms the **published week** into work — not order admin.  
 Kitchen Experience executes transferred work — it does not re-plan Production.  
 Delivery Experience transfers the prepared commitment — it does not own Billing.  
-Delivery Journey is **Certified and Frozen** — Operational Journeys complete · Observation next.
+Delivery Journey is **Certified and Frozen** — Operational Journeys complete · Observation / Organism Review active ([ORGANISM_REVIEW](../tenant-success/ORGANISM_REVIEW.md)).
 
 ```text
 MENU

@@ -143,11 +143,13 @@ Delivery Day comes before routes / maps / optimization.
 5. Journey Certification follows Review — freeze never skips it  
 6. Freeze until Observation (or explicit Product reopen)  
 7. Accelerators stay Reserved until evidence across certified journeys  
+8. After all Journeys are Certified · Frozen → **Organism Review** ([ORGANISM_REVIEW](../tenant-success/ORGANISM_REVIEW.md)) — no new Experience without Product Decision  
 
 ---
 
 ## Related
 
+* [ORGANISM_REVIEW](../tenant-success/ORGANISM_REVIEW.md) — active Observation Sprint  
 * [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md) — registry  
 * [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md) — first lifecycle completion  
 * [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md) — second lifecycle completion  

@@ -182,7 +182,6 @@ Menu Journey           ✅ Certified
 Production Journey     ✅ CERTIFIED · Frozen   ← THIS
 Kitchen Journey        ✅ Certified · Frozen
 Delivery Journey       ✅ Certified · Frozen
-Delivery Journey       ⏳
 ```
 
 ```text

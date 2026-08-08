@@ -184,7 +184,16 @@ Every Product Core decision must answer with evidence:
 
 If a change cannot answer those questions, it does not belong in Product Core.
 
-Active Experience Sprint: [CUSTOMER_EXPERIENCE_001](./CUSTOMER_EXPERIENCE_001.md) · Zero Friction · [EXPERIENCE_MANIFESTO](./EXPERIENCE_MANIFESTO.md).
+**Experience chain:** Customer → Order → Menu → Production → Kitchen → Delivery — ✅ **all Journeys CERTIFIED · FROZEN** ([JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)).
+
+**Active Observation Sprint:** [ORGANISM_REVIEW](../tenant-success/ORGANISM_REVIEW.md) · OBSERVATION-ORGANISM-001 — **not** a new Experience.
+
+```text
+Do not open another Experience block.
+Observe the complete organism.
+```
+
+Manifesto (historical Experience constitution): [EXPERIENCE_MANIFESTO](./EXPERIENCE_MANIFESTO.md).
 
 ---
 
@@ -382,15 +391,20 @@ Operational friction is now a first-class defect class.
 
 **Official instrument:** [OBSERVATION_FRAMEWORK](../tenant-success/OBSERVATION_FRAMEWORK.md) · TENANT-SUCCESS-001 · ADR [0095](../adr/0095-tenant-success-001-observation-framework.md)
 
+**Organism instrument (active):** [ORGANISM_REVIEW](../tenant-success/ORGANISM_REVIEW.md) · OBSERVATION-ORGANISM-001
+
 | Artefact | Path |
 |----------|------|
 | Framework | [OBSERVATION_FRAMEWORK](../tenant-success/OBSERVATION_FRAMEWORK.md) |
-| Session template | [TENANT_OBSERVATION_TEMPLATE](../tenant-success/TENANT_OBSERVATION_TEMPLATE.md) |
+| Organism Review | [ORGANISM_REVIEW](../tenant-success/ORGANISM_REVIEW.md) |
+| Work-transfer template | [ORGANISM_OBSERVATION_TEMPLATE](../tenant-success/ORGANISM_OBSERVATION_TEMPLATE.md) |
+| Single-task template | [TENANT_OBSERVATION_TEMPLATE](../tenant-success/TENANT_OBSERVATION_TEMPLATE.md) |
 | Friction classes | [FRICTION_CATALOG](../tenant-success/FRICTION_CATALOG.md) |
 | Priority score | [TIME_SAVINGS_SCORE](../tenant-success/TIME_SAVINGS_SCORE.md) |
 | Session files | `docs/tenant-success/observations/` |
 
-Goal: see the real job, not the demo job.
+Goal: see the real job, not the demo job.  
+Organism goal: see **work transfers** across Customer → … → Delivery → Outcome — not screens.
 
 ### Rules
 
@@ -399,16 +413,20 @@ Goal: see the real job, not the demo job.
 3. **Sit beside, not opposite.** You are a witness, not a teacher.  
 4. **Record friction, not opinions.** “Took three screens to correct one dish” > “UX feels bad.”  
 5. **Never invent urgency.** If they pause to explain, note that the pause itself is cost.  
-6. **One job at a time.** Customer create · order edit · kitchen queue · delivery confirm — not everything in one session.  
+6. **One transfer (or one job) at a time.** Prefer From → To handoffs for organism sessions; deep-dive a single task only when needed.  
 7. **Thank them for interruption cost.** Observation consumes tenant time; treat it as scarce.  
-8. **Use the official template** — do not invent ad-hoc spreadsheets as the system of record.
+8. **Use the official template** — organism template for transfers; task template for deep dives. Do not invent ad-hoc spreadsheets as the system of record.  
+9. **Clock the whole operational task** — product minutes + Excel + WhatsApp + paper = real duration (not click time alone).
 
 ### Anti-patterns
 
-* Leading questions (“Wouldn’t a button here help?”)  
+* Leading questions (“Wouldn’t a button here help?” · “Would an import help?”)  
+* Teaching the product during observation  
 * Fixing live while measuring  
 * Measuring only power users  
 * Measuring only empty / sandbox tenants  
+* Opening Import · Bulk · OCC · Quick Capture from intuition  
+* Reporting only in-product minutes when the job finished outside the product
 
 ---
 
@@ -478,16 +496,21 @@ Store links in validation notes, field reports, or the Time Savings Backlog — 
 ```text
 Observation
   ↓
-Friction log
+Measurement
   ↓
-Time estimate
+Pattern (candidate only)
   ↓
-TENANT_TIME_SAVINGS_BACKLOG row
+Evidence
   ↓
-Beta bucket (1 / 2 / GM)
+Product Decision
+  ↓
+TENANT_TIME_SAVINGS_BACKLOG row  (if Decision = build)
+  ↓
+Experience · Capability · Accelerator · or Do Nothing
 ```
 
-No friction → no Product Core ticket by default.
+No friction → no Product Core ticket by default.  
+No measurement → no accepted observation (LAW 001).
 
 ---
 
@@ -627,7 +650,8 @@ Avoid prompts that only say “add a module” without time returned.
 | **ERA_DECLARATION** | **Acta institucional · Era 1 CLOSED · Era 2 OPEN** |
 | **ERA2_PRODUCT_DISCOVERY_001** | **First Discovery · Accelerators registered** |
 | **TENANT-SUCCESS-001** | **Observation Framework** · docs/tenant-success/ |
-| **SPRINT_001_TENANT_SUCCESS** | **Active Era 2 sprint · hybrid Epic 0 + Epic 1** |
+| **OBSERVATION-ORGANISM-001** | **Organism Review** · [ORGANISM_REVIEW](../tenant-success/ORGANISM_REVIEW.md) · active Observation Sprint |
+| **SPRINT_001_TENANT_SUCCESS** | **Era 2 sprint constitution · Experience chain complete** |
 | **TENANT_SUCCESS_PLAYBOOK** | **How do we return time? (Era 2)** · TENANT SUCCESS LAW 001 |
 | TENANT_TIME_SAVINGS_BACKLOG | Which jobs return how many minutes? |
 | ERA2_CURSOR_PROMPT | Mandatory Era 2 prompt header |
