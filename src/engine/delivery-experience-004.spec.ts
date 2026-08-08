@@ -57,7 +57,7 @@ function card(
 }
 
 describe("DELIVERY EXPERIENCE 004 · Zero Friction Delivery Responsibility", () => {
-  it("documents TTDR · assignment honesty · no routes · Card In Progress", () => {
+  it("documents TTDR · assignment honesty · no routes · Card retained", () => {
     const doc = readFileSync(
       resolve(ROOT, "docs/00-status/DELIVERY_EXPERIENCE_004.md"),
       "utf8",
@@ -102,7 +102,7 @@ describe("DELIVERY EXPERIENCE 004 · Zero Friction Delivery Responsibility", () 
     );
 
     expect(missions).toContain("DELIVERY-EXPERIENCE-004");
-    expect(missions).toContain("DE004 Responsibility ▶");
+    expect(missions).toContain("DE004 Responsibility ✅");
     expect(missions).toContain("TTDR");
 
     expect(ui).toContain("DELIVERY EXPERIENCE 004");

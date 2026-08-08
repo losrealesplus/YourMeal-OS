@@ -181,7 +181,7 @@ Order Journey          ✅ Certified · Frozen
 Menu Journey           ✅ Certified
 Production Journey     ✅ CERTIFIED · Frozen   ← THIS
 Kitchen Journey        ✅ Certified · Frozen
-Delivery Journey       ⏳ DE004 Delivery Responsibility ▶ (DE001–003 ✅)
+Delivery Journey       ⏳ DE005 Route Preparation ▶ (DE001–004 ✅)
 Delivery Journey       ⏳
 ```
 
