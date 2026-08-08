@@ -56,7 +56,7 @@ describe("KITCHEN JOURNEY CERTIFICATION 001", () => {
       "Kitchen Journey       ✅ Certified · Frozen",
     );
     expect(journeys).toMatch(
-      /Delivery Journey\s+⏳ (NEXT \(eligible\)|DE001 Today's Delivery Day ▶|DE002 Delivery Search ▶|DE003 Delivery Adaptation ▶|DE004 Delivery Responsibility ▶|DE005 Route Preparation ▶|DE006 Delivery Completion ▶)/,
+      /Delivery Journey\s+⏳ (NEXT \(eligible\)|DE001 Today's Delivery Day ▶|DE002 Delivery Search ▶|DE003 Delivery Adaptation ▶|DE004 Delivery Responsibility ▶|DE005 Route Preparation ▶|DE006 Delivery Completion ▶|Review ✅ READY WITH IMPROVEMENTS)/,
     );
     expect(journeys).toContain(
       "Kitchen: 001–006 ✅ → Review ✅ → Certification ✅ CERTIFIED · Frozen",
@@ -68,7 +68,7 @@ describe("KITCHEN JOURNEY CERTIFICATION 001", () => {
     expect(cards).toContain("Journey Certified · Frozen");
     expect(cards).toContain("CERTIFIED");
     expect(cards).toMatch(
-      /Delivery Experience\s+(← NEXT \(eligible\)|▶ 001 Today's Delivery Day|▶ 002 Delivery Search|▶ 003 Delivery Adaptation|▶ 004 Delivery Responsibility|▶ 005 Route Preparation|▶ 006 Delivery Completion)/,
+      /Delivery Experience\s+(← NEXT \(eligible\)|▶ 001 Today's Delivery Day|▶ 002 Delivery Search|▶ 003 Delivery Adaptation|▶ 004 Delivery Responsibility|▶ 005 Route Preparation|▶ 006 Delivery Completion|▶ Review · READY WITH IMPROVEMENTS)/,
     );
     expect(cards).toContain("READY WITH IMPROVEMENTS");
     expect(cards).toContain(
@@ -79,7 +79,7 @@ describe("KITCHEN JOURNEY CERTIFICATION 001", () => {
     expect(missions).toContain("CERTIFIED · FROZEN");
     expect(missions).toContain("KITCHEN-JOURNEY-CERTIFICATION");
     expect(missions).toMatch(
-      /Delivery Experience\s+(⏳ NEXT \(eligible\)|▶ 001 Today's Delivery Day|▶ 002 Delivery Search|▶ 003 Delivery Adaptation|▶ 004 Delivery Responsibility|▶ 005 Route Preparation|▶ 006 Delivery Completion)/,
+      /Delivery Experience\s+(⏳ NEXT \(eligible\)|▶ 001 Today's Delivery Day|▶ 002 Delivery Search|▶ 003 Delivery Adaptation|▶ 004 Delivery Responsibility|▶ 005 Route Preparation|▶ 006 Delivery Completion|✅ Review READY WITH IMPROVEMENTS)/,
     );
     expect(missions).toContain("Journey Certification ✅ CERTIFIED → Freeze ✅");
   });

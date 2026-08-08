@@ -1,6 +1,6 @@
 # DELIVERY EXPERIENCE 006 · Zero Friction Delivery Completion
 
-**Status:** ▶ **IN PROGRESS**  
+**Status:** ✅ **COMPLETE** (superseded as active by Delivery Experience Review · surface retained)  
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/delivery-today` (mode **completion**)  
@@ -83,9 +83,9 @@ Capability / Facade / Engine / architecture changes.
 003 Delivery Adaptation        ✅
 004 Delivery Responsibility    ✅
 005 Route Preparation          ✅
-006 Delivery Completion        ▶ THIS
+006 Delivery Completion        ✅ THIS (complete)
 ↓
-Delivery Experience Review
+Delivery Experience Review     ▶ next
 ↓
 Journey Certification
 ↓
