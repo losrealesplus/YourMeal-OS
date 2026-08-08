@@ -116,11 +116,10 @@ describe("KITCHEN EXPERIENCE 005 · Execution Progress", () => {
     expect(cards).toContain("005 Execution Progress");
     expect(cards).toContain("Zero Friction Kitchen Execution Progress");
     expect(cards).toContain("Time-to-Understand-Execution-Progress <5 s");
-    expect(cards).toContain("In Progress");
 
     expect(missions).toContain("KITCHEN-EXPERIENCE-005");
-    expect(missions).toContain("KE005 Progress ▶");
-    expect(missions).toContain("TTEP");
+    expect(missions).toContain("KE005 Progress ✅");
+    expect(doc).toContain("COMPLETE");
 
     expect(ui).toContain("KITCHEN EXPERIENCE 005");
     expect(ui).toContain("KitchenProgressPanel");
