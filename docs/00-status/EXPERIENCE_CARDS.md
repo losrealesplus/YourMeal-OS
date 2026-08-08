@@ -336,7 +336,7 @@ Journey Certification          ✅ CERTIFIED
 Freeze                         ✅
 ↓
 Kitchen Experience             ✅ Journey Certified · Frozen
-Delivery Experience            ▶ 004 Delivery Responsibility
+Delivery Experience            ▶ 005 Route Preparation
 ```
 
 | Phase | Question | Status |
@@ -414,7 +414,7 @@ Journey Certification          ✅ CERTIFIED
 ↓
 Freeze                         ✅
 ↓
-Delivery Experience            ▶ 004 Delivery Responsibility
+Delivery Experience            ▶ 005 Route Preparation
 ```
 
 | Phase | Question | Status |
@@ -441,10 +441,10 @@ Name
 Delivery Experience
 
 Phase
-004 Delivery Responsibility · In Progress
+005 Route Preparation · In Progress
 
 Mission
-Zero Friction Delivery Responsibility (001–004)
+Zero Friction Route Preparation (001–005)
 
 Primary User
 Delivery Operator
@@ -453,9 +453,11 @@ Secondary User
 Driver
 
 Primary KPI
-Time-to-Understand-Delivery-Responsibility <10 s
+Time-to-Prepare-Delivery-Day <5 min (hypothesis)
 
 Secondary KPIs
+Time-to-Understand-Route <10 s (hypothesis)
+Time-to-Understand-Delivery-Responsibility <10 s
 Time-to-Identify-Unassigned-Delivery <10 s
 Time-to-Adapt-Delivery <30 s
 Time-to-Find-Delivery <10 s
@@ -463,21 +465,21 @@ Time-to-Understand-Delivery-Day <2 min
 
 Operational Time Saved
 Estimated
-Illustrative responsibility ≈ 50–170 s saved
-Adapt ≈ 90–570 s · Find ≈ 20–80 s · Day ≈ 3–18 min
-(see DELIVERY_EXPERIENCE_004 / 003 / 002 / 001 — Estimated ≠ Measured)
-Observation pending
+Illustrative route prep ≈ 2–15 min / day
+Responsibility ≈ 50–170 s · Adapt ≈ 90–570 s · Find ≈ 20–80 s · Day ≈ 3–18 min
+(see DELIVERY_EXPERIENCE_005 / 004 / 003 / 002 / 001 — Estimated ≠ Measured)
+Observation pending · TPDD hypothesis
 
 Status
-In Progress · 004 Delivery Responsibility
+In Progress · 005 Route Preparation
 ```
 
-Detail: [004 Delivery Responsibility · Zero Friction Delivery Responsibility](./DELIVERY_EXPERIENCE_004.md) · [003 Delivery Adaptation · Zero Friction Delivery Adaptation](./DELIVERY_EXPERIENCE_003.md) · [002 Delivery Search · Zero Friction Delivery Search](./DELIVERY_EXPERIENCE_002.md) · [001 Today's Delivery Day · Zero Friction Delivery Day](./DELIVERY_EXPERIENCE_001.md) · Surface `/admin/delivery-today` · Input: Kitchen completion honesty + Orders ready_for_delivery · **No routes · no maps · no ConfirmDelivery invent** · Kitchen Journey ✅ Certified · Frozen  
+Detail: [005 Route Preparation · Zero Friction Route Preparation](./DELIVERY_EXPERIENCE_005.md) · [004 Delivery Responsibility · Zero Friction Delivery Responsibility](./DELIVERY_EXPERIENCE_004.md) · [003 Delivery Adaptation · Zero Friction Delivery Adaptation](./DELIVERY_EXPERIENCE_003.md) · [002 Delivery Search · Zero Friction Delivery Search](./DELIVERY_EXPERIENCE_002.md) · [001 Today's Delivery Day · Zero Friction Delivery Day](./DELIVERY_EXPERIENCE_001.md) · Surface `/admin/delivery-today` · Input: Kitchen completion honesty + Orders ready_for_delivery · **No routes · no maps · Route Preparation ≠ Optimization · no ConfirmDelivery invent** · Kitchen Journey ✅ Certified · Frozen  
 
 **Mental model (controlled transfer — not route maps):**
 
 ```text
-Work ready → Today's Deliveries → Search → Adaptation → Responsibility → Route Preparation (NEXT)
+Work ready → Today's Deliveries → Search → Adaptation → Responsibility → Route Preparation → Completion (Future)
 ```
 
 **Sequence (hypothesis — Observation may reshape):**
@@ -486,8 +488,8 @@ Work ready → Today's Deliveries → Search → Adaptation → Responsibility �
 001 Today's Delivery Day       ✅
 002 Delivery Search            ✅
 003 Delivery Adaptation        ✅
-004 Delivery Responsibility    ▶
-005 Route Preparation          ← not Route Optimization
+004 Delivery Responsibility    ✅
+005 Route Preparation          ▶
 006 Delivery Completion
 ↓
 Experience Review
@@ -502,11 +504,11 @@ Freeze
 | 001 | ¿Entiendo la jornada de entregas de hoy en &lt;2 min? | ✅ |
 | 002 | ¿Encuentro cualquier entrega en &lt;10s? | ✅ |
 | 003 | ¿Adapto la jornada sin romper el compromiso? | ✅ |
-| 004 | ¿Entiendo responsabilidad / unassigned / unavailable en &lt;10s? | ▶ |
-| 005 | ¿Preparo la ruta con lo que Observation evidencie? | Planned |
+| 004 | ¿Entiendo responsabilidad / unassigned / unavailable en &lt;10s? | ✅ |
+| 005 | ¿Preparo una secuencia ejecutable (no optimización) en &lt;5 min? | ▶ |
 | 006 | ¿Cierro la entrega con resultado verificable? | Planned |
 
-Delivery receives completed work — does not create the Order commitment. Search finds **deliveries**, not Customer/Order entities. Responsibility shows Assigned / Unassigned / **Assignment unavailable** honestly — never invents AssignDelivery. Does not invent routes, maps, or ConfirmDelivery. Address / window / zone labeled absent when substrate missing.
+Delivery receives completed work — does not create the Order commitment. Search finds **deliveries**, not Customer/Order entities. Responsibility shows Assigned / Unassigned / **Assignment unavailable** honestly — never invents AssignDelivery. Route Preparation is **manual session sequence** — never shortest/fastest/optimal route, maps, or navigation. Address / window / zone labeled absent when substrate missing.
 
 ---
 

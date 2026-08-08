@@ -1,9 +1,9 @@
 /**
- * DELIVERY EXPERIENCE 001–004
- * Today's Delivery Day · Search · Adaptation · Responsibility
+ * DELIVERY EXPERIENCE 001–005
+ * Today's Delivery Day · Search · Adaptation · Responsibility · Route Preparation
  *
- * Experience only — no Delivery Capability invent · no routes · no maps ·
- * no navigation · no ConfirmDelivery · no durable assignment simulation.
+ * Experience only — no Delivery Capability invent · no route optimization ·
+ * no maps · no navigation · no ConfirmDelivery · no durable assignment simulation.
  */
 
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -12,18 +12,25 @@ import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { AdminHeader, SectionTitle, StatusChip } from "@/components/admin";
 import { DeliveryAdaptationPanel } from "@/delivery-experience/DeliveryAdaptationPanel";
 import { DeliveryResponsibilityPanel } from "@/delivery-experience/DeliveryResponsibilityPanel";
+import { DeliveryRoutePreparationPanel } from "@/delivery-experience/DeliveryRoutePreparationPanel";
 import { DeliverySearchPanel } from "@/delivery-experience/DeliverySearchPanel";
 import { DeliveryTodayPanel } from "@/delivery-experience/DeliveryTodayPanel";
 import { utcDateOnly } from "@/menu-experience/week-plan";
 
-type ExperienceMode = "today" | "search" | "adapt" | "responsibility";
+type ExperienceMode =
+  | "today"
+  | "search"
+  | "adapt"
+  | "responsibility"
+  | "route";
 
 function isExperienceMode(value: unknown): value is ExperienceMode {
   return (
     value === "today" ||
     value === "search" ||
     value === "adapt" ||
-    value === "responsibility"
+    value === "responsibility" ||
+    value === "route"
   );
 }
 
@@ -42,12 +49,12 @@ export const Route = createFileRoute("/_authenticated/admin/delivery-today")({
     meta: [
       {
         title:
-          "YourMeal OS — Delivery Experience · Responsibility · Adaptation · Search · Day",
+          "YourMeal OS — Delivery Experience · Route Preparation · Responsibility · Day",
       },
       {
         name: "description",
         content:
-          "DELIVERY EXPERIENCE 004 Responsibility · TTDR <10s · 003 Adaptation · 002 Search · 001 Day · no fake AssignDelivery",
+          "DELIVERY EXPERIENCE 005 Route Preparation · TPDD <5 min · TTUR <10s · not optimization · no maps · no AssignDelivery invent",
       },
     ],
   }),
@@ -112,9 +119,17 @@ function DeliveryTodayExperiencePage() {
       overline: "DELIVERY EXPERIENCE 004 · Delivery Responsibility",
       title: "Zero Friction Delivery Responsibility",
       subtitle:
-        "Quién es responsable · qué falta · sin simular AssignDelivery · Route Preparation NEXT",
+        "Quién es responsable · qué falta · sin simular AssignDelivery",
       kpi: "TTDR < 10 s",
       goal: "Entender responsabilidad en <10s · identificar unassigned / unavailable en <10s",
+    },
+    route: {
+      overline: "DELIVERY EXPERIENCE 005 · Route Preparation",
+      title: "Zero Friction Route Preparation",
+      subtitle:
+        "Convierte entregas preparadas en secuencia ejecutable — no optimización · no mapas",
+      kpi: "TPDD < 5 min",
+      goal: "Preparar jornada en <5 min · entender secuencia en <10s · Observation valida el KPI",
     },
   };
 
@@ -162,6 +177,15 @@ function DeliveryTodayExperiencePage() {
         >
           Responsabilidad
         </button>
+        <button
+          type="button"
+          className="text-xs underline-offset-2 hover:underline"
+          onClick={() =>
+            goMode("route", dayDate, focusDeliveryId ?? undefined)
+          }
+        >
+          Preparación de jornada
+        </button>
         <Link
           to="/admin/kitchen-today"
           search={{ mode: "completion", day: dayDate, workId: undefined }}
@@ -191,10 +215,22 @@ function DeliveryTodayExperiencePage() {
       <AdminHeader
         goal={m.goal}
         capability="logistics.operate · Delivery Facade (read) · Order (consume)"
-        object="Responsibility · adaptation · search · day · session honesty · no AssignDelivery invent · no routes"
+        object="Route prep (session sequence) · responsibility · adaptation · search · day · no optimization · no AssignDelivery invent"
       />
 
-      {mode === "responsibility" ? (
+      {mode === "route" ? (
+        <DeliveryRoutePreparationPanel
+          dayDate={dayDate}
+          focusDeliveryId={focusDeliveryId}
+          onOpenDelivery={(day, deliveryId) =>
+            goMode("today", day, deliveryId)
+          }
+          onOpenResponsibility={(day, deliveryId) =>
+            goMode("responsibility", day, deliveryId)
+          }
+          onBackToToday={() => goMode("today", dayDate)}
+        />
+      ) : mode === "responsibility" ? (
         <DeliveryResponsibilityPanel
           dayDate={dayDate}
           focusDeliveryId={focusDeliveryId}
@@ -202,6 +238,7 @@ function DeliveryTodayExperiencePage() {
             goMode("today", day, deliveryId)
           }
           onBackToToday={() => goMode("today", dayDate)}
+          onContinueToRoutePrep={(day) => goMode("route", day)}
         />
       ) : mode === "adapt" ? (
         <DeliveryAdaptationPanel

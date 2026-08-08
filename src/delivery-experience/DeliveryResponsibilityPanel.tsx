@@ -43,6 +43,8 @@ type Props = {
   focusDeliveryId?: string | null;
   onOpenDelivery: (dayDate: string, deliveryId: string) => void;
   onBackToToday: () => void;
+  /** DE005 — open Route Preparation (not optimization) */
+  onContinueToRoutePrep?: (dayDate: string) => void;
 };
 
 function stateTone(
@@ -59,6 +61,7 @@ export function DeliveryResponsibilityPanel({
   focusDeliveryId = null,
   onOpenDelivery,
   onBackToToday,
+  onContinueToRoutePrep,
 }: Props) {
   const delivery = useDelivery();
   const order = useOrder();
@@ -368,8 +371,12 @@ export function DeliveryResponsibilityPanel({
               );
               return;
             }
+            if (onContinueToRoutePrep) {
+              onContinueToRoutePrep(dayDate);
+              return;
+            }
             toast.message(
-              "Route Preparation → NEXT (Experience · no implementada aquí · sin mapas)",
+              "Route Preparation · abrir modo route en Today's Deliveries",
             );
           }}
         >

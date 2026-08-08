@@ -1,6 +1,6 @@
 # DELIVERY EXPERIENCE 004 · Zero Friction Delivery Responsibility
 
-**Status:** ▶ **IN PROGRESS**  
+**Status:** ✅ **COMPLETE** (superseded as active by DE005 · surface retained)  
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/delivery-today` (mode **responsibility**)  
@@ -34,7 +34,7 @@ Time-to-Identify-Unassigned-Delivery < 10 seconds
 * Delivery Capability · Facade · **frozen**  
 * **AssignDelivery** · **UNIMPLEMENTED** on Facade — do not invent  
 * Experience only  
-* Route Preparation · **NEXT** (not this Experience)  
+* Route Preparation · **DE005** (next Experience · not optimization)  
 * Accelerators · **Reserved**  
 
 ---
@@ -51,7 +51,7 @@ Delivery
 ├── Responsibility visible       ✅
 ├── Unassigned visible           ✅ (when substrate supports)
 ├── Assignment substrate         UNIMPLEMENTED
-└── Route Preparation             NEXT
+└── Route Preparation             DE005 ▶
 ```
 
 ---
@@ -84,8 +84,8 @@ modify Customer / Order from Experience.
 001 Today's Delivery Day       ✅
 002 Delivery Search            ✅
 003 Delivery Adaptation        ✅
-004 Delivery Responsibility    ▶ THIS
-005 Route Preparation          ← NEXT (not Optimization)
+004 Delivery Responsibility    ✅ THIS (complete)
+005 Route Preparation          ▶ next (not Optimization)
 006 Delivery Completion
 ↓
 Review → Journey Certification → Freeze
