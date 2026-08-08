@@ -59,11 +59,12 @@ Observe
 ```text
 OPERATIONAL-006  Delivery          ← Architecture ✅ · Facade ✅ · Engineering Certified ✅
         ↓
-FLOW-002         Kitchen → Delivery   (after Delivery Demo preferido)
+FLOW-002         Operational Fulfillment   ← Engineering Certified ✅ · BH-001
+                 Order → … → Confirmation
         ↓
 OPERATIONAL-007  Billing
         ↓
-FLOW-003         Delivery → Billing
+FLOW-003         Confirmation → Billing
         ↓
 OPERATIONAL-008  Inventory
         ↓
@@ -85,14 +86,15 @@ IOS-READY-001 / FIELD-VALIDATION-002
 
 ## First mission status
 
-**OPERATIONAL-006 · Delivery**  
-Phase 1 Architecture ✅ · Phase 2 Facade ✅ · Phase 3 Certification ✅ · Phase 4 Demo ◀ next
+**OPERATIONAL-FLOW-002** — Engineering Certified ✅ · Demo ◀ next  
+**BH-001** — Fulfill Weekly Commitment · Certified ✅  
+**Scenarios** — RESERVED ([registry](./OPERATIONAL_SCENARIO_REGISTRY.md))
 
-Canonical question:
+Canonical Flow question:
 
-> ¿Qué compromisos operativos deben entregarse ahora y cómo confirmamos su ejecución?
+> ¿Puede un compromiso operativo convertirse en una entrega confirmada sin romper ninguna Foundation Law?
 
-Contract: [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) · Facade: `src/delivery/` · Report: [DELIVERY_VALIDATION_REPORT](../10-validation/DELIVERY_VALIDATION_REPORT.md)
+Contract: [OPERATIONAL_FLOW_002](../05-architecture/OPERATIONAL_FLOW_002.md) · Report: [FLOW_002_VALIDATION_REPORT](../10-validation/FLOW_002_VALIDATION_REPORT.md)
 
 ---
 
@@ -100,7 +102,10 @@ Contract: [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) · Fa
 
 | Item | Lock |
 |------|------|
-| Delivery Product UI / DB | Until Phase 4+ |
-| FLOW-002 Harness | Until Delivery Certification (prefer Demo) |
-| Billing Architecture | Prefer after Delivery Demo |
+| Delivery Product UI / DB | Until Demo+ / Flow Demo preferido |
+| FLOW-002 Flow Demo | Next (useFlow002 only) |
+| Billing Architecture | ✅ ADR 0087 — unlocked by Delivery Demo |
+| Billing Facade → Demo | Next structural Engine work |
+| OPERATIONAL-ENGINE-001 | RESERVED — after Billing Demo |
+| Scenarios | RESERVED |
 | Claiming Engine **FIELD VALIDATED** | Until iPhone PASS + Android PASS |

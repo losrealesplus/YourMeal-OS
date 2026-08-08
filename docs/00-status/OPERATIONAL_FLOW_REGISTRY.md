@@ -76,14 +76,37 @@ Order ──Facade──▶ Production ──Facade──▶ Kitchen
 
 ---
 
-### FLOW-002 · Production → Kitchen → Delivery
+### FLOW-002 · Operational Fulfillment Flow
 
 | Field | Value |
 |-------|--------|
-| **Maturity** | Pending |
-| **Canonical question** | ¿Puede el trabajo ejecutado convertirse en trabajo entregable y confirmado? |
-| **Chain** | Production → Kitchen → Delivery |
-| **Notes** | Requires Delivery **Facade** (ADR 0078 Architecture only today). Prefer FLOW-001 Demo first. |
+| **Maturity** | **Engineering Certified** |
+| **Name** | Operational Fulfillment Flow |
+| **Behaviour** | [BH-001 Fulfill Weekly Commitment](../05-architecture/OPERATIONAL_BEHAVIOURS.md) · [Board](./OPERATIONAL_BEHAVIOUR_BOARD.md) |
+| **Canonical question** | ¿Puede un compromiso operativo convertirse en una entrega confirmada sin romper ninguna Foundation Law? |
+| **Chain** | Order → Production → Kitchen → Delivery → **Confirmation** |
+| **Context** | Identity · Customer |
+| **Facades** | OrderFacade · ProductionFacade · KitchenExecutionFacade · DeliveryFacade |
+| **Harness** | `src/flows/flow-002/Flow002Harness.ts` · `useFlow002()` |
+| **Contract** | [OPERATIONAL_FLOW_002](../05-architecture/OPERATIONAL_FLOW_002.md) |
+| **ADR** | [0081](../adr/0081-operational-flow-002.md) · [0082](../adr/0082-operational-flow-002-harness.md) · [0083](../adr/0083-operational-flow-002-engineering-certification.md) |
+| **Validation** | [FLOW_002_VALIDATION_REPORT](../10-validation/FLOW_002_VALIDATION_REPORT.md) · 15 PASS · 0 FAIL |
+| **Owns** | Transitions · context · integrity · evidence · lifecycle consistency |
+| **Never owns** | Business logic · UI · Billing · GPS |
+| **Ends at** | Delivery Confirmation (not Invoice) |
+| **Next** | Flow Demo |
+
+```text
+FLOW-002
+████ Architecture
+████ Harness
+████ Engineering Certified
+░░░░ Flow Demo
+
+Order ──▶ Production ──▶ Kitchen ──▶ Delivery ──▶ Confirmation
+                    ▲
+                    └── Flow002Harness
+```
 
 ---
 
@@ -92,17 +115,18 @@ Order ──Facade──▶ Production ──Facade──▶ Kitchen
 | Field | Value |
 |-------|--------|
 | **Maturity** | Pending |
-| **Canonical question** | ¿Puede el trabajo entregado convertirse en resultado económico? |
-| **Chain** | Delivery → Billing |
-| **Notes** | Begins after FLOW-002. Requires Billing Capability. |
+| **Canonical question** | ¿Qué resultado económico debe registrarse después de que un compromiso operativo ha sido confirmado? |
+| **Chain** | Delivery Confirmation → Billing |
+| **Notes** | Begins after FLOW-002. Requires Billing Capability Architecture. Outcome layer — never inside FLOW-002. |
 
 ---
 
 ## Discipline
 
 Never open two new Operational Flows at once.  
-Complete **Architecture → Harness → Certification → Demo** for FLOW-001 before FLOW-002 Architecture.  
-Delivery Capability Architecture (OPERATIONAL-006) may freeze before FLOW-002.
+FLOW-002 Architecture may freeze once Delivery is Engineering Certified.  
+Complete **Architecture → Harness → Certification → Demo** for FLOW-002 before FLOW-003.  
+Prefer Capability / Flow Demos before opening FLOW-002 Harness.
 
 ---
 

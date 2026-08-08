@@ -92,8 +92,8 @@ Functional consumers — not import graphs.
 | Orders | Operational Planning | Engineering Certified + Demo | Production |
 | Production | Operational Planning | **Engineering Certified + Demo** | Kitchen Execution |
 | Kitchen Execution | Operational Execution | **Engineering Certified + Demo** | Delivery |
-| Delivery | Operational Execution | **Engineering Certified** | Billing |
-| Billing | Operational Outcome | Pending | — |
+| Delivery | Operational Execution | **Capability Demo** | Billing |
+| Billing | Operational Outcome | **Engineering Certified** | FLOW-003 · Engine v1.0 |
 
 **Discipline:** Never open two new operational capabilities at once.  
 Complete **Architecture → Facade → Validation → Demo** before the next.
@@ -260,34 +260,38 @@ First **Operational Execution** Capability — Engineering Certified + Demo.
 
 | Field | Value |
 |-------|--------|
-| **Maturity** | **Engineering Certified** |
+| **Maturity** | **Capability Demo** |
 | **Type** | Operational Execution |
-| Completeness | Architecture ✅ · Facade ✅ · **Engineering Certification ✅** · Demo ⏳ · Field ⏳ |
+| Completeness | Architecture ✅ · Facade ✅ · Engineering Certification ✅ · **Capability Demo ✅** · Product UI ⏳ · Field ⏳ |
 | Consumida por | Billing (canonical) · FLOW-002 |
 | Depends on | OrderFacade · KitchenExecutionFacade |
 | Version | 1.0 |
-| ADRs | [0078](../adr/0078-delivery-capability.md) · [0079](../adr/0079-delivery-facade.md) · [0080](../adr/0080-delivery-engineering-certification.md) |
-| Contract | [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) |
+| ADRs | [0078](../adr/0078-delivery-capability.md) · [0079](../adr/0079-delivery-facade.md) · [0080](../adr/0080-delivery-engineering-certification.md) · [0085](../adr/0085-delivery-engine-v1-alignment.md) · [0086](../adr/0086-delivery-workspace-demo.md) |
+| Contract | [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) · [DELIVERY_WORKSPACE](../05-architecture/DELIVERY_WORKSPACE.md) |
 | Facade | `src/delivery/DeliveryFacade.ts` · `useDelivery()` · Commands / Queries |
 | Validation | [DELIVERY_VALIDATION_REPORT](../10-validation/DELIVERY_VALIDATION_REPORT.md) · 13 PASS · 5 UNIMPLEMENTED · 0 FAIL |
-| Notes | ConfirmDelivery composed · Assign/Start/Exception/Close/Routes EXPECTED GAP |
+| Demo | `/admin/delivery-workspace` — LAW 003 · 006 · 007 · PRODUCT LAW 001 |
+| Notes | ConfirmDelivery composed · Assign/Start/Exception/Close/Routes EXPECTED GAP (honest in Demo) |
 
 ```text
 Delivery
 ████ Architecture
 ████ Facade
 ████ Engineering Certified
-░░░░ Demo · Field
+████ Capability Demo (Workspace)
+░░░░ Product UI · Field
 
 Question: ¿Qué compromisos operativos deben entregarse ahora
           y cómo confirmamos su ejecución?
 
 Delivery = asignar · rutear · confirmar · evidenciar · exceptuar
 never drives · never cooks · never bills
+= controlled transfer of responsibility
 ```
 
-Second **Operational Execution** Capability — Engineering Certified.  
-**Next:** Capability Demo (no FLOW-002 until Demo preferido).
+Second **Operational Execution** Capability — Engineering Certified + Capability Demo.  
+**Next Engine block:** Billing Demo → **OPERATIONAL-ENGINE-001**.  
+Delivery is **closed** — do not reopen Architecture / Facade / Demo.
 
 ---
 
@@ -295,9 +299,59 @@ Second **Operational Execution** Capability — Engineering Certified.
 
 | Field | Value |
 |-------|--------|
-| **Maturity** | Pending |
+| **Maturity** | **Engineering Certified** |
 | **Type** | Operational Outcome |
-| Notes | ¿Qué trabajo puede cerrarse y facturarse? · after Delivery |
+| Completeness | Architecture ✅ · Facade ✅ · **Engineering Certification ✅** · Capability Demo ⏳ · Product UI ⏳ · Field ⏳ |
+| Consumida por | FLOW-003 · OPERATIONAL-ENGINE-001 |
+| Depends on | OrderFacade · DeliveryFacade · CustomerFacade · ProductionFacade · KitchenExecutionFacade |
+| Version | 1.0 |
+| ADRs | [0087](../adr/0087-billing-capability.md) · [0088](../adr/0088-billing-facade.md) · [0089](../adr/0089-billing-engineering-certification.md) |
+| Contract | [BILLING_CAPABILITY](../05-architecture/BILLING_CAPABILITY.md) · [BILLING_FACADE](../05-architecture/BILLING_FACADE.md) |
+| Facade | `src/billing/BillingFacade.ts` · `useBilling()` · `commands/` · `queries/` |
+| Validation | [BILLING_VALIDATION_REPORT](../10-validation/BILLING_VALIDATION_REPORT.md) · 15 PASS · 4 UNIMPLEMENTED · 0 FAIL |
+| Notes | **Final Engine Capability** · looks backward · Outcome only · Issue/Payment EXPECTED GAP |
+
+```text
+Billing
+████ Architecture Freeze
+████ Facade
+████ Engineering Certified
+░░░░ Demo · Field
+
+Question: What financial outcome must be produced
+          from successfully completed operational work?
+
+Billing = prepare · invoice · credit · payment status · evidence
+never creates demand · never plans · never executes
+= Operational Outcome (Engine ends here)
+Billing does not initiate — it certifies cycle completion.
+```
+
+Final **Operational Outcome** Capability — Engineering Certified.  
+**Next:** Capability Demo → **OPERATIONAL-ENGINE-001** (v1.0 Declaration).  
+See [OPERATIONAL_ENGINE_001_RESERVED](./OPERATIONAL_ENGINE_001_RESERVED.md).
+
+---
+
+## Operational Engine · Capability Completion
+
+```text
+Operational Engine
+Capability Completion
+████████████████████
+100%
+```
+
+| Layer | Capabilities | Engineering Certified |
+|-------|--------------|------------------------|
+| Context | Identity | ✅ |
+| Business Entity | Customer | ✅ |
+| Operational Planning | Orders · Production | ✅ |
+| Operational Execution | Kitchen · Delivery | ✅ |
+| Operational Outcome | Billing | ✅ |
+
+Evidence: Identity→Billing ADRs · validation reports · this Registry.  
+Remaining for **Engine v1.0 Declaration**: Billing Demo + OPERATIONAL-ENGINE-001 (docs/evidence only — not more Capabilities).
 
 ---
 
@@ -348,15 +402,17 @@ Second **Operational Execution** Capability — Engineering Certified.
 | Production | ¿Qué trabajo debe ejecutarse para cumplir los compromisos? |
 | Kitchen Execution | ¿Qué trabajo debe ejecutarse ahora? |
 | Delivery | ¿Qué compromisos operativos deben entregarse ahora y cómo confirmamos su ejecución? |
-| Billing | ¿Qué trabajo puede cerrarse y facturarse? |
+| Billing | ¿Qué resultado financiero debe producirse del trabajo operativo completado? |
 
 Screens will change. These questions are the product core (**LAW 006**).
 
 **Exists / v0.8:** [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) — Identity→Kitchen + FLOW-001 certified.  
 **Expansion:** [OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md) — Delivery Engineering Certified → Demo → …  
 **Language:** [OPERATIONAL_LANGUAGE_DICTIONARY](./OPERATIONAL_LANGUAGE_DICTIONARY.md) — LAW 006 questions.  
-**Flows:** [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md) — FLOW-001 Engineering Certified · FLOW-002 Pending.  
+**Flows:** [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md) — FLOW-001 + FLOW-002 Engineering Certified.  
+**Behaviours:** [OPERATIONAL_BEHAVIOUR_BOARD](./OPERATIONAL_BEHAVIOUR_BOARD.md) — BH-001 Certified.  
+**Scenarios:** [OPERATIONAL_SCENARIO_REGISTRY](./OPERATIONAL_SCENARIO_REGISTRY.md) — RESERVED.  
 **Review:** [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md).  
 **Phases:** [OPERATIONAL_CERTIFICATION_PHASES](./OPERATIONAL_CERTIFICATION_PHASES.md).  
 **Engine Completion:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md).  
-**Milestone v1.0:** full chain Identity→Billing + flows certified.
+**Milestone v1.0:** [OPERATIONAL_ENGINE_001_RESERVED](./OPERATIONAL_ENGINE_001_RESERVED.md) — Identity→Billing complete + flows certified · institutional declaration.

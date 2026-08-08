@@ -1,11 +1,13 @@
 # Estado del proyecto
 
-**Última actualización:** 2026-08-06  
+**Última actualización:** 2026-08-07  
 
 ## Permanent control panel (frozen)
 
 | Document | Role |
 |----------|------|
+| **[PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md)** | **North star** · PRODUCT LAW 001 · Tenant Success |
+| [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md) | Ideas prioritized by operational time saved |
 | [PLATFORM_STATUS](./PLATFORM_STATUS.md) | Platform layer verdict |
 | [FOUNDATION_STATUS](./FOUNDATION_STATUS.md) | Foundation + Laws 001–004 |
 | [CAPABILITY_REGISTRY](./CAPABILITY_REGISTRY.md) | Certified capabilities (product map) |
@@ -17,7 +19,11 @@
 | [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) | Engine meaning · v0.8 / v1.0 |
 | [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) | **v0.8 freeze declaration** |
 | [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) | **Official frozen board** + Expansion |
-| [OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md) | **Era** · Delivery Engineering Certified → Demo → … |
+| [OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md) | **Era** · Delivery Certified · FLOW-002 Architecture → … |
+| [OPERATIONAL_FLOW_002](../05-architecture/OPERATIONAL_FLOW_002.md) | **FLOW-002** · Operational Fulfillment · Certified · ADR 0081–0083 |
+| [OPERATIONAL_BEHAVIOURS](../05-architecture/OPERATIONAL_BEHAVIOURS.md) | **Behaviours** · BH-001 Fulfill Weekly Commitment |
+| [OPERATIONAL_BEHAVIOUR_BOARD](./OPERATIONAL_BEHAVIOUR_BOARD.md) | **ERA 4 board** · Behaviour maturity |
+| [OPERATIONAL_SCENARIO_REGISTRY](./OPERATIONAL_SCENARIO_REGISTRY.md) | **RESERVED** · Weekly Catering Cycle |
 | [OPERATIONAL_LANGUAGE_DICTIONARY](./OPERATIONAL_LANGUAGE_DICTIONARY.md) | **LAW 006** domain questions |
 | [OPERATIONAL_VALIDATION_SPRINT](./OPERATIONAL_VALIDATION_SPRINT.md) | **Active sprint** · Android PASS · iPhone next |
 | [FIELD_VALIDATION_MILESTONE](../10-validation/FIELD_VALIDATION_MILESTONE.md) | **OPPO PASS** · first physical Engine run |
@@ -26,21 +32,28 @@
 | [FIELD_VALIDATION_LOG](../10-validation/FIELD_VALIDATION_LOG.md) | Real-device evidence log (OPPO · iPhone) |
 | [OPERATIONAL_DEPENDENCY_GRAPH](./OPERATIONAL_DEPENDENCY_GRAPH.md) | Permanent dependency graph · layers |
 
-> Success = **¿Qué capacidades operativas están certificadas y cuáles usa un negocio real?**
+> Engineering success = certified Capabilities / Flows / Behaviours.  
+> **Product success = ¿El tenant trabaja mejor y más rápido?** · [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md) · ADR [0084](../adr/0084-product-law-001.md)
 
 ---
 
 **Platform v1:** ✅ **CLOSED** — [PLATFORM_V1_CLOSED](./PLATFORM_V1_CLOSED.md) · Baseline [v1](./PLATFORM_BASELINE_v1.md) · Transición [Platform → Flow DECLARED](./PLATFORM_FLOW_TRANSITION_DECLARED.md) · COMPLETE · [Operating Model v1](./OPERATING_MODEL_v1.md) · ACTIVE  
 **Product Core:** ✅ **[Foundation engineering-validated](./PRODUCT_CORE_FOUNDATION_001.md)** (ADR 0054) · Field smoke OPPO ⏳ · **Era Foundation center CLOSED**  
 **Operational Experience:** ▶ **[OPERATIONAL_EXPERIENCE](./OPERATIONAL_EXPERIENCE.md)** · Tenant Success  
-**Operational Modules:** ▶ **[OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md)** · Delivery **Engineering Certified** (ADR 0078–0080) · Engine [v0.8](./OPERATIONAL_ENGINE_V08.md)  
-**Delivery Capability:** [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) · `src/delivery/` · `useDelivery()` · [Validation Report](../10-validation/DELIVERY_VALIDATION_REPORT.md)  
-**Language:** [OPERATIONAL_LANGUAGE_DICTIONARY](./OPERATIONAL_LANGUAGE_DICTIONARY.md) 
-**Operational Engine:** 🎯 [OPERATIONAL_ENGINE](./OPERATIONAL_ENGINE.md) · Board: [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · Review: [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) · Flows: [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md)
+**Product Direction:** ▶ **[PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md)** · PRODUCT LAW 001 · ADR [0084](../adr/0084-product-law-001.md) · [Time Savings Backlog](./TENANT_TIME_SAVINGS_BACKLOG.md) · **[Tenant Success Playbook](./TENANT_SUCCESS_PLAYBOOK.md)**  
+**Operational Modules:** ▶ Expansion complete for Engine v1.0 · [OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md) · Engine [v1.0](./OPERATIONAL_ENGINE_V1.md)  
+**Delivery Capability:** [DELIVERY_CAPABILITY](../05-architecture/DELIVERY_CAPABILITY.md) · ADR 0078–0080 · **0086** · Demo `/admin/delivery-workspace` · `useDelivery()` · [Validation Report](../10-validation/DELIVERY_VALIDATION_REPORT.md)  
+**Operational Engine:** ✅ **v1.0 DECLARED** — [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) · ADR 0090 · Board: [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · Review: [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) · Flows: [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md)  
+**Billing Capability:** [BILLING_CAPABILITY](../05-architecture/BILLING_CAPABILITY.md) · ADR **0087–0089** · **Engineering Certified** · `useBilling()` · [Validation Report](../10-validation/BILLING_VALIDATION_REPORT.md)  
+**Engine v1.0 Declaration:** [OPERATIONAL_ENGINE_001](./OPERATIONAL_ENGINE_001_RESERVED.md) · ✅ DECLARED  
+**FLOW-002:** [OPERATIONAL_FLOW_002](../05-architecture/OPERATIONAL_FLOW_002.md) · **Engineering Certified** (ADR 0083) · [Report](../10-validation/FLOW_002_VALIDATION_REPORT.md)  
+**Behaviours:** [Board](./OPERATIONAL_BEHAVIOUR_BOARD.md) · BH-001 Certified · [Scenarios](./OPERATIONAL_SCENARIO_REGISTRY.md) RESERVED  
+**Language:** [OPERATIONAL_LANGUAGE_DICTIONARY](./OPERATIONAL_LANGUAGE_DICTIONARY.md)
 **Identity Validation:** [IDENTITY_VALIDATION_REPORT](../10-validation/IDENTITY_VALIDATION_REPORT.md) · smoke [checklist](../10-validation/IDENTITY_SMOKE_CHECKLIST.md)  
 **Customer Capability:** [CUSTOMER_CAPABILITY](../05-architecture/CUSTOMER_CAPABILITY.md) · ADR 0058–0061 · Demo `/admin/customer-workspace`  
 **Order Capability:** [ORDER_CAPABILITY](../05-architecture/ORDER_CAPABILITY.md) · ADR 0062–0065 · Demo `/admin/order-workspace`  
 **Production Capability:** [PRODUCTION_CAPABILITY](../05-architecture/PRODUCTION_CAPABILITY.md) · ADR 0066–0069 · Demo `/admin/production-workspace`  
+**Kitchen Capability:** [KITCHEN_EXECUTION_CAPABILITY](../05-architecture/KITCHEN_EXECUTION_CAPABILITY.md) · ADR 0070–0073 · Demo `/admin/kitchen-workspace`  
 
 **Modules index:** [OPERATIONAL_MODULES](./OPERATIONAL_MODULES.md)  
 **Developer Platform:** ✅ **v1.0 FROZEN** · tag `developer-platform-v1.0.0` · Infra: HOUSEKEEPING-001…003 ✅  

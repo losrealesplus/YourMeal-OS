@@ -82,8 +82,15 @@ What commitments must be delivered now, and how do we confirm fulfillment?
 ¿Qué compromisos operativos deben entregarse ahora y cómo confirmamos su ejecución?
 ```
 
+```text
+Delivery is the controlled transfer of responsibility
+from internal tenant operations to the customer.
+Not the courier. Not GPS. Not Billing.
+```
+
 Owns: Assignment · Route · Stop · Confirmation · Evidence · Exception.  
-Never owns: GPS navigation · cooking · billing. **Delivery never drives / cooks / bills.**
+Never owns: GPS navigation · cooking · billing. **Delivery never drives / cooks / bills.**  
+Avoid: Shipment · Parcel · Package · Courier.
 
 ---
 
@@ -92,12 +99,21 @@ Never owns: GPS navigation · cooking · billing. **Delivery never drives / cook
 ### Billing
 
 ```text
-What operational outcome must be recorded?
-¿Qué trabajo puede cerrarse y facturarse?
+What financial outcome must be produced
+from successfully completed operational work?
+
+¿Qué resultado financiero debe producirse
+a partir del trabajo operativo completado con éxito?
 ```
 
-Owns: settlement · invoices (when Architecture opens).  
-Never owns: delivery status · kitchen units.
+Owns: Invoice · Credit Note · Payment Status · Billing Evidence · Financial Outcome  
+([BILLING_CAPABILITY](../05-architecture/BILLING_CAPABILITY.md) · [BILLING_FACADE](../05-architecture/BILLING_FACADE.md) · ADR 0087–0089 · **Engineering Certified**).  
+Never owns: delivery status · kitchen units · ERP ledger · bank rails.
+
+**Final Operational Engine Capability** — Engine ends at Outcome.  
+**Passive / backward:** Billing does not initiate — it certifies cycle completion.  
+**Capability Layer:** 100% (Identity→Billing Engineering Certified).  
+Institutional close: [OPERATIONAL_ENGINE_001_RESERVED](./OPERATIONAL_ENGINE_001_RESERVED.md).
 
 ---
 
@@ -110,6 +126,41 @@ What patterns should the operation learn from?
 ```
 
 Pending — must not steal Execution or Outcome questions.
+
+---
+
+## Operational Flows (collaboration · LAW 007)
+
+Flows do not own business questions. They own lawful transitions between certified Capabilities.
+
+### FLOW-001 · Commitment → Executed Work
+
+```text
+Can an operational commitment become executed work
+without violating any Foundation Law?
+```
+
+Ends at: Kitchen Execution Completed.
+
+### FLOW-002 · Operational Fulfillment
+
+```text
+Can an operational commitment become a confirmed delivery
+without violating any Foundation Law?
+```
+
+Ends at: **Delivery Confirmation** — never Invoice.  
+Behaviour: **BH-001 Fulfill Weekly Commitment** → Outcome: Operational Commitment Fulfilled.  
+See [OPERATIONAL_BEHAVIOURS](../05-architecture/OPERATIONAL_BEHAVIOURS.md).
+
+### FLOW-003 · Confirmation → Outcome (future)
+
+```text
+What economic outcome must be recorded
+after an operational commitment has been confirmed?
+```
+
+Billing’s question — after FLOW-002.
 
 ---
 

@@ -1,62 +1,41 @@
 # Operational Engine — Official Board
 
-**Core frozen:** 2026-08-06 · **Operational Engine v0.8** · ADR [0077](../adr/0077-operational-engine-v08.md)  
-**Expansion:** [OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md) · OPERATIONAL-006 Delivery **Engineering Certified** · ADR [0078](../adr/0078-delivery-capability.md) · [0079](../adr/0079-delivery-facade.md) · [0080](../adr/0080-delivery-engineering-certification.md)  
+**Engine v1.0:** ✅ **DECLARED / CERTIFIED / ARCHITECTURE FROZEN** — [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) · ADR [0090](../adr/0090-operational-engine-v1-declaration.md) · **OPERATIONAL-ENGINE-001**  
+**Historic v0.8:** [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) · ADR [0077](../adr/0077-operational-engine-v08.md)  
+**Product Direction:** [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md) · **PRODUCT LAW 001** · ADR [0084](../adr/0084-product-law-001.md) · [Time Savings Backlog](./TENANT_TIME_SAVINGS_BACKLOG.md) · **[Tenant Success Playbook](./TENANT_SUCCESS_PLAYBOOK.md)**  
+**Behaviours:** [OPERATIONAL_BEHAVIOUR_BOARD](./OPERATIONAL_BEHAVIOUR_BOARD.md) · BH-001 Certified  
+**Scenarios:** [OPERATIONAL_SCENARIO_REGISTRY](./OPERATIONAL_SCENARIO_REGISTRY.md) · RESERVED  
 **Language:** [OPERATIONAL_LANGUAGE_DICTIONARY](./OPERATIONAL_LANGUAGE_DICTIONARY.md)  
-**Detail:** [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) · [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) · [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md)
+**Flows:** [OPERATIONAL_FLOW_REGISTRY](./OPERATIONAL_FLOW_REGISTRY.md)
 
 ```text
 ══════════════════════════════════════════════
 
 YOURMEAL OS
 
-Operational Engine v0.8
+Operational Engine v1.0
 
 ══════════════════════════════════════════════
 
-Platform
+Construction
 ██████████████████████████
-Stable
+COMPLETE
 
-Foundation
+Capabilities Identity→Billing
 ██████████████████████████
-Stable
+100% Engineering Certified
 
-Capabilities
-
-Identity
+FLOW-001 · FLOW-002
 ██████████████████████████
 Engineering Certified
 
-Customers
+Architecture
 ██████████████████████████
-Engineering Certified
+FROZEN
 
-Orders
+Primary Product Focus
 ██████████████████████████
-Engineering Certified
-
-Production
-██████████████████████████
-Engineering Certified
-
-Kitchen
-██████████████████████████
-Engineering Certified
-
-Delivery
-██████████████████████████
-Engineering Certified
-
-Operational Flow
-
-FLOW-001
-██████████████████████████
-Engineering Certified
-
-FLOW-002
-░░░░░░░░░░░░░░░░░░░░░░░░░░
-Pending (needs Delivery Demo preferido)
+Tenant Success
 
 ══════════════════════════════════════════════
 
@@ -72,11 +51,13 @@ FIELD-VALIDATION-002
 
 ══════════════════════════════════════════════
 
-PARALLEL TRACKS
+TENANT SUCCESS TRACKS
 
 1. Cross-Platform Validation (iPhone PASS)
-2. OPERATIONAL-006 Phase 4 Capability Demo
-3. FLOW-002 (after Delivery Demo preferido)
+2. Operational Evidence · Time saved
+3. Flow / Billing Demos (Validation era · not Construction)
+4. FLOW-003 (Outcome flow · Validation era)
+5. Beta 1 · Beta 2 · Golden Master
 
 ══════════════════════════════════════════════
 ```
@@ -86,29 +67,15 @@ PARALLEL TRACKS
 ## Era
 
 ```text
-Construction → Validation → Operational Expansion
+Construction  →  COMPLETE
+Validation    →  ACTIVE
+Tenant Success → PRIMARY PRODUCT FOCUS
 ```
 
-v0.8 core remains frozen. Expansion adds Execution/Outcome modules **without** rewriting Foundation.
+**Product question:** *¿Esto ayuda al tenant a trabajar mejor y más rápido?*  
+North star: [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md) · PRODUCT LAW 001.
 
-Android (OPPO): field evidence — [ANDROID_FIELD_VALIDATION_REPORT](../10-validation/ANDROID_FIELD_VALIDATION_REPORT.md).  
-Delivery Certification: [DELIVERY_VALIDATION_REPORT](../10-validation/DELIVERY_VALIDATION_REPORT.md) · ADR 0080.
-
----
-
-## No Delivery until
-
-Delivery is **Engineering Certified** (ADR 0080). Remaining gate before FLOW-002 / Product UI:
-
-```text
-Delivery Capability Demo (prefer)
-FLOW-001 Demo (prefer)
-Roadmap Review (Engine Review)
-Android APK / OPPO Field Validation ✅
-iPhone Field Validation (parallel · not blocking Demo)
-```
-
-**No Delivery until** Demo preferido — do not open FLOW-002 Harness, Delivery Product UI, or Billing Architecture before Delivery Capability Demo (prefer). Certification alone is the hard unlock; Demo is the discipline unlock.
+Architecture reopen only if: Foundation Law broken · production blocked · measurable time savings (PRODUCT LAW 001).
 
 ---
 
@@ -116,18 +83,23 @@ iPhone Field Validation (parallel · not blocking Demo)
 
 | Gate | Status | Meaning |
 |------|--------|---------|
-| Delivery **Architecture Freeze** | ✅ ADR 0078 |
-| Delivery **Facade** | ✅ ADR 0079 · `src/delivery/` |
-| Delivery **Engineering Certification** | ✅ ADR 0080 · FAIL=0 |
-| Delivery **Capability Demo** | 🔒 Phase 4 |
-| FLOW-002 | 🔒 After Certification · prefer Demo |
+| **OPERATIONAL-ENGINE-001** (v1.0 Declaration) | ✅ ADR 0090 · [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) |
+| Capability Layer Identity→Billing | ✅ **100%** Engineering Certified |
+| FLOW-001 / FLOW-002 Engineering Certification | ✅ |
+| BH-001 Behaviour Certified | ✅ |
+| Billing / Flow **Demos** | 🔒 Validation era (experience · not new Engine Capabilities) |
+| FLOW-003 | 🔒 Validation era Outcome flow |
+| Scenarios | 🔒 RESERVED |
 | Engine **FIELD VALIDATED** | 🔒 | Android + iPhone PASS |
 | Claiming Production Authorization | 🔒 | Governance |
 
+**No Delivery / Billing Product UI until** Validation evidence (Flow Demo preferido / Field) justifies it under PRODUCT LAW 001.
+
 ---
 
-## Immediate next steps (parallel)
+## Immediate next steps (Tenant Success)
 
-1. **OPERATIONAL-006 Phase 4** — Delivery Capability Demo (`useDelivery` only)  
-2. **IOS-READY / FIELD-VALIDATION-002** — [guide](../10-validation/FIELD_VALIDATION_002_IOS.md)  
-3. **FLOW-002** — only after Delivery Certification (prefer Demo)
+1. **Cross-platform / Field** — iPhone FIELD-VALIDATION-002 · Operational Evidence  
+2. **Time savings** — [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md) · [TENANT_TIME_SAVINGS_BACKLOG](./TENANT_TIME_SAVINGS_BACKLOG.md) · Beta usability  
+3. **Validation demos** — Billing / Flow Demos as experience proofs (optional path · not Construction)  
+4. **Observe Isabella** — friction log → backlog (Playbook protocol)

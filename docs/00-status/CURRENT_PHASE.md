@@ -1,7 +1,29 @@
 # CURRENT_PHASE
 
-**Última actualización:** 2026-08-04  
+**Última actualización:** 2026-08-07  
+**Institutional:** [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) · **Construction COMPLETE** · focus **Tenant Success**  
+**Playbook:** [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md)  
 **No sustituye** [MILESTONES](./MILESTONES.md) — tablero de “dónde estamos ahora”.
+
+```text
+═══════════════════════════════════════════════
+YOURMEAL OS · CURRENT GATE
+═══════════════════════════════════════════════
+
+Operational Engine v1.0     ✅ DECLARED (OPERATIONAL-ENGINE-001)
+Construction                ✅ COMPLETE
+Architecture                ✅ FROZEN
+Primary Product Focus       Tenant Success (PRODUCT LAW 001)
+
+Next measurements
+  · Tiempo ahorrado
+  · Field / Cross-platform
+  · Beta usability
+```
+
+---
+
+**Histórico (pre–Engine v1.0):**
 
 ```text
 ═══════════════════════════════════════════════

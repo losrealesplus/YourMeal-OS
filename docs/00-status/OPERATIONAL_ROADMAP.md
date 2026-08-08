@@ -1,73 +1,82 @@
 # Operational Roadmap
 
-**Permanent · Operational Engine v0.8 frozen · ADR [0077](../adr/0077-operational-engine-v08.md)**  
-**Companions:** [OPERATIONAL_ENGINE_V08](./OPERATIONAL_ENGINE_V08.md) · [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) · [OPERATIONAL_VALIDATION_SPRINT](./OPERATIONAL_VALIDATION_SPRINT.md) · [OPERATIONAL_EXPANSION](./OPERATIONAL_EXPANSION.md) · [FIELD_VALIDATION_LOG](../10-validation/FIELD_VALIDATION_LOG.md) · [FIELD_VALIDATION_002_IOS](../10-validation/FIELD_VALIDATION_002_IOS.md)
+**Permanent · Operational Engine v1.0 DECLARED** · ADR [0090](../adr/0090-operational-engine-v1-declaration.md) · [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md)  
+**Product Direction:** [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md) · **PRODUCT LAW 001** · ADR [0084](../adr/0084-product-law-001.md) · [Time Savings Backlog](./TENANT_TIME_SAVINGS_BACKLOG.md) · [Tenant Success Playbook](./TENANT_SUCCESS_PLAYBOOK.md)  
+**Companions:** [OPERATIONAL_ENGINE_BOARD](./OPERATIONAL_ENGINE_BOARD.md) · [OPERATIONAL_ENGINE_REVIEW](./OPERATIONAL_ENGINE_REVIEW.md) · [FIELD_VALIDATION_LOG](../10-validation/FIELD_VALIDATION_LOG.md) · [FIELD_VALIDATION_002_IOS](../10-validation/FIELD_VALIDATION_002_IOS.md)
 
 ---
 
 ## Era
 
 ```text
-Construction → Validation → Operational Expansion
+Construction  →  COMPLETE (OPERATIONAL-ENGINE-001)
+Validation    →  ACTIVE
+Tenant Success → PRIMARY PRODUCT FOCUS
 ```
 
-Do not reorder Expansion modules. Architecture Freeze may precede iPhone PASS; Facade+ stays disciplined.
+Governing product question:
+
+> **¿Esto ayuda al tenant a trabajar mejor y más rápido?**
+
+Architecture reopen only if Foundation broken · Production blocked · or measurable time savings require it (PRODUCT LAW 001).
 
 ---
 
-## Immediate roadmap
+## Immediate roadmap (Tenant Success)
 
-### Validation / Cross-Platform (parallel)
+```text
+Android
+  ↓
+OPPO
+  ↓
+iPhone
+  ↓
+Isabella
+  ↓
+Tiempo ahorrado
+  ↓
+Beta 1
+  ↓
+Beta 2
+  ↓
+Golden Master
+```
+
+### Validation / Cross-Platform
 
 ```text
 Android / OPPO Field Validation ✅ PASS
 iPhone FIELD-VALIDATION-002 ⏳
 Engine FIELD VALIDATED 🔒 until both
-Roadmap Review (Engine Review) — continuous with Expansion
+Operational Evidence · Tenant Time Savings ◀ primary KPI
 ```
 
-### Operational Expansion
+### Construction history (complete)
 
 ```text
-1. OPERATIONAL-006 Delivery · Architecture ✅ (ADR 0078)
-2. Delivery Facade (Phase 2) ✅ (ADR 0079)
-3. Delivery Engineering Certification (Phase 3) ✅ (ADR 0080)
-4. Delivery Capability Demo (Phase 4) ◀ next
-5. FLOW-002 Architecture 🔒 after Delivery Certification (prefer Demo)
-6. OPERATIONAL-007 Billing …
-7. FLOW-003 …
+1. Delivery Engineering Certified ✅
+2. FLOW-002 Engineering Certified ✅ · BH-001
+3. Delivery Capability Demo ✅
+4. Billing Architecture → Facade → Certification ✅
+5. Capability Layer 100% ✅
+6. OPERATIONAL-ENGINE-001 · Engine v1.0 Declaration ✅
 ```
 
-### Method (permanent)
+Remaining Demo / FLOW-003 items are **Validation & Experience**, not new Engine Construction.
+
+---
+
+## Method (permanent)
 
 ```text
 Observe → Design → Freeze → Facade/Harness → Engineering Certification
 → Demo → Field Validation → Cross-Platform Validation → Production
 ```
 
----
-
-## Certification phases
+For Product Core after v1.0:
 
 ```text
-PHASE A · Capability Certification     ████████████████ COMPLETE
-PHASE B · Operational Flow Validation  ████████████░░░░ FLOW-001 Certified · Demo next
-PHASE C · Real Tenant Validation       ░░░░░░░░░░░░░░░░
+Problem → Time lost → Solution → Time recovered → Evidence
 ```
 
----
-
-## FLOW-001 track
-
-```text
-Architecture (ADR 0074)              ✅
-Harness (ADR 0075)                   ✅
-Engineering Certification (ADR 0076) ✅
-Flow Demo                            ← next
-```
-
----
-
-## Success question (field)
-
-> **¿Una persona de EatClean puede recorrer un flujo completo en Android y en iPhone y decir: “Esto me ahorra tiempo y entiendo perfectamente qué tengo que hacer”?**
+See [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md) · Operational Impact on PRs.

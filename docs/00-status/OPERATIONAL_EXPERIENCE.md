@@ -1,7 +1,9 @@
 # Operational Experience
 
 **Declared:** 2026-08-06 · ADR [0061](../adr/0061-customer-workspace-demo.md)  
-**Center of the project (from today):**
+**Product Direction (from 2026-08-07):** [PRODUCT_DIRECTION](./PRODUCT_DIRECTION.md) · PRODUCT LAW 001 · Tenant Success  
+**Playbook:** [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md)  
+**Center of the project:**
 
 ```text
 YourMeal OS
@@ -10,15 +12,13 @@ Platform
         │
 Foundation
         │
-Operational Capabilities
+Operational Capabilities / Flows / Behaviours
         │
-Operational Experience   ← we are here
+Operational Experience   ← usability lives here
         │
 Operational Validation
         │
-Production
-        │
-Tenant Success
+Tenant Success           ← product success metric
 ```
 
 ---
@@ -38,7 +38,10 @@ We may still touch Foundation. It is no longer the protagonist.
 | Orders | **Engineering Certified** (ADR 0064) |
 | Order Workspace | **Capability Demo** (ADR 0065 · LAW 003 · 004) |
 | Production | **Engineering Certified + Demo** (ADR 0068–0069) |
-| Kitchen Execution / Delivery / Billing | **Engine v0.8** · FLOW-001 Certified · Demo → Review → Android → OPPO → iPhone · Delivery **GATED** |
+| Kitchen Execution | **Engineering Certified + Demo** (ADR 0072–0073) |
+| Delivery | **Capability Demo** (ADR 0086 · `/admin/delivery-workspace`) |
+| Billing | **Engineering Certified** (ADR 0089 · Outcome · Capability Layer 100%) |
+| Engine v1.0 Declaration | ✅ DECLARED · [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) |
 
 ---
 
