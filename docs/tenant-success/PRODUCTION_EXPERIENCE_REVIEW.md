@@ -296,11 +296,11 @@ Production Experience
 ↓
 Review                      ✅ THIS DOCUMENT · READY WITH IMPROVEMENTS
 ↓
-Journey Certification       ← NEXT (separate mission)
+Journey Certification       ✅ [PRODUCTION_JOURNEY_CERTIFICATION](./PRODUCTION_JOURNEY_CERTIFICATION.md) · CERTIFIED
 ↓
-Freeze Production Experience
+Freeze Production Experience ✅
 ↓
-KITCHEN EXPERIENCE 001      ← only after Freeze
+KITCHEN EXPERIENCE 001      ← eligible
 ```
 
 ---
