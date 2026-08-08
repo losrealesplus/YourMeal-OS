@@ -1,6 +1,6 @@
 /**
- * DELIVERY EXPERIENCE 001
- * Today's Delivery Day — Zero Friction Delivery Day
+ * DELIVERY EXPERIENCE 001–002
+ * Today's Delivery Day · Delivery Search
  *
  * Experience only — no Delivery Capability invent · no routes · no maps ·
  * no navigation · no ConfirmDelivery · no durable assignment simulation.
@@ -10,8 +10,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { AdminHeader, SectionTitle, StatusChip } from "@/components/admin";
+import { DeliverySearchPanel } from "@/delivery-experience/DeliverySearchPanel";
 import { DeliveryTodayPanel } from "@/delivery-experience/DeliveryTodayPanel";
 import { utcDateOnly } from "@/menu-experience/week-plan";
+
+type ExperienceMode = "today" | "search";
+
+function isExperienceMode(value: unknown): value is ExperienceMode {
+  return value === "today" || value === "search";
+}
 
 export const Route = createFileRoute("/_authenticated/admin/delivery-today")({
   beforeLoad: ({ context }) => {
@@ -19,6 +26,7 @@ export const Route = createFileRoute("/_authenticated/admin/delivery-today")({
   },
   component: DeliveryTodayExperiencePage,
   validateSearch: (search: Record<string, unknown>) => ({
+    mode: isExperienceMode(search.mode) ? search.mode : ("today" as const),
     day: typeof search.day === "string" ? search.day : undefined,
     deliveryId:
       typeof search.deliveryId === "string" ? search.deliveryId : undefined,
@@ -27,12 +35,12 @@ export const Route = createFileRoute("/_authenticated/admin/delivery-today")({
     meta: [
       {
         title:
-          "YourMeal OS — Delivery Experience 001 · Today's Delivery Day",
+          "YourMeal OS — Delivery Experience · Search · Today's Delivery Day",
       },
       {
         name: "description",
         content:
-          "DELIVERY EXPERIENCE 001 · Zero Friction Delivery Day · TTUDD <2 min · no routes yet",
+          "DELIVERY EXPERIENCE 002 Search · TTFD <10s · 001 Today's Delivery Day · TTUDD <2 min · no routes yet",
       },
     ],
   }),
@@ -41,6 +49,9 @@ export const Route = createFileRoute("/_authenticated/admin/delivery-today")({
 function DeliveryTodayExperiencePage() {
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
+  const [mode, setMode] = useState<ExperienceMode>(() =>
+    isExperienceMode(searchParams.mode) ? searchParams.mode : "today",
+  );
   const [dayDate, setDayDate] = useState(
     searchParams.day ?? utcDateOnly(),
   );
@@ -48,36 +59,69 @@ function DeliveryTodayExperiencePage() {
     searchParams.deliveryId ?? null,
   );
 
-  function goDay(day: string, deliveryId?: string) {
-    setDayDate(day);
+  function goMode(next: ExperienceMode, day?: string, deliveryId?: string) {
+    setMode(next);
+    if (day) setDayDate(day);
     if (deliveryId !== undefined) setFocusDeliveryId(deliveryId || null);
     void navigate({
       to: "/admin/delivery-today",
       search: {
-        day,
+        mode: next,
+        day: day ?? dayDate,
         deliveryId: deliveryId || undefined,
       },
     });
   }
 
+  const meta: Record<
+    ExperienceMode,
+    { overline: string; title: string; subtitle: string; kpi: string; goal: string }
+  > = {
+    today: {
+      overline: "DELIVERY EXPERIENCE 001 · Today's Delivery Day",
+      title: "Zero Friction Delivery Day",
+      subtitle:
+        "Prepara y entiende la jornada antes de que el conductor salga — sin mapas",
+      kpi: "TTUDD < 2 min",
+      goal: "Entender la jornada de entregas de hoy en <2 min · siguiente entrega <10s",
+    },
+    search: {
+      overline: "DELIVERY EXPERIENCE 002 · Delivery Search",
+      title: "Zero Friction Delivery Search",
+      subtitle:
+        "Encuentra una entrega en la jornada sin salir del contexto operativo",
+      kpi: "TTFD < 10 s",
+      goal: "Encontrar la entrega correcta en <10s sin reconstruir Customer/Order",
+    },
+  };
+
+  const m = meta[mode];
+
   return (
     <div className="animate-fade-in mx-auto max-w-3xl pb-24">
       <SectionTitle
-        overline="DELIVERY EXPERIENCE 001 · Today's Delivery Day"
-        title="Zero Friction Delivery Day"
-        subtitle="Prepara y entiende la jornada antes de que el conductor salga — sin mapas"
+        overline={m.overline}
+        title={m.title}
+        subtitle={m.subtitle}
       />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        <StatusChip tone="warning" label="TTUDD < 2 min" />
+        <StatusChip tone="warning" label={m.kpi} />
         <StatusChip tone="info" label="Kitchen → Delivery" />
         <StatusChip tone="info" label="Experience only" />
         <button
           type="button"
           className="text-xs underline-offset-2 hover:underline"
-          onClick={() => goDay(dayDate)}
+          onClick={() => goMode("today", dayDate)}
         >
           Today's Deliveries
+        </button>
+        <button
+          type="button"
+          className="text-xs underline-offset-2 hover:underline"
+          onClick={() => goMode("search", dayDate)}
+        >
+          Búsqueda
         </button>
         <Link
           to="/admin/kitchen-today"
@@ -112,15 +156,25 @@ function DeliveryTodayExperiencePage() {
       </div>
 
       <AdminHeader
-        goal="Entender la jornada de entregas de hoy en <2 min · siguiente entrega <10s"
+        goal={m.goal}
         capability="logistics.operate · Delivery Facade (read) · Order (consume)"
-        object="Today's deliveries · readiness · warnings · no routes · no assignment invent"
+        object="Search · today's deliveries · readiness · warnings · no routes · no assignment invent"
       />
 
-      <DeliveryTodayPanel
-        dayDate={dayDate}
-        focusDeliveryId={focusDeliveryId}
-      />
+      {mode === "search" ? (
+        <DeliverySearchPanel
+          dayDate={dayDate}
+          onOpenDelivery={(day, deliveryId) =>
+            goMode("today", day, deliveryId)
+          }
+          onBackToToday={() => goMode("today", dayDate)}
+        />
+      ) : (
+        <DeliveryTodayPanel
+          dayDate={dayDate}
+          focusDeliveryId={focusDeliveryId}
+        />
+      )}
     </div>
   );
 }

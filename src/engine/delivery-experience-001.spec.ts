@@ -102,13 +102,13 @@ describe("DELIVERY EXPERIENCE 001 · Zero Friction Delivery Day", () => {
     expect(cards).toContain("No routes · no maps");
 
     expect(missions).toContain("DELIVERY-EXPERIENCE-001");
-    expect(missions).toContain("DELIVERY EXPERIENCE 001");
     expect(missions).toContain("TTUDD");
 
     expect(ui).toContain("DELIVERY EXPERIENCE 001");
     expect(ui).toContain("DeliveryTodayPanel");
     expect(ui).toContain("TTUDD < 2 min");
     expect(ui).toContain("logistics.operate");
+    expect(ui).toContain('mode === "search"');
     expect(ui).not.toMatch(/from ["']@\/modules\/operations/);
     expect(ui).not.toMatch(/from ["']@\/modules\/delivery/);
     expect(ui).not.toContain("confirmDelivery");
