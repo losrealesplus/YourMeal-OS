@@ -37,19 +37,26 @@ export type ProductionRisk = {
 
 const RESOLVED_KEY = "ymos.pe.resolved_risks.v1";
 
+let resolvedMemory: Record<string, string[]> = {};
+
 function readResolved(): Record<string, string[]> {
-  if (typeof sessionStorage === "undefined") return {};
+  if (typeof sessionStorage === "undefined") {
+    return { ...resolvedMemory };
+  }
   try {
     const raw = sessionStorage.getItem(RESOLVED_KEY);
-    if (!raw) return {};
+    if (!raw) return { ...resolvedMemory };
     const parsed = JSON.parse(raw) as Record<string, string[]>;
-    return parsed && typeof parsed === "object" ? parsed : {};
+    return parsed && typeof parsed === "object"
+      ? { ...parsed }
+      : { ...resolvedMemory };
   } catch {
-    return {};
+    return { ...resolvedMemory };
   }
 }
 
 function writeResolved(map: Record<string, string[]>) {
+  resolvedMemory = map;
   if (typeof sessionStorage === "undefined") return;
   try {
     sessionStorage.setItem(RESOLVED_KEY, JSON.stringify(map));
@@ -71,6 +78,7 @@ export function resolveRisk(weekStart: string, riskId: string): void {
 }
 
 export function clearResolvedRisksForTests(): void {
+  resolvedMemory = {};
   if (typeof sessionStorage !== "undefined") {
     sessionStorage.removeItem(RESOLVED_KEY);
   }
