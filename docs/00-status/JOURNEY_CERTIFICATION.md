@@ -54,8 +54,8 @@ Verdicts that authorize certification: **READY** or **READY WITH IMPROVEMENTS**.
 |---------|--------|--------|-------|
 | **Customer Journey** | ✅ **Certified** | [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · Frozen |
 | **Order Journey** | ✅ **Certified** | [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · Frozen |
-| **Menu Journey** | ⏳ In progress (ME005) | — | Timeline · Adaptation · Dish Library · Publish |
-| **Production Journey** | ⏳ Pending | — | After Menu |
+| **Menu Journey** | ⏳ Phases complete · Review pending | — | ME001–005 ✅ · formal Review next |
+| **Production Journey** | ⏳ In progress (PE001) | — | Published week → executable work |
 | **Kitchen Journey** | ⏳ Pending | — | After Production |
 | **Delivery Journey** | ⏳ Pending | — | After Kitchen |
 | **Operational Journey** | ⏳ Pending | — | Cross-domain review after Delivery |
@@ -63,8 +63,8 @@ Verdicts that authorize certification: **READY** or **READY WITH IMPROVEMENTS**.
 ```text
 Customer Journey      ✅ Certified
 Order Journey         ✅ Certified
-Menu Journey          ⏳ ME005 Publish & Preview (ME001–004 ✅)
-Production Journey    ⏳
+Menu Journey          ⏳ Phases ME001–005 ✅ · Review pending
+Production Journey    ⏳ PE001 Production Planning
 Kitchen Journey       ⏳
 Delivery Journey      ⏳
 ↓
@@ -78,17 +78,22 @@ Operational Accelerators
 ```
 
 Menu Experience is structured by the **weekly operational cycle**, not CRUD.  
-Mental model for the whole Menu → Production chain:
+Production Experience transforms the **published week** into work — not order admin.
 
 ```text
+MENU
 Semana → Día → Menú → Platos
+
+PRODUCTION
+Semana → Día → Trabajo → Cantidad → Deadline → Kitchen
 ```
 
 Dish Library is an **Operational Library** — consumed in planning, not administered as the day’s work.  
-See [OPERATIONAL_LIBRARIES](./OPERATIONAL_LIBRARIES.md).
+See [OPERATIONAL_LIBRARIES](./OPERATIONAL_LIBRARIES.md) · [PRODUCTION_EXPERIENCE_001](./PRODUCTION_EXPERIENCE_001.md).
 
 ```text
-001 Weekly Planning → 002 Search → 003 Weekly Adaptation → 004 Dish Library → 005 Publish & Preview
+Menu: 001 → 002 → 003 → 004 → 005 ✅ → Review
+Production: 001 Planning ▶ → 002 Search → 003 Adaptation → 004 Preps → 005 Alerts → 006 Handoff
 ```
 
 ---

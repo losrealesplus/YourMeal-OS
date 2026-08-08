@@ -379,6 +379,13 @@ export function MenuPlanningPanel({
               Preparar siguiente semana
             </button>
             <Link
+              to="/admin/production-planning"
+              search={{ weekStart: plan.weekStart }}
+              className="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-4 text-sm"
+            >
+              Ir a Production
+            </Link>
+            <Link
               to="/admin/order-capture"
               search={{
                 mode: "search",
