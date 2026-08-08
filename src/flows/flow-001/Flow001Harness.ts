@@ -245,7 +245,7 @@ export class Flow001Harness {
       );
     }
 
-    const orderIds = (result.orders ?? []).map((o) => o.id);
+    const orderIds = result.summaries.map((s) => s.id);
     ctx.orderIds = orderIds;
     steps.push({
       transition: "OrderHop",
