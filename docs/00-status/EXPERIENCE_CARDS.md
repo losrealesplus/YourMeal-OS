@@ -359,27 +359,55 @@ EXPERIENCE CARD
 Name
 Kitchen Experience
 
+Phase
+001 Today's Work
+
 Mission
-Know what to execute in less than ten seconds
+Zero Friction Kitchen Execution
 
 Primary User
-Kitchen operator
+Kitchen Operator
 
 Primary KPI
-Time-to-Know Work <10 s
+Time-to-Understand-Kitchen-Work <10 s
 
 Secondary KPIs
-Time-to-Mark Done <3 s
+Time-to-Start-Execution <2 min
 
 Operational Time Saved
 Estimated
-TBD
+Understand kitchen work ≈ 50–170 s
+Observation pending
 
 Status
-Eligible · NEXT after Production Certification
+In Progress
 ```
 
-Input: Production Kitchen Handoff (Ready / Ready with warnings) — Kitchen executes, does not re-plan.
+Detail: [KITCHEN_EXPERIENCE_001](./KITCHEN_EXPERIENCE_001.md) · Surface `/admin/kitchen-today` · Input: Production Handoff (Ready / Ready with warnings)  
+
+**Sequence (daily execution — not Production planning):**
+
+```text
+001 Today's Work               ▶ In Progress
+002 Execution Search
+003 Execution Adaptation
+004 Labels & Special Info
+005 Execution Progress
+006 Completion / Handoff
+↓
+Review → Journey Certification → Freeze
+```
+
+| Phase | Question | Status |
+|-------|----------|--------|
+| 001 | ¿Sé qué ejecutar ahora en &lt;10s? | ▶ |
+| 002 | ¿Encuentro cualquier trabajo de cocina rápido? | Planned |
+| 003 | ¿Adapto la ejecución del día sin replanificar Production? | Planned |
+| 004 | ¿Veo etiquetas e info especial a tiempo? | Planned |
+| 005 | ¿Sigo el progreso sin Capability inventada? | Planned |
+| 006 | ¿Cierro y entrego el día con claridad? | Planned |
+
+Kitchen executes transferred work — does not re-plan Production.
 
 ---
 

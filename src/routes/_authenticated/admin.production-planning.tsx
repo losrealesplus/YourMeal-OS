@@ -221,10 +221,10 @@ function ProductionPlanningExperiencePage() {
           Menu Planning
         </Link>
         <Link
-          to="/admin/kitchen"
+          to="/admin/kitchen-today"
           className="text-xs underline-offset-2 hover:underline"
         >
-          Kitchen
+          Kitchen Today
         </Link>
       </div>
 
