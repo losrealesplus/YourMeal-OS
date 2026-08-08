@@ -43,10 +43,10 @@ describe("CUSTOMER EXPERIENCE 001 · Phase 1", () => {
     expect(cards).toContain("Time-to-Open Customer <3 s");
     expect(cards).toContain("Create Order from Customer <5 s");
     expect(cards).toContain("Operational Time Saved");
-    expect(cards).toContain("60–150 seconds");
+    expect(cards).toContain("60–150 s");
     expect(cards).toContain("002 Search");
 
-    expect(ui).toContain("Phase 1");
+    expect(ui).toContain("Phase 002");
     expect(ui).toContain("Cliente creado");
     expect(ui).toContain("¿Qué quieres hacer ahora?");
     expect(ui).toContain("Crear pedido");
@@ -54,6 +54,7 @@ describe("CUSTOMER EXPERIENCE 001 · Phase 1", () => {
     expect(ui).toContain("Crear otro cliente");
     expect(ui).toContain("recordCustomerCreationOrigin");
     expect(ui).toContain("customer_workspace");
+    expect(ui).toContain("staff_create");
     expect(ui).toContain("from \"@/customer/useCustomer\"");
     expect(ui).not.toMatch(/from ["']@\/integrations\/supabase/);
     expect(ui).not.toMatch(/from ["']@\/modules\/customer-directory/);

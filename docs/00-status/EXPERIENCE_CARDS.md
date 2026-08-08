@@ -54,44 +54,54 @@ Name
 Customer Experience
 
 Mission
-Zero Friction Customer Management
+Zero Friction Customer Search
+
+Phase
+002 Search
 
 Primary User
 Tenant Operator
 
 Primary KPI
-Time-to-Create Customer <30 s
+Time-to-Find Customer <10 s
 
 Secondary KPIs
-Time-to-Find Customer <10 s
+Time-to-Create Customer <30 s
 Time-to-Open Customer <3 s
 Create Order from Customer <5 s
 
 Operational Time Saved
 Estimated
-60–150 seconds
+10–35 seconds per search
+(Create path: 60–150 s · CX001)
 
 Status
-In Progress
+In Progress · Phase 002
 ```
 
-Detail: [CUSTOMER_EXPERIENCE_001](./CUSTOMER_EXPERIENCE_001.md) · [Phase 1](./CUSTOMER_EXPERIENCE_001_PHASE1.md)
+Detail: [CUSTOMER_EXPERIENCE_002](./CUSTOMER_EXPERIENCE_002.md) · [001 Create](./CUSTOMER_EXPERIENCE_001.md)
 
 **Customer Experience sequence** (Orders wait until Customer is fluid):
 
 ```text
-001 Create
-↓
-002 Search
-↓
+001 Create     ✅
+002 Search     ← active
 003 Edit
-↓
 004 Company Management
-↓
 005 Preferences
-↓
 006 Bulk Operations
 ```
+
+Measurable questions:
+
+| Phase | Question |
+|-------|----------|
+| 001 | ¿Puedo crear un cliente en menos de 30 segundos? |
+| 002 | ¿Puedo encontrar un cliente en menos de 10 segundos? |
+| 003 | ¿Puedo modificar un cliente frecuente en menos de 20 segundos? |
+| 004 | ¿Puedo gestionar empresas sin duplicar trabajo? |
+| 005 | ¿Puedo completar la ficha sin interrumpir la operación? |
+| 006 | ¿Puedo realizar operaciones masivas sin reescribir información? |
 
 ---
 

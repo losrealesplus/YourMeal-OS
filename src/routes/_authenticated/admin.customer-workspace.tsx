@@ -1,8 +1,9 @@
 /**
- * CUSTOMER EXPERIENCE 001 · Phase 1 · Zero Friction Customer Management
+ * CUSTOMER EXPERIENCE 002 · Zero Friction Customer Search
+ * (+ CX001 Create retained on the same surface)
  *
- * Experience above existing useCustomer() only — no Capability / Facade edits here.
- * Mission: TTC < 30s · EXPERIENCE MANIFESTO 001
+ * Experience above useCustomer() only — no Capability / Facade edits.
+ * Mission KPI: TTF < 10s · EXPERIENCE MANIFESTO 001
  */
 
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -36,10 +37,22 @@ import {
   recordCustomerCreationOrigin,
   type CustomerCreationOrigin,
 } from "@/customer-experience/creation-origin";
+import {
+  companyCodeFromTags,
+  customerTypeLabel,
+  rankSearchHits,
+} from "@/customer-experience/search-rank";
 import { cn } from "@/lib/utils";
 
 /** Silent origin for altas from this Experience surface. */
 const CREATE_ORIGIN: CustomerCreationOrigin = "customer_workspace";
+
+type SearchHit = {
+  summary: CustomerSummary;
+  phone: string | null;
+  area: string | null;
+  companyLabel: string | null;
+};
 
 export const Route = createFileRoute(
   "/_authenticated/admin/customer-workspace",
@@ -51,11 +64,11 @@ export const Route = createFileRoute(
   head: () => ({
     meta: [
       {
-        title: "YourMeal OS — Zero Friction Customer Management",
+        title: "YourMeal OS — Zero Friction Customer Search",
       },
       {
         name: "description",
-        content: "TTC < 30s · EXPERIENCE LAW 001 · useCustomer only",
+        content: "TTF < 10s · CX002 · useCustomer only",
       },
     ],
   }),
@@ -69,7 +82,6 @@ type CreateDraft = {
   phone: string;
   address: string;
   city: string;
-  /** Company-only progressive: contact email when needed by substrate */
   contactEmail: string;
 };
 
@@ -81,12 +93,16 @@ const emptyDraft = (): CreateDraft => ({
   contactEmail: "",
 });
 
+function hitKey(s: CustomerSummary) {
+  return `${s.partyKind}:${s.id}`;
+}
+
 function CustomerExperiencePage() {
   const customer = useCustomer();
   const identity = useIdentity();
   const [query, setQuery] = useState("");
   const [segment, setSegment] = useState<Segment>("all");
-  const [summaries, setSummaries] = useState<CustomerSummary[]>([]);
+  const [hits, setHits] = useState<SearchHit[]>([]);
   const [selected, setSelected] = useState<CustomerContext | null>(null);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -101,6 +117,48 @@ function CustomerExperiencePage() {
   const nextActionRef = useRef<HTMLAnchorElement>(null);
   const caps = identity.permissions.capabilities;
   const canWrite = caps.includes("customers.write");
+
+  const enrichSummaries = useEffectEvent(
+    async (summaries: CustomerSummary[], q: string): Promise<SearchHit[]> => {
+      const slice = summaries.slice(0, 20);
+      const enriched = await Promise.all(
+        slice.map(async (summary) => {
+          const base: SearchHit = {
+            summary,
+            phone: null,
+            area: null,
+            companyLabel: companyCodeFromTags(summary),
+          };
+          try {
+            const result = await customer.getCustomer(
+              getCustomerQuery({
+                partyRef: { kind: summary.partyKind, id: summary.id },
+              }),
+            );
+            if (!result.ok || !result.context) return base;
+            const ctx = result.context;
+            const phone = ctx.profile?.phones?.[0]?.e164?.trim() || null;
+            const area =
+              ctx.profile?.addresses
+                ?.map((a) => a.city || a.line1)
+                .find((v) => v?.trim())
+                ?.trim() || null;
+            const companyLabel =
+              companyCodeFromTags(summary) ||
+              (ctx.companyAccountId && summary.partyKind === "individual"
+                ? "Empresa vinculada"
+                : summary.partyKind === "company_account"
+                  ? summary.displayName
+                  : null);
+            return { summary, phone, area, companyLabel };
+          } catch {
+            return base;
+          }
+        }),
+      );
+      return rankSearchHits(enriched, q);
+    },
+  );
 
   const loadList = useEffectEvent(async (q: string, kind: Segment) => {
     if (!customer.isReady) return;
@@ -120,10 +178,11 @@ function CustomerExperiencePage() {
           );
       if (!result.ok) {
         toast.error(result.errors[0]?.message ?? "Search failed");
-        setSummaries([]);
+        setHits([]);
         return;
       }
-      setSummaries(result.summaries);
+      const ranked = await enrichSummaries(result.summaries, q);
+      setHits(ranked);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : String(e));
     } finally {
@@ -134,9 +193,15 @@ function CustomerExperiencePage() {
   useEffect(() => {
     const handle = window.setTimeout(() => {
       void loadList(query, segment);
-    }, 200);
+    }, 160);
     return () => window.clearTimeout(handle);
   }, [query, segment, customer.isReady]);
+
+  useEffect(() => {
+    if (!creating) {
+      searchRef.current?.focus();
+    }
+  }, [creating, customer.isReady]);
 
   useEffect(() => {
     if (creating && partyChoice) {
@@ -288,7 +353,15 @@ function CustomerExperiencePage() {
 
   async function onArchive() {
     if (!selected || selected.summary.partyKind !== "individual") return;
-    if (!selected.permissions.canWrite) {
+    await onArchiveParty({
+      kind: "individual",
+      id: selected.summary.id,
+    });
+  }
+
+  async function onArchiveParty(partyRef: PartyRef) {
+    if (partyRef.kind !== "individual") return;
+    if (!canWrite) {
       toast.error("Missing customers.write");
       return;
     }
@@ -296,16 +369,16 @@ function CustomerExperiencePage() {
     setBusy(true);
     try {
       const result = await customer.archiveCustomer(
-        archiveCustomerCommand({
-          partyRef: { kind: "individual", id: selected.summary.id },
-        }),
+        archiveCustomerCommand({ partyRef }),
       );
       if (!result.ok) {
         toast.error(result.errors[0]?.message ?? "Archive failed");
         return;
       }
       toast.success("Cliente archivado");
-      setSelected(null);
+      if (selected?.summary.id === partyRef.id) {
+        setSelected(null);
+      }
       setJustCreated(false);
       setCreatedFromLabel(null);
       await loadList(query, segment);
@@ -325,22 +398,22 @@ function CustomerExperiencePage() {
   return (
     <div className="animate-fade-in max-w-5xl">
       <SectionTitle
-        overline="CUSTOMER EXPERIENCE 001 · Phase 1"
-        title="Zero Friction Customer Management"
-        subtitle="Experience above Facade · TTC < 30s · el software desaparece"
+        overline="CUSTOMER EXPERIENCE 002 · Phase 002 Search"
+        title="Zero Friction Customer Search"
+        subtitle="TTF < 10s · Create (CX001) sigue disponible · el software desaparece"
       />
 
       <div className="mb-4 grid gap-2 rounded-md border border-foreground/15 bg-foreground/[0.03] px-4 py-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Kpi label="TTF · Find" value="< 10 s" primary />
         <Kpi label="TTC · Create" value="< 30 s" />
-        <Kpi label="TTF · Find" value="< 10 s" />
         <Kpi label="TTO · Open" value="< 3 s" />
         <Kpi label="Order from Customer" value="< 5 s" />
       </div>
 
       <AdminHeader
-        goal="Que Isabella no piense en el software — solo en el cliente"
+        goal="Que Isabella piense «Juan» — y el cliente ya esté ahí"
         capability="customers.read / customers.write"
-        object="Particular · Empresa · Empleado · Progressive Completion"
+        object="Nombre · Teléfono · Empresa · Empleado · Recientes"
       />
 
       {!creating ? (
@@ -350,20 +423,9 @@ function CustomerExperiencePage() {
             type="button"
             disabled={!canWrite || busy}
             onClick={startCreate}
-            className="min-h-11 rounded-md bg-foreground px-4 py-2.5 text-sm font-semibold text-background disabled:opacity-40"
+            className="min-h-11 rounded-md border border-border px-4 py-2.5 text-sm font-semibold disabled:opacity-40"
           >
             Nuevo cliente
-          </button>
-          <button
-            type="button"
-            disabled={busy}
-            onClick={() => {
-              searchRef.current?.focus();
-              void loadList(query, segment);
-            }}
-            className="min-h-11 rounded-md border border-border px-3 py-2.5 text-sm font-semibold"
-          >
-            Actualizar
           </button>
         </div>
       ) : (
@@ -405,71 +467,72 @@ function CustomerExperiencePage() {
         ))}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+      <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <section>
-          <label className="mb-2 block text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-            Buscar · nombre · teléfono · empresa · recientes
+          <label
+            htmlFor="cx-search"
+            className="mb-2 block text-[10px] font-mono uppercase tracking-widest text-muted-foreground"
+          >
+            Buscar · escribe y encuentra · sin botón
           </label>
           <input
+            id="cx-search"
             ref={searchRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar ahora…"
-            className="mb-3 min-h-11 w-full rounded-md border border-border bg-background px-3 py-2.5 text-base sm:text-sm"
+            placeholder="Nombre, teléfono, empresa…"
+            className="mb-3 min-h-12 w-full rounded-md border border-foreground/25 bg-background px-3 py-3 text-base font-medium sm:text-sm"
             autoComplete="off"
             enterKeyHint="search"
+            aria-label="Buscar cliente"
           />
+          <p className="mb-3 text-[11px] text-muted-foreground">
+            {query.trim()
+              ? "Resultados al escribir · coincidencia parcial"
+              : "Recientes · escribe para buscar"}
+          </p>
           {loading ? (
             <p className="py-8 text-center text-sm text-muted-foreground">
-              Cargando…
+              Buscando…
             </p>
-          ) : summaries.length === 0 ? (
-            <p className="py-8 text-center text-sm text-muted-foreground">
-              {query.trim()
-                ? "Sin resultados"
-                : "Recientes · escribe para buscar"}
-            </p>
+          ) : hits.length === 0 ? (
+            <SearchEmptyState
+              hasQuery={Boolean(query.trim())}
+              canWrite={canWrite}
+              onCreate={() => {
+                startCreate();
+                window.setTimeout(() => newCustomerRef.current?.focus(), 0);
+              }}
+            />
           ) : (
-            <ul className="divide-y divide-border rounded-md border border-border">
-              {summaries.map((s) => (
-                <li key={`${s.partyKind}:${s.id}`}>
-                  <button
-                    type="button"
-                    onClick={() => {
+            <ul className="space-y-2">
+              {hits.map((hit) => (
+                <li key={hitKey(hit.summary)}>
+                  <SearchResultCard
+                    hit={hit}
+                    selected={
+                      selected?.summary.id === hit.summary.id &&
+                      selected.summary.partyKind === hit.summary.partyKind
+                    }
+                    canWrite={canWrite}
+                    busy={busy}
+                    onOpen={() => {
                       setJustCreated(false);
-                      void openParty({ kind: s.partyKind, id: s.id });
+                      void openParty({
+                        kind: hit.summary.partyKind,
+                        id: hit.summary.id,
+                      });
                     }}
-                    className={cn(
-                      "flex min-h-12 w-full items-start justify-between gap-3 px-3 py-3 text-left hover:bg-muted/40",
-                      selected?.summary.id === s.id && "bg-muted/50",
-                    )}
-                  >
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold">
-                        {s.displayName}
-                      </p>
-                      <p className="text-[11px] text-muted-foreground">
-                        {s.partyKind === "individual"
-                          ? s.tags.some((t) => t.includes("company_employee"))
-                            ? "Empleado"
-                            : "Particular"
-                          : "Empresa"}
-                        {s.tags
-                          .filter((t) => t.startsWith("code:"))
-                          .slice(0, 1)
-                          .map((t) => ` · ${t.replace("code:", "")}`)
-                          .join("")}
-                      </p>
-                    </div>
-                    <StatusChip
-                      tone={
-                        s.status === "inactive" || s.status === "archived"
-                          ? "danger"
-                          : "positive"
-                      }
-                      label={s.status}
-                    />
-                  </button>
+                    onArchive={
+                      hit.summary.partyKind === "individual" && canWrite
+                        ? () =>
+                            void onArchiveParty({
+                              kind: "individual",
+                              id: hit.summary.id,
+                            })
+                        : undefined
+                    }
+                  />
                 </li>
               ))}
             </ul>
@@ -482,7 +545,7 @@ function CustomerExperiencePage() {
           </p>
           {!selected ? (
             <p className="rounded-md border border-dashed border-border px-4 py-12 text-center text-sm text-muted-foreground">
-              Selecciona o crea un cliente · Progressive Completion para el resto
+              Identifica en la lista · abre solo cuando haga falta
             </p>
           ) : (
             <div className="space-y-4 rounded-md border border-border p-4">
@@ -490,9 +553,7 @@ function CustomerExperiencePage() {
                 <NextBestAction
                   primaryRef={nextActionRef}
                   createdFromLabel={createdFromLabel}
-                  onCreateOrder={() => {
-                    /* Link handles navigation; keep for focus contract */
-                  }}
+                  onCreateOrder={() => {}}
                   onOpenCustomer={() => {
                     setJustCreated(false);
                   }}
@@ -746,6 +807,153 @@ function CreateWizard(props: {
   );
 }
 
+function SearchEmptyState(props: {
+  hasQuery: boolean;
+  canWrite: boolean;
+  onCreate: () => void;
+}) {
+  return (
+    <div className="rounded-md border border-dashed border-border px-4 py-10 text-center space-y-4">
+      <div>
+        <p className="text-sm font-semibold">
+          {props.hasQuery ? "No se encontró el cliente" : "Sin recientes todavía"}
+        </p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          {props.hasQuery
+            ? "Ningún callejón sin salida — créalo y sigue trabajando."
+            : "Escribe para buscar · o crea el primero."}
+        </p>
+      </div>
+      {props.canWrite ? (
+        <button
+          type="button"
+          onClick={props.onCreate}
+          className="min-h-11 rounded-md bg-foreground px-4 py-2.5 text-sm font-semibold text-background"
+        >
+          Crear cliente
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
+function SearchResultCard(props: {
+  hit: SearchHit;
+  selected: boolean;
+  canWrite: boolean;
+  busy: boolean;
+  onOpen: () => void;
+  onArchive?: () => void;
+}) {
+  const { hit } = props;
+  const typeLabel = customerTypeLabel(hit.summary);
+  const phoneHref = hit.phone
+    ? `tel:${hit.phone.replace(/[^\d+]/g, "")}`
+    : null;
+  const waHref = hit.phone
+    ? `https://wa.me/${hit.phone.replace(/\D/g, "")}`
+    : null;
+  const mapsHref = hit.area
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+        `${hit.summary.displayName} ${hit.area}`,
+      )}`
+    : null;
+
+  return (
+    <article
+      className={cn(
+        "rounded-md border border-border px-3 py-3 space-y-2",
+        props.selected && "border-foreground/40 bg-muted/40",
+      )}
+    >
+      <button
+        type="button"
+        onClick={props.onOpen}
+        className="flex w-full min-h-11 items-start justify-between gap-3 text-left"
+      >
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold">
+            {hit.summary.displayName}
+          </p>
+          <p className="mt-0.5 text-[11px] text-muted-foreground">
+            {typeLabel}
+            {hit.companyLabel ? ` · ${hit.companyLabel}` : ""}
+            {hit.phone ? ` · ${hit.phone}` : ""}
+            {hit.area ? ` · ${hit.area}` : ""}
+          </p>
+        </div>
+        <StatusChip
+          tone={
+            hit.summary.status === "inactive" ||
+            hit.summary.status === "archived"
+              ? "danger"
+              : "positive"
+          }
+          label={hit.summary.status}
+        />
+      </button>
+      <div className="flex flex-wrap gap-1.5">
+        <button
+          type="button"
+          disabled={props.busy}
+          onClick={props.onOpen}
+          className="min-h-10 rounded-md border border-border px-2.5 py-1.5 text-xs font-semibold"
+        >
+          Abrir
+        </button>
+        <Link
+          to="/admin/order-workspace"
+          className="inline-flex min-h-10 items-center rounded-md bg-foreground px-2.5 py-1.5 text-xs font-semibold text-background"
+        >
+          Crear pedido
+        </Link>
+        {phoneHref ? (
+          <a
+            href={phoneHref}
+            className="inline-flex min-h-10 items-center rounded-md border border-border px-2.5 py-1.5 text-xs font-semibold"
+          >
+            Llamar
+          </a>
+        ) : (
+          <span className="inline-flex min-h-10 items-center rounded-md border border-dashed border-border px-2.5 py-1.5 text-[11px] text-muted-foreground">
+            Llamar · —
+          </span>
+        )}
+        {waHref ? (
+          <a
+            href={waHref}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex min-h-10 items-center rounded-md border border-dashed border-border px-2.5 py-1.5 text-[11px] font-semibold text-muted-foreground"
+          >
+            WhatsApp · pronto
+          </a>
+        ) : null}
+        {mapsHref ? (
+          <a
+            href={mapsHref}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex min-h-10 items-center rounded-md border border-dashed border-border px-2.5 py-1.5 text-[11px] font-semibold text-muted-foreground"
+          >
+            Cómo llegar · pronto
+          </a>
+        ) : null}
+        {props.onArchive ? (
+          <button
+            type="button"
+            disabled={props.busy || !props.canWrite}
+            onClick={props.onArchive}
+            className="min-h-10 rounded-md border border-border px-2.5 py-1.5 text-xs font-semibold disabled:opacity-40"
+          >
+            Archivar
+          </button>
+        ) : null}
+      </div>
+    </article>
+  );
+}
+
 function NextBestAction(props: {
   primaryRef: React.RefObject<HTMLAnchorElement | null>;
   createdFromLabel: string | null;
@@ -858,13 +1066,21 @@ function OperationalActions(props: {
   );
 }
 
-function Kpi(props: { label: string; value: string }) {
+function Kpi(props: { label: string; value: string; primary?: boolean }) {
   return (
-    <div>
+    <div className={props.primary ? "sm:col-span-1" : undefined}>
       <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
         {props.label}
+        {props.primary ? " · mission" : ""}
       </p>
-      <p className="text-sm font-semibold">{props.value}</p>
+      <p
+        className={cn(
+          "text-sm font-semibold",
+          props.primary && "text-base",
+        )}
+      >
+        {props.value}
+      </p>
     </div>
   );
 }
