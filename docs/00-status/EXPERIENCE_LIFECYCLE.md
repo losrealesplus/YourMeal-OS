@@ -88,8 +88,8 @@ OCC · Quick Capture · Import · Bulk appeared because friction repeated across
 | Edit / Adapt | CX003 Edit | **OE003 Edit** | **ME003 Weekly Adaptation** |
 | Domain phases | Org · Growth | Templates · Incident | Dish Library ✅ · Publish ✅ |
 | Review | CX Review ✅ | Order Review ✅ | Menu Review ✅ |
-| Journey Certification | Customer Journey ✅ | Order Journey ✅ | Menu Journey ✅ · Production Journey ✅ |
-| Freeze | Customer Frozen | Order Frozen | Menu Freeze · Production Frozen |
+| Journey Certification | Customer Journey ✅ | Order Journey ✅ | Menu Journey ✅ · Production Journey ✅ · Kitchen ⏳ |
+| Freeze | Customer Frozen | Order Frozen | Menu Freeze · Production Frozen · Kitchen Freeze |
 
 | Lifecycle step | Production (physical work) |
 |----------------|----------------------------|
