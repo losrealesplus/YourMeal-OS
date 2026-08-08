@@ -904,6 +904,7 @@ function SearchResultCard(props: {
               hit.summary.partyKind === "company_account"
                 ? "company_account"
                 : "individual",
+            mode: "capture",
           }}
           className="inline-flex min-h-10 items-center rounded-md bg-foreground px-2.5 py-1.5 text-xs font-semibold text-background"
         >
@@ -992,6 +993,7 @@ function NextBestAction(props: {
           search={{
             customerId: props.customerId,
             kind: orderKind,
+            mode: "capture",
           }}
           className="inline-flex min-h-11 items-center justify-center rounded-md bg-foreground px-4 py-2.5 text-sm font-semibold text-background"
           onClick={props.onCreateOrder}

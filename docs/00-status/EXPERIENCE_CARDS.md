@@ -124,43 +124,53 @@ Name
 Order Experience
 
 Phase
-001 Capture
+002 Search
 
 Mission
-Zero Friction Order Capture
+Zero Friction Order Search
 
 Primary User
 Tenant Operator
 
 Primary KPI
-Time-to-Create Order <45 s
+Time-to-Find Order <10 s
 
 Secondary KPIs
-Time-to-Find Order <10 s
-Time-to-Confirm Commitment <15 s
+Time-to-Create Order <45 s
+Time-to-Edit Order <20 s (OE003)
 
 Operational Time Saved
 Estimated
-≈ 45–135 s per pedido (see Phase 1)
+Capture ≈ 45–135 s · Search ≈ 20–50 s per find
 Observation pending
 
 Status
 In Progress
 ```
 
-Detail: [ORDER_EXPERIENCE_001](./ORDER_EXPERIENCE_001.md) · [Phase 1](./ORDER_EXPERIENCE_001_PHASE1.md) · Surface `/admin/order-capture`
+Detail: [ORDER_EXPERIENCE_002](./ORDER_EXPERIENCE_002.md) · [001 Capture · Zero Friction Order Capture](./ORDER_EXPERIENCE_001.md) · Surface `/admin/order-capture`  
+Lifecycle: [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)
 
-**Sequence:**
+**Sequence (adapted — not a Customer clone):**
 
 ```text
-001 Capture     ▶ In Progress
+001 Capture                 ✅
+002 Search                  ▶ In Progress
+003 Edit
+004 Order Templates
+005 Operational Incident
 ↓
-002 Find / Edit (planned)
+Experience Review
 ↓
-003 Confirm (planned)
+Freeze
+↓
+Menu Experience
 ```
 
-Measurable question (001): ¿Puedo crear un pedido completo mientras hablo con el cliente en menos de 45 segundos?
+| Phase | Question | Status |
+|-------|----------|--------|
+| 001 | ¿Puedo crear un pedido mientras hablo en &lt;45s? | ✅ |
+| 002 | ¿Puedo encontrar cualquier compromiso en &lt;10s? | ▶ |
 
 ---
 

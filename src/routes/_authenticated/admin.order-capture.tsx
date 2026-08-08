@@ -1,5 +1,5 @@
 /**
- * ORDER EXPERIENCE 001 · Zero Friction Order Capture (Phase 1)
+ * ORDER EXPERIENCE · Capture (001) + Search (002)
  *
  * Conversation speed — not CRUD.
  * useCustomer + useOrder only. No Capability / Facade / Engine changes.
@@ -57,6 +57,7 @@ import {
   type CommitmentItem,
   type OperationalCommitment,
 } from "@/order-experience/operational-commitments";
+import { OrderSearchPanel } from "@/order-experience/OrderSearchPanel";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/order-capture")({
@@ -71,14 +72,15 @@ export const Route = createFileRoute("/_authenticated/admin/order-capture")({
       search.kind === "company_account" || search.kind === "individual"
         ? (search.kind as PartyKind)
         : undefined,
+    mode: search.mode === "capture" ? ("capture" as const) : ("search" as const),
   }),
   head: () => ({
     meta: [
-      { title: "YourMeal OS — Zero Friction Order Capture" },
+      { title: "YourMeal OS — Order Experience · Search & Capture" },
       {
         name: "description",
         content:
-          "ORDER EXPERIENCE 001 · conversation capture · TTO <45s · Facades only",
+          "ORDER EXPERIENCE 002 Search · 001 Capture · TTFO <10s · TTO <45s · Facades only",
       },
     ],
   }),
@@ -103,6 +105,11 @@ function OrderCaptureExperiencePage() {
   const caps = identity.permissions.capabilities;
   const canWrite = caps.includes("orders.write");
 
+  const [mode, setMode] = useState<"search" | "capture">(
+    searchParams.mode === "capture" || searchParams.customerId
+      ? "capture"
+      : "search",
+  );
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<SearchHit[]>([]);
   const [loadingSearch, setLoadingSearch] = useState(false);
@@ -380,7 +387,18 @@ function OrderCaptureExperiencePage() {
     setSelected(null);
     setQuery("");
     deepLinked.current = false;
+    setMode("capture");
     window.setTimeout(() => searchRef.current?.focus(), 0);
+  }
+
+  function goToSearch() {
+    setCreated(null);
+    setLines([]);
+    setInstructions("");
+    setSelected(null);
+    setQuery("");
+    deepLinked.current = false;
+    setMode("search");
   }
 
   const address = selected?.profile?.addresses?.[0]?.line1 ?? null;
@@ -398,14 +416,37 @@ function OrderCaptureExperiencePage() {
   return (
     <div className="animate-fade-in mx-auto max-w-3xl pb-24">
       <SectionTitle
-        overline="ORDER EXPERIENCE 001 · Phase 001 Capture"
-        title="Zero Friction Order Capture"
-        subtitle="Registrar el pedido mientras hablas — el software desaparece"
+        overline={
+          mode === "search"
+            ? "ORDER EXPERIENCE 002 · Phase 002 Search"
+            : "ORDER EXPERIENCE 001 · Phase 001 Capture"
+        }
+        title={
+          mode === "search"
+            ? "Zero Friction Order Search"
+            : "Zero Friction Order Capture"
+        }
+        subtitle={
+          mode === "search"
+            ? "Encuentra el compromiso en segundos — gente, días, situaciones"
+            : "Registrar el pedido mientras hablas — el software desaparece"
+        }
       />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        <StatusChip tone="warning" label="TTO < 45 s" />
+        {mode === "search" ? (
+          <StatusChip tone="warning" label="TTFO < 10 s" />
+        ) : (
+          <StatusChip tone="warning" label="TTO < 45 s" />
+        )}
         <StatusChip tone="info" label="Conversation · not CRUD" />
+        <button
+          type="button"
+          className="text-xs underline-offset-2 hover:underline"
+          onClick={() => setMode(mode === "search" ? "capture" : "search")}
+        >
+          {mode === "search" ? "Ir a captura" : "Ir a búsqueda"}
+        </button>
         <Link
           to="/admin/customer-workspace"
           className="text-xs underline-offset-2 hover:underline"
@@ -415,18 +456,32 @@ function OrderCaptureExperiencePage() {
       </div>
 
       <AdminHeader
-        goal="Crear compromiso operativo en <45s durante la llamada"
+        goal={
+          mode === "search"
+            ? "Encontrar cualquier compromiso operativo en <10s"
+            : "Crear compromiso operativo en <45s durante la llamada"
+        }
         capability="orders.read / orders.write · customers.read"
-        object="Operational commitment · PlanWeeklyOrder · session honesty"
+        object="Operational commitment · SearchOrders · session honesty"
       />
+
+      {mode === "search" && !created ? (
+        <OrderSearchPanel
+          onCreateOrder={() => {
+            setMode("capture");
+            window.setTimeout(() => searchRef.current?.focus(), 0);
+          }}
+        />
+      ) : null}
 
       {created ? (
         <CreatedPanel
           commitment={created}
           nextActionRef={nextActionRef}
           onAnother={resetForAnother}
+          onSearch={goToSearch}
         />
-      ) : (
+      ) : mode === "capture" ? (
         <>
           <section className="mb-8 space-y-3" aria-labelledby="oe-customer">
             <h2 id="oe-customer" className="text-sm font-semibold tracking-wide">
@@ -687,7 +742,7 @@ function OrderCaptureExperiencePage() {
             </>
           )}
         </>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -696,10 +751,12 @@ function CreatedPanel({
   commitment,
   nextActionRef,
   onAnother,
+  onSearch,
 }: {
   commitment: OperationalCommitment;
   nextActionRef: RefObject<HTMLButtonElement | null>;
   onAnother: () => void;
+  onSearch: () => void;
 }) {
   return (
     <section className="space-y-4" aria-labelledby="oe-created" aria-live="polite">
@@ -739,6 +796,13 @@ function CreatedPanel({
             className="inline-flex min-h-11 items-center justify-center rounded-md bg-foreground px-4 text-sm font-medium text-background"
           >
             Continuar con otro pedido
+          </button>
+          <button
+            type="button"
+            onClick={onSearch}
+            className="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-4 text-sm"
+          >
+            Buscar pedidos
           </button>
           <Link
             to="/admin/customer-workspace"
