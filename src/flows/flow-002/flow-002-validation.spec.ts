@@ -77,7 +77,7 @@ function mockDeps(overrides: {
   const orders = {
     getOrdersByDeliveryDay: vi.fn(async () => ({
       ok: true,
-      orders: [{ id: "o1" }, { id: "o2" }],
+      summaries: [{ id: "o1" }, { id: "o2" }],
       errors: [],
     })),
     ...overrides.orders,

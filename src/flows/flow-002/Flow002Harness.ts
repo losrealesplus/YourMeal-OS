@@ -268,7 +268,7 @@ export class Flow002Harness {
       );
     }
 
-    ctx.orderIds = (result.orders ?? []).map((o) => o.id);
+    ctx.orderIds = result.summaries.map((s) => s.id);
     steps.push({
       transition: "OrderHop",
       expected: "commitments via OrderFacade only (LAW 007)",
