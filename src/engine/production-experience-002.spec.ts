@@ -29,7 +29,7 @@ describe("PRODUCTION EXPERIENCE 002 · Zero Friction Production Search", () => {
     clearProductionPlansForTests();
   });
 
-  it("documents TTFPW · live search · Experience-only · Card In Progress", () => {
+  it("documents TTFPW · live search · Experience-only · Card READY WITH IMPROVEMENTS", () => {
     const doc = readFileSync(
       resolve(ROOT, "docs/00-status/PRODUCTION_EXPERIENCE_002.md"),
       "utf8",
@@ -62,12 +62,12 @@ describe("PRODUCTION EXPERIENCE 002 · Zero Friction Production Search", () => {
     expect(cards).toContain("002 Production Search");
     expect(cards).toContain("Zero Friction Production Search");
     expect(cards).toContain("Time-to-Find-Production-Work <10 s");
-    expect(cards).toContain("In Progress");
+    expect(cards).toContain("READY WITH IMPROVEMENTS");
 
     expect(missions).toContain("PRODUCTION-EXPERIENCE-002");
     expect(missions).toContain("TTFPW <10s");
     expect(missions).toContain("PE002 Search ✅");
-    expect(missions).toContain("PRODUCTION-EXPERIENCE-006");
+    expect(missions).toContain("PRODUCTION-EXPERIENCE-REVIEW");
 
     expect(ui).toContain("PRODUCTION EXPERIENCE 002");
     expect(ui).toContain("ProductionSearchPanel");

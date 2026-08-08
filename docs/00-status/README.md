@@ -26,7 +26,8 @@
 | [EXPERIENCE_CARDS](./EXPERIENCE_CARDS.md) | User-facing product map (30s cards) |
 | [EXPERIENCE_MISSIONS](./EXPERIENCE_MISSIONS.md) | Era 2 missions · TTA KPIs · EXPERIENCE LAW 001 |
 | [EXPERIENCE_MANIFESTO](./EXPERIENCE_MANIFESTO.md) | **Invisible software** · ADR 0099 |
-| **[PRODUCTION_EXPERIENCE_006](./PRODUCTION_EXPERIENCE_006.md)** | ▶ **In Progress** · Kitchen Handoff · TPKH &lt;5 min |
+| **[PRODUCTION_EXPERIENCE_REVIEW](../tenant-success/PRODUCTION_EXPERIENCE_REVIEW.md)** | ✅ Review · **READY WITH IMPROVEMENTS** · Certification next |
+| [PRODUCTION_EXPERIENCE_006](./PRODUCTION_EXPERIENCE_006.md) | ✅ Kitchen Handoff · TPKH &lt;5 min |
 | [PRODUCTION_EXPERIENCE_005](./PRODUCTION_EXPERIENCE_005.md) | ✅ Alerts & Deadlines · TTPR &lt;10s |
 | [PRODUCTION_EXPERIENCE_004](./PRODUCTION_EXPERIENCE_004.md) | ✅ Pre-Preparations · TIRP &lt;15s |
 | [PRODUCTION_EXPERIENCE_003](./PRODUCTION_EXPERIENCE_003.md) | ✅ Production Adaptation · TAPP &lt;5 min |

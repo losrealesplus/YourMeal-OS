@@ -55,7 +55,7 @@ Verdicts that authorize certification: **READY** or **READY WITH IMPROVEMENTS**.
 | **Customer Journey** | ✅ **Certified** | [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · Frozen |
 | **Order Journey** | ✅ **Certified** | [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · Frozen |
 | **Menu Journey** | ✅ **Certified** | [MENU_EXPERIENCE_005](./MENU_EXPERIENCE_005.md) | ME001–005 · published week handoff |
-| **Production Journey** | ⏳ In progress (PE006) | — | Planning ✅ · Search ✅ · Adaptation ✅ · Preps ✅ · Alerts ✅ · Handoff ▶ |
+| **Production Journey** | ⏳ Review complete · Certification next | [PRODUCTION_EXPERIENCE_REVIEW](../tenant-success/PRODUCTION_EXPERIENCE_REVIEW.md) | PE001–006 ✅ · Verdict **READY WITH IMPROVEMENTS** |
 | **Kitchen Journey** | ⏳ Pending | — | After Production |
 | **Delivery Journey** | ⏳ Pending | — | After Kitchen |
 | **Operational Journey** | ⏳ Pending | — | Cross-domain review after Delivery |
@@ -66,7 +66,7 @@ Order Journey         ✅ Certified
 Customer Journey      ✅ Certified
 Order Journey         ✅ Certified
 Menu Journey          ✅ Certified
-Production Journey    ⏳ PE006 Handoff (PE001–005 ✅)
+Production Journey    ⏳ Review ✅ · READY WITH IMPROVEMENTS · Certification next
 Kitchen Journey       ⏳
 Delivery Journey      ⏳
 ↓
@@ -95,7 +95,7 @@ See [OPERATIONAL_LIBRARIES](./OPERATIONAL_LIBRARIES.md) · [PRODUCTION_EXPERIENC
 
 ```text
 Menu: 001 → 002 → 003 → 004 → 005 ✅ Certified
-Production: 001 Planning ✅ → 002 Search ✅ → 003 Adaptation ✅ → 004 Preps ✅ → 005 Alerts ✅ → 006 Handoff ▶
+Production: 001 Planning ✅ → 002 Search ✅ → 003 Adaptation ✅ → 004 Preps ✅ → 005 Alerts ✅ → 006 Handoff ✅ → Review ✅ → Certification ←
 ```
 
 ---

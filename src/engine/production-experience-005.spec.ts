@@ -35,7 +35,7 @@ describe("PRODUCTION EXPERIENCE 005 · Zero Friction Production Alerts & Deadlin
     clearResolvedRisksForTests();
   });
 
-  it("documents TTPR · early risk · Experience-only · Card In Progress", () => {
+  it("documents TTPR · early risk · Experience-only · Card READY WITH IMPROVEMENTS", () => {
     const doc = readFileSync(
       resolve(ROOT, "docs/00-status/PRODUCTION_EXPERIENCE_005.md"),
       "utf8",
@@ -68,10 +68,10 @@ describe("PRODUCTION EXPERIENCE 005 · Zero Friction Production Alerts & Deadlin
     expect(cards).toContain("005 Alerts & Deadlines");
     expect(cards).toContain("Zero Friction Production Alerts & Deadlines");
     expect(cards).toContain("Time-to-Detect-Production-Risk <10 s");
-    expect(cards).toContain("In Progress");
+    expect(cards).toContain("READY WITH IMPROVEMENTS");
 
     expect(missions).toContain("PRODUCTION-EXPERIENCE-005");
-    expect(missions).toContain("PRODUCTION-EXPERIENCE-006");
+    expect(missions).toContain("PRODUCTION-EXPERIENCE-REVIEW");
     expect(missions).toContain("TTPR <10s");
     expect(missions).toContain("PE005 Alerts ✅");
 
