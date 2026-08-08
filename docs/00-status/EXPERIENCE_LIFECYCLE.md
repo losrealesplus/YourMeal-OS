@@ -95,8 +95,8 @@ OCC · Quick Capture · Import · Bulk appeared because friction repeated across
 |----------------|----------------------------|
 | Create / Capture | **PE001 Production Planning** ✅ |
 | Search | **PE002 Production Search** ✅ |
-| Edit / Adapt | **PE003 Production Adaptation** |
-| Domain phases | Pre-Preparations · Alerts & Deadlines · Kitchen Handoff |
+| Edit / Adapt | **PE003 Production Adaptation** ✅ |
+| Domain phases | **PE004 Pre-Preparations** · Alerts & Deadlines · Kitchen Handoff |
 | Review | Production Review |
 | Journey Certification | Production Journey |
 | Freeze | Production Freeze |

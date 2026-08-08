@@ -25,30 +25,73 @@ function inferPreps(
   dishLabel: string,
   productionDay: string,
   workId: string,
+  quantity: number,
 ): PrePreparation[] {
   const label = dishLabel.toLowerCase();
-  const preps: Array<{ kind: PrepKind; title: string; offsetDays: number }> = [];
+  const preps: Array<{
+    kind: PrepKind;
+    title: string;
+    offsetDays: number;
+    priority: "high" | "normal" | "low";
+  }> = [];
 
   if (
     /pescado|salmón|salmon|atún|marisco|congel|frozen|defrost/.test(label)
   ) {
-    preps.push({ kind: "defrost", title: "Descongelar", offsetDays: -1 });
+    preps.push({
+      kind: "defrost",
+      title: "Descongelar",
+      offsetDays: -1,
+      priority: "high",
+    });
   }
   if (/salsa|sauce|alioli|pesto/.test(label)) {
-    preps.push({ kind: "sauce", title: "Preparar salsa", offsetDays: -1 });
+    preps.push({
+      kind: "sauce",
+      title: "Preparar salsa",
+      offsetDays: -1,
+      priority: "high",
+    });
+  }
+  if (/verdura|vegetal|ensalada|veggie/.test(label)) {
+    preps.push({
+      kind: "vegetable",
+      title: "Prep verdura",
+      offsetDays: 0,
+      priority: "normal",
+    });
   }
   if (/base|arroz|rice|quinoa|bowl|poke/.test(label)) {
-    preps.push({ kind: "base", title: "Preparar base", offsetDays: 0 });
+    preps.push({
+      kind: "base",
+      title: "Preparar base",
+      offsetDays: 0,
+      priority: "normal",
+    });
   }
   if (/pollo|carne|protein|ternera|cerdo|tofu/.test(label)) {
     preps.push({
       kind: "protein",
       title: "Preparar proteína",
       offsetDays: 0,
+      priority: "high",
     });
   }
   if (/corte|juliana|dice|picad/.test(label)) {
-    preps.push({ kind: "cutting", title: "Corte / mise en place", offsetDays: 0 });
+    preps.push({
+      kind: "cutting",
+      title: "Corte / mise en place",
+      offsetDays: 0,
+      priority: "normal",
+    });
+  }
+  if (/pack|envas|bolsa/.test(label)) {
+    preps.push({
+      kind: "packaging",
+      title: "Prep envasado",
+      offsetDays: 0,
+      priority: "low",
+    });
   }
 
   if (preps.length === 0) {
@@ -56,6 +99,7 @@ function inferPreps(
       kind: "assembly",
       title: "Preparación de ensamblaje",
       offsetDays: 0,
+      priority: "normal",
     });
   }
 
@@ -65,8 +109,10 @@ function inferPreps(
     label: `${p.title} · ${dishLabel}`,
     preparationDate: addDaysIso(productionDay, p.offsetDays),
     requiredUseDate: productionDay,
-    status: "pending" as const,
+    status: "scheduled" as const,
     workId,
+    requiredQuantity: quantity,
+    priority: p.priority,
   }));
 }
 
@@ -139,7 +185,12 @@ export function generateProductionPlanFromWeek(week: WeekPlan): {
       prepIds: [],
     };
 
-    const preps = inferPreps(sample.dishLabel, sample.dayDate, workId);
+    const preps = inferPreps(
+      sample.dishLabel,
+      sample.dayDate,
+      workId,
+      quantity,
+    );
     item.prepIds = preps.map((p) => p.id);
     preparations.push(...preps);
     work.push(item);
