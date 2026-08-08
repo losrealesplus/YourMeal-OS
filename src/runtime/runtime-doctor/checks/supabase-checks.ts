@@ -43,19 +43,24 @@ export const supabaseChecks: DoctorCheck[] = [
     capability: "supabase",
     severity: "error",
     run: () => {
-      const key =
-        (import.meta as { env?: Record<string, string> }).env
-          ?.VITE_SUPABASE_ANON_KEY ?? "";
+    const env = (import.meta as { env?: Record<string, string> }).env;
+
+  const key =
+  env?.VITE_SUPABASE_PUBLISHABLE_KEY ??
+  env?.VITE_SUPABASE_ANON_KEY ??
+  "";
       if (!key) {
         return {
           status: "fail",
-          message: "VITE_SUPABASE_ANON_KEY is empty",
-          recommendations: ["Set VITE_SUPABASE_ANON_KEY for client auth"],
+          message: "Supabase publishable key is empty",
+          recommendations: [
+  "Set VITE_SUPABASE_PUBLISHABLE_KEY for client auth",
+],
         };
       }
       return {
         status: "pass",
-        message: `Anon key present (${key.slice(0, 6)}…)`,
+        message: `Publishable key present (${key.slice(0, 6)}...)`,
       };
     },
   },

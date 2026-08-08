@@ -68,7 +68,7 @@ export const FOUNDATION_KNOWLEDGE: RuntimeKnowledge[] = [
       "VITE_SUPABASE",
     ],
     recommendations: [
-      "Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY for the target flavor",
+      "Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY for the target flavor",
       "Rebuild the web bundle / Android assets after env changes",
       "Confirm secrets are not stripped by the Vite define pipeline",
     ],
