@@ -1,11 +1,11 @@
 /**
- * OPERATIONAL-002.5 · Customer Workspace Demo
+ * Sprint 001 · Epic 1 · Customer Experience (parallel track)
  *
- * Capability Demo — not the definitive CRM UI.
- * Proves FOUNDATION LAW 003: screen orchestrates interaction; Facade owns behaviour.
+ * Experience layer on CustomerFacade only (FOUNDATION LAW 003).
+ * Not Architecture · not a new Capability.
  *
- * Allowed imports: useCustomer · useIdentity · admin chrome · React.
- * Forbidden in imports: supabase · repositories · Directory/Company services · ServiceContext builder.
+ * Honest gaps: UpdateCustomer / RestoreCustomer / some facets remain UNIMPLEMENTED.
+ * Observation evidence still required (TENANT SUCCESS LAW 001) — this track is hybrid.
  */
 
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -33,6 +33,7 @@ import {
 import type {
   CustomerContext,
   CustomerSummary,
+  PartyKind,
   PartyRef,
 } from "@/customer/CustomerContext";
 import { cn } from "@/lib/utils";
@@ -43,40 +44,68 @@ export const Route = createFileRoute(
   beforeLoad: ({ context }) => {
     assertCapabilityFromContext(context, "customers.read");
   },
-  component: CustomerWorkspaceDemoPage,
+  component: CustomerExperiencePage,
   head: () => ({
     meta: [
-      { title: "YourMeal OS — Customer Workspace (Demo)" },
+      { title: "YourMeal OS — Customer Experience" },
       {
         name: "description",
         content:
-          "Capability Demo: Demand Party via CustomerFacade only (LAW 003).",
+          "Customer Experience: Demand Party via CustomerFacade (LAW 003).",
       },
     ],
   }),
 });
 
-function CustomerWorkspaceDemoPage() {
+type Segment = "all" | PartyKind;
+
+type CompanyForm = {
+  name: string;
+  contactName: string;
+  contactEmail: string;
+  contactPhone: string;
+  fiscalAddress: string;
+  deliveryAddress: string;
+};
+
+const emptyCompanyForm = (): CompanyForm => ({
+  name: "",
+  contactName: "",
+  contactEmail: "",
+  contactPhone: "",
+  fiscalAddress: "",
+  deliveryAddress: "",
+});
+
+function CustomerExperiencePage() {
   const customer = useCustomer();
   const identity = useIdentity();
   const [query, setQuery] = useState("");
+  const [segment, setSegment] = useState<Segment>("all");
   const [summaries, setSummaries] = useState<CustomerSummary[]>([]);
   const [selected, setSelected] = useState<CustomerContext | null>(null);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [showCompanyForm, setShowCompanyForm] = useState(false);
+  const [companyForm, setCompanyForm] = useState<CompanyForm>(emptyCompanyForm);
   const caps = identity.permissions.capabilities;
   const canWrite = caps.includes("customers.write");
 
-  const loadList = useEffectEvent(async (q: string) => {
+  const loadList = useEffectEvent(async (q: string, kind: Segment) => {
     if (!customer.isReady) return;
     setLoading(true);
     try {
+      const partyKind = kind === "all" ? "all" : kind;
       const result = q.trim()
         ? await customer.searchCustomers(
-            searchCustomersQuery({ query: q.trim(), limit: 40 }),
+            searchCustomersQuery({
+              query: q.trim(),
+              limit: 40,
+              partyKind,
+            }),
           )
         : await customer.listRecentCustomers(
-            listRecentCustomersQuery({ limit: 20 }),
+            listRecentCustomersQuery({ limit: 20, partyKind }),
           );
       if (!result.ok) {
         toast.error(result.errors[0]?.message ?? "Search failed");
@@ -93,10 +122,10 @@ function CustomerWorkspaceDemoPage() {
 
   useEffect(() => {
     const handle = window.setTimeout(() => {
-      void loadList(query);
+      void loadList(query, segment);
     }, 200);
     return () => window.clearTimeout(handle);
-  }, [query, customer.isReady]);
+  }, [query, segment, customer.isReady]);
 
   const openParty = useCallback(
     async (partyRef: PartyRef) => {
@@ -126,7 +155,7 @@ function CustomerWorkspaceDemoPage() {
       toast.error("Missing customers.write");
       return;
     }
-    if (!window.confirm("¿Archivar este Individual Customer? (soft delete)")) {
+    if (!window.confirm("¿Archivar este cliente individual?")) {
       return;
     }
     setBusy(true);
@@ -140,9 +169,9 @@ function CustomerWorkspaceDemoPage() {
         toast.error(result.errors[0]?.message ?? "Archive failed");
         return;
       }
-      toast.success("Archivado vía ArchiveCustomerCommand");
+      toast.success("Cliente archivado");
       setSelected(null);
-      await loadList(query);
+      await loadList(query, segment);
     } finally {
       setBusy(false);
     }
@@ -162,17 +191,55 @@ function CustomerWorkspaceDemoPage() {
         toast.error(result.errors[0]?.message ?? "Create failed");
         return;
       }
-      toast.success("CreateCustomerCommand · ensure_for_session");
+      toast.success("Cliente individual listo para esta sesión");
       if (result.partyRef) await openParty(result.partyRef);
-      await loadList(query);
+      await loadList(query, segment);
     } finally {
       setBusy(false);
     }
   }
 
-  async function onProbeUnimplemented(
-    kind: "update" | "restore",
-  ) {
+  async function onProvisionCompany() {
+    if (!customer.isReady || !canWrite) return;
+    if (
+      !companyForm.name.trim() ||
+      !companyForm.contactName.trim() ||
+      !companyForm.contactEmail.trim() ||
+      !companyForm.fiscalAddress.trim()
+    ) {
+      toast.error("Nombre, contacto, email y dirección fiscal son obligatorios");
+      return;
+    }
+    setBusy(true);
+    try {
+      const result = await customer.createCustomer(
+        createCustomerCommand({
+          partyKind: "company_account",
+          mode: "provision",
+          name: companyForm.name.trim(),
+          contactName: companyForm.contactName.trim(),
+          contactEmail: companyForm.contactEmail.trim(),
+          contactPhone: companyForm.contactPhone.trim() || null,
+          fiscalAddress: companyForm.fiscalAddress.trim(),
+          deliveryAddress: companyForm.deliveryAddress.trim() || null,
+        }),
+      );
+      if (!result.ok) {
+        toast.error(result.errors[0]?.message ?? "Provision failed");
+        return;
+      }
+      toast.success("Empresa creada");
+      setCompanyForm(emptyCompanyForm());
+      setShowCompanyForm(false);
+      if (result.partyRef) await openParty(result.partyRef);
+      await loadList(query, "company_account");
+      setSegment("company_account");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onProbeUnimplemented(kind: "update" | "restore") {
     if (!selected) return;
     const partyRef: PartyRef = {
       kind: selected.summary.partyKind,
@@ -192,47 +259,73 @@ function CustomerWorkspaceDemoPage() {
               restoreCustomerCommand({ partyRef }),
             );
       const code = result.errors[0]?.code ?? "UNKNOWN";
-      toast.message(`${kind === "update" ? "Update" : "Restore"}Customer`, {
-        description: `Expected honesty: ${code}`,
-      });
+      toast.message(
+        kind === "update" ? "Edición aún no disponible" : "Restaurar aún no disponible",
+        { description: `Honestidad Facade: ${code}` },
+      );
     } finally {
       setBusy(false);
     }
   }
 
+  const profile = selected?.profile;
+  const isEmployee = selected?.summary.tags.some((t) =>
+    t.includes("company_employee"),
+  );
+
   return (
     <div className="animate-fade-in max-w-5xl">
       <SectionTitle
-        overline="Operational Experience · Capability Demo"
-        title="Customer Workspace"
-        subtitle="Demuestra LAW 003: la pantalla orquesta; CustomerFacade posee el comportamiento. No es el CRM definitivo."
+        overline="Sprint 001 · Epic 1 · Customer Experience"
+        title="Clientes"
+        subtitle="Crear, buscar y segmentar sin pensar en la base de datos. Solo CustomerFacade."
       />
 
       <AdminHeader
-        goal="Probar Demand Party vía Facade (sin Supabase en UI)"
+        goal="Alta y mantenimiento de demand parties con menos fricción"
         capability="customers.read / customers.write"
-        object="CustomerSummary · CustomerContext"
+        object="Individual · Company · Company Employee (tags)"
       />
 
-      <div className="mb-6 rounded-lg border border-dashed border-border bg-muted/30 px-4 py-3 text-sm">
-        <p className="font-semibold text-foreground">
-          Screen → useCustomer() → CustomerFacade → Services → Repos
-        </p>
-        <p className="mt-1 text-muted-foreground">
+      <div className="mb-6 rounded-lg border border-border bg-muted/20 px-4 py-3 text-sm">
+        <p className="text-muted-foreground">
           Tenant: {identity.tenant?.slug ?? "—"} · Operator:{" "}
           {identity.currentUser?.fullName ?? identity.session.userId ?? "—"} ·
           Ready: {customer.isReady ? "yes" : "no"}
         </p>
         <p className="mt-2 text-xs text-muted-foreground">
-          Legacy CRUD:{" "}
+          Hybrid track: no sustituye la sesión de observación con Isabella.{" "}
           <Link
             to="/admin/customers"
             className="underline underline-offset-2 hover:text-foreground"
           >
-            /admin/customers
-          </Link>{" "}
-          (aún no migrado a Facade — esta demo es el camino canónico).
+            Directorio legacy
+          </Link>
         </p>
+      </div>
+
+      <div className="mb-4 flex flex-wrap gap-2">
+        {(
+          [
+            ["all", "Todos"],
+            ["individual", "Individual"],
+            ["company_account", "Empresa"],
+          ] as const
+        ).map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => setSegment(value)}
+            className={cn(
+              "rounded-md border px-3 py-1.5 text-xs font-semibold",
+              segment === value
+                ? "border-foreground bg-foreground text-background"
+                : "border-border",
+            )}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       <div className="mb-4 flex flex-wrap gap-2">
@@ -242,27 +335,74 @@ function CustomerWorkspaceDemoPage() {
           onClick={() => void onEnsureSession()}
           className="rounded-md bg-foreground px-3 py-1.5 text-xs font-semibold text-background disabled:opacity-40"
         >
-          CreateCustomer · ensure session
+          Asegurar cliente de sesión
+        </button>
+        <button
+          type="button"
+          disabled={!canWrite || busy}
+          onClick={() => setShowCompanyForm((v) => !v)}
+          className="rounded-md border border-border px-3 py-1.5 text-xs font-semibold disabled:opacity-40"
+        >
+          {showCompanyForm ? "Cerrar alta empresa" : "Nueva empresa"}
         </button>
         <button
           type="button"
           disabled={busy}
-          onClick={() => void loadList(query)}
+          onClick={() => void loadList(query, segment)}
           className="rounded-md border border-border px-3 py-1.5 text-xs font-semibold"
         >
-          Refresh list
+          Actualizar lista
         </button>
       </div>
+
+      {showCompanyForm ? (
+        <div className="mb-6 grid gap-3 rounded-md border border-border p-4 sm:grid-cols-2">
+          <p className="sm:col-span-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Alta empresa · CreateCustomer · provision
+          </p>
+          {(
+            [
+              ["name", "Nombre empresa *"],
+              ["contactName", "Contacto *"],
+              ["contactEmail", "Email contacto *"],
+              ["contactPhone", "Teléfono"],
+              ["fiscalAddress", "Dirección fiscal *"],
+              ["deliveryAddress", "Dirección entrega"],
+            ] as const
+          ).map(([key, label]) => (
+            <label key={key} className="block text-xs">
+              <span className="mb-1 block text-muted-foreground">{label}</span>
+              <input
+                value={companyForm[key]}
+                onChange={(e) =>
+                  setCompanyForm((f) => ({ ...f, [key]: e.target.value }))
+                }
+                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+              />
+            </label>
+          ))}
+          <div className="sm:col-span-2">
+            <button
+              type="button"
+              disabled={busy || !canWrite}
+              onClick={() => void onProvisionCompany()}
+              className="rounded-md bg-foreground px-3 py-1.5 text-xs font-semibold text-background disabled:opacity-40"
+            >
+              Crear empresa
+            </button>
+          </div>
+        </div>
+      ) : null}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
         <section>
           <label className="mb-2 block text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-            SearchCustomersQuery
+            Buscar cliente
           </label>
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar demand party…"
+            placeholder="Nombre, email, código…"
             className="mb-3 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
           />
           {loading ? (
@@ -292,7 +432,12 @@ function CustomerWorkspaceDemoPage() {
                         {s.displayName}
                       </p>
                       <p className="text-[11px] text-muted-foreground">
-                        {s.partyKind} · {s.demandChannelDefault}
+                        {s.partyKind === "individual"
+                          ? s.tags.some((t) => t.includes("company_employee"))
+                            ? "Empleado empresa"
+                            : "Individual"
+                          : "Empresa"}
+                        {s.tags.length > 0 ? ` · ${s.tags.slice(0, 2).join(" · ")}` : ""}
                       </p>
                     </div>
                     <StatusChip
@@ -312,52 +457,90 @@ function CustomerWorkspaceDemoPage() {
 
         <section>
           <p className="mb-2 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-            GetCustomer · CustomerContext
+            Ficha
           </p>
           {!selected ? (
             <p className="rounded-md border border-dashed border-border px-4 py-12 text-center text-sm text-muted-foreground">
-              Selecciona un demand party
+              Selecciona un cliente
             </p>
           ) : (
-            <div className="rounded-md border border-border p-4 space-y-3">
+            <div className="rounded-md border border-border p-4 space-y-4">
               <div>
                 <h3 className="text-lg font-semibold">
                   {selected.summary.displayName}
                 </h3>
                 <p className="text-xs text-muted-foreground">
-                  {selected.summary.partyKind} · {selected.summary.id}
+                  {selected.summary.partyKind === "individual"
+                    ? isEmployee
+                      ? "Empleado de empresa"
+                      : "Individual"
+                    : "Empresa"}
+                  {selected.companyAccountId
+                    ? ` · company ${selected.companyAccountId.slice(0, 8)}…`
+                    : ""}
                 </p>
               </div>
+
               <dl className="grid grid-cols-2 gap-2 text-xs">
                 <div>
-                  <dt className="text-muted-foreground">Status</dt>
+                  <dt className="text-muted-foreground">Estado</dt>
                   <dd className="font-semibold">{selected.summary.status}</dd>
                 </div>
                 <div>
-                  <dt className="text-muted-foreground">Channel</dt>
+                  <dt className="text-muted-foreground">Canal</dt>
                   <dd className="font-semibold">
                     {selected.summary.demandChannelDefault}
                   </dd>
                 </div>
-                <div>
-                  <dt className="text-muted-foreground">canWrite</dt>
-                  <dd className="font-semibold">
-                    {selected.permissions.canWrite ? "yes" : "no"}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-muted-foreground">Company</dt>
-                  <dd className="font-semibold truncate">
-                    {selected.companyAccountId ?? "—"}
-                  </dd>
-                </div>
-                {selected.profile?.email ? (
+                {profile?.email ? (
                   <div className="col-span-2">
                     <dt className="text-muted-foreground">Email</dt>
-                    <dd className="font-semibold">{selected.profile.email}</dd>
+                    <dd className="font-semibold">{profile.email}</dd>
+                  </div>
+                ) : null}
+                {profile?.phones?.length ? (
+                  <div className="col-span-2">
+                    <dt className="text-muted-foreground">Teléfonos</dt>
+                    <dd className="font-semibold">
+                      {profile.phones.map((p) => p.e164).join(" · ")}
+                    </dd>
                   </div>
                 ) : null}
               </dl>
+
+              <FacetBlock
+                title="Direcciones / entrega"
+                empty="Sin direcciones en ficha (individual delivery locations: pendiente)."
+                items={
+                  profile?.addresses?.map(
+                    (a) =>
+                      `${a.label ?? "Dir"}: ${a.line1}${a.city ? `, ${a.city}` : ""}`,
+                  ) ?? []
+                }
+                extra={
+                  selected.deliveryLocation
+                    ? `Delivery ref: ${selected.deliveryLocation.kind}`
+                    : null
+                }
+              />
+
+              <FacetBlock
+                title="Preferencias"
+                empty="Sin preferencias cargadas en Facade aún."
+                items={Object.keys(profile?.preferences ?? {}).map(
+                  (k) => `${k}: ${String((profile?.preferences ?? {})[k])}`,
+                )}
+              />
+
+              <FacetBlock
+                title="Restricciones / alérgenos"
+                empty="Sin alérgenos en ficha (CRUD admin pendiente — no inventar)."
+                items={
+                  profile?.allergens?.map(
+                    (a) => `${a.code}${a.note ? ` — ${a.note}` : ""}`,
+                  ) ?? []
+                }
+              />
 
               <div className="flex flex-wrap gap-2 pt-2 border-t border-dashed border-border">
                 <button
@@ -370,7 +553,7 @@ function CustomerWorkspaceDemoPage() {
                   onClick={() => void onArchive()}
                   className="rounded-md border border-border px-3 py-1.5 text-xs font-semibold disabled:opacity-40"
                 >
-                  ArchiveCustomer
+                  Archivar
                 </button>
                 <button
                   type="button"
@@ -378,7 +561,7 @@ function CustomerWorkspaceDemoPage() {
                   onClick={() => void onProbeUnimplemented("update")}
                   className="rounded-md border border-dashed border-border px-3 py-1.5 text-xs text-muted-foreground"
                 >
-                  UpdateCustomer (expect UNIMPLEMENTED)
+                  Editar (aún no)
                 </button>
                 <button
                   type="button"
@@ -386,13 +569,40 @@ function CustomerWorkspaceDemoPage() {
                   onClick={() => void onProbeUnimplemented("restore")}
                   className="rounded-md border border-dashed border-border px-3 py-1.5 text-xs text-muted-foreground"
                 >
-                  RestoreCustomer (expect UNIMPLEMENTED)
+                  Restaurar (aún no)
                 </button>
               </div>
             </div>
           )}
         </section>
       </div>
+    </div>
+  );
+}
+
+function FacetBlock(props: {
+  title: string;
+  empty: string;
+  items: string[];
+  extra?: string | null;
+}) {
+  return (
+    <div className="rounded-md border border-dashed border-border/80 px-3 py-2">
+      <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+        {props.title}
+      </p>
+      {props.items.length === 0 ? (
+        <p className="mt-1 text-xs text-muted-foreground">{props.empty}</p>
+      ) : (
+        <ul className="mt-1 space-y-0.5 text-xs font-medium">
+          {props.items.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      )}
+      {props.extra ? (
+        <p className="mt-1 text-[11px] text-muted-foreground">{props.extra}</p>
+      ) : null}
     </div>
   );
 }

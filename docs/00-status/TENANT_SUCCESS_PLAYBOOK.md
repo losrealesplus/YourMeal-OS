@@ -337,6 +337,16 @@ Operational friction is now a first-class defect class.
 
 ## How to observe an operator (without influencing the work)
 
+**Official instrument:** [OBSERVATION_FRAMEWORK](../tenant-success/OBSERVATION_FRAMEWORK.md) · TENANT-SUCCESS-001 · ADR [0095](../adr/0095-tenant-success-001-observation-framework.md)
+
+| Artefact | Path |
+|----------|------|
+| Framework | [OBSERVATION_FRAMEWORK](../tenant-success/OBSERVATION_FRAMEWORK.md) |
+| Session template | [TENANT_OBSERVATION_TEMPLATE](../tenant-success/TENANT_OBSERVATION_TEMPLATE.md) |
+| Friction classes | [FRICTION_CATALOG](../tenant-success/FRICTION_CATALOG.md) |
+| Priority score | [TIME_SAVINGS_SCORE](../tenant-success/TIME_SAVINGS_SCORE.md) |
+| Session files | `docs/tenant-success/observations/` |
+
 Goal: see the real job, not the demo job.
 
 ### Rules
@@ -347,7 +357,8 @@ Goal: see the real job, not the demo job.
 4. **Record friction, not opinions.** “Took three screens to correct one dish” > “UX feels bad.”  
 5. **Never invent urgency.** If they pause to explain, note that the pause itself is cost.  
 6. **One job at a time.** Customer create · order edit · kitchen queue · delivery confirm — not everything in one session.  
-7. **Thank them for interruption cost.** Observation consumes tenant time; treat it as scarce.
+7. **Thank them for interruption cost.** Observation consumes tenant time; treat it as scarce.  
+8. **Use the official template** — do not invent ad-hoc spreadsheets as the system of record.
 
 ### Anti-patterns
 
@@ -572,7 +583,8 @@ Avoid prompts that only say “add a module” without time returned.
 | OPERATIONAL_ENGINE_V1 | What motor is frozen? (Era 1 complete) |
 | **ERA_DECLARATION** | **Acta institucional · Era 1 CLOSED · Era 2 OPEN** |
 | **ERA2_PRODUCT_DISCOVERY_001** | **First Discovery · Accelerators registered** |
-| **SPRINT_001_TENANT_SUCCESS** | **Active Era 2 sprint · six epics** |
+| **TENANT-SUCCESS-001** | **Observation Framework** · docs/tenant-success/ |
+| **SPRINT_001_TENANT_SUCCESS** | **Active Era 2 sprint · hybrid Epic 0 + Epic 1** |
 | **TENANT_SUCCESS_PLAYBOOK** | **How do we return time? (Era 2)** · TENANT SUCCESS LAW 001 |
 | TENANT_TIME_SAVINGS_BACKLOG | Which jobs return how many minutes? |
 | ERA2_CURSOR_PROMPT | Mandatory Era 2 prompt header |
