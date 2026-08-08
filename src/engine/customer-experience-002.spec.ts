@@ -59,20 +59,19 @@ describe("CUSTOMER EXPERIENCE 002 · Zero Friction Search", () => {
     expect(doc).toContain("Operational Command Center");
     expect(doc).toContain("Recientes");
 
-    expect(cards).toContain("Phase");
-    expect(cards).toContain("003 Edit");
-    expect(cards).toContain("Time-to-Edit Customer <20 s");
-    expect(cards).toContain("In Progress · Phase 003");
+    expect(cards).toContain("004 Organization");
+    expect(cards).toContain("Time-to-Organization <45 s");
+    expect(cards).toContain("In Progress · Phase 004");
 
-    expect(missions).toContain("CUSTOMER_EXPERIENCE_003");
-    expect(missions).toContain("003 Edit");
-    expect(missions).toContain("editar frecuente < 20s");
+    expect(missions).toContain("CUSTOMER_EXPERIENCE_004");
+    expect(missions).toContain("004 Organization");
+    expect(missions).toContain("organización < 45s");
 
     expect(backlog).toContain("Operational Command Center");
     expect(backlog).toContain("ACCELERATOR-001");
 
-    expect(ui).toContain("CUSTOMER EXPERIENCE 003");
-    expect(ui).toContain("Zero Friction Customer Edit");
+    expect(ui).toContain("CUSTOMER EXPERIENCE 004");
+    expect(ui).toContain("Zero Friction Organization Management");
     expect(ui).toContain("sin botón");
     expect(ui).toContain("No se encontró el cliente");
     expect(ui).toContain("Crear cliente");
@@ -104,8 +103,10 @@ describe("CUSTOMER EXPERIENCE 002 · Zero Friction Search", () => {
     const byPhone = rankSearchHits(hits, "622111");
     expect(byPhone[0]?.summary.id).toBe("2");
 
-    expect(customerTypeLabel(summary({ id: "e", displayName: "X", tags: ["company_employee"] }))).toBe(
-      "Empleado",
-    );
+    expect(
+      customerTypeLabel(
+        summary({ id: "e", displayName: "X", tags: ["company_employee"] }),
+      ),
+    ).toBe("Trabajador");
   });
 });

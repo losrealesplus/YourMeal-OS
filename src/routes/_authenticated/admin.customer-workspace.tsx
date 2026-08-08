@@ -1,9 +1,9 @@
 /**
- * CUSTOMER EXPERIENCE 003 · Zero Friction Customer Edit
- * (+ CX001 Create · CX002 Search on the same surface)
+ * CUSTOMER EXPERIENCE 004 · Zero Friction Organization Management
+ * (+ CX001–003 Create · Search · Edit on the same surface)
  *
  * Experience above useCustomer() only — no Capability / Facade edits.
- * Mission KPI: TTE < 20s · EXPERIENCE MANIFESTO 001
+ * Mission KPI: TTO < 45s · EXPERIENCE MANIFESTO 001
  */
 
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -44,6 +44,7 @@ import {
 } from "@/customer-experience/search-rank";
 import { applyOperationalCorrection } from "@/customer-experience/operational-corrections";
 import { CustomerEditPanel } from "@/customer-experience/CustomerEditPanel";
+import { OrganizationPanel } from "@/customer-experience/OrganizationPanel";
 import { cn } from "@/lib/utils";
 
 /** Silent origin for altas from this Experience surface. */
@@ -66,11 +67,11 @@ export const Route = createFileRoute(
   head: () => ({
     meta: [
       {
-        title: "YourMeal OS — Zero Friction Customer Edit",
+        title: "YourMeal OS — Zero Friction Organization Management",
       },
       {
         name: "description",
-        content: "TTE < 20s · CX003 · useCustomer only",
+        content: "TTO < 45s · CX004 · useCustomer only",
       },
     ],
   }),
@@ -113,6 +114,7 @@ function CustomerExperiencePage() {
   const [draft, setDraft] = useState<CreateDraft>(emptyDraft);
   const [justCreated, setJustCreated] = useState(false);
   const [createdFromLabel, setCreatedFromLabel] = useState<string | null>(null);
+  const [organizing, setOrganizing] = useState(false);
   const nameRef = useRef<HTMLInputElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const newCustomerRef = useRef<HTMLButtonElement>(null);
@@ -235,6 +237,17 @@ function CustomerExperiencePage() {
 
   function startCreate() {
     setCreating(true);
+    setOrganizing(false);
+    setPartyChoice(null);
+    setDraft(emptyDraft());
+    setSelected(null);
+    setJustCreated(false);
+    setCreatedFromLabel(null);
+  }
+
+  function startOrganization() {
+    setOrganizing(true);
+    setCreating(false);
     setPartyChoice(null);
     setDraft(emptyDraft());
     setSelected(null);
@@ -246,6 +259,10 @@ function CustomerExperiencePage() {
     setCreating(false);
     setPartyChoice(null);
     setDraft(emptyDraft());
+  }
+
+  function cancelOrganization() {
+    setOrganizing(false);
   }
 
   function finishCreateSuccess(input: {
@@ -301,7 +318,7 @@ function CustomerExperiencePage() {
           segment: "individual",
           toastMessage:
             partyChoice === "company_employee"
-              ? `Empleado creado · ${ms} ms · vinculación a empresa: Progressive Completion`
+              ? `Trabajador creado · ${ms} ms · vinculación a organización: Progressive Completion`
               : `Cliente creado · ${ms} ms (objetivo TTC < 30s)`,
         });
         await openParty(result.partyRef);
@@ -309,7 +326,7 @@ function CustomerExperiencePage() {
         return;
       }
 
-      // Empresa — mínimo + email requerido por substrate (Progressive: default contact = name)
+      // Organización — mínimo + email requerido por substrate (Progressive)
       const email =
         draft.contactEmail.trim() ||
         `pending+${Date.now()}@customer.local`;
@@ -330,14 +347,14 @@ function CustomerExperiencePage() {
         return;
       }
       if (!result.partyRef) {
-        toast.error("Empresa creada sin referencia");
+        toast.error("Organización creada sin referencia");
         return;
       }
       const ms = Math.round(performance.now() - started);
       finishCreateSuccess({
         partyRef: result.partyRef,
         segment: "company_account",
-        toastMessage: `Empresa creada · ${ms} ms (objetivo TTC < 30s)`,
+        toastMessage: `Organización creada · ${ms} ms · preferir Nueva organización (CX004)`,
       });
       await openParty(result.partyRef);
       await loadList(query, "company_account");
@@ -392,26 +409,34 @@ function CustomerExperiencePage() {
   return (
     <div className="animate-fade-in max-w-5xl">
       <SectionTitle
-        overline="CUSTOMER EXPERIENCE 003 · Phase 003 Edit"
-        title="Zero Friction Customer Edit"
-        subtitle="TTE < 20s · corregir y seguir · el software desaparece"
+        overline="CUSTOMER EXPERIENCE 004 · Phase 004 Organization"
+        title="Zero Friction Organization Management"
+        subtitle="TTO < 45s · organización → trabajadores → pedidos"
       />
 
       <div className="mb-4 grid gap-2 rounded-md border border-foreground/15 bg-foreground/[0.03] px-4 py-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Kpi label="TTE · Edit" value="< 20 s" primary />
-        <Kpi label="Resume operation" value="< 5 s" />
+        <Kpi label="TTO · Organization" value="< 45 s" primary />
+        <Kpi label="Add worker" value="< 15 s" />
+        <Kpi label="TTE · Edit" value="< 20 s" />
         <Kpi label="TTF · Find" value="< 10 s" />
-        <Kpi label="TTC · Create" value="< 30 s" />
       </div>
 
       <AdminHeader
-        goal="Corregir un dato frecuente y volver a la operación — sin abrir un dossier"
+        goal="Crear una organización y empezar a trabajar — sin pensar en Membership"
         capability="customers.read / customers.write"
-        object="Inline edit · Basic · Delivery · Notes · Progressive Completion"
+        object="Organización · Contacto · Teléfono · Dirección · Trabajadores"
       />
 
-      {!creating ? (
+      {!creating && !organizing ? (
         <div className="mb-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            disabled={!canWrite || busy}
+            onClick={startOrganization}
+            className="min-h-11 rounded-md bg-foreground px-4 py-2.5 text-sm font-semibold text-background disabled:opacity-40"
+          >
+            Nueva organización
+          </button>
           <button
             ref={newCustomerRef}
             type="button"
@@ -422,7 +447,9 @@ function CustomerExperiencePage() {
             Nuevo cliente
           </button>
         </div>
-      ) : (
+      ) : null}
+
+      {creating ? (
         <CreateWizard
           partyChoice={partyChoice}
           draft={draft}
@@ -433,14 +460,30 @@ function CustomerExperiencePage() {
           onCancel={cancelCreate}
           onSave={() => void onSaveCreate()}
         />
-      )}
+      ) : null}
+
+      {organizing ? (
+        <OrganizationPanel
+          canWrite={canWrite}
+          busy={busy}
+          onBusy={setBusy}
+          onOpenParty={openParty}
+          onCreatedOrganization={(ctx) => {
+            setSelected(ctx);
+            setSegment("company_account");
+            void loadList(query, "company_account");
+          }}
+          onCancel={cancelOrganization}
+          viewing={null}
+        />
+      ) : null}
 
       <div className="mb-4 flex flex-wrap gap-2" role="tablist" aria-label="Segmento">
         {(
           [
             ["all", "Todos"],
             ["individual", "Particular"],
-            ["company_account", "Empresa"],
+            ["company_account", "Organizaciones"],
           ] as const
         ).map(([value, label]) => (
           <button
@@ -535,12 +578,34 @@ function CustomerExperiencePage() {
 
         <section>
           <p className="mb-2 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-            Cliente · editar sin interrumpir · TTE &lt; 20s
+            {selected?.summary.partyKind === "company_account"
+              ? "Organización · TTO < 45s"
+              : "Cliente · editar sin interrumpir · TTE < 20s"}
           </p>
           {!selected ? (
             <p className="rounded-md border border-dashed border-border px-4 py-12 text-center text-sm text-muted-foreground">
-              Busca · abre · corrige solo lo necesario · sigue
+              Busca · abre · corrige · o crea una organización
             </p>
+          ) : selected.summary.partyKind === "company_account" ? (
+            <OrganizationPanel
+              canWrite={canWrite && selected.permissions.canWrite}
+              busy={busy}
+              onBusy={setBusy}
+              onOpenParty={async (ref) => {
+                setOrganizing(false);
+                setJustCreated(false);
+                await openParty(ref);
+              }}
+              onCreatedOrganization={(ctx) => {
+                setSelected(ctx);
+                setSegment("company_account");
+                void loadList(query, "company_account");
+              }}
+              onCancel={() => {
+                setOrganizing(false);
+              }}
+              viewing={selected}
+            />
           ) : (
             <CustomerEditPanel
               context={selected}
@@ -619,14 +684,14 @@ function CreateWizard(props: {
               onClick={() => onChoose("company_account")}
               className="min-h-11 rounded-md border border-border px-4 py-2.5 text-sm font-semibold"
             >
-              Empresa
+              Organización
             </button>
             <button
               type="button"
               onClick={() => onChoose("company_employee")}
               className="min-h-11 rounded-md border border-border px-4 py-2.5 text-sm font-semibold"
             >
-              Empleado de empresa
+              Trabajador
             </button>
           </div>
           <p className="text-xs text-muted-foreground">
@@ -646,11 +711,11 @@ function CreateWizard(props: {
             {partyChoice === "individual"
               ? "Particular"
               : partyChoice === "company_account"
-                ? "Empresa"
-                : "Empleado de empresa"}{" "}
+                ? "Organización"
+                : "Trabajador"}{" "}
             · solo lo imprescindible (EXPERIENCE LAW 001)
             {partyChoice === "company_employee"
-              ? " · vinculación a empresa después (Progressive Completion)"
+              ? " · Empleado de empresa / trabajador · vinculación a organización después (Progressive Completion)"
               : ""}
           </p>
           <label className="sm:col-span-2 block text-xs">

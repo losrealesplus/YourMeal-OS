@@ -60,6 +60,7 @@ Every row must answer: **Does it save tenant time? How much? Which Beta?**
 | Operational Import Pipeline | Very High | High | Registered | One pipeline · many formats · LAW 002 |
 | Quick Create / Quick Repeat | Very High | Medium | Registered / Sprint stories | Last week · last order · template |
 | Order Templates | Very High | Medium | Sprint Epic 2 | Preference templates |
+| **Organization Templates** | High | Medium | Registered · post-CX004 | Org starter packs · not open now · see CX004 |
 | Production Timeline | High | Medium | Sprint Epic 4 | Guide operator · not mere alerts |
 | Preparation Inventory | High | Medium | Sprint Epic 4 | Lots · expiry · consumption |
 | Nutrition Engine | Medium | High | Registered · GM | System calculates macros |
