@@ -44,6 +44,8 @@ type Props = {
   onOpenDelivery: (dayDate: string, deliveryId: string) => void;
   onOpenResponsibility: (dayDate: string, deliveryId?: string) => void;
   onBackToToday: () => void;
+  /** DE006 — open Completion (outcomes · ConfirmDelivery via Facade) */
+  onContinueToCompletion?: (dayDate: string) => void;
 };
 
 function readinessTone(
@@ -62,6 +64,7 @@ export function DeliveryRoutePreparationPanel({
   onOpenDelivery,
   onOpenResponsibility,
   onBackToToday,
+  onContinueToCompletion,
 }: Props) {
   const delivery = useDelivery();
   const order = useOrder();
@@ -453,11 +456,24 @@ export function DeliveryRoutePreparationPanel({
         </button>
         <button
           type="button"
+          className="text-xs underline-offset-2 hover:underline"
+          onClick={() => {
+            if (onContinueToCompletion) {
+              onContinueToCompletion(dayDate);
+              return;
+            }
+            toast.message("Cierre · modo completion en Today's Deliveries");
+          }}
+        >
+          Continuar a Completion
+        </button>
+        <button
+          type="button"
           className="text-xs text-muted-foreground"
           disabled
           title="Future"
         >
-          Notify / Confirm → Future
+          Notify Customer → Future
         </button>
       </div>
 
