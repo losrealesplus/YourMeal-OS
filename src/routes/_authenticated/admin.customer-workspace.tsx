@@ -88,6 +88,7 @@ function CustomerExperiencePage() {
   const [busy, setBusy] = useState(false);
   const [showCompanyForm, setShowCompanyForm] = useState(false);
   const [companyForm, setCompanyForm] = useState<CompanyForm>(emptyCompanyForm);
+  const [quickName, setQuickName] = useState("");
   const caps = identity.permissions.capabilities;
   const canWrite = caps.includes("customers.write");
 
@@ -185,13 +186,19 @@ function CustomerExperiencePage() {
         createCustomerCommand({
           partyKind: "individual",
           mode: "ensure_for_session",
+          displayName: quickName.trim() || null,
         }),
       );
       if (!result.ok) {
         toast.error(result.errors[0]?.message ?? "Create failed");
         return;
       }
-      toast.success("Cliente individual listo para esta sesión");
+      toast.success(
+        quickName.trim()
+          ? `Cliente listo · ${quickName.trim()}`
+          : "Cliente individual listo para esta sesión",
+      );
+      setQuickName("");
       if (result.partyRef) await openParty(result.partyRef);
       await loadList(query, segment);
     } finally {
@@ -276,13 +283,26 @@ function CustomerExperiencePage() {
   return (
     <div className="animate-fade-in max-w-5xl">
       <SectionTitle
-        overline="Sprint 001 · Epic 1 · Customer Experience"
+        overline="CUSTOMER EXPERIENCE 001 · Experience Sprint"
         title="Clientes"
-        subtitle="Crear, buscar y segmentar sin pensar en la base de datos. Solo CustomerFacade."
+        subtitle="¿Cómo conseguimos que un operador dé de alta un cliente en menos de 30 segundos?"
       />
 
+      <div className="mb-4 rounded-md border border-foreground/20 bg-foreground/[0.03] px-4 py-3">
+        <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+          Objetivo de tiempo
+        </p>
+        <p className="text-sm font-semibold text-foreground">
+          Alta y gestión frecuente &lt; 30 segundos
+        </p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Observation Sprint con Isabella: después de la cadena de Experiences
+          usable (LAW 001-A). Este sprint solo construye.
+        </p>
+      </div>
+
       <AdminHeader
-        goal="Alta y mantenimiento de demand parties con menos fricción"
+        goal="Alta y mantenimiento de demand parties en menos de 30s"
         capability="customers.read / customers.write"
         object="Individual · Company · Company Employee (tags)"
       />
@@ -294,7 +314,7 @@ function CustomerExperiencePage() {
           Ready: {customer.isReady ? "yes" : "no"}
         </p>
         <p className="mt-2 text-xs text-muted-foreground">
-          Hybrid track: no sustituye la sesión de observación con Isabella.{" "}
+          Experience Sprint · no Observation Sprint.{" "}
           <Link
             to="/admin/customers"
             className="underline underline-offset-2 hover:text-foreground"
@@ -328,20 +348,37 @@ function CustomerExperiencePage() {
         ))}
       </div>
 
-      <div className="mb-4 flex flex-wrap gap-2">
+      <div className="mb-4 flex flex-wrap items-end gap-2">
+        <label className="min-w-[12rem] flex-1 text-xs">
+          <span className="mb-1 block text-muted-foreground">
+            Nombre rápido (opcional)
+          </span>
+          <input
+            value={quickName}
+            onChange={(e) => setQuickName(e.target.value)}
+            placeholder="Ej. Juan Pérez"
+            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                void onEnsureSession();
+              }
+            }}
+          />
+        </label>
         <button
           type="button"
           disabled={!customer.isReady || busy || !canWrite}
           onClick={() => void onEnsureSession()}
-          className="rounded-md bg-foreground px-3 py-1.5 text-xs font-semibold text-background disabled:opacity-40"
+          className="rounded-md bg-foreground px-3 py-2 text-xs font-semibold text-background disabled:opacity-40"
         >
-          Asegurar cliente de sesión
+          Alta rápida individual
         </button>
         <button
           type="button"
           disabled={!canWrite || busy}
           onClick={() => setShowCompanyForm((v) => !v)}
-          className="rounded-md border border-border px-3 py-1.5 text-xs font-semibold disabled:opacity-40"
+          className="rounded-md border border-border px-3 py-2 text-xs font-semibold disabled:opacity-40"
         >
           {showCompanyForm ? "Cerrar alta empresa" : "Nueva empresa"}
         </button>
@@ -349,9 +386,9 @@ function CustomerExperiencePage() {
           type="button"
           disabled={busy}
           onClick={() => void loadList(query, segment)}
-          className="rounded-md border border-border px-3 py-1.5 text-xs font-semibold"
+          className="rounded-md border border-border px-3 py-2 text-xs font-semibold"
         >
-          Actualizar lista
+          Actualizar
         </button>
       </div>
 

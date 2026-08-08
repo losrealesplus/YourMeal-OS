@@ -61,7 +61,7 @@ describe("TENANT-SUCCESS-001 Observation Framework", () => {
     expect(adr).toContain("OBSERVATION_FRAMEWORK");
 
     expect(playbook).toContain("OBSERVATION_FRAMEWORK");
-    expect(sprint).toContain("Epic 0");
-    expect(sprint).toContain("hybrid");
+    expect(sprint).toContain("CUSTOMER_EXPERIENCE_001");
+    expect(sprint).toContain("LAW 001-A");
   });
 });

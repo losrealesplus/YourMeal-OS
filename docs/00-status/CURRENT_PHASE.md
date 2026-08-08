@@ -2,9 +2,11 @@
 
 **Última actualización:** 2026-08-07  
 **Acta de eras:** [ERA_DECLARATION](./ERA_DECLARATION.md) · ADR [0091](../adr/0091-era-declaration.md) · **Era 1 CLOSED · Era 2 OPEN**  
-**Discovery:** [ERA2_PRODUCT_DISCOVERY_001](./ERA2_PRODUCT_DISCOVERY_001.md) · **Sprint:** [SPRINT_001_TENANT_SUCCESS](./SPRINT_001_TENANT_SUCCESS.md)  
+**Active Experience:** ▶ **[CUSTOMER_EXPERIENCE_001](./CUSTOMER_EXPERIENCE_001.md)** · alta/gestión **&lt; 30s**  
+**Sprint board:** [SPRINT_001_TENANT_SUCCESS](./SPRINT_001_TENANT_SUCCESS.md)  
+**Observation instrument (sessions deferred · LAW 001-A):** [OBSERVATION_FRAMEWORK](../tenant-success/OBSERVATION_FRAMEWORK.md) · ADR [0096](../adr/0096-tenant-success-law-001a.md)  
 **Institutional:** [OPERATIONAL_ENGINE_V1](./OPERATIONAL_ENGINE_V1.md) · **Construction COMPLETE**  
-**Playbook:** [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md) · Operational Evidence Loop  
+**Playbook:** [TENANT_SUCCESS_PLAYBOOK](./TENANT_SUCCESS_PLAYBOOK.md)  
 **Prompt:** [ERA2_CURSOR_PROMPT](./ERA2_CURSOR_PROMPT.md)  
 **No sustituye** [MILESTONES](./MILESTONES.md) — tablero de “dónde estamos ahora”.
 
@@ -13,38 +15,30 @@
 YOURMEAL OS · CURRENT GATE
 ═══════════════════════════════════════════════
 
-ERA 1 · Build the Engine    ✅ COMPLETE (ERA_DECLARATION · ADR 0091)
-Operational Engine v1.0     ✅ DECLARED (OPERATIONAL-ENGINE-001)
-Architecture                ✅ FROZEN
+ERA 1 · Build the Engine    ✅ COMPLETE
+Operational Engine v1.0     ✅ DECLARED · Architecture FROZEN
 
 ERA 2 · Return Time         ▶ OPEN
-Sprint 001 · Tenant Success ▶ ACTIVE (hybrid)
-  · Epic 0 Observation Framework  ▶ TENANT-SUCCESS-001
-  · Epic 1 Customer Experience    ▶ PARALLEL (Facade UI)
-Primary Product Focus       Observe first · develop known daily jobs in parallel
-Identity                    Operational First
+Sprint type                 Experience Sprint (not Observation)
+Active                      CUSTOMER EXPERIENCE 001
+Metric                      Alta/gestión cliente < 30 seconds
+
+Observation Framework       ✅ READY (instrument)
+Isabella / Sara sessions    ⏸ After usable Experience chain (LAW 001-A)
 
 Laws
-  · PRODUCT LAW 001
-  · PRODUCT LAW 002 (ADR 0093) — reuse existing knowledge
-  · TENANT SUCCESS LAW 001 (ADR 0092)
-  · TEAM LAW 001 (ADR 0094)
+  · PRODUCT LAW 001 · 002
+  · TENANT SUCCESS LAW 001 · 001-A (ADR 0096)
+  · TEAM LAW 001
 
-First question
-  · ¿Dónde pierde tiempo Isabella hoy?
-
-Instrument
-  · docs/tenant-success/OBSERVATION_FRAMEWORK.md
+Roadmap
+  Framework → Customer → Order → Menu → Production
+  → Kitchen → Delivery → Android → OPPO → Dogfood
+  → Isabella Observation → Sara → Backlog
 
 Do not open yet
-  · Operational Capture · Import Pipeline · AI · Nutrition Engine
-  · Orders/Menus as “evidence-complete” without sessions
-
-Next measurements
-  · Isabella Observation Session
-  · Tiempo recuperado (evidence-guided backlog)
-  · Beta = Discover Friction
-  · Field / Cross-platform
+  · Isabella Observation
+  · Operational Capture · Import Pipeline · AI
 ```
 
 ---

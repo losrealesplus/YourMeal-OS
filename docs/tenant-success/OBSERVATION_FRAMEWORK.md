@@ -3,9 +3,10 @@
 **Track:** TENANT-SUCCESS-001  
 **Status:** ▶ **ACTIVE** — permanent Era 2 methodology  
 **Declared:** 2026-08-07  
-**Laws:** PRODUCT LAW 001 · PRODUCT LAW 002 · TENANT SUCCESS LAW 001 · TEAM LAW 001  
+**Laws:** PRODUCT LAW 001 · PRODUCT LAW 002 · TENANT SUCCESS LAW 001 · **001-A** · TEAM LAW 001  
 **Playbook:** [TENANT_SUCCESS_PLAYBOOK](../00-status/TENANT_SUCCESS_PLAYBOOK.md)  
-**Companions:** [TENANT_OBSERVATION_TEMPLATE](./TENANT_OBSERVATION_TEMPLATE.md) · [FRICTION_CATALOG](./FRICTION_CATALOG.md) · [TIME_SAVINGS_SCORE](./TIME_SAVINGS_SCORE.md)
+**Companions:** [TENANT_OBSERVATION_TEMPLATE](./TENANT_OBSERVATION_TEMPLATE.md) · [FRICTION_CATALOG](./FRICTION_CATALOG.md) · [TIME_SAVINGS_SCORE](./TIME_SAVINGS_SCORE.md)  
+**ADR:** [0095](../adr/0095-tenant-success-001-observation-framework.md) · [0096](../adr/0096-tenant-success-law-001a.md) (LAW 001-A)
 
 ```text
 This is not software.
@@ -13,6 +14,9 @@ This is product methodology.
 
 One official question:
 Where does the tenant lose operational time?
+
+LAW 001-A:
+Never observe unfinished workflows.
 ```
 
 ---
@@ -29,17 +33,23 @@ It is **not** a Capability. It does not touch Foundation, Developer Platform, or
 
 ---
 
-## Official sequence (Era 2)
+## Official sequence (Era 2 · corrected)
 
 ```text
-1. Operational Observation Framework     ✅ THIS DOCUMENT
-2. Isabella Observation Session
-3. Sara Observation Session (or next role)
-4. Tenant Success Backlog (evidence-ranked)
-5. Experience sprints (Customer · Order · …)
+1. Operational Observation Framework     ✅ READY (instrument)
+2. Experience chain
+   Customer → Order → Menu → Production → Kitchen → Delivery
+3. Android APK → OPPO → Internal Dogfooding
+4. Isabella Observation Session          ⏸ after usable workflows
+5. Sara Observation Session
+6. Tenant Success Backlog (evidence-ranked)
 ```
 
-Hybrid note (2026-08-07): while sessions are scheduled, Product Core may run a **parallel** Customer Experience track on known daily friction — without claiming observation evidence until sessions are measured (TENANT SUCCESS LAW 001).
+**Experience Sprints** build. **Observation Sprints** learn. Never mixed.
+
+Do **not** observe Isabella on unfinished edit/order/menu paths — that measures missing implementation, not operational friction (TENANT SUCCESS LAW 001-A).
+
+Active now: [CUSTOMER_EXPERIENCE_001](../00-status/CUSTOMER_EXPERIENCE_001.md).
 
 ---
 
