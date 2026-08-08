@@ -30,7 +30,7 @@ describe("PRODUCTION EXPERIENCE 001 · Zero Friction Production Planning", () =>
     clearProductionPlansForTests();
   });
 
-  it("documents TPP · published-week source · Experience-only · Card In Progress", () => {
+  it("documents TPP · published-week source · Experience-only · Card READY WITH IMPROVEMENTS", () => {
     const doc = readFileSync(
       resolve(ROOT, "docs/00-status/PRODUCTION_EXPERIENCE_001.md"),
       "utf8",
@@ -64,12 +64,12 @@ describe("PRODUCTION EXPERIENCE 001 · Zero Friction Production Planning", () =>
     expect(cards).toContain("001 Production Planning");
     expect(cards).toContain("Zero Friction Production Planning");
     expect(cards).toContain("Time-to-Prepare-Production-Plan <10 min");
-    expect(cards).toContain("In Progress");
+    expect(cards).toContain("READY WITH IMPROVEMENTS");
 
     expect(missions).toContain("PRODUCTION-EXPERIENCE-001");
     expect(missions).toContain("TPP <10 min");
     expect(missions).toContain("PE001 Production Planning ✅");
-    expect(missions).toContain("PRODUCTION-EXPERIENCE-006");
+    expect(missions).toContain("PRODUCTION-EXPERIENCE-REVIEW");
 
     expect(ui).toContain("PRODUCTION EXPERIENCE 001");
     expect(ui).toContain("ProductionPlanningPanel");
