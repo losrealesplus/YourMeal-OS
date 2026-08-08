@@ -1,6 +1,6 @@
 # MENU EXPERIENCE 002 · Zero Friction Menu Search
 
-**Status:** ▶ **IN PROGRESS**  
+**Status:** ✅ **COMPLETE** (superseded as active by ME003 · surface retained)  
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/menu-planning` (mode **search**)  
@@ -87,8 +87,8 @@ No matching planning element → **Crear menú / semana** · **Duplicar semana a
 
 ```text
 001 Weekly Planning         ✅
-002 Menu Search             ▶ THIS
-003 Menu Edit
+002 Menu Search             ✅
+003 Weekly Adaptation       ▶
 004 Dish Library Integration
 005 Publish & Preview
 ↓

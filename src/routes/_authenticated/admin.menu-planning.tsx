@@ -1,5 +1,5 @@
 /**
- * MENU EXPERIENCE · Weekly Planning · Search (001–002)
+ * MENU EXPERIENCE · Planning · Search · Adaptation (001–003)
  *
  * Temporal hierarchy: Week → Day → Menu → Dishes.
  * Experience working set in session; OP-001 WeeklyMenuService for seed/publish when durable.
@@ -23,19 +23,21 @@ import {
   type DurableMenuSeed,
 } from "@/menu-experience/MenuPlanningPanel";
 import { MenuSearchPanel } from "@/menu-experience/MenuSearchPanel";
+import { MenuAdaptationPanel } from "@/menu-experience/MenuAdaptationPanel";
 import {
   activeSlots,
   createEmptyWeek,
   duplicateWeekPlan,
   getWeekPlan,
   listWeekPlans,
+  markPublished,
   mondayIso,
   nextWeekStart,
   prevWeekStart,
   type WeekPlan,
 } from "@/menu-experience/week-plan";
 
-type ExperienceMode = "search" | "planning";
+type ExperienceMode = "search" | "planning" | "adapt";
 
 export const Route = createFileRoute("/_authenticated/admin/menu-planning")({
   beforeLoad: ({ context }) => {
@@ -44,7 +46,9 @@ export const Route = createFileRoute("/_authenticated/admin/menu-planning")({
   component: MenuPlanningExperiencePage,
   validateSearch: (search: Record<string, unknown>) => ({
     mode:
-      search.mode === "planning" || search.mode === "search"
+      search.mode === "planning" ||
+      search.mode === "search" ||
+      search.mode === "adapt"
         ? (search.mode as ExperienceMode)
         : ("search" as const),
     weekStart:
@@ -53,12 +57,13 @@ export const Route = createFileRoute("/_authenticated/admin/menu-planning")({
   head: () => ({
     meta: [
       {
-        title: "YourMeal OS — Menu Experience · Search · Weekly Planning",
+        title:
+          "YourMeal OS — Menu Experience · Adaptation · Search · Planning",
       },
       {
         name: "description",
         content:
-          "MENU EXPERIENCE 002 Search · 001 Weekly Planning · Week → Day → Menu → Dishes",
+          "MENU EXPERIENCE 003 Adaptation · 002 Search · 001 Weekly Planning",
       },
     ],
   }),
@@ -94,10 +99,12 @@ function MenuPlanningExperiencePage() {
   const navigate = Route.useNavigate();
 
   const [mode, setMode] = useState<ExperienceMode>(
-    searchParams.mode === "planning" ? "planning" : "search",
+    searchParams.mode === "planning" || searchParams.mode === "adapt"
+      ? searchParams.mode
+      : "search",
   );
   const [focusWeekStart, setFocusWeekStart] = useState<string | null>(
-    searchParams.weekStart ?? null,
+    searchParams.weekStart ?? mondayIso(),
   );
   const [startInPreview, setStartInPreview] = useState(false);
   const [focusNonce, setFocusNonce] = useState(0);
@@ -184,6 +191,13 @@ function MenuPlanningExperiencePage() {
     goMode("planning", weekStart);
   }
 
+  function openAdapt(weekStart: string) {
+    setFocusWeekStart(weekStart);
+    setStartInPreview(false);
+    setFocusNonce((n) => n + 1);
+    goMode("adapt", weekStart);
+  }
+
   function resolveSource(weekStart: string): WeekPlan | null {
     const session = getWeekPlan(weekStart);
     if (session) return session;
@@ -216,8 +230,8 @@ function MenuPlanningExperiencePage() {
       targetWeekStart: target,
       sourceMenuId: source.durableMenuId ?? source.sourceMenuId,
     });
-    toast.success("Semana duplicada — edita solo los cambios");
-    openWeek(target);
+    toast.success("Semana duplicada — adapta solo los cambios");
+    openAdapt(target);
   }
 
   function createWeek() {
@@ -232,12 +246,12 @@ function MenuPlanningExperiencePage() {
 
   async function publishDurable(plan: WeekPlan) {
     if (!user || !tenantId) {
-      return { ok: false, message: "Sin sesión" };
+      return { ok: false as const, message: "Sin sesión" };
     }
     const slots = activeSlots(plan);
     if (slots.some((s) => s.dishId.startsWith("exp:"))) {
       return {
-        ok: false,
+        ok: false as const,
         message: "Hay platos de conversación — publicación solo en sesión",
       };
     }
@@ -263,37 +277,58 @@ function MenuPlanningExperiencePage() {
         });
       }
       const published = await WeeklyMenuService.publish(ctx, draft.id);
-      return { ok: true, menuId: published.id };
+      return { ok: true as const, menuId: published.id };
     } catch (e) {
       return {
-        ok: false,
+        ok: false as const,
         message: e instanceof Error ? e.message : String(e),
       };
     }
   }
 
+  async function publishAdaptation(plan: WeekPlan) {
+    const result = await publishDurable(plan);
+    if (result.ok) {
+      markPublished(plan.weekStart, "published_durable", result.menuId);
+      toast.success("Adaptación publicada");
+      return;
+    }
+    markPublished(plan.weekStart, "published_session");
+    toast.success(result.message ?? "Adaptación lista (sesión)");
+  }
+
+  const week = focusWeekStart ?? mondayIso();
+
   return (
     <div className="animate-fade-in mx-auto max-w-3xl pb-24">
       <SectionTitle
         overline={
-          mode === "search"
-            ? "MENU EXPERIENCE 002 · Phase 002 Search"
-            : "MENU EXPERIENCE 001 · Phase 001 Weekly Planning"
+          mode === "adapt"
+            ? "MENU EXPERIENCE 003 · Phase 003 Weekly Adaptation"
+            : mode === "search"
+              ? "MENU EXPERIENCE 002 · Phase 002 Search"
+              : "MENU EXPERIENCE 001 · Phase 001 Weekly Planning"
         }
         title={
-          mode === "search"
-            ? "Zero Friction Menu Search"
-            : "Zero Friction Weekly Menu Planning"
+          mode === "adapt"
+            ? "Zero Friction Weekly Adaptation"
+            : mode === "search"
+              ? "Zero Friction Menu Search"
+              : "Zero Friction Weekly Menu Planning"
         }
         subtitle={
-          mode === "search"
-            ? "Encuentra cualquier elemento de la planificación en segundos"
-            : "Duplica la semana anterior · adapta los cambios · publica · sigue"
+          mode === "adapt"
+            ? "Ajusta la planificación viva — sin reconstruir la semana"
+            : mode === "search"
+              ? "Encuentra cualquier elemento de la planificación en segundos"
+              : "Duplica la semana anterior · adapta los cambios · publica · sigue"
         }
       />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        {mode === "search" ? (
+        {mode === "adapt" ? (
+          <StatusChip tone="warning" label="TTAW < 5 min" />
+        ) : mode === "search" ? (
           <StatusChip tone="warning" label="TTFM < 10 s" />
         ) : (
           <StatusChip tone="warning" label="TTWM < 10 min" />
@@ -309,9 +344,16 @@ function MenuPlanningExperiencePage() {
         <button
           type="button"
           className="text-xs underline-offset-2 hover:underline"
-          onClick={() => goMode("planning", focusWeekStart ?? mondayIso())}
+          onClick={() => goMode("planning", week)}
         >
           Planificación
+        </button>
+        <button
+          type="button"
+          className="text-xs underline-offset-2 hover:underline"
+          onClick={() => goMode("adapt", week)}
+        >
+          Adaptación
         </button>
         <Link
           to="/admin/menus"
@@ -334,12 +376,14 @@ function MenuPlanningExperiencePage() {
 
       <AdminHeader
         goal={
-          mode === "search"
-            ? "Encontrar cualquier elemento de planificación en <10s"
-            : "Preparar el menú semanal en <10 min sin empezar desde cero"
+          mode === "adapt"
+            ? "Adaptar la planificación semanal en <5 min sin reconstruirla"
+            : mode === "search"
+              ? "Encontrar cualquier elemento de planificación en <10s"
+              : "Preparar el menú semanal en <10 min sin empezar desde cero"
         }
         capability="menus.read / menus.write"
-        object="Weekly timeline · search · duplicate · preview · session honesty"
+        object="Weekly adaptation · search · planning · session honesty"
       />
 
       {loading ? (
@@ -349,13 +393,25 @@ function MenuPlanningExperiencePage() {
           durableMenus={durableMenus}
           canWrite={canWrite}
           onOpenWeek={(weekStart) => openWeek(weekStart, false)}
+          onAdaptWeek={openAdapt}
           onDuplicateWeek={duplicateWeek}
           onPreviewWeek={(weekStart) => openWeek(weekStart, true)}
           onCreateWeek={createWeek}
         />
+      ) : mode === "adapt" ? (
+        <MenuAdaptationPanel
+          key={`adapt-${week}-${focusNonce}`}
+          canWrite={canWrite}
+          weekStart={week}
+          durableMenus={durableMenus}
+          dishPicks={dishPicks}
+          onPreview={() => openWeek(week, true)}
+          onPublish={publishAdaptation}
+          onBackToSearch={() => goMode("search")}
+        />
       ) : (
         <MenuPlanningPanel
-          key={`${focusWeekStart ?? "current"}-${focusNonce}`}
+          key={`${week}-${focusNonce}`}
           canWrite={canWrite}
           durableMenus={durableMenus}
           dishPicks={dishPicks}

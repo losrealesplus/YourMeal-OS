@@ -59,8 +59,9 @@ describe("MENU EXPERIENCE 002 · Zero Friction Menu Search", () => {
     expect(cards).toContain("In Progress");
 
     expect(missions).toContain("MENU-EXPERIENCE-002");
+    expect(missions).toContain("MENU-EXPERIENCE-003");
     expect(missions).toContain("TTFM <10s");
-    expect(missions).toContain("ME002 Search ▶");
+    expect(missions).toContain("ME002 Search ✅");
 
     expect(ui).toContain("MENU EXPERIENCE 002");
     expect(ui).toContain("MenuSearchPanel");

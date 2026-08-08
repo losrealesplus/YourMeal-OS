@@ -33,6 +33,7 @@ type Props = {
   durableMenus: DurableMenuSeed[];
   canWrite: boolean;
   onOpenWeek: (weekStart: string) => void;
+  onAdaptWeek: (weekStart: string) => void;
   onDuplicateWeek: (weekStart: string) => void;
   onPreviewWeek: (weekStart: string) => void;
   onCreateWeek: () => void;
@@ -216,6 +217,7 @@ export function MenuSearchPanel({
   durableMenus,
   canWrite,
   onOpenWeek,
+  onAdaptWeek,
   onDuplicateWeek,
   onPreviewWeek,
   onCreateWeek,
@@ -430,10 +432,10 @@ export function MenuSearchPanel({
             <button
               type="button"
               disabled={!canWrite}
-              onClick={() => onOpenWeek(selected.weekStart)}
+              onClick={() => onAdaptWeek(selected.weekStart)}
               className="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-4 text-sm disabled:opacity-40"
             >
-              Editar
+              Adaptar
             </button>
             <button
               type="button"

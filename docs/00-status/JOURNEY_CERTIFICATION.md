@@ -54,7 +54,7 @@ Verdicts that authorize certification: **READY** or **READY WITH IMPROVEMENTS**.
 |---------|--------|--------|-------|
 | **Customer Journey** | ✅ **Certified** | [CUSTOMER_EXPERIENCE_REVIEW](./CUSTOMER_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · Frozen |
 | **Order Journey** | ✅ **Certified** | [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · Frozen |
-| **Menu Journey** | ⏳ In progress (ME002) | — | Timeline Semana → Día → Menú → Platos |
+| **Menu Journey** | ⏳ In progress (ME003) | — | Timeline Semana → Día → Menú → Platos · Adaptation |
 | **Production Journey** | ⏳ Pending | — | After Menu |
 | **Kitchen Journey** | ⏳ Pending | — | After Production |
 | **Delivery Journey** | ⏳ Pending | — | After Kitchen |
@@ -63,7 +63,7 @@ Verdicts that authorize certification: **READY** or **READY WITH IMPROVEMENTS**.
 ```text
 Customer Journey      ✅ Certified
 Order Journey         ✅ Certified
-Menu Journey          ⏳ ME002 Search (ME001 ✅)
+Menu Journey          ⏳ ME003 Weekly Adaptation (ME001–002 ✅)
 Production Journey    ⏳
 Kitchen Journey       ⏳
 Delivery Journey      ⏳
@@ -85,7 +85,7 @@ Semana → Día → Menú → Platos
 ```
 
 ```text
-001 Weekly Planning → 002 Search → 003 Edit → 004 Dish Library → 005 Publish & Preview
+001 Weekly Planning → 002 Search → 003 Weekly Adaptation → 004 Dish Library → 005 Publish & Preview
 ```
 
 ---
