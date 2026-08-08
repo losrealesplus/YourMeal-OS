@@ -56,19 +56,17 @@ Verdicts that authorize certification: **READY** or **READY WITH IMPROVEMENTS**.
 | **Order Journey** | ✅ **Certified** | [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · Frozen |
 | **Menu Journey** | ✅ **Certified** | [MENU_EXPERIENCE_005](./MENU_EXPERIENCE_005.md) | ME001–005 · published week handoff |
 | **Production Journey** | ✅ **Certified** | [PRODUCTION_JOURNEY_CERTIFICATION](../tenant-success/PRODUCTION_JOURNEY_CERTIFICATION.md) · [Review](../tenant-success/PRODUCTION_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · **Frozen** · PE001–006 |
-| **Kitchen Journey** | ⏳ Review complete · Certification next | [KITCHEN_EXPERIENCE_REVIEW](../tenant-success/KITCHEN_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · KE001–006 ✅ |
-| **Delivery Journey** | ⏳ Pending | — | After Kitchen |
+| **Kitchen Journey** | ✅ **Certified** | [KITCHEN_JOURNEY_CERTIFICATION](../tenant-success/KITCHEN_JOURNEY_CERTIFICATION.md) · [Review](../tenant-success/KITCHEN_EXPERIENCE_REVIEW.md) | READY WITH IMPROVEMENTS · **Frozen** · KE001–006 |
+| **Delivery Journey** | ⏳ Pending (eligible) | — | After Kitchen Freeze |
 | **Operational Journey** | ⏳ Pending | — | Cross-domain review after Delivery |
 
 ```text
-Customer Journey      ✅ Certified
-Order Journey         ✅ Certified
-Customer Journey      ✅ Certified
-Order Journey         ✅ Certified
+Customer Journey      ✅ Certified · Frozen
+Order Journey         ✅ Certified · Frozen
 Menu Journey          ✅ Certified
 Production Journey    ✅ Certified · Frozen
-Kitchen Journey       ⏳ Review ✅ READY WITH IMPROVEMENTS → Certification next
-Delivery Journey      ⏳
+Kitchen Journey       ✅ Certified · Frozen
+Delivery Journey      ⏳ NEXT (eligible)
 ↓
 Operational Journey Review
 ↓
@@ -81,7 +79,8 @@ Operational Accelerators
 
 Menu Experience is structured by the **weekly operational cycle**, not CRUD.  
 Production Experience transforms the **published week** into work — not order admin.  
-Kitchen Experience executes transferred work — it does not re-plan Production.
+Kitchen Experience executes transferred work — it does not re-plan Production.  
+Kitchen Journey is **Certified and Frozen** — Delivery Experience 001 is eligible.
 
 ```text
 MENU
@@ -100,7 +99,7 @@ See [OPERATIONAL_LIBRARIES](./OPERATIONAL_LIBRARIES.md) · [PRODUCTION_JOURNEY_C
 ```text
 Menu: 001 → 002 → 003 → 004 → 005 ✅ Certified
 Production: 001–006 ✅ → Review ✅ → Certification ✅ CERTIFIED · Frozen
-Kitchen: 001 Today's Work ✅ → 002 Search ▶ → 003 … 006 → Review → Certification → Freeze
+Kitchen: 001–006 ✅ → Review ✅ → Certification ✅ CERTIFIED · Frozen
 ```
 
 ---
@@ -118,6 +117,8 @@ Kitchen: 001 Today's Work ✅ → 002 Search ▶ → 003 … 006 → Review → 
 ## Related
 
 * [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)  
+* [KITCHEN_JOURNEY_CERTIFICATION](../tenant-success/KITCHEN_JOURNEY_CERTIFICATION.md)  
+* [KITCHEN_EXPERIENCE_REVIEW](../tenant-success/KITCHEN_EXPERIENCE_REVIEW.md)  
 * [PRODUCTION_JOURNEY_CERTIFICATION](../tenant-success/PRODUCTION_JOURNEY_CERTIFICATION.md)  
 * [PRODUCTION_EXPERIENCE_REVIEW](../tenant-success/PRODUCTION_EXPERIENCE_REVIEW.md)  
 * [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md)  

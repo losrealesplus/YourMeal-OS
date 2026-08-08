@@ -356,11 +356,11 @@ Kitchen Experience
 ↓
 Review                      ✅ THIS DOCUMENT · READY WITH IMPROVEMENTS
 ↓
-Journey Certification       ◀ NEXT
+Journey Certification       ✅ [KITCHEN_JOURNEY_CERTIFICATION](./KITCHEN_JOURNEY_CERTIFICATION.md) · CERTIFIED
 ↓
-Freeze Kitchen Experience
+Freeze Kitchen Experience   ✅
 ↓
-DELIVERY EXPERIENCE         ← eligible after Kitchen Freeze
+DELIVERY EXPERIENCE 001     ← eligible
 ```
 
 ---
@@ -370,7 +370,7 @@ DELIVERY EXPERIENCE         ← eligible after Kitchen Freeze
 Until Observation Sprint (or explicit Product reopen):
 
 * ❌ No new Kitchen Experience missions  
-* ❌ No Delivery Experience until Kitchen Freeze (unless Product sequences otherwise)  
+* ✅ Delivery Experience 001 eligible after Kitchen Freeze (this Certification)  
 * ❌ No OCC / Bulk / Import / Quick Capture under Kitchen  
 * ❌ No Capability / Facade / Engine changes “for Kitchen polish”  
 * ❌ No automatic open of `CompleteExecutionUnit` from Experience gaps  

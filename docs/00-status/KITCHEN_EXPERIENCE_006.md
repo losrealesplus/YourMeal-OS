@@ -1,6 +1,6 @@
 # KITCHEN EXPERIENCE 006 · Zero Friction Kitchen Completion & Handoff
 
-**Status:** ✅ **COMPLETE** (Kitchen phases complete · Review ✅ · Certification next)  
+**Status:** ✅ **COMPLETE** (Kitchen Journey ✅ CERTIFIED · Frozen · Delivery NEXT eligible)  
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/kitchen-today` (mode **completion**)  

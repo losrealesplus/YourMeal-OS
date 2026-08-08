@@ -180,7 +180,8 @@ Customer Journey       ✅ Certified · Frozen
 Order Journey          ✅ Certified · Frozen
 Menu Journey           ✅ Certified
 Production Journey     ✅ CERTIFIED · Frozen   ← THIS
-Kitchen Journey        ⏳ NEXT (eligible)
+Kitchen Journey        ✅ Certified · Frozen
+Delivery Journey       ⏳ NEXT (eligible)
 Delivery Journey       ⏳
 ```
 

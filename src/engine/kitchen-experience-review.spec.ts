@@ -9,7 +9,7 @@ import { describe, expect, it } from "vitest";
 const ROOT = process.cwd();
 
 describe("KITCHEN EXPERIENCE REVIEW 001 · Readiness Review", () => {
-  it("records READY WITH IMPROVEMENTS · Estimated ≠ Measured · leads to Certification", () => {
+  it("records READY WITH IMPROVEMENTS · Estimated ≠ Measured · Certification complete after Review", () => {
     const review = readFileSync(
       resolve(ROOT, "docs/tenant-success/KITCHEN_EXPERIENCE_REVIEW.md"),
       "utf8",
@@ -42,23 +42,30 @@ describe("KITCHEN EXPERIENCE REVIEW 001 · Readiness Review", () => {
     expect(review).toContain("CompleteExecutionUnit");
     expect(review).toContain("Delivery");
     expect(review).toContain("Journey Certification");
+    expect(review).toContain("KITCHEN_JOURNEY_CERTIFICATION");
+    expect(review).toContain("CERTIFIED");
+    expect(review).toContain("DELIVERY EXPERIENCE 001     ← eligible");
 
     expect(journeys).toContain("READY WITH IMPROVEMENTS");
     expect(journeys).toContain("KITCHEN_EXPERIENCE_REVIEW");
+    expect(journeys).toContain("KITCHEN_JOURNEY_CERTIFICATION");
     expect(journeys).toContain(
-      "Kitchen Journey       ⏳ Review ✅ READY WITH IMPROVEMENTS → Certification next",
+      "Kitchen Journey       ✅ Certified · Frozen",
     );
 
     expect(lifecycle).toContain("Kitchen Review ✅");
     expect(lifecycle).toContain("READY WITH IMPROVEMENTS");
+    expect(lifecycle).toContain("Kitchen Journey ✅ CERTIFIED");
 
     expect(cards).toContain("READY WITH IMPROVEMENTS");
     expect(cards).toContain("KITCHEN_EXPERIENCE_REVIEW");
     expect(cards).toContain("Journey Certification");
-    expect(cards).toContain("◀ NEXT");
+    expect(cards).toContain("Journey Certified · Frozen");
+    expect(cards).toContain("Delivery Experience            ← NEXT (eligible)");
 
     expect(missions).toContain("KITCHEN-EXPERIENCE-REVIEW");
     expect(missions).toContain("READY WITH IMPROVEMENTS");
     expect(missions).toContain("KE006 Completion ✅");
+    expect(missions).toContain("CERTIFIED · FROZEN");
   });
 });

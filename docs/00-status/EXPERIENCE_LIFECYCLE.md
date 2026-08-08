@@ -88,8 +88,8 @@ OCC · Quick Capture · Import · Bulk appeared because friction repeated across
 | Edit / Adapt | CX003 Edit | **OE003 Edit** | **ME003 Weekly Adaptation** |
 | Domain phases | Org · Growth | Templates · Incident | Dish Library ✅ · Publish ✅ |
 | Review | CX Review ✅ | Order Review ✅ | Menu Review ✅ |
-| Journey Certification | Customer Journey ✅ | Order Journey ✅ | Menu Journey ✅ · Production Journey ✅ · Kitchen ⏳ Certification next |
-| Freeze | Customer Frozen | Order Frozen | Menu Freeze · Production Frozen · Kitchen Freeze |
+| Journey Certification | Customer Journey ✅ | Order Journey ✅ | Menu Journey ✅ · Production Journey ✅ · Kitchen Journey ✅ |
+| Freeze | Customer Frozen | Order Frozen | Menu Freeze · Production Frozen · Kitchen Frozen |
 
 | Lifecycle step | Production (physical work) |
 |----------------|----------------------------|
@@ -108,8 +108,8 @@ OCC · Quick Capture · Import · Bulk appeared because friction repeated across
 | Edit / Adapt | **KE003 Execution Adaptation** ✅ |
 | Domain phases | KE004 Labels ✅ · KE005 Progress ✅ · KE006 Completion ✅ |
 | Review | **Kitchen Review ✅** · READY WITH IMPROVEMENTS |
-| Journey Certification | Kitchen Journey ⏳ Certification next |
-| Freeze | Kitchen Freeze (after Certification) |
+| Journey Certification | **Kitchen Journey ✅ CERTIFIED** |
+| Freeze | **Kitchen Frozen** |
 
 Order does **not** need Company or Growth.  
 Order needs **Templates** and **Operational Incident**.  
