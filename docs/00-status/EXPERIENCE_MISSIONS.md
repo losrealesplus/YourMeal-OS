@@ -1,6 +1,6 @@
 # Experience Missions (Era 2)
 
-**Status:** ▶ **ACTIVE** — **PRODUCTION EXPERIENCE 002** Production Search  
+**Status:** ▶ **ACTIVE** — **PRODUCTION EXPERIENCE 003** Production Adaptation  
 
 
 **Declared:** 2026-08-07  
@@ -28,7 +28,7 @@ A great Experience is invisible.
 | **Customer** | Zero Friction (001–005) · includes **CUSTOMER_EXPERIENCE_005** Growth | Create <30s · Find <10s · Edit <20s · Org <45s · enriquecer < 30s | ✅ **Frozen** · Journey Certified |
 | **Order** | Zero Friction Capture · Search · Edit · Templates · Incident (001–005) | TTO <45s · TTFO <10s · TTEO <20s · Reuse <10s · TTRI <30s | ✅ **Frozen** · Journey Certified |
 | **Menu** | Zero Friction Planning · Search · Adaptation · Dish Library · Publish (001–005) | TTWM <10 min · TTFM <10s · TTAW <5 min · TTFID <15s · TTRP <5 min | ✅ **Certified** |
-| **Production** | Zero Friction Production Planning · Search (001…) | TPP <10 min · TTFPW <10s | ▶ **002 Production Search** |
+| **Production** | Zero Friction Planning · Search · Adaptation (001…) | TPP <10 min · TTFPW <10s · TAPP <5 min | ▶ **003 Production Adaptation** |
 | **Kitchen** | Know what to execute | &lt; 10s | Planned |
 | **Delivery** | Prepare today's routes | &lt; 2 min | Planned |
 
@@ -117,12 +117,12 @@ Temporal model: **Semana → Día → Menú → Platos**
 
 ## Active mission
 
-▶ **PRODUCTION-EXPERIENCE-002** · Zero Friction Production Search  
-Surface: `/admin/production-planning` · mode **search** · [PRODUCTION_EXPERIENCE_002](./PRODUCTION_EXPERIENCE_002.md)  
-PE001 ✅ · [PRODUCTION_EXPERIENCE_001](./PRODUCTION_EXPERIENCE_001.md)
+▶ **PRODUCTION-EXPERIENCE-003** · Zero Friction Production Adaptation  
+Surface: `/admin/production-planning` · mode **adapt** · [PRODUCTION_EXPERIENCE_003](./PRODUCTION_EXPERIENCE_003.md)  
+PE001–002 ✅ · [002](./PRODUCTION_EXPERIENCE_002.md) · [001](./PRODUCTION_EXPERIENCE_001.md)
 
 ```text
-PE001 Production Planning ✅ → PE002 Search ▶ → PE003 Adaptation → PE004 Pre-Preparations → PE005 Alerts → PE006 Kitchen Handoff → Review → Journey Certification → Freeze
+PE001 Production Planning ✅ → PE002 Search ✅ → PE003 Adaptation ▶ → PE004 Pre-Preparations → PE005 Alerts → PE006 Kitchen Handoff → Review → Journey Certification → Freeze
 ```
 
 Temporal model: **Semana → Día → Trabajo → Cantidad → Deadline → Kitchen**  
@@ -130,7 +130,7 @@ Source: published operational week (never invent from incomplete Menu).
 Menu: ✅ Certified · [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)  
 Order: frozen · [ORDER_EXPERIENCE_REVIEW](./ORDER_EXPERIENCE_REVIEW.md)  
 Customer: frozen · [OPERATIONAL_LIBRARIES](./OPERATIONAL_LIBRARIES.md)  
-Historical ids: **PRODUCTION-EXPERIENCE-001** (complete) · **MENU-EXPERIENCE-001** · **MENU-EXPERIENCE-002** · **MENU-EXPERIENCE-003** · **MENU-EXPERIENCE-004** · **MENU-EXPERIENCE-005** · **PRODUCTION EXPERIENCE** active
+Historical ids: **PRODUCTION-EXPERIENCE-001** · **PRODUCTION-EXPERIENCE-002** (complete) · **MENU-EXPERIENCE-001** · **MENU-EXPERIENCE-002** · **MENU-EXPERIENCE-003** · **MENU-EXPERIENCE-004** · **MENU-EXPERIENCE-005** · **PRODUCTION EXPERIENCE** active
 
 ---
 
@@ -143,7 +143,7 @@ Order Experience        ✅ MVP · Reviewed · Journey Certified · Frozen
 ↓
 Menu Experience         ✅ MVP · Journey Certified
 ↓
-Production Experience   ▶ 002 Search (001 ✅)
+Production Experience   ▶ 003 Adaptation (001–002 ✅)
 ↓
 Kitchen Experience
 ↓
@@ -169,6 +169,7 @@ Operational Accelerators
 
 * [EXPERIENCE_LIFECYCLE](./EXPERIENCE_LIFECYCLE.md)  
 * [JOURNEY_CERTIFICATION](./JOURNEY_CERTIFICATION.md)  
+* [PRODUCTION_EXPERIENCE_003](./PRODUCTION_EXPERIENCE_003.md)  
 * [PRODUCTION_EXPERIENCE_002](./PRODUCTION_EXPERIENCE_002.md)  
 * [PRODUCTION_EXPERIENCE_001](./PRODUCTION_EXPERIENCE_001.md)  
 * [MENU_EXPERIENCE_005](./MENU_EXPERIENCE_005.md)  
