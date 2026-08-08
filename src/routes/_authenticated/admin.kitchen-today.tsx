@@ -1,6 +1,6 @@
 /**
- * KITCHEN EXPERIENCE 001 · Zero Friction Kitchen Execution
- * Today's Work — receive Production Handoff · understand · execute clarity
+ * KITCHEN EXPERIENCE 001 · 002
+ * Today's Work · Execution Search
  *
  * Experience only — no Kitchen / Production Capability · Facade · Engine changes.
  * Start / Pause / Resume / Block / Assign → Future.
@@ -11,8 +11,15 @@ import { useState } from "react";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { AdminHeader, SectionTitle, StatusChip } from "@/components/admin";
 import { useCan } from "@/hooks/use-can";
+import { KitchenSearchPanel } from "@/kitchen-experience/KitchenSearchPanel";
 import { KitchenTodayPanel } from "@/kitchen-experience/KitchenTodayPanel";
 import { utcDateOnly } from "@/menu-experience/week-plan";
+
+type ExperienceMode = "today" | "search";
+
+function isExperienceMode(value: unknown): value is ExperienceMode {
+  return value === "today" || value === "search";
+}
 
 export const Route = createFileRoute("/_authenticated/admin/kitchen-today")({
   beforeLoad: ({ context }) => {
@@ -20,17 +27,19 @@ export const Route = createFileRoute("/_authenticated/admin/kitchen-today")({
   },
   component: KitchenTodayExperiencePage,
   validateSearch: (search: Record<string, unknown>) => ({
+    mode: isExperienceMode(search.mode) ? search.mode : ("today" as const),
     day: typeof search.day === "string" ? search.day : undefined,
+    workId: typeof search.workId === "string" ? search.workId : undefined,
   }),
   head: () => ({
     meta: [
       {
-        title: "YourMeal OS — Kitchen Experience · Today's Work",
+        title: "YourMeal OS — Kitchen Experience · Search · Today's Work",
       },
       {
         name: "description",
         content:
-          "KITCHEN EXPERIENCE 001 Zero Friction Kitchen Execution · TTUKW <10s",
+          "KITCHEN EXPERIENCE 002 Execution Search · 001 Today's Work · TTFEW <10s",
       },
     ],
   }),
@@ -40,20 +49,74 @@ function KitchenTodayExperiencePage() {
   const { can } = useCan();
   const canWrite = can("kitchen.operate");
   const searchParams = Route.useSearch();
-  const [dayDate] = useState(searchParams.day ?? utcDateOnly());
+  const navigate = Route.useNavigate();
+
+  const [mode, setMode] = useState<ExperienceMode>(() =>
+    isExperienceMode(searchParams.mode) ? searchParams.mode : "today",
+  );
+  const [dayDate, setDayDate] = useState(
+    searchParams.day ?? utcDateOnly(),
+  );
+  const [focusWorkId, setFocusWorkId] = useState<string | null>(
+    searchParams.workId ?? null,
+  );
+
+  function goMode(next: ExperienceMode, day?: string, workId?: string) {
+    setMode(next);
+    if (day) setDayDate(day);
+    if (workId !== undefined) setFocusWorkId(workId || null);
+    void navigate({
+      to: "/admin/kitchen-today",
+      search: {
+        mode: next,
+        day: day ?? dayDate,
+        workId: workId || undefined,
+      },
+    });
+  }
 
   return (
     <div className="animate-fade-in mx-auto max-w-3xl pb-24">
       <SectionTitle
-        overline="KITCHEN EXPERIENCE 001 · Today's Work"
-        title="Zero Friction Kitchen Execution"
-        subtitle="Recibe el handoff — entiende qué ejecutar ahora"
+        overline={
+          mode === "search"
+            ? "KITCHEN EXPERIENCE 002 · Execution Search"
+            : "KITCHEN EXPERIENCE 001 · Today's Work"
+        }
+        title={
+          mode === "search"
+            ? "Zero Friction Kitchen Execution Search"
+            : "Zero Friction Kitchen Execution"
+        }
+        subtitle={
+          mode === "search"
+            ? "Encuentra trabajo de ejecución sin salir del contexto"
+            : "Recibe el handoff — entiende qué ejecutar ahora"
+        }
       />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        <StatusChip tone="warning" label="TTUKW < 10 s" />
+        {mode === "search" ? (
+          <StatusChip tone="warning" label="TTFEW < 10 s" />
+        ) : (
+          <StatusChip tone="warning" label="TTUKW < 10 s" />
+        )}
         <StatusChip tone="info" label="Handoff → Ejecución" />
         <StatusChip tone="info" label="Experience only" />
+        <button
+          type="button"
+          className="text-xs underline-offset-2 hover:underline"
+          onClick={() => goMode("today", dayDate)}
+        >
+          Today's Work
+        </button>
+        <button
+          type="button"
+          className="text-xs underline-offset-2 hover:underline"
+          onClick={() => goMode("search", dayDate)}
+        >
+          Búsqueda
+        </button>
         <Link
           to="/admin/production-planning"
           search={{ mode: "handoff", weekStart: undefined }}
@@ -77,12 +140,28 @@ function KitchenTodayExperiencePage() {
       </div>
 
       <AdminHeader
-        goal="Entender el trabajo de cocina de hoy en <10s"
+        goal={
+          mode === "search"
+            ? "Encontrar trabajo de ejecución en <10s"
+            : "Entender el trabajo de cocina de hoy en <10s"
+        }
         capability="kitchen.operate · production handoff (read)"
-        object="Today's work · execution cards · session honesty · no Capability Start"
+        object="Execution search · today's work · session honesty · no Capability Start"
       />
 
-      <KitchenTodayPanel canWrite={canWrite} dayDate={dayDate} />
+      {mode === "search" ? (
+        <KitchenSearchPanel
+          dayDate={dayDate}
+          onOpenWork={(day, workId) => goMode("today", day, workId)}
+          onBackToToday={() => goMode("today", dayDate)}
+        />
+      ) : (
+        <KitchenTodayPanel
+          canWrite={canWrite}
+          dayDate={dayDate}
+          focusWorkId={focusWorkId}
+        />
+      )}
     </div>
   );
 }

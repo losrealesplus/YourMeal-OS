@@ -360,22 +360,24 @@ Name
 Kitchen Experience
 
 Phase
-001 Today's Work
+002 Execution Search
 
 Mission
-Zero Friction Kitchen Execution
+Zero Friction Kitchen Execution Search
 
 Primary User
 Kitchen Operator
 
 Primary KPI
-Time-to-Understand-Kitchen-Work <10 s
+Time-to-Find-Execution-Work <10 s
 
 Secondary KPIs
+Time-to-Understand-Kitchen-Work <10 s
 Time-to-Start-Execution <2 min
 
 Operational Time Saved
 Estimated
+Find execution work ≈ 20–80 s
 Understand kitchen work ≈ 50–170 s
 Observation pending
 
@@ -383,13 +385,13 @@ Status
 In Progress
 ```
 
-Detail: [KITCHEN_EXPERIENCE_001](./KITCHEN_EXPERIENCE_001.md) · Surface `/admin/kitchen-today` · Input: Production Handoff (Ready / Ready with warnings)  
+Detail: [KITCHEN_EXPERIENCE_002](./KITCHEN_EXPERIENCE_002.md) · [001 Today's Work · Zero Friction Kitchen Execution](./KITCHEN_EXPERIENCE_001.md) · Surface `/admin/kitchen-today` · Input: Production Handoff  
 
 **Sequence (daily execution — not Production planning):**
 
 ```text
-001 Today's Work               ▶ In Progress
-002 Execution Search
+001 Today's Work               ✅
+002 Execution Search           ▶ In Progress
 003 Execution Adaptation
 004 Labels & Special Info
 005 Execution Progress
@@ -400,14 +402,14 @@ Review → Journey Certification → Freeze
 
 | Phase | Question | Status |
 |-------|----------|--------|
-| 001 | ¿Sé qué ejecutar ahora en &lt;10s? | ▶ |
-| 002 | ¿Encuentro cualquier trabajo de cocina rápido? | Planned |
+| 001 | ¿Sé qué ejecutar ahora en &lt;10s? | ✅ |
+| 002 | ¿Encuentro cualquier trabajo de ejecución en &lt;10s? | ▶ |
 | 003 | ¿Adapto la ejecución del día sin replanificar Production? | Planned |
 | 004 | ¿Veo etiquetas e info especial a tiempo? | Planned |
 | 005 | ¿Sigo el progreso sin Capability inventada? | Planned |
 | 006 | ¿Cierro y entrego el día con claridad? | Planned |
 
-Kitchen executes transferred work — does not re-plan Production.
+Kitchen executes transferred work — does not re-plan Production. Search never becomes Order/Menu/Production planning.
 
 ---
 

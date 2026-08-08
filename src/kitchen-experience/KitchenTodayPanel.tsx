@@ -5,7 +5,7 @@
  * Start / Pause / Resume / Block / Assign → Future (Capability).
  */
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { StatusChip } from "@/components/admin";
@@ -28,6 +28,8 @@ import { cn } from "@/lib/utils";
 type Props = {
   canWrite: boolean;
   dayDate?: string | null;
+  /** Open detail when arriving from Execution Search. */
+  focusWorkId?: string | null;
 };
 
 function statusTone(
@@ -39,11 +41,15 @@ function statusTone(
   return "neutral";
 }
 
-export function KitchenTodayPanel({ canWrite, dayDate: focusDay }: Props) {
+export function KitchenTodayPanel({
+  canWrite,
+  dayDate: focusDay,
+  focusWorkId = null,
+}: Props) {
   const [tick, setTick] = useState(0);
   const [dayDate, setDayDate] = useState(focusDay ?? utcDateOnly());
   const [filter, setFilter] = useState<KitchenWorkFilter>("all");
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [openId, setOpenId] = useState<string | null>(focusWorkId);
 
   const view = useMemo(() => {
     void tick;
@@ -54,6 +60,10 @@ export function KitchenTodayPanel({ canWrite, dayDate: focusDay }: Props) {
     () => filterKitchenCards(view.cards, filter),
     [view.cards, filter],
   );
+
+  useEffect(() => {
+    if (focusWorkId) setOpenId(focusWorkId);
+  }, [focusWorkId]);
 
   function refresh() {
     setTick((n) => n + 1);
