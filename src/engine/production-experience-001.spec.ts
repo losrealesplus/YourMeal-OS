@@ -69,7 +69,7 @@ describe("PRODUCTION EXPERIENCE 001 · Zero Friction Production Planning", () =>
     expect(missions).toContain("PRODUCTION-EXPERIENCE-001");
     expect(missions).toContain("TPP <10 min");
     expect(missions).toContain("PE001 Production Planning ✅");
-    expect(missions).toContain("PRODUCTION-EXPERIENCE-002");
+    expect(missions).toContain("PRODUCTION-EXPERIENCE-003");
 
     expect(ui).toContain("PRODUCTION EXPERIENCE 001");
     expect(ui).toContain("ProductionPlanningPanel");

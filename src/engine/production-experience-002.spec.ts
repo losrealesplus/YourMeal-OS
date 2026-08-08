@@ -66,7 +66,8 @@ describe("PRODUCTION EXPERIENCE 002 · Zero Friction Production Search", () => {
 
     expect(missions).toContain("PRODUCTION-EXPERIENCE-002");
     expect(missions).toContain("TTFPW <10s");
-    expect(missions).toContain("PE002 Search ▶");
+    expect(missions).toContain("PE002 Search ✅");
+    expect(missions).toContain("PRODUCTION-EXPERIENCE-003");
 
     expect(ui).toContain("PRODUCTION EXPERIENCE 002");
     expect(ui).toContain("ProductionSearchPanel");

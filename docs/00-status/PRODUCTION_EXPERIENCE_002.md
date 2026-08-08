@@ -1,6 +1,6 @@
 # PRODUCTION EXPERIENCE 002 · Zero Friction Production Search
 
-**Status:** ▶ **IN PROGRESS**  
+**Status:** ✅ **COMPLETE** (superseded as active by PE003 · surface retained)  
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
 **Surface:** `/admin/production-planning` (mode **search**)  
@@ -84,8 +84,8 @@ Primary: **Open Production Planning** · **Open Menu Planning**
 
 ```text
 001 Production Planning        ✅
-002 Production Search          ▶ THIS
-003 Production Adaptation
+002 Production Search          ✅
+003 Production Adaptation      ▶ next
 004 Pre-Preparations
 005 Alerts & Deadlines
 006 Kitchen Handoff

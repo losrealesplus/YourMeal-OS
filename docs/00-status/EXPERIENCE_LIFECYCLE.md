@@ -94,8 +94,8 @@ OCC · Quick Capture · Import · Bulk appeared because friction repeated across
 | Lifecycle step | Production (physical work) |
 |----------------|----------------------------|
 | Create / Capture | **PE001 Production Planning** ✅ |
-| Search | **PE002 Production Search** |
-| Edit / Adapt | PE003 Production Adaptation |
+| Search | **PE002 Production Search** ✅ |
+| Edit / Adapt | **PE003 Production Adaptation** |
 | Domain phases | Pre-Preparations · Alerts & Deadlines · Kitchen Handoff |
 | Review | Production Review |
 | Journey Certification | Production Journey |
