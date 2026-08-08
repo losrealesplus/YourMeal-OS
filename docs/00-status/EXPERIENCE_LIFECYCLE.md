@@ -118,8 +118,8 @@ OCC · Quick Capture · Import · Bulk appeared because friction repeated across
 | Edit / Adapt | **DE003 Delivery Adaptation** ✅ |
 | Domain phases | DE004 Responsibility ✅ · DE005 Route Preparation ✅ · DE006 Completion ✅ |
 | Review | **Delivery Review ✅** · READY WITH IMPROVEMENTS |
-| Journey Certification | Pending ← NEXT |
-| Freeze | Pending |
+| Journey Certification | **Delivery Journey ✅ CERTIFIED** |
+| Freeze | **Delivery Frozen** |
 
 Order does **not** need Company or Growth.  
 Order needs **Templates** and **Operational Incident**.  

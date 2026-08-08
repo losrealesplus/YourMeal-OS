@@ -181,7 +181,7 @@ Order Journey          ✅ Certified · Frozen
 Menu Journey           ✅ Certified
 Production Journey     ✅ CERTIFIED · Frozen   ← THIS
 Kitchen Journey        ✅ Certified · Frozen
-Delivery Journey       ⏳ Review ✅ READY WITH IMPROVEMENTS (DE001–006 ✅) · Certification ▶
+Delivery Journey       ✅ Certified · Frozen
 Delivery Journey       ⏳
 ```
 
