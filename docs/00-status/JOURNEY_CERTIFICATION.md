@@ -63,8 +63,6 @@ Verdicts that authorize certification: **READY** or **READY WITH IMPROVEMENTS**.
 ```text
 Customer Journey      ✅ Certified
 Order Journey         ✅ Certified
-Customer Journey      ✅ Certified
-Order Journey         ✅ Certified
 Menu Journey          ✅ Certified
 Production Journey    ✅ Certified · Frozen
 Kitchen Journey       ⏳ Review ✅ READY WITH IMPROVEMENTS → Certification next
