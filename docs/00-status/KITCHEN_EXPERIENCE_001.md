@@ -1,9 +1,9 @@
 # KITCHEN EXPERIENCE 001 · Zero Friction Kitchen Execution
 
-**Status:** ▶ **IN PROGRESS**  
+**Status:** ✅ **COMPLETE** (superseded as active by KE002 · surface retained)  
 **Declared:** 2026-08-08  
 **Era:** 2 · Return Time  
-**Surface:** `/admin/kitchen-today`  
+**Surface:** `/admin/kitchen-today` (mode **today**)  
 **Card:** [EXPERIENCE_CARDS](./EXPERIENCE_CARDS.md) · Kitchen · Phase **001 Today's Work**  
 **Laws:** PRODUCT LAW 001 · EXPERIENCE LAW 001 · EXPERIENCE MANIFESTO 001 · TENANT SUCCESS 001 / 001-A  
 
@@ -94,8 +94,8 @@ Next: Review Production Handoff · Review Production.
 ## Sequence
 
 ```text
-001 Today's Work               ▶ THIS
-002 Execution Search
+001 Today's Work               ✅ THIS (complete)
+002 Execution Search           ▶ next
 003 Execution Adaptation
 004 Labels & Special Info
 005 Execution Progress

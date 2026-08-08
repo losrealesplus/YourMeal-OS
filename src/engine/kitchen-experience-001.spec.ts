@@ -36,7 +36,7 @@ describe("KITCHEN EXPERIENCE 001 · Zero Friction Kitchen Execution", () => {
     clearKitchenWorkStatusForTests();
   });
 
-  it("documents TTUKW · handoff receive · Experience-only · Card In Progress", () => {
+  it("documents TTUKW · handoff receive · Experience-only · Card READY WITH IMPROVEMENTS path", () => {
     const doc = readFileSync(
       resolve(ROOT, "docs/00-status/KITCHEN_EXPERIENCE_001.md"),
       "utf8",
@@ -73,8 +73,9 @@ describe("KITCHEN EXPERIENCE 001 · Zero Friction Kitchen Execution", () => {
     expect(cards).toContain("In Progress");
 
     expect(missions).toContain("KITCHEN-EXPERIENCE-001");
+    expect(missions).toContain("KITCHEN-EXPERIENCE-002");
     expect(missions).toContain("TTUKW <10s");
-    expect(missions).toContain("KE001 Today's Work ▶");
+    expect(missions).toContain("KE001 Today's Work ✅");
 
     expect(ui).toContain("KITCHEN EXPERIENCE 001");
     expect(ui).toContain("KitchenTodayPanel");

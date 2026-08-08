@@ -145,28 +145,21 @@ function isUrgent(deadline: string, dayDate: string, today: string): boolean {
   return due <= today || dayDate === today;
 }
 
-/** Build today's execution queue from Production handoff (Experience). */
-export function buildTodaysKitchenWork(
-  dayDate: string = utcDateOnly(),
-): TodaysKitchenWork {
-  const plans = listProductionPlans();
-  const handedOff = plans.filter((p) => p.status === "ready_for_kitchen");
-  const pending = plans.filter((p) => p.status !== "ready_for_kitchen");
-
-  const warnings: HandoffWarning[] = [];
+/**
+ * All execution cards from Ready-for-Kitchen handoffs.
+ * Optional dayDate filters to that production day (Today's Work).
+ */
+export function listExecutionCards(
+  dayDate?: string | null,
+  today: string = utcDateOnly(),
+): KitchenExecutionCard[] {
+  const handedOff = listHandedOffPlans();
   const cards: KitchenExecutionCard[] = [];
 
   for (const plan of handedOff) {
-    const handoff = buildKitchenHandoff(plan, dayDate);
-    for (const w of handoff.warnings) {
-      if (w.severity === "info") continue;
-      warnings.push({
-        ...w,
-        id: `${plan.weekStart}:${w.id}`,
-      });
-    }
+    const handoff = buildKitchenHandoff(plan, today);
     for (const line of handoff.lines) {
-      if (line.productionDay !== dayDate) continue;
+      if (dayDate && line.productionDay !== dayDate) continue;
       const prepBlocked =
         line.prepStatusSummary === "Bloqueada" ||
         line.prepStatusSummary === "Vencida";
@@ -181,7 +174,8 @@ export function buildTodaysKitchenWork(
         quantityEstimated: line.quantityEstimated,
         batchKey: line.batchKey,
         cookingDeadline: line.cookingDeadline,
-        priority: line.priority === "high" || prepBlocked ? "high" : line.priority,
+        priority:
+          line.priority === "high" || prepBlocked ? "high" : line.priority,
         status,
         requiredPreps: line.requiredPreps,
         prepStatusSummary: line.prepStatusSummary,
@@ -192,7 +186,39 @@ export function buildTodaysKitchenWork(
         orderRef: line.orderRef,
         specialInstruction: line.specialInstruction,
         handoffReady: true,
-        urgent: isUrgent(line.cookingDeadline, line.productionDay, dayDate),
+        urgent: isUrgent(line.cookingDeadline, line.productionDay, today),
+      });
+    }
+  }
+
+  cards.sort(
+    (a, b) =>
+      (a.status === "blocked" ? 0 : 1) - (b.status === "blocked" ? 0 : 1) ||
+      (a.urgent ? 0 : 1) - (b.urgent ? 0 : 1) ||
+      a.cookingDeadline.localeCompare(b.cookingDeadline) ||
+      a.dishLabel.localeCompare(b.dishLabel),
+  );
+  return cards;
+}
+
+/** Build today's execution queue from Production handoff (Experience). */
+export function buildTodaysKitchenWork(
+  dayDate: string = utcDateOnly(),
+): TodaysKitchenWork {
+  const plans = listProductionPlans();
+  const handedOff = plans.filter((p) => p.status === "ready_for_kitchen");
+  const pending = plans.filter((p) => p.status !== "ready_for_kitchen");
+
+  const warnings: HandoffWarning[] = [];
+  const cards = listExecutionCards(dayDate, dayDate);
+
+  for (const plan of handedOff) {
+    const handoff = buildKitchenHandoff(plan, dayDate);
+    for (const w of handoff.warnings) {
+      if (w.severity === "info") continue;
+      warnings.push({
+        ...w,
+        id: `${plan.weekStart}:${w.id}`,
       });
     }
   }
@@ -210,14 +236,6 @@ export function buildTodaysKitchenWork(
       nextAction: "planning",
     });
   }
-
-  cards.sort(
-    (a, b) =>
-      (a.status === "blocked" ? 0 : 1) - (b.status === "blocked" ? 0 : 1) ||
-      (a.urgent ? 0 : 1) - (b.urgent ? 0 : 1) ||
-      a.cookingDeadline.localeCompare(b.cookingDeadline) ||
-      a.dishLabel.localeCompare(b.dishLabel),
-  );
 
   let emptyReason: string | null = null;
   let nextActionHint = "Revisa la cola y abre el trabajo prioritario.";
