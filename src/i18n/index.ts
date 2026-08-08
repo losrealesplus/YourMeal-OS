@@ -28,7 +28,7 @@ if (!i18n.isInitialized) {
       ns: ["common", "auth", "customer", "admin", "branding"],
       interpolation: { escapeValue: false },
       // Sync resource store for first paint (Capacitor SPA has no SSR HTML).
-      initImmediate: true,
+      initAsync: false,
       react: { useSuspense: false },
       detection: {
         // Language persistence goes through StorageProvider (M-04), not localStorage.
