@@ -49,7 +49,7 @@ describe("PRODUCTION JOURNEY CERTIFICATION 001", () => {
     expect(journeys).toContain("✅ **Certified**");
     expect(journeys).toContain("PRODUCTION_JOURNEY_CERTIFICATION");
     expect(journeys).toContain(
-      "Kitchen Journey       ⏳ KE006 Completion (KE001–005 ✅)",
+      "Kitchen Journey       ⏳ Review ✅ READY WITH IMPROVEMENTS → Certification next",
     );
 
     expect(lifecycle).toContain("Production Journey ✅ CERTIFIED");
@@ -57,7 +57,9 @@ describe("PRODUCTION JOURNEY CERTIFICATION 001", () => {
 
     expect(cards).toContain("Journey Certified · Frozen");
     expect(cards).toContain("CERTIFIED");
-    expect(cards).toContain("Kitchen Experience             ← NEXT (eligible)");
+    expect(cards).toContain(
+      "Kitchen Experience             ✅ Review · READY WITH IMPROVEMENTS → Certification next",
+    );
     expect(cards).toContain("READY WITH IMPROVEMENTS");
 
     expect(missions).toContain("PRODUCTION JOURNEY CERTIFIED");
