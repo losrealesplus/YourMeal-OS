@@ -1412,6 +1412,7 @@ export type Database = {
           created_at: string
           currency: string | null
           id: string
+          join_code: string | null
           locale_default: string
           name: string
           slug: string
@@ -1434,6 +1435,7 @@ export type Database = {
           created_at?: string
           currency?: string | null
           id?: string
+          join_code?: string | null
           locale_default?: string
           name: string
           slug: string
@@ -1456,6 +1458,7 @@ export type Database = {
           created_at?: string
           currency?: string | null
           id?: string
+          join_code?: string | null
           locale_default?: string
           name?: string
           slug?: string
@@ -1675,6 +1678,10 @@ export type Database = {
         }
         Returns: string
       }
+      generate_tenant_join_code: {
+        Args: { p_tenant_id: string }
+        Returns: string
+      }
       ensure_platform_owner_for_user: {
         Args: { _user_id: string }
         Returns: Json
@@ -1704,6 +1711,10 @@ export type Database = {
           p_tenant_id: string
         }
         Returns: string
+      }
+      resolve_tenant_join_code: {
+        Args: { p_code: string }
+        Returns: Json
       }
     }
     Enums: {

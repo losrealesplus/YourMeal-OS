@@ -26,7 +26,7 @@
     "doctor:info": "node scripts/developer/index.mjs --verbose",
     "doctor:env": "node scripts/development/index.mjs",
     "doctor:env:json": "node scripts/development/index.mjs --json",
-    "test:doctor:unit": "node --test scripts/developer/*.spec.mjs scripts/development/*.spec.mjs scripts/rls-company-employees-recursion-static.spec.mjs",
+    "test:doctor:unit": "node --test scripts/developer/*.spec.mjs scripts/development/*.spec.mjs scripts/rls-company-employees-recursion-static.spec.mjs scripts/tenant-join-code-static.spec.mjs",
     "test": "vitest run && npm run test:doctor:unit",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
