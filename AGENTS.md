@@ -150,6 +150,84 @@ Hito: ORR PASSED → Ready for FOV → FOV-001
 
 Conflictos con `.lovable/plan.md` → **gana `docs/`**.
 
+## SOURCE OF TRUTH & CHANGE PERSISTENCE
+
+> **Zero Lost Changes.** Si un cambio no está en Git (commit identificable en el workspace local o en `origin`), **no existe** para la cadena de desarrollo ni para validación en dispositivo.
+
+### Fuente física de verdad
+
+1. El workspace Mac `~/Developer/YourMeal-OS` es la **fuente física de verdad** para desarrollo y device validation (OPPO, Android, iPhone, iOS Simulator).
+2. Ninguna implementación se considera **device-ready** hasta existir en el working tree local asociado a un **commit Git identificable**.
+3. Trabajo solo en VM cloud, Cursor Cloud Agent, worktree remoto, artifact remoto o texto de conversación → **NO DISPONIBLE LOCALMENTE**. No inventar ni reconstruir en silencio.
+
+### LOCAL ↔ CLOUD
+
+```text
+CLOUD (análisis / arquitectura / paralelo)
+   ↓
+GitHub (branch + commit + push)
+   ↓
+MAC LOCAL (pull / checkout)
+   ↓
+tests + build
+   ↓
+OPPO / iPhone (mismo commit trazable)
+   ↓
+observación real → evidencia → CLOUD
+```
+
+GitHub es el puente. Nunca asumir que una sesión conoce cambios no sincronizados vía Git.
+
+### Ramas y `main`
+
+- **No trabajar directamente sobre `main`.** Cada unidad de trabajo usa `cursor/<descriptive-name>`.
+- `main` no recibe commit directo, push directo, merge automático, force push ni reset destructivo.
+- El **merge a `main` es decisión humana explícita** (review / PR).
+
+### Cierre de unidad de trabajo (Nivel 1 — Checkpoint)
+
+**No** hacer `git add .` → commit → push en cada edición parcial.
+
+Al **completar** una unidad de trabajo:
+
+1. Ejecutar validaciones aplicables (`typecheck` / `tests` / `build` / mobile según el alcance).
+2. Revisar `git status` y `git diff` — excluir cambios ajenos, secretos y artifacts.
+3. Crear **commit descriptivo** solo con archivos de la unidad.
+4. **Push** de la rama a `origin`.
+5. Crear o actualizar **PR** (un nivel — [PR_CHANGE_LEVELS](./docs/22-implementation/PR_CHANGE_LEVELS.md)).
+6. **NO** merge a `main`.
+7. Reportar: branch · SHA · push · URL del PR · resultado de validación.
+
+Prioridad: **CORRECTNESS > TRACEABILITY > VALIDATION > PERSISTENCE > SPEED**.
+
+### Device build identity
+
+Antes de generar APK / IPA:
+
+- Git branch + Git commit SHA
+
+Después:
+
+- Build command · timestamp · artifact path · **SHA256** · applicationId / bundle ID · dispositivo
+
+Nunca instalar un artefacto cuya procedencia/commit no se pueda demostrar. Misma comparación Android ↔ iOS → **mismo commit**.
+
+### Cambios no committeados
+
+Si `git status` muestra `M` / `??` / `A` / `D`: reportarlos; no asumir basura.  
+Sin autorización explícita: **prohibido** `git reset --hard`, `git clean -fd`, `git checkout .` destructivo.
+
+### Reglas permanentes (persistencia)
+
+1. Local Mac workspace = fuente física de verdad para device validation.
+2. Sin presencia en Git local identificable → no device testing.
+3. Toda unidad de implementación completada **debe** quedar committeada.
+4. Toda rama committeada de una unidad **debe** pushearse a `origin`.
+5. `main` nunca se modifica directamente.
+6. Device builds reportan: commit SHA · branch · timestamp · artifact SHA256.
+7. Cambios uncommitted se reportan explícitamente.
+8. Trabajo cloud/remoto **nunca** se trata como device-ready hasta sincronizar al workspace local vía Git (o transferencia explícita del artifact + registro de SHA).
+
 ## Reglas permanentes (extracto)
 
 - Canónico: g, ml, km, °C, UTC, decimal  
@@ -162,6 +240,7 @@ Conflictos con `.lovable/plan.md` → **gana `docs/`**.
 - Tras v0.1.0: cambio arquitectónico = ADR  
 - AI / offline: no implementar aún  
 - Cierre de jornada incluye Diario  
+- **Zero Lost Changes** — ver [SOURCE OF TRUTH & CHANGE PERSISTENCE](#source-of-truth--change-persistence)  
 
 ## Enlaces
 
