@@ -10,6 +10,7 @@
  */
 
 import { CustomerDirectoryService } from "@/modules/customer-directory";
+import type { IndividualCustomerRecord } from "@/modules/customer-directory";
 import { CompanyAccountService } from "@/modules/company-account";
 import type { ServiceContext } from "@/services/types";
 import type {
@@ -112,6 +113,8 @@ export class CustomerFacade {
     try {
       if (command.partyKind === "individual") {
         if (command.mode === "staff_create") {
+          // CREATE success = write success (OPPO MVP-01.1: INSERT ok must not
+          // become ok:false because a secondary listIndividuals read-back fails).
           const id = await this.deps.directory.createIndividualStaff(
             resolved.ctx,
             {
@@ -122,16 +125,30 @@ export class CustomerFacade {
             },
           );
           const partyRef: PartyRef = { kind: "individual", id };
-          const got = await this.getCustomer(identity, {
-            type: "GetCustomer",
-            partyRef,
-          });
-          return {
-            ok: got.ok,
-            partyRef,
-            context: got.context,
-            errors: got.errors,
+          const permissions = capabilityBitsFromIdentity(identity);
+          const createdRow: IndividualCustomerRecord = {
+            id,
+            displayName: command.displayName?.trim() || null,
+            email: null,
+            phone: command.phone?.trim() || null,
+            kind: "individual",
+            status: "new",
+            createdAt: new Date().toISOString(),
+            lastOrderAt: null,
+            orderCount: 0,
+            averageTicket: 0,
+            lifetimeTotal: 0,
+            companyId: null,
+            companyName: null,
+            companyCode: null,
+            city: command.city?.trim() || null,
           };
+          const context = buildIndividualContext(
+            createdRow,
+            resolved.ctx.tenantId,
+            permissions,
+          );
+          return { ok: true, partyRef, context, errors: [] };
         }
 
         const displayName =

@@ -183,6 +183,132 @@ describe("CustomerFacade", () => {
     expect(result.partyRef).toEqual({ kind: "individual", id: "c1" });
   });
 
+  it("staff_create succeeds when createIndividualStaff returns an id", async () => {
+    const createIndividualStaff = vi.fn(async () => "c-new");
+    const listIndividuals = vi.fn(async () => {
+      throw new Error("listIndividuals must not determine CREATE success");
+    });
+    const facade = new CustomerFacade({
+      resolveContext: async () => ({ ok: true, ctx: ctx() }),
+      directory: {
+        createIndividualStaff,
+        listIndividuals,
+        listCompanies: vi.fn(async () => []),
+      } as never,
+      companyAccount: {} as never,
+    });
+
+    const result = await facade.createCustomer(
+      identity(),
+      createCustomerCommand({
+        partyKind: "individual",
+        mode: "staff_create",
+        displayName: "Nuevo Cliente",
+        phone: "+34611111111",
+        city: "Madrid",
+      }),
+    );
+
+    expect(createIndividualStaff).toHaveBeenCalledOnce();
+    expect(listIndividuals).not.toHaveBeenCalled();
+    expect(result.ok).toBe(true);
+    expect(result.partyRef).toEqual({ kind: "individual", id: "c-new" });
+    expect(result.context?.summary.displayName).toBe("Nuevo Cliente");
+    expect(result.errors).toEqual([]);
+  });
+
+  it("staff_create remains ok:true when getCustomer/listIndividuals would fail", async () => {
+    // Regression: OPPO MVP-01.1 — INSERT success must not become UI failure via read-back.
+    const createIndividualStaff = vi.fn(async () => "c-persisted");
+    const listIndividuals = vi.fn(async () => {
+      throw new Error("simulated listIndividuals failure");
+    });
+    const facade = new CustomerFacade({
+      resolveContext: async () => ({ ok: true, ctx: ctx() }),
+      directory: {
+        createIndividualStaff,
+        listIndividuals,
+        listCompanies: vi.fn(async () => []),
+      } as never,
+      companyAccount: {} as never,
+    });
+
+    const createResult = await facade.createCustomer(
+      identity(),
+      createCustomerCommand({
+        partyKind: "individual",
+        mode: "staff_create",
+        displayName: "Cliente Persistido",
+      }),
+    );
+
+    expect(createResult.ok).toBe(true);
+    expect(createResult.partyRef?.id).toBe("c-persisted");
+
+    const readBack = await facade.getCustomer(
+      identity(),
+      getCustomerQuery({
+        partyRef: { kind: "individual", id: "c-persisted" },
+      }),
+    );
+    expect(readBack.ok).toBe(false);
+    expect(createResult.ok).toBe(true);
+  });
+
+  it("staff_create returns ok:false when createIndividualStaff fails", async () => {
+    const { DomainError } = await import("@/domain/errors");
+    const createIndividualStaff = vi.fn(async () => {
+      throw new DomainError("INVALID_STATE", "Nombre es obligatorio");
+    });
+    const facade = new CustomerFacade({
+      resolveContext: async () => ({ ok: true, ctx: ctx() }),
+      directory: {
+        createIndividualStaff,
+        listIndividuals: vi.fn(async () => []),
+      } as never,
+      companyAccount: {} as never,
+    });
+
+    const result = await facade.createCustomer(
+      identity(),
+      createCustomerCommand({
+        partyKind: "individual",
+        mode: "staff_create",
+        displayName: "X",
+      }),
+    );
+
+    expect(result.ok).toBe(false);
+    expect(result.partyRef == null).toBe(true);
+  });
+
+  it("staff_create returns ok:false on authorization/permission failure", async () => {
+    const { DomainError } = await import("@/domain/errors");
+    const createIndividualStaff = vi.fn(async () => {
+      throw new DomainError("PERMISSION_DENIED", "Missing customers.write");
+    });
+    const facade = new CustomerFacade({
+      resolveContext: async () => ({ ok: true, ctx: ctx() }),
+      directory: {
+        createIndividualStaff,
+        listIndividuals: vi.fn(async () => []),
+      } as never,
+      companyAccount: {} as never,
+    });
+
+    const result = await facade.createCustomer(
+      identity(),
+      createCustomerCommand({
+        partyKind: "individual",
+        mode: "staff_create",
+        displayName: "Sin permiso",
+      }),
+    );
+
+    expect(result.ok).toBe(false);
+    expect(result.errors[0]?.code).toBe("PERMISSION_DENIED");
+  });
+
   it("CreateCustomer company_account provisions via CompanyAccountService", async () => {
     const company: CompanyAccount = {
       id: "co1",
