@@ -1,5 +1,6 @@
 # CURRENT_PHASE
 
+**MVP operativo (construcción):** 🔒 **[MVP_SCOPE_LOCK_001](./MVP_SCOPE_LOCK_001.md)** — Organism MVP · Bulk IN (post-individual) · Work Plan = Hoja · Zero Lost Changes
 **Última actualización:** 2026-08-07  
 **Acta de eras:** [ERA_DECLARATION](./ERA_DECLARATION.md) · ADR [0091](../adr/0091-era-declaration.md) · **Era 1 CLOSED · Era 2 OPEN**  
 **Active Experience:** ▶ **[CUSTOMER_EXPERIENCE_001](./CUSTOMER_EXPERIENCE_001.md)** · alta/gestión **&lt; 30s**  
