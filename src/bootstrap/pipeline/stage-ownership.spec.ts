@@ -24,6 +24,7 @@ vi.mock("./services/SessionBootstrapService", async () => {
         phone: null,
       },
       tenant: { id: "t1", name: "EatClean", slug: "eatclean-tenerife" },
+      membershipStatus: "approved" as const,
     })),
   };
 });

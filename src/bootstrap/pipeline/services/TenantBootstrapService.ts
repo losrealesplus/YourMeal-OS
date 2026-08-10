@@ -12,7 +12,7 @@ export type TenantBootstrapResult = {
 };
 
 export function resolveTenantFromSessionIdentity(
-  data: SessionIdentityData,
+  data: Pick<SessionIdentityData, "tenant">,
 ): TenantBootstrapResult {
   const tenant = data.tenant;
   return {

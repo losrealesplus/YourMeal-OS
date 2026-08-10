@@ -326,12 +326,17 @@ function EmailForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [joinCode, setJoinCode] = useState("");
   const [busy, setBusy] = useState(false);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (mode === "signup" && password.length < 6) {
       toast.error(t("auth:passwordTooWeak"));
+      return;
+    }
+    if (mode === "signup" && !joinCode.trim()) {
+      toast.error(t("auth:joinCodeRequired", { defaultValue: "Join code required" }));
       return;
     }
     setBusy(true);
@@ -388,6 +393,30 @@ function EmailForm() {
             hasSession: Boolean(data.session),
             source: "signUp",
           });
+
+          // Phase 2.2 — associate with EXISTING tenant via join code (pending).
+          const { supabase } = await import("@/integrations/supabase/client");
+          const { TenantJoinCodeService } = await import(
+            "@/modules/tenant-association/application/tenant-join-code-service"
+          );
+          const association = await TenantJoinCodeService.requestAssociation(
+            supabase,
+            joinCode,
+          );
+          logPostLoginStep("TENANT_ASSOCIATION", {
+            userId: uid,
+            status: association.status,
+            created: association.created,
+          });
+          if (association.status === "pending") {
+            toast.success(
+              t("auth:membershipPending", {
+                defaultValue:
+                  "Account created. Waiting for tenant approval before menu and orders unlock.",
+              }),
+            );
+          }
+
           await goHome(navigate, uid, "canonical_auth_response");
           return;
         }
@@ -428,6 +457,18 @@ function EmailForm() {
           placeholder={t("auth:fullName")}
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
+          className={cn(authInputClass, "!pl-4")}
+        />
+      ) : null}
+      {mode === "signup" ? (
+        <input
+          required
+          placeholder={t("auth:joinCode", {
+            defaultValue: "Tenant join code (TJ-…)",
+          })}
+          value={joinCode}
+          onChange={(e) => setJoinCode(e.target.value)}
+          autoComplete="off"
           className={cn(authInputClass, "!pl-4")}
         />
       ) : null}
