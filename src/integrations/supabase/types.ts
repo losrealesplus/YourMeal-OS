@@ -1716,6 +1716,10 @@ export type Database = {
         Args: { p_code: string }
         Returns: Json
       }
+      request_tenant_association_by_join_code: {
+        Args: { p_code: string }
+        Returns: Json
+      }
     }
     Enums: {
       app_role:

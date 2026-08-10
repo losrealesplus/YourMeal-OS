@@ -71,4 +71,40 @@ describe("TenantJoinCodeService", () => {
     );
     expect(code).toBe("TJ-ABCDEF12");
   });
+
+  it("requests pending association via join code without client tenant_id", async () => {
+    const supabase = mockRpc(async (fn, args) => {
+      expect(fn).toBe("request_tenant_association_by_join_code");
+      expect(args).toEqual({ p_code: "TJ-A1B2C3D4" });
+      expect("p_tenant_id" in args).toBe(false);
+      expect("tenant_id" in args).toBe(false);
+      return {
+        data: {
+          tenant_id: "11111111-1111-4111-8111-111111111111",
+          display_name: "EatClean",
+          membership_id: "33333333-3333-4333-8333-333333333333",
+          status: "pending",
+          created: true,
+        },
+        error: null,
+      };
+    });
+    const result = await TenantJoinCodeService.requestAssociation(
+      supabase as never,
+      "tj-a1b2c3d4",
+    );
+    expect(result.status).toBe("pending");
+    expect(result.created).toBe(true);
+    expect(result.tenantId).toBe("11111111-1111-4111-8111-111111111111");
+  });
+
+  it("rejects invalid join code for association without RPC", async () => {
+    const supabase = mockRpc(async () => {
+      throw new Error("rpc must not be called");
+    });
+    await expect(
+      TenantJoinCodeService.requestAssociation(supabase as never, "EC-0431"),
+    ).rejects.toThrow(/Invalid join code format/);
+    expect(supabase.rpc).not.toHaveBeenCalled();
+  });
 });

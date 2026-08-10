@@ -1,7 +1,7 @@
 /**
- * Phase 2.1 — tenant_join_code application contract.
+ * Phase 2.1 / 2.2 — tenant_join_code application contract.
  *
- * Resolution is server-authoritative via RPC.
+ * Resolution and association are server-authoritative via RPC.
  * Client-supplied tenant_id is never used as resolution input.
  */
 
@@ -13,13 +13,17 @@ import {
   parseResolvedTenantJoinPayload,
   type ResolvedTenantJoin,
 } from "../domain/tenant-join-code";
+import {
+  parseTenantAssociationPayload,
+  type TenantAssociationResult,
+} from "../domain/tenant-association";
 
 type RpcClient = Pick<SupabaseClient, "rpc">;
 
 export const TenantJoinCodeService = {
   /**
    * Resolve a join code to the minimum tenant identity.
-   * Does not create membership (Phase 2.2).
+   * Does not create membership.
    */
   async resolve(
     supabase: RpcClient,
@@ -42,6 +46,35 @@ export const TenantJoinCodeService = {
       return parseResolvedTenantJoinPayload(data);
     } catch {
       throw new DomainError("INVALID_STATE", "Join code resolution failed");
+    }
+  },
+
+  /**
+   * Phase 2.2 — associate authenticated user with EXISTING tenant via join code.
+   * Creates pending membership only (P2-DEC-002 / ADR 0018). Never creates a Tenant.
+   */
+  async requestAssociation(
+    supabase: RpcClient,
+    code: string,
+  ): Promise<TenantAssociationResult> {
+    if (!isValidTenantJoinCodeFormat(code)) {
+      throw new DomainError("INVALID_STATE", "Invalid join code format");
+    }
+    const normalized = normalizeTenantJoinCode(code);
+    const { data, error } = await supabase.rpc(
+      "request_tenant_association_by_join_code",
+      { p_code: normalized },
+    );
+    if (error) {
+      throw new DomainError(
+        "INVALID_STATE",
+        error.message || "Tenant association failed",
+      );
+    }
+    try {
+      return parseTenantAssociationPayload(data);
+    } catch {
+      throw new DomainError("INVALID_STATE", "Tenant association failed");
     }
   },
 
