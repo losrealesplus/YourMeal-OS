@@ -578,4 +578,63 @@ export const listProvisioningAudit = createServerFn({ method: "GET" })
     return data ?? [];
   });
 
+// -------- Deployment Registry (Phase 2.3) --------
+
+export const listTenantDeployments = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ tenantId: z.string().uuid() }).parse(d))
+  .handler(async ({ context, data }) => {
+    await assertSaasAdmin(context);
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+    const { data: rows, error } = await supabaseAdmin
+      .from("tenant_deployments")
+      .select(
+        "id, tenant_id, platform, identifier, is_primary, status, created_at, updated_at",
+      )
+      .eq("tenant_id", data.tenantId)
+      .order("platform", { ascending: true });
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+export const upsertTenantDeployment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z
+      .object({
+        tenantId: z.string().uuid(),
+        platform: z.enum(["android", "ios", "web"]),
+        identifier: z.string().min(1).max(255),
+        isPrimary: z.boolean().optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    await assertSaasAdmin(context);
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+    const { data: row, error } = await supabaseAdmin.rpc(
+      "upsert_tenant_deployment",
+      {
+        p_tenant_id: data.tenantId,
+        p_platform: data.platform,
+        p_identifier: data.identifier.trim(),
+        p_is_primary: data.isPrimary ?? false,
+      },
+    );
+    if (error) throw new Error(error.message);
+    await writeAudit(supabaseAdmin, {
+      tenantId: data.tenantId,
+      actorId: context.userId,
+      entityType: "tenant",
+      entityId: data.tenantId,
+      action: "DEPLOYMENT_UPSERT",
+      newData: row as Record<string, unknown>,
+    });
+    return row;
+  });
+
 export { ROLE_CATALOG };

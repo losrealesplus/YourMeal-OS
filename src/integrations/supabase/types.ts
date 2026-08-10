@@ -1288,6 +1288,47 @@ export type Database = {
           },
         ]
       }
+      tenant_deployments: {
+        Row: {
+          id: string
+          tenant_id: string
+          platform: string
+          identifier: string
+          is_primary: boolean
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          tenant_id: string
+          platform: string
+          identifier: string
+          is_primary?: boolean
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          tenant_id?: string
+          platform?: string
+          identifier?: string
+          is_primary?: boolean
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_deployments_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenant_domains: {
         Row: {
           domain: string
@@ -1719,6 +1760,28 @@ export type Database = {
       request_tenant_association_by_join_code: {
         Args: { p_code: string }
         Returns: Json
+      }
+      request_tenant_association_for_deployment: {
+        Args: { p_platform: string; p_identifier: string }
+        Returns: Json
+      }
+      upsert_tenant_deployment: {
+        Args: {
+          p_tenant_id: string
+          p_platform: string
+          p_identifier: string
+          p_is_primary?: boolean
+        }
+        Returns: {
+          id: string
+          tenant_id: string
+          platform: string
+          identifier: string
+          is_primary: boolean
+          status: string
+          created_at: string
+          updated_at: string
+        }
       }
     }
     Enums: {

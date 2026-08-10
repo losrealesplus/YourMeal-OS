@@ -40,6 +40,18 @@ export function createWeeklyMenuRepository(supabase: AppSupabase, tenantId: stri
       return (data ?? []) as WeeklyMenuRow[];
     },
 
+    async getById(id: string): Promise<WeeklyMenuRow | null> {
+      const { data, error } = await supabase
+        .from("weekly_menus")
+        .select("*")
+        .eq("tenant_id", tenantId)
+        .eq("id", id)
+        .is("deleted_at", null)
+        .maybeSingle();
+      if (error) throw error;
+      return data as WeeklyMenuRow | null;
+    },
+
     async findByWeekStart(weekStart: string): Promise<WeeklyMenuRow | null> {
       const { data, error } = await supabase
         .from("weekly_menus")
