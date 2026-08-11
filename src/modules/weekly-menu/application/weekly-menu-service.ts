@@ -11,7 +11,7 @@ import {
   type WeeklyMenuRow,
   type WeeklyMenuSlotWithDish,
 } from "@/modules/weekly-menu/infrastructure/weekly-menu-repository";
-import { utcWeekStartMonday } from "@/modules/weekly-menu/application/week-dates";
+import { utcWeekDates, utcWeekStartMonday, isDayDateInWeek } from "@/modules/weekly-menu/application/week-dates";
 import {
   canComposeWeeklyMenu,
   canPublishWeeklyMenu,
@@ -21,6 +21,16 @@ import { createDishRepository } from "@/modules/dish-library/infrastructure/dish
 async function activeDishCount(ctx: ServiceContext): Promise<number> {
   const dishes = await createDishRepository(ctx.supabase, ctx.tenantId).listActive();
   return dishes.length;
+}
+
+function assertDayDateInWeek(weekStart: string, dayDate: string): void {
+  if (!isDayDateInWeek(weekStart, dayDate)) {
+    const allowed = utcWeekDates(weekStart);
+    throw new DomainError(
+      "INVALID_STATE",
+      `day_date ${dayDate} is outside week_start ${weekStart}..${allowed[6] ?? weekStart}`,
+    );
+  }
 }
 
 export const WeeklyMenuService = {
@@ -75,6 +85,11 @@ export const WeeklyMenuService = {
       throw new DomainError("INVALID_STATE", "Dish is required");
     }
     const repo = createWeeklyMenuRepository(ctx.supabase, ctx.tenantId);
+    const menu = await repo.getById(input.weeklyMenuId);
+    if (!menu) {
+      throw new DomainError("NOT_FOUND", "Weekly menu not found");
+    }
+    assertDayDateInWeek(menu.week_start, input.dayDate);
     const slot = await repo.addSlot(input);
     await AuditService.write(ctx, {
       entityType: "weekly_menu_slot",

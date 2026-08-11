@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { handleAuthCallback } from "@/auth";
 import { AUTH_RESET_PASSWORD_PATH } from "@/auth/urls";
 import { resolveHomePath } from "@/lib/resolve-home-path";
+import { associateDeploymentAfterAuth } from "@/modules/tenant-association/application/associate-deployment-after-auth";
 import { toast } from "sonner";
 import {
   PoweredByLine,
@@ -16,6 +17,7 @@ import { brandConfig } from "@/tenant/brand-config";
  * OAuth / PKCE / email-confirm / password-recovery return — Supabase Auth only.
  * Honors allowlisted `?next=` (PRODUCT-001) so recovery can reach `/reset-password`
  * after `exchangeCodeForSession`.
+ * Phase 2.3: after session, request deployment-bound pending association (no TJ).
  */
 export const Route = createFileRoute("/auth_/callback")({
   ssr: false,
@@ -51,6 +53,18 @@ function AuthCallbackPage() {
         navigate({ to: "/reset-password", replace: true });
         return;
       }
+
+      // Phase 2.3 — associate after JWT exists (email confirm / OAuth).
+      const { supabase } = await import("@/integrations/supabase/client");
+      await associateDeploymentAfterAuth(supabase, {
+        userId: result.userId,
+        source: "auth_callback",
+        onPending: () =>
+          toast.success(
+            `Tu solicitud de acceso a ${brandConfig.name} está pendiente.`,
+          ),
+      });
+      if (cancelled) return;
 
       if (result.next === "/auth" || result.next === "/auth/admin") {
         navigate({ to: result.next, replace: true });

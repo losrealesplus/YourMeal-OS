@@ -14,10 +14,12 @@ import {
   signUp,
   verifyOtpSms,
   canonicalUserIdFromAuthData,
+  hasCanonicalSession,
   logPostLoginStep,
   stopPostLogin,
 } from "@/auth";
 import { resolveHomePath } from "@/lib/resolve-home-path";
+import { associateDeploymentAfterAuth } from "@/modules/tenant-association/application/associate-deployment-after-auth";
 import { toast } from "sonner";
 import {
   PoweredByLine,
@@ -59,9 +61,21 @@ async function goHome(
   navigate: ReturnType<typeof useNavigate>,
   userId: string,
   source: "canonical_auth_response" | "cold_get_session",
+  opts?: { skipAssociation?: boolean },
 ) {
   if (source === "cold_get_session") {
     beginPostLoginPipeline("cold", { route: "/auth", source });
+  }
+  if (!opts?.skipAssociation) {
+    const { supabase } = await import("@/integrations/supabase/client");
+    await associateDeploymentAfterAuth(supabase, {
+      userId,
+      source,
+      onPending: () =>
+        toast.success(
+          `Tu solicitud de acceso a ${brandConfig.name} está pendiente.`,
+        ),
+    });
   }
   logPostLoginStep("BOOTSTRAP_START", { userId, source, route: "/auth" });
   const path = await resolveHomePath(userId);
@@ -326,17 +340,12 @@ function EmailForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const [joinCode, setJoinCode] = useState("");
   const [busy, setBusy] = useState(false);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (mode === "signup" && password.length < 6) {
       toast.error(t("auth:passwordTooWeak"));
-      return;
-    }
-    if (mode === "signup" && !joinCode.trim()) {
-      toast.error(t("auth:joinCodeRequired", { defaultValue: "Join code required" }));
       return;
     }
     setBusy(true);
@@ -350,10 +359,10 @@ function EmailForm() {
         if (error) throw error;
         logPostLoginStep("LOGIN_OK", { route: "/auth", mode: "signin" });
         const uid = canonicalUserIdFromAuthData(data);
-        if (uid) {
+        if (uid && hasCanonicalSession(data)) {
           logPostLoginStep("CANONICAL_SESSION", {
             userId: uid,
-            hasSession: Boolean(data.session),
+            hasSession: true,
             source: "signInWithPassword",
           });
           await goHome(navigate, uid, "canonical_auth_response");
@@ -385,38 +394,15 @@ function EmailForm() {
           toast.error(t("auth:emailAlreadyRegistered"));
           return;
         }
-        const uid = canonicalUserIdFromAuthData(data);
-        if (uid) {
+        // Phase 2.3 — association only with JWT session (never user.id alone / no TJ).
+        if (hasCanonicalSession(data)) {
+          const uid = data.session!.user.id;
           logPostLoginStep("LOGIN_OK", { route: "/auth", mode: "signup" });
           logPostLoginStep("CANONICAL_SESSION", {
             userId: uid,
-            hasSession: Boolean(data.session),
+            hasSession: true,
             source: "signUp",
           });
-
-          // Phase 2.2 — associate with EXISTING tenant via join code (pending).
-          const { supabase } = await import("@/integrations/supabase/client");
-          const { TenantJoinCodeService } = await import(
-            "@/modules/tenant-association/application/tenant-join-code-service"
-          );
-          const association = await TenantJoinCodeService.requestAssociation(
-            supabase,
-            joinCode,
-          );
-          logPostLoginStep("TENANT_ASSOCIATION", {
-            userId: uid,
-            status: association.status,
-            created: association.created,
-          });
-          if (association.status === "pending") {
-            toast.success(
-              t("auth:membershipPending", {
-                defaultValue:
-                  "Account created. Waiting for tenant approval before menu and orders unlock.",
-              }),
-            );
-          }
-
           await goHome(navigate, uid, "canonical_auth_response");
           return;
         }
@@ -457,18 +443,6 @@ function EmailForm() {
           placeholder={t("auth:fullName")}
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
-          className={cn(authInputClass, "!pl-4")}
-        />
-      ) : null}
-      {mode === "signup" ? (
-        <input
-          required
-          placeholder={t("auth:joinCode", {
-            defaultValue: "Tenant join code (TJ-…)",
-          })}
-          value={joinCode}
-          onChange={(e) => setJoinCode(e.target.value)}
-          autoComplete="off"
           className={cn(authInputClass, "!pl-4")}
         />
       ) : null}

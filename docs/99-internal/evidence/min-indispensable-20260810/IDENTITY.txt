@@ -1,0 +1,4 @@
+APK_SHA=f7ea844d356dc66ef90fff22ec0259ec9008f8fa90192d9cfada539f08927bd2
+GIT=24490f5f0449d4cb9bb6369f6021313f408453af
+BRANCH=cursor/minimum-indispensable-closure
+PKG=com.yourmealos.eatclean

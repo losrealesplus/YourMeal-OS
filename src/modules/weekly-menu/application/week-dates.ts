@@ -28,3 +28,8 @@ export function utcWeekDates(weekStart: string): string[] {
     return utcDateOnly(day);
   });
 }
+
+/** True when dayDate is in [weekStart, weekStart+6] UTC calendar days. */
+export function isDayDateInWeek(weekStart: string, dayDate: string): boolean {
+  return utcWeekDates(weekStart).includes(dayDate);
+}
