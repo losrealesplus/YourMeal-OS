@@ -152,16 +152,36 @@ export function getFormatter(settings: LocalizationSettings) {
   const time = (value: Date | string | number, withSeconds = false) =>
     memo(`t:${withSeconds}`, () => new Intl.DateTimeFormat(bcp47, timeOpts(withSeconds))).format(toDate(value));
 
+  /**
+   * Date + time. ECMA-402 forbids mixing `dateStyle`/`timeStyle` with component
+   * options (`hour`, `minute`, `hour12`, …). Build component options only so we
+   * can honour `settings.timeFormat` without throwing TypeError.
+   */
+  const dateTimeOpts = (style: DateStyle): Intl.DateTimeFormatOptions => {
+    const datePart: Intl.DateTimeFormatOptions =
+      style === "short"
+        ? { year: "2-digit", month: "numeric", day: "numeric" }
+        : style === "long"
+          ? { year: "numeric", month: "long", day: "numeric" }
+          : style === "full"
+            ? { weekday: "long", year: "numeric", month: "long", day: "numeric" }
+            : { year: "numeric", month: "short", day: "numeric" }; // medium
+    return {
+      ...datePart,
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: settings.timeFormat === "12h",
+      timeZone: settings.timezone,
+    };
+  };
+
   const dateTime = (
     value: Date | string | number,
     style: DateStyle = "medium",
   ) =>
-    memo(`dt:${style}`, () =>
-      new Intl.DateTimeFormat(bcp47, {
-        ...dateOpts(style),
-        ...timeOpts(false),
-      }),
-    ).format(toDate(value));
+    memo(`dt:${style}`, () => new Intl.DateTimeFormat(bcp47, dateTimeOpts(style))).format(
+      toDate(value),
+    );
 
   const relativeTime = (
     value: Date | string | number,

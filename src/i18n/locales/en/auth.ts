@@ -54,4 +54,13 @@ export default {
     "This account is not allowed to complete Operations Center bootstrap.",
   adminBootstrapUnexpected:
     "Something went wrong while opening the Operations Center. Try again.",
+  signInInvalidCredentials: "Email or password is incorrect.",
+  signInEmailNotConfirmed:
+    "Your email is not confirmed yet. Check your inbox.",
+  signInRateLimit:
+    "Too many attempts. Wait a few minutes and try again.",
+  signInNetwork:
+    "We cannot reach the service. Check your connection and try again.",
+  signInUnexpected:
+    "We could not sign you in. Check your details and try again.",
 } as const;

@@ -37,6 +37,23 @@ vi.mock("./services/BrandingBootstrapService", () => ({
   })),
 }));
 
+vi.mock("./services/CustomerMaterializationService", () => ({
+  ensureCustomerForActiveTenant: vi.fn(async () => ({
+    customerId: "cust-1",
+  })),
+}));
+
+vi.mock("@/integrations/supabase/client", () => ({
+  supabase: {
+    auth: {
+      getUser: vi.fn(async () => ({
+        data: { user: { email: "t@example.com", user_metadata: {} } },
+        error: null,
+      })),
+    },
+  },
+}));
+
 describe("Stage ownership (PRODUCT-CORE-003)", () => {
   afterEach(() => {
     resetBootstrapIdentitySnapshot();
@@ -70,6 +87,9 @@ describe("Stage ownership (PRODUCT-CORE-003)", () => {
       status: "loading",
     });
     const { TenantStage } = await import("./stages/TenantStage");
+    const { ensureCustomerForActiveTenant } = await import(
+      "./services/CustomerMaterializationService"
+    );
     const { createBootstrapContext } = await import("./BootstrapContext");
     const ctx = createBootstrapContext("r1", "cold");
     ctx.hasSession = true;
@@ -78,6 +98,9 @@ describe("Stage ownership (PRODUCT-CORE-003)", () => {
     const outcome = await TenantStage.run(ctx);
     expect(outcome.status).toBe("ok");
     expect(outcome.patch?.tenantId).toBe("t1");
+    expect(ensureCustomerForActiveTenant).toHaveBeenCalledWith(
+      expect.objectContaining({ userId: "u1", tenantId: "t1" }),
+    );
   });
 
   it("NavigationStage owns homePath and marks snapshot ready", async () => {

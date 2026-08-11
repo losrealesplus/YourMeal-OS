@@ -56,4 +56,13 @@ export default {
     "Dieses Konto darf den Operations-Center-Bootstrap nicht abschließen.",
   adminBootstrapUnexpected:
     "Beim Öffnen des Operations Centers ist ein Fehler aufgetreten. Bitte erneut versuchen.",
+  signInInvalidCredentials: "E-Mail oder Passwort ist falsch.",
+  signInEmailNotConfirmed:
+    "Deine E-Mail ist noch nicht bestätigt. Bitte prüfe deinen Posteingang.",
+  signInRateLimit:
+    "Zu viele Versuche. Warte einige Minuten und versuche es erneut.",
+  signInNetwork:
+    "Wir können den Dienst nicht erreichen. Prüfe deine Verbindung und versuche es erneut.",
+  signInUnexpected:
+    "Anmeldung fehlgeschlagen. Prüfe deine Angaben und versuche es erneut.",
 } as const;

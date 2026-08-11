@@ -107,4 +107,40 @@ describe("mapWeeklyMenuToView", () => {
     expect(view.days[2].dishes.map((d) => d.id)).toEqual(["d3"]);
     expect(view.days[1].dishes).toEqual([]);
   });
+
+  it("T7: out-of-week slot is discarded; in-week slot is visible to Customer", () => {
+    const menu = {
+      id: "m1",
+      tenant_id: "t1",
+      week_start: "2026-08-10",
+      status: "published",
+      published_at: "2026-08-10T13:17:44Z",
+    } satisfies WeeklyMenuRow;
+
+    const slots: WeeklyMenuSlotWithDish[] = [
+      {
+        id: "bad",
+        tenant_id: "t1",
+        weekly_menu_id: "m1",
+        day_date: "2026-08-03",
+        dish_id: "d-bad",
+        sort_order: 0,
+        dishes: dish("d-bad"),
+      },
+      {
+        id: "ok",
+        tenant_id: "t1",
+        weekly_menu_id: "m1",
+        day_date: "2026-08-10",
+        dish_id: "d-ok",
+        sort_order: 0,
+        dishes: { ...dish("d-ok"), name: "Visible" },
+      },
+    ];
+
+    const view = mapWeeklyMenuToView(menu, slots);
+    const allIds = view.days.flatMap((d) => d.dishes.map((x) => x.id));
+    expect(allIds).toEqual(["d-ok"]);
+    expect(view.days[0]?.dishes[0]?.name).toBe("Visible");
+  });
 });
