@@ -1,6 +1,9 @@
 /**
  * ADMIN · Menús semanales — draft / slots / publish via WeeklyMenuService (OP-001).
  * Capability: menus.read / menus.write
+ *
+ * Integrity: dayDate always ∈ active week; published menus can be opened
+ * for edit (unpublish) to reassign out-of-week slots, then republish.
  */
 import { createFileRoute } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
@@ -12,7 +15,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { createServiceContext } from "@/services/types";
 import { DishService } from "@/services/dish-service";
 import { WeeklyMenuService } from "@/modules/weekly-menu/application/weekly-menu-service";
+import { resolveDayDateForWeek } from "@/modules/weekly-menu/application/admin-menu-day-date";
 import {
+  isDayDateInWeek,
   utcWeekDates,
   utcWeekStartMonday,
 } from "@/modules/weekly-menu/application/week-dates";
@@ -23,6 +28,7 @@ import { AdminHeader, PanelCard, SectionTitle, StatusChip } from "@/components/a
 import { BootstrapReadinessBanner } from "@/components/tenant/bootstrap-readiness-banner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/menus")({
   beforeLoad: ({ context }) => {
@@ -49,6 +55,7 @@ function AdminMenusPage() {
   const [dishes, setDishes] = useState<DishRow[]>([]);
   const [dayDate, setDayDate] = useState("");
   const [dishId, setDishId] = useState("");
+  const [slotDayEdits, setSlotDayEdits] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
 
@@ -62,7 +69,18 @@ function AdminMenusPage() {
     });
   }
 
-  async function reload() {
+  async function loadActive(
+    serviceCtx: Awaited<ReturnType<typeof ctx>>,
+    menu: WeeklyMenuRow,
+    preferDayDate?: string,
+  ) {
+    setActive(menu);
+    setSlots(await WeeklyMenuService.listSlots(serviceCtx, menu.id));
+    setDayDate(resolveDayDateForWeek(menu.week_start, preferDayDate));
+    setSlotDayEdits({});
+  }
+
+  async function reload(preferMenuId?: string | null) {
     setLoading(true);
     try {
       const serviceCtx = await ctx();
@@ -73,16 +91,18 @@ function AdminMenusPage() {
       setMenus(menuRows);
       setDishes(dishRows);
       const current =
+        (preferMenuId
+          ? menuRows.find((m) => m.id === preferMenuId)
+          : undefined) ??
         menuRows.find((m) => m.week_start === utcWeekStartMonday()) ??
         menuRows[0] ??
         null;
-      setActive(current);
       if (current) {
-        setSlots(await WeeklyMenuService.listSlots(serviceCtx, current.id));
-        const dates = utcWeekDates(current.week_start);
-        setDayDate((d) => d || dates[0]);
+        await loadActive(serviceCtx, current);
       } else {
+        setActive(null);
         setSlots([]);
+        setDayDate("");
       }
       if (dishRows[0]) setDishId((id) => id || dishRows[0].id);
     } finally {
@@ -101,7 +121,7 @@ function AdminMenusPage() {
       const serviceCtx = await ctx();
       const draft = await WeeklyMenuService.ensureDraft(serviceCtx);
       toast.success(`Borrador listo · semana ${draft.week_start}`);
-      await reload();
+      await reload(draft.id);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
     } finally {
@@ -110,11 +130,9 @@ function AdminMenusPage() {
   }
 
   async function selectMenu(menu: WeeklyMenuRow) {
-    setActive(menu);
     try {
       const serviceCtx = await ctx();
-      setSlots(await WeeklyMenuService.listSlots(serviceCtx, menu.id));
-      setDayDate(utcWeekDates(menu.week_start)[0]);
+      await loadActive(serviceCtx, menu);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
     }
@@ -122,6 +140,11 @@ function AdminMenusPage() {
 
   async function addSlot() {
     if (!active || !dishId || !dayDate) return;
+    if (!isDayDateInWeek(active.week_start, dayDate)) {
+      toast.error("El día seleccionado no pertenece a esta semana.");
+      setDayDate(resolveDayDateForWeek(active.week_start, null));
+      return;
+    }
     setBusy(true);
     try {
       const serviceCtx = await ctx();
@@ -146,7 +169,50 @@ function AdminMenusPage() {
       const serviceCtx = await ctx();
       await WeeklyMenuService.publish(serviceCtx, active.id);
       toast.success("Menú publicado — ya puede recibir pedidos");
-      await reload();
+      await reload(active.id);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : String(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function openForEdit() {
+    if (!active) return;
+    setBusy(true);
+    try {
+      const serviceCtx = await ctx();
+      const draft = await WeeklyMenuService.unpublish(serviceCtx, active.id);
+      toast.success("Menú abierto para editar (borrador)");
+      await loadActive(serviceCtx, draft);
+      setMenus((rows) =>
+        rows.map((m) => (m.id === draft.id ? draft : m)),
+      );
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : String(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function reassignSlot(slotId: string) {
+    if (!active) return;
+    const nextDay =
+      slotDayEdits[slotId] ?? resolveDayDateForWeek(active.week_start, null);
+    setBusy(true);
+    try {
+      const serviceCtx = await ctx();
+      await WeeklyMenuService.reassignSlotDay(serviceCtx, {
+        slotId,
+        dayDate: nextDay,
+      });
+      toast.success("Día del plato corregido");
+      setSlots(await WeeklyMenuService.listSlots(serviceCtx, active.id));
+      setSlotDayEdits((prev) => {
+        const copy = { ...prev };
+        delete copy[slotId];
+        return copy;
+      });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
     } finally {
@@ -155,6 +221,12 @@ function AdminMenusPage() {
   }
 
   const weekDays = active ? utcWeekDates(active.week_start) : [];
+  const selectDayValue = active
+    ? resolveDayDateForWeek(active.week_start, dayDate)
+    : "";
+  const hasOutOfWeekSlots =
+    !!active &&
+    slots.some((s) => !isDayDateInWeek(active.week_start, s.day_date));
 
   return (
     <div className="animate-fade-in space-y-4">
@@ -179,17 +251,33 @@ function AdminMenusPage() {
             Borrador semana actual
           </Button>
         ) : null}
+        {active && can("menus.write") && active.status === "published" ? (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={openForEdit}
+            disabled={busy}
+          >
+            Abrir para editar
+          </Button>
+        ) : null}
         {active && can("menus.write") && active.status !== "published" ? (
           <Button
             type="button"
             variant="default"
             onClick={publish}
-            disabled={busy || slots.length === 0}
+            disabled={busy || slots.length === 0 || hasOutOfWeekSlots}
           >
             Publicar menú
           </Button>
         ) : null}
       </div>
+
+      {hasOutOfWeekSlots && active?.status !== "published" ? (
+        <p className="text-sm text-destructive px-1">
+          Hay platos con día fuera de esta semana. Corrígelos antes de publicar.
+        </p>
+      ) : null}
 
       {loading ? (
         <p className="text-sm text-muted-foreground py-8 text-center">
@@ -248,7 +336,7 @@ function AdminMenusPage() {
                         <select
                           id="menu-day"
                           className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
-                          value={dayDate}
+                          value={selectDayValue}
                           onChange={(e) => setDayDate(e.target.value)}
                         >
                           {weekDays.map((d) => (
@@ -291,19 +379,74 @@ function AdminMenusPage() {
                   </p>
                 ) : (
                   <ul className="divide-y divide-border">
-                    {slots.map((s) => (
-                      <li
-                        key={s.id}
-                        className="py-2 flex items-center justify-between text-sm"
-                      >
-                        <span className="text-muted-foreground tabular-nums">
-                          {s.day_date}
-                        </span>
-                        <span className="font-medium">
-                          {s.dishes?.name ?? "—"}
-                        </span>
-                      </li>
-                    ))}
+                    {slots.map((s) => {
+                      const valid = isDayDateInWeek(
+                        active.week_start,
+                        s.day_date,
+                      );
+                      const editValue =
+                        slotDayEdits[s.id] ??
+                        (valid
+                          ? s.day_date
+                          : resolveDayDateForWeek(active.week_start, null));
+                      return (
+                        <li
+                          key={s.id}
+                          className={cn(
+                            "py-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-sm",
+                            !valid && "bg-destructive/5 -mx-2 px-2 rounded-md",
+                          )}
+                        >
+                          <div className="flex items-center justify-between gap-3 flex-1">
+                            <span
+                              className={cn(
+                                "tabular-nums",
+                                valid
+                                  ? "text-muted-foreground"
+                                  : "text-destructive font-medium",
+                              )}
+                            >
+                              {s.day_date}
+                              {!valid ? " · fuera de semana" : ""}
+                            </span>
+                            <span className="font-medium">
+                              {s.dishes?.name ?? "—"}
+                            </span>
+                          </div>
+                          {can("menus.write") &&
+                          active.status !== "published" &&
+                          !valid ? (
+                            <div className="flex items-center gap-2">
+                              <select
+                                className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+                                value={editValue}
+                                onChange={(e) =>
+                                  setSlotDayEdits((prev) => ({
+                                    ...prev,
+                                    [s.id]: e.target.value,
+                                  }))
+                                }
+                              >
+                                {weekDays.map((d) => (
+                                  <option key={d} value={d}>
+                                    {d}
+                                  </option>
+                                ))}
+                              </select>
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                disabled={busy}
+                                onClick={() => reassignSlot(s.id)}
+                              >
+                                Corregir día
+                              </Button>
+                            </div>
+                          ) : null}
+                        </li>
+                      );
+                    })}
                   </ul>
                 )}
               </PanelCard>

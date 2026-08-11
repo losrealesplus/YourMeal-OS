@@ -56,4 +56,13 @@ export default {
     "Ce compte n'est pas autorisé à terminer le bootstrap du centre d'opérations.",
   adminBootstrapUnexpected:
     "Une erreur s'est produite en ouvrant le centre d'opérations. Réessayez.",
+  signInInvalidCredentials: "L'e-mail ou le mot de passe est incorrect.",
+  signInEmailNotConfirmed:
+    "Votre e-mail n'est pas encore confirmé. Vérifiez votre boîte de réception.",
+  signInRateLimit:
+    "Trop de tentatives. Attendez quelques minutes et réessayez.",
+  signInNetwork:
+    "Impossible de joindre le service. Vérifiez votre connexion et réessayez.",
+  signInUnexpected:
+    "Connexion impossible. Vérifiez vos informations et réessayez.",
 } as const;

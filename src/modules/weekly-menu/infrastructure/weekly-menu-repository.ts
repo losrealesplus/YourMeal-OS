@@ -93,6 +93,21 @@ export function createWeeklyMenuRepository(supabase: AppSupabase, tenantId: stri
       return data as WeeklyMenuRow;
     },
 
+    async unpublish(id: string): Promise<WeeklyMenuRow> {
+      const { data, error } = await supabase
+        .from("weekly_menus")
+        .update({
+          status: "draft",
+          published_at: null,
+        })
+        .eq("tenant_id", tenantId)
+        .eq("id", id)
+        .select("*")
+        .single();
+      if (error) throw error;
+      return data as WeeklyMenuRow;
+    },
+
     async addSlot(input: {
       weeklyMenuId: string;
       dayDate: string;
@@ -112,6 +127,32 @@ export function createWeeklyMenuRepository(supabase: AppSupabase, tenantId: stri
         .single();
       if (error) throw error;
       return data as WeeklyMenuSlotRow;
+    },
+
+    async updateSlotDayDate(
+      slotId: string,
+      dayDate: string,
+    ): Promise<WeeklyMenuSlotRow> {
+      const { data, error } = await supabase
+        .from("weekly_menu_slots")
+        .update({ day_date: dayDate })
+        .eq("tenant_id", tenantId)
+        .eq("id", slotId)
+        .select("*")
+        .single();
+      if (error) throw error;
+      return data as WeeklyMenuSlotRow;
+    },
+
+    async getSlotById(slotId: string): Promise<WeeklyMenuSlotRow | null> {
+      const { data, error } = await supabase
+        .from("weekly_menu_slots")
+        .select("*")
+        .eq("tenant_id", tenantId)
+        .eq("id", slotId)
+        .maybeSingle();
+      if (error) throw error;
+      return data as WeeklyMenuSlotRow | null;
     },
 
     async listSlotsWithDishes(weeklyMenuId: string): Promise<WeeklyMenuSlotWithDish[]> {

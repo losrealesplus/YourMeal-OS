@@ -56,4 +56,13 @@ export default {
     "Questo account non può completare il bootstrap del Centro Operazioni.",
   adminBootstrapUnexpected:
     "Qualcosa è andato storto aprendo il Centro Operazioni. Riprova.",
+  signInInvalidCredentials: "Email o password non corretti.",
+  signInEmailNotConfirmed:
+    "La tua email non è ancora confermata. Controlla la casella di posta.",
+  signInRateLimit:
+    "Troppi tentativi. Attendi qualche minuto e riprova.",
+  signInNetwork:
+    "Non riusciamo a raggiungere il servizio. Controlla la connessione e riprova.",
+  signInUnexpected:
+    "Accesso non riuscito. Controlla i dati e riprova.",
 } as const;

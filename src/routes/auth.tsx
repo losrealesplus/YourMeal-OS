@@ -18,6 +18,7 @@ import {
   logPostLoginStep,
   stopPostLogin,
 } from "@/auth";
+import { classifyCustomerAuthError } from "@/auth/customer-auth-errors";
 import { resolveHomePath } from "@/lib/resolve-home-path";
 import { associateDeploymentAfterAuth } from "@/modules/tenant-association/application/associate-deployment-after-auth";
 import { toast } from "sonner";
@@ -341,9 +342,11 @@ function EmailForm() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [busy, setBusy] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    setFormError(null);
     if (mode === "signup" && password.length < 6) {
       toast.error(t("auth:passwordTooWeak"));
       return;
@@ -415,7 +418,14 @@ function EmailForm() {
         route: "/auth",
         message: err instanceof Error ? err.message : String(err),
       });
-      toast.error(err instanceof Error ? err.message : String(err));
+      if (mode === "signin") {
+        const classified = classifyCustomerAuthError(err);
+        const human = t(`auth:${classified.messageKey}`);
+        setFormError(human);
+        toast.error(human);
+      } else {
+        toast.error(err instanceof Error ? err.message : String(err));
+      }
     } finally {
       setBusy(false);
     }
@@ -457,7 +467,10 @@ function EmailForm() {
           required
           placeholder={t("common:email")}
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (formError) setFormError(null);
+          }}
           className={authInputClass}
         />
       </label>
@@ -472,10 +485,21 @@ function EmailForm() {
           required
           placeholder={t("common:password")}
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            if (formError) setFormError(null);
+          }}
           className={authInputClass}
         />
       </label>
+      {formError ? (
+        <p
+          role="alert"
+          className="text-sm text-destructive leading-snug px-0.5"
+        >
+          {formError}
+        </p>
+      ) : null}
       <button
         disabled={busy}
         className="mt-1 bg-primary text-primary-foreground text-[15px] font-semibold py-3.5 rounded-2xl disabled:opacity-50 hover:opacity-95 transition-opacity"
@@ -486,7 +510,10 @@ function EmailForm() {
         <button
           type="button"
           className="text-muted-foreground hover:text-foreground transition-colors"
-          onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+          onClick={() => {
+            setFormError(null);
+            setMode(mode === "signin" ? "signup" : "signin");
+          }}
         >
           {mode === "signin" ? t("common:signUp") : t("common:signIn")}
         </button>

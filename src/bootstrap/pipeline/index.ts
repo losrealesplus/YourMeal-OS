@@ -64,3 +64,4 @@ export { loadSessionIdentity } from "./services/SessionBootstrapService";
 export { resolveTenantFromSessionIdentity } from "./services/TenantBootstrapService";
 export { resolveBootstrapBranding } from "./services/BrandingBootstrapService";
 export { resolveBootstrapHomePath } from "./services/NavigationBootstrapService";
+export { ensureCustomerForActiveTenant } from "./services/CustomerMaterializationService";

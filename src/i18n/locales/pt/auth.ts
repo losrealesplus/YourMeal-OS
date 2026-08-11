@@ -56,4 +56,13 @@ export default {
     "Esta conta não pode concluir o bootstrap do Centro de Operações.",
   adminBootstrapUnexpected:
     "Algo falhou ao abrir o Centro de Operações. Tente novamente.",
+  signInInvalidCredentials: "O email ou a palavra-passe não estão corretos.",
+  signInEmailNotConfirmed:
+    "O seu email ainda não está confirmado. Verifique a caixa de entrada.",
+  signInRateLimit:
+    "Demasiadas tentativas. Espere alguns minutos e tente novamente.",
+  signInNetwork:
+    "Não conseguimos ligar ao serviço. Verifique a ligação e tente novamente.",
+  signInUnexpected:
+    "Não foi possível iniciar sessão. Verifique os dados e tente novamente.",
 } as const;
