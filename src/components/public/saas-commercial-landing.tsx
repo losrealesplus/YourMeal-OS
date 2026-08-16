@@ -44,6 +44,10 @@ import {
   Shield,
 } from "lucide-react";
 import { YourMealLogo, YourMealMark } from "@/components/brand/yourmeal-os-logo";
+import { ProductShowcase } from "@/components/public/product-showcase";
+import { OperationalFlow } from "@/components/public/operational-flow";
+import { ProductEcosystem } from "@/components/public/product-ecosystem";
+import { OperationalContext } from "@/components/public/operational-context";
 
 export function SaasCommercialLanding() {
   return (
@@ -57,11 +61,14 @@ export function SaasCommercialLanding() {
 
           {/* Navegación Desktop */}
           <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-muted-foreground">
-            <a href="#como-funciona" className="hover:text-foreground transition py-2">
-              Cómo Funciona
+            <a href="#en-accion" className="hover:text-foreground transition py-2">
+              En Acción
             </a>
             <a href="#flujo-operativo" className="hover:text-foreground transition py-2">
               Flujo Operativo
+            </a>
+            <a href="#ecosistema" className="hover:text-foreground transition py-2">
+              Ecosistema
             </a>
             <a href="#modulos" className="hover:text-foreground transition py-2">
               Módulos
@@ -118,6 +125,9 @@ export function SaasCommercialLanding() {
                   pedidos, producción, cocina, logística, atención y administración
                 </span>.
               </p>
+              <p className="text-xs sm:text-sm font-mono text-muted-foreground">
+                Diseñado para Meal Prep · Cocinas Centrales · Catering Corporativo · Cadenas Gastronómicas
+              </p>
             </div>
 
             {/* CTAs Principales B2B */}
@@ -130,7 +140,7 @@ export function SaasCommercialLanding() {
                 <ArrowRight className="size-4" aria-hidden="true" />
               </a>
               <a
-                href="#como-funciona"
+                href="#en-accion"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl bg-secondary hover:bg-secondary/80 text-foreground font-semibold text-sm border border-border transition min-h-[48px]"
               >
                 <span>Ver cómo funciona</span>
@@ -286,139 +296,96 @@ export function SaasCommercialLanding() {
           </div>
         </section>
 
-        {/* 3. EL PROBLEMA OPERATIVO */}
-        <section className="py-20 px-4 sm:px-6 max-w-6xl mx-auto">
-          <div className="max-w-3xl mx-auto text-center space-y-3 mb-14">
+        {/* 3. NUEVA SECCIÓN — YOURMEAL OS EN ACCIÓN */}
+        <section id="en-accion" className="py-20 px-4 sm:px-6 max-w-6xl mx-auto">
+          <div className="text-center space-y-3 max-w-3xl mx-auto mb-12">
             <span className="text-xs font-bold uppercase tracking-wider text-primary font-mono">
-              Fricción Operacional
+              Recorrido de Producto
             </span>
-            <h2 className="font-display text-2xl sm:text-4xl font-bold tracking-tight">
-              El coste de operar con herramientas desconectadas.
+            <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight">
+              YourMeal OS en acción.
             </h2>
             <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-              Cuando los pedidos entran por mensajería, las recetas se calculan en hojas sueltas y las comandas
-              se imprimen en papel, la operación pierde trazabilidad, tiempo y margen.
+              Una operación completa. Un solo sistema para gobernar cada fase.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
-            {/* Problema Clásico */}
-            <div className="p-8 rounded-3xl border border-destructive/30 bg-destructive/5 space-y-6">
-              <div className="flex items-center gap-3 text-destructive font-bold text-sm">
-                <AlertTriangle className="size-5" aria-hidden="true" />
-                <span>La Operación Fragmentada Tradicional</span>
-              </div>
-              <ul className="space-y-3.5 text-xs sm:text-sm text-muted-foreground">
-                <li className="flex items-start gap-2.5">
-                  <span className="text-destructive font-bold">✕</span>
-                  <span>Hojas de cálculo manuales con desfases entre pedidos, producción y compras.</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <span className="text-destructive font-bold">✕</span>
-                  <span>Comandas de papel en cocina que provocan errores en raciones y alérgenos.</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <span className="text-destructive font-bold">✕</span>
-                  <span>Planificación manual de rutas sin trazabilidad de entregas ni incidencias.</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <span className="text-destructive font-bold">✕</span>
-                  <span>Falta de visibilidad sobre los costes reales y márgenes de cada lote cocinado.</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* Solución YourMeal OS */}
-            <div className="p-8 rounded-3xl border border-primary/30 bg-primary/5 space-y-6">
-              <div className="flex items-center gap-3 text-primary font-bold text-sm">
-                <YourMealMark size={22} />
-                <span>El Flujo Integrado de YourMeal OS</span>
-              </div>
-              <ul className="space-y-3.5 text-xs sm:text-sm text-muted-foreground">
-                <li className="flex items-start gap-2.5">
-                  <Check className="size-4 text-primary shrink-0 mt-0.5" />
-                  <span>Demanda agregada instantánea que calcula raciones e ingredientes necesarios.</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <Check className="size-4 text-primary shrink-0 mt-0.5" />
-                  <span>KDS táctil en tabletas de cocina con avance de comandas en un solo toque.</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <Check className="size-4 text-primary shrink-0 mt-0.5" />
-                  <span>Generación automática de etiquetas térmicas con alérgenos y trazabilidad.</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <Check className="size-4 text-primary shrink-0 mt-0.5" />
-                  <span>Rutas organizadas por chofer con confirmación y liquidación contable directa.</span>
-                </li>
-              </ul>
-            </div>
-          </div>
+          <ProductShowcase />
         </section>
 
-        {/* 4. CÓMO FUNCIONA (El Ciclo Completo) */}
-        <section id="como-funciona" className="py-20 bg-muted/30 border-y border-border/70 px-4 sm:px-6">
-          <div className="max-w-6xl mx-auto space-y-14">
-            <div className="text-center space-y-3 max-w-3xl mx-auto">
+        {/* 4. EL PROBLEMA OPERATIVO */}
+        <section className="py-20 bg-muted/30 border-y border-border/70 px-4 sm:px-6">
+          <div className="max-w-6xl mx-auto space-y-12">
+            <div className="max-w-3xl mx-auto text-center space-y-3">
               <span className="text-xs font-bold uppercase tracking-wider text-primary font-mono">
-                Tubería Operacional
+                Fricción Operacional
               </span>
               <h2 className="font-display text-2xl sm:text-4xl font-bold tracking-tight">
-                ¿Qué hace realmente YourMeal OS?
+                El coste de operar con herramientas desconectadas.
               </h2>
               <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                YourMeal OS es la capa de software que conecta cada fase de la operación gastronómica.
+                Cuando los pedidos entran por mensajería, las recetas se calculan en hojas sueltas y las comandas
+                se imprimen en papel, la operación pierde trazabilidad, tiempo y margen.
               </p>
             </div>
 
-            {/* Pipeline Step-by-Step */}
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4 text-center">
-              <div className="p-4 rounded-2xl bg-card border border-border space-y-2">
-                <span className="text-[10px] font-mono font-bold text-primary block">01</span>
-                <span className="font-display font-bold text-xs block">PEDIDOS</span>
-                <p className="text-[11px] text-muted-foreground">App móvil, web o entrada manual</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+              {/* Problema Clásico */}
+              <div className="p-8 rounded-3xl border border-destructive/30 bg-destructive/5 space-y-6">
+                <div className="flex items-center gap-3 text-destructive font-bold text-sm">
+                  <AlertTriangle className="size-5" aria-hidden="true" />
+                  <span>La Operación Fragmentada Tradicional</span>
+                </div>
+                <ul className="space-y-3.5 text-xs sm:text-sm text-muted-foreground">
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-destructive font-bold">✕</span>
+                    <span>Hojas de cálculo manuales con desfases entre pedidos, producción y compras.</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-destructive font-bold">✕</span>
+                    <span>Comandas de papel en cocina que provocan errores en raciones y alérgenos.</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-destructive font-bold">✕</span>
+                    <span>Planificación manual de rutas sin trazabilidad de entregas ni incidencias.</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-destructive font-bold">✕</span>
+                    <span>Falta de visibilidad sobre los costes reales y márgenes de cada lote cocinado.</span>
+                  </li>
+                </ul>
               </div>
 
-              <div className="p-4 rounded-2xl bg-card border border-border space-y-2">
-                <span className="text-[10px] font-mono font-bold text-primary block">02</span>
-                <span className="font-display font-bold text-xs block">PRODUCCIÓN</span>
-                <p className="text-[11px] text-muted-foreground">Demanda agregada y escandallos</p>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-card border border-border space-y-2">
-                <span className="text-[10px] font-mono font-bold text-primary block">03</span>
-                <span className="font-display font-bold text-xs block">COCINA KDS</span>
-                <p className="text-[11px] text-muted-foreground">Comandas táctiles y alérgenos</p>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-card border border-border space-y-2">
-                <span className="text-[10px] font-mono font-bold text-primary block">04</span>
-                <span className="font-display font-bold text-xs block">EMPAQUE</span>
-                <p className="text-[11px] text-muted-foreground">Etiquetas térmicas y lotes</p>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-card border border-border space-y-2">
-                <span className="text-[10px] font-mono font-bold text-primary block">05</span>
-                <span className="font-display font-bold text-xs block">REPARTO</span>
-                <p className="text-[11px] text-muted-foreground">Rutas y choferes asignados</p>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-card border border-border space-y-2">
-                <span className="text-[10px] font-mono font-bold text-primary block">06</span>
-                <span className="font-display font-bold text-xs block">CLIENTE</span>
-                <p className="text-[11px] text-muted-foreground">Entrega y soporte directo</p>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-card border border-border space-y-2">
-                <span className="text-[10px] font-mono font-bold text-primary block">07</span>
-                <span className="font-display font-bold text-xs block">FINANZAS</span>
-                <p className="text-[11px] text-muted-foreground">Márgenes y contabilidad</p>
+              {/* Solución YourMeal OS */}
+              <div className="p-8 rounded-3xl border border-primary/30 bg-primary/5 space-y-6">
+                <div className="flex items-center gap-3 text-primary font-bold text-sm">
+                  <YourMealMark size={22} />
+                  <span>El Flujo Integrado de YourMeal OS</span>
+                </div>
+                <ul className="space-y-3.5 text-xs sm:text-sm text-muted-foreground">
+                  <li className="flex items-start gap-2.5">
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <span>Demanda agregada instantánea que calcula raciones e ingredientes necesarios.</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <span>KDS táctil en tabletas de cocina con avance de comandas en un solo toque.</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <span>Generación automática de etiquetas térmicas con alérgenos y trazabilidad.</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                    <span>Rutas organizadas por chofer con confirmación y liquidación contable directa.</span>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
         </section>
 
-        {/* 5. FLUJO OPERATIVO DETALLADO */}
+        {/* 5. FLUJO OPERATIVO VISUAL (Pipeline de Extremo a Extremo) */}
         <section id="flujo-operativo" className="py-20 px-4 sm:px-6 max-w-6xl mx-auto">
           <div className="text-center space-y-3 max-w-3xl mx-auto mb-14">
             <span className="text-xs font-bold uppercase tracking-wider text-primary font-mono">
@@ -432,88 +399,46 @@ export function SaasCommercialLanding() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="p-6 rounded-2xl border border-border bg-card space-y-3">
-              <span className="text-xs font-mono font-bold px-2 py-1 rounded-md bg-muted text-foreground inline-block">
-                01 · CAPTURA
+          <OperationalFlow />
+        </section>
+
+        {/* 6. UNA PLATAFORMA. TODA LA OPERACIÓN (Ecosistema Central) */}
+        <section id="ecosistema" className="py-20 bg-muted/30 border-y border-border/70 px-4 sm:px-6">
+          <div className="max-w-6xl mx-auto space-y-12">
+            <div className="text-center space-y-3 max-w-3xl mx-auto">
+              <span className="text-xs font-bold uppercase tracking-wider text-primary font-mono">
+                Ecosistema Conectado
               </span>
-              <h3 className="font-display font-bold text-base">Entrada de Pedidos</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Captura multicanal a través de la App de clientes, pedidos rápidos tomados por el equipo o importación masiva en Excel (.xlsx).
+              <h2 className="font-display text-2xl sm:text-4xl font-bold tracking-tight">
+                Una plataforma. Toda la operación.
+              </h2>
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                YourMeal OS no es un módulo aislado: es la capa central que integra todas las áreas de la empresa.
               </p>
-              <div className="text-[11px] font-mono text-primary pt-1">
-                Pasa a: Demanda agregada de producción
-              </div>
             </div>
 
-            <div className="p-6 rounded-2xl border border-border bg-card space-y-3">
-              <span className="text-xs font-mono font-bold px-2 py-1 rounded-md bg-muted text-foreground inline-block">
-                02 · PLANIFICACIÓN
-              </span>
-              <h3 className="font-display font-bold text-base">Cálculo de Lotes</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Cálculo de recetas, ingredientes requeridos, escandallos y lista de materias primas para el turno de cocción.
-              </p>
-              <div className="text-[11px] font-mono text-primary pt-1">
-                Pasa a: Pantalla táctil de cocina (KDS)
-              </div>
-            </div>
-
-            <div className="p-6 rounded-2xl border border-border bg-card space-y-3">
-              <span className="text-xs font-mono font-bold px-2 py-1 rounded-md bg-muted text-foreground inline-block">
-                03 · COCINA KDS
-              </span>
-              <h3 className="font-display font-bold text-base">Ejecución en Tiempo Real</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Tabletas de cocina con comandas organizadas por lote, orden de prioridad y alertas destacadas de alérgenos.
-              </p>
-              <div className="text-[11px] font-mono text-primary pt-1">
-                Pasa a: Estación de empaquetado
-              </div>
-            </div>
-
-            <div className="p-6 rounded-2xl border border-border bg-card space-y-3">
-              <span className="text-xs font-mono font-bold px-2 py-1 rounded-md bg-muted text-foreground inline-block">
-                04 · EMPAQUETADO
-              </span>
-              <h3 className="font-display font-bold text-base">Etiquetado Térmico</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Impresión de etiquetas con composición nutricional, fecha de caducidad y asignación a bolsas de reparto.
-              </p>
-              <div className="text-[11px] font-mono text-primary pt-1">
-                Pasa a: Despacho y logística
-              </div>
-            </div>
-
-            <div className="p-6 rounded-2xl border border-border bg-card space-y-3">
-              <span className="text-xs font-mono font-bold px-2 py-1 rounded-md bg-muted text-foreground inline-block">
-                05 · LOGÍSTICA
-              </span>
-              <h3 className="font-display font-bold text-base">Rutas & Despacho</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Organización de rutas de entrega, asignación a choferes y registro de incidencias en ruta en vivo.
-              </p>
-              <div className="text-[11px] font-mono text-primary pt-1">
-                Pasa a: Entrega al comensal
-              </div>
-            </div>
-
-            <div className="p-6 rounded-2xl border border-border bg-card space-y-3">
-              <span className="text-xs font-mono font-bold px-2 py-1 rounded-md bg-muted text-foreground inline-block">
-                06 · FINANZAS
-              </span>
-              <h3 className="font-display font-bold text-base">Cierre & Márgenes</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Confirmación de entregas, cierre de ruta y consolidación contable de ingresos y costes de producción.
-              </p>
-              <div className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400 pt-1">
-                Pasa a: Reportes de balance y margen
-              </div>
-            </div>
+            <ProductEcosystem />
           </div>
         </section>
 
-        {/* 6. MÓDULOS AGRUPADOS CONCEPTUALMENTE */}
+        {/* 7. CONTEXTO HUMANO & OPERATIVO */}
+        <section className="py-20 px-4 sm:px-6 max-w-6xl mx-auto">
+          <div className="text-center space-y-3 max-w-3xl mx-auto mb-12">
+            <span className="text-xs font-bold uppercase tracking-wider text-primary font-mono">
+              Contexto de Trabajo
+            </span>
+            <h2 className="font-display text-2xl sm:text-4xl font-bold tracking-tight">
+              Diseñado para operaciones reales.
+            </h2>
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+              Herramientas pensadas para las condiciones exigentes del obrador, la furgoneta de reparto y la oficina.
+            </p>
+          </div>
+
+          <OperationalContext />
+        </section>
+
+        {/* 8. MÓDULOS AGRUPADOS CONCEPTUALMENTE */}
         <section id="modulos" className="py-20 bg-muted/30 border-y border-border/70 px-4 sm:px-6">
           <div className="max-w-6xl mx-auto space-y-14">
             <div className="text-center space-y-3 max-w-3xl mx-auto">
@@ -646,7 +571,7 @@ export function SaasCommercialLanding() {
           </div>
         </section>
 
-        {/* 7. ARQUITECTURA MULTI-TENANT */}
+        {/* 9. ARQUITECTURA MULTI-TENANT */}
         <section id="multi-tenant" className="py-20 px-4 sm:px-6 max-w-6xl mx-auto">
           <div className="text-center space-y-3 max-w-3xl mx-auto mb-14">
             <span className="text-xs font-bold uppercase tracking-wider text-primary font-mono">
@@ -717,7 +642,7 @@ export function SaasCommercialLanding() {
           </div>
         </section>
 
-        {/* 8. SEGURIDAD Y AISLAMIENTO */}
+        {/* 10. SEGURIDAD Y AISLAMIENTO */}
         <section id="seguridad" className="py-20 bg-muted/30 border-y border-border/70 px-4 sm:px-6">
           <div className="max-w-6xl mx-auto space-y-12">
             <div className="text-center space-y-3 max-w-3xl mx-auto">
@@ -766,7 +691,7 @@ export function SaasCommercialLanding() {
           </div>
         </section>
 
-        {/* 9. TECNOLOGÍA & RENDIMIENTO */}
+        {/* 11. TECNOLOGÍA & RENDIMIENTO */}
         <section className="py-20 px-4 sm:px-6 max-w-6xl mx-auto">
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
             <div className="space-y-6">
@@ -817,7 +742,7 @@ export function SaasCommercialLanding() {
           </div>
         </section>
 
-        {/* 10. FINAL CTA SECTION */}
+        {/* 12. FINAL CTA SECTION */}
         <section className="py-20 sm:py-28 px-4 sm:px-6 text-center max-w-4xl mx-auto space-y-8">
           <div className="flex justify-center">
             <YourMealMark size={52} />
@@ -853,7 +778,7 @@ export function SaasCommercialLanding() {
         </section>
       </main>
 
-      {/* 11. FOOTER INSTITUCIONAL */}
+      {/* 13. FOOTER INSTITUCIONAL */}
       <footer className="border-t border-border/80 py-12 px-4 sm:px-6 bg-card">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-muted-foreground">
           <Link to="/" className="flex items-center gap-3">
@@ -861,11 +786,14 @@ export function SaasCommercialLanding() {
           </Link>
 
           <div className="flex flex-wrap items-center justify-center gap-6 font-medium">
-            <a href="#como-funciona" className="hover:text-foreground transition">
-              Cómo Funciona
+            <a href="#en-accion" className="hover:text-foreground transition">
+              En Acción
             </a>
             <a href="#flujo-operativo" className="hover:text-foreground transition">
               Flujo Operativo
+            </a>
+            <a href="#ecosistema" className="hover:text-foreground transition">
+              Ecosistema
             </a>
             <a href="#modulos" className="hover:text-foreground transition">
               Módulos

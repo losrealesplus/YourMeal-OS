@@ -272,3 +272,16 @@ Version ID: `879d6785-0d7a-4f1c-aa70-65dc7ba280df`
 - **Tone Calibration**: Eliminated all hyperbolic claims; replaced with accurate technical specifications (PostgreSQL RLS, RBAC, Cloudflare Edge Runtime).
 - **Live Version ID**: `743689dc-ea16-4379-9169-4c77dd8faa74`
 - **Quality Checks**: 916/916 tests PASS, Web build PASS, Mobile build PASS, Production URLs HTTP 200 certified.
+
+---
+
+# M15.3 — Product Visual Experience Release
+
+## Executive Summary
+- **Product Tour / Showcase**: New interactive operational module switcher covering Orders, Production, Kitchen KDS, Logistics, and Finance.
+- **Operational Flow Pipeline**: 7-stage visual pipeline (`PEDIDOS → PRODUCCIÓN → COCINA → EMPAQUE → LOGÍSTICA → ENTREGA → FINANZAS`).
+- **Product Ecosystem Diagram**: Central YourMeal OS operational hub connected to the 8 functional nodes.
+- **Operational Context**: 3 human-operational reality cards (Cocina & Obrador, Logística & Flota, Gestión & Dirección).
+- **Brand Integrity**: 100% official YourMeal OS brandmark, ZERO "tres platos", ZERO Lovable footprint.
+- **Live Version ID**: `324a02f1-ad69-4ed3-86ec-23b7bc862cfe`
+- **Quality Checks**: 916/916 tests PASS, Web build PASS, Mobile build PASS, Production endpoints HTTP 200 certified.
