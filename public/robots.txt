@@ -4,4 +4,4 @@ Disallow: /auth
 Disallow: /admin
 Disallow: /app
 
-Sitemap: https://eatcleanapp.lovable.app/sitemap.xml
+Sitemap: https://www.yourmealos.com/sitemap.xml

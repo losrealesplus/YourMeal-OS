@@ -13,7 +13,7 @@ import { Capacitor } from "@capacitor/core";
 import { ymosTrace } from "@/runtime/ymos-trace";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
+import { reportRuntimeError } from "../lib/error-reporting";
 import { onAuthStateChange } from "@/auth";
 import { BootstrapShell } from "@/bootstrap/BootstrapShell";
 import { ApplicationReadyGate } from "@/bootstrap/ready";
@@ -77,7 +77,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     console.error("[YMOS-ERROR-BOUNDARY]", msg, error);
     ymosRuntimeLog(msg);
     recordYmosRuntimeException(msg);
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    reportRuntimeError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
   return (
@@ -116,33 +116,40 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "YourMeal OS — The Operating System for Meal Prep & Catering" },
+      {
+        name: "viewport",
+        content:
+          "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover",
+      },
+      { title: "YourMeal OS — Sistema operativo para negocios de alimentación" },
       {
         name: "description",
         content:
-          "The multi-tenant operating system for meal prep, healthy catering and corporate food services. Every order generates every department's plan — no Excel, no WhatsApp.",
+          "YourMeal OS conecta pedidos, producción, cocina, reparto, atención al cliente, finanzas y administración en una única plataforma SaaS multi-tenant.",
       },
       { name: "author", content: "YourMeal OS" },
       {
         property: "og:title",
-        content: "YourMeal OS — The Operating System for Meal Prep & Catering",
+        content: "YourMeal OS — Sistema operativo para negocios de alimentación",
       },
       {
         property: "og:description",
         content:
-          "The multi-tenant operating system for meal prep, healthy catering and corporate food services. Every order generates every department's plan — no Excel, no WhatsApp.",
+          "La capa operacional que conecta el pedido con toda la operación: producción, cocina, reparto, atención, finanzas y administración.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "YourMeal OS — The Operating System for Meal Prep & Catering" },
-      { name: "twitter:description", content: "The multi-tenant operating system for meal prep, healthy catering and corporate food services. Every order generates every department's plan — no Excel, no WhatsApp." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/59fc57f6-0159-4577-bb70-0b62b1fbcd1d/id-preview-b02a611d--f8ba586d-0a01-4ad6-b65a-43058bf8649c.lovable.app-1784835094341.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/59fc57f6-0159-4577-bb70-0b62b1fbcd1d/id-preview-b02a611d--f8ba586d-0a01-4ad6-b65a-43058bf8649c.lovable.app-1784835094341.png" },
+      { name: "twitter:title", content: "YourMeal OS — Sistema operativo para negocios de alimentación" },
+      { name: "twitter:description", content: "YourMeal OS conecta pedidos, producción, cocina, reparto, atención al cliente, finanzas y administración en una única plataforma SaaS multi-tenant." },
+      { property: "og:image", content: "https://www.yourmealos.com/og-image.png" },
+      { name: "twitter:image", content: "https://www.yourmealos.com/og-image.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+      { rel: "icon", href: "/favicon.ico", type: "image/x-icon", sizes: "any" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+      { rel: "manifest", href: "/site.webmanifest" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       {
         rel: "preconnect",

@@ -10,7 +10,7 @@ import { emitCanonicalReady } from "@/auth/post-login-pipeline";
 import type { AppRole } from "@/hooks/use-auth";
 import { hasStaffAccess } from "@/permissions";
 import { resolvePostAdminLoginPath } from "@/lib/open-operations-center";
-import { reportLovableError } from "@/lib/lovable-error-reporting";
+import { reportRuntimeError } from "@/lib/error-reporting";
 
 export type AdminAuthErrorKind =
   | "network"
@@ -126,12 +126,11 @@ export function reportAdminAuthBootstrapFailure(
     message: safeMessage,
   });
 
-  reportLovableError(error, {
-    boundary: "auth_admin_bootstrap",
+  reportRuntimeError(error, {
+    context: "admin_auth_bootstrap",
     kind: classified.kind,
     route: context.route ?? "/auth/admin",
     userId: context.userId ?? null,
-    handled: true,
   });
 }
 
