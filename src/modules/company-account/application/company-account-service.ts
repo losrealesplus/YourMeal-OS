@@ -4,10 +4,14 @@ import { DomainError } from "@/domain/errors";
 import { createCompanyAccountRepository } from "../infrastructure/company-account-repository";
 import type {
   CompanyAccount,
+  CompanyEmployeeRecord,
   EmployeeMembership,
   OrderDemandContext,
   OrganizationalUnit,
   Site,
+  UpdateCompanyInput,
+  UpdateOrganizationalUnitInput,
+  UpdateSiteInput,
 } from "../domain/company-account";
 import { isValidCompanyCodeFormat } from "../domain/company-account";
 
@@ -44,9 +48,7 @@ function assertTenant(ctx: ServiceContext): void {
 }
 
 function canStaffManage(ctx: ServiceContext): boolean {
-  return (
-    ctx.roles.includes("saas_admin") || ctx.roles.includes("company_admin")
-  );
+  return ctx.roles.includes("saas_admin") || ctx.roles.includes("company_admin");
 }
 
 function assertStaffCanProvision(ctx: ServiceContext): void {
@@ -65,8 +67,7 @@ export const CompanyAccountService = {
     const repo = createCompanyAccountRepository(ctx.supabase, ctx.tenantId);
     const customerId = await repo.ensureIndividualCustomer({
       userId: ctx.userId,
-      displayName:
-        (ctx as ServiceContext & { displayName?: string }).displayName ?? null,
+      displayName: (ctx as ServiceContext & { displayName?: string }).displayName ?? null,
       email: null,
     });
     return customerId;
@@ -146,10 +147,55 @@ export const CompanyAccountService = {
     return repo.listCompanies();
   },
 
-  async lookupCompanyByCode(
+  async getCompany(ctx: ServiceContext, companyId: string): Promise<CompanyAccount> {
+    assertTenant(ctx);
+    await this.assertCanManageCompany(ctx, companyId);
+    const repo = createCompanyAccountRepository(ctx.supabase, ctx.tenantId);
+    const company = await repo.findCompanyById(companyId);
+    if (!company) {
+      throw new DomainError("NOT_FOUND", "Company not found");
+    }
+    return company;
+  },
+
+  async updateCompany(
     ctx: ServiceContext,
-    code: string,
+    companyId: string,
+    input: UpdateCompanyInput,
   ): Promise<CompanyAccount> {
+    assertTenant(ctx);
+    await this.assertCanManageCompany(ctx, companyId);
+    if (input.name !== undefined && !input.name.trim()) {
+      throw new DomainError("INVALID_STATE", "Company name cannot be empty");
+    }
+    if (
+      input.contactEmail !== undefined &&
+      input.contactEmail &&
+      !input.contactEmail.includes("@")
+    ) {
+      throw new DomainError("INVALID_STATE", "Invalid contact email address");
+    }
+
+    const repo = createCompanyAccountRepository(ctx.supabase, ctx.tenantId);
+    const oldCompany = await repo.findCompanyById(companyId);
+    if (!oldCompany) {
+      throw new DomainError("NOT_FOUND", "Company not found");
+    }
+
+    const updated = await repo.updateCompany(companyId, input);
+
+    await AuditService.write(ctx, {
+      entityType: "company",
+      entityId: companyId,
+      action: "update",
+      oldData: oldCompany,
+      newData: updated,
+    });
+
+    return updated;
+  },
+
+  async lookupCompanyByCode(ctx: ServiceContext, code: string): Promise<CompanyAccount> {
     assertTenant(ctx);
     if (!isValidCompanyCodeFormat(code)) {
       throw new DomainError("INVALID_STATE", "Invalid company code format");
@@ -162,10 +208,7 @@ export const CompanyAccountService = {
     return company;
   },
 
-  async joinCompany(
-    ctx: ServiceContext,
-    input: JoinCompanyInput,
-  ): Promise<EmployeeMembership> {
+  async joinCompany(ctx: ServiceContext, input: JoinCompanyInput): Promise<EmployeeMembership> {
     assertTenant(ctx);
     const repo = createCompanyAccountRepository(ctx.supabase, ctx.tenantId);
     const company = await this.lookupCompanyByCode(ctx, input.companyCode);
@@ -179,10 +222,7 @@ export const CompanyAccountService = {
     const units = await repo.listOrganizationalUnits(site.id);
     const unit = units.find((u) => u.id === input.organizationalUnitId);
     if (!unit) {
-      throw new DomainError(
-        "INVALID_STATE",
-        "Organizational unit does not belong to site",
-      );
+      throw new DomainError("INVALID_STATE", "Organizational unit does not belong to site");
     }
 
     const customerId = await repo.ensureIndividualCustomer({
@@ -256,6 +296,26 @@ export const CompanyAccountService = {
     return site;
   },
 
+  async updateSite(
+    ctx: ServiceContext,
+    input: { companyId: string; siteId: string; patch: UpdateSiteInput },
+  ): Promise<Site> {
+    assertTenant(ctx);
+    await this.assertCanManageCompany(ctx, input.companyId);
+    if (input.patch.name !== undefined && !input.patch.name.trim()) {
+      throw new DomainError("INVALID_STATE", "Site name cannot be empty");
+    }
+    const repo = createCompanyAccountRepository(ctx.supabase, ctx.tenantId);
+    const site = await repo.updateSite(input.companyId, input.siteId, input.patch);
+    await AuditService.write(ctx, {
+      entityType: "company_location",
+      entityId: site.id,
+      action: "update",
+      newData: { companyId: input.companyId, ...input.patch },
+    });
+    return site;
+  },
+
   async createOrganizationalUnit(
     ctx: ServiceContext,
     input: { companyId: string; siteId: string; name: string },
@@ -266,6 +326,10 @@ export const CompanyAccountService = {
       throw new DomainError("INVALID_STATE", "Unit name is required");
     }
     const repo = createCompanyAccountRepository(ctx.supabase, ctx.tenantId);
+    const site = await repo.findSiteById(input.siteId);
+    if (!site || site.companyId !== input.companyId) {
+      throw new DomainError("NOT_FOUND", "Site does not belong to target company");
+    }
     const unit = await repo.insertOrganizationalUnit({
       siteId: input.siteId,
       name: input.name.trim(),
@@ -279,9 +343,50 @@ export const CompanyAccountService = {
     return unit;
   },
 
-  async getMembershipForUser(
+  async updateOrganizationalUnit(
     ctx: ServiceContext,
-  ): Promise<{
+    input: {
+      companyId: string;
+      unitId: string;
+      patch: UpdateOrganizationalUnitInput;
+    },
+  ): Promise<OrganizationalUnit> {
+    assertTenant(ctx);
+    await this.assertCanManageCompany(ctx, input.companyId);
+    if (input.patch.name !== undefined && !input.patch.name.trim()) {
+      throw new DomainError("INVALID_STATE", "Unit name cannot be empty");
+    }
+    const repo = createCompanyAccountRepository(ctx.supabase, ctx.tenantId);
+    const unit = await repo.findOrganizationalUnitById(input.unitId);
+    if (!unit) {
+      throw new DomainError("NOT_FOUND", "Organizational unit not found");
+    }
+    const site = await repo.findSiteById(unit.siteId);
+    if (!site || site.companyId !== input.companyId) {
+      throw new DomainError("NOT_FOUND", "Organizational unit does not belong to target company");
+    }
+
+    const updated = await repo.updateOrganizationalUnit(input.unitId, input.patch);
+    await AuditService.write(ctx, {
+      entityType: "company_department",
+      entityId: updated.id,
+      action: "update",
+      newData: { companyId: input.companyId, ...input.patch },
+    });
+    return updated;
+  },
+
+  async listCompanyEmployees(
+    ctx: ServiceContext,
+    companyId: string,
+  ): Promise<CompanyEmployeeRecord[]> {
+    assertTenant(ctx);
+    await this.assertCanManageCompany(ctx, companyId);
+    const repo = createCompanyAccountRepository(ctx.supabase, ctx.tenantId);
+    return repo.listCompanyEmployees(companyId);
+  },
+
+  async getMembershipForUser(ctx: ServiceContext): Promise<{
     membership: EmployeeMembership;
     company: CompanyAccount;
   } | null> {
@@ -306,11 +411,7 @@ export const CompanyAccountService = {
   ): Promise<OrderDemandContext> {
     const repo = createCompanyAccountRepository(ctx.supabase, ctx.tenantId);
     const membership = await repo.findMembershipForCustomer(customerId);
-    if (
-      !membership ||
-      !membership.siteId ||
-      !membership.organizationalUnitId
-    ) {
+    if (!membership || !membership.siteId || !membership.organizationalUnitId) {
       return {
         demandChannel: "individual",
         companyId: null,
@@ -335,17 +436,10 @@ export const CompanyAccountService = {
     };
   },
 
-  async assertCanManageCompany(
-    ctx: ServiceContext,
-    companyId: string,
-  ): Promise<void> {
+  async assertCanManageCompany(ctx: ServiceContext, companyId: string): Promise<void> {
     if (canStaffManage(ctx)) return;
     const bound = await this.getMembershipForUser(ctx);
-    if (
-      !bound ||
-      bound.membership.companyId !== companyId ||
-      !bound.membership.isAdmin
-    ) {
+    if (!bound || bound.membership.companyId !== companyId || !bound.membership.isAdmin) {
       throw new DomainError(
         "PERMISSION_DENIED",
         "company.manage required for this Company Account",

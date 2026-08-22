@@ -7,6 +7,10 @@ export type {
   OrderDemandContext,
   CustomerType,
   DemandChannel,
+  UpdateCompanyInput,
+  UpdateSiteInput,
+  UpdateOrganizationalUnitInput,
+  CompanyEmployeeRecord,
 } from "./domain/company-account";
 export { isValidCompanyCodeFormat } from "./domain/company-account";
 export { CompanyAccountService } from "./application/company-account-service";
