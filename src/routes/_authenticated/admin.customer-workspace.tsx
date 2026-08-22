@@ -10,17 +10,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useRef, useState, useEffectEvent } from "react";
 import { toast } from "sonner";
-import {
-  AdminHeader,
-  SectionTitle,
-  StatusChip,
-} from "@/components/admin";
+import { AdminHeader, SectionTitle, StatusChip } from "@/components/admin";
 import { useCustomer } from "@/customer/useCustomer";
 import { useIdentity } from "@/identity/useIdentity";
-import {
-  archiveCustomerCommand,
-  createCustomerCommand,
-} from "@/customer/CustomerCommands";
+import { archiveCustomerCommand, createCustomerCommand } from "@/customer/CustomerCommands";
 import {
   getCustomerQuery,
   listRecentCustomersQuery,
@@ -57,9 +50,7 @@ type SearchHit = {
   companyLabel: string | null;
 };
 
-export const Route = createFileRoute(
-  "/_authenticated/admin/customer-workspace",
-)({
+export const Route = createFileRoute("/_authenticated/admin/customer-workspace")({
   beforeLoad: ({ context }) => {
     assertCapabilityFromContext(context, "customers.read");
   },
@@ -177,9 +168,7 @@ function CustomerExperiencePage() {
               partyKind,
             }),
           )
-        : await customer.listRecentCustomers(
-            listRecentCustomersQuery({ limit: 20, partyKind }),
-          );
+        : await customer.listRecentCustomers(listRecentCustomersQuery({ limit: 20, partyKind }));
       if (!result.ok) {
         toast.error(result.errors[0]?.message ?? "Search failed");
         setHits([]);
@@ -217,9 +206,7 @@ function CustomerExperiencePage() {
     async (partyRef: PartyRef) => {
       setBusy(true);
       try {
-        const result = await customer.getCustomer(
-          getCustomerQuery({ partyRef }),
-        );
+        const result = await customer.getCustomer(getCustomerQuery({ partyRef }));
         if (!result.ok || !result.context) {
           toast.error(result.errors[0]?.message ?? "Not found");
           setSelected(null);
@@ -327,9 +314,7 @@ function CustomerExperiencePage() {
       }
 
       // Organización — mínimo + email requerido por substrate (Progressive)
-      const email =
-        draft.contactEmail.trim() ||
-        `pending+${Date.now()}@customer.local`;
+      const email = draft.contactEmail.trim() || `pending+${Date.now()}@customer.local`;
       const result = await customer.createCustomer(
         createCustomerCommand({
           partyKind: "company_account",
@@ -354,7 +339,7 @@ function CustomerExperiencePage() {
       finishCreateSuccess({
         partyRef: result.partyRef,
         segment: "company_account",
-        toastMessage: `Organización creada · ${ms} ms · preferir Nueva organización (CX004)`,
+        toastMessage: "Organización creada",
       });
       await openParty(result.partyRef);
       await loadList(query, "company_account");
@@ -387,9 +372,7 @@ function CustomerExperiencePage() {
     if (!window.confirm("¿Archivar este cliente individual?")) return;
     setBusy(true);
     try {
-      const result = await customer.archiveCustomer(
-        archiveCustomerCommand({ partyRef }),
-      );
+      const result = await customer.archiveCustomer(archiveCustomerCommand({ partyRef }));
       if (!result.ok) {
         toast.error(result.errors[0]?.message ?? "Archive failed");
         return;
@@ -422,9 +405,9 @@ function CustomerExperiencePage() {
       </div>
 
       <AdminHeader
-        goal="Enriquecer cuando aporte valor — nunca bloquear por incompleto"
+        goal="Gestión unificada de clientes y empresas vinculadas"
         capability="customers.read / customers.write"
-        object="Living Profile · Preferencias · Alergias · Facturación · Tags"
+        object="Customer Profile · Preferencias · Alergias · Facturación · Tags"
       />
 
       {!creating && !organizing ? (
@@ -529,9 +512,7 @@ function CustomerExperiencePage() {
               : "Recientes · escribe para buscar"}
           </p>
           {loading ? (
-            <p className="py-8 text-center text-sm text-muted-foreground">
-              Buscando…
-            </p>
+            <p className="py-8 text-center text-sm text-muted-foreground">Buscando…</p>
           ) : hits.length === 0 ? (
             <SearchEmptyState
               hasQuery={Boolean(query.trim())}
@@ -652,8 +633,7 @@ function CreateWizard(props: {
   onCancel: () => void;
   onSave: () => void;
 }) {
-  const { partyChoice, draft, busy, nameRef, onChoose, onDraft, onCancel, onSave } =
-    props;
+  const { partyChoice, draft, busy, nameRef, onChoose, onDraft, onCancel, onSave } = props;
 
   return (
     <div className="mb-6 rounded-md border border-border p-4 space-y-4">
@@ -670,9 +650,7 @@ function CreateWizard(props: {
 
       {!partyChoice ? (
         <div className="space-y-3">
-          <p className="text-sm font-medium text-foreground">
-            ¿Qué tipo de cliente vas a crear?
-          </p>
+          <p className="text-sm font-medium text-foreground">¿Qué tipo de cliente vas a crear?</p>
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
@@ -697,8 +675,8 @@ function CreateWizard(props: {
             </button>
           </div>
           <p className="text-xs text-muted-foreground">
-            Una pregunta. El formulario solo muestra lo relevante (Manifesto ·
-            carga cognitiva mínima).
+            Una pregunta. El formulario solo muestra lo relevante (Manifesto · carga cognitiva
+            mínima).
           </p>
         </div>
       ) : (
@@ -725,9 +703,7 @@ function CreateWizard(props: {
             <input
               ref={nameRef}
               value={draft.name}
-              onChange={(e) =>
-                onDraft((d) => ({ ...d, name: e.target.value }))
-              }
+              onChange={(e) => onDraft((d) => ({ ...d, name: e.target.value }))}
               className="min-h-11 w-full rounded-md border border-border bg-background px-3 py-2.5 text-base sm:text-sm"
               autoComplete="name"
             />
@@ -736,9 +712,7 @@ function CreateWizard(props: {
             <span className="mb-1 block text-muted-foreground">Teléfono</span>
             <input
               value={draft.phone}
-              onChange={(e) =>
-                onDraft((d) => ({ ...d, phone: e.target.value }))
-              }
+              onChange={(e) => onDraft((d) => ({ ...d, phone: e.target.value }))}
               className="min-h-11 w-full rounded-md border border-border bg-background px-3 py-2.5 text-base sm:text-sm"
               autoComplete="tel"
             />
@@ -747,9 +721,7 @@ function CreateWizard(props: {
             <span className="mb-1 block text-muted-foreground">Ciudad</span>
             <input
               value={draft.city}
-              onChange={(e) =>
-                onDraft((d) => ({ ...d, city: e.target.value }))
-              }
+              onChange={(e) => onDraft((d) => ({ ...d, city: e.target.value }))}
               className="min-h-11 w-full rounded-md border border-border bg-background px-3 py-2.5 text-base sm:text-sm"
             />
           </label>
@@ -757,9 +729,7 @@ function CreateWizard(props: {
             <span className="mb-1 block text-muted-foreground">Dirección</span>
             <input
               value={draft.address}
-              onChange={(e) =>
-                onDraft((d) => ({ ...d, address: e.target.value }))
-              }
+              onChange={(e) => onDraft((d) => ({ ...d, address: e.target.value }))}
               className="min-h-11 w-full rounded-md border border-border bg-background px-3 py-2.5 text-base sm:text-sm"
               autoComplete="street-address"
             />
@@ -771,9 +741,7 @@ function CreateWizard(props: {
               </span>
               <input
                 value={draft.contactEmail}
-                onChange={(e) =>
-                  onDraft((d) => ({ ...d, contactEmail: e.target.value }))
-                }
+                onChange={(e) => onDraft((d) => ({ ...d, contactEmail: e.target.value }))}
                 className="min-h-11 w-full rounded-md border border-border bg-background px-3 py-2.5 text-base sm:text-sm"
                 autoComplete="email"
                 type="email"
@@ -802,11 +770,7 @@ function CreateWizard(props: {
   );
 }
 
-function SearchEmptyState(props: {
-  hasQuery: boolean;
-  canWrite: boolean;
-  onCreate: () => void;
-}) {
+function SearchEmptyState(props: { hasQuery: boolean; canWrite: boolean; onCreate: () => void }) {
   return (
     <div className="rounded-md border border-dashed border-border px-4 py-10 text-center space-y-4">
       <div>
@@ -842,12 +806,8 @@ function SearchResultCard(props: {
 }) {
   const { hit } = props;
   const typeLabel = customerTypeLabel(hit.summary);
-  const phoneHref = hit.phone
-    ? `tel:${hit.phone.replace(/[^\d+]/g, "")}`
-    : null;
-  const waHref = hit.phone
-    ? `https://wa.me/${hit.phone.replace(/\D/g, "")}`
-    : null;
+  const phoneHref = hit.phone ? `tel:${hit.phone.replace(/[^\d+]/g, "")}` : null;
+  const waHref = hit.phone ? `https://wa.me/${hit.phone.replace(/\D/g, "")}` : null;
   const mapsHref = hit.area
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
         `${hit.summary.displayName} ${hit.area}`,
@@ -867,9 +827,7 @@ function SearchResultCard(props: {
         className="flex w-full min-h-11 items-start justify-between gap-3 text-left"
       >
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold">
-            {hit.summary.displayName}
-          </p>
+          <p className="truncate text-sm font-semibold">{hit.summary.displayName}</p>
           <p className="mt-0.5 text-[11px] text-muted-foreground">
             {typeLabel}
             {hit.companyLabel ? ` · ${hit.companyLabel}` : ""}
@@ -879,8 +837,7 @@ function SearchResultCard(props: {
         </div>
         <StatusChip
           tone={
-            hit.summary.status === "inactive" ||
-            hit.summary.status === "archived"
+            hit.summary.status === "inactive" || hit.summary.status === "archived"
               ? "danger"
               : "positive"
           }
@@ -900,10 +857,7 @@ function SearchResultCard(props: {
           to="/admin/order-capture"
           search={{
             customerId: hit.summary.id,
-            kind:
-              hit.summary.partyKind === "company_account"
-                ? "company_account"
-                : "individual",
+            kind: hit.summary.partyKind === "company_account" ? "company_account" : "individual",
             mode: "capture",
           }}
           className="inline-flex min-h-10 items-center rounded-md bg-foreground px-2.5 py-1.5 text-xs font-semibold text-background"
@@ -967,10 +921,7 @@ function NextBestAction(props: {
   onCreateAnother: () => void;
   onBack: () => void;
 }) {
-  const orderKind =
-    props.customerKind === "company_account"
-      ? "company_account"
-      : "individual";
+  const orderKind = props.customerKind === "company_account" ? "company_account" : "individual";
   return (
     <div
       className="rounded-md border border-foreground/20 bg-foreground/[0.04] px-3 py-3 space-y-3"
@@ -981,9 +932,7 @@ function NextBestAction(props: {
         <p className="text-sm font-semibold">Cliente creado</p>
         <p className="text-xs text-muted-foreground">
           ¿Qué quieres hacer ahora?
-          {props.createdFromLabel
-            ? ` · alta desde ${props.createdFromLabel}`
-            : ""}
+          {props.createdFromLabel ? ` · alta desde ${props.createdFromLabel}` : ""}
         </p>
       </div>
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
@@ -1033,14 +982,7 @@ function Kpi(props: { label: string; value: string; primary?: boolean }) {
         {props.label}
         {props.primary ? " · mission" : ""}
       </p>
-      <p
-        className={cn(
-          "text-sm font-semibold",
-          props.primary && "text-base",
-        )}
-      >
-        {props.value}
-      </p>
+      <p className={cn("text-sm font-semibold", props.primary && "text-base")}>{props.value}</p>
     </div>
   );
 }
