@@ -26,6 +26,14 @@ export type IndividualCustomerRecord = {
   city: string | null;
 };
 
+export type UpdateIndividualCustomerInput = {
+  displayName: string;
+  email?: string | null;
+  phone?: string | null;
+  street?: string | null;
+  city?: string | null;
+};
+
 export type CompanyDirectoryRecord = {
   id: string;
   name: string;
@@ -56,30 +64,19 @@ export type SupportNoteRecord = {
 };
 
 /** Issue kinds that participate in Issues Resolved KPI / lifecycle. */
-export const SUPPORT_ISSUE_KINDS: readonly SupportNoteRecord["kind"][] = [
-  "incident",
-  "complaint",
-];
+export const SUPPORT_ISSUE_KINDS: readonly SupportNoteRecord["kind"][] = ["incident", "complaint"];
 
-const SUPPORT_STATUS_TRANSITIONS: Record<
-  SupportNoteStatus,
-  readonly SupportNoteStatus[]
-> = {
+const SUPPORT_STATUS_TRANSITIONS: Record<SupportNoteStatus, readonly SupportNoteStatus[]> = {
   open: ["resolved", "closed"],
   resolved: ["closed"],
   closed: [],
 };
 
-export function nextSupportNoteStatuses(
-  from: SupportNoteStatus,
-): SupportNoteStatus[] {
+export function nextSupportNoteStatuses(from: SupportNoteStatus): SupportNoteStatus[] {
   return [...(SUPPORT_STATUS_TRANSITIONS[from] ?? [])];
 }
 
-export function canTransitionSupportNote(
-  from: SupportNoteStatus,
-  to: SupportNoteStatus,
-): boolean {
+export function canTransitionSupportNote(from: SupportNoteStatus, to: SupportNoteStatus): boolean {
   return nextSupportNoteStatuses(from).includes(to);
 }
 

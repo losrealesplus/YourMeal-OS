@@ -7,7 +7,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Download, Building2, Users } from "lucide-react";
+import { Download, Building2, Users, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import {
   AdminHeader,
@@ -18,6 +18,17 @@ import {
   StatusChip,
 } from "@/components/admin";
 import type { Column } from "@/components/admin/data-table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useFmt } from "@/i18n/localization-provider";
 import { useAuth } from "@/hooks/use-auth";
 import { useCan } from "@/hooks/use-can";
@@ -66,12 +77,59 @@ function AdminCustomersPage() {
   const [tab, setTab] = useState<Tab>("individuals");
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [individuals, setIndividuals] = useState<IndividualCustomerRecord[]>(
-    [],
-  );
+  const [individuals, setIndividuals] = useState<IndividualCustomerRecord[]>([]);
   const [companies, setCompanies] = useState<CompanyDirectoryRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [archivingId, setArchivingId] = useState<string | null>(null);
+  const [editingCustomer, setEditingCustomer] = useState<IndividualCustomerRecord | null>(null);
+  const [editForm, setEditForm] = useState({
+    displayName: "",
+    email: "",
+    phone: "",
+    city: "",
+  });
+  const [saving, setSaving] = useState(false);
+
+  function startEdit(customer: IndividualCustomerRecord) {
+    setEditingCustomer(customer);
+    setEditForm({
+      displayName: customer.displayName || "",
+      email: customer.email || "",
+      phone: customer.phone || "",
+      city: customer.city || "",
+    });
+  }
+
+  async function handleSaveEdit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!user || !tenantId || !editingCustomer || !can("customers.write")) return;
+    if (!editForm.displayName.trim()) {
+      toast.error("El nombre es obligatorio");
+      return;
+    }
+    setSaving(true);
+    try {
+      const ctx = await createServiceContext({
+        supabase,
+        userId: user.id,
+        tenantId,
+        roles,
+      });
+      await CustomerDirectoryService.updateCustomer(ctx, editingCustomer.id, {
+        displayName: editForm.displayName.trim(),
+        email: editForm.email.trim() || null,
+        phone: editForm.phone.trim() || null,
+        city: editForm.city.trim() || null,
+      });
+      toast.success("Cliente actualizado");
+      setEditingCustomer(null);
+      await reload();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : String(err));
+    } finally {
+      setSaving(false);
+    }
+  }
 
   const reload = useCallback(async () => {
     if (!user || !tenantId) return;
@@ -86,10 +144,7 @@ function AdminCustomersPage() {
       const [inds, cos] = await Promise.all([
         CustomerDirectoryService.listIndividuals(ctx, {
           query,
-          status:
-            statusFilter === "all"
-              ? "all"
-              : (statusFilter as "active" | "inactive" | "new"),
+          status: statusFilter === "all" ? "all" : (statusFilter as "active" | "inactive" | "new"),
           kind: "individual",
         }),
         CustomerDirectoryService.listCompanies(ctx, {
@@ -152,9 +207,7 @@ function AdminCustomersPage() {
         header: "Nombre",
         render: (r) => (
           <div className="min-w-0">
-            <p className="font-semibold truncate">
-              {r.displayName || "Sin nombre"}
-            </p>
+            <p className="font-semibold truncate">{r.displayName || "Sin nombre"}</p>
             <p className="text-xs text-muted-foreground truncate">
               {r.kind === "company_employee" ? "Empleado empresa" : "Particular"}
               {r.companyName ? ` · ${r.companyName}` : ""}
@@ -165,17 +218,13 @@ function AdminCustomersPage() {
       {
         key: "status",
         header: "Estado",
-        render: (r) => (
-          <StatusChip tone={toneByStatus[r.status]} label={r.status} />
-        ),
+        render: (r) => <StatusChip tone={toneByStatus[r.status]} label={r.status} />,
       },
       {
         key: "email",
         header: "Correo",
         render: (r) => (
-          <span className="text-xs truncate block max-w-[180px]">
-            {r.email || "—"}
-          </span>
+          <span className="text-xs truncate block max-w-[180px]">{r.email || "—"}</span>
         ),
       },
       {
@@ -196,9 +245,7 @@ function AdminCustomersPage() {
         key: "orders",
         header: "Pedidos",
         className: "text-right",
-        render: (r) => (
-          <span className="font-mono tabular-nums">{r.orderCount}</span>
-        ),
+        render: (r) => <span className="font-mono tabular-nums">{r.orderCount}</span>,
       },
       {
         key: "avg",
@@ -225,6 +272,15 @@ function AdminCustomersPage() {
             {can("customers.write") ? (
               <button
                 type="button"
+                onClick={() => startEdit(r)}
+                className="text-xs font-semibold uppercase tracking-widest text-primary hover:underline"
+              >
+                Editar
+              </button>
+            ) : null}
+            {can("customers.write") ? (
+              <button
+                type="button"
                 disabled={archivingId === r.id}
                 onClick={() => archiveCustomer(r.id)}
                 className="text-xs font-semibold uppercase tracking-widest text-destructive hover:underline disabled:opacity-50"
@@ -248,9 +304,7 @@ function AdminCustomersPage() {
         render: (r) => (
           <div className="min-w-0">
             <p className="font-semibold truncate">{r.name}</p>
-            <p className="text-xs text-muted-foreground font-mono">
-              {r.companyCode}
-            </p>
+            <p className="text-xs text-muted-foreground font-mono">{r.companyCode}</p>
           </div>
         ),
       },
@@ -260,9 +314,7 @@ function AdminCustomersPage() {
         render: (r) => (
           <div className="min-w-0">
             <p className="text-sm truncate">{r.contactName || "—"}</p>
-            <p className="text-xs text-muted-foreground truncate">
-              {r.contactEmail || "—"}
-            </p>
+            <p className="text-xs text-muted-foreground truncate">{r.contactEmail || "—"}</p>
           </div>
         ),
       },
@@ -270,35 +322,26 @@ function AdminCustomersPage() {
         key: "employees",
         header: "Empleados",
         className: "text-right",
-        render: (r) => (
-          <span className="font-mono tabular-nums">{r.employeeCount}</span>
-        ),
+        render: (r) => <span className="font-mono tabular-nums">{r.employeeCount}</span>,
       },
       {
         key: "orders",
         header: "Pedidos",
         className: "text-right",
-        render: (r) => (
-          <span className="font-mono tabular-nums">{r.orderCount}</span>
-        ),
+        render: (r) => <span className="font-mono tabular-nums">{r.orderCount}</span>,
       },
       {
         key: "status",
         header: "Estado",
         render: (r) => (
-          <StatusChip
-            tone={r.status === "active" ? "positive" : "danger"}
-            label={r.status}
-          />
+          <StatusChip tone={r.status === "active" ? "positive" : "danger"} label={r.status} />
         ),
       },
       {
         key: "created",
         header: "Alta",
         render: (r) => (
-          <span className="text-xs text-muted-foreground">
-            {fmt.date(r.createdAt, "medium")}
-          </span>
+          <span className="text-xs text-muted-foreground">{fmt.date(r.createdAt, "medium")}</span>
         ),
       },
       {
@@ -341,32 +384,17 @@ function AdminCustomersPage() {
         >
           Customer Workspace
         </Link>{" "}
-        — construido solo con{" "}
-        <code className="text-xs">useCustomer()</code> (LAW 003). Esta pantalla
-        legacy aún habla con Services directo.
+        — construido solo con <code className="text-xs">useCustomer()</code> (LAW 003). Esta
+        pantalla legacy aún habla con Services directo.
       </div>
 
       <div className="grid gap-3 md:grid-cols-4 mb-6">
-        <KpiCard
-          label="Particulares"
-          value={String(particulares.length)}
-          trend="flat"
-        />
-        <KpiCard
-          label="Activos"
-          value={String(activeCount)}
-          trend="up"
-        />
-        <KpiCard
-          label="Empresas"
-          value={String(companies.length)}
-          trend="flat"
-        />
+        <KpiCard label="Particulares" value={String(particulares.length)} trend="flat" />
+        <KpiCard label="Activos" value={String(activeCount)} trend="up" />
+        <KpiCard label="Empresas" value={String(companies.length)} trend="flat" />
         <KpiCard
           label="Empleados vinculados"
-          value={String(
-            companies.reduce((s, c) => s + c.employeeCount, 0),
-          )}
+          value={String(companies.reduce((s, c) => s + c.employeeCount, 0))}
           trend="flat"
         />
       </div>
@@ -448,9 +476,7 @@ function AdminCustomersPage() {
         </div>
 
         {loading ? (
-          <p className="text-sm text-muted-foreground py-8 text-center">
-            Cargando…
-          </p>
+          <p className="text-sm text-muted-foreground py-8 text-center">Cargando…</p>
         ) : tab === "individuals" ? (
           <DataTable
             columns={individualColumns}
@@ -465,6 +491,82 @@ function AdminCustomersPage() {
           />
         )}
       </PanelCard>
+
+      <Dialog
+        open={Boolean(editingCustomer)}
+        onOpenChange={(open) => {
+          if (!open) setEditingCustomer(null);
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Editar Cliente</DialogTitle>
+            <DialogDescription>
+              Modifica los datos de contacto y perfil del cliente en el Tenant.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSaveEdit} className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-customer-name">
+                Nombre completo <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="edit-customer-name"
+                value={editForm.displayName}
+                onChange={(e) => setEditForm((f) => ({ ...f, displayName: e.target.value }))}
+                placeholder="Ej. Alexander Hernández"
+                required
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-customer-email">Email</Label>
+              <Input
+                id="edit-customer-email"
+                type="email"
+                value={editForm.email}
+                onChange={(e) => setEditForm((f) => ({ ...f, email: e.target.value }))}
+                placeholder="cliente@ejemplo.com"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-customer-phone">Teléfono</Label>
+              <Input
+                id="edit-customer-phone"
+                value={editForm.phone}
+                onChange={(e) => setEditForm((f) => ({ ...f, phone: e.target.value }))}
+                placeholder="+34 600 000 000"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-customer-city">Ciudad / Ubicación</Label>
+              <Input
+                id="edit-customer-city"
+                value={editForm.city}
+                onChange={(e) => setEditForm((f) => ({ ...f, city: e.target.value }))}
+                placeholder="Madrid"
+              />
+            </div>
+
+            <DialogFooter className="pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setEditingCustomer(null)}
+                disabled={saving}
+              >
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={saving}>
+                {saving ? "Guardando…" : "Guardar cambios"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

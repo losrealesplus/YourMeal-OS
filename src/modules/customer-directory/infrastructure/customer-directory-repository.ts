@@ -9,6 +9,7 @@ import {
   type CustomerKind,
   type CustomerOrderSummary,
   type IndividualCustomerRecord,
+  type UpdateIndividualCustomerInput,
   type SupportNoteRecord,
   type SupportStats,
 } from "../domain/customer-directory";
@@ -87,15 +88,7 @@ function startOfDaysAgo(days: number): Date {
 }
 
 function weekdayName(iso: string): string {
-  const names = [
-    "domingo",
-    "lunes",
-    "martes",
-    "miércoles",
-    "jueves",
-    "viernes",
-    "sábado",
-  ];
+  const names = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
   return names[new Date(iso).getUTCDay()] ?? "—";
 }
 
@@ -103,10 +96,7 @@ function weekdayName(iso: string): string {
  * Persistence for Customer Directory. Uses `any` where generated Database
  * types lag B2B / soft-delete columns.
  */
-export function createCustomerDirectoryRepository(
-  client: Client,
-  tenantId: string,
-) {
+export function createCustomerDirectoryRepository(client: Client, tenantId: string) {
   const db = client as any;
 
   async function loadCustomers(): Promise<RawCustomer[]> {
@@ -123,9 +113,7 @@ export function createCustomerDirectoryRepository(
   async function loadOrders(): Promise<RawOrder[]> {
     const { data, error } = await db
       .from("orders")
-      .select(
-        "id, customer_id, company_id, status, total, created_at, demand_channel",
-      )
+      .select("id, customer_id, company_id, status, total, created_at, demand_channel")
       .eq("tenant_id", tenantId)
       .is("deleted_at", null);
     if (error) throw error;
@@ -159,9 +147,7 @@ export function createCustomerDirectoryRepository(
   async function loadMemberships(): Promise<RawMembership[]> {
     const { data, error } = await db
       .from("company_employees")
-      .select(
-        "customer_id, company_id, status, deleted_at, companies(id, name, company_code)",
-      )
+      .select("customer_id, company_id, status, deleted_at, companies(id, name, company_code)")
       .eq("tenant_id", tenantId)
       .is("deleted_at", null);
     if (error) throw error;
@@ -171,9 +157,7 @@ export function createCustomerDirectoryRepository(
   async function loadCompanies(): Promise<RawCompany[]> {
     const { data, error } = await db
       .from("companies")
-      .select(
-        "id, name, company_code, contact_name, contact_email, contact_phone, created_at",
-      )
+      .select("id, name, company_code, contact_name, contact_email, contact_phone, created_at")
       .eq("tenant_id", tenantId)
       .is("deleted_at", null)
       .order("name");
@@ -227,9 +211,9 @@ export function createCustomerDirectoryRepository(
           .sort()
           .at(-1) ?? null;
       const membership = membershipByCustomer.get(c.id) ?? null;
-      const kind = (c.kind === "company_employee"
-        ? "company_employee"
-        : "individual") as CustomerKind;
+      const kind = (
+        c.kind === "company_employee" ? "company_employee" : "individual"
+      ) as CustomerKind;
 
       return {
         id: c.id,
@@ -263,10 +247,7 @@ export function createCustomerDirectoryRepository(
     const employeesByCompany = new Map<string, number>();
     for (const m of memberships) {
       if (m.status !== "active") continue;
-      employeesByCompany.set(
-        m.company_id,
-        (employeesByCompany.get(m.company_id) ?? 0) + 1,
-      );
+      employeesByCompany.set(m.company_id, (employeesByCompany.get(m.company_id) ?? 0) + 1);
     }
 
     const ordersByCompany = new Map<string, RawOrder[]>();
@@ -280,9 +261,7 @@ export function createCustomerDirectoryRepository(
     const activeSince = startOfDaysAgo(30).toISOString();
 
     return companies.map((co) => {
-      const coOrders = (ordersByCompany.get(co.id) ?? []).filter((o) =>
-        BILLABLE.has(o.status),
-      );
+      const coOrders = (ordersByCompany.get(co.id) ?? []).filter((o) => BILLABLE.has(o.status));
       const lifetimeTotal = coOrders.reduce((s, o) => s + num(o.total), 0);
       const recent = coOrders.some((o) => o.created_at >= activeSince);
       return {
@@ -295,9 +274,7 @@ export function createCustomerDirectoryRepository(
         employeeCount: employeesByCompany.get(co.id) ?? 0,
         orderCount: coOrders.length,
         lifetimeTotal,
-        status: recent || (employeesByCompany.get(co.id) ?? 0) > 0
-          ? "active"
-          : "inactive",
+        status: recent || (employeesByCompany.get(co.id) ?? 0) > 0 ? "active" : "inactive",
         createdAt: co.created_at,
       };
     });
@@ -313,13 +290,7 @@ export function createCustomerDirectoryRepository(
         loadAddresses(ids),
         loadMemberships(),
       ]);
-      return buildIndividualRecords(
-        customers,
-        orders,
-        phones,
-        addresses,
-        memberships,
-      );
+      return buildIndividualRecords(customers, orders, phones, addresses, memberships);
     },
 
     async listCompanies(): Promise<CompanyDirectoryRecord[]> {
@@ -331,14 +302,10 @@ export function createCustomerDirectoryRepository(
       return buildCompanyRecords(companies, memberships, orders);
     },
 
-    async getCustomerOrders(
-      customerId: string,
-    ): Promise<CustomerOrderSummary[]> {
+    async getCustomerOrders(customerId: string): Promise<CustomerOrderSummary[]> {
       const { data, error } = await db
         .from("orders")
-        .select(
-          "id, status, total, created_at, demand_channel, company_id",
-        )
+        .select("id, status, total, created_at, demand_channel, company_id")
         .eq("tenant_id", tenantId)
         .eq("customer_id", customerId)
         .is("deleted_at", null)
@@ -368,18 +335,20 @@ export function createCustomerDirectoryRepository(
       if (customerId) q = q.eq("customer_id", customerId);
       const { data, error } = await q;
       if (error) throw error;
-      return ((data ?? []) as Array<{
-        id: string;
-        customer_id: string;
-        kind: SupportNoteRecord["kind"];
-        status: SupportNoteRecord["status"];
-        body: string;
-        author_id: string | null;
-        created_at: string;
-        resolved_at: string | null;
-        closed_at: string | null;
-        customers: { display_name: string | null } | null;
-      }>).map((row) => ({
+      return (
+        (data ?? []) as Array<{
+          id: string;
+          customer_id: string;
+          kind: SupportNoteRecord["kind"];
+          status: SupportNoteRecord["status"];
+          body: string;
+          author_id: string | null;
+          created_at: string;
+          resolved_at: string | null;
+          closed_at: string | null;
+          customers: { display_name: string | null } | null;
+        }>
+      ).map((row) => ({
         id: row.id,
         customerId: row.customer_id,
         customerName: row.customers?.display_name ?? null,
@@ -557,6 +526,162 @@ export function createCustomerDirectoryRepository(
       return customerId;
     },
 
+    async getIndividualById(customerId: string): Promise<IndividualCustomerRecord | null> {
+      const { data: customer, error: custErr } = await db
+        .from("customers")
+        .select("id, display_name, email, kind, created_at, user_id")
+        .eq("tenant_id", tenantId)
+        .eq("id", customerId)
+        .is("deleted_at", null)
+        .maybeSingle();
+      if (custErr) throw custErr;
+      if (!customer) return null;
+
+      const [orders, phones, addresses, memberships] = await Promise.all([
+        loadOrders(),
+        loadPhones([customerId]),
+        loadAddresses([customerId]),
+        loadMemberships(),
+      ]);
+
+      const records = buildIndividualRecords(
+        [customer as RawCustomer],
+        orders,
+        phones,
+        addresses,
+        memberships,
+      );
+      return records[0] ?? null;
+    },
+
+    async updateIndividual(
+      customerId: string,
+      input: UpdateIndividualCustomerInput,
+    ): Promise<IndividualCustomerRecord> {
+      const name = input.displayName.trim();
+      if (!name) {
+        throw new Error("displayName is required");
+      }
+      const customerPatch: Record<string, unknown> = { display_name: name };
+      if (input.email !== undefined) {
+        customerPatch.email = input.email ? input.email.trim() : null;
+      }
+
+      const { error: custErr } = await db
+        .from("customers")
+        .update(customerPatch)
+        .eq("tenant_id", tenantId)
+        .eq("id", customerId)
+        .is("deleted_at", null);
+      if (custErr) throw custErr;
+
+      if (input.phone !== undefined) {
+        const phone = input.phone?.trim() || null;
+        const { data: phones, error: phoneErr } = await db
+          .from("customer_phones")
+          .select("id, phone, is_primary")
+          .eq("tenant_id", tenantId)
+          .eq("customer_id", customerId)
+          .is("deleted_at", null);
+        if (phoneErr) throw phoneErr;
+
+        const primary = (phones ?? []).find((p: any) => p.is_primary) ?? phones?.[0];
+        if (phone) {
+          if (primary) {
+            const { error: updErr } = await db
+              .from("customer_phones")
+              .update({ phone, is_primary: true })
+              .eq("tenant_id", tenantId)
+              .eq("id", primary.id);
+            if (updErr) throw updErr;
+          } else {
+            const { error: insErr } = await db.from("customer_phones").insert({
+              tenant_id: tenantId,
+              customer_id: customerId,
+              phone,
+              is_primary: true,
+            });
+            if (insErr) throw insErr;
+          }
+        } else if (primary) {
+          const { error: delErr } = await db
+            .from("customer_phones")
+            .update({ deleted_at: new Date().toISOString() })
+            .eq("tenant_id", tenantId)
+            .eq("id", primary.id);
+          if (delErr) throw delErr;
+        }
+      }
+
+      if (input.city !== undefined || input.street !== undefined) {
+        const city = input.city !== undefined ? input.city?.trim() || null : undefined;
+        const street = input.street !== undefined ? input.street?.trim() || null : undefined;
+        const { data: addresses, error: addrErr } = await db
+          .from("customer_addresses")
+          .select("id, city, street, is_default")
+          .eq("tenant_id", tenantId)
+          .eq("customer_id", customerId)
+          .is("deleted_at", null);
+        if (addrErr) throw addrErr;
+
+        const defAddr = (addresses ?? []).find((a: any) => a.is_default) ?? addresses?.[0];
+        if (city !== undefined || street !== undefined) {
+          if (defAddr) {
+            const patch: Record<string, unknown> = {};
+            if (city !== undefined) patch.city = city;
+            if (street !== undefined) patch.street = street;
+            const { error: updAddrErr } = await db
+              .from("customer_addresses")
+              .update(patch)
+              .eq("tenant_id", tenantId)
+              .eq("id", defAddr.id);
+            if (updAddrErr) throw updAddrErr;
+          } else if (city || street) {
+            const { error: insAddrErr } = await db.from("customer_addresses").insert({
+              tenant_id: tenantId,
+              customer_id: customerId,
+              city: city || null,
+              street: street || null,
+              is_default: true,
+              label: "Principal",
+            });
+            if (insAddrErr) throw insAddrErr;
+          }
+        }
+      }
+
+      const { data: customer, error: reFetchErr } = await db
+        .from("customers")
+        .select("id, display_name, email, kind, created_at, user_id")
+        .eq("tenant_id", tenantId)
+        .eq("id", customerId)
+        .is("deleted_at", null)
+        .maybeSingle();
+      if (reFetchErr) throw reFetchErr;
+      if (!customer) {
+        throw new Error(`Customer not found after update: ${customerId}`);
+      }
+
+      const [orders, phones, addresses, memberships] = await Promise.all([
+        loadOrders(),
+        loadPhones([customerId]),
+        loadAddresses([customerId]),
+        loadMemberships(),
+      ]);
+
+      const records = buildIndividualRecords(
+        [customer as RawCustomer],
+        orders,
+        phones,
+        addresses,
+        memberships,
+      );
+      if (!records[0]) {
+        throw new Error(`Customer record build failed after update: ${customerId}`);
+      }
+      return records[0];
+    },
+
     async commercialMetrics(): Promise<CommercialDashboardMetrics> {
       const [customers, companies, memberships, orders] = await Promise.all([
         loadCustomers(),
@@ -564,13 +689,7 @@ export function createCustomerDirectoryRepository(
         loadMemberships(),
         loadOrders(),
       ]);
-      const individuals = buildIndividualRecords(
-        customers,
-        orders,
-        [],
-        [],
-        memberships,
-      );
+      const individuals = buildIndividualRecords(customers, orders, [], [], memberships);
       const companyRows = buildCompanyRecords(companies, memberships, orders);
 
       const weekStart = startOfDaysAgo(7).toISOString();
@@ -588,8 +707,7 @@ export function createCustomerDirectoryRepository(
         const hour = new Date(o.created_at).getUTCHours();
         hourCounts.set(hour, (hourCounts.get(hour) ?? 0) + 1);
       }
-      const peakPurchaseDay =
-        [...dayCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+      const peakPurchaseDay = [...dayCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
       const troughPurchaseDay =
         [...dayCounts.entries()].sort((a, b) => a[1] - b[1])[0]?.[0] ?? null;
       const peakPurchaseHour =
@@ -648,8 +766,7 @@ export function createCustomerDirectoryRepository(
         if (c.orderCount < 2 || !c.lastOrderAt) continue;
         const span = Math.max(
           1,
-          (new Date(c.lastOrderAt).getTime() -
-            new Date(c.createdAt).getTime()) /
+          (new Date(c.lastOrderAt).getTime() - new Date(c.createdAt).getTime()) /
             (1000 * 60 * 60 * 24),
         );
         frequencySum += span / (c.orderCount - 1);
@@ -658,29 +775,21 @@ export function createCustomerDirectoryRepository(
 
       return {
         totalCustomers: individuals.length,
-        activeCustomers: individuals.filter((c) => c.status === "active")
-          .length,
+        activeCustomers: individuals.filter((c) => c.status === "active").length,
         newCustomers: individuals.filter((c) => c.status === "new").length,
         companies: companyRows.length,
-        activeCompanies: companyRows.filter((c) => c.status === "active")
-          .length,
-        linkedEmployees: memberships.filter((m) => m.status === "active")
-          .length,
+        activeCompanies: companyRows.filter((c) => c.status === "active").length,
+        linkedEmployees: memberships.filter((m) => m.status === "active").length,
         weeklyOrders: weekly.length,
         monthlyOrders: monthly.length,
         averageTicket: monthly.length > 0 ? monthlyTotal / monthly.length : 0,
-        recurringCustomers: individuals.filter(
-          (c) => c.orderCount >= RECURRING_MIN_ORDERS,
-        ).length,
-        inactiveCustomers: individuals.filter((c) => c.status === "inactive")
-          .length,
+        recurringCustomers: individuals.filter((c) => c.orderCount >= RECURRING_MIN_ORDERS).length,
+        inactiveCustomers: individuals.filter((c) => c.status === "inactive").length,
         peakPurchaseDay,
         troughPurchaseDay,
         peakPurchaseHour,
-        purchaseFrequencyDays:
-          frequencyN > 0 ? Math.round(frequencySum / frequencyN) : null,
-        companiesWithoutOrders: companyRows.filter((c) => c.orderCount === 0)
-          .length,
+        purchaseFrequencyDays: frequencyN > 0 ? Math.round(frequencySum / frequencyN) : null,
+        companiesWithoutOrders: companyRows.filter((c) => c.orderCount === 0).length,
         topCompanies,
         topCustomers,
         topMenus,
@@ -718,8 +827,7 @@ export function createCustomerDirectoryRepository(
         inactiveCustomers: metrics.inactiveCustomers,
         recurringCustomers: metrics.recurringCustomers,
         activeCompanies: metrics.activeCompanies,
-        companiesWithoutOrders: companies.filter((c) => c.orderCount === 0)
-          .length,
+        companiesWithoutOrders: companies.filter((c) => c.orderCount === 0).length,
         openIncidents: openIncidents ?? 0,
         pendingOrders: pendingOrders ?? 0,
       };
@@ -727,6 +835,4 @@ export function createCustomerDirectoryRepository(
   };
 }
 
-export type CustomerDirectoryRepository = ReturnType<
-  typeof createCustomerDirectoryRepository
->;
+export type CustomerDirectoryRepository = ReturnType<typeof createCustomerDirectoryRepository>;

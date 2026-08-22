@@ -7,6 +7,7 @@ export type {
   SupportNoteStatus,
   CustomerOrderSummary,
   IndividualCustomerFilters,
+  UpdateIndividualCustomerInput,
   CompanyDirectoryFilters,
   CommercialDashboardMetrics,
   SupportStats,
