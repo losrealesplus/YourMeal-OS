@@ -20,6 +20,17 @@ export function createDishRepository(supabase: AppSupabase, tenantId: string) {
       return (data ?? []) as DishRow[];
     },
 
+    async listArchived(): Promise<DishRow[]> {
+      const { data, error } = await supabase
+        .from("dishes")
+        .select("*")
+        .eq("tenant_id", tenantId)
+        .not("deleted_at", "is", null)
+        .order("name", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as DishRow[];
+    },
+
     /**
      * Customer catalog read (CAP-002): published dishes only.
      * Soft-deleted and non-active statuses excluded.
@@ -89,11 +100,7 @@ export function createDishRepository(supabase: AppSupabase, tenantId: string) {
     },
 
     async insert(row: TablesInsert<"dishes">): Promise<DishRow> {
-      const { data, error } = await supabase
-        .from("dishes")
-        .insert(row)
-        .select("*")
-        .single();
+      const { data, error } = await supabase.from("dishes").insert(row).select("*").single();
       if (error) throw error;
       return data as DishRow;
     },

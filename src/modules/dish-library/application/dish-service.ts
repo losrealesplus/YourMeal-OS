@@ -36,6 +36,11 @@ export const DishService = {
     return createDishRepository(ctx.supabase, ctx.tenantId).listActive();
   },
 
+  async listArchived(ctx: ServiceContext) {
+    requireCapability(ctx.roles, "dishes.read");
+    return createDishRepository(ctx.supabase, ctx.tenantId).listArchived();
+  },
+
   async get(ctx: ServiceContext, id: string) {
     requireCapability(ctx.roles, "dishes.read");
     const dish = await createDishRepository(ctx.supabase, ctx.tenantId).findActiveById(id);
@@ -92,8 +97,7 @@ export const DishService = {
     await AuditService.write(ctx, {
       entityType: "dish",
       entityId: id,
-      action:
-        input.status && input.status !== existing.status ? "status_change" : "update",
+      action: input.status && input.status !== existing.status ? "status_change" : "update",
       oldData: existing as unknown as Record<string, unknown>,
       newData: dish as unknown as Record<string, unknown>,
     });
