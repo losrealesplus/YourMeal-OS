@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "losrealesplus-yourmeal-os",
+  "compatibility_date": "2026-08-22",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "workers_dev": false,
+  "routes": [
+    {
+      "pattern": "www.yourmealos.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "*.yourmealos.com/*",
+      "zone_name": "yourmealos.com"
+    }
+  ]
+}
