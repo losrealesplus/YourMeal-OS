@@ -9,6 +9,7 @@ import type {
   CustomerOrderSummary,
   IndividualCustomerFilters,
   IndividualCustomerRecord,
+  UpdateIndividualCustomerInput,
   SupportNoteRecord,
   SupportStats,
 } from "../domain/customer-directory";
@@ -58,21 +59,12 @@ function matchesIndividual(
     return false;
   }
   if (filters.inactiveDays != null && row.lastOrderAt) {
-    const days =
-      (Date.now() - new Date(row.lastOrderAt).getTime()) /
-      (1000 * 60 * 60 * 24);
+    const days = (Date.now() - new Date(row.lastOrderAt).getTime()) / (1000 * 60 * 60 * 24);
     if (days < filters.inactiveDays) return false;
   }
   if (filters.query?.trim()) {
     const q = filters.query.trim().toLowerCase();
-    const hay = [
-      row.displayName,
-      row.email,
-      row.phone,
-      row.companyName,
-      row.companyCode,
-      row.city,
-    ]
+    const hay = [row.displayName, row.email, row.phone, row.companyName, row.companyCode, row.city]
       .filter(Boolean)
       .join(" ")
       .toLowerCase();
@@ -81,22 +73,13 @@ function matchesIndividual(
   return true;
 }
 
-function matchesCompany(
-  row: CompanyDirectoryRecord,
-  filters: CompanyDirectoryFilters,
-): boolean {
+function matchesCompany(row: CompanyDirectoryRecord, filters: CompanyDirectoryFilters): boolean {
   if (filters.status && filters.status !== "all" && row.status !== filters.status) {
     return false;
   }
   if (filters.query?.trim()) {
     const q = filters.query.trim().toLowerCase();
-    const hay = [
-      row.name,
-      row.companyCode,
-      row.contactName,
-      row.contactEmail,
-      row.contactPhone,
-    ]
+    const hay = [row.name, row.companyCode, row.contactName, row.contactEmail, row.contactPhone]
       .filter(Boolean)
       .join(" ")
       .toLowerCase();
@@ -142,10 +125,7 @@ export const CustomerDirectoryService = {
     return repo.getCustomerOrders(customerId);
   },
 
-  async listSupportNotes(
-    ctx: ServiceContext,
-    customerId?: string,
-  ): Promise<SupportNoteRecord[]> {
+  async listSupportNotes(ctx: ServiceContext, customerId?: string): Promise<SupportNoteRecord[]> {
     assertTenant(ctx);
     if (!ctx.capabilities.has("support.read") && !ctx.capabilities.has("customers.read")) {
       throw permissionDenied("support.read");
@@ -217,10 +197,7 @@ export const CustomerDirectoryService = {
     return updated;
   },
 
-  async archiveCustomer(
-    ctx: ServiceContext,
-    customerId: string,
-  ): Promise<void> {
+  async archiveCustomer(ctx: ServiceContext, customerId: string): Promise<void> {
     assertTenant(ctx);
     assertCanWriteCustomers(ctx);
     const repo = createCustomerDirectoryRepository(ctx.supabase, ctx.tenantId);
@@ -230,6 +207,70 @@ export const CustomerDirectoryService = {
       entityId: customerId,
       action: "archive",
     });
+  },
+
+  async updateIndividual(
+    ctx: ServiceContext,
+    customerId: string,
+    input: UpdateIndividualCustomerInput,
+  ): Promise<IndividualCustomerRecord> {
+    assertTenant(ctx);
+    assertCanWriteCustomers(ctx);
+    if (!customerId) {
+      throw new DomainError("INVALID_STATE", "customerId is required");
+    }
+    const name = input.displayName?.trim();
+    if (!name) {
+      throw new DomainError("INVALID_STATE", "Nombre es obligatorio");
+    }
+    if (input.email && input.email.trim()) {
+      const email = input.email.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        throw new DomainError("INVALID_STATE", "Email no es válido");
+      }
+    }
+
+    const repo = createCustomerDirectoryRepository(ctx.supabase, ctx.tenantId);
+    const current = await repo.getIndividualById(customerId);
+    if (!current) {
+      throw new DomainError("NOT_FOUND", `Cliente no encontrado: ${customerId}`);
+    }
+
+    const updated = await repo.updateIndividual(customerId, {
+      displayName: name,
+      email: input.email !== undefined ? input.email?.trim() || null : current.email,
+      phone: input.phone !== undefined ? input.phone?.trim() || null : current.phone,
+      street: input.street !== undefined ? input.street?.trim() || null : undefined,
+      city: input.city !== undefined ? input.city?.trim() || null : current.city,
+    });
+
+    await AuditService.write(ctx, {
+      entityType: "customer",
+      entityId: customerId,
+      action: "update",
+      oldData: {
+        displayName: current.displayName,
+        email: current.email,
+        phone: current.phone,
+        city: current.city,
+      },
+      newData: {
+        displayName: updated.displayName,
+        email: updated.email,
+        phone: updated.phone,
+        city: updated.city,
+      },
+    });
+
+    return updated;
+  },
+
+  async updateCustomer(
+    ctx: ServiceContext,
+    customerId: string,
+    input: UpdateIndividualCustomerInput,
+  ): Promise<IndividualCustomerRecord> {
+    return this.updateIndividual(ctx, customerId, input);
   },
 
   /**
@@ -265,9 +306,7 @@ export const CustomerDirectoryService = {
     return id;
   },
 
-  async commercialDashboard(
-    ctx: ServiceContext,
-  ): Promise<CommercialDashboardMetrics> {
+  async commercialDashboard(ctx: ServiceContext): Promise<CommercialDashboardMetrics> {
     assertTenant(ctx);
     assertCanReadCustomers(ctx);
     const repo = createCustomerDirectoryRepository(ctx.supabase, ctx.tenantId);
