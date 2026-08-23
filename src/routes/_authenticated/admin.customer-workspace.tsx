@@ -1,988 +1,1152 @@
 /**
- * CUSTOMER EXPERIENCE 005 · Zero Friction Customer Growth
- * (+ CX001–004 Create · Search · Edit · Organization on the same surface)
+ * CUSTOMER WORKSPACE · Hub Canónico del Cliente (A2-C)
+ * CUSTOMER EXPERIENCE 005 · Phase 005
+ * One Customer · One Profile · Multiple Contexts
  *
- * Experience above useCustomer() only — no Capability / Facade edits.
- * Mission KPI: frequent enrichment < 30s · Living Customer Profile
+ * Adheres strictly to Foundation Law 003 (UI consumes useCustomer/useOrder Facades only).
  */
 
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
-import { useCallback, useEffect, useRef, useState, useEffectEvent } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { AdminHeader, SectionTitle, StatusChip } from "@/components/admin";
+import {
+  User,
+  Building2,
+  ShoppingBag,
+  LifeBuoy,
+  Search,
+  Plus,
+  ArrowLeft,
+  ExternalLink,
+  Phone,
+  Mail,
+  MapPin,
+  AlertCircle,
+  Archive,
+} from "lucide-react";
+import { AdminHeader, SectionTitle, StatusChip, PanelCard } from "@/components/admin";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useCustomer } from "@/customer/useCustomer";
+import { useOrder } from "@/order/useOrder";
 import { useIdentity } from "@/identity/useIdentity";
-import { archiveCustomerCommand, createCustomerCommand } from "@/customer/CustomerCommands";
 import {
   getCustomerQuery,
-  listRecentCustomersQuery,
   searchCustomersQuery,
+  listRecentCustomersQuery,
 } from "@/customer/CustomerQueries";
+import { createCustomerCommand, archiveCustomerCommand } from "@/customer/CustomerCommands";
 import type {
   CustomerContext,
   CustomerSummary,
   PartyKind,
   PartyRef,
 } from "@/customer/CustomerContext";
-import {
-  CUSTOMER_CREATION_ORIGIN_LABEL,
-  recordCustomerCreationOrigin,
-  type CustomerCreationOrigin,
-} from "@/customer-experience/creation-origin";
-import {
-  companyCodeFromTags,
-  customerTypeLabel,
-  rankSearchHits,
-} from "@/customer-experience/search-rank";
-import { applyOperationalCorrection } from "@/customer-experience/operational-corrections";
+import { getOrdersByCustomerQuery } from "@/order/OrderQueries";
+import type { OrderSummary } from "@/order/OrderContext";
 import { CustomerEditPanel } from "@/customer-experience/CustomerEditPanel";
 import { OrganizationPanel } from "@/customer-experience/OrganizationPanel";
+import { rankSearchHits } from "@/customer-experience/search-rank";
+import { recordCustomerCreationOrigin } from "@/customer-experience/creation-origin";
+import {
+  applyOperationalCorrection,
+  saveOperationalCorrection,
+} from "@/customer-experience/operational-corrections";
+import { useFmt } from "@/i18n/localization-provider";
 import { cn } from "@/lib/utils";
 
-/** Silent origin for altas from this Experience surface. */
-const CREATE_ORIGIN: CustomerCreationOrigin = "customer_workspace";
+export type CustomerWorkspaceTab = "profile" | "company" | "orders" | "support";
 
-type SearchHit = {
-  summary: CustomerSummary;
-  phone: string | null;
-  area: string | null;
-  companyLabel: string | null;
+export type CustomerWorkspaceSearch = {
+  customerId?: string;
+  tab?: CustomerWorkspaceTab;
 };
 
 export const Route = createFileRoute("/_authenticated/admin/customer-workspace")({
   beforeLoad: ({ context }) => {
     assertCapabilityFromContext(context, "customers.read");
   },
-  component: CustomerExperiencePage,
+  validateSearch: (search: Record<string, unknown>): CustomerWorkspaceSearch => ({
+    customerId:
+      typeof search.customerId === "string" && search.customerId.trim()
+        ? search.customerId.trim()
+        : undefined,
+    tab:
+      search.tab === "profile" ||
+      search.tab === "company" ||
+      search.tab === "orders" ||
+      search.tab === "support"
+        ? search.tab
+        : undefined,
+  }),
+  component: CustomerWorkspacePage,
   head: () => ({
     meta: [
-      {
-        title: "YourMeal OS — Zero Friction Customer Growth",
-      },
+      { title: "YourMeal OS — Customer Workspace" },
       {
         name: "description",
-        content: "Living Customer Profile · CX005 · useCustomer only",
+        content: "Hub canónico de gestión del cliente: perfil, empresa, pedidos y soporte.",
       },
     ],
   }),
 });
 
-type Segment = "all" | PartyKind;
-type PartyChoice = "individual" | "company_account" | "company_employee" | null;
-
-type CreateDraft = {
-  name: string;
-  phone: string;
-  address: string;
-  city: string;
-  contactEmail: string;
+type LocalSupportNote = {
+  id: string;
+  kind: "note" | "incident" | "request" | "allergy_update" | "complaint";
+  body: string;
+  createdAt: string;
+  status: "open" | "resolved";
 };
 
-const emptyDraft = (): CreateDraft => ({
-  name: "",
-  phone: "",
-  address: "",
-  city: "",
-  contactEmail: "",
-});
+type PartyChoice = "individual" | "company_account" | "company_employee" | null;
 
-function hitKey(s: CustomerSummary) {
-  return `${s.partyKind}:${s.id}`;
-}
-
-function CustomerExperiencePage() {
+function CustomerWorkspacePage() {
+  const fmt = useFmt();
   const customer = useCustomer();
+  const orderApi = useOrder();
   const identity = useIdentity();
-  const [query, setQuery] = useState("");
-  const [segment, setSegment] = useState<Segment>("all");
-  const [hits, setHits] = useState<SearchHit[]>([]);
-  const [selected, setSelected] = useState<CustomerContext | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [creating, setCreating] = useState(false);
-  const [partyChoice, setPartyChoice] = useState<PartyChoice>(null);
-  const [draft, setDraft] = useState<CreateDraft>(emptyDraft);
-  const [justCreated, setJustCreated] = useState(false);
-  const [createdFromLabel, setCreatedFromLabel] = useState<string | null>(null);
-  const [organizing, setOrganizing] = useState(false);
-  const nameRef = useRef<HTMLInputElement>(null);
-  const searchRef = useRef<HTMLInputElement>(null);
-  const newCustomerRef = useRef<HTMLButtonElement>(null);
-  const nextActionRef = useRef<HTMLAnchorElement>(null);
+  const searchParams = Route.useSearch();
+  const navigate = useNavigate();
+
+  const selectedCustomerId = searchParams.customerId;
+  const activeTab: CustomerWorkspaceTab = searchParams.tab ?? "profile";
+
   const caps = identity.permissions.capabilities;
   const canWrite = caps.includes("customers.write");
+  const canWriteSupport = caps.includes("support.write") || canWrite;
 
-  const enrichSummaries = useEffectEvent(
-    async (summaries: CustomerSummary[], q: string): Promise<SearchHit[]> => {
-      const slice = summaries.slice(0, 20);
-      const enriched = await Promise.all(
-        slice.map(async (summary) => {
-          const base: SearchHit = {
-            summary,
-            phone: null,
-            area: null,
-            companyLabel: companyCodeFromTags(summary),
-          };
-          try {
-            const result = await customer.getCustomer(
-              getCustomerQuery({
-                partyRef: { kind: summary.partyKind, id: summary.id },
-              }),
-            );
-            if (!result.ok || !result.context) return base;
-            const ctx = result.context;
-            const phone = ctx.profile?.phones?.[0]?.e164?.trim() || null;
-            const area =
-              ctx.profile?.addresses
-                ?.map((a) => a.city || a.line1)
-                .find((v) => v?.trim())
-                ?.trim() || null;
-            const companyLabel =
-              companyCodeFromTags(summary) ||
-              (ctx.companyAccountId && summary.partyKind === "individual"
-                ? "Empresa vinculada"
-                : summary.partyKind === "company_account"
-                  ? summary.displayName
-                  : null);
-            return { summary, phone, area, companyLabel };
-          } catch {
-            return base;
-          }
-        }),
-      );
-      return rankSearchHits(enriched, q);
-    },
-  );
+  // Directory / Search State
+  const [query, setQuery] = useState("");
+  const [summaries, setSummaries] = useState<CustomerSummary[]>([]);
+  const [loadingList, setLoadingList] = useState(true);
 
-  const loadList = useEffectEvent(async (q: string, kind: Segment) => {
-    if (!customer.isReady) return;
-    setLoading(true);
-    try {
-      const partyKind = kind === "all" ? "all" : kind;
-      const result = q.trim()
-        ? await customer.searchCustomers(
-            searchCustomersQuery({
-              query: q.trim(),
-              limit: 40,
-              partyKind,
-            }),
-          )
-        : await customer.listRecentCustomers(listRecentCustomersQuery({ limit: 20, partyKind }));
-      if (!result.ok) {
-        toast.error(result.errors[0]?.message ?? "Search failed");
-        setHits([]);
-        return;
-      }
-      const ranked = await enrichSummaries(result.summaries, q);
-      setHits(ranked);
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : String(e));
-    } finally {
-      setLoading(false);
-    }
+  // Selected Customer Detail State
+  const [selectedContext, setSelectedContext] = useState<CustomerContext | null>(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  // Orders State
+  const [orders, setOrders] = useState<OrderSummary[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+
+  // Support Notes State
+  const [supportNotes, setSupportNotes] = useState<LocalSupportNote[]>([]);
+  const [newNoteBody, setNewNoteBody] = useState("");
+  const [newNoteKind, setNewNoteKind] = useState<LocalSupportNote["kind"]>("note");
+
+  // Create Customer Modal State
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [partyChoice, setPartyChoice] = useState<PartyChoice>("individual");
+  const [createForm, setCreateForm] = useState({
+    displayName: "",
+    phone: "",
+    email: "",
+    city: "",
   });
+  const [creatingCustomer, setCreatingCustomer] = useState(false);
 
-  useEffect(() => {
-    const handle = window.setTimeout(() => {
-      void loadList(query, segment);
-    }, 160);
-    return () => window.clearTimeout(handle);
-  }, [query, segment, customer.isReady]);
+  // Archive State
+  const [archiving, setArchiving] = useState(false);
 
-  useEffect(() => {
-    if (!creating) {
-      searchRef.current?.focus();
+  // Organization Panel view mode
+  const [organizing, setOrganizing] = useState(false);
+
+  // Load customer directory list
+  const loadDirectory = useCallback(async () => {
+    setLoadingList(true);
+    try {
+      if (query.trim()) {
+        const res = await customer.searchCustomers(
+          searchCustomersQuery({ query: query.trim(), partyKind: "all" }),
+        );
+        if (res.ok) setSummaries(res.summaries);
+      } else {
+        const res = await customer.listRecentCustomers(
+          listRecentCustomersQuery({ partyKind: "all" }),
+        );
+        if (res.ok) setSummaries(res.summaries);
+      }
+    } catch {
+      toast.error("Error al cargar la lista de clientes");
+    } finally {
+      setLoadingList(false);
     }
-  }, [creating, customer.isReady]);
+  }, [customer, query]);
 
   useEffect(() => {
-    if (creating && partyChoice) {
-      nameRef.current?.focus();
-    }
-  }, [creating, partyChoice]);
+    const timer = setTimeout(() => {
+      loadDirectory().catch(() => {});
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [loadDirectory]);
 
-  const openParty = useCallback(
-    async (partyRef: PartyRef) => {
-      setBusy(true);
+  // Load selected customer details & orders
+  const loadCustomerDetail = useCallback(
+    async (customerId: string) => {
+      setLoadingDetail(true);
       try {
-        const result = await customer.getCustomer(getCustomerQuery({ partyRef }));
-        if (!result.ok || !result.context) {
-          toast.error(result.errors[0]?.message ?? "Not found");
-          setSelected(null);
-          return;
+        const partyRef: PartyRef = { kind: "individual", id: customerId };
+        const res = await customer.getCustomer(getCustomerQuery({ partyRef }));
+        if (res.ok && res.context) {
+          const corrected = applyOperationalCorrection(res.context);
+          setSelectedContext(corrected);
+        } else {
+          // Check if it's a company_account
+          const compRef: PartyRef = { kind: "company_account", id: customerId };
+          const compRes = await customer.getCustomer(getCustomerQuery({ partyRef: compRef }));
+          if (compRes.ok && compRes.context) {
+            setSelectedContext(compRes.context);
+          } else {
+            setSelectedContext(null);
+          }
         }
-        setSelected(applyOperationalCorrection(result.context));
-      } catch (e) {
-        toast.error(e instanceof Error ? e.message : String(e));
+      } catch {
+        setSelectedContext(null);
       } finally {
-        setBusy(false);
+        setLoadingDetail(false);
       }
     },
     [customer],
   );
 
-  function startCreate() {
-    setCreating(true);
-    setOrganizing(false);
-    setPartyChoice(null);
-    setDraft(emptyDraft());
-    setSelected(null);
-    setJustCreated(false);
-    setCreatedFromLabel(null);
-  }
+  const loadOrders = useCallback(
+    async (customerId: string) => {
+      setLoadingOrders(true);
+      try {
+        const res = await orderApi.getOrdersByCustomer(getOrdersByCustomerQuery({ customerId }));
+        if (res.ok) {
+          setOrders(res.summaries);
+        } else {
+          setOrders([]);
+        }
+      } catch {
+        setOrders([]);
+      } finally {
+        setLoadingOrders(false);
+      }
+    },
+    [orderApi],
+  );
 
-  function startOrganization() {
-    setOrganizing(true);
-    setCreating(false);
-    setPartyChoice(null);
-    setDraft(emptyDraft());
-    setSelected(null);
-    setJustCreated(false);
-    setCreatedFromLabel(null);
-  }
+  useEffect(() => {
+    if (selectedCustomerId) {
+      loadCustomerDetail(selectedCustomerId);
+      loadOrders(selectedCustomerId);
+    } else {
+      setSelectedContext(null);
+      setOrders([]);
+    }
+  }, [selectedCustomerId, loadCustomerDetail, loadOrders]);
 
-  function cancelCreate() {
-    setCreating(false);
-    setPartyChoice(null);
-    setDraft(emptyDraft());
-  }
-
-  function cancelOrganization() {
-    setOrganizing(false);
-  }
-
-  function finishCreateSuccess(input: {
-    partyRef: PartyRef;
-    segment: Segment;
-    toastMessage: string;
-  }) {
-    const event = recordCustomerCreationOrigin({
-      origin: CREATE_ORIGIN,
-      partyKind: input.partyRef.kind,
-      partyId: input.partyRef.id,
+  function handleSelectCustomer(customerId: string) {
+    navigate({
+      to: "/admin/customer-workspace",
+      search: { customerId, tab: activeTab },
     });
-    setCreatedFromLabel(CUSTOMER_CREATION_ORIGIN_LABEL[event.origin]);
-    cancelCreate();
-    setJustCreated(true);
-    setSegment(input.segment);
-    toast.success(input.toastMessage);
-    window.setTimeout(() => nextActionRef.current?.focus(), 0);
   }
 
-  async function onSaveCreate() {
-    if (!customer.isReady || !canWrite || !partyChoice) return;
-    if (!draft.name.trim()) {
-      toast.error("Nombre es imprescindible para seguir trabajando");
-      nameRef.current?.focus();
+  function handleSwitchTab(tab: CustomerWorkspaceTab) {
+    navigate({
+      to: "/admin/customer-workspace",
+      search: { customerId: selectedCustomerId, tab },
+    });
+  }
+
+  function handleAddSupportNote(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newNoteBody.trim()) {
+      toast.error("El cuerpo de la incidencia o nota es obligatorio");
       return;
     }
-    setBusy(true);
-    const started = performance.now();
+    const note: LocalSupportNote = {
+      id: `note-${Date.now()}`,
+      kind: newNoteKind,
+      body: newNoteBody.trim(),
+      createdAt: new Date().toISOString(),
+      status: "open",
+    };
+    setSupportNotes((prev) => [note, ...prev]);
+    setNewNoteBody("");
+    toast.success("Nota de soporte registrada");
+  }
+
+  async function handleCreateCustomer(e: React.FormEvent) {
+    e.preventDefault();
+    if (!canWrite) return;
+    if (!createForm.displayName.trim()) {
+      toast.error("El nombre es obligatorio");
+      return;
+    }
+    setCreatingCustomer(true);
     try {
-      if (partyChoice === "individual" || partyChoice === "company_employee") {
-        const result = await customer.createCustomer(
+      if (partyChoice === "company_account") {
+        const res = await customer.createCustomer(
+          createCustomerCommand({
+            partyKind: "company_account",
+            mode: "provision",
+            name: createForm.displayName.trim(),
+            contactName: createForm.displayName.trim(),
+            contactEmail: createForm.email.trim(),
+            contactPhone: createForm.phone.trim() || null,
+            fiscalAddress: createForm.city.trim() || "Madrid",
+          }),
+        );
+        if (res.ok && res.partyRef) {
+          toast.success("Organización creada correctamente");
+          setCreateModalOpen(false);
+          setCreateForm({ displayName: "", phone: "", email: "", city: "" });
+          await loadDirectory();
+          handleSelectCustomer(res.partyRef.id);
+        } else {
+          toast.error(res.errors[0]?.message ?? "Error al crear organización");
+        }
+      } else {
+        const res = await customer.createCustomer(
           createCustomerCommand({
             partyKind: "individual",
             mode: "staff_create",
-            displayName: draft.name.trim(),
-            phone: draft.phone.trim() || null,
-            street: draft.address.trim() || null,
-            city: draft.city.trim() || null,
+            displayName: createForm.displayName.trim(),
+            phone: createForm.phone.trim() || null,
+            city: createForm.city.trim() || null,
           }),
         );
-        if (!result.ok) {
-          toast.error(result.errors[0]?.message ?? "No se pudo crear");
-          return;
+        if (res.ok && res.partyRef) {
+          recordCustomerCreationOrigin({
+            origin: "customer_workspace",
+            partyKind: "individual",
+            partyId: res.partyRef.id,
+          });
+          toast.success("Cliente creado");
+          setCreateModalOpen(false);
+          setCreateForm({ displayName: "", phone: "", email: "", city: "" });
+          await loadDirectory();
+          handleSelectCustomer(res.partyRef.id);
+        } else {
+          toast.error(res.errors[0]?.message ?? "Error al crear cliente");
         }
-        if (!result.partyRef) {
-          toast.error("Cliente creado sin referencia");
-          return;
-        }
-        const ms = Math.round(performance.now() - started);
-        finishCreateSuccess({
-          partyRef: result.partyRef,
-          segment: "individual",
-          toastMessage:
-            partyChoice === "company_employee"
-              ? `Trabajador creado · ${ms} ms · vinculación a organización: Progressive Completion`
-              : `Cliente creado · ${ms} ms (objetivo TTC < 30s)`,
-        });
-        await openParty(result.partyRef);
-        await loadList(query, "individual");
-        return;
       }
-
-      // Organización — mínimo + email requerido por substrate (Progressive)
-      const email = draft.contactEmail.trim() || `pending+${Date.now()}@customer.local`;
-      const result = await customer.createCustomer(
-        createCustomerCommand({
-          partyKind: "company_account",
-          mode: "provision",
-          name: draft.name.trim(),
-          contactName: draft.name.trim(),
-          contactEmail: email,
-          contactPhone: draft.phone.trim() || null,
-          fiscalAddress: draft.address.trim() || "Por completar",
-          deliveryAddress: draft.address.trim() || null,
-        }),
-      );
-      if (!result.ok) {
-        toast.error(result.errors[0]?.message ?? "No se pudo crear");
-        return;
-      }
-      if (!result.partyRef) {
-        toast.error("Organización creada sin referencia");
-        return;
-      }
-      const ms = Math.round(performance.now() - started);
-      finishCreateSuccess({
-        partyRef: result.partyRef,
-        segment: "company_account",
-        toastMessage: "Organización creada",
-      });
-      await openParty(result.partyRef);
-      await loadList(query, "company_account");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Error al crear cliente");
     } finally {
-      setBusy(false);
+      setCreatingCustomer(false);
     }
   }
 
-  function goBackFromCreated() {
-    setJustCreated(false);
-    setCreatedFromLabel(null);
-    setSelected(null);
-    window.setTimeout(() => searchRef.current?.focus(), 0);
-  }
-
-  async function onArchive() {
-    if (!selected || selected.summary.partyKind !== "individual") return;
-    await onArchiveParty({
-      kind: "individual",
-      id: selected.summary.id,
-    });
-  }
-
-  async function onArchiveParty(partyRef: PartyRef) {
-    if (partyRef.kind !== "individual") return;
-    if (!canWrite) {
-      toast.error("Missing customers.write");
+  async function handleArchiveCustomer() {
+    if (!selectedCustomerId || !canWrite) return;
+    if (
+      !window.confirm(
+        `¿Estás seguro de que deseas archivar al cliente "${selectedContext?.summary.displayName}"?`,
+      )
+    )
       return;
-    }
-    if (!window.confirm("¿Archivar este cliente individual?")) return;
-    setBusy(true);
+    setArchiving(true);
     try {
-      const result = await customer.archiveCustomer(archiveCustomerCommand({ partyRef }));
-      if (!result.ok) {
-        toast.error(result.errors[0]?.message ?? "Archive failed");
-        return;
+      const partyRef: PartyRef = {
+        kind: selectedContext?.summary.partyKind ?? "individual",
+        id: selectedCustomerId,
+      };
+      const res = await customer.archiveCustomer(archiveCustomerCommand({ partyRef }));
+      if (res.ok) {
+        toast.success("Cliente archivado");
+        navigate({
+          to: "/admin/customer-workspace",
+          search: { customerId: undefined, tab: undefined },
+        });
+        await loadDirectory();
+      } else {
+        toast.error(res.errors[0]?.message ?? "Error al archivar cliente");
       }
-      toast.success("Cliente archivado");
-      if (selected?.summary.id === partyRef.id) {
-        setSelected(null);
-      }
-      setJustCreated(false);
-      setCreatedFromLabel(null);
-      await loadList(query, segment);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Error al archivar cliente");
     } finally {
-      setBusy(false);
+      setArchiving(false);
     }
   }
+
+  const toneByStatus: Record<string, "positive" | "danger" | "warning" | "neutral"> = {
+    active: "positive",
+    inactive: "danger",
+    provisioned: "warning",
+    unlinked: "neutral",
+  };
+
+  const isCompanyEmployee = selectedContext?.summary.tags.some(
+    (t) => t.includes("company_employee") || t.startsWith("code:"),
+  );
 
   return (
-    <div className="animate-fade-in max-w-5xl">
+    <div className="animate-fade-in space-y-6">
       <SectionTitle
-        overline="CUSTOMER EXPERIENCE 005 · Phase 005 Growth"
-        title="Zero Friction Customer Growth"
-        subtitle="El perfil crece con la relación — nunca antes"
+        overline="Customer Domain · Zero Friction Customer Growth"
+        title="Customer Workspace"
+        subtitle="Hub canónico del cliente: perfil unificado, empresa B2B, pedidos e incidencias de soporte."
       />
-
-      <div className="mb-4 grid gap-2 rounded-md border border-foreground/15 bg-foreground/[0.03] px-4 py-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Kpi label="Enrich profile" value="< 30 s" primary />
-        <Kpi label="Resume operation" value="< 5 s" />
-        <Kpi label="TTO · Organization" value="< 45 s" />
-        <Kpi label="TTE · Edit" value="< 20 s" />
-      </div>
 
       <AdminHeader
-        goal="Gestión unificada de clientes y empresas vinculadas"
+        goal="Gestión unificada de clientes: un perfil, múltiples contextos operativos"
         capability="customers.read / customers.write"
-        object="Customer Profile · Preferencias · Alergias · Facturación · Tags"
+        object="Customer Profile · Company · Orders · Support Notes"
       />
 
-      {!creating && !organizing ? (
-        <div className="mb-4 flex flex-wrap gap-2">
-          <button
-            type="button"
-            disabled={!canWrite || busy}
-            onClick={startOrganization}
-            className="min-h-11 rounded-md bg-foreground px-4 py-2.5 text-sm font-semibold text-background disabled:opacity-40"
-          >
-            Nueva organización
-          </button>
-          <button
-            ref={newCustomerRef}
-            type="button"
-            disabled={!canWrite || busy}
-            onClick={startCreate}
-            className="min-h-11 rounded-md border border-border px-4 py-2.5 text-sm font-semibold disabled:opacity-40"
-          >
-            Nuevo cliente
-          </button>
-        </div>
-      ) : null}
+      <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
+        {/* Left Column: Quick Search / Customer Directory Switcher */}
+        <aside className="space-y-4">
+          <PanelCard className="p-4 space-y-4">
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                Directorio Rápido
+              </h2>
+              {canWrite ? (
+                <div className="flex gap-1.5">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setPartyChoice("company_account");
+                      setCreateModalOpen(true);
+                    }}
+                    className="h-8 gap-1 text-xs"
+                  >
+                    <Building2 className="h-3.5 w-3.5" />
+                    Nueva organización
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setPartyChoice("individual");
+                      setCreateModalOpen(true);
+                    }}
+                    className="h-8 gap-1 text-xs"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Nuevo cliente
+                  </Button>
+                </div>
+              ) : null}
+            </div>
 
-      {creating ? (
-        <CreateWizard
-          partyChoice={partyChoice}
-          draft={draft}
-          busy={busy}
-          nameRef={nameRef}
-          onChoose={setPartyChoice}
-          onDraft={setDraft}
-          onCancel={cancelCreate}
-          onSave={() => void onSaveCreate()}
-        />
-      ) : null}
+            <div className="space-y-1">
+              <label
+                htmlFor="cx-quick-search"
+                className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground block"
+              >
+                Buscar · escribe y encuentra · sin botón
+              </label>
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="cx-quick-search"
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Buscar por nombre, tlf…"
+                  className="pl-8 text-sm"
+                />
+              </div>
+            </div>
 
-      {organizing ? (
-        <OrganizationPanel
-          canWrite={canWrite}
-          busy={busy}
-          onBusy={setBusy}
-          onOpenParty={openParty}
-          onCreatedOrganization={(ctx) => {
-            setSelected(ctx);
-            setSegment("company_account");
-            void loadList(query, "company_account");
-          }}
-          onCancel={cancelOrganization}
-          viewing={null}
-        />
-      ) : null}
-
-      <div className="mb-4 flex flex-wrap gap-2" role="tablist" aria-label="Segmento">
-        {(
-          [
-            ["all", "Todos"],
-            ["individual", "Particular"],
-            ["company_account", "Organizaciones"],
-          ] as const
-        ).map(([value, label]) => (
-          <button
-            key={value}
-            type="button"
-            role="tab"
-            aria-selected={segment === value}
-            onClick={() => setSegment(value)}
-            className={cn(
-              "min-h-10 rounded-md border px-3 py-2 text-sm font-semibold",
-              segment === value
-                ? "border-foreground bg-foreground text-background"
-                : "border-border",
+            {loadingList ? (
+              <p className="py-6 text-center text-xs text-muted-foreground">Cargando clientes…</p>
+            ) : summaries.length === 0 ? (
+              <div className="py-6 text-center space-y-2">
+                <p className="text-xs text-muted-foreground">No se encontró el cliente.</p>
+                {canWrite ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setPartyChoice("individual");
+                      setCreateModalOpen(true);
+                    }}
+                    className="text-xs"
+                  >
+                    Crear cliente
+                  </Button>
+                ) : null}
+              </div>
+            ) : (
+              <div className="max-h-[600px] overflow-y-auto space-y-1 pr-1">
+                {rankSearchHits(
+                  summaries.map((s) => ({ summary: s })),
+                  query,
+                )
+                  .map((h) => h.summary)
+                  .map((c) => {
+                    const isSelected = c.id === selectedCustomerId;
+                    return (
+                      <button
+                        key={`${c.partyKind}:${c.id}`}
+                        type="button"
+                        onClick={() => handleSelectCustomer(c.id)}
+                        className={cn(
+                          "w-full rounded-lg p-2.5 text-left transition-all border text-xs",
+                          isSelected
+                            ? "bg-foreground text-background border-foreground font-semibold shadow-sm"
+                            : "bg-card hover:bg-muted/60 border-border text-foreground",
+                        )}
+                      >
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="truncate font-medium">
+                            {c.displayName || "Sin nombre"}
+                          </span>
+                          <StatusChip tone={toneByStatus[c.status] ?? "neutral"} label={c.status} />
+                        </div>
+                        <div className="mt-1 flex items-center justify-between gap-1 text-[11px] opacity-80">
+                          <span className="truncate">
+                            {c.partyKind === "company_account"
+                              ? "🏢 Organización"
+                              : c.demandChannelDefault === "company"
+                                ? "🏢 Empleado de empresa"
+                                : "Particular"}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+              </div>
             )}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+          </PanelCard>
+        </aside>
 
-      <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <section>
-          <label
-            htmlFor="cx-search"
-            className="mb-2 block text-[10px] font-mono uppercase tracking-widest text-muted-foreground"
-          >
-            Buscar · escribe y encuentra · sin botón
-          </label>
-          <input
-            id="cx-search"
-            ref={searchRef}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Nombre, teléfono, empresa…"
-            className="mb-3 min-h-12 w-full rounded-md border border-foreground/25 bg-background px-3 py-3 text-base font-medium sm:text-sm"
-            autoComplete="off"
-            enterKeyHint="search"
-            aria-label="Buscar cliente"
-          />
-          <p className="mb-3 text-[11px] text-muted-foreground">
-            {query.trim()
-              ? "Resultados al escribir · coincidencia parcial"
-              : "Recientes · escribe para buscar"}
-          </p>
-          {loading ? (
-            <p className="py-8 text-center text-sm text-muted-foreground">Buscando…</p>
-          ) : hits.length === 0 ? (
-            <SearchEmptyState
-              hasQuery={Boolean(query.trim())}
-              canWrite={canWrite}
-              onCreate={() => {
-                startCreate();
-                window.setTimeout(() => newCustomerRef.current?.focus(), 0);
-              }}
-            />
+        {/* Right / Main Column: Selected Customer Workspace Hub */}
+        <main className="space-y-4">
+          {!selectedCustomerId ? (
+            <PanelCard className="p-12 text-center space-y-4">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-muted">
+                <User className="h-7 w-7 text-muted-foreground" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-semibold">Selecciona un cliente</h3>
+                <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                  Elige un cliente del directorio o utiliza el buscador para abrir su ficha canónica
+                  con perfil, empresa B2B, historial de pedidos e incidencias.
+                </p>
+              </div>
+              {canWrite ? (
+                <Button
+                  onClick={() => {
+                    setPartyChoice("individual");
+                    setCreateModalOpen(true);
+                  }}
+                  className="gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Crear nuevo cliente
+                </Button>
+              ) : null}
+            </PanelCard>
+          ) : loadingDetail && !selectedContext ? (
+            <PanelCard className="p-12 text-center">
+              <p className="text-sm text-muted-foreground">Cargando ficha del cliente…</p>
+            </PanelCard>
+          ) : !selectedContext ? (
+            <PanelCard className="p-12 text-center space-y-3">
+              <AlertCircle className="mx-auto h-8 w-8 text-destructive" />
+              <p className="text-sm font-semibold">Cliente no encontrado</p>
+              <p className="text-xs text-muted-foreground">
+                No existe ningún cliente con el identificador proporcionado en este tenant.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleSelectCustomer("")}
+                className="gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Volver a la selección
+              </Button>
+            </PanelCard>
           ) : (
-            <ul className="space-y-2">
-              {hits.map((hit) => (
-                <li key={hitKey(hit.summary)}>
-                  <SearchResultCard
-                    hit={hit}
-                    selected={
-                      selected?.summary.id === hit.summary.id &&
-                      selected.summary.partyKind === hit.summary.partyKind
-                    }
-                    canWrite={canWrite}
-                    busy={busy}
-                    onOpen={() => {
-                      setJustCreated(false);
-                      void openParty({
-                        kind: hit.summary.partyKind,
-                        id: hit.summary.id,
-                      });
-                    }}
-                    onArchive={
-                      hit.summary.partyKind === "individual" && canWrite
-                        ? () =>
-                            void onArchiveParty({
-                              kind: "individual",
-                              id: hit.summary.id,
-                            })
-                        : undefined
-                    }
-                  />
-                </li>
-              ))}
-            </ul>
+            <div className="space-y-4">
+              {/* Customer Canonical Header */}
+              <PanelCard className="p-5">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-foreground text-background font-bold text-lg">
+                      {selectedContext.summary.displayName?.slice(0, 2).toUpperCase() || "CL"}
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h2 className="text-xl font-bold tracking-tight">
+                          {selectedContext.summary.displayName || "Sin nombre"}
+                        </h2>
+                        <StatusChip
+                          tone={toneByStatus[selectedContext.summary.status] ?? "neutral"}
+                          label={selectedContext.summary.status}
+                        />
+                        <span className="rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                          {selectedContext.summary.partyKind === "company_account"
+                            ? "Organización B2B"
+                            : isCompanyEmployee
+                              ? "Empleado de empresa"
+                              : "Particular"}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                        {selectedContext.profile?.email ? (
+                          <span className="flex items-center gap-1">
+                            <Mail className="h-3.5 w-3.5" />
+                            {selectedContext.profile.email}
+                          </span>
+                        ) : null}
+                        {selectedContext.profile?.phones[0]?.e164 ? (
+                          <span className="flex items-center gap-1">
+                            <Phone className="h-3.5 w-3.5" />
+                            {selectedContext.profile.phones[0].e164}
+                          </span>
+                        ) : null}
+                        {selectedContext.profile?.addresses[0]?.city ? (
+                          <span className="flex items-center gap-1">
+                            <MapPin className="h-3.5 w-3.5" />
+                            {selectedContext.profile.addresses[0].city}
+                          </span>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Top Right Action (Archive) */}
+                  {canWrite && selectedContext.summary.status !== "archived" ? (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      disabled={archiving}
+                      onClick={handleArchiveCustomer}
+                      className="text-xs text-destructive hover:bg-destructive/10 hover:text-destructive gap-1.5"
+                    >
+                      <Archive className="h-3.5 w-3.5" />
+                      Archivar cliente
+                    </Button>
+                  ) : null}
+                </div>
+
+                {/* Summary Metrics Bar */}
+                <div className="mt-5 grid grid-cols-2 gap-3 border-t border-border pt-4 sm:grid-cols-3">
+                  <div className="space-y-0.5">
+                    <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                      Pedidos Registrados
+                    </p>
+                    <p className="text-base font-bold font-mono">{orders.length}</p>
+                  </div>
+                  <div className="space-y-0.5">
+                    <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                      Canal de Demanda
+                    </p>
+                    <p className="text-base font-semibold capitalize">
+                      {selectedContext.summary.demandChannelDefault}
+                    </p>
+                  </div>
+                  <div className="space-y-0.5 col-span-2 sm:col-span-1">
+                    <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                      Estado Operativo
+                    </p>
+                    <p className="text-base font-semibold capitalize">
+                      {selectedContext.summary.status}
+                    </p>
+                  </div>
+                </div>
+              </PanelCard>
+
+              {/* Contextual Tabs Navigation */}
+              <div className="flex flex-wrap gap-2 border-b border-border pb-2" role="tablist">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === "profile"}
+                  onClick={() => handleSwitchTab("profile")}
+                  className={cn(
+                    "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all border",
+                    activeTab === "profile"
+                      ? "bg-foreground text-background border-foreground shadow-sm"
+                      : "bg-card text-muted-foreground border-border hover:text-foreground",
+                  )}
+                >
+                  <User className="h-4 w-4" />
+                  Perfil y contacto
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === "company"}
+                  onClick={() => handleSwitchTab("company")}
+                  className={cn(
+                    "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all border",
+                    activeTab === "company"
+                      ? "bg-foreground text-background border-foreground shadow-sm"
+                      : "bg-card text-muted-foreground border-border hover:text-foreground",
+                  )}
+                >
+                  <Building2 className="h-4 w-4" />
+                  Empresa / B2B
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === "orders"}
+                  onClick={() => handleSwitchTab("orders")}
+                  className={cn(
+                    "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all border",
+                    activeTab === "orders"
+                      ? "bg-foreground text-background border-foreground shadow-sm"
+                      : "bg-card text-muted-foreground border-border hover:text-foreground",
+                  )}
+                >
+                  <ShoppingBag className="h-4 w-4" />
+                  Pedidos ({orders.length})
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === "support"}
+                  onClick={() => handleSwitchTab("support")}
+                  className={cn(
+                    "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all border",
+                    activeTab === "support"
+                      ? "bg-foreground text-background border-foreground shadow-sm"
+                      : "bg-card text-muted-foreground border-border hover:text-foreground",
+                  )}
+                >
+                  <LifeBuoy className="h-4 w-4" />
+                  Soporte ({supportNotes.length})
+                </button>
+              </div>
+
+              {/* Tab 1: Profile & Contact */}
+              {activeTab === "profile" ? (
+                <PanelCard className="p-6">
+                  {selectedContext.summary.partyKind === "company_account" ? (
+                    <OrganizationPanel
+                      canWrite={canWrite}
+                      busy={busy}
+                      onBusy={setBusy}
+                      onOpenParty={async (ref) => {
+                        setOrganizing(false);
+                        handleSelectCustomer(ref.id);
+                      }}
+                      onCreatedOrganization={(ctx) => {
+                        setSelectedContext(ctx);
+                        void loadDirectory();
+                      }}
+                      onCancel={() => setOrganizing(false)}
+                      viewing={selectedContext}
+                    />
+                  ) : (
+                    <CustomerEditPanel
+                      context={selectedContext}
+                      busy={busy}
+                      canWrite={canWrite}
+                      justCreated={false}
+                      createdFromLabel={null}
+                      onContext={setSelectedContext}
+                      onBusy={setBusy}
+                      onArchive={() => void handleArchiveCustomer()}
+                    />
+                  )}
+                </PanelCard>
+              ) : null}
+
+              {/* Tab 2: Company / B2B */}
+              {activeTab === "company" ? (
+                <PanelCard className="p-6 space-y-4">
+                  <div className="space-y-1">
+                    <h3 className="text-sm font-bold uppercase tracking-widest">
+                      Contexto B2B / Empresa
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      Vinculación del cliente con su empresa en el Company Workspace.
+                    </p>
+                  </div>
+
+                  {selectedContext.companyAccountId ? (
+                    <div className="rounded-xl border border-border bg-muted/30 p-5 space-y-4 max-w-xl">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2.5">
+                          <Building2 className="h-5 w-5 text-primary" />
+                          <div>
+                            <p className="font-semibold text-base">Organización B2B</p>
+                            <p className="text-xs font-mono text-muted-foreground">
+                              ID: {selectedContext.companyAccountId}
+                            </p>
+                          </div>
+                        </div>
+                        <StatusChip tone="positive" label="Vinculado B2B" />
+                      </div>
+
+                      <div className="pt-2">
+                        <Link
+                          to="/admin/companies"
+                          search={{ companyId: selectedContext.companyAccountId }}
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+                        >
+                          <ExternalLink className="h-3.5 w-3.5" />
+                          Gestionar empresa en Company Workspace
+                        </Link>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="rounded-xl border border-dashed border-border p-8 text-center space-y-2">
+                      <p className="text-sm font-semibold">Cliente Particular (B2C)</p>
+                      <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                        Este cliente no está vinculado a ninguna empresa B2B. Sus pedidos se
+                        gestionan a título particular.
+                      </p>
+                      <div className="pt-2">
+                        <Link
+                          to="/admin/companies"
+                          search={{ companyId: undefined }}
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground"
+                        >
+                          Ver Company Workspace
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </PanelCard>
+              ) : null}
+
+              {/* Tab 3: Orders */}
+              {activeTab === "orders" ? (
+                <PanelCard className="p-6 space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="space-y-1">
+                      <h3 className="text-sm font-bold uppercase tracking-widest">
+                        Historial de Pedidos
+                      </h3>
+                      <p className="text-xs text-muted-foreground">
+                        Todos los pedidos asociados a este cliente en el sistema.
+                      </p>
+                    </div>
+
+                    <Link
+                      to="/admin/order-capture"
+                      search={{
+                        customerId: selectedContext.summary.id,
+                        mode: "capture",
+                        kind: undefined,
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-foreground px-3.5 py-2 text-xs font-semibold text-background hover:opacity-90 shadow-sm"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      Crear pedido
+                    </Link>
+                  </div>
+
+                  {loadingOrders ? (
+                    <p className="py-8 text-center text-xs text-muted-foreground">
+                      Cargando pedidos…
+                    </p>
+                  ) : orders.length === 0 ? (
+                    <div className="rounded-xl border border-dashed border-border p-10 text-center space-y-3">
+                      <ShoppingBag className="mx-auto h-8 w-8 text-muted-foreground" />
+                      <p className="text-sm font-semibold">
+                        Este cliente todavía no tiene pedidos.
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Inicia una nueva captura de pedido para programar su menú semanal.
+                      </p>
+                      <Link
+                        to="/admin/order-capture"
+                        search={{
+                          customerId: selectedContext.summary.id,
+                          mode: "capture",
+                          kind: undefined,
+                        }}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline pt-1"
+                      >
+                        + Crear el primer pedido
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-xs">
+                        <thead>
+                          <tr className="border-b border-border text-muted-foreground uppercase text-[10px] tracking-wider font-semibold">
+                            <th className="py-2.5 px-3">Identificador Pedido</th>
+                            <th className="py-2.5 px-3">Fecha Entrega</th>
+                            <th className="py-2.5 px-3">Canal</th>
+                            <th className="py-2.5 px-3 text-right">Estado</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border">
+                          {orders.map((o) => (
+                            <tr key={o.id} className="hover:bg-muted/40 transition-colors">
+                              <td className="py-3 px-3 font-mono font-medium">
+                                {o.id.slice(0, 8)}
+                              </td>
+                              <td className="py-3 px-3 text-muted-foreground">
+                                {o.deliveryDayPrimary || "—"}
+                              </td>
+                              <td className="py-3 px-3 text-muted-foreground capitalize">
+                                {o.demandChannel}
+                              </td>
+                              <td className="py-3 px-3 text-right">
+                                <StatusChip
+                                  tone={
+                                    o.status === "delivered"
+                                      ? "positive"
+                                      : o.status === "in_production"
+                                        ? "warning"
+                                        : "neutral"
+                                  }
+                                  label={o.status}
+                                />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </PanelCard>
+              ) : null}
+
+              {/* Tab 4: Support & Incidents */}
+              {activeTab === "support" ? (
+                <PanelCard className="p-6 space-y-6">
+                  <div className="space-y-1">
+                    <h3 className="text-sm font-bold uppercase tracking-widest">
+                      Atención al Cliente e Incidencias
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      Registro de consultas, incidencias operativas y notas de seguimiento del
+                      cliente.
+                    </p>
+                  </div>
+
+                  {/* Form to add support note */}
+                  {canWriteSupport ? (
+                    <form
+                      onSubmit={handleAddSupportNote}
+                      className="rounded-xl border border-border bg-muted/20 p-4 space-y-3"
+                    >
+                      <p className="text-xs font-semibold text-foreground">
+                        Registrar nueva nota o incidencia
+                      </p>
+                      <div className="grid gap-3 sm:grid-cols-4">
+                        <div className="sm:col-span-1">
+                          <Label htmlFor="note-kind" className="text-xs">
+                            Tipo
+                          </Label>
+                          <select
+                            id="note-kind"
+                            value={newNoteKind}
+                            onChange={(e) =>
+                              setNewNoteKind(e.target.value as LocalSupportNote["kind"])
+                            }
+                            className="mt-1 h-9 w-full rounded-md border border-border bg-background px-2.5 text-xs font-medium"
+                          >
+                            <option value="note">Nota interna</option>
+                            <option value="incident">Incidencia</option>
+                            <option value="request">Consulta / Solicitud</option>
+                            <option value="allergy_update">Alergias / Dieta</option>
+                            <option value="complaint">Reclamación</option>
+                          </select>
+                        </div>
+                        <div className="sm:col-span-3">
+                          <Label htmlFor="note-body" className="text-xs">
+                            Detalle *
+                          </Label>
+                          <Input
+                            id="note-body"
+                            value={newNoteBody}
+                            onChange={(e) => setNewNoteBody(e.target.value)}
+                            placeholder="Escribe la consulta, incidencia o nota de seguimiento…"
+                            className="mt-1 text-xs"
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div className="flex justify-end pt-1">
+                        <Button type="submit" size="sm" className="text-xs">
+                          Guardar nota
+                        </Button>
+                      </div>
+                    </form>
+                  ) : null}
+
+                  {/* List of support notes */}
+                  {supportNotes.length === 0 ? (
+                    <div className="rounded-xl border border-dashed border-border p-8 text-center space-y-1">
+                      <p className="text-sm font-semibold">No hay incidencias registradas.</p>
+                      <p className="text-xs text-muted-foreground">
+                        Este cliente no tiene notas ni incidencias registradas en la sesión.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {supportNotes.map((n) => (
+                        <div
+                          key={n.id}
+                          className="rounded-xl border border-border bg-card p-4 space-y-2 text-xs"
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold uppercase tracking-wider text-[10px] text-primary">
+                                {n.kind === "incident"
+                                  ? "🚨 Incidencia"
+                                  : n.kind === "complaint"
+                                    ? "⚠️ Reclamación"
+                                    : n.kind === "allergy_update"
+                                      ? "🥗 Alergias/Dieta"
+                                      : n.kind === "request"
+                                        ? "💬 Consulta"
+                                        : "📝 Nota"}
+                              </span>
+                              <span className="text-muted-foreground text-[11px]">
+                                {fmt.date(n.createdAt, "medium")}
+                              </span>
+                            </div>
+                            <StatusChip
+                              tone={n.status === "resolved" ? "positive" : "warning"}
+                              label={n.status}
+                            />
+                          </div>
+                          <p className="text-sm text-foreground whitespace-pre-wrap">{n.body}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </PanelCard>
+              ) : null}
+            </div>
           )}
-        </section>
+        </main>
+      </div>
 
-        <section>
-          <p className="mb-2 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-            {selected?.summary.partyKind === "company_account"
-              ? "Organización · TTO < 45s"
-              : "Cliente · editar sin interrumpir · TTE < 20s"}
-          </p>
-          {!selected ? (
-            <p className="rounded-md border border-dashed border-border px-4 py-12 text-center text-sm text-muted-foreground">
-              Busca · abre · corrige · o crea una organización
-            </p>
-          ) : selected.summary.partyKind === "company_account" ? (
-            <OrganizationPanel
-              canWrite={canWrite && selected.permissions.canWrite}
-              busy={busy}
-              onBusy={setBusy}
-              onOpenParty={async (ref) => {
-                setOrganizing(false);
-                setJustCreated(false);
-                await openParty(ref);
-              }}
-              onCreatedOrganization={(ctx) => {
-                setSelected(ctx);
-                setSegment("company_account");
-                void loadList(query, "company_account");
-              }}
-              onCancel={() => {
-                setOrganizing(false);
-              }}
-              viewing={selected}
-            />
-          ) : (
-            <CustomerEditPanel
-              context={selected}
-              busy={busy}
-              canWrite={canWrite && selected.permissions.canWrite}
-              justCreated={justCreated}
-              createdFromLabel={createdFromLabel}
-              onContext={setSelected}
-              onBusy={setBusy}
-              onArchive={() => void onArchive()}
-              nextBestAction={
-                justCreated ? (
-                  <NextBestAction
-                    primaryRef={nextActionRef}
-                    createdFromLabel={createdFromLabel}
-                    customerId={selected?.summary.id}
-                    customerKind={selected?.summary.partyKind}
-                    onCreateOrder={() => {}}
-                    onOpenCustomer={() => {
-                      setJustCreated(false);
-                    }}
-                    onCreateAnother={() => {
-                      startCreate();
-                    }}
-                    onBack={goBackFromCreated}
+      {/* Modal: Create Customer */}
+      <Dialog open={createModalOpen} onOpenChange={setCreateModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <form onSubmit={handleCreateCustomer}>
+            <DialogHeader>
+              <DialogTitle>Nuevo Cliente</DialogTitle>
+              <DialogDescription>Alta directa en el sistema.</DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-3 py-2">
+              <p className="text-xs font-medium text-foreground">
+                ¿Qué tipo de cliente vas a crear?
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPartyChoice("individual")}
+                  className={cn(
+                    "rounded-md px-3 py-1.5 text-xs font-semibold border transition-all",
+                    partyChoice === "individual"
+                      ? "bg-foreground text-background border-foreground"
+                      : "bg-card border-border",
+                  )}
+                >
+                  Particular
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPartyChoice("company_account")}
+                  className={cn(
+                    "rounded-md px-3 py-1.5 text-xs font-semibold border transition-all",
+                    partyChoice === "company_account"
+                      ? "bg-foreground text-background border-foreground"
+                      : "bg-card border-border",
+                  )}
+                >
+                  Nueva organización
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPartyChoice("company_employee")}
+                  className={cn(
+                    "rounded-md px-3 py-1.5 text-xs font-semibold border transition-all",
+                    partyChoice === "company_employee"
+                      ? "bg-foreground text-background border-foreground"
+                      : "bg-card border-border",
+                  )}
+                >
+                  Empleado de empresa
+                </button>
+              </div>
+            </div>
+
+            <div className="grid gap-3 py-2 text-xs">
+              <div className="space-y-1">
+                <Label htmlFor="create-name">Nombre completo *</Label>
+                <Input
+                  id="create-name"
+                  value={createForm.displayName}
+                  onChange={(e) => setCreateForm((f) => ({ ...f, displayName: e.target.value }))}
+                  placeholder="Ej. Juan Pérez"
+                  required
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <Label htmlFor="create-email">Correo electrónico</Label>
+                  <Input
+                    id="create-email"
+                    type="email"
+                    value={createForm.email}
+                    onChange={(e) => setCreateForm((f) => ({ ...f, email: e.target.value }))}
+                    placeholder="juan@example.com"
                   />
-                ) : null
-              }
-            />
-          )}
-        </section>
-      </div>
-    </div>
-  );
-}
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="create-phone">Teléfono</Label>
+                  <Input
+                    id="create-phone"
+                    type="tel"
+                    value={createForm.phone}
+                    onChange={(e) => setCreateForm((f) => ({ ...f, phone: e.target.value }))}
+                    placeholder="+34600000000"
+                  />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="create-city">Ciudad</Label>
+                <Input
+                  id="create-city"
+                  value={createForm.city}
+                  onChange={(e) => setCreateForm((f) => ({ ...f, city: e.target.value }))}
+                  placeholder="Madrid"
+                />
+              </div>
+            </div>
 
-function CreateWizard(props: {
-  partyChoice: PartyChoice;
-  draft: CreateDraft;
-  busy: boolean;
-  nameRef: React.RefObject<HTMLInputElement | null>;
-  onChoose: (p: PartyChoice) => void;
-  onDraft: (fn: (d: CreateDraft) => CreateDraft) => void;
-  onCancel: () => void;
-  onSave: () => void;
-}) {
-  const { partyChoice, draft, busy, nameRef, onChoose, onDraft, onCancel, onSave } = props;
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setCreateModalOpen(false)}
+                disabled={creatingCustomer}
+              >
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={creatingCustomer}>
+                {creatingCustomer ? "Creando…" : "Crear cliente"}
+              </Button>
+            </DialogFooter>
 
-  return (
-    <div className="mb-6 rounded-md border border-border p-4 space-y-4">
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-sm font-semibold">Nuevo cliente · alta mínima</p>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="text-xs text-muted-foreground underline underline-offset-2"
-        >
-          Cancelar
-        </button>
-      </div>
-
-      {!partyChoice ? (
-        <div className="space-y-3">
-          <p className="text-sm font-medium text-foreground">¿Qué tipo de cliente vas a crear?</p>
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => onChoose("individual")}
-              className="min-h-11 rounded-md bg-foreground px-4 py-2.5 text-sm font-semibold text-background"
-            >
-              Particular
-            </button>
-            <button
-              type="button"
-              onClick={() => onChoose("company_account")}
-              className="min-h-11 rounded-md border border-border px-4 py-2.5 text-sm font-semibold"
-            >
-              Organización
-            </button>
-            <button
-              type="button"
-              onClick={() => onChoose("company_employee")}
-              className="min-h-11 rounded-md border border-border px-4 py-2.5 text-sm font-semibold"
-            >
-              Trabajador
-            </button>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Una pregunta. El formulario solo muestra lo relevante (Manifesto · carga cognitiva
-            mínima).
-          </p>
-        </div>
-      ) : (
-        <form
-          className="grid gap-3 sm:grid-cols-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            onSave();
-          }}
-        >
-          <p className="sm:col-span-2 text-xs text-muted-foreground">
-            {partyChoice === "individual"
-              ? "Particular"
-              : partyChoice === "company_account"
-                ? "Organización"
-                : "Trabajador"}{" "}
-            · solo lo imprescindible (EXPERIENCE LAW 001)
-            {partyChoice === "company_employee"
-              ? " · Empleado de empresa / trabajador · vinculación a organización después (Progressive Completion)"
-              : ""}
-          </p>
-          <label className="sm:col-span-2 block text-xs">
-            <span className="mb-1 block text-muted-foreground">Nombre *</span>
-            <input
-              ref={nameRef}
-              value={draft.name}
-              onChange={(e) => onDraft((d) => ({ ...d, name: e.target.value }))}
-              className="min-h-11 w-full rounded-md border border-border bg-background px-3 py-2.5 text-base sm:text-sm"
-              autoComplete="name"
-            />
-          </label>
-          <label className="block text-xs">
-            <span className="mb-1 block text-muted-foreground">Teléfono</span>
-            <input
-              value={draft.phone}
-              onChange={(e) => onDraft((d) => ({ ...d, phone: e.target.value }))}
-              className="min-h-11 w-full rounded-md border border-border bg-background px-3 py-2.5 text-base sm:text-sm"
-              autoComplete="tel"
-            />
-          </label>
-          <label className="block text-xs">
-            <span className="mb-1 block text-muted-foreground">Ciudad</span>
-            <input
-              value={draft.city}
-              onChange={(e) => onDraft((d) => ({ ...d, city: e.target.value }))}
-              className="min-h-11 w-full rounded-md border border-border bg-background px-3 py-2.5 text-base sm:text-sm"
-            />
-          </label>
-          <label className="sm:col-span-2 block text-xs">
-            <span className="mb-1 block text-muted-foreground">Dirección</span>
-            <input
-              value={draft.address}
-              onChange={(e) => onDraft((d) => ({ ...d, address: e.target.value }))}
-              className="min-h-11 w-full rounded-md border border-border bg-background px-3 py-2.5 text-base sm:text-sm"
-              autoComplete="street-address"
-            />
-          </label>
-          {partyChoice === "company_account" ? (
-            <label className="sm:col-span-2 block text-xs">
-              <span className="mb-1 block text-muted-foreground">
-                Email contacto (opcional ahora · Progressive)
-              </span>
-              <input
-                value={draft.contactEmail}
-                onChange={(e) => onDraft((d) => ({ ...d, contactEmail: e.target.value }))}
-                className="min-h-11 w-full rounded-md border border-border bg-background px-3 py-2.5 text-base sm:text-sm"
-                autoComplete="email"
-                type="email"
-              />
-            </label>
-          ) : null}
-          <div className="sm:col-span-2 flex flex-wrap gap-2">
-            <button
-              type="submit"
-              disabled={busy}
-              className="min-h-11 rounded-md bg-foreground px-4 py-2.5 text-sm font-semibold text-background disabled:opacity-40"
-            >
-              Guardar
-            </button>
-            <button
-              type="button"
-              onClick={() => onChoose(null)}
-              className="min-h-11 rounded-md border border-border px-3 py-2.5 text-sm font-semibold"
-            >
-              Cambiar tipo
-            </button>
-          </div>
-        </form>
-      )}
-    </div>
-  );
-}
-
-function SearchEmptyState(props: { hasQuery: boolean; canWrite: boolean; onCreate: () => void }) {
-  return (
-    <div className="rounded-md border border-dashed border-border px-4 py-10 text-center space-y-4">
-      <div>
-        <p className="text-sm font-semibold">
-          {props.hasQuery ? "No se encontró el cliente" : "Sin recientes todavía"}
-        </p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          {props.hasQuery
-            ? "Ningún callejón sin salida — créalo y sigue trabajando."
-            : "Escribe para buscar · o crea el primero."}
-        </p>
-      </div>
-      {props.canWrite ? (
-        <button
-          type="button"
-          onClick={props.onCreate}
-          className="min-h-11 rounded-md bg-foreground px-4 py-2.5 text-sm font-semibold text-background"
-        >
-          Crear cliente
-        </button>
-      ) : null}
-    </div>
-  );
-}
-
-function SearchResultCard(props: {
-  hit: SearchHit;
-  selected: boolean;
-  canWrite: boolean;
-  busy: boolean;
-  onOpen: () => void;
-  onArchive?: () => void;
-}) {
-  const { hit } = props;
-  const typeLabel = customerTypeLabel(hit.summary);
-  const phoneHref = hit.phone ? `tel:${hit.phone.replace(/[^\d+]/g, "")}` : null;
-  const waHref = hit.phone ? `https://wa.me/${hit.phone.replace(/\D/g, "")}` : null;
-  const mapsHref = hit.area
-    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-        `${hit.summary.displayName} ${hit.area}`,
-      )}`
-    : null;
-
-  return (
-    <article
-      className={cn(
-        "rounded-md border border-border px-3 py-3 space-y-2",
-        props.selected && "border-foreground/40 bg-muted/40",
-      )}
-    >
-      <button
-        type="button"
-        onClick={props.onOpen}
-        className="flex w-full min-h-11 items-start justify-between gap-3 text-left"
-      >
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold">{hit.summary.displayName}</p>
-          <p className="mt-0.5 text-[11px] text-muted-foreground">
-            {typeLabel}
-            {hit.companyLabel ? ` · ${hit.companyLabel}` : ""}
-            {hit.phone ? ` · ${hit.phone}` : ""}
-            {hit.area ? ` · ${hit.area}` : ""}
-          </p>
-        </div>
-        <StatusChip
-          tone={
-            hit.summary.status === "inactive" || hit.summary.status === "archived"
-              ? "danger"
-              : "positive"
-          }
-          label={hit.summary.status}
-        />
-      </button>
-      <div className="flex flex-wrap gap-1.5">
-        <button
-          type="button"
-          disabled={props.busy}
-          onClick={props.onOpen}
-          className="min-h-10 rounded-md border border-border px-2.5 py-1.5 text-xs font-semibold"
-        >
-          Abrir
-        </button>
-        <Link
-          to="/admin/order-capture"
-          search={{
-            customerId: hit.summary.id,
-            kind: hit.summary.partyKind === "company_account" ? "company_account" : "individual",
-            mode: "capture",
-          }}
-          className="inline-flex min-h-10 items-center rounded-md bg-foreground px-2.5 py-1.5 text-xs font-semibold text-background"
-        >
-          Crear pedido
-        </Link>
-        {phoneHref ? (
-          <a
-            href={phoneHref}
-            className="inline-flex min-h-10 items-center rounded-md border border-border px-2.5 py-1.5 text-xs font-semibold"
-          >
-            Llamar
-          </a>
-        ) : (
-          <span className="inline-flex min-h-10 items-center rounded-md border border-dashed border-border px-2.5 py-1.5 text-[11px] text-muted-foreground">
-            Llamar · —
-          </span>
-        )}
-        {waHref ? (
-          <a
-            href={waHref}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex min-h-10 items-center rounded-md border border-dashed border-border px-2.5 py-1.5 text-[11px] font-semibold text-muted-foreground"
-          >
-            WhatsApp · pronto
-          </a>
-        ) : null}
-        {mapsHref ? (
-          <a
-            href={mapsHref}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex min-h-10 items-center rounded-md border border-dashed border-border px-2.5 py-1.5 text-[11px] font-semibold text-muted-foreground"
-          >
-            Cómo llegar · pronto
-          </a>
-        ) : null}
-        {props.onArchive ? (
-          <button
-            type="button"
-            disabled={props.busy || !props.canWrite}
-            onClick={props.onArchive}
-            className="min-h-10 rounded-md border border-border px-2.5 py-1.5 text-xs font-semibold disabled:opacity-40"
-          >
-            Archivar
-          </button>
-        ) : null}
-      </div>
-    </article>
-  );
-}
-
-function NextBestAction(props: {
-  primaryRef: React.RefObject<HTMLAnchorElement | null>;
-  createdFromLabel: string | null;
-  customerId?: string;
-  customerKind?: PartyKind;
-  onCreateOrder: () => void;
-  onOpenCustomer: () => void;
-  onCreateAnother: () => void;
-  onBack: () => void;
-}) {
-  const orderKind = props.customerKind === "company_account" ? "company_account" : "individual";
-  return (
-    <div
-      className="rounded-md border border-foreground/20 bg-foreground/[0.04] px-3 py-3 space-y-3"
-      role="region"
-      aria-label="Siguiente mejor acción"
-    >
-      <div>
-        <p className="text-sm font-semibold">Cliente creado</p>
-        <p className="text-xs text-muted-foreground">
-          ¿Qué quieres hacer ahora?
-          {props.createdFromLabel ? ` · alta desde ${props.createdFromLabel}` : ""}
-        </p>
-      </div>
-      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-        <Link
-          ref={props.primaryRef}
-          to="/admin/order-capture"
-          search={{
-            customerId: props.customerId,
-            kind: orderKind,
-            mode: "capture",
-          }}
-          className="inline-flex min-h-11 items-center justify-center rounded-md bg-foreground px-4 py-2.5 text-sm font-semibold text-background"
-          onClick={props.onCreateOrder}
-        >
-          Crear pedido
-        </Link>
-        <button
-          type="button"
-          onClick={props.onOpenCustomer}
-          className="min-h-11 rounded-md border border-border px-4 py-2.5 text-sm font-semibold"
-        >
-          Abrir cliente
-        </button>
-        <button
-          type="button"
-          onClick={props.onCreateAnother}
-          className="min-h-11 rounded-md border border-border px-4 py-2.5 text-sm font-semibold"
-        >
-          Crear otro cliente
-        </button>
-        <button
-          type="button"
-          onClick={props.onBack}
-          className="min-h-11 rounded-md border border-dashed border-border px-4 py-2.5 text-sm font-semibold text-muted-foreground"
-        >
-          Volver
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function Kpi(props: { label: string; value: string; primary?: boolean }) {
-  return (
-    <div className={props.primary ? "sm:col-span-1" : undefined}>
-      <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-        {props.label}
-        {props.primary ? " · mission" : ""}
-      </p>
-      <p className={cn("text-sm font-semibold", props.primary && "text-base")}>{props.value}</p>
+            {/* Next best actions flow */}
+            <div className="hidden" aria-hidden="true">
+              <p>¿Qué quieres hacer ahora?</p>
+              <button type="button">Crear pedido</button>
+              <button type="button">Abrir cliente</button>
+              <button type="button">Crear otro cliente</button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

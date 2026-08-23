@@ -104,6 +104,16 @@ export const CustomerDirectoryService = {
     return rows.filter((r) => matchesIndividual(r, filters));
   },
 
+  async getIndividualById(
+    ctx: ServiceContext,
+    customerId: string,
+  ): Promise<IndividualCustomerRecord | null> {
+    assertTenant(ctx);
+    assertCanReadCustomers(ctx);
+    const repo = createCustomerDirectoryRepository(ctx.supabase, ctx.tenantId);
+    return repo.getIndividualById(customerId);
+  },
+
   async listCompanies(
     ctx: ServiceContext,
     filters: CompanyDirectoryFilters = {},
