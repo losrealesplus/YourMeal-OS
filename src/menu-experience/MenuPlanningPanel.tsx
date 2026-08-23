@@ -108,9 +108,7 @@ export function MenuPlanningPanel({
   startInPreview = false,
   onPublishDurable,
 }: Props) {
-  const [weekStart, setWeekStart] = useState(
-    () => focusWeekStart ?? mondayIso(),
-  );
+  const [weekStart, setWeekStart] = useState(() => focusWeekStart ?? mondayIso());
   const [step, setStep] = useState<Step>(startInPreview ? "preview" : "plan");
   const [tick, setTick] = useState(0);
   const [pickDay, setPickDay] = useState<string | null>(null);
@@ -164,14 +162,10 @@ export function MenuPlanningPanel({
   const previousCandidates = useMemo(() => {
     void tick;
     const session = listWeekPlans().filter((p) => p.weekStart < weekStart);
-    const durable = durableMenus
-      .filter((m) => m.weekStart < weekStart)
-      .map(seedToPlan);
+    const durable = durableMenus.filter((m) => m.weekStart < weekStart).map(seedToPlan);
     const map = new Map<string, WeekPlan>();
     for (const p of [...durable, ...session]) map.set(p.weekStart, p);
-    return [...map.values()].sort(
-      (a, b) => Date.parse(b.weekStart) - Date.parse(a.weekStart),
-    );
+    return [...map.values()].sort((a, b) => Date.parse(b.weekStart) - Date.parse(a.weekStart));
   }, [weekStart, durableMenus, tick]);
 
   function refresh() {
@@ -278,9 +272,7 @@ export function MenuPlanningPanel({
 
     setPublishing(true);
     try {
-      const durableIds = activeSlots(p).every(
-        (s) => !s.dishId.startsWith("exp:"),
-      );
+      const durableIds = activeSlots(p).every((s) => !s.dishId.startsWith("exp:"));
       if (durableIds && onPublishDurable) {
         const result = await onPublishDurable(p);
         if (result.ok) {
@@ -349,9 +341,7 @@ export function MenuPlanningPanel({
         <p className="text-lg font-medium">{formatWeekLabel(plan.weekStart)}</p>
         <p className="text-sm text-muted-foreground">
           {activeSlots(plan).length} platos activos ·{" "}
-          {plan.status === "published_durable"
-            ? "Publicado (durable)"
-            : "Publicado en sesión"}
+          {plan.status === "published_durable" ? "Publicado (durable)" : "Publicado en sesión"}
         </p>
         <div className="flex flex-wrap gap-2">
           <StatusChip
@@ -397,6 +387,7 @@ export function MenuPlanningPanel({
             </Link>
             <Link
               to="/admin/menus"
+              search={{ weekStart: undefined }}
               className="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-4 text-sm"
             >
               Menús (bootstrap)
@@ -536,22 +527,14 @@ export function MenuPlanningPanel({
               }
             />
             {plan.sourceWeekStart ? (
-              <StatusChip
-                tone="info"
-                label={`Desde ${plan.sourceWeekStart}`}
-              />
+              <StatusChip tone="info" label={`Desde ${plan.sourceWeekStart}`} />
             ) : null}
-            <StatusChip
-              tone="info"
-              label={`${activeSlots(plan).length} activos`}
-            />
+            <StatusChip tone="info" label={`${activeSlots(plan).length} activos`} />
           </div>
 
           {previousCandidates.length > 0 ? (
             <div className="space-y-2">
-              <p className="text-xs font-semibold text-muted-foreground">
-                Duplicar desde
-              </p>
+              <p className="text-xs font-semibold text-muted-foreground">Duplicar desde</p>
               <div className="flex flex-wrap gap-2">
                 {previousCandidates.slice(0, 4).map((src) => (
                   <button
@@ -574,17 +557,12 @@ export function MenuPlanningPanel({
               <div key={day} className="space-y-2 border-t border-border/50 pt-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm font-semibold">
-                    {dayLabel(day)}{" "}
-                    <span className="font-normal text-muted-foreground">
-                      {day}
-                    </span>
+                    {dayLabel(day)} <span className="font-normal text-muted-foreground">{day}</span>
                   </p>
                   <button
                     type="button"
                     disabled={!canWrite}
-                    onClick={() =>
-                      setPickDay((d) => (d === day ? null : day))
-                    }
+                    onClick={() => setPickDay((d) => (d === day ? null : day))}
                     className="text-xs underline-offset-2 hover:underline disabled:opacity-40"
                   >
                     {pickDay === day ? "Cerrar" : "Añadir / reemplazar"}
@@ -601,14 +579,10 @@ export function MenuPlanningPanel({
                     >
                       <span className="font-medium">{slot.dishLabel}</span>
                       {slot.macrosHint ? (
-                        <span className="text-xs text-muted-foreground">
-                          {slot.macrosHint}
-                        </span>
+                        <span className="text-xs text-muted-foreground">{slot.macrosHint}</span>
                       ) : null}
                       {slot.allergenHint ? (
-                        <span className="text-xs text-muted-foreground">
-                          · {slot.allergenHint}
-                        </span>
+                        <span className="text-xs text-muted-foreground">· {slot.allergenHint}</span>
                       ) : null}
                       <button
                         type="button"
@@ -635,17 +609,12 @@ export function MenuPlanningPanel({
                 {pickDay === day ? (
                   <DishLibraryPicker
                     items={library}
-                    mode={
-                      replaceSlotId || (byDay?.[day] ?? []).length > 0
-                        ? "replace"
-                        : "insert"
-                    }
+                    mode={replaceSlotId || (byDay?.[day] ?? []).length > 0 ? "replace" : "insert"}
                     canWrite={canWrite}
                     onPick={(dish) => {
                       const existing =
-                        (byDay?.[day] ?? []).find(
-                          (s) => s.id === replaceSlotId,
-                        ) ?? (byDay?.[day] ?? [])[0];
+                        (byDay?.[day] ?? []).find((s) => s.id === replaceSlotId) ??
+                        (byDay?.[day] ?? [])[0];
                       if (existing) onReplace(existing, dish);
                       else onAddDish(day, dish);
                       setPickDay(null);

@@ -21,11 +21,9 @@ import {
   utcWeekDates,
   utcWeekStartMonday,
   isDayDateInWeek,
+  isValidMondayIso,
 } from "@/modules/weekly-menu/application/week-dates";
-import {
-  canComposeWeeklyMenu,
-  canPublishWeeklyMenu,
-} from "@/modules/bootstrap-integrity";
+import { canComposeWeeklyMenu, canPublishWeeklyMenu } from "@/modules/bootstrap-integrity";
 import { createDishRepository } from "@/modules/dish-library/infrastructure/dish-repository";
 
 export const PUBLISH_OUT_OF_WEEK_MESSAGE =
@@ -52,10 +50,7 @@ export const WeeklyMenuService = {
     return createWeeklyMenuRepository(ctx.supabase, ctx.tenantId).listAll();
   },
 
-  async ensureDraft(
-    ctx: ServiceContext,
-    weekStart?: string,
-  ): Promise<WeeklyMenuRow> {
+  async ensureDraft(ctx: ServiceContext, weekStart?: string): Promise<WeeklyMenuRow> {
     requireCapability(ctx.roles, "menus.write");
     const dishesOk = canComposeWeeklyMenu({
       activeDishCount: await activeDishCount(ctx),
@@ -79,14 +74,9 @@ export const WeeklyMenuService = {
     return created;
   },
 
-  async listSlots(
-    ctx: ServiceContext,
-    weeklyMenuId: string,
-  ): Promise<WeeklyMenuSlotWithDish[]> {
+  async listSlots(ctx: ServiceContext, weeklyMenuId: string): Promise<WeeklyMenuSlotWithDish[]> {
     requireCapability(ctx.roles, "menus.read");
-    return createWeeklyMenuRepository(ctx.supabase, ctx.tenantId).listSlotsWithDishes(
-      weeklyMenuId,
-    );
+    return createWeeklyMenuRepository(ctx.supabase, ctx.tenantId).listSlotsWithDishes(weeklyMenuId);
   },
 
   async addDishToDay(
@@ -155,10 +145,7 @@ export const WeeklyMenuService = {
   },
 
   /** published → draft so Admin can repair slots / republish. */
-  async unpublish(
-    ctx: ServiceContext,
-    weeklyMenuId: string,
-  ): Promise<WeeklyMenuRow> {
+  async unpublish(ctx: ServiceContext, weeklyMenuId: string): Promise<WeeklyMenuRow> {
     requireCapability(ctx.roles, "menus.write");
     const repo = createWeeklyMenuRepository(ctx.supabase, ctx.tenantId);
     const menu = await repo.getById(weeklyMenuId);
@@ -186,9 +173,7 @@ export const WeeklyMenuService = {
       throw new DomainError("NOT_FOUND", "Weekly menu not found");
     }
     const slots = await repo.listSlotsWithDishes(weeklyMenuId);
-    const outOfWeek = slots.filter(
-      (s) => !isDayDateInWeek(menu.week_start, s.day_date),
-    );
+    const outOfWeek = slots.filter((s) => !isDayDateInWeek(menu.week_start, s.day_date));
     if (outOfWeek.length > 0) {
       throw new DomainError("INVALID_STATE", PUBLISH_OUT_OF_WEEK_MESSAGE);
     }
@@ -209,5 +194,145 @@ export const WeeklyMenuService = {
       newData: published as unknown as Record<string, unknown>,
     });
     return published;
+  },
+
+  async removeSlot(
+    ctx: ServiceContext,
+    slotId: string,
+  ): Promise<{ id: string; weeklyMenuId: string }> {
+    requireCapability(ctx.roles, "menus.write");
+    const repo = createWeeklyMenuRepository(ctx.supabase, ctx.tenantId);
+    const slot = await repo.getSlotById(slotId);
+    if (!slot) {
+      throw new DomainError("NOT_FOUND", "Menu slot not found");
+    }
+    const menu = await repo.getById(slot.weekly_menu_id);
+    if (!menu) {
+      throw new DomainError("NOT_FOUND", "Weekly menu not found");
+    }
+    if (menu.status !== "draft") {
+      throw new DomainError(
+        "INVALID_STATE",
+        "Solo se pueden eliminar platos de un menú en borrador",
+      );
+    }
+    await repo.removeSlot(slotId);
+    await AuditService.write(ctx, {
+      entityType: "weekly_menu_slot",
+      entityId: slotId,
+      action: "purge",
+      oldData: slot as unknown as Record<string, unknown>,
+    });
+    return { id: slotId, weeklyMenuId: slot.weekly_menu_id };
+  },
+
+  async archiveMenu(ctx: ServiceContext, weeklyMenuId: string): Promise<WeeklyMenuRow> {
+    requireCapability(ctx.roles, "menus.write");
+    const repo = createWeeklyMenuRepository(ctx.supabase, ctx.tenantId);
+    const menu = await repo.getById(weeklyMenuId);
+    if (!menu) {
+      throw new DomainError("NOT_FOUND", "Weekly menu not found");
+    }
+    if (menu.status === "archived") {
+      throw new DomainError("INVALID_STATE", "El menú ya está archivado");
+    }
+    if (menu.status === "published") {
+      throw new DomainError(
+        "INVALID_STATE",
+        "No se puede archivar un menú publicado directamente. Ábrelo para editar primero.",
+      );
+    }
+    if (menu.status !== "draft") {
+      throw new DomainError("INVALID_STATE", "Solo se pueden archivar menús en borrador");
+    }
+    const archived = await repo.archive(weeklyMenuId);
+    await AuditService.write(ctx, {
+      entityType: "weekly_menu",
+      entityId: weeklyMenuId,
+      action: "status_change",
+      oldData: menu as unknown as Record<string, unknown>,
+      newData: archived as unknown as Record<string, unknown>,
+    });
+    return archived;
+  },
+
+  async duplicateWeek(
+    ctx: ServiceContext,
+    input: {
+      sourceMenuId: string;
+      targetWeekStart: string;
+    },
+  ): Promise<WeeklyMenuRow> {
+    requireCapability(ctx.roles, "menus.write");
+    if (!isValidMondayIso(input.targetWeekStart)) {
+      throw new DomainError(
+        "INVALID_STATE",
+        "La semana de destino debe ser un lunes válido (YYYY-MM-DD)",
+      );
+    }
+    const repo = createWeeklyMenuRepository(ctx.supabase, ctx.tenantId);
+    const sourceMenu = await repo.getById(input.sourceMenuId);
+    if (!sourceMenu) {
+      throw new DomainError("NOT_FOUND", "Menú de origen no encontrado");
+    }
+    if (sourceMenu.status === "archived") {
+      throw new DomainError("INVALID_STATE", "No se puede duplicar un menú archivado");
+    }
+    if (sourceMenu.week_start === input.targetWeekStart) {
+      throw new DomainError(
+        "INVALID_STATE",
+        "La semana de origen y destino no pueden ser la misma",
+      );
+    }
+    const existingTarget = await repo.findByWeekStart(input.targetWeekStart);
+    if (existingTarget && existingTarget.status !== "archived") {
+      throw new DomainError(
+        "INVALID_STATE",
+        `Ya existe un menú activo para la semana ${input.targetWeekStart}`,
+      );
+    }
+    const dishesOk = canComposeWeeklyMenu({
+      activeDishCount: await activeDishCount(ctx),
+    });
+    if (!dishesOk.ok) {
+      throw new DomainError("INVALID_STATE", dishesOk.message, {
+        code: dishesOk.code,
+      });
+    }
+
+    const sourceSlots = await repo.listSlotsWithDishes(input.sourceMenuId);
+    const sourceDates = utcWeekDates(sourceMenu.week_start);
+    const targetDates = utcWeekDates(input.targetWeekStart);
+
+    const createdMenu = await repo.insertDraft(input.targetWeekStart);
+
+    try {
+      if (sourceSlots.length > 0) {
+        const slotsToInsert = sourceSlots.map((s) => {
+          const dayIdx = sourceDates.indexOf(s.day_date);
+          const targetDay = dayIdx >= 0 ? targetDates[dayIdx]! : input.targetWeekStart;
+          return {
+            weeklyMenuId: createdMenu.id,
+            dayDate: targetDay,
+            dishId: s.dish_id,
+            sortOrder: s.sort_order,
+          };
+        });
+        await repo.addSlots(slotsToInsert);
+      }
+    } catch (err) {
+      // Safe cleanup of orphan target to protect integrity
+      await repo.deleteMenu(createdMenu.id).catch(() => {});
+      throw err;
+    }
+
+    await AuditService.write(ctx, {
+      entityType: "weekly_menu",
+      entityId: createdMenu.id,
+      action: "create",
+      newData: createdMenu as unknown as Record<string, unknown>,
+    });
+
+    return createdMenu;
   },
 };

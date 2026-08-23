@@ -129,10 +129,7 @@ export function createWeeklyMenuRepository(supabase: AppSupabase, tenantId: stri
       return data as WeeklyMenuSlotRow;
     },
 
-    async updateSlotDayDate(
-      slotId: string,
-      dayDate: string,
-    ): Promise<WeeklyMenuSlotRow> {
+    async updateSlotDayDate(slotId: string, dayDate: string): Promise<WeeklyMenuSlotRow> {
       const { data, error } = await supabase
         .from("weekly_menu_slots")
         .update({ day_date: dayDate })
@@ -165,9 +162,64 @@ export function createWeeklyMenuRepository(supabase: AppSupabase, tenantId: stri
         .order("sort_order", { ascending: true });
       if (error) throw error;
       // Soft-deleted dishes excluded; slots without an active dish are dropped by mapper/service.
-      return ((data ?? []) as WeeklyMenuSlotWithDish[]).filter(
-        (slot) => !slot.dishes?.deleted_at,
-      );
+      return ((data ?? []) as WeeklyMenuSlotWithDish[]).filter((slot) => !slot.dishes?.deleted_at);
+    },
+
+    async removeSlot(slotId: string): Promise<void> {
+      const { error } = await supabase
+        .from("weekly_menu_slots")
+        .delete()
+        .eq("tenant_id", tenantId)
+        .eq("id", slotId);
+      if (error) throw error;
+    },
+
+    async archive(id: string): Promise<WeeklyMenuRow> {
+      const { data, error } = await supabase
+        .from("weekly_menus")
+        .update({
+          status: "archived",
+        })
+        .eq("tenant_id", tenantId)
+        .eq("id", id)
+        .select("*")
+        .single();
+      if (error) throw error;
+      return data as WeeklyMenuRow;
+    },
+
+    async addSlots(
+      slots: Array<{
+        weeklyMenuId: string;
+        dayDate: string;
+        dishId: string;
+        sortOrder?: number;
+      }>,
+    ): Promise<WeeklyMenuSlotRow[]> {
+      if (slots.length === 0) return [];
+      const { data, error } = await supabase
+        .from("weekly_menu_slots")
+        .insert(
+          slots.map((s) => ({
+            tenant_id: tenantId,
+            weekly_menu_id: s.weeklyMenuId,
+            day_date: s.dayDate,
+            dish_id: s.dishId,
+            sort_order: s.sortOrder ?? 0,
+          })),
+        )
+        .select("*");
+      if (error) throw error;
+      return (data ?? []) as WeeklyMenuSlotRow[];
+    },
+
+    async deleteMenu(id: string): Promise<void> {
+      const { error } = await supabase
+        .from("weekly_menus")
+        .delete()
+        .eq("tenant_id", tenantId)
+        .eq("id", id);
+      if (error) throw error;
     },
   };
 }

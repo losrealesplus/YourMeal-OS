@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 import { utcWeekDates, utcWeekStartMonday } from "./week-dates";
 import { mapWeeklyMenuToView } from "./weekly-menu-mapper";
 import type { Tables } from "@/integrations/supabase/types";
-import type { WeeklyMenuRow, WeeklyMenuSlotWithDish } from "../infrastructure/weekly-menu-repository";
+import type {
+  WeeklyMenuRow,
+  WeeklyMenuSlotWithDish,
+} from "../infrastructure/weekly-menu-repository";
 
 type DishRow = Tables<"dishes">;
 
