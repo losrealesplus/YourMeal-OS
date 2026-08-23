@@ -61,11 +61,13 @@ import { cn } from "@/lib/utils";
 
 type CompanySearch = {
   companyId?: string;
+  fromCustomerId?: string;
 };
 
 export const Route = createFileRoute("/_authenticated/admin/companies")({
   validateSearch: (search: Record<string, unknown>): CompanySearch => ({
     companyId: typeof search.companyId === "string" ? search.companyId : undefined,
+    fromCustomerId: typeof search.fromCustomerId === "string" ? search.fromCustomerId : undefined,
   }),
   beforeLoad: ({ context }) => {
     assertCapabilityFromContext(context, "company.manage");
@@ -103,7 +105,7 @@ function AdminCompaniesPage() {
   const fmt = useFmt();
   const { user, tenantId, roles } = useAuth();
   const { can } = useCan();
-  const { companyId: paramCompanyId } = Route.useSearch();
+  const { companyId: paramCompanyId, fromCustomerId } = Route.useSearch();
   const navigate = useNavigate();
 
   const [companies, setCompanies] = useState<CompanyAccount[]>([]);
@@ -461,6 +463,19 @@ function AdminCompaniesPage() {
 
   return (
     <div className="animate-fade-in space-y-6">
+      {fromCustomerId ? (
+        <div>
+          <Link
+            to="/admin/customer-workspace"
+            search={{ customerId: fromCustomerId, tab: "company" }}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground shadow-sm hover:bg-muted/60 transition-colors"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Volver a la ficha del empleado
+          </Link>
+        </div>
+      ) : null}
+
       <SectionTitle
         overline="Clientes"
         title="Empresas (Company Accounts)"

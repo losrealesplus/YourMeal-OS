@@ -788,7 +788,10 @@ function CustomerWorkspacePage() {
                       <div className="pt-2">
                         <Link
                           to="/admin/companies"
-                          search={{ companyId: selectedContext.companyAccountId }}
+                          search={{
+                            companyId: selectedContext.companyAccountId,
+                            fromCustomerId: selectedContext.summary.id,
+                          }}
                           className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
                         >
                           <ExternalLink className="h-3.5 w-3.5" />

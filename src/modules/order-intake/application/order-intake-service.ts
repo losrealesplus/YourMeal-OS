@@ -2,10 +2,7 @@ import { AuditService } from "@/services/audit-service";
 import type { ServiceContext } from "@/services/types";
 import { requireCapability, hasStaffAccess } from "@/permissions";
 import { DomainError } from "@/domain/errors";
-import {
-  OrderService,
-  type ProgramDraftOrderResult,
-} from "@/modules/orders";
+import { OrderService, type ProgramDraftOrderResult } from "@/modules/orders";
 import type { OrderIntakeDraftCommand, OrderIntakeOrigin } from "../domain/intake-command";
 import {
   CUSTOMER_SELF_CHANNELS,
@@ -13,10 +10,7 @@ import {
   isOrderSourceChannel,
 } from "../domain/order-source";
 
-function buildOrigin(
-  ctx: ServiceContext,
-  command: OrderIntakeDraftCommand,
-): OrderIntakeOrigin {
+function buildOrigin(ctx: ServiceContext, command: OrderIntakeDraftCommand): OrderIntakeOrigin {
   return {
     channel: command.channel,
     createdByUserId: ctx.userId,
@@ -55,18 +49,11 @@ export const OrderIntakeService = {
     }
 
     const staff = hasStaffAccess(ctx.roles);
-    const selfChannel = (CUSTOMER_SELF_CHANNELS as readonly string[]).includes(
-      command.channel,
-    );
-    const staffChannel = (STAFF_INTAKE_CHANNELS as readonly string[]).includes(
-      command.channel,
-    );
+    const selfChannel = (CUSTOMER_SELF_CHANNELS as readonly string[]).includes(command.channel);
+    const staffChannel = (STAFF_INTAKE_CHANNELS as readonly string[]).includes(command.channel);
 
     if (!staff && !selfChannel) {
-      throw new DomainError(
-        "PERMISSION_DENIED",
-        "Customers may only intake via the App channel",
-      );
+      throw new DomainError("PERMISSION_DENIED", "Customers may only intake via the App channel");
     }
 
     if (staff && command.targetCustomerId) {
@@ -85,10 +72,7 @@ export const OrderIntakeService = {
     }
 
     if (staff && !command.targetCustomerId && !selfChannel) {
-      throw new DomainError(
-        "INVALID_STATE",
-        "Staff intake requires targetCustomerId",
-      );
+      throw new DomainError("INVALID_STATE", "Staff intake requires targetCustomerId");
     }
 
     // Customer self-service (and staff using app-as-self only if they have a customer row).
@@ -96,6 +80,7 @@ export const OrderIntakeService = {
       weekStart: command.weekStart,
       items: command.items,
       notes: command.notes ?? null,
+      clientRequestId: command.clientRequestId,
     });
 
     const origin = buildOrigin(ctx, command);

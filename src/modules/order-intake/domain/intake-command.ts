@@ -19,6 +19,8 @@ export type OrderIntakeDraftCommand = {
   notes?: string | null;
   /** Intake-only notes (origin context) — audit / future origin store. */
   intakeNotes?: string | null;
+  /** Client-provided idempotency request identifier. */
+  clientRequestId?: string;
 };
 
 export type OrderIntakeOrigin = {
