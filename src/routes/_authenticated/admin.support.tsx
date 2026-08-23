@@ -3,7 +3,7 @@
  * Shared: CustomerDirectoryService (no duplicate customer store).
  * Communications / campaigns: architecture catalog only (no external integrations).
  */
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -47,8 +47,7 @@ export const Route = createFileRoute("/_authenticated/admin/support")({
     assertCapabilityFromContext(context, "support.read");
   },
   validateSearch: (search: Record<string, unknown>): SupportSearch => ({
-    customerId:
-      typeof search.customerId === "string" ? search.customerId : undefined,
+    customerId: typeof search.customerId === "string" ? search.customerId : undefined,
   }),
   component: AdminSupportPage,
   head: () => ({
@@ -75,9 +74,7 @@ function AdminSupportPage() {
   const [minOrders, setMinOrders] = useState("");
   const [customers, setCustomers] = useState<IndividualCustomerRecord[]>([]);
   const [stats, setStats] = useState<SupportStats | null>(null);
-  const [selectedId, setSelectedId] = useState<string | null>(
-    initialCustomerId ?? null,
-  );
+  const [selectedId, setSelectedId] = useState<string | null>(initialCustomerId ?? null);
   const [orders, setOrders] = useState<CustomerOrderSummary[]>([]);
   const [notes, setNotes] = useState<SupportNoteRecord[]>([]);
   const [noteBody, setNoteBody] = useState("");
@@ -100,14 +97,8 @@ function AdminSupportPage() {
       const [rows, s] = await Promise.all([
         CustomerDirectoryService.listIndividuals(ctx, {
           query,
-          kind:
-            kindFilter === "all"
-              ? "all"
-              : (kindFilter as "individual" | "company_employee"),
-          status:
-            statusFilter === "all"
-              ? "all"
-              : (statusFilter as "active" | "inactive" | "new"),
+          kind: kindFilter === "all" ? "all" : (kindFilter as "individual" | "company_employee"),
+          status: statusFilter === "all" ? "all" : (statusFilter as "active" | "inactive" | "new"),
           minOrders: minOrders ? Number(minOrders) : null,
         }),
         CustomerDirectoryService.supportStats(ctx),
@@ -203,10 +194,7 @@ function AdminSupportPage() {
     }
   }
 
-  async function transitionNote(
-    noteId: string,
-    toStatus: SupportNoteRecord["status"],
-  ) {
+  async function transitionNote(noteId: string, toStatus: SupportNoteRecord["status"]) {
     if (!user || !tenantId || !can("support.write")) return;
     try {
       const ctx = await createServiceContext({
@@ -215,11 +203,7 @@ function AdminSupportPage() {
         tenantId,
         roles,
       });
-      await CustomerDirectoryService.transitionSupportNote(
-        ctx,
-        noteId,
-        toStatus,
-      );
+      await CustomerDirectoryService.transitionSupportNote(ctx, noteId, toStatus);
       toast.success(
         toStatus === "resolved"
           ? "Incidencia resuelta"
@@ -228,10 +212,7 @@ function AdminSupportPage() {
             : "Estado actualizado",
       );
       if (selectedId) {
-        const n = await CustomerDirectoryService.listSupportNotes(
-          ctx,
-          selectedId,
-        );
+        const n = await CustomerDirectoryService.listSupportNotes(ctx, selectedId);
         setNotes(n);
       }
       await reloadDirectory();
@@ -248,14 +229,9 @@ function AdminSupportPage() {
         <button
           type="button"
           onClick={() => setSelectedId(r.id)}
-          className={cn(
-            "text-left min-w-0 w-full",
-            selectedId === r.id && "text-primary",
-          )}
+          className={cn("text-left min-w-0 w-full", selectedId === r.id && "text-primary")}
         >
-          <p className="font-semibold truncate">
-            {r.displayName || "Sin nombre"}
-          </p>
+          <p className="font-semibold truncate">{r.displayName || "Sin nombre"}</p>
           <p className="text-xs text-muted-foreground truncate">
             {r.email || r.phone || r.id.slice(0, 8)}
           </p>
@@ -266,9 +242,7 @@ function AdminSupportPage() {
       key: "kind",
       header: "Tipo",
       render: (r) => (
-        <span className="text-xs">
-          {r.kind === "company_employee" ? "Empleado" : "Particular"}
-        </span>
+        <span className="text-xs">{r.kind === "company_employee" ? "Empleado" : "Particular"}</span>
       ),
     },
     {
@@ -276,13 +250,7 @@ function AdminSupportPage() {
       header: "Estado",
       render: (r) => (
         <StatusChip
-          tone={
-            r.status === "active"
-              ? "positive"
-              : r.status === "new"
-                ? "warning"
-                : "danger"
-          }
+          tone={r.status === "active" ? "positive" : r.status === "new" ? "warning" : "danger"}
           label={r.status}
         />
       ),
@@ -291,9 +259,7 @@ function AdminSupportPage() {
       key: "orders",
       header: "Pedidos",
       className: "text-right",
-      render: (r) => (
-        <span className="font-mono tabular-nums">{r.orderCount}</span>
-      ),
+      render: (r) => <span className="font-mono tabular-nums">{r.orderCount}</span>,
     },
     {
       key: "last",
@@ -349,12 +315,10 @@ function AdminSupportPage() {
       {panel === "comms" ? (
         <div className="grid gap-4 lg:grid-cols-2">
           <PanelCard>
-            <h3 className="text-sm font-bold uppercase tracking-widest mb-2">
-              Motor común
-            </h3>
+            <h3 className="text-sm font-bold uppercase tracking-widest mb-2">Motor común</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Communication → Channel → Recipient → Template → Campaign →
-              Delivery → Result. Sin integraciones externas todavía.
+              Communication → Channel → Recipient → Template → Campaign → Delivery → Result. Sin
+              integraciones externas todavía.
             </p>
             <ol className="space-y-2 list-decimal list-inside text-sm">
               {COMMUNICATION_ENGINE_STAGES.map((stage) => (
@@ -367,8 +331,7 @@ function AdminSupportPage() {
               Canales planificados
             </h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Cualquier canal futuro usa el mismo motor. Audience = Customer
-              Directory.
+              Cualquier canal futuro usa el mismo motor. Audience = Customer Directory.
             </p>
             <ul className="space-y-2">
               {PLANNED_COMMUNICATION_CHANNELS.map((c) => (
@@ -403,30 +366,12 @@ function AdminSupportPage() {
           {stats ? (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-6">
               <KpiCard label="Activos" value={String(stats.activeCustomers)} />
-              <KpiCard
-                label="Inactivos"
-                value={String(stats.inactiveCustomers)}
-              />
-              <KpiCard
-                label="Recurrentes"
-                value={String(stats.recurringCustomers)}
-              />
-              <KpiCard
-                label="Empresas activas"
-                value={String(stats.activeCompanies)}
-              />
-              <KpiCard
-                label="Empresas sin pedidos"
-                value={String(stats.companiesWithoutOrders)}
-              />
-              <KpiCard
-                label="Incidencias abiertas"
-                value={String(stats.openIncidents)}
-              />
-              <KpiCard
-                label="Pedidos pendientes"
-                value={String(stats.pendingOrders)}
-              />
+              <KpiCard label="Inactivos" value={String(stats.inactiveCustomers)} />
+              <KpiCard label="Recurrentes" value={String(stats.recurringCustomers)} />
+              <KpiCard label="Empresas activas" value={String(stats.activeCompanies)} />
+              <KpiCard label="Empresas sin pedidos" value={String(stats.companiesWithoutOrders)} />
+              <KpiCard label="Incidencias abiertas" value={String(stats.openIncidents)} />
+              <KpiCard label="Pedidos pendientes" value={String(stats.pendingOrders)} />
             </div>
           ) : null}
 
@@ -469,9 +414,7 @@ function AdminSupportPage() {
                 />
               </div>
               {loading ? (
-                <p className="text-sm text-muted-foreground py-8 text-center">
-                  Cargando…
-                </p>
+                <p className="text-sm text-muted-foreground py-8 text-center">Cargando…</p>
               ) : (
                 <DataTable
                   columns={columns}
@@ -483,9 +426,7 @@ function AdminSupportPage() {
 
             <div className="space-y-4">
               <PanelCard>
-                <h3 className="text-sm font-bold uppercase tracking-widest mb-3">
-                  Ficha
-                </h3>
+                <h3 className="text-sm font-bold uppercase tracking-widest mb-3">Ficha</h3>
                 {!selectedId ? (
                   <p className="text-sm text-muted-foreground">
                     Selecciona un cliente del directorio.
@@ -494,22 +435,13 @@ function AdminSupportPage() {
                   <p className="text-sm text-muted-foreground">Cargando…</p>
                 ) : (
                   <div className="space-y-2 text-sm">
-                    <p className="font-semibold text-base">
-                      {selected?.displayName || "Cliente"}
-                    </p>
-                    <p className="text-muted-foreground">
-                      {selected?.email || "Sin correo"}
-                    </p>
-                    <p className="text-muted-foreground">
-                      {selected?.phone || "Sin teléfono"}
-                    </p>
+                    <p className="font-semibold text-base">{selected?.displayName || "Cliente"}</p>
+                    <p className="text-muted-foreground">{selected?.email || "Sin correo"}</p>
+                    <p className="text-muted-foreground">{selected?.phone || "Sin teléfono"}</p>
                     {selected?.companyName ? (
                       <p>
-                        Empresa:{" "}
-                        <span className="font-medium">
-                          {selected.companyName}
-                        </span>{" "}
-                        ({selected.companyCode})
+                        Empresa: <span className="font-medium">{selected.companyName}</span> (
+                        {selected.companyCode})
                       </p>
                     ) : null}
                     <p>
@@ -519,11 +451,19 @@ function AdminSupportPage() {
                       })}
                     </p>
                     <p>
-                      Alta:{" "}
-                      {selected?.createdAt
-                        ? fmt.date(selected.createdAt, "medium")
-                        : "—"}
+                      Alta: {selected?.createdAt ? fmt.date(selected.createdAt, "medium") : "—"}
                     </p>
+                    {selected ? (
+                      <div className="pt-2 border-t border-border mt-3">
+                        <Link
+                          to="/admin/customer-workspace"
+                          search={{ customerId: selected.id, tab: "support" }}
+                          className="inline-flex items-center justify-center rounded-lg bg-foreground px-3.5 py-1.5 text-xs font-semibold text-background hover:opacity-90 shadow-sm"
+                        >
+                          Ver ficha completa
+                        </Link>
+                      </div>
+                    ) : null}
                   </div>
                 )}
               </PanelCard>
@@ -560,19 +500,14 @@ function AdminSupportPage() {
                   Incidencias / notas
                 </h3>
                 {notes.length === 0 ? (
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Sin notas.
-                  </p>
+                  <p className="text-sm text-muted-foreground mb-3">Sin notas.</p>
                 ) : (
                   <ul className="space-y-2 max-h-40 overflow-auto mb-3">
                     {notes.map((n) => {
                       const isIssue = SUPPORT_ISSUE_KINDS.includes(n.kind);
                       const next = nextSupportNoteStatuses(n.status);
                       return (
-                        <li
-                          key={n.id}
-                          className="text-sm border-b border-border/50 py-2"
-                        >
+                        <li key={n.id} className="text-sm border-b border-border/50 py-2">
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="meta-label">{n.kind}</span>
                             <StatusChip
@@ -597,9 +532,7 @@ function AdminSupportPage() {
                                   type="button"
                                   size="sm"
                                   variant="secondary"
-                                  onClick={() =>
-                                    void transitionNote(n.id, "resolved")
-                                  }
+                                  onClick={() => void transitionNote(n.id, "resolved")}
                                 >
                                   Resolver
                                 </Button>
@@ -609,9 +542,7 @@ function AdminSupportPage() {
                                   type="button"
                                   size="sm"
                                   variant="outline"
-                                  onClick={() =>
-                                    void transitionNote(n.id, "closed")
-                                  }
+                                  onClick={() => void transitionNote(n.id, "closed")}
                                 >
                                   Cerrar
                                 </Button>
@@ -630,11 +561,7 @@ function AdminSupportPage() {
                       <select
                         id="note-kind"
                         value={noteKind}
-                        onChange={(e) =>
-                          setNoteKind(
-                            e.target.value as SupportNoteRecord["kind"],
-                          )
-                        }
+                        onChange={(e) => setNoteKind(e.target.value as SupportNoteRecord["kind"])}
                         className="mt-1 w-full h-10 rounded-xl border border-border bg-card px-3 text-sm"
                       >
                         <option value="note">Nota</option>
