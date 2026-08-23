@@ -9,9 +9,17 @@
 
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
-import { useCallback, useEffect, useRef, useState, useEffectEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useEffectEvent } from "react";
 import type { RefObject } from "react";
 import { toast } from "sonner";
+import { ChevronDown, ChevronUp, Utensils } from "lucide-react";
+import { fetchPublishedWeeklyMenu } from "@/modules/weekly-menu/application/weekly-menu-queries";
+import type { WeeklyMenuView } from "@/modules/weekly-menu/application/weekly-menu-mapper";
+import {
+  utcWeekStartMonday,
+  utcWeekDates,
+  DAY_NAMES_ES,
+} from "@/modules/weekly-menu/application/week-dates";
 import { AdminHeader, SectionTitle, StatusChip } from "@/components/admin";
 import { useCustomer } from "@/customer/useCustomer";
 import { useOrder } from "@/order/useOrder";
@@ -890,6 +898,23 @@ function OrderCaptureExperiencePage() {
                 </div>
               </section>
 
+              <section className="mb-8" aria-label="Menú de la semana">
+                <ActiveWeeklyMenuPreview
+                  tenantId={identity.tenant?.id ?? null}
+                  deliveryDay={deliveryDay}
+                  hasMenuReadCapability={caps.includes("menus.read")}
+                  customerRestrictions={
+                    growth
+                      ? [growth.foodRestrictions, growth.allergies, growth.operationalNotes]
+                          .filter(Boolean)
+                          .join(" · ") || null
+                      : null
+                  }
+                  onSelectDeliveryDay={(day) => setDeliveryDay(day)}
+                  onAddDish={(dishId, label) => addDish(dishId, label)}
+                />
+              </section>
+
               <section className="mb-8 space-y-3" aria-labelledby="oe-items">
                 <h2 id="oe-items" className="text-sm font-semibold tracking-wide">
                   Platos
@@ -1169,5 +1194,276 @@ function CreatedPanel({
         </div>
       </div>
     </section>
+  );
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function formatWeekRange(weekStart: string): string {
+  const dates = utcWeekDates(weekStart);
+  const startDay = parseInt(weekStart.slice(8, 10), 10);
+  const endDay = parseInt((dates[6] ?? weekStart).slice(8, 10), 10);
+  const months = [
+    "Ene",
+    "Feb",
+    "Mar",
+    "Abr",
+    "May",
+    "Jun",
+    "Jul",
+    "Ago",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dic",
+  ];
+  const startMonth = months[parseInt(weekStart.slice(5, 7), 10) - 1] ?? "";
+  const endMonth = months[parseInt((dates[6] ?? weekStart).slice(5, 7), 10) - 1] ?? "";
+
+  return startMonth === endMonth
+    ? `${startDay} — ${endDay} ${startMonth}`
+    : `${startDay} ${startMonth} — ${endDay} ${endMonth}`;
+}
+
+export function ActiveWeeklyMenuPreview({
+  tenantId,
+  deliveryDay,
+  hasMenuReadCapability,
+  customerRestrictions,
+  onSelectDeliveryDay,
+  onAddDish,
+}: {
+  tenantId: string | null;
+  deliveryDay: string;
+  hasMenuReadCapability: boolean;
+  customerRestrictions?: string | null;
+  onSelectDeliveryDay: (dayDate: string) => void;
+  onAddDish: (dishId: string, label: string) => void;
+}) {
+  const [collapsed, setCollapsed] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [menuView, setMenuView] = useState<WeeklyMenuView | null>(null);
+
+  const weekStart = useMemo(() => {
+    try {
+      const [y, m, d] = deliveryDay.split("-").map(Number);
+      return utcWeekStartMonday(new Date(Date.UTC(y, m - 1, d)));
+    } catch {
+      return utcWeekStartMonday();
+    }
+  }, [deliveryDay]);
+
+  useEffect(() => {
+    let active = true;
+    if (!tenantId) return;
+    if (!hasMenuReadCapability) {
+      setError("Vista previa de menú no disponible (permiso menus.read requerido).");
+      return;
+    }
+
+    async function loadPublishedMenu() {
+      setLoading(true);
+      setError(null);
+      try {
+        const view = await fetchPublishedWeeklyMenu(tenantId!, weekStart);
+        if (!active) return;
+        setMenuView(view);
+      } catch {
+        if (!active) return;
+        setError("Vista previa de menú no disponible. La captura manual continúa disponible.");
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    void loadPublishedMenu();
+    return () => {
+      active = false;
+    };
+  }, [tenantId, weekStart, hasMenuReadCapability]);
+
+  const isPublished = menuView?.status === "published";
+  const hasAnyDishes = menuView?.days.some((d) => d.dishes.length > 0) ?? false;
+
+  const dayOffers = useMemo(() => {
+    if (!menuView) return [];
+    return menuView.days.map((day, idx) => ({
+      dayDate: day.dayDate,
+      dayName: DAY_NAMES_ES[idx] ?? `Día ${idx + 1}`,
+      dishes: day.dishes,
+    }));
+  }, [menuView]);
+
+  return (
+    <div
+      className="rounded-xl border border-border bg-card shadow-sm overflow-hidden"
+      aria-label="Weekly Menu Intelligence"
+    >
+      <div className="flex items-center justify-between p-4 bg-muted/20 border-b border-border/50">
+        <div className="flex items-center gap-2">
+          <Utensils className="h-4 w-4 text-primary" />
+          <h3 className="text-sm font-semibold text-foreground">
+            Menú de la semana ({formatWeekRange(weekStart)})
+          </h3>
+          {isPublished ? (
+            <StatusChip tone="positive" label="Publicado" />
+          ) : (
+            <StatusChip tone="neutral" label="Sin publicar" />
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={() => setCollapsed((c) => !c)}
+          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground p-1 rounded hover:bg-muted/40"
+          aria-label={collapsed ? "Expandir menú de la semana" : "Colapsar menú de la semana"}
+        >
+          {collapsed ? (
+            <>
+              <span>Mostrar</span>
+              <ChevronDown className="h-3.5 w-3.5" />
+            </>
+          ) : (
+            <>
+              <span>Ocultar</span>
+              <ChevronUp className="h-3.5 w-3.5" />
+            </>
+          )}
+        </button>
+      </div>
+
+      {!collapsed ? (
+        <div className="p-4 space-y-4">
+          {loading ? (
+            <p className="text-xs text-muted-foreground animate-pulse py-2">
+              Consultando oferta publicada para la semana…
+            </p>
+          ) : error ? (
+            <div className="rounded-lg border border-border/60 bg-muted/10 p-3 text-xs text-muted-foreground">
+              {error}
+            </div>
+          ) : !isPublished ? (
+            <div className="rounded-lg border border-dashed border-border p-4 text-center space-y-1">
+              <p className="text-xs font-medium text-foreground">
+                No hay menú publicado para esta semana ({formatWeekRange(weekStart)}).
+              </p>
+              <p className="text-[11px] text-muted-foreground">
+                Puedes continuar con la captura manual de platos.
+              </p>
+            </div>
+          ) : !hasAnyDishes ? (
+            <div className="rounded-lg border border-dashed border-border p-4 text-center space-y-1">
+              <p className="text-xs font-medium text-foreground">
+                El menú de esta semana está publicado pero no contiene platos asignados.
+              </p>
+              <p className="text-[11px] text-muted-foreground">
+                Puedes continuar con la captura manual de platos.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {customerRestrictions ? (
+                <div className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-xs text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
+                  <span>⚠️</span>
+                  <span>
+                    Revisar restricciones del cliente: <strong>{customerRestrictions}</strong>
+                  </span>
+                </div>
+              ) : null}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {dayOffers.map((day) => {
+                  const isSelectedDelivery = day.dayDate === deliveryDay;
+                  return (
+                    <div
+                      key={day.dayDate}
+                      className={cn(
+                        "rounded-lg border p-3 space-y-2 transition-colors",
+                        isSelectedDelivery
+                          ? "border-primary/50 bg-primary/5 shadow-sm ring-1 ring-primary/20"
+                          : "border-border/60 bg-background/50",
+                      )}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-foreground">
+                          {day.dayName}{" "}
+                          <span className="font-normal text-muted-foreground">
+                            ({day.dayDate.slice(8, 10)}/{day.dayDate.slice(5, 7)})
+                          </span>
+                        </span>
+                        {isSelectedDelivery ? (
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
+                            ✓ Día de entrega
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => onSelectDeliveryDay(day.dayDate)}
+                            className="inline-flex items-center gap-1 rounded border border-border bg-background px-2 py-0.5 text-[11px] font-medium text-foreground hover:bg-muted/50 transition-colors"
+                            title={`Cambiar fecha de entrega a ${day.dayName}`}
+                          >
+                            Seleccionar este día
+                          </button>
+                        )}
+                      </div>
+
+                      {day.dishes.length === 0 ? (
+                        <p className="text-[11px] text-muted-foreground italic py-1">
+                          Sin platos programados
+                        </p>
+                      ) : (
+                        <ul className="space-y-1.5 divide-y divide-border/40">
+                          {day.dishes.map((dish) => {
+                            const priceNum = Number(dish.price ?? 0);
+                            const priceFmt =
+                              priceNum > 0 ? `${priceNum.toFixed(2).replace(".", ",")} €` : "";
+
+                            return (
+                              <li
+                                key={dish.id}
+                                className="pt-1.5 first:pt-0 flex items-start justify-between gap-2"
+                              >
+                                <div className="min-w-0">
+                                  <p className="text-xs font-medium text-foreground truncate">
+                                    {dish.name}
+                                  </p>
+                                  <div className="flex flex-wrap items-center gap-1.5 text-[10px] text-muted-foreground mt-0.5">
+                                    {priceFmt ? (
+                                      <span className="font-semibold text-foreground">
+                                        {priceFmt}
+                                      </span>
+                                    ) : null}
+                                    {dish.allergens && dish.allergens.length > 0 ? (
+                                      <span>· {dish.allergens.join(", ")}</span>
+                                    ) : null}
+                                  </div>
+                                </div>
+                                {isSelectedDelivery ? (
+                                  <button
+                                    type="button"
+                                    onClick={() => onAddDish(dish.id, dish.name)}
+                                    className="shrink-0 inline-flex items-center justify-center rounded border border-border bg-background px-2.5 py-1 text-xs font-semibold hover:bg-foreground hover:text-background transition-colors"
+                                    title="Añadir al pedido"
+                                  >
+                                    + Añadir
+                                  </button>
+                                ) : (
+                                  <span className="shrink-0 text-[11px] text-muted-foreground italic px-1.5 py-1">
+                                    Solo lectura
+                                  </span>
+                                )}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      ) : null}
+    </div>
   );
 }
