@@ -9,7 +9,7 @@
  * No Menu / Dish Capability / Facade / Engine changes.
  */
 
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -27,10 +27,7 @@ import {
 } from "@/menu-experience/MenuPlanningPanel";
 import { MenuSearchPanel } from "@/menu-experience/MenuSearchPanel";
 import { MenuAdaptationPanel } from "@/menu-experience/MenuAdaptationPanel";
-import {
-  dishRowToLibraryItem,
-  type DishLibraryItem,
-} from "@/menu-experience/dish-library";
+import { dishRowToLibraryItem, type DishLibraryItem } from "@/menu-experience/dish-library";
 import {
   activeSlots,
   createEmptyWeek,
@@ -48,8 +45,18 @@ import {
 type ExperienceMode = "search" | "planning" | "adapt" | "publish";
 
 export const Route = createFileRoute("/_authenticated/admin/menu-planning")({
-  beforeLoad: ({ context }) => {
+  beforeLoad: ({ context, search }) => {
     assertCapabilityFromContext(context, "menus.read");
+    throw redirect({
+      to: "/admin/menus",
+      search:
+        typeof search === "object" &&
+        search !== null &&
+        "weekStart" in search &&
+        typeof search.weekStart === "string"
+          ? { weekStart: search.weekStart }
+          : undefined,
+    });
   },
   component: MenuPlanningExperiencePage,
   validateSearch: (search: Record<string, unknown>) => ({
@@ -60,14 +67,12 @@ export const Route = createFileRoute("/_authenticated/admin/menu-planning")({
       search.mode === "publish"
         ? (search.mode as ExperienceMode)
         : ("search" as const),
-    weekStart:
-      typeof search.weekStart === "string" ? search.weekStart : undefined,
+    weekStart: typeof search.weekStart === "string" ? search.weekStart : undefined,
   }),
   head: () => ({
     meta: [
       {
-        title:
-          "YourMeal OS — Menu Experience · Publish · Adaptation · Planning",
+        title: "YourMeal OS — Menu Experience · Publish · Adaptation · Planning",
       },
       {
         name: "description",
@@ -120,9 +125,7 @@ function MenuPlanningExperiencePage() {
   const [focusWeekStart, setFocusWeekStart] = useState<string | null>(
     searchParams.weekStart ?? mondayIso(),
   );
-  const [startInPreview, setStartInPreview] = useState(
-    () => searchParams.mode === "publish",
-  );
+  const [startInPreview, setStartInPreview] = useState(() => searchParams.mode === "publish");
   const [focusNonce, setFocusNonce] = useState(0);
   const [durableMenus, setDurableMenus] = useState<DurableMenuSeed[]>([]);
   const [dishPicks, setDishPicks] = useState<DishPick[]>([]);
@@ -250,8 +253,7 @@ function MenuPlanningExperiencePage() {
       toast.error("Sin permiso de escritura");
       return;
     }
-    const source =
-      resolveSource(fromWeek) ?? resolveSource(prevWeekStart(mondayIso()));
+    const source = resolveSource(fromWeek) ?? resolveSource(prevWeekStart(mondayIso()));
     const target = nextWeekStart(source?.weekStart ?? mondayIso());
     if (!source) {
       createEmptyWeek(target);
@@ -298,9 +300,7 @@ function MenuPlanningExperiencePage() {
       });
       const draft = await WeeklyMenuService.ensureDraft(ctx, plan.weekStart);
       const existing = await WeeklyMenuService.listSlots(ctx, draft.id);
-      const existingKeys = new Set(
-        existing.map((s) => `${s.day_date}:${s.dish_id}`),
-      );
+      const existingKeys = new Set(existing.map((s) => `${s.day_date}:${s.dish_id}`));
       for (const slot of slots) {
         const key = `${slot.dayDate}:${slot.dishId}`;
         if (existingKeys.has(key)) continue;
@@ -410,6 +410,7 @@ function MenuPlanningExperiencePage() {
         </button>
         <Link
           to="/admin/menus"
+          search={{ weekStart: undefined }}
           className="text-xs underline-offset-2 hover:underline"
         >
           Menús bootstrap

@@ -61,21 +61,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
   const admin = isOperationsAdmin(roles);
   const { flags: moduleFlags } = usePilotAdminModuleFlags();
-  const showKitchen =
-    can("kitchen.operate") ||
-    roles.includes("kitchen") ||
-    admin;
+  const showKitchen = can("kitchen.operate") || roles.includes("kitchen") || admin;
   const showDelivery =
-    can("logistics.operate") ||
-    roles.includes("delivery") ||
-    roles.includes("logistics") ||
-    admin;
+    can("logistics.operate") || roles.includes("delivery") || roles.includes("logistics") || admin;
   const showAllOps = admin || roles.includes("saas_admin");
   const showAdminMgmt =
-    can("customers.read") ||
-    can("company.manage") ||
-    can("admin.settings") ||
-    admin;
+    can("customers.read") || can("company.manage") || can("admin.settings") || admin;
 
   const primary: NavItem[] = [
     {
@@ -114,8 +105,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
       labelKey: "ops.nav.inventory",
       icon: Boxes,
       visible:
-        (can("inventory.operate") || showAllOps) &&
-        moduleFlags[PILOT_ADMIN_MODULE_FLAGS.inventory],
+        (can("inventory.operate") || showAllOps) && moduleFlags[PILOT_ADMIN_MODULE_FLAGS.inventory],
     },
   ].filter((i) => i.visible);
 
@@ -133,7 +123,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
       visible: can("orders.read") || showAllOps,
     },
     {
-      to: "/admin/menu-planning",
+      to: "/admin/menus",
       labelKey: "ops.nav.menuPlanning",
       icon: CalendarDays,
       visible: can("menus.read") || showAllOps,
@@ -203,8 +193,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
       labelKey: "routes",
       icon: Truck,
       visible:
-        (can("logistics.operate") || showAllOps) &&
-        moduleFlags[PILOT_ADMIN_MODULE_FLAGS.routes],
+        (can("logistics.operate") || showAllOps) && moduleFlags[PILOT_ADMIN_MODULE_FLAGS.routes],
     },
     {
       to: "/admin/menus",
@@ -269,10 +258,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
     },
   ].filter((i) => i.visible);
 
-  const firstName =
-    profile?.fullName?.trim().split(/\s+/)[0] ||
-    user?.email?.split("@")[0] ||
-    "";
+  const firstName = profile?.fullName?.trim().split(/\s+/)[0] || user?.email?.split("@")[0] || "";
 
   async function handleSignOut() {
     await qc.cancelQueries();
@@ -300,29 +286,29 @@ export function AdminShell({ children }: { children: ReactNode }) {
               ? "Customer Workspace"
               : item.labelKey === "ops.nav.orderCapture"
                 ? "Order Experience"
-              : item.labelKey === "ops.nav.menuPlanning"
-                ? "Menu Experience"
-                : item.labelKey === "ops.nav.orderWorkspace"
-                ? "Order Workspace"
-                : item.labelKey === "ops.nav.productionWorkspace"
-                  ? "Production Workspace"
-                  : item.labelKey === "ops.nav.kitchenWorkspace"
-                    ? "Kitchen Workspace"
-                    : item.labelKey === "ops.nav.deliveryWorkspace"
-                      ? "Delivery Workspace"
-              : item.labelKey === "ops.nav.companyClients"
-              ? "Clientes Empresa"
-              : item.labelKey === "commercial"
-                ? "Dashboard Comercial"
-                : item.labelKey === "users"
-                  ? "Usuarios"
-                  : item.labelKey === "branding"
-                    ? "Branding"
-                    : item.labelKey === "audit"
-                      ? "Auditoría"
-                      : item.labelKey === "support"
-                        ? "Atención al Cliente"
-                        : undefined,
+                : item.labelKey === "ops.nav.menuPlanning"
+                  ? "Menu Experience"
+                  : item.labelKey === "ops.nav.orderWorkspace"
+                    ? "Order Workspace"
+                    : item.labelKey === "ops.nav.productionWorkspace"
+                      ? "Production Workspace"
+                      : item.labelKey === "ops.nav.kitchenWorkspace"
+                        ? "Kitchen Workspace"
+                        : item.labelKey === "ops.nav.deliveryWorkspace"
+                          ? "Delivery Workspace"
+                          : item.labelKey === "ops.nav.companyClients"
+                            ? "Clientes Empresa"
+                            : item.labelKey === "commercial"
+                              ? "Dashboard Comercial"
+                              : item.labelKey === "users"
+                                ? "Usuarios"
+                                : item.labelKey === "branding"
+                                  ? "Branding"
+                                  : item.labelKey === "audit"
+                                    ? "Auditoría"
+                                    : item.labelKey === "support"
+                                      ? "Atención al Cliente"
+                                      : undefined,
     });
     return (
       <Link
@@ -379,11 +365,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                   {t("admin:ops.nav.more")}
                 </p>
                 {moreItems.map((item) => (
-                  <NavLink
-                    key={`${item.to}-${item.labelKey}`}
-                    item={item}
-                    dense
-                  />
+                  <NavLink key={`${item.to}-${item.labelKey}`} item={item} dense />
                 ))}
               </div>
             )}
@@ -394,9 +376,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
               <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                 {t("admin:ops.teamLabel")}
               </p>
-              <p className="mt-1 text-xs font-semibold text-foreground">
-                {t("common:tenant")}
-              </p>
+              <p className="mt-1 text-xs font-semibold text-foreground">{t("common:tenant")}</p>
             </div>
             <button
               type="button"
@@ -412,16 +392,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <header className="flex h-14 items-center justify-between border-b border-border/70 bg-card/80 px-4 backdrop-blur-sm lg:px-6">
             <div className="flex items-center gap-3 lg:hidden">
               <TenantLogo height={28} />
-              <span className="font-display text-sm font-bold">
-                {t("admin:ops.shellTitle")}
-              </span>
+              <span className="font-display text-sm font-bold">{t("admin:ops.shellTitle")}</span>
             </div>
             <h2 className="hidden text-sm font-semibold tracking-tight text-foreground lg:block">
               {t("admin:ops.headerToday")}
             </h2>
-            <p className="text-xs text-muted-foreground">
-              {t("admin:ops.headerFocus")}
-            </p>
+            <p className="text-xs text-muted-foreground">{t("admin:ops.headerFocus")}</p>
           </header>
 
           <main className="flex-1 overflow-y-auto p-4 lg:p-6">{children}</main>
@@ -491,9 +467,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           />
           <div className="absolute inset-x-0 bottom-0 max-h-[70vh] overflow-y-auto rounded-t-2xl border border-border bg-card p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-xl">
             <div className="mb-3 flex items-center justify-between">
-              <p className="font-display text-base font-semibold">
-                {t("admin:ops.nav.more")}
-              </p>
+              <p className="font-display text-base font-semibold">{t("admin:ops.nav.more")}</p>
               <button
                 type="button"
                 onClick={() => setMoreOpen(false)}
@@ -507,11 +481,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
                 .slice(mobilePrimary.length)
                 .concat(moreItems)
                 .map((item) => (
-                  <NavLink
-                    key={`sheet-${item.to}-${item.labelKey}`}
-                    item={item}
-                    dense
-                  />
+                  <NavLink key={`sheet-${item.to}-${item.labelKey}`} item={item} dense />
                 ))}
             </div>
             <button
