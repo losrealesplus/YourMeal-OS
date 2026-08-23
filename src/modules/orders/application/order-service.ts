@@ -19,6 +19,7 @@ export type ProgramDraftOrderCommand = {
   /** Candidate dish ids from UI — validated against published offer; never trusted for price. */
   dishIds: string[];
   notes?: string | null;
+  clientRequestId?: string;
 };
 
 /** Multi-day draft (EP-002A.2 repeat). Each line validated against its day offer. */
@@ -26,12 +27,26 @@ export type ProgramDraftItemsCommand = {
   weekStart: string;
   items: ProgramOrderItemInput[];
   notes?: string | null;
+  customerId?: string;
+  clientRequestId?: string;
 };
 
 export type ProgramDraftOrderResult = {
   order: OrderRow;
   items: OrderItemRow[];
 };
+
+type IdempotencyEntry = {
+  timestamp: number;
+  resultPromise?: Promise<ProgramDraftOrderResult>;
+  result?: ProgramDraftOrderResult;
+};
+
+const idempotencyStore = new Map<string, IdempotencyEntry>();
+
+export function clearOrderServiceIdempotencyForTests(): void {
+  idempotencyStore.clear();
+}
 
 /**
  * CAP-004 programDraft · CAP-006 confirm — Mutation Pattern.
@@ -48,6 +63,7 @@ export const OrderService = {
     return OrderService.programDraftItems(ctx, {
       weekStart: command.weekStart,
       notes: command.notes,
+      clientRequestId: command.clientRequestId,
       items: command.dishIds.map((dishId) => ({
         dishId,
         dayDate: command.dayDate,
@@ -72,110 +88,144 @@ export const OrderService = {
     if (!command.weekStart) {
       throw new DomainError("INVALID_STATE", "weekStart is required");
     }
-    for (const item of command.items) {
-      if (!item.dishId || !item.dayDate || item.qty <= 0) {
-        throw new DomainError("INVALID_STATE", "Each item needs dishId, dayDate and qty > 0");
+
+    const idempotencyKey = command.clientRequestId?.trim()
+      ? `${ctx.tenantId}:${command.clientRequestId.trim()}`
+      : null;
+
+    if (idempotencyKey) {
+      const existing = idempotencyStore.get(idempotencyKey);
+      if (existing) {
+        if (existing.resultPromise) {
+          return existing.resultPromise;
+        }
+        if (existing.result) {
+          return existing.result;
+        }
       }
     }
 
-    const uniqueDishIds = [...new Set(command.items.map((i) => i.dishId))];
-    const menuRepo = createWeeklyMenuRepository(ctx.supabase, ctx.tenantId);
-    const menu = await menuRepo.findPublishedByWeekStart(command.weekStart);
-    if (!menu) {
-      const gate = canAcceptOrders({ publishedMenuCount: 0 });
-      throw new DomainError("MENU_LOCKED", gate.message, { code: gate.code });
-    }
-
-    const slots = await menuRepo.listSlotsWithDishes(menu.id);
-    const offeredByDay = new Map<string, Set<string>>();
-    for (const s of slots) {
-      if (!s.dishes || s.dishes.deleted_at) continue;
-      const set = offeredByDay.get(s.day_date) ?? new Set<string>();
-      set.add(s.dish_id);
-      offeredByDay.set(s.day_date, set);
-    }
-
-    for (const item of command.items) {
-      const offered = offeredByDay.get(item.dayDate);
-      if (!offered?.has(item.dishId)) {
-        throw new DomainError(
-          "INVALID_STATE",
-          `Dish ${item.dishId} is not on the published offer for ${item.dayDate}`,
-        );
+    const execute = async (): Promise<ProgramDraftOrderResult> => {
+      for (const item of command.items) {
+        if (!item.dishId || !item.dayDate || item.qty <= 0) {
+          throw new DomainError("INVALID_STATE", "Each item needs dishId, dayDate and qty > 0");
+        }
       }
-    }
 
-    const dishRepo = createDishRepository(ctx.supabase, ctx.tenantId);
-    const dishes = await dishRepo.listCatalogByIds(uniqueDishIds);
-    if (dishes.length !== uniqueDishIds.length) {
-      throw new DomainError("DISH_NOT_FOUND", "One or more dishes are unavailable");
-    }
-
-    const priceById = new Map(dishes.map((d) => [d.id, Number(d.price)]));
-    let total = 0;
-    const items: ProgramOrderItemInput[] = command.items.map((item) => {
-      const unit = priceById.get(item.dishId);
-      if (unit == null || Number.isNaN(unit)) {
-        throw new DomainError("INVALID_STATE", `Missing price for dish ${item.dishId}`);
+      const uniqueDishIds = [...new Set(command.items.map((i) => i.dishId))];
+      const menuRepo = createWeeklyMenuRepository(ctx.supabase, ctx.tenantId);
+      const menu = await menuRepo.findPublishedByWeekStart(command.weekStart);
+      if (!menu) {
+        const gate = canAcceptOrders({ publishedMenuCount: 0 });
+        throw new DomainError("MENU_LOCKED", gate.message, { code: gate.code });
       }
-      total += unit * item.qty;
-      return {
-        dishId: item.dishId,
-        dayDate: item.dayDate,
-        qty: item.qty,
-      };
-    });
-    // Persist with 2 decimal places (orders.total numeric(12,2))
-    total = Math.round(total * 100) / 100;
 
-    const repo = createOrderRepository(ctx.supabase, ctx.tenantId);
-    let customerId = await repo.findCustomerIdForUser(ctx.userId);
-    if (!customerId) {
-      // Structural correction ADR 0015 — provision Individual Customer without breaking CJ-001.
-      const { CompanyAccountService } = await import(
-        "@/modules/company-account/application/company-account-service"
-      );
-      customerId = await CompanyAccountService.ensureIndividualCustomer(ctx);
+      const slots = await menuRepo.listSlotsWithDishes(menu.id);
+      const offeredByDay = new Map<string, Set<string>>();
+      for (const s of slots) {
+        if (!s.dishes || s.dishes.deleted_at) continue;
+        const set = offeredByDay.get(s.day_date) ?? new Set<string>();
+        set.add(s.dish_id);
+        offeredByDay.set(s.day_date, set);
+      }
+
+      for (const item of command.items) {
+        const offered = offeredByDay.get(item.dayDate);
+        if (!offered?.has(item.dishId)) {
+          throw new DomainError(
+            "INVALID_STATE",
+            `Dish ${item.dishId} is not offered on ${item.dayDate} for week ${command.weekStart}`,
+          );
+        }
+      }
+
+      const dishRepo = createDishRepository(ctx.supabase, ctx.tenantId);
+      const dishes = await dishRepo.listCatalogByIds(uniqueDishIds);
+      const priceById = new Map<string, number>();
+      for (const d of dishes) {
+        priceById.set(d.id, Number(d.price));
+      }
+
+      let total = 0;
+      const items: ProgramOrderItemInput[] = [];
+      for (const item of command.items) {
+        const unit = priceById.get(item.dishId);
+        if (unit === undefined) {
+          throw new DomainError("NOT_FOUND", `Dish not found for pricing: ${item.dishId}`);
+        }
+        total += unit * item.qty;
+        items.push({
+          dishId: item.dishId,
+          dayDate: item.dayDate,
+          qty: item.qty,
+        });
+      }
+      total = Math.round(total * 100) / 100;
+
+      const repo = createOrderRepository(ctx.supabase, ctx.tenantId);
+      let customerId = command.customerId ?? (await repo.findCustomerIdForUser(ctx.userId));
+      if (!customerId) {
+        // Structural correction ADR 0015 — provision Individual Customer without breaking CJ-001.
+        const { CompanyAccountService } =
+          await import("@/modules/company-account/application/company-account-service");
+        customerId = await CompanyAccountService.ensureIndividualCustomer(ctx);
+      }
+
+      const { CompanyAccountService } =
+        await import("@/modules/company-account/application/company-account-service");
+      const demand = await CompanyAccountService.resolveOrderDemandContext(ctx, customerId);
+
+      const result = await repo.insertDraft({
+        customerId,
+        weekStart: command.weekStart,
+        total,
+        notes: command.notes ?? null,
+        items,
+        demandChannel: demand.demandChannel,
+        companyId: demand.companyId,
+        siteId: demand.siteId,
+        organizationalUnitId: demand.organizationalUnitId,
+        deliveryGroupId: demand.deliveryGroupId,
+      });
+
+      try {
+        await AuditService.write(ctx, {
+          entityType: "order",
+          entityId: result.order.id,
+          action: "create",
+          newData: {
+            order: result.order,
+            items: result.items,
+          } as unknown as Record<string, unknown>,
+        });
+      } catch (e) {
+        const message = e instanceof Error ? e.message : "Audit write failed after draft persist";
+        throw new DomainError("INVALID_STATE", message);
+      }
+
+      return result;
+    };
+
+    if (!idempotencyKey) {
+      return execute();
     }
 
-    const { CompanyAccountService } = await import(
-      "@/modules/company-account/application/company-account-service"
-    );
-    const demand = await CompanyAccountService.resolveOrderDemandContext(
-      ctx,
-      customerId,
-    );
-
-    const result = await repo.insertDraft({
-      customerId,
-      weekStart: command.weekStart,
-      total,
-      notes: command.notes ?? null,
-      items,
-      demandChannel: demand.demandChannel,
-      companyId: demand.companyId,
-      siteId: demand.siteId,
-      organizationalUnitId: demand.organizationalUnitId,
-      deliveryGroupId: demand.deliveryGroupId,
-    });
+    const promise = execute();
+    const entry: IdempotencyEntry = {
+      timestamp: Date.now(),
+      resultPromise: promise,
+    };
+    idempotencyStore.set(idempotencyKey, entry);
 
     try {
-      await AuditService.write(ctx, {
-        entityType: "order",
-        entityId: result.order.id,
-        action: "create",
-        newData: {
-          order: result.order,
-          items: result.items,
-        } as unknown as Record<string, unknown>,
-      });
-    } catch (e) {
-      // Persist succeeded; surface audit failure so Connected→Operational invariant is visible.
-      const message = e instanceof Error ? e.message : "Audit write failed after draft persist";
-      throw new DomainError("INVALID_STATE", message);
+      const res = await promise;
+      entry.result = res;
+      delete entry.resultPromise;
+      return res;
+    } catch (err) {
+      idempotencyStore.delete(idempotencyKey);
+      throw err;
     }
-
-    return result;
   },
 
   /**

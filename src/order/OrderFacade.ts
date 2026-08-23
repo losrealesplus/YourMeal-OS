@@ -12,12 +12,7 @@ import { OrderIntakeService } from "@/modules/order-intake";
 import { OrderService } from "@/modules/orders";
 import { OperationsService } from "@/modules/operations";
 import type { ServiceContext } from "@/services/types";
-import type {
-  OrderCommandResult,
-  OrderResult,
-  OrderStatus,
-  OrderSummary,
-} from "./OrderContext";
+import type { OrderCommandResult, OrderResult, OrderStatus, OrderSummary } from "./OrderContext";
 import type {
   CancelOrderCommand,
   CloseOrderCommand,
@@ -130,6 +125,7 @@ export class OrderFacade {
         items: command.items,
         notes: command.notes,
         targetCustomerId: command.targetCustomerId,
+        clientRequestId: command.clientRequestId,
       });
       const orderId = draft.order.id;
       const status = draft.order.status as OrderStatus;
@@ -162,11 +158,7 @@ export class OrderFacade {
         type: "GetOrder",
         orderId: command.orderId,
       });
-      return okCommand(
-        command.orderId,
-        row.status as OrderStatus,
-        got.context,
-      );
+      return okCommand(command.orderId, row.status as OrderStatus, got.context);
     } catch (e) {
       return failCommand([mapDomainError(e)], command.orderId);
     }
@@ -177,11 +169,8 @@ export class OrderFacade {
     identity: OrderRuntimeIdentity,
     command: ScheduleProductionCommand,
   ): Promise<OrderCommandResult> {
-    return this.kitchenTransition(
-      identity,
-      command.orderId,
-      "ScheduleProduction",
-      (ctx, id) => this.deps.operations.startProduction(ctx, id),
+    return this.kitchenTransition(identity, command.orderId, "ScheduleProduction", (ctx, id) =>
+      this.deps.operations.startProduction(ctx, id),
     );
   }
 
@@ -193,11 +182,8 @@ export class OrderFacade {
     identity: OrderRuntimeIdentity,
     command: ReadyForKitchenCommand,
   ): Promise<OrderCommandResult> {
-    return this.kitchenTransition(
-      identity,
-      command.orderId,
-      "ReadyForKitchen",
-      (ctx, id) => this.deps.operations.completeProduction(ctx, id),
+    return this.kitchenTransition(identity, command.orderId, "ReadyForKitchen", (ctx, id) =>
+      this.deps.operations.completeProduction(ctx, id),
     );
   }
 
@@ -206,12 +192,8 @@ export class OrderFacade {
     identity: OrderRuntimeIdentity,
     command: ReadyForDeliveryCommand,
   ): Promise<OrderCommandResult> {
-    return this.kitchenTransition(
-      identity,
-      command.orderId,
-      "ReadyForDelivery",
-      (ctx, id) =>
-        this.deps.operations.transitionKitchen(ctx, id, "ready_for_delivery"),
+    return this.kitchenTransition(identity, command.orderId, "ReadyForDelivery", (ctx, id) =>
+      this.deps.operations.transitionKitchen(ctx, id, "ready_for_delivery"),
     );
   }
 
@@ -227,10 +209,7 @@ export class OrderFacade {
     if (!resolved.ok) return failCommand([resolved.error], command.orderId);
 
     try {
-      const current = await this.deps.operations.getOrder(
-        resolved.ctx,
-        command.orderId,
-      );
+      const current = await this.deps.operations.getOrder(resolved.ctx, command.orderId);
       if (!current) {
         return failCommand(
           [
@@ -363,10 +342,7 @@ export class OrderFacade {
     }
   }
 
-  async getOrder(
-    identity: OrderRuntimeIdentity,
-    q: GetOrderQuery,
-  ): Promise<OrderResult> {
+  async getOrder(identity: OrderRuntimeIdentity, q: GetOrderQuery): Promise<OrderResult> {
     const resolved = await this.deps.resolveContext(identity);
     if (!resolved.ok) return failResult([resolved.error]);
 
@@ -420,9 +396,7 @@ export class OrderFacade {
         rows = rows.filter((r) => r.weekStart === q.weekStart);
       }
       if (q.partyId) {
-        rows = rows.filter(
-          (r) => r.customerId === q.partyId || r.companyId === q.partyId,
-        );
+        rows = rows.filter((r) => r.customerId === q.partyId || r.companyId === q.partyId);
       }
       if (q.status) {
         const set = new Set(Array.isArray(q.status) ? q.status : [q.status]);
@@ -440,10 +414,7 @@ export class OrderFacade {
     }
   }
 
-  async getOrdersByWeek(
-    identity: OrderRuntimeIdentity,
-    q: GetOrdersByWeekQuery,
-  ) {
+  async getOrdersByWeek(identity: OrderRuntimeIdentity, q: GetOrdersByWeekQuery) {
     return this.searchOrders(identity, {
       type: "SearchOrders",
       weekStart: q.weekStart,
@@ -451,10 +422,7 @@ export class OrderFacade {
     });
   }
 
-  async getOrdersByCustomer(
-    identity: OrderRuntimeIdentity,
-    q: GetOrdersByCustomerQuery,
-  ) {
+  async getOrdersByCustomer(identity: OrderRuntimeIdentity, q: GetOrdersByCustomerQuery) {
     return this.searchOrders(identity, {
       type: "SearchOrders",
       partyId: q.customerId,
@@ -462,10 +430,7 @@ export class OrderFacade {
     });
   }
 
-  async getOrdersByDeliveryDay(
-    identity: OrderRuntimeIdentity,
-    q: GetOrdersByDeliveryDayQuery,
-  ) {
+  async getOrdersByDeliveryDay(identity: OrderRuntimeIdentity, q: GetOrdersByDeliveryDayQuery) {
     return this.searchOrders(identity, {
       type: "SearchOrders",
       deliveryDay: q.deliveryDay,
@@ -497,10 +462,7 @@ export class OrderFacade {
     });
   }
 
-  async getKitchenQueue(
-    identity: OrderRuntimeIdentity,
-    q: GetKitchenQueueQuery,
-  ) {
+  async getKitchenQueue(identity: OrderRuntimeIdentity, q: GetKitchenQueueQuery) {
     const resolved = await this.deps.resolveContext(identity);
     if (!resolved.ok) return { ok: false, summaries: [], errors: [resolved.error] };
 
@@ -519,10 +481,7 @@ export class OrderFacade {
     }
   }
 
-  async getOperationalCalendar(
-    identity: OrderRuntimeIdentity,
-    q: GetOperationalCalendarQuery,
-  ) {
+  async getOperationalCalendar(identity: OrderRuntimeIdentity, q: GetOperationalCalendarQuery) {
     const listed = await this.getOrdersByWeek(identity, {
       type: "GetOrdersByWeek",
       weekStart: q.weekStart,
@@ -536,9 +495,7 @@ export class OrderFacade {
     }
     const deliveryDays = [
       ...new Set(
-        listed.summaries
-          .map((s) => s.deliveryDayPrimary)
-          .filter((d): d is string => Boolean(d)),
+        listed.summaries.map((s) => s.deliveryDayPrimary).filter((d): d is string => Boolean(d)),
       ),
     ].sort();
     return {

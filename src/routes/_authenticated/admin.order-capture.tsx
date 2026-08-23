@@ -9,13 +9,7 @@
 
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  useEffectEvent,
-} from "react";
+import { useCallback, useEffect, useRef, useState, useEffectEvent } from "react";
 import type { RefObject } from "react";
 import { toast } from "sonner";
 import { AdminHeader, SectionTitle, StatusChip } from "@/components/admin";
@@ -27,11 +21,7 @@ import {
   searchCustomersQuery,
   listRecentCustomersQuery,
 } from "@/customer/CustomerQueries";
-import type {
-  CustomerContext,
-  CustomerSummary,
-  PartyKind,
-} from "@/customer/CustomerContext";
+import type { CustomerContext, CustomerSummary, PartyKind } from "@/customer/CustomerContext";
 import {
   companyCodeFromTags,
   customerTypeLabel,
@@ -39,6 +29,7 @@ import {
 } from "@/customer-experience/search-rank";
 import { getLivingProfile } from "@/customer-experience/living-profile";
 import { applyOperationalCorrection } from "@/customer-experience/operational-corrections";
+import { createCustomerCommand } from "@/customer/CustomerCommands";
 import { planWeeklyOrderCommand } from "@/order/OrderCommands";
 import { getOrdersByCustomerQuery } from "@/order/OrderQueries";
 import type { OrderSummary } from "@/order/OrderContext";
@@ -56,17 +47,19 @@ import {
   type CommitmentItem,
   type OperationalCommitment,
 } from "@/order-experience/operational-commitments";
-import {
-  OrderSearchPanel,
-  type OrderSearchHit,
-} from "@/order-experience/OrderSearchPanel";
+import { OrderSearchPanel, type OrderSearchHit } from "@/order-experience/OrderSearchPanel";
 import { OrderEditPanel } from "@/order-experience/OrderEditPanel";
 import { OrderTemplatesPanel } from "@/order-experience/OrderTemplatesPanel";
 import { OrderIncidentPanel } from "@/order-experience/OrderIncidentPanel";
+import { saveOrderTemplate, type OrderTemplate } from "@/order-experience/order-templates";
 import {
-  saveOrderTemplate,
-  type OrderTemplate,
-} from "@/order-experience/order-templates";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 type ExperienceMode = "search" | "capture" | "edit" | "templates" | "incident";
@@ -77,8 +70,7 @@ export const Route = createFileRoute("/_authenticated/admin/order-capture")({
   },
   component: OrderCaptureExperiencePage,
   validateSearch: (search: Record<string, unknown>) => ({
-    customerId:
-      typeof search.customerId === "string" ? search.customerId : undefined,
+    customerId: typeof search.customerId === "string" ? search.customerId : undefined,
     kind:
       search.kind === "company_account" || search.kind === "individual"
         ? (search.kind as PartyKind)
@@ -140,12 +132,8 @@ function OrderCaptureExperiencePage() {
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [selected, setSelected] = useState<CustomerContext | null>(null);
   const [prevOrders, setPrevOrders] = useState<OrderSummary[]>([]);
-  const [sessionCommitments, setSessionCommitments] = useState<
-    OperationalCommitment[]
-  >([]);
-  const [deliveryDay, setDeliveryDay] = useState(
-    () => upcomingDeliveryDays(1)[0] ?? mondayIso(),
-  );
+  const [sessionCommitments, setSessionCommitments] = useState<OperationalCommitment[]>([]);
+  const [deliveryDay, setDeliveryDay] = useState(() => upcomingDeliveryDays(1)[0] ?? mondayIso());
   const [lines, setLines] = useState<CommitmentItem[]>([]);
   const [customLabel, setCustomLabel] = useState("");
   const [instructions, setInstructions] = useState("");
@@ -153,10 +141,55 @@ function OrderCaptureExperiencePage() {
   const [created, setCreated] = useState<OperationalCommitment | null>(null);
   const deepLinked = useRef(false);
 
+  // Quick create customer state
+  const [showQuickCreate, setShowQuickCreate] = useState(false);
+  const [quickName, setQuickName] = useState("");
+  const [quickPhone, setQuickPhone] = useState("");
+  const [quickStreet, setQuickStreet] = useState("");
+  const [quickCity, setQuickCity] = useState("");
+  const [creatingCustomer, setCreatingCustomer] = useState(false);
+
   const searchRef = useRef<HTMLInputElement>(null);
   const confirmRef = useRef<HTMLButtonElement>(null);
   const nextActionRef = useRef<HTMLButtonElement>(null);
+  const clientRequestIdRef = useRef<string>(crypto.randomUUID());
   const deliveryDays = upcomingDeliveryDays(6);
+
+  async function handleQuickCreate(e: React.FormEvent) {
+    e.preventDefault();
+    if (!quickName.trim()) {
+      toast.error("El nombre del cliente es obligatorio");
+      return;
+    }
+    setCreatingCustomer(true);
+    try {
+      const res = await customer.createCustomer(
+        createCustomerCommand({
+          partyKind: "individual",
+          mode: "staff_create",
+          displayName: quickName.trim(),
+          phone: quickPhone.trim() || null,
+          street: quickStreet.trim() || null,
+          city: quickCity.trim() || null,
+        }),
+      );
+      if (res.ok && res.context) {
+        toast.success("Cliente creado correctamente");
+        setShowQuickCreate(false);
+        setQuickName("");
+        setQuickPhone("");
+        setQuickStreet("");
+        setQuickCity("");
+        await selectCustomer(res.context.summary);
+      } else {
+        toast.error(res.errors[0]?.message ?? "Error al crear el cliente");
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : String(err));
+    } finally {
+      setCreatingCustomer(false);
+    }
+  }
 
   const enrichSummaries = useEffectEvent(
     async (summaries: CustomerSummary[], q: string): Promise<SearchHit[]> => {
@@ -187,8 +220,7 @@ function OrderCaptureExperiencePage() {
               summary: ctx.summary,
               phone,
               area,
-              companyLabel:
-                companyCodeFromTags(ctx.summary) ?? base.companyLabel,
+              companyLabel: companyCodeFromTags(ctx.summary) ?? base.companyLabel,
             };
           } catch {
             return base;
@@ -205,12 +237,8 @@ function OrderCaptureExperiencePage() {
     try {
       const trimmed = q.trim();
       const result = trimmed
-        ? await customer.searchCustomers(
-            searchCustomersQuery({ query: trimmed, limit: 20 }),
-          )
-        : await customer.listRecentCustomers(
-            listRecentCustomersQuery({ limit: 12 }),
-          );
+        ? await customer.searchCustomers(searchCustomersQuery({ query: trimmed, limit: 20 }))
+        : await customer.listRecentCustomers(listRecentCustomersQuery({ limit: 12 }));
       if (!result.ok) {
         setHits([]);
         return;
@@ -241,9 +269,7 @@ function OrderCaptureExperiencePage() {
           }),
         );
         if (!result.ok || !result.context) {
-          toast.error(
-            result.errors[0]?.message ?? "No se pudo abrir el cliente",
-          );
+          toast.error(result.errors[0]?.message ?? "No se pudo abrir el cliente");
           return;
         }
         const ctx = applyOperationalCorrection(result.context);
@@ -260,17 +286,10 @@ function OrderCaptureExperiencePage() {
         }
 
         const growth = getLivingProfile({
-          kind:
-            summary.partyKind === "company_account"
-              ? "company_account"
-              : "individual",
+          kind: summary.partyKind === "company_account" ? "company_account" : "individual",
           id: summary.id,
         });
-        const bits = [
-          growth?.foodRestrictions,
-          growth?.allergies,
-          growth?.preferences,
-        ]
+        const bits = [growth?.foodRestrictions, growth?.allergies, growth?.preferences]
           .map((s) => s?.trim())
           .filter(Boolean);
         setInstructions((prev) => (prev.trim() ? prev : bits.join(" · ")));
@@ -310,9 +329,7 @@ function OrderCaptureExperiencePage() {
     setLines((prev) => {
       const existing = prev.find((l) => l.dishId === dishId);
       if (existing) {
-        return prev.map((l) =>
-          l.dishId === dishId ? { ...l, qty: l.qty + 1 } : l,
-        );
+        return prev.map((l) => (l.dishId === dishId ? { ...l, qty: l.qty + 1 } : l));
       }
       return [...prev, { dishId, label, qty: 1 }];
     });
@@ -321,9 +338,7 @@ function OrderCaptureExperiencePage() {
   function bumpQty(dishId: string, delta: number) {
     setLines((prev) =>
       prev
-        .map((l) =>
-          l.dishId === dishId ? { ...l, qty: Math.max(0, l.qty + delta) } : l,
-        )
+        .map((l) => (l.dishId === dishId ? { ...l, qty: Math.max(0, l.qty + delta) } : l))
         .filter((l) => l.qty > 0),
     );
   }
@@ -342,12 +357,9 @@ function OrderCaptureExperiencePage() {
       const weekStart = mondayIso(new Date(`${deliveryDay}T12:00:00`));
       const customerId = selected.summary.id;
       const customerKind =
-        selected.summary.partyKind === "company_account"
-          ? "company_account"
-          : "individual";
+        selected.summary.partyKind === "company_account" ? "company_account" : "individual";
 
-      let persistence: OperationalCommitment["persistence"] =
-        "experience_session";
+      let persistence: OperationalCommitment["persistence"] = "experience_session";
       let facadeOrderId: string | null = null;
 
       if (order.isReady) {
@@ -357,6 +369,7 @@ function OrderCaptureExperiencePage() {
             channel: "phone",
             targetCustomerId: customerId,
             notes: instructions.trim() || null,
+            clientRequestId: clientRequestIdRef.current,
             items: lines.map((l) => ({
               dishId: l.dishId,
               dayDate: deliveryDay,
@@ -370,9 +383,7 @@ function OrderCaptureExperiencePage() {
         } else {
           const code = result.errors[0]?.code;
           if (code !== "UNIMPLEMENTED") {
-            toast.error(
-              result.errors[0]?.message ?? "No se pudo crear el pedido",
-            );
+            toast.error(result.errors[0]?.message ?? "No se pudo crear el pedido");
             return;
           }
         }
@@ -412,6 +423,7 @@ function OrderCaptureExperiencePage() {
     setSelected(null);
     setQuery("");
     deepLinked.current = false;
+    clientRequestIdRef.current = crypto.randomUUID();
     setMode("capture");
     window.setTimeout(() => searchRef.current?.focus(), 0);
   }
@@ -425,6 +437,7 @@ function OrderCaptureExperiencePage() {
     setEditHit(null);
     setIncidentHit(null);
     deepLinked.current = false;
+    clientRequestIdRef.current = crypto.randomUUID();
     setMode("search");
   }
 
@@ -438,9 +451,7 @@ function OrderCaptureExperiencePage() {
     setEditHit(null);
     setIncidentHit(null);
     setLines(t.items.map((i) => ({ ...i })));
-    setInstructions(
-      [t.instructions, t.dietaryNotes].filter(Boolean).join(" · "),
-    );
+    setInstructions([t.instructions, t.dietaryNotes].filter(Boolean).join(" · "));
     if (t.preferredDeliveryDay) {
       setDeliveryDay(t.preferredDeliveryDay);
     }
@@ -457,9 +468,7 @@ function OrderCaptureExperiencePage() {
     });
     // Re-apply after selectCustomer may prefill instructions from living profile
     setLines(t.items.map((i) => ({ ...i })));
-    setInstructions(
-      [t.instructions, t.dietaryNotes].filter(Boolean).join(" · "),
-    );
+    setInstructions([t.instructions, t.dietaryNotes].filter(Boolean).join(" · "));
     if (t.preferredDeliveryDay) setDeliveryDay(t.preferredDeliveryDay);
   }
 
@@ -468,7 +477,10 @@ function OrderCaptureExperiencePage() {
       toast.error("Sin permiso de escritura");
       return;
     }
-    const name = `${c.customerName} · ${c.items.map((i) => i.label).slice(0, 2).join(" · ")}`;
+    const name = `${c.customerName} · ${c.items
+      .map((i) => i.label)
+      .slice(0, 2)
+      .join(" · ")}`;
     saveOrderTemplate({
       name,
       customerId: c.customerId,
@@ -483,13 +495,13 @@ function OrderCaptureExperiencePage() {
   }
 
   const address = selected?.profile?.addresses?.[0]?.line1 ?? null;
+  const city = selected?.profile?.addresses?.[0]?.city ?? null;
+  const fullAddress = [address, city].filter(Boolean).join(", ") || null;
   const phone = selected?.profile?.phones?.[0]?.e164 ?? null;
+  const email = selected?.profile?.email ?? null;
   const growth = selected
     ? getLivingProfile({
-        kind:
-          selected.summary.partyKind === "company_account"
-            ? "company_account"
-            : "individual",
+        kind: selected.summary.partyKind === "company_account" ? "company_account" : "individual",
         id: selected.summary.id,
       })
     : null;
@@ -573,10 +585,7 @@ function OrderCaptureExperiencePage() {
         >
           Incidencia
         </button>
-        <Link
-          to="/admin/customer-workspace"
-          className="text-xs underline-offset-2 hover:underline"
-        >
+        <Link to="/admin/customer-workspace" className="text-xs underline-offset-2 hover:underline">
           Customer Experience
         </Link>
       </div>
@@ -619,8 +628,7 @@ function OrderCaptureExperiencePage() {
               toast.error("Sin permiso de escritura");
               return;
             }
-            const customerId =
-              hit.session?.customerId ?? hit.facadeSummary?.partyRef.id;
+            const customerId = hit.session?.customerId ?? hit.facadeSummary?.partyRef.id;
             if (!customerId) {
               toast.error("No se pudo asociar la plantilla a un cliente");
               return;
@@ -640,9 +648,7 @@ function OrderCaptureExperiencePage() {
               name: `${hit.customerName} · patrón`,
               customerId,
               customerKind:
-                hit.session?.customerKind ??
-                hit.facadeSummary?.partyRef.kind ??
-                "individual",
+                hit.session?.customerKind ?? hit.facadeSummary?.partyRef.kind ?? "individual",
               customerName: hit.customerName,
               preferredDeliveryDay: hit.deliveryDay,
               items,
@@ -706,27 +712,50 @@ function OrderCaptureExperiencePage() {
                 <label className="sr-only" htmlFor="oe-search">
                   Buscar cliente
                 </label>
-                <input
-                  id="oe-search"
-                  ref={searchRef}
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Nombre, teléfono…"
-                  autoComplete="off"
-                  className="min-h-11 w-full rounded-md border border-border bg-background px-3 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                />
-                {loadingSearch && (
-                  <p className="text-sm text-muted-foreground">Buscando…</p>
-                )}
+                <div className="flex gap-2">
+                  <input
+                    id="oe-search"
+                    ref={searchRef}
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Nombre, teléfono o empresa…"
+                    autoComplete="off"
+                    className="min-h-11 w-full rounded-md border border-border bg-background px-3 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setQuickName(query);
+                      setShowQuickCreate(true);
+                    }}
+                    className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-md border border-border px-3 text-xs font-semibold hover:bg-muted/40"
+                  >
+                    + Alta rápida
+                  </button>
+                </div>
+                {loadingSearch && <p className="text-sm text-muted-foreground">Buscando…</p>}
                 {!loadingSearch && hits.length === 0 && (
-                  <div className="space-y-2 text-sm">
-                    <p>No se encontró el cliente.</p>
-                    <Link
-                      to="/admin/customer-workspace"
-                      className="inline-flex min-h-11 items-center font-medium underline-offset-2 hover:underline"
-                    >
-                      Crear cliente
-                    </Link>
+                  <div className="rounded-lg border border-dashed border-border p-4 text-center space-y-2">
+                    <p className="text-sm text-muted-foreground">No se encontró el cliente.</p>
+                    <div className="flex items-center justify-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setQuickName(query);
+                          setShowQuickCreate(true);
+                        }}
+                        className="inline-flex min-h-10 items-center justify-center rounded-md bg-foreground px-4 text-xs font-semibold text-background hover:opacity-90"
+                      >
+                        + Crear cliente inline
+                      </button>
+                      <Link
+                        to="/admin/customer-workspace"
+                        search={{ tab: "profile" }}
+                        className="inline-flex min-h-10 items-center font-medium text-xs text-muted-foreground underline-offset-2 hover:underline"
+                      >
+                        Ir al Customer Workspace
+                      </Link>
+                    </div>
                   </div>
                 )}
                 <ul className="divide-y divide-border/60" role="listbox">
@@ -739,9 +768,7 @@ function OrderCaptureExperiencePage() {
                         onClick={() => void selectCustomer(hit.summary)}
                         className="flex min-h-11 w-full flex-col items-start gap-0.5 py-2.5 text-left hover:bg-muted/40"
                       >
-                        <span className="font-medium">
-                          {hit.summary.displayName}
-                        </span>
+                        <span className="font-medium">{hit.summary.displayName}</span>
                         <span className="text-xs text-muted-foreground">
                           {customerTypeLabel(hit.summary)}
                           {hit.phone ? ` · ${hit.phone}` : ""}
@@ -753,64 +780,85 @@ function OrderCaptureExperiencePage() {
                 </ul>
               </>
             ) : (
-              <div className="space-y-2 border-b border-border/50 pb-4">
+              <div
+                className="rounded-xl border border-border bg-card p-4 shadow-sm space-y-3"
+                aria-label="Customer Context Preview"
+              >
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
-                    <p className="text-lg font-medium leading-tight">
-                      {selected.summary.displayName}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {customerTypeLabel(selected.summary)}
-                      {phone ? ` · ${phone}` : ""}
-                    </p>
-                    {address && (
-                      <p className="text-sm text-muted-foreground">{address}</p>
-                    )}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="text-base font-bold text-foreground">
+                        {selected.summary.displayName}
+                      </h3>
+                      <StatusChip
+                        tone={selected.summary.partyKind === "company_account" ? "info" : "neutral"}
+                        label={
+                          selected.summary.partyKind === "company_account"
+                            ? "Empresa / B2B"
+                            : "Particular B2C"
+                        }
+                      />
+                      {companyCodeFromTags(selected.summary) ? (
+                        <span className="text-xs text-muted-foreground font-mono">
+                          {companyCodeFromTags(selected.summary)}
+                        </span>
+                      ) : null}
+                    </div>
+                    <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                      {phone ? <span>📞 {phone}</span> : <span>📞 Sin teléfono</span>}
+                      {email ? <span>✉️ {email}</span> : null}
+                      {fullAddress ? <span>📍 {fullAddress}</span> : <span>📍 Sin dirección</span>}
+                    </div>
                   </div>
-                  <button
-                    type="button"
-                    className="min-h-11 text-sm underline-offset-2 hover:underline"
-                    onClick={() => {
-                      setSelected(null);
-                      setCreated(null);
-                      window.setTimeout(() => searchRef.current?.focus(), 0);
-                    }}
-                  >
-                    Cambiar
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <Link
+                      to="/admin/customer-workspace"
+                      search={{ customerId: selected.summary.id, tab: "profile" }}
+                      className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 py-1 text-xs font-semibold text-foreground hover:bg-muted/50"
+                    >
+                      Ver ficha completa
+                    </Link>
+                    <button
+                      type="button"
+                      className="text-xs text-muted-foreground hover:text-destructive underline underline-offset-2 px-1"
+                      onClick={() => {
+                        setSelected(null);
+                        setCreated(null);
+                        window.setTimeout(() => searchRef.current?.focus(), 0);
+                      }}
+                    >
+                      Cambiar
+                    </button>
+                  </div>
                 </div>
+
                 {(growth?.foodRestrictions ||
                   growth?.allergies ||
-                  growth?.operationalNotes) && (
-                  <p
-                    className="text-sm text-muted-foreground"
-                    aria-label="Restricciones conocidas"
-                  >
-                    {[
-                      growth.foodRestrictions,
-                      growth.allergies,
-                      growth.operationalNotes,
-                    ]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </p>
-                )}
-                {(prevOrders.length > 0 || sessionCommitments.length > 0) && (
-                  <div className="text-xs text-muted-foreground">
-                    {prevOrders.length > 0 && (
-                      <p>
-                        Pedidos recientes:{" "}
-                        {prevOrders
-                          .slice(0, 3)
-                          .map((o) => o.status)
-                          .join(" · ")}
-                      </p>
+                  growth?.operationalNotes ||
+                  prevOrders.length > 0) && (
+                  <div className="pt-2 border-t border-border/50 flex flex-wrap items-center justify-between gap-2 text-xs">
+                    {growth?.foodRestrictions || growth?.allergies || growth?.operationalNotes ? (
+                      <div
+                        className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-medium"
+                        aria-label="Restricciones conocidas"
+                      >
+                        <span>⚠️</span>
+                        <span>
+                          {[growth.foodRestrictions, growth.allergies, growth.operationalNotes]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </span>
+                      </div>
+                    ) : (
+                      <span />
                     )}
-                    {sessionCommitments.length > 0 && (
-                      <p>
-                        Compromisos de sesión: {sessionCommitments.length}
-                      </p>
-                    )}
+                    {prevOrders.length > 0 ? (
+                      <span className="text-muted-foreground">
+                        Último pedido:{" "}
+                        <span className="font-medium text-foreground">{prevOrders[0]?.status}</span>{" "}
+                        ({formatDayLabel(prevOrders[0]?.deliveryDayPrimary ?? mondayIso())})
+                      </span>
+                    ) : null}
                   </div>
                 )}
               </div>
@@ -847,8 +895,7 @@ function OrderCaptureExperiencePage() {
                   Platos
                 </h2>
                 <p className="text-xs text-muted-foreground">
-                  Aceleradores de conversación · menú durable llega con Menu
-                  Experience
+                  Aceleradores de conversación · menú durable llega con Menu Experience
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {CONVERSATION_DISHES.map((d) => (
@@ -906,9 +953,7 @@ function OrderCaptureExperiencePage() {
                           >
                             −
                           </button>
-                          <span className="w-6 text-center tabular-nums">
-                            {l.qty}
-                          </span>
+                          <span className="w-6 text-center tabular-nums">{l.qty}</span>
                           <button
                             type="button"
                             className="min-h-11 min-w-11 border border-border"
@@ -957,6 +1002,86 @@ function OrderCaptureExperiencePage() {
           )}
         </>
       ) : null}
+      <Dialog open={showQuickCreate} onOpenChange={setShowQuickCreate}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Alta Rápida de Cliente</DialogTitle>
+            <DialogDescription>
+              Crea un cliente particular directamente desde la captura de pedidos sin abandonar el
+              flujo.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={(e) => void handleQuickCreate(e)} className="space-y-4 pt-2">
+            <div className="space-y-1.5">
+              <label htmlFor="quick-name" className="text-xs font-semibold text-foreground">
+                Nombre completo / Razón social *
+              </label>
+              <input
+                id="quick-name"
+                required
+                value={quickName}
+                onChange={(e) => setQuickName(e.target.value)}
+                placeholder="Ej. Carmen Navarro"
+                className="min-h-10 w-full rounded-md border border-border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label htmlFor="quick-phone" className="text-xs font-semibold text-foreground">
+                Teléfono
+              </label>
+              <input
+                id="quick-phone"
+                value={quickPhone}
+                onChange={(e) => setQuickPhone(e.target.value)}
+                placeholder="Ej. +34 600 123 456"
+                className="min-h-10 w-full rounded-md border border-border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1.5">
+                <label htmlFor="quick-street" className="text-xs font-semibold text-foreground">
+                  Dirección / Calle
+                </label>
+                <input
+                  id="quick-street"
+                  value={quickStreet}
+                  onChange={(e) => setQuickStreet(e.target.value)}
+                  placeholder="Ej. C/ Gran Vía 28"
+                  className="min-h-10 w-full rounded-md border border-border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label htmlFor="quick-city" className="text-xs font-semibold text-foreground">
+                  Ciudad
+                </label>
+                <input
+                  id="quick-city"
+                  value={quickCity}
+                  onChange={(e) => setQuickCity(e.target.value)}
+                  placeholder="Ej. Madrid"
+                  className="min-h-10 w-full rounded-md border border-border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+              </div>
+            </div>
+            <DialogFooter className="gap-2 sm:justify-end pt-2">
+              <button
+                type="button"
+                onClick={() => setShowQuickCreate(false)}
+                className="min-h-10 rounded-md border border-border px-4 text-xs font-semibold hover:bg-muted/40"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={creatingCustomer || !quickName.trim()}
+                className="min-h-10 rounded-md bg-foreground px-4 text-xs font-semibold text-background hover:opacity-90 disabled:opacity-40"
+              >
+                {creatingCustomer ? "Creando…" : "Crear y Continuar"}
+              </button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -986,9 +1111,7 @@ function CreatedPanel({
         {formatDayLabel(commitment.deliveryDay)} ·{" "}
         {commitment.items.map((i) => `${i.qty}× ${i.label}`).join(" · ")}
       </p>
-      {commitment.instructions ? (
-        <p className="text-sm">{commitment.instructions}</p>
-      ) : null}
+      {commitment.instructions ? <p className="text-sm">{commitment.instructions}</p> : null}
       <StatusChip
         tone={commitment.persistence === "facade" ? "positive" : "warning"}
         label={
@@ -1002,6 +1125,13 @@ function CreatedPanel({
         <p className="text-sm font-medium">¿Qué quieres hacer ahora?</p>
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
           <Link
+            to="/admin/customer-workspace"
+            search={{ customerId: commitment.customerId, tab: "orders" }}
+            className="inline-flex min-h-11 items-center justify-center rounded-md bg-foreground px-4 text-sm font-semibold text-background shadow-sm hover:opacity-90"
+          >
+            Volver a la ficha del cliente
+          </Link>
+          <Link
             to="/admin/production-workspace"
             className="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-4 text-sm"
           >
@@ -1011,7 +1141,7 @@ function CreatedPanel({
             ref={nextActionRef}
             type="button"
             onClick={onAnother}
-            className="inline-flex min-h-11 items-center justify-center rounded-md bg-foreground px-4 text-sm font-medium text-background"
+            className="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-4 text-sm font-medium hover:bg-muted/40"
           >
             Continuar con otro pedido
           </button>
@@ -1036,12 +1166,6 @@ function CreatedPanel({
           >
             Buscar pedidos
           </button>
-          <Link
-            to="/admin/customer-workspace"
-            className="inline-flex min-h-11 items-center justify-center rounded-md border border-border px-4 text-sm"
-          >
-            Abrir cliente
-          </Link>
         </div>
       </div>
     </section>

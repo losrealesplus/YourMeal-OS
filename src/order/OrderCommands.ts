@@ -10,6 +10,7 @@ export type PlanWeeklyOrderCommand = {
   items: Array<{ dishId: string; dayDate: string; qty: number }>;
   notes?: string | null;
   targetCustomerId?: string;
+  clientRequestId?: string;
 };
 
 export type ConfirmOrderCommand = {
@@ -92,9 +93,7 @@ export function planWeeklyOrderCommand(
   return { type: "PlanWeeklyOrder", ...input };
 }
 
-export function confirmOrderCommand(
-  input: Omit<ConfirmOrderCommand, "type">,
-): ConfirmOrderCommand {
+export function confirmOrderCommand(input: Omit<ConfirmOrderCommand, "type">): ConfirmOrderCommand {
   return { type: "ConfirmOrder", ...input };
 }
 
@@ -122,14 +121,10 @@ export function completeDeliveryCommand(
   return { type: "CompleteDelivery", ...input };
 }
 
-export function closeOrderCommand(
-  input: Omit<CloseOrderCommand, "type">,
-): CloseOrderCommand {
+export function closeOrderCommand(input: Omit<CloseOrderCommand, "type">): CloseOrderCommand {
   return { type: "CloseOrder", ...input };
 }
 
-export function cancelOrderCommand(
-  input: Omit<CancelOrderCommand, "type">,
-): CancelOrderCommand {
+export function cancelOrderCommand(input: Omit<CancelOrderCommand, "type">): CancelOrderCommand {
   return { type: "CancelOrder", ...input };
 }
