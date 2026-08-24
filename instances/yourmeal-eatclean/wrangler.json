@@ -1,0 +1,26 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "yourmeal-instance-eatclean",
+  "compatibility_date": "2026-08-22",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "workers_dev": false,
+  "routes": [
+    {
+      "pattern": "eatclean.yourmealos.com",
+      "custom_domain": true
+    }
+  ],
+  "env": {
+    "staging": {
+      "name": "yourmeal-instance-eatclean-staging",
+      "routes": [
+        {
+          "pattern": "eatclean-staging.yourmealos.com",
+          "custom_domain": true
+        }
+      ]
+    }
+  }
+}

@@ -4,7 +4,7 @@
  * Single Source of Truth for resolving the surface to render based on hostname:
  * - www.yourmealos.com / yourmealos.com -> public_marketing (YourMeal OS SaaS site)
  * - clientes.yourmealos.com -> client_portal (Public client directory & access gateway)
- * - eatclean.yourmealos.com -> tenant (EatClean operational environment)
+ * - eatclean.yourmealos.com / eatclean-staging.yourmealos.com -> tenant (EatClean operational environment)
  * - demo.yourmealos.com -> demo (Reserved demo environment)
  * - <slug>.yourmealos.com -> tenant (Dynamic tenant resolution)
  *
@@ -45,8 +45,13 @@ export function resolveHostTopology(hostname: string): HostTopologyContext {
     };
   }
 
-  // 3. Explicit EatClean subdomain
-  if (cleanHost === "eatclean.yourmealos.com" || cleanHost.startsWith("eatclean.")) {
+  // 3. Explicit EatClean subdomain (production or staging)
+  if (
+    cleanHost === "eatclean.yourmealos.com" ||
+    cleanHost === "eatclean-staging.yourmealos.com" ||
+    cleanHost.startsWith("eatclean.") ||
+    cleanHost.startsWith("eatclean-staging.")
+  ) {
     return {
       hostType: "tenant",
       tenantSlug: "eatclean",
@@ -54,9 +59,10 @@ export function resolveHostTopology(hostname: string): HostTopologyContext {
     };
   }
 
-  // 4. Wildcard tenant resolution on yourmealos.com (e.g. singular.yourmealos.com)
+  // 4. Wildcard tenant resolution on yourmealos.com (e.g. singular.yourmealos.com or singular-staging.yourmealos.com)
   if (cleanHost.endsWith(".yourmealos.com")) {
-    const subdomain = cleanHost.replace(".yourmealos.com", "");
+    const rawSubdomain = cleanHost.replace(".yourmealos.com", "");
+    const subdomain = rawSubdomain.replace(/-staging$/, "");
     if (subdomain !== "www" && subdomain !== "app" && subdomain !== "api") {
       return {
         hostType: "tenant",

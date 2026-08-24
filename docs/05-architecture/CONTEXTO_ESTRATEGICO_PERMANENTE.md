@@ -242,11 +242,16 @@ Debe priorizar:
 
 Nunca debe proponer soluciones que comprometan la arquitectura por resolver un problema puntual.
 
-Siempre debe buscar que cada decisión fortalezca el Core y facilite futuras implantaciones.
+---
 
-El objetivo final no es construir la aplicación de EatClean.
+## Arquitectura de Instancias y Separación de Demo
 
-El objetivo final es construir un Core empresarial que evolucione con cada cliente y permita implantar soluciones personalizadas sin duplicar código, manteniendo una única base tecnológica, una única arquitectura y un único conocimiento acumulado.
+El Core de YourMeal OS alimenta dos tipos de entornos estrictamente diferenciados:
+
+1. **YourMeal OS Demo Oficial (`yourmeal-os`):** Entorno de producto, showcase público y desarrollo continuo (`djangucecsphnejplvic`). Datos sintéticos y fluctuantes.
+2. **Instancias de Clientes Reales (ej. `eatclean`):** Entornos de producción aislados físicamente (`nhirlpkuvonggctdzzad`), con repositorios, bases de datos y Workers dedicados.
+
+Ver la especificación técnica completa en [INSTANCE_RUNTIME_BOUNDARY.md](./INSTANCE_RUNTIME_BOUNDARY.md).
 
 ---
 

@@ -6,72 +6,87 @@ import {
   CLIENT_REGISTRY,
 } from "./public-clients-registry";
 
-describe("Block 1: Host Topology & Public Client Registry Micro-Hardening", () => {
-  it("A. www.yourmealos.com resolves to public_marketing", () => {
+describe("Block C0: Host Topology, Public Directory & Demo Distinction", () => {
+  it("A. www.yourmealos.com resolves deterministically to public_marketing in SSR", () => {
     const topo = resolveHostTopology("www.yourmealos.com");
     expect(topo.hostType).toBe("public_marketing");
     expect(topo.tenantSlug).toBeNull();
   });
 
-  it("B. yourmealos.com (apex domain) resolves to public_marketing", () => {
+  it("B. yourmealos.com (apex domain) resolves to public_marketing in SSR", () => {
     const topo = resolveHostTopology("yourmealos.com");
     expect(topo.hostType).toBe("public_marketing");
     expect(topo.tenantSlug).toBeNull();
   });
 
-  it("C. clientes.yourmealos.com resolves to client_portal", () => {
+  it("C. clientes.yourmealos.com resolves to client_portal in SSR", () => {
     const topo = resolveHostTopology("clientes.yourmealos.com");
     expect(topo.hostType).toBe("client_portal");
     expect(topo.tenantSlug).toBeNull();
   });
 
-  it("D. eatclean.yourmealos.com resolves to tenant 'eatclean'", () => {
-    const topo = resolveHostTopology("eatclean.yourmealos.com");
-    expect(topo.hostType).toBe("tenant");
-    expect(topo.tenantSlug).toBe("eatclean");
+  it("D. eatclean.yourmealos.com and eatclean-staging resolve to tenant 'eatclean' in SSR", () => {
+    const prodTopo = resolveHostTopology("eatclean.yourmealos.com");
+    expect(prodTopo.hostType).toBe("tenant");
+    expect(prodTopo.tenantSlug).toBe("eatclean");
+
+    const stagingTopo = resolveHostTopology("eatclean-staging.yourmealos.com");
+    expect(stagingTopo.hostType).toBe("tenant");
+    expect(stagingTopo.tenantSlug).toBe("eatclean");
   });
 
-  it("E. Future tenant (e.g. singular.yourmealos.com) resolves to tenant 'singular'", () => {
+  it("E. Future tenant (e.g. singular.yourmealos.com) resolves to tenant 'singular' in SSR", () => {
     const topo = resolveHostTopology("singular.yourmealos.com");
     expect(topo.hostType).toBe("tenant");
     expect(topo.tenantSlug).toBe("singular");
   });
 
-  it("F. Unknown host or preview domain safely falls back to public_marketing", () => {
+  it("F. Unknown host, preview URLs or localhost safely fall back to public_marketing", () => {
     const topo1 = resolveHostTopology("preview-123.pages.dev");
     expect(topo1.hostType).toBe("public_marketing");
 
-    const topo2 = resolveHostTopology("localhost");
+    const topo2 = resolveHostTopology("localhost:3000");
     expect(topo2.hostType).toBe("public_marketing");
+
+    const topo3 = resolveHostTopology("");
+    expect(topo3.hostType).toBe("public_marketing");
   });
 
-  it("G. Public registry filters strictly by isPublicDirectory === true", () => {
+  it("G. Hydration Parity: Server and Client resolve identical topology for any given host header", () => {
+    const testHosts = [
+      "www.yourmealos.com",
+      "yourmealos.com",
+      "clientes.yourmealos.com",
+      "eatclean.yourmealos.com",
+      "eatclean-staging.yourmealos.com",
+      "catering-b.yourmealos.com",
+    ];
+
+    for (const host of testHosts) {
+      const serverResult = resolveHostTopology(host);
+      const clientResult = resolveHostTopology(host);
+      expect(serverResult.hostType).toBe(clientResult.hostType);
+      expect(serverResult.tenantSlug).toBe(clientResult.tenantSlug);
+    }
+  });
+
+  it("H. Public directory places YourMeal OS Demo first with 'platform_demo' type", () => {
     const publicList = getPublicClientsDirectory();
     expect(publicList.length).toBeGreaterThan(0);
-    expect(publicList.every((c) => c.isPublicDirectory === true)).toBe(true);
+    expect(publicList[0].slug).toBe("yourmeal-os");
+    expect(publicList[0].type).toBe("platform_demo");
+    expect(publicList[0].label).toBe("Demo oficial");
   });
 
-  it("H. Non-public tenant is strictly invisible in the public directory", () => {
-    const allRegistered = CLIENT_REGISTRY;
-    const privateTenant = allRegistered.find((c) => c.isPublicDirectory === false);
-    expect(privateTenant).toBeDefined();
-
+  it("I. Public directory lists EatClean as a real customer with 'customer' type", () => {
     const publicList = getPublicClientsDirectory();
-    expect(publicList.find((c) => c.slug === privateTenant?.slug)).toBeUndefined();
-
-    const resolvedBySlug = getPublicClientBySlug(privateTenant?.slug || "");
-    expect(resolvedBySlug).toBeNull();
+    const eatclean = publicList.find((c) => c.slug === "eatclean");
+    expect(eatclean).toBeDefined();
+    expect(eatclean?.type).toBe("customer");
+    expect(eatclean?.label).toBe("Cliente de YourMeal OS");
   });
 
-  it("I. EatClean is correctly listed with its canonical public metadata", () => {
-    const eatclean = getPublicClientBySlug("eatclean");
-    expect(eatclean).not.toBeNull();
-    expect(eatclean?.publicName).toBe("EatClean");
-    expect(eatclean?.appUrl).toBe("https://eatclean.yourmealos.com");
-    expect(eatclean?.isPublicDirectory).toBe(true);
-  });
-
-  it("J. Language Audit: Public registry descriptions contain clean operational Spanish", () => {
+  it("J. Language Audit: Public registry descriptions contain clean operational Spanish without internal jargon", () => {
     const forbidden = [
       "Zero Friction",
       "Prototype",

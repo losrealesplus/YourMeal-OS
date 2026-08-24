@@ -1,43 +1,36 @@
 {
-  "slug": "eatclean",
-  "name": "EatClean",
-  "legalName": "Eat Clean Tenerife Catering",
-  "website": "https://eatcleantenerifecatering.es/",
-  "primaryColor": "#145B32",
-  "secondaryColor": "#EDB32A",
-  "background": "#F7F5F1",
+  "slug": "yourmeal-os",
+  "name": "YourMeal OS",
+  "legalName": "YourMeal OS Demo Platform",
+  "website": "https://www.yourmealos.com/",
+  "primaryColor": "#16A34A",
+  "secondaryColor": "#0F172A",
+  "background": "#F8FAFC",
   "surface": "#FFFFFF",
-  "foreground": "#0F2317",
-  "accent": "#EFF4F1",
-  "success": "#145B32",
-  "error": "#B42318",
+  "foreground": "#0F172A",
+  "accent": "#F1F5F9",
+  "success": "#16A34A",
+  "error": "#EF4444",
   "typography": {
-    "display": "Montserrat",
-    "body": "Open Sans"
+    "display": "Inter",
+    "body": "Inter"
   },
-  "borderRadius": "1.25rem",
+  "borderRadius": "1rem",
   "poweredBy": {
     "visible": true,
     "prefix": "Powered by",
     "name": "YourMeal OS",
-    "label": "Powered by YourMeal OS",
+    "label": "Demo oficial de YourMeal OS",
     "surfaces": ["login", "splash", "about"]
   },
   "assets": {
     "logo": "./logo.svg",
     "icon": "./icon.png",
     "splash": "./splash.webp",
-    "heroHome": "./hero-home.webp",
-    "onboarding": [
-      "./onboarding-1.webp",
-      "./onboarding-2.webp",
-      "./onboarding-3.webp"
-    ],
-    "emptyOrders": "./empty-orders.webp"
+    "heroHome": "./hero-home.webp"
   },
   "storeAssets": {
-    "appName": "EatClean",
-    "shortDescription": "Comida preparada para ayudarte a comer mejor."
-  },
-  "_notes": "Palette + logo from eatcleantenerifecatering.es (primary 145 63% 22%, golden 42 85% 55%, cream 40 30% 96%). Runtime via BrandConfig — no product forks."
+    "appName": "YourMeal OS",
+    "shortDescription": "Demostración oficial de la plataforma de gestión operativa de catering y meal prep."
+  }
 }

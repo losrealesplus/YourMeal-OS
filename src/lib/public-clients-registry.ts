@@ -1,16 +1,21 @@
 /**
  * YOURMEAL OS — PUBLIC CLIENT REGISTRY
  *
- * Canonical registry of tenant brands operated on YourMeal OS.
+ * Canonical registry of tenant brands and official showcase on YourMeal OS.
  * Governs public directory listings on clientes.yourmealos.com and /clientes.
  *
- * STRICT INVARIANT:
- * A tenant is ONLY displayed in the public directory if `isPublicDirectory === true`.
- * Private or unlisted client instances are completely invisible.
+ * ORDERING POLICY:
+ * 1. YourMeal OS Demo (Official platform showcase / Demo oficial)
+ * 2. Real public customers (e.g. EatClean)
+ * 3. Future customers
  */
+
+export type PublicClientType = "platform_demo" | "customer";
 
 export interface PublicClientEntry {
   slug: string;
+  type: PublicClientType;
+  label: string; // e.g. "Demo oficial" | "Cliente de YourMeal OS"
   publicName: string;
   description: string;
   category: string;
@@ -18,37 +23,45 @@ export interface PublicClientEntry {
   logoUrl?: string;
   appUrl: string;
   isPublicDirectory: boolean;
+  isFeatured?: boolean;
 }
 
 /**
  * Global registry of tenant configurations for public listing.
- * In a future phase, this can also sync with database-backed tenant configurations.
  */
 export const CLIENT_REGISTRY: readonly PublicClientEntry[] = [
   {
-    slug: "eatclean",
-    publicName: "EatClean",
+    slug: "yourmeal-os",
+    type: "platform_demo",
+    label: "Demo oficial",
+    publicName: "YourMeal OS",
     description:
-      "Comida preparada saludable con ingredientes naturales y reparto a domicilio y empresas.",
-    category: "Meal Prep & Catering Saludable",
-    areaServed: "Tenerife, España",
-    logoUrl: "/tenant/eatclean-logo.svg",
-    appUrl: "https://eatclean.yourmealos.com",
+      "Demostración interactiva de la plataforma completa YourMeal OS. Descubre cómo se adaptan los módulos de cocina, entregas y menús para cada modelo de catering.",
+    category: "Plataforma SaaS (Demostración)",
+    areaServed: "Entorno Interactivo",
+    logoUrl: "/assets/yourmeal-os-logo.png",
+    appUrl: "https://www.yourmealos.com/app",
     isPublicDirectory: true,
+    isFeatured: true,
   },
   {
-    slug: "internal-lab-private",
-    publicName: "Private Catering Co",
-    description: "Private test client not for public directory.",
-    category: "Corporate Catering",
-    areaServed: "Madrid, España",
-    appUrl: "https://private.yourmealos.com",
-    isPublicDirectory: false,
+    slug: "eatclean",
+    type: "customer",
+    label: "Cliente de YourMeal OS",
+    publicName: "EatClean",
+    description:
+      "Comida preparada saludable con ingredientes naturales, cocina al horno y grill, y reparto a domicilio y empresas.",
+    category: "Meal Prep & Catering Saludable",
+    areaServed: "Tenerife, España",
+    logoUrl: "/assets/eatclean-logo.png",
+    appUrl: "https://eatclean.yourmealos.com",
+    isPublicDirectory: true,
+    isFeatured: false,
   },
 ] as const;
 
 /**
- * Returns only explicitly authorized public clients.
+ * Returns only explicitly authorized public clients in canonical order.
  */
 export function getPublicClientsDirectory(): PublicClientEntry[] {
   return CLIENT_REGISTRY.filter((client) => client.isPublicDirectory === true);
@@ -58,9 +71,7 @@ export function getPublicClientsDirectory(): PublicClientEntry[] {
  * Resolves public client metadata by slug if publicly listed.
  */
 export function getPublicClientBySlug(slug: string): PublicClientEntry | null {
-  const cleanSlug = (slug || "").toLowerCase().trim();
-  const found = CLIENT_REGISTRY.find(
-    (c) => c.slug.toLowerCase() === cleanSlug && c.isPublicDirectory === true,
-  );
-  return found ? { ...found } : null;
+  const found = CLIENT_REGISTRY.find((client) => client.slug === slug);
+  if (!found || !found.isPublicDirectory) return null;
+  return found;
 }

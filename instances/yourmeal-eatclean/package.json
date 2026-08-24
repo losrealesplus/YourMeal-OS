@@ -1,0 +1,19 @@
+{
+  "name": "yourmeal-eatclean",
+  "version": "0.1.0",
+  "private": true,
+  "description": "YourMeal OS Client Instance — EatClean Tenerife Catering",
+  "type": "module",
+  "coreVersion": "0.1.0",
+  "scripts": {
+    "verify": "vitest run src/modules/client-instance/",
+    "build": "npm run --prefix ../.. build"
+  },
+  "instance": {
+    "tenantSlug": "eatclean",
+    "domain": "eatclean.yourmealos.com",
+    "locale": "es-ES",
+    "timezone": "Europe/Madrid",
+    "currency": "EUR"
+  }
+}
