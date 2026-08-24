@@ -1,0 +1,25 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "yourmeal-instance-eatclean",
+  "main": "../../.output/server/index.mjs",
+  "compatibility_date": "2026-08-22",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "workers_dev": false,
+  "assets": {
+    "directory": "../../.output/public",
+    "binding": "ASSETS"
+  },
+  "vars": {
+    "TENANT_SLUG": "eatclean",
+    "CORE_VERSION": "0.1.0",
+    "SUPABASE_URL": "https://nhirlpkuvonggctdzzad.supabase.co"
+  },
+  "routes": [
+    {
+      "pattern": "eatclean.yourmealos.com",
+      "custom_domain": true
+    }
+  ]
+}

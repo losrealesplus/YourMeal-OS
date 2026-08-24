@@ -12,6 +12,10 @@
       "custom_domain": true
     },
     {
+      "pattern": "clientes.yourmealos.com",
+      "custom_domain": true
+    },
+    {
       "pattern": "*.yourmealos.com/*",
       "zone_name": "yourmealos.com"
     }

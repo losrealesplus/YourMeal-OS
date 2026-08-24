@@ -1,8 +1,16 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Building2, MapPin, ShieldCheck, Sparkles, Utensils } from "lucide-react";
+import {
+  ArrowRight,
+  Building2,
+  MapPin,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Utensils,
+  Info,
+} from "lucide-react";
 import { YourMealLogo } from "@/components/brand/yourmeal-os-logo";
 import { getPublicClientsDirectory } from "@/lib/public-clients-registry";
-import { getTenantAppUrl } from "@/lib/host-topology";
 
 export function ClientPortalDirectory() {
   const publicClients = getPublicClientsDirectory();
@@ -41,39 +49,63 @@ export function ClientPortalDirectory() {
           <div className="text-center space-y-4 max-w-2xl mx-auto">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/25 text-primary text-xs font-mono font-bold tracking-wider uppercase">
               <Sparkles className="size-3.5" aria-hidden="true" />
-              <span>Portal de Clientes & Marcas Operadas</span>
+              <span>Directorio Oficial de Marcas & Demostración</span>
             </div>
             <h1 className="font-display text-3xl sm:text-5xl font-black tracking-tight text-foreground">
-              Nuestros clientes
+              Directorio de clientes
             </h1>
             <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-              Descubre las marcas gastronómicas y servicios de catering que gestionan su operativa,
-              menús y entregas con la plataforma YourMeal OS.
+              Explora la demostración interactiva oficial de la plataforma y las marcas de catering
+              que gestionan su operativa diaria con YourMeal OS.
             </p>
           </div>
 
           {/* Grid de Clientes Públicos procedentes del Registry */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6">
             {publicClients.map((client) => {
-              const directUrl = getTenantAppUrl(client.slug);
+              const isDemo = client.type === "platform_demo";
+
               return (
                 <div
                   key={client.slug}
-                  className="rounded-3xl border border-border/80 bg-card p-6 sm:p-8 flex flex-col justify-between shadow-sm hover:shadow-md hover:border-primary/40 transition duration-200"
+                  className={`rounded-3xl border ${
+                    isDemo
+                      ? "border-primary/40 bg-gradient-to-b from-primary/5 to-card ring-1 ring-primary/20"
+                      : "border-border/80 bg-card"
+                  } p-6 sm:p-8 flex flex-col justify-between shadow-sm hover:shadow-md transition duration-200`}
                 >
                   <div className="space-y-4">
                     <div className="flex items-center justify-between gap-4">
-                      <div className="size-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-display font-black text-xl">
-                        {client.publicName.charAt(0)}
+                      <div className="size-14 rounded-2xl bg-card border border-border/80 p-2 flex items-center justify-center shadow-xs overflow-hidden">
+                        {client.logoUrl ? (
+                          <img
+                            src={client.logoUrl}
+                            alt={client.publicName}
+                            className="w-full h-full object-contain"
+                          />
+                        ) : (
+                          <span className="text-primary font-display font-black text-xl">
+                            {client.publicName.charAt(0)}
+                          </span>
+                        )}
                       </div>
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted text-xs font-medium text-muted-foreground">
-                        <Utensils className="size-3" aria-hidden="true" />
-                        <span>{client.category}</span>
-                      </span>
+                      <div className="flex items-center gap-2">
+                        {isDemo ? (
+                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs font-bold uppercase tracking-wider">
+                            <Star className="size-3 fill-current" aria-hidden="true" />
+                            <span>{client.label}</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted text-xs font-medium text-muted-foreground">
+                            <Utensils className="size-3" aria-hidden="true" />
+                            <span>{client.label}</span>
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     <div>
-                      <h2 className="text-2xl font-bold font-display text-foreground">
+                      <h2 className="text-2xl font-bold font-display text-foreground flex items-center gap-2">
                         {client.publicName}
                       </h2>
                       <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1">
@@ -85,14 +117,35 @@ export function ClientPortalDirectory() {
                     <p className="text-sm text-muted-foreground leading-relaxed">
                       {client.description}
                     </p>
+
+                    {isDemo && (
+                      <div className="rounded-xl border border-primary/20 bg-primary/5 p-3.5 text-xs text-muted-foreground space-y-1.5">
+                        <div className="flex items-center gap-1.5 font-semibold text-foreground">
+                          <Info className="size-3.5 text-primary" aria-hidden="true" />
+                          <span>Información sobre la demostración</span>
+                        </div>
+                        <ul className="space-y-1 text-[11px] list-disc list-inside">
+                          <li>Esta es una demostración de YourMeal OS.</li>
+                          <li>Las funcionalidades se adaptan a cada cliente.</li>
+                          <li>
+                            Las capacidades visibles pueden variar según la configuración
+                            contratada.
+                          </li>
+                        </ul>
+                      </div>
+                    )}
                   </div>
 
                   <div className="pt-6 mt-6 border-t border-border/60">
                     <a
-                      href={directUrl}
-                      className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm shadow-sm hover:bg-primary/90 transition min-h-[44px]"
+                      href={client.appUrl}
+                      className={`w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl ${
+                        isDemo
+                          ? "bg-primary text-primary-foreground font-bold"
+                          : "bg-secondary text-foreground hover:bg-secondary/80 font-semibold"
+                      } text-sm shadow-sm transition min-h-[44px]`}
                     >
-                      <span>Acceder a la plataforma</span>
+                      <span>{isDemo ? "Explorar demostración" : "Acceder a la plataforma"}</span>
                       <ArrowRight className="size-4" aria-hidden="true" />
                     </a>
                   </div>
@@ -111,7 +164,7 @@ export function ClientPortalDirectory() {
             </h3>
             <p className="text-sm text-muted-foreground max-w-xl mx-auto">
               Optimiza tu producción, cocina y reparto con YourMeal OS. Solicita una demostración
-              guiada sin compromiso.
+              guiada adaptada a tu modelo de negocio.
             </p>
             <div className="pt-2">
               <a
@@ -128,8 +181,20 @@ export function ClientPortalDirectory() {
 
       {/* Footer */}
       <footer className="border-t border-border py-8 text-center text-xs text-muted-foreground">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p>© {new Date().getFullYear()} YourMeal OS. Todos los derechos reservados.</p>
+          <div className="flex items-center gap-4">
+            <a href="https://www.yourmealos.com" className="hover:text-foreground transition">
+              Web principal
+            </a>
+            <span className="text-border">·</span>
+            <a
+              href="https://www.yourmealos.com/privacidad"
+              className="hover:text-foreground transition"
+            >
+              Privacidad
+            </a>
+          </div>
         </div>
       </footer>
     </div>
