@@ -340,3 +340,17 @@ Instrumento permanente para que el equipo (y, con consentimiento, soporte) obser
 - [ADR 0038](./docs/adr/0038-runtime-core.md)
 
 **Regla:** framework first, tools second. No añadir Doctor/Network/Export hasta que el Core esté estable.
+
+---
+
+## Gobernanza de Ingeniería y Regla de Oro
+
+> **"Nunca optimices por velocidad sobre verificabilidad."**  
+> **"Nunca certifiques por intención. CERTIFICA POR EVIDENCIA."**
+
+En YourMeal OS, la certificación de cualquier capacidad, cambio de infraestructura, inquilino o despliegue exige una correlación demostrable y sin fisuras:
+
+$$\text{SOURCE} \longrightarrow \text{BUILD} \longrightarrow \text{WORKER} \longrightarrow \text{LIVE BUNDLE} \longrightarrow \text{SUPABASE} \longrightarrow \text{LIVE HTTP}$$
+
+Todo trabajo se ejecuta dentro del marco del [ENGINEERING_OPERATING_PROTOCOL](./docs/05-architecture/ENGINEERING_OPERATING_PROTOCOL.md) con compuertas de parada estricta (`Strict Stop`) y validación humana obligatoria.
+

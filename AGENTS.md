@@ -228,6 +228,25 @@ Sin autorización explícita: **prohibido** `git reset --hard`, `git clean -fd`,
 7. Cambios uncommitted se reportan explícitamente.
 8. Trabajo cloud/remoto **nunca** se trata como device-ready hasta sincronizar al workspace local vía Git (o transferencia explícita del artifact + registro de SHA).
 
+## Protocolo Operativo Permanente de Ingeniería (Workflow Canónico)
+
+Todo desarrollo sigue obligatoriamente la secuencia de 16 compuertas:
+
+```text
+INSPECT → CONTRACT GATE (Read-Only) → IMPLEMENT → TEST → RED TEAM → HARDEN → 
+FOUNDATION → PR → HUMAN REVIEW → MERGE → MAIN VERIFY → PROVIDER RECONCILIATION → 
+DEPLOY → LIVE BREAK TEST → CERTIFY → FREEZE
+```
+
+### Reglas de Parada Estricta (`Strict Stop`)
+- **Tras Contract Gate:** No implementar sin aprobación humana del diseño.
+- **Tras Red Team & Hardening:** No crear PR si existen fallos P0 o P1.
+- **Tras Creación de PR:** Parar y esperar la revisión humana. **Prohibido mergear o desplegar**.
+- **Tras Merge:** Sincronizar `main` localmente y conciliar proveedores antes de cualquier despliegue.
+- **Tras Certificación en Vivo:** El bloque queda congelado (`FREEZE`).
+
+Ver la especificación operativa completa en [`docs/05-architecture/ENGINEERING_OPERATING_PROTOCOL.md`](./docs/05-architecture/ENGINEERING_OPERATING_PROTOCOL.md).
+
 ## Reglas permanentes (extracto)
 
 - Canónico: g, ml, km, °C, UTC, decimal  
