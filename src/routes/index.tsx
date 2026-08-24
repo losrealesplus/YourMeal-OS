@@ -1,80 +1,79 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { LanguageSelector } from "@/components/language-selector";
-import {
-  PoweredByLine,
-  TenantBrandScope,
-} from "@/components/tenant/tenant-brand-scope";
+import { PoweredByLine, TenantBrandScope } from "@/components/tenant/tenant-brand-scope";
 import { brandConfig, tenantCopyEs } from "@/tenant/brand-config";
 import { PrimaryCTA } from "@/components/consumer";
 import { TenantLogo } from "@/components/tenant/tenant-logo";
 import { getSession } from "@/auth";
 import { resolveHomePath } from "@/lib/resolve-home-path";
 import heroImage from "@/assets/eatclean-hero.jpg";
-
-/**
- * Public entry — Tenant-branded (ADR 0014).
- * SCR (pre-auth) · CJ-001 door
- * BackOffice is invisible here by design; only /auth links out.
- */
-const SITE_URL = "https://eatcleanapp.lovable.app";
-const HOME_TITLE = `${brandConfig.name} — Comida preparada saludable en Tenerife`;
-const HOME_DESCRIPTION =
-  "EatClean Tenerife: comida preparada saludable con ingredientes naturales, cocina al horno y grill, y reparto gratuito a domicilio. Programa tu menú semanal en minutos.";
+import { SaasCommercialLanding } from "@/components/public/saas-commercial-landing";
+import { ClientPortalDirectory } from "@/components/public/client-portal-directory";
+import { resolveHostTopology, type HostType } from "@/lib/host-topology";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: HOME_TITLE },
-      { name: "description", content: HOME_DESCRIPTION },
-      { property: "og:title", content: HOME_TITLE },
-      { property: "og:description", content: HOME_DESCRIPTION },
+      { title: "YourMeal OS — El Sistema Operativo para Negocios de Alimentación" },
+      {
+        name: "description",
+        content:
+          "Plataforma unificada para conectar pedidos, producción, cocina, logística y administración en meal prep, cocinas centrales y catering.",
+      },
+      { property: "og:title", content: "YourMeal OS — Software de Operaciones Gastronómicas" },
+      {
+        property: "og:description",
+        content: "Plataforma integral para negocios de alimentación y catering organizado.",
+      },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: SITE_URL + "/" },
+      { property: "og:url", content: "https://www.yourmealos.com/" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: HOME_TITLE },
-      { name: "twitter:description", content: HOME_DESCRIPTION },
     ],
-    links: [{ rel: "canonical", href: SITE_URL + "/" }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          name: brandConfig.name,
-          url: SITE_URL,
-        }),
-      },
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Organization",
-          name: brandConfig.legalName ?? brandConfig.name,
-          url: SITE_URL,
-          logo: SITE_URL + "/favicon.ico",
-          sameAs: [brandConfig.website].filter(Boolean),
-        }),
-      },
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "LocalBusiness",
-          name: brandConfig.legalName ?? brandConfig.name,
-          url: SITE_URL,
-          image: SITE_URL + "/favicon.ico",
-          servesCuisine: "Healthy",
-          areaServed: "Tenerife, Spain",
-        }),
-      },
-    ],
+    links: [{ rel: "canonical", href: "https://www.yourmealos.com/" }],
   }),
-  component: Landing,
+  component: RootIndexDispatcher,
 });
 
-function Landing() {
+function RootIndexDispatcher() {
+  const [hostType, setHostType] = useState<HostType>("public_marketing");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      const queryTenant = urlParams.get("tenant");
+      const queryPortal = urlParams.get("portal");
+
+      if (queryPortal === "1" || queryPortal === "true") {
+        setHostType("client_portal");
+        return;
+      }
+
+      if (queryTenant) {
+        setHostType("tenant");
+        return;
+      }
+
+      const topo = resolveHostTopology(window.location.hostname);
+      setHostType(topo.hostType);
+    }
+  }, []);
+
+  if (hostType === "client_portal") {
+    return <ClientPortalDirectory />;
+  }
+
+  if (hostType === "tenant") {
+    return <TenantLanding />;
+  }
+
+  return <SaasCommercialLanding />;
+}
+
+/**
+ * Tenant-branded Customer Experience (e.g. eatclean.yourmealos.com)
+ */
+function TenantLanding() {
   const copy = tenantCopyEs;
   const navigate = useNavigate();
 
@@ -97,7 +96,6 @@ function Landing() {
       <div className="mx-auto max-w-[430px] min-h-screen flex flex-col">
         <header className="flex items-center justify-between px-6 pt-6">
           <TenantLogo height={40} />
-
           <LanguageSelector />
         </header>
 
@@ -114,8 +112,7 @@ function Landing() {
             <div
               className="absolute inset-0"
               style={{
-                background:
-                  "linear-gradient(180deg, transparent 40%, rgba(26,46,36,0.55) 100%)",
+                background: "linear-gradient(180deg, transparent 40%, rgba(26,46,36,0.55) 100%)",
               }}
             />
             <div className="absolute inset-x-0 bottom-0 p-6 text-white">
@@ -129,21 +126,16 @@ function Landing() {
           </div>
 
           <p className="text-base text-muted-foreground mt-6 leading-relaxed text-pretty">
-            {copy.claims.nutrition} {copy.claims.ingredients}{" "}
-            {copy.claims.delivery}
+            {copy.claims.nutrition} {copy.claims.ingredients} {copy.claims.delivery}
           </p>
 
           <ul className="mt-6 space-y-3">
-            {[copy.claims.method, copy.claims.service, copy.claims.everyday].map(
-              (line) => (
-                <li key={line} className="flex items-start gap-3">
-                  <span className="mt-2 size-1.5 rounded-full bg-primary shrink-0" />
-                  <span className="text-sm text-foreground/90 leading-relaxed">
-                    {line}
-                  </span>
-                </li>
-              ),
-            )}
+            {[copy.claims.method, copy.claims.service, copy.claims.everyday].map((line) => (
+              <li key={line} className="flex items-start gap-3">
+                <span className="mt-2 size-1.5 rounded-full bg-primary shrink-0" />
+                <span className="text-sm text-foreground/90 leading-relaxed">{line}</span>
+              </li>
+            ))}
           </ul>
 
           <div className="mt-auto pt-10 space-y-3">
