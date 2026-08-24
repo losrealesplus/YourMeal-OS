@@ -352,5 +352,4 @@ En YourMeal OS, la certificación de cualquier capacidad, cambio de infraestruct
 
 $$\text{SOURCE} \longrightarrow \text{BUILD} \longrightarrow \text{WORKER} \longrightarrow \text{LIVE BUNDLE} \longrightarrow \text{SUPABASE} \longrightarrow \text{LIVE HTTP}$$
 
-Todo trabajo se ejecuta dentro del marco del [ENGINEERING_OPERATING_PROTOCOL](./docs/05-architecture/ENGINEERING_OPERATING_PROTOCOL.md) con compuertas de parada estricta (`Strict Stop`) y validación humana obligatoria.
-
+Todo trabajo se ejecuta dentro del marco del [ENGINEERING_OPERATING_PROTOCOL](./docs/05-architecture/ENGINEERING_OPERATING_PROTOCOL.md) con compuertas de parada estricta (`Strict Stop`), consulta obligatoria de la jerarquía documental (L0 Foundation, L1 Gobernanza/FOPEBA, L2 Arquitectura/ADRs, L3 Dominio, L4 Capability, L5 Runbooks) y validación humana obligatoria.

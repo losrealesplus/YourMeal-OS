@@ -47,28 +47,24 @@ Registrar en el **Diario de Desarrollo** al terminar (antes de Done).
 
 **No rehacer Architecture Review ni Foundation** salvo ADR nuevo. Ya están cerrados (`v0.1.0`).
 
-## Pirámide de decisión
+## Pirámide de Autoridad Documental (Niveles L0 a L5)
 
-Cada nivel responde una pregunta distinta. **Nunca discutir una decisión en un nivel inferior si contradice uno superior.**
+Cada nivel responde a una pregunta distinta con una jerarquía de autoridad estricta. **El nivel superior prevalece siempre:**
 
 ```text
-FOUNDATION.md                    → ¿Cómo pensamos?
-AGENTS.md                        → ¿Cómo trabajamos en este proyecto?
-CONTEXTO_ESTRATEGICO…            → ¿Qué empresa estamos construyendo?
-FILOSOFIA_DE_PRODUCTO.md         → ¿Para qué existe el producto y cómo medimos el éxito?
-CONTEXTO_CTO.md                  → ¿Cómo debe evolucionar técnicamente?
-ADRs                             → ¿Por qué tomamos esta decisión?
-ACTORS.md                        → ¿Quiénes actúan en el negocio?
-UBIQUITOUS_LANGUAGE.md           → ¿Cómo nombramos el dominio?
-ENTITY_GUIDELINES.md             → ¿Cómo se modela una entidad?
-Domain Model (Dish.md, …)        → ¿Cómo funciona este concepto de negocio?
-Código (Dish.ts, …)              → ¿Cómo lo implementamos?
+L0 — FOUNDATION.md                    → Constitución inmutable (¿Cómo pensamos y gobernamos?)
+L1 — AGENTS.md / FOPEBA / PROTOCOL    → Gobernanza y metodología (¿Cómo trabajamos y razonamos?)
+L2 — CONTEXTO ESTRATÉGICO / ADRs      → Arquitectura permanente (¿Qué empresa y plataforma construimos?)
+L3 — MODELO DE DOMINIO / CONTRATOS    → Reglas e invariantes de negocio (¿Cómo opera el catering?)
+L4 — CONTRATOS DE CAPABILITY / BLOQUE → Alcance de la implementación (¿Qué construimos en este bloque?)
+L5 — RUNBOOKS / OPERATIVA DE PROV.    → Procedimientos de despliegue y soporte (¿Cómo desplegamos?)
 ```
 
 > **El código es consecuencia del diseño, no su inicio.**  
-> `Dish.ts` no abre el diseño: lo materializa. Lo mismo valdrá para Recipe, Ingredient, Order y el resto del Core.
+Si la implementación contradice el dominio, gana el dominio. Si el dominio contradice un ADR, gana el ADR. Si existe conflicto en el mismo nivel de autoridad: **STRICT STOP** y consultar al propietario humano.
 
-Si la implementación contradice el dominio, gana el dominio. Si el dominio contradice un ADR, primero el ADR. Y así hacia arriba.
+### Verificación de Contexto Obligatoria (`# DOCUMENT CONTEXT CHECK`)
+Al inicio de cada bloque, antes de escribir código, es obligatorio completar el cuadro de consulta documental según la matriz canónica (ver [`ENGINEERING_OPERATING_PROTOCOL.md`](./docs/05-architecture/ENGINEERING_OPERATING_PROTOCOL.md)).
 
 ### Primera validación del dominio
 
