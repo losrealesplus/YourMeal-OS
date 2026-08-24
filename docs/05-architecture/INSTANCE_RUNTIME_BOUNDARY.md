@@ -61,3 +61,13 @@ El directorio público clasifica y ordena las marcas expuestas según su natural
 
 * **Demo (`yourmeal-os`):** Contiene registros sintéticos mínimos permanentes y datos de prueba fluctuantes para demostración comercial. No expone identidades ni operativas reales de clientes.
 * **Clientes Reales (`eatclean`):** Base de datos 100% vacía en Day-0, persistiendo datos reales únicamente tras la validación y aprobación humana en el pipeline de onboarding.
+
+---
+
+## 5. Invariante de Identidad Única de Tenant en Instancias Dedicadas
+
+Cada base de datos de una instancia física dedicada alberga estrictamente **un único registro canónico en `public.tenants`** correspondiente a la identidad de la instancia:
+
+* **Instancia EatClean:** `slug = "eatclean"`, UUID `8bba00ba-331b-42c8-9283-4e3836ffb870`, dominio `eatclean.yourmealos.com`.
+* **Cero Residuos:** No existen tenants legados ni identidades secundarias en `public.tenants`.
+* **Resolución Genérica:** La lógica de negocio y los motores de ingestión de datos no deben hardcodear UUIDs; deben resolver la identidad y el UUID del tenant en tiempo de ejecución a través de la configuración canónica de instancia (`instance.config.ts` / `resolveInstanceRuntimeConfig()`).
