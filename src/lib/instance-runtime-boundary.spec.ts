@@ -61,4 +61,10 @@ describe("Block C0: Instance Runtime Boundary & Anti-Leak Guards", () => {
     expect(resolved.tenantSlug).toBe("yourmeal-os");
     expect(resolved.supabaseProjectRef).toBe("djangucecsphnejplvic");
   });
+
+  it("7. Legacy tenant slug 'eatclean-tenerife' is not present in canonical bindings dictionary", () => {
+    expect(CANONICAL_INSTANCE_BINDINGS["eatclean-tenerife"]).toBeUndefined();
+    expect(CANONICAL_INSTANCE_BINDINGS["eatclean"]).toBeDefined();
+    expect(CANONICAL_INSTANCE_BINDINGS["eatclean"].tenantSlug).toBe("eatclean");
+  });
 });

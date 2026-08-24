@@ -23,7 +23,7 @@ vi.mock("./services/SessionBootstrapService", async () => {
         locale: "es",
         phone: null,
       },
-      tenant: { id: "t1", name: "EatClean", slug: "eatclean-tenerife" },
+      tenant: { id: "t1", name: "EatClean", slug: "eatclean" },
       membershipStatus: "approved" as const,
     })),
   };

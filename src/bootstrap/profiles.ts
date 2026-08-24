@@ -5,8 +5,8 @@ import type { AppRole } from "@/hooks/use-auth-types";
  * Tenant id matches EatClean Tenerife seed (docs / OP-002 evidence).
  */
 export const BOOTSTRAP_TENANT_ID = "7823e85a-986f-401f-9bbe-e4e431ff3be1";
-export const BOOTSTRAP_TENANT_SLUG = "eatclean-tenerife";
-export const BOOTSTRAP_TENANT_NAME = "EatClean Tenerife";
+export const BOOTSTRAP_TENANT_SLUG = "eatclean";
+export const BOOTSTRAP_TENANT_NAME = "EatClean";
 export const BOOTSTRAP_COMPANY_ID = "00000000-0000-4000-8000-00000000c001";
 
 export type BootstrapProfileId =
