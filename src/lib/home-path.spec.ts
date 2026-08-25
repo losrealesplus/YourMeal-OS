@@ -35,8 +35,20 @@ describe("homePathForRoles · LP-001 / EP-OPS-002", () => {
     expect(homePathForRoles(["company_admin"])).toBe("/admin");
   });
 
-  it("routes pure saas_admin to platform surface", () => {
-    expect(homePathForRoles(["saas_admin"])).toBe("/saas");
+  it("routes pure saas_admin to platform surface on central platform", () => {
+    expect(homePathForRoles(["saas_admin"], "www.yourmealos.com")).toBe("/saas");
+    expect(homePathForRoles(["saas_admin"], "clientes.yourmealos.com")).toBe(
+      "/saas",
+    );
+  });
+
+  it("routes saas_admin to ops center on customer tenant instance", () => {
+    expect(homePathForRoles(["saas_admin"], "eatclean.yourmealos.com")).toBe(
+      "/admin",
+    );
+    expect(
+      homePathForRoles(["saas_admin"], "eatclean-staging.yourmealos.com"),
+    ).toBe("/admin");
   });
 
   it("routes hybrid staff + saas_admin to tenant ops (tenant-first)", () => {
@@ -55,3 +67,4 @@ describe("homePathForRoles · LP-001 / EP-OPS-002", () => {
     expect(homePathForRoles(roles)).toBe(homePathForRoles([...roles].reverse()));
   });
 });
+

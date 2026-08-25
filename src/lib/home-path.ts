@@ -1,4 +1,5 @@
 import type { AppRole } from "@/hooks/use-auth";
+import { resolveInstanceRuntimeConfig } from "@/lib/instance-runtime-boundary";
 
 /**
  * EP-OPS-002 · Landing Policy (LP-001)
@@ -25,19 +26,40 @@ function hasTenantStaff(roles: readonly AppRole[]): boolean {
 
 /**
  * Priority (highest first):
- * 1. Pure Platform (`saas_admin` without tenant staff) → `/saas`
- * 2. Company Admin / Operations Manager → Tenant Ops `/admin`
- * 3. Sole department workspace (kitchen, delivery, support, accounting, …)
- * 4. Other tenant staff → `/admin`
- * 5. Driver → `/driver`
- * 6. Customer / default → `/app`
+ * 1. Pure Platform (`saas_admin` without tenant staff on central platform) → `/saas`
+ * 2. Platform Principal on customer tenant instance → `/admin` (tenant operational context)
+ * 3. Company Admin / Operations Manager → Tenant Ops `/admin`
+ * 4. Sole department workspace (kitchen, delivery, support, accounting, …)
+ * 5. Other tenant staff → `/admin`
+ * 6. Driver → `/driver`
+ * 7. Customer / default → `/app`
  *
  * Hybrid Platform + Tenant staff → Tenant Surface first (`/admin`);
  * Platform entry remains available via SaaS ops entry (not a second ambiguous landing).
  */
-export function homePathForRoles(roles: readonly AppRole[]): string {
-  if (roles.includes("saas_admin") && !hasTenantStaff(roles)) {
-    return "/saas";
+export function homePathForRoles(
+  roles: readonly AppRole[],
+  host?: string,
+): string {
+  const currentHost =
+    host ??
+    (typeof window !== "undefined" ? window.location.hostname : undefined);
+  let isCustomerTenant = false;
+  try {
+    const config = resolveInstanceRuntimeConfig(currentHost);
+    isCustomerTenant = config.instanceType === "customer_tenant";
+  } catch {
+    // default to false
+  }
+
+  if (roles.includes("saas_admin")) {
+    if (isCustomerTenant) {
+      return "/admin";
+    }
+    if (!hasTenantStaff(roles)) {
+      return "/saas";
+    }
+    return "/admin";
   }
   if (roles.includes("operations_manager") || roles.includes("company_admin")) {
     return "/admin";
