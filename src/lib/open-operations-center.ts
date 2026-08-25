@@ -8,6 +8,7 @@
 import type { AppRole } from "@/hooks/use-auth";
 import { hasStaffAccess } from "@/permissions";
 import { resolveOperationsEntry } from "@/lib/operations-workspaces";
+import { resolveInstanceRuntimeConfig } from "@/lib/instance-runtime-boundary";
 
 export const OPERATIONS_CENTER_PATH = "/admin" as const;
 export const OPERATIONS_AUTH_PATH = "/auth/admin" as const;
@@ -53,6 +54,7 @@ export function parseOperationsAuthSearch(
 export function decideOperationsCenterEntry(input: {
   sessionUserId: string | null;
   roles: readonly AppRole[];
+  host?: string;
 }): OpenOperationsCenterResult {
   if (!input.sessionUserId || !hasStaffAccess(input.roles)) {
     return {
@@ -62,7 +64,22 @@ export function decideOperationsCenterEntry(input: {
     };
   }
 
-  if (input.roles.includes("saas_admin") && !hasTenantOpsRoles(input.roles)) {
+  const currentHost =
+    input.host ??
+    (typeof window !== "undefined" ? window.location.hostname : undefined);
+  let isCustomerTenant = false;
+  try {
+    const config = resolveInstanceRuntimeConfig(currentHost);
+    isCustomerTenant = config.instanceType === "customer_tenant";
+  } catch {
+    // default
+  }
+
+  if (
+    input.roles.includes("saas_admin") &&
+    !hasTenantOpsRoles(input.roles) &&
+    !isCustomerTenant
+  ) {
     return { action: "navigate", to: "/saas" };
   }
 
@@ -95,6 +112,7 @@ function hasTenantOpsRoles(roles: readonly AppRole[]): boolean {
 export function resolvePostAdminLoginPath(
   roles: readonly AppRole[],
   returnTo?: string,
+  host?: string,
 ): string {
   if (returnTo && isSafeOperationsReturnPath(returnTo)) {
     return returnTo;
@@ -102,6 +120,8 @@ export function resolvePostAdminLoginPath(
   const decision = decideOperationsCenterEntry({
     sessionUserId: "authenticated",
     roles,
+    host,
   });
   return decision.action === "navigate" ? decision.to : OPERATIONS_CENTER_PATH;
 }
+

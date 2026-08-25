@@ -130,7 +130,12 @@ Legend: ✅ granted · ❌ denied
 
 > **`onboarding.manage` & `tenants.manage`:** Exclusive to Platform SaaS Admin (`saas_admin`). The Onboarding Engine belongs to the platform: SaaS Admin selects the target tenant context, uploads intake files, reviews semantic mapping, and authorizes database ingestion. Tenant Admins operate resulting business data within their assigned tenant but have zero platform onboarding authority.
 
+> **Dual Authority Invariant (B3.6.11C.3):**
+> - **Platform Principal (`saas_admin`):** May operate an explicitly selected tenant context without becoming a tenant-scoped administrator (`company_admin`). When entering a customer instance (`/admin`), the actor remains `saas_admin` with transversal operational authority + onboarding capabilities.
+> - **Tenant Admin (`company_admin`):** Is permanently restricted to its assigned tenant. Cannot escape tenant boundaries, cannot access `/saas`, and cannot manage onboarding or other tenants.
+
 > **ADR 0015:** B2B Company Account portal admins are scoped by `company_employees.is_admin` (not the Tenant role `company_admin`). Tenant `company_admin` / `saas_admin` oversee any company in the tenant. Services enforce both paths.
+
 
 
 ### `brand.manage`
