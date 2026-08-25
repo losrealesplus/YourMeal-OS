@@ -87,8 +87,20 @@ describe("Live Instance Boundary Adversarial Break Test", () => {
   });
 
   it("5.1 Live EatClean JS on Edge contains runtime boundary code", async () => {
-    const res = await fetch("https://eatclean.yourmealos.com/assets/client-BeqGHvru.js");
-    const jsText = await res.text();
-    expect(jsText).toContain("SECURITY_VIOLATION");
+    const htmlRes = await fetch("https://eatclean.yourmealos.com/auth");
+    const htmlText = await htmlRes.text();
+    const scriptMatches = htmlText.match(/\/assets\/[a-zA-Z0-9_\-\.]+\.js/g) || [];
+    expect(scriptMatches.length).toBeGreaterThan(0);
+
+    let foundSecurityViolation = false;
+    for (const scriptPath of scriptMatches) {
+      const res = await fetch(`https://eatclean.yourmealos.com${scriptPath}`);
+      const jsText = await res.text();
+      if (jsText.includes("SECURITY_VIOLATION")) {
+        foundSecurityViolation = true;
+        break;
+      }
+    }
+    expect(foundSecurityViolation).toBe(true);
   });
 });
