@@ -11,6 +11,7 @@ describe("Block C0: Instance Runtime Boundary & Anti-Leak Guards", () => {
     const demoConfig = CANONICAL_INSTANCE_BINDINGS["yourmeal-os"];
     expect(demoConfig.instanceType).toBe("core_demo");
     expect(demoConfig.supabaseProjectRef).toBe("djangucecsphnejplvic");
+    expect(demoConfig.supabasePublishableKey).toBe("sb_publishable_PUfHKoTQ5aQO8IlG759-pg_adAFsa8A");
     expect(() => validateInstanceRuntimeConfig(demoConfig)).not.toThrow();
   });
 
@@ -18,6 +19,7 @@ describe("Block C0: Instance Runtime Boundary & Anti-Leak Guards", () => {
     const eatcleanConfig = CANONICAL_INSTANCE_BINDINGS["eatclean"];
     expect(eatcleanConfig.instanceType).toBe("customer_tenant");
     expect(eatcleanConfig.supabaseProjectRef).toBe("nhirlpkuvonggctdzzad");
+    expect(eatcleanConfig.supabasePublishableKey).toBe("sb_publishable_qgT9AjzgqzMPgtLRjTZaiQ_yjsQ2ChH");
     expect(() => validateInstanceRuntimeConfig(eatcleanConfig)).not.toThrow();
   });
 
