@@ -84,3 +84,6 @@ Cada base de datos de una instancia física dedicada alberga estrictamente **un 
    * La autenticación de tenant está destinada a los administradores de tenant (`company_admin`), personal operativo (`kitchen`, `delivery`, etc.) y clientes del negocio (`customer`, `employee`).
 3. **Cero Fallback a Tenants de Clientes:**
    * Ningún host no reconocido ni ruta desconfigurada puede caer por defecto en la identidad ni en la base de datos de un tenant de cliente. El único fallback seguro y cerrado es la Demo Oficial (`yourmeal-os`).
+4. **Fuente Canónica Única de Activos Públicos (`Public Brand Assets`):**
+   * El directorio `public/assets/` (`public/assets/yourmeal-os-logo.png` y `public/assets/eatclean-logo.png`) constituye la **ÚNICA FUENTE DE VERDAD** para los activos de marca expuestos al navegador y al Edge de Cloudflare.
+   * `src/tenant/resources/logo.png` se mantiene estrictamente como activo de compatibilidad offline para empaquetado nativo (Capacitor / Android - ADR-0014 / `ANDROID-ASSET-005`). No existen fuentes secundarias ni copias huérfanas en `src/assets/`.
