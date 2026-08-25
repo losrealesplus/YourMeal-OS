@@ -71,3 +71,16 @@ Cada base de datos de una instancia física dedicada alberga estrictamente **un 
 * **Instancia EatClean:** `slug = "eatclean"`, UUID `8bba00ba-331b-42c8-9283-4e3836ffb870`, dominio `eatclean.yourmealos.com`.
 * **Cero Residuos:** No existen tenants legados ni identidades secundarias en `public.tenants`.
 * **Resolución Genérica:** La lógica de negocio y los motores de ingestión de datos no deben hardcodear UUIDs; deben resolver la identidad y el UUID del tenant en tiempo de ejecución a través de la configuración canónica de instancia (`instance.config.ts` / `resolveInstanceRuntimeConfig()`).
+
+---
+
+## 6. Principio de Identidad de Autenticación y Desacoplamiento de Marca Pública
+
+1. **La identidad de autenticación es consciente de la instancia (`Instance-Aware Auth`):**
+   * `www.yourmealos.com/auth` resuelve estrictamente la autenticación de la plataforma YourMeal OS (`core_demo` / `yourmeal-os`), sirviendo el logo oficial y metadatos de YourMeal OS sin heredar recursos gráficos ni splash de ningún tenant cliente.
+   * `eatclean.yourmealos.com/auth` resuelve la autenticación de la instancia del cliente EatClean (`customer_tenant` / `eatclean`), sirviendo su marca, logo y colores dedicados.
+2. **Platform Auth != Tenant Auth:**
+   * La autenticación central de la plataforma está destinada a la demostración comercial y al acceso a gobernanza SaaS (`saas_admin`).
+   * La autenticación de tenant está destinada a los administradores de tenant (`company_admin`), personal operativo (`kitchen`, `delivery`, etc.) y clientes del negocio (`customer`, `employee`).
+3. **Cero Fallback a Tenants de Clientes:**
+   * Ningún host no reconocido ni ruta desconfigurada puede caer por defecto en la identidad ni en la base de datos de un tenant de cliente. El único fallback seguro y cerrado es la Demo Oficial (`yourmeal-os`).
