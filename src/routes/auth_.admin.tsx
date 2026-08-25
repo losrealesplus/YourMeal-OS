@@ -31,6 +31,8 @@ import { TenantLogo } from "@/components/tenant/tenant-logo";
 import { QuietLocaleSwitch } from "@/components/tenant/quiet-locale-switch";
 import { brandConfig, tenantCopyEs } from "@/tenant/brand-config";
 
+import { resolveInstanceRuntimeConfig } from "@/lib/instance-runtime-boundary";
+
 /**
  * Operations Center login — official backoffice gate.
  * EP-002A.1.1: after staff auth, return to Ops Center (or safe returnTo).
@@ -41,16 +43,29 @@ import { brandConfig, tenantCopyEs } from "@/tenant/brand-config";
 export const Route = createFileRoute("/auth_/admin")({
   validateSearch: (search: Record<string, unknown>) =>
     parseOperationsAuthSearch(search),
-  head: () => ({
-    meta: [
-      {
-        title: `${tenantCopyEs.backOffice.entryLabel} — ${brandConfig.name}`,
-      },
-      { name: "robots", content: "noindex" },
-    ],
-  }),
+  head: () => {
+    let instanceName = "YourMeal OS";
+    try {
+      const host = typeof window !== "undefined" ? window.location.hostname : undefined;
+      const config = resolveInstanceRuntimeConfig(host);
+      if (config.tenantSlug === "eatclean") {
+        instanceName = "EatClean Tenerife";
+      }
+    } catch {
+      // Default to YourMeal OS
+    }
+    return {
+      meta: [
+        {
+          title: `${tenantCopyEs.backOffice.entryLabel} — ${instanceName}`,
+        },
+        { name: "robots", content: "noindex" },
+      ],
+    };
+  },
   component: AdminAuthPage,
 });
+
 
 const authInputClass =
   "w-full border border-border/80 rounded-2xl bg-white pl-11 pr-4 py-3.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-colors";

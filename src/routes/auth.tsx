@@ -31,24 +31,37 @@ import { TenantLogo } from "@/components/tenant/tenant-logo";
 import { BrandLeafMark } from "@/components/tenant/brand-leaf-mark";
 import { QuietLocaleSwitch } from "@/components/tenant/quiet-locale-switch";
 import { brandConfig, tenantCopyEs } from "@/tenant/brand-config";
+import { resolveInstanceRuntimeConfig } from "@/lib/instance-runtime-boundary";
 import { PrimaryCTA } from "@/components/consumer";
-import splashImage from "@/assets/eatclean-splash.jpg";
+import eatcleanSplashImage from "@/assets/eatclean-splash.jpg";
 import { cn } from "@/lib/utils";
 import { getStorageProvider } from "@/platform/storage-provider";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({
-    meta: [
-      { title: `Iniciar sesión — ${brandConfig.name}` },
-      {
-        name: "description",
-        content: `Accede a tu cuenta de ${brandConfig.name} para programar tu pedido semanal de comida preparada saludable.`,
-      },
-      { name: "robots", content: "noindex" },
-    ],
-  }),
+  head: () => {
+    let title = "Iniciar sesión — YourMeal OS";
+    let description = "Accede a la plataforma de gestión operativa YourMeal OS.";
+    try {
+      const host = typeof window !== "undefined" ? window.location.hostname : undefined;
+      const config = resolveInstanceRuntimeConfig(host);
+      if (config.tenantSlug === "eatclean") {
+        title = "Iniciar sesión — EatClean Tenerife";
+        description = "Accede a tu cuenta de EatClean Tenerife para programar tu pedido semanal de comida preparada saludable.";
+      }
+    } catch {
+      // Fail-safe to default platform demo
+    }
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { name: "robots", content: "noindex" },
+      ],
+    };
+  },
   component: AuthPage,
 });
+
 
 type Tab = "email" | "phone";
 type Phase = "splash" | "onboarding" | "login";
@@ -133,6 +146,21 @@ function AuthPage() {
     },
   ];
 
+  const isCustomerInstance = (() => {
+    try {
+      const host = typeof window !== "undefined" ? window.location.hostname : undefined;
+      return resolveInstanceRuntimeConfig(host).tenantSlug === "eatclean";
+    } catch {
+      return false;
+    }
+  })();
+
+  const instanceDisplayName = isCustomerInstance ? "EatClean Tenerife" : "YourMeal OS";
+  const instanceTagline = isCustomerInstance
+    ? tenantCopyEs.claims.enjoy
+    : "Sistema Operativo para Negocios de Alimentación y Catering";
+
+
   return (
     <TenantBrandScope className="min-h-screen font-[family-name:var(--font-tenant-body,Open_Sans,sans-serif)]">
       <div
@@ -148,20 +176,30 @@ function AuthPage() {
         }
       >
         {phase === "login" ? (
-          <>
-            <img
-              src={splashImage}
-              alt=""
-              className="absolute inset-0 size-full object-cover"
-            />
+          isCustomerInstance ? (
+            <>
+              <img
+                src={eatcleanSplashImage}
+                alt=""
+                className="absolute inset-0 size-full object-cover"
+              />
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(180deg, rgba(247,245,241,0.72) 0%, rgba(247,245,241,0.88) 45%, rgba(247,245,241,0.94) 100%)",
+                }}
+              />
+            </>
+          ) : (
             <div
-              className="absolute inset-0"
+              className="absolute inset-0 bg-slate-900"
               style={{
                 background:
-                  "linear-gradient(180deg, rgba(247,245,241,0.72) 0%, rgba(247,245,241,0.88) 45%, rgba(247,245,241,0.94) 100%)",
+                  "radial-gradient(ellipse at top, #1E293B 0%, #0F172A 70%, #020617 100%)",
               }}
             />
-          </>
+          )
         ) : null}
 
         <div className="absolute top-5 right-5 md:top-7 md:right-7 z-20">
@@ -176,15 +214,16 @@ function AuthPage() {
                 className="text-2xl font-bold tracking-tight"
                 style={{ fontFamily: "var(--font-tenant-display)" }}
               >
-                {brandConfig.name}
+                {instanceDisplayName}
               </p>
               <p className="text-sm text-muted-foreground mt-3 max-w-xs leading-relaxed font-normal">
-                {tenantCopyEs.claims.enjoy}
+                {instanceTagline}
               </p>
             </div>
             <PoweredByLine className="mt-4" />
           </div>
         ) : null}
+
 
         {phase === "onboarding" ? (
           <div className="w-full max-w-md animate-fade-in relative z-10">
