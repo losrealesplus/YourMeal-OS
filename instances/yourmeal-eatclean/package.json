@@ -5,13 +5,19 @@
   "description": "YourMeal OS Client Instance — EatClean Tenerife Catering",
   "type": "module",
   "coreVersion": "0.1.0",
+  "coreCommit": "2b725151",
   "scripts": {
     "verify": "vitest run src/modules/client-instance/",
-    "build": "npm run --prefix ../.. build"
+    "build": "npm run --prefix ../.. build",
+    "deploy:prod": "npx wrangler deploy --config wrangler.prod.json",
+    "deploy:staging": "npx wrangler deploy --config wrangler.staging.json"
   },
   "instance": {
     "tenantSlug": "eatclean",
+    "tenantUUID": "8bba00ba-331b-42c8-9283-4e3836ffb870",
     "domain": "eatclean.yourmealos.com",
+    "stagingDomain": "eatclean-staging.yourmealos.com",
+    "supabaseProject": "nhirlpkuvonggctdzzad",
     "locale": "es-ES",
     "timezone": "Europe/Madrid",
     "currency": "EUR"
