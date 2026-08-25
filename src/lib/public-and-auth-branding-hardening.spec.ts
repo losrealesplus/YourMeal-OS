@@ -6,34 +6,38 @@ import { getPublicClientsDirectory } from "@/lib/public-clients-registry";
 import {
   resolveInstanceRuntimeConfig,
   validateInstanceRuntimeConfig,
-  CANONICAL_INSTANCE_BINDINGS,
   type InstanceRuntimeConfig,
 } from "@/lib/instance-runtime-boundary";
 
-describe("Block B3.6.11A: Public Identity and Auth Branding Hardening", () => {
-  describe("1. Public Logo Resolution", () => {
-    it("resolves EatClean logo for eatclean hostname", () => {
-      const logo = resolveInstanceLogoUrl("eatclean.yourmealos.com");
-      expect(logo).toBe("/assets/eatclean-logo.png");
-    });
-
-    it("resolves EatClean logo for eatclean staging hostname", () => {
-      const logo = resolveInstanceLogoUrl("eatclean-staging.yourmealos.com");
-      expect(logo).toBe("/assets/eatclean-logo.png");
-    });
-
-    it("resolves YourMeal OS logo for www hostname", () => {
+describe("PR #447: Official Brand Assets and Instance-Aware Branding Hardening", () => {
+  describe("1. Public Logo Resolution (Runtime Mapping)", () => {
+    it("A. YourMeal OS host -> YourMeal OS logo", () => {
       const logo = resolveInstanceLogoUrl("www.yourmealos.com");
       expect(logo).toBe("/assets/yourmeal-os-logo.png");
     });
 
-    it("resolves YourMeal OS logo for clientes portal hostname", () => {
+    it("B. Clientes host -> YourMeal OS logo", () => {
       const logo = resolveInstanceLogoUrl("clientes.yourmealos.com");
       expect(logo).toBe("/assets/yourmeal-os-logo.png");
     });
 
-    it("fails safe to YourMeal OS logo for unknown/undefined hostname (NEVER EatClean)", () => {
-      const logo = resolveInstanceLogoUrl("unknown-domain.com");
+    it("C. EatClean host -> EatClean logo", () => {
+      const logo = resolveInstanceLogoUrl("eatclean.yourmealos.com");
+      expect(logo).toBe("/assets/eatclean-logo.png");
+    });
+
+    it("D. EatClean staging -> EatClean logo", () => {
+      const logo = resolveInstanceLogoUrl("eatclean-staging.yourmealos.com");
+      expect(logo).toBe("/assets/eatclean-logo.png");
+    });
+
+    it("E. Unknown host -> YourMeal OS logo (NEVER EatClean)", () => {
+      const logo = resolveInstanceLogoUrl("random-unrecognized-domain.org");
+      expect(logo).toBe("/assets/yourmeal-os-logo.png");
+    });
+
+    it("F. Undefined hostname -> YourMeal OS logo", () => {
+      const logo = resolveInstanceLogoUrl(undefined);
       expect(logo).toBe("/assets/yourmeal-os-logo.png");
     });
   });
@@ -58,19 +62,38 @@ describe("Block B3.6.11A: Public Identity and Auth Branding Hardening", () => {
     });
   });
 
-  describe("3. Physical Assets in public/assets/", () => {
-    it("ensures public/assets/yourmeal-os-logo.png exists and is non-empty", () => {
+  describe("3. Physical Official Assets Validation", () => {
+    it("ensures public/assets/yourmeal-os-logo.png is valid official RGBA PNG", () => {
       const p = path.resolve(process.cwd(), "public/assets/yourmeal-os-logo.png");
       expect(fs.existsSync(p)).toBe(true);
-      const stat = fs.statSync(p);
-      expect(stat.size).toBeGreaterThan(1000);
+      const buf = fs.readFileSync(p);
+      expect(buf.toString("ascii", 1, 4)).toBe("PNG");
+      const width = buf.readUInt32BE(16);
+      const height = buf.readUInt32BE(20);
+      expect(width).toBe(932);
+      expect(height).toBe(1024);
     });
 
-    it("ensures public/assets/eatclean-logo.png exists and is non-empty", () => {
+    it("ensures public/assets/eatclean-logo.png is valid official RGBA PNG", () => {
       const p = path.resolve(process.cwd(), "public/assets/eatclean-logo.png");
       expect(fs.existsSync(p)).toBe(true);
-      const stat = fs.statSync(p);
-      expect(stat.size).toBeGreaterThan(1000);
+      const buf = fs.readFileSync(p);
+      expect(buf.toString("ascii", 1, 4)).toBe("PNG");
+      const width = buf.readUInt32BE(16);
+      const height = buf.readUInt32BE(20);
+      expect(width).toBe(1024);
+      expect(height).toBe(1024);
+    });
+
+    it("ensures src/tenant/resources/logo.png contains official YourMeal OS fallback", () => {
+      const p = path.resolve(process.cwd(), "src/tenant/resources/logo.png");
+      expect(fs.existsSync(p)).toBe(true);
+      const buf = fs.readFileSync(p);
+      expect(buf.toString("ascii", 1, 4)).toBe("PNG");
+      const width = buf.readUInt32BE(16);
+      const height = buf.readUInt32BE(20);
+      expect(width).toBe(932);
+      expect(height).toBe(1024);
     });
   });
 

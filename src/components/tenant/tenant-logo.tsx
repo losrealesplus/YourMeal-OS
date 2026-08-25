@@ -56,10 +56,23 @@ export function TenantLogo({
   const src = logoUrl ?? instanceDefaultLogo ?? FALLBACK_LOGO;
   const detectorRef = useRef(createTripleTapDetector());
 
+  const isCustomerInstance = (() => {
+    try {
+      const host = typeof window !== "undefined" ? window.location.hostname : undefined;
+      return resolveInstanceRuntimeConfig(host).tenantSlug === "eatclean";
+    } catch {
+      return false;
+    }
+  })();
+
+  const altText = isCustomerInstance
+    ? "EatClean Tenerife — Comida preparada saludable"
+    : `${brandConfig.name} — ${brandConfig.storeAssets.shortDescription}`;
+
   return (
     <img
       src={src}
-      alt={`${brandConfig.name} — ${brandConfig.storeAssets.shortDescription}`}
+      alt={altText}
       height={height}
       className={cn("w-auto object-contain select-none", className)}
       style={{ height, width: "auto" }}
