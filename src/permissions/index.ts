@@ -43,6 +43,8 @@ export type Capability =
   | "employee.manage"
   | "users.create"
   | "saas.manage"
+  | "tenants.manage"
+  | "onboarding.manage"
   | "records.purge";
 
 const STAFF_ROLES: AppRole[] = [
@@ -98,6 +100,8 @@ const ROLE_CAPABILITIES: Record<AppRole, readonly Capability[]> = {
     "employee.manage",
     "users.create",
     "saas.manage",
+    "tenants.manage",
+    "onboarding.manage",
     "records.purge",
   ],
   company_admin: [

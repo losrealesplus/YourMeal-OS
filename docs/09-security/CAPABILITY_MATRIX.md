@@ -122,11 +122,16 @@ Legend: ✅ granted · ❌ denied
 | employee.manage | ❌ | ✅ | ✅ |
 | users.create | ❌ | ✅ | ✅ |
 | saas.manage | ❌ | ❌ | ✅ |
+| tenants.manage | ❌ | ❌ | ✅ |
+| onboarding.manage | ❌ | ❌ | ✅ |
 | records.purge | ❌ | ❌ | ✅ |
 
 > **`users.create`:** Tenant Admin / Operations Manager / SaaS Admin may provision or invite users for **their** tenant. Create ≠ access — Membership must be Approved and a Role assigned (ADR 0018). Also granted to `operations_manager` in code.
 
+> **`onboarding.manage` & `tenants.manage`:** Exclusive to Platform SaaS Admin (`saas_admin`). The Onboarding Engine belongs to the platform: SaaS Admin selects the target tenant context, uploads intake files, reviews semantic mapping, and authorizes database ingestion. Tenant Admins operate resulting business data within their assigned tenant but have zero platform onboarding authority.
+
 > **ADR 0015:** B2B Company Account portal admins are scoped by `company_employees.is_admin` (not the Tenant role `company_admin`). Tenant `company_admin` / `saas_admin` oversee any company in the tenant. Services enforce both paths.
+
 
 ### `brand.manage`
 
