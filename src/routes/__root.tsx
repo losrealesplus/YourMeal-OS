@@ -27,6 +27,7 @@ import {
 } from "@/runtime/ymos-runtime-audit";
 import { YmosRuntimeInspector } from "@/runtime/ymos-runtime-inspector";
 import { DeveloperPortal } from "@/runtime/developer-portal";
+import { Toaster } from "@/components/ui/sonner";
 import {
   markYmosRuntimeRootImported,
   recordYmosRuntimeException,
@@ -274,6 +275,7 @@ function RootComponent() {
             <YmosRuntimeMountProbe label="Outlet rendered">
               <Outlet />
             </YmosRuntimeMountProbe>
+            <Toaster />
             {/* YMOS Runtime Inspector — observe-only; gated by flag */}
             <YmosRuntimeInspector />
             {/* Developer Portal — triple-tap logo → passphrase → Suite toggle */}
