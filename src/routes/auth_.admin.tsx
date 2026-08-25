@@ -19,6 +19,7 @@ import {
   reportAdminAuthBootstrapFailure,
   type ClassifiedAdminAuthError,
 } from "@/lib/admin-auth-bootstrap";
+import { classifyCustomerAuthError } from "@/auth/customer-auth-errors";
 import { parseOperationsAuthSearch } from "@/lib/open-operations-center";
 import { ensurePlatformOwnerSession } from "@/lib/ensure-platform-owner-session";
 import { createAuthSession002Trace } from "@/lib/auth-session-002-trace";
@@ -96,6 +97,7 @@ function AdminAuthPage() {
   const [busy, setBusy] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
   const [nonStaffSession, setNonStaffSession] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [bootstrapError, setBootstrapError] =
     useState<ClassifiedAdminAuthError | null>(null);
   const [retryNonce, setRetryNonce] = useState(0);
@@ -188,6 +190,7 @@ function AdminAuthPage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
+    setFormError(null);
     setBootstrapError(null);
     try {
       beginPostLoginPipeline("canonical", { route: "/auth/admin" });
@@ -195,7 +198,17 @@ function AdminAuthPage() {
         email,
         password,
       });
-      if (error) throw error;
+      if (error) {
+        const classified = classifyCustomerAuthError(error);
+        const human = t(`auth:${classified.messageKey}`);
+        setFormError(human);
+        toast.error(human);
+        stopPostLogin("auth_admin_credentials_error", {
+          route: "/auth/admin",
+          message: error.message,
+        });
+        return;
+      }
       logPostLoginStep("LOGIN_OK", { route: "/auth/admin" });
       const uid = canonicalUserIdFromAuthData(data);
       if (!uid) {
@@ -216,7 +229,9 @@ function AdminAuthPage() {
       if (result.status === "not_staff") {
         stopPostLogin("not_staff", { userId: uid, route: "/auth/admin" });
         setNonStaffSession(true);
-        toast.error(t("auth:adminNotStaff"));
+        const msg = t("auth:adminNotStaff");
+        setFormError(msg);
+        toast.error(msg);
         return;
       }
       // HOME_PATH_RESOLVED emitted inside enterOperationsCenter when canonical.
@@ -241,7 +256,9 @@ function AdminAuthPage() {
         route: "/auth/admin",
         userId: null,
       });
-      // Credential mistakes stay on the form (toast only). Bootstrap/infra
+      const human = t(`auth:${classified.messageKey}`);
+      setFormError(human);
+      // Credential mistakes stay on the form. Bootstrap/infra
       // failures also surface the retry panel without granting access.
       if (
         classified.kind === "rpc_missing" ||
@@ -252,7 +269,7 @@ function AdminAuthPage() {
       ) {
         setBootstrapError(classified);
       }
-      toast.error(t(`auth:${classified.messageKey}`));
+      toast.error(human);
     } finally {
       setBusy(false);
     }
@@ -320,6 +337,15 @@ function AdminAuthPage() {
               </div>
             ) : (
               <form onSubmit={submit} className="grid gap-4 mt-8">
+                {formError && (
+                  <div
+                    role="alert"
+                    aria-live="polite"
+                    className="rounded-2xl border border-destructive/30 bg-destructive/10 p-3.5 text-xs text-destructive font-medium text-center animate-fade-in"
+                  >
+                    {formError}
+                  </div>
+                )}
                 <label className="relative block">
                   <Mail
                     className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground"
@@ -332,7 +358,10 @@ function AdminAuthPage() {
                     autoComplete="username"
                     placeholder={t("common:email")}
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (formError) setFormError(null);
+                    }}
                     className={authInputClass}
                   />
                 </label>
@@ -348,7 +377,10 @@ function AdminAuthPage() {
                     autoComplete="current-password"
                     placeholder={t("common:password")}
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (formError) setFormError(null);
+                    }}
                     className={authInputClass}
                   />
                 </label>
@@ -357,7 +389,7 @@ function AdminAuthPage() {
                   disabled={busy}
                   className="mt-1 bg-primary text-primary-foreground text-[15px] font-semibold py-3.5 rounded-2xl disabled:opacity-50 hover:opacity-95 transition-opacity"
                 >
-                  {t("auth:adminEnter")}
+                  {busy ? t("common:loading") : t("auth:adminEnter")}
                 </button>
               </form>
             )}
