@@ -36,6 +36,7 @@ export const CANONICAL_INSTANCE_BINDINGS: Record<string, InstanceRuntimeConfig> 
     coreVersion: "0.1.0",
     supabaseProjectRef: "djangucecsphnejplvic",
     supabaseUrl: "https://djangucecsphnejplvic.supabase.co",
+    supabasePublishableKey: "sb_publishable_PUfHKoTQ5aQO8IlG759-pg_adAFsa8A",
   },
   eatclean: {
     instanceType: "customer_tenant",
@@ -43,6 +44,7 @@ export const CANONICAL_INSTANCE_BINDINGS: Record<string, InstanceRuntimeConfig> 
     coreVersion: "0.1.0",
     supabaseProjectRef: "nhirlpkuvonggctdzzad",
     supabaseUrl: "https://nhirlpkuvonggctdzzad.supabase.co",
+    supabasePublishableKey: "sb_publishable_qgT9AjzgqzMPgtLRjTZaiQ_yjsQ2ChH",
   },
 };
 
