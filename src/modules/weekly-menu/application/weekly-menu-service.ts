@@ -34,7 +34,8 @@ async function activeDishCount(ctx: ServiceContext): Promise<number> {
   return dishes.length;
 }
 
-function assertDayDateInWeek(weekStart: string, dayDate: string): void {
+function assertDayDateInWeek(weekStart: string | null, dayDate: string): void {
+  if (!weekStart) return;
   if (!isDayDateInWeek(weekStart, dayDate)) {
     const allowed = utcWeekDates(weekStart);
     throw new DomainError(
@@ -173,9 +174,12 @@ export const WeeklyMenuService = {
       throw new DomainError("NOT_FOUND", "Weekly menu not found");
     }
     const slots = await repo.listSlotsWithDishes(weeklyMenuId);
-    const outOfWeek = slots.filter((s) => !isDayDateInWeek(menu.week_start, s.day_date));
-    if (outOfWeek.length > 0) {
-      throw new DomainError("INVALID_STATE", PUBLISH_OUT_OF_WEEK_MESSAGE);
+    // Template menus (week_start null) use day_of_week — skip calendar boundary check
+    if (menu.week_start != null) {
+      const outOfWeek = slots.filter((s) => s.day_date != null && !isDayDateInWeek(menu.week_start!, s.day_date));
+      if (outOfWeek.length > 0) {
+        throw new DomainError("INVALID_STATE", PUBLISH_OUT_OF_WEEK_MESSAGE);
+      }
     }
     const publishOk = canPublishWeeklyMenu({
       slotCount: slots.length,
@@ -301,6 +305,9 @@ export const WeeklyMenuService = {
     }
 
     const sourceSlots = await repo.listSlotsWithDishes(input.sourceMenuId);
+    if (!sourceMenu.week_start) {
+      throw new DomainError("INVALID_STATE", "El menú de origen es una plantilla relativa y no puede duplicarse como menú con fecha. Usa la función de programación de plantillas.");
+    }
     const sourceDates = utcWeekDates(sourceMenu.week_start);
     const targetDates = utcWeekDates(input.targetWeekStart);
 
@@ -308,8 +315,8 @@ export const WeeklyMenuService = {
 
     try {
       if (sourceSlots.length > 0) {
-        const slotsToInsert = sourceSlots.map((s) => {
-          const dayIdx = sourceDates.indexOf(s.day_date);
+      const slotsToInsert = sourceSlots.map((s) => {
+          const dayIdx = s.day_date != null ? sourceDates.indexOf(s.day_date) : -1;
           const targetDay = dayIdx >= 0 ? targetDates[dayIdx]! : input.targetWeekStart;
           return {
             weeklyMenuId: createdMenu.id,

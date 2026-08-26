@@ -93,7 +93,7 @@ async function buildOfferByDish(
   const slots = await menuRepo.listSlotsWithDishes(menu.id);
   const offerByDish = new Map<string, string[]>();
   for (const slot of slots) {
-    if (!slot.dishes || slot.dishes.deleted_at) continue;
+    if (!slot.day_date || !slot.dishes || slot.dishes.deleted_at) continue;
     const days = offerByDish.get(slot.dish_id) ?? [];
     if (!days.includes(slot.day_date)) days.push(slot.day_date);
     offerByDish.set(slot.dish_id, days);

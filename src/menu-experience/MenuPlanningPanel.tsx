@@ -40,10 +40,10 @@ import { cn } from "@/lib/utils";
 
 export type DurableMenuSeed = {
   id: string;
-  weekStart: string;
+  weekStart: string | null;
   status: string;
   slots: Array<{
-    dayDate: string;
+    dayDate: string | null;
     dishId: string;
     dishLabel: string;
     macrosHint?: string | null;
@@ -79,15 +79,16 @@ type Props = {
 
 function seedToPlan(seed: DurableMenuSeed): WeekPlan {
   const now = new Date().toISOString();
+  const fallbackWeek = seed.weekStart ?? mondayIso();
   return {
     id: `seed_${seed.id}`,
-    weekStart: seed.weekStart,
+    weekStart: fallbackWeek,
     status: seed.status === "published" ? "published_durable" : "draft",
     sourceMenuId: seed.id,
     durableMenuId: seed.id,
     slots: seed.slots.map((s, i) => ({
       id: `seed_slot_${seed.id}_${i}`,
-      dayDate: s.dayDate,
+      dayDate: s.dayDate ?? fallbackWeek,
       dishId: s.dishId,
       dishLabel: s.dishLabel,
       disabled: false,
@@ -162,7 +163,9 @@ export function MenuPlanningPanel({
   const previousCandidates = useMemo(() => {
     void tick;
     const session = listWeekPlans().filter((p) => p.weekStart < weekStart);
-    const durable = durableMenus.filter((m) => m.weekStart < weekStart).map(seedToPlan);
+    const durable = durableMenus
+      .filter((m): m is DurableMenuSeed & { weekStart: string } => m.weekStart != null && m.weekStart < weekStart)
+      .map(seedToPlan);
     const map = new Map<string, WeekPlan>();
     for (const p of [...durable, ...session]) map.set(p.weekStart, p);
     return [...map.values()].sort((a, b) => Date.parse(b.weekStart) - Date.parse(a.weekStart));

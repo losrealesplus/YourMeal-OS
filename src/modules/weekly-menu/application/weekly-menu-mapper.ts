@@ -13,7 +13,9 @@ export type WeeklyMenuDayView = {
 
 export type WeeklyMenuView = {
   id: string;
-  weekStart: string;
+  weekStart: string | null;
+  relativeWeek?: number | null;
+  menuType?: string;
   status: string;
   days: WeeklyMenuDayView[];
 };
@@ -34,19 +36,28 @@ export function mapWeeklyMenuToView(
     if (slot.dishes.status !== "active") continue;
 
     const dish = mapDishRowToCatalogDish(slot.dishes);
-    const list = byDate.get(slot.day_date) ?? [];
+    const key = slot.day_date ?? (slot.day_of_week != null ? String(slot.day_of_week) : "");
+    if (!key) continue;
+    const list = byDate.get(key) ?? [];
     list.push(dish);
-    byDate.set(slot.day_date, list);
+    byDate.set(key, list);
   }
 
-  const days = utcWeekDates(menu.week_start).map((dayDate) => ({
-    dayDate,
-    dishes: byDate.get(dayDate) ?? [],
-  }));
+  const days = menu.week_start != null
+    ? utcWeekDates(menu.week_start).map((dayDate) => ({
+        dayDate,
+        dishes: byDate.get(dayDate) ?? [],
+      }))
+    : [1, 2, 3, 4, 5].map((dow) => ({
+        dayDate: `Day ${dow}`,
+        dishes: byDate.get(String(dow)) ?? [],
+      }));
 
   return {
     id: menu.id,
     weekStart: menu.week_start,
+    relativeWeek: menu.relative_week,
+    menuType: menu.menu_type,
     status: menu.status,
     days,
   };

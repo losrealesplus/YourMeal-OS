@@ -235,14 +235,12 @@ function OrderWorkspaceDemoPage() {
     }
   }
 
-  const orderId = selected?.details.summary.id;
-
   return (
-    <div className="animate-fade-in max-w-5xl">
+    <div className="animate-fade-in max-w-5xl space-y-6">
       <SectionTitle
-        overline="Operational Experience · Capability Demo"
-        title="Order Workspace"
-        subtitle="Demuestra LAW 003 y LAW 004: la pantalla orquesta; OrderFacade posee el proceso. No es el módulo Orders definitivo."
+        overline="Operaciones"
+        title="Gestión de Pedidos"
+        subtitle="Compromisos operativos y pedidos del tenant."
       />
 
       <AdminHeader
@@ -455,11 +453,11 @@ function OrderWorkspaceDemoPage() {
               <div className="flex flex-wrap gap-2 border-t border-dashed border-border pt-2">
                 <button
                   type="button"
-                  disabled={busy || !canWrite || !orderId}
+                  disabled={busy || !canWrite || !selected.details.summary.id}
                   onClick={() =>
                     void runProcess("ConfirmOrder", () =>
                       order.confirmOrder(
-                        confirmOrderCommand({ orderId: orderId! }),
+                        confirmOrderCommand({ orderId: selected.details.summary.id }),
                       ),
                     )
                   }
@@ -469,11 +467,11 @@ function OrderWorkspaceDemoPage() {
                 </button>
                 <button
                   type="button"
-                  disabled={busy || !canWrite || !orderId}
+                  disabled={busy || !canWrite || !selected.details.summary.id}
                   onClick={() =>
                     void runProcess("ScheduleProduction", () =>
                       order.scheduleProduction(
-                        scheduleProductionCommand({ orderId: orderId! }),
+                        scheduleProductionCommand({ orderId: selected.details.summary.id }),
                       ),
                     )
                   }
@@ -483,11 +481,11 @@ function OrderWorkspaceDemoPage() {
                 </button>
                 <button
                   type="button"
-                  disabled={busy || !canWrite || !orderId}
+                  disabled={busy || !canWrite || !selected.details.summary.id}
                   onClick={() =>
                     void runProcess("ReadyForKitchen", () =>
                       order.readyForKitchen(
-                        readyForKitchenCommand({ orderId: orderId! }),
+                        readyForKitchenCommand({ orderId: selected.details.summary.id }),
                       ),
                     )
                   }
@@ -497,11 +495,11 @@ function OrderWorkspaceDemoPage() {
                 </button>
                 <button
                   type="button"
-                  disabled={busy || !canWrite || !orderId}
+                  disabled={busy || !canWrite || !selected.details.summary.id}
                   onClick={() =>
                     void runProcess("ReadyForDelivery", () =>
                       order.readyForDelivery(
-                        readyForDeliveryCommand({ orderId: orderId! }),
+                        readyForDeliveryCommand({ orderId: selected.details.summary.id }),
                       ),
                     )
                   }
@@ -511,11 +509,11 @@ function OrderWorkspaceDemoPage() {
                 </button>
                 <button
                   type="button"
-                  disabled={busy || !canWrite || !orderId}
+                  disabled={busy || !canWrite || !selected.details.summary.id}
                   onClick={() =>
                     void runProcess("CompleteDelivery", () =>
                       order.completeDelivery(
-                        completeDeliveryCommand({ orderId: orderId! }),
+                        completeDeliveryCommand({ orderId: selected.details.summary.id }),
                       ),
                     )
                   }
@@ -525,10 +523,12 @@ function OrderWorkspaceDemoPage() {
                 </button>
                 <button
                   type="button"
-                  disabled={busy || !orderId}
+                  disabled={busy || !selected.details.summary.id}
                   onClick={() =>
                     void runProcess("CloseOrder", () =>
-                      order.closeOrder(closeOrderCommand({ orderId: orderId! })),
+                      order.closeOrder(
+                        closeOrderCommand({ orderId: selected.details.summary.id }),
+                      ),
                     )
                   }
                   className="rounded-md border border-dashed border-border px-3 py-1.5 text-xs text-muted-foreground disabled:opacity-40"
@@ -537,12 +537,12 @@ function OrderWorkspaceDemoPage() {
                 </button>
                 <button
                   type="button"
-                  disabled={busy || !orderId}
+                  disabled={busy || !selected.details.summary.id}
                   onClick={() =>
                     void runProcess("CancelOrder", () =>
                       order.cancelOrder(
                         cancelOrderCommand({
-                          orderId: orderId!,
+                          orderId: selected.details.summary.id,
                           reason: "workspace-demo-probe",
                         }),
                       ),

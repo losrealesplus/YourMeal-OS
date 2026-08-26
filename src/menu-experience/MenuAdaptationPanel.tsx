@@ -52,7 +52,7 @@ function ensurePlanFromDurable(
   const existing = getWeekPlan(weekStart);
   if (existing) return existing;
   const seed = durableMenus.find((m) => m.weekStart === weekStart);
-  if (!seed) return null;
+  if (!seed || !seed.weekStart) return null;
   const now = new Date().toISOString();
   return saveWeekPlan({
     id: `wp_adapt_${seed.id}`,
@@ -62,7 +62,7 @@ function ensurePlanFromDurable(
     durableMenuId: seed.id,
     slots: seed.slots.map((s, i) => ({
       id: `slot_adapt_${i}_${Math.random().toString(36).slice(2, 6)}`,
-      dayDate: s.dayDate,
+      dayDate: s.dayDate ?? weekStart,
       dishId: s.dishId,
       dishLabel: s.dishLabel,
       disabled: false,

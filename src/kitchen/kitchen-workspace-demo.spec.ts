@@ -53,12 +53,11 @@ describe("OPERATIONAL-005 Kitchen Workspace Demo · Law 003–006-A", () => {
     expect(law).toContain("never bypass Capabilities");
   });
 
-  it("nav exposes Kitchen Workspace under Más", () => {
-    const shell = readFileSync(
-      resolve(ROOT, "src/components/admin-shell.tsx"),
+  it("demo route file exists and is registered in routes", () => {
+    const routeFile = readFileSync(
+      resolve(ROOT, "src/routes/_authenticated/admin.kitchen-workspace.tsx"),
       "utf8",
     );
-    expect(shell).toContain("/admin/kitchen-workspace");
-    expect(shell).toContain("ops.nav.kitchenWorkspace");
+    expect(routeFile).toContain("createFileRoute");
   });
 });

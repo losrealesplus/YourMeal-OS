@@ -64,31 +64,12 @@ export const TenantStage: BootstrapStageHandler = {
         hasTenant: Boolean(tenantId),
       };
 
-      // ActiveTenant only exists for approved membership — gate for materialization.
+      // Operational Invariant (AUTH USER != CUSTOMER):
+      // TenantStage owns tenant binding only (ADR 0052).
+      // Administrators and staff are NOT automatically materialized as customers in public.customers.
+      // Customer records are created exclusively via customer onboarding or customer-specific registration flows.
       if (tenantId) {
-        try {
-          const { data: authUser } = await supabase.auth.getUser();
-          const email = authUser.user?.email ?? null;
-          const displayName =
-            data.profile?.fullName ??
-            (authUser.user?.user_metadata?.full_name as string | undefined) ??
-            null;
-          const { customerId } = await ensureCustomerForActiveTenant({
-            userId,
-            tenantId,
-            displayName,
-            email,
-          });
-          notes.push("customer:materialized");
-          evidence.customerId = customerId;
-        } catch (matErr) {
-          // Do not block navigation — membership/access already decided.
-          // Surface in evidence for operators / E2E forensic.
-          const matMsg =
-            matErr instanceof Error ? matErr.message : String(matErr);
-          notes.push("customer:materialization_failed");
-          evidence.customerMaterializationError = matMsg;
-        }
+        notes.push("customer:independent_domain_model");
       } else {
         notes.push("customer:skipped_no_active_tenant");
       }

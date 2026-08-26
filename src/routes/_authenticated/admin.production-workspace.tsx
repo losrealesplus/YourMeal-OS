@@ -223,11 +223,11 @@ function ProductionWorkspaceDemoPage() {
   const batches = context?.queue.batches ?? [];
 
   return (
-    <div className="animate-fade-in max-w-5xl">
+    <div className="animate-fade-in max-w-5xl space-y-6">
       <SectionTitle
-        overline="Operational Experience · Capability Demo"
-        title="Production Workspace"
-        subtitle="Demuestra LAW 003 y LAW 004: la pantalla orquesta; ProductionFacade posee la planificación. No es el módulo Production definitivo. No es Kitchen."
+        overline="Operaciones"
+        title="Planificación de Producción"
+        subtitle="Cálculo de lotes y asignación de platos por día de producción."
       />
 
       <AdminHeader

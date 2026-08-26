@@ -1,5 +1,10 @@
 /**
  * ORDER EXPERIENCE · Capture · Search · Edit · Templates · Incident (001–005)
+ * ORDER EXPERIENCE 001 · Zero Friction Order Capture · TTO < 45 s
+ * ORDER EXPERIENCE 002 · Zero Friction Order Search · TTFO < 10 s
+ * ORDER EXPERIENCE 003 · Zero Friction Order Edit · TTEO < 20 s
+ * ORDER EXPERIENCE 004 · Zero Friction Order Templates · Reuse < 10 s
+ * ORDER EXPERIENCE 005 · Zero Friction Operational Incident · TTRI < 30 s
  *
  * Conversation speed — not CRUD.
  * useCustomer + useOrder only. No Capability / Facade / Engine changes.
@@ -517,54 +522,32 @@ function OrderCaptureExperiencePage() {
   return (
     <div className="animate-fade-in mx-auto max-w-3xl pb-24">
       <SectionTitle
-        overline={
-          mode === "incident"
-            ? "ORDER EXPERIENCE 005 · Phase 005 Incident"
-            : mode === "templates"
-              ? "ORDER EXPERIENCE 004 · Phase 004 Templates"
-              : mode === "edit"
-                ? "ORDER EXPERIENCE 003 · Phase 003 Edit"
-                : mode === "search"
-                  ? "ORDER EXPERIENCE 002 · Phase 002 Search"
-                  : "ORDER EXPERIENCE 001 · Phase 001 Capture"
-        }
+        overline="Operaciones · Pedidos"
         title={
           mode === "incident"
-            ? "Zero Friction Operational Incident"
+            ? "Incidencias Operativas"
             : mode === "templates"
-              ? "Zero Friction Order Templates"
+              ? "Plantillas de Pedidos"
               : mode === "edit"
-                ? "Zero Friction Order Edit"
+                ? "Edición de Pedidos"
                 : mode === "search"
-                  ? "Zero Friction Order Search"
-                  : "Zero Friction Order Capture"
+                  ? "Búsqueda de Pedidos"
+                  : "Toma de Pedidos"
         }
         subtitle={
           mode === "incident"
-            ? "Registra la excepción y derívala — sin inventar un workaround"
+            ? "Registra y gestiona excepciones operativas en pedidos."
             : mode === "templates"
-              ? "Partir de un patrón conocido — nunca desde cero"
+              ? "Crea pedidos rápidamente a partir de plantillas frecuentes."
               : mode === "edit"
-                ? "Corregir un compromiso en vivo — sin perder el hilo"
+                ? "Modifica y actualiza pedidos existentes."
                 : mode === "search"
-                  ? "Encuentra el compromiso en segundos — gente, días, situaciones"
-                  : "Registrar el pedido mientras hablas — el software desaparece"
+                  ? "Encuentra cualquier pedido por cliente, día o estado."
+                  : "Registra pedidos de clientes de forma ágil y guiada."
         }
       />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        {mode === "incident" ? (
-          <StatusChip tone="warning" label="TTRI < 30 s" />
-        ) : mode === "templates" ? (
-          <StatusChip tone="warning" label="Reuse < 10 s" />
-        ) : mode === "edit" ? (
-          <StatusChip tone="warning" label="TTEO < 20 s" />
-        ) : mode === "search" ? (
-          <StatusChip tone="warning" label="TTFO < 10 s" />
-        ) : (
-          <StatusChip tone="warning" label="TTO < 45 s" />
-        )}
-        <StatusChip tone="info" label="Conversation · not CRUD" />
         <button
           type="button"
           className="text-xs underline-offset-2 hover:underline"

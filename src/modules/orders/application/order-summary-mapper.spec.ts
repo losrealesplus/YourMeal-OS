@@ -5,7 +5,7 @@ import type { CatalogDish } from "@/modules/dish-library/application/dish-catalo
 
 describe("mapOrderToSummaryView", () => {
   it("projects draft order and items for the summary screen", () => {
-    const order = {
+    const order: OrderRow = {
       id: "o1",
       tenant_id: "t1",
       customer_id: "c1",
@@ -17,7 +17,11 @@ describe("mapOrderToSummaryView", () => {
       deleted_at: null,
       company_id: null,
       delivery_address_id: null,
-    } satisfies OrderRow;
+      delivery_group_id: null,
+      demand_channel: "individual",
+      organizational_unit_id: null,
+      site_id: null,
+    };
 
     const items = [
       {

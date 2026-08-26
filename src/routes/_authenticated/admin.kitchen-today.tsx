@@ -1,8 +1,13 @@
 /**
- * KITCHEN EXPERIENCE 001–006
- * Today's Work · Search · Adaptation · Labels · Progress · Completion
+ * KITCHEN EXPERIENCE 001 · Zero Friction Kitchen Execution
+ * KITCHEN EXPERIENCE 002 · Zero Friction Kitchen Execution Search
+ * KITCHEN EXPERIENCE 003 · Zero Friction Kitchen Execution Adaptation
+ * KITCHEN EXPERIENCE 004 · Zero Friction Kitchen Labels & Special Information
+ * KITCHEN EXPERIENCE 005 · Zero Friction Kitchen Execution Progress
+ * KITCHEN EXPERIENCE 006 · Zero Friction Kitchen Completion & Handoff
+ * Today · Search · Adaptation · Labels · Progress · Completion
  *
- * Experience only — no Kitchen / Production / Delivery Capability invent.
+ * Execution facade only — no Kitchen Capability invent · no durable invent.
  * Start / Pause / Resume / Block / Assign / Complete durable / Delivery → Future.
  */
 
@@ -98,46 +103,46 @@ function KitchenTodayExperiencePage() {
     { overline: string; title: string; subtitle: string; kpi: string; goal: string }
   > = {
     today: {
-      overline: "KITCHEN EXPERIENCE 001 · Today's Work",
-      title: "Zero Friction Kitchen Execution",
-      subtitle: "Recibe el handoff — entiende qué ejecutar ahora",
+      overline: "Operaciones · Cocina",
+      title: "Jornada de Cocina de Hoy",
+      subtitle: "Trabajo y órdenes de preparación asignadas para hoy.",
       kpi: "TTUKW < 10 s",
-      goal: "Entender el trabajo de cocina de hoy en <10s",
+      goal: "Seguimiento y control de la preparación en cocina.",
     },
     search: {
-      overline: "KITCHEN EXPERIENCE 002 · Execution Search",
-      title: "Zero Friction Kitchen Execution Search",
-      subtitle: "Encuentra trabajo de ejecución sin salir del contexto",
+      overline: "Operaciones · Cocina",
+      title: "Búsqueda en Cocina",
+      subtitle: "Encuentra platos o preparaciones de la jornada.",
       kpi: "TTFEW < 10 s",
-      goal: "Encontrar trabajo de ejecución en <10s",
+      goal: "Búsqueda de preparaciones en cocina.",
     },
     adapt: {
-      overline: "KITCHEN EXPERIENCE 003 · Execution Adaptation",
-      title: "Zero Friction Kitchen Execution Adaptation",
-      subtitle: "Adapta la ejecución sin replanificar Production",
+      overline: "Operaciones · Cocina",
+      title: "Adaptación en Cocina",
+      subtitle: "Ajustes sobre preparaciones y lotes del día.",
       kpi: "TTAE < 30 s",
-      goal: "Adaptar ejecución en <30s y volver a ejecutar en <5s",
+      goal: "Adaptar preparación de platos.",
     },
     labels: {
-      overline: "KITCHEN EXPERIENCE 004 · Labels & Special Info",
-      title: "Zero Friction Kitchen Labels & Special Information",
-      subtitle: "Identifica el trabajo y la info especial sin inventar substrate",
+      overline: "Operaciones · Cocina",
+      title: "Etiquetas de Cocina",
+      subtitle: "Información especial y etiquetado de porciones.",
       kpi: "TILC < 10 s",
-      goal: "Identificar contexto de etiqueta en <10s · info especial en <5s",
+      goal: "Control de etiquetado.",
     },
     progress: {
-      overline: "KITCHEN EXPERIENCE 005 · Execution Progress",
-      title: "Zero Friction Kitchen Execution Progress",
-      subtitle: "Entiende qué queda sin inventar estado durable",
+      overline: "Operaciones · Cocina",
+      title: "Progreso de Cocina",
+      subtitle: "Estado de avance de las preparaciones.",
       kpi: "TTEP < 5 s",
-      goal: "Entender progreso y trabajo restante en <5s",
+      goal: "Seguimiento del progreso de cocinado.",
     },
     completion: {
-      overline: "KITCHEN EXPERIENCE 006 · Completion & Handoff",
-      title: "Zero Friction Kitchen Completion & Handoff",
-      subtitle: "Cierra el día con honestidad — Delivery → Future",
+      overline: "Operaciones · Cocina",
+      title: "Cierre de Cocina",
+      subtitle: "Transferencia de platos terminados a reparto.",
       kpi: "TTUC < 5 s",
-      goal: "Entender cierre en <5s · preparar siguiente paso en <10s",
+      goal: "Cierre de cocina y transferencia.",
     },
   };
 
@@ -152,9 +157,7 @@ function KitchenTodayExperiencePage() {
       />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        <StatusChip tone="warning" label={m.kpi} />
-        <StatusChip tone="info" label="Handoff → Ejecución" />
-        <StatusChip tone="info" label="Experience only" />
+        <StatusChip tone="info" label="Producción → Cocina" />
         <button
           type="button"
           className="text-xs underline-offset-2 hover:underline"

@@ -1,5 +1,9 @@
 /**
- * MENU EXPERIENCE 001 · MENU EXPERIENCE 002 · MENU EXPERIENCE 003 · MENU EXPERIENCE 004 · MENU EXPERIENCE 005
+ * MENU EXPERIENCE 001 · 001 Weekly Planning · Zero Friction Weekly Menu Planning · TTWM < 10 min
+ * MENU EXPERIENCE 002 · Phase 002 Search · Zero Friction Menu Search · TTFM < 10 s
+ * MENU EXPERIENCE 003 · 003 Weekly Adaptation · Zero Friction Weekly Adaptation · TTFID < 15 s
+ * MENU EXPERIENCE 004 · Dish Library · 004 Dish Library
+ * MENU EXPERIENCE 005 · 005 Publish & Preview · Zero Friction Publish & Preview · TTRP < 5 min
  * Planning · Search · Adaptation · Dish Library · Publish & Preview
  *
  * Temporal hierarchy: Week → Day → Menu → Dishes.
@@ -85,15 +89,16 @@ export const Route = createFileRoute("/_authenticated/admin/menu-planning")({
 
 function seedToPlan(seed: DurableMenuSeed): WeekPlan {
   const now = new Date().toISOString();
+  const fallbackWeek = seed.weekStart ?? mondayIso();
   return {
     id: `seed_${seed.id}`,
-    weekStart: seed.weekStart,
+    weekStart: fallbackWeek,
     status: seed.status === "published" ? "published_durable" : "draft",
     sourceMenuId: seed.id,
     durableMenuId: seed.id,
     slots: seed.slots.map((s, i) => ({
       id: `seed_slot_${seed.id}_${i}`,
-      dayDate: s.dayDate,
+      dayDate: s.dayDate ?? fallbackWeek,
       dishId: s.dishId,
       dishLabel: s.dishLabel,
       disabled: false,
@@ -243,7 +248,7 @@ function MenuPlanningExperiencePage() {
     const prev = listWeekPlans().find((p) => p.weekStart < weekStart);
     if (prev) return prev;
     const durablePrev = [...durableMenus]
-      .filter((m) => m.weekStart < weekStart)
+      .filter((m): m is DurableMenuSeed & { weekStart: string } => m.weekStart != null && m.weekStart < weekStart)
       .sort((a, b) => Date.parse(b.weekStart) - Date.parse(a.weekStart))[0];
     return durablePrev ? seedToPlan(durablePrev) : null;
   }
@@ -336,47 +341,30 @@ function MenuPlanningExperiencePage() {
   return (
     <div className="animate-fade-in mx-auto max-w-3xl pb-24">
       <SectionTitle
-        overline={
-          mode === "publish"
-            ? "MENU EXPERIENCE 005 · Publish & Preview"
-            : mode === "adapt"
-              ? "MENU EXPERIENCE 004 · Dish Library · 003 Weekly Adaptation"
-              : mode === "search"
-                ? "MENU EXPERIENCE 002 · Phase 002 Search"
-                : "MENU EXPERIENCE 005 · Publish · 001 Weekly Planning"
-        }
+        overline="Operaciones · Menús"
         title={
           mode === "publish"
-            ? "Zero Friction Publish & Preview"
+            ? "Publicación y Vista Previa"
             : mode === "adapt"
-              ? "Zero Friction Weekly Adaptation"
+              ? "Adaptación Semanal"
               : mode === "search"
-                ? "Zero Friction Menu Search"
-                : "Zero Friction Weekly Menu Planning"
+                ? "Búsqueda en Menús"
+                : "Planificación de Menús"
         }
         subtitle={
           mode === "publish"
-            ? "Revisa la semana · valida · publica con confianza"
+            ? "Revisa la semana, valida y publica el menú."
             : mode === "adapt"
-              ? "Reutiliza la Dish Library · adapta sin reconstruir"
+              ? "Reutiliza el catálogo de platos y adapta la semana."
               : mode === "search"
-                ? "Encuentra cualquier elemento de la planificación en segundos"
-                : "Duplica · inserta desde la biblioteca · revisa · publica"
+                ? "Encuentra cualquier elemento de la planificación."
+                : "Planifica los platos y menús para cada día de la semana."
         }
       />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        {mode === "publish" ? (
-          <StatusChip tone="warning" label="TTRP < 5 min" />
-        ) : mode === "adapt" ? (
-          <StatusChip tone="warning" label="TTFID < 15 s" />
-        ) : mode === "search" ? (
-          <StatusChip tone="warning" label="TTFM < 10 s" />
-        ) : (
-          <StatusChip tone="warning" label="TTWM < 10 min" />
-        )}
         <StatusChip tone="info" label="Semana → Día → Menú → Platos" />
-        <StatusChip tone="info" label="Listo para Orders · Production" />
+        <StatusChip tone="info" label="Listo para Pedidos y Cocina" />
         <button
           type="button"
           className="text-xs underline-offset-2 hover:underline"

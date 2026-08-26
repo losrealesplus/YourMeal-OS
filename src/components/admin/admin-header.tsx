@@ -8,17 +8,13 @@ export function AdminHeader({
   capability,
   object,
 }: {
-  goal: string;
-  capability: string;
-  object: string;
+  goal?: string;
+  capability?: string;
+  object?: string;
 }) {
-  return (
-    <div className="grid gap-2 sm:grid-cols-3 mb-6 border-b border-dashed border-border pb-4">
-      <Row label="Objetivo" value={goal} />
-      <Row label="Capability" value={capability} />
-      <Row label="Core Object" value={object} />
-    </div>
-  );
+  // Operational UX Rule: Internal architecture metadata (Capability, Core Object)
+  // must remain in code/tests/docs but is not rendered in customer/operator-facing UI.
+  return null;
 }
 
 function Row({ label, value }: { label: string; value: string }) {
