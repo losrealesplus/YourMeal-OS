@@ -337,7 +337,7 @@ function AdminCustomersPage() {
   return (
     <div className="animate-fade-in space-y-6">
       <SectionTitle
-        overline="Customer Domain"
+        overline="Clientes"
         title="Directorio de Clientes"
         subtitle="Localiza, filtra y accede a la ficha canónica de particulares y organizaciones."
       />

@@ -478,7 +478,7 @@ function AdminCompaniesPage() {
 
       <SectionTitle
         overline="Clientes"
-        title="Empresas (Company Accounts)"
+        title="Empresas"
         subtitle="Gestión comercial, sedes, departamentos y empleados vinculados."
       />
       <AdminHeader

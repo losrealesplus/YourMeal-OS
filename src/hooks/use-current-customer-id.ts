@@ -9,28 +9,21 @@ import { useAuth } from "@/hooks/use-auth";
 export function useCurrentCustomerId() {
   const { user, tenantId } = useAuth();
   const userId = user?.id ?? null;
-  const displayName =
-    (user?.user_metadata?.full_name as string | undefined) ?? null;
 
   return useQuery({
     queryKey: ["current-customer-id", tenantId, userId],
     enabled: Boolean(tenantId && userId),
     staleTime: 5 * 60_000,
     queryFn: async () => {
-      const db = supabase as unknown as {
-        rpc: (fn: string, args: Record<string, unknown>) => Promise<{
-          data: unknown;
-          error: { message: string } | null;
-        }>;
-      };
-      const { data, error } = await db.rpc("ensure_individual_customer", {
-        p_tenant_id: tenantId!,
-        p_user_id: userId!,
-        p_display_name: displayName,
-        p_email: user?.email ?? null,
-      });
+      const { data, error } = await supabase
+        .from("customers")
+        .select("id")
+        .eq("tenant_id", tenantId!)
+        .eq("user_id", userId!)
+        .is("deleted_at", null)
+        .maybeSingle();
       if (error) throw new Error(error.message);
-      return String(data);
+      return data?.id ? String(data.id) : null;
     },
   });
 }

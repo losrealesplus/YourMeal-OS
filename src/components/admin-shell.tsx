@@ -111,52 +111,16 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
   const moreItems: NavItem[] = [
     {
-      to: "/admin/customer-workspace",
-      labelKey: "ops.nav.customerWorkspace",
-      icon: FlaskConical,
-      visible: can("customers.read") || showAllOps,
-    },
-    {
-      to: "/admin/order-capture",
-      labelKey: "ops.nav.orderCapture",
-      icon: ClipboardList,
-      visible: can("orders.read") || showAllOps,
-    },
-    {
       to: "/admin/menus",
-      labelKey: "ops.nav.menuPlanning",
+      labelKey: "menus",
       icon: CalendarDays,
       visible: can("menus.read") || showAllOps,
     },
     {
-      to: "/admin/order-workspace",
-      labelKey: "ops.nav.orderWorkspace",
-      icon: ClipboardList,
-      visible: can("orders.read") || showAllOps,
-    },
-    {
-      to: "/admin/production-workspace",
-      labelKey: "ops.nav.productionWorkspace",
-      icon: FlaskConical,
-      visible: can("kitchen.operate") || showAllOps,
-    },
-    {
-      to: "/admin/kitchen-workspace",
-      labelKey: "ops.nav.kitchenWorkspace",
-      icon: FlaskConical,
-      visible: can("kitchen.operate") || showAllOps,
-    },
-    {
-      to: "/admin/delivery-workspace",
-      labelKey: "ops.nav.deliveryWorkspace",
-      icon: FlaskConical,
-      visible: showDelivery || showAllOps,
-    },
-    {
-      to: "/admin/commercial",
-      labelKey: "commercial",
-      icon: LineChart,
-      visible: showAdminMgmt,
+      to: "/admin/dishes",
+      labelKey: "dishes",
+      icon: BookOpen,
+      visible: can("dishes.read") || showAllOps,
     },
     {
       to: "/admin/companies",
@@ -165,10 +129,24 @@ export function AdminShell({ children }: { children: ReactNode }) {
       visible: can("company.manage") || admin,
     },
     {
+      to: "/admin/accounting",
+      labelKey: "accounting",
+      icon: Wallet,
+      visible:
+        (can("accounting.operate") || showAllOps) &&
+        moduleFlags[PILOT_ADMIN_MODULE_FLAGS.accounting],
+    },
+    {
       to: "/admin/support",
       labelKey: "support",
       icon: LifeBuoy,
       visible: can("support.read") || showAllOps,
+    },
+    {
+      to: "/admin/commercial",
+      labelKey: "commercial",
+      icon: LineChart,
+      visible: showAdminMgmt,
     },
     {
       to: "/admin/users",
@@ -181,6 +159,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
       labelKey: "branding",
       icon: Palette,
       visible: can("brand.manage") || admin,
+    },
+    {
+      to: "/admin/settings",
+      labelKey: "settings",
+      icon: Settings,
+      visible: can("admin.settings") || admin,
     },
     {
       to: "/admin/audit",
@@ -196,33 +180,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
         (can("logistics.operate") || showAllOps) && moduleFlags[PILOT_ADMIN_MODULE_FLAGS.routes],
     },
     {
-      to: "/admin/menus",
-      labelKey: "menus",
-      icon: CalendarDays,
-      // OP-001: dishes/menus are bootstrap-critical — no FF gate.
-      visible: can("menus.read") || showAllOps,
-    },
-    {
-      to: "/admin/dishes",
-      labelKey: "dishes",
-      icon: BookOpen,
-      visible: can("dishes.read") || showAllOps,
-    },
-    {
       to: "/admin/purchasing",
       labelKey: "purchasing",
       icon: ShoppingCart,
       visible:
         (can("purchasing.operate") || showAllOps) &&
         moduleFlags[PILOT_ADMIN_MODULE_FLAGS.purchasing],
-    },
-    {
-      to: "/admin/accounting",
-      labelKey: "accounting",
-      icon: Wallet,
-      visible:
-        (can("accounting.operate") || showAllOps) &&
-        moduleFlags[PILOT_ADMIN_MODULE_FLAGS.accounting],
     },
     {
       to: "/admin/reports",
@@ -243,12 +206,6 @@ export function AdminShell({ children }: { children: ReactNode }) {
       visible:
         (can("production.operate") || showAllOps) &&
         moduleFlags[PILOT_ADMIN_MODULE_FLAGS.production],
-    },
-    {
-      to: "/admin/settings",
-      labelKey: "settings",
-      icon: Settings,
-      visible: can("admin.settings") || admin,
     },
     {
       to: "/admin/design-system",
@@ -276,39 +233,37 @@ export function AdminShell({ children }: { children: ReactNode }) {
   function NavLink({ item, dense }: { item: NavItem; dense?: boolean }) {
     const active = isActive(item.to, item.exact);
     const Icon = item.icon;
-    const label = t(`admin:${item.labelKey}` as "admin:ops.nav.operations", {
-      defaultValue:
-        item.labelKey === "ops.nav.kitchen"
-          ? "Cocina"
-          : item.labelKey === "ops.nav.delivery"
-            ? "Reparto"
-            : item.labelKey === "ops.nav.customerWorkspace"
-              ? "Customer Workspace"
-              : item.labelKey === "ops.nav.orderCapture"
-                ? "Order Experience"
-                : item.labelKey === "ops.nav.menuPlanning"
-                  ? "Menu Experience"
-                  : item.labelKey === "ops.nav.orderWorkspace"
-                    ? "Order Workspace"
-                    : item.labelKey === "ops.nav.productionWorkspace"
-                      ? "Production Workspace"
-                      : item.labelKey === "ops.nav.kitchenWorkspace"
-                        ? "Kitchen Workspace"
-                        : item.labelKey === "ops.nav.deliveryWorkspace"
-                          ? "Delivery Workspace"
-                          : item.labelKey === "ops.nav.companyClients"
-                            ? "Clientes Empresa"
-                            : item.labelKey === "commercial"
-                              ? "Dashboard Comercial"
-                              : item.labelKey === "users"
-                                ? "Usuarios"
-                                : item.labelKey === "branding"
-                                  ? "Branding"
-                                  : item.labelKey === "audit"
-                                    ? "Auditoría"
-                                    : item.labelKey === "support"
-                                      ? "Atención al Cliente"
-                                      : undefined,
+    const label = t(`admin:ops.nav.${item.labelKey}` as any, {
+      defaultValue: t(`admin:${item.labelKey}` as any, {
+        defaultValue:
+          item.labelKey === "ops.nav.kitchen" || item.labelKey === "ops.nav.kitchenWorkspace"
+            ? "Cocina"
+            : item.labelKey === "ops.nav.delivery" || item.labelKey === "ops.nav.deliveryWorkspace"
+              ? "Reparto"
+              : item.labelKey === "ops.nav.customerWorkspace" || item.labelKey === "ops.nav.customers"
+                ? "Clientes"
+                : item.labelKey === "ops.nav.orderCapture"
+                  ? "Toma de pedidos"
+                  : item.labelKey === "ops.nav.menuPlanning"
+                    ? "Menús"
+                    : item.labelKey === "ops.nav.orderWorkspace" || item.labelKey === "ops.nav.orders"
+                      ? "Pedidos"
+                      : item.labelKey === "ops.nav.productionWorkspace"
+                        ? "Producción"
+                        : item.labelKey === "ops.nav.companyClients"
+                          ? "Empresas"
+                          : item.labelKey === "commercial"
+                            ? "Resumen comercial"
+                            : item.labelKey === "users"
+                              ? "Usuarios"
+                              : item.labelKey === "branding"
+                                ? "Marca"
+                                : item.labelKey === "audit"
+                                  ? "Auditoría"
+                                  : item.labelKey === "support"
+                                    ? "Atención al cliente"
+                                    : undefined,
+      }),
     });
     return (
       <Link

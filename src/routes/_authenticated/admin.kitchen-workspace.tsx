@@ -231,11 +231,11 @@ function KitchenWorkspaceDemoPage() {
   const units = context?.queue.units ?? [];
 
   return (
-    <div className="animate-fade-in max-w-5xl">
+    <div className="animate-fade-in max-w-5xl space-y-6">
       <SectionTitle
-        overline="Operational Experience · Final Isolated Capability Demo"
-        title="Kitchen Workspace"
-        subtitle="Demuestra LAW 003–006-A: la pantalla orquesta; KitchenExecutionFacade posee la ejecución. No es el módulo Kitchen definitivo. No es Delivery. Último demo aislado antes de Operational Flow Validation."
+        overline="Operaciones"
+        title="Ejecución de Cocina"
+        subtitle="Gestión de unidades de preparación y cola de cocinado."
       />
 
       <AdminHeader

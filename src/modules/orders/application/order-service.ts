@@ -123,7 +123,7 @@ export const OrderService = {
       const slots = await menuRepo.listSlotsWithDishes(menu.id);
       const offeredByDay = new Map<string, Set<string>>();
       for (const s of slots) {
-        if (!s.dishes || s.dishes.deleted_at) continue;
+        if (!s.day_date || !s.dishes || s.dishes.deleted_at) continue;
         const set = offeredByDay.get(s.day_date) ?? new Set<string>();
         set.add(s.dish_id);
         offeredByDay.set(s.day_date, set);

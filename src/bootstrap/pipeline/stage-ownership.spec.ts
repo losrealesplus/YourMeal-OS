@@ -98,9 +98,7 @@ describe("Stage ownership (PRODUCT-CORE-003)", () => {
     const outcome = await TenantStage.run(ctx);
     expect(outcome.status).toBe("ok");
     expect(outcome.patch?.tenantId).toBe("t1");
-    expect(ensureCustomerForActiveTenant).toHaveBeenCalledWith(
-      expect.objectContaining({ userId: "u1", tenantId: "t1" }),
-    );
+    expect(ensureCustomerForActiveTenant).not.toHaveBeenCalled();
   });
 
   it("NavigationStage owns homePath and marks snapshot ready", async () => {

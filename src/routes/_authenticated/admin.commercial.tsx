@@ -77,7 +77,7 @@ function AdminCommercialPage() {
     <div className="animate-fade-in">
       <SectionTitle
         overline="Administración"
-        title="Dashboard Comercial"
+        title="Resumen comercial"
         subtitle="Cada métrica responde una pregunta y sugiere una acción. Datos reales del tenant."
       />
       <AdminHeader

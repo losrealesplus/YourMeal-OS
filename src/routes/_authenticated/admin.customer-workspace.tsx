@@ -1,6 +1,6 @@
 /**
  * CUSTOMER WORKSPACE · Hub Canónico del Cliente (A2-C)
- * CUSTOMER EXPERIENCE 005 · Phase 005
+ * CUSTOMER EXPERIENCE 005 · Phase 005 · Zero Friction Customer Growth
  * One Customer · One Profile · Multiple Contexts
  *
  * Adheres strictly to Foundation Law 003 (UI consumes useCustomer/useOrder Facades only).
@@ -389,9 +389,9 @@ function CustomerWorkspacePage() {
   return (
     <div className="animate-fade-in space-y-6">
       <SectionTitle
-        overline="Customer Domain · Zero Friction Customer Growth"
-        title="Customer Workspace"
-        subtitle="Hub canónico del cliente: perfil unificado, empresa B2B, pedidos e incidencias de soporte."
+        overline="Clientes"
+        title="Gestión de Clientes"
+        subtitle="Perfil unificado, empresa B2B, pedidos e incidencias de soporte."
       />
 
       <AdminHeader

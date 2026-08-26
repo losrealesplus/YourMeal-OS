@@ -10,7 +10,32 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.17"
+  }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
   public: {
     Tables: {
@@ -64,28 +89,52 @@ export type Database = {
       companies: {
         Row: {
           billing_rule: Database["public"]["Enums"]["pay_mode"]
+          commercial_terms: string | null
+          company_code: string
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
           created_at: string
           deleted_at: string | null
+          fiscal_address: string | null
           id: string
+          internal_location_label: string
           name: string
+          org_unit_label: string
           tenant_id: string
           vat_id: string | null
         }
         Insert: {
           billing_rule?: Database["public"]["Enums"]["pay_mode"]
+          commercial_terms?: string | null
+          company_code: string
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
           created_at?: string
           deleted_at?: string | null
+          fiscal_address?: string | null
           id?: string
+          internal_location_label?: string
           name: string
+          org_unit_label?: string
           tenant_id: string
           vat_id?: string | null
         }
         Update: {
           billing_rule?: Database["public"]["Enums"]["pay_mode"]
+          commercial_terms?: string | null
+          company_code?: string
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
           created_at?: string
           deleted_at?: string | null
+          fiscal_address?: string | null
           id?: string
+          internal_location_label?: string
           name?: string
+          org_unit_label?: string
           tenant_id?: string
           vat_id?: string | null
         }
@@ -102,20 +151,29 @@ export type Database = {
       company_departments: {
         Row: {
           company_location_id: string
+          deleted_at: string | null
           id: string
+          is_active: boolean
           name: string
+          sort_order: number
           tenant_id: string
         }
         Insert: {
           company_location_id: string
+          deleted_at?: string | null
           id?: string
+          is_active?: boolean
           name: string
+          sort_order?: number
           tenant_id: string
         }
         Update: {
           company_location_id?: string
+          deleted_at?: string | null
           id?: string
+          is_active?: boolean
           name?: string
+          sort_order?: number
           tenant_id?: string
         }
         Relationships: [
@@ -139,25 +197,43 @@ export type Database = {
         Row: {
           company_id: string
           customer_id: string
+          deleted_at: string | null
           department_id: string | null
           id: string
+          internal_location: string | null
+          is_admin: boolean
+          joined_at: string
+          location_id: string | null
           pay_mode: Database["public"]["Enums"]["pay_mode"]
+          status: string
           tenant_id: string
         }
         Insert: {
           company_id: string
           customer_id: string
+          deleted_at?: string | null
           department_id?: string | null
           id?: string
+          internal_location?: string | null
+          is_admin?: boolean
+          joined_at?: string
+          location_id?: string | null
           pay_mode?: Database["public"]["Enums"]["pay_mode"]
+          status?: string
           tenant_id: string
         }
         Update: {
           company_id?: string
           customer_id?: string
+          deleted_at?: string | null
           department_id?: string | null
           id?: string
+          internal_location?: string | null
+          is_admin?: boolean
+          joined_at?: string
+          location_id?: string | null
           pay_mode?: Database["public"]["Enums"]["pay_mode"]
+          status?: string
           tenant_id?: string
         }
         Relationships: [
@@ -183,6 +259,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "company_employees_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "company_locations"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "company_employees_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
@@ -194,24 +277,36 @@ export type Database = {
       company_locations: {
         Row: {
           address: string | null
+          city: string | null
           company_id: string
+          deleted_at: string | null
           id: string
+          is_active: boolean
           name: string
           tenant_id: string
+          zip: string | null
         }
         Insert: {
           address?: string | null
+          city?: string | null
           company_id: string
+          deleted_at?: string | null
           id?: string
+          is_active?: boolean
           name: string
           tenant_id: string
+          zip?: string | null
         }
         Update: {
           address?: string | null
+          city?: string | null
           company_id?: string
+          deleted_at?: string | null
           id?: string
+          is_active?: boolean
           name?: string
           tenant_id?: string
+          zip?: string | null
         }
         Relationships: [
           {
@@ -326,9 +421,59 @@ export type Database = {
           },
         ]
       }
+      customer_dish_favorites: {
+        Row: {
+          created_at: string
+          customer_id: string
+          deleted_at: string | null
+          dish_id: string
+          id: string
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          deleted_at?: string | null
+          dish_id: string
+          id?: string
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          deleted_at?: string | null
+          dish_id?: string
+          id?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_dish_favorites_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_dish_favorites_dish_id_fkey"
+            columns: ["dish_id"]
+            isOneToOne: false
+            referencedRelation: "dishes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_dish_favorites_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_phones: {
         Row: {
           customer_id: string
+          deleted_at: string | null
           id: string
           is_primary: boolean
           phone: string
@@ -336,6 +481,7 @@ export type Database = {
         }
         Insert: {
           customer_id: string
+          deleted_at?: string | null
           id?: string
           is_primary?: boolean
           phone: string
@@ -343,6 +489,7 @@ export type Database = {
         }
         Update: {
           customer_id?: string
+          deleted_at?: string | null
           id?: string
           is_primary?: boolean
           phone?: string
@@ -438,6 +585,68 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "customers_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      delivery_groups: {
+        Row: {
+          company_id: string
+          created_at: string
+          deleted_at: string | null
+          id: string
+          name: string
+          organizational_unit_id: string
+          site_id: string
+          tenant_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          name: string
+          organizational_unit_id: string
+          site_id: string
+          tenant_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          name?: string
+          organizational_unit_id?: string
+          site_id?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_groups_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_groups_organizational_unit_id_fkey"
+            columns: ["organizational_unit_id"]
+            isOneToOne: false
+            referencedRelation: "company_departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_groups_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "company_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_groups_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -675,6 +884,41 @@ export type Database = {
           },
         ]
       }
+      financial_period_closures: {
+        Row: {
+          billing_period: string
+          closed_at: string
+          closed_by: string | null
+          invoice_count: number
+          paid_amount: number
+          tenant_id: string
+        }
+        Insert: {
+          billing_period: string
+          closed_at?: string
+          closed_by?: string | null
+          invoice_count?: number
+          paid_amount?: number
+          tenant_id: string
+        }
+        Update: {
+          billing_period?: string
+          closed_at?: string
+          closed_by?: string | null
+          invoice_count?: number
+          paid_amount?: number
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_period_closures_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       identity_events: {
         Row: {
           event_type: Database["public"]["Enums"]["identity_event_type"]
@@ -720,6 +964,8 @@ export type Database = {
         Row: {
           allergens: string[]
           cost: number
+          deleted_at: string | null
+          deleted_by: string | null
           expiration: string | null
           id: string
           min_stock: number
@@ -732,6 +978,8 @@ export type Database = {
         Insert: {
           allergens?: string[]
           cost?: number
+          deleted_at?: string | null
+          deleted_by?: string | null
           expiration?: string | null
           id?: string
           min_stock?: number
@@ -744,6 +992,8 @@ export type Database = {
         Update: {
           allergens?: string[]
           cost?: number
+          deleted_at?: string | null
+          deleted_by?: string | null
           expiration?: string | null
           id?: string
           min_stock?: number
@@ -770,6 +1020,49 @@ export type Database = {
           },
         ]
       }
+      invoice_orders: {
+        Row: {
+          created_at: string
+          invoice_id: string
+          order_id: string
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          invoice_id: string
+          order_id: string
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          invoice_id?: string
+          order_id?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_orders_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_orders_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_orders_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoices: {
         Row: {
           amount: number
@@ -777,8 +1070,10 @@ export type Database = {
           company_id: string | null
           created_at: string
           customer_id: string | null
+          deleted_at: string | null
           id: string
           pdf_url: string | null
+          reviewed_at: string | null
           status: Database["public"]["Enums"]["invoice_status"]
           tenant_id: string
         }
@@ -788,8 +1083,10 @@ export type Database = {
           company_id?: string | null
           created_at?: string
           customer_id?: string | null
+          deleted_at?: string | null
           id?: string
           pdf_url?: string | null
+          reviewed_at?: string | null
           status?: Database["public"]["Enums"]["invoice_status"]
           tenant_id: string
         }
@@ -799,8 +1096,10 @@ export type Database = {
           company_id?: string | null
           created_at?: string
           customer_id?: string | null
+          deleted_at?: string | null
           id?: string
           pdf_url?: string | null
+          reviewed_at?: string | null
           status?: Database["public"]["Enums"]["invoice_status"]
           tenant_id?: string
         }
@@ -821,6 +1120,170 @@ export type Database = {
           },
           {
             foreignKeyName: "invoices_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kitchen_production_batches: {
+        Row: {
+          created_at: string
+          delivery_date: string
+          dish_id: string
+          finished_at: string | null
+          id: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["kitchen_batch_status"]
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          delivery_date: string
+          dish_id: string
+          finished_at?: string | null
+          id?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["kitchen_batch_status"]
+          tenant_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          delivery_date?: string
+          dish_id?: string
+          finished_at?: string | null
+          id?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["kitchen_batch_status"]
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kitchen_production_batches_dish_id_fkey"
+            columns: ["dish_id"]
+            isOneToOne: false
+            referencedRelation: "dishes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kitchen_production_batches_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      operational_exceptions: {
+        Row: {
+          acknowledged_at: string | null
+          closed_at: string | null
+          company_id: string | null
+          created_at: string
+          created_by: string
+          customer_id: string | null
+          detected_at: string
+          id: string
+          order_id: string | null
+          owner_user_id: string | null
+          resolution_notes: string | null
+          resolution_payload: Json | null
+          resolution_type: string | null
+          resolved_at: string | null
+          severity: string
+          source_domain: string
+          source_entity_id: string
+          source_entity_type: string
+          status: string
+          tenant_id: string
+          type: string
+          updated_at: string
+          updated_by: string
+          version: number
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          closed_at?: string | null
+          company_id?: string | null
+          created_at?: string
+          created_by: string
+          customer_id?: string | null
+          detected_at?: string
+          id?: string
+          order_id?: string | null
+          owner_user_id?: string | null
+          resolution_notes?: string | null
+          resolution_payload?: Json | null
+          resolution_type?: string | null
+          resolved_at?: string | null
+          severity?: string
+          source_domain: string
+          source_entity_id: string
+          source_entity_type: string
+          status?: string
+          tenant_id: string
+          type: string
+          updated_at?: string
+          updated_by: string
+          version?: number
+        }
+        Update: {
+          acknowledged_at?: string | null
+          closed_at?: string | null
+          company_id?: string | null
+          created_at?: string
+          created_by?: string
+          customer_id?: string | null
+          detected_at?: string
+          id?: string
+          order_id?: string | null
+          owner_user_id?: string | null
+          resolution_notes?: string | null
+          resolution_payload?: Json | null
+          resolution_type?: string | null
+          resolved_at?: string | null
+          severity?: string
+          source_domain?: string
+          source_entity_id?: string
+          source_entity_type?: string
+          status?: string
+          tenant_id?: string
+          type?: string
+          updated_at?: string
+          updated_by?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operational_exceptions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operational_exceptions_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operational_exceptions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operational_exceptions_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -890,8 +1353,12 @@ export type Database = {
           customer_id: string
           deleted_at: string | null
           delivery_address_id: string | null
+          delivery_group_id: string | null
+          demand_channel: Database["public"]["Enums"]["demand_channel"]
           id: string
           notes: string | null
+          organizational_unit_id: string | null
+          site_id: string | null
           status: Database["public"]["Enums"]["order_status"]
           tenant_id: string
           total: number
@@ -903,8 +1370,12 @@ export type Database = {
           customer_id: string
           deleted_at?: string | null
           delivery_address_id?: string | null
+          delivery_group_id?: string | null
+          demand_channel?: Database["public"]["Enums"]["demand_channel"]
           id?: string
           notes?: string | null
+          organizational_unit_id?: string | null
+          site_id?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           tenant_id: string
           total?: number
@@ -916,8 +1387,12 @@ export type Database = {
           customer_id?: string
           deleted_at?: string | null
           delivery_address_id?: string | null
+          delivery_group_id?: string | null
+          demand_channel?: Database["public"]["Enums"]["demand_channel"]
           id?: string
           notes?: string | null
+          organizational_unit_id?: string | null
+          site_id?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           tenant_id?: string
           total?: number
@@ -946,6 +1421,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "orders_delivery_group_id_fkey"
+            columns: ["delivery_group_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_organizational_unit_id_fkey"
+            columns: ["organizational_unit_id"]
+            isOneToOne: false
+            referencedRelation: "company_departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "company_locations"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "orders_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
@@ -957,6 +1453,7 @@ export type Database = {
       payments: {
         Row: {
           amount: number
+          deleted_at: string | null
           id: string
           invoice_id: string
           method: string | null
@@ -966,6 +1463,7 @@ export type Database = {
         }
         Insert: {
           amount: number
+          deleted_at?: string | null
           id?: string
           invoice_id: string
           method?: string | null
@@ -975,6 +1473,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          deleted_at?: string | null
           id?: string
           invoice_id?: string
           method?: string | null
@@ -998,6 +1497,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      platform_owners: {
+        Row: {
+          active: boolean
+          created_at: string
+          email: string
+          full_name: string | null
+          tenant_slug: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          email: string
+          full_name?: string | null
+          tenant_slug?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          tenant_slug?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -1069,6 +1595,7 @@ export type Database = {
         Row: {
           body: string | null
           created_at: string
+          deleted_at: string | null
           ends_at: string | null
           id: string
           image_url: string | null
@@ -1080,6 +1607,7 @@ export type Database = {
         Insert: {
           body?: string | null
           created_at?: string
+          deleted_at?: string | null
           ends_at?: string | null
           id?: string
           image_url?: string | null
@@ -1091,6 +1619,7 @@ export type Database = {
         Update: {
           body?: string | null
           created_at?: string
+          deleted_at?: string | null
           ends_at?: string | null
           id?: string
           image_url?: string | null
@@ -1111,6 +1640,7 @@ export type Database = {
       }
       route_stops: {
         Row: {
+          deleted_at: string | null
           delivered_at: string | null
           eta: string | null
           id: string
@@ -1122,6 +1652,7 @@ export type Database = {
           tenant_id: string
         }
         Insert: {
+          deleted_at?: string | null
           delivered_at?: string | null
           eta?: string | null
           id?: string
@@ -1133,6 +1664,7 @@ export type Database = {
           tenant_id: string
         }
         Update: {
+          deleted_at?: string | null
           delivered_at?: string | null
           eta?: string | null
           id?: string
@@ -1170,6 +1702,7 @@ export type Database = {
       routes: {
         Row: {
           created_at: string
+          deleted_at: string | null
           delivery_date: string
           driver_id: string | null
           id: string
@@ -1178,6 +1711,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          deleted_at?: string | null
           delivery_date: string
           driver_id?: string | null
           id?: string
@@ -1186,6 +1720,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          deleted_at?: string | null
           delivery_date?: string
           driver_id?: string | null
           id?: string
@@ -1205,18 +1740,24 @@ export type Database = {
       suppliers: {
         Row: {
           contact: Json
+          deleted_at: string | null
+          deleted_by: string | null
           id: string
           name: string
           tenant_id: string
         }
         Insert: {
           contact?: Json
+          deleted_at?: string | null
+          deleted_by?: string | null
           id?: string
           name: string
           tenant_id: string
         }
         Update: {
           contact?: Json
+          deleted_at?: string | null
+          deleted_by?: string | null
           id?: string
           name?: string
           tenant_id?: string
@@ -1290,33 +1831,33 @@ export type Database = {
       }
       tenant_deployments: {
         Row: {
+          created_at: string
           id: string
-          tenant_id: string
-          platform: string
           identifier: string
           is_primary: boolean
+          platform: string
           status: string
-          created_at: string
+          tenant_id: string
           updated_at: string
         }
         Insert: {
+          created_at?: string
           id?: string
-          tenant_id: string
-          platform: string
           identifier: string
           is_primary?: boolean
+          platform: string
           status?: string
-          created_at?: string
+          tenant_id: string
           updated_at?: string
         }
         Update: {
+          created_at?: string
           id?: string
-          tenant_id?: string
-          platform?: string
           identifier?: string
           is_primary?: boolean
+          platform?: string
           status?: string
-          created_at?: string
+          tenant_id?: string
           updated_at?: string
         }
         Relationships: [
@@ -1624,7 +2165,8 @@ export type Database = {
       }
       weekly_menu_slots: {
         Row: {
-          day_date: string
+          day_date: string | null
+          day_of_week: number | null
           dish_id: string
           id: string
           sort_order: number
@@ -1632,7 +2174,8 @@ export type Database = {
           weekly_menu_id: string
         }
         Insert: {
-          day_date: string
+          day_date?: string | null
+          day_of_week?: number | null
           dish_id: string
           id?: string
           sort_order?: number
@@ -1640,7 +2183,8 @@ export type Database = {
           weekly_menu_id: string
         }
         Update: {
-          day_date?: string
+          day_date?: string | null
+          day_of_week?: number | null
           dish_id?: string
           id?: string
           sort_order?: number
@@ -1673,25 +2217,40 @@ export type Database = {
       }
       weekly_menus: {
         Row: {
+          customer_go_live_date: string | null
+          deleted_at: string | null
           id: string
+          internal_go_live_date: string | null
+          menu_type: string
           published_at: string | null
+          relative_week: number | null
           status: string
           tenant_id: string
-          week_start: string
+          week_start: string | null
         }
         Insert: {
+          customer_go_live_date?: string | null
+          deleted_at?: string | null
           id?: string
+          internal_go_live_date?: string | null
+          menu_type?: string
           published_at?: string | null
+          relative_week?: number | null
           status?: string
           tenant_id: string
-          week_start: string
+          week_start?: string | null
         }
         Update: {
+          customer_go_live_date?: string | null
+          deleted_at?: string | null
           id?: string
+          internal_go_live_date?: string | null
+          menu_type?: string
           published_at?: string | null
+          relative_week?: number | null
           status?: string
           tenant_id?: string
-          week_start?: string
+          week_start?: string | null
         }
         Relationships: [
           {
@@ -1719,15 +2278,16 @@ export type Database = {
         }
         Returns: string
       }
-      generate_tenant_join_code: {
-        Args: { p_tenant_id: string }
-        Returns: string
-      }
       ensure_platform_owner_for_user: {
         Args: { _user_id: string }
         Returns: Json
       }
       ensure_platform_owner_session: { Args: never; Returns: Json }
+      generate_company_code: { Args: { p_tenant_id: string }; Returns: string }
+      generate_tenant_join_code: {
+        Args: { p_tenant_id: string }
+        Returns: string
+      }
       has_any_staff_role: {
         Args: { _tenant_id: string; _user_id: string }
         Returns: boolean
@@ -1744,6 +2304,42 @@ export type Database = {
       is_platform_owner_email: { Args: { _email: string }; Returns: boolean }
       is_saas_admin: { Args: { _user_id: string }; Returns: boolean }
       is_tenant_member: { Args: { _tenant_id: string }; Returns: boolean }
+      program_draft_order:
+        | {
+            Args: {
+              _customer_id: string
+              _items: Json
+              _notes: string
+              _tenant_id: string
+              _total: number
+              _week_start: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              _company_id?: string
+              _customer_id: string
+              _delivery_group_id?: string
+              _demand_channel?: Database["public"]["Enums"]["demand_channel"]
+              _items: Json
+              _notes: string
+              _organizational_unit_id?: string
+              _site_id?: string
+              _tenant_id: string
+              _total: number
+              _week_start: string
+            }
+            Returns: Json
+          }
+      request_tenant_association_by_join_code: {
+        Args: { p_code: string }
+        Returns: Json
+      }
+      request_tenant_association_for_deployment: {
+        Args: { p_identifier: string; p_platform: string }
+        Returns: Json
+      }
       resolve_delivery_group: {
         Args: {
           p_company_id: string
@@ -1753,34 +2349,63 @@ export type Database = {
         }
         Returns: string
       }
-      resolve_tenant_join_code: {
-        Args: { p_code: string }
+      resolve_tenant_join_code: { Args: { p_code: string }; Returns: Json }
+      revoke_platform_owner_for_email: {
+        Args: { _email: string }
         Returns: Json
       }
-      request_tenant_association_by_join_code: {
-        Args: { p_code: string }
-        Returns: Json
-      }
-      request_tenant_association_for_deployment: {
-        Args: { p_platform: string; p_identifier: string }
-        Returns: Json
+      transition_order_status: {
+        Args: {
+          p_order_id: string
+          p_tenant_id: string
+          p_to_status: Database["public"]["Enums"]["order_status"]
+        }
+        Returns: {
+          company_id: string | null
+          created_at: string
+          customer_id: string
+          deleted_at: string | null
+          delivery_address_id: string | null
+          delivery_group_id: string | null
+          demand_channel: Database["public"]["Enums"]["demand_channel"]
+          id: string
+          notes: string | null
+          organizational_unit_id: string | null
+          site_id: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          tenant_id: string
+          total: number
+          week_start: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       upsert_tenant_deployment: {
         Args: {
-          p_tenant_id: string
-          p_platform: string
           p_identifier: string
           p_is_primary?: boolean
+          p_platform: string
+          p_tenant_id: string
         }
         Returns: {
+          created_at: string
           id: string
-          tenant_id: string
-          platform: string
           identifier: string
           is_primary: boolean
+          platform: string
           status: string
-          created_at: string
+          tenant_id: string
           updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "tenant_deployments"
+          isOneToOne: true
+          isSetofReturn: false
         }
       }
     }
@@ -1801,6 +2426,7 @@ export type Database = {
         | "operations_manager"
         | "delivery"
       customer_kind: "individual" | "company_employee"
+      demand_channel: "individual" | "company"
       dish_status: "draft" | "active" | "archived" | "inactive"
       identity_event_type:
         | "USER_REGISTERED"
@@ -1833,6 +2459,7 @@ export type Database = {
         | "revoked"
         | "cancelled"
       invoice_status: "pending" | "paid" | "overdue" | "void"
+      kitchen_batch_status: "pending" | "preparing" | "plating" | "finished"
       membership_status:
         | "pending"
         | "approved"
@@ -1992,6 +2619,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       app_role: [
@@ -2011,6 +2641,7 @@ export const Constants = {
         "delivery",
       ],
       customer_kind: ["individual", "company_employee"],
+      demand_channel: ["individual", "company"],
       dish_status: ["draft", "active", "archived", "inactive"],
       identity_event_type: [
         "USER_REGISTERED",
@@ -2045,6 +2676,7 @@ export const Constants = {
         "cancelled",
       ],
       invoice_status: ["pending", "paid", "overdue", "void"],
+      kitchen_batch_status: ["pending", "preparing", "plating", "finished"],
       membership_status: [
         "pending",
         "approved",

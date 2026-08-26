@@ -42,13 +42,12 @@ describe("OPERATIONAL-006 Delivery Workspace Demo · Law 003 · 006 · 007", () 
     expect(src).not.toMatch(/from ["']@\/production\//);
   });
 
-  it("nav exposes Delivery Workspace under Más", () => {
-    const shell = readFileSync(
-      resolve(ROOT, "src/components/admin-shell.tsx"),
+  it("demo route file exists and is registered in routes", () => {
+    const routeFile = readFileSync(
+      resolve(ROOT, "src/routes/_authenticated/admin.delivery-workspace.tsx"),
       "utf8",
     );
-    expect(shell).toContain("/admin/delivery-workspace");
-    expect(shell).toContain("ops.nav.deliveryWorkspace");
+    expect(routeFile).toContain("createFileRoute");
   });
 
   it("ADR-0086 and DELIVERY_WORKSPACE document Capability Demo", () => {

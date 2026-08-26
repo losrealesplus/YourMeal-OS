@@ -1,5 +1,10 @@
 /**
- * DELIVERY EXPERIENCE 001–006
+ * DELIVERY EXPERIENCE 001 · Zero Friction Delivery Day
+ * DELIVERY EXPERIENCE 002 · Zero Friction Delivery Search
+ * DELIVERY EXPERIENCE 003 · Zero Friction Delivery Adaptation
+ * DELIVERY EXPERIENCE 004 · Zero Friction Delivery Responsibility
+ * DELIVERY EXPERIENCE 005 · Zero Friction Route Preparation
+ * DELIVERY EXPERIENCE 006 · Zero Friction Delivery Completion
  * Day · Search · Adaptation · Responsibility · Route Preparation · Completion
  *
  * Experience only — no Capability invent · Route Preparation ≠ Optimization ·
@@ -95,52 +100,46 @@ function DeliveryTodayExperiencePage() {
     { overline: string; title: string; subtitle: string; kpi: string; goal: string }
   > = {
     today: {
-      overline: "DELIVERY EXPERIENCE 001 · Today's Delivery Day",
-      title: "Zero Friction Delivery Day",
-      subtitle:
-        "Prepara y entiende la jornada antes de que el conductor salga — sin mapas",
+      overline: "Operaciones · Reparto",
+      title: "Jornada de Reparto de Hoy",
+      subtitle: "Organización y control de las entregas del día.",
       kpi: "TTUDD < 2 min",
-      goal: "Entender la jornada de entregas de hoy en <2 min · siguiente entrega <10s",
+      goal: "Organización y seguimiento de las entregas de hoy.",
     },
     search: {
-      overline: "DELIVERY EXPERIENCE 002 · Delivery Search",
-      title: "Zero Friction Delivery Search",
-      subtitle:
-        "Encuentra una entrega en la jornada sin salir del contexto operativo",
+      overline: "Operaciones · Reparto",
+      title: "Búsqueda de Entregas",
+      subtitle: "Encuentra entregas de la jornada rápidamente.",
       kpi: "TTFD < 10 s",
-      goal: "Encontrar la entrega correcta en <10s sin reconstruir Customer/Order",
+      goal: "Búsqueda ágil de entregas en la jornada.",
     },
     adapt: {
-      overline: "DELIVERY EXPERIENCE 003 · Delivery Adaptation",
-      title: "Zero Friction Delivery Adaptation",
-      subtitle:
-        "Adapta el día cuando cambia la realidad — sin reescribir Order ni inventar rutas",
+      overline: "Operaciones · Reparto",
+      title: "Adaptación de Entregas",
+      subtitle: "Ajustes y cambios sobre la jornada de reparto.",
       kpi: "TTAD < 30 s",
-      goal: "Adaptar en <30s · volver a la jornada en <5s · Order intacto",
+      goal: "Adaptar incidencias de entrega sin alterar pedidos.",
     },
     responsibility: {
-      overline: "DELIVERY EXPERIENCE 004 · Delivery Responsibility",
-      title: "Zero Friction Delivery Responsibility",
-      subtitle:
-        "Quién es responsable · qué falta · sin simular AssignDelivery",
+      overline: "Operaciones · Reparto",
+      title: "Responsabilidad de Reparto",
+      subtitle: "Asignación y estado de conductores y rutas.",
       kpi: "TTDR < 10 s",
-      goal: "Entender responsabilidad en <10s · identificar unassigned / unavailable en <10s",
+      goal: "Revisión de asignaciones de reparto.",
     },
     route: {
-      overline: "DELIVERY EXPERIENCE 005 · Route Preparation",
-      title: "Zero Friction Route Preparation",
-      subtitle:
-        "Convierte entregas preparadas en secuencia ejecutable — no optimización · no mapas",
+      overline: "Operaciones · Reparto",
+      title: "Preparación de Rutas",
+      subtitle: "Secuencia y preparación de paradas de entrega.",
       kpi: "TPDD < 5 min",
-      goal: "Preparar jornada en <5 min · entender secuencia en <10s · Observation valida el KPI",
+      goal: "Preparación y orden de paradas para reparto.",
     },
     completion: {
-      overline: "DELIVERY EXPERIENCE 006 · Delivery Completion",
-      title: "Zero Friction Delivery Completion",
-      subtitle:
-        "Qué se entregó · qué queda · qué falla · siguiente responsabilidad — sin POD/Billing invent",
+      overline: "Operaciones · Reparto",
+      title: "Cierre de Reparto",
+      subtitle: "Resumen de entregas completadas e incidencias.",
       kpi: "TTDO < 5 s",
-      goal: "Entender outcome en <5s · preparar siguiente acción en <10s",
+      goal: "Cierre y balance de la jornada de reparto.",
     },
   };
 
@@ -155,9 +154,7 @@ function DeliveryTodayExperiencePage() {
       />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        <StatusChip tone="warning" label={m.kpi} />
-        <StatusChip tone="info" label="Kitchen → Delivery" />
-        <StatusChip tone="info" label="Experience only" />
+        <StatusChip tone="info" label="Cocina → Reparto" />
         <button
           type="button"
           className="text-xs underline-offset-2 hover:underline"

@@ -64,44 +64,44 @@ function dish(id: string, status: DishRow["status"] = "active"): DishRow {
   };
 }
 
+function mockMenu(overrides: Partial<WeeklyMenuRow> = {}): WeeklyMenuRow {
+  return {
+    id: "m1",
+    tenant_id: "t1",
+    week_start: "2026-07-20",
+    status: "published",
+    published_at: "2026-07-19T00:00:00Z",
+    deleted_at: null,
+    relative_week: null,
+    menu_type: "scheduled",
+    internal_go_live_date: null,
+    customer_go_live_date: null,
+    ...overrides,
+  };
+}
+
+function mockSlot(overrides: Partial<WeeklyMenuSlotWithDish> = {}): WeeklyMenuSlotWithDish {
+  return {
+    id: "s1",
+    tenant_id: "t1",
+    weekly_menu_id: "m1",
+    day_date: "2026-07-20",
+    day_of_week: null,
+    dish_id: "d1",
+    sort_order: 0,
+    dishes: dish("d1"),
+    ...overrides,
+  };
+}
+
 describe("mapWeeklyMenuToView", () => {
   it("groups active dishes by day_date and fills empty days", () => {
-    const menu = {
-      id: "m1",
-      tenant_id: "t1",
-      week_start: "2026-07-20",
-      status: "published",
-      published_at: "2026-07-19T00:00:00Z",
-    } satisfies WeeklyMenuRow;
+    const menu = mockMenu();
 
     const slots: WeeklyMenuSlotWithDish[] = [
-      {
-        id: "s1",
-        tenant_id: "t1",
-        weekly_menu_id: "m1",
-        day_date: "2026-07-20",
-        dish_id: "d1",
-        sort_order: 0,
-        dishes: dish("d1"),
-      },
-      {
-        id: "s2",
-        tenant_id: "t1",
-        weekly_menu_id: "m1",
-        day_date: "2026-07-20",
-        dish_id: "d2",
-        sort_order: 1,
-        dishes: dish("d2", "draft"),
-      },
-      {
-        id: "s3",
-        tenant_id: "t1",
-        weekly_menu_id: "m1",
-        day_date: "2026-07-22",
-        dish_id: "d3",
-        sort_order: 0,
-        dishes: dish("d3"),
-      },
+      mockSlot({ id: "s1", day_date: "2026-07-20", dish_id: "d1", sort_order: 0, dishes: dish("d1") }),
+      mockSlot({ id: "s2", day_date: "2026-07-20", dish_id: "d2", sort_order: 1, dishes: dish("d2", "draft") }),
+      mockSlot({ id: "s3", day_date: "2026-07-22", dish_id: "d3", sort_order: 0, dishes: dish("d3") }),
     ];
 
     const view = mapWeeklyMenuToView(menu, slots);
@@ -112,38 +112,60 @@ describe("mapWeeklyMenuToView", () => {
   });
 
   it("T7: out-of-week slot is discarded; in-week slot is visible to Customer", () => {
-    const menu = {
-      id: "m1",
-      tenant_id: "t1",
-      week_start: "2026-08-10",
-      status: "published",
-      published_at: "2026-08-10T13:17:44Z",
-    } satisfies WeeklyMenuRow;
+    const menu = mockMenu({ week_start: "2026-08-10", published_at: "2026-08-10T13:17:44Z" });
 
     const slots: WeeklyMenuSlotWithDish[] = [
-      {
+      mockSlot({
         id: "bad",
-        tenant_id: "t1",
-        weekly_menu_id: "m1",
         day_date: "2026-08-03",
         dish_id: "d-bad",
-        sort_order: 0,
         dishes: dish("d-bad"),
-      },
-      {
+      }),
+      mockSlot({
         id: "ok",
-        tenant_id: "t1",
-        weekly_menu_id: "m1",
         day_date: "2026-08-10",
         dish_id: "d-ok",
-        sort_order: 0,
         dishes: { ...dish("d-ok"), name: "Visible" },
-      },
+      }),
     ];
 
     const view = mapWeeklyMenuToView(menu, slots);
     const allIds = view.days.flatMap((d) => d.dishes.map((x) => x.id));
     expect(allIds).toEqual(["d-ok"]);
     expect(view.days[0]?.dishes[0]?.name).toBe("Visible");
+  });
+
+  it("maps template menus with relative_week and day_of_week", () => {
+    const templateMenu = mockMenu({
+      week_start: null,
+      relative_week: 1,
+      menu_type: "template",
+    });
+
+    const slots: WeeklyMenuSlotWithDish[] = [
+      mockSlot({
+        id: "t1",
+        day_date: null,
+        day_of_week: 1,
+        dish_id: "d1",
+        dishes: dish("d1"),
+      }),
+      mockSlot({
+        id: "t2",
+        day_date: null,
+        day_of_week: 3,
+        dish_id: "d3",
+        dishes: dish("d3"),
+      }),
+    ];
+
+    const view = mapWeeklyMenuToView(templateMenu, slots);
+    expect(view.menuType).toBe("template");
+    expect(view.relativeWeek).toBe(1);
+    expect(view.weekStart).toBeNull();
+    expect(view.days).toHaveLength(5);
+    expect(view.days[0].dishes.map((d) => d.id)).toEqual(["d1"]);
+    expect(view.days[2].dishes.map((d) => d.id)).toEqual(["d3"]);
+    expect(view.days[1].dishes).toEqual([]);
   });
 });

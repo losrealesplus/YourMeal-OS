@@ -150,12 +150,14 @@ function buildHits(
     const publication = planPublication(menu.status);
     const status =
       menu.status === "published" ? "durable_published" : "durable_draft";
+    const weekStartStr = menu.weekStart ?? "template";
+    const menuName = menu.weekStart ? `Menú ${menu.weekStart}` : `Menú Plantilla`;
     hits.push({
       id: `week:durable:${menu.id}`,
       scope: "week",
-      weekStart: menu.weekStart,
+      weekStart: weekStartStr,
       dayDate: null,
-      menuName: `Menú ${menu.weekStart}`,
+      menuName,
       dishLabel: null,
       dishCount: menu.slots.length,
       status,
@@ -169,18 +171,19 @@ function buildHits(
 
     const byDay = new Map<string, DurableMenuSeed["slots"]>();
     for (const s of menu.slots) {
-      const list = byDay.get(s.dayDate) ?? [];
+      const dayKey = s.dayDate ?? "Day";
+      const list = byDay.get(dayKey) ?? [];
       list.push(s);
-      byDay.set(s.dayDate, list);
+      byDay.set(dayKey, list);
     }
     for (const [day, slots] of byDay) {
       const c = completeness(slots);
       hits.push({
         id: `day:durable:${menu.id}:${day}`,
         scope: "day",
-        weekStart: menu.weekStart,
+        weekStart: weekStartStr,
         dayDate: day,
-        menuName: `Menú ${menu.weekStart}`,
+        menuName,
         dishLabel: slots.map((s) => s.dishLabel).slice(0, 3).join(" · "),
         dishCount: slots.length,
         status,
@@ -192,11 +195,11 @@ function buildHits(
       });
       for (const slot of slots) {
         hits.push({
-          id: `dish:durable:${menu.id}:${slot.dayDate}:${slot.dishId}`,
+          id: `dish:durable:${menu.id}:${slot.dayDate ?? day}:${slot.dishId}`,
           scope: "dish",
-          weekStart: menu.weekStart,
-          dayDate: slot.dayDate,
-          menuName: `Menú ${menu.weekStart}`,
+          weekStart: weekStartStr,
+          dayDate: slot.dayDate ?? day,
+          menuName,
           dishLabel: slot.dishLabel,
           dishCount: 1,
           status,

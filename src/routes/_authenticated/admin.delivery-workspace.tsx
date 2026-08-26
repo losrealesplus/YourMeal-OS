@@ -324,11 +324,11 @@ function DeliveryWorkspaceDemoPage() {
     : null;
 
   return (
-    <div className="animate-fade-in max-w-5xl">
+    <div className="animate-fade-in max-w-5xl space-y-6">
       <SectionTitle
-        overline="Operational Experience · Capability Demo"
-        title="Delivery Workspace"
-        subtitle="Demuestra LAW 003 · 006 · 007 y PRODUCT LAW 001: la pantalla orquesta; DeliveryFacade posee la transferencia controlada de responsabilidad. No es el módulo Delivery definitivo. No es GPS. No es Billing."
+        overline="Operaciones"
+        title="Gestión de Reparto"
+        subtitle="Transferencia de pedidos, rutas y paradas de entrega."
       />
 
       <AdminHeader

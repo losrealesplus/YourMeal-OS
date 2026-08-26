@@ -198,6 +198,7 @@ function AdminMenusPage() {
       map.set(day, []);
     }
     for (const slot of slots) {
+      if (!slot.day_date) continue;
       const list = map.get(slot.day_date);
       if (list) {
         list.push(slot);
@@ -225,7 +226,7 @@ function AdminMenusPage() {
       const ctx = await getServiceContext();
       const draft = await WeeklyMenuService.ensureDraft(ctx, selectedWeekStart);
       toast.success(`Borrador creado para la semana ${formatWeekRangeEs(selectedWeekStart)}`);
-      await loadData(draft.week_start);
+      await loadData(draft.week_start ?? selectedWeekStart);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo crear el borrador.");
     } finally {
@@ -283,7 +284,7 @@ function AdminMenusPage() {
       });
       toast.success("Platos de la semana anterior duplicados correctamente");
       setDuplicateConfirmOpen(false);
-      await loadData(duplicated.week_start);
+      await loadData(duplicated.week_start ?? selectedWeekStart);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Error al duplicar la semana.");
     } finally {
@@ -299,7 +300,7 @@ function AdminMenusPage() {
       await WeeklyMenuService.publish(ctx, currentMenu.id);
       toast.success("Menú semanal publicado con éxito — visible para clientes");
       setPublishConfirmOpen(false);
-      await loadData(currentMenu.week_start);
+      await loadData(currentMenu.week_start ?? selectedWeekStart);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Error al publicar el menú.");
     } finally {
@@ -315,7 +316,7 @@ function AdminMenusPage() {
       await WeeklyMenuService.unpublish(ctx, currentMenu.id);
       toast.success("Menú abierto para edición (borrador)");
       setUnpublishConfirmOpen(false);
-      await loadData(currentMenu.week_start);
+      await loadData(currentMenu.week_start ?? selectedWeekStart);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Error al reabrir el menú.");
     } finally {
@@ -331,7 +332,7 @@ function AdminMenusPage() {
       await WeeklyMenuService.archiveMenu(ctx, currentMenu.id);
       toast.success("Menú semanal archivado");
       setArchiveConfirmOpen(false);
-      await loadData(currentMenu.week_start);
+      await loadData(currentMenu.week_start ?? selectedWeekStart);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Error al archivar el menú.");
     } finally {
@@ -761,7 +762,7 @@ function AdminMenusPage() {
                 {deleteConfirmSlot?.dishes?.name ?? "este plato"}
               </strong>{" "}
               de la planificación del{" "}
-              {deleteConfirmSlot ? formatDayDateEs(deleteConfirmSlot.day_date).dayName : ""}. Podrás
+              {deleteConfirmSlot?.day_date ? formatDayDateEs(deleteConfirmSlot.day_date).dayName : "día"}. Podrás
               volver a añadirlo en cualquier momento mientras el menú esté en borrador.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -786,7 +787,7 @@ function AdminMenusPage() {
             <AlertDialogDescription>
               Se copiarán todos los platos de la semana anterior (
               <strong className="text-foreground">
-                {previousWeekMenu ? formatWeekRangeEs(previousWeekMenu.week_start) : ""}
+                {previousWeekMenu?.week_start ? formatWeekRangeEs(previousWeekMenu.week_start) : "semana anterior"}
               </strong>
               ) a la semana actual (
               <strong className="text-foreground">{formatWeekRangeEs(selectedWeekStart)}</strong>)
