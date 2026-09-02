@@ -10,6 +10,7 @@ import { MoneyUtil } from "../domain/money";
 import type {
   AppliedPromotionDetail,
   CommercialOffer,
+  CreatePriceSnapshotOptions,
   CustomerTier,
   ExtraItemEvaluationResult,
   ExtraItemInput,
@@ -26,11 +27,15 @@ export const PRICING_ENGINE_VERSION = "1.0.0";
 export class CommercialPricingEngine {
   /**
    * Evaluates if a customer tier is eligible for a given promotion rule.
+   * - If rule eligibility is 'public', any tier is eligible.
+   * - If rule eligibility is specific (e.g. 'subscriber_weekly'), only that specific tier is eligible.
+   * - If rule eligibility is an array, checks if the customer tier (or 'public') is included.
    */
   static isEligible(customerTier: CustomerTier, ruleEligibility: PromotionRule["eligibility"]): boolean {
     if (ruleEligibility === "public") return true;
     if (Array.isArray(ruleEligibility)) {
-      return ruleEligibility.includes(customerTier) || ruleEligibility.includes("public");
+      if (ruleEligibility.includes("public")) return true;
+      return ruleEligibility.includes(customerTier);
     }
     return ruleEligibility === customerTier;
   }
@@ -85,7 +90,6 @@ export class CommercialPricingEngine {
     // If non-stackable rules exist, we select the one providing the maximum savings.
     // If stackable rules exist, they are applied sequentially to the running amount.
     if (nonStackableRules.length > 0) {
-      // Evaluate all non-stackable rules to find the highest saving
       let bestRule: PromotionRule = nonStackableRules[0];
       let bestDiscountCents = 0;
 
@@ -121,7 +125,7 @@ export class CommercialPricingEngine {
       }
     }
 
-    // Apply any stackable rules on the remaining amount
+    // Apply stackable rules on the remaining amount
     for (const rule of stackableRules) {
       if (runningCents <= 0) break;
 
@@ -182,7 +186,6 @@ export class CommercialPricingEngine {
     let appliedRule: PromotionRule | null = null;
 
     if (eligibleRules.length > 0 && baseUnitCents > 0) {
-      // Find best extra promotion rule
       let bestRule = eligibleRules[0];
       let bestDiscount = 0;
 
@@ -290,39 +293,20 @@ export class CommercialPricingEngine {
 
   /**
    * Creates an immutable Order Price Snapshot from an evaluation result.
-   * Freezes applied discounts, promotional line items, and item-level details.
+   * Freezes applied discounts and explicit line item details without performing arbitrary total division.
    */
   static createSnapshot(
     evalResult: PricingEvaluationResult,
-    options?: {
-      orderId?: string;
-      menuDishes?: Array<{ slotId?: string; dishId: string; dishName: string; unitPriceCents?: number }>;
-    },
+    options?: CreatePriceSnapshotOptions,
   ): OrderPriceSnapshot {
     const items: OrderItemPriceDetail[] = [];
 
-    // 1. Menu dishes (if provided)
-    if (options?.menuDishes && options.menuDishes.length > 0) {
-      const dishCount = options.menuDishes.length;
-      const unitBase = Math.round(evalResult.basePrice.cents / dishCount);
-      const unitFinal = Math.round(evalResult.finalPrice.cents / dishCount);
-      const unitDiscount = Math.max(0, unitBase - unitFinal);
-
-      for (const dish of options.menuDishes) {
-        items.push({
-          slotId: dish.slotId,
-          dishId: dish.dishId,
-          dishName: dish.dishName,
-          itemType: "menu_dish",
-          qty: 1,
-          basePriceCents: dish.unitPriceCents ?? unitBase,
-          finalPriceCents: unitFinal,
-          discountCents: unitDiscount,
-        });
-      }
+    // 1. Explicit line items passed by caller (e.g. menu dishes with explicit line pricing)
+    if (options?.lineItems && options.lineItems.length > 0) {
+      items.push(...options.lineItems);
     }
 
-    // 2. Extras
+    // 2. Evaluated extras (itemized directly from evaluation breakdown)
     for (const extra of evalResult.extrasBreakdown) {
       items.push({
         dishId: extra.dishId,

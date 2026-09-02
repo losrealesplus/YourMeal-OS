@@ -42,7 +42,7 @@ describe("CommercialPricingEngine — Pure Evaluation & Snapshot Engine", () => 
           type: "percentage",
           value: 10.0,
           appliesTo: "extras",
-          eligibility: ["subscriber_weekly", "public"],
+          eligibility: "subscriber_weekly", // Strictly for weekly subscribers
         },
       ],
     },
@@ -72,7 +72,7 @@ describe("CommercialPricingEngine — Pure Evaluation & Snapshot Engine", () => 
           type: "percentage",
           value: 30.0,
           appliesTo: "extras",
-          eligibility: ["subscriber_monthly", "public"],
+          eligibility: "subscriber_monthly", // Strictly for monthly subscribers
         },
       ],
     },
@@ -158,7 +158,38 @@ describe("CommercialPricingEngine — Pure Evaluation & Snapshot Engine", () => 
     expect(result.savingsPercentage).toBe(17);
   });
 
-  it("5. Evaluates optional extras with tier-specific discounts (10% vs 30%)", () => {
+  it("5. Strict tier eligibility for extras: public customer gets 0% discount on subscriber extras", () => {
+    const extras = [
+      {
+        dishId: "dish_crema_01",
+        dishName: "Crema de calabaza asada",
+        basePriceCents: 450, // 4,50 €
+        qty: 1,
+      },
+    ];
+
+    // Public customer evaluating weekly offer: does NOT get 10% extra discount
+    const publicWeeklyResult = CommercialPricingEngine.evaluate(sampleOffers.weekly, {
+      offerCode: "weekly_plan",
+      customerTier: "public",
+      extras,
+    });
+    expect(publicWeeklyResult.extrasBreakdown[0].finalUnitPrice.cents).toBe(450);
+    expect(publicWeeklyResult.extrasBreakdown[0].totalSavings.cents).toBe(0);
+    expect(publicWeeklyResult.extrasBreakdown[0].appliedPromotion).toBeNull();
+
+    // Public customer evaluating monthly offer: does NOT get 30% extra discount
+    const publicMonthlyResult = CommercialPricingEngine.evaluate(sampleOffers.monthly, {
+      offerCode: "monthly_plan",
+      customerTier: "public",
+      extras,
+    });
+    expect(publicMonthlyResult.extrasBreakdown[0].finalUnitPrice.cents).toBe(450);
+    expect(publicMonthlyResult.extrasBreakdown[0].totalSavings.cents).toBe(0);
+    expect(publicMonthlyResult.extrasBreakdown[0].appliedPromotion).toBeNull();
+  });
+
+  it("6. Evaluates optional extras with subscriber tier-specific discounts (10% weekly vs 30% monthly)", () => {
     const extras = [
       {
         dishId: "dish_crema_01",
@@ -198,7 +229,7 @@ describe("CommercialPricingEngine — Pure Evaluation & Snapshot Engine", () => 
     expect(monthlyExtra.savingsPercentage).toBe(30);
   });
 
-  it("6. Multi-promotion stacking policy: sequential stackable promotions", () => {
+  it("7. Multi-promotion stacking policy: sequential stackable promotions", () => {
     const multiPromoOffer: CommercialOffer = {
       id: "offer_multi",
       code: "multi_promo_offer",
@@ -249,7 +280,7 @@ describe("CommercialPricingEngine — Pure Evaluation & Snapshot Engine", () => 
     expect(result.appliedPromotions[1].discountCents).toBe(500);
   });
 
-  it("7. Generates immutable OrderPriceSnapshot with itemized details", () => {
+  it("8. Generates immutable OrderPriceSnapshot with explicit line items (no total division)", () => {
     const evalResult = CommercialPricingEngine.evaluate(sampleOffers.weekly, {
       offerCode: "weekly_plan",
       customerTier: "subscriber_weekly",
@@ -263,12 +294,32 @@ describe("CommercialPricingEngine — Pure Evaluation & Snapshot Engine", () => 
       ],
     });
 
+    const explicitLineItems = [
+      {
+        slotId: "slot_01",
+        dishId: "dish_chicken_01",
+        dishName: "Pechuga de pollo al grill",
+        itemType: "menu_dish" as const,
+        qty: 1,
+        basePriceCents: 1190,
+        finalPriceCents: 1071,
+        discountCents: 119,
+      },
+      {
+        slotId: "slot_02",
+        dishId: "dish_salmon_01",
+        dishName: "Salmón al horno",
+        itemType: "menu_dish" as const,
+        qty: 1,
+        basePriceCents: 1190,
+        finalPriceCents: 1071,
+        discountCents: 119,
+      },
+    ];
+
     const snapshot = CommercialPricingEngine.createSnapshot(evalResult, {
       orderId: "ord_test_2026",
-      menuDishes: [
-        { slotId: "slot_01", dishId: "dish_chicken_01", dishName: "Pechuga de pollo al grill" },
-        { slotId: "slot_02", dishId: "dish_salmon_01", dishName: "Salmón al horno" },
-      ],
+      lineItems: explicitLineItems,
     });
 
     expect(snapshot.orderId).toBe("ord_test_2026");
@@ -279,7 +330,10 @@ describe("CommercialPricingEngine — Pure Evaluation & Snapshot Engine", () => 
     expect(snapshot.finalAmountCents).toBe(5355 + 405); // 5760 cents = 57,60 €
     expect(snapshot.currency).toBe("EUR");
     expect(snapshot.engineVersion).toBe(PRICING_ENGINE_VERSION);
-    expect(snapshot.items).toHaveLength(3); // 2 menu dishes + 1 extra
+    expect(snapshot.items).toHaveLength(3); // 2 explicit menu dishes + 1 extra
+    expect(snapshot.items[0].dishName).toBe("Pechuga de pollo al grill");
+    expect(snapshot.items[0].basePriceCents).toBe(1190);
+    expect(snapshot.items[0].finalPriceCents).toBe(1071);
     expect(snapshot.items[2].itemType).toBe("extra");
     expect(snapshot.items[2].dishName).toBe("Crema de calabaza asada");
     expect(snapshot.items[2].finalPriceCents).toBe(405);

@@ -4,7 +4,7 @@ import { PriceDisplay } from "./PriceDisplay";
 import { PromotionBadge } from "./PromotionBadge";
 import { OrderPricingSummary } from "./OrderPricingSummary";
 import { OfferCard } from "./OfferCard";
-import { OfferSelector } from "./OfferSelector";
+import { OfferSelector, type EvaluatedOfferItem } from "./OfferSelector";
 import { MoneyUtil } from "@/modules/commercial/domain/money";
 import { CommercialPricingEngine } from "@/modules/commercial/application/CommercialPricingEngine";
 import type { CommercialOffer } from "@/modules/commercial/domain/types";
@@ -81,44 +81,54 @@ describe("Commercial UI Components — Zero Client Math & HTML Rendering", () =>
     expect(html).toContain("Plan seleccionado");
   });
 
-  it("renders OfferSelector containing multiple offers without client-side math", () => {
-    const offers: CommercialOffer[] = [
+  it("renders OfferSelector containing pre-evaluated offers without client-side math", () => {
+    const indOffer: CommercialOffer = {
+      id: "ind",
+      code: "individual",
+      title: "Individual",
+      subtitle: "Días sueltos",
+      description: "Sin suscripción",
+      basePrice: MoneyUtil.fromCents(1190, "EUR"),
+      unitLabel: "menú",
+      slotsIncluded: 1,
+      promotions: [],
+    };
+
+    const wkOffer: CommercialOffer = {
+      id: "wk",
+      code: "weekly",
+      title: "Semanal",
+      subtitle: "L-V",
+      description: "10% dto.",
+      basePrice: MoneyUtil.fromCents(5950, "EUR"),
+      unitLabel: "semana",
+      slotsIncluded: 5,
+      promotions: [
+        {
+          id: "pwk",
+          code: "SEMANAL_10",
+          name: "10% Semanal",
+          type: "percentage",
+          value: 10.0,
+          appliesTo: "offer_base",
+          eligibility: "public",
+        },
+      ],
+    };
+
+    const evaluatedOffers: EvaluatedOfferItem[] = [
       {
-        id: "ind",
-        code: "individual",
-        title: "Individual",
-        subtitle: "Días sueltos",
-        description: "Sin suscripción",
-        basePrice: MoneyUtil.fromCents(1190, "EUR"),
-        unitLabel: "menú",
-        slotsIncluded: 1,
-        promotions: [],
+        offer: indOffer,
+        evaluation: CommercialPricingEngine.evaluate(indOffer, { offerCode: "individual", customerTier: "public" }),
       },
       {
-        id: "wk",
-        code: "weekly",
-        title: "Semanal",
-        subtitle: "L-V",
-        description: "10% dto.",
-        basePrice: MoneyUtil.fromCents(5950, "EUR"),
-        unitLabel: "semana",
-        slotsIncluded: 5,
-        promotions: [
-          {
-            id: "pwk",
-            code: "SEMANAL_10",
-            name: "10% Semanal",
-            type: "percentage",
-            value: 10.0,
-            appliesTo: "offer_base",
-            eligibility: "public",
-          },
-        ],
+        offer: wkOffer,
+        evaluation: CommercialPricingEngine.evaluate(wkOffer, { offerCode: "weekly", customerTier: "public" }),
       },
     ];
 
     const html = renderToString(
-      <OfferSelector offers={offers} title="Elige tu modalidad" subtitle="Planes saludables" />,
+      <OfferSelector evaluatedOffers={evaluatedOffers} title="Elige tu modalidad" subtitle="Planes saludables" />,
     );
 
     expect(html).toContain("Elige tu modalidad");

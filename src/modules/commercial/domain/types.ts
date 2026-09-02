@@ -135,6 +135,11 @@ export interface OrderItemPriceDetail {
   discountCents: number;
 }
 
+export interface CreatePriceSnapshotOptions {
+  orderId?: string;
+  lineItems?: OrderItemPriceDetail[];
+}
+
 export interface OrderPriceSnapshot {
   orderId?: string;
   offerCode: string;

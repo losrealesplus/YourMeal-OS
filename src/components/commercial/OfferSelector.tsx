@@ -1,16 +1,15 @@
 import { useState, type HTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
-import {
-  CommercialPricingEngine,
-  type CommercialOffer,
-  type CustomerTier,
-  type PricingEvaluationResult,
-} from "@/modules/commercial";
+import type { CommercialOffer, PricingEvaluationResult } from "@/modules/commercial";
 import { OfferCard } from "./OfferCard";
 
+export interface EvaluatedOfferItem {
+  offer: CommercialOffer;
+  evaluation: PricingEvaluationResult;
+}
+
 export interface OfferSelectorProps extends HTMLAttributes<HTMLDivElement> {
-  offers: CommercialOffer[];
-  customerTier?: CustomerTier;
+  evaluatedOffers: EvaluatedOfferItem[];
   selectedOfferCode?: string;
   onSelectOffer?: (offer: CommercialOffer, evaluation: PricingEvaluationResult) => void;
   title?: string;
@@ -18,8 +17,7 @@ export interface OfferSelectorProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export function OfferSelector({
-  offers,
-  customerTier = "public",
+  evaluatedOffers,
   selectedOfferCode,
   onSelectOffer,
   title = "Elige tu plan",
@@ -28,18 +26,14 @@ export function OfferSelector({
   ...props
 }: OfferSelectorProps) {
   const [internalSelected, setInternalSelected] = useState<string>(
-    selectedOfferCode ?? offers[0]?.code ?? "",
+    selectedOfferCode ?? evaluatedOffers[0]?.offer.code ?? "",
   );
 
   const activeCode = selectedOfferCode ?? internalSelected;
 
-  const handleSelect = (offer: CommercialOffer) => {
-    setInternalSelected(offer.code);
-    const evaluation = CommercialPricingEngine.evaluate(offer, {
-      offerCode: offer.code,
-      customerTier,
-    });
-    onSelectOffer?.(offer, evaluation);
+  const handleSelect = (item: EvaluatedOfferItem) => {
+    setInternalSelected(item.offer.code);
+    onSelectOffer?.(item.offer, item.evaluation);
   };
 
   return (
@@ -58,20 +52,16 @@ export function OfferSelector({
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-        {offers.map((offer) => {
-          const evaluation = CommercialPricingEngine.evaluate(offer, {
-            offerCode: offer.code,
-            customerTier,
-          });
-          const isSelected = offer.code === activeCode;
+        {evaluatedOffers.map((item) => {
+          const isSelected = item.offer.code === activeCode;
 
           return (
             <OfferCard
-              key={offer.id || offer.code}
-              offer={offer}
-              evaluation={evaluation}
+              key={item.offer.id || item.offer.code}
+              offer={item.offer}
+              evaluation={item.evaluation}
               selected={isSelected}
-              onSelect={handleSelect}
+              onSelect={() => handleSelect(item)}
               ctaText={isSelected ? "Plan seleccionado" : "Elegir este plan"}
             />
           );
