@@ -8,6 +8,7 @@ import { brandConfig, tenantCopyEs } from "@/tenant/brand-config";
 import { PrimaryCTA } from "@/components/consumer";
 import { TenantLogo } from "@/components/tenant/tenant-logo";
 import { getSession } from "@/auth";
+import { ensureApplicationReady } from "@/bootstrap/ready";
 import { resolveHomePath } from "@/lib/resolve-home-path";
 import heroImage from "@/assets/eatclean-hero.jpg";
 import { SaasCommercialLanding } from "@/components/public/saas-commercial-landing";
@@ -115,14 +116,20 @@ function TenantLanding() {
   const copy = tenantCopyEs;
   const navigate = useNavigate();
 
-  // OP-001: OAuth / session return must not stall on public landing.
+  // OP-001 / B3.8C: Session return must wait for application ready before navigating to avoid hydration race.
   useEffect(() => {
     let cancelled = false;
     getSession().then(async ({ data }) => {
       const userId = data.session?.user?.id;
       if (!userId || cancelled) return;
-      const path = await resolveHomePath(userId);
-      if (!cancelled) navigate({ to: path as "/app", replace: true });
+      try {
+        await ensureApplicationReady({ timeoutMs: 10_000 });
+        const path = await resolveHomePath(userId);
+        if (!cancelled) navigate({ to: path as "/app", replace: true });
+      } catch {
+        // Expired or invalid session: redirect to /auth safely without error boundary
+        if (!cancelled) navigate({ to: "/auth", replace: true });
+      }
     });
     return () => {
       cancelled = true;

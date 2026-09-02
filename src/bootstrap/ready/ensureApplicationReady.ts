@@ -52,7 +52,7 @@ export function ensureApplicationReady(
       cleanup();
       if (!settled) {
         settled = true;
-        reject(new Error("Timed out waiting for Application Ready"));
+        reject(new ApplicationReadyFailedError(currentSnapshot()));
       }
     }, timeoutMs);
 

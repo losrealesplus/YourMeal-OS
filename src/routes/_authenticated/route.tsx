@@ -1,5 +1,5 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { requireAuthenticatedUser } from "@/auth";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { requireAuthenticatedUser, AUTH_LOGIN_PATH } from "@/auth";
 import { ensureApplicationReady } from "@/bootstrap/ready";
 
 /**
@@ -15,9 +15,16 @@ import { ensureApplicationReady } from "@/bootstrap/ready";
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async () => {
-    const { user } = await requireAuthenticatedUser();
-    await ensureApplicationReady();
-    return { user };
+    try {
+      const { user } = await requireAuthenticatedUser();
+      await ensureApplicationReady({ timeoutMs: 15_000 });
+      return { user };
+    } catch (err) {
+      if (err && typeof err === "object" && "to" in err) {
+        throw err;
+      }
+      throw redirect({ to: AUTH_LOGIN_PATH });
+    }
   },
   component: () => <Outlet />,
 });
