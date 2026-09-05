@@ -1,0 +1,116 @@
+# ADR 0100 — Customer Data Quality & Customer Improvement Alerts
+
+## Estado
+
+**Accepted** — 2026-09-05  
+**Track:** CORE-CUSTOMER-002 · Phase 2 (Implementation & Decision Protocol)  
+**Context:** Universal Customer Directory (`src/modules/customer-directory/`)
+
+---
+
+## Contexto
+
+A medida que YourMeal OS consolida directorios de clientes procedentes de diversas fuentes operativas (importaciones B2C, onboarding B2B, canales directos y capturas en cocina/reparto), la calidad de los datos de contacto y entrega es heterogénea.
+
+Sin embargo, en el diseño de software para operaciones de misión crítica, la detección automática de discrepancias o posibles duplicados conlleva un riesgo si el software toma decisiones irreversibles sin intervención humana.
+
+---
+
+## Principio Fundamental
+
+### `DETECCIÓN ≠ DECISIÓN`
+
+1. **El motor de calidad solo detecta hipótesis y evalúa señales en memoria en tiempo de ejecución.**
+2. **El software NUNCA fusiona, modifica ni borra registros de clientes de forma automática.**
+3. **Toda fusión, corrección, override o descarte de alerta es una decisión humana explícita, auditada y registrada en el `audit_log`.**
+
+---
+
+## Regla de Oro sobre Coincidencia de Nombres
+
+### `NAME SIMILARITY IS NEVER DUPLICATE EVIDENCE`
+
+Queda **estrictamente prohibido**:
+- Algoritmos de similitud difusa (fuzzy matching) basados en nombres o apellidos.
+- Distancias de edición (Levenshtein, Jaro-Winkler, etc.).
+- Inferencia heurística basada en Inteligencia Artificial o Embeddings vectoriales.
+- Asunciones geográficas deducidas del nombre del cliente (p. ej. inferir que *"Pedro Adeje"* vive en Adeje o que es la misma persona que *"Pedro Madroñal"*).
+
+### Ejemplos Canónicos Obligatorios:
+1. **Pedro Madroñal** vs **Pedro Adeje** (o nombres idénticos como **Pedro** vs **Pedro**):
+   - Sin evidencia determinista adicional $\rightarrow$ **0 ALERTAS DE DUPLICADO** (NO ALERTA).
+2. **Pedro Madroñal** vs **Pedro Adeje** + **mismo enlace o coordenadas canónicas de Google Maps**:
+   - $\rightarrow$ **Alerta `duplicate_maps`** (Hipótesis para revisión humana; NUNCA fusión automática).
+3. **Pedro Madroñal** vs **Pedro Adeje** + **mismo teléfono normalizado + misma dirección**:
+   - $\rightarrow$ **Alerta `possible_duplicate`** (Múltiples señales coincidentes; NUNCA fusión automática).
+
+---
+
+## Decisiones de Arquitectura
+
+### 1. Clasificación (`CustomerQualityStatus`) en lugar de Score
+No se computa una métrica artificial de "puntuación numérica de cliente" para evitar degradación a rankings sin significado operativo. Se establecen tres estados canónicos:
+- `complete`: Datos completos de identificación, teléfono, dirección y sin bloqueos de entrega.
+- `improver`: Cuenta con identidad y contacto activo (teléfono o email), pero tiene datos parciales que pueden completarse progresivamente.
+- `needs_attention`: Falta de contacto esencial (sin teléfono ni email), nombre vacío o perfil con ubicación variable no instruida.
+
+### 2. Evidencia Fuertemente Tipada (`QualitySignalEvidence`)
+Queda terminantemente prohibido el uso de `unknown` o `any` en las evidencias emitidas por el evaluador:
+```typescript
+export type QualitySignalEvidence = {
+  ruleCode: string;
+  field: string;
+  detectedValue?: string | number | boolean | null;
+  conflictingCustomerId?: string | null;
+  conflictingCustomerName?: string | null;
+  rationale: string;
+};
+```
+
+### 3. Señales Deterministas de Duplicidad Soportadas
+
+1. **`duplicate_phone`**:
+   Mismo teléfono normalizado a 9 dígitos canónicos (extrayendo prefijos nacionales e internacionales).
+2. **`duplicate_email`**:
+   Mismo correo electrónico normalizado (lowercase, sin espacios).
+3. **`duplicate_maps`**:
+   Misma URL canónica de Google Maps o coordenadas geográficas (`lat`/`lng` redondeadas a 5 decimales).
+4. **`duplicate_address`**:
+   Misma dirección estructurada normalizada (calle normalizada con prefijos estándar + municipio + código postal, con longitud $\ge 5$ caracteres y descartando placeholders genéricos).
+5. **`possible_duplicate`**:
+   Combinación de $\ge 2$ señales deterministas independientes entre dos fichas de cliente.
+
+### 4. Semántica de Descarte de Alertas (`DismissReason`)
+Se separa explícitamente el descarte temporal o de conveniencia operativa de la desestimación de duplicados:
+- `not_now`: El operador decide posponer la acción ("Ahora no").
+- `not_same_customer`: El operador certifica que dos clientes con coincidencias son personas distintas ("No son la misma persona").
+- `not_relevant`: La alerta no aplica al contexto operativo del cliente.
+- `other`: Otras razones documentadas con notas explicativas.
+
+### 5. Arquitectura Híbrida de Persistencia
+- **Evaluación Dinámica (Runtime):**
+  - Todas las alertas de calidad y duplicidad se computan en memoria al consultar el directorio.
+- **Persistencia de Decisiones:**
+  - Tabla `public.customer_quality_dismissals` con RLS estricto por `tenant_id` que almacena descartes, motivos, autor y marcas de tiempo.
+
+### 6. 0x Math Client (Proyección Pura para Frontend)
+El cliente UI recibe proyecciones precalculadas de `CustomerQualityEvaluation` y `CustomerImprovementAlert[]` desde el Core. La interfaz no implementa heurísticas de evaluación.
+
+### 7. Auditoría y RBAC
+- Lectura: Requiere `customers.read` o `support.read`.
+- Acciones y descartes: Requiere `customers.write` o `support.write`.
+- Toda acción persiste rastro inmutable mediante `AuditService` en `public.audit_log`.
+
+---
+
+## Consecuencias
+
+- **Aislamiento Total:** El motor reside exclusivamente en Core (`YourMeal-OS`) y beneficia a todos los tenants de la plataforma.
+- **Seguridad e Integridad:** Los datos de clientes no sufren mutaciones silenciosas durante escaneos de calidad.
+- **Trazabilidad:** Cada descarte de alerta o decisión queda respaldado por el usuario operador y su motivo.
+
+---
+
+## Referencias
+
+- ADR [0015](./0015-b2b-b2c-customer-model.md) · [0006](./0006-soft-delete-audit.md) · [0098](./0098-experience-law-001.md)
