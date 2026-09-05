@@ -3,7 +3,7 @@
 ## Estado
 
 **Accepted** — 2026-09-05  
-**Track:** CORE-CUSTOMER-002 · Phase 2 (Implementation & Decision Protocol)  
+**Track:** CORE-CUSTOMER-002 / CORE-CUSTOMER-003 · Customer Improvement Architecture
 **Context:** Universal Customer Directory (`src/modules/customer-directory/`)
 
 ---
@@ -18,11 +18,11 @@ Sin embargo, en el diseño de software para operaciones de misión crítica, la 
 
 ## Principio Fundamental
 
-### `DETECCIÓN ≠ DECISIÓN`
+### `DETECCIÓN ≠ DECISIÓN ≠ MUTACIÓN`
 
-1. **El motor de calidad solo detecta hipótesis y evalúa señales en memoria en tiempo de ejecución.**
-2. **El software NUNCA fusiona, modifica ni borra registros de clientes de forma automática.**
-3. **Toda fusión, corrección, override o descarte de alerta es una decisión humana explícita, auditada y registrada en el `audit_log`.**
+1. **Detección (Runtime Engine):** El motor técnico (`Customer Data Quality`) evalúa hechos y discrepancias objetivas en memoria en tiempo de ejecución.
+2. **Decisión (Customer Improvement Layer):** La capa de experiencia de producto proyecta las oportunidades al operador humano con evidencia neutral y un catálogo de acciones permitidas. El motor nunca decide la acción.
+3. **Mutación (Domain Services & Audit):** Cualquier modificación de datos (añadir teléfono, dirección, notas) se ejecuta exclusivamente a través de los servicios ordinarios de dominio, con verificación de `Capability` (RBAC), validaciones de esquema y registro inmutable en `AuditService`.
 
 ---
 
@@ -80,21 +80,49 @@ export type QualitySignalEvidence = {
 5. **`possible_duplicate`**:
    Combinación de $\ge 2$ señales deterministas independientes entre dos fichas de cliente.
 
-### 4. Semántica de Descarte de Alertas (`DismissReason`)
+### 4. Contrato de Acciones Permitidas (`ImprovementActionKind`) y Exhaustividad en Compilación
+Cada alerta proyecta explícitamente las acciones que un operador puede ejecutar mediante un diccionario estricto y exhaustivo `ALLOWED_ACTIONS_BY_ALERT: Record<QualityAlertCode, readonly ImprovementActionKind[]>`.
+
+Queda **terminantemente prohibido** el uso de cláusulas `default:` o fallbacks permisivos en `allowedActionsForAlert(alertType: QualityAlertCode)`. Si en el futuro se añade un nuevo `QualityAlertCode`, TypeScript forzará un error de compilación inmediato mediante tipado `never` si no se declara explícitamente su matriz de acciones.
+
+```typescript
+export type ImprovementActionKind =
+  | "add_phone"
+  | "add_address"
+  | "add_delivery_instructions"
+  | "confirm_distinct_customer"
+  | "defer_review"
+  | "dismiss_irrelevant";
+
+export const ALLOWED_ACTIONS_BY_ALERT: Record<QualityAlertCode, readonly ImprovementActionKind[]> = {
+  missing_phone: ["add_phone", "defer_review", "dismiss_irrelevant"],
+  missing_address: ["add_address", "defer_review", "dismiss_irrelevant"],
+  missing_delivery_instructions: ["add_delivery_instructions", "defer_review", "dismiss_irrelevant"],
+  variable_location_without_instruction: ["add_delivery_instructions", "defer_review", "dismiss_irrelevant"],
+  incomplete_profile: ["defer_review"],
+  duplicate_phone: ["confirm_distinct_customer", "defer_review"],
+  duplicate_email: ["confirm_distinct_customer", "defer_review"],
+  duplicate_maps: ["confirm_distinct_customer", "defer_review"],
+  duplicate_address: ["confirm_distinct_customer", "defer_review"],
+  possible_duplicate: ["confirm_distinct_customer", "defer_review"],
+} as const;
+```
+
+#### Racional de `incomplete_profile` (Identidad Crítica):
+- Un cliente sin `displayName` es una anomalía de severidad `critical` porque atenta contra el invariante de identidad del directorio.
+- **No se puede descartar como irrelevante (`dismiss_irrelevant`)**: un perfil sin nombre jamás puede ser considerado un dato "irrelevante".
+- **Solo admite `defer_review`**: el operador puede posponer la revisión temporalmente si está esperando datos del cliente, pero la alerta sólo desaparecerá de forma natural cuando el operador edite el cliente y asigne un nombre legítimo.
+
+### 5. Semántica de Descarte de Alertas (`DismissReason`)
 Se separa explícitamente el descarte temporal o de conveniencia operativa de la desestimación de duplicados:
-- `not_now`: El operador decide posponer la acción ("Ahora no").
+- `not_now`: El operador decide posponer la acción ("Ahora no / Revisar más tarde").
 - `not_same_customer`: El operador certifica que dos clientes con coincidencias son personas distintas ("No son la misma persona").
 - `not_relevant`: La alerta no aplica al contexto operativo del cliente.
 - `other`: Otras razones documentadas con notas explicativas.
 
-### 5. Arquitectura Híbrida de Persistencia
-- **Evaluación Dinámica (Runtime):**
-  - Todas las alertas de calidad y duplicidad se computan en memoria al consultar el directorio.
-- **Persistencia de Decisiones:**
-  - Tabla `public.customer_quality_dismissals` con RLS estricto por `tenant_id` que almacena descartes, motivos, autor y marcas de tiempo.
-
-### 6. 0x Math Client (Proyección Pura para Frontend)
-El cliente UI recibe proyecciones precalculadas de `CustomerQualityEvaluation` y `CustomerImprovementAlert[]` desde el Core. La interfaz no implementa heurísticas de evaluación.
+### 6. Desaparición Natural de Alertas (Pure Disappearance)
+- Las oportunidades resueltas (p. ej. añadir teléfono a un cliente con `missing_phone`) **desaparecen inmediatamente en tiempo de ejecución** al reevaluarse el directorio.
+- No se persisten estados superfluos de "alerta resuelta"; la base de datos sólo persiste decisiones humanas de descarte / postergación (`customer_quality_dismissals`).
 
 ### 7. Auditoría y RBAC
 - Lectura: Requiere `customers.read` o `support.read`.

@@ -4,8 +4,12 @@ import {
   normalizePhone,
   normalizeEmail,
   isVariableLocationText,
+  allowedActionsForAlert,
+  ALLOWED_ACTIONS_BY_ALERT,
   type CustomerEvaluationInput,
   type CustomerQualityDismissalRecord,
+  type QualityAlertCode,
+  type ImprovementActionKind,
 } from "../domain/customer-quality";
 import { CustomerQualityService } from "./customer-quality-service";
 import type { ServiceContext } from "@/services/types";
@@ -35,6 +39,86 @@ describe("Customer Quality & Improvement Alerts Domain Engine", () => {
       expect(isVariableLocationText("Se mueve entre sedes")).toBe(true);
       expect(isVariableLocationText("Calle Mayor 10, Madrid")).toBe(false);
       expect(isVariableLocationText(null)).toBe(false);
+    });
+  });
+
+  describe("allowedActionsForAlert & improvement action contracts", () => {
+    const allExpectedAlertCodes: QualityAlertCode[] = [
+      "missing_phone",
+      "missing_address",
+      "missing_delivery_instructions",
+      "variable_location_without_instruction",
+      "incomplete_profile",
+      "duplicate_phone",
+      "duplicate_email",
+      "duplicate_maps",
+      "duplicate_address",
+      "possible_duplicate",
+    ];
+
+    it("maps EVERY QualityAlertCode to a non-empty list of allowed actions without fallback", () => {
+      for (const alertCode of allExpectedAlertCodes) {
+        const actions = allowedActionsForAlert(alertCode);
+        expect(actions).toBeDefined();
+        expect(Array.isArray(actions)).toBe(true);
+        expect(actions.length).toBeGreaterThan(0);
+        expect(ALLOWED_ACTIONS_BY_ALERT[alertCode]).toEqual(actions);
+      }
+    });
+
+    it("verifies incomplete_profile rationale: critical severity only allows defer_review (NO dismiss_irrelevant)", () => {
+      const actions = allowedActionsForAlert("incomplete_profile");
+      expect(actions).toEqual(["defer_review"]);
+      expect(actions).not.toContain("dismiss_irrelevant");
+    });
+
+    it("verifies missing data alerts allow resolution, deferral, and dismissal as irrelevant", () => {
+      expect(allowedActionsForAlert("missing_phone")).toEqual([
+        "add_phone",
+        "defer_review",
+        "dismiss_irrelevant",
+      ]);
+      expect(allowedActionsForAlert("missing_address")).toEqual([
+        "add_address",
+        "defer_review",
+        "dismiss_irrelevant",
+      ]);
+      expect(allowedActionsForAlert("missing_delivery_instructions")).toEqual([
+        "add_delivery_instructions",
+        "defer_review",
+        "dismiss_irrelevant",
+      ]);
+      expect(allowedActionsForAlert("variable_location_without_instruction")).toEqual([
+        "add_delivery_instructions",
+        "defer_review",
+        "dismiss_irrelevant",
+      ]);
+    });
+
+    it("verifies duplicate alerts allow confirming distinct customer and deferring review (NO dismiss_irrelevant)", () => {
+      const duplicateAlerts: QualityAlertCode[] = [
+        "duplicate_phone",
+        "duplicate_email",
+        "duplicate_maps",
+        "duplicate_address",
+        "possible_duplicate",
+      ];
+
+      for (const dupAlert of duplicateAlerts) {
+        expect(allowedActionsForAlert(dupAlert)).toEqual([
+          "confirm_distinct_customer",
+          "defer_review",
+        ]);
+      }
+    });
+
+    it("returns a new mutable array copy to avoid accidental mutation of the constant dictionary", () => {
+      const actions1 = allowedActionsForAlert("missing_phone");
+      const actions2 = allowedActionsForAlert("missing_phone");
+      expect(actions1).toEqual(actions2);
+      expect(actions1).not.toBe(actions2); // different references
+      actions1.push("dismiss_irrelevant" as ImprovementActionKind);
+      expect(allowedActionsForAlert("missing_phone")).toHaveLength(3);
     });
   });
 
@@ -71,6 +155,16 @@ describe("Customer Quality & Improvement Alerts Domain Engine", () => {
       expect(evalResult.activeAlertCount).toBe(2);
       expect(evalResult.alerts.map((a) => a.alertType)).toEqual(
         expect.arrayContaining(["missing_phone", "missing_address"]),
+      );
+
+      const phoneAlert = evalResult.alerts.find((a) => a.alertType === "missing_phone");
+      expect(phoneAlert?.allowedActions).toEqual(
+        expect.arrayContaining(["add_phone", "defer_review", "dismiss_irrelevant"]),
+      );
+
+      const addrAlert = evalResult.alerts.find((a) => a.alertType === "missing_address");
+      expect(addrAlert?.allowedActions).toEqual(
+        expect.arrayContaining(["add_address", "defer_review", "dismiss_irrelevant"]),
       );
     });
 
@@ -225,6 +319,9 @@ describe("Customer Quality & Improvement Alerts Domain Engine", () => {
       const addrAlert = evalResult1.alerts.find((a) => a.alertType === "duplicate_address");
       expect(addrAlert).toBeDefined();
       expect(addrAlert?.targetCustomerId).toBe("cust-addr2");
+      expect(addrAlert?.allowedActions).toEqual(
+        expect.arrayContaining(["confirm_distinct_customer", "defer_review"]),
+      );
     });
 
     it("emits possible_duplicate when >= 2 deterministic signals coincide (e.g. phone + address)", () => {
@@ -262,6 +359,9 @@ describe("Customer Quality & Improvement Alerts Domain Engine", () => {
       expect(possibleDupAlert).toBeDefined();
       expect(possibleDupAlert?.severity).toBe("warning");
       expect(possibleDupAlert?.evidence.rationale).toContain("Matched 2 deterministic signals");
+      expect(possibleDupAlert?.allowedActions).toEqual(
+        expect.arrayContaining(["confirm_distinct_customer", "defer_review"]),
+      );
     });
 
     it("NEGATIVE TEST: IDENTICAL names without shared phone/email/maps/address NEVER trigger duplicate alerts", () => {
