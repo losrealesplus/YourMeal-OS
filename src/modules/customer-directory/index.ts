@@ -38,4 +38,30 @@ export type {
   DeliveryDraft,
   DeliveryStatus,
 } from "./domain/communications";
+export type {
+  CustomerQualityStatus,
+  QualityAlertCode,
+  QualityAlertSeverity,
+  QualityAlertStatus,
+  DismissReason,
+  QualitySignalEvidence,
+  CustomerImprovementAlert,
+  CustomerQualityEvaluation,
+  CustomerQualityDismissalRecord,
+  CustomerPhoneItem,
+  CustomerAddressItem,
+  CustomerEvaluationInput,
+  QualityEvaluationContext,
+} from "./domain/customer-quality";
+export {
+  normalizePhone,
+  normalizeEmail,
+  isVariableLocationText,
+  evaluateCustomerQuality,
+} from "./domain/customer-quality";
 export { CustomerDirectoryService } from "./application/customer-directory-service";
+export {
+  CustomerQualityService,
+  type DismissAlertInput,
+  type ListAlertFilters,
+} from "./application/customer-quality-service";
