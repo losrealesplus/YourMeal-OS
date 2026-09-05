@@ -80,8 +80,11 @@ export type QualitySignalEvidence = {
 5. **`possible_duplicate`**:
    Combinación de $\ge 2$ señales deterministas independientes entre dos fichas de cliente.
 
-### 4. Contrato de Acciones Permitidas (`ImprovementActionKind`)
-Cada alerta proyecta explícitamente las acciones que un operador puede ejecutar:
+### 4. Contrato de Acciones Permitidas (`ImprovementActionKind`) y Exhaustividad en Compilación
+Cada alerta proyecta explícitamente las acciones que un operador puede ejecutar mediante un diccionario estricto y exhaustivo `ALLOWED_ACTIONS_BY_ALERT: Record<QualityAlertCode, readonly ImprovementActionKind[]>`.
+
+Queda **terminantemente prohibido** el uso de cláusulas `default:` o fallbacks permisivos en `allowedActionsForAlert(alertType: QualityAlertCode)`. Si en el futuro se añade un nuevo `QualityAlertCode`, TypeScript forzará un error de compilación inmediato mediante tipado `never` si no se declara explícitamente su matriz de acciones.
+
 ```typescript
 export type ImprovementActionKind =
   | "add_phone"
@@ -90,7 +93,25 @@ export type ImprovementActionKind =
   | "confirm_distinct_customer"
   | "defer_review"
   | "dismiss_irrelevant";
+
+export const ALLOWED_ACTIONS_BY_ALERT: Record<QualityAlertCode, readonly ImprovementActionKind[]> = {
+  missing_phone: ["add_phone", "defer_review", "dismiss_irrelevant"],
+  missing_address: ["add_address", "defer_review", "dismiss_irrelevant"],
+  missing_delivery_instructions: ["add_delivery_instructions", "defer_review", "dismiss_irrelevant"],
+  variable_location_without_instruction: ["add_delivery_instructions", "defer_review", "dismiss_irrelevant"],
+  incomplete_profile: ["defer_review"],
+  duplicate_phone: ["confirm_distinct_customer", "defer_review"],
+  duplicate_email: ["confirm_distinct_customer", "defer_review"],
+  duplicate_maps: ["confirm_distinct_customer", "defer_review"],
+  duplicate_address: ["confirm_distinct_customer", "defer_review"],
+  possible_duplicate: ["confirm_distinct_customer", "defer_review"],
+} as const;
 ```
+
+#### Racional de `incomplete_profile` (Identidad Crítica):
+- Un cliente sin `displayName` es una anomalía de severidad `critical` porque atenta contra el invariante de identidad del directorio.
+- **No se puede descartar como irrelevante (`dismiss_irrelevant`)**: un perfil sin nombre jamás puede ser considerado un dato "irrelevante".
+- **Solo admite `defer_review`**: el operador puede posponer la revisión temporalmente si está esperando datos del cliente, pero la alerta sólo desaparecerá de forma natural cuando el operador edite el cliente y asigne un nombre legítimo.
 
 ### 5. Semántica de Descarte de Alertas (`DismissReason`)
 Se separa explícitamente el descarte temporal o de conveniencia operativa de la desestimación de duplicados:

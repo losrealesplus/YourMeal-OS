@@ -50,25 +50,36 @@ export type ImprovementActionKind =
   | "defer_review"
   | "dismiss_irrelevant";
 
+export const ALLOWED_ACTIONS_BY_ALERT: Record<QualityAlertCode, readonly ImprovementActionKind[]> = {
+  missing_phone: ["add_phone", "defer_review", "dismiss_irrelevant"],
+  missing_address: ["add_address", "defer_review", "dismiss_irrelevant"],
+  missing_delivery_instructions: ["add_delivery_instructions", "defer_review", "dismiss_irrelevant"],
+  variable_location_without_instruction: ["add_delivery_instructions", "defer_review", "dismiss_irrelevant"],
+  incomplete_profile: ["defer_review"],
+  duplicate_phone: ["confirm_distinct_customer", "defer_review"],
+  duplicate_email: ["confirm_distinct_customer", "defer_review"],
+  duplicate_maps: ["confirm_distinct_customer", "defer_review"],
+  duplicate_address: ["confirm_distinct_customer", "defer_review"],
+  possible_duplicate: ["confirm_distinct_customer", "defer_review"],
+} as const;
+
 export function allowedActionsForAlert(alertType: QualityAlertCode): ImprovementActionKind[] {
   switch (alertType) {
     case "missing_phone":
-      return ["add_phone", "defer_review", "dismiss_irrelevant"];
     case "missing_address":
-      return ["add_address", "defer_review", "dismiss_irrelevant"];
     case "missing_delivery_instructions":
     case "variable_location_without_instruction":
-      return ["add_delivery_instructions", "defer_review", "dismiss_irrelevant"];
     case "incomplete_profile":
-      return ["defer_review"];
     case "duplicate_phone":
     case "duplicate_email":
     case "duplicate_maps":
     case "duplicate_address":
     case "possible_duplicate":
-      return ["confirm_distinct_customer", "defer_review"];
-    default:
-      return ["defer_review", "dismiss_irrelevant"];
+      return [...ALLOWED_ACTIONS_BY_ALERT[alertType]];
+    default: {
+      const _exhaustive: never = alertType;
+      throw new Error(`Unhandled alert type: ${_exhaustive}`);
+    }
   }
 }
 
