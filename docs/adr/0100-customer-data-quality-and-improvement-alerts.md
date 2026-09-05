@@ -26,6 +26,26 @@ Sin embargo, en el diseño de software para operaciones de misión crítica, la 
 
 ---
 
+## Regla de Oro sobre Coincidencia de Nombres
+
+### `NAME SIMILARITY IS NEVER DUPLICATE EVIDENCE`
+
+Queda **estrictamente prohibido**:
+- Algoritmos de similitud difusa (fuzzy matching) basados en nombres o apellidos.
+- Distancias de edición (Levenshtein, Jaro-Winkler, etc.).
+- Inferencia heurística basada en Inteligencia Artificial o Embeddings vectoriales.
+- Asunciones geográficas deducidas del nombre del cliente (p. ej. inferir que *"Pedro Adeje"* vive en Adeje o que es la misma persona que *"Pedro Madroñal"*).
+
+### Ejemplos Canónicos Obligatorios:
+1. **Pedro Madroñal** vs **Pedro Adeje** (o nombres idénticos como **Pedro** vs **Pedro**):
+   - Sin evidencia determinista adicional $\rightarrow$ **0 ALERTAS DE DUPLICADO** (NO ALERTA).
+2. **Pedro Madroñal** vs **Pedro Adeje** + **mismo enlace o coordenadas canónicas de Google Maps**:
+   - $\rightarrow$ **Alerta `duplicate_maps`** (Hipótesis para revisión humana; NUNCA fusión automática).
+3. **Pedro Madroñal** vs **Pedro Adeje** + **mismo teléfono normalizado + misma dirección**:
+   - $\rightarrow$ **Alerta `possible_duplicate`** (Múltiples señales coincidentes; NUNCA fusión automática).
+
+---
+
 ## Decisiones de Arquitectura
 
 ### 1. Clasificación (`CustomerQualityStatus`) en lugar de Score
@@ -47,23 +67,31 @@ export type QualitySignalEvidence = {
 };
 ```
 
-### 3. Semántica de Descarte de Alertas (`DismissReason`)
+### 3. Señales Deterministas de Duplicidad Soportadas
+
+1. **`duplicate_phone`**:
+   Mismo teléfono normalizado a 9 dígitos canónicos (extrayendo prefijos nacionales e internacionales).
+2. **`duplicate_email`**:
+   Mismo correo electrónico normalizado (lowercase, sin espacios).
+3. **`duplicate_maps`**:
+   Misma URL canónica de Google Maps o coordenadas geográficas (`lat`/`lng` redondeadas a 5 decimales).
+4. **`duplicate_address`**:
+   Misma dirección estructurada normalizada (calle normalizada con prefijos estándar + municipio + código postal, con longitud $\ge 5$ caracteres y descartando placeholders genéricos).
+5. **`possible_duplicate`**:
+   Combinación de $\ge 2$ señales deterministas independientes entre dos fichas de cliente.
+
+### 4. Semántica de Descarte de Alertas (`DismissReason`)
 Se separa explícitamente el descarte temporal o de conveniencia operativa de la desestimación de duplicados:
 - `not_now`: El operador decide posponer la acción ("Ahora no").
 - `not_same_customer`: El operador certifica que dos clientes con coincidencias son personas distintas ("No son la misma persona").
 - `not_relevant`: La alerta no aplica al contexto operativo del cliente.
 - `other`: Otras razones documentadas con notas explicativas.
 
-### 4. Arquitectura Híbrida de Persistencia
+### 5. Arquitectura Híbrida de Persistencia
 - **Evaluación Dinámica (Runtime):**
-  - `missing_phone`, `missing_address`, `missing_delivery_instructions`, `variable_location_without_instruction`, `incomplete_profile`, `duplicate_phone`, `duplicate_email`.
+  - Todas las alertas de calidad y duplicidad se computan en memoria al consultar el directorio.
 - **Persistencia de Decisiones:**
   - Tabla `public.customer_quality_dismissals` con RLS estricto por `tenant_id` que almacena descartes, motivos, autor y marcas de tiempo.
-
-### 5. Reglas Deterministas de Duplicados (Cero Falsos Positivos por Nombre)
-Dos clientes con nombres idénticos o similares (por ejemplo, "Pedro Madroñal" vs "Pedro Adeje") **NUNCA** disparan alertas de duplicado a menos que compartan de manera determinista:
-- Mismo teléfono normalizado (últimos 9 dígitos).
-- Mismo email normalizado.
 
 ### 6. 0x Math Client (Proyección Pura para Frontend)
 El cliente UI recibe proyecciones precalculadas de `CustomerQualityEvaluation` y `CustomerImprovementAlert[]` desde el Core. La interfaz no implementa heurísticas de evaluación.

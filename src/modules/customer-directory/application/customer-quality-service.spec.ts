@@ -154,7 +154,151 @@ describe("Customer Quality & Improvement Alerts Domain Engine", () => {
       expect(dupAlert?.evidence.detectedValue).toBe("688123456");
     });
 
-    it("NEGATIVE TEST: similar names WITHOUT shared phone/email NEVER trigger duplicate alerts", () => {
+    it("evaluates duplicate maps hypothesis deterministically when canonical maps URL or coords match", () => {
+      const customer1: CustomerEvaluationInput = {
+        id: "cust-m1",
+        displayName: "Pedro Madroñal",
+        email: "pedro.m@example.com",
+        phones: ["+34 611 111 222"],
+        addresses: [
+          {
+            street: "Calle Madroñal 10",
+            notes: "https://maps.google.com/?q=28.12345,-16.65432",
+          },
+        ],
+      };
+
+      const customer2: CustomerEvaluationInput = {
+        id: "cust-m2",
+        displayName: "Pedro Adeje",
+        email: "pedro.a@example.com",
+        phones: ["+34 622 222 333"],
+        addresses: [
+          {
+            street: "Calle Adeje 20",
+            notes: "https://maps.google.com/?q=28.12345,-16.65432",
+          },
+        ],
+      };
+
+      const evalResult1 = evaluateCustomerQuality(customer1, {
+        allCustomers: [customer1, customer2],
+      });
+
+      const mapsAlert = evalResult1.alerts.find((a) => a.alertType === "duplicate_maps");
+      expect(mapsAlert).toBeDefined();
+      expect(mapsAlert?.targetCustomerId).toBe("cust-m2");
+      expect(mapsAlert?.evidence.conflictingCustomerName).toBe("Pedro Adeje");
+    });
+
+    it("evaluates duplicate address hypothesis deterministically on exact structured address", () => {
+      const customer1: CustomerEvaluationInput = {
+        id: "cust-addr1",
+        displayName: "Cliente A",
+        phones: ["+34 600 000 001"],
+        addresses: [
+          {
+            street: "Calle Castillo 15, 2B",
+            city: "Santa Cruz",
+            zip: "38002",
+          },
+        ],
+      };
+
+      const customer2: CustomerEvaluationInput = {
+        id: "cust-addr2",
+        displayName: "Cliente B",
+        phones: ["+34 600 000 002"],
+        addresses: [
+          {
+            street: "c/ castillo 15, 2b",
+            city: "santa cruz",
+            zip: "38002",
+          },
+        ],
+      };
+
+      const evalResult1 = evaluateCustomerQuality(customer1, {
+        allCustomers: [customer1, customer2],
+      });
+
+      const addrAlert = evalResult1.alerts.find((a) => a.alertType === "duplicate_address");
+      expect(addrAlert).toBeDefined();
+      expect(addrAlert?.targetCustomerId).toBe("cust-addr2");
+    });
+
+    it("emits possible_duplicate when >= 2 deterministic signals coincide (e.g. phone + address)", () => {
+      const customer1: CustomerEvaluationInput = {
+        id: "cust-multi1",
+        displayName: "Pedro Uno",
+        email: "pedro@test.com",
+        phones: ["+34 699 112 233"],
+        addresses: [
+          {
+            street: "Calle Castillo 10",
+            city: "Santa Cruz",
+          },
+        ],
+      };
+
+      const customer2: CustomerEvaluationInput = {
+        id: "cust-multi2",
+        displayName: "Pedro Dos",
+        email: "pedro.otro@test.com",
+        phones: ["699 112 233"],
+        addresses: [
+          {
+            street: "c/ castillo 10",
+            city: "santa cruz",
+          },
+        ],
+      };
+
+      const evalResult1 = evaluateCustomerQuality(customer1, {
+        allCustomers: [customer1, customer2],
+      });
+
+      const possibleDupAlert = evalResult1.alerts.find((a) => a.alertType === "possible_duplicate");
+      expect(possibleDupAlert).toBeDefined();
+      expect(possibleDupAlert?.severity).toBe("warning");
+      expect(possibleDupAlert?.evidence.rationale).toContain("Matched 2 deterministic signals");
+    });
+
+    it("NEGATIVE TEST: IDENTICAL names without shared phone/email/maps/address NEVER trigger duplicate alerts", () => {
+      const customer1: CustomerEvaluationInput = {
+        id: "cust-id1",
+        displayName: "Carlos Santana",
+        email: "carlos1@music.com",
+        phones: ["+34 611 111 111"],
+        addresses: ["Calle Norte 1"],
+      };
+
+      const customer2: CustomerEvaluationInput = {
+        id: "cust-id2",
+        displayName: "Carlos Santana",
+        email: "carlos2@music.com",
+        phones: ["+34 622 222 222"],
+        addresses: ["Calle Sur 2"],
+      };
+
+      const evalResult1 = evaluateCustomerQuality(customer1, {
+        allCustomers: [customer1, customer2],
+      });
+
+      const dupPhone = evalResult1.alerts.find((a) => a.alertType === "duplicate_phone");
+      const dupEmail = evalResult1.alerts.find((a) => a.alertType === "duplicate_email");
+      const dupMaps = evalResult1.alerts.find((a) => a.alertType === "duplicate_maps");
+      const dupAddr = evalResult1.alerts.find((a) => a.alertType === "duplicate_address");
+      const possDup = evalResult1.alerts.find((a) => a.alertType === "possible_duplicate");
+
+      expect(dupPhone).toBeUndefined();
+      expect(dupEmail).toBeUndefined();
+      expect(dupMaps).toBeUndefined();
+      expect(dupAddr).toBeUndefined();
+      expect(possDup).toBeUndefined();
+    });
+
+    it("NEGATIVE TEST: similar names WITHOUT shared phone/email/maps/address NEVER trigger duplicate alerts", () => {
       const customer1: CustomerEvaluationInput = {
         id: "cust-p1",
         displayName: "Pedro Madroñal",

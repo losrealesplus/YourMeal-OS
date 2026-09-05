@@ -6,6 +6,10 @@
  * in a deterministic, pure runtime fashion. It NEVER merges, modifies, or deletes
  * customer records automatically. All interventions require explicit human action.
  *
+ * Rule on Name Matching:
+ * NAME SIMILARITY IS NEVER DUPLICATE EVIDENCE.
+ * Similar or identical names alone NEVER trigger duplicate alerts.
+ *
  * @see docs/adr/0100-customer-data-quality-and-improvement-alerts.md
  */
 
@@ -19,6 +23,8 @@ export type QualityAlertCode =
   | "incomplete_profile"
   | "duplicate_phone"
   | "duplicate_email"
+  | "duplicate_maps"
+  | "duplicate_address"
   | "possible_duplicate";
 
 export type QualityAlertSeverity = "info" | "warning" | "critical";
@@ -155,6 +161,104 @@ export function isVariableLocationText(text: string | null | undefined): boolean
   return VARIABLE_LOCATION_REGEX.test(text);
 }
 
+const MAPS_URL_REGEX = /https?:\/\/(?:www\.)?(?:google\.[a-z.]+\/maps|maps\.google\.[a-z.]+|goo\.gl\/maps|maps\.app\.goo\.gl)\/[^\s"']+/i;
+
+/**
+ * Extracts a canonical Google Maps reference (coordinates or normalized URL).
+ */
+export function extractCanonicalMapsIdentifier(
+  input: string | CustomerAddressItem | null | undefined,
+): string | null {
+  if (!input) return null;
+
+  if (typeof input === "object") {
+    if (
+      typeof input.lat === "number" &&
+      typeof input.lng === "number" &&
+      !isNaN(input.lat) &&
+      !isNaN(input.lng) &&
+      (input.lat !== 0 || input.lng !== 0)
+    ) {
+      return `coords:${input.lat.toFixed(5)},${input.lng.toFixed(5)}`;
+    }
+    const combined = [input.street, input.label, input.notes].filter(Boolean).join(" ");
+    return extractCanonicalMapsIdentifier(combined);
+  }
+
+  const match = input.match(MAPS_URL_REGEX);
+  if (match && match[0]) {
+    let url = match[0].trim().toLowerCase();
+    url = url.replace(/[.,;)\]]+$/, "");
+    return url;
+  }
+
+  return null;
+}
+
+const GENERIC_PLACEHOLDERS = new Set([
+  "variable",
+  "ubicacion variable",
+  "ubicación variable",
+  "sin direccion",
+  "sin dirección",
+  "recoger",
+  "local",
+  "oficina",
+  "tenerife",
+  "santa cruz",
+  "adeje",
+  "arona",
+]);
+
+/**
+ * Normalizes a structured address for deterministic comparison.
+ * Returns null if the address lacks sufficient specific structured detail.
+ */
+export function normalizeStructuredAddress(
+  address: CustomerAddressItem | string | null | undefined,
+): string | null {
+  if (!address) return null;
+
+  let street = "";
+  let city = "";
+  let zip = "";
+
+  if (typeof address === "string") {
+    street = address.trim();
+  } else {
+    street = address.street?.trim() || "";
+    city = address.city?.trim() || "";
+    zip = address.zip?.trim() || "";
+  }
+
+  if (street.length < 5) return null;
+
+  const lowerStreet = street.toLowerCase();
+  if (GENERIC_PLACEHOLDERS.has(lowerStreet) || lowerStreet.startsWith("http")) {
+    return null;
+  }
+
+  // Canonicalize street prefixes deterministically
+  let normalizedStreet = lowerStreet
+    .replace(/\s+/g, " ")
+    .replace(/^calle\s+/i, "c/ ")
+    .replace(/^c\.\s+/i, "c/ ")
+    .replace(/^avenida\s+/i, "av/ ")
+    .replace(/^avda\.?\s+/i, "av/ ")
+    .replace(/^paseo\s+/i, "pso/ ")
+    .replace(/^carretera\s+/i, "ctra/ ")
+    .replace(/^ctra\.?\s+/i, "ctra/ ")
+    .trim();
+
+  // If street has reasonable length
+  if (normalizedStreet.length < 5) return null;
+
+  const normalizedCity = city.toLowerCase().replace(/\s+/g, " ").trim();
+  const normalizedZip = zip.replace(/\D/g, "").trim();
+
+  return `${normalizedStreet}|${normalizedCity}|${normalizedZip}`;
+}
+
 /**
  * Pure evaluator: evaluates customer data quality and improvement alerts.
  * GUARANTEE: Never modifies or mutates customer input.
@@ -183,18 +287,23 @@ export function evaluateCustomerQuality(
     }
   }
 
-  // Extract address strings
-  const addressList: { street: string; city: string | null; notes: string | null }[] = [];
+  // Extract address items
+  const addressList: CustomerAddressItem[] = [];
   for (const a of rawAddresses) {
     if (typeof a === "string") {
-      if (a.trim()) addressList.push({ street: a.trim(), city: null, notes: null });
+      if (a.trim()) addressList.push({ street: a.trim() });
     } else if (a && typeof a === "object") {
       const street = a.street?.trim();
-      if (street) {
+      if (street || a.lat || a.lng) {
         addressList.push({
-          street,
+          street: street || null,
           city: a.city?.trim() || null,
+          zip: a.zip?.trim() || null,
+          label: a.label?.trim() || null,
           notes: a.notes?.trim() || null,
+          lat: a.lat ?? null,
+          lng: a.lng ?? null,
+          isDefault: a.isDefault,
         });
       }
     }
@@ -318,69 +427,151 @@ export function evaluateCustomerQuality(
     }
   }
 
-  // --- Rule 5: Duplicate phone hypotheses ---
+  // --- Rule 5: Deterministic Duplicate Detection ---
+  // Signals evaluated:
+  // 1. Phone (exact normalized digits)
+  // 2. Email (exact normalized email)
+  // 3. Maps (exact canonical Maps identifier / URL)
+  // 4. Address (exact normalized structured address)
+  // INVARIANT: Name similarity is NEVER duplicate evidence.
+
   const currentNormalizedPhones = phoneList
     .map(normalizePhone)
     .filter((p): p is string => p !== null);
 
-  if (currentNormalizedPhones.length > 0 && allCustomers.length > 0) {
+  const currentNormalizedEmail = normalizeEmail(customer.email);
+
+  const currentMapsIds = [
+    extractCanonicalMapsIdentifier(customerNotes),
+    ...addressList.map(extractCanonicalMapsIdentifier),
+  ].filter((m): m is string => m !== null);
+
+  const currentNormalizedAddresses = addressList
+    .map(normalizeStructuredAddress)
+    .filter((a): a is string => a !== null);
+
+  if (allCustomers.length > 0) {
     for (const other of allCustomers) {
       if (other.id === customer.id || other.deletedAt) continue;
-      const otherPhones = (other.phones ?? [])
-        .map((p) => (typeof p === "string" ? p : p?.phone))
-        .filter(Boolean)
-        .map(normalizePhone)
-        .filter((p): p is string => p !== null);
 
-      const matchingPhone = currentNormalizedPhones.find((p) => otherPhones.includes(p));
-      if (matchingPhone) {
+      const signals: {
+        type: QualityAlertCode;
+        field: string;
+        value: string;
+        label: string;
+      }[] = [];
+
+      // 1. Check Phone match
+      if (currentNormalizedPhones.length > 0) {
+        const otherPhones = (other.phones ?? [])
+          .map((p) => (typeof p === "string" ? p : p?.phone))
+          .filter(Boolean)
+          .map(normalizePhone)
+          .filter((p): p is string => p !== null);
+
+        const matchingPhone = currentNormalizedPhones.find((p) => otherPhones.includes(p));
+        if (matchingPhone) {
+          signals.push({
+            type: "duplicate_phone",
+            field: "phone",
+            value: matchingPhone,
+            label: "Teléfono",
+          });
+        }
+      }
+
+      // 2. Check Email match
+      if (currentNormalizedEmail) {
+        const otherEmail = normalizeEmail(other.email);
+        if (otherEmail && otherEmail === currentNormalizedEmail) {
+          signals.push({
+            type: "duplicate_email",
+            field: "email",
+            value: currentNormalizedEmail,
+            label: "Email",
+          });
+        }
+      }
+
+      // 3. Check Maps match
+      if (currentMapsIds.length > 0) {
+        const otherMapsIds = [
+          extractCanonicalMapsIdentifier(other.notes),
+          ...(other.addresses ?? []).map((a) => extractCanonicalMapsIdentifier(a)),
+        ].filter((m): m is string => m !== null);
+
+        const matchingMaps = currentMapsIds.find((m) => otherMapsIds.includes(m));
+        if (matchingMaps) {
+          signals.push({
+            type: "duplicate_maps",
+            field: "maps",
+            value: matchingMaps,
+            label: "Google Maps",
+          });
+        }
+      }
+
+      // 4. Check Structured Address match
+      if (currentNormalizedAddresses.length > 0) {
+        const otherAddresses = (other.addresses ?? [])
+          .map((a) => normalizeStructuredAddress(a))
+          .filter((a): a is string => a !== null);
+
+        const matchingAddress = currentNormalizedAddresses.find((a) =>
+          otherAddresses.includes(a),
+        );
+        if (matchingAddress) {
+          signals.push({
+            type: "duplicate_address",
+            field: "address",
+            value: matchingAddress,
+            label: "Dirección",
+          });
+        }
+      }
+
+      // Multi-signal vs Single-signal alerts
+      if (signals.length >= 2) {
+        // High confidence: multiple deterministic signals coincide
         alerts.push({
-          id: `${customer.id}:duplicate_phone:${other.id}`,
+          id: `${customer.id}:possible_duplicate:${other.id}`,
           customerId: customer.id,
           customerName: displayName,
-          alertType: "duplicate_phone",
-          severity: "info",
+          alertType: "possible_duplicate",
+          severity: "warning",
           status: "open",
-          title: "Teléfono compartido con otro cliente",
-          description: `El número ${matchingPhone} también está registrado en ${other.displayName || "otro cliente"}.`,
+          title: `Posible duplicado (${signals.map((s) => s.label).join(" + ")})`,
+          description: `Coincidencia determinista en ${signals.map((s) => s.label).join(" y ")} con ${other.displayName || "otro cliente"}.`,
           evidence: {
-            ruleCode: "RULE_DUPLICATE_PHONE",
-            field: "phone",
-            detectedValue: matchingPhone,
+            ruleCode: "RULE_POSSIBLE_DUPLICATE_MULTI_SIGNAL",
+            field: signals.map((s) => s.field).join(", "),
+            detectedValue: signals.map((s) => `${s.field}:${s.value}`).join("; "),
             conflictingCustomerId: other.id,
             conflictingCustomerName: other.displayName || null,
-            rationale: `Exact phone match detected with customer ${other.id}`,
+            rationale: `Matched ${signals.length} deterministic signals (${signals.map((s) => s.label).join(", ")}) with customer ${other.id}`,
           },
           targetCustomerId: other.id,
           createdAt: evaluatedAt,
         });
-      }
-    }
-  }
-
-  // --- Rule 6: Duplicate email hypotheses ---
-  const currentNormalizedEmail = normalizeEmail(customer.email);
-  if (currentNormalizedEmail && allCustomers.length > 0) {
-    for (const other of allCustomers) {
-      if (other.id === customer.id || other.deletedAt) continue;
-      const otherEmail = normalizeEmail(other.email);
-      if (otherEmail && otherEmail === currentNormalizedEmail) {
+      } else if (signals.length === 1) {
+        // Single deterministic signal
+        const single = signals[0];
         alerts.push({
-          id: `${customer.id}:duplicate_email:${other.id}`,
+          id: `${customer.id}:${single.type}:${other.id}`,
           customerId: customer.id,
           customerName: displayName,
-          alertType: "duplicate_email",
+          alertType: single.type,
           severity: "info",
           status: "open",
-          title: "Email compartido con otro cliente",
-          description: `El email ${currentNormalizedEmail} también está registrado en ${other.displayName || "otro cliente"}.`,
+          title: `${single.label} compartido con otro cliente`,
+          description: `El valor ${single.value} coincide determinísticamente con ${other.displayName || "otro cliente"}.`,
           evidence: {
-            ruleCode: "RULE_DUPLICATE_EMAIL",
-            field: "email",
-            detectedValue: currentNormalizedEmail,
+            ruleCode: `RULE_${single.type.toUpperCase()}`,
+            field: single.field,
+            detectedValue: single.value,
             conflictingCustomerId: other.id,
             conflictingCustomerName: other.displayName || null,
-            rationale: `Exact email match detected with customer ${other.id}`,
+            rationale: `Exact deterministic ${single.field} match detected with customer ${other.id}`,
           },
           targetCustomerId: other.id,
           createdAt: evaluatedAt,

@@ -56,6 +56,8 @@ export type {
 export {
   normalizePhone,
   normalizeEmail,
+  extractCanonicalMapsIdentifier,
+  normalizeStructuredAddress,
   isVariableLocationText,
   evaluateCustomerQuality,
 } from "./domain/customer-quality";
