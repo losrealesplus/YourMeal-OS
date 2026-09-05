@@ -42,6 +42,36 @@ export type QualitySignalEvidence = {
   rationale: string;
 };
 
+export type ImprovementActionKind =
+  | "add_phone"
+  | "add_address"
+  | "add_delivery_instructions"
+  | "confirm_distinct_customer"
+  | "defer_review"
+  | "dismiss_irrelevant";
+
+export function allowedActionsForAlert(alertType: QualityAlertCode): ImprovementActionKind[] {
+  switch (alertType) {
+    case "missing_phone":
+      return ["add_phone", "defer_review", "dismiss_irrelevant"];
+    case "missing_address":
+      return ["add_address", "defer_review", "dismiss_irrelevant"];
+    case "missing_delivery_instructions":
+    case "variable_location_without_instruction":
+      return ["add_delivery_instructions", "defer_review", "dismiss_irrelevant"];
+    case "incomplete_profile":
+      return ["defer_review"];
+    case "duplicate_phone":
+    case "duplicate_email":
+    case "duplicate_maps":
+    case "duplicate_address":
+    case "possible_duplicate":
+      return ["confirm_distinct_customer", "defer_review"];
+    default:
+      return ["defer_review", "dismiss_irrelevant"];
+  }
+}
+
 export type CustomerImprovementAlert = {
   id: string;
   customerId: string;
@@ -52,6 +82,7 @@ export type CustomerImprovementAlert = {
   title: string;
   description: string;
   evidence: QualitySignalEvidence;
+  allowedActions: ImprovementActionKind[];
   dismissedAt?: string | null;
   dismissedBy?: string | null;
   dismissReason?: DismissReason | null;
@@ -326,6 +357,7 @@ export function evaluateCustomerQuality(
         detectedValue: null,
         rationale: "displayName is null or whitespace",
       },
+      allowedActions: allowedActionsForAlert("incomplete_profile"),
       createdAt: evaluatedAt,
     });
   }
@@ -347,6 +379,7 @@ export function evaluateCustomerQuality(
         detectedValue: 0,
         rationale: "No active phone records found for customer",
       },
+      allowedActions: allowedActionsForAlert("missing_phone"),
       createdAt: evaluatedAt,
     });
   } else {
@@ -369,6 +402,7 @@ export function evaluateCustomerQuality(
           detectedValue: phoneList.join(", "),
           rationale: "Provided phone numbers cannot be normalized to standard digits",
         },
+        allowedActions: allowedActionsForAlert("missing_phone"),
         createdAt: evaluatedAt,
       });
     }
@@ -391,6 +425,7 @@ export function evaluateCustomerQuality(
         detectedValue: 0,
         rationale: "No active address records found for customer",
       },
+      allowedActions: allowedActionsForAlert("missing_address"),
       createdAt: evaluatedAt,
     });
   }
@@ -422,6 +457,7 @@ export function evaluateCustomerQuality(
           detectedValue: customerNotes ?? "variable",
           rationale: "Customer marked with variable location lacks specific delivery instructions",
         },
+        allowedActions: allowedActionsForAlert("variable_location_without_instruction"),
         createdAt: evaluatedAt,
       });
     }
@@ -550,6 +586,7 @@ export function evaluateCustomerQuality(
             conflictingCustomerName: other.displayName || null,
             rationale: `Matched ${signals.length} deterministic signals (${signals.map((s) => s.label).join(", ")}) with customer ${other.id}`,
           },
+          allowedActions: allowedActionsForAlert("possible_duplicate"),
           targetCustomerId: other.id,
           createdAt: evaluatedAt,
         });
@@ -573,6 +610,7 @@ export function evaluateCustomerQuality(
             conflictingCustomerName: other.displayName || null,
             rationale: `Exact deterministic ${single.field} match detected with customer ${other.id}`,
           },
+          allowedActions: allowedActionsForAlert(single.type),
           targetCustomerId: other.id,
           createdAt: evaluatedAt,
         });

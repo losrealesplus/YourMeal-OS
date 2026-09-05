@@ -44,6 +44,7 @@ export type {
   QualityAlertSeverity,
   QualityAlertStatus,
   DismissReason,
+  ImprovementActionKind,
   QualitySignalEvidence,
   CustomerImprovementAlert,
   CustomerQualityEvaluation,
@@ -59,6 +60,7 @@ export {
   extractCanonicalMapsIdentifier,
   normalizeStructuredAddress,
   isVariableLocationText,
+  allowedActionsForAlert,
   evaluateCustomerQuality,
 } from "./domain/customer-quality";
 export { CustomerDirectoryService } from "./application/customer-directory-service";

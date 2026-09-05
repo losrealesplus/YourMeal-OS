@@ -72,6 +72,16 @@ describe("Customer Quality & Improvement Alerts Domain Engine", () => {
       expect(evalResult.alerts.map((a) => a.alertType)).toEqual(
         expect.arrayContaining(["missing_phone", "missing_address"]),
       );
+
+      const phoneAlert = evalResult.alerts.find((a) => a.alertType === "missing_phone");
+      expect(phoneAlert?.allowedActions).toEqual(
+        expect.arrayContaining(["add_phone", "defer_review", "dismiss_irrelevant"]),
+      );
+
+      const addrAlert = evalResult.alerts.find((a) => a.alertType === "missing_address");
+      expect(addrAlert?.allowedActions).toEqual(
+        expect.arrayContaining(["add_address", "defer_review", "dismiss_irrelevant"]),
+      );
     });
 
     it("detects missing all contact info and marks needs_attention", () => {
@@ -225,6 +235,9 @@ describe("Customer Quality & Improvement Alerts Domain Engine", () => {
       const addrAlert = evalResult1.alerts.find((a) => a.alertType === "duplicate_address");
       expect(addrAlert).toBeDefined();
       expect(addrAlert?.targetCustomerId).toBe("cust-addr2");
+      expect(addrAlert?.allowedActions).toEqual(
+        expect.arrayContaining(["confirm_distinct_customer", "defer_review"]),
+      );
     });
 
     it("emits possible_duplicate when >= 2 deterministic signals coincide (e.g. phone + address)", () => {
@@ -262,6 +275,9 @@ describe("Customer Quality & Improvement Alerts Domain Engine", () => {
       expect(possibleDupAlert).toBeDefined();
       expect(possibleDupAlert?.severity).toBe("warning");
       expect(possibleDupAlert?.evidence.rationale).toContain("Matched 2 deterministic signals");
+      expect(possibleDupAlert?.allowedActions).toEqual(
+        expect.arrayContaining(["confirm_distinct_customer", "defer_review"]),
+      );
     });
 
     it("NEGATIVE TEST: IDENTICAL names without shared phone/email/maps/address NEVER trigger duplicate alerts", () => {
