@@ -20,7 +20,7 @@ const mobileSpa = process.env.CAPACITOR_BUILD === "1";
  * .output/server/index.mjs is not loadable by tanstack-start preview-server.
  */
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), "");
+  const env = { ...loadEnv(mode, process.cwd(), ""), ...process.env };
   const viteEnvDefines = Object.fromEntries(
     Object.entries(env)
       .filter(([key]) => key.startsWith("VITE_"))
