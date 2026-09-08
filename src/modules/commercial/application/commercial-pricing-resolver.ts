@@ -20,26 +20,26 @@ export interface OrderPricingResolutionInput {
 
 /**
  * Resolves commercial pricing for an order context.
- * Returns null when the tenant has no commercial offers configured (a-la-carte fallback).
+ * Returns null when the tenant has no commercial offers configured or no tenantSlug provided.
+ * In that case, callers fall back to standard a-la-carte catalog dish pricing.
  */
 export function resolveOrderCommercialPricing(
   input: OrderPricingResolutionInput,
 ): PricingEvaluationResult | null {
-  const tenantSlug = input.tenantSlug ?? "eatclean";
-  const customerTier: CustomerTier = input.customerTier ?? "public";
+  if (!input.tenantSlug) {
+    return null;
+  }
 
   if (!input.items || input.items.length === 0) {
     return null;
   }
 
-  // Calculate distinct delivery days / menu slots
-  const distinctDays = new Set(input.items.map((i) => i.dayDate)).size;
-  const menuCount = Math.max(1, distinctDays);
+  const customerTier: CustomerTier = input.customerTier ?? "public";
 
-  const offer = resolveCommercialOffer(tenantSlug, {
+  const offer = resolveCommercialOffer(input.tenantSlug, {
     offerCode: input.offerCode,
-    menuCount,
     customerTier,
+    menuCount: input.items.length,
   });
 
   if (!offer) {

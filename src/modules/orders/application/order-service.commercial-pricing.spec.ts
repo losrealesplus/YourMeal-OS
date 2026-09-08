@@ -1,9 +1,15 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DomainError } from "@/domain/errors";
 import type { ServiceContext } from "@/services/types";
 import { OrderService } from "./order-service";
 import { AuditService } from "@/services/audit-service";
 import type { OrderWithItems } from "../infrastructure/order-repository";
+import {
+  clearTenantOffersRegistry,
+  registerTenantOffers,
+  getTenantOffers,
+} from "@/modules/commercial";
+import type { CommercialOffer } from "@/modules/commercial";
 
 vi.mock("@/services/feature-flag-service", () => ({
   FeatureFlagService: {
@@ -39,19 +45,19 @@ vi.mock("@/modules/weekly-menu/infrastructure/weekly-menu-repository", () => ({
       week_start: "2026-07-20",
     })),
     listSlotsWithDishes: vi.fn(async () => [
-      { day_date: "2026-07-20", dish_id: "dish-01", dishes: { id: "dish-01", price: 0 } },
-      { day_date: "2026-07-21", dish_id: "dish-02", dishes: { id: "dish-02", price: 0 } },
-      { day_date: "2026-07-22", dish_id: "dish-03", dishes: { id: "dish-03", price: 0 } },
-      { day_date: "2026-07-23", dish_id: "dish-04", dishes: { id: "dish-04", price: 0 } },
-      { day_date: "2026-07-24", dish_id: "dish-05", dishes: { id: "dish-05", price: 0 } },
+      { day_date: "2026-07-20", dish_id: "dish-01", dishes: { id: "dish-01", price: 12.5 } },
+      { day_date: "2026-07-21", dish_id: "dish-02", dishes: { id: "dish-02", price: 12.5 } },
+      { day_date: "2026-07-22", dish_id: "dish-03", dishes: { id: "dish-03", price: 12.5 } },
+      { day_date: "2026-07-23", dish_id: "dish-04", dishes: { id: "dish-04", price: 12.5 } },
+      { day_date: "2026-07-24", dish_id: "dish-05", dishes: { id: "dish-05", price: 12.5 } },
     ]),
   })),
 }));
 
-vi.mock("@/modules/dishes/infrastructure/dish-repository", () => ({
+vi.mock("@/modules/dish-library/infrastructure/dish-repository", () => ({
   createDishRepository: vi.fn(() => ({
     listCatalogByIds: vi.fn(async (ids: string[]) =>
-      ids.map((id) => ({ id, name: `Dish ${id}`, price: 0 })),
+      ids.map((id) => ({ id, name: `Dish ${id}`, price: 12.5 })),
     ),
   })),
 }));
@@ -73,8 +79,8 @@ function makeContext(overrides: Partial<ServiceContext> = {}): ServiceContext {
   return {
     supabase: {} as ServiceContext["supabase"],
     userId: "user-123",
-    tenantId: "8bba00ba-331b-42c8-9283-4e3836ffb870",
-    tenantSlug: "eatclean",
+    tenantId: "tenant-test-id",
+    tenantSlug: "test-tenant",
     roles: ["customer"],
     capabilities: new Set(["orders.write", "orders.read"]),
     localization: null,
@@ -83,9 +89,11 @@ function makeContext(overrides: Partial<ServiceContext> = {}): ServiceContext {
   };
 }
 
-describe("OrderService Commercial Pricing Integration (ADR 0065 & FASE 3N)", () => {
+describe("OrderService Commercial Pricing Universal Core Integration (FASE 3N-R)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    clearTenantOffersRegistry();
+
     mockFindCustomerIdForUser.mockResolvedValue("customer-123");
     mockInsertDraft.mockImplementation(async (input: { total: number }) => ({
       order: {
@@ -100,33 +108,131 @@ describe("OrderService Commercial Pricing Integration (ADR 0065 & FASE 3N)", () 
     }));
   });
 
-  describe("Draft Pricing Resolution", () => {
-    it("prices 1 individual menu at 11.90 € despite catalog dish having price = 0", async () => {
-      const ctx = makeContext();
+  afterEach(() => {
+    clearTenantOffersRegistry();
+  });
+
+  describe("1. Architectural Separation & Multi-Tenant Agnostic Invariants", () => {
+    it("verifies Core registry has zero default hardcoded tenant offers", () => {
+      expect(getTenantOffers("eatclean")).toEqual([]);
+      expect(getTenantOffers("any-tenant")).toEqual([]);
+      expect(getTenantOffers(null)).toEqual([]);
+    });
+
+    it("falls back to standard catalog dish pricing when no commercial offers are registered for tenant", async () => {
+      const ctx = makeContext({ tenantSlug: "unconfigured-tenant" });
+
       const result = await OrderService.programDraftItems(ctx, {
         weekStart: "2026-07-20",
         items: [
-          {
-            dishId: "dish-01",
-            dayDate: "2026-07-20",
-            qty: 1,
-          },
+          { dishId: "dish-01", dayDate: "2026-07-20", qty: 2 },
         ],
       });
 
+      // Catalog dish price = 12.50 € * 2 = 25.00 €
       expect(mockInsertDraft).toHaveBeenCalledWith(
         expect.objectContaining({
-          total: 11.9,
-          customerId: "customer-123",
+          total: 25.0,
         }),
       );
-      expect(result.order.total).toBe(11.9);
+      expect(result.order.total).toBe(25.0);
     });
 
-    it("prices 5 weekly menus at 53.55 € (59.50 € with 10% promo)", async () => {
-      const ctx = makeContext();
+    it("ensures two distinct tenants with custom offers resolve independent commercial pricing", async () => {
+      // Tenant A: Acme Catering
+      const acmeOffers: CommercialOffer[] = [
+        {
+          id: "acme-offer-single",
+          code: "individual_menu",
+          title: "Menú Ejecutivo Acme",
+          subtitle: "Menú gourmet diario",
+          description: "Alta gastronomía corporativa",
+          basePrice: { cents: 1500, currency: "EUR", formatted: "15,00 €" },
+          unitLabel: "menú",
+          slotsIncluded: 1,
+          promotions: [],
+        },
+      ];
+      registerTenantOffers("acme-meals", acmeOffers);
+
+      // Tenant B: Fit Food
+      const fitFoodOffers: CommercialOffer[] = [
+        {
+          id: "fit-offer-single",
+          code: "individual_menu",
+          title: "Menú Fit Diario",
+          subtitle: "Comida saludable económica",
+          description: "Nutrición deportiva",
+          basePrice: { cents: 850, currency: "EUR", formatted: "8,50 €" },
+          unitLabel: "menú",
+          slotsIncluded: 1,
+          promotions: [],
+        },
+      ];
+      registerTenantOffers("fit-food", fitFoodOffers);
+
+      // Order for Tenant A
+      const ctxA = makeContext({ tenantSlug: "acme-meals" });
+      const resultA = await OrderService.programDraftItems(ctxA, {
+        weekStart: "2026-07-20",
+        items: [{ dishId: "dish-01", dayDate: "2026-07-20", qty: 1 }],
+      });
+      expect(resultA.order.total).toBe(15.0);
+
+      // Order for Tenant B
+      const ctxB = makeContext({ tenantSlug: "fit-food" });
+      const resultB = await OrderService.programDraftItems(ctxB, {
+        weekStart: "2026-07-20",
+        items: [{ dishId: "dish-01", dayDate: "2026-07-20", qty: 1 }],
+      });
+      expect(resultB.order.total).toBe(8.5);
+    });
+
+    it("verifies missing tenantSlug context does not default to any tenant or pricing", async () => {
+      const ctx = makeContext({ tenantSlug: null });
+
       const result = await OrderService.programDraftItems(ctx, {
         weekStart: "2026-07-20",
+        items: [{ dishId: "dish-01", dayDate: "2026-07-20", qty: 1 }],
+      });
+
+      // Fallback to catalog dish price: 12.50 €
+      expect(result.order.total).toBe(12.5);
+    });
+
+    it("verifies offerCode explicitly determines the offer and does not silently mutate by menuCount", async () => {
+      const tenantOffers: CommercialOffer[] = [
+        {
+          id: "offer-ind",
+          code: "individual_menu",
+          title: "Menú Suelto",
+          subtitle: "Por día",
+          description: "Menú puntual",
+          basePrice: { cents: 1000, currency: "EUR", formatted: "10,00 €" },
+          unitLabel: "menú",
+          slotsIncluded: 1,
+          promotions: [],
+        },
+        {
+          id: "offer-weekly",
+          code: "weekly_plan",
+          title: "Pack Semanal",
+          subtitle: "5 menús",
+          description: "Pack 5 días con descuento",
+          basePrice: { cents: 4500, currency: "EUR", formatted: "45,00 €" },
+          unitLabel: "semana",
+          slotsIncluded: 5,
+          promotions: [],
+        },
+      ];
+      registerTenantOffers("test-tenant", tenantOffers);
+
+      const ctx = makeContext({ tenantSlug: "test-tenant" });
+
+      // Case A: 5 dishes selected with explicit offerCode: "weekly_plan" -> evaluates 45.00 €
+      const resultWeekly = await OrderService.programDraftItems(ctx, {
+        weekStart: "2026-07-20",
+        offerCode: "weekly_plan",
         items: [
           { dishId: "dish-01", dayDate: "2026-07-20", qty: 1 },
           { dishId: "dish-02", dayDate: "2026-07-21", qty: 1 },
@@ -135,70 +241,94 @@ describe("OrderService Commercial Pricing Integration (ADR 0065 & FASE 3N)", () 
           { dishId: "dish-05", dayDate: "2026-07-24", qty: 1 },
         ],
       });
+      expect(resultWeekly.order.total).toBe(45.0);
 
-      expect(mockInsertDraft).toHaveBeenCalledWith(
-        expect.objectContaining({
-          total: 53.55,
-        }),
-      );
-      expect(result.order.total).toBe(53.55);
+      // Case B: 5 dishes selected with explicit offerCode: "individual_menu" -> stays individual (10.00 €)
+      const resultIndividual = await OrderService.programDraftItems(ctx, {
+        weekStart: "2026-07-20",
+        offerCode: "individual_menu",
+        items: [
+          { dishId: "dish-01", dayDate: "2026-07-20", qty: 1 },
+          { dishId: "dish-02", dayDate: "2026-07-21", qty: 1 },
+          { dishId: "dish-03", dayDate: "2026-07-22", qty: 1 },
+          { dishId: "dish-04", dayDate: "2026-07-23", qty: 1 },
+          { dishId: "dish-05", dayDate: "2026-07-24", qty: 1 },
+        ],
+      });
+      expect(resultIndividual.order.total).toBe(10.0);
     });
 
-    it("applies fixed price 9.97 € for subscriber_monthly customer tier", async () => {
-      const ctx = makeContext();
+    it("evaluates extras and customer tier discounts according to registered tenant rules", async () => {
+      const tenantOffers: CommercialOffer[] = [
+        {
+          id: "offer-ind",
+          code: "individual_menu",
+          title: "Menú Individual",
+          subtitle: "Por día",
+          description: "Menú",
+          basePrice: { cents: 1000, currency: "EUR", formatted: "10,00 €" },
+          unitLabel: "menú",
+          slotsIncluded: 1,
+          promotions: [
+            {
+              id: "promo-vip-extras",
+              code: "VIP_EXTRAS_20",
+              name: "20% dto en extras para VIP",
+              type: "percentage",
+              value: 20.0,
+              appliesTo: "extras",
+              eligibility: "subscriber_monthly",
+            },
+          ],
+        },
+      ];
+      registerTenantOffers("test-tenant", tenantOffers);
+
+      const ctx = makeContext({ tenantSlug: "test-tenant" });
       const result = await OrderService.programDraftItems(ctx, {
         weekStart: "2026-07-20",
         customerTier: "subscriber_monthly",
-        items: [
-          { dishId: "dish-01", dayDate: "2026-07-20", qty: 1 },
-        ],
-      });
-
-      expect(mockInsertDraft).toHaveBeenCalledWith(
-        expect.objectContaining({
-          total: 9.97,
-        }),
-      );
-      expect(result.order.total).toBe(9.97);
-    });
-
-    it("accurately computes extras in commercial total", async () => {
-      const ctx = makeContext();
-      const result = await OrderService.programDraftItems(ctx, {
-        weekStart: "2026-07-20",
-        items: [
-          { dishId: "dish-01", dayDate: "2026-07-20", qty: 1 },
-        ],
+        items: [{ dishId: "dish-01", dayDate: "2026-07-20", qty: 1 }],
         extras: [
           {
-            dishId: "extra-soup-01",
-            dishName: "Crema de verduras",
-            basePriceCents: 450,
+            dishId: "extra-soup",
+            dishName: "Sopa casera",
+            basePriceCents: 500, // 5,00 € base -> 20% off -> 4,00 €
             qty: 1,
           },
         ],
       });
 
-      // Individual menu: 11.90 € (1190 cents) + Extra: 4.50 € (450 cents) = 16.40 €
-      expect(mockInsertDraft).toHaveBeenCalledWith(
-        expect.objectContaining({
-          total: 16.4,
-        }),
-      );
-      expect(result.order.total).toBe(16.4);
+      // Base: 10,00 € + Extra con 20%: 4,00 € = 14,00 €
+      expect(result.order.total).toBe(14.0);
     });
   });
 
-  describe("Confirmation, Anti-Drift & Price Snapshot", () => {
+  describe("2. Confirmation, Anti-Drift Guard & Immutable Price Snapshot", () => {
     it("confirms draft and writes immutable PriceSnapshot to AuditService", async () => {
-      const ctx = makeContext();
+      const tenantOffers: CommercialOffer[] = [
+        {
+          id: "offer-ind",
+          code: "individual_menu",
+          title: "Menú Individual",
+          subtitle: "Por día",
+          description: "Menú puntual",
+          basePrice: { cents: 1200, currency: "EUR", formatted: "12,00 €" },
+          unitLabel: "menú",
+          slotsIncluded: 1,
+          promotions: [],
+        },
+      ];
+      registerTenantOffers("test-tenant", tenantOffers);
+
+      const ctx = makeContext({ tenantSlug: "test-tenant" });
       const mockOrderWithItems: OrderWithItems = {
         order: {
           id: "order-test-1",
           tenant_id: ctx.tenantId,
           customer_id: "customer-123",
           status: "draft",
-          total: 11.9,
+          total: 12.0,
           week_start: "2026-07-20",
           notes: null,
           demand_channel: "individual",
@@ -231,7 +361,7 @@ describe("OrderService Commercial Pricing Integration (ADR 0065 & FASE 3N)", () 
       });
 
       const confirmed = await OrderService.confirm(ctx, "order-test-1", {
-        expectedTotal: 11.9,
+        expectedTotal: 12.0,
       });
 
       expect(confirmed.status).toBe("confirmed");
@@ -246,7 +376,7 @@ describe("OrderService Commercial Pricing Integration (ADR 0065 & FASE 3N)", () 
             priceSnapshot: expect.objectContaining({
               orderId: "order-test-1",
               offerCode: "individual_menu",
-              finalAmountCents: 1190,
+              finalAmountCents: 1200,
             }),
           }),
         }),
@@ -254,14 +384,29 @@ describe("OrderService Commercial Pricing Integration (ADR 0065 & FASE 3N)", () 
     });
 
     it("rejects confirmation with PRICE_MISMATCH if expectedTotal does not match authoritative evaluation", async () => {
-      const ctx = makeContext();
+      const tenantOffers: CommercialOffer[] = [
+        {
+          id: "offer-ind",
+          code: "individual_menu",
+          title: "Menú Individual",
+          subtitle: "Por día",
+          description: "Menú puntual",
+          basePrice: { cents: 1400, currency: "EUR", formatted: "14,00 €" },
+          unitLabel: "menú",
+          slotsIncluded: 1,
+          promotions: [],
+        },
+      ];
+      registerTenantOffers("test-tenant", tenantOffers);
+
+      const ctx = makeContext({ tenantSlug: "test-tenant" });
       const mockOrderWithItems: OrderWithItems = {
         order: {
           id: "order-test-1",
           tenant_id: ctx.tenantId,
           customer_id: "customer-123",
           status: "draft",
-          total: 0.0, // Stale total from client or old draft
+          total: 10.0, // Stale price from old draft
           week_start: "2026-07-20",
           notes: null,
           demand_channel: "individual",
@@ -291,13 +436,7 @@ describe("OrderService Commercial Pricing Integration (ADR 0065 & FASE 3N)", () 
 
       await expect(
         OrderService.confirm(ctx, "order-test-1", {
-          expectedTotal: 0.0,
-        }),
-      ).rejects.toThrowError(DomainError);
-
-      await expect(
-        OrderService.confirm(ctx, "order-test-1", {
-          expectedTotal: 0.0,
+          expectedTotal: 10.0,
         }),
       ).rejects.toMatchObject({
         code: "PRICE_MISMATCH",
@@ -316,7 +455,7 @@ describe("OrderService Commercial Pricing Integration (ADR 0065 & FASE 3N)", () 
           tenant_id: ctx.tenantId,
           customer_id: "customer-123",
           status: "draft",
-          total: 11.9,
+          total: 12.0,
           week_start: "2026-07-20",
           notes: null,
           demand_channel: "individual",
@@ -334,7 +473,7 @@ describe("OrderService Commercial Pricing Integration (ADR 0065 & FASE 3N)", () 
       mockFindByIdWithItems.mockResolvedValue(mockOrderWithItems);
 
       await expect(
-        OrderService.confirm(ctx, "order-test-1", { expectedTotal: 11.9 }),
+        OrderService.confirm(ctx, "order-test-1", { expectedTotal: 12.0 }),
       ).rejects.toMatchObject({
         code: "PERMISSION_DENIED",
       });

@@ -151,14 +151,8 @@ export const OrderService = {
         }
       }
 
-      const tenantSlug =
-        ctx.tenantSlug ??
-        (ctx.tenantId === "8bba00ba-331b-42c8-9283-4e3836ffb870"
-          ? "eatclean"
-          : "yourmeal-os");
-
       const commercialPricing = resolveOrderCommercialPricing({
-        tenantSlug,
+        tenantSlug: ctx.tenantSlug ?? undefined,
         customerTier: command.customerTier ?? "public",
         offerCode: command.offerCode,
         items: command.items,
@@ -290,15 +284,9 @@ export const OrderService = {
       }
     }
 
-    const tenantSlug =
-      ctx.tenantSlug ??
-      (ctx.tenantId === "8bba00ba-331b-42c8-9283-4e3836ffb870"
-        ? "eatclean"
-        : "yourmeal-os");
-
     // Re-evaluate commercial pricing authoritatively at confirmation time
     const commercialPricing = resolveOrderCommercialPricing({
-      tenantSlug,
+      tenantSlug: ctx.tenantSlug ?? undefined,
       customerTier: "public",
       items: current.items.map((i) => ({
         dishId: i.dish_id,

@@ -6,12 +6,14 @@ import { OrderIntakeService } from "@/modules/order-intake";
 import { orderKeys } from "@/modules/orders/application/order-query-keys";
 import type { ProgramDraftOrderCommand } from "@/modules/orders/application/order-service";
 
+import { brandConfig } from "@/tenant/brand-config";
+
 /**
  * CAP-004 — mutation hook: program Draft order via Order Intake (ADR 0017).
  * Channel: app (customer self-service).
  */
 export function useProgramDraftOrder() {
-  const { user, tenantId, roles } = useAuth();
+  const { user, tenantId, tenant, roles } = useAuth();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -23,6 +25,7 @@ export function useProgramDraftOrder() {
         supabase,
         userId: user.id,
         tenantId,
+        tenantSlug: tenant?.slug ?? brandConfig.slug,
         roles,
       });
       return OrderIntakeService.intakeDraftDay(ctx, {

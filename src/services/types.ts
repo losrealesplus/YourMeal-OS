@@ -66,6 +66,7 @@ export type CreateServiceContextInput = {
   userId: string;
   /** Prefer explicit tenant; otherwise first membership is used. */
   tenantId?: string | null;
+  tenantSlug?: string | null;
   roles?: readonly AppRole[];
   localization?: LocalizationSettings | null;
   ip?: string | null;
@@ -114,6 +115,7 @@ export async function createServiceContext(
     supabase: input.supabase,
     userId: input.userId,
     tenantId,
+    tenantSlug: input.tenantSlug ?? null,
     roles,
     capabilities: capabilitiesFor(roles),
     localization: input.localization ?? null,

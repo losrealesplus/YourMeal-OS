@@ -5,11 +5,13 @@ import { createServiceContext } from "@/services/types";
 import { OrderService } from "@/modules/orders/application/order-service";
 import { orderKeys } from "@/modules/orders/application/order-query-keys";
 
+import { brandConfig } from "@/tenant/brand-config";
+
 /**
  * CAP-006 — Confirm Draft order (Mutation Pattern).
  */
 export function useConfirmOrder() {
-  const { user, tenantId, roles } = useAuth();
+  const { user, tenantId, tenant, roles } = useAuth();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -27,6 +29,7 @@ export function useConfirmOrder() {
         supabase,
         userId: user.id,
         tenantId,
+        tenantSlug: tenant?.slug ?? brandConfig.slug,
         roles,
       });
       return OrderService.confirm(ctx, orderId, { expectedTotal });

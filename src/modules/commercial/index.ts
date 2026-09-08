@@ -1,6 +1,6 @@
 export { CommercialPricingEngine, PRICING_ENGINE_VERSION } from "./application/CommercialPricingEngine";
 export {
-  CANONICAL_TENANT_OFFERS,
+  clearTenantOffersRegistry,
   getTenantOffers,
   registerTenantOffers,
   resolveCommercialOffer,
