@@ -50,14 +50,14 @@ async function loadSessionIdentityUncached(
       .maybeSingle(),
     supabase
       .from("tenant_members")
-      .select("tenant_id, status, tenants:tenant_id(id, name, slug)")
+      .select("tenant_id, status, membership_type, tenants:tenant_id(id, name, slug)")
       .eq("user_id", userId)
       .is("deleted_at", null)
       .limit(1)
       .maybeSingle(),
   ]);
 
-  const roles = (rolesRes.data ?? []).map((r) => r.role as AppRole);
+  const rawRoles = (rolesRes.data ?? []).map((r) => r.role as AppRole);
   const p = profileRes.data;
   const profile: UserProfile | null = p
     ? {
@@ -72,6 +72,7 @@ async function loadSessionIdentityUncached(
   const member = memberRes.data as
     | {
         status?: string | null;
+        membership_type?: string | null;
         tenants?: ActiveTenant | null;
       }
     | null;
@@ -94,6 +95,18 @@ async function loadSessionIdentityUncached(
     membershipStatus === "approved" && t
       ? { id: t.id, name: t.name, slug: t.slug ?? null }
       : null;
+
+  // ADR 0065: Synthesize canonical 'customer' role when user has an approved
+  // customer membership and no staff roles in user_roles.
+  // Staff memberships/roles remain strictly unchanged.
+  const isApprovedCustomer =
+    membershipStatus === "approved" &&
+    member?.membership_type === "customer";
+
+  const roles =
+    isApprovedCustomer && rawRoles.length === 0
+      ? (["customer"] as AppRole[])
+      : rawRoles;
 
   return { userId, roles, profile, tenant, membershipStatus };
 }
