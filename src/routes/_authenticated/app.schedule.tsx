@@ -13,6 +13,8 @@ import { useFmt } from "@/i18n/localization-provider";
 import { useWeeklyMenu } from "@/hooks/use-weekly-menu";
 import { useProgramDraftOrder } from "@/hooks/use-program-draft-order";
 import { utcWeekDates, utcWeekStartMonday } from "@/modules/weekly-menu/application/week-dates";
+import { resolveOrderCommercialPricing } from "@/modules/commercial";
+import { brandConfig } from "@/tenant/brand-config";
 import { cn } from "@/lib/utils";
 import dishPhoto from "@/assets/eatclean-hero.jpg";
 
@@ -65,9 +67,18 @@ function ScheduleFlow() {
   const offerDishes = weeklyMenu?.days[deliveryDay]?.dishes ?? [];
   const dayDate = utcWeekDates(weekStart)[deliveryDay] ?? weekStart;
   const selectedDishes = offerDishes.filter((d) => selected.includes(d.id));
-  // Authoritative total = sum of real dish prices from the published catalog.
-  // Matches OrderService.programDraft server-side computation (INC-01).
-  const totalEur = selectedDishes.reduce((sum, d) => sum + Number(d.price ?? 0), 0);
+  const commercialPricing = resolveOrderCommercialPricing({
+    tenantSlug: brandConfig.slug,
+    items: selectedDishes.map((d) => ({
+      dishId: d.id,
+      dayDate,
+      qty: 1,
+    })),
+  });
+  // Authoritative total = commercial offer evaluation with catalog price fallback
+  const totalEur = commercialPricing
+    ? commercialPricing.grandTotalFinalPrice.cents / 100
+    : selectedDishes.reduce((sum, d) => sum + Number(d.price ?? 0), 0);
 
   const deliveryDateLabel = formatDeliveryDate(dayDate, i18n.language);
 

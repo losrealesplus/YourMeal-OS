@@ -81,6 +81,9 @@ export const OrderIntakeService = {
       items: command.items,
       notes: command.notes ?? null,
       clientRequestId: command.clientRequestId,
+      offerCode: command.offerCode,
+      customerTier: command.customerTier,
+      extras: command.extras,
     });
 
     const origin = buildOrigin(ctx, command);
@@ -111,12 +114,18 @@ export const OrderIntakeService = {
       dayDate: string;
       dishIds: string[];
       notes?: string | null;
+      offerCode?: string;
+      customerTier?: import("@/modules/commercial").CustomerTier;
+      extras?: import("@/modules/commercial").ExtraItemInput[];
     },
   ): Promise<ProgramDraftOrderResult> {
     return OrderIntakeService.intakeDraft(ctx, {
       channel: "app",
       weekStart: input.weekStart,
       notes: input.notes,
+      offerCode: input.offerCode,
+      customerTier: input.customerTier,
+      extras: input.extras,
       items: input.dishIds.map((dishId) => ({
         dishId,
         dayDate: input.dayDate,

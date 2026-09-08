@@ -18,6 +18,7 @@ export type ServiceContext = {
   tenantId: string;
   roles: readonly AppRole[];
   capabilities: ReadonlySet<Capability>;
+  tenantSlug?: string | null;
   localization?: LocalizationSettings | null;
   ip?: string | null;
 };

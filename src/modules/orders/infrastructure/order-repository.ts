@@ -23,6 +23,11 @@ export type ProgramOrderInput = {
   deliveryGroupId?: string | null;
 };
 
+export type OrderWithItems = {
+  order: OrderRow;
+  items: OrderItemRow[];
+};
+
 type ProgramDraftRpcResult = {
   order: OrderRow;
   items: OrderItemRow[];

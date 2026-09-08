@@ -13,7 +13,13 @@ export function useConfirmOrder() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (orderId: string) => {
+    mutationFn: async (
+      input: string | { orderId: string; expectedTotal?: number },
+    ) => {
+      const orderId = typeof input === "string" ? input : input.orderId;
+      const expectedTotal =
+        typeof input === "object" ? input.expectedTotal : undefined;
+
       if (!user || !tenantId) {
         throw new Error("Authenticated user and tenant are required");
       }
@@ -23,9 +29,10 @@ export function useConfirmOrder() {
         tenantId,
         roles,
       });
-      return OrderService.confirm(ctx, orderId);
+      return OrderService.confirm(ctx, orderId, { expectedTotal });
     },
-    onSuccess: async (_order, orderId) => {
+    onSuccess: async (_order, input) => {
+      const orderId = typeof input === "string" ? input : input.orderId;
       if (!tenantId) return;
       await queryClient.invalidateQueries({ queryKey: orderKeys.all(tenantId) });
       await queryClient.invalidateQueries({

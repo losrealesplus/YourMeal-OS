@@ -7,6 +7,12 @@ import { createDishRepository } from "@/modules/dish-library/infrastructure/dish
 import { createWeeklyMenuRepository } from "@/modules/weekly-menu/infrastructure/weekly-menu-repository";
 import { canAcceptOrders } from "@/modules/bootstrap-integrity";
 import {
+  CommercialPricingEngine,
+  resolveOrderCommercialPricing,
+  type CustomerTier,
+  type ExtraItemInput,
+} from "@/modules/commercial";
+import {
   createOrderRepository,
   type OrderItemRow,
   type OrderRow,
@@ -20,6 +26,9 @@ export type ProgramDraftOrderCommand = {
   dishIds: string[];
   notes?: string | null;
   clientRequestId?: string;
+  offerCode?: string;
+  customerTier?: CustomerTier;
+  extras?: ExtraItemInput[];
 };
 
 /** Multi-day draft (EP-002A.2 repeat). Each line validated against its day offer. */
@@ -29,6 +38,9 @@ export type ProgramDraftItemsCommand = {
   notes?: string | null;
   customerId?: string;
   clientRequestId?: string;
+  offerCode?: string;
+  customerTier?: CustomerTier;
+  extras?: ExtraItemInput[];
 };
 
 export type ProgramDraftOrderResult = {
@@ -139,28 +151,45 @@ export const OrderService = {
         }
       }
 
-      const dishRepo = createDishRepository(ctx.supabase, ctx.tenantId);
-      const dishes = await dishRepo.listCatalogByIds(uniqueDishIds);
-      const priceById = new Map<string, number>();
-      for (const d of dishes) {
-        priceById.set(d.id, Number(d.price));
-      }
+      const tenantSlug =
+        ctx.tenantSlug ??
+        (ctx.tenantId === "8bba00ba-331b-42c8-9283-4e3836ffb870"
+          ? "eatclean"
+          : "yourmeal-os");
+
+      const commercialPricing = resolveOrderCommercialPricing({
+        tenantSlug,
+        customerTier: command.customerTier ?? "public",
+        offerCode: command.offerCode,
+        items: command.items,
+        extras: command.extras,
+      });
 
       let total = 0;
-      const items: ProgramOrderItemInput[] = [];
-      for (const item of command.items) {
-        const unit = priceById.get(item.dishId);
-        if (unit === undefined) {
-          throw new DomainError("NOT_FOUND", `Dish not found for pricing: ${item.dishId}`);
+      if (commercialPricing) {
+        total = commercialPricing.grandTotalFinalPrice.cents / 100;
+      } else {
+        const dishRepo = createDishRepository(ctx.supabase, ctx.tenantId);
+        const dishes = await dishRepo.listCatalogByIds(uniqueDishIds);
+        const priceById = new Map<string, number>();
+        for (const d of dishes) {
+          priceById.set(d.id, Number(d.price));
         }
-        total += unit * item.qty;
-        items.push({
-          dishId: item.dishId,
-          dayDate: item.dayDate,
-          qty: item.qty,
-        });
+        for (const item of command.items) {
+          const unit = priceById.get(item.dishId);
+          if (unit === undefined) {
+            throw new DomainError("NOT_FOUND", `Dish not found for pricing: ${item.dishId}`);
+          }
+          total += unit * item.qty;
+        }
+        total = Math.round(total * 100) / 100;
       }
-      total = Math.round(total * 100) / 100;
+
+      const items: ProgramOrderItemInput[] = command.items.map((item) => ({
+        dishId: item.dishId,
+        dayDate: item.dayDate,
+        qty: item.qty,
+      }));
 
       const repo = createOrderRepository(ctx.supabase, ctx.tenantId);
       let customerId = command.customerId ?? (await repo.findCustomerIdForUser(ctx.userId));
@@ -232,7 +261,11 @@ export const OrderService = {
    * CAP-006 — OM: Draft → Confirmed.
    * @see docs/17-operational-model/04-lifecycles/spine-transitions.md
    */
-  async confirm(ctx: ServiceContext, orderId: string): Promise<OrderRow> {
+  async confirm(
+    ctx: ServiceContext,
+    orderId: string,
+    options?: { expectedTotal?: number },
+  ): Promise<OrderRow> {
     requireCapability(ctx.roles, "orders.write");
 
     if (!(await FeatureFlagService.isEnabled(ctx, "order_confirmation"))) {
@@ -257,6 +290,38 @@ export const OrderService = {
       }
     }
 
+    const tenantSlug =
+      ctx.tenantSlug ??
+      (ctx.tenantId === "8bba00ba-331b-42c8-9283-4e3836ffb870"
+        ? "eatclean"
+        : "yourmeal-os");
+
+    // Re-evaluate commercial pricing authoritatively at confirmation time
+    const commercialPricing = resolveOrderCommercialPricing({
+      tenantSlug,
+      customerTier: "public",
+      items: current.items.map((i) => ({
+        dishId: i.dish_id,
+        dayDate: i.day_date,
+        qty: i.qty,
+      })),
+    });
+
+    const evaluatedTotal = commercialPricing
+      ? commercialPricing.grandTotalFinalPrice.cents / 100
+      : current.order.total;
+
+    // Detect price change between draft and confirmation (Anti-Drift Guard)
+    if (options?.expectedTotal !== undefined) {
+      if (Math.abs(evaluatedTotal - options.expectedTotal) > 0.001) {
+        throw new DomainError(
+          "PRICE_MISMATCH",
+          `El precio del pedido ha cambiado de ${options.expectedTotal.toFixed(2)} € a ${evaluatedTotal.toFixed(2)} €. Por favor, revisa el nuevo importe antes de confirmar.`,
+          { expectedTotal: options.expectedTotal, actualTotal: evaluatedTotal },
+        );
+      }
+    }
+
     let result: { old: OrderRow; order: OrderRow };
     try {
       result = await repo.confirmDraft(orderId);
@@ -268,13 +333,41 @@ export const OrderService = {
       throw new DomainError("INVALID_STATE", message);
     }
 
+    // Generate immutable Price Snapshot
+    const priceSnapshot = commercialPricing
+      ? CommercialPricingEngine.createSnapshot(commercialPricing, {
+          orderId: result.order.id,
+          lineItems: current.items.map((item) => ({
+            dishId: item.dish_id,
+            dishName: item.dish_id,
+            itemType: "menu_dish",
+            qty: item.qty,
+            basePriceCents: Math.round(
+              commercialPricing.grandTotalBasePrice.cents /
+                Math.max(1, current.items.length),
+            ),
+            finalPriceCents: Math.round(
+              commercialPricing.grandTotalFinalPrice.cents /
+                Math.max(1, current.items.length),
+            ),
+            discountCents: Math.round(
+              commercialPricing.grandTotalSavings.cents /
+                Math.max(1, current.items.length),
+            ),
+          })),
+        })
+      : null;
+
     try {
       await AuditService.write(ctx, {
         entityType: "order",
         entityId: result.order.id,
         action: "status_change",
         oldData: { status: result.old.status } as Record<string, unknown>,
-        newData: { status: result.order.status } as Record<string, unknown>,
+        newData: {
+          status: result.order.status,
+          priceSnapshot,
+        } as Record<string, unknown>,
       });
     } catch (e) {
       const message = e instanceof Error ? e.message : "Audit write failed after confirm";
