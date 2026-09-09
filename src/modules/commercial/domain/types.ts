@@ -91,6 +91,8 @@ export interface PriceEvaluationContext {
   offerCode: string;
   customerTier: CustomerTier;
   itemCount?: number;
+  /** Number of billable menu units / packages to evaluate (default: 1) */
+  menuUnits?: number;
   extras?: ExtraItemInput[];
 }
 
@@ -108,6 +110,7 @@ export interface AppliedPromotionDetail {
 export interface PricingEvaluationResult {
   offerCode: string;
   customerTier: CustomerTier;
+  menuUnits: number;
   basePrice: Money;
   finalPrice: Money;
   totalSavings: Money;

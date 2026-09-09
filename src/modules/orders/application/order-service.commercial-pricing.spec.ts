@@ -50,6 +50,7 @@ vi.mock("@/modules/weekly-menu/infrastructure/weekly-menu-repository", () => ({
       { day_date: "2026-07-22", dish_id: "dish-03", dishes: { id: "dish-03", price: 12.5 } },
       { day_date: "2026-07-23", dish_id: "dish-04", dishes: { id: "dish-04", price: 12.5 } },
       { day_date: "2026-07-24", dish_id: "dish-05", dishes: { id: "dish-05", price: 12.5 } },
+      { day_date: "2026-07-24", dish_id: "dish-side", dishes: { id: "dish-side", price: 4.0 } },
     ]),
   })),
 }));
@@ -89,7 +90,7 @@ function makeContext(overrides: Partial<ServiceContext> = {}): ServiceContext {
   };
 }
 
-describe("OrderService Commercial Pricing Universal Core Integration (FASE 3N-R)", () => {
+describe("OrderService Commercial Pricing Universal Core Integration (FASE 3N-R2)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     clearTenantOffersRegistry();
@@ -200,7 +201,77 @@ describe("OrderService Commercial Pricing Universal Core Integration (FASE 3N-R)
       expect(result.order.total).toBe(12.5);
     });
 
-    it("verifies offerCode explicitly determines the offer and does not silently mutate by menuCount", async () => {
+    it("verifies explicit commercial quantity: 1 individual menu (10,00 €) vs 2 individual menus (20,00 €)", async () => {
+      const tenantOffers: CommercialOffer[] = [
+        {
+          id: "offer-ind",
+          code: "individual_menu",
+          title: "Menú Suelto",
+          subtitle: "Por día",
+          description: "Menú puntual",
+          basePrice: { cents: 1000, currency: "EUR", formatted: "10,00 €" },
+          unitLabel: "menú",
+          slotsIncluded: 1,
+          promotions: [],
+        },
+      ];
+      registerTenantOffers("test-tenant", tenantOffers);
+
+      const ctx = makeContext({ tenantSlug: "test-tenant" });
+
+      // 1 menu unit
+      const result1 = await OrderService.programDraftItems(ctx, {
+        weekStart: "2026-07-20",
+        offerCode: "individual_menu",
+        items: [{ dishId: "dish-01", dayDate: "2026-07-20", qty: 1 }],
+      });
+      expect(result1.order.total).toBe(10.0);
+
+      // 2 menu units across 2 distinct days
+      const result2 = await OrderService.programDraftItems(ctx, {
+        weekStart: "2026-07-20",
+        offerCode: "individual_menu",
+        items: [
+          { dishId: "dish-01", dayDate: "2026-07-20", qty: 1 },
+          { dishId: "dish-02", dayDate: "2026-07-21", qty: 1 },
+        ],
+      });
+      expect(result2.order.total).toBe(20.0);
+    });
+
+    it("verifies 1 menu with 2 dish lines on same day does NOT become 2 billable menus", async () => {
+      const tenantOffers: CommercialOffer[] = [
+        {
+          id: "offer-ind",
+          code: "individual_menu",
+          title: "Menú Suelto",
+          subtitle: "Por día",
+          description: "Menú puntual",
+          basePrice: { cents: 1000, currency: "EUR", formatted: "10,00 €" },
+          unitLabel: "menú",
+          slotsIncluded: 1,
+          promotions: [],
+        },
+      ];
+      registerTenantOffers("test-tenant", tenantOffers);
+
+      const ctx = makeContext({ tenantSlug: "test-tenant" });
+
+      // 2 dish lines on the same delivery day (e.g. main dish + side)
+      const result = await OrderService.programDraftItems(ctx, {
+        weekStart: "2026-07-20",
+        offerCode: "individual_menu",
+        items: [
+          { dishId: "dish-05", dayDate: "2026-07-24", qty: 1 },
+          { dishId: "dish-side", dayDate: "2026-07-24", qty: 1 },
+        ],
+      });
+
+      // Still exactly 1 billable daily menu unit = 10,00 € (NOT 20,00 €)
+      expect(result.order.total).toBe(10.0);
+    });
+
+    it("verifies 5 menus with weekly_plan (45,00 €) vs 5 menus with individual_menu (50,00 €)", async () => {
       const tenantOffers: CommercialOffer[] = [
         {
           id: "offer-ind",
@@ -243,7 +314,7 @@ describe("OrderService Commercial Pricing Universal Core Integration (FASE 3N-R)
       });
       expect(resultWeekly.order.total).toBe(45.0);
 
-      // Case B: 5 dishes selected with explicit offerCode: "individual_menu" -> stays individual (10.00 €)
+      // Case B: 5 dishes selected with explicit offerCode: "individual_menu" -> evaluates 5 * 10.00 € = 50.00 €
       const resultIndividual = await OrderService.programDraftItems(ctx, {
         weekStart: "2026-07-20",
         offerCode: "individual_menu",
@@ -255,7 +326,7 @@ describe("OrderService Commercial Pricing Universal Core Integration (FASE 3N-R)
           { dishId: "dish-05", dayDate: "2026-07-24", qty: 1 },
         ],
       });
-      expect(resultIndividual.order.total).toBe(10.0);
+      expect(resultIndividual.order.total).toBe(50.0);
     });
 
     it("evaluates extras and customer tier discounts according to registered tenant rules", async () => {

@@ -236,9 +236,14 @@ export class CommercialPricingEngine {
   static evaluate(offer: CommercialOffer, context: PriceEvaluationContext): PricingEvaluationResult {
     const currency = offer.basePrice.currency;
     const customerTier = context.customerTier ?? "public";
+    const menuUnits = context.menuUnits !== undefined ? Math.max(0, context.menuUnits) : 1;
 
-    // 1. Evaluate base offer
+    // 1. Evaluate unit base offer
     const baseEval = this.evaluateBaseOffer(offer.basePrice, offer.promotions, customerTier);
+
+    const totalOfferBaseCents = offer.basePrice.cents * menuUnits;
+    const totalOfferFinalCents = baseEval.finalPrice.cents * menuUnits;
+    const totalOfferSavingsCents = baseEval.totalSavings.cents * menuUnits;
 
     // 2. Evaluate extras
     const extrasResults: ExtraItemEvaluationResult[] = (context.extras ?? []).map((extra) =>
@@ -254,12 +259,9 @@ export class CommercialPricingEngine {
     const extrasTotalSavingsCents = Math.max(0, extrasTotalBaseCents - extrasTotalFinalCents);
 
     // 3. Compute grand totals
-    const grandTotalBaseCents = baseEval.finalPrice.cents > 0 || baseEval.totalSavings.cents > 0
-      ? offer.basePrice.cents + extrasTotalBaseCents
-      : extrasTotalBaseCents;
-
-    const grandTotalFinalCents = baseEval.finalPrice.cents + extrasTotalFinalCents;
-    const grandTotalSavingsCents = Math.max(0, grandTotalBaseCents - grandTotalFinalCents);
+    const grandTotalBaseCents = totalOfferBaseCents + extrasTotalBaseCents;
+    const grandTotalFinalCents = totalOfferFinalCents + extrasTotalFinalCents;
+    const grandTotalSavingsCents = totalOfferSavingsCents + extrasTotalSavingsCents;
 
     // 4. Generate visual badge
     let pricingBadge: string | null = null;
@@ -274,11 +276,12 @@ export class CommercialPricingEngine {
     return {
       offerCode: offer.code,
       customerTier,
+      menuUnits,
       basePrice: offer.basePrice,
-      finalPrice: baseEval.finalPrice,
-      totalSavings: baseEval.totalSavings,
+      finalPrice: MoneyUtil.fromCents(totalOfferFinalCents, currency),
+      totalSavings: MoneyUtil.fromCents(totalOfferSavingsCents, currency),
       savingsPercentage: baseEval.savingsPercentage,
-      hasDiscount: baseEval.totalSavings.cents > 0,
+      hasDiscount: totalOfferSavingsCents > 0,
       appliedPromotions: baseEval.appliedPromotions,
       pricingBadge,
       extrasBreakdown: extrasResults,

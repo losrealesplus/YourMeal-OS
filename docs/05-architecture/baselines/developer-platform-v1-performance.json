@@ -1,9 +1,9 @@
 {
   "version": "1.0.0",
-  "capturedAt": "2026-08-26T18:19:12.563Z",
-  "doctorMs": 7.437,
-  "recoveryMs": 0.46,
-  "hostLookupMs": 0.014,
+  "capturedAt": "2026-09-09T06:16:14.296Z",
+  "doctorMs": 6.794,
+  "recoveryMs": 0.343,
+  "hostLookupMs": 0.018,
   "hostModuleCount": 19,
   "capabilityCount": 6,
   "knowledgeCount": 6,

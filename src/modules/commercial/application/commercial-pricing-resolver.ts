@@ -10,10 +10,13 @@ export interface OrderPricingResolutionInput {
   tenantSlug?: string;
   customerTier?: CustomerTier;
   offerCode?: string;
-  items: Array<{
+  /** Explicit number of billable menu units / packages. If omitted, deduced from non-extra item context */
+  menuUnits?: number;
+  items?: Array<{
     dishId: string;
     dayDate: string;
     qty: number;
+    isExtra?: boolean;
   }>;
   extras?: ExtraItemInput[];
 }
@@ -30,7 +33,9 @@ export function resolveOrderCommercialPricing(
     return null;
   }
 
-  if (!input.items || input.items.length === 0) {
+  const hasItems = input.items && input.items.length > 0;
+  const hasExtras = input.extras && input.extras.length > 0;
+  if (!hasItems && !hasExtras) {
     return null;
   }
 
@@ -39,16 +44,37 @@ export function resolveOrderCommercialPricing(
   const offer = resolveCommercialOffer(input.tenantSlug, {
     offerCode: input.offerCode,
     customerTier,
-    menuCount: input.items.length,
   });
 
   if (!offer) {
     return null;
   }
 
+  // Determine billable menu units
+  let menuUnits: number;
+  if (input.menuUnits !== undefined) {
+    menuUnits = Math.max(0, input.menuUnits);
+  } else if (hasItems) {
+    const nonExtraItems = (input.items ?? []).filter((i) => !i.isExtra);
+    if (nonExtraItems.length === 0) {
+      menuUnits = 0;
+    } else if (offer.slotsIncluded > 1) {
+      // Packaged plan (e.g. weekly_plan covering up to slotsIncluded days)
+      menuUnits = 1;
+    } else {
+      // Unit-based plan (e.g. individual_menu / monthly_plan priced per menu unit)
+      // Distinct delivery days represent distinct daily menus, regardless of number of dishes per day
+      const distinctDays = new Set(nonExtraItems.map((i) => i.dayDate)).size;
+      menuUnits = Math.max(1, distinctDays);
+    }
+  } else {
+    menuUnits = 0;
+  }
+
   return CommercialPricingEngine.evaluate(offer, {
     offerCode: offer.code,
     customerTier,
+    menuUnits,
     extras: input.extras ?? [],
   });
 }
