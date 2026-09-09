@@ -13,7 +13,7 @@ import { useFmt } from "@/i18n/localization-provider";
 import { useWeeklyMenu } from "@/hooks/use-weekly-menu";
 import { useProgramDraftOrder } from "@/hooks/use-program-draft-order";
 import { utcWeekDates, utcWeekStartMonday } from "@/modules/weekly-menu/application/week-dates";
-import { resolveOrderCommercialPricing } from "@/modules/commercial";
+import { resolveOrderCommercialPricing, getTenantOffers } from "@/modules/commercial";
 import { brandConfig } from "@/tenant/brand-config";
 import { cn } from "@/lib/utils";
 import dishPhoto from "@/assets/eatclean-hero.jpg";
@@ -64,12 +64,18 @@ function ScheduleFlow() {
     t("customer:summaryWeeklyTitle"),
   ];
 
+  const availableOffers = getTenantOffers(brandConfig.slug);
+  const [selectedOfferCode, setSelectedOfferCode] = useState<string | undefined>(
+    availableOffers.find((o) => (o as { isDefault?: boolean }).isDefault)?.code ??
+      availableOffers[0]?.code,
+  );
+
   const offerDishes = weeklyMenu?.days[deliveryDay]?.dishes ?? [];
   const dayDate = utcWeekDates(weekStart)[deliveryDay] ?? weekStart;
   const selectedDishes = offerDishes.filter((d) => selected.includes(d.id));
   const commercialPricing = resolveOrderCommercialPricing({
     tenantSlug: brandConfig.slug,
-    offerCode: "individual_menu",
+    offerCode: selectedOfferCode,
     items: selectedDishes.map((d) => ({
       dishId: d.id,
       dayDate,
@@ -89,7 +95,7 @@ function ScheduleFlow() {
       weekStart,
       dayDate,
       dishIds: selected,
-      offerCode: "individual_menu",
+      offerCode: selectedOfferCode,
     });
     void navigate({
       to: "/app/orders/$orderId",

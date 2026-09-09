@@ -76,7 +76,6 @@ export function resolveCommercialOffer(
   // 3. Fallback to default offer (explicit isDefault or first registered)
   const defaultOffer =
     offers.find((o) => (o as { isDefault?: boolean }).isDefault) ??
-    offers.find((o) => o.code === "individual_menu") ??
     offers[0];
 
   return defaultOffer ?? null;

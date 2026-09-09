@@ -978,5 +978,113 @@ describe("OrderService Commercial Pricing Universal Core Integration (FASE 3N-R2
       expect(mockRevertToDraft).toHaveBeenCalledWith("order-rollback-1");
     });
   });
+
+  describe("5. Pure Core Zero-Tenant Agnostic Multi-Tenant Architecture Proof (FASE 3N-R4)", () => {
+    it("proves Core functions for an arbitrary tenant (e.g. 'nordic-kitchen') without any EatClean data or hardcoding", async () => {
+      // 1. Initial State: Verify Core starts with zero hardcoded offers
+      expect(getTenantOffers("eatclean")).toEqual([]);
+      expect(getTenantOffers("nordic-kitchen")).toEqual([]);
+
+      // 2. Arbitrary tenant registers its own completely different commercial offer
+      const nordicOffers: CommercialOffer[] = [
+        {
+          id: "nordic_fjord_lunch",
+          code: "fjord_lunch",
+          title: "Fjord Express Lunch",
+          subtitle: "Daily organic Nordic lunch",
+          description: "Fresh Atlantic salmon & root vegetables",
+          basePrice: { cents: 1850, currency: "EUR", formatted: "18,50 €" },
+          unitLabel: "lunch",
+          slotsIncluded: 1,
+          isDefault: true,
+          promotions: [
+            {
+              id: "promo_nordic_spring_15",
+              code: "SPRING_15",
+              name: "Spring Launch 15%",
+              type: "percentage",
+              value: 15,
+              appliesTo: "offer_base",
+              eligibility: "public",
+              badgeLabel: "15% off",
+            },
+          ],
+        },
+      ];
+      registerTenantOffers("nordic-kitchen", nordicOffers);
+
+      // Verify registry contains ONLY nordic-kitchen offers and 0 EatClean offers
+      expect(getTenantOffers("nordic-kitchen")).toHaveLength(1);
+      expect(getTenantOffers("nordic-kitchen")[0].code).toBe("fjord_lunch");
+      expect(getTenantOffers("eatclean")).toEqual([]);
+
+      const ctx = makeContext({ tenantSlug: "nordic-kitchen" });
+
+      // 3. Draft creation: 18,50 € - 15% (2,78 € savings) = 15,72 € (1572 cents)
+      const draftResult = await OrderService.programDraftItems(ctx, {
+        weekStart: "2026-07-20",
+        offerCode: "fjord_lunch",
+        items: [{ dishId: "dish-01", dayDate: "2026-07-20", qty: 1 }],
+      });
+
+      expect(draftResult.order.total).toBe(15.72);
+
+      // 4. Confirm draft and snapshot creation
+      const mockNordicOrder: OrderWithItems = {
+        order: {
+          id: "order-nordic-1",
+          tenant_id: ctx.tenantId,
+          customer_id: "customer-123",
+          status: "draft",
+          total: 15.72,
+          week_start: "2026-07-20",
+          notes: null,
+          demand_channel: "individual",
+          company_id: null,
+          site_id: null,
+          organizational_unit_id: null,
+          delivery_group_id: null,
+          delivery_address_id: null,
+          created_at: new Date().toISOString(),
+          deleted_at: null,
+        },
+        items: [
+          { id: "i1", order_id: "order-nordic-1", tenant_id: ctx.tenantId, dish_id: "dish-01", day_date: "2026-07-20", qty: 1, comment: null, deleted_at: null },
+        ],
+      };
+
+      mockFindByIdWithItems.mockResolvedValue(mockNordicOrder);
+      mockConfirmDraft.mockResolvedValue({
+        old: mockNordicOrder.order,
+        order: { ...mockNordicOrder.order, status: "confirmed" },
+      });
+
+      const confirmed = await OrderService.confirm(ctx, "order-nordic-1", {
+        offerCode: "fjord_lunch",
+        expectedTotal: 15.72,
+      });
+
+      expect(confirmed.status).toBe("confirmed");
+      expect(AuditService.write).toHaveBeenCalledWith(
+        ctx,
+        expect.objectContaining({
+          entityType: "order",
+          entityId: "order-nordic-1",
+          action: "status_change",
+          newData: expect.objectContaining({
+            status: "confirmed",
+            priceSnapshot: expect.objectContaining({
+              offerCode: "fjord_lunch",
+              baseAmountCents: 1850,
+              discountAmountCents: 278,
+              finalAmountCents: 1572,
+              currency: "EUR",
+            }),
+          }),
+        }),
+      );
+    });
+  });
 });
+
 

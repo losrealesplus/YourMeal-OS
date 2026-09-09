@@ -65,6 +65,7 @@ export interface CommercialOffer {
   promotions: PromotionRule[];
   benefits?: string[];
   recommended?: boolean;
+  isDefault?: boolean;
 }
 
 export interface ExtraItemInput {
