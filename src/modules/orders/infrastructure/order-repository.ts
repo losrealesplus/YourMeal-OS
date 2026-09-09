@@ -139,8 +139,21 @@ export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
 
       return { old: current.order, order: order as OrderRow };
     },
+
+    /** Compensating action: revert confirmed order back to draft if audit/snapshot fails. */
+    async revertToDraft(orderId: string): Promise<void> {
+      const { error } = await supabase
+        .from("orders")
+        .update({ status: "draft" })
+        .eq("tenant_id", tenantId)
+        .eq("id", orderId)
+        .eq("status", "confirmed")
+        .is("deleted_at", null);
+      if (error) throw error;
+    },
   };
 }
+
 
 export type OrderRepository = ReturnType<typeof createOrderRepository>;
 

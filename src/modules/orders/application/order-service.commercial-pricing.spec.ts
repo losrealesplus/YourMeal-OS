@@ -26,6 +26,7 @@ vi.mock("@/services/audit-service", () => ({
 const mockInsertDraft = vi.fn();
 const mockFindByIdWithItems = vi.fn();
 const mockConfirmDraft = vi.fn();
+const mockRevertToDraft = vi.fn();
 const mockFindCustomerIdForUser = vi.fn();
 
 vi.mock("@/modules/orders/infrastructure/order-repository", () => ({
@@ -34,6 +35,7 @@ vi.mock("@/modules/orders/infrastructure/order-repository", () => ({
     insertDraft: mockInsertDraft,
     findByIdWithItems: mockFindByIdWithItems,
     confirmDraft: mockConfirmDraft,
+    revertToDraft: mockRevertToDraft,
   })),
 }));
 
@@ -551,4 +553,430 @@ describe("OrderService Commercial Pricing Universal Core Integration (FASE 3N-R2
       expect(mockConfirmDraft).not.toHaveBeenCalled();
     });
   });
+
+  describe("4. End-to-End Release Gate Commercial Workflows (FASE 3N-R3)", () => {
+    it("E2E Flow 1: EatClean bootstrap -> weekly offer -> 5 menus -> 53,55 € -> confirm -> structured snapshot", async () => {
+      // 1. EatClean tenant bootstrap offers
+      const eatcleanOffers: CommercialOffer[] = [
+        {
+          id: "eatclean_offer_weekly",
+          code: "weekly_plan",
+          title: "Suscripción Semanal",
+          subtitle: "5 almuerzos",
+          description: "Plan semanal",
+          basePrice: { cents: 5950, currency: "EUR", formatted: "59,50 €" },
+          unitLabel: "semana",
+          slotsIncluded: 5,
+          promotions: [
+            {
+              id: "promo_eatclean_weekly_10",
+              code: "SEMANAL_10",
+              name: "Descuento Plan Semanal",
+              type: "percentage",
+              value: 10,
+              appliesTo: "offer_base",
+              eligibility: "public",
+              badgeLabel: "🟢 10% dto. (53,55 €/sem)",
+            },
+          ],
+        },
+      ];
+      registerTenantOffers("eatclean", eatcleanOffers);
+
+      const ctx = makeContext({ tenantSlug: "eatclean" });
+
+      // 2. Draft creation with 5 days
+      const draftResult = await OrderService.programDraftItems(ctx, {
+        weekStart: "2026-07-20",
+        offerCode: "weekly_plan",
+        items: [
+          { dishId: "dish-01", dayDate: "2026-07-20", qty: 1 },
+          { dishId: "dish-02", dayDate: "2026-07-21", qty: 1 },
+          { dishId: "dish-03", dayDate: "2026-07-22", qty: 1 },
+          { dishId: "dish-04", dayDate: "2026-07-23", qty: 1 },
+          { dishId: "dish-05", dayDate: "2026-07-24", qty: 1 },
+        ],
+      });
+
+      expect(draftResult.order.total).toBe(53.55);
+
+      // 3. Confirm draft
+      const mockOrderWithItems: OrderWithItems = {
+        order: {
+          id: "order-weekly-1",
+          tenant_id: ctx.tenantId,
+          customer_id: "customer-123",
+          status: "draft",
+          total: 53.55,
+          week_start: "2026-07-20",
+          notes: null,
+          demand_channel: "individual",
+          company_id: null,
+          site_id: null,
+          organizational_unit_id: null,
+          delivery_group_id: null,
+          delivery_address_id: null,
+          created_at: new Date().toISOString(),
+          deleted_at: null,
+        },
+        items: [
+          { id: "i1", order_id: "order-weekly-1", tenant_id: ctx.tenantId, dish_id: "dish-01", day_date: "2026-07-20", qty: 1, comment: null, deleted_at: null },
+          { id: "i2", order_id: "order-weekly-1", tenant_id: ctx.tenantId, dish_id: "dish-02", day_date: "2026-07-21", qty: 1, comment: null, deleted_at: null },
+          { id: "i3", order_id: "order-weekly-1", tenant_id: ctx.tenantId, dish_id: "dish-03", day_date: "2026-07-22", qty: 1, comment: null, deleted_at: null },
+          { id: "i4", order_id: "order-weekly-1", tenant_id: ctx.tenantId, dish_id: "dish-04", day_date: "2026-07-23", qty: 1, comment: null, deleted_at: null },
+          { id: "i5", order_id: "order-weekly-1", tenant_id: ctx.tenantId, dish_id: "dish-05", day_date: "2026-07-24", qty: 1, comment: null, deleted_at: null },
+        ],
+      };
+
+      mockFindByIdWithItems.mockResolvedValue(mockOrderWithItems);
+      mockConfirmDraft.mockResolvedValue({
+        old: mockOrderWithItems.order,
+        order: { ...mockOrderWithItems.order, status: "confirmed" },
+      });
+
+      const confirmed = await OrderService.confirm(ctx, "order-weekly-1", {
+        offerCode: "weekly_plan",
+        expectedTotal: 53.55,
+      });
+
+      expect(confirmed.status).toBe("confirmed");
+      expect(AuditService.write).toHaveBeenCalledWith(
+        ctx,
+        expect.objectContaining({
+          entityType: "order",
+          entityId: "order-weekly-1",
+          action: "status_change",
+          newData: expect.objectContaining({
+            status: "confirmed",
+            priceSnapshot: expect.objectContaining({
+              offerCode: "weekly_plan",
+              baseAmountCents: 5950,
+              discountAmountCents: 595,
+              finalAmountCents: 5355,
+            }),
+          }),
+        }),
+      );
+    });
+
+    it("E2E Flow 2: EatClean bootstrap -> individual offer -> 1 menu -> 11,90 € -> confirm -> snapshot", async () => {
+      const eatcleanOffers: CommercialOffer[] = [
+        {
+          id: "eatclean_offer_individual",
+          code: "individual_menu",
+          title: "Pedido Individual",
+          subtitle: "1 menú",
+          description: "Cocina saludable puntual",
+          basePrice: { cents: 1190, currency: "EUR", formatted: "11,90 €" },
+          unitLabel: "menú",
+          slotsIncluded: 1,
+          promotions: [],
+        },
+      ];
+      registerTenantOffers("eatclean", eatcleanOffers);
+
+      const ctx = makeContext({ tenantSlug: "eatclean" });
+
+      const draftResult = await OrderService.programDraftItems(ctx, {
+        weekStart: "2026-07-20",
+        offerCode: "individual_menu",
+        items: [{ dishId: "dish-01", dayDate: "2026-07-20", qty: 1 }],
+      });
+
+      expect(draftResult.order.total).toBe(11.9);
+
+      const mockOrderWithItems: OrderWithItems = {
+        order: {
+          id: "order-ind-1",
+          tenant_id: ctx.tenantId,
+          customer_id: "customer-123",
+          status: "draft",
+          total: 11.9,
+          week_start: "2026-07-20",
+          notes: null,
+          demand_channel: "individual",
+          company_id: null,
+          site_id: null,
+          organizational_unit_id: null,
+          delivery_group_id: null,
+          delivery_address_id: null,
+          created_at: new Date().toISOString(),
+          deleted_at: null,
+        },
+        items: [
+          { id: "i1", order_id: "order-ind-1", tenant_id: ctx.tenantId, dish_id: "dish-01", day_date: "2026-07-20", qty: 1, comment: null, deleted_at: null },
+        ],
+      };
+
+      mockFindByIdWithItems.mockResolvedValue(mockOrderWithItems);
+      mockConfirmDraft.mockResolvedValue({
+        old: mockOrderWithItems.order,
+        order: { ...mockOrderWithItems.order, status: "confirmed" },
+      });
+
+      const confirmed = await OrderService.confirm(ctx, "order-ind-1", {
+        offerCode: "individual_menu",
+        expectedTotal: 11.9,
+      });
+
+      expect(confirmed.status).toBe("confirmed");
+      expect(AuditService.write).toHaveBeenCalledWith(
+        ctx,
+        expect.objectContaining({
+          action: "status_change",
+          newData: expect.objectContaining({
+            priceSnapshot: expect.objectContaining({
+              offerCode: "individual_menu",
+              baseAmountCents: 1190,
+              finalAmountCents: 1190,
+            }),
+          }),
+        }),
+      );
+    });
+
+    it("E2E Flow 3: verifies anti-drift guard triggers PRICE_MISMATCH when offer changes between draft and confirm", async () => {
+      const eatcleanOffers: CommercialOffer[] = [
+        {
+          id: "eatclean_offer_ind",
+          code: "individual_menu",
+          title: "Menú Individual",
+          subtitle: "Por día",
+          description: "11,90 € por menú",
+          basePrice: { cents: 1190, currency: "EUR", formatted: "11,90 €" },
+          unitLabel: "menú",
+          slotsIncluded: 1,
+          promotions: [],
+        },
+        {
+          id: "eatclean_offer_weekly",
+          code: "weekly_plan",
+          title: "Suscripción Semanal",
+          subtitle: "5 almuerzos",
+          description: "53,55 €",
+          basePrice: { cents: 5950, currency: "EUR", formatted: "59,50 €" },
+          unitLabel: "semana",
+          slotsIncluded: 5,
+          promotions: [
+            {
+              id: "promo-weekly-10",
+              code: "WEEKLY_10",
+              name: "10% dto.",
+              type: "percentage",
+              value: 10,
+              appliesTo: "offer_base",
+              eligibility: "public",
+            },
+          ],
+        },
+      ];
+      registerTenantOffers("eatclean", eatcleanOffers);
+
+      const ctx = makeContext({ tenantSlug: "eatclean" });
+
+      // Customer creates weekly draft (53.55 €)
+      const mockWeeklyDraft: OrderWithItems = {
+        order: {
+          id: "order-drift-test",
+          tenant_id: ctx.tenantId,
+          customer_id: "customer-123",
+          status: "draft",
+          total: 53.55, // Weekly plan expected total
+          week_start: "2026-07-20",
+          notes: null,
+          demand_channel: "individual",
+          company_id: null,
+          site_id: null,
+          organizational_unit_id: null,
+          delivery_group_id: null,
+          delivery_address_id: null,
+          created_at: new Date().toISOString(),
+          deleted_at: null,
+        },
+        items: [
+          { id: "i1", order_id: "order-drift-test", tenant_id: ctx.tenantId, dish_id: "dish-01", day_date: "2026-07-20", qty: 1, comment: null, deleted_at: null },
+          { id: "i2", order_id: "order-drift-test", tenant_id: ctx.tenantId, dish_id: "dish-02", day_date: "2026-07-21", qty: 1, comment: null, deleted_at: null },
+          { id: "i3", order_id: "order-drift-test", tenant_id: ctx.tenantId, dish_id: "dish-03", day_date: "2026-07-22", qty: 1, comment: null, deleted_at: null },
+          { id: "i4", order_id: "order-drift-test", tenant_id: ctx.tenantId, dish_id: "dish-04", day_date: "2026-07-23", qty: 1, comment: null, deleted_at: null },
+          { id: "i5", order_id: "order-drift-test", tenant_id: ctx.tenantId, dish_id: "dish-05", day_date: "2026-07-24", qty: 1, comment: null, deleted_at: null },
+        ],
+      };
+
+      mockFindByIdWithItems.mockResolvedValue(mockWeeklyDraft);
+
+      // If at confirm time the offer resolves to individual_menu (5 x 11.90 = 59.50 €),
+      // it must throw PRICE_MISMATCH rather than confirming with mutated price.
+      await expect(
+        OrderService.confirm(ctx, "order-drift-test", {
+          offerCode: "individual_menu",
+          expectedTotal: 53.55,
+        }),
+      ).rejects.toMatchObject({
+        code: "PRICE_MISMATCH",
+      });
+
+      expect(mockConfirmDraft).not.toHaveBeenCalled();
+    });
+
+    it("E2E Flow 4: Structured snapshot itemizes menu lines and extras without total division", async () => {
+      const eatcleanOffers: CommercialOffer[] = [
+        {
+          id: "offer-ind",
+          code: "individual_menu",
+          title: "Menú Individual",
+          subtitle: "Por día",
+          description: "11,90 €",
+          basePrice: { cents: 1190, currency: "EUR", formatted: "11,90 €" },
+          unitLabel: "menú",
+          slotsIncluded: 1,
+          promotions: [],
+        },
+      ];
+      registerTenantOffers("eatclean", eatcleanOffers);
+
+      const ctx = makeContext({ tenantSlug: "eatclean" });
+
+      // 1 menu unit with 2 dish lines on same day (dish-05 + dish-side) + 1 extra (4,50 €)
+      const mockOrderWithItems: OrderWithItems = {
+        order: {
+          id: "order-multiline",
+          tenant_id: ctx.tenantId,
+          customer_id: "customer-123",
+          status: "draft",
+          total: 16.4,
+          week_start: "2026-07-20",
+          notes: null,
+          demand_channel: "individual",
+          company_id: null,
+          site_id: null,
+          organizational_unit_id: null,
+          delivery_group_id: null,
+          delivery_address_id: null,
+          created_at: new Date().toISOString(),
+          deleted_at: null,
+        },
+        items: [
+          { id: "i1", order_id: "order-multiline", tenant_id: ctx.tenantId, dish_id: "dish-05", day_date: "2026-07-24", qty: 1, comment: null, deleted_at: null },
+          { id: "i2", order_id: "order-multiline", tenant_id: ctx.tenantId, dish_id: "dish-side", day_date: "2026-07-24", qty: 1, comment: null, deleted_at: null },
+        ],
+      };
+
+      mockFindByIdWithItems.mockResolvedValue(mockOrderWithItems);
+      mockConfirmDraft.mockResolvedValue({
+        old: mockOrderWithItems.order,
+        order: { ...mockOrderWithItems.order, status: "confirmed" },
+      });
+
+      await OrderService.confirm(ctx, "order-multiline", {
+        offerCode: "individual_menu",
+        expectedTotal: 16.4,
+        extras: [
+          {
+            dishId: "dish-extra",
+            dishName: "Extra Crema",
+            basePriceCents: 450,
+            qty: 1,
+          },
+        ],
+      });
+
+      expect(AuditService.write).toHaveBeenCalledWith(
+        ctx,
+        expect.objectContaining({
+          newData: expect.objectContaining({
+            priceSnapshot: expect.objectContaining({
+              baseAmountCents: 1640,
+              finalAmountCents: 1640,
+              items: expect.arrayContaining([
+                expect.objectContaining({
+                  dishId: "dish-05",
+                  itemType: "menu_dish",
+                  basePriceCents: 1190,
+                  finalPriceCents: 1190,
+                }),
+                expect.objectContaining({
+                  dishId: "dish-side",
+                  itemType: "menu_dish",
+                  basePriceCents: 0,
+                  finalPriceCents: 0,
+                }),
+                expect.objectContaining({
+                  dishId: "dish-extra",
+                  itemType: "extra",
+                  basePriceCents: 450,
+                  finalPriceCents: 450,
+                }),
+              ]),
+            }),
+          }),
+        }),
+      );
+    });
+
+    it("E2E Flow 5: Atomicity guard triggers compensating rollback when audit write fails", async () => {
+      const eatcleanOffers: CommercialOffer[] = [
+        {
+          id: "offer-ind",
+          code: "individual_menu",
+          title: "Menú Individual",
+          subtitle: "Por día",
+          description: "11,90 €",
+          basePrice: { cents: 1190, currency: "EUR", formatted: "11,90 €" },
+          unitLabel: "menú",
+          slotsIncluded: 1,
+          promotions: [],
+        },
+      ];
+      registerTenantOffers("eatclean", eatcleanOffers);
+
+      const ctx = makeContext({ tenantSlug: "eatclean" });
+      const mockOrderWithItems: OrderWithItems = {
+        order: {
+          id: "order-rollback-1",
+          tenant_id: ctx.tenantId,
+          customer_id: "customer-123",
+          status: "draft",
+          total: 11.9,
+          week_start: "2026-07-20",
+          notes: null,
+          demand_channel: "individual",
+          company_id: null,
+          site_id: null,
+          organizational_unit_id: null,
+          delivery_group_id: null,
+          delivery_address_id: null,
+          created_at: new Date().toISOString(),
+          deleted_at: null,
+        },
+        items: [
+          { id: "i1", order_id: "order-rollback-1", tenant_id: ctx.tenantId, dish_id: "dish-01", day_date: "2026-07-20", qty: 1, comment: null, deleted_at: null },
+        ],
+      };
+
+      mockFindByIdWithItems.mockResolvedValue(mockOrderWithItems);
+      mockConfirmDraft.mockResolvedValue({
+        old: mockOrderWithItems.order,
+        order: { ...mockOrderWithItems.order, status: "confirmed" },
+      });
+
+      // Simulate AuditService.write failure
+      vi.mocked(AuditService.write).mockRejectedValueOnce(
+        new Error("Database connection lost during audit persist"),
+      );
+
+      await expect(
+        OrderService.confirm(ctx, "order-rollback-1", {
+          offerCode: "individual_menu",
+          expectedTotal: 11.9,
+        }),
+      ).rejects.toMatchObject({
+        code: "INVALID_STATE",
+        message: expect.stringContaining("Confirmation aborted"),
+      });
+
+      // Verify compensating rollback was executed
+      expect(mockRevertToDraft).toHaveBeenCalledWith("order-rollback-1");
+    });
+  });
 });
+

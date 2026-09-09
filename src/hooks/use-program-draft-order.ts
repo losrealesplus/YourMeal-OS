@@ -33,6 +33,9 @@ export function useProgramDraftOrder() {
         dayDate: command.dayDate,
         dishIds: command.dishIds,
         notes: command.notes,
+        offerCode: command.offerCode,
+        customerTier: command.customerTier,
+        extras: command.extras,
       });
     },
     onSuccess: async () => {

@@ -219,6 +219,13 @@ export const OrderService = {
           newData: {
             order: result.order,
             items: result.items,
+            commercialContext: {
+              offerCode: command.offerCode ?? commercialPricing?.offerCode,
+              customerTier: command.customerTier ?? "public",
+              extras: command.extras ?? [],
+              menuUnits: commercialPricing?.menuUnits ?? 1,
+              grandTotalFinalPriceCents: commercialPricing?.grandTotalFinalPrice.cents,
+            },
           } as unknown as Record<string, unknown>,
         });
       } catch (e) {
@@ -258,7 +265,12 @@ export const OrderService = {
   async confirm(
     ctx: ServiceContext,
     orderId: string,
-    options?: { expectedTotal?: number },
+    options?: {
+      expectedTotal?: number;
+      offerCode?: string;
+      customerTier?: CustomerTier;
+      extras?: ExtraItemInput[];
+    },
   ): Promise<OrderRow> {
     requireCapability(ctx.roles, "orders.write");
 
@@ -284,15 +296,46 @@ export const OrderService = {
       }
     }
 
-    // Re-evaluate commercial pricing authoritatively at confirmation time
+    // Retrieve draft commercial context from audit trail if available
+    let draftContext:
+      | {
+          offerCode?: string;
+          customerTier?: CustomerTier;
+          extras?: ExtraItemInput[];
+        }
+      | undefined;
+    try {
+      const { data: auditEntries } = await ctx.supabase
+        .from("audit_log")
+        .select("new_data")
+        .eq("tenant_id", ctx.tenantId)
+        .eq("entity_type", "order")
+        .eq("entity_id", orderId)
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      const latestNewData = auditEntries?.[0]?.new_data as Record<string, unknown> | undefined;
+      draftContext = latestNewData?.commercialContext as typeof draftContext;
+    } catch {
+      // In-memory or test contexts where audit_log is mocked
+    }
+
+    const resolvedOfferCode = options?.offerCode ?? draftContext?.offerCode;
+    const resolvedCustomerTier =
+      options?.customerTier ?? draftContext?.customerTier ?? "public";
+    const resolvedExtras = options?.extras ?? draftContext?.extras ?? [];
+
+    // Re-evaluate commercial pricing authoritatively at confirmation time with preserved context
     const commercialPricing = resolveOrderCommercialPricing({
       tenantSlug: ctx.tenantSlug ?? undefined,
-      customerTier: "public",
+      customerTier: resolvedCustomerTier,
+      offerCode: resolvedOfferCode,
       items: current.items.map((i) => ({
         dishId: i.dish_id,
         dayDate: i.day_date,
         qty: i.qty,
       })),
+      extras: resolvedExtras,
     });
 
     const evaluatedTotal = commercialPricing
@@ -300,15 +343,28 @@ export const OrderService = {
       : current.order.total;
 
     // Detect price change between draft and confirmation (Anti-Drift Guard)
-    if (options?.expectedTotal !== undefined) {
-      if (Math.abs(evaluatedTotal - options.expectedTotal) > 0.001) {
-        throw new DomainError(
-          "PRICE_MISMATCH",
-          `El precio del pedido ha cambiado de ${options.expectedTotal.toFixed(2)} € a ${evaluatedTotal.toFixed(2)} €. Por favor, revisa el nuevo importe antes de confirmar.`,
-          { expectedTotal: options.expectedTotal, actualTotal: evaluatedTotal },
-        );
-      }
+    const expected =
+      options?.expectedTotal !== undefined ? options.expectedTotal : current.order.total;
+    if (Math.abs(evaluatedTotal - expected) > 0.001) {
+      throw new DomainError(
+        "PRICE_MISMATCH",
+        `El precio del pedido ha cambiado de ${expected.toFixed(2)} € a ${evaluatedTotal.toFixed(2)} €. Por favor, revisa el nuevo importe antes de confirmar.`,
+        { expectedTotal: expected, actualTotal: evaluatedTotal },
+      );
     }
+
+    // Generate immutable Price Snapshot
+    const priceSnapshot = commercialPricing
+      ? CommercialPricingEngine.createSnapshot(commercialPricing, {
+          orderId,
+          orderItems: current.items.map((item) => ({
+            dishId: item.dish_id,
+            dishName: item.dish_id,
+            dayDate: item.day_date,
+            qty: item.qty,
+          })),
+        })
+      : null;
 
     let result: { old: OrderRow; order: OrderRow };
     try {
@@ -320,31 +376,6 @@ export const OrderService = {
       }
       throw new DomainError("INVALID_STATE", message);
     }
-
-    // Generate immutable Price Snapshot
-    const priceSnapshot = commercialPricing
-      ? CommercialPricingEngine.createSnapshot(commercialPricing, {
-          orderId: result.order.id,
-          lineItems: current.items.map((item) => ({
-            dishId: item.dish_id,
-            dishName: item.dish_id,
-            itemType: "menu_dish",
-            qty: item.qty,
-            basePriceCents: Math.round(
-              commercialPricing.grandTotalBasePrice.cents /
-                Math.max(1, current.items.length),
-            ),
-            finalPriceCents: Math.round(
-              commercialPricing.grandTotalFinalPrice.cents /
-                Math.max(1, current.items.length),
-            ),
-            discountCents: Math.round(
-              commercialPricing.grandTotalSavings.cents /
-                Math.max(1, current.items.length),
-            ),
-          })),
-        })
-      : null;
 
     try {
       await AuditService.write(ctx, {
@@ -358,10 +389,17 @@ export const OrderService = {
         } as Record<string, unknown>,
       });
     } catch (e) {
+      // Compensating action: atomic consistency rollback
+      try {
+        await repo.revertToDraft(orderId);
+      } catch (rollbackErr) {
+        console.error("Critical: rollback to draft failed after audit failure", rollbackErr);
+      }
       const message = e instanceof Error ? e.message : "Audit write failed after confirm";
-      throw new DomainError("INVALID_STATE", message);
+      throw new DomainError("INVALID_STATE", `Confirmation aborted: ${message}`);
     }
 
     return result.order;
   },
 };
+

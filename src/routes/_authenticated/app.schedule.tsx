@@ -69,6 +69,7 @@ function ScheduleFlow() {
   const selectedDishes = offerDishes.filter((d) => selected.includes(d.id));
   const commercialPricing = resolveOrderCommercialPricing({
     tenantSlug: brandConfig.slug,
+    offerCode: "individual_menu",
     items: selectedDishes.map((d) => ({
       dishId: d.id,
       dayDate,
@@ -88,6 +89,7 @@ function ScheduleFlow() {
       weekStart,
       dayDate,
       dishIds: selected,
+      offerCode: "individual_menu",
     });
     void navigate({
       to: "/app/orders/$orderId",

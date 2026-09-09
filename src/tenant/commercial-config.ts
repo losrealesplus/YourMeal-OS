@@ -11,13 +11,18 @@ export const bundledCommercialOffers: CommercialOffer[] =
   Array.isArray(commercialJson) ? (commercialJson as CommercialOffer[]) : [];
 
 /**
- * Initialize bundled commercial offers for the active tenant build.
+ * Initialize bundled commercial offers for the active tenant build and runtime worker.
  */
 export function initializeBundledCommercialOffers(): void {
-  if (brandConfig?.slug && bundledCommercialOffers.length > 0) {
-    registerTenantOffers(brandConfig.slug, bundledCommercialOffers);
+  if (bundledCommercialOffers.length > 0) {
+    if (brandConfig?.slug) {
+      registerTenantOffers(brandConfig.slug, bundledCommercialOffers);
+    }
+    // Also ensure 'eatclean' instance mapping is available if bundled
+    registerTenantOffers("eatclean", bundledCommercialOffers);
   }
 }
 
 // Auto-initialize when module is loaded
 initializeBundledCommercialOffers();
+

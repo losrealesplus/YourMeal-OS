@@ -140,8 +140,16 @@ export interface OrderItemPriceDetail {
 
 export interface CreatePriceSnapshotOptions {
   orderId?: string;
+  orderItems?: Array<{
+    dishId: string;
+    dishName?: string;
+    dayDate?: string;
+    qty: number;
+    isExtra?: boolean;
+  }>;
   lineItems?: OrderItemPriceDetail[];
 }
+
 
 export interface OrderPriceSnapshot {
   orderId?: string;

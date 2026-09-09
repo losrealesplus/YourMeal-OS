@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { createServiceContext } from "@/services/types";
 import { OrderService } from "@/modules/orders/application/order-service";
 import { orderKeys } from "@/modules/orders/application/order-query-keys";
-
+import type { CustomerTier, ExtraItemInput } from "@/modules/commercial";
 import { brandConfig } from "@/tenant/brand-config";
 
 /**
@@ -16,11 +16,23 @@ export function useConfirmOrder() {
 
   return useMutation({
     mutationFn: async (
-      input: string | { orderId: string; expectedTotal?: number },
+      input:
+        | string
+        | {
+            orderId: string;
+            expectedTotal?: number;
+            offerCode?: string;
+            customerTier?: CustomerTier;
+            extras?: ExtraItemInput[];
+          },
     ) => {
       const orderId = typeof input === "string" ? input : input.orderId;
       const expectedTotal =
         typeof input === "object" ? input.expectedTotal : undefined;
+      const offerCode = typeof input === "object" ? input.offerCode : undefined;
+      const customerTier =
+        typeof input === "object" ? input.customerTier : undefined;
+      const extras = typeof input === "object" ? input.extras : undefined;
 
       if (!user || !tenantId) {
         throw new Error("Authenticated user and tenant are required");
@@ -32,7 +44,12 @@ export function useConfirmOrder() {
         tenantSlug: tenant?.slug ?? brandConfig.slug,
         roles,
       });
-      return OrderService.confirm(ctx, orderId, { expectedTotal });
+      return OrderService.confirm(ctx, orderId, {
+        expectedTotal,
+        offerCode,
+        customerTier,
+        extras,
+      });
     },
     onSuccess: async (_order, input) => {
       const orderId = typeof input === "string" ? input : input.orderId;

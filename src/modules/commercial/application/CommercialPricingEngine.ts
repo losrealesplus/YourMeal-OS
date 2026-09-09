@@ -304,9 +304,42 @@ export class CommercialPricingEngine {
   ): OrderPriceSnapshot {
     const items: OrderItemPriceDetail[] = [];
 
-    // 1. Explicit line items passed by caller (e.g. menu dishes with explicit line pricing)
+    // 1. Explicit line items passed by caller
     if (options?.lineItems && options.lineItems.length > 0) {
       items.push(...options.lineItems);
+    } else if (options?.orderItems && options.orderItems.length > 0) {
+      const nonExtraItems = options.orderItems.filter((i) => !i.isExtra);
+      // Group by delivery day to distinguish primary daily slot from additional dish components
+      const daysSet = new Set<string>();
+      for (const item of nonExtraItems) {
+        const day = item.dayDate ?? "unassigned";
+        const isFirstDishOfDay = !daysSet.has(day);
+        daysSet.add(day);
+
+        let basePriceCents = 0;
+        let finalPriceCents = 0;
+        let discountCents = 0;
+
+        if (isFirstDishOfDay && evalResult.menuUnits > 0) {
+          const unitBase = evalResult.basePrice.cents;
+          const unitSavings = Math.round(
+            evalResult.totalSavings.cents / Math.max(1, evalResult.menuUnits),
+          );
+          basePriceCents = unitBase;
+          discountCents = unitSavings;
+          finalPriceCents = Math.max(0, unitBase - unitSavings);
+        }
+
+        items.push({
+          dishId: item.dishId,
+          dishName: item.dishName ?? item.dishId,
+          itemType: "menu_dish",
+          qty: item.qty,
+          basePriceCents,
+          finalPriceCents,
+          discountCents,
+        });
+      }
     }
 
     // 2. Evaluated extras (itemized directly from evaluation breakdown)
@@ -321,6 +354,7 @@ export class CommercialPricingEngine {
         discountCents: Math.max(0, extra.baseUnitPrice.cents - extra.finalUnitPrice.cents),
       });
     }
+
 
     return {
       orderId: options?.orderId,
