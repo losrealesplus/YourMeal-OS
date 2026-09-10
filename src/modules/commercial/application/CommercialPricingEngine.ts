@@ -236,6 +236,8 @@ export class CommercialPricingEngine {
   static evaluate(offer: CommercialOffer, context: PriceEvaluationContext): PricingEvaluationResult {
     const currency = offer.basePrice.currency;
     const customerTier = context.customerTier ?? "public";
+    const pricingModel =
+      offer.pricingModel ?? (offer.slotsIncluded > 1 ? "fixed_package" : "per_unit");
     const menuUnits = context.menuUnits !== undefined ? Math.max(0, context.menuUnits) : 1;
 
     // 1. Evaluate unit base offer
@@ -275,6 +277,7 @@ export class CommercialPricingEngine {
 
     return {
       offerCode: offer.code,
+      pricingModel,
       customerTier,
       menuUnits,
       basePrice: offer.basePrice,
@@ -355,10 +358,10 @@ export class CommercialPricingEngine {
       });
     }
 
-
     return {
       orderId: options?.orderId,
       offerCode: evalResult.offerCode,
+      pricingModel: evalResult.pricingModel,
       customerTier: evalResult.customerTier,
       baseAmountCents: evalResult.grandTotalBasePrice.cents,
       discountAmountCents: evalResult.grandTotalSavings.cents,

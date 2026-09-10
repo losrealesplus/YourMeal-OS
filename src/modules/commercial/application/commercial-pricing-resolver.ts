@@ -56,9 +56,12 @@ export function resolveOrderCommercialPricing(
     menuUnits = Math.max(0, input.menuUnits);
   } else if (hasItems) {
     const nonExtraItems = (input.items ?? []).filter((i) => !i.isExtra);
+    const pricingModel =
+      offer.pricingModel ?? (offer.slotsIncluded > 1 ? "fixed_package" : "per_unit");
+
     if (nonExtraItems.length === 0) {
       menuUnits = 0;
-    } else if (offer.slotsIncluded > 1) {
+    } else if (pricingModel === "fixed_package") {
       // Packaged plan (e.g. weekly_plan covering up to slotsIncluded days)
       menuUnits = 1;
     } else {

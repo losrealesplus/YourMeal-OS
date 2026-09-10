@@ -80,3 +80,19 @@ export function resolveCommercialOffer(
 
   return defaultOffer ?? null;
 }
+
+/**
+ * Validates that an explicit offer code is valid and active for the tenant.
+ * Returns the matched offer, or throws / returns null if invalid.
+ */
+export function validateTenantCommercialOffer(
+  tenantSlug: string | undefined | null,
+  offerCode: string | undefined | null,
+): CommercialOffer | null {
+  if (!offerCode) return null;
+  if (!tenantSlug) return null;
+
+  const offers = getTenantOffers(tenantSlug);
+  const matched = offers.find((o) => o.code === offerCode);
+  return matched ?? null;
+}

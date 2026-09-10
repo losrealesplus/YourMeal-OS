@@ -4,6 +4,7 @@ export {
   getTenantOffers,
   registerTenantOffers,
   resolveCommercialOffer,
+  validateTenantCommercialOffer,
 } from "./application/commercial-offer-registry";
 export {
   resolveOrderCommercialPricing,
@@ -23,6 +24,7 @@ export type {
   OrderPriceSnapshot,
   PriceEvaluationContext,
   PricingEvaluationResult,
+  PricingModel,
   PromotionRule,
   PromotionScope,
   PromotionType,

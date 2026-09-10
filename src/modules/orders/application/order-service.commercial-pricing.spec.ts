@@ -8,8 +8,9 @@ import {
   clearTenantOffersRegistry,
   registerTenantOffers,
   getTenantOffers,
+  resolveOrderCommercialPricing,
 } from "@/modules/commercial";
-import type { CommercialOffer } from "@/modules/commercial";
+import type { CommercialOffer, CustomerTier } from "@/modules/commercial";
 
 vi.mock("@/services/feature-flag-service", () => ({
   FeatureFlagService: {
@@ -357,7 +358,11 @@ describe("OrderService Commercial Pricing Universal Core Integration (FASE 3N-R2
       ];
       registerTenantOffers("test-tenant", tenantOffers);
 
-      const ctx = makeContext({ tenantSlug: "test-tenant" });
+      const ctx = makeContext({
+        tenantSlug: "test-tenant",
+        roles: ["company_admin"],
+        capabilities: new Set(["orders.write", "orders.read"]),
+      });
       const result = await OrderService.programDraftItems(ctx, {
         weekStart: "2026-07-20",
         customerTier: "subscriber_monthly",
@@ -1079,6 +1084,243 @@ describe("OrderService Commercial Pricing Universal Core Integration (FASE 3N-R2
               discountAmountCents: 278,
               finalAmountCents: 1572,
               currency: "EUR",
+            }),
+          }),
+        }),
+      );
+    });
+  });
+
+  describe("6. Runtime & Commercial Integrity Gate (FASE 3N-R5)", () => {
+    const r5TenantOffers: CommercialOffer[] = [
+      {
+        id: "r5-ind",
+        code: "individual_menu",
+        title: "Pedido Individual",
+        subtitle: "Días puntuales",
+        description: "11,90 € por menú",
+        pricingModel: "per_unit",
+        basePrice: { cents: 1190, currency: "EUR", formatted: "11,90 €" },
+        unitLabel: "menú",
+        slotsIncluded: 1,
+        promotions: [],
+      },
+      {
+        id: "r5-wk",
+        code: "weekly_plan",
+        title: "Plan Semanal",
+        subtitle: "5 almuerzos",
+        description: "Paquete semanal fijo",
+        pricingModel: "fixed_package",
+        basePrice: { cents: 5950, currency: "EUR", formatted: "59,50 €" },
+        unitLabel: "semana",
+        slotsIncluded: 5,
+        promotions: [
+          {
+            id: "promo_r5_wk_10",
+            code: "SEMANAL_10",
+            name: "10% dto. Semanal",
+            type: "percentage",
+            value: 10.0,
+            appliesTo: "offer_base",
+            eligibility: "public",
+          },
+          {
+            id: "promo_r5_wk_extra_30",
+            code: "EXTRAS_30",
+            name: "30% dto. en Extras para suscriptores",
+            type: "percentage",
+            value: 30.0,
+            appliesTo: "extras",
+            eligibility: "subscriber_monthly",
+          },
+        ],
+      },
+      {
+        id: "r5-mo",
+        code: "monthly_plan",
+        title: "Plan Mensual",
+        subtitle: "Tarifa 9,97 €/menú",
+        description: "20 menús",
+        pricingModel: "per_unit",
+        basePrice: { cents: 1190, currency: "EUR", formatted: "11,90 €" },
+        unitLabel: "menú",
+        slotsIncluded: 20,
+        promotions: [
+          {
+            id: "promo_r5_mo_997",
+            code: "MENSUAL_997",
+            name: "Tarifa 9,97 €",
+            type: "fixed_price",
+            value: 997,
+            appliesTo: "offer_base",
+            eligibility: "public",
+          },
+        ],
+      },
+    ];
+
+    beforeEach(() => {
+      registerTenantOffers("integrity-tenant", r5TenantOffers);
+    });
+
+    it("6.1 Verifies runtime bootstrap registration -> retrieval -> pricing resolution flow", () => {
+      expect(getTenantOffers("integrity-tenant")).toHaveLength(3);
+      const ctx = makeContext({ tenantSlug: "integrity-tenant" });
+
+      const pricing = resolveOrderCommercialPricing({
+        tenantSlug: ctx.tenantSlug ?? undefined,
+        offerCode: "individual_menu",
+        items: [{ dishId: "dish-01", dayDate: "2026-07-20", qty: 1 }],
+      });
+
+      expect(pricing).not.toBeNull();
+      expect(pricing?.grandTotalFinalPrice.cents).toBe(1190);
+    });
+
+    it("6.2 Demonstrates explicit pricingModel semantics (per_unit vs fixed_package)", async () => {
+      const ctx = makeContext({ tenantSlug: "integrity-tenant" });
+
+      // Individual (per_unit): 2 days = 2 * 11,90 € = 23,80 €
+      const indDraft = await OrderService.programDraftItems(ctx, {
+        weekStart: "2026-07-20",
+        offerCode: "individual_menu",
+        items: [
+          { dishId: "dish-01", dayDate: "2026-07-20", qty: 1 },
+          { dishId: "dish-02", dayDate: "2026-07-21", qty: 1 },
+        ],
+      });
+      expect(indDraft.order.total).toBe(23.8);
+
+      // Weekly (fixed_package): 5 days = 53,55 € fixed package (not 53,55 * 5)
+      const wkDraft = await OrderService.programDraftItems(ctx, {
+        weekStart: "2026-07-20",
+        offerCode: "weekly_plan",
+        items: [
+          { dishId: "dish-01", dayDate: "2026-07-20", qty: 1 },
+          { dishId: "dish-02", dayDate: "2026-07-21", qty: 1 },
+          { dishId: "dish-03", dayDate: "2026-07-22", qty: 1 },
+          { dishId: "dish-04", dayDate: "2026-07-23", qty: 1 },
+          { dishId: "dish-05", dayDate: "2026-07-24", qty: 1 },
+        ],
+      });
+      expect(wkDraft.order.total).toBe(53.55);
+
+      // Monthly (per_unit): 20 menus with 9,97 € promo = 20 * 9,97 € = 199,40 €
+      const pricingMonthly = resolveOrderCommercialPricing({
+        tenantSlug: "integrity-tenant",
+        offerCode: "monthly_plan",
+        menuUnits: 20,
+        items: [{ dishId: "dish-01", dayDate: "2026-07-20", qty: 20 }],
+      });
+      expect(pricingMonthly?.grandTotalFinalPrice.cents).toBe(19940);
+      expect(pricingMonthly?.grandTotalFinalPrice.formatted).toBe("199,40 €");
+    });
+
+    it("6.3 Server-side Anti-Tampering: non-staff user cannot claim subscriber customerTier to illicitly get extras discount", async () => {
+      const ctx = makeContext({
+        tenantSlug: "integrity-tenant",
+        roles: ["customer"], // non-staff regular customer
+      });
+
+      // Customer payload maliciously includes customerTier: "subscriber_monthly" to get 30% off on 4,00 € extra
+      const draftResult = await OrderService.programDraftItems(ctx, {
+        weekStart: "2026-07-20",
+        offerCode: "weekly_plan",
+        customerTier: "subscriber_monthly" as CustomerTier,
+        items: [
+          { dishId: "dish-01", dayDate: "2026-07-20", qty: 1 },
+        ],
+        extras: [
+          { dishId: "dish-side", dishName: "Postre Fit", basePriceCents: 400, qty: 1 },
+        ],
+      });
+
+      // Server sanitizes customerTier to "public", so 30% discount on extras is NOT applied
+      // Total = 53,55 € (weekly plan) + 4,00 € (extra at 0% discount) = 57,55 €
+      expect(draftResult.order.total).toBe(57.55);
+
+      // Verify audit log recorded authoritative tier "public"
+      expect(AuditService.write).toHaveBeenCalledWith(
+        ctx,
+        expect.objectContaining({
+          newData: expect.objectContaining({
+            commercialContext: expect.objectContaining({
+              customerTier: "public",
+            }),
+          }),
+        }),
+      );
+    });
+
+    it("6.4 Server-side Anti-Tampering: rejects invalid or unverified offerCode with NOT_FOUND", async () => {
+      const ctx = makeContext({
+        tenantSlug: "integrity-tenant",
+      });
+
+      await expect(
+        OrderService.programDraftItems(ctx, {
+          weekStart: "2026-07-20",
+          offerCode: "unregistered_discount_hack",
+          items: [{ dishId: "dish-01", dayDate: "2026-07-20", qty: 1 }],
+        }),
+      ).rejects.toThrow(DomainError);
+    });
+
+    it("6.5 Full End-to-End Lifecycle (Draft -> Confirm -> Snapshot) across all 3 models", async () => {
+      const ctx = makeContext({ tenantSlug: "integrity-tenant" });
+
+      // 1. Individual Menu lifecycle
+      const indDraft = await OrderService.programDraftItems(ctx, {
+        weekStart: "2026-07-20",
+        offerCode: "individual_menu",
+        items: [{ dishId: "dish-01", dayDate: "2026-07-20", qty: 1 }],
+      });
+      expect(indDraft.order.total).toBe(11.9);
+
+      const mockOrder: OrderWithItems = {
+        order: {
+          id: "order-r5-ind",
+          tenant_id: ctx.tenantId,
+          customer_id: "customer-123",
+          status: "draft",
+          total: 11.9,
+          week_start: "2026-07-20",
+          notes: null,
+          demand_channel: "individual",
+          company_id: null,
+          site_id: null,
+          organizational_unit_id: null,
+          delivery_group_id: null,
+          delivery_address_id: null,
+          created_at: new Date().toISOString(),
+          deleted_at: null,
+        },
+        items: [
+          { id: "i1", order_id: "order-r5-ind", tenant_id: ctx.tenantId, dish_id: "dish-01", day_date: "2026-07-20", qty: 1, comment: null, deleted_at: null },
+        ],
+      };
+
+      mockFindByIdWithItems.mockResolvedValue(mockOrder);
+      mockConfirmDraft.mockResolvedValue({
+        old: mockOrder.order,
+        order: { ...mockOrder.order, status: "confirmed" },
+      });
+
+      const confirmed = await OrderService.confirm(ctx, "order-r5-ind", {
+        offerCode: "individual_menu",
+        expectedTotal: 11.9,
+      });
+      expect(confirmed.status).toBe("confirmed");
+      expect(AuditService.write).toHaveBeenCalledWith(
+        ctx,
+        expect.objectContaining({
+          action: "status_change",
+          newData: expect.objectContaining({
+            priceSnapshot: expect.objectContaining({
+              offerCode: "individual_menu",
+              pricingModel: "per_unit",
+              finalAmountCents: 1190,
             }),
           }),
         }),

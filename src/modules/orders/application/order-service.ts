@@ -8,7 +8,9 @@ import { createWeeklyMenuRepository } from "@/modules/weekly-menu/infrastructure
 import { canAcceptOrders } from "@/modules/bootstrap-integrity";
 import {
   CommercialPricingEngine,
+  getTenantOffers,
   resolveOrderCommercialPricing,
+  validateTenantCommercialOffer,
   type CustomerTier,
   type ExtraItemInput,
 } from "@/modules/commercial";
@@ -58,6 +60,24 @@ const idempotencyStore = new Map<string, IdempotencyEntry>();
 
 export function clearOrderServiceIdempotencyForTests(): void {
   idempotencyStore.clear();
+}
+
+function resolveAuthoritativeCustomerTier(
+  ctx: ServiceContext,
+  requestedTier?: CustomerTier,
+): CustomerTier {
+  // Staff callers (e.g. operators placing or editing phone orders) may specify client tiers
+  if (hasStaffAccess(ctx.roles)) {
+    return requestedTier ?? "public";
+  }
+
+  // For non-staff customers, tier cannot be arbitrarily claimed via client payload.
+  // Unless the user has an authorized subscription/corporate session tier, default strictly to "public".
+  if (requestedTier && requestedTier !== "public") {
+    return "public";
+  }
+
+  return "public";
 }
 
 /**
@@ -151,9 +171,27 @@ export const OrderService = {
         }
       }
 
+      if (command.offerCode && ctx.tenantSlug) {
+        const registeredOffers = getTenantOffers(ctx.tenantSlug);
+        if (registeredOffers.length > 0) {
+          const validOffer = validateTenantCommercialOffer(ctx.tenantSlug, command.offerCode);
+          if (!validOffer) {
+            throw new DomainError(
+              "NOT_FOUND",
+              `Commercial offer '${command.offerCode}' not found for tenant '${ctx.tenantSlug}'`,
+            );
+          }
+        }
+      }
+
+      const authoritativeCustomerTier = resolveAuthoritativeCustomerTier(
+        ctx,
+        command.customerTier,
+      );
+
       const commercialPricing = resolveOrderCommercialPricing({
         tenantSlug: ctx.tenantSlug ?? undefined,
-        customerTier: command.customerTier ?? "public",
+        customerTier: authoritativeCustomerTier,
         offerCode: command.offerCode,
         items: command.items,
         extras: command.extras,
@@ -221,7 +259,7 @@ export const OrderService = {
             items: result.items,
             commercialContext: {
               offerCode: command.offerCode ?? commercialPricing?.offerCode,
-              customerTier: command.customerTier ?? "public",
+              customerTier: authoritativeCustomerTier,
               extras: command.extras ?? [],
               menuUnits: commercialPricing?.menuUnits ?? 1,
               grandTotalFinalPriceCents: commercialPricing?.grandTotalFinalPrice.cents,
@@ -321,14 +359,31 @@ export const OrderService = {
     }
 
     const resolvedOfferCode = options?.offerCode ?? draftContext?.offerCode;
-    const resolvedCustomerTier =
+    const requestedCustomerTier =
       options?.customerTier ?? draftContext?.customerTier ?? "public";
+    const authoritativeCustomerTier = resolveAuthoritativeCustomerTier(
+      ctx,
+      requestedCustomerTier,
+    );
     const resolvedExtras = options?.extras ?? draftContext?.extras ?? [];
+
+    if (resolvedOfferCode && ctx.tenantSlug) {
+      const registeredOffers = getTenantOffers(ctx.tenantSlug);
+      if (registeredOffers.length > 0) {
+        const validOffer = validateTenantCommercialOffer(ctx.tenantSlug, resolvedOfferCode);
+        if (!validOffer) {
+          throw new DomainError(
+            "NOT_FOUND",
+            `Commercial offer '${resolvedOfferCode}' not found for tenant '${ctx.tenantSlug}'`,
+          );
+        }
+      }
+    }
 
     // Re-evaluate commercial pricing authoritatively at confirmation time with preserved context
     const commercialPricing = resolveOrderCommercialPricing({
       tenantSlug: ctx.tenantSlug ?? undefined,
-      customerTier: resolvedCustomerTier,
+      customerTier: authoritativeCustomerTier,
       offerCode: resolvedOfferCode,
       items: current.items.map((i) => ({
         dishId: i.dish_id,
