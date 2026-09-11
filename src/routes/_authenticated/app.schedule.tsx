@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 import {
   DayPicker,
   MenuDishPost,
@@ -12,9 +13,15 @@ import { DishThumb } from "@/components/consumer/dish-thumb";
 import { useFmt } from "@/i18n/localization-provider";
 import { useWeeklyMenu } from "@/hooks/use-weekly-menu";
 import { useProgramDraftOrder } from "@/hooks/use-program-draft-order";
-import { utcWeekDates, utcWeekStartMonday } from "@/modules/weekly-menu/application/week-dates";
+import {
+  utcWeekDates,
+  utcWeekStartMonday,
+  offsetWeekMonday,
+  formatWeekRangeEs,
+  MAX_FUTURE_WEEKS,
+} from "@/modules/weekly-menu/application/week-dates";
 import { resolveOrderCommercialPricing, getTenantOffers } from "@/modules/commercial";
-import { brandConfig } from "@/tenant/brand-config";
+import { useActiveTenantSlug } from "@/identity/active-tenant-slug";
 import { cn } from "@/lib/utils";
 import dishPhoto from "@/assets/eatclean-hero.jpg";
 
@@ -36,8 +43,11 @@ function ScheduleFlow() {
   const [mealsPerDay, setMealsPerDay] = useState(2);
   const [deliveryDay, setDeliveryDay] = useState(0);
   const [selected, setSelected] = useState<string[]>([]);
+  const [weekOffset, setWeekOffset] = useState<number>(0);
   const fmt = useFmt();
-  const weekStart = utcWeekStartMonday();
+
+  const baseWeekStart = utcWeekStartMonday();
+  const weekStart = offsetWeekMonday(baseWeekStart, weekOffset);
   const { data: weeklyMenu } = useWeeklyMenu(weekStart);
   const programDraft = useProgramDraftOrder();
 
@@ -64,18 +74,27 @@ function ScheduleFlow() {
     t("customer:summaryWeeklyTitle"),
   ];
 
-  const availableOffers = getTenantOffers(brandConfig.slug);
-  const [selectedOfferCode, setSelectedOfferCode] = useState<string | undefined>(
+  const activeTenantSlug = useActiveTenantSlug();
+  const availableOffers = getTenantOffers(activeTenantSlug);
+  const defaultOfferCode =
     availableOffers.find((o) => (o as { isDefault?: boolean }).isDefault)?.code ??
-      availableOffers[0]?.code,
-  );
+    availableOffers[0]?.code;
+
+  const [selectedOfferCode, setSelectedOfferCode] = useState<string | undefined>(defaultOfferCode);
+
+  useEffect(() => {
+    if (!selectedOfferCode && defaultOfferCode) {
+      setSelectedOfferCode(defaultOfferCode);
+    }
+  }, [defaultOfferCode, selectedOfferCode]);
 
   const offerDishes = weeklyMenu?.days[deliveryDay]?.dishes ?? [];
   const dayDate = utcWeekDates(weekStart)[deliveryDay] ?? weekStart;
   const selectedDishes = offerDishes.filter((d) => selected.includes(d.id));
+  const effectiveOfferCode = selectedOfferCode ?? defaultOfferCode;
   const commercialPricing = resolveOrderCommercialPricing({
-    tenantSlug: brandConfig.slug,
-    offerCode: selectedOfferCode,
+    tenantSlug: activeTenantSlug,
+    offerCode: effectiveOfferCode,
     items: selectedDishes.map((d) => ({
       dishId: d.id,
       dayDate,
@@ -95,7 +114,7 @@ function ScheduleFlow() {
       weekStart,
       dayDate,
       dishIds: selected,
-      offerCode: selectedOfferCode,
+      offerCode: effectiveOfferCode,
     });
     void navigate({
       to: "/app/orders/$orderId",
@@ -132,6 +151,72 @@ function ScheduleFlow() {
 
       {step === 1 ? (
         <section className="px-6 space-y-8">
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-semibold text-muted-foreground">
+                {t("customer:scheduleWeekTitle", "Semana de entrega")}
+              </p>
+              {weekOffset > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setWeekOffset(0);
+                    setSelected([]);
+                  }}
+                  className="text-xs font-semibold text-primary hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  {t("customer:resetToCurrentWeek", "Esta semana")}
+                </button>
+              )}
+            </div>
+            <div className="flex items-center justify-between bg-card border border-border rounded-2xl p-3 shadow-xs">
+              <button
+                type="button"
+                disabled={weekOffset <= 0}
+                onClick={() => {
+                  setWeekOffset((w) => Math.max(0, w - 1));
+                  setSelected([]);
+                }}
+                className="h-11 w-11 rounded-xl border border-border flex items-center justify-center text-foreground hover:bg-secondary disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+                aria-label={t("customer:prevWeek", "Semana anterior")}
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <div className="text-center px-2">
+                <span
+                  className={cn(
+                    "inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase mb-1",
+                    weekOffset === 0
+                      ? "bg-primary/10 text-primary"
+                      : "bg-secondary text-secondary-foreground",
+                  )}
+                >
+                  {weekOffset === 0
+                    ? t("customer:currentWeekLabel", "Esta semana")
+                    : weekOffset === 1
+                      ? t("customer:nextWeekLabel", "Próxima semana")
+                      : t("customer:futureWeekOffsetLabel", `+${weekOffset} semanas`)}
+                </span>
+                <p className="text-sm font-extrabold text-foreground tracking-tight">
+                  {formatWeekRangeEs(weekStart)}
+                </p>
+              </div>
+              <button
+                type="button"
+                disabled={weekOffset >= MAX_FUTURE_WEEKS}
+                onClick={() => {
+                  setWeekOffset((w) => Math.min(MAX_FUTURE_WEEKS, w + 1));
+                  setSelected([]);
+                }}
+                className="h-11 w-11 rounded-xl border border-border flex items-center justify-center text-foreground hover:bg-secondary disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+                aria-label={t("customer:nextWeek", "Semana siguiente")}
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+
           <div>
             <p className="text-sm font-semibold text-muted-foreground mb-3">
               {t("customer:mealsPerDay")}

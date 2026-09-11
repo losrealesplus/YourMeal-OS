@@ -7,7 +7,7 @@ import type {
 } from "../domain/types";
 
 export interface OrderPricingResolutionInput {
-  tenantSlug?: string;
+  tenantSlug?: string | null;
   customerTier?: CustomerTier;
   offerCode?: string;
   /** Explicit number of billable menu units / packages. If omitted, deduced from non-extra item context */

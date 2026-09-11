@@ -104,3 +104,15 @@ export function formatWeekRangeEs(weekStart: string): string {
   }
   return `${d1} ${m1Name} ${y1} — ${d2} ${m2Name} ${y2}`;
 }
+
+/** Maximum allowed forward planning horizon in weeks for customer self-service schedule. */
+export const MAX_FUTURE_WEEKS = 4;
+
+/**
+ * Returns true if the given weekStart is strictly in the past relative to referenceDate's Monday.
+ */
+export function isPastWeek(weekStart: string, referenceDate: Date = new Date()): boolean {
+  const currentMonday = utcWeekStartMonday(referenceDate);
+  return weekStart < currentMonday;
+}
+
