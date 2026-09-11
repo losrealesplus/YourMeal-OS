@@ -236,9 +236,16 @@ export class CommercialPricingEngine {
   static evaluate(offer: CommercialOffer, context: PriceEvaluationContext): PricingEvaluationResult {
     const currency = offer.basePrice.currency;
     const customerTier = context.customerTier ?? "public";
+    const pricingModel =
+      offer.pricingModel ?? (offer.slotsIncluded > 1 ? "fixed_package" : "per_unit");
+    const menuUnits = context.menuUnits !== undefined ? Math.max(0, context.menuUnits) : 1;
 
-    // 1. Evaluate base offer
+    // 1. Evaluate unit base offer
     const baseEval = this.evaluateBaseOffer(offer.basePrice, offer.promotions, customerTier);
+
+    const totalOfferBaseCents = offer.basePrice.cents * menuUnits;
+    const totalOfferFinalCents = baseEval.finalPrice.cents * menuUnits;
+    const totalOfferSavingsCents = baseEval.totalSavings.cents * menuUnits;
 
     // 2. Evaluate extras
     const extrasResults: ExtraItemEvaluationResult[] = (context.extras ?? []).map((extra) =>
@@ -254,12 +261,9 @@ export class CommercialPricingEngine {
     const extrasTotalSavingsCents = Math.max(0, extrasTotalBaseCents - extrasTotalFinalCents);
 
     // 3. Compute grand totals
-    const grandTotalBaseCents = baseEval.finalPrice.cents > 0 || baseEval.totalSavings.cents > 0
-      ? offer.basePrice.cents + extrasTotalBaseCents
-      : extrasTotalBaseCents;
-
-    const grandTotalFinalCents = baseEval.finalPrice.cents + extrasTotalFinalCents;
-    const grandTotalSavingsCents = Math.max(0, grandTotalBaseCents - grandTotalFinalCents);
+    const grandTotalBaseCents = totalOfferBaseCents + extrasTotalBaseCents;
+    const grandTotalFinalCents = totalOfferFinalCents + extrasTotalFinalCents;
+    const grandTotalSavingsCents = totalOfferSavingsCents + extrasTotalSavingsCents;
 
     // 4. Generate visual badge
     let pricingBadge: string | null = null;
@@ -273,12 +277,14 @@ export class CommercialPricingEngine {
 
     return {
       offerCode: offer.code,
+      pricingModel,
       customerTier,
+      menuUnits,
       basePrice: offer.basePrice,
-      finalPrice: baseEval.finalPrice,
-      totalSavings: baseEval.totalSavings,
+      finalPrice: MoneyUtil.fromCents(totalOfferFinalCents, currency),
+      totalSavings: MoneyUtil.fromCents(totalOfferSavingsCents, currency),
       savingsPercentage: baseEval.savingsPercentage,
-      hasDiscount: baseEval.totalSavings.cents > 0,
+      hasDiscount: totalOfferSavingsCents > 0,
       appliedPromotions: baseEval.appliedPromotions,
       pricingBadge,
       extrasBreakdown: extrasResults,
@@ -301,9 +307,42 @@ export class CommercialPricingEngine {
   ): OrderPriceSnapshot {
     const items: OrderItemPriceDetail[] = [];
 
-    // 1. Explicit line items passed by caller (e.g. menu dishes with explicit line pricing)
+    // 1. Explicit line items passed by caller
     if (options?.lineItems && options.lineItems.length > 0) {
       items.push(...options.lineItems);
+    } else if (options?.orderItems && options.orderItems.length > 0) {
+      const nonExtraItems = options.orderItems.filter((i) => !i.isExtra);
+      // Group by delivery day to distinguish primary daily slot from additional dish components
+      const daysSet = new Set<string>();
+      for (const item of nonExtraItems) {
+        const day = item.dayDate ?? "unassigned";
+        const isFirstDishOfDay = !daysSet.has(day);
+        daysSet.add(day);
+
+        let basePriceCents = 0;
+        let finalPriceCents = 0;
+        let discountCents = 0;
+
+        if (isFirstDishOfDay && evalResult.menuUnits > 0) {
+          const unitBase = evalResult.basePrice.cents;
+          const unitSavings = Math.round(
+            evalResult.totalSavings.cents / Math.max(1, evalResult.menuUnits),
+          );
+          basePriceCents = unitBase;
+          discountCents = unitSavings;
+          finalPriceCents = Math.max(0, unitBase - unitSavings);
+        }
+
+        items.push({
+          dishId: item.dishId,
+          dishName: item.dishName ?? item.dishId,
+          itemType: "menu_dish",
+          qty: item.qty,
+          basePriceCents,
+          finalPriceCents,
+          discountCents,
+        });
+      }
     }
 
     // 2. Evaluated extras (itemized directly from evaluation breakdown)
@@ -322,6 +361,7 @@ export class CommercialPricingEngine {
     return {
       orderId: options?.orderId,
       offerCode: evalResult.offerCode,
+      pricingModel: evalResult.pricingModel,
       customerTier: evalResult.customerTier,
       baseAmountCents: evalResult.grandTotalBasePrice.cents,
       discountAmountCents: evalResult.grandTotalSavings.cents,

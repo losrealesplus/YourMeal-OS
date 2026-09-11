@@ -53,18 +53,22 @@ export interface PromotionRule {
   badgeLabel?: string; // Optional custom display text, e.g. "🟢 Ahorras 1,93 € (16%)"
 }
 
+export type PricingModel = "per_unit" | "fixed_package";
+
 export interface CommercialOffer {
   id: string;
   code: string; // e.g. "individual_menu", "weekly_plan", "monthly_plan"
   title: string;
   subtitle: string;
   description: string;
+  pricingModel?: PricingModel; // Explicit pricing model (default: "per_unit")
   basePrice: Money;
   unitLabel: string; // e.g. "menú", "semana", "ración"
   slotsIncluded: number; // e.g. 1 for individual, 5 for weekly, 20 for monthly
   promotions: PromotionRule[];
   benefits?: string[];
   recommended?: boolean;
+  isDefault?: boolean;
 }
 
 export interface ExtraItemInput {
@@ -91,6 +95,8 @@ export interface PriceEvaluationContext {
   offerCode: string;
   customerTier: CustomerTier;
   itemCount?: number;
+  /** Number of billable menu units / packages to evaluate (default: 1) */
+  menuUnits?: number;
   extras?: ExtraItemInput[];
 }
 
@@ -107,7 +113,9 @@ export interface AppliedPromotionDetail {
 
 export interface PricingEvaluationResult {
   offerCode: string;
+  pricingModel: PricingModel;
   customerTier: CustomerTier;
+  menuUnits: number;
   basePrice: Money;
   finalPrice: Money;
   totalSavings: Money;
@@ -137,12 +145,21 @@ export interface OrderItemPriceDetail {
 
 export interface CreatePriceSnapshotOptions {
   orderId?: string;
+  orderItems?: Array<{
+    dishId: string;
+    dishName?: string;
+    dayDate?: string;
+    qty: number;
+    isExtra?: boolean;
+  }>;
   lineItems?: OrderItemPriceDetail[];
 }
+
 
 export interface OrderPriceSnapshot {
   orderId?: string;
   offerCode: string;
+  pricingModel?: PricingModel;
   customerTier: CustomerTier;
   baseAmountCents: number;
   discountAmountCents: number;

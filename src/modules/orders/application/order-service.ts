@@ -7,6 +7,14 @@ import { createDishRepository } from "@/modules/dish-library/infrastructure/dish
 import { createWeeklyMenuRepository } from "@/modules/weekly-menu/infrastructure/weekly-menu-repository";
 import { canAcceptOrders } from "@/modules/bootstrap-integrity";
 import {
+  CommercialPricingEngine,
+  getTenantOffers,
+  resolveOrderCommercialPricing,
+  validateTenantCommercialOffer,
+  type CustomerTier,
+  type ExtraItemInput,
+} from "@/modules/commercial";
+import {
   createOrderRepository,
   type OrderItemRow,
   type OrderRow,
@@ -20,6 +28,9 @@ export type ProgramDraftOrderCommand = {
   dishIds: string[];
   notes?: string | null;
   clientRequestId?: string;
+  offerCode?: string;
+  customerTier?: CustomerTier;
+  extras?: ExtraItemInput[];
 };
 
 /** Multi-day draft (EP-002A.2 repeat). Each line validated against its day offer. */
@@ -29,6 +40,9 @@ export type ProgramDraftItemsCommand = {
   notes?: string | null;
   customerId?: string;
   clientRequestId?: string;
+  offerCode?: string;
+  customerTier?: CustomerTier;
+  extras?: ExtraItemInput[];
 };
 
 export type ProgramDraftOrderResult = {
@@ -46,6 +60,24 @@ const idempotencyStore = new Map<string, IdempotencyEntry>();
 
 export function clearOrderServiceIdempotencyForTests(): void {
   idempotencyStore.clear();
+}
+
+function resolveAuthoritativeCustomerTier(
+  ctx: ServiceContext,
+  requestedTier?: CustomerTier,
+): CustomerTier {
+  // Staff callers (e.g. operators placing or editing phone orders) may specify client tiers
+  if (hasStaffAccess(ctx.roles)) {
+    return requestedTier ?? "public";
+  }
+
+  // For non-staff customers, tier cannot be arbitrarily claimed via client payload.
+  // Unless the user has an authorized subscription/corporate session tier, default strictly to "public".
+  if (requestedTier && requestedTier !== "public") {
+    return "public";
+  }
+
+  return "public";
 }
 
 /**
@@ -139,28 +171,57 @@ export const OrderService = {
         }
       }
 
-      const dishRepo = createDishRepository(ctx.supabase, ctx.tenantId);
-      const dishes = await dishRepo.listCatalogByIds(uniqueDishIds);
-      const priceById = new Map<string, number>();
-      for (const d of dishes) {
-        priceById.set(d.id, Number(d.price));
+      if (command.offerCode && ctx.tenantSlug) {
+        const registeredOffers = getTenantOffers(ctx.tenantSlug);
+        if (registeredOffers.length > 0) {
+          const validOffer = validateTenantCommercialOffer(ctx.tenantSlug, command.offerCode);
+          if (!validOffer) {
+            throw new DomainError(
+              "NOT_FOUND",
+              `Commercial offer '${command.offerCode}' not found for tenant '${ctx.tenantSlug}'`,
+            );
+          }
+        }
       }
 
+      const authoritativeCustomerTier = resolveAuthoritativeCustomerTier(
+        ctx,
+        command.customerTier,
+      );
+
+      const commercialPricing = resolveOrderCommercialPricing({
+        tenantSlug: ctx.tenantSlug ?? undefined,
+        customerTier: authoritativeCustomerTier,
+        offerCode: command.offerCode,
+        items: command.items,
+        extras: command.extras,
+      });
+
       let total = 0;
-      const items: ProgramOrderItemInput[] = [];
-      for (const item of command.items) {
-        const unit = priceById.get(item.dishId);
-        if (unit === undefined) {
-          throw new DomainError("NOT_FOUND", `Dish not found for pricing: ${item.dishId}`);
+      if (commercialPricing) {
+        total = commercialPricing.grandTotalFinalPrice.cents / 100;
+      } else {
+        const dishRepo = createDishRepository(ctx.supabase, ctx.tenantId);
+        const dishes = await dishRepo.listCatalogByIds(uniqueDishIds);
+        const priceById = new Map<string, number>();
+        for (const d of dishes) {
+          priceById.set(d.id, Number(d.price));
         }
-        total += unit * item.qty;
-        items.push({
-          dishId: item.dishId,
-          dayDate: item.dayDate,
-          qty: item.qty,
-        });
+        for (const item of command.items) {
+          const unit = priceById.get(item.dishId);
+          if (unit === undefined) {
+            throw new DomainError("NOT_FOUND", `Dish not found for pricing: ${item.dishId}`);
+          }
+          total += unit * item.qty;
+        }
+        total = Math.round(total * 100) / 100;
       }
-      total = Math.round(total * 100) / 100;
+
+      const items: ProgramOrderItemInput[] = command.items.map((item) => ({
+        dishId: item.dishId,
+        dayDate: item.dayDate,
+        qty: item.qty,
+      }));
 
       const repo = createOrderRepository(ctx.supabase, ctx.tenantId);
       let customerId = command.customerId ?? (await repo.findCustomerIdForUser(ctx.userId));
@@ -196,6 +257,13 @@ export const OrderService = {
           newData: {
             order: result.order,
             items: result.items,
+            commercialContext: {
+              offerCode: command.offerCode ?? commercialPricing?.offerCode,
+              customerTier: authoritativeCustomerTier,
+              extras: command.extras ?? [],
+              menuUnits: commercialPricing?.menuUnits ?? 1,
+              grandTotalFinalPriceCents: commercialPricing?.grandTotalFinalPrice.cents,
+            },
           } as unknown as Record<string, unknown>,
         });
       } catch (e) {
@@ -232,7 +300,16 @@ export const OrderService = {
    * CAP-006 — OM: Draft → Confirmed.
    * @see docs/17-operational-model/04-lifecycles/spine-transitions.md
    */
-  async confirm(ctx: ServiceContext, orderId: string): Promise<OrderRow> {
+  async confirm(
+    ctx: ServiceContext,
+    orderId: string,
+    options?: {
+      expectedTotal?: number;
+      offerCode?: string;
+      customerTier?: CustomerTier;
+      extras?: ExtraItemInput[];
+    },
+  ): Promise<OrderRow> {
     requireCapability(ctx.roles, "orders.write");
 
     if (!(await FeatureFlagService.isEnabled(ctx, "order_confirmation"))) {
@@ -257,6 +334,93 @@ export const OrderService = {
       }
     }
 
+    // Retrieve draft commercial context from audit trail if available
+    let draftContext:
+      | {
+          offerCode?: string;
+          customerTier?: CustomerTier;
+          extras?: ExtraItemInput[];
+        }
+      | undefined;
+    try {
+      const { data: auditEntries } = await ctx.supabase
+        .from("audit_log")
+        .select("new_data")
+        .eq("tenant_id", ctx.tenantId)
+        .eq("entity_type", "order")
+        .eq("entity_id", orderId)
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      const latestNewData = auditEntries?.[0]?.new_data as Record<string, unknown> | undefined;
+      draftContext = latestNewData?.commercialContext as typeof draftContext;
+    } catch {
+      // In-memory or test contexts where audit_log is mocked
+    }
+
+    const resolvedOfferCode = options?.offerCode ?? draftContext?.offerCode;
+    const requestedCustomerTier =
+      options?.customerTier ?? draftContext?.customerTier ?? "public";
+    const authoritativeCustomerTier = resolveAuthoritativeCustomerTier(
+      ctx,
+      requestedCustomerTier,
+    );
+    const resolvedExtras = options?.extras ?? draftContext?.extras ?? [];
+
+    if (resolvedOfferCode && ctx.tenantSlug) {
+      const registeredOffers = getTenantOffers(ctx.tenantSlug);
+      if (registeredOffers.length > 0) {
+        const validOffer = validateTenantCommercialOffer(ctx.tenantSlug, resolvedOfferCode);
+        if (!validOffer) {
+          throw new DomainError(
+            "NOT_FOUND",
+            `Commercial offer '${resolvedOfferCode}' not found for tenant '${ctx.tenantSlug}'`,
+          );
+        }
+      }
+    }
+
+    // Re-evaluate commercial pricing authoritatively at confirmation time with preserved context
+    const commercialPricing = resolveOrderCommercialPricing({
+      tenantSlug: ctx.tenantSlug ?? undefined,
+      customerTier: authoritativeCustomerTier,
+      offerCode: resolvedOfferCode,
+      items: current.items.map((i) => ({
+        dishId: i.dish_id,
+        dayDate: i.day_date,
+        qty: i.qty,
+      })),
+      extras: resolvedExtras,
+    });
+
+    const evaluatedTotal = commercialPricing
+      ? commercialPricing.grandTotalFinalPrice.cents / 100
+      : current.order.total;
+
+    // Detect price change between draft and confirmation (Anti-Drift Guard)
+    const expected =
+      options?.expectedTotal !== undefined ? options.expectedTotal : current.order.total;
+    if (Math.abs(evaluatedTotal - expected) > 0.001) {
+      throw new DomainError(
+        "PRICE_MISMATCH",
+        `El precio del pedido ha cambiado de ${expected.toFixed(2)} € a ${evaluatedTotal.toFixed(2)} €. Por favor, revisa el nuevo importe antes de confirmar.`,
+        { expectedTotal: expected, actualTotal: evaluatedTotal },
+      );
+    }
+
+    // Generate immutable Price Snapshot
+    const priceSnapshot = commercialPricing
+      ? CommercialPricingEngine.createSnapshot(commercialPricing, {
+          orderId,
+          orderItems: current.items.map((item) => ({
+            dishId: item.dish_id,
+            dishName: item.dish_id,
+            dayDate: item.day_date,
+            qty: item.qty,
+          })),
+        })
+      : null;
+
     let result: { old: OrderRow; order: OrderRow };
     try {
       result = await repo.confirmDraft(orderId);
@@ -274,13 +438,23 @@ export const OrderService = {
         entityId: result.order.id,
         action: "status_change",
         oldData: { status: result.old.status } as Record<string, unknown>,
-        newData: { status: result.order.status } as Record<string, unknown>,
+        newData: {
+          status: result.order.status,
+          priceSnapshot,
+        } as Record<string, unknown>,
       });
     } catch (e) {
+      // Compensating action: atomic consistency rollback
+      try {
+        await repo.revertToDraft(orderId);
+      } catch (rollbackErr) {
+        console.error("Critical: rollback to draft failed after audit failure", rollbackErr);
+      }
       const message = e instanceof Error ? e.message : "Audit write failed after confirm";
-      throw new DomainError("INVALID_STATE", message);
+      throw new DomainError("INVALID_STATE", `Confirmation aborted: ${message}`);
     }
 
     return result.order;
   },
 };
+

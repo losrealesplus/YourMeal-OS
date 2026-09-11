@@ -1,8 +1,20 @@
 export { CommercialPricingEngine, PRICING_ENGINE_VERSION } from "./application/CommercialPricingEngine";
+export {
+  clearTenantOffersRegistry,
+  getTenantOffers,
+  registerTenantOffers,
+  resolveCommercialOffer,
+  validateTenantCommercialOffer,
+} from "./application/commercial-offer-registry";
+export {
+  resolveOrderCommercialPricing,
+  type OrderPricingResolutionInput,
+} from "./application/commercial-pricing-resolver";
 export { MoneyUtil } from "./domain/money";
 export type {
   AppliedPromotionDetail,
   CommercialOffer,
+  CreatePriceSnapshotOptions,
   CurrencyCode,
   CustomerTier,
   ExtraItemEvaluationResult,
@@ -12,7 +24,9 @@ export type {
   OrderPriceSnapshot,
   PriceEvaluationContext,
   PricingEvaluationResult,
+  PricingModel,
   PromotionRule,
   PromotionScope,
   PromotionType,
 } from "./domain/types";
+

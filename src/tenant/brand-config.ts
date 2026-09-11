@@ -4,6 +4,7 @@
  */
 import brandJson from "./resources/brand.json";
 import copyEs from "./resources/copy.es.json";
+import "./commercial-config";
 
 export type BrandConfig = typeof brandJson;
 export type TenantCopy = typeof copyEs;

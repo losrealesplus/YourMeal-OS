@@ -21,6 +21,9 @@ export type OrderIntakeDraftCommand = {
   intakeNotes?: string | null;
   /** Client-provided idempotency request identifier. */
   clientRequestId?: string;
+  offerCode?: string;
+  customerTier?: import("@/modules/commercial").CustomerTier;
+  extras?: import("@/modules/commercial").ExtraItemInput[];
 };
 
 export type OrderIntakeOrigin = {

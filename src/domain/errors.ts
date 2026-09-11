@@ -13,6 +13,7 @@ export type DomainErrorCode =
   | "INVALID_RECIPE"
   | "ORDER_CLOSED"
   | "MENU_LOCKED"
+  | "PRICE_MISMATCH"
   | "INVALID_STATE"
   | "UNIMPLEMENTED";
 

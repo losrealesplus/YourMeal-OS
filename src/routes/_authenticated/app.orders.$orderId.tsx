@@ -218,7 +218,10 @@ function OrderSummary() {
             <PrimaryCTA
               disabled={confirmOrder.isPending}
               onClick={() => {
-                void confirmOrder.mutateAsync(order.id);
+                void confirmOrder.mutateAsync({
+                  orderId: order.id,
+                  expectedTotal: order.total,
+                });
               }}
             >
               {t("customer:confirmOrder")}
