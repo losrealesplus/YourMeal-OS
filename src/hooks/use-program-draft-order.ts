@@ -5,8 +5,7 @@ import { createServiceContext } from "@/services/types";
 import { OrderIntakeService } from "@/modules/order-intake";
 import { orderKeys } from "@/modules/orders/application/order-query-keys";
 import type { ProgramDraftOrderCommand } from "@/modules/orders/application/order-service";
-
-import { brandConfig } from "@/tenant/brand-config";
+import { resolveActiveTenantSlug } from "@/identity/active-tenant-slug";
 
 /**
  * CAP-004 — mutation hook: program Draft order via Order Intake (ADR 0017).
@@ -21,11 +20,15 @@ export function useProgramDraftOrder() {
       if (!user || !tenantId) {
         throw new Error("Authenticated user and tenant are required");
       }
+      const activeTenantSlug = resolveActiveTenantSlug(
+        { tenant },
+        typeof window !== "undefined" ? window.location.hostname : undefined,
+      );
       const ctx = await createServiceContext({
         supabase,
         userId: user.id,
         tenantId,
-        tenantSlug: tenant?.slug ?? brandConfig.slug,
+        tenantSlug: activeTenantSlug,
         roles,
       });
       return OrderIntakeService.intakeDraftDay(ctx, {

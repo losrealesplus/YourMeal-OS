@@ -10,8 +10,8 @@
  * Automatically registers EatClean commercial offers into Core's universal registry.
  */
 
-import { registerTenantOffers } from "../../YourMeal-OS/src/modules/commercial";
-import type { CommercialOffer } from "../../YourMeal-OS/src/modules/commercial";
+import { registerTenantOffers } from "@/modules/commercial";
+import type { CommercialOffer } from "@/modules/commercial";
 
 export const EATCLEAN_COMMERCIAL_OFFERS: CommercialOffer[] = [
   {
