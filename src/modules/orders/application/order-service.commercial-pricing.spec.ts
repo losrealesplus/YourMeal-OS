@@ -244,7 +244,7 @@ describe("OrderService Commercial Pricing Universal Core Integration (FASE 3N-R2
       expect(result2.order.total).toBe(20.0);
     });
 
-    it("verifies 1 menu with 2 dish lines on same day does NOT become 2 billable menus", async () => {
+    it("verifies 2 dish lines on same day evaluate to 2 billable meal units (20,00 €)", async () => {
       const tenantOffers: CommercialOffer[] = [
         {
           id: "offer-ind",
@@ -262,7 +262,7 @@ describe("OrderService Commercial Pricing Universal Core Integration (FASE 3N-R2
 
       const ctx = makeContext({ tenantSlug: "test-tenant" });
 
-      // 2 dish lines on the same delivery day (e.g. main dish + side)
+      // 2 dish lines on the same delivery day (2 billable meal units)
       const result = await OrderService.programDraftItems(ctx, {
         weekStart: "2026-07-20",
         offerCode: "individual_menu",
@@ -272,8 +272,8 @@ describe("OrderService Commercial Pricing Universal Core Integration (FASE 3N-R2
         ],
       });
 
-      // Still exactly 1 billable daily menu unit = 10,00 € (NOT 20,00 €)
-      expect(result.order.total).toBe(10.0);
+      // 2 billable meal units = 2 * 10,00 € = 20,00 €
+      expect(result.order.total).toBe(20.0);
     });
 
     it("verifies 5 menus with weekly_plan (45,00 €) vs 5 menus with individual_menu (50,00 €)", async () => {
@@ -843,14 +843,14 @@ describe("OrderService Commercial Pricing Universal Core Integration (FASE 3N-R2
 
       const ctx = makeContext({ tenantSlug: "eatclean" });
 
-      // 1 menu unit with 2 dish lines on same day (dish-05 + dish-side) + 1 extra (4,50 €)
+      // 2 menu dishes on same day (dish-05 + dish-side) = 23,80 € + 1 extra (4,50 €) = 28,30 €
       const mockOrderWithItems: OrderWithItems = {
         order: {
           id: "order-multiline",
           tenant_id: ctx.tenantId,
           customer_id: "customer-123",
           status: "draft",
-          total: 16.4,
+          total: 28.3,
           week_start: "2026-07-20",
           notes: null,
           demand_channel: "individual",
@@ -876,7 +876,7 @@ describe("OrderService Commercial Pricing Universal Core Integration (FASE 3N-R2
 
       await OrderService.confirm(ctx, "order-multiline", {
         offerCode: "individual_menu",
-        expectedTotal: 16.4,
+        expectedTotal: 28.3,
         extras: [
           {
             dishId: "dish-extra",
@@ -892,8 +892,8 @@ describe("OrderService Commercial Pricing Universal Core Integration (FASE 3N-R2
         expect.objectContaining({
           newData: expect.objectContaining({
             priceSnapshot: expect.objectContaining({
-              baseAmountCents: 1640,
-              finalAmountCents: 1640,
+              baseAmountCents: 2830,
+              finalAmountCents: 2830,
               items: expect.arrayContaining([
                 expect.objectContaining({
                   dishId: "dish-05",
@@ -904,8 +904,8 @@ describe("OrderService Commercial Pricing Universal Core Integration (FASE 3N-R2
                 expect.objectContaining({
                   dishId: "dish-side",
                   itemType: "menu_dish",
-                  basePriceCents: 0,
-                  finalPriceCents: 0,
+                  basePriceCents: 1190,
+                  finalPriceCents: 1190,
                 }),
                 expect.objectContaining({
                   dishId: "dish-extra",
@@ -1217,6 +1217,41 @@ describe("OrderService Commercial Pricing Universal Core Integration (FASE 3N-R2
       });
       expect(pricingMonthly?.grandTotalFinalPrice.cents).toBe(19940);
       expect(pricingMonthly?.grandTotalFinalPrice.formatted).toBe("199,40 €");
+    });
+
+    it("6.4 Correctly handles multiple dishes on the same delivery day (2 dishes on Friday = 23,80 €)", async () => {
+      const ctx = makeContext({ tenantSlug: "integrity-tenant" });
+
+      const indDraft = await OrderService.programDraftItems(ctx, {
+        weekStart: "2026-07-20",
+        offerCode: "individual_menu",
+        items: [
+          { dishId: "dish-05", dayDate: "2026-07-24", qty: 1 },
+          { dishId: "dish-side", dayDate: "2026-07-24", qty: 1 },
+        ],
+      });
+
+      expect(indDraft.order.total).toBe(23.8);
+
+      mockFindByIdWithItems.mockResolvedValue({
+        order: {
+          ...indDraft.order,
+          total: 23.8,
+        },
+        items: [
+          { id: "i1", order_id: indDraft.order.id, tenant_id: ctx.tenantId, dish_id: "dish-05", day_date: "2026-07-24", qty: 1, comment: null, deleted_at: null },
+          { id: "i2", order_id: indDraft.order.id, tenant_id: ctx.tenantId, dish_id: "dish-side", day_date: "2026-07-24", qty: 1, comment: null, deleted_at: null },
+        ],
+      });
+      mockConfirmDraft.mockResolvedValue({
+        old: indDraft.order,
+        order: { ...indDraft.order, status: "confirmed", total: 23.8 },
+      });
+
+      // Confirm order with preserved 2 dishes on same delivery day
+      const confirmed = await OrderService.confirm(ctx, indDraft.order.id);
+      expect(confirmed.total).toBe(23.8);
+      expect(confirmed.status).toBe("confirmed");
     });
 
     it("6.3 Server-side Anti-Tampering: non-staff user cannot claim subscriber customerTier to illicitly get extras discount", async () => {

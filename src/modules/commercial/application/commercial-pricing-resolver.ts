@@ -1,5 +1,6 @@
 import { CommercialPricingEngine } from "./CommercialPricingEngine";
 import { resolveCommercialOffer } from "./commercial-offer-registry";
+import { DomainError } from "../../../domain/errors";
 import type {
   CustomerTier,
   ExtraItemInput,
@@ -62,13 +63,30 @@ export function resolveOrderCommercialPricing(
     if (nonExtraItems.length === 0) {
       menuUnits = 0;
     } else if (pricingModel === "fixed_package") {
-      // Packaged plan (e.g. weekly_plan covering up to slotsIncluded days)
+      const totalMealUnits = nonExtraItems.reduce(
+        (sum, item) => sum + (item.qty ?? 1),
+        0,
+      );
+      if (offer.slotsIncluded > 0 && totalMealUnits > offer.slotsIncluded) {
+        throw new DomainError(
+          "INVALID_STATE",
+          `El plan '${offer.title}' admite un máximo de ${offer.slotsIncluded} comidas (se han seleccionado ${totalMealUnits}).`,
+          {
+            offerCode: offer.code,
+            slotsIncluded: offer.slotsIncluded,
+            selectedMealUnits: totalMealUnits,
+          },
+        );
+      }
       menuUnits = 1;
     } else {
-      // Unit-based plan (e.g. individual_menu / monthly_plan priced per menu unit)
-      // Distinct delivery days represent distinct daily menus, regardless of number of dishes per day
-      const distinctDays = new Set(nonExtraItems.map((i) => i.dayDate)).size;
-      menuUnits = Math.max(1, distinctDays);
+      // Unit-based plan (e.g. individual_menu / monthly_plan priced per billable meal unit)
+      // Every non-extra item dish qty represents a billable meal unit regardless of delivery day
+      const totalMealUnits = nonExtraItems.reduce(
+        (sum, item) => sum + (item.qty ?? 1),
+        0,
+      );
+      menuUnits = Math.max(0, totalMealUnits);
     }
   } else {
     menuUnits = 0;

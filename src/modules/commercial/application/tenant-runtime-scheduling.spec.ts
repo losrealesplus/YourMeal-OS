@@ -4,6 +4,7 @@ import {
   registerTenantOffers,
   getTenantOffers,
   resolveOrderCommercialPricing,
+  CommercialPricingEngine,
 } from "@/modules/commercial";
 import {
   utcWeekStartMonday,
@@ -180,6 +181,245 @@ describe("FASE 3N-S1 — Tenant Context Resolution + Future Week Scheduling", ()
       });
 
       expect(pricing).toBeNull();
+    });
+  });
+
+  describe("4. Billable Meal Quantity & Snapshot Itemization (FASE 3N-S7)", () => {
+    beforeEach(() => {
+      registerEatCleanCommercialOffers();
+    });
+
+    it("A. 1 day / 1 dish -> 11,90 €", () => {
+      const pricing = resolveOrderCommercialPricing({
+        tenantSlug: "eatclean",
+        offerCode: "individual_menu",
+        items: [{ dishId: "dish-01", dayDate: "2026-09-16", qty: 1 }],
+      });
+      expect(pricing?.menuUnits).toBe(1);
+      expect(pricing?.grandTotalFinalPrice.cents).toBe(1190);
+      expect(pricing?.grandTotalFinalPrice.formatted).toBe("11,90 €");
+    });
+
+    it("B. 1 day / 2 dishes (same day, 2 distinct items qty=1) -> 23,80 €", () => {
+      const pricing = resolveOrderCommercialPricing({
+        tenantSlug: "eatclean",
+        offerCode: "individual_menu",
+        items: [
+          { dishId: "dish-tacos", dayDate: "2026-09-16", qty: 1 },
+          { dishId: "dish-fogonero", dayDate: "2026-09-16", qty: 1 },
+        ],
+      });
+      expect(pricing?.menuUnits).toBe(2);
+      expect(pricing?.grandTotalFinalPrice.cents).toBe(2380);
+      expect(pricing?.grandTotalFinalPrice.formatted).toBe("23,80 €");
+    });
+
+    it("C. 1 day / 1 dish qty=2 -> 23,80 €", () => {
+      const pricing = resolveOrderCommercialPricing({
+        tenantSlug: "eatclean",
+        offerCode: "individual_menu",
+        items: [{ dishId: "dish-tacos", dayDate: "2026-09-16", qty: 2 }],
+      });
+      expect(pricing?.menuUnits).toBe(2);
+      expect(pricing?.grandTotalFinalPrice.cents).toBe(2380);
+      expect(pricing?.grandTotalFinalPrice.formatted).toBe("23,80 €");
+    });
+
+    it("D. 2 days / 1 dish per day -> 23,80 €", () => {
+      const pricing = resolveOrderCommercialPricing({
+        tenantSlug: "eatclean",
+        offerCode: "individual_menu",
+        items: [
+          { dishId: "dish-01", dayDate: "2026-09-16", qty: 1 },
+          { dishId: "dish-02", dayDate: "2026-09-17", qty: 1 },
+        ],
+      });
+      expect(pricing?.menuUnits).toBe(2);
+      expect(pricing?.grandTotalFinalPrice.cents).toBe(2380);
+    });
+
+    it("E. 2 dishes Wednesday + 1 dish Friday -> 35,70 €", () => {
+      const pricing = resolveOrderCommercialPricing({
+        tenantSlug: "eatclean",
+        offerCode: "individual_menu",
+        items: [
+          { dishId: "dish-01", dayDate: "2026-09-16", qty: 1 },
+          { dishId: "dish-02", dayDate: "2026-09-16", qty: 1 },
+          { dishId: "dish-03", dayDate: "2026-09-18", qty: 1 },
+        ],
+      });
+      expect(pricing?.menuUnits).toBe(3);
+      expect(pricing?.grandTotalFinalPrice.cents).toBe(3570);
+      expect(pricing?.grandTotalFinalPrice.formatted).toBe("35,70 €");
+    });
+
+    it("F. 5 dishes Mon-Fri individual plan -> 59,50 €", () => {
+      const pricing = resolveOrderCommercialPricing({
+        tenantSlug: "eatclean",
+        offerCode: "individual_menu",
+        items: [
+          { dishId: "dish-01", dayDate: "2026-09-14", qty: 1 },
+          { dishId: "dish-02", dayDate: "2026-09-15", qty: 1 },
+          { dishId: "dish-03", dayDate: "2026-09-16", qty: 1 },
+          { dishId: "dish-04", dayDate: "2026-09-17", qty: 1 },
+          { dishId: "dish-05", dayDate: "2026-09-18", qty: 1 },
+        ],
+      });
+      expect(pricing?.menuUnits).toBe(5);
+      expect(pricing?.grandTotalFinalPrice.cents).toBe(5950);
+      expect(pricing?.grandTotalFinalPrice.formatted).toBe("59,50 €");
+    });
+
+    it("G. 5 dishes weekly plan -> 53,55 €", () => {
+      const pricing = resolveOrderCommercialPricing({
+        tenantSlug: "eatclean",
+        offerCode: "weekly_plan",
+        items: [
+          { dishId: "dish-01", dayDate: "2026-09-14", qty: 1 },
+          { dishId: "dish-02", dayDate: "2026-09-15", qty: 1 },
+          { dishId: "dish-03", dayDate: "2026-09-16", qty: 1 },
+          { dishId: "dish-04", dayDate: "2026-09-17", qty: 1 },
+          { dishId: "dish-05", dayDate: "2026-09-18", qty: 1 },
+        ],
+      });
+      expect(pricing?.menuUnits).toBe(1);
+      expect(pricing?.grandTotalFinalPrice.cents).toBe(5355);
+      expect(pricing?.grandTotalFinalPrice.formatted).toBe("53,55 €");
+    });
+
+    it("H. 2 dishes Wednesday monthly plan -> 19,94 €", () => {
+      const pricing = resolveOrderCommercialPricing({
+        tenantSlug: "eatclean",
+        offerCode: "monthly_plan",
+        items: [
+          { dishId: "dish-tacos", dayDate: "2026-09-16", qty: 1 },
+          { dishId: "dish-fogonero", dayDate: "2026-09-16", qty: 1 },
+        ],
+      });
+      expect(pricing?.menuUnits).toBe(2);
+      expect(pricing?.grandTotalFinalPrice.cents).toBe(1994);
+      expect(pricing?.grandTotalFinalPrice.formatted).toBe("19,94 €");
+    });
+
+    it("I. 20 dishes monthly plan -> 199,40 €", () => {
+      const items = Array.from({ length: 20 }, (_, i) => ({
+        dishId: `dish-${i + 1}`,
+        dayDate: `2026-09-${String(i + 1).padStart(2, "0")}`,
+        qty: 1,
+      }));
+      const pricing = resolveOrderCommercialPricing({
+        tenantSlug: "eatclean",
+        offerCode: "monthly_plan",
+        items,
+      });
+      expect(pricing?.menuUnits).toBe(20);
+      expect(pricing?.grandTotalFinalPrice.cents).toBe(19940);
+      expect(pricing?.grandTotalFinalPrice.formatted).toBe("199,40 €");
+    });
+
+    it("J. Snapshot itemizes both dishes at 11,90 € each on the same day (no 0,00 € for second line)", () => {
+      const pricing = resolveOrderCommercialPricing({
+        tenantSlug: "eatclean",
+        offerCode: "individual_menu",
+        items: [
+          { dishId: "dish-tacos", dayDate: "2026-09-16", qty: 1 },
+          { dishId: "dish-fogonero", dayDate: "2026-09-16", qty: 1 },
+        ],
+      });
+      expect(pricing).not.toBeNull();
+
+      const snapshot = CommercialPricingEngine.createSnapshot(pricing!, {
+        orderItems: [
+          { dishId: "dish-tacos", dishName: "Tacos de pechuga", dayDate: "2026-09-16", qty: 1 },
+          { dishId: "dish-fogonero", dishName: "Fogonero", dayDate: "2026-09-16", qty: 1 },
+        ],
+      });
+
+      expect(snapshot.baseAmountCents).toBe(2380);
+      expect(snapshot.finalAmountCents).toBe(2380);
+      expect(snapshot.items).toHaveLength(2);
+
+      expect(snapshot.items[0]).toEqual({
+        dishId: "dish-tacos",
+        dishName: "Tacos de pechuga",
+        itemType: "menu_dish",
+        qty: 1,
+        basePriceCents: 1190,
+        finalPriceCents: 1190,
+        discountCents: 0,
+      });
+
+      expect(snapshot.items[1]).toEqual({
+        dishId: "dish-fogonero",
+        dishName: "Fogonero",
+        itemType: "menu_dish",
+        qty: 1,
+        basePriceCents: 1190,
+        finalPriceCents: 1190,
+        discountCents: 0,
+      });
+    });
+
+    it("K. Rejects 6 meals with weekly_plan (slotsIncluded: 5) with DomainError INVALID_STATE", () => {
+      const items = Array.from({ length: 6 }, (_, i) => ({
+        dishId: `dish-${i + 1}`,
+        dayDate: `2026-09-${String(14 + i).padStart(2, "0")}`,
+        qty: 1,
+      }));
+
+      expect(() =>
+        resolveOrderCommercialPricing({
+          tenantSlug: "eatclean",
+          offerCode: "weekly_plan",
+          items,
+        }),
+      ).toThrowError(/admite un m.ximo de 5 comidas/);
+    });
+
+    it("L. 5 meals weekly_plan snapshot itemizes 5 lines at 10,71 € with sum = 5355 cents (53,55 €)", () => {
+      const items = [
+        { dishId: "dish-01", dayDate: "2026-09-14", qty: 1 },
+        { dishId: "dish-02", dayDate: "2026-09-15", qty: 1 },
+        { dishId: "dish-03", dayDate: "2026-09-16", qty: 1 },
+        { dishId: "dish-04", dayDate: "2026-09-17", qty: 1 },
+        { dishId: "dish-05", dayDate: "2026-09-18", qty: 1 },
+      ];
+
+      const pricing = resolveOrderCommercialPricing({
+        tenantSlug: "eatclean",
+        offerCode: "weekly_plan",
+        items,
+      });
+      expect(pricing).not.toBeNull();
+
+      const snapshot = CommercialPricingEngine.createSnapshot(pricing!, {
+        orderItems: items.map((i, idx) => ({
+          ...i,
+          dishName: `Plato ${idx + 1}`,
+        })),
+      });
+
+      expect(snapshot.baseAmountCents).toBe(5950);
+      expect(snapshot.discountAmountCents).toBe(595);
+      expect(snapshot.finalAmountCents).toBe(5355);
+      expect(snapshot.items).toHaveLength(5);
+
+      let sumBase = 0;
+      let sumDiscount = 0;
+      let sumFinal = 0;
+
+      for (const item of snapshot.items) {
+        expect(item.basePriceCents).toBe(1190);
+        expect(item.discountCents).toBe(119);
+        expect(item.finalPriceCents).toBe(1071);
+        sumBase += item.basePriceCents;
+        sumDiscount += item.discountCents;
+        sumFinal += item.finalPriceCents;
+      }
+
+      expect(sumBase).toBe(5950);
+      expect(sumDiscount).toBe(595);
+      expect(sumFinal).toBe(5355);
     });
   });
 });

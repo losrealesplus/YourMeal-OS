@@ -312,32 +312,47 @@ export class CommercialPricingEngine {
       items.push(...options.lineItems);
     } else if (options?.orderItems && options.orderItems.length > 0) {
       const nonExtraItems = options.orderItems.filter((i) => !i.isExtra);
-      // Group by delivery day to distinguish primary daily slot from additional dish components
-      const daysSet = new Set<string>();
-      for (const item of nonExtraItems) {
-        const day = item.dayDate ?? "unassigned";
-        const isFirstDishOfDay = !daysSet.has(day);
-        daysSet.add(day);
+      const totalMealUnits = nonExtraItems.reduce(
+        (sum, item) => sum + (item.qty ?? 1),
+        0,
+      );
+      const isFixedPackage = evalResult.pricingModel === "fixed_package";
 
+      for (const item of nonExtraItems) {
+        const qty = Math.max(1, item.qty ?? 1);
         let basePriceCents = 0;
         let finalPriceCents = 0;
         let discountCents = 0;
 
-        if (isFirstDishOfDay && evalResult.menuUnits > 0) {
+        if (isFixedPackage) {
+          // Distributed package pricing across meal items proportionally to qty
+          const unitBase =
+            totalMealUnits > 0
+              ? Math.round((evalResult.grandTotalBasePrice.cents * qty) / totalMealUnits)
+              : 0;
+          const unitFinal =
+            totalMealUnits > 0
+              ? Math.round((evalResult.grandTotalFinalPrice.cents * qty) / totalMealUnits)
+              : 0;
+          basePriceCents = unitBase;
+          finalPriceCents = unitFinal;
+          discountCents = Math.max(0, unitBase - unitFinal);
+        } else {
+          // Per-unit pricing: each meal unit receives the unit base and unit savings
           const unitBase = evalResult.basePrice.cents;
           const unitSavings = Math.round(
             evalResult.totalSavings.cents / Math.max(1, evalResult.menuUnits),
           );
-          basePriceCents = unitBase;
-          discountCents = unitSavings;
-          finalPriceCents = Math.max(0, unitBase - unitSavings);
+          basePriceCents = unitBase * qty;
+          discountCents = unitSavings * qty;
+          finalPriceCents = Math.max(0, basePriceCents - discountCents);
         }
 
         items.push({
           dishId: item.dishId,
           dishName: item.dishName ?? item.dishId,
           itemType: "menu_dish",
-          qty: item.qty,
+          qty,
           basePriceCents,
           finalPriceCents,
           discountCents,
