@@ -14,6 +14,7 @@ export type DomainErrorCode =
   | "ORDER_CLOSED"
   | "MENU_LOCKED"
   | "PRICE_MISMATCH"
+  | "PRICE_UNAVAILABLE"
   | "INVALID_STATE"
   | "UNIMPLEMENTED";
 

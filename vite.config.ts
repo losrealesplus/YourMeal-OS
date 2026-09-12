@@ -9,6 +9,40 @@ import { nitro } from "nitro/vite";
 const mobileSpa = process.env.CAPACITOR_BUILD === "1";
 
 /**
+ * Vite plugin for tenant instance commercial runtime bootstrap.
+ * Resolves '@tenant-commercial' to import TENANT_COMMERCIAL_CONFIG_PATH when provided,
+ * otherwise exports an empty no-op module, keeping Core agnostic.
+ */
+function tenantCommercialPlugin() {
+  const virtualModuleId = "@tenant-commercial";
+  const resolvedVirtualModuleId = "\0" + virtualModuleId;
+
+  return {
+    name: "vite-plugin-tenant-commercial",
+    resolveId(id: string) {
+      if (id === virtualModuleId || id === "virtual:tenant-commercial") {
+        return {
+          id: resolvedVirtualModuleId,
+          moduleSideEffects: true,
+        };
+      }
+    },
+    load(id: string) {
+      if (id === resolvedVirtualModuleId) {
+        const tenantCommercialPath = process.env.TENANT_COMMERCIAL_CONFIG_PATH;
+        if (tenantCommercialPath) {
+          const resolvedPath = path.isAbsolute(tenantCommercialPath)
+            ? tenantCommercialPath
+            : path.resolve(process.cwd(), tenantCommercialPath);
+          return `import ${JSON.stringify(resolvedPath)};\nexport const hasTenantCommercial = true;`;
+        }
+        return `export const hasTenantCommercial = false;`;
+      }
+    },
+  };
+}
+
+/**
  * Native Vite + TanStack Start configuration.
  * Lovable wrapper removed — development toolchain is Cursor / Vite / Vitest.
  *
@@ -49,6 +83,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     plugins: [
+      tenantCommercialPlugin(),
       tsconfigPaths({ projects: ["./tsconfig.json"] }),
       tailwindcss(),
       tanstackStart({

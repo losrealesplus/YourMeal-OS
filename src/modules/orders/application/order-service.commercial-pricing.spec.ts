@@ -58,11 +58,13 @@ vi.mock("@/modules/weekly-menu/infrastructure/weekly-menu-repository", () => ({
   })),
 }));
 
+const mockListCatalogByIds = vi.fn(async (ids: string[]) =>
+  ids.map((id) => ({ id, name: `Dish ${id}`, price: 12.5 })),
+);
+
 vi.mock("@/modules/dish-library/infrastructure/dish-repository", () => ({
   createDishRepository: vi.fn(() => ({
-    listCatalogByIds: vi.fn(async (ids: string[]) =>
-      ids.map((id) => ({ id, name: `Dish ${id}`, price: 12.5 })),
-    ),
+    listCatalogByIds: mockListCatalogByIds,
   })),
 }));
 
@@ -1325,6 +1327,128 @@ describe("OrderService Commercial Pricing Universal Core Integration (FASE 3N-R2
           }),
         }),
       );
+    });
+  });
+
+  describe("6. FASE 3N-S4: Pricing Safety Guard (PRICE_UNAVAILABLE)", () => {
+    it("A. Blocks programDraftItems when dishes evaluate to 0.00 € without registered commercial offers", async () => {
+      const ctx = makeContext({ tenantSlug: "eatclean" }); // no offers registered yet
+      mockListCatalogByIds.mockResolvedValueOnce([
+        { id: "dish-01", name: "Zero Dish", price: 0 },
+      ]);
+
+      await expect(
+        OrderService.programDraftItems(ctx, {
+          weekStart: "2026-07-20",
+          items: [{ dishId: "dish-01", dayDate: "2026-07-20", qty: 1 }],
+        }),
+      ).rejects.toThrowError(
+        expect.objectContaining({
+          code: "PRICE_UNAVAILABLE",
+        }),
+      );
+    });
+
+    it("B. Blocks confirm when order total evaluates to 0.00 € without registered commercial pricing", async () => {
+      const ctx = makeContext({ tenantSlug: "eatclean" });
+      const mockOrder: OrderWithItems = {
+        order: {
+          id: "order-zero-test",
+          tenant_id: ctx.tenantId,
+          customer_id: "customer-123",
+          status: "draft",
+          total: 0,
+          week_start: "2026-07-20",
+          notes: null,
+          demand_channel: "individual",
+          company_id: null,
+          site_id: null,
+          organizational_unit_id: null,
+          delivery_group_id: null,
+          delivery_address_id: null,
+          created_at: new Date().toISOString(),
+          deleted_at: null,
+        },
+        items: [
+          { id: "i1", order_id: "order-zero-test", tenant_id: ctx.tenantId, dish_id: "dish-01", day_date: "2026-07-20", qty: 1, comment: null, deleted_at: null },
+        ],
+      };
+
+      mockFindByIdWithItems.mockResolvedValue(mockOrder);
+
+      await expect(
+        OrderService.confirm(ctx, "order-zero-test", {
+          expectedTotal: 0,
+        }),
+      ).rejects.toThrowError(
+        expect.objectContaining({
+          code: "PRICE_UNAVAILABLE",
+        }),
+      );
+    });
+
+    it("C. Allows confirm with 0.00 € when an explicit 100% discount promotion is applied", async () => {
+      const ctx = makeContext({ tenantSlug: "promo-tenant" });
+      const promoOffer: CommercialOffer = {
+        id: "free_welcome_offer",
+        code: "free_welcome",
+        title: "Welcome Gift",
+        subtitle: "Regalo de bienvenida",
+        description: "Menú gratis de prueba",
+        pricingModel: "per_unit",
+        basePrice: { cents: 1200, currency: "EUR", formatted: "12,00 €" },
+        unitLabel: "menú",
+        slotsIncluded: 1,
+        recommended: false,
+        promotions: [
+          {
+            id: "promo_100_free",
+            code: "FREE_100",
+            name: "100% Free Promo",
+            type: "percentage",
+            value: 100.0,
+            appliesTo: "offer_base",
+            eligibility: "public",
+          },
+        ],
+      };
+      registerTenantOffers("promo-tenant", [promoOffer]);
+
+      const mockOrder: OrderWithItems = {
+        order: {
+          id: "order-promo-free",
+          tenant_id: ctx.tenantId,
+          customer_id: "customer-123",
+          status: "draft",
+          total: 0,
+          week_start: "2026-07-20",
+          notes: null,
+          demand_channel: "individual",
+          company_id: null,
+          site_id: null,
+          organizational_unit_id: null,
+          delivery_group_id: null,
+          delivery_address_id: null,
+          created_at: new Date().toISOString(),
+          deleted_at: null,
+        },
+        items: [
+          { id: "i1", order_id: "order-promo-free", tenant_id: ctx.tenantId, dish_id: "dish-01", day_date: "2026-07-20", qty: 1, comment: null, deleted_at: null },
+        ],
+      };
+
+      mockFindByIdWithItems.mockResolvedValue(mockOrder);
+      mockConfirmDraft.mockResolvedValue({
+        old: mockOrder.order,
+        order: { ...mockOrder.order, status: "confirmed" },
+      });
+
+      const confirmed = await OrderService.confirm(ctx, "order-promo-free", {
+        offerCode: "free_welcome",
+        expectedTotal: 0,
+      });
+
+      expect(confirmed.status).toBe("confirmed");
     });
   });
 });
