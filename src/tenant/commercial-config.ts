@@ -6,6 +6,7 @@ import commercialJson from "./resources/commercial.json";
 import { brandConfig } from "./brand-config";
 import { registerTenantOffers } from "@/modules/commercial";
 import type { CommercialOffer } from "@/modules/commercial";
+import "@tenant-commercial";
 
 export const bundledCommercialOffers: CommercialOffer[] =
   Array.isArray(commercialJson) ? (commercialJson as CommercialOffer[]) : [];

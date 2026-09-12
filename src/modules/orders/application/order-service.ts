@@ -217,6 +217,28 @@ export const OrderService = {
         total = Math.round(total * 100) / 100;
       }
 
+      // Safety Guard (FASE 3N-S4): Block 0.00 € draft orders when items exist, unless an explicit valid 100% discount applies
+      if (command.items.length > 0 && total === 0) {
+        const isLegitimateZero =
+          commercialPricing !== null &&
+          commercialPricing.hasDiscount &&
+          commercialPricing.grandTotalFinalPrice.cents === 0 &&
+          commercialPricing.grandTotalBasePrice.cents > 0 &&
+          commercialPricing.appliedPromotions.length > 0;
+
+        if (!isLegitimateZero) {
+          throw new DomainError(
+            "PRICE_UNAVAILABLE",
+            "El precio de los platos no está disponible en este momento. No se puede generar un pedido a 0,00 €.",
+            {
+              tenantSlug: ctx.tenantSlug,
+              itemCount: command.items.length,
+              commercialPricingPresent: commercialPricing !== null,
+            },
+          );
+        }
+      }
+
       const items: ProgramOrderItemInput[] = command.items.map((item) => ({
         dishId: item.dishId,
         dayDate: item.dayDate,
@@ -396,6 +418,29 @@ export const OrderService = {
     const evaluatedTotal = commercialPricing
       ? commercialPricing.grandTotalFinalPrice.cents / 100
       : current.order.total;
+
+    // Safety Guard (FASE 3N-S4): Block confirmation of 0.00 € orders when items exist, unless an explicit valid 100% discount applies
+    if (current.items.length > 0 && evaluatedTotal === 0) {
+      const isLegitimateZero =
+        commercialPricing !== null &&
+        commercialPricing.hasDiscount &&
+        commercialPricing.grandTotalFinalPrice.cents === 0 &&
+        commercialPricing.grandTotalBasePrice.cents > 0 &&
+        commercialPricing.appliedPromotions.length > 0;
+
+      if (!isLegitimateZero) {
+        throw new DomainError(
+          "PRICE_UNAVAILABLE",
+          "No se puede confirmar un pedido con precio 0,00 € sin una promoción comercial válida del 100%.",
+          {
+            orderId,
+            tenantSlug: ctx.tenantSlug,
+            itemCount: current.items.length,
+            commercialPricingPresent: commercialPricing !== null,
+          },
+        );
+      }
+    }
 
     // Detect price change between draft and confirmation (Anti-Drift Guard)
     const expected =

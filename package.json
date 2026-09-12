@@ -3,7 +3,8 @@
   "private": true,
   "sideEffects": [
     "**/*.css",
-    "src/i18n/index.ts"
+    "src/i18n/index.ts",
+    "src/tenant/**"
   ],
   "type": "module",
   "scripts": {
