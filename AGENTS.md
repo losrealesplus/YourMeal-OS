@@ -53,7 +53,7 @@ Cada nivel responde a una pregunta distinta con una jerarquía de autoridad estr
 
 ```text
 L0 — FOUNDATION.md                    → Constitución inmutable (¿Cómo pensamos y gobernamos?)
-L1 — AGENTS.md / FOPEBA / PROTOCOL    → Gobernanza y metodología (¿Cómo trabajamos y razonamos?)
+L1 — AGENTS.md / AGENCY OPERATING MODEL → Gobernanza y metodología (docs/agency/Agency-Operating-Model.md)
 L2 — CONTEXTO ESTRATÉGICO / ADRs      → Arquitectura permanente (¿Qué empresa y plataforma construimos?)
 L3 — MODELO DE DOMINIO / CONTRATOS    → Reglas e invariantes de negocio (¿Cómo opera el catering?)
 L4 — CONTRATOS DE CAPABILITY / BLOQUE → Alcance de la implementación (¿Qué construimos en este bloque?)
