@@ -70,6 +70,7 @@ export default {
   deliveryDay: "Delivery",
   deliveryAddress: "Address",
   mealsSelected: "Meals selected",
+  planOrOffer: "Plan",
   subtotal: "Subtotal",
   deliveryFee: "Delivery",
   total: "Total",

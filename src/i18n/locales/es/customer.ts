@@ -71,6 +71,7 @@ export default {
   deliveryDay: "Entrega",
   deliveryAddress: "Dirección",
   mealsSelected: "Comidas seleccionadas",
+  planOrOffer: "Plan",
   subtotal: "Subtotal",
   deliveryFee: "Envío",
   total: "Total",
