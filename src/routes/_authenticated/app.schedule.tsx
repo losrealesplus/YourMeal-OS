@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
+import { ChevronLeft, ChevronRight, Minus, Plus, RotateCcw } from "lucide-react";
 import {
   DayPicker,
   MenuDishPost,
@@ -22,13 +22,14 @@ import {
 } from "@/modules/weekly-menu/application/week-dates";
 import { resolveOrderCommercialPricing, getTenantOffers } from "@/modules/commercial";
 import { useActiveTenantSlug } from "@/identity/active-tenant-slug";
+import type { MockDish } from "@/lib/mock-catalog";
 import { cn } from "@/lib/utils";
 import dishPhoto from "@/assets/eatclean-hero.jpg";
 
 /**
  * Screen: Customer · Schedule Weekly Order (3-step flow)
- * Experience: step 2 = Instagram dish choice · step 3 = calm Resumen.
- * Capability unchanged: CAP-004 Draft order (no Confirm logic change).
+ * Experience: step 1 = Day picker · step 2 = Stepper multi-quantity dish choice · step 3 = calm Resumen.
+ * Capability: CAP-004 Draft order with multi-dish quantities (ADR 0017 / Ordering Contract v1).
  */
 export const Route = createFileRoute("/_authenticated/app/schedule")({
   component: ScheduleFlow,
@@ -40,9 +41,8 @@ function ScheduleFlow() {
   const { t, i18n } = useTranslation(["customer", "common"]);
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>(1);
-  const [mealsPerDay, setMealsPerDay] = useState(2);
   const [deliveryDay, setDeliveryDay] = useState(0);
-  const [selected, setSelected] = useState<string[]>([]);
+  const [quantities, setQuantities] = useState<Record<string, Record<string, number>>>({});
   const [weekOffset, setWeekOffset] = useState<number>(0);
   const fmt = useFmt();
 
@@ -90,30 +90,46 @@ function ScheduleFlow() {
 
   const offerDishes = weeklyMenu?.days[deliveryDay]?.dishes ?? [];
   const dayDate = utcWeekDates(weekStart)[deliveryDay] ?? weekStart;
-  const selectedDishes = offerDishes.filter((d) => selected.includes(d.id));
+
+  const currentDayQuantities = quantities[dayDate] ?? {};
+  const selectedDishEntries = Object.entries(currentDayQuantities)
+    .filter(([_, qty]) => qty > 0)
+    .map(([dishId, qty]) => {
+      const dish = offerDishes.find((d) => d.id === dishId);
+      return { dishId, dish, qty };
+    })
+    .filter((entry): entry is { dishId: string; dish: MockDish; qty: number } => Boolean(entry.dish));
+
+  const totalMealsCount = selectedDishEntries.reduce((sum, item) => sum + item.qty, 0);
+
   const effectiveOfferCode = selectedOfferCode ?? defaultOfferCode;
+  const orderItems = selectedDishEntries.map((item) => ({
+    dishId: item.dishId,
+    dayDate,
+    qty: item.qty,
+  }));
+
   const commercialPricing = resolveOrderCommercialPricing({
     tenantSlug: activeTenantSlug,
     offerCode: effectiveOfferCode,
-    items: selectedDishes.map((d) => ({
-      dishId: d.id,
-      dayDate,
-      qty: 1,
-    })),
+    items: orderItems,
   });
+
   // Authoritative total = commercial offer evaluation with catalog price fallback
   const totalEur = commercialPricing
     ? commercialPricing.grandTotalFinalPrice.cents / 100
-    : selectedDishes.reduce((sum, d) => sum + Number(d.price ?? 0), 0);
+    : selectedDishEntries.reduce(
+        (sum, item) => sum + Number(item.dish.price ?? 0) * item.qty,
+        0,
+      );
 
   const deliveryDateLabel = formatDeliveryDate(dayDate, i18n.language);
 
   async function onProgramDraft() {
-    if (selected.length === 0 || programDraft.isPending) return;
+    if (orderItems.length === 0 || programDraft.isPending) return;
     const result = await programDraft.mutateAsync({
       weekStart,
-      dayDate,
-      dishIds: selected,
+      items: orderItems,
       offerCode: effectiveOfferCode,
     });
     void navigate({
@@ -122,10 +138,16 @@ function ScheduleFlow() {
     });
   }
 
-  function toggleDish(id: string) {
-    setSelected((s) =>
-      s.includes(id) ? s.filter((x) => x !== id) : [...s, id],
-    );
+  function setDishQty(day: string, dishId: string, qty: number) {
+    setQuantities((prev) => {
+      const dayMap = { ...(prev[day] ?? {}) };
+      if (qty <= 0) {
+        delete dayMap[dishId];
+      } else {
+        dayMap[dishId] = qty;
+      }
+      return { ...prev, [day]: dayMap };
+    });
   }
 
   return (
@@ -161,7 +183,7 @@ function ScheduleFlow() {
                   type="button"
                   onClick={() => {
                     setWeekOffset(0);
-                    setSelected([]);
+                    setQuantities({});
                   }}
                   className="text-xs font-semibold text-primary hover:underline flex items-center gap-1 cursor-pointer"
                 >
@@ -176,7 +198,7 @@ function ScheduleFlow() {
                 disabled={weekOffset <= 0}
                 onClick={() => {
                   setWeekOffset((w) => Math.max(0, w - 1));
-                  setSelected([]);
+                  setQuantities({});
                 }}
                 className="h-11 w-11 rounded-xl border border-border flex items-center justify-center text-foreground hover:bg-secondary disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
                 aria-label={t("customer:prevWeek", "Semana anterior")}
@@ -207,7 +229,7 @@ function ScheduleFlow() {
                 disabled={weekOffset >= MAX_FUTURE_WEEKS}
                 onClick={() => {
                   setWeekOffset((w) => Math.min(MAX_FUTURE_WEEKS, w + 1));
-                  setSelected([]);
+                  setQuantities({});
                 }}
                 className="h-11 w-11 rounded-xl border border-border flex items-center justify-center text-foreground hover:bg-secondary disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
                 aria-label={t("customer:nextWeek", "Semana siguiente")}
@@ -219,28 +241,6 @@ function ScheduleFlow() {
 
           <div>
             <p className="text-sm font-semibold text-muted-foreground mb-3">
-              {t("customer:mealsPerDay")}
-            </p>
-            <div className="grid grid-cols-4 gap-2">
-              {[1, 2, 3, 4].map((n) => (
-                <button
-                  key={n}
-                  type="button"
-                  onClick={() => setMealsPerDay(n)}
-                  className={cn(
-                    "h-14 rounded-2xl font-bold border transition-colors",
-                    mealsPerDay === n
-                      ? "bg-foreground text-background border-foreground"
-                      : "bg-card border-border",
-                  )}
-                >
-                  {n}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-muted-foreground mb-3">
               {t("customer:deliveryDay")}
             </p>
             <DayPicker days={daysShort} activeIndex={deliveryDay} onSelect={setDeliveryDay} />
@@ -249,12 +249,19 @@ function ScheduleFlow() {
       ) : null}
 
       {step === 2 ? (
-        <div className="px-6 space-y-12 pb-4">
-          <p className="text-lg font-extrabold tracking-tight">
-            {daysFull[deliveryDay]}
-          </p>
+        <div className="px-6 space-y-10 pb-4">
+          <div className="flex items-center justify-between">
+            <p className="text-lg font-extrabold tracking-tight">
+              {daysFull[deliveryDay]}
+            </p>
+            {totalMealsCount > 0 && (
+              <span className="text-xs font-bold bg-primary/10 text-primary px-3 py-1 rounded-full">
+                {totalMealsCount} {totalMealsCount === 1 ? "comida seleccionada" : "comidas seleccionadas"}
+              </span>
+            )}
+          </div>
           {offerDishes.map((d) => {
-            const active = selected.includes(d.id);
+            const qty = currentDayQuantities[d.id] ?? 0;
             return (
               <MenuDishPost
                 key={d.id}
@@ -262,18 +269,38 @@ function ScheduleFlow() {
                 imageSrc={dishPhoto}
                 macrosLabel={dishMacrosLine(d, macroLabels)}
                 cta={
-                  <button
-                    type="button"
-                    onClick={() => toggleDish(d.id)}
-                    className={cn(
-                      "flex h-14 w-full items-center justify-center rounded-2xl text-[15px] font-bold tracking-wide transition-colors",
-                      active
-                        ? "bg-foreground text-background"
-                        : "bg-primary text-primary-foreground",
-                    )}
-                  >
-                    {active ? t("customer:dishAdded") : t("customer:selectDish")}
-                  </button>
+                  qty === 0 ? (
+                    <button
+                      type="button"
+                      onClick={() => setDishQty(dayDate, d.id, 1)}
+                      className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-primary text-primary-foreground text-[15px] font-bold tracking-wide hover:bg-primary/90 transition-colors cursor-pointer"
+                    >
+                      <Plus className="w-5 h-5" />
+                      {t("customer:selectDish", "Añadir")}
+                    </button>
+                  ) : (
+                    <div className="flex h-14 w-full items-center justify-between rounded-2xl bg-foreground text-background px-3 font-bold shadow-xs">
+                      <button
+                        type="button"
+                        onClick={() => setDishQty(dayDate, d.id, qty - 1)}
+                        className="h-10 w-10 rounded-xl bg-background/20 hover:bg-background/30 flex items-center justify-center text-background transition-colors cursor-pointer"
+                        aria-label="Disminuir ración"
+                      >
+                        <Minus className="w-5 h-5" />
+                      </button>
+                      <span className="text-base font-extrabold tracking-tight tabular-nums">
+                        {qty} {qty === 1 ? "ración" : "raciones"}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setDishQty(dayDate, d.id, qty + 1)}
+                        className="h-10 w-10 rounded-xl bg-background/20 hover:bg-background/30 flex items-center justify-center text-background transition-colors cursor-pointer"
+                        aria-label="Aumentar ración"
+                      >
+                        <Plus className="w-5 h-5" />
+                      </button>
+                    </div>
+                  )
                 }
               />
             );
@@ -294,7 +321,7 @@ function ScheduleFlow() {
 
       {step === 3 ? (
         <section className="px-6 space-y-10 pt-1 pb-4">
-          {selectedDishes.length === 0 ? (
+          {selectedDishEntries.length === 0 ? (
             <div className="flex flex-col items-center text-center py-8 space-y-6">
               <DishThumb
                 emoji="🥗"
@@ -321,21 +348,33 @@ function ScheduleFlow() {
             <>
               <div className="space-y-6">
                 <div>
-                  <p className="text-sm font-semibold text-muted-foreground mb-3">
-                    {daysFull[deliveryDay]}
-                  </p>
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-sm font-semibold text-muted-foreground">
+                      {daysFull[deliveryDay]} · {totalMealsCount} {totalMealsCount === 1 ? "comida" : "comidas"}
+                    </p>
+                  </div>
                   <ul className="space-y-4">
-                    {selectedDishes.map((d) => (
-                      <li key={d.id} className="flex items-center gap-4">
-                        <DishThumb
-                          emoji={d.emoji}
-                          imageSrc={dishPhoto}
-                          size="sm"
-                          className="!size-14 !text-2xl !rounded-xl"
-                        />
-                        <p className="text-base font-bold tracking-tight leading-snug">
-                          {d.name}
-                        </p>
+                    {selectedDishEntries.map(({ dish, qty }) => (
+                      <li key={dish.id} className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                          <DishThumb
+                            emoji={dish.emoji}
+                            imageSrc={dishPhoto}
+                            size="sm"
+                            className="!size-14 !text-2xl !rounded-xl"
+                          />
+                          <div>
+                            <p className="text-base font-bold tracking-tight leading-snug">
+                              {dish.name}
+                            </p>
+                            <p className="text-xs text-muted-foreground font-mono">
+                              {dish.kcal} kcal · {dish.proteinG}g P
+                            </p>
+                          </div>
+                        </div>
+                        <div className="bg-secondary px-3 py-1.5 rounded-xl font-extrabold text-sm tabular-nums">
+                          {qty}x
+                        </div>
                       </li>
                     ))}
                   </ul>
@@ -387,12 +426,12 @@ function ScheduleFlow() {
       <div className="px-6 mt-auto pt-8 space-y-3">
         {step < 3 ? (
           <PrimaryCTA
-            disabled={step === 2 && selected.length === 0}
+            disabled={step === 2 && totalMealsCount === 0}
             onClick={() => setStep(((step + 1) as Step))}
           >
             {step === 2 ? t("customer:seeSummaryCta") : t("common:continue")}
           </PrimaryCTA>
-        ) : selectedDishes.length > 0 ? (
+        ) : selectedDishEntries.length > 0 ? (
           <PrimaryCTA
             disabled={programDraft.isPending}
             onClick={() => {
@@ -416,3 +455,4 @@ function formatDeliveryDate(isoDate: string, locale: string): string {
     timeZone: "UTC",
   }).format(date);
 }
+
