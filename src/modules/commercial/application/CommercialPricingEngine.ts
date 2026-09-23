@@ -298,6 +298,44 @@ export class CommercialPricingEngine {
   }
 
   /**
+   * Deterministically distributes an integer amount of cents across items with given quantities,
+   * guaranteeing that sum(distributed) === totalCents exactly (zero rounding drift).
+   */
+  static distributeCents(totalCents: number, quantities: number[]): number[] {
+    const n = quantities.length;
+    if (n === 0) return [];
+    const totalUnits = quantities.reduce((sum, q) => sum + q, 0);
+    if (totalUnits === 0 || totalCents === 0) {
+      return quantities.map(() => 0);
+    }
+
+    const shares: { index: number; floorCents: number; remainderRatio: number }[] = [];
+    let sumFloor = 0;
+
+    for (let i = 0; i < n; i++) {
+      const q = quantities[i];
+      const exact = (totalCents * q) / totalUnits;
+      const floorCents = Math.floor(exact);
+      const remainderRatio = exact - floorCents;
+      shares.push({ index: i, floorCents, remainderRatio });
+      sumFloor += floorCents;
+    }
+
+    const remainderCents = totalCents - sumFloor;
+    const sorted = [...shares].sort(
+      (a, b) => b.remainderRatio - a.remainderRatio || a.index - b.index,
+    );
+
+    const result = shares.map((s) => s.floorCents);
+    for (let i = 0; i < remainderCents; i++) {
+      const targetIndex = sorted[i % n].index;
+      result[targetIndex] += 1;
+    }
+
+    return result;
+  }
+
+  /**
    * Creates an immutable Order Price Snapshot from an evaluation result.
    * Freezes applied discounts and explicit line item details without performing arbitrary total division.
    */
@@ -312,51 +350,57 @@ export class CommercialPricingEngine {
       items.push(...options.lineItems);
     } else if (options?.orderItems && options.orderItems.length > 0) {
       const nonExtraItems = options.orderItems.filter((i) => !i.isExtra);
-      const totalMealUnits = nonExtraItems.reduce(
-        (sum, item) => sum + (item.qty ?? 1),
-        0,
-      );
       const isFixedPackage = evalResult.pricingModel === "fixed_package";
 
-      for (const item of nonExtraItems) {
-        const qty = Math.max(1, item.qty ?? 1);
-        let basePriceCents = 0;
-        let finalPriceCents = 0;
-        let discountCents = 0;
+      if (isFixedPackage) {
+        const quantities = nonExtraItems.map((item) => Math.max(1, item.qty ?? 1));
+        const distributedBase = this.distributeCents(
+          evalResult.grandTotalBasePrice.cents,
+          quantities,
+        );
+        const distributedFinal = this.distributeCents(
+          evalResult.grandTotalFinalPrice.cents,
+          quantities,
+        );
 
-        if (isFixedPackage) {
-          // Distributed package pricing across meal items proportionally to qty
-          const unitBase =
-            totalMealUnits > 0
-              ? Math.round((evalResult.grandTotalBasePrice.cents * qty) / totalMealUnits)
-              : 0;
-          const unitFinal =
-            totalMealUnits > 0
-              ? Math.round((evalResult.grandTotalFinalPrice.cents * qty) / totalMealUnits)
-              : 0;
-          basePriceCents = unitBase;
-          finalPriceCents = unitFinal;
-          discountCents = Math.max(0, unitBase - unitFinal);
-        } else {
-          // Per-unit pricing: each meal unit receives the unit base and unit savings
+        for (let i = 0; i < nonExtraItems.length; i++) {
+          const item = nonExtraItems[i];
+          const qty = quantities[i];
+          const basePriceCents = distributedBase[i] ?? 0;
+          const finalPriceCents = distributedFinal[i] ?? 0;
+          const discountCents = Math.max(0, basePriceCents - finalPriceCents);
+
+          items.push({
+            dishId: item.dishId,
+            dishName: item.dishName ?? item.dishId,
+            itemType: "menu_dish",
+            qty,
+            basePriceCents,
+            finalPriceCents,
+            discountCents,
+          });
+        }
+      } else {
+        for (const item of nonExtraItems) {
+          const qty = Math.max(1, item.qty ?? 1);
           const unitBase = evalResult.basePrice.cents;
           const unitSavings = Math.round(
             evalResult.totalSavings.cents / Math.max(1, evalResult.menuUnits),
           );
-          basePriceCents = unitBase * qty;
-          discountCents = unitSavings * qty;
-          finalPriceCents = Math.max(0, basePriceCents - discountCents);
-        }
+          const basePriceCents = unitBase * qty;
+          const discountCents = unitSavings * qty;
+          const finalPriceCents = Math.max(0, basePriceCents - discountCents);
 
-        items.push({
-          dishId: item.dishId,
-          dishName: item.dishName ?? item.dishId,
-          itemType: "menu_dish",
-          qty,
-          basePriceCents,
-          finalPriceCents,
-          discountCents,
-        });
+          items.push({
+            dishId: item.dishId,
+            dishName: item.dishName ?? item.dishId,
+            itemType: "menu_dish",
+            qty,
+            basePriceCents,
+            finalPriceCents,
+            discountCents,
+          });
+        }
       }
     }
 
