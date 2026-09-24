@@ -31,7 +31,7 @@ export async function requireAuthRoles(userId: string): Promise<AppRole[]> {
 export async function assertStaffRoute(userId: string): Promise<AppRole[]> {
   const roles = await loadRoles(userId);
   if (!hasStaffAccess(roles)) {
-    throw redirect({ to: "/app" });
+    throw redirect({ to: "/auth/admin", search: { returnTo: "/admin" } });
   }
   return roles;
 }
