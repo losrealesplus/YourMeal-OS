@@ -44,3 +44,15 @@ export type {
   OrderSummaryView,
   OrderSummaryStatus,
 } from "./application/order-summary-mapper";
+export { StaffOrderCaptureService } from "./application/staff-order-capture-service";
+export type {
+  UniversalOrderCaptureDTO,
+  UniversalOrderCaptureLineInput,
+  UniversalCustomerInput,
+  StaffOrderCaptureResult,
+} from "./application/staff-order-capture-service";
+export { OrderModificationService } from "./application/order-modification-service";
+export type {
+  ModifyConfirmedOrderDTO,
+  ModifyConfirmedOrderResult,
+} from "./application/order-modification-service";

@@ -14,6 +14,10 @@ export type {
   ProductionDishBlock,
   ProductionCustomLine,
   ProductionIngredientNeed,
+  ProductionPackingCustomerBlock,
+  ProductionPackingCustomerItem,
+  ProductionPackingDishBlock,
+  ProductionPackingDishAllocation,
 } from "./domain/production-report";
 export type {
   OperationalOrderListItem,
@@ -21,3 +25,9 @@ export type {
   OperationalOrderFilters,
 } from "./infrastructure/operations-repository";
 export type { KitchenBatchStatus } from "./domain/kitchen-batch-status";
+export { MonthlyOperationsService } from "./application/monthly-operations-service";
+export type {
+  MonthlyDayOperationalMetrics,
+  MonthlyOperationsSummary,
+  MonthlyOperationsQuery,
+} from "./application/monthly-operations-service";
