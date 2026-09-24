@@ -154,4 +154,153 @@ describe("production report aggregation", () => {
     expect(scaleIngredientNeed(180, "g", 100).displayQty).toBe(18);
     expect(scaleIngredientNeed(180, "g", 100).displayUnit).toBe("kg");
   });
+
+  it("builds Level 2 packing by customer with item checklists and culinary notes (G6)", () => {
+    const report = buildProductionReport({
+      deliveryDate: "2026-09-24",
+      lines: [
+        line({
+          orderId: "ord-1",
+          customerId: "cust-1",
+          customerName: "Elena Ramos",
+          dishId: "dish-1",
+          dishName: "Pollo al Curry",
+          qty: 2,
+          comment: "Sin picante",
+        }),
+        line({
+          orderId: "ord-1",
+          customerId: "cust-1",
+          customerName: "Elena Ramos",
+          dishId: "dish-2",
+          dishName: "Ensalada César",
+          qty: 1,
+          comment: null,
+        }),
+        line({
+          orderId: "ord-2",
+          customerId: "cust-2",
+          customerName: "Carlos Gómez",
+          dishId: "dish-1",
+          dishName: "Pollo al Curry",
+          qty: 3,
+        }),
+      ],
+    });
+
+    expect(report.packingByCustomer).toHaveLength(2);
+
+    const elena = report.packingByCustomer.find((c) => c.customerId === "cust-1");
+    expect(elena).toBeDefined();
+    expect(elena?.customerName).toBe("Elena Ramos");
+    expect(elena?.totalPortions).toBe(3);
+    expect(elena?.items).toHaveLength(2);
+    expect(elena?.items[0]).toEqual(
+      expect.objectContaining({
+        dishName: "Pollo al Curry",
+        qty: 2,
+        comment: "Sin picante",
+      }),
+    );
+    expect(elena?.specialInstructions).toEqual(["Sin picante"]);
+
+    const carlos = report.packingByCustomer.find((c) => c.customerId === "cust-2");
+    expect(carlos).toBeDefined();
+    expect(carlos?.totalPortions).toBe(3);
+  });
+
+  it("builds Level 2 packing by dish with customer allocations (G6)", () => {
+    const report = buildProductionReport({
+      deliveryDate: "2026-09-24",
+      lines: [
+        line({
+          orderId: "ord-1",
+          customerId: "cust-1",
+          customerName: "Elena Ramos",
+          dishId: "dish-1",
+          dishName: "Pollo al Curry",
+          qty: 2,
+          comment: "Sin picante",
+        }),
+        line({
+          orderId: "ord-2",
+          customerId: "cust-2",
+          customerName: "Carlos Gómez",
+          dishId: "dish-1",
+          dishName: "Pollo al Curry",
+          qty: 3,
+        }),
+      ],
+    });
+
+    expect(report.packingByDish).toHaveLength(1);
+    const curry = report.packingByDish[0];
+    expect(curry.dishName).toBe("Pollo al Curry");
+    expect(curry.totalQty).toBe(5);
+    expect(curry.allocations).toHaveLength(2);
+    expect(curry.allocations).toEqual([
+      expect.objectContaining({
+        customerName: "Elena Ramos",
+        qty: 2,
+        comment: "Sin picante",
+      }),
+      expect.objectContaining({
+        customerName: "Carlos Gómez",
+        qty: 3,
+        comment: null,
+      }),
+    ]);
+  });
+
+  it("propagates post-confirmation order modifications to P1 kitchen and P2 packing (G6)", () => {
+    // Initial order state
+    const initialLines = [
+      line({
+        orderId: "ord-mod-1",
+        customerId: "cust-mod-1",
+        customerName: "Sofía Vega",
+        dishId: "dish-1",
+        dishName: "Salmón Grill",
+        qty: 1,
+        comment: null,
+      }),
+    ];
+
+    const initialReport = buildProductionReport({
+      deliveryDate: "2026-09-24",
+      lines: initialLines,
+    });
+    expect(initialReport.totals.portionCount).toBe(1);
+    expect(initialReport.packingByCustomer[0]?.totalPortions).toBe(1);
+
+    // After modification: increased qty to 3 and added culinary note
+    const modifiedLines = [
+      line({
+        orderId: "ord-mod-1",
+        customerId: "cust-mod-1",
+        customerName: "Sofía Vega",
+        dishId: "dish-1",
+        dishName: "Salmón Grill",
+        qty: 3,
+        comment: "Muy hecho / Salsa aparte",
+      }),
+    ];
+
+    const updatedReport = buildProductionReport({
+      deliveryDate: "2026-09-24",
+      lines: modifiedLines,
+    });
+
+    // P1 Cocina updates
+    expect(updatedReport.totals.portionCount).toBe(3);
+    expect(updatedReport.totals.customizationCount).toBe(1);
+    expect(updatedReport.customizations[0]?.observation).toBe("Muy hecho / Salsa aparte");
+
+    // P2 Packing updates
+    expect(updatedReport.packingByCustomer[0]?.totalPortions).toBe(3);
+    expect(updatedReport.packingByCustomer[0]?.items[0]?.qty).toBe(3);
+    expect(updatedReport.packingByCustomer[0]?.items[0]?.comment).toBe("Muy hecho / Salsa aparte");
+    expect(updatedReport.packingByDish[0]?.totalQty).toBe(3);
+    expect(updatedReport.packingByDish[0]?.allocations[0]?.comment).toBe("Muy hecho / Salsa aparte");
+  });
 });

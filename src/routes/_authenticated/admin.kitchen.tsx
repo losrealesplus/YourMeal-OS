@@ -37,7 +37,9 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { OperationalTimeline } from "@/components/operations/operational-timeline";
+import { MonthlyOperationsCalendar } from "@/components/operations/monthly-operations-calendar";
 import { SectionTitle } from "@/components/admin";
 import { BootstrapReadinessBanner } from "@/components/tenant/bootstrap-readiness-banner";
 import {
@@ -71,6 +73,7 @@ function todayISO() {
 function KitchenWorkspacePage() {
   const { user, tenantId, roles } = useAuth();
   const { can } = useCan();
+  const [activeTab, setActiveTab] = useState<"daily" | "monthly">("daily");
   const [date, setDate] = useState(todayISO());
   const [companyId, setCompanyId] = useState<string>("all");
   const [siteId, setSiteId] = useState<string>("all");
@@ -211,28 +214,44 @@ function KitchenWorkspacePage() {
         focus={["BOOTSTRAP_NO_KITCHEN_DEMAND", "BOOTSTRAP_NO_PUBLISHED_MENU"]}
       />
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="space-y-1.5">
-          <Label htmlFor="kitchen-date">Fecha</Label>
-          <Input
-            id="kitchen-date"
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-          />
-        </div>
-        <div className="space-y-1.5">
-          <Label>Empresa</Label>
-          <Select
-            value={companyId}
-            onValueChange={(v) => {
-              setCompanyId(v);
-              setSiteId("all");
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "daily" | "monthly")} className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="daily">Pedidos Diarios</TabsTrigger>
+          <TabsTrigger value="monthly">Calendario Mensual</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="monthly" className="space-y-4">
+          <MonthlyOperationsCalendar
+            onSelectDate={(selectedDate) => {
+              setDate(selectedDate);
+              setActiveTab("daily");
             }}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Todas" />
-            </SelectTrigger>
+          />
+        </TabsContent>
+
+        <TabsContent value="daily" className="space-y-6">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="kitchen-date">Fecha</Label>
+              <Input
+                id="kitchen-date"
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Empresa</Label>
+              <Select
+                value={companyId}
+                onValueChange={(v) => {
+                  setCompanyId(v);
+                  setSiteId("all");
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Todas" />
+                </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todas</SelectItem>
               {companies.map((c) => (
@@ -334,6 +353,8 @@ function KitchenWorkspacePage() {
           </Table>
         </div>
       )}
+      </TabsContent>
+      </Tabs>
 
       <Dialog open={!!detail} onOpenChange={(open) => !open && setDetail(null)}>
         <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
