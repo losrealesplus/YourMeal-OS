@@ -37,6 +37,9 @@ import {
   type OperationalOrderStatus,
 } from "@/modules/operations";
 
+import { Plus } from "lucide-react";
+import { UniversalOrderIntakeDrawer } from "@/components/orders/universal-order-intake-drawer";
+
 export const Route = createFileRoute("/_authenticated/admin/orders")({
   beforeLoad: ({ context }) => {
     assertCapabilityFromContext(context, "orders.read");
@@ -52,6 +55,7 @@ function AdminOrdersPage() {
   const [orders, setOrders] = useState<OperationalOrderListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [detail, setDetail] = useState<OperationalOrderListItem | null>(null);
+  const [intakeDrawerOpen, setIntakeDrawerOpen] = useState(false);
 
   const load = useCallback(async () => {
     if (!user || !tenantId) return;
@@ -88,20 +92,25 @@ function AdminOrdersPage() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <SectionTitle
-        overline="Operaciones"
-        title="Pedidos"
-        subtitle="Vista de pedidos operativos con timeline."
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <SectionTitle
+            overline="Operaciones"
+            title="Pedidos"
+            subtitle="Vista de pedidos operativos con timeline y captura universal."
+          />
+        </div>
+        <Button onClick={() => setIntakeDrawerOpen(true)} className="gap-2">
+          <Plus className="h-4 w-4" />
+          + Nuevo Pedido
+        </Button>
+      </div>
+
+      <UniversalOrderIntakeDrawer
+        open={intakeDrawerOpen}
+        onOpenChange={setIntakeDrawerOpen}
+        onSuccess={() => void load()}
       />
-      <p className="text-xs text-muted-foreground -mt-2">
-        Capability Demo (LAW 003 · 004):{" "}
-        <Link
-          to="/admin/order-workspace"
-          className="underline underline-offset-2 hover:text-foreground"
-        >
-          /admin/order-workspace
-        </Link>
-      </p>
 
       {loading ? (
         <Skeleton className="h-48 w-full" />

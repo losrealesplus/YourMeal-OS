@@ -80,12 +80,48 @@ export type RecipeLine = {
   unit: string;
 };
 
+export type ProductionPackingCustomerItem = {
+  dishId: string;
+  dishName: string;
+  qty: number;
+  comment: string | null;
+  allergens: string[];
+};
+
+export type ProductionPackingCustomerBlock = {
+  customerId: string;
+  customerName: string;
+  orderId: string;
+  orderStatus: string;
+  totalPortions: number;
+  items: ProductionPackingCustomerItem[];
+  specialInstructions: string[];
+};
+
+export type ProductionPackingDishAllocation = {
+  customerId: string;
+  customerName: string;
+  orderId: string;
+  qty: number;
+  comment: string | null;
+};
+
+export type ProductionPackingDishBlock = {
+  dishId: string;
+  dishName: string;
+  totalQty: number;
+  allergens: string[];
+  allocations: ProductionPackingDishAllocation[];
+};
+
 export type ProductionReportModel = {
   deliveryDate: string;
   generatedAt: string;
   standardDishes: ProductionDishBlock[];
   customizations: ProductionCustomLine[];
   ingredientSummary: ProductionIngredientNeed[];
+  packingByCustomer: ProductionPackingCustomerBlock[];
+  packingByDish: ProductionPackingDishBlock[];
   totals: {
     orderCount: number;
     portionCount: number;
@@ -304,12 +340,90 @@ export function buildProductionReport(input: {
 
   const portionCount = [...portionsByDish.values()].reduce((s, n) => s + n, 0);
 
+  // 1. Packing by Customer
+  const customerPackingMap = new Map<string, ProductionPackingCustomerBlock>();
+  for (const line of input.lines) {
+    if (line.qty <= 0) continue;
+    const name = customerLabel(line.customerName, line.customerId);
+    const dishName = dishLabel(line.dishName, line.dishId);
+    const dishMeta = meta.get(line.dishId);
+    const allergens = dishMeta?.allergens ?? [];
+    const customerKey = `${line.customerId}::${line.orderId}`;
+
+    let block = customerPackingMap.get(customerKey);
+    if (!block) {
+      block = {
+        customerId: line.customerId,
+        customerName: name,
+        orderId: line.orderId,
+        orderStatus: line.orderStatus,
+        totalPortions: 0,
+        items: [],
+        specialInstructions: [],
+      };
+      customerPackingMap.set(customerKey, block);
+    }
+
+    block.totalPortions += line.qty;
+    block.items.push({
+      dishId: line.dishId,
+      dishName,
+      qty: line.qty,
+      comment: line.comment?.trim() || null,
+      allergens,
+    });
+    if (line.comment?.trim() && !block.specialInstructions.includes(line.comment.trim())) {
+      block.specialInstructions.push(line.comment.trim());
+    }
+  }
+
+  const packingByCustomer: ProductionPackingCustomerBlock[] = [
+    ...customerPackingMap.values(),
+  ].sort((a, b) => a.customerName.localeCompare(b.customerName, "es"));
+
+  // 2. Packing by Dish
+  const dishPackingMap = new Map<string, ProductionPackingDishBlock>();
+  for (const line of input.lines) {
+    if (line.qty <= 0) continue;
+    const name = customerLabel(line.customerName, line.customerId);
+    const dishName = dishLabel(line.dishName, line.dishId);
+    const dishMeta = meta.get(line.dishId);
+    const allergens = dishMeta?.allergens ?? [];
+
+    let block = dishPackingMap.get(line.dishId);
+    if (!block) {
+      block = {
+        dishId: line.dishId,
+        dishName,
+        totalQty: 0,
+        allergens,
+        allocations: [],
+      };
+      dishPackingMap.set(line.dishId, block);
+    }
+
+    block.totalQty += line.qty;
+    block.allocations.push({
+      customerId: line.customerId,
+      customerName: name,
+      orderId: line.orderId,
+      qty: line.qty,
+      comment: line.comment?.trim() || null,
+    });
+  }
+
+  const packingByDish: ProductionPackingDishBlock[] = [
+    ...dishPackingMap.values(),
+  ].sort((a, b) => a.dishName.localeCompare(b.dishName, "es"));
+
   return {
     deliveryDate: input.deliveryDate,
     generatedAt: input.generatedAt ?? new Date().toISOString(),
     standardDishes,
     customizations,
     ingredientSummary,
+    packingByCustomer,
+    packingByDish,
     totals: {
       orderCount: orderIds.size,
       portionCount,

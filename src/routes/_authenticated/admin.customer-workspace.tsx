@@ -29,6 +29,7 @@ import { AdminHeader, SectionTitle, StatusChip, PanelCard } from "@/components/a
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { UniversalOrderIntakeDrawer } from "@/components/orders/universal-order-intake-drawer";
 import {
   Dialog,
   DialogContent,
@@ -161,6 +162,9 @@ function CustomerWorkspacePage() {
 
   // Organization Panel view mode
   const [organizing, setOrganizing] = useState(false);
+
+  // Universal Order Intake Drawer State
+  const [orderIntakeOpen, setOrderIntakeOpen] = useState(false);
 
   // Load customer directory list
   const loadDirectory = useCallback(async () => {
@@ -618,19 +622,31 @@ function CustomerWorkspacePage() {
                     </div>
                   </div>
 
-                  {/* Top Right Action (Archive) */}
-                  {canWrite && selectedContext.summary.status !== "archived" ? (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      disabled={archiving}
-                      onClick={handleArchiveCustomer}
-                      className="text-xs text-destructive hover:bg-destructive/10 hover:text-destructive gap-1.5"
-                    >
-                      <Archive className="h-3.5 w-3.5" />
-                      Archivar cliente
-                    </Button>
-                  ) : null}
+                  {/* Top Right Actions (New Order & Archive) */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    {canWrite && selectedContext.summary.status !== "archived" ? (
+                      <Button
+                        size="sm"
+                        onClick={() => setOrderIntakeOpen(true)}
+                        className="text-xs gap-1.5"
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                        + Nuevo Pedido
+                      </Button>
+                    ) : null}
+                    {canWrite && selectedContext.summary.status !== "archived" ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        disabled={archiving}
+                        onClick={handleArchiveCustomer}
+                        className="text-xs text-destructive hover:bg-destructive/10 hover:text-destructive gap-1.5"
+                      >
+                        <Archive className="h-3.5 w-3.5" />
+                        Archivar
+                      </Button>
+                    ) : null}
+                  </div>
                 </div>
 
                 {/* Summary Metrics Bar */}
@@ -1150,6 +1166,18 @@ function CustomerWorkspacePage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {selectedContext ? (
+        <UniversalOrderIntakeDrawer
+          open={orderIntakeOpen}
+          onOpenChange={setOrderIntakeOpen}
+          preselectedCustomerId={selectedContext.summary.id}
+          preselectedCustomerName={selectedContext.summary.displayName ?? undefined}
+          onSuccess={() => {
+            void loadCustomerDetail(selectedContext.summary.id);
+          }}
+        />
+      ) : null}
     </div>
   );
 }

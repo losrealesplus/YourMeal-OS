@@ -122,6 +122,8 @@ function report(
     ],
     customizations: [],
     ingredientSummary: [],
+    packingByCustomer: [],
+    packingByDish: [],
     totals: {
       orderCount: 1,
       portionCount: 10,
