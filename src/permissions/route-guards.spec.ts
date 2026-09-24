@@ -17,9 +17,10 @@ vi.mock("@/bootstrap/profiles", () => ({
 }));
 
 vi.mock("@tanstack/react-router", () => ({
-  redirect: (opts: { to: string }) => {
+  redirect: (opts: { to: string; search?: Record<string, unknown> }) => {
     const err = new Error(`REDIRECT:${opts.to}`);
-    (err as Error & { to: string }).to = opts.to;
+    (err as Error & { to: string; search?: Record<string, unknown> }).to = opts.to;
+    (err as Error & { to: string; search?: Record<string, unknown> }).search = opts.search;
     throw err;
   },
 }));
@@ -48,10 +49,12 @@ describe("route-guards · EP-OPS-002 negative surface cases", () => {
     await expect(assertSaasRoute("saas-pure")).resolves.toEqual(["saas_admin"]);
   });
 
-  it("Customer denied Tenant Surface → /app", async () => {
+  it("Customer denied Tenant Surface → /auth/admin with returnTo", async () => {
     const { assertStaffRoute } = await import("./route-guards");
     await expect(assertStaffRoute("customer")).rejects.toMatchObject({
-      message: "REDIRECT:/app",
+      message: "REDIRECT:/auth/admin",
+      to: "/auth/admin",
+      search: { returnTo: "/admin" },
     });
   });
 
