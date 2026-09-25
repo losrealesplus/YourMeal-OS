@@ -6,3 +6,4 @@ export { StatusChip } from "./status-chip";
 export { DataTable } from "./data-table";
 export { Toolbar } from "./toolbar";
 export { ProgressBar } from "./progress-bar";
+export { DrawerErrorBoundary } from "./drawer-error-boundary";

@@ -23,16 +23,20 @@ import {
   LifeBuoy,
   User,
   Trash2,
+  AlertCircle,
+  RotateCcw,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
   AdminHeader,
   DataTable,
+  DrawerErrorBoundary,
   KpiCard,
   PanelCard,
   SectionTitle,
   StatusChip,
 } from "@/components/admin";
+import { formatErrorMessage } from "@/domain/errors";
 import type { Column } from "@/components/admin/data-table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -155,6 +159,17 @@ function AdminCustomersPage() {
   const [customerOrders, setCustomerOrders] = useState<CustomerOrderSummary[]>([]);
   const [customerNotes, setCustomerNotes] = useState<SupportNoteRecord[]>([]);
 
+  // Section-level Loading and Error States (Resilience Isolation)
+  type SectionStatus = "idle" | "loading" | "success" | "error";
+  const [profileStatus, setProfileStatus] = useState<SectionStatus>("idle");
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const [membershipsStatus, setMembershipsStatus] = useState<SectionStatus>("idle");
+  const [membershipsError, setMembershipsError] = useState<string | null>(null);
+  const [ordersStatus, setOrdersStatus] = useState<SectionStatus>("idle");
+  const [ordersError, setOrdersError] = useState<string | null>(null);
+  const [notesStatus, setNotesStatus] = useState<SectionStatus>("idle");
+  const [notesError, setNotesError] = useState<string | null>(null);
+
   // Edit Profile Form State
   const [editProfileForm, setEditProfileForm] = useState({
     displayName: "",
@@ -232,7 +247,7 @@ function AdminCustomersPage() {
       setIndividuals(inds);
       setCompanies(cos);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : String(e));
+      toast.error(formatErrorMessage(e));
     } finally {
       setLoading(false);
     }
@@ -245,19 +260,14 @@ function AdminCustomersPage() {
     return () => window.clearTimeout(handle);
   }, [reload]);
 
-  // Load customer detail whenever selectedCustomerId changes
-  const loadCustomerDetails = useCallback(
+  // Per-section loaders (isolated failures)
+  const loadProfile = useCallback(
     async (customerId: string) => {
+      setProfileStatus("loading");
+      setProfileError(null);
       try {
-        setLoadingDetail(true);
         const ctx = await getCtx();
-        const [cust, memberships, orders, notes] = await Promise.all([
-          CustomerDirectoryService.getIndividualById(ctx, customerId),
-          CompanyAccountService.listCustomerCompanyMemberships(ctx, customerId),
-          CustomerDirectoryService.getCustomerOrders(ctx, customerId),
-          CustomerDirectoryService.listSupportNotes(ctx, customerId),
-        ]);
-
+        const cust = await CustomerDirectoryService.getIndividualById(ctx, customerId);
         if (cust) {
           setSelectedCustomer(cust);
           setEditProfileForm({
@@ -266,17 +276,83 @@ function AdminCustomersPage() {
             phone: cust.phone || "",
             city: cust.city || "",
           });
+          setProfileStatus("success");
+        } else {
+          setProfileStatus("error");
+          setProfileError("No se encontró el registro del cliente.");
         }
-        setCustomerMemberships(memberships);
-        setCustomerOrders(orders);
-        setCustomerNotes(notes);
-      } catch (e) {
-        toast.error(e instanceof Error ? e.message : String(e));
-      } finally {
-        setLoadingDetail(false);
+      } catch (err) {
+        setProfileStatus("error");
+        setProfileError(formatErrorMessage(err, "Error al cargar los datos del perfil."));
       }
     },
     [getCtx],
+  );
+
+  const loadMemberships = useCallback(
+    async (customerId: string) => {
+      setMembershipsStatus("loading");
+      setMembershipsError(null);
+      try {
+        const ctx = await getCtx();
+        const memberships = await CompanyAccountService.listCustomerCompanyMemberships(ctx, customerId);
+        setCustomerMemberships(memberships);
+        setMembershipsStatus("success");
+      } catch (err) {
+        setMembershipsStatus("error");
+        setMembershipsError(formatErrorMessage(err, "Error al cargar las empresas vinculadas."));
+      }
+    },
+    [getCtx],
+  );
+
+  const loadOrders = useCallback(
+    async (customerId: string) => {
+      setOrdersStatus("loading");
+      setOrdersError(null);
+      try {
+        const ctx = await getCtx();
+        const orders = await CustomerDirectoryService.getCustomerOrders(ctx, customerId);
+        setCustomerOrders(orders);
+        setOrdersStatus("success");
+      } catch (err) {
+        setOrdersStatus("error");
+        setOrdersError(formatErrorMessage(err, "Error al cargar el historial de pedidos."));
+      }
+    },
+    [getCtx],
+  );
+
+  const loadNotes = useCallback(
+    async (customerId: string) => {
+      setNotesStatus("loading");
+      setNotesError(null);
+      try {
+        const ctx = await getCtx();
+        const notes = await CustomerDirectoryService.listSupportNotes(ctx, customerId);
+        setCustomerNotes(notes);
+        setNotesStatus("success");
+      } catch (err) {
+        setNotesStatus("error");
+        setNotesError(formatErrorMessage(err, "Error al cargar las notas de soporte."));
+      }
+    },
+    [getCtx],
+  );
+
+  // Load customer detail whenever selectedCustomerId changes (Promise.allSettled)
+  const loadCustomerDetails = useCallback(
+    async (customerId: string) => {
+      setLoadingDetail(true);
+      await Promise.allSettled([
+        loadProfile(customerId),
+        loadMemberships(customerId),
+        loadOrders(customerId),
+        loadNotes(customerId),
+      ]);
+      setLoadingDetail(false);
+    },
+    [loadProfile, loadMemberships, loadOrders, loadNotes],
   );
 
   useEffect(() => {
@@ -392,7 +468,7 @@ function AdminCustomersPage() {
       toast.success("Perfil actualizado correctamente");
       await reload();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : String(err));
+      toast.error(formatErrorMessage(err));
     } finally {
       setSavingProfile(false);
     }
@@ -413,7 +489,7 @@ function AdminCustomersPage() {
       setNewNoteBody("");
       toast.success("Nota añadida correctamente");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : String(err));
+      toast.error(formatErrorMessage(err));
     } finally {
       setAddingNote(false);
     }
@@ -427,7 +503,7 @@ function AdminCustomersPage() {
       setCustomerNotes((prev) => prev.map((n) => (n.id === noteId ? updated : n)));
       toast.success(toStatus === "resolved" ? "Incidencia resuelta" : "Estado actualizado");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : String(err));
+      toast.error(formatErrorMessage(err));
     }
   }
 
@@ -457,7 +533,7 @@ function AdminCustomersPage() {
       await loadCustomerDetails(selectedCustomer.id);
       await reload();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : String(err));
+      toast.error(formatErrorMessage(err));
     } finally {
       setLinkingCompany(false);
     }
@@ -478,7 +554,7 @@ function AdminCustomersPage() {
       }
       await reload();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : String(err));
+      toast.error(formatErrorMessage(err));
     }
   }
 
@@ -499,7 +575,7 @@ function AdminCustomersPage() {
       await reload();
       openCustomerDrawer(newId, "profile");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : String(err));
+      toast.error(formatErrorMessage(err));
     } finally {
       setCreatingCustomer(false);
     }
@@ -518,7 +594,7 @@ function AdminCustomersPage() {
       }
       await reload();
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : String(e));
+      toast.error(formatErrorMessage(e));
     } finally {
       setArchivingId(null);
     }
@@ -859,465 +935,563 @@ function AdminCustomersPage() {
       {/* ========================================================================= */}
       <Sheet open={Boolean(selectedCustomerId)} onOpenChange={(open) => !open && closeCustomerDrawer()}>
         <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto p-6 space-y-6">
-          {loadingDetail && !selectedCustomer ? (
-            <div className="py-16 text-center text-sm text-muted-foreground">
-              Cargando ficha del cliente…
-            </div>
-          ) : selectedCustomer ? (
-            <>
-              {/* Customer Header */}
-              <div className="space-y-3 pb-4 border-b border-border">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="size-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-lg">
-                      {selectedCustomer.displayName?.slice(0, 2).toUpperCase() || "CL"}
+          <DrawerErrorBoundary onReset={() => selectedCustomerId && loadCustomerDetails(selectedCustomerId)}>
+            {loadingDetail && !selectedCustomer ? (
+              <div className="py-16 text-center text-sm text-muted-foreground animate-pulse">
+                Cargando ficha del cliente…
+              </div>
+            ) : profileStatus === "error" && !selectedCustomer ? (
+              <div className="flex flex-col items-center justify-center p-8 text-center rounded-lg border border-destructive/30 bg-destructive/5 space-y-4 my-8">
+                <div className="p-3 rounded-full bg-destructive/10 text-destructive">
+                  <AlertCircle className="h-6 w-6" />
+                </div>
+                <div className="space-y-1 max-w-md">
+                  <h3 className="text-sm font-semibold text-foreground">
+                    No se pudo cargar la ficha del cliente
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    {profileError || "Error al obtener los datos del cliente."}
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => selectedCustomerId && loadCustomerDetails(selectedCustomerId)}
+                  className="flex items-center gap-1.5 text-xs"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  Reintentar
+                </Button>
+              </div>
+            ) : selectedCustomer ? (
+              <>
+                {/* Customer Header */}
+                <div className="space-y-3 pb-4 border-b border-border">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="size-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-lg">
+                        {selectedCustomer.displayName?.slice(0, 2).toUpperCase() || "CL"}
+                      </div>
+                      <div>
+                        <SheetTitle className="text-xl font-bold text-foreground">
+                          {selectedCustomer.displayName || "Sin nombre"}
+                        </SheetTitle>
+                        <SheetDescription className="text-xs text-muted-foreground flex items-center gap-2 mt-0.5">
+                          <Badge variant="outline" className="text-[10px] font-semibold uppercase">
+                            {selectedCustomer.kind === "company_employee"
+                              ? "Empleado Empresa"
+                              : "Particular"}
+                          </Badge>
+                          <span>Alta: {fmt.date(selectedCustomer.createdAt, "medium")}</span>
+                        </SheetDescription>
+                      </div>
                     </div>
-                    <div>
-                      <SheetTitle className="text-xl font-bold text-foreground">
-                        {selectedCustomer.displayName || "Sin nombre"}
-                      </SheetTitle>
-                      <SheetDescription className="text-xs text-muted-foreground flex items-center gap-2 mt-0.5">
-                        <Badge variant="outline" className="text-[10px] font-semibold uppercase">
-                          {selectedCustomer.kind === "company_employee"
-                            ? "Empleado Empresa"
-                            : "Particular"}
-                        </Badge>
-                        <span>Alta: {fmt.date(selectedCustomer.createdAt, "medium")}</span>
-                      </SheetDescription>
-                    </div>
+                    <StatusChip
+                      tone={toneByStatus[selectedCustomer.status] ?? "neutral"}
+                      label={selectedCustomer.status}
+                    />
                   </div>
-                  <StatusChip
-                    tone={toneByStatus[selectedCustomer.status] ?? "neutral"}
-                    label={selectedCustomer.status}
-                  />
-                </div>
 
-                {/* Header Action Buttons */}
-                <div className="flex flex-wrap items-center gap-2 pt-2">
-                  <Button
-                    size="sm"
-                    onClick={() => setOrderIntakeOpen(true)}
-                    className="gap-1.5 text-xs font-bold bg-primary text-primary-foreground shadow-sm"
-                  >
-                    <Plus className="size-3.5" />
-                    + Nuevo Pedido
-                  </Button>
-                  {canWrite ? (
+                  {/* Header Action Buttons */}
+                  <div className="flex flex-wrap items-center gap-2 pt-2">
                     <Button
-                      variant="outline"
                       size="sm"
-                      onClick={() =>
-                        archiveCustomer(
-                          selectedCustomer.id,
-                          selectedCustomer.displayName ?? "Sin nombre",
-                        )
-                      }
-                      className="gap-1.5 text-xs text-destructive hover:bg-destructive/10"
+                      onClick={() => setOrderIntakeOpen(true)}
+                      className="gap-1.5 text-xs font-bold bg-primary text-primary-foreground shadow-sm"
                     >
-                      <Archive className="size-3.5" />
-                      Archivar
+                      <Plus className="size-3.5" />
+                      + Nuevo Pedido
                     </Button>
-                  ) : null}
+                    {canWrite ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          archiveCustomer(
+                            selectedCustomer.id,
+                            selectedCustomer.displayName ?? "Sin nombre",
+                          )
+                        }
+                        className="gap-1.5 text-xs text-destructive hover:bg-destructive/10"
+                      >
+                        <Archive className="size-3.5" />
+                        Archivar
+                      </Button>
+                    ) : null}
+                  </div>
                 </div>
-              </div>
 
-              {/* Sub-Navigation Tabs */}
-              <div className="flex border-b border-border gap-2">
-                {[
-                  { id: "profile", label: "Perfil", icon: User },
-                  {
-                    id: "company",
-                    label: `Empresas (${customerMemberships.length})`,
-                    icon: Building2,
-                  },
-                  {
-                    id: "orders",
-                    label: `Pedidos (${customerOrders.length})`,
-                    icon: ShoppingBag,
-                  },
-                  {
-                    id: "support",
-                    label: `Soporte (${customerNotes.length})`,
-                    icon: LifeBuoy,
-                  },
-                ].map((t) => {
-                  const Icon = t.icon;
-                  return (
-                    <button
-                      key={t.id}
-                      type="button"
-                      onClick={() => switchDetailTab(t.id as CustomerDetailTab)}
-                      className={cn(
-                        "flex items-center gap-1.5 px-3 py-2 text-xs font-semibold border-b-2 transition-colors",
-                        activeDetailTab === t.id
-                          ? "border-primary text-primary"
-                          : "border-transparent text-muted-foreground hover:text-foreground",
-                      )}
-                    >
-                      <Icon className="size-3.5" />
-                      {t.label}
-                    </button>
-                  );
-                })}
-              </div>
+                {/* Sub-Navigation Tabs */}
+                <div className="flex border-b border-border gap-2">
+                  {[
+                    { id: "profile", label: "Perfil", icon: User },
+                    {
+                      id: "company",
+                      label: `Empresas (${customerMemberships.length})`,
+                      icon: Building2,
+                    },
+                    {
+                      id: "orders",
+                      label: `Pedidos (${customerOrders.length})`,
+                      icon: ShoppingBag,
+                    },
+                    {
+                      id: "support",
+                      label: `Soporte (${customerNotes.length})`,
+                      icon: LifeBuoy,
+                    },
+                  ].map((t) => {
+                    const Icon = t.icon;
+                    return (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => switchDetailTab(t.id as CustomerDetailTab)}
+                        className={cn(
+                          "flex items-center gap-1.5 px-3 py-2 text-xs font-semibold border-b-2 transition-colors",
+                          activeDetailTab === t.id
+                            ? "border-primary text-primary"
+                            : "border-transparent text-muted-foreground hover:text-foreground",
+                        )}
+                      >
+                        <Icon className="size-3.5" />
+                        {t.label}
+                      </button>
+                    );
+                  })}
+                </div>
 
-              {/* TAB 1: PERFIL */}
-              {activeDetailTab === "profile" && (
-                <div className="space-y-5">
-                  <form onSubmit={handleSaveProfile} className="space-y-4">
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <div className="space-y-1 sm:col-span-2">
-                        <Label htmlFor="cust-name" className="text-xs font-semibold">
-                          Nombre completo *
-                        </Label>
-                        <Input
-                          id="cust-name"
-                          value={editProfileForm.displayName}
-                          onChange={(e) =>
-                            setEditProfileForm((prev) => ({ ...prev, displayName: e.target.value }))
-                          }
-                          required
-                          disabled={!canWrite}
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label htmlFor="cust-email" className="text-xs font-semibold">
-                          Correo electrónico
-                        </Label>
-                        <Input
-                          id="cust-email"
-                          type="email"
-                          value={editProfileForm.email}
-                          onChange={(e) =>
-                            setEditProfileForm((prev) => ({ ...prev, email: e.target.value }))
-                          }
-                          disabled={!canWrite}
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label htmlFor="cust-phone" className="text-xs font-semibold">
-                          Teléfono
-                        </Label>
-                        <Input
-                          id="cust-phone"
-                          value={editProfileForm.phone}
-                          onChange={(e) =>
-                            setEditProfileForm((prev) => ({ ...prev, phone: e.target.value }))
-                          }
-                          disabled={!canWrite}
-                        />
-                      </div>
-                      <div className="space-y-1 sm:col-span-2">
-                        <Label htmlFor="cust-city" className="text-xs font-semibold">
-                          Ciudad / Población
-                        </Label>
-                        <Input
-                          id="cust-city"
-                          value={editProfileForm.city}
-                          onChange={(e) =>
-                            setEditProfileForm((prev) => ({ ...prev, city: e.target.value }))
-                          }
-                          disabled={!canWrite}
-                        />
-                      </div>
-                    </div>
-
-                    {canWrite && (
-                      <div className="flex justify-end pt-2">
-                        <Button type="submit" size="sm" disabled={savingProfile}>
-                          {savingProfile ? "Guardando…" : "Guardar Cambios"}
+                {/* TAB 1: PERFIL */}
+                {activeDetailTab === "profile" && (
+                  <div className="space-y-5">
+                    {profileStatus === "error" ? (
+                      <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-center space-y-2">
+                        <p className="text-xs text-destructive font-medium">
+                          {profileError || "Error al cargar los datos del perfil."}
+                        </p>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => selectedCustomerId && loadProfile(selectedCustomerId)}
+                          className="text-xs h-7 gap-1"
+                        >
+                          <RotateCcw className="size-3" /> Reintentar
                         </Button>
                       </div>
-                    )}
-                  </form>
-
-                  {/* Summary Metric Strip */}
-                  <div className="grid grid-cols-2 gap-3 pt-3 border-t border-border sm:grid-cols-4">
-                    <div className="rounded-lg border border-border p-3 bg-card text-center">
-                      <p className="text-[10px] uppercase font-bold text-muted-foreground">
-                        Pedidos Totales
-                      </p>
-                      <p className="font-mono text-lg font-bold text-foreground">
-                        {selectedCustomer.orderCount}
-                      </p>
-                    </div>
-                    <div className="rounded-lg border border-border p-3 bg-card text-center">
-                      <p className="text-[10px] uppercase font-bold text-muted-foreground">
-                        Ticket Medio
-                      </p>
-                      <p className="font-mono text-lg font-bold text-foreground">
-                        {fmt.currency(selectedCustomer.averageTicket, { currency: "EUR" })}
-                      </p>
-                    </div>
-                    <div className="rounded-lg border border-border p-3 bg-card text-center">
-                      <p className="text-[10px] uppercase font-bold text-muted-foreground">
-                        Valor Total
-                      </p>
-                      <p className="font-mono text-lg font-bold text-foreground">
-                        {fmt.currency(selectedCustomer.lifetimeTotal, { currency: "EUR" })}
-                      </p>
-                    </div>
-                    <div className="rounded-lg border border-border p-3 bg-card text-center">
-                      <p className="text-[10px] uppercase font-bold text-muted-foreground">
-                        Último Pedido
-                      </p>
-                      <p className="text-xs font-semibold text-foreground truncate mt-1">
-                        {selectedCustomer.lastOrderAt
-                          ? fmt.date(selectedCustomer.lastOrderAt, "medium")
-                          : "Ninguno"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 2: EMPRESAS / B2B */}
-              {activeDetailTab === "company" && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-sm font-bold text-foreground">Empresas Vinculadas</h4>
-                      <p className="text-xs text-muted-foreground">
-                        Relaciones laborales activas y sedes de entrega asignadas.
-                      </p>
-                    </div>
-                    {canManageCompany && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setLinkCompanyOpen(true)}
-                        className="gap-1.5 text-xs font-semibold"
-                      >
-                        <Plus className="size-3.5" />
-                        Vincular a Empresa
-                      </Button>
-                    )}
-                  </div>
-
-                  {customerMemberships.length === 0 ? (
-                    <div className="rounded-lg border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
-                      Este cliente no está vinculado a ninguna empresa actualmente.
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {customerMemberships.map((m) => (
-                        <div
-                          key={m.membershipId}
-                          className="rounded-lg border border-border p-4 bg-card space-y-3"
-                        >
-                          <div className="flex items-start justify-between gap-2">
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <h5 className="font-bold text-sm text-foreground">
-                                  {m.companyName}
-                                </h5>
-                                <Badge variant="outline" className="font-mono text-[10px]">
-                                  {m.companyCode}
-                                </Badge>
-                                {m.isAdmin ? (
-                                  <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 text-[10px]">
-                                    Admin Empresa
-                                  </Badge>
-                                ) : null}
-                              </div>
-                              <p className="text-xs text-muted-foreground mt-0.5">
-                                Vinculado el {fmt.date(m.createdAt, "medium")}
-                              </p>
-                            </div>
-                            {canManageCompany && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleUnlinkCompany(m)}
-                                className="h-7 px-2 text-destructive hover:bg-destructive/10 text-xs"
-                              >
-                                <Trash2 className="size-3.5 mr-1" />
-                                Desvincular
-                              </Button>
-                            )}
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-border/50">
-                            <div>
-                              <span className="text-muted-foreground block text-[10px] uppercase font-bold">
-                                Sede
-                              </span>
-                              <span className="font-semibold text-foreground">
-                                {m.siteName || "General / Sede principal"}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground block text-[10px] uppercase font-bold">
-                                Departamento
-                              </span>
-                              <span className="font-semibold text-foreground">
-                                {m.organizationalUnitName || "Sin asignar"}
-                              </span>
-                            </div>
-                            {m.internalLocation && (
-                              <div className="col-span-2">
-                                <span className="text-muted-foreground block text-[10px] uppercase font-bold">
-                                  Ubicación Interna
-                                </span>
-                                <span className="font-semibold text-foreground">
-                                  {m.internalLocation}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* TAB 3: PEDIDOS */}
-              {activeDetailTab === "orders" && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-bold text-foreground">Historial de Pedidos</h4>
-                    <Link
-                      to="/admin/orders"
-                      className="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1"
-                    >
-                      Ir a Consola de Pedidos <ExternalLink className="size-3" />
-                    </Link>
-                  </div>
-
-                  {customerOrders.length === 0 ? (
-                    <div className="rounded-lg border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
-                      No hay pedidos registrados para este cliente todavía.
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {customerOrders.map((o) => (
-                        <div
-                          key={o.id}
-                          className="flex items-center justify-between rounded-lg border border-border p-3 text-xs bg-card"
-                        >
-                          <div className="space-y-0.5">
-                            <p className="font-mono font-bold text-foreground">
-                              {o.id.slice(0, 8)}…
-                            </p>
-                            <p className="text-muted-foreground">
-                              {fmt.date(o.createdAt, "medium")} · Canal:{" "}
-                              <span className="font-semibold">
-                                {o.demandChannel === "company" ? "Empresa" : "B2C"}
-                              </span>
-                            </p>
-                          </div>
-                          <div className="text-right space-y-1">
-                            <p className="font-mono font-bold text-foreground">
-                              {fmt.currency(o.total, { currency: "EUR" })}
-                            </p>
-                            <StatusChip
-                              tone={
-                                o.status === "delivered"
-                                  ? "positive"
-                                  : o.status === "cancelled"
-                                    ? "danger"
-                                    : "warning"
-                              }
-                              label={o.status}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* TAB 4: SOPORTE */}
-              {activeDetailTab === "support" && (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-bold text-foreground">Notas e Incidencias</h4>
-                    {canWriteSupport && (
-                      <form onSubmit={handleAddSupportNote} className="space-y-2">
-                        <div className="flex gap-2">
-                          <select
-                            value={newNoteKind}
-                            onChange={(e) =>
-                              setNewNoteKind(e.target.value as SupportNoteRecord["kind"])
-                            }
-                            className="h-9 rounded-md border border-border bg-background px-2 text-xs font-semibold"
-                          >
-                            <option value="note">Nota operativa</option>
-                            <option value="incident">Incidencia</option>
-                            <option value="request">Petición</option>
-                            <option value="allergy_update">Alergias</option>
-                            <option value="complaint">Reclamación</option>
-                          </select>
-                          <Input
-                            placeholder="Escribe un apunte o incidencia del cliente…"
-                            value={newNoteBody}
-                            onChange={(e) => setNewNoteBody(e.target.value)}
-                            className="text-xs h-9"
-                          />
-                          <Button type="submit" size="sm" disabled={addingNote || !newNoteBody.trim()}>
-                            {addingNote ? "Añadiendo…" : "Añadir"}
-                          </Button>
-                        </div>
-                      </form>
-                    )}
-                  </div>
-
-                  {customerNotes.length === 0 ? (
-                    <div className="rounded-lg border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
-                      No hay notas de soporte registradas.
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {customerNotes.map((n) => (
-                        <div
-                          key={n.id}
-                          className="rounded-lg border border-border p-3 bg-card space-y-2 text-xs"
-                        >
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex items-center gap-2">
-                              <Badge
-                                variant="outline"
-                                className={cn(
-                                  "text-[10px] font-bold uppercase",
-                                  n.kind === "incident" || n.kind === "complaint"
-                                    ? "border-destructive text-destructive"
-                                    : "border-border",
-                                )}
-                              >
-                                {n.kind}
-                              </Badge>
-                              <span className="text-muted-foreground text-[11px]">
-                                {fmt.date(n.createdAt, "medium")}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <StatusChip
-                                tone={n.status === "resolved" ? "positive" : "warning"}
-                                label={n.status}
+                    ) : (
+                      <>
+                        <form onSubmit={handleSaveProfile} className="space-y-4">
+                          <div className="grid gap-3 sm:grid-cols-2">
+                            <div className="space-y-1 sm:col-span-2">
+                              <Label htmlFor="cust-name" className="text-xs font-semibold">
+                                Nombre completo *
+                              </Label>
+                              <Input
+                                id="cust-name"
+                                value={editProfileForm.displayName}
+                                onChange={(e) =>
+                                  setEditProfileForm((prev) => ({ ...prev, displayName: e.target.value }))
+                                }
+                                required
+                                disabled={!canWrite}
                               />
-                              {canWriteSupport && n.status === "open" && (
+                            </div>
+                            <div className="space-y-1">
+                              <Label htmlFor="cust-email" className="text-xs font-semibold">
+                                Correo electrónico
+                              </Label>
+                              <Input
+                                id="cust-email"
+                                type="email"
+                                value={editProfileForm.email}
+                                onChange={(e) =>
+                                  setEditProfileForm((prev) => ({ ...prev, email: e.target.value }))
+                                }
+                                disabled={!canWrite}
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label htmlFor="cust-phone" className="text-xs font-semibold">
+                                Teléfono
+                              </Label>
+                              <Input
+                                id="cust-phone"
+                                value={editProfileForm.phone}
+                                onChange={(e) =>
+                                  setEditProfileForm((prev) => ({ ...prev, phone: e.target.value }))
+                                }
+                                disabled={!canWrite}
+                              />
+                            </div>
+                            <div className="space-y-1 sm:col-span-2">
+                              <Label htmlFor="cust-city" className="text-xs font-semibold">
+                                Ciudad / Población
+                              </Label>
+                              <Input
+                                id="cust-city"
+                                value={editProfileForm.city}
+                                onChange={(e) =>
+                                  setEditProfileForm((prev) => ({ ...prev, city: e.target.value }))
+                                }
+                                disabled={!canWrite}
+                              />
+                            </div>
+                          </div>
+
+                          {canWrite && (
+                            <div className="flex justify-end pt-2">
+                              <Button type="submit" size="sm" disabled={savingProfile}>
+                                {savingProfile ? "Guardando…" : "Guardar Cambios"}
+                              </Button>
+                            </div>
+                          )}
+                        </form>
+
+                        {/* Summary Metric Strip */}
+                        <div className="grid grid-cols-2 gap-3 pt-3 border-t border-border sm:grid-cols-4">
+                          <div className="rounded-lg border border-border p-3 bg-card text-center">
+                            <p className="text-[10px] uppercase font-bold text-muted-foreground">
+                              Pedidos Totales
+                            </p>
+                            <p className="font-mono text-lg font-bold text-foreground">
+                              {selectedCustomer.orderCount}
+                            </p>
+                          </div>
+                          <div className="rounded-lg border border-border p-3 bg-card text-center">
+                            <p className="text-[10px] uppercase font-bold text-muted-foreground">
+                              Ticket Medio
+                            </p>
+                            <p className="font-mono text-lg font-bold text-foreground">
+                              {fmt.currency(selectedCustomer.averageTicket, { currency: "EUR" })}
+                            </p>
+                          </div>
+                          <div className="rounded-lg border border-border p-3 bg-card text-center">
+                            <p className="text-[10px] uppercase font-bold text-muted-foreground">
+                              Valor Total
+                            </p>
+                            <p className="font-mono text-lg font-bold text-foreground">
+                              {fmt.currency(selectedCustomer.lifetimeTotal, { currency: "EUR" })}
+                            </p>
+                          </div>
+                          <div className="rounded-lg border border-border p-3 bg-card text-center">
+                            <p className="text-[10px] uppercase font-bold text-muted-foreground">
+                              Último Pedido
+                            </p>
+                            <p className="text-xs font-semibold text-foreground truncate mt-1">
+                              {selectedCustomer.lastOrderAt
+                                ? fmt.date(selectedCustomer.lastOrderAt, "medium")
+                                : "Ninguno"}
+                            </p>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                {/* TAB 2: EMPRESAS / B2B */}
+                {activeDetailTab === "company" && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="text-sm font-bold text-foreground">Empresas Vinculadas</h4>
+                        <p className="text-xs text-muted-foreground">
+                          Relaciones laborales activas y sedes de entrega asignadas.
+                        </p>
+                      </div>
+                      {canManageCompany && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setLinkCompanyOpen(true)}
+                          className="gap-1.5 text-xs font-semibold"
+                        >
+                          <Plus className="size-3.5" />
+                          Vincular a Empresa
+                        </Button>
+                      )}
+                    </div>
+
+                    {membershipsStatus === "loading" ? (
+                      <div className="py-8 text-center text-xs text-muted-foreground animate-pulse">
+                        Cargando empresas vinculadas…
+                      </div>
+                    ) : membershipsStatus === "error" ? (
+                      <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-center space-y-2">
+                        <p className="text-xs text-destructive font-medium">
+                          {membershipsError || "Error al cargar empresas vinculadas."}
+                        </p>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => selectedCustomerId && loadMemberships(selectedCustomerId)}
+                          className="text-xs h-7 gap-1"
+                        >
+                          <RotateCcw className="size-3" /> Reintentar
+                        </Button>
+                      </div>
+                    ) : customerMemberships.length === 0 ? (
+                      <div className="rounded-lg border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
+                        Este cliente no está vinculado a ninguna empresa actualmente.
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {customerMemberships.map((m) => (
+                          <div
+                            key={m.membershipId}
+                            className="rounded-lg border border-border p-4 bg-card space-y-3"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <h5 className="font-bold text-sm text-foreground">
+                                    {m.companyName}
+                                  </h5>
+                                  <Badge variant="outline" className="font-mono text-[10px]">
+                                    {m.companyCode}
+                                  </Badge>
+                                  {m.isAdmin ? (
+                                    <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 text-[10px]">
+                                      Admin Empresa
+                                    </Badge>
+                                  ) : null}
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-0.5">
+                                  Vinculado el {fmt.date(m.createdAt, "medium")}
+                                </p>
+                              </div>
+                              {canManageCompany && (
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => handleTransitionNote(n.id, "resolved")}
-                                  className="h-6 px-2 text-[10px] text-primary"
+                                  onClick={() => handleUnlinkCompany(m)}
+                                  className="h-7 px-2 text-destructive hover:bg-destructive/10 text-xs"
                                 >
-                                  Resolver
+                                  <Trash2 className="size-3.5 mr-1" />
+                                  Desvincular
                                 </Button>
                               )}
                             </div>
+
+                            <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-border/50">
+                              <div>
+                                <span className="text-muted-foreground block text-[10px] uppercase font-bold">
+                                  Sede
+                                </span>
+                                <span className="font-semibold text-foreground">
+                                  {m.siteName || "General / Sede principal"}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground block text-[10px] uppercase font-bold">
+                                  Departamento
+                                </span>
+                                <span className="font-semibold text-foreground">
+                                  {m.organizationalUnitName || "Sin asignar"}
+                                </span>
+                              </div>
+                              {m.internalLocation && (
+                                <div className="col-span-2">
+                                  <span className="text-muted-foreground block text-[10px] uppercase font-bold">
+                                    Ubicación Interna
+                                  </span>
+                                  <span className="font-semibold text-foreground">
+                                    {m.internalLocation}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                          <p className="text-foreground whitespace-pre-wrap">{n.body}</p>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* TAB 3: PEDIDOS */}
+                {activeDetailTab === "orders" && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-bold text-foreground">Historial de Pedidos</h4>
+                      <Link
+                        to="/admin/orders"
+                        className="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1"
+                      >
+                        Ir a Consola de Pedidos <ExternalLink className="size-3" />
+                      </Link>
                     </div>
-                  )}
-                </div>
-              )}
-            </>
-          ) : null}
+
+                    {ordersStatus === "loading" ? (
+                      <div className="py-8 text-center text-xs text-muted-foreground animate-pulse">
+                        Cargando historial de pedidos…
+                      </div>
+                    ) : ordersStatus === "error" ? (
+                      <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-center space-y-2">
+                        <p className="text-xs text-destructive font-medium">
+                          {ordersError || "Error al cargar el historial de pedidos."}
+                        </p>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => selectedCustomerId && loadOrders(selectedCustomerId)}
+                          className="text-xs h-7 gap-1"
+                        >
+                          <RotateCcw className="size-3" /> Reintentar
+                        </Button>
+                      </div>
+                    ) : customerOrders.length === 0 ? (
+                      <div className="rounded-lg border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
+                        No hay pedidos registrados para este cliente todavía.
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {customerOrders.map((o) => (
+                          <div
+                            key={o.id}
+                            className="flex items-center justify-between rounded-lg border border-border p-3 text-xs bg-card"
+                          >
+                            <div className="space-y-0.5">
+                              <p className="font-mono font-bold text-foreground">
+                                {o.id.slice(0, 8)}…
+                              </p>
+                              <p className="text-muted-foreground">
+                                {fmt.date(o.createdAt, "medium")} · Canal:{" "}
+                                <span className="font-semibold">
+                                  {o.demandChannel === "company" ? "Empresa" : "B2C"}
+                                </span>
+                              </p>
+                            </div>
+                            <div className="text-right space-y-1">
+                              <p className="font-mono font-bold text-foreground">
+                                {fmt.currency(o.total, { currency: "EUR" })}
+                              </p>
+                              <StatusChip
+                                tone={
+                                  o.status === "delivered"
+                                    ? "positive"
+                                    : o.status === "cancelled"
+                                      ? "danger"
+                                      : "warning"
+                                }
+                                label={o.status}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* TAB 4: SOPORTE */}
+                {activeDetailTab === "support" && (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-bold text-foreground">Notas e Incidencias</h4>
+                      {canWriteSupport && (
+                        <form onSubmit={handleAddSupportNote} className="space-y-2">
+                          <div className="flex gap-2">
+                            <select
+                              value={newNoteKind}
+                              onChange={(e) =>
+                                setNewNoteKind(e.target.value as SupportNoteRecord["kind"])
+                              }
+                              className="h-9 rounded-md border border-border bg-background px-2 text-xs font-semibold"
+                            >
+                              <option value="note">Nota operativa</option>
+                              <option value="incident">Incidencia</option>
+                              <option value="request">Petición</option>
+                              <option value="allergy_update">Alergias</option>
+                              <option value="complaint">Reclamación</option>
+                            </select>
+                            <Input
+                              placeholder="Escribe un apunte o incidencia del cliente…"
+                              value={newNoteBody}
+                              onChange={(e) => setNewNoteBody(e.target.value)}
+                              className="text-xs h-9"
+                            />
+                            <Button type="submit" size="sm" disabled={addingNote || !newNoteBody.trim()}>
+                              {addingNote ? "Añadiendo…" : "Añadir"}
+                            </Button>
+                          </div>
+                        </form>
+                      )}
+                    </div>
+
+                    {notesStatus === "loading" ? (
+                      <div className="py-8 text-center text-xs text-muted-foreground animate-pulse">
+                        Cargando notas de soporte…
+                      </div>
+                    ) : notesStatus === "error" ? (
+                      <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-center space-y-2">
+                        <p className="text-xs text-destructive font-medium">
+                          {notesError || "Error al cargar las notas de soporte."}
+                        </p>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => selectedCustomerId && loadNotes(selectedCustomerId)}
+                          className="text-xs h-7 gap-1"
+                        >
+                          <RotateCcw className="size-3" /> Reintentar
+                        </Button>
+                      </div>
+                    ) : customerNotes.length === 0 ? (
+                      <div className="rounded-lg border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
+                        No hay notas de soporte registradas.
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {customerNotes.map((n) => (
+                          <div
+                            key={n.id}
+                            className="rounded-lg border border-border p-3 bg-card space-y-2 text-xs"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex items-center gap-2">
+                                <Badge
+                                  variant="outline"
+                                  className={cn(
+                                    "text-[10px] font-bold uppercase",
+                                    n.kind === "incident" || n.kind === "complaint"
+                                      ? "border-destructive text-destructive"
+                                      : "border-border",
+                                  )}
+                                >
+                                  {n.kind}
+                                </Badge>
+                                <span className="text-muted-foreground text-[11px]">
+                                  {fmt.date(n.createdAt, "medium")}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <StatusChip
+                                  tone={n.status === "resolved" ? "positive" : "warning"}
+                                  label={n.status}
+                                />
+                                {canWriteSupport && n.status === "open" && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleTransitionNote(n.id, "resolved")}
+                                    className="h-6 px-2 text-[10px] text-primary"
+                                  >
+                                    Resolver
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                            <p className="text-foreground whitespace-pre-wrap">{n.body}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            ) : null}
+          </DrawerErrorBoundary>
         </SheetContent>
       </Sheet>
 

@@ -147,7 +147,7 @@ export function createCustomerDirectoryRepository(client: Client, tenantId: stri
   async function loadMemberships(): Promise<RawMembership[]> {
     const { data, error } = await db
       .from("company_employees")
-      .select("customer_id, company_id, status, deleted_at, companies(id, name, company_code)")
+      .select("customer_id, company_id, status, deleted_at, companies!company_id(id, name, company_code)")
       .eq("tenant_id", tenantId)
       .is("deleted_at", null);
     if (error) throw error;
@@ -326,7 +326,7 @@ export function createCustomerDirectoryRepository(client: Client, tenantId: stri
       let q = db
         .from("support_notes")
         .select(
-          "id, customer_id, kind, status, body, author_id, created_at, resolved_at, closed_at, customers(display_name)",
+          "id, customer_id, kind, status, body, author_id, created_at, resolved_at, closed_at, customers!customer_id (display_name)",
         )
         .eq("tenant_id", tenantId)
         .is("deleted_at", null)

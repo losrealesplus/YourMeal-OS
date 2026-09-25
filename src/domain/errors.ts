@@ -61,3 +61,62 @@ export function invalidState(message: string): DomainError {
 export function unimplemented(what: string): DomainError {
   return new DomainError("UNIMPLEMENTED", `${what} is not implemented yet`);
 }
+
+/**
+ * Universal error message extractor — sanitizes Error, PostgREST objects,
+ * strings, and arbitrary failure payloads into clean human-readable Spanish text.
+ * Strictly guarantees NEVER returning "[object Object]".
+ */
+export function formatErrorMessage(
+  error: unknown,
+  fallback = "Ha ocurrido un error inesperado.",
+): string {
+  if (error == null) return fallback;
+
+  if (typeof error === "string") {
+    const trimmed = error.trim();
+    return trimmed && trimmed !== "[object Object]" ? trimmed : fallback;
+  }
+
+  if (error instanceof Error) {
+    const msg = error.message?.trim();
+    return msg && msg !== "[object Object]" ? msg : fallback;
+  }
+
+  if (typeof error === "object") {
+    const record = error as Record<string, unknown>;
+
+    if (typeof record.message === "string" && record.message.trim()) {
+      const msg = record.message.trim();
+      if (msg !== "[object Object]") return msg;
+    }
+
+    if (typeof record.details === "string" && record.details.trim()) {
+      return record.details.trim();
+    }
+
+    if (typeof record.hint === "string" && record.hint.trim()) {
+      return record.hint.trim();
+    }
+
+    if (typeof record.error_description === "string" && record.error_description.trim()) {
+      return record.error_description.trim();
+    }
+
+    if (typeof record.code === "string" && record.code.trim()) {
+      return `Error (${record.code}): ${fallback}`;
+    }
+  }
+
+  try {
+    const str = String(error).trim();
+    if (str && str !== "[object Object]") {
+      return str;
+    }
+  } catch {
+    // Ignore conversion failures
+  }
+
+  return fallback;
+}
+

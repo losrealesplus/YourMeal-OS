@@ -384,16 +384,16 @@ export function createCompanyAccountRepository(client: Client, tenantId: string)
           is_admin,
           status,
           created_at,
-          customers!inner (
+          customers!customer_id (
             id,
             display_name,
             email
           ),
-          company_locations (
+          company_locations!location_id (
             id,
             name
           ),
-          company_departments (
+          company_departments!department_id (
             id,
             name
           )
@@ -501,16 +501,16 @@ export function createCompanyAccountRepository(client: Client, tenantId: string)
           is_admin,
           status,
           created_at,
-          companies!inner (
+          companies!company_id (
             id,
             name,
             company_code
           ),
-          company_locations (
+          company_locations!location_id (
             id,
             name
           ),
-          company_departments (
+          company_departments!department_id (
             id,
             name
           )
