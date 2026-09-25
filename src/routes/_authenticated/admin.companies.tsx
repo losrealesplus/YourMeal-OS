@@ -21,6 +21,7 @@ import {
   Trash2,
   UserPlus,
   Users,
+  ShoppingBag,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useCan } from "@/hooks/use-can";
@@ -62,6 +63,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { UniversalOrderIntakeDrawer } from "@/components/orders/universal-order-intake-drawer";
 import { useFmt } from "@/i18n/localization-provider";
 import { cn } from "@/lib/utils";
 
@@ -175,6 +177,10 @@ function AdminCompaniesPage() {
     isAdmin: false,
   });
   const [savingMembership, setSavingMembership] = useState(false);
+
+  // Universal Order Intake Drawer State for Company Employee
+  const [orderIntakeOpen, setOrderIntakeOpen] = useState(false);
+  const [orderIntakeTarget, setOrderIntakeTarget] = useState<CompanyEmployeeRecord | null>(null);
 
   const getCtx = useCallback(async () => {
     if (!user || !tenantId) throw new Error("Tenant context required");
@@ -1080,6 +1086,19 @@ function AdminCompaniesPage() {
                       header: "Acciones",
                       render: (r) => (
                         <div className="flex items-center gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setOrderIntakeTarget(r);
+                              setOrderIntakeOpen(true);
+                            }}
+                            className="h-7 px-2 text-xs font-semibold gap-1 text-primary border-primary/30 hover:bg-primary/10"
+                            title="Crear Pedido para este empleado"
+                          >
+                            <ShoppingBag className="size-3" /> + Pedido
+                          </Button>
                           <Link
                             to="/admin/customers"
                             search={{ customerId: r.customerId, tab: "profile" }}
@@ -1913,6 +1932,23 @@ function AdminCompaniesPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* ========================================================================= */}
+      {/* UNIVERSAL ORDER INTAKE DRAWER (+ PEDIDO DESDE EMPRESA) */}
+      {/* ========================================================================= */}
+      <UniversalOrderIntakeDrawer
+        open={orderIntakeOpen}
+        onOpenChange={setOrderIntakeOpen}
+        preselectedCustomerId={orderIntakeTarget?.customerId}
+        preselectedCustomerName={orderIntakeTarget?.displayName || undefined}
+        preselectedDemandChannel="company"
+        preselectedCompanyId={selectedCompany?.id}
+        preselectedSiteId={orderIntakeTarget?.siteId || undefined}
+        preselectedOrganizationalUnitId={orderIntakeTarget?.organizationalUnitId || undefined}
+        onSuccess={() => {
+          toast.success("Pedido registrado con éxito desde la empresa");
+        }}
+      />
     </div>
   );
 }

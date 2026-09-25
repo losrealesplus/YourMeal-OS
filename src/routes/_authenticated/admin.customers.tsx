@@ -80,7 +80,7 @@ export type CustomerDetailTab = "profile" | "company" | "orders" | "support";
 export type AdminCustomersSearch = {
   customerId?: string;
   tab?: CustomerDetailTab;
-  category?: "individuals" | "companies";
+  category?: "all" | "individuals" | "companies";
 };
 
 export const Route = createFileRoute("/_authenticated/admin/customers")({
@@ -100,7 +100,9 @@ export const Route = createFileRoute("/_authenticated/admin/customers")({
         ? search.tab
         : undefined,
     category:
-      search.category === "individuals" || search.category === "companies"
+      search.category === "all" ||
+      search.category === "individuals" ||
+      search.category === "companies"
         ? search.category
         : undefined,
   }),
@@ -362,7 +364,7 @@ function AdminCustomersPage() {
     });
   }
 
-  function switchCategory(category: "individuals" | "companies") {
+  function switchCategory(category: "all" | "individuals" | "companies") {
     navigate({
       to: "/admin/customers",
       search: (prev: any) => ({
@@ -746,9 +748,21 @@ function AdminCustomersPage() {
         )}
       </div>
 
-      {/* Tabs Switcher: Particulares vs Empresas */}
+      {/* Tabs Switcher: Todos vs Personas vs Empresas */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3">
         <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => switchCategory("all")}
+            className={cn(
+              "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all border",
+              activeCategory === "all"
+                ? "bg-foreground text-background border-foreground shadow-sm"
+                : "bg-card text-muted-foreground border-border hover:text-foreground",
+            )}
+          >
+            Todos ({individuals.length + companies.length})
+          </button>
           <button
             type="button"
             onClick={() => switchCategory("individuals")}
@@ -760,7 +774,7 @@ function AdminCustomersPage() {
             )}
           >
             <Users className="h-4 w-4" />
-            Particulares ({individuals.length})
+            Personas ({individuals.length})
           </button>
           <button
             type="button"
@@ -804,9 +818,9 @@ function AdminCustomersPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={
-                activeCategory === "individuals"
-                  ? "Buscar por nombre, email, teléfono, ciudad o empresa…"
-                  : "Buscar por nombre de empresa, código, responsable…"
+                activeCategory === "companies"
+                  ? "Buscar por nombre de empresa, código, responsable…"
+                  : "Buscar por nombre, email, teléfono, ciudad o empresa…"
               }
               className="max-w-md text-sm"
             />
@@ -818,24 +832,24 @@ function AdminCustomersPage() {
               <option value="all">Todos los estados</option>
               <option value="active">Activos</option>
               <option value="inactive">Inactivos</option>
-              {activeCategory === "individuals" ? <option value="new">Nuevos</option> : null}
+              {activeCategory !== "companies" ? <option value="new">Nuevos</option> : null}
             </select>
           </div>
         </div>
 
         {loading ? (
           <p className="py-12 text-center text-xs text-muted-foreground">Cargando directorio…</p>
-        ) : activeCategory === "individuals" ? (
-          <DataTable
-            columns={individualColumns}
-            rows={individuals}
-            empty="No se encontraron clientes particulares con los filtros aplicados."
-          />
-        ) : (
+        ) : activeCategory === "companies" ? (
           <DataTable
             columns={companyColumns}
             rows={companies}
             empty="No se encontraron empresas con los filtros aplicados."
+          />
+        ) : (
+          <DataTable
+            columns={individualColumns}
+            rows={individuals}
+            empty="No se encontraron clientes con los filtros aplicados."
           />
         )}
       </PanelCard>
@@ -1501,6 +1515,19 @@ function AdminCustomersPage() {
         onOpenChange={setOrderIntakeOpen}
         preselectedCustomerId={selectedCustomer?.id}
         preselectedCustomerName={selectedCustomer?.displayName || undefined}
+        preselectedCompanyId={
+          customerMemberships.length === 1 ? customerMemberships[0].companyId : undefined
+        }
+        preselectedSiteId={
+          customerMemberships.length === 1
+            ? (customerMemberships[0].siteId || undefined)
+            : undefined
+        }
+        preselectedOrganizationalUnitId={
+          customerMemberships.length === 1
+            ? (customerMemberships[0].organizationalUnitId || undefined)
+            : undefined
+        }
         onSuccess={() => {
           reload();
           if (selectedCustomer) {
