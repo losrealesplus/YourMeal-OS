@@ -89,7 +89,7 @@ function getWeekDates(mondayStr: string): Array<{ date: string; label: string; i
 type CatalogDish = {
   id: string;
   name: string;
-  price: number;
+  price: number | null;
   category?: string | null;
 };
 
@@ -382,7 +382,7 @@ export function UniversalOrderIntakeDrawer({
             rows.map((d) => ({
               id: d.id,
               name: d.name,
-              price: Number(d.price || 0),
+              price: d.price != null && !isNaN(Number(d.price)) ? Number(d.price) : null,
               category: d.category,
             })),
           );
@@ -497,8 +497,9 @@ export function UniversalOrderIntakeDrawer({
         if (qty > 0) {
           portions += qty;
           const override = priceOverrides[dayDate]?.[dishId];
-          const standardPrice = dishPriceMap.get(dishId) ?? 0;
-          const effectivePrice = override !== undefined ? override : standardPrice;
+          const standardPrice = dishPriceMap.get(dishId);
+          const effectivePrice =
+            override !== undefined ? override : standardPrice != null ? standardPrice : 0;
           total += effectivePrice * qty;
         }
       }
@@ -530,6 +531,13 @@ export function UniversalOrderIntakeDrawer({
         if (qty > 0) {
           const comment = comments[dayDate]?.[dishId]?.trim() || null;
           const override = priceOverrides[dayDate]?.[dishId];
+          const catalogDish = dishes.find((d) => d.id === dishId);
+          if (catalogDish && catalogDish.price === null && override === undefined) {
+            toast.error(
+              `El plato '${catalogDish.name}' no tiene precio asignado en el catálogo. Introduce un precio manual.`,
+            );
+            return;
+          }
           lines.push({
             dayDate,
             dishId,
@@ -940,9 +948,19 @@ export function UniversalOrderIntakeDrawer({
                             <div className="flex items-center justify-between gap-2">
                               <div className="space-y-0.5">
                                 <p className="text-sm font-medium leading-none">{dish.name}</p>
-                                <p className="text-xs text-muted-foreground font-mono">
-                                  {dish.price.toFixed(2)} € / ración
-                                </p>
+                                {dish.price !== null && dish.price > 0 ? (
+                                  <p className="text-xs text-muted-foreground font-mono">
+                                    {dish.price.toFixed(2)} € / ración
+                                  </p>
+                                ) : dish.price === 0 ? (
+                                  <p className="text-xs text-muted-foreground font-mono">
+                                    0,00 € (Sin coste)
+                                  </p>
+                                ) : (
+                                  <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+                                    ⚠️ Precio no asignado (Requiere ajuste)
+                                  </p>
+                                )}
                               </div>
                               <div className="flex items-center gap-2">
                                 <Button
@@ -995,7 +1013,11 @@ export function UniversalOrderIntakeDrawer({
                                     type="number"
                                     step="0.10"
                                     min="0"
-                                    placeholder={`${dish.price.toFixed(2)} € (catálogo)`}
+                                    placeholder={
+                                      dish.price != null
+                                        ? `${dish.price.toFixed(2)} € (catálogo)`
+                                        : "Precio manual requerido"
+                                    }
                                     value={override !== undefined ? override : ""}
                                     onChange={(e) =>
                                       handlePriceOverrideChange(d.date, dish.id, e.target.value)

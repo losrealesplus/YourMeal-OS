@@ -1299,8 +1299,10 @@ export type Database = {
           dish_id: string
           id: string
           order_id: string
+          price_snapshot_status?: "captured" | "explicit_zero" | "historical_unavailable" | null
           qty: number
           tenant_id: string
+          unit_price?: number | null
         }
         Insert: {
           comment?: string | null
@@ -1309,8 +1311,10 @@ export type Database = {
           dish_id: string
           id?: string
           order_id: string
+          price_snapshot_status?: "captured" | "explicit_zero" | "historical_unavailable"
           qty?: number
           tenant_id: string
+          unit_price?: number | null
         }
         Update: {
           comment?: string | null
@@ -1319,8 +1323,10 @@ export type Database = {
           dish_id?: string
           id?: string
           order_id?: string
+          price_snapshot_status?: "captured" | "explicit_zero" | "historical_unavailable"
           qty?: number
           tenant_id?: string
+          unit_price?: number | null
         }
         Relationships: [
           {

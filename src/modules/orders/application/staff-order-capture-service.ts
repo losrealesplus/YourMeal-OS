@@ -178,12 +178,12 @@ export const StaffOrderCaptureService = {
     const uniqueDishIds = [...new Set(dto.lines.map((l) => l.dishId))];
     const dishRepo = createDishRepository(ctx.supabase, ctx.tenantId);
     const catalogDishes = await dishRepo.listCatalogByIds(uniqueDishIds);
-    const catalogMap = new Map<string, { id: string; price: number; name: string }>();
+    const catalogMap = new Map<string, { id: string; price: number | null; name: string }>();
 
     for (const d of catalogDishes) {
       catalogMap.set(d.id, {
         id: d.id,
-        price: Number(d.price),
+        price: d.price != null && !isNaN(Number(d.price)) ? Number(d.price) : null,
         name: d.name,
       });
     }
@@ -202,14 +202,26 @@ export const StaffOrderCaptureService = {
       qty: number;
       comment: string | null;
       effectiveUnitPrice: number;
+      priceSnapshotStatus: "captured" | "explicit_zero";
     }> = [];
 
     for (const line of dto.lines) {
       const catalogDish = catalogMap.get(line.dishId)!;
-      const effectiveUnitPrice =
-        line.unitPriceOverride !== undefined && line.unitPriceOverride !== null
-          ? line.unitPriceOverride
-          : catalogDish.price;
+      let effectiveUnitPrice: number;
+
+      if (line.unitPriceOverride !== undefined && line.unitPriceOverride !== null) {
+        if (isNaN(line.unitPriceOverride) || line.unitPriceOverride < 0) {
+          throw new DomainError("PRICE_MISMATCH", `Precio unitario inválido para el plato '${catalogDish.name}'.`);
+        }
+        effectiveUnitPrice = line.unitPriceOverride;
+      } else if (catalogDish.price != null) {
+        effectiveUnitPrice = catalogDish.price;
+      } else {
+        throw new DomainError(
+          "PRICE_UNAVAILABLE",
+          `El plato '${catalogDish.name}' no tiene precio asignado en el catálogo. Requiere un precio o ajuste explícito.`,
+        );
+      }
 
       const lineSubtotal = effectiveUnitPrice * line.qty;
       grandTotal += lineSubtotal;
@@ -220,6 +232,7 @@ export const StaffOrderCaptureService = {
         qty: line.qty,
         comment: line.comment?.trim() ? line.comment.trim() : null,
         effectiveUnitPrice,
+        priceSnapshotStatus: effectiveUnitPrice === 0 ? "explicit_zero" : "captured",
       });
     }
 
@@ -252,7 +265,7 @@ export const StaffOrderCaptureService = {
 
     const createdOrder = orderData as OrderRow;
 
-    // 5. Insert Order Items
+    // 5. Insert Order Items (with Financial Snapshot)
     const itemsPayload = itemRowsToInsert.map((item) => ({
       tenant_id: ctx.tenantId,
       order_id: createdOrder.id,
@@ -260,6 +273,8 @@ export const StaffOrderCaptureService = {
       day_date: item.day_date,
       qty: item.qty,
       comment: item.comment,
+      unit_price: item.effectiveUnitPrice,
+      price_snapshot_status: item.priceSnapshotStatus,
     }));
 
     const { data: itemsData, error: itemsError } = await ctx.supabase
