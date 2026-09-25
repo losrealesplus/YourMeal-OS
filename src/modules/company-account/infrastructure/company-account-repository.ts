@@ -5,10 +5,12 @@ import { DomainError } from "@/domain/errors";
 import type {
   CompanyAccount,
   CompanyEmployeeRecord,
+  CustomerCompanyMembershipRecord,
   EmployeeMembership,
   OrganizationalUnit,
   Site,
   UpdateCompanyInput,
+  UpdateMembershipInput,
   UpdateOrganizationalUnitInput,
   UpdateSiteInput,
 } from "../domain/company-account";
@@ -481,6 +483,170 @@ export function createCompanyAccountRepository(client: Client, tenantId: string)
         isAdmin: Boolean(r.is_admin),
         status: String(r.status ?? "active"),
       };
+    },
+
+    async listCustomerCompanyMemberships(
+      customerId: string,
+    ): Promise<CustomerCompanyMembershipRecord[]> {
+      const { data, error } = await db
+        .from("company_employees")
+        .select(`
+          id,
+          tenant_id,
+          company_id,
+          customer_id,
+          location_id,
+          department_id,
+          internal_location,
+          is_admin,
+          status,
+          created_at,
+          companies!inner (
+            id,
+            name,
+            company_code
+          ),
+          company_locations (
+            id,
+            name
+          ),
+          company_departments (
+            id,
+            name
+          )
+        `)
+        .eq("tenant_id", tenantId)
+        .eq("customer_id", customerId)
+        .is("deleted_at", null)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+
+      return ((data ?? []) as any[]).map((r) => ({
+        membershipId: String(r.id),
+        customerId: String(r.customer_id),
+        companyId: String(r.company_id),
+        companyName: String(r.companies?.name ?? "—"),
+        companyCode: String(r.companies?.company_code ?? "—"),
+        siteId: r.location_id ? String(r.location_id) : null,
+        siteName: r.company_locations?.name ?? null,
+        organizationalUnitId: r.department_id ? String(r.department_id) : null,
+        organizationalUnitName: r.company_departments?.name ?? null,
+        internalLocation: r.internal_location ?? null,
+        isAdmin: Boolean(r.is_admin),
+        status: String(r.status ?? "active"),
+        createdAt: String(r.created_at),
+      }));
+    },
+
+    async createIndividualCustomer(input: {
+      displayName: string;
+      email?: string | null;
+      phone?: string | null;
+    }): Promise<string> {
+      const name = input.displayName.trim();
+      if (!name) throw new DomainError("INVALID_STATE", "Customer name is required");
+
+      const { data, error } = await db
+        .from("customers")
+        .insert({
+          tenant_id: tenantId,
+          display_name: name,
+          email: input.email?.trim() || null,
+          kind: "company_employee",
+          user_id: null,
+        })
+        .select("id")
+        .single();
+      if (error) throw error;
+      const customerId = String(data.id);
+
+      const phone = input.phone?.trim();
+      if (phone) {
+        const { error: phoneErr } = await db.from("customer_phones").insert({
+          tenant_id: tenantId,
+          customer_id: customerId,
+          phone,
+          is_primary: true,
+        });
+        if (phoneErr) throw phoneErr;
+      }
+
+      return customerId;
+    },
+
+    async findActiveMembership(
+      companyId: string,
+      customerId: string,
+    ): Promise<EmployeeMembership | null> {
+      const { data, error } = await db
+        .from("company_employees")
+        .select("*")
+        .eq("tenant_id", tenantId)
+        .eq("company_id", companyId)
+        .eq("customer_id", customerId)
+        .is("deleted_at", null)
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) return null;
+      const r = data as Record<string, unknown>;
+      return {
+        id: String(r.id),
+        tenantId: String(r.tenant_id),
+        companyId: String(r.company_id),
+        customerId: String(r.customer_id),
+        siteId: (r.location_id as string | null) ?? null,
+        organizationalUnitId: (r.department_id as string | null) ?? null,
+        internalLocation: (r.internal_location as string | null) ?? null,
+        isAdmin: Boolean(r.is_admin),
+        status: String(r.status ?? "active"),
+      };
+    },
+
+    async updateMembership(
+      membershipId: string,
+      input: UpdateMembershipInput,
+    ): Promise<EmployeeMembership> {
+      const patch: Record<string, unknown> = {};
+      if (input.siteId !== undefined) patch.location_id = input.siteId;
+      if (input.organizationalUnitId !== undefined) patch.department_id = input.organizationalUnitId;
+      if (input.internalLocation !== undefined) patch.internal_location = input.internalLocation;
+      if (input.isAdmin !== undefined) patch.is_admin = input.isAdmin;
+      if (input.status !== undefined) patch.status = input.status;
+
+      const { data, error } = await db
+        .from("company_employees")
+        .update(patch)
+        .eq("tenant_id", tenantId)
+        .eq("id", membershipId)
+        .is("deleted_at", null)
+        .select("*")
+        .single();
+      if (error) throw error;
+      const r = data as Record<string, unknown>;
+      return {
+        id: String(r.id),
+        tenantId: String(r.tenant_id),
+        companyId: String(r.company_id),
+        customerId: String(r.customer_id),
+        siteId: (r.location_id as string | null) ?? null,
+        organizationalUnitId: (r.department_id as string | null) ?? null,
+        internalLocation: (r.internal_location as string | null) ?? null,
+        isAdmin: Boolean(r.is_admin),
+        status: String(r.status ?? "active"),
+      };
+    },
+
+    async unlinkMembership(membershipId: string): Promise<void> {
+      const { error } = await db
+        .from("company_employees")
+        .update({
+          deleted_at: new Date().toISOString(),
+          status: "inactive",
+        })
+        .eq("tenant_id", tenantId)
+        .eq("id", membershipId)
+        .is("deleted_at", null);
+      if (error) throw error;
     },
 
     async resolveDeliveryGroup(input: {

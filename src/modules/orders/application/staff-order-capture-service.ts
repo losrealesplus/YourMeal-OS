@@ -29,6 +29,10 @@ export interface UniversalOrderCaptureDTO {
   weekStart: string; // YYYY-MM-DD
   orderNotes?: string | null;
   autoConfirm?: boolean;
+  demandChannel?: "individual" | "company";
+  companyId?: string | null;
+  siteId?: string | null;
+  organizationalUnitId?: string | null;
   lines: UniversalOrderCaptureLineInput[];
 }
 
@@ -223,6 +227,7 @@ export const StaffOrderCaptureService = {
 
     // 4. Atomic Order Creation
     const status = dto.autoConfirm ? "confirmed" : "draft";
+    const isCompanyOrder = dto.demandChannel === "company" && !!dto.companyId;
 
     const { data: orderData, error: orderError } = await ctx.supabase
       .from("orders")
@@ -233,7 +238,10 @@ export const StaffOrderCaptureService = {
         total: grandTotal,
         notes: dto.orderNotes?.trim() ?? null,
         status,
-        demand_channel: "individual",
+        demand_channel: isCompanyOrder ? "company" : "individual",
+        company_id: isCompanyOrder ? dto.companyId : null,
+        site_id: isCompanyOrder ? (dto.siteId ?? null) : null,
+        organizational_unit_id: isCompanyOrder ? (dto.organizationalUnitId ?? null) : null,
       })
       .select("*")
       .single();

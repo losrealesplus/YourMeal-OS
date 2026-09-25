@@ -5,11 +5,15 @@ import { createCompanyAccountRepository } from "../infrastructure/company-accoun
 import type {
   CompanyAccount,
   CompanyEmployeeRecord,
+  CreateCustomerAndLinkInput,
+  CustomerCompanyMembershipRecord,
   EmployeeMembership,
+  LinkCustomerToCompanyInput,
   OrderDemandContext,
   OrganizationalUnit,
   Site,
   UpdateCompanyInput,
+  UpdateMembershipInput,
   UpdateOrganizationalUnitInput,
   UpdateSiteInput,
 } from "../domain/company-account";
@@ -434,6 +438,186 @@ export const CompanyAccountService = {
       organizationalUnitId: membership.organizationalUnitId,
       deliveryGroupId,
     };
+  },
+
+  async linkCustomerToCompany(
+    ctx: ServiceContext,
+    input: LinkCustomerToCompanyInput,
+  ): Promise<EmployeeMembership> {
+    assertTenant(ctx);
+    await this.assertCanManageCompany(ctx, input.companyId);
+
+    const repo = createCompanyAccountRepository(ctx.supabase, ctx.tenantId);
+    const company = await repo.findCompanyById(input.companyId);
+    if (!company) {
+      throw new DomainError("NOT_FOUND", "Company not found");
+    }
+
+    if (input.siteId) {
+      const site = await repo.findSiteById(input.siteId);
+      if (!site || site.companyId !== input.companyId) {
+        throw new DomainError("INVALID_STATE", "Site does not belong to company");
+      }
+    }
+
+    if (input.organizationalUnitId) {
+      const unit = await repo.findOrganizationalUnitById(input.organizationalUnitId);
+      if (!unit) {
+        throw new DomainError("NOT_FOUND", "Organizational unit not found");
+      }
+    }
+
+    const existing = await repo.findActiveMembership(input.companyId, input.customerId);
+    if (existing) {
+      throw new DomainError("INVALID_STATE", "Customer already has an active membership in this company");
+    }
+
+    const membership = await repo.insertMembership({
+      companyId: input.companyId,
+      customerId: input.customerId,
+      siteId: input.siteId ?? null,
+      organizationalUnitId: input.organizationalUnitId ?? null,
+      internalLocation: input.internalLocation ?? null,
+      isAdmin: input.isAdmin ?? false,
+    });
+
+    await AuditService.write(ctx, {
+      entityType: "company_employee",
+      entityId: membership.id,
+      action: "create",
+      newData: {
+        companyId: input.companyId,
+        customerId: input.customerId,
+        siteId: input.siteId ?? null,
+        organizationalUnitId: input.organizationalUnitId ?? null,
+        isAdmin: input.isAdmin ?? false,
+      },
+    });
+
+    return membership;
+  },
+
+  async createCustomerAndLinkToCompany(
+    ctx: ServiceContext,
+    input: CreateCustomerAndLinkInput,
+  ): Promise<{ customerId: string; membership: EmployeeMembership }> {
+    assertTenant(ctx);
+    await this.assertCanManageCompany(ctx, input.companyId);
+
+    const repo = createCompanyAccountRepository(ctx.supabase, ctx.tenantId);
+    const company = await repo.findCompanyById(input.companyId);
+    if (!company) {
+      throw new DomainError("NOT_FOUND", "Company not found");
+    }
+
+    if (input.siteId) {
+      const site = await repo.findSiteById(input.siteId);
+      if (!site || site.companyId !== input.companyId) {
+        throw new DomainError("INVALID_STATE", "Site does not belong to company");
+      }
+    }
+
+    if (input.organizationalUnitId) {
+      const unit = await repo.findOrganizationalUnitById(input.organizationalUnitId);
+      if (!unit) {
+        throw new DomainError("NOT_FOUND", "Organizational unit not found");
+      }
+    }
+
+    const customerId = await repo.createIndividualCustomer({
+      displayName: input.displayName,
+      email: input.email ?? null,
+      phone: input.phone ?? null,
+    });
+
+    const membership = await repo.insertMembership({
+      companyId: input.companyId,
+      customerId,
+      siteId: input.siteId ?? null,
+      organizationalUnitId: input.organizationalUnitId ?? null,
+      internalLocation: input.internalLocation ?? null,
+      isAdmin: input.isAdmin ?? false,
+    });
+
+    await AuditService.write(ctx, {
+      entityType: "company_employee",
+      entityId: membership.id,
+      action: "create",
+      newData: {
+        companyId: input.companyId,
+        customerId,
+        siteId: input.siteId ?? null,
+        organizationalUnitId: input.organizationalUnitId ?? null,
+        isAdmin: input.isAdmin ?? false,
+        createdWithCustomer: true,
+      },
+    });
+
+    return { customerId, membership };
+  },
+
+  async updateCompanyEmployeeMembership(
+    ctx: ServiceContext,
+    companyId: string,
+    membershipId: string,
+    patch: UpdateMembershipInput,
+  ): Promise<EmployeeMembership> {
+    assertTenant(ctx);
+    await this.assertCanManageCompany(ctx, companyId);
+
+    const repo = createCompanyAccountRepository(ctx.supabase, ctx.tenantId);
+    if (patch.siteId) {
+      const site = await repo.findSiteById(patch.siteId);
+      if (!site || site.companyId !== companyId) {
+        throw new DomainError("INVALID_STATE", "Site does not belong to company");
+      }
+    }
+
+    if (patch.organizationalUnitId) {
+      const unit = await repo.findOrganizationalUnitById(patch.organizationalUnitId);
+      if (!unit) {
+        throw new DomainError("NOT_FOUND", "Organizational unit not found");
+      }
+    }
+
+    const updated = await repo.updateMembership(membershipId, patch);
+
+    await AuditService.write(ctx, {
+      entityType: "company_employee",
+      entityId: membershipId,
+      action: "update",
+      newData: { companyId, membershipId, ...(patch as Record<string, unknown>) },
+    });
+
+    return updated;
+  },
+
+  async unlinkCompanyEmployee(
+    ctx: ServiceContext,
+    companyId: string,
+    membershipId: string,
+  ): Promise<void> {
+    assertTenant(ctx);
+    await this.assertCanManageCompany(ctx, companyId);
+
+    const repo = createCompanyAccountRepository(ctx.supabase, ctx.tenantId);
+    await repo.unlinkMembership(membershipId);
+
+    await AuditService.write(ctx, {
+      entityType: "company_employee",
+      entityId: membershipId,
+      action: "archive",
+      newData: { companyId, membershipId, unlinkedBy: ctx.userId },
+    });
+  },
+
+  async listCustomerCompanyMemberships(
+    ctx: ServiceContext,
+    customerId: string,
+  ): Promise<CustomerCompanyMembershipRecord[]> {
+    assertTenant(ctx);
+    const repo = createCompanyAccountRepository(ctx.supabase, ctx.tenantId);
+    return repo.listCustomerCompanyMemberships(customerId);
   },
 
   async assertCanManageCompany(ctx: ServiceContext, companyId: string): Promise<void> {

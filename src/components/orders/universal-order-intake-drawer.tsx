@@ -11,6 +11,7 @@ import {
   Search,
   Utensils,
   AlertTriangle,
+  Building2,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -43,6 +44,10 @@ export interface UniversalOrderIntakeDrawerProps {
   onOpenChange: (open: boolean) => void;
   preselectedCustomerId?: string;
   preselectedCustomerName?: string;
+  preselectedDemandChannel?: "individual" | "company";
+  preselectedCompanyId?: string;
+  preselectedSiteId?: string;
+  preselectedOrganizationalUnitId?: string;
   preselectedWeekStart?: string;
   initialDayDate?: string;
   onSuccess?: (result: StaffOrderCaptureResult) => void;
@@ -99,6 +104,10 @@ export function UniversalOrderIntakeDrawer({
   onOpenChange,
   preselectedCustomerId,
   preselectedCustomerName,
+  preselectedDemandChannel,
+  preselectedCompanyId,
+  preselectedSiteId,
+  preselectedOrganizationalUnitId,
   preselectedWeekStart,
   initialDayDate,
   onSuccess,
@@ -134,6 +143,34 @@ export function UniversalOrderIntakeDrawer({
   const [newCustomerStreet, setNewCustomerStreet] = useState("");
   const [newCustomerCity, setNewCustomerCity] = useState("");
   const [newCustomerDeliveryNotes, setNewCustomerDeliveryNotes] = useState("");
+
+  // Context State (Personal B2C vs Empresa B2B)
+  const [demandChannel, setDemandChannel] = useState<"individual" | "company">(
+    preselectedDemandChannel ?? (preselectedCompanyId ? "company" : "individual"),
+  );
+  const [memberships, setMemberships] = useState<
+    Array<{
+      id: string;
+      companyId: string;
+      companyName: string;
+      companyCode: string;
+      locationId: string | null;
+      locationName: string | null;
+      departmentId: string | null;
+      departmentName: string | null;
+      internalLocation: string | null;
+    }>
+  >([]);
+  const [loadingMemberships, setLoadingMemberships] = useState(false);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>(preselectedCompanyId ?? "");
+  const [selectedSiteId, setSelectedSiteId] = useState<string>(preselectedSiteId ?? "");
+  const [selectedOrganizationalUnitId, setSelectedOrganizationalUnitId] = useState<string>(
+    preselectedOrganizationalUnitId ?? "",
+  );
+  const [companySites, setCompanySites] = useState<
+    Array<{ id: string; name: string; address?: string | null }>
+  >([]);
+  const [companyUnits, setCompanyUnits] = useState<Array<{ id: string; name: string }>>([]);
 
   // Dishes & Selection State
   const [dishes, setDishes] = useState<CatalogDish[]>([]);
@@ -174,6 +211,150 @@ export function UniversalOrderIntakeDrawer({
       setCustomerMode("existing");
     }
   }, [preselectedCustomerId, preselectedCustomerName]);
+
+  // Synchronize preselected company context
+  useEffect(() => {
+    if (preselectedDemandChannel) {
+      setDemandChannel(preselectedDemandChannel);
+    }
+    if (preselectedCompanyId) {
+      setSelectedCompanyId(preselectedCompanyId);
+      setDemandChannel("company");
+    }
+    if (preselectedSiteId) {
+      setSelectedSiteId(preselectedSiteId);
+    }
+    if (preselectedOrganizationalUnitId) {
+      setSelectedOrganizationalUnitId(preselectedOrganizationalUnitId);
+    }
+  }, [
+    preselectedDemandChannel,
+    preselectedCompanyId,
+    preselectedSiteId,
+    preselectedOrganizationalUnitId,
+  ]);
+
+  // Load customer company memberships when existing customer is selected
+  useEffect(() => {
+    if (!open || !tenantId || customerMode !== "existing" || !selectedCustomerId) {
+      setMemberships([]);
+      return;
+    }
+    const activeTenantId: string = tenantId;
+
+    let isMounted = true;
+    async function loadMemberships() {
+      setLoadingMemberships(true);
+      try {
+        const { data, error } = await supabase
+          .from("company_employees")
+          .select(`
+            id,
+            company_id,
+            location_id,
+            department_id,
+            internal_location,
+            companies:company_id (id, name, company_code),
+            company_locations:location_id (id, name, address),
+            company_departments:department_id (id, name)
+          `)
+          .eq("tenant_id", activeTenantId)
+          .eq("customer_id", selectedCustomerId)
+          .is("deleted_at", null);
+
+        if (error) throw error;
+        if (isMounted) {
+          const mapped = (data ?? []).map((m: any) => ({
+            id: m.id,
+            companyId: m.company_id,
+            companyName: m.companies?.name ?? "Empresa",
+            companyCode: m.companies?.company_code ?? "",
+            locationId: m.location_id ?? null,
+            locationName: m.company_locations?.name ?? null,
+            departmentId: m.department_id ?? null,
+            departmentName: m.company_departments?.name ?? null,
+            internalLocation: m.internal_location ?? null,
+          }));
+          setMemberships(mapped);
+
+          // Apply non-silent UX preselection rules
+          if (preselectedCompanyId) {
+            setSelectedCompanyId(preselectedCompanyId);
+            setDemandChannel("company");
+          } else if (mapped.length === 1 && !preselectedDemandChannel) {
+            // Suggest company if 1 membership exists, while keeping Particular available
+            setSelectedCompanyId(mapped[0].companyId);
+            setSelectedSiteId(mapped[0].locationId || "");
+            setSelectedOrganizationalUnitId(mapped[0].departmentId || "");
+            setDemandChannel("company");
+          } else if (mapped.length === 0) {
+            setDemandChannel("individual");
+          }
+        }
+      } catch {
+        if (isMounted) setMemberships([]);
+      } finally {
+        if (isMounted) setLoadingMemberships(false);
+      }
+    }
+
+    void loadMemberships();
+    return () => {
+      isMounted = false;
+    };
+  }, [open, tenantId, customerMode, selectedCustomerId, preselectedCompanyId, preselectedDemandChannel]);
+
+  // Load company sites and departments when selectedCompanyId changes
+  useEffect(() => {
+    if (!open || !tenantId || !selectedCompanyId) {
+      setCompanySites([]);
+      setCompanyUnits([]);
+      return;
+    }
+    const activeTenantId: string = tenantId;
+
+    let isMounted = true;
+    async function loadCompanyMeta() {
+      try {
+        const { data: sitesData } = await supabase
+          .from("company_locations")
+          .select("id, name, address")
+          .eq("tenant_id", activeTenantId)
+          .eq("company_id", selectedCompanyId)
+          .is("deleted_at", null)
+          .order("name", { ascending: true });
+
+        const siteIds = (sitesData || []).map((s) => s.id);
+        let unitsData: Array<{ id: string; name: string }> = [];
+
+        if (siteIds.length > 0) {
+          const { data: uData } = await supabase
+            .from("company_departments")
+            .select("id, name")
+            .eq("tenant_id", activeTenantId)
+            .in("company_location_id", siteIds)
+            .is("deleted_at", null)
+            .order("name", { ascending: true });
+          unitsData = uData || [];
+        }
+
+        if (isMounted) {
+          setCompanySites(sitesData || []);
+          setCompanyUnits(unitsData);
+        }
+      } catch {
+        if (isMounted) {
+          setCompanySites([]);
+          setCompanyUnits([]);
+        }
+      }
+    }
+
+    void loadCompanyMeta();
+    return () => {
+      isMounted = false;
+    };
+  }, [open, tenantId, selectedCompanyId]);
 
   // Load catalog dishes
   useEffect(() => {
@@ -374,6 +555,8 @@ export function UniversalOrderIntakeDrawer({
         roles,
       });
 
+      const isCompanyContext = demandChannel === "company" && !!selectedCompanyId;
+
       const dto: UniversalOrderCaptureDTO = {
         customer:
           customerMode === "existing"
@@ -389,6 +572,10 @@ export function UniversalOrderIntakeDrawer({
         weekStart,
         orderNotes: orderNotes.trim() || null,
         autoConfirm,
+        demandChannel: isCompanyContext ? "company" : "individual",
+        companyId: isCompanyContext ? selectedCompanyId : null,
+        siteId: isCompanyContext ? (selectedSiteId || null) : null,
+        organizationalUnitId: isCompanyContext ? (selectedOrganizationalUnitId || null) : null,
         lines,
       };
 
@@ -552,6 +739,135 @@ export function UniversalOrderIntakeDrawer({
                   />
                 </div>
               </div>
+            )}
+          </div>
+
+          {/* 1.1 CONTEXTO DEL PEDIDO (B2C / B2B) */}
+          <div className="rounded-lg border border-border bg-card/50 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-semibold flex items-center gap-1.5">
+                <Building2 className="h-3.5 w-3.5 text-primary" />
+                Contexto del Pedido
+              </Label>
+              {customerMode === "existing" && memberships.length > 0 ? (
+                <Badge
+                  variant={demandChannel === "company" ? "default" : "outline"}
+                  className="text-[10px]"
+                >
+                  {demandChannel === "company" ? "🏢 Corporativo B2B" : "👤 Particular B2C"}
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="text-[10px]">
+                  👤 Particular B2C
+                </Badge>
+              )}
+            </div>
+
+            {customerMode === "existing" && memberships.length > 0 ? (
+              <div className="space-y-3 pt-1">
+                {/* Selector explícito Particular vs Empresa */}
+                <div className="grid grid-cols-2 gap-2 bg-muted/60 p-1 rounded-md">
+                  <button
+                    type="button"
+                    onClick={() => setDemandChannel("individual")}
+                    className={cn(
+                      "py-1.5 px-2 text-xs font-medium rounded-md transition-all text-center",
+                      demandChannel === "individual"
+                        ? "bg-background text-foreground shadow-sm font-semibold"
+                        : "text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    👤 Particular (B2C)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDemandChannel("company");
+                      if (!selectedCompanyId && memberships[0]) {
+                        setSelectedCompanyId(memberships[0].companyId);
+                        setSelectedSiteId(memberships[0].locationId || "");
+                        setSelectedOrganizationalUnitId(memberships[0].departmentId || "");
+                      }
+                    }}
+                    className={cn(
+                      "py-1.5 px-2 text-xs font-medium rounded-md transition-all text-center",
+                      demandChannel === "company"
+                        ? "bg-background text-foreground shadow-sm font-semibold"
+                        : "text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    🏢 Empresa (B2B)
+                  </button>
+                </div>
+
+                {demandChannel === "company" && (
+                  <div className="space-y-2 pt-1">
+                    {/* Dropdown Empresa si tiene múltiples */}
+                    {memberships.length > 1 && (
+                      <div className="space-y-1">
+                        <Label className="text-[11px] text-muted-foreground">Empresa</Label>
+                        <select
+                          value={selectedCompanyId}
+                          onChange={(e) => {
+                            const compId = e.target.value;
+                            setSelectedCompanyId(compId);
+                            const mem = memberships.find((m) => m.companyId === compId);
+                            setSelectedSiteId(mem?.locationId || "");
+                            setSelectedOrganizationalUnitId(mem?.departmentId || "");
+                          }}
+                          className="w-full h-8 rounded-md border border-border bg-background px-2 text-xs"
+                        >
+                          {memberships.map((m) => (
+                            <option key={m.companyId} value={m.companyId}>
+                              {m.companyName} ({m.companyCode})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {/* Sede y Departamento */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div className="space-y-1">
+                        <Label className="text-[11px] text-muted-foreground">Sede de Entrega</Label>
+                        <select
+                          value={selectedSiteId}
+                          onChange={(e) => setSelectedSiteId(e.target.value)}
+                          className="w-full h-8 rounded-md border border-border bg-background px-2 text-xs"
+                        >
+                          <option value="">Sede principal / Sin especificar</option>
+                          {companySites.map((s) => (
+                            <option key={s.id} value={s.id}>
+                              {s.name} {s.address ? `(${s.address})` : ""}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-[11px] text-muted-foreground">
+                          Departamento / Unidad
+                        </Label>
+                        <select
+                          value={selectedOrganizationalUnitId}
+                          onChange={(e) => setSelectedOrganizationalUnitId(e.target.value)}
+                          className="w-full h-8 rounded-md border border-border bg-background px-2 text-xs"
+                        >
+                          <option value="">General / Sin especificar</option>
+                          {companyUnits.map((u) => (
+                            <option key={u.id} value={u.id}>
+                              {u.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="text-[11px] text-muted-foreground">
+                Entrega individual en domicilio del cliente. Sin membresías corporativas activas.
+              </p>
             )}
           </div>
 

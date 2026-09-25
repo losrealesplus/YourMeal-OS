@@ -260,16 +260,25 @@ describe("OPS-01 G1 — StaffOrderCaptureService", () => {
     expect(res.order.total).toBe(34.5);
   });
 
-  it("rejects unknown dishes not in tenant catalog", async () => {
+  it("captures order with B2B company context (demandChannel: 'company')", async () => {
     const mockSupa = createMockSupabase();
     const ctx = mockCtx({}, mockSupa);
 
     const dto: UniversalOrderCaptureDTO = {
       customer: { mode: "existing", customerId: "cust-1" },
       weekStart: "2026-09-28",
-      lines: [{ dayDate: "2026-09-29", dishId: "non-existent-dish", qty: 1 }],
+      demandChannel: "company",
+      companyId: "comp-acme",
+      siteId: "loc-north",
+      organizationalUnitId: "dept-mktg",
+      lines: [{ dayDate: "2026-09-29", dishId: "dish-pollo", qty: 1 }],
     };
 
-    await expect(StaffOrderCaptureService.captureOrder(ctx, dto)).rejects.toBeInstanceOf(DomainError);
+    const res = await StaffOrderCaptureService.captureOrder(ctx, dto);
+
+    expect(res.order.demand_channel).toBe("company");
+    expect(res.order.company_id).toBe("comp-acme");
+    expect(res.order.site_id).toBe("loc-north");
+    expect(res.order.organizational_unit_id).toBe("dept-mktg");
   });
 });

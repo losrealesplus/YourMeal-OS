@@ -18,12 +18,19 @@ import {
   Pencil,
   Plus,
   Search,
+  Trash2,
+  UserPlus,
   Users,
+  ShoppingBag,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useCan } from "@/hooks/use-can";
 import { supabase } from "@/integrations/supabase/client";
 import { createServiceContext } from "@/services/types";
+import {
+  CustomerDirectoryService,
+  type IndividualCustomerRecord,
+} from "@/modules/customer-directory";
 import {
   CompanyAccountService,
   type CompanyAccount,
@@ -56,6 +63,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { UniversalOrderIntakeDrawer } from "@/components/orders/universal-order-intake-drawer";
 import { useFmt } from "@/i18n/localization-provider";
 import { cn } from "@/lib/utils";
 
@@ -142,6 +150,37 @@ function AdminCompaniesPage() {
   const [editingUnit, setEditingUnit] = useState<OrganizationalUnit | null>(null);
   const [editUnitForm, setEditUnitForm] = useState<UpdateOrganizationalUnitInput>({});
   const [savingUnit, setSavingUnit] = useState(false);
+
+  // Link Employee modal state
+  const [showLinkEmployeeDialog, setShowLinkEmployeeDialog] = useState(false);
+  const [linkEmployeeMode, setLinkEmployeeMode] = useState<"existing" | "new">("existing");
+  const [existingCustomers, setExistingCustomers] = useState<IndividualCustomerRecord[]>([]);
+  const [customerSearchQuery, setCustomerSearchQuery] = useState("");
+  const [linkEmployeeForm, setLinkEmployeeForm] = useState({
+    customerId: "",
+    newCustomerName: "",
+    newCustomerEmail: "",
+    newCustomerPhone: "",
+    siteId: "",
+    organizationalUnitId: "",
+    internalLocation: "",
+    isAdmin: false,
+  });
+  const [linkingEmployee, setLinkingEmployee] = useState(false);
+
+  // Edit Membership modal state
+  const [editingMembership, setEditingMembership] = useState<CompanyEmployeeRecord | null>(null);
+  const [editMembershipForm, setEditMembershipForm] = useState({
+    siteId: "",
+    organizationalUnitId: "",
+    internalLocation: "",
+    isAdmin: false,
+  });
+  const [savingMembership, setSavingMembership] = useState(false);
+
+  // Universal Order Intake Drawer State for Company Employee
+  const [orderIntakeOpen, setOrderIntakeOpen] = useState(false);
+  const [orderIntakeTarget, setOrderIntakeTarget] = useState<CompanyEmployeeRecord | null>(null);
 
   const getCtx = useCallback(async () => {
     if (!user || !tenantId) throw new Error("Tenant context required");
@@ -460,6 +499,134 @@ function AdminCompaniesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
+
+  async function handleOpenLinkEmployee() {
+    setShowLinkEmployeeDialog(true);
+    setLinkEmployeeMode("existing");
+    setLinkEmployeeForm({
+      customerId: "",
+      newCustomerName: "",
+      newCustomerEmail: "",
+      newCustomerPhone: "",
+      siteId: sites[0]?.id || "",
+      organizationalUnitId: "",
+      internalLocation: "",
+      isAdmin: false,
+    });
+    try {
+      const ctx = await getCtx();
+      const list = await CustomerDirectoryService.listIndividuals(ctx, {});
+      setExistingCustomers(list);
+    } catch {
+      // ignore
+    }
+  }
+
+  async function handleLinkEmployeeSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!selectedCompany) return;
+    setLinkingEmployee(true);
+    try {
+      const ctx = await getCtx();
+      if (linkEmployeeMode === "existing") {
+        if (!linkEmployeeForm.customerId) {
+          toast.error("Selecciona un cliente existente");
+          return;
+        }
+        await CompanyAccountService.linkCustomerToCompany(ctx, {
+          companyId: selectedCompany.id,
+          customerId: linkEmployeeForm.customerId,
+          siteId: linkEmployeeForm.siteId || null,
+          organizationalUnitId: linkEmployeeForm.organizationalUnitId || null,
+          internalLocation: linkEmployeeForm.internalLocation.trim() || null,
+          isAdmin: linkEmployeeForm.isAdmin,
+        });
+        toast.success("Empleado vinculado correctamente");
+      } else {
+        if (!linkEmployeeForm.newCustomerName.trim()) {
+          toast.error("El nombre del cliente es obligatorio");
+          return;
+        }
+        await CompanyAccountService.createCustomerAndLinkToCompany(ctx, {
+          companyId: selectedCompany.id,
+          displayName: linkEmployeeForm.newCustomerName.trim(),
+          email: linkEmployeeForm.newCustomerEmail.trim() || null,
+          phone: linkEmployeeForm.newCustomerPhone.trim() || null,
+          siteId: linkEmployeeForm.siteId || null,
+          organizationalUnitId: linkEmployeeForm.organizationalUnitId || null,
+          internalLocation: linkEmployeeForm.internalLocation.trim() || null,
+          isAdmin: linkEmployeeForm.isAdmin,
+        });
+        toast.success("Cliente creado y vinculado correctamente");
+      }
+      setShowLinkEmployeeDialog(false);
+      await loadCompanyDetails(selectedCompany.id);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : String(err));
+    } finally {
+      setLinkingEmployee(false);
+    }
+  }
+
+  function handleStartEditMembership(emp: CompanyEmployeeRecord) {
+    setEditingMembership(emp);
+    setEditMembershipForm({
+      siteId: emp.siteId || "",
+      organizationalUnitId: emp.organizationalUnitId || "",
+      internalLocation: emp.internalLocation || "",
+      isAdmin: emp.isAdmin,
+    });
+  }
+
+  async function handleSaveMembership(e: React.FormEvent) {
+    e.preventDefault();
+    if (!selectedCompany || !editingMembership) return;
+    setSavingMembership(true);
+    try {
+      const ctx = await getCtx();
+      await CompanyAccountService.updateCompanyEmployeeMembership(
+        ctx,
+        selectedCompany.id,
+        editingMembership.membershipId,
+        {
+          siteId: editMembershipForm.siteId || null,
+          organizationalUnitId: editMembershipForm.organizationalUnitId || null,
+          internalLocation: editMembershipForm.internalLocation.trim() || null,
+          isAdmin: editMembershipForm.isAdmin,
+        },
+      );
+      toast.success("Vínculo de empleado actualizado");
+      setEditingMembership(null);
+      await loadCompanyDetails(selectedCompany.id);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : String(err));
+    } finally {
+      setSavingMembership(false);
+    }
+  }
+
+  async function handleUnlinkEmployee(emp: CompanyEmployeeRecord) {
+    if (!selectedCompany) return;
+    if (
+      !window.confirm(
+        `¿Desvincular a "${emp.displayName || "este empleado"}" de la empresa ${selectedCompany.name}?`,
+      )
+    ) {
+      return;
+    }
+    try {
+      const ctx = await getCtx();
+      await CompanyAccountService.unlinkCompanyEmployee(
+        ctx,
+        selectedCompany.id,
+        emp.membershipId,
+      );
+      toast.success("Empleado desvinculado correctamente");
+      await loadCompanyDetails(selectedCompany.id);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : String(err));
+    }
+  }
 
   return (
     <div className="animate-fade-in space-y-6">
@@ -822,15 +989,44 @@ function AdminCompaniesPage() {
 
           {/* TAB 4: EMPLEADOS VINCULADOS */}
           {activeTab === "employees" ? (
-            <PanelCard title="Plantilla de Empleados">
+            <PanelCard
+              title="Plantilla de Empleados"
+              action={
+                can("company.manage") ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={handleOpenLinkEmployee}
+                    className="gap-1.5 text-xs font-semibold bg-primary text-primary-foreground shadow-sm"
+                  >
+                    <UserPlus className="size-3.5" />
+                    + Vincular Empleado
+                  </Button>
+                ) : undefined
+              }
+            >
               {employees.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-                  No hay empleados vinculados a esta empresa todavía. Los empleados se vinculan
-                  usando el Company Code{" "}
-                  <span className="font-mono font-bold text-foreground">
-                    {selectedCompany.companyCode}
-                  </span>{" "}
-                  al unirse.
+                <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground space-y-3">
+                  <p>
+                    No hay empleados vinculados a esta empresa todavía. Los empleados pueden unirse
+                    con el Company Code{" "}
+                    <span className="font-mono font-bold text-foreground">
+                      {selectedCompany.companyCode}
+                    </span>{" "}
+                    o puedes vincularlos directamente.
+                  </p>
+                  {can("company.manage") && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={handleOpenLinkEmployee}
+                      className="gap-1.5 text-xs font-semibold"
+                    >
+                      <UserPlus className="size-3.5" />
+                      Vincular Primer Empleado
+                    </Button>
+                  )}
                 </div>
               ) : (
                 <DataTable<{ id: string } & CompanyEmployeeRecord>
@@ -888,13 +1084,53 @@ function AdminCompaniesPage() {
                     {
                       key: "actions",
                       header: "Acciones",
-                      render: () => (
-                        <Link
-                          to="/admin/customers"
-                          className="text-xs font-bold uppercase tracking-wider text-primary hover:underline inline-flex items-center gap-1"
-                        >
-                          Ver en Clientes <ExternalLink className="size-3" />
-                        </Link>
+                      render: (r) => (
+                        <div className="flex items-center gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setOrderIntakeTarget(r);
+                              setOrderIntakeOpen(true);
+                            }}
+                            className="h-7 px-2 text-xs font-semibold gap-1 text-primary border-primary/30 hover:bg-primary/10"
+                            title="Crear Pedido para este empleado"
+                          >
+                            <ShoppingBag className="size-3" /> + Pedido
+                          </Button>
+                          <Link
+                            to="/admin/customers"
+                            search={{ customerId: r.customerId, tab: "profile" }}
+                            className="text-xs font-bold uppercase tracking-wider text-primary hover:underline inline-flex items-center gap-1"
+                          >
+                            Ver Ficha <ExternalLink className="size-3" />
+                          </Link>
+                          {can("company.manage") && (
+                            <>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleStartEditMembership(r)}
+                                className="h-7 px-2 text-xs"
+                                title="Editar vínculo"
+                              >
+                                <Pencil className="size-3" />
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleUnlinkEmployee(r)}
+                                className="h-7 px-2 text-xs text-destructive hover:bg-destructive/10"
+                                title="Desvincular"
+                              >
+                                <Trash2 className="size-3" />
+                              </Button>
+                            </>
+                          )}
+                        </div>
                       ),
                     },
                   ]}
@@ -1381,6 +1617,338 @@ function AdminCompaniesPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* ==================== DIALOG: VINCULAR EMPLEADO ==================== */}
+      <Dialog open={showLinkEmployeeDialog} onOpenChange={setShowLinkEmployeeDialog}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Vincular Empleado a {selectedCompany?.name}</DialogTitle>
+            <DialogDescription>
+              Elige si deseas vincular un cliente ya existente en la plataforma o crear una nueva
+              persona y vincularla inmediatamente.
+            </DialogDescription>
+          </DialogHeader>
+
+          {/* Mode Switcher */}
+          <div className="flex gap-2 p-1 bg-muted rounded-lg">
+            <button
+              type="button"
+              onClick={() => setLinkEmployeeMode("existing")}
+              className={cn(
+                "flex-1 py-1.5 px-3 rounded-md text-xs font-semibold transition-colors",
+                linkEmployeeMode === "existing"
+                  ? "bg-card text-foreground shadow-xs"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              Cliente Existente
+            </button>
+            <button
+              type="button"
+              onClick={() => setLinkEmployeeMode("new")}
+              className={cn(
+                "flex-1 py-1.5 px-3 rounded-md text-xs font-semibold transition-colors",
+                linkEmployeeMode === "new"
+                  ? "bg-card text-foreground shadow-xs"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              Crear Nuevo Cliente
+            </button>
+          </div>
+
+          <form onSubmit={handleLinkEmployeeSubmit} className="space-y-4 pt-2">
+            {linkEmployeeMode === "existing" ? (
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold">Seleccionar Cliente *</Label>
+                <Input
+                  type="search"
+                  placeholder="Filtrar por nombre, teléfono o email…"
+                  value={customerSearchQuery}
+                  onChange={(e) => setCustomerSearchQuery(e.target.value)}
+                  className="text-xs h-8"
+                />
+                <select
+                  value={linkEmployeeForm.customerId}
+                  onChange={(e) =>
+                    setLinkEmployeeForm((f) => ({ ...f, customerId: e.target.value }))
+                  }
+                  required
+                  className="w-full h-9 rounded-md border border-border bg-background px-3 text-xs"
+                >
+                  <option value="">Selecciona un cliente…</option>
+                  {existingCustomers
+                    .filter((c) => {
+                      if (!customerSearchQuery.trim()) return true;
+                      const q = customerSearchQuery.toLowerCase();
+                      return (
+                        c.displayName?.toLowerCase().includes(q) ||
+                        c.phone?.toLowerCase().includes(q) ||
+                        c.email?.toLowerCase().includes(q)
+                      );
+                    })
+                    .slice(0, 50)
+                    .map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.displayName || "Sin nombre"} {c.phone ? `(${c.phone})` : ""}{" "}
+                        {c.email ? `— ${c.email}` : ""}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <Label className="text-xs font-semibold">Nombre Completo *</Label>
+                  <Input
+                    required
+                    placeholder="Ej. Roberto Sánchez"
+                    value={linkEmployeeForm.newCustomerName}
+                    onChange={(e) =>
+                      setLinkEmployeeForm((f) => ({ ...f, newCustomerName: e.target.value }))
+                    }
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-xs font-semibold">Correo Electrónico</Label>
+                    <Input
+                      type="email"
+                      placeholder="roberto@empresa.com"
+                      value={linkEmployeeForm.newCustomerEmail}
+                      onChange={(e) =>
+                        setLinkEmployeeForm((f) => ({ ...f, newCustomerEmail: e.target.value }))
+                      }
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs font-semibold">Teléfono</Label>
+                    <Input
+                      placeholder="+34 600 000 000"
+                      value={linkEmployeeForm.newCustomerPhone}
+                      onChange={(e) =>
+                        setLinkEmployeeForm((f) => ({ ...f, newCustomerPhone: e.target.value }))
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Workplace Assignment (Common to both modes) */}
+            <div className="space-y-3 pt-2 border-t border-border">
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <Label className="text-xs font-semibold">Sede de Entrega</Label>
+                  <select
+                    value={linkEmployeeForm.siteId}
+                    onChange={(e) =>
+                      setLinkEmployeeForm((f) => ({
+                        ...f,
+                        siteId: e.target.value,
+                        organizationalUnitId: "",
+                      }))
+                    }
+                    className="w-full h-9 rounded-md border border-border bg-background px-3 text-xs"
+                  >
+                    <option value="">Sede principal</option>
+                    {sites.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-xs font-semibold">
+                    {selectedCompany?.orgUnitLabel || "Departamento"}
+                  </Label>
+                  <select
+                    value={linkEmployeeForm.organizationalUnitId}
+                    onChange={(e) =>
+                      setLinkEmployeeForm((f) => ({
+                        ...f,
+                        organizationalUnitId: e.target.value,
+                      }))
+                    }
+                    className="w-full h-9 rounded-md border border-border bg-background px-3 text-xs"
+                  >
+                    <option value="">General / Sin asignar</option>
+                    {units
+                      .filter((u) => !linkEmployeeForm.siteId || u.siteId === linkEmployeeForm.siteId)
+                      .map((u) => (
+                        <option key={u.id} value={u.id}>
+                          {u.name}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">Ubicación Interna (Opcional)</Label>
+                <Input
+                  placeholder="Ej. Planta 1, Mesa 12…"
+                  value={linkEmployeeForm.internalLocation}
+                  onChange={(e) =>
+                    setLinkEmployeeForm((f) => ({ ...f, internalLocation: e.target.value }))
+                  }
+                  className="text-xs"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 pt-1">
+                <input
+                  type="checkbox"
+                  id="link-is-admin-chk"
+                  checked={linkEmployeeForm.isAdmin}
+                  onChange={(e) =>
+                    setLinkEmployeeForm((f) => ({ ...f, isAdmin: e.target.checked }))
+                  }
+                  className="size-4 rounded border-border"
+                />
+                <Label htmlFor="link-is-admin-chk" className="text-xs cursor-pointer">
+                  Otorgar rol de Administrador de Empresa (Gestión B2B)
+                </Label>
+              </div>
+            </div>
+
+            <DialogFooter className="pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowLinkEmployeeDialog(false)}
+              >
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={linkingEmployee}>
+                {linkingEmployee
+                  ? "Vinculando…"
+                  : linkEmployeeMode === "existing"
+                    ? "Vincular Empleado"
+                    : "Crear y Vincular"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* ==================== DIALOG: EDITAR VÍNCULO DE EMPLEADO ==================== */}
+      <Dialog
+        open={Boolean(editingMembership)}
+        onOpenChange={(open) => !open && setEditingMembership(null)}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Editar Vínculo de Empleado</DialogTitle>
+            <DialogDescription>
+              Modifica la sede, departamento o rol de {editingMembership?.displayName || "este empleado"}.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSaveMembership} className="space-y-3">
+            <div className="space-y-1">
+              <Label className="text-xs font-semibold">Sede</Label>
+              <select
+                value={editMembershipForm.siteId}
+                onChange={(e) =>
+                  setEditMembershipForm((f) => ({
+                    ...f,
+                    siteId: e.target.value,
+                    organizationalUnitId: "",
+                  }))
+                }
+                className="w-full h-9 rounded-md border border-border bg-background px-3 text-xs"
+              >
+                <option value="">Sede principal</option>
+                {sites.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-xs font-semibold">
+                {selectedCompany?.orgUnitLabel || "Departamento"}
+              </Label>
+              <select
+                value={editMembershipForm.organizationalUnitId}
+                onChange={(e) =>
+                  setEditMembershipForm((f) => ({
+                    ...f,
+                    organizationalUnitId: e.target.value,
+                  }))
+                }
+                className="w-full h-9 rounded-md border border-border bg-background px-3 text-xs"
+              >
+                <option value="">General / Sin asignar</option>
+                {units
+                  .filter((u) => !editMembershipForm.siteId || u.siteId === editMembershipForm.siteId)
+                  .map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {u.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-xs font-semibold">Ubicación Interna</Label>
+              <Input
+                placeholder="Ej. Planta 2, Despacho 4B…"
+                value={editMembershipForm.internalLocation}
+                onChange={(e) =>
+                  setEditMembershipForm((f) => ({ ...f, internalLocation: e.target.value }))
+                }
+                className="text-xs"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-1">
+              <input
+                type="checkbox"
+                id="edit-is-admin-chk"
+                checked={editMembershipForm.isAdmin}
+                onChange={(e) =>
+                  setEditMembershipForm((f) => ({ ...f, isAdmin: e.target.checked }))
+                }
+                className="size-4 rounded border-border"
+              />
+              <Label htmlFor="edit-is-admin-chk" className="text-xs cursor-pointer">
+                Rol Administrador de Empresa
+              </Label>
+            </div>
+
+            <DialogFooter className="pt-2">
+              <Button type="button" variant="outline" onClick={() => setEditingMembership(null)}>
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={savingMembership}>
+                {savingMembership ? "Guardando…" : "Guardar Cambios"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* UNIVERSAL ORDER INTAKE DRAWER (+ PEDIDO DESDE EMPRESA) */}
+      {/* ========================================================================= */}
+      <UniversalOrderIntakeDrawer
+        open={orderIntakeOpen}
+        onOpenChange={setOrderIntakeOpen}
+        preselectedCustomerId={orderIntakeTarget?.customerId}
+        preselectedCustomerName={orderIntakeTarget?.displayName || undefined}
+        preselectedDemandChannel="company"
+        preselectedCompanyId={selectedCompany?.id}
+        preselectedSiteId={orderIntakeTarget?.siteId || undefined}
+        preselectedOrganizationalUnitId={orderIntakeTarget?.organizationalUnitId || undefined}
+        onSuccess={() => {
+          toast.success("Pedido registrado con éxito desde la empresa");
+        }}
+      />
     </div>
   );
 }

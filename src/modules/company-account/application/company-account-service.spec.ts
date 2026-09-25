@@ -161,8 +161,63 @@ describe("CompanyAccountService (A2-B)", () => {
         }),
       ),
       listCompanyEmployees: vi.fn(async () => [mockEmployee]),
+      listCustomerCompanyMemberships: vi.fn(async () => [
+        {
+          membershipId: "mem-1",
+          customerId: "cust-1",
+          companyId: "comp-1",
+          companyName: "Acme Corp",
+          companyCode: "EC-ACME-01",
+          siteId: "site-1",
+          siteName: "Sede Principal",
+          organizationalUnitId: "unit-1",
+          organizationalUnitName: "Dirección",
+          internalLocation: "Planta 2",
+          isAdmin: false,
+          status: "active",
+          createdAt: "2026-08-22T10:00:00Z",
+        },
+      ]),
+      findActiveMembership: vi.fn(async (compId: string, custId: string) =>
+        compId === "comp-1" && custId === "cust-existing-active"
+          ? {
+              id: "mem-active",
+              tenantId: "tenant-eatclean",
+              companyId: "comp-1",
+              customerId: "cust-existing-active",
+              siteId: "site-1",
+              organizationalUnitId: "unit-1",
+              internalLocation: null,
+              isAdmin: false,
+              status: "active",
+            }
+          : null,
+      ),
+      createIndividualCustomer: vi.fn(async () => "cust-new-created"),
+      insertMembership: vi.fn(async (input: any) => ({
+        id: "mem-new",
+        tenantId: "tenant-eatclean",
+        companyId: input.companyId,
+        customerId: input.customerId,
+        siteId: input.siteId ?? null,
+        organizationalUnitId: input.organizationalUnitId ?? null,
+        internalLocation: input.internalLocation ?? null,
+        isAdmin: input.isAdmin ?? false,
+        status: "active",
+      })),
+      updateMembership: vi.fn(async (id: string, input: any) => ({
+        id,
+        tenantId: "tenant-eatclean",
+        companyId: "comp-1",
+        customerId: "cust-1",
+        siteId: input.siteId ?? "site-1",
+        organizationalUnitId: input.organizationalUnitId ?? "unit-1",
+        internalLocation: input.internalLocation ?? null,
+        isAdmin: input.isAdmin ?? false,
+        status: input.status ?? "active",
+      })),
+      unlinkMembership: vi.fn(async () => undefined),
       findMembershipForCustomer: vi.fn(async () => null),
-      insertMembership: vi.fn(),
       resolveDeliveryGroup: vi.fn(async () => "dg-1"),
     };
   });
@@ -367,13 +422,111 @@ describe("CompanyAccountService (A2-B)", () => {
     });
   });
 
-  describe("Company Employees roster", () => {
+  describe("Company Employees roster & membership management", () => {
     it("lists linked employees for a company", async () => {
       const employees = await CompanyAccountService.listCompanyEmployees(staffCtx(), "comp-1");
       expect(employees).toHaveLength(1);
       expect(employees[0].displayName).toBe("Alice Smith");
       expect(employees[0].siteName).toBe("Sede Principal");
       expect(employees[0].organizationalUnitName).toBe("Dirección");
+    });
+
+    it("links existing customer to company and logs audit", async () => {
+      const membership = await CompanyAccountService.linkCustomerToCompany(staffCtx(), {
+        companyId: "comp-1",
+        customerId: "cust-1",
+        siteId: "site-1",
+        organizationalUnitId: "unit-1",
+        internalLocation: "Despacho 4B",
+        isAdmin: true,
+      });
+
+      expect(membership.companyId).toBe("comp-1");
+      expect(membership.customerId).toBe("cust-1");
+      expect(AuditService.write).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          entityType: "company_employee",
+          action: "create",
+        }),
+      );
+    });
+
+    it("rejects linking customer if already an active member of the company", async () => {
+      await expect(
+        CompanyAccountService.linkCustomerToCompany(staffCtx(), {
+          companyId: "comp-1",
+          customerId: "cust-existing-active",
+          siteId: "site-1",
+          organizationalUnitId: "unit-1",
+        }),
+      ).rejects.toBeInstanceOf(DomainError);
+    });
+
+    it("creates a customer and links them to the company in one operation", async () => {
+      const result = await CompanyAccountService.createCustomerAndLinkToCompany(staffCtx(), {
+        companyId: "comp-1",
+        displayName: "Bob Jones",
+        email: "bob@acme.com",
+        phone: "+34611223344",
+        siteId: "site-1",
+        organizationalUnitId: "unit-1",
+      });
+
+      expect(result.customerId).toBe("cust-new-created");
+      expect(result.membership.companyId).toBe("comp-1");
+      expect(AuditService.write).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          entityType: "company_employee",
+          action: "create",
+        }),
+      );
+    });
+
+    it("updates employee membership and logs audit", async () => {
+      const updated = await CompanyAccountService.updateCompanyEmployeeMembership(
+        staffCtx(),
+        "comp-1",
+        "mem-1",
+        {
+          internalLocation: "Planta 3 - Sala A",
+          isAdmin: true,
+        },
+      );
+
+      expect(updated.id).toBe("mem-1");
+      expect(AuditService.write).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          entityType: "company_employee",
+          action: "update",
+        }),
+      );
+    });
+
+    it("unlinks an employee and logs audit", async () => {
+      await CompanyAccountService.unlinkCompanyEmployee(staffCtx(), "comp-1", "mem-1");
+
+      expect(repoMock.unlinkMembership).toHaveBeenCalledWith("mem-1");
+      expect(AuditService.write).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          entityType: "company_employee",
+          action: "archive",
+        }),
+      );
+    });
+
+    it("lists company memberships for a specific customer", async () => {
+      const memberships = await CompanyAccountService.listCustomerCompanyMemberships(
+        staffCtx(),
+        "cust-1",
+      );
+
+      expect(memberships).toHaveLength(1);
+      expect(memberships[0].companyName).toBe("Acme Corp");
+      expect(memberships[0].siteName).toBe("Sede Principal");
     });
   });
 });
