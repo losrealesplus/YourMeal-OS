@@ -33,6 +33,8 @@ describe("mapOrderToSummaryView", () => {
         qty: 2,
         comment: null,
         deleted_at: null,
+        unit_price: 10,
+        price_snapshot_status: "captured",
       },
     ] satisfies OrderItemRow[];
 

@@ -8,6 +8,8 @@ export type ProgramOrderItemInput = {
   dishId: string;
   dayDate: string;
   qty: number;
+  unitPrice?: number | null;
+  priceSnapshotStatus?: "captured" | "explicit_zero" | "historical_unavailable";
 };
 
 export type ProgramOrderInput = {
@@ -86,6 +88,14 @@ export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
         dish_id: item.dishId,
         day_date: item.dayDate,
         qty: item.qty,
+        unit_price: item.unitPrice ?? null,
+        price_snapshot_status:
+          item.priceSnapshotStatus ??
+          (item.unitPrice !== undefined && item.unitPrice !== null
+            ? item.unitPrice === 0
+              ? "explicit_zero"
+              : "captured"
+            : undefined),
       }));
 
       // TODO(HP-001): program_draft_order RPC pending migration.
