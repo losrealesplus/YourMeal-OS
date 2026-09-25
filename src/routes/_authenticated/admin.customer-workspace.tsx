@@ -6,7 +6,7 @@
  * Adheres strictly to Foundation Law 003 (UI consumes useCustomer/useOrder Facades only).
  */
 
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -74,8 +74,15 @@ export type CustomerWorkspaceSearch = {
 };
 
 export const Route = createFileRoute("/_authenticated/admin/customer-workspace")({
-  beforeLoad: ({ context }) => {
+  beforeLoad: ({ context, search }) => {
     assertCapabilityFromContext(context, "customers.read");
+    throw redirect({
+      to: "/admin/customers",
+      search: {
+        customerId: search.customerId,
+        tab: search.tab,
+      },
+    });
   },
   validateSearch: (search: Record<string, unknown>): CustomerWorkspaceSearch => ({
     customerId:

@@ -121,6 +121,51 @@ export type CompanyEmployeeRecord = {
   createdAt: string;
 };
 
+export type LinkCustomerToCompanyInput = {
+  companyId: string;
+  customerId: string;
+  siteId?: string | null;
+  organizationalUnitId?: string | null;
+  internalLocation?: string | null;
+  isAdmin?: boolean;
+};
+
+export type CreateCustomerAndLinkInput = {
+  companyId: string;
+  displayName: string;
+  email?: string | null;
+  phone?: string | null;
+  siteId?: string | null;
+  organizationalUnitId?: string | null;
+  internalLocation?: string | null;
+  isAdmin?: boolean;
+};
+
+export type UpdateMembershipInput = {
+  membershipId?: string;
+  siteId?: string | null;
+  organizationalUnitId?: string | null;
+  internalLocation?: string | null;
+  isAdmin?: boolean;
+  status?: string;
+};
+
+export type CustomerCompanyMembershipRecord = {
+  membershipId: string;
+  customerId: string;
+  companyId: string;
+  companyName: string;
+  companyCode: string;
+  siteId: string | null;
+  siteName: string | null;
+  organizationalUnitId: string | null;
+  organizationalUnitName: string | null;
+  internalLocation: string | null;
+  isAdmin: boolean;
+  status: string;
+  createdAt: string;
+};
+
 export function isValidCompanyCodeFormat(code: string): boolean {
   return /^[A-Z0-9][A-Z0-9-]{2,31}$/i.test(code.trim());
 }

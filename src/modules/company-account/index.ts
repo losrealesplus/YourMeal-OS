@@ -11,6 +11,10 @@ export type {
   UpdateSiteInput,
   UpdateOrganizationalUnitInput,
   CompanyEmployeeRecord,
+  LinkCustomerToCompanyInput,
+  CreateCustomerAndLinkInput,
+  UpdateMembershipInput,
+  CustomerCompanyMembershipRecord,
 } from "./domain/company-account";
 export { isValidCompanyCodeFormat } from "./domain/company-account";
 export { CompanyAccountService } from "./application/company-account-service";

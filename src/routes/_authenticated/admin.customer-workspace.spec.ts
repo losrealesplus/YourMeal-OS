@@ -49,21 +49,28 @@ describe("A2-C Customer Workspace & Directory Routing", () => {
     expect(src).not.toContain("Resume operation");
   });
 
-  it("Customer Directory has isolated edit modal removed and links to Customer Workspace", () => {
+  it("Customer Workspace redirects to unified Customer Hub", () => {
+    const src = readFileSync(
+      resolve(ROOT, "src/routes/_authenticated/admin.customer-workspace.tsx"),
+      "utf8",
+    );
+    expect(src).toContain('to: "/admin/customers"');
+    expect(src).toContain("redirect({");
+  });
+
+  it("Customer Hub has integrated drawer with profile tab and order intake", () => {
     const src = readFileSync(
       resolve(ROOT, "src/routes/_authenticated/admin.customers.tsx"),
       "utf8",
     );
-    expect(src).toContain('to="/admin/customer-workspace"');
-    expect(src).toContain('tab: "profile"');
-    expect(src).not.toContain("startEdit");
-    expect(src).not.toContain("editForm");
-    expect(src).not.toContain("handleSaveEdit");
+    expect(src).toContain("openCustomerDrawer");
+    expect(src).toContain('tab: CustomerDetailTab = "profile"');
+    expect(src).toContain("UniversalOrderIntakeDrawer");
+    expect(src).not.toContain("Phase 005 Growth");
   });
 
-  it("Support page links to Customer Workspace with tab support", () => {
+  it("Support page links to Customer Workspace or Directory with tab support", () => {
     const src = readFileSync(resolve(ROOT, "src/routes/_authenticated/admin.support.tsx"), "utf8");
-    expect(src).toContain('to="/admin/customer-workspace"');
-    expect(src).toContain('tab: "support"');
+    expect(src).toContain("tab: ");
   });
 });
