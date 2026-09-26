@@ -11,7 +11,7 @@ describe("CR-COST-03 — Cost Intelligence Cockpit (admin.cost-intelligence)", (
     expect(Route.options).toBeDefined();
   });
 
-  it("contains 4 operational tabs (Simulator, Anatomy, Anomalies, Decision History)", () => {
+  it("contains 4 operational tabs (Simulator, Anatomy, Scenarios, Decision History)", () => {
     const src = readFileSync(
       resolve(ROOT, "src/routes/_authenticated/admin.cost-intelligence.tsx"),
       "utf8",
@@ -19,7 +19,7 @@ describe("CR-COST-03 — Cost Intelligence Cockpit (admin.cost-intelligence)", (
 
     expect(src).toContain("Simulador de Escenarios (E9)");
     expect(src).toContain("Anatomía de Costes Live");
-    expect(src).toContain("Desviaciones & Anomalías");
+    expect(src).toContain("Escenarios Guardados");
     expect(src).toContain("Histórico de Decisiones");
   });
 

@@ -35,6 +35,20 @@ export class ProcurementCostService {
   ) {}
 
   /**
+   * Lists purchase invoices for the tenant.
+   */
+  async listInvoices(
+    ctx: ServiceContext,
+    limit = 50,
+  ): Promise<CalculatedPurchaseInvoice[]> {
+    assertTenant(ctx);
+    assertInventoryPermission(ctx);
+
+    const repo = this.repositoryFactory(ctx);
+    return await repo.listInvoices(ctx.tenantId, limit);
+  }
+
+  /**
    * Creates a calculated draft purchase invoice with prorated inbound costs.
    */
   async createDraftInvoice(

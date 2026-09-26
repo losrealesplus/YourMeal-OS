@@ -78,6 +78,10 @@ type CreateFormState = {
   description: string;
   price: string;
   cost: string;
+  laborCost: string;
+  energyCost: string;
+  packagingCost: string;
+  marginPct: string;
   kcal: string;
   weightG: string;
   prepMinutes: string;
@@ -93,6 +97,10 @@ const emptyCreateForm: CreateFormState = {
   description: "",
   price: "",
   cost: "",
+  laborCost: "0.00",
+  energyCost: "0.00",
+  packagingCost: "0.00",
+  marginPct: "65.0",
   kcal: "",
   weightG: "",
   prepMinutes: "",
@@ -108,6 +116,10 @@ type EditDishFormState = {
   description: string;
   price: string;
   cost: string;
+  laborCost: string;
+  energyCost: string;
+  packagingCost: string;
+  marginPct: string;
   kcal: string;
   weightG: string;
   prepMinutes: string;
@@ -127,6 +139,10 @@ function dishRowToEditForm(d: DishRow): EditDishFormState {
     description: d.description ?? "",
     price: d.price != null ? String(d.price) : "0",
     cost: d.cost != null ? String(d.cost) : "0",
+    laborCost: d.labor_cost != null ? String(d.labor_cost) : "0",
+    energyCost: d.energy_cost != null ? String(d.energy_cost) : "0",
+    packagingCost: d.packaging_cost != null ? String(d.packaging_cost) : "0",
+    marginPct: d.margin_pct != null ? String(d.margin_pct) : "0",
     kcal: d.kcal != null ? String(d.kcal) : "",
     weightG: d.weight_g != null ? String(d.weight_g) : "",
     prepMinutes: d.prep_minutes != null ? String(d.prep_minutes) : "",
@@ -201,6 +217,10 @@ function AdminDishesPage() {
         description: createForm.description.trim() || null,
         price: createForm.price ? Number(createForm.price) : 0,
         cost: createForm.cost ? Number(createForm.cost) : 0,
+        laborCost: createForm.laborCost ? Number(createForm.laborCost) : 0,
+        energyCost: createForm.energyCost ? Number(createForm.energyCost) : 0,
+        packagingCost: createForm.packagingCost ? Number(createForm.packagingCost) : 0,
+        marginPct: createForm.marginPct ? Number(createForm.marginPct) : 0,
         kcal: createForm.kcal ? Number(createForm.kcal) : null,
         weightG: createForm.weightG ? Number(createForm.weightG) : null,
         prepMinutes: createForm.prepMinutes ? Number(createForm.prepMinutes) : null,
@@ -246,6 +266,10 @@ function AdminDishesPage() {
         description: editForm.description.trim() || null,
         price: editForm.price ? Number(editForm.price) : 0,
         cost: editForm.cost ? Number(editForm.cost) : 0,
+        laborCost: editForm.laborCost ? Number(editForm.laborCost) : 0,
+        energyCost: editForm.energyCost ? Number(editForm.energyCost) : 0,
+        packagingCost: editForm.packagingCost ? Number(editForm.packagingCost) : 0,
+        marginPct: editForm.marginPct ? Number(editForm.marginPct) : 0,
         kcal: editForm.kcal ? Number(editForm.kcal) : null,
         weightG: editForm.weightG ? Number(editForm.weightG) : null,
         prepMinutes: editForm.prepMinutes ? Number(editForm.prepMinutes) : null,
@@ -404,12 +428,42 @@ function AdminDishesPage() {
     },
     {
       key: "price",
-      header: "Precio",
-      render: (r) => (
-        <span className="tabular-nums text-sm font-medium">
-          {Number(r.price ?? 0).toFixed(2)} €
-        </span>
-      ),
+      header: "PVP / Escandallo",
+      render: (r) => {
+        const rawCost = Number(r.cost ?? 0);
+        const overheads =
+          Number(r.labor_cost ?? 0) +
+          Number(r.energy_cost ?? 0) +
+          Number(r.packaging_cost ?? 0);
+        const totalCost = rawCost + overheads;
+        const pvp = Number(r.price ?? 0);
+        const marginPct = pvp > 0 ? ((pvp - totalCost) / pvp) * 100 : 0;
+        return (
+          <div className="space-y-0.5 tabular-nums">
+            <div className="font-semibold text-sm">{pvp.toFixed(2)} €</div>
+            <div className="text-[11px] text-muted-foreground">
+              Coste: <span className="font-medium text-foreground">{totalCost.toFixed(2)} €</span>
+              {overheads > 0 && (
+                <span className="text-[10px] text-muted-foreground ml-1">
+                  ({rawCost.toFixed(2)}€ + {overheads.toFixed(2)}€ ovh)
+                </span>
+              )}
+            </div>
+            <div className="pt-0.5">
+              <Badge
+                variant={marginPct >= 60 ? "outline" : "destructive"}
+                className={cn(
+                  "text-[10px] px-1 py-0 font-medium",
+                  marginPct >= 60 &&
+                    "text-emerald-700 dark:text-emerald-400 border-emerald-500/40 bg-emerald-500/10",
+                )}
+              >
+                Margen: {marginPct.toFixed(1)}%
+              </Badge>
+            </div>
+          </div>
+        );
+      },
     },
     {
       key: "actions",
@@ -613,7 +667,7 @@ function AdminDishesPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="dish-cost">Coste (€)</Label>
+                <Label htmlFor="dish-cost">Coste Materia Prima (€)</Label>
                 <Input
                   id="dish-cost"
                   type="number"
@@ -622,6 +676,55 @@ function AdminDishesPage() {
                   placeholder="0.00"
                   value={createForm.cost}
                   onChange={(e) => setCreateForm((f) => ({ ...f, cost: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="dish-labor">Mano de Obra (€ / rac)</Label>
+                <Input
+                  id="dish-labor"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={createForm.laborCost}
+                  onChange={(e) => setCreateForm((f) => ({ ...f, laborCost: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="dish-energy">Energía (€ / rac)</Label>
+                <Input
+                  id="dish-energy"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={createForm.energyCost}
+                  onChange={(e) => setCreateForm((f) => ({ ...f, energyCost: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="dish-pack">Packaging (€ / rac)</Label>
+                <Input
+                  id="dish-pack"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={createForm.packagingCost}
+                  onChange={(e) => setCreateForm((f) => ({ ...f, packagingCost: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="dish-margin">Margen Objetivo (%)</Label>
+                <Input
+                  id="dish-margin"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  placeholder="65.0"
+                  value={createForm.marginPct}
+                  onChange={(e) => setCreateForm((f) => ({ ...f, marginPct: e.target.value }))}
                 />
               </div>
               <div className="space-y-1.5">
@@ -814,7 +917,7 @@ function AdminDishesPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="edit-cost">Coste (€)</Label>
+                  <Label htmlFor="edit-cost">Coste Materia Prima (€)</Label>
                   <Input
                     id="edit-cost"
                     type="number"
@@ -823,6 +926,59 @@ function AdminDishesPage() {
                     value={editForm.cost}
                     onChange={(e) =>
                       setEditForm((f) => (f ? { ...f, cost: e.target.value } : null))
+                    }
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-labor">Mano de Obra (€ / rac)</Label>
+                  <Input
+                    id="edit-labor"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={editForm.laborCost}
+                    onChange={(e) =>
+                      setEditForm((f) => (f ? { ...f, laborCost: e.target.value } : null))
+                    }
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-energy">Energía (€ / rac)</Label>
+                  <Input
+                    id="edit-energy"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={editForm.energyCost}
+                    onChange={(e) =>
+                      setEditForm((f) => (f ? { ...f, energyCost: e.target.value } : null))
+                    }
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-pack">Packaging (€ / rac)</Label>
+                  <Input
+                    id="edit-pack"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={editForm.packagingCost}
+                    onChange={(e) =>
+                      setEditForm((f) => (f ? { ...f, packagingCost: e.target.value } : null))
+                    }
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-margin">Margen Objetivo (%)</Label>
+                  <Input
+                    id="edit-margin"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={editForm.marginPct}
+                    onChange={(e) =>
+                      setEditForm((f) => (f ? { ...f, marginPct: e.target.value } : null))
                     }
                   />
                 </div>

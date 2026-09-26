@@ -20,7 +20,9 @@ export type OperationsDepartmentId =
   | "support"
   | "audit"
   | "settings"
-  | "commercial";
+  | "commercial"
+  | "cost_intelligence"
+  | "purchasing";
 
 export type OperationsDepartment = {
   id: OperationsDepartmentId;
@@ -51,6 +53,16 @@ const DEPARTMENT_CATALOG: readonly OperationsDepartment[] = [
     path: "/admin/inventory",
     labelKey: "ops.nav.inventory",
     moduleFlag: PILOT_ADMIN_MODULE_FLAGS.inventory,
+  },
+  {
+    id: "purchasing",
+    path: "/admin/purchasing",
+    labelKey: "purchasing",
+  },
+  {
+    id: "cost_intelligence",
+    path: "/admin/cost-intelligence",
+    labelKey: "costIntelligence",
   },
   {
     id: "customers",
@@ -126,6 +138,18 @@ function mayAccessDepartment(
       );
     case "stock":
       return can(roles, "inventory.operate") || admin;
+    case "purchasing":
+      return (
+        can(roles, "purchasing.operate") ||
+        can(roles, "inventory.operate") ||
+        admin
+      );
+    case "cost_intelligence":
+      return (
+        can(roles, "inventory.operate") ||
+        can(roles, "accounting.operate") ||
+        admin
+      );
     case "customers":
       return can(roles, "customers.read") || admin;
     case "support":

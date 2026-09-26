@@ -705,6 +705,10 @@ export type Database = {
           allergens: string[]
           category_id: string
           cost: number
+          labor_cost: number | null
+          energy_cost: number | null
+          packaging_cost: number | null
+          margin_pct: number | null
           created_at: string
           deleted_at: string | null
           deleted_by: string | null
@@ -728,6 +732,10 @@ export type Database = {
           allergens?: string[]
           category_id?: string
           cost?: number
+          labor_cost?: number | null
+          energy_cost?: number | null
+          packaging_cost?: number | null
+          margin_pct?: number | null
           created_at?: string
           deleted_at?: string | null
           deleted_by?: string | null
@@ -751,6 +759,10 @@ export type Database = {
           allergens?: string[]
           category_id?: string
           cost?: number
+          labor_cost?: number | null
+          energy_cost?: number | null
+          packaging_cost?: number | null
+          margin_pct?: number | null
           created_at?: string
           deleted_at?: string | null
           deleted_by?: string | null

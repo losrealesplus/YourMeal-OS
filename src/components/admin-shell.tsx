@@ -30,6 +30,7 @@ import {
   Shield,
   ScrollText,
   FlaskConical,
+  TrendingUp,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
@@ -184,8 +185,16 @@ export function AdminShell({ children }: { children: ReactNode }) {
       labelKey: "purchasing",
       icon: ShoppingCart,
       visible:
-        (can("purchasing.operate") || showAllOps) &&
-        moduleFlags[PILOT_ADMIN_MODULE_FLAGS.purchasing],
+        can("purchasing.operate") ||
+        can("inventory.operate") ||
+        showAllOps ||
+        Boolean(moduleFlags[PILOT_ADMIN_MODULE_FLAGS.purchasing]),
+    },
+    {
+      to: "/admin/cost-intelligence",
+      labelKey: "costIntelligence",
+      icon: TrendingUp,
+      visible: can("inventory.operate") || can("accounting.operate") || showAllOps,
     },
     {
       to: "/admin/reports",
@@ -254,15 +263,19 @@ export function AdminShell({ children }: { children: ReactNode }) {
                           ? "Empresas"
                           : item.labelKey === "commercial"
                             ? "Resumen comercial"
-                            : item.labelKey === "users"
-                              ? "Usuarios"
-                              : item.labelKey === "branding"
-                                ? "Marca"
-                                : item.labelKey === "audit"
-                                  ? "Auditoría"
-                                  : item.labelKey === "support"
-                                    ? "Atención al cliente"
-                                    : undefined,
+                            : item.labelKey === "purchasing"
+                              ? "Compras"
+                              : item.labelKey === "costIntelligence"
+                                ? "Cost Intelligence"
+                                : item.labelKey === "users"
+                                  ? "Usuarios"
+                                  : item.labelKey === "branding"
+                                    ? "Marca"
+                                    : item.labelKey === "audit"
+                                      ? "Auditoría"
+                                      : item.labelKey === "support"
+                                        ? "Atención al cliente"
+                                        : undefined,
       }),
     });
     return (

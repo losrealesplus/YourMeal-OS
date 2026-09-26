@@ -52,6 +52,10 @@ export type DishCreateInput = {
   macros?: Record<string, unknown>;
   cost?: number;
   price?: number;
+  laborCost?: number;
+  energyCost?: number;
+  packagingCost?: number;
+  marginPct?: number;
   prepMinutes?: number | null;
   prepInstructions?: string | null;
   allergens?: string[];

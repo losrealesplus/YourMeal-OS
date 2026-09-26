@@ -21,6 +21,8 @@ import {
   FileText,
   CalendarDays,
   Activity,
+  TrendingUp,
+  ShoppingCart,
   type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
@@ -76,6 +78,8 @@ const DEPARTMENT_ICONS: Record<OperationsDepartmentId, LucideIcon> = {
   kitchen: ChefHat,
   delivery: Truck,
   stock: Boxes,
+  purchasing: ShoppingCart,
+  cost_intelligence: TrendingUp,
   customers: Users,
   support: LifeBuoy,
   commercial: LineChart,
@@ -180,6 +184,15 @@ function OpsCenterHome() {
   const canReadOrders = useMemo(() => can("orders.read"), [can]);
   const canWriteOrders = useMemo(
     () => can("orders.write") || can("orders.manage") || roles.includes("company_admin") || roles.includes("operations_manager"),
+    [can, roles],
+  );
+  const showCostIntel = useMemo(
+    () =>
+      can("inventory.operate") ||
+      can("accounting.operate") ||
+      roles.includes("operations_manager") ||
+      roles.includes("company_admin") ||
+      can("saas.manage"),
     [can, roles],
   );
   const canReadSupport = useMemo(() => can("support.read"), [can]);
@@ -370,6 +383,15 @@ function OpsCenterHome() {
               <Link to="/admin/customers">
                 <Users className="h-4 w-4" />
                 Clientes
+              </Link>
+            </Button>
+          )}
+
+          {showCostIntel && (
+            <Button asChild variant="outline" size="sm" className="gap-1.5">
+              <Link to="/admin/cost-intelligence">
+                <TrendingUp className="h-4 w-4" />
+                Cost Intelligence
               </Link>
             </Button>
           )}

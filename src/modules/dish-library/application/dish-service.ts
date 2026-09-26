@@ -19,6 +19,10 @@ function toInsert(tenantId: string, input: DishCreateInput): TablesInsert<"dishe
     macros: (input.macros ?? {}) as Json,
     cost: input.cost ?? 0,
     price: input.price ?? 0,
+    labor_cost: input.laborCost ?? 0,
+    energy_cost: input.energyCost ?? 0,
+    packaging_cost: input.packagingCost ?? 0,
+    margin_pct: input.marginPct ?? 0,
     prep_minutes: input.prepMinutes ?? null,
     prep_instructions: input.prepInstructions ?? null,
     allergens: input.allergens ?? [],
@@ -85,6 +89,10 @@ export const DishService = {
     if (input.macros !== undefined) patch.macros = input.macros as Json;
     if (input.cost !== undefined) patch.cost = input.cost;
     if (input.price !== undefined) patch.price = input.price;
+    if (input.laborCost !== undefined) patch.labor_cost = input.laborCost;
+    if (input.energyCost !== undefined) patch.energy_cost = input.energyCost;
+    if (input.packagingCost !== undefined) patch.packaging_cost = input.packagingCost;
+    if (input.marginPct !== undefined) patch.margin_pct = input.marginPct;
     if (input.prepMinutes !== undefined) patch.prep_minutes = input.prepMinutes;
     if (input.prepInstructions !== undefined) {
       patch.prep_instructions = input.prepInstructions;
