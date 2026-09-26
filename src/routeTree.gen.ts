@@ -27,6 +27,7 @@ import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminBrandingRouteImport } from './routes/_authenticated/admin.branding'
 import { Route as AuthenticatedAdminCommercialRouteImport } from './routes/_authenticated/admin.commercial'
 import { Route as AuthenticatedAdminCompaniesRouteImport } from './routes/_authenticated/admin.companies'
+import { Route as AuthenticatedAdminCostIntelligenceRouteImport } from './routes/_authenticated/admin.cost-intelligence'
 import { Route as AuthenticatedAdminCustomerWorkspaceRouteImport } from './routes/_authenticated/admin.customer-workspace'
 import { Route as AuthenticatedAdminCustomersRouteImport } from './routes/_authenticated/admin.customers'
 import { Route as AuthenticatedAdminDeliveryRouteImport } from './routes/_authenticated/admin.delivery'
@@ -194,6 +195,12 @@ const AuthenticatedAdminCompaniesRoute =
   AuthenticatedAdminCompaniesRouteImport.update({
     id: '/companies',
     path: '/companies',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminCostIntelligenceRoute =
+  AuthenticatedAdminCostIntelligenceRouteImport.update({
+    id: '/cost-intelligence',
+    path: '/cost-intelligence',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminCustomerWorkspaceRoute =
@@ -655,6 +662,7 @@ export interface FileRoutesByFullPath {
   '/admin/branding': typeof AuthenticatedAdminBrandingRoute
   '/admin/commercial': typeof AuthenticatedAdminCommercialRoute
   '/admin/companies': typeof AuthenticatedAdminCompaniesRoute
+  '/admin/cost-intelligence': typeof AuthenticatedAdminCostIntelligenceRoute
   '/admin/customer-workspace': typeof AuthenticatedAdminCustomerWorkspaceRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/admin/delivery': typeof AuthenticatedAdminDeliveryRoute
@@ -746,6 +754,7 @@ export interface FileRoutesByTo {
   '/admin/branding': typeof AuthenticatedAdminBrandingRoute
   '/admin/commercial': typeof AuthenticatedAdminCommercialRoute
   '/admin/companies': typeof AuthenticatedAdminCompaniesRoute
+  '/admin/cost-intelligence': typeof AuthenticatedAdminCostIntelligenceRoute
   '/admin/customer-workspace': typeof AuthenticatedAdminCustomerWorkspaceRoute
   '/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/admin/delivery': typeof AuthenticatedAdminDeliveryRoute
@@ -838,6 +847,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/branding': typeof AuthenticatedAdminBrandingRoute
   '/_authenticated/admin/commercial': typeof AuthenticatedAdminCommercialRoute
   '/_authenticated/admin/companies': typeof AuthenticatedAdminCompaniesRoute
+  '/_authenticated/admin/cost-intelligence': typeof AuthenticatedAdminCostIntelligenceRoute
   '/_authenticated/admin/customer-workspace': typeof AuthenticatedAdminCustomerWorkspaceRoute
   '/_authenticated/admin/customers': typeof AuthenticatedAdminCustomersRoute
   '/_authenticated/admin/delivery': typeof AuthenticatedAdminDeliveryRoute
@@ -934,6 +944,7 @@ export interface FileRouteTypes {
     | '/admin/branding'
     | '/admin/commercial'
     | '/admin/companies'
+    | '/admin/cost-intelligence'
     | '/admin/customer-workspace'
     | '/admin/customers'
     | '/admin/delivery'
@@ -1025,6 +1036,7 @@ export interface FileRouteTypes {
     | '/admin/branding'
     | '/admin/commercial'
     | '/admin/companies'
+    | '/admin/cost-intelligence'
     | '/admin/customer-workspace'
     | '/admin/customers'
     | '/admin/delivery'
@@ -1116,6 +1128,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/branding'
     | '/_authenticated/admin/commercial'
     | '/_authenticated/admin/companies'
+    | '/_authenticated/admin/cost-intelligence'
     | '/_authenticated/admin/customer-workspace'
     | '/_authenticated/admin/customers'
     | '/_authenticated/admin/delivery'
@@ -1331,6 +1344,13 @@ declare module '@tanstack/react-router' {
       path: '/companies'
       fullPath: '/admin/companies'
       preLoaderRoute: typeof AuthenticatedAdminCompaniesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/cost-intelligence': {
+      id: '/_authenticated/admin/cost-intelligence'
+      path: '/cost-intelligence'
+      fullPath: '/admin/cost-intelligence'
+      preLoaderRoute: typeof AuthenticatedAdminCostIntelligenceRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/customer-workspace': {
@@ -1948,6 +1968,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminBrandingRoute: typeof AuthenticatedAdminBrandingRoute
   AuthenticatedAdminCommercialRoute: typeof AuthenticatedAdminCommercialRoute
   AuthenticatedAdminCompaniesRoute: typeof AuthenticatedAdminCompaniesRoute
+  AuthenticatedAdminCostIntelligenceRoute: typeof AuthenticatedAdminCostIntelligenceRoute
   AuthenticatedAdminCustomerWorkspaceRoute: typeof AuthenticatedAdminCustomerWorkspaceRoute
   AuthenticatedAdminCustomersRoute: typeof AuthenticatedAdminCustomersRoute
   AuthenticatedAdminDeliveryRoute: typeof AuthenticatedAdminDeliveryRoute
@@ -1985,6 +2006,8 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminBrandingRoute: AuthenticatedAdminBrandingRoute,
   AuthenticatedAdminCommercialRoute: AuthenticatedAdminCommercialRoute,
   AuthenticatedAdminCompaniesRoute: AuthenticatedAdminCompaniesRoute,
+  AuthenticatedAdminCostIntelligenceRoute:
+    AuthenticatedAdminCostIntelligenceRoute,
   AuthenticatedAdminCustomerWorkspaceRoute:
     AuthenticatedAdminCustomerWorkspaceRoute,
   AuthenticatedAdminCustomersRoute: AuthenticatedAdminCustomersRoute,
