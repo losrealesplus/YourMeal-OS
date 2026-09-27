@@ -1024,6 +1024,12 @@ export function EconomicCommandCenter({
         open={isInquiryOpen}
         onOpenChange={setIsInquiryOpen}
         marketProducts={marketProducts}
+        tenantId={tenantId}
+        userId={userId}
+        userName={userName}
+        onSaveInquiry={async () => {
+          if (onRefreshData) await onRefreshData();
+        }}
       />
 
       {editingDish && (
