@@ -3,7 +3,7 @@
  * Bundled resources mirror tenant instance commercial configuration when deployed.
  */
 import commercialJson from "./resources/commercial.json";
-import { brandConfig } from "./brand-config";
+import brandJson from "./resources/brand.json";
 import { registerTenantOffers } from "@/modules/commercial";
 import type { CommercialOffer } from "@/modules/commercial";
 import "@tenant-commercial";
@@ -15,8 +15,8 @@ export const bundledCommercialOffers: CommercialOffer[] =
  * Initialize bundled commercial offers for the active tenant build.
  */
 export function initializeBundledCommercialOffers(): void {
-  if (brandConfig?.slug && bundledCommercialOffers.length > 0) {
-    registerTenantOffers(brandConfig.slug, bundledCommercialOffers);
+  if (brandJson?.slug && bundledCommercialOffers.length > 0) {
+    registerTenantOffers(brandJson.slug, bundledCommercialOffers);
   }
 }
 

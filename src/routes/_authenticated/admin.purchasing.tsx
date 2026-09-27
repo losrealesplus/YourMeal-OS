@@ -30,6 +30,8 @@ import type {
   CalculatedPurchaseInvoice,
 } from "@/modules/cost-intelligence/domain/procurement-types";
 import type { ProrationMethod } from "@/modules/cost-intelligence/domain/types";
+import { MarketBenchmarkBadge } from "@/modules/market-intelligence/presentation/components/MarketBenchmarkBadge";
+import { useMarketIntelligence } from "@/modules/market-intelligence/presentation/hooks/use-market-intelligence";
 import { AdminHeader, DataTable, PanelCard, SectionTitle, StatusChip } from "@/components/admin";
 import type { Column } from "@/components/admin/data-table";
 import { Button } from "@/components/ui/button";
@@ -106,6 +108,7 @@ const emptyLineItem: FormLineItem = {
 export function AdminPurchasingPage() {
   const { user, tenantId, roles } = useAuth();
   const { can } = useCan();
+  const { benchmarksByIngredient, mappings } = useMarketIntelligence(tenantId);
   const [invoices, setInvoices] = useState<CalculatedPurchaseInvoice[]>([]);
   const [suppliers, setSuppliers] = useState<SupplierOption[]>([]);
   const [ingredients, setIngredients] = useState<IngredientOption[]>([]);
@@ -792,26 +795,40 @@ export function AdminPurchasingPage() {
               <div>
                 <h4 className="font-semibold mb-2">Líneas con Coste de Adquisición Prorrateado:</h4>
                 <div className="space-y-1.5">
-                  {selectedInvoice.items.map((it) => (
-                    <div
-                      key={it.id}
-                      className="p-2.5 bg-background border rounded flex justify-between items-center"
-                    >
-                      <div>
-                        <p className="font-semibold">{it.itemName}</p>
-                        <p className="text-[11px] text-muted-foreground">
-                          {it.quantity} {it.unit} @ {Number(it.unitPrice).toFixed(4)} €/u
-                          {it.allocatedOverhead > 0 && ` (+${it.allocatedOverhead.toFixed(2)} € flete)`}
-                        </p>
+                  {selectedInvoice.items.map((it) => {
+                    const benchmarkCalc = benchmarksByIngredient.get(it.itemId);
+                    const isMapped = mappings.some((m) => m.tenantIngredientId === it.itemId);
+
+                    return (
+                      <div
+                        key={it.id}
+                        className="p-2.5 bg-background border rounded flex justify-between items-center"
+                      >
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <p className="font-semibold">{it.itemName}</p>
+                            <MarketBenchmarkBadge
+                              benchmarkPriceExTax={benchmarkCalc?.benchmarkPriceExTax}
+                              effectiveWacExTax={it.effectiveUnitCost}
+                              unit={it.unit}
+                              comparabilityGrade={benchmarkCalc?.components[0]?.comparabilityGrade}
+                              isMapped={isMapped}
+                            />
+                          </div>
+                          <p className="text-[11px] text-muted-foreground">
+                            {it.quantity} {it.unit} @ {Number(it.unitPrice).toFixed(4)} €/u
+                            {it.allocatedOverhead > 0 && ` (+${it.allocatedOverhead.toFixed(2)} € flete)`}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-sm">{Number(it.lineTotal).toFixed(2)} €</p>
+                          <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                            WAC unitario: {Number(it.effectiveUnitCost).toFixed(4)} €/{it.unit}
+                          </p>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-bold text-sm">{Number(it.lineTotal).toFixed(2)} €</p>
-                        <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
-                          WAC unitario: {Number(it.effectiveUnitCost).toFixed(4)} €/{it.unit}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>

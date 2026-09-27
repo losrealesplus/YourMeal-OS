@@ -24,7 +24,12 @@ import {
   Filter,
   RefreshCw,
   FolderOpen,
+  Sparkles,
+  Layers,
 } from "lucide-react";
+import { MarketIntelligenceTab } from "@/modules/market-intelligence/presentation/components/MarketIntelligenceTab";
+import { EconomicCommandCenter } from "@/modules/market-intelligence/presentation/components/EconomicCommandCenter";
+import { IndirectCostQuickEditModal } from "@/modules/market-intelligence/presentation/components/IndirectCostQuickEditModal";
 import { useAuth } from "@/hooks/use-auth";
 import { useCan } from "@/hooks/use-can";
 import { supabase } from "@/integrations/supabase/client";
@@ -104,7 +109,7 @@ function formatPercent(pct: number): string {
 export function CostIntelligenceCockpitPage() {
   const { user, tenantId, roles } = useAuth();
   const { can } = useCan();
-  const [activeTab, setActiveTab] = useState<"simulator" | "anatomy" | "anomalies" | "history" | "scenarios">("simulator");
+  const [activeTab, setActiveTab] = useState<"command_center" | "simulator" | "anatomy" | "anomalies" | "history" | "scenarios" | "market_intelligence">("command_center");
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
 
@@ -115,6 +120,18 @@ export function CostIntelligenceCockpitPage() {
   const [savedScenarios, setSavedScenarios] = useState<CostSimulationScenarioRecord[]>([]);
   const [savedIntents, setSavedIntents] = useState<CostDecisionIntentRecord[]>([]);
   const [activeScenarioId, setActiveScenarioId] = useState<string | null>(null);
+
+  // In-situ Overhead Micro-Editor State
+  const [editingDish, setEditingDish] = useState<FoodDishRecord | null>(null);
+
+  // Market Intelligence Simulation Hypothesis State
+  const [activeHypothesis, setActiveHypothesis] = useState<{
+    ingredientId: string;
+    ingredientName: string;
+    baseCost: number;
+    simulatedPrice: number;
+    deltaPct: number;
+  } | null>(null);
 
   // Cockpit Controls State
   const [preset, setPreset] = useState<ScenarioPresetType>("supplier_hike");
@@ -251,7 +268,12 @@ export function CostIntelligenceCockpitPage() {
   const hypotheticalVariables: HypotheticalVariables = useMemo(() => {
     const itemDeltas: Record<string, number> = {};
     liveIngredients.forEach((ing) => {
-      itemDeltas[ing.id] = rawMaterialInflationPct / 100;
+      if (activeHypothesis && activeHypothesis.ingredientId === ing.id) {
+        // Deterministic market intelligence benchmark hypothesis delta
+        itemDeltas[ing.id] = (activeHypothesis.simulatedPrice - ing.cost) / (ing.cost || 1);
+      } else {
+        itemDeltas[ing.id] = rawMaterialInflationPct / 100;
+      }
     });
 
     return {
@@ -261,7 +283,7 @@ export function CostIntelligenceCockpitPage() {
         laborRateDeltaPct: laborInflationPct / 100,
       },
     };
-  }, [liveIngredients, rawMaterialInflationPct, energyInflationPct, laborInflationPct]);
+  }, [liveIngredients, rawMaterialInflationPct, energyInflationPct, laborInflationPct, activeHypothesis]);
 
   // Pure E9 Simulation Engine Execution (Zero operational mutations)
   const simulationResult: ScenarioResult = useMemo(() => {
@@ -433,9 +455,9 @@ export function CostIntelligenceCockpitPage() {
       />
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Cost Intelligence Cockpit</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Cockpit de Inteligencia de Costes</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Simulación económica What-If (E9), análisis de escandallos WAC y registro de decisiones de gestión.
+            Simulación de escenarios económicos (E9), análisis de escandallos con WAC real y registro de decisiones de gestión.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -463,6 +485,18 @@ export function CostIntelligenceCockpitPage() {
       {/* Primary Navigation Tabs */}
       <div className="flex border-b border-border gap-2 overflow-x-auto text-xs">
         <button
+          onClick={() => setActiveTab("command_center")}
+          className={cn(
+            "px-4 py-2 font-medium border-b-2 transition-colors flex items-center gap-2 shrink-0",
+            activeTab === "command_center"
+              ? "border-primary text-primary font-bold"
+              : "border-transparent text-muted-foreground hover:text-foreground",
+          )}
+        >
+          <Sparkles className="h-4 w-4 text-indigo-500" />
+          Centro de Decisión Económica (v4.1)
+        </button>
+        <button
           onClick={() => setActiveTab("simulator")}
           className={cn(
             "px-4 py-2 font-medium border-b-2 transition-colors flex items-center gap-2 shrink-0",
@@ -484,7 +518,7 @@ export function CostIntelligenceCockpitPage() {
           )}
         >
           <PieChart className="h-4 w-4" />
-          Anatomía de Costes Live ({liveDishes.length} platos)
+          Anatomía de Costes [REAL] ({liveDishes.length} platos)
         </button>
         <button
           onClick={() => setActiveTab("scenarios")}
@@ -496,7 +530,7 @@ export function CostIntelligenceCockpitPage() {
           )}
         >
           <FolderOpen className="h-4 w-4" />
-          Escenarios Guardados ({savedScenarios.length})
+          Escenarios Guardados [SIMULADO] ({savedScenarios.length})
         </button>
         <button
           onClick={() => setActiveTab("history")}
@@ -510,22 +544,106 @@ export function CostIntelligenceCockpitPage() {
           <History className="h-4 w-4" />
           Histórico de Decisiones ({savedIntents.length})
         </button>
+        <button
+          onClick={() => setActiveTab("market_intelligence")}
+          className={cn(
+            "px-4 py-2 font-medium border-b-2 transition-colors flex items-center gap-2 shrink-0",
+            activeTab === "market_intelligence"
+              ? "border-primary text-primary"
+              : "border-transparent text-muted-foreground hover:text-foreground",
+          )}
+        >
+          <Layers className="h-4 w-4 text-indigo-500" />
+          Fuentes y Mappings de Mercado
+        </button>
       </div>
+
+      {/* TAB 0: ECONOMIC COMMAND CENTER (CR-COST-05 v4.1 PRIMARY DECISION SURFACE) */}
+      {activeTab === "command_center" && tenantId && (
+        <EconomicCommandCenter
+          tenantId={tenantId}
+          tenantName={user?.user_metadata?.company_name || "Restaurante"}
+          userId={user?.id}
+          userName={user?.email || "Gerente"}
+          ingredients={liveIngredients.map((ing) => ({
+            id: ing.id,
+            name: ing.name,
+            unit: ing.unit,
+            cost: Number(ing.cost || 0),
+            annualVolume:
+              ing.name.toLowerCase().includes("pollo") || ing.name.toLowerCase().includes("pechuga") || ing.name.toLowerCase().includes("harina") ? 1200 :
+              ing.name.toLowerCase().includes("aceite") ? 600 :
+              ing.name.toLowerCase().includes("arroz") ? 800 : undefined,
+          }))}
+          dishes={liveDishes.map((d) => ({
+            id: d.id,
+            name: d.name,
+            price: Number(d.price || 0),
+            cost: (d.laborCost || 0) + (d.energyCost || 0) + (d.packagingCost || 0) + 2.50,
+            laborCost: Number(d.laborCost || 0),
+            energyCost: Number(d.energyCost || 0),
+            packagingCost: Number(d.packagingCost || 0),
+            monthlyVolume: 400,
+            recipeIngredients: liveRecipes
+              .filter((r) => r.dishId === d.id)
+              .map((r) => ({ ingredientId: r.ingredientId, amount: r.amount })),
+          }))}
+          onRefreshData={reloadData}
+          onOpenMacroSimulator={() => setActiveTab("simulator")}
+        />
+      )}
 
       {/* TAB 1: SIMULADOR DE ESCENARIOS */}
       {activeTab === "simulator" && (
         <div className="space-y-6">
+          {/* Active Simulation Hypothesis Banner */}
+          {activeHypothesis && (
+            <div className="p-4 rounded-xl border border-indigo-200 bg-indigo-50/70 text-indigo-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-3">
+                <span className="p-2 rounded-lg bg-indigo-600 text-white font-bold text-xs uppercase tracking-wider">
+                  HIPÓTESIS
+                </span>
+                <div>
+                  <div className="font-bold text-sm flex items-center gap-2">
+                    <span>Simulación con Benchmark de Mercado: {activeHypothesis.ingredientName}</span>
+                    <Badge variant="outline" className="text-[10px] bg-white text-indigo-700 border-indigo-300">
+                      {activeHypothesis.deltaPct > 0 ? "+" : ""}{activeHypothesis.deltaPct.toFixed(1)}% vs WAC
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-indigo-700/90 mt-0.5">
+                    Precio proyectado: {activeHypothesis.simulatedPrice.toFixed(2)} € (Base WAC: {activeHypothesis.baseCost.toFixed(2)} €). Hipótesis en memoria determinista; no altera costes reales de compra ni facturas.
+                  </p>
+                </div>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setActiveHypothesis(null);
+                  toast.info("Hipótesis revertida a Coste Real WAC.");
+                }}
+                className="text-xs font-semibold bg-white border-indigo-200 hover:bg-indigo-100 text-indigo-800 shrink-0"
+              >
+                <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+                Revertir a Coste Real (Deshacer)
+              </Button>
+            </div>
+          )}
+
           {/* Executive KPI Summary Bar */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <PanelCard className="p-4 bg-muted/30">
-              <div className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
-                Coste Mensual Simulado
+              <div className="flex items-center justify-between text-xs text-muted-foreground uppercase font-semibold tracking-wider">
+                <span>Coste Mensual Simulado</span>
+                <Badge variant="outline" className="text-[9px] uppercase font-mono bg-purple-50 text-purple-700 border-purple-200">
+                  SIMULADO
+                </Badge>
               </div>
               <div className="text-2xl font-bold mt-1">
                 {formatCurrency(simulationResult.summary.totalSimulatedMonthlyCost)}
               </div>
               <div className="text-xs mt-1 text-muted-foreground flex items-center gap-1">
-                <span>Baseline: {formatCurrency(simulationResult.summary.totalCurrentMonthlyCost)}</span>
+                <span>Base [REAL]: {formatCurrency(simulationResult.summary.totalCurrentMonthlyCost)}</span>
                 <Badge
                   variant={simulationResult.summary.totalMonthlyCostDelta > 0 ? "destructive" : "secondary"}
                   className="text-[10px] ml-auto"
@@ -537,8 +655,11 @@ export function CostIntelligenceCockpitPage() {
             </PanelCard>
 
             <PanelCard className="p-4 bg-muted/30">
-              <div className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
-                Margen Bruto Medio
+              <div className="flex items-center justify-between text-xs text-muted-foreground uppercase font-semibold tracking-wider">
+                <span>Margen Bruto Medio</span>
+                <Badge variant="outline" className="text-[9px] uppercase font-mono bg-purple-50 text-purple-700 border-purple-200">
+                  SIMULADO
+                </Badge>
               </div>
               <div className="text-2xl font-bold mt-1">
                 {simulationResult.products.length > 0
@@ -546,11 +667,11 @@ export function CostIntelligenceCockpitPage() {
                       simulationResult.products.reduce((acc, p) => acc + p.simulatedMarginPct, 0) /
                       simulationResult.products.length
                     ).toFixed(2)
-                  : "0.00"}{" "}
+                  : "0,00"}{" "}
                 %
               </div>
               <div className="text-xs mt-1 text-muted-foreground flex items-center gap-1">
-                <span>Delta margen:</span>
+                <span>Variación de margen:</span>
                 <span
                   className={cn(
                     "font-semibold ml-auto",
@@ -563,8 +684,11 @@ export function CostIntelligenceCockpitPage() {
             </PanelCard>
 
             <PanelCard className="p-4 bg-muted/30">
-              <div className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
-                Impacto en Beneficio
+              <div className="flex items-center justify-between text-xs text-muted-foreground uppercase font-semibold tracking-wider">
+                <span>Impacto en Beneficio</span>
+                <Badge variant="outline" className="text-[9px] uppercase font-mono bg-purple-50 text-purple-700 border-purple-200">
+                  SIMULADO
+                </Badge>
               </div>
               <div
                 className={cn(
@@ -688,7 +812,7 @@ export function CostIntelligenceCockpitPage() {
               <div>
                 <h3 className="font-semibold text-base">Matriz de Impacto en Catálogo Real</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Comparación side-by-side entre coste real y simulación What-If sobre platos activos.
+                  Comparación side-by-side entre coste real auditado y simulación hipotética sobre platos activos.
                 </p>
               </div>
 
@@ -722,12 +846,12 @@ export function CostIntelligenceCockpitPage() {
                   <thead className="bg-muted/50 text-muted-foreground border-b uppercase font-medium">
                     <tr>
                       <th className="py-2.5 px-3">Plato / Producto</th>
-                      <th className="py-2.5 px-3 text-right">PVP</th>
-                      <th className="py-2.5 px-3 text-right">Coste Real</th>
-                      <th className="py-2.5 px-3 text-right">Coste Simulado</th>
+                      <th className="py-2.5 px-3 text-right">PVP [REAL]</th>
+                      <th className="py-2.5 px-3 text-right">Coste Real [REAL]</th>
+                      <th className="py-2.5 px-3 text-right">Coste Simulado [SIMULADO]</th>
                       <th className="py-2.5 px-3 text-right">Δ Coste</th>
-                      <th className="py-2.5 px-3 text-right">Margen Real</th>
-                      <th className="py-2.5 px-3 text-right">Margen Simulado</th>
+                      <th className="py-2.5 px-3 text-right">Margen Real [REAL]</th>
+                      <th className="py-2.5 px-3 text-right">Margen Simulado [SIMULADO]</th>
                       <th className="py-2.5 px-3 text-center">Estado Margen</th>
                       <th className="py-2.5 px-3 text-right">Acción</th>
                     </tr>
@@ -772,7 +896,7 @@ export function CostIntelligenceCockpitPage() {
                                 )
                               }
                             >
-                              Ver Drivers
+                              Ver Factores
                               <ArrowRight className="h-3 w-3" />
                             </Button>
                           </td>
@@ -790,39 +914,83 @@ export function CostIntelligenceCockpitPage() {
       {/* TAB 2: ANATOMÍA DE COSTES LIVE */}
       {activeTab === "anatomy" && (
         <PanelCard className="p-5 space-y-4">
-          <SectionTitle title="Anatomía de Costes Live (WAC & Escandallos)" />
-          <p className="text-xs text-muted-foreground">
-            Desglose de costes operativos actuales derivados del catálogo real de platos e ingredientes en Supabase.
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <SectionTitle title="Anatomía de Costes Reales (WAC & Escandallos)" />
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Desglose de costes operativos actuales derivados del catálogo real de platos e ingredientes en Supabase.
+              </p>
+            </div>
+            <Badge variant="outline" className="text-xs uppercase font-mono bg-emerald-50 text-emerald-700 border-emerald-200">
+              DATOS REALES AUDITADOS
+            </Badge>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
             {liveBaselineSnapshot.products.map((p) => (
               <div key={p.productId} className="p-4 bg-muted/20 border rounded-lg space-y-2 text-xs">
-                <div className="font-bold text-sm">{p.productName}</div>
+                <div className="font-bold text-sm flex items-center justify-between">
+                  <span>{p.productName}</span>
+                  <Badge variant="outline" className="text-[9px] uppercase font-mono bg-emerald-50 text-emerald-700 border-emerald-200">
+                    REAL
+                  </Badge>
+                </div>
                 <div className="flex justify-between border-b pb-1">
                   <span className="text-muted-foreground">PVP:</span>
                   <span className="font-semibold">{formatCurrency(p.salesPrice)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Mano de Obra:</span>
-                  <span>{formatCurrency(p.overheads.laborCost)}</span>
+                  <span>
+                    {p.overheads.laborCost > 0 ? (
+                      formatCurrency(p.overheads.laborCost)
+                    ) : (
+                      <span className="text-muted-foreground/60 italic">— (Sin configurar)</span>
+                    )}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Energía:</span>
-                  <span>{formatCurrency(p.overheads.energyCost)}</span>
+                  <span>
+                    {p.overheads.energyCost > 0 ? (
+                      formatCurrency(p.overheads.energyCost)
+                    ) : (
+                      <span className="text-muted-foreground/60 italic">— (Sin configurar)</span>
+                    )}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Packaging:</span>
-                  <span>{formatCurrency(p.overheads.packagingCost)}</span>
-                </div>
-                <div className="pt-2 border-t font-semibold flex justify-between">
-                  <span>Ingredientes ({p.bomComponents.length}):</span>
                   <span>
+                    {p.overheads.packagingCost > 0 ? (
+                      formatCurrency(p.overheads.packagingCost)
+                    ) : (
+                      <span className="text-muted-foreground/60 italic">— (Sin configurar)</span>
+                    )}
+                  </span>
+                </div>
+                <div className="pt-2 border-t font-semibold flex justify-between items-center">
+                  <span>Ingredientes ({p.bomComponents.length}):</span>
+                  <span className="text-[11px] font-normal text-muted-foreground">
                     {p.bomComponents
                       .map((c) => c.componentName.split(" ")[0])
                       .slice(0, 3)
                       .join(", ")}
                     {p.bomComponents.length > 3 ? "..." : ""}
                   </span>
+                </div>
+                <div className="pt-2 flex justify-end">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-6 text-[11px] px-2 text-amber-700 bg-amber-50/50 border-amber-200 hover:bg-amber-100 font-medium"
+                    onClick={() => {
+                      const dish = liveDishes.find((d) => d.id === p.productId);
+                      if (dish) setEditingDish(dish);
+                    }}
+                  >
+                    <Sliders className="w-3 h-3 mr-1" />
+                    Imputar Costes Indirectos
+                  </Button>
                 </div>
               </div>
             ))}
@@ -910,6 +1078,53 @@ export function CostIntelligenceCockpitPage() {
             </div>
           )}
         </PanelCard>
+      )}
+
+      {/* TAB 5: INTELIGENCIA DE MERCADO (CR-COST-05) */}
+      {activeTab === "market_intelligence" && tenantId && (
+        <MarketIntelligenceTab
+          tenantId={tenantId}
+          tenantName={user?.user_metadata?.company_name || "Restaurante"}
+          ingredients={liveIngredients.map((ing) => ({
+            id: ing.id,
+            name: ing.name,
+            unit: ing.unit,
+            cost: Number(ing.cost || 0),
+            annualVolume:
+              ing.name.toLowerCase().includes("pollo") ? 1200 :
+              ing.name.toLowerCase().includes("aceite") ? 600 :
+              ing.name.toLowerCase().includes("arroz") ? 800 : undefined,
+          }))}
+          onInjectSimulation={(ingredientId, simulatedPrice, deltaPct) => {
+            const ing = liveIngredients.find((i) => i.id === ingredientId);
+            setActiveHypothesis({
+              ingredientId,
+              ingredientName: ing?.name || ingredientId,
+              baseCost: Number(ing?.cost || 0),
+              simulatedPrice,
+              deltaPct,
+            });
+            setActiveTab("simulator");
+            toast.success(`Hipótesis de mercado inyectada: ${ing?.name || ingredientId} a ${simulatedPrice.toFixed(2)} €`);
+          }}
+        />
+      )}
+
+      {/* In-Situ Indirect Cost Imputation Modal */}
+      {editingDish && tenantId && (
+        <IndirectCostQuickEditModal
+          open={Boolean(editingDish)}
+          onOpenChange={(open) => !open && setEditingDish(null)}
+          tenantId={tenantId}
+          dishId={editingDish.id}
+          dishName={editingDish.name}
+          currentOverheads={{
+            laborCost: editingDish.laborCost || 0,
+            energyCost: editingDish.energyCost || 0,
+            packagingCost: editingDish.packagingCost || 0,
+          }}
+          onCostUpdated={reloadData}
+        />
       )}
 
       {/* Save Scenario Modal */}
