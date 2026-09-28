@@ -25,10 +25,67 @@ import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-const DB_URL = process.env.LOCAL_DB_URL || 'postgresql://postgres:postgres@127.0.0.1:54322/postgres';
-const SUPABASE_URL = 'http://127.0.0.1:54321';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0';
-const SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU';
+function getLocalSupabaseCredentials() {
+  try {
+    const raw = execSync('supabase status -o json', {
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (!match) {
+      throw new Error('No JSON output returned from `supabase status -o json`');
+    }
+    const status = JSON.parse(match[0]);
+    if (!status.SERVICE_ROLE_KEY || !status.ANON_KEY) {
+      throw new Error('Local Supabase status missing SERVICE_ROLE_KEY or ANON_KEY');
+    }
+    return {
+      apiUrl: status.API_URL || 'http://127.0.0.1:54321',
+      anonKey: status.ANON_KEY,
+      serviceRoleKey: status.SERVICE_ROLE_KEY,
+      dbUrl: status.DB_URL,
+    };
+  } catch (err) {
+    throw new Error(`Failed to retrieve local Supabase credentials via CLI: ${err.message}`);
+  }
+}
+
+// Strictly obtain local Supabase instance credentials
+const localCreds = getLocalSupabaseCredentials();
+
+// Audit process environment without exposing secret values
+const envServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const envAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
+
+if (envServiceKey) {
+  if (envServiceKey !== localCreds.serviceRoleKey) {
+    console.warn('[SECURITY] Environment SUPABASE_SERVICE_ROLE_KEY: PRESENT (REMOTE - does not match local instance)');
+    console.warn('[SECURITY] Target is LOCAL (http://127.0.0.1:54321). Refusing to use remote key for local instance.');
+  } else {
+    console.log('[SECURITY] Environment SUPABASE_SERVICE_ROLE_KEY: PRESENT (LOCAL)');
+  }
+} else {
+  console.log('[SECURITY] Environment SUPABASE_SERVICE_ROLE_KEY: MISSING');
+}
+
+if (envAnonKey) {
+  if (envAnonKey !== localCreds.anonKey) {
+    console.warn('[SECURITY] Environment VITE_SUPABASE_ANON_KEY: PRESENT (REMOTE - does not match local instance)');
+    console.warn('[SECURITY] Target is LOCAL. Enforcing local Supabase anon key.');
+  } else {
+    console.log('[SECURITY] Environment VITE_SUPABASE_ANON_KEY: PRESENT (LOCAL)');
+  }
+} else {
+  console.log('[SECURITY] Environment VITE_SUPABASE_ANON_KEY: MISSING');
+}
+
+const DB_URL = process.env.LOCAL_DB_URL || localCreds.dbUrl || 'postgresql://postgres:postgres@127.0.0.1:54322/postgres';
+const SUPABASE_URL = localCreds.apiUrl;
+const SUPABASE_ANON_KEY = localCreds.anonKey;
+const SUPABASE_SERVICE_KEY = localCreds.serviceRoleKey;
+
+console.log('[SECURITY] Active Service Role Key: PRESENT (LOCAL)');
+console.log('[SECURITY] Active Anon Key: PRESENT (LOCAL)');
 
 const SCREENSHOT_DIR = resolve('docs/05-architecture/screenshots/cr-cost-05');
 
@@ -203,16 +260,16 @@ async function runBrowserWalkthrough() {
     viewport: { width: 1440, height: 900 },
   });
 
-  await context.addInitScript(() => {
+  await context.addInitScript(({ publishableKey, supabaseUrl }) => {
     window.__INSTANCE_CONFIG__ = {
       instanceType: 'core_demo',
       tenantSlug: 'tenant-alpha',
       coreVersion: '0.1.0',
       supabaseProjectRef: 'djangucecsphnejplvic',
-      supabaseUrl: 'http://127.0.0.1:54321',
-      supabasePublishableKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0',
+      supabaseUrl: supabaseUrl,
+      supabasePublishableKey: publishableKey,
     };
-  });
+  }, { publishableKey: SUPABASE_ANON_KEY, supabaseUrl: SUPABASE_URL });
 
   const page = await context.newPage();
   const consoleErrors = [];
