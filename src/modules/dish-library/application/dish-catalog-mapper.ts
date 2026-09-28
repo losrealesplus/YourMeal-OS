@@ -77,5 +77,7 @@ export function mapDishRowToCatalogDish(row: DishRow): CatalogDish {
     tags: filterTags(row.tags),
     allergens: row.allergens ?? [],
     ingredients: [],
+    imageSrc: row.photo_url || null,
+    photoUrl: row.photo_url || null,
   };
 }

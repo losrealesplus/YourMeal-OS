@@ -99,7 +99,7 @@ function DishDetail() {
       />
 
       <div className="px-6">
-        <DishThumb emoji={dish.emoji} size="xl" />
+        <DishThumb emoji={dish.emoji} imageSrc={dish.imageSrc || undefined} size="xl" />
       </div>
 
       <div className="px-6 mt-5 flex flex-wrap gap-1.5">

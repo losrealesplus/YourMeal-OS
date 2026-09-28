@@ -64,4 +64,20 @@ describe("mapDishRowToCatalogDish", () => {
   it("uses empty tagline when description is null", () => {
     expect(mapDishRowToCatalogDish(baseRow({ description: null })).tagline).toBe("");
   });
+
+  it("maps photo_url to imageSrc and photoUrl on the CatalogDish contract", () => {
+    const dishWithPhoto = mapDishRowToCatalogDish(
+      baseRow({ photo_url: "https://storage.yourmealos.com/tenant-media/t1/dishes/d1/photo-123.webp" }),
+    );
+    expect(dishWithPhoto.imageSrc).toBe(
+      "https://storage.yourmealos.com/tenant-media/t1/dishes/d1/photo-123.webp",
+    );
+    expect(dishWithPhoto.photoUrl).toBe(
+      "https://storage.yourmealos.com/tenant-media/t1/dishes/d1/photo-123.webp",
+    );
+
+    const dishWithoutPhoto = mapDishRowToCatalogDish(baseRow({ photo_url: null }));
+    expect(dishWithoutPhoto.imageSrc).toBeNull();
+    expect(dishWithoutPhoto.photoUrl).toBeNull();
+  });
 });

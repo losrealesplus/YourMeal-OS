@@ -21,7 +21,7 @@ export function DishCard({
       params={{ dishId: dish.id }}
       className="group relative flex gap-4 surface-raised border border-border/60 rounded-[1.5rem] p-4 pr-4 items-stretch transition-all duration-200 hover:border-primary/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.995]"
     >
-      <DishThumb emoji={dish.emoji} size="md" className="!size-28 !text-5xl !rounded-3xl" />
+      <DishThumb emoji={dish.emoji} imageSrc={dish.imageSrc || undefined} size="md" className="!size-28 !text-5xl !rounded-3xl" />
       <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
         <div className="min-w-0">
           <p className="font-extrabold text-base leading-tight truncate">{dish.name}</p>

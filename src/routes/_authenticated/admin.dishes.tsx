@@ -6,13 +6,19 @@ import { createFileRoute } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Plus, Pencil, Archive, RotateCcw, Clock, Flame, Scale } from "lucide-react";
+import { Plus, Pencil, Archive, RotateCcw, Clock, Flame, Scale, Camera, Upload, Trash2, ImageIcon, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useCan } from "@/hooks/use-can";
 import { supabase } from "@/integrations/supabase/client";
 import { createServiceContext } from "@/services/types";
 import { DishService } from "@/services/dish-service";
 import type { DishRow } from "@/modules/dish-library/infrastructure/dish-repository";
+import {
+  createDishMediaRepository,
+  MAX_DISH_PHOTO_SIZE_BYTES,
+  isAllowedDishPhotoMime,
+} from "@/modules/dish-library/infrastructure/dish-media-repository";
+import { DishThumb } from "@/components/consumer/dish-thumb";
 import { AdminHeader, DataTable, PanelCard, SectionTitle, StatusChip } from "@/components/admin";
 import type { Column } from "@/components/admin/data-table";
 import { Button } from "@/components/ui/button";
@@ -129,6 +135,7 @@ type EditDishFormState = {
   carbs: string;
   fat: string;
   allergens: string[];
+  photoUrl: string | null;
 };
 
 function dishRowToEditForm(d: DishRow): EditDishFormState {
@@ -152,6 +159,7 @@ function dishRowToEditForm(d: DishRow): EditDishFormState {
     carbs: macros.carbs != null ? String(macros.carbs) : "",
     fat: macros.fat != null ? String(macros.fat) : "",
     allergens: Array.isArray(d.allergens) ? d.allergens : [],
+    photoUrl: d.photo_url ?? null,
   };
 }
 
@@ -240,9 +248,48 @@ function AdminDishesPage() {
     }
   }
 
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
   function startEdit(dish: DishRow) {
     setEditingDish(dish);
     setEditForm(dishRowToEditForm(dish));
+  }
+
+  async function handleUploadPhoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !editingDish || !tenantId) return;
+
+    if (!isAllowedDishPhotoMime(file.type)) {
+      toast.error("Formato no permitido. Por favor usa JPG, PNG o WebP.");
+      e.target.value = "";
+      return;
+    }
+
+    if (file.size > MAX_DISH_PHOTO_SIZE_BYTES) {
+      toast.error(
+        `La imagen excede el límite máximo de 5 MB (${(file.size / (1024 * 1024)).toFixed(2)} MB).`,
+      );
+      e.target.value = "";
+      return;
+    }
+
+    setUploadingPhoto(true);
+    try {
+      const mediaRepo = createDishMediaRepository(supabase);
+      const result = await mediaRepo.uploadDishPhoto(tenantId, editingDish.id, file);
+      setEditForm((f) => (f ? { ...f, photoUrl: result.publicUrl } : null));
+      toast.success("Fotografía subida al almacenamiento");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : String(err));
+    } finally {
+      setUploadingPhoto(false);
+      e.target.value = "";
+    }
+  }
+
+  function handleRemovePhoto() {
+    setEditForm((f) => (f ? { ...f, photoUrl: null } : null));
+    toast.info("Fotografía desvinculada (guarda los cambios para confirmar)");
   }
 
   async function submitEdit(e: React.FormEvent) {
@@ -264,6 +311,7 @@ function AdminDishesPage() {
       await DishService.update(ctx, editingDish.id, {
         name: editForm.name.trim(),
         description: editForm.description.trim() || null,
+        photoUrl: editForm.photoUrl,
         price: editForm.price ? Number(editForm.price) : 0,
         cost: editForm.cost ? Number(editForm.cost) : 0,
         laborCost: editForm.laborCost ? Number(editForm.laborCost) : 0,
@@ -379,39 +427,47 @@ function AdminDishesPage() {
       key: "name",
       header: "Plato",
       render: (r) => (
-        <div className="space-y-1">
-          <p className="font-semibold">{r.name}</p>
-          {r.description ? (
-            <p className="text-xs text-muted-foreground line-clamp-1">{r.description}</p>
-          ) : null}
-          <div className="flex flex-wrap items-center gap-1 pt-0.5">
-            {r.kcal != null ? (
-              <span className="inline-flex items-center gap-0.5 text-[11px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                <Flame className="size-3 text-amber-500" />
-                {r.kcal} kcal
-              </span>
+        <div className="flex items-start gap-3">
+          <DishThumb
+            emoji="🍽️"
+            imageSrc={r.photo_url || undefined}
+            size="sm"
+            className="size-12 rounded-lg border border-border/80 shrink-0 text-xl"
+          />
+          <div className="space-y-1 min-w-0 flex-1">
+            <p className="font-semibold">{r.name}</p>
+            {r.description ? (
+              <p className="text-xs text-muted-foreground line-clamp-1">{r.description}</p>
             ) : null}
-            {r.weight_g != null ? (
-              <span className="inline-flex items-center gap-0.5 text-[11px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                <Scale className="size-3 text-blue-500" />
-                {r.weight_g} g
-              </span>
-            ) : null}
-            {r.prep_minutes != null ? (
-              <span className="inline-flex items-center gap-0.5 text-[11px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                <Clock className="size-3 text-emerald-500" />
-                {r.prep_minutes} min
-              </span>
-            ) : null}
-            {Array.isArray(r.allergens) && r.allergens.length > 0 ? (
-              <div className="flex flex-wrap gap-1 ml-1">
-                {r.allergens.map((a) => (
-                  <Badge key={a} variant="outline" className="text-[10px] py-0 px-1 font-normal">
-                    {EU_ALLERGENS.find((ea) => ea.id === a)?.label ?? a}
-                  </Badge>
-                ))}
-              </div>
-            ) : null}
+            <div className="flex flex-wrap items-center gap-1 pt-0.5">
+              {r.kcal != null ? (
+                <span className="inline-flex items-center gap-0.5 text-[11px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                  <Flame className="size-3 text-amber-500" />
+                  {r.kcal} kcal
+                </span>
+              ) : null}
+              {r.weight_g != null ? (
+                <span className="inline-flex items-center gap-0.5 text-[11px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                  <Scale className="size-3 text-blue-500" />
+                  {r.weight_g} g
+                </span>
+              ) : null}
+              {r.prep_minutes != null ? (
+                <span className="inline-flex items-center gap-0.5 text-[11px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                  <Clock className="size-3 text-emerald-500" />
+                  {r.prep_minutes} min
+                </span>
+              ) : null}
+              {Array.isArray(r.allergens) && r.allergens.length > 0 ? (
+                <div className="flex flex-wrap gap-1 ml-1">
+                  {r.allergens.map((a) => (
+                    <Badge key={a} variant="outline" className="text-[10px] py-0 px-1 font-normal">
+                      {EU_ALLERGENS.find((ea) => ea.id === a)?.label ?? a}
+                    </Badge>
+                  ))}
+                </div>
+              ) : null}
+            </div>
           </div>
         </div>
       ),
@@ -519,18 +575,26 @@ function AdminDishesPage() {
       key: "name",
       header: "Plato Archivado",
       render: (r) => (
-        <div>
-          <p className="font-semibold text-muted-foreground line-through decoration-muted-foreground/50">
-            {r.name}
-          </p>
-          {r.description ? (
-            <p className="text-xs text-muted-foreground line-clamp-1">{r.description}</p>
-          ) : null}
-          {r.deleted_at ? (
-            <p className="text-[11px] text-muted-foreground font-mono mt-0.5">
-              Archivado: {new Date(r.deleted_at).toLocaleDateString("es-ES")}
+        <div className="flex items-start gap-3 opacity-70">
+          <DishThumb
+            emoji="🍽️"
+            imageSrc={r.photo_url || undefined}
+            size="sm"
+            className="size-12 rounded-lg border border-border/80 shrink-0 text-xl grayscale"
+          />
+          <div className="space-y-1 min-w-0 flex-1">
+            <p className="font-semibold text-muted-foreground line-through decoration-muted-foreground/50">
+              {r.name}
             </p>
-          ) : null}
+            {r.description ? (
+              <p className="text-xs text-muted-foreground line-clamp-1">{r.description}</p>
+            ) : null}
+            {r.deleted_at ? (
+              <p className="text-[11px] text-muted-foreground font-mono mt-0.5">
+                Archivado: {new Date(r.deleted_at).toLocaleDateString("es-ES")}
+              </p>
+            ) : null}
+          </div>
         </div>
       ),
     },
@@ -878,6 +942,85 @@ function AdminDishesPage() {
                   auditados.
                 </DialogDescription>
               </DialogHeader>
+
+              {/* Fotografía del Plato (CR-OPS-04) */}
+              <div className="rounded-xl border border-border/80 bg-muted/30 p-3.5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-semibold flex items-center gap-1.5">
+                    <Camera className="size-4 text-primary" />
+                    Fotografía del plato
+                  </Label>
+                  <span className="text-[11px] text-muted-foreground">
+                    JPG, PNG, WebP (Máx. 5 MB)
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <DishThumb
+                    emoji="🍽️"
+                    imageSrc={editForm.photoUrl || undefined}
+                    size="md"
+                    className="size-20 rounded-xl border-2 border-border shadow-sm shrink-0"
+                  />
+
+                  <div className="flex-1 space-y-1.5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <label className="cursor-pointer">
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          className="hidden"
+                          disabled={uploadingPhoto || busy}
+                          onChange={handleUploadPhoto}
+                        />
+                        <span
+                          className={cn(
+                            "inline-flex items-center justify-center rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-3 gap-1.5",
+                            (uploadingPhoto || busy) && "opacity-50 pointer-events-none"
+                          )}
+                        >
+                          {uploadingPhoto ? (
+                            <>
+                              <Loader2 className="size-3.5 animate-spin" />
+                              Subiendo...
+                            </>
+                          ) : editForm.photoUrl ? (
+                            <>
+                              <Upload className="size-3.5" />
+                              Cambiar fotografía
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="size-3.5" />
+                              Subir fotografía
+                            </>
+                          )}
+                        </span>
+                      </label>
+
+                      {editForm.photoUrl && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          disabled={uploadingPhoto || busy}
+                          onClick={handleRemovePhoto}
+                          className="h-8 text-xs text-destructive hover:text-destructive hover:bg-destructive/10 gap-1"
+                        >
+                          <Trash2 className="size-3.5" />
+                          Eliminar
+                        </Button>
+                      )}
+                    </div>
+
+                    <p className="text-[11px] text-muted-foreground">
+                      {editForm.photoUrl
+                        ? "Fotografía canónica activa para este plato en catálogo y menú."
+                        : "Sin fotografía. La plataforma mostrará el fallback explícito \"🍽️ Sin imagen\"."}
+                    </p>
+                  </div>
+                </div>
+              </div>
 
               <div className="grid gap-3 sm:grid-cols-2 pt-2">
                 <div className="space-y-1.5 sm:col-span-2">

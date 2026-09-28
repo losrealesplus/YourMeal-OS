@@ -20,6 +20,8 @@ export type MockDish = {
   tags: Array<"vegan" | "vegetarian" | "glutenFree" | "lactoseFree" | "spicy">;
   allergens: string[];
   ingredients: string[];
+  imageSrc?: string | null;
+  photoUrl?: string | null;
 };
 
 export type MockOrderStatus =
