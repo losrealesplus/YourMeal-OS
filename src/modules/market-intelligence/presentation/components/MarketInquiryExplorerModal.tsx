@@ -5,7 +5,7 @@
  * "Escenario calculable ≠ escenario operacionalmente viable."
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -50,6 +50,7 @@ import {
 import { MarketProduct } from '../../domain/types';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 import { YieldCascadeCalculator } from '@/modules/cost-intelligence/domain/yield-cascade-calculator';
 import { OperationalCostEngine } from '@/modules/cost-intelligence/domain/operational-cost-engine';
@@ -100,6 +101,8 @@ export interface MarketInquiryExplorerModalProps {
   tenantId?: string;
   userId?: string;
   userName?: string;
+  studyId?: string;
+  initialStudy?: any;
   onSaveInquiry?: (data: any) => void;
 }
 
@@ -110,74 +113,112 @@ export function MarketInquiryExplorerModal({
   tenantId = 'tenant-current',
   userId,
   userName = 'Gerente',
+  studyId,
+  initialStudy,
   onSaveInquiry,
 }: MarketInquiryExplorerModalProps) {
   // Navigation: 4 Levels
   const [currentLevel, setCurrentLevel] = useState<1 | 2 | 3 | 4>(1);
 
+  // Initial active version resolution if initialStudy provided
+  const initialActiveVer = useMemo(() => {
+    if (!initialStudy) return null;
+    const versions = (initialStudy.study_versions || []) as any[];
+    return (
+      versions.find((v: any) => v.version_number === initialStudy.active_version_number) ||
+      versions[0] ||
+      null
+    );
+  }, [initialStudy]);
+
   // Level 1: Market & Basic Dish Info
-  const [dishName, setDishName] = useState<string>('Tarta de Zanahoria Casera');
-  const [dishCategory, setDishCategory] = useState<string>('Repostería / Postres');
-  const [targetSalesPrice, setTargetSalesPrice] = useState<string>('4.00');
+  const [dishName, setDishName] = useState<string>(
+    () => initialStudy?.product_name || 'Tarta de Zanahoria Casera'
+  );
+  const [dishCategory, setDishCategory] = useState<string>(
+    () => initialStudy?.product_category || 'Repostería / Postres'
+  );
+  const [targetSalesPrice, setTargetSalesPrice] = useState<string>(() =>
+    initialActiveVer?.target_pvp != null ? String(initialActiveVer.target_pvp) : '4.00'
+  );
   const [monthlyVolume, setMonthlyVolume] = useState<string>('300');
 
-  const [ingredients, setIngredients] = useState<InquiryIngredientRow[]>([
-    {
-      id: 'ing-1',
-      name: 'Zanahoria fresca',
-      grossAmount: 0.25,
-      grossUnit: 'kg',
-      unitPrice: 1.15,
-      provenance: 'OBSERVADO',
-      sourceName: 'Makro Adeje',
-      densityKgPerL: null,
-      pieceMassKg: null,
-      trimmingLossPct: 10.0,
-    },
-    {
-      id: 'ing-2',
-      name: 'Harina de trigo repostería',
-      grossAmount: 0.12,
-      grossUnit: 'kg',
-      unitPrice: 0.95,
-      provenance: 'OBSERVADO',
-      sourceName: 'Makro Adeje',
-      densityKgPerL: null,
-      pieceMassKg: null,
-      trimmingLossPct: 0.0,
-    },
-    {
-      id: 'ing-3',
-      name: 'Huevos camperos L',
-      grossAmount: 1,
-      grossUnit: 'unit',
-      unitPrice: 0.22,
-      provenance: 'OBSERVADO',
-      sourceName: 'Mercadona',
-      densityKgPerL: null,
-      pieceMassKg: 0.063, // 63g por huevo verificado
-      trimmingLossPct: 0.0,
-    },
-    {
-      id: 'ing-4',
-      name: 'Queso crema cobertura',
-      grossAmount: 0.08,
-      grossUnit: 'kg',
-      unitPrice: 4.5,
-      provenance: 'MANUAL',
-      sourceName: undefined,
-      densityKgPerL: null,
-      pieceMassKg: null,
-      trimmingLossPct: null, // [NO CONFIGURADO]
-    },
-  ]);
+  const [ingredients, setIngredients] = useState<InquiryIngredientRow[]>(() => {
+    if (initialActiveVer?.study_ingredients && initialActiveVer.study_ingredients.length > 0) {
+      return initialActiveVer.study_ingredients.map((ing: any) => ({
+        id: ing.id,
+        name: ing.ingredient_name,
+        grossAmount: Number(ing.gross_quantity) || 0,
+        grossUnit: ing.gross_unit as GrossUnit,
+        unitPrice: Number(ing.unit_price) || 0,
+        provenance: (ing.price_provenance || 'MANUAL') as PriceProvenance,
+        trimmingLossPct: ing.trimming_loss_pct != null ? Number(ing.trimming_loss_pct) : null,
+        densityKgPerL: ing.density_kg_per_l != null ? Number(ing.density_kg_per_l) : null,
+        pieceMassKg: ing.piece_mass_kg != null ? Number(ing.piece_mass_kg) : null,
+      }));
+    }
+    return [
+      {
+        id: 'ing-1',
+        name: 'Zanahoria fresca',
+        grossAmount: 0.25,
+        grossUnit: 'kg',
+        unitPrice: 1.15,
+        provenance: 'OBSERVADO',
+        sourceName: 'Makro Adeje',
+        densityKgPerL: null,
+        pieceMassKg: null,
+        trimmingLossPct: 10.0,
+      },
+      {
+        id: 'ing-2',
+        name: 'Harina de trigo repostería',
+        grossAmount: 0.12,
+        grossUnit: 'kg',
+        unitPrice: 0.95,
+        provenance: 'OBSERVADO',
+        sourceName: 'Makro Adeje',
+        densityKgPerL: null,
+        pieceMassKg: null,
+        trimmingLossPct: 0.0,
+      },
+      {
+        id: 'ing-3',
+        name: 'Huevos camperos L',
+        grossAmount: 1,
+        grossUnit: 'unit',
+        unitPrice: 0.22,
+        provenance: 'OBSERVADO',
+        sourceName: 'Mercadona',
+        densityKgPerL: null,
+        pieceMassKg: 0.063, // 63g por huevo verificado
+        trimmingLossPct: 0.0,
+      },
+      {
+        id: 'ing-4',
+        name: 'Queso crema cobertura',
+        grossAmount: 0.08,
+        grossUnit: 'kg',
+        unitPrice: 4.5,
+        provenance: 'MANUAL',
+        sourceName: undefined,
+        densityKgPerL: null,
+        pieceMassKg: null,
+        trimmingLossPct: null, // [NO CONFIGURADO]
+      },
+    ];
+  });
 
   const [newIngredientName, setNewIngredientName] = useState('');
 
   // Level 2: Recipe & Physical Yield
-  const [batchUnitName, setBatchUnitName] = useState('tarta');
-  const [batchNominalYield, setBatchNominalYield] = useState<number>(12); // 12 raciones
-  const [isFractionalAllowed, setIsFractionalAllowed] = useState(false);
+  const [batchUnitName, setBatchUnitName] = useState(() => initialActiveVer?.batch_unit_name || 'tarta');
+  const [batchNominalYield, setBatchNominalYield] = useState<number>(
+    () => initialActiveVer?.batch_nominal_yield != null ? Number(initialActiveVer.batch_nominal_yield) : 12
+  );
+  const [isFractionalAllowed, setIsFractionalAllowed] = useState(() =>
+    initialActiveVer?.is_fractional_allowed != null ? Boolean(initialActiveVer.is_fractional_allowed) : false
+  );
   const [cookingLossPct, setCookingLossPct] = useState<number>(6.0); // 6% horno
   const [portioningLossPct, setPortioningLossPct] = useState<number>(3.0); // 3% recorte
 
@@ -201,7 +242,7 @@ export function MarketInquiryExplorerModal({
   const [packagingSecondaryCapacity, setPackagingSecondaryCapacity] = useState<number>(12);
 
   const [surplusDestination, setSurplusDestination] =
-    useState<SurplusDestination>('STOCK_REFRIGERADO');
+    useState<SurplusDestination>(() => initialActiveVer?.surplus_destination || 'STOCK_REFRIGERADO');
 
   const [customDemandInput, setCustomDemandInput] = useState<string>('');
   const [customDemands, setCustomDemands] = useState<number[]>([]);
@@ -218,8 +259,261 @@ export function MarketInquiryExplorerModal({
   const [decisionNotes, setDecisionNotes] = useState<string>(
     'Validado por el jefe de cocina tras revisar costes de tirada y amortización.'
   );
-  const [isVersionFrozen, setIsVersionFrozen] = useState<boolean>(false);
-  const [recordedDecision, setRecordedDecision] = useState<StudyDecision | null>(null);
+  const [isVersionFrozen, setIsVersionFrozen] = useState<boolean>(() => {
+    if (!initialActiveVer) return false;
+    return initialActiveVer.is_frozen === true || initialActiveVer.version_status === 'CONGELADA';
+  });
+  const [recordedDecision, setRecordedDecision] = useState<StudyDecision | null>(() => {
+    if (!initialActiveVer) return null;
+    const dec = Array.isArray(initialActiveVer.study_decisions)
+      ? initialActiveVer.study_decisions[0]
+      : initialActiveVer.study_decisions;
+    if (!dec) return null;
+    return {
+      id: dec.id,
+      versionId: initialActiveVer.id,
+      decisionVerdict: dec.decision_verdict,
+      humanDecisionStatus: dec.human_decision_status,
+      executiveSummaryText: dec.executive_summary_text || '',
+      selectedScenarioDemand:
+        dec.selected_scenario_demand != null ? Number(dec.selected_scenario_demand) : null,
+      recommendedPvp: dec.recommended_pvp != null ? Number(dec.recommended_pvp) : null,
+      approvedByUserId: dec.approved_by_user_id || null,
+      decisionNotes: dec.decision_notes || '',
+      decidedAt: dec.decided_at || new Date().toISOString(),
+      createdAt: dec.created_at || new Date().toISOString(),
+      updatedAt: dec.updated_at || new Date().toISOString(),
+    };
+  });
+  const [persistedStudyId, setPersistedStudyId] = useState<string | null>(
+    () => initialStudy?.id || null
+  );
+  const [persistedVersionId, setPersistedVersionId] = useState<string | null>(
+    () => initialActiveVer?.id || null
+  );
+  const [isLoadingStudy, setIsLoadingStudy] = useState<boolean>(false);
+
+  // Rehydrate state from a persistent study entity
+  const applyRehydratedStudy = (data: any) => {
+    if (!data) return;
+    setPersistedStudyId(data.id);
+    if (data.product_name) setDishName(data.product_name);
+    if (data.product_category) setDishCategory(data.product_category);
+
+    const versions = (data.study_versions || []) as any[];
+    const activeVer =
+      versions.find((v: any) => v.version_number === data.active_version_number) || versions[0];
+    if (activeVer) {
+      setPersistedVersionId(activeVer.id);
+      const isFrozen =
+        activeVer.is_frozen === true || activeVer.version_status === 'CONGELADA';
+      setIsVersionFrozen(isFrozen);
+
+      if (activeVer.target_pvp != null) setTargetSalesPrice(String(activeVer.target_pvp));
+      if (activeVer.batch_unit_name) setBatchUnitName(activeVer.batch_unit_name);
+      if (activeVer.batch_nominal_yield != null)
+        setBatchNominalYield(Number(activeVer.batch_nominal_yield));
+      if (activeVer.is_fractional_allowed != null)
+        setIsFractionalAllowed(Boolean(activeVer.is_fractional_allowed));
+      if (activeVer.surplus_destination) setSurplusDestination(activeVer.surplus_destination);
+
+      if (activeVer.study_ingredients && activeVer.study_ingredients.length > 0) {
+        setIngredients(
+          activeVer.study_ingredients.map((ing: any) => ({
+            id: ing.id,
+            name: ing.ingredient_name,
+            grossAmount: Number(ing.gross_quantity) || 0,
+            grossUnit: ing.gross_unit as GrossUnit,
+            unitPrice: Number(ing.unit_price) || 0,
+            provenance: (ing.price_provenance || 'MANUAL') as PriceProvenance,
+            trimmingLossPct:
+              ing.trimming_loss_pct != null ? Number(ing.trimming_loss_pct) : null,
+            densityKgPerL: ing.density_kg_per_l != null ? Number(ing.density_kg_per_l) : null,
+            pieceMassKg: ing.piece_mass_kg != null ? Number(ing.piece_mass_kg) : null,
+          }))
+        );
+      }
+
+      if (activeVer.study_yield_stages && activeVer.study_yield_stages.length > 0) {
+        for (const stg of activeVer.study_yield_stages) {
+          if (stg.stage_order === 1) setCookingLossPct(Number(stg.loss_percentage) || 0);
+          if (stg.stage_order === 2) setPortioningLossPct(Number(stg.loss_percentage) || 0);
+        }
+      }
+
+      const opCfg = Array.isArray(activeVer.study_operation_configs)
+        ? activeVer.study_operation_configs[0]
+        : activeVer.study_operation_configs;
+      if (opCfg) {
+        if (opCfg.labor_setup_minutes != null)
+          setLaborSetupMin(Number(opCfg.labor_setup_minutes));
+        if (opCfg.labor_batch_minutes != null)
+          setLaborBatchMin(Number(opCfg.labor_batch_minutes));
+        if (opCfg.labor_unit_minutes != null) setLaborUnitMin(Number(opCfg.labor_unit_minutes));
+        if (opCfg.labor_cleaning_minutes != null)
+          setLaborCleaningMin(Number(opCfg.labor_cleaning_minutes));
+        if (opCfg.labor_hourly_rate != null)
+          setLaborHourlyRate(String(opCfg.labor_hourly_rate));
+        if (opCfg.energy_method) setEnergyMethod(opCfg.energy_method);
+        if (opCfg.energy_power_kw != null) setEnergyPowerKw(Number(opCfg.energy_power_kw));
+        if (opCfg.energy_cycle_hours != null)
+          setEnergyCycleHours(Number(opCfg.energy_cycle_hours));
+        if (opCfg.energy_tariff_kwh != null)
+          setEnergyTariffKwh(Number(opCfg.energy_tariff_kwh));
+        if (opCfg.energy_percentage_rate != null)
+          setEnergyPercentageRate(Number(opCfg.energy_percentage_rate));
+        if (opCfg.energy_flat_fee != null) setEnergyFlatFee(Number(opCfg.energy_flat_fee));
+        if (opCfg.packaging_mode) setPackagingMode(opCfg.packaging_mode);
+        if (opCfg.packaging_unit_cost != null)
+          setPackagingUnitCost(Number(opCfg.packaging_unit_cost));
+        if (opCfg.packaging_secondary_cost != null)
+          setPackagingSecondaryCost(Number(opCfg.packaging_secondary_cost));
+        if (opCfg.packaging_secondary_capacity != null)
+          setPackagingSecondaryCapacity(Number(opCfg.packaging_secondary_capacity));
+      }
+
+      const dec = Array.isArray(activeVer.study_decisions)
+        ? activeVer.study_decisions[0]
+        : activeVer.study_decisions;
+      if (dec) {
+        setDecisionVerdict(dec.decision_verdict);
+        setHumanDecisionStatus(dec.human_decision_status);
+        if (dec.decision_notes) setDecisionNotes(dec.decision_notes);
+        setRecordedDecision({
+          id: dec.id,
+          versionId: activeVer.id,
+          decisionVerdict: dec.decision_verdict,
+          humanDecisionStatus: dec.human_decision_status,
+          executiveSummaryText: dec.executive_summary_text || '',
+          selectedScenarioDemand:
+            dec.selected_scenario_demand != null
+              ? Number(dec.selected_scenario_demand)
+              : null,
+          recommendedPvp:
+            dec.recommended_pvp != null ? Number(dec.recommended_pvp) : null,
+          approvedByUserId: dec.approved_by_user_id || null,
+          decisionNotes: dec.decision_notes || '',
+          decidedAt: dec.decided_at || new Date().toISOString(),
+          createdAt: dec.created_at || new Date().toISOString(),
+          updatedAt: dec.updated_at || new Date().toISOString(),
+        });
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!open) return;
+
+    if (initialStudy) {
+      applyRehydratedStudy(initialStudy);
+      return;
+    }
+
+    if (tenantId === 'tenant-test') {
+      return;
+    }
+
+    let isMounted = true;
+    async function rehydrateStudy() {
+      try {
+        setIsLoadingStudy(true);
+        let query = (supabase as any)
+          .from('economic_studies')
+          .select(`
+            id,
+            product_name,
+            product_category,
+            current_status,
+            active_version_number,
+            study_versions (
+              id,
+              version_number,
+              version_status,
+              target_pvp,
+              sales_unit,
+              sales_unit_size,
+              batch_unit_name,
+              batch_nominal_yield,
+              is_fractional_allowed,
+              surplus_destination,
+              conclusion_tier,
+              provenance_summary,
+              is_frozen,
+              study_decisions (
+                id,
+                decision_verdict,
+                human_decision_status,
+                executive_summary_text,
+                selected_scenario_demand,
+                recommended_pvp,
+                decision_notes,
+                decided_at
+              ),
+              study_ingredients (
+                id,
+                ingredient_name,
+                gross_quantity,
+                gross_unit,
+                unit_price,
+                price_provenance,
+                trimming_loss_pct,
+                density_kg_per_l,
+                piece_mass_kg
+              ),
+              study_yield_stages (
+                id,
+                stage_order,
+                stage_name,
+                loss_percentage,
+                provenance
+              ),
+              study_operation_configs (
+                id,
+                labor_setup_minutes,
+                labor_batch_minutes,
+                labor_unit_minutes,
+                labor_cleaning_minutes,
+                labor_hourly_rate,
+                energy_method,
+                energy_power_kw,
+                energy_cycle_hours,
+                energy_tariff_kwh,
+                energy_percentage_rate,
+                energy_flat_fee,
+                packaging_mode,
+                packaging_unit_cost,
+                packaging_secondary_cost,
+                packaging_secondary_capacity
+              )
+            )
+          `);
+
+        if (studyId) {
+          query = query.eq('id', studyId);
+        } else if (tenantId && tenantId !== 'tenant-current' && tenantId !== 'tenant-test') {
+          query = query.eq('tenant_id', tenantId).order('updated_at', { ascending: false }).limit(1);
+        } else {
+          query = query.order('updated_at', { ascending: false }).limit(1);
+        }
+
+        const { data, error } = await query.maybeSingle();
+        if (!isMounted) return;
+
+        if (!error && data) {
+          applyRehydratedStudy(data);
+        }
+      } catch (err) {
+        console.warn('[MarketInquiry] Rehydration skipped:', err);
+      } finally {
+        if (isMounted) setIsLoadingStudy(false);
+      }
+    }
+
+    rehydrateStudy();
+    return () => {
+      isMounted = false;
+    };
+  }, [open, tenantId, studyId, initialStudy]);
 
   // ───────────────────────────────────────────────────────────────────────────
   // Domain Engines Calculations in Memory (Zero operational mutations)
@@ -436,6 +730,10 @@ export function MarketInquiryExplorerModal({
   // ───────────────────────────────────────────────────────────────────────────
 
   const handleAddIngredient = () => {
+    if (isVersionFrozen) {
+      toast.error('Acción denegada: La versión 1 está CONGELADA e inmutable.');
+      return;
+    }
     if (!newIngredientName.trim()) return;
     const newRow: InquiryIngredientRow = {
       id: `ing-${Date.now()}`,
@@ -451,16 +749,28 @@ export function MarketInquiryExplorerModal({
   };
 
   const handleRemoveIngredient = (id: string) => {
+    if (isVersionFrozen) {
+      toast.error('Acción denegada: La versión 1 está CONGELADA e inmutable.');
+      return;
+    }
     setIngredients((prev) => prev.filter((i) => i.id !== id));
   };
 
   const handleUpdateIngredient = (id: string, patch: Partial<InquiryIngredientRow>) => {
+    if (isVersionFrozen) {
+      toast.error('Acción denegada: La versión 1 está CONGELADA e inmutable.');
+      return;
+    }
     setIngredients((prev) =>
       prev.map((i) => (i.id === id ? { ...i, ...patch } : i))
     );
   };
 
   const handleAddCustomDemand = () => {
+    if (isVersionFrozen) {
+      toast.error('Acción denegada: La versión 1 está CONGELADA e inmutable.');
+      return;
+    }
     const val = parseInt(customDemandInput.trim(), 10);
     if (!isNaN(val) && val > 0 && !customDemands.includes(val)) {
       setCustomDemands((prev) => [...prev, val]);
@@ -470,9 +780,13 @@ export function MarketInquiryExplorerModal({
   };
 
   const handleConfirmDecision = () => {
+    if (isVersionFrozen) {
+      toast.error('Acción denegada: La versión 1 ya está confirmada y congelada.');
+      return;
+    }
     const decision: StudyDecision = {
       id: `dec-${Date.now().toString(36)}`,
-      versionId: 'ver-1',
+      versionId: persistedVersionId || 'ver-1',
       decisionVerdict,
       executiveSummaryText: executiveVerdict.narrativeSummary,
       humanDecisionStatus,
@@ -491,8 +805,18 @@ export function MarketInquiryExplorerModal({
       `Decisión soberana registrada. Versión 1 congelada e inmutable (#${decision.id}).`
     );
 
+    // If persistent connection exists, update Supabase version to frozen
+    if (persistedVersionId && tenantId && tenantId !== 'tenant-current' && tenantId !== 'tenant-test') {
+      (supabase as any)
+        .from('study_versions')
+        .update({ is_frozen: true, version_status: 'CONGELADA' })
+        .eq('id', persistedVersionId)
+        .then(() => {})
+        .catch((err: unknown) => console.warn('[MarketInquiry] Remote freeze sync failed:', err));
+    }
+
     onSaveInquiry?.({
-      studyId: `study-${Date.now()}`,
+      studyId: persistedStudyId || `study-${Date.now()}`,
       productName: dishName,
       decision,
       status: 'DECISION',
