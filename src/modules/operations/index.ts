@@ -31,3 +31,4 @@ export type {
   MonthlyOperationsSummary,
   MonthlyOperationsQuery,
 } from "./application/monthly-operations-service";
+export * from "./application/operational-temporal-context";

@@ -17,4 +17,5 @@ export {
   formatDayDateEs,
   formatWeekRangeEs,
   DAY_NAMES_ES,
+  MONTH_NAMES_ES,
 } from "./application/week-dates";

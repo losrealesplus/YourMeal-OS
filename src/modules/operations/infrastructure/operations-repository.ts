@@ -35,6 +35,7 @@ export type OperationalOrderListItem = {
     dayDate: string;
     qty: number;
     notes: string | null;
+    unitPrice?: number | null;
   }>;
 };
 
@@ -96,6 +97,7 @@ function mapRow(row: Record<string, any>): OperationalOrderListItem {
       dayDate: String(it.day_date),
       qty: Number(it.qty ?? 1),
       notes: (it.comment as string | null) ?? null,
+      unitPrice: it.unit_price != null ? Number(it.unit_price) : null,
     })),
   };
 }
@@ -108,7 +110,7 @@ const ORDER_SELECT = `
   company_locations ( id, name, address ),
   company_departments ( id, name ),
   delivery_groups ( id, name ),
-  order_items ( id, dish_id, day_date, qty, comment, dishes ( id, name ) )
+  order_items ( id, dish_id, day_date, qty, comment, unit_price, dishes ( id, name ) )
 `;
 
 export function createOperationsRepository(client: Client, tenantId: string) {
