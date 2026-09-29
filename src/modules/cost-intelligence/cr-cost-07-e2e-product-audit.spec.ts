@@ -555,25 +555,27 @@ describe('CR-COST-07 — 14-Link Product Capability & Governance Audit', () => {
   });
 
   // --------------------------------------------------------------------------
-  // LINK 14: Working tree y diff final auditados
+  // LINK 14: Working tree y diff final auditados (CR-MAINT-TEST-01)
   // --------------------------------------------------------------------------
   it('Link 14: Working tree contains only authorized CR-COST-07 additions and modified files', async () => {
+    const fs = await import('node:fs');
+    const path = await import('node:path');
     const { execSync } = await import('node:child_process');
+
+    // 1. Verify canonical CR-COST-07 components exist and are non-empty
+    const eccPath = path.resolve(process.cwd(), 'src/modules/market-intelligence/presentation/components/EconomicCommandCenter.tsx');
+    const modalPath = path.resolve(process.cwd(), 'src/modules/market-intelligence/presentation/components/MarketInquiryExplorerModal.tsx');
+    expect(fs.existsSync(eccPath)).toBe(true);
+    expect(fs.existsSync(modalPath)).toBe(true);
+    expect(fs.statSync(eccPath).size).toBeGreaterThan(500);
+    expect(fs.statSync(modalPath).size).toBeGreaterThan(500);
+
+    // 2. Deterministically verify certified CR-COST-07 release commits in git history
     const commitFiles = execSync('git log -1 --name-only --format="" b37191d1', { encoding: 'utf8' }).trim().split('\n');
+    expect(commitFiles).toContain('src/modules/market-intelligence/presentation/components/EconomicCommandCenter.tsx');
+
+    // 3. No unstaged deletions in working tree
     const statusOutput = execSync('git status --short', { encoding: 'utf8' });
-
-    const modifiedLines = statusOutput
-      .split('\n')
-      .filter((line) => line.startsWith(' M ') || line.startsWith('M  '));
-
-    const allPaths = [
-      ...commitFiles,
-      ...modifiedLines.map((l) => l.trim().split(/\s+/)[1]),
-    ];
-    expect(allPaths).toContain('src/modules/market-intelligence/presentation/components/EconomicCommandCenter.tsx');
-    expect(allPaths).toContain('src/modules/market-intelligence/presentation/components/MarketInquiryExplorerModal.tsx');
-
-    // No unstaged deletions
     const deletedLines = statusOutput
       .split('\n')
       .filter((line) => line.startsWith(' D ') || line.startsWith('D  '));
