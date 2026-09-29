@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { renderToString } from "react-dom/server";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import { UniversalOrderIntakeDrawer } from "./universal-order-intake-drawer";
 
 vi.mock("@/components/ui/sheet", () => ({
@@ -45,7 +47,24 @@ vi.mock("@/integrations/supabase/client", () => ({
   },
 }));
 
-describe("UniversalOrderIntakeDrawer Component Rendering (G4)", () => {
+vi.mock("@/modules/weekly-menu/application/weekly-menu-queries", () => ({
+  fetchPublishedWeeklyMenu: vi.fn(async (_tenantId: string, weekStart: string) => ({
+    id: "menu-test-1",
+    weekStart,
+    status: "published",
+    days: [
+      {
+        dayDate: `${weekStart}`,
+        dishes: [
+          { id: "dish-1", name: "Pollo al Curry con Quinoa", price: 11.9 },
+          { id: "dish-2", name: "Salmón Noruego con Batata", price: 12.5 },
+        ],
+      },
+    ],
+  })),
+}));
+
+describe("UniversalOrderIntakeDrawer Component Rendering & Contract (CR-OPS-08)", () => {
   it("renders drawer with week title and action buttons when open", () => {
     const html = renderToString(
       <UniversalOrderIntakeDrawer
@@ -73,5 +92,20 @@ describe("UniversalOrderIntakeDrawer Component Rendering (G4)", () => {
     );
 
     expect(html).not.toContain("Captura Universal de Pedido");
+  });
+
+  it("ARCHITECTURE LAW 003: does not query dishes table directly or reference category column", () => {
+    const filePath = path.resolve(__dirname, "./universal-order-intake-drawer.tsx");
+    const source = fs.readFileSync(filePath, "utf8");
+
+    // Must NOT query dishes catalog table directly for ordering offer
+    expect(source).not.toMatch(/\.from\(["']dishes["']\)/);
+
+    // Must NOT reference the non-existent dishes.category column
+    expect(source).not.toMatch(/select\(["'].*category[,"']/);
+
+    // MUST consume canonical fetchPublishedWeeklyMenu
+    expect(source).toMatch(/fetchPublishedWeeklyMenu/);
+    expect(source).toMatch(/from ["']@\/modules\/weekly-menu\/application\/weekly-menu-queries["']/);
   });
 });

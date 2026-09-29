@@ -12,6 +12,8 @@ import {
   Utensils,
   AlertTriangle,
   Building2,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,6 +24,15 @@ import {
   type UniversalOrderCaptureLineInput,
   type StaffOrderCaptureResult,
 } from "@/modules/orders";
+import { fetchPublishedWeeklyMenu } from "@/modules/weekly-menu/application/weekly-menu-queries";
+import type { WeeklyMenuView } from "@/modules/weekly-menu/application/weekly-menu-mapper";
+import type { CatalogDish } from "@/modules/dish-library/application/dish-catalog-mapper";
+import {
+  utcWeekStartMonday,
+  utcWeekDates,
+  offsetWeekMonday,
+  DAY_NAMES_ES,
+} from "@/modules/weekly-menu/application/week-dates";
 import {
   Sheet,
   SheetContent,
@@ -53,46 +64,6 @@ export interface UniversalOrderIntakeDrawerProps {
   onSuccess?: (result: StaffOrderCaptureResult) => void;
 }
 
-const DAY_LABELS_ES: Record<number, string> = {
-  0: "Lunes",
-  1: "Martes",
-  2: "Miércoles",
-  3: "Jueves",
-  4: "Viernes",
-  5: "Sábado",
-  6: "Domingo",
-};
-
-function getMondayISO(d: Date = new Date()): string {
-  const date = new Date(d);
-  const day = date.getDay();
-  const diff = date.getDate() - day + (day === 0 ? -6 : 1);
-  date.setDate(diff);
-  return date.toISOString().slice(0, 10);
-}
-
-function getWeekDates(mondayStr: string): Array<{ date: string; label: string; index: number }> {
-  const res: Array<{ date: string; label: string; index: number }> = [];
-  const base = new Date(`${mondayStr}T00:00:00Z`);
-  for (let i = 0; i < 7; i++) {
-    const current = new Date(base.getTime() + i * 24 * 60 * 60 * 1000);
-    const dateStr = current.toISOString().slice(0, 10);
-    res.push({
-      date: dateStr,
-      label: DAY_LABELS_ES[i] || `Día ${i + 1}`,
-      index: i,
-    });
-  }
-  return res;
-}
-
-type CatalogDish = {
-  id: string;
-  name: string;
-  price: number | null;
-  category?: string | null;
-};
-
 type CustomerItem = {
   id: string;
   display_name: string | null;
@@ -115,14 +86,21 @@ export function UniversalOrderIntakeDrawer({
   const { user, tenantId, roles } = useAuth();
 
   const [weekStart, setWeekStart] = useState<string>(() => {
-    if (initialDayDate) return getMondayISO(new Date(initialDayDate + "T00:00:00Z"));
+    if (initialDayDate) return utcWeekStartMonday(new Date(initialDayDate + "T00:00:00Z"));
     if (preselectedWeekStart) return preselectedWeekStart;
-    return getMondayISO();
+    return utcWeekStartMonday();
   });
-  const weekDays = useMemo(() => getWeekDates(weekStart), [weekStart]);
+  const weekDays = useMemo(() => {
+    const dates = utcWeekDates(weekStart);
+    return dates.map((dateStr, i) => ({
+      date: dateStr,
+      label: DAY_NAMES_ES[i] || `Día ${i + 1}`,
+      index: i,
+    }));
+  }, [weekStart]);
   const [selectedDayDate, setSelectedDayDate] = useState<string>(() => {
     if (initialDayDate) return initialDayDate;
-    return weekDays[0]?.date ?? getMondayISO();
+    return weekDays[0]?.date ?? utcWeekStartMonday();
   });
 
   // Customer State
@@ -172,9 +150,9 @@ export function UniversalOrderIntakeDrawer({
   >([]);
   const [companyUnits, setCompanyUnits] = useState<Array<{ id: string; name: string }>>([]);
 
-  // Dishes & Selection State
-  const [dishes, setDishes] = useState<CatalogDish[]>([]);
-  const [loadingDishes, setLoadingDishes] = useState(false);
+  // Published Weekly Menu State
+  const [menuView, setMenuView] = useState<WeeklyMenuView | null>(null);
+  const [loadingMenu, setLoadingMenu] = useState(false);
 
   // Quantities: { [dayDate]: { [dishId]: number } }
   const [quantities, setQuantities] = useState<Record<string, Record<string, number>>>({});
@@ -189,7 +167,7 @@ export function UniversalOrderIntakeDrawer({
   // Synchronize week when changed
   useEffect(() => {
     if (initialDayDate) {
-      const mon = getMondayISO(new Date(initialDayDate + "T00:00:00Z"));
+      const mon = utcWeekStartMonday(new Date(initialDayDate + "T00:00:00Z"));
       setWeekStart(mon);
       setSelectedDayDate(initialDayDate);
     } else if (preselectedWeekStart) {
@@ -356,48 +334,30 @@ export function UniversalOrderIntakeDrawer({
     };
   }, [open, tenantId, selectedCompanyId]);
 
-  // Load catalog dishes
+  // Load published weekly menu offer
   useEffect(() => {
     if (!open || !tenantId) return;
     let isMounted = true;
-    async function loadCatalog() {
-      setLoadingDishes(true);
+    async function loadPublishedOffer() {
+      setLoadingMenu(true);
       try {
-        const { data, error } = await (supabase as any)
-          .from("dishes")
-          .select("id, name, price, category")
-          .eq("tenant_id", tenantId)
-          .is("deleted_at", null)
-          .order("name", { ascending: true });
-
-        if (error) throw error;
+        const view = await fetchPublishedWeeklyMenu(tenantId!, weekStart);
         if (isMounted) {
-          const rows = (data ?? []) as Array<{
-            id: string;
-            name: string;
-            price: number | null;
-            category?: string | null;
-          }>;
-          setDishes(
-            rows.map((d) => ({
-              id: d.id,
-              name: d.name,
-              price: d.price != null && !isNaN(Number(d.price)) ? Number(d.price) : null,
-              category: d.category,
-            })),
-          );
+          setMenuView(view);
         }
       } catch {
-        toast.error("Error al cargar el catálogo de platos");
+        if (isMounted) {
+          toast.error("Error al cargar la oferta del menú semanal publicado");
+        }
       } finally {
-        if (isMounted) setLoadingDishes(false);
+        if (isMounted) setLoadingMenu(false);
       }
     }
-    void loadCatalog();
+    void loadPublishedOffer();
     return () => {
       isMounted = false;
     };
-  }, [open, tenantId]);
+  }, [open, tenantId, weekStart]);
 
   // Customer search autocomplete
   const searchCustomers = useCallback(
@@ -486,11 +446,29 @@ export function UniversalOrderIntakeDrawer({
     });
   };
 
+  const allDishes = useMemo(() => {
+    if (!menuView) return [];
+    const seen = new Set<string>();
+    const res: CatalogDish[] = [];
+    for (const d of menuView.days) {
+      for (const dish of d.dishes) {
+        if (!seen.has(dish.id)) {
+          seen.add(dish.id);
+          res.push(dish);
+        }
+      }
+    }
+    return res;
+  }, [menuView]);
+
+  const dishPriceMap = useMemo(() => {
+    return new Map(allDishes.map((d) => [d.id, d.price]));
+  }, [allDishes]);
+
   // Compute live totals
   const { totalPortions, grandTotal } = useMemo(() => {
     let portions = 0;
     let total = 0;
-    const dishPriceMap = new Map(dishes.map((d) => [d.id, d.price]));
 
     for (const [dayDate, dayQtyMap] of Object.entries(quantities)) {
       for (const [dishId, qty] of Object.entries(dayQtyMap)) {
@@ -508,11 +486,16 @@ export function UniversalOrderIntakeDrawer({
       totalPortions: portions,
       grandTotal: Math.round(total * 100) / 100,
     };
-  }, [quantities, priceOverrides, dishes]);
+  }, [quantities, priceOverrides, dishPriceMap]);
 
   // Submit Order
   const handleSubmit = async (autoConfirm: boolean) => {
     if (!user || !tenantId) return;
+
+    if (menuView?.status !== "published") {
+      toast.error("No se puede registrar un pedido sin un menú semanal publicado.");
+      return;
+    }
 
     // Validate Customer
     if (customerMode === "existing" && !selectedCustomerId) {
@@ -531,7 +514,7 @@ export function UniversalOrderIntakeDrawer({
         if (qty > 0) {
           const comment = comments[dayDate]?.[dishId]?.trim() || null;
           const override = priceOverrides[dayDate]?.[dishId];
-          const catalogDish = dishes.find((d) => d.id === dishId);
+          const catalogDish = allDishes.find((d) => d.id === dishId);
           if (catalogDish && catalogDish.price === null && override === undefined) {
             toast.error(
               `El plato '${catalogDish.name}' no tiene precio asignado en el catálogo. Introduce un precio manual.`,
@@ -613,9 +596,39 @@ export function UniversalOrderIntakeDrawer({
               <Utensils className="h-5 w-5 text-primary" />
               Captura Universal de Pedido
             </SheetTitle>
-            <Badge variant="outline" className="font-mono text-xs">
-              Semana: {weekStart}
-            </Badge>
+            <div className="flex items-center gap-1.5">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                title="Semana anterior"
+                onClick={() => {
+                  const prev = offsetWeekMonday(weekStart, -1);
+                  setWeekStart(prev);
+                  setSelectedDayDate(prev);
+                }}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Badge variant={menuView?.status === "published" ? "secondary" : "outline"} className="font-mono text-xs">
+                Semana: {weekStart}
+              </Badge>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                title="Semana siguiente"
+                onClick={() => {
+                  const next = offsetWeekMonday(weekStart, 1);
+                  setWeekStart(next);
+                  setSelectedDayDate(next);
+                }}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
           <SheetDescription className="text-xs">
             Registro ágil multidía con selección por cliente, override comercial y notas de cocina.
@@ -914,25 +927,42 @@ export function UniversalOrderIntakeDrawer({
                 })}
               </TabsList>
 
-              {weekDays.map((d) => (
-                <TabsContent key={d.date} value={d.date} className="mt-4 space-y-3">
-                  <div className="flex items-center justify-between pb-1">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Menú para {d.label} ({d.date})
-                    </p>
-                  </div>
-
-                  {loadingDishes ? (
-                    <div className="py-8 text-center text-xs text-muted-foreground flex justify-center items-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" /> Cargando platos...
+              {weekDays.map((d) => {
+                const dayDishes = menuView?.days.find((day) => day.dayDate === d.date)?.dishes ?? [];
+                return (
+                  <TabsContent key={d.date} value={d.date} className="mt-4 space-y-3">
+                    <div className="flex items-center justify-between pb-1">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Menú para {d.label} ({d.date})
+                      </p>
+                      {menuView?.status === "published" && (
+                        <span className="text-[11px] font-mono text-muted-foreground">
+                          {dayDishes.length} {dayDishes.length === 1 ? "plato ofertado" : "platos ofertados"}
+                        </span>
+                      )}
                     </div>
-                  ) : dishes.length === 0 ? (
-                    <p className="py-6 text-center text-xs text-muted-foreground">
-                      No hay platos configurados en el catálogo.
-                    </p>
-                  ) : (
-                    <div className="space-y-3">
-                      {dishes.map((dish) => {
+
+                    {loadingMenu ? (
+                      <div className="py-8 text-center text-xs text-muted-foreground flex justify-center items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" /> Cargando menú semanal...
+                      </div>
+                    ) : menuView?.status !== "published" ? (
+                      <div className="py-8 px-4 text-center rounded-lg border border-dashed border-amber-500/30 bg-amber-50/50 dark:bg-amber-950/10 space-y-2">
+                        <AlertTriangle className="h-5 w-5 text-amber-500 mx-auto" />
+                        <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">
+                          No hay menú publicado para esta semana ({weekStart})
+                        </p>
+                        <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                          Publica el menú semanal en la sección de Menús para habilitar la captura de pedidos para estas fechas.
+                        </p>
+                      </div>
+                    ) : dayDishes.length === 0 ? (
+                      <div className="py-8 px-4 text-center rounded-lg border border-dashed text-muted-foreground text-xs">
+                        Sin platos planificados para este día ({d.label}, {d.date}).
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {dayDishes.map((dish) => {
                         const qty = quantities[d.date]?.[dish.id] || 0;
                         const comment = comments[d.date]?.[dish.id] || "";
                         const override = priceOverrides[d.date]?.[dish.id];
@@ -1033,8 +1063,9 @@ export function UniversalOrderIntakeDrawer({
                     </div>
                   )}
                 </TabsContent>
-              ))}
-            </Tabs>
+              );
+            })}
+          </Tabs>
           </div>
 
           <Separator />

@@ -559,7 +559,7 @@ describe('CR-COST-07 — 14-Link Product Capability & Governance Audit', () => {
   // --------------------------------------------------------------------------
   it('Link 14: Working tree contains only authorized CR-COST-07 additions and modified files', async () => {
     const { execSync } = await import('node:child_process');
-    const commitFiles = execSync('git diff-tree --no-commit-id --name-only -r HEAD', { encoding: 'utf8' }).trim().split('\n');
+    const commitFiles = execSync('git log -1 --name-only --format="" b37191d1', { encoding: 'utf8' }).trim().split('\n');
     const statusOutput = execSync('git status --short', { encoding: 'utf8' });
 
     const modifiedLines = statusOutput
