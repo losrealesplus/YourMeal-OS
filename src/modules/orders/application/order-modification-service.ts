@@ -26,7 +26,6 @@ const MODIFIABLE_STATUSES = new Set([
   "draft",
   "confirmed",
   "in_production",
-  "in_preparation",
   "prepared",
 ]);
 
@@ -192,6 +191,8 @@ export const OrderModificationService = {
       day_date: item.day_date,
       qty: item.qty,
       comment: item.comment,
+      unit_price: item.effectiveUnitPrice,
+      price_snapshot_status: "captured" as const,
     }));
 
     const { data: newItemsData, error: insertItemsError } = await ctx.supabase

@@ -10,6 +10,7 @@
 
 import { OrderIntakeService } from "@/modules/order-intake";
 import { OrderService } from "@/modules/orders";
+import { OrderLifecycleService } from "@/modules/orders/application/order-lifecycle-service";
 import { OperationsService } from "@/modules/operations";
 import type { ServiceContext } from "@/services/types";
 import type { OrderCommandResult, OrderResult, OrderStatus, OrderSummary } from "./OrderContext";
@@ -56,6 +57,7 @@ export type OrderFacadeDeps = {
   orders: typeof OrderService;
   operations: typeof OperationsService;
   resolveContext: typeof resolveOrderServiceContext;
+  lifecycle?: typeof OrderLifecycleService;
 };
 
 const defaultDeps: OrderFacadeDeps = {
@@ -63,6 +65,7 @@ const defaultDeps: OrderFacadeDeps = {
   orders: OrderService,
   operations: OperationsService,
   resolveContext: resolveOrderServiceContext,
+  lifecycle: OrderLifecycleService,
 };
 
 export class OrderFacade {
@@ -280,16 +283,29 @@ export class OrderFacade {
   ): Promise<OrderCommandResult> {
     const resolved = await this.deps.resolveContext(identity);
     if (!resolved.ok) return failCommand([resolved.error], command.orderId);
-    void resolved;
-    return failCommand(
-      [
-        unimplementedError("CancelOrder", {
-          orderId: command.orderId,
-          reason: command.reason,
-        }),
-      ],
-      command.orderId,
+    const { createOrderRepository } = await import(
+      "@/modules/orders/infrastructure/order-repository"
     );
+    const repo = createOrderRepository(
+      resolved.ctx.supabase,
+      resolved.ctx.tenantId,
+    );
+    try {
+      const lifecycle = this.deps.lifecycle ?? OrderLifecycleService;
+      const updated = await lifecycle.cancelOrder(
+        resolved.ctx,
+        repo,
+        command.orderId,
+        command.reason ?? "",
+      );
+      const got = await this.getOrder(identity, {
+        type: "GetOrder",
+        orderId: command.orderId,
+      });
+      return okCommand(command.orderId, updated.status as OrderStatus, got.context);
+    } catch (e) {
+      return failCommand([mapDomainError(e)], command.orderId);
+    }
   }
 
   // ── Queries ───────────────────────────────────────────────────────────

@@ -4,6 +4,8 @@ import {
   nextDeliveryStatuses,
   nextKitchenStatuses,
   timelineReachedIndex,
+  operationalStatusLabel,
+  STATUS_LABEL_ES,
 } from "./operational-status";
 
 describe("operational status transitions", () => {
@@ -37,5 +39,10 @@ describe("operational status transitions", () => {
     expect(steps[0]?.state).toBe("done");
     expect(steps.find((s) => s.key === "in_production")?.state).toBe("current");
     expect(steps.find((s) => s.key === "delivered")?.state).toBe("upcoming");
+  });
+
+  it("status labels in Spanish: confirmed is Confirmado", () => {
+    expect(operationalStatusLabel("confirmed")).toBe("Confirmado");
+    expect(STATUS_LABEL_ES.confirmed).toBe("Confirmado");
   });
 });

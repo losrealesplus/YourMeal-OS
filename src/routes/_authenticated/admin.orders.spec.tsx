@@ -162,7 +162,7 @@ describe("CR-OPS-09A · OrderDetailView (Order Operational Control Center)", () 
     const html = renderDetailModal();
 
     expect(html).toContain("#fab4f2a9");
-    expect(html).toContain("Pendiente"); // Status label for 'confirmed' in operational status
+    expect(html).toContain("Confirmado"); // Updated label for 'confirmed' status
     expect(html).toContain("B2B Corporativo");
     expect(html).toContain("Cecilia la Laguna");
     expect(html).toContain("Acme Corp");
@@ -223,13 +223,12 @@ describe("CR-OPS-09A · OrderDetailView (Order Operational Control Center)", () 
     expect(html).toContain("CR-OPS-09B");
   });
 
-  it("STRICT GOVERNANCE: prohibits active mutating lifecycle buttons in 09A", () => {
+  it("CR-OPS-09B: renders operational lifecycle action buttons according to status", () => {
     const html = renderDetailModal();
 
+    expect(html).toContain("Iniciar Preparación (Cocina)");
+    expect(html).toContain("Cancelar Pedido");
     expect(html).not.toContain("Confirmar Pedido");
-    expect(html).not.toContain("Enviar a Cocina");
-    expect(html).not.toContain("Cancelar Pedido");
-    expect(html).not.toContain("Modificar Raciones");
   });
 });
 

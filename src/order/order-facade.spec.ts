@@ -220,23 +220,83 @@ describe("OrderFacade process API", () => {
     expect(result.status).toBe("delivered");
   });
 
-  it("CancelOrder / CloseOrder return expected UNIMPLEMENTED", async () => {
+  it("CloseOrder returns expected UNIMPLEMENTED", async () => {
     const facade = new OrderFacade({
       resolveContext: async () => ({ ok: true, ctx: ctx() }),
       intake: {} as never,
       orders: {} as never,
       operations: {} as never,
     });
-    const cancel = await facade.cancelOrder(
-      identity(),
-      cancelOrderCommand({ orderId: "o1" }),
-    );
     const close = await facade.closeOrder(
       identity(),
       closeOrderCommand({ orderId: "o1" }),
     );
-    expect(cancel.errors[0]?.code).toBe("UNIMPLEMENTED");
     expect(close.errors[0]?.code).toBe("UNIMPLEMENTED");
+  });
+
+  it("CancelOrder succeeds and returns updated status", async () => {
+    const facade = new OrderFacade({
+      resolveContext: async () => ({ ok: true, ctx: ctx() }),
+      intake: {} as never,
+      orders: {} as never,
+      operations: {} as never,
+      lifecycle: {
+        cancelOrder: vi.fn(async () => ({ id: "o1", status: "cancelled" })),
+      } as never,
+    });
+    vi.spyOn(facade, "getOrder").mockResolvedValue({
+      ok: true,
+      context: {} as never,
+      errors: [],
+    });
+    const result = await facade.cancelOrder(
+      identity(),
+      cancelOrderCommand({ orderId: "o1", reason: "customer request" }),
+    );
+    expect(result.ok).toBe(true);
+    expect(result.status).toBe("cancelled");
+  });
+
+  it("CancelOrder fails when reason is missing or invalid", async () => {
+    const facade = new OrderFacade({
+      resolveContext: async () => ({ ok: true, ctx: ctx() }),
+      intake: {} as never,
+      orders: {} as never,
+      operations: {} as never,
+      lifecycle: {
+        cancelOrder: vi.fn(async () => {
+          const { DomainError } = await import("@/domain/errors");
+          throw new DomainError("INVALID_STATE", "Cancellation reason is required");
+        }),
+      } as never,
+    });
+    const result = await facade.cancelOrder(
+      identity(),
+      cancelOrderCommand({ orderId: "o1", reason: "" }),
+    );
+    expect(result.ok).toBe(false);
+    expect(result.errors[0]?.code).toBe("INVALID_STATE");
+  });
+
+  it("CancelOrder fails when order not cancelable", async () => {
+    const facade = new OrderFacade({
+      resolveContext: async () => ({ ok: true, ctx: ctx() }),
+      intake: {} as never,
+      orders: {} as never,
+      operations: {} as never,
+      lifecycle: {
+        cancelOrder: vi.fn(async () => {
+          const { DomainError } = await import("@/domain/errors");
+          throw new DomainError("INVALID_STATE", "Order o1 cannot be cancelled");
+        }),
+      } as never,
+    });
+    const result = await facade.cancelOrder(
+      identity(),
+      cancelOrderCommand({ orderId: "o1", reason: "any" }),
+    );
+    expect(result.ok).toBe(false);
+    expect(result.errors[0]?.code).toBe("INVALID_STATE");
   });
 
   it("GetOrder / SearchOrders / GetKitchenQueue map summaries", async () => {

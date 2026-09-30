@@ -201,7 +201,11 @@ describe("OPS-01 G3 — OrderModificationService", () => {
     expect(res.order.notes).toBe("Dejar con el portero");
     expect(res.items.length).toBe(2);
     expect(res.items[0].comment).toBe("⚠️ SIN CEBOLLA");
+    expect(res.items[0].unit_price).toBe(11.9);
+    expect(res.items[0].price_snapshot_status).toBe("captured");
     expect(res.items[1].comment).toBe("⭐ SALSA APARTE");
+    expect(res.items[1].unit_price).toBe(14.5);
+    expect(res.items[1].price_snapshot_status).toBe("captured");
     expect(res.auditWritten).toBe(true);
 
     // Verify AuditService was called with old and new snapshots

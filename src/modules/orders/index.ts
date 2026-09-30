@@ -56,3 +56,4 @@ export type {
   ModifyConfirmedOrderDTO,
   ModifyConfirmedOrderResult,
 } from "./application/order-modification-service";
+export { OrderLifecycleService } from "./application/order-lifecycle-service";

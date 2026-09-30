@@ -53,8 +53,18 @@ import {
   User,
   FileText,
   Info,
+  Loader2,
 } from "lucide-react";
 import { UniversalOrderIntakeDrawer } from "@/components/orders/universal-order-intake-drawer";
+import { useOrder } from "@/order/useOrder";
+import {
+  cancelOrderCommand,
+  confirmOrderCommand,
+  readyForDeliveryCommand,
+  readyForKitchenCommand,
+  scheduleProductionCommand,
+  completeDeliveryCommand,
+} from "@/order/OrderCommands";
 
 export const Route = createFileRoute("/_authenticated/admin/orders")({
   beforeLoad: ({ context }) => {
@@ -147,9 +157,99 @@ export function OrdersTable({
  */
 export function OrderDetailView({
   detail,
+  onOrderUpdated,
 }: {
   detail: OperationalOrderListItem;
+  onOrderUpdated?: () => void;
 }) {
+  const orderApi = useOrder();
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const canCancel = [
+    "draft",
+    "confirmed",
+    "in_production",
+    "prepared",
+    "ready_for_delivery",
+  ].includes(detail.status);
+
+  const getMainActionLabel = (status: OperationalOrderStatus) => {
+    switch (status) {
+      case "draft":
+        return "Confirmar Pedido";
+      case "confirmed":
+        return "Iniciar Preparación (Cocina)";
+      case "in_production":
+        return "Marcar Preparado";
+      case "prepared":
+        return "Listo para Reparto";
+      case "ready_for_delivery":
+        return "Iniciar Reparto";
+      case "out_for_delivery":
+        return "Confirmar Entrega";
+      default:
+        return null;
+    }
+  };
+
+  const mainActionLabel = getMainActionLabel(detail.status);
+
+  const handleMainAction = async () => {
+    setBusy(true);
+    try {
+      let res;
+      if (detail.status === "draft") {
+        res = await orderApi.confirmOrder(confirmOrderCommand({ orderId: detail.id }));
+      } else if (detail.status === "confirmed") {
+        res = await orderApi.scheduleProduction(scheduleProductionCommand({ orderId: detail.id }));
+      } else if (detail.status === "in_production") {
+        res = await orderApi.readyForKitchen(readyForKitchenCommand({ orderId: detail.id }));
+      } else if (detail.status === "prepared") {
+        res = await orderApi.readyForDelivery(readyForDeliveryCommand({ orderId: detail.id }));
+      } else if (detail.status === "out_for_delivery") {
+        res = await orderApi.completeDelivery(completeDeliveryCommand({ orderId: detail.id }));
+      }
+      if (res) {
+        if (!res.ok) {
+          toast.error(res.errors[0]?.message ?? "Error al actualizar estado del pedido.");
+        } else {
+          toast.success("Estado del pedido actualizado.");
+          onOrderUpdated?.();
+        }
+      }
+    } catch (e: any) {
+      toast.error(e.message ?? "Error al procesar acción operacional.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleCancelOrder = async () => {
+    if (!cancelReason.trim()) {
+      toast.error("El motivo de cancelación es obligatorio.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const res = await orderApi.cancelOrder(
+        cancelOrderCommand({ orderId: detail.id, reason: cancelReason.trim() }),
+      );
+      if (!res.ok) {
+        toast.error(res.errors[0]?.message ?? "Error al cancelar el pedido.");
+      } else {
+        toast.success("Pedido cancelado correctamente.");
+        setCancelDialogOpen(false);
+        onOrderUpdated?.();
+      }
+    } catch (e: any) {
+      toast.error(e.message ?? "Error inesperado al cancelar pedido.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Cabecera Operativa */}
@@ -445,16 +545,87 @@ export function OrderDetailView({
       <div className="rounded-lg border p-4 bg-muted/20 space-y-4">
         <OperationalTimeline status={detail.status} />
 
-        {/* Contenedor preparado para futuras acciones (CR-OPS-09B) */}
-        <div className="pt-3 border-t flex items-start gap-2 text-xs text-muted-foreground">
-          <Info className="h-4 w-4 shrink-0 text-muted-foreground/80 mt-0.5" />
-          <span>
-            Acciones de ciclo de vida (Confirmar, Cocina, Reparto, Cancelar) se
-            activarán en <strong className="text-foreground">CR-OPS-09B</strong>{" "}
-            conforme a la gobernanza soberana.
-          </span>
+        {/* Acciones Operacionales (CR-OPS-09B) */}
+        <div className="pt-3 border-t space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <UtensilsCrossed className="h-3.5 w-3.5 text-primary" />
+              Acciones Operacionales (CR-OPS-09B)
+            </div>
+            {detail.status === "cancelled" && (
+              <Badge variant="destructive">Pedido Cancelado</Badge>
+            )}
+            {detail.status === "delivered" && (
+              <Badge variant="outline" className="border-green-600 text-green-600">
+                Pedido Entregado
+              </Badge>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            {mainActionLabel && (
+              <Button
+                onClick={handleMainAction}
+                disabled={busy}
+                className="gap-2"
+              >
+                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                {mainActionLabel}
+              </Button>
+            )}
+
+            {canCancel && (
+              <Button
+                variant="outline"
+                onClick={() => setCancelDialogOpen(true)}
+                disabled={busy}
+                className="text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30"
+              >
+                Cancelar Pedido
+              </Button>
+            )}
+          </div>
         </div>
       </div>
+
+      <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Cancelar Pedido #{detail.id.slice(0, 8)}</DialogTitle>
+            <DialogDescription>
+              Esta acción marcará el pedido como cancelado y registrará un evento inmutable en el registro de auditoría.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <label className="text-xs font-medium text-foreground">
+              Motivo de cancelación (obligatorio)
+            </label>
+            <textarea
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              placeholder="Indique el motivo de la cancelación..."
+              className="w-full rounded-md border border-input bg-background p-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 min-h-[80px]"
+            />
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button
+              variant="outline"
+              onClick={() => setCancelDialogOpen(false)}
+              disabled={busy}
+            >
+              Volver
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleCancelOrder}
+              disabled={busy || !cancelReason.trim()}
+            >
+              {busy ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Confirmar Cancelación
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -529,7 +700,15 @@ export function AdminOrdersPage() {
 
       <Dialog open={!!detail} onOpenChange={(open) => !open && setDetail(null)}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-6">
-          {detail && <OrderDetailView detail={detail} />}
+          {detail && (
+            <OrderDetailView
+              detail={detail}
+              onOrderUpdated={() => {
+                setDetail(null);
+                void load();
+              }}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </div>

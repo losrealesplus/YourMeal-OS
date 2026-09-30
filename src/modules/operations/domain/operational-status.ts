@@ -31,7 +31,7 @@ export const DELIVERY_QUEUE_STATUSES: OperationalOrderStatus[] = [
 
 export const STATUS_LABEL_ES: Record<OperationalOrderStatus, string> = {
   draft: "Borrador",
-  confirmed: "Pendiente",
+  confirmed: "Confirmado",
   in_production: "En preparación",
   prepared: "Preparado",
   ready_for_delivery: "Listo para reparto",

@@ -144,6 +144,7 @@ function facadeWith(
     intake?: Record<string, unknown>;
     orders?: Record<string, unknown>;
     operations?: Record<string, unknown>;
+    lifecycle?: Record<string, unknown>;
     resolveContext?: (
       identity: OrderRuntimeIdentity,
     ) => Promise<
@@ -183,6 +184,10 @@ function facadeWith(
       listKitchenOrders: vi.fn(async () => [listItem()]),
       listDeliveryOrders: vi.fn(async () => []),
       ...overrides.operations,
+    } as never,
+    lifecycle: {
+      cancelOrder: vi.fn(async () => ({ id: "o1", status: "cancelled" })),
+      ...overrides.lifecycle,
     } as never,
   });
 }
@@ -387,20 +392,20 @@ describe("OPERATIONAL-003 Order Validation Matrix", () => {
     });
   });
 
-  it("V08 CancelOrder (expected UNIMPLEMENTED)", async () => {
+  it("V08 CancelOrder (implemented)", async () => {
     const facade = facadeWith();
     const result = await facade.cancelOrder(
       identity(),
-      cancelOrderCommand({ orderId: "o1", reason: "test" }),
+      cancelOrderCommand({ orderId: "o1", reason: "customer request" }),
     );
-    const ok = !result.ok && result.errors[0]?.code === "UNIMPLEMENTED";
+    const ok = result.ok && result.status === "cancelled";
     record({
       id: "V08",
-      name: "CancelOrder (expected UNIMPLEMENTED)",
-      expected: "UNIMPLEMENTED · intent frozen · no invented cancel substrate",
-      observed: `ok=${result.ok} code=${result.errors[0]?.code}`,
+      name: "CancelOrder (implemented)",
+      expected: "ok · cancelled",
+      observed: `ok=${result.ok} status=${result.status}`,
       evidence: "OrderFacade.cancelOrder",
-      verdict: ok ? "UNIMPLEMENTED" : "FAIL",
+      verdict: ok ? "PASS" : "FAIL",
     });
   });
 
