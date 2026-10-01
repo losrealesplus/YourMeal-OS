@@ -5,7 +5,7 @@ import { Route } from "./admin.production-sheet";
 
 const ROOT = process.cwd();
 
-describe("OPS-01 G6 — Production & Packing Sheet (admin.production-sheet)", () => {
+describe("OPS-01 G6 / CR-OPS-UX Fase 3 — Production & Packing Sheet", () => {
   it("validates search parameters correctly", () => {
     const validate = Route.options.validateSearch as (s: Record<string, unknown>) => {
       date?: string;
@@ -29,7 +29,7 @@ describe("OPS-01 G6 — Production & Packing Sheet (admin.production-sheet)", ()
     expect(src).toContain("P2 · Packing por Plato");
   });
 
-  it("contains printable 2-level physical sheet format with page breaks", () => {
+  it("contains printable 2-level physical sheet format with page breaks (100% preserved)", () => {
     const src = readFileSync(
       resolve(ROOT, "src/routes/_authenticated/admin.production-sheet.tsx"),
       "utf8",
@@ -39,5 +39,25 @@ describe("OPS-01 G6 — Production & Packing Sheet (admin.production-sheet)", ()
     expect(src).toContain("HOJA DE PACKING POR CLIENTE (P2)");
     expect(src).toContain("page-break");
     expect(src).toContain("Modificaciones Culinarias y Alérgenos por Cliente");
+    expect(src).toContain("Empacado por: _________");
+    expect(src).toContain("[  ] OK");
+  });
+
+  it("CR-OPS-UX Fase 3: contains live packing kiosk features with progress bar and transition actions", () => {
+    const src = readFileSync(
+      resolve(ROOT, "src/routes/_authenticated/admin.production-sheet.tsx"),
+      "utf8",
+    );
+
+    // Live progress
+    expect(src).toContain("Progreso de Envasado");
+    // Filter pills
+    expect(src).toContain("Pendientes");
+    expect(src).toContain("Empacados");
+    // Packing order action
+    expect(src).toContain("Marcar Pedido Empacado");
+    expect(src).toContain("Listo para Expedición");
+    // Live batch kitchen lot action
+    expect(src).toContain("primaryKitchenBatchAction");
   });
 });

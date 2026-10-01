@@ -1,6 +1,8 @@
 /**
- * EP-002B — Hoja de Producción (digital + print).
- * UI consumes ProductionReportService only — no business logic here.
+ * EP-002B — Hoja de Producción y Mesa de Packing (CR-OPS-UX Fase 3: Flujo Operativo Vivo).
+ * Ergonomía Dual:
+ * 1. Kiosko Digital de Mesa (P1 Cocina viva + P2 Packing por Cliente con transición directa).
+ * 2. Formato Físico Imprimible de 2 Niveles (Print / PDF) 100% preservado.
  */
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
@@ -16,8 +18,14 @@ import {
   Users,
   Package,
   CheckSquare,
+  Square,
   AlertTriangle,
   ChefHat,
+  CheckCircle2,
+  Check,
+  Search,
+  Loader2,
+  Play,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
@@ -39,12 +47,19 @@ import {
 import { SectionTitle } from "@/components/admin";
 import {
   ProductionReportService,
+  KitchenExecutionService,
   kitchenBatchStatusLabel,
   operationalStatusLabel,
+  primaryKitchenBatchAction,
   type KitchenBatchStatus,
   type OperationalOrderStatus,
   type ProductionReportModel,
 } from "@/modules/operations";
+import { useOrder } from "@/order/useOrder";
+import {
+  readyForKitchenCommand,
+  scheduleProductionCommand,
+} from "@/order/OrderCommands";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin/production-sheet")({
@@ -239,11 +254,18 @@ function ProductionSheetPage() {
               </TabsList>
 
               <TabsContent value="p1_kitchen" className="space-y-6">
-                <DigitalKitchenP1View report={report} />
+                <DigitalKitchenP1View
+                  report={report}
+                  date={date}
+                  onBatchUpdated={() => void load()}
+                />
               </TabsContent>
 
               <TabsContent value="p2_packing_client" className="space-y-6">
-                <DigitalPackingByClientView report={report} />
+                <DigitalPackingByClientView
+                  report={report}
+                  onOrderUpdated={() => void load()}
+                />
               </TabsContent>
 
               <TabsContent value="p2_packing_dish" className="space-y-6">
@@ -252,7 +274,7 @@ function ProductionSheetPage() {
             </Tabs>
           </div>
 
-          {/* Paper-like sheet for Print / PDF */}
+          {/* Paper-like sheet for Print / PDF (100% Preserved) */}
           <div className="hidden print:block">
             <PrintableProductionSheet report={report} />
           </div>
@@ -278,8 +300,43 @@ function ProductionSheetPage() {
   );
 }
 
-/** NIVEL 1 — COCINA & MARMITAS */
-function DigitalKitchenP1View({ report }: { report: ProductionReportModel }) {
+/** NIVEL 1 — COCINA & MARMITAS (Con control interactivo de lotes) */
+function DigitalKitchenP1View({
+  report,
+  date,
+  onBatchUpdated,
+}: {
+  report: ProductionReportModel;
+  date: string;
+  onBatchUpdated?: () => void;
+}) {
+  const { user, tenantId, roles } = useAuth();
+  const [busyDishId, setBusyDishId] = useState<string | null>(null);
+
+  const handleBatchTransition = async (dishId: string, toStatus: KitchenBatchStatus) => {
+    if (!user || !tenantId) return;
+    setBusyDishId(dishId);
+    try {
+      const ctx = await createServiceContext({
+        supabase,
+        userId: user.id,
+        tenantId,
+        roles,
+      });
+      await KitchenExecutionService.transitionBatch(ctx, {
+        deliveryDate: date,
+        dishId,
+        toStatus,
+      });
+      toast.success("Estado de marmita actualizado.");
+      onBatchUpdated?.();
+    } catch (e: any) {
+      toast.error(e instanceof Error ? e.message : "Error al actualizar lote de cocina");
+    } finally {
+      setBusyDishId(null);
+    }
+  };
+
   return (
     <section className="space-y-6" aria-label="Nivel 1 Cocina y Marmitas">
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
@@ -304,52 +361,90 @@ function DigitalKitchenP1View({ report }: { report: ProductionReportModel }) {
       <div className="space-y-4">
         <h3 className="text-base font-semibold tracking-tight">Marmitas y Platos a Cocinar</h3>
         <Accordion type="multiple" className="rounded-xl border border-border bg-card px-4">
-          {report.standardDishes.map((dish) => (
-            <AccordionItem key={dish.dishId} value={dish.dishId}>
-              <AccordionTrigger>
-                <span className="flex flex-wrap items-center gap-2 text-left">
-                  <span className="font-semibold">{dish.dishName}</span>
-                  <Badge variant="secondary" className="font-mono font-bold">
-                    {dish.totalQty} raciones
-                  </Badge>
-                  <Badge variant="outline">
-                    {kitchenBatchStatusLabel(dish.batchStatus as KitchenBatchStatus)}
-                  </Badge>
-                  {dish.prepMinutes != null ? (
-                    <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                      <Clock className="h-3 w-3" />
-                      {dish.prepMinutes} min
-                    </span>
-                  ) : null}
-                </span>
-              </AccordionTrigger>
-              <AccordionContent>
-                <div className="space-y-3 pb-2">
-                  {dish.allergens.length > 0 ? (
-                    <div className="flex flex-wrap gap-1.5">
-                      {dish.allergens.map((a) => (
-                        <Badge key={a} variant="outline" className="gap-1 text-xs text-amber-700 bg-amber-50">
-                          <Wheat className="h-3 w-3" />
-                          {a}
-                        </Badge>
-                      ))}
+          {report.standardDishes.map((dish) => {
+            const primaryAction = primaryKitchenBatchAction(dish.batchStatus as KitchenBatchStatus);
+
+            return (
+              <AccordionItem key={dish.dishId} value={dish.dishId}>
+                <AccordionTrigger>
+                  <span className="flex flex-wrap items-center gap-2 text-left">
+                    <span className="font-semibold">{dish.dishName}</span>
+                    <Badge variant="secondary" className="font-mono font-bold">
+                      {dish.totalQty} raciones
+                    </Badge>
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        dish.batchStatus === "finished" && "border-emerald-600 text-emerald-700 bg-emerald-50",
+                        dish.batchStatus === "preparing" && "border-amber-600 text-amber-700 bg-amber-50",
+                      )}
+                    >
+                      {kitchenBatchStatusLabel(dish.batchStatus as KitchenBatchStatus)}
+                    </Badge>
+                    {dish.prepMinutes != null ? (
+                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                        <Clock className="h-3 w-3" />
+                        {dish.prepMinutes} min
+                      </span>
+                    ) : null}
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="space-y-4 pb-2">
+                    {/* Botón de acción rápida de lote */}
+                    {primaryAction && (
+                      <div className="flex items-center gap-2 pt-1 border-b border-border/40 pb-3">
+                        <Button
+                          size="sm"
+                          disabled={busyDishId === dish.dishId}
+                          onClick={() => void handleBatchTransition(dish.dishId, primaryAction.to)}
+                          className="h-8 text-xs font-semibold gap-1.5 shadow-2xs"
+                        >
+                          {busyDishId === dish.dishId ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <Play className="h-3.5 w-3.5 fill-current" />
+                          )}
+                          {primaryAction.label}
+                        </Button>
+                        <span className="text-xs text-muted-foreground">
+                          Avanza el estado de este lote de producción
+                        </span>
+                      </div>
+                    )}
+
+                    {dish.allergens.length > 0 ? (
+                      <div className="flex flex-wrap gap-1.5">
+                        {dish.allergens.map((a) => (
+                          <Badge key={a} variant="outline" className="gap-1 text-xs text-amber-700 bg-amber-50">
+                            <Wheat className="h-3 w-3" />
+                            {a}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : null}
+
+                    <div>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                        Desglose de raciones por cliente
+                      </p>
+                      <ul className="divide-y divide-border text-sm">
+                        {dish.customers.map((c) => (
+                          <li
+                            key={`${c.orderId}-${c.customerId}`}
+                            className="flex items-center justify-between py-2"
+                          >
+                            <span>{c.customerName}</span>
+                            <span className="font-mono tabular-nums font-semibold">×{c.qty}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                  ) : null}
-                  <ul className="divide-y divide-border text-sm">
-                    {dish.customers.map((c) => (
-                      <li
-                        key={`${c.orderId}-${c.customerId}`}
-                        className="flex items-center justify-between py-2"
-                      >
-                        <span>{c.customerName}</span>
-                        <span className="font-mono tabular-nums font-semibold">×{c.qty}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            );
+          })}
         </Accordion>
       </div>
 
@@ -397,72 +492,295 @@ function DigitalKitchenP1View({ report }: { report: ProductionReportModel }) {
   );
 }
 
-/** NIVEL 2 — PACKING POR CLIENTE */
-function DigitalPackingByClientView({ report }: { report: ProductionReportModel }) {
+/** NIVEL 2 — PACKING POR CLIENTE (Kiosko de Mesa de Envasado Interactivo) */
+function DigitalPackingByClientView({
+  report,
+  onOrderUpdated,
+}: {
+  report: ProductionReportModel;
+  onOrderUpdated?: () => void;
+}) {
+  const orderApi = useOrder();
+  const [busyOrderId, setBusyOrderId] = useState<string | null>(null);
+  const [checkedItemKeys, setCheckedItemKeys] = useState<Set<string>>(new Set());
+  const [filterStatus, setFilterStatus] = useState<"all" | "pending" | "packed">("all");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const isOrderPacked = (status: string) =>
+    ["prepared", "ready_for_delivery", "out_for_delivery", "delivered"].includes(status);
+
+  const totalCount = report.packingByCustomer.length;
+  const packedCount = report.packingByCustomer.filter((c) => isOrderPacked(c.orderStatus)).length;
+  const packedPortions = report.packingByCustomer
+    .filter((c) => isOrderPacked(c.orderStatus))
+    .reduce((sum, c) => sum + c.totalPortions, 0);
+  const percent = totalCount > 0 ? Math.round((packedCount / totalCount) * 100) : 0;
+
+  const toggleItemCheck = (key: string) => {
+    setCheckedItemKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  const handlePackOrder = async (
+    orderId: string,
+    customerName: string,
+    currentStatus: string,
+  ) => {
+    setBusyOrderId(orderId);
+    try {
+      let res;
+      if (currentStatus === "confirmed") {
+        await orderApi.scheduleProduction(scheduleProductionCommand({ orderId }));
+        res = await orderApi.readyForKitchen(readyForKitchenCommand({ orderId }));
+      } else if (currentStatus === "in_production") {
+        res = await orderApi.readyForKitchen(readyForKitchenCommand({ orderId }));
+      }
+      if (res && !res.ok) {
+        toast.error(res.errors[0]?.message ?? "Error al empacar pedido");
+      } else {
+        toast.success(`Bolsa de ${customerName} empacada y lista para reparto.`);
+        onOrderUpdated?.();
+      }
+    } catch (e: any) {
+      toast.error(e?.message ?? "Error al actualizar estado del pedido");
+    } finally {
+      setBusyOrderId(null);
+    }
+  };
+
+  const filteredCustomers = report.packingByCustomer.filter((cust) => {
+    const isPacked = isOrderPacked(cust.orderStatus);
+    if (filterStatus === "pending" && isPacked) return false;
+    if (filterStatus === "packed" && !isPacked) return false;
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      return (
+        cust.customerName.toLowerCase().includes(q) ||
+        cust.orderId.toLowerCase().includes(q)
+      );
+    }
+    return true;
+  });
+
   return (
-    <section className="space-y-4" aria-label="Nivel 2 Packing por Cliente">
-      <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold">Checklist de Emplatado y Packing por Cliente</h3>
-        <Badge variant="outline" className="font-mono">
-          {report.packingByCustomer.length} Clientes
-        </Badge>
+    <section className="space-y-6" aria-label="Nivel 2 Packing por Cliente">
+      {/* ── Barra de Progreso Macro de Envasado ────────────────────────────── */}
+      <div className="rounded-xl border border-border bg-card p-4 space-y-3 shadow-2xs">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+            <span className="font-bold text-foreground">
+              Progreso de Envasado: {packedCount} de {totalCount} pedidos ({percent}%)
+            </span>
+          </div>
+          <span className="text-xs text-muted-foreground font-mono">
+            {packedPortions} de {report.totals.portionCount} raciones empacadas
+          </span>
+        </div>
+        <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
+          <div
+            className="h-full bg-emerald-600 transition-all duration-300 rounded-full"
+            style={{ width: `${percent}%` }}
+          />
+        </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        {report.packingByCustomer.map((cust) => (
-          <div
-            key={`${cust.customerId}-${cust.orderId}`}
-            className="rounded-xl border border-border bg-card p-4 space-y-3 flex flex-col justify-between"
+      {/* ── Controles de Kiosko: Filtros Rápidos y Buscador ──────────────────── */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-1.5 bg-muted/60 p-1 rounded-xl">
+          <button
+            type="button"
+            onClick={() => setFilterStatus("all")}
+            className={cn(
+              "px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer",
+              filterStatus === "all"
+                ? "bg-card text-foreground shadow-2xs"
+                : "text-muted-foreground hover:text-foreground",
+            )}
           >
-            <div>
-              <div className="flex items-start justify-between gap-2 border-b border-border/60 pb-2">
-                <div>
-                  <p className="font-bold text-base leading-tight">{cust.customerName}</p>
-                  <p className="text-xs text-muted-foreground font-mono">Pedido #{cust.orderId.slice(0, 8)}</p>
+            Todos ({totalCount})
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilterStatus("pending")}
+            className={cn(
+              "px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer",
+              filterStatus === "pending"
+                ? "bg-card text-foreground shadow-2xs"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            Pendientes ({totalCount - packedCount})
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilterStatus("packed")}
+            className={cn(
+              "px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer",
+              filterStatus === "packed"
+                ? "bg-card text-foreground shadow-2xs"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            Empacados ({packedCount})
+          </button>
+        </div>
+
+        <div className="relative w-full sm:w-64">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <Input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Buscar cliente o pedido..."
+            className="pl-8 h-9 text-xs"
+          />
+        </div>
+      </div>
+
+      {/* ── Cuadrícula de Cajas de Clientes (Mesa de Packing) ────────────────── */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        {filteredCustomers.map((cust) => {
+          const isPacked = isOrderPacked(cust.orderStatus);
+
+          return (
+            <div
+              key={`${cust.customerId}-${cust.orderId}`}
+              className={cn(
+                "rounded-xl border p-4 space-y-3 flex flex-col justify-between transition-all",
+                isPacked
+                  ? "border-emerald-500/40 bg-emerald-50/20 dark:bg-emerald-950/10 shadow-2xs"
+                  : "border-border bg-card shadow-xs",
+              )}
+            >
+              <div>
+                <div className="flex items-start justify-between gap-2 border-b border-border/60 pb-2">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="font-bold text-base leading-tight text-foreground">
+                        {cust.customerName}
+                      </p>
+                      {isPacked && (
+                        <Badge
+                          variant="outline"
+                          className="border-emerald-600 text-emerald-700 bg-emerald-50 text-[10px] gap-1 px-1.5 py-0 font-semibold"
+                        >
+                          <Check className="h-3 w-3" />
+                          Empacado
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground font-mono mt-0.5">
+                      Pedido #{cust.orderId.slice(0, 8)}
+                    </p>
+                  </div>
+                  <Badge variant="secondary" className="font-mono text-xs">
+                    {cust.totalPortions} raciones
+                  </Badge>
                 </div>
-                <Badge variant="secondary" className="font-mono">
-                  {cust.totalPortions} raciones
-                </Badge>
+
+                {cust.specialInstructions.length > 0 ? (
+                  <div className="my-2 p-2 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1">
+                    <p className="font-semibold flex items-center gap-1">
+                      <AlertTriangle className="h-3.5 w-3.5 text-amber-600" />
+                      Observaciones cliente:
+                    </p>
+                    {cust.specialInstructions.map((ins, i) => (
+                      <p key={i} className="pl-4 italic">
+                        • {ins}
+                      </p>
+                    ))}
+                  </div>
+                ) : null}
+
+                {/* Checklist interactivo táctil por plato */}
+                <ul className="divide-y divide-border/60 pt-1 space-y-1.5">
+                  {cust.items.map((item, idx) => {
+                    const itemKey = `${cust.orderId}-${item.dishId}-${idx}`;
+                    const isChecked = checkedItemKeys.has(itemKey);
+
+                    return (
+                      <li
+                        key={itemKey}
+                        onClick={() => toggleItemCheck(itemKey)}
+                        className="pt-1.5 flex items-start justify-between gap-2 text-sm cursor-pointer select-none group"
+                      >
+                        <div className="flex items-start gap-2">
+                          {isChecked ? (
+                            <CheckSquare className="h-4 w-4 text-emerald-600 mt-0.5 shrink-0" />
+                          ) : (
+                            <Square className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0 group-hover:text-foreground" />
+                          )}
+                          <div>
+                            <p
+                              className={cn(
+                                "font-medium leading-tight",
+                                isChecked && "line-through text-muted-foreground",
+                              )}
+                            >
+                              {item.dishName}
+                            </p>
+                            {item.comment ? (
+                              <p className="text-xs text-amber-700 font-medium">
+                                ⚠️ {item.comment}
+                              </p>
+                            ) : null}
+                          </div>
+                        </div>
+                        <span className="font-mono font-bold tabular-nums text-foreground">
+                          ×{item.qty}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
 
-              {cust.specialInstructions.length > 0 ? (
-                <div className="my-2 p-2 rounded bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1">
-                  <p className="font-semibold flex items-center gap-1">
-                    <AlertTriangle className="h-3 w-3 text-amber-600" />
-                    Observaciones cliente:
-                  </p>
-                  {cust.specialInstructions.map((ins, i) => (
-                    <p key={i} className="pl-4 italic">
-                      • {ins}
-                    </p>
-                  ))}
-                </div>
-              ) : null}
-
-              <ul className="divide-y divide-border/60 pt-1 space-y-1.5">
-                {cust.items.map((item, idx) => (
-                  <li key={`${item.dishId}-${idx}`} className="pt-1.5 flex items-start justify-between gap-2 text-sm">
-                    <div className="flex items-start gap-2">
-                      <CheckSquare className="h-4 w-4 text-muted-foreground mt-0.5" />
-                      <div>
-                        <p className="font-medium leading-tight">{item.dishName}</p>
-                        {item.comment ? (
-                          <p className="text-xs text-amber-700 font-medium">⚠️ {item.comment}</p>
-                        ) : null}
-                      </div>
-                    </div>
-                    <span className="font-mono font-bold tabular-nums">×{item.qty}</span>
-                  </li>
-                ))}
-              </ul>
+              {/* Botón de Cierre de Bolsa y Transición */}
+              <div className="pt-3 border-t border-border/40">
+                {!isPacked ? (
+                  <Button
+                    size="sm"
+                    disabled={busyOrderId === cust.orderId}
+                    onClick={() =>
+                      void handlePackOrder(
+                        cust.orderId,
+                        cust.customerName,
+                        cust.orderStatus,
+                      )
+                    }
+                    className="w-full h-9 text-xs font-semibold gap-2 shadow-2xs"
+                  >
+                    {busyOrderId === cust.orderId ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <CheckCircle2 className="h-4 w-4 text-emerald-300" />
+                    )}
+                    Marcar Pedido Empacado
+                  </Button>
+                ) : (
+                  <div className="flex items-center justify-between text-xs text-emerald-700 dark:text-emerald-400 font-semibold py-1">
+                    <span className="flex items-center gap-1.5">
+                      <Check className="h-4 w-4" />
+                      Listo para Expedición
+                    </span>
+                    <span className="text-[11px] text-muted-foreground font-mono">
+                      {operationalStatusLabel(cust.orderStatus)}
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
-
-            <div className="pt-2 border-t border-border/40 text-[11px] text-muted-foreground flex justify-between items-center">
-              <span>Packing listo</span>
-              <span className="font-mono">[ ] Verificado</span>
-            </div>
+          );
+        })}
+        {filteredCustomers.length === 0 && (
+          <div className="col-span-2 rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
+            No se encontraron clientes para los filtros seleccionados.
           </div>
-        ))}
+        )}
       </div>
     </section>
   );
@@ -525,7 +843,7 @@ function DigitalPackingByDishView({ report }: { report: ProductionReportModel })
   );
 }
 
-/** FORMATO FÍSICO 2 NIVELES PARA IMPRESIÓN (PRINT / PDF) */
+/** FORMATO FÍSICO 2 NIVELES PARA IMPRESIÓN (PRINT / PDF) — 100% PRESERVADO */
 function PrintableProductionSheet({ report }: { report: ProductionReportModel }) {
   return (
     <article className="mx-auto max-w-3xl space-y-8 bg-white text-black font-sans text-sm">
@@ -698,4 +1016,3 @@ function PrintableProductionSheet({ report }: { report: ProductionReportModel })
     </article>
   );
 }
-

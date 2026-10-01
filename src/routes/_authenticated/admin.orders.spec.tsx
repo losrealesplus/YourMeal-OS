@@ -5,6 +5,7 @@ import {
   AdminOrdersPage,
   OrdersTable,
   OrderDetailView,
+  getOperationalQuickActionLabel,
 } from "./admin.orders";
 import type { OperationalOrderListItem } from "@/modules/operations";
 
@@ -22,6 +23,24 @@ vi.mock("@/components/ui/dialog", () => ({
     <h2 className={className}>{children}</h2>
   ),
   DialogDescription: ({ children, className }: any) => (
+    <p className={className}>{children}</p>
+  ),
+}));
+
+// Mock Radix sheet for SSR test rendering (CR-OPS-UX Fase 1)
+vi.mock("@/components/ui/sheet", () => ({
+  Sheet: ({ children, open }: any) =>
+    open ? <div data-testid="sheet">{children}</div> : null,
+  SheetContent: ({ children, className }: any) => (
+    <div className={className}>{children}</div>
+  ),
+  SheetHeader: ({ children, className }: any) => (
+    <div className={className}>{children}</div>
+  ),
+  SheetTitle: ({ children, className }: any) => (
+    <h2 className={className}>{children}</h2>
+  ),
+  SheetDescription: ({ children, className }: any) => (
     <p className={className}>{children}</p>
   ),
 }));
@@ -121,7 +140,20 @@ function renderDetailModal(order: OperationalOrderListItem = sampleOrder) {
   return renderToString(<OrderDetailView detail={order} />);
 }
 
-describe("CR-OPS-09A · OrdersTable (Clean Table)", () => {
+describe("CR-OPS-UX Fase 1 · Quick Action State Mapping", () => {
+  it("maps operational order statuses to clear human action verbs", () => {
+    expect(getOperationalQuickActionLabel("draft")).toBe("Confirmar Pedido");
+    expect(getOperationalQuickActionLabel("confirmed")).toBe("Iniciar Cocina");
+    expect(getOperationalQuickActionLabel("in_production")).toBe("Marcar Preparado");
+    expect(getOperationalQuickActionLabel("prepared")).toBe("Listo para Reparto");
+    expect(getOperationalQuickActionLabel("ready_for_delivery")).toBe("Iniciar Reparto");
+    expect(getOperationalQuickActionLabel("out_for_delivery")).toBe("Confirmar Entrega");
+    expect(getOperationalQuickActionLabel("delivered")).toBeNull();
+    expect(getOperationalQuickActionLabel("cancelled")).toBeNull();
+  });
+});
+
+describe("CR-OPS-09A / CR-OPS-UX Fase 1 · OrdersTable (Actionable Table)", () => {
   it("renders clean orders table headers matching specification", () => {
     const html = renderToString(
       <OrdersTable orders={[sampleOrder]} onSelectDetail={() => {}} />,
@@ -148,6 +180,16 @@ describe("CR-OPS-09A · OrdersTable (Clean Table)", () => {
     expect(html).toContain("Detalle");
   });
 
+  it("CR-OPS-UX Fase 1: renders 1-click Quick Action button directly in table row", () => {
+    const html = renderToString(
+      <OrdersTable orders={[sampleOrder]} onSelectDetail={() => {}} />,
+    );
+
+    // Order status is 'confirmed' -> action is 'Iniciar Cocina'
+    expect(html).toContain("Iniciar Cocina");
+    expect(html).toContain("Detalle");
+  });
+
   it("renders empty state when there are no operational orders", () => {
     const html = renderToString(
       <OrdersTable orders={[]} onSelectDetail={() => {}} />,
@@ -157,12 +199,12 @@ describe("CR-OPS-09A · OrdersTable (Clean Table)", () => {
   });
 });
 
-describe("CR-OPS-09A · OrderDetailView (Order Operational Control Center)", () => {
-  it("renders operational header with ID, badges, portions, and amount", () => {
+describe("CR-OPS-UX Fase 1 · OrderDetailView (5-Tier Operational Layout)", () => {
+  it("Tier 1: renders operational header with ID, badges, portions, and amount", () => {
     const html = renderDetailModal();
 
     expect(html).toContain("#fab4f2a9");
-    expect(html).toContain("Confirmado"); // Updated label for 'confirmed' status
+    expect(html).toContain("Confirmado");
     expect(html).toContain("B2B Corporativo");
     expect(html).toContain("Cecilia la Laguna");
     expect(html).toContain("Acme Corp");
@@ -170,7 +212,41 @@ describe("CR-OPS-09A · OrderDetailView (Order Operational Control Center)", () 
     expect(html).toContain("119.00 €");
   });
 
-  it("renders temporal & commercial context card with exact derived values", () => {
+  it("Tier 2: renders Hero Action Bar prominently with state buttons and timeline", () => {
+    const html = renderDetailModal();
+
+    expect(html).toContain("Acciones Operacionales (CR-OPS-09B)");
+    expect(html).toContain("Timeline operacional");
+    expect(html).toContain("Iniciar Preparación (Cocina)");
+    expect(html).toContain("Cancelar Pedido");
+    expect(html).not.toContain("Confirmar Pedido");
+  });
+
+  it("Tier 3: renders ordered dishes breakdown with immutable snapshot prices and culinary notes", () => {
+    const html = renderDetailModal();
+
+    expect(html).toContain("Platos del Pedido (2)");
+    expect(html).toContain("Snapshot financiero inmutable");
+    expect(html).toContain("Solomillo de pavo con verduras");
+    expect(html).toContain("Sin sal añadida");
+    expect(html).toContain("Salmón noruego a la plancha");
+    expect(html).toContain("Salsa aparte");
+    expect(html).toContain("11.90 €");
+    expect(html).toContain("47.60 €"); // 4 * 11.90
+    expect(html).toContain("71.40 €"); // 6 * 11.90
+  });
+
+  it("Tier 4: renders delivery instructions and customer contact details", () => {
+    const html = renderDetailModal();
+
+    expect(html).toContain("cecilia@example.com");
+    expect(html).toContain("Sede Central");
+    expect(html).toContain("Calle Mayor 10");
+    expect(html).toContain("Grupo de entrega: Ruta Norte");
+    expect(html).toContain("Dejar en recepción de planta 2");
+  });
+
+  it("Tier 5: renders temporal & commercial context card with exact derived values", () => {
     const html = renderDetailModal();
 
     expect(html).toContain("Contexto Temporal y Comercial");
@@ -191,48 +267,9 @@ describe("CR-OPS-09A · OrderDetailView (Order Operational Control Center)", () 
     expect(html).toContain("Menú de Origen");
     expect(html).toContain("Menú Semanal Publicado");
   });
-
-  it("renders ordered dishes breakdown with immutable snapshot prices and culinary notes", () => {
-    const html = renderDetailModal();
-
-    expect(html).toContain("Platos del Pedido (2)");
-    expect(html).toContain("Snapshot financiero inmutable");
-    expect(html).toContain("Solomillo de pavo con verduras");
-    expect(html).toContain("Sin sal añadida");
-    expect(html).toContain("Salmón noruego a la plancha");
-    expect(html).toContain("Salsa aparte");
-    expect(html).toContain("11.90 €");
-    expect(html).toContain("47.60 €"); // 4 * 11.90
-    expect(html).toContain("71.40 €"); // 6 * 11.90
-  });
-
-  it("renders delivery instructions and customer contact details", () => {
-    const html = renderDetailModal();
-
-    expect(html).toContain("cecilia@example.com");
-    expect(html).toContain("Sede Central");
-    expect(html).toContain("Calle Mayor 10");
-    expect(html).toContain("Grupo de entrega: Ruta Norte");
-    expect(html).toContain("Dejar en recepción de planta 2");
-  });
-
-  it("renders operational timeline and future actions placeholder", () => {
-    const html = renderDetailModal();
-
-    expect(html).toContain("Timeline operacional");
-    expect(html).toContain("CR-OPS-09B");
-  });
-
-  it("CR-OPS-09B: renders operational lifecycle action buttons according to status", () => {
-    const html = renderDetailModal();
-
-    expect(html).toContain("Iniciar Preparación (Cocina)");
-    expect(html).toContain("Cancelar Pedido");
-    expect(html).not.toContain("Confirmar Pedido");
-  });
 });
 
-describe("CR-OPS-09A · AdminOrdersPage (Root View)", () => {
+describe("CR-OPS-09A / CR-OPS-UX Fase 1 · AdminOrdersPage (Root View)", () => {
   it("renders title, intake trigger, and loading skeleton initially", () => {
     const html = renderToString(<AdminOrdersPage />);
 

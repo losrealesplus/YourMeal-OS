@@ -85,4 +85,9 @@ export {
   safeAuthNextPath,
 } from "./urls";
 
-export { isOAuthSocialEnabled, isPhoneAuthEnabled } from "./features";
+export {
+  isOAuthSocialEnabled,
+  isGoogleOAuthEnabled,
+  isAppleOAuthEnabled,
+  isPhoneAuthEnabled,
+} from "./features";

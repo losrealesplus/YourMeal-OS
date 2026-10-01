@@ -1,6 +1,6 @@
 /**
- * Pedidos — Centro de Control Operacional y Temporal (CR-OPS-09A).
- * PR-034 / CR-OPS-09A
+ * Pedidos — Centro de Control Operacional y Temporal (CR-OPS-09A / Fase 1 CR-OPS-UX).
+ * PR-034 / CR-OPS-09A / CR-OPS-UX Fase 1 (Quick Actions & 5-Tier Drawer).
  */
 import { createFileRoute } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
@@ -29,6 +29,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { OperationalTimeline } from "@/components/operations/operational-timeline";
 import {
   createOperationsRepository,
@@ -52,7 +59,6 @@ import {
   MapPin,
   User,
   FileText,
-  Info,
   Loader2,
 } from "lucide-react";
 import { UniversalOrderIntakeDrawer } from "@/components/orders/universal-order-intake-drawer";
@@ -77,16 +83,73 @@ export const Route = createFileRoute("/_authenticated/admin/orders")({
 });
 
 /**
- * Tabla Limpia de Pedidos (Clean Table) — CR-OPS-09A
+ * Determina la etiqueta de la acción rápida según el estado operacional del pedido.
+ */
+export function getOperationalQuickActionLabel(status: OperationalOrderStatus): string | null {
+  switch (status) {
+    case "draft":
+      return "Confirmar Pedido";
+    case "confirmed":
+      return "Iniciar Cocina";
+    case "in_production":
+      return "Marcar Preparado";
+    case "prepared":
+      return "Listo para Reparto";
+    case "ready_for_delivery":
+      return "Iniciar Reparto";
+    case "out_for_delivery":
+      return "Confirmar Entrega";
+    default:
+      return null;
+  }
+}
+
+/**
+ * Tabla Limpia de Pedidos con Quick Actions (Clean Actionable Table) — CR-OPS-UX Fase 1
  * Columnas: Cliente | Estado | Nº raciones | Fecha | Acción
  */
 export function OrdersTable({
   orders,
   onSelectDetail,
+  onOrderUpdated,
 }: {
   orders: OperationalOrderListItem[];
   onSelectDetail: (order: OperationalOrderListItem) => void;
+  onOrderUpdated?: () => void;
 }) {
+  const orderApi = useOrder();
+  const [busyOrderId, setBusyOrderId] = useState<string | null>(null);
+
+  const handleQuickAdvance = async (order: OperationalOrderListItem) => {
+    setBusyOrderId(order.id);
+    try {
+      let res;
+      if (order.status === "draft") {
+        res = await orderApi.confirmOrder(confirmOrderCommand({ orderId: order.id }));
+      } else if (order.status === "confirmed") {
+        res = await orderApi.scheduleProduction(scheduleProductionCommand({ orderId: order.id }));
+      } else if (order.status === "in_production") {
+        res = await orderApi.readyForKitchen(readyForKitchenCommand({ orderId: order.id }));
+      } else if (order.status === "prepared") {
+        res = await orderApi.readyForDelivery(readyForDeliveryCommand({ orderId: order.id }));
+      } else if (order.status === "ready_for_delivery" || order.status === "out_for_delivery") {
+        res = await orderApi.completeDelivery(completeDeliveryCommand({ orderId: order.id }));
+      }
+      if (res) {
+        if (!res.ok) {
+          toast.error(res.errors[0]?.message ?? "Error al actualizar estado del pedido.");
+        } else {
+          toast.success(`Pedido #${order.id.slice(0, 8)} actualizado.`);
+          onOrderUpdated?.();
+        }
+      }
+    } catch (e: any) {
+      toast.error(e.message ?? "Error al procesar acción operacional.");
+    } finally {
+      setBusyOrderId(null);
+    }
+  };
+
   return (
     <div className="rounded-lg border bg-card">
       <Table>
@@ -103,6 +166,8 @@ export function OrdersTable({
           {orders.map((o) => {
             const portions = calculateTotalPortions(o.items);
             const primaryDate = o.deliveryDates[0] ?? o.weekStart;
+            const quickActionLabel = getOperationalQuickActionLabel(o.status);
+
             return (
               <TableRow key={o.id}>
                 <TableCell className="font-medium">
@@ -124,14 +189,33 @@ export function OrdersTable({
                 <TableCell className="text-muted-foreground text-sm">
                   {formatShortDateEs(primaryDate)}
                 </TableCell>
-                <TableCell className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onSelectDetail(o)}
-                  >
-                    Detalle
-                  </Button>
+                <TableCell className="text-right whitespace-nowrap">
+                  <div className="flex items-center justify-end gap-2">
+                    {quickActionLabel && (
+                      <Button
+                        size="sm"
+                        disabled={busyOrderId === o.id}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          void handleQuickAdvance(o);
+                        }}
+                        className="h-8 gap-1.5 px-3 text-xs font-semibold shadow-2xs"
+                      >
+                        {busyOrderId === o.id ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : null}
+                        {quickActionLabel}
+                      </Button>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 text-xs text-muted-foreground hover:text-foreground"
+                      onClick={() => onSelectDetail(o)}
+                    >
+                      Detalle
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             );
@@ -153,7 +237,13 @@ export function OrdersTable({
 }
 
 /**
- * Centro de Control Operacional del Pedido (Order Operational Control Center) — CR-OPS-09A
+ * Centro de Control Operacional del Pedido (Order Operational Control Center) — CR-OPS-UX Fase 1
+ * Arquitectura de 5 Niveles Operativos:
+ * Tier 1: Identidad & Métricas Clave
+ * Tier 2: Barra de Acción Hero Pinned (CR-OPS-09B)
+ * Tier 3: Contenido Culinario & Modificaciones
+ * Tier 4: Logística, Ubicación y Notas
+ * Tier 5: Auditoría y Contexto Temporal Limpio
  */
 export function OrderDetailView({
   detail,
@@ -208,7 +298,7 @@ export function OrderDetailView({
         res = await orderApi.readyForKitchen(readyForKitchenCommand({ orderId: detail.id }));
       } else if (detail.status === "prepared") {
         res = await orderApi.readyForDelivery(readyForDeliveryCommand({ orderId: detail.id }));
-      } else if (detail.status === "out_for_delivery") {
+      } else if (detail.status === "ready_for_delivery" || detail.status === "out_for_delivery") {
         res = await orderApi.completeDelivery(completeDeliveryCommand({ orderId: detail.id }));
       }
       if (res) {
@@ -252,8 +342,8 @@ export function OrderDetailView({
 
   return (
     <div className="space-y-6">
-      {/* Cabecera Operativa */}
-      <DialogHeader className="space-y-2">
+      {/* ── Tier 1: Identidad Operativa & Métricas ───────────────────────────── */}
+      <div className="space-y-2 border-b pb-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <span className="font-mono text-lg font-bold text-foreground">
@@ -269,7 +359,7 @@ export function OrderDetailView({
             </Badge>
           </div>
           <div className="flex items-center gap-3 text-sm">
-            <span className="text-muted-foreground">
+            <span className="text-muted-foreground font-medium">
               {`${calculateTotalPortions(detail.items)} raciones`}
             </span>
             <span className="font-semibold text-foreground text-base">
@@ -279,83 +369,65 @@ export function OrderDetailView({
         </div>
 
         <div>
-          <DialogTitle className="text-base font-semibold">
+          <h2 className="text-base font-semibold text-foreground">
             {detail.customerName ?? "Cliente Particular"}
             {detail.companyName && (
               <span className="font-normal text-muted-foreground ml-2">
                 · {detail.companyName}
               </span>
             )}
-          </DialogTitle>
-          <DialogDescription className="text-xs text-muted-foreground">
+          </h2>
+          <p className="text-xs text-muted-foreground">
             Centro de control operacional del pedido
-          </DialogDescription>
-        </div>
-      </DialogHeader>
-
-      {/* Tarjeta de Contexto Temporal & Comercial */}
-      <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          <Calendar className="h-3.5 w-3.5 text-primary" />
-          Contexto Temporal y Comercial
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-          <div>
-            <p className="text-xs text-muted-foreground font-medium">
-              Semana del Menú
-            </p>
-            <p className="font-medium text-foreground mt-0.5">
-              {formatMenuWeekEs(detail.weekStart)}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground font-medium">
-              Fecha Prevista de Entrega
-            </p>
-            <p className="font-medium text-foreground mt-0.5">
-              {detail.deliveryDates.length > 0
-                ? detail.deliveryDates.map(formatServiceDayEs).join(", ")
-                : formatServiceDayEs(detail.weekStart)}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground font-medium">
-              Fecha de Creación
-            </p>
-            <p className="font-medium text-foreground mt-0.5">
-              {formatCreationDateTimeEs(detail.createdAt)}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground font-medium">
-              Fecha de Confirmación
-            </p>
-            <p className="font-medium text-foreground mt-0.5">
-              {detail.status === "draft"
-                ? "Pendiente de confirmación"
-                : "No registrada en modelo (sin columna en DB)"}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground font-medium">
-              Última Actualización
-            </p>
-            <p className="font-medium text-foreground mt-0.5 text-muted-foreground/80 italic text-xs">
-              No disponible (sin columna updated_at en modelo)
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground font-medium">
-              Menú de Origen
-            </p>
-            <p className="font-medium text-foreground mt-0.5">
-              Menú Semanal Publicado
-            </p>
-          </div>
+          </p>
         </div>
       </div>
 
-      {/* Desglose de Platos del Pedido */}
+      {/* ── Tier 2: Barra de Acción Hero & Timeline (CR-OPS-09B) ─────────────── */}
+      <div className="rounded-xl border bg-muted/40 p-4 space-y-4 shadow-2xs">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <UtensilsCrossed className="h-3.5 w-3.5 text-primary" />
+            Acciones Operacionales (CR-OPS-09B)
+          </div>
+          {detail.status === "cancelled" && (
+            <Badge variant="destructive">Pedido Cancelado</Badge>
+          )}
+          {detail.status === "delivered" && (
+            <Badge variant="outline" className="border-green-600 text-green-600">
+              Pedido Entregado
+            </Badge>
+          )}
+        </div>
+
+        <OperationalTimeline status={detail.status} />
+
+        <div className="flex flex-wrap items-center gap-3 pt-1 border-t border-border/40">
+          {mainActionLabel && (
+            <Button
+              onClick={handleMainAction}
+              disabled={busy}
+              className="gap-2 font-semibold shadow-xs"
+            >
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {mainActionLabel}
+            </Button>
+          )}
+
+          {canCancel && (
+            <Button
+              variant="outline"
+              onClick={() => setCancelDialogOpen(true)}
+              disabled={busy}
+              className="text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30 text-xs"
+            >
+              Cancelar Pedido
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* ── Tier 3: Desglose de Platos del Pedido ────────────────────────────── */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm font-semibold">
@@ -445,7 +517,7 @@ export function OrderDetailView({
             return (
               <div
                 key={it.id}
-                className="rounded-lg border bg-card p-3 space-y-2 shadow-xs"
+                className="rounded-lg border bg-card p-3 space-y-2 shadow-2xs"
               >
                 <div className="font-medium text-sm text-foreground leading-snug">
                   {it.dishName ?? "Plato no especificado"}
@@ -498,7 +570,7 @@ export function OrderDetailView({
         </div>
       </div>
 
-      {/* Datos de Entrega y Contacto */}
+      {/* ── Tier 4: Datos de Entrega y Contacto ──────────────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="rounded-lg border p-4 bg-card space-y-2">
           <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -541,49 +613,64 @@ export function OrderDetailView({
         </div>
       </div>
 
-      {/* Timeline Operacional */}
-      <div className="rounded-lg border p-4 bg-muted/20 space-y-4">
-        <OperationalTimeline status={detail.status} />
-
-        {/* Acciones Operacionales (CR-OPS-09B) */}
-        <div className="pt-3 border-t space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              <UtensilsCrossed className="h-3.5 w-3.5 text-primary" />
-              Acciones Operacionales (CR-OPS-09B)
-            </div>
-            {detail.status === "cancelled" && (
-              <Badge variant="destructive">Pedido Cancelado</Badge>
-            )}
-            {detail.status === "delivered" && (
-              <Badge variant="outline" className="border-green-600 text-green-600">
-                Pedido Entregado
-              </Badge>
-            )}
+      {/* ── Tier 5: Contexto Temporal y Comercial (Auditoría) ───────────────── */}
+      <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          <Calendar className="h-3.5 w-3.5 text-primary" />
+          Contexto Temporal y Comercial
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+          <div>
+            <p className="text-xs text-muted-foreground font-medium">
+              Semana del Menú
+            </p>
+            <p className="font-medium text-foreground mt-0.5">
+              {formatMenuWeekEs(detail.weekStart)}
+            </p>
           </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            {mainActionLabel && (
-              <Button
-                onClick={handleMainAction}
-                disabled={busy}
-                className="gap-2"
-              >
-                {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                {mainActionLabel}
-              </Button>
-            )}
-
-            {canCancel && (
-              <Button
-                variant="outline"
-                onClick={() => setCancelDialogOpen(true)}
-                disabled={busy}
-                className="text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30"
-              >
-                Cancelar Pedido
-              </Button>
-            )}
+          <div>
+            <p className="text-xs text-muted-foreground font-medium">
+              Fecha Prevista de Entrega
+            </p>
+            <p className="font-medium text-foreground mt-0.5">
+              {detail.deliveryDates.length > 0
+                ? detail.deliveryDates.map(formatServiceDayEs).join(", ")
+                : formatServiceDayEs(detail.weekStart)}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground font-medium">
+              Fecha de Creación
+            </p>
+            <p className="font-medium text-foreground mt-0.5">
+              {formatCreationDateTimeEs(detail.createdAt)}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground font-medium">
+              Fecha de Confirmación
+            </p>
+            <p className="font-medium text-foreground mt-0.5">
+              {detail.status === "draft"
+                ? "Pendiente de confirmación"
+                : "No registrada en modelo (sin columna en DB)"}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground font-medium">
+              Última Actualización
+            </p>
+            <p className="font-medium text-foreground mt-0.5 text-muted-foreground/80 italic text-xs">
+              No disponible (sin columna updated_at en modelo)
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground font-medium">
+              Menú de Origen
+            </p>
+            <p className="font-medium text-foreground mt-0.5">
+              Menú Semanal Publicado
+            </p>
           </div>
         </div>
       </div>
@@ -677,7 +764,7 @@ export function AdminOrdersPage() {
           <SectionTitle
             overline="Operaciones"
             title="Pedidos"
-            subtitle="Vista de pedidos operativos con timeline y captura universal."
+            subtitle="Vista de pedidos operativos con timeline, quick actions y captura universal."
           />
         </div>
         <Button onClick={() => setIntakeDrawerOpen(true)} className="gap-2">
@@ -695,11 +782,25 @@ export function AdminOrdersPage() {
       {loading ? (
         <Skeleton className="h-48 w-full" />
       ) : (
-        <OrdersTable orders={orders} onSelectDetail={(o) => setDetail(o)} />
+        <OrdersTable
+          orders={orders}
+          onSelectDetail={(o) => setDetail(o)}
+          onOrderUpdated={() => void load()}
+        />
       )}
 
-      <Dialog open={!!detail} onOpenChange={(open) => !open && setDetail(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-6">
+      {/* Drawer lateral ergonómico para Ficha de Pedido (CR-OPS-UX Fase 1) */}
+      <Sheet open={!!detail} onOpenChange={(open) => !open && setDetail(null)}>
+        <SheetContent
+          side="right"
+          className="w-full sm:max-w-2xl overflow-y-auto p-6"
+        >
+          <SheetHeader className="sr-only">
+            <SheetTitle>Ficha de Pedido</SheetTitle>
+            <SheetDescription>
+              Centro de control operacional del pedido
+            </SheetDescription>
+          </SheetHeader>
           {detail && (
             <OrderDetailView
               detail={detail}
@@ -709,8 +810,8 @@ export function AdminOrdersPage() {
               }}
             />
           )}
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

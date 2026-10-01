@@ -1,5 +1,5 @@
 /**
- * Auth surface feature toggles (INFRA-005 / PRODUCT-001).
+ * Auth surface feature toggles (INFRA-005 / PRODUCT-001 / CR-OPS-UX Fase 2).
  *
  * OAuth social (Google/Apple) remains fully implemented in `oauth.ts` and
  * `/auth/callback`. That flag only controls UI exposure on `/auth`.
@@ -38,6 +38,30 @@ function flagFromEnv(name: string): boolean | undefined {
  */
 export function isOAuthSocialEnabled(): boolean {
   return flagFromEnv("VITE_AUTH_OAUTH_SOCIAL_ENABLED") ?? false;
+}
+
+/**
+ * Whether Google OAuth button specifically is shown on `/auth`.
+ * Defaults to `isOAuthSocialEnabled()`, or explicitly overridden via `VITE_AUTH_GOOGLE_ENABLED`.
+ */
+export function isGoogleOAuthEnabled(): boolean {
+  return (
+    flagFromEnv("VITE_AUTH_GOOGLE_ENABLED") ??
+    flagFromEnv("VITE_AUTH_OAUTH_SOCIAL_ENABLED") ??
+    false
+  );
+}
+
+/**
+ * Whether Apple OAuth button specifically is shown on `/auth`.
+ * Defaults to `isOAuthSocialEnabled()`, or explicitly overridden via `VITE_AUTH_APPLE_ENABLED`.
+ */
+export function isAppleOAuthEnabled(): boolean {
+  return (
+    flagFromEnv("VITE_AUTH_APPLE_ENABLED") ??
+    flagFromEnv("VITE_AUTH_OAUTH_SOCIAL_ENABLED") ??
+    false
+  );
 }
 
 /**
