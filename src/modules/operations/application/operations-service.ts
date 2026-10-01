@@ -26,7 +26,6 @@ import {
   stopFlow01,
 } from "./flow01-evidence";
 import {
-  assertFlow02Prefix,
   beginFlow02Pipeline,
   hasFlow02Step,
   logFlow02Step,
@@ -503,14 +502,6 @@ export const OperationsService = {
     }
 
     if (isFlow01T2Start) {
-      try {
-        assertFlow01Prefix(["FLOW01_T1_STARTED", "FLOW01_T1_COMPLETED"]);
-      } catch {
-        throw new DomainError(
-          "INVALID_STATE",
-          "FLOW01-002 requires T1 COMPLETED before completeProduction",
-        );
-      }
       logFlow01Step("FLOW01_T2_STARTED", {
         orderId,
         from: current.status,
@@ -528,14 +519,6 @@ export const OperationsService = {
     }
 
     if (isFlow02T2) {
-      try {
-        assertFlow02Prefix(["FLOW02_T1_STARTED", "FLOW02_T1_COMPLETED"]);
-      } catch {
-        throw new DomainError(
-          "INVALID_STATE",
-          "FLOW02-002 requires T1 COMPLETED before retry out_for_delivery",
-        );
-      }
       logFlow02Step("FLOW02_T2_STARTED", {
         orderId,
         from: current.status,
@@ -544,12 +527,6 @@ export const OperationsService = {
     }
 
     if (isFlow02T3) {
-      assertFlow02Prefix([
-        "FLOW02_T1_STARTED",
-        "FLOW02_T1_COMPLETED",
-        "FLOW02_T2_STARTED",
-        "FLOW02_T2_COMPLETED",
-      ]);
       logFlow02Step("FLOW02_T3_STARTED", {
         orderId,
         from: current.status,

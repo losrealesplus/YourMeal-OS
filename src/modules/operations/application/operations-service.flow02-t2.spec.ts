@@ -90,11 +90,28 @@ describe("FLOW02-002 · OperationsService.transitionDelivery T2", () => {
     expect(flowTokens.some((t) => t.startsWith("FLOW02_T3"))).toBe(false);
   });
 
-  it("rejects T2 without T1 COMPLETED", async () => {
+  it("allows retrying out_for_delivery from delivery_issue independently without FLOW02 active pipeline", async () => {
     countByStatuses.mockResolvedValue(1);
     getOrder.mockResolvedValue({
       id: "order-1",
       status: "delivery_issue",
+    });
+    transitionStatus.mockResolvedValue("out_for_delivery");
+
+    const next = await OperationsService.transitionDelivery(
+      ctx(),
+      "order-1",
+      "out_for_delivery",
+    );
+    expect(next).toBe("out_for_delivery");
+    expect(transitionStatus).toHaveBeenCalledWith("order-1", "out_for_delivery");
+  });
+
+  it("rejects transitionDelivery to out_for_delivery from invalid status (e.g. delivered) via domain state machine", async () => {
+    countByStatuses.mockResolvedValue(1);
+    getOrder.mockResolvedValue({
+      id: "order-1",
+      status: "delivered",
     });
 
     await expect(
@@ -103,8 +120,7 @@ describe("FLOW02-002 · OperationsService.transitionDelivery T2", () => {
         "order-1",
         "out_for_delivery",
       ),
-    ).rejects.toBeInstanceOf(DomainError);
-    expect(getObservedFlow02Steps()).toEqual([]);
+    ).rejects.toThrow("Cannot transition delivered → out_for_delivery in delivery");
   });
 
   it("does not emit T3 tokens", async () => {

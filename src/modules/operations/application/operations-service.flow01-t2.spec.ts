@@ -86,12 +86,19 @@ describe("FLOW01-002 · Production → Packaging", () => {
     ).rejects.toBeInstanceOf(DomainError);
   });
 
-  it("rejects completeProduction without T1", async () => {
+  it("advances in_production → prepared via canonical domain rules without requiring FLOW-01 active pipeline", async () => {
     orderStatus = "in_production";
+    __resetFlow01EvidenceForTests();
+
+    const next = await OperationsService.completeProduction(ctx(), "order-1");
+    expect(next).toBe("prepared");
+    expect(transitionStatus).toHaveBeenCalledWith("order-1", "prepared");
+  });
+
+  it("rejects completeProduction when order is not in_production via domain state machine", async () => {
+    orderStatus = "confirmed";
     await expect(
       OperationsService.completeProduction(ctx(), "order-1"),
-    ).rejects.toMatchObject({
-      message: expect.stringContaining("T1 COMPLETED"),
-    });
+    ).rejects.toThrow("Cannot transition confirmed → prepared in kitchen");
   });
 });
