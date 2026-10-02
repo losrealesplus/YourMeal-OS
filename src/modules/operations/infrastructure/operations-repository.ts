@@ -2,6 +2,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import type { OperationalOrderStatus } from "../domain/operational-status";
+import type { OrderDietarySnapshot } from "@/types/dietary";
 
 type Client = SupabaseClient<Database>;
 
@@ -11,6 +12,7 @@ export type OperationalOrderListItem = {
   status: OperationalOrderStatus;
   weekStart: string;
   notes: string | null;
+  dietarySnapshot?: OrderDietarySnapshot | null;
   total: number;
   createdAt: string;
   demandChannel: "individual" | "company";
@@ -69,6 +71,7 @@ function mapRow(row: Record<string, any>): OperationalOrderListItem {
     status: row.status as OperationalOrderStatus,
     weekStart: String(row.week_start),
     notes: (row.notes as string | null) ?? null,
+    dietarySnapshot: (row.dietary_snapshot as OrderDietarySnapshot | null) ?? null,
     total: Number(row.total ?? 0),
     createdAt: String(row.created_at),
     demandChannel:
@@ -103,7 +106,7 @@ function mapRow(row: Record<string, any>): OperationalOrderListItem {
 }
 
 const ORDER_SELECT = `
-  id, tenant_id, status, week_start, notes, total, created_at, customer_id,
+  id, tenant_id, status, week_start, notes, dietary_snapshot, total, created_at, customer_id,
   demand_channel, company_id, site_id, organizational_unit_id, delivery_group_id,
   customers ( id, display_name, email ),
   companies ( id, name ),

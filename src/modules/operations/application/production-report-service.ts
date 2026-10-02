@@ -145,6 +145,7 @@ function flattenOrdersToLines(
         qty: item.qty,
         dayDate: item.dayDate,
         comment: item.notes,
+        dietarySnapshot: order.dietarySnapshot ?? null,
       });
     }
   }

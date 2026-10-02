@@ -58,6 +58,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { UniversalOrderIntakeDrawer } from "@/components/orders/universal-order-intake-drawer";
+import { CustomerDietaryEditor } from "@/components/admin/customer-dietary-editor";
 import { useFmt } from "@/i18n/localization-provider";
 import { useAuth } from "@/hooks/use-auth";
 import { useCan } from "@/hooks/use-can";
@@ -1147,6 +1148,12 @@ function AdminCustomersPage() {
                             </div>
                           )}
                         </form>
+
+                        {/* CR-CUST-01: Dietary Preferences, Allergens & Restrictions Profile */}
+                        <CustomerDietaryEditor
+                          customerId={selectedCustomer.id}
+                          canWrite={canWrite}
+                        />
 
                         {/* Summary Metric Strip */}
                         <div className="grid grid-cols-2 gap-3 pt-3 border-t border-border sm:grid-cols-4">

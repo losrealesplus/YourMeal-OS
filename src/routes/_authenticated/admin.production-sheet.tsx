@@ -45,6 +45,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { SectionTitle } from "@/components/admin";
+import { DietaryBadges } from "@/components/operations/dietary-badges";
 import {
   ProductionReportService,
   KitchenExecutionService,
@@ -673,6 +674,12 @@ function DigitalPackingByClientView({
                         </Badge>
                       )}
                     </div>
+                    {/* CR-CUST-01 Dietary Badges in P2 Packing Card */}
+                    {cust.dietarySnapshot && (
+                      <div className="mt-1">
+                        <DietaryBadges snapshot={cust.dietarySnapshot} compact={true} />
+                      </div>
+                    )}
                     <p className="text-xs text-muted-foreground font-mono mt-0.5">
                       Pedido #{cust.orderId.slice(0, 8)}
                     </p>
@@ -980,6 +987,12 @@ function PrintableProductionSheet({ report }: { report: ProductionReportModel })
                   <span className="font-black text-base">{cust.customerName}</span>
                   <span className="font-mono text-xs font-bold">Total: {cust.totalPortions}</span>
                 </div>
+
+                {cust.dietarySnapshot && (
+                  <div className="my-1">
+                    <DietaryBadges snapshot={cust.dietarySnapshot} compact={true} />
+                  </div>
+                )}
 
                 {cust.specialInstructions.length > 0 ? (
                   <div className="my-1.5 p-1 border border-black bg-gray-100 text-xs">

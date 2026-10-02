@@ -209,6 +209,39 @@ describe("production report aggregation", () => {
     expect(carlos?.totalPortions).toBe(3);
   });
 
+  it("preserves order-level dietary snapshots in customer packing blocks (CR-CUST-01)", () => {
+    const report = buildProductionReport({
+      deliveryDate: "2026-09-24",
+      lines: [
+        line({
+          orderId: "ord-dietary",
+          customerId: "cust-dietary",
+          customerName: "Laura Marcos",
+          dishId: "dish-1",
+          dishName: "Pollo al Curry",
+          qty: 1,
+          dietarySnapshot: {
+            capturedAt: "2026-10-02T10:00:00Z",
+            allergens: ["gluten", "milk"],
+            customAllergens: ["kiwi"],
+            restrictions: ["celiac"],
+            preferences: ["no_onion"],
+            dietaryNotes: "Severa alergia al kiwi",
+            isOverride: false,
+          },
+        }),
+      ],
+    });
+
+    const laura = report.packingByCustomer.find((c) => c.customerId === "cust-dietary");
+    expect(laura).toBeDefined();
+    expect(laura?.dietarySnapshot).not.toBeNull();
+    expect(laura?.dietarySnapshot?.allergens).toEqual(["gluten", "milk"]);
+    expect(laura?.dietarySnapshot?.customAllergens).toEqual(["kiwi"]);
+    expect(laura?.dietarySnapshot?.restrictions).toEqual(["celiac"]);
+    expect(laura?.dietarySnapshot?.dietaryNotes).toBe("Severa alergia al kiwi");
+  });
+
   it("builds Level 2 packing by dish with customer allocations (G6)", () => {
     const report = buildProductionReport({
       deliveryDate: "2026-09-24",

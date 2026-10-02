@@ -421,6 +421,60 @@ export type Database = {
           },
         ]
       }
+      customer_dietary_profiles: {
+        Row: {
+          allergens: Json
+          created_at: string
+          custom_allergens: Json
+          customer_id: string
+          dietary_notes: string | null
+          id: string
+          preferences: Json
+          restrictions: Json
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          allergens?: Json
+          created_at?: string
+          custom_allergens?: Json
+          customer_id: string
+          dietary_notes?: string | null
+          id?: string
+          preferences?: Json
+          restrictions?: Json
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          allergens?: Json
+          created_at?: string
+          custom_allergens?: Json
+          customer_id?: string
+          dietary_notes?: string | null
+          id?: string
+          preferences?: Json
+          restrictions?: Json
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_dietary_profiles_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_dietary_profiles_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_dish_favorites: {
         Row: {
           created_at: string
@@ -1373,6 +1427,7 @@ export type Database = {
           delivery_address_id: string | null
           delivery_group_id: string | null
           demand_channel: Database["public"]["Enums"]["demand_channel"]
+          dietary_snapshot?: Json | null
           id: string
           notes: string | null
           organizational_unit_id: string | null
@@ -1390,6 +1445,7 @@ export type Database = {
           delivery_address_id?: string | null
           delivery_group_id?: string | null
           demand_channel?: Database["public"]["Enums"]["demand_channel"]
+          dietary_snapshot?: Json | null
           id?: string
           notes?: string | null
           organizational_unit_id?: string | null
@@ -1407,6 +1463,7 @@ export type Database = {
           delivery_address_id?: string | null
           delivery_group_id?: string | null
           demand_channel?: Database["public"]["Enums"]["demand_channel"]
+          dietary_snapshot?: Json | null
           id?: string
           notes?: string | null
           organizational_unit_id?: string | null

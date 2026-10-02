@@ -30,6 +30,7 @@ function createMockSupabase() {
     customer_phones: [] as any[],
     customer_addresses: [] as any[],
     customer_preferences: [] as any[],
+    customer_dietary_profiles: [] as any[],
     orders: [] as any[],
     order_items: [] as any[],
   };
@@ -280,5 +281,112 @@ describe("OPS-01 G1 — StaffOrderCaptureService", () => {
     expect(res.order.company_id).toBe("comp-acme");
     expect(res.order.site_id).toBe("loc-north");
     expect(res.order.organizational_unit_id).toBe("dept-mktg");
+  });
+
+  it("automatically captures customer dietary profile into orders.dietary_snapshot (CR-CUST-01)", async () => {
+    const mockSupa = createMockSupabase();
+    mockSupa.client.from("customer_dietary_profiles");
+    // Pre-seed customer dietary profile
+    (mockSupa as any).store = (mockSupa as any); // reference
+    const ctx = mockCtx({}, mockSupa);
+
+    // Pre-insert dietary profile
+    await mockSupa.client.from("customer_dietary_profiles").insert({
+      tenant_id: "tenant-eatclean",
+      customer_id: "cust-1",
+      allergens: ["gluten", "milk"],
+      custom_allergens: ["kiwi"],
+      restrictions: ["celiac"],
+      preferences: ["no_onion"],
+      dietary_notes: "Alergia severa al kiwi",
+    });
+
+    const dto: UniversalOrderCaptureDTO = {
+      customer: { mode: "existing", customerId: "cust-1" },
+      weekStart: "2026-09-28",
+      lines: [{ dayDate: "2026-09-29", dishId: "dish-pollo", qty: 1 }],
+    };
+
+    const res = await StaffOrderCaptureService.captureOrder(ctx, dto);
+
+    expect(res.order.dietary_snapshot).not.toBeNull();
+    const snapshot = res.order.dietary_snapshot as any;
+    expect(snapshot.allergens).toEqual(["gluten", "milk"]);
+    expect(snapshot.customAllergens).toEqual(["kiwi"]);
+    expect(snapshot.restrictions).toEqual(["celiac"]);
+    expect(snapshot.preferences).toEqual(["no_onion"]);
+    expect(snapshot.dietaryNotes).toBe("Alergia severa al kiwi");
+    expect(snapshot.isOverride).toBe(false);
+  });
+
+  it("applies order-level dietary overrides without modifying customer profile (CR-CUST-01)", async () => {
+    const mockSupa = createMockSupabase();
+    const ctx = mockCtx({}, mockSupa);
+
+    await mockSupa.client.from("customer_dietary_profiles").insert({
+      tenant_id: "tenant-eatclean",
+      customer_id: "cust-1",
+      allergens: ["peanuts"],
+      custom_allergens: [],
+      restrictions: [],
+      preferences: [],
+      dietary_notes: null,
+    });
+
+    const dto: UniversalOrderCaptureDTO = {
+      customer: { mode: "existing", customerId: "cust-1" },
+      weekStart: "2026-09-28",
+      lines: [{ dayDate: "2026-09-29", dishId: "dish-pollo", qty: 1 }],
+      dietaryOverride: {
+        allergens: ["peanuts", "fish"],
+        overrideReason: "Invitado alérgico al pescado",
+      },
+    };
+
+    const res = await StaffOrderCaptureService.captureOrder(ctx, dto);
+
+    expect(res.order.dietary_snapshot).not.toBeNull();
+    const snapshot = res.order.dietary_snapshot as any;
+    expect(snapshot.allergens).toEqual(["peanuts", "fish"]);
+    expect(snapshot.isOverride).toBe(true);
+    expect(snapshot.overrideReason).toBe("Invitado alérgico al pescado");
+  });
+
+  it("rejects dietary override when justification reason is missing", async () => {
+    const mockSupa = createMockSupabase();
+    const ctx = mockCtx({}, mockSupa);
+
+    const dto: UniversalOrderCaptureDTO = {
+      customer: { mode: "existing", customerId: "cust-1" },
+      weekStart: "2026-09-28",
+      lines: [{ dayDate: "2026-09-29", dishId: "dish-pollo", qty: 1 }],
+      dietaryOverride: {
+        allergens: ["eggs"],
+        overrideReason: "",
+      },
+    };
+
+    await expect(StaffOrderCaptureService.captureOrder(ctx, dto)).rejects.toThrow(
+      "Un override dietético requiere un motivo obligatorio (mínimo 5 caracteres)."
+    );
+  });
+
+  it("rejects dietary override when justification reason has fewer than 5 characters", async () => {
+    const mockSupa = createMockSupabase();
+    const ctx = mockCtx({}, mockSupa);
+
+    const dto: UniversalOrderCaptureDTO = {
+      customer: { mode: "existing", customerId: "cust-1" },
+      weekStart: "2026-09-28",
+      lines: [{ dayDate: "2026-09-29", dishId: "dish-pollo", qty: 1 }],
+      dietaryOverride: {
+        dietaryNotes: "Sin aderezos",
+        overrideReason: "abc",
+      },
+    };
+
+    await expect(StaffOrderCaptureService.captureOrder(ctx, dto)).rejects.toThrow(
+      "Un override dietético requiere un motivo obligatorio (mínimo 5 caracteres)."
+    );
   });
 });

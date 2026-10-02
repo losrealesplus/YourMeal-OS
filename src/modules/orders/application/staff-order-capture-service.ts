@@ -4,6 +4,11 @@ import { AuditService } from "@/services/audit-service";
 import type { ServiceContext } from "@/services/types";
 import { createDishRepository } from "@/modules/dish-library/infrastructure/dish-repository";
 import type { OrderRow, OrderItemRow } from "../infrastructure/order-repository";
+import {
+  buildOrderDietarySnapshot,
+  type CustomerDietaryProfile,
+  type OrderDietarySnapshot,
+} from "@/types/dietary";
 
 export interface UniversalOrderCaptureLineInput {
   dayDate: string; // YYYY-MM-DD
@@ -22,6 +27,13 @@ export type UniversalCustomerInput =
       street?: string | null;
       city?: string | null;
       deliveryNotes?: string | null;
+      dietaryProfile?: {
+        allergens?: string[];
+        customAllergens?: string[];
+        restrictions?: string[];
+        preferences?: string[];
+        dietaryNotes?: string | null;
+      };
     };
 
 export interface UniversalOrderCaptureDTO {
@@ -34,6 +46,14 @@ export interface UniversalOrderCaptureDTO {
   siteId?: string | null;
   organizationalUnitId?: string | null;
   lines: UniversalOrderCaptureLineInput[];
+  dietaryOverride?: {
+    allergens?: string[];
+    customAllergens?: string[];
+    restrictions?: string[];
+    preferences?: string[];
+    dietaryNotes?: string | null;
+    overrideReason?: string | null;
+  } | null;
 }
 
 export interface StaffOrderCaptureResult {
@@ -238,6 +258,64 @@ export const StaffOrderCaptureService = {
 
     grandTotal = Math.round(grandTotal * 100) / 100;
 
+    // 3.5. Resolve Customer Dietary Profile & Build Immutable Snapshot (CR-CUST-01)
+    let customerDietaryProfile: CustomerDietaryProfile | null = null;
+    const { data: dietaryRow } = await (ctx.supabase as any)
+      .from("customer_dietary_profiles")
+      .select("*")
+      .eq("tenant_id", ctx.tenantId)
+      .eq("customer_id", customerId)
+      .maybeSingle();
+
+    if (dietaryRow) {
+      customerDietaryProfile = {
+        id: dietaryRow.id,
+        tenantId: dietaryRow.tenant_id,
+        customerId: dietaryRow.customer_id,
+        allergens: Array.isArray(dietaryRow.allergens) ? dietaryRow.allergens : [],
+        customAllergens: Array.isArray(dietaryRow.custom_allergens) ? dietaryRow.custom_allergens : [],
+        restrictions: Array.isArray(dietaryRow.restrictions) ? dietaryRow.restrictions : [],
+        preferences: Array.isArray(dietaryRow.preferences) ? dietaryRow.preferences : [],
+        dietaryNotes: dietaryRow.dietary_notes ?? null,
+      };
+    } else if (dto.customer.mode === "new" && dto.customer.dietaryProfile) {
+      customerDietaryProfile = {
+        tenantId: ctx.tenantId,
+        customerId,
+        allergens: dto.customer.dietaryProfile.allergens ?? [],
+        customAllergens: dto.customer.dietaryProfile.customAllergens ?? [],
+        restrictions: dto.customer.dietaryProfile.restrictions ?? [],
+        preferences: dto.customer.dietaryProfile.preferences ?? [],
+        dietaryNotes: dto.customer.dietaryProfile.dietaryNotes ?? null,
+      };
+    }
+
+    // Scope Lock Rule 3: Dietary override requires mandatory justification reason (min 5 chars)
+    if (dto.dietaryOverride) {
+      const hasOverrideContent = Boolean(
+        dto.dietaryOverride.allergens !== undefined ||
+        dto.dietaryOverride.customAllergens !== undefined ||
+        dto.dietaryOverride.restrictions !== undefined ||
+        dto.dietaryOverride.preferences !== undefined ||
+        dto.dietaryOverride.dietaryNotes !== undefined
+      );
+      if (hasOverrideContent) {
+        const reason = dto.dietaryOverride.overrideReason?.trim();
+        if (!reason || reason.length < 5) {
+          throw new DomainError(
+            "INVALID_STATE",
+            "Un override dietético requiere un motivo obligatorio (mínimo 5 caracteres)."
+          );
+        }
+      }
+    }
+
+    const dietarySnapshot = buildOrderDietarySnapshot({
+      customerProfile: customerDietaryProfile,
+      override: dto.dietaryOverride,
+      authorUserId: ctx.userId,
+    });
+
     // 4. Atomic Order Creation
     const status = dto.autoConfirm ? "confirmed" : "draft";
     const isCompanyOrder = dto.demandChannel === "company" && !!dto.companyId;
@@ -250,6 +328,7 @@ export const StaffOrderCaptureService = {
         week_start: dto.weekStart,
         total: grandTotal,
         notes: dto.orderNotes?.trim() ?? null,
+        dietary_snapshot: (dietarySnapshot as any) ?? null,
         status,
         demand_channel: isCompanyOrder ? "company" : "individual",
         company_id: isCompanyOrder ? dto.companyId : null,

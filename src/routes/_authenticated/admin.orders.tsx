@@ -37,6 +37,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { OperationalTimeline } from "@/components/operations/operational-timeline";
+import { DietaryBadges } from "@/components/operations/dietary-badges";
 import {
   createOperationsRepository,
   type OperationalOrderListItem,
@@ -569,6 +570,11 @@ export function OrderDetailView({
           </div>
         </div>
       </div>
+
+      {/* ── CR-CUST-01: Perfil Dietético & Alérgenos Inmutable del Pedido ─────── */}
+      {detail.dietarySnapshot && (
+        <DietaryBadges snapshot={detail.dietarySnapshot} />
+      )}
 
       {/* ── Tier 4: Datos de Entrega y Contacto ──────────────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

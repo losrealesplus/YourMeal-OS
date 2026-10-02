@@ -18,6 +18,8 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { createServiceContext } from "@/services/types";
+import { DietaryBadges } from "@/components/operations/dietary-badges";
+import type { CustomerDietaryProfile } from "@/types/dietary";
 import {
   StaffOrderCaptureService,
   type UniversalOrderCaptureDTO,
@@ -164,6 +166,12 @@ export function UniversalOrderIntakeDrawer({
   const [orderNotes, setOrderNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  // CR-CUST-01 Dietary Profile State
+  const [customerDietaryProfile, setCustomerDietaryProfile] = useState<CustomerDietaryProfile | null>(null);
+  const [isEditingDietaryOverride, setIsEditingDietaryOverride] = useState(false);
+  const [dietaryOverrideReason, setDietaryOverrideReason] = useState("");
+  const [dietaryOverrideNotes, setDietaryOverrideNotes] = useState("");
+
   // Synchronize week when changed
   useEffect(() => {
     if (initialDayDate) {
@@ -281,6 +289,55 @@ export function UniversalOrderIntakeDrawer({
       isMounted = false;
     };
   }, [open, tenantId, customerMode, selectedCustomerId, preselectedCompanyId, preselectedDemandChannel]);
+
+  // CR-CUST-01: Load customer dietary profile when existing customer is selected
+  useEffect(() => {
+    let isMounted = true;
+    if (!open || !tenantId || customerMode !== "existing" || !selectedCustomerId) {
+      setCustomerDietaryProfile(null);
+      setIsEditingDietaryOverride(false);
+      return;
+    }
+
+    async function loadDietary() {
+      try {
+        const { data } = await (supabase as any)
+          .from("customer_dietary_profiles")
+          .select("*")
+          .eq("tenant_id", tenantId)
+          .eq("customer_id", selectedCustomerId)
+          .maybeSingle();
+
+        if (isMounted) {
+          if (data) {
+            setCustomerDietaryProfile({
+              id: data.id,
+              tenantId: data.tenant_id,
+              customerId: data.customer_id,
+              allergens: Array.isArray(data.allergens) ? data.allergens : [],
+              customAllergens: Array.isArray(data.custom_allergens) ? data.custom_allergens : [],
+              restrictions: Array.isArray(data.restrictions) ? data.restrictions : [],
+              preferences: Array.isArray(data.preferences) ? data.preferences : [],
+              dietaryNotes: data.dietary_notes ?? null,
+            });
+            setDietaryOverrideNotes(data.dietary_notes ?? "");
+          } else {
+            setCustomerDietaryProfile(null);
+            setDietaryOverrideNotes("");
+          }
+        }
+      } catch {
+        if (isMounted) {
+          setCustomerDietaryProfile(null);
+        }
+      }
+    }
+
+    void loadDietary();
+    return () => {
+      isMounted = false;
+    };
+  }, [open, tenantId, customerMode, selectedCustomerId]);
 
   // Load company sites and departments when selectedCompanyId changes
   useEffect(() => {
@@ -537,6 +594,14 @@ export function UniversalOrderIntakeDrawer({
       return;
     }
 
+    if (isEditingDietaryOverride) {
+      const reason = dietaryOverrideReason.trim();
+      if (!reason || reason.length < 5) {
+        toast.error("Debe especificar un motivo obligatorio para la personalización de este pedido (mínimo 5 caracteres).");
+        return;
+      }
+    }
+
     setSubmitting(true);
     try {
       const ctx = await createServiceContext({
@@ -568,6 +633,12 @@ export function UniversalOrderIntakeDrawer({
         siteId: isCompanyContext ? (selectedSiteId || null) : null,
         organizationalUnitId: isCompanyContext ? (selectedOrganizationalUnitId || null) : null,
         lines,
+        dietaryOverride: isEditingDietaryOverride
+          ? {
+              dietaryNotes: dietaryOverrideNotes.trim() ? dietaryOverrideNotes.trim() : null,
+              overrideReason: dietaryOverrideReason.trim() ? dietaryOverrideReason.trim() : null,
+            }
+          : null,
       };
 
       const result = await StaffOrderCaptureService.captureOrder(ctx, dto);
@@ -667,6 +738,7 @@ export function UniversalOrderIntakeDrawer({
             {customerMode === "existing" ? (
               <div className="space-y-2">
                 {selectedCustomerId ? (
+                  <>
                   <div className="flex items-center justify-between p-2.5 rounded-md bg-accent/50 border border-border">
                     <div>
                       <p className="text-sm font-medium">{selectedCustomerDisplayName}</p>
@@ -684,6 +756,58 @@ export function UniversalOrderIntakeDrawer({
                       Cambiar
                     </Button>
                   </div>
+
+                  {/* CR-CUST-01 Dietary Badges & Override preview */}
+                  {customerDietaryProfile && (
+                    <div className="space-y-2 pt-1">
+                      <DietaryBadges snapshot={customerDietaryProfile} compact={false} />
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingDietaryOverride((prev) => !prev)}
+                          className="text-xs text-primary underline hover:text-primary/80 transition-colors"
+                        >
+                          {isEditingDietaryOverride
+                            ? "Cancelar personalización de este pedido"
+                            : "Personalizar para este pedido"}
+                        </button>
+                      </div>
+                      {isEditingDietaryOverride && (
+                        <div className="p-3 rounded-md border border-purple-500/40 bg-purple-500/5 space-y-2 text-xs">
+                          <p className="font-semibold text-purple-300">
+                            Personalización temporal para este pedido (no modifica el perfil maestro):
+                          </p>
+                          <div>
+                            <label className="text-[11px] font-medium text-muted-foreground block mb-1">
+                              Motivo de personalización <span className="text-destructive font-bold">*</span> (mínimo 5 caracteres):
+                            </label>
+                            <Input
+                              value={dietaryOverrideReason}
+                              onChange={(e) => setDietaryOverrideReason(e.target.value)}
+                              placeholder="Ej. Invitado en la cena / excepción temporal (obligatorio)"
+                              className="h-7 text-xs"
+                              required
+                            />
+                            {dietaryOverrideReason.trim().length > 0 && dietaryOverrideReason.trim().length < 5 && (
+                              <p className="text-[10px] text-destructive mt-0.5">El motivo debe tener al menos 5 caracteres.</p>
+                            )}
+                          </div>
+                          <div>
+                            <label className="text-[11px] font-medium text-muted-foreground block mb-1">
+                              Instrucciones específicas para este pedido:
+                            </label>
+                            <Input
+                              value={dietaryOverrideNotes}
+                              onChange={(e) => setDietaryOverrideNotes(e.target.value)}
+                              placeholder="Notas específicas para cocina"
+                              className="h-7 text-xs"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </>
                 ) : (
                   <div className="relative">
                     <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />

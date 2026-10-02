@@ -1,4 +1,5 @@
 import type { KitchenBatchStatus } from "./kitchen-batch-status";
+import type { OrderDietarySnapshot } from "@/types/dietary";
 
 /**
  * EP-002B — Hoja de Producción (pure aggregation).
@@ -17,6 +18,8 @@ export type ProductionSourceLine = {
   dayDate: string;
   /** order_items.comment — customization / special note */
   comment: string | null;
+  /** CR-CUST-01: Order-level frozen dietary snapshot */
+  dietarySnapshot?: OrderDietarySnapshot | null;
 };
 
 export type ProductionCustomerLine = {
@@ -96,6 +99,7 @@ export type ProductionPackingCustomerBlock = {
   totalPortions: number;
   items: ProductionPackingCustomerItem[];
   specialInstructions: string[];
+  dietarySnapshot?: OrderDietarySnapshot | null;
 };
 
 export type ProductionPackingDishAllocation = {
@@ -360,6 +364,7 @@ export function buildProductionReport(input: {
         totalPortions: 0,
         items: [],
         specialInstructions: [],
+        dietarySnapshot: line.dietarySnapshot ?? null,
       };
       customerPackingMap.set(customerKey, block);
     }
