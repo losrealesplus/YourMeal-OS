@@ -178,6 +178,11 @@ export function OrdersTable({
                       {o.companyName}
                     </div>
                   )}
+                  {o.dietarySnapshot && (
+                    <div className="mt-1">
+                      <DietaryBadges snapshot={o.dietarySnapshot} compact />
+                    </div>
+                  )}
                 </TableCell>
                 <TableCell>
                   <Badge variant="secondary">

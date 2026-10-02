@@ -60,5 +60,43 @@ describe("mapOrderToSummaryView", () => {
     expect(view.deliveryDateIso).toBe("2026-07-22T12:00:00.000Z");
     expect(view.address).toBeNull();
     expect(view.companyName).toBeNull();
+    expect(view.dietarySnapshot).toBeNull();
+  });
+
+  it("projects dietary_snapshot from order row into view model", () => {
+    const mockSnapshot = {
+      capturedAt: "2026-10-02T10:00:00.000Z",
+      allergens: ["gluten", "milk"],
+      customAllergens: ["kiwi"],
+      restrictions: ["celiac"],
+      preferences: ["vegetarian"],
+      dietaryNotes: "Separar salsa",
+      isOverride: false,
+      overrideReason: null,
+      authorUserId: "u1",
+    };
+
+    const order: OrderRow = {
+      id: "o2",
+      tenant_id: "t1",
+      customer_id: "c1",
+      week_start: "2026-10-05",
+      status: "confirmed",
+      total: 25,
+      notes: null,
+      dietary_snapshot: mockSnapshot,
+      created_at: "2026-10-02T10:00:00Z",
+      deleted_at: null,
+      company_id: null,
+      delivery_address_id: null,
+      delivery_group_id: null,
+      demand_channel: "individual",
+      organizational_unit_id: null,
+      site_id: null,
+    };
+
+    const view = mapOrderToSummaryView(order, [], new Map());
+    expect(view.dietarySnapshot).toEqual(mockSnapshot);
+    expect(view.dietarySnapshot?.allergens).toEqual(["gluten", "milk"]);
   });
 });

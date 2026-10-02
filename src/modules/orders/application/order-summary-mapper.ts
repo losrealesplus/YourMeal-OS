@@ -1,18 +1,13 @@
 import type { CatalogDish } from "@/modules/dish-library/application/dish-catalog-mapper";
 import type { OrderItemRow, OrderRow } from "../infrastructure/order-repository";
+import type { OrderDietarySnapshot } from "@/types/dietary";
 
 /**
  * CAP-005 — view model for existing Order Summary screen.
  * Maps as-built order_status to the StatusPill contract without redesign.
  */
 export type OrderSummaryStatus =
-  | "draft"
-  | "confirmed"
-  | "pending"
-  | "preparing"
-  | "dispatched"
-  | "delivered"
-  | "cancelled";
+  "draft" | "confirmed" | "pending" | "preparing" | "dispatched" | "delivered" | "cancelled";
 
 export type OrderSummaryItemView = {
   dishId: string;
@@ -39,6 +34,7 @@ export type OrderSummaryView = {
   items: OrderSummaryItemView[];
   address: OrderDeliveryAddressView | null;
   companyName: string | null;
+  dietarySnapshot: OrderDietarySnapshot | null;
 };
 
 function mapDbStatus(status: string): OrderSummaryStatus {
@@ -84,5 +80,6 @@ export function mapOrderToSummaryView(
     })),
     address: extras.address ?? null,
     companyName: extras.companyName ?? null,
+    dietarySnapshot: (order.dietary_snapshot as OrderDietarySnapshot | null) ?? null,
   };
 }

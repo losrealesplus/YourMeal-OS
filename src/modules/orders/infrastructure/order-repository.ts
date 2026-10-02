@@ -1,5 +1,6 @@
 import type { Json, Tables } from "@/integrations/supabase/types";
 import type { AppSupabase } from "@/services/types";
+import type { OrderDietarySnapshot } from "@/types/dietary";
 
 export type OrderRow = Tables<"orders">;
 export type OrderItemRow = Tables<"order_items">;
@@ -17,6 +18,7 @@ export type ProgramOrderInput = {
   weekStart: string;
   total: number;
   notes?: string | null;
+  dietarySnapshot?: OrderDietarySnapshot | null;
   items: ProgramOrderItemInput[];
   demandChannel?: "individual" | "company";
   companyId?: string | null;
@@ -121,6 +123,18 @@ export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
       if (!result?.order || !Array.isArray(result.items)) {
         throw new Error("program_draft_order returned unexpected payload");
       }
+
+      if (input.dietarySnapshot) {
+        const { error: snapErr } = await supabase
+          .from("orders")
+          .update({ dietary_snapshot: input.dietarySnapshot as any })
+          .eq("tenant_id", tenantId)
+          .eq("id", result.order.id);
+        if (!snapErr) {
+          result.order.dietary_snapshot = input.dietarySnapshot as any;
+        }
+      }
+
       return { order: result.order, items: result.items };
     },
 

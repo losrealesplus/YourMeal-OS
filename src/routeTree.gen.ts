@@ -101,6 +101,7 @@ import { Route as AuthenticatedAppOnboardingCompanyRouteImport } from './routes/
 import { Route as AuthenticatedAppOnboardingEmployeeRouteImport } from './routes/_authenticated/app.onboarding.employee'
 import { Route as AuthenticatedAppOrdersIndexRouteImport } from './routes/_authenticated/app.orders.index'
 import { Route as AuthenticatedAppOrdersOrderIdRouteImport } from './routes/_authenticated/app.orders.$orderId'
+import { Route as AuthenticatedAppSettingsDietaryRouteImport } from './routes/_authenticated/app.settings.dietary'
 import { Route as AuthenticatedAppSettingsProfileRouteImport } from './routes/_authenticated/app.settings.profile'
 import { Route as AuthenticatedSaasTenantsTenantIdRouteImport } from './routes/_authenticated/saas.tenants.$tenantId'
 
@@ -632,6 +633,12 @@ const AuthenticatedAppOrdersOrderIdRoute =
     path: '/$orderId',
     getParentRoute: () => AuthenticatedAppOrdersRoute,
   } as any)
+const AuthenticatedAppSettingsDietaryRoute =
+  AuthenticatedAppSettingsDietaryRouteImport.update({
+    id: '/dietary',
+    path: '/dietary',
+    getParentRoute: () => AuthenticatedAppSettingsRoute,
+  } as any)
 const AuthenticatedAppSettingsProfileRoute =
   AuthenticatedAppSettingsProfileRouteImport.update({
     id: '/profile',
@@ -733,6 +740,7 @@ export interface FileRoutesByFullPath {
   '/app/onboarding/company': typeof AuthenticatedAppOnboardingCompanyRoute
   '/app/onboarding/employee': typeof AuthenticatedAppOnboardingEmployeeRoute
   '/app/orders/$orderId': typeof AuthenticatedAppOrdersOrderIdRoute
+  '/app/settings/dietary': typeof AuthenticatedAppSettingsDietaryRoute
   '/app/settings/profile': typeof AuthenticatedAppSettingsProfileRoute
   '/saas/tenants/$tenantId': typeof AuthenticatedSaasTenantsTenantIdRoute
   '/admin/design-system/': typeof AuthenticatedAdminDesignSystemIndexRoute
@@ -821,6 +829,7 @@ export interface FileRoutesByTo {
   '/app/onboarding/company': typeof AuthenticatedAppOnboardingCompanyRoute
   '/app/onboarding/employee': typeof AuthenticatedAppOnboardingEmployeeRoute
   '/app/orders/$orderId': typeof AuthenticatedAppOrdersOrderIdRoute
+  '/app/settings/dietary': typeof AuthenticatedAppSettingsDietaryRoute
   '/app/settings/profile': typeof AuthenticatedAppSettingsProfileRoute
   '/saas/tenants/$tenantId': typeof AuthenticatedSaasTenantsTenantIdRoute
   '/admin/design-system': typeof AuthenticatedAdminDesignSystemIndexRoute
@@ -918,6 +927,7 @@ export interface FileRoutesById {
   '/_authenticated/app/onboarding/company': typeof AuthenticatedAppOnboardingCompanyRoute
   '/_authenticated/app/onboarding/employee': typeof AuthenticatedAppOnboardingEmployeeRoute
   '/_authenticated/app/orders/$orderId': typeof AuthenticatedAppOrdersOrderIdRoute
+  '/_authenticated/app/settings/dietary': typeof AuthenticatedAppSettingsDietaryRoute
   '/_authenticated/app/settings/profile': typeof AuthenticatedAppSettingsProfileRoute
   '/_authenticated/saas/tenants/$tenantId': typeof AuthenticatedSaasTenantsTenantIdRoute
   '/_authenticated/admin/design-system/': typeof AuthenticatedAdminDesignSystemIndexRoute
@@ -1015,6 +1025,7 @@ export interface FileRouteTypes {
     | '/app/onboarding/company'
     | '/app/onboarding/employee'
     | '/app/orders/$orderId'
+    | '/app/settings/dietary'
     | '/app/settings/profile'
     | '/saas/tenants/$tenantId'
     | '/admin/design-system/'
@@ -1103,6 +1114,7 @@ export interface FileRouteTypes {
     | '/app/onboarding/company'
     | '/app/onboarding/employee'
     | '/app/orders/$orderId'
+    | '/app/settings/dietary'
     | '/app/settings/profile'
     | '/saas/tenants/$tenantId'
     | '/admin/design-system'
@@ -1199,6 +1211,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/onboarding/company'
     | '/_authenticated/app/onboarding/employee'
     | '/_authenticated/app/orders/$orderId'
+    | '/_authenticated/app/settings/dietary'
     | '/_authenticated/app/settings/profile'
     | '/_authenticated/saas/tenants/$tenantId'
     | '/_authenticated/admin/design-system/'
@@ -1864,6 +1877,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppOrdersOrderIdRouteImport
       parentRoute: typeof AuthenticatedAppOrdersRoute
     }
+    '/_authenticated/app/settings/dietary': {
+      id: '/_authenticated/app/settings/dietary'
+      path: '/dietary'
+      fullPath: '/app/settings/dietary'
+      preLoaderRoute: typeof AuthenticatedAppSettingsDietaryRouteImport
+      parentRoute: typeof AuthenticatedAppSettingsRoute
+    }
     '/_authenticated/app/settings/profile': {
       id: '/_authenticated/app/settings/profile'
       path: '/profile'
@@ -2114,11 +2134,13 @@ const AuthenticatedAppOrdersRouteWithChildren =
   )
 
 interface AuthenticatedAppSettingsRouteChildren {
+  AuthenticatedAppSettingsDietaryRoute: typeof AuthenticatedAppSettingsDietaryRoute
   AuthenticatedAppSettingsProfileRoute: typeof AuthenticatedAppSettingsProfileRoute
 }
 
 const AuthenticatedAppSettingsRouteChildren: AuthenticatedAppSettingsRouteChildren =
   {
+    AuthenticatedAppSettingsDietaryRoute: AuthenticatedAppSettingsDietaryRoute,
     AuthenticatedAppSettingsProfileRoute: AuthenticatedAppSettingsProfileRoute,
   }
 
@@ -2234,13 +2256,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

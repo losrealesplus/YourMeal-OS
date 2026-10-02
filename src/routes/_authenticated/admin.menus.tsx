@@ -173,7 +173,7 @@ function AdminMenusPage() {
 
   function changeWeek(weekStart: string) {
     navigate({
-      search: (prev) => ({ ...prev, weekStart }),
+      search: (prev: Record<string, unknown>) => ({ ...prev, weekStart }),
     });
   }
 
@@ -762,8 +762,10 @@ function AdminMenusPage() {
                 {deleteConfirmSlot?.dishes?.name ?? "este plato"}
               </strong>{" "}
               de la planificación del{" "}
-              {deleteConfirmSlot?.day_date ? formatDayDateEs(deleteConfirmSlot.day_date).dayName : "día"}. Podrás
-              volver a añadirlo en cualquier momento mientras el menú esté en borrador.
+              {deleteConfirmSlot?.day_date
+                ? formatDayDateEs(deleteConfirmSlot.day_date).dayName
+                : "día"}
+              . Podrás volver a añadirlo en cualquier momento mientras el menú esté en borrador.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -787,7 +789,9 @@ function AdminMenusPage() {
             <AlertDialogDescription>
               Se copiarán todos los platos de la semana anterior (
               <strong className="text-foreground">
-                {previousWeekMenu?.week_start ? formatWeekRangeEs(previousWeekMenu.week_start) : "semana anterior"}
+                {previousWeekMenu?.week_start
+                  ? formatWeekRangeEs(previousWeekMenu.week_start)
+                  : "semana anterior"}
               </strong>
               ) a la semana actual (
               <strong className="text-foreground">{formatWeekRangeEs(selectedWeekStart)}</strong>)

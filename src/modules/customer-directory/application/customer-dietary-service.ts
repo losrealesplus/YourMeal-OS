@@ -2,10 +2,7 @@
 import type { ServiceContext } from "@/services/types";
 import { AuditService } from "@/services/audit-service";
 import { DomainError, permissionDenied } from "@/domain/errors";
-import type {
-  CustomerDietaryProfile,
-  SaveCustomerDietaryProfileDTO,
-} from "@/types/dietary";
+import type { CustomerDietaryProfile, SaveCustomerDietaryProfileDTO } from "@/types/dietary";
 
 function assertTenant(ctx: ServiceContext): void {
   if (!ctx.tenantId || !ctx.userId) {
@@ -47,7 +44,7 @@ export const CustomerDietaryService = {
    */
   async getDietaryProfile(
     ctx: ServiceContext,
-    customerId: string
+    customerId: string,
   ): Promise<CustomerDietaryProfile | null> {
     assertTenant(ctx);
     assertCanReadCustomers(ctx);
@@ -60,7 +57,10 @@ export const CustomerDietaryService = {
       .maybeSingle();
 
     if (error) {
-      throw new DomainError("INVALID_STATE", `Failed to get customer dietary profile: ${error.message}`);
+      throw new DomainError(
+        "INVALID_STATE",
+        `Failed to get customer dietary profile: ${error.message}`,
+      );
     }
 
     if (!data) return null;
@@ -73,7 +73,7 @@ export const CustomerDietaryService = {
    */
   async saveDietaryProfile(
     ctx: ServiceContext,
-    input: SaveCustomerDietaryProfileDTO
+    input: SaveCustomerDietaryProfileDTO,
   ): Promise<CustomerDietaryProfile> {
     assertTenant(ctx);
     assertCanWriteCustomers(ctx);
@@ -101,7 +101,10 @@ export const CustomerDietaryService = {
       .single();
 
     if (error) {
-      throw new DomainError("INVALID_STATE", `Failed to save customer dietary profile: ${error.message}`);
+      throw new DomainError(
+        "INVALID_STATE",
+        `Failed to save customer dietary profile: ${error.message}`,
+      );
     }
 
     await AuditService.write(ctx, {
@@ -121,7 +124,7 @@ export const CustomerDietaryService = {
    */
   async getBatchDietaryProfiles(
     ctx: ServiceContext,
-    customerIds: string[]
+    customerIds: string[],
   ): Promise<Map<string, CustomerDietaryProfile>> {
     assertTenant(ctx);
     assertCanReadCustomers(ctx);
@@ -136,7 +139,10 @@ export const CustomerDietaryService = {
       .in("customer_id", customerIds);
 
     if (error) {
-      throw new DomainError("INVALID_STATE", `Failed to load batch dietary profiles: ${error.message}`);
+      throw new DomainError(
+        "INVALID_STATE",
+        `Failed to load batch dietary profiles: ${error.message}`,
+      );
     }
 
     if (data) {
@@ -146,5 +152,99 @@ export const CustomerDietaryService = {
     }
 
     return map;
+  },
+
+  /**
+   * Retrieves the current authenticated customer's own dietary profile.
+   * Resolves customer_id from customers table matching ctx.userId.
+   */
+  async getOwnDietaryProfile(ctx: ServiceContext): Promise<CustomerDietaryProfile | null> {
+    assertTenant(ctx);
+
+    const { data: customer, error: custErr } = await (ctx.supabase as any)
+      .from("customers")
+      .select("id")
+      .eq("tenant_id", ctx.tenantId)
+      .eq("user_id", ctx.userId)
+      .is("deleted_at", null)
+      .maybeSingle();
+
+    if (custErr) {
+      throw new DomainError("INVALID_STATE", `Failed to resolve customer: ${custErr.message}`);
+    }
+
+    if (!customer?.id) return null;
+
+    const { data, error } = await (ctx.supabase as any)
+      .from("customer_dietary_profiles")
+      .select("*")
+      .eq("tenant_id", ctx.tenantId)
+      .eq("customer_id", customer.id)
+      .maybeSingle();
+
+    if (error) {
+      throw new DomainError("INVALID_STATE", `Failed to get own dietary profile: ${error.message}`);
+    }
+
+    if (!data) return null;
+    return mapRowToProfile(data);
+  },
+
+  /**
+   * Saves or updates the current authenticated customer's own dietary profile.
+   * Fully audited and tenant-scoped.
+   */
+  async saveOwnDietaryProfile(
+    ctx: ServiceContext,
+    input: Omit<SaveCustomerDietaryProfileDTO, "customerId">,
+  ): Promise<CustomerDietaryProfile> {
+    assertTenant(ctx);
+
+    const { data: customer, error: custErr } = await (ctx.supabase as any)
+      .from("customers")
+      .select("id")
+      .eq("tenant_id", ctx.tenantId)
+      .eq("user_id", ctx.userId)
+      .is("deleted_at", null)
+      .maybeSingle();
+
+    if (custErr || !customer?.id) {
+      throw new DomainError("INVALID_STATE", "Customer record not found for authenticated user");
+    }
+
+    const payload = {
+      tenant_id: ctx.tenantId,
+      customer_id: customer.id,
+      allergens: input.allergens ?? [],
+      custom_allergens: input.customAllergens ?? [],
+      restrictions: input.restrictions ?? [],
+      preferences: input.preferences ?? [],
+      dietary_notes: input.dietaryNotes ? input.dietaryNotes.trim() : null,
+      updated_at: new Date().toISOString(),
+    };
+
+    const { data, error } = await (ctx.supabase as any)
+      .from("customer_dietary_profiles")
+      .upsert(payload, { onConflict: "tenant_id,customer_id" })
+      .select("*")
+      .single();
+
+    if (error) {
+      throw new DomainError(
+        "INVALID_STATE",
+        `Failed to save customer dietary profile: ${error.message}`,
+      );
+    }
+
+    await AuditService.write(ctx, {
+      tenantId: ctx.tenantId,
+      actorId: ctx.userId,
+      entityType: "customer_dietary_profile",
+      entityId: customer.id,
+      action: "update",
+      newData: payload,
+    });
+
+    return mapRowToProfile(data);
   },
 };

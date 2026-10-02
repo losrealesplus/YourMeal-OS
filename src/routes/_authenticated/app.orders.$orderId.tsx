@@ -1,21 +1,15 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Building2, MapPin, RotateCcw, Truck } from "lucide-react";
-import {
-  DishThumb,
-  PrimaryCTA,
-  ScreenHeader,
-  StatusPill,
-} from "@/components/consumer";
+import { DishThumb, PrimaryCTA, ScreenHeader, StatusPill } from "@/components/consumer";
 import { useFmt } from "@/i18n/localization-provider";
 import { useOrder } from "@/hooks/use-order";
 import { useConfirmOrder } from "@/hooks/use-confirm-order";
-import {
-  useRepeatOrder,
-  useRepeatOrderPreview,
-} from "@/hooks/use-repeat-order";
+import { useRepeatOrder, useRepeatOrderPreview } from "@/hooks/use-repeat-order";
 import type { OrderSummaryStatus } from "@/modules/orders/application/order-summary-mapper";
 import type { MockOrderStatus } from "@/lib/mock-catalog";
+import { DietaryBadges } from "@/components/operations/dietary-badges";
+import { CONSTITUTIONAL_DIETARY_DISCLAIMER } from "@/types/dietary";
 
 /**
  * Screen: Customer · Order Summary / Confirm / Repeat
@@ -58,9 +52,7 @@ function OrderSummary() {
   const confirmOrder = useConfirmOrder();
   const repeatOrder = useRepeatOrder();
   const repeatPreview = useRepeatOrderPreview(
-    order && order.status !== "draft" && order.status !== "cancelled"
-      ? order.id
-      : undefined,
+    order && order.status !== "draft" && order.status !== "cancelled" ? order.id : undefined,
   );
   const fmt = useFmt();
 
@@ -87,9 +79,7 @@ function OrderSummary() {
   const isDraft = order.status === "draft";
   const addressLine = formatAddress(order.address);
   const showRepeat =
-    !isDraft &&
-    order.status !== "cancelled" &&
-    Boolean(repeatPreview.data?.canRepeat);
+    !isDraft && order.status !== "cancelled" && Boolean(repeatPreview.data?.canRepeat);
 
   return (
     <div className="flex-1 flex flex-col pb-6">
@@ -97,12 +87,7 @@ function OrderSummary() {
         backTo="/app/orders"
         overline={order.weekLabel}
         title={t("customer:orderSummary")}
-        trailing={
-          <StatusPill
-            status={pillTone(order.status)}
-            label={statusLabels[order.status]}
-          />
-        }
+        trailing={<StatusPill status={pillTone(order.status)} label={statusLabels[order.status]} />}
       />
 
       <section className="px-6">
@@ -122,9 +107,7 @@ function OrderSummary() {
             </div>
             <div>
               <p className="meta-label">{t("customer:deliveryAddress")}</p>
-              <p className="text-sm mt-1">
-                {addressLine ?? t("common:comingSoon")}
-              </p>
+              <p className="text-sm mt-1">{addressLine ?? t("common:comingSoon")}</p>
             </div>
           </div>
           {order.companyName ? (
@@ -152,33 +135,51 @@ function OrderSummary() {
                 <DishThumb emoji={dish.emoji} size="sm" />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold truncate">{dish.name}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {dish.kcal} kcal
-                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{dish.kcal} kcal</p>
                 </div>
-                <span className="font-mono text-sm font-bold tabular-nums">
-                  ×{it.qty}
-                </span>
+                <span className="font-mono text-sm font-bold tabular-nums">×{it.qty}</span>
               </div>
             );
           })}
         </div>
       </section>
 
-      {repeatPreview.data &&
-      repeatPreview.data.unavailable.length > 0 &&
-      showRepeat ? (
+      {/* Condiciones Dietéticas Aplicadas al Pedido */}
+      <section className="px-6 mt-6">
+        <p className="meta-label mb-2">
+          {t("customer:dietaryConditionsTitle", "Condiciones dietéticas aplicadas")}
+        </p>
+        <div className="bg-card border border-border rounded-2xl p-4">
+          {order.dietarySnapshot &&
+          ((order.dietarySnapshot.allergens?.length ?? 0) > 0 ||
+            (order.dietarySnapshot.customAllergens?.length ?? 0) > 0 ||
+            (order.dietarySnapshot.restrictions?.length ?? 0) > 0 ||
+            (order.dietarySnapshot.preferences?.length ?? 0) > 0 ||
+            Boolean(order.dietarySnapshot.dietaryNotes)) ? (
+            <DietaryBadges snapshot={order.dietarySnapshot} />
+          ) : (
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">
+                {t(
+                  "customer:noDietarySnapshot",
+                  "Sin alérgenos ni condiciones especiales declaradas en este pedido.",
+                )}
+              </p>
+              <p className="text-[10px] text-muted-foreground/80 leading-tight">
+                * {CONSTITUTIONAL_DIETARY_DISCLAIMER}
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {repeatPreview.data && repeatPreview.data.unavailable.length > 0 && showRepeat ? (
         <section className="px-6 mt-6">
           <p className="meta-label mb-2">{t("customer:repeatUnavailableTitle")}</p>
           <ul className="bg-card border border-border rounded-2xl divide-y divide-border">
             {repeatPreview.data.unavailable.map((line) => (
-              <li
-                key={`${line.dishId}-${line.sourceDayDate}`}
-                className="px-4 py-3 text-sm"
-              >
-                <p className="font-semibold">
-                  {line.dishName ?? line.dishId}
-                </p>
+              <li key={`${line.dishId}-${line.sourceDayDate}`} className="px-4 py-3 text-sm">
+                <p className="font-semibold">{line.dishName ?? line.dishId}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {t("customer:dishUnavailable")}
                 </p>
@@ -251,9 +252,7 @@ function TotalsRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between">
       <span className="text-sm text-muted-foreground">{label}</span>
-      <span className="font-mono tabular-nums text-sm font-semibold">
-        {value}
-      </span>
+      <span className="font-mono tabular-nums text-sm font-semibold">{value}</span>
     </div>
   );
 }

@@ -20,6 +20,7 @@ import {
   type OrderRow,
   type ProgramOrderItemInput,
 } from "../infrastructure/order-repository";
+import { buildOrderDietarySnapshot } from "@/types/dietary";
 
 export type ProgramDraftOrderCommand = {
   weekStart: string;
@@ -184,10 +185,7 @@ export const OrderService = {
         }
       }
 
-      const authoritativeCustomerTier = resolveAuthoritativeCustomerTier(
-        ctx,
-        command.customerTier,
-      );
+      const authoritativeCustomerTier = resolveAuthoritativeCustomerTier(ctx, command.customerTier);
 
       const commercialPricing = resolveOrderCommercialPricing({
         tenantSlug: ctx.tenantSlug ?? undefined,
@@ -258,11 +256,49 @@ export const OrderService = {
         await import("@/modules/company-account/application/company-account-service");
       const demand = await CompanyAccountService.resolveOrderDemandContext(ctx, customerId);
 
+      // CR-OPS-DIET-01 P1: Resolve customer's dietary profile and build immutable dietary_snapshot
+      const { data: profileRow } = await ctx.supabase
+        .from("customer_dietary_profiles")
+        .select("*")
+        .eq("tenant_id", ctx.tenantId)
+        .eq("customer_id", customerId)
+        .maybeSingle();
+
+      const customerDietaryProfile = profileRow
+        ? {
+            id: profileRow.id,
+            tenantId: profileRow.tenant_id,
+            customerId: profileRow.customer_id,
+            allergens: Array.isArray(profileRow.allergens)
+              ? (profileRow.allergens as string[])
+              : [],
+            customAllergens: Array.isArray(profileRow.custom_allergens)
+              ? (profileRow.custom_allergens as string[])
+              : [],
+            restrictions: Array.isArray(profileRow.restrictions)
+              ? (profileRow.restrictions as string[])
+              : [],
+            preferences: Array.isArray(profileRow.preferences)
+              ? (profileRow.preferences as string[])
+              : [],
+            dietaryNotes: profileRow.dietary_notes ?? null,
+            createdAt: profileRow.created_at,
+            updatedAt: profileRow.updated_at,
+          }
+        : null;
+
+      const dietarySnapshot = buildOrderDietarySnapshot({
+        customerProfile: customerDietaryProfile,
+        override: null,
+        authorUserId: ctx.userId,
+      });
+
       const result = await repo.insertDraft({
         customerId,
         weekStart: command.weekStart,
         total,
         notes: command.notes ?? null,
+        dietarySnapshot,
         items,
         demandChannel: demand.demandChannel,
         companyId: demand.companyId,
@@ -381,12 +417,8 @@ export const OrderService = {
     }
 
     const resolvedOfferCode = options?.offerCode ?? draftContext?.offerCode;
-    const requestedCustomerTier =
-      options?.customerTier ?? draftContext?.customerTier ?? "public";
-    const authoritativeCustomerTier = resolveAuthoritativeCustomerTier(
-      ctx,
-      requestedCustomerTier,
-    );
+    const requestedCustomerTier = options?.customerTier ?? draftContext?.customerTier ?? "public";
+    const authoritativeCustomerTier = resolveAuthoritativeCustomerTier(ctx, requestedCustomerTier);
     const resolvedExtras = options?.extras ?? draftContext?.extras ?? [];
 
     if (resolvedOfferCode && ctx.tenantSlug) {
@@ -502,4 +534,3 @@ export const OrderService = {
     return result.order;
   },
 };
-

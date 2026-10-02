@@ -190,6 +190,29 @@ describe("CR-OPS-09A / CR-OPS-UX Fase 1 · OrdersTable (Actionable Table)", () =
     expect(html).toContain("Detalle");
   });
 
+  it("CR-OPS-DIET-01 P2: renders compact dietary alert badges directly in table row", () => {
+    const orderWithDietary: OperationalOrderListItem = {
+      ...sampleOrder,
+      dietarySnapshot: {
+        capturedAt: "2026-10-02T10:00:00.000Z",
+        allergens: ["gluten", "milk"],
+        customAllergens: [],
+        restrictions: ["celiac"],
+        preferences: [],
+        dietaryNotes: null,
+        isOverride: false,
+      },
+    };
+
+    const html = renderToString(
+      <OrdersTable orders={[orderWithDietary]} onSelectDetail={() => {}} />,
+    );
+
+    // Should render EU allergen labels (Gluten, Lácteos) and celiac restriction
+    expect(html).toContain("Gluten, Lácteos");
+    expect(html).toContain("Celíaco (Estricto sin trazas)");
+  });
+
   it("renders empty state when there are no operational orders", () => {
     const html = renderToString(
       <OrdersTable orders={[]} onSelectDetail={() => {}} />,
