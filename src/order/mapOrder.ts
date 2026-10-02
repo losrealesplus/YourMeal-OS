@@ -22,21 +22,16 @@ export type OrderCapabilityBits = {
   canLogistics: boolean;
 };
 
-export function mapListItemToSummary(
-  row: OperationalOrderListItem,
-): OrderSummary {
+export function mapListItemToSummary(row: OperationalOrderListItem): OrderSummary {
   const partyKind =
     row.demandChannel === "company" && row.companyId
       ? ("company_account" as const)
       : ("individual" as const);
-  const partyId =
-    partyKind === "company_account"
-      ? (row.companyId as string)
-      : row.customerId;
+  const partyId = partyKind === "company_account" ? (row.companyId as string) : row.customerId;
   const displayName =
     partyKind === "company_account"
-      ? row.companyName ?? row.customerName ?? "Empresa"
-      : row.customerName ?? row.customerEmail ?? "Cliente";
+      ? (row.companyName ?? row.customerName ?? "Empresa")
+      : (row.customerName ?? row.customerEmail ?? "Cliente");
 
   return {
     id: row.id,
@@ -54,6 +49,7 @@ export function mapListItemToSummary(
     total: row.total,
     currency: "EUR",
     tenantId: row.tenantId,
+    dietarySnapshot: row.dietarySnapshot ?? null,
   };
 }
 
@@ -91,7 +87,16 @@ export function mapListItemToContext(
         invoiced: false,
         invoiceIds: [],
       },
-      constraints: { allergens: [], modifications: [] },
+      constraints: {
+        allergens: [
+          ...(row.dietarySnapshot?.allergens ?? []),
+          ...(row.dietarySnapshot?.customAllergens ?? []),
+        ],
+        modifications: [
+          ...(row.dietarySnapshot?.restrictions ?? []),
+          ...(row.dietarySnapshot?.preferences ?? []),
+        ],
+      },
       timeline: [
         { key: "draft", label: "Borrador", reached: true },
         {
@@ -130,8 +135,7 @@ export function mapDomainError(err: unknown): OrderError {
     return {
       code: domainCodeToOrder(err.code),
       message: err.message,
-      recoverable:
-        err.code === "PERMISSION_DENIED" || err.code === "UNIMPLEMENTED",
+      recoverable: err.code === "PERMISSION_DENIED" || err.code === "UNIMPLEMENTED",
       evidence: err.details,
     };
   }

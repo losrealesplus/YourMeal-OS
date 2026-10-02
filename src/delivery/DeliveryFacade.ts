@@ -9,10 +9,7 @@
  * ¿Qué compromisos operativos deben entregarse ahora y cómo confirmamos su ejecución?
  */
 
-import {
-  getOrderFacade,
-  type OrderFacade,
-} from "@/order/OrderFacade";
+import { getOrderFacade, type OrderFacade } from "@/order/OrderFacade";
 import {
   getKitchenExecutionFacade,
   type KitchenExecutionFacade,
@@ -108,10 +105,7 @@ export class DeliveryFacade {
   ): Promise<DeliveryCommandResult> {
     const gate = requireSession(identity);
     if (gate) {
-      return failCommand(
-        [gate],
-        assignmentIdForCommitment(command.commitmentRef),
-      );
+      return failCommand([gate], assignmentIdForCommitment(command.commitmentRef));
     }
     return failCommand(
       [
@@ -168,13 +162,11 @@ export class DeliveryFacade {
     const completed = await this.deps.orders.completeDelivery(identity, {
       type: "CompleteDelivery",
       orderId,
+      deliveryDay: command.operationalDay,
     });
 
     if (!completed.ok) {
-      return failCommand(
-        completed.errors.map(mapOrderError),
-        command.assignmentId,
-      );
+      return failCommand(completed.errors.map(mapOrderError), command.assignmentId);
     }
 
     const ctxResult = await this.loadContext(identity, command.operationalDay);
@@ -183,8 +175,7 @@ export class DeliveryFacade {
     }
 
     const status = mapOrderStatusToDelivery(
-      (completed.status as import("@/order/OrderContext").OrderStatus) ??
-        "delivered",
+      (completed.status as import("@/order/OrderContext").OrderStatus) ?? "delivered",
     );
     const confirmation: DeliveryConfirmation = {
       id: `confirmation:${orderId}`,
@@ -234,10 +225,7 @@ export class DeliveryFacade {
     );
   }
 
-  async query(
-    identity: DeliveryRuntimeIdentity,
-    q: DeliveryQuery,
-  ): Promise<DeliveryResult> {
+  async query(identity: DeliveryRuntimeIdentity, q: DeliveryQuery): Promise<DeliveryResult> {
     switch (q.type) {
       case "GetDeliveryContext":
         return this.getDeliveryContext(identity, q);
@@ -322,12 +310,7 @@ export class DeliveryFacade {
     }
 
     const tenantId = identity.tenant!.id;
-    const context = buildDeliveryContext(
-      tenantId,
-      q.operationalDay,
-      searched.summaries,
-      identity,
-    );
+    const context = buildDeliveryContext(tenantId, q.operationalDay, searched.summaries, identity);
     // Touch Kitchen so the Execution dependency stays exercised (no inventing).
     await this.deps.kitchen.getCompletedExecution(identity, {
       type: "GetCompletedExecution",

@@ -13,22 +13,13 @@ import type {
   DeliveryStatus,
 } from "@/delivery/DeliveryContext";
 import type { OrderDetails, OrderSummary } from "@/order/OrderContext";
+import type { OrderDietarySnapshot } from "@/types/dietary";
 
 export type DeliveryReadiness =
-  | "ready"
-  | "ready_with_warnings"
-  | "incomplete"
-  | "unassigned"
-  | "completed"
-  | "unknown";
+  "ready" | "ready_with_warnings" | "incomplete" | "unassigned" | "completed" | "unknown";
 
 export type DeliveryDayFilter =
-  | "all"
-  | "ready"
-  | "warnings"
-  | "incomplete"
-  | "remaining"
-  | "completed";
+  "all" | "ready" | "warnings" | "incomplete" | "remaining" | "completed";
 
 export type DeliveryDayWarning = {
   id: string;
@@ -59,6 +50,7 @@ export type DeliveryDayCard = {
   windowLabel: string | null;
   packageSummary: string | null;
   dietaryInfo: string | null;
+  dietarySnapshot?: OrderDietarySnapshot | null;
   specialInstructions: string | null;
   deliveryStatus: DeliveryStatus;
   readiness: DeliveryReadiness;
@@ -130,9 +122,7 @@ function isCompletedStatus(status: DeliveryStatus): boolean {
   return status === "Confirmed" || status === "Delivered";
 }
 
-function resolveAddress(
-  details: OrderDetails | undefined,
-): string | null {
+function resolveAddress(details: OrderDetails | undefined): string | null {
   if (!details) return null;
   const slot = details.deliverySlots[0];
   if (!slot) return null;
@@ -162,9 +152,7 @@ function resolveWindow(
   details: OrderDetails | undefined,
 ): string | null {
   if (assignment.windowStart || assignment.windowEnd) {
-    return [assignment.windowStart, assignment.windowEnd]
-      .filter(Boolean)
-      .join(" – ");
+    return [assignment.windowStart, assignment.windowEnd].filter(Boolean).join(" – ");
   }
   const label = details?.deliverySlots[0]?.timeWindowLabel;
   return label?.trim() ? label : null;
@@ -190,9 +178,7 @@ function resolvePackage(
   details: OrderDetails | undefined,
 ): string | null {
   if (details && details.lines.length > 0) {
-    const parts = details.lines.map(
-      (l) => `${l.quantity}× ${l.dishName}`,
-    );
+    const parts = details.lines.map((l) => `${l.quantity}× ${l.dishName}`);
     return parts.slice(0, 4).join(", ") + (parts.length > 4 ? "…" : "");
   }
   if (summary && summary.itemCount > 0) {
@@ -261,8 +247,7 @@ function buildCardWarnings(
       severity: "info",
       message: "Ventana de entrega no disponible en este substrate",
       why: "Ayuda a priorizar la jornada; no bloquea la comprensión base.",
-      nextAction:
-        "Continuar con el resto de la jornada · Observation puede evidenciar necesidad.",
+      nextAction: "Continuar con el resto de la jornada · Observation puede evidenciar necesidad.",
     });
   }
 
@@ -306,9 +291,7 @@ export function mapAssignmentToCard(
   const details = options.details;
 
   const customerLabel =
-    summary?.partyRef.displayName?.trim() ||
-    assignment.destinationLabel?.trim() ||
-    null;
+    summary?.partyRef.displayName?.trim() || assignment.destinationLabel?.trim() || null;
   const contactLabel = null; // not on Delivery / Order summary substrate
   const addressLabel = resolveAddress(details);
   const zoneLabel = resolveZone(details);
@@ -328,6 +311,7 @@ export function mapAssignmentToCard(
     windowLabel,
     packageSummary,
     dietaryInfo,
+    dietarySnapshot: summary?.dietarySnapshot ?? null,
     specialInstructions,
     deliveryStatus: assignment.status,
     driverLabel: null as string | null,
@@ -382,9 +366,7 @@ export function buildTodaysDeliveryDay(input: {
     .sort(
       (a, b) =>
         readinessRank(a.readiness) - readinessRank(b.readiness) ||
-        (a.customerLabel ?? a.orderRef).localeCompare(
-          b.customerLabel ?? b.orderRef,
-        ),
+        (a.customerLabel ?? a.orderRef).localeCompare(b.customerLabel ?? b.orderRef),
     );
 
   const dayWarnings: DeliveryDayWarning[] = [];
@@ -418,9 +400,7 @@ export function buildTodaysDeliveryDay(input: {
   const totals = {
     total: cards.length,
     ready: cards.filter((c) => c.readiness === "ready").length,
-    readyWithWarnings: cards.filter(
-      (c) => c.readiness === "ready_with_warnings",
-    ).length,
+    readyWithWarnings: cards.filter((c) => c.readiness === "ready_with_warnings").length,
     incomplete: cards.filter((c) => c.readiness === "incomplete").length,
     unassigned: cards.filter((c) => c.readiness === "unassigned").length,
     completed: cards.filter((c) => c.readiness === "completed").length,
@@ -442,10 +422,7 @@ export function buildTodaysDeliveryDay(input: {
   }
 
   const dayReady =
-    !loadError &&
-    cards.length > 0 &&
-    totals.incomplete === 0 &&
-    totals.remaining > 0;
+    !loadError && cards.length > 0 && totals.incomplete === 0 && totals.remaining > 0;
 
   return {
     dayDate,
@@ -492,9 +469,7 @@ export function filterDeliveryCards<T extends DeliveryDayCard>(
 ): T[] {
   switch (filter) {
     case "ready":
-      return cards.filter(
-        (c) => c.readiness === "ready" || c.readiness === "ready_with_warnings",
-      );
+      return cards.filter((c) => c.readiness === "ready" || c.readiness === "ready_with_warnings");
     case "warnings":
       return cards.filter(
         (c) =>

@@ -14,10 +14,8 @@ import {
   nextKitchenStatuses,
   type OperationalOrderStatus,
 } from "../domain/operational-status";
-import {
-  canOperateDelivery,
-  canOperateKitchen,
-} from "@/modules/bootstrap-integrity";
+import type { DeliveryServiceModel, DeliveryServiceStatus } from "../domain/delivery-service";
+import { canOperateDelivery, canOperateKitchen } from "@/modules/bootstrap-integrity";
 import {
   assertFlow01Prefix,
   beginFlow01Pipeline,
@@ -25,12 +23,7 @@ import {
   logFlow01Step,
   stopFlow01,
 } from "./flow01-evidence";
-import {
-  beginFlow02Pipeline,
-  hasFlow02Step,
-  logFlow02Step,
-  stopFlow02,
-} from "./flow02-evidence";
+import { beginFlow02Pipeline, hasFlow02Step, logFlow02Step, stopFlow02 } from "./flow02-evidence";
 import {
   completePackagingBatch,
   getPackagingBatch,
@@ -49,10 +42,7 @@ export const OperationsService = {
    * Kitchen → Production: confirmed → in_production
    * Emits FLOW01_T1_STARTED / FLOW01_T1_COMPLETED exactly once on success.
    */
-  async startProduction(
-    ctx: ServiceContext,
-    orderId: string,
-  ): Promise<OperationalOrderStatus> {
+  async startProduction(ctx: ServiceContext, orderId: string): Promise<OperationalOrderStatus> {
     return this.transitionKitchen(ctx, orderId, "in_production");
   },
 
@@ -61,10 +51,7 @@ export const OperationsService = {
    * Production complete: in_production → prepared
    * Emits FLOW01_T2_STARTED (T2_COMPLETED follows startPackaging).
    */
-  async completeProduction(
-    ctx: ServiceContext,
-    orderId: string,
-  ): Promise<OperationalOrderStatus> {
+  async completeProduction(ctx: ServiceContext, orderId: string): Promise<OperationalOrderStatus> {
     return this.transitionKitchen(ctx, orderId, "prepared");
   },
 
@@ -85,10 +72,7 @@ export const OperationsService = {
     try {
       assertFlow01Prefix(["FLOW01_T1_STARTED", "FLOW01_T1_COMPLETED"]);
     } catch {
-      throw new DomainError(
-        "INVALID_STATE",
-        "FLOW01-002 requires T1 COMPLETED before packaging",
-      );
+      throw new DomainError("INVALID_STATE", "FLOW01-002 requires T1 COMPLETED before packaging");
     }
 
     if (!hasFlow01Step("FLOW01_T2_STARTED")) {
@@ -133,10 +117,7 @@ export const OperationsService = {
   },
 
   /** Read-only helper for tests / evidence. */
-  getPackagingBatchForOrder(
-    ctx: ServiceContext,
-    orderId: string,
-  ): PackagingBatch | null {
+  getPackagingBatchForOrder(ctx: ServiceContext, orderId: string): PackagingBatch | null {
     return getPackagingBatch(ctx.tenantId, orderId);
   },
 
@@ -145,10 +126,7 @@ export const OperationsService = {
    * PackagingBatch IN_PROGRESS → READY → CLOSED. Emits FLOW01_T3_STARTED.
    * (T3_COMPLETED follows assignDelivery — Spec: handoff to Delivery.)
    */
-  async completePackaging(
-    ctx: ServiceContext,
-    orderId: string,
-  ): Promise<PackagingBatch> {
+  async completePackaging(ctx: ServiceContext, orderId: string): Promise<PackagingBatch> {
     requireCapability(ctx.roles, "kitchen.operate");
     if (!orderId) {
       throw new DomainError("INVALID_STATE", "orderId required");
@@ -213,17 +191,10 @@ export const OperationsService = {
 
     const batch = getPackagingBatch(ctx.tenantId, orderId);
     if (!batch || batch.status !== "CLOSED") {
-      throw new DomainError(
-        "INVALID_STATE",
-        "assignDelivery requires PackagingBatch CLOSED",
-      );
+      throw new DomainError("INVALID_STATE", "assignDelivery requires PackagingBatch CLOSED");
     }
 
-    const status = await this.transitionKitchen(
-      ctx,
-      orderId,
-      "ready_for_delivery",
-    );
+    const status = await this.transitionKitchen(ctx, orderId, "ready_for_delivery");
 
     const assignment = assignDeliveryOrder({
       tenantId: ctx.tenantId,
@@ -240,10 +211,7 @@ export const OperationsService = {
     return { status, assignment, batch };
   },
 
-  getDeliveryAssignmentForOrder(
-    ctx: ServiceContext,
-    orderId: string,
-  ): DeliveryAssignment | null {
+  getDeliveryAssignmentForOrder(ctx: ServiceContext, orderId: string): DeliveryAssignment | null {
     return getDeliveryAssignment(ctx.tenantId, orderId);
   },
 
@@ -251,10 +219,7 @@ export const OperationsService = {
    * FLOW-01 T4 · Spec start of delivery
    * ready_for_delivery → out_for_delivery. Emits FLOW01_T4_STARTED.
    */
-  async startOutForDelivery(
-    ctx: ServiceContext,
-    orderId: string,
-  ): Promise<OperationalOrderStatus> {
+  async startOutForDelivery(ctx: ServiceContext, orderId: string): Promise<OperationalOrderStatus> {
     requireCapability(ctx.roles, "logistics.operate");
     if (!orderId) {
       throw new DomainError("INVALID_STATE", "orderId required");
@@ -305,10 +270,7 @@ export const OperationsService = {
    * out_for_delivery → delivered. Emits FLOW01_T4_COMPLETED.
    * Success criterion: orders.status = delivered.
    */
-  async completeDelivery(
-    ctx: ServiceContext,
-    orderId: string,
-  ): Promise<OperationalOrderStatus> {
+  async completeDelivery(ctx: ServiceContext, orderId: string): Promise<OperationalOrderStatus> {
     requireCapability(ctx.roles, "logistics.operate");
     if (!orderId) {
       throw new DomainError("INVALID_STATE", "orderId required");
@@ -369,31 +331,133 @@ export const OperationsService = {
     });
   },
 
-  async kitchenPendingCount(
+  async listDeliveryServices(
     ctx: ServiceContext,
-    deliveryDate?: string | null,
-  ): Promise<number> {
+    filters: {
+      deliveryDate?: string | null;
+      status?: DeliveryServiceStatus | DeliveryServiceStatus[];
+      orderId?: string | null;
+      customerId?: string | null;
+    } = {},
+  ): Promise<DeliveryServiceModel[]> {
+    requireCapability(ctx.roles, "logistics.operate");
+    const repo = createOperationsRepository(ctx.supabase, ctx.tenantId);
+    return repo.listDeliveryServices(filters);
+  },
+
+  async getDeliveryService(
+    ctx: ServiceContext,
+    serviceId: string,
+  ): Promise<DeliveryServiceModel | null> {
+    requireCapability(ctx.roles, "logistics.operate");
+    const repo = createOperationsRepository(ctx.supabase, ctx.tenantId);
+    return repo.getDeliveryService(serviceId);
+  },
+
+  async getDeliveryServiceByOrderDay(
+    ctx: ServiceContext,
+    orderId: string,
+    deliveryDate: string,
+  ): Promise<DeliveryServiceModel | null> {
+    const repo = createOperationsRepository(ctx.supabase, ctx.tenantId);
+    return repo.getDeliveryServiceByOrderDay(orderId, deliveryDate);
+  },
+
+  async transitionDeliveryService(
+    ctx: ServiceContext,
+    serviceId: string,
+    toStatus: DeliveryServiceStatus,
+    notes?: string,
+  ): Promise<DeliveryServiceModel> {
+    requireCapability(ctx.roles, "logistics.operate");
+    const repo = createOperationsRepository(ctx.supabase, ctx.tenantId);
+    const updated = await repo.transitionDeliveryService(serviceId, toStatus, ctx.userId, notes);
+    await AuditService.write(ctx, {
+      entityType: "delivery_service",
+      entityId: serviceId,
+      action: "status_change",
+      newData: { status: toStatus, notes },
+    });
+    return updated;
+  },
+
+  async ensureDeliveryServicesForOrder(
+    ctx: ServiceContext,
+    orderId: string,
+  ): Promise<DeliveryServiceModel[]> {
+    const repo = createOperationsRepository(ctx.supabase, ctx.tenantId);
+    return repo.createDeliveryServicesForOrder(orderId);
+  },
+
+  /**
+   * CR-OPS-06 Handoff: Marks a customer bag packed for a delivery date.
+   * Atomically transitions the day's delivery_service to ready_for_delivery.
+   */
+  async packOrderDay(
+    ctx: ServiceContext,
+    orderId: string,
+    deliveryDate: string,
+  ): Promise<DeliveryServiceModel> {
+    requireCapability(ctx.roles, "kitchen.operate");
+    const repo = createOperationsRepository(ctx.supabase, ctx.tenantId);
+
+    // 1. Ensure service exists
+    let service = await repo.getDeliveryServiceByOrderDay(orderId, deliveryDate);
+    if (!service) {
+      await repo.createDeliveryServicesForOrder(orderId);
+      service = await repo.getDeliveryServiceByOrderDay(orderId, deliveryDate);
+    }
+
+    if (!service) {
+      throw new DomainError(
+        "NOT_FOUND",
+        `Delivery service not found for order ${orderId} on date ${deliveryDate}`,
+      );
+    }
+
+    // 2. Transition service to ready_for_delivery
+    const updated = await repo.transitionDeliveryService(
+      service.id,
+      "ready_for_delivery",
+      ctx.userId,
+    );
+
+    // 3. Keep kitchen macro-order state consistent with in_production/prepared
+    const currentOrder = await repo.getOrder(orderId);
+    if (
+      currentOrder &&
+      (currentOrder.status === "confirmed" || currentOrder.status === "in_production")
+    ) {
+      try {
+        await repo.transitionStatus(orderId, "prepared");
+      } catch {
+        // Best-effort macro status sync if order already advanced
+      }
+    }
+
+    await AuditService.write(ctx, {
+      entityType: "delivery_service",
+      entityId: service.id,
+      action: "status_change",
+      newData: { status: "ready_for_delivery", deliveryDate },
+    });
+
+    return updated;
+  },
+
+  async kitchenPendingCount(ctx: ServiceContext, deliveryDate?: string | null): Promise<number> {
     requireCapability(ctx.roles, "orders.read");
     const repo = createOperationsRepository(ctx.supabase, ctx.tenantId);
     return repo.countByStatuses(KITCHEN_QUEUE_STATUSES, deliveryDate);
   },
 
-  async deliveryPendingCount(
-    ctx: ServiceContext,
-    deliveryDate?: string | null,
-  ): Promise<number> {
+  async deliveryPendingCount(ctx: ServiceContext, deliveryDate?: string | null): Promise<number> {
     requireCapability(ctx.roles, "orders.read");
     const repo = createOperationsRepository(ctx.supabase, ctx.tenantId);
-    return repo.countByStatuses(
-      ["ready_for_delivery", "out_for_delivery"],
-      deliveryDate,
-    );
+    return repo.countByStatuses(["ready_for_delivery", "out_for_delivery"], deliveryDate);
   },
 
-  async getOrder(
-    ctx: ServiceContext,
-    orderId: string,
-  ): Promise<OperationalOrderListItem | null> {
+  async getOrder(ctx: ServiceContext, orderId: string): Promise<OperationalOrderListItem | null> {
     requireCapability(ctx.roles, "orders.read");
     const repo = createOperationsRepository(ctx.supabase, ctx.tenantId);
     return repo.getOrder(orderId);
@@ -464,14 +528,10 @@ export const OperationsService = {
     }
 
     const isFlow01T1 =
-      workspace === "kitchen" &&
-      current.status === "confirmed" &&
-      toStatus === "in_production";
+      workspace === "kitchen" && current.status === "confirmed" && toStatus === "in_production";
 
     const isFlow01T2Start =
-      workspace === "kitchen" &&
-      current.status === "in_production" &&
-      toStatus === "prepared";
+      workspace === "kitchen" && current.status === "in_production" && toStatus === "prepared";
 
     /** FLOW-02 T1 · out_for_delivery → delivery_issue */
     const isFlow02T1 =

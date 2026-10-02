@@ -1,0 +1,108 @@
+[
+  {
+    "track": "Track 1",
+    "step": 1,
+    "action": "Constitutional Disclaimer Visibility",
+    "result": "🟢 PASS",
+    "details": "Food safety disclaimer banner is rendered prominently",
+    "evidence": {},
+    "timestamp": "2026-10-02T02:40:41.011Z"
+  },
+  {
+    "track": "Track 1",
+    "step": 2,
+    "action": "Database Persistence Verification",
+    "result": "🟢 PASS",
+    "details": "Profile correctly persisted with EU-14, custom tag, restriction, preference, and notes",
+    "evidence": {
+      "dbStatus": "{\"allergens\":[\"gluten\",\"eggs\",\"milk\"],\"custom\":[\"kiwi\"],\"restrictions\":[\"celiac\"],\"preferences\":[\"no_onion\"],\"notes\":\"[TEST QA CR-CUST-01] Alergia severa cruzada gluten-lácteos y kiwi. Evitar aliños con cebolla.\"}",
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-cust-01/track1_01_customer_profile_saved.png"
+    },
+    "timestamp": "2026-10-02T02:40:46.639Z"
+  },
+  {
+    "track": "Track 1",
+    "step": 3,
+    "action": "Hard Reload UI Consistency",
+    "result": "🟢 PASS",
+    "details": "All dietary profile settings persist and rehydrate faithfully after full browser reload",
+    "evidence": {
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-cust-01/track1_02_customer_profile_rehydrated.png"
+    },
+    "timestamp": "2026-10-02T02:40:51.503Z"
+  },
+  {
+    "track": "Track 2",
+    "step": 1,
+    "action": "Dietary Profile Auto-Resolution in Intake",
+    "result": "🟢 PASS",
+    "details": "Customer dietary profile badges auto-populate in Order Intake Drawer",
+    "evidence": {},
+    "timestamp": "2026-10-02T02:40:58.403Z"
+  },
+  {
+    "track": "Track 2",
+    "step": 2,
+    "action": "Adversarial Override Rejection (< 5 chars)",
+    "result": "🟢 PASS",
+    "details": "Submission strictly blocked by client & domain validation when override reason is < 5 chars",
+    "evidence": {
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-cust-01/track2_01_adversarial_override_rejected.png"
+    },
+    "timestamp": "2026-10-02T02:41:00.980Z"
+  },
+  {
+    "track": "Track 2",
+    "step": 3,
+    "action": "Immutable Order Snapshot Persistence",
+    "result": "🟢 PASS",
+    "details": "Order created with immutable dietary_snapshot including override flag and audited reason",
+    "evidence": {
+      "dbStatus": "{\"allergens\":[\"gluten\",\"eggs\",\"milk\"],\"capturedAt\":\"2026-10-02T02:41:01.771Z\",\"isOverride\":true,\"preferences\":[\"no_onion\"],\"authorUserId\":\"d249ab86-d46e-4f34-8a46-ea24407445e2\",\"dietaryNotes\":\"Servir ración en recipiente sellado\",\"restrictions\":[\"celiac\"],\"overrideReason\":\"Excepción temporal cena invitados\",\"customAllergens\":[\"kiwi\"]}",
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-cust-01/track2_02_order_created_with_override.png"
+    },
+    "timestamp": "2026-10-02T02:41:05.681Z"
+  },
+  {
+    "track": "Track 2",
+    "step": 4,
+    "action": "Master Profile Immutability Preservation",
+    "result": "🟢 PASS",
+    "details": "Master customer profile was not mutated by order-scoped override",
+    "evidence": {},
+    "timestamp": "2026-10-02T02:41:05.773Z"
+  },
+  {
+    "track": "Track 3",
+    "step": 1,
+    "action": "Order Detail Dietary Badges Rendering",
+    "result": "🟢 PASS",
+    "details": "Order detail displays full dietary badges with override reason and constitutional disclaimer",
+    "evidence": {
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-cust-01/track3_01_order_detail_dietary_badges.png"
+    },
+    "timestamp": "2026-10-02T02:41:11.689Z"
+  },
+  {
+    "track": "Track 3",
+    "step": 2,
+    "action": "Production Sheet Allergen Visibility",
+    "result": "🟢 PASS",
+    "details": "Production Sheet renders allergen warning signals for active meal batches",
+    "evidence": {
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-cust-01/track3_02_production_sheet_allergens.png"
+    },
+    "timestamp": "2026-10-02T02:41:15.541Z"
+  },
+  {
+    "track": "Track 3",
+    "step": 3,
+    "action": "Packing Kiosk Dietary Alert Visibility",
+    "result": "🟢 PASS",
+    "details": "Packing Kiosk renders dietary badges on customer packing cards",
+    "evidence": {
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-cust-01/track3_03_packing_kiosk_dietary_alerts.png"
+    },
+    "timestamp": "2026-10-02T02:41:18.890Z"
+  }
+]

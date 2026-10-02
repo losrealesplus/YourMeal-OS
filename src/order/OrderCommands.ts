@@ -36,6 +36,7 @@ export type ReadyForDeliveryCommand = {
 export type CompleteDeliveryCommand = {
   type: "CompleteDelivery";
   orderId: string;
+  deliveryDay?: string;
 };
 
 export type CloseOrderCommand = {

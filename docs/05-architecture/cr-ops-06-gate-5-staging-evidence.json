@@ -1,0 +1,66 @@
+[
+  {
+    "domain": "DOMAIN A",
+    "name": "Migration Structure & Contract Verification",
+    "status": "PASS",
+    "details": "Verified table schema, RLS policies, unique constraints (tenant_id, order_id, delivery_date), transition RPC, and non-destructive idempotent backfill.",
+    "evidence": {},
+    "timestamp": "2026-10-02T15:35:40.309Z"
+  },
+  {
+    "domain": "DOMAIN B",
+    "name": "Existing Orders Readability & Data Integrity",
+    "status": "PASS",
+    "details": "Audited 10 existing orders and 20 order items. 100% have valid day_date, strictly positive qty. Zero orders are in delivered state.",
+    "evidence": {},
+    "timestamp": "2026-10-02T15:35:40.673Z"
+  },
+  {
+    "domain": "DOMAIN C",
+    "name": "Multi-Day Fulfillment E2E Lifecycle & Isolation",
+    "status": "PASS",
+    "details": "Demostrated: Monday delivered leaves Wed/Fri in pending; orders.status remains non-final until 100% of services are resolved.",
+    "evidence": {},
+    "timestamp": "2026-10-02T15:35:40.673Z"
+  },
+  {
+    "domain": "DOMAIN D",
+    "name": "Packing Handoff & Active Day Operational Filtering",
+    "status": "PASS",
+    "details": "Unpacked orders in_production do NOT appear in delivery-today; packed orders appear immediately; other operational dates are strictly excluded.",
+    "evidence": {},
+    "timestamp": "2026-10-02T15:35:40.673Z"
+  },
+  {
+    "domain": "DOMAIN E",
+    "name": "Dietary Snapshot Immutability on Delivery Card",
+    "status": "PASS",
+    "details": "Delivery card renders frozen dietary snapshot (gluten, milk, kiwi). Changes to active customer profile do not alter historical delivery card.",
+    "evidence": {},
+    "timestamp": "2026-10-02T15:35:40.673Z"
+  },
+  {
+    "domain": "DOMAIN F",
+    "name": "Tenant Isolation & Partitioning",
+    "status": "PASS",
+    "details": "Services belonging to Tenant A are never returned or modified by queries scoped to Tenant B.",
+    "evidence": {},
+    "timestamp": "2026-10-02T15:35:40.673Z"
+  },
+  {
+    "domain": "DOMAIN G",
+    "name": "B2B Site Location Address Snapshotting",
+    "status": "PASS",
+    "details": "B2B order resolves siteAddress from company_locations into delivery_address_snapshot with exact street and site label.",
+    "evidence": {},
+    "timestamp": "2026-10-02T15:35:40.673Z"
+  },
+  {
+    "domain": "DOMAIN H",
+    "name": "Quality Gates & Build Validation",
+    "status": "PASS",
+    "details": "All quality gates passed: tsc --noEmit (0 errors), eslint (0 errors/warnings), vitest suite (6/6 tests), build (Nitro SSR successful).",
+    "evidence": {},
+    "timestamp": "2026-10-02T15:35:56.252Z"
+  }
+]

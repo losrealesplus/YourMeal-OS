@@ -1,0 +1,50 @@
+[
+  {
+    "step": 1,
+    "action": "Operations Manager UI Save Button Access",
+    "result": "🟢 PASS",
+    "details": "Save button is visible and active for operations_manager (customers.write capability active)",
+    "evidence": {},
+    "timestamp": "2026-10-02T07:14:57.910Z"
+  },
+  {
+    "step": 2,
+    "action": "Live Database Persistence via Operations Manager",
+    "result": "🟢 PASS",
+    "details": "Profile correctly persisted in Supabase customer_dietary_profiles with zero RLS rejection",
+    "evidence": {
+      "dbStatus": "{\"id\":\"cd2533d8-7584-4cdf-b298-61bcc9aa9762\",\"tenant_id\":\"8bba00ba-331b-42c8-9283-4e3836ffb870\",\"customer_id\":\"cccc0001-8bba-42c8-9283-000000000001\",\"allergens\":[\"gluten\",\"fish\"],\"custom_allergens\":[\"chia\"],\"restrictions\":[\"celiac\"],\"preferences\":[\"vegetarian\"],\"dietary_notes\":\"[TEST QA CR-CUST-01-HF01] operations_manager guardando perfil dietético.\",\"created_at\":\"2026-10-02T07:14:59.998149+00:00\",\"updated_at\":\"2026-10-02T07:14:59.845+00:00\"}",
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-cust-01-hf01/track1_01_profile_saved_by_ops_manager.png"
+    },
+    "timestamp": "2026-10-02T07:15:03.464Z"
+  },
+  {
+    "step": 3,
+    "action": "Hard Reload UI Rehydration",
+    "result": "🟢 PASS",
+    "details": "Dietary profile rehydrated faithfully from Supabase after browser hard reload",
+    "evidence": {
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-cust-01-hf01/track1_02_profile_rehydrated_after_reload.png"
+    },
+    "timestamp": "2026-10-02T07:15:09.380Z"
+  },
+  {
+    "step": 4,
+    "action": "Order Dietary Snapshot Capture",
+    "result": "🟢 PASS",
+    "details": "Order created with immutable dietary_snapshot matching customer profile",
+    "evidence": {
+      "dbStatus": "{\"allergens\":[\"gluten\",\"fish\"],\"capturedAt\":\"2026-10-02T07:15:17.235Z\",\"isOverride\":false,\"preferences\":[\"vegetarian\"],\"authorUserId\":\"b77ee0d6-c4d5-4c1c-8b09-35a6360a9e3f\",\"dietaryNotes\":\"[TEST QA CR-CUST-01-HF01] operations_manager guardando perfil dietético.\",\"restrictions\":[\"celiac\"],\"overrideReason\":null,\"customAllergens\":[\"chia\"]}",
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-cust-01-hf01/track2_01_order_created_with_snapshot.png"
+    },
+    "timestamp": "2026-10-02T07:15:21.176Z"
+  },
+  {
+    "step": 5,
+    "action": "Multi-Tenant Cross-Write Rejection",
+    "result": "🟢 PASS",
+    "details": "operations_manager strictly prohibited from writing to foreign tenant. Supabase RLS rejected with: 42501: new row violates row-level security policy for table \"customer_dietary_profiles\"",
+    "evidence": {},
+    "timestamp": "2026-10-02T07:15:21.373Z"
+  }
+]

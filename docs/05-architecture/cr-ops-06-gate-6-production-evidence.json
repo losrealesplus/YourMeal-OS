@@ -1,0 +1,514 @@
+{
+  "timestamp": "2026-10-02T15:36:05.618Z",
+  "environment": "production",
+  "projectRef": "nhirlpkuvonggctdzzad",
+  "region": "eu-central-1 (Frankfurt)",
+  "databaseEngine": "PostgreSQL 17.6 (Supabase GA)",
+  "migration": "20261002130000_cr_ops_06_delivery_services.sql",
+  "rollback": "20261002130000_cr_ops_06_delivery_services_down.sql",
+  "columns": [
+    {
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "column_name": "tenant_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "order_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "customer_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "delivery_date",
+      "data_type": "date",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "status",
+      "data_type": "USER-DEFINED",
+      "is_nullable": "NO",
+      "column_default": "'pending'::delivery_service_status"
+    },
+    {
+      "column_name": "delivery_address_id",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "delivery_address_snapshot",
+      "data_type": "jsonb",
+      "is_nullable": "NO",
+      "column_default": "'{}'::jsonb"
+    },
+    {
+      "column_name": "customer_contact_snapshot",
+      "data_type": "jsonb",
+      "is_nullable": "NO",
+      "column_default": "'{}'::jsonb"
+    },
+    {
+      "column_name": "dietary_snapshot",
+      "data_type": "jsonb",
+      "is_nullable": "NO",
+      "column_default": "'{}'::jsonb"
+    },
+    {
+      "column_name": "delivery_instructions",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "packed_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "packed_by",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "dispatched_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "delivered_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "delivered_by",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "issue_reason",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "issue_notes",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "driver_notes",
+      "data_type": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "legacy_backfill",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "column_default": "false"
+    },
+    {
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "column_name": "deleted_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "column_default": null
+    }
+  ],
+  "constraints": [
+    {
+      "conname": "delivery_services_customer_id_fkey",
+      "contype": "f",
+      "def": "FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE"
+    },
+    {
+      "conname": "delivery_services_delivered_by_fkey",
+      "contype": "f",
+      "def": "FOREIGN KEY (delivered_by) REFERENCES auth.users(id) ON DELETE SET NULL"
+    },
+    {
+      "conname": "delivery_services_delivery_address_id_fkey",
+      "contype": "f",
+      "def": "FOREIGN KEY (delivery_address_id) REFERENCES customer_addresses(id) ON DELETE SET NULL"
+    },
+    {
+      "conname": "delivery_services_order_id_fkey",
+      "contype": "f",
+      "def": "FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE"
+    },
+    {
+      "conname": "delivery_services_packed_by_fkey",
+      "contype": "f",
+      "def": "FOREIGN KEY (packed_by) REFERENCES auth.users(id) ON DELETE SET NULL"
+    },
+    {
+      "conname": "delivery_services_pkey",
+      "contype": "p",
+      "def": "PRIMARY KEY (id)"
+    },
+    {
+      "conname": "delivery_services_tenant_id_fkey",
+      "contype": "f",
+      "def": "FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE"
+    },
+    {
+      "conname": "uq_delivery_services_order_day",
+      "contype": "u",
+      "def": "UNIQUE (tenant_id, order_id, delivery_date)"
+    }
+  ],
+  "indexes": [
+    {
+      "indexname": "delivery_services_pkey",
+      "indexdef": "CREATE UNIQUE INDEX delivery_services_pkey ON public.delivery_services USING btree (id)"
+    },
+    {
+      "indexname": "idx_delivery_services_customer",
+      "indexdef": "CREATE INDEX idx_delivery_services_customer ON public.delivery_services USING btree (tenant_id, customer_id) WHERE (deleted_at IS NULL)"
+    },
+    {
+      "indexname": "idx_delivery_services_day_status",
+      "indexdef": "CREATE INDEX idx_delivery_services_day_status ON public.delivery_services USING btree (tenant_id, delivery_date, status) WHERE (deleted_at IS NULL)"
+    },
+    {
+      "indexname": "idx_delivery_services_order",
+      "indexdef": "CREATE INDEX idx_delivery_services_order ON public.delivery_services USING btree (tenant_id, order_id) WHERE (deleted_at IS NULL)"
+    },
+    {
+      "indexname": "uq_delivery_services_order_day",
+      "indexdef": "CREATE UNIQUE INDEX uq_delivery_services_order_day ON public.delivery_services USING btree (tenant_id, order_id, delivery_date)"
+    }
+  ],
+  "rlsEnabled": true,
+  "policies": [
+    {
+      "policyname": "delivery_services_customer_read",
+      "cmd": "SELECT",
+      "roles": "{authenticated}",
+      "qual": "(EXISTS ( SELECT 1\n   FROM customers c\n  WHERE ((c.id = delivery_services.customer_id) AND (c.user_id = auth.uid()))))",
+      "with_check": null
+    },
+    {
+      "policyname": "delivery_services_driver_read",
+      "cmd": "SELECT",
+      "roles": "{authenticated}",
+      "qual": "(delivered_by = auth.uid())",
+      "with_check": null
+    },
+    {
+      "policyname": "delivery_services_staff_all",
+      "cmd": "ALL",
+      "roles": "{authenticated}",
+      "qual": "(has_any_staff_role(auth.uid(), tenant_id) OR is_saas_admin(auth.uid()))",
+      "with_check": "(has_any_staff_role(auth.uid(), tenant_id) OR is_saas_admin(auth.uid()))"
+    }
+  ],
+  "rpc": [
+    {
+      "proname": "transition_delivery_service_status",
+      "args": "p_tenant_id uuid, p_service_id uuid, p_to_status delivery_service_status, p_actor_id uuid DEFAULT NULL::uuid, p_notes text DEFAULT NULL::text",
+      "return_type": "delivery_services",
+      "prosecdef": true
+    }
+  ],
+  "deliveryServices": [
+    {
+      "id": "53d4f707-7cb9-43f8-a3fd-0cd724474663",
+      "order_id": "040f4394-ca80-4a15-b021-3789e77f1e0c",
+      "customer_id": "4721afbf-ae4a-4789-b2c1-050dff6fe592",
+      "delivery_date": "2026-09-07",
+      "status": "cancelled",
+      "legacy_backfill": true,
+      "delivery_address_snapshot": {
+        "reason": "no_address_at_intake",
+        "unresolved": true
+      },
+      "customer_contact_snapshot": {
+        "email": null,
+        "phone": null,
+        "customerId": "4721afbf-ae4a-4789-b2c1-050dff6fe592",
+        "displayName": "Customer"
+      },
+      "dietary_snapshot": {},
+      "order_status": "cancelled"
+    },
+    {
+      "id": "b2480045-9fec-4d39-80ea-227c488fa0c1",
+      "order_id": "2b33e7b3-e2f0-4703-852c-5e4e06bcdd73",
+      "customer_id": "4721afbf-ae4a-4789-b2c1-050dff6fe592",
+      "delivery_date": "2026-09-08",
+      "status": "pending",
+      "legacy_backfill": true,
+      "delivery_address_snapshot": {
+        "reason": "no_address_at_intake",
+        "unresolved": true
+      },
+      "customer_contact_snapshot": {
+        "email": null,
+        "phone": null,
+        "customerId": "4721afbf-ae4a-4789-b2c1-050dff6fe592",
+        "displayName": "Customer"
+      },
+      "dietary_snapshot": {},
+      "order_status": "confirmed"
+    },
+    {
+      "id": "ef31a796-de32-486a-b316-f0bc95dd94cc",
+      "order_id": "53e6ec9e-8d4b-4fcf-8958-10b09b4be20b",
+      "customer_id": "ab648e31-c3e7-4095-8f00-817c4d84475e",
+      "delivery_date": "2026-09-28",
+      "status": "ready_for_delivery",
+      "legacy_backfill": true,
+      "delivery_address_snapshot": {
+        "reason": "no_address_at_intake",
+        "unresolved": true
+      },
+      "customer_contact_snapshot": {
+        "email": null,
+        "phone": null,
+        "customerId": "ab648e31-c3e7-4095-8f00-817c4d84475e",
+        "displayName": "ADAN"
+      },
+      "dietary_snapshot": {},
+      "order_status": "ready_for_delivery"
+    },
+    {
+      "id": "ac7f06e6-43b5-4e7f-a7c5-767fc765a0e6",
+      "order_id": "5740a4c4-03f1-44da-9f03-8da6cc95b964",
+      "customer_id": "29521dcb-acfe-4f31-b864-a04683b0c8c6",
+      "delivery_date": "2026-09-28",
+      "status": "in_production",
+      "legacy_backfill": true,
+      "delivery_address_snapshot": {
+        "reason": "no_address_at_intake",
+        "unresolved": true
+      },
+      "customer_contact_snapshot": {
+        "email": null,
+        "phone": null,
+        "customerId": "29521dcb-acfe-4f31-b864-a04683b0c8c6",
+        "displayName": "Cecilia la laguna"
+      },
+      "dietary_snapshot": {},
+      "order_status": "in_production"
+    },
+    {
+      "id": "0d35ead2-979c-424c-b488-d7c0050f7785",
+      "order_id": "febd853f-1b93-4e51-b5cd-d6d7444179ca",
+      "customer_id": "4a55e9f8-c24d-481a-bb92-b56f9e448de4",
+      "delivery_date": "2026-09-28",
+      "status": "pending",
+      "legacy_backfill": true,
+      "delivery_address_snapshot": {
+        "reason": "no_address_at_intake",
+        "unresolved": true
+      },
+      "customer_contact_snapshot": {
+        "email": null,
+        "phone": null,
+        "customerId": "4a55e9f8-c24d-481a-bb92-b56f9e448de4",
+        "displayName": "Liz los abrigos medical implant"
+      },
+      "dietary_snapshot": {},
+      "order_status": "confirmed"
+    },
+    {
+      "id": "7b6176e9-65bc-4a4a-b9b9-a73f7d8f7157",
+      "order_id": "febd853f-1b93-4e51-b5cd-d6d7444179ca",
+      "customer_id": "4a55e9f8-c24d-481a-bb92-b56f9e448de4",
+      "delivery_date": "2026-09-29",
+      "status": "pending",
+      "legacy_backfill": true,
+      "delivery_address_snapshot": {
+        "reason": "no_address_at_intake",
+        "unresolved": true
+      },
+      "customer_contact_snapshot": {
+        "email": null,
+        "phone": null,
+        "customerId": "4a55e9f8-c24d-481a-bb92-b56f9e448de4",
+        "displayName": "Liz los abrigos medical implant"
+      },
+      "dietary_snapshot": {},
+      "order_status": "confirmed"
+    },
+    {
+      "id": "1d5a1bb6-8296-4f36-b359-81d8d01ce6a9",
+      "order_id": "5740a4c4-03f1-44da-9f03-8da6cc95b964",
+      "customer_id": "29521dcb-acfe-4f31-b864-a04683b0c8c6",
+      "delivery_date": "2026-09-30",
+      "status": "in_production",
+      "legacy_backfill": true,
+      "delivery_address_snapshot": {
+        "reason": "no_address_at_intake",
+        "unresolved": true
+      },
+      "customer_contact_snapshot": {
+        "email": null,
+        "phone": null,
+        "customerId": "29521dcb-acfe-4f31-b864-a04683b0c8c6",
+        "displayName": "Cecilia la laguna"
+      },
+      "dietary_snapshot": {},
+      "order_status": "in_production"
+    },
+    {
+      "id": "5f3b0a4b-13ac-43a8-a4f6-be8b78bd2b09",
+      "order_id": "febd853f-1b93-4e51-b5cd-d6d7444179ca",
+      "customer_id": "4a55e9f8-c24d-481a-bb92-b56f9e448de4",
+      "delivery_date": "2026-09-30",
+      "status": "pending",
+      "legacy_backfill": true,
+      "delivery_address_snapshot": {
+        "reason": "no_address_at_intake",
+        "unresolved": true
+      },
+      "customer_contact_snapshot": {
+        "email": null,
+        "phone": null,
+        "customerId": "4a55e9f8-c24d-481a-bb92-b56f9e448de4",
+        "displayName": "Liz los abrigos medical implant"
+      },
+      "dietary_snapshot": {},
+      "order_status": "confirmed"
+    },
+    {
+      "id": "fab1f47e-9979-4059-8d25-c051ad224b62",
+      "order_id": "5740a4c4-03f1-44da-9f03-8da6cc95b964",
+      "customer_id": "29521dcb-acfe-4f31-b864-a04683b0c8c6",
+      "delivery_date": "2026-10-01",
+      "status": "in_production",
+      "legacy_backfill": true,
+      "delivery_address_snapshot": {
+        "reason": "no_address_at_intake",
+        "unresolved": true
+      },
+      "customer_contact_snapshot": {
+        "email": null,
+        "phone": null,
+        "customerId": "29521dcb-acfe-4f31-b864-a04683b0c8c6",
+        "displayName": "Cecilia la laguna"
+      },
+      "dietary_snapshot": {},
+      "order_status": "in_production"
+    },
+    {
+      "id": "7e453748-bc39-4851-892b-d907613cbd37",
+      "order_id": "fab4f2a9-e00e-4d03-a346-c67e7d9da04c",
+      "customer_id": "49882472-c062-4926-9d98-736017abb8d7",
+      "delivery_date": "2026-10-01",
+      "status": "pending",
+      "legacy_backfill": true,
+      "delivery_address_snapshot": {
+        "reason": "no_address_at_intake",
+        "unresolved": true
+      },
+      "customer_contact_snapshot": {
+        "email": null,
+        "phone": null,
+        "customerId": "49882472-c062-4926-9d98-736017abb8d7",
+        "displayName": "Julio centro de salud"
+      },
+      "dietary_snapshot": {},
+      "order_status": "confirmed"
+    },
+    {
+      "id": "30f5ca48-e696-45b6-9e99-bec6e677ca04",
+      "order_id": "00000002-8bba-42c8-9283-000000000002",
+      "customer_id": "cccc0002-8bba-42c8-9283-000000000002",
+      "delivery_date": "2026-10-05",
+      "status": "pending",
+      "legacy_backfill": true,
+      "delivery_address_snapshot": {
+        "reason": "no_address_at_intake",
+        "unresolved": true
+      },
+      "customer_contact_snapshot": {
+        "email": null,
+        "phone": null,
+        "customerId": "cccc0002-8bba-42c8-9283-000000000002",
+        "displayName": "QA Comensal Dietético"
+      },
+      "dietary_snapshot": {
+        "allergens": [
+          "gluten",
+          "milk"
+        ],
+        "capturedAt": "2026-10-02T14:23:18.150Z",
+        "isOverride": false,
+        "preferences": [
+          "vegetarian"
+        ],
+        "authorUserId": "b77ee0d6-c4d5-4c1c-8b09-35a6360a9e3f",
+        "dietaryNotes": "Alergia severa a trazas de kiwi y gluten.",
+        "restrictions": [
+          "celiac"
+        ],
+        "overrideReason": null,
+        "customAllergens": [
+          "kiwi"
+        ]
+      },
+      "order_status": "confirmed"
+    }
+  ],
+  "ordersStatus": [
+    {
+      "status": "draft",
+      "count": 3
+    },
+    {
+      "status": "confirmed",
+      "count": 4
+    },
+    {
+      "status": "in_production",
+      "count": 1
+    },
+    {
+      "status": "cancelled",
+      "count": 1
+    },
+    {
+      "status": "ready_for_delivery",
+      "count": 1
+    }
+  ],
+  "orderItemsAudit": [
+    {
+      "total_items": 20,
+      "distinct_orders": 10
+    }
+  ]
+}

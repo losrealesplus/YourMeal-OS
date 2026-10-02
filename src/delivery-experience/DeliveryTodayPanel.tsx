@@ -10,10 +10,7 @@ import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { StatusChip } from "@/components/admin";
 import { useDelivery } from "@/delivery/useDelivery";
-import {
-  getCompletedDeliveriesQuery,
-  getDeliveryContextQuery,
-} from "@/delivery/DeliveryQueries";
+import { getCompletedDeliveriesQuery, getDeliveryContextQuery } from "@/delivery/DeliveryQueries";
 import type { DeliveryContext } from "@/delivery/DeliveryContext";
 import {
   downloadDeliveryDayCsv,
@@ -37,6 +34,7 @@ import { useOrder } from "@/order/useOrder";
 import { getOrdersReadyForDeliveryQuery } from "@/order/OrderQueries";
 import { getOrderQuery } from "@/order/OrderQueries";
 import type { OrderDetails, OrderSummary } from "@/order/OrderContext";
+import { DietaryBadges } from "@/components/operations/dietary-badges";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -44,9 +42,7 @@ type Props = {
   focusDeliveryId?: string | null;
 };
 
-function readinessTone(
-  r: DeliveryReadiness,
-): "positive" | "warning" | "info" | "neutral" {
+function readinessTone(r: DeliveryReadiness): "positive" | "warning" | "info" | "neutral" {
   if (r === "completed") return "positive";
   if (r === "incomplete" || r === "unassigned") return "warning";
   if (r === "ready_with_warnings") return "info";
@@ -95,42 +91,28 @@ function WarningNextLink({ w }: { w: DeliveryDayWarning }) {
   }
   if (w.nextHref === "customer-workspace") {
     return (
-      <Link
-        to="/admin/customer-workspace"
-        className="text-xs underline-offset-2 hover:underline"
-      >
+      <Link to="/admin/customer-workspace" className="text-xs underline-offset-2 hover:underline">
         Revisar Customer
       </Link>
     );
   }
   return (
-    <Link
-      to="/admin/delivery-workspace"
-      className="text-xs underline-offset-2 hover:underline"
-    >
+    <Link to="/admin/delivery-workspace" className="text-xs underline-offset-2 hover:underline">
       Delivery Workspace (Demo)
     </Link>
   );
 }
 
-export function DeliveryTodayPanel({
-  dayDate: focusDay,
-  focusDeliveryId = null,
-}: Props) {
+export function DeliveryTodayPanel({ dayDate: focusDay, focusDeliveryId = null }: Props) {
   const delivery = useDelivery();
   const order = useOrder();
   const [dayDate, setDayDate] = useState(focusDay ?? utcDateOnly());
   const [filter, setFilter] = useState<DeliveryDayFilter>("all");
   const [openId, setOpenId] = useState<string | null>(focusDeliveryId);
   const [context, setContext] = useState<DeliveryContext | null>(null);
-  const [completedContext, setCompletedContext] =
-    useState<DeliveryContext | null>(null);
-  const [summariesById, setSummariesById] = useState<
-    Record<string, OrderSummary>
-  >({});
-  const [detailsById, setDetailsById] = useState<Record<string, OrderDetails>>(
-    {},
-  );
+  const [completedContext, setCompletedContext] = useState<DeliveryContext | null>(null);
+  const [summariesById, setSummariesById] = useState<Record<string, OrderSummary>>({});
+  const [detailsById, setDetailsById] = useState<Record<string, OrderDetails>>({});
   const [loadError, setLoadError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -155,19 +137,13 @@ export function DeliveryTodayPanel({
       setLoadError(null);
       try {
         const [ready, completed] = await Promise.all([
-          delivery.getDeliveryContext(
-            getDeliveryContextQuery({ operationalDay: dayDate }),
-          ),
-          delivery.getCompletedDeliveries(
-            getCompletedDeliveriesQuery({ operationalDay: dayDate }),
-          ),
+          delivery.getDeliveryContext(getDeliveryContextQuery({ operationalDay: dayDate })),
+          delivery.getCompletedDeliveries(getCompletedDeliveriesQuery({ operationalDay: dayDate })),
         ]);
         if (cancelled) return;
         if (!ready.ok || !ready.context) {
           setContext(null);
-          setLoadError(
-            ready.errors[0]?.message ?? "GetDeliveryContext failed",
-          );
+          setLoadError(ready.errors[0]?.message ?? "GetDeliveryContext failed");
         } else {
           setContext(ready.context);
         }
@@ -217,29 +193,17 @@ export function DeliveryTodayPanel({
         loadError,
         assignmentSupported: false,
       }),
-    [
-      dayDate,
-      context,
-      completedContext,
-      summariesById,
-      detailsById,
-      loadError,
-    ],
+    [dayDate, context, completedContext, summariesById, detailsById, loadError],
   );
 
-  const filtered = useMemo(
-    () => filterDeliveryCards(view.cards, filter),
-    [view.cards, filter],
-  );
+  const filtered = useMemo(() => filterDeliveryCards(view.cards, filter), [view.cards, filter]);
 
   async function openDelivery(card: AdaptedDeliveryDayCard) {
     setOpenId(openId === card.id ? null : card.id);
     if (openId === card.id) return;
     if (detailsById[card.commitmentRef] || !order.isReady) return;
     try {
-      const got = await order.getOrder(
-        getOrderQuery({ orderId: card.commitmentRef }),
-      );
+      const got = await order.getOrder(getOrderQuery({ orderId: card.commitmentRef }));
       if (got.ok && got.context) {
         setDetailsById((prev) => ({
           ...prev,
@@ -258,10 +222,7 @@ export function DeliveryTodayPanel({
   if (loading && view.cards.length === 0 && !view.loadError) {
     return (
       <section className="space-y-3" aria-labelledby="de-today-loading">
-        <h2
-          id="de-today-loading"
-          className="text-sm font-semibold tracking-wide"
-        >
+        <h2 id="de-today-loading" className="text-sm font-semibold tracking-wide">
           Entregas de hoy
         </h2>
         <p className="text-xs text-muted-foreground">Cargando jornada…</p>
@@ -274,10 +235,7 @@ export function DeliveryTodayPanel({
       <section className="space-y-4" aria-labelledby="de-today-empty">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2
-              id="de-today-empty"
-              className="text-sm font-semibold tracking-wide"
-            >
+            <h2 id="de-today-empty" className="text-sm font-semibold tracking-wide">
               Entregas de hoy
             </h2>
             <p className="text-xs text-muted-foreground">
@@ -295,9 +253,7 @@ export function DeliveryTodayPanel({
           </label>
         </div>
         <div className="space-y-3 rounded-md border border-dashed border-border px-4 py-5">
-          <p className="text-sm font-medium">
-            No hay entregas listas para hoy.
-          </p>
+          <p className="text-sm font-medium">No hay entregas listas para hoy.</p>
           <p className="text-xs text-muted-foreground">{view.emptyReason}</p>
           <p className="text-xs">
             <span className="font-medium">Siguiente:</span> {view.nextActionHint}
@@ -344,8 +300,7 @@ export function DeliveryTodayPanel({
             Entregas de hoy
           </h2>
           <p className="text-xs text-muted-foreground">
-            Qué debe salir · cuántas · dónde · avisos · responsabilidad (cuando
-            exista)
+            Qué debe salir · cuántas · dónde · avisos · responsabilidad (cuando exista)
           </p>
         </div>
         <label className="text-xs">
@@ -362,10 +317,7 @@ export function DeliveryTodayPanel({
       <div className="flex flex-wrap gap-2">
         <StatusChip tone="info" label={`${view.dayLabel} · ${view.dayDate}`} />
         <StatusChip tone="info" label={`${view.totals.total} entregas`} />
-        <StatusChip
-          tone="positive"
-          label={`${view.totals.ready} ready`}
-        />
+        <StatusChip tone="positive" label={`${view.totals.ready} ready`} />
         <StatusChip
           tone={view.totals.readyWithWarnings ? "warning" : "positive"}
           label={`${view.totals.readyWithWarnings} con avisos`}
@@ -374,21 +326,15 @@ export function DeliveryTodayPanel({
           tone={view.totals.incomplete ? "warning" : "neutral"}
           label={`${view.totals.incomplete} incompletas`}
         />
-        <StatusChip
-          tone="info"
-          label={`${view.totals.remaining} restantes`}
-        />
-        <StatusChip
-          tone="positive"
-          label={`${view.totals.completed} completadas`}
-        />
+        <StatusChip tone="info" label={`${view.totals.remaining} restantes`} />
+        <StatusChip tone="positive" label={`${view.totals.completed} completadas`} />
         {loading ? <StatusChip tone="neutral" label="Cargando…" /> : null}
       </div>
 
       {!view.assignmentAvailable ? (
         <p className="text-xs text-muted-foreground">
-          Driver assignment not available in this substrate · AssignDelivery →
-          Future (no se inventa conductor)
+          Driver assignment not available in this substrate · AssignDelivery → Future (no se inventa
+          conductor)
         </p>
       ) : null}
 
@@ -409,9 +355,7 @@ export function DeliveryTodayPanel({
             onClick={() => setFilter(id)}
             className={cn(
               "rounded-md border px-2 py-1 text-xs",
-              filter === id
-                ? "border-foreground bg-foreground text-background"
-                : "border-border",
+              filter === id ? "border-foreground bg-foreground text-background" : "border-border",
             )}
           >
             {label}
@@ -443,8 +387,8 @@ export function DeliveryTodayPanel({
         <div className="rounded-md border border-border/60 px-3 py-2 text-xs">
           <p className="font-medium">Jornada comprensible · Ready for Route (Future)</p>
           <p className="text-muted-foreground">
-            No se construye ruta aquí. La preparación del día está clara; Route
-            Preparation es una Experience posterior.
+            No se construye ruta aquí. La preparación del día está clara; Route Preparation es una
+            Experience posterior.
           </p>
         </div>
       ) : (
@@ -459,10 +403,7 @@ export function DeliveryTodayPanel({
           <h3 className="text-xs font-semibold tracking-wide">Avisos</h3>
           <ul className="space-y-2">
             {view.warnings.slice(0, 12).map((w) => (
-              <li
-                key={w.id}
-                className="rounded-md border border-border/60 px-3 py-2"
-              >
+              <li key={w.id} className="rounded-md border border-border/60 px-3 py-2">
                 <p className="text-sm font-medium">{w.message}</p>
                 <p className="text-xs text-muted-foreground">{w.why}</p>
                 <p className="text-xs">
@@ -488,17 +429,14 @@ export function DeliveryTodayPanel({
               <div>
                 <p className="text-sm font-semibold">
                   {c.customerLabel ?? "Cliente ausente"}{" "}
-                  <span className="font-normal text-muted-foreground">
-                    · Order {c.orderRef}
-                  </span>
+                  <span className="font-normal text-muted-foreground">· Order {c.orderRef}</span>
                 </p>
                 <p className="text-xs text-muted-foreground">
                   Dirección: {absentOr(c.addressLabel)}
                   {c.zoneLabel ? ` · Zona: ${c.zoneLabel}` : ""}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Ventana: {absentOr(c.windowLabel)} · Paquete:{" "}
-                  {absentOr(c.packageSummary)}
+                  Ventana: {absentOr(c.windowLabel)} · Paquete: {absentOr(c.packageSummary)}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   Conductor:{" "}
@@ -511,19 +449,19 @@ export function DeliveryTodayPanel({
                     Aclaración operativa: {c.addressClarification}
                   </p>
                 ) : null}
+                {c.dietarySnapshot ? (
+                  <div className="mt-1">
+                    <DietaryBadges snapshot={c.dietarySnapshot} compact={true} />
+                  </div>
+                ) : null}
               </div>
               <div className="flex flex-wrap gap-1">
                 <StatusChip
                   tone={readinessTone(c.readiness)}
                   label={deliveryReadinessLabel(c.readiness)}
                 />
-                <StatusChip
-                  tone="neutral"
-                  label={deliveryStatusLabel(c.deliveryStatus)}
-                />
-                {c.deliveryAdapted ? (
-                  <StatusChip tone="info" label="Adaptado (sesión)" />
-                ) : null}
+                <StatusChip tone="neutral" label={deliveryStatusLabel(c.deliveryStatus)} />
+                {c.deliveryAdapted ? <StatusChip tone="info" label="Adaptado (sesión)" /> : null}
               </div>
             </div>
             <div className="mt-2 flex flex-wrap gap-2">
@@ -563,43 +501,42 @@ export function DeliveryTodayPanel({
             {open?.id === c.id ? (
               <div className="mt-3 space-y-1 border-t border-border/50 pt-3 text-xs">
                 <p>
-                  <span className="font-medium">Cliente:</span>{" "}
-                  {absentOr(c.customerLabel)}
+                  <span className="font-medium">Cliente:</span> {absentOr(c.customerLabel)}
                 </p>
                 <p>
                   <span className="font-medium">Order:</span> {c.orderRef}
                 </p>
                 <p>
-                  <span className="font-medium">Dirección:</span>{" "}
-                  {absentOr(c.addressLabel)}
+                  <span className="font-medium">Dirección:</span> {absentOr(c.addressLabel)}
                 </p>
                 <p>
-                  <span className="font-medium">Zona:</span>{" "}
-                  {absentOr(c.zoneLabel)}
+                  <span className="font-medium">Zona:</span> {absentOr(c.zoneLabel)}
                 </p>
                 <p>
-                  <span className="font-medium">Contacto:</span>{" "}
-                  {absentOr(c.contactLabel)}
+                  <span className="font-medium">Contacto:</span> {absentOr(c.contactLabel)}
                 </p>
                 <p>
-                  <span className="font-medium">Ventana:</span>{" "}
-                  {absentOr(c.windowLabel)}
+                  <span className="font-medium">Ventana:</span> {absentOr(c.windowLabel)}
                 </p>
                 <p>
-                  <span className="font-medium">Paquete:</span>{" "}
-                  {absentOr(c.packageSummary)}
+                  <span className="font-medium">Paquete:</span> {absentOr(c.packageSummary)}
                 </p>
-                <p>
+                <div className="py-0.5">
                   <span className="font-medium">Dietario / alérgenos:</span>{" "}
-                  {absentOr(c.dietaryInfo)}
-                </p>
+                  {c.dietarySnapshot ? (
+                    <div className="mt-1">
+                      <DietaryBadges snapshot={c.dietarySnapshot} />
+                    </div>
+                  ) : (
+                    <span>{absentOr(c.dietaryInfo)}</span>
+                  )}
+                </div>
                 <p>
                   <span className="font-medium">Instrucciones:</span>{" "}
                   {absentOr(c.specialInstructions)}
                 </p>
                 <p className="text-muted-foreground">
-                  Delivery Facade · sin rutas · sin ConfirmDelivery en esta
-                  Experience
+                  Delivery Facade · sin rutas · sin ConfirmDelivery en esta Experience
                 </p>
                 {c.warnings.length > 0 ? (
                   <ul className="mt-2 space-y-1">

@@ -1,0 +1,146 @@
+[
+  {
+    "track": "Track A",
+    "step": 1,
+    "action": "Initial Orders Table State (confirmed)",
+    "result": "🟢 PASS",
+    "details": "Order A displays customer name, badge Confirmado, and quick action Iniciar Cocina.",
+    "evidence": {
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-ops-ux/trackA_01_orders_table_initial.png"
+    },
+    "timestamp": "2026-10-01T23:45:45.503Z"
+  },
+  {
+    "track": "Track A",
+    "step": 2,
+    "action": "Action [ Iniciar Cocina ] -> Database Mutation to in_production",
+    "result": "🟢 PASS",
+    "details": "Direct PostgreSQL check confirms order status mutated to in_production.",
+    "evidence": {
+      "dbStatus": "in_production",
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-ops-ux/trackA_02_after_iniciar_cocina.png"
+    },
+    "timestamp": "2026-10-01T23:45:47.185Z"
+  },
+  {
+    "track": "Track A",
+    "step": 3,
+    "action": "Hard Reload UI Consistency (in_production)",
+    "result": "🟢 PASS",
+    "details": "After hard reload, UI consistently reflects in_production and displays next action [ Marcar Preparado ].",
+    "evidence": {
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-ops-ux/trackA_03_in_production_hard_reload.png"
+    },
+    "timestamp": "2026-10-01T23:45:49.648Z"
+  },
+  {
+    "track": "Track A",
+    "step": 4,
+    "action": "Action [ Marcar Preparado ] -> Database Mutation to prepared",
+    "result": "🟢 PASS",
+    "details": "Direct PostgreSQL check confirms order status mutated to prepared.",
+    "evidence": {
+      "dbStatus": "prepared",
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-ops-ux/trackA_04_after_marcar_preparado.png"
+    },
+    "timestamp": "2026-10-01T23:45:51.276Z"
+  },
+  {
+    "track": "Track A",
+    "step": 5,
+    "action": "Hard Reload UI Consistency (prepared)",
+    "result": "🟢 PASS",
+    "details": "After hard reload, UI consistently reflects prepared and displays next action [ Listo para Reparto ].",
+    "evidence": {
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-ops-ux/trackA_05_prepared_hard_reload.png"
+    },
+    "timestamp": "2026-10-01T23:45:53.680Z"
+  },
+  {
+    "track": "Track A",
+    "step": 6,
+    "action": "Audit Log Persistence for Order Lifecycle",
+    "result": "🟢 PASS",
+    "details": "audit_log table recorded 2 status_change entries with actor and timestamp.",
+    "evidence": {
+      "auditCount": 2
+    },
+    "timestamp": "2026-10-01T23:45:53.716Z"
+  },
+  {
+    "track": "Track B",
+    "step": 1,
+    "action": "Drawer 5-Tier Operational Hierarchy Rendering",
+    "result": "🟢 PASS",
+    "details": "Drawer renders Tier 1 (Identity), Tier 2 (Action Bar), Tier 3 (Culinary), Tier 4 (Logistics), Tier 5 (Audit).",
+    "evidence": {
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-ops-ux/trackB_01_drawer_5_tiers.png"
+    },
+    "timestamp": "2026-10-01T23:45:55.012Z"
+  },
+  {
+    "track": "Track B",
+    "step": 2,
+    "action": "Drawer Safe Close Without Side-Effect Mutations",
+    "result": "🟢 PASS",
+    "details": "Drawer closes cleanly without triggering any unwanted state changes.",
+    "evidence": {},
+    "timestamp": "2026-10-01T23:45:55.547Z"
+  },
+  {
+    "track": "Track C",
+    "step": 1,
+    "action": "Packing Kiosk Macro Progress Bar Presence",
+    "result": "🟢 PASS",
+    "details": "Macro progress bar renders live packing metrics.",
+    "evidence": {
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-ops-ux/trackC_02_packing_p2_view.png"
+    },
+    "timestamp": "2026-10-01T23:45:59.081Z"
+  },
+  {
+    "track": "Track C",
+    "step": 2,
+    "action": "Packing Card & Checklist Interaction",
+    "result": "🟢 PASS",
+    "details": "Order B card found in P2 packing grid with active checklist and [ Marcar Pedido Empacado ] button.",
+    "evidence": {
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-ops-ux/trackC_03_checklist_interaction.png"
+    },
+    "timestamp": "2026-10-01T23:45:59.156Z"
+  },
+  {
+    "track": "Track C",
+    "step": 3,
+    "action": "Action [ Marcar Pedido Empacado ] -> Database Mutation to prepared",
+    "result": "🟢 PASS",
+    "details": "Direct PostgreSQL check confirms Order B transitioned to prepared status upon packaging.",
+    "evidence": {
+      "dbStatus": "prepared",
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-ops-ux/trackC_04_after_marcar_empacado.png"
+    },
+    "timestamp": "2026-10-01T23:46:00.836Z"
+  },
+  {
+    "track": "Track C",
+    "step": 4,
+    "action": "Hard Reload Persistence of Packed State",
+    "result": "🟢 PASS",
+    "details": "After hard reload, Order B card consistently displays Empacado and Listo para Expedición.",
+    "evidence": {
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-ops-ux/trackC_05_packed_hard_reload.png"
+    },
+    "timestamp": "2026-10-01T23:46:04.161Z"
+  },
+  {
+    "track": "Track D",
+    "step": 1,
+    "action": "Physical 2-Page Printable Structure Integrity",
+    "result": "🟢 PASS",
+    "details": "Print layout preserves both P1 Kitchen Marmitas aggregation and P2 Packing per client intact.",
+    "evidence": {
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-ops-ux/trackD_01_printable_pdf_structure.png"
+    },
+    "timestamp": "2026-10-01T23:46:04.812Z"
+  }
+]

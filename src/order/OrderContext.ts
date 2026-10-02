@@ -68,6 +68,8 @@ export type OrderLineSummary = {
   allergenNotes?: string[];
 };
 
+import type { OrderDietarySnapshot } from "@/types/dietary";
+
 export type OrderSummary = {
   id: string;
   week: OrderWeek;
@@ -84,6 +86,7 @@ export type OrderSummary = {
   total: number;
   currency: string;
   tenantId: string;
+  dietarySnapshot?: OrderDietarySnapshot | null;
 };
 
 export type OrderDetails = {

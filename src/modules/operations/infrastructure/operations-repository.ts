@@ -3,6 +3,12 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import type { OperationalOrderStatus } from "../domain/operational-status";
 import type { OrderDietarySnapshot } from "@/types/dietary";
+import type {
+  DeliveryServiceModel,
+  DeliveryServiceStatus,
+  DeliveryAddressSnapshot,
+  CustomerContactSnapshot,
+} from "../domain/delivery-service";
 
 type Client = SupabaseClient<Database>;
 
@@ -62,9 +68,7 @@ function mapRow(row: Record<string, any>): OperationalOrderListItem {
   const unit = row.company_departments ?? null;
   const group = row.delivery_groups ?? null;
   const items = (row.order_items ?? []) as Record<string, any>[];
-  const deliveryDates = [
-    ...new Set(items.map((it) => String(it.day_date)).filter(Boolean)),
-  ].sort();
+  const deliveryDates = [...new Set(items.map((it) => String(it.day_date)).filter(Boolean))].sort();
   return {
     id: String(row.id),
     tenantId: String(row.tenant_id),
@@ -74,8 +78,7 @@ function mapRow(row: Record<string, any>): OperationalOrderListItem {
     dietarySnapshot: (row.dietary_snapshot as OrderDietarySnapshot | null) ?? null,
     total: Number(row.total ?? 0),
     createdAt: String(row.created_at),
-    demandChannel:
-      (row.demand_channel as "individual" | "company") ?? "individual",
+    demandChannel: (row.demand_channel as "individual" | "company") ?? "individual",
     customerId: String(row.customer_id),
     customerName: customer?.display_name ?? null,
     customerEmail: customer?.email ?? null,
@@ -84,13 +87,9 @@ function mapRow(row: Record<string, any>): OperationalOrderListItem {
     siteId: row.site_id ? String(row.site_id) : null,
     siteName: site?.name ?? null,
     siteAddress: site?.address ?? null,
-    organizationalUnitId: row.organizational_unit_id
-      ? String(row.organizational_unit_id)
-      : null,
+    organizationalUnitId: row.organizational_unit_id ? String(row.organizational_unit_id) : null,
     organizationalUnitName: unit?.name ?? null,
-    deliveryGroupId: row.delivery_group_id
-      ? String(row.delivery_group_id)
-      : null,
+    deliveryGroupId: row.delivery_group_id ? String(row.delivery_group_id) : null,
     deliveryGroupName: group?.name ?? null,
     deliveryDates,
     items: items.map((it) => ({
@@ -116,6 +115,33 @@ const ORDER_SELECT = `
   order_items ( id, dish_id, day_date, qty, comment, unit_price, dishes ( id, name ) )
 `;
 
+function mapDeliveryServiceRow(row: Record<string, any>): DeliveryServiceModel {
+  return {
+    id: String(row.id),
+    tenantId: String(row.tenant_id),
+    orderId: String(row.order_id),
+    customerId: String(row.customer_id),
+    deliveryDate: String(row.delivery_date),
+    status: row.status as DeliveryServiceStatus,
+    deliveryAddressId: row.delivery_address_id ? String(row.delivery_address_id) : null,
+    deliveryAddressSnapshot: (row.delivery_address_snapshot as DeliveryAddressSnapshot) ?? {},
+    customerContactSnapshot: (row.customer_contact_snapshot as CustomerContactSnapshot) ?? {},
+    dietarySnapshot: (row.dietary_snapshot as OrderDietarySnapshot | null) ?? null,
+    deliveryInstructions: (row.delivery_instructions as string | null) ?? null,
+    packedAt: row.packed_at ? String(row.packed_at) : null,
+    packedBy: row.packed_by ? String(row.packed_by) : null,
+    dispatchedAt: row.dispatched_at ? String(row.dispatched_at) : null,
+    deliveredAt: row.delivered_at ? String(row.delivered_at) : null,
+    deliveredBy: row.delivered_by ? String(row.delivered_by) : null,
+    issueReason: (row.issue_reason as string | null) ?? null,
+    issueNotes: (row.issue_notes as string | null) ?? null,
+    driverNotes: (row.driver_notes as string | null) ?? null,
+    legacyBackfill: Boolean(row.legacy_backfill),
+    createdAt: String(row.created_at),
+    updatedAt: String(row.updated_at),
+  };
+}
+
 export function createOperationsRepository(client: Client, tenantId: string) {
   const db = client as any;
 
@@ -133,9 +159,7 @@ export function createOperationsRepository(client: Client, tenantId: string) {
       return mapRow(data as Record<string, any>);
     },
 
-    async listOrders(
-      filters: OperationalOrderFilters,
-    ): Promise<OperationalOrderListItem[]> {
+    async listOrders(filters: OperationalOrderFilters): Promise<OperationalOrderListItem[]> {
       const day = filters.deliveryDate ?? filters.date ?? null;
       const useInnerItems = Boolean(day);
 
@@ -143,10 +167,7 @@ export function createOperationsRepository(client: Client, tenantId: string) {
         .from("orders")
         .select(
           useInnerItems
-            ? ORDER_SELECT.replace(
-                "order_items (",
-                "order_items!inner (",
-              )
+            ? ORDER_SELECT.replace("order_items (", "order_items!inner (")
             : ORDER_SELECT,
         )
         .eq("tenant_id", tenantId)
@@ -210,6 +231,129 @@ export function createOperationsRepository(client: Client, tenantId: string) {
       if (error) throw error;
       const row = data as Record<string, unknown>;
       return String(row.status) as OperationalOrderStatus;
+    },
+
+    async listDeliveryServices(
+      filters: {
+        deliveryDate?: string | null;
+        status?: DeliveryServiceStatus | DeliveryServiceStatus[];
+        orderId?: string | null;
+        customerId?: string | null;
+      } = {},
+    ): Promise<DeliveryServiceModel[]> {
+      let q = db
+        .from("delivery_services")
+        .select("*")
+        .eq("tenant_id", tenantId)
+        .is("deleted_at", null)
+        .order("created_at", { ascending: true });
+
+      if (filters.deliveryDate) q = q.eq("delivery_date", filters.deliveryDate);
+      if (filters.orderId) q = q.eq("order_id", filters.orderId);
+      if (filters.customerId) q = q.eq("customer_id", filters.customerId);
+      if (filters.status) {
+        if (Array.isArray(filters.status)) {
+          q = q.in("status", filters.status);
+        } else {
+          q = q.eq("status", filters.status);
+        }
+      }
+
+      const { data, error } = await q;
+      if (error) throw error;
+      return (data ?? []).map(mapDeliveryServiceRow);
+    },
+
+    async getDeliveryService(serviceId: string): Promise<DeliveryServiceModel | null> {
+      const { data, error } = await db
+        .from("delivery_services")
+        .select("*")
+        .eq("tenant_id", tenantId)
+        .eq("id", serviceId)
+        .is("deleted_at", null)
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) return null;
+      return mapDeliveryServiceRow(data);
+    },
+
+    async getDeliveryServiceByOrderDay(
+      orderId: string,
+      deliveryDate: string,
+    ): Promise<DeliveryServiceModel | null> {
+      const { data, error } = await db
+        .from("delivery_services")
+        .select("*")
+        .eq("tenant_id", tenantId)
+        .eq("order_id", orderId)
+        .eq("delivery_date", deliveryDate)
+        .is("deleted_at", null)
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) return null;
+      return mapDeliveryServiceRow(data);
+    },
+
+    async transitionDeliveryService(
+      serviceId: string,
+      toStatus: DeliveryServiceStatus,
+      actorId?: string,
+      notes?: string,
+    ): Promise<DeliveryServiceModel> {
+      const { data, error } = await db.rpc("transition_delivery_service_status", {
+        p_tenant_id: tenantId,
+        p_service_id: serviceId,
+        p_to_status: toStatus,
+        p_actor_id: actorId ?? null,
+        p_notes: notes ?? null,
+      });
+      if (error) throw error;
+      return mapDeliveryServiceRow(data as Record<string, unknown>);
+    },
+
+    async createDeliveryServicesForOrder(orderId: string): Promise<DeliveryServiceModel[]> {
+      const order = await this.getOrder(orderId);
+      if (!order) return [];
+
+      const distinctDays = [...new Set(order.items.map((i) => i.dayDate).filter(Boolean))].sort();
+      if (distinctDays.length === 0) return [];
+
+      let addrSnapshot: Record<string, unknown> = {
+        unresolved: true,
+        reason: "no_address_at_intake",
+      };
+      if (order.siteAddress) {
+        addrSnapshot = { street: order.siteAddress, label: order.siteName ?? "Sitio" };
+      }
+
+      const contactSnapshot = {
+        customerId: order.customerId,
+        displayName: order.customerName ?? "Cliente",
+        email: order.customerEmail ?? null,
+      };
+
+      const dietarySnapshot = order.dietarySnapshot ?? {};
+
+      const inserts = distinctDays.map((dayDate) => ({
+        tenant_id: tenantId,
+        order_id: orderId,
+        customer_id: order.customerId,
+        delivery_date: dayDate,
+        status: "pending" as const,
+        delivery_address_id: order.siteId ?? null,
+        delivery_address_snapshot: addrSnapshot,
+        customer_contact_snapshot: contactSnapshot,
+        dietary_snapshot: dietarySnapshot,
+        delivery_instructions: order.notes,
+        legacy_backfill: false,
+      }));
+
+      const { data, error } = await db
+        .from("delivery_services")
+        .upsert(inserts, { onConflict: "tenant_id,order_id,delivery_date" })
+        .select("*");
+      if (error) throw error;
+      return (data ?? []).map(mapDeliveryServiceRow);
     },
   };
 }

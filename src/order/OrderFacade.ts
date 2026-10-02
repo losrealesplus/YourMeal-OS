@@ -226,32 +226,80 @@ export class OrderFacade {
         );
       }
 
-      let status = current.status as OrderStatus;
-      if (status === "ready_for_delivery") {
-        status = (await this.deps.operations.transitionDelivery(
-          resolved.ctx,
-          command.orderId,
-          "out_for_delivery",
-        )) as OrderStatus;
+      // CR-OPS-06: If a delivery day is specified, transition that day's delivery_service
+      let serviceDelivered = false;
+      if (command.deliveryDay) {
+        try {
+          const service = await this.deps.operations.getDeliveryServiceByOrderDay(
+            resolved.ctx,
+            command.orderId,
+            command.deliveryDay,
+          );
+          if (service) {
+            await this.deps.operations.transitionDeliveryService(
+              resolved.ctx,
+              service.id,
+              "delivered",
+            );
+            serviceDelivered = true;
+          }
+        } catch (err) {
+          console.warn(
+            "[CR-OPS-06] Could not transition delivery_service on completeDelivery:",
+            err,
+          );
+        }
       }
-      if (status === "out_for_delivery" || status === "delivery_issue") {
-        status = (await this.deps.operations.transitionDelivery(
-          resolved.ctx,
-          command.orderId,
-          "delivered",
-        )) as OrderStatus;
-      } else if (status !== "delivered") {
-        return failCommand(
-          [
-            {
-              code: "INVALID_STATE",
-              message: `CompleteDelivery not allowed from ${status}`,
-              recoverable: true,
-              evidence: { orderId: command.orderId, status },
-            },
-          ],
-          command.orderId,
-        );
+
+      // Check if order has remaining active delivery days
+      let remainingActiveServices = 0;
+      try {
+        const allServices = await this.deps.operations.listDeliveryServices(resolved.ctx, {
+          orderId: command.orderId,
+        });
+        remainingActiveServices = allServices.filter(
+          (s) =>
+            s.deliveryDate !== command.deliveryDay &&
+            s.status !== "delivered" &&
+            s.status !== "cancelled",
+        ).length;
+      } catch {
+        // Fallback for orders without delivery_services (legacy single-day)
+      }
+
+      let status = current.status as OrderStatus;
+      if (remainingActiveServices === 0) {
+        // Monodía or last remaining day -> Transition order macrostate to delivered
+        if (status === "ready_for_delivery") {
+          status = (await this.deps.operations.transitionDelivery(
+            resolved.ctx,
+            command.orderId,
+            "out_for_delivery",
+          )) as OrderStatus;
+        }
+        if (status === "out_for_delivery" || status === "delivery_issue") {
+          status = (await this.deps.operations.transitionDelivery(
+            resolved.ctx,
+            command.orderId,
+            "delivered",
+          )) as OrderStatus;
+        } else if (status !== "delivered" && !serviceDelivered) {
+          return failCommand(
+            [
+              {
+                code: "INVALID_STATE",
+                message: `CompleteDelivery not allowed from ${status}`,
+                recoverable: true,
+                evidence: { orderId: command.orderId, status },
+              },
+            ],
+            command.orderId,
+          );
+        }
+      } else {
+        // Multidía with future days pending: order macrostate stays in_production/in_fulfillment
+        // Day delivery is successfully completed
+        status = "delivered";
       }
 
       const got = await this.getOrder(identity, {
@@ -283,13 +331,9 @@ export class OrderFacade {
   ): Promise<OrderCommandResult> {
     const resolved = await this.deps.resolveContext(identity);
     if (!resolved.ok) return failCommand([resolved.error], command.orderId);
-    const { createOrderRepository } = await import(
-      "@/modules/orders/infrastructure/order-repository"
-    );
-    const repo = createOrderRepository(
-      resolved.ctx.supabase,
-      resolved.ctx.tenantId,
-    );
+    const { createOrderRepository } =
+      await import("@/modules/orders/infrastructure/order-repository");
+    const repo = createOrderRepository(resolved.ctx.supabase, resolved.ctx.tenantId);
     try {
       const lifecycle = this.deps.lifecycle ?? OrderLifecycleService;
       const updated = await lifecycle.cancelOrder(
@@ -470,12 +514,64 @@ export class OrderFacade {
     identity: OrderRuntimeIdentity,
     q: GetOrdersReadyForDeliveryQuery,
   ) {
-    return this.searchOrders(identity, {
+    const base = await this.searchOrders(identity, {
       type: "SearchOrders",
       status: ["ready_for_delivery", "out_for_delivery"],
       deliveryDay: q.deliveryDay,
       limit: q.limit,
     });
+
+    const resolved = await this.deps.resolveContext(identity);
+    if (!resolved.ok) return base;
+
+    try {
+      // CR-OPS-06: Incorporate delivery_services for the specified date
+      const services = await this.deps.operations.listDeliveryServices(resolved.ctx, {
+        deliveryDate: q.deliveryDay,
+        status: ["ready_for_delivery", "out_for_delivery"],
+      });
+
+      if (services.length === 0) return base;
+
+      const orderMap = new Map<string, OrderSummary>();
+      if (base.ok) {
+        for (const s of base.summaries) orderMap.set(s.id, s);
+      }
+
+      for (const svc of services) {
+        if (!orderMap.has(svc.orderId)) {
+          const got = await this.getOrder(identity, {
+            type: "GetOrder",
+            orderId: svc.orderId,
+          });
+          if (got.ok && got.context) {
+            orderMap.set(svc.orderId, {
+              ...got.context.details.summary,
+              status: svc.status as OrderStatus,
+              deliveryDayPrimary: svc.deliveryDate,
+              dietarySnapshot: svc.dietarySnapshot,
+            });
+          }
+        } else {
+          const existing = orderMap.get(svc.orderId)!;
+          orderMap.set(svc.orderId, {
+            ...existing,
+            status: svc.status as OrderStatus,
+            deliveryDayPrimary: svc.deliveryDate,
+            dietarySnapshot: svc.dietarySnapshot ?? existing.dietarySnapshot,
+          });
+        }
+      }
+
+      const limit = q.limit ?? 100;
+      return {
+        ok: true,
+        summaries: [...orderMap.values()].slice(0, limit),
+        errors: [],
+      };
+    } catch {
+      return base;
+    }
   }
 
   async getKitchenQueue(identity: OrderRuntimeIdentity, q: GetKitchenQueueQuery) {

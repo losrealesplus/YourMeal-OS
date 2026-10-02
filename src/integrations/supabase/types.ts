@@ -708,6 +708,113 @@ export type Database = {
           },
         ]
       }
+      delivery_services: {
+        Row: {
+          created_at: string
+          customer_contact_snapshot: Json
+          customer_id: string
+          deleted_at: string | null
+          delivered_at: string | null
+          delivered_by: string | null
+          delivery_address_id: string | null
+          delivery_address_snapshot: Json
+          delivery_date: string
+          delivery_instructions: string | null
+          dietary_snapshot: Json
+          dispatched_at: string | null
+          driver_notes: string | null
+          id: string
+          issue_notes: string | null
+          issue_reason: string | null
+          legacy_backfill: boolean
+          order_id: string
+          packed_at: string | null
+          packed_by: string | null
+          status: Database["public"]["Enums"]["delivery_service_status"]
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_contact_snapshot?: Json
+          customer_id: string
+          deleted_at?: string | null
+          delivered_at?: string | null
+          delivered_by?: string | null
+          delivery_address_id?: string | null
+          delivery_address_snapshot?: Json
+          delivery_date: string
+          delivery_instructions?: string | null
+          dietary_snapshot?: Json
+          dispatched_at?: string | null
+          driver_notes?: string | null
+          id?: string
+          issue_notes?: string | null
+          issue_reason?: string | null
+          legacy_backfill?: boolean
+          order_id: string
+          packed_at?: string | null
+          packed_by?: string | null
+          status?: Database["public"]["Enums"]["delivery_service_status"]
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_contact_snapshot?: Json
+          customer_id?: string
+          deleted_at?: string | null
+          delivered_at?: string | null
+          delivered_by?: string | null
+          delivery_address_id?: string | null
+          delivery_address_snapshot?: Json
+          delivery_date?: string
+          delivery_instructions?: string | null
+          dietary_snapshot?: Json
+          dispatched_at?: string | null
+          driver_notes?: string | null
+          id?: string
+          issue_notes?: string | null
+          issue_reason?: string | null
+          legacy_backfill?: boolean
+          order_id?: string
+          packed_at?: string | null
+          packed_by?: string | null
+          status?: Database["public"]["Enums"]["delivery_service_status"]
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_services_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_services_delivery_address_id_fkey"
+            columns: ["delivery_address_id"]
+            isOneToOne: false
+            referencedRelation: "customer_addresses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_services_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_services_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dish_ingredients: {
         Row: {
           dish_id: string
@@ -2429,6 +2536,46 @@ export type Database = {
         Args: { _email: string }
         Returns: Json
       }
+      transition_delivery_service_status: {
+        Args: {
+          p_actor_id?: string
+          p_notes?: string
+          p_service_id: string
+          p_tenant_id: string
+          p_to_status: Database["public"]["Enums"]["delivery_service_status"]
+        }
+        Returns: {
+          created_at: string
+          customer_contact_snapshot: Json
+          customer_id: string
+          deleted_at: string | null
+          delivered_at: string | null
+          delivered_by: string | null
+          delivery_address_id: string | null
+          delivery_address_snapshot: Json
+          delivery_date: string
+          delivery_instructions: string | null
+          dietary_snapshot: Json
+          dispatched_at: string | null
+          driver_notes: string | null
+          id: string
+          issue_notes: string | null
+          issue_reason: string | null
+          legacy_backfill: boolean
+          order_id: string
+          packed_at: string | null
+          packed_by: string | null
+          status: Database["public"]["Enums"]["delivery_service_status"]
+          tenant_id: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "delivery_services"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       transition_order_status: {
         Args: {
           p_order_id: string
@@ -2502,6 +2649,15 @@ export type Database = {
         | "delivery"
       customer_kind: "individual" | "company_employee"
       demand_channel: "individual" | "company"
+      delivery_service_status:
+        | "pending"
+        | "in_production"
+        | "prepared"
+        | "ready_for_delivery"
+        | "out_for_delivery"
+        | "delivered"
+        | "delivery_issue"
+        | "cancelled"
       dish_status: "draft" | "active" | "archived" | "inactive"
       identity_event_type:
         | "USER_REGISTERED"

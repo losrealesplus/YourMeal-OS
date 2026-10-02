@@ -1,5 +1,6 @@
 export * from "./domain/operational-status";
 export * from "./domain/kitchen-batch-status";
+export * from "./domain/delivery-service";
 export { OperationsService } from "./application/operations-service";
 export { ProductionReportService } from "./application/production-report-service";
 export { KitchenExecutionService } from "./application/kitchen-execution-service";

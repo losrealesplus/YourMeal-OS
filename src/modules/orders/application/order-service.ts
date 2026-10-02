@@ -256,8 +256,18 @@ export const OrderService = {
         await import("@/modules/company-account/application/company-account-service");
       const demand = await CompanyAccountService.resolveOrderDemandContext(ctx, customerId);
 
-      // CR-OPS-DIET-01 P1: Resolve customer's dietary profile and build immutable dietary_snapshot
-      let profileRow: any = null;
+      let profileRow: {
+        id?: string;
+        tenant_id?: string;
+        customer_id?: string;
+        allergens?: unknown;
+        custom_allergens?: unknown;
+        restrictions?: unknown;
+        preferences?: unknown;
+        dietary_notes?: string | null;
+        created_at?: string;
+        updated_at?: string;
+      } | null = null;
       if (typeof ctx.supabase?.from === "function") {
         const res = await ctx.supabase
           .from("customer_dietary_profiles")
@@ -271,8 +281,8 @@ export const OrderService = {
       const customerDietaryProfile = profileRow
         ? {
             id: profileRow.id,
-            tenantId: profileRow.tenant_id,
-            customerId: profileRow.customer_id,
+            tenantId: profileRow.tenant_id ?? ctx.tenantId,
+            customerId: profileRow.customer_id ?? customerId,
             allergens: Array.isArray(profileRow.allergens)
               ? (profileRow.allergens as string[])
               : [],
@@ -331,6 +341,18 @@ export const OrderService = {
       } catch (e) {
         const message = e instanceof Error ? e.message : "Audit write failed after draft persist";
         throw new DomainError("INVALID_STATE", message);
+      }
+
+      // CR-OPS-06: Auto-create delivery_services for each distinct delivery day
+      if (result?.order?.id && typeof ctx.supabase?.from === "function") {
+        try {
+          const { createOperationsRepository } =
+            await import("@/modules/operations/infrastructure/operations-repository");
+          const opsRepo = createOperationsRepository(ctx.supabase, ctx.tenantId);
+          await opsRepo.createDeliveryServicesForOrder(result.order.id);
+        } catch (deliveryErr) {
+          console.warn("[CR-OPS-06] Auto-creation of delivery_services deferred:", deliveryErr);
+        }
       }
 
       return result;
@@ -533,6 +555,21 @@ export const OrderService = {
       }
       const message = e instanceof Error ? e.message : "Audit write failed after confirm";
       throw new DomainError("INVALID_STATE", `Confirmation aborted: ${message}`);
+    }
+
+    // CR-OPS-06: Auto-create delivery_services for each distinct delivery day
+    if (result?.order?.id && typeof ctx.supabase?.from === "function") {
+      try {
+        const { createOperationsRepository } =
+          await import("@/modules/operations/infrastructure/operations-repository");
+        const opsRepo = createOperationsRepository(ctx.supabase, ctx.tenantId);
+        await opsRepo.createDeliveryServicesForOrder(result.order.id);
+      } catch (deliveryErr) {
+        console.warn(
+          "[CR-OPS-06] Auto-creation of delivery_services deferred on confirm:",
+          deliveryErr,
+        );
+      }
     }
 
     return result.order;

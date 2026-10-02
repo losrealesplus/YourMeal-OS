@@ -49,6 +49,7 @@ import { DietaryBadges } from "@/components/operations/dietary-badges";
 import {
   ProductionReportService,
   KitchenExecutionService,
+  OperationsService,
   kitchenBatchStatusLabel,
   operationalStatusLabel,
   primaryKitchenBatchAction,
@@ -59,6 +60,7 @@ import {
 import { useOrder } from "@/order/useOrder";
 import {
   readyForKitchenCommand,
+  readyForDeliveryCommand,
   scheduleProductionCommand,
 } from "@/order/OrderCommands";
 import { cn } from "@/lib/utils";
@@ -76,7 +78,8 @@ export const Route = createFileRoute("/_authenticated/admin/production-sheet")({
       { title: "YourMeal OS — Hoja de Producción y Packing" },
       {
         name: "description",
-        content: "Hoja de producción de 2 niveles (Cocina P1 + Packing P2+) a partir de pedidos reales.",
+        content:
+          "Hoja de producción de 2 niveles (Cocina P1 + Packing P2+) a partir de pedidos reales.",
       },
     ],
   }),
@@ -88,8 +91,7 @@ function todayISO() {
 
 function formatDisplayQty(qty: number | null, unit: string): string {
   if (qty == null) return `— ${unit}`;
-  const rounded =
-    Math.abs(qty) >= 10 ? Math.round(qty * 10) / 10 : Math.round(qty * 100) / 100;
+  const rounded = Math.abs(qty) >= 10 ? Math.round(qty * 10) / 10 : Math.round(qty * 100) / 100;
   return `${rounded} ${unit}`;
 }
 
@@ -100,7 +102,9 @@ function ProductionSheetPage() {
   const [date, setDate] = useState(search.date ?? todayISO());
   const [report, setReport] = useState<ProductionReportModel | null>(null);
   const [loading, setLoading] = useState(true);
-  const [levelTab, setLevelTab] = useState<"p1_kitchen" | "p2_packing_client" | "p2_packing_dish">("p1_kitchen");
+  const [levelTab, setLevelTab] = useState<"p1_kitchen" | "p2_packing_client" | "p2_packing_dish">(
+    "p1_kitchen",
+  );
 
   const load = useCallback(async () => {
     if (!user || !tenantId) return;
@@ -117,9 +121,7 @@ function ProductionSheetPage() {
       });
       setReport(model);
     } catch (e) {
-      toast.error(
-        e instanceof Error ? e.message : "No se pudo generar la hoja de producción",
-      );
+      toast.error(e instanceof Error ? e.message : "No se pudo generar la hoja de producción");
       setReport(null);
     } finally {
       setLoading(false);
@@ -138,10 +140,7 @@ function ProductionSheetPage() {
     return (
       <div className="rounded-lg border border-dashed p-10 text-center text-sm text-muted-foreground">
         No tienes permiso de cocina.{" "}
-        <Link
-          to="/admin"
-          className="text-primary underline-offset-4 hover:underline"
-        >
+        <Link to="/admin" className="text-primary underline-offset-4 hover:underline">
           Volver
         </Link>
       </div>
@@ -170,23 +169,11 @@ function ProductionSheetPage() {
               Ejecución
             </Link>
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => void load()}
-            disabled={loading}
-          >
-            <RefreshCw
-              className={cn("mr-2 h-4 w-4", loading && "animate-spin")}
-            />
+          <Button variant="outline" size="sm" onClick={() => void load()} disabled={loading}>
+            <RefreshCw className={cn("mr-2 h-4 w-4", loading && "animate-spin")} />
             Actualizar
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handlePrint}
-            disabled={!report || loading}
-          >
+          <Button variant="outline" size="sm" onClick={handlePrint} disabled={!report || loading}>
             <Printer className="mr-2 h-4 w-4" />
             Imprimir
           </Button>
@@ -210,8 +197,8 @@ function ProductionSheetPage() {
         </div>
         {report ? (
           <p className="pb-2 text-sm text-muted-foreground">
-            {report.totals.orderCount} pedidos · {report.totals.portionCount}{" "}
-            raciones · {report.totals.dishCount} platos
+            {report.totals.orderCount} pedidos · {report.totals.portionCount} raciones ·{" "}
+            {report.totals.dishCount} platos
             {report.totals.customizationCount > 0
               ? ` · ${report.totals.customizationCount} personalizados`
               : ""}
@@ -224,9 +211,7 @@ function ProductionSheetPage() {
           <Skeleton className="h-24 w-full" />
           <Skeleton className="h-24 w-full" />
         </div>
-      ) : !report ||
-        (report.standardDishes.length === 0 &&
-          report.customizations.length === 0) ? (
+      ) : !report || (report.standardDishes.length === 0 && report.customizations.length === 0) ? (
         <div className="rounded-lg border border-dashed p-10 text-center text-sm text-muted-foreground print:hidden">
           No hay pedidos en cola de cocina para esta fecha.
         </div>
@@ -236,7 +221,9 @@ function ProductionSheetPage() {
           <div className="space-y-6 print:hidden">
             <Tabs
               value={levelTab}
-              onValueChange={(v) => setLevelTab(v as any)}
+              onValueChange={(v) =>
+                setLevelTab(v as "p1_kitchen" | "p2_packing_client" | "p2_packing_dish")
+              }
               className="space-y-4"
             >
               <TabsList className="grid grid-cols-3 w-full sm:w-auto">
@@ -263,10 +250,7 @@ function ProductionSheetPage() {
               </TabsContent>
 
               <TabsContent value="p2_packing_client" className="space-y-6">
-                <DigitalPackingByClientView
-                  report={report}
-                  onOrderUpdated={() => void load()}
-                />
+                <DigitalPackingByClientView report={report} onOrderUpdated={() => void load()} />
               </TabsContent>
 
               <TabsContent value="p2_packing_dish" className="space-y-6">
@@ -331,7 +315,7 @@ function DigitalKitchenP1View({
       });
       toast.success("Estado de marmita actualizado.");
       onBatchUpdated?.();
-    } catch (e: any) {
+    } catch (e) {
       toast.error(e instanceof Error ? e.message : "Error al actualizar lote de cocina");
     } finally {
       setBusyDishId(null);
@@ -343,7 +327,9 @@ function DigitalKitchenP1View({
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
         <div className="p-4 rounded-xl border border-border bg-card">
           <p className="text-xs uppercase text-muted-foreground font-semibold">Total Raciones</p>
-          <p className="text-2xl font-bold font-mono text-primary mt-1">{report.totals.portionCount}</p>
+          <p className="text-2xl font-bold font-mono text-primary mt-1">
+            {report.totals.portionCount}
+          </p>
         </div>
         <div className="p-4 rounded-xl border border-border bg-card">
           <p className="text-xs uppercase text-muted-foreground font-semibold">Platos Distintos</p>
@@ -355,7 +341,9 @@ function DigitalKitchenP1View({
         </div>
         <div className="p-4 rounded-xl border border-border bg-card">
           <p className="text-xs uppercase text-muted-foreground font-semibold">Personalizados</p>
-          <p className="text-2xl font-bold font-mono text-amber-600 mt-1">{report.totals.customizationCount}</p>
+          <p className="text-2xl font-bold font-mono text-amber-600 mt-1">
+            {report.totals.customizationCount}
+          </p>
         </div>
       </div>
 
@@ -376,8 +364,10 @@ function DigitalKitchenP1View({
                     <Badge
                       variant="outline"
                       className={cn(
-                        dish.batchStatus === "finished" && "border-emerald-600 text-emerald-700 bg-emerald-50",
-                        dish.batchStatus === "preparing" && "border-amber-600 text-amber-700 bg-amber-50",
+                        dish.batchStatus === "finished" &&
+                          "border-emerald-600 text-emerald-700 bg-emerald-50",
+                        dish.batchStatus === "preparing" &&
+                          "border-amber-600 text-amber-700 bg-amber-50",
                       )}
                     >
                       {kitchenBatchStatusLabel(dish.batchStatus as KitchenBatchStatus)}
@@ -417,7 +407,11 @@ function DigitalKitchenP1View({
                     {dish.allergens.length > 0 ? (
                       <div className="flex flex-wrap gap-1.5">
                         {dish.allergens.map((a) => (
-                          <Badge key={a} variant="outline" className="gap-1 text-xs text-amber-700 bg-amber-50">
+                          <Badge
+                            key={a}
+                            variant="outline"
+                            className="gap-1 text-xs text-amber-700 bg-amber-50"
+                          >
                             <Wheat className="h-3 w-3" />
                             {a}
                           </Badge>
@@ -501,6 +495,7 @@ function DigitalPackingByClientView({
   report: ProductionReportModel;
   onOrderUpdated?: () => void;
 }) {
+  const { user, tenantId, roles } = useAuth();
   const orderApi = useOrder();
   const [busyOrderId, setBusyOrderId] = useState<string | null>(null);
   const [checkedItemKeys, setCheckedItemKeys] = useState<Set<string>>(new Set());
@@ -526,28 +521,43 @@ function DigitalPackingByClientView({
     });
   };
 
-  const handlePackOrder = async (
-    orderId: string,
-    customerName: string,
-    currentStatus: string,
-  ) => {
+  const handlePackOrder = async (orderId: string, customerName: string, currentStatus: string) => {
     setBusyOrderId(orderId);
     try {
-      let res;
+      // 1. CR-OPS-06: Atomically mark this date's delivery_service as ready_for_delivery
+      if (user && tenantId) {
+        try {
+          const ctx = await createServiceContext({
+            supabase,
+            userId: user.id,
+            tenantId,
+            roles,
+          });
+          await OperationsService.packOrderDay(ctx, orderId, report.deliveryDate);
+        } catch (err) {
+          console.warn(
+            "[CR-OPS-06] Direct packOrderDay deferred, falling back to OrderFacade:",
+            err,
+          );
+        }
+      }
+
+      // 2. Synchronize OrderFacade to ready_for_delivery
       if (currentStatus === "confirmed") {
         await orderApi.scheduleProduction(scheduleProductionCommand({ orderId }));
-        res = await orderApi.readyForKitchen(readyForKitchenCommand({ orderId }));
+        await orderApi.readyForKitchen(readyForKitchenCommand({ orderId }));
+        await orderApi.readyForDelivery(readyForDeliveryCommand({ orderId }));
       } else if (currentStatus === "in_production") {
-        res = await orderApi.readyForKitchen(readyForKitchenCommand({ orderId }));
+        await orderApi.readyForKitchen(readyForKitchenCommand({ orderId }));
+        await orderApi.readyForDelivery(readyForDeliveryCommand({ orderId }));
+      } else if (currentStatus === "prepared") {
+        await orderApi.readyForDelivery(readyForDeliveryCommand({ orderId }));
       }
-      if (res && !res.ok) {
-        toast.error(res.errors[0]?.message ?? "Error al empacar pedido");
-      } else {
-        toast.success(`Bolsa de ${customerName} empacada y lista para reparto.`);
-        onOrderUpdated?.();
-      }
-    } catch (e: any) {
-      toast.error(e?.message ?? "Error al actualizar estado del pedido");
+
+      toast.success(`Bolsa de ${customerName} empacada y lista para reparto.`);
+      onOrderUpdated?.();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error al actualizar estado del pedido");
     } finally {
       setBusyOrderId(null);
     }
@@ -559,10 +569,7 @@ function DigitalPackingByClientView({
     if (filterStatus === "packed" && !isPacked) return false;
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
-      return (
-        cust.customerName.toLowerCase().includes(q) ||
-        cust.orderId.toLowerCase().includes(q)
-      );
+      return cust.customerName.toLowerCase().includes(q) || cust.orderId.toLowerCase().includes(q);
     }
     return true;
   });
@@ -753,11 +760,7 @@ function DigitalPackingByClientView({
                     size="sm"
                     disabled={busyOrderId === cust.orderId}
                     onClick={() =>
-                      void handlePackOrder(
-                        cust.orderId,
-                        cust.customerName,
-                        cust.orderStatus,
-                      )
+                      void handlePackOrder(cust.orderId, cust.customerName, cust.orderStatus)
                     }
                     className="w-full h-9 text-xs font-semibold gap-2 shadow-2xs"
                   >
@@ -868,7 +871,9 @@ function PrintableProductionSheet({ report }: { report: ProductionReportModel })
             </div>
             <div className="text-right">
               <p className="text-sm font-bold">Fecha: {report.deliveryDate}</p>
-              <p className="text-xs text-gray-600">Impreso: {new Date().toLocaleTimeString("es-ES")}</p>
+              <p className="text-xs text-gray-600">
+                Impreso: {new Date().toLocaleTimeString("es-ES")}
+              </p>
             </div>
           </div>
         </header>
@@ -912,8 +917,10 @@ function PrintableProductionSheet({ report }: { report: ProductionReportModel })
                 <tr key={dish.dishId} className="break-inside-avoid">
                   <td className="py-2 px-2 font-bold">{dish.dishName}</td>
                   <td className="py-2 px-2 text-xs">{dish.allergens.join(", ") || "—"}</td>
-                  <td className="py-2 px-2 text-right font-mono font-bold text-base">{dish.totalQty}</td>
-                  <td className="py-2 px-2 text-center font-mono">[  ] Listo</td>
+                  <td className="py-2 px-2 text-right font-mono font-bold text-base">
+                    {dish.totalQty}
+                  </td>
+                  <td className="py-2 px-2 text-center font-mono">[ ] Listo</td>
                 </tr>
               ))}
             </tbody>
@@ -931,9 +938,11 @@ function PrintableProductionSheet({ report }: { report: ProductionReportModel })
                 <li key={`${c.orderId}-${c.dishId}`} className="py-1.5 flex justify-between gap-2">
                   <div>
                     <span className="font-bold">{c.customerName}</span> — {c.dishName} (×{c.qty})
-                    <p className="italic text-gray-800 font-semibold">Observación: {c.observation}</p>
+                    <p className="italic text-gray-800 font-semibold">
+                      Observación: {c.observation}
+                    </p>
                   </div>
-                  <span className="font-mono">[  ]</span>
+                  <span className="font-mono">[ ]</span>
                 </li>
               ))}
             </ul>
@@ -948,9 +957,14 @@ function PrintableProductionSheet({ report }: { report: ProductionReportModel })
             </h2>
             <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
               {report.ingredientSummary.map((ing) => (
-                <div key={`${ing.ingredientId}-${ing.unit}`} className="flex justify-between border-b border-gray-200 py-0.5">
+                <div
+                  key={`${ing.ingredientId}-${ing.unit}`}
+                  className="flex justify-between border-b border-gray-200 py-0.5"
+                >
                   <span>{ing.name}</span>
-                  <span className="font-mono font-bold">{formatDisplayQty(ing.displayQty, ing.displayUnit)}</span>
+                  <span className="font-mono font-bold">
+                    {formatDisplayQty(ing.displayQty, ing.displayUnit)}
+                  </span>
                 </div>
               ))}
             </div>
@@ -1007,7 +1021,7 @@ function PrintableProductionSheet({ report }: { report: ProductionReportModel })
                   {cust.items.map((item, idx) => (
                     <li key={idx} className="pt-1 flex justify-between items-start gap-1">
                       <div>
-                        <span>[  ] {item.dishName}</span>
+                        <span>[ ] {item.dishName}</span>
                         {item.comment ? (
                           <p className="font-semibold text-[11px] pl-4">→ {item.comment}</p>
                         ) : null}
@@ -1020,7 +1034,7 @@ function PrintableProductionSheet({ report }: { report: ProductionReportModel })
 
               <div className="pt-2 border-t border-gray-400 flex justify-between text-[10px] uppercase font-bold text-gray-700">
                 <span>Empacado por: _________</span>
-                <span>[  ] OK</span>
+                <span>{"[  ] OK"}</span>
               </div>
             </div>
           ))}
