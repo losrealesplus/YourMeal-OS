@@ -1,0 +1,57 @@
+[
+  {
+    "step": 1,
+    "action": "Apertura del Cajón Universal de Captura de Pedidos (/admin/orders)",
+    "result": "🟢 PASS",
+    "details": "El botón \"+ Nuevo Pedido\" abre exitosamente el UniversalOrderIntakeDrawer.",
+    "evidence": {
+      "isDrawerOpen": true
+    },
+    "timestamp": "2026-10-02T14:39:26.210Z"
+  },
+  {
+    "step": 2,
+    "action": "Carga de Oferta Comercial Publicada — Lunes (2026-09-28)",
+    "result": "🟢 PASS",
+    "details": "El cajón carga la oferta comercial publicada de la semana con platos planificados, precios y componentes DishThumb.",
+    "evidence": {
+      "hasMondayHeader": true,
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-ops-05/01-drawer-open-published-monday.png"
+    },
+    "timestamp": "2026-10-02T14:39:26.301Z"
+  },
+  {
+    "step": 3,
+    "action": "Proyección de Disponibilidad por Día — Pestaña Martes",
+    "result": "🟢 PASS",
+    "details": "Al seleccionar la pestaña Martes, el cajón proyecta dinámicamente únicamente los platos planificados para el martes.",
+    "evidence": {
+      "hasTuesdayHeader": true,
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-ops-05/02-drawer-tuesday-tab-switch.png"
+    },
+    "timestamp": "2026-10-02T14:39:27.912Z"
+  },
+  {
+    "step": 4,
+    "action": "Interacción con Steppers de Raciones y Cálculo en Vivo",
+    "result": "🟢 PASS",
+    "details": "El incremento de cantidades actualiza en tiempo real el desglose de raciones y el importe del pedido.",
+    "evidence": {
+      "plusCount": 7,
+      "hasPortionsIncremented": true,
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-ops-05/03-drawer-order-quantities-selected.png"
+    },
+    "timestamp": "2026-10-02T14:39:29.027Z"
+  },
+  {
+    "step": 5,
+    "action": "Estado Vacío Operativo para Semanas No Publicadas",
+    "result": "🟢 PASS",
+    "details": "Para semanas sin menú publicado (estado draft o inexistente), el cajón muestra un banner de advertencia claro bloqueando la captura incorrecta.",
+    "evidence": {
+      "hasUnpublishedBanner": true,
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-ops-05/04-drawer-unpublished-week-empty-state.png"
+    },
+    "timestamp": "2026-10-02T14:39:31.628Z"
+  }
+]
