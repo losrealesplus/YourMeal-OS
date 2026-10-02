@@ -144,4 +144,73 @@ describe("CustomerDietaryService", () => {
     expect(result.id).toBe("dp-saved-1");
     expect(result.allergens).toEqual(["peanuts"]);
   });
+
+  it("allows operations_manager with customers.write capability to save dietary profile", async () => {
+    const opsManagerCtx: ServiceContext = {
+      supabase: mockSupabase,
+      userId: "user-ops-mgr",
+      tenantId: "tenant-eatclean",
+      roles: ["operations_manager"],
+      capabilities: new Set(["customers.read", "customers.write"]),
+    };
+
+    const mockSavedRow = {
+      id: "dp-ops-saved-1",
+      tenant_id: "tenant-eatclean",
+      customer_id: "c-ops-1",
+      allergens: ["eggs", "fish"],
+      custom_allergens: ["mango"],
+      restrictions: ["low_sodium"],
+      preferences: ["organic"],
+      dietary_notes: "Gestión por operaciones",
+      created_at: "2026-10-02T10:30:00Z",
+      updated_at: "2026-10-02T10:30:00Z",
+    };
+
+    const singleMock = vi.fn().mockResolvedValue({ data: mockSavedRow, error: null });
+    const selectMock = vi.fn().mockReturnValue({ single: singleMock });
+    const upsertMock = vi.fn().mockReturnValue({ select: selectMock });
+
+    mockSupabase.from.mockReturnValue({
+      upsert: upsertMock,
+    });
+
+    const result = await CustomerDietaryService.saveDietaryProfile(opsManagerCtx, {
+      customerId: "c-ops-1",
+      allergens: ["eggs", "fish"],
+      customAllergens: ["mango"],
+      restrictions: ["low_sodium"],
+      preferences: ["organic"],
+      dietaryNotes: "Gestión por operaciones",
+    });
+
+    expect(result.id).toBe("dp-ops-saved-1");
+    expect(result.allergens).toEqual(["eggs", "fish"]);
+    expect(result.customAllergens).toEqual(["mango"]);
+    expect(AuditService.write).toHaveBeenCalledWith(
+      opsManagerCtx,
+      expect.objectContaining({
+        actorId: "user-ops-mgr",
+        entityId: "c-ops-1",
+        action: "update",
+      })
+    );
+  });
+
+  it("throws permissionDenied if user lacks customers.write capability", async () => {
+    const readOnlyCtx: ServiceContext = {
+      supabase: mockSupabase,
+      userId: "user-readonly",
+      tenantId: "tenant-eatclean",
+      roles: ["kitchen"],
+      capabilities: new Set(["customers.read"]), // Missing customers.write
+    };
+
+    await expect(
+      CustomerDietaryService.saveDietaryProfile(readOnlyCtx, {
+        customerId: "c-readonly-1",
+        allergens: ["gluten"],
+      })
+    ).rejects.toThrow("Missing capability: customers.write");
+  });
 });
