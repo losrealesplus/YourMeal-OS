@@ -1,0 +1,88 @@
+[
+  {
+    "step": 1,
+    "action": "P2: Alertas de Alérgenos Compactas en OrdersTable (/admin/orders)",
+    "result": "🟢 PASS",
+    "details": "OrdersTable renderiza las alertas dietéticas compactas directamente en la columna Cliente para pedidos con snapshot.",
+    "evidence": {
+      "hasDietaryBadges": true,
+      "orderId": "00000002-8bba-42c8-9283-000000000002",
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-ops-diet-01/01-admin-orders-table-dietary-badges.png"
+    },
+    "timestamp": "2026-10-02T14:23:25.215Z"
+  },
+  {
+    "step": 2,
+    "action": "P1: Enlace activo a Configuración Dietética en /app/settings",
+    "result": "🟢 PASS",
+    "details": "La pantalla de ajustes del cliente expone el enlace a /app/settings/dietary en el grupo de alimentación.",
+    "evidence": {
+      "hasAllergiesLink": true
+    },
+    "timestamp": "2026-10-02T14:23:30.404Z"
+  },
+  {
+    "step": 3,
+    "action": "P1: Carga de Pantalla Autoservicio y Disclaimer Constitucional (/app/settings/dietary)",
+    "result": "🟢 PASS",
+    "details": "La pantalla de autoservicio carga el catálogo UE-14 y el Aviso Constitucional de Seguridad Alimentaria.",
+    "evidence": {
+      "hasDisclaimer": true,
+      "hasEU14": true
+    },
+    "timestamp": "2026-10-02T14:23:33.712Z"
+  },
+  {
+    "step": 4,
+    "action": "P1: Persistencia en Base de Datos de Perfil Dietético Guardado por el Cliente",
+    "result": "🟢 PASS",
+    "details": "El cliente autenticado guardó exitosamente su perfil dietético en public.customer_dietary_profiles.",
+    "evidence": {
+      "dbStatus": "PERSISTED",
+      "dbProfile": {
+        "id": "7ab29194-aac4-4a16-b16b-4a446e8dea5e",
+        "tenant_id": "8bba00ba-331b-42c8-9283-4e3836ffb870",
+        "customer_id": "cccc0002-8bba-42c8-9283-000000000002",
+        "allergens": [
+          "crustaceans"
+        ],
+        "custom_allergens": [
+          "fresas"
+        ],
+        "restrictions": [
+          "low_sodium"
+        ],
+        "preferences": [],
+        "dietary_notes": "Alergia severa a las fresas y régimen bajo en sal.",
+        "created_at": "2026-10-02T14:23:35.114989+00:00",
+        "updated_at": "2026-10-02T14:23:34.979+00:00"
+      }
+    },
+    "timestamp": "2026-10-02T14:23:39.200Z"
+  },
+  {
+    "step": 5,
+    "action": "P1: Consistencia UI tras Hard Reload (/app/settings/dietary)",
+    "result": "🟢 PASS",
+    "details": "Tras recargar la página, los alérgenos personalizados y notas permanecen activos y visibles en la UI.",
+    "evidence": {
+      "persistsFresas": true,
+      "persistsNotes": true,
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-ops-diet-01/03-customer-dietary-settings-reloaded.png"
+    },
+    "timestamp": "2026-10-02T14:23:43.212Z"
+  },
+  {
+    "step": 6,
+    "action": "P1: Verificación de Snapshot Dietético en Pedido del Cliente (/app/orders/$orderId)",
+    "result": "🟢 PASS",
+    "details": "El resumen del pedido muestra la sección de condiciones dietéticas aplicadas con badges del snapshot y el aviso constitucional.",
+    "evidence": {
+      "hasDietarySection": true,
+      "hasSnapshotBadges": true,
+      "hasOrderDisclaimer": true,
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-ops-diet-01/04-customer-order-dietary-snapshot.png"
+    },
+    "timestamp": "2026-10-02T14:23:47.462Z"
+  }
+]

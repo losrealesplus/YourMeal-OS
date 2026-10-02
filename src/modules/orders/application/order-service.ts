@@ -257,12 +257,16 @@ export const OrderService = {
       const demand = await CompanyAccountService.resolveOrderDemandContext(ctx, customerId);
 
       // CR-OPS-DIET-01 P1: Resolve customer's dietary profile and build immutable dietary_snapshot
-      const { data: profileRow } = await ctx.supabase
-        .from("customer_dietary_profiles")
-        .select("*")
-        .eq("tenant_id", ctx.tenantId)
-        .eq("customer_id", customerId)
-        .maybeSingle();
+      let profileRow: any = null;
+      if (typeof ctx.supabase?.from === "function") {
+        const res = await ctx.supabase
+          .from("customer_dietary_profiles")
+          .select("*")
+          .eq("tenant_id", ctx.tenantId)
+          .eq("customer_id", customerId)
+          .maybeSingle();
+        profileRow = res?.data ?? null;
+      }
 
       const customerDietaryProfile = profileRow
         ? {
