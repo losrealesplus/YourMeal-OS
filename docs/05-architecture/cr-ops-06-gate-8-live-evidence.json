@@ -1,0 +1,88 @@
+[
+  {
+    "track": 1,
+    "title": "Live Database Multi-Day Isolation & Safe Backfill Audit",
+    "result": "🟢 PASS",
+    "details": "Verified 11 live delivery_services (100% legacy_backfill=true). Orders 5740a4c4 and febd853f decoupled into exactly 3 delivery services each by calendar date.",
+    "meta": {
+      "totalServices": 11,
+      "legacyBackfilled": 11,
+      "multiDayOrder1Count": 3,
+      "multiDayOrder2Count": 3,
+      "order5740Dates": [
+        "2026-09-28",
+        "2026-09-30",
+        "2026-10-01"
+      ],
+      "orderFebdDates": [
+        "2026-09-28",
+        "2026-09-29",
+        "2026-09-30"
+      ]
+    },
+    "timestamp": "2026-10-02T15:41:19.938Z"
+  },
+  {
+    "track": 2,
+    "title": "Live Atomic RPC State Transition & Multi-Day Isolation",
+    "result": "🟢 PASS",
+    "details": "Atomic RPC verified in live DB: Day 1 packed (packed_at stamped), Day 2 isolated in pending, parent order in_production; Day 1 delivered left order in_production; Day 2 delivered automatically resolved order to delivered.",
+    "meta": {
+      "packedAtSet": true,
+      "day2StillPending": true,
+      "orderNowInProduction": true,
+      "day1DeliveredAtSet": true,
+      "orderStillInProduction": true,
+      "orderFinalDelivered": true
+    },
+    "timestamp": "2026-10-02T15:41:21.270Z"
+  },
+  {
+    "track": 3,
+    "title": "Live Browser: Production & Packing Kiosk Sheet (/admin/production-sheet)",
+    "result": "🟢 PASS",
+    "details": "Production sheet rendered P1 Cocina & P2 Packing tabs with active customer orders, portions, and packing controls.",
+    "meta": {
+      "hasP1Cocina": true,
+      "hasPackingTab": true,
+      "hasCustomers": true,
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-ops-06/01-production-sheet-p1-and-p2.png"
+    },
+    "timestamp": "2026-10-02T15:41:29.837Z"
+  },
+  {
+    "track": 4,
+    "title": "Live Browser: Delivery Today Operational Panel (/admin/delivery-today)",
+    "result": "🟢 PASS",
+    "details": "Delivery Today panel successfully loaded delivery services for 2026-09-28, displaying ready services, customer info, and dispatch actions.",
+    "meta": {
+      "hasDeliveryTitle": true,
+      "hasAdanOrder": true,
+      "screenshot": "/Users/alex/Developer/YourMeal-OS/docs/05-architecture/screenshots/cr-ops-06/03-delivery-today-live-panel.png"
+    },
+    "timestamp": "2026-10-02T15:41:35.194Z"
+  },
+  {
+    "track": 5,
+    "title": "Dietary & Address Snapshot Contract Immutability",
+    "result": "🟢 PASS",
+    "details": "Validated that delivery_services maintain immutable frozen address, contact, and dietary snapshots decoupled from mutations to live tables.",
+    "meta": {
+      "sampleCount": 5,
+      "allSnapshotsValid": true
+    },
+    "timestamp": "2026-10-02T15:41:35.405Z"
+  },
+  {
+    "track": 6,
+    "title": "Edge Performance & Live Console Error Audit",
+    "result": "🟢 PASS",
+    "details": "Edge returned HTTP 200 in 129ms with 0 browser console errors.",
+    "meta": {
+      "httpStatus": 200,
+      "edgeLatencyMs": 129,
+      "consoleErrorsCount": 0
+    },
+    "timestamp": "2026-10-02T15:41:35.534Z"
+  }
+]
