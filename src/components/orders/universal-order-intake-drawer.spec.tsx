@@ -64,7 +64,7 @@ vi.mock("@/modules/weekly-menu/application/weekly-menu-queries", () => ({
   })),
 }));
 
-describe("UniversalOrderIntakeDrawer Component Rendering & Contract (CR-OPS-08)", () => {
+describe("UniversalOrderIntakeDrawer Component Rendering & Contract (CR-OPS-05)", () => {
   it("renders drawer with week title and action buttons when open", () => {
     const html = renderToString(
       <UniversalOrderIntakeDrawer
@@ -107,5 +107,21 @@ describe("UniversalOrderIntakeDrawer Component Rendering & Contract (CR-OPS-08)"
     // MUST consume canonical fetchPublishedWeeklyMenu
     expect(source).toMatch(/fetchPublishedWeeklyMenu/);
     expect(source).toMatch(/from ["']@\/modules\/weekly-menu\/application\/weekly-menu-queries["']/);
+
+    // MUST render DishThumb for canonical photo / fallback representation
+    expect(source).toMatch(/DishThumb/);
+    expect(source).toMatch(/from ["']@\/components\/consumer\/dish-thumb["']/);
+  });
+
+  it("verifies contract adherence: handles empty state messaging and multi-tenant isolation", () => {
+    const filePath = path.resolve(__dirname, "./universal-order-intake-drawer.tsx");
+    const source = fs.readFileSync(filePath, "utf8");
+
+    // Contract strings for empty state handling
+    expect(source).toContain("No hay menú publicado para esta semana");
+    expect(source).toContain("Sin platos planificados para este día");
+
+    // Multi-tenant parameter passing
+    expect(source).toContain("fetchPublishedWeeklyMenu(tenantId!, weekStart)");
   });
 });

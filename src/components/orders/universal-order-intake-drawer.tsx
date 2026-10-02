@@ -18,6 +18,7 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { createServiceContext } from "@/services/types";
+import { DishThumb } from "@/components/consumer/dish-thumb";
 import { DietaryBadges } from "@/components/operations/dietary-badges";
 import type { CustomerDietaryProfile } from "@/types/dietary";
 import {
@@ -1099,24 +1100,32 @@ export function UniversalOrderIntakeDrawer({
                               qty > 0 ? "border-primary/50 bg-primary/5" : "border-border bg-card",
                             )}
                           >
-                            <div className="flex items-center justify-between gap-2">
-                              <div className="space-y-0.5">
-                                <p className="text-sm font-medium leading-none">{dish.name}</p>
-                                {dish.price !== null && dish.price > 0 ? (
-                                  <p className="text-xs text-muted-foreground font-mono">
-                                    {dish.price.toFixed(2)} € / ración
-                                  </p>
-                                ) : dish.price === 0 ? (
-                                  <p className="text-xs text-muted-foreground font-mono">
-                                    0,00 € (Sin coste)
-                                  </p>
-                                ) : (
-                                  <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
-                                    ⚠️ Precio no asignado (Requiere ajuste)
-                                  </p>
-                                )}
+                            <div className="flex items-center justify-between gap-3">
+                              <div className="flex items-center gap-3 min-w-0 flex-1">
+                                <DishThumb
+                                  emoji={dish.emoji || "🍽️"}
+                                  imageSrc={dish.imageSrc || dish.photoUrl || undefined}
+                                  size="sm"
+                                  className="size-12 rounded-lg border border-border/80 shrink-0 text-xl"
+                                />
+                                <div className="space-y-0.5 min-w-0 flex-1">
+                                  <p className="text-sm font-medium leading-none truncate">{dish.name}</p>
+                                  {dish.price !== null && dish.price > 0 ? (
+                                    <p className="text-xs text-muted-foreground font-mono">
+                                      {dish.price.toFixed(2)} € / ración
+                                    </p>
+                                  ) : dish.price === 0 ? (
+                                    <p className="text-xs text-muted-foreground font-mono">
+                                      0,00 € (Sin coste)
+                                    </p>
+                                  ) : (
+                                    <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+                                      ⚠️ Precio no asignado (Requiere ajuste)
+                                    </p>
+                                  )}
+                                </div>
                               </div>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-2 shrink-0">
                                 <Button
                                   type="button"
                                   variant="outline"
