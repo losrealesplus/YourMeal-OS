@@ -56,6 +56,8 @@ import {
   type KitchenBatchStatus,
   type OperationalOrderStatus,
   type ProductionReportModel,
+  type OperationalSuiteModel,
+  type PackingSheetModel,
 } from "@/modules/operations";
 import { useOrder } from "@/order/useOrder";
 import {
@@ -100,11 +102,12 @@ function ProductionSheetPage() {
   const { can } = useCan();
   const search = Route.useSearch();
   const [date, setDate] = useState(search.date ?? todayISO());
+  const [suite, setSuite] = useState<OperationalSuiteModel | null>(null);
   const [report, setReport] = useState<ProductionReportModel | null>(null);
   const [loading, setLoading] = useState(true);
-  const [levelTab, setLevelTab] = useState<"p1_kitchen" | "p2_packing_client" | "p2_packing_dish">(
-    "p1_kitchen",
-  );
+  const [levelTab, setLevelTab] = useState<
+    "p1_kitchen" | "p2_packing_hierarchy" | "p2_packing_client" | "p2_packing_dish"
+  >("p1_kitchen");
 
   const load = useCallback(async () => {
     if (!user || !tenantId) return;
@@ -116,12 +119,14 @@ function ProductionSheetPage() {
         tenantId,
         roles,
       });
-      const model = await ProductionReportService.buildForDay(ctx, {
+      const res = await ProductionReportService.buildOperationalSuiteForDay(ctx, {
         deliveryDate: date,
       });
-      setReport(model);
+      setSuite(res);
+      setReport(res.legacyModel);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "No se pudo generar la hoja de producción");
+      setSuite(null);
       setReport(null);
     } finally {
       setLoading(false);
@@ -134,6 +139,23 @@ function ProductionSheetPage() {
 
   function handlePrint() {
     window.print();
+  }
+
+  function handleDownloadCSV() {
+    if (!suite?.csvExport) {
+      toast.error("No hay datos disponibles para exportar");
+      return;
+    }
+    const blob = new Blob([suite.csvExport], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `EatClean_Matriz_Operacional_${date}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success("Matriz exportada en CSV / Excel");
   }
 
   if (!can("kitchen.operate")) {
@@ -158,9 +180,9 @@ function ProductionSheetPage() {
             </Link>
           </Button>
           <SectionTitle
-            overline="Operaciones"
-            title="Hoja de Producción & Packing (2 Niveles)"
-            subtitle="P1: Cocina y Marmitas · P2: Packing por Cliente y por Plato. Sin datos simulados."
+            overline="Operaciones · CR-OPS-07"
+            title="Centro de Hojas Operativas (Cocina, Packing & Export)"
+            subtitle="Proyecciones deterministas por fecha · P1 Cocina & Marmitas · P2 Packing Jerárquico · Trazabilidad de Versión"
           />
         </div>
         <div className="flex flex-wrap gap-2">
@@ -173,6 +195,10 @@ function ProductionSheetPage() {
             <RefreshCw className={cn("mr-2 h-4 w-4", loading && "animate-spin")} />
             Actualizar
           </Button>
+          <Button variant="outline" size="sm" onClick={handleDownloadCSV} disabled={!suite || loading}>
+            <FileDown className="mr-2 h-4 w-4" />
+            Excel (.csv)
+          </Button>
           <Button variant="outline" size="sm" onClick={handlePrint} disabled={!report || loading}>
             <Printer className="mr-2 h-4 w-4" />
             Imprimir
@@ -184,27 +210,122 @@ function ProductionSheetPage() {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-end gap-3 print:hidden">
-        <div className="space-y-1.5">
-          <Label htmlFor="sheet-date">Fecha de producción</Label>
-          <Input
-            id="sheet-date"
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="w-44"
-          />
+      {/* Quick Date Presets & Version Metadata Banner */}
+      <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 print:hidden">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-semibold text-muted-foreground mr-1">Selección Rápida:</span>
+            <Button
+              variant={date === todayISO() ? "default" : "outline"}
+              size="sm"
+              className="h-8 text-xs"
+              onClick={() => setDate(todayISO())}
+            >
+              Hoy
+            </Button>
+            <Button
+              variant={date === "2026-10-05" ? "default" : "outline"}
+              size="sm"
+              className="h-8 text-xs"
+              onClick={() => setDate("2026-10-05")}
+            >
+              Lun 05/10
+            </Button>
+            <Button
+              variant={date === "2026-10-06" ? "default" : "outline"}
+              size="sm"
+              className="h-8 text-xs"
+              onClick={() => setDate("2026-10-06")}
+            >
+              Mar 06/10
+            </Button>
+            <Button
+              variant={date === "2026-10-07" ? "default" : "outline"}
+              size="sm"
+              className="h-8 text-xs"
+              onClick={() => setDate("2026-10-07")}
+            >
+              Mié 07/10
+            </Button>
+            <Button
+              variant={date === "2026-10-08" ? "default" : "outline"}
+              size="sm"
+              className="h-8 text-xs"
+              onClick={() => setDate("2026-10-08")}
+            >
+              Jue 08/10
+            </Button>
+            <Button
+              variant={date === "2026-10-09" ? "default" : "outline"}
+              size="sm"
+              className="h-8 text-xs"
+              onClick={() => setDate("2026-10-09")}
+            >
+              Vie 09/10
+            </Button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Label htmlFor="sheet-date" className="text-xs font-semibold text-muted-foreground whitespace-nowrap">
+              Fecha específica:
+            </Label>
+            <Input
+              id="sheet-date"
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-40 h-8 text-xs"
+            />
+          </div>
         </div>
-        {report ? (
-          <p className="pb-2 text-sm text-muted-foreground">
-            {report.totals.orderCount} pedidos · {report.totals.portionCount} raciones ·{" "}
-            {report.totals.dishCount} platos
-            {report.totals.customizationCount > 0
-              ? ` · ${report.totals.customizationCount} personalizados`
-              : ""}
-          </p>
+
+        {suite ? (
+          <div className="flex flex-wrap items-center justify-between border-t border-border pt-3 text-xs text-muted-foreground gap-2">
+            <div className="flex items-center gap-3">
+              <Badge variant="outline" className="font-mono text-[10px] uppercase">
+                {suite.temporalMode === "historical"
+                  ? "📜 Histórico"
+                  : suite.temporalMode === "present"
+                    ? "⚡ Jornada de Hoy"
+                    : "📅 Planificación"}
+              </Badge>
+              <span className="font-mono text-foreground font-semibold">
+                Ref: {suite.versionMetadata.versionId}
+              </span>
+              <span>·</span>
+              <span>Corte: {new Date(suite.versionMetadata.cutoffTimestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            </div>
+
+            <div>
+              {suite.packingSheet.totals.grandTotalOrders} pedidos · {suite.packingSheet.totals.grandTotalPortions} raciones · {suite.kitchenSheet.dishes.length} platos
+            </div>
+          </div>
         ) : null}
       </div>
+
+      {/* Top-level Safety Alert Banner */}
+      {suite?.kitchenSheet.safetySummary.totalAllergyAlertCount ? (
+        <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-700 dark:text-red-400 print:border-black">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 shrink-0 text-red-600 mt-0.5" />
+            <div className="space-y-1">
+              <p className="text-sm font-bold uppercase tracking-wider">
+                ⚠️ Protocolo de Alergias Críticas ({suite.kitchenSheet.safetySummary.totalAllergyAlertCount} raciones afectadas)
+              </p>
+              <p className="text-xs">
+                Se detectaron solicitudes con alérgenos críticos declarados por comensales. Verifique manipulación cruzada:
+              </p>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {suite.kitchenSheet.safetySummary.criticalAllergensPresent.map((alg) => (
+                  <Badge key={alg.allergenId} variant="destructive" className="text-xs font-bold font-mono">
+                    🔴 {alg.allergenLabel.toUpperCase()}: {alg.affectedPortions} raciones
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {loading ? (
         <div className="space-y-3 print:hidden">
@@ -213,23 +334,27 @@ function ProductionSheetPage() {
         </div>
       ) : !report || (report.standardDishes.length === 0 && report.customizations.length === 0) ? (
         <div className="rounded-lg border border-dashed p-10 text-center text-sm text-muted-foreground print:hidden">
-          No hay pedidos en cola de cocina para esta fecha.
+          No hay pedidos registrados para la fecha seleccionada ({date}).
         </div>
       ) : (
         <>
-          {/* Digital 2-Level View */}
+          {/* Digital 2-Level & Hierarchy View */}
           <div className="space-y-6 print:hidden">
             <Tabs
               value={levelTab}
               onValueChange={(v) =>
-                setLevelTab(v as "p1_kitchen" | "p2_packing_client" | "p2_packing_dish")
+                setLevelTab(v as "p1_kitchen" | "p2_packing_hierarchy" | "p2_packing_client" | "p2_packing_dish")
               }
               className="space-y-4"
             >
-              <TabsList className="grid grid-cols-3 w-full sm:w-auto">
+              <TabsList className="grid grid-cols-4 w-full sm:w-auto">
                 <TabsTrigger value="p1_kitchen" className="gap-2">
                   <ChefHat className="h-4 w-4" />
                   P1 · Cocina & Marmitas
+                </TabsTrigger>
+                <TabsTrigger value="p2_packing_hierarchy" className="gap-2">
+                  <Package className="h-4 w-4" />
+                  P2 · Packing Jerárquico (Árbol)
                 </TabsTrigger>
                 <TabsTrigger value="p2_packing_client" className="gap-2">
                   <Users className="h-4 w-4" />
@@ -247,6 +372,12 @@ function ProductionSheetPage() {
                   date={date}
                   onBatchUpdated={() => void load()}
                 />
+              </TabsContent>
+
+              <TabsContent value="p2_packing_hierarchy" className="space-y-6">
+                {suite ? (
+                  <DigitalPackingHierarchyView packingSheet={suite.packingSheet} />
+                ) : null}
               </TabsContent>
 
               <TabsContent value="p2_packing_client" className="space-y-6">
@@ -282,6 +413,135 @@ function ProductionSheetPage() {
         }
       `}</style>
     </div>
+  );
+}
+
+/** COMPONENTE C: VISTA JERÁRQUICA DE PACKING (ÁRBOL EXPANDIBLE DE 6 NIVELES) */
+function DigitalPackingHierarchyView({ packingSheet }: { packingSheet: PackingSheetModel }) {
+  return (
+    <section className="space-y-6" aria-label="Nivel 2 Packing Jerárquico">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+        <div className="p-4 rounded-xl border border-border bg-card">
+          <p className="text-xs uppercase text-muted-foreground font-semibold">Municipios / Zonas</p>
+          <p className="text-2xl font-bold font-mono text-primary mt-1">
+            {packingSheet.totals.municipalityCount}
+          </p>
+        </div>
+        <div className="p-4 rounded-xl border border-border bg-card">
+          <p className="text-xs uppercase text-muted-foreground font-semibold">Empresas (B2B)</p>
+          <p className="text-2xl font-bold font-mono mt-1">
+            {packingSheet.totals.b2bCompanyCount} ({packingSheet.totals.b2bPortionsCount} com.)
+          </p>
+        </div>
+        <div className="p-4 rounded-xl border border-border bg-card">
+          <p className="text-xs uppercase text-muted-foreground font-semibold">Particulares (B2C)</p>
+          <p className="text-2xl font-bold font-mono mt-1">
+            {packingSheet.totals.b2cIndividualCount} ({packingSheet.totals.b2cPortionsCount} com.)
+          </p>
+        </div>
+        <div className="p-4 rounded-xl border border-border bg-card">
+          <p className="text-xs uppercase text-muted-foreground font-semibold">Total Raciones</p>
+          <p className="text-2xl font-bold font-mono text-emerald-600 mt-1">
+            {packingSheet.totals.grandTotalPortions}
+          </p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {packingSheet.municipalities.map((muni) => (
+          <div key={muni.municipality} className="rounded-xl border border-border bg-card p-5 space-y-4 shadow-sm">
+            <div className="flex flex-wrap items-center justify-between border-b border-border pb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-base font-bold text-foreground">📍 {muni.municipality}</span>
+                <Badge variant="outline" className="font-mono text-xs">
+                  {muni.totalOrders} pedidos · {muni.totalPortions} raciones
+                </Badge>
+              </div>
+            </div>
+
+            {/* B2C Individuals */}
+            {muni.b2cIndividuals.length > 0 ? (
+              <div className="space-y-2">
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  👤 Clientes Particulares ({muni.b2cIndividuals.length})
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {muni.b2cIndividuals.map((u) => (
+                    <div key={u.orderId} className="p-3 rounded-lg border border-border bg-secondary/20 space-y-1.5">
+                      <div className="flex justify-between items-center">
+                        <span className="font-semibold text-xs text-foreground">{u.customerName}</span>
+                        <span className="font-mono text-[10px] text-muted-foreground">#{u.orderId.slice(0, 8)}</span>
+                      </div>
+                      <div className="space-y-1 text-xs">
+                        {u.items.map((it, idx) => (
+                          <div key={idx} className="flex justify-between text-muted-foreground">
+                            <span>{it.qty}× {it.dishName}</span>
+                            {it.safetyTag ? <span className="font-bold">{it.safetyTag}</span> : null}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            {/* B2B Companies */}
+            {muni.b2bCompanies.length > 0 ? (
+              <div className="space-y-3 pt-2">
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  🏢 Empresas Corporativas ({muni.b2bCompanies.length})
+                </p>
+                {muni.b2bCompanies.map((comp) => (
+                  <div key={comp.companyId} className="rounded-lg border border-border bg-secondary/10 p-4 space-y-3">
+                    <div className="flex justify-between items-center font-bold text-sm">
+                      <span>🏢 {comp.companyName}</span>
+                      <Badge variant="secondary" className="font-mono text-xs">
+                        {comp.totalOrders} pedidos · {comp.totalPortions} raciones
+                      </Badge>
+                    </div>
+
+                    <div className="pl-4 space-y-3 border-l-2 border-primary/30">
+                      {comp.sites.map((site) => (
+                        <div key={site.siteId} className="space-y-2">
+                          <p className="text-xs font-semibold text-foreground/90">
+                            📍 Sede: {site.siteName} <span className="text-[10px] text-muted-foreground">({site.siteAddress})</span>
+                          </p>
+
+                          {site.units.map((unit) => (
+                            <div key={unit.unitId} className="pl-3 space-y-1.5 border-l border-border">
+                              <p className="text-[11px] font-medium text-muted-foreground">
+                                🏬 Unidad/Piso: {unit.unitName} ({unit.totalPortions} comidas)
+                              </p>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                {unit.customers.map((cu) => (
+                                  <div key={cu.orderId} className="p-2.5 rounded border border-border bg-card text-xs space-y-1">
+                                    <div className="flex justify-between">
+                                      <span className="font-semibold">{cu.customerName}</span>
+                                      <span className="font-mono text-[10px] text-muted-foreground">#{cu.orderId.slice(0, 8)}</span>
+                                    </div>
+                                    {cu.items.map((it, idx) => (
+                                      <div key={idx} className="flex justify-between text-muted-foreground text-[11px]">
+                                        <span>{it.qty}× {it.dishName}</span>
+                                        {it.safetyTag ? <span className="font-bold">{it.safetyTag}</span> : null}
+                                      </div>
+                                    ))}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 

@@ -1,10 +1,19 @@
 export * from "./domain/operational-status";
 export * from "./domain/kitchen-batch-status";
 export * from "./domain/delivery-service";
+export * from "./domain/operational-engine-types";
+export * from "./domain/operational-date-resolver";
+export * from "./domain/production-kitchen-engine";
+export * from "./domain/packing-hierarchy-engine";
+export * from "./domain/operational-version-manager";
+export * from "./domain/operational-sheet-exporter";
 export { OperationsService } from "./application/operations-service";
 export { ProductionReportService } from "./application/production-report-service";
 export { KitchenExecutionService } from "./application/kitchen-execution-service";
-export type { ProductionReportQuery } from "./application/production-report-service";
+export type {
+  ProductionReportQuery,
+  OperationalSuiteModel,
+} from "./application/production-report-service";
 export type { KitchenBatchTransitionCommand } from "./application/kitchen-execution-service";
 export {
   buildProductionReport,
