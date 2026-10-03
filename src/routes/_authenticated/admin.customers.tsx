@@ -25,6 +25,7 @@ import {
   Trash2,
   AlertCircle,
   RotateCcw,
+  MapPin,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -1155,6 +1156,12 @@ function AdminCustomersPage() {
                           canWrite={canWrite}
                         />
 
+                        {/* CR-OPS-08 (R-03): Customer B2C Delivery Addresses */}
+                        <CustomerAddressesViewer
+                          customerId={selectedCustomer.id}
+                          tenantId={tenantId ?? ""}
+                        />
+
                         {/* Summary Metric Strip */}
                         <div className="grid grid-cols-2 gap-3 pt-3 border-t border-border sm:grid-cols-4">
                           <div className="rounded-lg border border-border p-3 bg-card text-center">
@@ -1716,6 +1723,104 @@ function AdminCustomersPage() {
           }
         }}
       />
+    </div>
+  );
+}
+
+function CustomerAddressesViewer({
+  customerId,
+  tenantId,
+}: {
+  customerId: string;
+  tenantId: string;
+}) {
+  const [addresses, setAddresses] = useState<
+    Array<{
+      id: string;
+      label: string | null;
+      street: string;
+      city: string | null;
+      zip: string | null;
+      is_default: boolean;
+    }>
+  >([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      if (!tenantId || !customerId) return;
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from("customer_addresses")
+          .select("id, label, street, city, zip, is_default")
+          .eq("tenant_id", tenantId)
+          .eq("customer_id", customerId)
+          .is("deleted_at", null)
+          .order("is_default", { ascending: false })
+          .order("created_at", { ascending: true });
+        if (error) throw error;
+        if (!cancelled) {
+          setAddresses((data ?? []) as any[]);
+        }
+      } catch {
+        if (!cancelled) setAddresses([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [tenantId, customerId]);
+
+  return (
+    <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+      <div className="flex items-center gap-2 pb-2 border-b border-border/60">
+        <MapPin className="w-4 h-4 text-primary" />
+        <h4 className="text-sm font-semibold tracking-tight text-foreground">
+          Direcciones de Entrega Particulares (B2C)
+        </h4>
+      </div>
+      {loading ? (
+        <p className="text-xs text-muted-foreground">Cargando direcciones…</p>
+      ) : addresses.length === 0 ? (
+        <p className="text-xs text-muted-foreground italic">
+          Sin direcciones registradas en la aplicación de cliente.
+        </p>
+      ) : (
+        <div className="space-y-2">
+          {addresses.map((a) => (
+            <div
+              key={a.id}
+              className="rounded-md border border-border/70 p-2.5 bg-muted/20 flex items-start justify-between gap-3 text-xs"
+            >
+              <div className="space-y-0.5 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-foreground">
+                    {a.label || "Dirección de Entrega"}
+                  </span>
+                  {a.is_default && (
+                    <Badge
+                      variant="secondary"
+                      className="text-[10px] px-1.5 py-0 bg-primary/10 text-primary border-primary/20"
+                    >
+                      Predeterminada
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-muted-foreground">
+                  {a.street}
+                  {a.city ? `, ${a.city}` : ""}
+                  {a.zip ? ` · ${a.zip}` : ""}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

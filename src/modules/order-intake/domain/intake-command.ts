@@ -24,6 +24,7 @@ export type OrderIntakeDraftCommand = {
   offerCode?: string;
   customerTier?: import("@/modules/commercial").CustomerTier;
   extras?: import("@/modules/commercial").ExtraItemInput[];
+  deliveryAddressId?: string | null;
 };
 
 export type OrderIntakeOrigin = {
