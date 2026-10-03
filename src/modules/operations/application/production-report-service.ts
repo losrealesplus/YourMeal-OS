@@ -1,7 +1,11 @@
 /**
- * EP-002B — ProductionReportService
- * Builds the daily Hoja de Producción from real kitchen-queue orders.
- * EP-002B.2 attaches kitchen batch status (dish × day lot).
+ * EP-002B / CR-OPS-07 — ProductionReportService
+ * Builds the comprehensive Operations Engine projections:
+ * - Kitchen Consolidated Sheet with Safety Segregation (P1)
+ * - 6-Level Collapsible Packing Tree (P2)
+ * - Version Manager with Deterministic Fingerprint
+ * - Flat 14-column CSV / Excel Matrix
+ * - Thermal Label Feed
  */
 import type { ServiceContext } from "@/services/types";
 import { requireCapability } from "@/permissions";
@@ -21,13 +25,49 @@ import {
   type ProductionSourceLine,
   type RecipeLine,
 } from "../domain/production-report";
+import {
+  normalizeOperationalOrders,
+  resolveTemporalMode,
+  HISTORICAL_QUEUE_STATUSES,
+  LIVE_QUEUE_STATUSES,
+} from "../domain/operational-date-resolver";
+import { buildKitchenProductionSheet } from "../domain/production-kitchen-engine";
+import { buildPackingHierarchySheet } from "../domain/packing-hierarchy-engine";
+import { generateVersionMetadata } from "../domain/operational-version-manager";
+import {
+  buildFlatAnalyticMatrix,
+  exportToCSV,
+  buildThermalLabels,
+  type FlatAnalyticRow,
+  type ThermalLabelModel,
+} from "../domain/operational-sheet-exporter";
+import type {
+  KitchenProductionSheetModel,
+  NormalizedOperationalLine,
+  PackingSheetModel,
+  VersionMetadata,
+} from "../domain/operational-engine-types";
 
 export type ProductionReportQuery = {
   deliveryDate: string;
   companyId?: string | null;
   siteId?: string | null;
   deliveryGroupId?: string | null;
+  cutoffTimestamp?: string;
 };
+
+export interface OperationalSuiteModel {
+  deliveryDate: string;
+  temporalMode: "historical" | "present" | "future";
+  lines: NormalizedOperationalLine[];
+  kitchenSheet: KitchenProductionSheetModel;
+  packingSheet: PackingSheetModel;
+  versionMetadata: VersionMetadata;
+  flatMatrix: FlatAnalyticRow[];
+  csvExport: string;
+  thermalLabels: ThermalLabelModel[];
+  legacyModel: ProductionReportModel;
+}
 
 async function loadDishMeta(
   ctx: ServiceContext,
@@ -154,31 +194,38 @@ function flattenOrdersToLines(
 
 export const ProductionReportService = {
   /**
-   * Build the operational production sheet for a delivery day.
-   * Source = kitchen queue statuses (confirmed → prepared), never mocks.
-   * Includes EP-002B.2 batch status per dish lot (default pending).
+   * CR-OPS-07: Build the full operational suite for a delivery day.
+   * Resolves past/present/future modes, calculates fingerprints,
+   * generates 🔴 safety segregated kitchen and 6-tier packing trees.
    */
-  async buildForDay(
+  async buildOperationalSuiteForDay(
     ctx: ServiceContext,
     query: ProductionReportQuery,
-  ): Promise<ProductionReportModel> {
+  ): Promise<OperationalSuiteModel> {
     requireCapability(ctx.roles, "kitchen.operate");
 
     if (!query.deliveryDate) {
       throw new Error("deliveryDate is required");
     }
 
+    const temporalMode = resolveTemporalMode(query.deliveryDate);
+    const statuses =
+      temporalMode === "historical"
+        ? (HISTORICAL_QUEUE_STATUSES as unknown as OperationalOrderFilters["statuses"])
+        : (LIVE_QUEUE_STATUSES as unknown as OperationalOrderFilters["statuses"]);
+
     const repo = createOperationsRepository(ctx.supabase, ctx.tenantId);
     const filters: OperationalOrderFilters = {
-      statuses: KITCHEN_QUEUE_STATUSES,
+      statuses,
       deliveryDate: query.deliveryDate,
       companyId: query.companyId ?? null,
       siteId: query.siteId ?? null,
       deliveryGroupId: query.deliveryGroupId ?? null,
     };
+
     const orders = await repo.listOrders(filters);
-    const lines = flattenOrdersToLines(orders, query.deliveryDate);
-    const dishIds = [...new Set(lines.map((l) => l.dishId))];
+    const legacyLines = flattenOrdersToLines(orders, query.deliveryDate);
+    const dishIds = [...new Set(legacyLines.map((l) => l.dishId))];
 
     const [dishMetaById, recipeLines, batchStatusByDish] = await Promise.all([
       loadDishMeta(ctx, dishIds),
@@ -186,12 +233,75 @@ export const ProductionReportService = {
       loadBatchStatuses(ctx, query.deliveryDate, dishIds),
     ]);
 
-    return buildProductionReport({
-      deliveryDate: query.deliveryDate,
+    // 1. Normalize operational lines
+    const { lines, resolutionStatus } = normalizeOperationalOrders({
+      orders,
+      targetDate: query.deliveryDate,
+      temporalMode,
+      dishMetaMap: dishMetaById,
+    });
+
+    // 2. Generate deterministic version metadata
+    const versionMetadata = await generateVersionMetadata({
+      targetDate: query.deliveryDate,
       lines,
+      cutoffTimestamp: query.cutoffTimestamp,
+    });
+
+    // 3. Build Kitchen Production Sheet (P1)
+    const kitchenSheet = buildKitchenProductionSheet({
+      lines,
+      targetDate: query.deliveryDate,
+      temporalMode,
+      resolutionStatus,
+      versionMetadata,
+    });
+
+    // 4. Build Packing Hierarchy Sheet (P2)
+    const packingSheet = buildPackingHierarchySheet({
+      lines,
+      targetDate: query.deliveryDate,
+      temporalMode,
+      resolutionStatus,
+      versionMetadata,
+    });
+
+    // 5. Exporter models
+    const flatMatrix = buildFlatAnalyticMatrix(lines);
+    const csvExport = exportToCSV(flatMatrix);
+    const thermalLabels = buildThermalLabels(lines);
+
+    // 6. Legacy compatibility model
+    const legacyModel = buildProductionReport({
+      deliveryDate: query.deliveryDate,
+      lines: legacyLines,
       dishMetaById,
       recipeLines,
       batchStatusByDish,
     });
+
+    return {
+      deliveryDate: query.deliveryDate,
+      temporalMode,
+      lines,
+      kitchenSheet,
+      packingSheet,
+      versionMetadata,
+      flatMatrix,
+      csvExport,
+      thermalLabels,
+      legacyModel,
+    };
+  },
+
+  /**
+   * Legacy wrapper: Build the operational production sheet for a delivery day.
+   */
+  async buildForDay(
+    ctx: ServiceContext,
+    query: ProductionReportQuery,
+  ): Promise<ProductionReportModel> {
+    const suite = await this.buildOperationalSuiteForDay(ctx, query);
+    return suite.legacyModel;
   },
 };
