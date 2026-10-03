@@ -1,0 +1,12 @@
+# Sovereign Technical Authority (Human Approval Only via Web/2FA)
+# Alexander Hernandez (@losrealesplus) is the sole authority for governance and deployment pipelines.
+
+# Default rule: All files require review by Alexander Hernandez
+*                       @losrealesplus
+
+# CI/CD Workflows and GitHub Configurations require mandatory Code Owner review
+.github/                @losrealesplus
+.github/workflows/      @losrealesplus
+
+# Local and remote governance scripts require mandatory Code Owner review
+scripts/governance/     @losrealesplus
