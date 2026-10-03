@@ -4,14 +4,8 @@ import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { lockGate, consumeNonceAtomic, getGatesStatus } from "./lib/nonce-store.mjs";
-import {
-  validateTranscriptAuthorization,
-  computeHmacSignature,
-} from "./lib/transcript-validator.mjs";
+import { validateTranscriptAuthorization } from "./lib/transcript-validator.mjs";
 import { recordAudit, readAuditLog } from "./lib/audit-logger.mjs";
-import { loadProductionVault, executeWithVault } from "./lib/credential-vault.mjs";
-
-const DEFAULT_KEY_FILE = path.join(os.homedir(), ".yourmeal-os", "operator.key");
 
 /**
  * Discovers the active transcript path if not explicitly provided.
@@ -47,39 +41,6 @@ export function discoverDefaultTranscript() {
 }
 
 /**
- * Resolves operator key from CLI arg, key file, or environment.
- * @param {Object} options
- * @param {string} [options.key]
- * @param {string} [options.keyFile]
- * @returns {string | null}
- */
-export function resolveOperatorKey(options) {
-  if (options.key && options.key.trim().length > 0) {
-    return options.key.trim();
-  }
-
-  const keyFilePath = options.keyFile || DEFAULT_KEY_FILE;
-  if (fs.existsSync(keyFilePath)) {
-    try {
-      const raw = fs.readFileSync(keyFilePath, "utf8").trim();
-      if (raw.length > 0) return raw;
-    } catch {
-      // Failed to read key file
-    }
-  }
-
-  // Fallback to environment variable if explicitly provided
-  if (
-    process.env.GATEKEEPER_OPERATOR_KEY &&
-    process.env.GATEKEEPER_OPERATOR_KEY.trim().length > 0
-  ) {
-    return process.env.GATEKEEPER_OPERATOR_KEY.trim();
-  }
-
-  return null;
-}
-
-/**
  * Parses CLI arguments.
  * @param {string[]} args
  */
@@ -90,20 +51,13 @@ export function parseArgs(args) {
     gate: "",
     ttl: 60,
     transcript: "",
-    key: "",
-    keyFile: "",
-    vault: "",
     stateDir: "",
-    childCommand: [],
   };
 
   let i = 1;
   while (i < args.length) {
     const arg = args[i];
-    if (arg === "--") {
-      options.childCommand = args.slice(i + 1);
-      break;
-    } else if (arg === "--cr" && i + 1 < args.length) {
+    if (arg === "--cr" && i + 1 < args.length) {
       options.cr = args[++i];
     } else if (arg === "--gate" && i + 1 < args.length) {
       options.gate = args[++i].toUpperCase();
@@ -111,12 +65,6 @@ export function parseArgs(args) {
       options.ttl = parseInt(args[++i], 10) || 60;
     } else if (arg === "--transcript" && i + 1 < args.length) {
       options.transcript = args[++i];
-    } else if (arg === "--key" && i + 1 < args.length) {
-      options.key = args[++i];
-    } else if (arg === "--key-file" && i + 1 < args.length) {
-      options.keyFile = args[++i];
-    } else if (arg === "--vault" && i + 1 < args.length) {
-      options.vault = args[++i];
     } else if (arg === "--state-dir" && i + 1 < args.length) {
       options.stateDir = args[++i];
     }
@@ -189,31 +137,12 @@ export function executeVerification(options) {
     return { pass: false, reason };
   }
 
-  const operatorKey = resolveOperatorKey(options);
-  if (!operatorKey) {
-    const reason =
-      "OPERATOR_KEY_UNAVAILABLE: Human Product Authority key not provided. Set --key, --key-file, or GATEKEEPER_OPERATOR_KEY.";
-    recordAudit(
-      {
-        event: "VERIFY_ATTEMPT_REJECTED",
-        cr_id: cr,
-        gate,
-        nonce_prefix: activeRecord.nonce,
-        result: "FAIL",
-        reason,
-      },
-      stateDir,
-    );
-    return { pass: false, reason };
-  }
-
-  // 1. Validate transcript entry and HMAC signature
+  // 1. Validate transcript entry (provenance + CR/GATE/NONCE match)
   const transcriptResult = validateTranscriptAuthorization({
     transcriptPath,
     expectedCr: cr,
     expectedGate: gate,
     expectedNonce: activeRecord.nonce,
-    operatorKey,
   });
 
   if (!transcriptResult.valid) {
@@ -304,15 +233,17 @@ async function main() {
       console.log(`NONCE: ${record.nonce}`);
       console.log(`EXPIRES AT: ${new Date(record.expires_at).toISOString()}`);
       console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-      console.log("\nPara autorizar este Gate, la Human Product Authority debe emitir en el chat:");
+      console.log("\nCR-GOV-02: el Gatekeeper local NO autoriza ejecuciones privilegiadas.");
+      console.log("La autoridad de produccion reside exclusivamente en GitHub Actions + Environment");
+      console.log("protegido (aprobacion humana OOB). Este nonce solo registra la precondicion local.");
+      console.log("\nEl token de precondicion local que la Human Product Authority puede emitir en el chat:");
       console.log("\nAUTORIZACION_EXPLICITA_HUMANA:");
       console.log(`  CR: ${record.cr_id}`);
       console.log(`  GATE: ${record.gate}`);
       console.log(`  NONCE: ${record.nonce}`);
-      console.log("  SIGNATURE: <HMAC_SHA256(CR:GATE:NONCE, OPERATOR_SECRET)>");
       console.log("\nO en formato compacto:");
       console.log(
-        `AUTORIZO ${record.gate} ${record.cr_id} NONCE:${record.nonce} SIGNATURE:<HMAC_SHA256>`,
+        `AUTORIZO ${record.gate} ${record.cr_id} NONCE:${record.nonce}`,
       );
       console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
       break;
@@ -326,71 +257,8 @@ async function main() {
         process.exit(1);
       }
       console.log(
-        `\n✅ [GATEKEEPER PASS] Authorization verified for Gate ${options.gate}. Nonce consumed successfully.`,
+        `\n✅ [GATEKEEPER PASS] Local governance precondition verified for Gate ${options.gate}. Nonce consumed. ADVISORY ONLY: this does not authorize any execution (CR-GOV-02).`,
       );
-      break;
-    }
-
-    case "run": {
-      if (options.childCommand.length === 0) {
-        console.error("Error: No target command specified after --");
-        process.exit(1);
-      }
-
-      const verifyResult = executeVerification(options);
-      if (!verifyResult.pass) {
-        console.error(`\n🚨 [GATEKEEPER HARD STOP] Execution BLOCKED for Gate ${options.gate}:`);
-        console.error(`Reason: ${verifyResult.reason}\n`);
-        process.exit(1);
-      }
-
-      console.log(
-        `\n✅ [GATEKEEPER PASS] Authorization verified. Injecting credentials from vault...`,
-      );
-
-      let credentials = {};
-      try {
-        credentials = loadProductionVault(options.vault || undefined);
-      } catch (vaultErr) {
-        console.error(`\n🚨 [GATEKEEPER HARD STOP] Vault loading failed: ${vaultErr.message}\n`);
-        recordAudit(
-          {
-            event: "VAULT_LOAD_FAILED",
-            cr_id: options.cr,
-            gate: options.gate,
-            result: "FAIL",
-            reason: vaultErr.message,
-          },
-          options.stateDir || undefined,
-        );
-        process.exit(1);
-      }
-
-      const cmd = options.childCommand[0];
-      const cmdArgs = options.childCommand.slice(1);
-
-      recordAudit(
-        {
-          event: "COMMAND_SPAWNED",
-          cr_id: options.cr,
-          gate: options.gate,
-          result: "INFO",
-          command: options.childCommand.join(" "),
-        },
-        options.stateDir || undefined,
-      );
-
-      try {
-        const exitCode = await executeWithVault({
-          command: cmd,
-          args: cmdArgs,
-          credentials,
-        });
-        process.exit(exitCode);
-      } catch (execErr) {
-        console.error(`\n🚨 [GATEKEEPER] Command execution error: ${execErr.message}`);
-        process.exit(1);
-      }
       break;
     }
 
@@ -449,13 +317,10 @@ async function main() {
 
     default:
       console.log(
-        "Usage: gatekeeper <lock|verify|run|status|audit|deny-direct-deploy|deny-direct-migrate> [options]",
+        "Usage: gatekeeper <lock|verify|status|audit|deny-direct-deploy|deny-direct-migrate> [options]",
       );
       console.log("  lock   --cr <CR> --gate <GATE> [--ttl <MINUTES>]");
-      console.log("  verify --cr <CR> --gate <GATE> [--transcript <FILE>] [--key <KEY>]");
-      console.log(
-        "  run    --cr <CR> --gate <GATE> [--transcript <FILE>] [--key <KEY>] [--vault <FILE>] -- <COMMAND...>",
-      );
+      console.log("  verify --cr <CR> --gate <GATE> [--transcript <FILE>]");
       console.log("  status");
       console.log("  audit");
       process.exit(1);
