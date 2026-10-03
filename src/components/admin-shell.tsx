@@ -249,13 +249,15 @@ export function AdminShell({ children }: { children: ReactNode }) {
             ? "Cocina"
             : item.labelKey === "ops.nav.delivery" || item.labelKey === "ops.nav.deliveryWorkspace"
               ? "Reparto"
-              : item.labelKey === "ops.nav.customerWorkspace" || item.labelKey === "ops.nav.customers"
+              : item.labelKey === "ops.nav.customerWorkspace" ||
+                  item.labelKey === "ops.nav.customers"
                 ? "Clientes"
                 : item.labelKey === "ops.nav.orderCapture"
                   ? "Toma de pedidos"
                   : item.labelKey === "ops.nav.menuPlanning"
                     ? "Menús"
-                    : item.labelKey === "ops.nav.orderWorkspace" || item.labelKey === "ops.nav.orders"
+                    : item.labelKey === "ops.nav.orderWorkspace" ||
+                        item.labelKey === "ops.nav.orders"
                       ? "Pedidos"
                       : item.labelKey === "ops.nav.productionWorkspace"
                         ? "Producción"
@@ -368,7 +370,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
             <p className="text-xs text-muted-foreground">{t("admin:ops.headerFocus")}</p>
           </header>
 
-          <main className="flex-1 overflow-y-auto p-4 lg:p-6">{children}</main>
+          <main className="min-w-0 flex-1 overflow-y-auto p-4 lg:p-6">{children}</main>
         </div>
       </div>
 

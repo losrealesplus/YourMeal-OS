@@ -614,6 +614,7 @@ function AdminCustomersPage() {
       {
         key: "name",
         header: "Nombre",
+        className: "min-w-[180px]",
         render: (r) => (
           <div
             className="min-w-0 cursor-pointer group"
@@ -632,11 +633,13 @@ function AdminCustomersPage() {
       {
         key: "status",
         header: "Estado",
+        className: "min-w-[90px]",
         render: (r) => <StatusChip tone={toneByStatus[r.status] ?? "neutral"} label={r.status} />,
       },
       {
         key: "email",
         header: "Correo",
+        className: "min-w-[160px]",
         render: (r) => (
           <span className="text-xs truncate block max-w-[180px]">{r.email || "—"}</span>
         ),
@@ -644,16 +647,19 @@ function AdminCustomersPage() {
       {
         key: "phone",
         header: "Teléfono",
+        className: "min-w-[110px]",
         render: (r) => <span className="text-xs">{r.phone || "—"}</span>,
       },
       {
         key: "city",
         header: "Ciudad",
+        className: "min-w-[100px]",
         render: (r) => <span className="text-xs">{r.city || "—"}</span>,
       },
       {
         key: "last",
         header: "Último pedido",
+        className: "min-w-[110px]",
         render: (r) => (
           <span className="text-xs text-muted-foreground">
             {r.lastOrderAt ? fmt.date(r.lastOrderAt, "medium") : "—"}
@@ -663,13 +669,13 @@ function AdminCustomersPage() {
       {
         key: "orders",
         header: "Pedidos",
-        className: "text-right",
+        className: "text-right min-w-[70px]",
         render: (r) => <span className="font-mono tabular-nums">{r.orderCount}</span>,
       },
       {
         key: "avg",
         header: "Ticket medio",
-        className: "text-right",
+        className: "text-right min-w-[100px]",
         render: (r) => (
           <span className="font-mono tabular-nums">
             {fmt.currency(r.averageTicket, { currency: "EUR" })}
@@ -679,6 +685,7 @@ function AdminCustomersPage() {
       {
         key: "actions",
         header: "Acciones",
+        className: "min-w-[110px] text-right",
         render: (r) => (
           <div className="flex items-center gap-3">
             <button
@@ -711,6 +718,7 @@ function AdminCustomersPage() {
       {
         key: "name",
         header: "Nombre",
+        className: "min-w-[180px]",
         render: (r) => (
           <div className="min-w-0">
             <p className="font-semibold truncate">{r.name}</p>
@@ -721,6 +729,7 @@ function AdminCustomersPage() {
       {
         key: "contact",
         header: "Responsable",
+        className: "min-w-[160px]",
         render: (r) => (
           <div className="min-w-0">
             <p className="text-sm truncate">{r.contactName || "—"}</p>
@@ -731,18 +740,19 @@ function AdminCustomersPage() {
       {
         key: "employees",
         header: "Empleados",
-        className: "text-right",
+        className: "text-right min-w-[90px]",
         render: (r) => <span className="font-mono tabular-nums">{r.employeeCount}</span>,
       },
       {
         key: "orders",
         header: "Pedidos",
-        className: "text-right",
+        className: "text-right min-w-[80px]",
         render: (r) => <span className="font-mono tabular-nums">{r.orderCount}</span>,
       },
       {
         key: "status",
         header: "Estado",
+        className: "min-w-[90px]",
         render: (r) => (
           <StatusChip tone={r.status === "active" ? "positive" : "danger"} label={r.status} />
         ),
@@ -750,6 +760,7 @@ function AdminCustomersPage() {
       {
         key: "created",
         header: "Alta",
+        className: "min-w-[100px]",
         render: (r) => (
           <span className="text-xs text-muted-foreground">{fmt.date(r.createdAt, "medium")}</span>
         ),
@@ -757,6 +768,7 @@ function AdminCustomersPage() {
       {
         key: "actions",
         header: "Acciones",
+        className: "min-w-[110px] text-right",
         render: (r) => (
           <Link
             to="/admin/companies"

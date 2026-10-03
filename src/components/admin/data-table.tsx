@@ -12,10 +12,12 @@ export function DataTable<T extends { id: string }>({
   columns,
   rows,
   empty,
+  className,
 }: {
   columns: Column<T>[];
   rows: T[];
   empty?: ReactNode;
+  className?: string;
 }) {
   if (rows.length === 0) {
     return (
@@ -25,7 +27,7 @@ export function DataTable<T extends { id: string }>({
     );
   }
   return (
-    <div className="overflow-x-auto -mx-5">
+    <div className={cn("w-full overflow-x-auto", className)}>
       <table className="w-full text-sm">
         <thead>
           <tr className="text-left">
@@ -33,7 +35,7 @@ export function DataTable<T extends { id: string }>({
               <th
                 key={c.key}
                 className={cn(
-                  "meta-label font-mono px-5 pb-3 border-b border-border whitespace-nowrap",
+                  "meta-label font-mono px-4 pb-3 border-b border-border whitespace-nowrap",
                   c.className,
                 )}
               >
@@ -49,7 +51,7 @@ export function DataTable<T extends { id: string }>({
               className="border-b border-border/60 last:border-0 hover:bg-secondary/40 transition-colors"
             >
               {columns.map((c) => (
-                <td key={c.key} className={cn("px-5 py-3.5 align-middle", c.className)}>
+                <td key={c.key} className={cn("px-4 py-3.5 align-middle", c.className)}>
                   {c.render(row)}
                 </td>
               ))}
