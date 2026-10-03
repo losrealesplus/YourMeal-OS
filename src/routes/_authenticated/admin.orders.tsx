@@ -593,7 +593,7 @@ export function OrderDetailView({
               <span className="text-muted-foreground">Email:</span>{" "}
               {detail.customerEmail ?? "Sin email registrado"}
             </p>
-            {detail.siteName && (
+            {detail.siteName ? (
               <p className="flex items-center gap-1.5 text-muted-foreground">
                 <MapPin className="h-3.5 w-3.5 shrink-0 text-primary" />
                 <span>
@@ -602,7 +602,17 @@ export function OrderDetailView({
                     : detail.siteName}
                 </span>
               </p>
-            )}
+            ) : detail.deliveryAddress ? (
+              <p className="flex items-center gap-1.5 text-muted-foreground">
+                <MapPin className="h-3.5 w-3.5 shrink-0 text-primary" />
+                <span>
+                  {detail.deliveryAddress.label ? `${detail.deliveryAddress.label}: ` : ""}
+                  {detail.deliveryAddress.street}
+                  {detail.deliveryAddress.city ? `, ${detail.deliveryAddress.city}` : ""}
+                  {detail.deliveryAddress.zip ? ` (${detail.deliveryAddress.zip})` : ""}
+                </span>
+              </p>
+            ) : null}
             {detail.deliveryGroupName && (
               <p className="text-xs text-muted-foreground">
                 {`Grupo de entrega: ${detail.deliveryGroupName}`}

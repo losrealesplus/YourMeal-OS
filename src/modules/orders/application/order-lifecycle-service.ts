@@ -174,6 +174,18 @@ export const OrderLifecycleService = {
       newData: { status: updated.status, cancelReason: reason },
     });
 
+    // CR-OPS-08 (R-05): Cascade cancellation to delivery_services
+    if (typeof ctx.supabase?.from === "function") {
+      try {
+        const { createOperationsRepository } =
+          await import("@/modules/operations/infrastructure/operations-repository");
+        const opsRepo = createOperationsRepository(ctx.supabase, ctx.tenantId);
+        await opsRepo.cancelDeliveryServicesForOrder(orderId, reason);
+      } catch (deliveryErr) {
+        console.warn("[CR-OPS-08] Cascade cancellation of delivery_services deferred:", deliveryErr);
+      }
+    }
+
     return updated;
   },
 };

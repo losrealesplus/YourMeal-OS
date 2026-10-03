@@ -34,6 +34,14 @@ export type OperationalOrderListItem = {
   organizationalUnitName: string | null;
   deliveryGroupId: string | null;
   deliveryGroupName: string | null;
+  deliveryAddressId?: string | null;
+  deliveryAddress?: {
+    id: string;
+    label: string | null;
+    street: string;
+    city: string | null;
+    zip: string | null;
+  } | null;
   /** Distinct day_dates from items (YYYY-MM-DD), sorted */
   deliveryDates: string[];
   items: Array<{
@@ -67,6 +75,7 @@ function mapRow(row: Record<string, any>): OperationalOrderListItem {
   const site = row.company_locations ?? null;
   const unit = row.company_departments ?? null;
   const group = row.delivery_groups ?? null;
+  const customerAddress = row.customer_addresses ?? null;
   const items = (row.order_items ?? []) as Record<string, any>[];
   const deliveryDates = [...new Set(items.map((it) => String(it.day_date)).filter(Boolean))].sort();
   return {
@@ -91,6 +100,16 @@ function mapRow(row: Record<string, any>): OperationalOrderListItem {
     organizationalUnitName: unit?.name ?? null,
     deliveryGroupId: row.delivery_group_id ? String(row.delivery_group_id) : null,
     deliveryGroupName: group?.name ?? null,
+    deliveryAddressId: row.delivery_address_id ? String(row.delivery_address_id) : null,
+    deliveryAddress: customerAddress
+      ? {
+          id: String(customerAddress.id),
+          label: customerAddress.label ?? null,
+          street: String(customerAddress.street),
+          city: customerAddress.city ?? null,
+          zip: customerAddress.zip ?? null,
+        }
+      : null,
     deliveryDates,
     items: items.map((it) => ({
       id: String(it.id),
@@ -106,12 +125,13 @@ function mapRow(row: Record<string, any>): OperationalOrderListItem {
 
 const ORDER_SELECT = `
   id, tenant_id, status, week_start, notes, dietary_snapshot, total, created_at, customer_id,
-  demand_channel, company_id, site_id, organizational_unit_id, delivery_group_id,
+  demand_channel, company_id, site_id, organizational_unit_id, delivery_group_id, delivery_address_id,
   customers ( id, display_name, email ),
   companies ( id, name ),
   company_locations ( id, name, address ),
   company_departments ( id, name ),
   delivery_groups ( id, name ),
+  customer_addresses ( id, label, street, city, zip ),
   order_items ( id, dish_id, day_date, qty, comment, unit_price, dishes ( id, name ) )
 `;
 
@@ -322,8 +342,58 @@ export function createOperationsRepository(client: Client, tenantId: string) {
         unresolved: true,
         reason: "no_address_at_intake",
       };
+      let resolvedAddressId: string | null = null;
+
       if (order.siteAddress) {
         addrSnapshot = { street: order.siteAddress, label: order.siteName ?? "Sitio" };
+        resolvedAddressId = order.siteId ?? null;
+      } else if (order.deliveryAddress) {
+        addrSnapshot = {
+          addressId: order.deliveryAddress.id,
+          street: order.deliveryAddress.street,
+          city: order.deliveryAddress.city,
+          zip: order.deliveryAddress.zip,
+          label: order.deliveryAddress.label,
+        };
+        resolvedAddressId = order.deliveryAddress.id;
+      } else if (order.deliveryAddressId) {
+        const { data: ca } = await db
+          .from("customer_addresses")
+          .select("id, street, city, zip, label")
+          .eq("tenant_id", tenantId)
+          .eq("id", order.deliveryAddressId)
+          .maybeSingle();
+        if (ca) {
+          addrSnapshot = {
+            addressId: ca.id,
+            street: ca.street,
+            city: ca.city,
+            zip: ca.zip,
+            label: ca.label,
+          };
+          resolvedAddressId = ca.id;
+        }
+      } else {
+        // Fallback: lookup customer's default address
+        const { data: defAddr } = await db
+          .from("customer_addresses")
+          .select("id, street, city, zip, label")
+          .eq("tenant_id", tenantId)
+          .eq("customer_id", order.customerId)
+          .is("deleted_at", null)
+          .order("is_default", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (defAddr) {
+          addrSnapshot = {
+            addressId: defAddr.id,
+            street: defAddr.street,
+            city: defAddr.city,
+            zip: defAddr.zip,
+            label: defAddr.label,
+          };
+          resolvedAddressId = defAddr.id;
+        }
       }
 
       const contactSnapshot = {
@@ -340,7 +410,7 @@ export function createOperationsRepository(client: Client, tenantId: string) {
         customer_id: order.customerId,
         delivery_date: dayDate,
         status: "pending" as const,
-        delivery_address_id: order.siteId ?? null,
+        delivery_address_id: resolvedAddressId,
         delivery_address_snapshot: addrSnapshot,
         customer_contact_snapshot: contactSnapshot,
         dietary_snapshot: dietarySnapshot,
@@ -348,12 +418,33 @@ export function createOperationsRepository(client: Client, tenantId: string) {
         legacy_backfill: false,
       }));
 
+      // In case of rescheduling: cancel pending delivery services for dates no longer in the order
+      await db
+        .from("delivery_services")
+        .update({ status: "cancelled", issue_notes: "Order items rescheduled" })
+        .eq("tenant_id", tenantId)
+        .eq("order_id", orderId)
+        .eq("status", "pending")
+        .not("delivery_date", "in", `(${distinctDays.map((d) => `"${d}"`).join(",")})`);
+
       const { data, error } = await db
         .from("delivery_services")
         .upsert(inserts, { onConflict: "tenant_id,order_id,delivery_date" })
         .select("*");
       if (error) throw error;
       return (data ?? []).map(mapDeliveryServiceRow);
+    },
+
+    async cancelDeliveryServicesForOrder(orderId: string, reason?: string): Promise<void> {
+      await db
+        .from("delivery_services")
+        .update({
+          status: "cancelled",
+          issue_notes: reason ?? "Order cancelled",
+        })
+        .eq("tenant_id", tenantId)
+        .eq("order_id", orderId)
+        .in("status", ["pending", "packed"]);
     },
   };
 }

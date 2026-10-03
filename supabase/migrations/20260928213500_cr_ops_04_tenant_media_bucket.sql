@@ -46,7 +46,7 @@ WITH CHECK (
     OR public.has_role(
       auth.uid(),
       NULLIF(split_part(name, '/', 1), '')::uuid,
-      'staff'
+      'operations_manager'
     )
   )
 );
@@ -67,7 +67,7 @@ USING (
     OR public.has_role(
       auth.uid(),
       NULLIF(split_part(name, '/', 1), '')::uuid,
-      'staff'
+      'operations_manager'
     )
   )
 )
@@ -83,7 +83,7 @@ WITH CHECK (
     OR public.has_role(
       auth.uid(),
       NULLIF(split_part(name, '/', 1), '')::uuid,
-      'staff'
+      'operations_manager'
     )
   )
 );

@@ -19,6 +19,7 @@ export type ProgramOrderInput = {
   total: number;
   notes?: string | null;
   dietarySnapshot?: OrderDietarySnapshot | null;
+  deliveryAddressId?: string | null;
   items: ProgramOrderItemInput[];
   demandChannel?: "individual" | "company";
   companyId?: string | null;
@@ -124,14 +125,26 @@ export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
         throw new Error("program_draft_order returned unexpected payload");
       }
 
+      const updatePayload: Record<string, any> = {};
       if (input.dietarySnapshot) {
-        const { error: snapErr } = await supabase
-          .from("orders")
-          .update({ dietary_snapshot: input.dietarySnapshot as any })
+        updatePayload.dietary_snapshot = input.dietarySnapshot as any;
+      }
+      if (input.deliveryAddressId !== undefined) {
+        updatePayload.delivery_address_id = input.deliveryAddressId;
+      }
+
+      if (Object.keys(updatePayload).length > 0) {
+        const { error: updateErr } = await (supabase.from("orders") as any)
+          .update(updatePayload)
           .eq("tenant_id", tenantId)
           .eq("id", result.order.id);
-        if (!snapErr) {
-          result.order.dietary_snapshot = input.dietarySnapshot as any;
+        if (!updateErr) {
+          if (input.dietarySnapshot) {
+            result.order.dietary_snapshot = input.dietarySnapshot as any;
+          }
+          if (input.deliveryAddressId !== undefined) {
+            (result.order as any).delivery_address_id = input.deliveryAddressId;
+          }
         }
       }
 

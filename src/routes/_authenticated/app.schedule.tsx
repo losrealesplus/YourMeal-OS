@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { ChevronLeft, ChevronRight, Minus, Plus, RotateCcw } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { ChevronLeft, ChevronRight, Minus, Plus, RotateCcw, MapPin, Check } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
+import { useCurrentCustomerId } from "@/hooks/use-current-customer-id";
 import {
   DayPicker,
   MenuDishPost,
@@ -123,6 +127,44 @@ function ScheduleFlow() {
         0,
       );
 
+  const { tenantId } = useAuth();
+  const customerQuery = useCurrentCustomerId();
+  const customerId = customerQuery.data ?? null;
+
+  const addressesQuery = useQuery({
+    queryKey: ["customer-addresses", tenantId, customerId],
+    enabled: Boolean(tenantId && customerId),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("customer_addresses")
+        .select("id, label, street, city, zip, is_default")
+        .eq("tenant_id", tenantId!)
+        .eq("customer_id", customerId!)
+        .is("deleted_at", null)
+        .order("is_default", { ascending: false })
+        .order("label", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as Array<{
+        id: string;
+        label: string | null;
+        street: string;
+        city: string | null;
+        zip: string | null;
+        is_default: boolean;
+      }>;
+    },
+  });
+
+  const addresses = addressesQuery.data ?? [];
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!selectedAddressId && addresses.length > 0) {
+      const def = addresses.find((a) => a.is_default) ?? addresses[0];
+      setSelectedAddressId(def.id);
+    }
+  }, [addresses, selectedAddressId]);
+
   const deliveryDateLabel = formatDeliveryDate(dayDate, i18n.language);
 
   async function onProgramDraft() {
@@ -131,6 +173,7 @@ function ScheduleFlow() {
       weekStart,
       items: orderItems,
       offerCode: effectiveOfferCode,
+      deliveryAddressId: selectedAddressId,
     });
     void navigate({
       to: "/app/orders/$orderId",
@@ -392,12 +435,90 @@ function ScheduleFlow() {
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-muted-foreground">
-                      {t("customer:deliveryAddress")}
-                    </p>
-                    <p className="text-lg font-extrabold mt-1 tracking-tight">
-                      {t("customer:addressHomeDefault")}
-                    </p>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <p className="text-sm font-semibold text-muted-foreground">
+                        {t("customer:deliveryAddress")}
+                      </p>
+                      <Link
+                        to="/app/addresses"
+                        className="text-xs font-semibold text-primary hover:underline"
+                      >
+                        {addresses.length === 0
+                          ? t("customer:addAddress", "+ Añadir dirección")
+                          : t("common:change", "Cambiar")}
+                      </Link>
+                    </div>
+
+                    {addresses.length === 0 ? (
+                      <div className="rounded-2xl border border-dashed border-border p-3.5 bg-card/40 flex items-center justify-between">
+                        <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
+                          <MapPin className="size-4 text-primary shrink-0" />
+                          <span>{t("customer:addressHomeDefault")}</span>
+                        </div>
+                      </div>
+                    ) : addresses.length === 1 ? (
+                      <div className="rounded-2xl border border-border bg-card p-3.5 flex items-start gap-3">
+                        <MapPin className="size-4 text-primary shrink-0 mt-0.5" />
+                        <div className="min-w-0 flex-1">
+                          <p className="font-semibold text-sm">
+                            {addresses[0].label || t("customer:addressHomeDefault")}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                            {addresses[0].street}
+                            {addresses[0].city ? `, ${addresses[0].city}` : ""}
+                            {addresses[0].zip ? ` · ${addresses[0].zip}` : ""}
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {addresses.map((a) => {
+                          const isSelected = selectedAddressId === a.id;
+                          return (
+                            <button
+                              key={a.id}
+                              type="button"
+                              onClick={() => setSelectedAddressId(a.id)}
+                              className={cn(
+                                "w-full text-left rounded-2xl border p-3 flex items-start gap-3 transition-all cursor-pointer",
+                                isSelected
+                                  ? "border-primary bg-primary/5 shadow-2xs"
+                                  : "border-border bg-card hover:border-border/80",
+                              )}
+                            >
+                              <MapPin
+                                className={cn(
+                                  "size-4 shrink-0 mt-0.5",
+                                  isSelected ? "text-primary" : "text-muted-foreground",
+                                )}
+                              />
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-1.5">
+                                  <p className="font-semibold text-sm truncate">
+                                    {a.label || t("customer:addressHomeDefault")}
+                                  </p>
+                                  {a.is_default && (
+                                    <span className="text-[9px] font-bold uppercase tracking-wider text-primary bg-primary/10 rounded px-1 py-0.2">
+                                      {t("common:default")}
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                                  {a.street}
+                                  {a.city ? `, ${a.city}` : ""}
+                                  {a.zip ? ` · ${a.zip}` : ""}
+                                </p>
+                              </div>
+                              {isSelected && (
+                                <span className="size-5 rounded-full bg-primary text-primary-foreground grid place-items-center shrink-0">
+                                  <Check className="size-3 stroke-[3]" />
+                                </span>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 </div>
 

@@ -16,6 +16,7 @@ export type ProgramDraftOrderPayload =
       offerCode?: string;
       customerTier?: import("@/modules/commercial").CustomerTier;
       extras?: import("@/modules/commercial").ExtraItemInput[];
+      deliveryAddressId?: string | null;
     };
 
 /**
@@ -52,6 +53,7 @@ export function useProgramDraftOrder() {
           offerCode: command.offerCode,
           customerTier: command.customerTier,
           extras: command.extras,
+          deliveryAddressId: command.deliveryAddressId,
         });
       }
 
@@ -64,6 +66,7 @@ export function useProgramDraftOrder() {
         offerCode: singleDayCmd.offerCode,
         customerTier: singleDayCmd.customerTier,
         extras: singleDayCmd.extras,
+        deliveryAddressId: singleDayCmd.deliveryAddressId,
       });
     },
     onSuccess: async () => {

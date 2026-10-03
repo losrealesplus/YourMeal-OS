@@ -84,6 +84,7 @@ export const OrderIntakeService = {
       offerCode: command.offerCode,
       customerTier: command.customerTier,
       extras: command.extras,
+      deliveryAddressId: command.deliveryAddressId,
     });
 
     const origin = buildOrigin(ctx, command);
@@ -117,6 +118,7 @@ export const OrderIntakeService = {
       offerCode?: string;
       customerTier?: import("@/modules/commercial").CustomerTier;
       extras?: import("@/modules/commercial").ExtraItemInput[];
+      deliveryAddressId?: string | null;
     },
   ): Promise<ProgramDraftOrderResult> {
     return OrderIntakeService.intakeDraft(ctx, {
@@ -126,6 +128,7 @@ export const OrderIntakeService = {
       offerCode: input.offerCode,
       customerTier: input.customerTier,
       extras: input.extras,
+      deliveryAddressId: input.deliveryAddressId,
       items: input.dishIds.map((dishId) => ({
         dishId,
         dayDate: input.dayDate,

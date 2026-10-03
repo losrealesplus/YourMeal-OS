@@ -32,6 +32,7 @@ export type ProgramDraftOrderCommand = {
   offerCode?: string;
   customerTier?: CustomerTier;
   extras?: ExtraItemInput[];
+  deliveryAddressId?: string | null;
 };
 
 /** Multi-day draft (EP-002A.2 repeat). Each line validated against its day offer. */
@@ -44,6 +45,7 @@ export type ProgramDraftItemsCommand = {
   offerCode?: string;
   customerTier?: CustomerTier;
   extras?: ExtraItemInput[];
+  deliveryAddressId?: string | null;
 };
 
 export type ProgramDraftOrderResult = {
@@ -97,6 +99,10 @@ export const OrderService = {
       weekStart: command.weekStart,
       notes: command.notes,
       clientRequestId: command.clientRequestId,
+      offerCode: command.offerCode,
+      customerTier: command.customerTier,
+      extras: command.extras,
+      deliveryAddressId: command.deliveryAddressId,
       items: command.dishIds.map((dishId) => ({
         dishId,
         dayDate: command.dayDate,
@@ -307,12 +313,27 @@ export const OrderService = {
         authorUserId: ctx.userId,
       });
 
+      let effectiveDeliveryAddressId: string | null = command.deliveryAddressId ?? null;
+      if (!effectiveDeliveryAddressId && demand.demandChannel === "individual" && typeof ctx.supabase?.from === "function") {
+        const { data: defaultAddr } = await ctx.supabase
+          .from("customer_addresses")
+          .select("id")
+          .eq("tenant_id", ctx.tenantId)
+          .eq("customer_id", customerId)
+          .is("deleted_at", null)
+          .order("is_default", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        effectiveDeliveryAddressId = defaultAddr?.id ?? null;
+      }
+
       const result = await repo.insertDraft({
         customerId,
         weekStart: command.weekStart,
         total,
         notes: command.notes ?? null,
         dietarySnapshot,
+        deliveryAddressId: effectiveDeliveryAddressId,
         items,
         demandChannel: demand.demandChannel,
         companyId: demand.companyId,

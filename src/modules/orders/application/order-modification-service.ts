@@ -237,6 +237,18 @@ export const OrderModificationService = {
       // Non-fatal if audit fails after update
     }
 
+    // 7. CR-OPS-08 (R-04): Resync delivery services for new dates
+    if (typeof ctx.supabase?.from === "function") {
+      try {
+        const { createOperationsRepository } =
+          await import("@/modules/operations/infrastructure/operations-repository");
+        const opsRepo = createOperationsRepository(ctx.supabase, ctx.tenantId);
+        await opsRepo.createDeliveryServicesForOrder(dto.orderId);
+      } catch (deliveryErr) {
+        console.warn("[CR-OPS-08] Resync of delivery_services deferred on modification:", deliveryErr);
+      }
+    }
+
     return {
       order: updatedOrder,
       items: updatedItems,
