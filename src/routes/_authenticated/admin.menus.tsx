@@ -589,16 +589,22 @@ function AdminMenusPage() {
                         className="group relative flex items-start justify-between gap-2 p-2 rounded-md bg-muted/40 hover:bg-muted/80 border border-border/40 text-xs transition-colors"
                       >
                         <div className="flex-1 min-w-0 pr-1">
-                          <p className="font-medium text-foreground truncate">
+                          <p
+                            className="font-medium text-foreground text-xs leading-snug line-clamp-5 hover:line-clamp-none transition-all break-words"
+                            title={slot.dishes?.name ?? undefined}
+                          >
                             {slot.dishes?.name ?? "Plato no disponible"}
                           </p>
                           {slot.dishes?.kcal ? (
-                            <p className="text-[10px] text-muted-foreground">
+                            <p className="text-[10px] text-muted-foreground mt-0.5">
                               {slot.dishes.kcal} kcal
                             </p>
                           ) : null}
                           {slot.dishes?.allergens && slot.dishes.allergens.length > 0 ? (
-                            <p className="text-[9px] text-muted-foreground/80 truncate mt-0.5">
+                            <p
+                              className="text-[9px] text-muted-foreground/90 font-medium leading-tight mt-1 line-clamp-2"
+                              title={`Alérgenos: ${slot.dishes.allergens.join(", ")}`}
+                            >
                               {slot.dishes.allergens.join(", ")}
                             </p>
                           ) : null}
@@ -696,11 +702,16 @@ function AdminMenusPage() {
                   className="flex items-center justify-between p-2.5 hover:bg-muted/60 rounded-md transition-colors gap-3 pt-2"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-sm text-foreground truncate">{dish.name}</p>
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground mt-0.5">
+                    <p
+                      className="font-medium text-sm text-foreground leading-snug line-clamp-2 break-words"
+                      title={dish.name}
+                    >
+                      {dish.name}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground mt-1">
                       {dish.kcal ? <span>{dish.kcal} kcal</span> : null}
                       {dish.price ? (
-                        <span>
+                        <span className="font-semibold text-foreground/90">
                           {new Intl.NumberFormat("es-ES", {
                             style: "currency",
                             currency: "EUR",
@@ -708,7 +719,10 @@ function AdminMenusPage() {
                         </span>
                       ) : null}
                       {dish.allergens && dish.allergens.length > 0 ? (
-                        <span className="truncate max-w-[200px]">
+                        <span
+                          className="line-clamp-1 max-w-[280px]"
+                          title={`Alérgenos: ${dish.allergens.join(", ")}`}
+                        >
                           Alérgenos: {dish.allergens.join(", ")}
                         </span>
                       ) : null}
