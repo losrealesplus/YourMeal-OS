@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "repository": "losrealesplus/YourMeal-OS",
+  "environment": "production-worker",
+  "reviewerId": 292604102,
+  "reviewerLogin": "losrealesplus",
+  "worker": "yourmeal-instance-eatclean",
+  "origin": "https://eatclean.yourmealos.com",
+  "workflow": ".github/workflows/deploy-production.yml"
+}

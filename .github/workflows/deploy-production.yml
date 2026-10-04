@@ -1,127 +1,155 @@
 name: "Gate 7: Production Worker Deployment"
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       reason:
-        description: "Reason for production deployment"
+        description: "Reason for preparing an exact main release (not production approval)"
         required: true
-        default: "CR-GOV-01R production release"
+        default: "Controlled production preparation"
 
 permissions:
   contents: read
+  actions: read
+  deployments: read
+  pull-requests: read
 
 jobs:
+  classify:
+    name: "Classify outstanding main changes"
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      eligible: ${{ steps.plan.outputs.eligible }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Classify exact source against authoritative publication baseline
+        id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/governance/release-plan.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gate7-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/release-plan.json
+          if-no-files-found: warn
+          retention-days: 7
+
   build:
     name: "Phase 1: Build Once & Cryptographic Digest"
+    needs: classify
+    if: needs.classify.outputs.eligible == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    concurrency:
+      group: gate7-preparation-main
+      cancel-in-progress: true
+    outputs:
+      digest: ${{ steps.package.outputs.digest }}
+      config_digest: ${{ steps.package.outputs.config_digest }}
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
     steps:
-      - name: Checkout Code from Target SHA
+      - name: Checkout exact approved-source candidate
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: gate7-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "npm"
-
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Run Quality & Governance Checks
+          cache: npm
+      - run: npm ci
+      - name: Quality and governance validation
         run: |
           npm run typecheck
           npm run test:governance
-
-      - name: Compile Immutable Production Bundle
+          node --test scripts/governance/release-contract.spec.mjs scripts/governance/release-publication.spec.mjs
+      - name: Build exactly once
         run: npm run build
-
-      - name: Package Artifact and Generate SHA-256 Digest
+      - name: Immutable bundle, external manifest and digest
         id: package
-        run: |
-          mkdir -p artifacts
-          tar -czf artifacts/worker-dist.tar.gz .output/
-          cd artifacts
-          sha256sum worker-dist.tar.gz > digest.sha256
-          echo "DIGEST=$(cat digest.sha256 | awk '{print $1}')" >> $GITHUB_OUTPUT
-          echo "Build Digest: $(cat digest.sha256)"
-
-      - name: Upload Immutable Artifact
+        run: node scripts/governance/release-artifact.mjs package
+      - name: Upload immutable artifact of this run/attempt
+        id: upload
         uses: actions/upload-artifact@v4
         with:
-          name: production-worker-artifact
+          name: production-worker-artifact-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             artifacts/worker-dist.tar.gz
-            artifacts/digest.sha256
+            artifacts/release-manifest.json
           if-no-files-found: error
           retention-days: 7
+      - name: Publish pre-approval identity
+        env:
+          DIGEST: ${{ steps.package.outputs.digest }}
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+        run: |
+          printf '## AWAITING_PRODUCTION_APPROVAL\nSHA: `%s`\nArtifact ID: %s\nSHA-256: `%s`\nRun: %s / attempt %s\nMerge and CI do not authorize production.\n' "$GITHUB_SHA" "$ARTIFACT_ID" "$DIGEST" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" >> "$GITHUB_STEP_SUMMARY"
 
   deploy:
     name: "Phase 2: Protected Production Deployment"
-    needs: [build]
+    needs: [classify, build]
+    if: needs.classify.outputs.eligible == 'true' && needs.build.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    concurrency:
+      group: production-worker-publication
+      cancel-in-progress: false
+      queue: max
     environment:
       name: production-worker
       url: https://eatclean.yourmealos.com
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-
-      - name: Download Pre-Built Immutable Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: production-worker-artifact
-          path: artifacts/
-
-      - name: Verify Cryptographic Digest (Build Once -> Deploy Exactly That)
-        run: |
-          cd artifacts
-          echo "Verifying artifact checksum against pre-approval digest..."
-          sha256sum -c digest.sha256 || {
-            echo "🚨 [SECURITY INTEGRITY FAILURE] Artifact checksum mismatch!"
-            exit 1
-          }
-          echo "✅ Artifact checksum verified successfully."
-          tar -xzf worker-dist.tar.gz -C ../
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: Deploy Immutable Worker to Cloudflare Edge
+      - name: Initialize no-mutation ledger before artifact verification
+        run: node scripts/governance/release-publish.mjs initialize
+      - name: Download only the Phase 1 artifact ID from this run
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ needs.build.outputs.artifact_id }}
+          path: artifacts/
+          merge-multiple: true
+      - name: Verify pre-approval identity, bytes, config and safe archive
         env:
+          EXPECTED_DIGEST: ${{ needs.build.outputs.digest }}
+          EXPECTED_CONFIG_DIGEST: ${{ needs.build.outputs.config_digest }}
+        run: node scripts/governance/release-artifact.mjs verify
+      - name: Revalidate sovereign approval and publish exact version; read-only smoke
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_DIGEST: ${{ needs.build.outputs.digest }}
+          EXPECTED_CONFIG_DIGEST: ${{ needs.build.outputs.config_digest }}
+          EXPECTED_ARTIFACT_ID: ${{ needs.build.outputs.artifact_id }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          set -euo pipefail
-          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
-            echo "🚨 [CREDENTIAL BLOCK] CLOUDFLARE_API_TOKEN is not configured in Environment secrets."
-            exit 1
-          fi
-          # Publish code only; routing and domains remain managed out of band.
-          VERSION_OUTPUT=$(mktemp "$RUNNER_TEMP/eatclean-version-upload.XXXXXX")
-          WRANGLER_OUTPUT_FILE_PATH="$VERSION_OUTPUT" npx --yes wrangler@4.86.0 versions upload --config instances/yourmeal-eatclean/wrangler.prod.json --no-bundle
-          VERSION_ID=$(node --input-type=module - "$VERSION_OUTPUT" <<'NODE'
-          import fs from "node:fs";
-          const records = fs.readFileSync(process.argv[2], "utf8")
-            .split(/\r?\n/).filter(line => line.trim()).map(line => JSON.parse(line));
-          const uploads = records.filter(record => record?.type === "version-upload");
-          const upload = uploads[0];
-          if (uploads.length !== 1 || upload.version !== 1 ||
-              upload.worker_name !== "yourmeal-instance-eatclean" ||
-              typeof upload.version_id !== "string" ||
-              !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(upload.version_id)) {
-            throw new Error("Missing, ambiguous or invalid EatClean version upload result");
-          }
-          console.log(upload.version_id);
-          NODE
-          )
-          echo "Deploying exact uploaded Worker version: $VERSION_ID"
-          npx --yes wrangler@4.86.0 versions deploy "$VERSION_ID@100%" --config instances/yourmeal-eatclean/wrangler.prod.json --yes
+        run: node scripts/governance/release-publish.mjs
+      - name: Preserve publication ledger even if deployment or smoke fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate7-release-report-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/release-report.json
+          if-no-files-found: warn
+          retention-days: 90

@@ -224,6 +224,10 @@ Sin autorización explícita: **prohibido** `git reset --hard`, `git clean -fd`,
 7. Cambios uncommitted se reportan explícitamente.
 8. Trabajo cloud/remoto **nunca** se trata como device-ready hasta sincronizar al workspace local vía Git (o transferencia explícita del artifact + registro de SHA).
 
+## Codex: modelo de actuación obligatorio
+
+Para cada tarea sustancial, seguir [Codex Operating Model](docs/05-architecture/ENGINEERING_OPERATING_PROTOCOL.md#codex-operating-model--autonomía-con-frontera-de-autoridad): apertura breve, autonomía dentro del alcance, estados/evidencia separados y cierre con siguiente actor y autorización. Fuente única en el protocolo; automatización nunca concede aprobación productiva.
+
 ## Protocolo Operativo Permanente de Ingeniería (Workflow Canónico)
 
 Todo desarrollo sigue obligatoriamente la secuencia de 16 compuertas:
