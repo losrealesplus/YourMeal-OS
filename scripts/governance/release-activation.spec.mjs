@@ -5,6 +5,9 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import {
+  DIAGNOSTIC_BRANCH,
+  DIAGNOSTIC_FILES,
+  HISTORY_REPAIR_MERGE,
   ACTIVATION_MERGE,
   HISTORY_REMEDIATION_BRANCH,
   HISTORY_REMEDIATION_FILES,
@@ -262,27 +265,33 @@ test("direct GitHub commit attribution and old SPECIAL fail-closed guard remain 
   assert.equal(preparationEligible("REQUIRES_SEPARATE_AUTHORIZATION"), false);
 });
 
-function activationProcess(historyRepair = false) {
+function activationProcess(historyRepair = false, diagnostics = false) {
   const root = process.cwd(),
     dir = fs.mkdtempSync(path.join(os.tmpdir(), "gate7-activation-process-"));
   const cli = (name) => path.join(root, "scripts/governance", name);
   const git = (...args) => execFileSync("git", args, { cwd: dir, encoding: "utf8" }).trim();
   try {
     execFileSync("git", ["clone", "--shared", "--quiet", root, dir], { stdio: "pipe" });
-    git("checkout", "--quiet", historyRepair ? ACTIVATION_MERGE : INITIAL_COMMITS[2]);
+    git(
+      "checkout",
+      "--quiet",
+      diagnostics ? HISTORY_REPAIR_MERGE : historyRepair ? ACTIVATION_MERGE : INITIAL_COMMITS[2],
+    );
     git("config", "user.name", "Fixture");
     git("config", "user.email", "fixture@example.test");
-    for (const name of historyRepair
-      ? HISTORY_REMEDIATION_FILES
-      : [
-          ".github/workflows/deploy-production.yml",
-          ...REMEDIATION_FILES.filter(
-            (p) =>
-              p.startsWith("scripts/") &&
-              !p.endsWith("release-publication.spec.mjs") &&
-              !p.endsWith("release-contract.spec.mjs"),
-          ),
-        ])
+    for (const name of diagnostics
+      ? DIAGNOSTIC_FILES
+      : historyRepair
+        ? HISTORY_REMEDIATION_FILES
+        : [
+            ".github/workflows/deploy-production.yml",
+            ...REMEDIATION_FILES.filter(
+              (p) =>
+                p.startsWith("scripts/") &&
+                !p.endsWith("release-publication.spec.mjs") &&
+                !p.endsWith("release-contract.spec.mjs"),
+            ),
+          ])
       fs.copyFileSync(path.join(root, name), path.join(dir, name));
     git("add", ".");
     git("commit", "--quiet", "-m", "fixture remediation");
@@ -305,7 +314,7 @@ function activationProcess(historyRepair = false) {
       merged_at: "2026-10-04",
       base: { ref: "main", repo: { full_name: policy.repository } },
     });
-    const remediationPr = historyRepair ? 490 : 489;
+    const remediationPr = diagnostics ? 491 : historyRepair ? 490 : 489;
     const responses = {
       [`environments/${policy.environment}`]: environment,
       "git/ref/heads/main": { object: { sha } },
@@ -341,7 +350,11 @@ function activationProcess(historyRepair = false) {
       [`pulls/${remediationPr}`]: {
         ...pr(remediationPr, sha),
         head: {
-          ref: historyRepair ? HISTORY_REMEDIATION_BRANCH : REMEDIATION_BRANCH,
+          ref: diagnostics
+            ? DIAGNOSTIC_BRANCH
+            : historyRepair
+              ? HISTORY_REMEDIATION_BRANCH
+              : REMEDIATION_BRANCH,
           repo: { full_name: policy.repository },
         },
         merged_by: { id: policy.reviewerId },
@@ -352,6 +365,8 @@ function activationProcess(historyRepair = false) {
     });
     responses[`commits/${sha}/pulls`] = [pr(remediationPr, sha)];
     if (historyRepair) responses[`commits/${ACTIVATION_MERGE}/pulls`] = [pr(489, ACTIVATION_MERGE)];
+    if (diagnostics)
+      responses[`commits/${HISTORY_REPAIR_MERGE}/pulls`] = [pr(490, HISTORY_REPAIR_MERGE)];
     fs.writeFileSync(path.join(dir, "responses.json"), JSON.stringify(responses));
     fs.writeFileSync(
       path.join(dir, "bin/gh"),
@@ -391,6 +406,7 @@ function activationProcess(historyRepair = false) {
     const preview = execute("release-plan.mjs", ["--initial-activation-payload"]);
     assert.equal(preview.status, 0, preview.stderr);
     const certificate = JSON.parse(preview.stdout);
+    if (diagnostics) assert.ok(Buffer.byteLength(preview.stdout) > 8192);
     const dispatch = {
       ...inputs,
       expected_target_sha: sha,
@@ -551,4 +567,76 @@ test("every Gate 7 checkout provides real history without persisted credentials"
     assert.match(settings, /persist-credentials: false/);
     assert.match(settings, /ref: \$\{\{ github.sha \}\}/);
   }
+});
+
+test("sixth diagnostic PR retains real ancestry and Phase 1/2 identity guards", () =>
+  activationProcess(true, true));
+test("diagnostic bootstrap extension is pinned, bounded and rejects future SPECIAL", () => {
+  const d = structuredClone(snapshot);
+  d.commits[3].sha = ACTIVATION_MERGE;
+  d.commits.push({
+    sha: HISTORY_REPAIR_MERGE,
+    pr: 490,
+    paths: HISTORY_REMEDIATION_FILES,
+    specialFiles: files(
+      HISTORY_REMEDIATION_FILES.filter((p) => !p.startsWith("docs/99-internal/")),
+    ),
+  });
+  d.commits.push({
+    sha: target,
+    pr: 491,
+    paths: DIAGNOSTIC_FILES,
+    specialFiles: files(DIAGNOSTIC_FILES.filter((p) => !p.startsWith("docs/99-internal/"))),
+  });
+  d.remediation.number = 491;
+  d.remediation.head.ref = DIAGNOSTIC_BRANCH;
+  const canonical = activationPayload(d, policy);
+  assert.deepEqual(canonical.prs, [486, 487, 488, 489, 490, 491]);
+  assert.equal(canonical.special.length, 4);
+  for (const change of [
+    (x) => {
+      x.commits[4].sha = "b".repeat(40);
+    },
+    (x) => {
+      x.commits[4].pr = 499;
+    },
+    (x) => {
+      x.commits.push(x.commits[5]);
+    },
+    (x) => {
+      x.commits[5].paths = [...x.commits[5].paths, "scripts/governance/release-policy.json"].sort();
+    },
+    (x) => {
+      x.commits[5].specialFiles.pop();
+    },
+    (x) => {
+      x.remediation.head.ref = "other";
+    },
+    (x) => {
+      x.baseline.deploymentId++;
+    },
+    (x) => {
+      x.remediation.merged_by.id = 1;
+    },
+  ]) {
+    const bad = structuredClone(d);
+    change(bad);
+    assert.throws(() => activationPayload(bad, policy));
+  }
+  assert.throws(() => authorizeActivation(d, inputs, ctx, run, policy));
+});
+
+test("malformed PR assertions are contextualized without leaking authorization input", () => {
+  const raw = "486,487,488,489,490_SECRET_TOKEN";
+  assert.throws(
+    () => authorizeActivation(snapshot, { ...inputs, authorized_prs: raw }, ctx, run, policy),
+    (error) => {
+      assert.equal(
+        error.message,
+        "ACTIVATION_INPUT_INVALID: source=authorized_prs expected=json-array-of-integer-pr-numbers result=FAIL_CLOSED",
+      );
+      assert.equal(error.message.includes(raw), false);
+      return true;
+    },
+  );
 });
