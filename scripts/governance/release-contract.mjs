@@ -174,3 +174,6 @@ export function assertManifest(manifest, context, expectedDigest, expectedConfig
     "Release digest/config mismatch",
   );
 }
+
+export const preparationEligible = (decision) =>
+  ["DEPLOYABLE", "AUTHORIZED_INITIAL_ACTIVATION"].includes(decision);

@@ -1,7 +1,14 @@
 import fs from "node:fs";
 import { execFileSync } from "node:child_process";
 import { context, policy } from "./release-plan.mjs";
-import { assertContext, assertConfig, hash, assertManifest, demand } from "./release-contract.mjs";
+import {
+  assertContext,
+  assertConfig,
+  hash,
+  assertManifest,
+  demand,
+  preparationEligible,
+} from "./release-contract.mjs";
 const ctx = context();
 assertContext(ctx, policy);
 const configPath = "instances/yourmeal-eatclean/wrangler.prod.json";
@@ -19,7 +26,7 @@ if (process.argv[2] === "package") {
       plan.runId === ctx.runId &&
       plan.attempt === ctx.attempt &&
       plan.repository === ctx.repository &&
-      plan.decision === "DEPLOYABLE",
+      preparationEligible(plan.decision),
     "Unexpected release plan",
   );
   const manifest = {
@@ -29,6 +36,7 @@ if (process.argv[2] === "package") {
     configSha256,
     tarSha256,
     plan,
+    ...(plan.activation ? { activation: plan.activation } : {}),
     wrangler: "4.86.0",
     node: "20",
   };

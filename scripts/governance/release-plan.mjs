@@ -7,11 +7,15 @@ import {
   assertContext,
   assertEnvironment,
   classifyPaths,
+  classifyPath,
+  preparationEligible,
+  hash,
   demand,
   SHA,
   UUID,
   DIGEST,
 } from "./release-contract.mjs";
+import { activationMode, activationPayload, authorizeActivation } from "./release-activation.mjs";
 export const policy = JSON.parse(
   fs.readFileSync(new URL("./release-policy.json", import.meta.url)),
 );
@@ -172,19 +176,75 @@ export function baseline(ctx, publishing = false) {
   }
   throw new Error("No authoritative publication baseline; separate human reconciliation required");
 }
+function workflowInputs() {
+  return process.env.GITHUB_EVENT_PATH
+    ? (JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, "utf8")).inputs ?? {})
+    : {};
+}
+function activationSnapshot(ctx, base, diff, prs, currentMainSha) {
+  const commits = diff.commits.map((sha, i) => {
+    const paths = git("diff", "--name-only", "--no-renames", "-z", `${sha}^1`, sha)
+      .split("\0")
+      .filter(Boolean)
+      .sort();
+    const specialFiles = paths
+      .filter((p) => classifyPath(p) === "SPECIAL")
+      .map((p) => {
+        const fileHash = (revision) => {
+          const entry = git("ls-tree", revision, "--", p);
+          if (!entry) return null;
+          const blob = /^100(?:644|755) blob ([a-f0-9]{40})\t/.exec(entry);
+          demand(blob, "Activation files must be regular Git blobs");
+          return hash(
+            execFileSync("git", ["cat-file", "blob", blob[1]], { maxBuffer: 16 * 1024 * 1024 }),
+          );
+        };
+        return { path: p, before: fileHash(`${sha}^1`), after: fileHash(sha) };
+      });
+    return { sha, pr: prs[i], paths, specialFiles };
+  });
+  return {
+    repository: ctx.repository,
+    targetSha: ctx.sha,
+    currentMainSha,
+    baseline: base,
+    commits,
+    remediation: api(`pulls/${prs.at(-1)}`),
+  };
+}
 export function prepare(ctx, publishing = false) {
   assertContext(ctx, policy);
   assertEnvironment(api(`environments/${policy.environment}`), policy);
+  const inputs = workflowInputs();
+  const initial = activationMode(inputs);
+  demand(!initial || ctx.event === "workflow_dispatch", "Push cannot request initial activation");
   const currentMain = api("git/ref/heads/main").object.sha;
+  demand(!initial || currentMain === ctx.sha, "Initial activation target is stale");
   if (currentMain !== ctx.sha) return { decision: "SUPERSEDED", sourceSha: ctx.sha };
   const base = baseline(ctx, publishing);
   const diff = changedPaths(base.sha, ctx.sha);
   const classification = classifyPaths(diff.paths);
   // Each outstanding first-parent commit must come from an attributable main PR.
   const prs = diff.commits.map((sha) => assertMergedCommit(pages(`commits/${sha}/pulls`), sha));
+  const activation = initial
+    ? authorizeActivation(
+        activationSnapshot(ctx, base, diff, prs, api("git/ref/heads/main").object.sha),
+        inputs,
+        ctx,
+        api(`actions/runs/${ctx.runId}`),
+        policy,
+      )
+    : undefined;
   return {
     schema: 1,
     ...classification,
+    ...(activation
+      ? {
+          decision: "AUTHORIZED_INITIAL_ACTIVATION",
+          originalDecision: classification.decision,
+          activation,
+        }
+      : {}),
     repository: ctx.repository,
     sourceSha: ctx.sha,
     runId: ctx.runId,
@@ -196,13 +256,33 @@ export function prepare(ctx, publishing = false) {
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
+    if (process.argv[2] === "--initial-activation-payload") {
+      const sha = api("git/ref/heads/main").object.sha;
+      const ctx = { repository: policy.repository, sha, runId: "" };
+      const base = baseline(ctx);
+      const diff = changedPaths(base.sha, sha);
+      const prs = diff.commits.map((commit) =>
+        assertMergedCommit(pages(`commits/${commit}/pulls`), commit),
+      );
+      const payload = activationPayload(
+        activationSnapshot(ctx, base, diff, prs, api("git/ref/heads/main").object.sha),
+        policy,
+      );
+      console.log(
+        JSON.stringify({ payload, authorizationId: hash(JSON.stringify(payload)) }, null, 2),
+      );
+      process.exit(0); // Read-only reconciliation, never artifact/ledger or authorization.
+    }
     const plan = prepare(context());
     fs.mkdirSync("artifacts", { recursive: true });
     fs.writeFileSync("artifacts/release-plan.json", JSON.stringify(plan, null, 2));
-    fs.appendFileSync(process.env.GITHUB_OUTPUT, `eligible=${plan.decision === "DEPLOYABLE"}\n`);
+    fs.appendFileSync(
+      process.env.GITHUB_OUTPUT,
+      `eligible=${preparationEligible(plan.decision)}\n`,
+    );
     fs.appendFileSync(
       process.env.GITHUB_STEP_SUMMARY,
-      `## Gate 7 preparation\nState: ${plan.decision}\nSource: \`${plan.sourceSha}\`\n\n${plan.decision === "DEPLOYABLE" ? "Preparation is not production authorization." : "No protected publication is requested."}\n`,
+      `## Gate 7 preparation\nState: ${plan.decision}\nSource: \`${plan.sourceSha}\`\n\n${preparationEligible(plan.decision) ? "Preparation is not production authorization." : "No protected publication is requested."}\n`,
     );
     demand(
       plan.decision !== "REQUIRES_SEPARATE_AUTHORIZATION",

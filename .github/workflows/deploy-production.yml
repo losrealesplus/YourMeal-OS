@@ -5,6 +5,23 @@ on:
     branches: [main]
   workflow_dispatch:
     inputs:
+      mode:
+        description: "Normal preparation or exact one-time bootstrap"
+        type: choice
+        options: [normal, initial_activation]
+        default: normal
+      expected_base_sha:
+        description: "Initial activation only: exact confirmed baseline SHA"
+        type: string
+      expected_target_sha:
+        description: "Initial activation only: reconciled final main SHA"
+        type: string
+      authorized_prs:
+        description: "Initial activation only: exact ordered JSON PR array"
+        type: string
+      authorization_id:
+        description: "SHA-256 of canonical activation payload; scope identity, not production approval"
+        type: string
       reason:
         description: "Reason for preparing an exact main release (not production approval)"
         required: true
@@ -78,7 +95,7 @@ jobs:
         run: |
           npm run typecheck
           npm run test:governance
-          node --test scripts/governance/release-contract.spec.mjs scripts/governance/release-publication.spec.mjs
+          node --test scripts/governance/release-contract.spec.mjs scripts/governance/release-publication.spec.mjs scripts/governance/release-activation.spec.mjs
       - name: Build exactly once
         run: npm run build
       - name: Immutable bundle, external manifest and digest
