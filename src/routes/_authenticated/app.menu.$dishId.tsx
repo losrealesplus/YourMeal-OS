@@ -1,3 +1,4 @@
+import { DishAllergenDeclaration } from "@/components/operations/dish-allergen-declaration";
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Heart, Leaf } from "lucide-react";
@@ -149,6 +150,9 @@ function DishDetail() {
         </section>
       ) : null}
 
+      <div className="px-6 mt-6">
+        <DishAllergenDeclaration allergens={dish.allergens} />
+      </div>
       {dish.allergens.length > 0 ? (
         <section className="px-6 mt-6">
           <p className="meta-label mb-2">{t("customer:allergens")}</p>

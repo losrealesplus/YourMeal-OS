@@ -1,3 +1,4 @@
+import { DishAllergenDeclaration } from "@/components/operations/dish-allergen-declaration";
 /**
  * ADMIN · Dish Library — full CRUD via DishService (OP-001 / Carril A1).
  * Capability: dishes.read / dishes.create / dishes.update / dishes.archive / dishes.restore
@@ -458,6 +459,7 @@ function AdminDishesPage() {
                   {r.prep_minutes} min
                 </span>
               ) : null}
+              <DishAllergenDeclaration allergens={r.allergens} />
               {Array.isArray(r.allergens) && r.allergens.length > 0 ? (
                 <div className="flex flex-wrap gap-1 ml-1">
                   {r.allergens.map((a) => (
@@ -872,6 +874,7 @@ function AdminDishesPage() {
               </div>
               <div className="space-y-2 sm:col-span-2">
                 <Label>Alérgenos</Label>
+                <DishAllergenDeclaration allergens={createForm.allergens} />
                 <div className="flex flex-wrap gap-1.5">
                   {EU_ALLERGENS.map((allergen) => {
                     const selected = createForm.allergens.includes(allergen.id);
@@ -1246,6 +1249,7 @@ function AdminDishesPage() {
                 </div>
                 <div className="space-y-2 sm:col-span-2">
                   <Label>Alérgenos</Label>
+                  <DishAllergenDeclaration allergens={editForm.allergens} />
                   <div className="flex flex-wrap gap-1.5">
                     {EU_ALLERGENS.map((allergen) => {
                       const selected = editForm.allergens.includes(allergen.id);

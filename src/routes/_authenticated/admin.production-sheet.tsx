@@ -1,3 +1,4 @@
+import { DishAllergenDeclaration } from "@/components/operations/dish-allergen-declaration";
 /**
  * EP-002B — Hoja de Producción y Mesa de Packing (CR-OPS-UX Fase 3: Flujo Operativo Vivo).
  * Ergonomía Dual:
@@ -420,6 +421,10 @@ function ProductionSheetPage() {
 function DigitalPackingHierarchyView({ packingSheet }: { packingSheet: PackingSheetModel }) {
   return (
     <section className="space-y-6" aria-label="Nivel 2 Packing Jerárquico">
+      <p className="text-xs text-muted-foreground whitespace-normal">
+        Las alertas se basan en información declarada; su ausencia no acredita que un plato esté
+        libre de alérgenos.
+      </p>
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
         <div className="p-4 rounded-xl border border-border bg-card">
           <p className="text-xs uppercase text-muted-foreground font-semibold">Municipios / Zonas</p>
@@ -523,7 +528,9 @@ function DigitalPackingHierarchyView({ packingSheet }: { packingSheet: PackingSh
                                     {cu.items.map((it, idx) => (
                                       <div key={idx} className="flex justify-between text-muted-foreground text-[11px]">
                                         <span>{it.qty}× {it.dishName}</span>
-                                        {it.safetyTag ? <span className="font-bold">{it.safetyTag}</span> : null}
+                                        {it.safetyTag ? (
+                                          <span className="font-bold">{it.safetyTag}</span>
+                                        ) : null}
                                       </div>
                                     ))}
                                   </div>
@@ -664,6 +671,7 @@ function DigitalKitchenP1View({
                       </div>
                     )}
 
+                    <DishAllergenDeclaration allergens={dish.allergens} />
                     {dish.allergens.length > 0 ? (
                       <div className="flex flex-wrap gap-1.5">
                         {dish.allergens.map((a) => (
@@ -997,6 +1005,12 @@ function DigitalPackingByClientView({
                             >
                               {item.dishName}
                             </p>
+                            <DishAllergenDeclaration
+                              allergens={
+                                report.packingByDish.find((dish) => dish.dishId === item.dishId)
+                                  ?.allergens
+                              }
+                            />
                             {item.comment ? (
                               <p className="text-xs text-amber-700 font-medium">
                                 ⚠️ {item.comment}
@@ -1080,6 +1094,7 @@ function DigitalPackingByDishView({ report }: { report: ProductionReportModel })
               </Badge>
             </div>
 
+            <DishAllergenDeclaration allergens={dish.allergens} />
             {dish.allergens.length > 0 ? (
               <div className="flex flex-wrap gap-1.5">
                 {dish.allergens.map((a) => (
@@ -1176,7 +1191,13 @@ function PrintableProductionSheet({ report }: { report: ProductionReportModel })
               {report.standardDishes.map((dish) => (
                 <tr key={dish.dishId} className="break-inside-avoid">
                   <td className="py-2 px-2 font-bold">{dish.dishName}</td>
-                  <td className="py-2 px-2 text-xs">{dish.allergens.join(", ") || "—"}</td>
+                  <td className="py-2 px-2 text-xs">
+                    <DishAllergenDeclaration
+                      allergens={dish.allergens}
+                      showDeclared
+                      className="text-black"
+                    />
+                  </td>
                   <td className="py-2 px-2 text-right font-mono font-bold text-base">
                     {dish.totalQty}
                   </td>
@@ -1282,6 +1303,13 @@ function PrintableProductionSheet({ report }: { report: ProductionReportModel })
                     <li key={idx} className="pt-1 flex justify-between items-start gap-1">
                       <div>
                         <span>[ ] {item.dishName}</span>
+                        <DishAllergenDeclaration
+                          allergens={
+                            report.packingByDish.find((dish) => dish.dishId === item.dishId)
+                              ?.allergens
+                          }
+                          className="text-black"
+                        />
                         {item.comment ? (
                           <p className="font-semibold text-[11px] pl-4">→ {item.comment}</p>
                         ) : null}

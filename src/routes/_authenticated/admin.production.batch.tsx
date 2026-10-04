@@ -1,3 +1,4 @@
+import { DishAllergenDeclaration } from "@/components/operations/dish-allergen-declaration";
 /**
  * ADMIN · Producción · Batch
  * Capability: kitchen.operate  ·  Core Object: KitchenProductionBatch (dish × day)
@@ -126,7 +127,7 @@ function ProductionBatchPage() {
                     </TableCell>
                     <TableCell>
                       {d.allergens.length === 0 ? (
-                        <span className="text-xs text-muted-foreground">—</span>
+                        <DishAllergenDeclaration allergens={d.allergens} />
                       ) : (
                         <div className="flex flex-wrap gap-1">
                           {d.allergens.map((a) => (
