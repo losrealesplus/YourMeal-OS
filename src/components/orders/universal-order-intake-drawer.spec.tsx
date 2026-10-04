@@ -13,10 +13,6 @@ vi.mock("@/components/ui/sheet", () => ({
   SheetFooter: ({ children, className }: any) => <div className={className}>{children}</div>,
 }));
 
-vi.mock("@/components/ui/scroll-area", () => ({
-  ScrollArea: ({ children, className }: any) => <div className={className}>{children}</div>,
-}));
-
 vi.mock("@/components/ui/tabs", () => ({
   Tabs: ({ children, className }: any) => <div className={className}>{children}</div>,
   TabsList: ({ children, className }: any) => <div className={className}>{children}</div>,
@@ -81,6 +77,16 @@ describe("UniversalOrderIntakeDrawer Component Rendering & Contract (CR-OPS-05)"
     expect(html).toContain("Guardar Borrador");
     expect(html).toContain("Guardar y Confirmar 🟢");
     expect(html).toContain("Platos de la Semana");
+  });
+
+  it("keeps capture content in a native vertical scroll region without Radix intrinsic sizing", () => {
+    const html = renderToString(<UniversalOrderIntakeDrawer open={true} onOpenChange={() => {}} />);
+
+    expect(html).toContain('data-testid="order-capture-scroll"');
+    expect(html).toContain('class="min-h-0 min-w-0 flex-1 overflow-y-auto"');
+    expect(html).not.toContain("data-radix-scroll-area-viewport");
+    expect(html).not.toContain("display:table");
+    expect(html).not.toContain("overflow-x-hidden");
   });
 
   it("does not render contents when open is false", () => {
