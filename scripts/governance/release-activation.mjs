@@ -1,3 +1,4 @@
+import { parseReleaseJson } from "./release-json.mjs";
 import { assertContext, demand, hash, SHA, DIGEST } from "./release-contract.mjs";
 
 // Bootstrap only: immutable historical anchor, never a generic SPECIAL allowlist.
@@ -51,6 +52,18 @@ export const HISTORY_REMEDIATION_FILES = [
   "docs/05-architecture/GATE7_POST_MERGE_AUTOMATION.md",
   "docs/99-internal/development-journal/2026-10-04-gate7-phase1-history-fix.md",
 ].sort();
+export const HISTORY_REPAIR_MERGE = "4ac3fddb0b1fd855beab39dbbcb4d70c81919592";
+export const DIAGNOSTIC_BRANCH = "cursor/gate7-json-diagnostics";
+export const DIAGNOSTIC_FILES = [
+  ".github/workflows/deploy-production.yml",
+  "scripts/governance/release-json.mjs",
+  "scripts/governance/release-json.spec.mjs",
+  "scripts/governance/release-plan.mjs",
+  "scripts/governance/release-activation.mjs",
+  "scripts/governance/release-activation.spec.mjs",
+  "docs/05-architecture/GATE7_POST_MERGE_AUTOMATION.md",
+  "docs/99-internal/development-journal/2026-10-04-gate7-json-diagnostics.md",
+].sort();
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 export function activationMode(inputs = {}) {
   const mode = inputs.mode ?? "normal";
@@ -76,9 +89,11 @@ export function activationPayload(snapshot, policy) {
       baseline.versionId === null,
     "Initial baseline changed or activation already consumed",
   );
-  const historyRepair = commits.length === 5;
+  const diagnostics = commits.length === 6;
+  const historyRepair = commits.length === 5 || diagnostics;
   demand(
     (commits.length === 4 || historyRepair) &&
+      (!diagnostics || (commits[4].sha === HISTORY_REPAIR_MERGE && commits[4].pr === 490)) &&
       same(
         commits.slice(0, 3).map((c) => c.sha),
         INITIAL_COMMITS,
@@ -94,18 +109,25 @@ export function activationPayload(snapshot, policy) {
   const last = commits.at(-1);
   demand(
     Number.isSafeInteger(last.pr) &&
-      last.pr > (historyRepair ? 489 : 488) &&
+      last.pr > (diagnostics ? 490 : historyRepair ? 489 : 488) &&
       remediation.number === last.pr &&
       remediation.merge_commit_sha === targetSha &&
-      remediation.head?.ref === (historyRepair ? HISTORY_REMEDIATION_BRANCH : REMEDIATION_BRANCH) &&
+      remediation.head?.ref ===
+        (diagnostics
+          ? DIAGNOSTIC_BRANCH
+          : historyRepair
+            ? HISTORY_REMEDIATION_BRANCH
+            : REMEDIATION_BRANCH) &&
       remediation.head?.repo?.full_name === policy.repository &&
       remediation.merged_by?.id === policy.reviewerId,
     "Remediation must be the exact human-merged canonical activation PR",
   );
   demand(
-    historyRepair
-      ? same(last.paths, HISTORY_REMEDIATION_FILES)
-      : last.paths.length > 0 &&
+    diagnostics
+      ? same(last.paths, DIAGNOSTIC_FILES)
+      : historyRepair
+        ? same(last.paths, HISTORY_REMEDIATION_FILES)
+        : last.paths.length > 0 &&
           last.paths.every((p) => REMEDIATION_FILES.includes(p)) &&
           [
             ".github/workflows/deploy-production.yml",
@@ -141,7 +163,7 @@ export function activationPayload(snapshot, policy) {
       "Invalid SPECIAL content evidence",
     );
   }
-  for (const evidence of historyRepair ? [commits[3], last] : [last])
+  for (const evidence of commits.slice(3))
     demand(
       same(
         evidence.specialFiles.map((f) => f.path),
@@ -150,7 +172,8 @@ export function activationPayload(snapshot, policy) {
             (p) =>
               p !==
                 "docs/99-internal/development-journal/2026-10-04-gate7-initial-activation-lane.md" &&
-              p !== "docs/99-internal/development-journal/2026-10-04-gate7-phase1-history-fix.md",
+              p !== "docs/99-internal/development-journal/2026-10-04-gate7-phase1-history-fix.md" &&
+              p !== "docs/99-internal/development-journal/2026-10-04-gate7-json-diagnostics.md",
           )
           .sort(),
       ),
@@ -193,7 +216,16 @@ export function authorizeActivation(snapshot, inputs, ctx, run, policy) {
     payload.targetSha === ctx.sha &&
       inputs.expected_base_sha === payload.baselineSha &&
       inputs.expected_target_sha === payload.targetSha &&
-      same(JSON.parse(inputs.authorized_prs), payload.prs),
+      same(
+        parseReleaseJson(
+          inputs.authorized_prs,
+          "ACTIVATION_INPUT_INVALID",
+          "authorized_prs",
+          "json-array-of-integer-pr-numbers",
+          (value) => Array.isArray(value) && value.every(Number.isSafeInteger),
+        ),
+        payload.prs,
+      ),
     "Activation inputs do not match reconciled scope",
   );
   const authorizationId = hash(JSON.stringify(payload));

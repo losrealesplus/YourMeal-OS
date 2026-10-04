@@ -16,8 +16,13 @@ import {
   DIGEST,
 } from "./release-contract.mjs";
 import { activationMode, activationPayload, authorizeActivation } from "./release-activation.mjs";
-export const policy = JSON.parse(
+import { parseReleaseJson, jsonObject, githubResponseShape } from "./release-json.mjs";
+export const policy = parseReleaseJson(
   fs.readFileSync(new URL("./release-policy.json", import.meta.url)),
+  "RELEASE_POLICY_INVALID",
+  "release_policy",
+  "json-object",
+  jsonObject,
 );
 export function context() {
   return {
@@ -30,11 +35,16 @@ export function context() {
   };
 }
 export function api(endpoint) {
-  return JSON.parse(
+  const shape = githubResponseShape(endpoint);
+  return parseReleaseJson(
     execFileSync("gh", ["api", `repos/${policy.repository}/${endpoint}`], {
       encoding: "utf8",
       maxBuffer: 16 * 1024 * 1024,
     }),
+    "GITHUB_API_RESPONSE_INVALID",
+    shape.source,
+    shape.array ? "json-array" : "json-object",
+    shape.array ? Array.isArray : jsonObject,
   );
 }
 export function pages(endpoint) {
@@ -107,7 +117,13 @@ function readReport(run) {
       ],
       { stdio: "pipe" },
     );
-    const r = JSON.parse(fs.readFileSync(path.join(dir, "release-report.json"), "utf8"));
+    const r = parseReleaseJson(
+      fs.readFileSync(path.join(dir, "release-report.json"), "utf8"),
+      "RELEASE_REPORT_INVALID",
+      "release_report",
+      "json-object",
+      jsonObject,
+    );
     return r;
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
@@ -178,7 +194,13 @@ export function baseline(ctx, publishing = false) {
 }
 function workflowInputs() {
   return process.env.GITHUB_EVENT_PATH
-    ? (JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, "utf8")).inputs ?? {})
+    ? (parseReleaseJson(
+        fs.readFileSync(process.env.GITHUB_EVENT_PATH, "utf8"),
+        "EVENT_PAYLOAD_INVALID",
+        "github_event",
+        "json-object-with-optional-inputs-object",
+        (value) => jsonObject(value) && (value.inputs === undefined || jsonObject(value.inputs)),
+      ).inputs ?? {})
     : {};
 }
 function activationSnapshot(ctx, base, diff, prs, currentMainSha) {
@@ -268,8 +290,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
         activationSnapshot(ctx, base, diff, prs, api("git/ref/heads/main").object.sha),
         policy,
       );
-      console.log(
-        JSON.stringify({ payload, authorizationId: hash(JSON.stringify(payload)) }, null, 2),
+      fs.writeSync(
+        1,
+        `${JSON.stringify({ payload, authorizationId: hash(JSON.stringify(payload)) }, null, 2)}\n`,
       );
       process.exit(0); // Read-only reconciliation, never artifact/ledger or authorization.
     }
