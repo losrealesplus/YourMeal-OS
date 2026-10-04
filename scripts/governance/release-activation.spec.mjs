@@ -5,6 +5,9 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import {
+  ACTIVATION_MERGE,
+  HISTORY_REMEDIATION_BRANCH,
+  HISTORY_REMEDIATION_FILES,
   INITIAL_BASE,
   INITIAL_DEPLOYMENT,
   INITIAL_COMMITS,
@@ -259,25 +262,27 @@ test("direct GitHub commit attribution and old SPECIAL fail-closed guard remain 
   assert.equal(preparationEligible("REQUIRES_SEPARATE_AUTHORIZATION"), false);
 });
 
-test("actual Phase 1/manifest/Phase 2 processes bind the same Git scope and cannot publish mismatches", () => {
+function activationProcess(historyRepair = false) {
   const root = process.cwd(),
     dir = fs.mkdtempSync(path.join(os.tmpdir(), "gate7-activation-process-"));
   const cli = (name) => path.join(root, "scripts/governance", name);
   const git = (...args) => execFileSync("git", args, { cwd: dir, encoding: "utf8" }).trim();
   try {
     execFileSync("git", ["clone", "--shared", "--quiet", root, dir], { stdio: "pipe" });
-    git("checkout", "--quiet", INITIAL_COMMITS[2]);
+    git("checkout", "--quiet", historyRepair ? ACTIVATION_MERGE : INITIAL_COMMITS[2]);
     git("config", "user.name", "Fixture");
     git("config", "user.email", "fixture@example.test");
-    for (const name of [
-      ".github/workflows/deploy-production.yml",
-      ...REMEDIATION_FILES.filter(
-        (p) =>
-          p.startsWith("scripts/") &&
-          !p.endsWith("release-publication.spec.mjs") &&
-          !p.endsWith("release-contract.spec.mjs"),
-      ),
-    ])
+    for (const name of historyRepair
+      ? HISTORY_REMEDIATION_FILES
+      : [
+          ".github/workflows/deploy-production.yml",
+          ...REMEDIATION_FILES.filter(
+            (p) =>
+              p.startsWith("scripts/") &&
+              !p.endsWith("release-publication.spec.mjs") &&
+              !p.endsWith("release-contract.spec.mjs"),
+          ),
+        ])
       fs.copyFileSync(path.join(root, name), path.join(dir, name));
     git("add", ".");
     git("commit", "--quiet", "-m", "fixture remediation");
@@ -300,6 +305,7 @@ test("actual Phase 1/manifest/Phase 2 processes bind the same Git scope and cann
       merged_at: "2026-10-04",
       base: { ref: "main", repo: { full_name: policy.repository } },
     });
+    const remediationPr = historyRepair ? 490 : 489;
     const responses = {
       [`environments/${policy.environment}`]: environment,
       "git/ref/heads/main": { object: { sha } },
@@ -332,16 +338,20 @@ test("actual Phase 1/manifest/Phase 2 processes bind the same Git scope and cann
         expired: false,
         workflow_run: { id: 123, head_sha: sha },
       },
-      "pulls/489": {
-        ...pr(489, sha),
-        head: { ref: REMEDIATION_BRANCH, repo: { full_name: policy.repository } },
+      [`pulls/${remediationPr}`]: {
+        ...pr(remediationPr, sha),
+        head: {
+          ref: historyRepair ? HISTORY_REMEDIATION_BRANCH : REMEDIATION_BRANCH,
+          repo: { full_name: policy.repository },
+        },
         merged_by: { id: policy.reviewerId },
       },
     };
     INITIAL_COMMITS.forEach((commit, i) => {
       responses[`commits/${commit}/pulls`] = [pr(486 + i, commit)];
     });
-    responses[`commits/${sha}/pulls`] = [pr(489, sha)];
+    responses[`commits/${sha}/pulls`] = [pr(remediationPr, sha)];
+    if (historyRepair) responses[`commits/${ACTIVATION_MERGE}/pulls`] = [pr(489, ACTIVATION_MERGE)];
     fs.writeFileSync(path.join(dir, "responses.json"), JSON.stringify(responses));
     fs.writeFileSync(
       path.join(dir, "bin/gh"),
@@ -384,6 +394,7 @@ test("actual Phase 1/manifest/Phase 2 processes bind the same Git scope and cann
     const dispatch = {
       ...inputs,
       expected_target_sha: sha,
+      authorized_prs: JSON.stringify(certificate.payload.prs),
       authorization_id: certificate.authorizationId,
     };
     fs.writeFileSync(path.join(dir, "event.json"), JSON.stringify({ inputs: dispatch }));
@@ -463,5 +474,81 @@ test("actual Phase 1/manifest/Phase 2 processes bind the same Git scope and cann
     );
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
+  }
+}
+test("actual Phase 1/manifest/Phase 2 processes bind the same Git scope and cannot publish mismatches", () =>
+  activationProcess());
+test("bounded fifth-commit repair preserves actual history, canonical payload and publication guards", () =>
+  activationProcess(true));
+
+// This extension admits one bounded history repair, never an arbitrary fifth SPECIAL.
+test("history repair requires pinned #489 and the exact canonical scope", () => {
+  const repaired = structuredClone(snapshot);
+  repaired.commits[3].sha = ACTIVATION_MERGE;
+  repaired.commits.push({
+    sha: target,
+    pr: 490,
+    paths: HISTORY_REMEDIATION_FILES,
+    specialFiles: files(
+      HISTORY_REMEDIATION_FILES.filter((p) => !p.startsWith("docs/99-internal/")),
+    ),
+  });
+  repaired.remediation.number = 490;
+  repaired.remediation.head.ref = HISTORY_REMEDIATION_BRANCH;
+  const canonical = activationPayload(repaired, policy);
+  assert.deepEqual(canonical.prs, [486, 487, 488, 489, 490]);
+  assert.equal(canonical.special.length, 3);
+  assert.notEqual(hash(JSON.stringify(canonical)), inputs.authorization_id);
+  assert.throws(() => authorizeActivation(repaired, inputs, ctx, run, policy));
+  const repairedInputs = {
+    ...inputs,
+    authorized_prs: JSON.stringify(canonical.prs),
+    authorization_id: hash(JSON.stringify(canonical)),
+  };
+  assert.equal(
+    authorizeActivation(repaired, repairedInputs, ctx, run, policy).authorizationId,
+    repairedInputs.authorization_id,
+  );
+  for (const mutate of [
+    (s) => {
+      s.commits[3].sha = "f".repeat(40);
+    },
+    (s) => {
+      s.commits[3].pr = 500;
+    },
+    (s) => {
+      s.commits[4].paths = [...s.commits[4].paths, "scripts/governance/release-policy.json"].sort();
+    },
+    (s) => {
+      s.commits[4].paths = s.commits[4].paths.slice(1);
+    },
+    (s) => {
+      s.commits[4].specialFiles.pop();
+    },
+    (s) => {
+      s.remediation.head.ref = "other";
+    },
+    (s) => {
+      s.remediation.merged_by.id = 1;
+    },
+    (s) => {
+      s.commits.push(s.commits[4]);
+    },
+  ]) {
+    const bad = structuredClone(repaired);
+    mutate(bad);
+    assert.throws(() => activationPayload(bad, policy));
+  }
+});
+test("every Gate 7 checkout provides real history without persisted credentials", () => {
+  const workflow = fs.readFileSync(".github/workflows/deploy-production.yml", "utf8");
+  const checkouts = [
+    ...workflow.matchAll(/uses: actions\/checkout@v4\n\s+with:\n([\s\S]*?)(?=\n      -)/g),
+  ];
+  assert.equal(checkouts.length, 3);
+  for (const [, settings] of checkouts) {
+    assert.match(settings, /fetch-depth: 0/);
+    assert.match(settings, /persist-credentials: false/);
+    assert.match(settings, /ref: \$\{\{ github.sha \}\}/);
   }
 });

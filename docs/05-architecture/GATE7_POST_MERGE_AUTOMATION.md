@@ -159,3 +159,15 @@ NEXT STEP: revisar PR, especialmente clasificación, cola y activación separada
 WHO: Alexander.
 REQUIRES AUTHORIZATION: YES, para merge/activación/producción fuera de esta tarea.
 EXPECTED NEXT STATE: PR revisado; cualquier ejecución productiva exige su autorización propia.
+
+## Remediación de Phase 1 tras #489
+
+Run 37229919269: clasificación `AUTHORIZED_INITIAL_ACTIVATION` correcta; Phase 1 falla antes del build y Phase 2 queda omitida. El checkout del build heredaba `fetch-depth: 1`; la prueba de activación requiere commits históricos reales y falla al validar ancestralidad `820eef… → edc148…`. Todos los checkouts de Gate 7 pasan ahora `fetch-depth: 0` y conservan `ref: github.sha` / `persist-credentials: false`. No se elimina ni simula la comprobación de ancestralidad.
+
+Un fetch acotado al intervalo de activación resolvería solo este bootstrap: el contrato normal puede necesitar cualquier baseline publicado y los padres/árboles de cada commit intermedio. Un depth fijo o varios SHA sueltos no garantizan ancestralidad completa. Historial completo en Phase 1 es la modificación mínima que cubre ambos contratos, coherente con clasificación y publicación. Aumenta transferencia/tiempo y descarga refs adicionales; no concede permisos, persiste credenciales ni ejecuta código de otras refs. El source ejecutado permanece fijado al SHA y las APIs reconcilian main/baseline.
+
+El segundo fallo es independiente: la prueba de publicación simula `push` pero heredaba `GITHUB_EVENT_PATH` del dispatch inicial. Ahora cada proceso simulado recibe un evento local explícito con inputs vacíos, consistente con su escenario normal. El publicador real sigue leyendo y validando el evento real; no se debilitan guardas ni se evita historia real en activación.
+
+El merge de esta reparación cambia el target. Se admite únicamente un quinto commit después de #489 fijado a `8680099c49d32ddd88c66872f61df3dd483f0f77`, atribuido a un PR humano del repositorio canónico desde `cursor/gate7-phase1-history-fix`. Su conjunto de paths debe coincidir exactamente con `HISTORY_REMEDIATION_FILES`; incluye solo workflow, contrato/pruebas de activación, prueba de publicación, este documento y diario específico. No se admite sexto commit, cambio de policy, otro branch, ni paths adicionales/omitidos. El payload incluye los tres commits SPECIAL con sus hashes reales; se exige un nuevo authorization ID calculado tras merge. El número real del PR se obtiene de su atribución única, no de una entrada libre ni de un supuesto número futuro.
+
+La autorización anterior no es reutilizable. El baseline observado sigue siendo deployment 6841438048 / SHA `752234f406366bdf2fcec18750092b6f0fd44039`; deberá verificarse de nuevo antes de cualquier nueva activación. Esta implementación autoriza únicamente revisión del PR, sin merge, dispatch, rerun ni producción.

@@ -41,6 +41,16 @@ export const REMEDIATION_FILES = [
   "docs/05-architecture/GATE7_POST_MERGE_AUTOMATION.md",
   "docs/99-internal/development-journal/2026-10-04-gate7-initial-activation-lane.md",
 ].sort();
+export const ACTIVATION_MERGE = "8680099c49d32ddd88c66872f61df3dd483f0f77";
+export const HISTORY_REMEDIATION_BRANCH = "cursor/gate7-phase1-history-fix";
+export const HISTORY_REMEDIATION_FILES = [
+  ".github/workflows/deploy-production.yml",
+  "scripts/governance/release-activation.mjs",
+  "scripts/governance/release-activation.spec.mjs",
+  "scripts/governance/release-publication.spec.mjs",
+  "docs/05-architecture/GATE7_POST_MERGE_AUTOMATION.md",
+  "docs/99-internal/development-journal/2026-10-04-gate7-phase1-history-fix.md",
+].sort();
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 export function activationMode(inputs = {}) {
   const mode = inputs.mode ?? "normal";
@@ -66,8 +76,9 @@ export function activationPayload(snapshot, policy) {
       baseline.versionId === null,
     "Initial baseline changed or activation already consumed",
   );
+  const historyRepair = commits.length === 5;
   demand(
-    commits.length === 4 &&
+    (commits.length === 4 || historyRepair) &&
       same(
         commits.slice(0, 3).map((c) => c.sha),
         INITIAL_COMMITS,
@@ -76,32 +87,35 @@ export function activationPayload(snapshot, policy) {
         commits.slice(0, 3).map((c) => c.pr),
         [486, 487, 488],
       ) &&
-      commits[3].sha === targetSha,
+      commits.at(-1).sha === targetSha &&
+      (!historyRepair || (commits[3].sha === ACTIVATION_MERGE && commits[3].pr === 489)),
     "Unexpected/direct/extra activation interval",
   );
-  const last = commits[3];
+  const last = commits.at(-1);
   demand(
     Number.isSafeInteger(last.pr) &&
-      last.pr > 488 &&
+      last.pr > (historyRepair ? 489 : 488) &&
       remediation.number === last.pr &&
       remediation.merge_commit_sha === targetSha &&
-      remediation.head?.ref === REMEDIATION_BRANCH &&
+      remediation.head?.ref === (historyRepair ? HISTORY_REMEDIATION_BRANCH : REMEDIATION_BRANCH) &&
       remediation.head?.repo?.full_name === policy.repository &&
       remediation.merged_by?.id === policy.reviewerId,
     "Remediation must be the exact human-merged canonical activation PR",
   );
   demand(
-    last.paths.length > 0 &&
-      last.paths.every((p) => REMEDIATION_FILES.includes(p)) &&
-      [
-        ".github/workflows/deploy-production.yml",
-        "scripts/governance/release-activation.mjs",
-        "scripts/governance/release-activation.spec.mjs",
-        "scripts/governance/release-plan.mjs",
-        "scripts/governance/release-publish.mjs",
-        "scripts/governance/release-artifact.mjs",
-        "scripts/governance/release-contract.mjs",
-      ].every((p) => last.paths.includes(p)),
+    historyRepair
+      ? same(last.paths, HISTORY_REMEDIATION_FILES)
+      : last.paths.length > 0 &&
+          last.paths.every((p) => REMEDIATION_FILES.includes(p)) &&
+          [
+            ".github/workflows/deploy-production.yml",
+            "scripts/governance/release-activation.mjs",
+            "scripts/governance/release-activation.spec.mjs",
+            "scripts/governance/release-plan.mjs",
+            "scripts/governance/release-publish.mjs",
+            "scripts/governance/release-artifact.mjs",
+            "scripts/governance/release-contract.mjs",
+          ].every((p) => last.paths.includes(p)),
     "Remediation includes unauthorized files",
   );
   demand(
@@ -111,7 +125,7 @@ export function activationPayload(snapshot, policy) {
     ),
     "Historical SPECIAL scope differs",
   );
-  for (const commit of [commits[2], last]) {
+  for (const commit of commits.slice(2)) {
     const files = commit.specialFiles;
     demand(
       same(
@@ -127,19 +141,21 @@ export function activationPayload(snapshot, policy) {
       "Invalid SPECIAL content evidence",
     );
   }
-  demand(
-    same(
-      last.specialFiles.map((f) => f.path),
-      last.paths
-        .filter(
-          (p) =>
-            p !==
-            "docs/99-internal/development-journal/2026-10-04-gate7-initial-activation-lane.md",
-        )
-        .sort(),
-    ),
-    "SPECIAL paths missing from remediation evidence",
-  );
+  for (const evidence of historyRepair ? [commits[3], last] : [last])
+    demand(
+      same(
+        evidence.specialFiles.map((f) => f.path),
+        evidence.paths
+          .filter(
+            (p) =>
+              p !==
+                "docs/99-internal/development-journal/2026-10-04-gate7-initial-activation-lane.md" &&
+              p !== "docs/99-internal/development-journal/2026-10-04-gate7-phase1-history-fix.md",
+          )
+          .sort(),
+      ),
+      "SPECIAL paths missing from remediation evidence",
+    );
   return {
     schema: 1,
     mode: "initial_activation",
@@ -148,7 +164,7 @@ export function activationPayload(snapshot, policy) {
     baselineDeploymentId: INITIAL_DEPLOYMENT,
     targetSha,
     prs: commits.map((c) => c.pr),
-    special: [commits[2], last].map((c) => ({
+    special: commits.slice(2).map((c) => ({
       commit: c.sha,
       pr: c.pr,
       files: c.specialFiles.map((f) => ({ path: f.path, before: f.before, after: f.after })),

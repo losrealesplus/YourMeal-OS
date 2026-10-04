@@ -106,6 +106,7 @@ test("publication orchestration fails closed before deployment and preserves no-
       path.join(dir, "fetch-fixture.mjs"),
       `globalThis.fetch=async(url)=> { if(String(url).startsWith('https://api.cloudflare.com/client/v4/')) { const deployment={id:'11111111-1111-4111-8111-111111111111',versions:[{version_id:'75bfca8f-fc8c-4ef7-9cbd-c0aaaebf7e60',percentage:100}]};return {ok:true,json:async()=>({success:true,result:String(url).endsWith('/deployments')?{deployments:[deployment]}:deployment})}; } if(url==='https://eatclean.yourmealos.com/assets/a.js')return {status:200,arrayBuffer:async()=>Buffer.from(process.env.FAKE_SMOKE==='fail'?'different-bytes':'fixture-static-asset')};throw Error('Unexpected network request blocked'); };`,
     );
+    fs.writeFileSync(path.join(dir, "event.json"), JSON.stringify({ inputs: {} }));
     const run = (data, upload = "", extra = {}) => {
       fs.writeFileSync(path.join(dir, "responses.json"), JSON.stringify(data));
       fs.writeFileSync(path.join(dir, "calls"), "");
@@ -124,6 +125,7 @@ test("publication orchestration fails closed before deployment and preserves no-
           GITHUB_RUN_ID: "123",
           GITHUB_RUN_ATTEMPT: "1",
           GITHUB_EVENT_NAME: "push",
+          GITHUB_EVENT_PATH: path.join(dir, "event.json"),
           GITHUB_STEP_SUMMARY: path.join(dir, "summary"),
           RUNNER_TEMP: dir,
           EXPECTED_DIGEST: digest,
