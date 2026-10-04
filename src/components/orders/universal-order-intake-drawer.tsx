@@ -35,6 +35,7 @@ import {
   utcWeekDates,
   offsetWeekMonday,
   DAY_NAMES_ES,
+  formatDayDateEs,
 } from "@/modules/weekly-menu/application/week-dates";
 import {
   Sheet,
@@ -1063,6 +1064,7 @@ export function UniversalOrderIntakeDrawer({
                 <div className="overflow-x-auto pb-1">
                   <TabsList className="grid grid-cols-7 min-w-[360px] sm:min-w-0 h-auto p-1 bg-muted/60">
                     {weekDays.map((d) => {
+                      const { dayName, formattedDate } = formatDayDateEs(d.date);
                       const count = Object.values(quantities[d.date] || {}).reduce(
                         (a, b) => a + b,
                         0,
@@ -1071,11 +1073,13 @@ export function UniversalOrderIntakeDrawer({
                         <TabsTrigger
                           key={d.date}
                           value={d.date}
+                          aria-label={`${dayName}, ${formattedDate} ${d.date.slice(0, 4)}; ${count} ${count === 1 ? "ración" : "raciones"}`}
                           className="py-1.5 px-1 text-xs flex flex-col items-center gap-0.5 min-w-0"
                         >
                           <span className="font-semibold text-[11px] truncate">
                             {d.label.slice(0, 3)}
                           </span>
+                          <span className="text-[11px] whitespace-nowrap">{formattedDate}</span>
                           {count > 0 ? (
                             <Badge
                               variant="secondary"
