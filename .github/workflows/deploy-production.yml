@@ -100,8 +100,28 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
+          set -euo pipefail
           if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
             echo "🚨 [CREDENTIAL BLOCK] CLOUDFLARE_API_TOKEN is not configured in Environment secrets."
             exit 1
           fi
-          npx wrangler deploy --config instances/yourmeal-eatclean/wrangler.prod.json --no-bundle
+          # Publish code only; routing and domains remain managed out of band.
+          VERSION_OUTPUT=$(mktemp "$RUNNER_TEMP/eatclean-version-upload.XXXXXX")
+          WRANGLER_OUTPUT_FILE_PATH="$VERSION_OUTPUT" npx --yes wrangler@4.86.0 versions upload --config instances/yourmeal-eatclean/wrangler.prod.json --no-bundle
+          VERSION_ID=$(node --input-type=module - "$VERSION_OUTPUT" <<'NODE'
+          import fs from "node:fs";
+          const records = fs.readFileSync(process.argv[2], "utf8")
+            .split(/\r?\n/).filter(line => line.trim()).map(line => JSON.parse(line));
+          const uploads = records.filter(record => record?.type === "version-upload");
+          const upload = uploads[0];
+          if (uploads.length !== 1 || upload.version !== 1 ||
+              upload.worker_name !== "yourmeal-instance-eatclean" ||
+              typeof upload.version_id !== "string" ||
+              !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(upload.version_id)) {
+            throw new Error("Missing, ambiguous or invalid EatClean version upload result");
+          }
+          console.log(upload.version_id);
+          NODE
+          )
+          echo "Deploying exact uploaded Worker version: $VERSION_ID"
+          npx --yes wrangler@4.86.0 versions deploy "$VERSION_ID@100%" --config instances/yourmeal-eatclean/wrangler.prod.json --yes
