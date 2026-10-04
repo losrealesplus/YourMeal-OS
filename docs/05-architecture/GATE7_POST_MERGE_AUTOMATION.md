@@ -44,7 +44,47 @@ Los hijos UI del directorio de routing `_authenticated/` no se confunden con una
 
 Es una política conservadora: puede bloquear un cambio inocuo antes de conceder autoridad implícita. Ampliar la lista normal es otra modificación privilegiada revisable.
 
-**Activación inicial:** este propio PR es SPECIAL. Su merge no puede publicar silenciosamente sus cambios, y el intervalo pendiente seguirá bloqueado hasta una reconciliación/publicación privilegiada expresamente autorizada por Alexander. Este PR no incorpora un bypass ni inventa una base ya publicada. Esa activación es un paso posterior separado; después, los merges normales elegibles no requieren dispatch manual. La automatización no es requisito para el Gate 7 actual de #486/#487.
+**Activación inicial:** #488 sigue siendo SPECIAL. El carril explícito descrito abajo permite preparar exclusivamente el intervalo inicial autorizado; su merge no autoriza producción. Después de la publicación real, los merges normales elegibles no requieren dispatch manual. No se inventa una base ni se omiten protecciones.
+
+## Carril INITIAL_ACTIVATION — remediación acotada
+
+Scope de este PR: únicamente workflow/helpers/specs Gate 7, esta sección y diario. HIGH / PRIVILEGED; autorizado para implementación + commit/push/PR, sin merge, dispatch, aprobación o producción. FOUNDATION/AGENTS/protocolo/CR-GOV-02/ADR 0101 consultados/reutilizados; no se modifica modelo operativo ni producto. Base de implementación: `edc14825d4a513880df9542b29f89e5a04f2234c`.
+
+La clasificación por paths no cambia. `workflow_dispatch` incorpora `mode=initial_activation`, `expected_base_sha`, `expected_target_sha`, `authorized_prs` (array JSON ordenado) y `authorization_id`. Estos inputs ni `reason` conceden autoridad por sí solos. Se exige run nuevo attempt 1, repo/main/SHA exactos, original actor y triggering_actor Alexander, historial completo con atribución PR única y protecciones existentes. Push no puede activar la excepción; inputs de activación en modo normal tampoco pueden caer al camino normal.
+
+Anclas inmutables: base `752234f406366bdf2fcec18750092b6f0fd44039`, deployment GitHub **6841438048** (no solo mismo SHA), commits first-parent exactos #486 `dd03d2c85da6acf320a1c1d8498133168b68d451` → #487 `820eefb38331026e4e5e70f8ce00294ad6de62d6` → #488 `edc14825d4a513880df9542b29f89e5a04f2234c` → **un solo commit de merge del PR de este carril**. Ese PR debe estar merged por Alexander, venir del repo canónico y de `codex/gate7-initial-activation-lane`; su número se obtiene de GitHub, no se predice. No se acepta otro merge/commit o archivos fuera del conjunto cerrado de remediación. Los paths SPECIAL de #488 deben ser exactamente los del commit aprobado. Esta restricción no es un permiso permanente para esos paths: solo opera dentro de esa cadena/base/deployment únicos.
+
+Después del merge humano, fetch del main exacto y reconciliación READ-ONLY mediante `node scripts/governance/release-plan.mjs --initial-activation-payload` produce el payload canónico y su SHA-256. **Antes del merge no existe un target/certificado real válido**; el comando se bloquea si falta ese PR o main avanzó. No escribe artifact/ledger ni ejecuta workflows. La forma exacta del payload es:
+
+```json
+{
+  "schema": 1,
+  "mode": "initial_activation",
+  "repository": "losrealesplus/YourMeal-OS",
+  "baselineSha": "752234f406366bdf2fcec18750092b6f0fd44039",
+  "baselineDeploymentId": 6841438048,
+  "targetSha": "T: merge SHA real del PR de remediación",
+  "prs": [486, 487, 488, "N: número real de ese PR"],
+  "special": [
+    {"commit": "edc14825d4a513880df9542b29f89e5a04f2234c", "pr": 488, "files": "lista ordenada de {path,before,after}"},
+    {"commit": "T", "pr": "N", "files": "lista ordenada de {path,before,after}"}
+  ]
+}
+```
+
+Este bloque muestra estructura, **no es un certificado ejecutable**. N es entero y T hexadecimal de 40 caracteres en el payload real. `before`/`after` son SHA-256 de bytes de blobs regulares Git, o null para creación/eliminación. Paths y objetos tienen orden canónico; commits/PRs mantienen orden first-parent. `authorization_id = SHA256(JSON.stringify(payload))`, sin timestamps o selección latest. El hash prueba identidad de alcance, no firma humana. La fuente de verdad del conjunto cerrado está en `release-activation.mjs`, no duplicada en inputs/configs.
+
+Si todos los checks pasan, el plan conserva `originalDecision=REQUIRES_SEPARATE_AUTHORIZATION` y obtiene **AUTHORIZED_INITIAL_ACTIVATION**, con payload/ID/run/attempt. Phase 1 incluye esa misma identidad explícita en el manifest y construye una sola vez. Se permite únicamente llegar al environment `production-worker`; Alexander debe aprobar OOB el run/artifact concretos.
+
+Phase 2 conserva verificación artifact ID/source/run/attempt/digest/config; vuelve a leer base, main, PRs, actor e inputs, reconstruye hashes y payload y exige igualdad exacta con plan/manifest de Phase 1. No hay fallback a DEPLOYABLE. Antes de aplicar la versión se vuelve a comprobar main tras upload; si avanzó, se conserva VERSION_UPLOADED y se bloquea deploy, sin rollback. La ventana restante entre última lectura y escritura distribuida no puede hacerse atómica; el artifact/version nunca cambia de identidad.
+
+La publicación guarda la identidad de activación en el ledger real, solo tras el flujo existente. **Single-use:** el nuevo deployment/baseline deja de ser el deployment legado 6841438048; incluso una publicación/rollback posterior al mismo SHA tiene otro ID y no reabre el carril. Estado parcial/ledger perdido bloquea por el contrato previo. Un duplicado aprobado después del primer éxito falla la ancla; attempts >1 se rechazan. Esta prueba depende de historia GitHub confiable y no borrada; no protege contra reescritura privilegiada del propio contrato/historia. Tras éxito, los merges normales vuelven al clasificador estándar sin excepción.
+
+Validación de esta remediación: 20 tests de activación + 13 anteriores PASS en Node 20.20.2; 25 gobernanza PASS; typecheck/build PASS en Node 20.20.2; YAML/nueve bloques shell/changed-file lint/diff check PASS. Proceso fixture de Phase 1 → package → verify → Phase 2: hash/manifest idénticos; scope/actor/aprobación/run/attempt/input/main divergentes no alcanzan el upload simulado; avance de main durante upload impide versions deploy. No llamadas GitHub/Cloudflare reales en tests; no se fabrica evidencia productiva.
+
+Dry-run local Wrangler 4.86 sin credenciales: 282 módulos adicionales y entrypoint/asset bindings, sin cambios en configs ni comandos de versiones. Lint global previo y limitación local actionlint queue se reutilizan como deuda/evidencia conocida; el queue merged de #488 ya fue aceptado por GitHub. Validación remota de los inputs nuevos, dispatch, aprobación, activación/deploy reales: NOT TESTED. Vitest de producto no se repite: src/dependencias/configs de producto no cambian; la suite completa del bloque anterior quedó PASS. No se consulta inventario de secretos ni se amplían permisos por el 403: las variables se comprueban cuando entre el job protegido.
+
+Revisión adversarial: READY WITH WARNINGS / READY FOR HUMAN REVIEW. Sin ruta encontrada para arbitrary future SPECIAL + inputs: anclas de base/deployment/historial, PR canónico, contenido exacto y aprobación separada lo impiden. Riesgos residuales: nueva reconciliación obligatoria, cambio de main/base antes de activar, metadatos/API/ledger indisponibles, publicación parcial, confianza en GitHub/cuenta soberana, y límite distribuido mencionado. No hay autorización de merge/activación en esta tarea.
 
 ## Concurrencia y supersedencia
 

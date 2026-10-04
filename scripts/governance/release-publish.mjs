@@ -12,7 +12,9 @@ import {
   assertTraffic,
   demand,
   hash,
+  preparationEligible,
 } from "./release-contract.mjs";
+import { assertActivationManifest } from "./release-activation.mjs";
 const ctx = context();
 const report = {
   schema: 1,
@@ -56,6 +58,7 @@ try {
     "Artifact belongs to another source/run or expired",
   );
   const fresh = prepare(ctx, true);
+  assertActivationManifest(manifest, fresh);
   if (["SUPERSEDED", "NON_DEPLOYABLE"].includes(fresh.decision)) {
     report.state = fresh.decision;
     save();
@@ -64,7 +67,7 @@ try {
       `## Gate 7\n${fresh.decision}: no upload or deployment performed.\n`,
     );
   } else {
-    demand(fresh.decision === "DEPLOYABLE", "Publication eligibility changed");
+    demand(preparationEligible(fresh.decision), "Publication eligibility changed");
     // No secret values are logged or written to artifacts.
     demand(
       process.env.CLOUDFLARE_API_TOKEN &&
@@ -76,6 +79,7 @@ try {
       configSha256: manifest.configSha256,
       artifactId: process.env.EXPECTED_ARTIFACT_ID,
       baseline: fresh.baseline,
+      ...(fresh.activation ? { activation: fresh.activation } : {}),
     });
     report.state = "PUBLICATION_UNKNOWN";
     report.mutationStarted = true;
@@ -102,6 +106,11 @@ try {
     report.versionId = uploadRecord(fs.readFileSync(uploadPath, "utf8"), policy.worker).version_id;
     report.state = "VERSION_UPLOADED";
     save();
+    if (fresh.activation)
+      demand(
+        api("git/ref/heads/main").object.sha === ctx.sha,
+        "Initial activation main advanced during upload; deployment blocked",
+      );
     report.state = "DEPLOYMENT_UNKNOWN";
     save();
     invoke(["deploy", `${report.versionId}@100%`, "--yes"], deployPath);
