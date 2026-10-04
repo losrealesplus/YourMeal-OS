@@ -16,7 +16,11 @@ vi.mock("@/components/ui/sheet", () => ({
 vi.mock("@/components/ui/tabs", () => ({
   Tabs: ({ children, className }: any) => <div className={className}>{children}</div>,
   TabsList: ({ children, className }: any) => <div className={className}>{children}</div>,
-  TabsTrigger: ({ children, className }: any) => <button type="button" className={className}>{children}</button>,
+  TabsTrigger: ({ children, className, "aria-label": ariaLabel }: any) => (
+    <button type="button" className={className} aria-label={ariaLabel}>
+      {children}
+    </button>
+  ),
   TabsContent: ({ children, className }: any) => <div className={className}>{children}</div>,
 }));
 
@@ -79,6 +83,29 @@ describe("UniversalOrderIntakeDrawer Component Rendering & Contract (CR-OPS-05)"
     expect(html).toContain("Platos de la Semana");
   });
 
+  it.each([
+    ["2026-09-28", "Lunes, 28 sep 2026", "Domingo, 4 oct 2026", "28 sep", "4 oct"],
+    ["2026-10-05", "Lunes, 5 oct 2026", "Domingo, 11 oct 2026", "5 oct", "11 oct"],
+    ["2026-12-28", "Lunes, 28 dic 2026", "Domingo, 3 ene 2027", "28 dic", "3 ene"],
+  ])(
+    "shows civil dates separately from zero quantities for week %s",
+    (weekStart, monday, sunday, firstDate, lastDate) => {
+      const html = renderToString(
+        <UniversalOrderIntakeDrawer
+          open={true}
+          onOpenChange={() => {}}
+          preselectedWeekStart={weekStart}
+        />,
+      );
+      expect(html).toContain(`aria-label="${monday}; 0 raciones"`);
+      expect(html).toContain(`aria-label="${sunday}; 0 raciones"`);
+      expect(html).toContain(`>${firstDate}</span>`);
+      expect(html).toContain(`>${lastDate}</span>`);
+      expect(html.match(/aria-label="[^";]+; 0 raciones"/g)).toHaveLength(7);
+      expect(html.match(/>—<\/span>/g)).toHaveLength(7);
+    },
+  );
+
   it("keeps capture content in a native vertical scroll region without Radix intrinsic sizing", () => {
     const html = renderToString(<UniversalOrderIntakeDrawer open={true} onOpenChange={() => {}} />);
 
@@ -91,10 +118,7 @@ describe("UniversalOrderIntakeDrawer Component Rendering & Contract (CR-OPS-05)"
 
   it("does not render contents when open is false", () => {
     const html = renderToString(
-      <UniversalOrderIntakeDrawer
-        open={false}
-        onOpenChange={() => {}}
-      />,
+      <UniversalOrderIntakeDrawer open={false} onOpenChange={() => {}} />,
     );
 
     expect(html).not.toContain("Captura Universal de Pedido");
@@ -112,7 +136,9 @@ describe("UniversalOrderIntakeDrawer Component Rendering & Contract (CR-OPS-05)"
 
     // MUST consume canonical fetchPublishedWeeklyMenu
     expect(source).toMatch(/fetchPublishedWeeklyMenu/);
-    expect(source).toMatch(/from ["']@\/modules\/weekly-menu\/application\/weekly-menu-queries["']/);
+    expect(source).toMatch(
+      /from ["']@\/modules\/weekly-menu\/application\/weekly-menu-queries["']/,
+    );
 
     // MUST render DishThumb for canonical photo / fallback representation
     expect(source).toMatch(/DishThumb/);

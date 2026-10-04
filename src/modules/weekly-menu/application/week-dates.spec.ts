@@ -45,6 +45,19 @@ describe("week-dates calendar helpers", () => {
     expect(res.formattedDate).toBe("24 ago");
   });
 
+  it.each([
+    ["2026-09-28", "Lunes", "28 sep"],
+    ["2026-10-04", "Domingo", "4 oct"],
+    ["2026-10-05", "Lunes", "5 oct"],
+    ["2026-12-31", "Jueves", "31 dic"],
+    ["2027-01-03", "Domingo", "3 ene"],
+  ])(
+    "formats civil date %s independently of the local timezone",
+    (date, dayName, formattedDate) => {
+      expect(formatDayDateEs(date)).toEqual({ dayName, formattedDate });
+    },
+  );
+
   it("formats week ranges in Spanish", () => {
     expect(formatWeekRangeEs("2026-08-24")).toBe("24 — 30 ago 2026");
   });
