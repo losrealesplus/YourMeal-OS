@@ -50,7 +50,6 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 export interface UniversalOrderIntakeDrawerProps {
@@ -725,7 +724,7 @@ export function UniversalOrderIntakeDrawer({
           </SheetDescription>
         </SheetHeader>
 
-        <ScrollArea className="flex-1">
+        <div className="min-h-0 min-w-0 flex-1 overflow-y-auto" data-testid="order-capture-scroll">
           <div className="p-4 sm:p-6 space-y-6">
             {/* 1. SELECCIÓN DE CLIENTE */}
             <div className="space-y-3 rounded-lg border border-border bg-card/50 p-4">
@@ -1265,7 +1264,7 @@ export function UniversalOrderIntakeDrawer({
               />
             </div>
           </div>
-        </ScrollArea>
+        </div>
 
         {/* 4. FOOTER CON RESUMEN ECONÓMICO Y BOTONES */}
         <SheetFooter className="p-4 border-t border-border bg-card flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:space-x-0">
