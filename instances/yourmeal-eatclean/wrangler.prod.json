@@ -2,6 +2,14 @@
   "$schema": "../../node_modules/wrangler/config-schema.json",
   "name": "yourmeal-instance-eatclean",
   "main": "../../.output/server/index.mjs",
+  "find_additional_modules": true,
+  "base_dir": "../../.output/server",
+  "rules": [
+    {
+      "type": "ESModule",
+      "globs": ["**/*.mjs"]
+    }
+  ],
   "compatibility_date": "2026-08-22",
   "compatibility_flags": [
     "nodejs_compat"
