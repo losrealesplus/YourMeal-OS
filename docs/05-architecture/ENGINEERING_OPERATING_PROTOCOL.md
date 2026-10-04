@@ -212,3 +212,37 @@ Cada bloque completado concluye con un **BLOCK REPORT** con:
 5. Resultados de Quality Gates y Adversarial Red Team.
 6. Estado HTTP en vivo y Live Break Tests.
 7. Clasificación final: 🟢 **CERTIFIED** | 🟡 **HARDENING REQUIRED** | 🔴 **BLOCKED**.
+
+## Codex Operating Model — autonomía con frontera de autoridad
+
+Esta sección es la fuente canónica del comportamiento de Codex; AGENTS.md solo la referencia. No reemplaza las compuertas, contratos de dominio o aprobaciones anteriores.
+
+### Apertura de tareas sustanciales
+
+Comunicar concisamente: **OBJECTIVE · CURRENT STATE · CLASSIFICATION · RISK · AUTHORIZED NOW · NOT AUTHORIZED · PLAN · STOP CONDITION**. El estado debe indicar evidencia y siguiente gate, no una promesa de resultado.
+
+**Autonomía dentro del perímetro autorizado; parada en la frontera de autoridad.** Con autorización vigente, resolver decisiones técnicas rutinarias, buscar, implementar, probar, reproducir y revisar sin pedir confirmaciones repetidas. Branch/commit/push/PR solo si ese alcance está autorizado. La autorización de PR nunca incluye merge o producción por extensión.
+
+### Estados y evidencia
+
+Hitos separados: DISCOVERED → SCOPED → APPROVED → IMPLEMENTED → LOCAL_VERIFIED → PR_OPEN → CI_VERIFIED → MERGED → GATE7_RUNNING → AWAITING_PRODUCTION_APPROVAL → DEPLOYED → PRODUCTION_VERIFIED → CLOSED.
+
+No constituyen una transición automática: puede haber bloqueo, fallo, cancelación, expiración o supersedencia. READY ≠ APPROVED; APPROVED ≠ IMPLEMENTED; IMPLEMENTED ≠ MERGED; MERGED ≠ DEPLOYED; DEPLOYED ≠ VERIFIED. CLOSED exige completar la verificación requerida, incluido juicio humano de UX cuando corresponde.
+
+Clasificar cada validación: **PASS · FAIL — INTRODUCED · FAIL — PRE-EXISTING · BLOCKED — ENVIRONMENT · NOT TESTED**. Comparar deuda previa con una base identificable. Evidencia parcial nunca es PASS total.
+
+### Revisión adversarial proporcional
+
+Antes de READY, intentar refutar la solución: causa vs síntoma, scope creep, fuentes duplicadas, regresión arquitectónica/adyacente, escalada de autoridad, comportamiento ante fallo y secretos. Para UI: desktop/tablet/móvil, texto largo/expansión y zoom accesible pertinente; no hace falta infraestructura masiva. Para publicación: SHA, artifact ID/run/attempt, digest, versión exacta, environment y rollback; nunca rollback automático sin autorización nueva.
+
+### Producción y automatización
+
+Un merge, CI, Codex, hooks, IDEs, agentes o GitHub Actions no son autorización productiva. Gate 7 puede preparar automáticamente y llegar a AWAITING_PRODUCTION_APPROVAL. **Solo aprobación humana OOB en production-worker permite publicación.** El revisor soberano aprobado es Alexander, identificado en la política vigente de repositorio por su cuenta GitHub. Codex no llama APIs de aprobación ni modifica reviewers/bypass/protecciones.
+
+Preparación y publicación obedecen el contrato especializado [Gate 7 post-merge](GATE7_POST_MERGE_AUTOMATION.md). La aprobación se liga al run de un SHA y artefacto concretos; otro SHA, rebuild, artefacto expirado o rerun requiere una solicitud nueva. La CI no certifica Safari ni composición alimentaria.
+
+### Comunicación y eficiencia
+
+Buscar antes de leer archivos completos; agrupar inspecciones independientes; reutilizar evidencia verificada; no repetir suites caras sin cambios/fallos que lo justifiquen. Diffs mínimos, abstracciones existentes, ninguna limpieza ajena, ADR solo por decisión arquitectónica real. Explicar hallazgos/resultados, no narrar cada comando. Continuar mientras haya trabajo autorizado y parar en la frontera.
+
+El cierre sustancial entrega **LEVEL 1 — EXECUTIVE SUMMARY** (español concreto, ~10–15 líneas: STATUS, WHAT CHANGED, WHY, VALIDATION, RISK, próxima acción de Alexander), seguido de **LEVEL 2 — TECHNICAL EVIDENCE**. Termina siempre con **CURRENT STATE · NEXT STEP · WHO · REQUIRES AUTHORIZATION: YES/NO · EXPECTED NEXT STATE**.
