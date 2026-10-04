@@ -1,60 +1,85 @@
 import type { BootstrapStageHandler } from "./BootstrapStage";
+import {
+  CANONICAL_INSTANCE_BINDINGS,
+  resolveInstanceRuntimeConfig,
+  validateInstanceRuntimeConfig,
+} from "@/lib/instance-runtime-boundary";
 
-function readEnv(name: string): string | undefined {
-  const vite = (import.meta as ImportMeta & { env?: Record<string, string> }).env;
-  const fromVite = vite?.[name];
-  if (typeof fromVite === "string" && fromVite.length > 0) return fromVite;
-  if (typeof process !== "undefined" && process.env?.[name]) {
-    return process.env[name];
-  }
-  return undefined;
+function isPlaceholder(value: unknown): boolean {
+  return (
+    typeof value !== "string" ||
+    !value.trim() ||
+    /REPLACE_ME|your-project|changeme|todo/i.test(value)
+  );
 }
 
-function isPlaceholder(value: string | undefined): boolean {
-  if (!value) return true;
-  const v = value.trim();
-  if (!v) return true;
-  return /REPLACE_ME|your-project|changeme|todo/i.test(v);
-}
-
-/**
- * Environment — required Vite/env contract for Product Core.
- * Does not write .env; mirrors ADR 0049 required keys for in-app boot.
- */
+/** Validate the same instance configuration used by the runtime/auth client. */
 export const EnvironmentStage: BootstrapStageHandler = {
   id: "environment",
   blocking: true,
   async run() {
-    const url = readEnv("VITE_SUPABASE_URL") || readEnv("SUPABASE_URL");
-    const key =
-      readEnv("VITE_SUPABASE_PUBLISHABLE_KEY") ||
-      readEnv("SUPABASE_PUBLISHABLE_KEY");
+    const invalid: string[] = [];
+    try {
+      const config = resolveInstanceRuntimeConfig(
+        typeof window !== "undefined" ? window.location.hostname : undefined,
+      );
+      validateInstanceRuntimeConfig(config);
+      const canonical = CANONICAL_INSTANCE_BINDINGS[config.tenantSlug];
+      if (
+        !canonical ||
+        config.instanceType !== canonical.instanceType ||
+        config.supabaseProjectRef !== canonical.supabaseProjectRef
+      ) {
+        invalid.push("instance.binding");
+      }
+      if (isPlaceholder(config.supabaseUrl)) {
+        invalid.push("instance.supabaseUrl");
+      } else {
+        try {
+          const url = new URL(config.supabaseUrl);
+          if (
+            url.origin !== `https://${config.supabaseProjectRef}.supabase.co` ||
+            url.pathname !== "/" ||
+            url.search ||
+            url.hash ||
+            url.username ||
+            url.password
+          ) {
+            invalid.push("instance.supabaseUrl");
+          }
+        } catch {
+          invalid.push("instance.supabaseUrl");
+        }
+      }
+      if (
+        isPlaceholder(config.supabasePublishableKey) ||
+        !/^sb_publishable_[A-Za-z0-9_-]+$/.test(config.supabasePublishableKey ?? "")
+      ) {
+        invalid.push("instance.supabasePublishableKey");
+      }
+    } catch {
+      // Resolver/validation exceptions must not expose configuration or keys.
+      invalid.push("instance.binding");
+    }
 
-    const missing: string[] = [];
-    if (isPlaceholder(url)) missing.push("VITE_SUPABASE_URL");
-    if (isPlaceholder(key)) missing.push("VITE_SUPABASE_PUBLISHABLE_KEY");
-
-    if (missing.length > 0) {
+    if (invalid.length > 0) {
       return {
         status: "failed",
         error: {
           code: "ENV_INVALID",
           stage: "environment",
-          message: `Missing or placeholder environment: ${missing.join(", ")}`,
+          message: `Invalid instance configuration: ${invalid.join(", ")}`,
           recoverable: true,
-          evidence: { missing },
+          evidence: { invalid },
         },
-        evidence: { missing },
+        evidence: { invalid },
       };
     }
 
     return {
       status: "ok",
-      notes: ["environment:required_keys_present"],
-      evidence: {
-        hasSupabaseUrl: true,
-        hasSupabaseKey: true,
-      },
+      notes: ["environment:instance_binding_valid"],
+      evidence: { hasSupabaseUrl: true, hasSupabaseKey: true },
     };
   },
 };

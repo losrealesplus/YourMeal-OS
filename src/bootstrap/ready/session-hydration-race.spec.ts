@@ -1,14 +1,26 @@
-import { describe, expect, it, beforeEach, afterEach } from "vitest";
-import { resetBootstrapOrchestrator, getBootstrapOrchestrator } from "@/bootstrap/pipeline/BootstrapOrchestrator";
+import { describe, expect, it, beforeEach, afterEach, vi } from "vitest";
+import {
+  resetBootstrapOrchestrator,
+  getBootstrapOrchestrator,
+} from "@/bootstrap/pipeline/BootstrapOrchestrator";
 import {
   resetBootstrapIdentitySnapshot,
   publishBootstrapIdentitySnapshot,
   getBootstrapIdentitySnapshot,
 } from "@/bootstrap/pipeline/BootstrapIdentityStore";
-import { ensureApplicationReady, ApplicationReadyFailedError } from "@/bootstrap/ready/ensureApplicationReady";
+import {
+  ensureApplicationReady,
+  ApplicationReadyFailedError,
+} from "@/bootstrap/ready/ensureApplicationReady";
 import { deriveApplicationReadySnapshot } from "@/bootstrap/ready/deriveApplicationReady";
 import { homePathForRoles } from "@/lib/home-path";
 import { resolveInstanceRuntimeConfig } from "@/lib/instance-runtime-boundary";
+
+// Keep the real EnvironmentStage and orchestrator; isolate external services.
+vi.mock("@/auth/client", () => ({ getAuthClient: () => ({ auth: {} }) }));
+vi.mock("@/auth/session", () => ({
+  getSession: async () => ({ data: { session: null }, error: null }),
+}));
 
 describe("Core Auth Session Bootstrap & Hydration Race Hardening", () => {
   beforeEach(() => {
@@ -136,9 +148,9 @@ describe("Core Auth Session Bootstrap & Hydration Race Hardening", () => {
   });
 
   it("4. Expired or unauthenticated session throws ApplicationReadyFailedError on timeout for clean redirect to /auth", async () => {
-    await expect(
-      ensureApplicationReady({ timeoutMs: 100 }),
-    ).rejects.toThrowError(ApplicationReadyFailedError);
+    await expect(ensureApplicationReady({ timeoutMs: 100 })).rejects.toThrowError(
+      ApplicationReadyFailedError,
+    );
   });
 
   it("5. Malformed/incomplete session without user ID does not produce READY state", () => {
