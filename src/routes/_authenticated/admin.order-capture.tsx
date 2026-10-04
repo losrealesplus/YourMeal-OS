@@ -1,3 +1,4 @@
+import { DishAllergenDeclaration } from "@/components/operations/dish-allergen-declaration";
 /**
  * ORDER EXPERIENCE · Capture · Search · Edit · Templates · Incident (001–005)
  * ORDER EXPERIENCE 001 · Zero Friction Order Capture · TTO < 45 s
@@ -1415,6 +1416,7 @@ export function ActiveWeeklyMenuPreview({
                                         {priceFmt}
                                       </span>
                                     ) : null}
+                                    <DishAllergenDeclaration allergens={dish.allergens} />
                                     {dish.allergens && dish.allergens.length > 0 ? (
                                       <span>· {dish.allergens.join(", ")}</span>
                                     ) : null}

@@ -1,3 +1,4 @@
+import { DishAllergenDeclaration } from "@/components/operations/dish-allergen-declaration";
 import type { ReactNode } from "react";
 import type { MockDish } from "@/lib/mock-catalog";
 import { DishThumb } from "./dish-thumb";
@@ -45,6 +46,7 @@ export function MenuDishPost({
         </p>
         <p className="text-xs text-muted-foreground tracking-wide">{macrosLabel}</p>
       </div>
+      <DishAllergenDeclaration allergens={dish.allergens} showDeclared />
       <div className="pt-1">{cta}</div>
     </article>
   );

@@ -1,3 +1,4 @@
+import { DishAllergenDeclaration } from "@/components/operations/dish-allergen-declaration";
 /**
  * ADMIN · Producción · Etiquetas
  * Capability: kitchen.operate  ·  Core Object: ProductionLabel (portion-level)
@@ -139,6 +140,7 @@ function LabelsPage() {
                 </div>
                 <p className="text-sm font-semibold leading-tight">{l.dishName}</p>
                 <p className="leading-tight text-muted-foreground">{l.customerName}</p>
+                <DishAllergenDeclaration allergens={l.allergens} />
                 {l.allergens.length > 0 ? (
                   <div className="flex flex-wrap gap-1">
                     {l.allergens.map((a) => (

@@ -1,3 +1,4 @@
+import { DishAllergenDeclaration } from "@/components/operations/dish-allergen-declaration";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -1161,6 +1162,10 @@ export function UniversalOrderIntakeDrawer({
                                       <p className="text-sm font-medium leading-none truncate">
                                         {dish.name}
                                       </p>
+                                      <DishAllergenDeclaration
+                                        allergens={dish.allergens}
+                                        showDeclared
+                                      />
                                       {dish.price !== null && dish.price > 0 ? (
                                         <p className="text-xs text-muted-foreground font-mono">
                                           {dish.price.toFixed(2)} € / ración

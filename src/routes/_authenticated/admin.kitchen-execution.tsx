@@ -1,3 +1,4 @@
+import { DishAllergenDeclaration } from "@/components/operations/dish-allergen-declaration";
 /**
  * EP-002B.2 — Kitchen Execution workspace.
  * Same data as Hoja de Producción; lot-level status mutations via KitchenExecutionService.
@@ -262,6 +263,7 @@ function KitchenExecutionPage() {
                         </>
                       ) : null}
                     </p>
+                    <DishAllergenDeclaration allergens={dish.allergens} />
                     {dish.allergens.length > 0 ? (
                       <div className="flex flex-wrap gap-1.5">
                         {dish.allergens.map((a) => (

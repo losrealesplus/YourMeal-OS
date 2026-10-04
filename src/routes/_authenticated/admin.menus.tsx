@@ -1,3 +1,4 @@
+import { DishAllergenDeclaration } from "@/components/operations/dish-allergen-declaration";
 /**
  * YOURMEAL OS — A3 CANONICAL WEEKLY MENU WORKSPACE
  * Route: /admin/menus
@@ -600,6 +601,9 @@ function AdminMenusPage() {
                               {slot.dishes.kcal} kcal
                             </p>
                           ) : null}
+                          {slot.dishes ? (
+                            <DishAllergenDeclaration allergens={slot.dishes.allergens} />
+                          ) : null}
                           {slot.dishes?.allergens && slot.dishes.allergens.length > 0 ? (
                             <p
                               className="text-[9px] text-muted-foreground/90 font-medium leading-tight mt-1 line-clamp-2"
@@ -718,6 +722,7 @@ function AdminMenusPage() {
                           }).format(dish.price)}
                         </span>
                       ) : null}
+                      <DishAllergenDeclaration allergens={dish.allergens} />
                       {dish.allergens && dish.allergens.length > 0 ? (
                         <span
                           className="line-clamp-1 max-w-[280px]"
