@@ -30,7 +30,7 @@ export interface OperationalLineIdentity {
   operationalDate: string; // YYYY-MM-DD
   orderId: string;
   orderItemId: string;
-  dishId: string;
+  dishId: string | null;
   itemIdentity?: ItemIdentity;
   itemKind?: "dish" | "custom";
   portionIndex: number; // 0..N-1 for multi-qty line items
@@ -105,7 +105,11 @@ export interface ProductionPortionVariant {
 }
 
 export interface KitchenDishConsolidatedBlock {
-  dishId: string;
+  itemIdentity?: ItemIdentity;
+  itemKind?: "dish" | "custom";
+  allergenState?: AllergenSnapshotState;
+  recipeState?: "CATALOGUE_LINKED" | "NOT_AVAILABLE";
+  dishId: string | null;
   dishName: string;
   totalQty: number;
   catalogAllergens: string[];
@@ -143,7 +147,10 @@ export interface KitchenProductionSheetModel {
 }
 
 export interface PackingDishSummaryItem {
-  dishId: string;
+  itemIdentity?: ItemIdentity;
+  itemKind?: "dish" | "custom";
+  allergenState?: AllergenSnapshotState;
+  dishId: string | null;
   dishName: string;
   qty: number;
   safetyTag?: string | null; // e.g., "🔴 SIN GLUTEN", "🟡 SIN CEBOLLA"
@@ -210,7 +217,7 @@ export interface PackingSheetModel {
 }
 
 export interface VersionMetadata {
-  fingerprintSchemaVersion: "1";
+  fingerprintSchemaVersion: "1" | "2";
   versionId: string;
   targetDate: string;
   generatedAt: string; // ISO Timestamp UTC

@@ -10,21 +10,10 @@ export type ProductionScope = {
 };
 
 export type ProductionStatus =
-  | "draft"
-  | "planned"
-  | "ready_for_kitchen"
-  | "in_execution"
-  | "completed"
-  | "closed"
-  | "cancelled";
+  "draft" | "planned" | "ready_for_kitchen" | "in_execution" | "completed" | "closed" | "cancelled";
 
 export type ProductionBatchStatus =
-  | "queued"
-  | "released"
-  | "in_progress"
-  | "done"
-  | "blocked"
-  | "cancelled";
+  "queued" | "released" | "in_progress" | "done" | "blocked" | "cancelled";
 
 export type ProductionErrorCode =
   | "NOT_FOUND"
@@ -72,7 +61,11 @@ export type ProductionSchedule = {
 export type ProductionBatch = {
   id: string;
   scope: ProductionScope;
-  dishId: string;
+  dishId: string | null;
+  itemIdentity?: `dish:${string}` | `custom:${string}`;
+  kind?: "dish" | "custom";
+  allergenState?: "HISTORICAL_UNAVAILABLE" | "UNKNOWN" | "DECLARED";
+  recipeState?: "CATALOGUE_LINKED" | "NOT_AVAILABLE";
   dishName: string;
   portionCount: number;
   status: ProductionBatchStatus;

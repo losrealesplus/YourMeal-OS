@@ -1,3 +1,8 @@
+import {
+  readOrderItem,
+  type OrderItemReadModel,
+  type OrderItemReadRow,
+} from "../domain/order-item-read-model";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchCatalogDishesByIds } from "@/modules/dish-library/application/dish-catalog-queries";
 import type { CatalogDish } from "@/modules/dish-library/application/dish-catalog-mapper";
@@ -34,7 +39,7 @@ async function loadAddressMap(
   byId: Map<string, OrderDeliveryAddressView>;
   defaultAddress: OrderDeliveryAddressView | null;
 }> {
-  const db = supabase as any;
+  const db = supabase;
   const byId = new Map<string, OrderDeliveryAddressView>();
 
   if (addressIds.length > 0) {
@@ -73,7 +78,7 @@ async function loadCompanyNames(
 ): Promise<Map<string, string>> {
   const map = new Map<string, string>();
   if (companyIds.length === 0) return map;
-  const db = supabase as any;
+  const db = supabase;
   const { data, error } = await db
     .from("companies")
     .select("id, name")
@@ -94,7 +99,9 @@ export async function fetchOrderSummary(
   const result = await createOrderRepository(supabase, tenantId).findByIdWithItems(orderId);
   if (!result) return null;
 
-  const uniqueDishIds = [...new Set(result.items.map((i) => i.dish_id))];
+  const uniqueDishIds = [
+    ...new Set(result.items.map((i) => i.dish_id).filter((id): id is string => id !== null)),
+  ];
   const dishesById: Map<string, CatalogDish> = await fetchCatalogDishesByIds(
     tenantId,
     uniqueDishIds,
@@ -111,9 +118,8 @@ export async function fetchOrderSummary(
     orderAny.delivery_address_id ? [orderAny.delivery_address_id] : [],
   );
   const address =
-    (orderAny.delivery_address_id
-      ? byId.get(orderAny.delivery_address_id)
-      : null) ?? defaultAddress;
+    (orderAny.delivery_address_id ? byId.get(orderAny.delivery_address_id) : null) ??
+    defaultAddress;
 
   let companyName: string | null = null;
   if (orderAny.company_id) {
@@ -139,6 +145,8 @@ export type CustomerOrderListItem = {
   /** Delivery day (earliest item day) when known. */
   deliveryDate: string;
   dishNames: string[];
+  /** Typed snapshot reads; custom homonyms retain their source identities. */
+  lines: OrderItemReadModel[];
   address: OrderDeliveryAddressView | null;
   companyName: string | null;
 };
@@ -154,11 +162,11 @@ export async function fetchCustomerOrders(
   const customerId = await repo.findCustomerIdForUser(userId);
   if (!customerId) return [];
 
-  const db = supabase as any;
+  const db = supabase;
   const { data, error } = await db
     .from("orders")
     .select(
-      "id, week_start, status, total, created_at, delivery_address_id, company_id, order_items(id, dish_id, day_date, qty)",
+      "id, week_start, status, total, created_at, delivery_address_id, company_id, order_items(*)",
     )
     .eq("tenant_id", tenantId)
     .eq("customer_id", customerId)
@@ -174,28 +182,30 @@ export async function fetchCustomerOrders(
     created_at: string;
     delivery_address_id?: string | null;
     company_id?: string | null;
-    order_items?: Array<{
-      id: string;
-      dish_id: string;
-      day_date: string;
-      qty: number;
-    }> | null;
+    order_items?: Array<
+      OrderItemReadRow & {
+        deleted_at?: string | null;
+        day_date: string;
+        qty: number;
+      }
+    > | null;
   };
 
   const rows = (data ?? []) as ListRow[];
   const allDishIds = [
     ...new Set(
-      rows.flatMap((r) => (r.order_items ?? []).map((i) => i.dish_id)),
+      rows.flatMap((r) =>
+        (r.order_items ?? [])
+          .filter((i) => !i.deleted_at)
+          .map((i) => i.dish_id)
+          .filter((id): id is string => id !== null),
+      ),
     ),
   ];
   const dishesById = await fetchCatalogDishesByIds(tenantId, allDishIds);
 
   const addressIds = [
-    ...new Set(
-      rows
-        .map((r) => r.delivery_address_id)
-        .filter((id): id is string => Boolean(id)),
-    ),
+    ...new Set(rows.map((r) => r.delivery_address_id).filter((id): id is string => Boolean(id))),
   ];
   const { byId: addressById, defaultAddress } = await loadAddressMap(
     tenantId,
@@ -204,26 +214,28 @@ export async function fetchCustomerOrders(
   );
 
   const companyIds = [
-    ...new Set(
-      rows.map((r) => r.company_id).filter((id): id is string => Boolean(id)),
-    ),
+    ...new Set(rows.map((r) => r.company_id).filter((id): id is string => Boolean(id))),
   ];
   const companyNames = await loadCompanyNames(tenantId, companyIds);
 
   return rows.map((row) => {
-    const items = row.order_items ?? [];
-    const days = items.map((i) => i.day_date).filter(Boolean).sort();
-    const dishNames = [
-      ...new Set(
-        items
-          .map((i) => dishesById.get(i.dish_id)?.name)
-          .filter((n): n is string => Boolean(n)),
-      ),
-    ];
+    const items = (row.order_items ?? []).filter((i) => !i.deleted_at);
+    const days = items
+      .map((i) => i.day_date)
+      .filter(Boolean)
+      .sort();
+    const lines = items.map((item) =>
+      readOrderItem(item, item.dish_id === null ? null : dishesById.get(item.dish_id)),
+    );
+    const namesByIdentity = new Map(
+      lines.map((line) => [
+        line.identity,
+        line.name ?? (line.kind === "custom" ? "PERSONALIZADO" : "Plato"),
+      ]),
+    );
+    const dishNames = [...namesByIdentity.values()];
     const address =
-      (row.delivery_address_id
-        ? addressById.get(row.delivery_address_id)
-        : null) ?? defaultAddress;
+      (row.delivery_address_id ? addressById.get(row.delivery_address_id) : null) ?? defaultAddress;
 
     return {
       id: row.id,
@@ -235,10 +247,9 @@ export async function fetchCustomerOrders(
       createdAt: row.created_at,
       deliveryDate: days[0] ?? row.week_start,
       dishNames,
+      lines,
       address,
-      companyName: row.company_id
-        ? (companyNames.get(row.company_id) ?? null)
-        : null,
+      companyName: row.company_id ? (companyNames.get(row.company_id) ?? null) : null,
     };
   });
 }

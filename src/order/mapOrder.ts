@@ -1,3 +1,4 @@
+import { readOrderItem } from "@/modules/orders/domain/order-item-read-model";
 /**
  * INTERNAL — map operational list items → Order Capability contracts.
  */
@@ -58,14 +59,22 @@ export function mapListItemToContext(
   permissions: OrderCapabilityBits,
 ): OrderContext {
   const summary = mapListItemToSummary(row);
-  const lines = row.items.map((i) => ({
-    id: i.id,
-    dayDate: i.dayDate,
-    dishId: i.dishId,
-    dishName: i.dishName ?? "Plato",
-    quantity: i.qty,
-    modifications: i.notes ? [i.notes] : undefined,
-  }));
+  const lines = row.items.map((i) => {
+    const line = i.line ?? readOrderItem({ id: i.id, dish_id: i.dishId }, { name: i.dishName });
+    return {
+      id: i.id,
+      dayDate: i.dayDate,
+      dishId: i.dishId,
+      dishName: line.name ?? i.dishName ?? (i.dishId === null ? "PERSONALIZADO" : "Plato"),
+      itemIdentity: line.identity,
+      itemKind: line.kind,
+      allergenState: line.allergenState,
+      allergens: line.allergensSnapshot,
+      metadataSource: line.metadataSource,
+      quantity: i.qty,
+      modifications: i.notes ? [i.notes] : undefined,
+    };
+  });
 
   return {
     details: {

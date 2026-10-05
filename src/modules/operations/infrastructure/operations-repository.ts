@@ -1,6 +1,5 @@
 import {
   readOrderItem,
-  requireDishReader,
   type OrderItemReadModel,
 } from "@/modules/orders/domain/order-item-read-model";
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -51,7 +50,7 @@ export type OperationalOrderListItem = {
   deliveryDates: string[];
   items: Array<{
     id: string;
-    dishId: string;
+    dishId: string | null;
     dishName: string | null;
     dayDate: string;
     qty: number;
@@ -120,9 +119,7 @@ export function mapOperationalOrderRow(row: Record<string, any>): OperationalOrd
       : null,
     deliveryDates,
     items: items.map((it) => {
-      const line = requireDishReader(
-        readOrderItem({ ...it, id: it.id, dish_id: it.dish_id }, it.dishes),
-      );
+      const line = readOrderItem({ ...it, id: it.id, dish_id: it.dish_id }, it.dishes);
       return {
         id: String(it.id),
         dishId: line.dishId,

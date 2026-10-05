@@ -5,12 +5,7 @@
  * LAW 006: answers exactly one question — ¿Qué trabajo debe ejecutarse ahora?
  */
 
-export type ExecutionStatus =
-  | "READY"
-  | "IN_PROGRESS"
-  | "PAUSED"
-  | "BLOCKED"
-  | "COMPLETED";
+export type ExecutionStatus = "READY" | "IN_PROGRESS" | "PAUSED" | "BLOCKED" | "COMPLETED";
 
 export type KitchenErrorCode =
   | "NOT_FOUND"
@@ -36,7 +31,11 @@ export type ExecutionUnit = {
   /** Originating Production batch id (planning artifact). */
   productionBatchId: string;
   dayDate: string;
-  dishId: string;
+  dishId: string | null;
+  kind?: "dish" | "custom";
+  itemIdentity?: `dish:${string}` | `custom:${string}`;
+  allergenState?: "HISTORICAL_UNAVAILABLE" | "UNKNOWN" | "DECLARED";
+  recipeState?: "CATALOGUE_LINKED" | "NOT_AVAILABLE";
   label: string;
   portionCount: number;
   status: ExecutionStatus;

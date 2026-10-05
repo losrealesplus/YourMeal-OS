@@ -2,6 +2,7 @@
  * EP-002B.2 — KitchenExecutionService
  * Mutates dish×day production lot status. Board reads = ProductionReportService.
  */
+import type { Database } from "@/integrations/supabase/types";
 import type { ServiceContext } from "@/services/types";
 import { DomainError } from "@/domain/errors";
 import { requireCapability } from "@/permissions";
@@ -11,15 +12,13 @@ import {
   nextKitchenBatchStatuses,
   type KitchenBatchStatus,
 } from "../domain/kitchen-batch-status";
-import {
-  ProductionReportService,
-  type ProductionReportQuery,
-} from "./production-report-service";
+import { ProductionReportService, type ProductionReportQuery } from "./production-report-service";
 import type { ProductionReportModel } from "../domain/production-report";
 
 export type KitchenBatchTransitionCommand = {
   deliveryDate: string;
   dishId: string;
+  itemKind?: "dish" | "custom";
   toStatus: KitchenBatchStatus;
 };
 
@@ -38,17 +37,17 @@ export const KitchenExecutionService = {
   ): Promise<KitchenBatchStatus> {
     requireCapability(ctx.roles, "kitchen.operate");
 
+    if (command.itemKind === "custom" || command.dishId?.startsWith("custom:")) {
+      throw new DomainError("UNIMPLEMENTED", "Custom batch writes are not enabled");
+    }
     if (!command.deliveryDate || !command.dishId) {
-      throw new DomainError(
-        "INVALID_STATE",
-        "deliveryDate and dishId are required",
-      );
+      throw new DomainError("INVALID_STATE", "deliveryDate and dishId are required");
     }
     if (!isKitchenBatchStatus(command.toStatus)) {
       throw new DomainError("INVALID_STATE", `Invalid status: ${command.toStatus}`);
     }
 
-    const db = ctx.supabase as any;
+    const db = ctx.supabase;
     const { data: existing, error: findErr } = await db
       .from("kitchen_production_batches")
       .select("id, status")
@@ -58,10 +57,8 @@ export const KitchenExecutionService = {
       .maybeSingle();
     if (findErr) throw findErr;
 
-    const fromStatus: KitchenBatchStatus = isKitchenBatchStatus(
-      existing?.status ?? "",
-    )
-      ? (existing.status as KitchenBatchStatus)
+    const fromStatus: KitchenBatchStatus = isKitchenBatchStatus(existing?.status ?? "")
+      ? (existing!.status as KitchenBatchStatus)
       : "pending";
 
     const allowed = nextKitchenBatchStatuses(fromStatus);
@@ -72,7 +69,7 @@ export const KitchenExecutionService = {
       );
     }
 
-    const patch: Record<string, unknown> = {
+    const patch: Database["public"]["Tables"]["kitchen_production_batches"]["Update"] = {
       status: command.toStatus,
       updated_by: ctx.userId,
     };

@@ -268,8 +268,14 @@ describe("CR-OPS-07: Operational Engine Specification", () => {
         dishMetaMap: mockDishMeta,
       });
 
-      const baseVersion = await generateVersionMetadata({ targetDate: "2026-10-07", lines: baseLines });
-      const liveVersion = await generateVersionMetadata({ targetDate: "2026-10-07", lines: liveLines });
+      const baseVersion = await generateVersionMetadata({
+        targetDate: "2026-10-07",
+        lines: baseLines,
+      });
+      const liveVersion = await generateVersionMetadata({
+        targetDate: "2026-10-07",
+        lines: liveLines,
+      });
 
       const drift = detectDrift({
         baseVersion,
@@ -287,7 +293,7 @@ describe("CR-OPS-07: Operational Engine Specification", () => {
   });
 
   describe("5. OperationalSheetExporter", () => {
-    it("generates a canonical 14-column unmerged matrix and valid CSV output", () => {
+    it("generates a canonical 17-column unmerged matrix and valid CSV output", () => {
       const { lines } = normalizeOperationalOrders({
         orders: mockOrders,
         targetDate: "2026-10-07",
@@ -297,7 +303,7 @@ describe("CR-OPS-07: Operational Engine Specification", () => {
 
       const matrix = buildFlatAnalyticMatrix(lines);
       expect(matrix).toHaveLength(3);
-      expect(Object.keys(matrix[0])).toHaveLength(14);
+      expect(Object.keys(matrix[0])).toHaveLength(17);
 
       const csv = exportToCSV(matrix);
       expect(csv).toContain(CANONICAL_EXCEL_HEADERS.join(","));

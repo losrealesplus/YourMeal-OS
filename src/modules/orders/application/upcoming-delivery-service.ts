@@ -17,7 +17,12 @@ type OrderListRow = {
   status: string;
   total: number | string;
   delivery_address_id?: string | null;
-  order_items?: Array<{ id: string; day_date: string; qty: number }> | null;
+  order_items?: Array<{
+    id: string;
+    day_date: string;
+    qty: number;
+    deleted_at?: string | null;
+  }> | null;
 };
 
 function formatAddressLine(row: {
@@ -38,19 +43,16 @@ export const UpcomingDeliveryService = {
    * Resolve the customer's single upcoming delivery (or none).
    * Never invents windows or addresses.
    */
-  async getForUser(
-    tenantId: string,
-    userId: string,
-  ): Promise<UpcomingDeliveryResult> {
+  async getForUser(tenantId: string, userId: string): Promise<UpcomingDeliveryResult> {
     const repo = createOrderRepository(supabase, tenantId);
     const customerId = await repo.findCustomerIdForUser(userId);
     if (!customerId) return { kind: "none" };
 
-    const db = supabase as any;
+    const db = supabase;
     const { data: orders, error } = await db
       .from("orders")
       .select(
-        "id, week_start, status, total, delivery_address_id, order_items(id, day_date, qty)",
+        "id, week_start, status, total, delivery_address_id, order_items(id, day_date, qty, deleted_at)",
       )
       .eq("tenant_id", tenantId)
       .eq("customer_id", customerId)
@@ -62,11 +64,7 @@ export const UpcomingDeliveryService = {
     if (rows.length === 0) return { kind: "none" };
 
     const addressIds = [
-      ...new Set(
-        rows
-          .map((r) => r.delivery_address_id)
-          .filter((id): id is string => Boolean(id)),
-      ),
+      ...new Set(rows.map((r) => r.delivery_address_id).filter((id): id is string => Boolean(id))),
     ];
 
     const addressById = new Map<string, UpcomingDeliveryAddress>();
@@ -109,7 +107,7 @@ export const UpcomingDeliveryService = {
     if (def) defaultAddress = formatAddressLine(def);
 
     const candidates: UpcomingCandidate[] = rows.map((row) => {
-      const items = row.order_items ?? [];
+      const items = (row.order_items ?? []).filter((item) => !item.deleted_at);
       const days = items
         .map((i) => i.day_date)
         .filter(Boolean)
@@ -117,9 +115,8 @@ export const UpcomingDeliveryService = {
       const deliveryDate = days[0] ?? row.week_start;
       const itemCount = items.reduce((s, i) => s + Number(i.qty || 1), 0);
       const address =
-        (row.delivery_address_id
-          ? addressById.get(row.delivery_address_id)
-          : null) ?? defaultAddress;
+        (row.delivery_address_id ? addressById.get(row.delivery_address_id) : null) ??
+        defaultAddress;
 
       return {
         id: row.id,

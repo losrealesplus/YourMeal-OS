@@ -1,3 +1,4 @@
+import { assertLegacyOrderWriteCompatible } from "../domain/legacy-order-write-guard";
 import { AuditService } from "@/services/audit-service";
 import { FeatureFlagService } from "@/services/feature-flag-service";
 import type { ServiceContext } from "@/services/types";
@@ -314,7 +315,11 @@ export const OrderService = {
       });
 
       let effectiveDeliveryAddressId: string | null = command.deliveryAddressId ?? null;
-      if (!effectiveDeliveryAddressId && demand.demandChannel === "individual" && typeof ctx.supabase?.from === "function") {
+      if (
+        !effectiveDeliveryAddressId &&
+        demand.demandChannel === "individual" &&
+        typeof ctx.supabase?.from === "function"
+      ) {
         const { data: defaultAddr } = await ctx.supabase
           .from("customer_addresses")
           .select("id")
@@ -438,6 +443,8 @@ export const OrderService = {
         throw new DomainError("PERMISSION_DENIED", "Cannot confirm an order you do not own");
       }
     }
+
+    assertLegacyOrderWriteCompatible(current.order, current.items);
 
     // Retrieve draft commercial context from audit trail if available
     let draftContext:

@@ -1,3 +1,4 @@
+import { operationalItemIdentity } from "@/modules/orders/domain/order-item-read-model";
 /**
  * CR-OPS-07: Version Manager & 2-Tier Drift Detector
  * Computes deterministic planning fingerprints using 11-tuple canonical sorting,
@@ -12,21 +13,23 @@ import type {
   VersionMetadata,
 } from "./operational-engine-types";
 
-export const FINGERPRINT_SCHEMA_VERSION = "1" as const;
+export const FINGERPRINT_SCHEMA_VERSION = "2" as const;
 
 /**
  * Builds a deterministic identity key for map indexing.
  */
 export function buildIdentityKey(id: OperationalLineIdentity): string {
-  return `${id.operationalDate}::${id.orderId}::${id.orderItemId}::${id.dishId}::${id.portionIndex}`;
+  return `${id.operationalDate}::${id.orderId}::${id.orderItemId}::${operationalItemIdentity(id)}::${id.portionIndex}`;
 }
 
 /**
  * Sorts normalized lines deterministically by canonical 11-tuple before serialization.
  */
-export function sortLinesCanonically(lines: NormalizedOperationalLine[]): NormalizedOperationalLine[] {
+export function sortLinesCanonically(
+  lines: NormalizedOperationalLine[],
+): NormalizedOperationalLine[] {
   return [...lines].sort((a, b) => {
-    const kA = [
+    const kA = JSON.stringify([
       a.identity.operationalDate,
       a.municipality,
       a.demandChannel,
@@ -36,11 +39,11 @@ export function sortLinesCanonically(lines: NormalizedOperationalLine[]): Normal
       a.customerId,
       a.identity.orderId,
       a.identity.orderItemId,
-      a.identity.dishId,
+      operationalItemIdentity(a.identity),
       String(a.identity.portionIndex).padStart(4, "0"),
-    ].join("|");
+    ]);
 
-    const kB = [
+    const kB = JSON.stringify([
       b.identity.operationalDate,
       b.municipality,
       b.demandChannel,
@@ -50,9 +53,9 @@ export function sortLinesCanonically(lines: NormalizedOperationalLine[]): Normal
       b.customerId,
       b.identity.orderId,
       b.identity.orderItemId,
-      b.identity.dishId,
+      operationalItemIdentity(b.identity),
       String(b.identity.portionIndex).padStart(4, "0"),
-    ].join("|");
+    ]);
 
     return kA.localeCompare(kB);
   });
@@ -66,13 +69,13 @@ export function canonicalSerialize(lines: NormalizedOperationalLine[]): string {
   const buffer: string[] = [`schema=${FINGERPRINT_SCHEMA_VERSION}`];
 
   for (const l of sorted) {
-    const algs = [...l.customerAllergens].sort().join(",");
-    const mods = [...l.modifications].sort().join(",");
-    const lineStr = [
+    const algs = [...l.customerAllergens].sort();
+    const mods = [...l.modifications].sort();
+    const lineStr = JSON.stringify([
       l.identity.operationalDate,
       l.identity.orderId,
       l.identity.orderItemId,
-      l.identity.dishId,
+      operationalItemIdentity(l.identity),
       l.identity.portionIndex,
       l.customerId,
       l.demandChannel,
@@ -83,7 +86,9 @@ export function canonicalSerialize(lines: NormalizedOperationalLine[]): string {
       algs,
       mods,
       l.itemNotes ?? "",
-    ].join("|");
+      l.allergenSnapshotState ?? "HISTORICAL_UNAVAILABLE",
+      l.dishAllergens.slice().sort(),
+    ]);
     buffer.push(lineStr);
   }
 
@@ -217,15 +222,42 @@ export function detectDrift(params: {
       const fieldChanges: OperationalLineDelta["fieldChanges"] = [];
 
       if (baseLine.dishName !== liveLine.dishName) {
-        fieldChanges.push({ field: "dishName", before: baseLine.dishName, after: liveLine.dishName });
+        fieldChanges.push({
+          field: "dishName",
+          before: baseLine.dishName,
+          after: liveLine.dishName,
+        });
+      }
+      if (
+        (baseLine.allergenSnapshotState ?? "HISTORICAL_UNAVAILABLE") !==
+          (liveLine.allergenSnapshotState ?? "HISTORICAL_UNAVAILABLE") ||
+        [...baseLine.dishAllergens].sort().join(",") !==
+          [...liveLine.dishAllergens].sort().join(",")
+      ) {
+        fieldChanges.push({
+          field: "allergenSnapshotState",
+          before: baseLine.allergenSnapshotState ?? "HISTORICAL_UNAVAILABLE",
+          after: liveLine.allergenSnapshotState ?? "HISTORICAL_UNAVAILABLE",
+        });
+        alteredDietarySafetyCount++;
       }
       if (baseLine.customerName !== liveLine.customerName) {
-        fieldChanges.push({ field: "customerName", before: baseLine.customerName, after: liveLine.customerName });
+        fieldChanges.push({
+          field: "customerName",
+          before: baseLine.customerName,
+          after: liveLine.customerName,
+        });
       }
       if (baseLine.modifications.join(",") !== liveLine.modifications.join(",")) {
-        fieldChanges.push({ field: "modifications", before: baseLine.modifications, after: liveLine.modifications });
+        fieldChanges.push({
+          field: "modifications",
+          before: baseLine.modifications,
+          after: liveLine.modifications,
+        });
       }
-      if (baseLine.criticalSafetyAllergens.join(",") !== liveLine.criticalSafetyAllergens.join(",")) {
+      if (
+        baseLine.criticalSafetyAllergens.join(",") !== liveLine.criticalSafetyAllergens.join(",")
+      ) {
         fieldChanges.push({
           field: "criticalSafetyAllergens",
           before: baseLine.criticalSafetyAllergens,

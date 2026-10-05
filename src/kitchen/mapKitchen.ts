@@ -22,18 +22,14 @@ import type {
 } from "./KitchenContext";
 import type { KitchenRuntimeIdentity } from "./kitchenServiceContext";
 
-export function parseUnitId(
-  unitId: string,
-): { dayDate: string; dishId: string } | null {
+export function parseUnitId(unitId: string): { dayDate: string; dishId: string } | null {
   // Production batch ids: batch:{dayDate}:{dishId}
   const m = /^batch:(\d{4}-\d{2}-\d{2}):(.+)$/.exec(unitId);
-  if (!m) return null;
+  if (!m || m[2].startsWith("custom:")) return null;
   return { dayDate: m[1], dishId: m[2] };
 }
 
-export function mapProductionStatusToExecution(
-  status: ProductionBatchStatus,
-): ExecutionStatus {
+export function mapProductionStatusToExecution(status: ProductionBatchStatus): ExecutionStatus {
   switch (status) {
     case "queued":
       return "READY";
@@ -58,19 +54,23 @@ export function mapBatchToExecutionUnit(batch: ProductionBatch): ExecutionUnit {
     productionBatchId: batch.id,
     dayDate: batch.scope.dayDate,
     dishId: batch.dishId,
+    kind: batch.kind,
+    itemIdentity: batch.itemIdentity,
+    allergenState: batch.allergenState,
+    recipeState: batch.recipeState,
     label: batch.dishName,
     portionCount: batch.portionCount,
-    status: mapProductionStatusToExecution(batch.status),
+    status:
+      batch.kind === "custom" || batch.dishId === null
+        ? "BLOCKED"
+        : mapProductionStatusToExecution(batch.status),
     workstationId: batch.scope.station ?? null,
     assignedOperatorId: null,
     blockedReason: batch.readiness.blockedReason ?? null,
   };
 }
 
-export function mapBatchesToQueue(
-  dayDate: string,
-  batches: ProductionBatch[],
-): ExecutionQueue {
+export function mapBatchesToQueue(dayDate: string, batches: ProductionBatch[]): ExecutionQueue {
   return {
     dayDate,
     units: batches.map(mapBatchToExecutionUnit),
@@ -79,13 +79,15 @@ export function mapBatchesToQueue(
 
 export function progressForUnit(unit: ExecutionUnit): ExecutionProgress {
   const percent =
-    unit.status === "COMPLETED"
-      ? 100
-      : unit.status === "IN_PROGRESS"
-        ? 50
-        : unit.status === "PAUSED" || unit.status === "BLOCKED"
-          ? 25
-          : 0;
+    unit.kind === "custom" || unit.dishId === null
+      ? 0
+      : unit.status === "COMPLETED"
+        ? 100
+        : unit.status === "IN_PROGRESS"
+          ? 50
+          : unit.status === "PAUSED" || unit.status === "BLOCKED"
+            ? 25
+            : 0;
   return {
     unitId: unit.id,
     status: unit.status,
@@ -133,9 +135,7 @@ export function mapProductionError(err: ProductionError): KitchenError {
   };
 }
 
-function productionCodeToKitchen(
-  code: ProductionError["code"],
-): KitchenErrorCode {
+function productionCodeToKitchen(code: ProductionError["code"]): KitchenErrorCode {
   switch (code) {
     case "NOT_FOUND":
       return "NOT_FOUND";
@@ -203,9 +203,7 @@ export function okResult(context: KitchenContext): KitchenResult {
   return { ok: true, context, errors: [] };
 }
 
-export function requireSession(
-  identity: KitchenRuntimeIdentity,
-): KitchenError | null {
+export function requireSession(identity: KitchenRuntimeIdentity): KitchenError | null {
   if (!identity.session.present || !identity.session.userId) {
     return {
       code: "PERMISSION_DENIED",

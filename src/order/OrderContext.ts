@@ -58,10 +58,20 @@ export type OrderError = {
   evidence?: Record<string, unknown>;
 };
 
+import type {
+  AllergenSnapshotState,
+  ItemIdentity,
+} from "@/modules/orders/domain/order-item-read-model";
+
 export type OrderLineSummary = {
+  itemIdentity?: ItemIdentity;
+  itemKind?: "dish" | "custom";
+  allergenState?: AllergenSnapshotState;
+  allergens?: string[] | null;
+  metadataSource?: "snapshot" | "current_catalogue" | "unavailable";
   id: string;
   dayDate: string;
-  dishId: string;
+  dishId: string | null;
   dishName: string;
   quantity: number;
   modifications?: string[];

@@ -1,7 +1,7 @@
 import {
   readOrderItem,
-  requireDishReader,
   type OrderItemReadModel,
+  type OrderItemReadRow,
 } from "../domain/order-item-read-model";
 import type { CatalogDish } from "@/modules/dish-library/application/dish-catalog-mapper";
 import type { OrderItemRow, OrderRow } from "../infrastructure/order-repository";
@@ -15,8 +15,11 @@ export type OrderSummaryStatus =
   "draft" | "confirmed" | "pending" | "preparing" | "dispatched" | "delivered" | "cancelled";
 
 export type OrderSummaryItemView = {
+  id: string;
+  unitPrice: number | null;
+  priceSnapshotStatus: "captured" | "explicit_zero" | "historical_unavailable";
   line: OrderItemReadModel;
-  dishId: string;
+  dishId: string | null;
   qty: number;
   dayDate: string;
   dish: CatalogDish | null;
@@ -29,6 +32,7 @@ export type OrderDeliveryAddressView = {
 };
 
 export type OrderSummaryView = {
+  writeContractVersion?: 1 | 2;
   id: string;
   weekStart: string;
   weekLabel: string;
@@ -62,7 +66,7 @@ function mapDbStatus(status: string): OrderSummaryStatus {
 
 export function mapOrderToSummaryView(
   order: OrderRow,
-  items: OrderItemRow[],
+  items: Array<Omit<OrderItemRow, "dish_id"> & OrderItemReadRow>,
   dishesById: Map<string, CatalogDish>,
   extras: {
     address?: OrderDeliveryAddressView | null;
@@ -72,6 +76,7 @@ export function mapOrderToSummaryView(
   const firstDay = items[0]?.day_date ?? order.week_start;
   return {
     id: order.id,
+    writeContractVersion: order.write_contract_version ?? 1,
     weekStart: order.week_start,
     weekLabel: order.week_start,
     status: mapDbStatus(order.status),
@@ -79,11 +84,12 @@ export function mapOrderToSummaryView(
     total: order.total,
     currency: "EUR",
     items: items.map((item) => {
-      const dish = dishesById.get(item.dish_id) ?? null;
-      const line = requireDishReader(
-        readOrderItem(item, dish && { name: dish.name, description: dish.tagline }),
-      );
+      const dish = item.dish_id === null ? null : (dishesById.get(item.dish_id) ?? null);
+      const line = readOrderItem(item, dish && { name: dish.name, description: dish.tagline });
       return {
+        id: item.id,
+        unitPrice: item.unit_price ?? null,
+        priceSnapshotStatus: item.price_snapshot_status ?? "historical_unavailable",
         line,
         dishId: line.dishId,
         qty: item.qty,

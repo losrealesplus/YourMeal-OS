@@ -1,3 +1,4 @@
+import { operationalItemIdentity } from "@/modules/orders/domain/order-item-read-model";
 /**
  * CR-OPS-07: Packing Hierarchy Engine (P2 Packing)
  * Pure transformation over NormalizedOperationalLine[] to produce
@@ -109,23 +110,50 @@ function buildCustomerOrderUnits(lines: NormalizedOperationalLine[]): PackingCus
 
   for (const [orderId, orderLines] of orderMap.entries()) {
     const first = orderLines[0];
-    const dishCountMap = new Map<string, { dishId: string; dishName: string; qty: number; safetyTag?: string | null }>();
+    const dishCountMap = new Map<string, PackingDishSummaryItem>();
 
     for (const l of orderLines) {
-      const key = `${l.identity.dishId}:${l.criticalSafetyAllergens.join("_")}:${l.modifications.join("_")}`;
-      let safetyTag: string | null = null;
+      const key = `${operationalItemIdentity(l.identity)}:${l.criticalSafetyAllergens.join("_")}:${l.modifications.join("_")}`;
+      let safetyTag: string | null =
+        l.identity.itemKind === "custom" ? "PERSONALIZADO · Alérgenos sin declarar" : null;
       if (l.criticalSafetyAllergens.length > 0) {
         safetyTag = `🔴 ${l.criticalSafetyAllergens.join(", ").toUpperCase()}`;
       } else if (l.modifications.length > 0) {
         safetyTag = `🟡 ${l.modifications.join(" · ")}`;
       }
 
+      if (
+        l.identity.itemKind === "custom" &&
+        (l.modifications.length || l.criticalSafetyAllergens.length)
+      )
+        safetyTag += " · PERSONALIZADO · Alérgenos sin declarar";
+
       const existing = dishCountMap.get(key) || {
         dishId: l.identity.dishId,
+        itemIdentity: operationalItemIdentity(l.identity),
+        itemKind: l.identity.itemKind ?? "dish",
+        allergenState: l.allergenSnapshotState,
         dishName: l.dishName,
         qty: 0,
         safetyTag,
       };
+      if (existing.allergenState === "UNKNOWN" || l.allergenSnapshotState === "UNKNOWN")
+        existing.allergenState = "UNKNOWN";
+      else if (
+        !existing.allergenState ||
+        existing.allergenState === "HISTORICAL_UNAVAILABLE" ||
+        !l.allergenSnapshotState ||
+        l.allergenSnapshotState === "HISTORICAL_UNAVAILABLE"
+      )
+        existing.allergenState = "HISTORICAL_UNAVAILABLE";
+      if (existing.itemKind !== "custom" && existing.allergenState !== "DECLARED") {
+        const notice =
+          existing.allergenState === "UNKNOWN"
+            ? "Alérgenos sin declarar"
+            : "Declaración histórica no disponible";
+        if (!existing.safetyTag?.includes(notice))
+          existing.safetyTag = existing.safetyTag ? `${existing.safetyTag} · ${notice}` : notice;
+      }
       existing.qty += 1;
       dishCountMap.set(key, existing);
     }
