@@ -103,9 +103,27 @@ describe("mapWeeklyMenuToView", () => {
     const menu = mockMenu();
 
     const slots: WeeklyMenuSlotWithDish[] = [
-      mockSlot({ id: "s1", day_date: "2026-07-20", dish_id: "d1", sort_order: 0, dishes: dish("d1") }),
-      mockSlot({ id: "s2", day_date: "2026-07-20", dish_id: "d2", sort_order: 1, dishes: dish("d2", "draft") }),
-      mockSlot({ id: "s3", day_date: "2026-07-22", dish_id: "d3", sort_order: 0, dishes: dish("d3") }),
+      mockSlot({
+        id: "s1",
+        day_date: "2026-07-20",
+        dish_id: "d1",
+        sort_order: 0,
+        dishes: dish("d1"),
+      }),
+      mockSlot({
+        id: "s2",
+        day_date: "2026-07-20",
+        dish_id: "d2",
+        sort_order: 1,
+        dishes: dish("d2", "draft"),
+      }),
+      mockSlot({
+        id: "s3",
+        day_date: "2026-07-22",
+        dish_id: "d3",
+        sort_order: 0,
+        dishes: dish("d3"),
+      }),
     ];
 
     const view = mapWeeklyMenuToView(menu, slots);
@@ -171,5 +189,50 @@ describe("mapWeeklyMenuToView", () => {
     expect(view.days[0].dishes.map((d) => d.id)).toEqual(["d1"]);
     expect(view.days[2].dishes.map((d) => d.id)).toEqual(["d3"]);
     expect(view.days[1].dishes).toEqual([]);
+  });
+});
+
+describe("M1 offer projection", () => {
+  it("retains two independent slots for same Dish/day and leaves catalogue unchanged", () => {
+    const base = { ...dish("d1"), price: 11.9 };
+    const slots = [
+      mockSlot({ unit_price: 2.5, dishes: base }),
+      mockSlot({ id: "s2", unit_price: 0, dishes: base }),
+    ];
+    const view = mapWeeklyMenuToView(mockMenu(), slots);
+    expect(view.days[0]?.offers?.map((o) => [o.slotId, o.effectivePrice, o.priceSource])).toEqual([
+      ["s1", 2.5, "slot"],
+      ["s2", 0, "slot"],
+    ]);
+    expect(view.days[0]?.offers?.[0]).toMatchObject({
+      menuId: "m1",
+      dishId: "d1",
+      tenantId: "t1",
+      dayDate: "2026-07-20",
+      basePrice: 11.9,
+      slotPrice: 2.5,
+    });
+    expect(view.days[0]?.dishes.map((d) => d.price)).toEqual([11.9, 11.9]);
+    expect(base.price).toBe(11.9);
+  });
+  it("supports legacy rows lacking the column and relative template identity", () => {
+    const view = mapWeeklyMenuToView(mockMenu({ week_start: null }), [
+      mockSlot({ day_date: null, day_of_week: 1 }),
+    ]);
+    expect(view.days[0]?.offers?.[0]).toMatchObject({
+      slotPrice: null,
+      priceSource: "catalogue",
+      dayDate: "Day 1",
+    });
+  });
+  it.each([
+    { tenant_id: "other" },
+    { weekly_menu_id: "other" },
+    { dishes: { ...dish("d1"), tenant_id: "other" } },
+    { dishes: dish("other") },
+  ])("rejects incoherent tenant/Dish/menu relations %j", (patch) => {
+    expect(() => mapWeeklyMenuToView(mockMenu(), [mockSlot(patch)])).toThrow(
+      "OFFER_REFERENCE_INVALID",
+    );
   });
 });

@@ -19,3 +19,6 @@ export {
   DAY_NAMES_ES,
   MONTH_NAMES_ES,
 } from "./application/week-dates";
+
+export type { WeeklyMenuOfferView } from "./application/offer-pricing";
+export { selectWeeklyMenuOffer, OfferPricingError } from "./application/offer-pricing";

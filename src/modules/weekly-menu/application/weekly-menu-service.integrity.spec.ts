@@ -289,6 +289,51 @@ describe("WeeklyMenuService integrity", () => {
   });
 
   describe("duplicateWeek", () => {
+    it.each([null, 0, 2.5])(
+      "copies nullable offer %s to new draft without catalogue updates",
+      async (unitPrice) => {
+        getById.mockResolvedValue({ ...menuPublished, week_start: "2026-08-10" });
+        findByWeekStart.mockResolvedValue(null);
+        listSlotsWithDishes.mockResolvedValue([
+          {
+            id: "source-slot",
+            day_date: "2026-08-10",
+            dish_id: "dish-1",
+            sort_order: 0,
+            unit_price: unitPrice,
+          },
+        ]);
+        insertDraft.mockResolvedValue({
+          id: "new-menu",
+          status: "draft",
+          week_start: "2026-08-17",
+        });
+        addSlots.mockResolvedValue([{ id: "new-slot" }]);
+        await WeeklyMenuService.duplicateWeek(ctx(), {
+          sourceMenuId: "m1",
+          targetWeekStart: "2026-08-17",
+        });
+        expect(addSlots).toHaveBeenCalledWith([
+          {
+            weeklyMenuId: "new-menu",
+            dayDate: "2026-08-17",
+            dishId: "dish-1",
+            sortOrder: 0,
+            unitPrice,
+          },
+        ]);
+        expect(AuditService.write).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.objectContaining({
+            newData: expect.objectContaining({
+              sourceMenuId: "m1",
+              copiedOffers: [{ sourceSlotId: "source-slot", unitPrice }],
+            }),
+          }),
+        );
+        expect(publish).not.toHaveBeenCalled();
+      },
+    );
     it("successfully duplicates slots from source menu into target week with date mapping", async () => {
       const sourceMenu = {
         id: "m-source",

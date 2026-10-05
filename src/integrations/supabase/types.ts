@@ -2354,6 +2354,7 @@ export type Database = {
           sort_order: number
           tenant_id: string
           weekly_menu_id: string
+          unit_price?: number | null
         }
         Insert: {
           day_date?: string | null
@@ -2363,6 +2364,7 @@ export type Database = {
           sort_order?: number
           tenant_id: string
           weekly_menu_id: string
+          unit_price?: number | null
         }
         Update: {
           day_date?: string | null
@@ -2372,6 +2374,7 @@ export type Database = {
           sort_order?: number
           tenant_id?: string
           weekly_menu_id?: string
+          unit_price?: number | null
         }
         Relationships: [
           {
