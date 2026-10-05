@@ -176,7 +176,9 @@ export const WeeklyMenuService = {
     const slots = await repo.listSlotsWithDishes(weeklyMenuId);
     // Template menus (week_start null) use day_of_week — skip calendar boundary check
     if (menu.week_start != null) {
-      const outOfWeek = slots.filter((s) => s.day_date != null && !isDayDateInWeek(menu.week_start!, s.day_date));
+      const outOfWeek = slots.filter(
+        (s) => s.day_date != null && !isDayDateInWeek(menu.week_start!, s.day_date),
+      );
       if (outOfWeek.length > 0) {
         throw new DomainError("INVALID_STATE", PUBLISH_OUT_OF_WEEK_MESSAGE);
       }
@@ -306,7 +308,10 @@ export const WeeklyMenuService = {
 
     const sourceSlots = await repo.listSlotsWithDishes(input.sourceMenuId);
     if (!sourceMenu.week_start) {
-      throw new DomainError("INVALID_STATE", "El menú de origen es una plantilla relativa y no puede duplicarse como menú con fecha. Usa la función de programación de plantillas.");
+      throw new DomainError(
+        "INVALID_STATE",
+        "El menú de origen es una plantilla relativa y no puede duplicarse como menú con fecha. Usa la función de programación de plantillas.",
+      );
     }
     const sourceDates = utcWeekDates(sourceMenu.week_start);
     const targetDates = utcWeekDates(input.targetWeekStart);
@@ -315,7 +320,7 @@ export const WeeklyMenuService = {
 
     try {
       if (sourceSlots.length > 0) {
-      const slotsToInsert = sourceSlots.map((s) => {
+        const slotsToInsert = sourceSlots.map((s) => {
           const dayIdx = s.day_date != null ? sourceDates.indexOf(s.day_date) : -1;
           const targetDay = dayIdx >= 0 ? targetDates[dayIdx]! : input.targetWeekStart;
           return {
@@ -323,6 +328,7 @@ export const WeeklyMenuService = {
             dayDate: targetDay,
             dishId: s.dish_id,
             sortOrder: s.sort_order,
+            ...(s.unit_price !== undefined ? { unitPrice: s.unit_price } : {}),
           };
         });
         await repo.addSlots(slotsToInsert);
@@ -337,7 +343,14 @@ export const WeeklyMenuService = {
       entityType: "weekly_menu",
       entityId: createdMenu.id,
       action: "create",
-      newData: createdMenu as unknown as Record<string, unknown>,
+      newData: {
+        ...createdMenu,
+        sourceMenuId: input.sourceMenuId,
+        copiedOffers: sourceSlots.map((s) => ({
+          sourceSlotId: s.id,
+          unitPrice: s.unit_price ?? null,
+        })),
+      },
     });
 
     return createdMenu;

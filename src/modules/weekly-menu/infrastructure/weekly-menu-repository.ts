@@ -1,3 +1,4 @@
+import { validateOfferPrice } from "../application/offer-pricing";
 import type { Tables } from "@/integrations/supabase/types";
 import type { AppSupabase } from "@/services/types";
 
@@ -113,6 +114,7 @@ export function createWeeklyMenuRepository(supabase: AppSupabase, tenantId: stri
       dayDate: string;
       dishId: string;
       sortOrder?: number;
+      unitPrice?: number | null;
     }): Promise<WeeklyMenuSlotRow> {
       const { data, error } = await supabase
         .from("weekly_menu_slots")
@@ -122,6 +124,9 @@ export function createWeeklyMenuRepository(supabase: AppSupabase, tenantId: stri
           day_date: input.dayDate,
           dish_id: input.dishId,
           sort_order: input.sortOrder ?? 0,
+          ...(input.unitPrice !== undefined
+            ? { unit_price: input.unitPrice === null ? null : validateOfferPrice(input.unitPrice) }
+            : {}),
         })
         .select("*")
         .single();
@@ -194,6 +199,7 @@ export function createWeeklyMenuRepository(supabase: AppSupabase, tenantId: stri
         dayDate: string;
         dishId: string;
         sortOrder?: number;
+        unitPrice?: number | null;
       }>,
     ): Promise<WeeklyMenuSlotRow[]> {
       if (slots.length === 0) return [];
@@ -206,6 +212,9 @@ export function createWeeklyMenuRepository(supabase: AppSupabase, tenantId: stri
             day_date: s.dayDate,
             dish_id: s.dishId,
             sort_order: s.sortOrder ?? 0,
+            ...(s.unitPrice !== undefined
+              ? { unit_price: s.unitPrice === null ? null : validateOfferPrice(s.unitPrice) }
+              : {}),
           })),
         )
         .select("*");
