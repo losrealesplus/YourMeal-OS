@@ -1,9 +1,11 @@
+import { readOrderItem, type OrderItemReadRow } from "../domain/order-item-read-model";
 import type { Json, Tables } from "@/integrations/supabase/types";
 import type { AppSupabase } from "@/services/types";
 import type { OrderDietarySnapshot } from "@/types/dietary";
 
-export type OrderRow = Tables<"orders">;
-export type OrderItemRow = Tables<"order_items">;
+export type OrderRow = Tables<"orders"> & { revision?: number; write_contract_version?: 1 | 2 };
+export type OrderItemRow = Tables<"order_items"> &
+  Partial<Omit<OrderItemReadRow, "id" | "dish_id">>;
 
 export type ProgramOrderItemInput = {
   dishId: string;
@@ -102,10 +104,12 @@ export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
       }));
 
       // TODO(HP-001): program_draft_order RPC pending migration.
-      const { data, error } = await (supabase.rpc as unknown as (
-        name: string,
-        args: Record<string, unknown>,
-      ) => Promise<{ data: unknown; error: unknown }>)("program_draft_order", {
+      const { data, error } = await (
+        supabase.rpc as unknown as (
+          name: string,
+          args: Record<string, unknown>,
+        ) => Promise<{ data: unknown; error: unknown }>
+      )("program_draft_order", {
         _tenant_id: tenantId,
         _customer_id: input.customerId,
         _week_start: input.weekStart,
@@ -125,25 +129,26 @@ export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
         throw new Error("program_draft_order returned unexpected payload");
       }
 
-      const updatePayload: Record<string, any> = {};
+      const updatePayload: { dietary_snapshot?: Json; delivery_address_id?: string | null } = {};
       if (input.dietarySnapshot) {
-        updatePayload.dietary_snapshot = input.dietarySnapshot as any;
+        updatePayload.dietary_snapshot = input.dietarySnapshot as unknown as Json;
       }
       if (input.deliveryAddressId !== undefined) {
         updatePayload.delivery_address_id = input.deliveryAddressId;
       }
 
       if (Object.keys(updatePayload).length > 0) {
-        const { error: updateErr } = await (supabase.from("orders") as any)
+        const { error: updateErr } = await supabase
+          .from("orders")
           .update(updatePayload)
           .eq("tenant_id", tenantId)
           .eq("id", result.order.id);
         if (!updateErr) {
           if (input.dietarySnapshot) {
-            result.order.dietary_snapshot = input.dietarySnapshot as any;
+            result.order.dietary_snapshot = input.dietarySnapshot as unknown as Json;
           }
           if (input.deliveryAddressId !== undefined) {
-            (result.order as any).delivery_address_id = input.deliveryAddressId;
+            result.order.delivery_address_id = input.deliveryAddressId;
           }
         }
       }
@@ -152,6 +157,16 @@ export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
     },
 
     findByIdWithItems,
+
+    /** Expanded read projection, retaining every item; legacy writers remain dish-only. */
+    async findItemReadModels(orderId: string) {
+      const result = await findByIdWithItems(orderId);
+      if (!result) return null;
+      return {
+        order: result.order,
+        items: result.items.map((item) => ({ ...item, line: readOrderItem(item) })),
+      };
+    },
 
     /** CAP-006 — Draft → Confirmed (status guard + soft-delete filter). */
     async confirmDraft(orderId: string): Promise<{ old: OrderRow; order: OrderRow }> {
@@ -191,6 +206,4 @@ export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
   };
 }
 
-
 export type OrderRepository = ReturnType<typeof createOrderRepository>;
-

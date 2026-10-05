@@ -84,7 +84,10 @@ export function normalizeOperationalOrders(params: {
   orders: OperationalOrderListItem[];
   targetDate: string;
   temporalMode: OperationalTemporalMode;
-  dishMetaMap?: Map<string, { allergens: string[]; weightG?: number | null; prepMinutes?: number | null }>;
+  dishMetaMap?: Map<
+    string,
+    { allergens: string[]; weightG?: number | null; prepMinutes?: number | null }
+  >;
 }): {
   lines: NormalizedOperationalLine[];
   resolutionStatus: HistoricalResolutionStatus;
@@ -101,7 +104,9 @@ export function normalizeOperationalOrders(params: {
 
     if (temporalMode === "historical" && !hasDietarySnapshot) {
       missingSnapshotCount++;
-      warnings.push(`Pedido #${order.id.slice(0, 8)} (${order.customerName ?? "Cliente"}) carece de dietary_snapshot histórico.`);
+      warnings.push(
+        `Pedido #${order.id.slice(0, 8)} (${order.customerName ?? "Cliente"}) carece de dietary_snapshot histórico.`,
+      );
     }
 
     const customerAllergens = dietarySnapshot?.allergens ?? [];
@@ -128,7 +133,7 @@ export function normalizeOperationalOrders(params: {
       if (item.dayDate !== targetDate) continue;
 
       const meta = dishMetaMap.get(item.dishId);
-      const dishAllergens = meta?.allergens ?? [];
+      const dishAllergens = item.line?.allergensSnapshot ?? meta?.allergens ?? [];
       const criticalSafetyAllergens = extractCriticalSafetyAllergens(
         customerAllergens,
         dishAllergens,
@@ -142,6 +147,8 @@ export function normalizeOperationalOrders(params: {
           orderItemId: item.id,
           dishId: item.dishId,
           portionIndex: pIdx,
+          itemIdentity: item.line?.identity ?? `dish:${item.dishId}`,
+          itemKind: item.line?.kind ?? "dish",
         };
 
         lines.push({
@@ -161,10 +168,13 @@ export function normalizeOperationalOrders(params: {
           organizationalUnitId: order.organizationalUnitId,
           organizationalUnitName: order.organizationalUnitName,
           deliveryGroupId: order.deliveryGroupId,
-          dishName: item.dishName ?? meta?.allergens ? `Plato ${item.dishId.slice(0, 8)}` : "Plato sin nombre",
+          dishName:
+            item.dishName ?? (meta ? `Plato ${item.dishId.slice(0, 8)}` : "Plato sin nombre"),
           qty: 1, // Normalized to single portion per line
           unitPrice: item.unitPrice ?? null,
           dishAllergens,
+          allergenSnapshotState: item.line?.allergenState ?? "HISTORICAL_UNAVAILABLE",
+          metadataSource: item.line?.metadataSource ?? "current_catalogue",
           customerAllergens,
           customAllergens,
           criticalSafetyAllergens,

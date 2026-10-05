@@ -1,3 +1,7 @@
+import type {
+  ItemIdentity,
+  AllergenSnapshotState,
+} from "@/modules/orders/domain/order-item-read-model";
 /**
  * CR-OPS-07: Kitchen, Packing & Dispatch Operations Engine Domain Types
  * Defines the canonical DTOs, safety classifications, hierarchical tree nodes,
@@ -7,9 +11,9 @@
 export type OperationalTemporalMode = "historical" | "present" | "future";
 
 export type HistoricalResolutionStatus =
-  | "COMPLETE"             // All frozen snapshots present and verified
-  | "INCOMPLETE_SNAPSHOT"  // Missing address or dietary snapshot; explicit warning emitted
-  | "UNRESOLVED";          // Order state unresolvable
+  | "COMPLETE" // All frozen snapshots present and verified
+  | "INCOMPLETE_SNAPSHOT" // Missing address or dietary snapshot; explicit warning emitted
+  | "UNRESOLVED"; // Order state unresolvable
 
 export interface DateResolverQuery {
   targetDate: string; // ISO YYYY-MM-DD
@@ -27,6 +31,8 @@ export interface OperationalLineIdentity {
   orderId: string;
   orderItemId: string;
   dishId: string;
+  itemIdentity?: ItemIdentity;
+  itemKind?: "dish" | "custom";
   portionIndex: number; // 0..N-1 for multi-qty line items
 }
 
@@ -62,6 +68,8 @@ export interface NormalizedOperationalLine {
   unitPrice: number | null;
 
   // Strict Safety & Customization Segregation
+  allergenSnapshotState?: AllergenSnapshotState;
+  metadataSource?: "snapshot" | "current_catalogue" | "unavailable";
   dishAllergens: string[]; // Standard EU 14 IDs from catalog or snapshot
   customerAllergens: string[]; // Declared in customer dietary profile
   customAllergens: string[]; // e.g. "kiwi", "fresa"

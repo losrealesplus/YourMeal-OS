@@ -61,6 +61,20 @@ describe("mapOrderToSummaryView", () => {
     expect(view.address).toBeNull();
     expect(view.companyName).toBeNull();
     expect(view.dietarySnapshot).toBeNull();
+    const capturedItems = [
+      {
+        ...items[0],
+        name_snapshot: "Bowl at capture",
+        allergen_state: "UNKNOWN",
+        allergens_snapshot: [],
+        snapshot_captured_at: "2026-07-22T12:00:00Z",
+      },
+    ];
+    const captured = mapOrderToSummaryView(order, capturedItems, new Map([["d1", dish]]));
+    expect(captured.items[0].dish?.name).toBe("Bowl at capture");
+    expect(captured.items[0].line.metadataSource).toBe("snapshot");
+    expect(captured.total).toBe(19.8);
+    expect(dish.name).toBe("Bowl");
   });
 
   it("projects dietary_snapshot from order row into view model", () => {
