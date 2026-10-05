@@ -1,0 +1,102 @@
+{
+  "contract": "CR-ORDER r1 PROPOSED",
+  "source": "daa1fc4d945255eea0c6c541538c0162666d37d6",
+  "areas": [
+    {
+      "area": "Persistencia",
+      "files": "order_items, types.ts",
+      "change": "Discriminador, snapshots, null condicionado, FKs tenant",
+      "acceptance": "Dish histórico preservado; custom inválida rechazada"
+    },
+    {
+      "area": "Captura",
+      "files": "staff-order-capture-service.ts, universal-order-intake-drawer.tsx",
+      "change": "DTO discriminado, custom-only sin menú, RPC única, IDs locales",
+      "acceptance": "Captura mixta y custom-only atómicas"
+    },
+    {
+      "area": "RPC y seguridad",
+      "files": "RLS orders/order_items, nueva operación v2",
+      "change": "Capability server, restrictive policies, audit, consistencia diferida",
+      "acceptance": "Cliente/tenant ajeno no puede crear custom ni mover referencias"
+    },
+    {
+      "area": "Idempotencia y edición",
+      "files": "order-modification-service.ts, order_write_requests, orders.revision",
+      "change": "Conservar UUID, archive, revisión optimista, hashes",
+      "acceptance": "Retry único; stale edit fail-closed; no entidades parciales"
+    },
+    {
+      "area": "Repositorio operativo",
+      "files": "operations-repository.ts",
+      "change": "Leer kind/snapshots y prioridad snapshot, evitar String(null)",
+      "acceptance": "Todas las líneas presentes con identidad/nombre"
+    },
+    {
+      "area": "Normalización",
+      "files": "operational-date-resolver.ts",
+      "change": "Identidad tipada por ración, UNKNOWN independiente, nombre correcto",
+      "acceptance": "Sin colisiones ni nombres genéricos introducidos"
+    },
+    {
+      "area": "Cocina",
+      "files": "production-kitchen-engine.ts",
+      "change": "Agrupar custom por order_item.id, PERSONALIZADO",
+      "acceptance": "Igual texto de distintos items no se fusiona"
+    },
+    {
+      "area": "Lotes",
+      "files": "kitchen_production_batches, kitchen-execution-service.ts",
+      "change": "Clave custom order item, constraints/índices/FKs y estados",
+      "acceptance": "Persistencia y reload mantienen estados por identidad"
+    },
+    {
+      "area": "Producción/costes",
+      "files": "production-report-service.ts, production-report.ts",
+      "change": "Excluir IDs custom de consultas a Dish/recetas; NOT_AVAILABLE",
+      "acceptance": "Demanda íntegra; no ingredientes ni costes inventados"
+    },
+    {
+      "area": "Packing",
+      "files": "packing-hierarchy-engine.ts",
+      "change": "Clave discriminada, snapshots, UNKNOWN",
+      "acceptance": "Empaquetado por pedido/ración incluye custom"
+    },
+    {
+      "area": "Exportación",
+      "files": "modelos CSV/matriz/thermal labels",
+      "change": "Propagar kind/nombre/fecha/UNKNOWN y metadatos unavailable",
+      "acceptance": "Archivo/etiqueta conserva identidad y alertas"
+    },
+    {
+      "area": "Reparto",
+      "files": "derivación delivery_services, vistas operativas",
+      "change": "Fechas custom contribuyen al mismo pedido y entrega",
+      "acceptance": "Día custom-only no desaparece"
+    },
+    {
+      "area": "Resumen/historial",
+      "files": "order-summary-mapper.ts, vistas consumidor/staff",
+      "change": "Snapshot sin dependencia obligatoria al catálogo",
+      "acceptance": "Custom completa visible; fallback histórico etiquetado"
+    },
+    {
+      "area": "Repetición/plantillas",
+      "files": "repeat-order.ts, order templates, repeat service",
+      "change": "Custom propuesta, confirmaciones disponibilidad/precio, nuevos IDs",
+      "acceptance": "Sin confirmación no confirma; cero requiere aceptación"
+    },
+    {
+      "area": "Facturación",
+      "files": "accounting-service.ts, orders.total",
+      "change": "Mantener suma coherente de snapshots, sin flujo paralelo",
+      "acceptance": "Total/cobro consistentes; histórico no inventado"
+    },
+    {
+      "area": "Migración/activación",
+      "files": "schema, RPC, readers, permisos/feature gate vigente",
+      "change": "Expand → readers → writer compatible → activación humana",
+      "acceptance": "Old dish fluye; no custom antes de todos los consumidores"
+    }
+  ]
+}
