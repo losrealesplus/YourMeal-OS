@@ -58,3 +58,5 @@ Permanent decisions for YourMeal OS. New ADRs are additive; do not silently reve
 | [0062](./0062-order-capability.md) | Order Capability (OPERATIONAL-003 · weekly operational commitment) |
 
 | [0063](./0063-order-facade.md) | Order Facade (OPERATIONAL-003 Phase 2 · process API) |
+
+| [0102](./0102-native-custom-order-items.md) | Líneas nativas dish/custom — CR-ORDER r1 aprobado y congelado |
