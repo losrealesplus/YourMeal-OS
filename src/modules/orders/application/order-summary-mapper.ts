@@ -1,3 +1,8 @@
+import {
+  readOrderItem,
+  requireDishReader,
+  type OrderItemReadModel,
+} from "../domain/order-item-read-model";
 import type { CatalogDish } from "@/modules/dish-library/application/dish-catalog-mapper";
 import type { OrderItemRow, OrderRow } from "../infrastructure/order-repository";
 import type { OrderDietarySnapshot } from "@/types/dietary";
@@ -10,6 +15,7 @@ export type OrderSummaryStatus =
   "draft" | "confirmed" | "pending" | "preparing" | "dispatched" | "delivered" | "cancelled";
 
 export type OrderSummaryItemView = {
+  line: OrderItemReadModel;
   dishId: string;
   qty: number;
   dayDate: string;
@@ -72,12 +78,27 @@ export function mapOrderToSummaryView(
     deliveryDateIso: `${firstDay}T12:00:00.000Z`,
     total: order.total,
     currency: "EUR",
-    items: items.map((item) => ({
-      dishId: item.dish_id,
-      qty: item.qty,
-      dayDate: item.day_date,
-      dish: dishesById.get(item.dish_id) ?? null,
-    })),
+    items: items.map((item) => {
+      const dish = dishesById.get(item.dish_id) ?? null;
+      const line = requireDishReader(
+        readOrderItem(item, dish && { name: dish.name, description: dish.tagline }),
+      );
+      return {
+        line,
+        dishId: line.dishId,
+        qty: item.qty,
+        dayDate: item.day_date,
+        dish:
+          dish && line.metadataSource === "snapshot"
+            ? {
+                ...dish,
+                name: line.name!,
+                tagline: line.description ?? "",
+                allergens: line.allergensSnapshot ?? [],
+              }
+            : dish,
+      };
+    }),
     address: extras.address ?? null,
     companyName: extras.companyName ?? null,
     dietarySnapshot: (order.dietary_snapshot as OrderDietarySnapshot | null) ?? null,

@@ -1,3 +1,8 @@
+import {
+  readOrderItem,
+  requireDishReader,
+  type OrderItemReadModel,
+} from "@/modules/orders/domain/order-item-read-model";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
@@ -52,6 +57,7 @@ export type OperationalOrderListItem = {
     qty: number;
     notes: string | null;
     unitPrice?: number | null;
+    line?: OrderItemReadModel;
   }>;
 };
 
@@ -69,14 +75,16 @@ export type OperationalOrderFilters = {
   deliveryGroupId?: string | null;
 };
 
-function mapRow(row: Record<string, any>): OperationalOrderListItem {
+export function mapOperationalOrderRow(row: Record<string, any>): OperationalOrderListItem {
   const customer = row.customers ?? null;
   const company = row.companies ?? null;
   const site = row.company_locations ?? null;
   const unit = row.company_departments ?? null;
   const group = row.delivery_groups ?? null;
   const customerAddress = row.customer_addresses ?? null;
-  const items = (row.order_items ?? []) as Record<string, any>[];
+  const items = ((row.order_items ?? []) as Record<string, any>[]).filter(
+    (item) => !item.deleted_at,
+  );
   const deliveryDates = [...new Set(items.map((it) => String(it.day_date)).filter(Boolean))].sort();
   return {
     id: String(row.id),
@@ -111,15 +119,21 @@ function mapRow(row: Record<string, any>): OperationalOrderListItem {
         }
       : null,
     deliveryDates,
-    items: items.map((it) => ({
-      id: String(it.id),
-      dishId: String(it.dish_id),
-      dishName: it.dishes?.name ?? null,
-      dayDate: String(it.day_date),
-      qty: Number(it.qty ?? 1),
-      notes: (it.comment as string | null) ?? null,
-      unitPrice: it.unit_price != null ? Number(it.unit_price) : null,
-    })),
+    items: items.map((it) => {
+      const line = requireDishReader(
+        readOrderItem({ ...it, id: it.id, dish_id: it.dish_id }, it.dishes),
+      );
+      return {
+        id: String(it.id),
+        dishId: line.dishId,
+        dishName: line.name,
+        line,
+        dayDate: String(it.day_date),
+        qty: Number(it.qty ?? 1),
+        notes: (it.comment as string | null) ?? null,
+        unitPrice: it.unit_price != null ? Number(it.unit_price) : null,
+      };
+    }),
   };
 }
 
@@ -132,7 +146,7 @@ const ORDER_SELECT = `
   company_departments ( id, name ),
   delivery_groups ( id, name ),
   customer_addresses ( id, label, street, city, zip ),
-  order_items ( id, dish_id, day_date, qty, comment, unit_price, dishes ( id, name ) )
+  order_items ( *, dishes ( id, name ) )
 `;
 
 function mapDeliveryServiceRow(row: Record<string, any>): DeliveryServiceModel {
@@ -176,7 +190,7 @@ export function createOperationsRepository(client: Client, tenantId: string) {
         .maybeSingle();
       if (error) throw error;
       if (!data) return null;
-      return mapRow(data as Record<string, any>);
+      return mapOperationalOrderRow(data as Record<string, any>);
     },
 
     async listOrders(filters: OperationalOrderFilters): Promise<OperationalOrderListItem[]> {
@@ -207,7 +221,7 @@ export function createOperationsRepository(client: Client, tenantId: string) {
       const { data, error } = await q;
       if (error) throw error;
 
-      return ((data ?? []) as Record<string, any>[]).map(mapRow);
+      return ((data ?? []) as Record<string, any>[]).map(mapOperationalOrderRow);
     },
 
     async countByStatuses(
