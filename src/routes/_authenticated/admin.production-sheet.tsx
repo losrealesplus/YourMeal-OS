@@ -1,4 +1,11 @@
-import { DishAllergenDeclaration } from "@/components/operations/dish-allergen-declaration";
+import {
+  operationalItemIdentity,
+  isCustomOperationalItem,
+} from "@/production-experience/operational-item-identity";
+import {
+  CustomOperationalContext,
+  OperationalAllergenDeclaration,
+} from "@/production-experience/operational-item-presentation";
 /**
  * EP-002B — Hoja de Producción y Mesa de Packing (CR-OPS-UX Fase 3: Flujo Operativo Vivo).
  * Ergonomía Dual:
@@ -196,7 +203,12 @@ function ProductionSheetPage() {
             <RefreshCw className={cn("mr-2 h-4 w-4", loading && "animate-spin")} />
             Actualizar
           </Button>
-          <Button variant="outline" size="sm" onClick={handleDownloadCSV} disabled={!suite || loading}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDownloadCSV}
+            disabled={!suite || loading}
+          >
             <FileDown className="mr-2 h-4 w-4" />
             Excel (.csv)
           </Button>
@@ -215,7 +227,9 @@ function ProductionSheetPage() {
       <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 print:hidden">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-semibold text-muted-foreground mr-1">Selección Rápida:</span>
+            <span className="text-xs font-semibold text-muted-foreground mr-1">
+              Selección Rápida:
+            </span>
             <Button
               variant={date === todayISO() ? "default" : "outline"}
               size="sm"
@@ -267,7 +281,10 @@ function ProductionSheetPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Label htmlFor="sheet-date" className="text-xs font-semibold text-muted-foreground whitespace-nowrap">
+            <Label
+              htmlFor="sheet-date"
+              className="text-xs font-semibold text-muted-foreground whitespace-nowrap"
+            >
               Fecha específica:
             </Label>
             <Input
@@ -294,11 +311,19 @@ function ProductionSheetPage() {
                 Ref: {suite.versionMetadata.versionId}
               </span>
               <span>·</span>
-              <span>Corte: {new Date(suite.versionMetadata.cutoffTimestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+              <span>
+                Corte:{" "}
+                {new Date(suite.versionMetadata.cutoffTimestamp).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
             </div>
 
             <div>
-              {suite.packingSheet.totals.grandTotalOrders} pedidos · {suite.packingSheet.totals.grandTotalPortions} raciones · {suite.kitchenSheet.dishes.length} platos
+              {suite.packingSheet.totals.grandTotalOrders} pedidos ·{" "}
+              {suite.packingSheet.totals.grandTotalPortions} raciones ·{" "}
+              {suite.kitchenSheet.dishes.length} platos
             </div>
           </div>
         ) : null}
@@ -311,14 +336,20 @@ function ProductionSheetPage() {
             <AlertTriangle className="h-5 w-5 shrink-0 text-red-600 mt-0.5" />
             <div className="space-y-1">
               <p className="text-sm font-bold uppercase tracking-wider">
-                ⚠️ Protocolo de Alergias Críticas ({suite.kitchenSheet.safetySummary.totalAllergyAlertCount} raciones afectadas)
+                ⚠️ Protocolo de Alergias Críticas (
+                {suite.kitchenSheet.safetySummary.totalAllergyAlertCount} raciones afectadas)
               </p>
               <p className="text-xs">
-                Se detectaron solicitudes con alérgenos críticos declarados por comensales. Verifique manipulación cruzada:
+                Se detectaron solicitudes con alérgenos críticos declarados por comensales.
+                Verifique manipulación cruzada:
               </p>
               <div className="flex flex-wrap gap-2 pt-1">
                 {suite.kitchenSheet.safetySummary.criticalAllergensPresent.map((alg) => (
-                  <Badge key={alg.allergenId} variant="destructive" className="text-xs font-bold font-mono">
+                  <Badge
+                    key={alg.allergenId}
+                    variant="destructive"
+                    className="text-xs font-bold font-mono"
+                  >
                     🔴 {alg.allergenLabel.toUpperCase()}: {alg.affectedPortions} raciones
                   </Badge>
                 ))}
@@ -344,7 +375,10 @@ function ProductionSheetPage() {
             <Tabs
               value={levelTab}
               onValueChange={(v) =>
-                setLevelTab(v as "p1_kitchen" | "p2_packing_hierarchy" | "p2_packing_client" | "p2_packing_dish")
+                setLevelTab(
+                  v as
+                    "p1_kitchen" | "p2_packing_hierarchy" | "p2_packing_client" | "p2_packing_dish",
+                )
               }
               className="space-y-4"
             >
@@ -376,9 +410,7 @@ function ProductionSheetPage() {
               </TabsContent>
 
               <TabsContent value="p2_packing_hierarchy" className="space-y-6">
-                {suite ? (
-                  <DigitalPackingHierarchyView packingSheet={suite.packingSheet} />
-                ) : null}
+                {suite ? <DigitalPackingHierarchyView packingSheet={suite.packingSheet} /> : null}
               </TabsContent>
 
               <TabsContent value="p2_packing_client" className="space-y-6">
@@ -427,7 +459,9 @@ function DigitalPackingHierarchyView({ packingSheet }: { packingSheet: PackingSh
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
         <div className="p-4 rounded-xl border border-border bg-card">
-          <p className="text-xs uppercase text-muted-foreground font-semibold">Municipios / Zonas</p>
+          <p className="text-xs uppercase text-muted-foreground font-semibold">
+            Municipios / Zonas
+          </p>
           <p className="text-2xl font-bold font-mono text-primary mt-1">
             {packingSheet.totals.municipalityCount}
           </p>
@@ -439,7 +473,9 @@ function DigitalPackingHierarchyView({ packingSheet }: { packingSheet: PackingSh
           </p>
         </div>
         <div className="p-4 rounded-xl border border-border bg-card">
-          <p className="text-xs uppercase text-muted-foreground font-semibold">Particulares (B2C)</p>
+          <p className="text-xs uppercase text-muted-foreground font-semibold">
+            Particulares (B2C)
+          </p>
           <p className="text-2xl font-bold font-mono mt-1">
             {packingSheet.totals.b2cIndividualCount} ({packingSheet.totals.b2cPortionsCount} com.)
           </p>
@@ -454,7 +490,10 @@ function DigitalPackingHierarchyView({ packingSheet }: { packingSheet: PackingSh
 
       <div className="space-y-4">
         {packingSheet.municipalities.map((muni) => (
-          <div key={muni.municipality} className="rounded-xl border border-border bg-card p-5 space-y-4 shadow-sm">
+          <div
+            key={muni.municipality}
+            className="rounded-xl border border-border bg-card p-5 space-y-4 shadow-sm"
+          >
             <div className="flex flex-wrap items-center justify-between border-b border-border pb-3">
               <div className="flex items-center gap-2">
                 <span className="text-base font-bold text-foreground">📍 {muni.municipality}</span>
@@ -472,16 +511,27 @@ function DigitalPackingHierarchyView({ packingSheet }: { packingSheet: PackingSh
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {muni.b2cIndividuals.map((u) => (
-                    <div key={u.orderId} className="p-3 rounded-lg border border-border bg-secondary/20 space-y-1.5">
+                    <div
+                      key={u.orderId}
+                      className="p-3 rounded-lg border border-border bg-secondary/20 space-y-1.5"
+                    >
                       <div className="flex justify-between items-center">
-                        <span className="font-semibold text-xs text-foreground">{u.customerName}</span>
-                        <span className="font-mono text-[10px] text-muted-foreground">#{u.orderId.slice(0, 8)}</span>
+                        <span className="font-semibold text-xs text-foreground">
+                          {u.customerName}
+                        </span>
+                        <span className="font-mono text-[10px] text-muted-foreground">
+                          #{u.orderId.slice(0, 8)}
+                        </span>
                       </div>
                       <div className="space-y-1 text-xs">
                         {u.items.map((it, idx) => (
                           <div key={idx} className="flex justify-between text-muted-foreground">
-                            <span>{it.qty}× {it.dishName}</span>
-                            {it.safetyTag ? <span className="font-bold">{it.safetyTag}</span> : null}
+                            <span>
+                              {it.qty}× {it.dishName}
+                            </span>
+                            {it.safetyTag ? (
+                              <span className="font-bold">{it.safetyTag}</span>
+                            ) : null}
                           </div>
                         ))}
                       </div>
@@ -498,7 +548,10 @@ function DigitalPackingHierarchyView({ packingSheet }: { packingSheet: PackingSh
                   🏢 Empresas Corporativas ({muni.b2bCompanies.length})
                 </p>
                 {muni.b2bCompanies.map((comp) => (
-                  <div key={comp.companyId} className="rounded-lg border border-border bg-secondary/10 p-4 space-y-3">
+                  <div
+                    key={comp.companyId}
+                    className="rounded-lg border border-border bg-secondary/10 p-4 space-y-3"
+                  >
                     <div className="flex justify-between items-center font-bold text-sm">
                       <span>🏢 {comp.companyName}</span>
                       <Badge variant="secondary" className="font-mono text-xs">
@@ -510,24 +563,40 @@ function DigitalPackingHierarchyView({ packingSheet }: { packingSheet: PackingSh
                       {comp.sites.map((site) => (
                         <div key={site.siteId} className="space-y-2">
                           <p className="text-xs font-semibold text-foreground/90">
-                            📍 Sede: {site.siteName} <span className="text-[10px] text-muted-foreground">({site.siteAddress})</span>
+                            📍 Sede: {site.siteName}{" "}
+                            <span className="text-[10px] text-muted-foreground">
+                              ({site.siteAddress})
+                            </span>
                           </p>
 
                           {site.units.map((unit) => (
-                            <div key={unit.unitId} className="pl-3 space-y-1.5 border-l border-border">
+                            <div
+                              key={unit.unitId}
+                              className="pl-3 space-y-1.5 border-l border-border"
+                            >
                               <p className="text-[11px] font-medium text-muted-foreground">
                                 🏬 Unidad/Piso: {unit.unitName} ({unit.totalPortions} comidas)
                               </p>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                 {unit.customers.map((cu) => (
-                                  <div key={cu.orderId} className="p-2.5 rounded border border-border bg-card text-xs space-y-1">
+                                  <div
+                                    key={cu.orderId}
+                                    className="p-2.5 rounded border border-border bg-card text-xs space-y-1"
+                                  >
                                     <div className="flex justify-between">
                                       <span className="font-semibold">{cu.customerName}</span>
-                                      <span className="font-mono text-[10px] text-muted-foreground">#{cu.orderId.slice(0, 8)}</span>
+                                      <span className="font-mono text-[10px] text-muted-foreground">
+                                        #{cu.orderId.slice(0, 8)}
+                                      </span>
                                     </div>
                                     {cu.items.map((it, idx) => (
-                                      <div key={idx} className="flex justify-between text-muted-foreground text-[11px]">
-                                        <span>{it.qty}× {it.dishName}</span>
+                                      <div
+                                        key={idx}
+                                        className="flex justify-between text-muted-foreground text-[11px]"
+                                      >
+                                        <span>
+                                          {it.qty}× {it.dishName}
+                                        </span>
                                         {it.safetyTag ? (
                                           <span className="font-bold">{it.safetyTag}</span>
                                         ) : null}
@@ -565,8 +634,14 @@ function DigitalKitchenP1View({
   const { user, tenantId, roles } = useAuth();
   const [busyDishId, setBusyDishId] = useState<string | null>(null);
 
-  const handleBatchTransition = async (dishId: string, toStatus: KitchenBatchStatus) => {
-    if (!user || !tenantId) return;
+  const handleBatchTransition = async (dishId: string | null, toStatus: KitchenBatchStatus) => {
+    if (
+      !user ||
+      !tenantId ||
+      !dishId ||
+      report.standardDishes.some((item) => item.dishId === dishId && isCustomOperationalItem(item))
+    )
+      return;
     setBusyDishId(dishId);
     try {
       const ctx = await createServiceContext({
@@ -621,10 +696,16 @@ function DigitalKitchenP1View({
             const primaryAction = primaryKitchenBatchAction(dish.batchStatus as KitchenBatchStatus);
 
             return (
-              <AccordionItem key={dish.dishId} value={dish.dishId}>
+              <AccordionItem
+                key={operationalItemIdentity(dish)}
+                value={operationalItemIdentity(dish)}
+              >
                 <AccordionTrigger>
                   <span className="flex flex-wrap items-center gap-2 text-left">
-                    <span className="font-semibold">{dish.dishName}</span>
+                    <span className="font-semibold">
+                      {dish.dishName}
+                      <CustomOperationalContext item={dish} />
+                    </span>
                     <Badge variant="secondary" className="font-mono font-bold">
                       {dish.totalQty} raciones
                     </Badge>
@@ -639,7 +720,7 @@ function DigitalKitchenP1View({
                     >
                       {kitchenBatchStatusLabel(dish.batchStatus as KitchenBatchStatus)}
                     </Badge>
-                    {dish.prepMinutes != null ? (
+                    {!isCustomOperationalItem(dish) && dish.prepMinutes != null ? (
                       <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                         <Clock className="h-3 w-3" />
                         {dish.prepMinutes} min
@@ -654,11 +735,11 @@ function DigitalKitchenP1View({
                       <div className="flex items-center gap-2 pt-1 border-b border-border/40 pb-3">
                         <Button
                           size="sm"
-                          disabled={busyDishId === dish.dishId}
+                          disabled={isCustomOperationalItem(dish) || busyDishId === dish.dishId}
                           onClick={() => void handleBatchTransition(dish.dishId, primaryAction.to)}
                           className="h-8 text-xs font-semibold gap-1.5 shadow-2xs"
                         >
-                          {busyDishId === dish.dishId ? (
+                          {dish.dishId !== null && busyDishId === dish.dishId ? (
                             <Loader2 className="h-3.5 w-3.5 animate-spin" />
                           ) : (
                             <Play className="h-3.5 w-3.5 fill-current" />
@@ -671,8 +752,11 @@ function DigitalKitchenP1View({
                       </div>
                     )}
 
-                    <DishAllergenDeclaration allergens={dish.allergens} />
-                    {dish.allergens.length > 0 ? (
+                    <OperationalAllergenDeclaration item={dish} />
+                    {!isCustomOperationalItem(dish) &&
+                    dish.allergenState !== "UNKNOWN" &&
+                    dish.allergenState !== "HISTORICAL_UNAVAILABLE" &&
+                    dish.allergens.length > 0 ? (
                       <div className="flex flex-wrap gap-1.5">
                         {dish.allergens.map((a) => (
                           <Badge
@@ -694,7 +778,7 @@ function DigitalKitchenP1View({
                       <ul className="divide-y divide-border text-sm">
                         {dish.customers.map((c) => (
                           <li
-                            key={`${c.orderId}-${c.customerId}`}
+                            key={`${c.orderId}-${c.orderItemId ?? c.customerId}`}
                             className="flex items-center justify-between py-2"
                           >
                             <span>{c.customerName}</span>
@@ -719,7 +803,7 @@ function DigitalKitchenP1View({
           </h3>
           <ul className="divide-y divide-amber-200/70">
             {report.customizations.map((c) => (
-              <li key={`${c.orderId}-${c.dishId}`} className="py-2.5 text-sm">
+              <li key={`${c.orderId}-${operationalItemIdentity(c)}`} className="py-2.5 text-sm">
                 <p className="font-semibold text-amber-950">{c.customerName}</p>
                 <p className="text-xs text-amber-900">
                   {c.dishName} <span className="font-mono font-bold">×{c.qty}</span>
@@ -981,7 +1065,7 @@ function DigitalPackingByClientView({
                 {/* Checklist interactivo táctil por plato */}
                 <ul className="divide-y divide-border/60 pt-1 space-y-1.5">
                   {cust.items.map((item, idx) => {
-                    const itemKey = `${cust.orderId}-${item.dishId}-${idx}`;
+                    const itemKey = `${cust.orderId}-${operationalItemIdentity(item)}-${idx}`;
                     const isChecked = checkedItemKeys.has(itemKey);
 
                     return (
@@ -1004,13 +1088,9 @@ function DigitalPackingByClientView({
                               )}
                             >
                               {item.dishName}
+                              <CustomOperationalContext item={item} />
                             </p>
-                            <DishAllergenDeclaration
-                              allergens={
-                                report.packingByDish.find((dish) => dish.dishId === item.dishId)
-                                  ?.allergens
-                              }
-                            />
+                            <OperationalAllergenDeclaration item={item} />
                             {item.comment ? (
                               <p className="text-xs text-amber-700 font-medium">
                                 ⚠️ {item.comment}
@@ -1083,19 +1163,28 @@ function DigitalPackingByDishView({ report }: { report: ProductionReportModel })
 
       <div className="space-y-4">
         {report.packingByDish.map((dish) => (
-          <div key={dish.dishId} className="rounded-xl border border-border bg-card p-4 space-y-3">
+          <div
+            key={operationalItemIdentity(dish)}
+            className="rounded-xl border border-border bg-card p-4 space-y-3"
+          >
             <div className="flex items-center justify-between border-b border-border/60 pb-2">
               <div className="flex items-center gap-2">
                 <Utensils className="h-4 w-4 text-primary" />
-                <span className="font-bold text-base">{dish.dishName}</span>
+                <span className="font-bold text-base">
+                  {dish.dishName}
+                  <CustomOperationalContext item={dish} />
+                </span>
               </div>
               <Badge variant="secondary" className="font-mono text-sm font-bold">
                 Total: {dish.totalQty} raciones
               </Badge>
             </div>
 
-            <DishAllergenDeclaration allergens={dish.allergens} />
-            {dish.allergens.length > 0 ? (
+            <OperationalAllergenDeclaration item={dish} />
+            {!isCustomOperationalItem(dish) &&
+            dish.allergenState !== "UNKNOWN" &&
+            dish.allergenState !== "HISTORICAL_UNAVAILABLE" &&
+            dish.allergens.length > 0 ? (
               <div className="flex flex-wrap gap-1.5">
                 {dish.allergens.map((a) => (
                   <Badge key={a} variant="outline" className="text-xs">
@@ -1189,11 +1278,14 @@ function PrintableProductionSheet({ report }: { report: ProductionReportModel })
             </thead>
             <tbody className="divide-y divide-gray-300">
               {report.standardDishes.map((dish) => (
-                <tr key={dish.dishId} className="break-inside-avoid">
-                  <td className="py-2 px-2 font-bold">{dish.dishName}</td>
+                <tr key={operationalItemIdentity(dish)} className="break-inside-avoid">
+                  <td className="py-2 px-2 font-bold">
+                    {dish.dishName}
+                    <CustomOperationalContext item={dish} />
+                  </td>
                   <td className="py-2 px-2 text-xs">
-                    <DishAllergenDeclaration
-                      allergens={dish.allergens}
+                    <OperationalAllergenDeclaration
+                      item={dish}
                       showDeclared
                       className="text-black"
                     />
@@ -1216,7 +1308,10 @@ function PrintableProductionSheet({ report }: { report: ProductionReportModel })
             </h2>
             <ul className="divide-y divide-gray-200 text-xs">
               {report.customizations.map((c) => (
-                <li key={`${c.orderId}-${c.dishId}`} className="py-1.5 flex justify-between gap-2">
+                <li
+                  key={`${c.orderId}-${operationalItemIdentity(c)}`}
+                  className="py-1.5 flex justify-between gap-2"
+                >
                   <div>
                     <span className="font-bold">{c.customerName}</span> — {c.dishName} (×{c.qty})
                     <p className="italic text-gray-800 font-semibold">
@@ -1300,16 +1395,16 @@ function PrintableProductionSheet({ report }: { report: ProductionReportModel })
 
                 <ul className="divide-y divide-gray-200 text-xs pt-1 space-y-1">
                   {cust.items.map((item, idx) => (
-                    <li key={idx} className="pt-1 flex justify-between items-start gap-1">
+                    <li
+                      key={`${cust.orderId}-${operationalItemIdentity(item)}-${idx}`}
+                      className="pt-1 flex justify-between items-start gap-1"
+                    >
                       <div>
-                        <span>[ ] {item.dishName}</span>
-                        <DishAllergenDeclaration
-                          allergens={
-                            report.packingByDish.find((dish) => dish.dishId === item.dishId)
-                              ?.allergens
-                          }
-                          className="text-black"
-                        />
+                        <span>
+                          [ ] {item.dishName}
+                          <CustomOperationalContext item={item} />
+                        </span>
+                        <OperationalAllergenDeclaration item={item} className="text-black" />
                         {item.comment ? (
                           <p className="font-semibold text-[11px] pl-4">→ {item.comment}</p>
                         ) : null}

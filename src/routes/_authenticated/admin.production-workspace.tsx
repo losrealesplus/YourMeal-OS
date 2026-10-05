@@ -1,3 +1,7 @@
+import {
+  CustomOperationalContext,
+  OperationalAllergenDeclaration,
+} from "@/production-experience/operational-item-presentation";
 /**
  * OPERATIONAL-004.5 · Production Workspace Demo
  *
@@ -14,11 +18,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useState, useEffectEvent } from "react";
 import { toast } from "sonner";
-import {
-  AdminHeader,
-  SectionTitle,
-  StatusChip,
-} from "@/components/admin";
+import { AdminHeader, SectionTitle, StatusChip } from "@/components/admin";
 import { useProduction } from "@/production/useProduction";
 import { useIdentity } from "@/identity/useIdentity";
 import {
@@ -39,9 +39,7 @@ import type {
 } from "@/production/ProductionContext";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute(
-  "/_authenticated/admin/production-workspace",
-)({
+export const Route = createFileRoute("/_authenticated/admin/production-workspace")({
   beforeLoad: ({ context }) => {
     // Pilot caps: kitchen.operate gates EP-002B; production.operate for hub.
     assertCapabilityFromContext(context, "kitchen.operate");
@@ -52,8 +50,7 @@ export const Route = createFileRoute(
       { title: "YourMeal OS — Production Workspace (Demo)" },
       {
         name: "description",
-        content:
-          "Capability Demo: operational planning via ProductionFacade only (LAW 003 · 004).",
+        content: "Capability Demo: operational planning via ProductionFacade only (LAW 003 · 004).",
       },
     ],
   }),
@@ -63,9 +60,7 @@ function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-function batchTone(
-  status: string,
-): "positive" | "warning" | "danger" | "neutral" {
+function batchTone(status: string): "positive" | "warning" | "danger" | "neutral" {
   if (status === "done") return "positive";
   if (status === "blocked" || status === "cancelled") return "danger";
   if (status === "released" || status === "in_progress") return "warning";
@@ -90,12 +85,8 @@ function ProductionWorkspaceDemoPage() {
     setLoading(true);
     try {
       const [plan, loadResult] = await Promise.all([
-        production.getProductionPlan(
-          getProductionPlanQuery({ dayDate }),
-        ),
-        production.getProductionLoad(
-          getProductionLoadQuery({ dayDate }),
-        ),
+        production.getProductionPlan(getProductionPlanQuery({ dayDate })),
+        production.getProductionLoad(getProductionLoadQuery({ dayDate })),
       ]);
       if (!plan.ok || !plan.context) {
         toast.error(plan.errors[0]?.message ?? "GetProductionPlan failed");
@@ -148,9 +139,7 @@ function ProductionWorkspaceDemoPage() {
   async function onQueueOnly() {
     setBusy(true);
     try {
-      const result = await production.getProductionQueue(
-        getProductionQueueQuery({ dayDate }),
-      );
+      const result = await production.getProductionQueue(getProductionQueueQuery({ dayDate }));
       if (!result.ok || !result.context) {
         toast.error(result.errors[0]?.message ?? "GetProductionQueue failed");
         return;
@@ -163,7 +152,7 @@ function ProductionWorkspaceDemoPage() {
   }
 
   async function onProbeGenerateBatch() {
-    if (!selected) return;
+    if (!selected || selected.constraints.isCustom || !selected.dishId) return;
     setBusy(true);
     try {
       const result = await production.execute(
@@ -181,7 +170,7 @@ function ProductionWorkspaceDemoPage() {
   }
 
   async function onMarkReady() {
-    if (!selected || selected.constraints.isCustom) return;
+    if (!selected || selected.constraints.isCustom || !selected.dishId) return;
     setBusy(true);
     try {
       const result = await production.markBatchReady(
@@ -201,7 +190,7 @@ function ProductionWorkspaceDemoPage() {
   }
 
   async function onCloseBatch() {
-    if (!selected || selected.constraints.isCustom) return;
+    if (!selected || selected.constraints.isCustom || !selected.dishId) return;
     setBusy(true);
     try {
       const result = await production.closeBatch(
@@ -245,8 +234,8 @@ function ProductionWorkspaceDemoPage() {
         </p>
         <p className="mt-1 text-muted-foreground">
           Tenant: {identity.tenant?.slug ?? "—"} · Operator:{" "}
-          {identity.currentUser?.fullName ?? identity.session.userId ?? "—"} ·
-          Ready: {production.isReady ? "yes" : "no"}
+          {identity.currentUser?.fullName ?? identity.session.userId ?? "—"} · Ready:{" "}
+          {production.isReady ? "yes" : "no"}
         </p>
         <p className="mt-2 text-xs text-muted-foreground">
           Legacy hub:{" "}
@@ -307,20 +296,14 @@ function ProductionWorkspaceDemoPage() {
           GetProductionLoad · portions{" "}
           <span className="font-semibold text-foreground">{load.portionCount}</span>
           {" · "}
-          batches{" "}
-          <span className="font-semibold text-foreground">{load.batchCount}</span>
+          batches <span className="font-semibold text-foreground">{load.batchCount}</span>
           {" · "}
-          custom{" "}
-          <span className="font-semibold text-foreground">
-            {load.customLineCount}
-          </span>
+          custom <span className="font-semibold text-foreground">{load.customLineCount}</span>
           {load.estimatedPrepMinutes != null ? (
             <>
               {" · "}
               prep min{" "}
-              <span className="font-semibold text-foreground">
-                {load.estimatedPrepMinutes}
-              </span>
+              <span className="font-semibold text-foreground">{load.estimatedPrepMinutes}</span>
             </>
           ) : null}
         </p>
@@ -329,9 +312,7 @@ function ProductionWorkspaceDemoPage() {
       {context ? (
         <p className="mb-4 text-xs text-muted-foreground">
           Plan {context.summary.id} · status{" "}
-          <span className="font-semibold text-foreground">
-            {context.summary.status}
-          </span>
+          <span className="font-semibold text-foreground">{context.summary.status}</span>
           {" · "}
           source orders {context.sourceOrders.orderIds.length}
         </p>
@@ -343,9 +324,7 @@ function ProductionWorkspaceDemoPage() {
             ProductionQueue · day {dayDate}
           </p>
           {loading ? (
-            <p className="py-8 text-center text-sm text-muted-foreground">
-              Cargando…
-            </p>
+            <p className="py-8 text-center text-sm text-muted-foreground">Cargando…</p>
           ) : batches.length === 0 ? (
             <p className="py-8 text-center text-sm text-muted-foreground">
               Sin trabajo planificado — GenerateProductionPlan
@@ -365,6 +344,7 @@ function ProductionWorkspaceDemoPage() {
                     <div className="min-w-0">
                       <p className="truncate text-sm font-semibold">
                         {b.dishName}
+                        <CustomOperationalContext item={b} />
                         {b.constraints.isCustom ? " · custom" : ""}
                       </p>
                       <p className="text-[11px] text-muted-foreground">
@@ -390,7 +370,18 @@ function ProductionWorkspaceDemoPage() {
           ) : (
             <div className="space-y-3 rounded-md border border-border p-4">
               <div>
-                <h3 className="text-lg font-semibold">{selected.dishName}</h3>
+                <h3 className="text-lg font-semibold">
+                  {selected.dishName}
+                  <CustomOperationalContext item={selected} />
+                  <OperationalAllergenDeclaration
+                    item={{
+                      kind: selected.kind,
+                      allergenState: selected.allergenState,
+                      allergens: selected.constraints.allergens,
+                    }}
+                    showDeclared
+                  />
+                </h3>
                 <p className="text-xs text-muted-foreground">{selected.id}</p>
               </div>
               <dl className="grid grid-cols-2 gap-2 text-xs">
@@ -410,16 +401,14 @@ function ProductionWorkspaceDemoPage() {
                 </div>
                 <div>
                   <dt className="text-muted-foreground">Custom</dt>
-                  <dd className="font-semibold">
-                    {selected.constraints.isCustom ? "yes" : "no"}
-                  </dd>
+                  <dd className="font-semibold">{selected.constraints.isCustom ? "yes" : "no"}</dd>
                 </div>
               </dl>
 
               <div className="flex flex-wrap gap-2 border-t border-dashed border-border pt-2">
                 <button
                   type="button"
-                  disabled={busy || selected.constraints.isCustom || !canPlan}
+                  disabled={busy || selected.constraints.isCustom || !selected.dishId || !canPlan}
                   onClick={() => void onMarkReady()}
                   className="rounded-md border border-border px-3 py-1.5 text-xs font-semibold disabled:opacity-40"
                 >
@@ -427,7 +416,7 @@ function ProductionWorkspaceDemoPage() {
                 </button>
                 <button
                   type="button"
-                  disabled={busy || selected.constraints.isCustom || !canPlan}
+                  disabled={busy || selected.constraints.isCustom || !selected.dishId || !canPlan}
                   onClick={() => void onCloseBatch()}
                   className="rounded-md border border-border px-3 py-1.5 text-xs font-semibold disabled:opacity-40"
                 >
@@ -435,7 +424,7 @@ function ProductionWorkspaceDemoPage() {
                 </button>
                 <button
                   type="button"
-                  disabled={busy}
+                  disabled={busy || selected.constraints.isCustom || !selected.dishId}
                   onClick={() => void onProbeGenerateBatch()}
                   className="rounded-md border border-dashed border-border px-3 py-1.5 text-xs text-muted-foreground disabled:opacity-40"
                 >

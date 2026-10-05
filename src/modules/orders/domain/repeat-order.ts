@@ -4,11 +4,15 @@
  * Never invents availability: missing dishes stay unavailable.
  */
 
+import { DomainError } from "@/domain/errors";
+import type { OrderItemReadModel } from "./order-item-read-model";
+
 export type SourceOrderLine = {
-  dishId: string;
+  dishId: string | null;
   dishName: string | null;
   qty: number;
   dayDate: string;
+  line?: OrderItemReadModel;
 };
 
 export type RepeatAvailableLine = {
@@ -31,6 +35,25 @@ export type RepeatOrderPlan = {
   targetWeekStart: string;
   available: RepeatAvailableLine[];
   unavailable: RepeatUnavailableLine[];
+  customProposals: RepeatCustomProposal[];
+};
+
+/** Proposal only: no historical price or operational batch can authorize a new order. */
+export type RepeatCustomProposal = {
+  kind: "custom";
+  sourceOrderItemId: string;
+  sourceItemIdentity: `custom:${string}`;
+  dishId: null;
+  name: string;
+  description: string | null;
+  allergenState: "UNKNOWN";
+  allergensSnapshot: [];
+  qty: number;
+  sourceDayDate: string;
+  targetDayDate: string;
+  availabilityConfirmation: "PENDING";
+  priceConfirmation: "PENDING";
+  unitPrice: null;
 };
 
 /** Days between weekStart and dayDate (0 = Monday of that week). */
@@ -70,12 +93,37 @@ export function buildRepeatOrderPlan(input: {
 }): RepeatOrderPlan {
   const available: RepeatAvailableLine[] = [];
   const unavailable: RepeatUnavailableLine[] = [];
+  const customProposals: RepeatCustomProposal[] = [];
 
   for (const line of input.sourceLines) {
-    if (!line.dishId || line.qty <= 0) continue;
-
     const offset = weekdayOffset(input.sourceWeekStart, line.dayDate);
     const preferred = addUtcDays(input.targetWeekStart, offset);
+    if (line.line?.kind === "custom") {
+      if (!Number.isFinite(line.qty) || line.qty <= 0) {
+        throw new DomainError("INVALID_STATE", "Invalid custom repeat quantity");
+      }
+      customProposals.push({
+        kind: "custom",
+        sourceOrderItemId: line.line.orderItemId,
+        sourceItemIdentity: line.line.identity,
+        dishId: null,
+        name: line.line.name!,
+        description: line.line.description,
+        allergenState: "UNKNOWN",
+        allergensSnapshot: [],
+        qty: line.qty,
+        sourceDayDate: line.dayDate,
+        targetDayDate: preferred,
+        availabilityConfirmation: "PENDING",
+        priceConfirmation: "PENDING",
+        unitPrice: null,
+      });
+      continue;
+    }
+    if (!line.dishId) {
+      throw new DomainError("INVALID_STATE", "Missing typed repeat source identity");
+    }
+    if (line.qty <= 0) continue;
     const offered = input.offerByDish.get(line.dishId) ?? [];
     const targetDay = resolveTargetDay(preferred, offered);
 
@@ -103,9 +151,10 @@ export function buildRepeatOrderPlan(input: {
     targetWeekStart: input.targetWeekStart,
     available,
     unavailable,
+    customProposals,
   };
 }
 
 export function canRepeatPlan(plan: RepeatOrderPlan): boolean {
-  return plan.available.length > 0;
+  return plan.available.length > 0 && plan.customProposals.length === 0;
 }

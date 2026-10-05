@@ -1,3 +1,4 @@
+import { operationalItemIdentity } from "@/modules/orders/domain/order-item-read-model";
 /**
  * CR-OPS-07: Production Kitchen Engine (P1 Cocina)
  * Pure transformation over NormalizedOperationalLine[] to produce
@@ -37,9 +38,9 @@ export function buildKitchenProductionSheet(params: {
   // 1. Group normalized lines by dishId
   const dishGroups = new Map<string, NormalizedOperationalLine[]>();
   for (const line of lines) {
-    const group = dishGroups.get(line.identity.dishId) || [];
+    const group = dishGroups.get(operationalItemIdentity(line.identity)) || [];
     group.push(line);
-    dishGroups.set(line.identity.dishId, group);
+    dishGroups.set(operationalItemIdentity(line.identity), group);
   }
 
   const dishes: KitchenDishConsolidatedBlock[] = [];
@@ -47,27 +48,41 @@ export function buildKitchenProductionSheet(params: {
   let totalAllergyAlertCount = 0;
   let totalModificationCount = 0;
 
-  for (const [dishId, dishLines] of dishGroups.entries()) {
+  for (const [itemIdentity, dishLines] of dishGroups.entries()) {
     const firstLine = dishLines[0];
     const dishName = firstLine.dishName;
-    const catalogAllergens = firstLine.dishAllergens;
+    const catalogAllergens = [...new Set(dishLines.flatMap((line) => line.dishAllergens))];
+    const allergenState = dishLines.some((line) => line.allergenSnapshotState === "UNKNOWN")
+      ? "UNKNOWN"
+      : dishLines.some(
+            (line) =>
+              (line.allergenSnapshotState ?? "HISTORICAL_UNAVAILABLE") === "HISTORICAL_UNAVAILABLE",
+          )
+        ? "HISTORICAL_UNAVAILABLE"
+        : "DECLARED";
 
     // Segment portions into variants
-    const variantMap = new Map<string, {
-      variantKey: string;
-      variantLabel: string;
-      severity: SafetySeverity;
-      allergensAffected: string[];
-      modifications: string[];
-      customerMap: Map<string, {
-        identity: NormalizedOperationalLine["identity"];
-        customerId: string;
-        customerName: string;
-        orderId: string;
-        qty: number;
-        notes: string | null;
-      }>;
-    }>();
+    const variantMap = new Map<
+      string,
+      {
+        variantKey: string;
+        variantLabel: string;
+        severity: SafetySeverity;
+        allergensAffected: string[];
+        modifications: string[];
+        customerMap: Map<
+          string,
+          {
+            identity: NormalizedOperationalLine["identity"];
+            customerId: string;
+            customerName: string;
+            orderId: string;
+            qty: number;
+            notes: string | null;
+          }
+        >;
+      }
+    >();
 
     let standardCount = 0;
     let safetyAllergyCount = 0;
@@ -79,7 +94,10 @@ export function buildKitchenProductionSheet(params: {
 
       let severity: SafetySeverity = "standard";
       let variantKey = "STD";
-      let variantLabel = "Ración Estándar";
+      let variantLabel =
+        line.identity.itemKind === "custom"
+          ? "PERSONALIZADO · Alérgenos sin declarar"
+          : "Ración Estándar";
 
       if (hasCriticalAllergens) {
         severity = "critical_allergy";
@@ -107,6 +125,9 @@ export function buildKitchenProductionSheet(params: {
         standardCount++;
       }
 
+      if (line.identity.itemKind === "custom" && variantKey !== "STD")
+        variantLabel += " · Alérgenos sin declarar";
+
       const existingVariant = variantMap.get(variantKey) || {
         variantKey,
         variantLabel,
@@ -116,7 +137,8 @@ export function buildKitchenProductionSheet(params: {
         customerMap: new Map(),
       };
 
-      const custEntry = existingVariant.customerMap.get(line.customerId) || {
+      const customerKey = `${line.customerId}:${line.identity.orderId}:${line.identity.orderItemId}`;
+      const custEntry = existingVariant.customerMap.get(customerKey) || {
         identity: line.identity,
         customerId: line.customerId,
         customerName: line.customerName,
@@ -125,7 +147,7 @@ export function buildKitchenProductionSheet(params: {
         notes: line.itemNotes,
       };
       custEntry.qty += 1;
-      existingVariant.customerMap.set(line.customerId, custEntry);
+      existingVariant.customerMap.set(customerKey, custEntry);
       variantMap.set(variantKey, existingVariant);
     }
 
@@ -154,7 +176,11 @@ export function buildKitchenProductionSheet(params: {
     });
 
     dishes.push({
-      dishId,
+      dishId: firstLine.identity.dishId,
+      itemIdentity: operationalItemIdentity(firstLine.identity),
+      itemKind: firstLine.identity.itemKind ?? "dish",
+      allergenState,
+      recipeState: firstLine.identity.itemKind === "custom" ? "NOT_AVAILABLE" : "CATALOGUE_LINKED",
       dishName,
       totalQty: dishLines.length,
       catalogAllergens,
@@ -170,12 +196,14 @@ export function buildKitchenProductionSheet(params: {
   // Sort dishes by totalQty descending
   dishes.sort((a, b) => b.totalQty - a.totalQty);
 
-  const criticalAllergensPresent = Array.from(globalAllergenCounts.entries()).map(([algId, info]) => ({
-    allergenId: algId,
-    allergenLabel: formatAllergenName(algId),
-    affectedPortions: info.count,
-    affectedDishes: Array.from(info.affectedDishes),
-  }));
+  const criticalAllergensPresent = Array.from(globalAllergenCounts.entries()).map(
+    ([algId, info]) => ({
+      allergenId: algId,
+      allergenLabel: formatAllergenName(algId),
+      affectedPortions: info.count,
+      affectedDishes: Array.from(info.affectedDishes),
+    }),
+  );
 
   const safetySummary: KitchenSafetyAlertBanner = {
     totalAllergyAlertCount,

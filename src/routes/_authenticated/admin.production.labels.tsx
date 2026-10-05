@@ -1,4 +1,5 @@
-import { DishAllergenDeclaration } from "@/components/operations/dish-allergen-declaration";
+import { buildOperationalLabels } from "@/production-experience/operational-labels";
+import { OperationalAllergenDeclaration } from "@/production-experience/operational-item-presentation";
 /**
  * ADMIN · Producción · Etiquetas
  * Capability: kitchen.operate  ·  Core Object: ProductionLabel (portion-level)
@@ -17,23 +18,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import {
-  ProductionReportService,
-  type ProductionReportModel,
-} from "@/modules/operations";
+import { ProductionReportService, type ProductionReportModel } from "@/modules/operations";
 import { cn } from "@/lib/utils";
 
 const ROLES_ALLOWED = ["saas_admin", "company_admin", "operations_manager", "kitchen"];
-
-type LabelRow = {
-  key: string;
-  orderId: string;
-  customerName: string;
-  dishName: string;
-  allergens: string[];
-  note: string | null;
-  isCustom: boolean;
-};
 
 export const Route = createFileRoute("/_authenticated/admin/production/labels")({
   beforeLoad: ({ context }) => {
@@ -43,7 +31,9 @@ export const Route = createFileRoute("/_authenticated/admin/production/labels")(
   head: () => ({ meta: [{ title: "YourMeal OS — Etiquetas" }] }),
 });
 
-function todayISO() { return new Date().toISOString().slice(0, 10); }
+function todayISO() {
+  return new Date().toISOString().slice(0, 10);
+}
 
 function LabelsPage() {
   const { user, tenantId, roles } = useAuth();
@@ -60,59 +50,42 @@ function LabelsPage() {
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "No se pudieron generar las etiquetas");
       setReport(null);
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   }, [user, tenantId, roles, date]);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    void load();
+  }, [load]);
 
-  const labels = useMemo<LabelRow[]>(() => {
-    if (!report) return [];
-    const rows: LabelRow[] = [];
-    for (const dish of report.standardDishes) {
-      for (const c of dish.customers) {
-        for (let i = 0; i < c.qty; i++) {
-          rows.push({
-            key: `${dish.dishId}:${c.orderId}:${c.customerId}:${i}`,
-            orderId: c.orderId,
-            customerName: c.customerName,
-            dishName: dish.dishName,
-            allergens: dish.allergens,
-            note: c.note,
-            isCustom: false,
-          });
-        }
-      }
-    }
-    for (const cx of report.customizations) {
-      for (let i = 0; i < cx.qty; i++) {
-        rows.push({
-          key: `custom:${cx.dishId}:${cx.orderId}:${cx.customerId}:${i}`,
-          orderId: cx.orderId,
-          customerName: cx.customerName,
-          dishName: cx.dishName,
-          allergens: [],
-          note: cx.observation,
-          isCustom: true,
-        });
-      }
-    }
-    return rows;
-  }, [report]);
+  const labels = useMemo(() => (report ? buildOperationalLabels(report) : []), [report]);
 
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-wrap items-end justify-between gap-3 print:hidden">
         <div className="space-y-1.5">
           <Label htmlFor="labels-date">Fecha</Label>
-          <Input id="labels-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-44" />
+          <Input
+            id="labels-date"
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="w-44"
+          />
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={() => void load()} disabled={loading}>
             <RefreshCw className={cn("mr-2 h-4 w-4", loading && "animate-spin")} />
             Actualizar
           </Button>
-          <Button size="sm" onClick={() => window.print()} disabled={loading || labels.length === 0}>
-            <Printer className="mr-2 h-4 w-4" />Imprimir
+          <Button
+            size="sm"
+            onClick={() => window.print()}
+            disabled={loading || labels.length === 0}
+          >
+            <Printer className="mr-2 h-4 w-4" />
+            Imprimir
           </Button>
         </div>
       </div>
@@ -130,22 +103,37 @@ function LabelsPage() {
           </p>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 print:grid-cols-3">
             {labels.map((l) => (
-              <article key={l.key}
-                className="flex flex-col gap-2 rounded-lg border border-border bg-card p-3 text-xs print:border-black">
+              <article
+                key={l.key}
+                className="flex flex-col gap-2 rounded-lg border border-border bg-card p-3 text-xs print:border-black"
+              >
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-[10px] uppercase text-muted-foreground">
                     #{l.orderId.slice(0, 8)}
                   </span>
-                  {l.isCustom ? <Badge variant="outline" className="text-[10px]">Custom</Badge> : null}
+                  {l.isCustom ? (
+                    <Badge variant="outline" className="text-[10px]">
+                      PERSONALIZADO
+                    </Badge>
+                  ) : null}
                 </div>
                 <p className="text-sm font-semibold leading-tight">{l.dishName}</p>
+                {l.nativeCustom ? (
+                  <>
+                    <span>Receta no vinculada</span>
+                    <span className="font-mono text-[10px]">{l.itemIdentity}</span>
+                  </>
+                ) : null}
                 <p className="leading-tight text-muted-foreground">{l.customerName}</p>
-                <DishAllergenDeclaration allergens={l.allergens} />
-                {l.allergens.length > 0 ? (
+                <OperationalAllergenDeclaration item={l} />
+                {l.allergenState !== "UNKNOWN" &&
+                l.allergenState !== "HISTORICAL_UNAVAILABLE" &&
+                l.allergens.length > 0 ? (
                   <div className="flex flex-wrap gap-1">
                     {l.allergens.map((a) => (
                       <Badge key={a} variant="outline" className="gap-1 text-[10px]">
-                        <Wheat className="h-2.5 w-2.5" />{a}
+                        <Wheat className="h-2.5 w-2.5" />
+                        {a}
                       </Badge>
                     ))}
                   </div>

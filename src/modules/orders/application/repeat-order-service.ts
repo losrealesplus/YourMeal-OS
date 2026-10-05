@@ -12,6 +12,7 @@ import { fetchCatalogDishesByIds } from "@/modules/dish-library/application/dish
 import { createOrderRepository } from "../infrastructure/order-repository";
 import { OrderIntakeService } from "@/modules/order-intake";
 import type { ProgramDraftOrderResult } from "./order-service";
+import { readOrderItem } from "../domain/order-item-read-model";
 import {
   buildRepeatOrderPlan,
   canRepeatPlan,
@@ -29,10 +30,7 @@ export type RepeatOrderResult = {
   draft: ProgramDraftOrderResult;
 };
 
-async function assertOrderOwnership(
-  ctx: ServiceContext,
-  customerIdOnOrder: string,
-): Promise<void> {
+async function assertOrderOwnership(ctx: ServiceContext, customerIdOnOrder: string): Promise<void> {
   if (hasStaffAccess(ctx.roles)) return;
   const repo = createOrderRepository(ctx.supabase, ctx.tenantId);
   const customerId = await repo.findCustomerIdForUser(ctx.userId);
@@ -63,13 +61,24 @@ async function loadSourceLines(
 
   await assertOrderOwnership(ctx, current.order.customer_id);
 
-  const dishIds = [...new Set(current.items.map((i) => i.dish_id))];
-  const dishesById = await fetchCatalogDishesByIds(ctx.tenantId, dishIds);
+  const readers = current.items.map((item) => ({ item, line: readOrderItem(item) }));
+  const dishIds = [
+    ...new Set(
+      readers.flatMap(({ line }) =>
+        line.kind === "dish" && line.metadataSource !== "snapshot" ? [line.dishId] : [],
+      ),
+    ),
+  ];
+  const dishesById = dishIds.length
+    ? await fetchCatalogDishesByIds(ctx.tenantId, dishIds)
+    : new Map();
 
-  const lines: SourceOrderLine[] = current.items.map((item) => ({
-    dishId: item.dish_id,
-    dishName: dishesById.get(item.dish_id)?.name ?? null,
-    qty: Number(item.qty) || 1,
+  const lines: SourceOrderLine[] = readers.map(({ item, line }) => ({
+    line,
+    dishId: line.dishId,
+    dishName:
+      line.name ?? (line.kind === "dish" ? (dishesById.get(line.dishId)?.name ?? null) : null),
+    qty: Number(item.qty),
     dayDate: item.day_date,
   }));
 
@@ -83,10 +92,12 @@ async function loadSourceLines(
 async function buildOfferByDish(
   ctx: ServiceContext,
   targetWeekStart: string,
+  preserveCustomProposal = false,
 ): Promise<Map<string, string[]>> {
   const menuRepo = createWeeklyMenuRepository(ctx.supabase, ctx.tenantId);
   const menu = await menuRepo.findPublishedByWeekStart(targetWeekStart);
   if (!menu) {
+    if (preserveCustomProposal) return new Map();
     throw new DomainError("MENU_LOCKED", "No published weekly menu for this week");
   }
 
@@ -116,7 +127,13 @@ export const RepeatOrderService = {
     requireCapability(ctx.roles, "orders.read");
 
     const source = await loadSourceLines(ctx, sourceOrderId);
-    const offerByDish = await buildOfferByDish(ctx, targetWeekStart);
+    const offerByDish = source.lines.some((line) => line.line?.kind !== "custom")
+      ? await buildOfferByDish(
+          ctx,
+          targetWeekStart,
+          source.lines.some((line) => line.line?.kind === "custom"),
+        )
+      : new Map<string, string[]>();
     const plan = buildRepeatOrderPlan({
       sourceWeekStart: source.sourceWeekStart,
       sourceLines: source.lines,
@@ -141,11 +158,13 @@ export const RepeatOrderService = {
   ): Promise<RepeatOrderResult> {
     requireCapability(ctx.roles, "orders.write");
 
-    const preview = await RepeatOrderService.preview(
-      ctx,
-      sourceOrderId,
-      targetWeekStart,
-    );
+    const preview = await RepeatOrderService.preview(ctx, sourceOrderId, targetWeekStart);
+    if (preview.customProposals.length) {
+      throw new DomainError(
+        "UNIMPLEMENTED",
+        "Custom repeat requires availability and price reconfirmation; writer v2 is not enabled",
+      );
+    }
     if (!preview.canRepeat) {
       throw new DomainError(
         "INVALID_STATE",

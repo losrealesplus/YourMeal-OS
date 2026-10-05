@@ -1,4 +1,11 @@
-import { DishAllergenDeclaration } from "@/components/operations/dish-allergen-declaration";
+import {
+  operationalItemIdentity,
+  isCustomOperationalItem,
+} from "@/production-experience/operational-item-identity";
+import {
+  CustomOperationalContext,
+  OperationalAllergenDeclaration,
+} from "@/production-experience/operational-item-presentation";
 /**
  * EP-002B.2 — Kitchen Execution workspace.
  * Same data as Hoja de Producción; lot-level status mutations via KitchenExecutionService.
@@ -6,15 +13,7 @@ import { DishAllergenDeclaration } from "@/components/operations/dish-allergen-d
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useState } from "react";
-import {
-  ArrowLeft,
-  CheckCircle2,
-  Clock,
-  FileText,
-  Play,
-  RefreshCw,
-  Wheat,
-} from "lucide-react";
+import { ArrowLeft, CheckCircle2, Clock, FileText, Play, RefreshCw, Wheat } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { useCan } from "@/hooks/use-can";
@@ -103,9 +102,7 @@ function KitchenExecutionPage() {
       });
       setBoard(model);
     } catch (e) {
-      toast.error(
-        e instanceof Error ? e.message : "No se pudo cargar la ejecución",
-      );
+      toast.error(e instanceof Error ? e.message : "No se pudo cargar la ejecución");
       setBoard(null);
     } finally {
       setLoading(false);
@@ -117,7 +114,7 @@ function KitchenExecutionPage() {
   }, [load]);
 
   async function transition(dish: ProductionDishBlock, to: KitchenBatchStatus) {
-    if (!user || !tenantId) return;
+    if (!user || !tenantId || isCustomOperationalItem(dish) || !dish.dishId) return;
     setBusyDishId(dish.dishId);
     try {
       const ctx = await createServiceContext({
@@ -131,9 +128,7 @@ function KitchenExecutionPage() {
         dishId: dish.dishId,
         toStatus: to,
       });
-      toast.success(
-        `${dish.dishName} → ${kitchenBatchStatusLabel(to)}`,
-      );
+      toast.success(`${dish.dishName} → ${kitchenBatchStatusLabel(to)}`);
       await load();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Transición rechazada");
@@ -157,9 +152,9 @@ function KitchenExecutionPage() {
   const customs = board?.customizations ?? [];
   const customsByDish = new Map<string, typeof customs>();
   for (const c of customs) {
-    const list = customsByDish.get(c.dishId) ?? [];
+    const list = customsByDish.get(operationalItemIdentity(c)) ?? [];
     list.push(c);
-    customsByDish.set(c.dishId, list);
+    customsByDish.set(operationalItemIdentity(c), list);
   }
 
   return (
@@ -185,15 +180,8 @@ function KitchenExecutionPage() {
               Hoja de Producción
             </Link>
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => void load()}
-            disabled={loading}
-          >
-            <RefreshCw
-              className={cn("mr-2 h-4 w-4", loading && "animate-spin")}
-            />
+          <Button variant="outline" size="sm" onClick={() => void load()} disabled={loading}>
+            <RefreshCw className={cn("mr-2 h-4 w-4", loading && "animate-spin")} />
             Actualizar
           </Button>
         </div>
@@ -212,8 +200,8 @@ function KitchenExecutionPage() {
         </div>
         {board ? (
           <p className="pb-2 text-sm text-muted-foreground">
-            {board.totals.dishCount} lotes · {board.totals.portionCount} raciones
-            · {board.totals.customizationCount} personalizados
+            {board.totals.dishCount} lotes · {board.totals.portionCount} raciones ·{" "}
+            {board.totals.customizationCount} personalizados
           </p>
         ) : null}
       </div>
@@ -232,12 +220,12 @@ function KitchenExecutionPage() {
           {dishes.map((dish) => {
             const primary = primaryKitchenBatchAction(dish.batchStatus);
             const next = nextKitchenBatchStatuses(dish.batchStatus);
-            const relatedCustoms = customsByDish.get(dish.dishId) ?? [];
-            const busy = busyDishId === dish.dishId;
+            const relatedCustoms = customsByDish.get(operationalItemIdentity(dish)) ?? [];
+            const busy = dish.dishId !== null && busyDishId === dish.dishId;
 
             return (
               <article
-                key={dish.dishId}
+                key={operationalItemIdentity(dish)}
                 className="rounded-xl border border-border bg-card p-5"
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
@@ -245,6 +233,7 @@ function KitchenExecutionPage() {
                     <div className="flex flex-wrap items-center gap-2">
                       <h2 className="text-lg font-semibold tracking-tight">
                         {dish.dishName}
+                        <CustomOperationalContext item={dish} />
                       </h2>
                       <Badge className={batchTone(dish.batchStatus)}>
                         {kitchenBatchStatusLabel(dish.batchStatus)}
@@ -255,16 +244,18 @@ function KitchenExecutionPage() {
                         {dish.totalQty}
                       </span>{" "}
                       raciones
-                      {dish.prepMinutes != null ? (
+                      {!isCustomOperationalItem(dish) && dish.prepMinutes != null ? (
                         <>
                           {" · "}
-                          <Clock className="inline h-3.5 w-3.5" />{" "}
-                          {dish.prepMinutes} min
+                          <Clock className="inline h-3.5 w-3.5" /> {dish.prepMinutes} min
                         </>
                       ) : null}
                     </p>
-                    <DishAllergenDeclaration allergens={dish.allergens} />
-                    {dish.allergens.length > 0 ? (
+                    <OperationalAllergenDeclaration item={dish} />
+                    {!isCustomOperationalItem(dish) &&
+                    dish.allergenState !== "UNKNOWN" &&
+                    dish.allergenState !== "HISTORICAL_UNAVAILABLE" &&
+                    dish.allergens.length > 0 ? (
                       <div className="flex flex-wrap gap-1.5">
                         {dish.allergens.map((a) => (
                           <Badge key={a} variant="outline" className="gap-1 text-xs">
@@ -280,7 +271,7 @@ function KitchenExecutionPage() {
                     {primary ? (
                       <Button
                         size="sm"
-                        disabled={busy}
+                        disabled={isCustomOperationalItem(dish) || busy}
                         onClick={() => void transition(dish, primary.to)}
                       >
                         {dish.batchStatus === "pending" ? (
@@ -303,7 +294,7 @@ function KitchenExecutionPage() {
                           key={s}
                           size="sm"
                           variant="outline"
-                          disabled={busy}
+                          disabled={isCustomOperationalItem(dish) || busy}
                           onClick={() => void transition(dish, s)}
                         >
                           {kitchenBatchStatusLabel(s)}
@@ -321,7 +312,7 @@ function KitchenExecutionPage() {
                       <ul className="divide-y divide-border text-sm">
                         {dish.customers.map((c) => (
                           <li
-                            key={`${c.orderId}-${c.customerId}`}
+                            key={`${c.orderId}-${c.orderItemId ?? c.customerId}`}
                             className="flex justify-between py-2"
                           >
                             <span>{c.customerName}</span>
@@ -337,9 +328,7 @@ function KitchenExecutionPage() {
                           <ul className="mt-2 space-y-2 text-sm">
                             {relatedCustoms.map((c) => (
                               <li key={`${c.orderId}-${c.observation}`}>
-                                <span className="font-semibold">
-                                  {c.customerName}
-                                </span>
+                                <span className="font-semibold">{c.customerName}</span>
                                 {" · "}
                                 {c.observation}
                               </li>
@@ -359,7 +348,7 @@ function KitchenExecutionPage() {
               <h3 className="font-semibold">Personalizados del día</h3>
               <ul className="mt-3 divide-y divide-border text-sm">
                 {customs.map((c) => (
-                  <li key={`${c.orderId}-${c.dishId}`} className="py-3">
+                  <li key={`${c.orderId}-${operationalItemIdentity(c)}`} className="py-3">
                     <p className="font-semibold">{c.customerName}</p>
                     <p>
                       {c.dishName} ×{c.qty}

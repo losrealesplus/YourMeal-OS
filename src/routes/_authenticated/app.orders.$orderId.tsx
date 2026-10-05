@@ -77,6 +77,10 @@ function OrderSummary() {
   };
 
   const isDraft = order.status === "draft";
+  const canConfirmLegacy =
+    isDraft &&
+    (order.writeContractVersion ?? 1) === 1 &&
+    order.items.every((item) => item.line?.kind !== "custom");
   const addressLine = formatAddress(order.address);
   const showRepeat =
     !isDraft && order.status !== "cancelled" && Boolean(repeatPreview.data?.canRepeat);
@@ -129,13 +133,22 @@ function OrderSummary() {
         <div className="bg-card border border-border rounded-2xl divide-y divide-border">
           {order.items.map((it) => {
             const dish = it.dish;
-            if (!dish) return null;
+            const name = it.line?.name ?? dish?.name ?? "Nombre no disponible";
             return (
-              <div key={`${it.dishId}-${it.dayDate}`} className="flex items-center gap-3 p-3">
-                <DishThumb emoji={dish.emoji} size="sm" />
+              <div
+                key={it.line?.orderItemId ?? `${it.dishId}:${it.dayDate}`}
+                className="flex items-center gap-3 p-3"
+              >
+                <DishThumb emoji={dish?.emoji ?? "🍽️"} size="sm" />
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold truncate">{dish.name}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{dish.kcal} kcal</p>
+                  <p className="font-semibold truncate">{name}</p>
+                  {it.line?.kind === "custom" ? (
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      PERSONALIZADO · Alérgenos sin declarar · Receta no vinculada
+                    </p>
+                  ) : dish ? (
+                    <p className="text-xs text-muted-foreground mt-0.5">{dish.kcal} kcal</p>
+                  ) : null}
                 </div>
                 <span className="font-mono text-sm font-bold tabular-nums">×{it.qty}</span>
               </div>
@@ -173,6 +186,23 @@ function OrderSummary() {
         </div>
       </section>
 
+      {repeatPreview.data?.customProposals?.length ? (
+        <section className="px-6 mt-6">
+          <p className="meta-label mb-2">Propuestas personalizadas pendientes</p>
+          <ul className="bg-card border border-border rounded-2xl divide-y divide-border">
+            {repeatPreview.data!.customProposals.map((proposal) => (
+              <li key={proposal.sourceOrderItemId} className="px-4 py-3 text-sm">
+                <p className="font-semibold">{proposal.name}</p>
+                <p>PERSONALIZADO · Alérgenos sin declarar</p>
+                <p>
+                  Disponibilidad y precio pendientes de confirmación. No se ha creado otro pedido.
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       {repeatPreview.data && repeatPreview.data.unavailable.length > 0 && showRepeat ? (
         <section className="px-6 mt-6">
           <p className="meta-label mb-2">{t("customer:repeatUnavailableTitle")}</p>
@@ -209,7 +239,7 @@ function OrderSummary() {
       </section>
 
       <div className="px-6 mt-8 space-y-3">
-        {isDraft ? (
+        {canConfirmLegacy ? (
           <>
             {confirmOrder.isError ? (
               <p className="text-sm text-destructive" role="alert">

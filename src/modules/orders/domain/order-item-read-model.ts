@@ -102,3 +102,28 @@ export function requireDishReader(
   }
   return item;
 }
+
+/** Identity for downstream maps: never use nullable dishId or display text as a key. */
+export function operationalItemIdentity(input: {
+  dishId: string | null;
+  orderItemId: string;
+  itemKind?: "dish" | "custom";
+  itemIdentity?: ItemIdentity;
+}): ItemIdentity {
+  if (
+    ["null", "undefined"].includes(input.orderItemId) ||
+    (input.dishId !== null && ["null", "undefined"].includes(input.dishId))
+  ) {
+    throw new DomainError("INVALID_STATE", "Invalid typed operational identity");
+  }
+  const expected: ItemIdentity =
+    input.itemKind === "custom" ? `custom:${input.orderItemId}` : `dish:${input.dishId ?? ""}`;
+  if (
+    (input.itemKind === "custom" && (input.dishId !== null || !input.orderItemId)) ||
+    (input.itemKind !== "custom" && !input.dishId) ||
+    (input.itemIdentity !== undefined && input.itemIdentity !== expected)
+  ) {
+    throw new DomainError("INVALID_STATE", "Invalid typed operational identity");
+  }
+  return expected;
+}

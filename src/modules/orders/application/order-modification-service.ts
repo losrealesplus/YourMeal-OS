@@ -1,3 +1,4 @@
+import { assertLegacyOrderWriteCompatible } from "../domain/legacy-order-write-guard";
 import { DomainError } from "@/domain/errors";
 import { requireCapability } from "@/permissions";
 import { AuditService } from "@/services/audit-service";
@@ -22,12 +23,7 @@ export interface ModifyConfirmedOrderResult {
 
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
-const MODIFIABLE_STATUSES = new Set([
-  "draft",
-  "confirmed",
-  "in_production",
-  "prepared",
-]);
+const MODIFIABLE_STATUSES = new Set(["draft", "confirmed", "in_production", "prepared"]);
 
 /**
  * OPS-01 G3 — OrderModificationService
@@ -60,9 +56,16 @@ export const OrderModificationService = {
         throw new DomainError("INVALID_STATE", "Every line item must have a valid dishId.");
       }
       if (typeof line.qty !== "number" || line.qty <= 0 || !Number.isInteger(line.qty)) {
-        throw new DomainError("INVALID_STATE", `Quantity must be a positive integer, got ${line.qty}`);
+        throw new DomainError(
+          "INVALID_STATE",
+          `Quantity must be a positive integer, got ${line.qty}`,
+        );
       }
-      if (line.unitPriceOverride !== undefined && line.unitPriceOverride !== null && line.unitPriceOverride < 0) {
+      if (
+        line.unitPriceOverride !== undefined &&
+        line.unitPriceOverride !== null &&
+        line.unitPriceOverride < 0
+      ) {
         throw new DomainError("INVALID_STATE", "unitPriceOverride cannot be negative.");
       }
     }
@@ -98,8 +101,13 @@ export const OrderModificationService = {
       .is("deleted_at", null);
 
     if (itemsFetchError) {
-      throw new DomainError("INVALID_STATE", `Failed to fetch existing items: ${itemsFetchError.message}`);
+      throw new DomainError(
+        "INVALID_STATE",
+        `Failed to fetch existing items: ${itemsFetchError.message}`,
+      );
     }
+
+    assertLegacyOrderWriteCompatible(currentOrder as OrderRow, currentItems ?? []);
 
     const oldSnapshot = {
       order: currentOrder,
@@ -160,7 +168,8 @@ export const OrderModificationService = {
     newGrandTotal = Math.round(newGrandTotal * 100) / 100;
 
     // 4. Update Order header (total and notes)
-    const updatedNotes = dto.orderNotes !== undefined ? dto.orderNotes?.trim() ?? null : currentOrder.notes;
+    const updatedNotes =
+      dto.orderNotes !== undefined ? (dto.orderNotes?.trim() ?? null) : currentOrder.notes;
 
     const { data: updatedOrderData, error: updateOrderError } = await ctx.supabase
       .from("orders")
@@ -174,7 +183,10 @@ export const OrderModificationService = {
       .single();
 
     if (updateOrderError || !updatedOrderData) {
-      throw new DomainError("INVALID_STATE", `Failed to update order: ${updateOrderError?.message ?? "Unknown error"}`);
+      throw new DomainError(
+        "INVALID_STATE",
+        `Failed to update order: ${updateOrderError?.message ?? "Unknown error"}`,
+      );
     }
 
     // 5. Replace existing order items with updated lines
@@ -201,7 +213,10 @@ export const OrderModificationService = {
       .select("*");
 
     if (insertItemsError || !newItemsData) {
-      throw new DomainError("INVALID_STATE", `Failed to insert modified order items: ${insertItemsError?.message ?? "Unknown error"}`);
+      throw new DomainError(
+        "INVALID_STATE",
+        `Failed to insert modified order items: ${insertItemsError?.message ?? "Unknown error"}`,
+      );
     }
 
     const updatedOrder = updatedOrderData as OrderRow;
@@ -245,7 +260,10 @@ export const OrderModificationService = {
         const opsRepo = createOperationsRepository(ctx.supabase, ctx.tenantId);
         await opsRepo.createDeliveryServicesForOrder(dto.orderId);
       } catch (deliveryErr) {
-        console.warn("[CR-OPS-08] Resync of delivery_services deferred on modification:", deliveryErr);
+        console.warn(
+          "[CR-OPS-08] Resync of delivery_services deferred on modification:",
+          deliveryErr,
+        );
       }
     }
 

@@ -4,7 +4,7 @@
  * - Kitchen Consolidated Sheet with Safety Segregation (P1)
  * - 6-Level Collapsible Packing Tree (P2)
  * - Version Manager with Deterministic Fingerprint
- * - Flat 14-column CSV / Excel Matrix
+ * - Flat 17-column CSV / Excel Matrix
  * - Thermal Label Feed
  */
 import type { ServiceContext } from "@/services/types";
@@ -14,10 +14,7 @@ import {
   type OperationalOrderFilters,
 } from "../infrastructure/operations-repository";
 import { KITCHEN_QUEUE_STATUSES } from "../domain/operational-status";
-import {
-  isKitchenBatchStatus,
-  type KitchenBatchStatus,
-} from "../domain/kitchen-batch-status";
+import { isKitchenBatchStatus, type KitchenBatchStatus } from "../domain/kitchen-batch-status";
 import {
   buildProductionReport,
   type DishMeta,
@@ -76,7 +73,7 @@ async function loadDishMeta(
   const map = new Map<string, DishMeta>();
   if (dishIds.length === 0) return map;
 
-  const db = ctx.supabase as any;
+  const db = ctx.supabase;
   const { data, error } = await db
     .from("dishes")
     .select("id, allergens, prep_minutes, weight_g")
@@ -100,13 +97,10 @@ async function loadDishMeta(
   return map;
 }
 
-async function loadRecipeLines(
-  ctx: ServiceContext,
-  dishIds: string[],
-): Promise<RecipeLine[]> {
+async function loadRecipeLines(ctx: ServiceContext, dishIds: string[]): Promise<RecipeLine[]> {
   if (dishIds.length === 0) return [];
 
-  const db = ctx.supabase as any;
+  const db = ctx.supabase;
   const { data, error } = await db
     .from("dish_ingredients")
     .select("dish_id, ingredient_id, qty, unit, ingredients ( id, name )")
@@ -114,13 +108,15 @@ async function loadRecipeLines(
     .in("dish_id", dishIds);
   if (error) throw error;
 
-  return ((data ?? []) as Array<{
-    dish_id: string;
-    ingredient_id: string;
-    qty: number;
-    unit: string;
-    ingredients: { id: string; name: string } | null;
-  }>)
+  return (
+    (data ?? []) as Array<{
+      dish_id: string;
+      ingredient_id: string;
+      qty: number;
+      unit: string;
+      ingredients: { id: string; name: string } | null;
+    }>
+  )
     .filter((row) => row.ingredients?.name)
     .map((row) => ({
       dishId: row.dish_id,
@@ -134,30 +130,35 @@ async function loadRecipeLines(
 async function loadBatchStatuses(
   ctx: ServiceContext,
   deliveryDate: string,
-  dishIds: string[],
+  itemIdentities: string[],
 ): Promise<Map<string, { status: KitchenBatchStatus; updatedAt: string | null }>> {
-  const map = new Map<
-    string,
-    { status: KitchenBatchStatus; updatedAt: string | null }
-  >();
-  if (dishIds.length === 0) return map;
+  const map = new Map<string, { status: KitchenBatchStatus; updatedAt: string | null }>();
+  if (itemIdentities.length === 0) return map;
 
-  const db = ctx.supabase as any;
+  const db = ctx.supabase;
   const { data, error } = await db
     .from("kitchen_production_batches")
-    .select("dish_id, status, updated_at")
+    .select("*")
     .eq("tenant_id", ctx.tenantId)
-    .eq("delivery_date", deliveryDate)
-    .in("dish_id", dishIds);
+    .eq("delivery_date", deliveryDate);
   if (error) throw error;
 
   for (const row of (data ?? []) as Array<{
-    dish_id: string;
+    dish_id: string | null;
+    custom_order_item_id?: string | null;
+    item_kind?: string;
     status: string;
     updated_at: string | null;
   }>) {
     if (!isKitchenBatchStatus(row.status)) continue;
-    map.set(row.dish_id, {
+    const identity =
+      row.item_kind === "custom" && row.dish_id === null && row.custom_order_item_id
+        ? `custom:${row.custom_order_item_id}`
+        : (row.item_kind === undefined || row.item_kind === "dish") && row.dish_id
+          ? `dish:${row.dish_id}`
+          : null;
+    if (!identity || !itemIdentities.includes(identity)) continue;
+    map.set(identity, {
       status: row.status,
       updatedAt: row.updated_at,
     });
@@ -166,9 +167,7 @@ async function loadBatchStatuses(
 }
 
 function flattenOrdersToLines(
-  orders: Awaited<
-    ReturnType<ReturnType<typeof createOperationsRepository>["listOrders"]>
-  >,
+  orders: Awaited<ReturnType<ReturnType<typeof createOperationsRepository>["listOrders"]>>,
   deliveryDate: string,
 ): ProductionSourceLine[] {
   const lines: ProductionSourceLine[] = [];
@@ -180,6 +179,8 @@ function flattenOrdersToLines(
         orderStatus: order.status,
         customerId: order.customerId,
         customerName: order.customerName,
+        orderItemId: item.id,
+        line: item.line,
         dishId: item.dishId,
         dishName: item.dishName,
         qty: item.qty,
@@ -225,12 +226,18 @@ export const ProductionReportService = {
 
     const orders = await repo.listOrders(filters);
     const legacyLines = flattenOrdersToLines(orders, query.deliveryDate);
-    const dishIds = [...new Set(legacyLines.map((l) => l.dishId))];
+    const dishIds = [
+      ...new Set(legacyLines.map((l) => l.dishId).filter((id): id is string => id !== null)),
+    ];
+    const itemIdentities = legacyLines.map(
+      (l) =>
+        l.line?.identity ?? (l.dishId === null ? `custom:${l.orderItemId}` : `dish:${l.dishId}`),
+    );
 
     const [dishMetaById, recipeLines, batchStatusByDish] = await Promise.all([
       loadDishMeta(ctx, dishIds),
       loadRecipeLines(ctx, dishIds),
-      loadBatchStatuses(ctx, query.deliveryDate, dishIds),
+      loadBatchStatuses(ctx, query.deliveryDate, itemIdentities),
     ]);
 
     // 1. Normalize operational lines

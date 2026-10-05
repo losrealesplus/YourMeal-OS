@@ -1,3 +1,4 @@
+import { operationalItemIdentity } from "@/modules/orders/domain/order-item-read-model";
 /**
  * CR-OPS-07: Operational Date Resolver & Normalizer
  * Resolves temporal modes (historical/present/future) relative to operational timezone (Europe/Madrid),
@@ -132,7 +133,7 @@ export function normalizeOperationalOrders(params: {
     for (const item of order.items) {
       if (item.dayDate !== targetDate) continue;
 
-      const meta = dishMetaMap.get(item.dishId);
+      const meta = item.dishId === null ? undefined : dishMetaMap.get(item.dishId);
       const dishAllergens = item.line?.allergensSnapshot ?? meta?.allergens ?? [];
       const criticalSafetyAllergens = extractCriticalSafetyAllergens(
         customerAllergens,
@@ -147,7 +148,9 @@ export function normalizeOperationalOrders(params: {
           orderItemId: item.id,
           dishId: item.dishId,
           portionIndex: pIdx,
-          itemIdentity: item.line?.identity ?? `dish:${item.dishId}`,
+          itemIdentity:
+            item.line?.identity ??
+            operationalItemIdentity({ dishId: item.dishId, orderItemId: item.id }),
           itemKind: item.line?.kind ?? "dish",
         };
 
@@ -169,7 +172,9 @@ export function normalizeOperationalOrders(params: {
           organizationalUnitName: order.organizationalUnitName,
           deliveryGroupId: order.deliveryGroupId,
           dishName:
-            item.dishName ?? (meta ? `Plato ${item.dishId.slice(0, 8)}` : "Plato sin nombre"),
+            item.line?.name ??
+            item.dishName ??
+            (meta ? `Plato ${item.dishId?.slice(0, 8) ?? ""}` : "Plato sin nombre"),
           qty: 1, // Normalized to single portion per line
           unitPrice: item.unitPrice ?? null,
           dishAllergens,
@@ -182,14 +187,17 @@ export function normalizeOperationalOrders(params: {
           preferences,
           itemNotes: item.notes,
           isHistoricalSnapshot: temporalMode === "historical" && hasDietarySnapshot,
-          snapshotCapturedAt: dietarySnapshot?.capturedAt ?? null,
+          snapshotCapturedAt: item.line?.snapshotCapturedAt ?? dietarySnapshot?.capturedAt ?? null,
           resolutionStatus:
             temporalMode === "historical"
               ? hasDietarySnapshot
                 ? "COMPLETE"
                 : "INCOMPLETE_SNAPSHOT"
               : "COMPLETE",
-          resolutionWarnings: [],
+          resolutionWarnings:
+            item.line?.kind === "custom"
+              ? ["PERSONALIZADO", "Receta no vinculada", "Alérgenos sin declarar"]
+              : [],
         });
       }
     }

@@ -2,11 +2,9 @@
  * INTERNAL — map EP-002B production report → Production Capability contracts.
  */
 
-import type {
-  ProductionReportModel,
-  KitchenBatchStatus,
-} from "@/modules/operations";
+import type { ProductionReportModel, KitchenBatchStatus } from "@/modules/operations";
 import { DomainError } from "@/domain/errors";
+import { operationalItemIdentity } from "@/modules/orders/domain/order-item-read-model";
 import type {
   ProductionBatch,
   ProductionBatchStatus,
@@ -30,9 +28,7 @@ export function batchIdFor(dayDate: string, dishId: string): string {
   return `batch:${dayDate}:${dishId}`;
 }
 
-export function mapKitchenStatus(
-  status: KitchenBatchStatus,
-): ProductionBatchStatus {
+export function mapKitchenStatus(status: KitchenBatchStatus): ProductionBatchStatus {
   switch (status) {
     case "pending":
       return "queued";
@@ -47,35 +43,46 @@ export function mapKitchenStatus(
   }
 }
 
-export function mapReportToBatches(
-  report: ProductionReportModel,
-): ProductionBatch[] {
+export function mapReportToBatches(report: ProductionReportModel): ProductionBatch[] {
   const scope: ProductionScope = { dayDate: report.deliveryDate };
   const standard = report.standardDishes.map((d) => {
-    const status = mapKitchenStatus(d.batchStatus);
+    const custom = d.kind === "custom" || d.dishId === null;
+    const identity = operationalItemIdentity({
+      dishId: d.dishId,
+      orderItemId: d.orderItemId ?? "",
+      itemKind: d.kind,
+      itemIdentity: d.itemIdentity,
+    });
+    const status = custom ? ("blocked" as const) : mapKitchenStatus(d.batchStatus);
     return {
-      id: batchIdFor(report.deliveryDate, d.dishId),
+      id: custom
+        ? `batch:${report.deliveryDate}:${identity}`
+        : batchIdFor(report.deliveryDate, d.dishId!),
       scope,
+      itemIdentity: identity,
+      kind: custom ? ("custom" as const) : ("dish" as const),
+      allergenState: custom ? ("UNKNOWN" as const) : d.allergenState,
+      recipeState: custom ? ("NOT_AVAILABLE" as const) : d.recipeState,
       dishId: d.dishId,
       dishName: d.dishName,
       portionCount: d.totalQty,
       status,
       orderIds: [...new Set(d.customers.map((c) => c.orderId))],
       constraints: {
-        allergens: d.allergens,
+        allergens: custom ? [] : d.allergens,
         modifications: [],
-        isCustom: false,
+        isCustom: custom,
       },
       readiness: {
-        releasedToKitchen: status !== "queued",
-        blockedReason: null,
+        releasedToKitchen: !custom && status !== "queued",
+        blockedReason: custom ? "Custom batch transitions are not enabled" : null,
       },
     } satisfies ProductionBatch;
   });
 
   // Custom lines as individual custom batches (planning visibility)
   const customs = report.customizations.map((c, i) => {
-    const id = `batch:${report.deliveryDate}:custom:${c.dishId}:${i}`;
+    const id = `batch:${report.deliveryDate}:custom:${operationalItemIdentity({ dishId: c.dishId, orderItemId: c.orderItemId ?? "", itemKind: c.kind, itemIdentity: c.itemIdentity })}:${i}`;
     return {
       id,
       scope,
@@ -101,7 +108,8 @@ export function mapReportToBatches(
 
 export function mapReportToLoad(report: ProductionReportModel): ProductionLoad {
   const prep = report.standardDishes.reduce(
-    (s, d) => s + (d.prepMinutes ?? 0) * d.totalQty,
+    (s, d) =>
+      s + (d.kind === "custom" || d.dishId === null ? 0 : (d.prepMinutes ?? 0) * d.totalQty),
     0,
   );
   return {
@@ -113,17 +121,12 @@ export function mapReportToLoad(report: ProductionReportModel): ProductionLoad {
   };
 }
 
-export function derivePlanStatus(
-  batches: ProductionBatch[],
-): ProductionStatus {
+export function derivePlanStatus(batches: ProductionBatch[]): ProductionStatus {
   if (batches.length === 0) return "draft";
   const allDone = batches.every((b) => b.status === "done");
   if (allDone) return "completed";
   const anyProgress = batches.some(
-    (b) =>
-      b.status === "released" ||
-      b.status === "in_progress" ||
-      b.status === "done",
+    (b) => b.status === "released" || b.status === "in_progress" || b.status === "done",
   );
   if (anyProgress) return "in_execution";
   const anyReleased = batches.some((b) => b.readiness.releasedToKitchen);
@@ -164,8 +167,7 @@ export function mapDomainError(err: unknown): ProductionError {
     return {
       code: domainCodeToProduction(err.code),
       message: err.message,
-      recoverable:
-        err.code === "PERMISSION_DENIED" || err.code === "UNIMPLEMENTED",
+      recoverable: err.code === "PERMISSION_DENIED" || err.code === "UNIMPLEMENTED",
       evidence: err.details,
     };
   }
@@ -179,9 +181,7 @@ export function mapDomainError(err: unknown): ProductionError {
   return { code: "UNKNOWN", message: String(err), recoverable: false };
 }
 
-function domainCodeToProduction(
-  code: DomainError["code"],
-): ProductionErrorCode {
+function domainCodeToProduction(code: DomainError["code"]): ProductionErrorCode {
   switch (code) {
     case "PERMISSION_DENIED":
       return "PERMISSION_DENIED";

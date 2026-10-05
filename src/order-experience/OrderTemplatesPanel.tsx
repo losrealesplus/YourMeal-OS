@@ -9,6 +9,7 @@ import { StatusChip } from "@/components/admin";
 import {
   deleteOrderTemplate,
   listOrderTemplates,
+  templateRequiresCustomWriter,
   markTemplateUsed,
   templateSummary,
   type OrderTemplate,
@@ -46,6 +47,12 @@ export function OrderTemplatesPanel({
   }
 
   function handleApply(t: OrderTemplate) {
+    if (templateRequiresCustomWriter(t)) {
+      toast.error(
+        "Los personalizados necesitan confirmar disponibilidad y precio. La aplicación aún no está habilitada.",
+      );
+      return;
+    }
     markTemplateUsed(t.id);
     refresh();
     toast.success("Plantilla aplicada — adapta y confirma");
@@ -89,9 +96,7 @@ export function OrderTemplatesPanel({
             onClick={() => setFilterMine(true)}
             className={cn(
               "min-h-10 rounded-md border px-3 text-xs",
-              filterMine
-                ? "border-foreground bg-foreground text-background"
-                : "border-border",
+              filterMine ? "border-foreground bg-foreground text-background" : "border-border",
             )}
           >
             {customerName ?? "Este cliente"}
@@ -101,9 +106,7 @@ export function OrderTemplatesPanel({
             onClick={() => setFilterMine(false)}
             className={cn(
               "min-h-10 rounded-md border px-3 text-xs",
-              !filterMine
-                ? "border-foreground bg-foreground text-background"
-                : "border-border",
+              !filterMine ? "border-foreground bg-foreground text-background" : "border-border",
             )}
           >
             Todas
@@ -115,8 +118,7 @@ export function OrderTemplatesPanel({
         <div className="space-y-2 text-sm">
           <p>No hay plantillas todavía.</p>
           <p className="text-muted-foreground">
-            Captura un pedido y elige «Guardar como plantilla», o crea uno
-            nuevo.
+            Captura un pedido y elige «Guardar como plantilla», o crea uno nuevo.
           </p>
           <div className="flex flex-wrap gap-2">
             <button
@@ -137,34 +139,34 @@ export function OrderTemplatesPanel({
       ) : (
         <ul className="space-y-2">
           {templates.map((t) => (
-            <li
-              key={t.id}
-              className="rounded-md border border-border px-3 py-3 space-y-2"
-            >
+            <li key={t.id} className="rounded-md border border-border px-3 py-3 space-y-2">
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
                   <p className="font-medium">{t.name}</p>
                   <p className="text-sm text-muted-foreground">
                     {t.customerName}
-                    {t.preferredDeliveryDay
-                      ? ` · ${formatDayLabel(t.preferredDeliveryDay)}`
-                      : ""}
+                    {t.preferredDeliveryDay ? ` · ${formatDayLabel(t.preferredDeliveryDay)}` : ""}
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     {templateSummary(t)}
+                    {templateRequiresCustomWriter(t) ? (
+                      <span className="block">
+                        PERSONALIZADO · Alérgenos sin declarar · Disponibilidad y precio pendientes
+                        de confirmar
+                      </span>
+                    ) : null}
                   </p>
                 </div>
                 <StatusChip
                   tone="info"
-                  label={
-                    t.useCount > 0 ? `${t.useCount}× usada` : t.source
-                  }
+                  label={t.useCount > 0 ? `${t.useCount}× usada` : t.source}
                 />
               </div>
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
                   onClick={() => handleApply(t)}
+                  disabled={templateRequiresCustomWriter(t)}
                   className="inline-flex min-h-10 items-center rounded-md bg-foreground px-3 text-xs font-semibold text-background"
                 >
                   Aplicar
@@ -172,6 +174,7 @@ export function OrderTemplatesPanel({
                 <button
                   type="button"
                   onClick={() => handleApply(t)}
+                  disabled={templateRequiresCustomWriter(t)}
                   className="inline-flex min-h-10 items-center rounded-md border border-border px-3 text-xs font-semibold"
                 >
                   Editar antes de confirmar

@@ -1,3 +1,4 @@
+import { assertLegacyOrderWriteCompatible } from "../domain/legacy-order-write-guard";
 import { readOrderItem, type OrderItemReadRow } from "../domain/order-item-read-model";
 import type { Json, Tables } from "@/integrations/supabase/types";
 import type { AppSupabase } from "@/services/types";
@@ -6,6 +7,9 @@ import type { OrderDietarySnapshot } from "@/types/dietary";
 export type OrderRow = Tables<"orders"> & { revision?: number; write_contract_version?: 1 | 2 };
 export type OrderItemRow = Tables<"order_items"> &
   Partial<Omit<OrderItemReadRow, "id" | "dish_id">>;
+
+/** SELECT * projection accepts future custom rows without widening legacy writes. */
+export type OrderItemReadProjection = Omit<OrderItemRow, "dish_id"> & OrderItemReadRow;
 
 export type ProgramOrderItemInput = {
   dishId: string;
@@ -46,7 +50,7 @@ type ProgramDraftRpcResult = {
 export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
   async function findByIdWithItems(
     orderId: string,
-  ): Promise<{ order: OrderRow; items: OrderItemRow[] } | null> {
+  ): Promise<{ order: OrderRow; items: OrderItemReadProjection[] } | null> {
     const { data: order, error: orderError } = await supabase
       .from("orders")
       .select("*")
@@ -66,7 +70,7 @@ export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
       .order("day_date", { ascending: true });
     if (itemsError) throw itemsError;
 
-    return { order: order as OrderRow, items: (items ?? []) as OrderItemRow[] };
+    return { order: order as OrderRow, items: (items ?? []) as OrderItemReadProjection[] };
   }
 
   return {
@@ -174,6 +178,7 @@ export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
       if (!current) {
         throw new Error(`Order not found: ${orderId}`);
       }
+      assertLegacyOrderWriteCompatible(current.order, current.items);
       if (current.order.status !== "draft") {
         throw new Error(`Order ${orderId} is not draft (status=${current.order.status})`);
       }

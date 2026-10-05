@@ -1,4 +1,9 @@
 import type { KitchenBatchStatus } from "./kitchen-batch-status";
+import type {
+  AllergenSnapshotState,
+  ItemIdentity,
+  OrderItemReadModel,
+} from "@/modules/orders/domain/order-item-read-model";
 import type { OrderDietarySnapshot } from "@/types/dietary";
 
 /**
@@ -8,11 +13,13 @@ import type { OrderDietarySnapshot } from "@/types/dietary";
  */
 
 export type ProductionSourceLine = {
+  orderItemId?: string;
+  line?: OrderItemReadModel;
   orderId: string;
   orderStatus: string;
   customerId: string;
   customerName: string | null;
-  dishId: string;
+  dishId: string | null;
   dishName: string | null;
   qty: number;
   dayDate: string;
@@ -22,7 +29,10 @@ export type ProductionSourceLine = {
   dietarySnapshot?: OrderDietarySnapshot | null;
 };
 
-export type ProductionCustomerLine = {
+export type ProductionCustomerLine = Partial<ProductionItemMetadata> & {
+  dishName?: string;
+  dishId?: string | null;
+  allergens?: string[];
   orderId: string;
   orderStatus: string;
   customerId: string;
@@ -31,8 +41,8 @@ export type ProductionCustomerLine = {
   note: string | null;
 };
 
-export type ProductionDishBlock = {
-  dishId: string;
+export type ProductionDishBlock = Partial<ProductionItemMetadata> & {
+  dishId: string | null;
   dishName: string;
   totalQty: number;
   customers: ProductionCustomerLine[];
@@ -47,12 +57,12 @@ export type ProductionDishBlock = {
   batchUpdatedAt: string | null;
 };
 
-export type ProductionCustomLine = {
+export type ProductionCustomLine = Partial<ProductionItemMetadata> & {
   orderId: string;
   orderStatus: string;
   customerId: string;
   customerName: string;
-  dishId: string;
+  dishId: string | null;
   dishName: string;
   qty: number;
   observation: string;
@@ -83,8 +93,8 @@ export type RecipeLine = {
   unit: string;
 };
 
-export type ProductionPackingCustomerItem = {
-  dishId: string;
+export type ProductionPackingCustomerItem = Partial<ProductionItemMetadata> & {
+  dishId: string | null;
   dishName: string;
   qty: number;
   comment: string | null;
@@ -102,7 +112,10 @@ export type ProductionPackingCustomerBlock = {
   dietarySnapshot?: OrderDietarySnapshot | null;
 };
 
-export type ProductionPackingDishAllocation = {
+export type ProductionPackingDishAllocation = Partial<ProductionItemMetadata> & {
+  dishName?: string;
+  dishId?: string | null;
+  allergens?: string[];
   customerId: string;
   customerName: string;
   orderId: string;
@@ -110,8 +123,8 @@ export type ProductionPackingDishAllocation = {
   comment: string | null;
 };
 
-export type ProductionPackingDishBlock = {
-  dishId: string;
+export type ProductionPackingDishBlock = Partial<ProductionItemMetadata> & {
+  dishId: string | null;
   dishName: string;
   totalQty: number;
   allergens: string[];
@@ -133,6 +146,69 @@ export type ProductionReportModel = {
     customizationCount: number;
   };
 };
+
+export type ProductionItemMetadata = {
+  itemIdentity: ItemIdentity;
+  kind: "dish" | "custom";
+  orderItemId: string | null;
+  marker: "PERSONALIZADO" | null;
+  metadataSource: "snapshot" | "current_catalogue" | "unavailable";
+  allergenState: AllergenSnapshotState;
+  recipeState: "CATALOGUE_LINKED" | "NOT_AVAILABLE";
+};
+
+/** Aggregate uncertainty conservatively while preserving each source declaration separately. */
+function aggregateAllergenState(
+  a: AllergenSnapshotState,
+  b: AllergenSnapshotState,
+): AllergenSnapshotState {
+  if (a === "UNKNOWN" || b === "UNKNOWN") return "UNKNOWN";
+  if (a === "HISTORICAL_UNAVAILABLE" || b === "HISTORICAL_UNAVAILABLE")
+    return "HISTORICAL_UNAVAILABLE";
+  return "DECLARED";
+}
+
+function itemDetails(line: ProductionSourceLine, meta: ReadonlyMap<string, DishMeta>) {
+  const read = line.line;
+  const dishId = read ? read.dishId : line.dishId;
+  const kind = read?.kind ?? (dishId === null ? "custom" : "dish");
+  const orderItemId = read?.orderItemId ?? line.orderItemId ?? null;
+  if (
+    kind === "custom" &&
+    (!orderItemId || orderItemId === "null" || orderItemId === "undefined")
+  ) {
+    throw new Error("Custom production line requires order item identity");
+  }
+  if (kind === "custom" && (!read || read.metadataSource !== "snapshot" || !read.name?.trim())) {
+    throw new Error("Custom production line requires captured snapshot");
+  }
+  if (kind === "dish" && (!dishId || dishId === "null" || dishId === "undefined")) {
+    throw new Error("Dish production line requires dish identity");
+  }
+  const dishMeta = dishId === null ? undefined : meta.get(dishId);
+  const allergens = kind === "custom" ? [] : (read?.allergensSnapshot ?? dishMeta?.allergens ?? []);
+  const metadata: ProductionItemMetadata = {
+    itemIdentity: kind === "custom" ? `custom:${orderItemId!}` : `dish:${dishId!}`,
+    kind,
+    orderItemId,
+    marker: kind === "custom" ? "PERSONALIZADO" : null,
+    metadataSource: read?.metadataSource ?? (line.dishName ? "current_catalogue" : "unavailable"),
+    allergenState:
+      kind === "custom" ? "UNKNOWN" : (read?.allergenState ?? "HISTORICAL_UNAVAILABLE"),
+    recipeState: kind === "custom" ? "NOT_AVAILABLE" : "CATALOGUE_LINKED",
+  };
+  return {
+    ...metadata,
+    dishId,
+    dishName:
+      kind === "custom"
+        ? (read?.name ?? line.dishName ?? "PERSONALIZADO")
+        : dishLabel(read?.name ?? line.dishName, dishId!),
+    allergens,
+    prepMinutes: kind === "custom" ? null : (dishMeta?.prepMinutes ?? null),
+    weightG: kind === "custom" ? null : (dishMeta?.weightG ?? null),
+  };
+}
 
 function isCustomized(comment: string | null | undefined): boolean {
   return Boolean(comment && comment.trim().length > 0);
@@ -207,16 +283,13 @@ export function buildProductionReport(input: {
   lines: readonly ProductionSourceLine[];
   dishMetaById?: ReadonlyMap<string, DishMeta>;
   recipeLines?: readonly RecipeLine[];
-  batchStatusByDish?: ReadonlyMap<
-    string,
-    { status: KitchenBatchStatus; updatedAt: string | null }
-  >;
+  batchStatusByDish?: ReadonlyMap<string, { status: KitchenBatchStatus; updatedAt: string | null }>;
 }): ProductionReportModel {
   const meta = input.dishMetaById ?? new Map<string, DishMeta>();
   const standardMap = new Map<
     string,
     {
-      dishName: string;
+      details: ReturnType<typeof itemDetails>;
       customers: ProductionCustomerLine[];
       statuses: Set<string>;
     }
@@ -225,25 +298,28 @@ export function buildProductionReport(input: {
   const orderIds = new Set<string>();
   /** dishId → total portions (standard + custom) for recipe rollup */
   const portionsByDish = new Map<string, number>();
+  let portionCount = 0;
 
   for (const line of input.lines) {
     if (line.qty <= 0) continue;
     orderIds.add(line.orderId);
-    portionsByDish.set(
-      line.dishId,
-      (portionsByDish.get(line.dishId) ?? 0) + line.qty,
-    );
+    portionCount += line.qty;
+    const details = itemDetails(line, meta);
+    if (details.dishId !== null) {
+      portionsByDish.set(details.dishId, (portionsByDish.get(details.dishId) ?? 0) + line.qty);
+    }
 
     const name = customerLabel(line.customerName, line.customerId);
-    const dishName = dishLabel(line.dishName, line.dishId);
+    const dishName = details.dishName;
 
-    if (isCustomized(line.comment)) {
+    if (details.kind === "dish" && isCustomized(line.comment)) {
       customizations.push({
+        ...details,
         orderId: line.orderId,
         orderStatus: line.orderStatus,
         customerId: line.customerId,
         customerName: name,
-        dishId: line.dishId,
+        dishId: details.dishId,
         dishName,
         qty: line.qty,
         observation: line.comment!.trim(),
@@ -251,48 +327,55 @@ export function buildProductionReport(input: {
       continue;
     }
 
-    const block = standardMap.get(line.dishId) ?? {
-      dishName,
+    const block = standardMap.get(details.itemIdentity) ?? {
+      details,
       customers: [],
       statuses: new Set<string>(),
     };
-    block.dishName = dishName;
+    // Keep declarations from captured lines, never overwrite them with catalogue metadata.
+    block.details.allergens = [...new Set([...block.details.allergens, ...details.allergens])];
+    block.details.allergenState = aggregateAllergenState(
+      block.details.allergenState,
+      details.allergenState,
+    );
     block.statuses.add(line.orderStatus);
 
     const existing = block.customers.find(
-      (c) => c.customerId === line.customerId && c.orderId === line.orderId,
+      (c) =>
+        c.customerId === line.customerId &&
+        c.orderId === line.orderId &&
+        c.orderItemId === details.orderItemId,
     );
     if (existing) {
       existing.qty += line.qty;
     } else {
       block.customers.push({
+        ...details,
         orderId: line.orderId,
         orderStatus: line.orderStatus,
         customerId: line.customerId,
         customerName: name,
         qty: line.qty,
-        note: null,
+        note: line.comment?.trim() || null,
       });
     }
-    standardMap.set(line.dishId, block);
+    standardMap.set(details.itemIdentity, block);
   }
 
   const batchMap = input.batchStatusByDish ?? new Map();
   const standardDishes: ProductionDishBlock[] = [...standardMap.entries()]
-    .map(([dishId, block]) => {
+    .map(([identity, block]) => {
       const totalQty = block.customers.reduce((s, c) => s + c.qty, 0);
-      const dishMeta = meta.get(dishId);
-      const batch = batchMap.get(dishId);
+      const batch =
+        batchMap.get(identity) ??
+        (block.details.dishId === null ? undefined : batchMap.get(block.details.dishId));
       return {
-        dishId,
-        dishName: block.dishName,
+        ...block.details,
         totalQty,
         customers: block.customers.sort((a, b) =>
           a.customerName.localeCompare(b.customerName, "es"),
         ),
-        allergens: dishMeta?.allergens ?? [],
-        prepMinutes: dishMeta?.prepMinutes ?? null,
-        weightG: dishMeta?.weightG ?? null,
+
         orderStatuses: [...block.statuses],
         batchStatus: batch?.status ?? "pending",
         batchUpdatedAt: batch?.updatedAt ?? null,
@@ -306,10 +389,7 @@ export function buildProductionReport(input: {
     return a.dishName.localeCompare(b.dishName, "es");
   });
 
-  const ingredientAcc = new Map<
-    string,
-    { name: string; qty: number; unit: string }
-  >();
+  const ingredientAcc = new Map<string, { name: string; qty: number; unit: string }>();
   for (const recipe of input.recipeLines ?? []) {
     const portions = portionsByDish.get(recipe.dishId) ?? 0;
     if (portions <= 0) continue;
@@ -342,16 +422,13 @@ export function buildProductionReport(input: {
     })
     .sort((a, b) => a.name.localeCompare(b.name, "es"));
 
-  const portionCount = [...portionsByDish.values()].reduce((s, n) => s + n, 0);
-
   // 1. Packing by Customer
   const customerPackingMap = new Map<string, ProductionPackingCustomerBlock>();
   for (const line of input.lines) {
     if (line.qty <= 0) continue;
     const name = customerLabel(line.customerName, line.customerId);
-    const dishName = dishLabel(line.dishName, line.dishId);
-    const dishMeta = meta.get(line.dishId);
-    const allergens = dishMeta?.allergens ?? [];
+    const details = itemDetails(line, meta);
+    const { dishName, allergens } = details;
     const customerKey = `${line.customerId}::${line.orderId}`;
 
     let block = customerPackingMap.get(customerKey);
@@ -371,7 +448,8 @@ export function buildProductionReport(input: {
 
     block.totalPortions += line.qty;
     block.items.push({
-      dishId: line.dishId,
+      ...details,
+      dishId: details.dishId,
       dishName,
       qty: line.qty,
       comment: line.comment?.trim() || null,
@@ -382,33 +460,39 @@ export function buildProductionReport(input: {
     }
   }
 
-  const packingByCustomer: ProductionPackingCustomerBlock[] = [
-    ...customerPackingMap.values(),
-  ].sort((a, b) => a.customerName.localeCompare(b.customerName, "es"));
+  const packingByCustomer: ProductionPackingCustomerBlock[] = [...customerPackingMap.values()].sort(
+    (a, b) => a.customerName.localeCompare(b.customerName, "es"),
+  );
 
   // 2. Packing by Dish
   const dishPackingMap = new Map<string, ProductionPackingDishBlock>();
   for (const line of input.lines) {
     if (line.qty <= 0) continue;
     const name = customerLabel(line.customerName, line.customerId);
-    const dishName = dishLabel(line.dishName, line.dishId);
-    const dishMeta = meta.get(line.dishId);
-    const allergens = dishMeta?.allergens ?? [];
+    const details = itemDetails(line, meta);
+    const { dishName, allergens } = details;
 
-    let block = dishPackingMap.get(line.dishId);
+    let block = dishPackingMap.get(details.itemIdentity);
     if (!block) {
       block = {
-        dishId: line.dishId,
+        ...details,
+        dishId: details.dishId,
         dishName,
         totalQty: 0,
         allergens,
         allocations: [],
       };
-      dishPackingMap.set(line.dishId, block);
+      dishPackingMap.set(details.itemIdentity, block);
     }
 
+    block.allergens = [...new Set([...block.allergens, ...allergens])];
+    block.allergenState = aggregateAllergenState(
+      block.allergenState ?? "HISTORICAL_UNAVAILABLE",
+      details.allergenState,
+    );
     block.totalQty += line.qty;
     block.allocations.push({
+      ...details,
       customerId: line.customerId,
       customerName: name,
       orderId: line.orderId,
@@ -417,9 +501,9 @@ export function buildProductionReport(input: {
     });
   }
 
-  const packingByDish: ProductionPackingDishBlock[] = [
-    ...dishPackingMap.values(),
-  ].sort((a, b) => a.dishName.localeCompare(b.dishName, "es"));
+  const packingByDish: ProductionPackingDishBlock[] = [...dishPackingMap.values()].sort((a, b) =>
+    a.dishName.localeCompare(b.dishName, "es"),
+  );
 
   return {
     deliveryDate: input.deliveryDate,

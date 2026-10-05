@@ -7,13 +7,10 @@
  */
 
 import type { CommitmentItem } from "./operational-commitments";
+import { DomainError } from "@/domain/errors";
 
 export type OrderTemplateSource =
-  | "last_order"
-  | "frequent"
-  | "from_order"
-  | "manual"
-  | "preference";
+  "last_order" | "frequent" | "from_order" | "manual" | "preference";
 
 export type OrderTemplate = {
   id: string;
@@ -63,9 +60,7 @@ function writeAll(rows: OrderTemplate[]) {
 
 export function listOrderTemplates(customerId?: string): OrderTemplate[] {
   const all = readAll();
-  const filtered = customerId
-    ? all.filter((t) => t.customerId === customerId)
-    : all;
+  const filtered = customerId ? all.filter((t) => t.customerId === customerId) : all;
   return [...filtered].sort((a, b) => {
     const aUse = a.lastUsedAt ? Date.parse(a.lastUsedAt) : 0;
     const bUse = b.lastUsedAt ? Date.parse(b.lastUsedAt) : 0;
@@ -98,9 +93,7 @@ export function saveOrderTemplate(
   }
   const row: OrderTemplate = {
     ...input,
-    id:
-      input.id ??
-      `ot_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`,
+    id: input.id ?? `ot_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`,
     createdAt: new Date().toISOString(),
     useCount: 0,
     lastUsedAt: null,
@@ -113,6 +106,7 @@ export function markTemplateUsed(id: string): OrderTemplate | null {
   const rows = readAll();
   const idx = rows.findIndex((r) => r.id === id);
   if (idx < 0) return null;
+  assertLegacyTemplateApplicable(rows[idx]!);
   const updated: OrderTemplate = {
     ...rows[idx]!,
     useCount: rows[idx]!.useCount + 1,
@@ -133,8 +127,36 @@ export function deleteOrderTemplate(id: string): boolean {
 }
 
 export function templateSummary(t: OrderTemplate): string {
-  const items = t.items.map((i) => `${i.qty}× ${i.label}`).join(" · ");
+  const items = t.items
+    .map((i) => {
+      const snapshot = i as CommitmentItem & { name_snapshot?: string; name?: string };
+      return `${i.qty}× ${snapshot.name_snapshot ?? snapshot.name ?? i.label ?? "Personalizado sin nombre disponible"}`;
+    })
+    .join(" · ");
   return [items, t.instructions].filter(Boolean).join(" · ") || "Vacía";
+}
+
+/** Storage readers retain every future custom object; the legacy writer cannot apply it. */
+export function templateRequiresCustomWriter(t: OrderTemplate): boolean {
+  return t.items.some((item) => {
+    const shape = item as CommitmentItem & { kind?: string; itemKind?: string; item_kind?: string };
+    return (
+      shape.kind === "custom" ||
+      shape.itemKind === "custom" ||
+      shape.item_kind === "custom" ||
+      typeof shape.dishId !== "string" ||
+      !shape.dishId
+    );
+  });
+}
+
+export function assertLegacyTemplateApplicable(t: OrderTemplate): void {
+  if (templateRequiresCustomWriter(t)) {
+    throw new DomainError(
+      "UNIMPLEMENTED",
+      "Custom template requires availability and price reconfirmation; writer v2 is not enabled",
+    );
+  }
 }
 
 export function clearOrderTemplatesForTests() {

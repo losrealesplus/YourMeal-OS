@@ -1,4 +1,11 @@
-import { DishAllergenDeclaration } from "@/components/operations/dish-allergen-declaration";
+import {
+  operationalItemIdentity,
+  isCustomOperationalItem,
+} from "@/production-experience/operational-item-identity";
+import {
+  CustomOperationalContext,
+  OperationalAllergenDeclaration,
+} from "@/production-experience/operational-item-presentation";
 /**
  * ADMIN · Producción · Batch
  * Capability: kitchen.operate  ·  Core Object: KitchenProductionBatch (dish × day)
@@ -18,7 +25,12 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import {
   ProductionReportService,
@@ -41,7 +53,9 @@ export const Route = createFileRoute("/_authenticated/admin/production/batch")({
   head: () => ({ meta: [{ title: "YourMeal OS — Batch" }] }),
 });
 
-function todayISO() { return new Date().toISOString().slice(0, 10); }
+function todayISO() {
+  return new Date().toISOString().slice(0, 10);
+}
 
 function ProductionBatchPage() {
   const { user, tenantId, roles } = useAuth();
@@ -59,22 +73,38 @@ function ProductionBatchPage() {
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "No se pudo cargar las tandas");
       setReport(null);
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   }, [user, tenantId, roles, date]);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    void load();
+  }, [load]);
 
-  async function transition(dishId: string, to: KitchenBatchStatus) {
-    if (!user || !tenantId) return;
+  async function transition(dishId: string | null, to: KitchenBatchStatus) {
+    if (
+      !user ||
+      !tenantId ||
+      !dishId ||
+      report?.standardDishes.some((item) => item.dishId === dishId && isCustomOperationalItem(item))
+    )
+      return;
     setBusy(dishId);
     try {
       const ctx = await createServiceContext({ supabase, userId: user.id, tenantId, roles });
-      await KitchenExecutionService.transitionBatch(ctx, { deliveryDate: date, dishId, toStatus: to });
+      await KitchenExecutionService.transitionBatch(ctx, {
+        deliveryDate: date,
+        dishId,
+        toStatus: to,
+      });
       toast.success(`Tanda → ${kitchenBatchStatusLabel(to)}`);
       await load();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Transición rechazada");
-    } finally { setBusy(null); }
+    } finally {
+      setBusy(null);
+    }
   }
 
   return (
@@ -82,7 +112,13 @@ function ProductionBatchPage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="space-y-1.5">
           <Label htmlFor="batch-date">Fecha</Label>
-          <Input id="batch-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-44" />
+          <Input
+            id="batch-date"
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="w-44"
+          />
         </div>
         <Button variant="outline" size="sm" onClick={() => void load()} disabled={loading}>
           <RefreshCw className={cn("mr-2 h-4 w-4", loading && "animate-spin")} />
@@ -112,45 +148,68 @@ function ProductionBatchPage() {
             <TableBody>
               {report.standardDishes.map((d) => {
                 const primary = primaryKitchenBatchAction(d.batchStatus);
-                const others = nextKitchenBatchStatuses(d.batchStatus).filter((s) => s !== primary?.to);
-                const isBusy = busy === d.dishId;
+                const others = nextKitchenBatchStatuses(d.batchStatus).filter(
+                  (s) => s !== primary?.to,
+                );
+                const isBusy = d.dishId !== null && busy === d.dishId;
                 return (
-                  <TableRow key={d.dishId}>
-                    <TableCell className="font-medium">{d.dishName}</TableCell>
+                  <TableRow key={operationalItemIdentity(d)}>
+                    <TableCell className="font-medium">
+                      {d.dishName}
+                      <CustomOperationalContext item={d} />
+                    </TableCell>
                     <TableCell className="text-right tabular-nums">{d.totalQty}</TableCell>
                     <TableCell className="text-muted-foreground">
-                      {d.prepMinutes != null ? (
+                      {!isCustomOperationalItem(d) && d.prepMinutes != null ? (
                         <span className="inline-flex items-center gap-1 text-xs">
-                          <Clock className="h-3 w-3" />{d.prepMinutes} min
+                          <Clock className="h-3 w-3" />
+                          {d.prepMinutes} min
                         </span>
-                      ) : "—"}
+                      ) : (
+                        "—"
+                      )}
                     </TableCell>
                     <TableCell>
-                      {d.allergens.length === 0 ? (
-                        <DishAllergenDeclaration allergens={d.allergens} />
+                      {isCustomOperationalItem(d) ||
+                      d.allergenState === "UNKNOWN" ||
+                      d.allergenState === "HISTORICAL_UNAVAILABLE" ||
+                      d.allergens.length === 0 ? (
+                        <OperationalAllergenDeclaration item={d} />
                       ) : (
                         <div className="flex flex-wrap gap-1">
                           {d.allergens.map((a) => (
                             <Badge key={a} variant="outline" className="gap-1 text-xs">
-                              <Wheat className="h-3 w-3" />{a}
+                              <Wheat className="h-3 w-3" />
+                              {a}
                             </Badge>
                           ))}
                         </div>
                       )}
                     </TableCell>
-                    <TableCell><Badge variant="secondary">{kitchenBatchStatusLabel(d.batchStatus)}</Badge></TableCell>
+                    <TableCell>
+                      <Badge variant="secondary">{kitchenBatchStatusLabel(d.batchStatus)}</Badge>
+                    </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         {primary ? (
-                          <Button size="sm" disabled={isBusy} onClick={() => void transition(d.dishId, primary.to)}>
+                          <Button
+                            size="sm"
+                            disabled={isCustomOperationalItem(d) || isBusy}
+                            onClick={() => void transition(d.dishId, primary.to)}
+                          >
                             {primary.label}
                           </Button>
                         ) : (
                           <span className="text-xs text-muted-foreground">Cerrada</span>
                         )}
                         {others.map((s) => (
-                          <Button key={s} size="sm" variant="outline" disabled={isBusy}
-                            onClick={() => void transition(d.dishId, s)}>
+                          <Button
+                            key={s}
+                            size="sm"
+                            variant="outline"
+                            disabled={isCustomOperationalItem(d) || isBusy}
+                            onClick={() => void transition(d.dishId, s)}
+                          >
                             {kitchenBatchStatusLabel(s)}
                           </Button>
                         ))}
