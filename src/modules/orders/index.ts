@@ -14,10 +14,7 @@ export type {
   ProgramDraftItemsCommand,
   ProgramDraftOrderResult,
 } from "./application/order-service";
-export type {
-  RepeatOrderPreview,
-  RepeatOrderResult,
-} from "./application/repeat-order-service";
+export type { RepeatOrderPreview, RepeatOrderResult } from "./application/repeat-order-service";
 export {
   selectUpcomingDelivery,
   phaseFromStatus,
@@ -29,10 +26,7 @@ export type {
   UpcomingDeliveryPhase,
   UpcomingDeliveryAction,
 } from "./domain/upcoming-delivery";
-export {
-  buildRepeatOrderPlan,
-  canRepeatPlan,
-} from "./domain/repeat-order";
+export { buildRepeatOrderPlan, canRepeatPlan } from "./domain/repeat-order";
 export type {
   RepeatOrderPlan,
   RepeatAvailableLine,
@@ -40,10 +34,7 @@ export type {
 } from "./domain/repeat-order";
 export { orderKeys } from "./application/order-query-keys";
 export { fetchOrderSummary } from "./application/order-queries";
-export type {
-  OrderSummaryView,
-  OrderSummaryStatus,
-} from "./application/order-summary-mapper";
+export type { OrderSummaryView, OrderSummaryStatus } from "./application/order-summary-mapper";
 export { StaffOrderCaptureService } from "./application/staff-order-capture-service";
 export type {
   UniversalOrderCaptureDTO,
@@ -57,3 +48,11 @@ export type {
   ModifyConfirmedOrderResult,
 } from "./application/order-modification-service";
 export { OrderLifecycleService } from "./application/order-lifecycle-service";
+
+export { CanonicalOrderWriteService } from "./application/canonical-order-write-service";
+export type {
+  CanonicalCaptureInput,
+  CanonicalModifyInput,
+  CanonicalDishLine,
+} from "./domain/canonical-order-write";
+export type { CanonicalOrderWriteResult } from "./infrastructure/canonical-order-write-repository";

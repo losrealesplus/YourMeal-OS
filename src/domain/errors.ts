@@ -15,6 +15,11 @@ export type DomainErrorCode =
   | "MENU_LOCKED"
   | "PRICE_MISMATCH"
   | "PRICE_UNAVAILABLE"
+  | "IDEMPOTENCY_CONFLICT"
+  | "STALE_REVISION"
+  | "CUSTOM_NOT_ENABLED"
+  | "COMMERCIAL_QUOTE_REQUIRED"
+  | "PRICE_CHANGED"
   | "INVALID_STATE"
   | "UNIMPLEMENTED";
 
@@ -22,11 +27,7 @@ export class DomainError extends Error {
   readonly code: DomainErrorCode;
   readonly details?: Record<string, unknown>;
 
-  constructor(
-    code: DomainErrorCode,
-    message: string,
-    details?: Record<string, unknown>,
-  ) {
+  constructor(code: DomainErrorCode, message: string, details?: Record<string, unknown>) {
     super(message);
     this.name = "DomainError";
     this.code = code;
@@ -35,11 +36,7 @@ export class DomainError extends Error {
 }
 
 export function permissionDenied(capability: string): DomainError {
-  return new DomainError(
-    "PERMISSION_DENIED",
-    `Missing capability: ${capability}`,
-    { capability },
-  );
+  return new DomainError("PERMISSION_DENIED", `Missing capability: ${capability}`, { capability });
 }
 
 export function notFound(entity: string, id?: string): DomainError {
@@ -119,4 +116,3 @@ export function formatErrorMessage(
 
   return fallback;
 }
-
