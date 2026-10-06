@@ -2,11 +2,16 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   TRACK_B_RECONCILIATION,
-  auditSpecialPaths,
+  RECONCILIATION_GOVERNANCE_PR,
+  TRACK_B_SEALED_MIGRATION_BASELINE,
   verifyReconciliation,
   assertReconciliationManifest,
 } from "./release-reconciliation.mjs";
-import { preparationEligible } from "./release-contract.mjs";
+import {
+  assertApproval,
+  assertEnvironment,
+  preparationEligible,
+} from "./release-contract.mjs";
 
 const mockPolicy = {
   repository: "losrealesplus/YourMeal-OS",
@@ -52,11 +57,42 @@ test("1. Current #492→#501 exact interval + exact reconciliation is eligible",
   assert.ok(result.reconciliationId);
   assert.equal(result.payload.schema, 1);
   assert.equal(result.payload.reconciliationType, "PROVIDER_MIGRATIONS_TRACK_B");
+  assert.equal(result.payload.sealedMigrationSha, TRACK_B_SEALED_MIGRATION_BASELINE);
+  assert.equal(result.payload.governancePr, null);
   assert.equal(result.payload.migrations.length, 6);
   assert.equal(preparationEligible("AUTHORIZED_RECONCILED_RELEASE"), true);
 });
 
-test("2. Reconciliation fails if baseline SHA differs", () => {
+test("2. Post-#502 merge interval [492..501, 502] with advanced main SHA is eligible", () => {
+  const postMergeSnapshot = {
+    ...validSnapshot,
+    diff: {
+      ...validSnapshot.diff,
+      commits: [...validSnapshot.diff.commits, "1111222233334444555566667777888899990000"],
+    },
+    prs: [...validSnapshot.prs, RECONCILIATION_GOVERNANCE_PR],
+    currentMainSha: "1111222233334444555566667777888899990000",
+    targetSha: "1111222233334444555566667777888899990000",
+  };
+  const result = verifyReconciliation(postMergeSnapshot, mockPolicy, TRACK_B_RECONCILIATION);
+  assert.equal(result.reconciled, true);
+  assert.equal(result.payload.governancePr, RECONCILIATION_GOVERNANCE_PR);
+  assert.equal(result.payload.targetSha, "1111222233334444555566667777888899990000");
+  assert.equal(result.payload.sealedMigrationSha, TRACK_B_SEALED_MIGRATION_BASELINE);
+});
+
+test("3. Future release with extra PR #503 fails closed", () => {
+  const futureSnapshot = {
+    ...validSnapshot,
+    prs: [...validSnapshot.prs, 502, 503],
+  };
+  assert.throws(
+    () => verifyReconciliation(futureSnapshot, mockPolicy, TRACK_B_RECONCILIATION),
+    /Invalid release PR composition/,
+  );
+});
+
+test("4. Reconciliation fails if baseline SHA differs", () => {
   const alteredSnapshot = {
     ...validSnapshot,
     baseline: {
@@ -70,7 +106,7 @@ test("2. Reconciliation fails if baseline SHA differs", () => {
   );
 });
 
-test("3. Reconciliation fails if baseline deployment ID differs", () => {
+test("5. Reconciliation fails if baseline deployment ID differs", () => {
   const alteredSnapshot = {
     ...validSnapshot,
     baseline: {
@@ -84,7 +120,7 @@ test("3. Reconciliation fails if baseline deployment ID differs", () => {
   );
 });
 
-test("4. Changed migration in reconciliation fails closed", () => {
+test("6. Changed migration in reconciliation fails closed", () => {
   const corruptedReconciliation = {
     ...TRACK_B_RECONCILIATION,
     migrations: TRACK_B_RECONCILIATION.migrations.map((m) =>
@@ -97,7 +133,7 @@ test("4. Changed migration in reconciliation fails closed", () => {
   );
 });
 
-test("5. Additional unexpected migration in diff fails closed", () => {
+test("7. Additional unexpected migration in diff fails closed", () => {
   const alteredSnapshot = {
     ...validSnapshot,
     diff: {
@@ -114,7 +150,7 @@ test("5. Additional unexpected migration in diff fails closed", () => {
   );
 });
 
-test("6. Missing required migration in diff fails closed", () => {
+test("8. Missing required migration in diff fails closed", () => {
   const alteredSnapshot = {
     ...validSnapshot,
     diff: {
@@ -130,7 +166,7 @@ test("6. Missing required migration in diff fails closed", () => {
   );
 });
 
-test("7. Different provider identity / unverified state fails closed", () => {
+test("9. Different provider identity / unverified state fails closed", () => {
   const unverifiedProvider = {
     ...TRACK_B_RECONCILIATION,
     provider: {
@@ -168,18 +204,7 @@ test("7. Different provider identity / unverified state fails closed", () => {
   );
 });
 
-test("8. Reused reconciliation for future release with missing interval PRs fails closed", () => {
-  const futureSnapshot = {
-    ...validSnapshot,
-    prs: [502, 503], // Future PRs without interval PRs
-  };
-  assert.throws(
-    () => verifyReconciliation(futureSnapshot, mockPolicy, TRACK_B_RECONCILIATION),
-    /Reconciled PR #492 missing from interval PRs/,
-  );
-});
-
-test("9. Unrelated unknown SPECIAL path in diff fails closed", () => {
+test("10. Unrelated unknown SPECIAL path in diff fails closed", () => {
   const alteredSnapshot = {
     ...validSnapshot,
     diff: {
@@ -193,7 +218,76 @@ test("9. Unrelated unknown SPECIAL path in diff fails closed", () => {
   );
 });
 
-test("10. Reconciliation does not bypass Phase 1 / Phase 2 manifest assertions", () => {
+test("11. Sovereign approval authority provenance: forged reviewer ID / payload fails closed", () => {
+  // Forged reviewerId in approval payload
+  const forgedApprovals = [
+    {
+      state: "approved",
+      environments: [{ name: "production-worker" }],
+      user: { id: 999999999, login: "attacker" }, // Not Alexander
+    },
+  ];
+  assert.throws(
+    () => assertApproval(forgedApprovals, mockPolicy),
+    /Explicit sovereign production approval required/,
+  );
+
+  // Forged non-approved state
+  const pendingApprovals = [
+    {
+      state: "pending",
+      environments: [{ name: "production-worker" }],
+      user: { id: mockPolicy.reviewerId, login: "losrealesplus" },
+    },
+  ];
+  assert.throws(
+    () => assertApproval(pendingApprovals, mockPolicy),
+    /Explicit sovereign production approval required/,
+  );
+
+  // Environment mismatch (approval for staging instead of production-worker)
+  const stagingApprovals = [
+    {
+      state: "approved",
+      environments: [{ name: "staging" }],
+      user: { id: mockPolicy.reviewerId, login: "losrealesplus" },
+    },
+  ];
+  assert.throws(
+    () => assertApproval(stagingApprovals, mockPolicy),
+    /Explicit sovereign production approval required/,
+  );
+});
+
+test("12. Environment protection rule integrity: bypass or missing reviewer fails closed", () => {
+  // Environment where admin can bypass
+  const bypassEnv = {
+    name: "production-worker",
+    can_admins_bypass: true,
+    protection_rules: [
+      { type: "required_reviewers", reviewers: [{ type: "User", reviewer: { id: mockPolicy.reviewerId } }] },
+    ],
+  };
+  assert.throws(
+    () => assertEnvironment(bypassEnv, mockPolicy),
+    /Production environment authority changed or cannot be proved/,
+  );
+
+  // Environment with different reviewer
+  const wrongReviewerEnv = {
+    name: "production-worker",
+    can_admins_bypass: false,
+    protection_rules: [
+      { type: "required_reviewers", reviewers: [{ type: "User", reviewer: { id: 88888888 } }] },
+    ],
+  };
+  assert.throws(
+    () => assertEnvironment(wrongReviewerEnv, mockPolicy),
+    /Production environment authority changed or cannot be proved/,
+  );
+});
+
+test("13. Reconciliation does not bypass Phase 1 / Phase 2 manifest assertions", () => {
   const verified = verifyReconciliation(validSnapshot, mockPolicy, TRACK_B_RECONCILIATION);
   const validManifest = {
     plan: {

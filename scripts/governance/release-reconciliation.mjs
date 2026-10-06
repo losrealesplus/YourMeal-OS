@@ -1,5 +1,8 @@
 import { demand, hash, classifyPath } from "./release-contract.mjs";
 
+export const RECONCILIATION_GOVERNANCE_PR = 502;
+export const TRACK_B_SEALED_MIGRATION_BASELINE = "c02702afea56a5a4512b68b0c99aa377ca237b0a";
+
 /**
  * Immutable reconciliation record for the Track B closed release interval.
  * Reconciles the 6 migrations (A1→M3) verified on live Supabase (nhirlpkuvonggctdzzad)
@@ -14,6 +17,7 @@ export const TRACK_B_RECONCILIATION = Object.freeze({
   baselineSha: "daa1fc4d945255eea0c6c541538c0162666d37d6",
   baselineDeploymentId: 6846428166,
   previousVersionId: "fe6dfda8-2bd7-4766-8863-6a5d2f302753",
+  sealedMigrationSha: TRACK_B_SEALED_MIGRATION_BASELINE,
   intervalPrs: [492, 493, 494, 495, 496, 498, 499, 500, 501],
   provider: {
     projectId: "nhirlpkuvonggctdzzad",
@@ -143,7 +147,8 @@ export function auditSpecialPaths(paths, reconciliation) {
 
 /**
  * Verifies a snapshot against the reconciliation record.
- * Fails closed if repository, baseline, deployment, provider state, PRs, or paths diverge.
+ * Distinguishes the reconciled database migration interval from the application target.
+ * Bounded strictly to PRs #492..#501 plus the optional governance PR #502.
  */
 export function verifyReconciliation(snapshot, policy, reconciliation = TRACK_B_RECONCILIATION) {
   const { repository, baseline, diff, prs, currentMainSha, targetSha } = snapshot;
@@ -166,12 +171,17 @@ export function verifyReconciliation(snapshot, policy, reconciliation = TRACK_B_
     "Provider project ID mismatch",
   );
 
-  // Verify that all interval PRs are accounted for
+  // Verify interval PR composition: strictly #492..#501, or #492..#501 + governance PR #502
+  demand(
+    Array.isArray(prs) &&
+      (prs.length === 9 || (prs.length === 10 && prs[9] === RECONCILIATION_GOVERNANCE_PR)),
+    `Invalid release PR composition: expected Track B interval or governance PR #${RECONCILIATION_GOVERNANCE_PR}`,
+  );
   for (const pr of reconciliation.intervalPrs) {
-    demand(prs.includes(pr), `Reconciled PR #${pr} missing from interval PRs`);
+    demand(prs.includes(pr), `Reconciled PR #${pr} missing from release PRs`);
   }
 
-  // Audit all SPECIAL paths
+  // Audit all SPECIAL paths (migrations + allowed non-migration paths)
   auditSpecialPaths(diff.paths, reconciliation);
 
   const payload = {
@@ -180,8 +190,10 @@ export function verifyReconciliation(snapshot, policy, reconciliation = TRACK_B_
     authority: reconciliation.authority,
     repository: reconciliation.repository,
     baselineSha: reconciliation.baselineSha,
+    sealedMigrationSha: TRACK_B_SEALED_MIGRATION_BASELINE,
     targetSha: targetSha ?? currentMainSha,
     intervalPrs: reconciliation.intervalPrs,
+    governancePr: prs.includes(RECONCILIATION_GOVERNANCE_PR) ? RECONCILIATION_GOVERNANCE_PR : null,
     provider: reconciliation.provider,
     migrations: reconciliation.migrations,
   };
@@ -201,7 +213,8 @@ export function assertReconciliationManifest(manifest, fresh) {
   if (fresh.decision === "AUTHORIZED_RECONCILED_RELEASE") {
     demand(
       fresh.reconciliation &&
-        fresh.reconciliation.reconciliationId === hash(JSON.stringify(fresh.reconciliation.payload)) &&
+        fresh.reconciliation.reconciliationId ===
+          hash(JSON.stringify(fresh.reconciliation.payload)) &&
         manifest.plan?.decision === fresh.decision &&
         manifest.reconciliation?.reconciliationId === fresh.reconciliation.reconciliationId &&
         manifest.plan?.reconciliation?.reconciliationId === fresh.reconciliation.reconciliationId,
