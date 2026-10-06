@@ -1304,8 +1304,10 @@ export type Database = {
         Row: {
           created_at: string
           delivery_date: string
-          dish_id: string
+          dish_id: string | null
           finished_at: string | null
+          item_kind: "dish" | "custom";
+          custom_order_item_id: string | null;
           id: string
           started_at: string | null
           status: Database["public"]["Enums"]["kitchen_batch_status"]
@@ -1316,8 +1318,10 @@ export type Database = {
         Insert: {
           created_at?: string
           delivery_date: string
-          dish_id: string
+          dish_id: string | null
           finished_at?: string | null
+          item_kind?: "dish" | "custom";
+          custom_order_item_id?: string | null;
           id?: string
           started_at?: string | null
           status?: Database["public"]["Enums"]["kitchen_batch_status"]
@@ -1328,8 +1332,10 @@ export type Database = {
         Update: {
           created_at?: string
           delivery_date?: string
-          dish_id?: string
+          dish_id?: string | null
           finished_at?: string | null
+          item_kind?: "dish" | "custom";
+          custom_order_item_id?: string | null;
           id?: string
           started_at?: string | null
           status?: Database["public"]["Enums"]["kitchen_batch_status"]
@@ -1469,7 +1475,7 @@ export type Database = {
           comment: string | null
           day_date: string
           deleted_at: string | null
-          dish_id: string
+          dish_id: string | null
           id: string
           order_id: string
           price_snapshot_status?: "captured" | "explicit_zero" | "historical_unavailable" | null
@@ -1481,7 +1487,7 @@ export type Database = {
           comment?: string | null
           day_date: string
           deleted_at?: string | null
-          dish_id: string
+          dish_id: string | null
           id?: string
           order_id: string
           price_snapshot_status?: "captured" | "explicit_zero" | "historical_unavailable"
@@ -1493,7 +1499,7 @@ export type Database = {
           comment?: string | null
           day_date?: string
           deleted_at?: string | null
-          dish_id?: string
+          dish_id?: string | null
           id?: string
           order_id?: string
           price_snapshot_status?: "captured" | "explicit_zero" | "historical_unavailable"
@@ -2452,6 +2458,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cr_order_custom_commit: {
+        Args: { _tenant_id: string; _actor_id: string; _request_id: string; _command: Json };
+        Returns: Json;
+      };
+      cr_order_custom_batch_transition: {
+        Args: {
+          _tenant_id: string;
+          _order_item_id: string;
+          _delivery_date: string;
+          _to_status: string;
+        };
+        Returns: Json;
+      };
       cr_order_offer_quote_issue: {
         Args: {
           _tenant_id: string;

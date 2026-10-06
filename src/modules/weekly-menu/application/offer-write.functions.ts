@@ -24,3 +24,18 @@ export const commitOfferOrder = createServerFn({ method: "POST" })
       quoteId,
     );
   });
+
+/** Offline foundation entry; SQL activation stays closed until a separate human gate. */
+export const commitCustomOrder = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(parseOfferWriteRequest)
+  .handler(async ({ context, data }) => {
+    const { runVerifiedOfferWrite } = await import("../server/offer-write.server");
+    return runVerifiedOfferWrite(
+      { supabase: context.supabase, userId: context.userId },
+      data,
+      undefined,
+      undefined,
+      true,
+    );
+  });

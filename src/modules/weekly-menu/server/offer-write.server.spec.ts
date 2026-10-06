@@ -159,7 +159,7 @@ it("trusted actor is server identity and quote response is validated", async () 
         {
           slotId: quoteId,
           menuId: quoteId,
-          dishId: request.command.lines[0]!.dishId,
+          dishId: request.command.lines.filter((line) => line.kind === "dish")[0]!.dishId,
           dayDate: "2026-10-05",
           qty: 1,
           basePrice: "11.9000",
@@ -210,7 +210,7 @@ it.each([
       {
         slotId: quoteId,
         menuId: quoteId,
-        dishId: request.command.lines[0]!.dishId,
+        dishId: request.command.lines.filter((line) => line.kind === "dish")[0]!.dishId,
         dayDate: "2026-10-05",
         qty: 1,
         basePrice: "11.9000",
@@ -227,4 +227,88 @@ it.each([
       rpc: async () => ({ data, error: null }),
     }),
   ).rejects.toMatchObject({ message: "OFFER_WRITE_FAILED" });
+});
+
+const customRequest = () =>
+  parseOfferWriteRequest({
+    ...request,
+    command: {
+      ...request.command,
+      lines: [{ kind: "custom", name: "Sopa", qty: 2, dayDate: "2026-10-05", unitPrice: "3.25" }],
+    },
+  });
+it("custom-only uses exact staff RPC with no commercial registry, menu or quote", async () => {
+  clearTenantOffersRegistry();
+  const rpc = vi.fn(async () => ({ data: null, error: { message: "CUSTOM_NOT_ENABLED" } }));
+  await expect(
+    runVerifiedOfferWrite(actor(), customRequest(), undefined, { rpc }, true),
+  ).rejects.toMatchObject({ message: "CUSTOM_NOT_ENABLED" });
+  expect(rpc).toHaveBeenCalledWith(
+    "cr_order_custom_commit",
+    expect.objectContaining({ _actor_id: userId, _command: customRequest().command }),
+  );
+  expect(rpc).not.toHaveBeenCalledWith(
+    expect.anything(),
+    expect.objectContaining({ _commercial_context: expect.anything() }),
+  );
+  expect(rpc).not.toHaveBeenCalledWith(
+    expect.anything(),
+    expect.objectContaining({ _quote_id: expect.anything() }),
+  );
+});
+it.each(["customer", "kitchen"])("rejects custom %s before privileged RPC", async (role) => {
+  const rpc = vi.fn();
+  await expect(
+    runVerifiedOfferWrite(actor({ role }), customRequest(), undefined, { rpc }, true),
+  ).rejects.toMatchObject({ code: "PERMISSION_DENIED" });
+  expect(rpc).not.toHaveBeenCalled();
+});
+it("rejects purecustom via quote and dish via custom bypass", async () => {
+  const rpc = vi.fn();
+  await expect(
+    runVerifiedOfferWrite(actor(), customRequest(), undefined, { rpc }),
+  ).rejects.toMatchObject({ message: "CUSTOM_COMMIT_REQUIRED" });
+  await expect(
+    runVerifiedOfferWrite(actor(), request, undefined, { rpc }, true),
+  ).rejects.toMatchObject({ message: "OFFER_WRITE_FAILED" });
+  expect(rpc).not.toHaveBeenCalled();
+});
+it("mixed financial DTO distinguishes dish quote subtotal and explicit custom grand total", async () => {
+  const mixed = parseOfferWriteRequest({
+    ...request,
+    command: {
+      ...request.command,
+      lines: [...request.command.lines, ...customRequest().command.lines],
+    },
+  });
+  const context = await offerCommercialContext(actor(), tenantId);
+  const rpc = vi.fn(async () => ({
+    data: {
+      quoteId,
+      expiresAt: "2026-10-06T10:00:00+00:00",
+      policyHash: context.policyHash,
+      total: "2.50",
+      lines: [
+        {
+          slotId: quoteId,
+          menuId: quoteId,
+          dishId: request.command.lines.filter((line) => line.kind === "dish")[0]!.dishId,
+          dayDate: "2026-10-05",
+          qty: 1,
+          basePrice: "11.9000",
+          slotPrice: "2.5000",
+          unitPrice: "2.5000",
+          priceSource: "slot",
+          priceSnapshotStatus: "captured",
+        },
+      ],
+    },
+    error: null,
+  }));
+  const result = await runVerifiedOfferWrite(actor(), mixed, undefined, { rpc });
+  expect(result).toMatchObject({ dishSubtotal: "2.50", customSubtotal: "6.50", total: "9.00" });
+  expect(rpc).toHaveBeenCalledWith(
+    "cr_order_offer_quote_issue",
+    expect.objectContaining({ _command: mixed.command }),
+  );
 });

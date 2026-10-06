@@ -22,6 +22,8 @@ const envelope = z
 export function parseOfferWriteRequest(value: unknown): OfferWriteRequest {
   const input = envelope.parse(value);
   const lines = z.array(z.record(z.unknown())).min(1).parse(input.command.lines);
+  if (lines.some((line) => line.kind === "custom" && line.slotId !== undefined))
+    throw new DomainError("INVALID_STATE", "Custom lines cannot claim an offer slot");
   const slotIds = lines.map((line) =>
     line.slotId === undefined ? undefined : z.string().uuid().parse(line.slotId),
   );
@@ -29,7 +31,11 @@ export function parseOfferWriteRequest(value: unknown): OfferWriteRequest {
     ...input.command,
     lines: lines.map(({ slotId: _slot, ...line }) => line),
   });
-  if (canonical.command.lines.some((line) => line.unitPriceOverride !== undefined))
+  if (
+    canonical.command.lines.some(
+      (line) => line.kind === "dish" && line.unitPriceOverride !== undefined,
+    )
+  )
     throw new DomainError(
       "OFFER_PRICING_OVERRIDE_UNSUPPORTED",
       "Quoted offer capture does not accept manual price overrides",

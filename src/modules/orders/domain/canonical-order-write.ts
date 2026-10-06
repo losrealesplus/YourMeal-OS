@@ -47,9 +47,40 @@ export const canonicalDishLineSchema = z
     explicitZeroConfirmed: z.boolean().optional(),
   })
   .strict();
+export const canonicalCustomLineSchema = z
+  .object({
+    kind: z.literal("custom"),
+    lineId: uuid.optional(),
+    name: z.string().trim().min(1).max(200),
+    description: z.string().max(2000).nullable().optional(),
+    dayDate: date,
+    qty: z.number().int().positive().max(2147483647),
+    unitPrice: decimal,
+    explicitZeroConfirmed: z.boolean().optional(),
+    comment: z.string().max(2000).nullable().optional(),
+    repeatConfirmation: z
+      .object({
+        sourceOrderItemId: uuid,
+        confirmedName: z.string().trim().min(1).max(200),
+        confirmedDescription: z.string().max(2000).nullable(),
+        confirmedQuantity: z.number().int().positive().max(2147483647),
+        confirmedDayDate: date,
+        confirmedUnitPrice: decimal,
+        availabilityConfirmed: z.literal(true),
+        preparationConfirmed: z.literal(true),
+        priceConfirmed: z.literal(true),
+      })
+      .strict()
+      .optional(),
+  })
+  .strict();
+export const canonicalOrderLineSchema = z.discriminatedUnion("kind", [
+  canonicalDishLineSchema,
+  canonicalCustomLineSchema,
+]);
 const common = {
   weekStart: date,
-  lines: z.array(canonicalDishLineSchema).min(1),
+  lines: z.array(canonicalOrderLineSchema).min(1),
   orderNotes: z.string().max(2000).nullable().optional(),
   deliveryAddressId: uuid.nullable().optional(),
   demandChannel: z.enum(["individual", "company"]).optional(),
@@ -96,8 +127,29 @@ export const canonicalOrderCommandSchema = z
     const first = Date.parse(`${command.weekStart}T00:00:00Z`);
     const ids = new Set<string>();
     for (const line of command.lines) {
-      if (line.unitPriceOverride !== undefined && !line.unitPriceOverrideReason)
+      if (
+        line.kind === "dish" &&
+        line.unitPriceOverride !== undefined &&
+        !line.unitPriceOverrideReason
+      )
         ctx.addIssue({ code: "custom", message: "Price override needs an explicit audit reason" });
+      if (
+        line.kind === "custom" &&
+        /^0(?:\.0{1,4})?$/.test(line.unitPrice) &&
+        line.explicitZeroConfirmed !== true
+      )
+        ctx.addIssue({ code: "custom", message: "Explicit custom zero needs confirmation" });
+      if (line.kind === "custom" && line.repeatConfirmation) {
+        const confirmation = line.repeatConfirmation;
+        if (
+          confirmation.confirmedName !== line.name ||
+          confirmation.confirmedDescription !== (line.description ?? null) ||
+          confirmation.confirmedQuantity !== line.qty ||
+          confirmation.confirmedDayDate !== line.dayDate ||
+          confirmation.confirmedUnitPrice !== line.unitPrice
+        )
+          ctx.addIssue({ code: "custom", message: "Repeat intent changed after confirmation" });
+      }
       const day = Date.parse(`${line.dayDate}T00:00:00Z`);
       if (day < first || day > first + 6 * 86400000)
         ctx.addIssue({ code: "custom", message: "Day outside order week" });
@@ -109,6 +161,7 @@ export const canonicalOrderCommandSchema = z
       if (command.operation === "capture" && line.lineId)
         ctx.addIssue({ code: "custom", message: "Capture cannot claim an existing item" });
       if (
+        line.kind === "dish" &&
         line.unitPriceOverride !== undefined &&
         /^0(?:\.0{1,4})?$/.test(line.unitPriceOverride) &&
         line.explicitZeroConfirmed !== true
@@ -117,6 +170,8 @@ export const canonicalOrderCommandSchema = z
     }
   });
 export type CanonicalOrderCommand = z.infer<typeof canonicalOrderCommandSchema>;
+export type CanonicalCustomLine = z.infer<typeof canonicalCustomLineSchema>;
+export type CanonicalOrderLine = z.infer<typeof canonicalOrderLineSchema>;
 export type CanonicalDishLine = z.infer<typeof canonicalDishLineSchema>;
 export type CanonicalCaptureInput = Omit<
   Extract<CanonicalOrderCommand, { operation: "capture" }>,
@@ -133,7 +188,7 @@ export function parseCanonicalOrderWrite(
   const id = uuid.safeParse(requestId);
   const parsed = canonicalOrderCommandSchema.safeParse(command);
   if (!id.success || !parsed.success)
-    throw new DomainError("INVALID_STATE", "Invalid canonical dish-only order command");
+    throw new DomainError("INVALID_STATE", "Invalid canonical order command");
   return { requestId: id.data, command: parsed.data };
 }
 
@@ -147,7 +202,7 @@ export function parseCanonicalOrderEnvelope(
     Array.isArray(input) ||
     Object.hasOwn(input, "operation")
   )
-    throw new DomainError("INVALID_STATE", "Invalid canonical dish-only order command");
+    throw new DomainError("INVALID_STATE", "Invalid canonical order command");
   const { requestId, ...command } = input as Record<string, unknown>;
   return parseCanonicalOrderWrite(requestId, { ...command, operation });
 }

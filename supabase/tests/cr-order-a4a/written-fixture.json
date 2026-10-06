@@ -1,0 +1,141 @@
+{
+  "provenance": {
+    "migration": "20261006072046_cr_order_a4a_custom_writer.sql",
+    "fixture": "actual-role local canonical mixed commit"
+  },
+  "customer": {
+    "id": "30000000-0000-4000-8000-000000000001",
+    "kind": "individual",
+    "email": null,
+    "user_id": "20000000-0000-4000-8000-000000000002",
+    "tenant_id": "10000000-0000-4000-8000-000000000001",
+    "created_at": "2026-10-06T08:27:39.979621+01:00",
+    "deleted_at": null,
+    "display_name": "Ana"
+  },
+  "order": {
+    "id": "b84acba6-0c1b-492e-99dd-261bb0452c61",
+    "notes": null,
+    "total": 36.8,
+    "status": "confirmed",
+    "site_id": null,
+    "revision": 1,
+    "tenant_id": "10000000-0000-4000-8000-000000000001",
+    "company_id": null,
+    "created_at": "2026-10-06T08:27:40.67301+01:00",
+    "deleted_at": null,
+    "week_start": "2026-10-05",
+    "customer_id": "30000000-0000-4000-8000-000000000001",
+    "demand_channel": "individual",
+    "dietary_snapshot": {
+      "allergens": [],
+      "capturedAt": "2026-10-06T08:27:40.67301+01:00",
+      "isOverride": false,
+      "preferences": [],
+      "authorUserId": "20000000-0000-4000-8000-000000000001",
+      "dietaryNotes": null,
+      "restrictions": [],
+      "overrideReason": null,
+      "customAllergens": []
+    },
+    "delivery_group_id": null,
+    "delivery_address_id": null,
+    "organizational_unit_id": null,
+    "write_contract_version": 2
+  },
+  "items": [
+    {
+      "id": "0935d96b-44d5-43ae-841e-f91c6be534f9",
+      "qty": 2,
+      "comment": null,
+      "dish_id": "40000000-0000-4000-8000-000000000001",
+      "day_date": "2026-10-05",
+      "order_id": "b84acba6-0c1b-492e-99dd-261bb0452c61",
+      "item_kind": "dish",
+      "tenant_id": "10000000-0000-4000-8000-000000000001",
+      "deleted_at": null,
+      "unit_price": 11.9,
+      "name_snapshot": "Captured soup",
+      "allergen_state": "UNKNOWN",
+      "allergens_snapshot": [],
+      "snapshot_author_id": "20000000-0000-4000-8000-000000000001",
+      "description_snapshot": null,
+      "snapshot_captured_at": "2026-10-06T08:27:40.67301+01:00",
+      "price_snapshot_status": "captured"
+    },
+    {
+      "id": "918039d4-9fc7-4f2c-8093-a7bd0242ac50",
+      "qty": 2,
+      "comment": null,
+      "dish_id": null,
+      "day_date": "2026-10-05",
+      "order_id": "b84acba6-0c1b-492e-99dd-261bb0452c61",
+      "item_kind": "custom",
+      "tenant_id": "10000000-0000-4000-8000-000000000001",
+      "deleted_at": null,
+      "unit_price": 3.25,
+      "name_snapshot": "Soup by request",
+      "allergen_state": "UNKNOWN",
+      "allergens_snapshot": [],
+      "snapshot_author_id": "20000000-0000-4000-8000-000000000001",
+      "description_snapshot": null,
+      "snapshot_captured_at": "2026-10-06T08:27:40.67301+01:00",
+      "price_snapshot_status": "captured"
+    },
+    {
+      "id": "f0ddffb9-6940-48f9-8988-efdb3ac8cc8b",
+      "qty": 2,
+      "comment": null,
+      "dish_id": null,
+      "day_date": "2026-10-05",
+      "order_id": "b84acba6-0c1b-492e-99dd-261bb0452c61",
+      "item_kind": "custom",
+      "tenant_id": "10000000-0000-4000-8000-000000000001",
+      "deleted_at": null,
+      "unit_price": 3.25,
+      "name_snapshot": "Soup by request",
+      "allergen_state": "UNKNOWN",
+      "allergens_snapshot": [],
+      "snapshot_author_id": "20000000-0000-4000-8000-000000000001",
+      "description_snapshot": null,
+      "snapshot_captured_at": "2026-10-06T08:27:40.67301+01:00",
+      "price_snapshot_status": "captured"
+    }
+  ],
+  "deliveries": [
+    {
+      "id": "4ab93737-ccc0-44f9-8be4-b8700a8a8a20",
+      "status": "pending",
+      "order_id": "b84acba6-0c1b-492e-99dd-261bb0452c61",
+      "tenant_id": "10000000-0000-4000-8000-000000000001",
+      "deleted_at": null,
+      "customer_id": "30000000-0000-4000-8000-000000000001",
+      "issue_notes": null,
+      "delivery_date": "2026-10-05",
+      "legacy_backfill": false,
+      "dietary_snapshot": {
+        "allergens": [],
+        "capturedAt": "2026-10-06T08:27:40.67301+01:00",
+        "isOverride": false,
+        "preferences": [],
+        "authorUserId": "20000000-0000-4000-8000-000000000001",
+        "dietaryNotes": null,
+        "restrictions": [],
+        "overrideReason": null,
+        "customAllergens": []
+      },
+      "delivery_address_id": null,
+      "delivery_instructions": null,
+      "customer_contact_snapshot": {
+        "email": null,
+        "phone": null,
+        "customerId": "30000000-0000-4000-8000-000000000001",
+        "displayName": "Ana"
+      },
+      "delivery_address_snapshot": {
+        "reason": "no_address_at_intake",
+        "unresolved": true
+      }
+    }
+  ]
+}

@@ -5,8 +5,9 @@ import type { AppSupabase } from "@/services/types";
 import type { OrderDietarySnapshot } from "@/types/dietary";
 
 export type OrderRow = Tables<"orders"> & { revision?: number; write_contract_version?: 1 | 2 };
-export type OrderItemRow = Tables<"order_items"> &
-  Partial<Omit<OrderItemReadRow, "id" | "dish_id">>;
+export type OrderItemRow = Omit<Tables<"order_items">, "dish_id"> & { dish_id: string } & Partial<
+    Omit<OrderItemReadRow, "id" | "dish_id">
+  >;
 
 /** SELECT * projection accepts future custom rows without widening legacy writes. */
 export type OrderItemReadProjection = Omit<OrderItemRow, "dish_id"> & OrderItemReadRow;

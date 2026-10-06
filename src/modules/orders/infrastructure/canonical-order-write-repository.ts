@@ -3,11 +3,11 @@ import { DomainError, type DomainErrorCode } from "@/domain/errors";
 import type { AppSupabase } from "@/services/types";
 import type { Json } from "@/integrations/supabase/types";
 import type { CanonicalOrderCommand } from "../domain/canonical-order-write";
-import type { OrderRow, OrderItemRow } from "./order-repository";
+import type { OrderRow, OrderItemReadProjection } from "./order-repository";
 
 export type CanonicalOrderWriteResult = {
   order: OrderRow;
-  items: OrderItemRow[];
+  items: OrderItemReadProjection[];
   committedRevision: number;
   replayed: boolean;
   inputHash: string;
@@ -26,6 +26,35 @@ const errors: readonly DomainErrorCode[] = [
   "CUSTOM_NOT_ENABLED",
   "COMMERCIAL_QUOTE_REQUIRED",
 ];
+const customSnapshot = z
+  .object({
+    dish_id: z.null(),
+    item_kind: z.literal("custom"),
+    name_snapshot: z.string().trim().min(1).max(200),
+    description_snapshot: z.string().max(2000).nullable().optional(),
+    qty: z.number().int().positive().max(2147483647),
+    day_date: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .refine((value) => {
+        const date = new Date(`${value}T00:00:00Z`);
+        return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
+      }),
+    allergen_state: z.literal("UNKNOWN"),
+    allergens_snapshot: z.array(z.never()).length(0),
+    snapshot_captured_at: z
+      .string()
+      .min(1)
+      .refine((value) => Number.isFinite(Date.parse(value))),
+    unit_price: z
+      .union([z.string(), z.number().finite()])
+      .refine((value) => /^(?:0|[1-9]\d{0,7})(?:\.\d{1,4})?$/.test(String(value))),
+    price_snapshot_status: z.enum(["captured", "explicit_zero"]),
+  })
+  .superRefine((item, ctx) => {
+    if ((Number(item.unit_price) === 0) !== (item.price_snapshot_status === "explicit_zero"))
+      ctx.addIssue({ code: "custom", message: "Invalid zero snapshot state" });
+  });
 const validIdentity = (value: unknown) => z.string().uuid().safeParse(value).success;
 export function canonicalWriteError(message: string): DomainError {
   const code = errors.find((code) => message === code || message.startsWith(`${code}:`));
@@ -58,8 +87,14 @@ export function parseCanonicalOrderWriteResult(
         !validIdentity(item.id) ||
         item.tenant_id !== tenantId ||
         item.order_id !== result.order.id ||
-        !validIdentity(item.dish_id) ||
-        item.item_kind !== "dish",
+        (item.item_kind === "custom"
+          ? !customSnapshot.safeParse(item).success ||
+            !/^\d{4}-\d{2}-\d{2}$/.test(result.order.week_start ?? "") ||
+            !Number.isFinite(Date.parse(`${result.order.week_start}T00:00:00Z`)) ||
+            item.day_date < result.order.week_start ||
+            Date.parse(`${item.day_date}T00:00:00Z`) >
+              Date.parse(`${result.order.week_start}T00:00:00Z`) + 6 * 86400000
+          : item.item_kind !== "dish" || !validIdentity(item.dish_id)),
     )
   )
     throw new DomainError("INVALID_STATE", "Invalid canonical writer response");

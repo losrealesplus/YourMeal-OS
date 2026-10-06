@@ -15,14 +15,15 @@ import type { Json } from "@/integrations/supabase/types";
 import type { OfferWriteRequest } from "../application/offer-write-input";
 
 export type VerifiedOfferActor = { supabase: AppSupabase; userId: string };
-type OfferRpcName = "cr_order_offer_quote_issue" | "cr_order_offer_quote_commit";
+type OfferRpcName =
+  "cr_order_offer_quote_issue" | "cr_order_offer_quote_commit" | "cr_order_custom_commit";
 type RpcCall = (
   name: OfferRpcName,
   parameters: Record<string, Json>,
 ) => Promise<{ data: Json | null; error: { message: string } | null }>;
 
 /** Verified DB identity and explicit build configuration, never a client tenant slug/tier. */
-export async function offerCommercialContext(actor: VerifiedOfferActor, tenantId: string) {
+export async function verifiedOrderActorContext(actor: VerifiedOfferActor, tenantId: string) {
   const tenant = await actor.supabase
     .from("tenants")
     .select("id,slug")
@@ -56,10 +57,15 @@ export async function offerCommercialContext(actor: VerifiedOfferActor, tenantId
   if (saas.data) verifiedRoles.push("saas_admin");
   if (!can(verifiedRoles, "orders.write"))
     throw new DomainError("PERMISSION_DENIED", "Order write capability required");
+  return { tenant: tenant.data, roles: verifiedRoles };
+}
+
+export async function offerCommercialContext(actor: VerifiedOfferActor, tenantId: string) {
+  const { tenant } = await verifiedOrderActorContext(actor, tenantId);
   if (!Array.isArray(bundledCommercial))
     throw new OfferWriteRpcError("COMMERCIAL_CONTEXT_UNAVAILABLE");
-  const offers = getTenantOffers(tenant.data.slug);
-  if (!hasRegisteredTenantOffers(tenant.data.slug))
+  const offers = getTenantOffers(tenant.slug);
+  if (!hasRegisteredTenantOffers(tenant.slug))
     throw new OfferWriteRpcError("COMMERCIAL_CONTEXT_UNAVAILABLE");
   if (
     !Array.isArray(offers) ||
@@ -74,7 +80,7 @@ export async function offerCommercialContext(actor: VerifiedOfferActor, tenantId
     )
   )
     throw new OfferWriteRpcError("COMMERCIAL_CONTEXT_UNAVAILABLE");
-  const policy = JSON.stringify({ tenantId, tenantSlug: tenant.data.slug, offers });
+  const policy = JSON.stringify({ tenantId, tenantSlug: tenant.slug, offers });
   const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(policy));
   return {
     active: offers.length > 0,
@@ -85,6 +91,8 @@ export async function offerCommercialContext(actor: VerifiedOfferActor, tenantId
 }
 
 const allowedCodes = [
+  "CUSTOM_NOT_ENABLED",
+  "REPEAT_CONFIRMATION_REQUIRED",
   "OFFER_NOT_FOUND",
   "OFFER_AMBIGUOUS",
   "OFFER_PRICING_COMMERCIAL_UNSUPPORTED",
@@ -116,12 +124,29 @@ export async function runVerifiedOfferWrite(
   request: OfferWriteRequest,
   quoteId?: string,
   admin: { rpc: unknown } = supabaseAdmin,
+  customCommit = false,
 ) {
   // Policy re-evaluation is mandatory at both quote and commit. RPC handles committed retry
   // before quote expiry/price-policy comparison, keeping the original immutable quote payload.
+  const dishLines = request.command.lines.filter(
+    (line): line is Extract<typeof line, { kind: "dish" }> => line.kind === "dish",
+  );
+  if (customCommit && (dishLines.length > 0 || quoteId))
+    throw new OfferWriteRpcError("OFFER_WRITE_FAILED");
+  if (!customCommit && dishLines.length === 0)
+    throw new OfferWriteRpcError("CUSTOM_COMMIT_REQUIRED");
   let context;
   try {
-    context = await offerCommercialContext(actor, request.tenantId);
+    if (request.command.lines.some((line) => line.kind === "custom")) {
+      const identity = await verifiedOrderActorContext(actor, request.tenantId);
+      if (
+        !identity.roles.some((role) =>
+          ["company_admin", "operations_manager", "saas_admin"].includes(role),
+        )
+      )
+        throw new DomainError("PERMISSION_DENIED", "Staff capability required for custom writes");
+    }
+    if (!customCommit) context = await offerCommercialContext(actor, request.tenantId);
   } catch (error) {
     if (error instanceof DomainError || error instanceof OfferWriteRpcError) throw error;
     throw new OfferWriteRpcError("OFFER_WRITE_UNAVAILABLE");
@@ -131,13 +156,17 @@ export async function runVerifiedOfferWrite(
     _actor_id: actor.userId,
     _request_id: request.requestId,
     _command: request.command as unknown as Json,
-    _commercial_context: context,
+    ...(context ? { _commercial_context: context } : {}),
   };
   if (quoteId) parameters._quote_id = quoteId;
   let response;
   try {
     response = await (admin.rpc as RpcCall)(
-      quoteId ? "cr_order_offer_quote_commit" : "cr_order_offer_quote_issue",
+      customCommit
+        ? "cr_order_custom_commit"
+        : quoteId
+          ? "cr_order_offer_quote_commit"
+          : "cr_order_offer_quote_issue",
       parameters,
     );
   } catch {
@@ -150,7 +179,8 @@ export async function runVerifiedOfferWrite(
         "OFFER_WRITE_FAILED",
     );
   if (data === null) throw new OfferWriteRpcError("OFFER_WRITE_FAILED");
-  if (quoteId) return parseCanonicalOrderWriteResult(data, request.tenantId, request.command);
+  if (quoteId || customCommit)
+    return parseCanonicalOrderWriteResult(data, request.tenantId, request.command);
   const quote = z
     .object({
       quoteId: z.string().uuid(),
@@ -180,15 +210,14 @@ export async function runVerifiedOfferWrite(
     .safeParse(data);
   if (
     !quote.success ||
-    quote.data.policyHash !== context.policyHash ||
-    quote.data.lines.length !== request.command.lines.length ||
+    quote.data.policyHash !== context?.policyHash ||
+    quote.data.lines.length !== dishLines.length ||
     quote.data.lines.some(
       (line, index) =>
-        line.dishId !== request.command.lines[index]?.dishId ||
-        line.dayDate !== request.command.lines[index]?.dayDate ||
-        line.qty !== request.command.lines[index]?.qty ||
-        (request.command.lines[index]?.slotId !== undefined &&
-          line.slotId !== request.command.lines[index]?.slotId),
+        line.dishId !== dishLines[index]?.dishId ||
+        line.dayDate !== dishLines[index]?.dayDate ||
+        line.qty !== dishLines[index]?.qty ||
+        (dishLines[index]?.slotId !== undefined && line.slotId !== dishLines[index]?.slotId),
     )
   )
     throw new OfferWriteRpcError("OFFER_WRITE_FAILED");
@@ -214,5 +243,20 @@ export async function runVerifiedOfferWrite(
     )
   )
     throw new OfferWriteRpcError("OFFER_WRITE_FAILED");
-  return quote.data;
+  const customLines = request.command.lines.filter((line) => line.kind === "custom");
+  const customUnits = customLines.reduce(
+    (sum, line) => sum + offerPriceUnits(line.unitPrice) * BigInt(line.qty),
+    0n,
+  );
+  const formatCents = (units: bigint) => {
+    const cents = (units + 50n) / 100n;
+    return `${cents / 100n}.${String(cents % 100n).padStart(2, "0")}`;
+  };
+  return {
+    ...quote.data,
+    dishSubtotal: quote.data.total,
+    customSubtotal: formatCents(customUnits),
+    total: formatCents(financialUnits + customUnits),
+    customLines,
+  };
 }

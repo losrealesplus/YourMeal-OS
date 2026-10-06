@@ -1,7 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 import type { ServiceContext } from "@/services/types";
 import { CanonicalOrderWriteService } from "./canonical-order-write-service";
-import type { CanonicalCaptureInput, CanonicalModifyInput } from "../domain/canonical-order-write";
+import type {
+  CanonicalCaptureInput,
+  CanonicalModifyInput,
+  CanonicalDishLine,
+} from "../domain/canonical-order-write";
 
 const tenant = "11111111-1111-4111-8111-111111111111";
 const requestId = "22222222-2222-4222-8222-222222222222";
@@ -9,7 +13,7 @@ const orderId = "33333333-3333-4333-8333-333333333333";
 const dishId = "44444444-4444-4444-8444-444444444444";
 const customerId = "55555555-5555-4555-8555-555555555555";
 const itemId = "66666666-6666-4666-8666-666666666666";
-const capture = (): CanonicalCaptureInput => ({
+const capture = (): Omit<CanonicalCaptureInput, "lines"> & { lines: CanonicalDishLine[] } => ({
   requestId,
   weekStart: "2026-10-05",
   customer: { kind: "existing", id: customerId },
@@ -115,7 +119,9 @@ describe("canonical order authenticated application boundary", () => {
       unitPriceOverrideReason: "Acuerdo comercial",
     });
     expect(from).not.toHaveBeenCalled();
-    expect(input.lines[0]?.unitPriceOverrideReason).toBe("  Acuerdo comercial  ");
+    expect(input.lines.filter((line) => line.kind === "dish")[0]?.unitPriceOverrideReason).toBe(
+      "  Acuerdo comercial  ",
+    );
   });
   it("rejects every canonical B2B capture/modify context before RPC or separate writes", async () => {
     for (const [operation, base] of [
