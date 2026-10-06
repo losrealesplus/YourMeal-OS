@@ -27,6 +27,7 @@ describe("OP08 Published offer price remediation", () => {
     ],
   };
 
+  const authorizationId = "90000000-0000-4000-8000-000000000001";
   it("computes deterministic SHA-256 manifest hash regardless of item order", async () => {
     const hash1 = await computeRemediationManifestHash(manifest);
     expect(hash1).toMatch(/^[0-9a-f]{64}$/);
@@ -70,6 +71,7 @@ describe("OP08 Published offer price remediation", () => {
     const valid = publishedOfferPriceRemediationRequestSchema.safeParse({
       tenantId,
       requestId,
+      authorizationId,
       manifest,
     });
     expect(valid.success).toBe(true);
@@ -79,6 +81,7 @@ describe("OP08 Published offer price remediation", () => {
     const invalid = publishedOfferPriceRemediationRequestSchema.safeParse({
       tenantId,
       requestId,
+      authorizationId,
       manifest: {
         ...manifest,
         items: [

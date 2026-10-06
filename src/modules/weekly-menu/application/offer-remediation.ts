@@ -38,6 +38,7 @@ export const publishedOfferPriceRemediationRequestSchema = z
   .object({
     tenantId: z.string().uuid(),
     requestId: z.string().uuid(),
+    authorizationId: z.string().uuid(),
     manifest: publishedOfferPriceRemediationManifestSchema,
   })
   .strict();
@@ -111,6 +112,7 @@ export async function runPublishedOfferPriceRemediation(
       _tenant_id: request.tenantId,
       _actor_id: actor.userId,
       _request_id: request.requestId,
+      _authorization_id: request.authorizationId,
       _manifest: {
         ...request.manifest,
         manifestHash,
@@ -126,6 +128,7 @@ export async function runPublishedOfferPriceRemediation(
 
   return response.data as {
     success: boolean;
+    authorizationId: string;
     remediatedCount: number;
     manifestHash: string;
   };

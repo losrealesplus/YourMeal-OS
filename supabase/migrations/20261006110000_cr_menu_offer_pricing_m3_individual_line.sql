@@ -8,7 +8,55 @@ CREATE SCHEMA IF NOT EXISTS cr_menu_private;
 REVOKE ALL ON SCHEMA cr_menu_private FROM PUBLIC,anon,authenticated;
 GRANT USAGE ON SCHEMA cr_menu_private TO service_role;
 
--- 1. Updated offer_state accepting explicit commercial_mode string
+-- 1. Sovereign Authorization Registry for Published Offer Remediation (OP08)
+CREATE TABLE IF NOT EXISTS cr_menu_private.approved_remediations (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id uuid NOT NULL REFERENCES public.tenants(id),
+  menu_id uuid NOT NULL REFERENCES public.weekly_menus(id),
+  manifest_hash text NOT NULL CHECK (manifest_hash ~ '^[0-9a-f]{64}$'),
+  operation text NOT NULL DEFAULT 'published_offer_price_remediation',
+  approval_source text NOT NULL,
+  approved_at timestamptz NOT NULL DEFAULT now(),
+  expires_at timestamptz NOT NULL,
+  consumed_at timestamptz,
+  consumed_by uuid,
+  consumed_request_id uuid
+);
+
+ALTER TABLE cr_menu_private.approved_remediations ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON cr_menu_private.approved_remediations FROM PUBLIC,anon,authenticated,service_role;
+-- service_role runtime cannot INSERT approvals; it can only SELECT and consume an existing approval.
+GRANT SELECT, UPDATE(consumed_at, consumed_by, consumed_request_id) ON cr_menu_private.approved_remediations TO service_role;
+
+CREATE OR REPLACE FUNCTION cr_menu_private.protect_approved_remediations()
+RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path='' AS $$
+BEGIN
+  IF TG_OP = 'DELETE' THEN
+    RAISE EXCEPTION 'APPROVED_REMEDIATION_IMMUTABLE';
+  ELSIF TG_OP = 'UPDATE' THEN
+    IF OLD.id IS DISTINCT FROM NEW.id
+       OR OLD.tenant_id IS DISTINCT FROM NEW.tenant_id
+       OR OLD.menu_id IS DISTINCT FROM NEW.menu_id
+       OR OLD.manifest_hash IS DISTINCT FROM NEW.manifest_hash
+       OR OLD.operation IS DISTINCT FROM NEW.operation
+       OR OLD.approval_source IS DISTINCT FROM NEW.approval_source
+       OR OLD.approved_at IS DISTINCT FROM NEW.approved_at
+       OR OLD.expires_at IS DISTINCT FROM NEW.expires_at THEN
+      RAISE EXCEPTION 'APPROVED_REMEDIATION_IMMUTABLE';
+    END IF;
+    IF OLD.consumed_at IS NOT NULL AND NEW.consumed_at IS DISTINCT FROM OLD.consumed_at THEN
+      RAISE EXCEPTION 'REMEDIATION_AUTHORIZATION_ALREADY_CONSUMED';
+    END IF;
+  END IF;
+  RETURN NEW;
+END $$;
+
+DROP TRIGGER IF EXISTS approved_remediations_immutable ON cr_menu_private.approved_remediations;
+CREATE TRIGGER approved_remediations_immutable
+  BEFORE UPDATE OR DELETE ON cr_menu_private.approved_remediations
+  FOR EACH ROW EXECUTE FUNCTION cr_menu_private.protect_approved_remediations();
+
+-- 2. Updated offer_state accepting explicit commercial_mode string with positive context checks
 CREATE OR REPLACE FUNCTION cr_order_private.offer_state(
   _tenant uuid,
   _command jsonb,
@@ -25,6 +73,7 @@ DECLARE
   p numeric;
   source text;
   mode text;
+  cust_id uuid;
 BEGIN
   mode := coalesce(_commercial_mode, 'commercial_inactive');
   IF jsonb_typeof(_command->'lines') IS DISTINCT FROM 'array' OR jsonb_array_length(_command->'lines')=0 THEN
@@ -37,6 +86,22 @@ BEGIN
 
   IF NOT EXISTS(SELECT 1 FROM jsonb_array_elements(_command->'lines') x WHERE x->>'kind'='dish') THEN
     RAISE EXCEPTION 'CUSTOM_ONLY_NO_OFFER_QUOTE';
+  END IF;
+
+  -- Positive exclusion of corporate / plan-linked purchases in individual_line_pricing_v1
+  IF mode = 'individual_line_pricing_v1' THEN
+    IF _command ? 'companyId' OR _command ? 'deliveryGroupId' THEN
+      RAISE EXCEPTION 'OFFER_PRICING_COMMERCIAL_UNSUPPORTED';
+    END IF;
+    IF _command->'customer'->>'kind' = 'existing' THEN
+      cust_id := (_command->'customer'->>'id')::uuid;
+      IF EXISTS(
+        SELECT 1 FROM public.company_employees
+         WHERE tenant_id = _tenant AND customer_id = cust_id AND status = 'active' AND deleted_at IS NULL
+      ) THEN
+        RAISE EXCEPTION 'OFFER_PRICING_COMMERCIAL_UNSUPPORTED';
+      END IF;
+    END IF;
   END IF;
 
   SELECT * INTO menu FROM public.weekly_menus
@@ -137,7 +202,7 @@ BEGIN
   RETURN result;
 END $$;
 
--- 2. Backward compatibility wrapper for boolean commercial_active
+-- 3. Backward compatibility wrapper for boolean commercial_active
 CREATE OR REPLACE FUNCTION cr_order_private.offer_state(
   _tenant uuid,
   _command jsonb,
@@ -150,7 +215,7 @@ CREATE OR REPLACE FUNCTION cr_order_private.offer_state(
   );
 $$;
 
--- 3. Updated quote issue
+-- 4. Updated quote issue
 CREATE OR REPLACE FUNCTION public.cr_order_offer_quote_issue(
   _tenant_id uuid,
   _actor_id uuid,
@@ -201,7 +266,7 @@ BEGIN
   );
 END $$;
 
--- 4. Updated quote commit
+-- 5. Updated quote commit
 CREATE OR REPLACE FUNCTION public.cr_order_offer_quote_commit(
   _tenant_id uuid,
   _actor_id uuid,
@@ -273,7 +338,7 @@ BEGIN
   RETURN result;
 END $$;
 
--- 5. OP08 Published Offer Price Protection Trigger
+-- 6. OP08 Published Offer Price Protection Trigger
 CREATE OR REPLACE FUNCTION cr_menu_private.protect_published_weekly_menu_slots()
 RETURNS trigger LANGUAGE plpgsql SECURITY INVOKER SET search_path='' AS $$
 DECLARE
@@ -295,26 +360,27 @@ CREATE TRIGGER protect_published_slots
   BEFORE UPDATE ON public.weekly_menu_slots
   FOR EACH ROW EXECUTE FUNCTION cr_menu_private.protect_published_weekly_menu_slots();
 
--- 5. OP08 Published Offer Price Remediation RPC
+-- 7. OP08 Published Offer Price Remediation RPC with Sovereign Authorization Check
 CREATE OR REPLACE FUNCTION public.cr_menu_published_offer_price_remediation(
   _tenant_id uuid,
   _actor_id uuid,
   _request_id uuid,
+  _authorization_id uuid,
   _manifest jsonb
 ) RETURNS jsonb LANGUAGE plpgsql SECURITY INVOKER SET search_path='' AS $$
 DECLARE
   staff boolean;
   item jsonb;
+  auth_row cr_menu_private.approved_remediations;
   slot_row public.weekly_menu_slots;
   menu_row public.weekly_menus;
   remediated_count integer := 0;
   expected_old numeric;
   new_p numeric;
   manifest_hash text;
-  calc_hash text;
   old_val text;
 BEGIN
-  IF current_setting('role', true) IS DISTINCT FROM 'service_role' OR _actor_id IS NULL OR _tenant_id IS NULL THEN
+  IF current_setting('role', true) IS DISTINCT FROM 'service_role' OR _actor_id IS NULL OR _tenant_id IS NULL OR _authorization_id IS NULL THEN
     RAISE EXCEPTION 'PERMISSION_DENIED';
   END IF;
 
@@ -336,12 +402,34 @@ BEGIN
     RAISE EXCEPTION 'INPUT_INVALID';
   END IF;
 
-  -- Verify all items and lock them atomically
+  -- 1. Sovereign Authorization Check: Record must exist, match tenant/hash, be unexpired and unconsumed
+  SELECT * INTO auth_row FROM cr_menu_private.approved_remediations
+   WHERE id = _authorization_id AND tenant_id = _tenant_id
+   FOR UPDATE;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'REMEDIATION_NOT_AUTHORIZED';
+  END IF;
+
+  IF auth_row.manifest_hash IS DISTINCT FROM manifest_hash THEN
+    RAISE EXCEPTION 'REMEDIATION_MANIFEST_MISMATCH';
+  END IF;
+
+  IF auth_row.expires_at < now() THEN
+    RAISE EXCEPTION 'REMEDIATION_AUTHORIZATION_EXPIRED';
+  END IF;
+
+  IF auth_row.consumed_at IS NOT NULL THEN
+    RAISE EXCEPTION 'REMEDIATION_AUTHORIZATION_ALREADY_CONSUMED';
+  END IF;
+
+  -- 2. Verify all items and lock them atomically
   FOR item IN SELECT * FROM jsonb_array_elements(_manifest->'items') LOOP
     SELECT * INTO menu_row FROM public.weekly_menus
      WHERE id=(item->>'menuId')::uuid AND tenant_id=_tenant_id AND status='published' AND deleted_at IS NULL
      FOR UPDATE;
-    IF NOT FOUND THEN RAISE EXCEPTION 'REMEDIATION_MANIFEST_MISMATCH'; END IF;
+    IF NOT FOUND OR menu_row.id IS DISTINCT FROM auth_row.menu_id THEN
+      RAISE EXCEPTION 'REMEDIATION_MANIFEST_MISMATCH';
+    END IF;
 
     SELECT * INTO slot_row FROM public.weekly_menu_slots
      WHERE id=(item->>'slotId')::uuid AND weekly_menu_id=menu_row.id AND tenant_id=_tenant_id
@@ -367,7 +455,14 @@ BEGIN
     END IF;
   END LOOP;
 
-  -- Apply updates within privileged remediation context
+  -- 3. Atomically consume sovereign authorization
+  UPDATE cr_menu_private.approved_remediations
+     SET consumed_at = now(),
+         consumed_by = _actor_id,
+         consumed_request_id = _request_id
+   WHERE id = auth_row.id;
+
+  -- 4. Apply updates within privileged remediation context
   PERFORM set_config('cr_menu.remediation_active', 'true', true);
 
   FOR item IN SELECT * FROM jsonb_array_elements(_manifest->'items') LOOP
@@ -389,6 +484,7 @@ BEGIN
       (item->>'slotId')::text,
       jsonb_build_object('unitPrice', old_val),
       jsonb_build_object(
+        'authorizationId', _authorization_id,
         'unitPrice', item->>'newPrice',
         'requestId', _request_id,
         'manifestHash', manifest_hash,
@@ -404,11 +500,12 @@ BEGIN
 
   RETURN jsonb_build_object(
     'success', true,
+    'authorizationId', _authorization_id,
     'remediatedCount', remediated_count,
     'manifestHash', manifest_hash
   );
 END $$;
 
-GRANT EXECUTE ON FUNCTION public.cr_menu_published_offer_price_remediation(uuid,uuid,uuid,jsonb) TO service_role;
+GRANT EXECUTE ON FUNCTION public.cr_menu_published_offer_price_remediation(uuid,uuid,uuid,uuid,jsonb) TO service_role;
 
 COMMIT;
