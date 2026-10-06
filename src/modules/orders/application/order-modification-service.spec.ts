@@ -26,10 +26,36 @@ vi.mock("@/modules/dish-library/infrastructure/dish-repository", () => ({
   }),
 }));
 
-function createMockSupabase(initialData: {
-  orders?: any[];
-  orderItems?: any[];
-} = {}) {
+vi.mock("@/modules/weekly-menu/infrastructure/weekly-menu-repository", () => ({
+  createWeeklyMenuRepository: (_client: unknown, tenantId: string) => ({
+    findPublishedByWeekStart: async (weekStart: string) => ({
+      id: "menu",
+      tenant_id: tenantId,
+      week_start: weekStart,
+      status: "published",
+      deleted_at: null,
+    }),
+    listSlotsWithDishes: async () =>
+      ["2026-09-29", "2026-09-30"].flatMap((dayDate) =>
+        ["dish-pollo", "dish-salmon", "dish-quinoa"].map((dishId) => ({
+          id: `${dayDate}-${dishId}`,
+          tenant_id: tenantId,
+          weekly_menu_id: "menu",
+          day_date: dayDate,
+          dish_id: dishId,
+          unit_price: null,
+          dishes: { id: dishId, tenant_id: tenantId, status: "active", deleted_at: null },
+        })),
+      ),
+  }),
+}));
+
+function createMockSupabase(
+  initialData: {
+    orders?: any[];
+    orderItems?: any[];
+  } = {},
+) {
   const store = {
     orders: initialData.orders ?? [
       {
@@ -120,10 +146,12 @@ function createMockSupabase(initialData: {
                   id: `${currentTable.slice(0, 4)}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
                   ...p,
                 }))
-              : [{
-                  id: `${currentTable.slice(0, 4)}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-                  ...insertedPayload,
-                }];
+              : [
+                  {
+                    id: `${currentTable.slice(0, 4)}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+                    ...insertedPayload,
+                  },
+                ];
             (store as any)[currentTable]?.push(...rows);
             return Promise.resolve({ data: rows, error: null }).then(resolve);
           }
@@ -176,7 +204,9 @@ describe("OPS-01 G3 — OrderModificationService", () => {
       lines: [{ dayDate: "2026-09-29", dishId: "dish-pollo", qty: 2 }],
     };
 
-    await expect(OrderModificationService.modifyOrder(ctx, dto)).rejects.toBeInstanceOf(DomainError);
+    await expect(OrderModificationService.modifyOrder(ctx, dto)).rejects.toBeInstanceOf(
+      DomainError,
+    );
   });
 
   it("modifies confirmed order, updates total, updates culinary comments and writes audit", async () => {

@@ -2452,6 +2452,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cr_order_offer_quote_issue: {
+        Args: {
+          _tenant_id: string;
+          _actor_id: string;
+          _request_id: string;
+          _command: Json;
+          _commercial_context: Json;
+        };
+        Returns: Json;
+      };
+      cr_order_offer_quote_commit: {
+        Args: {
+          _tenant_id: string;
+          _actor_id: string;
+          _request_id: string;
+          _quote_id: string;
+          _command: Json;
+          _commercial_context: Json;
+        };
+        Returns: Json;
+      };
       cr_order_write_v2: {
         Args: { _tenant_id: string; _request_id: string; _command: Json };
         Returns: Json;
