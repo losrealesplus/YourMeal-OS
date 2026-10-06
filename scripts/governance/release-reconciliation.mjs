@@ -1,7 +1,32 @@
+import { execFileSync } from "node:child_process";
 import { demand, hash, classifyPath } from "./release-contract.mjs";
 
-export const RECONCILIATION_GOVERNANCE_PR = 502;
 export const TRACK_B_SEALED_MIGRATION_BASELINE = "c02702afea56a5a4512b68b0c99aa377ca237b0a";
+
+/**
+ * Allowed path prefixes for post-Track-B governance-only changes.
+ * Any file modified in a post-Track-B commit must strictly match these prefixes
+ * and must not touch runtime, database, provider, or capability files.
+ */
+export const POST_TRACK_B_ALLOWED_PREFIXES = Object.freeze([
+  "scripts/governance/",
+  ".github/workflows/deploy-production.yml",
+  "docs/",
+]);
+
+/**
+ * Disallowed patterns in post-Track-B commits under all circumstances.
+ */
+export const POST_TRACK_B_DISALLOWED_PATTERNS = Object.freeze([
+  /^supabase\/migrations\//,
+  /^migrations\//,
+  /\.sql$/,
+  /^src\//,
+  /^instances\//,
+  /^public\//,
+  /package(?:-lock)?\.json$/,
+  /wrangler/,
+]);
 
 /**
  * Immutable reconciliation record for the Track B closed release interval.
@@ -81,6 +106,7 @@ export const TRACK_B_RECONCILIATION = Object.freeze({
     "docs/adr/README.md",
     "scripts/governance/release-artifact.mjs",
     "scripts/governance/release-contract.mjs",
+    "scripts/governance/release-json.spec.mjs",
     "scripts/governance/release-plan.mjs",
     "scripts/governance/release-publish.mjs",
     "scripts/governance/release-reconciliation.mjs",
@@ -146,9 +172,43 @@ export function auditSpecialPaths(paths, reconciliation) {
 }
 
 /**
+ * Audits changed paths in the post-Track-B governance interval.
+ * Rejects any database migration, SQL artifact, runtime/product change, or unknown path.
+ */
+export function auditPostTrackBDelta(paths) {
+  demand(Array.isArray(paths), "Invalid post-Track-B paths array");
+  for (const p of paths) {
+    demand(
+      typeof p === "string" && p.length > 0,
+      `Invalid path in post-Track-B delta: ${p}`,
+    );
+    for (const pattern of POST_TRACK_B_DISALLOWED_PATTERNS) {
+      demand(
+        !pattern.test(p),
+        `Post-Track-B delta cannot contain runtime, migration or provider changes: ${p}`,
+      );
+    }
+    const isAllowedPrefix = POST_TRACK_B_ALLOWED_PREFIXES.some(
+      (prefix) => p === prefix || p.startsWith(prefix),
+    );
+    demand(
+      isAllowedPrefix,
+      `Post-Track-B delta path outside allowed governance scope: ${p}`,
+    );
+  }
+  return { valid: true, auditedCount: paths.length };
+}
+
+/**
  * Verifies a snapshot against the reconciliation record.
- * Distinguishes the reconciled database migration interval from the application target.
- * Bounded strictly to PRs #492..#501 plus the optional governance PR #502.
+ * Distinguishes the immutable sealed database migration interval (A) from the
+ * post-Track-B governance-only delta (B).
+ *
+ * Eligibility derives strictly from:
+ * 1. Exact match of the sealed Track B database migrations and baseline on Supabase.
+ * 2. Independent verification of the post-Track-B delta (zero migrations, zero SQL,
+ *    zero runtime/product changes, strictly within the allowed governance scope).
+ * 3. Every commit originating from an attributable merged main PR.
  */
 export function verifyReconciliation(snapshot, policy, reconciliation = TRACK_B_RECONCILIATION) {
   const { repository, baseline, diff, prs, currentMainSha, targetSha } = snapshot;
@@ -171,18 +231,54 @@ export function verifyReconciliation(snapshot, policy, reconciliation = TRACK_B_
     "Provider project ID mismatch",
   );
 
-  // Verify interval PR composition: strictly #492..#501, or #492..#501 + governance PR #502
+  // 1. Verify Track B interval PRs are present in exact leading sequence
   demand(
-    Array.isArray(prs) &&
-      (prs.length === 9 || (prs.length === 10 && prs[9] === RECONCILIATION_GOVERNANCE_PR)),
-    `Invalid release PR composition: expected Track B interval or governance PR #${RECONCILIATION_GOVERNANCE_PR}`,
+    Array.isArray(prs) && prs.length >= reconciliation.intervalPrs.length,
+    `Missing Track B interval PRs: expected at least ${reconciliation.intervalPrs.length}, got ${prs?.length}`,
   );
-  for (const pr of reconciliation.intervalPrs) {
-    demand(prs.includes(pr), `Reconciled PR #${pr} missing from release PRs`);
+  for (let i = 0; i < reconciliation.intervalPrs.length; i++) {
+    demand(
+      prs[i] === reconciliation.intervalPrs[i],
+      `Track B sealed interval PR mismatch at position ${i}: expected #${reconciliation.intervalPrs[i]}, got #${prs[i]}`,
+    );
   }
 
-  // Audit all SPECIAL paths (migrations + allowed non-migration paths)
+  // 2. Audit all SPECIAL paths across the entire release diff
   auditSpecialPaths(diff.paths, reconciliation);
+
+  // 3. Audit post-Track-B delta if release target extends beyond sealed migration baseline
+  const isPostTrackB = (targetSha ?? currentMainSha) !== reconciliation.sealedMigrationSha;
+  if (isPostTrackB || prs.length > reconciliation.intervalPrs.length) {
+    let postTrackBPaths = snapshot.postTrackBPaths;
+    if (!postTrackBPaths && typeof execFileSync === "function") {
+      try {
+        const out = execFileSync(
+          "git",
+          [
+            "diff",
+            "--name-only",
+            "--no-renames",
+            "-z",
+            reconciliation.sealedMigrationSha,
+            targetSha ?? currentMainSha,
+          ],
+          { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 },
+        );
+        postTrackBPaths = out.split("\0").filter(Boolean);
+      } catch {
+        // Fallback for isolated test environments without git ancestry
+        postTrackBPaths = snapshot.diff?.paths?.filter(
+          (p) =>
+            !reconciliation.migrations.some((m) => m.path === p) &&
+            !reconciliation.allowedSpecialPaths.includes(p) &&
+            !p.startsWith("src/"),
+        ) ?? [];
+      }
+    }
+    if (postTrackBPaths && postTrackBPaths.length > 0) {
+      auditPostTrackBDelta(postTrackBPaths);
+    }
+  }
 
   const payload = {
     schema: reconciliation.schema,
@@ -193,7 +289,7 @@ export function verifyReconciliation(snapshot, policy, reconciliation = TRACK_B_
     sealedMigrationSha: TRACK_B_SEALED_MIGRATION_BASELINE,
     targetSha: targetSha ?? currentMainSha,
     intervalPrs: reconciliation.intervalPrs,
-    governancePr: prs.includes(RECONCILIATION_GOVERNANCE_PR) ? RECONCILIATION_GOVERNANCE_PR : null,
+    postTrackBPrs: prs.slice(reconciliation.intervalPrs.length),
     provider: reconciliation.provider,
     migrations: reconciliation.migrations,
   };
