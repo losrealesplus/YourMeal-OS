@@ -316,6 +316,20 @@ export function assertReconciliationManifest(manifest, fresh) {
         manifest.plan?.reconciliation?.reconciliationId === fresh.reconciliation.reconciliationId,
       "Phase 1 / Phase 2 reconciliation scope changed",
     );
+    if (fresh.reconciliation.payload?.reconciliationType === "A4B_CLOSED_RELEASE") {
+      demand(
+        [manifest.reconciliation, manifest.plan.reconciliation].every(
+          (item) => item.reconciliationId === hash(JSON.stringify(item.payload)),
+        ),
+        "A4b manifest reconciliation payload changed",
+      );
+      demand(
+        fresh.sourceSha === fresh.reconciliation.payload.finalSourceSha &&
+          manifest.sourceSha === fresh.sourceSha &&
+          manifest.plan.sourceSha === fresh.sourceSha,
+        "A4b manifest final source changed",
+      );
+    }
   } else {
     demand(
       !manifest.reconciliation &&
@@ -324,4 +338,213 @@ export function assertReconciliationManifest(manifest, fresh) {
       "Reconciliation cannot fall back to unverified publication",
     );
   }
+}
+
+/** Independent, one-interval A4b authority. Track B and classifyPath stay unchanged. */
+function freezeA4b(value) {
+  if (value && typeof value === "object") {
+    for (const child of Object.values(value)) freezeA4b(child);
+    Object.freeze(value);
+  }
+  return value;
+}
+export const A4B_CLOSED_RECONCILIATION = freezeA4b({
+  repository: "losrealesplus/YourMeal-OS",
+  environment: "production-worker",
+  baselineSha: "b51bbf02fa963489b4f40d33856598faee29a366",
+  baselineDeploymentId: 6884418288,
+  baselineVersionId: "5a551d76-a041-4878-9989-798087e5bee4",
+  sealedProductTargetSha: "f2ef7edddb808b362ee77e6077c0b3971d38ea92",
+  originalDecision: "REQUIRES_SEPARATE_AUTHORIZATION",
+  allProductPaths: [
+    "docs/00-status/CR_ORDER_A4B_IMPLEMENTATION_REVIEW.md",
+    "docs/99-internal/development-journal/2026-10-06-cr-order-a4b.md",
+    "src/components/orders/canonical-order-edit-panel.tsx",
+    "src/components/orders/canonical-order-submit.tsx",
+    "src/components/orders/custom-order-item-editor.spec.tsx",
+    "src/components/orders/custom-order-item-editor.tsx",
+    "src/components/orders/universal-order-intake-drawer.tsx",
+    "src/hooks/use-custom-order-capture.spec.tsx",
+    "src/hooks/use-custom-order-capture.ts",
+    "src/modules/operations/infrastructure/a4b-order-version.spec.ts",
+    "src/modules/operations/infrastructure/operations-repository.ts",
+    "src/modules/orders/application/custom-order-capture-service.spec.ts",
+    "src/modules/orders/application/custom-order-capture-service.ts",
+    "src/modules/orders/domain/custom-order-capture-draft.spec.ts",
+    "src/modules/orders/domain/custom-order-capture-draft.ts",
+    "src/routes/_authenticated/admin.orders.tsx",
+    "src/services/feature-flag-service.custom.spec.ts",
+    "src/services/feature-flag-service.ts",
+    "tests/a4b/README.md",
+    "tests/a4b/fixture.tsx",
+    "tests/a4b/index.html",
+    "tests/a4b/run.mjs",
+    "tests/a4b/vite.config.mjs",
+  ],
+  constraints: {
+    migrations: 0,
+    writerChanges: 0,
+    orders_custom_capture: "CLOSED",
+    custom_activation: "CLOSED",
+    M3: "CLOSED",
+    OP08: "CLOSED",
+    Extras: "UNTOUCHED",
+    productActivation: 0,
+  },
+  schema: 1,
+  reconciliationType: "A4B_CLOSED_RELEASE",
+  authority: "Alexander Hernandez",
+  reviewerId: 292604102,
+  reviewerLogin: "losrealesplus",
+  productPr: 504,
+  failedRunId: "37517576979",
+  failedAttempt: "1",
+  planArtifactId: "11437961392",
+  planArtifactDigest: "sha256:c324d6c09870428b8861fe04396372e3a45ca05353a87108c611ca9c9928dab0",
+  governanceBranch: "codex/a4b-closed-release-reconciliation",
+  liveClosure: "UNVERIFIED_REQUIRES_SEPARATE_READ_ONLY_CERTIFICATION",
+  specialFiles: [
+    {
+      path: "src/services/feature-flag-service.custom.spec.ts",
+      before: null,
+      after: "deeaba347ab67fec8cfad3d165d791e9b4985bcd03abf578e12a67a8592f92e0",
+    },
+    {
+      path: "src/services/feature-flag-service.ts",
+      before: "0a0c47569889da013f5edf4e84bd830637396f72e6af37966299fc9e3aa815f3",
+      after: "2ec59d07fdc28c839c72d709a67a9da33b5a657a6196e121d50931385ebe7bf0",
+    },
+    {
+      path: "tests/a4b/README.md",
+      before: null,
+      after: "cda531a2e07e0c538cc98cfd0b476f4cc4b9dbf9c7cb8e606072f47ea497a85e",
+    },
+    {
+      path: "tests/a4b/fixture.tsx",
+      before: null,
+      after: "a57cd502dc16e1a888fde462505e9137fd09f604aabe7067660765f7ceb20cde",
+    },
+    {
+      path: "tests/a4b/index.html",
+      before: null,
+      after: "eacbbe92c871331ae51acac19131ac835da1e85f7198b97a56683bd902b38f7a",
+    },
+    {
+      path: "tests/a4b/run.mjs",
+      before: null,
+      after: "e557489e7e75e8c76acbb16babac5f32f37757092c05e0cac24980811e1a5e9f",
+    },
+    {
+      path: "tests/a4b/vite.config.mjs",
+      before: null,
+      after: "c5835b70f58eb60190c4d9b22653fd3392d8c193c3b868d77967248d8fe53311",
+    },
+  ],
+  governanceFiles: [
+    "docs/05-architecture/GATE7_POST_MERGE_AUTOMATION.md",
+    "docs/99-internal/development-journal/2026-10-06-a4b-closed-release-authorization.md",
+    "scripts/governance/release-plan.mjs",
+    "scripts/governance/release-reconciliation.mjs",
+    "scripts/governance/release-reconciliation.spec.mjs",
+  ],
+});
+const sameA4b = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
+/** Snapshot must come from Git blobs/history and GitHub PR attribution, never UI input. */
+export function verifyA4bReconciliation(snapshot, policy) {
+  const record = A4B_CLOSED_RECONCILIATION;
+  const { baseline, commits, productPr, remediation, targetSha, currentMainSha } = snapshot;
+  demand(
+    snapshot.repository === record.repository &&
+      policy.repository === record.repository &&
+      policy.environment === record.environment &&
+      policy.reviewerId === record.reviewerId,
+    "A4b repository/authority policy mismatch",
+  );
+  demand(
+    baseline?.sha === record.baselineSha &&
+      baseline.deploymentId === record.baselineDeploymentId &&
+      baseline.versionId === record.baselineVersionId,
+    "A4b production baseline mismatch",
+  );
+  demand(
+    /^[a-f0-9]{40}$/.test(targetSha ?? "") &&
+      targetSha === currentMainSha &&
+      targetSha !== record.sealedProductTargetSha,
+    "A4b final source missing/stale",
+  );
+  demand(
+    commits?.length === 2 &&
+      commits[0].sha === record.sealedProductTargetSha &&
+      commits[0].parent === record.baselineSha &&
+      commits[0].pr === record.productPr &&
+      commits[1].sha === targetSha &&
+      commits[1].parent === record.sealedProductTargetSha,
+    "A4b requires sealed product plus exactly one governance merge",
+  );
+  const assertHumanPr = (pr, number, sha) =>
+    demand(
+      pr?.number === number &&
+        pr.merged_at &&
+        pr.merge_commit_sha === sha &&
+        pr.base?.ref === "main" &&
+        pr.base.repo?.full_name === record.repository &&
+        pr.head?.repo?.full_name === record.repository &&
+        pr.merged_by?.id === record.reviewerId &&
+        pr.merged_by?.login === record.reviewerLogin,
+      "A4b missing canonical human merge evidence",
+    );
+  assertHumanPr(productPr, record.productPr, record.sealedProductTargetSha);
+  demand(
+    Number.isSafeInteger(commits[1].pr) && commits[1].pr > record.productPr,
+    "A4b governance PR invalid",
+  );
+  assertHumanPr(remediation, commits[1].pr, targetSha);
+  demand(remediation.head.ref === record.governanceBranch, "A4b governance branch mismatch");
+  demand(
+    sameA4b(commits[0].paths, record.allProductPaths) &&
+      sameA4b(commits[0].specialFiles, record.specialFiles),
+    "A4b sealed product paths/hashes mismatch",
+  );
+  demand(sameA4b(commits[1].paths, record.governanceFiles), "A4b governance-only paths mismatch");
+  const union = [...new Set(commits.flatMap((c) => c.paths))].sort();
+  demand(
+    sameA4b(
+      snapshot.diff?.commits,
+      commits.map((c) => c.sha),
+    ) && sameA4b(snapshot.diff?.paths, union),
+    "A4b outstanding history/path mismatch",
+  );
+  demand(
+    snapshot.originalDecision === record.originalDecision &&
+      sameA4b(snapshot.constraints, record.constraints),
+    "A4b classification/closure contract mismatch",
+  );
+  // Every governance file is SPECIAL today. Reject missing/invalid blob evidence.
+  const governanceEvidence = commits[1].specialFiles;
+  demand(
+    Array.isArray(governanceEvidence) &&
+      sameA4b(
+        governanceEvidence.map((f) => f.path),
+        record.governanceFiles,
+      ) &&
+      governanceEvidence.every(
+        (f) =>
+          (f.before === null || /^[a-f0-9]{64}$/.test(f.before)) &&
+          /^[a-f0-9]{64}$/.test(f.after ?? ""),
+      ),
+    "A4b governance content evidence invalid",
+  );
+  const payload = {
+    ...record,
+    finalSourceSha: targetSha,
+    productMerge: { sha: commits[0].sha, pr: record.productPr, mergedBy: productPr.merged_by.id },
+    governanceMerge: {
+      sha: targetSha,
+      pr: remediation.number,
+      mergedBy: remediation.merged_by.id,
+      files: governanceEvidence,
+    },
+  };
+  return { reconciled: true, reconciliationId: hash(JSON.stringify(payload)), payload };
 }
