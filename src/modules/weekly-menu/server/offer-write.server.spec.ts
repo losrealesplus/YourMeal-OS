@@ -99,7 +99,27 @@ it("current server registry changes policy hash at commit", async () => {
   ]);
   const after = await offerCommercialContext(actor(), tenantId);
   expect(after.active).toBe(true);
+  expect(after.mode).toBe("weekly_plan");
   expect(after.policyHash).not.toBe(before.policyHash);
+});
+it("identifies individual_line_pricing_v1 mode for single per_unit unpromoted offer", async () => {
+  registerTenantOffers("test-tenant", [
+    {
+      id: "individual_menu",
+      title: "Individual Menu",
+      subtitle: "",
+      description: "",
+      unitLabel: "dish",
+      slotsIncluded: 1,
+      code: "individual_menu",
+      pricingModel: "per_unit",
+      basePrice: { cents: 1190, currency: "EUR", formatted: "11.90" },
+      promotions: [],
+    } as CommercialOffer,
+  ]);
+  const context = await offerCommercialContext(actor(), tenantId);
+  expect(context.active).toBe(true);
+  expect(context.mode).toBe("individual_line_pricing_v1");
 });
 it("DB slug must match this server configuration", async () =>
   await expect(offerCommercialContext(actor({ slug: "other" }), tenantId)).rejects.toMatchObject({

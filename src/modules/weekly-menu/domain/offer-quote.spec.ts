@@ -79,6 +79,44 @@ describe("trusted offer quote financial authority", () => {
       resolveOfferQuote({ ...input, candidates: [{ ...candidate, slotPrice }] }),
     ).toThrow("PRICE_UNAVAILABLE"),
   );
+  it("accepts individual_line_pricing_v1 mode with explicit slot price", () =>
+    expect(
+      resolveOfferQuote({
+        ...input,
+        commercialMode: "individual_line_pricing_v1",
+        candidates: [{ ...candidate, slotPrice: "2.5000" }],
+      }),
+    ).toMatchObject({
+      total: "5.00",
+      lines: [{ basePrice: "11.9000", unitPrice: "2.5000", priceSource: "slot" }],
+    }));
+  it("accepts individual_line_pricing_v1 mode with NULL slot price falling back to catalogue", () =>
+    expect(
+      resolveOfferQuote({
+        ...input,
+        commercialMode: "individual_line_pricing_v1",
+        candidates: [{ ...candidate, slotPrice: null }],
+      }),
+    ).toMatchObject({
+      total: "23.80",
+      lines: [{ basePrice: "11.9000", unitPrice: "11.9000", priceSource: "catalogue" }],
+    }));
+  it("rejects unsupported commercial modes with explicit slot price", () =>
+    expect(() =>
+      resolveOfferQuote({
+        ...input,
+        commercialMode: "weekly_plan",
+        candidates: [{ ...candidate, slotPrice: "2.5000" }],
+      }),
+    ).toThrow("OFFER_PRICING_COMMERCIAL_UNSUPPORTED"));
+  it("rejects unsupported commercial modes with NULL slot price requiring legacy commercial resolver", () =>
+    expect(() =>
+      resolveOfferQuote({
+        ...input,
+        commercialMode: "monthly_plan",
+        candidates: [{ ...candidate, slotPrice: null }],
+      }),
+    ).toThrow("COMMERCIAL_QUOTE_REQUIRED"));
   it("rejects active commercial explicit price before irrelevant base validation", () =>
     expect(() =>
       resolveOfferQuote({

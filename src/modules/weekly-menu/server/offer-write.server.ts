@@ -80,10 +80,25 @@ export async function offerCommercialContext(actor: VerifiedOfferActor, tenantId
     )
   )
     throw new OfferWriteRpcError("COMMERCIAL_CONTEXT_UNAVAILABLE");
-  const policy = JSON.stringify({ tenantId, tenantSlug: tenant.slug, offers });
+
+  // Determine commercial mode server-side:
+  // Individual menu / independent à-la-carte:
+  // - single active offer or explicit individual menu
+  // - pricingModel = per_unit
+  // - no promotions
+  const isIndividualMode =
+    offers.length === 1 &&
+    offers[0]?.code === "individual_menu" &&
+    offers[0]?.pricingModel === "per_unit" &&
+    (!offers[0]?.promotions || offers[0]?.promotions.length === 0);
+
+  const mode = isIndividualMode ? "individual_line_pricing_v1" : "weekly_plan";
+
+  const policy = JSON.stringify({ tenantId, tenantSlug: tenant.slug, mode, offers });
   const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(policy));
   return {
     active: offers.length > 0,
+    mode,
     policyHash: Array.from(new Uint8Array(hash), (byte) => byte.toString(16).padStart(2, "0")).join(
       "",
     ),
@@ -110,6 +125,9 @@ const allowedCodes = [
   "B2B_DELIVERY_UNSUPPORTED",
   "PERMISSION_DENIED",
   "LINE_ID_INVALID",
+  "PUBLISHED_OFFER_PRICE_MODIFICATION_BLOCKED",
+  "REMEDIATION_MANIFEST_MISMATCH",
+  "REMEDIATION_EXPECTED_PRICE_MISMATCH",
 ] as const;
 /** Error messages expose a fixed code, never raw SQL/command/customer/secret payloads. */
 export class OfferWriteRpcError extends Error {
