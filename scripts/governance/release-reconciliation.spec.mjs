@@ -334,3 +334,307 @@ test("12. Track B reconciliation still cannot constitute production approval", (
     /Phase 1 \/ Phase 2 reconciliation scope changed/,
   );
 });
+
+// A4b tests use synthetic GitHub evidence; no API/provider/workflow mutations.
+const { A4B_CLOSED_RECONCILIATION: a4b, verifyA4bReconciliation } =
+  await import("./release-reconciliation.mjs");
+const finalA4b = "a".repeat(40);
+const a4bPr = (number, sha, branch = "codex/cr-order-a4b-custom-capture") => ({
+  number,
+  merged_at: "2026-10-06T00:00:00Z",
+  merge_commit_sha: sha,
+  base: { ref: "main", repo: { full_name: mockPolicy.repository } },
+  head: { ref: branch, repo: { full_name: mockPolicy.repository } },
+  merged_by: { id: 292604102, login: "losrealesplus" },
+});
+function a4bSnapshot() {
+  return {
+    repository: mockPolicy.repository,
+    baseline: {
+      sha: a4b.baselineSha,
+      deploymentId: a4b.baselineDeploymentId,
+      versionId: a4b.baselineVersionId,
+    },
+    targetSha: finalA4b,
+    currentMainSha: finalA4b,
+    originalDecision: a4b.originalDecision,
+    constraints: structuredClone(a4b.constraints),
+    productPr: a4bPr(504, a4b.sealedProductTargetSha),
+    remediation: a4bPr(505, finalA4b, a4b.governanceBranch),
+    commits: [
+      {
+        sha: a4b.sealedProductTargetSha,
+        parent: a4b.baselineSha,
+        pr: 504,
+        paths: [...a4b.allProductPaths],
+        specialFiles: structuredClone(a4b.specialFiles),
+      },
+      {
+        sha: finalA4b,
+        parent: a4b.sealedProductTargetSha,
+        pr: 505,
+        paths: [...a4b.governanceFiles],
+        specialFiles: a4b.governanceFiles.map((path) => ({
+          path,
+          before: null,
+          after: "b".repeat(64),
+        })),
+      },
+    ],
+    diff: {
+      commits: [a4b.sealedProductTargetSha, finalA4b],
+      paths: [...new Set([...a4b.allProductPaths, ...a4b.governanceFiles])].sort(),
+    },
+  };
+}
+test("A4b sealed interval PASS and immutable record", () => {
+  const result = verifyA4bReconciliation(a4bSnapshot(), mockPolicy);
+  assert.equal(result.payload.finalSourceSha, finalA4b);
+  assert.equal(result.payload.liveClosure, "UNVERIFIED_REQUIRES_SEPARATE_READ_ONLY_CERTIFICATION");
+  assert.equal(preparationEligible("AUTHORIZED_RECONCILED_RELEASE"), true);
+  assert.ok(Object.isFrozen(a4b.specialFiles));
+  assert.ok(Object.isFrozen(a4b.constraints));
+});
+const a4bInvalid = [
+  [
+    "wrong production baseline",
+    (s) => {
+      s.baseline.sha = "b".repeat(40);
+    },
+  ],
+  [
+    "wrong deployment",
+    (s) => {
+      s.baseline.deploymentId++;
+    },
+  ],
+  [
+    "wrong baseline version",
+    (s) => {
+      s.baseline.versionId = "wrong";
+    },
+  ],
+  [
+    "wrong product target",
+    (s) => {
+      s.commits[0].sha = "c".repeat(40);
+    },
+  ],
+  [
+    "wrong PR",
+    (s) => {
+      s.commits[0].pr = 503;
+    },
+  ],
+  [
+    "extra product commit",
+    (s) => {
+      s.commits.splice(1, 0, structuredClone(s.commits[0]));
+    },
+  ],
+  [
+    "extra runtime path",
+    (s) => {
+      s.commits[1].paths.push("src/app.ts");
+    },
+  ],
+  [
+    "missing path",
+    (s) => {
+      s.commits[0].paths.pop();
+    },
+  ],
+  [
+    "modified SPECIAL hash",
+    (s) => {
+      s.commits[0].specialFiles[0].after = "c".repeat(64);
+    },
+  ],
+  [
+    "wrong human identity",
+    (s) => {
+      s.remediation.merged_by.id = 1;
+    },
+  ],
+  [
+    "missing authority evidence",
+    (s) => {
+      delete s.productPr.merged_by;
+    },
+  ],
+  [
+    "missing governance merge evidence",
+    (s) => {
+      s.remediation.merged_at = null;
+    },
+  ],
+  [
+    "wrong canonical repo",
+    (s) => {
+      s.remediation.head.repo.full_name = "attacker/fork";
+    },
+  ],
+  [
+    "wrong branch",
+    (s) => {
+      s.remediation.head.ref = "main";
+    },
+  ],
+  [
+    "wrong product parent",
+    (s) => {
+      s.commits[0].parent = "c".repeat(40);
+    },
+  ],
+  [
+    "wrong governance parent",
+    (s) => {
+      s.commits[1].parent = "c".repeat(40);
+    },
+  ],
+  [
+    "different finalSource replay",
+    (s) => {
+      s.targetSha = "c".repeat(40);
+      s.currentMainSha = s.targetSha;
+    },
+  ],
+  [
+    "stale main",
+    (s) => {
+      s.currentMainSha = "c".repeat(40);
+    },
+  ],
+  [
+    "no governance target",
+    (s) => {
+      s.targetSha = a4b.sealedProductTargetSha;
+      s.currentMainSha = s.targetSha;
+    },
+  ],
+  [
+    "changed classification",
+    (s) => {
+      s.originalDecision = "DEPLOYABLE";
+    },
+  ],
+  [
+    "unknown outstanding history",
+    (s) => {
+      s.diff.commits.push("c".repeat(40));
+    },
+  ],
+  [
+    "unknown outstanding path",
+    (s) => {
+      s.diff.paths.push("surprise");
+    },
+  ],
+  [
+    "missing governance hash",
+    (s) => {
+      s.commits[1].specialFiles.pop();
+    },
+  ],
+  [
+    "invalid governance hash",
+    (s) => {
+      s.commits[1].specialFiles[0].after = "invalid";
+    },
+  ],
+];
+for (const [name, mutate] of a4bInvalid)
+  test(`A4b FAIL: ${name}`, () => {
+    const s = a4bSnapshot();
+    mutate(s);
+    assert.throws(() => verifyA4bReconciliation(s, mockPolicy));
+  });
+for (const path of [
+  "supabase/migrations/extra.sql",
+  "schema.sql",
+  "src/modules/orders/infrastructure/canonical-order-write-repository.ts",
+  "src/tenant/custom_activation.ts",
+  "src/tenant/commercial-config.ts",
+  "OP08.json",
+  "src/extras.ts",
+  "src/modules/weekly-menu/offer.ts",
+  "src/catalogue.ts",
+  ".github/workflows/deploy-production.yml",
+]) {
+  test(`A4b forbidden delta FAIL: ${path}`, () => {
+    const s = a4bSnapshot();
+    s.commits[1].paths.push(path);
+    s.diff.paths.push(path);
+    assert.throws(() => verifyA4bReconciliation(s, mockPolicy));
+  });
+}
+for (const key of [
+  "orders_custom_capture",
+  "custom_activation",
+  "M3",
+  "OP08",
+  "Extras",
+  "migrations",
+  "writerChanges",
+  "productActivation",
+]) {
+  test(`A4b constraint FAIL: ${key}`, () => {
+    const s = a4bSnapshot();
+    s.constraints[key] = "OPEN";
+    assert.throws(() => verifyA4bReconciliation(s, mockPolicy));
+  });
+}
+test("Track B cannot authorize A4b and A4b cannot authorize Track B", () => {
+  assert.throws(() => verifyReconciliation(a4bSnapshot(), mockPolicy));
+  assert.throws(() => verifyA4bReconciliation(validSnapshot, mockPolicy));
+  assert.throws(() => verifyReconciliation(validSnapshot, mockPolicy, a4b));
+});
+test("A4b manifest hash, final source and reconciliation divergence FAIL", () => {
+  const verified = verifyA4bReconciliation(a4bSnapshot(), mockPolicy);
+  const fresh = {
+    decision: "AUTHORIZED_RECONCILED_RELEASE",
+    reconciliation: verified,
+    sourceSha: finalA4b,
+  };
+  const manifest = {
+    plan: structuredClone(fresh),
+    reconciliation: structuredClone(verified),
+    sourceSha: finalA4b,
+  };
+  assert.doesNotThrow(() => assertReconciliationManifest(manifest, fresh));
+  manifest.reconciliation.payload.finalSourceSha = "c".repeat(40);
+  manifest.reconciliation.reconciliationId = "c".repeat(64);
+  assert.throws(() => assertReconciliationManifest(manifest, fresh));
+  const s = a4bSnapshot();
+  s.targetSha = "c".repeat(40);
+  s.currentMainSha = s.targetSha;
+  s.commits[1].sha = s.targetSha;
+  s.diff.commits[1] = s.targetSha;
+  s.remediation.merge_commit_sha = s.targetSha;
+  const other = verifyA4bReconciliation(s, mockPolicy);
+  assert.notEqual(other.reconciliationId, verified.reconciliationId);
+  assert.throws(() =>
+    assertReconciliationManifest(
+      { plan: fresh, reconciliation: verified },
+      { ...fresh, reconciliation: other },
+    ),
+  );
+});
+
+test("A4b payload modification with unchanged ID and wrong manifest source FAIL", () => {
+  const reconciliation = verifyA4bReconciliation(a4bSnapshot(), mockPolicy);
+  const fresh = { decision: "AUTHORIZED_RECONCILED_RELEASE", reconciliation, sourceSha: finalA4b };
+  for (const field of ["topPayload", "planPayload", "topSource", "planSource"]) {
+    const manifest = {
+      plan: structuredClone(fresh),
+      reconciliation: structuredClone(reconciliation),
+      sourceSha: finalA4b,
+    };
+    if (field === "topPayload") manifest.reconciliation.payload.constraints.M3 = "OPEN";
+    if (field === "planPayload")
+      manifest.plan.reconciliation.payload.finalSourceSha = "c".repeat(40);
+    if (field === "topSource") manifest.sourceSha = "c".repeat(40);
+    if (field === "planSource") manifest.plan.sourceSha = "c".repeat(40);
+    assert.throws(() => assertReconciliationManifest(manifest, fresh));
+  }
+});

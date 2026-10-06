@@ -16,7 +16,12 @@ import {
   DIGEST,
 } from "./release-contract.mjs";
 import { activationMode, activationPayload, authorizeActivation } from "./release-activation.mjs";
-import { verifyReconciliation, TRACK_B_RECONCILIATION } from "./release-reconciliation.mjs";
+import {
+  verifyReconciliation,
+  TRACK_B_RECONCILIATION,
+  verifyA4bReconciliation,
+  A4B_CLOSED_RECONCILIATION,
+} from "./release-reconciliation.mjs";
 import { parseReleaseJson, jsonObject, githubResponseShape } from "./release-json.mjs";
 
 export const policy = parseReleaseJson(
@@ -278,6 +283,31 @@ export function prepare(ctx, publishing = false) {
       } catch {
         // Reconciliation check failed; remains REQUIRES_SEPARATE_AUTHORIZATION
       }
+    }
+  }
+  if (
+    !initial &&
+    classification.decision === "REQUIRES_SEPARATE_AUTHORIZATION" &&
+    base.sha === A4B_CLOSED_RECONCILIATION.baselineSha
+  ) {
+    try {
+      const snapshot = activationSnapshot(ctx, base, diff, prs, currentMain);
+      reconciliation = verifyA4bReconciliation(
+        {
+          ...snapshot,
+          commits: snapshot.commits.map((commit) => ({
+            ...commit,
+            parent: git("rev-parse", `${commit.sha}^1`).trim(),
+          })),
+          diff,
+          productPr: api(`pulls/${A4B_CLOSED_RECONCILIATION.productPr}`),
+          originalDecision: classification.decision,
+          constraints: A4B_CLOSED_RECONCILIATION.constraints,
+        },
+        policy,
+      );
+    } catch {
+      // No fallback: exact A4b evidence absent/mismatched remains SPECIAL.
     }
   }
   return {
