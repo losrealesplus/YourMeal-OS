@@ -17,6 +17,8 @@ import type {
 type Client = SupabaseClient<Database>;
 
 export type OperationalOrderListItem = {
+  /** Reader projection only; v2 actions must never route through legacy editors. */
+  writeContractVersion?: 1 | 2;
   id: string;
   tenantId: string;
   status: OperationalOrderStatus;
@@ -86,6 +88,7 @@ export function mapOperationalOrderRow(row: Record<string, any>): OperationalOrd
   );
   const deliveryDates = [...new Set(items.map((it) => String(it.day_date)).filter(Boolean))].sort();
   return {
+    ...(row.write_contract_version === 2 ? { writeContractVersion: 2 as const } : {}),
     id: String(row.id),
     tenantId: String(row.tenant_id),
     status: row.status as OperationalOrderStatus,
@@ -135,7 +138,7 @@ export function mapOperationalOrderRow(row: Record<string, any>): OperationalOrd
 }
 
 const ORDER_SELECT = `
-  id, tenant_id, status, week_start, notes, dietary_snapshot, total, created_at, customer_id,
+  id, tenant_id, write_contract_version, status, week_start, notes, dietary_snapshot, total, created_at, customer_id,
   demand_channel, company_id, site_id, organizational_unit_id, delivery_group_id, delivery_address_id,
   customers ( id, display_name, email ),
   companies ( id, name ),
