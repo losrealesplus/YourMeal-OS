@@ -2452,6 +2452,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cr_order_write_v2: {
+        Args: { _tenant_id: string; _request_id: string; _command: Json };
+        Returns: Json;
+      };
+
       current_membership_id: { Args: { _tenant_id: string }; Returns: string }
       current_user_tenants: { Args: never; Returns: string[] }
       ensure_individual_customer: {
