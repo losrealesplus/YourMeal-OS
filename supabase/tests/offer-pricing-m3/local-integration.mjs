@@ -240,6 +240,8 @@ try {
     });
 
     // --- OP08 SOVEREIGN AUTHORITY TESTS ---
+    // Enforce production UUID type on audit_log.entity_id to test schema fidelity
+    await sql(`SET ROLE ${executor}; ALTER TABLE public.audit_log ALTER COLUMN entity_id TYPE uuid USING entity_id::uuid;`);
 
     await t.test("OP08: direct UPDATE on published weekly_menu_slots unit_price is blocked", async () => {
       await expectFailure(
@@ -345,11 +347,26 @@ try {
       assert.notEqual(consumedAt, "");
       assert.notEqual(consumedAt, "null");
 
-      // Verify audit log entry
-      const auditAction = await sql(
-        `SELECT action FROM public.audit_log WHERE tenant_id = '${tenant}' AND action = 'published_offer_price_remediation' LIMIT 1;`,
+      // Verify audit log entry and exact UUID entity_id fidelity
+      const auditEntry = JSON.parse(
+        await sql(
+          `SELECT jsonb_build_object(
+            'action', action,
+            'entity_type', entity_type,
+            'entity_id', entity_id::text,
+            'tenant_id', tenant_id::text,
+            'actor_id', actor_id::text,
+            'new_data', new_data
+          ) FROM public.audit_log WHERE tenant_id = '${tenant}' AND action = 'published_offer_price_remediation' AND entity_id = '${slotId}'::uuid LIMIT 1;`
+        )
       );
-      assert.equal(auditAction, "published_offer_price_remediation");
+      assert.equal(auditEntry.action, "published_offer_price_remediation");
+      assert.equal(auditEntry.entity_type, "weekly_menu_slot");
+      assert.equal(auditEntry.entity_id, slotId);
+      assert.equal(auditEntry.tenant_id, tenant);
+      assert.equal(auditEntry.actor_id, actor(1));
+      assert.equal(auditEntry.new_data.authorizationId, authId);
+      assert.equal(auditEntry.new_data.unitPrice, "2.5000");
 
       // Attempting to reuse the consumed authorization must fail (Anti-Replay)
       await expectFailure(

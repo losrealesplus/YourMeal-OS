@@ -481,7 +481,7 @@ BEGIN
       _actor_id,
       'published_offer_price_remediation',
       'weekly_menu_slot',
-      (item->>'slotId')::text,
+      (item->>'slotId')::uuid,
       jsonb_build_object('unitPrice', old_val),
       jsonb_build_object(
         'authorizationId', _authorization_id,
