@@ -2,6 +2,7 @@
  * EP-002B.2 — KitchenExecutionService
  * Mutates dish×day production lot status. Board reads = ProductionReportService.
  */
+import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
 import type { ServiceContext } from "@/services/types";
 import { DomainError } from "@/domain/errors";
@@ -23,6 +24,55 @@ export type KitchenBatchTransitionCommand = {
 };
 
 export const KitchenExecutionService = {
+  /** Offline custom entry. Existing UI dish transition remains closed for custom. */
+  async transitionCustomBatch(ctx: ServiceContext, input: unknown): Promise<KitchenBatchStatus> {
+    requireCapability(ctx.roles, "kitchen.operate");
+    const command = z
+      .object({
+        deliveryDate: z
+          .string()
+          .regex(/^\d{4}-\d{2}-\d{2}$/)
+          .refine((value) => {
+            const date = new Date(`${value}T00:00:00Z`);
+            return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
+          }),
+        orderItemId: z.string().uuid(),
+        toStatus: z.enum(["preparing", "plating", "finished"]),
+      })
+      .strict()
+      .safeParse(input);
+    if (!command.success) throw new DomainError("INVALID_STATE", "Invalid custom batch command");
+    let response;
+    try {
+      response = await ctx.supabase.rpc("cr_order_custom_batch_transition", {
+        _tenant_id: ctx.tenantId,
+        _order_item_id: command.data.orderItemId,
+        _delivery_date: command.data.deliveryDate,
+        _to_status: command.data.toStatus,
+      });
+    } catch {
+      throw new DomainError("INVALID_STATE", "Custom batch transition unavailable");
+    }
+    const { data, error } = response;
+    if (error)
+      throw new DomainError(
+        error.message === "CUSTOM_NOT_ENABLED" ? "CUSTOM_NOT_ENABLED" : "INVALID_STATE",
+        "Custom batch transition rejected",
+      );
+    const batch = z
+      .object({
+        id: z.string().uuid(),
+        tenant_id: z.literal(ctx.tenantId),
+        item_kind: z.literal("custom"),
+        dish_id: z.null(),
+        custom_order_item_id: z.literal(command.data.orderItemId),
+        delivery_date: z.literal(command.data.deliveryDate),
+        status: z.literal(command.data.toStatus),
+      })
+      .safeParse(data);
+    if (!batch.success) throw new DomainError("INVALID_STATE", "Invalid custom batch response");
+    return command.data.toStatus;
+  },
   /** Same day model as the printable sheet (single source). */
   async getDayBoard(
     ctx: ServiceContext,

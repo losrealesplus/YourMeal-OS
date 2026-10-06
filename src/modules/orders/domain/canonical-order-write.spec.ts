@@ -14,9 +14,7 @@ const capture = () => ({
   lines: [line()],
 });
 function rejects(command: unknown, id: unknown = request) {
-  expect(() => parseCanonicalOrderWrite(id, command)).toThrow(
-    "Invalid canonical dish-only order command",
-  );
+  expect(() => parseCanonicalOrderWrite(id, command)).toThrow("Invalid canonical order command");
 }
 
 describe("canonical authenticated Dish-only DTO", () => {
@@ -37,9 +35,11 @@ describe("canonical authenticated Dish-only DTO", () => {
         { ...line(), unitPriceOverride: "2.50", unitPriceOverrideReason: "  Acuerdo comercial  " },
       ],
     };
-    expect(parseCanonicalOrderWrite(request, input).command.lines[0]?.unitPriceOverrideReason).toBe(
-      "Acuerdo comercial",
-    );
+    expect(
+      parseCanonicalOrderWrite(request, input).command.lines.filter(
+        (line) => line.kind === "dish",
+      )[0]?.unitPriceOverrideReason,
+    ).toBe("Acuerdo comercial");
     expect(input.lines[0]?.unitPriceOverrideReason).toBe("  Acuerdo comercial  ");
   });
   it("keeps canonical B2B capture/modify closed while admitting individual null context", () => {
@@ -140,7 +140,7 @@ describe("canonical authenticated Dish-only DTO", () => {
               explicitZeroConfirmed: true,
             },
           ],
-        }).command.lines[0]?.unitPriceOverride,
+        }).command.lines.filter((line) => line.kind === "dish")[0]?.unitPriceOverride,
       ).toBe(unitPriceOverride);
     },
   );
@@ -157,7 +157,7 @@ describe("canonical authenticated Dish-only DTO", () => {
               unitPriceOverrideReason: "Ajuste comercial autorizado",
             },
           ],
-        }).command.lines[0]?.unitPriceOverride,
+        }).command.lines.filter((line) => line.kind === "dish")[0]?.unitPriceOverride,
       ).toBe(unitPriceOverride);
     },
   );
