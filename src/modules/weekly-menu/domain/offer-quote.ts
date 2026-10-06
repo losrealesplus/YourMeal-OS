@@ -62,17 +62,31 @@ export type ResolvedOfferQuoteLine = {
   priceSnapshotStatus: "captured" | "explicit_zero";
 };
 
+export type CommercialMode =
+  | "commercial_inactive"
+  | "individual_line_pricing_v1"
+  | "weekly_plan"
+  | "monthly_plan"
+  | "package"
+  | "corporate";
+
 /** Called only with verified server commercial context; never accept that flag from input. */
 export function resolveOfferQuote(input: {
   tenantId: string;
   weekStart: string;
   lines: OfferQuoteLine[];
   candidates: OfferQuoteCandidate[];
-  commercialActive: boolean;
+  commercialActive?: boolean;
+  commercialMode?: CommercialMode;
   zeroConfirmed: boolean;
 }): { lines: ResolvedOfferQuoteLine[]; total: string } {
   if (!isValidMondayIso(input.weekStart) || input.lines.length === 0)
     throw new OfferQuoteError("OFFER_REFERENCE_INVALID");
+
+  const mode: CommercialMode =
+    input.commercialMode ??
+    (input.commercialActive ? "weekly_plan" : "commercial_inactive");
+
   const lines = input.lines.map((line): ResolvedOfferQuoteLine => {
     if (
       !Number.isInteger(line.qty) ||
@@ -98,12 +112,21 @@ export function resolveOfferQuote(input: {
     if (eligible.length === 0) throw new OfferQuoteError("OFFER_NOT_FOUND");
     if (eligible.length !== 1) throw new OfferQuoteError("OFFER_AMBIGUOUS");
     const offer = eligible[0]!;
-    if (input.commercialActive && offer.slotPrice != null)
-      throw new OfferQuoteError("OFFER_PRICING_COMMERCIAL_UNSUPPORTED");
+
+    // In unsupported commercial modes (e.g. weekly_plan, monthly_plan, packages),
+    // explicit slot pricing fails closed.
+    if (mode !== "commercial_inactive" && mode !== "individual_line_pricing_v1") {
+      if (offer.slotPrice != null) {
+        throw new OfferQuoteError("OFFER_PRICING_COMMERCIAL_UNSUPPORTED");
+      }
+      throw new OfferQuoteError("COMMERCIAL_QUOTE_REQUIRED");
+    }
+
     const base = offerPriceUnits(offer.basePrice);
     const slot = offer.slotPrice == null ? null : offerPriceUnits(offer.slotPrice);
-    // Legacy commercial callers must retain the established resolver, never allocation into v2.
-    if (input.commercialActive) throw new OfferQuoteError("COMMERCIAL_QUOTE_REQUIRED");
+
+    // In both commercial_inactive and individual_line_pricing_v1,
+    // effective_line_price = slot.unit_price ?? dishes.price
     const effective = slot ?? base;
     if (effective === 0n && slot === null) throw new OfferQuoteError("PRICE_UNAVAILABLE");
     if (effective === 0n && !input.zeroConfirmed)
