@@ -15,6 +15,7 @@ import {
   preparationEligible,
 } from "./release-contract.mjs";
 import { assertActivationManifest } from "./release-activation.mjs";
+import { assertReconciliationManifest } from "./release-reconciliation.mjs";
 const ctx = context();
 const report = {
   schema: 1,
@@ -59,6 +60,7 @@ try {
   );
   const fresh = prepare(ctx, true);
   assertActivationManifest(manifest, fresh);
+  assertReconciliationManifest(manifest, fresh);
   if (["SUPERSEDED", "NON_DEPLOYABLE"].includes(fresh.decision)) {
     report.state = fresh.decision;
     save();
@@ -80,6 +82,7 @@ try {
       artifactId: process.env.EXPECTED_ARTIFACT_ID,
       baseline: fresh.baseline,
       ...(fresh.activation ? { activation: fresh.activation } : {}),
+      ...(fresh.reconciliation ? { reconciliation: fresh.reconciliation } : {}),
     });
     report.state = "PUBLICATION_UNKNOWN";
     report.mutationStarted = true;
