@@ -20,6 +20,11 @@ export function registerTenantOffers(tenantSlug: string, offers: CommercialOffer
   tenantOffersRegistry.set(tenantSlug.toLowerCase().trim(), [...offers]);
 }
 
+/** Distinguish an explicitly registered empty policy from missing initialization. */
+export function hasRegisteredTenantOffers(tenantSlug: string): boolean {
+  return tenantOffersRegistry.has(tenantSlug.toLowerCase().trim());
+}
+
 /**
  * Retrieve commercial offers registered for a tenant.
  */
@@ -74,9 +79,7 @@ export function resolveCommercialOffer(
   }
 
   // 3. Fallback to default offer (explicit isDefault or first registered)
-  const defaultOffer =
-    offers.find((o) => (o as { isDefault?: boolean }).isDefault) ??
-    offers[0];
+  const defaultOffer = offers.find((o) => (o as { isDefault?: boolean }).isDefault) ?? offers[0];
 
   return defaultOffer ?? null;
 }

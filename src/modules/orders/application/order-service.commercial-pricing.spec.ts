@@ -41,20 +41,28 @@ vi.mock("@/modules/orders/infrastructure/order-repository", () => ({
 }));
 
 vi.mock("@/modules/weekly-menu/infrastructure/weekly-menu-repository", () => ({
-  createWeeklyMenuRepository: vi.fn(() => ({
+  createWeeklyMenuRepository: vi.fn((_client, tenantId) => ({
     findPublishedByWeekStart: vi.fn(async () => ({
       id: "menu-2026-07-20",
       status: "published",
       week_start: "2026-07-20",
     })),
-    listSlotsWithDishes: vi.fn(async () => [
-      { day_date: "2026-07-20", dish_id: "dish-01", dishes: { id: "dish-01", price: 12.5 } },
-      { day_date: "2026-07-21", dish_id: "dish-02", dishes: { id: "dish-02", price: 12.5 } },
-      { day_date: "2026-07-22", dish_id: "dish-03", dishes: { id: "dish-03", price: 12.5 } },
-      { day_date: "2026-07-23", dish_id: "dish-04", dishes: { id: "dish-04", price: 12.5 } },
-      { day_date: "2026-07-24", dish_id: "dish-05", dishes: { id: "dish-05", price: 12.5 } },
-      { day_date: "2026-07-24", dish_id: "dish-side", dishes: { id: "dish-side", price: 4.0 } },
-    ]),
+    listSlotsWithDishes: vi.fn(async () =>
+      [
+        { day_date: "2026-07-20", dish_id: "dish-01", dishes: { id: "dish-01", price: 12.5 } },
+        { day_date: "2026-07-21", dish_id: "dish-02", dishes: { id: "dish-02", price: 12.5 } },
+        { day_date: "2026-07-22", dish_id: "dish-03", dishes: { id: "dish-03", price: 12.5 } },
+        { day_date: "2026-07-23", dish_id: "dish-04", dishes: { id: "dish-04", price: 12.5 } },
+        { day_date: "2026-07-24", dish_id: "dish-05", dishes: { id: "dish-05", price: 12.5 } },
+        { day_date: "2026-07-24", dish_id: "dish-side", dishes: { id: "dish-side", price: 4.0 } },
+      ].map((slot) => ({
+        ...slot,
+        tenant_id: tenantId,
+        weekly_menu_id: "menu-2026-07-20",
+        unit_price: null,
+        dishes: { ...slot.dishes, tenant_id: tenantId, status: "active", deleted_at: null },
+      })),
+    ),
   })),
 }));
 

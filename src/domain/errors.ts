@@ -21,7 +21,12 @@ export type DomainErrorCode =
   | "COMMERCIAL_QUOTE_REQUIRED"
   | "PRICE_CHANGED"
   | "INVALID_STATE"
-  | "UNIMPLEMENTED";
+  | "UNIMPLEMENTED"
+  | "OFFER_NOT_FOUND"
+  | "OFFER_AMBIGUOUS"
+  | "OFFER_PRICING_COMMERCIAL_UNSUPPORTED"
+  | "OFFER_PRICING_QUOTE_REQUIRED"
+  | "OFFER_PRICING_OVERRIDE_UNSUPPORTED";
 
 export class DomainError extends Error {
   readonly code: DomainErrorCode;

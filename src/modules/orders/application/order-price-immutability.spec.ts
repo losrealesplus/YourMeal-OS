@@ -1,6 +1,27 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { StaffOrderCaptureService } from "./staff-order-capture-service";
 import { createServiceContext } from "@/services/types";
+
+vi.mock("@/modules/weekly-menu/infrastructure/weekly-menu-repository", () => ({
+  createWeeklyMenuRepository: (_client: unknown, tenantId: string) => ({
+    findPublishedByWeekStart: async (weekStart: string) => ({
+      id: weekStart,
+      tenant_id: tenantId,
+      week_start: weekStart,
+      status: "published",
+    }),
+    listSlotsWithDishes: async (menuId: string) =>
+      ["dish-alpha", "dish-free", "dish-unpriced"].map((dishId) => ({
+        id: `${menuId}-${dishId}`,
+        tenant_id: tenantId,
+        weekly_menu_id: menuId,
+        day_date: menuId,
+        dish_id: dishId,
+        unit_price: null,
+        dishes: { id: dishId, tenant_id: tenantId, status: "active", deleted_at: null },
+      })),
+  }),
+}));
 
 describe("CR-OPS-03: Order Line Price Snapshot & Immutability Regression ($X \\neq Y$)", () => {
   function createMockSupabase() {

@@ -1,3 +1,4 @@
+import { assertLegacyOfferWrite } from "@/modules/weekly-menu/application/legacy-offer-write-guard";
 import { DomainError } from "@/domain/errors";
 import { requireCapability } from "@/permissions";
 import { AuditService } from "@/services/audit-service";
@@ -105,6 +106,8 @@ export const StaffOrderCaptureService = {
         throw new DomainError("INVALID_STATE", "unitPriceOverride cannot be negative.");
       }
     }
+
+    await assertLegacyOfferWrite(ctx, dto.weekStart, dto.lines);
 
     // 1. Customer Resolution / Provisioning
     let customerId: string;
