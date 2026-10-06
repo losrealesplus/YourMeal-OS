@@ -1,3 +1,4 @@
+import { CanonicalOrderEditPanel } from "@/components/orders/canonical-order-edit-panel";
 /**
  * Pedidos — Centro de Control Operacional y Temporal (CR-OPS-09A / Fase 1 CR-OPS-UX).
  * PR-034 / CR-OPS-09A / CR-OPS-UX Fase 1 (Quick Actions & 5-Tier Drawer).
@@ -254,11 +255,14 @@ export function OrdersTable({
 export function OrderDetailView({
   detail,
   onOrderUpdated,
+  onEditorLock,
 }: {
   detail: OperationalOrderListItem;
   onOrderUpdated?: () => void;
+  onEditorLock?: (locked: boolean) => void;
 }) {
   const orderApi = useOrder();
+  const [editorLocked, setEditorLocked] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [busy, setBusy] = useState(false);
@@ -412,7 +416,7 @@ export function OrderDetailView({
           {mainActionLabel && (
             <Button
               onClick={handleMainAction}
-              disabled={busy}
+              disabled={busy || editorLocked}
               className="gap-2 font-semibold shadow-xs"
             >
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
@@ -424,7 +428,7 @@ export function OrderDetailView({
             <Button
               variant="outline"
               onClick={() => setCancelDialogOpen(true)}
-              disabled={busy}
+              disabled={busy || editorLocked}
               className="text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30 text-xs"
             >
               Cancelar Pedido
@@ -433,12 +437,26 @@ export function OrderDetailView({
         </div>
       </div>
 
+      {(detail.writeContractVersion === 2 ||
+        detail.items.some((item) => item.line?.kind === "custom")) && (
+        <CanonicalOrderEditPanel
+          key={detail.id}
+          orderId={detail.id}
+          channel={detail.demandChannel}
+          onSuccess={onOrderUpdated}
+          onLockChange={(next) => {
+            setEditorLocked(next);
+            onEditorLock?.(next);
+          }}
+        />
+      )}
+
       {/* ── Tier 3: Desglose de Platos del Pedido ────────────────────────────── */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm font-semibold">
             <UtensilsCrossed className="h-4 w-4 text-primary" />
-            {`Platos del Pedido (${detail.items.length})`}
+            {`${detail.items.some((item) => item.line?.kind === "custom") ? "Artículos" : "Platos"} del Pedido (${detail.items.length})`}
           </div>
           <span className="text-xs text-muted-foreground">
             Snapshot financiero inmutable
@@ -464,7 +482,15 @@ export function OrderDetailView({
                 return (
                   <TableRow key={it.id}>
                     <TableCell className="font-medium">
-                      <div>{it.dishName ?? "Plato no especificado"}</div>
+                      <div>
+                        {it.dishName ?? "Plato no especificado"}
+                        {it.line?.kind === "custom" && (
+                          <span className="block text-xs text-muted-foreground">
+                            Personalizado · UNKNOWN (alérgenos desconocidos) · NOT_AVAILABLE (receta
+                            no disponible)
+                          </span>
+                        )}
+                      </div>
                       {it.notes && (
                         <div className="mt-1 flex items-center gap-1 text-xs text-amber-700 dark:text-amber-400">
                           <AlertCircle className="h-3 w-3 shrink-0" />
@@ -527,6 +553,12 @@ export function OrderDetailView({
               >
                 <div className="font-medium text-sm text-foreground leading-snug">
                   {it.dishName ?? "Plato no especificado"}
+                  {it.line?.kind === "custom" && (
+                    <span className="block text-xs text-muted-foreground">
+                      Personalizado · UNKNOWN (alérgenos desconocidos) · NOT_AVAILABLE (receta no
+                      disponible)
+                    </span>
+                  )}
                 </div>
                 {it.notes && (
                   <div className="flex items-center gap-1 text-xs text-amber-700 dark:text-amber-400">
@@ -719,7 +751,7 @@ export function OrderDetailView({
             <Button
               variant="outline"
               onClick={() => setCancelDialogOpen(false)}
-              disabled={busy}
+              disabled={busy || editorLocked}
             >
               Volver
             </Button>
@@ -743,6 +775,7 @@ export function AdminOrdersPage() {
   const [orders, setOrders] = useState<OperationalOrderListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [detail, setDetail] = useState<OperationalOrderListItem | null>(null);
+  const [detailLocked, setDetailLocked] = useState(false);
   const [intakeDrawerOpen, setIntakeDrawerOpen] = useState(false);
 
   const load = useCallback(async () => {
@@ -811,11 +844,13 @@ export function AdminOrdersPage() {
       )}
 
       {/* Drawer lateral ergonómico para Ficha de Pedido (CR-OPS-UX Fase 1) */}
-      <Sheet open={!!detail} onOpenChange={(open) => !open && setDetail(null)}>
-        <SheetContent
-          side="right"
-          className="w-full sm:max-w-2xl overflow-y-auto p-6"
-        >
+      <Sheet
+        open={!!detail}
+        onOpenChange={(open) => {
+          if (!open && !detailLocked) setDetail(null);
+        }}
+      >
+        <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto p-6">
           <SheetHeader className="sr-only">
             <SheetTitle>Ficha de Pedido</SheetTitle>
             <SheetDescription>
@@ -825,6 +860,7 @@ export function AdminOrdersPage() {
           {detail && (
             <OrderDetailView
               detail={detail}
+              onEditorLock={setDetailLocked}
               onOrderUpdated={() => {
                 setDetail(null);
                 void load();

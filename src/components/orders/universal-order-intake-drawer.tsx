@@ -1,3 +1,13 @@
+import { CustomOrderItemEditor } from "./custom-order-item-editor";
+import { CanonicalOrderSubmit } from "./canonical-order-submit";
+import { useCustomOrderCapture } from "@/hooks/use-custom-order-capture";
+import {
+  customDraftLine,
+  newCustomItemDraft,
+  type CustomItemDraft,
+} from "@/modules/orders/domain/custom-order-capture-draft";
+import type { CanonicalOrderCommand } from "@/modules/orders/domain/canonical-order-write";
+import type { CanonicalOrderWriteResult } from "@/modules/orders/infrastructure/canonical-order-write-repository";
 import { DishAllergenDeclaration } from "@/components/operations/dish-allergen-declaration";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -65,7 +75,7 @@ export interface UniversalOrderIntakeDrawerProps {
   preselectedOrganizationalUnitId?: string;
   preselectedWeekStart?: string;
   initialDayDate?: string;
-  onSuccess?: (result: StaffOrderCaptureResult) => void;
+  onSuccess?: (result: StaffOrderCaptureResult | CanonicalOrderWriteResult) => void;
 }
 
 type CustomerItem = {
@@ -164,6 +174,10 @@ export function UniversalOrderIntakeDrawer({
   const [comments, setComments] = useState<Record<string, Record<string, string>>>({});
   // Price Overrides: { [dayDate]: { [dishId]: number } }
   const [priceOverrides, setPriceOverrides] = useState<Record<string, Record<string, number>>>({});
+
+  const customEnabled = useCustomOrderCapture(demandChannel);
+  const [customItems, setCustomItems] = useState<CustomItemDraft[]>([]);
+  const [canonicalLocked, setCanonicalLocked] = useState(false);
 
   const [orderNotes, setOrderNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -558,8 +572,57 @@ export function UniversalOrderIntakeDrawer({
   }, [quantities, priceOverrides, dishPriceMap]);
 
   // Submit Order
+  const buildCustomCommand = (autoConfirm: boolean): CanonicalOrderCommand => {
+    if (!customEnabled || demandChannel !== "individual") throw new Error("CUSTOM_NOT_ENABLED");
+    const dishLines = Object.entries(quantities).flatMap(([dayDate, byDish]) =>
+      Object.entries(byDish)
+        .filter(([, qty]) => qty > 0)
+        .map(([dishId, qty]) => {
+          if (priceOverrides[dayDate]?.[dishId] !== undefined)
+            throw new Error("OFFER_PRICING_OVERRIDE_UNSUPPORTED");
+          return {
+            kind: "dish" as const,
+            dishId,
+            dayDate,
+            qty,
+            comment: comments[dayDate]?.[dishId] || null,
+          };
+        }),
+    );
+    if (dishLines.length && menuView?.status !== "published") throw new Error("MENU_LOCKED");
+    return {
+      operation: "capture",
+      weekStart,
+      autoConfirm,
+      demandChannel: "individual",
+      customer:
+        customerMode === "existing"
+          ? { kind: "existing", id: selectedCustomerId }
+          : {
+              kind: "new",
+              displayName: newCustomerName.trim(),
+              phone: newCustomerPhone.trim(),
+              street: newCustomerStreet.trim() || null,
+              city: newCustomerCity.trim() || null,
+              deliveryNotes: newCustomerDeliveryNotes.trim() || null,
+            },
+      lines: [...dishLines, ...customItems.map(customDraftLine)],
+      orderNotes: orderNotes.trim() || null,
+      dietaryOverride: isEditingDietaryOverride
+        ? {
+            dietaryNotes: dietaryOverrideNotes.trim() || null,
+            overrideReason: dietaryOverrideReason.trim(),
+          }
+        : null,
+    };
+  };
+
   const handleSubmit = async (autoConfirm: boolean) => {
     if (!user || !tenantId) return;
+    if (customItems.length) {
+      toast.error("Los personalizados requieren el envío canónico.");
+      return;
+    }
 
     if (menuView?.status !== "published") {
       toast.error("No se puede registrar un pedido sin un menú semanal publicado.");
@@ -673,7 +736,12 @@ export function UniversalOrderIntakeDrawer({
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet
+      open={open}
+      onOpenChange={(next) => {
+        if (!canonicalLocked) onOpenChange(next);
+      }}
+    >
       <SheetContent
         side="right"
         className="w-full sm:max-w-xl md:max-w-2xl lg:max-w-3xl flex flex-col p-0 gap-0"
@@ -690,6 +758,7 @@ export function UniversalOrderIntakeDrawer({
                 variant="ghost"
                 size="icon"
                 className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                disabled={canonicalLocked}
                 title="Semana anterior"
                 onClick={() => {
                   const prev = offsetWeekMonday(weekStart, -1);
@@ -710,6 +779,7 @@ export function UniversalOrderIntakeDrawer({
                 variant="ghost"
                 size="icon"
                 className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                disabled={canonicalLocked}
                 title="Semana siguiente"
                 onClick={() => {
                   const next = offsetWeekMonday(weekStart, 1);
@@ -726,7 +796,11 @@ export function UniversalOrderIntakeDrawer({
           </SheetDescription>
         </SheetHeader>
 
-        <div className="min-h-0 min-w-0 flex-1 overflow-y-auto" data-testid="order-capture-scroll">
+        <div
+          className="min-h-0 min-w-0 flex-1 overflow-y-auto"
+          data-testid="order-capture-scroll"
+          inert={canonicalLocked}
+        >
           <div className="p-4 sm:p-6 space-y-6">
             {/* 1. SELECCIÓN DE CLIENTE */}
             <div className="space-y-3 rounded-lg border border-border bg-card/50 p-4">
@@ -1049,6 +1123,43 @@ export function UniversalOrderIntakeDrawer({
               )}
             </div>
 
+            {(customEnabled || customItems.length > 0) && (
+              <section aria-label="Artículos personalizados" className="space-y-3">
+                <p className="text-xs text-muted-foreground">
+                  Para particulares. Los pedidos mixtos no admiten precios manuales de platos.
+                </p>
+                {customItems.map((draft) => (
+                  <CustomOrderItemEditor
+                    key={draft.key}
+                    draft={draft}
+                    disabled={canonicalLocked}
+                    weekDays={weekDays.map((day) => day.date)}
+                    onChange={(next) =>
+                      setCustomItems((items) =>
+                        items.map((item) => (item.key === next.key ? next : item)),
+                      )
+                    }
+                    onRemove={() =>
+                      setCustomItems((items) => items.filter((item) => item.key !== draft.key))
+                    }
+                  />
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={!customEnabled}
+                  onClick={() =>
+                    setCustomItems((items) => [...items, newCustomItemDraft(selectedDayDate)])
+                  }
+                >
+                  + Añadir personalizado
+                </Button>
+                {!customEnabled && (
+                  <p role="alert">La captura personalizada está cerrada para este contexto.</p>
+                )}
+              </section>
+            )}
+
             {/* 2. SELECTOR DE DÍAS Y PLATOS */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -1125,8 +1236,9 @@ export function UniversalOrderIntakeDrawer({
                             No hay menú publicado para esta semana ({weekStart})
                           </p>
                           <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-                            Publica el menú semanal en la sección de Menús para habilitar la captura
-                            de pedidos para estas fechas.
+                            {customEnabled
+                              ? "Los platos requieren un menú publicado. Los personalizados pueden capturarse sin él."
+                              : "Publica el menú semanal en la sección de Menús para habilitar la captura de pedidos para estas fechas."}
                           </p>
                         </div>
                       ) : dayDishes.length === 0 ? (
@@ -1277,39 +1389,63 @@ export function UniversalOrderIntakeDrawer({
 
         {/* 4. FOOTER CON RESUMEN ECONÓMICO Y BOTONES */}
         <SheetFooter className="p-4 border-t border-border bg-card flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:space-x-0">
-          <div className="text-left flex items-baseline justify-between sm:block">
-            <p className="text-xs text-muted-foreground">
-              Total: <strong>{totalPortions}</strong> raciones
-            </p>
-            <p className="text-lg font-bold font-mono text-primary">{grandTotal.toFixed(2)} €</p>
-          </div>
-          <div className="flex items-center gap-2 justify-end shrink-0">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => handleSubmit(false)}
-              disabled={submitting || totalPortions === 0}
-              className="shrink-0 text-xs"
-            >
-              Guardar Borrador
-            </Button>
-            <Button
-              type="button"
-              variant="default"
-              size="sm"
-              onClick={() => handleSubmit(true)}
-              disabled={submitting || totalPortions === 0}
-              className="gap-1.5 shrink-0 text-xs font-semibold"
-            >
-              {submitting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Check className="h-4 w-4" />
-              )}
-              Guardar y Confirmar 🟢
-            </Button>
-          </div>
+          {customItems.length === 0 && (
+            <div className="text-left flex items-baseline justify-between sm:block">
+              <p className="text-xs text-muted-foreground">
+                Total: <strong>{totalPortions}</strong> raciones
+              </p>
+              <p className="text-lg font-bold font-mono text-primary">{grandTotal.toFixed(2)} €</p>
+            </div>
+          )}
+          {customItems.length > 0 && tenantId ? (
+            <CanonicalOrderSubmit
+              tenantId={tenantId}
+              enabled={customEnabled}
+              buildCommand={buildCustomCommand}
+              dishLabel={(id) =>
+                allDishes.find((dish) => dish.id === id)?.name ?? `Plato ${id.slice(0, 8)}`
+              }
+              onLock={setCanonicalLocked}
+              onSuccess={(result) => {
+                setCanonicalLocked(false);
+                setCustomItems([]);
+                setQuantities({});
+                setComments({});
+                setPriceOverrides({});
+                onSuccess?.(result);
+                onOpenChange(false);
+                toast.success("Pedido personalizado guardado.");
+              }}
+            />
+          ) : (
+            <div className="flex items-center gap-2 justify-end shrink-0">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => handleSubmit(false)}
+                disabled={submitting || totalPortions === 0}
+                className="shrink-0 text-xs"
+              >
+                Guardar Borrador
+              </Button>
+              <Button
+                type="button"
+                variant="default"
+                size="sm"
+                onClick={() => handleSubmit(true)}
+                disabled={submitting || totalPortions === 0}
+                className="gap-1.5 shrink-0 text-xs font-semibold"
+              >
+                {submitting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Check className="h-4 w-4" />
+                )}
+                Guardar y Confirmar 🟢
+              </Button>
+            </div>
+          )}
         </SheetFooter>
       </SheetContent>
     </Sheet>

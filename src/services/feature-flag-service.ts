@@ -9,6 +9,20 @@ type FlagRow = Pick<Tables<"feature_flags">, "key" | "enabled" | "tenant_id" | "
  * @see docs/adr/0007-feature-flags.md
  */
 export const FeatureFlagService = {
+  /** Presentation only. No global fallback for tenant-controlled custom capture. */
+  async isTenantEnabled(ctx: ServiceContext, key: string): Promise<boolean> {
+    try {
+      const { data, error } = await ctx.supabase
+        .from("feature_flags")
+        .select("enabled")
+        .eq("key", key)
+        .eq("tenant_id", ctx.tenantId)
+        .maybeSingle();
+      return !error && data?.enabled === true;
+    } catch {
+      return false;
+    }
+  },
   async isEnabled(ctx: ServiceContext, key: string): Promise<boolean> {
     const { data, error } = await ctx.supabase
       .from("feature_flags")
