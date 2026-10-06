@@ -1,5 +1,6 @@
 import { demand, hash, classifyPath } from "./release-contract.mjs";
 
+export const RECONCILIATION_GOVERNANCE_PRS = Object.freeze([502, 503]);
 export const RECONCILIATION_GOVERNANCE_PR = 502;
 export const TRACK_B_SEALED_MIGRATION_BASELINE = "c02702afea56a5a4512b68b0c99aa377ca237b0a";
 
@@ -81,6 +82,7 @@ export const TRACK_B_RECONCILIATION = Object.freeze({
     "docs/adr/README.md",
     "scripts/governance/release-artifact.mjs",
     "scripts/governance/release-contract.mjs",
+    "scripts/governance/release-json.spec.mjs",
     "scripts/governance/release-plan.mjs",
     "scripts/governance/release-publish.mjs",
     "scripts/governance/release-reconciliation.mjs",
@@ -148,7 +150,7 @@ export function auditSpecialPaths(paths, reconciliation) {
 /**
  * Verifies a snapshot against the reconciliation record.
  * Distinguishes the reconciled database migration interval from the application target.
- * Bounded strictly to PRs #492..#501 plus the optional governance PR #502.
+ * Bounded strictly to PRs #492..#501 plus the allowed governance PRs #502..#503.
  */
 export function verifyReconciliation(snapshot, policy, reconciliation = TRACK_B_RECONCILIATION) {
   const { repository, baseline, diff, prs, currentMainSha, targetSha } = snapshot;
@@ -171,11 +173,17 @@ export function verifyReconciliation(snapshot, policy, reconciliation = TRACK_B_
     "Provider project ID mismatch",
   );
 
-  // Verify interval PR composition: strictly #492..#501, or #492..#501 + governance PR #502
-  demand(
+  // Verify interval PR composition: strictly #492..#501, or #492..#501 + governance PRs (#502, #503)
+  const nonTrackBPrs = prs.slice(9);
+  const isValidComposition =
     Array.isArray(prs) &&
-      (prs.length === 9 || (prs.length === 10 && prs[9] === RECONCILIATION_GOVERNANCE_PR)),
-    `Invalid release PR composition: expected Track B interval or governance PR #${RECONCILIATION_GOVERNANCE_PR}`,
+    prs.length >= 9 &&
+    prs.length <= 9 + RECONCILIATION_GOVERNANCE_PRS.length &&
+    nonTrackBPrs.every((pr, idx) => pr === RECONCILIATION_GOVERNANCE_PRS[idx]);
+
+  demand(
+    isValidComposition,
+    `Invalid release PR composition: expected Track B interval or governance PRs ${RECONCILIATION_GOVERNANCE_PRS.join(", ")}`,
   );
   for (const pr of reconciliation.intervalPrs) {
     demand(prs.includes(pr), `Reconciled PR #${pr} missing from release PRs`);
@@ -193,7 +201,8 @@ export function verifyReconciliation(snapshot, policy, reconciliation = TRACK_B_
     sealedMigrationSha: TRACK_B_SEALED_MIGRATION_BASELINE,
     targetSha: targetSha ?? currentMainSha,
     intervalPrs: reconciliation.intervalPrs,
-    governancePr: prs.includes(RECONCILIATION_GOVERNANCE_PR) ? RECONCILIATION_GOVERNANCE_PR : null,
+    governancePr: prs.length > 9 ? prs.at(-1) : null,
+    governancePrs: prs.slice(9),
     provider: reconciliation.provider,
     migrations: reconciliation.migrations,
   };

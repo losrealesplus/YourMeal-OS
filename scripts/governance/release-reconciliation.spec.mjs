@@ -70,21 +70,42 @@ test("2. Post-#502 merge interval [492..501, 502] with advanced main SHA is elig
       ...validSnapshot.diff,
       commits: [...validSnapshot.diff.commits, "1111222233334444555566667777888899990000"],
     },
-    prs: [...validSnapshot.prs, RECONCILIATION_GOVERNANCE_PR],
+    prs: [...validSnapshot.prs, 502],
     currentMainSha: "1111222233334444555566667777888899990000",
     targetSha: "1111222233334444555566667777888899990000",
   };
   const result = verifyReconciliation(postMergeSnapshot, mockPolicy, TRACK_B_RECONCILIATION);
   assert.equal(result.reconciled, true);
-  assert.equal(result.payload.governancePr, RECONCILIATION_GOVERNANCE_PR);
+  assert.equal(result.payload.governancePr, 502);
   assert.equal(result.payload.targetSha, "1111222233334444555566667777888899990000");
   assert.equal(result.payload.sealedMigrationSha, TRACK_B_SEALED_MIGRATION_BASELINE);
 });
 
-test("3. Future release with extra PR #503 fails closed", () => {
+test("3. Post-#503 merge interval [492..501, 502, 503] with advanced main SHA is eligible", () => {
+  const postMergeSnapshot = {
+    ...validSnapshot,
+    diff: {
+      ...validSnapshot.diff,
+      commits: [
+        ...validSnapshot.diff.commits,
+        "1111222233334444555566667777888899990000",
+        "2222333344445555666677778888999900001111",
+      ],
+    },
+    prs: [...validSnapshot.prs, 502, 503],
+    currentMainSha: "2222333344445555666677778888999900001111",
+    targetSha: "2222333344445555666677778888999900001111",
+  };
+  const result = verifyReconciliation(postMergeSnapshot, mockPolicy, TRACK_B_RECONCILIATION);
+  assert.equal(result.reconciled, true);
+  assert.equal(result.payload.governancePr, 503);
+  assert.deepEqual(result.payload.governancePrs, [502, 503]);
+});
+
+test("3b. Future release with extra PR #504 fails closed", () => {
   const futureSnapshot = {
     ...validSnapshot,
-    prs: [...validSnapshot.prs, 502, 503],
+    prs: [...validSnapshot.prs, 502, 503, 504],
   };
   assert.throws(
     () => verifyReconciliation(futureSnapshot, mockPolicy, TRACK_B_RECONCILIATION),
