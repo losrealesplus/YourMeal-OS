@@ -6,6 +6,36 @@ import { OrderLifecycleService } from "./order-lifecycle-service";
 import { capabilitiesFor } from "@/permissions";
 import type { ServiceContext } from "@/services/types";
 
+vi.mock("@/modules/weekly-menu/infrastructure/weekly-menu-repository", () => ({
+  createWeeklyMenuRepository: (_client: unknown, tenantId: string) => ({
+    findPublishedByWeekStart: async () => ({
+      id: "menu-1",
+      tenant_id: tenantId,
+      week_start: "2026-10-05",
+      status: "published",
+    }),
+    listSlotsWithDishes: async () =>
+      [
+        { dishId: "dish-1", dayDate: "2026-10-05" },
+        { dishId: "dish-2", dayDate: "2026-10-06" },
+      ].map(({ dishId, dayDate }) => ({
+        id: dayDate,
+        tenant_id: tenantId,
+        weekly_menu_id: "menu-1",
+        day_date: dayDate,
+        dish_id: dishId,
+        unit_price: null,
+        dishes: {
+          id: dishId,
+          tenant_id: tenantId,
+          status: "active",
+          deleted_at: null,
+          price: 12.75,
+        },
+      })),
+  }),
+}));
+
 function createMockQuery(data: any = null, error: any = null) {
   const query: any = {
     select: vi.fn().mockReturnThis(),

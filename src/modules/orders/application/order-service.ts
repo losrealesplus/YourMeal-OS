@@ -1,3 +1,4 @@
+import { assertLegacyOfferSlots } from "@/modules/weekly-menu/application/legacy-offer-write-guard";
 import { assertLegacyOrderWriteCompatible } from "../domain/legacy-order-write-guard";
 import { AuditService } from "@/services/audit-service";
 import { FeatureFlagService } from "@/services/feature-flag-service";
@@ -161,23 +162,13 @@ export const OrderService = {
       }
 
       const slots = await menuRepo.listSlotsWithDishes(menu.id);
-      const offeredByDay = new Map<string, Set<string>>();
-      for (const s of slots) {
-        if (!s.day_date || !s.dishes || s.dishes.deleted_at) continue;
-        const set = offeredByDay.get(s.day_date) ?? new Set<string>();
-        set.add(s.dish_id);
-        offeredByDay.set(s.day_date, set);
-      }
-
-      for (const item of command.items) {
-        const offered = offeredByDay.get(item.dayDate);
-        if (!offered?.has(item.dishId)) {
-          throw new DomainError(
-            "INVALID_STATE",
-            `Dish ${item.dishId} is not offered on ${item.dayDate} for week ${command.weekStart}`,
-          );
-        }
-      }
+      assertLegacyOfferSlots(
+        ctx.tenantId,
+        menu.id,
+        command.items,
+        slots,
+        getTenantOffers(ctx.tenantSlug).length > 0,
+      );
 
       if (command.offerCode && ctx.tenantSlug) {
         const registeredOffers = getTenantOffers(ctx.tenantSlug);
