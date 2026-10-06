@@ -23,13 +23,22 @@ vi.mock("@/services/audit-service", () => ({
 let insertDraftMock: ReturnType<typeof vi.fn>;
 
 vi.mock("@/modules/weekly-menu/infrastructure/weekly-menu-repository", () => ({
-  createWeeklyMenuRepository: vi.fn(() => ({
+  createWeeklyMenuRepository: vi.fn((_client, tenantId) => ({
     findPublishedByWeekStart: vi.fn(async () => ({ id: "menu-01", week_start: "2026-08-31" })),
     listSlotsWithDishes: vi.fn(async () => [
       {
+        tenant_id: tenantId,
+        weekly_menu_id: "menu-01",
+        unit_price: null,
         day_date: "2026-08-31",
         dish_id: "dish-01",
-        dishes: { id: "dish-01", name: "Dish 1", deleted_at: null },
+        dishes: {
+          id: "dish-01",
+          tenant_id: tenantId,
+          status: "active",
+          name: "Dish 1",
+          deleted_at: null,
+        },
       },
     ]),
   })),

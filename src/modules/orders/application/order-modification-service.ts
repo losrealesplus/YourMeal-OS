@@ -1,3 +1,4 @@
+import { assertLegacyOfferWrite } from "@/modules/weekly-menu/application/legacy-offer-write-guard";
 import { assertLegacyOrderWriteCompatible } from "../domain/legacy-order-write-guard";
 import { DomainError } from "@/domain/errors";
 import { requireCapability } from "@/permissions";
@@ -115,6 +116,8 @@ export const OrderModificationService = {
       total: currentOrder.total,
       notes: currentOrder.notes,
     };
+
+    await assertLegacyOfferWrite(ctx, currentOrder.week_start, dto.lines);
 
     // 2. Validate Dishes against Tenant Catalog (Strictly read-only)
     const uniqueDishIds = [...new Set(dto.lines.map((l) => l.dishId))];

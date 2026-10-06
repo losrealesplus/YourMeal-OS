@@ -1,6 +1,9 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { DomainError } from "@/domain/errors";
-import { StaffOrderCaptureService, type UniversalOrderCaptureDTO } from "./staff-order-capture-service";
+import {
+  StaffOrderCaptureService,
+  type UniversalOrderCaptureDTO,
+} from "./staff-order-capture-service";
 import type { ServiceContext } from "@/services/types";
 
 vi.mock("@/services/audit-service", () => ({
@@ -19,6 +22,30 @@ vi.mock("@/modules/dish-library/infrastructure/dish-repository", () => ({
       };
       return ids.map((id) => mockCatalog[id]).filter(Boolean);
     }),
+  }),
+}));
+
+vi.mock("@/modules/weekly-menu/infrastructure/weekly-menu-repository", () => ({
+  createWeeklyMenuRepository: (_client: unknown, tenantId: string) => ({
+    findPublishedByWeekStart: async (weekStart: string) => ({
+      id: "menu",
+      tenant_id: tenantId,
+      week_start: weekStart,
+      status: "published",
+      deleted_at: null,
+    }),
+    listSlotsWithDishes: async () =>
+      ["2026-09-29", "2026-09-30"].flatMap((dayDate) =>
+        ["dish-pollo", "dish-salmon", "dish-quinoa"].map((dishId) => ({
+          id: `${dayDate}-${dishId}`,
+          tenant_id: tenantId,
+          weekly_menu_id: "menu",
+          day_date: dayDate,
+          dish_id: dishId,
+          unit_price: null,
+          dishes: { id: dishId, tenant_id: tenantId, status: "active", deleted_at: null },
+        })),
+      ),
   }),
 }));
 
@@ -91,11 +118,13 @@ function createMockSupabase() {
                   created_at: new Date().toISOString(),
                   ...p,
                 }))
-              : [{
-                  id: `${currentTable.slice(0, 4)}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-                  created_at: new Date().toISOString(),
-                  ...insertedPayload,
-                }];
+              : [
+                  {
+                    id: `${currentTable.slice(0, 4)}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+                    created_at: new Date().toISOString(),
+                    ...insertedPayload,
+                  },
+                ];
             (store as any)[currentTable]?.push(...rows);
             return Promise.resolve({ data: rows, error: null }).then(resolve);
           }
@@ -287,7 +316,7 @@ describe("OPS-01 G1 — StaffOrderCaptureService", () => {
     const mockSupa = createMockSupabase();
     mockSupa.client.from("customer_dietary_profiles");
     // Pre-seed customer dietary profile
-    (mockSupa as any).store = (mockSupa as any); // reference
+    (mockSupa as any).store = mockSupa as any; // reference
     const ctx = mockCtx({}, mockSupa);
 
     // Pre-insert dietary profile
@@ -367,7 +396,7 @@ describe("OPS-01 G1 — StaffOrderCaptureService", () => {
     };
 
     await expect(StaffOrderCaptureService.captureOrder(ctx, dto)).rejects.toThrow(
-      "Un override dietético requiere un motivo obligatorio (mínimo 5 caracteres)."
+      "Un override dietético requiere un motivo obligatorio (mínimo 5 caracteres).",
     );
   });
 
@@ -386,7 +415,7 @@ describe("OPS-01 G1 — StaffOrderCaptureService", () => {
     };
 
     await expect(StaffOrderCaptureService.captureOrder(ctx, dto)).rejects.toThrow(
-      "Un override dietético requiere un motivo obligatorio (mínimo 5 caracteres)."
+      "Un override dietético requiere un motivo obligatorio (mínimo 5 caracteres).",
     );
   });
 });
