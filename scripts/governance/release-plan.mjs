@@ -16,7 +16,9 @@ import {
   DIGEST,
 } from "./release-contract.mjs";
 import { activationMode, activationPayload, authorizeActivation } from "./release-activation.mjs";
+import { verifyReconciliation, TRACK_B_RECONCILIATION } from "./release-reconciliation.mjs";
 import { parseReleaseJson, jsonObject, githubResponseShape } from "./release-json.mjs";
+
 export const policy = parseReleaseJson(
   fs.readFileSync(new URL("./release-policy.json", import.meta.url)),
   "RELEASE_POLICY_INVALID",
@@ -257,6 +259,27 @@ export function prepare(ctx, publishing = false) {
         policy,
       )
     : undefined;
+  let reconciliation;
+  if (!initial && classification.decision === "REQUIRES_SEPARATE_AUTHORIZATION") {
+    if (base.sha === TRACK_B_RECONCILIATION.baselineSha) {
+      try {
+        reconciliation = verifyReconciliation(
+          {
+            repository: ctx.repository,
+            baseline: base,
+            diff,
+            prs,
+            currentMainSha: currentMain,
+            targetSha: ctx.sha,
+          },
+          policy,
+          TRACK_B_RECONCILIATION,
+        );
+      } catch {
+        // Reconciliation check failed; remains REQUIRES_SEPARATE_AUTHORIZATION
+      }
+    }
+  }
   return {
     schema: 1,
     ...classification,
@@ -266,7 +289,13 @@ export function prepare(ctx, publishing = false) {
           originalDecision: classification.decision,
           activation,
         }
-      : {}),
+      : reconciliation
+        ? {
+            decision: "AUTHORIZED_RECONCILED_RELEASE",
+            originalDecision: classification.decision,
+            reconciliation,
+          }
+        : {}),
     repository: ctx.repository,
     sourceSha: ctx.sha,
     runId: ctx.runId,

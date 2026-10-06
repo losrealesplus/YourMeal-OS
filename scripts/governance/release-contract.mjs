@@ -176,4 +176,5 @@ export function assertManifest(manifest, context, expectedDigest, expectedConfig
 }
 
 export const preparationEligible = (decision) =>
-  ["DEPLOYABLE", "AUTHORIZED_INITIAL_ACTIVATION"].includes(decision);
+  ["DEPLOYABLE", "AUTHORIZED_INITIAL_ACTIVATION", "AUTHORIZED_RECONCILED_RELEASE"].includes(decision);
+

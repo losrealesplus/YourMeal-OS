@@ -64,6 +64,7 @@ test("CLI policy, event and API diagnostics emit no raw payload or secrets", () 
       "release-plan.mjs",
       "release-contract.mjs",
       "release-activation.mjs",
+      "release-reconciliation.mjs",
       "release-json.mjs",
       "release-policy.json",
     ])

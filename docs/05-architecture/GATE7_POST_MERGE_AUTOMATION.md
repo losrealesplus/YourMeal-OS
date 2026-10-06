@@ -86,6 +86,19 @@ Dry-run local Wrangler 4.86 sin credenciales: 282 módulos adicionales y entrypo
 
 Revisión adversarial: READY WITH WARNINGS / READY FOR HUMAN REVIEW. Sin ruta encontrada para arbitrary future SPECIAL + inputs: anclas de base/deployment/historial, PR canónico, contenido exacto y aprobación separada lo impiden. Riesgos residuales: nueva reconciliación obligatoria, cambio de main/base antes de activar, metadatos/API/ledger indisponibles, publicación parcial, confianza en GitHub/cuenta soberana, y límite distribuido mencionado. No hay autorización de merge/activación en esta tarea.
 
+## Carril TRACK_B_RECONCILIATION — reconciliación de migraciones de proveedor verificadas
+
+Fecha: 2026-10-06. Clasificación: HIGH / PRIVILEGED.
+
+Cuando un intervalo de publicación contiene deltas `SPECIAL` debido a migraciones de base de datos (`supabase/migrations/`) y documentación/tests asociados, Gate 7 clasifica inicialmente el intervalo como `REQUIRES_SEPARATE_AUTHORIZATION`.
+
+Si la totalidad de las migraciones dentro del intervalo ya fue ejecutada, atomizada y post-verificada en el proveedor de producción bajo un gate soberano independiente previo (Track B: `PROVIDER_MIGRATIONS_VERIFIED` 🟢 en `nhirlpkuvonggctdzzad`), el carril `TRACK_B_RECONCILIATION` permite la preparación determinista de la aplicación:
+
+1. **Ancla inmutable:** `TRACK_B_RECONCILIATION` fija `baselineSha: daa1fc4d945255eea0c6c541538c0162666d37d6`, deployment ID `6846428166`, intervalo de PRs `#492`..`#501`, proveedor `nhirlpkuvonggctdzzad` y estado `PROVIDER_MIGRATIONS_VERIFIED`.
+2. **Audit estricto de paths:** Cada migración de base de datos en el diff debe corresponder exactamente por path y digest SHA-256 a las 6 migraciones selladas (A1, M1, A3, M2, A4a, M3). Todo path `SPECIAL` no-migración debe pertenecer al conjunto cerrado y auditado `allowedSpecialPaths`.
+3. **Fail-Closed:** Cualquier migración extra, migración faltante, digest alterado, baseline divergente o path `SPECIAL` no catalogado preserva `REQUIRES_SEPARATE_AUTHORIZATION` y bloquea la preparación.
+4. **Preservación de barreras:** `READY != APPROVED`. La elegibilidad para preparación (`AUTHORIZED_RECONCILED_RELEASE`) permite a Phase 1 construir y empaquetar el artefacto inmutable, pero el despliegue en `production-worker` exige rigurosamente la aprobación manual Out-Of-Band (OOB) de Alexander Hernandez en GitHub Actions.
+
 ## Concurrencia y supersedencia
 
 Solo el build/preparación utiliza `cancel-in-progress: true`; puede sustituirse antes de producción. No hay cancelación a nivel workflow. La publicación usa un grupo global, `cancel-in-progress: false`, `queue: max`: un publicador activo y hasta 100 pendientes; el límite de cola puede rechazar entradas nuevas. GitHub ordena según llegada a la cola, no según SHA/fecha de dispatch. No se depende de esa ordenación para seleccionar código.

@@ -37,6 +37,7 @@ if (process.argv[2] === "package") {
     tarSha256,
     plan,
     ...(plan.activation ? { activation: plan.activation } : {}),
+    ...(plan.reconciliation ? { reconciliation: plan.reconciliation } : {}),
     wrangler: "4.86.0",
     node: "20",
   };
