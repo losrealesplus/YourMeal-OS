@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {validateRequest, execute, PRODUCTION_ERROR, productionExecution} from './a5-directed-executor.mjs';
-const valid = {mode:'isolated-qualification',binary:'/tmp/executor',binarySha256:'a'.repeat(64),manifest:'/tmp/manifest',repo:'/tmp/repo',executeLocal:false};
+import {validateRequest, execute, PRODUCTION_ERROR, productionExecution, QUALIFIED_BINARY_SHA256} from './a5-directed-executor.mjs';
+const valid = {mode:'isolated-qualification',binary:'/tmp/executor',binarySha256:QUALIFIED_BINARY_SHA256,manifest:'/tmp/manifest',repo:'/tmp/repo',executeLocal:false};
 test('local qualification request validates without granting authority',()=>assert.equal(validateRequest(valid),true));
 test('production hard disabled regardless of advisory approval',()=>{
   assert.equal(productionExecution,'HARD_DISABLED');
@@ -21,11 +21,12 @@ test('local execution strictly bounded to three steps',()=>{
  for(const step of [0,4,'1',undefined]) assert.throws(()=>validateRequest({...valid,executeLocal:true,isolation:'/tmp/local',step}),{message:'LOCAL_INPUT_INVALID'});
 });
 
-test('transport loss performs one read-only reconciliation and never retries mutation', async()=>{
- const {mkdtempSync,writeFileSync,rmSync}=await import('node:fs');
+test('transport loss performs one read-only reconciliation and never retries mutation', async(t)=>{
+ const {mkdtempSync,writeFileSync,rmSync,readFileSync,existsSync}=await import('node:fs');
+ if(!existsSync('/tmp/a5-directed-executor')){t.skip('compile the qualified local binary first');return;}
  const {tmpdir}=await import('node:os');const {join}=await import('node:path');const {createHash}=await import('node:crypto');
  const temp=mkdtempSync(join(tmpdir(),'a5-wrapper-'));try{
-  const binary=join(temp,'binary');const bytes=Buffer.from('test-only synthetic binary');writeFileSync(binary,bytes);
+  const binary=join(temp,'binary');const bytes=readFileSync('/tmp/a5-directed-executor');writeFileSync(binary,bytes);
   let calls=0;
   const req={...valid,binary,binarySha256:createHash('sha256').update(bytes).digest('hex'),executeLocal:true,step:1,isolation:'/tmp/a5-executor-test'};
   process.env.PGPASSWORD='secret-sentinel';process.env.APPROVED='true';
@@ -37,4 +38,8 @@ test('transport loss performs one read-only reconciliation and never retries mut
   }),e=>e.message==='OUTCOME_UNCERTAIN'&&e.result.reconciled==='DDL_COMMITTED_LEDGER_MISSING');
   assert.equal(calls,2);
  } finally{delete process.env.PGPASSWORD;delete process.env.APPROVED;rmSync(temp,{recursive:true,force:true});}
+});
+
+test('caller cannot select an unqualified binary by supplying its own hash',()=>{
+ let calls=0;assert.throws(()=>execute({...valid,binarySha256:'a'.repeat(64)},()=>{calls++;}),{message:'BINARY_DIGEST_MISMATCH'});assert.equal(calls,0);
 });

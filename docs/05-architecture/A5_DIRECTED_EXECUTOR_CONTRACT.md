@@ -87,7 +87,7 @@ A5_PG_BIN=/absolute/local/postgresql/bin A5_GO=/absolute/go1.27.1/bin/go \
   node tools/a5-directed-executor/testdata/qualify.mjs
 ```
 
-El harness requiere psql local `/opt/homebrew/bin/psql` y node disponibles, usa el binario local compilado `/tmp/a5-directed-executor`, crea/detiene/elimina el cluster y produce `/tmp/a5-qualification-evidence.json`. No descargar ni usar secrets. En entornos que bloquean shared memory, requiere permiso del sistema para este cluster local. Tests unitarios sin harness marcan los casos locales como SKIP: eso por sí solo no certifica la integración.
+El harness requiere psql local `/opt/homebrew/bin/psql` y node disponibles, usa el binario local compilado `/tmp/a5-directed-executor` (el wrapper admite exclusivamente el SHA-256 cualificado, no un digest elegido por el caller), crea/detiene/elimina el cluster y produce `/tmp/a5-qualification-evidence.json`. No descargar ni usar secrets. En entornos que bloquean shared memory, requiere permiso del sistema para este cluster local. Tests unitarios sin harness marcan los casos locales como SKIP: eso por sí solo no certifica la integración.
 
 La evidencia registra manifest/parser/statement offsets-hashes, firmas de catálogo y ledger, resultados de cada paso, fallos, tres ventanas de interrupción y binary digest. Buildvcs=false permite reproducibilidad; la procedencia se liga externamente al commit y hashes de fuentes, no a una identidad VCS implícita del binario.
 
@@ -115,8 +115,8 @@ Resultado: **A5_EXECUTOR_TECHNICALLY_QUALIFIED_READY_FOR_HUMAN_REVIEW + A5_PRODU
 - Reconciliación determinista: dos conexiones READ ONLY separadas observaron exactamente el mismo ledger y catálogo.
 - Duplicado exacto y misma versión con otro name/statements: rechazo antes del motor. Prefijo y orden incorrectos: rechazo antes del motor. Lock contention: LOCK_FAILED antes del motor.
 - Rol insuficiente: DDL y ledger ausentes.
-- Wrapper: 6 tests PASS; pérdida de transporte causa solo una lectura posterior, no retry mutador; datos de aprobación y PG secrets no pasan al child.
-- Governance existente: 123 PASS en el barrido inicial más 12 PASS de release-contract tras resolver js-yaml externo; cero cambios de dependencies o validators. El loader de prueba fue temporal fuera del repo y usó js-yaml ya instalado.
+- Wrapper: 7 tests PASS; pérdida de transporte causa solo una lectura posterior, no retry mutador; datos de aprobación y PG secrets no pasan al child.
+- Governance existente: 129 casos PASS (117 en el barrido inicial más 12 de release-contract tras resolver js-yaml externo); junto a los 7 tests del wrapper son 136 casos únicos PASS; cero cambios de dependencies o validators. El loader de prueba fue temporal fuera del repo y usó js-yaml ya instalado.
 - Go unit tests con race detector, integración local con race detector, go vet, go mod verify, build y diff check: PASS. Los unit tests sin cluster dejan dos pruebas locales en SKIP; la integración real se ejecutó aparte y PASS.
 
 Firmas de catálogo de la referencia aislada (no del proveedor):
@@ -126,3 +126,5 @@ Firmas de catálogo de la referencia aislada (no del proveedor):
 - Stage 3: `ee13713eca4a3589fcdd57e235902482caaf68bcb9560b4b20329d3f0fe504db`.
 
 La prueba local requirió una excepción del sandbox para memoria compartida de PostgreSQL. No se habilitó listener TCP y el cluster terminó eliminado. No se instaló runtime global ni se consultó Supabase. La LOC real supera la estimación inicial debido a validación estricta, firma de catálogo y fault injection; no se añadió framework propio ni se amplió el scope físico.
+
+Hardening final: wrapper fijado al SHA-256 cualificado `3bdb268bad8ba9d313c11e61a5cec3307094cce3c40bf1b1f5d90caeb8d7a18e`. Un binario distinto, incluso con digest self-consistent, se rechaza antes de spawn. Este pin corresponde a Go1.27.1/darwin-arm64 con los flags registrados; otra arquitectura/build requiere revisión y nueva cualificación, no override por CLI/env/manifest. El test de transporte del wrapper requiere ese binario local; si no se ha compilado, se marca SKIP sin certificar ese caso.

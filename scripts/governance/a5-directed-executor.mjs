@@ -7,11 +7,13 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 export const PRODUCTION_ERROR = 'PRODUCTION_AUTHORITY_BINDING_REQUIRED';
 export const productionExecution = 'HARD_DISABLED';
+export const QUALIFIED_BINARY_SHA256 = '3bdb268bad8ba9d313c11e61a5cec3307094cce3c40bf1b1f5d90caeb8d7a18e';
 const allowed = new Set(['mode','binary','binarySha256','manifest','repo','isolation','step','executeLocal']);
 export function validateRequest(request) {
   if (!request || request.mode !== 'isolated-qualification' || Object.keys(request).some(k => !allowed.has(k))) throw new Error(PRODUCTION_ERROR);
   for (const k of ['binary','manifest','repo']) if (typeof request[k] !== 'string' || !path.isAbsolute(request[k])) throw new Error('LOCAL_INPUT_INVALID');
   if (!/^[a-f0-9]{64}$/.test(request.binarySha256 ?? '')) throw new Error('BINARY_DIGEST_REQUIRED');
+  if (request.binarySha256 !== QUALIFIED_BINARY_SHA256) throw new Error('BINARY_DIGEST_MISMATCH');
   if (typeof request.executeLocal !== 'boolean') throw new Error('LOCAL_INPUT_INVALID');
   if (request.executeLocal && (!Number.isInteger(request.step) || request.step < 1 || request.step > 3 || typeof request.isolation !== 'string')) throw new Error('LOCAL_INPUT_INVALID');
   return true;
@@ -21,7 +23,7 @@ export function execute(request, spawn = spawnSync) {
   const stat = lstatSync(request.binary);
   if (stat.isSymbolicLink() || !stat.isFile()) throw new Error('BINARY_INVALID');
   const hash = createHash('sha256').update(readFileSync(request.binary)).digest('hex');
-  if (hash !== request.binarySha256) throw new Error('BINARY_DIGEST_MISMATCH');
+  if (hash !== QUALIFIED_BINARY_SHA256) throw new Error('BINARY_DIGEST_MISMATCH');
   const args = ['--manifest', request.manifest, '--repo', request.repo];
   if (request.executeLocal) args.push('--execute-local', '--step', String(request.step), '--isolation', request.isolation);
   // No PG*, DSN, JWT, PAT, credentials or claimed approval passed to child.
