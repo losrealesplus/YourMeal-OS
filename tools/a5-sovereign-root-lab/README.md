@@ -19,6 +19,18 @@ Authority store tests durable transaction/CAS, counter concurrency, expiry, revo
 
 A new intended process for the next migration is different from resuming after crash. All uncertainty ends the session; observation stays available but neither receipt nor reconcile allows repair or retry.
 
-Container recipe requires an immutable Node Debian image supplied as LAB_NODE_IMAGE. Before build, validate it is `node:...@sha256:<64 lowerhex>`. Building uses Debian package repositories for Python; record installed Python/SQLite and pin the resulting container digest. No reproducible-build claim is made for unpinned apt dependencies. Runtime must use no network after image build. Recipe presence or Go cross-compile does NOT certify Linux: report execution evidence separately.
+## Receta Linux ARM64 fijada
+
+Baseline de implementación: `b829e539ba4560493340d2d79f54f99ef0a68d77`. El commit posterior de hardening cambia exclusivamente receta/documentación; sus resultados no se atribuyen al Dockerfile original.
+
+La receta fija el manifest ARM64 de Node22.14.0 (`sha256:663c09e4fd483fbcb2bb7297b3618061ac23f0a1925b0958db2ab734efad7c94`), snapshot Debian `20250407T205129Z` y las 22 versiones transitivas en Dockerfile. No usa repositorios variables ni actualiza paquetes de la base. APT verifica firmas y hashes; únicamente se desactiva la caducidad del snapshot histórico, como documenta https://snapshot.debian.org/. Son dependencias históricas de laboratorio, no una recomendación productiva.
+
+```sh
+docker build --no-cache --platform linux/arm64 --provenance=false -f tools/a5-sovereign-root-lab/Dockerfile -t a5-root-lab:qualification-1 .
+docker run --rm --network none --read-only --tmpfs /tmp:rw,nosuid,nodev,mode=1777 --cap-drop ALL --security-opt no-new-privileges --pids-limit 256 a5-root-lab:qualification-1
+```
+
+Repetir build sin cache en otra etiqueta sobre el mismo commit limpio. Comparar IDs de imagen, inventario `/lab-packages.txt`, hashes de archivos regulares (incluyendo Node/Python/SQLite y `/lab`) y metadatos. Los timestamps de instalación, logs y metadata de capas pueden variar; no afirmar identidad binaria si el digest difiere. El contenido efectivo y cada diferencia residual deben quedar registrados en la evidencia externa del commit exacto. Runtime offline, sin credenciales/mounts del host/socket ni acceso a contenedores existentes. Dockerfile ejecutado no equivale por sí solo a suite PASS. Solo ARM64; ninguna cualificación amd64.
+
 
 Remaining gates: real attestation/hardware/enrolment, OIDC/GitHub API verification, non-exportable signing, independent CAS/custody, workload credential plane, Linux/container run, live schema compatibility and exact production authorization. AWS/domain/custodians/TTL remain candidates.

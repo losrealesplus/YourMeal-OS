@@ -33,3 +33,9 @@ Container recipe is pending execution. Its Node base must be provided by immutab
 Linux/container execution; real attestation/UV hardware qualification; human bootstrap and custodians; RP/origin; non-exportable signer; independent strongly-consistent store/audit; OIDC and direct GitHub checks; minimal-privilege DB credential plane; live compatibility; explicit exact-intent sovereign authorization. AWS/region/model/TTL/retention remain candidates. None is authorized by this qualification.
 
 The laboratory makes maintenance cost concrete: no new npm dependency/provider SDK, but Node+Python, own narrow schema/crypto profile, process-based storage and two-store failure handling still need independent review. These tests are evidence of the local implementation only, not security certification of an independent root.
+
+## Hardening mínimo autorizado — 2026-10-07
+
+El baseline de implementación es b829e539ba4560493340d2d79f54f99ef0a68d77. La receta posterior fija manifest Node ARM64, snapshot Debian y 22 paquetes transitivos exactos. La autorización cubre builds Linux ARM64 aislados en OrbStack y registro de resultados; no cambios de lógica ni infraestructura/provider. El estado anterior corresponde a evidencia Darwin: los resultados Linux se registran separadamente vinculados al nuevo commit, sin reatribuirlos al baseline.
+
+Método: dos builds --no-cache del mismo commit; ejecución de qualify.mjs offline/read-only con /tmp efímero; inventarios y hashes de contenido comparados además de IDs Docker. Registrar toda diferencia de metadatos. Producción HARD_DISABLED; PR509 Draft sin merge. El harness HTTP forma parte de la suite Linux; la prueba Chromium visual previa sigue siendo evidencia Darwin, no Chromium Linux.
