@@ -60,3 +60,6 @@ xcuserdata/
 # macOS
 .AppleDouble
 .LSOverride
+
+# Repomix context packages (machine-generated LLM context)
+.repomix/
