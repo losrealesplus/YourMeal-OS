@@ -1,7 +1,12 @@
+import {
+  createLifecycleAttempt,
+  executeLifecycleAttempt,
+  type LifecycleAction,
+} from "@/modules/orders/infrastructure/canonical-lifecycle";
 import type { ServiceContext } from "@/services/types";
 import { AuditService } from "@/services/audit-service";
 import { DomainError } from "@/domain/errors";
-import { requireCapability } from "@/permissions";
+import { canAny, requireCapability } from "@/permissions";
 import {
   createOperationsRepository,
   type OperationalOrderFilters,
@@ -36,6 +41,20 @@ import {
   type DeliveryAssignment,
 } from "../domain/delivery-assignment";
 
+async function canonicalOperation(ctx: ServiceContext, orderId: string, action: LifecycleAction) {
+  const repo = createOperationsRepository(ctx.supabase, ctx.tenantId);
+  const order = await repo.getOrder(orderId);
+  if (order?.writeContractVersion !== 2) return null;
+  return executeLifecycleAttempt(
+    ctx.supabase,
+    ctx.tenantId,
+    createLifecycleAttempt(
+      { id: order.id, status: order.status, revision: order.revision! },
+      action,
+    ),
+  );
+}
+
 export const OperationsService = {
   /**
    * FLOW-01 T1 · Spec `startProduction`
@@ -52,6 +71,10 @@ export const OperationsService = {
    * Emits FLOW01_T2_STARTED (T2_COMPLETED follows startPackaging).
    */
   async completeProduction(ctx: ServiceContext, orderId: string): Promise<OperationalOrderStatus> {
+    if (!canAny(ctx.roles, ["kitchen.operate", "production.operate"]))
+      throw new DomainError("PERMISSION_DENIED", "No tienes permiso para completar producción.");
+    const canonical = await canonicalOperation(ctx, orderId, "complete_production");
+    if (canonical) return canonical.toState;
     return this.transitionKitchen(ctx, orderId, "prepared");
   },
 
@@ -65,6 +88,12 @@ export const OperationsService = {
     orderId: string,
   ): Promise<{ status: OperationalOrderStatus; batch: PackagingBatch }> {
     requireCapability(ctx.roles, "kitchen.operate");
+    const canonical = await canonicalOperation(ctx, orderId, "start_packing");
+    if (canonical)
+      return {
+        status: canonical.toState,
+        batch: { id: `pkg-${orderId}`, tenantId: ctx.tenantId, orderId, status: "IN_PROGRESS" },
+      };
     if (!orderId) {
       throw new DomainError("INVALID_STATE", "orderId required");
     }
@@ -128,6 +157,9 @@ export const OperationsService = {
    */
   async completePackaging(ctx: ServiceContext, orderId: string): Promise<PackagingBatch> {
     requireCapability(ctx.roles, "kitchen.operate");
+    const canonical = await canonicalOperation(ctx, orderId, "complete_packing");
+    if (canonical)
+      return { id: `pkg-${orderId}`, tenantId: ctx.tenantId, orderId, status: "CLOSED" };
     if (!orderId) {
       throw new DomainError("INVALID_STATE", "orderId required");
     }
@@ -178,6 +210,13 @@ export const OperationsService = {
     batch: PackagingBatch;
   }> {
     requireCapability(ctx.roles, "kitchen.operate");
+    const canonical = await canonicalOperation(ctx, orderId, "assign_delivery");
+    if (canonical)
+      return {
+        status: canonical.toState,
+        batch: { id: `pkg-${orderId}`, tenantId: ctx.tenantId, orderId, status: "CLOSED" },
+        assignment: { id: `asgn-${orderId}`, tenantId: ctx.tenantId, orderId, status: "ASSIGNED" },
+      };
     if (!orderId) {
       throw new DomainError("INVALID_STATE", "orderId required");
     }
@@ -221,6 +260,8 @@ export const OperationsService = {
    */
   async startOutForDelivery(ctx: ServiceContext, orderId: string): Promise<OperationalOrderStatus> {
     requireCapability(ctx.roles, "logistics.operate");
+    const canonical = await canonicalOperation(ctx, orderId, "dispatch");
+    if (canonical) return canonical.toState;
     if (!orderId) {
       throw new DomainError("INVALID_STATE", "orderId required");
     }
@@ -372,6 +413,8 @@ export const OperationsService = {
     requireCapability(ctx.roles, "logistics.operate");
     const repo = createOperationsRepository(ctx.supabase, ctx.tenantId);
     const updated = await repo.transitionDeliveryService(serviceId, toStatus, ctx.userId, notes);
+    const parent = await repo.getOrder(updated.orderId);
+    if (parent?.writeContractVersion === 2) return updated;
     await AuditService.write(ctx, {
       entityType: "delivery_service",
       entityId: serviceId,
@@ -424,6 +467,7 @@ export const OperationsService = {
 
     // 3. Keep kitchen macro-order state consistent with in_production/prepared
     const currentOrder = await repo.getOrder(orderId);
+    if (currentOrder?.writeContractVersion === 2) return updated;
     if (
       currentOrder &&
       (currentOrder.status === "confirmed" || currentOrder.status === "in_production")
@@ -526,6 +570,8 @@ export const OperationsService = {
         `Cannot transition ${current.status} → ${toStatus} in ${workspace}`,
       );
     }
+
+    if (current.writeContractVersion === 2) return repo.transitionStatus(orderId, toStatus);
 
     const isFlow01T1 =
       workspace === "kitchen" && current.status === "confirmed" && toStatus === "in_production";

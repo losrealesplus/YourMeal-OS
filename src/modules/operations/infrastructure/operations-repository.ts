@@ -1,4 +1,9 @@
 import {
+  createLifecycleAttempt,
+  executeLifecycleAttempt,
+  type LifecycleAction,
+} from "@/modules/orders/infrastructure/canonical-lifecycle";
+import {
   readOrderItem,
   type OrderItemReadModel,
 } from "@/modules/orders/domain/order-item-read-model";
@@ -19,6 +24,7 @@ type Client = SupabaseClient<Database>;
 export type OperationalOrderListItem = {
   /** Reader projection only; v2 actions must never route through legacy editors. */
   writeContractVersion?: 1 | 2;
+  revision?: number;
   id: string;
   tenantId: string;
   status: OperationalOrderStatus;
@@ -89,6 +95,7 @@ export function mapOperationalOrderRow(row: Record<string, any>): OperationalOrd
   const deliveryDates = [...new Set(items.map((it) => String(it.day_date)).filter(Boolean))].sort();
   return {
     ...(row.write_contract_version === 2 ? { writeContractVersion: 2 as const } : {}),
+    revision: Number(row.revision ?? 0),
     id: String(row.id),
     tenantId: String(row.tenant_id),
     status: row.status as OperationalOrderStatus,
@@ -138,7 +145,7 @@ export function mapOperationalOrderRow(row: Record<string, any>): OperationalOrd
 }
 
 const ORDER_SELECT = `
-  id, tenant_id, write_contract_version, status, week_start, notes, dietary_snapshot, total, created_at, customer_id,
+  id, tenant_id, write_contract_version, revision, status, week_start, notes, dietary_snapshot, total, created_at, customer_id,
   demand_channel, company_id, site_id, organizational_unit_id, delivery_group_id, delivery_address_id,
   customers ( id, display_name, email ),
   companies ( id, name ),
@@ -257,6 +264,32 @@ export function createOperationsRepository(client: Client, tenantId: string) {
       orderId: string,
       toStatus: OperationalOrderStatus,
     ): Promise<OperationalOrderStatus> {
+      const order = await this.getOrder(orderId);
+      if (order?.writeContractVersion === 2) {
+        const action: LifecycleAction =
+          toStatus === "in_production"
+            ? "start_production"
+            : toStatus === "prepared"
+              ? "complete_production"
+              : toStatus === "ready_for_delivery"
+                ? "assign_delivery"
+                : toStatus === "delivery_issue"
+                  ? "delivery_issue"
+                  : toStatus === "delivered"
+                    ? "complete_delivery"
+                    : order.status === "delivery_issue"
+                      ? "retry_delivery"
+                      : "dispatch";
+        const result = await executeLifecycleAttempt(
+          db,
+          tenantId,
+          createLifecycleAttempt(
+            { id: order.id, status: order.status, revision: order.revision! },
+            action,
+          ),
+        );
+        return result.toState;
+      }
       const { data, error } = await db.rpc("transition_order_status", {
         p_tenant_id: tenantId,
         p_order_id: orderId,
@@ -334,6 +367,33 @@ export function createOperationsRepository(client: Client, tenantId: string) {
       actorId?: string,
       notes?: string,
     ): Promise<DeliveryServiceModel> {
+      const service = await this.getDeliveryService(serviceId);
+      const order = service ? await this.getOrder(service.orderId) : null;
+      if (order?.writeContractVersion === 2) {
+        const actions: Partial<Record<DeliveryServiceStatus, LifecycleAction>> = {
+          in_production: "service_start",
+          prepared: "service_prepare",
+          ready_for_delivery: "service_ready",
+          out_for_delivery:
+            service!.status === "delivery_issue" ? "service_retry" : "service_dispatch",
+          delivered: "service_deliver",
+          delivery_issue: "service_issue",
+        };
+        const action = actions[toStatus];
+        if (!action) throw new Error("INVALID_STATE");
+        await executeLifecycleAttempt(
+          db,
+          tenantId,
+          createLifecycleAttempt(
+            { id: order.id, status: order.status, revision: order.revision! },
+            action,
+            { serviceId, ...(notes === undefined ? {} : { reason: notes }) },
+          ),
+        );
+        const updated = await this.getDeliveryService(serviceId);
+        if (!updated) throw new Error("NOT_FOUND");
+        return updated;
+      }
       const { data, error } = await db.rpc("transition_delivery_service_status", {
         p_tenant_id: tenantId,
         p_service_id: serviceId,
@@ -348,6 +408,8 @@ export function createOperationsRepository(client: Client, tenantId: string) {
     async createDeliveryServicesForOrder(orderId: string): Promise<DeliveryServiceModel[]> {
       const order = await this.getOrder(orderId);
       if (!order) return [];
+      // The canonical capture/modify transaction already creates all required v2 services.
+      if (order.writeContractVersion === 2) return this.listDeliveryServices({ orderId });
 
       const distinctDays = [...new Set(order.items.map((i) => i.dayDate).filter(Boolean))].sort();
       if (distinctDays.length === 0) return [];
@@ -450,7 +512,7 @@ export function createOperationsRepository(client: Client, tenantId: string) {
     },
 
     async cancelDeliveryServicesForOrder(orderId: string, reason?: string): Promise<void> {
-      await db
+      const { error } = await db
         .from("delivery_services")
         .update({
           status: "cancelled",
@@ -458,7 +520,8 @@ export function createOperationsRepository(client: Client, tenantId: string) {
         })
         .eq("tenant_id", tenantId)
         .eq("order_id", orderId)
-        .in("status", ["pending", "packed"]);
+        .eq("status", "pending");
+      if (error) throw error;
     },
   };
 }

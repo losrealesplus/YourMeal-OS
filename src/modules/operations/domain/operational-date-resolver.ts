@@ -1,4 +1,5 @@
 import { operationalItemIdentity } from "@/modules/orders/domain/order-item-read-model";
+import type { OperationalOrderStatus } from "./operational-status";
 /**
  * CR-OPS-07: Operational Date Resolver & Normalizer
  * Resolves temporal modes (historical/present/future) relative to operational timezone (Europe/Madrid),
@@ -35,6 +36,17 @@ export const LIVE_QUEUE_STATUSES = [
   "in_preparation",
   "prepared",
 ] as const;
+
+/** Database predicates use actual enum values; reporting aliases above are not SQL states. */
+export const PERSISTED_HISTORICAL_QUEUE_STATUSES: OperationalOrderStatus[] = [
+  "confirmed",
+  "in_production",
+  "prepared",
+  "ready_for_delivery",
+  "out_for_delivery",
+  "delivery_issue",
+  "delivered",
+];
 
 /**
  * Resolves the operational "today" date string in the target timezone (YYYY-MM-DD).

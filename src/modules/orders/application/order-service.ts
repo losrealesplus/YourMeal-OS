@@ -1,3 +1,4 @@
+import { OrderLifecycleService } from "./order-lifecycle-service";
 import { assertLegacyOfferSlots } from "@/modules/weekly-menu/application/legacy-offer-write-guard";
 import { assertLegacyOrderWriteCompatible } from "../domain/legacy-order-write-guard";
 import { AuditService } from "@/services/audit-service";
@@ -435,6 +436,18 @@ export const OrderService = {
       }
     }
 
+    if (current.order.write_contract_version === 2) {
+      if (
+        options?.offerCode ||
+        options?.extras?.length ||
+        (options?.expectedTotal !== undefined && options.expectedTotal !== current.order.total)
+      )
+        throw new DomainError(
+          "INVALID_STATE",
+          "Canonical confirmation cannot reconstruct financial state",
+        );
+      return OrderLifecycleService.confirmOrder(ctx, repo, orderId);
+    }
     assertLegacyOrderWriteCompatible(current.order, current.items);
 
     // Retrieve draft commercial context from audit trail if available
