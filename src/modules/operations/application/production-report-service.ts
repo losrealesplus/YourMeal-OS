@@ -25,8 +25,7 @@ import {
 import {
   normalizeOperationalOrders,
   resolveTemporalMode,
-  HISTORICAL_QUEUE_STATUSES,
-  LIVE_QUEUE_STATUSES,
+  PERSISTED_HISTORICAL_QUEUE_STATUSES,
 } from "../domain/operational-date-resolver";
 import { buildKitchenProductionSheet } from "../domain/production-kitchen-engine";
 import { buildPackingHierarchySheet } from "../domain/packing-hierarchy-engine";
@@ -211,9 +210,7 @@ export const ProductionReportService = {
 
     const temporalMode = resolveTemporalMode(query.deliveryDate);
     const statuses =
-      temporalMode === "historical"
-        ? (HISTORICAL_QUEUE_STATUSES as unknown as OperationalOrderFilters["statuses"])
-        : (LIVE_QUEUE_STATUSES as unknown as OperationalOrderFilters["statuses"]);
+      temporalMode === "historical" ? PERSISTED_HISTORICAL_QUEUE_STATUSES : KITCHEN_QUEUE_STATUSES;
 
     const repo = createOperationsRepository(ctx.supabase, ctx.tenantId);
     const filters: OperationalOrderFilters = {

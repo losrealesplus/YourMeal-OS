@@ -160,6 +160,13 @@ export function mapDomainError(err: unknown): OrderError {
 
 function domainCodeToOrder(code: DomainError["code"]): OrderErrorCode {
   switch (code) {
+    case "REQUEST_ID_CONFLICT":
+    case "REVISION_CONFLICT":
+    case "OPERATIONAL_WORK_STARTED":
+    case "OPERATIONAL_EVIDENCE_REQUIRED":
+    case "DELIVERY_RESOLUTION_REQUIRED":
+    case "LIFECYCLE_RESULT_UNCERTAIN":
+      return code;
     case "PERMISSION_DENIED":
       return "PERMISSION_DENIED";
     case "TENANT_MISMATCH":

@@ -6,6 +6,7 @@ import { OrderModificationService } from "./order-modification-service";
 const mocks = vi.hoisted(() => ({
   current: { order: {} as Record<string, unknown>, items: [] as Array<Record<string, unknown>> },
   confirm: vi.fn(),
+  rpc: vi.fn(),
   audit: vi.fn(),
   catalogue: vi.fn(),
   from: vi.fn(),
@@ -30,7 +31,7 @@ function context(): ServiceContext {
     tenantId: "tenant",
     userId: "staff",
     roles: ["operations_manager"],
-    supabase: { from: mocks.from },
+    supabase: { from: mocks.from, rpc: mocks.rpc },
   } as unknown as ServiceContext;
 }
 
@@ -53,19 +54,45 @@ beforeEach(() => {
 
 describe("legacy paths cannot write future orders", () => {
   it.each(["custom", "v2"])(
-    "blocks %s before confirm mutation or commercial reads",
+    "blocks malformed %s before legacy confirm mutation or commercial reads",
     async (shape) => {
       if (shape === "custom")
         mocks.current.items = [{ id: "custom-item", dish_id: null, item_kind: "custom" }];
       else mocks.current.order.write_contract_version = 2;
       await expect(OrderService.confirm(context(), "order")).rejects.toMatchObject({
-        code: "UNIMPLEMENTED",
+        code: shape === "custom" ? "UNIMPLEMENTED" : "INVALID_STATE",
       });
       expect(mocks.confirm).not.toHaveBeenCalled();
       expect(mocks.audit).not.toHaveBeenCalled();
       expect(mocks.from).not.toHaveBeenCalled();
     },
   );
+
+  it("valid v2 confirmation goes exclusively through the canonical RPC", async () => {
+    const id = "50000000-0000-4000-8000-000000000001";
+    const ctx = context();
+    ctx.tenantId = "10000000-0000-4000-8000-000000000001";
+    mocks.current.order = { ...mocks.current.order, id, write_contract_version: 2, revision: 1 };
+    mocks.rpc.mockImplementation(async (_name: string, args: { _request_id: string }) => ({
+      data: {
+        tenantId: ctx.tenantId,
+        orderId: id,
+        requestId: args._request_id,
+        actorId: "20000000-0000-4000-8000-000000000001",
+        schemaVersion: 1,
+        fromState: "draft",
+        toState: "confirmed",
+        committedRevision: 2,
+        outcome: "COMMITTED",
+      },
+      error: null,
+    }));
+    expect((await OrderService.confirm(ctx, id)).status).toBe("confirmed");
+    expect(mocks.rpc).toHaveBeenCalledWith("cr_order_lifecycle_v2", expect.anything());
+    expect(mocks.confirm).not.toHaveBeenCalled();
+    expect(mocks.audit).not.toHaveBeenCalled();
+    expect(mocks.from).not.toHaveBeenCalled();
+  });
 
   it.each(["custom", "v2"])(
     "blocks %s before modification can replace order lines",

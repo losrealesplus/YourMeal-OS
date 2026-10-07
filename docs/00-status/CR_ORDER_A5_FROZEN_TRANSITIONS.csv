@@ -1,0 +1,82 @@
+from_state,to_state,classification,action,condition
+draft,draft,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+draft,confirmed,HUMAN_STAFF,confirm,Exact active tenant membership; valid bounded domain action + required positive evidence; no browser target-state authority
+draft,in_production,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+draft,prepared,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+draft,ready_for_delivery,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+draft,out_for_delivery,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+draft,delivery_issue,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+draft,delivered,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+draft,cancelled,HUMAN_STAFF_CONDITIONAL,cancel,Exact active tenant membership + compatible staff + orders.write; all required operational work safely stoppable; preserve history; atomic rollback otherwise
+confirmed,draft,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+confirmed,confirmed,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+confirmed,in_production,SYSTEM_ONLY,start_production,Exact active tenant membership; valid bounded domain action + required positive evidence; no browser target-state authority
+confirmed,prepared,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+confirmed,ready_for_delivery,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+confirmed,out_for_delivery,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+confirmed,delivery_issue,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+confirmed,delivered,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+confirmed,cancelled,HUMAN_STAFF_CONDITIONAL,cancel,Exact active tenant membership + compatible staff + orders.write; all required operational work safely stoppable; preserve history; atomic rollback otherwise
+in_production,draft,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+in_production,confirmed,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+in_production,in_production,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+in_production,prepared,SYSTEM_ONLY,complete_production,Exact active tenant membership; valid bounded domain action + required positive evidence; no browser target-state authority
+in_production,ready_for_delivery,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+in_production,out_for_delivery,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+in_production,delivery_issue,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+in_production,delivered,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+in_production,cancelled,HUMAN_STAFF_CONDITIONAL,cancel,Exact active tenant membership + compatible staff + orders.write; all required operational work safely stoppable; preserve history; atomic rollback otherwise
+prepared,draft,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+prepared,confirmed,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+prepared,in_production,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+prepared,prepared,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+prepared,ready_for_delivery,SYSTEM_ONLY,assign_delivery,Exact active tenant membership; valid bounded domain action + required positive evidence; no browser target-state authority
+prepared,out_for_delivery,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+prepared,delivery_issue,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+prepared,delivered,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+prepared,cancelled,HUMAN_STAFF_CONDITIONAL,cancel,Exact active tenant membership + compatible staff + orders.write; all required operational work safely stoppable; preserve history; atomic rollback otherwise
+ready_for_delivery,draft,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+ready_for_delivery,confirmed,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+ready_for_delivery,in_production,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+ready_for_delivery,prepared,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+ready_for_delivery,ready_for_delivery,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+ready_for_delivery,out_for_delivery,SYSTEM_ONLY,dispatch,Exact active tenant membership; valid bounded domain action + required positive evidence; no browser target-state authority
+ready_for_delivery,delivery_issue,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+ready_for_delivery,delivered,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+ready_for_delivery,cancelled,HUMAN_STAFF_CONDITIONAL,cancel,Exact active tenant membership + compatible staff + orders.write; all required operational work safely stoppable; preserve history; atomic rollback otherwise
+out_for_delivery,draft,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+out_for_delivery,confirmed,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+out_for_delivery,in_production,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+out_for_delivery,prepared,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+out_for_delivery,ready_for_delivery,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+out_for_delivery,out_for_delivery,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+out_for_delivery,delivery_issue,SYSTEM_ONLY,delivery_issue,Exact active tenant membership; valid bounded domain action + required positive evidence; no browser target-state authority
+out_for_delivery,delivered,SYSTEM_ONLY,complete_delivery,Exact active tenant membership; valid bounded domain action + required positive evidence; no browser target-state authority
+out_for_delivery,cancelled,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+delivery_issue,draft,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+delivery_issue,confirmed,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+delivery_issue,in_production,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+delivery_issue,prepared,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+delivery_issue,ready_for_delivery,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+delivery_issue,out_for_delivery,SYSTEM_ONLY,retry_delivery,Exact active tenant membership; valid bounded domain action + required positive evidence; no browser target-state authority
+delivery_issue,delivery_issue,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+delivery_issue,delivered,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+delivery_issue,cancelled,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+delivered,draft,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+delivered,confirmed,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+delivered,in_production,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+delivered,prepared,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+delivered,ready_for_delivery,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+delivered,out_for_delivery,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+delivered,delivery_issue,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+delivered,delivered,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+delivered,cancelled,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+cancelled,draft,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+cancelled,confirmed,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+cancelled,in_production,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+cancelled,prepared,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+cancelled,ready_for_delivery,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+cancelled,out_for_delivery,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+cancelled,delivery_issue,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+cancelled,delivered,DENY,,"No approved ordinary transition. Evidence-only operations and service events are separate bounded commands, never state skipping."
+cancelled,cancelled,NO_OP,cancel,Different request returns ALREADY_CANCELLED; no revision/audit/cascade. Same valid request replay is checked before this matrix.

@@ -226,6 +226,36 @@ export class OrderFacade {
         );
       }
 
+      if (current.writeContractVersion === 2) {
+        if (command.deliveryDay) {
+          const service = await this.deps.operations.getDeliveryServiceByOrderDay(
+            resolved.ctx,
+            command.orderId,
+            command.deliveryDay,
+          );
+          if (!service)
+            return failCommand(
+              [{ code: "NOT_FOUND", message: "Delivery service not found", recoverable: false }],
+              command.orderId,
+            );
+          await this.deps.operations.transitionDeliveryService(
+            resolved.ctx,
+            service.id,
+            "delivered",
+          );
+        } else {
+          await this.deps.operations.transitionDelivery(resolved.ctx, command.orderId, "delivered");
+        }
+        const actual = await this.deps.operations.getOrder(resolved.ctx, command.orderId);
+        if (!actual)
+          return failCommand(
+            [{ code: "NOT_FOUND", message: "Order not found", recoverable: false }],
+            command.orderId,
+          );
+        const got = await this.getOrder(identity, { type: "GetOrder", orderId: command.orderId });
+        return okCommand(command.orderId, actual.status, got.context);
+      }
+
       // CR-OPS-06: If a delivery day is specified, transition that day's delivery_service
       let serviceDelivered = false;
       if (command.deliveryDay) {
