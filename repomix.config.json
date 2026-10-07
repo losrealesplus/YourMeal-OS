@@ -1,0 +1,26 @@
+{
+  "$schema": "https://repomix.com/schemas/repomix-config.json",
+  "output": {
+    "filePath": ".repomix/repomix-output.xml",
+    "style": "xml",
+    "parsableStyle": true,
+    "fileSummary": true,
+    "directoryStructure": true,
+    "removeComments": false,
+    "removeEmptyLines": true,
+    "showLineNumbers": true,
+    "truncateBase64": true,
+    "topFilesLength": 10
+  },
+  "ignore": {
+    "useGitignore": true,
+    "useDotIgnore": true,
+    "useDefaultPatterns": true
+  },
+  "security": {
+    "enableSecurityCheck": true
+  },
+  "tokenCount": {
+    "encoding": "o200k_base"
+  }
+}
