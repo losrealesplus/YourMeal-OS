@@ -8,11 +8,13 @@ export function DishThumb({
   imageSrc,
   size = "md",
   className,
+  onImageError,
 }: {
   emoji: string;
   imageSrc?: string;
   size?: "sm" | "md" | "lg" | "xl" | "hero";
   className?: string;
+  onImageError?: () => void;
 }) {
   const sizes: Record<string, string> = {
     sm: "size-16 text-3xl rounded-xl",
@@ -38,6 +40,7 @@ export function DishThumb({
           className="size-full object-cover"
           width={800}
           height={640}
+          onError={onImageError}
         />
       </div>
     );
