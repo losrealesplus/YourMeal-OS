@@ -91,6 +91,7 @@ export function useCustomerSelfProfile() {
     }
   }
   return {
+    tenantId,
     profile,
     links,
     customer,

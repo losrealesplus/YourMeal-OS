@@ -38,7 +38,7 @@ try {
   const fakeModules = {
     auth: `export function useAuth(){const n=Number(new URLSearchParams(location.search).get('actor')||1);return {tenantId:'10000000-0000-4000-8000-000000000001',user:{id:'20000000-0000-4000-8000-'+String(n).padStart(12,'0'),email:n===6?'opaque@privaterelay.appleid.com':'access@example.test',user_metadata:{}},roles:n===3?['operations_manager']:['customer']};}`,
     lookup: `import {useQuery} from '@tanstack/react-query';import {api} from 'lab-api';export function useCurrentCustomerId(){return useQuery({queryKey:['current-customer-id'],queryFn:()=>api('customer_id',{})});}`,
-    api: `export async function api(mode,data){const actor=Number(new URLSearchParams(location.search).get('actor')||1);const response=await fetch('${api}',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({mode,actor,...data})});const value=await response.json();if(!response.ok)throw new Error(value.error);if(mode==='command'&&window.__loseResponse){window.__loseResponse=false;throw new Error('LAB_RESPONSE_LOST');}if(mode==='links'&&window.__holdRefresh){await new Promise(resolve=>window.__releaseRefresh=resolve);}return value.data;}export const customerProfileClient={read:(tenantId,customerId)=>api('read',{tenantId,customerId}),command:request=>api('command',request),identityRequests:tenantId=>api('links',{tenantId}),readback:(tenantId,requestId)=>api('readback',{tenantId,requestId})};`,
+    api: `export async function api(mode,data){if(mode==='command')(window.__commands??=[]).push(data);const actor=Number(new URLSearchParams(location.search).get('actor')||1);const response=await fetch('${api}',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({mode,actor,...data})});const value=await response.json();if(!response.ok)throw new Error(value.error);if(mode==='command'&&window.__loseResponse){window.__loseResponse=false;throw new Error('LAB_RESPONSE_LOST');}if(mode==='links'&&window.__holdRefresh){await new Promise(resolve=>window.__releaseRefresh=resolve);}return value.data;}export const customerProfileClient={read:(tenantId,customerId)=>api('read',{tenantId,customerId}),command:request=>api('command',request),identityRequests:tenantId=>api('links',{tenantId}),readback:(tenantId,requestId)=>api('readback',{tenantId,requestId})};`,
     router: `import React from 'react';export const createFileRoute=()=>options=>({options});export const Link=({to,children,...p})=><a href={to} {...p}>{children}</a>;`,
     consumer: `import React from 'react';export const ScreenHeader=({title})=><h1>{title}</h1>;`,
     toast: `function show(message){let n=document.getElementById('status');if(!n){n=document.createElement('p');n.id='status';n.setAttribute('role','status');document.body.append(n);}n.textContent=message;}export const toast={success:show,error:show,info:show};`,
@@ -64,7 +64,7 @@ try {
       }));
     },
   };
-  const entry = `import React from 'react';import {createRoot} from 'react-dom/client';import {QueryClient,QueryClientProvider} from '@tanstack/react-query';import {Route as P} from './src/routes/_authenticated/app.settings.profile';import {Route as A} from './src/routes/_authenticated/app.addresses';import {CustomerIdentityLinkReview} from './src/components/customer/customer-identity-link-review';const q=new QueryClient({defaultOptions:{queries:{retry:false}}});const params=new URLSearchParams(location.search);const Page=params.get('screen')==='addresses'?A.options.component:P.options.component;createRoot(document.getElementById('root')).render(<QueryClientProvider client={q}>{params.get('screen')==='review'?<CustomerIdentityLinkReview customerId={params.get('cid')} revision={1} displayName="Ficha LAB"/>:<Page/>}</QueryClientProvider>);`;
+  const entry = `import React from 'react';import {createRoot} from 'react-dom/client';import {QueryClient,QueryClientProvider} from '@tanstack/react-query';import {Route as P} from './src/routes/_authenticated/app.settings.profile';import {Route as A} from './src/routes/_authenticated/app.addresses';import {CustomerIdentityLinkReview} from './src/components/customer/customer-identity-link-review';const q=new QueryClient({defaultOptions:{queries:{retry:false}}});const params=new URLSearchParams(location.search);window.__refetchProfile=()=>q.refetchQueries({queryKey:['customer-self-profile']});const Page=params.get('screen')==='addresses'?A.options.component:P.options.component;function Lab(){const [review,setReview]=React.useState({id:params.get('cid'),revision:Number(params.get('revision')||1)});window.__setReviewCustomer=setReview;return params.get('screen')==='review'?<CustomerIdentityLinkReview customerId={review.id} revision={review.revision} displayName={review.id}/>:<Page/>}createRoot(document.getElementById('root')).render(<QueryClientProvider client={q}><Lab/></QueryClientProvider>);`;
   const bundled = await build({
     stdin: { contents: entry, loader: "tsx", resolveDir: root },
     bundle: true,
@@ -128,6 +128,35 @@ try {
   assert.equal(staffRead.displayName, "Ana Browser");
   assert.equal(staffRead.phone, "777888");
   checked.push("staff sees same canonical CRM");
+  const tenantId = "10000000-0000-4000-8000-000000000001";
+  const mutate = (actor, command) =>
+    request(actor, "command", { tenantId, requestId: crypto.randomUUID(), command });
+  await page.getByRole("button", { name: "Editar mis datos" }).click();
+  await page.getByLabel("Nombre", { exact: true }).fill("Stale profile draft");
+  await mutate(3, {
+    operation: "profile",
+    customerId: cid,
+    expectedRevision: staffRead.revision,
+    patch: { displayName: "Concurrent CRM name" },
+  });
+  await page.evaluate(() => window.__refetchProfile());
+  await page.getByRole("button", { name: "Guardar", exact: true }).click();
+  await page.getByText("El CRM cambió.", { exact: false }).waitFor();
+  assert.equal(
+    await page.getByLabel("Nombre", { exact: true }).inputValue(),
+    "Stale profile draft",
+  );
+  assert.equal(await page.getByRole("button", { name: "Guardar", exact: true }).isDisabled(), true);
+  assert.equal(
+    (await request(3, "read", { tenantId, customerId: cid })).displayName,
+    "Concurrent CRM name",
+  );
+  await page.getByRole("button", { name: "Descartar borrador y recargar datos actuales" }).click();
+  await page.getByText("Nombre: Concurrent CRM name", { exact: true }).waitFor();
+  checked.push(
+    "profile draft keeps original revision across refetch; conflict preserves values until explicit discard",
+  );
+
   await page.goto(url + "?screen=addresses");
   await page.getByLabel("Calle y número").fill("Browser Street 3");
   await page.getByLabel("Nombre de la dirección").fill("Browser Casa");
@@ -180,6 +209,30 @@ try {
     .filter({ hasText: /^Browser Casa\s*$/ })
     .waitFor();
   checked.push("restore preserves current default");
+  await block.getByRole("button", { name: "Editar", exact: true }).click();
+  await page.getByLabel("Calle y número").fill("Stale address draft");
+  const beforeAddressRace = await request(3, "read", { tenantId, customerId: cid });
+  await mutate(3, {
+    operation: "profile",
+    customerId: cid,
+    expectedRevision: beforeAddressRace.revision,
+    patch: { phone: "999" },
+  });
+  await page.evaluate(() => window.__refetchProfile());
+  await page.getByRole("button", { name: "Guardar dirección" }).click();
+  await page.getByText("El CRM cambió.", { exact: false }).waitFor();
+  assert.equal(await page.getByLabel("Calle y número").inputValue(), "Stale address draft");
+  assert.equal(await page.getByRole("button", { name: "Guardar dirección" }).isDisabled(), true);
+  const afterAddressRace = await request(3, "read", { tenantId, customerId: cid });
+  assert.equal(
+    afterAddressRace.addresses.find((a) => a.label === "Browser Casa").street,
+    "Browser Street edited",
+  );
+  await page.getByRole("button", { name: "Descartar borrador y recargar datos actuales" }).click();
+  checked.push(
+    "address draft keeps original revision across refetch and cannot overwrite concurrent CRM changes",
+  );
+
   await page.goto(url);
   await page.getByRole("button", { name: "Editar mis datos" }).click();
   await page.getByLabel("Nombre", { exact: true }).fill("After Lost Response");
@@ -210,6 +263,27 @@ try {
     true,
   );
   await page.getByRole("checkbox").check();
+  const otherStaff = await mutate(3, { operation: "create_staff", displayName: "Other CRM" });
+  await page.evaluate(
+    (id) => window.__setReviewCustomer({ id, revision: 1 }),
+    otherStaff.customerId,
+  );
+  await page
+    .getByText("Ficha seleccionada: " + otherStaff.customerId + ".", { exact: false })
+    .waitFor();
+  assert.equal(await page.locator("select").inputValue(), "");
+  assert.equal(await page.getByRole("checkbox").isChecked(), false);
+  assert.equal(
+    await page
+      .getByRole("button", { name: "Aprobar vinculación para confirmación del cliente" })
+      .isDisabled(),
+    true,
+  );
+  await page.evaluate((id) => window.__setReviewCustomer({ id, revision: 1 }), newStaff.customerId);
+  await page.locator("select").selectOption(link.linkRequestId);
+  await page.getByRole("checkbox").check();
+  checked.push("A-to-B customer switch clears exact request and verification before approval");
+
   await page
     .getByRole("button", { name: "Aprobar vinculación para confirmación del cliente" })
     .click();
@@ -217,8 +291,43 @@ try {
   checked.push("staff verifies exact selected CRM");
   await page.goto(url + "?actor=5");
   await page.getByText("Ficha verificada: Ficha LAB").waitFor();
+  await mutate(3, {
+    operation: "profile",
+    customerId: newStaff.customerId,
+    expectedRevision: 1,
+    patch: { displayName: "Ficha CRM revisada" },
+  });
   await page.getByRole("button", { name: "Confirmar vinculación verificada" }).click();
-  await page.getByText("Nombre: Ficha LAB", { exact: true }).waitFor();
+  await page.getByRole("button", { name: "Cerrar solicitud conflictiva" }).waitFor();
+  await page.getByRole("button", { name: "Cerrar solicitud conflictiva" }).click();
+  await page.getByRole("button", { name: "Ya soy cliente: solicitar vinculación" }).waitFor();
+  await page.getByRole("button", { name: "Ya soy cliente: solicitar vinculación" }).click();
+  await page
+    .getByText("Solicitud pendiente de verificación por EatClean.", { exact: false })
+    .waitFor();
+  assert.equal(
+    await page.getByRole("button", { name: "Confirmar vinculación verificada" }).count(),
+    0,
+  );
+  const newLinks = await request(5, "links", { tenantId });
+  assert.equal(newLinks.find((l) => l.id === link.linkRequestId).state, "closed");
+  const freshLink = newLinks.find((l) => l.state === "requested");
+  assert.ok(freshLink && freshLink.id !== link.linkRequestId);
+  await page.goto(url + "?screen=review&actor=3&revision=2&cid=" + newStaff.customerId);
+  await page.locator("select").selectOption(freshLink.id);
+  await page.getByRole("checkbox").check();
+  await page
+    .getByRole("button", { name: "Aprobar vinculación para confirmación del cliente" })
+    .click();
+  await page.getByRole("status").getByText("Verificación registrada.", { exact: false }).waitFor();
+  await page.goto(url + "?actor=5");
+  await page.getByText("Ficha verificada: Ficha CRM revisada").waitFor();
+  checked.push(
+    "explicit conflict closure leads to new unapproved request and fresh staff approval",
+  );
+
+  await page.getByRole("button", { name: "Confirmar vinculación verificada" }).click();
+  await page.getByText("Nombre: Ficha CRM revisada", { exact: true }).waitFor();
   checked.push("customer second confirmation");
   await page.goto(url + "?actor=3");
   await page

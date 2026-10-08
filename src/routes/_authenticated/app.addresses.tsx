@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { ScreenHeader } from "@/components/consumer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/hooks/use-auth";
 import { useCustomerSelfProfile } from "@/hooks/use-customer-self-profile";
 import type {
   CustomerAddress,
@@ -12,6 +13,14 @@ import type {
 export const Route = createFileRoute("/_authenticated/app/addresses")({ component: AddressesPage });
 function AddressesPage() {
   const state = useCustomerSelfProfile();
+  const { user } = useAuth();
+  const owner = `${state.tenantId}/${user?.id}`;
+  const [draft, setDraft] = useState<{
+    customerId: string;
+    revision: number;
+    owner: string;
+  } | null>(null);
+  const [conflict, setConflict] = useState(false);
   const profile = state.profile.data;
   const [editing, setEditing] = useState<CustomerAddress | null>(null);
   const [form, setForm] = useState({ label: "", street: "", city: "", zip: "" });
@@ -21,10 +30,13 @@ function AddressesPage() {
     try {
       await state.execute(command);
       setEditing(null);
+      setDraft(null);
+      setConflict(false);
       setForm({ label: "", street: "", city: "", zip: "" });
       setReplacement("");
       toast.success("Direcciones actualizadas.");
     } catch (e) {
+      if (e instanceof Error && e.message === "STALE_REVISION") setConflict(true);
       toast.error(e instanceof Error ? e.message : "No se pudo actualizar.");
     }
   }
@@ -94,6 +106,12 @@ function AddressesPage() {
                       disabled={locked}
                       onClick={() => {
                         setEditing(a);
+                        setDraft({
+                          customerId: profile.customerId,
+                          revision: profile.revision,
+                          owner,
+                        });
+                        setConflict(false);
                         setForm({
                           label: a.label || "",
                           street: a.street,
@@ -165,10 +183,17 @@ function AddressesPage() {
               className="space-y-3"
               onSubmit={(e) => {
                 e.preventDefault();
+                if (
+                  !draft ||
+                  conflict ||
+                  draft.owner !== owner ||
+                  draft.customerId !== profile.customerId
+                )
+                  return;
                 void command({
                   operation: editing ? "address_edit" : "address_create",
-                  customerId: profile.customerId,
-                  expectedRevision: profile.revision,
+                  customerId: draft.customerId,
+                  expectedRevision: draft.revision,
                   ...(editing ? { addressId: editing.id } : {}),
                   patch: form,
                 } as CustomerCommand);
@@ -190,23 +215,57 @@ function AddressesPage() {
                     disabled={locked}
                     maxLength={{ label: 100, street: 500, city: 200, zip: 32 }[k]}
                     value={form[k]}
-                    onChange={(e) => setForm({ ...form, [k]: e.target.value })}
+                    onFocus={() => {
+                      if (!draft)
+                        setDraft({
+                          customerId: profile.customerId,
+                          revision: profile.revision,
+                          owner,
+                        });
+                    }}
+                    onChange={(e) => {
+                      if (!draft)
+                        setDraft({
+                          customerId: profile.customerId,
+                          revision: profile.revision,
+                          owner,
+                        });
+                      setForm({ ...form, [k]: e.target.value });
+                    }}
                   />
                 </label>
               ))}
-              <Button type="submit" disabled={locked}>
+              {conflict && (
+                <p role="alert">
+                  El CRM cambió. Conservamos tu borrador. Descártalo y recarga los datos actuales
+                  antes de volver a editar.
+                </p>
+              )}
+              <Button
+                type="submit"
+                disabled={
+                  locked ||
+                  conflict ||
+                  !draft ||
+                  draft.owner !== owner ||
+                  draft.customerId !== profile.customerId
+                }
+              >
                 Guardar dirección
               </Button>
-              {editing && (
+              {(editing || draft) && (
                 <Button
                   type="button"
                   variant="outline"
+                  disabled={locked}
                   onClick={() => {
                     setEditing(null);
+                    setDraft(null);
+                    setConflict(false);
                     setForm({ label: "", street: "", city: "", zip: "" });
                   }}
                 >
-                  Cancelar edición
+                  Descartar borrador y recargar datos actuales
                 </Button>
               )}
             </form>

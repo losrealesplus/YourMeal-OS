@@ -18,6 +18,14 @@ function ProfilePage() {
   const state = useCustomerSelfProfile();
   const p = state.profile.data;
   const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState<{
+    customerId: string;
+    revision: number;
+    owner: string;
+  } | null>(null);
+  const [conflict, setConflict] = useState(false);
+  const [conflictedLink, setConflictedLink] = useState<string | null>(null);
+  const owner = `${state.tenantId}/${user?.id}`;
   const [name, setName] = useState(
     () => customerOnboardingPrefill(user?.user_metadata).displayName,
   );
@@ -34,8 +42,12 @@ function ProfilePage() {
         return;
       }
       setEditing(false);
+      setDraft(null);
+      setConflict(false);
+      setConflictedLink(null);
       toast.success("Operación confirmada.");
     } catch (e) {
+      if (e instanceof Error && e.message === "STALE_REVISION" && editing) setConflict(true);
       toast.error(e instanceof Error ? e.message : "No se pudo completar el cambio.");
     }
   }
@@ -80,6 +92,8 @@ function ProfilePage() {
                     setName(p.displayName);
                     setEmail(p.email || "");
                     setPhone(p.phone || "");
+                    setDraft({ customerId: p.customerId, revision: p.revision, owner });
+                    setConflict(false);
                     setEditing(true);
                   }}
                 >
@@ -90,11 +104,18 @@ function ProfilePage() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
+                  if (
+                    !draft ||
+                    conflict ||
+                    draft.owner !== owner ||
+                    draft.customerId !== p.customerId
+                  )
+                    return;
                   void action(() =>
                     state.execute({
                       operation: "profile",
-                      customerId: p.customerId,
-                      expectedRevision: p.revision,
+                      customerId: draft.customerId,
+                      expectedRevision: draft.revision,
                       patch: { displayName: name, email: email || null, phone: phone || null },
                     }),
                   );
@@ -128,7 +149,33 @@ function ProfilePage() {
                     onChange={(e) => setPhone(e.target.value)}
                   />
                 </label>
-                <Button disabled={state.busy || state.uncertain} type="submit">
+                {conflict && (
+                  <p role="alert">
+                    El CRM cambió. Tu borrador se conserva. Recarga los datos actuales antes de
+                    volver a editar; se descartará este borrador.
+                  </p>
+                )}
+                <Button
+                  type="button"
+                  disabled={state.busy || state.uncertain}
+                  onClick={() => {
+                    setEditing(false);
+                    setDraft(null);
+                    setConflict(false);
+                  }}
+                >
+                  Descartar borrador y recargar datos actuales
+                </Button>
+                <Button
+                  disabled={
+                    state.busy ||
+                    state.uncertain ||
+                    conflict ||
+                    draft?.owner !== owner ||
+                    draft?.customerId !== p.customerId
+                  }
+                  type="submit"
+                >
                   Guardar
                 </Button>
               </form>
@@ -161,19 +208,47 @@ function ProfilePage() {
                       <Button
                         disabled={state.busy || state.uncertain}
                         onClick={() =>
-                          void action(() =>
-                            state.execute({
-                              operation: "confirm_link",
-                              linkRequestId: l.id,
-                              customerId: l.customerId!,
-                              expectedRevision: l.revision!,
-                              confirmed: true,
-                            }),
-                          )
+                          void action(async () => {
+                            try {
+                              return await state.execute({
+                                operation: "confirm_link",
+                                linkRequestId: l.id,
+                                customerId: l.customerId!,
+                                expectedRevision: l.revision!,
+                                confirmed: true,
+                              });
+                            } catch (error) {
+                              if (error instanceof Error && error.message === "STALE_REVISION")
+                                setConflictedLink(l.id);
+                              throw error;
+                            }
+                          })
                         }
                       >
                         Confirmar vinculación verificada
                       </Button>
+                    )}
+                    {conflictedLink === l.id && (
+                      <div role="alert">
+                        <p>
+                          La ficha cambió desde la verificación. Cierra esta solicitud y solicita
+                          otra; EatClean deberá verificarla de nuevo.
+                        </p>
+                        <Button
+                          disabled={state.busy || state.uncertain}
+                          onClick={() =>
+                            void action(() =>
+                              state.execute({
+                                operation: "close_conflicted_link",
+                                linkRequestId: l.id,
+                                reason: "REVISION_CONFLICT",
+                              }),
+                            )
+                          }
+                        >
+                          Cerrar solicitud conflictiva
+                        </Button>
+                      </div>
                     )}
                   </div>
                 ))
