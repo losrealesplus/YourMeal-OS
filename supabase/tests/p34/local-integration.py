@@ -30,14 +30,23 @@ try:
   if docker('exec',NAME,'cat','/proc/1/comm',check=False).stdout.strip()=='postgres' and docker('exec',NAME,'pg_isready',check=False).returncode==0:break
   time.sleep(.1)
  # Supabase image contains Auth; isolated synthetic Storage is sufficient for SQL history policies.
- sql('CREATE TABLE storage.buckets(id text PRIMARY KEY,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]); CREATE TABLE storage.objects(id uuid DEFAULT gen_random_uuid(),bucket_id text,name text,owner uuid); ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY; GRANT ALL ON storage.buckets,storage.objects TO postgres; GRANT USAGE,CREATE ON SCHEMA storage TO postgres; GRANT USAGE ON SCHEMA auth TO postgres WITH GRANT OPTION; GRANT EXECUTE ON FUNCTION auth.uid() TO postgres WITH GRANT OPTION;')
+ sql('CREATE TABLE storage.buckets(id text PRIMARY KEY,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]); CREATE TABLE storage.objects(id uuid DEFAULT gen_random_uuid(),bucket_id text,name text,owner uuid); ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY; GRANT ALL ON storage.buckets,storage.objects TO postgres; GRANT USAGE,CREATE ON SCHEMA storage TO postgres;')
  manifest=[]
  writer_query="SELECT coalesce(string_agg(md5(pg_get_functiondef(p.oid)),',' ORDER BY p.oid),'') FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='public' AND (p.proname LIKE 'cr_order_%' OR p.proname LIKE 'offer_quote%')"
  writer_before=None
+ order_acl_before=None
  for p in sorted((ROOT/'supabase/migrations').glob('*.sql')):
-  if p.name.endswith('_p34_identity_crm_profile.sql'):writer_before=sql(writer_query).stdout.strip()
+  if p.name.endswith('_p34_identity_crm_profile.sql'):
+   writer_before=sql(writer_query).stdout.strip()
+   order_acl_before=sql("SELECT has_schema_privilege('cr_order_writer','auth','USAGE')").stdout.strip()
   sql('SET ROLE postgres;\n'+p.read_text());manifest.append({'file':p.name,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})
  print('PASS','migration history',len(manifest))
+ assert sql("SELECT has_schema_privilege('p34_writer','auth','USAGE')").stdout.strip()=='f';passed.append('writer has no auth schema access')
+ assert sql("SELECT rolsuper OR rolbypassrls OR rolcanlogin FROM pg_roles WHERE rolname='p34_writer'").stdout.strip()=='f';passed.append('writer remains NOLOGIN NOSUPERUSER NOBYPASSRLS')
+ assert order_acl_before==sql("SELECT has_schema_privilege('cr_order_writer','auth','USAGE')").stdout.strip();passed.append('existing order writer auth ACL unchanged')
+ # Removing required resolver grants must still trip the security assertion. Roll back test only.
+ denied=sql("BEGIN; REVOKE EXECUTE ON FUNCTION public.current_membership_id(uuid) FROM PUBLIC,p34_writer; DO $$ BEGIN IF NOT has_schema_privilege('p34_writer','public','USAGE') OR NOT has_function_privilege('p34_writer','public.current_membership_id(uuid)','EXECUTE') THEN RAISE EXCEPTION 'P34_EXECUTOR_GRANTS_INSUFFICIENT'; END IF; END $$; ROLLBACK;",check=False)
+ assert denied.returncode and 'P34_EXECUTOR_GRANTS_INSUFFICIENT' in denied.stderr;passed.append('insufficient resolver grant still fails closed')
  assert writer_before is not None and writer_before==sql(writer_query).stdout.strip();passed.append('existing order and offer writer function definitions unchanged')
  sql(f"INSERT INTO public.tenants(id,slug,name) VALUES('{T}','p34-synthetic','Synthetic P34'),('10000000-0000-4000-8000-000000000002','p34-b','Synthetic B'); INSERT INTO auth.users(id) VALUES "+','.join(f"('{U(i)}')" for i in range(1,7))+f"; INSERT INTO public.tenant_members(tenant_id,user_id,status,membership_type) VALUES "+','.join(f"('{T}','{U(i)}','approved','customer')" for i in range(1,6))+f"; INSERT INTO public.user_roles(user_id,tenant_id,role) VALUES('{U(3)}','{T}','operations_manager'),('{U(4)}','{T}','support');")
  failure({'operation':'onboard','displayName':'Implicit'},'ONBOARDING_BLOCKED',n=5,r=101)

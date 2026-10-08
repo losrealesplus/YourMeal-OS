@@ -6,10 +6,10 @@ CREATE SCHEMA p34_private;
 REVOKE ALL ON SCHEMA p34_private FROM PUBLIC,anon,authenticated,service_role;
 CREATE ROLE p34_writer NOLOGIN NOINHERIT NOBYPASSRLS;
 DO $$ BEGIN EXECUTE format('GRANT p34_writer TO %I',current_user); END $$;
-GRANT USAGE ON SCHEMA public,auth,p34_private TO p34_writer;
+GRANT USAGE ON SCHEMA public,p34_private TO p34_writer;
 GRANT CREATE ON SCHEMA p34_private TO p34_writer;
-GRANT EXECUTE ON FUNCTION auth.uid(),public.has_role(uuid,uuid,public.app_role),public.is_saas_admin(uuid) TO p34_writer;
-DO $$ BEGIN IF NOT has_schema_privilege('p34_writer','auth','USAGE') OR NOT has_function_privilege('p34_writer','auth.uid()','EXECUTE') THEN RAISE EXCEPTION 'P34_EXECUTOR_GRANTS_INSUFFICIENT'; END IF; END $$;
+GRANT EXECUTE ON FUNCTION public.has_role(uuid,uuid,public.app_role),public.is_saas_admin(uuid),public.current_membership_id(uuid) TO p34_writer;
+DO $$ BEGIN IF NOT has_schema_privilege('p34_writer','public','USAGE') OR NOT has_function_privilege('p34_writer','public.current_membership_id(uuid)','EXECUTE') THEN RAISE EXCEPTION 'P34_EXECUTOR_GRANTS_INSUFFICIENT'; END IF; END $$;
 ALTER TABLE public.customers ADD COLUMN revision bigint NOT NULL DEFAULT 1 CHECK(revision>0);
 CREATE UNIQUE INDEX p34_active_identity ON public.customers(tenant_id,user_id) WHERE deleted_at IS NULL AND user_id IS NOT NULL;
 CREATE UNIQUE INDEX p34_customer_tenant_identity ON public.customers(tenant_id,id);
@@ -52,11 +52,17 @@ DO $$ DECLARE t text; BEGIN
  EXECUTE format('CREATE POLICY p34_canonical ON public.%I TO p34_writer USING(true) WITH CHECK(true)',t);
  END LOOP;
 END $$;
+-- Reuse the existing approved-membership resolver, whose authority is auth.uid().
+-- No auth schema privileges, role inheritance, or new SECURITY DEFINER auth bridge.
+CREATE FUNCTION p34_private.actor(t uuid) RETURNS uuid LANGUAGE sql STABLE SECURITY INVOKER SET search_path='' AS $$
+ SELECT user_id FROM public.tenant_members
+ WHERE id=public.current_membership_id(t) AND tenant_id=t AND status='approved' AND deleted_at IS NULL
+$$;
 CREATE FUNCTION p34_private.member(t uuid) RETURNS boolean LANGUAGE sql STABLE SECURITY INVOKER SET search_path='' AS $$
- SELECT auth.uid() IS NOT NULL AND EXISTS(SELECT 1 FROM public.tenant_members WHERE tenant_id=t AND user_id=auth.uid() AND status='approved' AND deleted_at IS NULL)
+ SELECT p34_private.actor(t) IS NOT NULL AND EXISTS(SELECT 1 FROM public.tenant_members WHERE tenant_id=t AND user_id=p34_private.actor(t) AND status='approved' AND deleted_at IS NULL)
 $$;
 CREATE FUNCTION p34_private.staff(t uuid,link_only boolean DEFAULT false) RETURNS boolean LANGUAGE sql STABLE SECURITY INVOKER SET search_path='' AS $$
- SELECT p34_private.member(t) AND (public.has_role(auth.uid(),t,'company_admin') OR public.has_role(auth.uid(),t,'operations_manager') OR (NOT link_only AND (public.has_role(auth.uid(),t,'support') OR public.is_saas_admin(auth.uid()))))
+ SELECT p34_private.member(t) AND (public.has_role(p34_private.actor(t),t,'company_admin') OR public.has_role(p34_private.actor(t),t,'operations_manager') OR (NOT link_only AND (public.has_role(p34_private.actor(t),t,'support') OR public.is_saas_admin(p34_private.actor(t)))))
 $$;
 CREATE FUNCTION p34_private.profile(t uuid,c uuid) RETURNS jsonb LANGUAGE sql STABLE SECURITY INVOKER SET search_path='' AS $$
  SELECT jsonb_build_object('customerId',id,'tenantId',tenant_id,'revision',revision,'displayName',display_name,'email',email,'kind',kind,
@@ -66,7 +72,7 @@ CREATE FUNCTION p34_private.profile(t uuid,c uuid) RETURNS jsonb LANGUAGE sql ST
 $$;
 CREATE FUNCTION p34_private.execute(t uuid,r uuid,j jsonb) RETURNS jsonb
 LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
-DECLARE actor uuid:=auth.uid(); op text:=j->>'operation'; c public.customers%ROWTYPE;
+DECLARE actor uuid:=p34_private.actor(t); op text:=j->>'operation'; c public.customers%ROWTYPE;
  previous p34_private.requests%ROWTYPE; link p34_private.identity_requests%ROWTYPE;
  result jsonb; cid uuid; aid uuid; replacement uuid; a public.customer_addresses%ROWTYPE;
  patch jsonb:=coalesce(j->'patch','{}'::jsonb); key text; val text; count_active integer;
@@ -220,8 +226,8 @@ BEGIN
  RETURN result||jsonb_build_object('replayed',false);
 END $$;
 ALTER FUNCTION p34_private.execute(uuid,uuid,jsonb) OWNER TO p34_writer;
-REVOKE ALL ON FUNCTION p34_private.member(uuid),p34_private.staff(uuid,boolean),p34_private.profile(uuid,uuid) FROM PUBLIC,anon,authenticated,service_role;
-GRANT EXECUTE ON FUNCTION p34_private.member(uuid),p34_private.staff(uuid,boolean),p34_private.profile(uuid,uuid) TO p34_writer;
+REVOKE ALL ON FUNCTION p34_private.actor(uuid),p34_private.member(uuid),p34_private.staff(uuid,boolean),p34_private.profile(uuid,uuid) FROM PUBLIC,anon,authenticated,service_role;
+GRANT EXECUTE ON FUNCTION p34_private.actor(uuid),p34_private.member(uuid),p34_private.staff(uuid,boolean),p34_private.profile(uuid,uuid) TO p34_writer;
 CREATE FUNCTION public.p34_customer_command(_tenant uuid,_request uuid,_command jsonb) RETURNS jsonb LANGUAGE sql SECURITY INVOKER SET search_path='' AS $$ SELECT p34_private.execute(_tenant,_request,_command) $$;
 REVOKE ALL ON FUNCTION p34_private.execute(uuid,uuid,jsonb),public.p34_customer_command(uuid,uuid,jsonb) FROM PUBLIC,anon,service_role;
 GRANT USAGE ON SCHEMA p34_private TO authenticated;
@@ -229,7 +235,7 @@ GRANT EXECUTE ON FUNCTION p34_private.execute(uuid,uuid,jsonb),public.p34_custom
 -- Public reads still verify current membership and ownership through the private function.
 CREATE FUNCTION p34_private.read_profile(t uuid,c uuid) RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
 BEGIN
- IF NOT p34_private.member(t) OR NOT EXISTS(SELECT 1 FROM public.customers WHERE tenant_id=t AND id=c AND deleted_at IS NULL AND (user_id=auth.uid() OR p34_private.staff(t))) THEN RAISE EXCEPTION 'PERMISSION_DENIED'; END IF;
+ IF NOT p34_private.member(t) OR NOT EXISTS(SELECT 1 FROM public.customers WHERE tenant_id=t AND id=c AND deleted_at IS NULL AND (user_id=p34_private.actor(t) OR p34_private.staff(t))) THEN RAISE EXCEPTION 'PERMISSION_DENIED'; END IF;
  RETURN p34_private.profile(t,c);
 END $$;
 ALTER FUNCTION p34_private.read_profile(uuid,uuid) OWNER TO p34_writer;
@@ -239,7 +245,7 @@ GRANT EXECUTE ON FUNCTION p34_private.read_profile(uuid,uuid),public.p34_custome
 CREATE FUNCTION p34_private.read_requests(t uuid) RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
 BEGIN
  IF NOT p34_private.member(t) THEN RAISE EXCEPTION 'PERMISSION_DENIED'; END IF;
- RETURN coalesce((SELECT jsonb_agg(jsonb_build_object('id',id,'userId',user_id,'customerId',customer_id,'state',CASE WHEN state='approved' AND expires_at<=now() THEN 'expired' ELSE state END,'revision',approved_revision,'expiresAt',expires_at,'displayName',(SELECT display_name FROM public.customers c WHERE c.id=customer_id AND c.tenant_id=t)) ORDER BY created_at) FROM p34_private.identity_requests WHERE tenant_id=t AND (user_id=auth.uid() OR p34_private.staff(t,true))),'[]');
+ RETURN coalesce((SELECT jsonb_agg(jsonb_build_object('id',id,'userId',user_id,'customerId',customer_id,'state',CASE WHEN state='approved' AND expires_at<=now() THEN 'expired' ELSE state END,'revision',approved_revision,'expiresAt',expires_at,'displayName',(SELECT display_name FROM public.customers c WHERE c.id=customer_id AND c.tenant_id=t)) ORDER BY created_at) FROM p34_private.identity_requests WHERE tenant_id=t AND (user_id=p34_private.actor(t) OR p34_private.staff(t,true))),'[]');
 END $$;
 ALTER FUNCTION p34_private.read_requests(uuid) OWNER TO p34_writer;
 CREATE FUNCTION public.p34_identity_requests(_tenant uuid) RETURNS jsonb LANGUAGE sql SECURITY INVOKER SET search_path='' AS $$ SELECT p34_private.read_requests(_tenant) $$;
@@ -248,8 +254,8 @@ GRANT EXECUTE ON FUNCTION p34_private.read_requests(uuid),public.p34_identity_re
 CREATE FUNCTION p34_private.readback(t uuid,r uuid) RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
 DECLARE result jsonb; BEGIN
  IF NOT p34_private.member(t) THEN RAISE EXCEPTION 'PERMISSION_DENIED'; END IF;
- SELECT q.result INTO result FROM p34_private.requests q WHERE tenant_id=t AND actor_id=auth.uid() AND request_id=r;
- IF result ? 'customerId' AND NOT p34_private.staff(t) AND NOT EXISTS(SELECT 1 FROM public.customers WHERE tenant_id=t AND id=(result->>'customerId')::uuid AND user_id=auth.uid() AND deleted_at IS NULL) THEN RAISE EXCEPTION 'PERMISSION_DENIED'; END IF;
+ SELECT q.result INTO result FROM p34_private.requests q WHERE tenant_id=t AND actor_id=p34_private.actor(t) AND request_id=r;
+ IF result ? 'customerId' AND NOT p34_private.staff(t) AND NOT EXISTS(SELECT 1 FROM public.customers WHERE tenant_id=t AND id=(result->>'customerId')::uuid AND user_id=p34_private.actor(t) AND deleted_at IS NULL) THEN RAISE EXCEPTION 'PERMISSION_DENIED'; END IF;
  RETURN result;
 END $$;
 ALTER FUNCTION p34_private.readback(uuid,uuid) OWNER TO p34_writer;
