@@ -1,7 +1,7 @@
 import { DishAllergenDeclaration } from "@/components/operations/dish-allergen-declaration";
 import type { ReactNode } from "react";
 import type { MockDish } from "@/lib/mock-catalog";
-import { DishThumb } from "./dish-thumb";
+import { MenuDishPhoto } from "./menu-dish-photo";
 import { cn } from "@/lib/utils";
 
 /**
@@ -13,6 +13,7 @@ export function MenuDishPost({
   cta,
   macrosLabel,
   imageSrc,
+  photoUrl,
   className,
 }: {
   dish: MockDish;
@@ -22,16 +23,13 @@ export function MenuDishPost({
   macrosLabel: string;
   /** Tenant product photo when available. */
   imageSrc?: string;
+  /** Canonical photo from this Dish's tenant-scoped projection. */
+  photoUrl?: string | null;
   className?: string;
 }) {
   return (
     <article className={cn("space-y-4", className)}>
-      <DishThumb
-        emoji={dish.emoji}
-        imageSrc={imageSrc}
-        size="hero"
-        className="!rounded-[1.75rem] border-0 shadow-sm"
-      />
+      <MenuDishPhoto emoji={dish.emoji} photoUrl={photoUrl} placeholder={imageSrc} />
       <div className="space-y-2 px-0.5">
         <h2 className="text-[1.35rem] font-extrabold tracking-tight leading-tight text-balance">
           {dish.name}

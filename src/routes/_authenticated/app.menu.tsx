@@ -80,6 +80,7 @@ function MenuPage() {
           <MenuDishPost
             key={d.id + active}
             dish={d}
+            photoUrl={d.photoUrl}
             imageSrc={dishPhoto}
             macrosLabel={dishMacrosLine(d, macroLabels)}
             cta={
