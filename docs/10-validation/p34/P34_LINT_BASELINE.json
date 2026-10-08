@@ -1,0 +1,78 @@
+[
+  {
+    "file": "src/modules/orders/application/staff-order-capture-service.spec.ts",
+    "baseline_errors": 29,
+    "baseline_rules": [
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "prefer-const",
+      "prefer-const",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any"
+    ]
+  },
+  {
+    "file": "src/modules/orders/application/staff-order-capture-service.ts",
+    "baseline_errors": 15,
+    "baseline_rules": [
+      "prettier/prettier",
+      "prettier/prettier",
+      "prettier/prettier",
+      "prettier/prettier",
+      "prettier/prettier",
+      "prettier/prettier",
+      "prettier/prettier",
+      "@typescript-eslint/no-explicit-any",
+      "prettier/prettier",
+      "prettier/prettier",
+      "prettier/prettier",
+      "@typescript-eslint/no-explicit-any",
+      "prettier/prettier",
+      "prettier/prettier",
+      "prettier/prettier"
+    ]
+  },
+  {
+    "file": "src/routes/_authenticated/admin.customers.tsx",
+    "baseline_errors": 14,
+    "baseline_rules": [
+      "prettier/prettier",
+      "prettier/prettier",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "@typescript-eslint/no-explicit-any",
+      "prettier/prettier",
+      "prettier/prettier",
+      "prettier/prettier",
+      "prettier/prettier",
+      "prettier/prettier",
+      "prettier/prettier",
+      "prettier/prettier",
+      "@typescript-eslint/no-explicit-any"
+    ]
+  }
+]

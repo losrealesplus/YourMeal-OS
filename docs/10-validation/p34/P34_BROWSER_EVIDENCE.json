@@ -1,0 +1,21 @@
+{
+  "state": "LOCAL_E2E_SQL_AND_UI_PASS",
+  "checks": [
+    "canonical profile edit",
+    "staff sees same canonical CRM",
+    "address creation",
+    "atomic default switch",
+    "address edit",
+    "default archive requires replacement",
+    "restore preserves current default",
+    "lost response reconciles without second mutation",
+    "staff verifies exact selected CRM",
+    "customer second confirmation",
+    "no staff auto-materialization",
+    "no runtime errors or external connections"
+  ],
+  "sqlRuntime": "linux/aarch64",
+  "auth": "synthetic laboratory sessions only; no real OAuth or JWT certification",
+  "styling": "functional harness CSS; product visual/device certification not claimed",
+  "providerConnections": 0
+}
