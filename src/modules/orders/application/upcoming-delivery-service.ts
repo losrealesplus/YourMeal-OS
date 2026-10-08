@@ -74,8 +74,7 @@ export const UpcomingDeliveryService = {
         .select("id, label, street, city, is_default")
         .eq("tenant_id", tenantId)
         .eq("customer_id", customerId)
-        .in("id", addressIds)
-        .is("deleted_at", null);
+        .in("id", addressIds);
       if (aErr) throw aErr;
       for (const a of (addrs ?? []) as Array<{
         id: string;
@@ -94,9 +93,9 @@ export const UpcomingDeliveryService = {
       .eq("tenant_id", tenantId)
       .eq("customer_id", customerId)
       .is("deleted_at", null)
-      .order("is_default", { ascending: false })
-      .limit(1);
+      .eq("is_default", true);
     if (dErr) throw dErr;
+    if ((defaults ?? []).length > 1) throw new Error("DEFAULT_INCONSISTENT");
     const def = (defaults ?? [])[0] as
       | {
           label: string | null;
@@ -114,9 +113,9 @@ export const UpcomingDeliveryService = {
         .sort();
       const deliveryDate = days[0] ?? row.week_start;
       const itemCount = items.reduce((s, i) => s + Number(i.qty || 1), 0);
-      const address =
-        (row.delivery_address_id ? addressById.get(row.delivery_address_id) : null) ??
-        defaultAddress;
+      const address = row.delivery_address_id
+        ? (addressById.get(row.delivery_address_id) ?? null)
+        : defaultAddress;
 
       return {
         id: row.id,

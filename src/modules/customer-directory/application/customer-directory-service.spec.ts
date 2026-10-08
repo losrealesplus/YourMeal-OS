@@ -156,7 +156,7 @@ describe("CustomerDirectoryService.updateIndividual", () => {
     ).rejects.toMatchObject({ code: "NOT_FOUND" });
   });
 
-  it("successfully updates customer and writes audit log with oldData and newData", async () => {
+  it("updates through canonical revision/idempotency RPC without a second audit write", async () => {
     const ctx = mockCtx(["customers.write"]);
     const initialCustomer = {
       id: "cust-1",
@@ -171,6 +171,13 @@ describe("CustomerDirectoryService.updateIndividual", () => {
     let updatedEmail = initialCustomer.email;
 
     const fakeSupabase = {
+      rpc: vi.fn(async (name, args) => {
+        expect(name).toBe("p34_customer_command");
+        expect(args._command.expectedRevision).toBe(1);
+        updatedDisplayName = args._command.patch.displayName;
+        updatedEmail = args._command.patch.email;
+        return { data: { customerId: "cust-1", revision: 2 }, error: null };
+      }),
       from: vi.fn().mockImplementation((table: string) => {
         if (table === "customers") {
           return {
@@ -233,6 +240,8 @@ describe("CustomerDirectoryService.updateIndividual", () => {
     ctx.supabase = fakeSupabase;
 
     const result = await CustomerDirectoryService.updateCustomer(ctx, "cust-1", {
+      expectedRevision: 1,
+      requestId: "10000000-0000-4000-8000-000000000001",
       displayName: "Alexander Modificado",
       email: "alex.new@example.com",
       phone: "+34611223344",

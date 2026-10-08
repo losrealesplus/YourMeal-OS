@@ -27,6 +27,8 @@ export type Capability =
   | "orders.manage"
   | "customers.read"
   | "customers.write"
+  | "profile.manage"
+  | "customers.link_identity"
   | "support.read"
   | "support.write"
   | "kitchen.operate"
@@ -63,6 +65,7 @@ const STAFF_ROLES: AppRole[] = [
 /** Role → capabilities. Single source of truth with CAPABILITY_MATRIX.md */
 const ROLE_CAPABILITIES: Record<AppRole, readonly Capability[]> = {
   saas_admin: [
+    "profile.manage",
     "dishes.read",
     "dishes.create",
     "dishes.update",
@@ -125,6 +128,8 @@ const ROLE_CAPABILITIES: Record<AppRole, readonly Capability[]> = {
     "orders.manage",
     "customers.read",
     "customers.write",
+    "customers.link_identity",
+    "profile.manage",
     "support.read",
     "support.write",
     "kitchen.operate",
@@ -151,6 +156,8 @@ const ROLE_CAPABILITIES: Record<AppRole, readonly Capability[]> = {
     "orders.manage",
     "customers.read",
     "customers.write",
+    "customers.link_identity",
+    "profile.manage",
     "kitchen.operate",
     "production.operate",
     "purchasing.operate",
@@ -163,6 +170,7 @@ const ROLE_CAPABILITIES: Record<AppRole, readonly Capability[]> = {
     "users.create",
   ],
   kitchen: [
+    "profile.manage",
     "dishes.read",
     "ingredients.read",
     "recipes.read",
@@ -171,6 +179,7 @@ const ROLE_CAPABILITIES: Record<AppRole, readonly Capability[]> = {
     "kitchen.operate",
   ],
   production: [
+    "profile.manage",
     "dishes.read",
     "dishes.create",
     "dishes.update",
@@ -184,6 +193,7 @@ const ROLE_CAPABILITIES: Record<AppRole, readonly Capability[]> = {
     "production.operate",
   ],
   purchasing: [
+    "profile.manage",
     "dishes.read",
     "ingredients.read",
     "ingredients.create",
@@ -193,6 +203,7 @@ const ROLE_CAPABILITIES: Record<AppRole, readonly Capability[]> = {
     "purchasing.operate",
   ],
   inventory: [
+    "profile.manage",
     "dishes.read",
     "ingredients.read",
     "ingredients.create",
@@ -201,10 +212,11 @@ const ROLE_CAPABILITIES: Record<AppRole, readonly Capability[]> = {
     "recipes.read",
     "inventory.operate",
   ],
-  accounting: ["orders.read", "customers.read", "accounting.operate"],
-  logistics: ["orders.read", "customers.read", "logistics.operate"],
-  delivery: ["orders.read", "customers.read", "logistics.operate"],
+  accounting: ["profile.manage", "orders.read", "customers.read", "accounting.operate"],
+  logistics: ["profile.manage", "orders.read", "customers.read", "logistics.operate"],
+  delivery: ["profile.manage", "orders.read", "customers.read", "logistics.operate"],
   support: [
+    "profile.manage",
     "customers.read",
     "customers.write",
     "orders.read",
@@ -212,9 +224,9 @@ const ROLE_CAPABILITIES: Record<AppRole, readonly Capability[]> = {
     "support.read",
     "support.write",
   ],
-  driver: ["orders.read", "logistics.operate"],
-  employee: ["dishes.read", "menus.read"],
-  customer: ["menus.read", "orders.read", "orders.write"],
+  driver: ["profile.manage", "orders.read", "logistics.operate"],
+  employee: ["profile.manage", "dishes.read", "menus.read"],
+  customer: ["menus.read", "orders.read", "orders.write", "profile.manage"],
 };
 
 export function capabilitiesFor(roles: readonly AppRole[]): Set<Capability> {
@@ -261,10 +273,7 @@ export function hasStaffAccess(roles: readonly AppRole[]): boolean {
   return roles.some((r) => isStaffRole(r)) || roles.includes("saas_admin");
 }
 
-export function requireCapability(
-  roles: readonly AppRole[],
-  capability: Capability,
-): void {
+export function requireCapability(roles: readonly AppRole[], capability: Capability): void {
   if (!can(roles, capability)) {
     throw permissionDenied(capability);
   }
