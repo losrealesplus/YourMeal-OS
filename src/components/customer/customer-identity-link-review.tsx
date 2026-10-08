@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { customerProfileClient } from "@/modules/customer-directory/application/customer-profile-client";
@@ -14,34 +14,55 @@ export function CustomerIdentityLinkReview({
   revision?: number;
   displayName: string;
 }) {
-  const { tenantId, roles } = useAuth();
+  const { tenantId, user, roles } = useAuth();
   const allowed = roles.includes("company_admin") || roles.includes("operations_manager");
   const repo = customerProfileClient;
-  const [selected, setSelected] = useState("");
-  const [verified, setVerified] = useState(false);
+  const scope = `${tenantId}/${user?.id}/${customerId}/${revision}`;
+  const [verification, setVerification] = useState({ scope, selected: "", verified: false });
+  // Derived synchronously: there is no render/effect window where A's checkbox authorizes B.
+  const selected = verification.scope === scope ? verification.selected : "";
+  const verified = verification.scope === scope && verification.verified;
+  useEffect(() => {
+    setVerification({ scope, selected: "", verified: false });
+  }, [scope]);
+  const sessionContext = useRef<{ owner: string; customerId: string } | null>(null);
+  const owner = `${tenantId}/${user?.id}`;
   const [pending, setPending] = useState(false);
   const session = useRef(createCustomerMutationSession(repo)).current;
+  const originalContext =
+    !session.pending ||
+    (sessionContext.current?.owner === owner && sessionContext.current.customerId === customerId);
   const [uncertain, setUncertain] = useState(false);
   const [mayRetry, setMayRetry] = useState(false);
   const query = useQuery({
-    queryKey: ["p34-link-review", tenantId],
+    queryKey: ["p34-link-review", tenantId, user?.id],
     enabled: Boolean(allowed && tenantId),
     queryFn: () => repo.identityRequests(tenantId!),
   });
   if (!allowed) return null;
   async function approve() {
-    if (pending || uncertain || !verified || !selected || !revision) return;
+    if (
+      pending ||
+      uncertain ||
+      !verified ||
+      !selected ||
+      !revision ||
+      !tenantId ||
+      !query.data?.some((r) => r.id === selected && r.state === "requested")
+    )
+      return;
+    const bound = { tenantId, customerId, revision, linkRequestId: selected };
+    sessionContext.current = { owner, customerId };
     setPending(true);
     try {
-      await session.execute(tenantId!, {
+      await session.execute(bound.tenantId, {
         operation: "approve_link",
-        customerId,
-        expectedRevision: revision!,
-        linkRequestId: selected,
+        customerId: bound.customerId,
+        expectedRevision: bound.revision,
+        linkRequestId: bound.linkRequestId,
         verified: true,
       });
-      setSelected("");
-      setVerified(false);
+      setVerification({ scope, selected: "", verified: false });
       await query.refetch();
       toast.success("Verificación registrada. Falta la confirmación del cliente.");
     } catch (e) {
@@ -66,8 +87,7 @@ export function CustomerIdentityLinkReview({
           className="w-full border p-2"
           value={selected}
           onChange={(e) => {
-            setSelected(e.target.value);
-            setVerified(false);
+            setVerification({ scope, selected: e.target.value, verified: false });
           }}
           disabled={pending || Boolean(uncertain)}
         >
@@ -86,22 +106,36 @@ export function CustomerIdentityLinkReview({
           type="checkbox"
           checked={verified}
           disabled={pending || Boolean(uncertain)}
-          onChange={(e) => setVerified(e.target.checked)}
+          onChange={(e) => setVerification({ scope, selected, verified: e.target.checked })}
         />
         He verificado que esta identidad corresponde a esta ficha.
       </label>
       <Button
-        disabled={!verified || !selected || !revision || pending || Boolean(uncertain)}
+        disabled={
+          !verified ||
+          !selected ||
+          !revision ||
+          !query.data?.some((r) => r.id === selected && r.state === "requested") ||
+          pending ||
+          Boolean(uncertain)
+        }
         onClick={() => void approve()}
       >
         Aprobar vinculación para confirmación del cliente
       </Button>
       {uncertain && (
         <div role="alert">
-          <p>Comprueba la solicitud antes de volver a aprobar.</p>
+          <p>
+            Comprueba la solicitud antes de volver a aprobar. Ficha original:{" "}
+            {sessionContext.current?.customerId}.
+          </p>
+          {!originalContext && (
+            <p>Vuelve a la ficha y sesión originales para reconciliar esta solicitud.</p>
+          )}
           <Button
-            disabled={pending}
-            onClick={() =>
+            disabled={pending || !originalContext}
+            onClick={() => {
+              if (!originalContext) return;
               void session
                 .reconcile()
                 .then((r) => {
@@ -114,15 +148,16 @@ export function CustomerIdentityLinkReview({
                     toast.info("No hay resultado registrado. Puedes reenviar la misma solicitud.");
                   }
                 })
-                .catch((e) => toast.error(String(e)))
-            }
+                .catch((e) => toast.error(String(e)));
+            }}
           >
             Comprobar resultado
           </Button>
           {mayRetry && (
             <Button
-              disabled={pending}
+              disabled={pending || !originalContext}
               onClick={async () => {
+                if (!originalContext) return;
                 setPending(true);
                 try {
                   await session.retrySame();

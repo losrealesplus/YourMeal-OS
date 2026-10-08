@@ -45,6 +45,13 @@ export const customerCommandSchema = z.discriminatedUnion("operation", [
   z.object({ operation: z.literal("request_link") }).strict(),
   z
     .object({
+      operation: z.literal("close_conflicted_link"),
+      linkRequestId: uuid,
+      reason: z.literal("REVISION_CONFLICT"),
+    })
+    .strict(),
+  z
+    .object({
       operation: z.literal("approve_link"),
       ...aggregate,
       linkRequestId: uuid,
@@ -115,7 +122,7 @@ export type IdentityRequest = {
   id: string;
   userId: string;
   customerId: string | null;
-  state: "requested" | "approved" | "consumed" | "expired";
+  state: "requested" | "approved" | "consumed" | "expired" | "closed";
   displayName?: string | null;
   revision: number | null;
   expiresAt: string | null;
