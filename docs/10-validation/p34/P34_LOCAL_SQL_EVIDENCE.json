@@ -1,0 +1,309 @@
+{
+  "state": "LOCAL_SQL_QUALIFIED_PROVIDER_UNVERIFIED",
+  "architecture": "linux/aarch64",
+  "image": "public.ecr.aws/supabase/postgres@sha256:3866d94d8426927e8db3f1c5d790752292bfbe27b5f1f46e199ae1b7d3c1710b",
+  "tests": [
+    "existing order and offer writer function definitions unchanged",
+    "ONBOARDING_BLOCKED",
+    "INVALID_TYPE",
+    "INVALID_EMAIL",
+    "onboarding creates canonical CRM without membership/role grants",
+    "ALREADY_ASSOCIATED",
+    "STAFF_ONBOARDING_FORBIDDEN",
+    "PERMISSION_DENIED",
+    "INVALID_EMAIL",
+    "profile atomic",
+    "exact idempotent replay",
+    "REQUEST_PAYLOAD_MISMATCH",
+    "STALE_REVISION",
+    "PERMISSION_DENIED",
+    "FIELD_NOT_ALLOWED",
+    "first address default",
+    "second address preserves default",
+    "DEFAULT_REPLACEMENT_REQUIRED",
+    "explicit replacement atomic",
+    "restore preserves default",
+    "PERMISSION_DENIED",
+    "raw customers denied",
+    "raw customer_addresses denied",
+    "raw customer_phones denied",
+    "staff/customer concurrency one winner",
+    "ONBOARDING_BLOCKED",
+    "PERMISSION_DENIED",
+    "LINK_NOT_CONFIRMABLE",
+    "double confirmation exact identity",
+    "service_role denied"
+  ],
+  "migrations": [
+    {
+      "file": "20260720164312_9137d8ab-e998-4e02-816c-63bda5634159.sql",
+      "sha256": "a846787d08b28ec99e908347cc5097e8d00cf833bac4d5d1072fc7705b2647f0"
+    },
+    {
+      "file": "20260720164327_63fdc61e-1100-4fa6-ad62-e2a91eb9f2b1.sql",
+      "sha256": "f13600bd9ec188c2d2172ca36c40e22b00ddde9b6f51b019d8629a67f084442a"
+    },
+    {
+      "file": "20260720170834_2a394c23-2b57-4ded-87ae-7824d406b01e.sql",
+      "sha256": "deec427ec89aa8bfe85f2236ced2a5005708c4b53a1aef37bc7bd2fd1b3e6c5e"
+    },
+    {
+      "file": "20260720210000_soft_delete_audit_feature_flags.sql",
+      "sha256": "ea5e6dc0796198362ba082542e39ab13ac90a3d8ab3b921c248631fa1b99f132"
+    },
+    {
+      "file": "20260720220000_foundation_lock_soft_delete_rbac.sql",
+      "sha256": "2e6273ddea8636c3461e40bc6b88aff09c7adef08667fe60612ca5788bf12b70"
+    },
+    {
+      "file": "20260721190000_dish_infra_align_domain.sql",
+      "sha256": "33fc81e4cccf3c6c261bc5d60da168e646d212310aa4067a41f4b6d760e5cff7"
+    },
+    {
+      "file": "20260722172703_596a291b-6c2c-4e61-a38a-27760d7bc0bc.sql",
+      "sha256": "14b158c9dfb7c724b4f7ab23ddb7d09184cac7e7047baa940954ed3bcd6f1b81"
+    },
+    {
+      "file": "20260722172737_55b5491b-422d-4966-b5df-fb5c62d8ed02.sql",
+      "sha256": "bf277b1e2d9b1ce5cd955c40ae8e8a81f43af50258f13beab68c41265be41e46"
+    },
+    {
+      "file": "20260723120000_program_draft_order_atomic.sql",
+      "sha256": "9ffc9137cd26cee116eb0b7eb633f259f86c114a002799af2888d6a7784b6d6c"
+    },
+    {
+      "file": "20260723174724_de4a9047-5477-4932-abcc-94ce217570b3.sql",
+      "sha256": "842b2b39106901439c82999b2e5394998a2cdcfa61da302cca24597f124a2511"
+    },
+    {
+      "file": "20260723183000_b2b_b2c_customer_model.sql",
+      "sha256": "118df5908261feb3e73bf06b8d1a62e4b5c6ae57c3a8dd9f7b1c470baf4f799f"
+    },
+    {
+      "file": "20260723190000_company_provision_staff_only.sql",
+      "sha256": "30a887e7fbaa170fde6bdd071dcbc7498fd185c189305abefaf1bf005cdfe7a4"
+    },
+    {
+      "file": "20260723193459_41cf7a3a-71c9-4f23-8d9d-f41660ade316.sql",
+      "sha256": "434e865ad91397c555b1debeddb074f010362f18b3e2864e01abce6c34ac0f84"
+    },
+    {
+      "file": "20260723200000_operations_workspace_statuses.sql",
+      "sha256": "d1612ea208d76465586ecacd62480a57a2f72948745550cb19e16f884953ff7f"
+    },
+    {
+      "file": "20260723200100_operations_transition_rpc.sql",
+      "sha256": "d5ad6c85880bb7d05dba3e7d4ea0888c0470df6ac18a0dc2a25bc7ae96ab480d"
+    },
+    {
+      "file": "20260724132839_f9e39003-6584-4d8b-af26-975d95c6dd20.sql",
+      "sha256": "5495f5b32242bb5a2b5a886e1a162589bdf73adcf4c9ad6b0fa84275fdfb3b1d"
+    },
+    {
+      "file": "20260724132857_5f8e76e5-5e14-45a6-b36a-d890ab2e6d20.sql",
+      "sha256": "bd129346fa3265e808baed8f8807b3e55b74513620ea18f00fd6cd55d5d120e0"
+    },
+    {
+      "file": "20260724160000_customer_dish_favorites.sql",
+      "sha256": "38bfc27de5c8d86abf622fb1a27596f302f16bd0f406751061cd9d914d5b98bd"
+    },
+    {
+      "file": "20260724170000_kitchen_production_batches.sql",
+      "sha256": "2f6793171ca2f6fa936d5d157c340fabed60b19931518ae7166baf37e4bb9092"
+    },
+    {
+      "file": "20260724185434_2bdc2c0f-86fa-45f7-bb2a-d34dfe96ee30.sql",
+      "sha256": "7dd744883d61c7c7dbe56440941cf1de25d5e084296336631c9db615df24b878"
+    },
+    {
+      "file": "20260725120000_op002_platform_owners_bootstrap.sql",
+      "sha256": "4f05904a9343e87aeebde3bfe56f37b33001a86f87473b86afbc4d2f25f3c9cd"
+    },
+    {
+      "file": "20260725123000_op002_platform_owners_config.sql",
+      "sha256": "a50835a1cde880d42fbe941a90cfef14f263efe395312f76725815ffc5c5d629"
+    },
+    {
+      "file": "20260728200000_support_note_lifecycle.sql",
+      "sha256": "e543713c06cf6b52ae36ea74cecc66301d61db44dd515073f3335e9bddde9ec1"
+    },
+    {
+      "file": "20260728202853_48233bd7-5fd1-4f21-a721-7ad67caacaed.sql",
+      "sha256": "4d5d25f4c0da3582eca25b8dd8aad580e295b27382d9f535e8076a45705b7609"
+    },
+    {
+      "file": "20260728202923_9631ede0-19f6-416e-9706-84e99e666f9c.sql",
+      "sha256": "7e49e4521a29704ed12f5ebc786c5b47a534c4b80bab198c9ef0bb4ffdb562d2"
+    },
+    {
+      "file": "20260728210000_accounting_invoice_orders.sql",
+      "sha256": "e61a952156e59812cbbbd1e0c4c937a871398529d87d867ed208e5f380d3ebf6"
+    },
+    {
+      "file": "20260728220000_accounting_review_period_close.sql",
+      "sha256": "76082fc0020c6229bc7901aed1f870712529b4452e1624f40d4a7b7b48787f4a"
+    },
+    {
+      "file": "20260729100000_identity_membership_lifecycle.sql",
+      "sha256": "e00b1d634b564681ee59b55c0ee666a891fa940e6166a0ccbc3c312f69dae120"
+    },
+    {
+      "file": "20260729120000_identity_hardening_v1.sql",
+      "sha256": "c9231c23893b8765aa1f9823024df14b530a13c4d33ff67cd24de47185e6ef39"
+    },
+    {
+      "file": "20260729184500_infra008_tenant_branding_bucket.sql",
+      "sha256": "865fd8be08fad0acbb110b882fe06341103fddded19dc78481b6ecf9dac4a3fd"
+    },
+    {
+      "file": "20260729184828_4ddc6cba-153d-4881-bb43-b7b585f6f7d0.sql",
+      "sha256": "8cafa4b974c729824688f70ba1c46b0748d53f233586ddfcfd49f9178d6b1cd5"
+    },
+    {
+      "file": "20260729184916_07e6e663-6a71-4a74-9652-c61d0efde124.sql",
+      "sha256": "4a07c5fd31089e14ed2b89cb5ccddef14998ea7c30ff578b1a4c146d4aa0c0bb"
+    },
+    {
+      "file": "20260729190000_infra009_tenant_branding_bucket.sql",
+      "sha256": "69bf2b3a6f256e7f6573a6473bea53711389f191a55b871b0658aa257a18fd61"
+    },
+    {
+      "file": "20260729191000_infra011_tenant_branding_bucket.sql",
+      "sha256": "c1aaa9bea3fe1ff92bd204bddf53ef93c90d07d5a71d184af93ec83472cd1bd2"
+    },
+    {
+      "file": "20260809172400_drop_recursive_company_employees_rls.sql",
+      "sha256": "298fadada038a445bfa1f3869f89180328f48809549c81fc9ad75550afe2bbf3"
+    },
+    {
+      "file": "20260809181400_tenant_join_code.sql",
+      "sha256": "bec823ee764c4d92231e06f8c22cf331146695cc0d6308f5a3c67fefdbc2053a"
+    },
+    {
+      "file": "20260810143000_request_tenant_association.sql",
+      "sha256": "772dfe1b43b4e96cf565afaa5efad5af4926978c5fd5995cfad55d6e8faf44e6"
+    },
+    {
+      "file": "20260810180000_tenant_deployments.sql",
+      "sha256": "2e07fd59b0637d4d4ef8721b5a61b2af5731d227d0ef0b9300da551f47d36653"
+    },
+    {
+      "file": "20260823170000_operational_exceptions_v1.sql",
+      "sha256": "ae6fd613a2bd4d99efa3e328f07e4b34897fac37ca0c29fad3ab882deced4e5c"
+    },
+    {
+      "file": "20260826200000_relative_menu_scheduling.sql",
+      "sha256": "233bf17378971ae53e2a4f12874203652ef4cc6a6ef75429403863d564de5fcc"
+    },
+    {
+      "file": "20260905180000_customer_quality_alerts.sql",
+      "sha256": "316e11eefa998762af46d25ef3eb8100691f375140e24c004c876c26f0f1b80a"
+    },
+    {
+      "file": "20260908120000_customer_deployment_auto_approval.sql",
+      "sha256": "a6589b7f0e0d8babbc56dd4a33b2060c4518a28518823ea60bbad484bb39d857"
+    },
+    {
+      "file": "20260925203000_order_items_pricing_snapshot.sql",
+      "sha256": "50208bec103177712e12ad21c2fb1b0b8fe361a0822eeb64f861a21b59fb6f81"
+    },
+    {
+      "file": "20260926170000_procurement_cost_foundation.sql",
+      "sha256": "dd7bcdad55ca1c0e4b4f01b35d2a03320f11a8fa68d0639890a6036a9ebd1183"
+    },
+    {
+      "file": "20260926180000_food_recipe_costing_extension.sql",
+      "sha256": "f3be81d11a083750f793aa8e41faf919397441ede39c0838342d838855ef1de8"
+    },
+    {
+      "file": "20260926190000_cost_simulation_scenarios_and_intents.sql",
+      "sha256": "6148325dc30e687084991b89a2817572349565a882b831951aff7802fde2fe69"
+    },
+    {
+      "file": "20260927120000_food_market_intelligence_foundation.sql",
+      "sha256": "3db982cffcc0bfc572af12b2820def9ab1ee47aa4bcdf32cc92c939527153a95"
+    },
+    {
+      "file": "20260927200000_cr_cost_07a_economic_study_foundation.sql",
+      "sha256": "07ef021edcade61d5d37b1ad331ec1f88b29aecb81d5f4a44f3dfdeb8a9ddaaa"
+    },
+    {
+      "file": "20260927210000_cr_cost_07b_production_and_operational_engine.sql",
+      "sha256": "cfcb440312714cf81078ec1bf1f9cfcfd212e2e9bc596b7db3d834698b2016f4"
+    },
+    {
+      "file": "20260927220000_cr_cost_07c_decision_intelligence.sql",
+      "sha256": "d153829d4925ba8b57712dd2a0247b66ec339c81f7e02ed711f1dd17d7696573"
+    },
+    {
+      "file": "20260927221000_fix_study_decisions_rls_tenant_isolation.sql",
+      "sha256": "4841fb69aacc6952fa5545b0f170da3c45e766ce4796b53eb5b4e3f42fe83ca7"
+    },
+    {
+      "file": "20260928213500_cr_ops_04_tenant_media_bucket.sql",
+      "sha256": "e847ce3257c56cb76c8ac0e6aef99a77d903b945c0471023ea49d016de8773d1"
+    },
+    {
+      "file": "20261002100000_cr_cust_01_customer_dietary_profiles.sql",
+      "sha256": "db341afc57de3e91908f883fc1c2ca2569b2fa7d60e07e5cb3e4102d4c1f4083"
+    },
+    {
+      "file": "20261002110000_cr_cust_01_hf01_customer_dietary_profiles_operations_manager_rls.sql",
+      "sha256": "be2acec4ee16c6addff38d5e3619d3b67d569769909c7970926fb1bbe0c2d150"
+    },
+    {
+      "file": "20261002120000_cr_ops_diet_01_customer_dietary_profiles_client_rls.sql",
+      "sha256": "5385737e3563535051d80d92656bf9558a52b864dd2931a2440f533943031473"
+    },
+    {
+      "file": "20261002130000_cr_ops_06_delivery_services.sql",
+      "sha256": "02db63021bb4265ea87f51b051d3e69dc233c8b8d9f1883d8a08ae5204a29aab"
+    },
+    {
+      "file": "20261005113919_cr_order_expand_readers_foundation.sql",
+      "sha256": "9230471b07b8ddd287d02ec5aecfb84f6ce3de0502ce76b631f0da9e5e0c424c"
+    },
+    {
+      "file": "20261005131410_offer_pricing_nullable_foundation.sql",
+      "sha256": "724eae6ee6572f989851431c1eeb0e4a198008a6a6c388e539085fe3182a6011"
+    },
+    {
+      "file": "20261005174218_cr_order_v2_dish_writer.sql",
+      "sha256": "4ffdf99b6ec020930ce5dbb87cc85f0d3153a4613ba758f6d524f53b344c629b"
+    },
+    {
+      "file": "20261005174256_offer_pricing_canonical_quote_capture.sql",
+      "sha256": "99f331797700c4e19c7e8aa7f3131c6e6860a4912ddb5cbcad280f536f3219de"
+    },
+    {
+      "file": "20261006072046_cr_order_a4a_custom_writer.sql",
+      "sha256": "206353584ac32770f849645cd47871ce5567a87fafffed0729d7069fcb7f3299"
+    },
+    {
+      "file": "20261006110000_cr_menu_offer_pricing_m3_individual_line.sql",
+      "sha256": "d52df564a1df3564a9a4e516e843586f035345b78b9e13bc193a9ac69c8ffc7b"
+    },
+    {
+      "file": "20261007020208_cr_order_a5_lifecycle_ledger_expand.sql",
+      "sha256": "a4ae81e745ec556485b004aaff218af97dcd1b60d8f32a430a2b01440491dc47"
+    },
+    {
+      "file": "20261007020245_cr_order_a5_lifecycle_writer.sql",
+      "sha256": "ffb41a798cddf851b34dc2bc7f63590edb33cdf3c69c1fa7b75ac914aeddf310"
+    },
+    {
+      "file": "20261007020849_cr_order_a5_audit_uuid_compatibility.sql",
+      "sha256": "303cd5971c63c726caa5cce234045baefba48a464d90c6150b3298e536024f4f"
+    },
+    {
+      "file": "20261008112217_p34_identity_crm_profile.sql",
+      "sha256": "e31f7df93b48f3b19ccd5d6d6db9b0b0f4fd9617c9cf1315ca45749bf541ba42"
+    }
+  ],
+  "network": "none",
+  "provider_access": false,
+  "limitations": [
+    "Synthetic Storage fixture; no provider/live certification",
+    "Browser E2E and legacy callers qualification separate"
+  ]
+}
