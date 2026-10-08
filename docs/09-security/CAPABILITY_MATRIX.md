@@ -170,3 +170,10 @@ La UI puede ocultar el acceso; la **seguridad** es Service + roles/capabilities 
 2. Update `src/permissions/index.ts` to match.
 3. Add/adjust route guards and Service checks.
 4. Never grant in UI only.
+
+## P34 — Perfil canónico y vinculación asistida
+
+Contrato D1–D5 aprobado en `docs/10-validation/p34/P34_CONTRACT_FREEZE.md`.
+`profile.manage` permite exclusivamente la ficha propia de un miembro aprobado, incluida una identidad staff previamente vinculada; jamás la de otra persona. La autoridad SQL vuelve a comprobar tenant y owner; la UI no constituye autorización.
+`customers.link_identity` corresponde únicamente a `company_admin` y `operations_manager` con membership aprobada del tenant exacto. `support` no puede vincular identidades. Staff mantiene su `customers.write` para el perfil comercial; cliente recibe solo `profile.manage`, no `customers.write`.
+El merge/aplicación local no activa OAuth ni concede membership. No hay cambios de governance ni autoridad Tier3.

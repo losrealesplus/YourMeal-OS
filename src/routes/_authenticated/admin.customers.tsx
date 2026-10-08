@@ -1,3 +1,4 @@
+import { CustomerIdentityLinkReview } from "@/components/customer/customer-identity-link-review";
 /**
  * ADMIN · Clientes — Hub Canónico Unificado de Clientes y Empresas (CR — Clientes Unificados).
  *
@@ -157,7 +158,9 @@ function AdminCustomersPage() {
   // Selected Customer Detail State
   const [selectedCustomer, setSelectedCustomer] = useState<IndividualCustomerRecord | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
-  const [customerMemberships, setCustomerMemberships] = useState<CustomerCompanyMembershipRecord[]>([]);
+  const [customerMemberships, setCustomerMemberships] = useState<CustomerCompanyMembershipRecord[]>(
+    [],
+  );
   const [customerOrders, setCustomerOrders] = useState<CustomerOrderSummary[]>([]);
   const [customerNotes, setCustomerNotes] = useState<SupportNoteRecord[]>([]);
 
@@ -297,7 +300,10 @@ function AdminCustomersPage() {
       setMembershipsError(null);
       try {
         const ctx = await getCtx();
-        const memberships = await CompanyAccountService.listCustomerCompanyMemberships(ctx, customerId);
+        const memberships = await CompanyAccountService.listCustomerCompanyMemberships(
+          ctx,
+          customerId,
+        );
         setCustomerMemberships(memberships);
         setMembershipsStatus("success");
       } catch (err) {
@@ -461,6 +467,8 @@ function AdminCustomersPage() {
     try {
       const ctx = await getCtx();
       const updated = await CustomerDirectoryService.updateIndividual(ctx, selectedCustomer.id, {
+        expectedRevision: selectedCustomer.revision,
+        requestId: crypto.randomUUID(),
         displayName: editProfileForm.displayName,
         email: editProfileForm.email || null,
         phone: editProfileForm.phone || null,
@@ -947,9 +955,14 @@ function AdminCustomersPage() {
       {/* ========================================================================= */}
       {/* DRAWER DE CLIENTE INTEGRADO (MASTER-DETAIL) */}
       {/* ========================================================================= */}
-      <Sheet open={Boolean(selectedCustomerId)} onOpenChange={(open) => !open && closeCustomerDrawer()}>
+      <Sheet
+        open={Boolean(selectedCustomerId)}
+        onOpenChange={(open) => !open && closeCustomerDrawer()}
+      >
         <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto p-6 space-y-6">
-          <DrawerErrorBoundary onReset={() => selectedCustomerId && loadCustomerDetails(selectedCustomerId)}>
+          <DrawerErrorBoundary
+            onReset={() => selectedCustomerId && loadCustomerDetails(selectedCustomerId)}
+          >
             {loadingDetail && !selectedCustomer ? (
               <div className="py-16 text-center text-sm text-muted-foreground animate-pulse">
                 Cargando ficha del cliente…
@@ -1007,6 +1020,11 @@ function AdminCustomersPage() {
                     />
                   </div>
 
+                  <CustomerIdentityLinkReview
+                    customerId={selectedCustomer.id}
+                    revision={selectedCustomer.revision}
+                    displayName={selectedCustomer.displayName || "Sin nombre"}
+                  />
                   {/* Header Action Buttons */}
                   <div className="flex flex-wrap items-center gap-2 pt-2">
                     <Button
@@ -1014,8 +1032,7 @@ function AdminCustomersPage() {
                       onClick={() => setOrderIntakeOpen(true)}
                       className="gap-1.5 text-xs font-bold bg-primary text-primary-foreground shadow-sm"
                     >
-                      <Plus className="size-3.5" />
-                      + Nuevo Pedido
+                      <Plus className="size-3.5" />+ Nuevo Pedido
                     </Button>
                     {canWrite ? (
                       <Button
@@ -1105,7 +1122,10 @@ function AdminCustomersPage() {
                                 id="cust-name"
                                 value={editProfileForm.displayName}
                                 onChange={(e) =>
-                                  setEditProfileForm((prev) => ({ ...prev, displayName: e.target.value }))
+                                  setEditProfileForm((prev) => ({
+                                    ...prev,
+                                    displayName: e.target.value,
+                                  }))
                                 }
                                 required
                                 disabled={!canWrite}
@@ -1437,7 +1457,11 @@ function AdminCustomersPage() {
                               onChange={(e) => setNewNoteBody(e.target.value)}
                               className="text-xs h-9"
                             />
-                            <Button type="submit" size="sm" disabled={addingNote || !newNoteBody.trim()}>
+                            <Button
+                              type="submit"
+                              size="sm"
+                              disabled={addingNote || !newNoteBody.trim()}
+                            >
                               {addingNote ? "Añadiendo…" : "Añadir"}
                             </Button>
                           </div>
@@ -1719,13 +1743,11 @@ function AdminCustomersPage() {
           customerMemberships.length === 1 ? customerMemberships[0].companyId : undefined
         }
         preselectedSiteId={
-          customerMemberships.length === 1
-            ? (customerMemberships[0].siteId || undefined)
-            : undefined
+          customerMemberships.length === 1 ? customerMemberships[0].siteId || undefined : undefined
         }
         preselectedOrganizationalUnitId={
           customerMemberships.length === 1
-            ? (customerMemberships[0].organizationalUnitId || undefined)
+            ? customerMemberships[0].organizationalUnitId || undefined
             : undefined
         }
         onSuccess={() => {

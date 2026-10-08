@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 
 /**
  * Resolves the current authenticated user's customer_id for the active tenant.
- * Uses the security-definer RPC `ensure_individual_customer` — reuse; no duplication.
+ * Read-only canonical lookup; customer creation requires explicit onboarding.
  */
 export function useCurrentCustomerId() {
   const { user, tenantId } = useAuth();

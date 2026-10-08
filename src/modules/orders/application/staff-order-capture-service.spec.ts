@@ -63,6 +63,42 @@ function createMockSupabase() {
   };
 
   const client = {
+    rpc: vi.fn(
+      async (
+        name: string,
+        args: {
+          _tenant: string;
+          _command: {
+            operation: string;
+            displayName: string;
+            phone?: string;
+            street?: string;
+            city?: string;
+          };
+        },
+      ) => {
+        expect(name).toBe("p34_customer_command");
+        expect(args._command.operation).toBe("create_staff");
+        const c = args._command;
+        const id = "cust-2";
+        store.customers.push({
+          id,
+          tenant_id: args._tenant,
+          display_name: c.displayName,
+          deleted_at: null,
+        });
+        if (c.phone)
+          store.customer_phones.push({ customer_id: id, phone: c.phone, is_primary: true });
+        if (c.street)
+          store.customer_addresses.push({
+            customer_id: id,
+            street: c.street,
+            city: c.city,
+            is_default: true,
+          });
+        return { data: { customerId: id, revision: 1 }, error: null };
+      },
+    ),
     from: (table: string) => {
       let currentTable = table;
       let filters: Array<(row: any) => boolean> = [];

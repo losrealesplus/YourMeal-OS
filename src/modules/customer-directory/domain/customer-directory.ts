@@ -10,6 +10,7 @@ export type CustomerActivityStatus = "active" | "inactive" | "new";
 
 export type IndividualCustomerRecord = {
   id: string;
+  revision?: number;
   displayName: string | null;
   email: string | null;
   phone: string | null;
@@ -27,6 +28,8 @@ export type IndividualCustomerRecord = {
 };
 
 export type UpdateIndividualCustomerInput = {
+  expectedRevision?: number;
+  requestId?: string;
   displayName: string;
   email?: string | null;
   phone?: string | null;

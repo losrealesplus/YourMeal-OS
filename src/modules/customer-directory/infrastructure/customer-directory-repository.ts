@@ -1,3 +1,4 @@
+import { createCustomerProfileRepository } from "./customer-profile-repository";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
@@ -23,6 +24,7 @@ type RawCustomer = {
   kind: string;
   created_at: string;
   user_id: string | null;
+  revision: number;
 };
 
 type RawOrder = {
@@ -102,7 +104,7 @@ export function createCustomerDirectoryRepository(client: Client, tenantId: stri
   async function loadCustomers(): Promise<RawCustomer[]> {
     const { data, error } = await db
       .from("customers")
-      .select("id, display_name, email, kind, created_at, user_id")
+      .select("id, display_name, email, kind, created_at, user_id, revision")
       .eq("tenant_id", tenantId)
       .is("deleted_at", null)
       .order("created_at", { ascending: false });
@@ -147,7 +149,9 @@ export function createCustomerDirectoryRepository(client: Client, tenantId: stri
   async function loadMemberships(): Promise<RawMembership[]> {
     const { data, error } = await db
       .from("company_employees")
-      .select("customer_id, company_id, status, deleted_at, companies!company_id(id, name, company_code)")
+      .select(
+        "customer_id, company_id, status, deleted_at, companies!company_id(id, name, company_code)",
+      )
       .eq("tenant_id", tenantId)
       .is("deleted_at", null);
     if (error) throw error;
@@ -217,6 +221,7 @@ export function createCustomerDirectoryRepository(client: Client, tenantId: stri
 
       return {
         id: c.id,
+        revision: c.revision,
         displayName: c.display_name,
         email: c.email,
         phone: phoneByCustomer.get(c.id) ?? null,
@@ -482,54 +487,24 @@ export function createCustomerDirectoryRepository(client: Client, tenantId: stri
       street?: string | null;
       city?: string | null;
     }): Promise<string> {
-      const name = input.displayName.trim();
-      if (!name) {
-        throw new Error("displayName is required");
-      }
-      const { data, error } = await db
-        .from("customers")
-        .insert({
-          tenant_id: tenantId,
-          display_name: name,
-          kind: "individual",
-          user_id: null,
-        })
-        .select("id")
-        .single();
-      if (error) throw error;
-      const customerId = String(data.id);
-
-      const phone = input.phone?.trim();
-      if (phone) {
-        const { error: phoneErr } = await db.from("customer_phones").insert({
-          tenant_id: tenantId,
-          customer_id: customerId,
-          phone,
-          is_primary: true,
-        });
-        if (phoneErr) throw phoneErr;
-      }
-
-      const street = input.street?.trim();
-      if (street) {
-        const { error: addrErr } = await db.from("customer_addresses").insert({
-          tenant_id: tenantId,
-          customer_id: customerId,
-          street,
-          city: input.city?.trim() || null,
-          is_default: true,
-          label: "Principal",
-        });
-        if (addrErr) throw addrErr;
-      }
-
-      return customerId;
+      const result = await createCustomerProfileRepository(client).command({
+        tenantId,
+        requestId: crypto.randomUUID(),
+        command: {
+          operation: "create_staff",
+          displayName: input.displayName,
+          phone: input.phone,
+          street: input.street?.trim() || undefined,
+          city: input.city,
+        },
+      });
+      return result.customerId;
     },
 
     async getIndividualById(customerId: string): Promise<IndividualCustomerRecord | null> {
       const { data: customer, error: custErr } = await db
         .from("customers")
-        .select("id, display_name, email, kind, created_at, user_id")
+        .select("id, display_name, email, kind, created_at, user_id, revision")
         .eq("tenant_id", tenantId)
         .eq("id", customerId)
         .is("deleted_at", null)
@@ -558,101 +533,23 @@ export function createCustomerDirectoryRepository(client: Client, tenantId: stri
       customerId: string,
       input: UpdateIndividualCustomerInput,
     ): Promise<IndividualCustomerRecord> {
-      const name = input.displayName.trim();
-      if (!name) {
-        throw new Error("displayName is required");
-      }
-      const customerPatch: Record<string, unknown> = { display_name: name };
-      if (input.email !== undefined) {
-        customerPatch.email = input.email ? input.email.trim() : null;
-      }
-
-      const { error: custErr } = await db
-        .from("customers")
-        .update(customerPatch)
-        .eq("tenant_id", tenantId)
-        .eq("id", customerId)
-        .is("deleted_at", null);
-      if (custErr) throw custErr;
-
-      if (input.phone !== undefined) {
-        const phone = input.phone?.trim() || null;
-        const { data: phones, error: phoneErr } = await db
-          .from("customer_phones")
-          .select("id, phone, is_primary")
-          .eq("tenant_id", tenantId)
-          .eq("customer_id", customerId)
-          .is("deleted_at", null);
-        if (phoneErr) throw phoneErr;
-
-        const primary = (phones ?? []).find((p: any) => p.is_primary) ?? phones?.[0];
-        if (phone) {
-          if (primary) {
-            const { error: updErr } = await db
-              .from("customer_phones")
-              .update({ phone, is_primary: true })
-              .eq("tenant_id", tenantId)
-              .eq("id", primary.id);
-            if (updErr) throw updErr;
-          } else {
-            const { error: insErr } = await db.from("customer_phones").insert({
-              tenant_id: tenantId,
-              customer_id: customerId,
-              phone,
-              is_primary: true,
-            });
-            if (insErr) throw insErr;
-          }
-        } else if (primary) {
-          const { error: delErr } = await db
-            .from("customer_phones")
-            .update({ deleted_at: new Date().toISOString() })
-            .eq("tenant_id", tenantId)
-            .eq("id", primary.id);
-          if (delErr) throw delErr;
-        }
-      }
-
-      if (input.city !== undefined || input.street !== undefined) {
-        const city = input.city !== undefined ? input.city?.trim() || null : undefined;
-        const street = input.street !== undefined ? input.street?.trim() || null : undefined;
-        const { data: addresses, error: addrErr } = await db
-          .from("customer_addresses")
-          .select("id, city, street, is_default")
-          .eq("tenant_id", tenantId)
-          .eq("customer_id", customerId)
-          .is("deleted_at", null);
-        if (addrErr) throw addrErr;
-
-        const defAddr = (addresses ?? []).find((a: any) => a.is_default) ?? addresses?.[0];
-        if (city !== undefined || street !== undefined) {
-          if (defAddr) {
-            const patch: Record<string, unknown> = {};
-            if (city !== undefined) patch.city = city;
-            if (street !== undefined) patch.street = street;
-            const { error: updAddrErr } = await db
-              .from("customer_addresses")
-              .update(patch)
-              .eq("tenant_id", tenantId)
-              .eq("id", defAddr.id);
-            if (updAddrErr) throw updAddrErr;
-          } else if (city || street) {
-            const { error: insAddrErr } = await db.from("customer_addresses").insert({
-              tenant_id: tenantId,
-              customer_id: customerId,
-              city: city || null,
-              street: street || null,
-              is_default: true,
-              label: "Principal",
-            });
-            if (insAddrErr) throw insAddrErr;
-          }
-        }
-      }
+      if (!input.expectedRevision || !input.requestId)
+        throw new Error("REVISION_AND_REQUEST_REQUIRED");
+      const { expectedRevision, requestId, ...patch } = input;
+      await createCustomerProfileRepository(client).command({
+        tenantId,
+        requestId,
+        command: {
+          operation: "profile",
+          customerId,
+          expectedRevision,
+          patch: { ...patch, street: patch.street ?? undefined },
+        },
+      });
 
       const { data: customer, error: reFetchErr } = await db
         .from("customers")
-        .select("id, display_name, email, kind, created_at, user_id")
+        .select("id, display_name, email, kind, created_at, user_id, revision")
         .eq("tenant_id", tenantId)
         .eq("id", customerId)
         .is("deleted_at", null)

@@ -1,3 +1,4 @@
+import { CustomerSelfProfileService } from "./customer-self-profile-service";
 import type { ServiceContext } from "@/services/types";
 import { AuditService } from "@/services/audit-service";
 import { DomainError, permissionDenied } from "@/domain/errors";
@@ -211,12 +212,13 @@ export const CustomerDirectoryService = {
     assertTenant(ctx);
     assertCanWriteCustomers(ctx);
     const repo = createCustomerDirectoryRepository(ctx.supabase, ctx.tenantId);
-    await repo.softDeleteCustomer(customerId);
-    await AuditService.write(ctx, {
-      entityType: "customer",
-      entityId: customerId,
-      action: "archive",
+    const profile = await CustomerSelfProfileService.read(ctx, customerId);
+    await CustomerSelfProfileService.execute(ctx, crypto.randomUUID(), {
+      operation: "customer_archive",
+      customerId,
+      expectedRevision: profile.revision,
     });
+    // Canonical SQL already commits the audit with the archive.
   },
 
   async updateIndividual(
@@ -247,29 +249,13 @@ export const CustomerDirectoryService = {
     }
 
     const updated = await repo.updateIndividual(customerId, {
+      expectedRevision: input.expectedRevision,
+      requestId: input.requestId,
       displayName: name,
       email: input.email !== undefined ? input.email?.trim() || null : current.email,
       phone: input.phone !== undefined ? input.phone?.trim() || null : current.phone,
       street: input.street !== undefined ? input.street?.trim() || null : undefined,
       city: input.city !== undefined ? input.city?.trim() || null : current.city,
-    });
-
-    await AuditService.write(ctx, {
-      entityType: "customer",
-      entityId: customerId,
-      action: "update",
-      oldData: {
-        displayName: current.displayName,
-        email: current.email,
-        phone: current.phone,
-        city: current.city,
-      },
-      newData: {
-        displayName: updated.displayName,
-        email: updated.email,
-        phone: updated.phone,
-        city: updated.city,
-      },
     });
 
     return updated;
@@ -308,11 +294,7 @@ export const CustomerDirectoryService = {
       street: input.street,
       city: input.city,
     });
-    await AuditService.write(ctx, {
-      entityType: "customer",
-      entityId: id,
-      action: "create",
-    });
+    // Canonical SQL already commits the audit with CRM creation.
     return id;
   },
 

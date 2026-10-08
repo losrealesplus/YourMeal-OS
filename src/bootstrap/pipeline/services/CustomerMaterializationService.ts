@@ -1,5 +1,5 @@
 /**
- * CustomerMaterializationService — ensure `customers` exists after ActiveTenant.
+ * CustomerMaterializationService — resolve an explicitly onboarded canonical customer.
  *
  * Contract (Minimum Indispensable):
  *   authenticated + approved membership + ActiveTenant
@@ -8,7 +8,8 @@
  *
  * Does NOT create access (membership remains authority).
  * Does NOT run without ActiveTenant (pending/rejected/suspended/revoked stay out).
- * Idempotent: RPC upserts / selects existing customer.
+ * P34: existing association only; otherwise EXPLICIT_ONBOARDING_REQUIRED.
+ * The retained RPC never creates membership, roles or an implicit staff customer.
  */
 
 import { supabase } from "@/integrations/supabase/client";

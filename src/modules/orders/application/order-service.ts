@@ -312,15 +312,19 @@ export const OrderService = {
         demand.demandChannel === "individual" &&
         typeof ctx.supabase?.from === "function"
       ) {
-        const { data: defaultAddr } = await ctx.supabase
+        const { data: defaultAddr, error: defaultAddressError } = await ctx.supabase
           .from("customer_addresses")
           .select("id")
           .eq("tenant_id", ctx.tenantId)
           .eq("customer_id", customerId)
           .is("deleted_at", null)
-          .order("is_default", { ascending: false })
-          .limit(1)
+          .eq("is_default", true)
           .maybeSingle();
+        if (defaultAddressError)
+          throw new DomainError(
+            "INVALID_STATE",
+            "La dirección predeterminada no se pudo verificar.",
+          );
         effectiveDeliveryAddressId = defaultAddr?.id ?? null;
       }
 

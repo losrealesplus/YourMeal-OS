@@ -1,3 +1,4 @@
+import { createCustomerProfileRepository } from "@/modules/customer-directory/infrastructure/customer-profile-repository";
 import { assertLegacyOfferWrite } from "@/modules/weekly-menu/application/legacy-offer-write-guard";
 import { DomainError } from "@/domain/errors";
 import { requireCapability } from "@/permissions";
@@ -69,7 +70,7 @@ const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
 /**
  * OPS-01 G1 — StaffOrderCaptureService
- * 
+ *
  * Canonical L4 Use Case for Universal Order Intake:
  * - Supports existing customers and minimal synchronous customer creation.
  * - Multi-day lines with dayDate, dishId, qty, and culinary comment.
@@ -85,7 +86,10 @@ export const StaffOrderCaptureService = {
     requireCapability(ctx.roles, "orders.write");
 
     if (!dto.weekStart || !DATE_REGEX.test(dto.weekStart)) {
-      throw new DomainError("INVALID_STATE", `Invalid weekStart: ${dto.weekStart}. Expected YYYY-MM-DD.`);
+      throw new DomainError(
+        "INVALID_STATE",
+        `Invalid weekStart: ${dto.weekStart}. Expected YYYY-MM-DD.`,
+      );
     }
 
     if (!Array.isArray(dto.lines) || dto.lines.length === 0) {
@@ -100,9 +104,16 @@ export const StaffOrderCaptureService = {
         throw new DomainError("INVALID_STATE", "Every line item must have a valid dishId.");
       }
       if (typeof line.qty !== "number" || line.qty <= 0 || !Number.isInteger(line.qty)) {
-        throw new DomainError("INVALID_STATE", `Quantity must be a positive integer, got ${line.qty}`);
+        throw new DomainError(
+          "INVALID_STATE",
+          `Quantity must be a positive integer, got ${line.qty}`,
+        );
       }
-      if (line.unitPriceOverride !== undefined && line.unitPriceOverride !== null && line.unitPriceOverride < 0) {
+      if (
+        line.unitPriceOverride !== undefined &&
+        line.unitPriceOverride !== null &&
+        line.unitPriceOverride < 0
+      ) {
         throw new DomainError("INVALID_STATE", "unitPriceOverride cannot be negative.");
       }
     }
@@ -115,7 +126,10 @@ export const StaffOrderCaptureService = {
 
     if (dto.customer.mode === "existing") {
       if (!dto.customer.customerId?.trim()) {
-        throw new DomainError("INVALID_STATE", "customerId is required for existing customer mode.");
+        throw new DomainError(
+          "INVALID_STATE",
+          "customerId is required for existing customer mode.",
+        );
       }
       const { data: existingCustomer, error: findError } = await ctx.supabase
         .from("customers")
@@ -129,7 +143,10 @@ export const StaffOrderCaptureService = {
         throw new DomainError("INVALID_STATE", `Failed to query customer: ${findError.message}`);
       }
       if (!existingCustomer) {
-        throw new DomainError("NOT_FOUND", `Customer ${dto.customer.customerId} not found in tenant.`);
+        throw new DomainError(
+          "NOT_FOUND",
+          `Customer ${dto.customer.customerId} not found in tenant.`,
+        );
       }
       customerId = existingCustomer.id;
     } else if (dto.customer.mode === "new") {
@@ -142,47 +159,20 @@ export const StaffOrderCaptureService = {
         throw new DomainError("INVALID_STATE", "phone is required to create a new customer.");
       }
 
-      // Provision customer record
-      const { data: newCustomer, error: insertCustError } = await ctx.supabase
-        .from("customers")
-        .insert({
-          tenant_id: ctx.tenantId,
-          display_name: displayName,
-          kind: "individual",
-        })
-        .select("id")
-        .single();
-
-      if (insertCustError || !newCustomer) {
-        throw new DomainError(
-          "INVALID_STATE",
-          `Failed to create customer: ${insertCustError?.message ?? "Unknown error"}`,
-        );
-      }
-      customerId = newCustomer.id;
-      isNewCustomer = true;
-
-      // Insert primary phone
-      const { error: phoneError } = await ctx.supabase.from("customer_phones").insert({
-        tenant_id: ctx.tenantId,
-        customer_id: customerId,
-        phone,
-        is_primary: true,
+      // Preserve legacy financial flow; CRM provisioning now uses the shared atomic boundary.
+      const provisioned = await createCustomerProfileRepository(ctx.supabase).command({
+        tenantId: ctx.tenantId,
+        requestId: crypto.randomUUID(),
+        command: {
+          operation: "create_staff",
+          displayName,
+          phone,
+          street: dto.customer.street?.trim() || undefined,
+          city: dto.customer.city,
+        },
       });
-      if (phoneError) {
-        // Non-fatal logging
-      }
-
-      // Insert default address if street provided
-      if (dto.customer.street?.trim()) {
-        await ctx.supabase.from("customer_addresses").insert({
-          tenant_id: ctx.tenantId,
-          customer_id: customerId,
-          street: dto.customer.street.trim(),
-          city: dto.customer.city?.trim() ?? null,
-          is_default: true,
-        });
-      }
+      customerId = provisioned.customerId;
+      isNewCustomer = true;
 
       // Insert delivery notes preference if provided
       if (dto.customer.deliveryNotes?.trim()) {
@@ -234,7 +224,10 @@ export const StaffOrderCaptureService = {
 
       if (line.unitPriceOverride !== undefined && line.unitPriceOverride !== null) {
         if (isNaN(line.unitPriceOverride) || line.unitPriceOverride < 0) {
-          throw new DomainError("PRICE_MISMATCH", `Precio unitario inválido para el plato '${catalogDish.name}'.`);
+          throw new DomainError(
+            "PRICE_MISMATCH",
+            `Precio unitario inválido para el plato '${catalogDish.name}'.`,
+          );
         }
         effectiveUnitPrice = line.unitPriceOverride;
       } else if (catalogDish.price != null) {
@@ -276,7 +269,9 @@ export const StaffOrderCaptureService = {
         tenantId: dietaryRow.tenant_id,
         customerId: dietaryRow.customer_id,
         allergens: Array.isArray(dietaryRow.allergens) ? dietaryRow.allergens : [],
-        customAllergens: Array.isArray(dietaryRow.custom_allergens) ? dietaryRow.custom_allergens : [],
+        customAllergens: Array.isArray(dietaryRow.custom_allergens)
+          ? dietaryRow.custom_allergens
+          : [],
         restrictions: Array.isArray(dietaryRow.restrictions) ? dietaryRow.restrictions : [],
         preferences: Array.isArray(dietaryRow.preferences) ? dietaryRow.preferences : [],
         dietaryNotes: dietaryRow.dietary_notes ?? null,
@@ -300,14 +295,14 @@ export const StaffOrderCaptureService = {
         dto.dietaryOverride.customAllergens !== undefined ||
         dto.dietaryOverride.restrictions !== undefined ||
         dto.dietaryOverride.preferences !== undefined ||
-        dto.dietaryOverride.dietaryNotes !== undefined
+        dto.dietaryOverride.dietaryNotes !== undefined,
       );
       if (hasOverrideContent) {
         const reason = dto.dietaryOverride.overrideReason?.trim();
         if (!reason || reason.length < 5) {
           throw new DomainError(
             "INVALID_STATE",
-            "Un override dietético requiere un motivo obligatorio (mínimo 5 caracteres)."
+            "Un override dietético requiere un motivo obligatorio (mínimo 5 caracteres).",
           );
         }
       }
@@ -342,7 +337,10 @@ export const StaffOrderCaptureService = {
       .single();
 
     if (orderError || !orderData) {
-      throw new DomainError("INVALID_STATE", `Failed to insert order: ${orderError?.message ?? "Unknown error"}`);
+      throw new DomainError(
+        "INVALID_STATE",
+        `Failed to insert order: ${orderError?.message ?? "Unknown error"}`,
+      );
     }
 
     const createdOrder = orderData as OrderRow;
@@ -366,8 +364,15 @@ export const StaffOrderCaptureService = {
 
     if (itemsError || !itemsData) {
       // Compensating action: soft-delete or remove incomplete order
-      await ctx.supabase.from("orders").delete().eq("id", createdOrder.id).eq("tenant_id", ctx.tenantId);
-      throw new DomainError("INVALID_STATE", `Failed to insert order items: ${itemsError?.message ?? "Unknown error"}`);
+      await ctx.supabase
+        .from("orders")
+        .delete()
+        .eq("id", createdOrder.id)
+        .eq("tenant_id", ctx.tenantId);
+      throw new DomainError(
+        "INVALID_STATE",
+        `Failed to insert order items: ${itemsError?.message ?? "Unknown error"}`,
+      );
     }
 
     const createdItems = itemsData as OrderItemRow[];

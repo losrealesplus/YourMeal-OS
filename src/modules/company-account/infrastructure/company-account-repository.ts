@@ -1,3 +1,4 @@
+import { createCustomerProfileRepository } from "@/modules/customer-directory/infrastructure/customer-profile-repository";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
@@ -490,7 +491,8 @@ export function createCompanyAccountRepository(client: Client, tenantId: string)
     ): Promise<CustomerCompanyMembershipRecord[]> {
       const { data, error } = await db
         .from("company_employees")
-        .select(`
+        .select(
+          `
           id,
           tenant_id,
           company_id,
@@ -514,7 +516,8 @@ export function createCompanyAccountRepository(client: Client, tenantId: string)
             id,
             name
           )
-        `)
+        `,
+        )
         .eq("tenant_id", tenantId)
         .eq("customer_id", customerId)
         .is("deleted_at", null)
@@ -543,35 +546,18 @@ export function createCompanyAccountRepository(client: Client, tenantId: string)
       email?: string | null;
       phone?: string | null;
     }): Promise<string> {
-      const name = input.displayName.trim();
-      if (!name) throw new DomainError("INVALID_STATE", "Customer name is required");
-
-      const { data, error } = await db
-        .from("customers")
-        .insert({
-          tenant_id: tenantId,
-          display_name: name,
-          email: input.email?.trim() || null,
+      const result = await createCustomerProfileRepository(client).command({
+        tenantId,
+        requestId: crypto.randomUUID(),
+        command: {
+          operation: "create_staff",
+          displayName: input.displayName,
           kind: "company_employee",
-          user_id: null,
-        })
-        .select("id")
-        .single();
-      if (error) throw error;
-      const customerId = String(data.id);
-
-      const phone = input.phone?.trim();
-      if (phone) {
-        const { error: phoneErr } = await db.from("customer_phones").insert({
-          tenant_id: tenantId,
-          customer_id: customerId,
-          phone,
-          is_primary: true,
-        });
-        if (phoneErr) throw phoneErr;
-      }
-
-      return customerId;
+          email: input.email,
+          phone: input.phone,
+        },
+      });
+      return result.customerId;
     },
 
     async findActiveMembership(
@@ -608,7 +594,8 @@ export function createCompanyAccountRepository(client: Client, tenantId: string)
     ): Promise<EmployeeMembership> {
       const patch: Record<string, unknown> = {};
       if (input.siteId !== undefined) patch.location_id = input.siteId;
-      if (input.organizationalUnitId !== undefined) patch.department_id = input.organizationalUnitId;
+      if (input.organizationalUnitId !== undefined)
+        patch.department_id = input.organizationalUnitId;
       if (input.internalLocation !== undefined) patch.internal_location = input.internalLocation;
       if (input.isAdmin !== undefined) patch.is_admin = input.isAdmin;
       if (input.status !== undefined) patch.status = input.status;
