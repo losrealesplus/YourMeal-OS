@@ -8,6 +8,22 @@ import {
 const id = "10000000-0000-4000-8000-000000000001";
 const request = (command: unknown) => ({ tenantId: id, requestId: id, command });
 describe("P34 input boundary", () => {
+  it("permits only explicit revision-conflict closure with an exact request", () => {
+    const command = {
+      operation: "close_conflicted_link",
+      linkRequestId: id,
+      reason: "REVISION_CONFLICT",
+    };
+    expect(customerRequestSchema.parse(request(command)).command).toEqual(command);
+    for (const patch of [
+      { reason: "OTHER" },
+      { actorId: id },
+      { verified: true },
+      { linkRequestId: "missing" },
+    ]) {
+      expect(() => customerRequestSchema.parse(request({ ...command, ...patch }))).toThrow();
+    }
+  });
   it("requires exact revision and request for profile", () => {
     expect(
       customerRequestSchema.parse(

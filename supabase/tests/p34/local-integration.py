@@ -48,7 +48,8 @@ try:
  denied=sql("BEGIN; REVOKE EXECUTE ON FUNCTION public.current_membership_id(uuid) FROM PUBLIC,p34_writer; DO $$ BEGIN IF NOT has_schema_privilege('p34_writer','public','USAGE') OR NOT has_function_privilege('p34_writer','public.current_membership_id(uuid)','EXECUTE') THEN RAISE EXCEPTION 'P34_EXECUTOR_GRANTS_INSUFFICIENT'; END IF; END $$; ROLLBACK;",check=False)
  assert denied.returncode and 'P34_EXECUTOR_GRANTS_INSUFFICIENT' in denied.stderr;passed.append('insufficient resolver grant still fails closed')
  assert writer_before is not None and writer_before==sql(writer_query).stdout.strip();passed.append('existing order and offer writer function definitions unchanged')
- sql(f"INSERT INTO public.tenants(id,slug,name) VALUES('{T}','p34-synthetic','Synthetic P34'),('10000000-0000-4000-8000-000000000002','p34-b','Synthetic B'); INSERT INTO auth.users(id) VALUES "+','.join(f"('{U(i)}')" for i in range(1,7))+f"; INSERT INTO public.tenant_members(tenant_id,user_id,status,membership_type) VALUES "+','.join(f"('{T}','{U(i)}','approved','customer')" for i in range(1,6))+f"; INSERT INTO public.user_roles(user_id,tenant_id,role) VALUES('{U(3)}','{T}','operations_manager'),('{U(4)}','{T}','support');")
+ sql(f"INSERT INTO public.tenants(id,slug,name) VALUES('{T}','p34-synthetic','Synthetic P34'),('10000000-0000-4000-8000-000000000002','p34-b','Synthetic B'); INSERT INTO auth.users(id) VALUES "+','.join(f"('{U(i)}')" for i in range(1,8))+f"; INSERT INTO public.tenant_members(tenant_id,user_id,status,membership_type) VALUES "+','.join(f"('{T}','{U(i)}','approved','customer')" for i in range(1,6))+f"; INSERT INTO public.user_roles(user_id,tenant_id,role) VALUES('{U(3)}','{T}','operations_manager'),('{U(4)}','{T}','support');")
+ sql(f"INSERT INTO public.tenant_members(tenant_id,user_id,status,membership_type) VALUES('{T}','{U(7)}','approved','customer');")
  failure({'operation':'onboard','displayName':'Implicit'},'ONBOARDING_BLOCKED',n=5,r=101)
  failure({'operation':'create_staff','displayName':'Malformed','email':{}},'INVALID_TYPE',n=3,r=102)
  failure({'operation':'create_staff','displayName':'Malformed','email':'broken'},'INVALID_EMAIL',n=3,r=103)
@@ -92,6 +93,41 @@ try:
  confirm={'operation':'confirm_link','linkRequestId':R(20),'customerId':customer['customerId'],'expectedRevision':1,'confirmed':True}
  failure(confirm,'LINK_NOT_CONFIRMABLE',n=5,r=25)
  result=command(confirm,n=2,r=26);assert result['revision']==2;passed.append('double confirmation exact identity')
+ # P2.3: only the request owner may terminally close a proven revision conflict.
+ conflict_customer=command({'operation':'create_staff','displayName':'Conflict CRM'},n=3,r=200)
+ ccid=conflict_customer['customerId']
+ command({'operation':'request_link'},n=7,r=201)
+ capprove={'operation':'approve_link','linkRequestId':R(201),'customerId':ccid,'expectedRevision':1,'verified':True}
+ command(capprove,n=3,r=202)
+ close={'operation':'close_conflicted_link','linkRequestId':R(201),'reason':'REVISION_CONFLICT'}
+ failure(close,'LINK_NOT_CONFLICTED',n=7,r=203)
+ failure(close,'PERMISSION_DENIED',n=3,r=204)
+ failure(close,'PERMISSION_DENIED',n=7,r=205,tenant=foreign)
+ sql(f"INSERT INTO public.tenant_members(tenant_id,user_id,status,membership_type) VALUES('{foreign}','{U(7)}','approved','customer');")
+ failure(close,'LINK_NOT_FOUND',n=7,r=218,tenant=foreign)
+ command({'operation':'profile','customerId':ccid,'expectedRevision':1,'patch':{'displayName':'Staff changed CRM'}},n=3,r=206)
+ cconfirm={'operation':'confirm_link','linkRequestId':R(201),'customerId':ccid,'expectedRevision':1,'confirmed':True}
+ failure(cconfirm,'STALE_REVISION',n=7,r=207)
+ # Race close against the old confirmation: only close can succeed.
+ with ThreadPoolExecutor(2) as pool:
+  outs=list(pool.map(lambda item:sql(stmt(*item),check=False),[(close,7,208),(cconfirm,7,209)]))
+ assert outs[0].returncode==0 and outs[1].returncode!=0 and any(code in outs[1].stderr for code in ['STALE_REVISION','LINK_NOT_CONFIRMABLE']);passed.append('conflict close/confirmation concurrency never links')
+ closed=command(close,n=7,r=208);assert closed['replayed'] and closed['state']=='closed';passed.append('closure exact request replay')
+ repeated=command(close,n=7,r=210);assert repeated['closedAt']==closed['closedAt'];passed.append('closure new UUID preserves original terminal evidence')
+ with ThreadPoolExecutor(2) as pool:
+  repeated_closures=list(pool.map(lambda rid:command(close,n=7,r=rid),[219,220]))
+ assert all(x['closedAt']==closed['closedAt'] and x['state']=='closed' for x in repeated_closures);passed.append('concurrent repeated closures preserve terminal evidence')
+ failure({**close,'reason':'OTHER'},'INVALID_INPUT',n=7,r=211)
+ failure({'operation':'request_link'},'REQUEST_PAYLOAD_MISMATCH',n=7,r=208)
+ audit=json.loads(sql(f"SELECT json_build_object('n',count(*),'actor',min(actor_id::text),'reason',min(new_data->>'reason'),'time',min(new_data->>'closedAt')) FROM public.audit_log WHERE tenant_id='{T}' AND entity_id='{R(201)}' AND action='p34.close_conflicted_link'").stdout.strip())
+ assert audit['n']==1 and audit['actor']==U(7) and audit['reason']=='REVISION_CONFLICT' and audit['time']==closed['closedAt'];passed.append('single audit closure actor tenant request reason timestamp')
+ failure({**cconfirm,'expectedRevision':2},'LINK_NOT_CONFIRMABLE',n=7,r=212)
+ failure(capprove,'PERMISSION_DENIED',n=3,r=213)
+ command({'operation':'request_link'},n=7,r=214)
+ fresh={**cconfirm,'linkRequestId':R(214),'expectedRevision':2}
+ failure(fresh,'LINK_NOT_CONFIRMABLE',n=7,r=215)
+ command({**capprove,'linkRequestId':R(214),'expectedRevision':2},n=3,r=216)
+ linked=command(fresh,n=7,r=217);assert linked['revision']==3;passed.append('fresh explicit request requires fresh double confirmation')
  # Transport/admin identities have no authority without actor and explicit EXECUTE.
  for role in ['service_role']:
   out=sql(f"SET SESSION AUTHORIZATION {role}; SELECT public.p34_customer_command('{T}','{R(30)}','{{\"operation\":\"request_link\"}}');",check=False);assert out.returncode;passed.append(role+' denied')
