@@ -38,7 +38,7 @@ try {
   const fakeModules = {
     auth: `export function useAuth(){const n=Number(new URLSearchParams(location.search).get('actor')||1);return {tenantId:'10000000-0000-4000-8000-000000000001',user:{id:'20000000-0000-4000-8000-'+String(n).padStart(12,'0'),email:n===6?'opaque@privaterelay.appleid.com':'access@example.test',user_metadata:{}},roles:n===3?['operations_manager']:['customer']};}`,
     lookup: `import {useQuery} from '@tanstack/react-query';import {api} from 'lab-api';export function useCurrentCustomerId(){return useQuery({queryKey:['current-customer-id'],queryFn:()=>api('customer_id',{})});}`,
-    api: `export async function api(mode,data){const actor=Number(new URLSearchParams(location.search).get('actor')||1);const response=await fetch('${api}',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({mode,actor,...data})});const value=await response.json();if(!response.ok)throw new Error(value.error);if(mode==='command'&&window.__loseResponse){window.__loseResponse=false;throw new Error('LAB_RESPONSE_LOST');}return value.data;}export const customerProfileClient={read:(tenantId,customerId)=>api('read',{tenantId,customerId}),command:request=>api('command',request),identityRequests:tenantId=>api('links',{tenantId}),readback:(tenantId,requestId)=>api('readback',{tenantId,requestId})};`,
+    api: `export async function api(mode,data){const actor=Number(new URLSearchParams(location.search).get('actor')||1);const response=await fetch('${api}',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({mode,actor,...data})});const value=await response.json();if(!response.ok)throw new Error(value.error);if(mode==='command'&&window.__loseResponse){window.__loseResponse=false;throw new Error('LAB_RESPONSE_LOST');}if(mode==='links'&&window.__holdRefresh){await new Promise(resolve=>window.__releaseRefresh=resolve);}return value.data;}export const customerProfileClient={read:(tenantId,customerId)=>api('read',{tenantId,customerId}),command:request=>api('command',request),identityRequests:tenantId=>api('links',{tenantId}),readback:(tenantId,requestId)=>api('readback',{tenantId,requestId})};`,
     router: `import React from 'react';export const createFileRoute=()=>options=>({options});export const Link=({to,children,...p})=><a href={to} {...p}>{children}</a>;`,
     consumer: `import React from 'react';export const ScreenHeader=({title})=><h1>{title}</h1>;`,
     toast: `function show(message){let n=document.getElementById('status');if(!n){n=document.createElement('p');n.id='status';n.setAttribute('role','status');document.body.append(n);}n.textContent=message;}export const toast={success:show,error:show,info:show};`,
@@ -146,14 +146,31 @@ try {
   checked.push("atomic default switch");
   await block.getByRole("button", { name: "Editar", exact: true }).click();
   await page.getByLabel("Calle y número").fill("Browser Street edited");
+  // Hold another invalidated query after the new profile is already visible.
+  await page.evaluate(() => (window.__holdRefresh = true));
   await page.getByRole("button", { name: "Guardar dirección" }).click();
   await page.getByText("Browser Street edited, LAB").waitFor();
   checked.push("address edit");
+  await page.waitForFunction(() => typeof window.__releaseRefresh === "function");
+  assert.equal(await block.locator("select").isDisabled(), true);
+  await page.evaluate(() => {
+    window.__holdRefresh = false;
+    window.__releaseRefresh();
+  });
+  checked.push("replacement selection locked until previous command finishes");
   assert.equal(
     await block.getByRole("button", { name: "Archivar", exact: true }).isDisabled(),
     true,
   );
-  await block.locator("select").selectOption({ index: 1 });
+  const canonicalAddresses = await request(1, "read", {
+    customerId: cid,
+    tenantId: "10000000-0000-4000-8000-000000000001",
+  });
+  assert.equal(canonicalAddresses.customerId, cid);
+  const replacementAddress = canonicalAddresses.addresses.find((a) => !a.archived && !a.isDefault);
+  assert.ok(replacementAddress, "An active replacement of the same canonical customer is required");
+  await block.locator("select").selectOption(replacementAddress.id);
+  assert.equal(await block.locator("select").inputValue(), replacementAddress.id);
   await block.getByRole("button", { name: "Archivar", exact: true }).click();
   await page.getByText("Browser Casa · Archivada").waitFor();
   checked.push("default archive requires replacement");

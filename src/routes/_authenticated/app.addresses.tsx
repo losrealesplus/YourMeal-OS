@@ -124,6 +124,7 @@ function AddressesPage() {
                       <label className="block">
                         Elegir sustituta antes de archivar
                         <select
+                          disabled={locked}
                           value={replacement}
                           onChange={(e) => setReplacement(e.target.value)}
                           className="block border rounded p-2 w-full"
