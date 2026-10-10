@@ -6,21 +6,24 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "Normal preparation or exact one-time bootstrap"
+        description: "Normal preparation, historical bootstrap or human-authorized exact interval"
         type: choice
-        options: [normal, initial_activation]
+        options: [normal, initial_activation, exact_interval]
         default: normal
       expected_base_sha:
-        description: "Initial activation only: exact confirmed baseline SHA"
+        description: "Special modes only: exact confirmed baseline SHA"
         type: string
       expected_target_sha:
-        description: "Initial activation only: reconciled final main SHA"
+        description: "Special modes only: reconciled final main SHA"
         type: string
       authorized_prs:
-        description: "Initial activation only: exact ordered JSON PR array"
+        description: "Special modes only: exact ordered JSON PR array"
         type: string
       authorization_id:
         description: "SHA-256 of canonical activation payload; scope identity, not production approval"
+        type: string
+      exact_interval_scope:
+        description: "Exact interval only: human-reviewed JSON scope with final source and every governance hash"
         type: string
       reason:
         description: "Reason for preparing an exact main release (not production approval)"
@@ -96,7 +99,7 @@ jobs:
         run: |
           npm run typecheck
           npm run test:governance
-          node --test scripts/governance/release-contract.spec.mjs scripts/governance/release-publication.spec.mjs scripts/governance/release-activation.spec.mjs scripts/governance/release-json.spec.mjs scripts/governance/release-reconciliation.spec.mjs
+          node --test scripts/governance/release-contract.spec.mjs scripts/governance/release-publication.spec.mjs scripts/governance/release-activation.spec.mjs scripts/governance/release-json.spec.mjs scripts/governance/release-reconciliation.spec.mjs scripts/governance/release-exact-interval.spec.mjs
 
       - name: Build exactly once
         run: npm run build

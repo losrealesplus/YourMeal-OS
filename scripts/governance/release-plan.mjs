@@ -17,6 +17,15 @@ import {
 } from "./release-contract.mjs";
 import { activationMode, activationPayload, authorizeActivation } from "./release-activation.mjs";
 import {
+  EXACT_INTERVAL,
+  readExactEvidence,
+  verifyExactEvidence,
+  authorizeExactInterval,
+  exactIntervalPayload,
+  exactScopeId,
+  canonical,
+} from "./release-exact-interval.mjs";
+import {
   verifyReconciliation,
   TRACK_B_RECONCILIATION,
   verifyA4bReconciliation,
@@ -210,6 +219,53 @@ function workflowInputs() {
       ).inputs ?? {})
     : {};
 }
+export function exactIntervalSnapshot(ctx, base, diff, prs) {
+  const evidenceBytes = readExactEvidence();
+  const evidence = verifyExactEvidence(evidenceBytes);
+  const candidate = EXACT_INTERVAL.candidateSha;
+  const sealed = changedPaths(base.sha, candidate);
+  const governance = changedPaths(candidate, ctx.sha);
+  const file = (revision, p) => {
+    const entry = git("ls-tree", revision, "--", p);
+    if (!entry) return null;
+    const blob = /^100(?:644|755) blob ([a-f0-9]{40})\t/.exec(entry);
+    demand(blob, "Exact interval files must be regular Git blobs");
+    const bytes = execFileSync("git", ["cat-file", "blob", blob[1]], {
+      maxBuffer: 16 * 1024 * 1024,
+    });
+    return { sha256: hash(bytes), bytes: bytes.length };
+  };
+  return {
+    ...evidenceBytes,
+    repository: ctx.repository,
+    baseline: base,
+    candidateSha: candidate,
+    finalSourceSha: ctx.sha,
+    currentMainSha: api("git/ref/heads/main").object.sha,
+    sealedCommits: sealed.commits,
+    sealedPrs: sealed.commits.map((sha) => assertMergedCommit(pages(`commits/${sha}/pulls`), sha)),
+    sealedPaths: sealed.paths,
+    sealedFiles: evidence.paths.map((p) => ({
+      path: p,
+      classification: classifyPath(p),
+      before: file(base.sha, p),
+      after: file(candidate, p),
+    })),
+    governanceParent: git("rev-parse", `${ctx.sha}^1`).trim(),
+    governanceHead: git("rev-parse", `${ctx.sha}^2`).trim(),
+    governanceCommits: governance.commits,
+    governancePaths: governance.paths,
+    governanceFiles: governance.paths.map((p) => ({
+      path: p,
+      before: file(candidate, p)?.sha256 ?? null,
+      after: file(ctx.sha, p)?.sha256 ?? null,
+    })),
+    fullCommits: diff.commits,
+    fullPaths: diff.paths,
+    fullPrs: prs,
+    remediation: api(`pulls/${prs.at(-1)}`),
+  };
+}
 function activationSnapshot(ctx, base, diff, prs, currentMainSha) {
   const commits = diff.commits.map((sha, i) => {
     const paths = git("diff", "--name-only", "--no-renames", "-z", `${sha}^1`, sha)
@@ -246,7 +302,12 @@ export function prepare(ctx, publishing = false) {
   assertEnvironment(api(`environments/${policy.environment}`), policy);
   const inputs = workflowInputs();
   const initial = activationMode(inputs);
+  const exact = inputs.mode === "exact_interval";
   demand(!initial || ctx.event === "workflow_dispatch", "Push cannot request initial activation");
+  demand(
+    !exact || ctx.event === "workflow_dispatch",
+    "Push cannot request exact interval authority",
+  );
   const currentMain = api("git/ref/heads/main").object.sha;
   demand(!initial || currentMain === ctx.sha, "Initial activation target is stale");
   if (currentMain !== ctx.sha) return { decision: "SUPERSEDED", sourceSha: ctx.sha };
@@ -265,7 +326,20 @@ export function prepare(ctx, publishing = false) {
       )
     : undefined;
   let reconciliation;
-  if (!initial && classification.decision === "REQUIRES_SEPARATE_AUTHORIZATION") {
+  if (exact) {
+    demand(
+      classification.decision === "REQUIRES_SEPARATE_AUTHORIZATION",
+      "Exact interval cannot authorize a different classification",
+    );
+    reconciliation = authorizeExactInterval(
+      exactIntervalSnapshot(ctx, base, diff, prs),
+      inputs,
+      ctx,
+      api(`actions/runs/${ctx.runId}`),
+      policy,
+    );
+  }
+  if (!initial && !exact && classification.decision === "REQUIRES_SEPARATE_AUTHORIZATION") {
     if (base.sha === TRACK_B_RECONCILIATION.baselineSha) {
       try {
         reconciliation = verifyReconciliation(
@@ -287,6 +361,7 @@ export function prepare(ctx, publishing = false) {
   }
   if (
     !initial &&
+    !exact &&
     classification.decision === "REQUIRES_SEPARATE_AUTHORIZATION" &&
     base.sha === A4B_CLOSED_RECONCILIATION.baselineSha
   ) {
@@ -337,6 +412,29 @@ export function prepare(ctx, publishing = false) {
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
+    if (process.argv[2] === "--exact-interval-payload") {
+      const sha = api("git/ref/heads/main").object.sha;
+      const ctx = { repository: policy.repository, sha, runId: "" };
+      const base = baseline(ctx);
+      const diff = changedPaths(base.sha, sha);
+      const prs = diff.commits.map((commit) =>
+        assertMergedCommit(pages(`commits/${commit}/pulls`), commit),
+      );
+      const payload = exactIntervalPayload(exactIntervalSnapshot(ctx, base, diff, prs), policy);
+      fs.writeSync(
+        1,
+        `${JSON.stringify(
+          {
+            payload,
+            exactIntervalScope: JSON.stringify(canonical(payload)),
+            authorizationId: exactScopeId(payload),
+          },
+          null,
+          2,
+        )}\n`,
+      );
+      process.exit(0); // Read-only proposal: no artifact, ledger, dispatch or authority.
+    }
     if (process.argv[2] === "--initial-activation-payload") {
       const sha = api("git/ref/heads/main").object.sha;
       const ctx = { repository: policy.repository, sha, runId: "" };
