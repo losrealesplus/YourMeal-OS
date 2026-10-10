@@ -100,3 +100,15 @@ Until required, treat a red Migration Bootstrap Validation as a **merge blocker*
 - Fix that motivated this gate: PR teardown of `companies_*` before B2B redefine  
 - [OP001_DAY0_CHECKLIST](./OP001_DAY0_CHECKLIST.md) — `db reset` → seed → operate  
 - [PR_CHANGE_LEVELS](../22-implementation/PR_CHANGE_LEVELS.md) — Infrastructure / schema PRs  
+
+## Prerrequisito local de autoridad sobre auth (PR #516)
+
+El CLI migra como `postgres`; en la imagen local el propietario de `auth` es `supabase_admin`. `postgres` tiene USAGE sin grant option. La concesión puede no surtir efecto y la migración `20261010155728_release_cr_order_writer_auth_usage.sql` debe abortar con `RELEASE_AUTH_SCHEMA_GRANT_NOT_EFFECTIVE`.
+
+El job descartable usa `scripts/migration-bootstrap-ci.mjs`: arranca/reset con un directorio de migraciones temporal vacío, prepara `cr_order_writer` con su creador normal `postgres` (NOLOGIN/NOINHERIT/NOBYPASSRLS), y concede únicamente USAGE sobre auth desde el propietario local. Después copia los archivos intactos y ejecuta `supabase migration up --local`; el CLI registra su historial normalmente. Se verifica el resultado y se elimina solamente el proyecto temporal del job.
+
+No se cambia el propietario de auth ni se conceden grant option a postgres, superusuario/BYPASSRLS a la aplicación, SELECT de auth.users ni membresías API al escritor. El control original sigue intacto. El bootstrap general aplica la cadena histórica completa, incluidas A5, únicamente en CI descartable; no es el manifiesto productivo restringido.
+
+**Producción:** disponer del administrador local de Docker no acredita acceso al propietario administrado. Antes de aplicar el paquete real, el operador debe acreditar un canal autorizado del proveedor capaz de conceder ese USAGE mínimo. Si no existe, STOP; no elevar privilegios ni transferir ownership. No ejecutar este helper contra el proveedor.
+
+Cualificación focalizada: 5 pruebas del helper y 8 comprobaciones SQL sintéticas, incluyendo concesión inefectiva rechazada, ejecutor ajeno rechazado, roles inseguros rechazados, owner/autoridad de postgres intactos y ausencia de acceso a filas Auth. No se repite el E2E.

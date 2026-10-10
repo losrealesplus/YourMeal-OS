@@ -40,13 +40,12 @@ jobs:
         with:
           version: latest
 
-      - name: Start fresh local database (applies all migrations)
-        run: supabase db start
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
 
-      - name: Reset and re-apply all migrations
-        run: supabase db reset --yes
-
-      - name: Confirm migration list is clean
-        run: |
-          echo "Bootstrap OK — all migrations applied on empty database."
-          supabase migration list --local
+      # The local schema owner supplies the restricted writer's auth USAGE.
+      # postgres remains the ordinary CLI migrator; no grant option is added.
+      # CI bootstrap is separate from the production four-file manifest.
+      - name: Start and reset isolated DB with owner-authorized auth prerequisite
+        run: node scripts/migration-bootstrap-ci.mjs
