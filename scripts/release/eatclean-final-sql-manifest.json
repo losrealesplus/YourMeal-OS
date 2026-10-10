@@ -1,0 +1,36 @@
+{
+  "base": "38eb0b5dabacf5f35b326608f92084db2323317a",
+  "checkpoint": "49c8f57dfb692fa06011a751ba63cea7c7bb30f3",
+  "productionExecutionAuthorized": false,
+  "applicationMethod": "exact files only; no db push, wildcard, history repair or A5",
+  "entries": [
+    {
+      "order": 1,
+      "category": "P34_FROZEN",
+      "path": "supabase/migrations/20261008112217_p34_identity_crm_profile.sql",
+      "sha256": "4ee85c359dd1d098ae4dd7581e6bca1d1288971da474e25cdb381ac23ff872f4",
+      "bytes": 25905
+    },
+    {
+      "order": 2,
+      "category": "P34_FROZEN",
+      "path": "supabase/migrations/20261008160753_p34_identity_conflict_recovery.sql",
+      "sha256": "81acb6ac9c87c3a38e60ff5f810ff9f6a0a201a015465b01e5b48eb57a0726b4",
+      "bytes": 4239
+    },
+    {
+      "order": 3,
+      "category": "RELEASE_CORRECTION_NEW",
+      "path": "supabase/migrations/20261010155728_release_cr_order_writer_auth_usage.sql",
+      "sha256": "86d6203287bedf2f87c7f9dd11c47a99c7efce635266efedccebba0215d8fac5",
+      "bytes": 734
+    },
+    {
+      "order": 4,
+      "category": "RELEASE_CORRECTION_NEW",
+      "path": "supabase/migrations/20261010155729_release_program_draft_order_price_snapshot.sql",
+      "sha256": "7a2b1f9a530f6edca8bd73bde6a53dd01fe6124750a417fcd1d9701ba0a5f106",
+      "bytes": 3266
+    }
+  ]
+}

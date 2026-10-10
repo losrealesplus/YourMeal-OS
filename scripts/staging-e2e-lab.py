@@ -45,9 +45,7 @@ def start():
   for p in sorted((ROOT/'supabase/migrations').glob('*.sql')):
    if p.name.startswith(('20261007020208_','20261007020245_','20261007020849_')):continue
    if p.name.endswith('_p34_identity_crm_profile.sql'):sql('ALTER TABLE public.audit_log ALTER COLUMN entity_id TYPE uuid USING entity_id::uuid;')
-   sql('SET ROLE postgres;\n'+p.read_text())
-  sql((ROOT/'scripts/staging-e2e-prerequisites.sql').read_text())
-  sql('SET ROLE postgres;\n'+(ROOT/'scripts/staging-e2e-order-writer.sql').read_text())
+   sql(('' if p.name.endswith('_release_cr_order_writer_auth_usage.sql') else 'SET ROLE postgres;\n')+p.read_text())
   env={'GOTRUE_API_HOST':'0.0.0.0','GOTRUE_API_PORT':'9999','API_EXTERNAL_URL':'http://127.0.0.1:54331/auth/v1','GOTRUE_DB_DRIVER':'postgres','GOTRUE_DB_DATABASE_URL':f'postgres://supabase_auth_admin:{PASSWORD}@{DB}:5432/postgres','GOTRUE_SITE_URL':'http://127.0.0.1:8080','GOTRUE_URI_ALLOW_LIST':'http://127.0.0.1:8080/**','GOTRUE_JWT_SECRET':SECRET,'GOTRUE_JWT_AUD':'authenticated','GOTRUE_JWT_DEFAULT_GROUP_NAME':'authenticated','GOTRUE_JWT_ADMIN_ROLES':'service_role','GOTRUE_JWT_EXP':'3600','GOTRUE_EXTERNAL_EMAIL_ENABLED':'true','GOTRUE_MAILER_AUTOCONFIRM':'true','GOTRUE_DISABLE_SIGNUP':'false','GOTRUE_EXTERNAL_PHONE_ENABLED':'false','GOTRUE_EXTERNAL_GOOGLE_ENABLED':'false','GOTRUE_EXTERNAL_APPLE_ENABLED':'false'}
   args=[]
   for k,v in env.items():args+=['-e',k+'='+v]
