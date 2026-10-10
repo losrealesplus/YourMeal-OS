@@ -67,14 +67,25 @@ export const DIAGNOSTIC_FILES = [
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 export function activationMode(inputs = {}) {
   const mode = inputs.mode ?? "normal";
-  demand(["normal", "initial_activation"].includes(mode), "Unknown preparation mode");
+  demand(
+    ["normal", "initial_activation", "exact_interval"].includes(mode),
+    "Unknown preparation mode",
+  );
   if (mode === "normal")
     demand(
-      ["expected_base_sha", "expected_target_sha", "authorized_prs", "authorization_id"].every(
-        (k) => !inputs[k],
-      ),
+      [
+        "expected_base_sha",
+        "expected_target_sha",
+        "authorized_prs",
+        "authorization_id",
+        "exact_interval_scope",
+      ].every((k) => !inputs[k]),
       "Activation inputs cannot fall back to normal mode",
     );
+  demand(
+    mode === "exact_interval" || !inputs.exact_interval_scope,
+    "Exact interval scope cannot enter historical activation",
+  );
   return mode === "initial_activation";
 }
 export function activationPayload(snapshot, policy) {

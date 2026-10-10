@@ -1,5 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { demand, hash, classifyPath } from "./release-contract.mjs";
+import { exactScopeId, assertExactIntervalManifest } from "./release-exact-interval.mjs";
 
 export const TRACK_B_SEALED_MIGRATION_BASELINE = "c02702afea56a5a4512b68b0c99aa377ca237b0a";
 
@@ -178,10 +179,7 @@ export function auditSpecialPaths(paths, reconciliation) {
 export function auditPostTrackBDelta(paths) {
   demand(Array.isArray(paths), "Invalid post-Track-B paths array");
   for (const p of paths) {
-    demand(
-      typeof p === "string" && p.length > 0,
-      `Invalid path in post-Track-B delta: ${p}`,
-    );
+    demand(typeof p === "string" && p.length > 0, `Invalid path in post-Track-B delta: ${p}`);
     for (const pattern of POST_TRACK_B_DISALLOWED_PATTERNS) {
       demand(
         !pattern.test(p),
@@ -191,10 +189,7 @@ export function auditPostTrackBDelta(paths) {
     const isAllowedPrefix = POST_TRACK_B_ALLOWED_PREFIXES.some(
       (prefix) => p === prefix || p.startsWith(prefix),
     );
-    demand(
-      isAllowedPrefix,
-      `Post-Track-B delta path outside allowed governance scope: ${p}`,
-    );
+    demand(isAllowedPrefix, `Post-Track-B delta path outside allowed governance scope: ${p}`);
   }
   return { valid: true, auditedCount: paths.length };
 }
@@ -222,10 +217,7 @@ export function verifyReconciliation(snapshot, policy, reconciliation = TRACK_B_
     reconciliation.provider.verificationState === "PROVIDER_MIGRATIONS_VERIFIED",
     "Provider verification state must be PROVIDER_MIGRATIONS_VERIFIED",
   );
-  demand(
-    reconciliation.provider.trackB === "CLOSED",
-    "Track B status must be CLOSED",
-  );
+  demand(reconciliation.provider.trackB === "CLOSED", "Track B status must be CLOSED");
   demand(
     reconciliation.provider.projectId === "nhirlpkuvonggctdzzad",
     "Provider project ID mismatch",
@@ -267,12 +259,13 @@ export function verifyReconciliation(snapshot, policy, reconciliation = TRACK_B_
         postTrackBPaths = out.split("\0").filter(Boolean);
       } catch {
         // Fallback for isolated test environments without git ancestry
-        postTrackBPaths = snapshot.diff?.paths?.filter(
-          (p) =>
-            !reconciliation.migrations.some((m) => m.path === p) &&
-            !reconciliation.allowedSpecialPaths.includes(p) &&
-            !p.startsWith("src/"),
-        ) ?? [];
+        postTrackBPaths =
+          snapshot.diff?.paths?.filter(
+            (p) =>
+              !reconciliation.migrations.some((m) => m.path === p) &&
+              !reconciliation.allowedSpecialPaths.includes(p) &&
+              !p.startsWith("src/"),
+          ) ?? [];
       }
     }
     if (postTrackBPaths && postTrackBPaths.length > 0) {
@@ -310,12 +303,15 @@ export function assertReconciliationManifest(manifest, fresh) {
     demand(
       fresh.reconciliation &&
         fresh.reconciliation.reconciliationId ===
-          hash(JSON.stringify(fresh.reconciliation.payload)) &&
+          (fresh.reconciliation.payload?.reconciliationType === "EXACT_506_513_PREPARATION"
+            ? exactScopeId(fresh.reconciliation.payload)
+            : hash(JSON.stringify(fresh.reconciliation.payload))) &&
         manifest.plan?.decision === fresh.decision &&
         manifest.reconciliation?.reconciliationId === fresh.reconciliation.reconciliationId &&
         manifest.plan?.reconciliation?.reconciliationId === fresh.reconciliation.reconciliationId,
       "Phase 1 / Phase 2 reconciliation scope changed",
     );
+    assertExactIntervalManifest(manifest, fresh);
     if (fresh.reconciliation.payload?.reconciliationType === "A4B_CLOSED_RELEASE") {
       demand(
         [manifest.reconciliation, manifest.plan.reconciliation].every(
