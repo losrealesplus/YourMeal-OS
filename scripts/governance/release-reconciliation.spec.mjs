@@ -12,6 +12,7 @@ import {
   assertApproval,
   assertEnvironment,
   preparationEligible,
+  classifyPath,
 } from "./release-contract.mjs";
 
 const mockPolicy = {
@@ -693,11 +694,13 @@ function eatcleanSnapshot() {
         parent: eatcleanRec.sealedCandidateTargetSha,
         pr: 517,
         paths: [...eatcleanRec.governanceFiles],
-        specialFiles: eatcleanRec.governanceFiles.map((path) => ({
-          path,
-          before: null,
-          after: "e".repeat(64),
-        })),
+        specialFiles: eatcleanRec.governanceFiles
+          .filter((path) => classifyPath(path) === "SPECIAL")
+          .map((path) => ({
+            path,
+            before: null,
+            after: "e".repeat(64),
+          })),
       },
     ],
     diff: {
@@ -797,3 +800,128 @@ test("EatClean manifest hash and final source divergence FAIL", () => {
     ),
   );
 });
+
+const finalHotfixSha = "a".repeat(40);
+function eatclean4CommitSnapshot() {
+  const base3 = eatcleanSnapshot();
+  const commit517 = {
+    sha: eatcleanRec.pr517Sha,
+    parent: eatcleanRec.sealedCandidateTargetSha,
+    pr: eatcleanRec.pr517Number,
+    paths: [...eatcleanRec.governanceFiles],
+    specialFiles: eatcleanRec.governanceFiles
+      .filter((p) => classifyPath(p) === "SPECIAL")
+      .map((p) => ({
+        path: p,
+        before: null,
+        after: "e".repeat(64),
+      })),
+  };
+  const hotfixCommit = {
+    sha: finalHotfixSha,
+    parent: eatcleanRec.pr517Sha,
+    pr: 518,
+    paths: [...eatcleanRec.hotfixFiles],
+    specialFiles: eatcleanRec.hotfixFiles.map((p) => ({
+      path: p,
+      before: "e".repeat(64),
+      after: "a".repeat(64),
+    })),
+  };
+  return {
+    ...base3,
+    targetSha: finalHotfixSha,
+    currentMainSha: finalHotfixSha,
+    remediation: eatcleanPr(518, finalHotfixSha, eatcleanRec.hotfixBranch),
+    commits: [
+      base3.commits[0],
+      base3.commits[1],
+      commit517,
+      hotfixCommit,
+    ],
+    diff: {
+      commits: [eatcleanRec.commits[0].sha, eatcleanRec.commits[1].sha, eatcleanRec.pr517Sha, finalHotfixSha],
+      paths: [...new Set([...eatcleanRec.allCandidatePaths, ...eatcleanRec.governanceFiles, ...eatcleanRec.hotfixFiles])].sort(),
+    },
+  };
+}
+
+test("EatClean 4-commit sequence PASS (#515 -> #516 -> #517 -> #HOTFIX)", () => {
+  const result = verifyEatCleanFinalReconciliation(eatclean4CommitSnapshot(), mockPolicy);
+  assert.equal(result.payload.finalSourceSha, finalHotfixSha);
+  assert.equal(result.payload.governanceMerge.pr, 518);
+  assert.equal(result.payload.governanceMerge.pr517Sha, eatcleanRec.pr517Sha);
+  assert.equal(result.payload.reconciliationType, "EATCLEAN_FINAL_RELEASE_RECONCILIATION");
+  assert.equal(preparationEligible("AUTHORIZED_RECONCILED_RELEASE"), true);
+});
+
+test("EatClean 4-commit FAIL: 5th commit fails closed", () => {
+  const s = eatclean4CommitSnapshot();
+  s.commits.push({
+    sha: "b".repeat(40),
+    parent: finalHotfixSha,
+    pr: 519,
+    paths: ["scripts/governance/release-reconciliation.mjs"],
+    specialFiles: [],
+  });
+  s.diff.commits.push("b".repeat(40));
+  assert.throws(
+    () => verifyEatCleanFinalReconciliation(s, mockPolicy),
+    /EatClean final release requires sealed candidate commits/,
+  );
+});
+
+test("EatClean 4-commit FAIL: wrong hotfix parent (not #517)", () => {
+  const s = eatclean4CommitSnapshot();
+  s.commits[3].parent = "9".repeat(40);
+  assert.throws(
+    () => verifyEatCleanFinalReconciliation(s, mockPolicy),
+    /EatClean hotfix commit lineage mismatch/,
+  );
+});
+
+test("EatClean 4-commit FAIL: wrong hotfix head branch", () => {
+  const s = eatclean4CommitSnapshot();
+  s.remediation.head.ref = "feature/arbitrary-branch";
+  assert.throws(
+    () => verifyEatCleanFinalReconciliation(s, mockPolicy),
+    /EatClean hotfix branch mismatch/,
+  );
+});
+
+test("EatClean 4-commit FAIL: unauthorized merger for hotfix PR", () => {
+  const s = eatclean4CommitSnapshot();
+  s.remediation.merged_by.id = 123456789;
+  assert.throws(
+    () => verifyEatCleanFinalReconciliation(s, mockPolicy),
+    /EatClean final release missing canonical human merge evidence/,
+  );
+});
+
+test("EatClean 4-commit FAIL: unmerged hotfix PR", () => {
+  const s = eatclean4CommitSnapshot();
+  s.remediation.merged_at = null;
+  assert.throws(
+    () => verifyEatCleanFinalReconciliation(s, mockPolicy),
+    /EatClean final release missing canonical human merge evidence/,
+  );
+});
+
+test("EatClean 4-commit FAIL: extra unverified path in hotfix commit", () => {
+  const s = eatclean4CommitSnapshot();
+  s.commits[3].paths = [...s.commits[3].paths, "src/unauthorized.ts"].sort();
+  assert.throws(
+    () => verifyEatCleanFinalReconciliation(s, mockPolicy),
+    /EatClean hotfix paths mismatch/,
+  );
+});
+
+test("EatClean 4-commit FAIL: invalid special hash in hotfix", () => {
+  const s = eatclean4CommitSnapshot();
+  s.commits[3].specialFiles[0].after = "invalid_hash";
+  assert.throws(
+    () => verifyEatCleanFinalReconciliation(s, mockPolicy),
+    /EatClean hotfix content evidence invalid/,
+  );
+});
+
