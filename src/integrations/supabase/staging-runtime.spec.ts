@@ -110,7 +110,7 @@ describe("explicit local staging boundary", () => {
     "https://nhirlpkuvonggctdzzad.supabase.co/auth/v1",
     "https://djangucecsphnejplvic.supabase.co",
     "http://127.0.0.1:54322",
-    "http://user:password@127.0.0.1:54321",
+    "http://user:password@127.0.0.1:54331",
   ])("rejects non-pinned backend %s", (url) => {
     expect(() => assertLocalStagingRequest(url)).toThrow(/SECURITY_VIOLATION/);
   });

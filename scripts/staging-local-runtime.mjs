@@ -36,7 +36,7 @@ const jwt = (role) => {
 if (
   entries.YOURMEAL_RUNTIME_ENV !== "staging_local" ||
   entries.TENANT_SLUG !== "eatclean-staging" ||
-  entries.SUPABASE_URL !== "http://127.0.0.1:54321" ||
+  entries.SUPABASE_URL !== "http://127.0.0.1:54331" ||
   entries.SUPABASE_PUBLISHABLE_KEY !== jwt("anon") ||
   entries.SUPABASE_SERVICE_ROLE_KEY !== jwt("service_role") ||
   entries.P34_LOCAL_JWT_SECRET !== secret
