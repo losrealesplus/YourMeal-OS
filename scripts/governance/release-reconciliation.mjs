@@ -1022,6 +1022,13 @@ export const EATCLEAN_FINAL_RELEASE_RECONCILIATION = freezeEatClean({
   "reviewerId": 292604102,
   "reviewerLogin": "losrealesplus",
   "governanceBranch": "ag/gate7-final-reconciliation",
+  "pr517Sha": "2d5b3914dabfd8acfd2bf054dc8c6df3822c8535",
+  "pr517Number": 517,
+  "hotfixBranch": "ag/gate7-hotfix-governance-classification",
+  "hotfixFiles": [
+    "scripts/governance/release-reconciliation.mjs",
+    "scripts/governance/release-reconciliation.spec.mjs"
+  ],
   "sqlManifest": {
     "path": "scripts/release/eatclean-final-sql-manifest.json",
     "sha256": "a111b82a8b32e787f3e3975f5a06f7de62c01e87509bd346ccc01cf8047350ca",
@@ -1054,18 +1061,21 @@ export function verifyEatCleanFinalReconciliation(snapshot, policy) {
       targetSha !== record.sealedCandidateTargetSha,
     "EatClean final release final source missing/stale",
   );
+  const isFourCommits = commits?.length === 4;
   demand(
-    commits?.length === 3 &&
-      commits[0].sha === record.commits[0].sha &&
+    commits?.length === 3 || isFourCommits,
+    "EatClean final release requires sealed candidate commits (#515, #516) plus governance reconciliation commits",
+  );
+  demand(
+    commits[0].sha === record.commits[0].sha &&
       commits[0].parent === record.baselineSha &&
       commits[0].pr === record.candidatePrs[0] &&
       commits[1].sha === record.commits[1].sha &&
       commits[1].parent === record.commits[0].sha &&
-      commits[1].pr === record.candidatePrs[1] &&
-      commits[2].sha === targetSha &&
-      commits[2].parent === record.sealedCandidateTargetSha,
-    "EatClean final release requires sealed candidate commits (#515, #516) plus exactly one governance merge",
+      commits[1].pr === record.candidatePrs[1],
+    "EatClean final release requires sealed candidate commits (#515, #516) lineage",
   );
+
   const assertHumanPr = (pr, number, sha) =>
     demand(
       pr?.number === number &&
@@ -1081,12 +1091,7 @@ export function verifyEatCleanFinalReconciliation(snapshot, policy) {
   demand(Array.isArray(productPrs) && productPrs.length === 2, "EatClean candidate requires exactly two merged PRs");
   assertHumanPr(productPrs[0], record.candidatePrs[0], record.commits[0].sha);
   assertHumanPr(productPrs[1], record.candidatePrs[1], record.commits[1].sha);
-  demand(
-    Number.isSafeInteger(commits[2].pr) && commits[2].pr > record.candidatePrs[1],
-    "EatClean governance PR invalid",
-  );
-  assertHumanPr(remediation, commits[2].pr, targetSha);
-  demand(remediation.head.ref === record.governanceBranch, "EatClean governance branch mismatch");
+
   demand(
     sameEatClean(commits[0].paths, record.commits[0].paths) &&
       sameEatClean(commits[0].specialFiles, record.commits[0].specialFiles),
@@ -1097,10 +1102,118 @@ export function verifyEatCleanFinalReconciliation(snapshot, policy) {
       sameEatClean(commits[1].specialFiles, record.commits[1].specialFiles),
     "EatClean PR #516 paths/hashes mismatch",
   );
-  demand(
-    sameEatClean(commits[2].paths, record.governanceFiles),
-    "EatClean governance-only paths mismatch",
-  );
+
+  let governanceMerge;
+
+  if (!isFourCommits) {
+    // 3-commit mode: commit 2 is PR #517 and is targetSha
+    demand(
+      commits[2].sha === targetSha &&
+        commits[2].parent === record.sealedCandidateTargetSha,
+      "EatClean 3-commit mode governance commit lineage mismatch",
+    );
+    demand(
+      Number.isSafeInteger(commits[2].pr) && commits[2].pr > record.candidatePrs[1],
+      "EatClean governance PR invalid",
+    );
+    assertHumanPr(remediation, commits[2].pr, targetSha);
+    demand(remediation.head.ref === record.governanceBranch, "EatClean governance branch mismatch");
+    demand(
+      sameEatClean(commits[2].paths, record.governanceFiles),
+      "EatClean governance-only paths mismatch",
+    );
+    const expectedSpecialPaths = record.governanceFiles.filter((p) => classifyPath(p) === "SPECIAL");
+    const governanceEvidence = commits[2].specialFiles;
+    demand(
+      Array.isArray(governanceEvidence) &&
+        sameEatClean(
+          governanceEvidence.map((f) => f.path),
+          expectedSpecialPaths,
+        ) &&
+        governanceEvidence.every(
+          (f) =>
+            (f.before === null || /^[a-f0-9]{64}$/.test(f.before)) &&
+            /^[a-f0-9]{64}$/.test(f.after ?? ""),
+        ),
+      "EatClean governance content evidence invalid",
+    );
+    governanceMerge = {
+      sha: targetSha,
+      pr: remediation.number,
+      mergedBy: remediation.merged_by.id,
+      files: governanceEvidence,
+    };
+  } else {
+    // 4-commit mode:
+    // commit 2 is sealed PR #517 merge commit (2d5b3914...)
+    demand(
+      commits[2].sha === record.pr517Sha &&
+        commits[2].parent === record.sealedCandidateTargetSha &&
+        commits[2].pr === record.pr517Number,
+      "EatClean PR #517 merge commit lineage mismatch",
+    );
+    demand(
+      sameEatClean(commits[2].paths, record.governanceFiles),
+      "EatClean PR #517 governance paths mismatch",
+    );
+    const expectedSpecialPaths517 = record.governanceFiles.filter((p) => classifyPath(p) === "SPECIAL");
+    demand(
+      Array.isArray(commits[2].specialFiles) &&
+        sameEatClean(
+          commits[2].specialFiles.map((f) => f.path),
+          expectedSpecialPaths517,
+        ) &&
+        commits[2].specialFiles.every(
+          (f) =>
+            (f.before === null || /^[a-f0-9]{64}$/.test(f.before)) &&
+            /^[a-f0-9]{64}$/.test(f.after ?? ""),
+        ),
+      "EatClean PR #517 governance evidence invalid",
+    );
+
+    // commit 3 is the hotfix PR merge commit and is targetSha
+    demand(
+      commits[3].sha === targetSha &&
+        commits[3].parent === record.pr517Sha,
+      "EatClean hotfix commit lineage mismatch",
+    );
+    demand(
+      Number.isSafeInteger(commits[3].pr) && commits[3].pr > record.pr517Number,
+      "EatClean hotfix PR number invalid",
+    );
+    assertHumanPr(remediation, commits[3].pr, targetSha);
+    demand(
+      remediation.head.ref === record.hotfixBranch,
+      "EatClean hotfix branch mismatch",
+    );
+    demand(
+      sameEatClean(commits[3].paths, record.hotfixFiles),
+      "EatClean hotfix paths mismatch",
+    );
+    const expectedHotfixSpecial = record.hotfixFiles.filter((p) => classifyPath(p) === "SPECIAL");
+    const hotfixEvidence = commits[3].specialFiles;
+    demand(
+      Array.isArray(hotfixEvidence) &&
+        sameEatClean(
+          hotfixEvidence.map((f) => f.path),
+          expectedHotfixSpecial,
+        ) &&
+        hotfixEvidence.every(
+          (f) =>
+            (f.before === null || /^[a-f0-9]{64}$/.test(f.before)) &&
+            /^[a-f0-9]{64}$/.test(f.after ?? ""),
+        ),
+      "EatClean hotfix content evidence invalid",
+    );
+    governanceMerge = {
+      sha: targetSha,
+      pr: remediation.number,
+      mergedBy: remediation.merged_by.id,
+      pr517Sha: record.pr517Sha,
+      files: hotfixEvidence,
+    };
+  }
+
   const union = [...new Set(commits.flatMap((c) => c.paths))].sort();
   demand(
     sameEatClean(
@@ -1114,20 +1227,7 @@ export function verifyEatCleanFinalReconciliation(snapshot, policy) {
       sameEatClean(snapshot.constraints, record.constraints),
     "EatClean classification/closure contract mismatch",
   );
-  const governanceEvidence = commits[2].specialFiles;
-  demand(
-    Array.isArray(governanceEvidence) &&
-      sameEatClean(
-        governanceEvidence.map((f) => f.path),
-        record.governanceFiles,
-      ) &&
-      governanceEvidence.every(
-        (f) =>
-          (f.before === null || /^[a-f0-9]{64}$/.test(f.before)) &&
-          /^[a-f0-9]{64}$/.test(f.after ?? ""),
-      ),
-    "EatClean governance content evidence invalid",
-  );
+
   const payload = {
     ...record,
     finalSourceSha: targetSha,
@@ -1135,12 +1235,7 @@ export function verifyEatCleanFinalReconciliation(snapshot, policy) {
       { sha: commits[0].sha, pr: record.candidatePrs[0], mergedBy: productPrs[0].merged_by.id },
       { sha: commits[1].sha, pr: record.candidatePrs[1], mergedBy: productPrs[1].merged_by.id },
     ],
-    governanceMerge: {
-      sha: targetSha,
-      pr: remediation.number,
-      mergedBy: remediation.merged_by.id,
-      files: governanceEvidence,
-    },
+    governanceMerge,
   };
   return { reconciled: true, reconciliationId: hash(JSON.stringify(payload)), payload };
 }
