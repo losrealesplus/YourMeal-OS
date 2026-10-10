@@ -1,4 +1,5 @@
-import { describe, it, expect } from "vitest";
+import { afterEach, describe, it, expect, vi } from "vitest";
+import { LOCAL_STAGING_CONFIG } from "./local-staging-runtime";
 import fs from "node:fs";
 import path from "node:path";
 import { resolveInstanceLogoUrl } from "@/components/tenant/tenant-logo";
@@ -10,6 +11,7 @@ import {
 } from "@/lib/instance-runtime-boundary";
 
 describe("PR #447: Official Brand Assets and Instance-Aware Branding Hardening", () => {
+  afterEach(() => vi.unstubAllGlobals());
   describe("1. Public Logo Resolution (Runtime Mapping)", () => {
     it("A. YourMeal OS host -> YourMeal OS logo", () => {
       const logo = resolveInstanceLogoUrl("www.yourmealos.com");
@@ -26,8 +28,12 @@ describe("PR #447: Official Brand Assets and Instance-Aware Branding Hardening",
       expect(logo).toBe("/assets/eatclean-logo.png");
     });
 
-    it("D. EatClean staging -> EatClean logo", () => {
-      const logo = resolveInstanceLogoUrl("eatclean-staging.yourmealos.com");
+    it("D. Explicit local staging -> EatClean logo", () => {
+      vi.stubGlobal("window", {
+        location: { hostname: "localhost" },
+        __INSTANCE_CONFIG__: LOCAL_STAGING_CONFIG,
+      });
+      const logo = resolveInstanceLogoUrl("localhost");
       expect(logo).toBe("/assets/eatclean-logo.png");
     });
 

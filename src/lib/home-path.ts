@@ -37,17 +37,14 @@ function hasTenantStaff(roles: readonly AppRole[]): boolean {
  * Hybrid Platform + Tenant staff → Tenant Surface first (`/admin`);
  * Platform entry remains available via SaaS ops entry (not a second ambiguous landing).
  */
-export function homePathForRoles(
-  roles: readonly AppRole[],
-  host?: string,
-): string {
+export function homePathForRoles(roles: readonly AppRole[], host?: string): string {
   const currentHost =
-    host ??
-    (typeof window !== "undefined" ? window.location.hostname : undefined);
+    host ?? (typeof window !== "undefined" ? window.location.hostname : undefined);
   let isCustomerTenant = false;
   try {
     const config = resolveInstanceRuntimeConfig(currentHost);
-    isCustomerTenant = config.instanceType === "customer_tenant";
+    isCustomerTenant =
+      config.instanceType === "customer_tenant" || config.instanceType === "local_staging";
   } catch {
     // default to false
   }

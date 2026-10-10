@@ -1,7 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { LOCAL_STAGING_CONFIG } from "./local-staging-runtime";
 import { homePathForRoles } from "./home-path";
 
 describe("homePathForRoles · LP-001 / EP-OPS-002", () => {
+  afterEach(() => vi.unstubAllGlobals());
   it("routes kitchen-only to kitchen workspace", () => {
     expect(homePathForRoles(["kitchen"])).toBe("/admin/kitchen");
   });
@@ -37,24 +39,23 @@ describe("homePathForRoles · LP-001 / EP-OPS-002", () => {
 
   it("routes pure saas_admin to platform surface on central platform", () => {
     expect(homePathForRoles(["saas_admin"], "www.yourmealos.com")).toBe("/saas");
-    expect(homePathForRoles(["saas_admin"], "clientes.yourmealos.com")).toBe(
-      "/saas",
-    );
+    expect(homePathForRoles(["saas_admin"], "clientes.yourmealos.com")).toBe("/saas");
   });
 
   it("routes saas_admin to ops center on customer tenant instance", () => {
-    expect(homePathForRoles(["saas_admin"], "eatclean.yourmealos.com")).toBe(
-      "/admin",
-    );
-    expect(
-      homePathForRoles(["saas_admin"], "eatclean-staging.yourmealos.com"),
-    ).toBe("/admin");
+    expect(homePathForRoles(["saas_admin"], "eatclean.yourmealos.com")).toBe("/admin");
+  });
+
+  it("routes explicitly isolated local staging to tenant operations", () => {
+    vi.stubGlobal("window", {
+      location: { hostname: "localhost" },
+      __INSTANCE_CONFIG__: LOCAL_STAGING_CONFIG,
+    });
+    expect(homePathForRoles(["saas_admin"], "localhost")).toBe("/admin");
   });
 
   it("routes hybrid staff + saas_admin to tenant ops (tenant-first)", () => {
-    expect(homePathForRoles(["operations_manager", "saas_admin"])).toBe(
-      "/admin",
-    );
+    expect(homePathForRoles(["operations_manager", "saas_admin"])).toBe("/admin");
     expect(homePathForRoles(["company_admin", "saas_admin"])).toBe("/admin");
   });
 
@@ -67,4 +68,3 @@ describe("homePathForRoles · LP-001 / EP-OPS-002", () => {
     expect(homePathForRoles(roles)).toBe(homePathForRoles([...roles].reverse()));
   });
 });
-

@@ -1,0 +1,19 @@
+{
+  "purpose": "local synthetic SQL staging; not a Cloudflare or full Auth deployment",
+  "source": "b9d9ff56c50570f60f6b1cb1db0e41909b477d2d",
+  "network": "none",
+  "productionBindings": [],
+  "cloudDeployAllowed": false,
+  "image": "public.ecr.aws/supabase/postgres@sha256:3866d94d8426927e8db3f1c5d790752292bfbe27b5f1f46e199ae1b7d3c1710b",
+  "postgresVersion": "17.6",
+  "storage": "tmpfs",
+  "syntheticTenant": "10000000-0000-4000-8000-000000000001",
+  "authentication": "synthetic authenticated role and JWT claim; no production credentials",
+  "a5": "HARD_DISABLED",
+  "a4bActivation": false,
+  "oauthActivation": false,
+  "migrationHashes": {
+    "20261008112217_p34_identity_crm_profile.sql": "4ee85c359dd1d098ae4dd7581e6bca1d1288971da474e25cdb381ac23ff872f4",
+    "20261008160753_p34_identity_conflict_recovery.sql": "81acb6ac9c87c3a38e60ff5f810ff9f6a0a201a015465b01e5b48eb57a0726b4"
+  }
+}

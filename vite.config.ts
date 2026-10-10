@@ -5,6 +5,7 @@ import react from "@vitejs/plugin-react";
 import { defineConfig, loadEnv } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { nitro } from "nitro/vite";
+import { serverLocalStaging } from "./src/integrations/supabase/local-staging.server";
 
 const mobileSpa = process.env.CAPACITOR_BUILD === "1";
 
@@ -54,7 +55,11 @@ function tenantCommercialPlugin() {
  * .output/server/index.mjs is not loadable by tanstack-start preview-server.
  */
 export default defineConfig(({ mode }) => {
-  const env = { ...loadEnv(mode, process.cwd(), ""), ...process.env };
+  // Local staging never reads the repository's .env files or their cloud credentials.
+  const localStaging = serverLocalStaging(process.env);
+  const env = localStaging
+    ? { VITE_YOURMEAL_RUNTIME_ENV: "staging_local" }
+    : { ...loadEnv(mode, process.cwd(), ""), ...process.env };
   const viteEnvDefines = Object.fromEntries(
     Object.entries(env)
       .filter(([key]) => key.startsWith("VITE_"))
@@ -62,22 +67,19 @@ export default defineConfig(({ mode }) => {
   );
 
   return {
-    envPrefix: ["VITE_", "NEXT_PUBLIC_"],
+    ...(localStaging ? { envDir: false as const } : {}),
+    envPrefix: localStaging ? [] : ["VITE_", "NEXT_PUBLIC_"],
     define: viteEnvDefines,
     resolve: {
       alias: {
         "@": path.resolve(process.cwd(), "./src"),
       },
-      dedupe: [
-        "react",
-        "react-dom",
-        "@tanstack/react-query",
-        "@tanstack/query-core",
-      ],
+      dedupe: ["react", "react-dom", "@tanstack/react-query", "@tanstack/query-core"],
     },
     server: {
-      host: "::",
+      host: localStaging ? "127.0.0.1" : "::",
       port: 8080,
+      ...(localStaging ? { strictPort: true } : {}),
       hmr: {
         overlay: false,
       },
@@ -102,7 +104,7 @@ export default defineConfig(({ mode }) => {
             }
           : {}),
       }),
-      ...(mobileSpa
+      ...(mobileSpa || localStaging
         ? []
         : [
             nitro({

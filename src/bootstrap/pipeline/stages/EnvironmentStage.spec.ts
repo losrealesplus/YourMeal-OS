@@ -35,7 +35,7 @@ afterEach(() => {
 });
 
 describe("EnvironmentStage canonical instance contract", () => {
-  it.each(["eatclean.yourmealos.com", "eatclean-staging.yourmealos.com", "yourmealos.com"])(
+  it.each(["eatclean.yourmealos.com", "yourmealos.com"])(
     "accepts hostname %s without duplicated Vite environment",
     async (hostname) => {
       vi.stubGlobal("window", { location: { hostname } });
