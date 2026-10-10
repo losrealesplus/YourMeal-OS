@@ -63,7 +63,7 @@ const server = createServer((req, res) => {
 beforeAll(async () => {
   await new Promise<void>((ok, fail) => {
     server.once("error", fail);
-    server.listen(54321, "127.0.0.1", ok);
+    server.listen(54331, "127.0.0.1", ok);
   });
 });
 afterEach(() => {

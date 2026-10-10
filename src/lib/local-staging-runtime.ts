@@ -1,6 +1,6 @@
 /** Explicit local-only staging contract. All credentials here are synthetic, never cloud keys. */
 import type { InstanceRuntimeConfig } from "./instance-runtime-boundary";
-export const LOCAL_STAGING_URL = "http://127.0.0.1:54321";
+export const LOCAL_STAGING_URL = "http://127.0.0.1:54331";
 export const LOCAL_STAGING_PUBLIC_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJwMzQtbG9jYWwtc3ludGhldGljIiwicm9sZSI6ImFub24ifQ.z2pUjMp_cFMba16ShIt-TtReuggUPen10BpncZD9GJs";
 export const LOCAL_STAGING_CONFIG: InstanceRuntimeConfig = Object.freeze({

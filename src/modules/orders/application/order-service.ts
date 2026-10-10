@@ -366,7 +366,11 @@ export const OrderService = {
       }
 
       // CR-OPS-06: Auto-create delivery_services for each distinct delivery day
-      if (result?.order?.id && typeof ctx.supabase?.from === "function") {
+      if (
+        hasStaffAccess(ctx.roles) &&
+        result?.order?.id &&
+        typeof ctx.supabase?.from === "function"
+      ) {
         try {
           const { createOperationsRepository } =
             await import("@/modules/operations/infrastructure/operations-repository");
@@ -594,7 +598,11 @@ export const OrderService = {
     }
 
     // CR-OPS-06: Auto-create delivery_services for each distinct delivery day
-    if (result?.order?.id && typeof ctx.supabase?.from === "function") {
+    if (
+      hasStaffAccess(ctx.roles) &&
+      result?.order?.id &&
+      typeof ctx.supabase?.from === "function"
+    ) {
       try {
         const { createOperationsRepository } =
           await import("@/modules/operations/infrastructure/operations-repository");
