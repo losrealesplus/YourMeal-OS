@@ -638,3 +638,162 @@ test("A4b payload modification with unchanged ID and wrong manifest source FAIL"
     assert.throws(() => assertReconciliationManifest(manifest, fresh));
   }
 });
+
+
+// EatClean final release tests (#515 + #516) use synthetic GitHub evidence; no API/provider mutations.
+const {
+  EATCLEAN_FINAL_RELEASE_RECONCILIATION: eatcleanRec,
+  verifyEatCleanFinalReconciliation,
+} = await import("./release-reconciliation.mjs");
+
+const finalEatClean = "f".repeat(40);
+const eatcleanPr = (number, sha, branch) => ({
+  number,
+  merged_at: "2026-10-10T00:00:00Z",
+  merge_commit_sha: sha,
+  base: { ref: "main", repo: { full_name: mockPolicy.repository } },
+  head: { ref: branch, repo: { full_name: mockPolicy.repository } },
+  merged_by: { id: 292604102, login: "losrealesplus" },
+});
+
+function eatcleanSnapshot() {
+  return {
+    repository: mockPolicy.repository,
+    baseline: {
+      sha: eatcleanRec.baselineSha,
+      deploymentId: eatcleanRec.baselineDeploymentId,
+      versionId: eatcleanRec.baselineVersionId,
+    },
+    targetSha: finalEatClean,
+    currentMainSha: finalEatClean,
+    originalDecision: eatcleanRec.originalDecision,
+    constraints: structuredClone(eatcleanRec.constraints),
+    productPrs: [
+      eatcleanPr(515, eatcleanRec.commits[0].sha, "codex/staging-runtime-isolation"),
+      eatcleanPr(516, eatcleanRec.commits[1].sha, "codex/eatclean-final-release-package"),
+    ],
+    remediation: eatcleanPr(517, finalEatClean, eatcleanRec.governanceBranch),
+    commits: [
+      {
+        sha: eatcleanRec.commits[0].sha,
+        parent: eatcleanRec.baselineSha,
+        pr: 515,
+        paths: [...eatcleanRec.commits[0].paths],
+        specialFiles: structuredClone(eatcleanRec.commits[0].specialFiles),
+      },
+      {
+        sha: eatcleanRec.commits[1].sha,
+        parent: eatcleanRec.commits[0].sha,
+        pr: 516,
+        paths: [...eatcleanRec.commits[1].paths],
+        specialFiles: structuredClone(eatcleanRec.commits[1].specialFiles),
+      },
+      {
+        sha: finalEatClean,
+        parent: eatcleanRec.sealedCandidateTargetSha,
+        pr: 517,
+        paths: [...eatcleanRec.governanceFiles],
+        specialFiles: eatcleanRec.governanceFiles.map((path) => ({
+          path,
+          before: null,
+          after: "e".repeat(64),
+        })),
+      },
+    ],
+    diff: {
+      commits: [eatcleanRec.commits[0].sha, eatcleanRec.commits[1].sha, finalEatClean],
+      paths: [...new Set([...eatcleanRec.allCandidatePaths, ...eatcleanRec.governanceFiles])].sort(),
+    },
+  };
+}
+
+test("EatClean sealed interval PASS and immutable record", () => {
+  const result = verifyEatCleanFinalReconciliation(eatcleanSnapshot(), mockPolicy);
+  assert.equal(result.payload.finalSourceSha, finalEatClean);
+  assert.equal(result.payload.reconciliationType, "EATCLEAN_FINAL_RELEASE_RECONCILIATION");
+  assert.equal(result.payload.sqlManifest.entriesCount, 4);
+  assert.equal(result.payload.sqlManifest.productionExecutionAuthorized, false);
+  assert.equal(preparationEligible("AUTHORIZED_RECONCILED_RELEASE"), true);
+  assert.ok(Object.isFrozen(eatcleanRec.specialFiles));
+  assert.ok(Object.isFrozen(eatcleanRec.constraints));
+  assert.ok(Object.isFrozen(eatcleanRec.commits));
+});
+
+test("EatClean FAIL: wrong production baseline", () => {
+  const s = eatcleanSnapshot();
+  s.baseline.sha = "0".repeat(40);
+  assert.throws(() => verifyEatCleanFinalReconciliation(s, mockPolicy), /EatClean final release production baseline mismatch/);
+});
+
+test("EatClean FAIL: wrong deployment ID", () => {
+  const s = eatcleanSnapshot();
+  s.baseline.deploymentId++;
+  assert.throws(() => verifyEatCleanFinalReconciliation(s, mockPolicy), /EatClean final release production baseline mismatch/);
+});
+
+test("EatClean FAIL: wrong baseline version", () => {
+  const s = eatcleanSnapshot();
+  s.baseline.versionId = "00000000-0000-0000-0000-000000000000";
+  assert.throws(() => verifyEatCleanFinalReconciliation(s, mockPolicy), /EatClean final release production baseline mismatch/);
+});
+
+test("EatClean FAIL: wrong candidate commit", () => {
+  const s = eatcleanSnapshot();
+  s.commits[1].sha = "1".repeat(40);
+  assert.throws(() => verifyEatCleanFinalReconciliation(s, mockPolicy), /EatClean final release requires sealed candidate commits/);
+});
+
+test("EatClean FAIL: missing PR in sequence", () => {
+  const s = eatcleanSnapshot();
+  s.productPrs = [s.productPrs[0]];
+  assert.throws(() => verifyEatCleanFinalReconciliation(s, mockPolicy), /EatClean candidate requires exactly two merged PRs/);
+});
+
+test("EatClean FAIL: unauthorized human identity", () => {
+  const s = eatcleanSnapshot();
+  s.productPrs[1].merged_by.id = 999999999;
+  assert.throws(() => verifyEatCleanFinalReconciliation(s, mockPolicy), /EatClean final release missing canonical human merge evidence/);
+});
+
+test("EatClean FAIL: governance branch mismatch", () => {
+  const s = eatcleanSnapshot();
+  s.remediation.head.ref = "attacker/governance-branch";
+  assert.throws(() => verifyEatCleanFinalReconciliation(s, mockPolicy), /EatClean governance branch mismatch/);
+});
+
+test("EatClean FAIL: extra path in diff", () => {
+  const s = eatcleanSnapshot();
+  s.diff.paths = [...s.diff.paths, "src/unauthorized.ts"].sort();
+  assert.throws(() => verifyEatCleanFinalReconciliation(s, mockPolicy), /EatClean outstanding history\/path mismatch/);
+});
+
+test("EatClean FAIL: altered SPECIAL hash in PR #516", () => {
+  const s = eatcleanSnapshot();
+  s.commits[1].specialFiles[0].after = "0".repeat(64);
+  assert.throws(() => verifyEatCleanFinalReconciliation(s, mockPolicy), /EatClean PR #516 paths\/hashes mismatch/);
+});
+
+test("EatClean constraint FAIL: productionSqlAuthorized cannot be true", () => {
+  const s = eatcleanSnapshot();
+  s.constraints.productionSqlAuthorized = true;
+  assert.throws(() => verifyEatCleanFinalReconciliation(s, mockPolicy), /EatClean classification\/closure contract mismatch/);
+});
+
+test("EatClean manifest hash and final source divergence FAIL", () => {
+  const verified = verifyEatCleanFinalReconciliation(eatcleanSnapshot(), mockPolicy);
+  const fresh = { decision: "AUTHORIZED_RECONCILED_RELEASE", reconciliation: verified, sourceSha: finalEatClean };
+  const s = eatcleanSnapshot();
+  s.targetSha = "e".repeat(40);
+  s.currentMainSha = s.targetSha;
+  s.commits[2].sha = s.targetSha;
+  s.diff.commits[2] = s.targetSha;
+  s.remediation.merge_commit_sha = s.targetSha;
+  const other = verifyEatCleanFinalReconciliation(s, mockPolicy);
+  assert.notEqual(other.reconciliationId, verified.reconciliationId);
+  assert.throws(() =>
+    assertReconciliationManifest(
+      { plan: fresh, reconciliation: verified },
+      { ...fresh, reconciliation: other },
+    ),
+  );
+});
