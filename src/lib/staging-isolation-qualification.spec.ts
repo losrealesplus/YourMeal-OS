@@ -8,9 +8,9 @@ import { createBootstrapContext } from "@/bootstrap/pipeline/BootstrapContext";
 
 afterEach(() => vi.unstubAllGlobals());
 
-it("characterizes the existing staging hostname as a production binding", () => {
-  expect(resolveInstanceRuntimeConfig("eatclean-staging.yourmealos.com").supabaseProjectRef).toBe(
-    "nhirlpkuvonggctdzzad",
+it("rejects the legacy staging hostname before any production fallback", () => {
+  expect(() => resolveInstanceRuntimeConfig("eatclean-staging.yourmealos.com")).toThrow(
+    /SECURITY_VIOLATION/,
   );
 });
 

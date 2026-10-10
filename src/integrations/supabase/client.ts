@@ -5,13 +5,15 @@ import {
   validateInstanceRuntimeConfig,
 } from "@/lib/instance-runtime-boundary";
 import type { Database } from "./types";
+import { isLocalStaging, assertLocalStagingRequest } from "@/lib/local-staging-runtime";
 
 function isNewSupabaseApiKey(value: string): boolean {
   return value.startsWith("sb_publishable_") || value.startsWith("sb_secret_");
 }
 
-function createSupabaseFetch(supabaseKey: string): typeof fetch {
+function createSupabaseFetch(supabaseKey: string, staging = false): typeof fetch {
   return (input, init) => {
+    if (staging) assertLocalStagingRequest(input);
     const headers = new Headers(
       typeof Request !== "undefined" && input instanceof Request ? input.headers : undefined,
     );
@@ -29,7 +31,7 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
     }
 
     headers.set("apikey", supabaseKey);
-    return fetch(input, { ...init, headers });
+    return fetch(input, { ...init, headers, ...(staging ? { redirect: "error" as const } : {}) });
   };
 }
 
@@ -39,11 +41,13 @@ function createSupabaseClient() {
   validateInstanceRuntimeConfig(runtimeConfig);
 
   const SUPABASE_URL = runtimeConfig.supabaseUrl;
-  const SUPABASE_PUBLISHABLE_KEY =
-    runtimeConfig.supabasePublishableKey ||
-    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-    process.env.SUPABASE_PUBLISHABLE_KEY ||
-    "sb_publishable_PUfHKoTQ5aQO8IlG759-pg_adAFsa8A";
+  const staging = isLocalStaging(runtimeConfig);
+  const SUPABASE_PUBLISHABLE_KEY = staging
+    ? runtimeConfig.supabasePublishableKey
+    : runtimeConfig.supabasePublishableKey ||
+      import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+      process.env.SUPABASE_PUBLISHABLE_KEY ||
+      "sb_publishable_PUfHKoTQ5aQO8IlG759-pg_adAFsa8A";
 
   if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
     const missing = [
@@ -57,13 +61,14 @@ function createSupabaseClient() {
 
   return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     global: {
-      fetch: createSupabaseFetch(SUPABASE_PUBLISHABLE_KEY),
+      fetch: createSupabaseFetch(SUPABASE_PUBLISHABLE_KEY, staging),
     },
     auth: {
       // M-04: session persistence via StorageProvider (web localStorage / Capacitor Preferences).
       storage: createSupabaseAuthStorage(),
       persistSession: true,
       autoRefreshToken: true,
+      ...(staging ? { storageKey: "yourmeal-local-staging-auth" } : {}),
     },
   });
 }

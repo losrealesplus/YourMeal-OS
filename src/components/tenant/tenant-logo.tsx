@@ -13,10 +13,7 @@ import { brandConfig } from "@/tenant/brand-config";
 import { cn } from "@/lib/utils";
 import { useTenantBrand } from "@/hooks/use-tenant-brand";
 import { resolveInstanceRuntimeConfig } from "@/lib/instance-runtime-boundary";
-import {
-  createTripleTapDetector,
-  requestDeveloperPortal,
-} from "@/runtime/developer-portal";
+import { createTripleTapDetector, requestDeveloperPortal } from "@/runtime/developer-portal";
 
 const FALLBACK_LOGO = fallbackLogoUrl;
 
@@ -25,7 +22,7 @@ export function resolveInstanceLogoUrl(hostname?: string): string {
     const config = resolveInstanceRuntimeConfig(
       hostname ?? (typeof window !== "undefined" ? window.location.hostname : undefined),
     );
-    if (config.tenantSlug === "eatclean") {
+    if (config.tenantSlug === "eatclean" || config.instanceType === "local_staging") {
       return "/assets/eatclean-logo.png";
     }
   } catch {
@@ -59,7 +56,8 @@ export function TenantLogo({
   const isCustomerInstance = (() => {
     try {
       const host = typeof window !== "undefined" ? window.location.hostname : undefined;
-      return resolveInstanceRuntimeConfig(host).tenantSlug === "eatclean";
+      const config = resolveInstanceRuntimeConfig(host);
+      return config.tenantSlug === "eatclean" || config.instanceType === "local_staging";
     } catch {
       return false;
     }

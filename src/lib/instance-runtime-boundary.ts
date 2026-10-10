@@ -11,9 +11,18 @@
  * - Silent fallback to Core .env is strictly blocked (FAIL FAST).
  */
 
-export type InstanceType = "core_demo" | "customer_tenant";
+import {
+  isLocalStaging,
+  validateLocalStaging,
+  assertLocalStagingHost,
+  localStagingFromEnvironment,
+  LOCAL_STAGING_CONFIG,
+} from "./local-staging-runtime";
+
+export type InstanceType = "core_demo" | "customer_tenant" | "local_staging";
 
 export interface InstanceRuntimeConfig {
+  runtimeEnvironment?: "staging_local";
   instanceType: InstanceType;
   tenantSlug: string;
   coreVersion: string;
@@ -56,6 +65,13 @@ export function validateInstanceRuntimeConfig(config: InstanceRuntimeConfig): vo
   if (!config) {
     throw new Error("SECURITY_VIOLATION: Instance runtime configuration is missing.");
   }
+  if (isLocalStaging(config)) {
+    validateLocalStaging(config);
+    return;
+  }
+  if (config.runtimeEnvironment !== undefined) {
+    throw new Error("SECURITY_VIOLATION: Unknown runtime environment.");
+  }
 
   // 1. Tenant: yourmeal-os (Core Demo)
   if (config.tenantSlug === "yourmeal-os") {
@@ -95,12 +111,36 @@ export function validateInstanceRuntimeConfig(config: InstanceRuntimeConfig): vo
  */
 export function resolveInstanceRuntimeConfig(hostname?: string): InstanceRuntimeConfig {
   const host = (hostname || "").toLowerCase().trim();
+  const localBuild = import.meta.env.VITE_YOURMEAL_RUNTIME_ENV;
+  if (localBuild !== undefined && localBuild !== "staging_local") {
+    throw new Error("SECURITY_VIOLATION: Unknown build runtime environment.");
+  }
+  if (localBuild === "staging_local") {
+    assertLocalStagingHost(host);
+    if (typeof window !== "undefined" && window.__INSTANCE_CONFIG__) {
+      validateLocalStaging(window.__INSTANCE_CONFIG__);
+    }
+    return LOCAL_STAGING_CONFIG;
+  }
 
   // 1. Check for explicit window injection if in browser
   if (typeof window !== "undefined" && window.__INSTANCE_CONFIG__) {
     const injected = window.__INSTANCE_CONFIG__;
+    if (isLocalStaging(injected)) assertLocalStagingHost(host);
+    else if (host.includes("staging"))
+      throw new Error("SECURITY_VIOLATION: Staging cannot use a production identity.");
     validateInstanceRuntimeConfig(injected);
     return injected;
+  }
+  if (typeof window === "undefined" && typeof process !== "undefined") {
+    const local = localStagingFromEnvironment(process.env);
+    if (local) {
+      assertLocalStagingHost(host);
+      return local;
+    }
+  }
+  if (host.includes("staging")) {
+    throw new Error("SECURITY_VIOLATION: Explicit staging configuration required.");
   }
 
   // 2. Hostname-based deterministic resolution
