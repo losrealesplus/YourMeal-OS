@@ -225,3 +225,39 @@ Secuencia tras revisión: merge humano del PR governance → push automático no
 Reviewer: Codex autoauditoría técnica, no aprobación humana independiente. Base: f2ef7edddb808b362ee77e6077c0b3971d38ea92. Branch: codex/a4b-closed-release-reconciliation. Fecha: 2026-10-06. Categoría: Operational Service (governance, sin cambios de Product Core ni certificación de Flow). Impacto: preparación verificable del release cerrado sin ampliar permisos ni recalificar sensibilidad. Tiempos operacionales: N/A; no se inventan métricas.
 
 Arquitectura/contratos: verificador separado, runtime y clasificador intactos. Tests: ver diario con resultados finales. Riesgo MEDIUM: código de elegibilidad de preparación, protegido por historia/paths/hashes y aprobación soberana independiente. Residuales: confianza en GitHub/metadatos y merge humano del propio governance; API inaccesible bloquea; estado live CLOSED aún no certificado. Android/APK/ADB y UX: N/A a este delta governance. Verdict: READY WITH WARNINGS para revisión humana, sin autoridad de merge/deploy.
+
+
+## EatClean final release reconciliation (#515 + #516) — alcance único
+
+Autorización de implementación: Alexander Hernandez, 2026-10-10.
+Este carril reconcilia el intervalo exacto entre el baseline de producción publicado (`b9d9ff56c50570f60f6b1cb1db0e41909b477d2d`, deployment `6981646840`, versión `52391b7d-d1d5-4997-abe4-15b0e29bd652`) y el candidato en main (`9106124499a0f028161ab09309b772a576217102`), compuesto por los PRs #515 y #516.
+
+Anclas EatClean:
+- Baseline publicado: `b9d9ff56c50570f60f6b1cb1db0e41909b477d2d`
+- Deployment ID: `6981646840`
+- Versión ID: `52391b7d-d1d5-4997-abe4-15b0e29bd652`
+- Candidato target: `9106124499a0f028161ab09309b772a576217102`
+- PRs del candidato: #515 (`38eb0b5d...`) y #516 (`91061244...`)
+- Total rutas del intervalo candidato: 43 rutas
+- Rutas SPECIAL selladas: 28 rutas con hashes before/after exactos
+- Manifiesto SQL: `scripts/release/eatclean-final-sql-manifest.json` con SHA-256 `a111b82a8b32e787f3e3975f5a06f7de62c01e87509bd346ccc01cf8047350ca` (4 entradas selladas, ejecución en producción NO autorizada)
+
+Estructura final requerida:
+Exactamente tres commits first-parent desde el baseline publicado:
+1. PR #515 (aislamiento staging)
+2. PR #516 (versión de correcciones y manifiesto)
+3. Un único merge humano de governance desde `ag/gate7-final-reconciliation` con merge commit resultante en main.
+
+Restricciones fail-closed:
+- `productionSqlAuthorized: false`
+- `migrationExecutionAuthorized: false`
+- `productionWorkerApprovalGranted: false`
+- `a5: "HARD_DISABLED"`
+- `a4b: "CLOSED"`
+- `oauthActivationAuthorized: false`
+- `orders_custom_capture: "CLOSED"`
+- `custom_activation: "CLOSED"`
+- `M3: "CLOSED"`
+- `OP08: "CLOSED"`
+- `Extras: "UNTOUCHED"`
+

@@ -30,6 +30,8 @@ import {
   TRACK_B_RECONCILIATION,
   verifyA4bReconciliation,
   A4B_CLOSED_RECONCILIATION,
+  verifyEatCleanFinalReconciliation,
+  EATCLEAN_FINAL_RELEASE_RECONCILIATION,
 } from "./release-reconciliation.mjs";
 import { parseReleaseJson, jsonObject, githubResponseShape } from "./release-json.mjs";
 
@@ -383,6 +385,34 @@ export function prepare(ctx, publishing = false) {
       );
     } catch {
       // No fallback: exact A4b evidence absent/mismatched remains SPECIAL.
+    }
+  }
+  if (
+    !initial &&
+    !exact &&
+    classification.decision === "REQUIRES_SEPARATE_AUTHORIZATION" &&
+    base.sha === EATCLEAN_FINAL_RELEASE_RECONCILIATION.baselineSha
+  ) {
+    try {
+      const snapshot = activationSnapshot(ctx, base, diff, prs, currentMain);
+      reconciliation = verifyEatCleanFinalReconciliation(
+        {
+          ...snapshot,
+          commits: snapshot.commits.map((commit) => ({
+            ...commit,
+            parent: git("rev-parse", `${commit.sha}^1`).trim(),
+          })),
+          diff,
+          productPrs: EATCLEAN_FINAL_RELEASE_RECONCILIATION.candidatePrs.map((num) =>
+            api(`pulls/${num}`),
+          ),
+          originalDecision: classification.decision,
+          constraints: EATCLEAN_FINAL_RELEASE_RECONCILIATION.constraints,
+        },
+        policy,
+      );
+    } catch {
+      // No fallback: exact EatClean evidence absent/mismatched remains SPECIAL.
     }
   }
   return {
