@@ -35,7 +35,7 @@ export const EATCLEAN_PARTIAL_LAUNCH_CONFIG = {
     customerDirectoryMutations: true,
     orderWorkflowMutations: true,
     kitchenStateMutations: true,
-    staffOrderCapture: true,
+    staffOrderCapture: false,
     catalogConsultation: true,
     weeklyMenuConsultation: true,
     existingOrdersConsultation: true,

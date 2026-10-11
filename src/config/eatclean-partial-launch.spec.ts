@@ -6,10 +6,12 @@ import {
   isEatCleanContext,
   isEatCleanOrderCreationFrozen,
   isEatCleanCrmMutationFrozen,
+  isEatCleanStaffOrderCaptureFrozen,
   isEatCleanDishMutationFrozen,
   isEatCleanMenuMutationFrozen,
 } from "./eatclean-partial-launch";
 import { OrderIntakeService } from "@/modules/order-intake";
+import { StaffOrderCaptureService } from "@/modules/orders";
 import { DomainError } from "@/domain/errors";
 import type { ServiceContext } from "@/services/types";
 
@@ -28,9 +30,10 @@ describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
     expect(EATCLEAN_PARTIAL_LAUNCH_CONFIG.features.orderWorkflowMutations).toBe(true);
     expect(EATCLEAN_PARTIAL_LAUNCH_CONFIG.features.kitchenStateMutations).toBe(true);
 
-    // Specifically frozen features requiring pending Supabase migrations
+    // Specifically frozen features requiring pending Supabase migrations / auth USAGE
     expect(EATCLEAN_PARTIAL_LAUNCH_CONFIG.features.orderCreation).toBe(false);
     expect(EATCLEAN_PARTIAL_LAUNCH_CONFIG.features.crmIdentityMutations).toBe(false);
+    expect(EATCLEAN_PARTIAL_LAUNCH_CONFIG.features.staffOrderCapture).toBe(false);
   });
 
   describe("Tenant Isolation", () => {
@@ -66,6 +69,13 @@ describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
       expect(isEatCleanCrmMutationFrozen("other-tenant-uuid")).toBe(false);
     });
 
+    it("freezes staffOrderCapture ONLY for EatClean", () => {
+      expect(isEatCleanStaffOrderCaptureFrozen(EATCLEAN_TENANT_ID)).toBe(true);
+      expect(isEatCleanStaffOrderCaptureFrozen({ tenantId: EATCLEAN_TENANT_ID })).toBe(true);
+      expect(isEatCleanStaffOrderCaptureFrozen("other-tenant-uuid")).toBe(false);
+      expect(isEatCleanStaffOrderCaptureFrozen({ tenantId: "other-tenant-uuid" })).toBe(false);
+    });
+
     it("keeps operational mutations enabled for all tenants including EatClean", () => {
       expect(isEatCleanDishMutationFrozen(EATCLEAN_TENANT_ID)).toBe(false);
       expect(isEatCleanDishMutationFrozen("other-tenant-uuid")).toBe(false);
@@ -92,6 +102,36 @@ describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
           items: [{ dishId: "d-1", dayDate: "2026-10-12", qty: 1 }],
         }),
       ).rejects.toThrow(DomainError);
+    });
+
+    it("blocks StaffOrderCaptureService.captureOrder early for EatClean context", async () => {
+      const eatcleanCtx = {
+        tenantId: EATCLEAN_TENANT_ID,
+        tenantSlug: EATCLEAN_TENANT_SLUG,
+        roles: ["company_admin"],
+        capabilities: new Set(["orders.write"]),
+        userId: "u-staff",
+        supabase: {} as unknown,
+      } as unknown as ServiceContext;
+
+      await expect(
+        StaffOrderCaptureService.captureOrder(eatcleanCtx, {
+          customer: { mode: "existing", customerId: "c-1" },
+          weekStart: "2026-10-12",
+          lines: [{ dayDate: "2026-10-12", dishId: "d-1", qty: 1 }],
+        }),
+      ).rejects.toThrow(DomainError);
+
+      try {
+        await StaffOrderCaptureService.captureOrder(eatcleanCtx, {
+          customer: { mode: "existing", customerId: "c-1" },
+          weekStart: "2026-10-12",
+          lines: [{ dayDate: "2026-10-12", dishId: "d-1", qty: 1 }],
+        });
+      } catch (err: unknown) {
+        expect(err).toBeInstanceOf(DomainError);
+        expect((err as DomainError).message).toBe(EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage);
+      }
     });
 
     it("does not block OrderIntakeService.intakeDraft for non-EatClean context at launch barrier", async () => {

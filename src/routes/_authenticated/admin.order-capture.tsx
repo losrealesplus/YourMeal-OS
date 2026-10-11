@@ -31,6 +31,10 @@ import { useCustomer } from "@/customer/useCustomer";
 import { useOrder } from "@/order/useOrder";
 import { useIdentity } from "@/identity/useIdentity";
 import {
+  isEatCleanStaffOrderCaptureFrozen,
+  EATCLEAN_PARTIAL_LAUNCH_CONFIG,
+} from "@/config/eatclean-partial-launch";
+import {
   getCustomerQuery,
   searchCustomersQuery,
   listRecentCustomersQuery,
@@ -128,7 +132,11 @@ function OrderCaptureExperiencePage() {
   const identity = useIdentity();
   const searchParams = Route.useSearch();
   const caps = identity.permissions.capabilities;
-  const canWrite = caps.includes("orders.write");
+  const isTenantCaptureFrozen = isEatCleanStaffOrderCaptureFrozen({
+    tenantId: identity.tenant?.id,
+    tenantSlug: identity.tenant?.slug,
+  });
+  const canWrite = caps.includes("orders.write") && !isTenantCaptureFrozen;
 
   const [mode, setMode] = useState<ExperienceMode>(
     searchParams.mode === "capture" || searchParams.customerId
@@ -598,6 +606,16 @@ function OrderCaptureExperiencePage() {
         object="Operational incidents · order templates · session honesty"
       />
 
+      {isTenantCaptureFrozen && (
+        <div className="mb-4 p-4 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-800 dark:text-amber-200 text-xs">
+          <p className="font-bold mb-1">{EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage}</p>
+          <p className="text-[11px] opacity-90">
+            La captura administrativa de pedidos se encuentra pausada temporalmente mientras se
+            completa la activación comercial.
+          </p>
+        </div>
+      )}
+
       {mode === "templates" && !created ? (
         <OrderTemplatesPanel
           customerId={selected?.summary.id}
@@ -994,7 +1012,9 @@ function OrderCaptureExperiencePage() {
               <section className="space-y-3">
                 {!canWrite && (
                   <p className="text-sm text-muted-foreground">
-                    Necesitas permiso de escritura de pedidos.
+                    {isTenantCaptureFrozen
+                      ? EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage
+                      : "Necesitas permiso de escritura de pedidos."}
                   </p>
                 )}
                 <button
