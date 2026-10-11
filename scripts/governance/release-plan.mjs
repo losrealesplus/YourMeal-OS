@@ -111,11 +111,24 @@ export function assertMergedCommit(prs, sha) {
   );
   return matches[0].number;
 }
-function readReport(run) {
+export function readReport(run) {
   const name = `gate7-release-report-${run.id}-1`;
   const artifacts = api(`actions/runs/${run.id}/artifacts?per_page=100`);
   demand(artifacts.total_count <= 100, "Artifact listing truncated");
   const candidates = artifacts.artifacts.filter((a) => a.name === name);
+  if (candidates.length === 0) {
+    const jobs = api(`actions/runs/${run.id}/jobs?per_page=100`);
+    const phase2 = jobs.jobs.find(
+      (j) => j.name === "Phase 2: Protected Production Deployment" || j.name.includes("Phase 2"),
+    );
+    const phase2NeverExecuted =
+      !phase2 ||
+      phase2.status === "queued" ||
+      (phase2.status === "completed" &&
+        ["cancelled", "skipped"].includes(phase2.conclusion) &&
+        (!phase2.steps || phase2.steps.length === 0));
+    if (phase2NeverExecuted) return null;
+  }
   demand(
     candidates.length === 1 && !candidates[0].expired,
     "Publication ledger missing, expired or ambiguous: reconciliation required",
@@ -199,7 +212,9 @@ export function baseline(ctx, publishing = false) {
     );
     const workflow = git("show", `${run.head_sha}:${policy.workflow}`);
     if (workflow.includes("gate7-release-report-")) {
-      const published = baselineFromReport(readReport(run), run, deployment.id);
+      const report = readReport(run);
+      if (!report) continue; // Run was cancelled/skipped before Phase 2 ever started.
+      const published = baselineFromReport(report, run, deployment.id);
       if (!published) continue; // Superseded/duplicate approved job is not a deployment.
       return published;
     }

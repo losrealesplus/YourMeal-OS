@@ -1070,3 +1070,179 @@ test("EatClean Release A FAIL: altered candidate commit path in PR #519", () => 
     /EatClean Release A commit 4 \(#519\) paths\/hashes mismatch/,
   );
 });
+
+// ============================================================================
+// GATE 7 PUBLICATION LEDGER & BASELINE RESOLUTION SUITE
+// ============================================================================
+
+const {
+  baselineFromReport,
+} = await import("./release-plan.mjs");
+
+function mockPhase2Run(jobs, artifacts = []) {
+  return {
+    run: { id: 12345678, head_sha: "a".repeat(40) },
+    jobs: { total_count: jobs.length, jobs },
+    artifacts: { total_count: artifacts.length, artifacts },
+  };
+}
+
+function evaluateReadReport(run, artifactsList, jobsList) {
+  const name = `gate7-release-report-${run.id}-1`;
+  const candidates = artifactsList.filter((a) => a.name === name);
+  if (candidates.length === 0) {
+    const phase2 = jobsList.find(
+      (j) => j.name === "Phase 2: Protected Production Deployment" || j.name.includes("Phase 2"),
+    );
+    const phase2NeverExecuted =
+      !phase2 ||
+      phase2.status === "queued" ||
+      (phase2.status === "completed" &&
+        ["cancelled", "skipped"].includes(phase2.conclusion) &&
+        (!phase2.steps || phase2.steps.length === 0));
+    if (phase2NeverExecuted) return null;
+  }
+  if (candidates.length !== 1 || candidates[0].expired) {
+    throw new Error("Publication ledger missing, expired or ambiguous: reconciliation required");
+  }
+  return candidates[0].report;
+}
+
+test("Ledger 1: Cancelled run with 0 Phase 2 steps returns null (non-publication)", () => {
+  const run = { id: 38084240756, head_sha: "0b88e9760d8e1574fc62c16c907a91b86ef9d3ba" };
+  const jobs = [
+    { name: "Classify outstanding main changes", status: "completed", conclusion: "success", steps: [1, 2, 3] },
+    { name: "Phase 1: Build Once & Cryptographic Digest", status: "completed", conclusion: "success", steps: [1, 2] },
+    { name: "Phase 2: Protected Production Deployment", status: "completed", conclusion: "cancelled", steps: [] },
+  ];
+  const result = evaluateReadReport(run, [], jobs);
+  assert.equal(result, null);
+});
+
+test("Ledger 2: Skipped Phase 2 run returns null (non-publication)", () => {
+  const run = { id: 38125150507, head_sha: "81b0da1533f9442d8171d9bbb9863343c13389f0" };
+  const jobs = [
+    { name: "Classify outstanding main changes", status: "completed", conclusion: "failure", steps: [1] },
+    { name: "Phase 1: Build Once & Cryptographic Digest", status: "completed", conclusion: "skipped", steps: [] },
+    { name: "Phase 2: Protected Production Deployment", status: "completed", conclusion: "skipped", steps: [] },
+  ];
+  const result = evaluateReadReport(run, [], jobs);
+  assert.equal(result, null);
+});
+
+test("Ledger 3: Queued Phase 2 run returns null (waiting approval / never executed)", () => {
+  const run = { id: 999999, head_sha: "c".repeat(40) };
+  const jobs = [
+    { name: "Phase 2: Protected Production Deployment", status: "queued", steps: [] },
+  ];
+  const result = evaluateReadReport(run, [], jobs);
+  assert.equal(result, null);
+});
+
+test("Ledger 4: Run missing Phase 2 job entirely returns null", () => {
+  const run = { id: 999998, head_sha: "c".repeat(40) };
+  const jobs = [
+    { name: "Classify outstanding main changes", status: "completed", conclusion: "success", steps: [1] },
+  ];
+  const result = evaluateReadReport(run, [], jobs);
+  assert.equal(result, null);
+});
+
+test("Ledger 5: Phase 2 started mutation steps but report missing FAILS CLOSED", () => {
+  const run = { id: 888888, head_sha: "d".repeat(40) };
+  const jobs = [
+    {
+      name: "Phase 2: Protected Production Deployment",
+      status: "completed",
+      conclusion: "failure",
+      steps: [
+        { name: "Set up job" },
+        { name: "Run actions/checkout@v4" },
+        { name: "Revalidate sovereign approval and publish exact version" },
+      ],
+    },
+  ];
+  assert.throws(
+    () => evaluateReadReport(run, [], jobs),
+    /Publication ledger missing, expired or ambiguous: reconciliation required/,
+  );
+});
+
+test("Ledger 6: Phase 2 completed success but report missing FAILS CLOSED", () => {
+  const run = { id: 888887, head_sha: "d".repeat(40) };
+  const jobs = [
+    {
+      name: "Phase 2: Protected Production Deployment",
+      status: "completed",
+      conclusion: "success",
+      steps: [{ name: "Publish" }],
+    },
+  ];
+  assert.throws(
+    () => evaluateReadReport(run, [], jobs),
+    /Publication ledger missing, expired or ambiguous: reconciliation required/,
+  );
+});
+
+test("Ledger 7: Ambiguous multiple report artifacts FAILS CLOSED", () => {
+  const run = { id: 777777, head_sha: "e".repeat(40) };
+  const artifacts = [
+    { name: `gate7-release-report-${run.id}-1`, expired: false, report: {} },
+    { name: `gate7-release-report-${run.id}-1`, expired: false, report: {} },
+  ];
+  assert.throws(
+    () => evaluateReadReport(run, artifacts, []),
+    /Publication ledger missing, expired or ambiguous: reconciliation required/,
+  );
+});
+
+test("Ledger 8: Expired report artifact FAILS CLOSED", () => {
+  const run = { id: 777776, head_sha: "e".repeat(40) };
+  const artifacts = [
+    { name: `gate7-release-report-${run.id}-1`, expired: true, report: {} },
+  ];
+  assert.throws(
+    () => evaluateReadReport(run, artifacts, []),
+    /Publication ledger missing, expired or ambiguous: reconciliation required/,
+  );
+});
+
+test("Ledger 9: Valid report with mutationStarted=false returns null (no-mutation)", () => {
+  const run = { id: 38126243292, head_sha: "845ecfb8eadd7bc184945c2c710be2224ad43eef" };
+  const report = {
+    schema: 1,
+    repository: mockPolicy.repository,
+    sourceSha: run.head_sha,
+    runId: String(run.id),
+    attempt: "1",
+    state: "NOT_DEPLOYED",
+    mutationStarted: false,
+  };
+  const published = baselineFromReport(report, run, 6993237039);
+  assert.equal(published, null);
+});
+
+test("Ledger 10: Valid DEPLOYED report resolves authoritative publication baseline", () => {
+  const run = { id: 38056339585, head_sha: "b9d9ff56c50570f60f6b1cb1db0e41909b477d2d" };
+  const report = {
+    schema: 1,
+    repository: mockPolicy.repository,
+    sourceSha: run.head_sha,
+    runId: String(run.id),
+    attempt: "1",
+    state: "DEPLOYED",
+    mutationStarted: true,
+    versionId: "52391b7d-d1d5-4997-abe4-15b0e29bd652",
+    deploymentId: "fcab038c-29e4-4561-a287-8300cdf682a3",
+    tarSha256: "281a7332f675a8df45a6a6fb60c65be6a2c4b36ddc168e3c66b7f6304161fba5",
+    configSha256: "7cd095c5076ba693512f9126aa63464dbdaef48e996ebc730eebbf8cd6ea5fb6",
+    artifactId: "11671712003",
+  };
+  const published = baselineFromReport(report, run, 6981646840);
+  assert.deepEqual(published, {
+    sha: "b9d9ff56c50570f60f6b1cb1db0e41909b477d2d",
+    versionId: "52391b7d-d1d5-4997-abe4-15b0e29bd652",
+    deploymentId: 6981646840,
+  });
+});
+
