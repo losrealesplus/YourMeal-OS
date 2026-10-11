@@ -1,5 +1,7 @@
+import { createStaffExistingOrderRepository } from "../infrastructure/staff-existing-order-repository";
 import { createCustomerProfileRepository } from "@/modules/customer-directory/infrastructure/customer-profile-repository";
 import { assertLegacyOfferWrite } from "@/modules/weekly-menu/application/legacy-offer-write-guard";
+import type { Json } from "@/integrations/supabase/types";
 import { DomainError } from "@/domain/errors";
 import { requireCapability } from "@/permissions";
 import { AuditService } from "@/services/audit-service";
@@ -12,6 +14,7 @@ import {
   type OrderDietarySnapshot,
 } from "@/types/dietary";
 import {
+  isEatCleanContext,
   isEatCleanStaffOrderCaptureFrozen,
   EATCLEAN_PARTIAL_LAUNCH_CONFIG,
 } from "@/config/eatclean-partial-launch";
@@ -79,7 +82,8 @@ const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
  * - Supports existing customers and minimal synchronous customer creation.
  * - Multi-day lines with dayDate, dishId, qty, and culinary comment.
  * - Order-scoped unit price override without mutating master dish catalog prices.
- * - Atomic persistence of orders + order_items with snapshot total.
+ * - EatClean existing-customer persistence prepared via one transactional RPC.
+ * - Other tenants and new-customer provisioning retain the legacy write path.
  * - Full audit trail via canonical AuditService.
  */
 export const StaffOrderCaptureService = {
@@ -124,6 +128,12 @@ export const StaffOrderCaptureService = {
       ) {
         throw new DomainError("INVALID_STATE", "unitPriceOverride cannot be negative.");
       }
+    }
+
+    // EatClean preparation only: the existing freeze remains authoritative.
+    // Other tenants and new-customer provisioning retain their current path.
+    if (isEatCleanContext(ctx) && dto.customer.mode === "existing") {
+      return createStaffExistingOrderRepository(ctx.supabase).capture(ctx.tenantId, dto);
     }
 
     await assertLegacyOfferWrite(ctx, dto.weekStart, dto.lines);
@@ -264,7 +274,7 @@ export const StaffOrderCaptureService = {
 
     // 3.5. Resolve Customer Dietary Profile & Build Immutable Snapshot (CR-CUST-01)
     let customerDietaryProfile: CustomerDietaryProfile | null = null;
-    const { data: dietaryRow } = await (ctx.supabase as any)
+    const { data: dietaryRow } = await ctx.supabase
       .from("customer_dietary_profiles")
       .select("*")
       .eq("tenant_id", ctx.tenantId)
@@ -276,12 +286,16 @@ export const StaffOrderCaptureService = {
         id: dietaryRow.id,
         tenantId: dietaryRow.tenant_id,
         customerId: dietaryRow.customer_id,
-        allergens: Array.isArray(dietaryRow.allergens) ? dietaryRow.allergens : [],
+        allergens: Array.isArray(dietaryRow.allergens) ? (dietaryRow.allergens as string[]) : [],
         customAllergens: Array.isArray(dietaryRow.custom_allergens)
-          ? dietaryRow.custom_allergens
+          ? (dietaryRow.custom_allergens as string[])
           : [],
-        restrictions: Array.isArray(dietaryRow.restrictions) ? dietaryRow.restrictions : [],
-        preferences: Array.isArray(dietaryRow.preferences) ? dietaryRow.preferences : [],
+        restrictions: Array.isArray(dietaryRow.restrictions)
+          ? (dietaryRow.restrictions as string[])
+          : [],
+        preferences: Array.isArray(dietaryRow.preferences)
+          ? (dietaryRow.preferences as string[])
+          : [],
         dietaryNotes: dietaryRow.dietary_notes ?? null,
       };
     } else if (dto.customer.mode === "new" && dto.customer.dietaryProfile) {
@@ -322,7 +336,7 @@ export const StaffOrderCaptureService = {
       authorUserId: ctx.userId,
     });
 
-    // 4. Atomic Order Creation
+    // 4. Legacy separate writes (other tenants / new-customer path; not transactional)
     const status = dto.autoConfirm ? "confirmed" : "draft";
     const isCompanyOrder = dto.demandChannel === "company" && !!dto.companyId;
 
@@ -334,7 +348,7 @@ export const StaffOrderCaptureService = {
         week_start: dto.weekStart,
         total: grandTotal,
         notes: dto.orderNotes?.trim() ?? null,
-        dietary_snapshot: (dietarySnapshot as any) ?? null,
+        dietary_snapshot: (dietarySnapshot as unknown as Json) ?? null,
         status,
         demand_channel: isCompanyOrder ? "company" : "individual",
         company_id: isCompanyOrder ? dto.companyId : null,

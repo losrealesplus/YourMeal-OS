@@ -73,3 +73,27 @@ READY_FOR_REVIEW: YES, propuesta de permiso y límites; READY_FOR_PRODUCTION: NO
 Obtener del proveedor/propietario un canal legítimo para el USAGE mínimo, sin compartir credenciales con agentes. Separadamente completar la adaptación atómica staff y aceptación autenticada antes de activar flags; el hotfix #522 no contiene cambios de pedidos. No se solicita ampliar privilegios del operador postgres ni reabrir P34.
 
 Referencia oficial sobre roles administrados: https://supabase.com/docs/guides/database/postgres/roles (supabase_admin es rol interno del proveedor; Dashboard ejecuta como postgres).
+
+## Continuación: operación staff atómica implementada — 11/10/2026
+
+Estado: LOCAL_ATOMIC_STAFF_ORDER_QUALIFIED / HOSTED_EXECUTOR_BLOCKED / ORDERS_FLAGS_UNCHANGED.
+
+`public.capture_staff_existing_order(uuid,jsonb)` es una RPC nueva, SECURITY INVOKER con search_path vacío, EXECUTE exclusivamente para authenticated, RLS y triggers intactos. Solo acepta Company Admin / Operations Manager con membresía aprobada y cliente existente del tenant. No utiliza actor suministrado por el caller ni service_role. Conserva el contrato legacy version 1; no habilita writer V2, A5 ni el circuito comercial de quotes.
+
+Una sola transacción crea draft, líneas, total calculado por el servidor, confirmación opcional y auditoría. No se utiliza compensación DELETE. El servidor valida cliente/tenant, oferta publicada, día, cantidad entera positiva, precio finito no negativo y relaciones empresa/sede/unidad. Conserva comentarios y overrides staff, obtiene el perfil dietético actual y deriva la autoría desde auth.uid(). Los precios específicos de slot siguen requiriendo su vía de quote y se rechazan en este circuito, igual que antes.
+
+Adaptador Repository y servicio preparados únicamente para EatClean + cliente existente. El freeze se comprueba primero y sigue false en las features de producción; no se reactiva el flujo. Otros tenants y el alta de nuevos clientes conservan su comportamiento anterior, que no se certifica como atómico por este cambio.
+
+SQL mínimo para este alcance: el USAGE ya preparado y la nueva migración `20261011163814_staff_existing_order_atomic_capture.sql`. Hashes/ejecutor en ATOMIC_STAFF_ORDER_SQL_MANIFEST.json. La corrección de program_draft_order no es dependencia de esta RPC; sigue siendo necesaria si se decide recuperar aquel flujo B2C. No se alteraron las migraciones originales P34, los dos SQL anteriores, flags ni governance.
+
+Pruebas nuevas: 37/37 PostgreSQL PASS en contenedor propio `yourmeal-p0-orders-atomic-20261011`, imagen digest anterior, sin red/puertos/mounts y PGDATA tmpfs. Evidencia ATOMIC_STAFF_ORDER_SYNTHETIC_RESULT.txt. Incluye rollback de segunda línea inválida, fallo de confirmación y fallo de auditoría; compara cabeceras, líneas y auditorías antes/después. Verifica roles staff, membresía, tenant/customer extranjero, RLS, precios/total, comentarios, snapshot dietético y relaciones empresariales. CLEANUP PASS con ausencia independiente del contenedor.
+
+29/29 Vitest PASS: 8 pruebas nuevas del adaptador/frontera, 11 del servicio existente y 10 del freeze. Typecheck, lint focalizado y diff-check PASS. Se corrigieron incompatibilidades locales de la implementación con tipos reales (order_items sin created_at; audit_log.entity_id UUID). El fixture empresarial incluye company_code requerido; no se relajaron constraints ni guards.
+
+Límite: integración SQL con rol authenticated e identidad sintética configurada por el laboratorio; NO es login real GoTrue ni E2E navegador/PostgREST. No hubo conexión productiva en esta continuación. Una respuesta de transporte perdida no acredita si el commit ocurrió: no hay retry/fallback automático, y antes de un intento manual debe reconciliarse el resultado. No se certifica exactamente-una-vez/idempotencia.
+
+Información exacta para Supabase Support (borrador, no enviado):
+
+> Proyecto nhirlpkuvonggctdzzad, PostgreSQL 17.6. Solicitamos el canal oficial o intervención del propietario para conceder únicamente GRANT USAGE ON SCHEMA auth TO cr_order_writer. auth pertenece a supabase_admin; el canal postgres comprobado carece de USAGE WITH GRANT OPTION, membresía efectiva/SET al propietario y superuser. cr_order_writer es NOLOGIN/NOSUPERUSER/NOBYPASSRLS y ya tiene EXECUTE auth.uid(); su guard_legacy_offer SECURITY DEFINER requiere resolver auth.uid(). No solicitamos SELECT sobre auth.users, cambio de propietario ni ampliación de roles. Indicar quién puede ejecutar el GRANT y cómo verificar su efectividad sin acceder a filas Auth.
+
+Siguiente decisión: autorización independiente para publicar/revisar este paquete local, sin merge/deploy implícitos. En paralelo el propietario puede solicitar a Support el canal legítimo. Aplicación SQL, publicación y activación del flujo necesitan decisiones posteriores; no están autorizadas por esta preparación. Antes de integrar debe reconciliarse la rama basada en 9059a666 con el main actual del hotfix #522, sin modificar ni repetir su incidente. La aceptación autenticada de pedidos y la habilitación quedan pendientes.

@@ -1,0 +1,24 @@
+{
+  "status": "LOCAL_PREPARATION_NOT_PRODUCTION_AUTHORIZATION",
+  "scope": "STAFF_EXISTING_CUSTOMER",
+  "sql": [
+    {
+      "path": "supabase/migrations/20261010155728_release_cr_order_writer_auth_usage.sql",
+      "sha256": "86d6203287bedf2f87c7f9dd11c47a99c7efce635266efedccebba0215d8fac5",
+      "executor": "Provider-approved auth schema owner/grant-option holder",
+      "purpose": "Minimum auth schema USAGE prerequisite"
+    },
+    {
+      "path": "supabase/migrations/20261011163814_staff_existing_order_atomic_capture.sql",
+      "sha256": "c08fc8487f6955589d4e6eefe0d1f3a0852cdd5a36d0ffd4a9038dc3ccce2e32",
+      "executor": "Approved migration operator",
+      "purpose": "Atomic INVOKER staff order RPC"
+    }
+  ],
+  "notRequiredForThisStaffPath": [
+    "20261010155729_release_program_draft_order_price_snapshot.sql",
+    "P34 CRM migrations",
+    "A5 migrations"
+  ],
+  "productionApplied": false
+}
