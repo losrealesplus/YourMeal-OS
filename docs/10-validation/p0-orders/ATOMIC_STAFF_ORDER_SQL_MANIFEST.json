@@ -12,7 +12,8 @@
       "path": "supabase/migrations/20261011163814_staff_existing_order_atomic_capture.sql",
       "sha256": "c08fc8487f6955589d4e6eefe0d1f3a0852cdd5a36d0ffd4a9038dc3ccce2e32",
       "executor": "Approved migration operator",
-      "purpose": "Atomic INVOKER staff order RPC"
+      "purpose": "Atomic INVOKER staff order RPC",
+      "executeActivation": "Applying this migration immediately enables direct authenticated staff RPC calls; frontend freeze is not server authorization."
     }
   ],
   "notRequiredForThisStaffPath": [
@@ -20,5 +21,11 @@
     "P34 CRM migrations",
     "A5 migrations"
   ],
-  "productionApplied": false
+  "productionApplied": false,
+  "productionPreconditions": [
+    "Explicit approval of direct RPC activation timing",
+    "Provider-approved minimum auth USAGE effective",
+    "Independent deployment/application activation authorization",
+    "Authenticated acceptance pending"
+  ]
 }

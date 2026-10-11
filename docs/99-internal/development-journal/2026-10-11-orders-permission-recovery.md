@@ -13,3 +13,7 @@ Decisión de herramienta: Codex exclusivo; continuidad de investigación/laborat
 Se materializa RPC INVOKER (sin bypass RLS), adaptador Repository y selección del servicio para EatClean + existing, después del freeze intacto. Atomicidad incluye cabecera, líneas, confirmación, total servidor y auditoría. No se modifica la semántica de otros tenants ni se habilita alta nueva/B2C. SQL mínimo y límites en ORDER_PERMISSION_RECOVERY.md y ATOMIC_STAFF_ORDER_SQL_MANIFEST.json.
 
 37 controles PostgreSQL nuevos PASS, 29 pruebas TypeScript afectadas PASS; typecheck/lint/diff-check PASS. Contenedor propio sin red, tmpfs, eliminado y ausencia verificada. E2E GoTrue/PostgREST/navegador NOT_TESTED. No se repitieron los 20 controles antiguos como objetivo, ni P34/E2E general. Sin producción, SQL productivo, cambios de flags, push o PR. Commit local autorizado; el permiso del proveedor y la integración/revisión quedan pendientes.
+
+## Publicación para revisión autorizada
+
+Se prepara rama limpia desde main 27dc2bda con PR #522 preservado. Autorización limitada a push y un PR; sin merge/deploy/SQL/flags. Se revisa acceso directo: la migración activa EXECUTE authenticated inmediatamente, independiente de la congelación frontend. Se documenta como condición productiva explícita, sin crear nuevos mecanismos de governance. Gate7 clasifica cuatro de diez rutas como SPECIAL: REQUIRES_SEPARATE_AUTHORIZATION. Build local PASS; no acredita artefacto productivo ni E2E autenticado.

@@ -1,7 +1,7 @@
 # P0 — Recuperación de pedidos: corrección mínima preparada
 
 Estado: LOCAL_SQL_QUALIFIED / HOSTED_EXECUTOR_BLOCKED / ORDERS_FLAGS_UNCHANGED.
-Base: 9059a666235bc3809adf964ff05666f38731c0b8. Rama local separada: codex/eatclean-orders-permission-recovery. Sin PR ni push.
+Base inicial: 9059a666235bc3809adf964ff05666f38731c0b8. Rama histórica local: codex/eatclean-orders-permission-recovery. Sin PR ni push.
 
 ## Evidencia productiva permitida
 
@@ -97,3 +97,17 @@ Información exacta para Supabase Support (borrador, no enviado):
 > Proyecto nhirlpkuvonggctdzzad, PostgreSQL 17.6. Solicitamos el canal oficial o intervención del propietario para conceder únicamente GRANT USAGE ON SCHEMA auth TO cr_order_writer. auth pertenece a supabase_admin; el canal postgres comprobado carece de USAGE WITH GRANT OPTION, membresía efectiva/SET al propietario y superuser. cr_order_writer es NOLOGIN/NOSUPERUSER/NOBYPASSRLS y ya tiene EXECUTE auth.uid(); su guard_legacy_offer SECURITY DEFINER requiere resolver auth.uid(). No solicitamos SELECT sobre auth.users, cambio de propietario ni ampliación de roles. Indicar quién puede ejecutar el GRANT y cómo verificar su efectividad sin acceder a filas Auth.
 
 Siguiente decisión: autorización independiente para publicar/revisar este paquete local, sin merge/deploy implícitos. En paralelo el propietario puede solicitar a Support el canal legítimo. Aplicación SQL, publicación y activación del flujo necesitan decisiones posteriores; no están autorizadas por esta preparación. Antes de integrar debe reconciliarse la rama basada en 9059a666 con el main actual del hotfix #522, sin modificar ni repetir su incidente. La aceptación autenticada de pedidos y la habilitación quedan pendientes.
+
+## Preparación de PR sobre main vigente
+
+Base de revisión: 27dc2bda8844b7c27a2df9f2deac2433a9789f39 (contiene PR #522). Rama: codex/eatclean-atomic-staff-order-capture. Se incorporan exclusivamente los checkpoints de pedidos, preservando la rama anterior. Diff sin cambios de customer-directory, flags, workflows, governance ni migraciones anteriores.
+
+**Exposición directa:** la migración nueva concede EXECUTE a authenticated dentro de la misma transacción que crea la RPC. Aplicarla habilita el acceso directo para staff autorizado del tenant, aunque la UI de EatClean siga congelada. La RPC no consulta flags frontend: estos no son una barrera de servidor. Por ello la autorización SQL futura debe incluir expresamente el momento de habilitación directa; no aplicar esta migración como preparación inocua mientras la creación de pedidos deba permanecer cerrada. La invocación directa conserva RLS, tenant, membresía aprobada y rol Company Admin/Operations Manager; anon, service_role y customers sin rol staff están rechazados. No hay ampliación de permisos sobre tablas.
+
+Orden mínimo propuesto, todavía NO autorizado productivamente: (1) proveedor/propietario legítimo verifica y concede el USAGE mínimo ya versionado; (2) operador de migraciones autorizado crea esta RPC y concede su EXECUTE en la ventana de activación aprobada; (3) aceptación autenticada y publicación/activación de aplicación bajo autorización específica. El permiso debe verificarse antes de habilitar el endpoint. No ejecutar una cadena automática de todas las migraciones pendientes: P34/A5 no forman parte del paquete SQL mínimo.
+
+La pérdida de respuesta después del COMMIT puede dejar un pedido íntegro creado sin que el cliente lo conozca. No existe idempotencia de request en esta RPC ni fallback/retry automático en el adaptador. Antes de repetir manualmente, el operador debe reconciliar el pedido creado; atomicidad no equivale a exactamente-una-vez.
+
+Validación tras integración: 37/37 controles atómicos PostgreSQL PASS, 20/20 controles existentes de permiso PASS; 29/29 Vitest PASS, typecheck y lint focalizado PASS, build SSR local PASS. E2E GoTrue/PostgREST/navegador NOT_TESTED. La reproducción PostgreSQL excluye P34 y A5 explícitamente; no acredita el estado ni la autoridad productiva del proveedor.
+
+Clasificación pura de las 10 rutas del PR con reglas Gate7 vigentes: REQUIRES_SEPARATE_AUTHORIZATION. SPECIAL: ORDER_PERMISSION_RECOVERY.md, qualify-permission-recovery.py, development-journal/2026-10-11-orders-permission-recovery.md y la migración nueva. No se genera autorización de release ni se reutiliza autorización histórica. Cualquier delta productivo posterior debe recalcularse contra su baseline vigente.
