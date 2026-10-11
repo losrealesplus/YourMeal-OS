@@ -1,3 +1,4 @@
+import { CustomerSelfProfileService } from "@/modules/customer-directory/application/customer-self-profile-service";
 import { CustomerIdentityLinkReview } from "@/components/customer/customer-identity-link-review";
 /**
  * ADMIN · Clientes — Hub Canónico Unificado de Clientes y Empresas (CR — Clientes Unificados).
@@ -62,6 +63,7 @@ import {
 import { UniversalOrderIntakeDrawer } from "@/components/orders/universal-order-intake-drawer";
 import {
   isEatCleanStaffOrderCaptureFrozen,
+  isEatCleanCrmMutationFrozen,
   EATCLEAN_PARTIAL_LAUNCH_CONFIG,
 } from "@/config/eatclean-partial-launch";
 import { CustomerDietaryEditor } from "@/components/admin/customer-dietary-editor";
@@ -157,6 +159,8 @@ function AdminCustomersPage() {
   const [individuals, setIndividuals] = useState<IndividualCustomerRecord[]>([]);
   const [companies, setCompanies] = useState<CompanyDirectoryRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [individualsError, setIndividualsError] = useState<string | null>(null);
+  const [companiesError, setCompaniesError] = useState<string | null>(null);
   const [archivingId, setArchivingId] = useState<string | null>(null);
 
   // Selected Customer Detail State
@@ -219,6 +223,7 @@ function AdminCustomersPage() {
   // Universal Order Intake Drawer State
   const [orderIntakeOpen, setOrderIntakeOpen] = useState(false);
   const isTenantCaptureFrozen = isEatCleanStaffOrderCaptureFrozen(tenantId);
+  const isCrmWriteFrozenForTenant = isEatCleanCrmMutationFrozen(tenantId);
 
   const canWrite = can("customers.write");
   const canManageCompany = can("company.manage");
@@ -237,9 +242,11 @@ function AdminCustomersPage() {
   const reload = useCallback(async () => {
     if (!user || !tenantId) return;
     setLoading(true);
+    setIndividualsError(null);
+    setCompaniesError(null);
     try {
       const ctx = await getCtx();
-      const [inds, cos] = await Promise.all([
+      const [indsResult, cosResult] = await Promise.allSettled([
         CustomerDirectoryService.listIndividuals(ctx, {
           query,
           status: statusFilter === "all" ? "all" : (statusFilter as "active" | "inactive" | "new"),
@@ -254,10 +261,29 @@ function AdminCustomersPage() {
                 : (statusFilter as "active" | "inactive"),
         }),
       ]);
-      setIndividuals(inds);
-      setCompanies(cos);
+
+      if (indsResult.status === "fulfilled") {
+        setIndividuals(indsResult.value);
+        setIndividualsError(null);
+      } else {
+        const msg = formatErrorMessage(indsResult.reason);
+        setIndividualsError(msg);
+        toast.error(`Error al cargar particulares: ${msg}`);
+      }
+
+      if (cosResult.status === "fulfilled") {
+        setCompanies(cosResult.value);
+        setCompaniesError(null);
+      } else {
+        const msg = formatErrorMessage(cosResult.reason);
+        setCompaniesError(msg);
+        toast.error(`Error al cargar empresas: ${msg}`);
+      }
     } catch (e) {
-      toast.error(formatErrorMessage(e));
+      const message = formatErrorMessage(e);
+      setIndividualsError(message);
+      setCompaniesError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -279,6 +305,10 @@ function AdminCustomersPage() {
         const ctx = await getCtx();
         const cust = await CustomerDirectoryService.getIndividualById(ctx, customerId);
         if (cust) {
+          if (canWrite && !isCrmWriteFrozenForTenant) {
+            const canonicalProfile = await CustomerSelfProfileService.read(ctx, customerId);
+            cust.revision = canonicalProfile.revision;
+          }
           setSelectedCustomer(cust);
           setEditProfileForm({
             displayName: cust.displayName || "",
@@ -296,7 +326,7 @@ function AdminCustomersPage() {
         setProfileError(formatErrorMessage(err, "Error al cargar los datos del perfil."));
       }
     },
-    [getCtx],
+    [getCtx, canWrite, isCrmWriteFrozenForTenant],
   );
 
   const loadMemberships = useCallback(
@@ -424,7 +454,7 @@ function AdminCustomersPage() {
   function openCustomerDrawer(customerId: string, tab: CustomerDetailTab = "profile") {
     navigate({
       to: "/admin/customers",
-      search: (prev: any) => ({
+      search: (prev) => ({
         ...prev,
         customerId,
         tab,
@@ -435,7 +465,7 @@ function AdminCustomersPage() {
   function closeCustomerDrawer() {
     navigate({
       to: "/admin/customers",
-      search: (prev: any) => ({
+      search: (prev) => ({
         ...prev,
         customerId: undefined,
         tab: undefined,
@@ -446,7 +476,7 @@ function AdminCustomersPage() {
   function switchDetailTab(tab: CustomerDetailTab) {
     navigate({
       to: "/admin/customers",
-      search: (prev: any) => ({
+      search: (prev) => ({
         ...prev,
         tab,
       }),
@@ -456,7 +486,7 @@ function AdminCustomersPage() {
   function switchCategory(category: "all" | "individuals" | "companies") {
     navigate({
       to: "/admin/customers",
-      search: (prev: any) => ({
+      search: (prev) => ({
         ...prev,
         category,
         customerId: undefined,
@@ -467,7 +497,7 @@ function AdminCustomersPage() {
 
   async function handleSaveProfile(e: React.FormEvent) {
     e.preventDefault();
-    if (!selectedCustomer || !canWrite) return;
+    if (!selectedCustomer || !canWrite || isCrmWriteFrozenForTenant) return;
     setSavingProfile(true);
     try {
       const ctx = await getCtx();
@@ -481,6 +511,7 @@ function AdminCustomersPage() {
       });
       setSelectedCustomer(updated);
       toast.success("Perfil actualizado correctamente");
+      await loadProfile(updated.id);
       await reload();
     } catch (err) {
       toast.error(formatErrorMessage(err));
@@ -575,7 +606,7 @@ function AdminCustomersPage() {
 
   async function handleCreateCustomer(e: React.FormEvent) {
     e.preventDefault();
-    if (!createCustomerForm.displayName.trim() || !canWrite) return;
+    if (!createCustomerForm.displayName.trim() || !canWrite || isCrmWriteFrozenForTenant) return;
     setCreatingCustomer(true);
     try {
       const ctx = await getCtx();
@@ -597,7 +628,7 @@ function AdminCustomersPage() {
   }
 
   async function archiveCustomer(id: string, name: string) {
-    if (!user || !tenantId || !canWrite) return;
+    if (!user || !tenantId || !canWrite || isCrmWriteFrozenForTenant) return;
     if (!window.confirm(`¿Estás seguro de que deseas archivar al cliente "${name}"?`)) return;
     setArchivingId(id);
     try {
@@ -711,9 +742,23 @@ function AdminCustomersPage() {
             {canWrite ? (
               <button
                 type="button"
-                disabled={archivingId === r.id}
-                onClick={() => archiveCustomer(r.id, r.displayName ?? "Sin nombre")}
-                className="text-xs font-semibold text-destructive hover:underline uppercase tracking-wider disabled:opacity-50"
+                disabled={isCrmWriteFrozenForTenant || archivingId === r.id}
+                onClick={
+                  isCrmWriteFrozenForTenant
+                    ? undefined
+                    : () => archiveCustomer(r.id, r.displayName ?? "Sin nombre")
+                }
+                title={
+                  isCrmWriteFrozenForTenant
+                    ? "Gestión de bajas en preparación para EatClean (migración P34 pendiente)"
+                    : undefined
+                }
+                className={cn(
+                  "text-xs font-semibold uppercase tracking-wider",
+                  isCrmWriteFrozenForTenant
+                    ? "text-muted-foreground cursor-not-allowed opacity-50"
+                    : "text-destructive hover:underline disabled:opacity-50",
+                )}
               >
                 Archivar
               </button>
@@ -902,8 +947,19 @@ function AdminCustomersPage() {
           {canWrite ? (
             <Button
               size="sm"
-              onClick={() => setCreateCustomerOpen(true)}
-              className="gap-1.5 text-xs font-semibold bg-primary text-primary-foreground shadow-sm"
+              disabled={isCrmWriteFrozenForTenant}
+              onClick={isCrmWriteFrozenForTenant ? undefined : () => setCreateCustomerOpen(true)}
+              title={
+                isCrmWriteFrozenForTenant
+                  ? "Alta de nuevos clientes en preparación para EatClean (migración P34 pendiente)"
+                  : undefined
+              }
+              className={cn(
+                "gap-1.5 text-xs font-semibold",
+                isCrmWriteFrozenForTenant
+                  ? "bg-primary/50 text-primary-foreground cursor-not-allowed shadow-none"
+                  : "bg-primary text-primary-foreground shadow-sm",
+              )}
             >
               <Plus className="h-4 w-4" />
               Nuevo Cliente
@@ -943,11 +999,41 @@ function AdminCustomersPage() {
         {loading ? (
           <p className="py-12 text-center text-xs text-muted-foreground">Cargando directorio…</p>
         ) : activeCategory === "companies" ? (
-          <DataTable
-            columns={companyColumns}
-            rows={companies}
-            empty="No se encontraron empresas con los filtros aplicados."
-          />
+          companiesError ? (
+            <div className="flex flex-col items-center justify-center p-8 text-center rounded-lg border border-destructive/30 bg-destructive/5 space-y-3 my-4">
+              <div className="p-2 rounded-full bg-destructive/10 text-destructive">
+                <AlertCircle className="h-5 w-5" />
+              </div>
+              <div className="space-y-1 max-w-md">
+                <h3 className="text-sm font-semibold text-foreground">Error al cargar empresas</h3>
+                <p className="text-xs text-muted-foreground">{companiesError}</p>
+              </div>
+              <Button type="button" variant="outline" size="sm" onClick={() => reload()}>
+                Reintentar
+              </Button>
+            </div>
+          ) : (
+            <DataTable
+              columns={companyColumns}
+              rows={companies}
+              empty="No se encontraron empresas con los filtros aplicados."
+            />
+          )
+        ) : individualsError ? (
+          <div className="flex flex-col items-center justify-center p-8 text-center rounded-lg border border-destructive/30 bg-destructive/5 space-y-3 my-4">
+            <div className="p-2 rounded-full bg-destructive/10 text-destructive">
+              <AlertCircle className="h-5 w-5" />
+            </div>
+            <div className="space-y-1 max-w-md">
+              <h3 className="text-sm font-semibold text-foreground">
+                Error al cargar el directorio de clientes
+              </h3>
+              <p className="text-xs text-muted-foreground">{individualsError}</p>
+            </div>
+            <Button type="button" variant="outline" size="sm" onClick={() => reload()}>
+              Reintentar
+            </Button>
+          </div>
         ) : (
           <DataTable
             columns={individualColumns}
@@ -1049,13 +1135,27 @@ function AdminCustomersPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() =>
-                          archiveCustomer(
-                            selectedCustomer.id,
-                            selectedCustomer.displayName ?? "Sin nombre",
-                          )
+                        disabled={isCrmWriteFrozenForTenant || archivingId === selectedCustomer.id}
+                        onClick={
+                          isCrmWriteFrozenForTenant
+                            ? undefined
+                            : () =>
+                                archiveCustomer(
+                                  selectedCustomer.id,
+                                  selectedCustomer.displayName ?? "Sin nombre",
+                                )
                         }
-                        className="gap-1.5 text-xs text-destructive hover:bg-destructive/10"
+                        title={
+                          isCrmWriteFrozenForTenant
+                            ? "Gestión de bajas en preparación para EatClean (migración P34 pendiente)"
+                            : undefined
+                        }
+                        className={cn(
+                          "gap-1.5 text-xs",
+                          isCrmWriteFrozenForTenant
+                            ? "text-muted-foreground opacity-50 cursor-not-allowed"
+                            : "text-destructive hover:bg-destructive/10",
+                        )}
                       >
                         <Archive className="size-3.5" />
                         Archivar
@@ -1121,6 +1221,49 @@ function AdminCustomersPage() {
                           <RotateCcw className="size-3" /> Reintentar
                         </Button>
                       </div>
+                    ) : isCrmWriteFrozenForTenant || !canWrite ? (
+                      <>
+                        <div className="grid gap-4 sm:grid-cols-2 rounded-lg border border-border/60 bg-muted/20 p-4">
+                          <div className="space-y-1 sm:col-span-2">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              Nombre completo
+                            </Label>
+                            <p className="text-sm font-semibold text-foreground">
+                              {selectedCustomer.displayName || "—"}
+                            </p>
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              Correo electrónico
+                            </Label>
+                            <p className="text-sm font-mono text-foreground">
+                              {selectedCustomer.email || "—"}
+                            </p>
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              Teléfono
+                            </Label>
+                            <p className="text-sm font-mono text-foreground">
+                              {selectedCustomer.phone || "—"}
+                            </p>
+                          </div>
+                          <div className="space-y-1 sm:col-span-2">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              Ciudad / Población
+                            </Label>
+                            <p className="text-sm text-foreground">
+                              {selectedCustomer.city || "—"}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="rounded-md border border-muted bg-muted/40 p-3 text-xs text-muted-foreground">
+                          {isCrmWriteFrozenForTenant
+                            ? "La ficha de cliente está en modo consulta. La edición estará disponible próximamente."
+                            : "Tu acceso permite consultar esta ficha, sin editarla."}
+                        </div>
+                      </>
                     ) : (
                       <>
                         <form onSubmit={handleSaveProfile} className="space-y-4">
@@ -1192,7 +1335,11 @@ function AdminCustomersPage() {
                             </div>
                           )}
                         </form>
+                      </>
+                    )}
 
+                    {profileStatus !== "error" && (
+                      <>
                         {/* CR-CUST-01: Dietary Preferences, Allergens & Restrictions Profile */}
                         <CustomerDietaryEditor
                           customerId={selectedCustomer.id}
@@ -1807,7 +1954,7 @@ function CustomerAddressesViewer({
           .order("created_at", { ascending: true });
         if (error) throw error;
         if (!cancelled) {
-          setAddresses((data ?? []) as any[]);
+          setAddresses((data ?? []) as typeof addresses);
         }
       } catch {
         if (!cancelled) setAddresses([]);

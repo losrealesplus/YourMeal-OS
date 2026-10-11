@@ -1,3 +1,4 @@
+import { isEatCleanCrmMutationFrozen } from "@/config/eatclean-partial-launch";
 import { CustomerSelfProfileService } from "./customer-self-profile-service";
 import type { ServiceContext } from "@/services/types";
 import { AuditService } from "@/services/audit-service";
@@ -31,6 +32,12 @@ function assertCanReadCustomers(ctx: ServiceContext): void {
 function assertCanWriteCustomers(ctx: ServiceContext): void {
   if (!ctx.capabilities.has("customers.write")) {
     throw permissionDenied("customers.write");
+  }
+  if (isEatCleanCrmMutationFrozen(ctx.tenantId)) {
+    throw new DomainError(
+      "PERMISSION_DENIED",
+      "La edición de clientes estará disponible próximamente.",
+    );
   }
 }
 
