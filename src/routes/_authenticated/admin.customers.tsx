@@ -511,6 +511,7 @@ function AdminCustomersPage() {
       });
       setSelectedCustomer(updated);
       toast.success("Perfil actualizado correctamente");
+      await loadProfile(updated.id);
       await reload();
     } catch (err) {
       toast.error(formatErrorMessage(err));
