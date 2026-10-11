@@ -4,6 +4,9 @@
 BEGIN;
 SET LOCAL lock_timeout = '5s';
 SET LOCAL statement_timeout = '30s';
+-- Deparse catalog definitions independently of the operator's search_path.
+-- Explicit catalog first also prevents temporary relations shadowing catalog views.
+SET LOCAL search_path = pg_catalog, pg_temp;
 DO $$
 DECLARE definition_hash text;
 BEGIN
@@ -29,7 +32,7 @@ BEGIN
  IF EXISTS(SELECT 1 FROM pg_namespace n CROSS JOIN LATERAL aclexplode(coalesce(n.nspacl,acldefault('n',n.nspowner))) a WHERE n.nspname='cr_order_private' AND a.grantee=0 AND a.privilege_type='USAGE') THEN RAISE EXCEPTION 'STAFF_ORDER_ACTIVATION_PRIVATE_SCHEMA_PUBLIC'; END IF;
  IF NOT (SELECT bool_and(relrowsecurity) FROM pg_class WHERE oid IN ('public.orders'::regclass,'public.order_items'::regclass,'public.audit_log'::regclass)) THEN RAISE EXCEPTION 'STAFF_ORDER_ACTIVATION_RLS_DISABLED'; END IF;
 
- IF (SELECT encode(sha256(convert_to(jsonb_build_object('policies',(SELECT coalesce(jsonb_agg(jsonb_build_object('schema',schemaname,'table',tablename,'name',policyname,'permissive',permissive,'roles',roles,'cmd',cmd,'qual',qual,'check',with_check) ORDER BY schemaname,tablename,policyname),'[]'::jsonb) FROM pg_policies WHERE schemaname='public' AND tablename IN ('orders','order_items','audit_log')),'triggers',(SELECT coalesce(jsonb_agg(jsonb_build_object('table',c.relname,'name',t.tgname,'enabled',t.tgenabled,'definition',pg_get_triggerdef(t.oid,true)) ORDER BY c.relname,t.tgname),'[]'::jsonb) FROM pg_trigger t JOIN pg_class c ON c.oid=t.tgrelid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname IN ('orders','order_items','audit_log') AND NOT t.tgisinternal))::text,'UTF8')),'hex')) IS DISTINCT FROM '80c377b50e563141042c92631a999de87ad8468520fe103655a399409cd5e4c3' THEN RAISE EXCEPTION 'STAFF_ORDER_ACTIVATION_RLS_TRIGGER_DRIFT'; END IF;
+ IF (SELECT encode(sha256(convert_to(jsonb_build_object('policies',(SELECT coalesce(jsonb_agg(jsonb_build_object('schema',schemaname,'table',tablename,'name',policyname,'permissive',permissive,'roles',roles,'cmd',cmd,'qual',qual,'check',with_check) ORDER BY schemaname,tablename,policyname),'[]'::jsonb) FROM pg_policies WHERE schemaname='public' AND tablename IN ('orders','order_items','audit_log')),'triggers',(SELECT coalesce(jsonb_agg(jsonb_build_object('table',c.relname,'name',t.tgname,'enabled',t.tgenabled,'definition',pg_get_triggerdef(t.oid,true)) ORDER BY c.relname,t.tgname),'[]'::jsonb) FROM pg_trigger t JOIN pg_class c ON c.oid=t.tgrelid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname IN ('orders','order_items','audit_log') AND NOT t.tgisinternal))::text,'UTF8')),'hex')) IS DISTINCT FROM '08a95d476c85c39bf33547251622436f63e0291b7a0e186ce920b7da885c9a7a' THEN RAISE EXCEPTION 'STAFF_ORDER_ACTIVATION_RLS_TRIGGER_DRIFT'; END IF;
 END $$;
 GRANT EXECUTE ON FUNCTION public.capture_staff_existing_order(uuid,jsonb) TO authenticated;
 DO $$ BEGIN
