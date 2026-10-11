@@ -1,0 +1,90 @@
+{
+  "repository": "losrealesplus/YourMeal-OS",
+  "environment": "production-worker",
+  "reviewerId": 292604102,
+  "reviewerLogin": "losrealesplus",
+  "baseline": {
+    "sha": "27dc2bda8844b7c27a2df9f2deac2433a9789f39",
+    "versionId": "01c8974e-caad-465a-b762-8f7af837ca34",
+    "deploymentId": 6994729119
+  },
+  "candidateSha": "ce436f665781e809e61ddb70f623bf2b7ec163ca",
+  "productPr": 523,
+  "productHeadSha": "f3c6bc2ca5cada5ca8d819d1f9af4749129a0380",
+  "productFiles": [
+    {
+      "path": "docs/10-validation/p0-orders/ATOMIC_STAFF_ORDER_SQL_MANIFEST.json",
+      "before": null,
+      "after": "e7cae6c3b6ca777d58e1edf59c6ab958763d80036e181931c3cc171214a6498e"
+    },
+    {
+      "path": "docs/10-validation/p0-orders/ATOMIC_STAFF_ORDER_SYNTHETIC_RESULT.txt",
+      "before": null,
+      "after": "296df7c7d6a2fb4bd44d6722ae60939df83056be7401129dd640145476e09a54"
+    },
+    {
+      "path": "docs/10-validation/p0-orders/ORDER_PERMISSION_RECOVERY.md",
+      "before": null,
+      "after": "efe947c1229cacfd2e3d463fd35cc4baa76f6fbc0bfae0b892bf3f1521a0a6cf"
+    },
+    {
+      "path": "docs/10-validation/p0-orders/qualify-atomic-staff-order.py",
+      "before": null,
+      "after": "9704c783058abbb0e02229df6efd052d3b4983d15b9f96a74f6bcdba165f5e71"
+    },
+    {
+      "path": "docs/10-validation/p0-orders/qualify-permission-recovery.py",
+      "before": null,
+      "after": "deddc7d8bbd3bd38e4a41b2610e384dc988417bfea62160315b4adfd1dd2527d"
+    },
+    {
+      "path": "docs/99-internal/development-journal/2026-10-11-orders-permission-recovery.md",
+      "before": null,
+      "after": "abee81da3f1f12896c05cfa9a7b9d4b48f7061a562f4098645ae0a9a75921556"
+    },
+    {
+      "path": "scripts/release/activate-eatclean-staff-existing-order.sql",
+      "before": null,
+      "after": "284ef28d1baf848d707c0eb591614770688b1d8f727e69f4d51c23308de15dbe"
+    },
+    {
+      "path": "src/modules/orders/application/staff-order-capture-atomic.spec.ts",
+      "before": null,
+      "after": "b15b190bf49342fcdb7feaf9cd4694c1c484cb04427e785b2c99d7ccd830923f"
+    },
+    {
+      "path": "src/modules/orders/application/staff-order-capture-service.ts",
+      "before": "c0786fa7cd5bc3e69db2078bcb90edeb2ea26ef140fb448600d4903dc953625f",
+      "after": "a6196ec71bead519f48595cdd9fc185c6cfa1f558d5ec03ec9afd9b06075253a"
+    },
+    {
+      "path": "src/modules/orders/infrastructure/staff-existing-order-repository.ts",
+      "before": null,
+      "after": "00091e1d1d8698d312c034d18c8e410a17bbd828d6147bdd27be4b20b8e4b088"
+    },
+    {
+      "path": "supabase/migrations/20261011163814_staff_existing_order_atomic_capture.sql",
+      "before": null,
+      "after": "ff54aa20b7f1cae20f3597edab227ef32ee82f747e2e4c996ecc475a99600b03"
+    }
+  ],
+  "governanceBranch": "codex/gate7-staff-orders-523-reconciliation",
+  "governancePaths": [
+    "docs/99-internal/development-journal/2026-10-11-gate7-staff-orders-523.md",
+    "scripts/governance/release-json.spec.mjs",
+    "scripts/governance/release-plan.mjs",
+    "scripts/governance/release-reconciliation.mjs",
+    "scripts/governance/release-staff-orders-523.json",
+    "scripts/governance/release-staff-orders-523.mjs",
+    "scripts/governance/release-staff-orders-523.spec.mjs"
+  ],
+  "constraints": {
+    "productionSqlAuthorized": false,
+    "migrationExecutionAuthorized": false,
+    "productionWorkerApprovalGranted": false,
+    "orderActivationAuthorized": false,
+    "a5": "HARD_DISABLED",
+    "a4b": "CLOSED",
+    "oauthActivationAuthorized": false
+  }
+}

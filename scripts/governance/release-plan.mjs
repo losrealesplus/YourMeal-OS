@@ -1,3 +1,9 @@
+import {
+  STAFF_523,
+  staff523Payload,
+  staff523ScopeId,
+  authorizeStaff523,
+} from "./release-staff-orders-523.mjs";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -126,10 +132,7 @@ export function evaluatePublicationLedger(run, artifactsResponse, jobsResponse) 
   const name = `gate7-release-report-${run.id}-1`;
   const candidates = artifactsResponse.artifacts.filter((a) => a.name === name);
   if (candidates.length === 0) {
-    demand(
-      run.status === "completed",
-      "Run incomplete: cannot verify non-publication",
-    );
+    demand(run.status === "completed", "Run incomplete: cannot verify non-publication");
     demand(
       ["cancelled", "failure"].includes(run.conclusion),
       "Successful run missing ledger: fail closed",
@@ -141,10 +144,7 @@ export function evaluatePublicationLedger(run, artifactsResponse, jobsResponse) 
         jobsResponse.total_count <= 100,
       "Jobs listing invalid",
     );
-    demand(
-      jobsResponse.total_count === jobsResponse.jobs.length,
-      "Jobs listing truncated",
-    );
+    demand(jobsResponse.total_count === jobsResponse.jobs.length, "Jobs listing truncated");
     const phase2 = jobsResponse.jobs.find(
       (j) => j.name === "Phase 2: Protected Production Deployment" || j.name.includes("Phase 2"),
     );
@@ -358,6 +358,28 @@ function activationSnapshot(ctx, base, diff, prs, currentMainSha) {
     remediation: api(`pulls/${prs.at(-1)}`),
   };
 }
+export function staff523Snapshot(ctx, base, diff, prs, currentMainSha) {
+  const s = activationSnapshot(ctx, base, diff, prs, currentMainSha);
+  s.productPr = api("pulls/523");
+  s.commits = s.commits.map((c) => ({
+    ...c,
+    parent: git("rev-parse", `${c.sha}^1`).trim(),
+    headSha: git("rev-parse", `${c.sha}^2`).trim(),
+    files: c.paths.map((p) => {
+      const fileHash = (rev) => {
+        const entry = git("ls-tree", rev, "--", p);
+        if (!entry) return null;
+        const blob = /^100(?:644|755) blob ([a-f0-9]{40})\t/.exec(entry);
+        demand(blob, "Staff #523 files must be regular Git blobs");
+        return hash(
+          execFileSync("git", ["cat-file", "blob", blob[1]], { maxBuffer: 16 * 1024 * 1024 }),
+        );
+      };
+      return { path: p, before: fileHash(`${c.sha}^1`), after: fileHash(c.sha) };
+    }),
+  }));
+  return { ...s, diff };
+}
 export function prepare(ctx, publishing = false) {
   assertContext(ctx, policy);
   assertEnvironment(api(`environments/${policy.environment}`), policy);
@@ -392,13 +414,22 @@ export function prepare(ctx, publishing = false) {
       classification.decision === "REQUIRES_SEPARATE_AUTHORIZATION",
       "Exact interval cannot authorize a different classification",
     );
-    reconciliation = authorizeExactInterval(
-      exactIntervalSnapshot(ctx, base, diff, prs),
-      inputs,
-      ctx,
-      api(`actions/runs/${ctx.runId}`),
-      policy,
-    );
+    reconciliation =
+      base.sha === STAFF_523.baseline.sha
+        ? authorizeStaff523(
+            staff523Snapshot(ctx, base, diff, prs, currentMain),
+            inputs,
+            ctx,
+            api(`actions/runs/${ctx.runId}`),
+            policy,
+          )
+        : authorizeExactInterval(
+            exactIntervalSnapshot(ctx, base, diff, prs),
+            inputs,
+            ctx,
+            api(`actions/runs/${ctx.runId}`),
+            policy,
+          );
   }
   if (!initial && !exact && classification.decision === "REQUIRES_SEPARATE_AUTHORIZATION") {
     if (base.sha === TRACK_B_RECONCILIATION.baselineSha) {
@@ -530,6 +561,27 @@ export function prepare(ctx, publishing = false) {
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
+    if (process.argv[2] === "--staff-523-payload") {
+      const sha = api("git/ref/heads/main").object.sha;
+      const ctx = { repository: policy.repository, sha, runId: "" };
+      const base = baseline(ctx);
+      const diff = changedPaths(base.sha, sha);
+      const prs = diff.commits.map((c) => assertMergedCommit(pages(`commits/${c}/pulls`), c));
+      const payload = staff523Payload(staff523Snapshot(ctx, base, diff, prs, sha), policy);
+      fs.writeSync(
+        1,
+        JSON.stringify(
+          {
+            payload,
+            exactIntervalScope: JSON.stringify(canonical(payload)),
+            authorizationId: staff523ScopeId(payload),
+          },
+          null,
+          2,
+        ) + "\n",
+      );
+      process.exit(0); // Read-only proposal; never dispatch or production authority.
+    }
     if (process.argv[2] === "--exact-interval-payload") {
       const sha = api("git/ref/heads/main").object.sha;
       const ctx = { repository: policy.repository, sha, runId: "" };
