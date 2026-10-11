@@ -1,0 +1,401 @@
+{
+  "postgres": {
+    "status": "AUTH_BRIDGE_SQL_PASS",
+    "checks": [
+      {
+        "name": "INSTALLATION_API_EXECUTE_REVOKED",
+        "result": "PASS"
+      },
+      {
+        "name": "INSTALLED_RPC_DIRECT_CALL_DENIED",
+        "result": "PASS"
+      },
+      {
+        "name": "ACTIVATION_REQUIRES_BRIDGE",
+        "result": "PASS"
+      },
+      {
+        "name": "BRIDGE_BASELINE_42501",
+        "result": "PASS"
+      },
+      {
+        "name": "INSTALLATION_SOURCE_DRIFT_REJECTED",
+        "result": "PASS"
+      },
+      {
+        "name": "BRIDGE_INSTALLATION_CLOSED",
+        "result": "PASS"
+      },
+      {
+        "name": "ACTIVATION_PUBLIC_EXECUTE_DRIFT_REJECTED",
+        "result": "PASS"
+      },
+      {
+        "name": "ACTIVATION_BRIDGE_GRANT_OPTION_REJECTED",
+        "result": "PASS"
+      },
+      {
+        "name": "ACTIVATION_WRITER_AUTH_USAGE_REJECTED",
+        "result": "PASS"
+      },
+      {
+        "name": "ACTIVATION_POLICY_DRIFT_REJECTED",
+        "result": "PASS"
+      },
+      {
+        "name": "ACTIVATION_ADAPTED_FUNCTION_DRIFT_REJECTED",
+        "result": "PASS"
+      },
+      {
+        "name": "EXPLICIT_ACTIVATION_EFFECTIVE",
+        "result": "PASS"
+      },
+      {
+        "name": "CONFIRMED_HEADER_LINES_TOTAL",
+        "result": "PASS"
+      },
+      {
+        "name": "COMMENT_PRESERVED",
+        "result": "PASS"
+      },
+      {
+        "name": "PERSISTED_READ",
+        "result": "PASS"
+      },
+      {
+        "name": "TRANSACTIONAL_AUDIT",
+        "result": "PASS"
+      },
+      {
+        "name": "INVOKER_EMPTY_SEARCH_PATH",
+        "result": "PASS"
+      },
+      {
+        "name": "AUTHENTICATED_ONLY_EXECUTE",
+        "result": "PASS"
+      },
+      {
+        "name": "CUSTOMER_NOT_STAFF",
+        "result": "PASS"
+      },
+      {
+        "name": "MISSING_ACTOR",
+        "result": "PASS"
+      },
+      {
+        "name": "FOREIGN_TENANT",
+        "result": "PASS"
+      },
+      {
+        "name": "NONEXISTENT_CUSTOMER",
+        "result": "PASS"
+      },
+      {
+        "name": "OTHER_TENANT_STAFF_ACTUALLY_AUTHORIZED",
+        "result": "PASS"
+      },
+      {
+        "name": "AUTHORIZED_OTHER_TENANT_SCOPE_DENIED",
+        "result": "PASS"
+      },
+      {
+        "name": "EXISTING_FOREIGN_CUSTOMER",
+        "result": "PASS"
+      },
+      {
+        "name": "UNAPPROVED_STAFF_MEMBERSHIP",
+        "result": "PASS"
+      },
+      {
+        "name": "KITCHEN_CANNOT_CAPTURE",
+        "result": "PASS"
+      },
+      {
+        "name": "OPERATIONS_MANAGER_CAPTURE",
+        "result": "PASS"
+      },
+      {
+        "name": "NO_LINES",
+        "result": "PASS"
+      },
+      {
+        "name": "ZERO_QUANTITY",
+        "result": "PASS"
+      },
+      {
+        "name": "FRACTIONAL_QUANTITY",
+        "result": "PASS"
+      },
+      {
+        "name": "NEGATIVE_PRICE",
+        "result": "PASS"
+      },
+      {
+        "name": "TEXT_PRICE",
+        "result": "PASS"
+      },
+      {
+        "name": "SECOND_LINE_FOREIGN_DISH_ROLLBACK",
+        "result": "PASS"
+      },
+      {
+        "name": "SECOND_LINE_DAY_ROLLBACK",
+        "result": "PASS"
+      },
+      {
+        "name": "UNPUBLISHED_WEEK",
+        "result": "PASS"
+      },
+      {
+        "name": "DIETARY_REASON_REQUIRED",
+        "result": "PASS"
+      },
+      {
+        "name": "DIETARY_ARRAY_INVALID",
+        "result": "PASS"
+      },
+      {
+        "name": "FOREIGN_COMPANY_CONTEXT",
+        "result": "PASS"
+      },
+      {
+        "name": "COMPANY_SITE_UNIT_PRESERVED",
+        "result": "PASS"
+      },
+      {
+        "name": "SITE_PARENT_MISMATCH",
+        "result": "PASS"
+      },
+      {
+        "name": "UNIT_REQUIRES_SITE",
+        "result": "PASS"
+      },
+      {
+        "name": "POSITIVE_OVERRIDE_SERVER_TOTAL",
+        "result": "PASS"
+      },
+      {
+        "name": "DRAFT_EXPLICIT_ZERO_OVERRIDE",
+        "result": "PASS"
+      },
+      {
+        "name": "DIETARY_AUTHOR_FROM_SESSION",
+        "result": "PASS"
+      },
+      {
+        "name": "CATALOG_NOT_MUTATED",
+        "result": "PASS"
+      },
+      {
+        "name": "QUOTE_ONLY_OFFER_STILL_REJECTED",
+        "result": "PASS"
+      },
+      {
+        "name": "CONFIRMATION_FAILURE_ROLLBACK_ALL",
+        "result": "PASS"
+      },
+      {
+        "name": "AUDIT_FAILURE_ROLLBACK_ALL",
+        "result": "PASS"
+      },
+      {
+        "name": "WRITER_AUTH_USAGE_ABSENT",
+        "result": "PASS"
+      },
+      {
+        "name": "BRIDGE_OWNER_AND_BODY",
+        "result": "PASS"
+      },
+      {
+        "name": "BRIDGE_EXECUTE_INTERNAL_ONLY",
+        "result": "PASS"
+      },
+      {
+        "name": "GUARD_OWNER_UNCHANGED",
+        "result": "PASS"
+      },
+      {
+        "name": "WRITER_FLAGS_UNCHANGED",
+        "result": "PASS"
+      },
+      {
+        "name": "API_CANNOT_ASSUME_WRITER",
+        "result": "PASS"
+      },
+      {
+        "name": "VERIFIED_ACTOR_NOT_AUTHORITY_FOR_API",
+        "result": "PASS"
+      },
+      {
+        "name": "NULL_API_IDENTITY_CANNOT_USE_VERIFIED_ACTOR",
+        "result": "PASS"
+      },
+      {
+        "name": "WRITER_CLAIM_PRECEDES_VERIFIED_ACTOR",
+        "result": "PASS"
+      },
+      {
+        "name": "CUSTOM_BATCH_NO_VERIFIED_ACTOR_FALLBACK",
+        "result": "PASS"
+      },
+      {
+        "name": "CUSTOM_BATCH_FOREIGN_TENANT_REJECTED",
+        "result": "PASS"
+      },
+      {
+        "name": "WRITER_VERIFIED_ACTOR_SEMANTICS",
+        "result": "PASS"
+      },
+      {
+        "name": "API_DIRECT_BRIDGE_DENIED",
+        "result": "PASS"
+      },
+      {
+        "name": "RLS_REMAINS_ENABLED",
+        "result": "PASS"
+      },
+      {
+        "name": "OTHER_TENANT_READ_HIDDEN",
+        "result": "PASS"
+      }
+    ],
+    "authenticatedAppE2E": "NOT_TESTED",
+    "productionConnection": false,
+    "cleanup": "PASS"
+  },
+  "gotruePostgrest": {
+    "status": "AUTH_BRIDGE_E2E_PASS",
+    "checks": [
+      {
+        "name": "GOTRUE_SIGNUP_admin",
+        "result": "PASS"
+      },
+      {
+        "name": "GOTRUE_PASSWORD_LOGIN_admin",
+        "result": "PASS"
+      },
+      {
+        "name": "GOTRUE_SIGNUP_customer",
+        "result": "PASS"
+      },
+      {
+        "name": "GOTRUE_PASSWORD_LOGIN_customer",
+        "result": "PASS"
+      },
+      {
+        "name": "GOTRUE_SIGNUP_foreignadmin",
+        "result": "PASS"
+      },
+      {
+        "name": "GOTRUE_PASSWORD_LOGIN_foreignadmin",
+        "result": "PASS"
+      },
+      {
+        "name": "INSTALL_EXECUTE_REVOKED",
+        "result": "PASS"
+      },
+      {
+        "name": "POSTGREST_INSTALL_CLOSED",
+        "result": "PASS"
+      },
+      {
+        "name": "BASELINE_42501_REPRODUCED",
+        "result": "PASS"
+      },
+      {
+        "name": "BASELINE_WRITER_AUTH_USAGE_ABSENT",
+        "result": "PASS"
+      },
+      {
+        "name": "BRIDGE_INSTALLATION_CLOSED",
+        "result": "PASS"
+      },
+      {
+        "name": "BRIDGE_WRITER_AUTH_USAGE_STILL_ABSENT",
+        "result": "PASS"
+      },
+      {
+        "name": "POSTGREST_MULTI_LINE_CONFIRMED",
+        "result": "PASS"
+      },
+      {
+        "name": "POSTGREST_ORDER_READ",
+        "result": "PASS"
+      },
+      {
+        "name": "POSTGREST_PRICE_PERSISTENCE",
+        "result": "PASS"
+      },
+      {
+        "name": "AUDIT_SESSION_ACTOR",
+        "result": "PASS"
+      },
+      {
+        "name": "POSTGREST_CUSTOMER_NOT_STAFF",
+        "result": "PASS"
+      },
+      {
+        "name": "POSTGREST_AUTHORIZED_OTHER_TENANT_REJECTED",
+        "result": "PASS"
+      },
+      {
+        "name": "POSTGREST_RLS_FOREIGN_READ_HIDDEN",
+        "result": "PASS"
+      },
+      {
+        "name": "REJECTIONS_NO_EXTRA_ORDERS",
+        "result": "PASS"
+      },
+      {
+        "name": "TAMPERED_JWT_REJECTED",
+        "result": "PASS"
+      },
+      {
+        "name": "ANONYMOUS_REJECTED",
+        "result": "PASS"
+      },
+      {
+        "name": "BRIDGE_NOT_EXPOSED_POSTGREST",
+        "result": "PASS"
+      },
+      {
+        "name": "CALLER_FAKE_VERIFIED_ACTOR_IGNORED",
+        "result": "PASS"
+      },
+      {
+        "name": "ISOLATION",
+        "result": "PASS"
+      }
+    ],
+    "ordersCreated": 1,
+    "productionConnection": false,
+    "browserUI": "NOT_TESTED",
+    "source": "7e652d36372572be203964cb0f997485b57642ec",
+    "cleanup": "PASS"
+  },
+  "emptyDatabaseBootstrap": {
+    "status": "FULL_CHAIN_PASS",
+    "migrations": 71,
+    "checks": [
+      {
+        "name": "FULL_MIGRATION_CHAIN",
+        "result": "PASS"
+      }
+    ],
+    "productionConnection": false,
+    "cleanup": "PASS"
+  },
+  "vitest": {
+    "passed": 29,
+    "files": 3
+  },
+  "typecheck": "PASS",
+  "build": "PASS",
+  "migrationStatic": "PASS",
+  "lint": {
+    "status": "FAILED_EXISTING_UNCHANGED_FILES",
+    "errors": 13714,
+    "warnings": 45
+  },
+  "productionConnection": false
+}

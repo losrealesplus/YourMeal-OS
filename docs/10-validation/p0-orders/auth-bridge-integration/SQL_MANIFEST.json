@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "project": "nhirlpkuvonggctdzzad",
+  "tenant": "8bba00ba-331b-42c8-9283-4e3836ffb870",
+  "base": "7e652d36372572be203964cb0f997485b57642ec",
+  "productionSqlAuthorized": false,
+  "productionActivationAuthorized": false,
+  "installation": [
+    {
+      "path": "supabase/migrations/20261011163814_staff_existing_order_atomic_capture.sql",
+      "sha256": "ff54aa20b7f1cae20f3597edab227ef32ee82f747e2e4c996ecc475a99600b03"
+    },
+    {
+      "path": "supabase/migrations/20261011190421_eatclean_private_session_identity_bridge.sql",
+      "sha256": "4a2f65fd5595ed8658f9cfd92944b15caa2c938fe514a12d0a4b78fdd732799a"
+    }
+  ],
+  "manualActivation": {
+    "path": "scripts/release/activate-eatclean-staff-existing-order.sql",
+    "sha256": "4b45145a2c3b2036ab5ca252b4b83df298c19f7c297ce0f28555f96937a6ba3d"
+  },
+  "excluded": [
+    "20261010155728_release_cr_order_writer_auth_usage.sql",
+    "P34",
+    "A5",
+    "A4b activation",
+    "OAuth"
+  ],
+  "ledgerRepairAuthorized": false
+}
