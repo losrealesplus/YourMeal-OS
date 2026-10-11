@@ -14,6 +14,12 @@ import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  isEatCleanStaffOrderCaptureFrozen,
+  isEatCleanCrmMutationFrozen,
+  EATCLEAN_PARTIAL_LAUNCH_CONFIG,
+} from "@/config/eatclean-partial-launch";
+
+import {
   Download,
   Building2,
   Users,
@@ -1029,11 +1035,19 @@ function AdminCustomersPage() {
                   <div className="flex flex-wrap items-center gap-2 pt-2">
                     <Button
                       size="sm"
-                      onClick={() => setOrderIntakeOpen(true)}
-                      className="gap-1.5 text-xs font-bold bg-primary text-primary-foreground shadow-sm"
+                      disabled={isEatCleanStaffOrderCaptureFrozen()}
+                      onClick={() => {
+                        if (isEatCleanStaffOrderCaptureFrozen()) return;
+                        setOrderIntakeOpen(true);
+                      }}
+                      className="gap-1.5 text-xs font-bold bg-primary text-primary-foreground shadow-sm disabled:opacity-50"
                     >
-                      <Plus className="size-3.5" />+ Nuevo Pedido
+                      <Plus className="size-3.5" />
+                      {isEatCleanStaffOrderCaptureFrozen()
+                        ? EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage
+                        : "+ Nuevo Pedido"}
                     </Button>
+
                     {canWrite ? (
                       <Button
                         variant="outline"

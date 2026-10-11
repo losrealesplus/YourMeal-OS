@@ -9,6 +9,10 @@ import {
   STAFF_INTAKE_CHANNELS,
   isOrderSourceChannel,
 } from "../domain/order-source";
+import {
+  isEatCleanOrderCreationFrozen,
+  EATCLEAN_PARTIAL_LAUNCH_CONFIG,
+} from "@/config/eatclean-partial-launch";
 
 function buildOrigin(ctx: ServiceContext, command: OrderIntakeDraftCommand): OrderIntakeOrigin {
   return {
@@ -39,6 +43,9 @@ export const OrderIntakeService = {
     ctx: ServiceContext,
     command: OrderIntakeDraftCommand,
   ): Promise<ProgramDraftOrderResult> {
+    if (isEatCleanOrderCreationFrozen()) {
+      throw new DomainError("INVALID_STATE", EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage);
+    }
     requireCapability(ctx.roles, "orders.write");
 
     if (!command.channel || !isOrderSourceChannel(command.channel)) {

@@ -67,6 +67,11 @@ import { OrderTemplatesPanel } from "@/order-experience/OrderTemplatesPanel";
 import { OrderIncidentPanel } from "@/order-experience/OrderIncidentPanel";
 import { saveOrderTemplate, type OrderTemplate } from "@/order-experience/order-templates";
 import {
+  isEatCleanStaffOrderCaptureFrozen,
+  EATCLEAN_PARTIAL_LAUNCH_CONFIG,
+} from "@/config/eatclean-partial-launch";
+
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -598,6 +603,16 @@ function OrderCaptureExperiencePage() {
         object="Operational incidents · order templates · session honesty"
       />
 
+      {isEatCleanStaffOrderCaptureFrozen() && (
+        <div className="mb-6 p-4 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-800 dark:text-amber-200 text-xs">
+          <p className="font-bold mb-1">{EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage}</p>
+          <p className="text-[11px] opacity-90">
+            La captura manual y edición de pedidos en administración está desactivada temporalmente
+            durante la fase de lanzamiento parcial.
+          </p>
+        </div>
+      )}
+
       {mode === "templates" && !created ? (
         <OrderTemplatesPanel
           customerId={selected?.summary.id}
@@ -1000,11 +1015,20 @@ function OrderCaptureExperiencePage() {
                 <button
                   ref={confirmRef}
                   type="button"
-                  disabled={busy || !canWrite || lines.length === 0}
-                  onClick={() => void onConfirm()}
+                  disabled={
+                    busy || !canWrite || lines.length === 0 || isEatCleanStaffOrderCaptureFrozen()
+                  }
+                  onClick={() => {
+                    if (isEatCleanStaffOrderCaptureFrozen()) return;
+                    void onConfirm();
+                  }}
                   className="flex min-h-12 w-full items-center justify-center rounded-md bg-foreground px-4 text-base font-medium text-background disabled:opacity-40"
                 >
-                  {busy ? "Registrando…" : "Confirmar pedido"}
+                  {isEatCleanStaffOrderCaptureFrozen()
+                    ? EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage
+                    : busy
+                      ? "Registrando…"
+                      : "Confirmar pedido"}
                 </button>
               </section>
             </>

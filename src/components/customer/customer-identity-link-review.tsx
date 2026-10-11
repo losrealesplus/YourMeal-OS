@@ -4,7 +4,13 @@ import { useAuth } from "@/hooks/use-auth";
 import { customerProfileClient } from "@/modules/customer-directory/application/customer-profile-client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+
 import { createCustomerMutationSession } from "@/modules/customer-directory/application/customer-mutation-session";
+import {
+  isEatCleanCrmMutationFrozen,
+  EATCLEAN_PARTIAL_LAUNCH_CONFIG,
+} from "@/config/eatclean-partial-launch";
+
 export function CustomerIdentityLinkReview({
   customerId,
   revision,
@@ -16,6 +22,7 @@ export function CustomerIdentityLinkReview({
 }) {
   const { tenantId, user, roles } = useAuth();
   const allowed = roles.includes("company_admin") || roles.includes("operations_manager");
+
   const repo = customerProfileClient;
   const scope = `${tenantId}/${user?.id}/${customerId}/${revision}`;
   const [verification, setVerification] = useState({ scope, selected: "", verified: false });
@@ -36,10 +43,21 @@ export function CustomerIdentityLinkReview({
   const [mayRetry, setMayRetry] = useState(false);
   const query = useQuery({
     queryKey: ["p34-link-review", tenantId, user?.id],
-    enabled: Boolean(allowed && tenantId),
+    enabled: Boolean(allowed && tenantId && !isEatCleanCrmMutationFrozen()),
     queryFn: () => repo.identityRequests(tenantId!),
   });
   if (!allowed) return null;
+
+  if (isEatCleanCrmMutationFrozen()) {
+    return (
+      <div className="rounded-lg border border-border/60 bg-muted/20 p-3 text-xs text-muted-foreground flex items-center justify-between">
+        <span>Vinculación de identidad (CRM P34)</span>
+        <span className="font-semibold text-[11px] text-amber-600 dark:text-amber-400">
+          {EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage}
+        </span>
+      </div>
+    );
+  }
   async function approve() {
     if (
       pending ||

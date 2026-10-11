@@ -14,11 +14,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useState, useEffectEvent } from "react";
 import { toast } from "sonner";
-import {
-  AdminHeader,
-  SectionTitle,
-  StatusChip,
-} from "@/components/admin";
+import { AdminHeader, SectionTitle, StatusChip } from "@/components/admin";
 import { useOrder } from "@/order/useOrder";
 import { useIdentity } from "@/identity/useIdentity";
 import {
@@ -38,16 +34,15 @@ import {
   getOrdersByWeekQuery,
   searchOrdersQuery,
 } from "@/order/OrderQueries";
-import type {
-  OrderCommandResult,
-  OrderContext,
-  OrderSummary,
-} from "@/order/OrderContext";
+import type { OrderCommandResult, OrderContext, OrderSummary } from "@/order/OrderContext";
+import {
+  isEatCleanStaffOrderCaptureFrozen,
+  EATCLEAN_PARTIAL_LAUNCH_CONFIG,
+} from "@/config/eatclean-partial-launch";
+
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute(
-  "/_authenticated/admin/order-workspace",
-)({
+export const Route = createFileRoute("/_authenticated/admin/order-workspace")({
   beforeLoad: ({ context }) => {
     assertCapabilityFromContext(context, "orders.read");
   },
@@ -72,9 +67,7 @@ function mondayIso(d = new Date()): string {
   return x.toISOString().slice(0, 10);
 }
 
-function statusTone(
-  status: string,
-): "positive" | "warning" | "danger" | "neutral" {
+function statusTone(status: string): "positive" | "warning" | "danger" | "neutral" {
   if (status === "delivered") return "positive";
   if (status === "cancelled" || status === "delivery_issue") return "danger";
   if (status === "draft") return "neutral";
@@ -114,12 +107,8 @@ function OrderWorkspaceDemoPage() {
                 limit: 40,
               }),
             )
-          : order.getOrdersByWeek(
-              getOrdersByWeekQuery({ weekStart, limit: 40 }),
-            ),
-        order.getOperationalCalendar(
-          getOperationalCalendarQuery({ weekStart }),
-        ),
+          : order.getOrdersByWeek(getOrdersByWeekQuery({ weekStart, limit: 40 })),
+        order.getOperationalCalendar(getOperationalCalendarQuery({ weekStart })),
       ]);
       if (!listed.ok) {
         toast.error(listed.errors[0]?.message ?? "Search failed");
@@ -169,9 +158,7 @@ function OrderWorkspaceDemoPage() {
   async function onSearchAll() {
     setBusy(true);
     try {
-      const result = await order.searchOrders(
-        searchOrdersQuery({ weekStart, limit: 40 }),
-      );
+      const result = await order.searchOrders(searchOrdersQuery({ weekStart, limit: 40 }));
       if (!result.ok) {
         toast.error(result.errors[0]?.message ?? "Search failed");
         return;
@@ -210,10 +197,7 @@ function OrderWorkspaceDemoPage() {
     }
   }
 
-  async function runProcess(
-    label: string,
-    run: () => Promise<OrderCommandResult>,
-  ) {
+  async function runProcess(label: string, run: () => Promise<OrderCommandResult>) {
     if (!selected) return;
     setBusy(true);
     try {
@@ -249,6 +233,16 @@ function OrderWorkspaceDemoPage() {
         object="OrderSummary · OrderContext · process commands"
       />
 
+      {isEatCleanStaffOrderCaptureFrozen() && (
+        <div className="mb-6 p-4 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-800 dark:text-amber-200 text-xs">
+          <p className="font-bold mb-1">{EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage}</p>
+          <p className="text-[11px] opacity-90">
+            La creación y transición de compromisos operativos de pedidos está pausada durante el
+            lanzamiento parcial.
+          </p>
+        </div>
+      )}
+
       <div className="mb-6 rounded-lg border border-dashed border-border bg-muted/30 px-4 py-3 text-sm">
         <p className="font-semibold text-foreground">
           Screen → useOrder() → OrderFacade → Intake / Orders / Operations
@@ -258,15 +252,12 @@ function OrderWorkspaceDemoPage() {
         </p>
         <p className="mt-1 text-muted-foreground">
           Tenant: {identity.tenant?.slug ?? "—"} · Operator:{" "}
-          {identity.currentUser?.fullName ?? identity.session.userId ?? "—"} ·
-          Ready: {order.isReady ? "yes" : "no"}
+          {identity.currentUser?.fullName ?? identity.session.userId ?? "—"} · Ready:{" "}
+          {order.isReady ? "yes" : "no"}
         </p>
         <p className="mt-2 text-xs text-muted-foreground">
           Legacy:{" "}
-          <Link
-            to="/admin/orders"
-            className="underline underline-offset-2 hover:text-foreground"
-          >
+          <Link to="/admin/orders" className="underline underline-offset-2 hover:text-foreground">
             /admin/orders
           </Link>{" "}
           · Customer demo:{" "}
@@ -321,9 +312,7 @@ function OrderWorkspaceDemoPage() {
       {calendarDays.length > 0 ? (
         <p className="mb-4 text-xs text-muted-foreground">
           GetOperationalCalendar · delivery days:{" "}
-          <span className="font-semibold text-foreground">
-            {calendarDays.join(" · ")}
-          </span>
+          <span className="font-semibold text-foreground">{calendarDays.join(" · ")}</span>
         </p>
       ) : null}
 
@@ -353,11 +342,16 @@ function OrderWorkspaceDemoPage() {
           />
           <button
             type="button"
-            disabled={!order.isReady || busy || !canWrite}
-            onClick={() => void onPlanWeekly()}
+            disabled={!order.isReady || busy || !canWrite || isEatCleanStaffOrderCaptureFrozen()}
+            onClick={() => {
+              if (isEatCleanStaffOrderCaptureFrozen()) return;
+              void onPlanWeekly();
+            }}
             className="rounded-md bg-foreground px-3 py-1.5 text-xs font-semibold text-background disabled:opacity-40"
           >
-            PlanWeeklyOrder
+            {isEatCleanStaffOrderCaptureFrozen()
+              ? EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage
+              : "PlanWeeklyOrder"}
           </button>
         </div>
       </div>
@@ -368,9 +362,7 @@ function OrderWorkspaceDemoPage() {
             Orders · week {weekStart}
           </p>
           {loading ? (
-            <p className="py-8 text-center text-sm text-muted-foreground">
-              Cargando…
-            </p>
+            <p className="py-8 text-center text-sm text-muted-foreground">Cargando…</p>
           ) : summaries.length === 0 ? (
             <p className="py-8 text-center text-sm text-muted-foreground">
               Sin compromisos en esta semana
@@ -388,12 +380,9 @@ function OrderWorkspaceDemoPage() {
                     )}
                   >
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold">
-                        {s.partyRef.displayName}
-                      </p>
+                      <p className="truncate text-sm font-semibold">{s.partyRef.displayName}</p>
                       <p className="text-[11px] text-muted-foreground">
-                        {s.id.slice(0, 8)} · {s.partyRef.kind} · items{" "}
-                        {s.itemCount}
+                        {s.id.slice(0, 8)} · {s.partyRef.kind} · items {s.itemCount}
                       </p>
                     </div>
                     <StatusChip tone={statusTone(s.status)} label={s.status} />
@@ -419,16 +408,13 @@ function OrderWorkspaceDemoPage() {
                   {selected.details.summary.partyRef.displayName}
                 </h3>
                 <p className="text-xs text-muted-foreground">
-                  {selected.details.summary.id} · week{" "}
-                  {selected.details.summary.week.weekStart}
+                  {selected.details.summary.id} · week {selected.details.summary.week.weekStart}
                 </p>
               </div>
               <dl className="grid grid-cols-2 gap-2 text-xs">
                 <div>
                   <dt className="text-muted-foreground">Status</dt>
-                  <dd className="font-semibold">
-                    {selected.details.summary.status}
-                  </dd>
+                  <dd className="font-semibold">{selected.details.summary.status}</dd>
                 </div>
                 <div>
                   <dt className="text-muted-foreground">Delivery day</dt>
@@ -438,15 +424,11 @@ function OrderWorkspaceDemoPage() {
                 </div>
                 <div>
                   <dt className="text-muted-foreground">canWrite</dt>
-                  <dd className="font-semibold">
-                    {selected.permissions.canWrite ? "yes" : "no"}
-                  </dd>
+                  <dd className="font-semibold">{selected.permissions.canWrite ? "yes" : "no"}</dd>
                 </div>
                 <div>
                   <dt className="text-muted-foreground">Lines</dt>
-                  <dd className="font-semibold">
-                    {selected.details.lines.length}
-                  </dd>
+                  <dd className="font-semibold">{selected.details.lines.length}</dd>
                 </div>
               </dl>
 
@@ -526,9 +508,7 @@ function OrderWorkspaceDemoPage() {
                   disabled={busy || !selected.details.summary.id}
                   onClick={() =>
                     void runProcess("CloseOrder", () =>
-                      order.closeOrder(
-                        closeOrderCommand({ orderId: selected.details.summary.id }),
-                      ),
+                      order.closeOrder(closeOrderCommand({ orderId: selected.details.summary.id })),
                     )
                   }
                   className="rounded-md border border-dashed border-border px-3 py-1.5 text-xs text-muted-foreground disabled:opacity-40"
