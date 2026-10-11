@@ -1268,19 +1268,22 @@ export const EATCLEAN_RELEASE_A_RECONCILIATION = freezeEatClean({
   "baselineSha": "b9d9ff56c50570f60f6b1cb1db0e41909b477d2d",
   "baselineDeploymentId": 6981646840,
   "baselineVersionId": "52391b7d-d1d5-4997-abe4-15b0e29bd652",
-  "sealedCandidateTargetSha": "81b0da1533f9442d8171d9bbb9863343c13389f0",
+  "sealedCandidateTargetSha": "845ecfb8eadd7bc184945c2c710be2224ad43eef",
   "originalDecision": "REQUIRES_SEPARATE_AUTHORIZATION",
   "candidatePrs": [
     515,
     516,
     517,
     518,
-    519
+    519,
+    520
   ],
   "allCandidatePaths": [
     ".github/workflows/migration-bootstrap.yml",
     "AG_GATE7_FINAL_RECONCILIATION.md",
+    "AG_GATE7_RELEASE_A_RECONCILIATION.md",
     "docs/05-architecture/GATE7_POST_MERGE_AUTOMATION.md",
+    "docs/05-architecture/GATE7_RELEASE_A_AUTOMATION.md",
     "docs/10-validation/MIGRATION_BOOTSTRAP_VALIDATION.md",
     "docs/99-internal/development-journal/2026-10-10-eatclean-final-release-reconciliation.md",
     "docs/99-internal/development-journal/2026-10-10-final-release-package.md",
@@ -1647,12 +1650,49 @@ export const EATCLEAN_RELEASE_A_RECONCILIATION = freezeEatClean({
           "after": "0c24428dc11d451eb787ded48b9b8b873cd9778066b7bf8594a375f20a5c5ab7"
         }
       ]
+    },
+    {
+      "sha": "845ecfb8eadd7bc184945c2c710be2224ad43eef",
+      "pr": 520,
+      "parent": "81b0da1533f9442d8171d9bbb9863343c13389f0",
+      "paths": [
+        "AG_GATE7_RELEASE_A_RECONCILIATION.md",
+        "docs/05-architecture/GATE7_RELEASE_A_AUTOMATION.md",
+        "scripts/governance/release-plan.mjs",
+        "scripts/governance/release-reconciliation.mjs",
+        "scripts/governance/release-reconciliation.spec.mjs"
+      ],
+      "specialFiles": [
+        {
+          "path": "AG_GATE7_RELEASE_A_RECONCILIATION.md",
+          "before": null,
+          "after": "4c0990730bf38aa744235239a09c777984c942f04e06b7b670d562b8902af416"
+        },
+        {
+          "path": "docs/05-architecture/GATE7_RELEASE_A_AUTOMATION.md",
+          "before": null,
+          "after": "bde2e4ea2eb55fa16a9ca9cf4c25e44a57187e0a34c82215fce9235041473dfd"
+        },
+        {
+          "path": "scripts/governance/release-plan.mjs",
+          "before": "bf8a5637630d72e5e3619cfd6dd1b1fe70c8ae2b306950a960bd90c63199647b",
+          "after": "defd34a178b9425213fe0e14b1d1169f52456bc61d63279ae4384f94eaffa073"
+        },
+        {
+          "path": "scripts/governance/release-reconciliation.mjs",
+          "before": "8b883102b7fe17f9c1ae824ef978468938dc52889cc40caea5799cc187953e40",
+          "after": "1af21c40af9e3f8776a70519b77fd091f859e7d9f5e4a71655a0bc7c4bbc6dad"
+        },
+        {
+          "path": "scripts/governance/release-reconciliation.spec.mjs",
+          "before": "61f98efc3032a959b7da56aa0ddabf20bf89ddf04dd784830b2b6e1cf4ed2a37",
+          "after": "e7c59f1cafcca0dad5327819e28b67c9935586276c09ea6db772eb38c1c95ea6"
+        }
+      ]
     }
   ],
-  "governanceBranch": "ag/gate7-release-a-reconciliation",
+  "governanceBranch": "ag/gate7-cancelled-ledger-fix",
   "governanceFiles": [
-    "AG_GATE7_RELEASE_A_RECONCILIATION.md",
-    "docs/05-architecture/GATE7_RELEASE_A_AUTOMATION.md",
     "scripts/governance/release-plan.mjs",
     "scripts/governance/release-reconciliation.mjs",
     "scripts/governance/release-reconciliation.spec.mjs"
@@ -1687,8 +1727,8 @@ export const EATCLEAN_RELEASE_A_RECONCILIATION = freezeEatClean({
 });
 
 /**
- * Verifies exact 5-commit candidate lineage (#515, #516, #517, #518, #519) plus
- * governance reconciliation commit (PR #520 on ag/gate7-release-a-reconciliation).
+ * Verifies exact 6-commit candidate lineage (#515-#520) plus
+ * governance remediation commit (PR #521 on ag/gate7-cancelled-ledger-fix).
  */
 export function verifyEatCleanReleaseAReconciliation(snapshot, policy) {
   const record = EATCLEAN_RELEASE_A_RECONCILIATION;
@@ -1716,10 +1756,10 @@ export function verifyEatCleanReleaseAReconciliation(snapshot, policy) {
     "EatClean Release A final source missing/stale",
   );
 
-  // Exactly 6 commits in first-parent history: 5 product/governance candidate commits + 1 final governance PR commit
+  // Exactly 7 commits in first-parent history: 6 product/governance candidate commits (#515-#520) + 1 final governance PR commit (#521)
   demand(
-    commits?.length === 6,
-    "EatClean Release A requires exact 5 candidate commits (#515-#519) plus 1 governance commit",
+    commits?.length === 7,
+    "EatClean Release A requires exact 6 candidate commits (#515-#520) plus 1 governance commit",
   );
 
   // Verify candidate lineage
@@ -1739,7 +1779,7 @@ export function verifyEatCleanReleaseAReconciliation(snapshot, policy) {
     );
   }
 
-  // Verify all 5 candidate PRs were human-merged by authorized reviewer
+  // Verify all 6 candidate PRs were human-merged by authorized reviewer
   const assertHumanPr = (pr, number, sha) =>
     demand(
       pr?.number === number &&
@@ -1755,15 +1795,15 @@ export function verifyEatCleanReleaseAReconciliation(snapshot, policy) {
 
   demand(
     Array.isArray(productPrs) && productPrs.length === record.candidatePrs.length,
-    "EatClean Release A requires exactly 5 candidate PRs",
+    "EatClean Release A requires exactly 6 candidate PRs",
   );
 
   for (let i = 0; i < record.candidatePrs.length; i++) {
     assertHumanPr(productPrs[i], record.candidatePrs[i], record.commits[i].sha);
   }
 
-  // Commit 5 is the final governance reconciliation commit and is targetSha
-  const govCommit = commits[5];
+  // Commit 6 is the final governance remediation commit and is targetSha
+  const govCommit = commits[6];
   demand(
     govCommit.sha === targetSha &&
       govCommit.parent === record.sealedCandidateTargetSha,
