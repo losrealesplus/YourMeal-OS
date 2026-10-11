@@ -944,18 +944,19 @@ function releaseASnapshot() {
     eatcleanPr(517, releaseARec.commits[2].sha, "ag/gate7-final-reconciliation"),
     eatcleanPr(518, releaseARec.commits[3].sha, "ag/gate7-hotfix-governance-classification"),
     eatcleanPr(519, releaseARec.commits[4].sha, "feat/eatclean-partial-launch"),
+    eatcleanPr(520, releaseARec.commits[5].sha, "ag/gate7-release-a-reconciliation"),
   ];
 
   const govCommit = {
     sha: finalReleaseASha,
     parent: releaseARec.sealedCandidateTargetSha,
-    pr: 520,
+    pr: 521,
     paths: [...releaseARec.governanceFiles],
     specialFiles: releaseARec.governanceFiles
       .filter((p) => classifyPath(p) === "SPECIAL")
       .map((p) => ({
         path: p,
-        before: null,
+        before: "b".repeat(64),
         after: "a".repeat(64),
       })),
   };
@@ -972,7 +973,7 @@ function releaseASnapshot() {
     originalDecision: releaseARec.originalDecision,
     constraints: structuredClone(releaseARec.constraints),
     productPrs: candidatePrs,
-    remediation: eatcleanPr(520, finalReleaseASha, releaseARec.governanceBranch),
+    remediation: eatcleanPr(521, finalReleaseASha, releaseARec.governanceBranch),
     commits: [
       ...releaseARec.commits.map((c) => ({
         sha: c.sha,
@@ -990,14 +991,14 @@ function releaseASnapshot() {
   };
 }
 
-test("EatClean Release A sealed 6-commit interval PASS and immutable record", () => {
+test("EatClean Release A sealed 7-commit interval PASS and immutable record", () => {
   const s = releaseASnapshot();
   const result = verifyEatCleanReleaseAReconciliation(s, mockPolicy);
   assert.equal(result.payload.finalSourceSha, finalReleaseASha);
   assert.equal(result.payload.reconciliationType, "EATCLEAN_RELEASE_A_RECONCILIATION");
-  assert.equal(result.payload.candidatePrs.length, 5);
-  assert.equal(result.payload.candidateMerges.length, 5);
-  assert.equal(result.payload.governanceMerge.pr, 520);
+  assert.equal(result.payload.candidatePrs.length, 6);
+  assert.equal(result.payload.candidateMerges.length, 6);
+  assert.equal(result.payload.governanceMerge.pr, 521);
   assert.equal(result.payload.sqlManifest.entriesCount, 4);
   assert.equal(result.payload.sqlManifest.productionExecutionAuthorized, false);
   assert.equal(result.payload.constraints.release_a_order_creation, "FROZEN_FOR_EATCLEAN");
@@ -1016,46 +1017,62 @@ test("EatClean Release A FAIL: wrong baseline SHA", () => {
   );
 });
 
-test("EatClean Release A FAIL: missing candidate PR (only 4 candidate commits)", () => {
+test("EatClean Release A FAIL: missing candidate PR (only 5 candidate commits)", () => {
   const s = releaseASnapshot();
-  s.commits.splice(4, 1); // remove PR 519 commit
-  s.diff.commits.splice(4, 1);
+  s.commits.splice(5, 1); // remove PR 520 commit
+  s.diff.commits.splice(5, 1);
   assert.throws(
     () => verifyEatCleanReleaseAReconciliation(s, mockPolicy),
-    /EatClean Release A requires exact 5 candidate commits/,
+    /EatClean Release A requires exact 6 candidate commits/,
   );
 });
 
-test("EatClean Release A FAIL: wrong governance parent (not sealed 81b0da15)", () => {
+test("EatClean Release A FAIL: 8th commit fails closed", () => {
   const s = releaseASnapshot();
-  s.commits[5].parent = "1".repeat(40);
+  s.commits.push({
+    sha: "f".repeat(40),
+    parent: finalReleaseASha,
+    pr: 522,
+    paths: ["scripts/governance/release-plan.mjs"],
+    specialFiles: [],
+  });
+  s.diff.commits.push("f".repeat(40));
+  assert.throws(
+    () => verifyEatCleanReleaseAReconciliation(s, mockPolicy),
+    /EatClean Release A requires exact 6 candidate commits/,
+  );
+});
+
+test("EatClean Release A FAIL: wrong governance parent (not sealed 845ecfb8)", () => {
+  const s = releaseASnapshot();
+  s.commits[6].parent = "1".repeat(40);
   assert.throws(
     () => verifyEatCleanReleaseAReconciliation(s, mockPolicy),
     /EatClean Release A governance commit lineage mismatch/,
   );
 });
 
-test("EatClean Release A FAIL: unauthorized merger for PR #519", () => {
+test("EatClean Release A FAIL: unauthorized merger for PR #520", () => {
   const s = releaseASnapshot();
-  s.productPrs[4].merged_by.id = 999999;
-  assert.throws(
-    () => verifyEatCleanReleaseAReconciliation(s, mockPolicy),
-    /EatClean Release A missing canonical human merge evidence for PR #519/,
-  );
-});
-
-test("EatClean Release A FAIL: unmerged governance PR", () => {
-  const s = releaseASnapshot();
-  s.remediation.merged_at = null;
+  s.productPrs[5].merged_by.id = 999999;
   assert.throws(
     () => verifyEatCleanReleaseAReconciliation(s, mockPolicy),
     /EatClean Release A missing canonical human merge evidence for PR #520/,
   );
 });
 
+test("EatClean Release A FAIL: unmerged governance PR #521", () => {
+  const s = releaseASnapshot();
+  s.remediation.merged_at = null;
+  assert.throws(
+    () => verifyEatCleanReleaseAReconciliation(s, mockPolicy),
+    /EatClean Release A missing canonical human merge evidence for PR #521/,
+  );
+});
+
 test("EatClean Release A FAIL: extra unexpected file in governance PR", () => {
   const s = releaseASnapshot();
-  s.commits[5].paths = [...s.commits[5].paths, "src/unauthorized-leak.ts"].sort();
+  s.commits[6].paths = [...s.commits[6].paths, "src/unauthorized-leak.ts"].sort();
   assert.throws(
     () => verifyEatCleanReleaseAReconciliation(s, mockPolicy),
     /EatClean Release A governance paths mismatch/,
@@ -1070,3 +1087,266 @@ test("EatClean Release A FAIL: altered candidate commit path in PR #519", () => 
     /EatClean Release A commit 4 \(#519\) paths\/hashes mismatch/,
   );
 });
+
+test("EatClean Release A FAIL: altered candidate commit path in PR #520", () => {
+  const s = releaseASnapshot();
+  s.commits[5].paths = [...s.commits[5].paths, "src/unauthorized.ts"].sort();
+  assert.throws(
+    () => verifyEatCleanReleaseAReconciliation(s, mockPolicy),
+    /EatClean Release A commit 5 \(#520\) paths\/hashes mismatch/,
+  );
+});
+
+// ============================================================================
+// GATE 7 PUBLICATION LEDGER & BASELINE RESOLUTION SUITE
+// ============================================================================
+
+const {
+  baselineFromReport,
+  evaluatePublicationLedger,
+} = await import("./release-plan.mjs");
+
+function wrapArtifacts(artifacts) {
+  return { total_count: artifacts.length, artifacts };
+}
+
+function wrapJobs(jobs) {
+  return { total_count: jobs.length, jobs };
+}
+
+test("Ledger 1: Cancelled run with 0 Phase 2 steps returns null (non-publication)", () => {
+  const run = { id: 38084240756, status: "completed", conclusion: "cancelled", head_sha: "0b88e9760d8e1574fc62c16c907a91b86ef9d3ba" };
+  const jobs = [
+    { name: "Classify outstanding main changes", status: "completed", conclusion: "success", steps: [1, 2, 3] },
+    { name: "Phase 1: Build Once & Cryptographic Digest", status: "completed", conclusion: "success", steps: [1, 2] },
+    { name: "Phase 2: Protected Production Deployment", status: "completed", conclusion: "cancelled", steps: [] },
+  ];
+  const result = evaluatePublicationLedger(run, wrapArtifacts([]), wrapJobs(jobs));
+  assert.equal(result, null);
+});
+
+test("Ledger 2: Skipped Phase 2 run returns null (non-publication)", () => {
+  const run = { id: 38125150507, status: "completed", conclusion: "failure", head_sha: "81b0da1533f9442d8171d9bbb9863343c13389f0" };
+  const jobs = [
+    { name: "Classify outstanding main changes", status: "completed", conclusion: "failure", steps: [1] },
+    { name: "Phase 1: Build Once & Cryptographic Digest", status: "completed", conclusion: "skipped", steps: [] },
+    { name: "Phase 2: Protected Production Deployment", status: "completed", conclusion: "skipped", steps: [] },
+  ];
+  const result = evaluatePublicationLedger(run, wrapArtifacts([]), wrapJobs(jobs));
+  assert.equal(result, null);
+});
+
+test("Ledger 3: Incomplete run (run status in_progress) FAILS CLOSED", () => {
+  const run = { id: 999999, status: "in_progress", conclusion: null, head_sha: "c".repeat(40) };
+  const jobs = [
+    { name: "Phase 2: Protected Production Deployment", status: "completed", conclusion: "cancelled", steps: [] },
+  ];
+  assert.throws(
+    () => evaluatePublicationLedger(run, wrapArtifacts([]), wrapJobs(jobs)),
+    /Run incomplete: cannot verify non-publication/,
+  );
+});
+
+test("Ledger 4: Phase 2 queued FAILS CLOSED", () => {
+  const run = { id: 999998, status: "completed", conclusion: "cancelled", head_sha: "c".repeat(40) };
+  const jobs = [
+    { name: "Phase 2: Protected Production Deployment", status: "queued", steps: [] },
+  ];
+  assert.throws(
+    () => evaluatePublicationLedger(run, wrapArtifacts([]), wrapJobs(jobs)),
+    /Phase 2 incomplete: fail closed/,
+  );
+});
+
+test("Ledger 5: Phase 2 in_progress FAILS CLOSED", () => {
+  const run = { id: 999997, status: "completed", conclusion: "cancelled", head_sha: "c".repeat(40) };
+  const jobs = [
+    { name: "Phase 2: Protected Production Deployment", status: "in_progress", steps: [] },
+  ];
+  assert.throws(
+    () => evaluatePublicationLedger(run, wrapArtifacts([]), wrapJobs(jobs)),
+    /Phase 2 incomplete: fail closed/,
+  );
+});
+
+test("Ledger 6: Run missing Phase 2 job entirely FAILS CLOSED", () => {
+  const run = { id: 999996, status: "completed", conclusion: "failure", head_sha: "c".repeat(40) };
+  const jobs = [
+    { name: "Classify outstanding main changes", status: "completed", conclusion: "success", steps: [1] },
+  ];
+  assert.throws(
+    () => evaluatePublicationLedger(run, wrapArtifacts([]), wrapJobs(jobs)),
+    /Phase 2 missing: fail closed/,
+  );
+});
+
+test("Ledger 7a: Phase 2 steps = [] returns null (non-publication)", () => {
+  const run = { id: 888889, status: "completed", conclusion: "cancelled", head_sha: "d".repeat(40) };
+  const jobs = [
+    { name: "Phase 2: Protected Production Deployment", status: "completed", conclusion: "cancelled", steps: [] },
+  ];
+  const result = evaluatePublicationLedger(run, wrapArtifacts([]), wrapJobs(jobs));
+  assert.equal(result, null);
+});
+
+test("Ledger 7b: Phase 2 steps = undefined FAILS CLOSED", () => {
+  const run = { id: 888890, status: "completed", conclusion: "cancelled", head_sha: "d".repeat(40) };
+  const jobs = [
+    { name: "Phase 2: Protected Production Deployment", status: "completed", conclusion: "cancelled", steps: undefined },
+  ];
+  assert.throws(
+    () => evaluatePublicationLedger(run, wrapArtifacts([]), wrapJobs(jobs)),
+    /Phase 2 executed steps without ledger: fail closed/,
+  );
+});
+
+test("Ledger 7c: Phase 2 steps = null FAILS CLOSED", () => {
+  const run = { id: 888891, status: "completed", conclusion: "cancelled", head_sha: "d".repeat(40) };
+  const jobs = [
+    { name: "Phase 2: Protected Production Deployment", status: "completed", conclusion: "cancelled", steps: null },
+  ];
+  assert.throws(
+    () => evaluatePublicationLedger(run, wrapArtifacts([]), wrapJobs(jobs)),
+    /Phase 2 executed steps without ledger: fail closed/,
+  );
+});
+
+test("Ledger 7d: Phase 2 steps con elementos FAILS CLOSED", () => {
+  const run = { id: 888892, status: "completed", conclusion: "cancelled", head_sha: "d".repeat(40) };
+  const jobs = [
+    {
+      name: "Phase 2: Protected Production Deployment",
+      status: "completed",
+      conclusion: "cancelled",
+      steps: [{ name: "Set up job" }],
+    },
+  ];
+  assert.throws(
+    () => evaluatePublicationLedger(run, wrapArtifacts([]), wrapJobs(jobs)),
+    /Phase 2 executed steps without ledger: fail closed/,
+  );
+});
+
+test("Ledger 7: Phase 2 started mutation steps but report missing FAILS CLOSED", () => {
+  const run = { id: 888888, status: "completed", conclusion: "failure", head_sha: "d".repeat(40) };
+  const jobs = [
+    {
+      name: "Phase 2: Protected Production Deployment",
+      status: "completed",
+      conclusion: "failure",
+      steps: [
+        { name: "Set up job" },
+        { name: "Run actions/checkout@v4" },
+        { name: "Revalidate sovereign approval and publish exact version" },
+      ],
+    },
+  ];
+  assert.throws(
+    () => evaluatePublicationLedger(run, wrapArtifacts([]), wrapJobs(jobs)),
+    /Phase 2 not cancelled\/skipped: fail closed/,
+  );
+});
+
+test("Ledger 8: Phase 2 completed success but report missing FAILS CLOSED", () => {
+  const run = { id: 888887, status: "completed", conclusion: "success", head_sha: "d".repeat(40) };
+  const jobs = [
+    {
+      name: "Phase 2: Protected Production Deployment",
+      status: "completed",
+      conclusion: "success",
+      steps: [{ name: "Publish" }],
+    },
+  ];
+  assert.throws(
+    () => evaluatePublicationLedger(run, wrapArtifacts([]), wrapJobs(jobs)),
+    /Successful run missing ledger: fail closed/,
+  );
+});
+
+test("Ledger 9: Ambiguous multiple report artifacts FAILS CLOSED", () => {
+  const run = { id: 777777, status: "completed", conclusion: "success", head_sha: "e".repeat(40) };
+  const artifacts = [
+    { name: `gate7-release-report-${run.id}-1`, expired: false },
+    { name: `gate7-release-report-${run.id}-1`, expired: false },
+  ];
+  assert.throws(
+    () => evaluatePublicationLedger(run, wrapArtifacts(artifacts), wrapJobs([])),
+    /Publication ledger missing, expired or ambiguous: reconciliation required/,
+  );
+});
+
+test("Ledger 10: Expired report artifact FAILS CLOSED", () => {
+  const run = { id: 777776, status: "completed", conclusion: "success", head_sha: "e".repeat(40) };
+  const artifacts = [
+    { name: `gate7-release-report-${run.id}-1`, expired: true },
+  ];
+  assert.throws(
+    () => evaluatePublicationLedger(run, wrapArtifacts(artifacts), wrapJobs([])),
+    /Publication ledger missing, expired or ambiguous: reconciliation required/,
+  );
+});
+
+test("Ledger 11: Truncated artifacts response FAILS CLOSED", () => {
+  const run = { id: 666666, status: "completed", conclusion: "success", head_sha: "f".repeat(40) };
+  const invalidArtifacts = { total_count: 5, artifacts: [{ name: "other" }] };
+  assert.throws(
+    () => evaluatePublicationLedger(run, invalidArtifacts, wrapJobs([])),
+    /Artifact listing truncated/,
+  );
+});
+
+test("Ledger 12: Truncated jobs response FAILS CLOSED", () => {
+  const run = { id: 666665, status: "completed", conclusion: "cancelled", head_sha: "f".repeat(40) };
+  const invalidJobs = { total_count: 5, jobs: [{ name: "Phase 2: Protected Production Deployment", status: "completed", conclusion: "cancelled", steps: [] }] };
+  assert.throws(
+    () => evaluatePublicationLedger(run, wrapArtifacts([]), invalidJobs),
+    /Jobs listing truncated/,
+  );
+});
+
+test("Ledger 13: Valid non-expired report artifact returns artifact candidate", () => {
+  const run = { id: 555555, status: "completed", conclusion: "success", head_sha: "1".repeat(40) };
+  const artifact = { name: `gate7-release-report-${run.id}-1`, expired: false, id: 12345 };
+  const candidate = evaluatePublicationLedger(run, wrapArtifacts([artifact]), wrapJobs([]));
+  assert.deepEqual(candidate, artifact);
+});
+
+test("Ledger 14: Valid report with mutationStarted=false returns null (no-mutation)", () => {
+  const run = { id: 38126243292, head_sha: "845ecfb8eadd7bc184945c2c710be2224ad43eef" };
+  const report = {
+    schema: 1,
+    repository: mockPolicy.repository,
+    sourceSha: run.head_sha,
+    runId: String(run.id),
+    attempt: "1",
+    state: "NOT_DEPLOYED",
+    mutationStarted: false,
+  };
+  const published = baselineFromReport(report, run, 6993237039);
+  assert.equal(published, null);
+});
+
+test("Ledger 15: Valid DEPLOYED report resolves authoritative publication baseline", () => {
+  const run = { id: 38056339585, head_sha: "b9d9ff56c50570f60f6b1cb1db0e41909b477d2d" };
+  const report = {
+    schema: 1,
+    repository: mockPolicy.repository,
+    sourceSha: run.head_sha,
+    runId: String(run.id),
+    attempt: "1",
+    state: "DEPLOYED",
+    mutationStarted: true,
+    versionId: "52391b7d-d1d5-4997-abe4-15b0e29bd652",
+    deploymentId: "fcab038c-29e4-4561-a287-8300cdf682a3",
+    tarSha256: "281a7332f675a8df45a6a6fb60c65be6a2c4b36ddc168e3c66b7f6304161fba5",
+    configSha256: "7cd095c5076ba693512f9126aa63464dbdaef48e996ebc730eebbf8cd6ea5fb6",
+    artifactId: "11671712003",
+  };
+  const published = baselineFromReport(report, run, 6981646840);
+  assert.deepEqual(published, {
+    sha: "b9d9ff56c50570f60f6b1cb1db0e41909b477d2d",
+    versionId: "52391b7d-d1d5-4997-abe4-15b0e29bd652",
+    deploymentId: 6981646840,
+  });
+});
+

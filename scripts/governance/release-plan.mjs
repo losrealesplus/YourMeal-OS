@@ -111,15 +111,70 @@ export function assertMergedCommit(prs, sha) {
   );
   return matches[0].number;
 }
-function readReport(run) {
+export function evaluatePublicationLedger(run, artifactsResponse, jobsResponse) {
+  demand(
+    artifactsResponse &&
+      Array.isArray(artifactsResponse.artifacts) &&
+      typeof artifactsResponse.total_count === "number" &&
+      artifactsResponse.total_count <= 100,
+    "Artifact listing invalid",
+  );
+  demand(
+    artifactsResponse.total_count === artifactsResponse.artifacts.length,
+    "Artifact listing truncated",
+  );
   const name = `gate7-release-report-${run.id}-1`;
-  const artifacts = api(`actions/runs/${run.id}/artifacts?per_page=100`);
-  demand(artifacts.total_count <= 100, "Artifact listing truncated");
-  const candidates = artifacts.artifacts.filter((a) => a.name === name);
+  const candidates = artifactsResponse.artifacts.filter((a) => a.name === name);
+  if (candidates.length === 0) {
+    demand(
+      run.status === "completed",
+      "Run incomplete: cannot verify non-publication",
+    );
+    demand(
+      ["cancelled", "failure"].includes(run.conclusion),
+      "Successful run missing ledger: fail closed",
+    );
+    demand(
+      jobsResponse &&
+        Array.isArray(jobsResponse.jobs) &&
+        typeof jobsResponse.total_count === "number" &&
+        jobsResponse.total_count <= 100,
+      "Jobs listing invalid",
+    );
+    demand(
+      jobsResponse.total_count === jobsResponse.jobs.length,
+      "Jobs listing truncated",
+    );
+    const phase2 = jobsResponse.jobs.find(
+      (j) => j.name === "Phase 2: Protected Production Deployment" || j.name.includes("Phase 2"),
+    );
+    demand(phase2, "Phase 2 missing: fail closed");
+    demand(phase2.status === "completed", "Phase 2 incomplete: fail closed");
+    demand(
+      ["cancelled", "skipped"].includes(phase2.conclusion),
+      "Phase 2 not cancelled/skipped: fail closed",
+    );
+    demand(
+      Array.isArray(phase2.steps) && phase2.steps.length === 0,
+      "Phase 2 executed steps without ledger: fail closed",
+    );
+    return null;
+  }
   demand(
     candidates.length === 1 && !candidates[0].expired,
     "Publication ledger missing, expired or ambiguous: reconciliation required",
   );
+  return candidates[0];
+}
+export function readReport(run) {
+  const artifacts = api(`actions/runs/${run.id}/artifacts?per_page=100`);
+  let jobs = null;
+  const name = `gate7-release-report-${run.id}-1`;
+  if (!artifacts?.artifacts?.some((a) => a.name === name)) {
+    jobs = api(`actions/runs/${run.id}/jobs?per_page=100`);
+  }
+  const candidate = evaluatePublicationLedger(run, artifacts, jobs);
+  if (!candidate) return null;
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "gate7-ledger-"));
   try {
     execFileSync(
@@ -199,7 +254,9 @@ export function baseline(ctx, publishing = false) {
     );
     const workflow = git("show", `${run.head_sha}:${policy.workflow}`);
     if (workflow.includes("gate7-release-report-")) {
-      const published = baselineFromReport(readReport(run), run, deployment.id);
+      const report = readReport(run);
+      if (!report) continue; // Run was cancelled/skipped before Phase 2 ever started.
+      const published = baselineFromReport(report, run, deployment.id);
       if (!published) continue; // Superseded/duplicate approved job is not a deployment.
       return published;
     }
