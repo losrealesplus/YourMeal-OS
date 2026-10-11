@@ -157,6 +157,8 @@ function AdminCustomersPage() {
   const [individuals, setIndividuals] = useState<IndividualCustomerRecord[]>([]);
   const [companies, setCompanies] = useState<CompanyDirectoryRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [individualsError, setIndividualsError] = useState<string | null>(null);
+  const [companiesError, setCompaniesError] = useState<string | null>(null);
   const [archivingId, setArchivingId] = useState<string | null>(null);
 
   // Selected Customer Detail State
@@ -237,9 +239,11 @@ function AdminCustomersPage() {
   const reload = useCallback(async () => {
     if (!user || !tenantId) return;
     setLoading(true);
+    setIndividualsError(null);
+    setCompaniesError(null);
     try {
       const ctx = await getCtx();
-      const [inds, cos] = await Promise.all([
+      const [indsResult, cosResult] = await Promise.allSettled([
         CustomerDirectoryService.listIndividuals(ctx, {
           query,
           status: statusFilter === "all" ? "all" : (statusFilter as "active" | "inactive" | "new"),
@@ -254,8 +258,24 @@ function AdminCustomersPage() {
                 : (statusFilter as "active" | "inactive"),
         }),
       ]);
-      setIndividuals(inds);
-      setCompanies(cos);
+
+      if (indsResult.status === "fulfilled") {
+        setIndividuals(indsResult.value);
+        setIndividualsError(null);
+      } else {
+        const msg = formatErrorMessage(indsResult.reason);
+        setIndividualsError(msg);
+        toast.error(`Error al cargar particulares: ${msg}`);
+      }
+
+      if (cosResult.status === "fulfilled") {
+        setCompanies(cosResult.value);
+        setCompaniesError(null);
+      } else {
+        const msg = formatErrorMessage(cosResult.reason);
+        setCompaniesError(msg);
+        toast.error(`Error al cargar empresas: ${msg}`);
+      }
     } catch (e) {
       toast.error(formatErrorMessage(e));
     } finally {
@@ -711,9 +731,9 @@ function AdminCustomersPage() {
             {canWrite ? (
               <button
                 type="button"
-                disabled={archivingId === r.id}
-                onClick={() => archiveCustomer(r.id, r.displayName ?? "Sin nombre")}
-                className="text-xs font-semibold text-destructive hover:underline uppercase tracking-wider disabled:opacity-50"
+                disabled={true}
+                title="Gestión de bajas en preparación (migración P34 pendiente)"
+                className="text-xs font-semibold text-muted-foreground cursor-not-allowed opacity-50 uppercase tracking-wider"
               >
                 Archivar
               </button>
@@ -902,8 +922,9 @@ function AdminCustomersPage() {
           {canWrite ? (
             <Button
               size="sm"
-              onClick={() => setCreateCustomerOpen(true)}
-              className="gap-1.5 text-xs font-semibold bg-primary text-primary-foreground shadow-sm"
+              disabled={true}
+              title="Alta de nuevos clientes en preparación (migración P34 pendiente)"
+              className="gap-1.5 text-xs font-semibold bg-primary/50 text-primary-foreground cursor-not-allowed shadow-none"
             >
               <Plus className="h-4 w-4" />
               Nuevo Cliente
@@ -943,11 +964,43 @@ function AdminCustomersPage() {
         {loading ? (
           <p className="py-12 text-center text-xs text-muted-foreground">Cargando directorio…</p>
         ) : activeCategory === "companies" ? (
-          <DataTable
-            columns={companyColumns}
-            rows={companies}
-            empty="No se encontraron empresas con los filtros aplicados."
-          />
+          companiesError ? (
+            <div className="flex flex-col items-center justify-center p-8 text-center rounded-lg border border-destructive/30 bg-destructive/5 space-y-3 my-4">
+              <div className="p-2 rounded-full bg-destructive/10 text-destructive">
+                <AlertCircle className="h-5 w-5" />
+              </div>
+              <div className="space-y-1 max-w-md">
+                <h3 className="text-sm font-semibold text-foreground">
+                  Error al cargar empresas
+                </h3>
+                <p className="text-xs text-muted-foreground">{companiesError}</p>
+              </div>
+              <Button type="button" variant="outline" size="sm" onClick={() => reload()}>
+                Reintentar
+              </Button>
+            </div>
+          ) : (
+            <DataTable
+              columns={companyColumns}
+              rows={companies}
+              empty="No se encontraron empresas con los filtros aplicados."
+            />
+          )
+        ) : individualsError ? (
+          <div className="flex flex-col items-center justify-center p-8 text-center rounded-lg border border-destructive/30 bg-destructive/5 space-y-3 my-4">
+            <div className="p-2 rounded-full bg-destructive/10 text-destructive">
+              <AlertCircle className="h-5 w-5" />
+            </div>
+            <div className="space-y-1 max-w-md">
+              <h3 className="text-sm font-semibold text-foreground">
+                Error al cargar el directorio de clientes
+              </h3>
+              <p className="text-xs text-muted-foreground">{individualsError}</p>
+            </div>
+            <Button type="button" variant="outline" size="sm" onClick={() => reload()}>
+              Reintentar
+            </Button>
+          </div>
         ) : (
           <DataTable
             columns={individualColumns}
@@ -1049,13 +1102,9 @@ function AdminCustomersPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() =>
-                          archiveCustomer(
-                            selectedCustomer.id,
-                            selectedCustomer.displayName ?? "Sin nombre",
-                          )
-                        }
-                        className="gap-1.5 text-xs text-destructive hover:bg-destructive/10"
+                        disabled={true}
+                        title="Gestión de bajas en preparación (migración P34 pendiente)"
+                        className="gap-1.5 text-xs text-muted-foreground opacity-50 cursor-not-allowed"
                       >
                         <Archive className="size-3.5" />
                         Archivar
@@ -1184,10 +1233,19 @@ function AdminCustomersPage() {
                             </div>
                           </div>
 
+                          <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-800 dark:text-amber-200">
+                            <strong>Directorio en modo consulta segura:</strong> La edición de perfiles se habilitará con la adopción formal del módulo CRM (P34). La lectura y datos actuales están totalmente protegidos.
+                          </div>
+
                           {canWrite && (
                             <div className="flex justify-end pt-2">
-                              <Button type="submit" size="sm" disabled={savingProfile}>
-                                {savingProfile ? "Guardando…" : "Guardar Cambios"}
+                              <Button
+                                type="submit"
+                                size="sm"
+                                disabled={true}
+                                title="Edición deshabilitada hasta la adopción formal de P34"
+                              >
+                                Guardar Cambios
                               </Button>
                             </div>
                           )}

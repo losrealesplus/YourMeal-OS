@@ -24,7 +24,7 @@ type RawCustomer = {
   kind: string;
   created_at: string;
   user_id: string | null;
-  revision: number;
+  revision?: number;
 };
 
 type RawOrder = {
@@ -104,7 +104,7 @@ export function createCustomerDirectoryRepository(client: Client, tenantId: stri
   async function loadCustomers(): Promise<RawCustomer[]> {
     const { data, error } = await db
       .from("customers")
-      .select("id, display_name, email, kind, created_at, user_id, revision")
+      .select("id, display_name, email, kind, created_at, user_id")
       .eq("tenant_id", tenantId)
       .is("deleted_at", null)
       .order("created_at", { ascending: false });
@@ -504,7 +504,7 @@ export function createCustomerDirectoryRepository(client: Client, tenantId: stri
     async getIndividualById(customerId: string): Promise<IndividualCustomerRecord | null> {
       const { data: customer, error: custErr } = await db
         .from("customers")
-        .select("id, display_name, email, kind, created_at, user_id, revision")
+        .select("id, display_name, email, kind, created_at, user_id")
         .eq("tenant_id", tenantId)
         .eq("id", customerId)
         .is("deleted_at", null)
@@ -549,7 +549,7 @@ export function createCustomerDirectoryRepository(client: Client, tenantId: stri
 
       const { data: customer, error: reFetchErr } = await db
         .from("customers")
-        .select("id, display_name, email, kind, created_at, user_id, revision")
+        .select("id, display_name, email, kind, created_at, user_id")
         .eq("tenant_id", tenantId)
         .eq("id", customerId)
         .is("deleted_at", null)
