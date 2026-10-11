@@ -31,3 +31,13 @@ Pruebas locales en synthetic-results.json. Incluyen 42501 antes/después, pedido
 Typecheck y build local PASS; Vitest 29/29. Lint global falla con 13.714 errores y 45 warnings en archivos ajenos; el paquete no modifica TypeScript/JavaScript. No se corrige esa deuda fuera de alcance. Clasificación SPECIAL conservada. Gate7 no se modifica ni se fuerza a DEPLOYABLE. El mecanismo exact_interval de #523/#524 no autoriza automáticamente este nuevo source.
 
 Siguiente decisión: revisión y eventual merge del único PR. SQL, activación, flags y publicación productiva siguen sujetos a autorizaciones independientes. PRODUCTION_NO_GO.
+
+## Corrección focalizada post-merge #525
+
+Causa demostrada: la descompilación del catálogo depende del search_path de la sesión. El laboratorio usa "\$user", public, auth, extensions y representa auth.uid() como uid(); la consulta productiva lo representa como auth.uid(). Cinco políticas difieren en esa representación: audit_log_insert, audit_log_read, oi_all, orders_customer_read y orders_customer_write. Los cinco triggers y los restantes campos coinciden. Con contexto fijo, las 15 políticas y cinco triggers coinciden exactamente, sin cambios semánticos observados.
+
+El script fija SET LOCAL search_path = pg_catalog, pg_temp antes del DO: catálogos reales primero, tablas temporales después. La representación queda totalmente cualificada y usa una única huella canónica 08a95d476c85c39bf33547251622436f63e0291b7a0e186ce920b7da885c9a7a, obtenida tanto en laboratorio como mediante consulta READ ONLY en producción. No se aceptan los hashes dependientes del contexto 80c377…/2cd39f…. No se cambian políticas, triggers, funciones, permisos ni controles de activación.
+
+26/26 comprobaciones focalizadas PASS: reproducen ambos hashes anteriores, cotejan todas las definiciones contra production-catalog-canonical.json, aceptan tres search_path distintos y rechazan drift de políticas, código, ACL/grant option, RLS deshabilitada y trigger deshabilitado. El sombreado de catálogos con tablas temporales no altera el contrato. Pedido sintético confirmado con total/auditoría; aislamiento y rechazo de cliente sin autoridad preservados. Cleanup PASS. No se repiten las 64/25/29 pruebas generales anteriores; sus evidencias quedan intactas.
+
+Las lecturas productivas consultaron solo catálogos en transacciones READ ONLY y ROLLBACK. No se instalaron el puente ni la RPC, no se ejecutó activación ni escrituras productivas. Migración y bridge originales del #525 byte a byte intactos. El único cambio ejecutable de activación es contexto fijo y huella canónica; el manifiesto actualiza su SHA-256. Gate7 permanece sin modificaciones y la ruta de activación sigue SPECIAL. PR correctivo sujeto a revisión y merge humano; PRODUCTION_NO_GO.

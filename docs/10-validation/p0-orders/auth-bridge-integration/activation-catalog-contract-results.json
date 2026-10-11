@@ -1,0 +1,118 @@
+{
+  "status": "ACTIVATION_CATALOG_CONTRACT_PASS",
+  "checks": [
+    {
+      "name": "INSTALLATION_API_EXECUTE_REVOKED",
+      "result": "PASS"
+    },
+    {
+      "name": "INSTALLED_RPC_DIRECT_CALL_DENIED",
+      "result": "PASS"
+    },
+    {
+      "name": "ACTIVATION_REQUIRES_BRIDGE",
+      "result": "PASS"
+    },
+    {
+      "name": "BRIDGE_BASELINE_42501",
+      "result": "PASS"
+    },
+    {
+      "name": "INSTALLATION_SOURCE_DRIFT_REJECTED",
+      "result": "PASS"
+    },
+    {
+      "name": "BRIDGE_INSTALLATION_CLOSED",
+      "result": "PASS"
+    },
+    {
+      "name": "ACTIVATION_PUBLIC_EXECUTE_DRIFT_REJECTED",
+      "result": "PASS"
+    },
+    {
+      "name": "ACTIVATION_BRIDGE_GRANT_OPTION_REJECTED",
+      "result": "PASS"
+    },
+    {
+      "name": "ACTIVATION_WRITER_AUTH_USAGE_REJECTED",
+      "result": "PASS"
+    },
+    {
+      "name": "ACTIVATION_POLICY_DRIFT_REJECTED",
+      "result": "PASS"
+    },
+    {
+      "name": "ACTIVATION_ADAPTED_FUNCTION_DRIFT_REJECTED",
+      "result": "PASS"
+    },
+    {
+      "name": "EXPLICIT_ACTIVATION_EFFECTIVE",
+      "result": "PASS"
+    },
+    {
+      "name": "RAW_LAB_HASH_REPRODUCED",
+      "result": "PASS"
+    },
+    {
+      "name": "RAW_PRODUCTION_HASH_REPRODUCED",
+      "result": "PASS"
+    },
+    {
+      "name": "CANONICAL_HASH_MATCHES_PRODUCTION",
+      "result": "PASS"
+    },
+    {
+      "name": "ALL_15_POLICIES_5_TRIGGERS_EQUAL_PRODUCTION",
+      "result": "PASS"
+    },
+    {
+      "name": "ACTIVATION_PATH_public",
+      "result": "PASS"
+    },
+    {
+      "name": "ACTIVATION_PATH_public,auth,extensions",
+      "result": "PASS"
+    },
+    {
+      "name": "ACTIVATION_PATH_pg_catalog",
+      "result": "PASS"
+    },
+    {
+      "name": "TEMP_CATALOG_SHADOW_CANNOT_CHANGE_CONTRACT",
+      "result": "PASS"
+    },
+    {
+      "name": "DISABLED_TRIGGER_REJECTED_CLOSED",
+      "result": "PASS"
+    },
+    {
+      "name": "DISABLED_RLS_REJECTED_CLOSED",
+      "result": "PASS"
+    },
+    {
+      "name": "CONFIRMED_ORDER_TOTAL_AUDIT_PERSISTED",
+      "result": "PASS"
+    },
+    {
+      "name": "WRITER_AUTH_USAGE_REMAINS_ABSENT",
+      "result": "PASS"
+    },
+    {
+      "name": "TENANT_ISOLATION_AFTER_CONTEXT_FIX",
+      "result": "PASS"
+    },
+    {
+      "name": "UNAUTHORIZED_CUSTOMER_AFTER_CONTEXT_FIX",
+      "result": "PASS"
+    }
+  ],
+  "productionConnection": false,
+  "cleanup": "PASS",
+  "readOnlyProductionCatalogComparison": {
+    "project": "nhirlpkuvonggctdzzad",
+    "policies": 15,
+    "triggers": 5,
+    "canonicalEqual": true,
+    "canonicalSha256": "08a95d476c85c39bf33547251622436f63e0291b7a0e186ce920b7da885c9a7a"
+  }
+}

@@ -1,0 +1,219 @@
+{
+  "policies": [
+    {
+      "cmd": "INSERT",
+      "name": "audit_log_insert",
+      "qual": null,
+      "check": "((actor_id = auth.uid()) AND (public.is_saas_admin(auth.uid()) OR ((tenant_id IS NOT NULL) AND public.is_tenant_member(tenant_id))))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "audit_log",
+      "schema": "public",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "cmd": "SELECT",
+      "name": "audit_log_read",
+      "qual": "(public.is_saas_admin(auth.uid()) OR ((tenant_id IS NOT NULL) AND public.has_role(auth.uid(), tenant_id, 'company_admin'::public.app_role)))",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "audit_log",
+      "schema": "public",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "cmd": "ALL",
+      "name": "cr_order_canonical_role",
+      "qual": "cr_order_private.can_write(tenant_id)",
+      "check": "cr_order_private.can_write(tenant_id)",
+      "roles": [
+        "cr_order_writer"
+      ],
+      "table": "audit_log",
+      "schema": "public",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "cmd": "INSERT",
+      "name": "custom_kitchen_audit",
+      "qual": null,
+      "check": "cr_order_private.can_operate_custom_batch(tenant_id)",
+      "roles": [
+        "cr_order_writer"
+      ],
+      "table": "audit_log",
+      "schema": "public",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "cmd": "ALL",
+      "name": "cr_order_canonical_role",
+      "qual": "cr_order_private.can_write(tenant_id)",
+      "check": "cr_order_private.can_write(tenant_id)",
+      "roles": [
+        "cr_order_writer"
+      ],
+      "table": "order_items",
+      "schema": "public",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "cmd": "DELETE",
+      "name": "custom_item_delete_closed",
+      "qual": "(item_kind <> 'custom'::text)",
+      "check": null,
+      "roles": [
+        "authenticated",
+        "service_role"
+      ],
+      "table": "order_items",
+      "schema": "public",
+      "permissive": "RESTRICTIVE"
+    },
+    {
+      "cmd": "INSERT",
+      "name": "custom_item_insert_closed",
+      "qual": null,
+      "check": "(item_kind <> 'custom'::text)",
+      "roles": [
+        "authenticated",
+        "service_role"
+      ],
+      "table": "order_items",
+      "schema": "public",
+      "permissive": "RESTRICTIVE"
+    },
+    {
+      "cmd": "UPDATE",
+      "name": "custom_item_update_closed",
+      "qual": "(item_kind <> 'custom'::text)",
+      "check": "(item_kind <> 'custom'::text)",
+      "roles": [
+        "authenticated",
+        "service_role"
+      ],
+      "table": "order_items",
+      "schema": "public",
+      "permissive": "RESTRICTIVE"
+    },
+    {
+      "cmd": "SELECT",
+      "name": "custom_kitchen_item_read",
+      "qual": "cr_order_private.can_operate_custom_batch(tenant_id)",
+      "check": null,
+      "roles": [
+        "cr_order_writer"
+      ],
+      "table": "order_items",
+      "schema": "public",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "cmd": "ALL",
+      "name": "oi_all",
+      "qual": "(public.has_any_staff_role(auth.uid(), tenant_id) OR (EXISTS ( SELECT 1\n   FROM (public.orders o\n     JOIN public.customers c ON ((c.id = o.customer_id)))\n  WHERE ((o.id = order_items.order_id) AND (c.user_id = auth.uid())))))",
+      "check": "(public.has_any_staff_role(auth.uid(), tenant_id) OR (EXISTS ( SELECT 1\n   FROM (public.orders o\n     JOIN public.customers c ON ((c.id = o.customer_id)))\n  WHERE ((o.id = order_items.order_id) AND (c.user_id = auth.uid())))))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "order_items",
+      "schema": "public",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "cmd": "ALL",
+      "name": "cr_order_canonical_role",
+      "qual": "cr_order_private.can_write(tenant_id)",
+      "check": "cr_order_private.can_write(tenant_id)",
+      "roles": [
+        "cr_order_writer"
+      ],
+      "table": "orders",
+      "schema": "public",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "cmd": "UPDATE",
+      "name": "custom_kitchen_order_lock",
+      "qual": "cr_order_private.can_operate_custom_batch(tenant_id)",
+      "check": "cr_order_private.can_operate_custom_batch(tenant_id)",
+      "roles": [
+        "cr_order_writer"
+      ],
+      "table": "orders",
+      "schema": "public",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "cmd": "SELECT",
+      "name": "custom_kitchen_order_read",
+      "qual": "cr_order_private.can_operate_custom_batch(tenant_id)",
+      "check": null,
+      "roles": [
+        "cr_order_writer"
+      ],
+      "table": "orders",
+      "schema": "public",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "cmd": "SELECT",
+      "name": "orders_customer_read",
+      "qual": "(public.has_any_staff_role(auth.uid(), tenant_id) OR (EXISTS ( SELECT 1\n   FROM public.customers c\n  WHERE ((c.id = orders.customer_id) AND (c.user_id = auth.uid())))))",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "orders",
+      "schema": "public",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "cmd": "ALL",
+      "name": "orders_customer_write",
+      "qual": "(public.has_any_staff_role(auth.uid(), tenant_id) OR (EXISTS ( SELECT 1\n   FROM public.customers c\n  WHERE ((c.id = orders.customer_id) AND (c.user_id = auth.uid())))))",
+      "check": "(public.has_any_staff_role(auth.uid(), tenant_id) OR (EXISTS ( SELECT 1\n   FROM public.customers c\n  WHERE ((c.id = orders.customer_id) AND (c.user_id = auth.uid())))))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "orders",
+      "schema": "public",
+      "permissive": "PERMISSIVE"
+    }
+  ],
+  "triggers": [
+    {
+      "name": "cr_order_v2_item_guard",
+      "table": "order_items",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER cr_order_v2_item_guard BEFORE INSERT OR DELETE OR UPDATE ON public.order_items FOR EACH ROW EXECUTE FUNCTION cr_order_private.guard_v2()"
+    },
+    {
+      "name": "cr_order_v2_total_items",
+      "table": "order_items",
+      "enabled": "O",
+      "definition": "CREATE CONSTRAINT TRIGGER cr_order_v2_total_items AFTER INSERT OR DELETE OR UPDATE ON public.order_items DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION cr_order_private.check_v2_total()"
+    },
+    {
+      "name": "order_items_legacy_offer_guard",
+      "table": "order_items",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER order_items_legacy_offer_guard BEFORE INSERT OR UPDATE ON public.order_items FOR EACH ROW EXECUTE FUNCTION cr_order_private.guard_legacy_offer()"
+    },
+    {
+      "name": "cr_order_v2_header_guard",
+      "table": "orders",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER cr_order_v2_header_guard BEFORE INSERT OR DELETE OR UPDATE ON public.orders FOR EACH ROW EXECUTE FUNCTION cr_order_private.guard_v2()"
+    },
+    {
+      "name": "cr_order_v2_total_header",
+      "table": "orders",
+      "enabled": "O",
+      "definition": "CREATE CONSTRAINT TRIGGER cr_order_v2_total_header AFTER INSERT OR UPDATE ON public.orders DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION cr_order_private.check_v2_total()"
+    }
+  ]
+}

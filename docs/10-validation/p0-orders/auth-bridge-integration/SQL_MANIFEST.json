@@ -2,7 +2,7 @@
   "schema": 1,
   "project": "nhirlpkuvonggctdzzad",
   "tenant": "8bba00ba-331b-42c8-9283-4e3836ffb870",
-  "base": "7e652d36372572be203964cb0f997485b57642ec",
+  "base": "5abb88ecf65327ca2268e27664c78551055020d5",
   "productionSqlAuthorized": false,
   "productionActivationAuthorized": false,
   "installation": [
@@ -17,7 +17,7 @@
   ],
   "manualActivation": {
     "path": "scripts/release/activate-eatclean-staff-existing-order.sql",
-    "sha256": "4b45145a2c3b2036ab5ca252b4b83df298c19f7c297ce0f28555f96937a6ba3d"
+    "sha256": "133a28b2673cac809c89ced89678f70051ab8dc931ada7eac266cd10c000b776"
   },
   "excluded": [
     "20261010155728_release_cr_order_writer_auth_usage.sql",
