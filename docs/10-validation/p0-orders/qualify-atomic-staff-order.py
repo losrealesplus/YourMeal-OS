@@ -14,7 +14,7 @@ def scalar(s):return sql(s).stdout.strip().splitlines()[-1]
 def check(name,value):
  checks.append({'name':name,'result':'PASS' if value else 'FAIL'})
  if not value:raise RuntimeError(name)
-T='11000000-0000-4000-8000-000000000001';T2='11000000-0000-4000-8000-000000000002';U='22000000-0000-4000-8000-000000000001';U2='22000000-0000-4000-8000-000000000002';C='33000000-0000-4000-8000-000000000001';D='44000000-0000-4000-8000-000000000001';F='44000000-0000-4000-8000-000000000002'
+T='8bba00ba-331b-42c8-9283-4e3836ffb870';T2='11000000-0000-4000-8000-000000000002';U='22000000-0000-4000-8000-000000000001';U2='22000000-0000-4000-8000-000000000002';C='33000000-0000-4000-8000-000000000001';D='44000000-0000-4000-8000-000000000001';F='44000000-0000-4000-8000-000000000002'
 def session(actor=U):return f"SET SESSION AUTHORIZATION authenticated; SELECT set_config('request.jwt.claim.sub','{actor}',false);"
 def draft(dish=D,actor=U,tenant=T):return session(actor)+f"SELECT public.program_draft_order('{tenant}','{C}','2026-10-12',17,NULL,'[{{\"dish_id\":\"{dish}\",\"day_date\":\"2026-10-12\",\"qty\":2,\"unit_price\":999}}]'::jsonb,'individual',NULL,NULL,NULL,NULL);"
 owned=False
@@ -34,8 +34,7 @@ try:
   sql('SET ROLE postgres;\n'+p.read_text())
  sql(f"INSERT INTO tenants(id,slug,name) VALUES('{T}','p0-synthetic','Synthetic'),('{T2}','p0-other','Other'); INSERT INTO auth.users(id) VALUES('{U}'),('{U2}'); INSERT INTO tenant_members(tenant_id,user_id,status,membership_type) VALUES('{T}','{U}','approved','customer'),('{T}','{U2}','approved','customer'); INSERT INTO user_roles(user_id,tenant_id,role) VALUES('{U}','{T}','company_admin'),('{U2}','{T}','customer'); INSERT INTO customers(id,tenant_id,user_id,kind,display_name) VALUES('{C}','{T}','{U2}','individual','Synthetic'); INSERT INTO dishes(id,tenant_id,name,status,price) VALUES('{D}','{T}','Paid','active',8.5),('{F}','{T2}','Foreign','active',99); INSERT INTO weekly_menus(id,tenant_id,week_start,status) VALUES('55000000-0000-4000-8000-000000000001','{T}','2026-10-12','published'); INSERT INTO weekly_menu_slots(weekly_menu_id,tenant_id,day_date,dish_id,unit_price) VALUES('55000000-0000-4000-8000-000000000001','{T}','2026-10-12','{D}',NULL);")
 
- # Required permission is applied only inside this networkless synthetic cluster.
- sql((ROOT/'supabase/migrations/20261010155728_release_cr_order_writer_auth_usage.sql').read_text())
+ # Public EatClean UUID is used only as a synthetic tenant identifier, never a production DSN.
  sql('SET ROLE postgres;\n'+(ROOT/'supabase/migrations/20261011163814_staff_existing_order_atomic_capture.sql').read_text())
  def command(**overrides):
   payload={'customerId':C,'weekStart':'2026-10-12','autoConfirm':True,'lines':[{'dishId':D,'dayDate':'2026-10-12','qty':2,'comment':'Synthetic comment'}]}
@@ -47,6 +46,16 @@ try:
  def reject(name,payload=None,actor=U,tenant=T,code=None):
   before=state();r=sql(call(payload,actor,tenant),False)
   check(name,r.returncode!=0 and (code is None or code in r.stderr) and state()==before)
+
+ check('INSTALLATION_API_EXECUTE_REVOKED',scalar("SELECT NOT has_function_privilege('authenticated','public.capture_staff_existing_order(uuid,jsonb)','EXECUTE') AND NOT has_function_privilege('anon','public.capture_staff_existing_order(uuid,jsonb)','EXECUTE') AND NOT has_function_privilege('service_role','public.capture_staff_existing_order(uuid,jsonb)','EXECUTE')")=='t')
+ reject('INSTALLED_RPC_DIRECT_CALL_DENIED',code='42501')
+ activation=(ROOT/'scripts/release/activate-eatclean-staff-existing-order.sql').read_text()
+ failed=sql('SET ROLE postgres;\n'+activation,False)
+ check('ACTIVATION_REQUIRES_AUTH_USAGE',failed.returncode!=0 and 'STAFF_ORDER_ACTIVATION_AUTH_USAGE_REQUIRED' in failed.stderr and scalar("SELECT NOT has_function_privilege('authenticated','public.capture_staff_existing_order(uuid,jsonb)','EXECUTE')")=='t')
+ # Both grants run only in this owned networkless synthetic cluster.
+ sql((ROOT/'supabase/migrations/20261010155728_release_cr_order_writer_auth_usage.sql').read_text())
+ sql('SET ROLE postgres;\n'+activation)
+ check('EXPLICIT_ACTIVATION_EFFECTIVE',scalar("SELECT has_function_privilege('authenticated','public.capture_staff_existing_order(uuid,jsonb)','EXECUTE')")=='t')
  result=json.loads(sql(call()).stdout.strip().splitlines()[-1])
  oid=result['order']['id']
  check('CONFIRMED_HEADER_LINES_TOTAL',result['order']['status']=='confirmed' and result['total']==17 and len(result['items'])==1 and result['items'][0]['qty']==2 and result['items'][0]['unit_price']==8.5)
@@ -57,10 +66,14 @@ try:
  check('AUTHENTICATED_ONLY_EXECUTE',scalar("SELECT has_function_privilege('authenticated','public.capture_staff_existing_order(uuid,jsonb)','EXECUTE') AND NOT has_function_privilege('anon','public.capture_staff_existing_order(uuid,jsonb)','EXECUTE') AND NOT has_function_privilege('service_role','public.capture_staff_existing_order(uuid,jsonb)','EXECUTE')")=='t')
  reject('CUSTOMER_NOT_STAFF',actor=U2,code='STAFF_ORDER_PERMISSION_DENIED')
  reject('MISSING_ACTOR',actor='',code='STAFF_ORDER_PERMISSION_DENIED')
- reject('FOREIGN_TENANT',tenant=T2,code='STAFF_ORDER_PERMISSION_DENIED')
+ reject('FOREIGN_TENANT',tenant=T2,code='STAFF_ORDER_TENANT_NOT_ENABLED')
  reject('NONEXISTENT_CUSTOMER',command(customerId='33000000-0000-4000-8000-000000000099'),code='STAFF_ORDER_CUSTOMER_NOT_FOUND')
 
  sql(f"INSERT INTO customers(id,tenant_id,kind,display_name) VALUES('33000000-0000-4000-8000-000000000002','{T2}','individual','Other synthetic');")
+
+ sql(f"INSERT INTO tenant_members(tenant_id,user_id,status,membership_type) VALUES('{T2}','{U}','approved','customer'); INSERT INTO user_roles(user_id,tenant_id,role) VALUES('{U}','{T2}','company_admin');")
+ check('OTHER_TENANT_STAFF_ACTUALLY_AUTHORIZED',scalar(session()+f"SELECT public.is_tenant_member('{T2}') AND public.has_role('{U}','{T2}','company_admin');")=='t')
+ reject('AUTHORIZED_OTHER_TENANT_SCOPE_DENIED',command(customerId='33000000-0000-4000-8000-000000000002'),tenant=T2,code='STAFF_ORDER_TENANT_NOT_ENABLED')
  reject('EXISTING_FOREIGN_CUSTOMER',command(customerId='33000000-0000-4000-8000-000000000002'),code='STAFF_ORDER_CUSTOMER_NOT_FOUND')
  sql(f"UPDATE tenant_members SET status='pending' WHERE tenant_id='{T}' AND user_id='{U}';")
  reject('UNAPPROVED_STAFF_MEMBERSHIP',code='STAFF_ORDER_PERMISSION_DENIED')

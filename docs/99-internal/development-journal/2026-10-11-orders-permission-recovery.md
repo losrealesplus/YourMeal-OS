@@ -17,3 +17,7 @@ Se materializa RPC INVOKER (sin bypass RLS), adaptador Repository y selección d
 ## Publicación para revisión autorizada
 
 Se prepara rama limpia desde main 27dc2bda con PR #522 preservado. Autorización limitada a push y un PR; sin merge/deploy/SQL/flags. Se revisa acceso directo: la migración activa EXECUTE authenticated inmediatamente, independiente de la congelación frontend. Se documenta como condición productiva explícita, sin crear nuevos mecanismos de governance. Gate7 clasifica cuatro de diez rutas como SPECIAL: REQUIRES_SEPARATE_AUTHORIZATION. Build local PASS; no acredita artefacto productivo ni E2E autenticado.
+
+## Revisión focalizada PR #523
+
+RPC restringida en PostgreSQL al tenant EatClean; instalación con EXECUTE revocado. Activación manual independiente fuera de migrations, vinculada a definición exacta y USAGE previo. Laboratorio sintético: 43/43 PASS y cleanup PASS; staff legítimo de otro tenant rechazado y ACL cerrada antes del GRANT comprobada. Sin cambios productivos, flags, governance ni migraciones P34 originales. Idempotencia y E2E autenticado siguen pendientes.

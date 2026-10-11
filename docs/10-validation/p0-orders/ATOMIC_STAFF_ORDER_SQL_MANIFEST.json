@@ -1,6 +1,6 @@
 {
   "status": "LOCAL_PREPARATION_NOT_PRODUCTION_AUTHORIZATION",
-  "scope": "STAFF_EXISTING_CUSTOMER",
+  "scope": "EATCLEAN_STAFF_EXISTING_CUSTOMER",
   "sql": [
     {
       "path": "supabase/migrations/20261010155728_release_cr_order_writer_auth_usage.sql",
@@ -10,10 +10,17 @@
     },
     {
       "path": "supabase/migrations/20261011163814_staff_existing_order_atomic_capture.sql",
-      "sha256": "c08fc8487f6955589d4e6eefe0d1f3a0852cdd5a36d0ffd4a9038dc3ccce2e32",
+      "sha256": "ff54aa20b7f1cae20f3597edab227ef32ee82f747e2e4c996ecc475a99600b03",
       "executor": "Approved migration operator",
       "purpose": "Atomic INVOKER staff order RPC",
-      "executeActivation": "Applying this migration immediately enables direct authenticated staff RPC calls; frontend freeze is not server authorization."
+      "executeActivation": "Installed closed: EXECUTE revoked from PUBLIC, anon, authenticated and service_role. Separate manual activation required."
+    },
+    {
+      "path": "scripts/release/activate-eatclean-staff-existing-order.sql",
+      "sha256": "284ef28d1baf848d707c0eb591614770688b1d8f727e69f4d51c23308de15dbe",
+      "executor": "Independently authorized function owner/migration operator",
+      "purpose": "Explicit authenticated EXECUTE activation after auth USAGE and exact definition checks",
+      "mode": "MANUAL_ONLY_NOT_MIGRATION"
     }
   ],
   "notRequiredForThisStaffPath": [

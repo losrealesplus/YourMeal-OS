@@ -13,6 +13,9 @@ DECLARE
  quantity integer; price numeric; applied_total numeric := 0; items jsonb := '[]';
  snapshot jsonb; overrides jsonb; field text; override_used boolean := false;
 BEGIN
+ IF _tenant_id IS DISTINCT FROM '8bba00ba-331b-42c8-9283-4e3836ffb870'::uuid THEN
+  RAISE EXCEPTION 'STAFF_ORDER_TENANT_NOT_ENABLED' USING ERRCODE='42501';
+ END IF;
  IF actor IS NULL OR _tenant_id IS NULL OR NOT public.is_tenant_member(_tenant_id)
  OR NOT (public.has_role(actor,_tenant_id,'company_admin')
       OR public.has_role(actor,_tenant_id,'operations_manager')) THEN
@@ -115,7 +118,7 @@ BEGIN
  VALUES(_tenant_id,actor,'order',header.id,'create',jsonb_build_object('source','admin','itemsCount',jsonb_array_length(items),'autoConfirm',header.status='confirmed','appliedTotal',header.total));
  RETURN jsonb_build_object('order',to_jsonb(header),'items',items,'customerId',resolved_customer_id,'isNewCustomer',false,'total',header.total);
 END $$;
-REVOKE ALL ON FUNCTION public.capture_staff_existing_order(uuid,jsonb) FROM PUBLIC,anon,service_role;
-GRANT EXECUTE ON FUNCTION public.capture_staff_existing_order(uuid,jsonb) TO authenticated;
-COMMENT ON FUNCTION public.capture_staff_existing_order(uuid,jsonb) IS 'Atomic legacy staff intake, existing customer only; INVOKER RLS, no V2/A5 activation.';
+REVOKE ALL ON FUNCTION public.capture_staff_existing_order(uuid,jsonb) FROM PUBLIC,anon,authenticated,service_role;
+-- Installation remains closed. Explicit activation is a separate operator decision.
+COMMENT ON FUNCTION public.capture_staff_existing_order(uuid,jsonb) IS 'EatClean-only atomic legacy staff intake; installed with API EXECUTE revoked; INVOKER RLS.';
 COMMIT;
