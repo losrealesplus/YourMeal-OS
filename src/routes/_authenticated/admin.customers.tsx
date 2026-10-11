@@ -1,3 +1,4 @@
+import { CustomerSelfProfileService } from "@/modules/customer-directory/application/customer-self-profile-service";
 import { CustomerIdentityLinkReview } from "@/components/customer/customer-identity-link-review";
 /**
  * ADMIN · Clientes — Hub Canónico Unificado de Clientes y Empresas (CR — Clientes Unificados).
@@ -62,6 +63,7 @@ import {
 import { UniversalOrderIntakeDrawer } from "@/components/orders/universal-order-intake-drawer";
 import {
   isEatCleanStaffOrderCaptureFrozen,
+  isEatCleanCrmMutationFrozen,
   EATCLEAN_PARTIAL_LAUNCH_CONFIG,
 } from "@/config/eatclean-partial-launch";
 import { CustomerDietaryEditor } from "@/components/admin/customer-dietary-editor";
@@ -221,6 +223,7 @@ function AdminCustomersPage() {
   // Universal Order Intake Drawer State
   const [orderIntakeOpen, setOrderIntakeOpen] = useState(false);
   const isTenantCaptureFrozen = isEatCleanStaffOrderCaptureFrozen(tenantId);
+  const isCrmWriteFrozenForTenant = isEatCleanCrmMutationFrozen(tenantId);
 
   const canWrite = can("customers.write");
   const canManageCompany = can("company.manage");
@@ -277,7 +280,10 @@ function AdminCustomersPage() {
         toast.error(`Error al cargar empresas: ${msg}`);
       }
     } catch (e) {
-      toast.error(formatErrorMessage(e));
+      const message = formatErrorMessage(e);
+      setIndividualsError(message);
+      setCompaniesError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -299,6 +305,10 @@ function AdminCustomersPage() {
         const ctx = await getCtx();
         const cust = await CustomerDirectoryService.getIndividualById(ctx, customerId);
         if (cust) {
+          if (canWrite && !isCrmWriteFrozenForTenant) {
+            const canonicalProfile = await CustomerSelfProfileService.read(ctx, customerId);
+            cust.revision = canonicalProfile.revision;
+          }
           setSelectedCustomer(cust);
           setEditProfileForm({
             displayName: cust.displayName || "",
@@ -316,7 +326,7 @@ function AdminCustomersPage() {
         setProfileError(formatErrorMessage(err, "Error al cargar los datos del perfil."));
       }
     },
-    [getCtx],
+    [getCtx, canWrite, isCrmWriteFrozenForTenant],
   );
 
   const loadMemberships = useCallback(
@@ -444,7 +454,7 @@ function AdminCustomersPage() {
   function openCustomerDrawer(customerId: string, tab: CustomerDetailTab = "profile") {
     navigate({
       to: "/admin/customers",
-      search: (prev: any) => ({
+      search: (prev) => ({
         ...prev,
         customerId,
         tab,
@@ -455,7 +465,7 @@ function AdminCustomersPage() {
   function closeCustomerDrawer() {
     navigate({
       to: "/admin/customers",
-      search: (prev: any) => ({
+      search: (prev) => ({
         ...prev,
         customerId: undefined,
         tab: undefined,
@@ -466,7 +476,7 @@ function AdminCustomersPage() {
   function switchDetailTab(tab: CustomerDetailTab) {
     navigate({
       to: "/admin/customers",
-      search: (prev: any) => ({
+      search: (prev) => ({
         ...prev,
         tab,
       }),
@@ -476,7 +486,7 @@ function AdminCustomersPage() {
   function switchCategory(category: "all" | "individuals" | "companies") {
     navigate({
       to: "/admin/customers",
-      search: (prev: any) => ({
+      search: (prev) => ({
         ...prev,
         category,
         customerId: undefined,
@@ -487,7 +497,7 @@ function AdminCustomersPage() {
 
   async function handleSaveProfile(e: React.FormEvent) {
     e.preventDefault();
-    if (!selectedCustomer || !canWrite) return;
+    if (!selectedCustomer || !canWrite || isCrmWriteFrozenForTenant) return;
     setSavingProfile(true);
     try {
       const ctx = await getCtx();
@@ -595,7 +605,7 @@ function AdminCustomersPage() {
 
   async function handleCreateCustomer(e: React.FormEvent) {
     e.preventDefault();
-    if (!createCustomerForm.displayName.trim() || !canWrite) return;
+    if (!createCustomerForm.displayName.trim() || !canWrite || isCrmWriteFrozenForTenant) return;
     setCreatingCustomer(true);
     try {
       const ctx = await getCtx();
@@ -617,7 +627,7 @@ function AdminCustomersPage() {
   }
 
   async function archiveCustomer(id: string, name: string) {
-    if (!user || !tenantId || !canWrite) return;
+    if (!user || !tenantId || !canWrite || isCrmWriteFrozenForTenant) return;
     if (!window.confirm(`¿Estás seguro de que deseas archivar al cliente "${name}"?`)) return;
     setArchivingId(id);
     try {
@@ -731,9 +741,23 @@ function AdminCustomersPage() {
             {canWrite ? (
               <button
                 type="button"
-                disabled={true}
-                title="Gestión de bajas en preparación (migración P34 pendiente)"
-                className="text-xs font-semibold text-muted-foreground cursor-not-allowed opacity-50 uppercase tracking-wider"
+                disabled={isCrmWriteFrozenForTenant || archivingId === r.id}
+                onClick={
+                  isCrmWriteFrozenForTenant
+                    ? undefined
+                    : () => archiveCustomer(r.id, r.displayName ?? "Sin nombre")
+                }
+                title={
+                  isCrmWriteFrozenForTenant
+                    ? "Gestión de bajas en preparación para EatClean (migración P34 pendiente)"
+                    : undefined
+                }
+                className={cn(
+                  "text-xs font-semibold uppercase tracking-wider",
+                  isCrmWriteFrozenForTenant
+                    ? "text-muted-foreground cursor-not-allowed opacity-50"
+                    : "text-destructive hover:underline disabled:opacity-50",
+                )}
               >
                 Archivar
               </button>
@@ -922,9 +946,19 @@ function AdminCustomersPage() {
           {canWrite ? (
             <Button
               size="sm"
-              disabled={true}
-              title="Alta de nuevos clientes en preparación (migración P34 pendiente)"
-              className="gap-1.5 text-xs font-semibold bg-primary/50 text-primary-foreground cursor-not-allowed shadow-none"
+              disabled={isCrmWriteFrozenForTenant}
+              onClick={isCrmWriteFrozenForTenant ? undefined : () => setCreateCustomerOpen(true)}
+              title={
+                isCrmWriteFrozenForTenant
+                  ? "Alta de nuevos clientes en preparación para EatClean (migración P34 pendiente)"
+                  : undefined
+              }
+              className={cn(
+                "gap-1.5 text-xs font-semibold",
+                isCrmWriteFrozenForTenant
+                  ? "bg-primary/50 text-primary-foreground cursor-not-allowed shadow-none"
+                  : "bg-primary text-primary-foreground shadow-sm",
+              )}
             >
               <Plus className="h-4 w-4" />
               Nuevo Cliente
@@ -970,9 +1004,7 @@ function AdminCustomersPage() {
                 <AlertCircle className="h-5 w-5" />
               </div>
               <div className="space-y-1 max-w-md">
-                <h3 className="text-sm font-semibold text-foreground">
-                  Error al cargar empresas
-                </h3>
+                <h3 className="text-sm font-semibold text-foreground">Error al cargar empresas</h3>
                 <p className="text-xs text-muted-foreground">{companiesError}</p>
               </div>
               <Button type="button" variant="outline" size="sm" onClick={() => reload()}>
@@ -1102,9 +1134,27 @@ function AdminCustomersPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        disabled={true}
-                        title="Gestión de bajas en preparación (migración P34 pendiente)"
-                        className="gap-1.5 text-xs text-muted-foreground opacity-50 cursor-not-allowed"
+                        disabled={isCrmWriteFrozenForTenant || archivingId === selectedCustomer.id}
+                        onClick={
+                          isCrmWriteFrozenForTenant
+                            ? undefined
+                            : () =>
+                                archiveCustomer(
+                                  selectedCustomer.id,
+                                  selectedCustomer.displayName ?? "Sin nombre",
+                                )
+                        }
+                        title={
+                          isCrmWriteFrozenForTenant
+                            ? "Gestión de bajas en preparación para EatClean (migración P34 pendiente)"
+                            : undefined
+                        }
+                        className={cn(
+                          "gap-1.5 text-xs",
+                          isCrmWriteFrozenForTenant
+                            ? "text-muted-foreground opacity-50 cursor-not-allowed"
+                            : "text-destructive hover:bg-destructive/10",
+                        )}
                       >
                         <Archive className="size-3.5" />
                         Archivar
@@ -1170,47 +1220,125 @@ function AdminCustomersPage() {
                           <RotateCcw className="size-3" /> Reintentar
                         </Button>
                       </div>
+                    ) : isCrmWriteFrozenForTenant || !canWrite ? (
+                      <>
+                        <div className="grid gap-4 sm:grid-cols-2 rounded-lg border border-border/60 bg-muted/20 p-4">
+                          <div className="space-y-1 sm:col-span-2">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              Nombre completo
+                            </Label>
+                            <p className="text-sm font-semibold text-foreground">
+                              {selectedCustomer.displayName || "—"}
+                            </p>
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              Correo electrónico
+                            </Label>
+                            <p className="text-sm font-mono text-foreground">
+                              {selectedCustomer.email || "—"}
+                            </p>
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              Teléfono
+                            </Label>
+                            <p className="text-sm font-mono text-foreground">
+                              {selectedCustomer.phone || "—"}
+                            </p>
+                          </div>
+                          <div className="space-y-1 sm:col-span-2">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              Ciudad / Población
+                            </Label>
+                            <p className="text-sm text-foreground">
+                              {selectedCustomer.city || "—"}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="rounded-md border border-muted bg-muted/40 p-3 text-xs text-muted-foreground">
+                          {isCrmWriteFrozenForTenant
+                            ? "La ficha de cliente está en modo consulta. La edición estará disponible próximamente."
+                            : "Tu acceso permite consultar esta ficha, sin editarla."}
+                        </div>
+                      </>
                     ) : (
                       <>
-                          <div className="grid gap-4 sm:grid-cols-2 rounded-lg border border-border/60 bg-muted/20 p-4">
+                        <form onSubmit={handleSaveProfile} className="space-y-4">
+                          <div className="grid gap-3 sm:grid-cols-2">
                             <div className="space-y-1 sm:col-span-2">
-                              <Label className="text-xs font-medium text-muted-foreground">
-                                Nombre completo
+                              <Label htmlFor="cust-name" className="text-xs font-semibold">
+                                Nombre completo *
                               </Label>
-                              <p className="text-sm font-semibold text-foreground">
-                                {selectedCustomer.displayName || "—"}
-                              </p>
+                              <Input
+                                id="cust-name"
+                                value={editProfileForm.displayName}
+                                onChange={(e) =>
+                                  setEditProfileForm((prev) => ({
+                                    ...prev,
+                                    displayName: e.target.value,
+                                  }))
+                                }
+                                required
+                                disabled={!canWrite}
+                              />
                             </div>
                             <div className="space-y-1">
-                              <Label className="text-xs font-medium text-muted-foreground">
+                              <Label htmlFor="cust-email" className="text-xs font-semibold">
                                 Correo electrónico
                               </Label>
-                              <p className="text-sm font-mono text-foreground">
-                                {selectedCustomer.email || "—"}
-                              </p>
+                              <Input
+                                id="cust-email"
+                                type="email"
+                                value={editProfileForm.email}
+                                onChange={(e) =>
+                                  setEditProfileForm((prev) => ({ ...prev, email: e.target.value }))
+                                }
+                                disabled={!canWrite}
+                              />
                             </div>
                             <div className="space-y-1">
-                              <Label className="text-xs font-medium text-muted-foreground">
+                              <Label htmlFor="cust-phone" className="text-xs font-semibold">
                                 Teléfono
                               </Label>
-                              <p className="text-sm font-mono text-foreground">
-                                {selectedCustomer.phone || "—"}
-                              </p>
+                              <Input
+                                id="cust-phone"
+                                value={editProfileForm.phone}
+                                onChange={(e) =>
+                                  setEditProfileForm((prev) => ({ ...prev, phone: e.target.value }))
+                                }
+                                disabled={!canWrite}
+                              />
                             </div>
                             <div className="space-y-1 sm:col-span-2">
-                              <Label className="text-xs font-medium text-muted-foreground">
+                              <Label htmlFor="cust-city" className="text-xs font-semibold">
                                 Ciudad / Población
                               </Label>
-                              <p className="text-sm text-foreground">
-                                {selectedCustomer.city || "—"}
-                              </p>
+                              <Input
+                                id="cust-city"
+                                value={editProfileForm.city}
+                                onChange={(e) =>
+                                  setEditProfileForm((prev) => ({ ...prev, city: e.target.value }))
+                                }
+                                disabled={!canWrite}
+                              />
                             </div>
                           </div>
 
-                          <div className="rounded-md border border-muted bg-muted/40 p-3 text-xs text-muted-foreground">
-                            <strong>Directorio en modo consulta segura:</strong> La ficha de cliente se muestra en modo solo lectura para proteger la integridad de los datos. La edición se habilitará con la adopción formal del módulo CRM (P34).
-                          </div>
+                          {canWrite && (
+                            <div className="flex justify-end pt-2">
+                              <Button type="submit" size="sm" disabled={savingProfile}>
+                                {savingProfile ? "Guardando…" : "Guardar Cambios"}
+                              </Button>
+                            </div>
+                          )}
+                        </form>
+                      </>
+                    )}
 
+                    {profileStatus !== "error" && (
+                      <>
                         {/* CR-CUST-01: Dietary Preferences, Allergens & Restrictions Profile */}
                         <CustomerDietaryEditor
                           customerId={selectedCustomer.id}
@@ -1825,7 +1953,7 @@ function CustomerAddressesViewer({
           .order("created_at", { ascending: true });
         if (error) throw error;
         if (!cancelled) {
-          setAddresses((data ?? []) as any[]);
+          setAddresses((data ?? []) as typeof addresses);
         }
       } catch {
         if (!cancelled) setAddresses([]);

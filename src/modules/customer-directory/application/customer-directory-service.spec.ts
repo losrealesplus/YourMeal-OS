@@ -322,4 +322,164 @@ describe("CustomerDirectoryService.updateIndividual", () => {
     expect(companies).toHaveLength(1);
     expect(companies[0].name).toBe("Empresa EatClean");
   });
+
+  it("strictly isolates EatClean freeze rules from standard non-EatClean tenants", async () => {
+    const { isEatCleanContext, EATCLEAN_TENANT_ID, EATCLEAN_TENANT_SLUG } =
+      await import("@/config/eatclean-partial-launch");
+
+    // EatClean identifiers must match
+    expect(isEatCleanContext(EATCLEAN_TENANT_ID)).toBe(true);
+    expect(isEatCleanContext(EATCLEAN_TENANT_SLUG)).toBe(true);
+    expect(isEatCleanContext({ tenantId: EATCLEAN_TENANT_ID })).toBe(true);
+
+    // Standard/other tenants must NOT be frozen
+    const standardTenantId = "11111111-2222-3333-4444-555555555555";
+    const demoTenantSlug = "demo-catering";
+    expect(isEatCleanContext(standardTenantId)).toBe(false);
+    expect(isEatCleanContext(demoTenantSlug)).toBe(false);
+    expect(isEatCleanContext({ tenantId: standardTenantId })).toBe(false);
+    expect(isEatCleanContext(null)).toBe(false);
+    expect(isEatCleanContext(undefined)).toBe(false);
+  });
+});
+
+// Synthetic repository responses: these tests are not authenticated E2E.
+describe("customer directory recovery boundaries", () => {
+  const eatclean = "8bba00ba-331b-42c8-9283-4e3836ffb870";
+  function context(
+    tenantId = "11111111-2222-4333-8444-555555555555",
+    capabilities = ["customers.read", "customers.write"],
+    failedTable?: string,
+  ): any {
+    const rows: Record<string, any[]> = {
+      customers: [
+        {
+          id: "synthetic-customer",
+          display_name: "Ana Tenerife",
+          email: "synthetic@example.test",
+          kind: "individual",
+          created_at: "2024-01-01T00:00:00Z",
+          user_id: null,
+        },
+      ],
+      companies: [
+        {
+          id: "synthetic-company",
+          name: "Synthetic Catering",
+          company_code: "SYN",
+          created_at: "2024-01-01T00:00:00Z",
+        },
+      ],
+    };
+    const from = vi.fn((table: string) => {
+      const result = {
+        data: rows[table] ?? [],
+        error: table === failedTable ? { code: "42501", message: "synthetic failure" } : null,
+      };
+      const chain: any = { then: (resolve: any) => Promise.resolve(result).then(resolve) };
+      chain.select = vi.fn((columns: string) => {
+        if (table === "customers") expect(columns).not.toContain("revision");
+        return chain;
+      });
+      chain.eq = vi.fn().mockReturnValue(chain);
+      chain.is = vi.fn().mockReturnValue(chain);
+      chain.in = vi.fn().mockReturnValue(chain);
+      chain.order = vi.fn().mockReturnValue(chain);
+      chain.limit = vi.fn().mockReturnValue(chain);
+      chain.maybeSingle = vi
+        .fn()
+        .mockResolvedValue({ data: rows[table]?.[0] ?? null, error: result.error });
+      return chain;
+    });
+    return {
+      tenantId,
+      userId: "synthetic-staff",
+      capabilities: new Set(capabilities),
+      roles: ["company_admin"],
+      supabase: { from, rpc: vi.fn() },
+    };
+  }
+
+  it.each(["create", "update", "archive"])(
+    "blocks EatClean %s before repository access",
+    async (operation) => {
+      const ctx = context(eatclean);
+      const call =
+        operation === "create"
+          ? CustomerDirectoryService.createIndividualStaff(ctx, { displayName: "Synthetic" })
+          : operation === "update"
+            ? CustomerDirectoryService.updateIndividual(ctx, "synthetic-customer", {
+                displayName: "Synthetic",
+              })
+            : CustomerDirectoryService.archiveCustomer(ctx, "synthetic-customer");
+      await expect(call).rejects.toMatchObject({ code: "PERMISSION_DENIED" });
+      expect(ctx.supabase.from).not.toHaveBeenCalled();
+      expect(ctx.supabase.rpc).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([eatclean, "11111111-2222-4333-8444-555555555555"])(
+    "rejects write without capability for tenant %s",
+    async (tenant) => {
+      const ctx = context(tenant, ["customers.read"]);
+      await expect(
+        CustomerDirectoryService.createIndividualStaff(ctx, { displayName: "Synthetic" }),
+      ).rejects.toMatchObject({ code: "PERMISSION_DENIED" });
+      expect(ctx.supabase.from).not.toHaveBeenCalled();
+    },
+  );
+
+  it("does not freeze canonical creation for another tenant", async () => {
+    const ctx = context();
+    ctx.supabase.rpc.mockResolvedValue({
+      data: { customerId: "new-synthetic", revision: 1 },
+      error: null,
+    });
+    expect(
+      await CustomerDirectoryService.createIndividualStaff(ctx, { displayName: "Synthetic" }),
+    ).toBe("new-synthetic");
+    expect(ctx.supabase.rpc).toHaveBeenCalledWith(
+      "p34_customer_command",
+      expect.objectContaining({ _tenant: ctx.tenantId }),
+    );
+  });
+
+  it("keeps companies readable when individuals fail", async () => {
+    const ctx = context(eatclean, ["customers.read"], "customers");
+    const results = await Promise.allSettled([
+      CustomerDirectoryService.listIndividuals(ctx),
+      CustomerDirectoryService.listCompanies(ctx),
+    ]);
+    expect(results[0].status).toBe("rejected");
+    expect(results[1]).toMatchObject({
+      status: "fulfilled",
+      value: [{ name: "Synthetic Catering" }],
+    });
+  });
+
+  it("surfaces company errors without losing individual reads", async () => {
+    const ctx = context(eatclean, ["customers.read"], "companies");
+    await expect(CustomerDirectoryService.listCompanies(ctx)).rejects.toMatchObject({
+      code: "42501",
+    });
+    expect(await CustomerDirectoryService.listIndividuals(ctx)).toHaveLength(1);
+  });
+
+  it("filters searches and status against revision-free reads", async () => {
+    const ctx = context(eatclean, ["customers.read"]);
+    expect(
+      await CustomerDirectoryService.listIndividuals(ctx, {
+        query: "TENERIFE",
+        status: "inactive",
+      }),
+    ).toHaveLength(1);
+    expect(await CustomerDirectoryService.listIndividuals(ctx, { query: "absent" })).toHaveLength(
+      0,
+    );
+    expect(await CustomerDirectoryService.listCompanies(ctx, { query: "SYN" })).toHaveLength(1);
+    expect(await CustomerDirectoryService.listCompanies(ctx, { query: "absent" })).toHaveLength(0);
+    expect(
+      (await CustomerDirectoryService.getIndividualById(ctx, "synthetic-customer"))?.revision,
+    ).toBeUndefined();
+  });
 });
