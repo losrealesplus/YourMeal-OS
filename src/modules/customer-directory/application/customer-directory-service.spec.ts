@@ -251,4 +251,75 @@ describe("CustomerDirectoryService.updateIndividual", () => {
     expect(result.displayName).toBe("Alexander Modificado");
     expect(result.email).toBe("alex.new@example.com");
   });
+
+  it("lists individuals and companies cleanly against production schema without revision column", async () => {
+    const ctx = mockCtx(["customers.read"]);
+    const fakeSupabase = {
+      from: vi.fn((table: string) => {
+        if (table === "customers") {
+          return {
+            select: vi.fn((cols: string) => {
+              // Strict invariant: Must NOT select 'revision'
+              expect(cols).not.toContain("revision");
+              return {
+                eq: vi.fn().mockReturnThis(),
+                is: vi.fn().mockReturnThis(),
+                order: vi.fn().mockResolvedValue({
+                  data: [
+                    {
+                      id: "cust-1",
+                      display_name: "Cliente Real",
+                      email: "real@eatclean.es",
+                      kind: "individual",
+                      created_at: "2026-01-01T00:00:00Z",
+                      user_id: null,
+                    },
+                  ],
+                  error: null,
+                }),
+              };
+            }),
+          };
+        }
+        if (table === "companies") {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnThis(),
+              is: vi.fn().mockReturnThis(),
+              order: vi.fn().mockResolvedValue({
+                data: [
+                  {
+                    id: "comp-1",
+                    name: "Empresa EatClean",
+                    company_code: "EC-001",
+                    contact_name: "Admin",
+                    contact_email: "admin@eatclean.es",
+                    contact_phone: null,
+                    created_at: "2026-01-01T00:00:00Z",
+                  },
+                ],
+                error: null,
+              }),
+            }),
+          };
+        }
+        return {
+          select: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          in: vi.fn().mockReturnThis(),
+          is: vi.fn().mockResolvedValue({ data: [], error: null }),
+        };
+      }),
+    };
+    ctx.supabase = fakeSupabase;
+
+    const individuals = await CustomerDirectoryService.listIndividuals(ctx, {});
+    expect(individuals).toHaveLength(1);
+    expect(individuals[0].displayName).toBe("Cliente Real");
+    expect(individuals[0].revision).toBeUndefined();
+
+    const companies = await CustomerDirectoryService.listCompanies(ctx, {});
+    expect(companies).toHaveLength(1);
+    expect(companies[0].name).toBe("Empresa EatClean");
+  });
 });

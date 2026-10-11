@@ -1172,84 +1172,44 @@ function AdminCustomersPage() {
                       </div>
                     ) : (
                       <>
-                        <form onSubmit={handleSaveProfile} className="space-y-4">
-                          <div className="grid gap-3 sm:grid-cols-2">
+                          <div className="grid gap-4 sm:grid-cols-2 rounded-lg border border-border/60 bg-muted/20 p-4">
                             <div className="space-y-1 sm:col-span-2">
-                              <Label htmlFor="cust-name" className="text-xs font-semibold">
-                                Nombre completo *
+                              <Label className="text-xs font-medium text-muted-foreground">
+                                Nombre completo
                               </Label>
-                              <Input
-                                id="cust-name"
-                                value={editProfileForm.displayName}
-                                onChange={(e) =>
-                                  setEditProfileForm((prev) => ({
-                                    ...prev,
-                                    displayName: e.target.value,
-                                  }))
-                                }
-                                required
-                                disabled={!canWrite}
-                              />
+                              <p className="text-sm font-semibold text-foreground">
+                                {selectedCustomer.displayName || "—"}
+                              </p>
                             </div>
                             <div className="space-y-1">
-                              <Label htmlFor="cust-email" className="text-xs font-semibold">
+                              <Label className="text-xs font-medium text-muted-foreground">
                                 Correo electrónico
                               </Label>
-                              <Input
-                                id="cust-email"
-                                type="email"
-                                value={editProfileForm.email}
-                                onChange={(e) =>
-                                  setEditProfileForm((prev) => ({ ...prev, email: e.target.value }))
-                                }
-                                disabled={!canWrite}
-                              />
+                              <p className="text-sm font-mono text-foreground">
+                                {selectedCustomer.email || "—"}
+                              </p>
                             </div>
                             <div className="space-y-1">
-                              <Label htmlFor="cust-phone" className="text-xs font-semibold">
+                              <Label className="text-xs font-medium text-muted-foreground">
                                 Teléfono
                               </Label>
-                              <Input
-                                id="cust-phone"
-                                value={editProfileForm.phone}
-                                onChange={(e) =>
-                                  setEditProfileForm((prev) => ({ ...prev, phone: e.target.value }))
-                                }
-                                disabled={!canWrite}
-                              />
+                              <p className="text-sm font-mono text-foreground">
+                                {selectedCustomer.phone || "—"}
+                              </p>
                             </div>
                             <div className="space-y-1 sm:col-span-2">
-                              <Label htmlFor="cust-city" className="text-xs font-semibold">
+                              <Label className="text-xs font-medium text-muted-foreground">
                                 Ciudad / Población
                               </Label>
-                              <Input
-                                id="cust-city"
-                                value={editProfileForm.city}
-                                onChange={(e) =>
-                                  setEditProfileForm((prev) => ({ ...prev, city: e.target.value }))
-                                }
-                                disabled={!canWrite}
-                              />
+                              <p className="text-sm text-foreground">
+                                {selectedCustomer.city || "—"}
+                              </p>
                             </div>
                           </div>
 
-                          <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-800 dark:text-amber-200">
-                            <strong>Directorio en modo consulta segura:</strong> La edición de perfiles se habilitará con la adopción formal del módulo CRM (P34). La lectura y datos actuales están totalmente protegidos.
+                          <div className="rounded-md border border-muted bg-muted/40 p-3 text-xs text-muted-foreground">
+                            <strong>Directorio en modo consulta segura:</strong> La ficha de cliente se muestra en modo solo lectura para proteger la integridad de los datos. La edición se habilitará con la adopción formal del módulo CRM (P34).
                           </div>
-
-                          {canWrite && (
-                            <div className="flex justify-end pt-2">
-                              <Button
-                                type="submit"
-                                size="sm"
-                                disabled={true}
-                                title="Edición deshabilitada hasta la adopción formal de P34"
-                              >
-                                Guardar Cambios
-                              </Button>
-                            </div>
-                          )}
-                        </form>
 
                         {/* CR-CUST-01: Dietary Preferences, Allergens & Restrictions Profile */}
                         <CustomerDietaryEditor
