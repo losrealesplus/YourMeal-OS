@@ -29,6 +29,10 @@ import { useActiveTenantSlug } from "@/identity/active-tenant-slug";
 import type { MockDish } from "@/lib/mock-catalog";
 import { cn } from "@/lib/utils";
 import dishPhoto from "@/assets/eatclean-hero.jpg";
+import {
+  isEatCleanOrderCreationFrozen,
+  EATCLEAN_PARTIAL_LAUNCH_CONFIG,
+} from "@/config/eatclean-partial-launch";
 
 /**
  * Screen: Customer · Schedule Weekly Order (3-step flow)
@@ -56,13 +60,21 @@ function ScheduleFlow() {
   const programDraft = useProgramDraftOrder();
 
   const daysShort = [
-    t("customer:dayMon"), t("customer:dayTue"), t("customer:dayWed"),
-    t("customer:dayThu"), t("customer:dayFri"), t("customer:daySat"),
+    t("customer:dayMon"),
+    t("customer:dayTue"),
+    t("customer:dayWed"),
+    t("customer:dayThu"),
+    t("customer:dayFri"),
+    t("customer:daySat"),
     t("customer:daySun"),
   ];
   const daysFull = [
-    t("customer:dayMonFull"), t("customer:dayTueFull"), t("customer:dayWedFull"),
-    t("customer:dayThuFull"), t("customer:dayFriFull"), t("customer:daySatFull"),
+    t("customer:dayMonFull"),
+    t("customer:dayTueFull"),
+    t("customer:dayWedFull"),
+    t("customer:dayThuFull"),
+    t("customer:dayFriFull"),
+    t("customer:daySatFull"),
     t("customer:daySunFull"),
   ];
 
@@ -102,7 +114,9 @@ function ScheduleFlow() {
       const dish = offerDishes.find((d) => d.id === dishId);
       return { dishId, dish, qty };
     })
-    .filter((entry): entry is { dishId: string; dish: MockDish; qty: number } => Boolean(entry.dish));
+    .filter((entry): entry is { dishId: string; dish: MockDish; qty: number } =>
+      Boolean(entry.dish),
+    );
 
   const totalMealsCount = selectedDishEntries.reduce((sum, item) => sum + item.qty, 0);
 
@@ -122,10 +136,7 @@ function ScheduleFlow() {
   // Authoritative total = commercial offer evaluation with catalog price fallback
   const totalEur = commercialPricing
     ? commercialPricing.grandTotalFinalPrice.cents / 100
-    : selectedDishEntries.reduce(
-        (sum, item) => sum + Number(item.dish.price ?? 0) * item.qty,
-        0,
-      );
+    : selectedDishEntries.reduce((sum, item) => sum + Number(item.dish.price ?? 0) * item.qty, 0);
 
   const { tenantId } = useAuth();
   const customerQuery = useCurrentCustomerId();
@@ -193,14 +204,29 @@ function ScheduleFlow() {
     });
   }
 
+  const isTenantOrderCreationFrozen = isEatCleanOrderCreationFrozen({
+    tenantSlug: activeTenantSlug,
+    tenantId,
+  });
+
   return (
     <div className="flex-1 flex flex-col pb-4">
       <ScreenHeader
         backTo={step === 1 ? "/app" : undefined}
-        onBack={step > 1 ? () => setStep(((step - 1) as Step)) : undefined}
+        onBack={step > 1 ? () => setStep((step - 1) as Step) : undefined}
         overline={t("customer:scheduleFlow")}
         title={stepTitles[step - 1]}
       />
+
+      {isTenantOrderCreationFrozen && (
+        <div className="mx-6 mb-4 p-4 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-800 dark:text-amber-200 text-xs">
+          <p className="font-bold mb-1">{EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage}</p>
+          <p className="text-[11px] opacity-90">
+            La creación de nuevos pedidos se encuentra pausada temporalmente mientras se completa la
+            activación comercial. Puedes explorar los menús semanales y platos disponibles.
+          </p>
+        </div>
+      )}
 
       <div className="px-6 flex gap-2 mb-5">
         {[1, 2, 3].map((n) => (
@@ -294,12 +320,11 @@ function ScheduleFlow() {
       {step === 2 ? (
         <div className="px-6 space-y-10 pb-4">
           <div className="flex items-center justify-between">
-            <p className="text-lg font-extrabold tracking-tight">
-              {daysFull[deliveryDay]}
-            </p>
+            <p className="text-lg font-extrabold tracking-tight">{daysFull[deliveryDay]}</p>
             {totalMealsCount > 0 && (
               <span className="text-xs font-bold bg-primary/10 text-primary px-3 py-1 rounded-full">
-                {totalMealsCount} {totalMealsCount === 1 ? "comida seleccionada" : "comidas seleccionadas"}
+                {totalMealsCount}{" "}
+                {totalMealsCount === 1 ? "comida seleccionada" : "comidas seleccionadas"}
               </span>
             )}
           </div>
@@ -350,12 +375,7 @@ function ScheduleFlow() {
           })}
           {offerDishes.length === 0 ? (
             <div className="flex flex-col items-center text-center py-10 space-y-5">
-              <DishThumb
-                emoji="🍽️"
-                imageSrc={dishPhoto}
-                size="xl"
-                className="!rounded-[1.75rem]"
-              />
+              <DishThumb emoji="🍽️" imageSrc={dishPhoto} size="xl" className="!rounded-[1.75rem]" />
               <p className="text-lg font-extrabold">{t("customer:menuEmptyDay")}</p>
             </div>
           ) : null}
@@ -380,10 +400,7 @@ function ScheduleFlow() {
                   {t("customer:noDishesSelectedHint")}
                 </p>
               </div>
-              <PrimaryCTA
-                className="!h-14 !rounded-2xl w-full max-w-sm"
-                onClick={() => setStep(2)}
-              >
+              <PrimaryCTA className="!h-14 !rounded-2xl w-full max-w-sm" onClick={() => setStep(2)}>
                 {t("customer:chooseMeals")}
               </PrimaryCTA>
             </div>
@@ -393,7 +410,8 @@ function ScheduleFlow() {
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <p className="text-sm font-semibold text-muted-foreground">
-                      {daysFull[deliveryDay]} · {totalMealsCount} {totalMealsCount === 1 ? "comida" : "comidas"}
+                      {daysFull[deliveryDay]} · {totalMealsCount}{" "}
+                      {totalMealsCount === 1 ? "comida" : "comidas"}
                     </p>
                   </div>
                   <ul className="space-y-4">
@@ -548,18 +566,21 @@ function ScheduleFlow() {
         {step < 3 ? (
           <PrimaryCTA
             disabled={step === 2 && totalMealsCount === 0}
-            onClick={() => setStep(((step + 1) as Step))}
+            onClick={() => setStep((step + 1) as Step)}
           >
             {step === 2 ? t("customer:seeSummaryCta") : t("common:continue")}
           </PrimaryCTA>
         ) : selectedDishEntries.length > 0 ? (
           <PrimaryCTA
-            disabled={programDraft.isPending}
+            disabled={programDraft.isPending || isTenantOrderCreationFrozen}
             onClick={() => {
+              if (isTenantOrderCreationFrozen) return;
               void onProgramDraft();
             }}
           >
-            {t("customer:confirmOrder")}
+            {isTenantOrderCreationFrozen
+              ? EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage
+              : t("customer:confirmOrder")}
           </PrimaryCTA>
         ) : null}
       </div>
@@ -576,4 +597,3 @@ function formatDeliveryDate(isoDate: string, locale: string): string {
     timeZone: "UTC",
   }).format(date);
 }
-

@@ -11,6 +11,10 @@ import {
   type CustomerDietaryProfile,
   type OrderDietarySnapshot,
 } from "@/types/dietary";
+import {
+  isEatCleanStaffOrderCaptureFrozen,
+  EATCLEAN_PARTIAL_LAUNCH_CONFIG,
+} from "@/config/eatclean-partial-launch";
 
 export interface UniversalOrderCaptureLineInput {
   dayDate: string; // YYYY-MM-DD
@@ -84,6 +88,10 @@ export const StaffOrderCaptureService = {
     dto: UniversalOrderCaptureDTO,
   ): Promise<StaffOrderCaptureResult> {
     requireCapability(ctx.roles, "orders.write");
+
+    if (isEatCleanStaffOrderCaptureFrozen(ctx)) {
+      throw new DomainError("INVALID_STATE", EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage);
+    }
 
     if (!dto.weekStart || !DATE_REGEX.test(dto.weekStart)) {
       throw new DomainError(

@@ -60,6 +60,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { UniversalOrderIntakeDrawer } from "@/components/orders/universal-order-intake-drawer";
+import {
+  isEatCleanStaffOrderCaptureFrozen,
+  EATCLEAN_PARTIAL_LAUNCH_CONFIG,
+} from "@/config/eatclean-partial-launch";
 import { CustomerDietaryEditor } from "@/components/admin/customer-dietary-editor";
 import { useFmt } from "@/i18n/localization-provider";
 import { useAuth } from "@/hooks/use-auth";
@@ -214,6 +218,7 @@ function AdminCustomersPage() {
 
   // Universal Order Intake Drawer State
   const [orderIntakeOpen, setOrderIntakeOpen] = useState(false);
+  const isTenantCaptureFrozen = isEatCleanStaffOrderCaptureFrozen(tenantId);
 
   const canWrite = can("customers.write");
   const canManageCompany = can("company.manage");
@@ -1030,7 +1035,13 @@ function AdminCustomersPage() {
                     <Button
                       size="sm"
                       onClick={() => setOrderIntakeOpen(true)}
-                      className="gap-1.5 text-xs font-bold bg-primary text-primary-foreground shadow-sm"
+                      disabled={isTenantCaptureFrozen}
+                      title={
+                        isTenantCaptureFrozen
+                          ? EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage
+                          : undefined
+                      }
+                      className="gap-1.5 text-xs font-bold bg-primary text-primary-foreground shadow-sm disabled:opacity-50"
                     >
                       <Plus className="size-3.5" />+ Nuevo Pedido
                     </Button>

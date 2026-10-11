@@ -58,6 +58,10 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  isEatCleanStaffOrderCaptureFrozen,
+  EATCLEAN_PARTIAL_LAUNCH_CONFIG,
+} from "@/config/eatclean-partial-launch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -98,6 +102,7 @@ export function UniversalOrderIntakeDrawer({
   onSuccess,
 }: UniversalOrderIntakeDrawerProps) {
   const { user, tenantId, roles } = useAuth();
+  const isTenantCaptureFrozen = isEatCleanStaffOrderCaptureFrozen(tenantId);
 
   const [weekStart, setWeekStart] = useState<string>(() => {
     if (initialDayDate) return utcWeekStartMonday(new Date(initialDayDate + "T00:00:00Z"));
@@ -801,6 +806,15 @@ export function UniversalOrderIntakeDrawer({
           data-testid="order-capture-scroll"
           inert={canonicalLocked}
         >
+          {isTenantCaptureFrozen && (
+            <div className="m-4 sm:m-6 mb-0 p-4 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-800 dark:text-amber-200 text-xs">
+              <p className="font-bold mb-1">{EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage}</p>
+              <p className="text-[11px] opacity-90">
+                La captura administrativa de pedidos se encuentra pausada temporalmente mientras se
+                completa la activación comercial.
+              </p>
+            </div>
+          )}
           <div className="p-4 sm:p-6 space-y-6">
             {/* 1. SELECCIÓN DE CLIENTE */}
             <div className="space-y-3 rounded-lg border border-border bg-card/50 p-4">
@@ -1400,7 +1414,7 @@ export function UniversalOrderIntakeDrawer({
           {customItems.length > 0 && tenantId ? (
             <CanonicalOrderSubmit
               tenantId={tenantId}
-              enabled={customEnabled}
+              enabled={customEnabled && !isTenantCaptureFrozen}
               buildCommand={buildCustomCommand}
               dishLabel={(id) =>
                 allDishes.find((dish) => dish.id === id)?.name ?? `Plato ${id.slice(0, 8)}`
@@ -1424,7 +1438,7 @@ export function UniversalOrderIntakeDrawer({
                 variant="outline"
                 size="sm"
                 onClick={() => handleSubmit(false)}
-                disabled={submitting || totalPortions === 0}
+                disabled={submitting || totalPortions === 0 || isTenantCaptureFrozen}
                 className="shrink-0 text-xs"
               >
                 Guardar Borrador
@@ -1434,7 +1448,7 @@ export function UniversalOrderIntakeDrawer({
                 variant="default"
                 size="sm"
                 onClick={() => handleSubmit(true)}
-                disabled={submitting || totalPortions === 0}
+                disabled={submitting || totalPortions === 0 || isTenantCaptureFrozen}
                 className="gap-1.5 shrink-0 text-xs font-semibold"
               >
                 {submitting ? (
