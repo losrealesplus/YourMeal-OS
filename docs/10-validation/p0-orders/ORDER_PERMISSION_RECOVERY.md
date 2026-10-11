@@ -12,6 +12,7 @@ Consulta exclusiva de catálogos en transacción READ ONLY, proyecto nhirlpkuvon
 - cr_order_writer USAGE auth = false.
 - postgres USAGE WITH GRANT OPTION auth = false.
 - postgres privilegios efectivos del propietario auth = false.
+- postgres puede SET ROLE al propietario auth = false; superuser = false.
 - guard_legacy_offer owner cr_order_writer; SECURITY DEFINER; search_path vacío.
 
 No se leyeron filas de clientes/Auth, secretos ni archivos de servidor. No hubo escrituras productivas. No se probó SET ROLE ni se concedieron privilegios. Esta evidencia confirma que el canal actual no acredita autoridad para el GRANT; no demuestra que no exista otro canal legítimo del proveedor.
