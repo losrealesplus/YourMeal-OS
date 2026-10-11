@@ -326,6 +326,20 @@ export function assertReconciliationManifest(manifest, fresh) {
         "A4b manifest final source changed",
       );
     }
+    if (fresh.reconciliation.payload?.reconciliationType === "EATCLEAN_RELEASE_A_RECONCILIATION") {
+      demand(
+        [manifest.reconciliation, manifest.plan.reconciliation].every(
+          (item) => item.reconciliationId === hash(JSON.stringify(item.payload)),
+        ),
+        "EatClean Release A manifest reconciliation payload changed",
+      );
+      demand(
+        fresh.sourceSha === fresh.reconciliation.payload.finalSourceSha &&
+          manifest.sourceSha === fresh.sourceSha &&
+          manifest.plan.sourceSha === fresh.sourceSha,
+        "EatClean Release A manifest final source changed",
+      );
+    }
     if (fresh.reconciliation.payload?.reconciliationType === "EATCLEAN_FINAL_RELEASE_RECONCILIATION") {
       demand(
         [manifest.reconciliation, manifest.plan.reconciliation].every(
@@ -1237,5 +1251,591 @@ export function verifyEatCleanFinalReconciliation(snapshot, policy) {
     ],
     governanceMerge,
   };
+  return { reconciled: true, reconciliationId: hash(JSON.stringify(payload)), payload };
+}
+
+
+// ============================================================================
+// EATCLEAN RELEASE A (PARTIAL LAUNCH) RECONCILIATION
+// Baseline: b9d9ff56c50570f60f6b1cb1db0e41909b477d2d (Deployment 6981646840)
+// Candidate: 81b0da1533f9442d8171d9bbb9863343c13389f0 (PRs #515, #516, #517, #518, #519)
+// Governance branch: ag/gate7-release-a-reconciliation
+// ============================================================================
+
+export const EATCLEAN_RELEASE_A_RECONCILIATION = freezeEatClean({
+  "repository": "losrealesplus/YourMeal-OS",
+  "environment": "production-worker",
+  "baselineSha": "b9d9ff56c50570f60f6b1cb1db0e41909b477d2d",
+  "baselineDeploymentId": 6981646840,
+  "baselineVersionId": "52391b7d-d1d5-4997-abe4-15b0e29bd652",
+  "sealedCandidateTargetSha": "81b0da1533f9442d8171d9bbb9863343c13389f0",
+  "originalDecision": "REQUIRES_SEPARATE_AUTHORIZATION",
+  "candidatePrs": [
+    515,
+    516,
+    517,
+    518,
+    519
+  ],
+  "allCandidatePaths": [
+    ".github/workflows/migration-bootstrap.yml",
+    "AG_GATE7_FINAL_RECONCILIATION.md",
+    "docs/05-architecture/GATE7_POST_MERGE_AUTOMATION.md",
+    "docs/10-validation/MIGRATION_BOOTSTRAP_VALIDATION.md",
+    "docs/99-internal/development-journal/2026-10-10-eatclean-final-release-reconciliation.md",
+    "docs/99-internal/development-journal/2026-10-10-final-release-package.md",
+    "docs/99-internal/development-journal/2026-10-10-local-staging-e2e.md",
+    "docs/99-internal/development-journal/2026-10-10-pr516-migration-authority.md",
+    "docs/99-internal/development-journal/2026-10-10-staging-migration-qualification.md",
+    "docs/99-internal/development-journal/2026-10-10-staging-runtime-isolation.md",
+    "instances/yourmeal-eatclean/staging.local.runtime.env.example",
+    "instances/yourmeal-eatclean/staging.local.synthetic.json",
+    "scripts/governance/release-plan.mjs",
+    "scripts/governance/release-reconciliation.mjs",
+    "scripts/governance/release-reconciliation.spec.mjs",
+    "scripts/migration-bootstrap-ci.mjs",
+    "scripts/migration-bootstrap-ci.spec.mjs",
+    "scripts/release-corrections.synthetic.py",
+    "scripts/release/eatclean-final-sql-manifest.json",
+    "scripts/staging-e2e-browser.mjs",
+    "scripts/staging-e2e-gateway.mjs",
+    "scripts/staging-e2e-lab.py",
+    "scripts/staging-e2e-order-writer.sql",
+    "scripts/staging-e2e-prerequisites.sql",
+    "scripts/staging-e2e-rls.mjs",
+    "scripts/staging-e2e-seed.mjs",
+    "scripts/staging-local-runtime.mjs",
+    "scripts/staging-migration-qualification.py",
+    "scripts/staging-write-barrier.synthetic.sql",
+    "src/bootstrap/pipeline/stages/EnvironmentStage.spec.ts",
+    "src/bootstrap/pipeline/stages/EnvironmentStage.ts",
+    "src/components/customer/customer-identity-link-review.tsx",
+    "src/components/orders/universal-order-intake-drawer.tsx",
+    "src/components/tenant/tenant-logo.tsx",
+    "src/config/eatclean-partial-launch.spec.ts",
+    "src/config/eatclean-partial-launch.ts",
+    "src/integrations/supabase/auth-middleware.ts",
+    "src/integrations/supabase/client.server.ts",
+    "src/integrations/supabase/client.ts",
+    "src/integrations/supabase/local-staging.server.ts",
+    "src/integrations/supabase/staging-local-http.spec.ts",
+    "src/integrations/supabase/staging-runtime.spec.ts",
+    "src/lib/home-path.spec.ts",
+    "src/lib/home-path.ts",
+    "src/lib/instance-runtime-boundary.ts",
+    "src/lib/local-staging-runtime.ts",
+    "src/lib/local-staging-vite.spec.ts",
+    "src/lib/public-and-auth-branding-hardening.spec.ts",
+    "src/lib/staging-isolation-qualification.spec.ts",
+    "src/modules/order-intake/application/order-intake-service.ts",
+    "src/modules/orders/application/order-service.ts",
+    "src/modules/orders/application/staff-order-capture-service.ts",
+    "src/routes/_authenticated/admin.customers.tsx",
+    "src/routes/_authenticated/admin.order-capture.tsx",
+    "src/routes/_authenticated/app.schedule.tsx",
+    "supabase/migrations/20261010155728_release_cr_order_writer_auth_usage.sql",
+    "supabase/migrations/20261010155729_release_program_draft_order_price_snapshot.sql",
+    "vite.config.ts"
+  ],
+  "commits": [
+    {
+      "sha": "38eb0b5dabacf5f35b326608f92084db2323317a",
+      "pr": 515,
+      "parent": "b9d9ff56c50570f60f6b1cb1db0e41909b477d2d",
+      "paths": [
+        "docs/99-internal/development-journal/2026-10-10-staging-migration-qualification.md",
+        "docs/99-internal/development-journal/2026-10-10-staging-runtime-isolation.md",
+        "instances/yourmeal-eatclean/staging.local.runtime.env.example",
+        "instances/yourmeal-eatclean/staging.local.synthetic.json",
+        "scripts/staging-local-runtime.mjs",
+        "scripts/staging-migration-qualification.py",
+        "scripts/staging-write-barrier.synthetic.sql",
+        "src/bootstrap/pipeline/stages/EnvironmentStage.spec.ts",
+        "src/bootstrap/pipeline/stages/EnvironmentStage.ts",
+        "src/components/tenant/tenant-logo.tsx",
+        "src/integrations/supabase/auth-middleware.ts",
+        "src/integrations/supabase/client.server.ts",
+        "src/integrations/supabase/client.ts",
+        "src/integrations/supabase/local-staging.server.ts",
+        "src/integrations/supabase/staging-local-http.spec.ts",
+        "src/integrations/supabase/staging-runtime.spec.ts",
+        "src/lib/home-path.spec.ts",
+        "src/lib/home-path.ts",
+        "src/lib/instance-runtime-boundary.ts",
+        "src/lib/local-staging-runtime.ts",
+        "src/lib/local-staging-vite.spec.ts",
+        "src/lib/public-and-auth-branding-hardening.spec.ts",
+        "src/lib/staging-isolation-qualification.spec.ts",
+        "vite.config.ts"
+      ],
+      "specialFiles": [
+        {
+          "path": "instances/yourmeal-eatclean/staging.local.runtime.env.example",
+          "before": null,
+          "after": "0714ea587c22111bff99608ff3be085208ef23e1b995e5b4203aaf8c4cb8385a"
+        },
+        {
+          "path": "instances/yourmeal-eatclean/staging.local.synthetic.json",
+          "before": null,
+          "after": "112b916f479c9ae0aa91eae36ad08fdc96c79af871f3cd4b51fe8ac9b9ee12ad"
+        },
+        {
+          "path": "scripts/staging-local-runtime.mjs",
+          "before": null,
+          "after": "a3ac8e93ccd7cf2dfc98012c324624228a651f5998ada2424848a84b98ca43c7"
+        },
+        {
+          "path": "scripts/staging-migration-qualification.py",
+          "before": null,
+          "after": "8138629e063b3ac30caf2a30f8aab3b6895d277f939d1ddc8fed8e975f84fb06"
+        },
+        {
+          "path": "scripts/staging-write-barrier.synthetic.sql",
+          "before": null,
+          "after": "7b0ee567cc50548212f72da93f6201715d6077671cf9bebb684f36a64d022df7"
+        },
+        {
+          "path": "src/components/tenant/tenant-logo.tsx",
+          "before": "f75448cd2c4e41322ec91c5e656b381f1cb0f612a480af7402db63225fb8d91b",
+          "after": "522c9407d75d4b62c12962ca4a3fa6c31da4c9e9de811620045aecbb49ecbe16"
+        },
+        {
+          "path": "src/integrations/supabase/auth-middleware.ts",
+          "before": "e5cb837e60c9d58f7642f7de94c24b43bbab9931c4ddce34e42aac2e141f2038",
+          "after": "d196aa53c6f257fdae963bd0732140766f9c0afa52cabb13009842bd897e1a0e"
+        },
+        {
+          "path": "src/integrations/supabase/client.server.ts",
+          "before": "2cdb46aedc2054356b170221c3e4fe0fabe7da46e76e9f74ec9e160a52622ffd",
+          "after": "fcb100c1a1d03281035ac324c31bc6d95c9e07cd3964b5b6d9c9d4b523e03bf5"
+        },
+        {
+          "path": "src/integrations/supabase/client.ts",
+          "before": "09a40769dd44e098d3efae19d13af74ac706e4b4d82320b3593f083eed067f97",
+          "after": "c35027699ed546fb6a1de767e41d8e7ab0b91cb3a4f6b4fda73795ee46c924f2"
+        },
+        {
+          "path": "src/integrations/supabase/local-staging.server.ts",
+          "before": null,
+          "after": "de16a7b3bcea7c007458f4d5e6550b4b1cc6c9467c848c9075edb1ac2da6423f"
+        },
+        {
+          "path": "src/integrations/supabase/staging-local-http.spec.ts",
+          "before": null,
+          "after": "2cdfc02f80e7e79e2087d9d09bdbe9f71ac67c8b18b5df1ed878a8da23f883c8"
+        },
+        {
+          "path": "src/integrations/supabase/staging-runtime.spec.ts",
+          "before": null,
+          "after": "c93d5859c0fc1c08543ac77e090e00cf17e003c74a2f11dbdc17b616dffc845c"
+        },
+        {
+          "path": "src/lib/public-and-auth-branding-hardening.spec.ts",
+          "before": "fb54d24e7b7f3caa069fc13b8a713529694e24f0608fe3c0bba0fb723893b33c",
+          "after": "6555379f0237c780cfe3a151e4fae4aeae27bd5f704e16581cf1ef0716dba654"
+        },
+        {
+          "path": "vite.config.ts",
+          "before": "448f45e65ab3c737003bd56d2a3a4f8c127146cca828f1c59fae50c1947e947c",
+          "after": "be3798b0278e1e03895ff20f337b6ae8bdf905bc2db38ca869df23be23e2893a"
+        }
+      ]
+    },
+    {
+      "sha": "9106124499a0f028161ab09309b772a576217102",
+      "pr": 516,
+      "parent": "38eb0b5dabacf5f35b326608f92084db2323317a",
+      "paths": [
+        ".github/workflows/migration-bootstrap.yml",
+        "docs/10-validation/MIGRATION_BOOTSTRAP_VALIDATION.md",
+        "docs/99-internal/development-journal/2026-10-10-final-release-package.md",
+        "docs/99-internal/development-journal/2026-10-10-local-staging-e2e.md",
+        "docs/99-internal/development-journal/2026-10-10-pr516-migration-authority.md",
+        "instances/yourmeal-eatclean/staging.local.runtime.env.example",
+        "scripts/migration-bootstrap-ci.mjs",
+        "scripts/migration-bootstrap-ci.spec.mjs",
+        "scripts/release-corrections.synthetic.py",
+        "scripts/release/eatclean-final-sql-manifest.json",
+        "scripts/staging-e2e-browser.mjs",
+        "scripts/staging-e2e-gateway.mjs",
+        "scripts/staging-e2e-lab.py",
+        "scripts/staging-e2e-order-writer.sql",
+        "scripts/staging-e2e-prerequisites.sql",
+        "scripts/staging-e2e-rls.mjs",
+        "scripts/staging-e2e-seed.mjs",
+        "scripts/staging-local-runtime.mjs",
+        "src/integrations/supabase/staging-local-http.spec.ts",
+        "src/integrations/supabase/staging-runtime.spec.ts",
+        "src/lib/local-staging-runtime.ts",
+        "src/modules/orders/application/order-service.ts",
+        "supabase/migrations/20261010155728_release_cr_order_writer_auth_usage.sql",
+        "supabase/migrations/20261010155729_release_program_draft_order_price_snapshot.sql"
+      ],
+      "specialFiles": [
+        {
+          "path": ".github/workflows/migration-bootstrap.yml",
+          "before": "fa5ac4bf7faf17c5cdee50620a69527cd9da97848339807831bacf5bd2621b0d",
+          "after": "99b402c791f65521ebd0ee2a3107c4647130169a24b6f5bcde97e6422908ae58"
+        },
+        {
+          "path": "docs/99-internal/development-journal/2026-10-10-pr516-migration-authority.md",
+          "before": null,
+          "after": "dc2a3071f128b9045bfe9d74a1d0b222c2017a58b6ccea55c6a152d5e2a6624f"
+        },
+        {
+          "path": "instances/yourmeal-eatclean/staging.local.runtime.env.example",
+          "before": "0714ea587c22111bff99608ff3be085208ef23e1b995e5b4203aaf8c4cb8385a",
+          "after": "f05d088fce76d7cb0ed8326eae72d0b1ab0b2cc2bf2e5c5cad5f2fea04e4d32f"
+        },
+        {
+          "path": "scripts/migration-bootstrap-ci.mjs",
+          "before": null,
+          "after": "639115525f24e5bc070f5a87c36db8eecfc97651474673e368cd435bf6744d16"
+        },
+        {
+          "path": "scripts/release-corrections.synthetic.py",
+          "before": null,
+          "after": "e1e21134e1d221851122a4335b5103ecf4eadc9dc451541b0edcaa6fe8ddc45b"
+        },
+        {
+          "path": "scripts/release/eatclean-final-sql-manifest.json",
+          "before": null,
+          "after": "a111b82a8b32e787f3e3975f5a06f7de62c01e87509bd346ccc01cf8047350ca"
+        },
+        {
+          "path": "scripts/staging-e2e-browser.mjs",
+          "before": null,
+          "after": "8cb94319fe2d19ff46be9b65aab0737fbbc68eeb837f1dbe9ca962cd10adec4b"
+        },
+        {
+          "path": "scripts/staging-e2e-gateway.mjs",
+          "before": null,
+          "after": "fe20f921b7114fca06f2a875223db5ead368ba225a45509835192522017caaeb"
+        },
+        {
+          "path": "scripts/staging-e2e-lab.py",
+          "before": null,
+          "after": "3aea1425f6797463c23eef2764d88a84ae64b4d34b36bc952f614115561e7d36"
+        },
+        {
+          "path": "scripts/staging-e2e-order-writer.sql",
+          "before": null,
+          "after": "cac37471c00fc93ed79beeae8a878f85bcf56236ecccde24e8c39d1ec014b378"
+        },
+        {
+          "path": "scripts/staging-e2e-prerequisites.sql",
+          "before": null,
+          "after": "12fdd97af56f5f0387e95aec227fdc30edb872cc946db254d1159bc0f200b218"
+        },
+        {
+          "path": "scripts/staging-e2e-rls.mjs",
+          "before": null,
+          "after": "e99c53ff9feea3054ee43c4bddbc656e37512c47b403a99c9bf04ef22914ed6b"
+        },
+        {
+          "path": "scripts/staging-e2e-seed.mjs",
+          "before": null,
+          "after": "09d27ffcba1025c4ba818fa5abaa1d0197846708f69355746cba11fb30379a2b"
+        },
+        {
+          "path": "scripts/staging-local-runtime.mjs",
+          "before": "a3ac8e93ccd7cf2dfc98012c324624228a651f5998ada2424848a84b98ca43c7",
+          "after": "581a490fc1bb6e4979bced8924dd7a5726b0cca1dbe9e08a02a413b8eaddc57d"
+        },
+        {
+          "path": "src/integrations/supabase/staging-local-http.spec.ts",
+          "before": "2cdfc02f80e7e79e2087d9d09bdbe9f71ac67c8b18b5df1ed878a8da23f883c8",
+          "after": "0af95c4acb16d61810bebb535a0347c1ce27a2a76cddfbbbe44c39f8f3b4cc2c"
+        },
+        {
+          "path": "src/integrations/supabase/staging-runtime.spec.ts",
+          "before": "c93d5859c0fc1c08543ac77e090e00cf17e003c74a2f11dbdc17b616dffc845c",
+          "after": "4694d1ac00746dc0a95a4e7e96d291fae05d8f12013becf3142d39da51fe2da2"
+        },
+        {
+          "path": "supabase/migrations/20261010155728_release_cr_order_writer_auth_usage.sql",
+          "before": null,
+          "after": "86d6203287bedf2f87c7f9dd11c47a99c7efce635266efedccebba0215d8fac5"
+        },
+        {
+          "path": "supabase/migrations/20261010155729_release_program_draft_order_price_snapshot.sql",
+          "before": null,
+          "after": "7a2b1f9a530f6edca8bd73bde6a53dd01fe6124750a417fcd1d9701ba0a5f106"
+        }
+      ]
+    },
+    {
+      "sha": "2d5b3914dabfd8acfd2bf054dc8c6df3822c8535",
+      "pr": 517,
+      "parent": "9106124499a0f028161ab09309b772a576217102",
+      "paths": [
+        "AG_GATE7_FINAL_RECONCILIATION.md",
+        "docs/05-architecture/GATE7_POST_MERGE_AUTOMATION.md",
+        "docs/99-internal/development-journal/2026-10-10-eatclean-final-release-reconciliation.md",
+        "scripts/governance/release-plan.mjs",
+        "scripts/governance/release-reconciliation.mjs",
+        "scripts/governance/release-reconciliation.spec.mjs"
+      ],
+      "specialFiles": [
+        {
+          "path": "AG_GATE7_FINAL_RECONCILIATION.md",
+          "before": null,
+          "after": "07ca806d81785922110656c1fe06746418e782ba0dbad56d0de265deb024f8fa"
+        },
+        {
+          "path": "docs/05-architecture/GATE7_POST_MERGE_AUTOMATION.md",
+          "before": "7d85aa5cb290c6c070095c05c685a39a4e3859b88c782d4cba027fff1468b338",
+          "after": "12f88373fb1822d7279e636aa664a9b42654c41d6ee5db7375fa3d36f77edfde"
+        },
+        {
+          "path": "scripts/governance/release-plan.mjs",
+          "before": "a959c4702eae71149ff2adc688ce3be9ed94b86e345c23b354c0ea0c012b2708",
+          "after": "bf8a5637630d72e5e3619cfd6dd1b1fe70c8ae2b306950a960bd90c63199647b"
+        },
+        {
+          "path": "scripts/governance/release-reconciliation.mjs",
+          "before": "d9a8a369eae1f58c0a3e763a59c0c9fd2899c960991155cfad018adbe69ebbc5",
+          "after": "1c789fbfdffa9521f9dd7250e3a26e34dc5f94927bbd16917098432229d1ddaf"
+        },
+        {
+          "path": "scripts/governance/release-reconciliation.spec.mjs",
+          "before": "6672406909da7a62531ea841fe0b60cd3502e97e3c60e1c549e35023580d5c8d",
+          "after": "be70e38c9d840f4b1efbd7e0aa8303338517f1783e7d45363848802fdb9f2847"
+        }
+      ]
+    },
+    {
+      "sha": "0b88e9760d8e1574fc62c16c907a91b86ef9d3ba",
+      "pr": 518,
+      "parent": "2d5b3914dabfd8acfd2bf054dc8c6df3822c8535",
+      "paths": [
+        "scripts/governance/release-reconciliation.mjs",
+        "scripts/governance/release-reconciliation.spec.mjs"
+      ],
+      "specialFiles": [
+        {
+          "path": "scripts/governance/release-reconciliation.mjs",
+          "before": "1c789fbfdffa9521f9dd7250e3a26e34dc5f94927bbd16917098432229d1ddaf",
+          "after": "8b883102b7fe17f9c1ae824ef978468938dc52889cc40caea5799cc187953e40"
+        },
+        {
+          "path": "scripts/governance/release-reconciliation.spec.mjs",
+          "before": "be70e38c9d840f4b1efbd7e0aa8303338517f1783e7d45363848802fdb9f2847",
+          "after": "61f98efc3032a959b7da56aa0ddabf20bf89ddf04dd784830b2b6e1cf4ed2a37"
+        }
+      ]
+    },
+    {
+      "sha": "81b0da1533f9442d8171d9bbb9863343c13389f0",
+      "pr": 519,
+      "parent": "0b88e9760d8e1574fc62c16c907a91b86ef9d3ba",
+      "paths": [
+        "src/components/customer/customer-identity-link-review.tsx",
+        "src/components/orders/universal-order-intake-drawer.tsx",
+        "src/config/eatclean-partial-launch.spec.ts",
+        "src/config/eatclean-partial-launch.ts",
+        "src/modules/order-intake/application/order-intake-service.ts",
+        "src/modules/orders/application/staff-order-capture-service.ts",
+        "src/routes/_authenticated/admin.customers.tsx",
+        "src/routes/_authenticated/admin.order-capture.tsx",
+        "src/routes/_authenticated/app.schedule.tsx"
+      ],
+      "specialFiles": [
+        {
+          "path": "src/components/customer/customer-identity-link-review.tsx",
+          "before": "6627bc7e9f119a99804e0a837b122764c436e0648da7d36ec858064eadb85f7f",
+          "after": "0c24428dc11d451eb787ded48b9b8b873cd9778066b7bf8594a375f20a5c5ab7"
+        }
+      ]
+    }
+  ],
+  "governanceBranch": "ag/gate7-release-a-reconciliation",
+  "governanceFiles": [
+    "AG_GATE7_RELEASE_A_RECONCILIATION.md",
+    "docs/05-architecture/GATE7_RELEASE_A_AUTOMATION.md",
+    "scripts/governance/release-plan.mjs",
+    "scripts/governance/release-reconciliation.mjs",
+    "scripts/governance/release-reconciliation.spec.mjs"
+  ],
+  "constraints": {
+    "productionSqlAuthorized": false,
+    "migrationExecutionAuthorized": false,
+    "productionWorkerApprovalGranted": false,
+    "a5": "HARD_DISABLED",
+    "a4b": "CLOSED",
+    "oauthActivationAuthorized": false,
+    "orders_custom_capture": "CLOSED",
+    "custom_activation": "CLOSED",
+    "M3": "CLOSED",
+    "OP08": "CLOSED",
+    "Extras": "UNTOUCHED",
+    "release_a_order_creation": "FROZEN_FOR_EATCLEAN",
+    "release_a_staff_order_capture": "FROZEN_FOR_EATCLEAN",
+    "release_a_crm_p34": "FROZEN_FOR_EATCLEAN"
+  },
+  "schema": 1,
+  "reconciliationType": "EATCLEAN_RELEASE_A_RECONCILIATION",
+  "authority": "Alexander Hernandez",
+  "reviewerId": 292604102,
+  "reviewerLogin": "losrealesplus",
+  "sqlManifest": {
+    "path": "scripts/release/eatclean-final-sql-manifest.json",
+    "sha256": "a111b82a8b32e787f3e3975f5a06f7de62c01e87509bd346ccc01cf8047350ca",
+    "entriesCount": 4,
+    "productionExecutionAuthorized": false
+  }
+});
+
+/**
+ * Verifies exact 5-commit candidate lineage (#515, #516, #517, #518, #519) plus
+ * governance reconciliation commit (PR #520 on ag/gate7-release-a-reconciliation).
+ */
+export function verifyEatCleanReleaseAReconciliation(snapshot, policy) {
+  const record = EATCLEAN_RELEASE_A_RECONCILIATION;
+  const { baseline, commits, productPrs, remediation, targetSha, currentMainSha } = snapshot;
+
+  demand(
+    snapshot.repository === record.repository &&
+      policy.repository === record.repository &&
+      policy.environment === record.environment &&
+      policy.reviewerId === record.reviewerId,
+    "EatClean Release A repository/authority policy mismatch",
+  );
+
+  demand(
+    baseline?.sha === record.baselineSha &&
+      baseline.deploymentId === record.baselineDeploymentId &&
+      baseline.versionId === record.baselineVersionId,
+    "EatClean Release A production baseline mismatch",
+  );
+
+  demand(
+    /^[a-f0-9]{40}$/.test(targetSha ?? "") &&
+      targetSha === currentMainSha &&
+      targetSha !== record.sealedCandidateTargetSha,
+    "EatClean Release A final source missing/stale",
+  );
+
+  // Exactly 6 commits in first-parent history: 5 product/governance candidate commits + 1 final governance PR commit
+  demand(
+    commits?.length === 6,
+    "EatClean Release A requires exact 5 candidate commits (#515-#519) plus 1 governance commit",
+  );
+
+  // Verify candidate lineage
+  for (let i = 0; i < record.commits.length; i++) {
+    const expected = record.commits[i];
+    const actual = commits[i];
+    demand(
+      actual.sha === expected.sha &&
+        actual.parent === expected.parent &&
+        actual.pr === expected.pr,
+      `EatClean Release A candidate commit ${i} (#${expected.pr}) lineage mismatch`,
+    );
+    demand(
+      sameEatClean(actual.paths, expected.paths) &&
+        sameEatClean(actual.specialFiles, expected.specialFiles),
+      `EatClean Release A commit ${i} (#${expected.pr}) paths/hashes mismatch`,
+    );
+  }
+
+  // Verify all 5 candidate PRs were human-merged by authorized reviewer
+  const assertHumanPr = (pr, number, sha) =>
+    demand(
+      pr?.number === number &&
+        pr.merged_at &&
+        pr.merge_commit_sha === sha &&
+        pr.base?.ref === "main" &&
+        pr.base.repo?.full_name === record.repository &&
+        pr.head?.repo?.full_name === record.repository &&
+        pr.merged_by?.id === record.reviewerId &&
+        pr.merged_by?.login === record.reviewerLogin,
+      `EatClean Release A missing canonical human merge evidence for PR #${number}`,
+    );
+
+  demand(
+    Array.isArray(productPrs) && productPrs.length === record.candidatePrs.length,
+    "EatClean Release A requires exactly 5 candidate PRs",
+  );
+
+  for (let i = 0; i < record.candidatePrs.length; i++) {
+    assertHumanPr(productPrs[i], record.candidatePrs[i], record.commits[i].sha);
+  }
+
+  // Commit 5 is the final governance reconciliation commit and is targetSha
+  const govCommit = commits[5];
+  demand(
+    govCommit.sha === targetSha &&
+      govCommit.parent === record.sealedCandidateTargetSha,
+    "EatClean Release A governance commit lineage mismatch",
+  );
+
+  demand(
+    Number.isSafeInteger(govCommit.pr) && govCommit.pr > record.candidatePrs.at(-1),
+    "EatClean Release A governance PR number invalid",
+  );
+
+  assertHumanPr(remediation, govCommit.pr, targetSha);
+
+  demand(
+    remediation.head.ref === record.governanceBranch,
+    "EatClean Release A governance branch mismatch",
+  );
+
+  demand(
+    sameEatClean(govCommit.paths, record.governanceFiles),
+    "EatClean Release A governance paths mismatch",
+  );
+
+  const expectedSpecialGov = record.governanceFiles.filter((p) => classifyPath(p) === "SPECIAL");
+  const govEvidence = govCommit.specialFiles;
+
+  demand(
+    Array.isArray(govEvidence) &&
+      sameEatClean(
+        govEvidence.map((f) => f.path),
+        expectedSpecialGov,
+      ) &&
+      govEvidence.every(
+        (f) =>
+          (f.before === null || /^[a-f0-9]{64}$/.test(f.before)) &&
+          /^[a-f0-9]{64}$/.test(f.after ?? ""),
+      ),
+    "EatClean Release A governance content evidence invalid",
+  );
+
+  const governanceMerge = {
+    sha: targetSha,
+    pr: remediation.number,
+    mergedBy: remediation.merged_by.id,
+    files: govEvidence,
+  };
+
+  const union = [...new Set(commits.flatMap((c) => c.paths))].sort();
+  demand(
+    sameEatClean(
+      snapshot.diff?.commits,
+      commits.map((c) => c.sha),
+    ) && sameEatClean(snapshot.diff?.paths, union),
+    "EatClean Release A outstanding history/path mismatch",
+  );
+
+  demand(
+    snapshot.originalDecision === record.originalDecision &&
+      sameEatClean(snapshot.constraints, record.constraints),
+    "EatClean Release A classification/closure contract mismatch",
+  );
+
+  const payload = {
+    ...record,
+    finalSourceSha: targetSha,
+    candidateMerges: record.candidatePrs.map((prNum, i) => ({
+      sha: record.commits[i].sha,
+      pr: prNum,
+      mergedBy: productPrs[i].merged_by.id,
+    })),
+    governanceMerge,
+  };
+
   return { reconciled: true, reconciliationId: hash(JSON.stringify(payload)), payload };
 }

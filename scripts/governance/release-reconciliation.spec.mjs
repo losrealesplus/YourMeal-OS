@@ -925,3 +925,148 @@ test("EatClean 4-commit FAIL: invalid special hash in hotfix", () => {
   );
 });
 
+
+// ============================================================================
+// EATCLEAN RELEASE A (PARTIAL LAUNCH) RECONCILIATION TESTS
+// ============================================================================
+
+const {
+  EATCLEAN_RELEASE_A_RECONCILIATION: releaseARec,
+  verifyEatCleanReleaseAReconciliation,
+} = await import("./release-reconciliation.mjs");
+
+const finalReleaseASha = "a".repeat(40);
+
+function releaseASnapshot() {
+  const candidatePrs = [
+    eatcleanPr(515, releaseARec.commits[0].sha, "codex/staging-runtime-isolation"),
+    eatcleanPr(516, releaseARec.commits[1].sha, "codex/eatclean-final-release-package"),
+    eatcleanPr(517, releaseARec.commits[2].sha, "ag/gate7-final-reconciliation"),
+    eatcleanPr(518, releaseARec.commits[3].sha, "ag/gate7-hotfix-governance-classification"),
+    eatcleanPr(519, releaseARec.commits[4].sha, "feat/eatclean-partial-launch"),
+  ];
+
+  const govCommit = {
+    sha: finalReleaseASha,
+    parent: releaseARec.sealedCandidateTargetSha,
+    pr: 520,
+    paths: [...releaseARec.governanceFiles],
+    specialFiles: releaseARec.governanceFiles
+      .filter((p) => classifyPath(p) === "SPECIAL")
+      .map((p) => ({
+        path: p,
+        before: null,
+        after: "a".repeat(64),
+      })),
+  };
+
+  return {
+    repository: mockPolicy.repository,
+    baseline: {
+      sha: releaseARec.baselineSha,
+      deploymentId: releaseARec.baselineDeploymentId,
+      versionId: releaseARec.baselineVersionId,
+    },
+    targetSha: finalReleaseASha,
+    currentMainSha: finalReleaseASha,
+    originalDecision: releaseARec.originalDecision,
+    constraints: structuredClone(releaseARec.constraints),
+    productPrs: candidatePrs,
+    remediation: eatcleanPr(520, finalReleaseASha, releaseARec.governanceBranch),
+    commits: [
+      ...releaseARec.commits.map((c) => ({
+        sha: c.sha,
+        parent: c.parent,
+        pr: c.pr,
+        paths: [...c.paths],
+        specialFiles: structuredClone(c.specialFiles),
+      })),
+      govCommit,
+    ],
+    diff: {
+      commits: [...releaseARec.commits.map((c) => c.sha), finalReleaseASha],
+      paths: [...new Set([...releaseARec.allCandidatePaths, ...releaseARec.governanceFiles])].sort(),
+    },
+  };
+}
+
+test("EatClean Release A sealed 6-commit interval PASS and immutable record", () => {
+  const s = releaseASnapshot();
+  const result = verifyEatCleanReleaseAReconciliation(s, mockPolicy);
+  assert.equal(result.payload.finalSourceSha, finalReleaseASha);
+  assert.equal(result.payload.reconciliationType, "EATCLEAN_RELEASE_A_RECONCILIATION");
+  assert.equal(result.payload.candidatePrs.length, 5);
+  assert.equal(result.payload.candidateMerges.length, 5);
+  assert.equal(result.payload.governanceMerge.pr, 520);
+  assert.equal(result.payload.sqlManifest.entriesCount, 4);
+  assert.equal(result.payload.sqlManifest.productionExecutionAuthorized, false);
+  assert.equal(result.payload.constraints.release_a_order_creation, "FROZEN_FOR_EATCLEAN");
+  assert.equal(result.payload.constraints.release_a_staff_order_capture, "FROZEN_FOR_EATCLEAN");
+  assert.equal(preparationEligible("AUTHORIZED_RECONCILED_RELEASE"), true);
+  assert.ok(Object.isFrozen(releaseARec.constraints));
+  assert.ok(Object.isFrozen(releaseARec.commits));
+});
+
+test("EatClean Release A FAIL: wrong baseline SHA", () => {
+  const s = releaseASnapshot();
+  s.baseline.sha = "0".repeat(40);
+  assert.throws(
+    () => verifyEatCleanReleaseAReconciliation(s, mockPolicy),
+    /EatClean Release A production baseline mismatch/,
+  );
+});
+
+test("EatClean Release A FAIL: missing candidate PR (only 4 candidate commits)", () => {
+  const s = releaseASnapshot();
+  s.commits.splice(4, 1); // remove PR 519 commit
+  s.diff.commits.splice(4, 1);
+  assert.throws(
+    () => verifyEatCleanReleaseAReconciliation(s, mockPolicy),
+    /EatClean Release A requires exact 5 candidate commits/,
+  );
+});
+
+test("EatClean Release A FAIL: wrong governance parent (not sealed 81b0da15)", () => {
+  const s = releaseASnapshot();
+  s.commits[5].parent = "1".repeat(40);
+  assert.throws(
+    () => verifyEatCleanReleaseAReconciliation(s, mockPolicy),
+    /EatClean Release A governance commit lineage mismatch/,
+  );
+});
+
+test("EatClean Release A FAIL: unauthorized merger for PR #519", () => {
+  const s = releaseASnapshot();
+  s.productPrs[4].merged_by.id = 999999;
+  assert.throws(
+    () => verifyEatCleanReleaseAReconciliation(s, mockPolicy),
+    /EatClean Release A missing canonical human merge evidence for PR #519/,
+  );
+});
+
+test("EatClean Release A FAIL: unmerged governance PR", () => {
+  const s = releaseASnapshot();
+  s.remediation.merged_at = null;
+  assert.throws(
+    () => verifyEatCleanReleaseAReconciliation(s, mockPolicy),
+    /EatClean Release A missing canonical human merge evidence for PR #520/,
+  );
+});
+
+test("EatClean Release A FAIL: extra unexpected file in governance PR", () => {
+  const s = releaseASnapshot();
+  s.commits[5].paths = [...s.commits[5].paths, "src/unauthorized-leak.ts"].sort();
+  assert.throws(
+    () => verifyEatCleanReleaseAReconciliation(s, mockPolicy),
+    /EatClean Release A governance paths mismatch/,
+  );
+});
+
+test("EatClean Release A FAIL: altered candidate commit path in PR #519", () => {
+  const s = releaseASnapshot();
+  s.commits[4].paths = [...s.commits[4].paths, "src/unauthorized.ts"].sort();
+  assert.throws(
+    () => verifyEatCleanReleaseAReconciliation(s, mockPolicy),
+    /EatClean Release A commit 4 \(#519\) paths\/hashes mismatch/,
+  );
+});
