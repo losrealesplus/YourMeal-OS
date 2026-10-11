@@ -1180,6 +1180,53 @@ test("Ledger 6: Run missing Phase 2 job entirely FAILS CLOSED", () => {
   );
 });
 
+test("Ledger 7a: Phase 2 steps = [] returns null (non-publication)", () => {
+  const run = { id: 888889, status: "completed", conclusion: "cancelled", head_sha: "d".repeat(40) };
+  const jobs = [
+    { name: "Phase 2: Protected Production Deployment", status: "completed", conclusion: "cancelled", steps: [] },
+  ];
+  const result = evaluatePublicationLedger(run, wrapArtifacts([]), wrapJobs(jobs));
+  assert.equal(result, null);
+});
+
+test("Ledger 7b: Phase 2 steps = undefined FAILS CLOSED", () => {
+  const run = { id: 888890, status: "completed", conclusion: "cancelled", head_sha: "d".repeat(40) };
+  const jobs = [
+    { name: "Phase 2: Protected Production Deployment", status: "completed", conclusion: "cancelled", steps: undefined },
+  ];
+  assert.throws(
+    () => evaluatePublicationLedger(run, wrapArtifacts([]), wrapJobs(jobs)),
+    /Phase 2 executed steps without ledger: fail closed/,
+  );
+});
+
+test("Ledger 7c: Phase 2 steps = null FAILS CLOSED", () => {
+  const run = { id: 888891, status: "completed", conclusion: "cancelled", head_sha: "d".repeat(40) };
+  const jobs = [
+    { name: "Phase 2: Protected Production Deployment", status: "completed", conclusion: "cancelled", steps: null },
+  ];
+  assert.throws(
+    () => evaluatePublicationLedger(run, wrapArtifacts([]), wrapJobs(jobs)),
+    /Phase 2 executed steps without ledger: fail closed/,
+  );
+});
+
+test("Ledger 7d: Phase 2 steps con elementos FAILS CLOSED", () => {
+  const run = { id: 888892, status: "completed", conclusion: "cancelled", head_sha: "d".repeat(40) };
+  const jobs = [
+    {
+      name: "Phase 2: Protected Production Deployment",
+      status: "completed",
+      conclusion: "cancelled",
+      steps: [{ name: "Set up job" }],
+    },
+  ];
+  assert.throws(
+    () => evaluatePublicationLedger(run, wrapArtifacts([]), wrapJobs(jobs)),
+    /Phase 2 executed steps without ledger: fail closed/,
+  );
+});
+
 test("Ledger 7: Phase 2 started mutation steps but report missing FAILS CLOSED", () => {
   const run = { id: 888888, status: "completed", conclusion: "failure", head_sha: "d".repeat(40) };
   const jobs = [

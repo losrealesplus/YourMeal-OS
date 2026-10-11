@@ -155,7 +155,7 @@ export function evaluatePublicationLedger(run, artifactsResponse, jobsResponse) 
       "Phase 2 not cancelled/skipped: fail closed",
     );
     demand(
-      !phase2.steps || phase2.steps.length === 0,
+      Array.isArray(phase2.steps) && phase2.steps.length === 0,
       "Phase 2 executed steps without ledger: fail closed",
     );
     return null;
