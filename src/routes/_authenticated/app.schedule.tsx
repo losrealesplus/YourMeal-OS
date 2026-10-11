@@ -204,6 +204,11 @@ function ScheduleFlow() {
     });
   }
 
+  const isTenantOrderCreationFrozen = isEatCleanOrderCreationFrozen({
+    tenantSlug: activeTenantSlug,
+    tenantId,
+  });
+
   return (
     <div className="flex-1 flex flex-col pb-4">
       <ScreenHeader
@@ -213,7 +218,7 @@ function ScheduleFlow() {
         title={stepTitles[step - 1]}
       />
 
-      {isEatCleanOrderCreationFrozen() && (
+      {isTenantOrderCreationFrozen && (
         <div className="mx-6 mb-4 p-4 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-800 dark:text-amber-200 text-xs">
           <p className="font-bold mb-1">{EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage}</p>
           <p className="text-[11px] opacity-90">
@@ -567,13 +572,13 @@ function ScheduleFlow() {
           </PrimaryCTA>
         ) : selectedDishEntries.length > 0 ? (
           <PrimaryCTA
-            disabled={programDraft.isPending || isEatCleanOrderCreationFrozen()}
+            disabled={programDraft.isPending || isTenantOrderCreationFrozen}
             onClick={() => {
-              if (isEatCleanOrderCreationFrozen()) return;
+              if (isTenantOrderCreationFrozen) return;
               void onProgramDraft();
             }}
           >
-            {isEatCleanOrderCreationFrozen()
+            {isTenantOrderCreationFrozen
               ? EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage
               : t("customer:confirmOrder")}
           </PrimaryCTA>

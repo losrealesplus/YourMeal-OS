@@ -43,7 +43,7 @@ export const OrderIntakeService = {
     ctx: ServiceContext,
     command: OrderIntakeDraftCommand,
   ): Promise<ProgramDraftOrderResult> {
-    if (isEatCleanOrderCreationFrozen()) {
+    if (isEatCleanOrderCreationFrozen(ctx)) {
       throw new DomainError("INVALID_STATE", EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage);
     }
     requireCapability(ctx.roles, "orders.write");

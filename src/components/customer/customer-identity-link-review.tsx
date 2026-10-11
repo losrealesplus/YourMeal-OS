@@ -41,14 +41,15 @@ export function CustomerIdentityLinkReview({
     (sessionContext.current?.owner === owner && sessionContext.current.customerId === customerId);
   const [uncertain, setUncertain] = useState(false);
   const [mayRetry, setMayRetry] = useState(false);
+  const isTenantCrmFrozen = isEatCleanCrmMutationFrozen(tenantId);
   const query = useQuery({
     queryKey: ["p34-link-review", tenantId, user?.id],
-    enabled: Boolean(allowed && tenantId && !isEatCleanCrmMutationFrozen()),
+    enabled: Boolean(allowed && tenantId && !isTenantCrmFrozen),
     queryFn: () => repo.identityRequests(tenantId!),
   });
   if (!allowed) return null;
 
-  if (isEatCleanCrmMutationFrozen()) {
+  if (isTenantCrmFrozen) {
     return (
       <div className="rounded-lg border border-border/60 bg-muted/20 p-3 text-xs text-muted-foreground flex items-center justify-between">
         <span>Vinculación de identidad (CRM P34)</span>
