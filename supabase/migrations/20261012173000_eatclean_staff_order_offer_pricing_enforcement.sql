@@ -7,19 +7,19 @@ SET LOCAL lock_timeout = '5s';
 SET LOCAL statement_timeout = '60s';
 SET LOCAL ROLE postgres;
 
--- 1. Update cr_order_private.guard_legacy_offer()
--- PRESERVE V2 CONTRACT & PREVENT UNAUTHORIZED LEGACY WRITES:
--- Any direct legacy writer attempting to write an offer with explicit pricing (unit_price IS NOT NULL)
--- is strictly rejected with OFFER_PRICING_QUOTE_REQUIRED UNLESS the call originates from the
--- authorized administrative intake procedure public.capture_staff_existing_order()
--- whose call frame is verified directly via PL/pgSQL call stack (PG_CONTEXT).
--- Under capture_staff_existing_order(), the trigger additionally verifies that NEW.unit_price
--- matches the exact published slot price coalesce(s.unit_price, d.price).
+-- 1. Tighten DDL privileges on orders and order_items:
+-- Explicitly revoke TRIGGER and TRUNCATE from anon and authenticated to seal privilege boundaries.
+REVOKE TRIGGER, TRUNCATE ON public.orders, public.order_items FROM anon, authenticated;
+
+-- 2. Update cr_order_private.guard_legacy_offer()
+-- PRESERVE V2 CONTRACT & ELIMINATE STACK PARSING:
+-- Any direct legacy writer attempting to write an explicit offer (unit_price IS NOT NULL)
+-- is strictly rejected with OFFER_PRICING_QUOTE_REQUIRED. Explicit offer pricing requires
+-- the canonical V2 quote engine (cr_order_offer_quote_issue & cr_order_offer_quote_commit).
 CREATE OR REPLACE FUNCTION cr_order_private.guard_legacy_offer() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
 DECLARE
  actor uuid; week date; version integer; n integer; explicit boolean;
- expected_price numeric; customer_user uuid; menu_id uuid; stack text;
- is_authorized_staff_intake boolean := false;
+ expected_price numeric; customer_user uuid; menu_id uuid;
 BEGIN
  SELECT week_start,write_contract_version INTO week,version FROM public.orders WHERE tenant_id=NEW.tenant_id AND id=NEW.order_id;
  IF version=2 THEN RETURN NEW; END IF;
@@ -50,19 +50,9 @@ BEGIN
  IF n=0 OR n IS NULL THEN RAISE EXCEPTION 'OFFER_NOT_FOUND'; ELSIF n>1 THEN RAISE EXCEPTION 'OFFER_AMBIGUOUS'; END IF;
 
  IF explicit THEN
-  -- Inspect PL/pgSQL call stack: cannot be spoofed or set by user input or GUC.
-  GET DIAGNOSTICS stack = PG_CONTEXT;
-  is_authorized_staff_intake := (stack ~ 'PL/pgSQL function (public\.)?capture_staff_existing_order\(');
-
-  IF NOT is_authorized_staff_intake THEN
-   -- Legacy writers attempting to write an explicit offer must use the canonical quote engine
-   RAISE EXCEPTION 'OFFER_PRICING_QUOTE_REQUIRED';
-  END IF;
-
-  -- Under authorized staff intake, the price must match the published offer price exactly
-  IF NEW.unit_price IS DISTINCT FROM expected_price THEN
-   RAISE EXCEPTION 'OFFER_PRICING_QUOTE_REQUIRED';
-  END IF;
+  -- Direct legacy writes of explicit offers are strictly blocked.
+  -- Authoritative commercial offer pricing must flow through canonical V2 engine.
+  RAISE EXCEPTION 'OFFER_PRICING_QUOTE_REQUIRED';
  END IF;
 
  RETURN NEW;
@@ -211,7 +201,41 @@ END $$;
 
 COMMENT ON FUNCTION public.capture_staff_existing_order(uuid,jsonb) IS 'EatClean-only atomic legacy staff intake with server-authoritative offer pricing; INVOKER RLS.';
 
--- 3. POST-MIGRATION ACL PRESERVATION ASSERTION
+-- 3. Update lifecycle identity checks to use cr_order_private.actor() (session_uid_bridge)
+-- Under cr_order_writer, auth.uid() fails if schema auth USAGE is ungranted; actor() bridges seamlessly.
+CREATE OR REPLACE FUNCTION cr_order_private.lifecycle_member(_tenant uuid) RETURNS boolean
+LANGUAGE sql STABLE SECURITY INVOKER SET search_path = '' AS $$
+  SELECT cr_order_private.actor() IS NOT NULL AND EXISTS (
+    SELECT 1 FROM public.tenant_members
+    WHERE tenant_id = _tenant AND user_id = cr_order_private.actor()
+      AND status = 'approved' AND deleted_at IS NULL
+  )
+$$;
+
+CREATE OR REPLACE FUNCTION cr_order_private.lifecycle_staff(_tenant uuid) RETURNS boolean
+LANGUAGE sql STABLE SECURITY INVOKER SET search_path = '' AS $$
+  SELECT cr_order_private.lifecycle_member(_tenant) AND (
+    public.has_role(cr_order_private.actor(), _tenant, 'company_admin')
+    OR public.has_role(cr_order_private.actor(), _tenant, 'operations_manager')
+    OR public.is_saas_admin(cr_order_private.actor())
+  )
+$$;
+
+CREATE OR REPLACE FUNCTION cr_order_private.lifecycle_operator(_tenant uuid, _domain text) RETURNS boolean
+LANGUAGE sql STABLE SECURITY INVOKER SET search_path = '' AS $$
+  SELECT cr_order_private.lifecycle_member(_tenant) AND (
+    cr_order_private.lifecycle_staff(_tenant)
+    OR CASE _domain
+      WHEN 'kitchen' THEN public.has_role(cr_order_private.actor(), _tenant, 'kitchen')
+      WHEN 'production' THEN public.has_role(cr_order_private.actor(), _tenant, 'production')
+      WHEN 'logistics' THEN public.has_role(cr_order_private.actor(), _tenant, 'logistics')
+        OR public.has_role(cr_order_private.actor(), _tenant, 'delivery')
+        OR public.has_role(cr_order_private.actor(), _tenant, 'driver')
+      ELSE false END
+  )
+$$;
+
+-- 4. POST-MIGRATION ACL PRESERVATION ASSERTION
 -- Ensure authenticated retains EXECUTE on capture_staff_existing_order (no accidental revocation)
 DO $$
 BEGIN

@@ -86,11 +86,13 @@ export async function offerCommercialContext(actor: VerifiedOfferActor, tenantId
   // - single active offer or explicit individual menu
   // - pricingModel = per_unit
   // - no promotions
+  // - unbundled tenant (such as EatClean with empty registered offers)
   const isIndividualMode =
-    offers.length === 1 &&
-    offers[0]?.code === "individual_menu" &&
-    offers[0]?.pricingModel === "per_unit" &&
-    (!offers[0]?.promotions || offers[0]?.promotions.length === 0);
+    (offers.length === 1 &&
+      offers[0]?.code === "individual_menu" &&
+      offers[0]?.pricingModel === "per_unit" &&
+      (!offers[0]?.promotions || offers[0]?.promotions.length === 0)) ||
+    (offers.length === 0 && tenant.slug === "eatclean");
 
   const mode = isIndividualMode ? "individual_line_pricing_v1" : "weekly_plan";
 

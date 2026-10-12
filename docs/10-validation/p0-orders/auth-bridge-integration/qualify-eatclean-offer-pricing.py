@@ -2,6 +2,7 @@
 Synthetic qualification suite for EatClean commercial offer pricing enforcement.
 Runs in an isolated synthetic PG 17.6 container (Orbstack tmpfs).
 No network, no production DSN, no production credentials.
+Verifies Canonical V2 Order Engine integration (Alternativa A) and security hardening.
 """
 import subprocess, time, json, pathlib
 
@@ -72,7 +73,6 @@ try:
     skip = (
         "20261007020208_",
         "20261007020245_",
-        "20261007020849_",
         "20261008112217_",
         "20261008160753_",
         "20261010155728_",
@@ -92,13 +92,14 @@ try:
     U = "22000000-0000-4000-8000-000000000001"   # company_admin
     U2 = "22000000-0000-4000-8000-000000000002"  # customer
     C = "33000000-0000-4000-8000-000000000001"
+    C2 = "33000000-0000-4000-8000-000000000002"
 
     init_sql = f"""
     INSERT INTO tenants(id,slug,name) VALUES('{T}','eatclean','EatClean'),('{T2}','foreign','Foreign');
     INSERT INTO auth.users(id) VALUES('{U}'),('{U2}');
     INSERT INTO tenant_members(tenant_id,user_id,status,membership_type) VALUES('{T}','{U}','approved','customer'),('{T}','{U2}','approved','customer');
     INSERT INTO user_roles(user_id,tenant_id,role) VALUES('{U}','{T}','company_admin'),('{U2}','{T}','customer');
-    INSERT INTO customers(id,tenant_id,user_id,kind,display_name) VALUES('{C}','{T}','{U2}','individual','Synthetic Customer');
+    INSERT INTO customers(id,tenant_id,user_id,kind,display_name) VALUES('{C}','{T}','{U2}','individual','Synthetic Customer'),('{C2}','{T}','{U}','individual','Admin Personal Customer');
     """
     sql(init_sql)
 
@@ -162,12 +163,24 @@ try:
     post_acl = scalar("SELECT has_function_privilege('authenticated', 'public.capture_staff_existing_order(uuid,jsonb)', 'EXECUTE');")
     check("POST_MIGRATION_ACL_RETAINED", post_acl == "t", "authenticated retains EXECUTE privilege post-migration without re-grant")
 
+    # Verify DDL Privilege Hardening (Revocation of TRIGGER and TRUNCATE)
+    anon_trigger = scalar("SELECT has_table_privilege('anon', 'public.orders', 'TRIGGER');")
+    auth_trigger = scalar("SELECT has_table_privilege('authenticated', 'public.orders', 'TRIGGER');")
+    anon_trunc = scalar("SELECT has_table_privilege('anon', 'public.orders', 'TRUNCATE');")
+    auth_trunc = scalar("SELECT has_table_privilege('authenticated', 'public.orders', 'TRUNCATE');")
+    items_auth_trigger = scalar("SELECT has_table_privilege('authenticated', 'public.order_items', 'TRIGGER');")
+    items_auth_trunc = scalar("SELECT has_table_privilege('authenticated', 'public.order_items', 'TRUNCATE');")
+    check("DDL_PRIVILEGES_HARDENED", anon_trigger == 'f' and auth_trigger == 'f' and anon_trunc == 'f' and auth_trunc == 'f' and items_auth_trigger == 'f' and items_auth_trunc == 'f', "TRIGGER and TRUNCATE revoked from anon and authenticated")
+
     # Verify GUC bypass is completely absent from database functions
     guard_source = scalar("SELECT prosrc FROM pg_proc WHERE oid='cr_order_private.guard_legacy_offer()'::regprocedure")
     check("NO_GUC_BYPASS_IN_GUARD", "staff_capture_in_progress" not in guard_source, "No session config bypass in trigger")
 
     rpc_source = scalar("SELECT prosrc FROM pg_proc WHERE oid='public.capture_staff_existing_order(uuid,jsonb)'::regprocedure")
     check("NO_GUC_BYPASS_IN_RPC", "staff_capture_in_progress" not in rpc_source, "No session config setting in RPC")
+
+    # Verify PG_CONTEXT is completely removed from guard_legacy_offer
+    check("NO_PG_CONTEXT_IN_GUARD", "PG_CONTEXT" not in guard_source, "No call stack inspection in trigger guard")
 
     # Verify guard owner is cr_order_writer
     guard_owner = scalar("SELECT pg_get_userbyid(proowner) FROM pg_proc WHERE oid='cr_order_private.guard_legacy_offer()'::regprocedure")
@@ -176,64 +189,116 @@ try:
     def state():
         return scalar("SELECT concat((SELECT count(*) FROM orders),':',(SELECT count(*) FROM order_items),':',(SELECT count(*) FROM audit_log WHERE entity_type='order'))")
 
-    def run_order(lines, autoConfirm=False, actor=U, tenant=T):
-        payload = {"customerId": C, "weekStart": "2026-10-12", "autoConfirm": autoConfirm, "lines": lines}
-        enc = json.dumps(payload).replace("'", "''")
-        call_sql = f"""
-        SET SESSION AUTHORIZATION authenticated;
-        SELECT set_config('request.jwt.claim.sub','{actor}',false);
-        SELECT public.capture_staff_existing_order('{tenant}'::uuid,'{enc}'::jsonb);
+    # Helpers for Canonical V2 Quote & Commit Flow
+    comm_ctx = {
+        "active": True,
+        "mode": "individual_line_pricing_v1",
+        "policyHash": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+    }
+
+    def v2_quote_and_commit(lines, request_id, actor=U, tenant=T, customer=C, autoConfirm=False):
+        cmd = {
+            "operation": "capture",
+            "customer": {"kind": "existing", "id": customer},
+            "weekStart": "2026-10-12",
+            "lines": lines,
+            "autoConfirm": autoConfirm
+        }
+        issue_sql = f"""
+        SET ROLE service_role;
+        SELECT public.cr_order_offer_quote_issue(
+          '{tenant}'::uuid,
+          '{actor}'::uuid,
+          '{request_id}'::uuid,
+          '{json.dumps(cmd)}'::jsonb,
+          '{json.dumps(comm_ctx)}'::jsonb
+        );
         """
-        return sql(call_sql, ok=False)
+        r_issue = sql(issue_sql, ok=False)
+        if r_issue.returncode != 0:
+            return r_issue, None
+        quote = json.loads(r_issue.stdout.strip().splitlines()[-1])
+        quote_id = quote["quoteId"]
 
-    # 1. Test Dessert @ 3.50 WITHOUT override: auto-resolved by server to 3.50 via authorized RPC
-    r1 = run_order([{"dishId": dish_map["postre_2026-10-13"], "dayDate": "2026-10-13", "qty": 1}])
-    check("EXPLICIT_SLOT_3_50_AUTO_RESOLVED", r1.returncode == 0 and json.loads(r1.stdout.strip().splitlines()[-1])["total"] == 3.50, "Dessert captured at commercial 3.50 without client override")
+        commit_sql = f"""
+        SET ROLE service_role;
+        SELECT public.cr_order_offer_quote_commit(
+          '{tenant}'::uuid,
+          '{actor}'::uuid,
+          '{request_id}'::uuid,
+          '{quote_id}'::uuid,
+          '{json.dumps(cmd)}'::jsonb,
+          '{json.dumps(comm_ctx)}'::jsonb
+        );
+        """
+        r_commit = sql(commit_sql, ok=False)
+        return r_commit, quote
 
-    # 2. Test Dessert @ 3.50 WITH override: client sends 3.50, server validates and accepts via authorized RPC
-    r2 = run_order([{"dishId": dish_map["postre_2026-10-13"], "dayDate": "2026-10-13", "qty": 1, "unitPriceOverride": 3.50}])
-    check("EXPLICIT_SLOT_3_50_WITH_MATCHING_OVERRIDE", r2.returncode == 0 and json.loads(r2.stdout.strip().splitlines()[-1])["total"] == 3.50, "Dessert captured at commercial 3.50 with matching override")
+    # 1. Test Canonical V2: Dessert @ 3.50 auto-quoted and committed
+    req1 = "a1000000-0000-4000-8000-000000000001"
+    r1, q1 = v2_quote_and_commit(
+        [{"kind": "dish", "dishId": dish_map["postre_2026-10-13"], "dayDate": "2026-10-13", "qty": 1}],
+        req1,
+        autoConfirm=False
+    )
+    check("CANONICAL_V2_DESSERT_QUOTED_3_50", q1 is not None and q1["total"] == "3.50", f"Quote total is 3.50 (got {q1['total'] if q1 else 'None'})")
+    check("CANONICAL_V2_DESSERT_COMMITTED_3_50", r1.returncode == 0 and json.loads(r1.stdout.strip().splitlines()[-1])["order"]["total"] == 3.50, "Order committed at 3.50 €")
 
-    # 3. Test TAMPERING: Client attempts 0.01 € on Main dish (published 11.90 €)
-    st_before = state()
-    r3 = run_order([{"dishId": dish_map["main_2026-10-13_1"], "dayDate": "2026-10-13", "qty": 1, "unitPriceOverride": 0.01}])
-    check("TAMPERED_PRICE_0_01_REJECTED", r3.returncode != 0 and "STAFF_ORDER_PRICE_MISMATCH" in r3.stderr and state() == st_before, "Tampered 0.01 € rejected atomically")
+    # 2. Test Canonical V2 Idempotency: Replaying exact same request ID succeeds with replayed = True
+    commit_replay_sql = f"""
+    SET ROLE service_role;
+    SELECT public.cr_order_offer_quote_commit(
+      '{T}'::uuid,
+      '{U}'::uuid,
+      '{req1}'::uuid,
+      '{q1["quoteId"]}'::uuid,
+      '{json.dumps({"operation": "capture", "customer": {"kind": "existing", "id": C}, "weekStart": "2026-10-12", "lines": [{"kind": "dish", "dishId": dish_map["postre_2026-10-13"], "dayDate": "2026-10-13", "qty": 1}], "autoConfirm": False})}'::jsonb,
+      '{json.dumps(comm_ctx)}'::jsonb
+    );
+    """
+    r_replay = sql(commit_replay_sql, ok=False)
+    res_replay = json.loads(r_replay.stdout.strip().splitlines()[-1])
+    check("CANONICAL_V2_IDEMPOTENCY_REPLAYED", r_replay.returncode == 0 and res_replay.get("replayed") is True, "Idempotent replay returned replayed: true")
 
-    # 4. Test TAMPERING: Client attempts to pay Catalog price (2.50 €) on Dessert (published 3.50 €)
-    st_before = state()
-    r4 = run_order([{"dishId": dish_map["postre_2026-10-13"], "dayDate": "2026-10-13", "qty": 1, "unitPriceOverride": 2.50}])
-    check("TAMPERED_CATALOG_PRICE_REJECTED", r4.returncode != 0 and "STAFF_ORDER_PRICE_MISMATCH" in r4.stderr and state() == st_before, "Tampered 2.50 € catalog price rejected on 3.50 € slot")
+    # 3. Test Canonical V2: Request ID conflict when tampering payload with same request_id
+    tampered_cmd = {"operation": "capture", "customer": {"kind": "existing", "id": C}, "weekStart": "2026-10-12", "lines": [{"kind": "dish", "dishId": dish_map["postre_2026-10-13"], "dayDate": "2026-10-13", "qty": 2}], "autoConfirm": False}
+    commit_conflict_sql = f"""
+    SET ROLE service_role;
+    SELECT public.cr_order_offer_quote_commit(
+      '{T}'::uuid,
+      '{U}'::uuid,
+      '{req1}'::uuid,
+      '{q1["quoteId"]}'::uuid,
+      '{json.dumps(tampered_cmd)}'::jsonb,
+      '{json.dumps(comm_ctx)}'::jsonb
+    );
+    """
+    r_conflict = sql(commit_conflict_sql, ok=False)
+    check("CANONICAL_V2_REQUEST_ID_CONFLICT_REJECTED", r_conflict.returncode != 0 and ("QUOTE_INPUT_MISMATCH" in r_conflict.stderr or "REQUEST_ID_CONFLICT" in r_conflict.stderr), "Tampered payload with committed request ID rejected")
 
-    # 5. Full combo order: 1 Main (11.90) + 1 Crema (2.50) + 1 Postre (3.50) + 1 Zumo (2.50) = 20.40 €
+    # 4. Test Canonical V2 Full Combo Order: 1 Main (11.90) + 1 Crema (2.50) + 1 Postre (3.50) + 1 Zumo (2.50) = 20.40 €
+    req4 = "a1000000-0000-4000-8000-000000000004"
     combo = [
-        {"dishId": dish_map["main_2026-10-14_1"], "dayDate": "2026-10-14", "qty": 1},
-        {"dishId": dish_map["crema_2026-10-14"], "dayDate": "2026-10-14", "qty": 1},
-        {"dishId": dish_map["postre_2026-10-14"], "dayDate": "2026-10-14", "qty": 1},
-        {"dishId": dish_map["zumo_2026-10-14"], "dayDate": "2026-10-14", "qty": 1},
+        {"kind": "dish", "dishId": dish_map["main_2026-10-14_1"], "dayDate": "2026-10-14", "qty": 1},
+        {"kind": "dish", "dishId": dish_map["crema_2026-10-14"], "dayDate": "2026-10-14", "qty": 1},
+        {"kind": "dish", "dishId": dish_map["postre_2026-10-14"], "dayDate": "2026-10-14", "qty": 1},
+        {"kind": "dish", "dishId": dish_map["zumo_2026-10-14"], "dayDate": "2026-10-14", "qty": 1},
     ]
-    r5 = run_order(combo, autoConfirm=False)
-    res5 = json.loads(r5.stdout.strip().splitlines()[-1])
-    check("FULL_COMBO_ORDER_TOTAL_20_40", r5.returncode == 0 and res5["total"] == 20.40 and res5["order"]["status"] == "draft", "Combo total 20.40 € accurately calculated")
+    r4, q4 = v2_quote_and_commit(combo, req4, autoConfirm=True)
+    res4 = json.loads(r4.stdout.strip().splitlines()[-1])
+    check("CANONICAL_V2_COMBO_ORDER_TOTAL_20_40", r4.returncode == 0 and res4["order"]["total"] == 20.40 and res4["order"]["status"] == "confirmed", "Combo total 20.40 € calculated and confirmed")
 
-    # 6. Test Atomic Rollback on invalid second line
-    st_before = state()
-    r6 = run_order([
-        {"dishId": dish_map["main_2026-10-13_1"], "dayDate": "2026-10-13", "qty": 1},
-        {"dishId": "44000000-0000-4000-8000-999999999999", "dayDate": "2026-10-13", "qty": 1},
-    ])
-    check("SECOND_LINE_FAILURE_ATOMIC_ROLLBACK", r6.returncode != 0 and state() == st_before, "Partial insert rolled back completely")
+    # 5. Test Unauthorized Actor (Customer role U2) cannot issue V2 quote
+    req5 = "a1000000-0000-4000-8000-000000000005"
+    r5, _ = v2_quote_and_commit([{"kind": "dish", "dishId": dish_map["main_2026-10-13_1"], "dayDate": "2026-10-13", "qty": 1}], req5, actor=U2, customer=C2)
+    check("CANONICAL_V2_UNAUTHORIZED_CUSTOMER_REJECTED", r5.returncode != 0 and "PERMISSION_DENIED" in r5.stderr, "Customer role cannot issue V2 quote for other customer")
 
-    # 7. Test Customer role rejected
-    st_before = state()
-    r7 = run_order([{"dishId": dish_map["main_2026-10-13_1"], "dayDate": "2026-10-13", "qty": 1}], actor=U2)
-    check("UNAUTHORIZED_CUSTOMER_REJECTED", r7.returncode != 0 and "STAFF_ORDER_PERMISSION_DENIED" in r7.stderr and state() == st_before, "Customer role rejected")
+    # 6. Test Foreign Tenant rejected in V2
+    req6 = "a1000000-0000-4000-8000-000000000006"
+    r6, _ = v2_quote_and_commit([{"kind": "dish", "dishId": dish_map["main_2026-10-13_1"], "dayDate": "2026-10-13", "qty": 1}], req6, tenant=T2)
+    check("CANONICAL_V2_FOREIGN_TENANT_REJECTED", r6.returncode != 0 and ("PERMISSION_DENIED" in r6.stderr or "TENANT_MISMATCH" in r6.stderr or "NOT_FOUND" in r6.stderr), "Foreign tenant rejected")
 
-    # 8. Test Foreign tenant rejected
-    st_before = state()
-    r8 = run_order([{"dishId": dish_map["main_2026-10-13_1"], "dayDate": "2026-10-13", "qty": 1}], tenant=T2)
-    check("FOREIGN_TENANT_REJECTED", r8.returncode != 0 and "STAFF_ORDER_TENANT_NOT_ENABLED" in r8.stderr and state() == st_before, "Foreign tenant rejected")
-
-    # 9. PRESERVATION OF V2 CONTRACT: Direct Legacy Writer attempting to insert an explicit offer
+    # 7. PRESERVATION OF V2 CONTRACT: Direct Legacy Writer attempting to insert an explicit offer
     # Even if unit_price matches 3.50 EXACTLY, direct legacy write MUST BE REJECTED with OFFER_PRICING_QUOTE_REQUIRED!
     st_before = state()
     direct_legacy_sql = f"""
@@ -249,7 +314,7 @@ try:
     r_direct = sql(direct_legacy_sql, ok=False)
     check("DIRECT_LEGACY_WRITER_EXPLICIT_OFFER_STRICTLY_REJECTED", r_direct.returncode != 0 and "OFFER_PRICING_QUOTE_REQUIRED" in r_direct.stderr and state() == st_before, "Direct legacy insert of explicit offer strictly rejected with OFFER_PRICING_QUOTE_REQUIRED even if matching price")
 
-    # 10. Direct Legacy Writer attempting tampered price 0.01 also strictly rejected
+    # 8. Direct Legacy Writer attempting tampered price 0.01 also strictly rejected
     direct_legacy_tampered = f"""
     BEGIN;
     SET SESSION AUTHORIZATION authenticated;
@@ -263,23 +328,22 @@ try:
     r_direct_tampered = sql(direct_legacy_tampered, ok=False)
     check("DIRECT_LEGACY_WRITER_TAMPERED_PRICE_STRICTLY_REJECTED", r_direct_tampered.returncode != 0 and "OFFER_PRICING_QUOTE_REQUIRED" in r_direct_tampered.stderr and state() == st_before, "Direct legacy insert with 0.01 strictly rejected with OFFER_PRICING_QUOTE_REQUIRED")
 
-    # 11. Test Ambiguous Duplicate Slots with Different Prices for Same Dish and Date
-    # Inserting a second slot for same menu, dish, date but different price (e.g. 4.50)
+    # 9. Test Ambiguous Duplicate Slots with Different Prices for Same Dish and Date
     sql(f"INSERT INTO weekly_menu_slots(weekly_menu_id, tenant_id, day_date, dish_id, unit_price) VALUES('55000000-0000-4000-8000-000000000001', '{T}', '2026-10-15', '{dish_map['postre_2026-10-15']}', 4.50);")
-
-    # Both the authorized RPC and the trigger guard must detect n > 1 and reject with OFFER_AMBIGUOUS!
-    st_before = state()
-    r_ambig = run_order([{"dishId": dish_map["postre_2026-10-15"], "dayDate": "2026-10-15", "qty": 1}])
-    check("AMBIGUOUS_DUPLICATE_SLOTS_REJECTED", r_ambig.returncode != 0 and "OFFER_AMBIGUOUS" in r_ambig.stderr and state() == st_before, "Two slots with different prices for same dish/day rejected as OFFER_AMBIGUOUS")
-
-    # Clean up duplicate slot to restore exact catalog state
+    req9 = "a1000000-0000-4000-8000-000000000009"
+    r9, _ = v2_quote_and_commit([{"kind": "dish", "dishId": dish_map["postre_2026-10-15"], "dayDate": "2026-10-15", "qty": 1}], req9)
+    check("AMBIGUOUS_DUPLICATE_SLOTS_REJECTED", r9.returncode != 0 and "OFFER_AMBIGUOUS" in r9.stderr, "Two slots with different prices for same dish/day rejected as OFFER_AMBIGUOUS in V2")
     sql(f"DELETE FROM weekly_menu_slots WHERE tenant_id='{T}' AND day_date='2026-10-15' AND dish_id='{dish_map['postre_2026-10-15']}' AND unit_price=4.50;")
 
-    # 12. Count persisted orders: exactly 3 (r1=1, r2=1, r5=1; ambiguous order rolled back)
+    # 10. Verify persisted orders in DB: exactly 2 orders created (req1 and req4)
     orders_count = scalar(f"SELECT count(*) FROM orders WHERE tenant_id='{T}'")
-    check("PERSISTED_ORDERS_COUNT_EXACT", orders_count == "3", f"Orders count: {orders_count}")
+    check("PERSISTED_ORDERS_COUNT_EXACT", orders_count == "2", f"Orders count: {orders_count}")
 
-    print(json.dumps({"status": "EATCLEAN_DEFINITIVE_PRICING_PASS", "checks": checks, "totalSlotsVerified": 28}, indent=2))
+    # 11. Verify write_contract_version = 2 and revision tracking on persisted orders
+    v2_versions = scalar(f"SELECT count(*) FROM orders WHERE tenant_id='{T}' AND write_contract_version=2")
+    check("ALL_ORDERS_WRITE_CONTRACT_VERSION_2", v2_versions == "2", "All captured orders have write_contract_version = 2")
+
+    print(json.dumps({"status": "EATCLEAN_CANONICAL_V2_PRICING_PASS", "checks": checks, "totalSlotsVerified": 28}, indent=2))
 
 finally:
     if owned:
