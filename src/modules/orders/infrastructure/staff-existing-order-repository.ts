@@ -37,7 +37,9 @@ export function createStaffExistingOrderRepository(client: ServiceContext["supab
       if (error || !data)
         throw new DomainError(
           "INVALID_STATE",
-          "No se pudo guardar el pedido completo. No se reintentó la operación.",
+          error?.message
+            ? `No se pudo guardar el pedido completo: ${error.message}`
+            : "No se pudo guardar el pedido completo. No se reintentó la operación.",
         );
       return data;
     },

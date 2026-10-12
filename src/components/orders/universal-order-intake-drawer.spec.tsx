@@ -156,4 +156,14 @@ describe("UniversalOrderIntakeDrawer Component Rendering & Contract (CR-OPS-05)"
     // Multi-tenant parameter passing
     expect(source).toContain("fetchPublishedWeeklyMenu(tenantId!, weekStart)");
   });
+
+  it("resolves published weekly menu offer prices as authority over catalog prices", () => {
+    const filePath = path.resolve(__dirname, "./universal-order-intake-drawer.tsx");
+    const source = fs.readFileSync(filePath, "utf8");
+
+    expect(source).toContain("offerPriceMap = useMemo");
+    expect(source).toContain("publishedOfferPrice !== undefined");
+    expect(source).toContain("oferta semanal");
+  });
 });
+

@@ -553,6 +553,19 @@ export function UniversalOrderIntakeDrawer({
     return new Map(allDishes.map((d) => [d.id, d.price]));
   }, [allDishes]);
 
+  const offerPriceMap = useMemo(() => {
+    const map = new Map<string, number>();
+    if (!menuView) return map;
+    for (const day of menuView.days) {
+      if (day.offers) {
+        for (const offer of day.offers) {
+          map.set(`${offer.dayDate}:${offer.dishId}`, offer.effectivePrice);
+        }
+      }
+    }
+    return map;
+  }, [menuView]);
+
   // Compute live totals
   const { totalPortions, grandTotal } = useMemo(() => {
     let portions = 0;
@@ -563,9 +576,16 @@ export function UniversalOrderIntakeDrawer({
         if (qty > 0) {
           portions += qty;
           const override = priceOverrides[dayDate]?.[dishId];
-          const standardPrice = dishPriceMap.get(dishId);
+          const publishedOfferPrice = offerPriceMap.get(`${dayDate}:${dishId}`);
+          const catalogPrice = dishPriceMap.get(dishId);
           const effectivePrice =
-            override !== undefined ? override : standardPrice != null ? standardPrice : 0;
+            override !== undefined
+              ? override
+              : publishedOfferPrice !== undefined
+                ? publishedOfferPrice
+                : catalogPrice != null
+                  ? catalogPrice
+                  : 0;
           total += effectivePrice * qty;
         }
       }
@@ -574,7 +594,7 @@ export function UniversalOrderIntakeDrawer({
       totalPortions: portions,
       grandTotal: Math.round(total * 100) / 100,
     };
-  }, [quantities, priceOverrides, dishPriceMap]);
+  }, [quantities, priceOverrides, dishPriceMap, offerPriceMap]);
 
   // Submit Order
   const buildCustomCommand = (autoConfirm: boolean): CanonicalOrderCommand => {
@@ -651,10 +671,18 @@ export function UniversalOrderIntakeDrawer({
         if (qty > 0) {
           const comment = comments[dayDate]?.[dishId]?.trim() || null;
           const override = priceOverrides[dayDate]?.[dishId];
+          const publishedOfferPrice = offerPriceMap.get(`${dayDate}:${dishId}`);
           const catalogDish = allDishes.find((d) => d.id === dishId);
-          if (catalogDish && catalogDish.price === null && override === undefined) {
+          const resolvedPrice =
+            override !== undefined
+              ? override
+              : publishedOfferPrice !== undefined
+                ? publishedOfferPrice
+                : catalogDish?.price ?? null;
+
+          if (resolvedPrice === null) {
             toast.error(
-              `El plato '${catalogDish.name}' no tiene precio asignado en el catálogo. Introduce un precio manual.`,
+              `El plato '${catalogDish?.name ?? dishId}' no tiene precio asignado en la oferta ni en el catálogo. Introduce un precio manual.`,
             );
             return;
           }
@@ -663,7 +691,12 @@ export function UniversalOrderIntakeDrawer({
             dishId,
             qty,
             comment,
-            unitPriceOverride: override !== undefined ? override : null,
+            unitPriceOverride:
+              override !== undefined
+                ? override
+                : publishedOfferPrice !== undefined
+                  ? publishedOfferPrice
+                  : null,
           });
         }
       }
@@ -1292,20 +1325,42 @@ export function UniversalOrderIntakeDrawer({
                                         allergens={dish.allergens}
                                         showDeclared
                                       />
-                                      {dish.price !== null && dish.price > 0 ? (
-                                        <p className="text-xs text-muted-foreground font-mono">
-                                          {dish.price.toFixed(2)} € / ración
-                                        </p>
-                                      ) : dish.price === 0 ? (
-                                        <p className="text-xs text-muted-foreground font-mono">
-                                          0,00 € (Sin coste)
-                                        </p>
-                                      ) : (
-                                        <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
-                                          ⚠️ Precio no asignado (Requiere ajuste)
-                                        </p>
-                                      )}
-                                    </div>
+                                      {(() => {
+                                        const publishedOfferPrice = offerPriceMap.get(
+                                          `${d.date}:${dish.id}`,
+                                        );
+                                        const displayPrice =
+                                          publishedOfferPrice !== undefined
+                                            ? publishedOfferPrice
+                                            : dish.price;
+                                        if (displayPrice !== null && displayPrice > 0) {
+                                          return (
+                                            <p className="text-xs text-muted-foreground font-mono">
+                                              {displayPrice.toFixed(2)} € / ración
+                                              {publishedOfferPrice !== undefined &&
+                                                dish.price !== null &&
+                                                publishedOfferPrice !== dish.price && (
+                                                  <span className="text-[10px] text-primary ml-1.5 font-sans font-medium">
+                                                    (oferta semanal)
+                                                  </span>
+                                                )}
+                                            </p>
+                                          );
+                                        }
+                                        if (displayPrice === 0) {
+                                          return (
+                                            <p className="text-xs text-muted-foreground font-mono">
+                                              0,00 € (Sin coste)
+                                            </p>
+                                          );
+                                        }
+                                        return (
+                                          <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+                                            ⚠️ Precio no asignado (Requiere ajuste)
+                                          </p>
+                                        );
+                                      })()}
+                                     </div>
                                   </div>
                                   <div className="flex items-center gap-2 shrink-0">
                                     <Button
