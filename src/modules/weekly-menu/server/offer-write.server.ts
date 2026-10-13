@@ -9,7 +9,7 @@ import { can } from "@/permissions";
 import { DomainError } from "@/domain/errors";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getTenantOffers } from "@/modules/commercial";
-import brand from "@/tenant/resources/brand.json";
+import { resolveServerInstanceRuntimeConfig } from "@/lib/instance-runtime-boundary";
 import "@/tenant/commercial-config";
 import type { Json } from "@/integrations/supabase/types";
 import type { OfferWriteRequest } from "../application/offer-write-input";
@@ -22,15 +22,25 @@ type RpcCall = (
   parameters: Record<string, Json>,
 ) => Promise<{ data: Json | null; error: { message: string } | null }>;
 
-/** Verified DB identity and explicit build configuration, never a client tenant slug/tier. */
+/** Verified DB identity and server instance binding, strictly rejecting cross-instance requests. */
 export async function verifiedOrderActorContext(actor: VerifiedOfferActor, tenantId: string) {
+  const serverConfig = resolveServerInstanceRuntimeConfig();
+
   const tenant = await actor.supabase
     .from("tenants")
     .select("id,slug")
     .eq("id", tenantId)
     .maybeSingle();
-  if (tenant.error || !tenant.data || tenant.data.slug !== brand.slug)
+
+  if (tenant.error || !tenant.data)
     throw new DomainError("TENANT_MISMATCH", "Tenant does not match this configured server");
+
+  // Strict physical & logical boundary: The request tenant must match this server's bound tenant.
+  // The demo server (yourmeal-os) only serves yourmeal-os and strictly rejects eatclean.
+  // The eatclean customer server only serves eatclean and strictly rejects yourmeal-os.
+  if (tenant.data.slug !== serverConfig.tenantSlug)
+    throw new DomainError("TENANT_MISMATCH", "Tenant does not match this configured server");
+
   const membership = await actor.supabase
     .from("tenant_members")
     .select("status")
@@ -62,8 +72,23 @@ export async function verifiedOrderActorContext(actor: VerifiedOfferActor, tenan
 
 export async function offerCommercialContext(actor: VerifiedOfferActor, tenantId: string) {
   const { tenant } = await verifiedOrderActorContext(actor, tenantId);
+  const serverConfig = resolveServerInstanceRuntimeConfig();
   if (!Array.isArray(bundledCommercial))
     throw new OfferWriteRpcError("COMMERCIAL_CONTEXT_UNAVAILABLE");
+
+  // Commercial configuration is strictly registered within the authorized instance context.
+  // The Core Demo server is never contaminated with EatClean instance configuration.
+  if (
+    serverConfig.tenantSlug === "eatclean" &&
+    tenant.slug === "eatclean" &&
+    !hasRegisteredTenantOffers("eatclean")
+  ) {
+    const { registerEatCleanCommercialOffers } = await import(
+      "../../../../instances/yourmeal-eatclean/config/commercial.config"
+    );
+    registerEatCleanCommercialOffers();
+  }
+
   const offers = getTenantOffers(tenant.slug);
   if (!hasRegisteredTenantOffers(tenant.slug))
     throw new OfferWriteRpcError("COMMERCIAL_CONTEXT_UNAVAILABLE");
@@ -82,17 +107,17 @@ export async function offerCommercialContext(actor: VerifiedOfferActor, tenantId
     throw new OfferWriteRpcError("COMMERCIAL_CONTEXT_UNAVAILABLE");
 
   // Determine commercial mode server-side:
-  // Individual menu / independent à-la-carte:
-  // - single active offer or explicit individual menu
-  // - pricingModel = per_unit
-  // - no promotions
-  const isIndividualMode =
-    offers.length === 1 &&
-    offers[0]?.code === "individual_menu" &&
-    offers[0]?.pricingModel === "per_unit" &&
-    (!offers[0]?.promotions || offers[0]?.promotions.length === 0);
+  // Individual menu / independent à-la-carte requires an explicit registered
+  // individual_menu offer with pricingModel = per_unit and no promotions.
+  // Never automatically authorize from an empty offers list.
+  const hasIndividualOffer = offers.some(
+    (offer) =>
+      offer.code === "individual_menu" &&
+      offer.pricingModel === "per_unit" &&
+      (!offer.promotions || offer.promotions.length === 0),
+  );
 
-  const mode = isIndividualMode ? "individual_line_pricing_v1" : "weekly_plan";
+  const mode = hasIndividualOffer ? "individual_line_pricing_v1" : "weekly_plan";
 
   const policy = JSON.stringify({ tenantId, tenantSlug: tenant.slug, mode, offers });
   const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(policy));
@@ -278,3 +303,72 @@ export async function runVerifiedOfferWrite(
     customLines,
   };
 }
+
+/**
+ * Reconciles an uncertain in-flight order capture using the PostgreSQL canonical idempotency ledger.
+ * Determines whether the request ID was already committed in the database or never published.
+ */
+export async function runVerifiedOfferReconciliation(
+  actor: VerifiedOfferActor,
+  tenantId: string,
+  requestId: string,
+) {
+  await verifiedOrderActorContext(actor, tenantId);
+
+  // Check the PostgreSQL canonical idempotency ledger (order_write_requests)
+  const { data: requestRow, error: requestError } = await supabaseAdmin
+    .from("order_write_requests")
+    .select("order_id, committed_revision, operation, created_at")
+    .eq("tenant_id", tenantId)
+    .eq("request_id", requestId)
+    .maybeSingle();
+
+  if (requestError) {
+    throw new DomainError("LEDGER_QUERY_FAILED", "Failed to query canonical order ledger");
+  }
+
+  if (!requestRow?.order_id) {
+    // Ledger has no confirmed row for this requestId.
+    // NEVER assume the operation died or unlock automatically based on timers:
+    // a network delay or slow transaction could still be in-flight.
+    // Lock must remain active on the client.
+    return {
+      reconciled: false,
+      committed: false,
+      requestId,
+      order: null,
+      reason: "LEDGER_RECORD_NOT_FOUND",
+    };
+  }
+
+  // Fetch the committed order details from public.orders using column 'total' (NOT 'total_amount')
+  const { data: orderRow, error: orderError } = await supabaseAdmin
+    .from("orders")
+    .select("id, status, total, created_at")
+    .eq("tenant_id", tenantId)
+    .eq("id", requestRow.order_id)
+    .maybeSingle();
+
+  if (orderError || !orderRow) {
+    // Ledger entry is confirmed, but reading public.orders failed.
+    // NEVER synthesize draft or total=0 as verified data.
+    // Preserve the lock and report the reconciliation failure.
+    throw new DomainError(
+      "RECONCILIATION_ORDER_FETCH_FAILED",
+      "Order ledger record confirmed, but order row could not be read. Lock preserved.",
+    );
+  }
+
+  return {
+    reconciled: true,
+    committed: true,
+    requestId,
+    order: {
+      id: orderRow.id,
+      status: orderRow.status,
+      total: Number(orderRow.total),
+      createdAt: orderRow.created_at,
+    },
+  };
+}
+

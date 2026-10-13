@@ -9,7 +9,7 @@ import {
 import type { CanonicalOrderCommand } from "@/modules/orders/domain/canonical-order-write";
 import type { CanonicalOrderWriteResult } from "@/modules/orders/infrastructure/canonical-order-write-repository";
 import { DishAllergenDeclaration } from "@/components/operations/dish-allergen-declaration";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   Calendar,
@@ -59,9 +59,20 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
+  isEatCleanContext,
   isEatCleanStaffOrderCaptureFrozen,
   EATCLEAN_PARTIAL_LAUNCH_CONFIG,
 } from "@/config/eatclean-partial-launch";
+import {
+  createCustomCaptureSession,
+  customCaptureTransport,
+} from "@/modules/orders/application/custom-order-capture-service";
+import {
+  getPendingCaptureToken,
+  savePendingCaptureToken,
+  clearPendingCaptureToken,
+  type PendingCaptureToken,
+} from "@/modules/orders/application/pending-capture-recovery";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -183,9 +194,25 @@ export function UniversalOrderIntakeDrawer({
   const customEnabled = useCustomOrderCapture(demandChannel);
   const [customItems, setCustomItems] = useState<CustomItemDraft[]>([]);
   const [canonicalLocked, setCanonicalLocked] = useState(false);
+  const captureSessionRef = useRef<ReturnType<typeof createCustomCaptureSession> | undefined>(
+    undefined,
+  );
 
   const [orderNotes, setOrderNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [pendingRecovery, setPendingRecovery] = useState<PendingCaptureToken | null>(() => {
+    return open && tenantId ? getPendingCaptureToken(tenantId) : null;
+  });
+  const [reconciling, setReconciling] = useState(false);
+
+  useEffect(() => {
+    if (open && tenantId) {
+      const token = getPendingCaptureToken(tenantId);
+      setPendingRecovery(token);
+    } else if (!open) {
+      setPendingRecovery(null);
+    }
+  }, [open, tenantId]);
 
   // CR-CUST-01 Dietary Profile State
   const [customerDietaryProfile, setCustomerDietaryProfile] =
@@ -553,6 +580,19 @@ export function UniversalOrderIntakeDrawer({
     return new Map(allDishes.map((d) => [d.id, d.price]));
   }, [allDishes]);
 
+  const offerPriceMap = useMemo(() => {
+    const map = new Map<string, number>();
+    if (!menuView) return map;
+    for (const day of menuView.days) {
+      if (day.offers) {
+        for (const offer of day.offers) {
+          map.set(`${offer.dayDate}:${offer.dishId}`, offer.effectivePrice);
+        }
+      }
+    }
+    return map;
+  }, [menuView]);
+
   // Compute live totals
   const { totalPortions, grandTotal } = useMemo(() => {
     let portions = 0;
@@ -563,9 +603,16 @@ export function UniversalOrderIntakeDrawer({
         if (qty > 0) {
           portions += qty;
           const override = priceOverrides[dayDate]?.[dishId];
-          const standardPrice = dishPriceMap.get(dishId);
+          const publishedOfferPrice = offerPriceMap.get(`${dayDate}:${dishId}`);
+          const catalogPrice = dishPriceMap.get(dishId);
           const effectivePrice =
-            override !== undefined ? override : standardPrice != null ? standardPrice : 0;
+            override !== undefined
+              ? override
+              : publishedOfferPrice !== undefined
+                ? publishedOfferPrice
+                : catalogPrice != null
+                  ? catalogPrice
+                  : 0;
           total += effectivePrice * qty;
         }
       }
@@ -574,7 +621,7 @@ export function UniversalOrderIntakeDrawer({
       totalPortions: portions,
       grandTotal: Math.round(total * 100) / 100,
     };
-  }, [quantities, priceOverrides, dishPriceMap]);
+  }, [quantities, priceOverrides, dishPriceMap, offerPriceMap]);
 
   // Submit Order
   const buildCustomCommand = (autoConfirm: boolean): CanonicalOrderCommand => {
@@ -622,8 +669,57 @@ export function UniversalOrderIntakeDrawer({
     };
   };
 
+  const handleReconcilePending = async () => {
+    if (!pendingRecovery || !tenantId) return;
+    setReconciling(true);
+    try {
+      const { reconcileOfferOrder } = await import(
+        "@/modules/weekly-menu/application/offer-write.functions"
+      );
+      const result = await reconcileOfferOrder({
+        data: {
+          tenantId,
+          requestId: pendingRecovery.requestId,
+        },
+      });
+      if (result.committed && result.order) {
+        toast.success(
+          `Pedido conciliado con éxito (#${result.order.id.slice(0, 8)}). Ya estaba registrado en el servidor.`,
+        );
+        clearPendingCaptureToken(tenantId);
+        setPendingRecovery(null);
+        captureSessionRef.current = undefined;
+        onSuccess?.({
+          order: { id: result.order.id, status: result.order.status } as any,
+          total: result.order.total,
+          orderId: result.order.id,
+        });
+        onOpenChange(false);
+      } else {
+        // Safe recovery: Never unlock automatically on missing ledger record.
+        // A delayed commit or network interruption means the outcome is still uncertain.
+        // The lock is strictly conserved to prevent duplicate orders.
+        toast.warning(
+          `Sin registro confirmado en el ledger (#${pendingRecovery.requestId.slice(0, 8)}). Se conserva el bloqueo para evitar pedidos duplicados. Comprueba de nuevo o realiza una conciliación administrativa.`,
+        );
+      }
+    } catch (err) {
+      toast.error(
+        err instanceof Error
+          ? `Error al conciliar: ${err.message}`
+          : "No se pudo contactar con el servidor. Se mantiene el bloqueo por seguridad.",
+      );
+    } finally {
+      setReconciling(false);
+    }
+  };
+
   const handleSubmit = async (autoConfirm: boolean) => {
     if (!user || !tenantId) return;
+    if (pendingRecovery) {
+      toast.error("Concilia la operación pendiente con el servidor antes de crear otra captura.");
+      return;
+    }
     if (customItems.length) {
       toast.error("Los personalizados requieren el envío canónico.");
       return;
@@ -644,6 +740,19 @@ export function UniversalOrderIntakeDrawer({
       return;
     }
 
+    const isEatClean = isEatCleanContext(tenantId);
+    if (isEatClean) {
+      const hasOverrides = Object.values(priceOverrides).some((byDish) =>
+        Object.values(byDish).some((p) => p !== undefined),
+      );
+      if (hasOverrides) {
+        toast.error(
+          "Retira los precios manuales de platos antes de registrar un pedido con precios oficiales.",
+        );
+        return;
+      }
+    }
+
     // Build Lines
     const lines: UniversalOrderCaptureLineInput[] = [];
     for (const [dayDate, dayQtyMap] of Object.entries(quantities)) {
@@ -651,10 +760,18 @@ export function UniversalOrderIntakeDrawer({
         if (qty > 0) {
           const comment = comments[dayDate]?.[dishId]?.trim() || null;
           const override = priceOverrides[dayDate]?.[dishId];
+          const publishedOfferPrice = offerPriceMap.get(`${dayDate}:${dishId}`);
           const catalogDish = allDishes.find((d) => d.id === dishId);
-          if (catalogDish && catalogDish.price === null && override === undefined) {
+          const resolvedPrice =
+            override !== undefined
+              ? override
+              : publishedOfferPrice !== undefined
+                ? publishedOfferPrice
+                : catalogDish?.price ?? null;
+
+          if (resolvedPrice === null) {
             toast.error(
-              `El plato '${catalogDish.name}' no tiene precio asignado en el catálogo. Introduce un precio manual.`,
+              `El plato '${catalogDish?.name ?? dishId}' no tiene precio asignado en la oferta ni en el catálogo. Introduce un precio manual.`,
             );
             return;
           }
@@ -663,7 +780,13 @@ export function UniversalOrderIntakeDrawer({
             dishId,
             qty,
             comment,
-            unitPriceOverride: override !== undefined ? override : null,
+            unitPriceOverride: isEatClean
+              ? undefined
+              : override !== undefined
+                ? override
+                : publishedOfferPrice !== undefined
+                  ? publishedOfferPrice
+                  : null,
           });
         }
       }
@@ -723,17 +846,74 @@ export function UniversalOrderIntakeDrawer({
           : null,
       };
 
-      const result = await StaffOrderCaptureService.captureOrder(ctx, dto);
+      const captureSession = (captureSessionRef.current ??= createCustomCaptureSession(
+        await customCaptureTransport(),
+      ));
+
+      const result = await StaffOrderCaptureService.captureOrder(ctx, dto, {
+        session: captureSession,
+        beforeCommit: (preparedSession) => {
+          const canonicalRequestId = preparedSession.review?.request?.requestId;
+          if (!canonicalRequestId) {
+            throw new Error("CANNOT_COMMIT_WITHOUT_CANONICAL_REQUEST_ID");
+          }
+          // Persist minimal recovery token with the exact canonical requestId before commit is invoked.
+          // Throws StoragePersistenceError if localStorage is unavailable or write cannot be verified,
+          // which immediately aborts commit. Zero customer personal names or PII stored.
+          savePendingCaptureToken({
+            requestId: canonicalRequestId,
+            tenantId,
+            customerId: customerMode === "new" ? "new_customer_placeholder" : selectedCustomerId,
+            weekStart,
+            lineCount: lines.length,
+            timestamp: new Date().toISOString(),
+          });
+        },
+      });
+
+      // Clear the pending token on successful commit
+      clearPendingCaptureToken(tenantId);
+      captureSessionRef.current = undefined;
+      setPendingRecovery(null);
 
       toast.success(
         autoConfirm
           ? `Pedido confirmado con éxito (#${result.order.id.slice(0, 8)}) por ${result.total.toFixed(2)} €`
-          : `Borrador de pedido guardado (#${result.order.id.slice(0, 8)})`,
+          : `Borrador de pedido guardado (#${result.order.id.slice(0, 8)}) por ${result.total.toFixed(2)} €`,
       );
 
       onSuccess?.(result);
       onOpenChange(false);
     } catch (e) {
+      const isKnownNonPublishedError =
+        e instanceof Error &&
+        ([
+          "OFFER_PRICING_OVERRIDE_UNSUPPORTED",
+          "CUSTOM_NOT_ENABLED",
+          "PRICE_CHANGED",
+          "QUOTE_INPUT_MISMATCH",
+          "PERMISSION_DENIED",
+          "ORDER_CLOSED",
+          "PRICE_UNAVAILABLE",
+          "OFFER_NOT_FOUND",
+          "OFFER_AMBIGUOUS",
+          "COMMERCIAL_QUOTE_REQUIRED",
+          "TENANT_MISMATCH",
+          "STORAGE_PERSISTENCE_FAILED",
+        ].includes(e.message) ||
+          e.name === "StoragePersistenceError" ||
+          e.message.startsWith("Failed to persist recovery token") ||
+          e.message.startsWith("LocalStorage is not available"));
+
+      if (isKnownNonPublishedError) {
+        clearPendingCaptureToken(tenantId);
+        setPendingRecovery(null);
+      } else {
+        // Uncertain error (e.g. network timeout or server dropped response)
+        // Keep pending token and refresh state so drawer locks against new distinct captures
+        const token = getPendingCaptureToken(tenantId);
+        setPendingRecovery(token);
+      }
       toast.error(e instanceof Error ? e.message : "Error al procesar el pedido");
     } finally {
       setSubmitting(false);
@@ -806,6 +986,47 @@ export function UniversalOrderIntakeDrawer({
           data-testid="order-capture-scroll"
           inert={canonicalLocked}
         >
+          {pendingRecovery && (
+            <div
+              data-testid="pending-capture-reconciliation-alert"
+              className="m-4 sm:m-6 mb-0 p-4 rounded-xl border border-destructive/40 bg-destructive/10 text-destructive dark:text-red-300 text-xs"
+            >
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+                <div className="space-y-2 flex-1">
+                  <p className="font-bold text-sm">
+                    Captura previa con resultado incierto detectada (#{pendingRecovery.requestId.slice(0, 8)})
+                  </p>
+                  <p className="text-[11px] leading-relaxed opacity-90">
+                    Se registró un intento de confirmación previo para{" "}
+                    <strong>el cliente (#{pendingRecovery.customerId.slice(0, 8)})</strong> (Semana {pendingRecovery.weekStart}) cuya respuesta del servidor quedó interrumpida. Para prevenir pedidos duplicados en el ledger canónico, las nuevas capturas están bloqueadas hasta que el servidor confirme el pedido.
+                  </p>
+                  <p className="text-[11px] leading-relaxed opacity-80">
+                    Si el ledger no contiene el pedido tras comprobar el estado, contacta con el administrador del sistema para verificar los registros del servidor antes de iniciar una nueva captura.
+                  </p>
+                  <div className="flex items-center gap-2 pt-1">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="destructive"
+                      className="text-xs h-7 gap-1.5"
+                      disabled={reconciling}
+                      onClick={handleReconcilePending}
+                    >
+                      {reconciling ? (
+                        <>
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          Comprobando servidor...
+                        </>
+                      ) : (
+                        "Comprobar estado en servidor"
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           {isTenantCaptureFrozen && (
             <div className="m-4 sm:m-6 mb-0 p-4 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-800 dark:text-amber-200 text-xs">
               <p className="font-bold mb-1">{EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage}</p>
@@ -1292,20 +1513,42 @@ export function UniversalOrderIntakeDrawer({
                                         allergens={dish.allergens}
                                         showDeclared
                                       />
-                                      {dish.price !== null && dish.price > 0 ? (
-                                        <p className="text-xs text-muted-foreground font-mono">
-                                          {dish.price.toFixed(2)} € / ración
-                                        </p>
-                                      ) : dish.price === 0 ? (
-                                        <p className="text-xs text-muted-foreground font-mono">
-                                          0,00 € (Sin coste)
-                                        </p>
-                                      ) : (
-                                        <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
-                                          ⚠️ Precio no asignado (Requiere ajuste)
-                                        </p>
-                                      )}
-                                    </div>
+                                      {(() => {
+                                        const publishedOfferPrice = offerPriceMap.get(
+                                          `${d.date}:${dish.id}`,
+                                        );
+                                        const displayPrice =
+                                          publishedOfferPrice !== undefined
+                                            ? publishedOfferPrice
+                                            : dish.price;
+                                        if (displayPrice !== null && displayPrice > 0) {
+                                          return (
+                                            <p className="text-xs text-muted-foreground font-mono">
+                                              {displayPrice.toFixed(2)} € / ración
+                                              {publishedOfferPrice !== undefined &&
+                                                dish.price !== null &&
+                                                publishedOfferPrice !== dish.price && (
+                                                  <span className="text-[10px] text-primary ml-1.5 font-sans font-medium">
+                                                    (oferta semanal)
+                                                  </span>
+                                                )}
+                                            </p>
+                                          );
+                                        }
+                                        if (displayPrice === 0) {
+                                          return (
+                                            <p className="text-xs text-muted-foreground font-mono">
+                                              0,00 € (Sin coste)
+                                            </p>
+                                          );
+                                        }
+                                        return (
+                                          <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+                                            ⚠️ Precio no asignado (Requiere ajuste)
+                                          </p>
+                                        );
+                                      })()}
+                                     </div>
                                   </div>
                                   <div className="flex items-center gap-2 shrink-0">
                                     <Button
@@ -1438,7 +1681,7 @@ export function UniversalOrderIntakeDrawer({
                 variant="outline"
                 size="sm"
                 onClick={() => handleSubmit(false)}
-                disabled={submitting || totalPortions === 0 || isTenantCaptureFrozen}
+                disabled={submitting || totalPortions === 0 || isTenantCaptureFrozen || !!pendingRecovery}
                 className="shrink-0 text-xs"
               >
                 Guardar Borrador
@@ -1448,7 +1691,7 @@ export function UniversalOrderIntakeDrawer({
                 variant="default"
                 size="sm"
                 onClick={() => handleSubmit(true)}
-                disabled={submitting || totalPortions === 0 || isTenantCaptureFrozen}
+                disabled={submitting || totalPortions === 0 || isTenantCaptureFrozen || !!pendingRecovery}
                 className="gap-1.5 shrink-0 text-xs font-semibold"
               >
                 {submitting ? (

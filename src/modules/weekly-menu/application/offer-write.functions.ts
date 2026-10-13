@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { parseOfferCommitRequest, parseOfferWriteRequest } from "./offer-write-input";
 
@@ -39,3 +40,22 @@ export const commitCustomOrder = createServerFn({ method: "POST" })
       true,
     );
   });
+
+/** Reconciles an uncertain in-flight order capture using the PostgreSQL canonical idempotency ledger. */
+export const reconcileOfferOrder = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    z.object({
+      tenantId: z.string().uuid(),
+      requestId: z.string().uuid(),
+    }),
+  )
+  .handler(async ({ context, data }) => {
+    const { runVerifiedOfferReconciliation } = await import("../server/offer-write.server");
+    return runVerifiedOfferReconciliation(
+      { supabase: context.supabase, userId: context.userId },
+      data.tenantId,
+      data.requestId,
+    );
+  });
+

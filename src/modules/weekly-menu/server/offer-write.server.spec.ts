@@ -2,11 +2,21 @@ import { beforeEach, expect, it, vi } from "vitest";
 import { clearTenantOffersRegistry, registerTenantOffers } from "@/modules/commercial";
 import type { CommercialOffer } from "@/modules/commercial";
 import type { AppSupabase } from "@/services/types";
-import { offerCommercialContext, runVerifiedOfferWrite } from "./offer-write.server";
+import {
+  offerCommercialContext,
+  runVerifiedOfferWrite,
+  runVerifiedOfferReconciliation,
+} from "./offer-write.server";
 import { parseOfferWriteRequest } from "../application/offer-write-input";
 vi.mock("@/tenant/commercial-config", () => ({}));
 vi.mock("@/tenant/resources/brand.json", () => ({ default: { slug: "test-tenant" } }));
-vi.mock("@/integrations/supabase/client.server", () => ({ supabaseAdmin: { rpc: vi.fn() } }));
+const mockAdminFrom = vi.fn();
+vi.mock("@/integrations/supabase/client.server", () => ({
+  supabaseAdmin: {
+    rpc: vi.fn(),
+    from: (...args: unknown[]) => mockAdminFrom(...args),
+  },
+}));
 const tenantId = "10000000-0000-4000-8000-000000000001",
   userId = "20000000-0000-4000-8000-000000000001",
   quoteId = "60000000-0000-4000-8000-000000000001";
@@ -120,6 +130,55 @@ it("identifies individual_line_pricing_v1 mode for single per_unit unpromoted of
   const context = await offerCommercialContext(actor(), tenantId);
   expect(context.active).toBe(true);
   expect(context.mode).toBe("individual_line_pricing_v1");
+});
+it("server isolation: Demo server rejects EatClean requests", async () => {
+  const eatcleanTenantId = "8bba00ba-331b-42c8-9283-4e3836ffb870";
+  vi.stubEnv("TENANT_SLUG", "yourmeal-os");
+  try {
+    await expect(
+      offerCommercialContext(actor({ slug: "eatclean" }), eatcleanTenantId),
+    ).rejects.toMatchObject({
+      code: "TENANT_MISMATCH",
+    });
+  } finally {
+    vi.unstubAllEnvs();
+  }
+});
+it("server isolation: EatClean server accepts EatClean and resolves individual_line_pricing_v1", async () => {
+  const eatcleanTenantId = "8bba00ba-331b-42c8-9283-4e3836ffb870";
+  vi.stubEnv("TENANT_SLUG", "eatclean");
+  try {
+    const context = await offerCommercialContext(
+      actor({ slug: "eatclean" }),
+      eatcleanTenantId,
+    );
+    expect(context.active).toBe(true);
+    expect(context.mode).toBe("individual_line_pricing_v1");
+
+    // Foreign tenant rejected on EatClean server
+    await expect(
+      offerCommercialContext(actor({ slug: "yourmeal-os" }), tenantId),
+    ).rejects.toMatchObject({
+      code: "TENANT_MISMATCH",
+    });
+  } finally {
+    vi.unstubAllEnvs();
+  }
+});
+it("never treats empty offers list as commercial authorization for individual_line_pricing_v1", async () => {
+  const eatcleanTenantId = "8bba00ba-331b-42c8-9283-4e3836ffb870";
+  vi.stubEnv("TENANT_SLUG", "eatclean");
+  try {
+    registerTenantOffers("eatclean", []);
+    const context = await offerCommercialContext(
+      actor({ slug: "eatclean" }),
+      eatcleanTenantId,
+    );
+    expect(context.active).toBe(false);
+    expect(context.mode).toBe("weekly_plan");
+  } finally {
+    vi.unstubAllEnvs();
+  }
 });
 it("DB slug must match this server configuration", async () =>
   await expect(offerCommercialContext(actor({ slug: "other" }), tenantId)).rejects.toMatchObject({
@@ -332,3 +391,209 @@ it("mixed financial DTO distinguishes dish quote subtotal and explicit custom gr
     expect.objectContaining({ _command: mixed.command }),
   );
 });
+
+it("reconciliation: recovers existing committed order from canonical ledger", async () => {
+  const committedOrderId = "50000000-0000-4000-8000-000000000001";
+  mockAdminFrom.mockImplementation((table: string) => {
+    if (table === "order_write_requests") {
+      return {
+        select: () => ({
+          eq: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({
+                data: {
+                  order_id: committedOrderId,
+                  committed_revision: 1,
+                  operation: "capture",
+                  created_at: "2026-10-13T10:00:00Z",
+                },
+                error: null,
+              }),
+            }),
+          }),
+        }),
+      };
+    }
+    if (table === "orders") {
+      return {
+        select: (cols: string) => {
+          expect(cols).toBe("id, status, total, created_at");
+          expect(cols).not.toContain("total_amount");
+          return {
+            eq: () => ({
+              eq: () => ({
+                maybeSingle: async () => ({
+                  data: {
+                    id: committedOrderId,
+                    status: "draft",
+                    total: 3.5,
+                    created_at: "2026-10-13T10:00:00Z",
+                  },
+                  error: null,
+                }),
+              }),
+            }),
+          };
+        },
+      };
+    }
+    return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) };
+  });
+
+  const res = await runVerifiedOfferReconciliation(actor(), tenantId, request.requestId);
+  expect(res).toEqual({
+    reconciled: true,
+    committed: true,
+    requestId: request.requestId,
+    order: {
+      id: committedOrderId,
+      status: "draft",
+      total: 3.5,
+      createdAt: "2026-10-13T10:00:00Z",
+    },
+  });
+});
+
+it("reconciliation: confirmed ledger row + unreadable order throws error and strictly preserves lock", async () => {
+  const committedOrderId = "99000000-0000-4000-8000-000000000001";
+  mockAdminFrom.mockImplementation((table: string) => {
+    if (table === "order_write_requests") {
+      return {
+        select: () => ({
+          eq: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({
+                data: {
+                  order_id: committedOrderId,
+                  committed_revision: 1,
+                  operation: "capture",
+                  created_at: "2026-10-13T10:00:00Z",
+                },
+                error: null,
+              }),
+            }),
+          }),
+        }),
+      };
+    }
+    if (table === "orders") {
+      return {
+        select: () => ({
+          eq: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({
+                data: null,
+                error: { message: "Order query failed" },
+              }),
+            }),
+          }),
+        }),
+      };
+    }
+    return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) };
+  });
+
+  await expect(
+    runVerifiedOfferReconciliation(actor(), tenantId, request.requestId),
+  ).rejects.toMatchObject({
+    code: "RECONCILIATION_ORDER_FETCH_FAILED",
+  });
+});
+
+it("reconciliation: empty ledger row returns reconciled: false without timer-based automatic unlock", async () => {
+  mockAdminFrom.mockImplementation((table: string) => {
+    if (table === "order_write_requests") {
+      return {
+        select: () => ({
+          eq: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({
+                data: null,
+                error: null,
+              }),
+            }),
+          }),
+        }),
+      };
+    }
+    return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) };
+  });
+
+  const res = await runVerifiedOfferReconciliation(
+    actor(),
+    tenantId,
+    request.requestId,
+  );
+  expect(res).toEqual({
+    reconciled: false,
+    committed: false,
+    requestId: request.requestId,
+    order: null,
+    reason: "LEDGER_RECORD_NOT_FOUND",
+  });
+});
+
+it("reconciliation: late arrival of committed ledger entry safely transitions to single confirmed order", async () => {
+  const committedOrderId = "99000000-0000-4000-8000-000000000001";
+  let committedInPostgres = false;
+
+  mockAdminFrom.mockImplementation((table: string) => {
+    if (table === "order_write_requests") {
+      return {
+        select: () => ({
+          eq: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({
+                data: committedInPostgres
+                  ? {
+                      order_id: committedOrderId,
+                      committed_revision: 1,
+                      operation: "capture",
+                      created_at: "2026-10-13T10:00:00Z",
+                    }
+                  : null,
+                error: null,
+              }),
+            }),
+          }),
+        }),
+      };
+    }
+    if (table === "orders") {
+      return {
+        select: () => ({
+          eq: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({
+                data: {
+                  id: committedOrderId,
+                  status: "draft",
+                  total: 3.5,
+                  created_at: "2026-10-13T10:00:00Z",
+                },
+                error: null,
+              }),
+            }),
+          }),
+        }),
+      };
+    }
+    return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) };
+  });
+
+  // Check 1: In-flight / delayed commit, ledger empty -> stays uncertain (reconciled: false)
+  const initialCheck = await runVerifiedOfferReconciliation(actor(), tenantId, request.requestId);
+  expect(initialCheck.committed).toBe(false);
+  expect(initialCheck.reconciled).toBe(false);
+
+  // Late transaction commit completes in Postgres
+  committedInPostgres = true;
+
+  // Check 2: Subsequent reconciliation check detects the single committed order without creating duplicates
+  const finalCheck = await runVerifiedOfferReconciliation(actor(), tenantId, request.requestId);
+  expect(finalCheck.committed).toBe(true);
+  expect(finalCheck.reconciled).toBe(true);
+  expect(finalCheck.order?.id).toBe(committedOrderId);
+  expect(finalCheck.order?.total).toBe(3.5);
+});
+

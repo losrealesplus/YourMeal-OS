@@ -18,6 +18,7 @@ import {
   localStagingFromEnvironment,
   LOCAL_STAGING_CONFIG,
 } from "./local-staging-runtime";
+import brand from "@/tenant/resources/brand.json";
 
 export type InstanceType = "core_demo" | "customer_tenant" | "local_staging";
 
@@ -155,3 +156,45 @@ export function resolveInstanceRuntimeConfig(hostname?: string): InstanceRuntime
   validateInstanceRuntimeConfig(defaultConfig);
   return defaultConfig;
 }
+
+/**
+ * Resolves the server's bound instance runtime configuration based on environment variables
+ * and build resources, enforcing zero-silent-fallback and anti-leak boundary invariants.
+ */
+export function resolveServerInstanceRuntimeConfig(
+  env: Record<string, string | undefined> = typeof process !== "undefined" ? process.env : {},
+): InstanceRuntimeConfig {
+  const local = localStagingFromEnvironment(env);
+  if (local) {
+    validateLocalStaging(local);
+    return local;
+  }
+
+  // Deployed server identity determination:
+  // 1. Explicit TENANT_SLUG from worker / runtime env (e.g. wrangler vars / process.env)
+  // 2. Bundled brand.slug from build-time resources
+  const tenantSlug = env.TENANT_SLUG || brand?.slug || "yourmeal-os";
+  const binding = CANONICAL_INSTANCE_BINDINGS[tenantSlug];
+  if (!binding) {
+    if (tenantSlug === "test-tenant") {
+      return {
+        instanceType: "core_demo",
+        tenantSlug: "test-tenant",
+        coreVersion: "0.1.0",
+        supabaseProjectRef: "test-synthetic",
+        supabaseUrl: env.SUPABASE_URL || "http://127.0.0.1:5432",
+      };
+    }
+    throw new Error(`SECURITY_VIOLATION: Unrecognized server tenant slug '${tenantSlug}'.`);
+  }
+
+  const supabaseUrl = env.SUPABASE_URL || binding.supabaseUrl;
+  const config: InstanceRuntimeConfig = {
+    ...binding,
+    supabaseUrl,
+  };
+
+  validateInstanceRuntimeConfig(config);
+  return config;
+}
+

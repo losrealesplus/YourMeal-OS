@@ -1,6 +1,11 @@
-import { createStaffExistingOrderRepository } from "../infrastructure/staff-existing-order-repository";
 import { createCustomerProfileRepository } from "@/modules/customer-directory/infrastructure/customer-profile-repository";
 import { assertLegacyOfferWrite } from "@/modules/weekly-menu/application/legacy-offer-write-guard";
+import {
+  createCustomCaptureSession,
+  customCaptureTransport,
+  type CaptureTransport,
+} from "./custom-order-capture-service";
+import type { CanonicalOrderCommand } from "../domain/canonical-order-write";
 import type { Json } from "@/integrations/supabase/types";
 import { DomainError } from "@/domain/errors";
 import { requireCapability } from "@/permissions";
@@ -18,6 +23,14 @@ import {
   isEatCleanStaffOrderCaptureFrozen,
   EATCLEAN_PARTIAL_LAUNCH_CONFIG,
 } from "@/config/eatclean-partial-launch";
+
+export interface StaffOrderCaptureOptions {
+  transport?: CaptureTransport;
+  session?: ReturnType<typeof createCustomCaptureSession>;
+  beforeCommit?: (
+    session: ReturnType<typeof createCustomCaptureSession>,
+  ) => void | Promise<void>;
+}
 
 export interface UniversalOrderCaptureLineInput {
   dayDate: string; // YYYY-MM-DD
@@ -90,6 +103,7 @@ export const StaffOrderCaptureService = {
   async captureOrder(
     ctx: ServiceContext,
     dto: UniversalOrderCaptureDTO,
+    options?: StaffOrderCaptureOptions,
   ): Promise<StaffOrderCaptureResult> {
     requireCapability(ctx.roles, "orders.write");
 
@@ -130,10 +144,90 @@ export const StaffOrderCaptureService = {
       }
     }
 
-    // EatClean preparation only: the existing freeze remains authoritative.
-    // Other tenants and new-customer provisioning retain their current path.
-    if (isEatCleanContext(ctx) && dto.customer.mode === "existing") {
-      return createStaffExistingOrderRepository(ctx.supabase).capture(ctx.tenantId, dto);
+    // EatClean canonical V2 order intake: TanStack Start server functions (Quote V2 + Commit V2).
+    // Zero calls to capture_staff_existing_order RPC. Server-side session & capabilities verified.
+    if (
+      isEatCleanContext(ctx) &&
+      (dto.demandChannel ?? "individual") === "individual" &&
+      !dto.companyId
+    ) {
+      for (const line of dto.lines) {
+        if (line.unitPriceOverride !== undefined && line.unitPriceOverride !== null) {
+          throw new DomainError(
+            "OFFER_PRICING_OVERRIDE_UNSUPPORTED",
+            "Quoted offer capture does not accept manual price overrides",
+          );
+        }
+      }
+
+      const canonicalLines = dto.lines.map((line) => ({
+        kind: "dish" as const,
+        dishId: line.dishId,
+        dayDate: line.dayDate,
+        qty: line.qty,
+        comment: line.comment ? line.comment.trim() : null,
+      }));
+
+      const customerInput =
+        dto.customer.mode === "existing"
+          ? ({ kind: "existing" as const, id: dto.customer.customerId } as const)
+          : ({
+              kind: "new" as const,
+              displayName: dto.customer.displayName.trim(),
+              phone: dto.customer.phone.trim(),
+              street: dto.customer.street?.trim() || null,
+              city: dto.customer.city?.trim() || null,
+              deliveryNotes: dto.customer.deliveryNotes?.trim() || null,
+              dietaryProfile: dto.customer.dietaryProfile
+                ? {
+                    allergens: dto.customer.dietaryProfile.allergens,
+                    customAllergens: dto.customer.dietaryProfile.customAllergens,
+                    restrictions: dto.customer.dietaryProfile.restrictions,
+                    preferences: dto.customer.dietaryProfile.preferences,
+                    dietaryNotes: dto.customer.dietaryProfile.dietaryNotes ?? null,
+                  }
+                : undefined,
+            } as const);
+
+      const command: CanonicalOrderCommand = {
+        operation: "capture",
+        customer: customerInput,
+        weekStart: dto.weekStart,
+        autoConfirm: !!dto.autoConfirm,
+        demandChannel: "individual",
+        lines: canonicalLines,
+        orderNotes: dto.orderNotes?.trim() || null,
+        dietaryOverride: dto.dietaryOverride
+          ? {
+              allergens: dto.dietaryOverride.allergens,
+              customAllergens: dto.dietaryOverride.customAllergens,
+              restrictions: dto.dietaryOverride.restrictions,
+              preferences: dto.dietaryOverride.preferences,
+              dietaryNotes: dto.dietaryOverride.dietaryNotes ?? null,
+              overrideReason: dto.dietaryOverride.overrideReason?.trim() || undefined,
+            }
+          : null,
+      };
+
+      const session =
+        options?.session ??
+        createCustomCaptureSession(options?.transport ?? (await customCaptureTransport()));
+
+      await session.prepare(ctx.tenantId, command);
+
+      if (options?.beforeCommit) {
+        await options.beforeCommit(session);
+      }
+
+      const writeResult = await session.commit();
+
+      return {
+        order: writeResult.order,
+        items: writeResult.items as OrderItemRow[],
+        customerId: writeResult.order.customer_id,
+        isNewCustomer: dto.customer.mode === "new",
+        total: Number(writeResult.order.total),
+      };
     }
 
     await assertLegacyOfferWrite(ctx, dto.weekStart, dto.lines);
