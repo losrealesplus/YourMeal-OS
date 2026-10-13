@@ -22,7 +22,8 @@
   "vars": {
     "TENANT_SLUG": "eatclean",
     "CORE_VERSION": "0.1.0",
-    "SUPABASE_URL": "https://nhirlpkuvonggctdzzad.supabase.co"
+    "SUPABASE_URL": "https://nhirlpkuvonggctdzzad.supabase.co",
+    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_qgT9AjzgqzMPgtLRjTZaiQ_yjsQ2ChH"
   },
   "routes": [
     {

@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import { describe, it, expect } from "vitest";
 import {
   validateInstanceRuntimeConfig,
@@ -102,4 +104,35 @@ describe("Block C0: Instance Runtime Boundary & Anti-Leak Guards", () => {
       resolveServerInstanceRuntimeConfig({ TENANT_SLUG: "unknown-rogue-tenant" }),
     ).toThrowError(/SECURITY_VIOLATION.*Unrecognized server tenant slug/);
   });
+
+  it("11. EatClean Production Worker Configuration: wrangler.prod.json binds exclusively to EatClean canonical project", () => {
+    const wranglerProdPath = path.resolve(__dirname, "../../instances/yourmeal-eatclean/wrangler.prod.json");
+    const raw = fs.readFileSync(wranglerProdPath, "utf-8");
+    const parsed = JSON.parse(raw);
+
+    const eatcleanConfig = CANONICAL_INSTANCE_BINDINGS["eatclean"];
+    const demoConfig = CANONICAL_INSTANCE_BINDINGS["yourmeal-os"];
+
+    // 1. Worker name and routes
+    expect(parsed.name).toBe("yourmeal-instance-eatclean");
+    expect(parsed.routes).toEqual([
+      { pattern: "eatclean.yourmealos.com", custom_domain: true },
+    ]);
+
+    // 2. Canonical EatClean vars
+    expect(parsed.vars.TENANT_SLUG).toBe("eatclean");
+    expect(parsed.vars.CORE_VERSION).toBe("0.1.0");
+    expect(parsed.vars.SUPABASE_URL).toBe(eatcleanConfig.supabaseUrl);
+    expect(parsed.vars.SUPABASE_PUBLISHABLE_KEY).toBe(eatcleanConfig.supabasePublishableKey);
+
+    // 3. Strict isolation from Core Demo
+    expect(parsed.vars.SUPABASE_URL).not.toContain(demoConfig.supabaseProjectRef);
+    expect(parsed.vars.SUPABASE_PUBLISHABLE_KEY).not.toBe(demoConfig.supabasePublishableKey);
+
+    // 4. Secret preservation: SUPABASE_SERVICE_ROLE_KEY must NEVER be in wrangler.prod.json
+    expect(parsed.vars.SUPABASE_SERVICE_ROLE_KEY).toBeUndefined();
+    expect(raw).not.toContain("SUPABASE_SERVICE_ROLE_KEY");
+    expect(raw).not.toContain("sb_secret_");
+  });
 });
+
