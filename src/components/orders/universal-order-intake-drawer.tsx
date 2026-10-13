@@ -67,6 +67,12 @@ import {
   createCustomCaptureSession,
   customCaptureTransport,
 } from "@/modules/orders/application/custom-order-capture-service";
+import {
+  getPendingCaptureToken,
+  savePendingCaptureToken,
+  clearPendingCaptureToken,
+  type PendingCaptureToken,
+} from "@/modules/orders/application/pending-capture-recovery";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -194,6 +200,15 @@ export function UniversalOrderIntakeDrawer({
 
   const [orderNotes, setOrderNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [pendingRecovery, setPendingRecovery] = useState<PendingCaptureToken | null>(null);
+  const [reconciling, setReconciling] = useState(false);
+
+  useEffect(() => {
+    if (open && tenantId) {
+      const token = getPendingCaptureToken(tenantId);
+      setPendingRecovery(token);
+    }
+  }, [open, tenantId]);
 
   // CR-CUST-01 Dietary Profile State
   const [customerDietaryProfile, setCustomerDietaryProfile] =
@@ -650,8 +665,54 @@ export function UniversalOrderIntakeDrawer({
     };
   };
 
+  const handleReconcilePending = async () => {
+    if (!pendingRecovery || !tenantId) return;
+    setReconciling(true);
+    try {
+      const { reconcileOfferOrder } = await import(
+        "@/modules/weekly-menu/application/offer-write.functions"
+      );
+      const result = await reconcileOfferOrder({
+        data: { tenantId, requestId: pendingRecovery.requestId },
+      });
+      if (result.committed && result.order) {
+        toast.success(
+          `Pedido conciliado con éxito (#${result.order.id.slice(0, 8)}). Ya estaba registrado en el servidor.`,
+        );
+        clearPendingCaptureToken(tenantId);
+        setPendingRecovery(null);
+        captureSessionRef.current = undefined;
+        onSuccess?.({
+          order: { id: result.order.id, status: result.order.status } as any,
+          total: result.order.total,
+          orderId: result.order.id,
+        });
+        onOpenChange(false);
+      } else {
+        toast.info(
+          `La operación previa no se registró en el servidor (#${pendingRecovery.requestId.slice(0, 8)}). Desbloqueando formulario para nueva captura segura.`,
+        );
+        clearPendingCaptureToken(tenantId);
+        setPendingRecovery(null);
+        captureSessionRef.current = undefined;
+      }
+    } catch (err) {
+      toast.error(
+        err instanceof Error
+          ? `Error al conciliar: ${err.message}`
+          : "No se pudo contactar con el servidor. Se mantiene el bloqueo por seguridad.",
+      );
+    } finally {
+      setReconciling(false);
+    }
+  };
+
   const handleSubmit = async (autoConfirm: boolean) => {
     if (!user || !tenantId) return;
+    if (pendingRecovery) {
+      toast.error("Concilia la operación pendiente con el servidor antes de crear otra captura.");
+      return;
+    }
     if (customItems.length) {
       toast.error("Los personalizados requieren el envío canónico.");
       return;
@@ -782,11 +843,27 @@ export function UniversalOrderIntakeDrawer({
         await customCaptureTransport(),
       ));
 
+      // Persist minimal recovery token before calling captureOrder
+      // Ensures that if connection drops, or tab is closed/reloaded, the request identity is preserved
+      savePendingCaptureToken({
+        requestId: captureSession.review?.request?.requestId ?? crypto.randomUUID(),
+        tenantId,
+        customerId: customerMode === "new" ? "new_customer_placeholder" : selectedCustomerId,
+        customerDisplayName:
+          selectedCustomerDisplayName || (customerMode === "new" ? newCustomerName : undefined),
+        weekStart,
+        lineCount: lines.length,
+        timestamp: new Date().toISOString(),
+      });
+
       const result = await StaffOrderCaptureService.captureOrder(ctx, dto, {
         session: captureSession,
       });
 
+      // Clear the pending token on successful commit
+      clearPendingCaptureToken(tenantId);
       captureSessionRef.current = undefined;
+      setPendingRecovery(null);
 
       toast.success(
         autoConfirm
@@ -797,6 +874,31 @@ export function UniversalOrderIntakeDrawer({
       onSuccess?.(result);
       onOpenChange(false);
     } catch (e) {
+      const isKnownNonPublishedError =
+        e instanceof Error &&
+        [
+          "OFFER_PRICING_OVERRIDE_UNSUPPORTED",
+          "CUSTOM_NOT_ENABLED",
+          "PRICE_CHANGED",
+          "QUOTE_INPUT_MISMATCH",
+          "PERMISSION_DENIED",
+          "ORDER_CLOSED",
+          "PRICE_UNAVAILABLE",
+          "OFFER_NOT_FOUND",
+          "OFFER_AMBIGUOUS",
+          "COMMERCIAL_QUOTE_REQUIRED",
+          "TENANT_MISMATCH",
+        ].includes(e.message);
+
+      if (isKnownNonPublishedError) {
+        clearPendingCaptureToken(tenantId);
+        setPendingRecovery(null);
+      } else {
+        // Uncertain error (e.g. network timeout or server dropped response)
+        // Keep pending token and refresh state so drawer locks against new distinct captures
+        const token = getPendingCaptureToken(tenantId);
+        setPendingRecovery(token);
+      }
       toast.error(e instanceof Error ? e.message : "Error al procesar el pedido");
     } finally {
       setSubmitting(false);
@@ -869,6 +971,44 @@ export function UniversalOrderIntakeDrawer({
           data-testid="order-capture-scroll"
           inert={canonicalLocked}
         >
+          {pendingRecovery && (
+            <div
+              data-testid="pending-capture-reconciliation-alert"
+              className="m-4 sm:m-6 mb-0 p-4 rounded-xl border border-destructive/40 bg-destructive/10 text-destructive dark:text-red-300 text-xs"
+            >
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+                <div className="space-y-2 flex-1">
+                  <p className="font-bold text-sm">
+                    Captura previa con resultado incierto detectada (#{pendingRecovery.requestId.slice(0, 8)})
+                  </p>
+                  <p className="text-[11px] leading-relaxed opacity-90">
+                    Se registró un intento de confirmación previo para{" "}
+                    <strong>{pendingRecovery.customerDisplayName || "el cliente"}</strong> (Semana {pendingRecovery.weekStart}) cuya respuesta del servidor quedó interrumpida. Para prevenir pedidos duplicados en el ledger canónico, las nuevas capturas están bloqueadas hasta conciliar con el servidor.
+                  </p>
+                  <div className="flex items-center gap-2 pt-1">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="destructive"
+                      className="text-xs h-7 gap-1.5"
+                      disabled={reconciling}
+                      onClick={handleReconcilePending}
+                    >
+                      {reconciling ? (
+                        <>
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          Conciliando con servidor...
+                        </>
+                      ) : (
+                        "Conciliar con el servidor"
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           {isTenantCaptureFrozen && (
             <div className="m-4 sm:m-6 mb-0 p-4 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-800 dark:text-amber-200 text-xs">
               <p className="font-bold mb-1">{EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage}</p>
@@ -1523,7 +1663,7 @@ export function UniversalOrderIntakeDrawer({
                 variant="outline"
                 size="sm"
                 onClick={() => handleSubmit(false)}
-                disabled={submitting || totalPortions === 0 || isTenantCaptureFrozen}
+                disabled={submitting || totalPortions === 0 || isTenantCaptureFrozen || !!pendingRecovery}
                 className="shrink-0 text-xs"
               >
                 Guardar Borrador
@@ -1533,7 +1673,7 @@ export function UniversalOrderIntakeDrawer({
                 variant="default"
                 size="sm"
                 onClick={() => handleSubmit(true)}
-                disabled={submitting || totalPortions === 0 || isTenantCaptureFrozen}
+                disabled={submitting || totalPortions === 0 || isTenantCaptureFrozen || !!pendingRecovery}
                 className="gap-1.5 shrink-0 text-xs font-semibold"
               >
                 {submitting ? (

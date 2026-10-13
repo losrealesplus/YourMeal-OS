@@ -2,11 +2,21 @@ import { beforeEach, expect, it, vi } from "vitest";
 import { clearTenantOffersRegistry, registerTenantOffers } from "@/modules/commercial";
 import type { CommercialOffer } from "@/modules/commercial";
 import type { AppSupabase } from "@/services/types";
-import { offerCommercialContext, runVerifiedOfferWrite } from "./offer-write.server";
+import {
+  offerCommercialContext,
+  runVerifiedOfferWrite,
+  runVerifiedOfferReconciliation,
+} from "./offer-write.server";
 import { parseOfferWriteRequest } from "../application/offer-write-input";
 vi.mock("@/tenant/commercial-config", () => ({}));
 vi.mock("@/tenant/resources/brand.json", () => ({ default: { slug: "test-tenant" } }));
-vi.mock("@/integrations/supabase/client.server", () => ({ supabaseAdmin: { rpc: vi.fn() } }));
+const mockAdminFrom = vi.fn();
+vi.mock("@/integrations/supabase/client.server", () => ({
+  supabaseAdmin: {
+    rpc: vi.fn(),
+    from: (...args: unknown[]) => mockAdminFrom(...args),
+  },
+}));
 const tenantId = "10000000-0000-4000-8000-000000000001",
   userId = "20000000-0000-4000-8000-000000000001",
   quoteId = "60000000-0000-4000-8000-000000000001";
@@ -121,24 +131,54 @@ it("identifies individual_line_pricing_v1 mode for single per_unit unpromoted of
   expect(context.active).toBe(true);
   expect(context.mode).toBe("individual_line_pricing_v1");
 });
-it("verifies EatClean tenant identity and resolves individual_line_pricing_v1 from registered offers", async () => {
+it("server isolation: Demo server rejects EatClean requests", async () => {
   const eatcleanTenantId = "8bba00ba-331b-42c8-9283-4e3836ffb870";
-  const context = await offerCommercialContext(
-    actor({ slug: "eatclean" }),
-    eatcleanTenantId,
-  );
-  expect(context.active).toBe(true);
-  expect(context.mode).toBe("individual_line_pricing_v1");
+  vi.stubEnv("TENANT_SLUG", "yourmeal-os");
+  try {
+    await expect(
+      offerCommercialContext(actor({ slug: "eatclean" }), eatcleanTenantId),
+    ).rejects.toMatchObject({
+      code: "TENANT_MISMATCH",
+    });
+  } finally {
+    vi.unstubAllEnvs();
+  }
+});
+it("server isolation: EatClean server accepts EatClean and resolves individual_line_pricing_v1", async () => {
+  const eatcleanTenantId = "8bba00ba-331b-42c8-9283-4e3836ffb870";
+  vi.stubEnv("TENANT_SLUG", "eatclean");
+  try {
+    const context = await offerCommercialContext(
+      actor({ slug: "eatclean" }),
+      eatcleanTenantId,
+    );
+    expect(context.active).toBe(true);
+    expect(context.mode).toBe("individual_line_pricing_v1");
+
+    // Foreign tenant rejected on EatClean server
+    await expect(
+      offerCommercialContext(actor({ slug: "yourmeal-os" }), tenantId),
+    ).rejects.toMatchObject({
+      code: "TENANT_MISMATCH",
+    });
+  } finally {
+    vi.unstubAllEnvs();
+  }
 });
 it("never treats empty offers list as commercial authorization for individual_line_pricing_v1", async () => {
   const eatcleanTenantId = "8bba00ba-331b-42c8-9283-4e3836ffb870";
-  registerTenantOffers("eatclean", []);
-  const context = await offerCommercialContext(
-    actor({ slug: "eatclean" }),
-    eatcleanTenantId,
-  );
-  expect(context.active).toBe(false);
-  expect(context.mode).toBe("weekly_plan");
+  vi.stubEnv("TENANT_SLUG", "eatclean");
+  try {
+    registerTenantOffers("eatclean", []);
+    const context = await offerCommercialContext(
+      actor({ slug: "eatclean" }),
+      eatcleanTenantId,
+    );
+    expect(context.active).toBe(false);
+    expect(context.mode).toBe("weekly_plan");
+  } finally {
+    vi.unstubAllEnvs();
+  }
 });
 it("DB slug must match this server configuration", async () =>
   await expect(offerCommercialContext(actor({ slug: "other" }), tenantId)).rejects.toMatchObject({
@@ -351,3 +391,90 @@ it("mixed financial DTO distinguishes dish quote subtotal and explicit custom gr
     expect.objectContaining({ _command: mixed.command }),
   );
 });
+
+it("reconciliation: recovers existing committed order from canonical ledger", async () => {
+  const committedOrderId = "50000000-0000-4000-8000-000000000001";
+  mockAdminFrom.mockImplementation((table: string) => {
+    if (table === "order_write_requests") {
+      return {
+        select: () => ({
+          eq: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({
+                data: {
+                  order_id: committedOrderId,
+                  committed_revision: 1,
+                  operation: "capture",
+                  created_at: "2026-10-13T10:00:00Z",
+                },
+                error: null,
+              }),
+            }),
+          }),
+        }),
+      };
+    }
+    if (table === "orders") {
+      return {
+        select: () => ({
+          eq: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({
+                data: {
+                  id: committedOrderId,
+                  status: "draft",
+                  total_amount: 3.5,
+                  created_at: "2026-10-13T10:00:00Z",
+                },
+                error: null,
+              }),
+            }),
+          }),
+        }),
+      };
+    }
+    return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) };
+  });
+
+  const res = await runVerifiedOfferReconciliation(actor(), tenantId, request.requestId);
+  expect(res).toEqual({
+    reconciled: true,
+    committed: true,
+    requestId: request.requestId,
+    order: {
+      id: committedOrderId,
+      status: "draft",
+      total: 3.5,
+      createdAt: "2026-10-13T10:00:00Z",
+    },
+  });
+});
+
+it("reconciliation: identifies non-committed uncertain request safely", async () => {
+  mockAdminFrom.mockImplementation((table: string) => {
+    if (table === "order_write_requests") {
+      return {
+        select: () => ({
+          eq: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({
+                data: null,
+                error: null,
+              }),
+            }),
+          }),
+        }),
+      };
+    }
+    return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) };
+  });
+
+  const res = await runVerifiedOfferReconciliation(actor(), tenantId, request.requestId);
+  expect(res).toEqual({
+    reconciled: true,
+    committed: false,
+    requestId: request.requestId,
+    order: null,
+  });
+});
+

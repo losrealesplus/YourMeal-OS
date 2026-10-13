@@ -165,5 +165,18 @@ describe("UniversalOrderIntakeDrawer Component Rendering & Contract (CR-OPS-05)"
     expect(source).toContain("publishedOfferPrice !== undefined");
     expect(source).toContain("oferta semanal");
   });
+
+  it("UNCERTAIN_COMMIT_RECOVERY: drawer source integrates pending capture token and reconciliation", () => {
+    const filePath = path.resolve(__dirname, "./universal-order-intake-drawer.tsx");
+    const source = fs.readFileSync(filePath, "utf8");
+
+    expect(source).toContain("savePendingCaptureToken");
+    expect(source).toContain("clearPendingCaptureToken");
+    expect(source).toContain("handleReconcilePending");
+    expect(source).toContain("pending-capture-reconciliation-alert");
+    expect(source).toContain("Conciliar con el servidor");
+    expect(source).toContain("disabled={submitting || totalPortions === 0 || isTenantCaptureFrozen || !!pendingRecovery}");
+  });
 });
+
 

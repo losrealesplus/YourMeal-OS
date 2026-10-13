@@ -9,8 +9,7 @@ import { can } from "@/permissions";
 import { DomainError } from "@/domain/errors";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getTenantOffers } from "@/modules/commercial";
-import { isEatCleanContext } from "@/config/eatclean-partial-launch";
-import brand from "@/tenant/resources/brand.json";
+import { resolveServerInstanceRuntimeConfig } from "@/lib/instance-runtime-boundary";
 import "@/tenant/commercial-config";
 import type { Json } from "@/integrations/supabase/types";
 import type { OfferWriteRequest } from "../application/offer-write-input";
@@ -23,16 +22,25 @@ type RpcCall = (
   parameters: Record<string, Json>,
 ) => Promise<{ data: Json | null; error: { message: string } | null }>;
 
-/** Verified DB identity and explicit build configuration, never a client tenant slug/tier. */
+/** Verified DB identity and server instance binding, strictly rejecting cross-instance requests. */
 export async function verifiedOrderActorContext(actor: VerifiedOfferActor, tenantId: string) {
+  const serverConfig = resolveServerInstanceRuntimeConfig();
+
   const tenant = await actor.supabase
     .from("tenants")
     .select("id,slug")
     .eq("id", tenantId)
     .maybeSingle();
-  const isEatClean = isEatCleanContext(tenantId) && tenant.data?.slug === "eatclean";
-  if (tenant.error || !tenant.data || (tenant.data.slug !== brand.slug && !isEatClean))
+
+  if (tenant.error || !tenant.data)
     throw new DomainError("TENANT_MISMATCH", "Tenant does not match this configured server");
+
+  // Strict physical & logical boundary: The request tenant must match this server's bound tenant.
+  // The demo server (yourmeal-os) only serves yourmeal-os and strictly rejects eatclean.
+  // The eatclean customer server only serves eatclean and strictly rejects yourmeal-os.
+  if (tenant.data.slug !== serverConfig.tenantSlug)
+    throw new DomainError("TENANT_MISMATCH", "Tenant does not match this configured server");
+
   const membership = await actor.supabase
     .from("tenant_members")
     .select("status")
@@ -64,10 +72,17 @@ export async function verifiedOrderActorContext(actor: VerifiedOfferActor, tenan
 
 export async function offerCommercialContext(actor: VerifiedOfferActor, tenantId: string) {
   const { tenant } = await verifiedOrderActorContext(actor, tenantId);
+  const serverConfig = resolveServerInstanceRuntimeConfig();
   if (!Array.isArray(bundledCommercial))
     throw new OfferWriteRpcError("COMMERCIAL_CONTEXT_UNAVAILABLE");
 
-  if (tenant.slug === "eatclean" && !hasRegisteredTenantOffers("eatclean")) {
+  // Commercial configuration is strictly registered within the authorized instance context.
+  // The Core Demo server is never contaminated with EatClean instance configuration.
+  if (
+    serverConfig.tenantSlug === "eatclean" &&
+    tenant.slug === "eatclean" &&
+    !hasRegisteredTenantOffers("eatclean")
+  ) {
     const { registerEatCleanCommercialOffers } = await import(
       "../../../../instances/yourmeal-eatclean/config/commercial.config"
     );
@@ -288,3 +303,71 @@ export async function runVerifiedOfferWrite(
     customLines,
   };
 }
+
+/**
+ * Reconciles an uncertain in-flight order capture using the PostgreSQL canonical idempotency ledger.
+ * Determines whether the request ID was already committed in the database or never published.
+ */
+export async function runVerifiedOfferReconciliation(
+  actor: VerifiedOfferActor,
+  tenantId: string,
+  requestId: string,
+) {
+  await verifiedOrderActorContext(actor, tenantId);
+
+  // Check the PostgreSQL canonical idempotency ledger (order_write_requests)
+  const { data: requestRow, error: requestError } = await supabaseAdmin
+    .from("order_write_requests")
+    .select("order_id, committed_revision, operation, created_at")
+    .eq("tenant_id", tenantId)
+    .eq("request_id", requestId)
+    .maybeSingle();
+
+  if (requestError) {
+    throw new DomainError("LEDGER_QUERY_FAILED", "Failed to query canonical order ledger");
+  }
+
+  if (!requestRow?.order_id) {
+    return {
+      reconciled: true,
+      committed: false,
+      requestId,
+      order: null,
+    };
+  }
+
+  // Fetch the committed order details
+  const { data: orderRow, error: orderError } = await supabaseAdmin
+    .from("orders")
+    .select("id, status, total_amount, created_at")
+    .eq("tenant_id", tenantId)
+    .eq("id", requestRow.order_id)
+    .maybeSingle();
+
+  if (orderError || !orderRow) {
+    return {
+      reconciled: true,
+      committed: true,
+      requestId,
+      order: {
+        id: requestRow.order_id,
+        status: "draft",
+        total: 0,
+        createdAt: requestRow.created_at,
+      },
+    };
+  }
+
+  return {
+    reconciled: true,
+    committed: true,
+    requestId,
+    order: {
+      id: orderRow.id,
+      status: orderRow.status,
+      total: Number(orderRow.total_amount),
+      createdAt: orderRow.created_at,
+    },
+  };
+}
+

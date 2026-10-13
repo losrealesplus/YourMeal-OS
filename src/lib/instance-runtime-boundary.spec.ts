@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   validateInstanceRuntimeConfig,
   resolveInstanceRuntimeConfig,
+  resolveServerInstanceRuntimeConfig,
   CANONICAL_INSTANCE_BINDINGS,
   type InstanceRuntimeConfig,
 } from "./instance-runtime-boundary";
@@ -68,5 +69,37 @@ describe("Block C0: Instance Runtime Boundary & Anti-Leak Guards", () => {
     expect(CANONICAL_INSTANCE_BINDINGS["eatclean-tenerife"]).toBeUndefined();
     expect(CANONICAL_INSTANCE_BINDINGS["eatclean"]).toBeDefined();
     expect(CANONICAL_INSTANCE_BINDINGS["eatclean"].tenantSlug).toBe("eatclean");
+  });
+
+  it("8. Server instance resolution: EatClean server binds to customer instance and rejects demo database", () => {
+    const resolved = resolveServerInstanceRuntimeConfig({ TENANT_SLUG: "eatclean" });
+    expect(resolved.tenantSlug).toBe("eatclean");
+    expect(resolved.supabaseProjectRef).toBe("nhirlpkuvonggctdzzad");
+
+    expect(() =>
+      resolveServerInstanceRuntimeConfig({
+        TENANT_SLUG: "eatclean",
+        SUPABASE_URL: "https://djangucecsphnejplvic.supabase.co",
+      }),
+    ).toThrowError(/SECURITY_VIOLATION.*Demo Supabase/);
+  });
+
+  it("9. Server instance resolution: Demo server binds to core_demo and rejects EatClean database", () => {
+    const resolved = resolveServerInstanceRuntimeConfig({ TENANT_SLUG: "yourmeal-os" });
+    expect(resolved.tenantSlug).toBe("yourmeal-os");
+    expect(resolved.supabaseProjectRef).toBe("djangucecsphnejplvic");
+
+    expect(() =>
+      resolveServerInstanceRuntimeConfig({
+        TENANT_SLUG: "yourmeal-os",
+        SUPABASE_URL: "https://nhirlpkuvonggctdzzad.supabase.co",
+      }),
+    ).toThrowError(/SECURITY_VIOLATION.*EatClean Supabase/);
+  });
+
+  it("10. Server instance resolution: Unrecognized server tenant slug throws Security Violation", () => {
+    expect(() =>
+      resolveServerInstanceRuntimeConfig({ TENANT_SLUG: "unknown-rogue-tenant" }),
+    ).toThrowError(/SECURITY_VIOLATION.*Unrecognized server tenant slug/);
   });
 });
