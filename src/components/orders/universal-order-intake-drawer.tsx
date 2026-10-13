@@ -200,13 +200,17 @@ export function UniversalOrderIntakeDrawer({
 
   const [orderNotes, setOrderNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [pendingRecovery, setPendingRecovery] = useState<PendingCaptureToken | null>(null);
+  const [pendingRecovery, setPendingRecovery] = useState<PendingCaptureToken | null>(() => {
+    return open && tenantId ? getPendingCaptureToken(tenantId) : null;
+  });
   const [reconciling, setReconciling] = useState(false);
 
   useEffect(() => {
     if (open && tenantId) {
       const token = getPendingCaptureToken(tenantId);
       setPendingRecovery(token);
+    } else if (!open) {
+      setPendingRecovery(null);
     }
   }, [open, tenantId]);
 
@@ -710,21 +714,6 @@ export function UniversalOrderIntakeDrawer({
     }
   };
 
-  const handleAdminDiscardPending = () => {
-    if (!pendingRecovery || !tenantId) return;
-    const confirmed =
-      typeof window !== "undefined" &&
-      window.confirm(
-        `¿Confirmar conciliación administrativa?\n\nSolo descarta esta captura (#${pendingRecovery.requestId.slice(0, 8)}) si has verificado que la operación no se persistió en el servidor y deseas reiniciar el formulario manualmente.`,
-      );
-    if (!confirmed) return;
-
-    clearPendingCaptureToken(tenantId);
-    setPendingRecovery(null);
-    captureSessionRef.current = undefined;
-    toast.info("Captura pendiente descartada administrativamente. Formulario desbloqueado.");
-  };
-
   const handleSubmit = async (autoConfirm: boolean) => {
     if (!user || !tenantId) return;
     if (pendingRecovery) {
@@ -1010,9 +999,12 @@ export function UniversalOrderIntakeDrawer({
                   </p>
                   <p className="text-[11px] leading-relaxed opacity-90">
                     Se registró un intento de confirmación previo para{" "}
-                    <strong>el cliente (#{pendingRecovery.customerId.slice(0, 8)})</strong> (Semana {pendingRecovery.weekStart}) cuya respuesta del servidor quedó interrumpida. Para prevenir pedidos duplicados en el ledger canónico, las nuevas capturas están bloqueadas hasta conciliar con el servidor.
+                    <strong>el cliente (#{pendingRecovery.customerId.slice(0, 8)})</strong> (Semana {pendingRecovery.weekStart}) cuya respuesta del servidor quedó interrumpida. Para prevenir pedidos duplicados en el ledger canónico, las nuevas capturas están bloqueadas hasta que el servidor confirme el pedido.
                   </p>
-                  <div className="flex items-center gap-2 pt-1 flex-wrap">
+                  <p className="text-[11px] leading-relaxed opacity-80">
+                    Si el ledger no contiene el pedido tras comprobar el estado, contacta con el administrador del sistema para verificar los registros del servidor antes de iniciar una nueva captura.
+                  </p>
+                  <div className="flex items-center gap-2 pt-1">
                     <Button
                       type="button"
                       size="sm"
@@ -1029,16 +1021,6 @@ export function UniversalOrderIntakeDrawer({
                       ) : (
                         "Comprobar estado en servidor"
                       )}
-                    </Button>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      className="text-xs h-7 border-destructive/30 hover:bg-destructive/10 text-destructive dark:text-red-300"
-                      disabled={reconciling}
-                      onClick={handleAdminDiscardPending}
-                    >
-                      Descartar administrativamente
                     </Button>
                   </div>
                 </div>

@@ -24,10 +24,12 @@ vi.mock("@/components/ui/tabs", () => ({
   TabsContent: ({ children, className }: any) => <div className={className}>{children}</div>,
 }));
 
+const testTenantId = "8bba00ba-331b-42c8-9283-4e3836ffb870";
+
 vi.mock("@/hooks/use-auth", () => ({
   useAuth: () => ({
     user: { id: "test-user-1" },
-    tenantId: "tenant-eatclean",
+    tenantId: testTenantId,
     roles: ["operations_manager"],
   }),
 }));
@@ -166,18 +168,80 @@ describe("UniversalOrderIntakeDrawer Component Rendering & Contract (CR-OPS-05)"
     expect(source).toContain("oferta semanal");
   });
 
-  it("UNCERTAIN_COMMIT_RECOVERY: drawer source integrates pending capture token and reconciliation", () => {
+  it("BEHAVIORAL: renders active reconciliation alert and disables order submission when pending token exists", () => {
+    const tenantId = testTenantId;
+    const pendingToken = {
+      requestId: "88000000-0000-4000-8000-000000000001",
+      tenantId,
+      customerId: "cust-123",
+      weekStart: "2026-09-28",
+      lineCount: 2,
+      timestamp: new Date().toISOString(),
+    };
+
+    // Simulate presence of pending capture token in localStorage
+    const store: Record<string, string> = {
+      [`ym_pending_order_capture_${tenantId}`]: JSON.stringify(pendingToken),
+    };
+    vi.stubGlobal("window", {
+      localStorage: {
+        getItem: vi.fn((key: string) => store[key] ?? null),
+        setItem: vi.fn((key: string, val: string) => {
+          store[key] = val;
+        }),
+        removeItem: vi.fn((key: string) => {
+          delete store[key];
+        }),
+      },
+    });
+
+    try {
+      const html = renderToString(
+        <UniversalOrderIntakeDrawer
+          open={true}
+          onOpenChange={() => {}}
+          preselectedCustomerId="cust-123"
+          preselectedCustomerName="Juan Pérez"
+          preselectedWeekStart="2026-09-28"
+        />,
+      );
+
+      // Alert must be rendered with exact transaction identification
+      expect(html).toContain('data-testid="pending-capture-reconciliation-alert"');
+      expect(html).toContain("Captura previa con resultado incierto detectada");
+      expect(html).toContain("88000000");
+      expect(html).toContain("Comprobar estado en servidor");
+
+      // STRICTLY NO local administrative bypass or window.confirm button in rendered HTML
+      expect(html).not.toContain("Descartar administrativamente");
+      expect(html).not.toContain("window.confirm");
+
+      // Verify that order submission action buttons are disabled while pending recovery is active
+      expect(html).toContain("Guardar Borrador");
+      expect(html).toContain("Guardar y Confirmar 🟢");
+      expect(html).toMatch(/<button[^>]*disabled=""[^>]*>Guardar Borrador<\/button>/);
+      expect(html).toMatch(/<button[^>]*disabled=""[^>]*>.*?Guardar y Confirmar 🟢<\/button>/);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("UNCERTAIN_COMMIT_RECOVERY: enforces server-verified reconciliation and removes manual local bypass", () => {
     const filePath = path.resolve(__dirname, "./universal-order-intake-drawer.tsx");
     const source = fs.readFileSync(filePath, "utf8");
 
+    // Verified lifecycle functions
     expect(source).toContain("savePendingCaptureToken");
     expect(source).toContain("clearPendingCaptureToken");
     expect(source).toContain("handleReconcilePending");
-    expect(source).toContain("handleAdminDiscardPending");
     expect(source).toContain("pending-capture-reconciliation-alert");
     expect(source).toContain("Comprobar estado en servidor");
-    expect(source).toContain("Descartar administrativamente");
     expect(source).toContain("disabled={submitting || totalPortions === 0 || isTenantCaptureFrozen || !!pendingRecovery}");
+
+    // STRICTLY REMOVED: local administrative bypass, unverified discard, and window.confirm
+    expect(source).not.toContain("handleAdminDiscardPending");
+    expect(source).not.toContain("Descartar administrativamente");
+    expect(source).not.toContain("window.confirm");
 
     // Deterministic canonical requestId passed via beforeCommit callback
     expect(source).toContain("beforeCommit: (preparedSession) =>");
