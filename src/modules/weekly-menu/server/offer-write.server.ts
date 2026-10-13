@@ -9,6 +9,7 @@ import { can } from "@/permissions";
 import { DomainError } from "@/domain/errors";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getTenantOffers } from "@/modules/commercial";
+import { isEatCleanContext } from "@/config/eatclean-partial-launch";
 import brand from "@/tenant/resources/brand.json";
 import "@/tenant/commercial-config";
 import type { Json } from "@/integrations/supabase/types";
@@ -29,7 +30,8 @@ export async function verifiedOrderActorContext(actor: VerifiedOfferActor, tenan
     .select("id,slug")
     .eq("id", tenantId)
     .maybeSingle();
-  if (tenant.error || !tenant.data || tenant.data.slug !== brand.slug)
+  const isEatClean = isEatCleanContext(tenantId) && tenant.data?.slug === "eatclean";
+  if (tenant.error || !tenant.data || (tenant.data.slug !== brand.slug && !isEatClean))
     throw new DomainError("TENANT_MISMATCH", "Tenant does not match this configured server");
   const membership = await actor.supabase
     .from("tenant_members")
@@ -64,6 +66,14 @@ export async function offerCommercialContext(actor: VerifiedOfferActor, tenantId
   const { tenant } = await verifiedOrderActorContext(actor, tenantId);
   if (!Array.isArray(bundledCommercial))
     throw new OfferWriteRpcError("COMMERCIAL_CONTEXT_UNAVAILABLE");
+
+  if (tenant.slug === "eatclean" && !hasRegisteredTenantOffers("eatclean")) {
+    const { registerEatCleanCommercialOffers } = await import(
+      "../../../../instances/yourmeal-eatclean/config/commercial.config"
+    );
+    registerEatCleanCommercialOffers();
+  }
+
   const offers = getTenantOffers(tenant.slug);
   if (!hasRegisteredTenantOffers(tenant.slug))
     throw new OfferWriteRpcError("COMMERCIAL_CONTEXT_UNAVAILABLE");
@@ -82,19 +92,17 @@ export async function offerCommercialContext(actor: VerifiedOfferActor, tenantId
     throw new OfferWriteRpcError("COMMERCIAL_CONTEXT_UNAVAILABLE");
 
   // Determine commercial mode server-side:
-  // Individual menu / independent à-la-carte:
-  // - single active offer or explicit individual menu
-  // - pricingModel = per_unit
-  // - no promotions
-  // - unbundled tenant (such as EatClean with empty registered offers)
-  const isIndividualMode =
-    (offers.length === 1 &&
-      offers[0]?.code === "individual_menu" &&
-      offers[0]?.pricingModel === "per_unit" &&
-      (!offers[0]?.promotions || offers[0]?.promotions.length === 0)) ||
-    (offers.length === 0 && tenant.slug === "eatclean");
+  // Individual menu / independent à-la-carte requires an explicit registered
+  // individual_menu offer with pricingModel = per_unit and no promotions.
+  // Never automatically authorize from an empty offers list.
+  const hasIndividualOffer = offers.some(
+    (offer) =>
+      offer.code === "individual_menu" &&
+      offer.pricingModel === "per_unit" &&
+      (!offer.promotions || offer.promotions.length === 0),
+  );
 
-  const mode = isIndividualMode ? "individual_line_pricing_v1" : "weekly_plan";
+  const mode = hasIndividualOffer ? "individual_line_pricing_v1" : "weekly_plan";
 
   const policy = JSON.stringify({ tenantId, tenantSlug: tenant.slug, mode, offers });
   const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(policy));

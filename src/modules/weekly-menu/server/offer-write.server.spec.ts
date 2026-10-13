@@ -121,6 +121,25 @@ it("identifies individual_line_pricing_v1 mode for single per_unit unpromoted of
   expect(context.active).toBe(true);
   expect(context.mode).toBe("individual_line_pricing_v1");
 });
+it("verifies EatClean tenant identity and resolves individual_line_pricing_v1 from registered offers", async () => {
+  const eatcleanTenantId = "8bba00ba-331b-42c8-9283-4e3836ffb870";
+  const context = await offerCommercialContext(
+    actor({ slug: "eatclean" }),
+    eatcleanTenantId,
+  );
+  expect(context.active).toBe(true);
+  expect(context.mode).toBe("individual_line_pricing_v1");
+});
+it("never treats empty offers list as commercial authorization for individual_line_pricing_v1", async () => {
+  const eatcleanTenantId = "8bba00ba-331b-42c8-9283-4e3836ffb870";
+  registerTenantOffers("eatclean", []);
+  const context = await offerCommercialContext(
+    actor({ slug: "eatclean" }),
+    eatcleanTenantId,
+  );
+  expect(context.active).toBe(false);
+  expect(context.mode).toBe("weekly_plan");
+});
 it("DB slug must match this server configuration", async () =>
   await expect(offerCommercialContext(actor({ slug: "other" }), tenantId)).rejects.toMatchObject({
     code: "TENANT_MISMATCH",

@@ -241,8 +241,20 @@ try:
         req1,
         autoConfirm=False
     )
+    res1 = json.loads(r1.stdout.strip().splitlines()[-1])
+    order_id1 = res1["order"]["id"]
     check("CANONICAL_V2_DESSERT_QUOTED_3_50", q1 is not None and q1["total"] == "3.50", f"Quote total is 3.50 (got {q1['total'] if q1 else 'None'})")
-    check("CANONICAL_V2_DESSERT_COMMITTED_3_50", r1.returncode == 0 and json.loads(r1.stdout.strip().splitlines()[-1])["order"]["total"] == 3.50, "Order committed at 3.50 €")
+    check("CANONICAL_V2_DESSERT_COMMITTED_3_50", r1.returncode == 0 and res1["order"]["total"] == 3.50, "Order committed at 3.50 €")
+    check("CANONICAL_V2_DESSERT_DRAFT_STATUS", res1["order"]["status"] == "draft", "Order is in draft status with autoConfirm: false")
+
+    item_row = json.loads(scalar(f"SELECT row_to_json(i) FROM order_items i WHERE order_id='{order_id1}'"))
+    check("CANONICAL_V2_ITEM_PRICE_CAPTURED_3_50", item_row["unit_price"] == 3.50 and item_row["price_snapshot_status"] == "captured", "Order item unit_price is 3.50 with price_snapshot_status captured")
+
+    audit_count = scalar(f"SELECT count(*) FROM audit_log WHERE entity_id='{order_id1}' AND entity_type='order' AND action='order.offer.capture'")
+    check("CANONICAL_V2_AUDIT_LOG_RECORDED", audit_count == "1", "Audit log order.offer.capture record persisted for canonical V2 order")
+
+    legacy_rpc_calls = scalar("SELECT count(*) FROM audit_log WHERE action='create' AND new_data->>'source' = 'admin'")
+    check("ZERO_LEGACY_RPC_INVOCATIONS", legacy_rpc_calls == "0", "Zero invocations of legacy capture_staff_existing_order RPC")
 
     # 2. Test Canonical V2 Idempotency: Replaying exact same request ID succeeds with replayed = True
     commit_replay_sql = f"""

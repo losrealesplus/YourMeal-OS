@@ -9,7 +9,7 @@ import {
 import type { CanonicalOrderCommand } from "@/modules/orders/domain/canonical-order-write";
 import type { CanonicalOrderWriteResult } from "@/modules/orders/infrastructure/canonical-order-write-repository";
 import { DishAllergenDeclaration } from "@/components/operations/dish-allergen-declaration";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   Calendar,
@@ -59,9 +59,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
+  isEatCleanContext,
   isEatCleanStaffOrderCaptureFrozen,
   EATCLEAN_PARTIAL_LAUNCH_CONFIG,
 } from "@/config/eatclean-partial-launch";
+import {
+  createCustomCaptureSession,
+  customCaptureTransport,
+} from "@/modules/orders/application/custom-order-capture-service";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -183,6 +188,9 @@ export function UniversalOrderIntakeDrawer({
   const customEnabled = useCustomOrderCapture(demandChannel);
   const [customItems, setCustomItems] = useState<CustomItemDraft[]>([]);
   const [canonicalLocked, setCanonicalLocked] = useState(false);
+  const captureSessionRef = useRef<ReturnType<typeof createCustomCaptureSession> | undefined>(
+    undefined,
+  );
 
   const [orderNotes, setOrderNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -664,6 +672,19 @@ export function UniversalOrderIntakeDrawer({
       return;
     }
 
+    const isEatClean = isEatCleanContext(tenantId);
+    if (isEatClean) {
+      const hasOverrides = Object.values(priceOverrides).some((byDish) =>
+        Object.values(byDish).some((p) => p !== undefined),
+      );
+      if (hasOverrides) {
+        toast.error(
+          "Retira los precios manuales de platos antes de registrar un pedido con precios oficiales.",
+        );
+        return;
+      }
+    }
+
     // Build Lines
     const lines: UniversalOrderCaptureLineInput[] = [];
     for (const [dayDate, dayQtyMap] of Object.entries(quantities)) {
@@ -691,8 +712,9 @@ export function UniversalOrderIntakeDrawer({
             dishId,
             qty,
             comment,
-            unitPriceOverride:
-              override !== undefined
+            unitPriceOverride: isEatClean
+              ? undefined
+              : override !== undefined
                 ? override
                 : publishedOfferPrice !== undefined
                   ? publishedOfferPrice
@@ -756,12 +778,20 @@ export function UniversalOrderIntakeDrawer({
           : null,
       };
 
-      const result = await StaffOrderCaptureService.captureOrder(ctx, dto);
+      const captureSession = (captureSessionRef.current ??= createCustomCaptureSession(
+        await customCaptureTransport(),
+      ));
+
+      const result = await StaffOrderCaptureService.captureOrder(ctx, dto, {
+        session: captureSession,
+      });
+
+      captureSessionRef.current = undefined;
 
       toast.success(
         autoConfirm
           ? `Pedido confirmado con éxito (#${result.order.id.slice(0, 8)}) por ${result.total.toFixed(2)} €`
-          : `Borrador de pedido guardado (#${result.order.id.slice(0, 8)})`,
+          : `Borrador de pedido guardado (#${result.order.id.slice(0, 8)}) por ${result.total.toFixed(2)} €`,
       );
 
       onSuccess?.(result);
