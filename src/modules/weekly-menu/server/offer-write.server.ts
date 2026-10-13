@@ -312,6 +312,7 @@ export async function runVerifiedOfferReconciliation(
   actor: VerifiedOfferActor,
   tenantId: string,
   requestId: string,
+  clientTimestamp?: string,
 ) {
   await verifiedOrderActorContext(actor, tenantId);
 
@@ -328,44 +329,58 @@ export async function runVerifiedOfferReconciliation(
   }
 
   if (!requestRow?.order_id) {
+    // If request timestamp is recent (< 60s, PostgreSQL statement_timeout window),
+    // transaction could still be in-flight. Do NOT conclude uncommitted prematurely!
+    const elapsedMs = clientTimestamp ? Date.now() - Date.parse(clientTimestamp) : null;
+    const isRecent = elapsedMs !== null && !isNaN(elapsedMs) && elapsedMs < 60_000;
+
+    if (isRecent) {
+      return {
+        reconciled: false,
+        committed: false,
+        pendingGrace: true,
+        reason: "TRANSACTION_POTENTIALLY_IN_FLIGHT",
+        requestId,
+        order: null,
+      };
+    }
+
     return {
       reconciled: true,
       committed: false,
+      pendingGrace: false,
       requestId,
       order: null,
     };
   }
 
-  // Fetch the committed order details
+  // Fetch the committed order details from public.orders using column 'total' (NOT 'total_amount')
   const { data: orderRow, error: orderError } = await supabaseAdmin
     .from("orders")
-    .select("id, status, total_amount, created_at")
+    .select("id, status, total, created_at")
     .eq("tenant_id", tenantId)
     .eq("id", requestRow.order_id)
     .maybeSingle();
 
   if (orderError || !orderRow) {
-    return {
-      reconciled: true,
-      committed: true,
-      requestId,
-      order: {
-        id: requestRow.order_id,
-        status: "draft",
-        total: 0,
-        createdAt: requestRow.created_at,
-      },
-    };
+    // Ledger entry is confirmed, but reading public.orders failed.
+    // NEVER synthesize draft or total=0 as verified data.
+    // Preserve the lock and report the reconciliation failure.
+    throw new DomainError(
+      "RECONCILIATION_ORDER_FETCH_FAILED",
+      "Order ledger record confirmed, but order row could not be read. Lock preserved.",
+    );
   }
 
   return {
     reconciled: true,
     committed: true,
+    pendingGrace: false,
     requestId,
     order: {
       id: orderRow.id,
       status: orderRow.status,
-      total: Number(orderRow.total_amount),
+      total: Number(orderRow.total),
       createdAt: orderRow.created_at,
     },
   };

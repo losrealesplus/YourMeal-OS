@@ -416,21 +416,25 @@ it("reconciliation: recovers existing committed order from canonical ledger", as
     }
     if (table === "orders") {
       return {
-        select: () => ({
-          eq: () => ({
+        select: (cols: string) => {
+          expect(cols).toBe("id, status, total, created_at");
+          expect(cols).not.toContain("total_amount");
+          return {
             eq: () => ({
-              maybeSingle: async () => ({
-                data: {
-                  id: committedOrderId,
-                  status: "draft",
-                  total_amount: 3.5,
-                  created_at: "2026-10-13T10:00:00Z",
-                },
-                error: null,
+              eq: () => ({
+                maybeSingle: async () => ({
+                  data: {
+                    id: committedOrderId,
+                    status: "draft",
+                    total: 3.5,
+                    created_at: "2026-10-13T10:00:00Z",
+                  },
+                  error: null,
+                }),
               }),
             }),
-          }),
-        }),
+          };
+        },
       };
     }
     return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) };
@@ -440,6 +444,7 @@ it("reconciliation: recovers existing committed order from canonical ledger", as
   expect(res).toEqual({
     reconciled: true,
     committed: true,
+    pendingGrace: false,
     requestId: request.requestId,
     order: {
       id: committedOrderId,
@@ -450,7 +455,53 @@ it("reconciliation: recovers existing committed order from canonical ledger", as
   });
 });
 
-it("reconciliation: identifies non-committed uncertain request safely", async () => {
+it("reconciliation: confirmed ledger row + unreadable order throws error and strictly preserves lock", async () => {
+  const committedOrderId = "99000000-0000-4000-8000-000000000001";
+  mockAdminFrom.mockImplementation((table: string) => {
+    if (table === "order_write_requests") {
+      return {
+        select: () => ({
+          eq: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({
+                data: {
+                  order_id: committedOrderId,
+                  committed_revision: 1,
+                  operation: "capture",
+                  created_at: "2026-10-13T10:00:00Z",
+                },
+                error: null,
+              }),
+            }),
+          }),
+        }),
+      };
+    }
+    if (table === "orders") {
+      return {
+        select: () => ({
+          eq: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({
+                data: null,
+                error: { message: "Order query failed" },
+              }),
+            }),
+          }),
+        }),
+      };
+    }
+    return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) };
+  });
+
+  await expect(
+    runVerifiedOfferReconciliation(actor(), tenantId, request.requestId),
+  ).rejects.toMatchObject({
+    code: "RECONCILIATION_ORDER_FETCH_FAILED",
+  });
+});
+
+it("reconciliation: empty ledger row within 60s grace period returns pendingGrace: true without premature unlock", async () => {
   mockAdminFrom.mockImplementation((table: string) => {
     if (table === "order_write_requests") {
       return {
@@ -469,10 +520,53 @@ it("reconciliation: identifies non-committed uncertain request safely", async ()
     return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) };
   });
 
-  const res = await runVerifiedOfferReconciliation(actor(), tenantId, request.requestId);
+  const recentTimestamp = new Date(Date.now() - 15_000).toISOString(); // 15s ago
+  const res = await runVerifiedOfferReconciliation(
+    actor(),
+    tenantId,
+    request.requestId,
+    recentTimestamp,
+  );
+  expect(res).toEqual({
+    reconciled: false,
+    committed: false,
+    pendingGrace: true,
+    reason: "TRANSACTION_POTENTIALLY_IN_FLIGHT",
+    requestId: request.requestId,
+    order: null,
+  });
+});
+
+it("reconciliation: empty ledger row after 60s statement_timeout safely confirms uncommitted", async () => {
+  mockAdminFrom.mockImplementation((table: string) => {
+    if (table === "order_write_requests") {
+      return {
+        select: () => ({
+          eq: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({
+                data: null,
+                error: null,
+              }),
+            }),
+          }),
+        }),
+      };
+    }
+    return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) };
+  });
+
+  const expiredTimestamp = new Date(Date.now() - 75_000).toISOString(); // 75s ago (> 60s)
+  const res = await runVerifiedOfferReconciliation(
+    actor(),
+    tenantId,
+    request.requestId,
+    expiredTimestamp,
+  );
   expect(res).toEqual({
     reconciled: true,
     committed: false,
+    pendingGrace: false,
     requestId: request.requestId,
     order: null,
   });

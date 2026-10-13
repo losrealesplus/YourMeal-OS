@@ -673,7 +673,11 @@ export function UniversalOrderIntakeDrawer({
         "@/modules/weekly-menu/application/offer-write.functions"
       );
       const result = await reconcileOfferOrder({
-        data: { tenantId, requestId: pendingRecovery.requestId },
+        data: {
+          tenantId,
+          requestId: pendingRecovery.requestId,
+          clientTimestamp: pendingRecovery.timestamp,
+        },
       });
       if (result.committed && result.order) {
         toast.success(
@@ -688,6 +692,10 @@ export function UniversalOrderIntakeDrawer({
           orderId: result.order.id,
         });
         onOpenChange(false);
+      } else if (!result.reconciled && result.pendingGrace) {
+        toast.warning(
+          `La transacción (#${pendingRecovery.requestId.slice(0, 8)}) podría seguir en curso en el servidor. Espera al menos 60 segundos antes de reintentar la conciliación. Bloqueo de seguridad conservado.`,
+        );
       } else {
         toast.info(
           `La operación previa no se registró en el servidor (#${pendingRecovery.requestId.slice(0, 8)}). Desbloqueando formulario para nueva captura segura.`,
@@ -843,21 +851,25 @@ export function UniversalOrderIntakeDrawer({
         await customCaptureTransport(),
       ));
 
-      // Persist minimal recovery token before calling captureOrder
-      // Ensures that if connection drops, or tab is closed/reloaded, the request identity is preserved
-      savePendingCaptureToken({
-        requestId: captureSession.review?.request?.requestId ?? crypto.randomUUID(),
-        tenantId,
-        customerId: customerMode === "new" ? "new_customer_placeholder" : selectedCustomerId,
-        customerDisplayName:
-          selectedCustomerDisplayName || (customerMode === "new" ? newCustomerName : undefined),
-        weekStart,
-        lineCount: lines.length,
-        timestamp: new Date().toISOString(),
-      });
-
       const result = await StaffOrderCaptureService.captureOrder(ctx, dto, {
         session: captureSession,
+        beforeCommit: (preparedSession) => {
+          const canonicalRequestId = preparedSession.review?.request?.requestId;
+          if (!canonicalRequestId) {
+            throw new Error("CANNOT_COMMIT_WITHOUT_CANONICAL_REQUEST_ID");
+          }
+          // Persist minimal recovery token with the exact canonical requestId before commit is invoked.
+          // Throws StoragePersistenceError if localStorage is unavailable or write cannot be verified,
+          // which immediately aborts commit. Zero customer personal names or PII stored.
+          savePendingCaptureToken({
+            requestId: canonicalRequestId,
+            tenantId,
+            customerId: customerMode === "new" ? "new_customer_placeholder" : selectedCustomerId,
+            weekStart,
+            lineCount: lines.length,
+            timestamp: new Date().toISOString(),
+          });
+        },
       });
 
       // Clear the pending token on successful commit
@@ -876,7 +888,7 @@ export function UniversalOrderIntakeDrawer({
     } catch (e) {
       const isKnownNonPublishedError =
         e instanceof Error &&
-        [
+        ([
           "OFFER_PRICING_OVERRIDE_UNSUPPORTED",
           "CUSTOM_NOT_ENABLED",
           "PRICE_CHANGED",
@@ -888,7 +900,11 @@ export function UniversalOrderIntakeDrawer({
           "OFFER_AMBIGUOUS",
           "COMMERCIAL_QUOTE_REQUIRED",
           "TENANT_MISMATCH",
-        ].includes(e.message);
+          "STORAGE_PERSISTENCE_FAILED",
+        ].includes(e.message) ||
+          e.name === "StoragePersistenceError" ||
+          e.message.startsWith("Failed to persist recovery token") ||
+          e.message.startsWith("LocalStorage is not available"));
 
       if (isKnownNonPublishedError) {
         clearPendingCaptureToken(tenantId);
@@ -984,7 +1000,7 @@ export function UniversalOrderIntakeDrawer({
                   </p>
                   <p className="text-[11px] leading-relaxed opacity-90">
                     Se registró un intento de confirmación previo para{" "}
-                    <strong>{pendingRecovery.customerDisplayName || "el cliente"}</strong> (Semana {pendingRecovery.weekStart}) cuya respuesta del servidor quedó interrumpida. Para prevenir pedidos duplicados en el ledger canónico, las nuevas capturas están bloqueadas hasta conciliar con el servidor.
+                    <strong>el cliente (#{pendingRecovery.customerId.slice(0, 8)})</strong> (Semana {pendingRecovery.weekStart}) cuya respuesta del servidor quedó interrumpida. Para prevenir pedidos duplicados en el ledger canónico, las nuevas capturas están bloqueadas hasta conciliar con el servidor.
                   </p>
                   <div className="flex items-center gap-2 pt-1">
                     <Button

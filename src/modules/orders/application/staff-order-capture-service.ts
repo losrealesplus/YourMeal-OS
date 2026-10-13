@@ -27,6 +27,9 @@ import {
 export interface StaffOrderCaptureOptions {
   transport?: CaptureTransport;
   session?: ReturnType<typeof createCustomCaptureSession>;
+  beforeCommit?: (
+    session: ReturnType<typeof createCustomCaptureSession>,
+  ) => void | Promise<void>;
 }
 
 export interface UniversalOrderCaptureLineInput {
@@ -211,6 +214,11 @@ export const StaffOrderCaptureService = {
         createCustomCaptureSession(options?.transport ?? (await customCaptureTransport()));
 
       await session.prepare(ctx.tenantId, command);
+
+      if (options?.beforeCommit) {
+        await options.beforeCommit(session);
+      }
+
       const writeResult = await session.commit();
 
       return {

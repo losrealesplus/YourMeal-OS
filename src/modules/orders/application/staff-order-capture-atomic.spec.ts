@@ -248,4 +248,42 @@ describe("EatClean Canonical V2 Order Intake Integration", () => {
 
     expect(transport.quote).not.toHaveBeenCalled();
   });
+
+  it("REQUEST_ID_MATCH: passes identical canonical requestId to beforeCommit, Quote V2, and Commit V2", async () => {
+    const { ctx, transport } = fixture();
+    let capturedInBeforeCommit: string | undefined;
+
+    const result = await StaffOrderCaptureService.captureOrder(ctx, dto, {
+      transport,
+      beforeCommit: (session) => {
+        capturedInBeforeCommit = session.review?.request?.requestId;
+      },
+    });
+
+    expect(capturedInBeforeCommit).toBeDefined();
+    const quoteReq = (transport.quote as any).mock.calls[0][0];
+    const commitReq = (transport.mixed as any).mock.calls[0][0];
+
+    // Guarantee that requestId is 100% deterministic and identical across all phases
+    expect(capturedInBeforeCommit).toBe(quoteReq.requestId);
+    expect(capturedInBeforeCommit).toBe(commitReq.requestId);
+    expect(result.order.status).toBe("draft");
+  });
+
+  it("beforeCommit storage failure immediately aborts and NEVER executes session commit", async () => {
+    const { ctx, transport } = fixture();
+
+    await expect(
+      StaffOrderCaptureService.captureOrder(ctx, dto, {
+        transport,
+        beforeCommit: () => {
+          throw new Error("STORAGE_PERSISTENCE_FAILED");
+        },
+      }),
+    ).rejects.toThrow("STORAGE_PERSISTENCE_FAILED");
+
+    // Quote was prepared, but commit was strictly aborted
+    expect(transport.quote).toHaveBeenCalledTimes(1);
+    expect(transport.mixed).not.toHaveBeenCalled();
+  });
 });

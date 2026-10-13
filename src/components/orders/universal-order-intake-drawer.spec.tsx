@@ -176,6 +176,18 @@ describe("UniversalOrderIntakeDrawer Component Rendering & Contract (CR-OPS-05)"
     expect(source).toContain("pending-capture-reconciliation-alert");
     expect(source).toContain("Conciliar con el servidor");
     expect(source).toContain("disabled={submitting || totalPortions === 0 || isTenantCaptureFrozen || !!pendingRecovery}");
+
+    // Deterministic canonical requestId passed via beforeCommit callback
+    expect(source).toContain("beforeCommit: (preparedSession) =>");
+    expect(source).toContain("canonicalRequestId = preparedSession.review?.request?.requestId");
+    expect(source).not.toContain("crypto.randomUUID()");
+
+    // Data minimization: ZERO customerDisplayName stored or referenced in recovery token
+    expect(source).not.toContain("customerDisplayName");
+
+    // Avoid false negatives: clientTimestamp passed and pendingGrace handled
+    expect(source).toContain("clientTimestamp: pendingRecovery.timestamp");
+    expect(source).toContain("result.pendingGrace");
   });
 });
 
