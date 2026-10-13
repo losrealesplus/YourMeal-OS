@@ -676,7 +676,6 @@ export function UniversalOrderIntakeDrawer({
         data: {
           tenantId,
           requestId: pendingRecovery.requestId,
-          clientTimestamp: pendingRecovery.timestamp,
         },
       });
       if (result.committed && result.order) {
@@ -692,17 +691,13 @@ export function UniversalOrderIntakeDrawer({
           orderId: result.order.id,
         });
         onOpenChange(false);
-      } else if (!result.reconciled && result.pendingGrace) {
-        toast.warning(
-          `La transacción (#${pendingRecovery.requestId.slice(0, 8)}) podría seguir en curso en el servidor. Espera al menos 60 segundos antes de reintentar la conciliación. Bloqueo de seguridad conservado.`,
-        );
       } else {
-        toast.info(
-          `La operación previa no se registró en el servidor (#${pendingRecovery.requestId.slice(0, 8)}). Desbloqueando formulario para nueva captura segura.`,
+        // Safe recovery: Never unlock automatically on missing ledger record.
+        // A delayed commit or network interruption means the outcome is still uncertain.
+        // The lock is strictly conserved to prevent duplicate orders.
+        toast.warning(
+          `Sin registro confirmado en el ledger (#${pendingRecovery.requestId.slice(0, 8)}). Se conserva el bloqueo para evitar pedidos duplicados. Comprueba de nuevo o realiza una conciliación administrativa.`,
         );
-        clearPendingCaptureToken(tenantId);
-        setPendingRecovery(null);
-        captureSessionRef.current = undefined;
       }
     } catch (err) {
       toast.error(
@@ -713,6 +708,21 @@ export function UniversalOrderIntakeDrawer({
     } finally {
       setReconciling(false);
     }
+  };
+
+  const handleAdminDiscardPending = () => {
+    if (!pendingRecovery || !tenantId) return;
+    const confirmed =
+      typeof window !== "undefined" &&
+      window.confirm(
+        `¿Confirmar conciliación administrativa?\n\nSolo descarta esta captura (#${pendingRecovery.requestId.slice(0, 8)}) si has verificado que la operación no se persistió en el servidor y deseas reiniciar el formulario manualmente.`,
+      );
+    if (!confirmed) return;
+
+    clearPendingCaptureToken(tenantId);
+    setPendingRecovery(null);
+    captureSessionRef.current = undefined;
+    toast.info("Captura pendiente descartada administrativamente. Formulario desbloqueado.");
   };
 
   const handleSubmit = async (autoConfirm: boolean) => {
@@ -1002,7 +1012,7 @@ export function UniversalOrderIntakeDrawer({
                     Se registró un intento de confirmación previo para{" "}
                     <strong>el cliente (#{pendingRecovery.customerId.slice(0, 8)})</strong> (Semana {pendingRecovery.weekStart}) cuya respuesta del servidor quedó interrumpida. Para prevenir pedidos duplicados en el ledger canónico, las nuevas capturas están bloqueadas hasta conciliar con el servidor.
                   </p>
-                  <div className="flex items-center gap-2 pt-1">
+                  <div className="flex items-center gap-2 pt-1 flex-wrap">
                     <Button
                       type="button"
                       size="sm"
@@ -1014,11 +1024,21 @@ export function UniversalOrderIntakeDrawer({
                       {reconciling ? (
                         <>
                           <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                          Conciliando con servidor...
+                          Comprobando servidor...
                         </>
                       ) : (
-                        "Conciliar con el servidor"
+                        "Comprobar estado en servidor"
                       )}
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="text-xs h-7 border-destructive/30 hover:bg-destructive/10 text-destructive dark:text-red-300"
+                      disabled={reconciling}
+                      onClick={handleAdminDiscardPending}
+                    >
+                      Descartar administrativamente
                     </Button>
                   </div>
                 </div>

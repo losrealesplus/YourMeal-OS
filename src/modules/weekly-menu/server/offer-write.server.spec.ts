@@ -444,7 +444,6 @@ it("reconciliation: recovers existing committed order from canonical ledger", as
   expect(res).toEqual({
     reconciled: true,
     committed: true,
-    pendingGrace: false,
     requestId: request.requestId,
     order: {
       id: committedOrderId,
@@ -501,7 +500,7 @@ it("reconciliation: confirmed ledger row + unreadable order throws error and str
   });
 });
 
-it("reconciliation: empty ledger row within 60s grace period returns pendingGrace: true without premature unlock", async () => {
+it("reconciliation: empty ledger row returns reconciled: false without timer-based automatic unlock", async () => {
   mockAdminFrom.mockImplementation((table: string) => {
     if (table === "order_write_requests") {
       return {
@@ -520,24 +519,24 @@ it("reconciliation: empty ledger row within 60s grace period returns pendingGrac
     return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) };
   });
 
-  const recentTimestamp = new Date(Date.now() - 15_000).toISOString(); // 15s ago
   const res = await runVerifiedOfferReconciliation(
     actor(),
     tenantId,
     request.requestId,
-    recentTimestamp,
   );
   expect(res).toEqual({
     reconciled: false,
     committed: false,
-    pendingGrace: true,
-    reason: "TRANSACTION_POTENTIALLY_IN_FLIGHT",
     requestId: request.requestId,
     order: null,
+    reason: "LEDGER_RECORD_NOT_FOUND",
   });
 });
 
-it("reconciliation: empty ledger row after 60s statement_timeout safely confirms uncommitted", async () => {
+it("reconciliation: late arrival of committed ledger entry safely transitions to single confirmed order", async () => {
+  const committedOrderId = "99000000-0000-4000-8000-000000000001";
+  let committedInPostgres = false;
+
   mockAdminFrom.mockImplementation((table: string) => {
     if (table === "order_write_requests") {
       return {
@@ -545,7 +544,33 @@ it("reconciliation: empty ledger row after 60s statement_timeout safely confirms
           eq: () => ({
             eq: () => ({
               maybeSingle: async () => ({
-                data: null,
+                data: committedInPostgres
+                  ? {
+                      order_id: committedOrderId,
+                      committed_revision: 1,
+                      operation: "capture",
+                      created_at: "2026-10-13T10:00:00Z",
+                    }
+                  : null,
+                error: null,
+              }),
+            }),
+          }),
+        }),
+      };
+    }
+    if (table === "orders") {
+      return {
+        select: () => ({
+          eq: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({
+                data: {
+                  id: committedOrderId,
+                  status: "draft",
+                  total: 3.5,
+                  created_at: "2026-10-13T10:00:00Z",
+                },
                 error: null,
               }),
             }),
@@ -556,19 +581,19 @@ it("reconciliation: empty ledger row after 60s statement_timeout safely confirms
     return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) };
   });
 
-  const expiredTimestamp = new Date(Date.now() - 75_000).toISOString(); // 75s ago (> 60s)
-  const res = await runVerifiedOfferReconciliation(
-    actor(),
-    tenantId,
-    request.requestId,
-    expiredTimestamp,
-  );
-  expect(res).toEqual({
-    reconciled: true,
-    committed: false,
-    pendingGrace: false,
-    requestId: request.requestId,
-    order: null,
-  });
+  // Check 1: In-flight / delayed commit, ledger empty -> stays uncertain (reconciled: false)
+  const initialCheck = await runVerifiedOfferReconciliation(actor(), tenantId, request.requestId);
+  expect(initialCheck.committed).toBe(false);
+  expect(initialCheck.reconciled).toBe(false);
+
+  // Late transaction commit completes in Postgres
+  committedInPostgres = true;
+
+  // Check 2: Subsequent reconciliation check detects the single committed order without creating duplicates
+  const finalCheck = await runVerifiedOfferReconciliation(actor(), tenantId, request.requestId);
+  expect(finalCheck.committed).toBe(true);
+  expect(finalCheck.reconciled).toBe(true);
+  expect(finalCheck.order?.id).toBe(committedOrderId);
+  expect(finalCheck.order?.total).toBe(3.5);
 });
 

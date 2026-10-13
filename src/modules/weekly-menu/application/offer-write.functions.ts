@@ -48,7 +48,6 @@ export const reconcileOfferOrder = createServerFn({ method: "POST" })
     z.object({
       tenantId: z.string().uuid(),
       requestId: z.string().uuid(),
-      clientTimestamp: z.string().optional(),
     }),
   )
   .handler(async ({ context, data }) => {
@@ -57,7 +56,6 @@ export const reconcileOfferOrder = createServerFn({ method: "POST" })
       { supabase: context.supabase, userId: context.userId },
       data.tenantId,
       data.requestId,
-      data.clientTimestamp,
     );
   });
 

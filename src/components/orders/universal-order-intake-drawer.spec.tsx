@@ -173,8 +173,10 @@ describe("UniversalOrderIntakeDrawer Component Rendering & Contract (CR-OPS-05)"
     expect(source).toContain("savePendingCaptureToken");
     expect(source).toContain("clearPendingCaptureToken");
     expect(source).toContain("handleReconcilePending");
+    expect(source).toContain("handleAdminDiscardPending");
     expect(source).toContain("pending-capture-reconciliation-alert");
-    expect(source).toContain("Conciliar con el servidor");
+    expect(source).toContain("Comprobar estado en servidor");
+    expect(source).toContain("Descartar administrativamente");
     expect(source).toContain("disabled={submitting || totalPortions === 0 || isTenantCaptureFrozen || !!pendingRecovery}");
 
     // Deterministic canonical requestId passed via beforeCommit callback
@@ -185,9 +187,9 @@ describe("UniversalOrderIntakeDrawer Component Rendering & Contract (CR-OPS-05)"
     // Data minimization: ZERO customerDisplayName stored or referenced in recovery token
     expect(source).not.toContain("customerDisplayName");
 
-    // Avoid false negatives: clientTimestamp passed and pendingGrace handled
-    expect(source).toContain("clientTimestamp: pendingRecovery.timestamp");
-    expect(source).toContain("result.pendingGrace");
+    // Strictly NO timer-based automatic unlock or clientTimestamp authority
+    expect(source).not.toContain("clientTimestamp: pendingRecovery.timestamp");
+    expect(source).not.toContain("result.pendingGrace");
   });
 });
 

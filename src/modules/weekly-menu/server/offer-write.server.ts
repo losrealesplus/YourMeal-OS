@@ -312,7 +312,6 @@ export async function runVerifiedOfferReconciliation(
   actor: VerifiedOfferActor,
   tenantId: string,
   requestId: string,
-  clientTimestamp?: string,
 ) {
   await verifiedOrderActorContext(actor, tenantId);
 
@@ -329,28 +328,16 @@ export async function runVerifiedOfferReconciliation(
   }
 
   if (!requestRow?.order_id) {
-    // If request timestamp is recent (< 60s, PostgreSQL statement_timeout window),
-    // transaction could still be in-flight. Do NOT conclude uncommitted prematurely!
-    const elapsedMs = clientTimestamp ? Date.now() - Date.parse(clientTimestamp) : null;
-    const isRecent = elapsedMs !== null && !isNaN(elapsedMs) && elapsedMs < 60_000;
-
-    if (isRecent) {
-      return {
-        reconciled: false,
-        committed: false,
-        pendingGrace: true,
-        reason: "TRANSACTION_POTENTIALLY_IN_FLIGHT",
-        requestId,
-        order: null,
-      };
-    }
-
+    // Ledger has no confirmed row for this requestId.
+    // NEVER assume the operation died or unlock automatically based on timers:
+    // a network delay or slow transaction could still be in-flight.
+    // Lock must remain active on the client.
     return {
-      reconciled: true,
+      reconciled: false,
       committed: false,
-      pendingGrace: false,
       requestId,
       order: null,
+      reason: "LEDGER_RECORD_NOT_FOUND",
     };
   }
 
@@ -375,7 +362,6 @@ export async function runVerifiedOfferReconciliation(
   return {
     reconciled: true,
     committed: true,
-    pendingGrace: false,
     requestId,
     order: {
       id: orderRow.id,
