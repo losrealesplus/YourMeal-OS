@@ -13,14 +13,16 @@
  */
 
 import { chromium } from 'playwright';
-import { createClient } from '@supabase/supabase-js';
+import { createVerificationClient as createClient, verificationInvocation, verificationPublishableKey } from './lib/verification-supabase.mjs';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const PROD_URL = 'https://eatclean.yourmealos.com';
-const SUPABASE_URL = 'https://nhirlpkuvonggctdzzad.supabase.co';
-const SUPABASE_ANON_KEY = process.env.EATCLEAN_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
-const SUPABASE_SERVICE_KEY = process.env.EATCLEAN_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const verification = verificationInvocation('verify-eatclean-prod-live', true);
+if (verification.environment !== 'production') throw new Error('VERIFICATION_PRODUCTION_SCRIPT_ENVIRONMENT_REQUIRED');
+const SUPABASE_URL = verification.url;
+const SUPABASE_SERVICE_KEY = verification.secretKey;
+const SUPABASE_ANON_KEY = verificationPublishableKey('production');
 
 const EATCLEAN_TENANT_ID = '8bba00ba-331b-42c8-9283-4e3836ffb870';
 const QA_CUSTOMER_ID = 'cccc0001-8bba-42c8-9283-000000000001';

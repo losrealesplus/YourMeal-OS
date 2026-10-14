@@ -71,3 +71,34 @@ for (const name of scripts) test(`${name} uses guarded explicit configuration`, 
   assert.match(source, new RegExp(`verificationConfig\\('${name.includes('gate-5-staging') ? 'staging' : 'production'}'\\)`));
   assert.doesNotMatch(source, /eatcleanbackend|find-generic-password|getServiceKey|process\.env\.(?:EATCLEAN_SUPABASE_SERVICE_ROLE_KEY|SUPABASE_SERVICE_ROLE_KEY)/);
 });
+
+test('production write opt-in binds script and project; credentials alone never authorize', async () => {
+  const { verificationInvocation } = await import('./verification-supabase.mjs');
+  const env = envFor('production', prod);
+  for (const args of [[], ['--environment=production'], ['--environment=production', '--authorize-production-writes=other:'+prod], ['--environment=production', '--authorize-production-writes=seed-day0:'+stage]]) {
+    assert.throws(() => verificationInvocation('seed-day0', true, args, env));
+  }
+  assert.equal(verificationInvocation('seed-day0', true, ['--environment=production', '--authorize-production-writes=seed-day0:'+prod], env).environment, 'production');
+});
+test('staging writers require isolated explicit configuration without production authorization', async () => {
+  const { verificationInvocation } = await import('./verification-supabase.mjs');
+  assert.equal(verificationInvocation('seed-day0', true, ['--environment=staging'], envFor('staging', stage)).environment, 'staging');
+  assert.throws(() => verificationInvocation('seed-day0', true, ['--environment=staging'], envFor('staging', prod)));
+});
+test('read-only transport blocks POST RPC, PUT, PATCH and DELETE before any request', async () => {
+  let calls = 0;
+  const send = createVerificationFetch(`https://${stage}.supabase.co`, 'sb_secret_synthetic', async () => { calls++; return new Response('{}'); }, { readOnly: true });
+  for (const method of ['POST','PUT','PATCH','DELETE']) assert.throws(() => send(`https://${stage}.supabase.co/rest/v1/rpc/example`, { method }), /VERIFICATION_READ_ONLY_REQUIRED/);
+  await send(`https://${stage}.supabase.co/rest/v1/tenants`, { method: 'GET' });
+  await send(new Request(`https://${stage}.supabase.co/rest/v1/tenants`, { method: 'HEAD' }));
+  assert.equal(calls, 2);
+});
+for (const name of ['verify-eatclean-prod-live.mjs','bootstrap-verify.mjs','seed-day0.mjs','seed-platform-owners.mjs']) test(`${name} has no legacy fallback or dotenv and uses invocation guard`, () => {
+  const source = readFileSync(new URL(`../${name}`, import.meta.url), 'utf8');
+  assert.match(source, /verificationInvocation/);
+  assert.doesNotMatch(source, /dotenv\/config|process\.env\.(?:SUPABASE_SERVICE_ROLE_KEY|EATCLEAN_SUPABASE_SERVICE_ROLE_KEY|VITE_SUPABASE_ANON_KEY)|requireEnv\("SUPABASE/);
+  if (name === 'bootstrap-verify.mjs') {
+    assert.match(source, /createReadOnlyVerificationClient as createClient/);
+    assert.match(source, /const live = args.includes\("--live"\);/);
+  } else assert.match(source, /verificationInvocation\(['"][^'"]+['"], true\)/);
+});

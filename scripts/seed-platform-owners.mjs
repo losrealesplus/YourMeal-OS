@@ -11,8 +11,8 @@
  * Emails removed from config are deactivated and platform grants revoked.
  *
  * Required env:
- *   SUPABASE_URL (or VITE_SUPABASE_URL)
- *   SUPABASE_SERVICE_ROLE_KEY
+ *   EATCLEAN_<ENV>_PROJECT_REF / SUPABASE_URL / SUPABASE_SECRET_KEY
+ *   --environment=staging|production; production requires scoped write authorization
  *
  * Optional:
  *   PLATFORM_OWNERS_PASSWORD   (min 8; used only when creating Auth users)
@@ -21,24 +21,14 @@
  * Usage:
  *   npm run seed:platform-owners
  *
- * Loads repository-root `.env` via dotenv (same pattern as PS-002-C scripts).
- * Node does not inject Vite/env files automatically.
+ * Never loads dotenv or legacy credentials automatically.
  */
-import "dotenv/config";
-import { createClient } from "@supabase/supabase-js";
+import { createVerificationClient as createClient, verificationInvocation } from "./lib/verification-supabase.mjs";
 import { resolve } from "node:path";
 import {
   DEFAULT_PLATFORM_OWNERS_CONFIG_PATH,
   loadPlatformOwnersConfig,
 } from "./lib/platform-owners-config.mjs";
-
-function requireEnv(name, fallbacks = []) {
-  const keys = [name, ...fallbacks];
-  for (const k of keys) {
-    if (process.env[k]) return process.env[k];
-  }
-  throw new Error(`Missing env: ${keys.join(" | ")}`);
-}
 
 async function findUserByEmail(admin, email) {
   for (let page = 1; page <= 20; page += 1) {
@@ -127,13 +117,13 @@ async function syncConfigTable(admin, config) {
 }
 
 async function main() {
+  const { url, secretKey: serviceKey } = verificationInvocation("seed-platform-owners", true);
   const configPath = process.env.PLATFORM_OWNERS_CONFIG
     ? resolve(process.env.PLATFORM_OWNERS_CONFIG)
     : DEFAULT_PLATFORM_OWNERS_CONFIG_PATH;
   const config = loadPlatformOwnersConfig(configPath);
 
-  const url = requireEnv("SUPABASE_URL", ["VITE_SUPABASE_URL"]);
-  const serviceKey = requireEnv("SUPABASE_SERVICE_ROLE_KEY");
+
   const password = process.env.PLATFORM_OWNERS_PASSWORD;
 
   const admin = createClient(url, serviceKey, {

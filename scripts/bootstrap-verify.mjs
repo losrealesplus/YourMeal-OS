@@ -19,7 +19,7 @@
  *   npm run bootstrap:verify -- --ci
  *   npm run bootstrap:verify -- --live --tenant=eatclean-tenerife --json=docs/10-validation/evidence/op001/bootstrap-report.json
  */
-import { createClient } from "@supabase/supabase-js";
+import { createReadOnlyVerificationClient as createClient, verificationInvocation } from "./lib/verification-supabase.mjs";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -164,15 +164,7 @@ async function count(db, table, apply) {
 }
 
 async function runLive(tenantArg) {
-  const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) {
-    const err = new Error(
-      "Live/CI live mode requires SUPABASE_URL (or VITE_SUPABASE_URL) and SUPABASE_SERVICE_ROLE_KEY",
-    );
-    err.status = EXIT.CONFIG;
-    throw err;
-  }
+  const { url, secretKey: key } = verificationInvocation("bootstrap-verify", false);
 
   const db = createClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
@@ -335,7 +327,7 @@ function writeJson(jsonPath, report) {
 async function main() {
   const args = process.argv.slice(2);
   const ci = args.includes("--ci");
-  const live = args.includes("--live") || (ci && process.env.SUPABASE_SERVICE_ROLE_KEY);
+  const live = args.includes("--live");
   const tenantArg = args
     .find((a) => a.startsWith("--tenant="))
     ?.slice("--tenant=".length);
@@ -363,7 +355,7 @@ async function main() {
 
   if (!live) {
     if (ci) {
-      console.log("\nCI pure-only PASS (no SUPABASE_SERVICE_ROLE_KEY for live).");
+      console.log("\nCI pure-only PASS (live requires explicit --live and --environment).");
       if (jsonArg) writeJson(jsonArg, pureReport);
       process.exit(EXIT.PASS);
     }

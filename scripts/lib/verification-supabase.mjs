@@ -28,13 +28,15 @@ export function verificationPublishableKey(environment, env = process.env) {
   return key;
 }
 
-export function createVerificationFetch(url, key, transport = globalThis.fetch) {
+export function createVerificationFetch(url, key, transport = globalThis.fetch, { readOnly = false } = {}) {
   return (input, init) => {
     let destination;
     try { destination = new URL(input instanceof Request ? input.url : input); }
     catch { throw new Error('VERIFICATION_REQUEST_DESTINATION_FORBIDDEN'); }
     if (destination.origin !== url || destination.username || destination.password)
       throw new Error('VERIFICATION_REQUEST_DESTINATION_FORBIDDEN');
+    const method = (init?.method ?? (input instanceof Request ? input.method : 'GET')).toUpperCase();
+    if (readOnly && !['GET', 'HEAD'].includes(method)) throw new Error('VERIFICATION_READ_ONLY_REQUIRED');
     const headers = new Headers(input instanceof Request ? input.headers : undefined);
     new Headers(init?.headers).forEach((value, name) => headers.set(name, value));
     if (headers.get('Authorization') === `Bearer ${key}`) headers.delete('Authorization');
@@ -48,5 +50,24 @@ export function createVerificationClient(url, key, options = {}) {
   return createClient(url, key, {
     ...options,
     global: { ...options.global, fetch: createVerificationFetch(url, key) },
+  });
+}
+
+/** Explicit invocation: environment is mandatory; production writers require scoped opt-in. */
+export function verificationInvocation(script, writeCapable, argv = process.argv.slice(2), env = process.env) {
+  const environments = argv.filter(arg => arg.startsWith('--environment='));
+  if (environments.length !== 1) throw new Error('VERIFICATION_ENVIRONMENT_REQUIRED');
+  const environment = environments[0].slice('--environment='.length);
+  const config = verificationConfig(environment, env);
+  if (writeCapable && environment === 'production' &&
+      !argv.includes(`--authorize-production-writes=${script}:${productionRef}`))
+    throw new Error('VERIFICATION_PRODUCTION_WRITE_AUTHORIZATION_REQUIRED');
+  return { ...config, environment };
+}
+
+export function createReadOnlyVerificationClient(url, key, options = {}) {
+  return createClient(url, key, {
+    ...options,
+    global: { ...options.global, fetch: createVerificationFetch(url, key, globalThis.fetch, { readOnly: true }) },
   });
 }
