@@ -8,7 +8,7 @@ import type { AppRole } from "@/hooks/use-auth";
 import { can } from "@/permissions";
 import { DomainError } from "@/domain/errors";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { getTenantOffers } from "@/modules/commercial";
+import { getTenantOffers, registerTenantOffers } from "@/modules/commercial";
 import { resolveServerInstanceRuntimeConfig } from "@/lib/instance-runtime-boundary";
 import "@/tenant/commercial-config";
 import type { Json } from "@/integrations/supabase/types";
@@ -78,15 +78,18 @@ export async function offerCommercialContext(actor: VerifiedOfferActor, tenantId
 
   // Commercial configuration is strictly registered within the authorized instance context.
   // The Core Demo server is never contaminated with EatClean instance configuration.
-  if (
-    serverConfig.tenantSlug === "eatclean" &&
-    tenant.slug === "eatclean" &&
-    !hasRegisteredTenantOffers("eatclean")
-  ) {
-    const { registerEatCleanCommercialOffers } = await import(
+  const isEatClean =
+    (serverConfig.tenantSlug === "eatclean" || serverConfig.tenantSlug === "eatclean-staging") &&
+    (tenant.slug === "eatclean" || tenant.slug === "eatclean-staging");
+
+  if (isEatClean && !hasRegisteredTenantOffers(tenant.slug)) {
+    const { registerEatCleanCommercialOffers, EATCLEAN_COMMERCIAL_OFFERS } = await import(
       "../../../../instances/yourmeal-eatclean/config/commercial.config"
     );
     registerEatCleanCommercialOffers();
+    if (tenant.slug !== "eatclean") {
+      registerTenantOffers(tenant.slug, EATCLEAN_COMMERCIAL_OFFERS);
+    }
   }
 
   const offers = getTenantOffers(tenant.slug);
@@ -216,12 +219,17 @@ export async function runVerifiedOfferWrite(
     throw new OfferWriteRpcError("OFFER_WRITE_UNAVAILABLE");
   }
   const { data, error } = response;
-  if (error)
+  if (error) {
+    console.error("[OFFER_WRITE_RPC_DEBUG] error:", error);
     throw new OfferWriteRpcError(
       allowedCodes.find((code) => error.message === code || error.message.startsWith(`${code}:`)) ??
         "OFFER_WRITE_FAILED",
     );
-  if (data === null) throw new OfferWriteRpcError("OFFER_WRITE_FAILED");
+  }
+  if (data === null) {
+    console.error("[OFFER_WRITE_RPC_DEBUG] data is null!");
+    throw new OfferWriteRpcError("OFFER_WRITE_FAILED");
+  }
   if (quoteId || customCommit)
     return parseCanonicalOrderWriteResult(data, request.tenantId, request.command);
   const quote = z

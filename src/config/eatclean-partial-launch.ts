@@ -112,6 +112,12 @@ export function isEatCleanCrmMutationFrozen(context?: TenantContextParam): boole
  */
 export function isEatCleanStaffOrderCaptureFrozen(context?: TenantContextParam): boolean {
   if (!isEatCleanContext(context)) return false;
+  if (
+    import.meta.env?.VITE_YOURMEAL_RUNTIME_ENV === "staging_local" ||
+    (typeof process !== "undefined" && process.env?.YOURMEAL_RUNTIME_ENV === "staging_local")
+  ) {
+    return false;
+  }
   return !EATCLEAN_PARTIAL_LAUNCH_CONFIG.features.staffOrderCapture;
 }
 
