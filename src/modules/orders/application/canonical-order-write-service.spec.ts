@@ -203,6 +203,34 @@ describe("canonical order authenticated application boundary", () => {
     expect(rpc).toHaveBeenCalledTimes(2);
     expect(from).not.toHaveBeenCalled();
   });
+  it("identical request replay preserves single order, item and audit capture invariants with replayed: true", async () => {
+    const initial = committed();
+    const replay = { ...committed(), replayed: true };
+    const rpc = vi
+      .fn()
+      .mockResolvedValueOnce({ data: initial, error: null })
+      .mockResolvedValueOnce({ data: replay, error: null });
+    const from = vi.fn();
+    const ctx: ServiceContext = {
+      supabase: { rpc, from } as unknown as ServiceContext["supabase"],
+      userId: "77777777-7777-4777-8777-777777777777",
+      tenantId: tenant,
+      roles: ["company_admin"],
+      capabilities: new Set(["orders.write"]),
+    };
+    const input = capture();
+    const firstResult = await CanonicalOrderWriteService.capture(ctx, input);
+    expect(firstResult.replayed).toBe(false);
+    expect(firstResult.items.length).toBe(1);
+
+    const replayResult = await CanonicalOrderWriteService.capture(ctx, input);
+    expect(replayResult.replayed).toBe(true);
+    expect(replayResult.order.id).toBe(firstResult.order.id);
+    expect(replayResult.items.length).toBe(1);
+    expect(replayResult.committedRevision).toBe(firstResult.committedRevision);
+    expect(rpc).toHaveBeenCalledTimes(2);
+    expect(from).not.toHaveBeenCalled();
+  });
   it("rejects denied callers before making an RPC", async () => {
     const { ctx, rpc } = context();
     await expect(

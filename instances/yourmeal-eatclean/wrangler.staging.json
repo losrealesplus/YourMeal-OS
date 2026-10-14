@@ -20,9 +20,10 @@
     "binding": "ASSETS"
   },
   "vars": {
-    "TENANT_SLUG": "eatclean",
+    "TENANT_SLUG": "eatclean-staging-unconfigured",
     "CORE_VERSION": "0.1.0",
-    "SUPABASE_URL": "https://nhirlpkuvonggctdzzad.supabase.co"
+    "SUPABASE_URL": "https://eatclean-staging-unconfigured.supabase.co",
+    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_STAGING_UNCONFIGURED_REPLACE_ME"
   },
   "routes": [
     {

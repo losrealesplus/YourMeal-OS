@@ -43,8 +43,6 @@ def start():
   expected={'20261008112217_p34_identity_crm_profile.sql':'4ee85c359dd1d098ae4dd7581e6bca1d1288971da474e25cdb381ac23ff872f4','20261008160753_p34_identity_conflict_recovery.sql':'81acb6ac9c87c3a38e60ff5f810ff9f6a0a201a015465b01e5b48eb57a0726b4'}
   for f,h in expected.items():assert hashlib.sha256((ROOT/'supabase/migrations'/f).read_bytes()).hexdigest()==h
   for p in sorted((ROOT/'supabase/migrations').glob('*.sql')):
-   if p.name.startswith(('20261007020208_','20261007020245_','20261007020849_')):continue
-   if p.name.endswith('_p34_identity_crm_profile.sql'):sql('ALTER TABLE public.audit_log ALTER COLUMN entity_id TYPE uuid USING entity_id::uuid;')
    sql(('' if p.name.endswith('_release_cr_order_writer_auth_usage.sql') else 'SET ROLE postgres;\n')+p.read_text())
   env={'GOTRUE_API_HOST':'0.0.0.0','GOTRUE_API_PORT':'9999','API_EXTERNAL_URL':'http://127.0.0.1:54331/auth/v1','GOTRUE_DB_DRIVER':'postgres','GOTRUE_DB_DATABASE_URL':f'postgres://supabase_auth_admin:{PASSWORD}@{DB}:5432/postgres','GOTRUE_SITE_URL':'http://127.0.0.1:8080','GOTRUE_URI_ALLOW_LIST':'http://127.0.0.1:8080/**','GOTRUE_JWT_SECRET':SECRET,'GOTRUE_JWT_AUD':'authenticated','GOTRUE_JWT_DEFAULT_GROUP_NAME':'authenticated','GOTRUE_JWT_ADMIN_ROLES':'service_role','GOTRUE_JWT_EXP':'3600','GOTRUE_EXTERNAL_EMAIL_ENABLED':'true','GOTRUE_MAILER_AUTOCONFIRM':'true','GOTRUE_DISABLE_SIGNUP':'false','GOTRUE_EXTERNAL_PHONE_ENABLED':'false','GOTRUE_EXTERNAL_GOOGLE_ENABLED':'false','GOTRUE_EXTERNAL_APPLE_ENABLED':'false'}
   args=[]

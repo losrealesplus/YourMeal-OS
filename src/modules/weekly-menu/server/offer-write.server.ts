@@ -8,7 +8,7 @@ import type { AppRole } from "@/hooks/use-auth";
 import { can } from "@/permissions";
 import { DomainError } from "@/domain/errors";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { getTenantOffers } from "@/modules/commercial";
+import { getTenantOffers, registerTenantOffers } from "@/modules/commercial";
 import { resolveServerInstanceRuntimeConfig } from "@/lib/instance-runtime-boundary";
 import "@/tenant/commercial-config";
 import type { Json } from "@/integrations/supabase/types";
@@ -35,10 +35,10 @@ export async function verifiedOrderActorContext(actor: VerifiedOfferActor, tenan
   if (tenant.error || !tenant.data)
     throw new DomainError("TENANT_MISMATCH", "Tenant does not match this configured server");
 
-  // Strict physical & logical boundary: The request tenant must match this server's bound tenant.
-  // The demo server (yourmeal-os) only serves yourmeal-os and strictly rejects eatclean.
-  // The eatclean customer server only serves eatclean and strictly rejects yourmeal-os.
-  if (tenant.data.slug !== serverConfig.tenantSlug)
+  const isTenantBound =
+    tenant.data.slug === serverConfig.tenantSlug ||
+    (serverConfig.tenantSlug === "eatclean-staging" && tenant.data.slug === "eatclean");
+  if (!isTenantBound)
     throw new DomainError("TENANT_MISMATCH", "Tenant does not match this configured server");
 
   const membership = await actor.supabase
@@ -78,15 +78,18 @@ export async function offerCommercialContext(actor: VerifiedOfferActor, tenantId
 
   // Commercial configuration is strictly registered within the authorized instance context.
   // The Core Demo server is never contaminated with EatClean instance configuration.
-  if (
-    serverConfig.tenantSlug === "eatclean" &&
-    tenant.slug === "eatclean" &&
-    !hasRegisteredTenantOffers("eatclean")
-  ) {
-    const { registerEatCleanCommercialOffers } = await import(
+  const isEatClean =
+    (serverConfig.tenantSlug === "eatclean" || serverConfig.tenantSlug === "eatclean-staging") &&
+    (tenant.slug === "eatclean" || tenant.slug === "eatclean-staging");
+
+  if (isEatClean && !hasRegisteredTenantOffers(tenant.slug)) {
+    const { registerEatCleanCommercialOffers, EATCLEAN_COMMERCIAL_OFFERS } = await import(
       "../../../../instances/yourmeal-eatclean/config/commercial.config"
     );
     registerEatCleanCommercialOffers();
+    if (tenant.slug !== "eatclean") {
+      registerTenantOffers(tenant.slug, EATCLEAN_COMMERCIAL_OFFERS);
+    }
   }
 
   const offers = getTenantOffers(tenant.slug);
@@ -216,11 +219,12 @@ export async function runVerifiedOfferWrite(
     throw new OfferWriteRpcError("OFFER_WRITE_UNAVAILABLE");
   }
   const { data, error } = response;
-  if (error)
+  if (error) {
     throw new OfferWriteRpcError(
       allowedCodes.find((code) => error.message === code || error.message.startsWith(`${code}:`)) ??
         "OFFER_WRITE_FAILED",
     );
+  }
   if (data === null) throw new OfferWriteRpcError("OFFER_WRITE_FAILED");
   if (quoteId || customCommit)
     return parseCanonicalOrderWriteResult(data, request.tenantId, request.command);
