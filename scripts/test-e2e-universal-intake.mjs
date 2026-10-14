@@ -7,17 +7,10 @@ const sql = (query) =>
     encoding: "utf8",
   }).trim();
 
-console.log("Resetting orders and idempotency ledgers for pristine E2E run...");
+console.log("Ensuring orders and idempotency ledgers are clean for pristine E2E run...");
 sql(`
-  ALTER TABLE public.orders DISABLE TRIGGER USER;
-  ALTER TABLE public.order_items DISABLE TRIGGER USER;
+  TRUNCATE TABLE public.order_write_requests, public.delivery_services, public.order_items, public.orders CASCADE;
   DELETE FROM public.audit_log WHERE entity_type = 'order';
-  DELETE FROM public.order_write_requests;
-  DELETE FROM public.delivery_services;
-  DELETE FROM public.order_items;
-  DELETE FROM public.orders;
-  ALTER TABLE public.orders ENABLE TRIGGER USER;
-  ALTER TABLE public.order_items ENABLE TRIGGER USER;
 `);
 
 console.log("=== STARTING FULL UI E2E TEST: UNIVERSAL INTAKE DRAWER ===");
@@ -210,6 +203,13 @@ try {
   }
 
   // 10.1: Verify idempotency conflict rejection when replaying with conflicting command
+  const actorId = sql(`
+    SELECT actor_id
+    FROM public.audit_log
+    WHERE entity_id = '${orderId}'
+    LIMIT 1;
+  `);
+
   const conflictCheck = sql(`
     DO $$
     BEGIN
@@ -230,7 +230,7 @@ try {
             'orderNotes', 'tampered',
             'dietaryOverride', null
           ),
-          'a441687e-5a7a-4c76-95e5-1674267da9e9'::uuid,
+          '${actorId}'::uuid,
           '{}'::jsonb
         );
         RAISE EXCEPTION 'TEST_FAILED: conflicting write was not rejected';
@@ -300,49 +300,62 @@ try {
     console.log("Orders page text sample:", ordersPageText.slice(0, 400).replace(/\n+/g, " "));
   }
 
-  // Step 12: Transition order to 'confirmed' and check Kitchen visibility
-  console.log("\n[Step 12] Transitioning order to confirmed and checking /admin/kitchen...");
-  sql(`
-    SET ROLE cr_order_writer;
-    SELECT set_config('cr_order.verified_actor', 'a441687e-5a7a-4c76-95e5-1674267da9e9', false);
-    UPDATE public.orders
-    SET status = 'confirmed'
-    WHERE id = '${orderId}';
-    RESET ROLE;
-  `);
-  console.log("Order status updated to 'confirmed' in database.");
+  // Step 12: Transition order to 'confirmed' via App UI
+  console.log("\n[Step 12] Transitioning order from draft -> confirmed via App UI...");
+  const confirmBtn = page.getByRole("button", { name: "Confirmar Pedido" }).first();
+  await confirmBtn.waitFor({ state: "visible", timeout: 8000 });
+  await confirmBtn.click();
+  await page.waitForTimeout(3000);
 
+  // Assert order status in database via read-only query
+  const updatedOrderSql = sql(`
+    SELECT status, revision, write_contract_version FROM public.orders WHERE id = '${orderId}';
+  `);
+  console.log("Updated order row after UI confirmation:", updatedOrderSql);
+  const [newStatus, newRev, newContractVer] = updatedOrderSql.split("|");
+  if (newStatus !== "confirmed") {
+    throw new Error(`Expected status 'confirmed' after UI click, got: ${newStatus}`);
+  }
+  if (Number(newRev) < 2) {
+    throw new Error(`Expected revision >= 2 after transition, got: ${newRev}`);
+  }
+  console.log(`PASS: Order successfully transitioned to 'confirmed' (revision=${newRev}) via App UI!`);
+
+  // Step 13: Check Kitchen visibility on /admin/kitchen
+  console.log("\n[Step 13] Checking Kitchen workspace (/admin/kitchen)...");
   await page.goto("http://127.0.0.1:8080/admin/kitchen", { waitUntil: "domcontentloaded", timeout: 30000 });
   await page.waitForTimeout(2000);
 
   // On the kitchen page, set date input to 2026-10-19
   const dateInput = page.locator("#kitchen-date, input[type=date]").first();
-  if (await dateInput.isVisible()) {
-    await dateInput.fill("2026-10-19");
-    await dateInput.dispatchEvent("change");
-    await page.waitForTimeout(2500);
-  }
+  await dateInput.waitFor({ state: "visible", timeout: 5000 });
+  await dateInput.fill("2026-10-19");
+  await dateInput.dispatchEvent("change");
+  await page.waitForTimeout(3000);
 
   const kitchenText = await page.locator("body").innerText();
-  console.log("Kitchen page content snippet:", kitchenText.slice(0, 600).replace(/\n+/g, " "));
+  console.log("Kitchen page content snippet:", kitchenText.slice(0, 500).replace(/\n+/g, " "));
 
   if (kitchenText.includes("Cliente Ficticio") || kitchenText.includes("Tarta de Queso") || kitchenText.includes(orderId.slice(0, 8))) {
-    console.log("PASS: Order is visible on /admin/kitchen for date 2026-10-19!");
+    console.log("PASS: Order is visible on /admin/kitchen UI for date 2026-10-19!");
   } else {
-    const kitchenSql = sql(`
-      SELECT o.id, o.status, oi.day_date, oi.dish_id, d.name
-      FROM public.orders o
-      JOIN public.order_items oi ON oi.order_id = o.id
-      JOIN public.dishes d ON d.id = oi.dish_id
-      WHERE o.status IN ('confirmed', 'in_production', 'prepared')
-        AND oi.day_date = '2026-10-19';
-    `);
-    console.log("Kitchen DB query result:", kitchenSql);
-    if (!kitchenSql.includes(orderId)) {
-      throw new Error(`Order ${orderId} not found in kitchen query!`);
-    }
-    console.log("PASS: Kitchen SQL query confirms order is active in kitchen queue!");
+    throw new Error(`Order ${orderId} not visible on /admin/kitchen page!`);
   }
+
+  const kitchenSql = sql(`
+    SELECT o.id, o.status, oi.day_date, oi.dish_id, d.name
+    FROM public.orders o
+    JOIN public.order_items oi ON oi.order_id = o.id
+    JOIN public.dishes d ON d.id = oi.dish_id
+    WHERE o.status IN ('confirmed', 'in_production', 'prepared')
+      AND oi.day_date = '2026-10-19'
+      AND o.id = '${orderId}';
+  `);
+  console.log("Kitchen DB query result:", kitchenSql);
+  if (!kitchenSql.includes(orderId)) {
+    throw new Error(`Order ${orderId} not found in kitchen DB query!`);
+  }
+  console.log("PASS: Kitchen SQL query confirms order is active in kitchen queue!");
 
   console.log("\n========================================================");
   console.log("=== ALL E2E VERIFICATION CRITERIA PASSED (10/10) PASS ===");

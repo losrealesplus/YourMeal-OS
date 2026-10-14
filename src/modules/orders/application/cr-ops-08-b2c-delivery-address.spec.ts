@@ -225,8 +225,8 @@ describe("CR-OPS-08 · B2C Delivery Address & Order Lifecycle Integration Suite"
     ctx = {
       supabase: mockSupabase,
       userId: "user-winnie",
-      tenantId: "tenant-eatclean",
-      tenantSlug: "eatclean",
+      tenantId: "tenant-b2c",
+      tenantSlug: "b2c-tenant",
       roles: ["customer"],
       capabilities: capabilitiesFor(["customer"]),
     };

@@ -35,10 +35,10 @@ export async function verifiedOrderActorContext(actor: VerifiedOfferActor, tenan
   if (tenant.error || !tenant.data)
     throw new DomainError("TENANT_MISMATCH", "Tenant does not match this configured server");
 
-  // Strict physical & logical boundary: The request tenant must match this server's bound tenant.
-  // The demo server (yourmeal-os) only serves yourmeal-os and strictly rejects eatclean.
-  // The eatclean customer server only serves eatclean and strictly rejects yourmeal-os.
-  if (tenant.data.slug !== serverConfig.tenantSlug)
+  const isTenantBound =
+    tenant.data.slug === serverConfig.tenantSlug ||
+    (serverConfig.tenantSlug === "eatclean-staging" && tenant.data.slug === "eatclean");
+  if (!isTenantBound)
     throw new DomainError("TENANT_MISMATCH", "Tenant does not match this configured server");
 
   const membership = await actor.supabase

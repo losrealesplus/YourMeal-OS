@@ -790,6 +790,7 @@ export function AdminOrdersPage() {
       });
       const repo = createOperationsRepository(ctx.supabase, ctx.tenantId);
       const statuses: OperationalOrderStatus[] = [
+        "draft",
         "confirmed",
         "in_production",
         "prepared",
