@@ -8,35 +8,18 @@
  */
 
 import { chromium } from 'playwright';
-import { createClient } from '@supabase/supabase-js';
+import { createVerificationClient as createClient, verificationConfig, verificationQaCredentials } from './lib/verification-supabase.mjs';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { execSync } from 'node:child_process';
 
 const PROD_URL = 'https://eatclean.yourmealos.com';
-const SUPABASE_URL = 'https://nhirlpkuvonggctdzzad.supabase.co';
-
-function getServiceKey() {
-  if (process.env.EATCLEAN_SUPABASE_SERVICE_ROLE_KEY) {
-    return process.env.EATCLEAN_SUPABASE_SERVICE_ROLE_KEY;
-  }
-  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    return process.env.SUPABASE_SERVICE_ROLE_KEY;
-  }
-  try {
-    const key = execSync('security find-generic-password -s eatcleanbackend -w 2>/dev/null', { encoding: 'utf8' }).trim();
-    if (key) return key;
-  } catch {}
-  throw new Error('Supabase Secret Key not available.');
-}
-
-const SUPABASE_SERVICE_KEY = getServiceKey();
+const verification = verificationConfig('production');
+const SUPABASE_URL = verification.url;
+const SUPABASE_SERVICE_KEY = verification.secretKey;
 const EATCLEAN_TENANT_ID = '8bba00ba-331b-42c8-9283-4e3836ffb870';
-const OPS_MANAGER_EMAIL = 'qa.ops.manager.hf01@eatclean.yourmealos.local';
-const OPS_MANAGER_PASSWORD = 'TestOpsPassword123!';
+const { email: OPS_MANAGER_EMAIL, password: OPS_MANAGER_PASSWORD } = verificationQaCredentials('verify-cr-ops-diet-01-live', 'OPS_MANAGER');
 
-const CUSTOMER_EMAIL = 'qa.customer.diet01@eatclean.yourmealos.local';
-const CUSTOMER_PASSWORD = 'TestCustPassword123!';
+const { email: CUSTOMER_EMAIL, password: CUSTOMER_PASSWORD } = verificationQaCredentials('verify-cr-ops-diet-01-live', 'CUSTOMER');
 const QA_CUSTOMER_ID = 'cccc0002-8bba-42c8-9283-000000000002';
 const QA_ORDER_ID = '00000002-8bba-42c8-9283-000000000002';
 
@@ -92,11 +75,6 @@ async function runLiveCertification() {
     });
     if (createErr) throw createErr;
     opsUser = created.user;
-  } else {
-    await supabaseAdmin.auth.admin.updateUserById(opsUser.id, {
-      password: OPS_MANAGER_PASSWORD,
-      email_confirm: true,
-    });
   }
 
   await supabaseAdmin.from('profiles').upsert({
@@ -129,11 +107,6 @@ async function runLiveCertification() {
     });
     if (createErr) throw createErr;
     custUser = created.user;
-  } else {
-    await supabaseAdmin.auth.admin.updateUserById(custUser.id, {
-      password: CUSTOMER_PASSWORD,
-      email_confirm: true,
-    });
   }
 
   await supabaseAdmin.from('profiles').upsert({

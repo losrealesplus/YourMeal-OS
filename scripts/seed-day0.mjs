@@ -6,8 +6,8 @@
  * Idempotent: if a saas_admin already exists, exits 0 unless --force-user.
  *
  * Required env:
- *   SUPABASE_URL (or VITE_SUPABASE_URL)
- *   SUPABASE_SERVICE_ROLE_KEY
+ *   EATCLEAN_<ENV>_PROJECT_REF / SUPABASE_URL / SUPABASE_SECRET_KEY
+ *   --environment=staging|production; production requires scoped write authorization
  *   SEED_SAAS_ADMIN_EMAIL
  *   SEED_SAAS_ADMIN_PASSWORD   (min 8 chars; used only when creating the user)
  *
@@ -20,19 +20,16 @@
  * Target install path:
  *   git clone → npm install → supabase db reset → npm run seed → login → operate
  */
-import { createClient } from "@supabase/supabase-js";
+import { createVerificationClient as createClient, verificationInvocation } from "./lib/verification-supabase.mjs";
 
-function requireEnv(name, fallbacks = []) {
-  const keys = [name, ...fallbacks];
-  for (const k of keys) {
-    if (process.env[k]) return process.env[k];
-  }
-  throw new Error(`Missing env: ${keys.join(" | ")}`);
+function requireEnv(name) {
+  if (process.env[name]) return process.env[name];
+  throw new Error(`Missing env: ${name}`);
 }
 
 async function main() {
-  const url = requireEnv("SUPABASE_URL", ["VITE_SUPABASE_URL"]);
-  const serviceKey = requireEnv("SUPABASE_SERVICE_ROLE_KEY");
+  const { url, secretKey: serviceKey } = verificationInvocation("seed-day0", true);
+
   const email = requireEnv("SEED_SAAS_ADMIN_EMAIL").trim().toLowerCase();
   const password = process.env.SEED_SAAS_ADMIN_PASSWORD;
   const fullName = process.env.SEED_SAAS_ADMIN_NAME?.trim() || "Platform Admin";
