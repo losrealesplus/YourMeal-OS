@@ -134,5 +134,20 @@ describe("Block C0: Instance Runtime Boundary & Anti-Leak Guards", () => {
     expect(raw).not.toContain("SUPABASE_SERVICE_ROLE_KEY");
     expect(raw).not.toContain("sb_secret_");
   });
+
+  it("12. Staging Worker Isolation: wrangler.staging.json strictly forbids production Supabase reference", () => {
+    const wranglerStagingPath = path.resolve(__dirname, "../../instances/yourmeal-eatclean/wrangler.staging.json");
+    const raw = fs.readFileSync(wranglerStagingPath, "utf-8");
+    const parsed = JSON.parse(raw);
+
+    const eatcleanConfig = CANONICAL_INSTANCE_BINDINGS["eatclean"];
+
+    // Staging configuration must NEVER point to the production database or project ref
+    expect(raw).not.toContain(eatcleanConfig.supabaseProjectRef);
+    expect(parsed.vars.SUPABASE_URL).not.toBe(eatcleanConfig.supabaseUrl);
+    expect(parsed.vars.SUPABASE_URL).not.toContain(eatcleanConfig.supabaseProjectRef);
+    expect(parsed.vars.SUPABASE_PUBLISHABLE_KEY).not.toBe(eatcleanConfig.supabasePublishableKey);
+  });
 });
+
 
