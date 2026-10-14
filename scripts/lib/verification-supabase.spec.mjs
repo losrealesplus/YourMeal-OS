@@ -102,3 +102,19 @@ for (const name of ['verify-eatclean-prod-live.mjs','bootstrap-verify.mjs','seed
     assert.match(source, /const live = args.includes\("--live"\);/);
   } else assert.match(source, /verificationInvocation\(['"][^'"]+['"], true\)/);
 });
+
+test('QA credentials have no defaults and errors never reveal private values', async () => {
+  const { verificationQaCredentials } = await import('./verification-supabase.mjs');
+  const args = ['--environment=production', '--authorize-production-writes=qa-script:'+prod];
+  const base = envFor('production', prod);
+  assert.throws(() => verificationQaCredentials('qa-script','QA_USER',args,base), /VERIFICATION_PRIVATE_QA_CREDENTIALS_REQUIRED/);
+  const env = { ...base, EATCLEAN_PRODUCTION_QA_USER_EMAIL: 'synthetic@example.invalid', EATCLEAN_PRODUCTION_QA_USER_PASSWORD: 'synthetic-private-fixture' };
+  assert.deepEqual(verificationQaCredentials('qa-script','QA_USER',args,env), { email: env.EATCLEAN_PRODUCTION_QA_USER_EMAIL, password: env.EATCLEAN_PRODUCTION_QA_USER_PASSWORD });
+  assert.throws(() => verificationQaCredentials('qa-script','QA_USER',['--environment=production'],env), /VERIFICATION_PRODUCTION_WRITE_AUTHORIZATION_REQUIRED/);
+  assert.throws(() => verificationQaCredentials('qa-script','INVALID',args,env), /VERIFICATION_QA_ACCOUNT_INVALID/);
+});
+for (const name of ['verify-eatclean-prod-live.mjs','verify-eatclean-cust-01-hf01-live.mjs','verify-cr-ops-05-live.mjs','verify-cr-ops-06-gate-8-live.mjs','verify-cr-ops-diet-01-live.mjs','verify-cr-ux-menu-01-visual.mjs','verify-eatclean-cust-01-live.mjs','verify-eatclean-track-c-live.mjs']) test(`${name} requires private QA credentials and never resets accounts`, () => {
+  const source = readFileSync(new URL(`../${name}`, import.meta.url), 'utf8');
+  assert.match(source, /verificationQaCredentials/);
+  assert.doesNotMatch(source, /const\s+\w*PASSWORD\s*=\s*['"]|password\s*:\s*['"]|updateUserById/);
+});

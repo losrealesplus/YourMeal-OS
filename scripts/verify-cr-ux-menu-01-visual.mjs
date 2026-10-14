@@ -16,7 +16,7 @@
 
 import { createServer } from 'vite';
 import { chromium } from 'playwright';
-import { createVerificationClient as createClient, verificationConfig } from './lib/verification-supabase.mjs';
+import { createVerificationClient as createClient, verificationConfig, verificationQaCredentials } from './lib/verification-supabase.mjs';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -24,8 +24,7 @@ const verification = verificationConfig('production');
 const SUPABASE_URL = verification.url;
 const SUPABASE_SERVICE_KEY = verification.secretKey;
 const EATCLEAN_TENANT_ID = '8bba00ba-331b-42c8-9283-4e3836ffb870';
-const ADMIN_EMAIL = 'qa.certification.hf01@eatclean.yourmealos.local';
-const ADMIN_PASSWORD = 'TestOpsPassword123!';
+const { email: ADMIN_EMAIL, password: ADMIN_PASSWORD } = verificationQaCredentials('verify-cr-ux-menu-01-visual', 'QA_USER');
 
 const SCREENSHOT_DIR = resolve('docs/05-architecture/screenshots/cr-ux-menu-01');
 if (!existsSync(SCREENSHOT_DIR)) {
@@ -68,11 +67,8 @@ async function runVisualVerification() {
   const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
     auth: { persistSession: false },
   });
+  // Authenticate using privately supplied credentials; never reset an existing account.
 
-  // Ensure password for test company_admin user
-  await supabaseAdmin.auth.admin.updateUserById('d249ab86-d46e-4f34-8a46-ea24407445e2', {
-    password: ADMIN_PASSWORD,
-  });
 
   const { data: adminSession, error: adminSessionErr } = await supabaseAdmin.auth.signInWithPassword({
     email: ADMIN_EMAIL,

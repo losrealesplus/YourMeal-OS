@@ -10,7 +10,7 @@
  */
 
 import { chromium } from 'playwright';
-import { createVerificationClient as createClient, verificationConfig } from './lib/verification-supabase.mjs';
+import { createVerificationClient as createClient, verificationConfig, verificationQaCredentials } from './lib/verification-supabase.mjs';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -19,8 +19,7 @@ const verification = verificationConfig('production');
 const SUPABASE_URL = verification.url;
 const SUPABASE_SERVICE_KEY = verification.secretKey;
 const EATCLEAN_TENANT_ID = '8bba00ba-331b-42c8-9283-4e3836ffb870';
-const OPS_MANAGER_EMAIL = 'qa.ops.manager.hf01@eatclean.yourmealos.local';
-const OPS_MANAGER_PASSWORD = 'TestOpsPassword123!';
+const { email: OPS_MANAGER_EMAIL, password: OPS_MANAGER_PASSWORD } = verificationQaCredentials('verify-cr-ops-05-live', 'OPS_MANAGER');
 
 const SCREENSHOT_DIR = resolve('docs/05-architecture/screenshots/cr-ops-05');
 if (!existsSync(SCREENSHOT_DIR)) {

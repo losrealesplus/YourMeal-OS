@@ -37,9 +37,25 @@ fallbacks de proyecto ni carga automática de dotenv.
 - Workflow `deploy-production.yml`: referencias a credenciales Cloudflare, sin
   claves Supabase. Nombres de secretos remotos no acreditados por la consulta 403 anterior.
 
-Pruebas: `node --test scripts/lib/verification-supabase.spec.mjs` (30/30).
+Pruebas: `node --test scripts/lib/verification-supabase.spec.mjs` (39/39).
 Este paquete no autoriza ejecución de verificadores sobre servicios reales,
 modificación de secretos, merge ni despliegue. La retirada de la legacy sigue
 condicionada a actualizar o retirar las entradas privadas del propietario y confirmar
 que no existen consumidores externos. Los doce verificadores/consumidores aquí tratados
 ya no dependen de la credencial legacy.
+
+## Credenciales QA privadas y revisión manual
+
+Los verificadores no contienen contraseñas QA ni restablecen contraseñas existentes.
+Exigen `--environment=production`, autorización de escritura vinculada al script/proyecto,
+y las variables QA privadas documentadas en la plantilla. Ante credenciales ausentes o
+incorrectas, STOP; no intentar corregir cuentas automáticamente. Los flujos que provisionan
+usuarios nuevos mantienen esa operación únicamente dentro de la autorización explícita.
+
+Revisar manualmente estas cuentas históricas si llegaron a provisionarse:
+- `qa.certification.hf01@eatclean.yourmealos.local` (QA_USER; también ADMIN visual).
+- `qa.ops.manager.hf01@eatclean.yourmealos.local` (OPS_MANAGER).
+- `qa.customer.diet01@eatclean.yourmealos.local` (CUSTOMER).
+
+Su existencia y contraseña actual no se han consultado. Ningún valor privado se modifica
+por este PR; cualquier cambio de cuenta real corresponde a una operación humana aparte.

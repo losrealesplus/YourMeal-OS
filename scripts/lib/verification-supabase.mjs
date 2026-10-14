@@ -71,3 +71,16 @@ export function createReadOnlyVerificationClient(url, key, options = {}) {
     global: { ...options.global, fetch: createVerificationFetch(url, key, globalThis.fetch, { readOnly: true }) },
   });
 }
+
+/** QA credentials are private and explicit; login/provisioning requires production opt-in. */
+export function verificationQaCredentials(script, account, argv = process.argv.slice(2), env = process.env) {
+  const config = verificationInvocation(script, true, argv, env);
+  if (config.environment !== 'production') throw new Error('VERIFICATION_QA_PRODUCTION_ENVIRONMENT_REQUIRED');
+  if (!['QA_USER', 'OPS_MANAGER', 'CUSTOMER'].includes(account)) throw new Error('VERIFICATION_QA_ACCOUNT_INVALID');
+  const email = env[`EATCLEAN_PRODUCTION_${account}_EMAIL`];
+  const password = env[`EATCLEAN_PRODUCTION_${account}_PASSWORD`];
+  if (typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
+      typeof password !== 'string' || password.length < 8)
+    throw new Error('VERIFICATION_PRIVATE_QA_CREDENTIALS_REQUIRED');
+  return { email, password };
+}

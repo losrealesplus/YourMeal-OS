@@ -13,7 +13,7 @@
  */
 
 import { chromium } from 'playwright';
-import { createVerificationClient as createClient, verificationInvocation, verificationPublishableKey } from './lib/verification-supabase.mjs';
+import { createVerificationClient as createClient, verificationInvocation, verificationPublishableKey, verificationQaCredentials } from './lib/verification-supabase.mjs';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -32,8 +32,7 @@ const QA_ORDER_B_ID = 'cafe0002-8bba-42c8-9283-000000000002';
 const QA_ITEM_A_ID = 'ca1e000a-8bba-42c8-9283-000000000001';
 const QA_ITEM_B_ID = 'ca1e000b-8bba-42c8-9283-000000000002';
 
-const QA_USER_EMAIL = 'qa.certification.hf01@eatclean.yourmealos.local';
-const QA_USER_PASSWORD = 'TestPassword123!';
+const { email: QA_USER_EMAIL, password: QA_USER_PASSWORD } = verificationQaCredentials('verify-eatclean-prod-live', 'QA_USER');
 
 const SCREENSHOT_DIR = resolve('docs/05-architecture/screenshots/cr-ops-ux');
 if (!existsSync(SCREENSHOT_DIR)) {
@@ -89,12 +88,6 @@ async function runLiveProductionCertification() {
     });
     if (createErr) throw createErr;
     qaUser = created.user;
-  } else {
-    // Ensure password is confirmed
-    await supabase.auth.admin.updateUserById(qaUser.id, {
-      password: QA_USER_PASSWORD,
-      email_confirm: true,
-    });
   }
 
   // Ensure Profile & Tenant Member

@@ -8,7 +8,7 @@
  */
 
 import { chromium } from 'playwright';
-import { createVerificationClient as createClient, verificationConfig, verificationPublishableKey } from './lib/verification-supabase.mjs';
+import { createVerificationClient as createClient, verificationConfig, verificationPublishableKey, verificationQaCredentials } from './lib/verification-supabase.mjs';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -18,8 +18,7 @@ const SUPABASE_URL = verification.url;
 const SUPABASE_SERVICE_KEY = verification.secretKey;
 const EATCLEAN_TENANT_ID = '8bba00ba-331b-42c8-9283-4e3836ffb870';
 const QA_CUSTOMER_ID = 'cccc0001-8bba-42c8-9283-000000000001';
-const OPS_MANAGER_EMAIL = 'qa.ops.manager.hf01@eatclean.yourmealos.local';
-const OPS_MANAGER_PASSWORD = 'TestOpsPassword123!';
+const { email: OPS_MANAGER_EMAIL, password: OPS_MANAGER_PASSWORD } = verificationQaCredentials('verify-eatclean-cust-01-hf01-live', 'OPS_MANAGER');
 
 const SCREENSHOT_DIR = resolve('docs/05-architecture/screenshots/cr-cust-01-hf01');
 if (!existsSync(SCREENSHOT_DIR)) {
@@ -73,11 +72,6 @@ async function runLiveCertification() {
     });
     if (createErr) throw createErr;
     opsUser = created.user;
-  } else {
-    await supabaseAdmin.auth.admin.updateUserById(opsUser.id, {
-      password: OPS_MANAGER_PASSWORD,
-      email_confirm: true,
-    });
   }
 
   // Profile & Tenant Membership
