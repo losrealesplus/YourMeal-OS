@@ -220,16 +220,12 @@ export async function runVerifiedOfferWrite(
   }
   const { data, error } = response;
   if (error) {
-    console.error("[OFFER_WRITE_RPC_DEBUG] error:", error);
     throw new OfferWriteRpcError(
       allowedCodes.find((code) => error.message === code || error.message.startsWith(`${code}:`)) ??
         "OFFER_WRITE_FAILED",
     );
   }
-  if (data === null) {
-    console.error("[OFFER_WRITE_RPC_DEBUG] data is null!");
-    throw new OfferWriteRpcError("OFFER_WRITE_FAILED");
-  }
+  if (data === null) throw new OfferWriteRpcError("OFFER_WRITE_FAILED");
   if (quoteId || customCommit)
     return parseCanonicalOrderWriteResult(data, request.tenantId, request.command);
   const quote = z

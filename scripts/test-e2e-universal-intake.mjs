@@ -202,7 +202,6 @@ try {
     throw new Error(`Unexpected order_write_request row: ${writeReqRow}`);
   }
 
-  // 10.1: Verify idempotency conflict rejection when replaying with conflicting command
   const actorId = sql(`
     SELECT actor_id
     FROM public.audit_log
@@ -210,6 +209,58 @@ try {
     LIMIT 1;
   `);
 
+  // 10.1: Verify identical request replay with identical requestId & payload
+  console.log("Testing identical request replay with identical requestId & payload...");
+  const replayResult = sql(`
+    DO $$
+    DECLARE
+      v_q record;
+      v_res jsonb;
+    BEGIN
+      SET LOCAL ROLE service_role;
+      SELECT * INTO v_q FROM cr_order_private.offer_quotes WHERE request_id = '${requestId}'::uuid;
+      IF NOT FOUND THEN
+        RAISE EXCEPTION 'TEST_FAILED: offer quote not found for replay';
+      END IF;
+      v_res := public.cr_order_offer_quote_commit(
+        '${tenantId}'::uuid,
+        '${actorId}'::uuid,
+        '${requestId}'::uuid,
+        v_q.id,
+        jsonb_build_object(
+          'operation', 'capture',
+          'customer', jsonb_build_object('kind', 'existing', 'id', '${customerId}'),
+          'weekStart', '${weekStart}',
+          'autoConfirm', false,
+          'demandChannel', 'individual',
+          'lines', jsonb_build_array(
+            jsonb_build_object('kind', 'dish', 'dishId', '${dishId}', 'dayDate', '2026-10-19', 'qty', 1, 'comment', null, 'slotId', (v_q.lines->0->>'slotId')::uuid)
+          ),
+          'orderNotes', null,
+          'dietaryOverride', null
+        ),
+        jsonb_build_object('policyHash', v_q.policy_hash, 'mode', 'weekly_plan')
+      );
+      IF coalesce((v_res->>'replayed')::boolean, false) IS NOT TRUE THEN
+        RAISE EXCEPTION 'TEST_FAILED: expected replayed: true, got %', v_res;
+      END IF;
+    END $$;
+    SELECT 'REPLAY_VERIFIED';
+  `);
+  if (!replayResult.includes("REPLAY_VERIFIED")) {
+    throw new Error("Identical replay test failed: " + replayResult);
+  }
+  console.log("PASS: Identical replay with same requestId returned replayed: true");
+
+  const auditCaptureCountAfterReplay = sql(`
+    SELECT count(*) FROM public.audit_log WHERE entity_id = '${orderId}' AND action = 'order.offer.capture';
+  `);
+  if (Number(auditCaptureCountAfterReplay) !== 1) {
+    throw new Error(`Expected exactly 1 audit capture record after replay, got: ${auditCaptureCountAfterReplay}`);
+  }
+  console.log("PASS: Exactly 1 audit capture record preserved after identical replay");
+
+  // 10.2: Verify idempotency conflict rejection when replaying with conflicting command
   const conflictCheck = sql(`
     DO $$
     BEGIN
@@ -247,7 +298,7 @@ try {
   }
   console.log("PASS: Conflicting write attempt with reused requestId rejected with IDEMPOTENCY_CONFLICT");
 
-  // 10.2: Verify primary key constraint on order_write_requests prevents duplicates
+  // 10.3: Verify primary key constraint on order_write_requests prevents duplicates
   const pkeyCheck = sql(`
     DO $$
     BEGIN
@@ -266,7 +317,7 @@ try {
   }
   console.log("PASS: order_write_requests primary key strictly enforces single write record");
 
-  // 10.3: Verify canonical reconciliation path (as executed by runVerifiedOfferReconciliation)
+  // 10.4: Verify canonical reconciliation path (as executed by runVerifiedOfferReconciliation)
   const reconciliationSql = sql(`
     SELECT owr.request_id, owr.order_id, owr.committed_revision, o.status, o.total
     FROM public.order_write_requests owr
@@ -280,7 +331,7 @@ try {
   }
   console.log("PASS: Canonical reconciliation confirmed: order resolved safely without re-execution");
 
-  // 10.4: Database invariants: strictly 1 order and 1 item exist
+  // 10.5: Database invariants: strictly 1 order and 1 item exist
   const orderCount = sql(`SELECT count(*) FROM public.orders;`);
   const itemCount = sql(`SELECT count(*) FROM public.order_items;`);
   console.log(`Database state: ${orderCount} order(s), ${itemCount} order item(s).`);

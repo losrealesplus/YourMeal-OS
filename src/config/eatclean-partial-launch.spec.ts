@@ -9,11 +9,16 @@ import {
   isEatCleanStaffOrderCaptureFrozen,
   isEatCleanDishMutationFrozen,
   isEatCleanMenuMutationFrozen,
+  isVerifiedLocalSyntheticLab,
 } from "./eatclean-partial-launch";
 import { OrderIntakeService } from "@/modules/order-intake";
 import { StaffOrderCaptureService } from "@/modules/orders";
 import { DomainError } from "@/domain/errors";
 import type { ServiceContext } from "@/services/types";
+import {
+  LOCAL_STAGING_PUBLIC_KEY,
+  LOCAL_STAGING_URL,
+} from "@/lib/local-staging-runtime";
 
 describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
   it("enforces partial launch configuration flags", () => {
@@ -155,6 +160,157 @@ describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
         const message = err instanceof Error ? err.message : String(err);
         expect(message).not.toBe(EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage);
       }
+    });
+  });
+
+  describe("Staff Order Capture Barrier & Synthetic Lab Hardening", () => {
+    const validLocalEnv = {
+      YOURMEAL_RUNTIME_ENV: "staging_local",
+      TENANT_SLUG: "eatclean-staging",
+      SUPABASE_URL: LOCAL_STAGING_URL,
+      SUPABASE_PUBLISHABLE_KEY: LOCAL_STAGING_PUBLIC_KEY,
+    };
+
+    describe("1. Negative: EatClean Production", () => {
+      it("freezes staffOrderCapture in production context without loopback origin", () => {
+        expect(isEatCleanStaffOrderCaptureFrozen(EATCLEAN_TENANT_ID)).toBe(true);
+        expect(isEatCleanStaffOrderCaptureFrozen({ tenantId: EATCLEAN_TENANT_ID })).toBe(true);
+        expect(
+          isEatCleanStaffOrderCaptureFrozen({
+            tenantSlug: "eatclean",
+            hostname: "eatclean.yourmealos.com",
+          }),
+        ).toBe(true);
+        expect(
+          isEatCleanStaffOrderCaptureFrozen({
+            tenantSlug: "eatclean",
+            hostname: "app.eatclean.es",
+          }),
+        ).toBe(true);
+      });
+
+      it("rejects local bypass attempt targeting production hostname", () => {
+        // Even if valid local synthetic env is injected, non-loopback host fails closed
+        expect(
+          isVerifiedLocalSyntheticLab(
+            { hostname: "eatclean.yourmealos.com", tenantSlug: "eatclean" },
+            validLocalEnv,
+          ),
+        ).toBe(false);
+        expect(
+          isEatCleanStaffOrderCaptureFrozen(
+            { hostname: "eatclean.yourmealos.com", tenantSlug: "eatclean" },
+            validLocalEnv,
+          ),
+        ).toBe(true);
+      });
+    });
+
+    describe("2. Negative: Demo Instance", () => {
+      it("does not qualify as EatClean or local synthetic lab", () => {
+        const demoContext = { tenantSlug: "yourmeal-os", hostname: "yourmealos.com" };
+        expect(isEatCleanContext(demoContext)).toBe(false);
+        expect(isVerifiedLocalSyntheticLab(demoContext)).toBe(false);
+        expect(isEatCleanStaffOrderCaptureFrozen(demoContext)).toBe(false);
+
+        const demoEnv = {
+          TENANT_SLUG: "yourmeal-os",
+          SUPABASE_URL: "https://djangucecsphnejplvic.supabase.co",
+        };
+        expect(isVerifiedLocalSyntheticLab(demoContext, demoEnv)).toBe(false);
+      });
+    });
+
+    describe("3. Negative: Unconfigured Cloud Staging", () => {
+      it("freezes staffOrderCapture for unconfigured Cloud staging hostname", () => {
+        const cloudStagingContext = {
+          tenantSlug: "eatclean-staging",
+          hostname: "eatclean-staging.yourmealos.com",
+        };
+        expect(isEatCleanContext(cloudStagingContext)).toBe(true);
+        expect(isVerifiedLocalSyntheticLab(cloudStagingContext)).toBe(false);
+        expect(isEatCleanStaffOrderCaptureFrozen(cloudStagingContext)).toBe(true);
+      });
+
+      it("rejects cloud staging environment variables without synthetic local binding", () => {
+        const cloudStagingEnv = {
+          TENANT_SLUG: "eatclean-staging-unconfigured",
+          SUPABASE_URL: "https://eatclean-staging-unconfigured.supabase.co",
+          SUPABASE_PUBLISHABLE_KEY: "sb_publishable_STAGING_UNCONFIGURED_REPLACE_ME",
+        };
+        expect(
+          isVerifiedLocalSyntheticLab(
+            { hostname: "eatclean-staging.yourmealos.com" },
+            cloudStagingEnv,
+          ),
+        ).toBe(false);
+        expect(
+          isEatCleanStaffOrderCaptureFrozen(
+            { tenantSlug: "eatclean", hostname: "eatclean-staging.yourmealos.com" },
+            cloudStagingEnv,
+          ),
+        ).toBe(true);
+      });
+    });
+
+    describe("4. Negative: Inconsistent Environment Variables", () => {
+      it("rejects staging_local with production Supabase URL leak", () => {
+        const leakedEnv = {
+          ...validLocalEnv,
+          SUPABASE_URL: "https://nhirlpkuvonggctdzzad.supabase.co",
+        };
+        expect(isVerifiedLocalSyntheticLab({ hostname: "127.0.0.1" }, leakedEnv)).toBe(false);
+        expect(isEatCleanStaffOrderCaptureFrozen(EATCLEAN_TENANT_ID, leakedEnv)).toBe(true);
+      });
+
+      it("rejects staging_local with demo Supabase URL leak", () => {
+        const leakedEnv = {
+          ...validLocalEnv,
+          SUPABASE_URL: "https://djangucecsphnejplvic.supabase.co",
+        };
+        expect(isVerifiedLocalSyntheticLab({ hostname: "127.0.0.1" }, leakedEnv)).toBe(false);
+        expect(isEatCleanStaffOrderCaptureFrozen(EATCLEAN_TENANT_ID, leakedEnv)).toBe(true);
+      });
+
+      it("rejects staging_local with invalid/tampered publishable key", () => {
+        const tamperedEnv = {
+          ...validLocalEnv,
+          SUPABASE_PUBLISHABLE_KEY: "sb_publishable_unauthorized_key",
+        };
+        expect(isVerifiedLocalSyntheticLab({ hostname: "127.0.0.1" }, tamperedEnv)).toBe(false);
+        expect(isEatCleanStaffOrderCaptureFrozen(EATCLEAN_TENANT_ID, tamperedEnv)).toBe(true);
+      });
+
+      it("rejects staging_local with wrong tenant slug", () => {
+        const wrongSlugEnv = {
+          ...validLocalEnv,
+          TENANT_SLUG: "eatclean", // Must be eatclean-staging
+        };
+        expect(isVerifiedLocalSyntheticLab({ hostname: "127.0.0.1" }, wrongSlugEnv)).toBe(false);
+        expect(isEatCleanStaffOrderCaptureFrozen(EATCLEAN_TENANT_ID, wrongSlugEnv)).toBe(true);
+      });
+
+      it("rejects missing YOURMEAL_RUNTIME_ENV even if synthetic URL is supplied", () => {
+        const missingEnv = {
+          TENANT_SLUG: "eatclean-staging",
+          SUPABASE_URL: LOCAL_STAGING_URL,
+          SUPABASE_PUBLISHABLE_KEY: LOCAL_STAGING_PUBLIC_KEY,
+        };
+        expect(isVerifiedLocalSyntheticLab({ hostname: "127.0.0.1" }, missingEnv)).toBe(false);
+        expect(isEatCleanStaffOrderCaptureFrozen(EATCLEAN_TENANT_ID, missingEnv)).toBe(true);
+      });
+    });
+
+    describe("5. Positive: Verified Local Synthetic Lab", () => {
+      it("unfreezes staffOrderCapture strictly when loopback host and synthetic env match", () => {
+        const localContext = { hostname: "127.0.0.1", tenantSlug: "eatclean-staging" };
+        expect(isVerifiedLocalSyntheticLab(localContext, validLocalEnv)).toBe(true);
+        expect(isEatCleanStaffOrderCaptureFrozen(localContext, validLocalEnv)).toBe(false);
+
+        const localhostContext = { hostname: "localhost", tenantSlug: "eatclean-staging" };
+        expect(isVerifiedLocalSyntheticLab(localhostContext, validLocalEnv)).toBe(true);
+        expect(isEatCleanStaffOrderCaptureFrozen(localhostContext, validLocalEnv)).toBe(false);
+      });
     });
   });
 });
