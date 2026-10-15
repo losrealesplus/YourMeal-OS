@@ -4,12 +4,18 @@
 --
 -- STATUS: DRAFT FOR HUMAN REVIEW — DO NOT EXECUTE AUTOMATICALLY
 -- ENVIRONMENT: Supabase Production (Target: EatClean / YourMeal OS)
--- BUSINESS IMPACT: ZERO table writes; closes legacy RPC bypass vector.
+-- ATOMICITY: Single transaction; Prechecks -> Revocation -> Postchecks -> Commit.
+-- FAIL-CLOSED: Any drift, missing dependency or lingering grant triggers ROLLBACK.
 -- ==============================================================================
 
+BEGIN;
+SET LOCAL lock_timeout = '5s';
+SET LOCAL statement_timeout = '30s';
+SET LOCAL search_path = pg_catalog, pg_temp;
+
 -- ------------------------------------------------------------------------------
--- 1. PRECHECK
--- Validates preconditions, schema integrity, and detects permission status/drift
+-- 1. PRECHECK (TRANSACTIONAL & FAIL-CLOSED)
+-- Validates preconditions, schema integrity, and detects definition drift.
 -- ------------------------------------------------------------------------------
 DO $$
 DECLARE
@@ -29,20 +35,25 @@ BEGIN
     RAISE EXCEPTION 'PRECHECK_FAILED: public.capture_staff_existing_order(uuid,jsonb) does not exist.';
   END IF;
 
-  -- 1.3 Definition Drift Check (matches migration 20261011163814)
+  -- 1.3 Definition Drift Check (must strictly match migration 20261011163814)
   SELECT encode(sha256(convert_to(p.prosrc, 'UTF8')), 'hex') INTO v_definition_hash
   FROM pg_proc p WHERE p.oid = v_proc_oid;
   IF v_definition_hash IS DISTINCT FROM 'b953706417c7689974ca855f2108fcb24a2b937d159407dfbf3313b97e5ce8ea' THEN
-    RAISE WARNING 'PRECHECK_NOTICE: capture_staff_existing_order definition hash differs from base migration (current: %).', v_definition_hash;
+    RAISE EXCEPTION 'PRECHECK_FAILED: capture_staff_existing_order definition hash drift detected (expected b953706417c7689974ca855f2108fcb24a2b937d159407dfbf3313b97e5ce8ea, got %). Aborting.', v_definition_hash;
   END IF;
 
-  -- 1.4 Inspect Current Permission Status
+  -- 1.4 Inspect Current Permission Status (logging for operator audit trail)
   v_auth_has_exec := has_function_privilege('authenticated', v_proc_oid, 'EXECUTE');
   v_anon_has_exec := has_function_privilege('anon', v_proc_oid, 'EXECUTE');
-
   RAISE NOTICE 'PRECHECK_STATUS: authenticated EXECUTE = %, anon EXECUTE = %', v_auth_has_exec, v_anon_has_exec;
 
   -- 1.5 Canonical V2 Dependency Verification (must exist and remain intact)
+  IF to_regprocedure('public.cr_order_offer_quote_issue(uuid,uuid,uuid,jsonb,jsonb)') IS NULL THEN
+    RAISE EXCEPTION 'PRECHECK_FAILED: public.cr_order_offer_quote_issue() missing.';
+  END IF;
+  IF to_regprocedure('public.cr_order_offer_quote_commit(uuid,uuid,uuid,uuid,jsonb,jsonb)') IS NULL THEN
+    RAISE EXCEPTION 'PRECHECK_FAILED: public.cr_order_offer_quote_commit() missing.';
+  END IF;
   IF to_regprocedure('cr_order_private.session_uid_bridge()') IS NULL THEN
     RAISE EXCEPTION 'PRECHECK_FAILED: cr_order_private.session_uid_bridge() missing.';
   END IF;
@@ -50,28 +61,21 @@ BEGIN
     RAISE EXCEPTION 'PRECHECK_FAILED: cr_order_private.guard_legacy_offer() missing.';
   END IF;
 
-  RAISE NOTICE 'PRECHECK_COMPLETE: All prechecks passed. Ready for proposed transaction.';
+  RAISE NOTICE 'PRECHECK_COMPLETE: All prechecks passed. Proceeding with revocation.';
 END $$;
 
 -- ------------------------------------------------------------------------------
--- 2. CAMBIO PROPUESTO (MINIMAL TRANSACTION)
+-- 2. CAMBIO PROPUESTO (REVOCATION)
 -- Revokes EXECUTE on legacy capture RPC exclusively.
 -- Zero rows modified, zero DDL schema changes.
 -- ------------------------------------------------------------------------------
-BEGIN;
-SET LOCAL lock_timeout = '5s';
-SET LOCAL statement_timeout = '30s';
-SET LOCAL search_path = pg_catalog, pg_temp;
-
 REVOKE ALL ON FUNCTION public.capture_staff_existing_order(uuid,jsonb) FROM PUBLIC, anon, authenticated, service_role;
 
 COMMENT ON FUNCTION public.capture_staff_existing_order(uuid,jsonb) IS 'DEPRECATED: Legacy EatClean staff order intake RPC. Permanently revoked. All intake flows exclusively through Universal Intake V2.';
 
-COMMIT;
-
 -- ------------------------------------------------------------------------------
--- 3. POSTCHECK
--- Confirms that authenticated, anon, and PUBLIC cannot execute the legacy RPC.
+-- 3. POSTCHECK (TRANSACTIONAL ASSERTIONS BEFORE COMMIT)
+-- Confirms that authenticated, anon, PUBLIC, and any non-owner lack EXECUTE.
 -- ------------------------------------------------------------------------------
 DO $$
 DECLARE
@@ -81,26 +85,47 @@ BEGIN
     RAISE EXCEPTION 'POSTCHECK_FAILED: Function public.capture_staff_existing_order(uuid,jsonb) not found.';
   END IF;
 
+  -- 3.1 Effective privilege checks
   IF has_function_privilege('authenticated', v_proc_oid, 'EXECUTE') THEN
-    RAISE EXCEPTION 'POSTCHECK_FAILED: authenticated still has EXECUTE privilege on legacy RPC.';
+    RAISE EXCEPTION 'POSTCHECK_FAILED: authenticated has effective EXECUTE privilege on legacy RPC.';
   END IF;
 
   IF has_function_privilege('anon', v_proc_oid, 'EXECUTE') THEN
-    RAISE EXCEPTION 'POSTCHECK_FAILED: anon has EXECUTE privilege on legacy RPC.';
+    RAISE EXCEPTION 'POSTCHECK_FAILED: anon has effective EXECUTE privilege on legacy RPC.';
   END IF;
 
-  IF EXISTS (SELECT 1 FROM pg_proc p CROSS JOIN LATERAL aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) WHERE p.oid = v_proc_oid AND grantee = 0) THEN
-    RAISE EXCEPTION 'POSTCHECK_FAILED: PUBLIC has EXECUTE privilege on legacy RPC.';
+  IF has_function_privilege('service_role', v_proc_oid, 'EXECUTE') THEN
+    RAISE EXCEPTION 'POSTCHECK_FAILED: service_role has effective EXECUTE privilege on legacy RPC.';
   END IF;
 
-  -- Verify canonical V2 infrastructure remains unaffected
-  IF to_regprocedure('cr_order_private.session_uid_bridge()') IS NULL
+  -- 3.2 Granular ACL check: no non-owner grantee may possess EXECUTE
+  IF EXISTS (
+    SELECT 1 FROM pg_proc p
+    CROSS JOIN LATERAL aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) a
+    WHERE p.oid = v_proc_oid
+      AND a.privilege_type = 'EXECUTE'
+      AND a.grantee <> p.proowner
+  ) THEN
+    RAISE EXCEPTION 'POSTCHECK_FAILED: Non-owner role retains EXECUTE privilege in ACL.';
+  END IF;
+
+  -- 3.3 Verify owner retains EXECUTE
+  IF NOT has_function_privilege('postgres', v_proc_oid, 'EXECUTE') THEN
+    RAISE EXCEPTION 'POSTCHECK_FAILED: postgres owner lost EXECUTE privilege.';
+  END IF;
+
+  -- 3.4 Verify canonical V2 infrastructure remains unaffected
+  IF to_regprocedure('public.cr_order_offer_quote_issue(uuid,uuid,uuid,jsonb,jsonb)') IS NULL
+  OR to_regprocedure('public.cr_order_offer_quote_commit(uuid,uuid,uuid,uuid,jsonb,jsonb)') IS NULL
+  OR to_regprocedure('cr_order_private.session_uid_bridge()') IS NULL
   OR to_regprocedure('cr_order_private.guard_legacy_offer()') IS NULL THEN
     RAISE EXCEPTION 'POSTCHECK_FAILED: Canonical V2 dependencies were affected.';
   END IF;
 
-  RAISE NOTICE 'POSTCHECK_COMPLETE: Legacy RPC EXECUTE successfully revoked for authenticated, anon, and PUBLIC. V2 intact.';
+  RAISE NOTICE 'POSTCHECK_COMPLETE: Legacy RPC EXECUTE successfully revoked for authenticated, anon, PUBLIC and inherited roles. V2 intact.';
 END $$;
+
+COMMIT;
 
 -- ------------------------------------------------------------------------------
 -- 4. RECUPERACIÓN (ROLLBACK RUNBOOK)
