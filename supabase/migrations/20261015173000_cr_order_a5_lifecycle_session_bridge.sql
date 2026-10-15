@@ -2,34 +2,150 @@
 -- Resolves "permission denied for schema auth" when cr_order_writer executes lifecycle_v2.
 -- Preserves all state invariants, operational evidence, audit logging, and idempotency contracts.
 -- Does NOT grant schema auth USAGE to cr_order_writer; preserves security separation.
+-- Includes fail-closed drift detection across all involved functions, owners, languages, search paths, and ACLs.
+
 BEGIN;
 SET LOCAL lock_timeout = '5s';
 SET LOCAL statement_timeout = '30s';
 SET LOCAL ROLE postgres;
 
-DO $$ BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_proc
-    WHERE oid = to_regprocedure('cr_order_private.session_uid_bridge()')
-  ) THEN
-    RAISE EXCEPTION 'PREREQUISITE_MISSING: cr_order_private.session_uid_bridge() required';
+-- -----------------------------------------------------------------------------
+-- PRECHECKS: DRIFT FAIL-CLOSED
+-- -----------------------------------------------------------------------------
+DO $$ 
+DECLARE
+  v_hash text;
+  v_owner text;
+  v_secdef boolean;
+  v_lang text;
+  v_config text[];
+BEGIN
+  -- 1. Caller authority check
+  IF current_user IS DISTINCT FROM 'postgres' OR NOT pg_has_role(current_user, 'cr_order_writer', 'SET') THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: caller must be postgres with SET on cr_order_writer';
   END IF;
 
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_proc
-    WHERE oid = to_regprocedure('cr_order_private.actor()')
-  ) THEN
-    RAISE EXCEPTION 'PREREQUISITE_MISSING: cr_order_private.actor() required';
+  -- 2. Validate cr_order_private.session_uid_bridge() definition & attributes
+  SELECT 
+    encode(sha256(convert_to(p.prosrc, 'UTF8')), 'hex'),
+    pg_get_userbyid(p.proowner),
+    p.prosecdef,
+    l.lanname,
+    p.proconfig
+  INTO v_hash, v_owner, v_secdef, v_lang, v_config
+  FROM pg_proc p
+  JOIN pg_namespace n ON n.oid = p.pronamespace
+  JOIN pg_language l ON l.oid = p.prolang
+  WHERE n.nspname = 'cr_order_private' AND p.proname = 'session_uid_bridge'
+    AND p.oid = to_regprocedure('cr_order_private.session_uid_bridge()');
+
+  IF v_hash IS NULL THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: session_uid_bridge() not found';
+  END IF;
+  IF v_hash IS DISTINCT FROM 'c628b78ce1d2a3b15ddbaf7b0a5838fa26c925d332103e53f34ba73b9b227604' THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: session_uid_bridge() source hash drift: expected c628b78ce1d2a3b15ddbaf7b0a5838fa26c925d332103e53f34ba73b9b227604, got %', v_hash;
+  END IF;
+  IF v_owner IS DISTINCT FROM 'postgres' THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: session_uid_bridge() owner must be postgres, got %', v_owner;
+  END IF;
+  IF NOT v_secdef THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: session_uid_bridge() must be SECURITY DEFINER';
+  END IF;
+  IF v_lang IS DISTINCT FROM 'sql' THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: session_uid_bridge() language must be sql, got %', v_lang;
+  END IF;
+  IF v_config IS DISTINCT FROM ARRAY['search_path=""'] THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: session_uid_bridge() search_path must be empty, got %', array_to_string(v_config, ',');
+  END IF;
+  IF NOT has_function_privilege('cr_order_writer', to_regprocedure('cr_order_private.session_uid_bridge()'), 'EXECUTE') THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: session_uid_bridge() missing EXECUTE for cr_order_writer';
+  END IF;
+  IF has_function_privilege('authenticated', to_regprocedure('cr_order_private.session_uid_bridge()'), 'EXECUTE')
+     OR has_function_privilege('anon', to_regprocedure('cr_order_private.session_uid_bridge()'), 'EXECUTE') THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: session_uid_bridge() unexpected EXECUTE for public/anon/authenticated';
   END IF;
 
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_proc
-    WHERE oid = to_regprocedure('cr_order_private.lifecycle_v2(uuid,uuid,jsonb)')
-  ) THEN
-    RAISE EXCEPTION 'PREREQUISITE_MISSING: cr_order_private.lifecycle_v2(uuid,uuid,jsonb) required';
+  -- 3. Validate cr_order_private.actor() definition & attributes
+  SELECT 
+    encode(sha256(convert_to(p.prosrc, 'UTF8')), 'hex'),
+    pg_get_userbyid(p.proowner),
+    p.prosecdef,
+    l.lanname,
+    p.proconfig
+  INTO v_hash, v_owner, v_secdef, v_lang, v_config
+  FROM pg_proc p
+  JOIN pg_namespace n ON n.oid = p.pronamespace
+  JOIN pg_language l ON l.oid = p.prolang
+  WHERE n.nspname = 'cr_order_private' AND p.proname = 'actor'
+    AND p.oid = to_regprocedure('cr_order_private.actor()');
+
+  IF v_hash IS NULL THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: actor() not found';
+  END IF;
+  IF v_hash IS DISTINCT FROM '9094c00b9605600a6e5329dc1d7c2ac7aced0ef57c08b3e83f3b9e02d477894c' THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: actor() source hash drift: expected 9094c00b9605600a6e5329dc1d7c2ac7aced0ef57c08b3e83f3b9e02d477894c, got %', v_hash;
+  END IF;
+  IF v_owner IS DISTINCT FROM 'postgres' THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: actor() owner must be postgres, got %', v_owner;
+  END IF;
+  IF v_secdef THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: actor() must be SECURITY INVOKER';
+  END IF;
+  IF v_lang IS DISTINCT FROM 'plpgsql' THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: actor() language must be plpgsql, got %', v_lang;
+  END IF;
+  IF v_config IS DISTINCT FROM ARRAY['search_path=""'] THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: actor() search_path must be empty, got %', array_to_string(v_config, ',');
+  END IF;
+  IF NOT has_function_privilege('cr_order_writer', to_regprocedure('cr_order_private.actor()'), 'EXECUTE') THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: actor() missing EXECUTE for cr_order_writer';
+  END IF;
+
+  -- 4. Validate cr_order_private.lifecycle_v2(uuid,uuid,jsonb) historical definition & attributes
+  SELECT 
+    encode(sha256(convert_to(p.prosrc, 'UTF8')), 'hex'),
+    pg_get_userbyid(p.proowner),
+    p.prosecdef,
+    l.lanname,
+    p.proconfig
+  INTO v_hash, v_owner, v_secdef, v_lang, v_config
+  FROM pg_proc p
+  JOIN pg_namespace n ON n.oid = p.pronamespace
+  JOIN pg_language l ON l.oid = p.prolang
+  WHERE n.nspname = 'cr_order_private' AND p.proname = 'lifecycle_v2'
+    AND p.oid = to_regprocedure('cr_order_private.lifecycle_v2(uuid,uuid,jsonb)');
+
+  IF v_hash IS NULL THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: lifecycle_v2(uuid,uuid,jsonb) not found';
+  END IF;
+  -- Expected baseline hash from 20261007020245_cr_order_a5_lifecycle_writer.sql
+  IF v_hash IS DISTINCT FROM '8859600d93efd94b37c7de2d49a68340d433e695f59d6bb51ed9447945dba0d8' THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: lifecycle_v2(uuid,uuid,jsonb) source hash drift: expected 8859600d93efd94b37c7de2d49a68340d433e695f59d6bb51ed9447945dba0d8, got %', v_hash;
+  END IF;
+  IF v_owner IS DISTINCT FROM 'cr_order_writer' THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: lifecycle_v2(uuid,uuid,jsonb) owner must be cr_order_writer, got %', v_owner;
+  END IF;
+  IF NOT v_secdef THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: lifecycle_v2(uuid,uuid,jsonb) must be SECURITY DEFINER';
+  END IF;
+  IF v_lang IS DISTINCT FROM 'plpgsql' THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: lifecycle_v2(uuid,uuid,jsonb) language must be plpgsql, got %', v_lang;
+  END IF;
+  IF v_config IS DISTINCT FROM ARRAY['search_path=""'] THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: lifecycle_v2(uuid,uuid,jsonb) search_path must be empty, got %', array_to_string(v_config, ',');
+  END IF;
+  IF NOT has_function_privilege('authenticated', to_regprocedure('cr_order_private.lifecycle_v2(uuid,uuid,jsonb)'), 'EXECUTE') THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: lifecycle_v2(uuid,uuid,jsonb) missing EXECUTE for authenticated';
+  END IF;
+  IF has_function_privilege('anon', to_regprocedure('cr_order_private.lifecycle_v2(uuid,uuid,jsonb)'), 'EXECUTE')
+     OR has_function_privilege('service_role', to_regprocedure('cr_order_private.lifecycle_v2(uuid,uuid,jsonb)'), 'EXECUTE') THEN
+    RAISE EXCEPTION 'A5_PRECHECK_FAILED: lifecycle_v2(uuid,uuid,jsonb) unexpected EXECUTE for anon or service_role';
   END IF;
 END $$;
 
+-- -----------------------------------------------------------------------------
+-- FUNCTION REPLACEMENT
+-- -----------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION cr_order_private.lifecycle_v2(_tenant uuid, _request uuid, _command jsonb)
 RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$
 DECLARE
@@ -285,6 +401,9 @@ BEGIN
   RETURN result;
 END $$;
 
+-- -----------------------------------------------------------------------------
+-- OWNERSHIP AND PRIVILEGE CONFIGURATION
+-- -----------------------------------------------------------------------------
 GRANT CREATE ON SCHEMA cr_order_private TO cr_order_writer;
 ALTER FUNCTION cr_order_private.lifecycle_v2(uuid, uuid, jsonb) OWNER TO cr_order_writer;
 REVOKE CREATE ON SCHEMA cr_order_private FROM cr_order_writer;
@@ -292,13 +411,51 @@ REVOKE CREATE ON SCHEMA cr_order_private FROM cr_order_writer;
 REVOKE ALL ON FUNCTION cr_order_private.lifecycle_v2(uuid, uuid, jsonb) FROM PUBLIC, anon, service_role;
 GRANT EXECUTE ON FUNCTION cr_order_private.lifecycle_v2(uuid, uuid, jsonb) TO authenticated;
 
-DO $$ BEGIN
-  IF (SELECT pg_get_userbyid(proowner) FROM pg_proc WHERE oid = 'cr_order_private.lifecycle_v2(uuid,uuid,jsonb)'::regprocedure) IS DISTINCT FROM 'cr_order_writer' THEN
-    RAISE EXCEPTION 'POSTCHECK_FAILED: cr_order_private.lifecycle_v2 must be owned by cr_order_writer';
-  END IF;
+-- -----------------------------------------------------------------------------
+-- POSTCHECKS: INTEGRITY & ATTRIBUTES VERIFICATION
+-- -----------------------------------------------------------------------------
+DO $$ 
+DECLARE
+  v_hash text;
+  v_owner text;
+  v_secdef boolean;
+  v_lang text;
+  v_config text[];
+BEGIN
+  SELECT 
+    encode(sha256(convert_to(p.prosrc, 'UTF8')), 'hex'),
+    pg_get_userbyid(p.proowner),
+    p.prosecdef,
+    l.lanname,
+    p.proconfig
+  INTO v_hash, v_owner, v_secdef, v_lang, v_config
+  FROM pg_proc p
+  JOIN pg_namespace n ON n.oid = p.pronamespace
+  JOIN pg_language l ON l.oid = p.prolang
+  WHERE n.nspname = 'cr_order_private' AND p.proname = 'lifecycle_v2'
+    AND p.oid = to_regprocedure('cr_order_private.lifecycle_v2(uuid,uuid,jsonb)');
 
-  IF NOT has_function_privilege('authenticated', 'cr_order_private.lifecycle_v2(uuid,uuid,jsonb)', 'EXECUTE') THEN
-    RAISE EXCEPTION 'POSTCHECK_FAILED: authenticated must possess EXECUTE on cr_order_private.lifecycle_v2';
+  IF v_owner IS DISTINCT FROM 'cr_order_writer' THEN
+    RAISE EXCEPTION 'A5_POSTCHECK_FAILED: cr_order_private.lifecycle_v2 must be owned by cr_order_writer, got %', v_owner;
+  END IF;
+  IF NOT v_secdef THEN
+    RAISE EXCEPTION 'A5_POSTCHECK_FAILED: cr_order_private.lifecycle_v2 must be SECURITY DEFINER';
+  END IF;
+  IF v_lang IS DISTINCT FROM 'plpgsql' THEN
+    RAISE EXCEPTION 'A5_POSTCHECK_FAILED: cr_order_private.lifecycle_v2 language must be plpgsql, got %', v_lang;
+  END IF;
+  IF v_config IS DISTINCT FROM ARRAY['search_path=""'] THEN
+    RAISE EXCEPTION 'A5_POSTCHECK_FAILED: cr_order_private.lifecycle_v2 search_path must be empty';
+  END IF;
+  IF v_hash IS DISTINCT FROM '4e28f7c539e19f08bf1561b1dfc367f4370a1e732a1c341dbc61657a477ace6f' THEN
+    RAISE EXCEPTION 'A5_POSTCHECK_FAILED: cr_order_private.lifecycle_v2 replacement hash mismatch: %', v_hash;
+  END IF;
+  IF NOT has_function_privilege('authenticated', to_regprocedure('cr_order_private.lifecycle_v2(uuid,uuid,jsonb)'), 'EXECUTE') THEN
+    RAISE EXCEPTION 'A5_POSTCHECK_FAILED: authenticated must possess EXECUTE on cr_order_private.lifecycle_v2';
+  END IF;
+  IF has_function_privilege('anon', to_regprocedure('cr_order_private.lifecycle_v2(uuid,uuid,jsonb)'), 'EXECUTE')
+     OR has_function_privilege('service_role', to_regprocedure('cr_order_private.lifecycle_v2(uuid,uuid,jsonb)'), 'EXECUTE') THEN
+    RAISE EXCEPTION 'A5_POSTCHECK_FAILED: unexpected EXECUTE on cr_order_private.lifecycle_v2 for anon or service_role';
   END IF;
 END $$;
 
