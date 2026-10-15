@@ -142,8 +142,8 @@ function restoreCanonicalBaseline() {
     CREATE OR REPLACE FUNCTION cr_order_private.actor()
     RETURNS uuid LANGUAGE plpgsql STABLE SECURITY INVOKER SET search_path = '' AS $actor$${CANONICAL_ACTOR_BODY}$actor$;
     ALTER FUNCTION cr_order_private.actor() OWNER TO postgres;
-    REVOKE ALL ON FUNCTION cr_order_private.actor() FROM PUBLIC, anon, service_role;
-    GRANT EXECUTE ON FUNCTION cr_order_private.actor() TO authenticated, cr_order_writer;
+    REVOKE ALL ON FUNCTION cr_order_private.actor() FROM PUBLIC, anon, authenticated, service_role;
+    GRANT EXECUTE ON FUNCTION cr_order_private.actor() TO cr_order_writer;
 
     -- Ensure lifecycle_v2 is canonical baseline
     GRANT CREATE ON SCHEMA cr_order_private TO cr_order_writer;

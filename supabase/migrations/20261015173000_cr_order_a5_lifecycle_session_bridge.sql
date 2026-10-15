@@ -152,7 +152,7 @@ DECLARE
 BEGIN
   FOR f IN SELECT * FROM (VALUES
     ('cr_order_private.session_uid_bridge()', 'postgres', ARRAY['cr_order_writer','postgres']::text[]),
-    ('cr_order_private.actor()', 'postgres', ARRAY['authenticated','cr_order_writer','postgres']::text[]),
+    ('cr_order_private.actor()', 'postgres', ARRAY['cr_order_writer','postgres']::text[]),
     ('cr_order_private.lifecycle_v2(uuid,uuid,jsonb)', 'cr_order_writer', ARRAY['authenticated','cr_order_writer']::text[])
   ) AS expected(signature, owner_name, grantees) LOOP
     SELECT array_agg(pg_get_userbyid(a.grantee)::text ORDER BY pg_get_userbyid(a.grantee)::text)
@@ -170,7 +170,7 @@ BEGIN
     END IF;
     IF has_function_privilege('anon',to_regprocedure(f.signature),'EXECUTE')
       OR has_function_privilege('service_role',to_regprocedure(f.signature),'EXECUTE')
-      OR (f.signature='cr_order_private.session_uid_bridge()'
+      OR (f.signature IN ('cr_order_private.session_uid_bridge()', 'cr_order_private.actor()')
         AND has_function_privilege('authenticated',to_regprocedure(f.signature),'EXECUTE')) THEN
       RAISE EXCEPTION 'A5_PRECHECK_FAILED: unexpected effective EXECUTE on %', f.signature;
     END IF;
@@ -506,7 +506,7 @@ DECLARE
 BEGIN
   FOR f IN SELECT * FROM (VALUES
     ('cr_order_private.session_uid_bridge()', 'postgres', ARRAY['cr_order_writer','postgres']::text[]),
-    ('cr_order_private.actor()', 'postgres', ARRAY['authenticated','cr_order_writer','postgres']::text[]),
+    ('cr_order_private.actor()', 'postgres', ARRAY['cr_order_writer','postgres']::text[]),
     ('cr_order_private.lifecycle_v2(uuid,uuid,jsonb)', 'cr_order_writer', ARRAY['authenticated','cr_order_writer']::text[])
   ) AS expected(signature, owner_name, grantees) LOOP
     SELECT array_agg(pg_get_userbyid(a.grantee)::text ORDER BY pg_get_userbyid(a.grantee)::text)
@@ -524,7 +524,7 @@ BEGIN
     END IF;
     IF has_function_privilege('anon',to_regprocedure(f.signature),'EXECUTE')
       OR has_function_privilege('service_role',to_regprocedure(f.signature),'EXECUTE')
-      OR (f.signature='cr_order_private.session_uid_bridge()'
+      OR (f.signature IN ('cr_order_private.session_uid_bridge()', 'cr_order_private.actor()')
         AND has_function_privilege('authenticated',to_regprocedure(f.signature),'EXECUTE')) THEN
       RAISE EXCEPTION 'A5_POSTCHECK_FAILED: unexpected effective EXECUTE on %', f.signature;
     END IF;
