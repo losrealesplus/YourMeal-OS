@@ -371,6 +371,38 @@ console.log("\n--- [SCENARIO F] Drift in search_path or ACL privileges ---");
   console.log("  ✓ F.3: unexpected bridge execute grant aborted fail-closed.");
 }
 
+// F.4-F.8: execute the unchanged migration against real unexpected ACLs.
+for (const [name, setup, cleanup] of [
+  ['grant option', `GRANT EXECUTE ON FUNCTION cr_order_private.lifecycle_v2(uuid,uuid,jsonb) TO authenticated WITH GRANT OPTION;`,
+    `REVOKE GRANT OPTION FOR EXECUTE ON FUNCTION cr_order_private.lifecycle_v2(uuid,uuid,jsonb) FROM authenticated;`],
+  ['unexpected grantee', `CREATE ROLE a5_drift_probe NOLOGIN; GRANT EXECUTE ON FUNCTION cr_order_private.lifecycle_v2(uuid,uuid,jsonb) TO a5_drift_probe;`,
+    `REVOKE ALL ON FUNCTION cr_order_private.lifecycle_v2(uuid,uuid,jsonb) FROM a5_drift_probe; DROP ROLE a5_drift_probe;`],
+  ['bridge service_role', `GRANT EXECUTE ON FUNCTION cr_order_private.session_uid_bridge() TO service_role;`,
+    `REVOKE ALL ON FUNCTION cr_order_private.session_uid_bridge() FROM service_role;`],
+  ['actor PUBLIC', `GRANT EXECUTE ON FUNCTION cr_order_private.actor() TO PUBLIC;`,
+    `REVOKE ALL ON FUNCTION cr_order_private.actor() FROM PUBLIC;`],
+  ['inherited writer', `GRANT cr_order_writer TO authenticated;`,
+    `REVOKE cr_order_writer FROM authenticated;`],
+]) {
+  restoreCanonicalBaseline();
+  sql(setup);
+  try {
+    const before = sql(`SELECT json_agg(row_to_json(p) ORDER BY p.oid) FROM pg_proc p WHERE p.oid IN (
+      'cr_order_private.actor()'::regprocedure, 'cr_order_private.session_uid_bridge()'::regprocedure,
+      'cr_order_private.lifecycle_v2(uuid,uuid,jsonb)'::regprocedure);`);
+    const res = executeRealMigration();
+    assert.equal(res.ok, false, name);
+    assert.match(res.error, /A5_PRECHECK_FAILED:/, name);
+    const after = sql(`SELECT json_agg(row_to_json(p) ORDER BY p.oid) FROM pg_proc p WHERE p.oid IN (
+      'cr_order_private.actor()'::regprocedure, 'cr_order_private.session_uid_bridge()'::regprocedure,
+      'cr_order_private.lifecycle_v2(uuid,uuid,jsonb)'::regprocedure);`);
+    assert.equal(after, before, `${name}: rejected migration must preserve all function metadata`);
+    console.log(`  ✓ ${name}: real migration rejected; function metadata unchanged.`);
+  } finally {
+    sql(cleanup);
+  }
+}
+
 // -----------------------------------------------------------------------------
 // SCENARIO A: Valid canonical baseline -> migration executes cleanly
 // -----------------------------------------------------------------------------
@@ -422,10 +454,11 @@ console.log("\n--- [SCENARIO H] Functional Call Execution under Authenticated Se
   const STAFF_USER_ID = sql(`
     SELECT tm.user_id FROM public.tenant_members tm
     JOIN public.user_roles ur ON ur.user_id = tm.user_id AND ur.tenant_id = tm.tenant_id
-    WHERE tm.tenant_id = '8bba00ba-331b-42c8-9283-4e3836ffb870' AND ur.role = 'operations_manager'
+    WHERE tm.tenant_id = '8bba00ba-331b-42c8-9283-4e3836ffb870' AND ur.role = 'operations_manager' AND tm.status = 'approved' AND tm.deleted_at IS NULL
     LIMIT 1;
   `);
 
+  assert.match(STAFF_USER_ID, /^[0-9a-f-]{36}$/, "Approved synthetic operations_manager required");
   const testCallSql = `
     DO $$
     DECLARE
@@ -434,6 +467,9 @@ console.log("\n--- [SCENARIO H] Functional Call Execution under Authenticated Se
       PERFORM set_config('role', 'authenticated', true);
       PERFORM set_config('request.jwt.claim.sub', '${STAFF_USER_ID}', true);
 
+      IF auth.uid() IS DISTINCT FROM '${STAFF_USER_ID}'::uuid THEN
+        RAISE EXCEPTION 'TEST_FAILED: legitimate lifecycle staff session required';
+      END IF;
       BEGIN
         -- Call lifecycle_v2 with invalid input to verify it traverses authentication
         -- and reaches input validation without "permission denied for schema auth"
@@ -442,11 +478,11 @@ console.log("\n--- [SCENARIO H] Functional Call Execution under Authenticated Se
           gen_random_uuid(),
           jsonb_build_object('bad', 'data')
         );
+        RAISE EXCEPTION 'TEST_FAILED: invalid command unexpectedly succeeded';
       EXCEPTION WHEN OTHERS THEN
-        IF SQLERRM LIKE '%permission denied for schema auth%' THEN
-          RAISE EXCEPTION 'A5_AUTH_SCHEMA_DENIED: cr_order_writer still encountered auth schema permission error';
+        IF SQLSTATE <> 'P0001' OR SQLERRM <> 'INPUT_INVALID' THEN
+          RAISE EXCEPTION 'TEST_FAILED: expected P0001 INPUT_INVALID, got % %', SQLSTATE, SQLERRM;
         END IF;
-        -- INPUT_INVALID or PERMISSION_DENIED (lifecycle_reader) proves auth.uid() schema issue is eliminated
       END;
     END $$;
     SELECT 'FUNCTIONAL_INVOCATION_PASS';
@@ -454,9 +490,9 @@ console.log("\n--- [SCENARIO H] Functional Call Execution under Authenticated Se
 
   const functionalResult = sql(testCallSql);
   assert.equal(functionalResult, "FUNCTIONAL_INVOCATION_PASS");
-  console.log("  ✓ Functional call executed without 'permission denied for schema auth'.");
+  console.log("  ✓ Legitimate staff invocation reached exact P0001 INPUT_INVALID.");
 }
 
 console.log("\n=======================================================================");
-console.log("   ALL DRIFT & ATOMIC ROLLBACK TESTS PASSED (8/8 SCENARIOS PASS)        ");
+console.log("   ALL 17 FOCUSED CASES PASSED (PRECHECK PRESERVATION; NO POST-REPLACEMENT FAILURE INJECTION)        ");
 console.log("=======================================================================");

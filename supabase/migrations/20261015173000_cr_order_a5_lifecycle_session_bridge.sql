@@ -143,6 +143,44 @@ BEGIN
   END IF;
 END $$;
 
+-- Exact ACL contract: reject unknown grantees, PUBLIC, grantors and delegation.
+-- Effective API checks additionally detect inherited EXECUTE permissions.
+DO $$
+DECLARE
+  f record;
+  actual_acl text[];
+BEGIN
+  FOR f IN SELECT * FROM (VALUES
+    ('cr_order_private.session_uid_bridge()', 'postgres', ARRAY['cr_order_writer','postgres']::text[]),
+    ('cr_order_private.actor()', 'postgres', ARRAY['authenticated','cr_order_writer','postgres']::text[]),
+    ('cr_order_private.lifecycle_v2(uuid,uuid,jsonb)', 'cr_order_writer', ARRAY['authenticated','cr_order_writer']::text[])
+  ) AS expected(signature, owner_name, grantees) LOOP
+    SELECT array_agg(pg_get_userbyid(a.grantee)::text ORDER BY pg_get_userbyid(a.grantee)::text)
+      INTO actual_acl
+      FROM pg_proc p CROSS JOIN LATERAL aclexplode(coalesce(p.proacl, acldefault('f',p.proowner))) a
+      WHERE p.oid=to_regprocedure(f.signature);
+    IF actual_acl IS DISTINCT FROM f.grantees OR EXISTS (
+      SELECT 1 FROM pg_proc p
+      CROSS JOIN LATERAL aclexplode(coalesce(p.proacl, acldefault('f',p.proowner))) a
+      WHERE p.oid=to_regprocedure(f.signature)
+        AND (a.grantee=0 OR a.is_grantable OR a.privilege_type<>'EXECUTE'
+          OR a.grantor<>(SELECT oid FROM pg_roles WHERE rolname=f.owner_name))
+    ) THEN
+      RAISE EXCEPTION 'A5_PRECHECK_FAILED: unexpected ACL on %', f.signature;
+    END IF;
+    IF has_function_privilege('anon',to_regprocedure(f.signature),'EXECUTE')
+      OR has_function_privilege('service_role',to_regprocedure(f.signature),'EXECUTE')
+      OR (f.signature='cr_order_private.session_uid_bridge()'
+        AND has_function_privilege('authenticated',to_regprocedure(f.signature),'EXECUTE')) THEN
+      RAISE EXCEPTION 'A5_PRECHECK_FAILED: unexpected effective EXECUTE on %', f.signature;
+    END IF;
+    IF EXISTS (SELECT 1 FROM pg_roles r WHERE r.rolname IN ('anon','authenticated','service_role')
+      AND (pg_has_role(r.oid,'cr_order_writer','SET') OR pg_has_role(r.oid,'postgres','SET'))) THEN
+      RAISE EXCEPTION 'A5_PRECHECK_FAILED: API role can assume privileged owner';
+    END IF;
+  END LOOP;
+END $$;
+
 -- -----------------------------------------------------------------------------
 -- FUNCTION REPLACEMENT
 -- -----------------------------------------------------------------------------
@@ -457,6 +495,44 @@ BEGIN
      OR has_function_privilege('service_role', to_regprocedure('cr_order_private.lifecycle_v2(uuid,uuid,jsonb)'), 'EXECUTE') THEN
     RAISE EXCEPTION 'A5_POSTCHECK_FAILED: unexpected EXECUTE on cr_order_private.lifecycle_v2 for anon or service_role';
   END IF;
+END $$;
+
+-- Exact ACL contract: reject unknown grantees, PUBLIC, grantors and delegation.
+-- Effective API checks additionally detect inherited EXECUTE permissions.
+DO $$
+DECLARE
+  f record;
+  actual_acl text[];
+BEGIN
+  FOR f IN SELECT * FROM (VALUES
+    ('cr_order_private.session_uid_bridge()', 'postgres', ARRAY['cr_order_writer','postgres']::text[]),
+    ('cr_order_private.actor()', 'postgres', ARRAY['authenticated','cr_order_writer','postgres']::text[]),
+    ('cr_order_private.lifecycle_v2(uuid,uuid,jsonb)', 'cr_order_writer', ARRAY['authenticated','cr_order_writer']::text[])
+  ) AS expected(signature, owner_name, grantees) LOOP
+    SELECT array_agg(pg_get_userbyid(a.grantee)::text ORDER BY pg_get_userbyid(a.grantee)::text)
+      INTO actual_acl
+      FROM pg_proc p CROSS JOIN LATERAL aclexplode(coalesce(p.proacl, acldefault('f',p.proowner))) a
+      WHERE p.oid=to_regprocedure(f.signature);
+    IF actual_acl IS DISTINCT FROM f.grantees OR EXISTS (
+      SELECT 1 FROM pg_proc p
+      CROSS JOIN LATERAL aclexplode(coalesce(p.proacl, acldefault('f',p.proowner))) a
+      WHERE p.oid=to_regprocedure(f.signature)
+        AND (a.grantee=0 OR a.is_grantable OR a.privilege_type<>'EXECUTE'
+          OR a.grantor<>(SELECT oid FROM pg_roles WHERE rolname=f.owner_name))
+    ) THEN
+      RAISE EXCEPTION 'A5_POSTCHECK_FAILED: unexpected ACL on %', f.signature;
+    END IF;
+    IF has_function_privilege('anon',to_regprocedure(f.signature),'EXECUTE')
+      OR has_function_privilege('service_role',to_regprocedure(f.signature),'EXECUTE')
+      OR (f.signature='cr_order_private.session_uid_bridge()'
+        AND has_function_privilege('authenticated',to_regprocedure(f.signature),'EXECUTE')) THEN
+      RAISE EXCEPTION 'A5_POSTCHECK_FAILED: unexpected effective EXECUTE on %', f.signature;
+    END IF;
+    IF EXISTS (SELECT 1 FROM pg_roles r WHERE r.rolname IN ('anon','authenticated','service_role')
+      AND (pg_has_role(r.oid,'cr_order_writer','SET') OR pg_has_role(r.oid,'postgres','SET'))) THEN
+      RAISE EXCEPTION 'A5_POSTCHECK_FAILED: API role can assume privileged owner';
+    END IF;
+  END LOOP;
 END $$;
 
 COMMIT;
