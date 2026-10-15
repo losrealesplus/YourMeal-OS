@@ -9,8 +9,10 @@ const sql = (query) =>
 
 console.log("Ensuring orders and idempotency ledgers are clean for pristine E2E run...");
 sql(`
+  SET session_replication_role = 'replica';
   TRUNCATE TABLE public.order_write_requests, public.delivery_services, public.order_items, public.orders CASCADE;
   DELETE FROM public.audit_log WHERE entity_type = 'order';
+  SET session_replication_role = 'origin';
 `);
 
 console.log("=== STARTING FULL UI E2E TEST: UNIVERSAL INTAKE DRAWER ===");
