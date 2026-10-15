@@ -11,6 +11,12 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getTenantOffers, registerTenantOffers } from "@/modules/commercial";
 import { resolveServerInstanceRuntimeConfig } from "@/lib/instance-runtime-boundary";
 import "@/tenant/commercial-config";
+import {
+  EATCLEAN_PARTIAL_LAUNCH_CONFIG,
+  EATCLEAN_TENANT_ID,
+  isEatCleanContext,
+  isEatCleanStaffOrderCaptureFrozen,
+} from "@/config/eatclean-partial-launch";
 import type { Json } from "@/integrations/supabase/types";
 import type { OfferWriteRequest } from "../application/offer-write-input";
 
@@ -23,8 +29,12 @@ type RpcCall = (
 ) => Promise<{ data: Json | null; error: { message: string } | null }>;
 
 /** Verified DB identity and server instance binding, strictly rejecting cross-instance requests. */
-export async function verifiedOrderActorContext(actor: VerifiedOfferActor, tenantId: string) {
-  const serverConfig = resolveServerInstanceRuntimeConfig();
+export async function verifiedOrderActorContext(
+  actor: VerifiedOfferActor,
+  tenantId: string,
+  customEnv?: Record<string, string | undefined>,
+) {
+  const serverConfig = resolveServerInstanceRuntimeConfig(customEnv);
 
   const tenant = await actor.supabase
     .from("tenants")
@@ -70,9 +80,53 @@ export async function verifiedOrderActorContext(actor: VerifiedOfferActor, tenan
   return { tenant: tenant.data, roles: verifiedRoles };
 }
 
-export async function offerCommercialContext(actor: VerifiedOfferActor, tenantId: string) {
-  const { tenant } = await verifiedOrderActorContext(actor, tenantId);
-  const serverConfig = resolveServerInstanceRuntimeConfig();
+/**
+ * Authoritative server-side gate for order capture & creation.
+ * Enforces release flags (staffOrderCapture, orderCreation) strictly on the server
+ * before any privileged database writes, commercial quote issuance, or commits.
+ * Never trusts client headers, client-supplied flags, or unverified runtime environments.
+ */
+export function assertServerOrderWriteAllowed(
+  tenant: { id: string; slug: string },
+  operation: "capture" | "modify",
+  customCommit = false,
+  customEnv?: Record<string, string | undefined>,
+): void {
+  const isEatClean =
+    tenant.slug === "eatclean" ||
+    tenant.slug === "eatclean-staging" ||
+    tenant.id === EATCLEAN_TENANT_ID ||
+    isEatCleanContext({ tenantId: tenant.id, tenantSlug: tenant.slug });
+
+  if (!isEatClean) {
+    return;
+  }
+
+  // EatClean never enables custom order commits
+  if (customCommit) {
+    throw new OfferWriteRpcError("CUSTOM_NOT_ENABLED");
+  }
+
+  // New order capture / creation is strictly frozen unless running in a verified local synthetic lab
+  if (operation === "capture") {
+    if (
+      isEatCleanStaffOrderCaptureFrozen(
+        { tenantId: tenant.id, tenantSlug: tenant.slug },
+        customEnv,
+      )
+    ) {
+      throw new DomainError("INVALID_STATE", EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage);
+    }
+  }
+}
+
+export async function offerCommercialContext(
+  actor: VerifiedOfferActor,
+  tenantId: string,
+  customEnv?: Record<string, string | undefined>,
+) {
+  const { tenant } = await verifiedOrderActorContext(actor, tenantId, customEnv);
+  const serverConfig = resolveServerInstanceRuntimeConfig(customEnv);
   if (!Array.isArray(bundledCommercial))
     throw new OfferWriteRpcError("COMMERCIAL_CONTEXT_UNAVAILABLE");
 
@@ -171,6 +225,7 @@ export async function runVerifiedOfferWrite(
   quoteId?: string,
   admin: { rpc: unknown } = supabaseAdmin,
   customCommit = false,
+  customEnv?: Record<string, string | undefined>,
 ) {
   // Policy re-evaluation is mandatory at both quote and commit. RPC handles committed retry
   // before quote expiry/price-policy comparison, keeping the original immutable quote payload.
@@ -181,18 +236,25 @@ export async function runVerifiedOfferWrite(
     throw new OfferWriteRpcError("OFFER_WRITE_FAILED");
   if (!customCommit && dishLines.length === 0)
     throw new OfferWriteRpcError("CUSTOM_COMMIT_REQUIRED");
+
+  // 1. Authoritative verification of actor identity, membership, capabilities, and server instance binding
+  const { tenant, roles } = await verifiedOrderActorContext(actor, request.tenantId, customEnv);
+
+  // 2. Centralized authoritative server barrier for EatClean order capture & custom write
+  // Runs BEFORE any commercial context evaluation, quote generation, or privileged RPC
+  assertServerOrderWriteAllowed(tenant, request.command.operation, customCommit, customEnv);
+
   let context;
   try {
     if (request.command.lines.some((line) => line.kind === "custom")) {
-      const identity = await verifiedOrderActorContext(actor, request.tenantId);
       if (
-        !identity.roles.some((role) =>
+        !roles.some((role) =>
           ["company_admin", "operations_manager", "saas_admin"].includes(role),
         )
       )
         throw new DomainError("PERMISSION_DENIED", "Staff capability required for custom writes");
     }
-    if (!customCommit) context = await offerCommercialContext(actor, request.tenantId);
+    if (!customCommit) context = await offerCommercialContext(actor, request.tenantId, customEnv);
   } catch (error) {
     if (error instanceof DomainError || error instanceof OfferWriteRpcError) throw error;
     throw new OfferWriteRpcError("OFFER_WRITE_UNAVAILABLE");
@@ -316,16 +378,30 @@ export async function runVerifiedOfferReconciliation(
   actor: VerifiedOfferActor,
   tenantId: string,
   requestId: string,
+  customEnv?: Record<string, string | undefined>,
 ) {
-  await verifiedOrderActorContext(actor, tenantId);
+  await verifiedOrderActorContext(actor, tenantId, customEnv);
 
   // Check the PostgreSQL canonical idempotency ledger (order_write_requests)
-  const { data: requestRow, error: requestError } = await supabaseAdmin
+  const { data: requestRow, error: requestError } = await ((supabaseAdmin as unknown as {
+    from: (table: string) => {
+      select: (cols: string) => {
+        eq: (col: string, val: string) => {
+          eq: (col2: string, val2: string) => {
+            maybeSingle: () => Promise<{
+              data: { order_id: string; committed_revision: number; operation: string; created_at: string } | null;
+              error: { message: string } | null;
+            }>;
+          };
+        };
+      };
+    };
+  })
     .from("order_write_requests")
     .select("order_id, committed_revision, operation, created_at")
     .eq("tenant_id", tenantId)
     .eq("request_id", requestId)
-    .maybeSingle();
+    .maybeSingle());
 
   if (requestError) {
     throw new DomainError("LEDGER_QUERY_FAILED", "Failed to query canonical order ledger");

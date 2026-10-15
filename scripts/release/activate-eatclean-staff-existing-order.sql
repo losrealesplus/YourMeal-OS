@@ -1,6 +1,6 @@
 -- MANUAL ONLY. Not a migration; do not run as part of installation/reset/deploy.
--- Requires independent approval of activation timing and an authorized function owner.
--- Contains no business-row writes; enables a new write endpoint for EatClean staff.
+-- DEPRECATED: Legacy staff order intake endpoint has been permanently superseded by Universal Intake V2.
+-- Contains no business-row writes; enforces revoked ACL status for EatClean staff legacy RPC.
 BEGIN;
 SET LOCAL lock_timeout = '5s';
 SET LOCAL statement_timeout = '30s';
@@ -34,12 +34,16 @@ BEGIN
 
  IF (SELECT encode(sha256(convert_to(jsonb_build_object('policies',(SELECT coalesce(jsonb_agg(jsonb_build_object('schema',schemaname,'table',tablename,'name',policyname,'permissive',permissive,'roles',roles,'cmd',cmd,'qual',qual,'check',with_check) ORDER BY schemaname,tablename,policyname),'[]'::jsonb) FROM pg_policies WHERE schemaname='public' AND tablename IN ('orders','order_items','audit_log')),'triggers',(SELECT coalesce(jsonb_agg(jsonb_build_object('table',c.relname,'name',t.tgname,'enabled',t.tgenabled,'definition',pg_get_triggerdef(t.oid,true)) ORDER BY c.relname,t.tgname),'[]'::jsonb) FROM pg_trigger t JOIN pg_class c ON c.oid=t.tgrelid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relname IN ('orders','order_items','audit_log') AND NOT t.tgisinternal))::text,'UTF8')),'hex')) IS DISTINCT FROM '08a95d476c85c39bf33547251622436f63e0291b7a0e186ce920b7da885c9a7a' THEN RAISE EXCEPTION 'STAFF_ORDER_ACTIVATION_RLS_TRIGGER_DRIFT'; END IF;
 END $$;
-GRANT EXECUTE ON FUNCTION public.capture_staff_existing_order(uuid,jsonb) TO authenticated;
+-- PERMANENT SECURITY SEAL: Legacy staff order capture RPC is superseded by Universal Intake V2.
+-- This procedure strictly revokes and verifies revocation of capture_staff_existing_order.
+-- It will NEVER grant EXECUTE to authenticated, anon, or PUBLIC.
+REVOKE ALL ON FUNCTION public.capture_staff_existing_order(uuid,jsonb) FROM PUBLIC, anon, authenticated, service_role;
 DO $$ BEGIN
- IF NOT has_function_privilege('authenticated','public.capture_staff_existing_order(uuid,jsonb)','EXECUTE')
+ IF has_function_privilege('authenticated','public.capture_staff_existing_order(uuid,jsonb)','EXECUTE')
  OR has_function_privilege('anon','public.capture_staff_existing_order(uuid,jsonb)','EXECUTE')
- OR has_function_privilege('service_role','public.capture_staff_existing_order(uuid,jsonb)','EXECUTE') THEN
-  RAISE EXCEPTION 'STAFF_ORDER_ACTIVATION_ACL_INVALID';
+ OR EXISTS (SELECT 1 FROM pg_proc p CROSS JOIN LATERAL aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) WHERE p.oid='public.capture_staff_existing_order(uuid,jsonb)'::regprocedure AND grantee = 0) THEN
+  RAISE EXCEPTION 'STAFF_ORDER_ACTIVATION_ACL_INVALID: legacy capture must remain revoked';
  END IF;
 END $$;
 COMMIT;
+

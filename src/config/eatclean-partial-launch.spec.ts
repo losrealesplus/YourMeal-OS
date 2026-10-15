@@ -299,6 +299,17 @@ describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
         expect(isVerifiedLocalSyntheticLab({ hostname: "127.0.0.1" }, missingEnv)).toBe(false);
         expect(isEatCleanStaffOrderCaptureFrozen(EATCLEAN_TENANT_ID, missingEnv)).toBe(true);
       });
+
+      it("rejects server bypass attempt using VITE_YOURMEAL_RUNTIME_ENV without authoritative YOURMEAL_RUNTIME_ENV", () => {
+        const viteOnlyEnv = {
+          VITE_YOURMEAL_RUNTIME_ENV: "staging_local",
+          TENANT_SLUG: "eatclean-staging",
+          SUPABASE_URL: LOCAL_STAGING_URL,
+          SUPABASE_PUBLISHABLE_KEY: LOCAL_STAGING_PUBLIC_KEY,
+        };
+        expect(isVerifiedLocalSyntheticLab({ hostname: "127.0.0.1" }, viteOnlyEnv)).toBe(false);
+        expect(isEatCleanStaffOrderCaptureFrozen(EATCLEAN_TENANT_ID, viteOnlyEnv)).toBe(true);
+      });
     });
 
     describe("5. Positive: Verified Local Synthetic Lab", () => {
@@ -310,6 +321,30 @@ describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
         const localhostContext = { hostname: "localhost", tenantSlug: "eatclean-staging" };
         expect(isVerifiedLocalSyntheticLab(localhostContext, validLocalEnv)).toBe(true);
         expect(isEatCleanStaffOrderCaptureFrozen(localhostContext, validLocalEnv)).toBe(false);
+      });
+
+      it("unfreezes staffOrderCapture in browser context with loopback host and VITE_YOURMEAL_RUNTIME_ENV", () => {
+        const originalWindow = globalThis.window;
+        const originalImportMeta = import.meta.env.VITE_YOURMEAL_RUNTIME_ENV;
+        try {
+          // Simulate browser with window and TanStack Start process shim
+          (import.meta.env as Record<string, string | undefined>).VITE_YOURMEAL_RUNTIME_ENV = "staging_local";
+          (globalThis as unknown as { window: unknown }).window = {
+            location: { hostname: "127.0.0.1" },
+          };
+
+          const localContext = { hostname: "127.0.0.1", tenantSlug: "eatclean-staging" };
+          expect(isVerifiedLocalSyntheticLab(localContext)).toBe(true);
+          expect(isEatCleanStaffOrderCaptureFrozen(localContext)).toBe(false);
+
+          // Non-loopback host in browser fails closed
+          const nonLoopback = { hostname: "eatclean.yourmealos.com", tenantSlug: "eatclean" };
+          expect(isVerifiedLocalSyntheticLab(nonLoopback)).toBe(false);
+          expect(isEatCleanStaffOrderCaptureFrozen(nonLoopback)).toBe(true);
+        } finally {
+          (globalThis as unknown as { window: unknown }).window = originalWindow;
+          (import.meta.env as Record<string, string | undefined>).VITE_YOURMEAL_RUNTIME_ENV = originalImportMeta;
+        }
       });
     });
   });

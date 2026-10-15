@@ -1,4 +1,4 @@
-import { beforeEach, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { clearTenantOffersRegistry, registerTenantOffers } from "@/modules/commercial";
 import type { CommercialOffer } from "@/modules/commercial";
 import type { AppSupabase } from "@/services/types";
@@ -8,6 +8,8 @@ import {
   runVerifiedOfferReconciliation,
 } from "./offer-write.server";
 import { parseOfferWriteRequest } from "../application/offer-write-input";
+import { EATCLEAN_TENANT_ID } from "@/config/eatclean-partial-launch";
+import { LOCAL_STAGING_URL, LOCAL_STAGING_PUBLIC_KEY } from "@/lib/local-staging-runtime";
 vi.mock("@/tenant/commercial-config", () => ({}));
 vi.mock("@/tenant/resources/brand.json", () => ({ default: { slug: "test-tenant" } }));
 const mockAdminFrom = vi.fn();
@@ -595,5 +597,387 @@ it("reconciliation: late arrival of committed ledger entry safely transitions to
   expect(finalCheck.reconciled).toBe(true);
   expect(finalCheck.order?.id).toBe(committedOrderId);
   expect(finalCheck.order?.total).toBe(3.5);
+});
+
+describe("Server-Authoritative Order Capture Gate & Defense-in-Depth", () => {
+  const prodEatCleanEnv = {
+    TENANT_SLUG: "eatclean",
+    SUPABASE_URL: "https://nhirlpkuvonggctdzzad.supabase.co",
+  };
+
+  const eatcleanCaptureRequest = parseOfferWriteRequest({
+    tenantId: EATCLEAN_TENANT_ID,
+    requestId: "70000000-0000-4000-8000-000000000002",
+    command: {
+      operation: "capture",
+      weekStart: "2026-10-05",
+      customer: { kind: "existing", id: "30000000-0000-4000-8000-000000000001" },
+      lines: [
+        {
+          kind: "dish",
+          dishId: "40000000-0000-4000-8000-000000000001",
+          dayDate: "2026-10-05",
+          qty: 1,
+        },
+      ],
+    },
+  });
+
+  const eatcleanModifyRequest = parseOfferWriteRequest({
+    tenantId: EATCLEAN_TENANT_ID,
+    requestId: "70000000-0000-4000-8000-000000000003",
+    command: {
+      operation: "modify",
+      orderId: "50000000-0000-4000-8000-000000000001",
+      expectedRevision: 1,
+      weekStart: "2026-10-05",
+      lines: [
+        {
+          kind: "dish",
+          dishId: "40000000-0000-4000-8000-000000000001",
+          dayDate: "2026-10-05",
+          qty: 2,
+        },
+      ],
+    },
+  });
+
+  function eatcleanActor(
+    options: { role?: string; membership?: boolean } = {},
+  ) {
+    return {
+      userId,
+      supabase: {
+        from(table: string) {
+          const query = {
+            select: () => query,
+            eq: () => query,
+            is: () => query,
+            maybeSingle: async () => ({
+              data:
+                table === "tenants"
+                  ? { id: EATCLEAN_TENANT_ID, slug: "eatclean" }
+                  : table === "tenant_members"
+                    ? options.membership === false
+                      ? null
+                      : { status: "approved" }
+                    : null,
+              error: null,
+            }),
+            then: (resolve: (v: unknown) => unknown) =>
+              Promise.resolve({
+                data: [{ role: options.role ?? "company_admin" }],
+                error: null,
+              }).then(resolve),
+          };
+          return query;
+        },
+      } as unknown as AppSupabase,
+    };
+  }
+
+  it("authenticated user with orders.write is blocked on direct quote when staffOrderCapture is frozen in EatClean production", async () => {
+    const rpc = vi.fn();
+    await expect(
+      runVerifiedOfferWrite(eatcleanActor(), eatcleanCaptureRequest, undefined, { rpc }, false, prodEatCleanEnv),
+    ).rejects.toMatchObject({
+      code: "INVALID_STATE",
+      message: "Funcionalidad disponible próximamente",
+    });
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it("direct commit attempt of new capture is blocked with zero privileged RPCs in EatClean production", async () => {
+    const rpc = vi.fn();
+    await expect(
+      runVerifiedOfferWrite(eatcleanActor(), eatcleanCaptureRequest, quoteId, { rpc }, false, prodEatCleanEnv),
+    ).rejects.toMatchObject({
+      code: "INVALID_STATE",
+      message: "Funcionalidad disponible próximamente",
+    });
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it("direct custom commit attempt on EatClean is blocked with CUSTOM_NOT_ENABLED and zero privileged RPCs", async () => {
+    const rpc = vi.fn();
+    const customReq = parseOfferWriteRequest({
+      ...eatcleanCaptureRequest,
+      command: {
+        ...eatcleanCaptureRequest.command,
+        lines: [{ kind: "custom", name: "Sopa", qty: 1, dayDate: "2026-10-05", unitPrice: "5.00" }],
+      },
+    });
+    await expect(
+      runVerifiedOfferWrite(eatcleanActor(), customReq, undefined, { rpc }, true, prodEatCleanEnv),
+    ).rejects.toMatchObject({
+      message: "CUSTOM_NOT_ENABLED",
+    });
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it("unauthorized user (missing membership or orders.write) is rejected with PERMISSION_DENIED before RPC", async () => {
+    const rpc = vi.fn();
+    // Missing membership
+    await expect(
+      runVerifiedOfferWrite(eatcleanActor({ membership: false }), eatcleanCaptureRequest, undefined, { rpc }, false, prodEatCleanEnv),
+    ).rejects.toMatchObject({
+      code: "PERMISSION_DENIED",
+    });
+    // Insufficient role (kitchen role lacks orders.write)
+    await expect(
+      runVerifiedOfferWrite(eatcleanActor({ role: "kitchen" }), eatcleanCaptureRequest, undefined, { rpc }, false, prodEatCleanEnv),
+    ).rejects.toMatchObject({
+      code: "PERMISSION_DENIED",
+    });
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it("fails closed when synthetic variables are injected targeting production EatClean", async () => {
+    const rpc = vi.fn();
+    // Injected YOURMEAL_RUNTIME_ENV with production Supabase URL leak
+    const leakedEnv = {
+      YOURMEAL_RUNTIME_ENV: "staging_local",
+      TENANT_SLUG: "eatclean",
+      SUPABASE_URL: "https://nhirlpkuvonggctdzzad.supabase.co",
+      SUPABASE_PUBLISHABLE_KEY: "sb_publishable_qgT9AjzgqzMPgtLRjTZaiQ_yjsQ2ChH",
+    };
+    await expect(
+      runVerifiedOfferWrite(eatcleanActor(), eatcleanCaptureRequest, undefined, { rpc }, false, leakedEnv),
+    ).rejects.toThrow("SECURITY_VIOLATION: Incomplete or mixed staging environment.");
+    expect(rpc).not.toHaveBeenCalled();
+
+    // Injected VITE_YOURMEAL_RUNTIME_ENV on server without YOURMEAL_RUNTIME_ENV
+    const viteInjectedEnv = {
+      ...prodEatCleanEnv,
+      VITE_YOURMEAL_RUNTIME_ENV: "staging_local",
+    };
+    await expect(
+      runVerifiedOfferWrite(eatcleanActor(), eatcleanCaptureRequest, undefined, { rpc }, false, viteInjectedEnv),
+    ).rejects.toMatchObject({
+      code: "INVALID_STATE",
+      message: "Funcionalidad disponible próximamente",
+    });
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it("Demo tenant (yourmeal-os) is unaffected by EatClean capture freeze", async () => {
+    const demoTenantId = "10000000-0000-4000-8000-000000000001";
+    const demoEnv = {
+      TENANT_SLUG: "yourmeal-os",
+      SUPABASE_URL: "https://djangucecsphnejplvic.supabase.co",
+    };
+    registerTenantOffers("yourmeal-os", [
+      {
+        id: "individual_menu",
+        title: "Demo",
+        subtitle: "",
+        description: "",
+        unitLabel: "dish",
+        slotsIncluded: 1,
+        code: "individual_menu",
+        pricingModel: "per_unit",
+        basePrice: { cents: 1000, currency: "EUR", formatted: "10.00" },
+        promotions: [],
+      } as CommercialOffer,
+    ]);
+    const demoRequest = parseOfferWriteRequest({
+      tenantId: demoTenantId,
+      requestId: "70000000-0000-4000-8000-000000000004",
+      command: {
+        operation: "capture",
+        weekStart: "2026-10-05",
+        customer: { kind: "existing", id: "30000000-0000-4000-8000-000000000001" },
+        lines: [{ kind: "dish", dishId: "40000000-0000-4000-8000-000000000001", dayDate: "2026-10-05", qty: 1 }],
+      },
+    });
+    const rpc = vi.fn(async () => ({
+      data: {
+        quoteId,
+        expiresAt: "2026-10-06T10:00:00+00:00",
+        policyHash: (await offerCommercialContext(actor({ slug: "yourmeal-os" }), demoTenantId, demoEnv)).policyHash,
+        total: "10.00",
+        lines: [
+          {
+            slotId: quoteId,
+            menuId: quoteId,
+            dishId: "40000000-0000-4000-8000-000000000001",
+            dayDate: "2026-10-05",
+            qty: 1,
+            basePrice: "10.0000",
+            slotPrice: null,
+            unitPrice: "10.0000",
+            priceSource: "catalogue",
+            priceSnapshotStatus: "captured",
+          },
+        ],
+      },
+      error: null,
+    }));
+    const quoteResult = await runVerifiedOfferWrite(actor({ slug: "yourmeal-os" }), demoRequest, undefined, { rpc }, false, demoEnv);
+    expect(quoteResult).toBeDefined();
+    expect(rpc).toHaveBeenCalledWith("cr_order_offer_quote_issue", expect.anything());
+  });
+
+  it("verified local synthetic lab allows quote and commit for EatClean staging", async () => {
+    const stagingTenantId = EATCLEAN_TENANT_ID;
+    const localLabEnv = {
+      YOURMEAL_RUNTIME_ENV: "staging_local",
+      TENANT_SLUG: "eatclean-staging",
+      SUPABASE_URL: LOCAL_STAGING_URL,
+      SUPABASE_PUBLISHABLE_KEY: LOCAL_STAGING_PUBLIC_KEY,
+    };
+    const stagingActor = {
+      userId,
+      supabase: {
+        from(table: string) {
+          const query = {
+            select: () => query,
+            eq: () => query,
+            is: () => query,
+            maybeSingle: async () => ({
+              data:
+                table === "tenants"
+                  ? { id: stagingTenantId, slug: "eatclean" }
+                  : table === "tenant_members"
+                    ? { status: "approved" }
+                    : null,
+              error: null,
+            }),
+            then: (resolve: (v: unknown) => unknown) =>
+              Promise.resolve({
+                data: [{ role: "company_admin" }],
+                error: null,
+              }).then(resolve),
+          };
+          return query;
+        },
+      } as unknown as AppSupabase,
+    };
+    const context = await offerCommercialContext(stagingActor, stagingTenantId, localLabEnv);
+    const rpc = vi.fn(async () => ({
+      data: {
+        quoteId,
+        expiresAt: "2026-10-06T10:00:00+00:00",
+        policyHash: context.policyHash,
+        total: "11.90",
+        lines: [
+          {
+            slotId: quoteId,
+            menuId: quoteId,
+            dishId: "40000000-0000-4000-8000-000000000001",
+            dayDate: "2026-10-05",
+            qty: 1,
+            basePrice: "11.9000",
+            slotPrice: null,
+            unitPrice: "11.9000",
+            priceSource: "catalogue",
+            priceSnapshotStatus: "captured",
+          },
+        ],
+      },
+      error: null,
+    }));
+    const quoteResult = await runVerifiedOfferWrite(stagingActor, eatcleanCaptureRequest, undefined, { rpc }, false, localLabEnv);
+    expect(quoteResult).toBeDefined();
+    expect(rpc).toHaveBeenCalledWith("cr_order_offer_quote_issue", expect.anything());
+  });
+
+  it("allows legitimate order modification (operation: modify) on existing EatClean order without capture freeze", async () => {
+    const context = await offerCommercialContext(eatcleanActor(), EATCLEAN_TENANT_ID, prodEatCleanEnv);
+    const rpc = vi.fn(async () => ({
+      data: {
+        quoteId,
+        expiresAt: "2026-10-06T10:00:00+00:00",
+        policyHash: context.policyHash,
+        total: "23.80",
+        lines: [
+          {
+            slotId: quoteId,
+            menuId: quoteId,
+            dishId: "40000000-0000-4000-8000-000000000001",
+            dayDate: "2026-10-05",
+            qty: 2,
+            basePrice: "11.9000",
+            slotPrice: null,
+            unitPrice: "11.9000",
+            priceSource: "catalogue",
+            priceSnapshotStatus: "captured",
+          },
+        ],
+      },
+      error: null,
+    }));
+    const result = await runVerifiedOfferWrite(eatcleanActor(), eatcleanModifyRequest, undefined, { rpc }, false, prodEatCleanEnv);
+    expect(result).toBeDefined();
+    expect(rpc).toHaveBeenCalledWith(
+      "cr_order_offer_quote_issue",
+      expect.objectContaining({
+        _command: eatcleanModifyRequest.command,
+      }),
+    );
+  });
+
+  it("preserves legitimate order reconciliation on EatClean without being blocked by capture freeze", async () => {
+    const committedOrderId = "50000000-0000-4000-8000-000000000001";
+    mockAdminFrom.mockImplementation((table: string) => {
+      if (table === "order_write_requests") {
+        return {
+          select: () => ({
+            eq: () => ({
+              eq: () => ({
+                maybeSingle: async () => ({
+                  data: {
+                    order_id: committedOrderId,
+                    committed_revision: 1,
+                    operation: "capture",
+                    created_at: "2026-10-13T10:00:00Z",
+                  },
+                  error: null,
+                }),
+              }),
+            }),
+          }),
+        };
+      }
+      if (table === "orders") {
+        return {
+          select: () => ({
+            eq: () => ({
+              eq: () => ({
+                maybeSingle: async () => ({
+                  data: {
+                    id: committedOrderId,
+                    status: "confirmed",
+                    total: 11.90,
+                    created_at: "2026-10-13T10:00:00Z",
+                  },
+                  error: null,
+                }),
+              }),
+            }),
+          }),
+        };
+      }
+      return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) };
+    });
+
+    const res = await runVerifiedOfferReconciliation(
+      eatcleanActor(),
+      EATCLEAN_TENANT_ID,
+      eatcleanCaptureRequest.requestId,
+      prodEatCleanEnv,
+    );
+    expect(res).toEqual({
+      reconciled: true,
+      committed: true,
+      requestId: eatcleanCaptureRequest.requestId,
+      order: {
+        id: committedOrderId,
+        status: "confirmed",
+        total: 11.9,
+        createdAt: "2026-10-13T10:00:00Z",
+      },
+    });
+  });
 });
 

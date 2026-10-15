@@ -31,6 +31,8 @@ const networkCalls = {
   rpcCalls: [],
 };
 
+let capturedCommitRequest = null;
+
 const errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
 page.on("request", (req) => {
@@ -50,7 +52,19 @@ page.on("request", (req) => {
   if (url.includes("_server") || url.includes("quoteOfferOrder") || url.includes("commitOfferOrder")) {
     networkCalls.serverFunctions.push(url);
     if (url.includes("quoteOfferOrder")) networkCalls.quoteV2++;
-    if (url.includes("commitOfferOrder")) networkCalls.commitV2++;
+    if (url.includes("commitOfferOrder") || (url.includes("_server") && req.postData()?.includes("commitOfferOrder"))) {
+      networkCalls.commitV2++;
+    }
+  }
+  if (url.includes("commitOfferOrder") || (url.includes("_server") && req.postData()?.includes("quoteId"))) {
+    try {
+      const parsed = req.postDataJSON();
+      const payload = parsed?.data || parsed;
+      if (payload && (payload.command || payload.quoteId)) {
+        capturedCommitRequest = payload;
+        console.log("Captured real browser commitOfferOrder payload:", JSON.stringify(capturedCommitRequest));
+      }
+    } catch {}
   }
 });
 
@@ -211,35 +225,52 @@ try {
 
   // 10.1: Verify identical request replay with identical requestId & payload
   console.log("Testing identical request replay with identical requestId & payload...");
+  const commandToReplay = capturedCommitRequest?.command || {
+    operation: "capture",
+    customer: { kind: "existing", id: customerId },
+    weekStart,
+    autoConfirm: false,
+    demandChannel: "individual",
+    lines: [
+      {
+        kind: "dish",
+        dishId,
+        dayDate: "2026-10-19",
+        qty: 1,
+        comment: null,
+      },
+    ],
+    orderNotes: null,
+    dietaryOverride: null,
+  };
+  const exactCommandJson = JSON.stringify(commandToReplay).replace(/'/g, "''");
+
   const replayResult = sql(`
     DO $$
     DECLARE
       v_q record;
       v_res jsonb;
+      v_cmd jsonb := '${exactCommandJson}'::jsonb;
     BEGIN
       SET LOCAL ROLE service_role;
       SELECT * INTO v_q FROM cr_order_private.offer_quotes WHERE request_id = '${requestId}'::uuid;
       IF NOT FOUND THEN
         RAISE EXCEPTION 'TEST_FAILED: offer quote not found for replay';
       END IF;
+
+      -- Cryptographic assertion: assert exact command payload hash matches quote command_hash
+      IF v_q.command_hash <> encode(sha256(convert_to(v_cmd::text, 'UTF8')), 'hex') THEN
+        RAISE EXCEPTION 'TEST_FAILED: command payload does not match quote command_hash! computed: %, expected: %',
+          encode(sha256(convert_to(v_cmd::text, 'UTF8')), 'hex'), v_q.command_hash;
+      END IF;
+
       v_res := public.cr_order_offer_quote_commit(
-        '${tenantId}'::uuid,
-        '${actorId}'::uuid,
-        '${requestId}'::uuid,
-        v_q.id,
-        jsonb_build_object(
-          'operation', 'capture',
-          'customer', jsonb_build_object('kind', 'existing', 'id', '${customerId}'),
-          'weekStart', '${weekStart}',
-          'autoConfirm', false,
-          'demandChannel', 'individual',
-          'lines', jsonb_build_array(
-            jsonb_build_object('kind', 'dish', 'dishId', '${dishId}', 'dayDate', '2026-10-19', 'qty', 1, 'comment', null, 'slotId', (v_q.lines->0->>'slotId')::uuid)
-          ),
-          'orderNotes', null,
-          'dietaryOverride', null
-        ),
-        jsonb_build_object('policyHash', v_q.policy_hash, 'mode', 'weekly_plan')
+        _tenant_id => '${tenantId}'::uuid,
+        _actor_id => '${actorId}'::uuid,
+        _request_id => '${requestId}'::uuid,
+        _quote_id => v_q.id,
+        _command => v_cmd,
+        _commercial_context => jsonb_build_object('policyHash', v_q.policy_hash, 'mode', 'individual_line_pricing_v1', 'active', true)
       );
       IF coalesce((v_res->>'replayed')::boolean, false) IS NOT TRUE THEN
         RAISE EXCEPTION 'TEST_FAILED: expected replayed: true, got %', v_res;
@@ -250,7 +281,7 @@ try {
   if (!replayResult.includes("REPLAY_VERIFIED")) {
     throw new Error("Identical replay test failed: " + replayResult);
   }
-  console.log("PASS: Identical replay with same requestId returned replayed: true");
+  console.log("PASS: Identical replay with exact original Commit V2 command returned replayed: true");
 
   const auditCaptureCountAfterReplay = sql(`
     SELECT count(*) FROM public.audit_log WHERE entity_id = '${orderId}' AND action = 'order.offer.capture';
@@ -344,12 +375,23 @@ try {
   console.log("\n[Step 11] Checking order visibility in /admin/orders...");
   await page.goto("http://127.0.0.1:8080/admin/orders", { waitUntil: "domcontentloaded", timeout: 30000 });
   await page.waitForTimeout(2000);
-  const ordersPageText = await page.locator("body").innerText();
-  if (ordersPageText.includes("Cliente Ficticio") || ordersPageText.includes(orderId.slice(0, 8)) || ordersPageText.includes("3,50") || ordersPageText.includes("3.50")) {
-    console.log("PASS: Order is visible on /admin/orders table in browser!");
-  } else {
-    console.log("Orders page text sample:", ordersPageText.slice(0, 400).replace(/\n+/g, " "));
+
+  // Mandatory assertion: verify that the exact order row is visible in the orders table
+  const orderRowLocator = page.locator("tr", { hasText: "Cliente Ficticio" }).first();
+  await orderRowLocator.waitFor({ state: "visible", timeout: 10000 });
+  const orderRowText = await orderRowLocator.innerText();
+  console.log("Found order row in table:", orderRowText.replace(/\n+/g, " "));
+
+  if (!orderRowText.includes("Cliente Ficticio")) {
+    throw new Error(`MANDATORY ASSERTION FAILED: Order for customer 'Cliente Ficticio' not found in /admin/orders table! Row: ${orderRowText}`);
   }
+  if (!orderRowText.includes("Borrador")) {
+    throw new Error(`MANDATORY ASSERTION FAILED: Order status is not 'Borrador' (draft) in /admin/orders table! Row: ${orderRowText}`);
+  }
+  if (!orderRowText.includes("Confirmar Pedido")) {
+    throw new Error(`MANDATORY ASSERTION FAILED: Quick action button 'Confirmar Pedido' not found on order row! Row: ${orderRowText}`);
+  }
+  console.log("PASS: Mandatory assertion passed: exact order is visible in /admin/orders with status 'Borrador' and 'Confirmar Pedido' action!");
 
   // Step 12: Transition order to 'confirmed' via App UI
   console.log("\n[Step 12] Transitioning order from draft -> confirmed via App UI...");

@@ -141,9 +141,11 @@ export function isVerifiedLocalSyntheticLab(
       assertLocalStagingHost(host);
     }
 
-    const env = customEnv ?? (typeof process !== "undefined" ? process.env : undefined);
+    const env =
+      customEnv ??
+      (typeof window === "undefined" && typeof process !== "undefined" ? process.env : undefined);
     if (env) {
-      const mode = env.YOURMEAL_RUNTIME_ENV ?? env.VITE_YOURMEAL_RUNTIME_ENV;
+      const mode = env.YOURMEAL_RUNTIME_ENV;
       if (mode !== "staging_local") {
         return false;
       }
@@ -172,6 +174,14 @@ export function isVerifiedLocalSyntheticLab(
       assertLocalStagingHost(host);
       if (typeof window !== "undefined" && window.__INSTANCE_CONFIG__) {
         validateLocalStaging(window.__INSTANCE_CONFIG__);
+      }
+      if (context && typeof context === "object" && context.tenantSlug) {
+        if (
+          context.tenantSlug !== "eatclean-staging" &&
+          context.tenantSlug !== EATCLEAN_TENANT_SLUG
+        ) {
+          return false;
+        }
       }
       return true;
     }
