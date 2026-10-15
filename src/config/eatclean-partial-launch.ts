@@ -145,7 +145,7 @@ export function isVerifiedLocalSyntheticLab(
       customEnv ??
       (typeof window === "undefined" && typeof process !== "undefined" ? process.env : undefined);
     if (env) {
-      const mode = env.YOURMEAL_RUNTIME_ENV ?? env.VITE_YOURMEAL_RUNTIME_ENV;
+      const mode = env.YOURMEAL_RUNTIME_ENV;
       if (mode !== "staging_local") {
         return false;
       }

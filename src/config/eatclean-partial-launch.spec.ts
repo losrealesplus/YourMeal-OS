@@ -299,6 +299,17 @@ describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
         expect(isVerifiedLocalSyntheticLab({ hostname: "127.0.0.1" }, missingEnv)).toBe(false);
         expect(isEatCleanStaffOrderCaptureFrozen(EATCLEAN_TENANT_ID, missingEnv)).toBe(true);
       });
+
+      it("rejects server bypass attempt using VITE_YOURMEAL_RUNTIME_ENV without authoritative YOURMEAL_RUNTIME_ENV", () => {
+        const viteOnlyEnv = {
+          VITE_YOURMEAL_RUNTIME_ENV: "staging_local",
+          TENANT_SLUG: "eatclean-staging",
+          SUPABASE_URL: LOCAL_STAGING_URL,
+          SUPABASE_PUBLISHABLE_KEY: LOCAL_STAGING_PUBLIC_KEY,
+        };
+        expect(isVerifiedLocalSyntheticLab({ hostname: "127.0.0.1" }, viteOnlyEnv)).toBe(false);
+        expect(isEatCleanStaffOrderCaptureFrozen(EATCLEAN_TENANT_ID, viteOnlyEnv)).toBe(true);
+      });
     });
 
     describe("5. Positive: Verified Local Synthetic Lab", () => {
