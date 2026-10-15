@@ -67,7 +67,7 @@ INSERT INTO public.weekly_menu_slots(id,weekly_menu_id,tenant_id,day_date,dish_i
 ('3a36be6b-8cc0-43ed-9d6a-4728487e8069','40000000-0000-4000-8000-000000000001','${tenant}','${week}','30000000-0000-4000-8000-000000000002',1,1,3.50)
 ON CONFLICT DO NOTHING;
 
-INSERT INTO public.feature_flags(tenant_id,key,enabled) VALUES('${tenant}','order_programming',true) ON CONFLICT(tenant_id,key) WHERE tenant_id IS NOT NULL DO UPDATE SET enabled=EXCLUDED.enabled;
+INSERT INTO public.feature_flags(tenant_id,key,enabled) VALUES('${tenant}','order_programming',true),('${tenant}','order_confirmation',true) ON CONFLICT(tenant_id,key) WHERE tenant_id IS NOT NULL DO UPDATE SET enabled=EXCLUDED.enabled;
 INSERT INTO public.tenant_deployments(tenant_id,platform,identifier,is_primary,status) VALUES('${tenant}','android','com.yourmealos.eatclean',true,'active') ON CONFLICT(platform,identifier) DO NOTHING;
 COMMIT;`;
 const p = spawnSync("python3", ["scripts/staging-e2e-lab.py", "sql"], {
