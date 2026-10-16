@@ -1,5 +1,3 @@
-import { CustomOrderItemEditor } from "./custom-order-item-editor";
-import { CanonicalOrderSubmit } from "./canonical-order-submit";
 import { useCustomOrderCapture } from "@/hooks/use-custom-order-capture";
 import {
   customDraftLine,
@@ -25,7 +23,16 @@ import {
   Building2,
   ChevronLeft,
   ChevronRight,
+  History,
+  Sparkles,
+  Trash2,
 } from "lucide-react";
+import {
+  fetchCatalogHistoricalPricesMap,
+  fetchTenantReusableCustomItems,
+  type HistoricalPriceResult,
+  type ReusableCustomItem,
+} from "@/modules/orders/application/order-historical-queries";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { createServiceContext } from "@/services/types";
@@ -41,6 +48,7 @@ import {
 import { fetchPublishedWeeklyMenu } from "@/modules/weekly-menu/application/weekly-menu-queries";
 import type { WeeklyMenuView } from "@/modules/weekly-menu/application/weekly-menu-mapper";
 import type { CatalogDish } from "@/modules/dish-library/application/dish-catalog-mapper";
+import { fetchCatalogDishes } from "@/modules/dish-library/application/dish-catalog-queries";
 import {
   utcWeekStartMonday,
   utcWeekDates,
@@ -114,6 +122,32 @@ export function UniversalOrderIntakeDrawer({
 }: UniversalOrderIntakeDrawerProps) {
   const { user, tenantId, roles } = useAuth();
   const isTenantCaptureFrozen = isEatCleanStaffOrderCaptureFrozen(tenantId);
+
+  const isStaffAdmin = useMemo(() => {
+    return roles.some((r) =>
+      ["company_admin", "operations_manager", "saas_admin"].includes(r),
+    );
+  }, [roles]);
+
+  // Off-Menu Catalog Exceptions & Free Custom Preparations State
+  const [catalogDishes, setCatalogDishes] = useState<CatalogDish[]>([]);
+  const [loadingCatalog, setLoadingCatalog] = useState(false);
+  const [offMenuKeys, setOffMenuKeys] = useState<Set<string>>(new Set());
+  const [dishTab, setDishTab] = useState<"menu" | "off_menu">("menu");
+  const [offMenuSubTab, setOffMenuSubTab] = useState<"catalog" | "custom">("catalog");
+  const [offMenuSearch, setOffMenuSearch] = useState("");
+  const [historicalPrices, setHistoricalPrices] = useState<Record<string, HistoricalPriceResult>>({});
+  const [loadingHistoricalPrices, setLoadingHistoricalPrices] = useState(false);
+
+  // Free Custom Preparation State (Fuera de carta / Nivel 1 & 2)
+  const [customName, setCustomName] = useState("");
+  const [customDescription, setCustomDescription] = useState("");
+  const [customQty, setCustomQty] = useState(1);
+  const [customPrice, setCustomPrice] = useState("");
+  const [customComment, setCustomComment] = useState("");
+  const [reusableItems, setReusableItems] = useState<ReusableCustomItem[]>([]);
+  const [reusableSearch, setReusableSearch] = useState("");
+  const [loadingReusable, setLoadingReusable] = useState(false);
 
   const [weekStart, setWeekStart] = useState<string>(() => {
     if (initialDayDate) return utcWeekStartMonday(new Date(initialDayDate + "T00:00:00Z"));
@@ -474,6 +508,87 @@ export function UniversalOrderIntakeDrawer({
     };
   }, [open, tenantId, weekStart]);
 
+  // Load tenant catalog dishes for off-menu exceptions
+  useEffect(() => {
+    if (!open || !tenantId) return;
+    let isMounted = true;
+    async function loadCatalog() {
+      setLoadingCatalog(true);
+      try {
+        const dishes = await fetchCatalogDishes(tenantId!);
+        if (isMounted) {
+          setCatalogDishes(dishes);
+        }
+      } catch {
+        // Non-fatal
+      } finally {
+        if (isMounted) setLoadingCatalog(false);
+      }
+    }
+    void loadCatalog();
+    return () => {
+      isMounted = false;
+    };
+  }, [open, tenantId]);
+
+  // Load historical price suggestions for catalog dishes
+  useEffect(() => {
+    if (!open || !tenantId || catalogDishes.length === 0) return;
+    let isMounted = true;
+    async function loadPrices() {
+      setLoadingHistoricalPrices(true);
+      try {
+        const prices = await fetchCatalogHistoricalPricesMap(
+          supabase,
+          tenantId!,
+          catalogDishes.map((d) => ({ id: d.id, price: d.price })),
+          customerMode === "existing" && selectedCustomerId ? selectedCustomerId : null,
+        );
+        if (isMounted) {
+          setHistoricalPrices(prices);
+        }
+      } catch {
+        // non-fatal
+      } finally {
+        if (isMounted) setLoadingHistoricalPrices(false);
+      }
+    }
+    void loadPrices();
+    return () => {
+      isMounted = false;
+    };
+  }, [open, tenantId, catalogDishes, selectedCustomerId, customerMode]);
+
+  // Load reusable custom preparations for Level 2 reuse
+  useEffect(() => {
+    if (!open || !tenantId || dishTab !== "off_menu" || offMenuSubTab !== "custom") return;
+    let isMounted = true;
+    async function loadReusable() {
+      setLoadingReusable(true);
+      try {
+        const items = await fetchTenantReusableCustomItems(
+          supabase,
+          tenantId!,
+          reusableSearch,
+        );
+        if (isMounted) {
+          setReusableItems(items);
+        }
+      } catch {
+        // non-fatal
+      } finally {
+        if (isMounted) setLoadingReusable(false);
+      }
+    }
+    const timer = setTimeout(() => {
+      void loadReusable();
+    }, 200);
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
+  }, [open, tenantId, dishTab, offMenuSubTab, reusableSearch]);
+
   // Customer search autocomplete
   const searchCustomers = useCallback(
     async (query: string) => {
@@ -561,20 +676,127 @@ export function UniversalOrderIntakeDrawer({
     });
   };
 
+  const handleAddOffMenuDish = (dayDate: string, dishId: string) => {
+    setOffMenuKeys((prev) => {
+      const next = new Set(prev);
+      next.add(`${dayDate}:${dishId}`);
+      return next;
+    });
+    setQuantities((prev) => {
+      const currentDay = prev[dayDate] || {};
+      return {
+        ...prev,
+        [dayDate]: {
+          ...currentDay,
+          [dishId]: (currentDay[dishId] || 0) + 1,
+        },
+      };
+    });
+    setPriceOverrides((prev) => {
+      const currentDay = prev[dayDate] || {};
+      if (currentDay[dishId] !== undefined) return prev;
+      const suggested =
+        historicalPrices[dishId]?.suggestedPrice ?? dishPriceMap.get(dishId);
+      if (suggested !== undefined) {
+        return {
+          ...prev,
+          [dayDate]: {
+            ...currentDay,
+            [dishId]: suggested,
+          },
+        };
+      }
+      return prev;
+    });
+  };
+
+  const handleRemoveOffMenuDish = (dayDate: string, dishId: string) => {
+    setOffMenuKeys((prev) => {
+      const next = new Set(prev);
+      next.delete(`${dayDate}:${dishId}`);
+      return next;
+    });
+    setQuantities((prev) => {
+      const currentDay = { ...(prev[dayDate] || {}) };
+      delete currentDay[dishId];
+      return {
+        ...prev,
+        [dayDate]: currentDay,
+      };
+    });
+    setPriceOverrides((prev) => {
+      const currentDay = { ...(prev[dayDate] || {}) };
+      delete currentDay[dishId];
+      return {
+        ...prev,
+        [dayDate]: currentDay,
+      };
+    });
+  };
+
+  const handleAddCustomPreparation = (dayDate: string) => {
+    const rawPrice = customPrice.trim().replace(",", ".");
+    const p = parseFloat(rawPrice);
+    if (!customName.trim()) {
+      toast.error("El nombre de la preparación es obligatorio.");
+      return;
+    }
+    if (isNaN(p) || p <= 0) {
+      toast.error("El precio manual es obligatorio para la preparación libre y debe ser mayor que 0.");
+      return;
+    }
+    const newItem: CustomItemDraft = {
+      key: `custom:${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      dayDate,
+      name: customName.trim(),
+      description: customDescription.trim(),
+      qty: customQty >= 1 ? customQty : 1,
+      price: rawPrice,
+      comment: customComment.trim() || null,
+      explicitZeroConfirmed: false,
+    };
+    setCustomItems((prev) => [...prev, newItem]);
+    setCustomName("");
+    setCustomDescription("");
+    setCustomQty(1);
+    setCustomPrice("");
+    setCustomComment("");
+    toast.success(`Preparación libre "${newItem.name}" añadida.`);
+  };
+
+  const handleRemoveCustomItem = (key: string) => {
+    setCustomItems((prev) => prev.filter((item) => item.key !== key));
+  };
+
+  const handleSelectReusableCustomItem = (item: ReusableCustomItem) => {
+    setCustomName(item.name);
+    setCustomDescription(item.description || "");
+    // Mandatory manual entry: NEVER auto-populate price from past orders
+    setCustomPrice("");
+    toast.info(`Cargado "${item.name}". Introduce el precio unitario obligatorio.`);
+  };
+
   const allDishes = useMemo(() => {
-    if (!menuView) return [];
     const seen = new Set<string>();
     const res: CatalogDish[] = [];
-    for (const d of menuView.days) {
-      for (const dish of d.dishes) {
-        if (!seen.has(dish.id)) {
-          seen.add(dish.id);
-          res.push(dish);
+    if (menuView) {
+      for (const d of menuView.days) {
+        for (const dish of d.dishes) {
+          if (!seen.has(dish.id)) {
+            seen.add(dish.id);
+            res.push(dish);
+          }
         }
       }
     }
+    for (const dish of catalogDishes) {
+      if (!seen.has(dish.id)) {
+        seen.add(dish.id);
+        res.push(dish);
+      }
+    }
     return res;
-  }, [menuView]);
+  }, [menuView, catalogDishes]);
 
   const dishPriceMap = useMemo(() => {
     return new Map(allDishes.map((d) => [d.id, d.price]));
@@ -602,8 +824,9 @@ export function UniversalOrderIntakeDrawer({
       for (const [dishId, qty] of Object.entries(dayQtyMap)) {
         if (qty > 0) {
           portions += qty;
+          const isOff = offMenuKeys.has(`${dayDate}:${dishId}`);
           const override = priceOverrides[dayDate]?.[dishId];
-          const publishedOfferPrice = offerPriceMap.get(`${dayDate}:${dishId}`);
+          const publishedOfferPrice = isOff ? undefined : offerPriceMap.get(`${dayDate}:${dishId}`);
           const catalogPrice = dishPriceMap.get(dishId);
           const effectivePrice =
             override !== undefined
@@ -617,11 +840,19 @@ export function UniversalOrderIntakeDrawer({
         }
       }
     }
+
+    for (const custom of customItems) {
+      const qty = custom.qty || 0;
+      const price = parseFloat(custom.price.replace(",", ".")) || 0;
+      portions += qty;
+      total += qty * price;
+    }
+
     return {
       totalPortions: portions,
       grandTotal: Math.round(total * 100) / 100,
     };
-  }, [quantities, priceOverrides, dishPriceMap, offerPriceMap]);
+  }, [quantities, priceOverrides, dishPriceMap, offerPriceMap, offMenuKeys, customItems]);
 
   // Submit Order
   const buildCustomCommand = (autoConfirm: boolean): CanonicalOrderCommand => {
@@ -630,7 +861,9 @@ export function UniversalOrderIntakeDrawer({
       Object.entries(byDish)
         .filter(([, qty]) => qty > 0)
         .map(([dishId, qty]) => {
-          if (priceOverrides[dayDate]?.[dishId] !== undefined)
+          const isOff = offMenuKeys.has(`${dayDate}:${dishId}`);
+          const override = priceOverrides[dayDate]?.[dishId];
+          if (!isOff && override !== undefined)
             throw new Error("OFFER_PRICING_OVERRIDE_UNSUPPORTED");
           return {
             kind: "dish" as const,
@@ -638,6 +871,9 @@ export function UniversalOrderIntakeDrawer({
             dayDate,
             qty,
             comment: comments[dayDate]?.[dishId] || null,
+            isOffMenu: isOff ? true : undefined,
+            unitPriceOverride: isOff && override !== undefined ? override.toFixed(4) : undefined,
+            unitPriceOverrideReason: isOff && override !== undefined ? "Excepción administrativa fuera de menú" : undefined,
           };
         }),
     );
@@ -693,7 +929,7 @@ export function UniversalOrderIntakeDrawer({
           order: { id: result.order.id, status: result.order.status } as any,
           total: result.order.total,
           orderId: result.order.id,
-        });
+        } as any);
         onOpenChange(false);
       } else {
         // Safe recovery: Never unlock automatically on missing ledger record.
@@ -720,10 +956,6 @@ export function UniversalOrderIntakeDrawer({
       toast.error("Concilia la operación pendiente con el servidor antes de crear otra captura.");
       return;
     }
-    if (customItems.length) {
-      toast.error("Los personalizados requieren el envío canónico.");
-      return;
-    }
 
     if (menuView?.status !== "published") {
       toast.error("No se puede registrar un pedido sin un menú semanal publicado.");
@@ -740,14 +972,25 @@ export function UniversalOrderIntakeDrawer({
       return;
     }
 
-    const isEatClean = isEatCleanContext(tenantId);
-    if (isEatClean) {
-      const hasOverrides = Object.values(priceOverrides).some((byDish) =>
-        Object.values(byDish).some((p) => p !== undefined),
+    // Commercial rule: weekly menu items cannot have manual price overrides
+    const hasForbiddenOverrides = Object.entries(priceOverrides).some(([dDate, byDish]) =>
+      Object.entries(byDish).some(
+        ([dId, p]) => p !== undefined && !offMenuKeys.has(`${dDate}:${dId}`),
+      ),
+    );
+    if (hasForbiddenOverrides) {
+      toast.error(
+        "Los platos del menú semanal no admiten precios manuales. Los precios especiales solo aplican a platos fuera de menú.",
       );
-      if (hasOverrides) {
+      return;
+    }
+
+    // Validate custom items
+    for (const c of customItems) {
+      const p = parseFloat(c.price.replace(",", "."));
+      if (!c.name.trim() || isNaN(p) || p <= 0 || c.qty <= 0) {
         toast.error(
-          "Retira los precios manuales de platos antes de registrar un pedido con precios oficiales.",
+          `La preparación libre '${c.name || "sin nombre"}' debe tener un precio manual mayor a 0 y raciones válidas.`,
         );
         return;
       }
@@ -758,9 +1001,10 @@ export function UniversalOrderIntakeDrawer({
     for (const [dayDate, dayQtyMap] of Object.entries(quantities)) {
       for (const [dishId, qty] of Object.entries(dayQtyMap)) {
         if (qty > 0) {
+          const isOff = offMenuKeys.has(`${dayDate}:${dishId}`);
           const comment = comments[dayDate]?.[dishId]?.trim() || null;
           const override = priceOverrides[dayDate]?.[dishId];
-          const publishedOfferPrice = offerPriceMap.get(`${dayDate}:${dishId}`);
+          const publishedOfferPrice = isOff ? undefined : offerPriceMap.get(`${dayDate}:${dishId}`);
           const catalogDish = allDishes.find((d) => d.id === dishId);
           const resolvedPrice =
             override !== undefined
@@ -769,31 +1013,27 @@ export function UniversalOrderIntakeDrawer({
                 ? publishedOfferPrice
                 : catalogDish?.price ?? null;
 
-          if (resolvedPrice === null) {
+          if (resolvedPrice === null && !isOff) {
             toast.error(
-              `El plato '${catalogDish?.name ?? dishId}' no tiene precio asignado en la oferta ni en el catálogo. Introduce un precio manual.`,
+              `El plato '${catalogDish?.name ?? dishId}' no tiene precio asignado en la oferta ni en el catálogo.`,
             );
             return;
           }
+
           lines.push({
             dayDate,
             dishId,
             qty,
             comment,
-            unitPriceOverride: isEatClean
-              ? undefined
-              : override !== undefined
-                ? override
-                : publishedOfferPrice !== undefined
-                  ? publishedOfferPrice
-                  : null,
+            isOffMenu: isOff ? true : undefined,
+            unitPriceOverride: isOff && override !== undefined ? override : undefined,
           });
         }
       }
     }
 
-    if (lines.length === 0) {
-      toast.error("Debes seleccionar al menos un plato en la semana.");
+    if (lines.length === 0 && customItems.length === 0) {
+      toast.error("Debes seleccionar al menos un plato o preparación en la semana.");
       return;
     }
 
@@ -838,6 +1078,7 @@ export function UniversalOrderIntakeDrawer({
         siteId: isCompanyContext ? selectedSiteId || null : null,
         organizationalUnitId: isCompanyContext ? selectedOrganizationalUnitId || null : null,
         lines,
+        customLines: customItems,
         dietaryOverride: isEditingDietaryOverride
           ? {
               dietaryNotes: dietaryOverrideNotes.trim() ? dietaryOverrideNotes.trim() : null,
@@ -865,7 +1106,7 @@ export function UniversalOrderIntakeDrawer({
             tenantId,
             customerId: customerMode === "new" ? "new_customer_placeholder" : selectedCustomerId,
             weekStart,
-            lineCount: lines.length,
+            lineCount: lines.length + customItems.length,
             timestamp: new Date().toISOString(),
           });
         },
@@ -875,6 +1116,11 @@ export function UniversalOrderIntakeDrawer({
       clearPendingCaptureToken(tenantId);
       captureSessionRef.current = undefined;
       setPendingRecovery(null);
+      setOffMenuKeys(new Set());
+      setCustomItems([]);
+      setQuantities({});
+      setComments({});
+      setPriceOverrides({});
 
       toast.success(
         autoConfirm
@@ -919,6 +1165,7 @@ export function UniversalOrderIntakeDrawer({
       setSubmitting(false);
     }
   };
+
 
   return (
     <Sheet
@@ -1358,41 +1605,42 @@ export function UniversalOrderIntakeDrawer({
               )}
             </div>
 
-            {(customEnabled || customItems.length > 0) && (
-              <section aria-label="Artículos personalizados" className="space-y-3">
-                <p className="text-xs text-muted-foreground">
-                  Para particulares. Los pedidos mixtos no admiten precios manuales de platos.
-                </p>
-                {customItems.map((draft) => (
-                  <CustomOrderItemEditor
-                    key={draft.key}
-                    draft={draft}
-                    disabled={canonicalLocked}
-                    weekDays={weekDays.map((day) => day.date)}
-                    onChange={(next) =>
-                      setCustomItems((items) =>
-                        items.map((item) => (item.key === next.key ? next : item)),
-                      )
-                    }
-                    onRemove={() =>
-                      setCustomItems((items) => items.filter((item) => item.key !== draft.key))
-                    }
-                  />
-                ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={!customEnabled}
-                  onClick={() =>
-                    setCustomItems((items) => [...items, newCustomItemDraft(selectedDayDate)])
-                  }
-                >
-                  + Añadir personalizado
-                </Button>
-                {!customEnabled && (
-                  <p role="alert">La captura personalizada está cerrada para este contexto.</p>
-                )}
-              </section>
+            {customItems.length > 0 && (
+              <div className="rounded-lg border border-purple-500/30 bg-purple-50/20 dark:bg-purple-950/20 p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold flex items-center gap-1.5 text-purple-900 dark:text-purple-200">
+                    <Sparkles className="h-3.5 w-3.5 text-purple-600" />
+                    Preparaciones libres añadidas ({customItems.length})
+                  </span>
+                  <Badge variant="outline" className="text-[10px] bg-purple-100 text-purple-800 border-purple-300">
+                    Fuera de carta
+                  </Badge>
+                </div>
+                <div className="space-y-1.5">
+                  {customItems.map((c) => (
+                    <div
+                      key={c.key}
+                      className="flex items-center justify-between text-xs bg-background/80 px-2.5 py-1.5 rounded border border-border/60"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <span className="font-medium">{c.name}</span>
+                        <span className="text-muted-foreground ml-2 font-mono">
+                          ({c.dayDate}) · {c.qty} ración(es) @ {parseFloat(c.price).toFixed(2)} €
+                        </span>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 text-destructive hover:bg-destructive/10 shrink-0"
+                        onClick={() => handleRemoveCustomItem(c.key)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
 
             {/* 2. SELECTOR DE DÍAS Y PLATOS */}
@@ -1412,10 +1660,9 @@ export function UniversalOrderIntakeDrawer({
                   <TabsList className="grid grid-cols-7 min-w-[360px] sm:min-w-0 h-auto p-1 bg-muted/60">
                     {weekDays.map((d) => {
                       const { dayName, formattedDate } = formatDayDateEs(d.date);
-                      const count = Object.values(quantities[d.date] || {}).reduce(
-                        (a, b) => a + b,
-                        0,
-                      );
+                      const count =
+                        Object.values(quantities[d.date] || {}).reduce((a, b) => a + b, 0) +
+                        customItems.filter((c) => c.dayDate === d.date).reduce((a, b) => a + b.qty, 0);
                       return (
                         <TabsTrigger
                           key={d.date}
@@ -1446,178 +1693,725 @@ export function UniversalOrderIntakeDrawer({
                 {weekDays.map((d) => {
                   const dayDishes =
                     menuView?.days.find((day) => day.dayDate === d.date)?.dishes ?? [];
+                  const dayOffMenuDishIds = Object.keys(quantities[d.date] || {}).filter(
+                    (id) => (quantities[d.date]?.[id] || 0) > 0 && offMenuKeys.has(`${d.date}:${id}`),
+                  );
+                  const dayCustomItems = customItems.filter((c) => c.dayDate === d.date);
+                  const dayDishIds = new Set(dayDishes.map((dd) => dd.id));
+                  const filteredCatalog = catalogDishes.filter((dish) => {
+                    if (dayDishIds.has(dish.id)) return false;
+                    if (!offMenuSearch.trim()) return true;
+                    const q = offMenuSearch.toLowerCase().trim();
+                    return (
+                      dish.name.toLowerCase().includes(q) ||
+                      (dish.tagline && dish.tagline.toLowerCase().includes(q))
+                    );
+                  });
+
                   return (
                     <TabsContent key={d.date} value={d.date} className="mt-4 space-y-3">
-                      <div className="flex items-center justify-between pb-1">
+                      <div className="flex items-center justify-between pb-1 gap-2 flex-wrap">
                         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                          Menú para {d.label} ({d.date})
+                          {dishTab === "menu"
+                            ? `Menú semanal para ${d.label} (${d.date})`
+                            : `Catálogo fuera de menú para ${d.label} (${d.date})`}
                         </p>
-                        {menuView?.status === "published" && (
-                          <span className="text-[11px] font-mono text-muted-foreground">
-                            {dayDishes.length}{" "}
-                            {dayDishes.length === 1 ? "plato ofertado" : "platos ofertados"}
-                          </span>
-                        )}
-                      </div>
-
-                      {loadingMenu ? (
-                        <div className="py-8 text-center text-xs text-muted-foreground flex justify-center items-center gap-2">
-                          <Loader2 className="h-4 w-4 animate-spin" /> Cargando menú semanal...
-                        </div>
-                      ) : menuView?.status !== "published" ? (
-                        <div className="py-8 px-4 text-center rounded-lg border border-dashed border-amber-500/30 bg-amber-50/50 dark:bg-amber-950/10 space-y-2">
-                          <AlertTriangle className="h-5 w-5 text-amber-500 mx-auto" />
-                          <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">
-                            No hay menú publicado para esta semana ({weekStart})
-                          </p>
-                          <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-                            {customEnabled
-                              ? "Los platos requieren un menú publicado. Los personalizados pueden capturarse sin él."
-                              : "Publica el menú semanal en la sección de Menús para habilitar la captura de pedidos para estas fechas."}
-                          </p>
-                        </div>
-                      ) : dayDishes.length === 0 ? (
-                        <div className="py-8 px-4 text-center rounded-lg border border-dashed text-muted-foreground text-xs">
-                          Sin platos planificados para este día ({d.label}, {d.date}).
-                        </div>
-                      ) : (
-                        <div className="space-y-3">
-                          {dayDishes.map((dish) => {
-                            const qty = quantities[d.date]?.[dish.id] || 0;
-                            const comment = comments[d.date]?.[dish.id] || "";
-                            const override = priceOverrides[d.date]?.[dish.id];
-
-                            return (
-                              <div
-                                key={dish.id}
+                        <div className="flex items-center gap-2">
+                          {dishTab === "menu" && menuView?.status === "published" && (
+                            <span className="text-[11px] font-mono text-muted-foreground">
+                              {dayDishes.length}{" "}
+                              {dayDishes.length === 1 ? "plato ofertado" : "platos ofertados"}
+                            </span>
+                          )}
+                          {isStaffAdmin && (
+                            <div className="flex items-center gap-1 bg-muted/70 p-0.5 rounded-md">
+                              <button
+                                type="button"
+                                onClick={() => setDishTab("menu")}
                                 className={cn(
-                                  "p-3 rounded-lg border transition-all",
-                                  qty > 0
-                                    ? "border-primary/50 bg-primary/5"
-                                    : "border-border bg-card",
+                                  "px-2 py-0.5 text-xs font-medium rounded transition-all",
+                                  dishTab === "menu"
+                                    ? "bg-background text-foreground shadow-xs font-semibold"
+                                    : "text-muted-foreground hover:text-foreground",
                                 )}
                               >
-                                <div className="flex items-center justify-between gap-3">
-                                  <div className="flex items-center gap-3 min-w-0 flex-1">
-                                    <DishThumb
-                                      emoji={dish.emoji || "🍽️"}
-                                      imageSrc={dish.imageSrc || dish.photoUrl || undefined}
-                                      size="sm"
-                                      className="size-12 rounded-lg border border-border/80 shrink-0 text-xl"
-                                    />
-                                    <div className="space-y-0.5 min-w-0 flex-1">
-                                      <p className="text-sm font-medium leading-none truncate">
-                                        {dish.name}
-                                      </p>
-                                      <DishAllergenDeclaration
-                                        allergens={dish.allergens}
-                                        showDeclared
-                                      />
-                                      {(() => {
-                                        const publishedOfferPrice = offerPriceMap.get(
-                                          `${d.date}:${dish.id}`,
-                                        );
-                                        const displayPrice =
-                                          publishedOfferPrice !== undefined
-                                            ? publishedOfferPrice
-                                            : dish.price;
-                                        if (displayPrice !== null && displayPrice > 0) {
-                                          return (
-                                            <p className="text-xs text-muted-foreground font-mono">
-                                              {displayPrice.toFixed(2)} € / ración
-                                              {publishedOfferPrice !== undefined &&
-                                                dish.price !== null &&
-                                                publishedOfferPrice !== dish.price && (
-                                                  <span className="text-[10px] text-primary ml-1.5 font-sans font-medium">
-                                                    (oferta semanal)
-                                                  </span>
-                                                )}
-                                            </p>
-                                          );
-                                        }
-                                        if (displayPrice === 0) {
-                                          return (
-                                            <p className="text-xs text-muted-foreground font-mono">
-                                              0,00 € (Sin coste)
-                                            </p>
-                                          );
-                                        }
-                                        return (
-                                          <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
-                                            ⚠️ Precio no asignado (Requiere ajuste)
-                                          </p>
-                                        );
-                                      })()}
-                                     </div>
-                                  </div>
-                                  <div className="flex items-center gap-2 shrink-0">
-                                    <Button
-                                      type="button"
-                                      variant="outline"
-                                      size="icon"
-                                      className="h-8 w-8"
-                                      onClick={() => handleQtyChange(d.date, dish.id, -1)}
-                                      disabled={qty === 0}
-                                    >
-                                      <Minus className="h-3.5 w-3.5" />
-                                    </Button>
-                                    <span className="w-6 text-center font-mono font-bold text-sm">
-                                      {qty}
-                                    </span>
-                                    <Button
-                                      type="button"
-                                      variant="outline"
-                                      size="icon"
-                                      className="h-8 w-8"
-                                      onClick={() => handleQtyChange(d.date, dish.id, 1)}
-                                    >
-                                      <Plus className="h-3.5 w-3.5" />
-                                    </Button>
-                                  </div>
-                                </div>
+                                Menú semanal
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setDishTab("off_menu")}
+                                className={cn(
+                                  "px-2 py-0.5 text-xs font-medium rounded transition-all flex items-center gap-1",
+                                  dishTab === "off_menu"
+                                    ? "bg-background text-foreground shadow-xs font-semibold text-amber-700 dark:text-amber-300"
+                                    : "text-muted-foreground hover:text-foreground",
+                                )}
+                              >
+                                Fuera de menú
+                                {dayOffMenuDishIds.length > 0 && (
+                                  <Badge
+                                    variant="secondary"
+                                    className="h-3.5 px-1 text-[9px] bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-200"
+                                  >
+                                    {dayOffMenuDishIds.length}
+                                  </Badge>
+                                )}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
 
-                                {/* Options when qty > 0 */}
-                                {qty > 0 ? (
-                                  <div className="mt-3 pt-2 border-t border-border/60 grid gap-2 sm:grid-cols-2 text-xs">
+                      {dishTab === "menu" ? (
+                        <>
+                          {loadingMenu ? (
+                            <div className="py-8 text-center text-xs text-muted-foreground flex justify-center items-center gap-2">
+                              <Loader2 className="h-4 w-4 animate-spin" /> Cargando menú semanal...
+                            </div>
+                          ) : menuView?.status !== "published" ? (
+                            <div className="py-8 px-4 text-center rounded-lg border border-dashed border-amber-500/30 bg-amber-50/50 dark:bg-amber-950/10 space-y-2">
+                              <AlertTriangle className="h-5 w-5 text-amber-500 mx-auto" />
+                              <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">
+                                No hay menú publicado para esta semana ({weekStart})
+                              </p>
+                              <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                                {customEnabled
+                                  ? "Los platos requieren un menú publicado. Los personalizados pueden capturarse sin él."
+                                  : "Publica el menú semanal en la sección de Menús para habilitar la captura de pedidos para estas fechas."}
+                              </p>
+                            </div>
+                          ) : dayDishes.length === 0 ? (
+                            <div className="py-8 px-4 text-center rounded-lg border border-dashed text-muted-foreground text-xs">
+                              Sin platos planificados para este día ({d.label}, {d.date}).
+                            </div>
+                          ) : (
+                            <div className="space-y-3">
+                              {dayDishes.map((dish) => {
+                                const qty = quantities[d.date]?.[dish.id] || 0;
+                                const comment = comments[d.date]?.[dish.id] || "";
+                                const override = priceOverrides[d.date]?.[dish.id];
+
+                                return (
+                                  <div
+                                    key={dish.id}
+                                    className={cn(
+                                      "p-3 rounded-lg border transition-all",
+                                      qty > 0
+                                        ? "border-primary/50 bg-primary/5"
+                                        : "border-border bg-card",
+                                    )}
+                                  >
+                                    <div className="flex items-center justify-between gap-3">
+                                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                                        <DishThumb
+                                          emoji={dish.emoji || "🍽️"}
+                                          imageSrc={dish.imageSrc || dish.photoUrl || undefined}
+                                          size="sm"
+                                          className="size-12 rounded-lg border border-border/80 shrink-0 text-xl"
+                                        />
+                                        <div className="space-y-0.5 min-w-0 flex-1">
+                                          <p className="text-sm font-medium leading-none truncate">
+                                            {dish.name}
+                                          </p>
+                                          <DishAllergenDeclaration
+                                            allergens={dish.allergens}
+                                            showDeclared
+                                          />
+                                          {(() => {
+                                            const publishedOfferPrice = offerPriceMap.get(
+                                              `${d.date}:${dish.id}`,
+                                            );
+                                            const displayPrice =
+                                              publishedOfferPrice !== undefined
+                                                ? publishedOfferPrice
+                                                : dish.price;
+                                            if (displayPrice !== null && displayPrice > 0) {
+                                              return (
+                                                <p className="text-xs text-muted-foreground font-mono">
+                                                  {displayPrice.toFixed(2)} € / ración
+                                                  {publishedOfferPrice !== undefined &&
+                                                    dish.price !== null &&
+                                                    publishedOfferPrice !== dish.price && (
+                                                      <span className="text-[10px] text-primary ml-1.5 font-sans font-medium">
+                                                        (oferta semanal)
+                                                      </span>
+                                                    )}
+                                                </p>
+                                              );
+                                            }
+                                            if (displayPrice === 0) {
+                                              return (
+                                                <p className="text-xs text-muted-foreground font-mono">
+                                                  0,00 € (Sin coste)
+                                                </p>
+                                              );
+                                            }
+                                            return (
+                                              <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+                                                ⚠️ Precio no asignado (Requiere ajuste)
+                                              </p>
+                                            );
+                                          })()}
+                                        </div>
+                                      </div>
+                                      <div className="flex items-center gap-2 shrink-0">
+                                        <Button
+                                          type="button"
+                                          variant="outline"
+                                          size="icon"
+                                          className="h-8 w-8"
+                                          onClick={() => handleQtyChange(d.date, dish.id, -1)}
+                                          disabled={qty === 0}
+                                        >
+                                          <Minus className="h-3.5 w-3.5" />
+                                        </Button>
+                                        <span className="w-6 text-center font-mono font-bold text-sm">
+                                          {qty}
+                                        </span>
+                                        <Button
+                                          type="button"
+                                          variant="outline"
+                                          size="icon"
+                                          className="h-8 w-8"
+                                          onClick={() => handleQtyChange(d.date, dish.id, 1)}
+                                        >
+                                          <Plus className="h-3.5 w-3.5" />
+                                        </Button>
+                                      </div>
+                                    </div>
+
+                                    {/* Options when qty > 0 */}
+                                    {qty > 0 ? (
+                                      <div className="mt-3 pt-2 border-t border-border/60 grid gap-2 sm:grid-cols-2 text-xs">
+                                        <div className="space-y-1">
+                                          <Label className="text-[11px] text-muted-foreground flex items-center gap-1">
+                                            <AlertTriangle className="h-3 w-3 text-amber-500" />
+                                            Nota / Alérgeno Cocina:
+                                          </Label>
+                                          <Input
+                                            placeholder="Ej. ⚠️ Sin cebolla / Salsa aparte"
+                                            value={comment}
+                                            onChange={(e) =>
+                                              handleCommentChange(d.date, dish.id, e.target.value)
+                                            }
+                                            className="h-7 text-xs"
+                                          />
+                                        </div>
+                                        <div className="space-y-1">
+                                          <Label className="text-[11px] text-muted-foreground">
+                                            Precio especial (€):
+                                          </Label>
+                                          <Input
+                                            type="number"
+                                            step="0.10"
+                                            min="0"
+                                            placeholder={
+                                              dish.price != null
+                                                ? `${dish.price.toFixed(2)} € (catálogo)`
+                                                : "Precio manual requerido"
+                                            }
+                                            value={override !== undefined ? override : ""}
+                                            onChange={(e) =>
+                                              handlePriceOverrideChange(d.date, dish.id, e.target.value)
+                                            }
+                                            className="h-7 text-xs font-mono"
+                                          />
+                                        </div>
+                                      </div>
+                                    ) : null}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+
+                          {/* Platos añadidos fuera de menú para este día */}
+                          {dayOffMenuDishIds.length > 0 && (
+                            <div className="pt-3 border-t border-dashed border-amber-500/40 space-y-2">
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
+                                  <Badge
+                                    variant="outline"
+                                    className="text-[10px] bg-amber-50 text-amber-800 border-amber-300 dark:bg-amber-950 dark:text-amber-300"
+                                  >
+                                    Excepción Fuera de Menú
+                                  </Badge>
+                                  Platos añadidos para este día ({dayOffMenuDishIds.length})
+                                </span>
+                              </div>
+                              <div className="space-y-3">
+                                {dayOffMenuDishIds.map((dishId) => {
+                                  const dish = allDishes.find((item) => item.id === dishId);
+                                  if (!dish) return null;
+                                  const qty = quantities[d.date]?.[dish.id] || 0;
+                                  const comment = comments[d.date]?.[dish.id] || "";
+                                  return (
+                                    <div
+                                      key={dish.id}
+                                      className="p-3 rounded-lg border border-amber-500/40 bg-amber-50/20 dark:bg-amber-950/20"
+                                    >
+                                      <div className="flex items-center justify-between gap-3">
+                                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                                          <DishThumb
+                                            emoji={dish.emoji || "🍽️"}
+                                            imageSrc={dish.imageSrc || dish.photoUrl || undefined}
+                                            size="sm"
+                                            className="size-12 rounded-lg border border-border/80 shrink-0 text-xl"
+                                          />
+                                          <div className="space-y-0.5 min-w-0 flex-1">
+                                            <div className="flex items-center gap-2">
+                                              <p className="text-sm font-medium leading-none truncate">
+                                                {dish.name}
+                                              </p>
+                                              <Badge
+                                                variant="outline"
+                                                className="text-[10px] bg-amber-50 text-amber-700 border-amber-300 dark:bg-amber-950/40 dark:text-amber-300 shrink-0"
+                                              >
+                                                Fuera de Menú
+                                              </Badge>
+                                            </div>
+                                            <DishAllergenDeclaration
+                                              allergens={dish.allergens}
+                                              showDeclared
+                                            />
+                                            <p className="text-xs text-muted-foreground font-mono">
+                                              {dish.price != null
+                                                ? `${dish.price.toFixed(2)} € (catálogo)`
+                                                : "0,00 €"}
+                                            </p>
+                                          </div>
+                                        </div>
+                                        <div className="flex items-center gap-2 shrink-0">
+                                          <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="icon"
+                                            className="h-8 w-8"
+                                            onClick={() => handleQtyChange(d.date, dish.id, -1)}
+                                            disabled={qty === 0}
+                                          >
+                                            <Minus className="h-3.5 w-3.5" />
+                                          </Button>
+                                          <span className="w-6 text-center font-mono font-bold text-sm">
+                                            {qty}
+                                          </span>
+                                          <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="icon"
+                                            className="h-8 w-8"
+                                            onClick={() => handleQtyChange(d.date, dish.id, 1)}
+                                          >
+                                            <Plus className="h-3.5 w-3.5" />
+                                          </Button>
+                                        </div>
+                                      </div>
+                                      {qty > 0 && (
+                                        <div className="mt-3 pt-2 border-t border-border/60 text-xs">
+                                          <div className="space-y-1">
+                                            <Label className="text-[11px] text-muted-foreground flex items-center gap-1">
+                                              <AlertTriangle className="h-3 w-3 text-amber-500" />
+                                              Nota / Alérgeno Cocina:
+                                            </Label>
+                                            <Input
+                                              placeholder="Ej. ⚠️ Sin cebolla / Salsa aparte"
+                                              value={comment}
+                                              onChange={(e) =>
+                                                handleCommentChange(d.date, dish.id, e.target.value)
+                                              }
+                                              className="h-7 text-xs"
+                                            />
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-1 bg-muted/60 p-1 rounded-md mb-2">
+                            <button
+                              type="button"
+                              onClick={() => setOffMenuSubTab("catalog")}
+                              className={cn(
+                                "flex-1 py-1 px-2.5 text-xs font-medium rounded transition-all text-center",
+                                offMenuSubTab === "catalog"
+                                  ? "bg-background text-foreground shadow-xs font-semibold"
+                                  : "text-muted-foreground hover:text-foreground",
+                              )}
+                            >
+                              📚 Platos de Biblioteca ({filteredCatalog.length})
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setOffMenuSubTab("custom")}
+                              className={cn(
+                                "flex-1 py-1 px-2.5 text-xs font-medium rounded transition-all text-center flex items-center justify-center gap-1.5",
+                                offMenuSubTab === "custom"
+                                  ? "bg-background text-foreground shadow-xs font-semibold text-purple-700 dark:text-purple-300"
+                                  : "text-muted-foreground hover:text-foreground",
+                              )}
+                            >
+                              <Sparkles className="h-3 w-3" />
+                              Preparación Libre
+                              {dayCustomItems.length > 0 && (
+                                <Badge variant="secondary" className="h-3.5 px-1 text-[9px] bg-purple-100 text-purple-800">
+                                  {dayCustomItems.length}
+                                </Badge>
+                              )}
+                            </button>
+                          </div>
+
+                          {offMenuSubTab === "catalog" ? (
+                            <div className="space-y-3">
+                              <div className="p-2.5 rounded-lg border border-amber-500/30 bg-amber-50/40 dark:bg-amber-950/20 text-xs text-amber-800 dark:text-amber-200 flex items-start gap-2">
+                                <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                                <div>
+                                  <p className="font-semibold">Excepción Administrativa Controlada</p>
+                                  <p className="text-[11px] opacity-90">
+                                    Selecciona platos activos del catálogo de la Biblioteca para este día. El sistema sugiere un precio según el histórico y permite modificarlo antes de confirmar sin modificar el menú semanal publicado.
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="relative">
+                                <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+                                <Input
+                                  placeholder="Buscar en el catálogo general (nombre, descripción)..."
+                                  value={offMenuSearch}
+                                  onChange={(e) => setOffMenuSearch(e.target.value)}
+                                  className="h-8 pl-8 text-xs"
+                                />
+                              </div>
+
+                              {loadingCatalog ? (
+                                <div className="py-8 text-center text-xs text-muted-foreground flex justify-center items-center gap-2">
+                                  <Loader2 className="h-4 w-4 animate-spin" /> Cargando catálogo de la biblioteca...
+                                </div>
+                              ) : filteredCatalog.length === 0 ? (
+                                <div className="py-8 px-4 text-center rounded-lg border border-dashed text-muted-foreground text-xs">
+                                  No se encontraron platos en el catálogo {offMenuSearch.trim() ? `para "${offMenuSearch}"` : "disponibles fuera de menú para este día"}.
+                                </div>
+                              ) : (
+                                <div className="space-y-3 max-h-[380px] overflow-y-auto pr-1">
+                                  {filteredCatalog.map((dish) => {
+                                    const qty = quantities[d.date]?.[dish.id] || 0;
+                                    const isAdded = offMenuKeys.has(`${d.date}:${dish.id}`) && qty > 0;
+                                    const comment = comments[d.date]?.[dish.id] || "";
+                                    const hist = historicalPrices[dish.id];
+                                    const override = priceOverrides[d.date]?.[dish.id];
+
+                                    return (
+                                      <div
+                                        key={dish.id}
+                                        className={cn(
+                                          "p-3 rounded-lg border transition-all",
+                                          isAdded
+                                            ? "border-amber-500/50 bg-amber-50/30 dark:bg-amber-950/30"
+                                            : "border-border bg-card",
+                                        )}
+                                      >
+                                        <div className="flex items-center justify-between gap-3">
+                                          <div className="flex items-center gap-3 min-w-0 flex-1">
+                                            <DishThumb
+                                              emoji={dish.emoji || "🍽️"}
+                                              imageSrc={dish.imageSrc || dish.photoUrl || undefined}
+                                              size="sm"
+                                              className="size-12 rounded-lg border border-border/80 shrink-0 text-xl"
+                                            />
+                                            <div className="space-y-0.5 min-w-0 flex-1">
+                                              <div className="flex items-center gap-2 flex-wrap">
+                                                <p className="text-sm font-medium leading-none truncate">
+                                                  {dish.name}
+                                                </p>
+                                                <Badge
+                                                  variant="outline"
+                                                  className="text-[10px] bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 shrink-0"
+                                                >
+                                                  Excepción Fuera de Menú
+                                                </Badge>
+                                                {hist?.source === "customer_history" && (
+                                                  <Badge
+                                                    variant="outline"
+                                                    className="text-[10px] bg-emerald-50 text-emerald-800 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300 flex items-center gap-1 shrink-0"
+                                                  >
+                                                    <History className="h-2.5 w-2.5" />
+                                                    Histórico cliente: {hist.suggestedPrice.toFixed(2)} €
+                                                  </Badge>
+                                                )}
+                                                {hist?.source === "tenant_history" && (
+                                                  <Badge
+                                                    variant="outline"
+                                                    className="text-[10px] bg-blue-50 text-blue-800 border-blue-300 dark:bg-blue-950/40 dark:text-blue-300 flex items-center gap-1 shrink-0"
+                                                  >
+                                                    <History className="h-2.5 w-2.5" />
+                                                    Histórico general: {hist.suggestedPrice.toFixed(2)} €
+                                                  </Badge>
+                                                )}
+                                              </div>
+                                              <DishAllergenDeclaration
+                                                allergens={dish.allergens}
+                                                showDeclared
+                                              />
+                                              <p className="text-xs text-muted-foreground font-mono">
+                                                {dish.price != null
+                                                  ? `${dish.price.toFixed(2)} € (catálogo)`
+                                                  : "0,00 €"}
+                                              </p>
+                                            </div>
+                                          </div>
+                                          <div className="flex items-center gap-2 shrink-0">
+                                            {isAdded ? (
+                                              <div className="flex items-center gap-2">
+                                                <Button
+                                                  type="button"
+                                                  variant="outline"
+                                                  size="icon"
+                                                  className="h-8 w-8"
+                                                  onClick={() => handleQtyChange(d.date, dish.id, -1)}
+                                                >
+                                                  <Minus className="h-3.5 w-3.5" />
+                                                </Button>
+                                                <span className="w-6 text-center font-mono font-bold text-sm">
+                                                  {qty}
+                                                </span>
+                                                <Button
+                                                  type="button"
+                                                  variant="outline"
+                                                  size="icon"
+                                                  className="h-8 w-8"
+                                                  onClick={() => handleQtyChange(d.date, dish.id, 1)}
+                                                >
+                                                  <Plus className="h-3.5 w-3.5" />
+                                                </Button>
+                                              </div>
+                                            ) : (
+                                              <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                className="text-xs h-8 gap-1 border-amber-300 hover:bg-amber-50 dark:border-amber-800 dark:hover:bg-amber-950 font-medium"
+                                                onClick={() => handleAddOffMenuDish(d.date, dish.id)}
+                                              >
+                                                <Plus className="h-3.5 w-3.5" />
+                                                Añadir al día
+                                              </Button>
+                                            )}
+                                          </div>
+                                        </div>
+
+                                        {isAdded && (
+                                          <div className="mt-3 pt-2 border-t border-border/60 grid gap-2 sm:grid-cols-2 text-xs">
+                                            <div className="space-y-1">
+                                              <Label className="text-[11px] text-muted-foreground flex items-center gap-1">
+                                                <AlertTriangle className="h-3 w-3 text-amber-500" />
+                                                Nota / Alérgeno Cocina:
+                                              </Label>
+                                              <Input
+                                                placeholder="Ej. ⚠️ Sin cebolla / Salsa aparte"
+                                                value={comment}
+                                                onChange={(e) =>
+                                                  handleCommentChange(d.date, dish.id, e.target.value)
+                                                }
+                                                className="h-7 text-xs"
+                                              />
+                                            </div>
+                                            <div className="space-y-1">
+                                              <Label className="text-[11px] text-muted-foreground">
+                                                Precio unitario acordado (€):
+                                              </Label>
+                                              <Input
+                                                type="number"
+                                                step="0.10"
+                                                min="0"
+                                                placeholder="Precio acordado"
+                                                value={override !== undefined ? override : (dish.price ?? "")}
+                                                onChange={(e) =>
+                                                  handlePriceOverrideChange(d.date, dish.id, e.target.value)
+                                                }
+                                                className="h-7 text-xs font-mono border-amber-300"
+                                              />
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="space-y-3">
+                              <div className="p-2.5 rounded-lg border border-purple-500/30 bg-purple-50/40 dark:bg-purple-950/20 text-xs text-purple-900 dark:text-purple-200 flex items-start gap-2">
+                                <Sparkles className="h-4 w-4 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
+                                <div>
+                                  <p className="font-semibold">Preparación Libre (Fuera de Carta)</p>
+                                  <p className="text-[11px] opacity-90">
+                                    Registra una preparación no catalogada para este día. El precio manual es obligatorio y no altera la biblioteca de platos.
+                                  </p>
+                                </div>
+                              </div>
+
+                              {reusableItems.length > 0 && (
+                                <div className="space-y-1.5 p-2.5 rounded-lg border bg-muted/40">
+                                  <div className="flex items-center justify-between">
+                                    <Label className="text-xs font-semibold flex items-center gap-1.5">
+                                      <History className="h-3.5 w-3.5 text-primary" />
+                                      Histórico reutilizable (Nivel 2)
+                                    </Label>
+                                    <span className="text-[10px] text-muted-foreground font-mono">
+                                      {reusableItems.length} preparaciones
+                                    </span>
+                                  </div>
+                                  <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto pt-1">
+                                    {reusableItems.map((item, idx) => (
+                                      <button
+                                        key={`${item.name}-${idx}`}
+                                        type="button"
+                                        onClick={() => handleSelectReusableCustomItem(item)}
+                                        className="text-xs px-2 py-1 rounded-md border border-border bg-background hover:bg-accent hover:text-accent-foreground text-left transition-colors flex items-center gap-1"
+                                        title={item.description || item.name}
+                                      >
+                                        <span className="font-medium truncate max-w-[220px]">{item.name}</span>
+                                      </button>
+                                    ))}
+                                  </div>
+                                  <p className="text-[10px] text-muted-foreground italic">
+                                    Al hacer clic se copian el nombre y descripción. El precio unitario debe reintroducirse manualmente.
+                                  </p>
+                                </div>
+                              )}
+
+                              <div className="space-y-3 p-3 rounded-lg border border-border bg-card">
+                                <p className="text-xs font-semibold">Añadir preparación para {d.label} ({d.date})</p>
+                                <div className="space-y-2">
+                                  <div className="space-y-1">
+                                    <Label htmlFor={`custom-name-${d.date}`} className="text-xs">
+                                      Nombre de la preparación (*)
+                                    </Label>
+                                    <Input
+                                      id={`custom-name-${d.date}`}
+                                      placeholder="Ej. Salmón a la plancha con puré de coliflor sin sal"
+                                      value={customName}
+                                      onChange={(e) => setCustomName(e.target.value)}
+                                      className="h-8 text-xs"
+                                    />
+                                  </div>
+                                  <div className="space-y-1">
+                                    <Label htmlFor={`custom-desc-${d.date}`} className="text-xs">
+                                      Descripción / Ingredientes (opcional)
+                                    </Label>
+                                    <Input
+                                      id={`custom-desc-${d.date}`}
+                                      placeholder="Ej. 200g salmón fresco, coliflor hervida sin lácteos"
+                                      value={customDescription}
+                                      onChange={(e) => setCustomDescription(e.target.value)}
+                                      className="h-8 text-xs"
+                                    />
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-2">
                                     <div className="space-y-1">
-                                      <Label className="text-[11px] text-muted-foreground flex items-center gap-1">
-                                        <AlertTriangle className="h-3 w-3 text-amber-500" />
-                                        Nota / Alérgeno Cocina:
+                                      <Label htmlFor={`custom-qty-${d.date}`} className="text-xs">
+                                        Raciones (*)
                                       </Label>
                                       <Input
-                                        placeholder="Ej. ⚠️ Sin cebolla / Salsa aparte"
-                                        value={comment}
-                                        onChange={(e) =>
-                                          handleCommentChange(d.date, dish.id, e.target.value)
-                                        }
-                                        className="h-7 text-xs"
+                                        id={`custom-qty-${d.date}`}
+                                        type="number"
+                                        min="1"
+                                        value={customQty}
+                                        onChange={(e) => setCustomQty(Math.max(1, parseInt(e.target.value) || 1))}
+                                        className="h-8 text-xs font-mono"
                                       />
                                     </div>
                                     <div className="space-y-1">
-                                      <Label className="text-[11px] text-muted-foreground">
-                                        Precio especial (€):
+                                      <Label htmlFor={`custom-price-${d.date}`} className="text-xs">
+                                        Precio unitario (€) (*) <span className="text-destructive font-bold">Manual</span>
                                       </Label>
                                       <Input
+                                        id={`custom-price-${d.date}`}
                                         type="number"
                                         step="0.10"
-                                        min="0"
-                                        placeholder={
-                                          dish.price != null
-                                            ? `${dish.price.toFixed(2)} € (catálogo)`
-                                            : "Precio manual requerido"
-                                        }
-                                        value={override !== undefined ? override : ""}
-                                        onChange={(e) =>
-                                          handlePriceOverrideChange(d.date, dish.id, e.target.value)
-                                        }
-                                        className="h-7 text-xs font-mono"
+                                        min="0.01"
+                                        placeholder="0.00 €"
+                                        value={customPrice}
+                                        onChange={(e) => setCustomPrice(e.target.value)}
+                                        className="h-8 text-xs font-mono border-amber-400 focus-visible:ring-amber-400"
                                       />
                                     </div>
                                   </div>
-                                ) : null}
+                                  <div className="space-y-1">
+                                    <Label htmlFor={`custom-notes-${d.date}`} className="text-xs flex items-center gap-1">
+                                      <AlertTriangle className="h-3 w-3 text-amber-500" /> Notas especiales para cocina
+                                    </Label>
+                                    <Input
+                                      id={`custom-notes-${d.date}`}
+                                      placeholder="Ej. Servir en envase hermético biodegradable, no usar pimienta"
+                                      value={customComment}
+                                      onChange={(e) => setCustomComment(e.target.value)}
+                                      className="h-8 text-xs"
+                                    />
+                                  </div>
+                                  <Button
+                                    type="button"
+                                    variant="secondary"
+                                    size="sm"
+                                    onClick={() => handleAddCustomPreparation(d.date)}
+                                    className="w-full text-xs font-medium gap-1.5 mt-1"
+                                  >
+                                    <Plus className="h-3.5 w-3.5" />
+                                    Añadir preparación a {d.label}
+                                  </Button>
+                                </div>
                               </div>
-                            );
-                          })}
+
+                              {dayCustomItems.length > 0 && (
+                                <div className="space-y-2 pt-2">
+                                  <Label className="text-xs font-semibold">
+                                    Preparaciones añadidas para este día ({dayCustomItems.length})
+                                  </Label>
+                                  {dayCustomItems.map((item) => (
+                                    <div
+                                      key={item.key}
+                                      className="p-3 rounded-lg border border-purple-500/30 bg-purple-50/10 flex items-center justify-between gap-3"
+                                    >
+                                      <div className="min-w-0 flex-1 space-y-0.5">
+                                        <div className="flex items-center gap-2">
+                                          <span className="font-semibold text-xs truncate">{item.name}</span>
+                                          <Badge variant="outline" className="text-[9px] bg-purple-50 text-purple-700 border-purple-200">
+                                            Fuera de carta
+                                          </Badge>
+                                        </div>
+                                        {item.description && (
+                                          <p className="text-[11px] text-muted-foreground truncate">{item.description}</p>
+                                        )}
+                                        <p className="text-xs font-mono text-muted-foreground">
+                                          {item.qty} ración(es) @ {parseFloat(item.price).toFixed(2)} € = {(item.qty * parseFloat(item.price)).toFixed(2)} €
+                                        </p>
+                                        {item.comment && (
+                                          <p className="text-[11px] text-amber-700 dark:text-amber-400">
+                                            ⚠️ Cocina: {item.comment}
+                                          </p>
+                                        )}
+                                      </div>
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-7 w-7 text-destructive hover:bg-destructive/10 shrink-0"
+                                        onClick={() => handleRemoveCustomItem(item.key)}
+                                      >
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                      </Button>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       )}
                     </TabsContent>
@@ -1646,63 +2440,39 @@ export function UniversalOrderIntakeDrawer({
 
         {/* 4. FOOTER CON RESUMEN ECONÓMICO Y BOTONES */}
         <SheetFooter className="p-4 border-t border-border bg-card flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:space-x-0">
-          {customItems.length === 0 && (
-            <div className="text-left flex items-baseline justify-between sm:block">
-              <p className="text-xs text-muted-foreground">
-                Total: <strong>{totalPortions}</strong> raciones
-              </p>
-              <p className="text-lg font-bold font-mono text-primary">{grandTotal.toFixed(2)} €</p>
-            </div>
-          )}
-          {customItems.length > 0 && tenantId ? (
-            <CanonicalOrderSubmit
-              tenantId={tenantId}
-              enabled={customEnabled && !isTenantCaptureFrozen}
-              buildCommand={buildCustomCommand}
-              dishLabel={(id) =>
-                allDishes.find((dish) => dish.id === id)?.name ?? `Plato ${id.slice(0, 8)}`
-              }
-              onLock={setCanonicalLocked}
-              onSuccess={(result) => {
-                setCanonicalLocked(false);
-                setCustomItems([]);
-                setQuantities({});
-                setComments({});
-                setPriceOverrides({});
-                onSuccess?.(result);
-                onOpenChange(false);
-                toast.success("Pedido personalizado guardado.");
-              }}
-            />
-          ) : (
-            <div className="flex items-center gap-2 justify-end shrink-0">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => handleSubmit(false)}
-                disabled={submitting || totalPortions === 0 || isTenantCaptureFrozen || !!pendingRecovery}
-                className="shrink-0 text-xs"
-              >
-                Guardar Borrador
-              </Button>
-              <Button
-                type="button"
-                variant="default"
-                size="sm"
-                onClick={() => handleSubmit(true)}
-                disabled={submitting || totalPortions === 0 || isTenantCaptureFrozen || !!pendingRecovery}
-                className="gap-1.5 shrink-0 text-xs font-semibold"
-              >
-                {submitting ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Check className="h-4 w-4" />
-                )}
-                Guardar y Confirmar 🟢
-              </Button>
-            </div>
-          )}
+          <div className="text-left flex items-baseline justify-between sm:block">
+            <p className="text-xs text-muted-foreground">
+              Total: <strong>{totalPortions}</strong> raciones
+            </p>
+            <p className="text-lg font-bold font-mono text-primary">{grandTotal.toFixed(2)} €</p>
+          </div>
+          <div className="flex items-center gap-2 justify-end shrink-0">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => handleSubmit(false)}
+              disabled={submitting || totalPortions === 0 || isTenantCaptureFrozen || !!pendingRecovery}
+              className="shrink-0 text-xs"
+            >
+              Guardar Borrador
+            </Button>
+            <Button
+              type="button"
+              variant="default"
+              size="sm"
+              onClick={() => handleSubmit(true)}
+              disabled={submitting || totalPortions === 0 || isTenantCaptureFrozen || !!pendingRecovery}
+              className="gap-1.5 shrink-0 text-xs font-semibold"
+            >
+              {submitting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Check className="h-4 w-4" />
+              )}
+              Guardar y Confirmar 🟢
+            </Button>
+          </div>
         </SheetFooter>
       </SheetContent>
     </Sheet>

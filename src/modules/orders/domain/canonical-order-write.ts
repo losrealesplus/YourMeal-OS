@@ -45,6 +45,7 @@ export const canonicalDishLineSchema = z
     unitPriceOverride: decimal.optional(),
     unitPriceOverrideReason: z.string().trim().min(1).max(2000).optional(),
     explicitZeroConfirmed: z.boolean().optional(),
+    isOffMenu: z.boolean().optional(),
   })
   .strict();
 export const canonicalCustomLineSchema = z

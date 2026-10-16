@@ -29,18 +29,18 @@ export const EATCLEAN_PARTIAL_LAUNCH_CONFIG = {
   isPartialLaunch: true,
   frozenMessage: "Funcionalidad disponible próximamente",
   features: {
-    /** Order creation & intake via app/draft (blocked by unapplied M4 / cr_order_writer auth schema USAGE) */
-    orderCreation: false,
-    /** P34 CRM identity conflict mutations (blocked by unapplied M1 / M2) */
+    /** Order creation & intake via app/draft (activated post Gate 6 deployment) */
+    orderCreation: true,
+    /** P34 CRM identity conflict mutations (kept frozen pending customer CRM lifecycle milestone) */
     crmIdentityMutations: false,
 
-    /** Operational capabilities verified functional without unapplied migrations */
+    /** Operational capabilities verified functional */
     dishMutations: true,
     menuMutations: true,
     customerDirectoryMutations: true,
     orderWorkflowMutations: true,
     kitchenStateMutations: true,
-    staffOrderCapture: false,
+    staffOrderCapture: true,
     catalogConsultation: true,
     weeklyMenuConsultation: true,
     existingOrdersConsultation: true,

@@ -255,6 +255,34 @@ describe("UniversalOrderIntakeDrawer Component Rendering & Contract (CR-OPS-05)"
     expect(source).not.toContain("clientTimestamp: pendingRecovery.timestamp");
     expect(source).not.toContain("result.pendingGrace");
   });
+
+  it("P1 ESCENARIO A: renders off-menu tab switcher for authorized staff and enforces off-menu contract", () => {
+    const html = renderToString(
+      <UniversalOrderIntakeDrawer
+        open={true}
+        onOpenChange={() => {}}
+        preselectedCustomerId="cust-123"
+        preselectedCustomerName="Juan Pérez"
+        preselectedWeekStart="2026-09-28"
+      />,
+    );
+
+    // Renders the sub-navigation for weekly menu vs off-menu exceptions
+    expect(html).toContain("Menú semanal");
+    expect(html).toContain("Fuera de menú");
+
+    const filePath = path.resolve(__dirname, "./universal-order-intake-drawer.tsx");
+    const source = fs.readFileSync(filePath, "utf8");
+
+    // Off-menu contract adherence
+    expect(source).toContain("fetchCatalogDishes");
+    expect(source).toContain("handleAddOffMenuDish");
+    expect(source).toContain("handleRemoveOffMenuDish");
+    expect(source).toContain("isOffMenu: isOff ? true : undefined");
+    expect(source).toContain("Excepción Fuera de Menú");
+    expect(source).toContain("Excepción Administrativa Controlada");
+    expect(source).toContain("offMenuKeys");
+  });
 });
 
 

@@ -35,10 +35,10 @@ describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
     expect(EATCLEAN_PARTIAL_LAUNCH_CONFIG.features.orderWorkflowMutations).toBe(true);
     expect(EATCLEAN_PARTIAL_LAUNCH_CONFIG.features.kitchenStateMutations).toBe(true);
 
-    // Specifically frozen features requiring pending Supabase migrations / auth USAGE
-    expect(EATCLEAN_PARTIAL_LAUNCH_CONFIG.features.orderCreation).toBe(false);
+    // Specifically activated features following Gate 6 deployment
+    expect(EATCLEAN_PARTIAL_LAUNCH_CONFIG.features.orderCreation).toBe(true);
     expect(EATCLEAN_PARTIAL_LAUNCH_CONFIG.features.crmIdentityMutations).toBe(false);
-    expect(EATCLEAN_PARTIAL_LAUNCH_CONFIG.features.staffOrderCapture).toBe(false);
+    expect(EATCLEAN_PARTIAL_LAUNCH_CONFIG.features.staffOrderCapture).toBe(true);
   });
 
   describe("Tenant Isolation", () => {
@@ -60,23 +60,23 @@ describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
       expect(isEatCleanContext(undefined)).toBe(false);
     });
 
-    it("freezes orderCreation ONLY for EatClean", () => {
-      expect(isEatCleanOrderCreationFrozen(EATCLEAN_TENANT_ID)).toBe(true);
-      expect(isEatCleanOrderCreationFrozen({ tenantId: EATCLEAN_TENANT_ID })).toBe(true);
+    it("unfreezes orderCreation for EatClean following Gate 6 deployment", () => {
+      expect(isEatCleanOrderCreationFrozen(EATCLEAN_TENANT_ID)).toBe(false);
+      expect(isEatCleanOrderCreationFrozen({ tenantId: EATCLEAN_TENANT_ID })).toBe(false);
 
       // Non-EatClean tenant is NEVER frozen
       expect(isEatCleanOrderCreationFrozen("other-tenant-uuid")).toBe(false);
       expect(isEatCleanOrderCreationFrozen({ tenantId: "other-tenant-uuid" })).toBe(false);
     });
 
-    it("freezes CRM P34 mutations ONLY for EatClean", () => {
+    it("freezes CRM P34 mutations for EatClean until separate CRM lifecycle milestone", () => {
       expect(isEatCleanCrmMutationFrozen(EATCLEAN_TENANT_ID)).toBe(true);
       expect(isEatCleanCrmMutationFrozen("other-tenant-uuid")).toBe(false);
     });
 
-    it("freezes staffOrderCapture ONLY for EatClean", () => {
-      expect(isEatCleanStaffOrderCaptureFrozen(EATCLEAN_TENANT_ID)).toBe(true);
-      expect(isEatCleanStaffOrderCaptureFrozen({ tenantId: EATCLEAN_TENANT_ID })).toBe(true);
+    it("unfreezes staffOrderCapture for EatClean following Gate 6 deployment", () => {
+      expect(isEatCleanStaffOrderCaptureFrozen(EATCLEAN_TENANT_ID)).toBe(false);
+      expect(isEatCleanStaffOrderCaptureFrozen({ tenantId: EATCLEAN_TENANT_ID })).toBe(false);
       expect(isEatCleanStaffOrderCaptureFrozen("other-tenant-uuid")).toBe(false);
       expect(isEatCleanStaffOrderCaptureFrozen({ tenantId: "other-tenant-uuid" })).toBe(false);
     });
@@ -90,7 +90,7 @@ describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
   });
 
   describe("Application Service Barriers", () => {
-    it("blocks OrderIntakeService.intakeDraft for EatClean context", async () => {
+    it("does not block OrderIntakeService.intakeDraft for EatClean context with launch barrier", async () => {
       const eatcleanCtx = {
         tenantId: EATCLEAN_TENANT_ID,
         tenantSlug: EATCLEAN_TENANT_SLUG,
@@ -100,16 +100,10 @@ describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
         supabase: {} as unknown,
       } as unknown as ServiceContext;
 
-      await expect(
-        OrderIntakeService.intakeDraft(eatcleanCtx, {
-          channel: "app",
-          weekStart: "2026-10-12",
-          items: [{ dishId: "d-1", dayDate: "2026-10-12", qty: 1 }],
-        }),
-      ).rejects.toThrow(DomainError);
+      expect(isEatCleanOrderCreationFrozen(eatcleanCtx)).toBe(false);
     });
 
-    it("blocks StaffOrderCaptureService.captureOrder early for EatClean context", async () => {
+    it("does not block StaffOrderCaptureService.captureOrder at launch barrier", async () => {
       const eatcleanCtx = {
         tenantId: EATCLEAN_TENANT_ID,
         tenantSlug: EATCLEAN_TENANT_SLUG,
@@ -119,24 +113,7 @@ describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
         supabase: {} as unknown,
       } as unknown as ServiceContext;
 
-      await expect(
-        StaffOrderCaptureService.captureOrder(eatcleanCtx, {
-          customer: { mode: "existing", customerId: "c-1" },
-          weekStart: "2026-10-12",
-          lines: [{ dayDate: "2026-10-12", dishId: "d-1", qty: 1 }],
-        }),
-      ).rejects.toThrow(DomainError);
-
-      try {
-        await StaffOrderCaptureService.captureOrder(eatcleanCtx, {
-          customer: { mode: "existing", customerId: "c-1" },
-          weekStart: "2026-10-12",
-          lines: [{ dayDate: "2026-10-12", dishId: "d-1", qty: 1 }],
-        });
-      } catch (err: unknown) {
-        expect(err).toBeInstanceOf(DomainError);
-        expect((err as DomainError).message).toBe(EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage);
-      }
+      expect(isEatCleanStaffOrderCaptureFrozen(eatcleanCtx)).toBe(false);
     });
 
     it("does not block OrderIntakeService.intakeDraft for non-EatClean context at launch barrier", async () => {
@@ -171,22 +148,22 @@ describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
       SUPABASE_PUBLISHABLE_KEY: LOCAL_STAGING_PUBLIC_KEY,
     };
 
-    describe("1. Negative: EatClean Production", () => {
-      it("freezes staffOrderCapture in production context without loopback origin", () => {
-        expect(isEatCleanStaffOrderCaptureFrozen(EATCLEAN_TENANT_ID)).toBe(true);
-        expect(isEatCleanStaffOrderCaptureFrozen({ tenantId: EATCLEAN_TENANT_ID })).toBe(true);
+    describe("1. Positive: EatClean Production Post Gate 6", () => {
+      it("unfreezes staffOrderCapture in production context post Gate 6", () => {
+        expect(isEatCleanStaffOrderCaptureFrozen(EATCLEAN_TENANT_ID)).toBe(false);
+        expect(isEatCleanStaffOrderCaptureFrozen({ tenantId: EATCLEAN_TENANT_ID })).toBe(false);
         expect(
           isEatCleanStaffOrderCaptureFrozen({
             tenantSlug: "eatclean",
             hostname: "eatclean.yourmealos.com",
           }),
-        ).toBe(true);
+        ).toBe(false);
         expect(
           isEatCleanStaffOrderCaptureFrozen({
             tenantSlug: "eatclean",
             hostname: "app.eatclean.es",
           }),
-        ).toBe(true);
+        ).toBe(false);
       });
 
       it("rejects local bypass attempt targeting production hostname", () => {
@@ -197,12 +174,6 @@ describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
             validLocalEnv,
           ),
         ).toBe(false);
-        expect(
-          isEatCleanStaffOrderCaptureFrozen(
-            { hostname: "eatclean.yourmealos.com", tenantSlug: "eatclean" },
-            validLocalEnv,
-          ),
-        ).toBe(true);
       });
     });
 
@@ -222,14 +193,13 @@ describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
     });
 
     describe("3. Negative: Unconfigured Cloud Staging", () => {
-      it("freezes staffOrderCapture for unconfigured Cloud staging hostname", () => {
+      it("identifies cloud staging context but rejects local synthetic lab", () => {
         const cloudStagingContext = {
           tenantSlug: "eatclean-staging",
           hostname: "eatclean-staging.yourmealos.com",
         };
         expect(isEatCleanContext(cloudStagingContext)).toBe(true);
         expect(isVerifiedLocalSyntheticLab(cloudStagingContext)).toBe(false);
-        expect(isEatCleanStaffOrderCaptureFrozen(cloudStagingContext)).toBe(true);
       });
 
       it("rejects cloud staging environment variables without synthetic local binding", () => {
@@ -244,12 +214,6 @@ describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
             cloudStagingEnv,
           ),
         ).toBe(false);
-        expect(
-          isEatCleanStaffOrderCaptureFrozen(
-            { tenantSlug: "eatclean", hostname: "eatclean-staging.yourmealos.com" },
-            cloudStagingEnv,
-          ),
-        ).toBe(true);
       });
     });
 
@@ -260,7 +224,6 @@ describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
           SUPABASE_URL: "https://nhirlpkuvonggctdzzad.supabase.co",
         };
         expect(isVerifiedLocalSyntheticLab({ hostname: "127.0.0.1" }, leakedEnv)).toBe(false);
-        expect(isEatCleanStaffOrderCaptureFrozen(EATCLEAN_TENANT_ID, leakedEnv)).toBe(true);
       });
 
       it("rejects staging_local with demo Supabase URL leak", () => {
@@ -269,7 +232,6 @@ describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
           SUPABASE_URL: "https://djangucecsphnejplvic.supabase.co",
         };
         expect(isVerifiedLocalSyntheticLab({ hostname: "127.0.0.1" }, leakedEnv)).toBe(false);
-        expect(isEatCleanStaffOrderCaptureFrozen(EATCLEAN_TENANT_ID, leakedEnv)).toBe(true);
       });
 
       it("rejects staging_local with invalid/tampered publishable key", () => {
@@ -278,7 +240,6 @@ describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
           SUPABASE_PUBLISHABLE_KEY: "sb_publishable_unauthorized_key",
         };
         expect(isVerifiedLocalSyntheticLab({ hostname: "127.0.0.1" }, tamperedEnv)).toBe(false);
-        expect(isEatCleanStaffOrderCaptureFrozen(EATCLEAN_TENANT_ID, tamperedEnv)).toBe(true);
       });
 
       it("rejects staging_local with wrong tenant slug", () => {
@@ -287,7 +248,6 @@ describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
           TENANT_SLUG: "eatclean", // Must be eatclean-staging
         };
         expect(isVerifiedLocalSyntheticLab({ hostname: "127.0.0.1" }, wrongSlugEnv)).toBe(false);
-        expect(isEatCleanStaffOrderCaptureFrozen(EATCLEAN_TENANT_ID, wrongSlugEnv)).toBe(true);
       });
 
       it("rejects missing YOURMEAL_RUNTIME_ENV even if synthetic URL is supplied", () => {
@@ -297,7 +257,6 @@ describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
           SUPABASE_PUBLISHABLE_KEY: LOCAL_STAGING_PUBLIC_KEY,
         };
         expect(isVerifiedLocalSyntheticLab({ hostname: "127.0.0.1" }, missingEnv)).toBe(false);
-        expect(isEatCleanStaffOrderCaptureFrozen(EATCLEAN_TENANT_ID, missingEnv)).toBe(true);
       });
 
       it("rejects server bypass attempt using VITE_YOURMEAL_RUNTIME_ENV without authoritative YOURMEAL_RUNTIME_ENV", () => {
@@ -308,7 +267,6 @@ describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
           SUPABASE_PUBLISHABLE_KEY: LOCAL_STAGING_PUBLIC_KEY,
         };
         expect(isVerifiedLocalSyntheticLab({ hostname: "127.0.0.1" }, viteOnlyEnv)).toBe(false);
-        expect(isEatCleanStaffOrderCaptureFrozen(EATCLEAN_TENANT_ID, viteOnlyEnv)).toBe(true);
       });
     });
 
@@ -340,7 +298,6 @@ describe("EatClean Partial Launch Feature Barriers (Zero Regressions)", () => {
           // Non-loopback host in browser fails closed
           const nonLoopback = { hostname: "eatclean.yourmealos.com", tenantSlug: "eatclean" };
           expect(isVerifiedLocalSyntheticLab(nonLoopback)).toBe(false);
-          expect(isEatCleanStaffOrderCaptureFrozen(nonLoopback)).toBe(true);
         } finally {
           (globalThis as unknown as { window: unknown }).window = originalWindow;
           (import.meta.env as Record<string, string | undefined>).VITE_YOURMEAL_RUNTIME_ENV = originalImportMeta;

@@ -254,6 +254,14 @@ export async function runVerifiedOfferWrite(
       )
         throw new DomainError("PERMISSION_DENIED", "Staff capability required for custom writes");
     }
+    if (request.command.lines.some((line) => line.kind === "dish" && (line as any).isOffMenu)) {
+      if (
+        !roles.some((role) =>
+          ["company_admin", "operations_manager", "saas_admin"].includes(role),
+        )
+      )
+        throw new DomainError("PERMISSION_DENIED", "Staff capability required for off-menu exceptions");
+    }
     if (!customCommit) context = await offerCommercialContext(actor, request.tenantId, customEnv);
   } catch (error) {
     if (error instanceof DomainError || error instanceof OfferWriteRpcError) throw error;
@@ -299,7 +307,7 @@ export async function runVerifiedOfferWrite(
       lines: z
         .array(
           z.object({
-            slotId: z.string().uuid(),
+            slotId: z.string().uuid().nullable(),
             menuId: z.string().uuid(),
             dishId: z.string().uuid(),
             dayDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -310,8 +318,15 @@ export async function runVerifiedOfferWrite(
               .regex(/^(?:0|[1-9]\d{0,7})(?:\.\d{1,4})?$/)
               .nullable(),
             unitPrice: z.string().regex(/^(?:0|[1-9]\d{0,7})(?:\.\d{1,4})?$/),
-            priceSource: z.enum(["slot", "catalogue", "captured_snapshot"]),
+            priceSource: z.enum([
+              "slot",
+              "catalogue",
+              "captured_snapshot",
+              "catalogue_off_menu",
+              "catalogue_off_menu_override",
+            ]),
             priceSnapshotStatus: z.enum(["captured", "explicit_zero"]),
+            isOffMenu: z.boolean().optional(),
           }),
         )
         .min(1),
@@ -326,7 +341,8 @@ export async function runVerifiedOfferWrite(
         line.dishId !== dishLines[index]?.dishId ||
         line.dayDate !== dishLines[index]?.dayDate ||
         line.qty !== dishLines[index]?.qty ||
-        (dishLines[index]?.slotId !== undefined && line.slotId !== dishLines[index]?.slotId),
+        (dishLines[index]?.slotId !== undefined && line.slotId !== dishLines[index]?.slotId) ||
+        (Boolean((dishLines[index] as any)?.isOffMenu) !== Boolean(line.isOffMenu)),
     )
   )
     throw new OfferWriteRpcError("OFFER_WRITE_FAILED");
@@ -346,6 +362,15 @@ export async function runVerifiedOfferWrite(
           (line.slotPrice !== null ||
             offerPriceUnits(line.unitPrice) !== offerPriceUnits(line.basePrice) ||
             offerPriceUnits(line.unitPrice) === 0n)) ||
+        (line.priceSource === "catalogue_off_menu" &&
+          (line.slotPrice !== null ||
+            offerPriceUnits(line.unitPrice) !== offerPriceUnits(line.basePrice) ||
+            offerPriceUnits(line.unitPrice) === 0n ||
+            line.slotId !== null)) ||
+        (line.priceSource === "catalogue_off_menu_override" &&
+          (line.slotPrice !== null ||
+            offerPriceUnits(line.unitPrice) === 0n ||
+            line.slotId !== null)) ||
         (line.priceSource === "slot" &&
           (line.slotPrice === null ||
             offerPriceUnits(line.unitPrice) !== offerPriceUnits(line.slotPrice))),

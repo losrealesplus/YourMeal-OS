@@ -8,7 +8,7 @@ import {
   runVerifiedOfferReconciliation,
 } from "./offer-write.server";
 import { parseOfferWriteRequest } from "../application/offer-write-input";
-import { EATCLEAN_TENANT_ID } from "@/config/eatclean-partial-launch";
+import { EATCLEAN_TENANT_ID, EATCLEAN_PARTIAL_LAUNCH_CONFIG } from "@/config/eatclean-partial-launch";
 import { LOCAL_STAGING_URL, LOCAL_STAGING_PUBLIC_KEY } from "@/lib/local-staging-runtime";
 vi.mock("@/tenant/commercial-config", () => ({}));
 vi.mock("@/tenant/resources/brand.json", () => ({ default: { slug: "test-tenant" } }));
@@ -677,25 +677,37 @@ describe("Server-Authoritative Order Capture Gate & Defense-in-Depth", () => {
   }
 
   it("authenticated user with orders.write is blocked on direct quote when staffOrderCapture is frozen in EatClean production", async () => {
-    const rpc = vi.fn();
-    await expect(
-      runVerifiedOfferWrite(eatcleanActor(), eatcleanCaptureRequest, undefined, { rpc }, false, prodEatCleanEnv),
-    ).rejects.toMatchObject({
-      code: "INVALID_STATE",
-      message: "Funcionalidad disponible próximamente",
-    });
-    expect(rpc).not.toHaveBeenCalled();
+    const original = EATCLEAN_PARTIAL_LAUNCH_CONFIG.features.staffOrderCapture;
+    try {
+      (EATCLEAN_PARTIAL_LAUNCH_CONFIG.features as any).staffOrderCapture = false;
+      const rpc = vi.fn();
+      await expect(
+        runVerifiedOfferWrite(eatcleanActor(), eatcleanCaptureRequest, undefined, { rpc }, false, prodEatCleanEnv),
+      ).rejects.toMatchObject({
+        code: "INVALID_STATE",
+        message: "Funcionalidad disponible próximamente",
+      });
+      expect(rpc).not.toHaveBeenCalled();
+    } finally {
+      (EATCLEAN_PARTIAL_LAUNCH_CONFIG.features as any).staffOrderCapture = original;
+    }
   });
 
   it("direct commit attempt of new capture is blocked with zero privileged RPCs in EatClean production", async () => {
-    const rpc = vi.fn();
-    await expect(
-      runVerifiedOfferWrite(eatcleanActor(), eatcleanCaptureRequest, quoteId, { rpc }, false, prodEatCleanEnv),
-    ).rejects.toMatchObject({
-      code: "INVALID_STATE",
-      message: "Funcionalidad disponible próximamente",
-    });
-    expect(rpc).not.toHaveBeenCalled();
+    const original = EATCLEAN_PARTIAL_LAUNCH_CONFIG.features.staffOrderCapture;
+    try {
+      (EATCLEAN_PARTIAL_LAUNCH_CONFIG.features as any).staffOrderCapture = false;
+      const rpc = vi.fn();
+      await expect(
+        runVerifiedOfferWrite(eatcleanActor(), eatcleanCaptureRequest, quoteId, { rpc }, false, prodEatCleanEnv),
+      ).rejects.toMatchObject({
+        code: "INVALID_STATE",
+        message: "Funcionalidad disponible próximamente",
+      });
+      expect(rpc).not.toHaveBeenCalled();
+    } finally {
+      (EATCLEAN_PARTIAL_LAUNCH_CONFIG.features as any).staffOrderCapture = original;
+    }
   });
 
   it("direct custom commit attempt on EatClean is blocked with CUSTOM_NOT_ENABLED and zero privileged RPCs", async () => {
@@ -751,13 +763,19 @@ describe("Server-Authoritative Order Capture Gate & Defense-in-Depth", () => {
       ...prodEatCleanEnv,
       VITE_YOURMEAL_RUNTIME_ENV: "staging_local",
     };
-    await expect(
-      runVerifiedOfferWrite(eatcleanActor(), eatcleanCaptureRequest, undefined, { rpc }, false, viteInjectedEnv),
-    ).rejects.toMatchObject({
-      code: "INVALID_STATE",
-      message: "Funcionalidad disponible próximamente",
-    });
-    expect(rpc).not.toHaveBeenCalled();
+    const original = EATCLEAN_PARTIAL_LAUNCH_CONFIG.features.staffOrderCapture;
+    try {
+      (EATCLEAN_PARTIAL_LAUNCH_CONFIG.features as any).staffOrderCapture = false;
+      await expect(
+        runVerifiedOfferWrite(eatcleanActor(), eatcleanCaptureRequest, undefined, { rpc }, false, viteInjectedEnv),
+      ).rejects.toMatchObject({
+        code: "INVALID_STATE",
+        message: "Funcionalidad disponible próximamente",
+      });
+      expect(rpc).not.toHaveBeenCalled();
+    } finally {
+      (EATCLEAN_PARTIAL_LAUNCH_CONFIG.features as any).staffOrderCapture = original;
+    }
   });
 
   it("Demo tenant (yourmeal-os) is unaffected by EatClean capture freeze", async () => {
