@@ -1,0 +1,460 @@
+{
+  "repository": "losrealesplus/YourMeal-OS",
+  "environment": "production-worker",
+  "reviewerId": 292604102,
+  "reviewerLogin": "losrealesplus",
+  "baseline": {
+    "sha": "7e652d36372572be203964cb0f997485b57642ec",
+    "versionId": "4622778f-1faf-4232-ac40-fe28e9fafe13",
+    "deploymentId": 6999959567
+  },
+  "candidateSha": "7a9a6da809709f6ebca962b47ea37927d6b4c27a",
+  "productPr": 532,
+  "productHeadSha": "a1f260a9652a4f45feecb51f1c9f005301c2317e",
+  "productPrs": [
+    525,
+    526,
+    527,
+    528,
+    529,
+    530,
+    531,
+    532
+  ],
+  "productFiles": [
+    {
+      "path": "docs/10-validation/p0-orders/auth-bridge-integration/README.md",
+      "before": null,
+      "after": "cc5046bfa615a0e99e5f1520ff068c6a3f6cb71e9d1415ff5ee83ccf99c0b697"
+    },
+    {
+      "path": "docs/10-validation/p0-orders/auth-bridge-integration/SQL_MANIFEST.json",
+      "before": null,
+      "after": "b2dafa5f636c7da8311eb9956563ac1ac051721230d5758556698f519af3a00a"
+    },
+    {
+      "path": "docs/10-validation/p0-orders/auth-bridge-integration/activation-catalog-contract-results.json",
+      "before": null,
+      "after": "e1f9e0503f6b23ce4b724ca27c0538b71fceda97c054bfc501dce955c2ccd0e1"
+    },
+    {
+      "path": "docs/10-validation/p0-orders/auth-bridge-integration/production-catalog-canonical.json",
+      "before": null,
+      "after": "b1bf64e21ac18c3197bd1ff0861c274bdb93bd328dac6313177df73519e3d7db"
+    },
+    {
+      "path": "docs/10-validation/p0-orders/auth-bridge-integration/qualify-activation-catalog-contract.py",
+      "before": null,
+      "after": "233cf3a4606b11a9c260531b2a982faae417af87f2c6bb2261915b447ab4c149"
+    },
+    {
+      "path": "docs/10-validation/p0-orders/auth-bridge-integration/qualify-auth-bridge-e2e.py",
+      "before": null,
+      "after": "b91ae90c9e636095c21da635d5239e2297fdf09f0d9bdaa3be982108a00ce15d"
+    },
+    {
+      "path": "docs/10-validation/p0-orders/auth-bridge-integration/qualify-auth-bridge-sql.py",
+      "before": null,
+      "after": "810cc5990e4768b127b38a2c0d1c1c7e99b3c1936314ab2512ff7d7d858e8eed"
+    },
+    {
+      "path": "docs/10-validation/p0-orders/auth-bridge-integration/qualify-eatclean-offer-pricing.py",
+      "before": null,
+      "after": "ef762591ffda092d442bc8e39c9e1cca131eb68e545fddf831672415e991faed"
+    },
+    {
+      "path": "docs/10-validation/p0-orders/auth-bridge-integration/qualify-full-chain.py",
+      "before": null,
+      "after": "00cb4e44d5e4e1eab464433ef3c20f97938e7b559a76c1619d50e168f7acd649"
+    },
+    {
+      "path": "docs/10-validation/p0-orders/auth-bridge-integration/synthetic-results.json",
+      "before": null,
+      "after": "557843f35dc0add81e1b341a674caf9c8c87c4e322525bd8e0f8940d12eb1cb3"
+    },
+    {
+      "path": "docs/99-internal/development-journal/2026-10-11-activation-catalog-contract.md",
+      "before": null,
+      "after": "30108313579c9739bc292d9434622aafb63da785f4b4472eacd5b001e39d885a"
+    },
+    {
+      "path": "docs/99-internal/development-journal/2026-10-11-auth-bridge-integration.md",
+      "before": null,
+      "after": "fa3ede9e8b3cb2d9952bd9813b45097487b3b8586f54e1372ff7f6fdd21140cd"
+    },
+    {
+      "path": "docs/99-internal/development-journal/2026-10-13-local-verification-credentials.md",
+      "before": null,
+      "after": "255beb915b5f0589464666e596d27aabb26036583150bb60548ff00d6d017cfd"
+    },
+    {
+      "path": "instances/yourmeal-eatclean/wrangler.prod.json",
+      "before": "7cd095c5076ba693512f9126aa63464dbdaef48e996ebc730eebbf8cd6ea5fb6",
+      "after": "6b430f21921697883924ee1457dd680e8bb056ac8b970d1481230e73ccddbd5c"
+    },
+    {
+      "path": "instances/yourmeal-eatclean/wrangler.staging.json",
+      "before": "9bce4a3b2a5889c64a27aee3329f3985250f47108f807579036de5751e87ab9c",
+      "after": "1fae2216c159ab874aa8d31a45a03af37ed68fbc38f9b0a81e1d4df647504e3d"
+    },
+    {
+      "path": "scripts/bootstrap-verify.mjs",
+      "before": "29158eba111232c580b4c2717a879ad9d9fb35275208fd2b3656e6539a225dd1",
+      "after": "2ab7c6f1d61c6274e455a4854c82a428ce2d5c2d0603c77d7e5fe94d38fbbbea"
+    },
+    {
+      "path": "scripts/gate6-controlled-cutover-suite.mjs",
+      "before": null,
+      "after": "c187defb5cd1d7188f8337b3103b7cf1f8b33fd7f0c219037ddd6b2a090be181"
+    },
+    {
+      "path": "scripts/gate6-production-cutover-live.sh",
+      "before": null,
+      "after": "b6d5858d732eb4bce9c7a43f37d8fead2667427713ea1a619ce86619ff19ed68"
+    },
+    {
+      "path": "scripts/gate6-production-preflight-live.sh",
+      "before": null,
+      "after": "d7310f203b0054d83c331e9131f00296b1141bdec2280ac8865394f818ca8516"
+    },
+    {
+      "path": "scripts/gate6-reconciliation-lab.mjs",
+      "before": null,
+      "after": "8b2062b41d412491aff1d148aef9abb689eee60694e573712b2d72bb4c2ea092"
+    },
+    {
+      "path": "scripts/gate6-recovery-suite.mjs",
+      "before": null,
+      "after": "745fca26b846f023d0bb038cc75254dae5e8097cc14033cdf1fbc7e4e4b026d5"
+    },
+    {
+      "path": "scripts/gate6-supabase-cli-lab.mjs",
+      "before": null,
+      "after": "23aa3ec491e80c045544d8c1d5ed894306814a3b346f3212099ef8d034c5ff83"
+    },
+    {
+      "path": "scripts/lib/verification-supabase.mjs",
+      "before": null,
+      "after": "8e4462e2ca6966c9a3c2b31d201febf9275858c10b481669fa2eecf860272cc0"
+    },
+    {
+      "path": "scripts/lib/verification-supabase.spec.mjs",
+      "before": null,
+      "after": "66f18f19d4e768c17310250053ca13728894dafe031939e08ac58bb624276a8d"
+    },
+    {
+      "path": "scripts/migration-bootstrap-ci.mjs",
+      "before": "639115525f24e5bc070f5a87c36db8eecfc97651474673e368cd435bf6744d16",
+      "after": "c1696a89da74fe3a1591eef7d7e7665772350ba9c18c6a8d964aabeb4190554b"
+    },
+    {
+      "path": "scripts/migration-bootstrap-ci.spec.mjs",
+      "before": "ab3b564e78e39c9d2eeb85564910093539184d6b935f314286cc2a6a990c5173",
+      "after": "70edad2bb94b4502a163d00cd5bea442c499fd3b2226b0e0339c790baa076f46"
+    },
+    {
+      "path": "scripts/p1-production-migration-live.sh",
+      "before": null,
+      "after": "e31f6decb9e3ab3d2d5dd4990e254e6f1e3ee0eb930940b5525c0281f876b235"
+    },
+    {
+      "path": "scripts/p1-production-preflight-live.sh",
+      "before": null,
+      "after": "2d54e869908fae088126023ce32e7c7e45ad9c7e3629706d34b84331059a19b9"
+    },
+    {
+      "path": "scripts/release/activate-eatclean-staff-existing-order.sql",
+      "before": "284ef28d1baf848d707c0eb591614770688b1d8f727e69f4d51c23308de15dbe",
+      "after": "5d466b06cd80e2f9c48b7493611fca769733171ed157d26805fc2783221c1b87"
+    },
+    {
+      "path": "scripts/release/revoke-eatclean-legacy-staff-existing-order.sql",
+      "before": null,
+      "after": "649190ff942a058d16f2f675fb8aea471058be8409fad4ad070a1460ed6cdb23"
+    },
+    {
+      "path": "scripts/seed-day0.mjs",
+      "before": "4ff58b85dc7e227a078fd9ae952b42c69e355ea8aa2a4f92fa20d1020a3cb091",
+      "after": "dda80ae3454fa625005a1c0c14524e2100499fb3786d62a98865a10e35e4ec7f"
+    },
+    {
+      "path": "scripts/seed-platform-owners.mjs",
+      "before": "21e91832e2f25d6f7319a377eaa65fa6ecbbc9ca5715e74d1af2e0c39b758953",
+      "after": "a455898d286fec2ecb4e4c7fb82c6a78361352242591c4e29ea998250b95706f"
+    },
+    {
+      "path": "scripts/staging-e2e-lab.py",
+      "before": "3aea1425f6797463c23eef2764d88a84ae64b4d34b36bc952f614115561e7d36",
+      "after": "eaa45ef1eb90c95a5b51fb130da6f74149f2f4254f46e1b9bdbb5141e6cb09f9"
+    },
+    {
+      "path": "scripts/staging-e2e-seed.mjs",
+      "before": "09d27ffcba1025c4ba818fa5abaa1d0197846708f69355746cba11fb30379a2b",
+      "after": "f6c00e55cfb76d2974d7ea8193f49cca15d5a70daa22e102dab9e7cd8a1cb7b2"
+    },
+    {
+      "path": "scripts/test-e2e-universal-intake.mjs",
+      "before": null,
+      "after": "e9f33298cd273ef8e20137c579bc28e04cb18076fef2be19d58555d90d9aec20"
+    },
+    {
+      "path": "scripts/test-gate6-production-cutover-mock.mjs",
+      "before": null,
+      "after": "92be83b689f9a55ef7da0aa8f311e8fcd3d7858b5a939254d23845e5366b4998"
+    },
+    {
+      "path": "scripts/test-gate6-production-preflight-mock.mjs",
+      "before": null,
+      "after": "9bda1e4348712862c96aa5999f026cb62ba9c055418c2b64eeb898fabe1ddb4f"
+    },
+    {
+      "path": "scripts/test-migration-drift-a5.mjs",
+      "before": null,
+      "after": "4d771b69ef7b543e26f244df1100466a687d3babaa04bae3eb1d21de40bc2768"
+    },
+    {
+      "path": "scripts/test-p1-atomic-executor-lab.mjs",
+      "before": null,
+      "after": "4669499f8f7d73e3de504e843c13ac643474659fec3210c190d9fbe802f44124"
+    },
+    {
+      "path": "scripts/test-p1-off-menu-postgresql-live.mjs",
+      "before": null,
+      "after": "9e2a92f4fe594a7100e9b3f62d3f95f248e36367467a599dc5e8ee319ae11761"
+    },
+    {
+      "path": "scripts/test-p1-preflight-logic.sh",
+      "before": null,
+      "after": "05794cabfcff627ebaf2ab52f7992c6677bb7dfa67a372f2c53f188b7eb216f8"
+    },
+    {
+      "path": "scripts/test-sql-security-legacy-rpc.mjs",
+      "before": null,
+      "after": "deedb5c0a21ed6dc079e3acfc8a05d582d8dc79de5eb03068de63b3dd31cf747"
+    },
+    {
+      "path": "scripts/verification-credentials.md",
+      "before": null,
+      "after": "841eac8440eca512b4e6cbe250fea9f3a9f18406e63cc19b8af5050ffec80e7d"
+    },
+    {
+      "path": "scripts/verification.env.example",
+      "before": null,
+      "after": "3067a0b6b2d61b38724c209461c5b1ab773b4579255cb2945ca8e2f51337dfac"
+    },
+    {
+      "path": "scripts/verify-cr-ops-05-live.mjs",
+      "before": "628455eff5196fd8774782b1a2d9e4879222e96f27e06eadd1f96a57e4b50342",
+      "after": "f140842304ca1cdbbd3b54cf71984709525dbe15af14ae4d7d61dbf44c87af48"
+    },
+    {
+      "path": "scripts/verify-cr-ops-06-gate-5-staging.mjs",
+      "before": "d7ebb2519ac1a8655f2893b0c1fb33e627cfc2dffeaa70e4a15042fd13704b3a",
+      "after": "f1c3bacf08d7642c5294a1fd07e138aaccbd9fc20bf00dd5e9fade3f25603e10"
+    },
+    {
+      "path": "scripts/verify-cr-ops-06-gate-8-live.mjs",
+      "before": "13c291c5237c584c60a3ec6d7b71c04996cb63bb71feda96952dc0fbd0003dc8",
+      "after": "3595527e06eed368825cace35e5a7098bd86b2d52e9e23b67b541350f5b8163f"
+    },
+    {
+      "path": "scripts/verify-cr-ops-diet-01-live.mjs",
+      "before": "0a69b4041857a13afdee3a1c56c8dcca4072603be01d51404e175936b84a2d65",
+      "after": "a03201a090b07abb9809b41b2f08e6af3d694034f4837b1bf2f63890e81f9639"
+    },
+    {
+      "path": "scripts/verify-cr-ux-menu-01-visual.mjs",
+      "before": "3ba943c518046786f5b45d98984c379a9ea07d7b1e5a8fcc53299759aca847ff",
+      "after": "99665b4f045a9c2ffded74f1fb1c670e3fffa6728913122b23cf5c1659b07b49"
+    },
+    {
+      "path": "scripts/verify-eatclean-cust-01-hf01-live.mjs",
+      "before": "b4f79181a83480436f95e826da82884d56fab4ed8601eb7ae643f16a1a324fc6",
+      "after": "955a25fa0c0edf0cd648b128e110ab652b3fb7b75a4a5cec99e3e21c12ee2d8b"
+    },
+    {
+      "path": "scripts/verify-eatclean-cust-01-live.mjs",
+      "before": "c50831983b8ad711aefceee428e3397dad78ff2defc7f676e06f847a7f34e89f",
+      "after": "e9c3c824a10e33d72cc82a8d8e3680836221216225e4f360436ed45173007557"
+    },
+    {
+      "path": "scripts/verify-eatclean-prod-live.mjs",
+      "before": "11295cef962a744ff86ba8df06bca6d8a58b3c35d99f8b185a32e0d2aaaee1b4",
+      "after": "2a8e51be29b2788d3f92647175fbf77d224e3e473ca2f0f870f74df14e1eba33"
+    },
+    {
+      "path": "scripts/verify-eatclean-track-c-live.mjs",
+      "before": "1365e6d4b9b5ee31dbc9659b128ef9fd8c3c3bc58b121446bf403927c911c29e",
+      "after": "261545662d2bccf0b5be143848ade83ef126621a5be3c089c44b31e3413a522f"
+    },
+    {
+      "path": "src/components/orders/universal-order-intake-drawer.spec.tsx",
+      "before": "91a26df5ce5284d544f026351dd5b2ab649408b29834df1908b8c1638e881f4a",
+      "after": "dc59072667a0c1f4b40946efbf90a30f09fa42f08b40114e9c700d825f7d35a3"
+    },
+    {
+      "path": "src/components/orders/universal-order-intake-drawer.tsx",
+      "before": "62a8dda19459d337cee5a72a1d0810badc7cf87e585d6d933518b5c27f0d3881",
+      "after": "bcc12660c871f73be3962d4006024486505234b731961fcb8b4bacfc3ab5d10c"
+    },
+    {
+      "path": "src/config/eatclean-partial-launch.spec.ts",
+      "before": "a49258fb7eb033bf6eeccf15ea5b2a79e77d39c0b50754e690cbac16de855ba9",
+      "after": "e4848e510e7cd939acaf4662543ae51a30ca2c795c707ed6a15e363bd8d1d448"
+    },
+    {
+      "path": "src/config/eatclean-partial-launch.ts",
+      "before": "317cf06b14b5db3e3b569daa882527478b75ce95b0f4608d3d4eb3d04eb646c4",
+      "after": "8ddb0617831aeeb156394e7ccd2b8910a9654f16d43d8c2164ee1d42b7ca7621"
+    },
+    {
+      "path": "src/domain/errors.ts",
+      "before": "ebf77416010fa97014f2a74d326c3a555ae8e73a2800b64170b0758de27782e5",
+      "after": "c7a010e48c6e2cd075878036926fe2b025f6b82df9f617f131d953b6d545129e"
+    },
+    {
+      "path": "src/lib/instance-runtime-boundary.spec.ts",
+      "before": "b3e3d3c438fe404e974eabf9f9dc4c2bd02d02d5ae63a1287f99d1fda7ca6d7f",
+      "after": "1690a2e98c95f0c4f682972a87012d7166afac134c15240f1b0a0d59289b827a"
+    },
+    {
+      "path": "src/lib/instance-runtime-boundary.ts",
+      "before": "de3b3de42b3568467ba5ec44cadbb176cd574d8eb9dfb60fd0366723d90f36fe",
+      "after": "42ffb1d7ef00a54c5179951a93b6d7a27cabc5fb1587736bbd251e5a586a444f"
+    },
+    {
+      "path": "src/modules/customer-directory/application/customer-profile.functions.ts",
+      "before": "95a97d3badff6bdd58d6b3fc63ec9f200300d604cbb732eee1df66574763b279",
+      "after": "50b0fadb7f3155b13d17c8a8cbc2c4e02d3698c30b17eeae58cfd8c0ec9ec833"
+    },
+    {
+      "path": "src/modules/orders/application/canonical-order-write-service.spec.ts",
+      "before": "156491c64c0f8feb851f086ad9e28a578d4dc9d1e2d2844503a22758f79942e3",
+      "after": "11287e5c13938cb3c7e6e288ab62221afe77131badccbdd99bb45d5d3c1fc5d1"
+    },
+    {
+      "path": "src/modules/orders/application/cr-ops-08-b2c-delivery-address.spec.ts",
+      "before": "88b546e6453c618dbc9254ba92fb15ff28e6197924f2fb3ed24110a4c4f0e0ed",
+      "after": "057ea26784793fdd3fec5d00c4b5d244658d1394b1411e64d29a79307acbf77b"
+    },
+    {
+      "path": "src/modules/orders/application/off-menu-order-backend-check.spec.ts",
+      "before": null,
+      "after": "1df1adc9473aeb9d7f792b38c748e25a8a0084dbda4a78c00cf171beaf307f2a"
+    },
+    {
+      "path": "src/modules/orders/application/order-historical-queries.ts",
+      "before": null,
+      "after": "1c51b2d6052f47fc6d78d5a0b467d761c26148b366fcb4f4705efe6800e800db"
+    },
+    {
+      "path": "src/modules/orders/application/pending-capture-recovery.spec.ts",
+      "before": null,
+      "after": "5f9d159ff021a71abbd18e182477d684e60f3c8f558f999db47cf2b9af62f2d3"
+    },
+    {
+      "path": "src/modules/orders/application/pending-capture-recovery.ts",
+      "before": null,
+      "after": "56630e6611372dbf127e2f3b722e73cdd1b84eea84c6d1d92afb2a0c033e01d3"
+    },
+    {
+      "path": "src/modules/orders/application/staff-order-capture-atomic.spec.ts",
+      "before": "b15b190bf49342fcdb7feaf9cd4694c1c484cb04427e785b2c99d7ccd830923f",
+      "after": "da43ffd1ef04746869a1d0e09abbffc38d5d89fe1934c183f738493f6951c1ca"
+    },
+    {
+      "path": "src/modules/orders/application/staff-order-capture-service.ts",
+      "before": "a6196ec71bead519f48595cdd9fc185c6cfa1f558d5ec03ec9afd9b06075253a",
+      "after": "737c93e7be27f59e006171675d14173436642735eab9d34c22e3742b72424e09"
+    },
+    {
+      "path": "src/modules/orders/domain/canonical-order-write.ts",
+      "before": "2c8506029ecaac22190b2cccb204fb5441b418f259e570baf92b5d54f6aaf691",
+      "after": "3038222b1f45202790bf35bcc72c051d59bb028577b25afec2fd06f5e2ac1e62"
+    },
+    {
+      "path": "src/modules/orders/infrastructure/staff-existing-order-repository.ts",
+      "before": "00091e1d1d8698d312c034d18c8e410a17bbd828d6147bdd27be4b20b8e4b088",
+      "after": "ea1b25f55f4504c52c859e0323b459559f69f0c076164ea0a5e91c40e44dccc2"
+    },
+    {
+      "path": "src/modules/weekly-menu/application/legacy-offer-write-guard.ts",
+      "before": "054abd048db55f3224ce53f6cecd5eb7ee666bd6f8f83631f251c9731736ee67",
+      "after": "543a257235ac9eb75a4504073e492598b6a7ed57d64ef42080c5f130dac26077"
+    },
+    {
+      "path": "src/modules/weekly-menu/application/offer-write-input.ts",
+      "before": "d461ec71f1dff7d55566304dcb6a4cbe0ab2a9369afe4cdaf2008d5cc828020a",
+      "after": "a235bf11ea2288ff0e9f55051e52bc87448e3ff35c73d992a7a08ebde14c89ce"
+    },
+    {
+      "path": "src/modules/weekly-menu/application/offer-write.functions.ts",
+      "before": "583437497db2774df37c9e8cf41f3f443b180a3d6cd0a665f311528fc78b08a1",
+      "after": "fce2459a3c2ee01376ebd3b6f0e6a3ced2fb8a2a0e4e4fe0ae6dbd42268f4bb1"
+    },
+    {
+      "path": "src/modules/weekly-menu/server/offer-write.server.spec.ts",
+      "before": "98b77b6e2ead34c05a2c628443bb088594a25154c5a7d96b0c54281c44910330",
+      "after": "9bdd9fe81e17a56226c767bdb244c6cc3b21c30faffdfff4b52af14c5935a060"
+    },
+    {
+      "path": "src/modules/weekly-menu/server/offer-write.server.ts",
+      "before": "83f34d8711854a408fc68c8e11ab7f9f096783b4993c00c7bd75145a610c25bd",
+      "after": "d340feb4db935a68a8e0349b7614304fc2401f88c49ac23427273774f8a27db4"
+    },
+    {
+      "path": "src/routes/_authenticated/admin.orders.tsx",
+      "before": "4adb4ec6bb8b64b296fc7f09a54c0492e7010b993ac94f81b0686e438825323e",
+      "after": "2e3696c3dedebdcdb13726e4bc7e1ab4e6e279021e32fe1bf83f0974b15d6faf"
+    },
+    {
+      "path": "supabase/migrations/20261011190421_eatclean_private_session_identity_bridge.sql",
+      "before": null,
+      "after": "4a2f65fd5595ed8658f9cfd92944b15caa2c938fe514a12d0a4b78fdd732799a"
+    },
+    {
+      "path": "supabase/migrations/20261012173000_eatclean_staff_order_offer_pricing_enforcement.sql",
+      "before": null,
+      "after": "ceeb3f93029641996776c5a737114b6a9f5be45661d1f559a0fdaef22517c924"
+    },
+    {
+      "path": "supabase/migrations/20261015113000_revoke_legacy_staff_order_capture.sql",
+      "before": null,
+      "after": "6eade0d6e50dee96227d6807d58e33922dec9844ff600f60717cf955ffbcc6e7"
+    },
+    {
+      "path": "supabase/migrations/20261015173000_cr_order_a5_lifecycle_session_bridge.sql",
+      "before": null,
+      "after": "46b416d698a041e4d7d587d2998a5af9116f17803d6fdf26859900963a4141ea"
+    },
+    {
+      "path": "supabase/migrations/20261015180000_cr_order_custom_batch_session_bridge.sql",
+      "before": null,
+      "after": "8b112eed8580412e466d4050b702494bb374b1d7bc55a5d2b5ed5c4af129ab7a"
+    },
+    {
+      "path": "supabase/migrations/20261016203000_cr_order_off_menu_admin_exception.sql",
+      "before": null,
+      "after": "9366fd1bd871106ce463425153d524bb8fde1710e0237693dd3075648838713e"
+    }
+  ],
+  "governanceBranch": "codex/gate7-p1-orders-532-reconciliation",
+  "governancePaths": [
+    "docs/99-internal/development-journal/2026-10-17-gate7-p1-orders-532.md",
+    "scripts/governance/release-json.spec.mjs",
+    "scripts/governance/release-p1-orders-532.json",
+    "scripts/governance/release-p1-orders-532.mjs",
+    "scripts/governance/release-p1-orders-532.spec.mjs",
+    "scripts/governance/release-plan.mjs",
+    "scripts/governance/release-reconciliation.mjs"
+  ],
+  "constraints": {
+    "productionSqlAuthorized": false,
+    "migrationExecutionAuthorized": false,
+    "productionWorkerApprovalGranted": false,
+    "orderActivationAuthorized": false,
+    "a5": "HARD_DISABLED",
+    "a4b": "CLOSED",
+    "oauthActivationAuthorized": false
+  }
+}

@@ -4,6 +4,12 @@ import {
   staff523ScopeId,
   authorizeStaff523,
 } from "./release-staff-orders-523.mjs";
+import {
+  P1_532,
+  p1Orders532Payload,
+  p1Orders532ScopeId,
+  authorizeP1Orders532,
+} from "./release-p1-orders-532.mjs";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -380,6 +386,41 @@ export function staff523Snapshot(ctx, base, diff, prs, currentMainSha) {
   }));
   return { ...s, diff };
 }
+export function p1Orders532Snapshot(ctx, base, diff, prs, currentMainSha) {
+  const s = activationSnapshot(ctx, base, diff, prs, currentMainSha);
+  s.productPr = api("pulls/532");
+  s.commits = s.commits.map((c) => ({
+    ...c,
+    parent: git("rev-parse", `${c.sha}^1`).trim(),
+    headSha: git("rev-parse", `${c.sha}^2`).trim(),
+    files: c.paths.map((p) => {
+      const fileHash = (rev) => {
+        const entry = git("ls-tree", rev, "--", p);
+        if (!entry) return null;
+        const blob = /^100(?:644|755) blob ([a-f0-9]{40})\t/.exec(entry);
+        demand(blob, "P1 #532 files must be regular Git blobs");
+        return hash(
+          execFileSync("git", ["cat-file", "blob", blob[1]], { maxBuffer: 16 * 1024 * 1024 }),
+        );
+      };
+      return { path: p, before: fileHash(`${c.sha}^1`), after: fileHash(c.sha) };
+    }),
+  }));
+  const productDiff = changedPaths(base.sha, P1_532.candidateSha);
+  s.productFiles = productDiff.paths.map((p) => {
+    const fileHash = (rev) => {
+      const entry = git("ls-tree", rev, "--", p);
+      if (!entry) return null;
+      const blob = /^100(?:644|755) blob ([a-f0-9]{40})\t/.exec(entry);
+      demand(blob, "P1 #532 files must be regular Git blobs");
+      return hash(
+        execFileSync("git", ["cat-file", "blob", blob[1]], { maxBuffer: 16 * 1024 * 1024 }),
+      );
+    };
+    return { path: p, before: fileHash(base.sha), after: fileHash(P1_532.candidateSha) };
+  });
+  return { ...s, diff };
+}
 export function prepare(ctx, publishing = false) {
   assertContext(ctx, policy);
   assertEnvironment(api(`environments/${policy.environment}`), policy);
@@ -415,21 +456,29 @@ export function prepare(ctx, publishing = false) {
       "Exact interval cannot authorize a different classification",
     );
     reconciliation =
-      base.sha === STAFF_523.baseline.sha
-        ? authorizeStaff523(
-            staff523Snapshot(ctx, base, diff, prs, currentMain),
+      base.sha === P1_532.baseline.sha
+        ? authorizeP1Orders532(
+            p1Orders532Snapshot(ctx, base, diff, prs, currentMain),
             inputs,
             ctx,
             api(`actions/runs/${ctx.runId}`),
             policy,
           )
-        : authorizeExactInterval(
-            exactIntervalSnapshot(ctx, base, diff, prs),
-            inputs,
-            ctx,
-            api(`actions/runs/${ctx.runId}`),
-            policy,
-          );
+        : base.sha === STAFF_523.baseline.sha
+          ? authorizeStaff523(
+              staff523Snapshot(ctx, base, diff, prs, currentMain),
+              inputs,
+              ctx,
+              api(`actions/runs/${ctx.runId}`),
+              policy,
+            )
+          : authorizeExactInterval(
+              exactIntervalSnapshot(ctx, base, diff, prs),
+              inputs,
+              ctx,
+              api(`actions/runs/${ctx.runId}`),
+              policy,
+            );
   }
   if (!initial && !exact && classification.decision === "REQUIRES_SEPARATE_AUTHORIZATION") {
     if (base.sha === TRACK_B_RECONCILIATION.baselineSha) {
@@ -561,6 +610,27 @@ export function prepare(ctx, publishing = false) {
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
+    if (process.argv[2] === "--p1-532-payload") {
+      const sha = api("git/ref/heads/main").object.sha;
+      const ctx = { repository: policy.repository, sha, runId: "" };
+      const base = baseline(ctx);
+      const diff = changedPaths(base.sha, sha);
+      const prs = diff.commits.map((c) => assertMergedCommit(pages(`commits/${c}/pulls`), c));
+      const payload = p1Orders532Payload(p1Orders532Snapshot(ctx, base, diff, prs, sha), policy);
+      fs.writeSync(
+        1,
+        JSON.stringify(
+          {
+            payload,
+            exactIntervalScope: JSON.stringify(canonical(payload)),
+            authorizationId: p1Orders532ScopeId(payload),
+          },
+          null,
+          2,
+        ) + "\n",
+      );
+      process.exit(0); // Read-only proposal; never dispatch or production authority.
+    }
     if (process.argv[2] === "--staff-523-payload") {
       const sha = api("git/ref/heads/main").object.sha;
       const ctx = { repository: policy.repository, sha, runId: "" };
