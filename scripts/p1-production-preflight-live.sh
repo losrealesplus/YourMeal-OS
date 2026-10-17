@@ -172,6 +172,16 @@ run_readonly_sql() {
     -c "BEGIN TRANSACTION READ ONLY; $query; COMMIT;"
 }
 
+# Helper de normalización estricta de booleanos (true, t, 1 => 0; otros => 1)
+is_true() {
+  local val
+  val="$(echo "${1:-}" | tr '[:upper:]' '[:lower:]' | xargs)"
+  case "$val" in
+    true|t|1) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 echo "===================================================================="
 echo "YOURMEAL OS — EATCLEAN P1 PREFLIGHT AUDIT (READ-ONLY)"
 echo "Target Project : $EXPECTED_PROJECT"
@@ -273,13 +283,18 @@ fi
 # ------------------------------------------------------------------------------
 PRIVILEGES_AUDIT="$(run_readonly_sql "
 SELECT 
-  has_table_privilege('postgres', 'supabase_migrations.schema_migrations', 'INSERT') || '|' ||
-  (to_regclass('public.orders') IS NOT NULL) || '|' ||
-  (to_regclass('public.order_items') IS NOT NULL) || '|' ||
-  (to_regclass('public.dishes') IS NOT NULL) || '|' ||
-  (to_regclass('public.weekly_menus') IS NOT NULL) || '|' ||
-  (to_regclass('public.kitchen_production_batches') IS NOT NULL);
+  CASE WHEN has_table_privilege('postgres', 'supabase_migrations.schema_migrations', 'INSERT') THEN 'true' ELSE 'false' END || '|' ||
+  CASE WHEN to_regclass('public.orders') IS NOT NULL THEN 'true' ELSE 'false' END || '|' ||
+  CASE WHEN to_regclass('public.order_items') IS NOT NULL THEN 'true' ELSE 'false' END || '|' ||
+  CASE WHEN to_regclass('public.dishes') IS NOT NULL THEN 'true' ELSE 'false' END || '|' ||
+  CASE WHEN to_regclass('public.weekly_menus') IS NOT NULL THEN 'true' ELSE 'false' END || '|' ||
+  CASE WHEN to_regclass('public.kitchen_production_batches') IS NOT NULL THEN 'true' ELSE 'false' END;
 ")"
+
+if [ -z "$PRIVILEGES_AUDIT" ]; then
+  echo "   ✗ PREREQUISITES: FAIL (Consulta de privilegios devolvió resultado vacío)!" >&2
+  exit 1
+fi
 
 CAN_INSERT_LEDGER="$(echo "$PRIVILEGES_AUDIT" | cut -d'|' -f1)"
 HAS_ORDERS="$(echo "$PRIVILEGES_AUDIT" | cut -d'|' -f2)"
@@ -290,15 +305,19 @@ HAS_BATCHES="$(echo "$PRIVILEGES_AUDIT" | cut -d'|' -f6)"
 
 echo ""
 echo "4. Permisos y Tablas Requeridas:"
-echo "   INSERT sobre schema_migrations     : $CAN_INSERT_LEDGER (esperado: t)"
-echo "   Tabla public.orders                : $HAS_ORDERS (esperado: t)"
-echo "   Tabla public.order_items           : $HAS_ORDER_ITEMS (esperado: t)"
-echo "   Tabla public.dishes                : $HAS_DISHES (esperado: t)"
-echo "   Tabla public.weekly_menus          : $HAS_MENUS (esperado: t)"
-echo "   Tabla kitchen_production_batches   : $HAS_BATCHES (esperado: t)"
+echo "   INSERT sobre schema_migrations     : $CAN_INSERT_LEDGER (esperado: true)"
+echo "   Tabla public.orders                : $HAS_ORDERS (esperado: true)"
+echo "   Tabla public.order_items           : $HAS_ORDER_ITEMS (esperado: true)"
+echo "   Tabla public.dishes                : $HAS_DISHES (esperado: true)"
+echo "   Tabla public.weekly_menus          : $HAS_MENUS (esperado: true)"
+echo "   Tabla kitchen_production_batches   : $HAS_BATCHES (esperado: true)"
 
-if [ "$CAN_INSERT_LEDGER" = "t" ] && [ "$HAS_ORDERS" = "t" ] && [ "$HAS_ORDER_ITEMS" = "t" ] && \
-   [ "$HAS_DISHES" = "t" ] && [ "$HAS_MENUS" = "t" ] && [ "$HAS_BATCHES" = "t" ]; then
+if is_true "$CAN_INSERT_LEDGER" && \
+   is_true "$HAS_ORDERS" && \
+   is_true "$HAS_ORDER_ITEMS" && \
+   is_true "$HAS_DISHES" && \
+   is_true "$HAS_MENUS" && \
+   is_true "$HAS_BATCHES"; then
   echo "   ✓ PREREQUISITES: PASS"
 else
   echo "   ✗ PREREQUISITES: DISCREPANCIA DETECTADA!" >&2
