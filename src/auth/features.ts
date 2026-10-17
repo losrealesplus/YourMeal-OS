@@ -60,7 +60,7 @@ export function isGoogleOAuthEnabled(): boolean {
   return (
     flagFromEnv("VITE_AUTH_GOOGLE_ENABLED") ??
     flagFromEnv("VITE_AUTH_OAUTH_SOCIAL_ENABLED") ??
-    false
+    true
   );
 }
 

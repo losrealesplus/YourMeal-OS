@@ -409,19 +409,24 @@ export function SocialAuthButtons() {
 
       <div className="mt-6 grid gap-3">
         {googleEnabled && (
-          <button
-            type="button"
-            disabled={busyProvider !== null}
-            onClick={() => void handleOAuth("google")}
-            className="flex items-center justify-center gap-3 border border-border/80 bg-white text-sm font-semibold py-3.5 px-4 rounded-2xl hover:bg-muted/40 hover:border-foreground/20 active:scale-[0.99] transition-all shadow-2xs disabled:opacity-60 cursor-pointer text-foreground"
-          >
-            {busyProvider === "google" ? (
-              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-            ) : (
-              <GoogleIcon />
-            )}
-            <span>{t("auth:withGoogle")}</span>
-          </button>
+          <div>
+            <button
+              type="button"
+              disabled={busyProvider !== null}
+              onClick={() => void handleOAuth("google")}
+              className="w-full flex items-center justify-center gap-3 border border-border/80 bg-white text-sm font-semibold py-3.5 px-4 rounded-2xl hover:bg-muted/40 hover:border-foreground/20 active:scale-[0.99] transition-all shadow-2xs disabled:opacity-60 cursor-pointer text-foreground"
+            >
+              {busyProvider === "google" ? (
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              ) : (
+                <GoogleIcon />
+              )}
+              <span>{t("auth:withGoogle")}</span>
+            </button>
+            <p className="text-[11px] text-muted-foreground text-center mt-1.5">
+              Acceso con Google en pruebas
+            </p>
+          </div>
         )}
 
         {appleEnabled && (

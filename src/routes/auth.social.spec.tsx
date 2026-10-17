@@ -67,6 +67,9 @@ describe("CX-01C.5 · SocialAuthButtons UI Component & Integration", () => {
     expect(html).toContain("#FBBC05"); // Google yellow
     expect(html).toContain("#EA4335"); // Google red
 
+    // Discrete Warm Premium testing notice
+    expect(html).toContain("Acceso con Google en pruebas");
+
     // Apple button remains absent
     expect(html).not.toContain("Continuar con Apple");
   });

@@ -115,8 +115,13 @@ describe("CX-01C · Google OAuth Authentication Scenarios", () => {
     // Apple OAuth is disabled
     expect(isAppleOAuthEnabled()).toBe(false);
 
-    // When Google OAuth flag is false (default), Google button is hidden
+    // Google OAuth is enabled for EatClean (CX-01C)
+    expect(isGoogleOAuthEnabled()).toBe(true);
+
+    // Can be specifically disabled via flag
+    vi.stubEnv("VITE_AUTH_GOOGLE_ENABLED", "false");
     expect(isGoogleOAuthEnabled()).toBe(false);
+    vi.unstubAllEnvs();
 
     // Supabase provider mapping for Google is standard
     expect(toSupabaseOAuthProvider("google")).toBe("google");
