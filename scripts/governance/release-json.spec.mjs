@@ -66,6 +66,8 @@ test("CLI policy, event and API diagnostics emit no raw payload or secrets", () 
       "release-staff-orders-523.json",
       "release-p1-orders-532.mjs",
       "release-p1-orders-532.json",
+      "release-cx-01c-google-536.mjs",
+      "release-cx-01c-google-536.json",
       "release-contract.mjs",
       "release-activation.mjs",
       "release-reconciliation.mjs",

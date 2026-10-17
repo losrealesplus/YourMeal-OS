@@ -1,0 +1,55 @@
+{
+  "repository": "losrealesplus/YourMeal-OS",
+  "environment": "production-worker",
+  "reviewerId": 292604102,
+  "reviewerLogin": "losrealesplus",
+  "baseline": {
+    "sha": "0f3420821a536d178251317f171fe47d5968dd15",
+    "versionId": "cb855c40-4365-4000-bf57-8df04b922be0",
+    "deploymentId": 7140838944
+  },
+  "candidateSha": "c3e10665ca60efb93e52a0db2a485a824000efb7",
+  "productPr": 536,
+  "productHeadSha": "bdb27b59c175a4e39755b1759c1f4f026a66a921",
+  "productFiles": [
+    {
+      "path": "src/auth/features.ts",
+      "before": "f8eabce4f6a0b34e089a5d702f1527ae21ff3650284f7db84dc827a9a6036fd6",
+      "after": "629cda0da1522738f74cabc2cc31e1a0c036308ff2582085fafb173d9e50f951"
+    },
+    {
+      "path": "src/auth/google-oauth-flow.spec.ts",
+      "before": null,
+      "after": "e164fe33c9a3746a2c77ed1643771675749ef82640a75ee626840e72285dcd96"
+    },
+    {
+      "path": "src/routes/auth.social.spec.tsx",
+      "before": "c1b122e72b6ae116cb90c3e6b12fedba2232e51d04f8761fc9bf0a4d12cf2111",
+      "after": "c3d6c33e44c3ab1ee45ad18b10f21ba2a8da0c98e9654a0cc4e9eecc42ee6734"
+    },
+    {
+      "path": "src/routes/auth.tsx",
+      "before": "94b6ef9a6a242e6cb7946e752b9f6b596e26f9cc345c5398ddc0f599145725a1",
+      "after": "60af07a657aad091251e4c892ef31ba0f334eab9a96b733b532c0ba76c426c2c"
+    }
+  ],
+  "governanceBranch": "codex/gate7-cx-01c-google-536-reconciliation",
+  "governancePaths": [
+    "docs/99-internal/development-journal/2026-10-17-gate7-cx-01c-google-536.md",
+    "scripts/governance/release-cx-01c-google-536.json",
+    "scripts/governance/release-cx-01c-google-536.mjs",
+    "scripts/governance/release-cx-01c-google-536.spec.mjs",
+    "scripts/governance/release-json.spec.mjs",
+    "scripts/governance/release-plan.mjs",
+    "scripts/governance/release-reconciliation.mjs"
+  ],
+  "constraints": {
+    "productionSqlAuthorized": false,
+    "migrationExecutionAuthorized": false,
+    "productionWorkerApprovalGranted": false,
+    "orderActivationAuthorized": false,
+    "a5": "HARD_DISABLED",
+    "a4b": "CLOSED",
+    "oauthActivationAuthorized": true
+  }
+}
