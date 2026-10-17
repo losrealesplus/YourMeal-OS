@@ -1,9 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import {
+  ArrowRight,
   CalendarDays,
   ChevronRight,
   ClipboardList,
+  Clock,
   Heart,
   MapPin,
   Sparkles,
@@ -47,13 +49,15 @@ export type CustomerHomeState =
   | "new_profile"
   | "missing_address"
   | "unprogrammed"
+  | "draft_pending"
   | "confirmed_delivery";
 
 export interface CustomerHomeContextData {
   hasProfile: boolean;
   hasAddress: boolean;
   totalPortions: number;
-  hasUpcomingDelivery: boolean;
+  hasUpcomingConfirmed: boolean;
+  hasDraftOrder?: boolean;
 }
 
 export function getTimeOfDayGreeting(now: Date = new Date()): {
@@ -77,8 +81,11 @@ export function resolveCustomerHomeState(data: CustomerHomeContextData): Custome
   if (!data.hasAddress) {
     return "missing_address";
   }
-  if (data.totalPortions > 0 || data.hasUpcomingDelivery) {
+  if (data.totalPortions > 0 || data.hasUpcomingConfirmed) {
     return "confirmed_delivery";
+  }
+  if (data.hasDraftOrder) {
+    return "draft_pending";
   }
   return "unprogrammed";
 }
@@ -100,6 +107,14 @@ export function getAdaptiveCTA(state: CustomerHomeState) {
         ctaLabel: "Añadir dirección de entrega",
         ctaTo: "/app/addresses" as const,
         ctaIcon: MapPin,
+      };
+    case "draft_pending":
+      return {
+        headline: "Tienes un pedido pendiente",
+        subtitle: "Confirma tu selección para asegurar tus platos de la semana antes del cierre de pedidos.",
+        ctaLabel: "Completar mi pedido",
+        ctaTo: "/app/orders" as const,
+        ctaIcon: ClipboardList,
       };
     case "unprogrammed":
       return {
@@ -162,8 +177,17 @@ function HomeBody({ state }: { state: DashboardStateId }) {
   const weekStart = utcWeekStartMonday();
 
   // Primary data sources for Customer Experience
-  const { data: upcoming, isLoading: upcomingLoading } = useUpcomingDelivery();
-  const { data: customerOrders, isLoading: ordersLoading } = useCustomerOrders();
+  const {
+    data: upcoming,
+    isLoading: upcomingLoading,
+    refetch: refetchUpcoming,
+  } = useUpcomingDelivery();
+  const {
+    data: customerOrders,
+    isLoading: ordersLoading,
+    error: ordersError,
+    refetch: refetchOrders,
+  } = useCustomerOrders();
   const { profile: profileQuery } = useCustomerSelfProfile();
   // Fetch weekly menu for catalog awareness
   useWeeklyMenu(weekStart);
@@ -183,13 +207,36 @@ function HomeBody({ state }: { state: DashboardStateId }) {
     );
   }
 
-  // Initial loading shimmer when essential customer data is loading
-  const isInitialLoading = profileQuery.isLoading && !profileQuery.data && upcomingLoading;
+  // 1. Initial loading shimmer: protect against displaying "semana sin organizar" while data is still loading
+  const isInitialLoading =
+    (profileQuery.isLoading && !profileQuery.data) ||
+    (ordersLoading && customerOrders === undefined) ||
+    (upcomingLoading && upcoming === undefined);
+
   if (isInitialLoading && state === "default") {
     return <DashboardSkeleton label={t("loadingDashboard")} />;
   }
 
-  // 1. Resolve Customer Name
+  // 2. Query error handling: do not interpret query failure as confirmed absence of orders
+  const hasQueryError =
+    (Boolean(profileQuery.error) && !profileQuery.data) ||
+    (Boolean(ordersError) && customerOrders === undefined);
+
+  if (hasQueryError && state === "default") {
+    return (
+      <DashboardError
+        title="No pudimos cargar tus pedidos"
+        hint="Comprueba tu conexión e inténtalo de nuevo para ver el estado de tu semana."
+        retryLabel={t("retry")}
+        onRetry={() => {
+          void refetchOrders();
+          void refetchUpcoming();
+        }}
+      />
+    );
+  }
+
+  // 3. Resolve Customer Name
   const profileName = profileQuery.data?.displayName?.trim();
   const authName =
     (user?.user_metadata?.full_name as string | undefined)?.trim() ??
@@ -199,24 +246,30 @@ function HomeBody({ state }: { state: DashboardStateId }) {
   const fullName = profileName || authName || "";
   const firstName = fullName.split(" ")[0] || "";
 
-  // 2. Daytime Greeting
+  // 4. Daytime Greeting
   const { greeting, emoji } = getTimeOfDayGreeting();
   const greetingText = firstName ? `${greeting}, ${firstName}!` : `${greeting}!`;
 
-  // 3. Addresses & Profile completeness
+  // 5. Addresses & Profile completeness
   const activeAddresses = profileQuery.data?.addresses?.filter((a) => !a.archived) ?? [];
   const hasProfile = Boolean(profileName);
   const hasAddress = activeAddresses.length > 0;
-  const hasUpcoming = upcoming?.kind === "upcoming";
+  const hasUpcomingConfirmed =
+    upcoming?.kind === "upcoming" && upcoming.delivery.phase !== "scheduled";
 
-  // 4. Weekly schedule computation without data invention
-  const currentWeekOrders = (customerOrders ?? []).filter(
+  // 6. Weekly schedule computation without data invention
+  // Filter active week orders (excluding cancelled)
+  const activeWeekOrders = (customerOrders ?? []).filter(
     (o) => o.weekStart === weekStart && o.status !== "cancelled",
   );
 
+  // Strictly differentiate confirmed vs draft orders
+  const confirmedWeekOrders = activeWeekOrders.filter((o) => o.status !== "draft");
+  const draftWeekOrders = activeWeekOrders.filter((o) => o.status === "draft");
+
   let totalPortions = 0;
   const scheduledDayDates = new Set<string>();
-  for (const order of currentWeekOrders) {
+  for (const order of confirmedWeekOrders) {
     totalPortions += order.itemCount;
     if (order.dayDates && order.dayDates.length > 0) {
       for (const d of order.dayDates) {
@@ -226,10 +279,18 @@ function HomeBody({ state }: { state: DashboardStateId }) {
       scheduledDayDates.add(order.deliveryDate);
     }
   }
-  const scheduledDays = scheduledDayDates.size;
-  const deliveryCount = currentWeekOrders.length;
 
-  // 5. Contextual State Resolution
+  let draftPortions = 0;
+  for (const order of draftWeekOrders) {
+    draftPortions += order.itemCount;
+  }
+
+  const scheduledDays = scheduledDayDates.size;
+  // Accurately labeled metric: confirmed orders count (never equating orders with deliveries)
+  const confirmedOrdersCount = confirmedWeekOrders.length;
+  const hasDraftOrder = draftWeekOrders.length > 0;
+
+  // 7. Contextual State Resolution
   let resolvedState: CustomerHomeState;
   if (state === "empty") {
     resolvedState = "unprogrammed";
@@ -239,8 +300,10 @@ function HomeBody({ state }: { state: DashboardStateId }) {
     resolvedState = "new_profile";
   } else if (profileQuery.isSuccess && !hasAddress) {
     resolvedState = "missing_address";
-  } else if (totalPortions > 0 || hasUpcoming) {
+  } else if (totalPortions > 0 || hasUpcomingConfirmed) {
     resolvedState = "confirmed_delivery";
+  } else if (hasDraftOrder) {
+    resolvedState = "draft_pending";
   } else {
     resolvedState = "unprogrammed";
   }
@@ -318,10 +381,30 @@ function HomeBody({ state }: { state: DashboardStateId }) {
                 <span className="text-lg font-extrabold text-foreground tabular-nums">{totalPortions}</span>
               </div>
               <div className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-secondary/50 border border-border/40">
-                <span className="text-[11px] text-muted-foreground font-medium">Entregas</span>
-                <span className="text-lg font-extrabold text-foreground tabular-nums">{deliveryCount}</span>
+                <span className="text-[11px] text-muted-foreground font-medium">Pedidos</span>
+                <span className="text-lg font-extrabold text-foreground tabular-nums">{confirmedOrdersCount}</span>
               </div>
             </div>
+
+            {/* Notice for additional draft orders if any */}
+            {hasDraftOrder && (
+              <div className="flex items-center justify-between p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs">
+                <div className="flex items-center gap-2 text-amber-800 dark:text-amber-200">
+                  <Clock className="size-4 shrink-0 text-amber-600" />
+                  <span>
+                    {draftWeekOrders.length === 1
+                      ? "1 pedido adicional en borrador"
+                      : `${draftWeekOrders.length} pedidos adicionales en borrador`}
+                  </span>
+                </div>
+                <Link
+                  to="/app/orders"
+                  className="font-bold text-amber-900 dark:text-amber-100 underline hover:no-underline text-xs"
+                >
+                  Ver
+                </Link>
+              </div>
+            )}
 
             {/* 7-Day Visual Strip */}
             <div className="grid grid-cols-7 gap-1.5 pt-1">
@@ -348,6 +431,40 @@ function HomeBody({ state }: { state: DashboardStateId }) {
                 );
               })}
             </div>
+          </section>
+        ) : hasDraftOrder ? (
+          <section className="surface-raised rounded-3xl border border-amber-500/30 bg-amber-50/40 dark:bg-amber-950/20 p-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-amber-700 dark:text-amber-400">
+                Ritmo semanal · Borrador
+              </p>
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-400">
+                <Clock className="size-3.5" />
+                <span>Pendiente de confirmar</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/20">
+                <span className="text-[11px] text-muted-foreground font-medium">Raciones elegidas</span>
+                <span className="text-lg font-extrabold text-foreground tabular-nums">{draftPortions}</span>
+              </div>
+              <div className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/20">
+                <span className="text-[11px] text-muted-foreground font-medium">Borradores</span>
+                <span className="text-lg font-extrabold text-foreground tabular-nums">{draftWeekOrders.length}</span>
+              </div>
+            </div>
+
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Tus platos seleccionados no están confirmados todavía. Finaliza tu pedido para asegurar la elaboración en cocina.
+            </p>
+            <Link
+              to="/app/orders"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:underline"
+            >
+              <span>Completar pedido ahora</span>
+              <ArrowRight className="size-3.5" />
+            </Link>
           </section>
         ) : (
           <section className="surface-raised rounded-3xl border border-border/70 bg-card p-5 space-y-3">

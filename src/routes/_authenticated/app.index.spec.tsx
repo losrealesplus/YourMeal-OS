@@ -38,24 +38,29 @@ vi.mock("@/hooks/use-auth", () => ({
     tenantId: "tenant-eatclean-1",
   }),
 }));
-
 let mockUpcomingDelivery: any = { kind: "none" };
 let mockUpcomingLoading = false;
+let mockUpcomingError: any = null;
 
 vi.mock("@/hooks/use-upcoming-delivery", () => ({
   useUpcomingDelivery: () => ({
     data: mockUpcomingDelivery,
     isLoading: mockUpcomingLoading,
+    error: mockUpcomingError,
+    refetch: vi.fn(),
   }),
 }));
 
-let mockCustomerOrders: any[] = [];
+let mockCustomerOrders: any = [];
 let mockOrdersLoading = false;
+let mockOrdersError: any = null;
 
 vi.mock("@/hooks/use-customer-orders", () => ({
   useCustomerOrders: () => ({
     data: mockCustomerOrders,
     isLoading: mockOrdersLoading,
+    error: mockOrdersError,
+    refetch: vi.fn(),
   }),
 }));
 
@@ -75,6 +80,7 @@ let mockProfileData: any = {
 };
 let mockProfileSuccess = true;
 let mockProfileLoading = false;
+let mockProfileError: any = null;
 
 vi.mock("@/hooks/use-customer-self-profile", () => ({
   useCustomerSelfProfile: () => ({
@@ -82,6 +88,7 @@ vi.mock("@/hooks/use-customer-self-profile", () => ({
       data: mockProfileData,
       isSuccess: mockProfileSuccess,
       isLoading: mockProfileLoading,
+      error: mockProfileError,
     },
   }),
 }));
@@ -157,14 +164,14 @@ describe("Customer Home (CX-01A) Logic & State Engine", () => {
     });
   });
 
-  it("resolves the 4 adaptive customer states accurately without simulating fake data", () => {
+  it("resolves the 5 adaptive customer states accurately without simulating fake data", () => {
     // State 1: New Profile
     expect(
       resolveCustomerHomeState({
         hasProfile: false,
         hasAddress: false,
         totalPortions: 0,
-        hasUpcomingDelivery: false,
+        hasUpcomingConfirmed: false,
       }),
     ).toBe("new_profile");
 
@@ -174,27 +181,39 @@ describe("Customer Home (CX-01A) Logic & State Engine", () => {
         hasProfile: true,
         hasAddress: false,
         totalPortions: 0,
-        hasUpcomingDelivery: false,
+        hasUpcomingConfirmed: false,
       }),
     ).toBe("missing_address");
 
-    // State 3: Unprogrammed (profile and address ready, but 0 portions and no upcoming delivery)
+    // State 3: Draft Pending (has draft order, but 0 confirmed portions)
     expect(
       resolveCustomerHomeState({
         hasProfile: true,
         hasAddress: true,
         totalPortions: 0,
-        hasUpcomingDelivery: false,
+        hasUpcomingConfirmed: false,
+        hasDraftOrder: true,
+      }),
+    ).toBe("draft_pending");
+
+    // State 4: Unprogrammed (profile and address ready, but 0 portions and no draft or upcoming confirmed)
+    expect(
+      resolveCustomerHomeState({
+        hasProfile: true,
+        hasAddress: true,
+        totalPortions: 0,
+        hasUpcomingConfirmed: false,
+        hasDraftOrder: false,
       }),
     ).toBe("unprogrammed");
 
-    // State 4: Confirmed Delivery (scheduled portions or upcoming delivery)
+    // State 5: Confirmed Delivery (scheduled confirmed portions or upcoming confirmed delivery)
     expect(
       resolveCustomerHomeState({
         hasProfile: true,
         hasAddress: true,
         totalPortions: 4,
-        hasUpcomingDelivery: false,
+        hasUpcomingConfirmed: false,
       }),
     ).toBe("confirmed_delivery");
 
@@ -203,7 +222,7 @@ describe("Customer Home (CX-01A) Logic & State Engine", () => {
         hasProfile: true,
         hasAddress: true,
         totalPortions: 0,
-        hasUpcomingDelivery: true,
+        hasUpcomingConfirmed: true,
       }),
     ).toBe("confirmed_delivery");
   });
@@ -216,6 +235,11 @@ describe("Customer Home (CX-01A) Logic & State Engine", () => {
     const cta2 = getAdaptiveCTA("missing_address");
     expect(cta2.ctaTo).toBe("/app/addresses");
     expect(cta2.ctaLabel).toBe("Añadir dirección de entrega");
+
+    const ctaDraft = getAdaptiveCTA("draft_pending");
+    expect(ctaDraft.ctaTo).toBe("/app/orders");
+    expect(ctaDraft.ctaLabel).toBe("Completar mi pedido");
+    expect(ctaDraft.headline).toBe("Tienes un pedido pendiente");
 
     const cta3 = getAdaptiveCTA("unprogrammed");
     expect(cta3.ctaTo).toBe("/app/schedule");
@@ -255,8 +279,11 @@ describe("Customer Home (CX-01A) Presentation Rendering", () => {
     };
     mockProfileSuccess = true;
     mockProfileLoading = false;
+    mockProfileError = null;
     mockOrdersLoading = false;
+    mockOrdersError = null;
     mockUpcomingLoading = false;
+    mockUpcomingError = null;
   });
 
   it("renders State 1 (New Profile): prompts profile setup when displayName is missing", () => {
@@ -287,7 +314,7 @@ describe("Customer Home (CX-01A) Presentation Rendering", () => {
     expect(html).toContain('href="/app/addresses"');
   });
 
-  it("renders State 3 (Unprogrammed): prompts meal selection with clean empty states", () => {
+  it("renders State 3 (Unprogrammed): prompts meal selection with clean empty states when customer is genuinely without orders", () => {
     mockProfileData = {
       customerId: "cust-1",
       tenantId: "tenant-eatclean-1",
@@ -301,6 +328,8 @@ describe("Customer Home (CX-01A) Presentation Rendering", () => {
       ],
     };
     mockCustomerOrders = [];
+    mockOrdersLoading = false;
+    mockOrdersError = null;
     mockUpcomingDelivery = { kind: "none" };
 
     const html = renderToString(<Component />);
@@ -308,10 +337,53 @@ describe("Customer Home (CX-01A) Presentation Rendering", () => {
     expect(html).toContain("Elegir mis platos");
     expect(html).toContain('href="/app/schedule"');
     expect(html).toContain("Sin entregas programadas");
+    expect(html).toContain("0 raciones esta semana");
     expect(html).toContain("Planifica de 1 a 7 días según tu ritmo de vida");
   });
 
-  it("renders State 4 (Confirmed/Scheduled): displays real order metrics and weekly progress strip", () => {
+  it("renders State: Draft Pending: shows draft notification and CTA when customer has only an unconfirmed draft order", () => {
+    const today = new Date();
+    const day = today.getUTCDay();
+    const offset = day === 0 ? -6 : 1 - day;
+    const monday = new Date(today);
+    monday.setUTCDate(today.getUTCDate() + offset);
+    const weekStart = monday.toISOString().slice(0, 10);
+
+    const tuesday = new Date(monday);
+    tuesday.setUTCDate(monday.getUTCDate() + 1);
+    const dayTue = tuesday.toISOString().slice(0, 10);
+
+    mockCustomerOrders = [
+      {
+        id: "ord-draft-1",
+        weekStart,
+        status: "draft",
+        itemCount: 4,
+        deliveryDate: dayTue,
+        dayDates: [dayTue],
+      },
+    ];
+    mockUpcomingDelivery = { kind: "none" };
+
+    const html = renderToString(<Component />);
+    // Hero shows pending draft CTA
+    expect(html).toContain("Tienes un pedido pendiente");
+    expect(html).toContain("Completar mi pedido");
+    expect(html).toContain('href="/app/orders"');
+
+    // Weekly strip shows draft awareness, not confirmed schedule
+    expect(html).toContain("Ritmo semanal · Borrador");
+    expect(html).toContain("Pendiente de confirmar");
+    expect(html).toContain("4"); // draft portions
+    expect(html).toContain("1"); // draft count
+    expect(html).toContain("Tus platos seleccionados no están confirmados todavía");
+
+    // Must NOT present as confirmed delivery
+    expect(html).not.toContain("Todo bajo control");
+    expect(html).not.toContain("Tu semana está por organizar");
+  });
+
+  it("renders State 4 (Confirmed/Scheduled): displays real order metrics accurately labeled as Pedidos (never equating orders with deliveries)", () => {
     // Current Monday
     const today = new Date();
     const day = today.getUTCDay();
@@ -366,13 +438,130 @@ describe("Customer Home (CX-01A) Presentation Rendering", () => {
     // Real weekly metrics computed strictly without simulation
     expect(html).toContain("Ritmo semanal");
     expect(html).toContain("2"); // 2 scheduled days (Tue, Thu)
-    expect(html).toContain("5"); // 5 total portions (2 + 3)
-    expect(html).toContain("1"); // 1 delivery
+    expect(html).toContain("5"); // 5 total portions
+    expect(html).toContain("Pedidos"); // Accurately labeled as Pedidos
+    expect(html).toContain("1"); // 1 confirmed order
 
     // Upcoming delivery card details
     expect(html).toContain("13:00 - 15:00");
     expect(html).toContain("Oficina · Madrid");
     expect(html).toContain("48.5 €");
+  });
+
+  it("renders multi-day order correctly: single order with multiple days aggregates days into scheduledDays and counts exactly 1 Pedido", () => {
+    const today = new Date();
+    const day = today.getUTCDay();
+    const offset = day === 0 ? -6 : 1 - day;
+    const monday = new Date(today);
+    monday.setUTCDate(today.getUTCDate() + offset);
+    const weekStart = monday.toISOString().slice(0, 10);
+
+    const tuesday = new Date(monday);
+    tuesday.setUTCDate(monday.getUTCDate() + 1);
+    const dayTue = tuesday.toISOString().slice(0, 10);
+
+    const wednesday = new Date(monday);
+    wednesday.setUTCDate(monday.getUTCDate() + 2);
+    const dayWed = wednesday.toISOString().slice(0, 10);
+
+    const thursday = new Date(monday);
+    thursday.setUTCDate(monday.getUTCDate() + 3);
+    const dayThu = thursday.toISOString().slice(0, 10);
+
+    mockCustomerOrders = [
+      {
+        id: "ord-multi-day",
+        weekStart,
+        status: "confirmed",
+        itemCount: 6,
+        deliveryDate: dayTue,
+        dayDates: [dayTue, dayWed, dayThu],
+      },
+    ];
+
+    const html = renderToString(<Component />);
+    const cleanHtml = html.replace(/<!--.*?-->/g, "");
+    expect(cleanHtml).toContain("3 días activos");
+    expect(html).toContain("6"); // 6 portions
+    expect(html).toContain("Pedidos");
+    expect(html).toContain("1"); // Exactly 1 order, NOT 3
+  });
+
+  it("renders multiple orders in the same week: aggregates unique days, sums all portions, and counts total confirmed orders", () => {
+    const today = new Date();
+    const day = today.getUTCDay();
+    const offset = day === 0 ? -6 : 1 - day;
+    const monday = new Date(today);
+    monday.setUTCDate(today.getUTCDate() + offset);
+    const weekStart = monday.toISOString().slice(0, 10);
+
+    const tuesday = new Date(monday);
+    tuesday.setUTCDate(monday.getUTCDate() + 1);
+    const dayTue = tuesday.toISOString().slice(0, 10);
+
+    const wednesday = new Date(monday);
+    wednesday.setUTCDate(monday.getUTCDate() + 2);
+    const dayWed = wednesday.toISOString().slice(0, 10);
+
+    const thursday = new Date(monday);
+    thursday.setUTCDate(monday.getUTCDate() + 3);
+    const dayThu = thursday.toISOString().slice(0, 10);
+
+    // Two confirmed orders:
+    // Order 1: Tue & Wed (4 portions)
+    // Order 2: Wed & Thu (3 portions) -> Wed overlaps, unique days = 3!
+    mockCustomerOrders = [
+      {
+        id: "ord-1",
+        weekStart,
+        status: "confirmed",
+        itemCount: 4,
+        deliveryDate: dayTue,
+        dayDates: [dayTue, dayWed],
+      },
+      {
+        id: "ord-2",
+        weekStart,
+        status: "in_production",
+        itemCount: 3,
+        deliveryDate: dayWed,
+        dayDates: [dayWed, dayThu],
+      },
+    ];
+
+    const html = renderToString(<Component />);
+    const cleanHtml = html.replace(/<!--.*?-->/g, "");
+    expect(cleanHtml).toContain("3 días activos");
+    expect(html).toContain("7"); // 4 + 3 portions
+    expect(html).toContain("Pedidos");
+    expect(html).toContain("2"); // 2 confirmed orders
+  });
+
+  it("renders Skeleton loading state when customer orders query is pending (never shows semana sin organizar while loading)", () => {
+    mockCustomerOrders = undefined;
+    mockOrdersLoading = true;
+
+    const html = renderToString(<Component />);
+    // Displays shimmer / skeleton
+    expect(html).toContain("loadingDashboard");
+    // Must NOT prematurely show unprogrammed / missing state
+    expect(html).not.toContain("Tu semana está por organizar");
+    expect(html).not.toContain("Todo bajo control");
+    expect(html).not.toContain("Tienes un pedido pendiente");
+  });
+
+  it("renders Error recovery state when customer orders query fails (never shows semana sin organizar on error)", () => {
+    mockCustomerOrders = undefined;
+    mockOrdersLoading = false;
+    mockOrdersError = new Error("Network connection error");
+
+    const html = renderToString(<Component />);
+    // Displays error UI with retry action
+    expect(html).toContain("No pudimos cargar tus pedidos");
+    expect(html).toContain("Comprueba tu conexión e inténtalo de nuevo");
+    // Must NOT masquerade error as empty state
+    expect(html).not.toContain("Tu semana está por organizar");
+    expect(html).not.toContain("Todo bajo control");
   });
 
   it("renders Editorial Gastro Card and Quick Action Navigation Grid", () => {
