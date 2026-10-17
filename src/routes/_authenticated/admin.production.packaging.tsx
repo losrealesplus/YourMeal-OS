@@ -23,6 +23,7 @@ import {
 import { cn } from "@/lib/utils";
 
 import { DietaryBadges } from "@/components/operations/dietary-badges";
+import { DishSafetyAlert } from "@/components/operations/dish-safety-alert";
 import type { AllergenSnapshotState } from "@/modules/orders/domain/order-item-read-model";
 import type { OrderDietarySnapshot } from "@/types/dietary";
 
@@ -200,24 +201,13 @@ function PackagingPage() {
                             </Badge>
                           ) : null}
                         </div>
-                        {l.criticalAlert ? (
-                          <Badge variant="destructive" className="h-4 px-1 text-[10px] font-bold">
-                            🔴 ALERTA: {l.criticalAlert}
-                          </Badge>
-                        ) : null}
-                        {l.kind === "custom" || l.allergenState === "UNKNOWN" ? (
-                          <span className="block text-[11px] font-medium text-amber-700 dark:text-amber-400">
-                            ⚠️ Alérgenos sin declarar · Receta no vinculada
-                          </span>
-                        ) : l.allergenState === "HISTORICAL_UNAVAILABLE" ? (
-                          <span className="block text-[11px] text-muted-foreground italic">
-                            Declaración histórica no disponible
-                          </span>
-                        ) : l.allergens.length > 0 ? (
-                          <span className="block text-[11px] text-muted-foreground">
-                            Alérgenos: {l.allergens.join(", ")}
-                          </span>
-                        ) : null}
+                        <DishSafetyAlert
+                          isCustom={l.isCustom}
+                          allergenState={l.allergenState}
+                          allergens={l.allergens}
+                          customerAllergens={bag.dietarySnapshot?.allergens}
+                          compact
+                        />
                         {l.note ? (
                           <span className="block text-xs italic text-amber-700 dark:text-amber-400 font-medium">
                             🟡 {l.note}

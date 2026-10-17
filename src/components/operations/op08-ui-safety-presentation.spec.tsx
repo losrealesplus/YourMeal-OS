@@ -1,22 +1,22 @@
 import { describe, expect, it } from "vitest";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { Badge } from "@/components/ui/badge";
 import { DietaryBadges } from "./dietary-badges";
-import { DishAllergenDeclaration } from "./dish-allergen-declaration";
+import { DishSafetyAlert, getCriticalAllergens } from "./dish-safety-alert";
 import type { OrderDietarySnapshot } from "@/types/dietary";
-import type { AllergenSnapshotState } from "@/modules/orders/domain/order-item-read-model";
 
 /**
  * OP-08 UI Safety Presentation Test Suite
- * Validates rendering of:
- * 1. Critical safety allergens (🔴 ALERTA)
- * 2. Unknown allergens (UNKNOWN -> Alérgenos sin declarar)
- * 3. Custom preparations (Custom / PERSONALIZADO)
- * 4. Missing historical data (HISTORICAL_UNAVAILABLE)
- * 5. Strict absence certification: UNKNOWN is never presented as safe
+ * Validates uniform food safety presentations across Kitchen and Packaging dialogs:
+ * 1. Critical allergy matching badge (🔴 ALERTA: ...)
+ * 2. UNKNOWN allergen state (preserves unlinked recipe warning, never safe)
+ * 3. Custom preparations (Custom badge + unlinked recipe warning)
+ * 4. HISTORICAL_UNAVAILABLE state (shows historical unavailable notice)
+ * 5. Declared allergens (renders allergen list)
+ * 6. Custom preparations override DECLARED state (strict food safety for free items)
+ * 7. Compact rendering for dense packaging cards
  */
-describe("OP-08 UI Safety Presentation", () => {
+describe("OP-08 UI Safety Presentation (DishSafetyAlert)", () => {
   it("renders critical allergy alert when dish allergen matches customer dietary snapshot", () => {
     const snapshot: OrderDietarySnapshot = {
       allergens: ["pescado", "marisco"],
@@ -30,19 +30,17 @@ describe("OP-08 UI Safety Presentation", () => {
       authorUserId: "user-1",
     };
 
-    const dishAllergens = ["pescado"];
-    const customerAllergens = snapshot.allergens.map((a) => a.toLowerCase().trim());
-    const matching = dishAllergens.filter((a) => customerAllergens.includes(a.toLowerCase().trim()));
+    const matching = getCriticalAllergens(["Pescado"], snapshot.allergens);
+    expect(matching).toEqual(["Pescado"]);
 
-    expect(matching).toEqual(["pescado"]);
-
-    const alertHtml = renderToStaticMarkup(
-      <Badge variant="destructive" className="h-4 px-1 text-[10px] font-bold">
-        🔴 ALERTA: {matching.join(", ").toUpperCase()}
-      </Badge>,
+    const html = renderToStaticMarkup(
+      <DishSafetyAlert
+        allergens={["pescado"]}
+        customerAllergens={snapshot.allergens}
+      />,
     );
 
-    expect(alertHtml).toContain("🔴 ALERTA: PESCADO");
+    expect(html).toContain("🔴 ALERTA: PESCADO");
 
     const badgesHtml = renderToStaticMarkup(<DietaryBadges snapshot={snapshot} compact />);
     expect(badgesHtml).toContain("pescado");
@@ -50,17 +48,11 @@ describe("OP-08 UI Safety Presentation", () => {
   });
 
   it("renders UNKNOWN allergen state as explicit warning and never as safe", () => {
-    const allergenState: AllergenSnapshotState = "UNKNOWN";
-    const isCustom = false;
-
     const html = renderToStaticMarkup(
-      <div>
-        {isCustom || allergenState === "UNKNOWN" ? (
-          <span className="block text-xs font-medium text-amber-700">
-            ⚠️ Alérgenos sin declarar · Receta no vinculada
-          </span>
-        ) : null}
-      </div>,
+      <DishSafetyAlert
+        allergenState="UNKNOWN"
+        isCustom={false}
+      />,
     );
 
     expect(html).toContain("⚠️ Alérgenos sin declarar · Receta no vinculada");
@@ -68,44 +60,23 @@ describe("OP-08 UI Safety Presentation", () => {
   });
 
   it("identifies custom items with Custom badge and unlinked recipe warning", () => {
-    const isCustom = true;
-    const dishName = "Tortilla personalizada";
-
     const html = renderToStaticMarkup(
-      <div>
-        <span>{dishName}</span>
-        {isCustom && (
-          <Badge variant="outline" className="text-[10px] uppercase font-semibold text-purple-700">
-            Custom
-          </Badge>
-        )}
-        <span className="block text-xs font-medium text-amber-700">
-          ⚠️ Alérgenos sin declarar · Receta no vinculada
-        </span>
-      </div>,
+      <DishSafetyAlert
+        isCustom={true}
+        showCustomBadge={true}
+      />,
     );
 
-    expect(html).toContain("Tortilla personalizada");
     expect(html).toContain("Custom");
     expect(html).toContain("⚠️ Alérgenos sin declarar · Receta no vinculada");
   });
 
   it("handles HISTORICAL_UNAVAILABLE gracefully with historical notice", () => {
-    const allergenState: AllergenSnapshotState = "HISTORICAL_UNAVAILABLE";
-    const isCustom: boolean = false;
-
     const html = renderToStaticMarkup(
-      <div>
-        {isCustom || allergenState === "UNKNOWN" ? (
-          <span className="block text-xs font-medium text-amber-700">
-            ⚠️ Alérgenos sin declarar · Receta no vinculada
-          </span>
-        ) : allergenState === "HISTORICAL_UNAVAILABLE" ? (
-          <span className="block text-xs text-muted-foreground italic">
-            Declaración histórica no disponible
-          </span>
-        ) : null}
-      </div>,
+      <DishSafetyAlert
+        allergenState="HISTORICAL_UNAVAILABLE"
+        isCustom={false}
+      />,
     );
 
     expect(html).toContain("Declaración histórica no disponible");
@@ -114,13 +85,37 @@ describe("OP-08 UI Safety Presentation", () => {
   });
 
   it("renders declared allergens accurately when present", () => {
-    const allergens = ["gluten", "huevos"];
     const html = renderToStaticMarkup(
-      <span className="block text-xs text-muted-foreground">
-        Alérgenos: {allergens.join(", ")}
-      </span>,
+      <DishSafetyAlert
+        allergenState="DECLARED"
+        allergens={["gluten", "huevos"]}
+      />,
     );
 
     expect(html).toContain("Alérgenos: gluten, huevos");
+  });
+
+  it("ensures custom items ALWAYS show unlinked recipe warning even if allergenState is DECLARED", () => {
+    const html = renderToStaticMarkup(
+      <DishSafetyAlert
+        isCustom={true}
+        allergenState="DECLARED"
+        allergens={["apio"]}
+      />,
+    );
+
+    expect(html).toContain("⚠️ Alérgenos sin declarar · Receta no vinculada");
+  });
+
+  it("supports compact rendering for dense packaging cards", () => {
+    const html = renderToStaticMarkup(
+      <DishSafetyAlert
+        allergenState="UNKNOWN"
+        compact={true}
+      />,
+    );
+
+    expect(html).toContain("text-[11px]");
+    expect(html).toContain("⚠️ Alérgenos sin declarar · Receta no vinculada");
   });
 });
