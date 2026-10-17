@@ -17,7 +17,9 @@ import { DishThumb } from "@/components/consumer/dish-thumb";
 import { useFmt } from "@/i18n/localization-provider";
 import { useWeeklyMenu } from "@/hooks/use-weekly-menu";
 import { useProgramDraftOrder } from "@/hooks/use-program-draft-order";
+import { useConfirmOrder } from "@/hooks/use-confirm-order";
 import {
+  utcDateOnly,
   utcWeekDates,
   utcWeekStartMonday,
   offsetWeekMonday,
@@ -51,13 +53,32 @@ function ScheduleFlow() {
   const [step, setStep] = useState<Step>(1);
   const [deliveryDay, setDeliveryDay] = useState(0);
   const [quantities, setQuantities] = useState<Record<string, Record<string, number>>>({});
-  const [weekOffset, setWeekOffset] = useState<number>(0);
+  const todayIso = utcDateOnly();
+  const [weekOffset, setWeekOffset] = useState<number>(() => {
+    const today = utcDateOnly();
+    const currentWeekMon = utcWeekStartMonday();
+    const currentWeekDates = utcWeekDates(currentWeekMon);
+    return currentWeekDates.slice(0, 5).every((d) => d < today) ? 1 : 0;
+  });
   const fmt = useFmt();
 
   const baseWeekStart = utcWeekStartMonday();
   const weekStart = offsetWeekMonday(baseWeekStart, weekOffset);
+  const weekDates = utcWeekDates(weekStart);
   const { data: weeklyMenu } = useWeeklyMenu(weekStart);
   const programDraft = useProgramDraftOrder();
+  const confirmOrder = useConfirmOrder();
+
+  const isDayDisabled = (i: number) => (weekDates[i] ? weekDates[i] < todayIso : false);
+
+  useEffect(() => {
+    if (isDayDisabled(deliveryDay)) {
+      const firstAvailable = weekDates.findIndex((d) => d >= todayIso);
+      if (firstAvailable !== -1) {
+        setDeliveryDay(firstAvailable);
+      }
+    }
+  }, [weekStart, deliveryDay, todayIso]);
 
   const daysShort = [
     t("customer:dayMon"),
@@ -104,26 +125,31 @@ function ScheduleFlow() {
     }
   }, [defaultOfferCode, selectedOfferCode]);
 
-  const offerDishes = weeklyMenu?.days[deliveryDay]?.dishes ?? [];
-  const dayDate = utcWeekDates(weekStart)[deliveryDay] ?? weekStart;
+  const allDishesMap = new Map<string, MockDish>();
+  for (const day of weeklyMenu?.days ?? []) {
+    for (const d of day.dishes ?? []) {
+      allDishesMap.set(d.id, d);
+    }
+  }
 
-  const currentDayQuantities = quantities[dayDate] ?? {};
-  const selectedDishEntries = Object.entries(currentDayQuantities)
-    .filter(([_, qty]) => qty > 0)
-    .map(([dishId, qty]) => {
-      const dish = offerDishes.find((d) => d.id === dishId);
-      return { dishId, dish, qty };
-    })
-    .filter((entry): entry is { dishId: string; dish: MockDish; qty: number } =>
-      Boolean(entry.dish),
-    );
+  const allSelectedDishEntries: Array<{ dishId: string; dayDate: string; qty: number; dish: MockDish }> = [];
+  for (const [dDate, dayQtys] of Object.entries(quantities)) {
+    for (const [dishId, qty] of Object.entries(dayQtys)) {
+      if (qty > 0) {
+        const dish = allDishesMap.get(dishId);
+        if (dish) {
+          allSelectedDishEntries.push({ dishId, dayDate: dDate, qty, dish });
+        }
+      }
+    }
+  }
 
-  const totalMealsCount = selectedDishEntries.reduce((sum, item) => sum + item.qty, 0);
+  const totalMealsCount = allSelectedDishEntries.reduce((sum, item) => sum + item.qty, 0);
 
   const effectiveOfferCode = selectedOfferCode ?? defaultOfferCode;
-  const orderItems = selectedDishEntries.map((item) => ({
+  const orderItems = allSelectedDishEntries.map((item) => ({
     dishId: item.dishId,
-    dayDate,
+    dayDate: item.dayDate,
     qty: item.qty,
   }));
 
@@ -136,7 +162,20 @@ function ScheduleFlow() {
   // Authoritative total = commercial offer evaluation with catalog price fallback
   const totalEur = commercialPricing
     ? commercialPricing.grandTotalFinalPrice.cents / 100
-    : selectedDishEntries.reduce((sum, item) => sum + Number(item.dish.price ?? 0) * item.qty, 0);
+    : allSelectedDishEntries.reduce((sum, item) => sum + Number(item.dish.price ?? 0) * item.qty, 0);
+
+  const offerDishes = weeklyMenu?.days[deliveryDay]?.dishes ?? [];
+  const dayDate = weekDates[deliveryDay] ?? weekStart;
+  const currentDayQuantities = quantities[dayDate] ?? {};
+  const currentDayMealsCount = Object.values(currentDayQuantities).reduce((sum, qty) => sum + (qty > 0 ? qty : 0), 0);
+
+  const itemsByDay = new Map<string, typeof allSelectedDishEntries>();
+  for (const item of allSelectedDishEntries) {
+    const list = itemsByDay.get(item.dayDate) ?? [];
+    list.push(item);
+    itemsByDay.set(item.dayDate, list);
+  }
+  const sortedDayDates = [...itemsByDay.keys()].sort();
 
   const { tenantId } = useAuth();
   const customerQuery = useCurrentCustomerId();
@@ -179,13 +218,21 @@ function ScheduleFlow() {
   const deliveryDateLabel = formatDeliveryDate(dayDate, i18n.language);
 
   async function onProgramDraft() {
-    if (orderItems.length === 0 || programDraft.isPending) return;
+    if (orderItems.length === 0 || programDraft.isPending || confirmOrder.isPending) return;
     const result = await programDraft.mutateAsync({
       weekStart,
       items: orderItems,
       offerCode: effectiveOfferCode,
       deliveryAddressId: selectedAddressId,
     });
+    try {
+      await confirmOrder.mutateAsync({
+        orderId: result.order.id,
+        expectedTotal: result.order.total != null ? Number(result.order.total) : undefined,
+      });
+    } catch (confirmErr) {
+      console.warn("Auto-confirm deferred to order detail screen:", confirmErr);
+    }
     void navigate({
       to: "/app/orders/$orderId",
       params: { orderId: result.order.id },
@@ -312,7 +359,12 @@ function ScheduleFlow() {
             <p className="text-sm font-semibold text-muted-foreground mb-3">
               {t("customer:deliveryDay")}
             </p>
-            <DayPicker days={daysShort} activeIndex={deliveryDay} onSelect={setDeliveryDay} />
+            <DayPicker
+              days={daysShort}
+              activeIndex={deliveryDay}
+              onSelect={setDeliveryDay}
+              isDayDisabled={isDayDisabled}
+            />
           </div>
         </section>
       ) : null}
@@ -321,10 +373,10 @@ function ScheduleFlow() {
         <div className="px-6 space-y-10 pb-4">
           <div className="flex items-center justify-between">
             <p className="text-lg font-extrabold tracking-tight">{daysFull[deliveryDay]}</p>
-            {totalMealsCount > 0 && (
+            {currentDayMealsCount > 0 && (
               <span className="text-xs font-bold bg-primary/10 text-primary px-3 py-1 rounded-full">
-                {totalMealsCount}{" "}
-                {totalMealsCount === 1 ? "comida seleccionada" : "comidas seleccionadas"}
+                {currentDayMealsCount}{" "}
+                {currentDayMealsCount === 1 ? "comida seleccionada" : "comidas seleccionadas"}
               </span>
             )}
           </div>
@@ -384,7 +436,7 @@ function ScheduleFlow() {
 
       {step === 3 ? (
         <section className="px-6 space-y-10 pt-1 pb-4">
-          {selectedDishEntries.length === 0 ? (
+          {allSelectedDishEntries.length === 0 ? (
             <div className="flex flex-col items-center text-center py-8 space-y-6">
               <DishThumb
                 emoji="🥗"
@@ -407,38 +459,60 @@ function ScheduleFlow() {
           ) : (
             <>
               <div className="space-y-6">
-                <div>
-                  <div className="flex items-center justify-between mb-3">
+                <div className="space-y-5">
+                  <div className="flex items-center justify-between">
                     <p className="text-sm font-semibold text-muted-foreground">
-                      {daysFull[deliveryDay]} · {totalMealsCount}{" "}
-                      {totalMealsCount === 1 ? "comida" : "comidas"}
+                      {totalMealsCount} {totalMealsCount === 1 ? "comida seleccionada" : "comidas seleccionadas"}
                     </p>
                   </div>
-                  <ul className="space-y-4">
-                    {selectedDishEntries.map(({ dish, qty }) => (
-                      <li key={dish.id} className="flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-4">
-                          <DishThumb
-                            emoji={dish.emoji}
-                            imageSrc={dishPhoto}
-                            size="sm"
-                            className="!size-14 !text-2xl !rounded-xl"
-                          />
-                          <div>
-                            <p className="text-base font-bold tracking-tight leading-snug">
-                              {dish.name}
-                            </p>
-                            <p className="text-xs text-muted-foreground font-mono">
-                              {dish.kcal} kcal · {dish.proteinG}g P
-                            </p>
-                          </div>
+
+                  {sortedDayDates.map((dDate) => {
+                    const dayItems = itemsByDay.get(dDate) ?? [];
+                    const dIndex = weekDates.indexOf(dDate);
+                    const dMeals = dayItems.reduce((s, it) => s + it.qty, 0);
+                    const dayLabel = dIndex >= 0 ? daysFull[dIndex] : dDate;
+                    const dateFormatted = formatDeliveryDate(dDate, i18n.language);
+
+                    return (
+                      <div key={dDate} className="space-y-3 bg-card/60 border border-border/80 rounded-2xl p-4">
+                        <div className="flex items-center justify-between border-b border-border/50 pb-2">
+                          <p className="font-extrabold text-sm text-foreground">
+                            {dayLabel} <span className="font-normal text-muted-foreground text-xs">({dateFormatted})</span>
+                          </p>
+                          <span className="text-xs font-semibold text-muted-foreground">
+                            {dMeals} {dMeals === 1 ? "comida" : "comidas"}
+                          </span>
                         </div>
-                        <div className="bg-secondary px-3 py-1.5 rounded-xl font-extrabold text-sm tabular-nums">
-                          {qty}x
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
+                        <ul className="space-y-3 pt-1">
+                          {dayItems.map(({ dish, qty }) => (
+                            <li key={`${dDate}-${dish.id}`} className="flex items-center justify-between gap-4">
+                              <div className="flex items-center gap-3">
+                                <DishThumb
+                                  emoji={dish.emoji}
+                                  imageSrc={dishPhoto}
+                                  size="sm"
+                                  className="!size-12 !text-xl !rounded-xl"
+                                />
+                                <div>
+                                  <p className="text-sm font-bold tracking-tight leading-snug">
+                                    {dish.name}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground font-mono">
+                                    {dish.kcal > 0
+                                      ? `${dish.kcal} kcal · ${dish.proteinG}g P`
+                                      : "Nutrición no disponible"}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="bg-secondary px-2.5 py-1 rounded-xl font-extrabold text-xs tabular-nums">
+                                {qty}x
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    );
+                  })}
                 </div>
 
                 <div className="border-t border-border/70" />
@@ -448,8 +522,22 @@ function ScheduleFlow() {
                     <p className="text-sm font-semibold text-muted-foreground">
                       {t("customer:deliveryDay")}
                     </p>
-                    <p className="text-lg font-extrabold mt-1 tracking-tight">
-                      {daysFull[deliveryDay]} {deliveryDateLabel}
+                    <p className="text-base font-extrabold mt-1 tracking-tight">
+                      {sortedDayDates.length === 1 ? (
+                        <>
+                          {weekDates.indexOf(sortedDayDates[0]) >= 0
+                            ? daysFull[weekDates.indexOf(sortedDayDates[0])]
+                            : sortedDayDates[0]}{" "}
+                          {formatDeliveryDate(sortedDayDates[0], i18n.language)}
+                        </>
+                      ) : (
+                        `Entregas múltiples: ${sortedDayDates
+                          .map((d) => {
+                            const idx = weekDates.indexOf(d);
+                            return idx >= 0 ? daysShort[idx] : d;
+                          })
+                          .join(", ")}`
+                      )}
                     </p>
                   </div>
                   <div>
@@ -552,9 +640,9 @@ function ScheduleFlow() {
                 </div>
               </div>
 
-              {programDraft.isError ? (
+              {(programDraft.isError || confirmOrder.isError) ? (
                 <p className="text-sm text-destructive text-center" role="alert">
-                  {(programDraft.error as Error)?.message ?? "Error"}
+                  {((programDraft.error || confirmOrder.error) as Error)?.message ?? "Error"}
                 </p>
               ) : null}
             </>
@@ -570,9 +658,9 @@ function ScheduleFlow() {
           >
             {step === 2 ? t("customer:seeSummaryCta") : t("common:continue")}
           </PrimaryCTA>
-        ) : selectedDishEntries.length > 0 ? (
+        ) : allSelectedDishEntries.length > 0 ? (
           <PrimaryCTA
-            disabled={programDraft.isPending || isTenantOrderCreationFrozen}
+            disabled={programDraft.isPending || confirmOrder.isPending || isTenantOrderCreationFrozen}
             onClick={() => {
               if (isTenantOrderCreationFrozen) return;
               void onProgramDraft();

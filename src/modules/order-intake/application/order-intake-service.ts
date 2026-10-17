@@ -2,7 +2,11 @@ import { AuditService } from "@/services/audit-service";
 import type { ServiceContext } from "@/services/types";
 import { requireCapability, hasStaffAccess } from "@/permissions";
 import { DomainError } from "@/domain/errors";
-import { OrderService, type ProgramDraftOrderResult } from "@/modules/orders";
+import {
+  OrderService,
+  type ProgramDraftOrderResult,
+  type ProgramDraftItemsOptions,
+} from "@/modules/orders";
 import type { OrderIntakeDraftCommand, OrderIntakeOrigin } from "../domain/intake-command";
 import {
   CUSTOMER_SELF_CHANNELS,
@@ -42,6 +46,7 @@ export const OrderIntakeService = {
   async intakeDraft(
     ctx: ServiceContext,
     command: OrderIntakeDraftCommand,
+    options?: ProgramDraftItemsOptions,
   ): Promise<ProgramDraftOrderResult> {
     if (isEatCleanOrderCreationFrozen(ctx)) {
       throw new DomainError("INVALID_STATE", EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage);
@@ -82,8 +87,7 @@ export const OrderIntakeService = {
       throw new DomainError("INVALID_STATE", "Staff intake requires targetCustomerId");
     }
 
-    // Customer self-service (and staff using app-as-self only if they have a customer row).
-    const result = await OrderService.programDraftItems(ctx, {
+    const payload = {
       weekStart: command.weekStart,
       items: command.items,
       notes: command.notes ?? null,
@@ -92,7 +96,12 @@ export const OrderIntakeService = {
       customerTier: command.customerTier,
       extras: command.extras,
       deliveryAddressId: command.deliveryAddressId,
-    });
+    };
+
+    // Customer self-service (and staff using app-as-self only if they have a customer row).
+    const result = options
+      ? await OrderService.programDraftItems(ctx, payload, options)
+      : await OrderService.programDraftItems(ctx, payload);
 
     const origin = buildOrigin(ctx, command);
 
@@ -127,9 +136,10 @@ export const OrderIntakeService = {
       extras?: import("@/modules/commercial").ExtraItemInput[];
       deliveryAddressId?: string | null;
     },
+    options?: ProgramDraftItemsOptions,
   ): Promise<ProgramDraftOrderResult> {
-    return OrderIntakeService.intakeDraft(ctx, {
-      channel: "app",
+    const intakeCommand = {
+      channel: "app" as const,
       weekStart: input.weekStart,
       notes: input.notes,
       offerCode: input.offerCode,
@@ -141,6 +151,10 @@ export const OrderIntakeService = {
         dayDate: input.dayDate,
         qty: 1,
       })),
-    });
+    };
+
+    return options
+      ? OrderIntakeService.intakeDraft(ctx, intakeCommand, options)
+      : OrderIntakeService.intakeDraft(ctx, intakeCommand);
   },
 };

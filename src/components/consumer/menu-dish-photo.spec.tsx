@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { MenuDishPhoto, canonicalDishPhotoUrl } from "./menu-dish-photo";
-import { MenuDishPost } from "./menu-dish-post";
+import { MenuDishPost, dishMacrosLine } from "./menu-dish-post";
 import type { MockDish } from "@/lib/mock-catalog";
 const dish: MockDish = {
   id: "dish-a",
@@ -63,5 +63,27 @@ describe("canonical menu photos", () => {
     expect(canonicalDishPhotoUrl(" https://media.example/a.webp ")).toBe(
       "https://media.example/a.webp",
     );
+  });
+
+  it("renders 'Información nutricional no disponible' when kcal is 0 or undeclared", () => {
+    const zeroKcalDish: MockDish = {
+      ...dish,
+      kcal: 0,
+      proteinG: 0,
+      carbsG: 0,
+      fatG: 0,
+    };
+    const labels = { protein: "Proteínas", carbs: "Carbohidratos", fat: "Grasas" };
+    expect(dishMacrosLine(zeroKcalDish, labels)).toBe("");
+
+    const html = renderToStaticMarkup(
+      <MenuDishPost
+        dish={zeroKcalDish}
+        macrosLabel={dishMacrosLine(zeroKcalDish, labels)}
+        cta={<button>Añadir</button>}
+      />,
+    );
+    expect(html).toContain("Información nutricional no disponible");
+    expect(html).not.toContain("0 kcal");
   });
 });

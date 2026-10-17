@@ -135,4 +135,37 @@ describe("app.orders.$orderId dietary snapshot verification", () => {
     expect(html).toContain("Separar aliño en envase aparte");
     expect(html).toContain(CONSTITUTIONAL_DIETARY_DISCLAIMER);
   });
+
+  it("renders Confirmar pedido CTA for V2 canonical draft orders (writeContractVersion: 2)", () => {
+    currentOrderData = {
+      ...mockOrderData,
+      status: "draft",
+      writeContractVersion: 2,
+    };
+
+    const html = renderToString(<Component />);
+    expect(html).toContain("customer:confirmOrder");
+  });
+
+  it("does not display '0 kcal' when dish kcal is 0 or undeclared", () => {
+    currentOrderData = {
+      ...mockOrderData,
+      items: [
+        {
+          dishId: "d1",
+          qty: 1,
+          dayDate: "2026-10-07",
+          dish: {
+            id: "d1",
+            name: "Plato Especial",
+            emoji: "🍽️",
+            kcal: 0,
+          },
+        },
+      ],
+    };
+
+    const html = renderToString(<Component />);
+    expect(html).not.toContain("0 kcal");
+  });
 });

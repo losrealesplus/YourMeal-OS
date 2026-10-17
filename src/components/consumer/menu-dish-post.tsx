@@ -39,10 +39,20 @@ export function MenuDishPost({
             {dish.tagline}
           </p>
         ) : null}
-        <p className="font-mono text-sm font-bold tabular-nums text-foreground/80 pt-1">
-          {dish.kcal} kcal
-        </p>
-        <p className="text-xs text-muted-foreground tracking-wide">{macrosLabel}</p>
+        {dish.kcal > 0 ? (
+          <>
+            <p className="font-mono text-sm font-bold tabular-nums text-foreground/80 pt-1">
+              {dish.kcal} kcal
+            </p>
+            {macrosLabel ? (
+              <p className="text-xs text-muted-foreground tracking-wide">{macrosLabel}</p>
+            ) : null}
+          </>
+        ) : (
+          <p className="text-xs text-muted-foreground italic pt-1">
+            Información nutricional no disponible
+          </p>
+        )}
       </div>
       <DishAllergenDeclaration allergens={dish.allergens} showDeclared />
       <div className="pt-1">{cta}</div>
@@ -54,5 +64,8 @@ export function dishMacrosLine(
   dish: MockDish,
   labels: { protein: string; carbs: string; fat: string },
 ): string {
+  if (dish.proteinG === 0 && dish.carbsG === 0 && dish.fatG === 0) {
+    return "";
+  }
   return `${dish.proteinG}g ${labels.protein} · ${dish.carbsG}g ${labels.carbs} · ${dish.fatG}g ${labels.fat}`;
 }

@@ -77,9 +77,8 @@ function OrderSummary() {
   };
 
   const isDraft = order.status === "draft";
-  const canConfirmLegacy =
+  const canConfirm =
     isDraft &&
-    (order.writeContractVersion ?? 1) === 1 &&
     order.items.every((item) => item.line?.kind !== "custom");
   const addressLine = formatAddress(order.address);
   const showRepeat =
@@ -147,7 +146,9 @@ function OrderSummary() {
                       PERSONALIZADO · Alérgenos sin declarar · Receta no vinculada
                     </p>
                   ) : dish ? (
-                    <p className="text-xs text-muted-foreground mt-0.5">{dish.kcal} kcal</p>
+                    dish.kcal > 0 ? (
+                      <p className="text-xs text-muted-foreground mt-0.5">{dish.kcal} kcal</p>
+                    ) : null
                   ) : null}
                 </div>
                 <span className="font-mono text-sm font-bold tabular-nums">×{it.qty}</span>
@@ -239,7 +240,7 @@ function OrderSummary() {
       </section>
 
       <div className="px-6 mt-8 space-y-3">
-        {canConfirmLegacy ? (
+        {canConfirm ? (
           <>
             {confirmOrder.isError ? (
               <p className="text-sm text-destructive" role="alert">

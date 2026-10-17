@@ -12,6 +12,7 @@ export { RepeatOrderService } from "./application/repeat-order-service";
 export type {
   ProgramDraftOrderCommand,
   ProgramDraftItemsCommand,
+  ProgramDraftItemsOptions,
   ProgramDraftOrderResult,
 } from "./application/order-service";
 export type { RepeatOrderPreview, RepeatOrderResult } from "./application/repeat-order-service";
