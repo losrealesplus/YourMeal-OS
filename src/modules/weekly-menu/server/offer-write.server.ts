@@ -53,7 +53,7 @@ export async function verifiedOrderActorContext(
 
   const membership = await actor.supabase
     .from("tenant_members")
-    .select("status")
+    .select("status, membership_type")
     .eq("tenant_id", tenantId)
     .eq("user_id", actor.userId)
     .eq("status", "approved")
@@ -75,6 +75,20 @@ export async function verifiedOrderActorContext(
     throw new DomainError("PERMISSION_DENIED", "Active tenant membership required");
   const verifiedRoles: AppRole[] = (roles.data ?? []).map((row) => row.role);
   if (saas.data) verifiedRoles.push("saas_admin");
+
+  // ADR 0065 / Customer Effective Role Resolution:
+  // When an authenticated user has an approved tenant membership of type 'customer'
+  // and has no explicit staff roles in user_roles, synthesize canonical 'customer' role.
+  // This honors the customer's tenant membership and authorizes weekly menu order writes
+  // without conferring administrative or staff capabilities.
+  const isApprovedCustomer =
+    membership.data?.status === "approved" &&
+    membership.data?.membership_type === "customer";
+
+  if (isApprovedCustomer && verifiedRoles.length === 0) {
+    verifiedRoles.push("customer");
+  }
+
   if (!can(verifiedRoles, "orders.write"))
     throw new DomainError("PERMISSION_DENIED", "Order write capability required");
   return { tenant: tenant.data, roles: verifiedRoles };
