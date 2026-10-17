@@ -144,6 +144,8 @@ export type CustomerOrderListItem = {
   createdAt: string;
   /** Delivery day (earliest item day) when known. */
   deliveryDate: string;
+  /** Unique scheduled day dates in this order. */
+  dayDates: string[];
   dishNames: string[];
   /** Typed snapshot reads; custom homonyms retain their source identities. */
   lines: OrderItemReadModel[];
@@ -246,6 +248,7 @@ export async function fetchCustomerOrders(
       itemCount: items.reduce((s, i) => s + Number(i.qty || 1), 0),
       createdAt: row.created_at,
       deliveryDate: days[0] ?? row.week_start,
+      dayDates: [...new Set(days)],
       dishNames,
       lines,
       address,
