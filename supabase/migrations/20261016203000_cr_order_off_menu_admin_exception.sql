@@ -573,9 +573,10 @@ END $$;
 REVOKE ALL ON FUNCTION public.cr_order_offer_quote_issue(uuid,uuid,uuid,jsonb,jsonb) FROM PUBLIC,anon,authenticated;
 GRANT EXECUTE ON FUNCTION public.cr_order_offer_quote_issue(uuid,uuid,uuid,jsonb,jsonb) TO service_role;
 
--- 4. Ensure custom item activation is enabled for active tenants
+-- 4. Ensure custom item activation is enabled specifically for EatClean tenant (P1 scope)
 INSERT INTO cr_order_private.custom_activation(tenant_id, enabled)
 SELECT id, true FROM public.tenants
+ WHERE id = '8bba00ba-331b-42c8-9283-4e3836ffb870'::uuid OR slug = 'eatclean'
 ON CONFLICT (tenant_id) DO UPDATE SET enabled = true;
 
 COMMIT;
