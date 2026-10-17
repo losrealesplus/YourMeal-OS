@@ -19,6 +19,18 @@ function readFlag(value: unknown): boolean | undefined {
 
 function viteEnvFlag(name: string): unknown {
   try {
+    if (name === "VITE_AUTH_GOOGLE_ENABLED") {
+      return import.meta.env.VITE_AUTH_GOOGLE_ENABLED;
+    }
+    if (name === "VITE_AUTH_OAUTH_SOCIAL_ENABLED") {
+      return import.meta.env.VITE_AUTH_OAUTH_SOCIAL_ENABLED;
+    }
+    if (name === "VITE_AUTH_APPLE_ENABLED") {
+      return import.meta.env.VITE_AUTH_APPLE_ENABLED;
+    }
+    if (name === "VITE_AUTH_PHONE_ENABLED") {
+      return import.meta.env.VITE_AUTH_PHONE_ENABLED;
+    }
     return (import.meta.env as Record<string, unknown>)[name];
   } catch {
     return undefined;
@@ -48,7 +60,7 @@ export function isGoogleOAuthEnabled(): boolean {
   return (
     flagFromEnv("VITE_AUTH_GOOGLE_ENABLED") ??
     flagFromEnv("VITE_AUTH_OAUTH_SOCIAL_ENABLED") ??
-    false
+    true
   );
 }
 
