@@ -278,7 +278,7 @@ SELECT
   (to_regclass('public.order_items') IS NOT NULL) || '|' ||
   (to_regclass('public.dishes') IS NOT NULL) || '|' ||
   (to_regclass('public.weekly_menus') IS NOT NULL) || '|' ||
-  (to_regclass('cr_order_private.order_batches') IS NOT NULL);
+  (to_regclass('public.kitchen_production_batches') IS NOT NULL);
 ")"
 
 CAN_INSERT_LEDGER="$(echo "$PRIVILEGES_AUDIT" | cut -d'|' -f1)"
@@ -290,12 +290,12 @@ HAS_BATCHES="$(echo "$PRIVILEGES_AUDIT" | cut -d'|' -f6)"
 
 echo ""
 echo "4. Permisos y Tablas Requeridas:"
-echo "   INSERT sobre schema_migrations : $CAN_INSERT_LEDGER (esperado: t)"
-echo "   Tabla public.orders            : $HAS_ORDERS (esperado: t)"
-echo "   Tabla public.order_items       : $HAS_ORDER_ITEMS (esperado: t)"
-echo "   Tabla public.dishes            : $HAS_DISHES (esperado: t)"
-echo "   Tabla public.weekly_menus      : $HAS_MENUS (esperado: t)"
-echo "   Tabla order_batches            : $HAS_BATCHES (esperado: t)"
+echo "   INSERT sobre schema_migrations     : $CAN_INSERT_LEDGER (esperado: t)"
+echo "   Tabla public.orders                : $HAS_ORDERS (esperado: t)"
+echo "   Tabla public.order_items           : $HAS_ORDER_ITEMS (esperado: t)"
+echo "   Tabla public.dishes                : $HAS_DISHES (esperado: t)"
+echo "   Tabla public.weekly_menus          : $HAS_MENUS (esperado: t)"
+echo "   Tabla kitchen_production_batches   : $HAS_BATCHES (esperado: t)"
 
 if [ "$CAN_INSERT_LEDGER" = "t" ] && [ "$HAS_ORDERS" = "t" ] && [ "$HAS_ORDER_ITEMS" = "t" ] && \
    [ "$HAS_DISHES" = "t" ] && [ "$HAS_MENUS" = "t" ] && [ "$HAS_BATCHES" = "t" ]; then
