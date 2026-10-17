@@ -22,14 +22,30 @@ import {
 } from "@/modules/operations";
 import { cn } from "@/lib/utils";
 
+import { DietaryBadges } from "@/components/operations/dietary-badges";
+import type { AllergenSnapshotState } from "@/modules/orders/domain/order-item-read-model";
+import type { OrderDietarySnapshot } from "@/types/dietary";
+
 const ROLES_ALLOWED = ["saas_admin", "company_admin", "operations_manager", "kitchen"];
 
-type BagLine = { dishName: string; qty: number; note: string | null; isCustom: boolean };
+type BagLine = {
+  dishName: string;
+  qty: number;
+  note: string | null;
+  isCustom: boolean;
+  kind: "dish" | "custom";
+  allergenState: AllergenSnapshotState;
+  allergens: string[];
+  criticalAlert: string | null;
+  safetyTag: string | null;
+};
+
 type Bag = {
   orderId: string;
   customerId: string;
   customerName: string;
   totalPortions: number;
+  dietarySnapshot?: OrderDietarySnapshot | null;
   lines: BagLine[];
 };
 
@@ -65,34 +81,64 @@ function PackagingPage() {
 
   const bags = useMemo<Bag[]>(() => {
     if (!report) return [];
-    const map = new Map<string, Bag>();
-    const push = (
-      orderId: string, customerId: string, customerName: string,
-      line: BagLine,
-    ) => {
-      const key = `${orderId}:${customerId}`;
-      let bag = map.get(key);
-      if (!bag) {
-        bag = { orderId, customerId, customerName, totalPortions: 0, lines: [] };
-        map.set(key, bag);
-      }
-      bag.lines.push(line);
-      bag.totalPortions += line.qty;
-    };
+    const list: Bag[] = [];
 
-    for (const dish of report.standardDishes) {
-      for (const c of dish.customers) {
-        push(c.orderId, c.customerId, c.customerName, {
-          dishName: dish.dishName, qty: c.qty, note: c.note, isCustom: false,
-        });
-      }
-    }
-    for (const cx of report.customizations) {
-      push(cx.orderId, cx.customerId, cx.customerName, {
-        dishName: cx.dishName, qty: cx.qty, note: cx.observation, isCustom: true,
+    for (const cust of report.packingByCustomer) {
+      const customerAllergens = (cust.dietarySnapshot?.allergens ?? []).map((a) =>
+        a.toLowerCase().trim(),
+      );
+
+      const lines: BagLine[] = cust.items.map((item) => {
+        const isCustom = item.kind === "custom";
+        const itemAllergens = item.allergens ?? [];
+        const allergenState: AllergenSnapshotState =
+          item.kind === "custom"
+            ? "UNKNOWN"
+            : (item.allergenState ?? "HISTORICAL_UNAVAILABLE");
+
+        const matchingCritical = itemAllergens.filter((a) =>
+          customerAllergens.includes(a.toLowerCase().trim()),
+        );
+        const criticalAlert =
+          matchingCritical.length > 0 ? matchingCritical.join(", ").toUpperCase() : null;
+
+        let safetyTag: string | null = null;
+        if (isCustom) {
+          safetyTag = "Alérgenos sin declarar · Receta no vinculada";
+        } else if (allergenState === "HISTORICAL_UNAVAILABLE") {
+          safetyTag = "Declaración histórica no disponible";
+        } else if (allergenState === "UNKNOWN") {
+          safetyTag = "Alérgenos sin declarar";
+        } else if (criticalAlert) {
+          safetyTag = `🔴 ALERTA: ${criticalAlert}`;
+        } else if (itemAllergens.length > 0) {
+          safetyTag = `Alérgenos: ${itemAllergens.join(", ")}`;
+        }
+
+        return {
+          dishName: item.dishName,
+          qty: item.qty,
+          note: item.comment,
+          isCustom,
+          kind: item.kind ?? "dish",
+          allergenState,
+          allergens: itemAllergens,
+          criticalAlert,
+          safetyTag,
+        };
+      });
+
+      list.push({
+        orderId: cust.orderId,
+        customerId: cust.customerId,
+        customerName: cust.customerName,
+        totalPortions: cust.totalPortions,
+        dietarySnapshot: cust.dietarySnapshot,
+        lines,
       });
     }
-    return Array.from(map.values()).sort((a, b) => a.customerName.localeCompare(b.customerName));
+
+    return list.sort((a, b) => a.customerName.localeCompare(b.customerName, "es"));
   }, [report]);
 
   return (
@@ -127,27 +173,58 @@ function PackagingPage() {
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {bags.map((bag) => (
               <article key={`${bag.orderId}:${bag.customerId}`}
-                className="rounded-xl border border-border bg-card p-4 print:border-black">
-                <header className="mb-3 flex items-center justify-between">
+                className="rounded-xl border border-border bg-card p-4 print:border-black space-y-3">
+                <header className="flex items-start justify-between gap-2">
                   <div>
                     <p className="text-sm font-semibold">{bag.customerName}</p>
                     <p className="font-mono text-[10px] uppercase text-muted-foreground">
                       #{bag.orderId.slice(0, 8)}
                     </p>
+                    {bag.dietarySnapshot && (
+                      <DietaryBadges snapshot={bag.dietarySnapshot} compact className="mt-1" />
+                    )}
                   </div>
-                  <Badge variant="secondary" className="gap-1">
+                  <Badge variant="secondary" className="gap-1 shrink-0">
                     <Package className="h-3 w-3" />{bag.totalPortions}
                   </Badge>
                 </header>
-                <ul className="space-y-1.5 text-sm">
+                <ul className="space-y-2 text-sm divide-y divide-border/40 pt-1">
                   {bag.lines.map((l, i) => (
-                    <li key={i} className="flex items-start justify-between gap-2">
-                      <span className="leading-tight">
-                        {l.dishName}
-                        {l.isCustom ? <Badge variant="outline" className="ml-1 text-[10px]">Custom</Badge> : null}
-                        {l.note ? <span className="block text-xs italic text-muted-foreground">{l.note}</span> : null}
-                      </span>
-                      <span className="tabular-nums font-medium">×{l.qty}</span>
+                    <li key={i} className="pt-1.5 flex items-start justify-between gap-2">
+                      <div className="space-y-0.5 leading-tight">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-medium">{l.dishName}</span>
+                          {l.isCustom ? (
+                            <Badge variant="outline" className="text-[10px] uppercase font-semibold text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-800">
+                              Custom
+                            </Badge>
+                          ) : null}
+                        </div>
+                        {l.criticalAlert ? (
+                          <Badge variant="destructive" className="h-4 px-1 text-[10px] font-bold">
+                            🔴 ALERTA: {l.criticalAlert}
+                          </Badge>
+                        ) : null}
+                        {l.kind === "custom" || l.allergenState === "UNKNOWN" ? (
+                          <span className="block text-[11px] font-medium text-amber-700 dark:text-amber-400">
+                            ⚠️ Alérgenos sin declarar · Receta no vinculada
+                          </span>
+                        ) : l.allergenState === "HISTORICAL_UNAVAILABLE" ? (
+                          <span className="block text-[11px] text-muted-foreground italic">
+                            Declaración histórica no disponible
+                          </span>
+                        ) : l.allergens.length > 0 ? (
+                          <span className="block text-[11px] text-muted-foreground">
+                            Alérgenos: {l.allergens.join(", ")}
+                          </span>
+                        ) : null}
+                        {l.note ? (
+                          <span className="block text-xs italic text-amber-700 dark:text-amber-400 font-medium">
+                            🟡 {l.note}
+                          </span>
+                        ) : null}
+                      </div>
+                      <span className="tabular-nums font-bold text-foreground">×{l.qty}</span>
                     </li>
                   ))}
                 </ul>

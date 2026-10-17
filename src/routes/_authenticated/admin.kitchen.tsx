@@ -41,6 +41,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { OperationalTimeline } from "@/components/operations/operational-timeline";
 import { MonthlyOperationsCalendar } from "@/components/operations/monthly-operations-calendar";
 import { SectionTitle } from "@/components/admin";
+import { DietaryBadges } from "@/components/operations/dietary-badges";
 import { BootstrapReadinessBanner } from "@/components/tenant/bootstrap-readiness-banner";
 import {
   OperationsService,
@@ -397,6 +398,14 @@ function KitchenWorkspacePage() {
                       </Badge>
                     </dd>
                   </div>
+                  {detail.dietarySnapshot && (
+                    <div className="col-span-2 pt-1">
+                      <dt className="text-muted-foreground text-xs">Alergias y Preferencias</dt>
+                      <dd className="mt-1">
+                        <DietaryBadges snapshot={detail.dietarySnapshot} />
+                      </dd>
+                    </div>
+                  )}
                   {detail.notes && (
                     <div className="col-span-2">
                       <dt className="text-muted-foreground">Observaciones</dt>
@@ -407,21 +416,61 @@ function KitchenWorkspacePage() {
 
                 <div>
                   <p className="mb-2 font-medium">Platos</p>
-                  <ul className="space-y-1 rounded-md border p-3">
-                    {detail.items.map((it) => (
-                      <li key={it.id} className="flex justify-between gap-2">
-                        <span>
-                          {it.dishName ?? "Plato"}
-                          <span className="block text-xs text-muted-foreground">
-                            {it.dayDate}
-                            {it.notes ? ` · ${it.notes}` : ""}
+                  <ul className="space-y-1.5 divide-y divide-border/40 rounded-md border p-3">
+                    {detail.items.map((it) => {
+                      const isCustom = it.line?.kind === "custom";
+                      const allergenState = it.line?.allergenState;
+                      const allergens = it.line?.allergensSnapshot ?? [];
+                      const customerAllergens = (detail.dietarySnapshot?.allergens ?? []).map((a) =>
+                        a.toLowerCase().trim(),
+                      );
+                      const matchingCritical = allergens.filter((a) =>
+                        customerAllergens.includes(a.toLowerCase().trim()),
+                      );
+
+                      return (
+                        <li key={it.id} className="pt-1.5 first:pt-0 flex justify-between items-start gap-2">
+                          <div className="space-y-0.5 leading-tight">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="font-medium">{it.dishName ?? "Plato"}</span>
+                              {isCustom && (
+                                <Badge
+                                  variant="outline"
+                                  className="text-[10px] uppercase font-semibold text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-800"
+                                >
+                                  Custom
+                                </Badge>
+                              )}
+                            </div>
+                            {matchingCritical.length > 0 && (
+                              <Badge variant="destructive" className="h-4 px-1 text-[10px] font-bold">
+                                🔴 ALERTA: {matchingCritical.join(", ").toUpperCase()}
+                              </Badge>
+                            )}
+                            {isCustom || allergenState === "UNKNOWN" ? (
+                              <span className="block text-xs font-medium text-amber-700 dark:text-amber-400">
+                                ⚠️ Alérgenos sin declarar · Receta no vinculada
+                              </span>
+                            ) : allergenState === "HISTORICAL_UNAVAILABLE" ? (
+                              <span className="block text-xs text-muted-foreground italic">
+                                Declaración histórica no disponible
+                              </span>
+                            ) : allergens.length > 0 ? (
+                              <span className="block text-xs text-muted-foreground">
+                                Alérgenos: {allergens.join(", ")}
+                              </span>
+                            ) : null}
+                            <span className="block text-xs text-muted-foreground">
+                              {it.dayDate}
+                              {it.notes ? ` · 🟡 ${it.notes}` : ""}
+                            </span>
+                          </div>
+                          <span className="tabular-nums font-bold text-foreground">
+                            ×{it.qty}
                           </span>
-                        </span>
-                        <span className="tabular-nums text-muted-foreground">
-                          ×{it.qty}
-                        </span>
-                      </li>
-                    ))}
+                        </li>
+                      );
+                    })}
                     {detail.items.length === 0 && (
                       <li className="text-muted-foreground">Sin ítems</li>
                     )}
