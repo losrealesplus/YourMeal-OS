@@ -189,9 +189,13 @@ describe("CR-UX-CLIENT-02 · FASE 5 E2E: Google OAuth & PKCE Flow", () => {
     process.env = { ...originalEnv };
 
     try {
-      // Both disabled
+      // Default unset -> true
       delete process.env.VITE_AUTH_GOOGLE_ENABLED;
       delete process.env.VITE_AUTH_OAUTH_SOCIAL_ENABLED;
+      expect(isGoogleOAuthEnabled()).toBe(true);
+
+      // Explicitly disabled
+      process.env.VITE_AUTH_GOOGLE_ENABLED = "false";
       expect(isGoogleOAuthEnabled()).toBe(false);
 
       // Google specifically enabled

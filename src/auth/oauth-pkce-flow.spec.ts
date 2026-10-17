@@ -17,8 +17,8 @@ describe("CR-UX-CLIENT-02 · Google OAuth & PKCE Flow Specification", () => {
   });
 
   it("TC-AUTH-01: resolves Google OAuth feature flag correctly across env configurations", () => {
-    // Default / unset -> false
-    expect(isGoogleOAuthEnabled()).toBe(false);
+    // Default / unset -> true
+    expect(isGoogleOAuthEnabled()).toBe(true);
 
     // Explicitly false
     process.env.VITE_AUTH_GOOGLE_ENABLED = "false";
