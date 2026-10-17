@@ -5,7 +5,14 @@ import {
   customCaptureTransport,
   type CaptureTransport,
 } from "./custom-order-capture-service";
-import type { CanonicalOrderCommand } from "../domain/canonical-order-write";
+import {
+  canonicalCustomLineSchema,
+  type CanonicalOrderCommand,
+} from "../domain/canonical-order-write";
+import {
+  customDraftLine,
+  type CustomItemDraft,
+} from "../domain/custom-order-capture-draft";
 import type { Json } from "@/integrations/supabase/types";
 import { DomainError } from "@/domain/errors";
 import { requireCapability } from "@/permissions";
@@ -38,6 +45,17 @@ export interface UniversalOrderCaptureLineInput {
   qty: number;
   unitPriceOverride?: number | null;
   comment?: string | null;
+  isOffMenu?: boolean;
+}
+
+export interface UniversalOrderCaptureCustomLineInput {
+  name: string;
+  description?: string | null;
+  dayDate: string; // YYYY-MM-DD
+  qty: number;
+  unitPrice: number | string;
+  comment?: string | null;
+  explicitZeroConfirmed?: boolean;
 }
 
 export type UniversalCustomerInput =
@@ -68,6 +86,7 @@ export interface UniversalOrderCaptureDTO {
   siteId?: string | null;
   organizationalUnitId?: string | null;
   lines: UniversalOrderCaptureLineInput[];
+  customLines?: (UniversalOrderCaptureCustomLineInput | any)[];
   dietaryOverride?: {
     allergens?: string[];
     customAllergens?: string[];
@@ -118,11 +137,12 @@ export const StaffOrderCaptureService = {
       );
     }
 
-    if (!Array.isArray(dto.lines) || dto.lines.length === 0) {
+    const totalLines = (dto.lines?.length || 0) + (dto.customLines?.length || 0);
+    if (totalLines === 0) {
       throw new DomainError("INVALID_STATE", "Order capture requires at least one line item.");
     }
 
-    for (const line of dto.lines) {
+    for (const line of dto.lines || []) {
       if (!line.dayDate || !DATE_REGEX.test(line.dayDate)) {
         throw new DomainError("INVALID_STATE", `Invalid dayDate on item: ${line.dayDate}`);
       }
@@ -144,6 +164,26 @@ export const StaffOrderCaptureService = {
       }
     }
 
+    for (const c of dto.customLines || []) {
+      if ("key" in c) {
+        if (!c.name?.trim()) throw new DomainError("INVALID_STATE", "Custom item must have a name.");
+        if (typeof c.qty !== "number" || c.qty <= 0 || !Number.isInteger(c.qty)) {
+          throw new DomainError("INVALID_STATE", `Invalid quantity on custom item: ${c.qty}`);
+        }
+        if (!c.dayDate || !DATE_REGEX.test(c.dayDate)) {
+          throw new DomainError("INVALID_STATE", `Invalid dayDate on custom item: ${c.dayDate}`);
+        }
+      } else {
+        if (!c.name?.trim()) throw new DomainError("INVALID_STATE", "Custom item must have a name.");
+        if (typeof c.qty !== "number" || c.qty <= 0 || !Number.isInteger(c.qty)) {
+          throw new DomainError("INVALID_STATE", `Invalid quantity on custom item: ${c.qty}`);
+        }
+        if (!c.dayDate || !DATE_REGEX.test(c.dayDate)) {
+          throw new DomainError("INVALID_STATE", `Invalid dayDate on custom item: ${c.dayDate}`);
+        }
+      }
+    }
+
     // EatClean canonical V2 order intake: TanStack Start server functions (Quote V2 + Commit V2).
     // Zero calls to capture_staff_existing_order RPC. Server-side session & capabilities verified.
     if (
@@ -151,22 +191,55 @@ export const StaffOrderCaptureService = {
       (dto.demandChannel ?? "individual") === "individual" &&
       !dto.companyId
     ) {
-      for (const line of dto.lines) {
-        if (line.unitPriceOverride !== undefined && line.unitPriceOverride !== null) {
+      for (const line of dto.lines || []) {
+        if (line.unitPriceOverride !== undefined && line.unitPriceOverride !== null && !line.isOffMenu) {
           throw new DomainError(
             "OFFER_PRICING_OVERRIDE_UNSUPPORTED",
-            "Quoted offer capture does not accept manual price overrides",
+            "Quoted offer capture does not accept manual price overrides on weekly menu dishes",
           );
         }
       }
 
-      const canonicalLines = dto.lines.map((line) => ({
-        kind: "dish" as const,
-        dishId: line.dishId,
-        dayDate: line.dayDate,
-        qty: line.qty,
-        comment: line.comment ? line.comment.trim() : null,
-      }));
+      const canonicalDishLines = (dto.lines || []).map((line) => {
+        const hasOverride =
+          Boolean(line.isOffMenu) &&
+          line.unitPriceOverride !== undefined &&
+          line.unitPriceOverride !== null;
+        return {
+          kind: "dish" as const,
+          dishId: line.dishId,
+          dayDate: line.dayDate,
+          qty: line.qty,
+          comment: line.comment ? line.comment.trim() : null,
+          isOffMenu: line.isOffMenu ? true : undefined,
+          unitPriceOverride: hasOverride ? line.unitPriceOverride!.toFixed(4) : undefined,
+          unitPriceOverrideReason: hasOverride
+            ? "Excepción administrativa fuera de menú"
+            : undefined,
+        };
+      });
+
+      const canonicalCustomLines = (dto.customLines || []).map((c) => {
+        if ("key" in c) {
+          return customDraftLine(c);
+        }
+        const unitPriceStr =
+          typeof c.unitPrice === "number"
+            ? c.unitPrice.toFixed(4)
+            : c.unitPrice.trim().replace(",", ".");
+        return canonicalCustomLineSchema.parse({
+          kind: "custom",
+          name: c.name.trim(),
+          description: c.description?.trim() || null,
+          dayDate: c.dayDate,
+          qty: c.qty,
+          unitPrice: unitPriceStr,
+          comment: c.comment?.trim() || null,
+          explicitZeroConfirmed: !!c.explicitZeroConfirmed,
+        });
+      });
+
+      const canonicalLines = [...canonicalDishLines, ...canonicalCustomLines];
 
       const customerInput =
         dto.customer.mode === "existing"

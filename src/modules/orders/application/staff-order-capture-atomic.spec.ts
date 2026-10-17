@@ -30,7 +30,7 @@ const dto: UniversalOrderCaptureDTO = {
 };
 
 function fixture() {
-  const canonicalWriteResult: CanonicalOrderWriteResult = {
+  const canonicalWriteResult = {
     order: {
       id: "99000000-0000-4000-8000-000000000001",
       tenant_id: EATCLEAN_TENANT_ID,
@@ -93,8 +93,8 @@ function fixture() {
         },
       ],
     }),
-    custom: vi.fn().mockResolvedValue(canonicalWriteResult),
-    mixed: vi.fn().mockResolvedValue(canonicalWriteResult),
+    custom: vi.fn().mockResolvedValue(canonicalWriteResult as unknown as CanonicalOrderWriteResult),
+    mixed: vi.fn().mockResolvedValue(canonicalWriteResult as unknown as CanonicalOrderWriteResult),
   };
 
   const rpc = vi.fn();

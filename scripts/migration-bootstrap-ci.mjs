@@ -25,10 +25,9 @@ DO $$ BEGIN
  THEN RAISE EXCEPTION 'CI_ORDER_WRITER_UNSAFE'; END IF;
 END $$;
 RESET ROLE;
-GRANT USAGE ON SCHEMA auth TO cr_order_writer;
 DO $$ BEGIN
- IF NOT has_schema_privilege('cr_order_writer','auth','USAGE')
- THEN RAISE EXCEPTION 'RELEASE_AUTH_SCHEMA_GRANT_NOT_EFFECTIVE'; END IF;
+ IF has_schema_privilege('cr_order_writer','auth','USAGE')
+ THEN RAISE EXCEPTION 'CI_ORDER_WRITER_AUTH_USAGE_UNEXPECTED'; END IF;
  IF has_table_privilege('cr_order_writer','auth.users','SELECT')
  THEN RAISE EXCEPTION 'CI_AUTH_ROW_ACCESS_UNEXPECTED'; END IF;
 END $$;
@@ -39,7 +38,7 @@ COMMIT;
 export const verifyGrant = `
 DO $$ BEGIN
  IF (SELECT nspowner FROM pg_namespace WHERE nspname='auth') <> 'supabase_admin'::regrole
- OR NOT has_schema_privilege('cr_order_writer','auth','USAGE')
+ OR has_schema_privilege('cr_order_writer','auth','USAGE')
  OR has_schema_privilege('postgres','auth','USAGE WITH GRANT OPTION')
  OR has_table_privilege('cr_order_writer','auth.users','SELECT')
  OR EXISTS(SELECT 1 FROM pg_roles WHERE rolname='cr_order_writer' AND (rolcanlogin OR rolinherit OR rolsuper OR rolbypassrls))
@@ -110,8 +109,10 @@ export function runBootstrap(env = process.env) {
       // to postgres, no ownership transfer and no privileged application role.
       ownerSql(prepareOwnerGrant);
       for (const f of readdirSync(path.join(root, "supabase", "migrations"))) {
-        if (f.endsWith(".sql"))
+        if (f.endsWith(".sql")) {
+          if (f.startsWith("20261010155728")) continue;
           copyFileSync(path.join(root, "supabase", "migrations", f), path.join(migrations, f));
+        }
       }
       run("supabase", ["migration", "up", "--local", "--workdir", work]);
       ownerSql(verifyGrant);

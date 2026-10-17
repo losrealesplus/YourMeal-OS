@@ -9,17 +9,16 @@ test("refuses an arbitrary project/run identifier", () =>
     () => runBootstrap({ GITHUB_ACTIONS: "true", GITHUB_RUN_ID: "project-token" }),
     /CI_ONLY_EXECUTOR/,
   ));
-test("owner authority grants only exact schema USAGE", () => {
-  assert.match(prepareOwnerGrant, /GRANT USAGE ON SCHEMA auth TO cr_order_writer/);
+test("owner authority verifies schema security and restricts privileges", () => {
   assert.doesNotMatch(
     prepareOwnerGrant,
-    /WITH GRANT OPTION|ALTER SCHEMA|SUPERUSER;|GRANT .* TO postgres/,
+    /WITH GRANT OPTION|ALTER SCHEMA|SUPERUSER;|GRANT .* TO postgres|GRANT USAGE ON SCHEMA auth/,
   );
   assert.match(prepareOwnerGrant, /current_user <> 'supabase_admin'/);
   assert.match(prepareOwnerGrant, /CI_ORDER_WRITER_UNSAFE/);
 });
-test("preserves effective grant and absence of Auth row privileges", () => {
-  assert.match(prepareOwnerGrant, /RELEASE_AUTH_SCHEMA_GRANT_NOT_EFFECTIVE/);
+test("preserves absence of Auth schema and row privileges", () => {
+  assert.match(prepareOwnerGrant, /CI_ORDER_WRITER_AUTH_USAGE_UNEXPECTED/);
   assert.match(verifyGrant, /has_table_privilege\('cr_order_writer','auth.users','SELECT'\)/);
   assert.match(verifyGrant, /USAGE WITH GRANT OPTION/);
 });

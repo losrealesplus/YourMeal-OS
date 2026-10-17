@@ -10,11 +10,14 @@ import {
 export function assertLegacyOfferSlots(
   tenantId: string,
   menuId: string,
-  lines: Array<{ dishId: string; dayDate: string }>,
+  lines: Array<{ dishId: string; dayDate: string; isOffMenu?: boolean }>,
   slots: WeeklyMenuSlotWithDish[],
   commercialActive: boolean,
 ): void {
   for (const line of lines) {
+    if (line.isOffMenu) {
+      continue;
+    }
     const eligible = slots.filter(
       (slot) =>
         slot.tenant_id === tenantId &&
@@ -41,7 +44,7 @@ export function assertLegacyOfferSlots(
 export async function assertLegacyOfferWrite(
   ctx: ServiceContext,
   weekStart: string,
-  lines: Array<{ dishId: string; dayDate: string }>,
+  lines: Array<{ dishId: string; dayDate: string; isOffMenu?: boolean }>,
 ): Promise<void> {
   const repo = createWeeklyMenuRepository(ctx.supabase, ctx.tenantId);
   const menu = await repo.findPublishedByWeekStart(weekStart);
