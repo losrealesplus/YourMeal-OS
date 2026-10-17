@@ -118,7 +118,7 @@ export function UpcomingDeliveryCard({
 
   if (isLoading) {
     return (
-      <div className="rounded-[1.25rem] border border-border/70 bg-card p-5 animate-pulse">
+      <div className="surface-raised rounded-3xl border border-border/70 bg-card p-5 animate-pulse">
         <div className="h-3 w-28 rounded bg-muted" />
         <div className="mt-4 h-6 w-40 rounded bg-muted" />
         <div className="mt-3 h-4 w-full rounded bg-muted" />
@@ -128,31 +128,34 @@ export function UpcomingDeliveryCard({
 
   if (!result || result.kind === "none") {
     return (
-      <section className="rounded-[1.25rem] border border-border/70 bg-card p-5 space-y-4">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-          {t("nextDelivery")}
+      <section className="surface-raised rounded-3xl border border-border/70 bg-card p-5 space-y-3">
+        <div className="flex items-center justify-between">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+            {t("nextDelivery")}
+          </p>
+          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-secondary text-muted-foreground">
+            Sin entregas activas
+          </span>
+        </div>
+        <p className="text-base font-bold leading-snug text-foreground">
+          Sin entregas programadas
         </p>
-        <p className="text-[15px] font-semibold leading-snug text-pretty">
-          {t("upcomingEmptyTitle")}
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Cuando planifiques tu menú semanal, podrás seguir aquí la preparación y fecha estimada de tu entrega.
         </p>
-        <Link to="/app/menu" className="block">
-          <PrimaryCTA className="!h-12 !text-sm !rounded-2xl">
-            {t("upcomingActionProgram")}
-          </PrimaryCTA>
-        </Link>
       </section>
     );
   }
 
   const { delivery } = result;
   const phase = delivery.phase as Exclude<UpcomingDeliveryPhase, "none">;
-  const Icon = phaseIcon[phase];
+  const Icon = phaseIcon[phase] ?? Package;
   const addressLabel = formatAddress(delivery);
   const primary = delivery.actions[0];
   const secondary = delivery.actions[1];
 
   return (
-    <section className="rounded-[1.25rem] border border-border/70 bg-card p-5 space-y-4">
+    <section className="surface-raised rounded-3xl border border-border/70 bg-card p-5 space-y-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">

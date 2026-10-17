@@ -1,7 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import type { ReactNode } from "react";
-import { ChevronRight, Heart, UtensilsCrossed } from "lucide-react";
+import {
+  CalendarDays,
+  ChevronRight,
+  ClipboardList,
+  Heart,
+  MapPin,
+  Sparkles,
+  UtensilsCrossed,
+} from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import {
   PrimaryCTA,
@@ -13,20 +20,21 @@ import {
   dashboardStateIds,
   isDashboardState,
   type DashboardStateId,
-  MenuDishPost,
-  dishMacrosLine,
 } from "@/components/consumer";
 import { TenantLogo } from "@/components/tenant/tenant-logo";
 import { BrandLeafMark } from "@/components/tenant/brand-leaf-mark";
 import { PoweredByLine } from "@/components/tenant/tenant-brand-scope";
 import { useWeeklyMenu } from "@/hooks/use-weekly-menu";
 import { useUpcomingDelivery } from "@/hooks/use-upcoming-delivery";
-import { utcWeekStartMonday } from "@/modules/weekly-menu/application/week-dates";
+import { useCustomerOrders } from "@/hooks/use-customer-orders";
+import { useCustomerSelfProfile } from "@/hooks/use-customer-self-profile";
+import { utcWeekStartMonday, utcWeekDates } from "@/modules/weekly-menu/application/week-dates";
+import { cn } from "@/lib/utils";
 import dishPhoto from "@/assets/eatclean-hero.jpg";
 
 /**
- * SCR-005 · Home — CJ-001 + EP-002A.1 Próxima entrega
- * Customer Weekly Cycle: next delivery is the information center.
+ * SCR-005 · Customer Home — CX-01A Warm Premium Experience
+ * "La tecnología trabaja detrás. El bienestar se siente delante"
  */
 export const Route = createFileRoute("/_authenticated/app/")({
   validateSearch: (search: Record<string, unknown>): { state?: DashboardStateId } => ({
@@ -35,17 +43,89 @@ export const Route = createFileRoute("/_authenticated/app/")({
   component: CustomerHome,
 });
 
+export type CustomerHomeState =
+  | "new_profile"
+  | "missing_address"
+  | "unprogrammed"
+  | "confirmed_delivery";
+
+export interface CustomerHomeContextData {
+  hasProfile: boolean;
+  hasAddress: boolean;
+  totalPortions: number;
+  hasUpcomingDelivery: boolean;
+}
+
+export function getTimeOfDayGreeting(now: Date = new Date()): {
+  greeting: string;
+  emoji: string;
+} {
+  const hour = now.getHours();
+  if (hour >= 6 && hour < 13) {
+    return { greeting: "¡Buenos días", emoji: "☀️" };
+  } else if (hour >= 13 && hour < 21) {
+    return { greeting: "¡Buenas tardes", emoji: "🌤️" };
+  } else {
+    return { greeting: "¡Buenas noches", emoji: "🌙" };
+  }
+}
+
+export function resolveCustomerHomeState(data: CustomerHomeContextData): CustomerHomeState {
+  if (!data.hasProfile) {
+    return "new_profile";
+  }
+  if (!data.hasAddress) {
+    return "missing_address";
+  }
+  if (data.totalPortions > 0 || data.hasUpcomingDelivery) {
+    return "confirmed_delivery";
+  }
+  return "unprogrammed";
+}
+
+export function getAdaptiveCTA(state: CustomerHomeState) {
+  switch (state) {
+    case "new_profile":
+      return {
+        headline: "Tu alimentación, organizada",
+        subtitle: "Empecemos por tus preferencias para personalizar tus menús y recomendaciones.",
+        ctaLabel: "Configurar mi perfil",
+        ctaTo: "/app/settings/profile" as const,
+        ctaIcon: Sparkles,
+      };
+    case "missing_address":
+      return {
+        headline: "Añade tu dirección",
+        subtitle: "Para planificar tus entregas semanales necesitamos saber dónde llevar tu comida.",
+        ctaLabel: "Añadir dirección de entrega",
+        ctaTo: "/app/addresses" as const,
+        ctaIcon: MapPin,
+      };
+    case "unprogrammed":
+      return {
+        headline: "Tu semana está por organizar",
+        subtitle: "¿Elegimos tus platos? Elige las raciones y los días que mejor se adapten a tu ritmo.",
+        ctaLabel: "Elegir mis platos",
+        ctaTo: "/app/schedule" as const,
+        ctaIcon: UtensilsCrossed,
+      };
+    case "confirmed_delivery":
+      return {
+        headline: "Todo bajo control",
+        subtitle: "Tu próxima entrega está en marcha. Disfruta de una alimentación cuidada sin complicaciones.",
+        ctaLabel: "Revisar mi semana",
+        ctaTo: "/app/orders" as const,
+        ctaIcon: CalendarDays,
+      };
+  }
+}
+
 function CustomerHome() {
   const { t } = useTranslation(["customer", "common"]);
-  const { user, isStaff } = useAuth();
+  const { isStaff } = useAuth();
   const navigate = useNavigate({ from: "/app" });
   const search = Route.useSearch();
   const state: DashboardStateId = search.state ?? "default";
-
-  const name =
-    (user?.user_metadata?.full_name as string | undefined)?.split(" ")[0] ??
-    user?.email?.split("@")[0] ??
-    "";
 
   const stateOptions = dashboardStateIds.map((id) => ({
     id,
@@ -70,34 +150,23 @@ function CustomerHome() {
           />
         </div>
       ) : null}
-      <HomeBody name={name} state={state} />
+      <HomeBody state={state} />
     </div>
   );
 }
 
-function HomeBody({
-  name,
-  state,
-}: {
-  name: string;
-  state: DashboardStateId;
-}) {
+function HomeBody({ state }: { state: DashboardStateId }) {
   const { t } = useTranslation("customer");
-  const { isStaff } = useAuth();
+  const { user, isStaff } = useAuth();
   const navigate = useNavigate({ from: "/app" });
   const weekStart = utcWeekStartMonday();
-  const { data: weeklyMenu } = useWeeklyMenu(weekStart);
+
+  // Primary data sources for Customer Experience
   const { data: upcoming, isLoading: upcomingLoading } = useUpcomingDelivery();
-
-  const featured =
-    weeklyMenu?.days.flatMap((d) => d.dishes).find(Boolean) ?? null;
-  const hasUpcoming = upcoming?.kind === "upcoming";
-
-  const macroLabels = {
-    protein: t("macroProtein"),
-    carbs: t("macroCarbs"),
-    fat: t("macroFat"),
-  };
+  const { data: customerOrders, isLoading: ordersLoading } = useCustomerOrders();
+  const { profile: profileQuery } = useCustomerSelfProfile();
+  // Fetch weekly menu for catalog awareness
+  useWeeklyMenu(weekStart);
 
   if (state === "loading") {
     return <DashboardSkeleton label={t("loadingDashboard")} />;
@@ -114,112 +183,297 @@ function HomeBody({
     );
   }
 
+  // Initial loading shimmer when essential customer data is loading
+  const isInitialLoading = profileQuery.isLoading && !profileQuery.data && upcomingLoading;
+  if (isInitialLoading && state === "default") {
+    return <DashboardSkeleton label={t("loadingDashboard")} />;
+  }
+
+  // 1. Resolve Customer Name
+  const profileName = profileQuery.data?.displayName?.trim();
+  const authName =
+    (user?.user_metadata?.full_name as string | undefined)?.trim() ??
+    (user?.user_metadata?.name as string | undefined)?.trim() ??
+    user?.email?.split("@")[0] ??
+    "";
+  const fullName = profileName || authName || "";
+  const firstName = fullName.split(" ")[0] || "";
+
+  // 2. Daytime Greeting
+  const { greeting, emoji } = getTimeOfDayGreeting();
+  const greetingText = firstName ? `${greeting}, ${firstName}!` : `${greeting}!`;
+
+  // 3. Addresses & Profile completeness
+  const activeAddresses = profileQuery.data?.addresses?.filter((a) => !a.archived) ?? [];
+  const hasProfile = Boolean(profileName);
+  const hasAddress = activeAddresses.length > 0;
+  const hasUpcoming = upcoming?.kind === "upcoming";
+
+  // 4. Weekly schedule computation without data invention
+  const currentWeekOrders = (customerOrders ?? []).filter(
+    (o) => o.weekStart === weekStart && o.status !== "cancelled",
+  );
+
+  let totalPortions = 0;
+  const scheduledDayDates = new Set<string>();
+  for (const order of currentWeekOrders) {
+    totalPortions += order.itemCount;
+    if (order.dayDates && order.dayDates.length > 0) {
+      for (const d of order.dayDates) {
+        scheduledDayDates.add(d);
+      }
+    } else if (order.deliveryDate) {
+      scheduledDayDates.add(order.deliveryDate);
+    }
+  }
+  const scheduledDays = scheduledDayDates.size;
+  const deliveryCount = currentWeekOrders.length;
+
+  // 5. Contextual State Resolution
+  let resolvedState: CustomerHomeState;
+  if (state === "empty") {
+    resolvedState = "unprogrammed";
+  } else if (state === "confirmed" || state === "withOrders") {
+    resolvedState = "confirmed_delivery";
+  } else if (profileQuery.isSuccess && !hasProfile) {
+    resolvedState = "new_profile";
+  } else if (profileQuery.isSuccess && !hasAddress) {
+    resolvedState = "missing_address";
+  } else if (totalPortions > 0 || hasUpcoming) {
+    resolvedState = "confirmed_delivery";
+  } else {
+    resolvedState = "unprogrammed";
+  }
+
+  const adaptive = getAdaptiveCTA(resolvedState);
+  const CTAIcon = adaptive.ctaIcon;
+
+  // 7-day strip calculation (Monday to Sunday)
+  const weekDates = utcWeekDates(weekStart);
+  const DAY_LETTERS = ["L", "M", "X", "J", "V", "S", "D"];
+
   return (
-    <div className="flex-1 flex flex-col px-6 pt-8 pb-10">
+    <div className="flex-1 flex flex-col px-6 pt-6 pb-12">
       {state === "offline" ? (
         <div className="mb-4">
           <OfflineBanner title={t("offlineTitle")} hint={t("offlineHint")} />
         </div>
       ) : null}
 
+      {/* Brand Identity */}
       <div className="flex justify-center">
-        <TenantLogo height={44} />
+        <TenantLogo height={42} />
       </div>
 
-      <div className="mt-10 text-center space-y-3">
-        <h1 className="text-[1.75rem] font-extrabold tracking-tight text-balance">
-          {t("greeting")}
-          {name ? ` ${name}` : ""}
-        </h1>
-        <p className="text-lg font-semibold leading-snug text-foreground/90 text-pretty max-w-[20rem] mx-auto">
-          {hasUpcoming ? t("assistantHint") : t("homeMenuReady")}
+      {/* Hero Greeting & Status */}
+      <header className="mt-8 text-center space-y-2">
+        <p className="text-xs font-bold uppercase tracking-widest text-primary">
+          {greetingText} <span className="inline-block" role="img" aria-label="saludo">{emoji}</span>
         </p>
+        <h1 className="text-2xl font-extrabold tracking-tight text-balance text-foreground">
+          {adaptive.headline}
+        </h1>
+        <p className="text-sm font-medium leading-relaxed text-muted-foreground text-pretty max-w-[22rem] mx-auto">
+          {adaptive.subtitle}
+        </p>
+      </header>
+
+      {/* Adaptive Primary CTA */}
+      <div className="mt-6">
+        <Link to={adaptive.ctaTo} className="block w-full">
+          <PrimaryCTA className="!h-14 !text-base !rounded-2xl flex items-center justify-center gap-2.5 shadow-sm">
+            <CTAIcon className="size-5" />
+            <span>{adaptive.ctaLabel}</span>
+          </PrimaryCTA>
+        </Link>
       </div>
 
-      {/* EP-002A.1 — information center */}
+      {/* Next Delivery Card */}
       <div className="mt-8">
         <UpcomingDeliveryCard result={upcoming} isLoading={upcomingLoading} />
       </div>
 
-      {!hasUpcoming ? (
-        <div className="mt-4">
-          <Link to="/app/menu" className="block">
-            <PrimaryCTA className="!h-14 !text-base !rounded-[1.25rem]" variant="outline">
-              {t("homeViewMenuCta")}
-            </PrimaryCTA>
-          </Link>
+      {/* Weekly Progress Strip (Ritmo semanal) */}
+      <div className="mt-6">
+        {totalPortions > 0 ? (
+          <section className="surface-raised rounded-3xl border border-border/70 bg-card p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                Ritmo semanal
+              </p>
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
+                <span className="size-2 rounded-full bg-primary animate-pulse" />
+                <span>{scheduledDays} {scheduledDays === 1 ? "día activo" : "días activos"}</span>
+              </div>
+            </div>
+
+            {/* Metric Pills */}
+            <div className="grid grid-cols-3 gap-2">
+              <div className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-secondary/50 border border-border/40">
+                <span className="text-[11px] text-muted-foreground font-medium">Días</span>
+                <span className="text-lg font-extrabold text-foreground tabular-nums">{scheduledDays}</span>
+              </div>
+              <div className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-secondary/50 border border-border/40">
+                <span className="text-[11px] text-muted-foreground font-medium">Raciones</span>
+                <span className="text-lg font-extrabold text-foreground tabular-nums">{totalPortions}</span>
+              </div>
+              <div className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-secondary/50 border border-border/40">
+                <span className="text-[11px] text-muted-foreground font-medium">Entregas</span>
+                <span className="text-lg font-extrabold text-foreground tabular-nums">{deliveryCount}</span>
+              </div>
+            </div>
+
+            {/* 7-Day Visual Strip */}
+            <div className="grid grid-cols-7 gap-1.5 pt-1">
+              {weekDates.map((dateStr, idx) => {
+                const isScheduled = scheduledDayDates.has(dateStr);
+                return (
+                  <div
+                    key={dateStr}
+                    className={cn(
+                      "flex flex-col items-center justify-center py-2.5 rounded-xl transition-all",
+                      isScheduled
+                        ? "bg-primary text-primary-foreground font-bold shadow-sm"
+                        : "bg-secondary/40 text-muted-foreground/70 font-medium",
+                    )}
+                  >
+                    <span className="text-[11px] uppercase tracking-wider">{DAY_LETTERS[idx]}</span>
+                    <span
+                      className={cn(
+                        "size-1.5 rounded-full mt-1.5",
+                        isScheduled ? "bg-primary-foreground" : "bg-transparent",
+                      )}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        ) : (
+          <section className="surface-raised rounded-3xl border border-border/70 bg-card p-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                Ritmo semanal
+              </p>
+              <span className="text-xs text-muted-foreground">0 raciones esta semana</span>
+            </div>
+
+            {/* Neutral 7-Day Strip */}
+            <div className="grid grid-cols-7 gap-1.5 pt-1">
+              {weekDates.map((dateStr, idx) => (
+                <div
+                  key={dateStr}
+                  className="flex flex-col items-center justify-center py-2.5 rounded-xl bg-secondary/30 text-muted-foreground/60 font-medium"
+                >
+                  <span className="text-[11px] uppercase tracking-wider">{DAY_LETTERS[idx]}</span>
+                  <span className="size-1.5 rounded-full mt-1.5 bg-transparent" />
+                </div>
+              ))}
+            </div>
+
+            <p className="text-xs text-muted-foreground leading-relaxed pt-1">
+              Planifica de 1 a 7 días según tu ritmo de vida. Tú decides cuándo y cuántas comidas recibir.
+            </p>
+          </section>
+        )}
+      </div>
+
+      {/* Editorial Gastro Card */}
+      <section className="mt-8 overflow-hidden rounded-3xl border border-border/70 bg-card surface-raised shadow-sm">
+        <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
+          <img
+            src={dishPhoto}
+            alt="Alimentación saludable EatClean"
+            className="h-full w-full object-cover"
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
+          <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/95 backdrop-blur-md px-3 py-1 text-[11px] font-bold text-foreground shadow-sm">
+              ✨ Bienestar diario
+            </span>
+          </div>
         </div>
-      ) : (
-        <div className="mt-4">
+        <div className="p-5 space-y-3">
+          <h3 className="text-base font-bold text-foreground leading-snug">
+            Tu alimentación, organizada
+          </h3>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Consulta tus próximas comidas y disfruta de tu día con platos equilibrados preparados con ingredientes frescos.
+          </p>
+          <div className="pt-1">
+            <Link
+              to="/app/menu"
+              className="inline-flex items-center gap-2 text-sm font-bold text-primary hover:underline"
+            >
+              <span>Explorar menú semanal</span>
+              <ChevronRight className="size-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Quick Actions Navigation Grid */}
+      <section className="mt-8 space-y-3">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-1">
+          Accesos rápidos
+        </p>
+        <div className="grid grid-cols-1 gap-2.5">
           <Link
             to="/app/menu"
-            className="flex h-12 items-center justify-center rounded-2xl border border-border text-sm font-bold"
+            className="flex items-center gap-4 p-4 rounded-2xl border border-border/60 bg-card surface-raised transition-all active:scale-[0.99] hover:border-primary/40"
           >
-            {t("homeViewMenuCta")}
+            <div className="grid place-items-center size-10 rounded-xl bg-primary/10 text-primary shrink-0">
+              <UtensilsCrossed className="size-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-foreground">Mi menú</p>
+              <p className="text-xs text-muted-foreground truncate">
+                Platos equilibrados de la semana
+              </p>
+            </div>
+            <ChevronRight className="size-4 text-muted-foreground/60 shrink-0" />
+          </Link>
+
+          <Link
+            to="/app/orders"
+            className="flex items-center gap-4 p-4 rounded-2xl border border-border/60 bg-card surface-raised transition-all active:scale-[0.99] hover:border-primary/40"
+          >
+            <div className="grid place-items-center size-10 rounded-xl bg-primary/10 text-primary shrink-0">
+              <ClipboardList className="size-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-foreground">Mis pedidos</p>
+              <p className="text-xs text-muted-foreground truncate">
+                Historial y seguimiento de entregas
+              </p>
+            </div>
+            <ChevronRight className="size-4 text-muted-foreground/60 shrink-0" />
+          </Link>
+
+          <Link
+            to="/app/settings/dietary"
+            className="flex items-center gap-4 p-4 rounded-2xl border border-border/60 bg-card surface-raised transition-all active:scale-[0.99] hover:border-primary/40"
+          >
+            <div className="grid place-items-center size-10 rounded-xl bg-primary/10 text-primary shrink-0">
+              <Heart className="size-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-foreground">Mis preferencias</p>
+              <p className="text-xs text-muted-foreground truncate">
+                Alergias, restricciones y estilo de vida
+              </p>
+            </div>
+            <ChevronRight className="size-4 text-muted-foreground/60 shrink-0" />
           </Link>
         </div>
-      )}
+      </section>
 
-      {featured && !hasUpcoming ? (
-        <div className="mt-12 space-y-5">
-          <p className="text-sm font-semibold text-muted-foreground tracking-wide">
-            {t("homeFeatured")}
-          </p>
-          <MenuDishPost
-            dish={featured}
-            imageSrc={dishPhoto}
-            macrosLabel={dishMacrosLine(featured, macroLabels)}
-            cta={
-              <Link
-                to="/app/menu"
-                className="flex h-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground text-[15px] font-bold"
-              >
-                {t("homeViewMenuCta")}
-              </Link>
-            }
-          />
-        </div>
-      ) : null}
-
-      <div className="mt-12 space-y-1 border-t border-border/60 pt-6">
-        <QuietLink
-          to="/app/schedule"
-          icon={<UtensilsCrossed className="size-5" strokeWidth={2} />}
-          label={t("scheduleCta")}
-        />
-        <QuietLink
-          to="/app/favorites"
-          icon={<Heart className="size-5" strokeWidth={2} />}
-          label={t("homeFavorites")}
-        />
-      </div>
-
-      {/* EP-002A.1.1 — Ops Center entry only for staff; customers never see it */}
-      <div className="mt-10 flex flex-col items-center gap-3 pb-2">
+      {/* Footer / Ops Center Entry */}
+      <footer className="mt-12 flex flex-col items-center gap-3 pb-2">
         {isStaff ? <BrandLeafMark /> : null}
         <PoweredByLine />
-      </div>
+      </footer>
     </div>
-  );
-}
-
-function QuietLink({
-  to,
-  icon,
-  label,
-}: {
-  to: "/app/menu" | "/app/schedule" | "/app/favorites";
-  icon: ReactNode;
-  label: string;
-}) {
-  return (
-    <Link
-      to={to}
-      className="flex items-center gap-4 py-4 border-b border-border/50 last:border-0 active:opacity-70"
-    >
-      <span className="text-primary">{icon}</span>
-      <span className="flex-1 text-[15px] font-semibold">{label}</span>
-      <ChevronRight className="size-4 text-muted-foreground/70" />
-    </Link>
   );
 }

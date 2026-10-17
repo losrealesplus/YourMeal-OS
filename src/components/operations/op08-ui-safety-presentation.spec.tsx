@@ -92,7 +92,7 @@ describe("OP-08 UI Safety Presentation", () => {
 
   it("handles HISTORICAL_UNAVAILABLE gracefully with historical notice", () => {
     const allergenState: AllergenSnapshotState = "HISTORICAL_UNAVAILABLE";
-    const isCustom = false;
+    const isCustom: boolean = false;
 
     const html = renderToStaticMarkup(
       <div>
