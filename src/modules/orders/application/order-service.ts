@@ -24,6 +24,12 @@ import {
   type ProgramOrderItemInput,
 } from "../infrastructure/order-repository";
 import { buildOrderDietarySnapshot } from "@/types/dietary";
+import {
+  createCustomCaptureSession,
+  customCaptureTransport,
+  type CaptureTransport,
+} from "./custom-order-capture-service";
+import type { CanonicalOrderCommand } from "../domain/canonical-order-write";
 
 export type ProgramDraftOrderCommand = {
   weekStart: string;
@@ -49,6 +55,11 @@ export type ProgramDraftItemsCommand = {
   customerTier?: CustomerTier;
   extras?: ExtraItemInput[];
   deliveryAddressId?: string | null;
+};
+
+export type ProgramDraftItemsOptions = {
+  transport?: CaptureTransport;
+  useQuotedWriter?: boolean;
 };
 
 export type ProgramDraftOrderResult = {
@@ -117,6 +128,7 @@ export const OrderService = {
   async programDraftItems(
     ctx: ServiceContext,
     command: ProgramDraftItemsCommand,
+    options?: ProgramDraftItemsOptions,
   ): Promise<ProgramDraftOrderResult> {
     requireCapability(ctx.roles, "orders.write");
 
@@ -163,6 +175,112 @@ export const OrderService = {
       }
 
       const slots = await menuRepo.listSlotsWithDishes(menu.id);
+
+      const hasExplicitOfferPrices = command.items.some((item) => {
+        const eligible = slots.filter(
+          (slot) =>
+            slot.tenant_id === ctx.tenantId &&
+            slot.weekly_menu_id === menu.id &&
+            slot.day_date === item.dayDate &&
+            slot.dish_id === item.dishId &&
+            slot.dishes?.id === item.dishId &&
+            slot.dishes.tenant_id === ctx.tenantId &&
+            slot.dishes.status === "active" &&
+            !slot.dishes.deleted_at,
+        );
+        return eligible.some((slot) => slot.unit_price != null);
+      });
+
+      const shouldUseQuotedWriter =
+        options?.useQuotedWriter === true ||
+        Boolean(options?.transport) ||
+        hasExplicitOfferPrices;
+
+      if (shouldUseQuotedWriter) {
+        const repo = createOrderRepository(ctx.supabase, ctx.tenantId);
+        let customerId = command.customerId ?? (await repo.findCustomerIdForUser(ctx.userId));
+        if (!customerId) {
+          // Structural correction ADR 0015 — provision Individual Customer without breaking CJ-001.
+          const { CompanyAccountService } =
+            await import("@/modules/company-account/application/company-account-service");
+          customerId = await CompanyAccountService.ensureIndividualCustomer(ctx);
+        }
+
+        const { CompanyAccountService } =
+          await import("@/modules/company-account/application/company-account-service");
+        const demand = await CompanyAccountService.resolveOrderDemandContext(ctx, customerId);
+
+        let effectiveDeliveryAddressId: string | null = command.deliveryAddressId ?? null;
+        if (
+          !effectiveDeliveryAddressId &&
+          demand.demandChannel === "individual" &&
+          typeof ctx.supabase?.from === "function"
+        ) {
+          const { data: defaultAddr, error: defaultAddressError } = await ctx.supabase
+            .from("customer_addresses")
+            .select("id")
+            .eq("tenant_id", ctx.tenantId)
+            .eq("customer_id", customerId)
+            .is("deleted_at", null)
+            .eq("is_default", true)
+            .maybeSingle();
+          if (defaultAddressError)
+            throw new DomainError(
+              "INVALID_STATE",
+              "La dirección predeterminada no se pudo verificar.",
+            );
+          effectiveDeliveryAddressId = defaultAddr?.id ?? null;
+        }
+
+        const canonicalLines = command.items.map((item) => ({
+          kind: "dish" as const,
+          dishId: item.dishId,
+          dayDate: item.dayDate,
+          qty: item.qty,
+        }));
+
+        const canonicalCommand: CanonicalOrderCommand = {
+          operation: "capture",
+          customer: { kind: "existing", id: customerId },
+          weekStart: command.weekStart,
+          autoConfirm: false,
+          demandChannel: "individual",
+          lines: canonicalLines,
+          orderNotes: command.notes?.trim() || null,
+          deliveryAddressId: effectiveDeliveryAddressId,
+        };
+
+        const session = createCustomCaptureSession(
+          options?.transport ?? (await customCaptureTransport()),
+        );
+
+        await session.prepare(ctx.tenantId, canonicalCommand);
+        const writeResult = await session.commit();
+
+        try {
+          await AuditService.write(ctx, {
+            entityType: "order",
+            entityId: writeResult.order.id,
+            action: "create",
+            newData: {
+              customerId,
+              total: Number(writeResult.order.total),
+              status: writeResult.order.status,
+              demandChannel: "individual",
+              deliveryAddressId: effectiveDeliveryAddressId,
+              writeContractVersion: 2,
+            },
+          });
+        } catch {
+          // Non-blocking for draft creation
+        }
+
+        return {
+          order: writeResult.order,
+          items: writeResult.items as OrderItemRow[],
+        };
+      }
+
       assertLegacyOfferSlots(
         ctx.tenantId,
         menu.id,
@@ -448,7 +566,8 @@ export const OrderService = {
       if (
         options?.offerCode ||
         options?.extras?.length ||
-        (options?.expectedTotal !== undefined && options.expectedTotal !== current.order.total)
+        (options?.expectedTotal !== undefined &&
+          Number(options.expectedTotal) !== Number(current.order.total))
       )
         throw new DomainError(
           "INVALID_STATE",

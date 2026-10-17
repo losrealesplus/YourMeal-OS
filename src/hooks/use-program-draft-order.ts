@@ -17,6 +17,7 @@ export type ProgramDraftOrderPayload =
       customerTier?: import("@/modules/commercial").CustomerTier;
       extras?: import("@/modules/commercial").ExtraItemInput[];
       deliveryAddressId?: string | null;
+      useQuotedWriter?: boolean;
     };
 
 /**
@@ -44,30 +45,41 @@ export function useProgramDraftOrder() {
         roles,
       });
 
+      const useQuotedWriter = "useQuotedWriter" in command ? command.useQuotedWriter : undefined;
+      const options = useQuotedWriter !== undefined ? { useQuotedWriter } : undefined;
+
       if ("items" in command && Array.isArray(command.items)) {
-        return OrderIntakeService.intakeDraft(ctx, {
-          channel: "app",
-          weekStart: command.weekStart,
-          items: command.items,
-          notes: command.notes,
-          offerCode: command.offerCode,
-          customerTier: command.customerTier,
-          extras: command.extras,
-          deliveryAddressId: command.deliveryAddressId,
-        });
+        return OrderIntakeService.intakeDraft(
+          ctx,
+          {
+            channel: "app",
+            weekStart: command.weekStart,
+            items: command.items,
+            notes: command.notes,
+            offerCode: command.offerCode,
+            customerTier: command.customerTier,
+            extras: command.extras,
+            deliveryAddressId: command.deliveryAddressId,
+          },
+          options,
+        );
       }
 
       const singleDayCmd = command as ProgramDraftOrderCommand;
-      return OrderIntakeService.intakeDraftDay(ctx, {
-        weekStart: singleDayCmd.weekStart,
-        dayDate: singleDayCmd.dayDate,
-        dishIds: singleDayCmd.dishIds,
-        notes: singleDayCmd.notes,
-        offerCode: singleDayCmd.offerCode,
-        customerTier: singleDayCmd.customerTier,
-        extras: singleDayCmd.extras,
-        deliveryAddressId: singleDayCmd.deliveryAddressId,
-      });
+      return OrderIntakeService.intakeDraftDay(
+        ctx,
+        {
+          weekStart: singleDayCmd.weekStart,
+          dayDate: singleDayCmd.dayDate,
+          dishIds: singleDayCmd.dishIds,
+          notes: singleDayCmd.notes,
+          offerCode: singleDayCmd.offerCode,
+          customerTier: singleDayCmd.customerTier,
+          extras: singleDayCmd.extras,
+          deliveryAddressId: singleDayCmd.deliveryAddressId,
+        },
+        options,
+      );
     },
     onSuccess: async () => {
       if (!tenantId) return;
