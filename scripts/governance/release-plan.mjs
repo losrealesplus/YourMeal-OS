@@ -1,4 +1,10 @@
 import {
+  CX_536,
+  cx536Payload,
+  cx536ScopeId,
+  authorizeCx536,
+} from "./release-cx-01c-google-536.mjs";
+import {
   STAFF_523,
   staff523Payload,
   staff523ScopeId,
@@ -364,6 +370,28 @@ function activationSnapshot(ctx, base, diff, prs, currentMainSha) {
     remediation: api(`pulls/${prs.at(-1)}`),
   };
 }
+export function cx536Snapshot(ctx, base, diff, prs, currentMainSha) {
+  const s = activationSnapshot(ctx, base, diff, prs, currentMainSha);
+  s.productPr = api("pulls/536");
+  s.commits = s.commits.map((c) => ({
+    ...c,
+    parent: git("rev-parse", `${c.sha}^1`).trim(),
+    headSha: git("rev-parse", `${c.sha}^2`).trim(),
+    files: c.paths.map((p) => {
+      const fileHash = (rev) => {
+        const entry = git("ls-tree", rev, "--", p);
+        if (!entry) return null;
+        const blob = /^100(?:644|755) blob ([a-f0-9]{40})\t/.exec(entry);
+        demand(blob, "CX-01C #536 files must be regular Git blobs");
+        return hash(
+          execFileSync("git", ["cat-file", "blob", blob[1]], { maxBuffer: 16 * 1024 * 1024 }),
+        );
+      };
+      return { path: p, before: fileHash(`${c.sha}^1`), after: fileHash(c.sha) };
+    }),
+  }));
+  return { ...s, diff };
+}
 export function staff523Snapshot(ctx, base, diff, prs, currentMainSha) {
   const s = activationSnapshot(ctx, base, diff, prs, currentMainSha);
   s.productPr = api("pulls/523");
@@ -456,7 +484,15 @@ export function prepare(ctx, publishing = false) {
       "Exact interval cannot authorize a different classification",
     );
     reconciliation =
-      base.sha === P1_532.baseline.sha
+      base.sha === CX_536.baseline.sha
+        ? authorizeCx536(
+            cx536Snapshot(ctx, base, diff, prs, currentMain),
+            inputs,
+            ctx,
+            api(`actions/runs/${ctx.runId}`),
+            policy,
+          )
+        : base.sha === P1_532.baseline.sha
         ? authorizeP1Orders532(
             p1Orders532Snapshot(ctx, base, diff, prs, currentMain),
             inputs,
@@ -610,6 +646,27 @@ export function prepare(ctx, publishing = false) {
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
+    if (process.argv[2] === "--cx-536-payload") {
+      const sha = api("git/ref/heads/main").object.sha;
+      const ctx = { repository: policy.repository, sha, runId: "" };
+      const base = baseline(ctx);
+      const diff = changedPaths(base.sha, sha);
+      const prs = diff.commits.map((c) => assertMergedCommit(pages(`commits/${c}/pulls`), c));
+      const payload = cx536Payload(cx536Snapshot(ctx, base, diff, prs, sha), policy);
+      fs.writeSync(
+        1,
+        JSON.stringify(
+          {
+            payload,
+            exactIntervalScope: JSON.stringify(canonical(payload)),
+            authorizationId: cx536ScopeId(payload),
+          },
+          null,
+          2,
+        ) + "\n",
+      );
+      process.exit(0); // Read-only proposal; never dispatch or production authority.
+    }
     if (process.argv[2] === "--p1-532-payload") {
       const sha = api("git/ref/heads/main").object.sha;
       const ctx = { repository: policy.repository, sha, runId: "" };
