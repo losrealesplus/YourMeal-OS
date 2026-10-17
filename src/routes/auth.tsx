@@ -374,7 +374,7 @@ function AppleIcon({ className }: { className?: string }) {
   );
 }
 
-function SocialAuthButtons() {
+export function SocialAuthButtons() {
   const { t } = useTranslation(["auth", "common"]);
   const [busyProvider, setBusyProvider] = useState<AppOAuthProvider | null>(null);
 
