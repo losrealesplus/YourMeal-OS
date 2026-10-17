@@ -484,15 +484,66 @@ async function runSuite() {
   const requireOffMenuRollbackB = sql("SELECT to_regprocedure('cr_order_private.require_off_menu(uuid,uuid)') IS NOT NULL;");
   assert.equal(requireOffMenuRollbackB, "f", "DDL changes MUST be rolled back when ledger insert fails!");
 
-  console.log("  ✓ TEST 3 PASS: Atomic rollback confirmed across DDL and ledger. Ledger: 71, DDL reverted.\\n");
+  console.log("  ✓ TEST 3 PASS: Atomic rollback confirmed across DDL and ledger. Ledger: 71, DDL reverted.\n");
 
   // ---------------------------------------------------------------------------
-  // [TEST 4] Multi-Tenant Isolation & Configuration Preservation
+  // [TEST 4] Fault Injection C: Failure during Checkpoint 11 Insert
   // ---------------------------------------------------------------------------
-  console.log("--- [TEST 4/4] MULTI-TENANT PRESERVATION & ISOLATION CHECK ---");
-  // Drop the rejection trigger and run clean
+  console.log("--- [TEST 4/5] FAULT INJECTION C: FAILURE DURING CHECKPOINT INSERTION ---");
+  // Clean up ledger trigger first
   sql("DROP TRIGGER IF EXISTS trg_fail_p1_ledger ON supabase_migrations.schema_migrations;", "postgres", "supabase_admin");
   sql("DROP FUNCTION IF EXISTS fail_p1_ledger();", "postgres", "supabase_admin");
+  build71Baseline();
+
+  console.log("  Injecting constraint violation trigger on gate6_recovery.checkpoints...");
+  sql(`
+    CREATE OR REPLACE FUNCTION fail_p1_checkpoint() RETURNS trigger AS $$
+    BEGIN
+      IF NEW.checkpoint_id = 11 THEN
+        RAISE EXCEPTION 'CONTROLLED_CHECKPOINT_FAULT_INJECTION: Rejection test';
+      END IF;
+      RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+
+    CREATE TRIGGER trg_fail_p1_checkpoint
+    BEFORE INSERT ON gate6_recovery.checkpoints
+    FOR EACH ROW EXECUTE FUNCTION fail_p1_checkpoint();
+  `, "postgres", "supabase_admin");
+
+  const failCheckpointProc = spawnSync("bash", [SCRIPT_PATH], {
+    cwd: ROOT,
+    env: {
+      ...process.env,
+      LAB_ISOLATED_PG17: "true",
+      PGPORT: String(HOST_PORT),
+      PGPASSWORD: "postgres",
+    },
+    encoding: "utf8",
+  });
+
+  assert.notEqual(failCheckpointProc.status, 0, "Script MUST fail and exit with non-zero code on checkpoint rejection");
+  console.log("  ✓ Script aborted fail-closed on checkpoint rejection (Exit Code: " + failCheckpointProc.status + ")");
+
+  // Verify Rollback of DDL AND ledger despite DDL and ledger having executed before the checkpoint insert
+  const rollbackLedgerC = sql("SELECT count(*) FROM supabase_migrations.schema_migrations;");
+  assert.equal(rollbackLedgerC, "71", "Ledger must remain strictly at 71 when checkpoint insert fails");
+
+  const checkpoint11C = sql("SELECT count(*) FROM gate6_recovery.checkpoints WHERE checkpoint_id = 11;");
+  assert.equal(checkpoint11C, "0", "Checkpoint 11 must NOT exist in checkpoints table");
+
+  const requireOffMenuRollbackC = sql("SELECT to_regprocedure('cr_order_private.require_off_menu(uuid,uuid)') IS NOT NULL;");
+  assert.equal(requireOffMenuRollbackC, "f", "DDL changes MUST be rolled back when checkpoint insert fails!");
+
+  console.log("  ✓ TEST 4 PASS: Atomic rollback confirmed across DDL, ledger, and checkpoint. Ledger: 71, DDL reverted.\n");
+
+  // ---------------------------------------------------------------------------
+  // [TEST 5] Multi-Tenant Isolation & Configuration Preservation
+  // ---------------------------------------------------------------------------
+  console.log("--- [TEST 5/5] MULTI-TENANT PRESERVATION & ISOLATION CHECK ---");
+  // Drop the rejection trigger and run clean
+  sql("DROP TRIGGER IF EXISTS trg_fail_p1_checkpoint ON gate6_recovery.checkpoints;", "postgres", "supabase_admin");
+  sql("DROP FUNCTION IF EXISTS fail_p1_checkpoint();", "postgres", "supabase_admin");
 
   const finalProc = spawnSync("bash", [SCRIPT_PATH], {
     cwd: ROOT,
