@@ -1,0 +1,121 @@
+{
+  "repository": "losrealesplus/YourMeal-OS",
+  "environment": "production-worker",
+  "reviewerId": 292604102,
+  "reviewerLogin": "losrealesplus",
+  "baseline": {
+    "sha": "d78e8c21f3cf9421d3f745d9132b45d8fb9f7f88",
+    "versionId": "4ead8d2e-48b5-410f-b1a4-36092f49cf06",
+    "deploymentId": 7143817474
+  },
+  "candidateSha": "b84775d050f0f2d3233f8981d662b3c8f5bf0cd5",
+  "productPr": 538,
+  "productHeadSha": "12c68aa581d3243a3f736a3a8cfadad519f9236b",
+  "productPrs": [
+    538,
+    539,
+    540
+  ],
+  "productFiles": [
+    {
+      "path": "src/components/consumer/day-picker.spec.tsx",
+      "before": null,
+      "after": "dcd7a59de8f9b528ccc7b068d0c4aafe6b6f0ee25401d01ffd8f9a3a9b205bc7"
+    },
+    {
+      "path": "src/components/consumer/day-picker.tsx",
+      "before": "2d1cb41b04719dc08f2f53c0392ccfb58f7dfe287404a1804cf0c83d8ea1794b",
+      "after": "791b21503dfef62dccd8e10cedebde08e0001aedb36bc56ebc215fcd86b7c088"
+    },
+    {
+      "path": "src/components/consumer/menu-dish-photo.spec.tsx",
+      "before": "adc369dc57100831ac1ca71a09a171d0a157a4056a9ae4762d8b8d4fca7aebad",
+      "after": "8e6b7c257eb7822cb2f31a6eecbbf98640ae9ef7ee44b04b30bbcbfdde6d55b3"
+    },
+    {
+      "path": "src/components/consumer/menu-dish-post.tsx",
+      "before": "c00682fe2ef7da4dc9c0930d962f62e737c72942cedcf4b614b7258d34473f84",
+      "after": "e8b8f47939e162d94cf6c7c18b8d255dd6fdc80ef5607ee7f5200ea02cdd5e2b"
+    },
+    {
+      "path": "src/hooks/use-program-draft-order.ts",
+      "before": "1ced4f0432b806781c110e3ce4c5a4f26ee971c1692de3a349c54763d14e4c73",
+      "after": "6483434b804a193f7a1caffd32e939d6be5d1241750b599defc0fd71b6453b11"
+    },
+    {
+      "path": "src/modules/order-intake/application/order-intake-service.ts",
+      "before": "c4b07174a0de515d57bd0605aa638a3f30d1927b10f9f86b493699df60caf07b",
+      "after": "8580b425ccd595b6996c8138123b7672c8e1f4fea26c95dc1a9ab8156ee0070c"
+    },
+    {
+      "path": "src/modules/orders/application/order-service.quoted-writer.spec.ts",
+      "before": null,
+      "after": "b01edc2baecc4a24ea23657132c7647fe585ef498d97b78a503056e39892f0ed"
+    },
+    {
+      "path": "src/modules/orders/application/order-service.ts",
+      "before": "e4cc0ab8b7dc8f912eb2fe56f148c388418659a99fdfe125f78f9f8074fd3df4",
+      "after": "6a2b8939fd9ac124e5222ca1024748986eb3c3856ad97a167bb0a2faa2ca1333"
+    },
+    {
+      "path": "src/modules/orders/index.ts",
+      "before": "0f6ceab12ab068340aef662ef855b65a6fbddb8dc6aac7b4b52f6eb3b8b17e04",
+      "after": "7a3fd1569de25358a212466d097e8ea4af8b3ecb3550391694b7f15e1e93cfa7"
+    },
+    {
+      "path": "src/modules/weekly-menu/server/offer-write.customer-b2c.spec.ts",
+      "before": null,
+      "after": "b6713bcd99cac3b99b32b9b1e3372108529d869b565b8cee75bad1888efaca4d"
+    },
+    {
+      "path": "src/modules/weekly-menu/server/offer-write.server.ts",
+      "before": "d340feb4db935a68a8e0349b7614304fc2401f88c49ac23427273774f8a27db4",
+      "after": "c480373e16e58d2fccb1159b84840315ca4756e5fbf89fc13fca56edb4d66093"
+    },
+    {
+      "path": "src/routes/_authenticated/app.orders.$orderId.spec.tsx",
+      "before": "f15c10bb565cc20d7912af55f1130f659ec848f5ead8e1f340b17f59c18d2068",
+      "after": "f4faebdf6572cf2e6316f3d6d5ea342e378ee42dcb9495b405a0582d03514777"
+    },
+    {
+      "path": "src/routes/_authenticated/app.orders.$orderId.tsx",
+      "before": "1da1457246eb03f71049ae13953d49be9975b1dd0324bd916426ecd78c85dd7c",
+      "after": "a189a59d619a2adbfd7397b4619ec6f210925b44f6cc6431317a702724aac5e1"
+    },
+    {
+      "path": "src/routes/_authenticated/app.schedule.tsx",
+      "before": "1cf201282f396e54e8d5c8311b3aa87aed10003adb87b11184cf38dd05c07b92",
+      "after": "15637473d2dca60b0d79d9e8d146121f5599d6fd91ebf3d0bf55e77e51ecf86f"
+    },
+    {
+      "path": "supabase/migrations/20261017230000_customer_approved_membership_order_authorization.sql",
+      "before": null,
+      "after": "c7ec90fa5baedeff02ef65bdb004a54e52f2279e41d354577449a462e483ddde"
+    },
+    {
+      "path": "supabase/tests/b2c-membership-order/b2c-order-postgres.spec.mjs",
+      "before": null,
+      "after": "9527fac7c83c5ab4d603d4a709f9046af978086f79f22833c06455bcd97edc75"
+    }
+  ],
+  "governanceBranch": "codex/gate7-p0-orders-538-reconciliation",
+  "governancePaths": [
+    "docs/99-internal/development-journal/2026-10-18-gate7-p0-orders-538.md",
+    "scripts/governance/release-json.spec.mjs",
+    "scripts/governance/release-p0-orders-538.json",
+    "scripts/governance/release-p0-orders-538.mjs",
+    "scripts/governance/release-p0-orders-538.spec.mjs",
+    "scripts/governance/release-plan.mjs",
+    "scripts/governance/release-reconciliation.mjs"
+  ],
+  "constraints": {
+    "productionSqlAuthorized": false,
+    "migrationExecutionAuthorized": false,
+    "productionWorkerApprovalGranted": false,
+    "orderActivationAuthorized": true,
+    "a5": "HARD_DISABLED",
+    "a4b": "CLOSED",
+    "oauthActivationAuthorized": true,
+    "customerProfileWarmPremiumPreserved": true
+  }
+}
