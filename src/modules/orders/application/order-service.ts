@@ -563,7 +563,7 @@ export const OrderService = {
       if (!customerId || current.order.customer_id !== customerId) {
         throw new DomainError("PERMISSION_DENIED", "Cannot confirm an order you do not own");
       }
-      if (options?.validateCutoff && ctx.tenantSlug && current.order.week_start) {
+      if (options?.validateCutoff && current.order.week_start) {
         if (isWeeklyOrderCutoffPassed(current.order.week_start, { tenantSlug: ctx.tenantSlug })) {
           throw new DomainError(
             "WEEKLY_ORDER_CUTOFF_PASSED",

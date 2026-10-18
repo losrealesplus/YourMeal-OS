@@ -118,7 +118,7 @@ export function isPastWeek(weekStart: string, referenceDate: Date = new Date()):
 
 export interface TenantOperationalScheduleConfig {
   timezone: string;
-  cutoffDay: number; // 1 = Monday .. 5 = Friday .. 7 = Sunday (ISO)
+  cutoffDay: number | null; // 1 = Monday .. 5 = Friday .. 7 = Sunday (ISO), null = no weekly cutoff
   cutoffTime: string; // "14:00" in 24h format
   activeDeliveryDays: number[]; // e.g. [1, 2, 3, 4, 5]
   maxFutureWeeks: number;
@@ -126,9 +126,9 @@ export interface TenantOperationalScheduleConfig {
 
 export const DEFAULT_SCHEDULE_CONFIG: TenantOperationalScheduleConfig = {
   timezone: "Europe/Madrid",
-  cutoffDay: 5,
-  cutoffTime: "14:00",
-  activeDeliveryDays: [1, 2, 3, 4, 5],
+  cutoffDay: null,
+  cutoffTime: "23:59",
+  activeDeliveryDays: [1, 2, 3, 4, 5, 6, 7],
   maxFutureWeeks: 4,
 };
 
@@ -221,9 +221,12 @@ export function getZonedDateParts(
 
 export function isPastWeeklyCutoff(
   parts: Pick<ZonedDateParts, "isoDow" | "hour" | "minute" | "second">,
-  cutoffDay: number = 5,
-  cutoffTime: string = "14:00",
+  cutoffDay: number | null = null,
+  cutoffTime: string = "23:59",
 ): boolean {
+  if (cutoffDay === null || cutoffDay === undefined) {
+    return false;
+  }
   const [cutoffH, cutoffM] = cutoffTime.split(":").map(Number);
   if (parts.isoDow > cutoffDay) return true;
   if (parts.isoDow < cutoffDay) return false;

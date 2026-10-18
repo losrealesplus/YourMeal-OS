@@ -15,7 +15,7 @@ export const CanonicalOrderWriteService = {
     requireCapability(ctx.roles, "orders.write");
     const parsed = parseCanonicalOrderEnvelope("capture", input);
 
-    if (!hasStaffAccess(ctx.roles) && ctx.tenantSlug) {
+    if (!hasStaffAccess(ctx.roles)) {
       if (isWeeklyOrderCutoffPassed(parsed.command.weekStart, { tenantSlug: ctx.tenantSlug })) {
         throw new DomainError(
           "WEEKLY_ORDER_CUTOFF_PASSED",
@@ -34,7 +34,7 @@ export const CanonicalOrderWriteService = {
     requireCapability(ctx.roles, "orders.write");
     const parsed = parseCanonicalOrderEnvelope("modify", input);
 
-    if (!hasStaffAccess(ctx.roles) && ctx.tenantSlug) {
+    if (!hasStaffAccess(ctx.roles)) {
       if (isWeeklyOrderCutoffPassed(parsed.command.weekStart, { tenantSlug: ctx.tenantSlug })) {
         throw new DomainError(
           "WEEKLY_ORDER_CUTOFF_PASSED",

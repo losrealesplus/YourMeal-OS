@@ -62,7 +62,7 @@ export const OrderIntakeService = {
     }
 
     const staff = hasStaffAccess(ctx.roles);
-    if (!staff && options?.validateCutoff && ctx.tenantSlug) {
+    if (!staff && options?.validateCutoff) {
       if (isWeeklyOrderCutoffPassed(command.weekStart, { tenantSlug: ctx.tenantSlug })) {
         throw new DomainError(
           "WEEKLY_ORDER_CUTOFF_PASSED",
