@@ -116,3 +116,137 @@ export function isPastWeek(weekStart: string, referenceDate: Date = new Date()):
   return weekStart < currentMonday;
 }
 
+export interface TenantOperationalScheduleConfig {
+  timezone: string;
+  cutoffDay: number; // 1 = Monday .. 5 = Friday .. 7 = Sunday (ISO)
+  cutoffTime: string; // "14:00" in 24h format
+  activeDeliveryDays: number[]; // e.g. [1, 2, 3, 4, 5]
+  maxFutureWeeks: number;
+}
+
+export const DEFAULT_SCHEDULE_CONFIG: TenantOperationalScheduleConfig = {
+  timezone: "Atlantic/Canary",
+  cutoffDay: 5,
+  cutoffTime: "14:00",
+  activeDeliveryDays: [1, 2, 3, 4, 5],
+  maxFutureWeeks: 4,
+};
+
+export const TENANT_SCHEDULE_CONFIGS: Record<string, TenantOperationalScheduleConfig> = {
+  eatclean: {
+    timezone: "Atlantic/Canary",
+    cutoffDay: 5,
+    cutoffTime: "14:00",
+    activeDeliveryDays: [1, 2, 3, 4, 5],
+    maxFutureWeeks: 4,
+  },
+  "eatclean-staging": {
+    timezone: "Atlantic/Canary",
+    cutoffDay: 5,
+    cutoffTime: "14:00",
+    activeDeliveryDays: [1, 2, 3, 4, 5],
+    maxFutureWeeks: 4,
+  },
+};
+
+export function getTenantScheduleConfig(tenantSlug?: string | null): TenantOperationalScheduleConfig {
+  if (tenantSlug && TENANT_SCHEDULE_CONFIGS[tenantSlug]) {
+    return TENANT_SCHEDULE_CONFIGS[tenantSlug];
+  }
+  return DEFAULT_SCHEDULE_CONFIG;
+}
+
+export interface ZonedDateParts {
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+  second: number;
+  isoDow: number; // 1 = Monday .. 7 = Sunday
+  dateIso: string; // "YYYY-MM-DD"
+}
+
+export function getZonedDateParts(
+  date: Date = new Date(),
+  timezone: string = "Atlantic/Canary",
+): ZonedDateParts {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: timezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  });
+  const parts = Object.fromEntries(formatter.formatToParts(date).map((p) => [p.type, p.value]));
+  const year = parseInt(parts.year, 10);
+  const month = parseInt(parts.month, 10);
+  const day = parseInt(parts.day, 10);
+  const hour = parseInt(parts.hour, 10);
+  const minute = parseInt(parts.minute, 10);
+  const second = parseInt(parts.second, 10);
+  const civilUtc = new Date(Date.UTC(year, month - 1, day));
+  const dow = civilUtc.getUTCDay();
+  const isoDow = dow === 0 ? 7 : dow;
+  const dateIso = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  return { year, month, day, hour, minute, second, isoDow, dateIso };
+}
+
+export function isPastWeeklyCutoff(
+  parts: Pick<ZonedDateParts, "isoDow" | "hour" | "minute" | "second">,
+  cutoffDay: number = 5,
+  cutoffTime: string = "14:00",
+): boolean {
+  const [cutoffH, cutoffM] = cutoffTime.split(":").map(Number);
+  if (parts.isoDow > cutoffDay) return true;
+  if (parts.isoDow < cutoffDay) return false;
+  if (parts.hour > cutoffH) return true;
+  if (parts.hour < cutoffH) return false;
+  return parts.minute >= cutoffM;
+}
+
+export interface TenantActiveWeekResult {
+  calendarMondayIso: string;
+  defaultActiveMondayIso: string;
+  isPastCutoff: boolean;
+  activeDeliveryDates: string[];
+  allWeekDates: string[];
+  config: TenantOperationalScheduleConfig;
+}
+
+export function resolveTenantActiveWeek(options?: {
+  tenantSlug?: string | null;
+  now?: Date;
+}): TenantActiveWeekResult {
+  const config = getTenantScheduleConfig(options?.tenantSlug);
+  const now = options?.now ?? new Date();
+  const parts = getZonedDateParts(now, config.timezone);
+
+  // Monday of the civil week in tenant's timezone
+  const offset = parts.isoDow === 1 ? 0 : 1 - parts.isoDow;
+  const mondayUtc = new Date(Date.UTC(parts.year, parts.month - 1, parts.day + offset));
+  const calendarMondayIso = mondayUtc.toISOString().slice(0, 10);
+
+  const pastCutoff = isPastWeeklyCutoff(parts, config.cutoffDay, config.cutoffTime);
+  const defaultActiveMondayIso = pastCutoff
+    ? offsetWeekMonday(calendarMondayIso, 1)
+    : calendarMondayIso;
+
+  const allWeekDates = utcWeekDates(defaultActiveMondayIso);
+  const activeDeliveryDates = allWeekDates.filter((_, idx) =>
+    config.activeDeliveryDays.includes(idx + 1),
+  );
+
+  return {
+    calendarMondayIso,
+    defaultActiveMondayIso,
+    isPastCutoff: pastCutoff,
+    allWeekDates,
+    activeDeliveryDates,
+    config,
+  };
+}
+

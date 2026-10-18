@@ -8,6 +8,21 @@ import {
   resolveCustomerHomeState,
   getAdaptiveCTA,
 } from "./app.index";
+import { resolveTenantActiveWeek } from "@/modules/weekly-menu/application/week-dates";
+
+function getTestActiveWeek() {
+  const weekStart = resolveTenantActiveWeek().defaultActiveMondayIso;
+  const [y, m, d] = weekStart.split("-").map(Number);
+  const tuesday = new Date(Date.UTC(y, m - 1, d + 1));
+  const wednesday = new Date(Date.UTC(y, m - 1, d + 2));
+  const thursday = new Date(Date.UTC(y, m - 1, d + 3));
+  return {
+    weekStart,
+    dayTue: tuesday.toISOString().slice(0, 10),
+    dayWed: wednesday.toISOString().slice(0, 10),
+    dayThu: thursday.toISOString().slice(0, 10),
+  };
+}
 
 // Mock router
 vi.mock("@tanstack/react-router", () => ({
@@ -342,16 +357,7 @@ describe("Customer Home (CX-01A) Presentation Rendering", () => {
   });
 
   it("renders State: Draft Pending: shows draft notification and CTA when customer has only an unconfirmed draft order", () => {
-    const today = new Date();
-    const day = today.getUTCDay();
-    const offset = day === 0 ? -6 : 1 - day;
-    const monday = new Date(today);
-    monday.setUTCDate(today.getUTCDate() + offset);
-    const weekStart = monday.toISOString().slice(0, 10);
-
-    const tuesday = new Date(monday);
-    tuesday.setUTCDate(monday.getUTCDate() + 1);
-    const dayTue = tuesday.toISOString().slice(0, 10);
+    const { weekStart, dayTue } = getTestActiveWeek();
 
     mockCustomerOrders = [
       {
@@ -384,21 +390,7 @@ describe("Customer Home (CX-01A) Presentation Rendering", () => {
   });
 
   it("renders State 4 (Confirmed/Scheduled): displays real order metrics accurately labeled as Pedidos (never equating orders with deliveries)", () => {
-    // Current Monday
-    const today = new Date();
-    const day = today.getUTCDay();
-    const offset = day === 0 ? -6 : 1 - day;
-    const monday = new Date(today);
-    monday.setUTCDate(today.getUTCDate() + offset);
-    const weekStart = monday.toISOString().slice(0, 10);
-
-    const tuesday = new Date(monday);
-    tuesday.setUTCDate(monday.getUTCDate() + 1);
-    const dayTue = tuesday.toISOString().slice(0, 10);
-
-    const thursday = new Date(monday);
-    thursday.setUTCDate(monday.getUTCDate() + 3);
-    const dayThu = thursday.toISOString().slice(0, 10);
+    const { weekStart, dayTue, dayThu } = getTestActiveWeek();
 
     mockCustomerOrders = [
       {
@@ -449,24 +441,7 @@ describe("Customer Home (CX-01A) Presentation Rendering", () => {
   });
 
   it("renders multi-day order correctly: single order with multiple days aggregates days into scheduledDays and counts exactly 1 Pedido", () => {
-    const today = new Date();
-    const day = today.getUTCDay();
-    const offset = day === 0 ? -6 : 1 - day;
-    const monday = new Date(today);
-    monday.setUTCDate(today.getUTCDate() + offset);
-    const weekStart = monday.toISOString().slice(0, 10);
-
-    const tuesday = new Date(monday);
-    tuesday.setUTCDate(monday.getUTCDate() + 1);
-    const dayTue = tuesday.toISOString().slice(0, 10);
-
-    const wednesday = new Date(monday);
-    wednesday.setUTCDate(monday.getUTCDate() + 2);
-    const dayWed = wednesday.toISOString().slice(0, 10);
-
-    const thursday = new Date(monday);
-    thursday.setUTCDate(monday.getUTCDate() + 3);
-    const dayThu = thursday.toISOString().slice(0, 10);
+    const { weekStart, dayTue, dayWed, dayThu } = getTestActiveWeek();
 
     mockCustomerOrders = [
       {
@@ -488,24 +463,7 @@ describe("Customer Home (CX-01A) Presentation Rendering", () => {
   });
 
   it("renders multiple orders in the same week: aggregates unique days, sums all portions, and counts total confirmed orders", () => {
-    const today = new Date();
-    const day = today.getUTCDay();
-    const offset = day === 0 ? -6 : 1 - day;
-    const monday = new Date(today);
-    monday.setUTCDate(today.getUTCDate() + offset);
-    const weekStart = monday.toISOString().slice(0, 10);
-
-    const tuesday = new Date(monday);
-    tuesday.setUTCDate(monday.getUTCDate() + 1);
-    const dayTue = tuesday.toISOString().slice(0, 10);
-
-    const wednesday = new Date(monday);
-    wednesday.setUTCDate(monday.getUTCDate() + 2);
-    const dayWed = wednesday.toISOString().slice(0, 10);
-
-    const thursday = new Date(monday);
-    thursday.setUTCDate(monday.getUTCDate() + 3);
-    const dayThu = thursday.toISOString().slice(0, 10);
+    const { weekStart, dayTue, dayWed, dayThu } = getTestActiveWeek();
 
     // Two confirmed orders:
     // Order 1: Tue & Wed (4 portions)

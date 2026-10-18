@@ -25,4 +25,5 @@ export {
   isDashboardState,
   type DashboardStateId,
 } from "./dashboard-states";
+export { CustomerWelcomeModal } from "./customer-welcome-modal";
 

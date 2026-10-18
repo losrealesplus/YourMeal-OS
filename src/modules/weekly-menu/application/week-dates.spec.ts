@@ -6,6 +6,7 @@ import {
   offsetWeekMonday,
   formatDayDateEs,
   formatWeekRangeEs,
+  resolveTenantActiveWeek,
 } from "./week-dates";
 
 describe("week-dates calendar helpers", () => {
@@ -60,5 +61,54 @@ describe("week-dates calendar helpers", () => {
 
   it("formats week ranges in Spanish", () => {
     expect(formatWeekRangeEs("2026-08-24")).toBe("24 — 30 ago 2026");
+  });
+
+  describe("resolveTenantActiveWeek (Weekly Cutoff & Active Dates)", () => {
+    it("rolls over to next Monday when today is Sunday (Oct 18, 2026)", () => {
+      // Sunday Oct 18, 2026 at 17:21 Canary time (UTC 16:21)
+      const now = new Date("2026-10-18T16:21:05Z");
+      const result = resolveTenantActiveWeek({ tenantSlug: "eatclean", now });
+
+      expect(result.calendarMondayIso).toBe("2026-10-12");
+      expect(result.isPastCutoff).toBe(true);
+      expect(result.defaultActiveMondayIso).toBe("2026-10-19");
+      expect(result.activeDeliveryDates).toEqual([
+        "2026-10-19",
+        "2026-10-20",
+        "2026-10-21",
+        "2026-10-22",
+        "2026-10-23",
+      ]);
+    });
+
+    it("stays in current week before Friday 14:00 Canary time", () => {
+      // Friday Oct 16, 2026 at 13:59 Canary time (UTC 12:59)
+      const now = new Date("2026-10-16T12:59:00Z");
+      const result = resolveTenantActiveWeek({ tenantSlug: "eatclean", now });
+
+      expect(result.calendarMondayIso).toBe("2026-10-12");
+      expect(result.isPastCutoff).toBe(false);
+      expect(result.defaultActiveMondayIso).toBe("2026-10-12");
+    });
+
+    it("rolls over to next Monday exactly at Friday 14:00 Canary time", () => {
+      // Friday Oct 16, 2026 at 14:00 Canary time (UTC 13:00)
+      const now = new Date("2026-10-16T13:00:00Z");
+      const result = resolveTenantActiveWeek({ tenantSlug: "eatclean", now });
+
+      expect(result.calendarMondayIso).toBe("2026-10-12");
+      expect(result.isPastCutoff).toBe(true);
+      expect(result.defaultActiveMondayIso).toBe("2026-10-19");
+    });
+
+    it("stays on Monday on Monday morning (Oct 19, 2026)", () => {
+      // Monday Oct 19, 2026 at 09:00 Canary time (UTC 08:00)
+      const now = new Date("2026-10-19T08:00:00Z");
+      const result = resolveTenantActiveWeek({ tenantSlug: "eatclean", now });
+
+      expect(result.calendarMondayIso).toBe("2026-10-19");
+      expect(result.isPastCutoff).toBe(false);
+      expect(result.defaultActiveMondayIso).toBe("2026-10-19");
+    });
   });
 });
