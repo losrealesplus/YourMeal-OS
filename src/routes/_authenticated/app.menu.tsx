@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DayPicker, MenuDishPost, dishMacrosLine, PrimaryCTA } from "@/components/consumer";
 import { useWeeklyMenu } from "@/hooks/use-weekly-menu";
-import { utcWeekStartMonday } from "@/modules/weekly-menu/application/week-dates";
+import { useTenantActiveWeek } from "@/hooks/use-tenant-active-week";
 import { DishThumb } from "@/components/consumer/dish-thumb";
 import dishPhoto from "@/assets/eatclean-hero.jpg";
 
@@ -19,10 +20,10 @@ export const Route = createFileRoute("/_authenticated/app/menu")({
 function MenuPage() {
   const { t, i18n } = useTranslation(["customer", "common"]);
   const [active, setActive] = useState(0);
-  const weekStart = utcWeekStartMonday();
-  const { data: weeklyMenu } = useWeeklyMenu(weekStart);
+  const activeWeek = useTenantActiveWeek();
+  const { data: weeklyMenu } = useWeeklyMenu(activeWeek.weekStart);
 
-  const dayShort = [
+  const allDaysShort = [
     t("customer:dayMon"),
     t("customer:dayTue"),
     t("customer:dayWed"),
@@ -32,7 +33,7 @@ function MenuPage() {
     t("customer:daySun"),
   ];
 
-  const dayFull = [
+  const allDaysFull = [
     t("customer:dayMonFull"),
     t("customer:dayTueFull"),
     t("customer:dayWedFull"),
@@ -42,33 +43,72 @@ function MenuPage() {
     t("customer:daySunFull"),
   ];
 
+  const deliveryDayIndices = activeWeek.config.activeDeliveryDays.map((d) => d - 1);
+  const dayShort = deliveryDayIndices.map((idx) => allDaysShort[idx] ?? "");
+  const dayFull = deliveryDayIndices.map((idx) => allDaysFull[idx] ?? "");
+  const deliveryDates = activeWeek.activeDeliveryDates;
+
   const macroLabels = {
     protein: t("customer:macroProtein"),
     carbs: t("customer:macroCarbs"),
     fat: t("customer:macroFat"),
   };
 
-  const dishes = weeklyMenu?.days[active]?.dishes ?? [];
+  const actualMenuDayIndex = deliveryDayIndices[active] ?? active;
+  const dishes = weeklyMenu?.days[actualMenuDayIndex]?.dishes ?? [];
   const hasAnyDish = useMemo(
     () => (weeklyMenu?.days ?? []).some((d) => d.dishes.length > 0),
     [weeklyMenu],
   );
 
-  const weekLabel = formatWeekOf(weekStart, i18n.language, t("customer:weekOf"));
+  const weekLabel = formatWeekOf(activeWeek.weekStart, i18n.language, t("customer:weekOf"));
 
   return (
     <div className="flex-1 flex flex-col pb-28">
       <header className="px-6 pt-8 pb-2 space-y-3">
-        <p className="text-sm font-semibold text-muted-foreground tracking-wide">
-          {weekLabel}
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-semibold text-muted-foreground tracking-wide">
+            {weekLabel}
+          </p>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              disabled={!activeWeek.canGoPrev}
+              onClick={() => {
+                activeWeek.setWeekOffset((w) => Math.max(0, w - 1));
+                setActive(0);
+              }}
+              className="size-8 rounded-lg border border-border flex items-center justify-center text-foreground hover:bg-secondary disabled:opacity-25 disabled:cursor-not-allowed transition-colors cursor-pointer"
+              aria-label={t("customer:prevWeek", "Semana anterior")}
+            >
+              <ChevronLeft className="size-4" />
+            </button>
+            <button
+              type="button"
+              disabled={!activeWeek.canGoNext}
+              onClick={() => {
+                activeWeek.setWeekOffset((w) => w + 1);
+                setActive(0);
+              }}
+              className="size-8 rounded-lg border border-border flex items-center justify-center text-foreground hover:bg-secondary disabled:opacity-25 disabled:cursor-not-allowed transition-colors cursor-pointer"
+              aria-label={t("customer:nextWeek", "Semana siguiente")}
+            >
+              <ChevronRight className="size-4" />
+            </button>
+          </div>
+        </div>
         <h1 className="text-[1.85rem] font-extrabold tracking-tight text-balance leading-tight">
           {t("customer:programWeeklyMenu")}
         </h1>
       </header>
 
       <div className="px-6 mt-5 sticky top-0 z-10 bg-background/95 backdrop-blur-sm py-3">
-        <DayPicker days={dayShort} activeIndex={active} onSelect={setActive} />
+        <DayPicker
+          days={dayShort}
+          dates={deliveryDates}
+          activeIndex={active}
+          onSelect={setActive}
+        />
       </div>
 
       <div className="px-6 pt-2 pb-4">

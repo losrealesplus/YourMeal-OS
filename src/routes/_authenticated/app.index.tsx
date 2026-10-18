@@ -30,6 +30,7 @@ import { useWeeklyMenu } from "@/hooks/use-weekly-menu";
 import { useUpcomingDelivery } from "@/hooks/use-upcoming-delivery";
 import { useCustomerOrders } from "@/hooks/use-customer-orders";
 import { useCustomerSelfProfile } from "@/hooks/use-customer-self-profile";
+import { useTenantActiveWeek } from "@/hooks/use-tenant-active-week";
 import { utcWeekStartMonday, utcWeekDates } from "@/modules/weekly-menu/application/week-dates";
 import { cn } from "@/lib/utils";
 import dishPhoto from "@/assets/eatclean-hero.jpg";
@@ -174,7 +175,8 @@ function HomeBody({ state }: { state: DashboardStateId }) {
   const { t } = useTranslation("customer");
   const { user, isStaff } = useAuth();
   const navigate = useNavigate({ from: "/app" });
-  const weekStart = utcWeekStartMonday();
+  const activeWeek = useTenantActiveWeek();
+  const weekStart = activeWeek.weekStart;
 
   // Primary data sources for Customer Experience
   const {

@@ -2,7 +2,16 @@ import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight, Minus, Plus, RotateCcw, MapPin, Check } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Minus,
+  Plus,
+  RotateCcw,
+  MapPin,
+  Check,
+  ShoppingBag,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useCurrentCustomerId } from "@/hooks/use-current-customer-id";
@@ -12,40 +21,39 @@ import {
   dishMacrosLine,
   PrimaryCTA,
   ScreenHeader,
+  CustomerWelcomeModal,
 } from "@/components/consumer";
+import type { OnboardingStep } from "@/components/consumer/customer-welcome-modal";
 import { DishThumb } from "@/components/consumer/dish-thumb";
 import { useFmt } from "@/i18n/localization-provider";
 import { useWeeklyMenu } from "@/hooks/use-weekly-menu";
 import { useProgramDraftOrder } from "@/hooks/use-program-draft-order";
 import { useConfirmOrder } from "@/hooks/use-confirm-order";
-import {
-  utcDateOnly,
-  utcWeekDates,
-  utcWeekStartMonday,
-  offsetWeekMonday,
-  formatWeekRangeEs,
-  MAX_FUTURE_WEEKS,
-} from "@/modules/weekly-menu/application/week-dates";
+import { useTenantActiveWeek } from "@/hooks/use-tenant-active-week";
+import { utcDateOnly } from "@/modules/weekly-menu/application/week-dates";
 import { resolveOrderCommercialPricing, getTenantOffers } from "@/modules/commercial";
 import { useActiveTenantSlug } from "@/identity/active-tenant-slug";
 import type { MockDish } from "@/lib/mock-catalog";
 import { cn } from "@/lib/utils";
 import dishPhoto from "@/assets/eatclean-hero.jpg";
+import { toast } from "sonner";
 import {
   isEatCleanOrderCreationFrozen,
   EATCLEAN_PARTIAL_LAUNCH_CONFIG,
 } from "@/config/eatclean-partial-launch";
 
 /**
- * Screen: Customer · Schedule Weekly Order (3-step flow)
- * Experience: step 1 = Day picker · step 2 = Stepper multi-quantity dish choice · step 3 = calm Resumen.
+ * Screen: Customer · Schedule Weekly Order (Multi-Day Basket Flow)
+ * Experience:
+ * - Step 1: Carta Semanal con Selector Multidía persistente y barra flotante de resumen.
+ * - Step 2: Resumen y Checkout con salvavidas de onboarding.
  * Capability: CAP-004 Draft order with multi-dish quantities (ADR 0017 / Ordering Contract v1).
  */
 export const Route = createFileRoute("/_authenticated/app/schedule")({
   component: ScheduleFlow,
 });
 
-type Step = 1 | 2 | 3;
+type Step = 1 | 2;
 
 function ScheduleFlow() {
   const { t, i18n } = useTranslation(["customer", "common"]);
@@ -54,33 +62,15 @@ function ScheduleFlow() {
   const [deliveryDay, setDeliveryDay] = useState(0);
   const [quantities, setQuantities] = useState<Record<string, Record<string, number>>>({});
   const todayIso = utcDateOnly();
-  const [weekOffset, setWeekOffset] = useState<number>(() => {
-    const today = utcDateOnly();
-    const currentWeekMon = utcWeekStartMonday();
-    const currentWeekDates = utcWeekDates(currentWeekMon);
-    return currentWeekDates.slice(0, 5).every((d) => d < today) ? 1 : 0;
-  });
   const fmt = useFmt();
 
-  const baseWeekStart = utcWeekStartMonday();
-  const weekStart = offsetWeekMonday(baseWeekStart, weekOffset);
-  const weekDates = utcWeekDates(weekStart);
-  const { data: weeklyMenu } = useWeeklyMenu(weekStart);
-  const programDraft = useProgramDraftOrder();
-  const confirmOrder = useConfirmOrder();
+  // Unified tenant active week & weekly cutoff (Friday 14:00 Canary)
+  const activeWeek = useTenantActiveWeek();
+  const weekStart = activeWeek.weekStart;
+  const deliveryDates = activeWeek.activeDeliveryDates;
+  const deliveryDayIndices = activeWeek.config.activeDeliveryDays.map((d) => d - 1);
 
-  const isDayDisabled = (i: number) => (weekDates[i] ? weekDates[i] < todayIso : false);
-
-  useEffect(() => {
-    if (isDayDisabled(deliveryDay)) {
-      const firstAvailable = weekDates.findIndex((d) => d >= todayIso);
-      if (firstAvailable !== -1) {
-        setDeliveryDay(firstAvailable);
-      }
-    }
-  }, [weekStart, deliveryDay, todayIso]);
-
-  const daysShort = [
+  const allDaysShort = [
     t("customer:dayMon"),
     t("customer:dayTue"),
     t("customer:dayWed"),
@@ -89,7 +79,8 @@ function ScheduleFlow() {
     t("customer:daySat"),
     t("customer:daySun"),
   ];
-  const daysFull = [
+
+  const allDaysFull = [
     t("customer:dayMonFull"),
     t("customer:dayTueFull"),
     t("customer:dayWedFull"),
@@ -99,6 +90,24 @@ function ScheduleFlow() {
     t("customer:daySunFull"),
   ];
 
+  const daysShort = deliveryDayIndices.map((idx) => allDaysShort[idx] ?? "");
+  const daysFull = deliveryDayIndices.map((idx) => allDaysFull[idx] ?? "");
+
+  const { data: weeklyMenu } = useWeeklyMenu(weekStart);
+  const programDraft = useProgramDraftOrder();
+  const confirmOrder = useConfirmOrder();
+
+  const isDayDisabled = (i: number) => (deliveryDates[i] ? deliveryDates[i] < todayIso : false);
+
+  useEffect(() => {
+    if (isDayDisabled(deliveryDay)) {
+      const firstAvailable = deliveryDates.findIndex((d) => d >= todayIso);
+      if (firstAvailable !== -1) {
+        setDeliveryDay(firstAvailable);
+      }
+    }
+  }, [weekStart, deliveryDay, todayIso, deliveryDates]);
+
   const macroLabels = {
     protein: t("customer:macroProtein"),
     carbs: t("customer:macroCarbs"),
@@ -106,9 +115,8 @@ function ScheduleFlow() {
   };
 
   const stepTitles = [
-    t("customer:scheduleStep1"),
-    t("customer:scheduleStep2"),
-    t("customer:summaryWeeklyTitle"),
+    t("customer:scheduleStep2", "Elegir platos"),
+    t("customer:summaryWeeklyTitle", "Resumen de tu pedido"),
   ];
 
   const activeTenantSlug = useActiveTenantSlug();
@@ -125,6 +133,7 @@ function ScheduleFlow() {
     }
   }, [defaultOfferCode, selectedOfferCode]);
 
+  // Catalog mapping
   const allDishesMap = new Map<string, MockDish>();
   for (const day of weeklyMenu?.days ?? []) {
     for (const d of day.dishes ?? []) {
@@ -132,7 +141,14 @@ function ScheduleFlow() {
     }
   }
 
-  const allSelectedDishEntries: Array<{ dishId: string; dayDate: string; qty: number; dish: MockDish }> = [];
+  // Selected dishes calculation across all days
+  const allSelectedDishEntries: Array<{
+    dishId: string;
+    dayDate: string;
+    qty: number;
+    dish: MockDish;
+  }> = [];
+
   for (const [dDate, dayQtys] of Object.entries(quantities)) {
     for (const [dishId, qty] of Object.entries(dayQtys)) {
       if (qty > 0) {
@@ -159,16 +175,33 @@ function ScheduleFlow() {
     items: orderItems,
   });
 
-  // Authoritative total = commercial offer evaluation with catalog price fallback
   const totalEur = commercialPricing
     ? commercialPricing.grandTotalFinalPrice.cents / 100
-    : allSelectedDishEntries.reduce((sum, item) => sum + Number(item.dish.price ?? 0) * item.qty, 0);
+    : allSelectedDishEntries.reduce(
+        (sum, item) => sum + Number(item.dish.price ?? 0) * item.qty,
+        0,
+      );
 
-  const offerDishes = weeklyMenu?.days[deliveryDay]?.dishes ?? [];
-  const dayDate = weekDates[deliveryDay] ?? weekStart;
+  // Dishes for current selected day in DayPicker
+  const actualMenuDayIndex = deliveryDayIndices[deliveryDay] ?? deliveryDay;
+  const offerDishes = weeklyMenu?.days[actualMenuDayIndex]?.dishes ?? [];
+  const dayDate = deliveryDates[deliveryDay] ?? weekStart;
   const currentDayQuantities = quantities[dayDate] ?? {};
-  const currentDayMealsCount = Object.values(currentDayQuantities).reduce((sum, qty) => sum + (qty > 0 ? qty : 0), 0);
+  const currentDayMealsCount = Object.values(currentDayQuantities).reduce(
+    (sum, qty) => sum + (qty > 0 ? qty : 0),
+    0,
+  );
 
+  // Meal counts per delivery date for DayPicker badges
+  const dayMealCounts: Record<string, number> = {};
+  for (const [dDate, dayQtys] of Object.entries(quantities)) {
+    const count = Object.values(dayQtys).reduce((sum, q) => sum + (q > 0 ? q : 0), 0);
+    if (count > 0) {
+      dayMealCounts[dDate] = count;
+    }
+  }
+
+  // Items grouped by day for summary
   const itemsByDay = new Map<string, typeof allSelectedDishEntries>();
   for (const item of allSelectedDishEntries) {
     const list = itemsByDay.get(item.dayDate) ?? [];
@@ -177,6 +210,7 @@ function ScheduleFlow() {
   }
   const sortedDayDates = [...itemsByDay.keys()].sort();
 
+  // Customer profile & addresses
   const { tenantId } = useAuth();
   const customerQuery = useCurrentCustomerId();
   const customerId = customerQuery.data ?? null;
@@ -208,36 +242,16 @@ function ScheduleFlow() {
   const addresses = addressesQuery.data ?? [];
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
 
+  // Welcome modal safety net
+  const [welcomeOpen, setWelcomeOpen] = useState(false);
+  const [forcedStep, setForcedStep] = useState<OnboardingStep>("welcome");
+
   useEffect(() => {
     if (!selectedAddressId && addresses.length > 0) {
       const def = addresses.find((a) => a.is_default) ?? addresses[0];
       setSelectedAddressId(def.id);
     }
   }, [addresses, selectedAddressId]);
-
-  const deliveryDateLabel = formatDeliveryDate(dayDate, i18n.language);
-
-  async function onProgramDraft() {
-    if (orderItems.length === 0 || programDraft.isPending || confirmOrder.isPending) return;
-    const result = await programDraft.mutateAsync({
-      weekStart,
-      items: orderItems,
-      offerCode: effectiveOfferCode,
-      deliveryAddressId: selectedAddressId,
-    });
-    try {
-      await confirmOrder.mutateAsync({
-        orderId: result.order.id,
-        expectedTotal: result.order.total != null ? Number(result.order.total) : undefined,
-      });
-    } catch (confirmErr) {
-      console.warn("Auto-confirm deferred to order detail screen:", confirmErr);
-    }
-    void navigate({
-      to: "/app/orders/$orderId",
-      params: { orderId: result.order.id },
-    });
-  }
 
   function setDishQty(day: string, dishId: string, qty: number) {
     setQuantities((prev) => {
@@ -256,11 +270,59 @@ function ScheduleFlow() {
     tenantId,
   });
 
+  async function onProgramDraft() {
+    if (orderItems.length === 0 || programDraft.isPending || confirmOrder.isPending) return;
+
+    // Safety net: check profile and address before firing mutation
+    if (!customerId) {
+      setForcedStep("identity");
+      setWelcomeOpen(true);
+      return;
+    }
+    if (addresses.length === 0) {
+      setForcedStep("address");
+      setWelcomeOpen(true);
+      return;
+    }
+
+    try {
+      const result = await programDraft.mutateAsync({
+        weekStart,
+        items: orderItems,
+        offerCode: effectiveOfferCode,
+        deliveryAddressId: selectedAddressId,
+      });
+
+      try {
+        await confirmOrder.mutateAsync({
+          orderId: result.order.id,
+          expectedTotal: result.order.total != null ? Number(result.order.total) : undefined,
+        });
+      } catch (confirmErr) {
+        console.warn("Auto-confirm deferred to order detail screen:", confirmErr);
+      }
+
+      void navigate({
+        to: "/app/orders/$orderId",
+        params: { orderId: result.order.id },
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes("EXPLICIT_ONBOARDING_REQUIRED") || msg.includes("PERMISSION_DENIED")) {
+        setForcedStep("identity");
+        setWelcomeOpen(true);
+        toast.info("Para confirmar tu pedido necesitamos configurar tus datos de entrega.");
+        return;
+      }
+      toast.error(msg);
+    }
+  }
+
   return (
-    <div className="flex-1 flex flex-col pb-4">
+    <div className="flex-1 flex flex-col pb-24">
       <ScreenHeader
         backTo={step === 1 ? "/app" : undefined}
-        onBack={step > 1 ? () => setStep((step - 1) as Step) : undefined}
+        onBack={step > 1 ? () => setStep(1) : undefined}
         overline={t("customer:scheduleFlow")}
         title={stepTitles[step - 1]}
       />
@@ -275,8 +337,9 @@ function ScheduleFlow() {
         </div>
       )}
 
+      {/* 2-Step Progress Indicator */}
       <div className="px-6 flex gap-2 mb-5">
-        {[1, 2, 3].map((n) => (
+        {[1, 2].map((n) => (
           <div
             key={n}
             className={cn(
@@ -287,18 +350,20 @@ function ScheduleFlow() {
         ))}
       </div>
 
+      {/* STEP 1: MULTI-DAY BASKET SELECTION */}
       {step === 1 ? (
-        <section className="px-6 space-y-8">
+        <div className="px-6 space-y-6">
+          {/* Week Navigator */}
           <div>
             <div className="flex items-center justify-between mb-3">
               <p className="text-sm font-semibold text-muted-foreground">
                 {t("customer:scheduleWeekTitle", "Semana de entrega")}
               </p>
-              {weekOffset > 0 && (
+              {activeWeek.weekOffset > 0 && (
                 <button
                   type="button"
                   onClick={() => {
-                    setWeekOffset(0);
+                    activeWeek.resetToDefaultWeek();
                     setQuantities({});
                   }}
                   className="text-xs font-semibold text-primary hover:underline flex items-center gap-1 cursor-pointer"
@@ -311,12 +376,12 @@ function ScheduleFlow() {
             <div className="flex items-center justify-between bg-card border border-border rounded-2xl p-3 shadow-xs">
               <button
                 type="button"
-                disabled={weekOffset <= 0}
+                disabled={!activeWeek.canGoPrev}
                 onClick={() => {
-                  setWeekOffset((w) => Math.max(0, w - 1));
+                  activeWeek.setWeekOffset((w) => Math.max(0, w - 1));
                   setQuantities({});
                 }}
-                className="h-11 w-11 rounded-xl border border-border flex items-center justify-center text-foreground hover:bg-secondary disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+                className="h-11 w-11 rounded-xl border border-border flex items-center justify-center text-foreground hover:bg-secondary disabled:opacity-25 disabled:cursor-not-allowed transition-colors cursor-pointer"
                 aria-label={t("customer:prevWeek", "Semana anterior")}
               >
                 <ChevronLeft className="h-5 w-5" />
@@ -325,29 +390,29 @@ function ScheduleFlow() {
                 <span
                   className={cn(
                     "inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase mb-1",
-                    weekOffset === 0
+                    activeWeek.weekOffset === 0
                       ? "bg-primary/10 text-primary"
                       : "bg-secondary text-secondary-foreground",
                   )}
                 >
-                  {weekOffset === 0
+                  {activeWeek.weekOffset === 0
                     ? t("customer:currentWeekLabel", "Esta semana")
-                    : weekOffset === 1
+                    : activeWeek.weekOffset === 1
                       ? t("customer:nextWeekLabel", "Próxima semana")
-                      : t("customer:futureWeekOffsetLabel", `+${weekOffset} semanas`)}
+                      : `+${activeWeek.weekOffset} semanas`}
                 </span>
                 <p className="text-sm font-extrabold text-foreground tracking-tight">
-                  {formatWeekRangeEs(weekStart)}
+                  {activeWeek.weekLabel}
                 </p>
               </div>
               <button
                 type="button"
-                disabled={weekOffset >= MAX_FUTURE_WEEKS}
+                disabled={!activeWeek.canGoNext}
                 onClick={() => {
-                  setWeekOffset((w) => Math.min(MAX_FUTURE_WEEKS, w + 1));
+                  activeWeek.setWeekOffset((w) => w + 1);
                   setQuantities({});
                 }}
-                className="h-11 w-11 rounded-xl border border-border flex items-center justify-center text-foreground hover:bg-secondary disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+                className="h-11 w-11 rounded-xl border border-border flex items-center justify-center text-foreground hover:bg-secondary disabled:opacity-25 disabled:cursor-not-allowed transition-colors cursor-pointer"
                 aria-label={t("customer:nextWeek", "Semana siguiente")}
               >
                 <ChevronRight className="h-5 w-5" />
@@ -355,24 +420,29 @@ function ScheduleFlow() {
             </div>
           </div>
 
-          <div>
-            <p className="text-sm font-semibold text-muted-foreground mb-3">
-              {t("customer:deliveryDay")}
+          {/* Sticky DayPicker with Badges */}
+          <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm py-3 -mx-6 px-6 border-b border-border/50">
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
+              {t("customer:deliveryDay", "Día de entrega")}
             </p>
             <DayPicker
               days={daysShort}
+              dates={deliveryDates}
+              mealCounts={dayMealCounts}
               activeIndex={deliveryDay}
               onSelect={setDeliveryDay}
               isDayDisabled={isDayDisabled}
             />
           </div>
-        </section>
-      ) : null}
 
-      {step === 2 ? (
-        <div className="px-6 space-y-10 pb-4">
-          <div className="flex items-center justify-between">
-            <p className="text-lg font-extrabold tracking-tight">{daysFull[deliveryDay]}</p>
+          {/* Active Day Header */}
+          <div className="flex items-center justify-between pt-1">
+            <div>
+              <p className="text-lg font-extrabold tracking-tight">{daysFull[deliveryDay]}</p>
+              <p className="text-xs text-muted-foreground">
+                {formatDeliveryDate(dayDate, i18n.language)}
+              </p>
+            </div>
             {currentDayMealsCount > 0 && (
               <span className="text-xs font-bold bg-primary/10 text-primary px-3 py-1 rounded-full">
                 {currentDayMealsCount}{" "}
@@ -380,70 +450,96 @@ function ScheduleFlow() {
               </span>
             )}
           </div>
-          {offerDishes.map((d) => {
-            const qty = currentDayQuantities[d.id] ?? 0;
-            return (
-              <MenuDishPost
-                key={d.id}
-                dish={d}
-                imageSrc={dishPhoto}
-                macrosLabel={dishMacrosLine(d, macroLabels)}
-                cta={
-                  qty === 0 ? (
-                    <button
-                      type="button"
-                      onClick={() => setDishQty(dayDate, d.id, 1)}
-                      className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-primary text-primary-foreground text-[15px] font-bold tracking-wide hover:bg-primary/90 transition-colors cursor-pointer"
-                    >
-                      <Plus className="w-5 h-5" />
-                      {t("customer:selectDish", "Añadir")}
-                    </button>
-                  ) : (
-                    <div className="flex h-14 w-full items-center justify-between rounded-2xl bg-foreground text-background px-3 font-bold shadow-xs">
+
+          {/* Dishes List */}
+          <div className="space-y-10 pb-16">
+            {offerDishes.map((d) => {
+              const qty = currentDayQuantities[d.id] ?? 0;
+              return (
+                <MenuDishPost
+                  key={d.id}
+                  dish={d}
+                  imageSrc={dishPhoto}
+                  macrosLabel={dishMacrosLine(d, macroLabels)}
+                  cta={
+                    qty === 0 ? (
                       <button
                         type="button"
-                        onClick={() => setDishQty(dayDate, d.id, qty - 1)}
-                        className="h-10 w-10 rounded-xl bg-background/20 hover:bg-background/30 flex items-center justify-center text-background transition-colors cursor-pointer"
-                        aria-label="Disminuir ración"
-                      >
-                        <Minus className="w-5 h-5" />
-                      </button>
-                      <span className="text-base font-extrabold tracking-tight tabular-nums">
-                        {qty} {qty === 1 ? "ración" : "raciones"}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setDishQty(dayDate, d.id, qty + 1)}
-                        className="h-10 w-10 rounded-xl bg-background/20 hover:bg-background/30 flex items-center justify-center text-background transition-colors cursor-pointer"
-                        aria-label="Aumentar ración"
+                        onClick={() => setDishQty(dayDate, d.id, 1)}
+                        className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-primary text-primary-foreground text-[15px] font-bold tracking-wide hover:bg-primary/90 transition-colors cursor-pointer"
                       >
                         <Plus className="w-5 h-5" />
+                        {t("customer:selectDish", "Añadir")}
                       </button>
-                    </div>
-                  )
-                }
-              />
-            );
-          })}
-          {offerDishes.length === 0 ? (
-            <div className="flex flex-col items-center text-center py-10 space-y-5">
-              <DishThumb emoji="🍽️" imageSrc={dishPhoto} size="xl" className="!rounded-[1.75rem]" />
-              <p className="text-lg font-extrabold">{t("customer:menuEmptyDay")}</p>
+                    ) : (
+                      <div className="flex h-14 w-full items-center justify-between rounded-2xl bg-foreground text-background px-3 font-bold shadow-xs">
+                        <button
+                          type="button"
+                          onClick={() => setDishQty(dayDate, d.id, qty - 1)}
+                          className="h-10 w-10 rounded-xl bg-background/20 hover:bg-background/30 flex items-center justify-center text-background transition-colors cursor-pointer"
+                          aria-label="Disminuir ración"
+                        >
+                          <Minus className="w-5 h-5" />
+                        </button>
+                        <span className="text-base font-extrabold tracking-tight tabular-nums">
+                          {qty} {qty === 1 ? "ración" : "raciones"}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setDishQty(dayDate, d.id, qty + 1)}
+                          className="h-10 w-10 rounded-xl bg-background/20 hover:bg-background/30 flex items-center justify-center text-background transition-colors cursor-pointer"
+                          aria-label="Aumentar ración"
+                        >
+                          <Plus className="w-5 h-5" />
+                        </button>
+                      </div>
+                    )
+                  }
+                />
+              );
+            })}
+
+            {offerDishes.length === 0 ? (
+              <div className="flex flex-col items-center text-center py-10 space-y-5">
+                <DishThumb emoji="🍽️" imageSrc={dishPhoto} size="xl" className="!rounded-[1.75rem]" />
+                <p className="text-lg font-extrabold">{t("customer:menuEmptyDay")}</p>
+              </div>
+            ) : null}
+          </div>
+
+          {/* Persistent Floating Summary Bar */}
+          {totalMealsCount > 0 && (
+            <div className="fixed bottom-6 inset-x-0 z-30 px-6 pointer-events-none">
+              <div className="mx-auto max-w-lg pointer-events-auto bg-foreground text-background p-3.5 rounded-2xl shadow-xl flex items-center justify-between gap-4">
+                <div className="min-w-0 pl-1">
+                  <p className="text-xs font-bold text-background/80 truncate">
+                    {totalMealsCount} {totalMealsCount === 1 ? "comida" : "comidas"} en{" "}
+                    {sortedDayDates.length} {sortedDayDates.length === 1 ? "día" : "días"}
+                  </p>
+                  <p className="text-lg font-extrabold tracking-tight tabular-nums leading-tight">
+                    {fmt.currency(totalEur, { currency: "EUR" })}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setStep(2)}
+                  className="h-11 px-5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm flex items-center gap-1.5 shadow-sm shrink-0 cursor-pointer transition-colors"
+                >
+                  <span>Ver resumen</span>
+                  <ChevronRight className="size-4" />
+                </button>
+              </div>
             </div>
-          ) : null}
+          )}
         </div>
       ) : null}
 
-      {step === 3 ? (
-        <section className="px-6 space-y-10 pt-1 pb-4">
+      {/* STEP 2: SUMMARY & CHECKOUT */}
+      {step === 2 ? (
+        <section className="px-6 space-y-8 pt-1 pb-4">
           {allSelectedDishEntries.length === 0 ? (
             <div className="flex flex-col items-center text-center py-8 space-y-6">
-              <DishThumb
-                emoji="🥗"
-                imageSrc={dishPhoto}
-                size="hero"
-                className="!rounded-[1.75rem]"
-              />
+              <DishThumb emoji="🥗" imageSrc={dishPhoto} size="hero" className="!rounded-[1.75rem]" />
               <div className="space-y-2 max-w-[20rem]">
                 <p className="text-xl font-extrabold tracking-tight">
                   {t("customer:noDishesSelected")}
@@ -452,32 +548,47 @@ function ScheduleFlow() {
                   {t("customer:noDishesSelectedHint")}
                 </p>
               </div>
-              <PrimaryCTA className="!h-14 !rounded-2xl w-full max-w-sm" onClick={() => setStep(2)}>
+              <PrimaryCTA className="!h-14 !rounded-2xl w-full max-w-sm" onClick={() => setStep(1)}>
                 {t("customer:chooseMeals")}
               </PrimaryCTA>
             </div>
           ) : (
             <>
               <div className="space-y-6">
-                <div className="space-y-5">
+                {/* Grouped Days */}
+                <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-semibold text-muted-foreground">
-                      {totalMealsCount} {totalMealsCount === 1 ? "comida seleccionada" : "comidas seleccionadas"}
+                      {totalMealsCount}{" "}
+                      {totalMealsCount === 1 ? "comida seleccionada" : "comidas seleccionadas"}
                     </p>
+                    <button
+                      type="button"
+                      onClick={() => setStep(1)}
+                      className="text-xs font-semibold text-primary hover:underline cursor-pointer"
+                    >
+                      Editar selección
+                    </button>
                   </div>
 
                   {sortedDayDates.map((dDate) => {
                     const dayItems = itemsByDay.get(dDate) ?? [];
-                    const dIndex = weekDates.indexOf(dDate);
+                    const dIndex = deliveryDates.indexOf(dDate);
                     const dMeals = dayItems.reduce((s, it) => s + it.qty, 0);
                     const dayLabel = dIndex >= 0 ? daysFull[dIndex] : dDate;
                     const dateFormatted = formatDeliveryDate(dDate, i18n.language);
 
                     return (
-                      <div key={dDate} className="space-y-3 bg-card/60 border border-border/80 rounded-2xl p-4">
+                      <div
+                        key={dDate}
+                        className="space-y-3 bg-card/60 border border-border/80 rounded-2xl p-4"
+                      >
                         <div className="flex items-center justify-between border-b border-border/50 pb-2">
                           <p className="font-extrabold text-sm text-foreground">
-                            {dayLabel} <span className="font-normal text-muted-foreground text-xs">({dateFormatted})</span>
+                            {dayLabel}{" "}
+                            <span className="font-normal text-muted-foreground text-xs">
+                              ({dateFormatted})
+                            </span>
                           </p>
                           <span className="text-xs font-semibold text-muted-foreground">
                             {dMeals} {dMeals === 1 ? "comida" : "comidas"}
@@ -485,7 +596,10 @@ function ScheduleFlow() {
                         </div>
                         <ul className="space-y-3 pt-1">
                           {dayItems.map(({ dish, qty }) => (
-                            <li key={`${dDate}-${dish.id}`} className="flex items-center justify-between gap-4">
+                            <li
+                              key={`${dDate}-${dish.id}`}
+                              className="flex items-center justify-between gap-4"
+                            >
                               <div className="flex items-center gap-3">
                                 <DishThumb
                                   emoji={dish.emoji}
@@ -517,119 +631,105 @@ function ScheduleFlow() {
 
                 <div className="border-t border-border/70" />
 
-                <div className="space-y-5">
-                  <div>
+                {/* Delivery Address */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between mb-1">
                     <p className="text-sm font-semibold text-muted-foreground">
-                      {t("customer:deliveryDay")}
+                      {t("customer:deliveryAddress")}
                     </p>
-                    <p className="text-base font-extrabold mt-1 tracking-tight">
-                      {sortedDayDates.length === 1 ? (
-                        <>
-                          {weekDates.indexOf(sortedDayDates[0]) >= 0
-                            ? daysFull[weekDates.indexOf(sortedDayDates[0])]
-                            : sortedDayDates[0]}{" "}
-                          {formatDeliveryDate(sortedDayDates[0], i18n.language)}
-                        </>
-                      ) : (
-                        `Entregas múltiples: ${sortedDayDates
-                          .map((d) => {
-                            const idx = weekDates.indexOf(d);
-                            return idx >= 0 ? daysShort[idx] : d;
-                          })
-                          .join(", ")}`
-                      )}
-                    </p>
+                    <Link
+                      to="/app/addresses"
+                      className="text-xs font-semibold text-primary hover:underline"
+                    >
+                      {addresses.length === 0
+                        ? t("customer:addAddress", "+ Añadir dirección")
+                        : t("common:change", "Gestionar")}
+                    </Link>
                   </div>
-                  <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <p className="text-sm font-semibold text-muted-foreground">
-                        {t("customer:deliveryAddress")}
-                      </p>
-                      <Link
-                        to="/app/addresses"
-                        className="text-xs font-semibold text-primary hover:underline"
-                      >
-                        {addresses.length === 0
-                          ? t("customer:addAddress", "+ Añadir dirección")
-                          : t("common:change", "Cambiar")}
-                      </Link>
-                    </div>
 
-                    {addresses.length === 0 ? (
-                      <div className="rounded-2xl border border-dashed border-border p-3.5 bg-card/40 flex items-center justify-between">
-                        <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
-                          <MapPin className="size-4 text-primary shrink-0" />
-                          <span>{t("customer:addressHomeDefault")}</span>
-                        </div>
+                  {addresses.length === 0 ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setForcedStep("address");
+                        setWelcomeOpen(true);
+                      }}
+                      className="w-full rounded-2xl border border-dashed border-primary/40 p-4 bg-primary/5 flex items-center justify-between text-left cursor-pointer hover:bg-primary/10 transition-colors"
+                    >
+                      <div className="flex items-center gap-2.5 text-sm text-foreground">
+                        <MapPin className="size-4 text-primary shrink-0" />
+                        <span className="font-semibold">Añadir dirección de entrega</span>
                       </div>
-                    ) : addresses.length === 1 ? (
-                      <div className="rounded-2xl border border-border bg-card p-3.5 flex items-start gap-3">
-                        <MapPin className="size-4 text-primary shrink-0 mt-0.5" />
-                        <div className="min-w-0 flex-1">
-                          <p className="font-semibold text-sm">
-                            {addresses[0].label || t("customer:addressHomeDefault")}
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-0.5 truncate">
-                            {addresses[0].street}
-                            {addresses[0].city ? `, ${addresses[0].city}` : ""}
-                            {addresses[0].zip ? ` · ${addresses[0].zip}` : ""}
-                          </p>
-                        </div>
+                      <Plus className="size-4 text-primary" />
+                    </button>
+                  ) : addresses.length === 1 ? (
+                    <div className="rounded-2xl border border-border bg-card p-3.5 flex items-start gap-3">
+                      <MapPin className="size-4 text-primary shrink-0 mt-0.5" />
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-sm">
+                          {addresses[0].label || t("customer:addressHomeDefault")}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                          {addresses[0].street}
+                          {addresses[0].city ? `, ${addresses[0].city}` : ""}
+                          {addresses[0].zip ? ` · ${addresses[0].zip}` : ""}
+                        </p>
                       </div>
-                    ) : (
-                      <div className="space-y-2">
-                        {addresses.map((a) => {
-                          const isSelected = selectedAddressId === a.id;
-                          return (
-                            <button
-                              key={a.id}
-                              type="button"
-                              onClick={() => setSelectedAddressId(a.id)}
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {addresses.map((a) => {
+                        const isSelected = selectedAddressId === a.id;
+                        return (
+                          <button
+                            key={a.id}
+                            type="button"
+                            onClick={() => setSelectedAddressId(a.id)}
+                            className={cn(
+                              "w-full text-left rounded-2xl border p-3 flex items-start gap-3 transition-all cursor-pointer",
+                              isSelected
+                                ? "border-primary bg-primary/5 shadow-2xs"
+                                : "border-border bg-card hover:border-border/80",
+                            )}
+                          >
+                            <MapPin
                               className={cn(
-                                "w-full text-left rounded-2xl border p-3 flex items-start gap-3 transition-all cursor-pointer",
-                                isSelected
-                                  ? "border-primary bg-primary/5 shadow-2xs"
-                                  : "border-border bg-card hover:border-border/80",
+                                "size-4 shrink-0 mt-0.5",
+                                isSelected ? "text-primary" : "text-muted-foreground",
                               )}
-                            >
-                              <MapPin
-                                className={cn(
-                                  "size-4 shrink-0 mt-0.5",
-                                  isSelected ? "text-primary" : "text-muted-foreground",
-                                )}
-                              />
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-1.5">
-                                  <p className="font-semibold text-sm truncate">
-                                    {a.label || t("customer:addressHomeDefault")}
-                                  </p>
-                                  {a.is_default && (
-                                    <span className="text-[9px] font-bold uppercase tracking-wider text-primary bg-primary/10 rounded px-1 py-0.2">
-                                      {t("common:default")}
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-xs text-muted-foreground mt-0.5 truncate">
-                                  {a.street}
-                                  {a.city ? `, ${a.city}` : ""}
-                                  {a.zip ? ` · ${a.zip}` : ""}
+                            />
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-1.5">
+                                <p className="font-semibold text-sm truncate">
+                                  {a.label || t("customer:addressHomeDefault")}
                                 </p>
+                                {a.is_default && (
+                                  <span className="text-[9px] font-bold uppercase tracking-wider text-primary bg-primary/10 rounded px-1 py-0.2">
+                                    {t("common:default")}
+                                  </span>
+                                )}
                               </div>
-                              {isSelected && (
-                                <span className="size-5 rounded-full bg-primary text-primary-foreground grid place-items-center shrink-0">
-                                  <Check className="size-3 stroke-[3]" />
-                                </span>
-                              )}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
+                              <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                                {a.street}
+                                {a.city ? `, ${a.city}` : ""}
+                                {a.zip ? ` · ${a.zip}` : ""}
+                              </p>
+                            </div>
+                            {isSelected && (
+                              <span className="size-5 rounded-full bg-primary text-primary-foreground grid place-items-center shrink-0">
+                                <Check className="size-3 stroke-[3]" />
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
 
                 <div className="border-t border-border/70" />
 
+                {/* Total */}
                 <div>
                   <p className="text-sm font-semibold text-muted-foreground">
                     {t("customer:total")}
@@ -640,43 +740,45 @@ function ScheduleFlow() {
                 </div>
               </div>
 
-              {(programDraft.isError || confirmOrder.isError) ? (
-                <p className="text-sm text-destructive text-center" role="alert">
-                  {((programDraft.error || confirmOrder.error) as Error)?.message ?? "Error"}
-                </p>
-              ) : null}
+              {/* Confirm Order CTA */}
+              <div className="pt-4">
+                <PrimaryCTA
+                  disabled={
+                    programDraft.isPending || confirmOrder.isPending || isTenantOrderCreationFrozen
+                  }
+                  onClick={() => {
+                    if (isTenantOrderCreationFrozen) return;
+                    void onProgramDraft();
+                  }}
+                >
+                  {isTenantOrderCreationFrozen
+                    ? EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage
+                    : programDraft.isPending || confirmOrder.isPending
+                      ? "Confirmando pedido..."
+                      : t("customer:confirmOrder")}
+                </PrimaryCTA>
+              </div>
             </>
           )}
         </section>
       ) : null}
 
-      <div className="px-6 mt-auto pt-8 space-y-3">
-        {step < 3 ? (
-          <PrimaryCTA
-            disabled={step === 2 && totalMealsCount === 0}
-            onClick={() => setStep((step + 1) as Step)}
-          >
-            {step === 2 ? t("customer:seeSummaryCta") : t("common:continue")}
-          </PrimaryCTA>
-        ) : allSelectedDishEntries.length > 0 ? (
-          <PrimaryCTA
-            disabled={programDraft.isPending || confirmOrder.isPending || isTenantOrderCreationFrozen}
-            onClick={() => {
-              if (isTenantOrderCreationFrozen) return;
-              void onProgramDraft();
-            }}
-          >
-            {isTenantOrderCreationFrozen
-              ? EATCLEAN_PARTIAL_LAUNCH_CONFIG.frozenMessage
-              : t("customer:confirmOrder")}
-          </PrimaryCTA>
-        ) : null}
-      </div>
+      {/* Safety Net Onboarding Modal */}
+      <CustomerWelcomeModal
+        open={welcomeOpen}
+        onOpenChange={setWelcomeOpen}
+        forcedStep={forcedStep}
+        onCompleted={() => {
+          setWelcomeOpen(false);
+          void addressesQuery.refetch();
+        }}
+      />
     </div>
   );
 }
 
 function formatDeliveryDate(isoDate: string, locale: string): string {
+  if (!isoDate || !isoDate.includes("-")) return "";
   const [y, m, d] = isoDate.split("-").map(Number);
   const date = new Date(Date.UTC(y, m - 1, d));
   return new Intl.DateTimeFormat(locale || "es", {
