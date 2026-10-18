@@ -26,6 +26,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { useCustomerSelfProfile } from "@/hooks/use-customer-self-profile";
 import { useCurrentCustomerId } from "@/hooks/use-current-customer-id";
 import { customerOnboardingPrefill } from "@/modules/customer-directory/application/customer-onboarding-service";
+import { supabase } from "@/integrations/supabase/client";
+import { EU_ALLERGENS } from "@/types/dietary";
 import { cn } from "@/lib/utils";
 
 export type OnboardingStep = "welcome" | "identity" | "address" | "dietary";
@@ -43,7 +45,7 @@ export function CustomerWelcomeModal({
   onCompleted,
   forcedStep,
 }: CustomerWelcomeModalProps) {
-  const { user } = useAuth();
+  const { user, tenantId } = useAuth();
   const customerQuery = useCurrentCustomerId();
   const state = useCustomerSelfProfile();
   const profile = state.profile.data;
@@ -58,8 +60,13 @@ export function CustomerWelcomeModal({
   // Step 3: Address state
   const [label, setLabel] = useState("Casa");
   const [street, setStreet] = useState("");
-  const [city, setCity] = useState("Las Palmas de Gran Canaria");
+  const [city, setCity] = useState("");
   const [zip, setZip] = useState("");
+
+  // Step 4: Dietary state
+  const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
+  const [noKnownAllergens, setNoKnownAllergens] = useState(false);
+  const [savingDietary, setSavingDietary] = useState(false);
 
   useEffect(() => {
     if (forcedStep) {
@@ -138,6 +145,41 @@ export function CustomerWelcomeModal({
     }
   }
 
+  async function handleSaveDietary() {
+    const effectiveCustomerId = customerQuery.data ?? profile?.customerId;
+    if (!effectiveCustomerId || !tenantId) {
+      handleFinish();
+      return;
+    }
+    setSavingDietary(true);
+    try {
+      const payload = {
+        tenant_id: tenantId,
+        customer_id: effectiveCustomerId,
+        allergens: selectedAllergens,
+        custom_allergens: [],
+        restrictions: [],
+        preferences: [],
+        dietary_notes: noKnownAllergens ? "Sin alérgenos conocidos" : null,
+        updated_at: new Date().toISOString(),
+      };
+      const { error } = await supabase
+        .from("customer_dietary_profiles")
+        .upsert(payload, { onConflict: "tenant_id,customer_id" });
+
+      if (error) {
+        console.warn("Could not save dietary profile during onboarding:", error);
+      } else {
+        toast.success("¡Preferencias de alérgenos guardadas!");
+      }
+    } catch (e) {
+      console.warn("Dietary save error:", e);
+    } finally {
+      setSavingDietary(false);
+      handleFinish();
+    }
+  }
+
   function handleFinish() {
     toast.success("¡Todo listo para programar tus pedidos semanales!");
     onOpenChange(false);
@@ -148,7 +190,7 @@ export function CustomerWelcomeModal({
     { id: "welcome", label: "Bienvenida" },
     { id: "identity", label: "Tus datos" },
     { id: "address", label: "Dirección" },
-    { id: "dietary", label: "Listo" },
+    { id: "dietary", label: "Alérgenos" },
   ];
 
   const currentStepIdx = stepsList.findIndex((s) => s.id === step);
@@ -339,7 +381,7 @@ export function CustomerWelcomeModal({
                     <Input
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      placeholder="Las Palmas"
+                      placeholder="Santa Cruz de Tenerife, La Laguna..."
                       className="h-11 rounded-xl bg-background"
                       disabled={state.busy}
                     />
@@ -350,7 +392,7 @@ export function CustomerWelcomeModal({
                     <Input
                       value={zip}
                       onChange={(e) => setZip(e.target.value)}
-                      placeholder="35001"
+                      placeholder="38001"
                       className="h-11 rounded-xl bg-background"
                       disabled={state.busy}
                     />
@@ -377,28 +419,105 @@ export function CustomerWelcomeModal({
             </form>
           )}
 
-          {/* STEP 4: DIETARY & COMPLETION */}
+          {/* STEP 4: DIETARY & ALLERGENS */}
           {step === "dietary" && (
-            <div className="space-y-6">
-              <div className="rounded-2xl border border-border/80 bg-card p-5 text-center space-y-3">
-                <div className="size-12 rounded-2xl bg-primary/10 text-primary mx-auto grid place-items-center">
-                  <Check className="size-6 stroke-[3]" />
-                </div>
-                <div>
-                  <h4 className="font-extrabold text-base text-foreground">¡Ficha y dirección listas!</h4>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Tu cuenta está completamente operativa. Si tienes alergias o intolerancias alimentarias, puedes configurarlas en cualquier momento desde tu perfil.
-                  </p>
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-border/80 bg-card p-4 space-y-1.5">
+                <div className="flex items-center gap-2.5">
+                  <div className="size-8 rounded-xl bg-primary/10 text-primary grid place-items-center">
+                    <Heart className="size-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-foreground">Alergias y Preferencias</h4>
+                    <p className="text-xs text-muted-foreground">
+                      Indícanos si tienes alguna alergia alimentaria para adaptar tus platos con seguridad.
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              <Button
+              {/* No known allergens toggle */}
+              <button
                 type="button"
-                onClick={handleFinish}
-                className="w-full h-12 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-sm cursor-pointer"
+                onClick={() => {
+                  setNoKnownAllergens((prev) => {
+                    const next = !prev;
+                    if (next) setSelectedAllergens([]);
+                    return next;
+                  });
+                }}
+                className={cn(
+                  "w-full flex items-center justify-between p-3 rounded-xl border text-xs font-semibold transition cursor-pointer text-left",
+                  noKnownAllergens
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border/80 bg-background text-foreground hover:bg-muted/50",
+                )}
               >
-                Empezar a programar mis comidas
-              </Button>
+                <span>Sin alérgenos conocidos</span>
+                {noKnownAllergens && <Check className="size-4 text-primary" />}
+              </button>
+
+              {/* EU 14 Allergens Grid */}
+              <div className="space-y-1.5">
+                <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                  Alérgenos oficiales (UE 14)
+                </span>
+                <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
+                  {EU_ALLERGENS.map((allergen) => {
+                    const isSelected = selectedAllergens.includes(allergen.id);
+                    return (
+                      <button
+                        key={allergen.id}
+                        type="button"
+                        disabled={noKnownAllergens}
+                        onClick={() => {
+                          setNoKnownAllergens(false);
+                          setSelectedAllergens((prev) =>
+                            isSelected ? prev.filter((a) => a !== allergen.id) : [...prev, allergen.id],
+                          );
+                        }}
+                        className={cn(
+                          "flex items-center justify-between px-3 py-2 rounded-xl border text-xs font-medium transition cursor-pointer text-left",
+                          isSelected
+                            ? "border-primary bg-primary/10 text-primary font-bold"
+                            : "border-border/80 bg-background text-foreground hover:bg-muted/50",
+                          noKnownAllergens && "opacity-40 cursor-not-allowed",
+                        )}
+                      >
+                        <span className="truncate">{allergen.label}</span>
+                        {isSelected && <Check className="size-3.5 shrink-0 text-primary ml-1" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="pt-2 flex flex-col gap-2">
+                <Button
+                  type="button"
+                  disabled={savingDietary}
+                  onClick={() => void handleSaveDietary()}
+                  className="w-full h-12 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-sm cursor-pointer"
+                >
+                  {savingDietary ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="size-4 animate-spin" />
+                      <span>Guardando preferencias...</span>
+                    </span>
+                  ) : (
+                    <span>Guardar y empezar a programar</span>
+                  )}
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={handleFinish}
+                  className="w-full h-9 rounded-xl text-xs text-muted-foreground hover:text-foreground cursor-pointer"
+                >
+                  Saltar por ahora (lo configuraré luego en mi perfil)
+                </Button>
+              </div>
             </div>
           )}
         </div>

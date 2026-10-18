@@ -7,6 +7,8 @@ import {
   formatDayDateEs,
   formatWeekRangeEs,
   resolveTenantActiveWeek,
+  getTenantScheduleConfig,
+  isWeeklyOrderCutoffPassed,
 } from "./week-dates";
 
 describe("week-dates calendar helpers", () => {
@@ -109,6 +111,109 @@ describe("week-dates calendar helpers", () => {
       expect(result.calendarMondayIso).toBe("2026-10-19");
       expect(result.isPastCutoff).toBe(false);
       expect(result.defaultActiveMondayIso).toBe("2026-10-19");
+    });
+
+    it("respects isolated multi-tenant timezone configuration without leaking EatClean defaults", () => {
+      // Default fallback has no weekly cutoff and full 7-day operation
+      const configDefault = getTenantScheduleConfig();
+      expect(configDefault.timezone).toBe("Europe/Madrid");
+      expect(configDefault.cutoffDay).toBeNull();
+      expect(configDefault.cutoffTime).toBe("23:59");
+      expect(configDefault.activeDeliveryDays).toEqual([1, 2, 3, 4, 5, 6, 7]);
+
+      // An unconfigured tenant does not inherit EatClean's Friday 14:00 cutoff
+      const unconfiguredTenant = getTenantScheduleConfig({ tenantSlug: "peninsula-bistro", tenantTimezone: "Europe/Madrid" });
+      expect(unconfiguredTenant.timezone).toBe("Europe/Madrid");
+      expect(unconfiguredTenant.cutoffDay).toBeNull();
+      expect(unconfiguredTenant.activeDeliveryDays).toEqual([1, 2, 3, 4, 5, 6, 7]);
+
+      // EatClean tenant retains its specific operational schedule
+      const configCanary = getTenantScheduleConfig("eatclean");
+      expect(configCanary.timezone).toBe("Atlantic/Canary");
+      expect(configCanary.cutoffDay).toBe(5);
+      expect(configCanary.cutoffTime).toBe("14:00");
+      expect(configCanary.activeDeliveryDays).toEqual([1, 2, 3, 4, 5]);
+    });
+
+    it("does not advance week for unconfigured tenants on Friday afternoon (no weekly pre-cutoff)", () => {
+      // Friday Oct 16, 2026 at 15:30 Madrid time (after Friday 14:00)
+      const now = new Date("2026-10-16T13:30:00Z");
+
+      // EatClean: passed cutoff -> rolls over to Oct 19
+      const eatcleanResult = resolveTenantActiveWeek({ tenantSlug: "eatclean", now });
+      expect(eatcleanResult.isPastCutoff).toBe(true);
+      expect(eatcleanResult.defaultActiveMondayIso).toBe("2026-10-19");
+
+      // Generic/unconfigured tenant: no cutoff -> stays on Oct 12
+      const genericResult = resolveTenantActiveWeek({ tenantSlug: "generic-tenant", now });
+      expect(genericResult.isPastCutoff).toBe(false);
+      expect(genericResult.defaultActiveMondayIso).toBe("2026-10-12");
+      expect(genericResult.activeDeliveryDates).toHaveLength(7);
+    });
+
+    it("respects custom tenant schedule like Wednesday 18:00 cutoff", () => {
+      const customConfig = {
+        timezone: "Europe/Madrid",
+        cutoffDay: 3, // Wednesday
+        cutoffTime: "18:00",
+        activeDeliveryDays: [1, 2, 3, 4, 5],
+        maxFutureWeeks: 4,
+      };
+
+      // Wednesday Oct 14, 2026 at 17:59 Madrid time (15:59 UTC) -> before cutoff
+      const beforeCutoff = new Date("2026-10-14T15:59:00Z");
+      const resBefore = resolveTenantActiveWeek({ scheduleConfig: customConfig, now: beforeCutoff });
+      expect(resBefore.isPastCutoff).toBe(false);
+      expect(resBefore.defaultActiveMondayIso).toBe("2026-10-12");
+
+      // Wednesday Oct 14, 2026 at 18:00 Madrid time (16:00 UTC) -> at cutoff
+      const atCutoff = new Date("2026-10-14T16:00:00Z");
+      const resAt = resolveTenantActiveWeek({ scheduleConfig: customConfig, now: atCutoff });
+      expect(resAt.isPastCutoff).toBe(true);
+      expect(resAt.defaultActiveMondayIso).toBe("2026-10-19");
+    });
+  });
+
+  describe("isWeeklyOrderCutoffPassed", () => {
+    it("returns true for a past week when cutoff has passed", () => {
+      const now = new Date("2026-10-18T16:21:05Z"); // Sunday
+      // Active week is 2026-10-19, so 2026-10-12 is cutoff passed
+      expect(isWeeklyOrderCutoffPassed("2026-10-12", { tenantSlug: "eatclean", now })).toBe(true);
+    });
+
+    it("returns false for the active week or future weeks", () => {
+      const now = new Date("2026-10-18T16:21:05Z"); // Sunday
+      expect(isWeeklyOrderCutoffPassed("2026-10-19", { tenantSlug: "eatclean", now })).toBe(false);
+      expect(isWeeklyOrderCutoffPassed("2026-10-26", { tenantSlug: "eatclean", now })).toBe(false);
+    });
+
+    it("unconfigured tenant rejects historical weeks but allows current week", () => {
+      const now = new Date("2026-10-16T15:00:00Z"); // Friday 15:00 UTC
+      // 2026-10-05 is past week -> rejected
+      expect(isWeeklyOrderCutoffPassed("2026-10-05", { tenantSlug: "unconfigured", now })).toBe(true);
+      // 2026-10-12 is current week -> open (cutoffDay is null)
+      expect(isWeeklyOrderCutoffPassed("2026-10-12", { tenantSlug: "unconfigured", now })).toBe(false);
+      // 2026-10-19 is future week -> open
+      expect(isWeeklyOrderCutoffPassed("2026-10-19", { tenantSlug: "unconfigured", now })).toBe(false);
+    });
+
+    it("evaluates custom schedule cutoff (Wednesday 18:00) accurately", () => {
+      const scheduleConfig = {
+        timezone: "Europe/Madrid",
+        cutoffDay: 3,
+        cutoffTime: "18:00",
+        activeDeliveryDays: [1, 2, 3, 4, 5],
+        maxFutureWeeks: 4,
+      };
+
+      // Wednesday 17:59 Madrid (15:59 UTC)
+      const before = new Date("2026-10-14T15:59:00Z");
+      expect(isWeeklyOrderCutoffPassed("2026-10-12", { scheduleConfig, now: before })).toBe(false);
+
+      // Wednesday 18:00 Madrid (16:00 UTC)
+      const after = new Date("2026-10-14T16:00:00Z");
+      expect(isWeeklyOrderCutoffPassed("2026-10-12", { scheduleConfig, now: after })).toBe(true);
+      expect(isWeeklyOrderCutoffPassed("2026-10-19", { scheduleConfig, now: after })).toBe(false);
     });
   });
 });

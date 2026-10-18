@@ -304,4 +304,79 @@ describe("canonical order authenticated application boundary", () => {
       ),
     ).rejects.toMatchObject({ code: "INVALID_STATE" });
   });
+
+  it("rejects order capture when weekly cutoff has passed for tenant with WEEKLY_ORDER_CUTOFF_PASSED", async () => {
+    const { ctx } = context();
+    const eatCleanCtx: ServiceContext = {
+      ...ctx,
+      tenantSlug: "eatclean",
+      roles: ["customer"],
+    };
+    const pastCaptureInput: CanonicalCaptureInput = {
+      ...capture(),
+      weekStart: "2026-10-12",
+      lines: [{ kind: "dish", dishId, dayDate: "2026-10-12", qty: 1 }],
+    };
+    await expect(
+      CanonicalOrderWriteService.capture(eatCleanCtx, pastCaptureInput),
+    ).rejects.toMatchObject({
+      code: "WEEKLY_ORDER_CUTOFF_PASSED",
+    });
+  });
+
+  it("rejects order modify when weekly cutoff has passed for tenant with WEEKLY_ORDER_CUTOFF_PASSED", async () => {
+    const { ctx } = context();
+    const eatCleanCtx: ServiceContext = {
+      ...ctx,
+      tenantSlug: "eatclean",
+      roles: ["customer"],
+    };
+    const pastModifyInput: CanonicalModifyInput = {
+      ...modify(),
+      weekStart: "2026-10-12",
+      lines: [{ kind: "dish", dishId, dayDate: "2026-10-12", qty: 1 }],
+    };
+    await expect(
+      CanonicalOrderWriteService.modify(eatCleanCtx, pastModifyInput),
+    ).rejects.toMatchObject({
+      code: "WEEKLY_ORDER_CUTOFF_PASSED",
+    });
+  });
+
+  it("allows staff override when weekly cutoff has passed for tenant", async () => {
+    const { ctx, rpc } = context();
+    rpc.mockResolvedValueOnce({ data: committed(), error: null });
+    const staffCtx: ServiceContext = {
+      ...ctx,
+      tenantSlug: "eatclean",
+      roles: ["company_admin"],
+    };
+    const pastCaptureInput: CanonicalCaptureInput = {
+      ...capture(),
+      weekStart: "2026-10-12",
+      lines: [{ kind: "dish", dishId, dayDate: "2026-10-12", qty: 1 }],
+    };
+    const res = await CanonicalOrderWriteService.capture(staffCtx, pastCaptureInput);
+    expect(res).toBeDefined();
+    expect(rpc).toHaveBeenCalledOnce();
+  });
+
+  it("allows unconfigured tenant to capture order without EatClean Friday cutoff", async () => {
+    const { ctx, rpc } = context();
+    rpc.mockResolvedValueOnce({ data: committed(), error: null });
+    const genericCtx: ServiceContext = {
+      ...ctx,
+      tenantSlug: "other-tenant",
+      roles: ["customer"],
+    };
+    // 2026-10-19 is future / active week for unconfigured tenant
+    const captureInput: CanonicalCaptureInput = {
+      ...capture(),
+      weekStart: "2026-10-19",
+      lines: [{ kind: "dish", dishId, dayDate: "2026-10-19", qty: 1 }],
+    };
+    const res = await CanonicalOrderWriteService.capture(genericCtx, captureInput);
+    expect(res).toBeDefined();
+    expect(rpc).toHaveBeenCalledOnce();
+  });
 });

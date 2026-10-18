@@ -34,7 +34,8 @@ export type DomainErrorCode =
   | "OFFER_PRICING_QUOTE_REQUIRED"
   | "OFFER_PRICING_OVERRIDE_UNSUPPORTED"
   | "LEDGER_QUERY_FAILED"
-  | "RECONCILIATION_ORDER_FETCH_FAILED";
+  | "RECONCILIATION_ORDER_FETCH_FAILED"
+  | "WEEKLY_ORDER_CUTOFF_PASSED";
 
 export class DomainError extends Error {
   readonly code: DomainErrorCode;

@@ -17,6 +17,7 @@ import {
   isEatCleanOrderCreationFrozen,
   EATCLEAN_PARTIAL_LAUNCH_CONFIG,
 } from "@/config/eatclean-partial-launch";
+import { isWeeklyOrderCutoffPassed } from "@/modules/weekly-menu/application/week-dates";
 
 function buildOrigin(ctx: ServiceContext, command: OrderIntakeDraftCommand): OrderIntakeOrigin {
   return {
@@ -61,6 +62,15 @@ export const OrderIntakeService = {
     }
 
     const staff = hasStaffAccess(ctx.roles);
+    if (!staff && options?.validateCutoff) {
+      if (isWeeklyOrderCutoffPassed(command.weekStart, { tenantSlug: ctx.tenantSlug })) {
+        throw new DomainError(
+          "WEEKLY_ORDER_CUTOFF_PASSED",
+          `El plazo para realizar pedidos de la semana ${command.weekStart} ha finalizado.`,
+          { weekStart: command.weekStart, tenantSlug: ctx.tenantSlug },
+        );
+      }
+    }
     const selfChannel = (CUSTOMER_SELF_CHANNELS as readonly string[]).includes(command.channel);
     const staffChannel = (STAFF_INTAKE_CHANNELS as readonly string[]).includes(command.channel);
 

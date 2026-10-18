@@ -46,7 +46,10 @@ export function useProgramDraftOrder() {
       });
 
       const useQuotedWriter = "useQuotedWriter" in command ? command.useQuotedWriter : undefined;
-      const options = useQuotedWriter !== undefined ? { useQuotedWriter } : undefined;
+      const options = {
+        useQuotedWriter,
+        validateCutoff: true,
+      };
 
       if ("items" in command && Array.isArray(command.items)) {
         return OrderIntakeService.intakeDraft(
