@@ -125,7 +125,7 @@ export interface TenantOperationalScheduleConfig {
 }
 
 export const DEFAULT_SCHEDULE_CONFIG: TenantOperationalScheduleConfig = {
-  timezone: "Atlantic/Canary",
+  timezone: "Europe/Madrid",
   cutoffDay: 5,
   cutoffTime: "14:00",
   activeDeliveryDays: [1, 2, 3, 4, 5],
@@ -149,11 +149,35 @@ export const TENANT_SCHEDULE_CONFIGS: Record<string, TenantOperationalScheduleCo
   },
 };
 
-export function getTenantScheduleConfig(tenantSlug?: string | null): TenantOperationalScheduleConfig {
-  if (tenantSlug && TENANT_SCHEDULE_CONFIGS[tenantSlug]) {
-    return TENANT_SCHEDULE_CONFIGS[tenantSlug];
+export interface TenantScheduleConfigOptions {
+  tenantSlug?: string | null;
+  tenantTimezone?: string | null;
+  scheduleConfig?: Partial<TenantOperationalScheduleConfig> | null;
+}
+
+export function getTenantScheduleConfig(
+  optionsOrSlug?: string | null | TenantScheduleConfigOptions,
+): TenantOperationalScheduleConfig {
+  const opts: TenantScheduleConfigOptions =
+    typeof optionsOrSlug === "string"
+      ? { tenantSlug: optionsOrSlug }
+      : (optionsOrSlug ?? {});
+
+  const baseConfig =
+    opts.tenantSlug && TENANT_SCHEDULE_CONFIGS[opts.tenantSlug]
+      ? TENANT_SCHEDULE_CONFIGS[opts.tenantSlug]
+      : {
+          ...DEFAULT_SCHEDULE_CONFIG,
+          ...(opts.tenantTimezone ? { timezone: opts.tenantTimezone } : {}),
+        };
+
+  if (opts.scheduleConfig) {
+    return {
+      ...baseConfig,
+      ...opts.scheduleConfig,
+    };
   }
-  return DEFAULT_SCHEDULE_CONFIG;
+  return baseConfig;
 }
 
 export interface ZonedDateParts {
@@ -219,9 +243,11 @@ export interface TenantActiveWeekResult {
 
 export function resolveTenantActiveWeek(options?: {
   tenantSlug?: string | null;
+  tenantTimezone?: string | null;
+  scheduleConfig?: Partial<TenantOperationalScheduleConfig> | null;
   now?: Date;
 }): TenantActiveWeekResult {
-  const config = getTenantScheduleConfig(options?.tenantSlug);
+  const config = getTenantScheduleConfig(options);
   const now = options?.now ?? new Date();
   const parts = getZonedDateParts(now, config.timezone);
 
@@ -249,4 +275,22 @@ export function resolveTenantActiveWeek(options?: {
     config,
   };
 }
+
+/**
+ * Validates whether the given weekStart has already passed the weekly cutoff for ordering/modifying.
+ * Returns true if weekStart is earlier than the defaultActiveMondayIso for the tenant.
+ */
+export function isWeeklyOrderCutoffPassed(
+  weekStart: string,
+  options?: {
+    tenantSlug?: string | null;
+    tenantTimezone?: string | null;
+    scheduleConfig?: Partial<TenantOperationalScheduleConfig> | null;
+    now?: Date;
+  },
+): boolean {
+  const active = resolveTenantActiveWeek(options);
+  return weekStart < active.defaultActiveMondayIso;
+}
+
 

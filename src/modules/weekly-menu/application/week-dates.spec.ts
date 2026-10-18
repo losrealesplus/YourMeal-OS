@@ -7,6 +7,8 @@ import {
   formatDayDateEs,
   formatWeekRangeEs,
   resolveTenantActiveWeek,
+  getTenantScheduleConfig,
+  isWeeklyOrderCutoffPassed,
 } from "./week-dates";
 
 describe("week-dates calendar helpers", () => {
@@ -109,6 +111,34 @@ describe("week-dates calendar helpers", () => {
       expect(result.calendarMondayIso).toBe("2026-10-19");
       expect(result.isPastCutoff).toBe(false);
       expect(result.defaultActiveMondayIso).toBe("2026-10-19");
+    });
+
+    it("respects isolated multi-tenant timezone configuration without leaking EatClean defaults", () => {
+      // A peninsular tenant with Europe/Madrid
+      const configMadrid = getTenantScheduleConfig({ tenantSlug: "other-tenant", tenantTimezone: "Europe/Madrid" });
+      expect(configMadrid.timezone).toBe("Europe/Madrid");
+
+      // Default fallback
+      const configDefault = getTenantScheduleConfig();
+      expect(configDefault.timezone).toBe("Europe/Madrid");
+
+      // EatClean tenant
+      const configCanary = getTenantScheduleConfig("eatclean");
+      expect(configCanary.timezone).toBe("Atlantic/Canary");
+    });
+  });
+
+  describe("isWeeklyOrderCutoffPassed", () => {
+    it("returns true for a past week when cutoff has passed", () => {
+      const now = new Date("2026-10-18T16:21:05Z"); // Sunday
+      // Active week is 2026-10-19, so 2026-10-12 is cutoff passed
+      expect(isWeeklyOrderCutoffPassed("2026-10-12", { tenantSlug: "eatclean", now })).toBe(true);
+    });
+
+    it("returns false for the active week or future weeks", () => {
+      const now = new Date("2026-10-18T16:21:05Z"); // Sunday
+      expect(isWeeklyOrderCutoffPassed("2026-10-19", { tenantSlug: "eatclean", now })).toBe(false);
+      expect(isWeeklyOrderCutoffPassed("2026-10-26", { tenantSlug: "eatclean", now })).toBe(false);
     });
   });
 });

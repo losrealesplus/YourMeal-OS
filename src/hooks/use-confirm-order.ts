@@ -53,6 +53,7 @@ export function useConfirmOrder() {
         offerCode,
         customerTier,
         extras,
+        validateCutoff: true,
       });
     },
     onSuccess: async (_order, input) => {

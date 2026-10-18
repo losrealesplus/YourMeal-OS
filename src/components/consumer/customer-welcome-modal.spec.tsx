@@ -100,7 +100,7 @@ describe("CustomerWelcomeModal (CX-01B Onboarding Wizard)", () => {
     expect(html).toContain("Solicitar vinculación de ficha histórica");
   });
 
-  it("renders Address step with street, city and zip inputs", () => {
+  it("renders Address step with street, city and zip inputs without hardcoding Las Palmas", () => {
     mockCustomerId = "cust-123";
     const html = renderToString(
       <CustomerWelcomeModal
@@ -112,12 +112,14 @@ describe("CustomerWelcomeModal (CX-01B Onboarding Wizard)", () => {
 
     expect(html).toContain("¿Dónde te entregamos tus platos?");
     expect(html).toContain("Calle, número y piso");
-    expect(html).toContain("Las Palmas de Gran Canaria");
+    expect(html).toContain("Santa Cruz de Tenerife, La Laguna...");
     expect(html).toContain("Código postal");
+    expect(html).toContain("38001");
+    expect(html).not.toContain("Las Palmas de Gran Canaria");
     expect(html).toContain("Guardar dirección y continuar");
   });
 
-  it("renders Completion step ready to schedule meals", () => {
+  it("renders Dietary step with real EU-14 allergens and skip options", () => {
     mockCustomerId = "cust-123";
     const html = renderToString(
       <CustomerWelcomeModal
@@ -127,8 +129,13 @@ describe("CustomerWelcomeModal (CX-01B Onboarding Wizard)", () => {
       />,
     );
 
-    expect(html).toContain("¡Tu cuenta está lista!");
-    expect(html).toContain("¡Ficha y dirección listas!");
-    expect(html).toContain("Empezar a programar mis comidas");
+    expect(html).toContain("Alergias y Preferencias");
+    expect(html).toContain("Sin alérgenos conocidos");
+    expect(html).toContain("Alérgenos oficiales (UE 14)");
+    expect(html).toContain("Gluten");
+    expect(html).toContain("Crustáceos");
+    expect(html).toContain("Huevos");
+    expect(html).toContain("Guardar y empezar a programar");
+    expect(html).toContain("Saltar por ahora");
   });
 });

@@ -3,6 +3,7 @@ import { assertLegacyOfferSlots } from "@/modules/weekly-menu/application/legacy
 import { assertLegacyOrderWriteCompatible } from "../domain/legacy-order-write-guard";
 import { AuditService } from "@/services/audit-service";
 import { FeatureFlagService } from "@/services/feature-flag-service";
+import { isWeeklyOrderCutoffPassed } from "@/modules/weekly-menu/application/week-dates";
 import type { ServiceContext } from "@/services/types";
 import { requireCapability, hasStaffAccess } from "@/permissions";
 import { DomainError } from "@/domain/errors";
@@ -60,6 +61,7 @@ export type ProgramDraftItemsCommand = {
 export type ProgramDraftItemsOptions = {
   transport?: CaptureTransport;
   useQuotedWriter?: boolean;
+  validateCutoff?: boolean;
 };
 
 export type ProgramDraftOrderResult = {
@@ -536,6 +538,7 @@ export const OrderService = {
       offerCode?: string;
       customerTier?: CustomerTier;
       extras?: ExtraItemInput[];
+      validateCutoff?: boolean;
     },
   ): Promise<OrderRow> {
     requireCapability(ctx.roles, "orders.write");
@@ -559,6 +562,15 @@ export const OrderService = {
       const customerId = await repo.findCustomerIdForUser(ctx.userId);
       if (!customerId || current.order.customer_id !== customerId) {
         throw new DomainError("PERMISSION_DENIED", "Cannot confirm an order you do not own");
+      }
+      if (options?.validateCutoff && ctx.tenantSlug && current.order.week_start) {
+        if (isWeeklyOrderCutoffPassed(current.order.week_start, { tenantSlug: ctx.tenantSlug })) {
+          throw new DomainError(
+            "WEEKLY_ORDER_CUTOFF_PASSED",
+            `El plazo para confirmar pedidos de la semana ${current.order.week_start} ha finalizado.`,
+            { weekStart: current.order.week_start, tenantSlug: ctx.tenantSlug },
+          );
+        }
       }
     }
 

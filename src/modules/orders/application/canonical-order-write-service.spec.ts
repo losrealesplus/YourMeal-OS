@@ -304,4 +304,23 @@ describe("canonical order authenticated application boundary", () => {
       ),
     ).rejects.toMatchObject({ code: "INVALID_STATE" });
   });
+
+  it("rejects order capture when weekly cutoff has passed for tenant with WEEKLY_ORDER_CUTOFF_PASSED", async () => {
+    const { ctx } = context();
+    const eatCleanCtx: ServiceContext = {
+      ...ctx,
+      tenantSlug: "eatclean",
+      roles: ["customer"],
+    };
+    const pastCaptureInput: CanonicalCaptureInput = {
+      ...capture(),
+      weekStart: "2026-10-12",
+      lines: [{ kind: "dish", dishId, dayDate: "2026-10-12", qty: 1 }],
+    };
+    await expect(
+      CanonicalOrderWriteService.capture(eatCleanCtx, pastCaptureInput),
+    ).rejects.toMatchObject({
+      code: "WEEKLY_ORDER_CUTOFF_PASSED",
+    });
+  });
 });

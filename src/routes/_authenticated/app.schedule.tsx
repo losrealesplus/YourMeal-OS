@@ -274,7 +274,11 @@ function ScheduleFlow() {
     if (orderItems.length === 0 || programDraft.isPending || confirmOrder.isPending) return;
 
     // Safety net: check profile and address before firing mutation
-    if (!customerId) {
+    if (customerQuery.isError) {
+      toast.error("Error al verificar tu cuenta de cliente. Por favor recarga la página.");
+      return;
+    }
+    if (customerQuery.isSuccess && !customerId) {
       setForcedStep("identity");
       setWelcomeOpen(true);
       return;
@@ -308,10 +312,18 @@ function ScheduleFlow() {
       });
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      if (msg.includes("EXPLICIT_ONBOARDING_REQUIRED") || msg.includes("PERMISSION_DENIED")) {
+      if (msg.includes("EXPLICIT_ONBOARDING_REQUIRED")) {
         setForcedStep("identity");
         setWelcomeOpen(true);
         toast.info("Para confirmar tu pedido necesitamos configurar tus datos de entrega.");
+        return;
+      }
+      if (msg.includes("WEEKLY_ORDER_CUTOFF_PASSED")) {
+        toast.error("El plazo para realizar o modificar pedidos de esta semana ha finalizado.");
+        return;
+      }
+      if (msg.includes("PERMISSION_DENIED")) {
+        toast.error("No tienes permisos suficientes para registrar este pedido.");
         return;
       }
       toast.error(msg);
