@@ -1,0 +1,181 @@
+{
+  "repository": "losrealesplus/YourMeal-OS",
+  "environment": "production-worker",
+  "reviewerId": 292604102,
+  "reviewerLogin": "losrealesplus",
+  "baseline": {
+    "sha": "f2d63350ba3e21dd77301730dd1754cc11ad1fdc",
+    "versionId": "8bbf1cc1-8325-4ade-82c9-86798ca119c6",
+    "deploymentId": 7155586740
+  },
+  "candidateSha": "82e984eb647fef90db98d28a7b3e81ca5dd2dfb8",
+  "productPrs": [
+    542,
+    543
+  ],
+  "productPr542HeadSha": "6486b8d998568da1addd01b027a502067d8b2d63",
+  "productPr543HeadSha": "4cd483590699c8ae9b30cd3644df6216e6f81e02",
+  "productFiles": [
+    {
+      "path": "B2C_HARDENING_5_POINTS_IMPLEMENTATION_REPORT.md",
+      "before": null,
+      "after": "d5184fe27e139cf8d07cb899d762e2db0227ba5fc8dcebcb7a5c0f334374a28f"
+    },
+    {
+      "path": "EATCLEAN_B2C_ONBOARDING_AND_MULTIDAY_IMPLEMENTATION_REPORT.md",
+      "before": null,
+      "after": "6472640ab91fc81454059e8f5a6d90c89c032eb7135e3b1d492e9de8c4d038ff"
+    },
+    {
+      "path": "src/components/consumer/customer-welcome-modal.spec.tsx",
+      "before": null,
+      "after": "19bbce0255f0f49fa5b724768451dfcb01af6ce1c19a5a649a54af0eabf1423f"
+    },
+    {
+      "path": "src/components/consumer/customer-welcome-modal.tsx",
+      "before": null,
+      "after": "6cff24044b09aeaa8ae129bf2236f93f5ee082cfdf621530c697abf09c1678cf"
+    },
+    {
+      "path": "src/components/consumer/day-picker.spec.tsx",
+      "before": "dcd7a59de8f9b528ccc7b068d0c4aafe6b6f0ee25401d01ffd8f9a3a9b205bc7",
+      "after": "34eedaf06617a6e20d562b47d2669314908ebe5be26d6414db92e7491974995f"
+    },
+    {
+      "path": "src/components/consumer/day-picker.tsx",
+      "before": "791b21503dfef62dccd8e10cedebde08e0001aedb36bc56ebc215fcd86b7c088",
+      "after": "7f31174d137ec1835e303136168b28a7177e52937a39e6b58a8e348898016cc0"
+    },
+    {
+      "path": "src/components/consumer/index.ts",
+      "before": "10c7434dbaf776b880c1bc028a29cb3a8e476f83f8ac4d84a3e3c854d15acd12",
+      "after": "f8ab6017f4d861e2a57bf47742fd3547f2cdd6eb7abfc46cef9a8e6434acb93a"
+    },
+    {
+      "path": "src/domain/errors.ts",
+      "before": "c7a010e48c6e2cd075878036926fe2b025f6b82df9f617f131d953b6d545129e",
+      "after": "215c1378dabf5a27bdc637564ba1503402c444ce0a919012a75eea035ffff9e6"
+    },
+    {
+      "path": "src/hooks/use-confirm-order.spec.tsx",
+      "before": null,
+      "after": "4c384fdf242f52521e1d55cc211e541288c39ebb9bd289df113a561ee11e7251"
+    },
+    {
+      "path": "src/hooks/use-confirm-order.ts",
+      "before": "05c4861e7a81e8a75092beddfa4b0a1426e3e22c98bed83af367b8959e3456ee",
+      "after": "fa313e383332b0bd5258a03fabffbbb0bd02a016624d9308896adbed743829e5"
+    },
+    {
+      "path": "src/hooks/use-program-draft-order.spec.tsx",
+      "before": null,
+      "after": "e67ee7a7ba569affe5a5e22b7741d873f723729856b09669f88492e81107320b"
+    },
+    {
+      "path": "src/hooks/use-program-draft-order.ts",
+      "before": "6483434b804a193f7a1caffd32e939d6be5d1241750b599defc0fd71b6453b11",
+      "after": "5335616567bac8e90c0e9169c723a7ad01659bfef0a90415cf730bfe1912ef7f"
+    },
+    {
+      "path": "src/hooks/use-tenant-active-week.spec.tsx",
+      "before": null,
+      "after": "bbff47f742b5edf40ac95aace4044c08a5d3b7b9a9bcdf87dcc6a3fb7a26a12c"
+    },
+    {
+      "path": "src/hooks/use-tenant-active-week.ts",
+      "before": null,
+      "after": "42f3757b72fd8fd4f02dbb0f6e3bad1c114884462b4cc891c96f7ef1e1c3d005"
+    },
+    {
+      "path": "src/modules/order-intake/application/order-intake-service.ts",
+      "before": "8580b425ccd595b6996c8138123b7672c8e1f4fea26c95dc1a9ab8156ee0070c",
+      "after": "aaf61deeae343c687a0bc1eccca44bec30a702081cbd894e46148d51ad3ee7c2"
+    },
+    {
+      "path": "src/modules/orders/application/canonical-order-write-service.spec.ts",
+      "before": "11287e5c13938cb3c7e6e288ab62221afe77131badccbdd99bb45d5d3c1fc5d1",
+      "after": "effa7402db91636b0907f3c9c3b39c206cdf7e3e9997bcffe6f30ef1c93c4300"
+    },
+    {
+      "path": "src/modules/orders/application/canonical-order-write-service.ts",
+      "before": "6afd0b622fa9dcc1bef90d75c8c69c7aa5587f83cb7c4dc9e7e3c500b2640591",
+      "after": "4ff48f83619cb0220c229c0a6dae1f38d9fc547830bdcadbf02b3a6a77831cf7"
+    },
+    {
+      "path": "src/modules/orders/application/order-cutoff-validation.spec.ts",
+      "before": null,
+      "after": "4e93ec2d14dad572d8f091c890335e328901c68cbd3cb3a9874bd1bd6f4e39ac"
+    },
+    {
+      "path": "src/modules/orders/application/order-service.ts",
+      "before": "6a2b8939fd9ac124e5222ca1024748986eb3c3856ad97a167bb0a2faa2ca1333",
+      "after": "060dd672de8f1d0848ef2fc5d227398c6c87a1d8f8081e477c3c517bf358788f"
+    },
+    {
+      "path": "src/modules/weekly-menu/application/week-dates.spec.ts",
+      "before": "0957aab34254fc3c5c04ac33b6bf4a43371c64e080f352905d028aabf3bfd78a",
+      "after": "ae8da348e82c2813e09c108b4b7822d4b92081017e93b38457772faaab2e3102"
+    },
+    {
+      "path": "src/modules/weekly-menu/application/week-dates.ts",
+      "before": "e2e3126b8b8fb6c96b071c894bbd4cc64cda10494b6af4147f94ee2268e9c265",
+      "after": "ef7afa0227958b41a2842722f040d889f95ddff3698384025710177ef8147b99"
+    },
+    {
+      "path": "src/routes/_authenticated/app.index.spec.tsx",
+      "before": "a8cbcca1d6a06faa2b22807076f80dc28f6f04e6e8e2075d9c2ffcf1c1ead21f",
+      "after": "700efc8298db4b5251d1a8b2860e60b2cd9d3a2164b6f81ccc644098de0fcdbd"
+    },
+    {
+      "path": "src/routes/_authenticated/app.index.tsx",
+      "before": "2897bf1f6b2b35457abf524a4ebef5967e18235e612c78d60f2e110b72949574",
+      "after": "3a5545c98780b09b7613e2e53aaa5d998ece9d7a8ccdd0e4510ca08bc4884f36"
+    },
+    {
+      "path": "src/routes/_authenticated/app.menu.tsx",
+      "before": "9efae68bda299352d147f8c56f299412b31a0beab6120fdc33068dbaa7afb4be",
+      "after": "dc784724e4eb88020e4c2fc34e2a1b2d3a6a1edd332ed954e64b4d4bd914ff84"
+    },
+    {
+      "path": "src/routes/_authenticated/app.schedule.spec.tsx",
+      "before": null,
+      "after": "4d7a5725f653fc5d41abed75426aaaede9dd7c9757d0a4c670e7e6c39100fbcd"
+    },
+    {
+      "path": "src/routes/_authenticated/app.schedule.tsx",
+      "before": "15637473d2dca60b0d79d9e8d146121f5599d6fd91ebf3d0bf55e77e51ecf86f",
+      "after": "44fda9e7995f3b5fed403869817922623d913557046ebc1d1b79d6b0cfc850fc"
+    },
+    {
+      "path": "src/routes/_authenticated/app.tsx",
+      "before": "c55e7251dae19c115ee428141c3cee107eb22b77460d71f0c80ecbe55e4c7075",
+      "after": "f9646ddd0697926558219828b4dfc6d2157b132f635c8e2d02797ea2fd2ff2b5"
+    },
+    {
+      "path": "supabase/migrations/20261018193000_cr_order_server_cutoff_enforcement.sql",
+      "before": null,
+      "after": "a7254c8270fd9f1d6f2da6610ef2f386ac7009ad4745bcc2341fb2ddc6287467"
+    }
+  ],
+  "governanceBranch": "codex/gate7-b2c-hardening-543-reconciliation",
+  "governancePaths": [
+    "docs/99-internal/development-journal/2026-10-19-gate7-b2c-hardening-543.md",
+    "scripts/governance/release-b2c-hardening-543.json",
+    "scripts/governance/release-b2c-hardening-543.mjs",
+    "scripts/governance/release-b2c-hardening-543.spec.mjs",
+    "scripts/governance/release-json.spec.mjs",
+    "scripts/governance/release-plan.mjs",
+    "scripts/governance/release-reconciliation.mjs"
+  ],
+  "constraints": {
+    "productionSqlAuthorized": false,
+    "migrationExecutionAuthorized": false,
+    "productionWorkerApprovalGranted": false,
+    "orderCreation": true,
+    "staffOrderCapture": true,
+    "crmIdentityMutations": false,
+    "b2cOnboardingCX01BPreserved": true,
+    "multidayCartPreserved": true,
+    "m74ServerCutoffEnforced": true
+  }
+}

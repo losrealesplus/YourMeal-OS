@@ -1,4 +1,10 @@
 import {
+  B2C_543,
+  b2cHardening543Payload,
+  b2cHardening543ScopeId,
+  authorizeB2cHardening543,
+} from "./release-b2c-hardening-543.mjs";
+import {
   P0_538,
   p0Orders538Payload,
   p0Orders538ScopeId,
@@ -376,6 +382,44 @@ function activationSnapshot(ctx, base, diff, prs, currentMainSha) {
     remediation: api(`pulls/${prs.at(-1)}`),
   };
 }
+export function b2cHardening543Snapshot(ctx, base, diff, prs, currentMainSha) {
+  const s = activationSnapshot(ctx, base, diff, prs, currentMainSha);
+  s.productPrs = [api("pulls/542"), api("pulls/543")];
+  s.commits = s.commits.map((c) => ({
+    ...c,
+    parent: git("rev-parse", `${c.sha}^1`).trim(),
+    headSha: git("rev-parse", `${c.sha}^2`).trim(),
+    files: c.paths.map((p) => {
+      const fileHash = (rev) => {
+        const entry = git("ls-tree", rev, "--", p);
+        if (!entry) return null;
+        const blob = /^100(?:644|755) blob ([a-f0-9]{40})\t/.exec(entry);
+        demand(blob, "B2C #543 files must be regular Git blobs");
+        return hash(
+          execFileSync("git", ["cat-file", "blob", blob[1]], { maxBuffer: 16 * 1024 * 1024 }),
+        );
+      };
+      return { path: p, before: fileHash(`${c.sha}^1`), after: fileHash(c.sha) };
+    }),
+  }));
+  const productPaths = git("diff", "--name-only", base.sha, B2C_543.candidateSha)
+    .trim()
+    .split("\n")
+    .filter(Boolean);
+  s.productFiles = productPaths.map((p) => {
+    const fileHash = (rev) => {
+      const entry = git("ls-tree", rev, "--", p);
+      if (!entry) return null;
+      const blob = /^100(?:644|755) blob ([a-f0-9]{40})\t/.exec(entry);
+      demand(blob, "B2C #543 product files must be regular Git blobs");
+      return hash(
+        execFileSync("git", ["cat-file", "blob", blob[1]], { maxBuffer: 16 * 1024 * 1024 }),
+      );
+    };
+    return { path: p, before: fileHash(base.sha), after: fileHash(B2C_543.candidateSha) };
+  });
+  return { ...s, diff };
+}
 export function p0Orders538Snapshot(ctx, base, diff, prs, currentMainSha) {
   const s = activationSnapshot(ctx, base, diff, prs, currentMainSha);
   s.productPr = api("pulls/538");
@@ -528,7 +572,15 @@ export function prepare(ctx, publishing = false) {
       "Exact interval cannot authorize a different classification",
     );
     reconciliation =
-      base.sha === P0_538.baseline.sha
+      base.sha === B2C_543.baseline.sha
+        ? authorizeB2cHardening543(
+            b2cHardening543Snapshot(ctx, base, diff, prs, currentMain),
+            inputs,
+            ctx,
+            api(`actions/runs/${ctx.runId}`),
+            policy,
+          )
+        : base.sha === P0_538.baseline.sha
         ? authorizeP0Orders538(
             p0Orders538Snapshot(ctx, base, diff, prs, currentMain),
             inputs,
@@ -698,6 +750,27 @@ export function prepare(ctx, publishing = false) {
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
+    if (process.argv[2] === "--b2c-543-payload") {
+      const sha = api("git/ref/heads/main").object.sha;
+      const ctx = { repository: policy.repository, sha, runId: "" };
+      const base = baseline(ctx);
+      const diff = changedPaths(base.sha, sha);
+      const prs = diff.commits.map((c) => assertMergedCommit(pages(`commits/${c}/pulls`), c));
+      const payload = b2cHardening543Payload(b2cHardening543Snapshot(ctx, base, diff, prs, sha), policy);
+      fs.writeSync(
+        1,
+        JSON.stringify(
+          {
+            payload,
+            exactIntervalScope: JSON.stringify(canonical(payload)),
+            authorizationId: b2cHardening543ScopeId(payload),
+          },
+          null,
+          2,
+        ) + "\n",
+      );
+      process.exit(0); // Read-only proposal; never dispatch or production authority.
+    }
     if (process.argv[2] === "--p0-538-payload") {
       const sha = api("git/ref/heads/main").object.sha;
       const ctx = { repository: policy.repository, sha, runId: "" };
