@@ -72,6 +72,8 @@ test("CLI policy, event and API diagnostics emit no raw payload or secrets", () 
       "release-p0-orders-538.json",
       "release-b2c-hardening-543.mjs",
       "release-b2c-hardening-543.json",
+      "release-operational-evolution-545.mjs",
+      "release-operational-evolution-545.json",
       "release-contract.mjs",
       "release-activation.mjs",
       "release-reconciliation.mjs",

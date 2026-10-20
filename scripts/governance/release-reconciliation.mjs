@@ -3,6 +3,7 @@ import { assertP1Orders532Manifest } from "./release-p1-orders-532.mjs";
 import { assertCx536Manifest } from "./release-cx-01c-google-536.mjs";
 import { assertP0Orders538Manifest } from "./release-p0-orders-538.mjs";
 import { assertB2cHardening543Manifest } from "./release-b2c-hardening-543.mjs";
+import { assertOperations545Manifest } from "./release-operational-evolution-545.mjs";
 import { execFileSync } from "node:child_process";
 import { demand, hash, classifyPath } from "./release-contract.mjs";
 import { exactScopeId, assertExactIntervalManifest } from "./release-exact-interval.mjs";
@@ -322,6 +323,7 @@ export function assertReconciliationManifest(manifest, fresh) {
     assertCx536Manifest(manifest, fresh);
     assertP0Orders538Manifest(manifest, fresh);
     assertB2cHardening543Manifest(manifest, fresh);
+    assertOperations545Manifest(manifest, fresh);
     if (fresh.reconciliation.payload?.reconciliationType === "A4B_CLOSED_RELEASE") {
       demand(
         [manifest.reconciliation, manifest.plan.reconciliation].every(
