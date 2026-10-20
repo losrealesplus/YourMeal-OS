@@ -1,0 +1,138 @@
+{
+  "repository": "losrealesplus/YourMeal-OS",
+  "environment": "production-worker",
+  "reviewerId": 292604102,
+  "reviewerLogin": "losrealesplus",
+  "baseline": {
+    "sha": "14c168ccc7e50067e57204b236725b450a1a238d",
+    "versionId": "6cb4f6b5-ba78-434f-9497-4a9257dc6f1f",
+    "deploymentId": 7176894333
+  },
+  "candidateSha": "cc5206d4047c2f2321e55805875816bfe6c7b1dc",
+  "productPr": 545,
+  "productHeadSha": "a2b7ed2aa78ee1320341f1fa71858ff51e1ee696",
+  "productFiles": [
+    {
+      "path": ".gitignore",
+      "before": "eb4f6edf272133f34c4a368c98394ac5e0072041486b41b67ca628be01b0950d",
+      "after": "a49d1e4077af29b03e8dbec16c0fe797a8a60412bf955a352607da8090888375"
+    },
+    {
+      "path": "src/auth/google-oauth-flow.spec.ts",
+      "before": "e164fe33c9a3746a2c77ed1643771675749ef82640a75ee626840e72285dcd96",
+      "after": "34871d64c9bf7ceb6075184b6d089ba7669ae808a11755200d2b763595e1838c"
+    },
+    {
+      "path": "src/modules/operations/application/monthly-operations-service.spec.ts",
+      "before": "07fdac5ee89ee3ad224a27371535cea9a8542837dd15ef617bddd55c152e5d4f",
+      "after": "25bf016941f36ead3b6a3dabc3ce3ee2665bad3422de4df610536cfc3a5c4014"
+    },
+    {
+      "path": "src/modules/operations/application/monthly-operations-service.ts",
+      "before": "c4042f70422fa96185a19faf01cf442a9e554f40e63d4f61b6e6a5fa10d7f4ef",
+      "after": "7e5ddd7bb0223bbfbfb7abbca308863153a5af51f517c4a1bb00c3c5576335ec"
+    },
+    {
+      "path": "src/modules/operations/application/production-report-service.ts",
+      "before": "af116ff5d451387a97b7e2d381df36403d676981334f61fd225336131a0e6268",
+      "after": "93f79c2aa0134c9fb99dc9e19c13fcd0c415470bd5c0fc90187719806f434f6c"
+    },
+    {
+      "path": "src/modules/operations/domain/operational-status.spec.ts",
+      "before": "90e5d242762b937ae5aef974c0e93e4e68d32ae634687cab4c511d58d86eb6b3",
+      "after": "3d54fea7d696770e5e5fe54a6965d1329a0f33dc7e1d814701f26956de848420"
+    },
+    {
+      "path": "src/modules/operations/domain/operational-status.ts",
+      "before": "fd1c507a393585020bdfdabb6bd8504809682089e6ff4e5d716a53bfb6722e3c",
+      "after": "b16d9bdbed5f818f1f75d4ef26ce28758b3717d16426f29ff1fbf35f41e2d523"
+    },
+    {
+      "path": "src/modules/operations/domain/production-report.ts",
+      "before": "fa6b0756ebd0ed9aa20b68f3b93b1d73a15861e66c5f79e55b2be72c3988e306",
+      "after": "72c7c5d5c565a33a9112d441b39cb0fef7219311195287f08e42e52233fb4b4a"
+    },
+    {
+      "path": "src/modules/orders/application/order-lifecycle-service.spec.ts",
+      "before": "201effd3733221722ecd286f9eb17f50df557892edc61b8238da0561ff013563",
+      "after": "631507fa704959bf32161a7c97de3ecf462e6c6f14dc1bdb505a55f8775f22a1"
+    },
+    {
+      "path": "src/modules/orders/application/order-lifecycle-service.ts",
+      "before": "57d67bb90b24879e8d0a175ae50e45cef53eebd0c2fba7a7768fd97e77e50680",
+      "after": "2a7dc38a9cb066eadcc4c1fcc3cac495e299575f6c1974d1b06826d2466d99fa"
+    },
+    {
+      "path": "src/order/OrderCommands.ts",
+      "before": "430ae01982799f5b2c1b47d069a5e5f44efca0c1ae600fff51b3828983f55668",
+      "after": "737e3099ab47d5fcbee8e58b941d86efe53d798b03e3b069c75dc47d8b96e2c2"
+    },
+    {
+      "path": "src/order/OrderFacade.ts",
+      "before": "b8267c63a383627b40e45b6fc678ea50d33667c4852606a27c0eb7d61326c6ab",
+      "after": "c0356f2e6a93d01d0994c6e9dcedd5c3b78beb7b5639512d793225ea139fd88e"
+    },
+    {
+      "path": "src/order/order-facade.spec.ts",
+      "before": "a95731071199dcca7f03ea9e31b0def37177cd953a110a7039237b2860ee76c7",
+      "after": "f4d931f7da6e4fb5eac97b2994c5bec394d584b9c52732a41c77691aca9b7d13"
+    },
+    {
+      "path": "src/order/useOrder.ts",
+      "before": "4020429d7843b921bf2845ad3fe27cb133ab7e362252cdca88505af586c1cb61",
+      "after": "258dbb9679e65cb877746d3b9a037df9d0ad5ac1fea4a4390e347e80f6f882e2"
+    },
+    {
+      "path": "src/production-experience/operational-item-presentation.spec.tsx",
+      "before": "c2565ce338327c4b06f5e580170249a141206bd5d4302bea4b31d0ed1c0e6faf",
+      "after": "dc68cf82b6873d2c532fe1708770bb8cc77dc328c9aaf4a02d550193715b6062"
+    },
+    {
+      "path": "src/production-experience/operational-item-presentation.tsx",
+      "before": "599b92232ab3bab8a2d83af44f11a49a471faab00de20f09587472d4db4de6c5",
+      "after": "2b5a5ed697a67dcf3310dcdb812c004e9fbaf551b9879e8b35870f473605a9c0"
+    },
+    {
+      "path": "src/production-experience/operational-labels.ts",
+      "before": "4bca25b303f091c54165ab93b3bd1e29a9f234e8b87cece8283c5870770d0bfc",
+      "after": "ddb7d3eb7fb27320061c182693c6b76a24f797cc896c6983e9ab9be3e47e3403"
+    },
+    {
+      "path": "src/routes/_authenticated/admin.orders.spec.tsx",
+      "before": "c4072cf9dd2f9fcf064d3dacd77b1c10c1866d330808a93becd5c1d73b14caac",
+      "after": "e51387a8cfe344debfcb012e18e29079c22086913b057727d74288d7b18504a9"
+    },
+    {
+      "path": "src/routes/_authenticated/admin.orders.tsx",
+      "before": "2e3696c3dedebdcdb13726e4bc7e1ab4e6e279021e32fe1bf83f0974b15d6faf",
+      "after": "15935f300ec92aeec9149530a3343449a4ce627573e35ea8ab19cc22523611d3"
+    },
+    {
+      "path": "src/routes/_authenticated/admin.production-sheet.tsx",
+      "before": "9dd054c368e494f0b26a9139cfc68af1ee2085eee41b538d97bc8296395a0b3c",
+      "after": "3dd41191998285e28e6021ae93ba23b46854d6635a34a66d671daeee1ec7e9c4"
+    },
+    {
+      "path": "src/routes/_authenticated/admin.production.labels.tsx",
+      "before": "19f31185c2fc597586870ad47e3d9a88a879ca5166cf36401c4c4da242187323",
+      "after": "95ad4f74070a926179c0f3a3e67ae29ed8a623340230617446f1ed747bf66bd5"
+    }
+  ],
+  "governanceBranch": "codex/gate7-operational-evolution-545-reconciliation",
+  "governancePaths": [
+    "docs/99-internal/development-journal/2026-10-20-gate7-operational-evolution-545.md",
+    "scripts/governance/release-json.spec.mjs",
+    "scripts/governance/release-operational-evolution-545.json",
+    "scripts/governance/release-operational-evolution-545.mjs",
+    "scripts/governance/release-operational-evolution-545.spec.mjs",
+    "scripts/governance/release-plan.mjs",
+    "scripts/governance/release-reconciliation.mjs"
+  ],
+  "constraints": {
+    "productionSqlAuthorized": false,
+    "migrationExecutionAuthorized": false,
+    "productionWorkerApprovalGranted": false,
+    "orderActivationAuthorized": false,
+    "operationalRollback": "HARD_DISABLED"
+  }
+}
