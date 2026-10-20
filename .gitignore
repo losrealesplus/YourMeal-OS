@@ -63,3 +63,10 @@ xcuserdata/
 
 # Repomix context packages (machine-generated LLM context)
 .repomix/
+
+# Local reconciliation snapshots containing customer data
+scripts/disa_crm_snapshot.json
+scripts/disa_reconciliation_report.json
+scripts/disa_import_group_a.sql
+scripts/disa_group_a_import_result.json
+scripts/disa_production_verification.json

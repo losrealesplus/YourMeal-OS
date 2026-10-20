@@ -76,6 +76,28 @@ const DELIVERY_TRANSITIONS: Partial<
   delivery_issue: ["out_for_delivery"],
 };
 
+export const ROLLBACK_TRANSITIONS: Partial<
+  Record<OperationalOrderStatus, OperationalOrderStatus>
+> = {
+  prepared: "in_production",
+  in_production: "confirmed",
+  ready_for_delivery: "prepared",
+};
+
+export const ROLLBACK_LABEL_ES: Partial<
+  Record<OperationalOrderStatus, string>
+> = {
+  prepared: "Volver a En preparación",
+  in_production: "Volver a Confirmado",
+  ready_for_delivery: "Volver a Preparado",
+};
+
+export function getRollbackStatus(
+  from: OperationalOrderStatus,
+): OperationalOrderStatus | null {
+  return ROLLBACK_TRANSITIONS[from] ?? null;
+}
+
 export function nextKitchenStatuses(
   from: OperationalOrderStatus,
 ): OperationalOrderStatus[] {

@@ -133,12 +133,11 @@ export const MonthlyOperationsService = {
 
     // 2. Fetch scheduled menu dates for the month
     const { data: menuSlots, error: menuError } = await (ctx.supabase as any)
-      .from("menu_schedules")
+      .from("weekly_menu_slots")
       .select("day_date")
       .eq("tenant_id", ctx.tenantId)
       .gte("day_date", startDate)
-      .lte("day_date", endDate)
-      .is("deleted_at", null);
+      .lte("day_date", endDate);
 
     if (menuError) {
       throw new DomainError(

@@ -19,7 +19,7 @@ describe("native custom operational presentation", () => {
           item={{ allergens: ["gluten"], allergenState: "HISTORICAL_UNAVAILABLE" }}
         />,
       ),
-    ).toContain("Declaración histórica no disponible");
+    ).toContain("Alérgenos no verificados");
     expect(
       renderToStaticMarkup(
         <OperationalAllergenDeclaration

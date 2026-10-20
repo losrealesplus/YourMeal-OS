@@ -178,6 +178,13 @@ function flattenOrdersToLines(
         orderStatus: order.status,
         customerId: order.customerId,
         customerName: order.customerName,
+        companyName: order.companyName ?? null,
+        siteName: order.siteName ?? null,
+        deliveryAddress:
+          order.siteAddress ??
+          (order.deliveryAddress
+            ? `${order.deliveryAddress.street}${order.deliveryAddress.city ? `, ${order.deliveryAddress.city}` : ""}`
+            : null),
         orderItemId: item.id,
         line: item.line,
         dishId: item.dishId,

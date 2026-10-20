@@ -19,6 +19,9 @@ export type ProductionSourceLine = {
   orderStatus: string;
   customerId: string;
   customerName: string | null;
+  companyName?: string | null;
+  siteName?: string | null;
+  deliveryAddress?: string | null;
   dishId: string | null;
   dishName: string | null;
   qty: number;
@@ -110,6 +113,9 @@ export type ProductionPackingCustomerBlock = {
   items: ProductionPackingCustomerItem[];
   specialInstructions: string[];
   dietarySnapshot?: OrderDietarySnapshot | null;
+  companyName?: string | null;
+  siteName?: string | null;
+  deliveryAddress?: string | null;
 };
 
 export type ProductionPackingDishAllocation = Partial<ProductionItemMetadata> & {
@@ -442,6 +448,9 @@ export function buildProductionReport(input: {
         items: [],
         specialInstructions: [],
         dietarySnapshot: line.dietarySnapshot ?? null,
+        companyName: line.companyName ?? null,
+        siteName: line.siteName ?? null,
+        deliveryAddress: line.deliveryAddress ?? null,
       };
       customerPackingMap.set(customerKey, block);
     }

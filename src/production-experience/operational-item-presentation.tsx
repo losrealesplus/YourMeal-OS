@@ -5,6 +5,7 @@ import {
 } from "./operational-item-identity";
 import { DishAllergenDeclaration } from "@/components/operations/dish-allergen-declaration";
 import type { AllergenSnapshotState } from "@/modules/orders/domain/order-item-read-model";
+import { cn } from "@/lib/utils";
 
 export function OperationalAllergenDeclaration({
   item,
@@ -20,7 +21,16 @@ export function OperationalAllergenDeclaration({
   className?: string;
 }) {
   if (item.kind !== "custom" && item.allergenState === "HISTORICAL_UNAVAILABLE") {
-    return <span className={className}>Declaración histórica no disponible</span>;
+    return (
+      <span
+        className={cn(
+          "inline-flex items-center gap-1 rounded-md bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800 border border-amber-300 mt-1",
+          className,
+        )}
+      >
+        ⚠️ Alérgenos no verificados
+      </span>
+    );
   }
   return (
     <DishAllergenDeclaration

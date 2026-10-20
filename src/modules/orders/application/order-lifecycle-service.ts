@@ -11,6 +11,7 @@ import {
   type OperationalOrderStatus,
   nextKitchenStatuses,
   nextDeliveryStatuses,
+  ROLLBACK_TRANSITIONS,
 } from "@/modules/operations";
 import type { OrderRepository } from "@/modules/orders/infrastructure/order-repository";
 import { requireCapability } from "@/permissions";
@@ -226,6 +227,60 @@ export const OrderLifecycleService = {
         );
       }
     }
+
+    return updated;
+  },
+
+  /** Controlled state rollback with required reason and immutable audit */
+  async rollbackStatus(
+    ctx: ServiceContext,
+    repo: OrderRepository,
+    orderId: string,
+    reason: string,
+  ) {
+    requireCapability(ctx.roles, "orders.write");
+    if (!reason?.trim()) {
+      throw new DomainError("INVALID_STATE", "Rollback reason is required");
+    }
+
+    const current = await repo.findByIdWithItems(orderId);
+    if (!current) throw new DomainError("NOT_FOUND", `Order ${orderId} not found`);
+
+    if (current.order.write_contract_version === 2) {
+      throw new DomainError(
+        "INVALID_STATE",
+        "Rollback is not supported on canonical v2 orders",
+      );
+    }
+
+    const currentStatus = current.order.status as OperationalOrderStatus;
+    const targetStatus = ROLLBACK_TRANSITIONS[currentStatus];
+    if (!targetStatus) {
+      throw new DomainError(
+        "INVALID_STATE",
+        `Order ${orderId} in status '${currentStatus}' cannot be rolled back`,
+      );
+    }
+
+    const { data: updated, error } = await ctx.supabase
+      .from("orders")
+      .update({ status: targetStatus })
+      .eq("tenant_id", ctx.tenantId)
+      .eq("id", orderId)
+      .eq("status", currentStatus)
+      .is("deleted_at", null)
+      .select("*")
+      .single();
+
+    if (error) throw error;
+
+    await AuditService.write(ctx, {
+      entityType: "order",
+      entityId: orderId,
+      action: "status_change",
+      oldData: { status: currentStatus },
+      newData: { status: targetStatus, reason: reason.trim(), isRollback: true },
+    });
 
     return updated;
   },

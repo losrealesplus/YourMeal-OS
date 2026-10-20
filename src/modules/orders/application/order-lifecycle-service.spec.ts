@@ -227,4 +227,118 @@ describe("OrderLifecycleService (CR-OPS-09B)", () => {
       },
     );
   });
+
+  describe("rollbackStatus", () => {
+    it("rejects rollback if reason is empty or whitespace", async () => {
+      const order = { id: "o1", status: "prepared", tenant_id: "tenant-eatclean" };
+      const repo = {
+        findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+      } as any;
+      const ctx = mockCtx();
+
+      await expect(
+        OrderLifecycleService.rollbackStatus(ctx, repo, "o1", ""),
+      ).rejects.toBeInstanceOf(DomainError);
+
+      await expect(
+        OrderLifecycleService.rollbackStatus(ctx, repo, "o1", "   "),
+      ).rejects.toBeInstanceOf(DomainError);
+    });
+
+    it("rolls back from prepared to in_production and writes audit log", async () => {
+      const order = { id: "o1", status: "prepared", tenant_id: "tenant-eatclean" };
+      const repo = {
+        findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+      } as any;
+      const supa = createMockSupabase(order);
+      const ctx = mockCtx({}, supa);
+
+      const res = await OrderLifecycleService.rollbackStatus(
+        ctx,
+        repo,
+        "o1",
+        "Aún no está empaquetado",
+      );
+
+      expect(res.status).toBe("in_production");
+      expect(AuditService.write).toHaveBeenCalledWith(
+        ctx,
+        expect.objectContaining({
+          entityType: "order",
+          entityId: "o1",
+          action: "status_change",
+          oldData: { status: "prepared" },
+          newData: { status: "in_production", reason: "Aún no está empaquetado", isRollback: true },
+        }),
+      );
+    });
+
+    it("rolls back from in_production to confirmed", async () => {
+      const order = { id: "o1", status: "in_production", tenant_id: "tenant-eatclean" };
+      const repo = {
+        findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+      } as any;
+      const supa = createMockSupabase(order);
+      const ctx = mockCtx({}, supa);
+
+      const res = await OrderLifecycleService.rollbackStatus(
+        ctx,
+        repo,
+        "o1",
+        "Error al iniciar en cocina",
+      );
+
+      expect(res.status).toBe("confirmed");
+    });
+
+    it("rolls back from ready_for_delivery to prepared", async () => {
+      const order = { id: "o1", status: "ready_for_delivery", tenant_id: "tenant-eatclean" };
+      const repo = {
+        findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+      } as any;
+      const supa = createMockSupabase(order);
+      const ctx = mockCtx({}, supa);
+
+      const res = await OrderLifecycleService.rollbackStatus(
+        ctx,
+        repo,
+        "o1",
+        "Reabrir empaque para revisión",
+      );
+
+      expect(res.status).toBe("prepared");
+    });
+
+    it.each(["draft", "confirmed", "out_for_delivery", "delivered", "cancelled"])(
+      "prohibits rollback from irreversible/invalid status %s",
+      async (status) => {
+        const order = { id: "o1", status, tenant_id: "tenant-eatclean" };
+        const repo = {
+          findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+        } as any;
+        const ctx = mockCtx();
+
+        await expect(
+          OrderLifecycleService.rollbackStatus(ctx, repo, "o1", "Razón cualquiera"),
+        ).rejects.toBeInstanceOf(DomainError);
+      },
+    );
+
+    it("rejects rollback on canonical v2 orders", async () => {
+      const order = {
+        id: "o1",
+        status: "prepared",
+        tenant_id: "tenant-eatclean",
+        write_contract_version: 2,
+      };
+      const repo = {
+        findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+      } as any;
+      const ctx = mockCtx();
+
+      await expect(
+        OrderLifecycleService.rollbackStatus(ctx, repo, "o1", "Intento en v2"),
+      ).rejects.toBeInstanceOf(DomainError);
+    });
+  });
 });
