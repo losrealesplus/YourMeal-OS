@@ -11,7 +11,7 @@
 import { OrderIntakeService } from "@/modules/order-intake";
 import { OrderService } from "@/modules/orders";
 import { OrderLifecycleService } from "@/modules/orders/application/order-lifecycle-service";
-import { OperationsService } from "@/modules/operations";
+import { OperationsService, isOperationalRollbackEnabled } from "@/modules/operations";
 import type { ServiceContext } from "@/services/types";
 import type { OrderCommandResult, OrderResult, OrderStatus, OrderSummary } from "./OrderContext";
 import type {
@@ -23,6 +23,7 @@ import type {
   PlanWeeklyOrderCommand,
   ReadyForDeliveryCommand,
   ReadyForKitchenCommand,
+  RollbackOrderStatusCommand,
   ScheduleProductionCommand,
 } from "./OrderCommands";
 import type {
@@ -96,6 +97,8 @@ export class OrderFacade {
         return this.closeOrder(identity, command);
       case "CancelOrder":
         return this.cancelOrder(identity, command);
+      case "RollbackOrderStatus":
+        return this.rollbackOrderStatus(identity, command);
       case "DuplicateWeek":
       case "CloneMenus":
       case "SplitOrder":
@@ -371,6 +374,46 @@ export class OrderFacade {
         repo,
         command.orderId,
         command.reason ?? "",
+      );
+      const got = await this.getOrder(identity, {
+        type: "GetOrder",
+        orderId: command.orderId,
+      });
+      return okCommand(command.orderId, updated.status as OrderStatus, got.context);
+    } catch (e) {
+      return failCommand([mapDomainError(e)], command.orderId);
+    }
+  }
+
+  async rollbackOrderStatus(
+    identity: OrderRuntimeIdentity,
+    command: RollbackOrderStatusCommand,
+  ): Promise<OrderCommandResult> {
+    if (!isOperationalRollbackEnabled()) {
+      return failCommand(
+        [
+          {
+            code: "INVALID_STATE",
+            message:
+              "El retroceso de estados operacionales está desactivado hasta disponer de una operación transaccional atómica en PostgreSQL.",
+            recoverable: false,
+          },
+        ],
+        command.orderId,
+      );
+    }
+    const resolved = await this.deps.resolveContext(identity);
+    if (!resolved.ok) return failCommand([resolved.error], command.orderId);
+    const { createOrderRepository } =
+      await import("@/modules/orders/infrastructure/order-repository");
+    const repo = createOrderRepository(resolved.ctx.supabase, resolved.ctx.tenantId);
+    try {
+      const lifecycle = this.deps.lifecycle ?? OrderLifecycleService;
+      const updated = await lifecycle.rollbackStatus(
+        resolved.ctx,
+        repo,
+        command.orderId,
+        command.reason,
       );
       const got = await this.getOrder(identity, {
         type: "GetOrder",

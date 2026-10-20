@@ -50,6 +50,12 @@ export type CancelOrderCommand = {
   reason?: string;
 };
 
+export type RollbackOrderStatusCommand = {
+  type: "RollbackOrderStatus";
+  orderId: string;
+  reason: string;
+};
+
 /** Future process intents — frozen names, substrate later. */
 export type DuplicateWeekCommand = {
   type: "DuplicateWeek";
@@ -83,6 +89,7 @@ export type OrderCommand =
   | CompleteDeliveryCommand
   | CloseOrderCommand
   | CancelOrderCommand
+  | RollbackOrderStatusCommand
   | DuplicateWeekCommand
   | CloneMenusCommand
   | SplitOrderCommand
@@ -128,4 +135,10 @@ export function closeOrderCommand(input: Omit<CloseOrderCommand, "type">): Close
 
 export function cancelOrderCommand(input: Omit<CancelOrderCommand, "type">): CancelOrderCommand {
   return { type: "CancelOrder", ...input };
+}
+
+export function rollbackOrderStatusCommand(
+  input: Omit<RollbackOrderStatusCommand, "type">,
+): RollbackOrderStatusCommand {
+  return { type: "RollbackOrderStatus", ...input };
 }

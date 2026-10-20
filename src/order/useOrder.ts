@@ -16,6 +16,7 @@ import type {
   PlanWeeklyOrderCommand,
   ReadyForDeliveryCommand,
   ReadyForKitchenCommand,
+  RollbackOrderStatusCommand,
   ScheduleProductionCommand,
 } from "./OrderCommands";
 import type { OrderQuery } from "./OrderQueries";
@@ -71,6 +72,9 @@ export type OrderFacadeApi = {
   cancelOrder(
     command: CancelOrderCommand,
   ): ReturnType<OrderFacade["cancelOrder"]>;
+  rollbackOrderStatus(
+    command: RollbackOrderStatusCommand,
+  ): ReturnType<OrderFacade["rollbackOrderStatus"]>;
   getOrder(q: GetOrderQuery): ReturnType<OrderFacade["getOrder"]>;
   searchOrders(q: SearchOrdersQuery): ReturnType<OrderFacade["searchOrders"]>;
   getOrdersByWeek(
@@ -124,6 +128,8 @@ export function useOrder(): OrderFacadeApi {
       completeDelivery: (command) => facade.completeDelivery(identity, command),
       closeOrder: (command) => facade.closeOrder(identity, command),
       cancelOrder: (command) => facade.cancelOrder(identity, command),
+      rollbackOrderStatus: (command) =>
+        facade.rollbackOrderStatus(identity, command),
       getOrder: (q) => facade.getOrder(identity, q),
       searchOrders: (q) => facade.searchOrders(identity, q),
       getOrdersByWeek: (q) => facade.getOrdersByWeek(identity, q),

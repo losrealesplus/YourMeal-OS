@@ -112,6 +112,7 @@ describe("CX-01C · Google OAuth Authentication Scenarios", () => {
 
   // Scenario 2: Cliente existente que utiliza email y contraseña
   it("Scenario 2: Existing email/password login is decoupled and unaffected by Google OAuth", () => {
+    vi.stubEnv("VITE_AUTH_GOOGLE_ENABLED", "true");
     // Apple OAuth is disabled
     expect(isAppleOAuthEnabled()).toBe(false);
 

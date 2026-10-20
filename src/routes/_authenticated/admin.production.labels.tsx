@@ -1,5 +1,6 @@
 import { buildOperationalLabels } from "@/production-experience/operational-labels";
 import { OperationalAllergenDeclaration } from "@/production-experience/operational-item-presentation";
+import { brandConfig } from "@/tenant/brand-config";
 /**
  * ADMIN · Producción · Etiquetas
  * Capability: kitchen.operate  ·  Core Object: ProductionLabel (portion-level)
@@ -35,11 +36,46 @@ function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function getWeekDaysFromDate(dateStr: string) {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const curr = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
+  const day = curr.getUTCDay();
+  const diffToMon = day === 0 ? -6 : 1 - day;
+  const monday = new Date(curr);
+  monday.setUTCDate(curr.getUTCDate() + diffToMon);
+
+  const days: Array<{ date: string; label: string }> = [];
+  const dayNames = ["Lun", "Mar", "Mié", "Jue", "Vie"];
+  for (let i = 0; i < 5; i++) {
+    const next = new Date(monday);
+    next.setUTCDate(monday.getUTCDate() + i);
+    const iso = next.toISOString().slice(0, 10);
+    const dd = String(next.getUTCDate()).padStart(2, "0");
+    const mm = String(next.getUTCMonth() + 1).padStart(2, "0");
+    days.push({
+      date: iso,
+      label: `${dayNames[i]} ${dd}/${mm}`,
+    });
+  }
+  return days;
+}
+
 function LabelsPage() {
   const { user, tenantId, roles } = useAuth();
-  const [date, setDate] = useState(todayISO());
+  const [date, setDate] = useState(() => {
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      const urlDate = sp.get("date");
+      if (urlDate) return urlDate;
+    }
+    return todayISO();
+  });
   const [report, setReport] = useState<ProductionReportModel | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const weekDays = useMemo(() => getWeekDaysFromDate(date), [date]);
+  const brandName = brandConfig?.name || "YourMeal OS";
+  const brandTicker = `${brandName} · `.repeat(8);
 
   const load = useCallback(async () => {
     if (!user || !tenantId) return;
@@ -64,16 +100,46 @@ function LabelsPage() {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-wrap items-end justify-between gap-3 print:hidden">
-        <div className="space-y-1.5">
-          <Label htmlFor="labels-date">Fecha</Label>
-          <Input
-            id="labels-date"
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="w-44"
-          />
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-semibold text-muted-foreground mr-1">
+              Selección Rápida:
+            </span>
+            <Button
+              variant={date === todayISO() ? "default" : "outline"}
+              size="sm"
+              className="h-8 text-xs"
+              onClick={() => setDate(todayISO())}
+            >
+              Hoy
+            </Button>
+            {weekDays.map((d) => (
+              <Button
+                key={d.date}
+                variant={date === d.date ? "default" : "outline"}
+                size="sm"
+                className="h-8 text-xs"
+                onClick={() => setDate(d.date)}
+              >
+                {d.label}
+              </Button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2 pt-1">
+            <Label htmlFor="labels-date" className="text-xs font-semibold text-muted-foreground">
+              Fecha específica:
+            </Label>
+            <Input
+              id="labels-date"
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-40 h-8 text-xs"
+            />
+          </div>
         </div>
+
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={() => void load()} disabled={loading}>
             <RefreshCw className={cn("mr-2 h-4 w-4", loading && "animate-spin")} />
@@ -85,7 +151,7 @@ function LabelsPage() {
             disabled={loading || labels.length === 0}
           >
             <Printer className="mr-2 h-4 w-4" />
-            Imprimir
+            Imprimir Etiquetas
           </Button>
         </div>
       </div>
@@ -94,52 +160,114 @@ function LabelsPage() {
         <Skeleton className="h-64 w-full" />
       ) : labels.length === 0 ? (
         <div className="rounded-lg border border-dashed p-10 text-center text-sm text-muted-foreground print:hidden">
-          No hay etiquetas para esta fecha.
+          No hay etiquetas para esta fecha ({date}).
         </div>
       ) : (
         <>
           <p className="text-sm text-muted-foreground print:hidden">
-            {labels.length} etiquetas · {new Set(labels.map((l) => l.orderId)).size} pedidos
+            {labels.length} etiquetas individuales de envase ·{" "}
+            {new Set(labels.map((l) => l.orderId)).size} pedidos
           </p>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 print:grid-cols-3">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 print:grid-cols-2 print:gap-2">
             {labels.map((l) => (
               <article
                 key={l.key}
-                className="flex flex-col gap-2 rounded-lg border border-border bg-card p-3 text-xs print:border-black"
+                className="label-sticker flex flex-col justify-between rounded-lg border-2 border-border/80 bg-card p-3 text-xs shadow-sm break-inside-avoid print:border-black print:p-2.5 print:shadow-none"
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-[10px] uppercase text-muted-foreground">
-                    #{l.orderId.slice(0, 8)}
-                  </span>
-                  {l.isCustom ? (
-                    <Badge variant="outline" className="text-[10px]">
-                      PERSONALIZADO
-                    </Badge>
+                {/* Marco de Branding Superior */}
+                <div className="overflow-hidden whitespace-nowrap text-[9px] font-black tracking-widest text-primary/70 uppercase select-none pb-1.5 border-b border-border/60 print:text-black">
+                  {brandTicker}
+                </div>
+
+                {/* Cabecera Logística y Cliente */}
+                <div className="pt-2 pb-1.5 space-y-1">
+                  <div className="flex justify-between items-baseline text-[10px] text-muted-foreground font-medium print:text-black">
+                    <span className="truncate max-w-[180px]">
+                      {l.companyName
+                        ? `🏢 ${l.companyName}${l.siteName ? ` · ${l.siteName}` : ""}`
+                        : "👤 Particular"}
+                    </span>
+                    <span className="font-mono">{l.deliveryDate ?? date}</span>
+                  </div>
+
+                  {l.deliveryAddress ? (
+                    <div className="text-[10px] text-muted-foreground truncate print:text-black">
+                      📍 {l.deliveryAddress}
+                    </div>
+                  ) : null}
+
+                  <div className="flex justify-between items-baseline gap-1">
+                    <span className="font-bold text-sm text-foreground uppercase truncate print:text-black">
+                      {l.customerName}
+                    </span>
+                    <span className="font-mono text-[11px] font-semibold text-muted-foreground shrink-0 print:text-black">
+                      #{l.orderId.slice(0, 8).toUpperCase()}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Bloque de Plato y Porción */}
+                <div className="py-2 border-t border-b border-border/60 space-y-1.5">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-xs font-bold leading-snug text-foreground print:text-black">
+                      {l.dishName}
+                    </p>
+                    <span className="font-mono font-bold text-xs shrink-0 bg-primary/10 text-primary px-1.5 py-0.5 rounded border border-primary/20 print:border-black print:bg-white print:text-black">
+                      ×{l.totalPortions > 1 ? `${l.portionIndex}/${l.totalPortions}` : "1"} RACIÓN
+                    </span>
+                  </div>
+
+                  {l.nativeCustom ? (
+                    <div className="text-[10px] text-muted-foreground">
+                      <span>Receta no vinculada</span>
+                      <span className="block font-mono text-[9px]">{l.itemIdentity}</span>
+                    </div>
                   ) : null}
                 </div>
-                <p className="text-sm font-semibold leading-tight">{l.dishName}</p>
-                {l.nativeCustom ? (
-                  <>
-                    <span>Receta no vinculada</span>
-                    <span className="font-mono text-[10px]">{l.itemIdentity}</span>
-                  </>
-                ) : null}
-                <p className="leading-tight text-muted-foreground">{l.customerName}</p>
-                <OperationalAllergenDeclaration item={l} />
-                {l.allergenState !== "UNKNOWN" &&
-                l.allergenState !== "HISTORICAL_UNAVAILABLE" &&
-                l.allergens.length > 0 ? (
-                  <div className="flex flex-wrap gap-1">
-                    {l.allergens.map((a) => (
-                      <Badge key={a} variant="outline" className="gap-1 text-[10px]">
-                        <Wheat className="h-2.5 w-2.5" />
-                        {a}
-                      </Badge>
-                    ))}
+
+                {/* Bloque de Alérgenos y Observaciones */}
+                <div className="pt-2 pb-2 space-y-1.5">
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] uppercase font-bold text-muted-foreground block print:text-black">
+                      Alérgenos:
+                    </span>
+                    <OperationalAllergenDeclaration item={l} />
+                    {l.allergenState !== "UNKNOWN" &&
+                    l.allergenState !== "HISTORICAL_UNAVAILABLE" &&
+                    l.allergens.length > 0 ? (
+                      <div className="flex flex-wrap gap-1 pt-0.5">
+                        {l.allergens.map((a) => (
+                          <Badge
+                            key={a}
+                            variant="outline"
+                            className="gap-1 text-[10px] py-0 px-1 border-muted-foreground/40 print:border-black"
+                          >
+                            <Wheat className="h-2.5 w-2.5" />
+                            {a}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : l.allergens.length === 0 &&
+                      l.allergenState !== "HISTORICAL_UNAVAILABLE" &&
+                      !l.isCustom ? (
+                      <span className="text-[10px] text-muted-foreground italic block">
+                        Sin alérgenos declarados
+                      </span>
+                    ) : null}
                   </div>
-                ) : null}
-                {l.note ? <p className="italic text-muted-foreground">{l.note}</p> : null}
-                <p className="mt-auto text-[10px] text-muted-foreground">{date}</p>
+
+                  {l.note ? (
+                    <div className="mt-1 p-1 rounded bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-400 text-[11px] font-medium print:bg-white print:border-black print:text-black">
+                      ⚠️ Obs: {l.note}
+                    </div>
+                  ) : null}
+                </div>
+
+                {/* Marco de Branding Inferior */}
+                <div className="overflow-hidden whitespace-nowrap text-[9px] font-black tracking-widest text-primary/70 uppercase select-none pt-1.5 border-t border-border/60 print:text-black">
+                  · {brandTicker}
+                </div>
               </article>
             ))}
           </div>
@@ -148,8 +276,10 @@ function LabelsPage() {
 
       <style>{`
         @media print {
+          body { background: white !important; color: black !important; }
           aside, header, nav, .print\\:hidden { display: none !important; }
           main { padding: 0 !important; }
+          .label-sticker { break-inside: avoid; page-break-inside: avoid; }
         }
       `}</style>
     </div>

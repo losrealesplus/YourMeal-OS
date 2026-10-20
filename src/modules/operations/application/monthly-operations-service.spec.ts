@@ -8,11 +8,11 @@ import type { ServiceContext } from "@/services/types";
 
 function createMockSupabase(initialData: {
   orderItems?: any[];
-  menuSchedules?: any[];
+  weeklyMenuSlots?: any[];
 } = {}) {
   const store = {
     order_items: initialData.orderItems ?? [],
-    menu_schedules: initialData.menuSchedules ?? [],
+    weekly_menu_slots: initialData.weeklyMenuSlots ?? [],
   };
 
   const client = {
@@ -136,14 +136,14 @@ describe("OPS-01 G2 — MonthlyOperationsService", () => {
       },
     ];
 
-    const mockMenuSchedules = [
-      { tenant_id: "tenant-eatclean", day_date: "2026-09-15", deleted_at: null },
-      { tenant_id: "tenant-eatclean", day_date: "2026-09-16", deleted_at: null },
+    const mockWeeklyMenuSlots = [
+      { tenant_id: "tenant-eatclean", day_date: "2026-09-15" },
+      { tenant_id: "tenant-eatclean", day_date: "2026-09-16" },
     ];
 
     const mockSupa = createMockSupabase({
       orderItems: mockOrderItems,
-      menuSchedules: mockMenuSchedules,
+      weeklyMenuSlots: mockWeeklyMenuSlots,
     });
     const ctx = mockCtx({}, mockSupa);
 

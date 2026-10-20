@@ -76,6 +76,85 @@ const DELIVERY_TRANSITIONS: Partial<
   delivery_issue: ["out_for_delivery"],
 };
 
+export const ROLLBACK_TRANSITIONS: Partial<
+  Record<OperationalOrderStatus, OperationalOrderStatus>
+> = {
+  prepared: "in_production",
+  in_production: "confirmed",
+  ready_for_delivery: "prepared",
+};
+
+function isTestEnvironment(): boolean {
+  try {
+    if (import.meta.env?.PROD || import.meta.env?.MODE === "production") {
+      return false;
+    }
+  } catch {
+    // ignore
+  }
+  if (typeof process !== "undefined") {
+    if (process.env?.NODE_ENV === "production") {
+      return false;
+    }
+    if (process.env?.NODE_ENV === "test" || process.env?.VITEST !== undefined) {
+      return true;
+    }
+  }
+  try {
+    if (import.meta.env?.MODE === "test") {
+      return true;
+    }
+  } catch {
+    // ignore
+  }
+  return false;
+}
+
+let _featureOperationalRollbackEnabled = false;
+
+/**
+ * Flag de aislamiento para retroceso de estado operacional (Marcha atrás).
+ * Permanece deshabilitado (false) por defecto en producción para garantizar cero mutaciones parciales
+ * hasta que se autorice y despliegue el procedimiento almacenado atómico PostgreSQL
+ * (cr_order_rollback_v1) en una migración dedicada.
+ */
+export function isOperationalRollbackEnabled(): boolean {
+  if (!isTestEnvironment()) {
+    return false;
+  }
+  return _featureOperationalRollbackEnabled;
+}
+
+/**
+ * Permite alternar el flag exclusivamente en entornos de prueba automatizados (Vitest / NODE_ENV=test).
+ * En entornos de producción o fuera de test, falla de forma estricta (fail-closed) para garantizar
+ * que ninguna invocación en tiempo de ejecución productivo pueda activar el retroceso.
+ */
+export function setOperationalRollbackEnabledForTests(enabled: boolean): void {
+  if (!isTestEnvironment()) {
+    throw new Error(
+      "setOperationalRollbackEnabledForTests está estrictamente restringido a entornos de prueba (NODE_ENV=test / VITEST). No se puede invocar en producción.",
+    );
+  }
+  _featureOperationalRollbackEnabled = enabled;
+}
+
+export const FEATURE_OPERATIONAL_ROLLBACK_ENABLED = false;
+
+export const ROLLBACK_LABEL_ES: Partial<
+  Record<OperationalOrderStatus, string>
+> = {
+  prepared: "Volver a En preparación",
+  in_production: "Volver a Confirmado",
+  ready_for_delivery: "Volver a Preparado",
+};
+
+export function getRollbackStatus(
+  from: OperationalOrderStatus,
+): OperationalOrderStatus | null {
+  return ROLLBACK_TRANSITIONS[from] ?? null;
+}
+
 export function nextKitchenStatuses(
   from: OperationalOrderStatus,
 ): OperationalOrderStatus[] {

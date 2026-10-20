@@ -1,8 +1,9 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { OrderLifecycleService } from "./order-lifecycle-service";
 import { AuditService } from "@/services/audit-service";
 import type { ServiceContext } from "@/services/types";
 import { DomainError } from "@/domain/errors";
+import { setOperationalRollbackEnabledForTests } from "@/modules/operations";
 
 vi.mock("@/services/audit-service", () => ({
   AuditService: {
@@ -12,10 +13,14 @@ vi.mock("@/services/audit-service", () => ({
 
 function createMockSupabase(orderData: { id: string; status: string; tenant_id: string }) {
   let currentStatus = orderData.status;
+  const updates: Array<{ status: string }> = [];
   const client = {
-    from: () => ({
-      update: (payload: { status: string }) => {
+    getStatus: () => currentStatus,
+    getUpdates: () => updates,
+    from: vi.fn(() => ({
+      update: vi.fn((payload: { status: string }) => {
         currentStatus = payload.status;
+        updates.push(payload);
         return {
           eq: function eq() {
             return {
@@ -25,6 +30,7 @@ function createMockSupabase(orderData: { id: string; status: string; tenant_id: 
                     return {
                       is: function is() {
                         return {
+                          then: (resolve: any) => resolve({ data: null, error: null }),
                           select: () => ({
                             single: async () => ({
                               data: { ...orderData, status: currentStatus },
@@ -37,6 +43,7 @@ function createMockSupabase(orderData: { id: string; status: string; tenant_id: 
                   },
                   is: function is() {
                     return {
+                      then: (resolve: any) => resolve({ data: null, error: null }),
                       select: () => ({
                         single: async () => ({
                           data: { ...orderData, status: currentStatus },
@@ -50,8 +57,8 @@ function createMockSupabase(orderData: { id: string; status: string; tenant_id: 
             };
           },
         };
-      },
-    }),
+      }),
+    })),
   };
   return client;
 }
@@ -226,5 +233,290 @@ describe("OrderLifecycleService (CR-OPS-09B)", () => {
         ).rejects.toBeInstanceOf(DomainError);
       },
     );
+  });
+
+  describe("rollbackStatus", () => {
+    it("strictly blocks rollback at the application layer by default while atomic RPC is pending", async () => {
+      const order = { id: "o1", status: "prepared", tenant_id: "tenant-eatclean" };
+      const repo = {
+        findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+      } as any;
+      const supa = createMockSupabase(order);
+      const ctx = mockCtx({}, supa);
+
+      await expect(
+        OrderLifecycleService.rollbackStatus(ctx, repo, "o1", "Motivo de prueba"),
+      ).rejects.toThrow(
+        "El retroceso de estados operacionales está desactivado hasta disponer de una operación transaccional atómica en PostgreSQL.",
+      );
+
+      expect(repo.findByIdWithItems).not.toHaveBeenCalled();
+      expect(supa.from).not.toHaveBeenCalled();
+      expect(AuditService.write).not.toHaveBeenCalled();
+    });
+
+    describe("when rollback is enabled for unit tests", () => {
+      beforeEach(() => {
+        setOperationalRollbackEnabledForTests(true);
+      });
+
+      afterEach(() => {
+        setOperationalRollbackEnabledForTests(false);
+      });
+
+      it("rejects rollback if reason is empty or whitespace", async () => {
+        const order = { id: "o1", status: "prepared", tenant_id: "tenant-eatclean" };
+        const repo = {
+          findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+        } as any;
+        const ctx = mockCtx();
+
+        await expect(
+          OrderLifecycleService.rollbackStatus(ctx, repo, "o1", ""),
+        ).rejects.toBeInstanceOf(DomainError);
+
+        await expect(
+          OrderLifecycleService.rollbackStatus(ctx, repo, "o1", "   "),
+        ).rejects.toBeInstanceOf(DomainError);
+      });
+
+      it("rolls back from prepared to in_production and writes audit log", async () => {
+        const order = { id: "o1", status: "prepared", tenant_id: "tenant-eatclean" };
+        const repo = {
+          findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+        } as any;
+        const supa = createMockSupabase(order);
+        const ctx = mockCtx({}, supa);
+
+        const res = await OrderLifecycleService.rollbackStatus(
+          ctx,
+          repo,
+          "o1",
+          "Aún no está empaquetado",
+        );
+
+        expect(res.status).toBe("in_production");
+        expect(AuditService.write).toHaveBeenCalledWith(
+          ctx,
+          expect.objectContaining({
+            entityType: "order",
+            entityId: "o1",
+            action: "status_change",
+            oldData: { status: "prepared" },
+            newData: { status: "in_production", reason: "Aún no está empaquetado", isRollback: true },
+          }),
+        );
+      });
+
+      it("rolls back from in_production to confirmed", async () => {
+        const order = { id: "o1", status: "in_production", tenant_id: "tenant-eatclean" };
+        const repo = {
+          findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+        } as any;
+        const supa = createMockSupabase(order);
+        const ctx = mockCtx({}, supa);
+
+        const res = await OrderLifecycleService.rollbackStatus(
+          ctx,
+          repo,
+          "o1",
+          "Error al iniciar en cocina",
+        );
+
+        expect(res.status).toBe("confirmed");
+      });
+
+      it("rolls back from ready_for_delivery to prepared", async () => {
+        const order = { id: "o1", status: "ready_for_delivery", tenant_id: "tenant-eatclean" };
+        const repo = {
+          findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+        } as any;
+        const supa = createMockSupabase(order);
+        const ctx = mockCtx({}, supa);
+
+        const res = await OrderLifecycleService.rollbackStatus(
+          ctx,
+          repo,
+          "o1",
+          "Reabrir empaque para revisión",
+        );
+
+        expect(res.status).toBe("prepared");
+      });
+
+      it.each(["draft", "confirmed", "out_for_delivery", "delivered", "cancelled"])(
+        "prohibits rollback from irreversible/invalid status %s",
+        async (status) => {
+          const order = { id: "o1", status, tenant_id: "tenant-eatclean" };
+          const repo = {
+            findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+          } as any;
+          const ctx = mockCtx();
+
+          await expect(
+            OrderLifecycleService.rollbackStatus(ctx, repo, "o1", "Razón cualquiera"),
+          ).rejects.toBeInstanceOf(DomainError);
+        },
+      );
+
+      it("rejects rollback on canonical v2 orders", async () => {
+        const order = {
+          id: "o1",
+          status: "prepared",
+          tenant_id: "tenant-eatclean",
+          write_contract_version: 2,
+        };
+        const repo = {
+          findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+        } as any;
+        const ctx = mockCtx();
+
+        await expect(
+          OrderLifecycleService.rollbackStatus(ctx, repo, "o1", "Intento en v2"),
+        ).rejects.toBeInstanceOf(DomainError);
+      });
+
+      it("guarantees audit atomicity by reverting order status if AuditService.write fails", async () => {
+        const order = { id: "o1", status: "prepared", tenant_id: "tenant-eatclean" };
+        const repo = {
+          findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+        } as any;
+        const supa = createMockSupabase(order);
+        const ctx = mockCtx({}, supa);
+
+        vi.mocked(AuditService.write).mockRejectedValueOnce(
+          new Error("Audit log database failure"),
+        );
+
+        await expect(
+          OrderLifecycleService.rollbackStatus(
+            ctx,
+            repo,
+            "o1",
+            "Fallo intencionado de auditoría",
+          ),
+        ).rejects.toThrow("Fallo al registrar auditoría de retroceso");
+
+        // Verify status was reverted back to 'prepared'
+        expect(supa.getStatus()).toBe("prepared");
+        expect(supa.getUpdates()).toEqual([
+          { status: "in_production" },
+          { status: "prepared" },
+        ]);
+      });
+
+      it("aborts cleanly and does not write audit if initial status update fails", async () => {
+        const order = { id: "o1", status: "prepared", tenant_id: "tenant-eatclean" };
+        const repo = {
+          findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+        } as any;
+        const client = {
+          from: vi.fn(() => ({
+            update: vi.fn(() => ({
+              eq: () => ({
+                eq: () => ({
+                  eq: () => ({
+                    is: () => ({
+                      select: () => ({
+                        single: async () => ({
+                          data: null,
+                          error: new Error("Database lock timeout on update"),
+                        }),
+                      }),
+                    }),
+                  }),
+                }),
+              }),
+            })),
+          })),
+        };
+        const ctx = mockCtx({}, client as any);
+        vi.mocked(AuditService.write).mockClear();
+
+        await expect(
+          OrderLifecycleService.rollbackStatus(ctx, repo, "o1", "Fallo de DB"),
+        ).rejects.toThrow("Database lock timeout on update");
+
+        expect(AuditService.write).not.toHaveBeenCalled();
+      });
+
+      it("rejects rollback if order status was changed concurrently", async () => {
+        const order = { id: "o1", status: "prepared", tenant_id: "tenant-eatclean" };
+        const repo = {
+          findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+        } as any;
+        const client = {
+          from: vi.fn(() => ({
+            update: vi.fn(() => ({
+              eq: () => ({
+                eq: () => ({
+                  eq: () => ({
+                    is: () => ({
+                      select: () => ({
+                        single: async () => ({
+                          data: null,
+                          error: { message: "JSON object requested, multiple (or no) rows returned", code: "PGRST116" },
+                        }),
+                      }),
+                    }),
+                  }),
+                }),
+              }),
+            })),
+          })),
+        };
+        const ctx = mockCtx({}, client as any);
+        vi.mocked(AuditService.write).mockClear();
+
+        await expect(
+          OrderLifecycleService.rollbackStatus(ctx, repo, "o1", "Conflicto concurrente"),
+        ).rejects.toBeDefined();
+
+        expect(AuditService.write).not.toHaveBeenCalled();
+      });
+
+      it("throws critical error if audit fails AND compensating revert fails", async () => {
+        const order = { id: "o1", status: "prepared", tenant_id: "tenant-eatclean" };
+        const repo = {
+          findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+        } as any;
+        let callCount = 0;
+        const client = {
+          from: vi.fn(() => ({
+            update: vi.fn(() => {
+              callCount++;
+              return {
+                eq: () => ({
+                  eq: () => ({
+                    eq: () => ({
+                      is: () => {
+                        if (callCount === 1) {
+                          return {
+                            select: () => ({
+                              single: async () => ({
+                                data: { ...order, status: "in_production" },
+                                error: null,
+                              }),
+                            }),
+                          };
+                        }
+                        // Compensating update fails
+                        return { error: new Error("Network failure on revert") };
+                      },
+                    }),
+                  }),
+                }),
+              };
+            }),
+          })),
+        };
+        const ctx = mockCtx({}, client as any);
+        vi.mocked(AuditService.write).mockRejectedValueOnce(new Error("Audit log DB down"));
+
+        await expect(
+          OrderLifecycleService.rollbackStatus(ctx, repo, "o1", "Doble fallo"),
+        ).rejects.toThrow(/CRITICAL: Fallo en auditoría y fallo en compensación/);
+      });
+    });
   });
 });

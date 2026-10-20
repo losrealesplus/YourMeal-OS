@@ -13,6 +13,12 @@ export type OperationalLabelRow = {
   isCustom: boolean;
   itemIdentity: string;
   nativeCustom: boolean;
+  companyName?: string | null;
+  siteName?: string | null;
+  deliveryAddress?: string | null;
+  portionIndex: number;
+  totalPortions: number;
+  deliveryDate?: string;
 };
 
 /** Portion labels retain each captured line's declaration; a Dish aggregate is not a snapshot. */
@@ -30,6 +36,12 @@ export function buildOperationalLabels(report: ProductionReportModel): Operation
         isCustom: isCustomOperationalItem(item) || Boolean(item.comment?.trim()),
         itemIdentity: operationalItemIdentity(item),
         nativeCustom: isCustomOperationalItem(item),
+        companyName: customer.companyName ?? null,
+        siteName: customer.siteName ?? null,
+        deliveryAddress: customer.deliveryAddress ?? null,
+        portionIndex: portionIndex + 1,
+        totalPortions: item.qty,
+        deliveryDate: report.deliveryDate,
       })),
     ),
   );

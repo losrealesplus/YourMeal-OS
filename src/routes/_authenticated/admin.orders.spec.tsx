@@ -6,6 +6,7 @@ import {
   OrdersTable,
   OrderDetailView,
   getOperationalQuickActionLabel,
+  FEATURE_OPERATIONAL_ROLLBACK_ENABLED,
 } from "./admin.orders";
 import type { OperationalOrderListItem } from "@/modules/operations";
 
@@ -299,5 +300,21 @@ describe("CR-OPS-09A / CR-OPS-UX Fase 1 · AdminOrdersPage (Root View)", () => {
     expect(html).toContain("Pedidos");
     expect(html).toContain("Vista de pedidos operativos");
     expect(html).toContain("+ Nuevo Pedido");
+  });
+});
+
+describe("CR-OPS-UX Block 2 & Block 3 · Operational Evolution Hardening", () => {
+  it("isolates rollback button in production to guarantee zero partial mutations until atomic RPC is deployed", () => {
+    expect(FEATURE_OPERATIONAL_ROLLBACK_ENABLED).toBe(false);
+
+    const v1Order: OperationalOrderListItem = {
+      ...sampleOrder,
+      status: "in_production",
+      writeContractVersion: 1,
+    };
+    const html = renderDetailModal(v1Order);
+
+    // Verified: rollback button is cleanly omitted from UI to enforce ACID safety
+    expect(html).not.toContain("Volver a Confirmado");
   });
 });

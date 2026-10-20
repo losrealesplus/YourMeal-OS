@@ -14,7 +14,17 @@ import {
  */
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { brandConfig } from "@/tenant/brand-config";
 import {
   ArrowLeft,
   Clock,
@@ -99,6 +109,30 @@ function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function getWeekDaysFromDate(dateStr: string) {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const curr = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
+  const day = curr.getUTCDay();
+  const diffToMon = day === 0 ? -6 : 1 - day;
+  const monday = new Date(curr);
+  monday.setUTCDate(curr.getUTCDate() + diffToMon);
+
+  const days: Array<{ date: string; label: string }> = [];
+  const dayNames = ["Lun", "Mar", "Mié", "Jue", "Vie"];
+  for (let i = 0; i < 5; i++) {
+    const next = new Date(monday);
+    next.setUTCDate(monday.getUTCDate() + i);
+    const iso = next.toISOString().slice(0, 10);
+    const dd = String(next.getUTCDate()).padStart(2, "0");
+    const mm = String(next.getUTCMonth() + 1).padStart(2, "0");
+    days.push({
+      date: iso,
+      label: `${dayNames[i]} ${dd}/${mm}`,
+    });
+  }
+  return days;
+}
+
 function formatDisplayQty(qty: number | null, unit: string): string {
   if (qty == null) return `— ${unit}`;
   const rounded = Math.abs(qty) >= 10 ? Math.round(qty * 10) / 10 : Math.round(qty * 100) / 100;
@@ -116,6 +150,16 @@ function ProductionSheetPage() {
   const [levelTab, setLevelTab] = useState<
     "p1_kitchen" | "p2_packing_hierarchy" | "p2_packing_client" | "p2_packing_dish"
   >("p1_kitchen");
+
+  const [printModalOpen, setPrintModalOpen] = useState(false);
+  const [printSections, setPrintSections] = useState({
+    p1Kitchen: true,
+    p2Hierarchy: true,
+    p2Client: false,
+    p2Dish: false,
+  });
+
+  const weekDays = useMemo(() => getWeekDaysFromDate(date), [date]);
 
   const load = useCallback(async () => {
     if (!user || !tenantId) return;
@@ -145,8 +189,15 @@ function ProductionSheetPage() {
     void load();
   }, [load]);
 
-  function handlePrint() {
-    window.print();
+  function handleOpenPrintModal() {
+    setPrintModalOpen(true);
+  }
+
+  function handleConfirmPrint() {
+    setPrintModalOpen(false);
+    setTimeout(() => {
+      window.print();
+    }, 150);
   }
 
   function handleDownloadCSV() {
@@ -212,11 +263,11 @@ function ProductionSheetPage() {
             <FileDown className="mr-2 h-4 w-4" />
             Excel (.csv)
           </Button>
-          <Button variant="outline" size="sm" onClick={handlePrint} disabled={!report || loading}>
+          <Button variant="outline" size="sm" onClick={handleOpenPrintModal} disabled={!report || loading}>
             <Printer className="mr-2 h-4 w-4" />
             Imprimir
           </Button>
-          <Button size="sm" onClick={handlePrint} disabled={!report || loading}>
+          <Button size="sm" onClick={handleOpenPrintModal} disabled={!report || loading}>
             <FileDown className="mr-2 h-4 w-4" />
             Descargar PDF
           </Button>
@@ -238,46 +289,17 @@ function ProductionSheetPage() {
             >
               Hoy
             </Button>
-            <Button
-              variant={date === "2026-10-05" ? "default" : "outline"}
-              size="sm"
-              className="h-8 text-xs"
-              onClick={() => setDate("2026-10-05")}
-            >
-              Lun 05/10
-            </Button>
-            <Button
-              variant={date === "2026-10-06" ? "default" : "outline"}
-              size="sm"
-              className="h-8 text-xs"
-              onClick={() => setDate("2026-10-06")}
-            >
-              Mar 06/10
-            </Button>
-            <Button
-              variant={date === "2026-10-07" ? "default" : "outline"}
-              size="sm"
-              className="h-8 text-xs"
-              onClick={() => setDate("2026-10-07")}
-            >
-              Mié 07/10
-            </Button>
-            <Button
-              variant={date === "2026-10-08" ? "default" : "outline"}
-              size="sm"
-              className="h-8 text-xs"
-              onClick={() => setDate("2026-10-08")}
-            >
-              Jue 08/10
-            </Button>
-            <Button
-              variant={date === "2026-10-09" ? "default" : "outline"}
-              size="sm"
-              className="h-8 text-xs"
-              onClick={() => setDate("2026-10-09")}
-            >
-              Vie 09/10
-            </Button>
+            {weekDays.map((d) => (
+              <Button
+                key={d.date}
+                variant={date === d.date ? "default" : "outline"}
+                size="sm"
+                className="h-8 text-xs"
+                onClick={() => setDate(d.date)}
+              >
+                {d.label}
+              </Button>
+            ))}
           </div>
 
           <div className="flex items-center gap-2">
@@ -425,17 +447,192 @@ function ProductionSheetPage() {
 
           {/* Paper-like sheet for Print / PDF (100% Preserved) */}
           <div className="hidden print:block">
-            <PrintableProductionSheet report={report} />
+            <PrintableProductionSheet report={report} suite={suite} sections={printSections} />
           </div>
 
           <div className="rounded-xl border border-border bg-card p-6 print:hidden">
             <p className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
               Vista previa para impresión (formato físico de 2 niveles)
             </p>
-            <PrintableProductionSheet report={report} />
+            <PrintableProductionSheet report={report} suite={suite} sections={printSections} />
           </div>
         </>
       )}
+
+      {/* Modal Dialog: Configurador de Documento Operativo */}
+      <Dialog open={printModalOpen} onOpenChange={setPrintModalOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base">
+              📄 Generar Documentación de Producción & Packing
+            </DialogTitle>
+            <DialogDescription className="text-xs">
+              Fecha: <strong className="text-foreground">{date}</strong> ·{" "}
+              {suite?.packingSheet.totals.grandTotalPortions ?? report?.totals.portionCount ?? 0} raciones ·{" "}
+              {suite?.packingSheet.totals.grandTotalOrders ?? report?.totals.orderCount ?? 0} pedidos
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <p className="text-xs font-medium text-muted-foreground">
+              Selecciona las secciones a incluir en el documento físico o PDF:
+            </p>
+
+            <div className="space-y-3 rounded-lg border border-border p-3.5 bg-muted/20">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <Checkbox
+                  checked={printSections.p1Kitchen}
+                  onCheckedChange={(checked) =>
+                    setPrintSections((prev) => ({ ...prev, p1Kitchen: Boolean(checked) }))
+                  }
+                  className="mt-0.5"
+                />
+                <div className="space-y-0.5">
+                  <p className="text-sm font-semibold text-foreground">
+                    P1 — Cocina & Marmitas
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Totales consolidados de raciones, lista por plato, modificaciones culinarias e ingredientes.
+                  </p>
+                </div>
+              </label>
+
+              <label className="flex items-start gap-3 cursor-pointer">
+                <Checkbox
+                  checked={printSections.p2Hierarchy}
+                  onCheckedChange={(checked) =>
+                    setPrintSections((prev) => ({ ...prev, p2Hierarchy: Boolean(checked) }))
+                  }
+                  className="mt-0.5"
+                />
+                <div className="space-y-0.5">
+                  <p className="text-sm font-semibold text-foreground">
+                    P2 — Packing Jerárquico
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Árbol logístico clasificado por Municipio &gt; Empresa B2B &gt; Sede &gt; Departamento.
+                  </p>
+                </div>
+              </label>
+
+              <label className="flex items-start gap-3 cursor-pointer">
+                <Checkbox
+                  checked={printSections.p2Client}
+                  onCheckedChange={(checked) =>
+                    setPrintSections((prev) => ({ ...prev, p2Client: Boolean(checked) }))
+                  }
+                  className="mt-0.5"
+                />
+                <div className="space-y-0.5">
+                  <p className="text-sm font-semibold text-foreground">
+                    P2 — Packing por Cliente
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Tarjetas individuales de empaque para mesa de expedición con checks por comensal.
+                  </p>
+                </div>
+              </label>
+
+              <label className="flex items-start gap-3 cursor-pointer">
+                <Checkbox
+                  checked={printSections.p2Dish}
+                  onCheckedChange={(checked) =>
+                    setPrintSections((prev) => ({ ...prev, p2Dish: Boolean(checked) }))
+                  }
+                  className="mt-0.5"
+                />
+                <div className="space-y-0.5">
+                  <p className="text-sm font-semibold text-foreground">
+                    P2 — Packing por Plato
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Distribución de porciones de cada receta asignadas a cada cliente.
+                  </p>
+                </div>
+              </label>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs text-muted-foreground">
+              <span>Accesos rápidos:</span>
+              <div className="flex gap-1.5">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs px-2"
+                  onClick={() =>
+                    setPrintSections({
+                      p1Kitchen: true,
+                      p2Hierarchy: true,
+                      p2Client: true,
+                      p2Dish: true,
+                    })
+                  }
+                >
+                  Todo el documento
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs px-2"
+                  onClick={() =>
+                    setPrintSections({
+                      p1Kitchen: true,
+                      p2Hierarchy: false,
+                      p2Client: false,
+                      p2Dish: false,
+                    })
+                  }
+                >
+                  Solo Cocina
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs px-2"
+                  onClick={() =>
+                    setPrintSections({
+                      p1Kitchen: false,
+                      p2Hierarchy: true,
+                      p2Client: true,
+                      p2Dish: true,
+                    })
+                  }
+                >
+                  Solo Packing
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setPrintModalOpen(false)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleConfirmPrint}
+              disabled={
+                !printSections.p1Kitchen &&
+                !printSections.p2Hierarchy &&
+                !printSections.p2Client &&
+                !printSections.p2Dish
+              }
+            >
+              <Printer className="mr-2 h-4 w-4" />
+              🖨️ Imprimir / Guardar PDF
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <style>{`
         @media print {
@@ -1217,212 +1414,403 @@ function DigitalPackingByDishView({ report }: { report: ProductionReportModel })
   );
 }
 
-/** FORMATO FÍSICO 2 NIVELES PARA IMPRESIÓN (PRINT / PDF) — 100% PRESERVADO */
-function PrintableProductionSheet({ report }: { report: ProductionReportModel }) {
+/** FORMATO FÍSICO MODULAR PARA IMPRESIÓN (PRINT / PDF) */
+function PrintableProductionSheet({
+  report,
+  suite,
+  sections,
+}: {
+  report: ProductionReportModel;
+  suite?: OperationalSuiteModel | null;
+  sections: {
+    p1Kitchen: boolean;
+    p2Hierarchy: boolean;
+    p2Client: boolean;
+    p2Dish: boolean;
+  };
+}) {
   return (
     <article className="mx-auto max-w-3xl space-y-8 bg-white text-black font-sans text-sm">
       {/* ========================================================================= */}
       {/* PÁGINA 1 (P1) — COCINA & PRODUCCIÓN (MARMITAS / TOTALES / ALÉRGENOS) */}
       {/* ========================================================================= */}
-      <section className="page-break space-y-6 pb-6">
-        <header className="border-b-2 border-black pb-3">
-          <div className="flex justify-between items-start">
+      {sections.p1Kitchen && (
+        <section className="page-break space-y-6 pb-6">
+          <header className="border-b-2 border-black pb-3">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-xs uppercase font-bold tracking-[0.2em] text-gray-700">
+                  {brandConfig.name} · Operaciones de Cocina
+                </p>
+                <h1 className="text-2xl font-black mt-0.5">HOJA DE PRODUCCIÓN (P1)</h1>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-bold">Fecha: {report.deliveryDate}</p>
+                <p className="text-xs text-gray-600">
+                  Impreso: {new Date().toLocaleTimeString("es-ES")}
+                </p>
+              </div>
+            </div>
+          </header>
+
+          {/* Resumen Global */}
+          <div className="grid grid-cols-4 gap-2 border border-black p-3 bg-gray-50 text-center">
             <div>
-              <p className="text-xs uppercase font-bold tracking-[0.2em] text-gray-700">
-                EatClean · Operaciones de Cocina
-              </p>
-              <h1 className="text-2xl font-black mt-0.5">HOJA DE PRODUCCIÓN (P1)</h1>
+              <p className="text-[10px] uppercase font-bold text-gray-600">Total Raciones</p>
+              <p className="text-xl font-black font-mono">{report.totals.portionCount}</p>
             </div>
-            <div className="text-right">
-              <p className="text-sm font-bold">Fecha: {report.deliveryDate}</p>
-              <p className="text-xs text-gray-600">
-                Impreso: {new Date().toLocaleTimeString("es-ES")}
-              </p>
+            <div>
+              <p className="text-[10px] uppercase font-bold text-gray-600">Total Platos</p>
+              <p className="text-xl font-black font-mono">{report.totals.dishCount}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase font-bold text-gray-600">Total Clientes</p>
+              <p className="text-xl font-black font-mono">{report.packingByCustomer.length}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase font-bold text-gray-600">Personalizados</p>
+              <p className="text-xl font-black font-mono">{report.totals.customizationCount}</p>
             </div>
           </div>
-        </header>
 
-        {/* Resumen Global */}
-        <div className="grid grid-cols-4 gap-2 border border-black p-3 bg-gray-50 text-center">
+          {/* Listado de Platos a Cocinar */}
           <div>
-            <p className="text-[10px] uppercase font-bold text-gray-600">Total Raciones</p>
-            <p className="text-xl font-black font-mono">{report.totals.portionCount}</p>
-          </div>
-          <div>
-            <p className="text-[10px] uppercase font-bold text-gray-600">Total Platos</p>
-            <p className="text-xl font-black font-mono">{report.totals.dishCount}</p>
-          </div>
-          <div>
-            <p className="text-[10px] uppercase font-bold text-gray-600">Total Clientes</p>
-            <p className="text-xl font-black font-mono">{report.packingByCustomer.length}</p>
-          </div>
-          <div>
-            <p className="text-[10px] uppercase font-bold text-gray-600">Personalizados</p>
-            <p className="text-xl font-black font-mono">{report.totals.customizationCount}</p>
-          </div>
-        </div>
-
-        {/* Listado de Platos a Cocinar */}
-        <div>
-          <h2 className="text-base font-bold uppercase border-b border-black pb-1 mb-3">
-            1. Cocinado y Marmitas por Plato
-          </h2>
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-black text-xs uppercase bg-gray-100">
-                <th className="py-1.5 px-2">Plato</th>
-                <th className="py-1.5 px-2">Alérgenos</th>
-                <th className="py-1.5 px-2 text-right">Raciones</th>
-                <th className="py-1.5 px-2 text-center">Check Cocina</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-300">
-              {report.standardDishes.map((dish) => (
-                <tr key={operationalItemIdentity(dish)} className="break-inside-avoid">
-                  <td className="py-2 px-2 font-bold">
-                    {dish.dishName}
-                    <CustomOperationalContext item={dish} />
-                  </td>
-                  <td className="py-2 px-2 text-xs">
-                    <OperationalAllergenDeclaration
-                      item={dish}
-                      showDeclared
-                      className="text-black"
-                    />
-                  </td>
-                  <td className="py-2 px-2 text-right font-mono font-bold text-base">
-                    {dish.totalQty}
-                  </td>
-                  <td className="py-2 px-2 text-center font-mono">[ ] Listo</td>
+            <h2 className="text-base font-bold uppercase border-b border-black pb-1 mb-3">
+              1. Cocinado y Marmitas por Plato
+            </h2>
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-black text-xs uppercase bg-gray-100">
+                  <th className="py-1.5 px-2">Plato</th>
+                  <th className="py-1.5 px-2">Alérgenos</th>
+                  <th className="py-1.5 px-2 text-right">Raciones</th>
+                  <th className="py-1.5 px-2 text-center">Check Cocina</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Modificaciones culinarias */}
-        {report.customizations.length > 0 ? (
-          <div className="border border-black p-3 space-y-2 break-inside-avoid">
-            <h2 className="text-xs font-bold uppercase tracking-wider bg-black text-white px-2 py-0.5 inline-block">
-              ⚠️ Modificaciones Culinarias y Alérgenos por Cliente
-            </h2>
-            <ul className="divide-y divide-gray-200 text-xs">
-              {report.customizations.map((c) => (
-                <li
-                  key={`${c.orderId}-${operationalItemIdentity(c)}`}
-                  className="py-1.5 flex justify-between gap-2"
-                >
-                  <div>
-                    <span className="font-bold">{c.customerName}</span> — {c.dishName} (×{c.qty})
-                    <p className="italic text-gray-800 font-semibold">
-                      Observación: {c.observation}
-                    </p>
-                  </div>
-                  <span className="font-mono">[ ]</span>
-                </li>
-              ))}
-            </ul>
+              </thead>
+              <tbody className="divide-y divide-gray-300">
+                {report.standardDishes.map((dish) => (
+                  <tr key={operationalItemIdentity(dish)} className="break-inside-avoid">
+                    <td className="py-2 px-2 font-bold">
+                      {dish.dishName}
+                      <CustomOperationalContext item={dish} />
+                    </td>
+                    <td className="py-2 px-2 text-xs">
+                      <OperationalAllergenDeclaration
+                        item={dish}
+                        showDeclared
+                        className="text-black"
+                      />
+                    </td>
+                    <td className="py-2 px-2 text-right font-mono font-bold text-base">
+                      {dish.totalQty}
+                    </td>
+                    <td className="py-2 px-2 text-center font-mono">[ ] Listo</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        ) : null}
 
-        {/* Ingredientes si existen */}
-        {report.ingredientSummary.length > 0 ? (
-          <div className="break-inside-avoid">
-            <h2 className="text-xs font-bold uppercase border-b border-black pb-1 mb-2">
-              Resumen de Ingredientes
-            </h2>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-              {report.ingredientSummary.map((ing) => (
-                <div
-                  key={`${ing.ingredientId}-${ing.unit}`}
-                  className="flex justify-between border-b border-gray-200 py-0.5"
-                >
-                  <span>{ing.name}</span>
-                  <span className="font-mono font-bold">
-                    {formatDisplayQty(ing.displayQty, ing.displayUnit)}
+          {/* Modificaciones culinarias */}
+          {report.customizations.length > 0 ? (
+            <div className="border border-black p-3 space-y-2 break-inside-avoid">
+              <h2 className="text-xs font-bold uppercase tracking-wider bg-black text-white px-2 py-0.5 inline-block">
+                ⚠️ Modificaciones Culinarias y Alérgenos por Cliente
+              </h2>
+              <ul className="divide-y divide-gray-200 text-xs">
+                {report.customizations.map((c) => (
+                  <li
+                    key={`${c.orderId}-${operationalItemIdentity(c)}`}
+                    className="py-1.5 flex justify-between gap-2"
+                  >
+                    <div>
+                      <span className="font-bold">{c.customerName}</span> — {c.dishName} (×{c.qty})
+                      <p className="italic text-gray-800 font-semibold">
+                        Observación: {c.observation}
+                      </p>
+                    </div>
+                    <span className="font-mono">[ ]</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          {/* Ingredientes si existen */}
+          {report.ingredientSummary.length > 0 ? (
+            <div className="break-inside-avoid">
+              <h2 className="text-xs font-bold uppercase border-b border-black pb-1 mb-2">
+                Resumen de Ingredientes
+              </h2>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                {report.ingredientSummary.map((ing) => (
+                  <div
+                    key={`${ing.ingredientId}-${ing.unit}`}
+                    className="flex justify-between border-b border-gray-200 py-0.5"
+                  >
+                    <span>{ing.name}</span>
+                    <span className="font-mono font-bold">
+                      {formatDisplayQty(ing.displayQty, ing.displayUnit)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </section>
+      )}
+
+      {/* ========================================================================= */}
+      {/* PÁGINAS 2 (P2) — PACKING JERÁRQUICO (EMPRESA / SEDE / DEPARTAMENTO) */}
+      {/* ========================================================================= */}
+      {sections.p2Hierarchy && suite?.packingSheet ? (
+        <section className="page-break space-y-6 pt-6">
+          <header className="border-b-2 border-black pb-2">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-xs uppercase font-bold tracking-[0.2em] text-gray-700">
+                  {brandConfig.name} · Mesa de Expedición
+                </p>
+                <h1 className="text-2xl font-black mt-0.5">HOJA DE PACKING JERÁRQUICO (P2)</h1>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-bold">Fecha: {report.deliveryDate}</p>
+                <p className="text-xs text-gray-600">
+                  {suite.packingSheet.totals.grandTotalPortions} raciones · {suite.packingSheet.totals.grandTotalOrders} pedidos
+                </p>
+              </div>
+            </div>
+          </header>
+
+          <div className="space-y-4">
+            {suite.packingSheet.municipalities.map((muni) => (
+              <div key={muni.municipality} className="border border-black p-3 space-y-3 break-inside-avoid">
+                <div className="flex justify-between items-baseline border-b border-black pb-1">
+                  <span className="font-black text-base">📍 {muni.municipality}</span>
+                  <span className="font-mono text-xs font-bold">
+                    {muni.totalOrders} pedidos · {muni.totalPortions} raciones
                   </span>
                 </div>
-              ))}
-            </div>
+
+                {/* B2B Companies */}
+                {muni.b2bCompanies.map((comp) => (
+                  <div key={comp.companyId} className="pl-2 space-y-2 border-l-2 border-black">
+                    <div className="flex justify-between font-bold text-sm bg-gray-100 p-1">
+                      <span>🏢 {comp.companyName}</span>
+                      <span className="font-mono text-xs font-bold">{comp.totalPortions} raciones</span>
+                    </div>
+
+                    {comp.sites.map((site) => (
+                      <div key={site.siteId} className="pl-2 space-y-1">
+                        <p className="text-xs font-bold">
+                          📍 Sede: {site.siteName}{" "}
+                          <span className="font-normal text-gray-600">({site.siteAddress})</span>
+                        </p>
+                        {site.units.map((unit) => (
+                          <div key={unit.unitId} className="pl-2 text-xs">
+                            <p className="font-semibold text-gray-800">
+                              🏬 {unit.unitName} ({unit.totalPortions} raciones):
+                            </p>
+                            <table className="w-full text-left border-collapse mt-1">
+                              <thead>
+                                <tr className="border-b border-gray-400 text-[10px] uppercase">
+                                  <th className="py-1">Cliente</th>
+                                  <th className="py-1">Platos</th>
+                                  <th className="py-1 text-right">Raciones</th>
+                                  <th className="py-1 text-center">Check</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-gray-200">
+                                {unit.customers.map((cu) => (
+                                  <tr key={cu.orderId}>
+                                    <td className="py-1 font-medium">{cu.customerName}</td>
+                                    <td className="py-1">
+                                      {cu.items.map((it, idx) => (
+                                        <span key={idx} className="block">
+                                          {it.qty}× {it.dishName}
+                                          {it.safetyTag ? ` (${it.safetyTag})` : ""}
+                                        </span>
+                                      ))}
+                                    </td>
+                                    <td className="py-1 text-right font-mono font-bold">
+                                      {cu.totalPortions}
+                                    </td>
+                                    <td className="py-1 text-center font-mono">[ ]</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                ))}
+
+                {/* B2C Individuals */}
+                {muni.b2cIndividuals.length > 0 ? (
+                  <div className="pl-2 space-y-1 border-l-2 border-gray-400">
+                    <p className="text-xs font-bold bg-gray-50 p-1">👤 Particulares</p>
+                    <table className="w-full text-left border-collapse">
+                      <tbody className="divide-y divide-gray-200 text-xs">
+                        {muni.b2cIndividuals.map((u) => (
+                          <tr key={u.orderId}>
+                            <td className="py-1 font-medium">{u.customerName}</td>
+                            <td className="py-1">
+                              {u.items.map((it, idx) => (
+                                <span key={idx} className="block">
+                                  {it.qty}× {it.dishName}
+                                  {it.safetyTag ? ` (${it.safetyTag})` : ""}
+                                </span>
+                              ))}
+                            </td>
+                            <td className="py-1 text-right font-mono font-bold">{u.totalPortions}</td>
+                            <td className="py-1 text-center font-mono">[ ]</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : null}
+              </div>
+            ))}
           </div>
-        ) : null}
-      </section>
+        </section>
+      ) : null}
 
       {/* ========================================================================= */}
       {/* PÁGINAS 2+ (P2+) — PACKING & EMPLATADO (POR CLIENTE) */}
       {/* ========================================================================= */}
-      <section className="space-y-6 pt-6">
-        <header className="border-b-2 border-black pb-2">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-xs uppercase font-bold tracking-[0.2em] text-gray-700">
-                EatClean · Mesa de Expedición
-              </p>
-              <h1 className="text-2xl font-black mt-0.5">HOJA DE PACKING POR CLIENTE (P2)</h1>
-            </div>
-            <div className="text-right">
-              <p className="text-sm font-bold">Fecha: {report.deliveryDate}</p>
-            </div>
-          </div>
-        </header>
-
-        <div className="grid grid-cols-2 gap-4">
-          {report.packingByCustomer.map((cust) => (
-            <div
-              key={`print-cust-${cust.customerId}-${cust.orderId}`}
-              className="border-2 border-black p-3 space-y-2 break-inside-avoid flex flex-col justify-between"
-            >
+      {sections.p2Client && (
+        <section className="space-y-6 pt-6">
+          <header className="border-b-2 border-black pb-2">
+            <div className="flex justify-between items-start">
               <div>
-                <div className="flex justify-between items-baseline border-b border-black pb-1">
-                  <span className="font-black text-base">{cust.customerName}</span>
-                  <span className="font-mono text-xs font-bold">Total: {cust.totalPortions}</span>
+                <p className="text-xs uppercase font-bold tracking-[0.2em] text-gray-700">
+                  {brandConfig.name} · Mesa de Expedición
+                </p>
+                <h1 className="text-2xl font-black mt-0.5">HOJA DE PACKING POR CLIENTE (P2)</h1>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-bold">Fecha: {report.deliveryDate}</p>
+              </div>
+            </div>
+          </header>
+
+          <div className="grid grid-cols-2 gap-4">
+            {report.packingByCustomer.map((cust) => (
+              <div
+                key={`print-cust-${cust.customerId}-${cust.orderId}`}
+                className="border-2 border-black p-3 space-y-2 break-inside-avoid flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex justify-between items-baseline border-b border-black pb-1">
+                    <span className="font-black text-base">{cust.customerName}</span>
+                    <span className="font-mono text-xs font-bold">Total: {cust.totalPortions}</span>
+                  </div>
+
+                  {cust.dietarySnapshot && (
+                    <div className="my-1">
+                      <DietaryBadges snapshot={cust.dietarySnapshot} compact={true} />
+                    </div>
+                  )}
+
+                  {cust.specialInstructions.length > 0 ? (
+                    <div className="my-1.5 p-1 border border-black bg-gray-100 text-xs">
+                      <p className="font-bold">⚠️ Observaciones:</p>
+                      {cust.specialInstructions.map((ins, i) => (
+                        <p key={i}>• {ins}</p>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  <ul className="divide-y divide-gray-200 text-xs pt-1 space-y-1">
+                    {cust.items.map((item, idx) => (
+                      <li
+                        key={`${cust.orderId}-${operationalItemIdentity(item)}-${idx}`}
+                        className="pt-1 flex justify-between items-start gap-1"
+                      >
+                        <div>
+                          <span>
+                            [ ] {item.dishName}
+                            <CustomOperationalContext item={item} />
+                          </span>
+                          <OperationalAllergenDeclaration item={item} className="text-black" />
+                          {item.comment ? (
+                            <p className="font-semibold text-[11px] pl-4">→ {item.comment}</p>
+                          ) : null}
+                        </div>
+                        <span className="font-mono font-bold">×{item.qty}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
-                {cust.dietarySnapshot && (
-                  <div className="my-1">
-                    <DietaryBadges snapshot={cust.dietarySnapshot} compact={true} />
-                  </div>
-                )}
-
-                {cust.specialInstructions.length > 0 ? (
-                  <div className="my-1.5 p-1 border border-black bg-gray-100 text-xs">
-                    <p className="font-bold">⚠️ Observaciones:</p>
-                    {cust.specialInstructions.map((ins, i) => (
-                      <p key={i}>• {ins}</p>
-                    ))}
-                  </div>
-                ) : null}
-
-                <ul className="divide-y divide-gray-200 text-xs pt-1 space-y-1">
-                  {cust.items.map((item, idx) => (
-                    <li
-                      key={`${cust.orderId}-${operationalItemIdentity(item)}-${idx}`}
-                      className="pt-1 flex justify-between items-start gap-1"
-                    >
-                      <div>
-                        <span>
-                          [ ] {item.dishName}
-                          <CustomOperationalContext item={item} />
-                        </span>
-                        <OperationalAllergenDeclaration item={item} className="text-black" />
-                        {item.comment ? (
-                          <p className="font-semibold text-[11px] pl-4">→ {item.comment}</p>
-                        ) : null}
-                      </div>
-                      <span className="font-mono font-bold">×{item.qty}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="pt-2 border-t border-gray-400 flex justify-between text-[10px] uppercase font-bold text-gray-700">
+                  <span>Empacado por: _________</span>
+                  <span>{"[  ] OK"}</span>
+                </div>
               </div>
+            ))}
+          </div>
+        </section>
+      )}
 
-              <div className="pt-2 border-t border-gray-400 flex justify-between text-[10px] uppercase font-bold text-gray-700">
-                <span>Empacado por: _________</span>
-                <span>{"[  ] OK"}</span>
+      {/* ========================================================================= */}
+      {/* PÁGINAS 2 (P2) — PACKING POR PLATO */}
+      {/* ========================================================================= */}
+      {sections.p2Dish && (
+        <section className="page-break space-y-6 pt-6">
+          <header className="border-b-2 border-black pb-2">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-xs uppercase font-bold tracking-[0.2em] text-gray-700">
+                  {brandConfig.name} · Mesa de Expedición
+                </p>
+                <h1 className="text-2xl font-black mt-0.5">HOJA DE PACKING POR PLATO (P2)</h1>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-bold">Fecha: {report.deliveryDate}</p>
+                <p className="text-xs text-gray-600">{report.packingByDish.length} platos</p>
               </div>
             </div>
-          ))}
-        </div>
-      </section>
+          </header>
+
+          <div className="space-y-4">
+            {report.packingByDish.map((dish) => (
+              <div
+                key={operationalItemIdentity(dish)}
+                className="border border-black p-3 space-y-2 break-inside-avoid"
+              >
+                <div className="flex justify-between items-baseline border-b border-black pb-1">
+                  <span className="font-bold text-base">{dish.dishName}</span>
+                  <span className="font-mono text-sm font-bold">Total: {dish.totalQty} raciones</span>
+                </div>
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="border-b border-gray-400 text-[10px] uppercase">
+                      <th className="py-1">Cliente</th>
+                      <th className="py-1">Observaciones</th>
+                      <th className="py-1 text-right">Cantidad</th>
+                      <th className="py-1 text-center">Check</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {dish.allocations.map((alloc, i) => (
+                      <tr key={`${alloc.customerId}-${i}`}>
+                        <td className="py-1 font-medium">{alloc.customerName}</td>
+                        <td className="py-1 text-gray-600">{alloc.comment ?? "—"}</td>
+                        <td className="py-1 text-right font-mono font-bold">×{alloc.qty}</td>
+                        <td className="py-1 text-center font-mono">[ ]</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </article>
   );
 }
