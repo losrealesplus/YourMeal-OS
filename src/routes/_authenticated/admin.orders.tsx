@@ -101,6 +101,14 @@ export const Route = createFileRoute("/_authenticated/admin/orders")({
 /**
  * Determina la etiqueta de la acción rápida según el estado operacional del pedido.
  */
+/**
+ * Flag de aislamiento para retroceso de estado operacional (Marcha atrás).
+ * Permanece deshabilitado (false) en producción para garantizar cero mutaciones parciales
+ * hasta que se autorice y despliegue el procedimiento almacenado atómico PostgreSQL
+ * (cr_order_rollback_v1) en una migración dedicada.
+ */
+export const FEATURE_OPERATIONAL_ROLLBACK_ENABLED = false;
+
 export function getOperationalQuickActionLabel(status: OperationalOrderStatus): string | null {
   switch (status) {
     case "draft":
@@ -322,7 +330,9 @@ export function OrderDetailView({
   const rollbackStatus = getRollbackStatus(detail.status);
   const rollbackLabel = rollbackStatus ? ROLLBACK_LABEL_ES[detail.status] : null;
   const isV2Canonical = detail.writeContractVersion === 2;
-  const canRollback = Boolean(rollbackStatus && !isV2Canonical);
+  const canRollback = Boolean(
+    FEATURE_OPERATIONAL_ROLLBACK_ENABLED && rollbackStatus && !isV2Canonical,
+  );
 
   const canCancel = [
     "draft",
@@ -507,7 +517,7 @@ export function OrderDetailView({
             </Button>
           )}
 
-          {rollbackLabel && rollbackStatus && (
+          {FEATURE_OPERATIONAL_ROLLBACK_ENABLED && rollbackLabel && rollbackStatus && (
             <Button
               variant="outline"
               onClick={() => {

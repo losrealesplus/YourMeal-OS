@@ -284,13 +284,20 @@ export const OrderLifecycleService = {
       });
     } catch (auditError) {
       // Revert status to guarantee state/audit consistency
-      await ctx.supabase
+      const { error: revertError } = await ctx.supabase
         .from("orders")
         .update({ status: currentStatus })
         .eq("tenant_id", ctx.tenantId)
         .eq("id", orderId)
         .eq("status", targetStatus)
         .is("deleted_at", null);
+
+      if (revertError) {
+        throw new DomainError(
+          "INVALID_STATE",
+          `CRITICAL: Fallo en auditoría y fallo en compensación de estado para el pedido ${orderId}. Se requiere intervención administrativa.`,
+        );
+      }
 
       throw new DomainError(
         "INVALID_STATE",

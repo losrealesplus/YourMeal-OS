@@ -6,6 +6,7 @@ import {
   OrdersTable,
   OrderDetailView,
   getOperationalQuickActionLabel,
+  FEATURE_OPERATIONAL_ROLLBACK_ENABLED,
 } from "./admin.orders";
 import type { OperationalOrderListItem } from "@/modules/operations";
 
@@ -303,7 +304,9 @@ describe("CR-OPS-09A / CR-OPS-UX Fase 1 · AdminOrdersPage (Root View)", () => {
 });
 
 describe("CR-OPS-UX Block 2 & Block 3 · Operational Evolution Hardening", () => {
-  it("renders active rollback button for corporate/v1 orders in reversible states", () => {
+  it("isolates rollback button in production to guarantee zero partial mutations until atomic RPC is deployed", () => {
+    expect(FEATURE_OPERATIONAL_ROLLBACK_ENABLED).toBe(false);
+
     const v1Order: OperationalOrderListItem = {
       ...sampleOrder,
       status: "in_production",
@@ -311,20 +314,7 @@ describe("CR-OPS-UX Block 2 & Block 3 · Operational Evolution Hardening", () =>
     };
     const html = renderDetailModal(v1Order);
 
-    expect(html).toContain("Volver a Confirmado");
-    expect(html).not.toContain("(No disp. v2)");
-  });
-
-  it("renders disabled rollback button for canonical v2 orders with informative badge", () => {
-    const v2Order: OperationalOrderListItem = {
-      ...sampleOrder,
-      status: "in_production",
-      writeContractVersion: 2,
-    };
-    const html = renderDetailModal(v2Order);
-
-    expect(html).toContain("Volver a Confirmado");
-    expect(html).toContain("(No disp. v2)");
-    expect(html).toContain("disabled");
+    // Verified: rollback button is cleanly omitted from UI to enforce ACID safety
+    expect(html).not.toContain("Volver a Confirmado");
   });
 });

@@ -375,5 +375,118 @@ describe("OrderLifecycleService (CR-OPS-09B)", () => {
         { status: "prepared" },
       ]);
     });
+
+    it("aborts cleanly and does not write audit if initial status update fails", async () => {
+      const order = { id: "o1", status: "prepared", tenant_id: "tenant-eatclean" };
+      const repo = {
+        findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+      } as any;
+      const client = {
+        from: vi.fn(() => ({
+          update: vi.fn(() => ({
+            eq: () => ({
+              eq: () => ({
+                eq: () => ({
+                  is: () => ({
+                    select: () => ({
+                      single: async () => ({
+                        data: null,
+                        error: new Error("Database lock timeout on update"),
+                      }),
+                    }),
+                  }),
+                }),
+              }),
+            }),
+          })),
+        })),
+      };
+      const ctx = mockCtx({}, client as any);
+      vi.mocked(AuditService.write).mockClear();
+
+      await expect(
+        OrderLifecycleService.rollbackStatus(ctx, repo, "o1", "Fallo de DB"),
+      ).rejects.toThrow("Database lock timeout on update");
+
+      expect(AuditService.write).not.toHaveBeenCalled();
+    });
+
+    it("rejects rollback if order status was changed concurrently", async () => {
+      const order = { id: "o1", status: "prepared", tenant_id: "tenant-eatclean" };
+      const repo = {
+        findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+      } as any;
+      const client = {
+        from: vi.fn(() => ({
+          update: vi.fn(() => ({
+            eq: () => ({
+              eq: () => ({
+                eq: () => ({
+                  is: () => ({
+                    select: () => ({
+                      single: async () => ({
+                        data: null,
+                        error: { message: "JSON object requested, multiple (or no) rows returned", code: "PGRST116" },
+                      }),
+                    }),
+                  }),
+                }),
+              }),
+            }),
+          })),
+        })),
+      };
+      const ctx = mockCtx({}, client as any);
+      vi.mocked(AuditService.write).mockClear();
+
+      await expect(
+        OrderLifecycleService.rollbackStatus(ctx, repo, "o1", "Conflicto concurrente"),
+      ).rejects.toBeDefined();
+
+      expect(AuditService.write).not.toHaveBeenCalled();
+    });
+
+    it("throws critical error if audit fails AND compensating revert fails", async () => {
+      const order = { id: "o1", status: "prepared", tenant_id: "tenant-eatclean" };
+      const repo = {
+        findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+      } as any;
+      let callCount = 0;
+      const client = {
+        from: vi.fn(() => ({
+          update: vi.fn(() => {
+            callCount++;
+            return {
+              eq: () => ({
+                eq: () => ({
+                  eq: () => ({
+                    is: () => {
+                      if (callCount === 1) {
+                        return {
+                          select: () => ({
+                            single: async () => ({
+                              data: { ...order, status: "in_production" },
+                              error: null,
+                            }),
+                          }),
+                        };
+                      }
+                      // Compensating update fails
+                      return { error: new Error("Network failure on revert") };
+                    },
+                  }),
+                }),
+              }),
+            };
+          }),
+        })),
+      };
+      const ctx = mockCtx({}, client as any);
+      vi.mocked(AuditService.write).mockRejectedValueOnce(new Error("Audit log DB down"));
+
+      await expect(
+        OrderLifecycleService.rollbackStatus(ctx, repo, "o1", "Doble fallo"),
+      ).rejects.toThrow(/CRITICAL: Fallo en auditoría y fallo en compensación/);
+    });
   });
 });
