@@ -84,6 +84,32 @@ export const ROLLBACK_TRANSITIONS: Partial<
   ready_for_delivery: "prepared",
 };
 
+function isTestEnvironment(): boolean {
+  try {
+    if (import.meta.env?.PROD || import.meta.env?.MODE === "production") {
+      return false;
+    }
+  } catch {
+    // ignore
+  }
+  if (typeof process !== "undefined") {
+    if (process.env?.NODE_ENV === "production") {
+      return false;
+    }
+    if (process.env?.NODE_ENV === "test" || process.env?.VITEST !== undefined) {
+      return true;
+    }
+  }
+  try {
+    if (import.meta.env?.MODE === "test") {
+      return true;
+    }
+  } catch {
+    // ignore
+  }
+  return false;
+}
+
 let _featureOperationalRollbackEnabled = false;
 
 /**
@@ -93,10 +119,23 @@ let _featureOperationalRollbackEnabled = false;
  * (cr_order_rollback_v1) en una migración dedicada.
  */
 export function isOperationalRollbackEnabled(): boolean {
+  if (!isTestEnvironment()) {
+    return false;
+  }
   return _featureOperationalRollbackEnabled;
 }
 
+/**
+ * Permite alternar el flag exclusivamente en entornos de prueba automatizados (Vitest / NODE_ENV=test).
+ * En entornos de producción o fuera de test, falla de forma estricta (fail-closed) para garantizar
+ * que ninguna invocación en tiempo de ejecución productivo pueda activar el retroceso.
+ */
 export function setOperationalRollbackEnabledForTests(enabled: boolean): void {
+  if (!isTestEnvironment()) {
+    throw new Error(
+      "setOperationalRollbackEnabledForTests está estrictamente restringido a entornos de prueba (NODE_ENV=test / VITEST). No se puede invocar en producción.",
+    );
+  }
   _featureOperationalRollbackEnabled = enabled;
 }
 

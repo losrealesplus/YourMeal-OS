@@ -6,6 +6,9 @@ import {
   timelineReachedIndex,
   operationalStatusLabel,
   STATUS_LABEL_ES,
+  isOperationalRollbackEnabled,
+  setOperationalRollbackEnabledForTests,
+  FEATURE_OPERATIONAL_ROLLBACK_ENABLED,
 } from "./operational-status";
 
 describe("operational status transitions", () => {
@@ -44,5 +47,35 @@ describe("operational status transitions", () => {
   it("status labels in Spanish: confirmed is Confirmado", () => {
     expect(operationalStatusLabel("confirmed")).toBe("Confirmado");
     expect(STATUS_LABEL_ES.confirmed).toBe("Confirmado");
+  });
+
+  describe("operational rollback environment isolation", () => {
+    it("defaults to disabled even in test environment", () => {
+      expect(isOperationalRollbackEnabled()).toBe(false);
+      expect(FEATURE_OPERATIONAL_ROLLBACK_ENABLED).toBe(false);
+    });
+
+    it("allows toggling rollback in test environment", () => {
+      setOperationalRollbackEnabledForTests(true);
+      expect(isOperationalRollbackEnabled()).toBe(true);
+      setOperationalRollbackEnabledForTests(false);
+      expect(isOperationalRollbackEnabled()).toBe(false);
+    });
+
+    it("strictly prevents activation and throws when called in production environment", () => {
+      const originalNodeEnv = process.env.NODE_ENV;
+      try {
+        process.env.NODE_ENV = "production";
+        // Attempting to invoke setter in production must throw
+        expect(() => setOperationalRollbackEnabledForTests(true)).toThrow(
+          /estrictamente restringido a entornos de prueba/,
+        );
+        // Even if state was somehow true, isOperationalRollbackEnabled returns false in production
+        expect(isOperationalRollbackEnabled()).toBe(false);
+      } finally {
+        process.env.NODE_ENV = originalNodeEnv;
+        setOperationalRollbackEnabledForTests(false);
+      }
+    });
   });
 });
