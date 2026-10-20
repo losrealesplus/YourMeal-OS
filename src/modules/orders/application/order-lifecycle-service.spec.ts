@@ -12,10 +12,14 @@ vi.mock("@/services/audit-service", () => ({
 
 function createMockSupabase(orderData: { id: string; status: string; tenant_id: string }) {
   let currentStatus = orderData.status;
+  const updates: Array<{ status: string }> = [];
   const client = {
-    from: () => ({
-      update: (payload: { status: string }) => {
+    getStatus: () => currentStatus,
+    getUpdates: () => updates,
+    from: vi.fn(() => ({
+      update: vi.fn((payload: { status: string }) => {
         currentStatus = payload.status;
+        updates.push(payload);
         return {
           eq: function eq() {
             return {
@@ -25,6 +29,7 @@ function createMockSupabase(orderData: { id: string; status: string; tenant_id: 
                     return {
                       is: function is() {
                         return {
+                          then: (resolve: any) => resolve({ data: null, error: null }),
                           select: () => ({
                             single: async () => ({
                               data: { ...orderData, status: currentStatus },
@@ -37,6 +42,7 @@ function createMockSupabase(orderData: { id: string; status: string; tenant_id: 
                   },
                   is: function is() {
                     return {
+                      then: (resolve: any) => resolve({ data: null, error: null }),
                       select: () => ({
                         single: async () => ({
                           data: { ...orderData, status: currentStatus },
@@ -50,8 +56,8 @@ function createMockSupabase(orderData: { id: string; status: string; tenant_id: 
             };
           },
         };
-      },
-    }),
+      }),
+    })),
   };
   return client;
 }
@@ -339,6 +345,35 @@ describe("OrderLifecycleService (CR-OPS-09B)", () => {
       await expect(
         OrderLifecycleService.rollbackStatus(ctx, repo, "o1", "Intento en v2"),
       ).rejects.toBeInstanceOf(DomainError);
+    });
+
+    it("guarantees audit atomicity by reverting order status if AuditService.write fails", async () => {
+      const order = { id: "o1", status: "prepared", tenant_id: "tenant-eatclean" };
+      const repo = {
+        findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+      } as any;
+      const supa = createMockSupabase(order);
+      const ctx = mockCtx({}, supa);
+
+      vi.mocked(AuditService.write).mockRejectedValueOnce(
+        new Error("Audit log database failure"),
+      );
+
+      await expect(
+        OrderLifecycleService.rollbackStatus(
+          ctx,
+          repo,
+          "o1",
+          "Fallo intencionado de auditoría",
+        ),
+      ).rejects.toThrow("Fallo al registrar auditoría de retroceso");
+
+      // Verify status was reverted back to 'prepared'
+      expect(supa.getStatus()).toBe("prepared");
+      expect(supa.getUpdates()).toEqual([
+        { status: "in_production" },
+        { status: "prepared" },
+      ]);
     });
   });
 });

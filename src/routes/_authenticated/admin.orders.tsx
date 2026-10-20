@@ -321,6 +321,8 @@ export function OrderDetailView({
 
   const rollbackStatus = getRollbackStatus(detail.status);
   const rollbackLabel = rollbackStatus ? ROLLBACK_LABEL_ES[detail.status] : null;
+  const isV2Canonical = detail.writeContractVersion === 2;
+  const canRollback = Boolean(rollbackStatus && !isV2Canonical);
 
   const canCancel = [
     "draft",
@@ -509,14 +511,23 @@ export function OrderDetailView({
             <Button
               variant="outline"
               onClick={() => {
+                if (isV2Canonical) return;
                 setRollbackReason("");
                 setRollbackDialogOpen(true);
               }}
-              disabled={busy || editorLocked}
+              disabled={busy || editorLocked || isV2Canonical}
+              title={
+                isV2Canonical
+                  ? "Los pedidos canónicos v2 no admiten retroceso de estado operacional directo"
+                  : undefined
+              }
               className="gap-1.5 text-xs font-semibold"
             >
               <RotateCcw className="h-3.5 w-3.5" />
               {rollbackLabel}
+              {isV2Canonical && (
+                <span className="text-[10px] text-muted-foreground ml-1">(No disp. v2)</span>
+              )}
             </Button>
           )}
 
@@ -920,6 +931,7 @@ export function AdminOrdersPage() {
   // Bulk actions state (CR-OPS-UX Block 2)
   const [selectedOrderIds, setSelectedOrderIds] = useState<Set<string>>(new Set());
   const [bulkBusy, setBulkBusy] = useState(false);
+  const [bulkAdvanceOpen, setBulkAdvanceOpen] = useState(false);
   const [bulkCancelOpen, setBulkCancelOpen] = useState(false);
   const [bulkCancelReason, setBulkCancelReason] = useState("");
 
@@ -967,6 +979,60 @@ export function AdminOrdersPage() {
     [selectedOrders],
   );
 
+  const bulkAdvanceBreakdown = useMemo(() => {
+    let draftCount = 0;
+    let draftPortions = 0;
+    let confirmedCount = 0;
+    let confirmedPortions = 0;
+    let inProductionCount = 0;
+    let inProductionPortions = 0;
+    let preparedCount = 0;
+    let preparedPortions = 0;
+    let omittedCount = 0;
+    let omittedPortions = 0;
+
+    for (const o of selectedOrders) {
+      const portions = calculateTotalPortions(o.items);
+      if (o.status === "draft") {
+        draftCount++;
+        draftPortions += portions;
+      } else if (o.status === "confirmed") {
+        confirmedCount++;
+        confirmedPortions += portions;
+      } else if (o.status === "in_production") {
+        inProductionCount++;
+        inProductionPortions += portions;
+      } else if (o.status === "prepared") {
+        preparedCount++;
+        preparedPortions += portions;
+      } else {
+        // ready_for_delivery, out_for_delivery, delivered, cancelled, delivery_issue
+        omittedCount++;
+        omittedPortions += portions;
+      }
+    }
+
+    const eligibleCount =
+      draftCount + confirmedCount + inProductionCount + preparedCount;
+    const eligiblePortions =
+      draftPortions + confirmedPortions + inProductionPortions + preparedPortions;
+
+    return {
+      draftCount,
+      draftPortions,
+      confirmedCount,
+      confirmedPortions,
+      inProductionCount,
+      inProductionPortions,
+      preparedCount,
+      preparedPortions,
+      omittedCount,
+      omittedPortions,
+      eligibleCount,
+      eligiblePortions,
+    };
+  }, [selectedOrders]);
+
   const handleToggleSelectAll = () => {
     if (selectedOrderIds.size === orders.length && orders.length > 0) {
       setSelectedOrderIds(new Set());
@@ -984,7 +1050,18 @@ export function AdminOrdersPage() {
     });
   };
 
-  const handleBulkAdvanceAll = async () => {
+  const handleOpenBulkAdvanceModal = () => {
+    if (selectedOrders.length === 0) return;
+    if (bulkAdvanceBreakdown.eligibleCount === 0) {
+      toast.warning(
+        "Ninguno de los pedidos seleccionados es elegible para avance operacional (Cocina / Packing).",
+      );
+      return;
+    }
+    setBulkAdvanceOpen(true);
+  };
+
+  const executeBulkAdvanceAll = async () => {
     if (selectedOrders.length === 0) return;
     setBulkBusy(true);
     let successCount = 0;
@@ -1002,9 +1079,8 @@ export function AdminOrdersPage() {
           res = await orderApi.readyForKitchen(readyForKitchenCommand({ orderId: o.id }));
         } else if (o.status === "prepared") {
           res = await orderApi.readyForDelivery(readyForDeliveryCommand({ orderId: o.id }));
-        } else if (o.status === "ready_for_delivery" || o.status === "out_for_delivery") {
-          res = await orderApi.completeDelivery(completeDeliveryCommand({ orderId: o.id }));
         } else {
+          // Strictly exclude transitions to delivered (delivery requires physical evidence)
           omittedCount++;
           continue;
         }
@@ -1020,8 +1096,9 @@ export function AdminOrdersPage() {
     }
 
     setBulkBusy(false);
+    setBulkAdvanceOpen(false);
     toast.success(
-      `✓ ${successCount} completados · ⚠️ ${omittedCount} omitidos · ${errorCount} fallidos`,
+      `✓ ${successCount} actualizados · ⚠️ ${omittedCount} omitidos · ${errorCount} fallidos`,
     );
     setSelectedOrderIds(new Set());
     void load();
@@ -1204,7 +1281,7 @@ export function AdminOrdersPage() {
           <div className="flex items-center gap-2">
             <Button
               size="sm"
-              onClick={handleBulkAdvanceAll}
+              onClick={handleOpenBulkAdvanceModal}
               disabled={bulkBusy}
               className="gap-1.5 text-xs font-semibold shadow-xs"
             >
@@ -1339,6 +1416,112 @@ export function AdminOrdersPage() {
             >
               {bulkBusy ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               Confirmar Cancelación Masiva
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de Confirmación de Avance Masivo (Cocina / Packing) */}
+      <Dialog open={bulkAdvanceOpen} onOpenChange={setBulkAdvanceOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Confirmar Avance Masivo de Pedidos</DialogTitle>
+            <DialogDescription>
+              Se avanzarán al siguiente estado operacional los pedidos seleccionados elegibles.
+              Las transiciones a reparto final y entrega están estrictamente excluidas de las acciones masivas.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-3">
+            <div className="rounded-lg border bg-muted/40 p-3 space-y-2 text-sm">
+              <div className="flex justify-between items-center font-semibold text-foreground border-b pb-1.5">
+                <span>Resumen de selección</span>
+                <span>
+                  {selectedOrders.length} {selectedOrders.length === 1 ? "pedido" : "pedidos"} ({selectedPortions} {selectedPortions === 1 ? "ración" : "raciones"})
+                </span>
+              </div>
+
+              <div className="space-y-1.5 text-xs">
+                {bulkAdvanceBreakdown.draftCount > 0 && (
+                  <div className="flex justify-between items-center text-muted-foreground">
+                    <span className="flex items-center gap-1.5 font-medium text-foreground">
+                      <span className="h-2 w-2 rounded-full bg-blue-500" />
+                      Borrador → Confirmado
+                    </span>
+                    <span>
+                      {bulkAdvanceBreakdown.draftCount} pedidos ({bulkAdvanceBreakdown.draftPortions} rac.)
+                    </span>
+                  </div>
+                )}
+
+                {bulkAdvanceBreakdown.confirmedCount > 0 && (
+                  <div className="flex justify-between items-center text-muted-foreground">
+                    <span className="flex items-center gap-1.5 font-medium text-foreground">
+                      <span className="h-2 w-2 rounded-full bg-amber-500" />
+                      Confirmado → En Preparación (Cocina)
+                    </span>
+                    <span>
+                      {bulkAdvanceBreakdown.confirmedCount} pedidos ({bulkAdvanceBreakdown.confirmedPortions} rac.)
+                    </span>
+                  </div>
+                )}
+
+                {bulkAdvanceBreakdown.inProductionCount > 0 && (
+                  <div className="flex justify-between items-center text-muted-foreground">
+                    <span className="flex items-center gap-1.5 font-medium text-foreground">
+                      <span className="h-2 w-2 rounded-full bg-indigo-500" />
+                      En Preparación → Preparado
+                    </span>
+                    <span>
+                      {bulkAdvanceBreakdown.inProductionCount} pedidos ({bulkAdvanceBreakdown.inProductionPortions} rac.)
+                    </span>
+                  </div>
+                )}
+
+                {bulkAdvanceBreakdown.preparedCount > 0 && (
+                  <div className="flex justify-between items-center text-muted-foreground">
+                    <span className="flex items-center gap-1.5 font-medium text-foreground">
+                      <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                      Preparado → Listo para Reparto
+                    </span>
+                    <span>
+                      {bulkAdvanceBreakdown.preparedCount} pedidos ({bulkAdvanceBreakdown.preparedPortions} rac.)
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {bulkAdvanceBreakdown.omittedCount > 0 && (
+              <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-900 dark:text-amber-200">
+                <p className="font-semibold mb-0.5">
+                  ⚠️ {bulkAdvanceBreakdown.omittedCount}{" "}
+                  {bulkAdvanceBreakdown.omittedCount === 1 ? "pedido omitido" : "pedidos omitidos"}
+                </p>
+                <p>
+                  Los pedidos en reparto, entregados o cancelados no se modifican masivamente.
+                  La entrega de pedidos requiere confirmación individual con evidencia física.
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2 border-t">
+            <Button
+              variant="outline"
+              onClick={() => setBulkAdvanceOpen(false)}
+              disabled={bulkBusy}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="default"
+              onClick={executeBulkAdvanceAll}
+              disabled={bulkBusy || bulkAdvanceBreakdown.eligibleCount === 0}
+              className="gap-2 font-semibold"
+            >
+              {bulkBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+              Confirmar Avance ({bulkAdvanceBreakdown.eligibleCount} {bulkAdvanceBreakdown.eligibleCount === 1 ? "elegible" : "elegibles"})
             </Button>
           </div>
         </DialogContent>

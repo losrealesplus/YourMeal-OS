@@ -274,13 +274,29 @@ export const OrderLifecycleService = {
 
     if (error) throw error;
 
-    await AuditService.write(ctx, {
-      entityType: "order",
-      entityId: orderId,
-      action: "status_change",
-      oldData: { status: currentStatus },
-      newData: { status: targetStatus, reason: reason.trim(), isRollback: true },
-    });
+    try {
+      await AuditService.write(ctx, {
+        entityType: "order",
+        entityId: orderId,
+        action: "status_change",
+        oldData: { status: currentStatus },
+        newData: { status: targetStatus, reason: reason.trim(), isRollback: true },
+      });
+    } catch (auditError) {
+      // Revert status to guarantee state/audit consistency
+      await ctx.supabase
+        .from("orders")
+        .update({ status: currentStatus })
+        .eq("tenant_id", ctx.tenantId)
+        .eq("id", orderId)
+        .eq("status", targetStatus)
+        .is("deleted_at", null);
+
+      throw new DomainError(
+        "INVALID_STATE",
+        `Fallo al registrar auditoría de retroceso. El estado del pedido se ha revertido a '${currentStatus}'.`,
+      );
+    }
 
     return updated;
   },

@@ -301,3 +301,30 @@ describe("CR-OPS-09A / CR-OPS-UX Fase 1 · AdminOrdersPage (Root View)", () => {
     expect(html).toContain("+ Nuevo Pedido");
   });
 });
+
+describe("CR-OPS-UX Block 2 & Block 3 · Operational Evolution Hardening", () => {
+  it("renders active rollback button for corporate/v1 orders in reversible states", () => {
+    const v1Order: OperationalOrderListItem = {
+      ...sampleOrder,
+      status: "in_production",
+      writeContractVersion: 1,
+    };
+    const html = renderDetailModal(v1Order);
+
+    expect(html).toContain("Volver a Confirmado");
+    expect(html).not.toContain("(No disp. v2)");
+  });
+
+  it("renders disabled rollback button for canonical v2 orders with informative badge", () => {
+    const v2Order: OperationalOrderListItem = {
+      ...sampleOrder,
+      status: "in_production",
+      writeContractVersion: 2,
+    };
+    const html = renderDetailModal(v2Order);
+
+    expect(html).toContain("Volver a Confirmado");
+    expect(html).toContain("(No disp. v2)");
+    expect(html).toContain("disabled");
+  });
+});
