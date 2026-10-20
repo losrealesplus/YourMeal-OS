@@ -61,7 +61,11 @@ import {
   formatShortDateEs,
   getRollbackStatus,
   ROLLBACK_LABEL_ES,
+  isOperationalRollbackEnabled,
+  FEATURE_OPERATIONAL_ROLLBACK_ENABLED,
 } from "@/modules/operations";
+
+export { FEATURE_OPERATIONAL_ROLLBACK_ENABLED, isOperationalRollbackEnabled };
 
 import {
   Plus,
@@ -101,14 +105,6 @@ export const Route = createFileRoute("/_authenticated/admin/orders")({
 /**
  * Determina la etiqueta de la acción rápida según el estado operacional del pedido.
  */
-/**
- * Flag de aislamiento para retroceso de estado operacional (Marcha atrás).
- * Permanece deshabilitado (false) en producción para garantizar cero mutaciones parciales
- * hasta que se autorice y despliegue el procedimiento almacenado atómico PostgreSQL
- * (cr_order_rollback_v1) en una migración dedicada.
- */
-export const FEATURE_OPERATIONAL_ROLLBACK_ENABLED = false;
-
 export function getOperationalQuickActionLabel(status: OperationalOrderStatus): string | null {
   switch (status) {
     case "draft":

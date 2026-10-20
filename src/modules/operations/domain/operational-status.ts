@@ -84,6 +84,24 @@ export const ROLLBACK_TRANSITIONS: Partial<
   ready_for_delivery: "prepared",
 };
 
+let _featureOperationalRollbackEnabled = false;
+
+/**
+ * Flag de aislamiento para retroceso de estado operacional (Marcha atrás).
+ * Permanece deshabilitado (false) por defecto en producción para garantizar cero mutaciones parciales
+ * hasta que se autorice y despliegue el procedimiento almacenado atómico PostgreSQL
+ * (cr_order_rollback_v1) en una migración dedicada.
+ */
+export function isOperationalRollbackEnabled(): boolean {
+  return _featureOperationalRollbackEnabled;
+}
+
+export function setOperationalRollbackEnabledForTests(enabled: boolean): void {
+  _featureOperationalRollbackEnabled = enabled;
+}
+
+export const FEATURE_OPERATIONAL_ROLLBACK_ENABLED = false;
+
 export const ROLLBACK_LABEL_ES: Partial<
   Record<OperationalOrderStatus, string>
 > = {

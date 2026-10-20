@@ -9,6 +9,7 @@ import {
   readyForDeliveryCommand,
   readyForKitchenCommand,
   scheduleProductionCommand,
+  rollbackOrderStatusCommand,
 } from "./OrderCommands";
 import {
   getKitchenQueueQuery,
@@ -350,5 +351,31 @@ describe("OrderFacade process API", () => {
     );
     expect(result.ok).toBe(false);
     expect(result.errors[0]?.code).toBe("PERMISSION_DENIED");
+  });
+
+  it("strictly rejects rollbackOrderStatus at application facade layer when rollback is disabled", async () => {
+    const facade = new OrderFacade({
+      resolveContext: async () => ({
+        ok: true,
+        ctx: {
+          supabase: {} as any,
+          userId: "u1",
+          tenantId: "t1",
+          roles: ["operations_manager"],
+          capabilities: new Set(["orders.write"]),
+          localization: null,
+          ip: "127.0.0.1",
+        },
+      }),
+    });
+    const result = await facade.rollbackOrderStatus(
+      identity(),
+      rollbackOrderStatusCommand({ orderId: "o1", reason: "Test motivo" }),
+    );
+    expect(result.ok).toBe(false);
+    expect(result.errors[0]?.code).toBe("INVALID_STATE");
+    expect(result.errors[0]?.message).toContain(
+      "El retroceso de estados operacionales está desactivado hasta disponer de una operación transaccional atómica en PostgreSQL",
+    );
   });
 });

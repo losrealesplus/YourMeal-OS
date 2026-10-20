@@ -12,6 +12,7 @@ import {
   nextKitchenStatuses,
   nextDeliveryStatuses,
   ROLLBACK_TRANSITIONS,
+  isOperationalRollbackEnabled,
 } from "@/modules/operations";
 import type { OrderRepository } from "@/modules/orders/infrastructure/order-repository";
 import { requireCapability } from "@/permissions";
@@ -238,6 +239,12 @@ export const OrderLifecycleService = {
     orderId: string,
     reason: string,
   ) {
+    if (!isOperationalRollbackEnabled()) {
+      throw new DomainError(
+        "INVALID_STATE",
+        "El retroceso de estados operacionales está desactivado hasta disponer de una operación transaccional atómica en PostgreSQL.",
+      );
+    }
     requireCapability(ctx.roles, "orders.write");
     if (!reason?.trim()) {
       throw new DomainError("INVALID_STATE", "Rollback reason is required");

@@ -11,7 +11,7 @@
 import { OrderIntakeService } from "@/modules/order-intake";
 import { OrderService } from "@/modules/orders";
 import { OrderLifecycleService } from "@/modules/orders/application/order-lifecycle-service";
-import { OperationsService } from "@/modules/operations";
+import { OperationsService, isOperationalRollbackEnabled } from "@/modules/operations";
 import type { ServiceContext } from "@/services/types";
 import type { OrderCommandResult, OrderResult, OrderStatus, OrderSummary } from "./OrderContext";
 import type {
@@ -389,6 +389,19 @@ export class OrderFacade {
     identity: OrderRuntimeIdentity,
     command: RollbackOrderStatusCommand,
   ): Promise<OrderCommandResult> {
+    if (!isOperationalRollbackEnabled()) {
+      return failCommand(
+        [
+          {
+            code: "INVALID_STATE",
+            message:
+              "El retroceso de estados operacionales está desactivado hasta disponer de una operación transaccional atómica en PostgreSQL.",
+            recoverable: false,
+          },
+        ],
+        command.orderId,
+      );
+    }
     const resolved = await this.deps.resolveContext(identity);
     if (!resolved.ok) return failCommand([resolved.error], command.orderId);
     const { createOrderRepository } =
