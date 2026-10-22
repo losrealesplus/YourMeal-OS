@@ -95,6 +95,59 @@ function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
 
+export async function executeBulkAdvanceOrders(
+  eligibleOrders: OperationalOrderListItem[],
+  orderApi: Pick<
+    ReturnType<typeof useOrder>,
+    "confirmOrder" | "scheduleProduction" | "readyForKitchen" | "readyForDelivery"
+  >,
+): Promise<BulkExecutionResult> {
+  const result: BulkExecutionResult = {
+    succeeded: [],
+    omitted: [],
+    failed: [],
+  };
+
+  for (const o of eligibleOrders) {
+    try {
+      let res;
+      let target: OperationalStatus;
+      if (o.status === "draft") {
+        target = "confirmed";
+        res = await orderApi.confirmOrder(confirmOrderCommand({ orderId: o.id }));
+      } else if (o.status === "confirmed") {
+        target = "in_production";
+        res = await orderApi.scheduleProduction(scheduleProductionCommand({ orderId: o.id }));
+      } else if (o.status === "in_production") {
+        target = "prepared";
+        res = await orderApi.readyForKitchen(readyForKitchenCommand({ orderId: o.id }));
+      } else if (o.status === "prepared") {
+        target = "ready_for_delivery";
+        res = await orderApi.readyForDelivery(readyForDeliveryCommand({ orderId: o.id }));
+      } else {
+        result.omitted.push({ orderId: o.id, reason: `Estado ${o.status} omitido` });
+        continue;
+      }
+
+      if (res.ok) {
+        result.succeeded.push({ orderId: o.id, from: o.status, to: target });
+      } else {
+        result.failed.push({
+          orderId: o.id,
+          error: res.errors[0]?.message ?? "Error desconocido al avanzar",
+        });
+      }
+    } catch (err: any) {
+      result.failed.push({
+        orderId: o.id,
+        error: err.message ?? "Error inesperado",
+      });
+    }
+  }
+
+  return result;
+}
+
 export function KitchenWorkspacePage() {
   const { user, tenantId, roles } = useAuth();
   const { can } = useCan();
@@ -222,63 +275,24 @@ export function KitchenWorkspacePage() {
     eligibleOrders: OperationalOrderListItem[],
   ): Promise<BulkExecutionResult> => {
     setBulkBusy(true);
-    const result: BulkExecutionResult = {
-      succeeded: [],
-      omitted: [],
-      failed: [],
-    };
-
-    for (const o of eligibleOrders) {
-      try {
-        let res;
-        let target: OperationalStatus;
-        if (o.status === "draft") {
-          target = "confirmed";
-          res = await orderApi.confirmOrder(confirmOrderCommand({ orderId: o.id }));
-        } else if (o.status === "confirmed") {
-          target = "in_production";
-          res = await orderApi.readyForKitchen(readyForKitchenCommand({ orderId: o.id }));
-        } else if (o.status === "in_production") {
-          target = "prepared";
-          res = await orderApi.scheduleProduction(scheduleProductionCommand({ orderId: o.id }));
-        } else if (o.status === "prepared") {
-          target = "ready_for_delivery";
-          res = await orderApi.readyForDelivery(readyForDeliveryCommand({ orderId: o.id }));
-        } else {
-          result.omitted.push({ orderId: o.id, reason: `Estado ${o.status} omitido` });
-          continue;
-        }
-
-        if (res.ok) {
-          result.succeeded.push({ orderId: o.id, from: o.status, to: target });
-        } else {
-          result.failed.push({
-            orderId: o.id,
-            error: res.errors[0]?.message ?? "Error desconocido al avanzar",
-          });
-        }
-      } catch (err: any) {
-        result.failed.push({
-          orderId: o.id,
-          error: err.message ?? "Error inesperado",
-        });
+    try {
+      const result = await executeBulkAdvanceOrders(eligibleOrders, orderApi);
+      clearSelection();
+      await load();
+      if (result.succeeded.length > 0) {
+        toast.success(
+          `Se avanzaron ${result.succeeded.length} pedidos correctamente.`,
+        );
       }
+      if (result.failed.length > 0) {
+        toast.error(
+          `${result.failed.length} pedidos fallaron al avanzar. Revisa el resumen.`,
+        );
+      }
+      return result;
+    } finally {
+      setBulkBusy(false);
     }
-
-    setBulkBusy(false);
-    clearSelection();
-    await load();
-    if (result.succeeded.length > 0) {
-      toast.success(
-        `Se avanzaron ${result.succeeded.length} pedidos correctamente.`,
-      );
-    }
-    if (result.failed.length > 0) {
-      toast.error(
-        `${result.failed.length} pedidos fallaron al avanzar. Revisa el resumen.`,
-      );
-    }
-    return result;
   };
 
   const executeBulkRollback = async (
@@ -571,7 +585,7 @@ export function KitchenWorkspacePage() {
                           variant="outline"
                           className="text-[10px] px-1.5 py-0 text-amber-700 dark:text-amber-300 border-amber-300"
                         >
-                          Multijornada
+                          {o.temporalScopeKnown === false ? "Alcance no confirmado" : "Multijornada"}
                         </Badge>
                       )}
                     </div>
@@ -628,12 +642,17 @@ export function KitchenWorkspacePage() {
                 >
                   <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-semibold">Pedido multijornada:</span> Contiene entregas en varias fechas (
-                    {(detail.allDeliveryDates && detail.allDeliveryDates.length > 0
-                      ? detail.allDeliveryDates
-                      : detail.deliveryDates
-                    ).join(", ")}
-                    ). Cambiar su estado afectará al contrato del pedido completo.
+                    <span className="font-semibold">
+                      {detail.temporalScopeKnown === false
+                        ? "Alcance no confirmado:"
+                        : "Pedido multijornada:"}
+                    </span>{" "}
+                    {detail.temporalScopeKnown === false
+                      ? "No se pudo confirmar el alcance total de fechas de este pedido. Por seguridad, cualquier cambio de estado debe realizarse con precaución."
+                      : `Contiene entregas en varias fechas (${(detail.allDeliveryDates && detail.allDeliveryDates.length > 0
+                          ? detail.allDeliveryDates
+                          : detail.deliveryDates
+                        ).join(", ")}). Cambiar su estado afectará al contrato del pedido completo.`}
                   </div>
                 </div>
               )}

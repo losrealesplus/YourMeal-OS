@@ -42,6 +42,9 @@ export function isOrderMultiDay(
   order: OperationalOrderListItem,
   currentOperatingDate?: string | null,
 ): boolean {
+  if (order.temporalScopeKnown === false) {
+    return true; // Excluir por seguridad si el alcance temporal no se pudo verificar fehacientemente
+  }
   if (order.isMultiDay) return true;
   const dates =
     order.allDeliveryDates && order.allDeliveryDates.length > 0
@@ -314,7 +317,10 @@ export function BulkAdvanceModal({
       if (isMulti && !includeMultiDay) {
         omitted.push({
           order: o,
-          reason: "Omitido por seguridad (multijornada: contiene raciones en otras fechas)",
+          reason:
+            o.temporalScopeKnown === false
+              ? "Omitido por seguridad (alcance temporal no determinable)"
+              : "Omitido por seguridad (multijornada: contiene raciones en otras fechas)",
         });
         continue;
       }
@@ -668,7 +674,10 @@ export function BulkRollbackModal({
       if (isMulti && !includeMultiDay) {
         omitted.push({
           order: o,
-          reason: "Omitido por seguridad (multijornada: contiene raciones en otras fechas)",
+          reason:
+            o.temporalScopeKnown === false
+              ? "Omitido por seguridad (alcance temporal no determinable)"
+              : "Omitido por seguridad (multijornada: contiene raciones en otras fechas)",
         });
         continue;
       }

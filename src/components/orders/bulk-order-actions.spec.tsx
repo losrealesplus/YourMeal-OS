@@ -376,6 +376,13 @@ describe("Bulk Order Actions — UI Components", () => {
         allDeliveryDates: ["2026-10-23"],
       })[0];
       expect(isOrderMultiDay(differentDateOrder, "2026-10-22")).toBe(true);
+
+      const unknownScopeOrder = createSyntheticOrders(1, {
+        deliveryDates: ["2026-10-22"],
+        allDeliveryDates: ["2026-10-22"],
+        temporalScopeKnown: false,
+      })[0];
+      expect(isOrderMultiDay(unknownScopeOrder, "2026-10-22")).toBe(true);
     });
 
     it("BulkAdvanceModal validates scope when all orders are single-day for operating date", () => {

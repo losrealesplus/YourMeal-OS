@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { renderToString } from "react-dom/server";
 import React from "react";
-import { KitchenWorkspacePage } from "./admin.kitchen";
+import { KitchenWorkspacePage, executeBulkAdvanceOrders } from "./admin.kitchen";
 import type { OperationalOrderListItem } from "@/modules/operations";
 import {
   BulkActionBar,
@@ -314,5 +314,169 @@ describe("Cocina Workspace — Bulk Actions Integration & Scale", () => {
     expect(advanceHtml).toContain("2026-10-23");
     expect(advanceHtml).toContain("Incluir pedidos multijornada");
     expect(advanceHtml).toContain("Omitido por seguridad");
+  });
+
+  describe("executeBulkAdvanceOrders — Functional OrderFacade Command Mapping", () => {
+    it("invokes exact correct OrderFacade commands for each operational transition", async () => {
+      const mockOrderApi = {
+        confirmOrder: vi.fn().mockResolvedValue({ ok: true }),
+        scheduleProduction: vi.fn().mockResolvedValue({ ok: true }),
+        readyForKitchen: vi.fn().mockResolvedValue({ ok: true }),
+        readyForDelivery: vi.fn().mockResolvedValue({ ok: true }),
+      };
+
+      const orders: OperationalOrderListItem[] = [
+        ...createSyntheticOrders(1, { id: "ord-draft", status: "draft" }),
+        ...createSyntheticOrders(1, { id: "ord-confirmed", status: "confirmed" }),
+        ...createSyntheticOrders(1, { id: "ord-production", status: "in_production" }),
+        ...createSyntheticOrders(1, { id: "ord-prepared", status: "prepared" }),
+        ...createSyntheticOrders(1, { id: "ord-delivered", status: "delivered" }),
+      ];
+
+      const result = await executeBulkAdvanceOrders(orders, mockOrderApi as any);
+
+      // 1. draft → confirmed (must call confirmOrder)
+      expect(mockOrderApi.confirmOrder).toHaveBeenCalledTimes(1);
+      expect(mockOrderApi.confirmOrder).toHaveBeenCalledWith(
+        expect.objectContaining({ orderId: "ord-draft", type: "ConfirmOrder" }),
+      );
+
+      // 2. confirmed → in_production (MUST call scheduleProduction, NOT readyForKitchen)
+      expect(mockOrderApi.scheduleProduction).toHaveBeenCalledTimes(1);
+      expect(mockOrderApi.scheduleProduction).toHaveBeenCalledWith(
+        expect.objectContaining({ orderId: "ord-confirmed", type: "ScheduleProduction" }),
+      );
+
+      // 3. in_production → prepared (MUST call readyForKitchen, NOT scheduleProduction)
+      expect(mockOrderApi.readyForKitchen).toHaveBeenCalledTimes(1);
+      expect(mockOrderApi.readyForKitchen).toHaveBeenCalledWith(
+        expect.objectContaining({ orderId: "ord-production", type: "ReadyForKitchen" }),
+      );
+
+      // 4. prepared → ready_for_delivery (must call readyForDelivery)
+      expect(mockOrderApi.readyForDelivery).toHaveBeenCalledTimes(1);
+      expect(mockOrderApi.readyForDelivery).toHaveBeenCalledWith(
+        expect.objectContaining({ orderId: "ord-prepared", type: "ReadyForDelivery" }),
+      );
+
+      // 5. Result verification
+      expect(result.succeeded).toEqual([
+        { orderId: "ord-draft", from: "draft", to: "confirmed" },
+        { orderId: "ord-confirmed", from: "confirmed", to: "in_production" },
+        { orderId: "ord-production", from: "in_production", to: "prepared" },
+        { orderId: "ord-prepared", from: "prepared", to: "ready_for_delivery" },
+      ]);
+      expect(result.omitted).toEqual([
+        { orderId: "ord-delivered", reason: "Estado delivered omitido" },
+      ]);
+      expect(result.failed).toEqual([]);
+    });
+
+    it("captures execution errors from OrderFacade gracefully", async () => {
+      const mockOrderApi = {
+        confirmOrder: vi.fn().mockResolvedValue({
+          ok: false,
+          errors: [{ message: "Fallo de validación de corte horario" }],
+        }),
+        scheduleProduction: vi.fn(),
+        readyForKitchen: vi.fn(),
+        readyForDelivery: vi.fn(),
+      };
+
+      const orders: OperationalOrderListItem[] = createSyntheticOrders(1, {
+        id: "ord-fail",
+        status: "draft",
+      });
+
+      const result = await executeBulkAdvanceOrders(orders, mockOrderApi as any);
+
+      expect(result.succeeded).toEqual([]);
+      expect(result.failed).toEqual([
+        { orderId: "ord-fail", error: "Fallo de validación de corte horario" },
+      ]);
+    });
+  });
+
+  describe("Temporal Scope Protection — 1, 2, and 5 delivery dates without delivery_services", () => {
+    it("handles 1-date order without delivery_services as single-day", () => {
+      const order1Date = createSyntheticOrders(1, {
+        deliveryDates: ["2026-10-22"],
+        allDeliveryDates: ["2026-10-22"],
+        isMultiDay: false,
+        temporalScopeKnown: true,
+      })[0];
+
+      expect(isOrderMultiDay(order1Date, "2026-10-22")).toBe(false);
+    });
+
+    it("handles 2-date order without delivery_services as multi-day", () => {
+      const order2Dates = createSyntheticOrders(1, {
+        deliveryDates: ["2026-10-22"],
+        allDeliveryDates: ["2026-10-22", "2026-10-23"],
+        isMultiDay: true,
+        temporalScopeKnown: true,
+      })[0];
+
+      expect(isOrderMultiDay(order2Dates, "2026-10-22")).toBe(true);
+    });
+
+    it("handles 5-date order without delivery_services as multi-day and warns in modal", () => {
+      const order5Dates = createSyntheticOrders(1, {
+        deliveryDates: ["2026-10-22"],
+        allDeliveryDates: [
+          "2026-10-19",
+          "2026-10-20",
+          "2026-10-21",
+          "2026-10-22",
+          "2026-10-23",
+        ],
+        isMultiDay: true,
+        temporalScopeKnown: true,
+        status: "confirmed",
+      })[0];
+
+      expect(isOrderMultiDay(order5Dates, "2026-10-22")).toBe(true);
+
+      const html = renderToString(
+        <BulkAdvanceModal
+          open={true}
+          onOpenChange={vi.fn()}
+          selectedOrders={[order5Dates]}
+          onExecute={vi.fn()}
+          busy={false}
+          currentOperatingDate="2026-10-22"
+        />,
+      );
+
+      expect(html).toContain("Atención: 1 pedido seleccionado es multijornada");
+      expect(html).toContain("2026-10-19");
+      expect(html).toContain("2026-10-23");
+      expect(html).toContain("Omitido por seguridad (multijornada: contiene raciones en otras fechas)");
+    });
+
+    it("strictly excludes order when temporal scope could not be determined", () => {
+      const unknownScopeOrder = createSyntheticOrders(1, {
+        deliveryDates: ["2026-10-22"],
+        allDeliveryDates: ["2026-10-22"],
+        isMultiDay: false,
+        temporalScopeKnown: false, // Invariant: scope could not be determined
+        status: "confirmed",
+      })[0];
+
+      expect(isOrderMultiDay(unknownScopeOrder, "2026-10-22")).toBe(true);
+
+      const html = renderToString(
+        <BulkAdvanceModal
+          open={true}
+          onOpenChange={vi.fn()}
+          selectedOrders={[unknownScopeOrder]}
+          onExecute={vi.fn()}
+          busy={false}
+          currentOperatingDate="2026-10-22"
+        />,
+      );
+
+      expect(html).toContain("Omitido por seguridad (alcance temporal no determinable)");
+    });
   });
 });

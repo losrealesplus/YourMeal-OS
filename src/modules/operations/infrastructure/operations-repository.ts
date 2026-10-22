@@ -56,10 +56,12 @@ export type OperationalOrderListItem = {
   } | null;
   /** Distinct day_dates from items (YYYY-MM-DD), sorted */
   deliveryDates: string[];
-  /** Distinct day_dates across entire order contract (from delivery_services and items) */
+  /** Distinct day_dates across entire order contract (from all order items and delivery_services) */
   allDeliveryDates?: string[];
   /** True if order contains items across multiple delivery dates */
   isMultiDay?: boolean;
+  /** False if temporal scope could not be determined with certainty */
+  temporalScopeKnown?: boolean;
   items: Array<{
     id: string;
     dishId: string | null;
@@ -86,7 +88,10 @@ export type OperationalOrderFilters = {
   deliveryGroupId?: string | null;
 };
 
-export function mapOperationalOrderRow(row: Record<string, any>): OperationalOrderListItem {
+export function mapOperationalOrderRow(
+  row: Record<string, any>,
+  extra?: { allItemDates?: string[]; temporalScopeKnown?: boolean },
+): OperationalOrderListItem {
   const customer = row.customers ?? null;
   const company = row.companies ?? null;
   const site = row.company_locations ?? null;
@@ -100,8 +105,10 @@ export function mapOperationalOrderRow(row: Record<string, any>): OperationalOrd
   const dsDates = ((row.delivery_services ?? []) as Record<string, any>[])
     .map((ds) => String(ds.delivery_date))
     .filter(Boolean);
-  const allDeliveryDates = [...new Set([...dsDates, ...deliveryDates])].sort();
+  const extraDates = extra?.allItemDates ?? [];
+  const allDeliveryDates = [...new Set([...extraDates, ...dsDates, ...deliveryDates])].sort();
   const isMultiDay = allDeliveryDates.length > 1;
+  const temporalScopeKnown = extra?.temporalScopeKnown ?? true;
   return {
     ...(row.write_contract_version === 2 ? { writeContractVersion: 2 as const } : {}),
     revision: Number(row.revision ?? 0),
@@ -139,6 +146,7 @@ export function mapOperationalOrderRow(row: Record<string, any>): OperationalOrd
     deliveryDates,
     allDeliveryDates,
     isMultiDay,
+    temporalScopeKnown,
     items: items.map((it) => {
       const line = readOrderItem({ ...it, id: it.id, dish_id: it.dish_id }, it.dishes);
       return {
@@ -240,7 +248,54 @@ export function createOperationsRepository(client: Client, tenantId: string) {
       const { data, error } = await q;
       if (error) throw error;
 
-      return ((data ?? []) as Record<string, any>[]).map(mapOperationalOrderRow);
+      const rows = ((data ?? []) as Record<string, any>[]);
+      if (rows.length === 0) return [];
+
+      // When filtering by a specific day, order_items embedded in rows contains ONLY that day's items.
+      // To reliably detect multi-day orders even for legacy/imported orders WITHOUT complete delivery_services,
+      // we query all distinct active day_dates for these orders directly from order_items.
+      if (day) {
+        const orderIds = rows.map((r) => r.id);
+        const { data: itemRows, error: itemsError } = await db
+          .from("order_items")
+          .select("order_id, day_date")
+          .in("order_id", orderIds)
+          .is("deleted_at", null);
+
+        if (!itemsError && Array.isArray(itemRows)) {
+          const datesByOrder = new Map<string, Set<string>>();
+          for (const item of itemRows) {
+            const oid = String(item.order_id);
+            const d = String(item.day_date || "").trim();
+            if (!d) continue;
+            let set = datesByOrder.get(oid);
+            if (!set) {
+              set = new Set<string>();
+              datesByOrder.set(oid, set);
+            }
+            set.add(d);
+          }
+          return rows.map((row) => {
+            const allItemDates = datesByOrder.has(row.id)
+              ? Array.from(datesByOrder.get(row.id)!)
+              : [];
+            return mapOperationalOrderRow(row, {
+              allItemDates,
+              temporalScopeKnown: true,
+            });
+          });
+        } else {
+          // If query failed to retrieve item dates, mark temporalScopeKnown = false for safety
+          return rows.map((row) =>
+            mapOperationalOrderRow(row, {
+              allItemDates: [],
+              temporalScopeKnown: false,
+            }),
+          );
+        }
+      }
+
+      return rows.map((row) => mapOperationalOrderRow(row));
     },
 
     async countByStatuses(
