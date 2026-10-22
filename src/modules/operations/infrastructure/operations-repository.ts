@@ -56,6 +56,10 @@ export type OperationalOrderListItem = {
   } | null;
   /** Distinct day_dates from items (YYYY-MM-DD), sorted */
   deliveryDates: string[];
+  /** Distinct day_dates across entire order contract (from delivery_services and items) */
+  allDeliveryDates?: string[];
+  /** True if order contains items across multiple delivery dates */
+  isMultiDay?: boolean;
   items: Array<{
     id: string;
     dishId: string | null;
@@ -93,6 +97,11 @@ export function mapOperationalOrderRow(row: Record<string, any>): OperationalOrd
     (item) => !item.deleted_at,
   );
   const deliveryDates = [...new Set(items.map((it) => String(it.day_date)).filter(Boolean))].sort();
+  const dsDates = ((row.delivery_services ?? []) as Record<string, any>[])
+    .map((ds) => String(ds.delivery_date))
+    .filter(Boolean);
+  const allDeliveryDates = [...new Set([...dsDates, ...deliveryDates])].sort();
+  const isMultiDay = allDeliveryDates.length > 1;
   return {
     ...(row.write_contract_version === 2 ? { writeContractVersion: 2 as const } : {}),
     revision: Number(row.revision ?? 0),
@@ -128,6 +137,8 @@ export function mapOperationalOrderRow(row: Record<string, any>): OperationalOrd
         }
       : null,
     deliveryDates,
+    allDeliveryDates,
+    isMultiDay,
     items: items.map((it) => {
       const line = readOrderItem({ ...it, id: it.id, dish_id: it.dish_id }, it.dishes);
       return {
@@ -153,7 +164,8 @@ const ORDER_SELECT = `
   company_departments ( id, name ),
   delivery_groups ( id, name ),
   customer_addresses ( id, label, street, city, zip ),
-  order_items ( *, dishes ( id, name ) )
+  order_items ( *, dishes ( id, name ) ),
+  delivery_services ( delivery_date )
 `;
 
 function mapDeliveryServiceRow(row: Record<string, any>): DeliveryServiceModel {

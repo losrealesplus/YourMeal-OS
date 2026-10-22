@@ -26,10 +26,15 @@ BEGIN
     RAISE EXCEPTION 'not authenticated';
   END IF;
 
-  -- 2. Authorization check (staff role or saas admin for this tenant)
+  -- 2. Strict operational authorization check:
+  -- Only operational roles with order modification and kitchen execution capabilities are authorized.
+  -- Excludes non-operational staff roles (accounting, purchasing, inventory, support, driver, employee, customer).
   IF NOT (
-    public.has_any_staff_role(v_actor_id, p_tenant_id)
-    OR public.is_saas_admin(v_actor_id)
+    public.is_saas_admin(v_actor_id)
+    OR public.has_role(v_actor_id, p_tenant_id, 'company_admin'::public.app_role)
+    OR public.has_role(v_actor_id, p_tenant_id, 'operations_manager'::public.app_role)
+    OR public.has_role(v_actor_id, p_tenant_id, 'kitchen'::public.app_role)
+    OR public.has_role(v_actor_id, p_tenant_id, 'production'::public.app_role)
   ) THEN
     RAISE EXCEPTION 'not allowed';
   END IF;

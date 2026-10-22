@@ -7,6 +7,7 @@ import {
   toggleOrderIdInSet,
   toggleAllOrdersInSet,
   filterVisibleOrderIds,
+  isOrderMultiDay,
   BulkActionBar,
   BulkAdvanceModal,
   BulkRollbackModal,
@@ -32,6 +33,18 @@ vi.mock("@/components/ui/dialog", () => ({
   ),
   DialogFooter: ({ children, className }: any) => (
     <footer className={className}>{children}</footer>
+  ),
+}));
+
+vi.mock("@/components/ui/checkbox", () => ({
+  Checkbox: ({ checked, onCheckedChange, id, ...props }: any) => (
+    <input
+      type="checkbox"
+      id={id}
+      checked={!!checked}
+      onChange={(e) => onCheckedChange?.(e.target.checked)}
+      {...props}
+    />
   ),
 }));
 
@@ -335,5 +348,130 @@ describe("Bulk Order Actions — UI Components", () => {
 
     expect(html).toContain("Avanzar");
     expect(html).toContain("pedidos elegibles");
+  });
+
+  describe("Temporal Scope Protection (Multi-Day Orders)", () => {
+    it("isOrderMultiDay correctly identifies multi-day orders vs single-day orders", () => {
+      const singleDayOrder = createSyntheticOrders(1, {
+        deliveryDates: ["2026-10-22"],
+        allDeliveryDates: ["2026-10-22"],
+        isMultiDay: false,
+      })[0];
+      expect(isOrderMultiDay(singleDayOrder, "2026-10-22")).toBe(false);
+
+      const flagMultiDayOrder = createSyntheticOrders(1, {
+        deliveryDates: ["2026-10-22"],
+        isMultiDay: true,
+      })[0];
+      expect(isOrderMultiDay(flagMultiDayOrder, "2026-10-22")).toBe(true);
+
+      const multiDateOrder = createSyntheticOrders(1, {
+        deliveryDates: ["2026-10-22", "2026-10-24"],
+        allDeliveryDates: ["2026-10-22", "2026-10-24"],
+      })[0];
+      expect(isOrderMultiDay(multiDateOrder, "2026-10-22")).toBe(true);
+
+      const differentDateOrder = createSyntheticOrders(1, {
+        deliveryDates: ["2026-10-23"],
+        allDeliveryDates: ["2026-10-23"],
+      })[0];
+      expect(isOrderMultiDay(differentDateOrder, "2026-10-22")).toBe(true);
+    });
+
+    it("BulkAdvanceModal validates scope when all orders are single-day for operating date", () => {
+      const orders = createSyntheticOrders(3, {
+        deliveryDates: ["2026-10-22"],
+        allDeliveryDates: ["2026-10-22"],
+        isMultiDay: false,
+        status: "confirmed",
+      });
+
+      const html = renderToString(
+        <BulkAdvanceModal
+          open={true}
+          onOpenChange={vi.fn()}
+          selectedOrders={orders}
+          onExecute={vi.fn()}
+          busy={false}
+          currentOperatingDate="2026-10-22"
+        />,
+      );
+
+      expect(html).toContain("Alcance validado");
+      expect(html).toContain("2026-10-22");
+      expect(html).not.toContain("Atención: ");
+      expect(html).toContain("Avanzar 3 pedidos elegibles");
+    });
+
+    it("BulkAdvanceModal warns and omits multi-day orders by default for safety", () => {
+      const orders = [
+        ...createSyntheticOrders(2, {
+          deliveryDates: ["2026-10-22"],
+          allDeliveryDates: ["2026-10-22"],
+          isMultiDay: false,
+          status: "confirmed",
+        }),
+        ...createSyntheticOrders(1, {
+          deliveryDates: ["2026-10-22", "2026-10-23"],
+          allDeliveryDates: ["2026-10-22", "2026-10-23"],
+          isMultiDay: true,
+          status: "confirmed",
+        }),
+      ];
+
+      const html = renderToString(
+        <BulkAdvanceModal
+          open={true}
+          onOpenChange={vi.fn()}
+          selectedOrders={orders}
+          onExecute={vi.fn()}
+          busy={false}
+          currentOperatingDate="2026-10-22"
+        />,
+      );
+
+      expect(html).toContain("Atención: 1 pedido seleccionado es multijornada");
+      expect(html).toContain("2026-10-23");
+      expect(html).toContain("Incluir pedidos multijornada");
+      expect(html).toContain("Omitido por seguridad (multijornada: contiene raciones en otras fechas)");
+      expect(html).toContain("Avanzar 2 pedidos elegibles");
+    });
+
+    it("BulkRollbackModal warns and omits multi-day orders by default", () => {
+      const orders = [
+        ...createSyntheticOrders(2, {
+          deliveryDates: ["2026-10-22"],
+          allDeliveryDates: ["2026-10-22"],
+          isMultiDay: false,
+          status: "prepared",
+          writeContractVersion: 1,
+        }),
+        ...createSyntheticOrders(1, {
+          deliveryDates: ["2026-10-22", "2026-10-25"],
+          allDeliveryDates: ["2026-10-22", "2026-10-25"],
+          isMultiDay: true,
+          status: "prepared",
+          writeContractVersion: 1,
+        }),
+      ];
+
+      const html = renderToString(
+        <BulkRollbackModal
+          open={true}
+          onOpenChange={vi.fn()}
+          selectedOrders={orders}
+          onExecute={vi.fn()}
+          busy={false}
+          rollbackEnabled={true}
+          currentOperatingDate="2026-10-22"
+        />,
+      );
+
+      expect(html).toContain("Atención: 1 pedido seleccionado es multijornada");
+      expect(html).toContain("2026-10-25");
+      expect(html).toContain("Incluir pedidos multijornada");
+      expect(html).toContain("Omitido por seguridad (multijornada: contiene raciones en otras fechas)");
+      expect(html).toContain("Confirmar Retroceso (2)");
+    });
   });
 });

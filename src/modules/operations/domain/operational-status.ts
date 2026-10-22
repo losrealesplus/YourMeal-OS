@@ -110,25 +110,68 @@ function isTestEnvironment(): boolean {
   return false;
 }
 
+function readBooleanFlag(value: unknown): boolean | undefined {
+  if (value === undefined || value === null || value === "") return undefined;
+  const s = String(value).trim().toLowerCase();
+  if (s === "true" || s === "1" || s === "yes" || s === "on") return true;
+  if (s === "false" || s === "0" || s === "no" || s === "off") return false;
+  return undefined;
+}
+
+function getRollbackEnvFlag(): boolean | undefined {
+  try {
+    if (typeof process !== "undefined" && process.env) {
+      const fromProcess = readBooleanFlag(process.env.VITE_OPERATIONAL_ROLLBACK_ENABLED);
+      if (fromProcess !== undefined) return fromProcess;
+    }
+  } catch {}
+  try {
+    const fromVite = readBooleanFlag(
+      (import.meta.env as Record<string, unknown>)?.VITE_OPERATIONAL_ROLLBACK_ENABLED,
+    );
+    if (fromVite !== undefined) return fromVite;
+  } catch {}
+  return undefined;
+}
+
 let _featureOperationalRollbackEnabled = false;
 
 /**
  * Flag de aislamiento para retroceso de estado operacional (Marcha atrás).
- * Permanece deshabilitado (false) por defecto en producción para garantizar cero mutaciones parciales
+ *
+ * Permanece HARD_DISABLED (false) por defecto en todos los entornos para garantizar cero mutaciones
  * hasta que se autorice y despliegue el procedimiento almacenado atómico PostgreSQL
  * (cr_order_rollback_v1) en una migración dedicada.
+ *
+ * MECANISMO DE ACTIVACIÓN CONTROLADA POST-MIGRACIÓN:
+ * Para activar el retroceso en producción o staging de forma explícita y controlada tras el
+ * despliegue de la migración SQL 20261022081500_cr_order_rollback_v1_rpc.sql, se debe configurar:
+ *   VITE_OPERATIONAL_ROLLBACK_ENABLED="true"
+ * en las variables de entorno del Worker / hosting.
+ *
+ * En suites de prueba automatizadas (Vitest / NODE_ENV=test), también puede activarse
+ * programáticamente mediante setOperationalRollbackEnabledForTests(true).
  */
 export function isOperationalRollbackEnabled(): boolean {
-  if (!isTestEnvironment()) {
-    return false;
+  // 1. Prioridad: Flag de entorno explícito (mecanismo formal para activación post-migración)
+  const envFlag = getRollbackEnvFlag();
+  if (envFlag !== undefined) {
+    return envFlag;
   }
-  return _featureOperationalRollbackEnabled;
+
+  // 2. Entorno de pruebas: permite control local de tests
+  if (isTestEnvironment()) {
+    return _featureOperationalRollbackEnabled;
+  }
+
+  // 3. Fallback estricto de seguridad: HARD_DISABLED
+  return false;
 }
 
 /**
  * Permite alternar el flag exclusivamente en entornos de prueba automatizados (Vitest / NODE_ENV=test).
  * En entornos de producción o fuera de test, falla de forma estricta (fail-closed) para garantizar
- * que ninguna invocación en tiempo de ejecución productivo pueda activar el retroceso.
+ * que ninguna invocación en tiempo de ejecución productivo pueda activar el retroceso sin la variable de entorno.
  */
 export function setOperationalRollbackEnabledForTests(enabled: boolean): void {
   if (!isTestEnvironment()) {

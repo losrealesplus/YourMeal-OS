@@ -8,6 +8,7 @@ import {
   BulkAdvanceModal,
   BulkRollbackModal,
   calculateOrderPortions,
+  isOrderMultiDay,
 } from "@/components/orders/bulk-order-actions";
 
 // Mock Radix dialog for SSR test rendering
@@ -286,5 +287,32 @@ describe("Cocina Workspace — Bulk Actions Integration & Scale", () => {
     expect(rollbackHtml).toContain("Pedido canónico v2");
     expect(rollbackHtml).toContain("pedidos elegibles");
     expect(rollbackHtml).toContain("pedidos omitidos (no reversibles)");
+  });
+
+  it("handles multi-day orders safely with currentOperatingDate in Kitchen workspace", () => {
+    const multiDayOrder = createSyntheticOrders(1, {
+      status: "in_production",
+      deliveryDates: ["2026-10-22", "2026-10-23"],
+      allDeliveryDates: ["2026-10-22", "2026-10-23"],
+      isMultiDay: true,
+    })[0];
+
+    expect(isOrderMultiDay(multiDayOrder, "2026-10-22")).toBe(true);
+
+    const advanceHtml = renderToString(
+      <BulkAdvanceModal
+        open={true}
+        onOpenChange={vi.fn()}
+        selectedOrders={[multiDayOrder]}
+        onExecute={vi.fn()}
+        busy={false}
+        currentOperatingDate="2026-10-22"
+      />,
+    );
+
+    expect(advanceHtml).toContain("Atención: 1 pedido seleccionado es multijornada");
+    expect(advanceHtml).toContain("2026-10-23");
+    expect(advanceHtml).toContain("Incluir pedidos multijornada");
+    expect(advanceHtml).toContain("Omitido por seguridad");
   });
 });

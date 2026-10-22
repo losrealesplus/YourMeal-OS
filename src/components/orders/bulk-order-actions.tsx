@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -32,6 +33,25 @@ import {
 export function calculateOrderPortions(order: OperationalOrderListItem): number {
   if (!order.items || !Array.isArray(order.items)) return 0;
   return order.items.reduce((sum, item) => sum + (Number(item.qty) || 0), 0);
+}
+
+/**
+ * Determina si un pedido es multijornada o incluye fechas distintas a la jornada de operación actual.
+ */
+export function isOrderMultiDay(
+  order: OperationalOrderListItem,
+  currentOperatingDate?: string | null,
+): boolean {
+  if (order.isMultiDay) return true;
+  const dates =
+    order.allDeliveryDates && order.allDeliveryDates.length > 0
+      ? order.allDeliveryDates
+      : order.deliveryDates ?? [];
+  if (dates.length > 1) return true;
+  if (currentOperatingDate && dates.some((d) => d !== currentOperatingDate)) {
+    return true;
+  }
+  return false;
 }
 
 export function toggleOrderIdInSet(prev: Set<string>, orderId: string): Set<string> {
@@ -237,23 +257,50 @@ export function BulkAdvanceModal({
   selectedOrders,
   onExecute,
   busy,
+  currentOperatingDate,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   selectedOrders: OperationalOrderListItem[];
   onExecute: (eligibleOrders: OperationalOrderListItem[]) => Promise<BulkExecutionResult | void>;
   busy: boolean;
+  currentOperatingDate?: string | null;
 }) {
   const [result, setResult] = useState<BulkExecutionResult | null>(null);
+  const [includeMultiDay, setIncludeMultiDay] = useState(false);
 
   useEffect(() => {
-    if (open) setResult(null);
+    if (open) {
+      setResult(null);
+      setIncludeMultiDay(false);
+    }
   }, [open]);
 
   const totalPortions = useMemo(
     () => selectedOrders.reduce((sum, o) => sum + calculateOrderPortions(o), 0),
     [selectedOrders],
   );
+
+  const multiDayOrders = useMemo(
+    () => selectedOrders.filter((o) => isOrderMultiDay(o, currentOperatingDate)),
+    [selectedOrders, currentOperatingDate],
+  );
+
+  const multiDayOtherDates = useMemo(() => {
+    const dates = new Set<string>();
+    for (const o of multiDayOrders) {
+      const list =
+        o.allDeliveryDates && o.allDeliveryDates.length > 0
+          ? o.allDeliveryDates
+          : o.deliveryDates ?? [];
+      for (const d of list) {
+        if (!currentOperatingDate || d !== currentOperatingDate) {
+          dates.add(d);
+        }
+      }
+    }
+    return Array.from(dates).sort();
+  }, [multiDayOrders, currentOperatingDate]);
 
   const breakdown = useMemo(() => {
     const draft: OperationalOrderListItem[] = [];
@@ -263,6 +310,15 @@ export function BulkAdvanceModal({
     const omitted: Array<{ order: OperationalOrderListItem; reason: string }> = [];
 
     for (const o of selectedOrders) {
+      const isMulti = isOrderMultiDay(o, currentOperatingDate);
+      if (isMulti && !includeMultiDay) {
+        omitted.push({
+          order: o,
+          reason: "Omitido por seguridad (multijornada: contiene raciones en otras fechas)",
+        });
+        continue;
+      }
+
       if (o.status === "draft") {
         draft.push(o);
       } else if (o.status === "confirmed") {
@@ -300,7 +356,7 @@ export function BulkAdvanceModal({
       eligiblePortions,
       omittedPortions,
     };
-  }, [selectedOrders]);
+  }, [selectedOrders, includeMultiDay, currentOperatingDate]);
 
   const handleConfirm = async () => {
     if (breakdown.eligible.length === 0 || busy) return;
@@ -375,6 +431,48 @@ export function BulkAdvanceModal({
           </div>
         ) : (
           <div className="space-y-4 py-2">
+            {multiDayOrders.length > 0 ? (
+              <div
+                data-testid="multiday-safety-warning"
+                className="rounded-md border border-amber-300 bg-amber-50 dark:bg-amber-950/30 p-3 text-xs text-amber-900 dark:text-amber-200 space-y-2"
+              >
+                <div className="font-semibold flex items-center gap-1.5 text-amber-800 dark:text-amber-300">
+                  <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                  {`Atención: ${multiDayOrders.length} ${
+                    multiDayOrders.length === 1
+                      ? "pedido seleccionado es multijornada"
+                      : "pedidos seleccionados son multijornada"
+                  }`}
+                </div>
+                <p className="text-[11px] leading-relaxed">
+                  Contiene entregas en varias fechas
+                  {multiDayOtherDates.length > 0 ? ` (${multiDayOtherDates.join(", ")})` : ""}.
+                  Avanzar su estado cambiará el pedido completo en todas sus fechas.
+                  {!includeMultiDay ? " Por seguridad se ha omitido de este lote." : ""}
+                </p>
+                <label className="flex items-center gap-2 pt-1 cursor-pointer font-medium text-foreground select-none">
+                  <Checkbox
+                    checked={includeMultiDay}
+                    onCheckedChange={(checked) => setIncludeMultiDay(Boolean(checked))}
+                    id="bulk-advance-include-multiday"
+                  />
+                  <span className="text-xs">
+                    Incluir pedidos multijornada (asumo la actualización de todas sus fechas asociadas)
+                  </span>
+                </label>
+              </div>
+            ) : currentOperatingDate ? (
+              <div
+                data-testid="multiday-scope-validated"
+                className="rounded-md border border-emerald-200 bg-emerald-50/60 dark:bg-emerald-950/20 p-2.5 text-xs text-emerald-800 dark:text-emerald-300 flex items-center gap-2"
+              >
+                <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span>
+                  Alcance validado: Todos los pedidos pertenecen exclusivamente a la jornada ({currentOperatingDate}).
+                </span>
+              </div>
+            ) : null}
+
             <div className="rounded-lg border bg-muted/40 p-3 space-y-2 text-sm">
               <div className="flex justify-between items-center font-semibold text-foreground border-b pb-1.5">
                 <span>Total seleccionado</span>
@@ -446,12 +544,26 @@ export function BulkAdvanceModal({
               <div className="rounded-md border border-amber-200/80 bg-amber-50/60 dark:bg-amber-950/20 p-2.5 text-xs text-amber-800 dark:text-amber-300 space-y-1">
                 <div className="font-semibold flex items-center gap-1.5">
                   <AlertTriangle className="h-3.5 w-3.5" />
-                  {breakdown.omitted.length} {breakdown.omitted.length === 1 ? "pedido omitido" : "pedidos omitidos"}:
+                  {`${breakdown.omitted.length} ${
+                    breakdown.omitted.length === 1 ? "pedido omitido" : "pedidos omitidos"
+                  }:`}
                 </div>
                 <p className="text-[11px] text-muted-foreground">
                   No pueden avanzar más o ya están en fase de entrega. No se marcarán pedidos como
                   entregados en operaciones masivas.
                 </p>
+                <ul className="list-disc list-inside space-y-0.5 text-[11px]">
+                  {breakdown.omitted.slice(0, 3).map((item) => (
+                    <li key={item.order.id}>
+                      <span className="font-mono">#{item.order.id.slice(0, 8)}</span> ({item.reason})
+                    </li>
+                  ))}
+                  {breakdown.omitted.length > 3 && (
+                    <li className="list-none text-[10px] text-muted-foreground italic pl-3">
+                      ... y {breakdown.omitted.length - 3} pedidos más.
+                    </li>
+                  )}
+                </ul>
               </div>
             )}
 
@@ -470,7 +582,7 @@ export function BulkAdvanceModal({
                 className="gap-2 font-semibold"
               >
                 {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                Avanzar {breakdown.eligible.length} {breakdown.eligible.length === 1 ? "pedido elegible" : "pedidos elegibles"}
+                {`Avanzar ${breakdown.eligible.length} ${breakdown.eligible.length === 1 ? "pedido elegible" : "pedidos elegibles"}`}
               </Button>
             </DialogFooter>
           </div>
@@ -490,6 +602,7 @@ export function BulkRollbackModal({
   onExecute,
   busy,
   rollbackEnabled = FEATURE_OPERATIONAL_ROLLBACK_ENABLED || isOperationalRollbackEnabled(),
+  currentOperatingDate,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -500,16 +613,40 @@ export function BulkRollbackModal({
   ) => Promise<BulkExecutionResult | void>;
   busy: boolean;
   rollbackEnabled?: boolean;
+  currentOperatingDate?: string | null;
 }) {
   const [reason, setReason] = useState("");
   const [result, setResult] = useState<BulkExecutionResult | null>(null);
+  const [includeMultiDay, setIncludeMultiDay] = useState(false);
 
   useEffect(() => {
     if (open) {
       setReason("");
       setResult(null);
+      setIncludeMultiDay(false);
     }
   }, [open]);
+
+  const multiDayOrders = useMemo(
+    () => selectedOrders.filter((o) => isOrderMultiDay(o, currentOperatingDate)),
+    [selectedOrders, currentOperatingDate],
+  );
+
+  const multiDayOtherDates = useMemo(() => {
+    const dates = new Set<string>();
+    for (const o of multiDayOrders) {
+      const list =
+        o.allDeliveryDates && o.allDeliveryDates.length > 0
+          ? o.allDeliveryDates
+          : o.deliveryDates ?? [];
+      for (const d of list) {
+        if (!currentOperatingDate || d !== currentOperatingDate) {
+          dates.add(d);
+        }
+      }
+    }
+    return Array.from(dates).sort();
+  }, [multiDayOrders, currentOperatingDate]);
 
   const breakdown = useMemo(() => {
     const readyToPrepared: OperationalOrderListItem[] = [];
@@ -523,6 +660,15 @@ export function BulkRollbackModal({
         omitted.push({
           order: o,
           reason: "Pedido canónico v2 (no admite retroceso de estado)",
+        });
+        continue;
+      }
+
+      const isMulti = isOrderMultiDay(o, currentOperatingDate);
+      if (isMulti && !includeMultiDay) {
+        omitted.push({
+          order: o,
+          reason: "Omitido por seguridad (multijornada: contiene raciones en otras fechas)",
         });
         continue;
       }
@@ -559,7 +705,7 @@ export function BulkRollbackModal({
       eligible,
       eligiblePortions,
     };
-  }, [selectedOrders]);
+  }, [selectedOrders, includeMultiDay, currentOperatingDate]);
 
   const handleConfirm = async () => {
     if (!reason.trim() || breakdown.eligible.length === 0 || busy || !rollbackEnabled) return;
@@ -648,6 +794,48 @@ export function BulkRollbackModal({
                 </p>
               </div>
             )}
+
+            {multiDayOrders.length > 0 ? (
+              <div
+                data-testid="multiday-rollback-warning"
+                className="rounded-md border border-amber-300 bg-amber-50 dark:bg-amber-950/30 p-3 text-xs text-amber-900 dark:text-amber-200 space-y-2"
+              >
+                <div className="font-semibold flex items-center gap-1.5 text-amber-800 dark:text-amber-300">
+                  <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                  {`Atención: ${multiDayOrders.length} ${
+                    multiDayOrders.length === 1
+                      ? "pedido seleccionado es multijornada"
+                      : "pedidos seleccionados son multijornada"
+                  }`}
+                </div>
+                <p className="text-[11px] leading-relaxed">
+                  Contiene entregas en varias fechas
+                  {multiDayOtherDates.length > 0 ? ` (${multiDayOtherDates.join(", ")})` : ""}.
+                  Retroceder su estado afectará al pedido completo en todas sus fechas.
+                  {!includeMultiDay ? " Por seguridad se ha omitido de este lote." : ""}
+                </p>
+                <label className="flex items-center gap-2 pt-1 cursor-pointer font-medium text-foreground select-none">
+                  <Checkbox
+                    checked={includeMultiDay}
+                    onCheckedChange={(checked) => setIncludeMultiDay(Boolean(checked))}
+                    id="bulk-rollback-include-multiday"
+                  />
+                  <span className="text-xs">
+                    Incluir pedidos multijornada (asumo la actualización de todas sus fechas asociadas)
+                  </span>
+                </label>
+              </div>
+            ) : currentOperatingDate ? (
+              <div
+                data-testid="multiday-rollback-validated"
+                className="rounded-md border border-emerald-200 bg-emerald-50/60 dark:bg-emerald-950/20 p-2.5 text-xs text-emerald-800 dark:text-emerald-300 flex items-center gap-2"
+              >
+                <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span>
+                  Alcance validado: Todos los pedidos pertenecen exclusivamente a la jornada ({currentOperatingDate}).
+                </span>
+              </div>
+            ) : null}
 
             <div className="rounded-lg border bg-muted/40 p-3 space-y-2 text-sm">
               <div className="flex justify-between items-center font-semibold text-foreground border-b pb-1.5">
@@ -760,7 +948,7 @@ export function BulkRollbackModal({
                 className="gap-2 font-semibold bg-amber-600 hover:bg-amber-700 text-white"
               >
                 {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                Confirmar Retroceso ({breakdown.eligible.length})
+                {`Confirmar Retroceso (${breakdown.eligible.length})`}
               </Button>
             </DialogFooter>
           </div>

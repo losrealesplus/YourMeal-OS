@@ -5,7 +5,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useState } from "react";
-import { ChefHat, RefreshCw, RotateCcw, Loader2 } from "lucide-react";
+import { ChefHat, RefreshCw, RotateCcw, Loader2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { useCan } from "@/hooks/use-can";
@@ -52,6 +52,7 @@ import {
   BulkActionBar,
   BulkAdvanceModal,
   BulkRollbackModal,
+  isOrderMultiDay,
   type BulkExecutionResult,
 } from "@/components/orders/bulk-order-actions";
 import { useOrder } from "@/order/useOrder";
@@ -563,7 +564,17 @@ export function KitchenWorkspacePage() {
                     {o.deliveryGroupName ?? "—"}
                   </TableCell>
                   <TableCell className="text-sm tabular-nums">
-                    {o.deliveryDates.join(", ") || date}
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span>{o.deliveryDates.join(", ") || date}</span>
+                      {isOrderMultiDay(o, date) && (
+                        <Badge
+                          variant="outline"
+                          className="text-[10px] px-1.5 py-0 text-amber-700 dark:text-amber-300 border-amber-300"
+                        >
+                          Multijornada
+                        </Badge>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <Badge variant="secondary">
@@ -591,6 +602,7 @@ export function KitchenWorkspacePage() {
         selectedOrders={selectedOrders}
         onExecute={executeBulkAdvance}
         busy={bulkBusy}
+        currentOperatingDate={date}
       />
 
       <BulkRollbackModal
@@ -599,6 +611,7 @@ export function KitchenWorkspacePage() {
         selectedOrders={selectedOrders}
         onExecute={executeBulkRollback}
         busy={bulkBusy}
+        currentOperatingDate={date}
       />
 
       <Dialog open={!!detail} onOpenChange={(open) => !open && setDetail(null)}>
@@ -608,6 +621,22 @@ export function KitchenWorkspacePage() {
               <DialogHeader>
                 <DialogTitle>Pedido {detail.id.slice(0, 8)}</DialogTitle>
               </DialogHeader>
+              {isOrderMultiDay(detail, date) && (
+                <div
+                  data-testid="detail-multiday-alert"
+                  className="rounded-md border border-amber-300 bg-amber-50 dark:bg-amber-950/40 p-2.5 text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2"
+                >
+                  <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-semibold">Pedido multijornada:</span> Contiene entregas en varias fechas (
+                    {(detail.allDeliveryDates && detail.allDeliveryDates.length > 0
+                      ? detail.allDeliveryDates
+                      : detail.deliveryDates
+                    ).join(", ")}
+                    ). Cambiar su estado afectará al contrato del pedido completo.
+                  </div>
+                </div>
+              )}
               <div className="space-y-4 text-sm">
                 <dl className="grid grid-cols-2 gap-2">
                   <div>
