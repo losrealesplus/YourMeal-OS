@@ -8,12 +8,23 @@ import {
   toggleAllOrdersInSet,
   filterVisibleOrderIds,
   isOrderMultiDay,
+  getTemporalScopeOmissionReason,
   BulkActionBar,
   BulkAdvanceModal,
   BulkRollbackModal,
   type BulkExecutionResult,
 } from "./bulk-order-actions";
 import type { OperationalOrderListItem } from "@/modules/operations";
+
+// Simulate the checked consent state without needing a browser renderer.
+const consentState = vi.hoisted(() => ({ checked: false }));
+vi.mock("react", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("react")>();
+  return {
+    ...actual,
+    useState: (initial: any) => actual.useState(consentState.checked && initial === false ? true : initial),
+  };
+});
 
 // Mock Radix dialog for SSR / vitest rendering
 vi.mock("@/components/ui/dialog", () => ({
@@ -480,5 +491,46 @@ describe("Bulk Order Actions — UI Components", () => {
       expect(html).toContain("Omitido por seguridad (multijornada: contiene raciones en otras fechas)");
       expect(html).toContain("Confirmar Retroceso (2)");
     });
+  });
+});
+
+describe("Temporal scope consent boundary", () => {
+  it.each([false, true])("never admits unknown scope with includeMultiDay=%s", (include) => {
+    const order = createSyntheticOrders(1, { temporalScopeKnown: false })[0];
+    expect(getTemporalScopeOmissionReason(order, "2026-10-22", include))
+      .toContain("alcance temporal no determinable");
+  });
+  it("consent only unlocks known multi-day orders", () => {
+    const order = createSyntheticOrders(1, {
+      temporalScopeKnown: true,
+      allDeliveryDates: ["2026-10-22", "2026-10-23"],
+    })[0];
+    expect(getTemporalScopeOmissionReason(order, "2026-10-22", false)).toContain("multijornada");
+    expect(getTemporalScopeOmissionReason(order, "2026-10-22", true)).toBeNull();
+  });
+});
+
+describe("Bulk modal unknown scope with consent checked", () => {
+  it.each(["advance", "rollback"])("%s keeps unknown orders excluded", (action) => {
+    consentState.checked = true;
+    try {
+      const selectedOrders = [
+        ...createSyntheticOrders(1, { temporalScopeKnown: false, status: "prepared" }),
+        ...createSyntheticOrders(1, {
+          id: "known-multiday", status: "prepared", temporalScopeKnown: true,
+          allDeliveryDates: ["2026-10-22", "2026-10-23"],
+        }),
+      ];
+      const props = { open: true, onOpenChange: vi.fn(), selectedOrders, onExecute: vi.fn(), busy: false,
+        currentOperatingDate: "2026-10-22" };
+      const html = renderToString(action === "advance"
+        ? <BulkAdvanceModal {...props} />
+        : <BulkRollbackModal {...props} rollbackEnabled={true} />);
+      expect(html).toContain("alcance temporal no determinable");
+      expect(html).toContain(action === "advance" ? "Avanzar 1 pedido elegible" : "Confirmar Retroceso (1)");
+      expect(html).not.toContain(action === "advance" ? "Avanzar 2 pedidos elegibles" : "Confirmar Retroceso (2)");
+    } finally {
+      consentState.checked = false;
+    }
   });
 });

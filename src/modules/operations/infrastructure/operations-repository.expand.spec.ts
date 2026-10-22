@@ -1,6 +1,6 @@
 import { operationalItemIdentity } from "@/modules/orders/domain/order-item-read-model";
-import { describe, expect, it } from "vitest";
-import { mapOperationalOrderRow } from "./operations-repository";
+import { describe, expect, it, vi } from "vitest";
+import { createOperationsRepository, mapOperationalOrderRow } from "./operations-repository";
 import { buildKitchenProductionSheet } from "../domain/production-kitchen-engine";
 import { buildPackingHierarchySheet } from "../domain/packing-hierarchy-engine";
 import {
@@ -241,5 +241,55 @@ describe("A2 native custom downstream", () => {
     expect(canonicalSerialize([{ ...left, customerAllergens: ["a", "b"] }])).not.toBe(
       canonicalSerialize([{ ...left, customerAllergens: ["a,b"] }]),
     );
+  });
+});
+
+describe("Daily order temporal scope verification", () => {
+  const item = (id: string, order_id = "order-1", day_date = "2026-10-05") =>
+    ({ id, order_id, day_date });
+  async function list(pages: any[], rows = [row]) {
+    const orders: any = {};
+    for (const method of ["select", "eq", "is", "in", "order"]) orders[method] = vi.fn(() => orders);
+    orders.then = (resolve: any) => Promise.resolve({ data: rows, error: null }).then(resolve);
+    const items: any = {};
+    for (const method of ["select", "in", "is", "order"]) items[method] = vi.fn(() => items);
+    let index = 0;
+    items.range = vi.fn(async () => {
+      const page = pages[index++];
+      if (page instanceof Error) throw page;
+      return page ?? { data: [], count: null, error: null };
+    });
+    const client = { from: vi.fn((table: string) => table === "orders" ? orders : items) };
+    const result = await createOperationsRepository(client as any, "tenant-1")
+      .listOrders({ date: "2026-10-05", statuses: ["confirmed"] });
+    return { result, items };
+  }
+  it("only verifies orders present in a complete response", async () => {
+    const { result } = await list([{ data: [item("a")], count: 1 }], [row, { ...row, id: "order-2" }]);
+    expect(result.map(o => o.temporalScopeKnown)).toEqual([true, false]);
+  });
+  it("retrieves later dates even when the server cap is below the requested page size", async () => {
+    const { result, items } = await list([
+      { data: [item("a")], count: 2 },
+      { data: [item("b", "order-1", "2026-10-06")], count: 2 },
+    ]);
+    expect(items.range.mock.calls).toEqual([[0, 499], [1, 500]]);
+    expect(items.select).toHaveBeenCalledWith("id, order_id, day_date", { count: "exact" });
+    expect(items.order).toHaveBeenCalledWith("id", { ascending: true });
+    expect(result[0].temporalScopeKnown).toBe(true);
+    expect(result[0].allDeliveryDates).toEqual(["2026-10-05", "2026-10-06"]);
+  });
+  it.each([
+    [{ data: [item("a")], count: 2 }, { data: [], count: 2 }],
+    [{ data: [item("a")], count: 2 }, { data: null, count: null, error: { message: "failed" } }],
+    [{ data: [item("a")], count: 2 }, new Error("network")],
+    [{ data: [item("a")], count: null }],
+    [{ data: [item("a")], count: 2 }, { data: [item("b")], count: 3 }],
+    [{ data: [item("a")], count: 2 }, { data: [item("a")], count: 2 }],
+    [{ data: [item("a", "order-1", "")], count: 1 }],
+    [{ data: [item("a", "order-1", "2026-10-06")], count: 1 }],
+  ])("fails closed on incomplete or unverifiable dates %#", async (...pages) => {
+    const { result } = await list(pages);
+    expect(result[0].temporalScopeKnown).toBe(false);
   });
 });

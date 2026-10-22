@@ -256,43 +256,59 @@ export function createOperationsRepository(client: Client, tenantId: string) {
       // we query all distinct active day_dates for these orders directly from order_items.
       if (day) {
         const orderIds = rows.map((r) => r.id);
-        const { data: itemRows, error: itemsError } = await db
-          .from("order_items")
-          .select("order_id, day_date")
-          .in("order_id", orderIds)
-          .is("deleted_at", null);
-
-        if (!itemsError && Array.isArray(itemRows)) {
-          const datesByOrder = new Map<string, Set<string>>();
-          for (const item of itemRows) {
-            const oid = String(item.order_id);
-            const d = String(item.day_date || "").trim();
-            if (!d) continue;
-            let set = datesByOrder.get(oid);
-            if (!set) {
-              set = new Set<string>();
-              datesByOrder.set(oid, set);
-            }
-            set.add(d);
+        const itemRows: Record<string, any>[] = [];
+        let complete = false;
+        let expectedCount: number | null = null;
+        try {
+          // Count + stable ordering detects server row caps and incomplete pages.
+          // Advance by the rows actually received, even if the server cap is below 500.
+          while (!complete) {
+            const { data: page, error, count } = await db
+              .from("order_items")
+              .select("id, order_id, day_date", { count: "exact" })
+              .in("order_id", orderIds)
+              .is("deleted_at", null)
+              .order("id", { ascending: true })
+              .range(itemRows.length, itemRows.length + 499);
+            if (error || !Array.isArray(page) || !Number.isInteger(count) || count < 0) break;
+            if (expectedCount !== null && count !== expectedCount) break;
+            expectedCount = count;
+            itemRows.push(...page);
+            if (itemRows.length > count) break;
+            complete = itemRows.length === count;
+            if (!complete && page.length === 0) break;
           }
-          return rows.map((row) => {
-            const allItemDates = datesByOrder.has(row.id)
-              ? Array.from(datesByOrder.get(row.id)!)
-              : [];
-            return mapOperationalOrderRow(row, {
-              allItemDates,
-              temporalScopeKnown: true,
-            });
-          });
-        } else {
-          // If query failed to retrieve item dates, mark temporalScopeKnown = false for safety
-          return rows.map((row) =>
-            mapOperationalOrderRow(row, {
-              allItemDates: [],
-              temporalScopeKnown: false,
-            }),
-          );
+        } catch {
+          // Failed fetches must never turn a partial date list into verified scope.
         }
+
+        const datesByOrder = new Map<string, Set<string>>();
+        const invalidOrders = new Set<string>();
+        const seenIds = new Set<string>();
+        for (const item of itemRows) {
+          const oid = String(item.order_id);
+          const d = String(item.day_date || "").trim();
+          if (!item.id || seenIds.has(item.id)) complete = false;
+          seenIds.add(item.id);
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) {
+            invalidOrders.add(oid);
+            continue;
+          }
+          const dates = datesByOrder.get(oid) ?? new Set<string>();
+          dates.add(d);
+          datesByOrder.set(oid, dates);
+        }
+        return rows.map((row) => {
+          const dates = datesByOrder.get(row.id);
+          const visibleDates = (row.order_items ?? [])
+            .filter((item: Record<string, any>) => !item.deleted_at)
+            .map((item: Record<string, any>) => String(item.day_date));
+          return mapOperationalOrderRow(row, {
+            allItemDates: dates ? Array.from(dates) : [],
+            temporalScopeKnown: complete && !invalidOrders.has(row.id) &&
+              Boolean(dates?.size) && visibleDates.every((d: string) => dates?.has(d)),
+          });
+        });
       }
 
       return rows.map((row) => mapOperationalOrderRow(row));

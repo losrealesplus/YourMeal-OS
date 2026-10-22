@@ -57,6 +57,21 @@ export function isOrderMultiDay(
   return false;
 }
 
+/** Unknown scope cannot be overridden by consent to known multi-day changes. */
+export function getTemporalScopeOmissionReason(
+  order: OperationalOrderListItem,
+  currentOperatingDate: string | null | undefined,
+  includeMultiDay: boolean,
+): string | null {
+  if (order.temporalScopeKnown === false) {
+    return "Omitido por seguridad (alcance temporal no determinable)";
+  }
+  if (isOrderMultiDay(order, currentOperatingDate) && !includeMultiDay) {
+    return "Omitido por seguridad (multijornada: contiene raciones en otras fechas)";
+  }
+  return null;
+}
+
 export function toggleOrderIdInSet(prev: Set<string>, orderId: string): Set<string> {
   const next = new Set(prev);
   if (next.has(orderId)) {
@@ -313,15 +328,9 @@ export function BulkAdvanceModal({
     const omitted: Array<{ order: OperationalOrderListItem; reason: string }> = [];
 
     for (const o of selectedOrders) {
-      const isMulti = isOrderMultiDay(o, currentOperatingDate);
-      if (isMulti && !includeMultiDay) {
-        omitted.push({
-          order: o,
-          reason:
-            o.temporalScopeKnown === false
-              ? "Omitido por seguridad (alcance temporal no determinable)"
-              : "Omitido por seguridad (multijornada: contiene raciones en otras fechas)",
-        });
+      const scopeOmission = getTemporalScopeOmissionReason(o, currentOperatingDate, includeMultiDay);
+      if (scopeOmission) {
+        omitted.push({ order: o, reason: scopeOmission });
         continue;
       }
 
@@ -466,6 +475,7 @@ export function BulkAdvanceModal({
                     Incluir pedidos multijornada (asumo la actualización de todas sus fechas asociadas)
                   </span>
                 </label>
+                <p>Los pedidos de alcance no confirmado permanecen excluidos aunque se marque esta casilla.</p>
               </div>
             ) : currentOperatingDate ? (
               <div
@@ -670,15 +680,9 @@ export function BulkRollbackModal({
         continue;
       }
 
-      const isMulti = isOrderMultiDay(o, currentOperatingDate);
-      if (isMulti && !includeMultiDay) {
-        omitted.push({
-          order: o,
-          reason:
-            o.temporalScopeKnown === false
-              ? "Omitido por seguridad (alcance temporal no determinable)"
-              : "Omitido por seguridad (multijornada: contiene raciones en otras fechas)",
-        });
+      const scopeOmission = getTemporalScopeOmissionReason(o, currentOperatingDate, includeMultiDay);
+      if (scopeOmission) {
+        omitted.push({ order: o, reason: scopeOmission });
         continue;
       }
 
@@ -833,6 +837,7 @@ export function BulkRollbackModal({
                     Incluir pedidos multijornada (asumo la actualización de todas sus fechas asociadas)
                   </span>
                 </label>
+                <p>Los pedidos de alcance no confirmado permanecen excluidos aunque se marque esta casilla.</p>
               </div>
             ) : currentOperatingDate ? (
               <div
