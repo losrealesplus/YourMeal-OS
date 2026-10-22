@@ -56,6 +56,12 @@ export type OperationalOrderListItem = {
   } | null;
   /** Distinct day_dates from items (YYYY-MM-DD), sorted */
   deliveryDates: string[];
+  /** Distinct day_dates across entire order contract (from all order items and delivery_services) */
+  allDeliveryDates?: string[];
+  /** True if order contains items across multiple delivery dates */
+  isMultiDay?: boolean;
+  /** False if temporal scope could not be determined with certainty */
+  temporalScopeKnown?: boolean;
   items: Array<{
     id: string;
     dishId: string | null;
@@ -82,7 +88,10 @@ export type OperationalOrderFilters = {
   deliveryGroupId?: string | null;
 };
 
-export function mapOperationalOrderRow(row: Record<string, any>): OperationalOrderListItem {
+export function mapOperationalOrderRow(
+  row: Record<string, any>,
+  extra?: { allItemDates?: string[]; temporalScopeKnown?: boolean },
+): OperationalOrderListItem {
   const customer = row.customers ?? null;
   const company = row.companies ?? null;
   const site = row.company_locations ?? null;
@@ -93,6 +102,13 @@ export function mapOperationalOrderRow(row: Record<string, any>): OperationalOrd
     (item) => !item.deleted_at,
   );
   const deliveryDates = [...new Set(items.map((it) => String(it.day_date)).filter(Boolean))].sort();
+  const dsDates = ((row.delivery_services ?? []) as Record<string, any>[])
+    .map((ds) => String(ds.delivery_date))
+    .filter(Boolean);
+  const extraDates = extra?.allItemDates ?? [];
+  const allDeliveryDates = [...new Set([...extraDates, ...dsDates, ...deliveryDates])].sort();
+  const isMultiDay = allDeliveryDates.length > 1;
+  const temporalScopeKnown = extra?.temporalScopeKnown ?? true;
   return {
     ...(row.write_contract_version === 2 ? { writeContractVersion: 2 as const } : {}),
     revision: Number(row.revision ?? 0),
@@ -128,6 +144,9 @@ export function mapOperationalOrderRow(row: Record<string, any>): OperationalOrd
         }
       : null,
     deliveryDates,
+    allDeliveryDates,
+    isMultiDay,
+    temporalScopeKnown,
     items: items.map((it) => {
       const line = readOrderItem({ ...it, id: it.id, dish_id: it.dish_id }, it.dishes);
       return {
@@ -153,7 +172,8 @@ const ORDER_SELECT = `
   company_departments ( id, name ),
   delivery_groups ( id, name ),
   customer_addresses ( id, label, street, city, zip ),
-  order_items ( *, dishes ( id, name ) )
+  order_items ( *, dishes ( id, name ) ),
+  delivery_services ( delivery_date )
 `;
 
 function mapDeliveryServiceRow(row: Record<string, any>): DeliveryServiceModel {
@@ -228,7 +248,70 @@ export function createOperationsRepository(client: Client, tenantId: string) {
       const { data, error } = await q;
       if (error) throw error;
 
-      return ((data ?? []) as Record<string, any>[]).map(mapOperationalOrderRow);
+      const rows = ((data ?? []) as Record<string, any>[]);
+      if (rows.length === 0) return [];
+
+      // When filtering by a specific day, order_items embedded in rows contains ONLY that day's items.
+      // To reliably detect multi-day orders even for legacy/imported orders WITHOUT complete delivery_services,
+      // we query all distinct active day_dates for these orders directly from order_items.
+      if (day) {
+        const orderIds = rows.map((r) => r.id);
+        const itemRows: Record<string, any>[] = [];
+        let complete = false;
+        let expectedCount: number | null = null;
+        try {
+          // Count + stable ordering detects server row caps and incomplete pages.
+          // Advance by the rows actually received, even if the server cap is below 500.
+          while (!complete) {
+            const { data: page, error, count } = await db
+              .from("order_items")
+              .select("id, order_id, day_date", { count: "exact" })
+              .in("order_id", orderIds)
+              .is("deleted_at", null)
+              .order("id", { ascending: true })
+              .range(itemRows.length, itemRows.length + 499);
+            if (error || !Array.isArray(page) || !Number.isInteger(count) || count < 0) break;
+            if (expectedCount !== null && count !== expectedCount) break;
+            expectedCount = count;
+            itemRows.push(...page);
+            if (itemRows.length > count) break;
+            complete = itemRows.length === count;
+            if (!complete && page.length === 0) break;
+          }
+        } catch {
+          // Failed fetches must never turn a partial date list into verified scope.
+        }
+
+        const datesByOrder = new Map<string, Set<string>>();
+        const invalidOrders = new Set<string>();
+        const seenIds = new Set<string>();
+        for (const item of itemRows) {
+          const oid = String(item.order_id);
+          const d = String(item.day_date || "").trim();
+          if (!item.id || seenIds.has(item.id)) complete = false;
+          seenIds.add(item.id);
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) {
+            invalidOrders.add(oid);
+            continue;
+          }
+          const dates = datesByOrder.get(oid) ?? new Set<string>();
+          dates.add(d);
+          datesByOrder.set(oid, dates);
+        }
+        return rows.map((row) => {
+          const dates = datesByOrder.get(row.id);
+          const visibleDates = (row.order_items ?? [])
+            .filter((item: Record<string, any>) => !item.deleted_at)
+            .map((item: Record<string, any>) => String(item.day_date));
+          return mapOperationalOrderRow(row, {
+            allItemDates: dates ? Array.from(dates) : [],
+            temporalScopeKnown: complete && !invalidOrders.has(row.id) &&
+              Boolean(dates?.size) && visibleDates.every((d: string) => dates?.has(d)),
+          });
+        });
+      }
+
+      return rows.map((row) => mapOperationalOrderRow(row));
     },
 
     async countByStatuses(

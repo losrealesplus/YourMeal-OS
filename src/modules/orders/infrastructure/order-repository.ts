@@ -209,6 +209,32 @@ export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
         .is("deleted_at", null);
       if (error) throw error;
     },
+
+    /**
+     * Atomic operational rollback for v1 orders via PostgreSQL RPC (cr_order_rollback_v1).
+     * Order status mutation and immutable audit logging occur inside the same database transaction.
+     */
+    async rollbackStatusV1(
+      orderId: string,
+      expectedCurrentStatus: string,
+      targetStatus: string,
+      reason: string,
+    ): Promise<OrderRow> {
+      const { data, error } = await (
+        supabase.rpc as unknown as (
+          name: string,
+          args: Record<string, unknown>,
+        ) => Promise<{ data: unknown; error: unknown }>
+      )("rollback_order_status_v1", {
+        p_tenant_id: tenantId,
+        p_order_id: orderId,
+        p_expected_current_status: expectedCurrentStatus,
+        p_target_status: targetStatus,
+        p_reason: reason,
+      });
+      if (error) throw error;
+      return data as OrderRow;
+    },
   };
 }
 

@@ -26,6 +26,9 @@ vi.mock("@/components/ui/dialog", () => ({
   DialogDescription: ({ children, className }: any) => (
     <p className={className}>{children}</p>
   ),
+  DialogFooter: ({ children, className }: any) => (
+    <footer className={className}>{children}</footer>
+  ),
 }));
 
 // Mock Radix sheet for SSR test rendering (CR-OPS-UX Fase 1)

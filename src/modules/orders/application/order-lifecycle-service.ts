@@ -269,49 +269,19 @@ export const OrderLifecycleService = {
       );
     }
 
-    const { data: updated, error } = await ctx.supabase
-      .from("orders")
-      .update({ status: targetStatus })
-      .eq("tenant_id", ctx.tenantId)
-      .eq("id", orderId)
-      .eq("status", currentStatus)
-      .is("deleted_at", null)
-      .select("*")
-      .single();
-
-    if (error) throw error;
-
     try {
-      await AuditService.write(ctx, {
-        entityType: "order",
-        entityId: orderId,
-        action: "status_change",
-        oldData: { status: currentStatus },
-        newData: { status: targetStatus, reason: reason.trim(), isRollback: true },
-      });
-    } catch (auditError) {
-      // Revert status to guarantee state/audit consistency
-      const { error: revertError } = await ctx.supabase
-        .from("orders")
-        .update({ status: currentStatus })
-        .eq("tenant_id", ctx.tenantId)
-        .eq("id", orderId)
-        .eq("status", targetStatus)
-        .is("deleted_at", null);
-
-      if (revertError) {
-        throw new DomainError(
-          "INVALID_STATE",
-          `CRITICAL: Fallo en auditoría y fallo en compensación de estado para el pedido ${orderId}. Se requiere intervención administrativa.`,
-        );
-      }
-
+      const updated = await repo.rollbackStatusV1(
+        orderId,
+        currentStatus,
+        targetStatus,
+        reason.trim(),
+      );
+      return updated;
+    } catch (rpcError: any) {
       throw new DomainError(
         "INVALID_STATE",
-        `Fallo al registrar auditoría de retroceso. El estado del pedido se ha revertido a '${currentStatus}'.`,
+        `Fallo al ejecutar retroceso atómico: ${rpcError.message ?? rpcError}`,
       );
     }
-
-    return updated;
   },
 };

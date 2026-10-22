@@ -81,6 +81,10 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { UniversalOrderIntakeDrawer } from "@/components/orders/universal-order-intake-drawer";
+import {
+  BulkRollbackModal,
+  type BulkExecutionResult,
+} from "@/components/orders/bulk-order-actions";
 import { useOrder } from "@/order/useOrder";
 import {
   cancelOrderCommand,
@@ -940,6 +944,7 @@ export function AdminOrdersPage() {
   const [bulkAdvanceOpen, setBulkAdvanceOpen] = useState(false);
   const [bulkCancelOpen, setBulkCancelOpen] = useState(false);
   const [bulkCancelReason, setBulkCancelReason] = useState("");
+  const [bulkRollbackOpen, setBulkRollbackOpen] = useState(false);
 
   const load = useCallback(async () => {
     if (!user || !tenantId) return;
@@ -1247,6 +1252,59 @@ export function AdminOrdersPage() {
     void load();
   };
 
+  const executeBulkRollback = async (
+    eligibleOrders: OperationalOrderListItem[],
+    reason: string,
+  ): Promise<BulkExecutionResult> => {
+    setBulkBusy(true);
+    const result: BulkExecutionResult = {
+      succeeded: [],
+      omitted: [],
+      failed: [],
+    };
+
+    for (const o of eligibleOrders) {
+      const prev = getRollbackStatus(o.status);
+      if (!prev) {
+        result.omitted.push({ orderId: o.id, reason: "No reversible" });
+        continue;
+      }
+      try {
+        const res = await orderApi.rollbackOrderStatus(
+          rollbackOrderStatusCommand({ orderId: o.id, reason }),
+        );
+        if (res.ok) {
+          result.succeeded.push({ orderId: o.id, from: o.status, to: prev });
+        } else {
+          result.failed.push({
+            orderId: o.id,
+            error: res.errors[0]?.message ?? "Error al retroceder",
+          });
+        }
+      } catch (err: any) {
+        result.failed.push({
+          orderId: o.id,
+          error: err.message ?? "Error inesperado",
+        });
+      }
+    }
+
+    setBulkBusy(false);
+    setSelectedOrderIds(new Set());
+    void load();
+    if (result.succeeded.length > 0) {
+      toast.success(
+        `Se retrocedieron ${result.succeeded.length} pedidos a su estado anterior.`,
+      );
+    }
+    if (result.failed.length > 0) {
+      toast.error(
+        `${result.failed.length} pedidos fallaron al retroceder. Revisa el resumen.`,
+      );
+    }
+    return result;
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -1284,7 +1342,7 @@ export function AdminOrdersPage() {
               {selectedPortions === 1 ? "ración total" : "raciones totales"} afectadas
             </span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <Button
               size="sm"
               onClick={handleOpenBulkAdvanceModal}
@@ -1297,6 +1355,17 @@ export function AdminOrdersPage() {
                 <Check className="h-3.5 w-3.5" />
               )}
               Avanzar todos los elegibles
+            </Button>
+
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setBulkRollbackOpen(true)}
+              disabled={bulkBusy}
+              className="gap-1.5 text-xs font-semibold border-amber-500/40 text-amber-900 dark:text-amber-200 hover:bg-amber-500/10"
+            >
+              <RotateCcw className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+              Retroceder estado
             </Button>
 
             <DropdownMenu>
@@ -1319,6 +1388,13 @@ export function AdminOrdersPage() {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleBulkMarkPrepared}>
                   Marcar preparados (in_production)
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => setBulkRollbackOpen(true)}
+                  className="text-amber-800 dark:text-amber-300"
+                >
+                  Retroceder seleccionados...
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
@@ -1532,6 +1608,15 @@ export function AdminOrdersPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Modal de Retroceso Masivo Seguro */}
+      <BulkRollbackModal
+        open={bulkRollbackOpen}
+        onOpenChange={setBulkRollbackOpen}
+        selectedOrders={selectedOrders}
+        onExecute={executeBulkRollback}
+        busy={bulkBusy}
+      />
     </div>
   );
 }

@@ -62,6 +62,26 @@ describe("operational status transitions", () => {
       expect(isOperationalRollbackEnabled()).toBe(false);
     });
 
+    it("activates via explicit VITE_OPERATIONAL_ROLLBACK_ENABLED env flag post-migration", () => {
+      const originalEnv = process.env.VITE_OPERATIONAL_ROLLBACK_ENABLED;
+      const originalNodeEnv = process.env.NODE_ENV;
+      try {
+        process.env.NODE_ENV = "production";
+        process.env.VITE_OPERATIONAL_ROLLBACK_ENABLED = "true";
+        expect(isOperationalRollbackEnabled()).toBe(true);
+
+        process.env.VITE_OPERATIONAL_ROLLBACK_ENABLED = "false";
+        expect(isOperationalRollbackEnabled()).toBe(false);
+      } finally {
+        if (originalEnv !== undefined) {
+          process.env.VITE_OPERATIONAL_ROLLBACK_ENABLED = originalEnv;
+        } else {
+          delete process.env.VITE_OPERATIONAL_ROLLBACK_ENABLED;
+        }
+        process.env.NODE_ENV = originalNodeEnv;
+      }
+    });
+
     it("strictly prevents activation and throws when called in production environment", () => {
       const originalNodeEnv = process.env.NODE_ENV;
       try {
