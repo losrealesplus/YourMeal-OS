@@ -280,13 +280,13 @@ describe("OrderLifecycleService (CR-OPS-09B)", () => {
         ).rejects.toBeInstanceOf(DomainError);
       });
 
-      it("rolls back from prepared to in_production and writes audit log", async () => {
+      it("rolls back from prepared to in_production via atomic RPC", async () => {
         const order = { id: "o1", status: "prepared", tenant_id: "tenant-eatclean" };
         const repo = {
           findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+          rollbackStatusV1: vi.fn(async () => ({ ...order, status: "in_production" })),
         } as any;
-        const supa = createMockSupabase(order);
-        const ctx = mockCtx({}, supa);
+        const ctx = mockCtx();
 
         const res = await OrderLifecycleService.rollbackStatus(
           ctx,
@@ -296,25 +296,21 @@ describe("OrderLifecycleService (CR-OPS-09B)", () => {
         );
 
         expect(res.status).toBe("in_production");
-        expect(AuditService.write).toHaveBeenCalledWith(
-          ctx,
-          expect.objectContaining({
-            entityType: "order",
-            entityId: "o1",
-            action: "status_change",
-            oldData: { status: "prepared" },
-            newData: { status: "in_production", reason: "Aún no está empaquetado", isRollback: true },
-          }),
+        expect(repo.rollbackStatusV1).toHaveBeenCalledWith(
+          "o1",
+          "prepared",
+          "in_production",
+          "Aún no está empaquetado",
         );
       });
 
-      it("rolls back from in_production to confirmed", async () => {
+      it("rolls back from in_production to confirmed via atomic RPC", async () => {
         const order = { id: "o1", status: "in_production", tenant_id: "tenant-eatclean" };
         const repo = {
           findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+          rollbackStatusV1: vi.fn(async () => ({ ...order, status: "confirmed" })),
         } as any;
-        const supa = createMockSupabase(order);
-        const ctx = mockCtx({}, supa);
+        const ctx = mockCtx();
 
         const res = await OrderLifecycleService.rollbackStatus(
           ctx,
@@ -324,15 +320,21 @@ describe("OrderLifecycleService (CR-OPS-09B)", () => {
         );
 
         expect(res.status).toBe("confirmed");
+        expect(repo.rollbackStatusV1).toHaveBeenCalledWith(
+          "o1",
+          "in_production",
+          "confirmed",
+          "Error al iniciar en cocina",
+        );
       });
 
-      it("rolls back from ready_for_delivery to prepared", async () => {
+      it("rolls back from ready_for_delivery to prepared via atomic RPC", async () => {
         const order = { id: "o1", status: "ready_for_delivery", tenant_id: "tenant-eatclean" };
         const repo = {
           findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+          rollbackStatusV1: vi.fn(async () => ({ ...order, status: "prepared" })),
         } as any;
-        const supa = createMockSupabase(order);
-        const ctx = mockCtx({}, supa);
+        const ctx = mockCtx();
 
         const res = await OrderLifecycleService.rollbackStatus(
           ctx,
@@ -342,6 +344,12 @@ describe("OrderLifecycleService (CR-OPS-09B)", () => {
         );
 
         expect(res.status).toBe("prepared");
+        expect(repo.rollbackStatusV1).toHaveBeenCalledWith(
+          "o1",
+          "ready_for_delivery",
+          "prepared",
+          "Reabrir empaque para revisión",
+        );
       });
 
       it.each(["draft", "confirmed", "out_for_delivery", "delivered", "cancelled"])(
@@ -350,12 +358,14 @@ describe("OrderLifecycleService (CR-OPS-09B)", () => {
           const order = { id: "o1", status, tenant_id: "tenant-eatclean" };
           const repo = {
             findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+            rollbackStatusV1: vi.fn(),
           } as any;
           const ctx = mockCtx();
 
           await expect(
             OrderLifecycleService.rollbackStatus(ctx, repo, "o1", "Razón cualquiera"),
           ).rejects.toBeInstanceOf(DomainError);
+          expect(repo.rollbackStatusV1).not.toHaveBeenCalled();
         },
       );
 
@@ -368,154 +378,29 @@ describe("OrderLifecycleService (CR-OPS-09B)", () => {
         };
         const repo = {
           findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+          rollbackStatusV1: vi.fn(),
         } as any;
         const ctx = mockCtx();
 
         await expect(
           OrderLifecycleService.rollbackStatus(ctx, repo, "o1", "Intento en v2"),
         ).rejects.toBeInstanceOf(DomainError);
+        expect(repo.rollbackStatusV1).not.toHaveBeenCalled();
       });
 
-      it("guarantees audit atomicity by reverting order status if AuditService.write fails", async () => {
+      it("propagates atomic RPC errors as DomainError without partial side effects", async () => {
         const order = { id: "o1", status: "prepared", tenant_id: "tenant-eatclean" };
         const repo = {
           findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
+          rollbackStatusV1: vi.fn(async () => {
+            throw new Error("Concurrency conflict: order is in status ready_for_delivery, expected prepared");
+          }),
         } as any;
-        const supa = createMockSupabase(order);
-        const ctx = mockCtx({}, supa);
-
-        vi.mocked(AuditService.write).mockRejectedValueOnce(
-          new Error("Audit log database failure"),
-        );
+        const ctx = mockCtx();
 
         await expect(
-          OrderLifecycleService.rollbackStatus(
-            ctx,
-            repo,
-            "o1",
-            "Fallo intencionado de auditoría",
-          ),
-        ).rejects.toThrow("Fallo al registrar auditoría de retroceso");
-
-        // Verify status was reverted back to 'prepared'
-        expect(supa.getStatus()).toBe("prepared");
-        expect(supa.getUpdates()).toEqual([
-          { status: "in_production" },
-          { status: "prepared" },
-        ]);
-      });
-
-      it("aborts cleanly and does not write audit if initial status update fails", async () => {
-        const order = { id: "o1", status: "prepared", tenant_id: "tenant-eatclean" };
-        const repo = {
-          findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
-        } as any;
-        const client = {
-          from: vi.fn(() => ({
-            update: vi.fn(() => ({
-              eq: () => ({
-                eq: () => ({
-                  eq: () => ({
-                    is: () => ({
-                      select: () => ({
-                        single: async () => ({
-                          data: null,
-                          error: new Error("Database lock timeout on update"),
-                        }),
-                      }),
-                    }),
-                  }),
-                }),
-              }),
-            })),
-          })),
-        };
-        const ctx = mockCtx({}, client as any);
-        vi.mocked(AuditService.write).mockClear();
-
-        await expect(
-          OrderLifecycleService.rollbackStatus(ctx, repo, "o1", "Fallo de DB"),
-        ).rejects.toThrow("Database lock timeout on update");
-
-        expect(AuditService.write).not.toHaveBeenCalled();
-      });
-
-      it("rejects rollback if order status was changed concurrently", async () => {
-        const order = { id: "o1", status: "prepared", tenant_id: "tenant-eatclean" };
-        const repo = {
-          findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
-        } as any;
-        const client = {
-          from: vi.fn(() => ({
-            update: vi.fn(() => ({
-              eq: () => ({
-                eq: () => ({
-                  eq: () => ({
-                    is: () => ({
-                      select: () => ({
-                        single: async () => ({
-                          data: null,
-                          error: { message: "JSON object requested, multiple (or no) rows returned", code: "PGRST116" },
-                        }),
-                      }),
-                    }),
-                  }),
-                }),
-              }),
-            })),
-          })),
-        };
-        const ctx = mockCtx({}, client as any);
-        vi.mocked(AuditService.write).mockClear();
-
-        await expect(
-          OrderLifecycleService.rollbackStatus(ctx, repo, "o1", "Conflicto concurrente"),
-        ).rejects.toBeDefined();
-
-        expect(AuditService.write).not.toHaveBeenCalled();
-      });
-
-      it("throws critical error if audit fails AND compensating revert fails", async () => {
-        const order = { id: "o1", status: "prepared", tenant_id: "tenant-eatclean" };
-        const repo = {
-          findByIdWithItems: vi.fn(async () => ({ order: order as any, items: [] })),
-        } as any;
-        let callCount = 0;
-        const client = {
-          from: vi.fn(() => ({
-            update: vi.fn(() => {
-              callCount++;
-              return {
-                eq: () => ({
-                  eq: () => ({
-                    eq: () => ({
-                      is: () => {
-                        if (callCount === 1) {
-                          return {
-                            select: () => ({
-                              single: async () => ({
-                                data: { ...order, status: "in_production" },
-                                error: null,
-                              }),
-                            }),
-                          };
-                        }
-                        // Compensating update fails
-                        return { error: new Error("Network failure on revert") };
-                      },
-                    }),
-                  }),
-                }),
-              };
-            }),
-          })),
-        };
-        const ctx = mockCtx({}, client as any);
-        vi.mocked(AuditService.write).mockRejectedValueOnce(new Error("Audit log DB down"));
-
-        await expect(
-          OrderLifecycleService.rollbackStatus(ctx, repo, "o1", "Doble fallo"),
-        ).rejects.toThrow(/CRITICAL: Fallo en auditoría y fallo en compensación/);
+          OrderLifecycleService.rollbackStatus(ctx, repo, "o1", "Motivo"),
+        ).rejects.toThrow("Fallo al ejecutar retroceso atómico: Concurrency conflict");
       });
     });
   });

@@ -1,0 +1,339 @@
+import { describe, expect, it, vi } from "vitest";
+import React from "react";
+import { renderToString } from "react-dom/server";
+import {
+  useBulkOrderSelection,
+  calculateOrderPortions,
+  toggleOrderIdInSet,
+  toggleAllOrdersInSet,
+  filterVisibleOrderIds,
+  BulkActionBar,
+  BulkAdvanceModal,
+  BulkRollbackModal,
+  type BulkExecutionResult,
+} from "./bulk-order-actions";
+import type { OperationalOrderListItem } from "@/modules/operations";
+
+// Mock Radix dialog for SSR / vitest rendering
+vi.mock("@/components/ui/dialog", () => ({
+  Dialog: ({ children, open }: any) =>
+    open ? <div data-testid="dialog">{children}</div> : null,
+  DialogContent: ({ children, className }: any) => (
+    <div className={className}>{children}</div>
+  ),
+  DialogHeader: ({ children, className }: any) => (
+    <div className={className}>{children}</div>
+  ),
+  DialogTitle: ({ children, className }: any) => (
+    <h2 className={className}>{children}</h2>
+  ),
+  DialogDescription: ({ children, className }: any) => (
+    <p className={className}>{children}</p>
+  ),
+  DialogFooter: ({ children, className }: any) => (
+    <footer className={className}>{children}</footer>
+  ),
+}));
+
+function createSyntheticOrders(
+  count: number,
+  overrides: Partial<OperationalOrderListItem> = {},
+): OperationalOrderListItem[] {
+  return Array.from({ length: count }, (_, i) => ({
+    id: `order-syn-${i + 1}`,
+    tenantId: "tenant-eatclean",
+    status: (i % 4 === 0
+      ? "draft"
+      : i % 4 === 1
+      ? "confirmed"
+      : i % 4 === 2
+      ? "in_production"
+      : "prepared") as any,
+    weekStart: "2026-10-19",
+    total: 25.0,
+    createdAt: "2026-10-19T10:00:00Z",
+    demandChannel: "company",
+    customerId: `cust-${i + 1}`,
+    customerName: `Cliente ${i + 1}`,
+    customerEmail: `cliente${i + 1}@example.com`,
+    companyId: "comp-1",
+    companyName: "Empresa Piloto",
+    siteId: "site-1",
+    siteName: "Sede Central",
+    siteAddress: "Calle Principal 1",
+    organizationalUnitId: null,
+    organizationalUnitName: null,
+    deliveryGroupId: "group-1",
+    deliveryGroupName: "Ruta 1",
+    deliveryDates: ["2026-10-22"],
+    notes: null,
+    items: [
+      {
+        id: `item-${i + 1}-1`,
+        dishId: "dish-1",
+        dishName: "Plato Principal",
+        dayDate: "2026-10-22",
+        qty: (i % 3) + 1, // 1, 2, or 3 portions
+        notes: null,
+      },
+    ],
+    ...overrides,
+  }));
+}
+
+describe("Bulk Order Actions — Pure Functions & Selection Helpers", () => {
+  it("calculates portions correctly across 1, 20, and 100 orders", () => {
+    const singleOrder = createSyntheticOrders(1, {
+      items: [
+        { id: "i1", dishId: "d1", dishName: "Plato A", dayDate: "2026-10-22", qty: 2, notes: null },
+        { id: "i2", dishId: "d2", dishName: "Plato B", dayDate: "2026-10-22", qty: 3, notes: null },
+      ],
+    })[0];
+    expect(calculateOrderPortions(singleOrder)).toBe(5);
+
+    const orders20 = createSyntheticOrders(20);
+    const sum20 = orders20.reduce((acc, o) => acc + calculateOrderPortions(o), 0);
+    expect(sum20).toBeGreaterThan(20);
+
+    const orders100 = createSyntheticOrders(100);
+    const sum100 = orders100.reduce((acc, o) => acc + calculateOrderPortions(o), 0);
+    expect(sum100).toBeGreaterThan(100);
+
+    // Empty items
+    expect(calculateOrderPortions({ id: "o-empty" } as any)).toBe(0);
+  });
+
+  it("handles toggleOrderIdInSet for 1, 20, and 100 orders", () => {
+    let set = new Set<string>();
+
+    // Add 1
+    set = toggleOrderIdInSet(set, "order-1");
+    expect(set.has("order-1")).toBe(true);
+    expect(set.size).toBe(1);
+
+    // Toggle off 1
+    set = toggleOrderIdInSet(set, "order-1");
+    expect(set.has("order-1")).toBe(false);
+    expect(set.size).toBe(0);
+
+    // Add 20 orders sequentially
+    for (let i = 1; i <= 20; i++) {
+      set = toggleOrderIdInSet(set, `order-${i}`);
+    }
+    expect(set.size).toBe(20);
+
+    // Add up to 100 orders
+    for (let i = 21; i <= 100; i++) {
+      set = toggleOrderIdInSet(set, `order-${i}`);
+    }
+    expect(set.size).toBe(100);
+  });
+
+  it("handles toggleAllOrdersInSet for 1, 20, and 100 orders", () => {
+    const orders100 = createSyntheticOrders(100);
+    const orders20 = orders100.slice(0, 20);
+    const orders1 = orders100.slice(0, 1);
+
+    // 1 order: select all then toggle off
+    let set1 = toggleAllOrdersInSet(new Set(), orders1);
+    expect(set1.size).toBe(1);
+    set1 = toggleAllOrdersInSet(set1, orders1);
+    expect(set1.size).toBe(0);
+
+    // 20 orders: select all then toggle off
+    let set20 = toggleAllOrdersInSet(new Set(), orders20);
+    expect(set20.size).toBe(20);
+    set20 = toggleAllOrdersInSet(set20, orders20);
+    expect(set20.size).toBe(0);
+
+    // 100 orders: select all then toggle off
+    let set100 = toggleAllOrdersInSet(new Set(), orders100);
+    expect(set100.size).toBe(100);
+    set100 = toggleAllOrdersInSet(set100, orders100);
+    expect(set100.size).toBe(0);
+  });
+
+  it("filters out invisible/deleted order IDs correctly", () => {
+    const orders = createSyntheticOrders(5);
+    const initialSet = new Set(["order-syn-1", "order-syn-2", "order-syn-5"]);
+
+    // If order-syn-5 is filtered out
+    const visibleOrders = orders.slice(0, 4);
+    const nextSet = filterVisibleOrderIds(initialSet, visibleOrders);
+
+    expect(nextSet.size).toBe(2);
+    expect(nextSet.has("order-syn-1")).toBe(true);
+    expect(nextSet.has("order-syn-2")).toBe(true);
+    expect(nextSet.has("order-syn-5")).toBe(false);
+  });
+});
+
+describe("Bulk Order Actions — Hook Probe in SSR", () => {
+  it("initializes useBulkOrderSelection with clean empty state", () => {
+    const orders = createSyntheticOrders(10);
+    let captured: any = null;
+
+    function Probe() {
+      captured = useBulkOrderSelection(orders, []);
+      return (
+        <div data-testid="probe">
+          <span>{captured.isAllSelected ? "ALL" : "NOT_ALL"}</span>
+          <span>{captured.selectedPortions}</span>
+        </div>
+      );
+    }
+
+    const html = renderToString(<Probe />);
+    expect(html).toContain("NOT_ALL");
+    expect(html).toContain("0");
+    expect(captured.selectedOrderIds.size).toBe(0);
+    expect(captured.selectedOrders).toHaveLength(0);
+    expect(captured.isPartiallySelected).toBe(false);
+  });
+});
+
+describe("Bulk Order Actions — UI Components", () => {
+  it("renders BulkActionBar with selected count and portions", () => {
+    const html = renderToString(
+      <BulkActionBar
+        selectedCount={5}
+        selectedPortions={12}
+        onAdvance={vi.fn()}
+        onRollback={vi.fn()}
+        onClear={vi.fn()}
+        rollbackEnabled={false}
+      />,
+    );
+
+    expect(html).toContain("pedidos seleccionados");
+    expect(html).toContain("raciones");
+    expect(html).toContain("Avanzar estado");
+    expect(html).toContain("Retroceder estado");
+    expect(html).toContain("Pend. migración");
+    expect(html).toContain("Deseleccionar");
+  });
+
+  it("renders BulkActionBar with active rollback button when rollbackEnabled is true", () => {
+    const html = renderToString(
+      <BulkActionBar
+        selectedCount={20}
+        selectedPortions={45}
+        onAdvance={vi.fn()}
+        onRollback={vi.fn()}
+        onClear={vi.fn()}
+        rollbackEnabled={true}
+      />,
+    );
+
+    expect(html).toContain("pedidos seleccionados");
+    expect(html).toContain("raciones");
+    expect(html).toContain("Retroceder estado");
+    expect(html).not.toContain("Pend. migración");
+  });
+
+  it("renders BulkAdvanceModal with breakdown for mixed states and omits delivered", () => {
+    const mixedOrders: OperationalOrderListItem[] = [
+      ...createSyntheticOrders(2, { status: "draft" }),
+      ...createSyntheticOrders(3, { status: "confirmed" }),
+      ...createSyntheticOrders(4, { status: "in_production" }),
+      ...createSyntheticOrders(2, { status: "prepared" }),
+      ...createSyntheticOrders(2, { status: "ready_for_delivery" }),
+      ...createSyntheticOrders(1, { status: "delivered" }),
+      ...createSyntheticOrders(1, { status: "cancelled" }),
+    ];
+
+    const html = renderToString(
+      <BulkAdvanceModal
+        open={true}
+        onOpenChange={vi.fn()}
+        selectedOrders={mixedOrders}
+        onExecute={vi.fn()}
+        busy={false}
+      />,
+    );
+
+    expect(html).toContain("Avanzar estado");
+    expect(html).toContain("Borrador");
+    expect(html).toContain("Confirmado");
+    expect(html).toContain("En preparación");
+    expect(html).toContain("Preparado");
+    expect(html).toContain("Listo para reparto");
+    expect(html).toContain("pedidos omitidos");
+    expect(html).toContain("No se marcarán pedidos como entregados");
+    expect(html).toContain("pedidos elegibles");
+  });
+
+  it("renders BulkAdvanceModal for homogeneous batch of 100 confirmed orders", () => {
+    const confirmed100 = createSyntheticOrders(100, { status: "confirmed" });
+
+    const html = renderToString(
+      <BulkAdvanceModal
+        open={true}
+        onOpenChange={vi.fn()}
+        selectedOrders={confirmed100}
+        onExecute={vi.fn()}
+        busy={false}
+      />,
+    );
+
+    expect(html).toContain("Avanzar estado");
+    expect(html).toContain("Cada pedido avanzará exactamente");
+    expect(html).toContain("Confirmado");
+    expect(html).toContain("En preparación");
+    expect(html).toContain("pedidos elegibles");
+  });
+
+  it("renders BulkRollbackModal breakdown and strictly excludes v2 canonical orders", () => {
+    const testOrders: OperationalOrderListItem[] = [
+      ...createSyntheticOrders(2, { status: "ready_for_delivery", writeContractVersion: 1 }),
+      ...createSyntheticOrders(3, { status: "prepared", writeContractVersion: 1 }),
+      ...createSyntheticOrders(2, { status: "in_production", writeContractVersion: 1 }),
+      ...createSyntheticOrders(2, { status: "prepared", writeContractVersion: 2 }), // V2 should be omitted!
+      ...createSyntheticOrders(1, { status: "confirmed", writeContractVersion: 1 }), // Initial status omitted!
+      ...createSyntheticOrders(1, { status: "delivered", writeContractVersion: 1 }), // Delivered omitted!
+    ];
+
+    const html = renderToString(
+      <BulkRollbackModal
+        open={true}
+        onOpenChange={vi.fn()}
+        selectedOrders={testOrders}
+        onExecute={vi.fn()}
+        busy={false}
+        rollbackEnabled={true}
+      />,
+    );
+
+    expect(html).toContain("Retroceder estado operacional");
+    expect(html).toContain("pedidos elegibles");
+    expect(html).toContain("Listo para reparto");
+    expect(html).toContain("Preparado");
+    expect(html).toContain("En preparación");
+    expect(html).toContain("Confirmado");
+    expect(html).toContain("Pedido canónico v2");
+    expect(html).toContain("Motivo del retroceso");
+    expect(html).toContain("Confirmar Retroceso");
+  });
+
+  it("shows execution summary with succeeded, omitted, and failed orders", () => {
+    const orders = createSyntheticOrders(3, { status: "prepared" });
+    const mockResult: BulkExecutionResult = {
+      succeeded: [{ orderId: "order-syn-1", from: "prepared", to: "ready_for_delivery" }],
+      omitted: [{ orderId: "order-syn-2", reason: "Omitido por filtro" }],
+      failed: [{ orderId: "order-syn-3", error: "Lock timeout en base de datos" }],
+    };
+
+    const html = renderToString(
+      <BulkAdvanceModal
+        open={true}
+        onOpenChange={vi.fn()}
+        selectedOrders={orders}
+        onExecute={vi.fn(async () => mockResult)}
+        busy={false}
+      />,
+    );
+
+    expect(html).toContain("Avanzar");
+    expect(html).toContain("pedidos elegibles");
+  });
+});

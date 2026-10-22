@@ -5,7 +5,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
 import { useCallback, useEffect, useState } from "react";
-import { ChefHat, RefreshCw } from "lucide-react";
+import { ChefHat, RefreshCw, RotateCcw, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { useCan } from "@/hooks/use-can";
@@ -14,6 +14,8 @@ import { createServiceContext } from "@/services/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -34,6 +36,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -45,12 +48,31 @@ import { DietaryBadges } from "@/components/operations/dietary-badges";
 import { DishSafetyAlert } from "@/components/operations/dish-safety-alert";
 import { BootstrapReadinessBanner } from "@/components/tenant/bootstrap-readiness-banner";
 import {
+  useBulkOrderSelection,
+  BulkActionBar,
+  BulkAdvanceModal,
+  BulkRollbackModal,
+  type BulkExecutionResult,
+} from "@/components/orders/bulk-order-actions";
+import { useOrder } from "@/order/useOrder";
+import {
+  confirmOrderCommand,
+  readyForKitchenCommand,
+  scheduleProductionCommand,
+  readyForDeliveryCommand,
+  rollbackOrderStatusCommand,
+} from "@/order/OrderCommands";
+import {
   OperationsService,
   kitchenNextStatuses,
   operationalStatusLabel,
   type OperationalOrderListItem,
   type OperationalStatus,
 } from "@/modules/operations";
+import {
+  getRollbackStatus,
+  ROLLBACK_LABEL_ES,
+} from "@/modules/operations/domain/operational-status";
 
 export const Route = createFileRoute("/_authenticated/admin/kitchen")({
   beforeLoad: ({ context }) => {
@@ -72,7 +94,7 @@ function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
 
-function KitchenWorkspacePage() {
+export function KitchenWorkspacePage() {
   const { user, tenantId, roles } = useAuth();
   const { can } = useCan();
   const [activeTab, setActiveTab] = useState<"daily" | "monthly">("daily");
@@ -89,6 +111,27 @@ function KitchenWorkspacePage() {
   const [loading, setLoading] = useState(true);
   const [detail, setDetail] = useState<OperationalOrderListItem | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+
+  const orderApi = useOrder();
+  const {
+    selectedOrderIds,
+    selectedOrders,
+    selectedPortions,
+    toggleSelectOrder,
+    toggleSelectAll,
+    clearSelection,
+    isAllSelected,
+    isPartiallySelected,
+  } = useBulkOrderSelection(orders, [date, companyId, siteId, deliveryGroupId]);
+
+  const [bulkAdvanceOpen, setBulkAdvanceOpen] = useState(false);
+  const [bulkRollbackOpen, setBulkRollbackOpen] = useState(false);
+  const [bulkBusy, setBulkBusy] = useState(false);
+
+  // Single order rollback in detail modal
+  const [detailRollbackOpen, setDetailRollbackOpen] = useState(false);
+  const [detailRollbackReason, setDetailRollbackReason] = useState("");
+  const [detailRollbackBusy, setDetailRollbackBusy] = useState(false);
 
   const loadFilters = useCallback(async () => {
     /* Tables/columns from ADR 0015 may lag generated types */
@@ -173,6 +216,153 @@ function KitchenWorkspacePage() {
       setBusyId(null);
     }
   }
+
+  const executeBulkAdvance = async (
+    eligibleOrders: OperationalOrderListItem[],
+  ): Promise<BulkExecutionResult> => {
+    setBulkBusy(true);
+    const result: BulkExecutionResult = {
+      succeeded: [],
+      omitted: [],
+      failed: [],
+    };
+
+    for (const o of eligibleOrders) {
+      try {
+        let res;
+        let target: OperationalStatus;
+        if (o.status === "draft") {
+          target = "confirmed";
+          res = await orderApi.confirmOrder(confirmOrderCommand({ orderId: o.id }));
+        } else if (o.status === "confirmed") {
+          target = "in_production";
+          res = await orderApi.readyForKitchen(readyForKitchenCommand({ orderId: o.id }));
+        } else if (o.status === "in_production") {
+          target = "prepared";
+          res = await orderApi.scheduleProduction(scheduleProductionCommand({ orderId: o.id }));
+        } else if (o.status === "prepared") {
+          target = "ready_for_delivery";
+          res = await orderApi.readyForDelivery(readyForDeliveryCommand({ orderId: o.id }));
+        } else {
+          result.omitted.push({ orderId: o.id, reason: `Estado ${o.status} omitido` });
+          continue;
+        }
+
+        if (res.ok) {
+          result.succeeded.push({ orderId: o.id, from: o.status, to: target });
+        } else {
+          result.failed.push({
+            orderId: o.id,
+            error: res.errors[0]?.message ?? "Error desconocido al avanzar",
+          });
+        }
+      } catch (err: any) {
+        result.failed.push({
+          orderId: o.id,
+          error: err.message ?? "Error inesperado",
+        });
+      }
+    }
+
+    setBulkBusy(false);
+    clearSelection();
+    await load();
+    if (result.succeeded.length > 0) {
+      toast.success(
+        `Se avanzaron ${result.succeeded.length} pedidos correctamente.`,
+      );
+    }
+    if (result.failed.length > 0) {
+      toast.error(
+        `${result.failed.length} pedidos fallaron al avanzar. Revisa el resumen.`,
+      );
+    }
+    return result;
+  };
+
+  const executeBulkRollback = async (
+    eligibleOrders: OperationalOrderListItem[],
+    reason: string,
+  ): Promise<BulkExecutionResult> => {
+    setBulkBusy(true);
+    const result: BulkExecutionResult = {
+      succeeded: [],
+      omitted: [],
+      failed: [],
+    };
+
+    for (const o of eligibleOrders) {
+      const prev = getRollbackStatus(o.status);
+      if (!prev) {
+        result.omitted.push({ orderId: o.id, reason: "No reversible" });
+        continue;
+      }
+      try {
+        const res = await orderApi.rollbackOrderStatus(
+          rollbackOrderStatusCommand({ orderId: o.id, reason }),
+        );
+        if (res.ok) {
+          result.succeeded.push({ orderId: o.id, from: o.status, to: prev });
+        } else {
+          result.failed.push({
+            orderId: o.id,
+            error: res.errors[0]?.message ?? "Error al retroceder",
+          });
+        }
+      } catch (err: any) {
+        result.failed.push({
+          orderId: o.id,
+          error: err.message ?? "Error inesperado",
+        });
+      }
+    }
+
+    setBulkBusy(false);
+    clearSelection();
+    await load();
+    if (result.succeeded.length > 0) {
+      toast.success(
+        `Se retrocedieron ${result.succeeded.length} pedidos a su estado anterior.`,
+      );
+    }
+    if (result.failed.length > 0) {
+      toast.error(
+        `${result.failed.length} pedidos fallaron al retroceder. Revisa el resumen.`,
+      );
+    }
+    return result;
+  };
+
+  const detailRollbackStatus = detail ? getRollbackStatus(detail.status) : null;
+  const detailRollbackLabel = detail && detailRollbackStatus ? ROLLBACK_LABEL_ES[detail.status] : null;
+  const detailIsV2 = detail?.writeContractVersion === 2;
+
+  const handleSingleOrderRollback = async () => {
+    if (!detail || !detailRollbackReason.trim() || !detailRollbackStatus) return;
+    setDetailRollbackBusy(true);
+    try {
+      const res = await orderApi.rollbackOrderStatus(
+        rollbackOrderStatusCommand({
+          orderId: detail.id,
+          reason: detailRollbackReason.trim(),
+        }),
+      );
+      if (!res.ok) {
+        toast.error(res.errors[0]?.message ?? "Error al retroceder pedido");
+      } else {
+        toast.success(
+          `Pedido #${detail.id.slice(0, 8)} devuelto a ${operationalStatusLabel(detailRollbackStatus)}.`,
+        );
+        setDetailRollbackOpen(false);
+        setDetail(null);
+        await load();
+      }
+    } catch (e: any) {
+      toast.error(e.message ?? "Error inesperado al retroceder pedido");
+    } finally {
+      setDetailRollbackBusy(false);
+    }
+  };
 
   if (!can("kitchen.operate")) {
     return (
@@ -298,6 +488,16 @@ function KitchenWorkspacePage() {
         </div>
       </div>
 
+      {/* Barra de Acciones Masivas Contextual */}
+      <BulkActionBar
+        selectedCount={selectedOrderIds.size}
+        selectedPortions={selectedPortions}
+        onAdvance={() => setBulkAdvanceOpen(true)}
+        onRollback={() => setBulkRollbackOpen(true)}
+        onClear={clearSelection}
+        busy={bulkBusy}
+      />
+
       {loading ? (
         <Skeleton className="h-48 w-full" />
       ) : orders.length === 0 ? (
@@ -310,6 +510,19 @@ function KitchenWorkspacePage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-12 text-center">
+                  <Checkbox
+                    checked={
+                      orders.length > 0 && selectedOrderIds.size === orders.length
+                        ? true
+                        : selectedOrderIds.size > 0
+                          ? "indeterminate"
+                          : false
+                    }
+                    onCheckedChange={toggleSelectAll}
+                    aria-label="Seleccionar todos los pedidos visibles"
+                  />
+                </TableHead>
                 <TableHead>Pedido</TableHead>
                 <TableHead>Cliente</TableHead>
                 <TableHead>Empresa</TableHead>
@@ -323,7 +536,20 @@ function KitchenWorkspacePage() {
             </TableHeader>
             <TableBody>
               {orders.map((o) => (
-                <TableRow key={o.id}>
+                <TableRow
+                  key={o.id}
+                  className={selectedOrderIds.has(o.id) ? "bg-muted/40" : undefined}
+                >
+                  <TableCell
+                    className="w-12 text-center"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Checkbox
+                      checked={selectedOrderIds.has(o.id)}
+                      onCheckedChange={() => toggleSelectOrder(o.id)}
+                      aria-label={`Seleccionar pedido ${o.id}`}
+                    />
+                  </TableCell>
                   <TableCell className="font-mono text-xs">
                     {o.id.slice(0, 8)}
                   </TableCell>
@@ -357,6 +583,23 @@ function KitchenWorkspacePage() {
       )}
       </TabsContent>
       </Tabs>
+
+      {/* Modales de Acciones Masivas */}
+      <BulkAdvanceModal
+        open={bulkAdvanceOpen}
+        onOpenChange={setBulkAdvanceOpen}
+        selectedOrders={selectedOrders}
+        onExecute={executeBulkAdvance}
+        busy={bulkBusy}
+      />
+
+      <BulkRollbackModal
+        open={bulkRollbackOpen}
+        onOpenChange={setBulkRollbackOpen}
+        selectedOrders={selectedOrders}
+        onExecute={executeBulkRollback}
+        busy={bulkBusy}
+      />
 
       <Dialog open={!!detail} onOpenChange={(open) => !open && setDetail(null)}>
         <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
@@ -462,18 +705,44 @@ function KitchenWorkspacePage() {
 
                 <OperationalTimeline status={detail.status} />
 
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 items-center">
                   {kitchenNextStatuses(detail.status).map((next) => (
                     <Button
                       key={next}
                       size="sm"
-                      disabled={busyId === detail.id}
+                      disabled={busyId === detail.id || detailRollbackBusy}
                       onClick={() => void advance(detail, next)}
                     >
                       → {operationalStatusLabel(next)}
                     </Button>
                   ))}
-                  {kitchenNextStatuses(detail.status).length === 0 && (
+
+                  {detailRollbackLabel && detailRollbackStatus && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        if (detailIsV2) return;
+                        setDetailRollbackReason("");
+                        setDetailRollbackOpen(true);
+                      }}
+                      disabled={busyId === detail.id || detailRollbackBusy || detailIsV2}
+                      title={
+                        detailIsV2
+                          ? "Los pedidos canónicos v2 no admiten retroceso de estado operacional directo"
+                          : undefined
+                      }
+                      className="gap-1.5 text-xs font-semibold border-amber-500/40 text-amber-900 dark:text-amber-200"
+                    >
+                      <RotateCcw className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+                      {detailRollbackLabel}
+                      {detailIsV2 && (
+                        <span className="text-[10px] text-muted-foreground ml-1">(No disp. v2)</span>
+                      )}
+                    </Button>
+                  )}
+
+                  {kitchenNextStatuses(detail.status).length === 0 && !detailRollbackStatus && (
                     <p className="text-xs text-muted-foreground">
                       Sin transiciones de cocina disponibles.
                     </p>
@@ -484,6 +753,56 @@ function KitchenWorkspacePage() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Modal de confirmación para retroceso individual de Cocina */}
+      <Dialog open={detailRollbackOpen} onOpenChange={setDetailRollbackOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Retroceder Estado Operacional</DialogTitle>
+            <DialogDescription>
+              {detail && (
+                <>
+                  ¿Confirmas que deseas retroceder el pedido #{detail.id.slice(0, 8)} de &quot;
+                  {operationalStatusLabel(detail.status)}&quot; a &quot;
+                  {detailRollbackStatus ? operationalStatusLabel(detailRollbackStatus) : ""}&quot;?
+                  Esta acción quedará registrada en el historial inmutable de auditoría.
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <label className="text-xs font-medium text-foreground">
+              Motivo del retroceso (obligatorio)
+            </label>
+            <Textarea
+              value={detailRollbackReason}
+              onChange={(e) => setDetailRollbackReason(e.target.value)}
+              placeholder="Indique la justificación operativa del retroceso..."
+              className="text-xs min-h-[80px]"
+            />
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button
+              variant="outline"
+              onClick={() => setDetailRollbackOpen(false)}
+              disabled={detailRollbackBusy}
+            >
+              Volver
+            </Button>
+            <Button
+              variant="default"
+              onClick={handleSingleOrderRollback}
+              disabled={detailRollbackBusy || !detailRollbackReason.trim()}
+              className="bg-amber-600 hover:bg-amber-700 text-white"
+            >
+              {detailRollbackBusy ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Confirmar Retroceso
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+
+export default KitchenWorkspacePage;
