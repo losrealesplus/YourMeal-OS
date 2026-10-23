@@ -1,0 +1,89 @@
+name: "Gate 6: Selected EatClean Database Migration"
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        type: choice
+        options: [preflight, install]
+        default: preflight
+        required: true
+      expected_source_sha:
+        description: "Exact reviewed main SHA; this run must use that SHA"
+        required: true
+        type: string
+      expected_migration_sha256:
+        description: "Reviewed digest from rollback-v1-install.json"
+        required: true
+        type: string
+      authorization_scope:
+        description: "Install only: INSTALL_ONLY_20261023065216_ON_nhirlpkuvonggctdzzad"
+        type: string
+      reason:
+        description: "Human reason for this exact operation (not a blanket authorization)"
+        required: true
+        type: string
+permissions:
+  contents: read
+  actions: read
+  deployments: read
+concurrency:
+  group: eatclean-selected-database-migration
+  cancel-in-progress: false
+env:
+  EXPECTED_SOURCE_SHA: ${{ inputs.expected_source_sha }}
+  EXPECTED_MIGRATION_SHA256: ${{ inputs.expected_migration_sha256 }}
+  MIGRATION_OPERATION: ${{ inputs.operation }}
+  AUTHORIZATION_SCOPE: ${{ inputs.authorization_scope }}
+jobs:
+  validate:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Offline safety tests
+        run: node --test scripts/governance/rollback-migration.spec.mjs
+      - name: Verify scope, source, bytes and environment authority without database credentials
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/governance/rollback-migration.mjs validate
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rollback-migration-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/rollback-migration-report.json
+          if-no-files-found: warn
+  migrate:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: production-db
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Ensure PostgreSQL client is available
+        run: sudo apt-get update && sudo apt-get install --yes postgresql-client
+      - name: Preflight or install exactly one reviewed migration
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SUPABASE_DB_URL_PROD: ${{ secrets.SUPABASE_DB_URL_PROD }}
+        run: node scripts/governance/rollback-migration.mjs execute
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rollback-migration-result-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/rollback-migration-report.json
+          if-no-files-found: warn
+          retention-days: 90
