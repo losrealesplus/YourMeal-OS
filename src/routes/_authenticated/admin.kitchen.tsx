@@ -185,7 +185,7 @@ export function KitchenWorkspacePage() {
 
   // Single order rollback in detail modal
   const [detailRollbackOpen, setDetailRollbackOpen] = useState(false);
-  const [detailRollbackChanged, setDetailRollbackChanged] = useState(false);
+  const [detailRollbackNeedsRefresh, setDetailRollbackNeedsRefresh] = useState(false);
   const [detailRollbackBusy, setDetailRollbackBusy] = useState(false);
 
   const loadFilters = useCallback(async () => {
@@ -739,7 +739,7 @@ export function KitchenWorkspacePage() {
       <BulkRollbackModal
         open={detailRollbackOpen} onOpenChange={(open) => {
           setDetailRollbackOpen(open);
-          if (!open && detailRollbackChanged) { setDetailRollbackChanged(false); setDetail(null); }
+          if (!open && detailRollbackNeedsRefresh) { setDetailRollbackNeedsRefresh(false); setDetail(null); }
         }}
         selectedOrders={detail ? [detail] : []} busy={detailRollbackBusy}
         currentOperatingDate={date}
@@ -747,7 +747,7 @@ export function KitchenWorkspacePage() {
           setDetailRollbackBusy(true);
           try {
             const result = await executeRollbackOrders(orders, reason, scope, orderApi);
-            setDetailRollbackChanged(result.succeeded.length > 0);
+            setDetailRollbackNeedsRefresh(result.succeeded.length > 0 || result.failed.length > 0);
             await load();
             return result;
           } finally { setDetailRollbackBusy(false); }

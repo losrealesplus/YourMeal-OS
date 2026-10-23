@@ -767,7 +767,7 @@ export function BulkRollbackModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(next) => { if (!busy) onOpenChange(next); }}>
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-amber-900 dark:text-amber-200">
@@ -814,6 +814,13 @@ export function BulkRollbackModal({
               <ul className="text-xs space-y-1">
                 {result.succeeded.map((item) => <li key={item.orderId}>
                   #{item.orderId.slice(0, 8)}: {operationalStatusLabel(item.from)} → {operationalStatusLabel(item.to)}
+                </li>)}
+              </ul>
+            )}
+            {result.omitted.length > 0 && (
+              <ul className="text-xs space-y-1" aria-label="Pedidos omitidos">
+                {result.omitted.map((item) => <li key={item.orderId}>
+                  #{item.orderId.slice(0, 8)}: {item.reason}
                 </li>)}
               </ul>
             )}

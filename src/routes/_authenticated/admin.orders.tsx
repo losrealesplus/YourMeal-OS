@@ -325,7 +325,7 @@ export function OrderDetailView({
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [rollbackDialogOpen, setRollbackDialogOpen] = useState(false);
-  const [rollbackChanged, setRollbackChanged] = useState(false);
+  const [rollbackNeedsRefresh, setRollbackNeedsRefresh] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const rollbackStatus = getRollbackStatus(detail.status);
@@ -863,14 +863,14 @@ export function OrderDetailView({
       <BulkRollbackModal
         open={rollbackDialogOpen} onOpenChange={(open) => {
           setRollbackDialogOpen(open);
-          if (!open && rollbackChanged) { setRollbackChanged(false); onOrderUpdated?.(); }
+          if (!open && rollbackNeedsRefresh) { setRollbackNeedsRefresh(false); onOrderUpdated?.(); }
         }}
         selectedOrders={[detail]} busy={busy || editorLocked}
         onExecute={async (orders, reason, scope) => {
           setBusy(true);
           try {
             const result = await executeRollbackOrders(orders, reason, scope, orderApi);
-            setRollbackChanged(result.succeeded.length > 0);
+            setRollbackNeedsRefresh(result.succeeded.length > 0 || result.failed.length > 0);
             return result;
           } finally { setBusy(false); }
         }}

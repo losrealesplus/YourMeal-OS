@@ -37,3 +37,10 @@ Una variable runtime del Worker no sustituye la compilación. No se ha cambiado 
 Si existen servicios de entrega más avanzados que el destino, el RPC rechaza la operación sin cambiar nada;
 no se revierten entregas ni trabajo logístico automáticamente. Los v2 requieren ampliar el ciclo de vida
 canónico (revisión, idempotencia, dependientes y auditoría); no se usa el RPC v1 ni se desactiva guard_v2.
+
+## Cierre de revisión
+
+Se excluyen las fechas de delivery_services archivados del snapshot UI, igual que en el RPC.
+El modal no puede cerrarse por Escape/X/exterior mientras ejecuta. El resumen conserva resultado por pedido,
+incluidos motivos de omisión, y el detalle se refresca al cerrar tras éxito o fallo para no reintentar sobre datos
+obsoletos. Pruebas específicas del mapper, guard de cierre y resultado parcial SSR; no se presentan como E2E.

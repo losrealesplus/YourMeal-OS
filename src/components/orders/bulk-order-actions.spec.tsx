@@ -19,19 +19,22 @@ import {
 import type { OperationalOrderListItem } from "@/modules/operations";
 
 // Simulate the checked consent state without needing a browser renderer.
-const consentState = vi.hoisted(() => ({ checked: false }));
+const consentState = vi.hoisted(() => ({ checked: false, result: undefined as any }));
+const dialogState = vi.hoisted(() => ({ onOpenChange: undefined as any }));
 vi.mock("react", async (importOriginal) => {
   const actual = await importOriginal<typeof import("react")>();
   return {
     ...actual,
-    useState: (initial: any) => actual.useState(consentState.checked && initial === false ? true : initial),
+    useState: (initial: any) => actual.useState(initial === null && consentState.result !== undefined ? consentState.result : consentState.checked && initial === false ? true : initial),
   };
 });
 
 // Mock Radix dialog for SSR / vitest rendering
 vi.mock("@/components/ui/dialog", () => ({
-  Dialog: ({ children, open }: any) =>
-    open ? <div data-testid="dialog">{children}</div> : null,
+  Dialog: ({ children, open, onOpenChange }: any) => {
+    dialogState.onOpenChange = onOpenChange;
+    return open ? <div data-testid="dialog">{children}</div> : null;
+  },
   DialogContent: ({ children, className }: any) => (
     <div className={className}>{children}</div>
   ),
@@ -571,5 +574,28 @@ describe("Rollback execution boundary", () => {
       expect(result.succeeded).toHaveLength(0);
       expect(result.failed).toHaveLength(1);
     } finally { setOperationalRollbackEnabledForTests(false); }
+  });
+});
+
+describe("Rollback modal execution lifecycle", () => {
+  it.each([true, false])("close guard with busy=%s", (busy) => {
+    const onOpenChange = vi.fn();
+    renderToString(<BulkRollbackModal open onOpenChange={onOpenChange} selectedOrders={[]}
+      onExecute={vi.fn()} busy={busy} rollbackEnabled />);
+    dialogState.onOpenChange(false);
+    expect(onOpenChange).toHaveBeenCalledTimes(busy ? 0 : 1);
+  });
+  it("retains individual success, omitted and error details after a partial result", () => {
+    consentState.result = {
+      succeeded: [{ orderId: "success-one", from: "prepared", to: "in_production" }],
+      omitted: [{ orderId: "omitted-one", reason: "Alcance desconocido" }],
+      failed: [{ orderId: "failure-one", error: "Revision conflict" }],
+    };
+    try {
+      const html = renderToString(<BulkRollbackModal open onOpenChange={vi.fn()} selectedOrders={[]}
+        onExecute={vi.fn()} busy={false} rollbackEnabled />);
+      for (const detail of ["success-", "omitted-", "failure-", "Alcance desconocido", "Revision conflict", "Preparado", "En preparación"])
+        expect(html).toContain(detail);
+    } finally { consentState.result = undefined; }
   });
 });

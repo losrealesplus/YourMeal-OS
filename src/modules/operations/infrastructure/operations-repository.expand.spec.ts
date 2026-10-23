@@ -293,3 +293,12 @@ describe("Daily order temporal scope verification", () => {
     expect(result[0].temporalScopeKnown).toBe(false);
   });
 });
+
+it("does not include archived delivery services in the operator's temporal snapshot", () => {
+  const mapped = mapOperationalOrderRow({ ...row, delivery_services: [
+    { delivery_date: "2026-10-05", deleted_at: null },
+    { delivery_date: "2026-10-06", deleted_at: "2026-10-01T00:00:00Z" },
+  ] });
+  expect(mapped.allDeliveryDates).toEqual(["2026-10-05"]);
+  expect(mapped.isMultiDay).toBe(false);
+});
