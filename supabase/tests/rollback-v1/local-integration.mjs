@@ -27,7 +27,7 @@ try {
   const results=await Promise.all([concurrent(actor+call),concurrent(actor+call)]);
   assert.equal(results.filter(x=>x.code===0).length,1,JSON.stringify(results));
   assert.match(results.find(x=>x.code!==0).err,/Concurrency conflict/);
-  assert.equal(sql(`SELECT count(*) FROM public.audit_log WHERE entity_id='40000000-0000-4000-8000-000000000004'`).trim(),'1');
+  assert.equal(sql(`SELECT count(*) FROM public.audit_log WHERE entity_type='order' AND entity_id='40000000-0000-4000-8000-000000000004'`).trim(),'1');
   assert.equal(sql(`SELECT status||':'||revision FROM public.orders WHERE id='40000000-0000-4000-8000-000000000005'`).trim(),'in_production:0');
   console.log('PASS: v1 rollback, v2 rejection, tenant/role/auth guards, reason, multiday consent, dates, revision, audit atomicity, concurrent requests and unselected orders.');
 } finally {
