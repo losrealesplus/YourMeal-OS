@@ -26,6 +26,22 @@ test('reviewer/environment/main checks reject bypass and self approval',()=>{
  for(const invalid of [[],null,[{...reviews[0],state:'rejected'}],[{...reviews[0],user:{id:7}}]])
   assert.throws(()=>validateAuthority(ctx,environment,run,sha,invalid));
 });
+test('solo owner can dispatch and approve preflight and install only with explicit protected approval',()=>{
+ const soloEnvironment={...environment,protection_rules:[{...environment.protection_rules[0],prevent_self_review:false}]};
+ const ownerRun={...run,actor:{id:policy.reviewerId},triggering_actor:{id:policy.reviewerId}};
+ for(const operation of ['preflight','install']) {
+  const ctx=validateContext({...contextEnv,MIGRATION_OPERATION:operation,AUTHORIZATION_SCOPE:operation==='install'?scopeText:''});
+  validateAuthority(ctx,soloEnvironment,ownerRun,sha,reviews);
+  for(const invalid of [[],null,[{...reviews[0],state:'rejected'}],
+   [{...reviews[0],user:{id:7}}],[{...reviews[0],environments:[{name:'production-worker'}]}]])
+   assert.throws(()=>validateAuthority(ctx,soloEnvironment,ownerRun,sha,invalid));
+  assert.throws(()=>validateAuthority(ctx,{...soloEnvironment,can_admins_bypass:true},ownerRun,sha,reviews));
+  assert.throws(()=>validateAuthority(ctx,{...soloEnvironment,protection_rules:[]},ownerRun,sha,reviews));
+  // If the owner enables self-review prevention again, respect that protection.
+  assert.throws(()=>validateAuthority(ctx,environment,ownerRun,sha,reviews));
+  assert.throws(()=>validateAuthority(ctx,environment,{...run,triggering_actor:{id:policy.reviewerId}},sha,reviews));
+ }
+});
 test('baseline rejects schema/ledger/identity/overload drift',()=>{
  const b={schemaSha256:'b'.repeat(64),ledgerVersions:['123'],ledgerColumns:['version'],tenantVerified:true,rpcAbsent:true};
  validateBaseline(b,b);

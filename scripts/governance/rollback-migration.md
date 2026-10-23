@@ -7,9 +7,11 @@ no activa el flag, no ejecuta `db push`, no modifica pedidos y no instala ningun
 
 1. Revisar y autorizar el merge del backend #548; revisar y mergear por separado el PR de este canal.
 2. El propietario verifica `production-db`: reviewer soberano 292604102, ramas protegidas y bypass deshabilitado.
-   La configuración observada permite bypass y el script la rechaza. Cualquier cambio de protección requiere
-   autorización independiente. Con prevent_self_review=true, el run debe iniciarlo otro actor legítimo;
-   no se elude esa regla ni se amplían permisos automáticamente.
+   Modelo individual autorizado: `can_admins_bypass=false`, `prevent_self_review=false` y único revisor
+   `losrealesplus` (292604102). Esa cuenta puede iniciar el run y aprobarlo manualmente; cada preflight e
+   instalación requiere su aprobación explícita de `production-db`. Iniciar un run no equivale a aprobarlo.
+   Si se reactiva `prevent_self_review=true`, el instalador exige otro actor legítimo para iniciarlo.
+   No se elude esa regla ni se amplían permisos automáticamente.
 3. El propietario confirma el secreto existente `SUPABASE_DB_URL_PROD` en production-db (no accesible en lectura
    con el PAT de esta sesión). Debe apuntar a EatClean, sesión pooler puerto5432 o host directo, BD postgres.
 4. Confirmar que el SHA actual de main contiene exactamente los bytes de `rollback-v1-install.json` y la

@@ -23,7 +23,7 @@ Unit tests de contexto/alcance, target TLS, drift y autoridad; integración Post
 real generado. Se fuerzan fallos de baseline, inserción de ledger y postcheck y se comprueba ausencia de
 RPC/fila de ledger tras cada rollback; éxito y segunda instalación rechazada. Sin conexiones productivas de escritura.
 
-## Bloqueos productivos observados (no modificados)
+## Observación inicial (histórica)
 
 GET production-db: `can_admins_bypass=true`, `prevent_self_review=true`, único revisor `losrealesplus`.
 El ejecutor falla cerrado en esa configuración. Para una futura instalación, el propietario deberá deshabilitar
@@ -31,3 +31,14 @@ bypass con autorización separada y usar un actor legítimo distinto para inicia
 No se propone desactivar la prohibición de autoaprobación. La consulta de nombres de secretos devuelve 403;
 no se puede afirmar que `SUPABASE_DB_URL_PROD` esté configurado. Debe verificarlo el propietario antes del preflight.
 No se han ampliado permisos de tokens ni modificado entornos.
+
+## Actualización — modelo individual autorizado
+
+El propietario adopta responsable único y cambia manualmente el entorno. GET posterior confirma
+`can_admins_bypass=false`, `prevent_self_review=false`, required reviewer `losrealesplus` (292604102)
+y ramas protegidas. El instalador ya respeta esa configuración; no requiere cambios en runtime ni workflow.
+Se añade regresión para inicio y aprobación por el propietario en preflight e install: rechaza ausencia,
+rechazo, revisor/entorno incorrectos, bypass y ausencia de required reviewers. Si se reactiva la prohibición
+de autoaprobación, vuelve a rechazar al mismo actor/triggering_actor. Cada run conserva aprobación manual.
+Metadatos de `SUPABASE_DB_URL_PROD`: HTTP 403, existencia no verificada. Sin cambio de protecciones,
+workflows ejecutados manualmente, SQL productivo, merge ni activación.
