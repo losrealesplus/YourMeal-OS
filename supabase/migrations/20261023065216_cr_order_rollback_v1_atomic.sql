@@ -25,6 +25,9 @@ DECLARE
   v_valid_transition boolean := false;
   v_dates date[];
   v_expected_dates date[];
+  v_service public.delivery_services%ROWTYPE;
+  v_service_target public.delivery_service_status;
+  v_source_rank integer;
 BEGIN
   -- 1. Authentication check
   v_actor_id := auth.uid();
@@ -114,11 +117,28 @@ BEGIN
     AND p_allow_multi_day IS DISTINCT FROM true THEN
     RAISE EXCEPTION 'Explicit multi-day confirmation required';
   END IF;
+  v_source_rank := array_position(ARRAY['in_production','prepared','ready_for_delivery'], p_expected_current_status::text);
+  v_service_target := (CASE WHEN p_target_status='confirmed' THEN 'pending' ELSE p_target_status::text END)::public.delivery_service_status;
   IF EXISTS (SELECT 1 FROM public.delivery_services
     WHERE tenant_id=p_tenant_id AND order_id=p_order_id AND deleted_at IS NULL
-      AND status::text NOT IN ('pending','cancelled',p_target_status::text)) THEN
+      AND status::text NOT IN ('pending','cancelled')
+      AND (array_position(ARRAY['in_production','prepared','ready_for_delivery'], status::text) IS NULL
+        OR array_position(ARRAY['in_production','prepared','ready_for_delivery'], status::text)>v_source_rank)) THEN
     RAISE EXCEPTION 'Dependent delivery services require separate correction';
   END IF;
+  -- Only synchronized source microstates move back. Earlier/cancelled days are preserved.
+  FOR v_service IN SELECT * FROM public.delivery_services
+    WHERE tenant_id=p_tenant_id AND order_id=p_order_id AND deleted_at IS NULL
+      AND status::text=p_expected_current_status::text ORDER BY id
+  LOOP
+    UPDATE public.delivery_services SET status=v_service_target
+      WHERE tenant_id=p_tenant_id AND id=v_service.id;
+    INSERT INTO public.audit_log(tenant_id,actor_id,entity_type,entity_id,action,old_data,new_data)
+      VALUES(p_tenant_id,v_actor_id,'delivery_service',v_service.id,'status_change',
+        jsonb_build_object('status',v_service.status),
+        jsonb_build_object('status',v_service_target,'reason',v_trimmed_reason,'isRollback',true,
+          'orderId',p_order_id,'deliveryDate',v_service.delivery_date));
+  END LOOP;
 
   -- 8. Atomic mutation: Update order status
   UPDATE public.orders

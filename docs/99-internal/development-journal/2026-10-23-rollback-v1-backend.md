@@ -14,7 +14,7 @@ El pedido operativo en preparación es v1, revisión 0, fechas 19–22/10; sus c
 RPC autenticado y limitado a roles operativos; revoca EXECUTE a PUBLIC/anon. Bloquea cabecera y dependientes,
 verifica estado/revisión/fechas exactas y consentimiento multijornada, incrementa revisión y escribe auditoría
 en la misma transacción. Solo permite prepared→in_production, in_production→confirmed y ready_for_delivery→prepared.
-Los servicios de entrega deben estar pendientes, cancelados o ya en el estado objetivo; no se rebobina reparto silenciosamente.
+Los servicios sincronizados con el estado origen retroceden un microestado (confirmed corresponde a pending); los anteriores y cancelados se conservan. Se rechazan estados más avanzados que la cabecera, reparto, entregados e incidencias. Cada microcambio y la cabecera se auditan en la misma transacción.
 
 V2 permanece rechazado: `cr_order_private.guard_v2` exige writer canónico y `cr_order_lifecycle` no ofrece acción
 inversa. Añadirla requeriría extender sus validadores, revisiones, idempotencia, servicios, sesiones y auditoría;
@@ -26,3 +26,12 @@ Pruebas SQL sintéticas en BD Docker desechable con esquema local completo: PASS
 concurrencia y pedidos no seleccionados. Se consultaron columnas, permisos y triggers productivos solo en lectura.
 Pendiente instalar esta migración en el entorno correcto, con autorización humana separada y por el canal
 controlado del repositorio. No ejecutar manualmente en Supabase. El flag de aplicación sigue desactivado.
+
+## Cierre de revisión técnica
+
+Se corrigió el guard que rechazaba servicios válidos en in_production/prepared/ready_for_delivery.
+El enum real no contiene confirmed: su destino de servicio es pending. Las pruebas originales sin servicios
+positivos no detectaban el defecto; ahora cubren los tres microestados, jornadas mixtas, servicios anteriores,
+cancelados/no seleccionados y fallo de auditoría después de actualizar el microestado. Integración local PASS.
+Los triggers productivos v1 permiten estas transiciones; v2 sigue protegido. Un conflicto de locks aborta
+la transacción sin cambios parciales y se informa como fallo por pedido, nunca como éxito de lote.

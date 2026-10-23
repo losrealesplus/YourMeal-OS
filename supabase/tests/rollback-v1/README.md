@@ -9,7 +9,8 @@ Copia únicamente el esquema a una base nueva, instala allí la migración, ejec
 Verifica las tres transiciones, permisos operativos y denegados, aislamiento tenant, rechazo v2,
 justificación, revisión y estado esperados, alcance multijornada exacto y consentimiento, rollback
 transaccional ante error de auditoría, permiso real `authenticated` y denegación `anon`,
-rechazo de servicios de entrega avanzados, dos solicitudes concurrentes y pedidos no seleccionados.
+retroceso de microestados reales con auditoría, conservación de servicios anteriores/cancelados,
+rechazo de reparto avanzado, dos solicitudes concurrentes y pedidos/servicios no seleccionados.
 
 La prueba utiliza el esquema local, no certifica que esté sincronizado al 100% con producción.
 El bootstrap completo de migraciones del PR verifica la instalación desde una BD vacía.
