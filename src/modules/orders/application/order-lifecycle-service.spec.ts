@@ -301,6 +301,7 @@ describe("OrderLifecycleService (CR-OPS-09B)", () => {
           "prepared",
           "in_production",
           "Aún no está empaquetado",
+          {},
         );
       });
 
@@ -325,6 +326,7 @@ describe("OrderLifecycleService (CR-OPS-09B)", () => {
           "in_production",
           "confirmed",
           "Error al iniciar en cocina",
+          {},
         );
       });
 
@@ -349,6 +351,7 @@ describe("OrderLifecycleService (CR-OPS-09B)", () => {
           "ready_for_delivery",
           "prepared",
           "Reabrir empaque para revisión",
+          {},
         );
       });
 
@@ -403,5 +406,27 @@ describe("OrderLifecycleService (CR-OPS-09B)", () => {
         ).rejects.toThrow("Fallo al ejecutar retroceso atómico: Concurrency conflict");
       });
     });
+  });
+});
+
+describe("Rollback operator snapshot", () => {
+  beforeEach(() => setOperationalRollbackEnabledForTests(true));
+  afterEach(() => setOperationalRollbackEnabledForTests(false));
+  it.each(["kitchen", "production", "operations_manager"])("allows operational role %s", async (role) => {
+    const repo = { findByIdWithItems: vi.fn(async () => ({ order: { status: "prepared", revision: 4 }, items: [] })),
+      rollbackStatusV1: vi.fn(async () => ({ status: "in_production" })) } as any;
+    await OrderLifecycleService.rollbackStatus(mockCtx({ roles: [role as any] }), repo, "o1", "fix",
+      { expectedStatus: "prepared", expectedRevision: 4 });
+    expect(repo.rollbackStatusV1).toHaveBeenCalled();
+  });
+  it.each(["accounting", "customer", "support", "driver"])("rejects role %s", async (role) => {
+    const repo = { findByIdWithItems: vi.fn() } as any;
+    await expect(OrderLifecycleService.rollbackStatus(mockCtx({ roles: [role as any] }), repo, "o1", "fix")).rejects.toThrow();
+    expect(repo.findByIdWithItems).not.toHaveBeenCalled();
+  });
+  it("rejects a stale operator-confirmed state before invoking RPC", async () => {
+    const repo = { findByIdWithItems: vi.fn(async () => ({ order: { status: "in_production" }, items: [] })), rollbackStatusV1: vi.fn() } as any;
+    await expect(OrderLifecycleService.rollbackStatus(mockCtx(), repo, "o1", "fix", { expectedStatus: "prepared" })).rejects.toThrow("estado ha cambiado");
+    expect(repo.rollbackStatusV1).not.toHaveBeenCalled();
   });
 });

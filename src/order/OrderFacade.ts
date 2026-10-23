@@ -414,6 +414,7 @@ export class OrderFacade {
         repo,
         command.orderId,
         command.reason,
+        command,
       );
       const got = await this.getOrder(identity, {
         type: "GetOrder",

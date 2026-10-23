@@ -119,18 +119,15 @@ function readBooleanFlag(value: unknown): boolean | undefined {
 }
 
 function getRollbackEnvFlag(): boolean | undefined {
+  // Vite embeds this value into both browser and SSR bundles at build time.
+  // Runtime Worker variables must not disagree with the browser's compiled flag.
   try {
-    if (typeof process !== "undefined" && process.env) {
-      const fromProcess = readBooleanFlag(process.env.VITE_OPERATIONAL_ROLLBACK_ENABLED);
-      if (fromProcess !== undefined) return fromProcess;
-    }
+    const flag = readBooleanFlag(import.meta.env?.VITE_OPERATIONAL_ROLLBACK_ENABLED);
+    if (flag !== undefined) return flag;
   } catch {}
-  try {
-    const fromVite = readBooleanFlag(
-      (import.meta.env as Record<string, unknown>)?.VITE_OPERATIONAL_ROLLBACK_ENABLED,
-    );
-    if (fromVite !== undefined) return fromVite;
-  } catch {}
+  if (isTestEnvironment() && typeof process !== "undefined") {
+    return readBooleanFlag(process.env?.VITE_OPERATIONAL_ROLLBACK_ENABLED);
+  }
   return undefined;
 }
 
@@ -147,7 +144,8 @@ let _featureOperationalRollbackEnabled = false;
  * Para activar el retroceso en producción o staging de forma explícita y controlada tras el
  * despliegue de la migración SQL 20261022081500_cr_order_rollback_v1_rpc.sql, se debe configurar:
  *   VITE_OPERATIONAL_ROLLBACK_ENABLED="true"
- * en las variables de entorno del Worker / hosting.
+ * en el entorno de compilación Vite, generando y publicando un artefacto nuevo.
+ * Cambiar solo una variable runtime del Worker no activa el bundle del navegador.
  *
  * En suites de prueba automatizadas (Vitest / NODE_ENV=test), también puede activarse
  * programáticamente mediante setOperationalRollbackEnabledForTests(true).
@@ -294,3 +292,12 @@ export function buildOperationalTimeline(
 
   return [created, ...spine];
 }
+
+/** Snapshot confirmed by the operator; the RPC revalidates it under lock. */
+export type OperationalRollbackScope = {
+  expectedStatus?: OperationalOrderStatus;
+  expectedRevision?: number;
+  expectedDeliveryDates?: string[];
+  allowMultiDay?: boolean;
+  operatingDate?: string;
+};

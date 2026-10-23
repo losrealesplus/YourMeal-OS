@@ -1,3 +1,4 @@
+import type { OperationalRollbackScope } from "@/modules/operations/domain/operational-status";
 /**
  * Order Commands — operational process intents (OPERATIONAL-003 Phase 2).
  * Not CRUD. EatClean weekly commitment language.
@@ -50,7 +51,7 @@ export type CancelOrderCommand = {
   reason?: string;
 };
 
-export type RollbackOrderStatusCommand = {
+export type RollbackOrderStatusCommand = OperationalRollbackScope & {
   type: "RollbackOrderStatus";
   orderId: string;
   reason: string;

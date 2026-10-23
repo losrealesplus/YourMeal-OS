@@ -1,3 +1,4 @@
+import type { OperationalRollbackScope } from "@/modules/operations/domain/operational-status";
 import { assertLegacyOrderWriteCompatible } from "../domain/legacy-order-write-guard";
 import { readOrderItem, type OrderItemReadRow } from "../domain/order-item-read-model";
 import type { Json, Tables } from "@/integrations/supabase/types";
@@ -219,6 +220,7 @@ export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
       expectedCurrentStatus: string,
       targetStatus: string,
       reason: string,
+      scope: OperationalRollbackScope = {},
     ): Promise<OrderRow> {
       const { data, error } = await (
         supabase.rpc as unknown as (
@@ -231,6 +233,10 @@ export function createOrderRepository(supabase: AppSupabase, tenantId: string) {
         p_expected_current_status: expectedCurrentStatus,
         p_target_status: targetStatus,
         p_reason: reason,
+        p_expected_revision: scope.expectedRevision ?? null,
+        p_expected_dates: scope.expectedDeliveryDates ?? null,
+        p_allow_multi_day: scope.allowMultiDay ?? false,
+        p_operating_date: scope.operatingDate ?? null,
       });
       if (error) throw error;
       return data as OrderRow;

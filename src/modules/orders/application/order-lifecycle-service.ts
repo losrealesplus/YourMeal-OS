@@ -1,3 +1,4 @@
+import type { OperationalRollbackScope } from "@/modules/operations/domain/operational-status";
 import {
   createLifecycleAttempt,
   executeLifecycleAttempt,
@@ -15,7 +16,7 @@ import {
   isOperationalRollbackEnabled,
 } from "@/modules/operations";
 import type { OrderRepository } from "@/modules/orders/infrastructure/order-repository";
-import { requireCapability } from "@/permissions";
+import { requireCapability, canAny, hasStaffAccess } from "@/permissions";
 import { DomainError } from "@/domain/errors";
 
 async function canonical(
@@ -238,6 +239,7 @@ export const OrderLifecycleService = {
     repo: OrderRepository,
     orderId: string,
     reason: string,
+    scope: OperationalRollbackScope = {},
   ) {
     if (!isOperationalRollbackEnabled()) {
       throw new DomainError(
@@ -245,7 +247,9 @@ export const OrderLifecycleService = {
         "El retroceso de estados operacionales está desactivado hasta disponer de una operación transaccional atómica en PostgreSQL.",
       );
     }
-    requireCapability(ctx.roles, "orders.write");
+    if (!hasStaffAccess(ctx.roles) || !canAny(ctx.roles, ["orders.write", "kitchen.operate", "production.operate"])) {
+      requireCapability(ctx.roles, "kitchen.operate");
+    }
     if (!reason?.trim()) {
       throw new DomainError("INVALID_STATE", "Rollback reason is required");
     }
@@ -261,6 +265,12 @@ export const OrderLifecycleService = {
     }
 
     const currentStatus = current.order.status as OperationalOrderStatus;
+    if (scope.expectedStatus !== undefined && currentStatus !== scope.expectedStatus) {
+      throw new DomainError("INVALID_STATE", "El estado ha cambiado. Recarga y confirma la transición de nuevo.");
+    }
+    if (scope.expectedRevision !== undefined && current.order.revision !== scope.expectedRevision) {
+      throw new DomainError("INVALID_STATE", "La revisión del pedido ha cambiado. Recarga antes de retroceder.");
+    }
     const targetStatus = ROLLBACK_TRANSITIONS[currentStatus];
     if (!targetStatus) {
       throw new DomainError(
@@ -275,6 +285,7 @@ export const OrderLifecycleService = {
         currentStatus,
         targetStatus,
         reason.trim(),
+        scope,
       );
       return updated;
     } catch (rpcError: any) {

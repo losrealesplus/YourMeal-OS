@@ -1,3 +1,4 @@
+import { setOperationalRollbackEnabledForTests } from "@/modules/operations/domain/operational-status";
 import { describe, expect, it, vi } from "vitest";
 import { renderToString } from "react-dom/server";
 import React from "react";
@@ -320,4 +321,12 @@ describe("CR-OPS-UX Block 2 & Block 3 · Operational Evolution Hardening", () =>
     // Verified: rollback button is cleanly omitted from UI to enforce ACID safety
     expect(html).not.toContain("Volver a Confirmado");
   });
+});
+
+it("uses the shared enabled flag for the v1 individual rollback button", () => {
+  setOperationalRollbackEnabledForTests(true);
+  try {
+    expect(renderDetailModal({ ...sampleOrder, status: "in_production", writeContractVersion: 1 }))
+      .toContain("Volver a Confirmado");
+  } finally { setOperationalRollbackEnabledForTests(false); }
 });

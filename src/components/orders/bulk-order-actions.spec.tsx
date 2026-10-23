@@ -1,3 +1,4 @@
+import { setOperationalRollbackEnabledForTests } from "@/modules/operations/domain/operational-status";
 import { describe, expect, it, vi } from "vitest";
 import React from "react";
 import { renderToString } from "react-dom/server";
@@ -9,6 +10,7 @@ import {
   filterVisibleOrderIds,
   isOrderMultiDay,
   getTemporalScopeOmissionReason,
+  executeRollbackOrders,
   BulkActionBar,
   BulkAdvanceModal,
   BulkRollbackModal,
@@ -532,5 +534,42 @@ describe("Bulk modal unknown scope with consent checked", () => {
     } finally {
       consentState.checked = false;
     }
+  });
+});
+
+describe("Rollback execution boundary", () => {
+  it("mutates only eligible selected orders and reports partial results with confirmed states", async () => {
+    setOperationalRollbackEnabledForTests(true);
+    try {
+      const selected = createSyntheticOrders(4, { status: "prepared", revision: 3, temporalScopeKnown: true });
+      selected[2].temporalScopeKnown = false;
+      selected[3].writeContractVersion = 2;
+      const unselected = createSyntheticOrders(1, { id: "not-selected", status: "prepared" })[0];
+      const api = { rollbackOrderStatus: vi.fn(async (command: any) => ({
+        ok: command.orderId === selected[0].id, orderId: command.orderId,
+        status: command.orderId === selected[0].id ? "in_production" : null,
+        context: null, errors: [{ message: "conflict" }],
+      })) } as any;
+      const result = await executeRollbackOrders(selected, "  correction  ", { allowMultiDay: true }, api);
+      expect(result.succeeded).toEqual([{ orderId: selected[0].id, from: "prepared", to: "in_production" }]);
+      expect(result.failed).toHaveLength(1);
+      expect(result.omitted).toHaveLength(2);
+      expect(api.rollbackOrderStatus).toHaveBeenCalledTimes(2);
+      expect(api.rollbackOrderStatus).toHaveBeenCalledWith(expect.objectContaining({
+        orderId: selected[0].id, expectedStatus: "prepared", expectedRevision: 3,
+        expectedDeliveryDates: ["2026-10-22"], reason: "correction", allowMultiDay: true,
+      }));
+      expect(unselected.status).toBe("prepared");
+      expect(api.rollbackOrderStatus.mock.calls.some(([c]: any) => c.orderId === unselected.id)).toBe(false);
+    } finally { setOperationalRollbackEnabledForTests(false); }
+  });
+  it("does not claim success for an unconfirmed target state", async () => {
+    setOperationalRollbackEnabledForTests(true);
+    try {
+      const api = { rollbackOrderStatus: vi.fn(async () => ({ ok: true, status: "prepared", errors: [] })) } as any;
+      const result = await executeRollbackOrders(createSyntheticOrders(1, { status: "prepared" }), "fix", {}, api);
+      expect(result.succeeded).toHaveLength(0);
+      expect(result.failed).toHaveLength(1);
+    } finally { setOperationalRollbackEnabledForTests(false); }
   });
 });

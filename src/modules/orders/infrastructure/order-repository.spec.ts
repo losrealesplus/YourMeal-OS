@@ -26,6 +26,8 @@ describe("OrderRepository — rollbackStatusV1", () => {
       p_expected_current_status: "prepared",
       p_target_status: "in_production",
       p_reason: "Error en empaque",
+      p_expected_revision: null, p_expected_dates: null,
+      p_allow_multi_day: false, p_operating_date: null,
     });
 
     expect(result).toEqual({
@@ -56,4 +58,17 @@ describe("OrderRepository — rollbackStatusV1", () => {
       ),
     ).rejects.toThrow("Concurrency conflict");
   });
+});
+
+it("forwards the operator-confirmed revision and full temporal scope", async () => {
+  const rpc = vi.fn(async () => ({ data: { status: "confirmed" }, error: null }));
+  const repo = createOrderRepository({ rpc } as any, "tenant-1");
+  await repo.rollbackStatusV1("order-1", "in_production", "confirmed", "correction", {
+    expectedRevision: 8, expectedDeliveryDates: ["2026-10-19", "2026-10-20"],
+    allowMultiDay: true, operatingDate: "2026-10-19",
+  });
+  expect(rpc).toHaveBeenCalledWith("rollback_order_status_v1", expect.objectContaining({
+    p_expected_revision: 8, p_expected_dates: ["2026-10-19", "2026-10-20"],
+    p_allow_multi_day: true, p_operating_date: "2026-10-19",
+  }));
 });
