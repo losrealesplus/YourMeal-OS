@@ -1,4 +1,4 @@
-import { ROLLBACK_V1, rollbackV1Payload, rollbackV1ScopeId, authorizeRollbackV1 } from "./release-rollback-v1.mjs";
+import { ROLLBACK_V1, rollbackV1Payload, rollbackV1ScopeId, authorizeRollbackV1, rollbackBuildEnabled } from "./release-rollback-v1.mjs";
 import {
   OPERATIONS_545,
   operations545Payload,
@@ -391,7 +391,7 @@ function activationSnapshot(ctx, base, diff, prs, currentMainSha) {
 }
 export function rollbackV1Snapshot(ctx, base, diff, prs, currentMainSha) {
   const s = activationSnapshot(ctx, base, diff, prs, currentMainSha);
-  s.productPrs = [548, 550, 549].map((n) => api(`pulls/${n}`));
+  s.productPrs = [548, 550, 549, 551].map((n) => api(`pulls/${n}`));
   s.commits = s.commits.map((c) => ({
     sha: c.sha,
     parent: git("rev-parse", `${c.sha}^1`).trim(),
@@ -1066,7 +1066,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     fs.writeFileSync("artifacts/release-plan.json", JSON.stringify(plan, null, 2));
     fs.appendFileSync(
       process.env.GITHUB_OUTPUT,
-      `eligible=${preparationEligible(plan.decision)}\n`,
+      `eligible=${preparationEligible(plan.decision)}\nrollback_enabled=${rollbackBuildEnabled(plan, context())}\n`,
     );
     fs.appendFileSync(
       process.env.GITHUB_STEP_SUMMARY,

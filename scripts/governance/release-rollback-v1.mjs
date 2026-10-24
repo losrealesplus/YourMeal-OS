@@ -84,17 +84,17 @@ export function rollbackV1Payload(s, policy) {
     "Rollback v1 final source stale",
   );
   demand(
-    s.commits?.length === 4 && same(s.commits.slice(0, 3), r.productCommits),
+    s.commits?.length === 5 && same(s.commits.slice(0, 4), r.productCommits),
     "Rollback v1 sealed interval changed",
   );
-  demand(s.productPrs?.length === 3, "Rollback v1 product PRs missing");
+  demand(s.productPrs?.length === 4, "Rollback v1 product PRs missing");
   r.productCommits.forEach((c, n) => humanPr(s.productPrs[n], c, policy));
-  const gov = s.commits[3];
+  const gov = s.commits[4];
   demand(
     gov.sha === s.targetSha &&
       gov.parent === r.candidateSha &&
       Number.isSafeInteger(gov.pr) &&
-      gov.pr > 550 &&
+      gov.pr > 551 &&
       SHA.test(gov.headSha ?? ""),
     "Rollback v1 governance lineage mismatch",
   );
@@ -131,7 +131,7 @@ export function rollbackV1Payload(s, policy) {
   const installation = verifyRollbackInstallation(s.installation);
   return canonical({
     schema: 1,
-    reconciliationType: "ROLLBACK_V1_PREPARATION",
+    reconciliationType: "ROLLBACK_V1_ACTIVATION_PREPARATION",
     repository: r.repository,
     baseline: r.baseline,
     candidateSha: r.candidateSha,
@@ -181,7 +181,7 @@ export function authorizeRollbackV1(s, inputs, ctx, run, policy) {
     payload.finalSourceSha === ctx.sha &&
       inputs.expected_base_sha === ROLLBACK_V1.baseline.sha &&
       inputs.expected_target_sha === ctx.sha &&
-      same(prs, [548, 550, 549, payload.governancePr]),
+      same(prs, [548, 550, 549, 551, payload.governancePr]),
     "Rollback v1 dispatch anchors mismatch",
   );
   demand(
@@ -193,7 +193,8 @@ export function authorizeRollbackV1(s, inputs, ctx, run, policy) {
   return { reconciled: true, reconciliationId: hash(JSON.stringify(payload)), payload };
 }
 export function assertRollbackV1Manifest(manifest, fresh) {
-  if (fresh.reconciliation?.payload?.reconciliationType !== "ROLLBACK_V1_PREPARATION") return;
+  if (fresh.reconciliation?.payload?.reconciliationType !== "ROLLBACK_V1_ACTIVATION_PREPARATION")
+    return;
   const { payload, reconciliationId } = fresh.reconciliation;
   demand(
     reconciliationId === hash(JSON.stringify(payload)) &&
@@ -207,4 +208,30 @@ export function assertRollbackV1Manifest(manifest, fresh) {
       manifest.plan?.sourceSha === fresh.sourceSha,
     "Rollback v1 preparation/publication scope changed",
   );
+}
+
+/** Only a freshly authorized exact rollback plan may enable the Vite build. */
+export function rollbackBuildEnabled(plan, ctx) {
+  const p = plan.reconciliation?.payload;
+  if (p?.reconciliationType !== "ROLLBACK_V1_ACTIVATION_PREPARATION") return false;
+  assertContext(ctx, ROLLBACK_V1);
+  demand(
+    ctx.event === "workflow_dispatch" &&
+      plan.decision === "AUTHORIZED_RECONCILED_RELEASE" &&
+      plan.repository === ctx.repository &&
+      plan.reconciliation.reconciled === true &&
+      same(p.baseline, ROLLBACK_V1.baseline) &&
+      plan.sourceSha === ctx.sha &&
+      plan.runId === ctx.runId &&
+      plan.attempt === ctx.attempt &&
+      p.finalSourceSha === ctx.sha &&
+      p.candidateSha === ROLLBACK_V1.candidateSha &&
+      same(p.productCommits, ROLLBACK_V1.productCommits) &&
+      same(p.installation, ROLLBACK_V1.installation) &&
+      same(p.constraints, ROLLBACK_V1.constraints) &&
+      p.constraints.rollbackFlagActivationAuthorized === true &&
+      plan.reconciliation.reconciliationId === hash(JSON.stringify(p)),
+    "Rollback Vite build lacks exact activation authority",
+  );
+  return true;
 }

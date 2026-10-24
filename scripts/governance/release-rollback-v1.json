@@ -8,7 +8,7 @@
     "versionId": "6c4d9331-deb9-4ad7-a324-53f4b1c8bab2",
     "deploymentId": 7258525945
   },
-  "candidateSha": "8634cd1a42cc278e1a7419e01e55cbed503a6feb",
+  "candidateSha": "f3d41db62fc325fc10c4887d7dc9e7f9f0460d98",
   "productCommits": [
     {
       "sha": "df78022d8eac8f0275a947157f25b1d9fc5c199d",
@@ -198,15 +198,61 @@
           "after": "c6c4efc9978132c65b0e58b63e1ef36f5044ed6e09f34a2c029a89c6b7783e27"
         }
       ]
+    },
+    {
+      "sha": "f3d41db62fc325fc10c4887d7dc9e7f9f0460d98",
+      "parent": "8634cd1a42cc278e1a7419e01e55cbed503a6feb",
+      "headSha": "ce648790f41d8b6c5896cf4829716a04c0739b09",
+      "pr": 551,
+      "files": [
+        {
+          "path": ".github/workflows/deploy-production.yml",
+          "before": "51f6d25b2f8f570c60914cb211792b7c64ed11caf22a85ef458819597318a532",
+          "after": "c635a1073cf99b693b3c013877e9fc5f6c69d63e912c1cb9a567e4d7de41467b"
+        },
+        {
+          "path": "docs/99-internal/development-journal/2026-10-24-rollback-release-reconciliation.md",
+          "before": null,
+          "after": "a616628f0e9b0ffe21006848b0e196693758886aed1dde13ea9c68ff3da93204"
+        },
+        {
+          "path": "scripts/governance/release-json.spec.mjs",
+          "before": "809e5e97a919f67a1e8828b319e70f989f9563cf80392e2efb7bf4288d5d738f",
+          "after": "590db7050ed71022472e43ac56418740b51ae0c696dd564b3a629d3437da921d"
+        },
+        {
+          "path": "scripts/governance/release-plan.mjs",
+          "before": "6d61be6f8b3890ac8e4b0e344867d8dc98e25c2efe48887ce09ff42a8ea710ff",
+          "after": "4b815644aca347f6b52114fa658801206e56cbb7fc41bc5d9e9e774ab97efab1"
+        },
+        {
+          "path": "scripts/governance/release-reconciliation.mjs",
+          "before": "3ce541a666ad0cff53622fa6f970b10bd85209e21a9838ae4e28c557c5e0587e",
+          "after": "4dafc63f81f6489e3e67f614f14c078e038ebcd3e494098ff5a8a0cca1753b62"
+        },
+        {
+          "path": "scripts/governance/release-rollback-v1.json",
+          "before": null,
+          "after": "d1f5db8e331ece9c2826bfa60a9245057efb01170c889a8ee3ea056d28d9c3d3"
+        },
+        {
+          "path": "scripts/governance/release-rollback-v1.mjs",
+          "before": null,
+          "after": "d08960d40518053231b3d216c289b32c3d6de46ac4c9f31afc6bfd4a235234c3"
+        },
+        {
+          "path": "scripts/governance/release-rollback-v1.spec.mjs",
+          "before": null,
+          "after": "dd7d39a47e668062508b56cd8d34fc1aaf47c65ac696d8e44a4935f8fe5d754d"
+        }
+      ]
     }
   ],
-  "governanceBranch": "codex/rollback-release-reconciliation",
+  "governanceBranch": "codex/rollback-build-activation",
   "governancePaths": [
     ".github/workflows/deploy-production.yml",
-    "docs/99-internal/development-journal/2026-10-24-rollback-release-reconciliation.md",
-    "scripts/governance/release-json.spec.mjs",
+    "docs/99-internal/development-journal/2026-10-24-rollback-build-activation.md",
     "scripts/governance/release-plan.mjs",
-    "scripts/governance/release-reconciliation.mjs",
     "scripts/governance/release-rollback-v1.json",
     "scripts/governance/release-rollback-v1.mjs",
     "scripts/governance/release-rollback-v1.spec.mjs"
@@ -232,7 +278,7 @@
     "productionSqlAuthorized": false,
     "migrationExecutionAuthorized": false,
     "productionWorkerApprovalGranted": false,
-    "rollbackFlagActivationAuthorized": false,
+    "rollbackFlagActivationAuthorized": true,
     "unselectedOrdersMutationAuthorized": false
   }
 }
