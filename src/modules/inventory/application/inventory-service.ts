@@ -203,6 +203,7 @@ export const InventoryService = {
       const applied = await repo.applyConsumption({
         tenantId: ctx.tenantId,
         consumptionId,
+        actorId: ctx.userId,
       });
 
       if (applied.status !== "applied") {
@@ -303,6 +304,7 @@ export const InventoryService = {
       const sealed = await repo.sealConsumption({
         tenantId: ctx.tenantId,
         consumptionId,
+        actorId: ctx.userId,
       });
 
       if (sealed.status !== "sealed") {
