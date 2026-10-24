@@ -1,3 +1,4 @@
+import { assertRollbackV1Manifest } from "./release-rollback-v1.mjs";
 import { assertStaff523Manifest } from "./release-staff-orders-523.mjs";
 import { assertP1Orders532Manifest } from "./release-p1-orders-532.mjs";
 import { assertCx536Manifest } from "./release-cx-01c-google-536.mjs";
@@ -324,6 +325,7 @@ export function assertReconciliationManifest(manifest, fresh) {
     assertP0Orders538Manifest(manifest, fresh);
     assertB2cHardening543Manifest(manifest, fresh);
     assertOperations545Manifest(manifest, fresh);
+    assertRollbackV1Manifest(manifest, fresh);
     if (fresh.reconciliation.payload?.reconciliationType === "A4B_CLOSED_RELEASE") {
       demand(
         [manifest.reconciliation, manifest.plan.reconciliation].every(
