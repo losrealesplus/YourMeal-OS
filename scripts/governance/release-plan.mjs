@@ -1,3 +1,4 @@
+import { ROLLBACK_V1, rollbackV1Payload, rollbackV1ScopeId, authorizeRollbackV1 } from "./release-rollback-v1.mjs";
 import {
   OPERATIONS_545,
   operations545Payload,
@@ -388,6 +389,71 @@ function activationSnapshot(ctx, base, diff, prs, currentMainSha) {
     remediation: api(`pulls/${prs.at(-1)}`),
   };
 }
+export function rollbackV1Snapshot(ctx, base, diff, prs, currentMainSha) {
+  const s = activationSnapshot(ctx, base, diff, prs, currentMainSha);
+  s.productPrs = [548, 550, 549].map((n) => api(`pulls/${n}`));
+  s.commits = s.commits.map((c) => ({
+    sha: c.sha,
+    parent: git("rev-parse", `${c.sha}^1`).trim(),
+    headSha: git("rev-parse", `${c.sha}^2`).trim(),
+    pr: c.pr,
+    files: c.paths.map((p) => {
+      const fileHash = (rev) => {
+        const entry = git("ls-tree", rev, "--", p);
+        if (!entry) return null;
+        const blob = /^100(?:644|755) blob ([a-f0-9]{40})\t/.exec(entry);
+        demand(blob, "Rollback v1 requires regular Git blobs");
+        return hash(
+          execFileSync("git", ["cat-file", "blob", blob[1]], { maxBuffer: 16 * 1024 * 1024 }),
+        );
+      };
+      return { path: p, before: fileHash(`${c.sha}^1`), after: fileHash(c.sha) };
+    }),
+  }));
+  const i = ROLLBACK_V1.installation;
+  const run = api(`actions/runs/${i.runId}`);
+  const artifacts = api(`actions/runs/${i.runId}/artifacts?per_page=100`);
+  demand(
+    artifacts.total_count === artifacts.artifacts?.length && artifacts.total_count <= 100,
+    "Rollback installation artifacts truncated",
+  );
+  const matches = artifacts.artifacts.filter(
+    (a) => a.id === i.artifactId && a.name === i.artifactName,
+  );
+  demand(
+    matches.length === 1 && !matches[0].expired && matches[0].digest === i.artifactDigest,
+    "Rollback installation artifact unavailable or changed",
+  );
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "gate7-rollback-receipt-"));
+  try {
+    execFileSync(
+      "gh",
+      [
+        "run",
+        "download",
+        String(i.runId),
+        "--repo",
+        policy.repository,
+        "--name",
+        i.artifactName,
+        "--dir",
+        dir,
+      ],
+      { stdio: "pipe" },
+    );
+    const bytes = fs.readFileSync(path.join(dir, "rollback-migration-report.json"));
+    s.installation = {
+      run,
+      artifact: matches[0],
+      reportSha256: hash(bytes),
+      report: JSON.parse(bytes),
+      reviews: api(`actions/runs/${i.runId}/approvals`),
+    };
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+  return { ...s, diff };
+}
 export function operations545Snapshot(ctx, base, diff, prs, currentMainSha) {
   const s = activationSnapshot(ctx, base, diff, prs, currentMainSha);
   s.productPr = api("pulls/545");
@@ -616,7 +682,12 @@ export function prepare(ctx, publishing = false) {
       "Exact interval cannot authorize a different classification",
     );
     reconciliation =
-      base.sha === OPERATIONS_545.baseline.sha
+      base.sha === ROLLBACK_V1.baseline.sha
+        ? authorizeRollbackV1(
+            rollbackV1Snapshot(ctx, base, diff, prs, currentMain), inputs, ctx,
+            api(`actions/runs/${ctx.runId}`), policy,
+          )
+        : base.sha === OPERATIONS_545.baseline.sha
         ? authorizeOperations545(
             operations545Snapshot(ctx, base, diff, prs, currentMain),
             inputs,
@@ -802,6 +873,27 @@ export function prepare(ctx, publishing = false) {
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
+    if (process.argv[2] === "--rollback-v1-payload") {
+      const sha = api("git/ref/heads/main").object.sha;
+      const ctx = { repository: policy.repository, sha, runId: "" };
+      const base = baseline(ctx),
+        diff = changedPaths(base.sha, sha);
+      const prs = diff.commits.map((c) => assertMergedCommit(pages(`commits/${c}/pulls`), c));
+      const payload = rollbackV1Payload(rollbackV1Snapshot(ctx, base, diff, prs, sha), policy);
+      fs.writeSync(
+        1,
+        JSON.stringify(
+          {
+            payload,
+            exactIntervalScope: JSON.stringify(canonical(payload)),
+            authorizationId: rollbackV1ScopeId(payload),
+          },
+          null,
+          2,
+        ) + "\n",
+      );
+      process.exit(0); // Read-only proposal, never dispatch or approval.
+    }
     if (process.argv[2] === "--operations-545-payload") {
       const sha = api("git/ref/heads/main").object.sha;
       const ctx = { repository: policy.repository, sha, runId: "" };

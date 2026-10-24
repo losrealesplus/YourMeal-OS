@@ -1,0 +1,238 @@
+{
+  "repository": "losrealesplus/YourMeal-OS",
+  "environment": "production-worker",
+  "reviewerId": 292604102,
+  "reviewerLogin": "losrealesplus",
+  "baseline": {
+    "sha": "be4f3a6c6bfd9801180488dce7e23337590f28a4",
+    "versionId": "6c4d9331-deb9-4ad7-a324-53f4b1c8bab2",
+    "deploymentId": 7258525945
+  },
+  "candidateSha": "8634cd1a42cc278e1a7419e01e55cbed503a6feb",
+  "productCommits": [
+    {
+      "sha": "df78022d8eac8f0275a947157f25b1d9fc5c199d",
+      "parent": "be4f3a6c6bfd9801180488dce7e23337590f28a4",
+      "headSha": "90dcdc7c7b7d455132ee0d2b3f4ebe8ce19dfd5f",
+      "pr": 548,
+      "files": [
+        {
+          "path": "docs/99-internal/development-journal/2026-10-23-rollback-v1-backend.md",
+          "before": null,
+          "after": "87ebe7ddfea7f892cea556457d3aa835381727893dd3280a8d055b12005cb852"
+        },
+        {
+          "path": "supabase/migrations/20261023065216_cr_order_rollback_v1_atomic.sql",
+          "before": null,
+          "after": "54b979f088f765ab8f435599a5831a9fea9c704d40fae0d898a536a453676714"
+        },
+        {
+          "path": "supabase/migrations/rollback/20261023065216_cr_order_rollback_v1_atomic_down.sql",
+          "before": null,
+          "after": "a1ea51daafad13638798fa47c597b6ac2b91a526aadd03611a037890a78ea43c"
+        },
+        {
+          "path": "supabase/tests/rollback-v1/README.md",
+          "before": null,
+          "after": "3b5ffcd1bb129ab88edc8752e31a1d70ee6568da3beee60055711de4b1cc2c20"
+        },
+        {
+          "path": "supabase/tests/rollback-v1/assertions.sql",
+          "before": null,
+          "after": "ca70a110c96980317335d3fc7f719d7bad66add6f98eb6d476af2f38d44540cd"
+        },
+        {
+          "path": "supabase/tests/rollback-v1/local-integration.mjs",
+          "before": null,
+          "after": "852cde9e6b3ae0c8b1bc3229765530ab0f0e8a3855e07d9636a573113cac2e07"
+        }
+      ]
+    },
+    {
+      "sha": "c64300ce47b7fbca3f4ef1b5d861fd48ddfe5bdf",
+      "parent": "df78022d8eac8f0275a947157f25b1d9fc5c199d",
+      "headSha": "dbe836a518b3d6bc1c6992b1e930841b4171af47",
+      "pr": 550,
+      "files": [
+        {
+          "path": ".github/workflows/migrate-production.yml",
+          "before": null,
+          "after": "587c6d4a1f0710b06e1da67c353eed46d276c75c915ea8dc3a05904d68cf876e"
+        },
+        {
+          "path": "config/eatclean-postgres-ca.crt",
+          "before": null,
+          "after": "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7"
+        },
+        {
+          "path": "docs/99-internal/development-journal/2026-10-23-rollback-selected-migration-channel.md",
+          "before": null,
+          "after": "1435c32e392cb809510bdff1ea4c90d0f220e00f983fce649030d83f02f9715a"
+        },
+        {
+          "path": "scripts/governance/rollback-migration.local-test.mjs",
+          "before": null,
+          "after": "8adb0e1d2eeb3e986cb7829a419d3c94ef854d78580a72bd8c148e1cbd0db916"
+        },
+        {
+          "path": "scripts/governance/rollback-migration.md",
+          "before": null,
+          "after": "42a20cb51c495e990bf8d45c1f8be6d2e218b17de0a14e2a00db53f2be1ddba5"
+        },
+        {
+          "path": "scripts/governance/rollback-migration.mjs",
+          "before": null,
+          "after": "dc49b3e60af89df55b11a438a8d07267ef1108b9fdf9d3c91d1e2247038e97a2"
+        },
+        {
+          "path": "scripts/governance/rollback-migration.spec.mjs",
+          "before": null,
+          "after": "ba2b55866cc6534045aa620f55f5b9d2b7ab11c3cc8fdb8dd4fe32f2c60229e4"
+        },
+        {
+          "path": "scripts/governance/rollback-v1-baseline.json",
+          "before": null,
+          "after": "9fd3ca3b5ead3c95eff6de0e6fe4c94e0c4a58ac1613dd47c967d9942a36a1da"
+        },
+        {
+          "path": "scripts/governance/rollback-v1-baseline.sql",
+          "before": null,
+          "after": "7b479f03ee21d9e8cc70e62271aa8df7d25cf75be4920a4496bb6f6d18374a51"
+        },
+        {
+          "path": "scripts/governance/rollback-v1-install.json",
+          "before": null,
+          "after": "f877581fa1839e5a4fa3de9e29205210fd7df7d2f3805623f993fdd0e5400948"
+        }
+      ]
+    },
+    {
+      "sha": "8634cd1a42cc278e1a7419e01e55cbed503a6feb",
+      "parent": "c64300ce47b7fbca3f4ef1b5d861fd48ddfe5bdf",
+      "headSha": "b2aadff3ab576af4b03530a1b7ae0b4b25770dac",
+      "pr": 549,
+      "files": [
+        {
+          "path": "docs/99-internal/development-journal/2026-10-23-rollback-v1-application.md",
+          "before": null,
+          "after": "7e1f8576355c45618e0a5b4ad4bef80e203aa4e92d9bf7a10941248ff5a26dcb"
+        },
+        {
+          "path": "src/components/orders/bulk-order-actions.spec.tsx",
+          "before": "861ffb2ca48916a68d13ceb20b00aa370460a1ec2e958de025cc9fa2bd234672",
+          "after": "0151ee2f4c2dba3a4d322dfee86fcc62b6c7a07790fce65c46234ff9c9a5f840"
+        },
+        {
+          "path": "src/components/orders/bulk-order-actions.tsx",
+          "before": "35558f136c5ee3b64d256d8c00469789e236526caf9116675883ce6375590e6b",
+          "after": "882f6ede4b47516b5f548e3a15ee3f14ce044fd8467a6afd681d7490d9370895"
+        },
+        {
+          "path": "src/modules/operations/domain/operational-status.spec.ts",
+          "before": "4d2692691dfeb6c25deb263f4daba7ea7d9ce4a3daa9acab7ee001899d9e8cab",
+          "after": "c4cc3a73fb6e574b9ce1c520965959e0a09a7782eb37a49188533eaf2b99985d"
+        },
+        {
+          "path": "src/modules/operations/domain/operational-status.ts",
+          "before": "9dfe9220233a68df1105e8b84c036f58046ab6babb97788eb3a63784a587ddc5",
+          "after": "7d43e959e03bd674271bb2b8b0b8d3649c7be84925f5157560fc9319f0b99e37"
+        },
+        {
+          "path": "src/modules/operations/domain/rollback-build.spec.ts",
+          "before": null,
+          "after": "316d563ba2744a3a476e68bf15e8d61945373b54387a0b1c919490cbb7c4de04"
+        },
+        {
+          "path": "src/modules/operations/infrastructure/operations-repository.expand.spec.ts",
+          "before": "fd3c7f12e6cdf74f282432ea0f331b2b65ba5447fa8fb05cf16217f24bc386a3",
+          "after": "5c980c125513bb575270981080d2d415ba20883f95b22e071660845bacd65884"
+        },
+        {
+          "path": "src/modules/operations/infrastructure/operations-repository.ts",
+          "before": "f89f63607ff6a0d5ebf854b30dce9a356d39fa5b552fa68d7ef79456a3c4f13b",
+          "after": "fff9350f74dbb62748c54c64fb1cafb3d8553656196c02082d7b7c9ffc9172fa"
+        },
+        {
+          "path": "src/modules/orders/application/order-lifecycle-service.spec.ts",
+          "before": "39fcef8fce91badbed6fccc87d7624a4422d0a0c35a4598ad6837a7d5ed860b9",
+          "after": "60fee0ecc5406cd3b0ad9a8f26749a519837f57f675cc71bda180b6442fe15ac"
+        },
+        {
+          "path": "src/modules/orders/application/order-lifecycle-service.ts",
+          "before": "3c35c1f662b48124e60ec87f3484fb2971149aff52d57f94c98d0cced55babdc",
+          "after": "8672a44ac1226280805ff285c7a1c2f96c65cef7efc22fc7c73046834dbf1f8c"
+        },
+        {
+          "path": "src/modules/orders/infrastructure/order-repository.spec.ts",
+          "before": "9443d72ec54ed9d705c3a2953d4a1e11b300d7f911cdec84a6e165658c437a30",
+          "after": "d103393e4bcda672e77364fcccb4a25c8c16624b1d56588e50eec6331c2d216f"
+        },
+        {
+          "path": "src/modules/orders/infrastructure/order-repository.ts",
+          "before": "3589723c165b045e8ee6eb51c99c8ef5739da1587a8a2e78e990c21fe37c65c3",
+          "after": "45829d3f1eb3d9494aef173a65c6505b2d21756c7ccecc56a76da2d7de599b69"
+        },
+        {
+          "path": "src/order/OrderCommands.ts",
+          "before": "737e3099ab47d5fcbee8e58b941d86efe53d798b03e3b069c75dc47d8b96e2c2",
+          "after": "5ed57bdeaada6aec320b84fb5045c76efeb19161548efcc5919f88bf49bbda1f"
+        },
+        {
+          "path": "src/order/OrderFacade.ts",
+          "before": "c0356f2e6a93d01d0994c6e9dcedd5c3b78beb7b5639512d793225ea139fd88e",
+          "after": "07df6e03cf213e23c6c282bca9eb880336cbfde7f8130f62a6b37b2a4e0a99ce"
+        },
+        {
+          "path": "src/routes/_authenticated/admin.kitchen.tsx",
+          "before": "cb3a5add177e4afd11536f42d0cbf018dc580a07192b89fae9f0cc683b7ddbe9",
+          "after": "224d0c69a28e675af0b1e04a887c4de5358d480eec3d3c5f28ad5bc8a4d23dad"
+        },
+        {
+          "path": "src/routes/_authenticated/admin.orders.spec.tsx",
+          "before": "1ed83901adf61c941f7b7a75b03351b0ea076b4d3a6195f93aa48bf56bc70b8a",
+          "after": "17ccdc3144b9cc314e1b06c14a67afe7bcf55b3c4ea694b8a1a2ce78dda14834"
+        },
+        {
+          "path": "src/routes/_authenticated/admin.orders.tsx",
+          "before": "5bffd84fb4738f69a4aa6be69f4156a86151c036f6501e3411b6379a2aac9da5",
+          "after": "c6c4efc9978132c65b0e58b63e1ef36f5044ed6e09f34a2c029a89c6b7783e27"
+        }
+      ]
+    }
+  ],
+  "governanceBranch": "codex/rollback-release-reconciliation",
+  "governancePaths": [
+    ".github/workflows/deploy-production.yml",
+    "docs/99-internal/development-journal/2026-10-24-rollback-release-reconciliation.md",
+    "scripts/governance/release-json.spec.mjs",
+    "scripts/governance/release-plan.mjs",
+    "scripts/governance/release-reconciliation.mjs",
+    "scripts/governance/release-rollback-v1.json",
+    "scripts/governance/release-rollback-v1.mjs",
+    "scripts/governance/release-rollback-v1.spec.mjs"
+  ],
+  "installation": {
+    "runId": 40089701179,
+    "sourceSha": "c64300ce47b7fbca3f4ef1b5d861fd48ddfe5bdf",
+    "artifactId": 12558233788,
+    "artifactName": "rollback-migration-result-40089701179-1",
+    "artifactDigest": "sha256:f7a3908b771ea2eed9e24c37b73da815adee70fd8add73542d19d9836b544c90",
+    "reportSha256": "43176e937cab6ae31ad7824c136fa4918ff0f7d47015ffcd972f9a60f3ba041d",
+    "report": {
+      "sourceSha": "c64300ce47b7fbca3f4ef1b5d861fd48ddfe5bdf",
+      "runId": "40089701179",
+      "project": "nhirlpkuvonggctdzzad",
+      "migrationSha256": "54b979f088f765ab8f435599a5831a9fea9c704d40fae0d898a536a453676714",
+      "baselineSchema": "d3cab5c479d31ea2358e3d107dfc3e47a826803ed19ef22325d73dbcc7b97e49",
+      "state": "INSTALLED_AND_VERIFIED",
+      "operation": "install"
+    }
+  },
+  "constraints": {
+    "productionSqlAuthorized": false,
+    "migrationExecutionAuthorized": false,
+    "productionWorkerApprovalGranted": false,
+    "rollbackFlagActivationAuthorized": false,
+    "unselectedOrdersMutationAuthorized": false
+  }
+}
