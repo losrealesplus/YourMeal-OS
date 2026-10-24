@@ -49,7 +49,7 @@ END $$;
 CREATE TABLE IF NOT EXISTS public.stock_movements (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id uuid NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
-  ingredient_id uuid NOT NULL REFERENCES public.ingredients(id) ON DELETE CASCADE,
+  ingredient_id uuid NOT NULL REFERENCES public.ingredients(id) ON DELETE RESTRICT,
   movement_type text NOT NULL CHECK (movement_type IN ('PURCHASE_RECEIPT', 'PRODUCTION_CONSUMPTION', 'MANUAL_ADJUSTMENT', 'WASTE_DISPOSAL')),
   quantity numeric(12,3) NOT NULL,
   previous_stock numeric(12,3) NOT NULL,
@@ -64,21 +64,16 @@ CREATE TABLE IF NOT EXISTS public.stock_movements (
   created_at timestamptz NOT NULL DEFAULT now()
 );
 
-GRANT SELECT, INSERT ON public.stock_movements TO authenticated;
+REVOKE ALL ON public.stock_movements FROM PUBLIC, anon, authenticated;
+GRANT SELECT ON public.stock_movements TO authenticated;
 GRANT ALL ON public.stock_movements TO service_role;
 ALTER TABLE public.stock_movements ENABLE ROW LEVEL SECURITY;
 
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE tablename = 'stock_movements' AND policyname = 'stock_movements_staff'
-  ) THEN
-    CREATE POLICY stock_movements_staff ON public.stock_movements
-      FOR ALL TO authenticated
-      USING (public.is_tenant_member(tenant_id))
-      WITH CHECK (public.has_any_staff_role(auth.uid(), tenant_id) OR public.is_saas_admin(auth.uid()));
-  END IF;
-END $$;
+DROP POLICY IF EXISTS stock_movements_staff ON public.stock_movements;
+CREATE POLICY stock_movements_staff ON public.stock_movements
+  FOR SELECT TO authenticated
+  USING (public.is_tenant_member(tenant_id) AND
+    (public.has_any_staff_role(auth.uid(), tenant_id) OR public.is_saas_admin(auth.uid())));
 
 CREATE INDEX IF NOT EXISTS idx_stock_movements_tenant_ingredient
   ON public.stock_movements (tenant_id, ingredient_id);
@@ -93,29 +88,25 @@ CREATE INDEX IF NOT EXISTS idx_stock_movements_receipt_id
 CREATE TABLE IF NOT EXISTS public.purchase_receipt_executions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id uuid NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
-  invoice_id uuid NOT NULL REFERENCES public.purchase_invoices(id) ON DELETE CASCADE,
+  invoice_id uuid NOT NULL REFERENCES public.purchase_invoices(id) ON DELETE RESTRICT,
   receipt_id uuid NOT NULL,
   execution_payload jsonb NOT NULL,
+  request_payload jsonb NOT NULL,
   executed_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
   executed_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT uq_receipt_execution UNIQUE (tenant_id, receipt_id)
 );
 
-GRANT SELECT, INSERT ON public.purchase_receipt_executions TO authenticated;
+REVOKE ALL ON public.purchase_receipt_executions FROM PUBLIC, anon, authenticated;
+GRANT SELECT ON public.purchase_receipt_executions TO authenticated;
 GRANT ALL ON public.purchase_receipt_executions TO service_role;
 ALTER TABLE public.purchase_receipt_executions ENABLE ROW LEVEL SECURITY;
 
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE tablename = 'purchase_receipt_executions' AND policyname = 'purchase_receipt_executions_staff'
-  ) THEN
-    CREATE POLICY purchase_receipt_executions_staff ON public.purchase_receipt_executions
-      FOR ALL TO authenticated
-      USING (public.is_tenant_member(tenant_id))
-      WITH CHECK (public.has_any_staff_role(auth.uid(), tenant_id) OR public.is_saas_admin(auth.uid()));
-  END IF;
-END $$;
+DROP POLICY IF EXISTS purchase_receipt_executions_staff ON public.purchase_receipt_executions;
+CREATE POLICY purchase_receipt_executions_staff ON public.purchase_receipt_executions
+  FOR SELECT TO authenticated
+  USING (public.is_tenant_member(tenant_id) AND
+    (public.has_any_staff_role(auth.uid(), tenant_id) OR public.is_saas_admin(auth.uid())));
 
 CREATE INDEX IF NOT EXISTS idx_purchase_receipt_executions_invoice
   ON public.purchase_receipt_executions (tenant_id, invoice_id);
@@ -139,7 +130,9 @@ DECLARE
   v_line RECORD;
   v_ing RECORD;
   v_receipt_id uuid;
-  v_existing_exec jsonb;
+  v_existing_exec public.purchase_receipt_executions%ROWTYPE;
+  v_request jsonb;
+  v_input jsonb;
   v_target_qty numeric;
   v_normalized_qty numeric;
   v_normalized_cost numeric;
@@ -155,31 +148,63 @@ DECLARE
   v_new_status text;
   v_result jsonb;
 BEGIN
-  -- 1. Identificación y Autorización
-  v_actor := COALESCE(auth.uid(), p_actor_id);
-  
-  IF auth.role() IS DISTINCT FROM 'service_role' THEN
-    IF v_actor IS NULL THEN
-      RAISE EXCEPTION 'not authenticated' USING ERRCODE = '28000';
-    END IF;
-
-    IF NOT (
-      public.has_any_staff_role(v_actor, p_tenant_id)
-      OR public.is_saas_admin(v_actor)
-    ) THEN
-      RAISE EXCEPTION 'permission denied: actor % requires staff role for tenant %', v_actor, p_tenant_id USING ERRCODE = '42501';
-    END IF;
+  -- Identity comes exclusively from the authenticated session, never client input.
+  v_actor := auth.uid();
+  IF v_actor IS NULL THEN
+    RAISE EXCEPTION 'not authenticated' USING ERRCODE = '28000';
+  END IF;
+  IF p_actor_id IS NOT NULL AND p_actor_id IS DISTINCT FROM v_actor THEN
+    RAISE EXCEPTION 'actor mismatch' USING ERRCODE = '42501';
+  END IF;
+  IF NOT (public.is_tenant_member(p_tenant_id) AND
+    (public.has_any_staff_role(v_actor, p_tenant_id) OR public.is_saas_admin(v_actor))) THEN
+    RAISE EXCEPTION 'permission denied' USING ERRCODE = '42501';
   END IF;
 
-  -- 2. Idempotencia: Verificar si receipt_id ya fue ejecutado previamente
-  IF p_receipt_id IS NOT NULL THEN
-    SELECT execution_payload INTO v_existing_exec
-    FROM public.purchase_receipt_executions
-    WHERE tenant_id = p_tenant_id AND receipt_id = p_receipt_id;
-
-    IF FOUND THEN
-      RETURN v_existing_exec || jsonb_build_object('idempotent', true);
+  -- SQL NULL alone means full receipt. JSON null, objects and empty arrays fail closed.
+  IF p_received_lines IS NOT NULL THEN
+    IF jsonb_typeof(p_received_lines) IS DISTINCT FROM 'array' THEN
+      RAISE EXCEPTION 'received_lines must be an array' USING ERRCODE = '22023';
     END IF;
+    IF jsonb_array_length(p_received_lines) = 0 THEN
+      RAISE EXCEPTION 'received_lines must not be empty' USING ERRCODE = '22023';
+    END IF;
+    FOR v_input IN SELECT value FROM jsonb_array_elements(p_received_lines) LOOP
+      IF jsonb_typeof(v_input) IS DISTINCT FROM 'object'
+        OR jsonb_typeof(v_input->'line_id') IS DISTINCT FROM 'string'
+        OR jsonb_typeof(v_input->'quantity') IS DISTINCT FROM 'number'
+        OR (v_input - 'line_id' - 'quantity') <> '{}'::jsonb THEN
+        RAISE EXCEPTION 'invalid receipt line' USING ERRCODE = '22023';
+      END IF;
+      -- Cast rejects malformed UUIDs; three decimals match persisted quantities.
+      PERFORM (v_input->>'line_id')::uuid;
+      IF (v_input->>'quantity')::numeric <= 0
+        OR (v_input->>'quantity')::numeric <> round((v_input->>'quantity')::numeric, 3) THEN
+        RAISE EXCEPTION 'invalid receipt quantity' USING ERRCODE = '22023';
+      END IF;
+    END LOOP;
+    IF (SELECT count(*) <> count(DISTINCT (value->>'line_id')::uuid)
+        FROM jsonb_array_elements(p_received_lines)) THEN
+      RAISE EXCEPTION 'duplicate receipt line' USING ERRCODE = '22023';
+    END IF;
+  END IF;
+  SELECT jsonb_build_object('invoice_id', p_invoice_id, 'lines',
+    CASE WHEN p_received_lines IS NULL THEN 'null'::jsonb ELSE
+      (SELECT jsonb_agg(jsonb_build_object('line_id', (value->>'line_id')::uuid,
+        'quantity', (value->>'quantity')::numeric) ORDER BY (value->>'line_id')::uuid)
+       FROM jsonb_array_elements(p_received_lines)) END) INTO v_request;
+
+  v_receipt_id := COALESCE(p_receipt_id, gen_random_uuid());
+  -- Serialize a receipt key even when competing requests name different invoices.
+  PERFORM pg_advisory_xact_lock(hashtextextended(p_tenant_id::text || ':' || v_receipt_id::text, 0));
+  SELECT * INTO v_existing_exec FROM public.purchase_receipt_executions
+    WHERE tenant_id = p_tenant_id AND receipt_id = v_receipt_id;
+  IF FOUND THEN
+    IF v_existing_exec.invoice_id IS DISTINCT FROM p_invoice_id
+      OR v_existing_exec.request_payload IS DISTINCT FROM v_request THEN
+      RAISE EXCEPTION 'receipt_id reused with different request' USING ERRCODE = '22023';
+    END IF;
+    RETURN v_existing_exec.execution_payload || jsonb_build_object('idempotent', true);
   END IF;
 
   -- 3. Bloqueo pesimista del documento de compra
@@ -192,29 +217,30 @@ BEGIN
     RAISE EXCEPTION 'Purchase invoice % not found for tenant %', p_invoice_id, p_tenant_id USING ERRCODE = 'P0002';
   END IF;
 
-  IF v_invoice.status = 'cancelled' THEN
-    RAISE EXCEPTION 'Cannot receive a cancelled purchase invoice (%)', p_invoice_id USING ERRCODE = '22023';
+  IF v_invoice.status NOT IN ('draft', 'partially_received') THEN
+    RAISE EXCEPTION 'invoice status does not permit receipt: %', v_invoice.status USING ERRCODE = '22023';
   END IF;
-
-  -- Si la factura ya estaba completamente recibida y no se especifican líneas parciales, salida idempotente
-  IF v_invoice.status = 'received' AND p_received_lines IS NULL THEN
-    RETURN jsonb_build_object(
-      'success', true,
-      'invoice_id', p_invoice_id,
-      'status', 'received',
-      'idempotent', true,
-      'message', 'Invoice already fully received'
-    );
+  -- Lock lines and ingredients in stable order across invoices to avoid deadlocks.
+  PERFORM id FROM public.purchase_invoice_items
+    WHERE purchase_invoice_id = p_invoice_id AND tenant_id = p_tenant_id ORDER BY id FOR UPDATE;
+  IF p_received_lines IS NOT NULL AND EXISTS (
+    SELECT 1 FROM jsonb_array_elements(p_received_lines) e
+    WHERE NOT EXISTS (SELECT 1 FROM public.purchase_invoice_items i
+      WHERE i.id = (e->>'line_id')::uuid AND i.purchase_invoice_id = p_invoice_id AND i.tenant_id = p_tenant_id)
+  ) THEN
+    RAISE EXCEPTION 'unknown receipt line' USING ERRCODE = '22023';
   END IF;
-
-  v_receipt_id := COALESCE(p_receipt_id, gen_random_uuid());
+  PERFORM g.id FROM public.ingredients g WHERE g.tenant_id = p_tenant_id
+    AND g.id IN (SELECT item_id FROM public.purchase_invoice_items
+      WHERE purchase_invoice_id = p_invoice_id AND tenant_id = p_tenant_id AND item_nature = 'INVENTORYABLE')
+    ORDER BY g.id FOR UPDATE;
 
   -- 4. Procesamiento atómico línea por línea
   FOR v_line IN
     SELECT *
     FROM public.purchase_invoice_items
     WHERE purchase_invoice_id = p_invoice_id AND tenant_id = p_tenant_id
-    ORDER BY created_at ASC
+    ORDER BY id ASC
   LOOP
     -- Determinar cantidad a recibir
     IF p_received_lines IS NOT NULL AND jsonb_typeof(p_received_lines) = 'array' THEN
@@ -302,6 +328,10 @@ BEGIN
     ELSE
       RAISE EXCEPTION 'Incompatible units between invoice item (%) and ingredient (%): cannot auto-convert',
         v_line.unit, v_ing.unit USING ERRCODE = '22023';
+    END IF;
+
+    IF v_normalized_qty <= 0 OR v_normalized_qty <> round(v_normalized_qty, 3) THEN
+      RAISE EXCEPTION 'receipt quantity cannot be represented in stock unit' USING ERRCODE = '22023';
     END IF;
 
     v_prev_stock := v_ing.stock;
@@ -404,6 +434,10 @@ BEGIN
     v_total_items_processed := v_total_items_processed + 1;
   END LOOP;
 
+  IF v_total_items_processed = 0 THEN
+    RAISE EXCEPTION 'receipt has no pending lines' USING ERRCODE = '22023';
+  END IF;
+
   -- 5. Evaluación del estado global de la factura
   SELECT COUNT(*) INTO v_remaining_pending_lines
   FROM public.purchase_invoice_items
@@ -445,12 +479,14 @@ BEGIN
     invoice_id,
     receipt_id,
     execution_payload,
+    request_payload,
     executed_by
   ) VALUES (
     p_tenant_id,
     p_invoice_id,
     v_receipt_id,
     v_result,
+    v_request,
     v_actor
   );
 

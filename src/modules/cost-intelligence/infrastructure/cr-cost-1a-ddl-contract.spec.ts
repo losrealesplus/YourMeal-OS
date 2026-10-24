@@ -39,7 +39,7 @@ describe("CR-COST-1A Atomic Purchase Receipt & Stock DDL Contract Verification",
     // 3. stock_movements table
     expect(sql).toContain("CREATE TABLE IF NOT EXISTS public.stock_movements");
     expect(sql).toContain("tenant_id uuid NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE");
-    expect(sql).toContain("ingredient_id uuid NOT NULL REFERENCES public.ingredients(id) ON DELETE CASCADE");
+    expect(sql).toContain("ingredient_id uuid NOT NULL REFERENCES public.ingredients(id) ON DELETE RESTRICT");
     expect(sql).toContain("movement_type text NOT NULL CHECK");
     expect(sql).toContain("'PURCHASE_RECEIPT', 'PRODUCTION_CONSUMPTION', 'MANUAL_ADJUSTMENT', 'WASTE_DISPOSAL'");
     expect(sql).toContain("reference_document_type text NOT NULL CHECK");
@@ -57,15 +57,9 @@ describe("CR-COST-1A Atomic Purchase Receipt & Stock DDL Contract Verification",
     expect(sql).toContain("GRANT EXECUTE ON FUNCTION public.receive_purchase_invoice_v1 TO authenticated, service_role;");
   });
 
-  it("verifies rollback SQL cleanly drops functions, tables, and removes added columns", () => {
-    const rollbackSql = fs.readFileSync(rollbackPath, "utf8");
-
-    expect(rollbackSql).toContain("DROP FUNCTION IF EXISTS public.receive_purchase_invoice_v1");
-    expect(rollbackSql).toContain("DROP TABLE IF EXISTS public.purchase_receipt_executions CASCADE");
-    expect(rollbackSql).toContain("DROP TABLE IF EXISTS public.stock_movements CASCADE");
-    expect(rollbackSql).toContain("DROP COLUMN IF EXISTS item_nature");
-    expect(rollbackSql).toContain("DROP COLUMN IF EXISTS received_quantity");
-    expect(rollbackSql).toContain("DROP COLUMN IF EXISTS received_at");
-    expect(rollbackSql).toContain("DROP COLUMN IF EXISTS received_by");
+  it("disables receipt without deleting historical evidence", () => {
+    const sql = fs.readFileSync(rollbackPath, "utf8");
+    expect(sql).toContain("REVOKE EXECUTE");
+    expect(sql).not.toMatch(/DROP (TABLE|COLUMN|FUNCTION)|DELETE FROM|TRUNCATE/i);
   });
 });

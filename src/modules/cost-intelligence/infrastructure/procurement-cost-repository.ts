@@ -211,7 +211,7 @@ export class SupabaseProcurementCostRepository implements ProcurementCostReposit
       p_tenant_id: input.tenantId,
       p_invoice_id: input.invoiceId,
       p_receipt_id: input.receiptId ?? null,
-      p_received_lines: input.receivedLines ?? null,
+      p_received_lines: input.receivedLines?.map(({ lineId, quantity }) => ({ line_id: lineId, quantity })) ?? null,
       p_actor_id: input.actorId ?? null,
     });
 
