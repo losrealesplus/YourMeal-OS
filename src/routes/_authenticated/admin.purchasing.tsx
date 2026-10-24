@@ -25,9 +25,10 @@ import { useCan } from "@/hooks/use-can";
 import { supabase } from "@/integrations/supabase/client";
 import { createServiceContext } from "@/services/types";
 import { ProcurementCostService } from "@/modules/cost-intelligence/application/procurement-cost-service";
-import { InventoryCostSyncService } from "@/modules/cost-intelligence/application/inventory-cost-sync-service";
 import type {
   CalculatedPurchaseInvoice,
+  ItemNature,
+  ReceiptPreviewResult,
 } from "@/modules/cost-intelligence/domain/procurement-types";
 import type { ProrationMethod } from "@/modules/cost-intelligence/domain/types";
 import { MarketBenchmarkBadge } from "@/modules/market-intelligence/presentation/components/MarketBenchmarkBadge";
@@ -88,6 +89,7 @@ type IngredientOption = {
 type FormLineItem = {
   itemId: string;
   itemName: string;
+  itemNature: ItemNature;
   quantity: string;
   unit: string;
   unitPrice: string;
@@ -98,6 +100,7 @@ type FormLineItem = {
 const emptyLineItem: FormLineItem = {
   itemId: "",
   itemName: "",
+  itemNature: "INVENTORYABLE",
   quantity: "1",
   unit: "kg",
   unitPrice: "0.00",
@@ -115,6 +118,10 @@ export function AdminPurchasingPage() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [activeTab, setActiveTab] = useState<"all" | "draft" | "received">("all");
+
+  // Atomic Physical Receipt Dialog State
+  const [receiptPreview, setReceiptPreview] = useState<ReceiptPreviewResult | null>(null);
+  const [isReceiptDialogOpen, setIsReceiptDialogOpen] = useState(false);
 
   // Create Invoice Dialog State
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -238,6 +245,7 @@ export function AdminPurchasingPage() {
       return {
         itemId,
         itemName,
+        itemNature: l.itemNature || "INVENTORYABLE",
         quantity: Number(l.quantity) || 1,
         unit: l.unit || "kg",
         unitPrice: Number(l.unitPrice) || 0,
@@ -279,7 +287,7 @@ export function AdminPurchasingPage() {
     }
   }
 
-  async function handleReceiveInvoice(invoice: CalculatedPurchaseInvoice) {
+  async function handleOpenReceiveConfirmation(invoice: CalculatedPurchaseInvoice) {
     if (!user || !tenantId) return;
     if (invoice.status === "received") return;
 
@@ -293,29 +301,43 @@ export function AdminPurchasingPage() {
       });
 
       const procurementService = new ProcurementCostService();
-      const syncService = new InventoryCostSyncService();
+      const preview = await procurementService.previewInvoiceReception(ctx, invoice.id);
+      setReceiptPreview(preview);
+      setIsReceiptDialogOpen(true);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : String(err));
+    } finally {
+      setBusy(false);
+    }
+  }
 
-      // 1. Mark received & record immutable cost history
-      await procurementService.receiveInvoice(ctx, invoice.id);
+  async function handleConfirmAtomicReceipt() {
+    if (!user || !tenantId || !receiptPreview) return;
 
-      // 2. Synchronously recalculate WAC for each purchased line item
-      for (const item of invoice.items) {
-        const ing = ingredients.find((i) => i.id === item.itemId);
-        const currentStock = ing?.stock ?? 0;
-        const currentCost = ing?.cost ?? item.effectiveUnitCost;
+    setBusy(true);
+    try {
+      const ctx = await createServiceContext({
+        supabase,
+        userId: user.id,
+        tenantId,
+        roles,
+      });
 
-        await syncService.syncDerivedItemCostWAC(ctx, {
-          itemId: item.itemId,
-          currentStock,
-          currentCost,
-          inboundQuantity: item.quantity,
-          inboundEffectiveCost: item.effectiveUnitCost,
-        });
+      const procurementService = new ProcurementCostService();
+      const result = await procurementService.receiveInvoice(ctx, receiptPreview.invoiceId);
+
+      if (result.idempotent) {
+        toast.info(
+          `Factura ${receiptPreview.invoiceNumber} ya estaba procesada (ejecución idempotente).`,
+        );
+      } else {
+        toast.success(
+          `Recepción confirmada: ${result.summary.totalStockIncrement} uds añadidas a existencias y WAC actualizado atómicamente.`,
+        );
       }
 
-      toast.success(
-        `Factura ${invoice.invoiceNumber} procesada. Costes medios (WAC) actualizados.`,
-      );
+      setIsReceiptDialogOpen(false);
+      setReceiptPreview(null);
       setSelectedInvoice(null);
       await reload();
     } catch (err) {
@@ -404,16 +426,16 @@ export function AdminPurchasingPage() {
           >
             Ver Detalle
           </Button>
-          {r.status === "draft" && (
+          {(r.status === "draft" || r.status === "partially_received") && (
             <Button
               size="sm"
               variant="default"
               className="h-7 text-xs gap-1"
               disabled={busy}
-              onClick={() => handleReceiveInvoice(r)}
+              onClick={() => handleOpenReceiveConfirmation(r)}
             >
               <CheckCircle2 className="h-3 w-3" />
-              Procesar WAC
+              Recepcionar
             </Button>
           )}
         </div>
@@ -837,16 +859,142 @@ export function AdminPurchasingPage() {
               <Button variant="outline" onClick={() => setSelectedInvoice(null)}>
                 Cerrar
               </Button>
-              {selectedInvoice.status === "draft" && (
+              {(selectedInvoice.status === "draft" || selectedInvoice.status === "partially_received") && (
                 <Button
                   disabled={busy}
-                  onClick={() => handleReceiveInvoice(selectedInvoice)}
+                  onClick={() => handleOpenReceiveConfirmation(selectedInvoice)}
                   className="gap-1.5"
                 >
                   <CheckCircle2 className="h-4 w-4" />
-                  Procesar Factura y Recalcular WAC
+                  Confirmar Recepción Física & WAC
                 </Button>
               )}
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Physical Warehouse Receipt Confirmation Modal (Atomic CR-COST-1A) */}
+      {receiptPreview && (
+        <Dialog open={isReceiptDialogOpen} onOpenChange={setIsReceiptDialogOpen}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-primary">
+                <Truck className="h-5 w-5" />
+                Confirmar Recepción Física en Almacén
+              </DialogTitle>
+              <DialogDescription className="text-xs">
+                Esta acción ejecutará una <strong>transacción atómica en PostgreSQL</strong>. Incrementará las existencias reales en inventario, actualizará el coste medio ponderado (WAC) y registrará los asientos inmutables.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 text-xs pt-2">
+              <div className="p-3 bg-muted/30 rounded border flex justify-between items-center">
+                <div>
+                  <span className="font-semibold text-sm">Factura {receiptPreview.invoiceNumber}</span>
+                  <p className="text-muted-foreground mt-0.5">
+                    {receiptPreview.lines.length} líneas detectadas · {receiptPreview.hasServices ? "Incluye servicios/gastos" : "Solo mercancía inventariable"}
+                  </p>
+                </div>
+                <Badge variant={receiptPreview.hasServices ? "secondary" : "default"}>
+                  {receiptPreview.totalStockIncrement > 0
+                    ? `+${receiptPreview.totalStockIncrement} uds en stock`
+                    : "Sin incremento físico"}
+                </Badge>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="font-semibold text-foreground">Impacto Previsto en Inventario y Coste (WAC):</h4>
+                <div className="space-y-2">
+                  {receiptPreview.lines.map((l) => (
+                    <div
+                      key={l.lineId}
+                      className={cn(
+                        "p-3 rounded-lg border transition-colors",
+                        l.stockMutated
+                          ? "bg-background border-border/80"
+                          : "bg-muted/20 border-dashed border-muted-foreground/30",
+                      )}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-sm">{l.itemName}</span>
+                            <Badge
+                              variant="outline"
+                              className={cn(
+                                "text-[10px] px-1.5 py-0",
+                                l.stockMutated
+                                  ? "bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800"
+                                  : "bg-blue-50 text-blue-700 border-blue-300 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800",
+                              )}
+                            >
+                              {l.itemNature === "EXPENSE_SERVICE"
+                                ? "Servicio / Gasto (Sin Stock)"
+                                : l.itemNature === "CAPEX_ASSET"
+                                ? "Activo CAPEX (Sin Stock)"
+                                : "Mercancía Inventariable"}
+                            </Badge>
+                          </div>
+                          <p className="text-muted-foreground">
+                            Cantidad a recepcionar: <strong>{l.quantityToReceive} {l.unit}</strong>
+                          </p>
+                          {l.unitConversionWarning && (
+                            <p className="text-[11px] text-amber-600 dark:text-amber-400 font-medium">
+                              ⚠️ {l.unitConversionWarning}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="text-right space-y-1">
+                          {l.stockMutated ? (
+                            <>
+                              <div className="text-[11px]">
+                                <span className="text-muted-foreground">Stock: </span>
+                                <span className="line-through text-muted-foreground">{l.currentStock.toFixed(2)}</span>
+                                <span className="font-bold text-foreground"> → {l.predictedNewStock.toFixed(2)} {l.unit}</span>
+                              </div>
+                              <div className="text-[11px]">
+                                <span className="text-muted-foreground">WAC: </span>
+                                <span className="text-muted-foreground">{l.currentWac.toFixed(4)} €</span>
+                                <span className="font-bold text-emerald-600 dark:text-emerald-400"> → {l.predictedNewWac.toFixed(4)} €/{l.unit}</span>
+                              </div>
+                            </>
+                          ) : (
+                            <span className="text-muted-foreground italic text-[11px]">
+                              Sin mutación en existencias
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg text-amber-800 dark:text-amber-200">
+                <p className="font-medium text-[11px] flex items-center gap-1.5">
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                  Garantía de Integridad Transaccional:
+                </p>
+                <p className="text-[11px] mt-0.5 text-amber-700 dark:text-amber-300">
+                  Si cualquier línea o recálculo falla en el servidor, toda la operación se revertirá automáticamente sin alterar existencias ni costes.
+                </p>
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2 pt-2 border-t">
+              <Button variant="outline" onClick={() => setIsReceiptDialogOpen(false)}>
+                Cancelar
+              </Button>
+              <Button
+                disabled={busy}
+                onClick={handleConfirmAtomicReceipt}
+                className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white"
+              >
+                <CheckCircle2 className="h-4 w-4" />
+                Confirmar Recepción Atómica en Almacén
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
