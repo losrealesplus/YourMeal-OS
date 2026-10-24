@@ -1,3 +1,6 @@
+import { rollbackOrderStatusCommand } from "@/order/OrderCommands";
+import type { OrderCommandResult } from "@/order/OrderContext";
+import type { OperationalRollbackScope } from "@/modules/operations/domain/operational-status";
 import React, { useState, useMemo, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -26,7 +29,6 @@ import {
   type OperationalOrderStatus,
   operationalStatusLabel,
   ROLLBACK_TRANSITIONS,
-  FEATURE_OPERATIONAL_ROLLBACK_ENABLED,
   isOperationalRollbackEnabled,
 } from "@/modules/operations/domain/operational-status";
 
@@ -70,6 +72,39 @@ export function getTemporalScopeOmissionReason(
     return "Omitido por seguridad (multijornada: contiene raciones en otras fechas)";
   }
   return null;
+}
+
+export async function executeRollbackOrders(
+  orders: OperationalOrderListItem[],
+  reason: string,
+  scope: Pick<OperationalRollbackScope, "allowMultiDay" | "operatingDate">,
+  api: { rollbackOrderStatus: (command: ReturnType<typeof rollbackOrderStatusCommand>) => Promise<OrderCommandResult> },
+): Promise<BulkExecutionResult> {
+  const result: BulkExecutionResult = { succeeded: [], omitted: [], failed: [] };
+  for (const order of orders) {
+    const target = ROLLBACK_TRANSITIONS[order.status];
+    const omitted = getTemporalScopeOmissionReason(order, scope.operatingDate, scope.allowMultiDay ?? false);
+    if (order.writeContractVersion === 2 || !target || omitted) {
+      result.omitted.push({ orderId: order.id, reason: omitted ?? "Contrato v2 o estado no reversible" });
+      continue;
+    }
+    try {
+      if (!isOperationalRollbackEnabled() || !reason.trim()) throw new Error("Retroceso desactivado o motivo vacío");
+      const response = await api.rollbackOrderStatus(rollbackOrderStatusCommand({
+        orderId: order.id, reason: reason.trim(), expectedStatus: order.status,
+        expectedRevision: order.revision,
+        expectedDeliveryDates: order.allDeliveryDates ?? order.deliveryDates,
+        ...scope,
+      }));
+      if (!response.ok || response.status !== target) {
+        throw new Error(response.errors[0]?.message ?? "No se confirmó el estado esperado tras el retroceso");
+      }
+      result.succeeded.push({ orderId: order.id, from: order.status, to: target });
+    } catch (error) {
+      result.failed.push({ orderId: order.id, error: error instanceof Error ? error.message : String(error) });
+    }
+  }
+  return result;
 }
 
 export function toggleOrderIdInSet(prev: Set<string>, orderId: string): Set<string> {
@@ -173,7 +208,7 @@ export function BulkActionBar({
   onRollback,
   onClear,
   onCancelSelection,
-  rollbackEnabled = FEATURE_OPERATIONAL_ROLLBACK_ENABLED || isOperationalRollbackEnabled(),
+  rollbackEnabled = isOperationalRollbackEnabled(),
   busy = false,
 }: {
   selectedCount: number;
@@ -617,7 +652,7 @@ export function BulkRollbackModal({
   selectedOrders,
   onExecute,
   busy,
-  rollbackEnabled = FEATURE_OPERATIONAL_ROLLBACK_ENABLED || isOperationalRollbackEnabled(),
+  rollbackEnabled = isOperationalRollbackEnabled(),
   currentOperatingDate,
 }: {
   open: boolean;
@@ -626,6 +661,7 @@ export function BulkRollbackModal({
   onExecute: (
     eligibleOrders: OperationalOrderListItem[],
     reason: string,
+    scope: Pick<OperationalRollbackScope, "allowMultiDay" | "operatingDate">,
   ) => Promise<BulkExecutionResult | void>;
   busy: boolean;
   rollbackEnabled?: boolean;
@@ -722,14 +758,16 @@ export function BulkRollbackModal({
 
   const handleConfirm = async () => {
     if (!reason.trim() || breakdown.eligible.length === 0 || busy || !rollbackEnabled) return;
-    const res = await onExecute(breakdown.eligible, reason.trim());
+    const res = await onExecute(breakdown.eligible, reason.trim(), { allowMultiDay: includeMultiDay, operatingDate: currentOperatingDate ?? undefined });
     if (res) {
-      setResult(res);
+      setResult({ ...res, omitted: [
+        ...breakdown.omitted.map(({ order, reason }) => ({ orderId: order.id, reason })), ...res.omitted,
+      ] });
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(next) => { if (!busy) onOpenChange(next); }}>
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-amber-900 dark:text-amber-200">
@@ -772,6 +810,20 @@ export function BulkRollbackModal({
               </div>
             </div>
 
+            {result.succeeded.length > 0 && (
+              <ul className="text-xs space-y-1">
+                {result.succeeded.map((item) => <li key={item.orderId}>
+                  #{item.orderId.slice(0, 8)}: {operationalStatusLabel(item.from)} → {operationalStatusLabel(item.to)}
+                </li>)}
+              </ul>
+            )}
+            {result.omitted.length > 0 && (
+              <ul className="text-xs space-y-1" aria-label="Pedidos omitidos">
+                {result.omitted.map((item) => <li key={item.orderId}>
+                  #{item.orderId.slice(0, 8)}: {item.reason}
+                </li>)}
+              </ul>
+            )}
             {result.failed.length > 0 && (
               <div className="rounded-md border border-red-200 bg-red-50/50 dark:bg-red-950/20 p-3 text-xs space-y-1.5">
                 <div className="font-semibold text-red-800 dark:text-red-300 flex items-center gap-1.5">

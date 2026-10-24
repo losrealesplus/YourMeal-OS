@@ -62,7 +62,7 @@ describe("operational status transitions", () => {
       expect(isOperationalRollbackEnabled()).toBe(false);
     });
 
-    it("activates via explicit VITE_OPERATIONAL_ROLLBACK_ENABLED env flag post-migration", () => {
+    it("reads the explicit Vite test environment flag", () => {
       const originalEnv = process.env.VITE_OPERATIONAL_ROLLBACK_ENABLED;
       const originalNodeEnv = process.env.NODE_ENV;
       try {

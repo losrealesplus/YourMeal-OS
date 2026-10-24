@@ -103,6 +103,7 @@ export function mapOperationalOrderRow(
   );
   const deliveryDates = [...new Set(items.map((it) => String(it.day_date)).filter(Boolean))].sort();
   const dsDates = ((row.delivery_services ?? []) as Record<string, any>[])
+    .filter((ds) => !ds.deleted_at)
     .map((ds) => String(ds.delivery_date))
     .filter(Boolean);
   const extraDates = extra?.allItemDates ?? [];
@@ -173,7 +174,7 @@ const ORDER_SELECT = `
   delivery_groups ( id, name ),
   customer_addresses ( id, label, street, city, zip ),
   order_items ( *, dishes ( id, name ) ),
-  delivery_services ( delivery_date )
+  delivery_services ( delivery_date, deleted_at )
 `;
 
 function mapDeliveryServiceRow(row: Record<string, any>): DeliveryServiceModel {

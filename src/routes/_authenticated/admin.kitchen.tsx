@@ -1,3 +1,4 @@
+import type { OperationalRollbackScope } from "@/modules/operations/domain/operational-status";
 /**
  * Workspace Cocina — pedidos reales, filtros y transición de estado.
  * PR-034 · Operations Workspace Activation
@@ -15,7 +16,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -52,6 +52,7 @@ import {
   BulkActionBar,
   BulkAdvanceModal,
   BulkRollbackModal,
+  executeRollbackOrders,
   isOrderMultiDay,
   type BulkExecutionResult,
 } from "@/components/orders/bulk-order-actions";
@@ -61,7 +62,6 @@ import {
   readyForKitchenCommand,
   scheduleProductionCommand,
   readyForDeliveryCommand,
-  rollbackOrderStatusCommand,
 } from "@/order/OrderCommands";
 import {
   OperationsService,
@@ -73,6 +73,7 @@ import {
 import {
   getRollbackStatus,
   ROLLBACK_LABEL_ES,
+  isOperationalRollbackEnabled,
 } from "@/modules/operations/domain/operational-status";
 
 export const Route = createFileRoute("/_authenticated/admin/kitchen")({
@@ -184,7 +185,7 @@ export function KitchenWorkspacePage() {
 
   // Single order rollback in detail modal
   const [detailRollbackOpen, setDetailRollbackOpen] = useState(false);
-  const [detailRollbackReason, setDetailRollbackReason] = useState("");
+  const [detailRollbackNeedsRefresh, setDetailRollbackNeedsRefresh] = useState(false);
   const [detailRollbackBusy, setDetailRollbackBusy] = useState(false);
 
   const loadFilters = useCallback(async () => {
@@ -296,88 +297,21 @@ export function KitchenWorkspacePage() {
   };
 
   const executeBulkRollback = async (
-    eligibleOrders: OperationalOrderListItem[],
-    reason: string,
+    eligibleOrders: OperationalOrderListItem[], reason: string,
+    scope: Pick<OperationalRollbackScope, "allowMultiDay" | "operatingDate">,
   ): Promise<BulkExecutionResult> => {
     setBulkBusy(true);
-    const result: BulkExecutionResult = {
-      succeeded: [],
-      omitted: [],
-      failed: [],
-    };
-
-    for (const o of eligibleOrders) {
-      const prev = getRollbackStatus(o.status);
-      if (!prev) {
-        result.omitted.push({ orderId: o.id, reason: "No reversible" });
-        continue;
-      }
-      try {
-        const res = await orderApi.rollbackOrderStatus(
-          rollbackOrderStatusCommand({ orderId: o.id, reason }),
-        );
-        if (res.ok) {
-          result.succeeded.push({ orderId: o.id, from: o.status, to: prev });
-        } else {
-          result.failed.push({
-            orderId: o.id,
-            error: res.errors[0]?.message ?? "Error al retroceder",
-          });
-        }
-      } catch (err: any) {
-        result.failed.push({
-          orderId: o.id,
-          error: err.message ?? "Error inesperado",
-        });
-      }
-    }
-
-    setBulkBusy(false);
-    clearSelection();
-    await load();
-    if (result.succeeded.length > 0) {
-      toast.success(
-        `Se retrocedieron ${result.succeeded.length} pedidos a su estado anterior.`,
-      );
-    }
-    if (result.failed.length > 0) {
-      toast.error(
-        `${result.failed.length} pedidos fallaron al retroceder. Revisa el resumen.`,
-      );
-    }
-    return result;
+    try {
+      const result = await executeRollbackOrders(eligibleOrders, reason, scope, orderApi);
+      await load();
+      return result;
+    } finally { setBulkBusy(false); }
   };
 
   const detailRollbackStatus = detail ? getRollbackStatus(detail.status) : null;
   const detailRollbackLabel = detail && detailRollbackStatus ? ROLLBACK_LABEL_ES[detail.status] : null;
   const detailIsV2 = detail?.writeContractVersion === 2;
 
-  const handleSingleOrderRollback = async () => {
-    if (!detail || !detailRollbackReason.trim() || !detailRollbackStatus) return;
-    setDetailRollbackBusy(true);
-    try {
-      const res = await orderApi.rollbackOrderStatus(
-        rollbackOrderStatusCommand({
-          orderId: detail.id,
-          reason: detailRollbackReason.trim(),
-        }),
-      );
-      if (!res.ok) {
-        toast.error(res.errors[0]?.message ?? "Error al retroceder pedido");
-      } else {
-        toast.success(
-          `Pedido #${detail.id.slice(0, 8)} devuelto a ${operationalStatusLabel(detailRollbackStatus)}.`,
-        );
-        setDetailRollbackOpen(false);
-        setDetail(null);
-        await load();
-      }
-    } catch (e: any) {
-      toast.error(e.message ?? "Error inesperado al retroceder pedido");
-    } finally {
-      setDetailRollbackBusy(false);
-    }
-  };
 
   if (!can("kitchen.operate")) {
     return (
@@ -621,7 +555,7 @@ export function KitchenWorkspacePage() {
 
       <BulkRollbackModal
         open={bulkRollbackOpen}
-        onOpenChange={setBulkRollbackOpen}
+        onOpenChange={(open) => { setBulkRollbackOpen(open); if (!open) clearSelection(); }}
         selectedOrders={selectedOrders}
         onExecute={executeBulkRollback}
         busy={bulkBusy}
@@ -771,10 +705,9 @@ export function KitchenWorkspacePage() {
                       size="sm"
                       onClick={() => {
                         if (detailIsV2) return;
-                        setDetailRollbackReason("");
                         setDetailRollbackOpen(true);
                       }}
-                      disabled={busyId === detail.id || detailRollbackBusy || detailIsV2}
+                      disabled={busyId === detail.id || detailRollbackBusy || detailIsV2 || !isOperationalRollbackEnabled()}
                       title={
                         detailIsV2
                           ? "Los pedidos canónicos v2 no admiten retroceso de estado operacional directo"
@@ -803,52 +736,23 @@ export function KitchenWorkspacePage() {
       </Dialog>
 
       {/* Modal de confirmación para retroceso individual de Cocina */}
-      <Dialog open={detailRollbackOpen} onOpenChange={setDetailRollbackOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Retroceder Estado Operacional</DialogTitle>
-            <DialogDescription>
-              {detail && (
-                <>
-                  ¿Confirmas que deseas retroceder el pedido #{detail.id.slice(0, 8)} de &quot;
-                  {operationalStatusLabel(detail.status)}&quot; a &quot;
-                  {detailRollbackStatus ? operationalStatusLabel(detailRollbackStatus) : ""}&quot;?
-                  Esta acción quedará registrada en el historial inmutable de auditoría.
-                </>
-              )}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-3 py-2">
-            <label className="text-xs font-medium text-foreground">
-              Motivo del retroceso (obligatorio)
-            </label>
-            <Textarea
-              value={detailRollbackReason}
-              onChange={(e) => setDetailRollbackReason(e.target.value)}
-              placeholder="Indique la justificación operativa del retroceso..."
-              className="text-xs min-h-[80px]"
-            />
-          </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <Button
-              variant="outline"
-              onClick={() => setDetailRollbackOpen(false)}
-              disabled={detailRollbackBusy}
-            >
-              Volver
-            </Button>
-            <Button
-              variant="default"
-              onClick={handleSingleOrderRollback}
-              disabled={detailRollbackBusy || !detailRollbackReason.trim()}
-              className="bg-amber-600 hover:bg-amber-700 text-white"
-            >
-              {detailRollbackBusy ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              Confirmar Retroceso
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <BulkRollbackModal
+        open={detailRollbackOpen} onOpenChange={(open) => {
+          setDetailRollbackOpen(open);
+          if (!open && detailRollbackNeedsRefresh) { setDetailRollbackNeedsRefresh(false); setDetail(null); }
+        }}
+        selectedOrders={detail ? [detail] : []} busy={detailRollbackBusy}
+        currentOperatingDate={date}
+        onExecute={async (orders, reason, scope) => {
+          setDetailRollbackBusy(true);
+          try {
+            const result = await executeRollbackOrders(orders, reason, scope, orderApi);
+            setDetailRollbackNeedsRefresh(result.succeeded.length > 0 || result.failed.length > 0);
+            await load();
+            return result;
+          } finally { setDetailRollbackBusy(false); }
+        }}
+      />
     </div>
   );
 }

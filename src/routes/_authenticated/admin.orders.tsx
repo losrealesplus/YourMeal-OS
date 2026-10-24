@@ -1,3 +1,4 @@
+import type { OperationalRollbackScope } from "@/modules/operations/domain/operational-status";
 import { CanonicalOrderEditPanel } from "@/components/orders/canonical-order-edit-panel";
 /**
  * Pedidos — Centro de Control Operacional y Temporal (CR-OPS-09A / Fase 1 CR-OPS-UX).
@@ -83,6 +84,7 @@ import {
 import { UniversalOrderIntakeDrawer } from "@/components/orders/universal-order-intake-drawer";
 import {
   BulkRollbackModal,
+  executeRollbackOrders,
   type BulkExecutionResult,
 } from "@/components/orders/bulk-order-actions";
 import { useOrder } from "@/order/useOrder";
@@ -93,7 +95,6 @@ import {
   readyForKitchenCommand,
   scheduleProductionCommand,
   completeDeliveryCommand,
-  rollbackOrderStatusCommand,
 } from "@/order/OrderCommands";
 
 export const Route = createFileRoute("/_authenticated/admin/orders")({
@@ -324,14 +325,14 @@ export function OrderDetailView({
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [rollbackDialogOpen, setRollbackDialogOpen] = useState(false);
-  const [rollbackReason, setRollbackReason] = useState("");
+  const [rollbackNeedsRefresh, setRollbackNeedsRefresh] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const rollbackStatus = getRollbackStatus(detail.status);
   const rollbackLabel = rollbackStatus ? ROLLBACK_LABEL_ES[detail.status] : null;
   const isV2Canonical = detail.writeContractVersion === 2;
   const canRollback = Boolean(
-    FEATURE_OPERATIONAL_ROLLBACK_ENABLED && rollbackStatus && !isV2Canonical,
+    isOperationalRollbackEnabled() && rollbackStatus && !isV2Canonical,
   );
 
   const canCancel = [
@@ -417,31 +418,7 @@ export function OrderDetailView({
     }
   };
 
-  const handleRollbackOrder = async () => {
-    if (!rollbackReason.trim()) {
-      toast.error("El motivo del retroceso es obligatorio.");
-      return;
-    }
-    setBusy(true);
-    try {
-      const res = await orderApi.rollbackOrderStatus(
-        rollbackOrderStatusCommand({ orderId: detail.id, reason: rollbackReason.trim() }),
-      );
-      if (!res.ok) {
-        toast.error(res.errors[0]?.message ?? "Error al retroceder el estado del pedido.");
-      } else {
-        toast.success(
-          `Pedido #${detail.id.slice(0, 8)} devuelto a ${rollbackStatus ? operationalStatusLabel(rollbackStatus) : ""}.`,
-        );
-        setRollbackDialogOpen(false);
-        onOrderUpdated?.();
-      }
-    } catch (e: any) {
-      toast.error(e.message ?? "Error inesperado al retroceder estado.");
-    } finally {
-      setBusy(false);
-    }
-  };
+
 
   return (
     <div className="space-y-6">
@@ -517,12 +494,11 @@ export function OrderDetailView({
             </Button>
           )}
 
-          {FEATURE_OPERATIONAL_ROLLBACK_ENABLED && rollbackLabel && rollbackStatus && (
+          {isOperationalRollbackEnabled() && rollbackLabel && rollbackStatus && (
             <Button
               variant="outline"
               onClick={() => {
                 if (isV2Canonical) return;
-                setRollbackReason("");
                 setRollbackDialogOpen(true);
               }}
               disabled={busy || editorLocked || isV2Canonical}
@@ -884,47 +860,21 @@ export function OrderDetailView({
         </DialogContent>
       </Dialog>
 
-      <Dialog open={rollbackDialogOpen} onOpenChange={setRollbackDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Retroceder Estado Operacional</DialogTitle>
-            <DialogDescription>
-              ¿Confirmas que deseas retroceder el pedido #{detail.id.slice(0, 8)} de &quot;
-              {operationalStatusLabel(detail.status)}&quot; a &quot;
-              {rollbackStatus ? operationalStatusLabel(rollbackStatus) : ""}&quot;?
-              Esta acción quedará registrada en el historial inmutable de auditoría.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-3 py-2">
-            <label className="text-xs font-medium text-foreground">
-              Motivo del retroceso (obligatorio)
-            </label>
-            <textarea
-              value={rollbackReason}
-              onChange={(e) => setRollbackReason(e.target.value)}
-              placeholder="Indique la justificación operativa del retroceso..."
-              className="w-full rounded-md border border-input bg-background p-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 min-h-[80px]"
-            />
-          </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <Button
-              variant="outline"
-              onClick={() => setRollbackDialogOpen(false)}
-              disabled={busy || editorLocked}
-            >
-              Volver
-            </Button>
-            <Button
-              variant="default"
-              onClick={handleRollbackOrder}
-              disabled={busy || !rollbackReason.trim()}
-            >
-              {busy ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              Confirmar Retroceso
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <BulkRollbackModal
+        open={rollbackDialogOpen} onOpenChange={(open) => {
+          setRollbackDialogOpen(open);
+          if (!open && rollbackNeedsRefresh) { setRollbackNeedsRefresh(false); onOrderUpdated?.(); }
+        }}
+        selectedOrders={[detail]} busy={busy || editorLocked}
+        onExecute={async (orders, reason, scope) => {
+          setBusy(true);
+          try {
+            const result = await executeRollbackOrders(orders, reason, scope, orderApi);
+            setRollbackNeedsRefresh(result.succeeded.length > 0 || result.failed.length > 0);
+            return result;
+          } finally { setBusy(false); }
+        }}
+      />
     </div>
   );
 }
@@ -1253,56 +1203,15 @@ export function AdminOrdersPage() {
   };
 
   const executeBulkRollback = async (
-    eligibleOrders: OperationalOrderListItem[],
-    reason: string,
+    eligibleOrders: OperationalOrderListItem[], reason: string,
+    scope: Pick<OperationalRollbackScope, "allowMultiDay" | "operatingDate">,
   ): Promise<BulkExecutionResult> => {
     setBulkBusy(true);
-    const result: BulkExecutionResult = {
-      succeeded: [],
-      omitted: [],
-      failed: [],
-    };
-
-    for (const o of eligibleOrders) {
-      const prev = getRollbackStatus(o.status);
-      if (!prev) {
-        result.omitted.push({ orderId: o.id, reason: "No reversible" });
-        continue;
-      }
-      try {
-        const res = await orderApi.rollbackOrderStatus(
-          rollbackOrderStatusCommand({ orderId: o.id, reason }),
-        );
-        if (res.ok) {
-          result.succeeded.push({ orderId: o.id, from: o.status, to: prev });
-        } else {
-          result.failed.push({
-            orderId: o.id,
-            error: res.errors[0]?.message ?? "Error al retroceder",
-          });
-        }
-      } catch (err: any) {
-        result.failed.push({
-          orderId: o.id,
-          error: err.message ?? "Error inesperado",
-        });
-      }
-    }
-
-    setBulkBusy(false);
-    setSelectedOrderIds(new Set());
-    void load();
-    if (result.succeeded.length > 0) {
-      toast.success(
-        `Se retrocedieron ${result.succeeded.length} pedidos a su estado anterior.`,
-      );
-    }
-    if (result.failed.length > 0) {
-      toast.error(
-        `${result.failed.length} pedidos fallaron al retroceder. Revisa el resumen.`,
-      );
-    }
-    return result;
+    try {
+      const result = await executeRollbackOrders(eligibleOrders, reason, scope, orderApi);
+      void load();
+      return result;
+    } finally { setBulkBusy(false); }
   };
 
   return (
@@ -1612,7 +1521,7 @@ export function AdminOrdersPage() {
       {/* Modal de Retroceso Masivo Seguro */}
       <BulkRollbackModal
         open={bulkRollbackOpen}
-        onOpenChange={setBulkRollbackOpen}
+        onOpenChange={(open) => { setBulkRollbackOpen(open); if (!open) setSelectedOrderIds(new Set()); }}
         selectedOrders={selectedOrders}
         onExecute={executeBulkRollback}
         busy={bulkBusy}
