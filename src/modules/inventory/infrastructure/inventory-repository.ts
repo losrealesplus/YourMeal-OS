@@ -31,6 +31,7 @@ export type InventoryRepository = {
     tenantId: string;
     deliveryDate: string;
     lines: ConsumptionLine[];
+    actorId?: string;
   }) => Promise<InventoryConsumption>;
   getStock: (tenantId: string, ingredientId: string) => Promise<number>;
   /**
@@ -210,12 +211,23 @@ function createPostgresInventoryRepository(client: any): InventoryRepository {
 
       if (itemsErr) throw new Error(itemsErr.message);
 
+      const AUTHORIZED_PRODUCTION_STATUSES = new Set([
+        "confirmed",
+        "in_production",
+        "prepared",
+        "ready_for_delivery",
+        "out_for_delivery",
+        "delivered",
+      ]);
+
       const validItems = (rawItems || []).filter((item: any) => {
         const o = item.orders;
         return (
           o &&
           o.deleted_at === null &&
+          o.status !== "draft" &&
           o.status !== "cancelled" &&
+          AUTHORIZED_PRODUCTION_STATUSES.has(o.status) &&
           item.dish_id
         );
       });
@@ -275,44 +287,36 @@ function createPostgresInventoryRepository(client: any): InventoryRepository {
       };
     },
 
-    async createPlanned({ tenantId, deliveryDate, lines }) {
-      const { data: cons, error: consErr } = await client
-        .from("inventory_consumptions")
-        .insert({
-          tenant_id: tenantId,
-          delivery_date: deliveryDate,
-          status: "planned",
-        })
-        .select("id, tenant_id, delivery_date, status, created_at")
-        .single();
+    async createPlanned({ tenantId, deliveryDate, lines, actorId }) {
+      const linesPayload = lines.map((l) => ({
+        ingredient_id: l.ingredientId,
+        ingredient_name: l.name,
+        quantity: l.qty,
+        unit: l.unit,
+      }));
 
-      if (consErr) throw new Error(consErr.message);
+      const { data, error } = await client.rpc(
+        "create_inventory_consumption_plan_v1",
+        {
+          p_tenant_id: tenantId,
+          p_delivery_date: deliveryDate,
+          p_lines: linesPayload,
+          p_actor_id: actorId || null,
+        },
+      );
 
-      if (lines.length > 0) {
-        const linesPayload = lines.map((l) => ({
-          consumption_id: cons.id,
-          tenant_id: tenantId,
-          ingredient_id: l.ingredientId,
-          ingredient_name: l.name,
-          quantity: l.qty,
-          unit: l.unit,
-        }));
-
-        const { error: linesErr } = await client
-          .from("inventory_consumption_lines")
-          .insert(linesPayload);
-
-        if (linesErr) throw new Error(linesErr.message);
+      if (error) throw new Error(error.message);
+      const res = data as any;
+      if (!res?.success) {
+        throw new Error(res?.error || "Failed to create inventory consumption plan");
       }
 
-      return {
-        id: cons.id,
-        tenantId: cons.tenant_id,
-        deliveryDate: cons.delivery_date,
-        status: cons.status,
-        createdAt: cons.created_at,
-        lines: lines.map((l) => ({ ...l })),
-      };
+      const cons = await findById(tenantId, res.consumption_id);
+      if (!cons) {
+        throw new Error(`Created consumption plan ${res.consumption_id} not found`);
+      }
+
+      return cons;
     },
 
     async getStock(tenantId, ingredientId) {

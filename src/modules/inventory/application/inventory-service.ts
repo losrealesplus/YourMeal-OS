@@ -110,6 +110,7 @@ export const InventoryService = {
         tenantId: ctx.tenantId,
         deliveryDate,
         lines,
+        actorId: ctx.userId,
       });
 
       if (consumption.status !== "planned") {
