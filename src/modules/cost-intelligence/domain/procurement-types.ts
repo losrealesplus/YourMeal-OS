@@ -5,12 +5,20 @@
 
 import { ProrationMethod } from "./types";
 
-export type PurchaseInvoiceStatus = "draft" | "received" | "posted" | "cancelled";
+export type PurchaseInvoiceStatus =
+  | "draft"
+  | "partially_received"
+  | "received"
+  | "posted"
+  | "cancelled";
+
+export type ItemNature = "INVENTORYABLE" | "EXPENSE_SERVICE" | "CAPEX_ASSET";
 
 export interface PurchaseInvoiceItemInput {
   id?: string;
   itemId: string;
   itemName: string;
+  itemNature?: ItemNature;
   quantity: number;
   unit: string;
   unitPrice: number;
@@ -39,7 +47,9 @@ export interface CalculatedPurchaseInvoiceItem {
   tenantId: string;
   itemId: string;
   itemName: string;
+  itemNature?: ItemNature;
   quantity: number;
+  receivedQuantity?: number;
   unit: string;
   unitPrice: number;
   discountAmount: number;
@@ -65,6 +75,8 @@ export interface CalculatedPurchaseInvoice {
   totalAmount: number;
   allocationMethod: ProrationMethod;
   status: PurchaseInvoiceStatus;
+  receivedAt?: string;
+  receivedBy?: string;
   notes?: string;
   items: CalculatedPurchaseInvoiceItem[];
   createdAt: string;
@@ -82,4 +94,59 @@ export interface ItemCostHistoryEntry {
   effectiveUnitCost: number;
   costMethod: "effective_purchase" | "weighted_average" | "standard";
   effectiveAt: string;
+}
+
+export interface ReceiptExecutionLineResult {
+  lineId: string;
+  itemId: string;
+  itemName: string;
+  itemNature: ItemNature;
+  receivedQuantity: number;
+  unit?: string;
+  previousStock?: number;
+  newStock?: number;
+  previousWac?: number;
+  newWac?: number;
+  stockMutated: boolean;
+  notes?: string;
+}
+
+export interface ReceiptExecutionResult {
+  success: boolean;
+  invoiceId: string;
+  status: PurchaseInvoiceStatus;
+  receiptId: string;
+  idempotent: boolean;
+  summary: {
+    itemsProcessed: number;
+    totalStockIncrement: number;
+    remainingPendingLines: number;
+  };
+  processedLines: ReceiptExecutionLineResult[];
+  message?: string;
+}
+
+export interface ReceiptPreviewLine {
+  lineId: string;
+  itemId: string;
+  itemName: string;
+  itemNature: ItemNature;
+  quantityToReceive: number;
+  unit: string;
+  currentStock: number;
+  predictedNewStock: number;
+  currentWac: number;
+  predictedNewWac: number;
+  stockMutated: boolean;
+  unitConversionWarning?: string;
+}
+
+export interface ReceiptPreviewResult {
+  invoiceId: string;
+  invoiceNumber: string;
+  supplierId: string;
+  lines: ReceiptPreviewLine[];
+  totalStockIncrement: number;
+  hasServices: boolean;
+  hasInventoryItems: boolean;
 }

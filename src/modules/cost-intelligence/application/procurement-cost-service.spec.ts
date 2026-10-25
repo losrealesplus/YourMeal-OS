@@ -5,6 +5,7 @@ import {
   CalculatedPurchaseInvoice,
   ItemCostHistoryEntry,
   PurchaseInvoiceStatus,
+  ReceiptExecutionResult,
 } from "../domain/procurement-types";
 import { ProcurementCostRepository } from "../infrastructure/procurement-cost-repository";
 
@@ -36,6 +37,69 @@ class InMemoryProcurementRepository implements ProcurementCostRepository {
     if (inv && inv.tenantId === tenantId) {
       inv.status = status;
     }
+  }
+
+  async receiveInvoiceAtomic(input: {
+    tenantId: string;
+    invoiceId: string;
+    receiptId?: string;
+    receivedLines?: Array<{ lineId: string; quantity: number }>;
+    actorId?: string;
+  }): Promise<ReceiptExecutionResult> {
+    const inv = this.invoices.get(input.invoiceId);
+    if (!inv || inv.tenantId !== input.tenantId) {
+      throw new Error(`Purchase invoice ${input.invoiceId} not found or tenant mismatch`);
+    }
+    if (inv.status === "cancelled") {
+      throw new Error(`Cannot receive a cancelled purchase invoice (${input.invoiceId})`);
+    }
+    if (inv.status === "received" && !input.receivedLines) {
+      return {
+        success: true,
+        invoiceId: inv.id,
+        status: "received",
+        receiptId: input.receiptId ?? "rcpt-mock",
+        idempotent: true,
+        summary: { itemsProcessed: 0, totalStockIncrement: 0, remainingPendingLines: 0 },
+        processedLines: [],
+      };
+    }
+
+    inv.status = "received";
+    const historyEntries: ItemCostHistoryEntry[] = inv.items.map((item) => ({
+      id: crypto.randomUUID(),
+      tenantId: input.tenantId,
+      itemId: item.itemId,
+      sourceInvoiceItemId: item.id,
+      supplierId: inv.supplierId,
+      unitPrice: item.unitPrice,
+      allocatedOverhead: item.allocatedOverhead,
+      effectiveUnitCost: item.effectiveUnitCost,
+      costMethod: "effective_purchase",
+      effectiveAt: new Date().toISOString(),
+    }));
+    await this.recordCostHistory(historyEntries);
+
+    return {
+      success: true,
+      invoiceId: inv.id,
+      status: "received",
+      receiptId: input.receiptId ?? "rcpt-mock",
+      idempotent: false,
+      summary: {
+        itemsProcessed: inv.items.length,
+        totalStockIncrement: inv.items.reduce((acc, i) => acc + i.quantity, 0),
+        remainingPendingLines: 0,
+      },
+      processedLines: inv.items.map((i) => ({
+        lineId: i.id,
+        itemId: i.itemId,
+        itemName: i.itemName,
+        itemNature: i.itemNature ?? "INVENTORYABLE",
+        receivedQuantity: i.quantity,
+        stockMutated: (i.itemNature ?? "INVENTORYABLE") === "INVENTORYABLE",
+      })),
+    };
   }
 
   async recordCostHistory(entries: ItemCostHistoryEntry[]): Promise<void> {
