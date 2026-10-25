@@ -6,12 +6,24 @@
 --            Garantizado a nivel de motor PostgreSQL: cualquier intento de
 --            mutación (INSERT, UPDATE, DELETE, ALTER, DROP) fallará de inmediato.
 -- Propósito: Certificar que la base de datos destino cumple todos los
---            prerrequisitos técnicos, verificación de destino (tenant/base),
---            permisos y dependencias antes de autorizar la ejecución de las
---            migraciones del Incremento 1A.
--- Parámetros Opcionales de Sesión:
---   SET LOCAL app.expected_tenant_slug = 'eatclean';  -- (Por defecto: 'eatclean')
---   SET LOCAL app.expected_database_name = 'postgres'; -- (Por defecto: ignora check de db si no se define)
+--            prerrequisitos técnicos, verificación de destino (tenant/base/proyecto),
+--            permisos y dependencias antes de someter a autorización humana la
+--            ejecución de las migraciones del Incremento 1A.
+--
+-- Parámetros OBLIGATORIOS de Sesión para Verificación de Destino:
+--   SET LOCAL app.expected_tenant_slug = 'eatclean';
+--   SET LOCAL app.expected_database_name = 'postgres';
+--   SET LOCAL app.expected_project_ref = '<supabase-project-ref-autorizado>';
+--
+-- PRINCIPIOS DE GOBERNANZA:
+-- 1. Si cualquiera de estos tres parámetros no se define explícitamente en la
+--    sesión, el preflight marcará DESTINATION_UNVERIFIED y emitirá un veredicto
+--    BLOCKED. Ninguna base de datos se asumirá verificada por omisión.
+-- 2. La coincidencia interna de base/tenant en SQL NO sustituye la validación
+--    externa e independiente del endpoint y proyecto Supabase autorizado.
+-- 3. Este script certifica condiciones técnicas. Un veredicto TECHNICALLY_READY
+--    NUNCA autoriza por sí mismo el despliegue ni la ejecución de migraciones;
+--    la autorización humana explícita es un requisito previo indispensable.
 -- ============================================================================
 
 \set ON_ERROR_STOP on
@@ -24,21 +36,31 @@ BEGIN TRANSACTION READ ONLY;
 -- ----------------------------------------------------------------------------
 WITH target_config AS (
   SELECT
-    COALESCE(NULLIF(current_setting('app.expected_tenant_slug', true), ''), 'eatclean') AS expected_tenant_slug,
-    NULLIF(current_setting('app.expected_database_name', true), '') AS expected_database_name
+    NULLIF(current_setting('app.expected_tenant_slug', true), '') AS expected_tenant_slug,
+    NULLIF(current_setting('app.expected_database_name', true), '') AS expected_database_name,
+    NULLIF(current_setting('app.expected_project_ref', true), '') AS expected_project_ref
 ),
 target_eval AS (
   SELECT
     tc.expected_tenant_slug,
     tc.expected_database_name,
+    tc.expected_project_ref,
     current_database() AS actual_database,
     current_user AS connected_user,
     inet_server_addr() AS server_ip,
     inet_server_port() AS server_port,
     now() AS preflight_timestamp,
     version() AS postgresql_version,
-    EXISTS(SELECT 1 FROM public.tenants WHERE slug = tc.expected_tenant_slug) AS tenant_verified,
-    (tc.expected_database_name IS NULL OR tc.expected_database_name = current_database()) AS database_verified
+    -- Los parámetros deben proporcionarse explícitamente (sin valores por omisión)
+    (tc.expected_tenant_slug IS NOT NULL) AS tenant_param_provided,
+    (tc.expected_database_name IS NOT NULL) AS database_param_provided,
+    (tc.expected_project_ref IS NOT NULL) AS project_ref_param_provided,
+    -- Comprobación física de tenant en el catálogo
+    (tc.expected_tenant_slug IS NOT NULL AND EXISTS(SELECT 1 FROM public.tenants WHERE slug = tc.expected_tenant_slug)) AS tenant_verified,
+    -- Comprobación física del nombre de base conectada
+    (tc.expected_database_name IS NOT NULL AND tc.expected_database_name = current_database()) AS database_verified,
+    -- Declaración explícita del identificador de proyecto Supabase
+    (tc.expected_project_ref IS NOT NULL) AS project_ref_declared
   FROM target_config tc
 )
 SELECT
@@ -48,13 +70,22 @@ SELECT
   server_port,
   preflight_timestamp,
   expected_tenant_slug,
+  tenant_param_provided,
   tenant_verified,
   expected_database_name,
+  database_param_provided,
   database_verified,
+  expected_project_ref,
+  project_ref_param_provided,
+  project_ref_declared,
   CASE
-    WHEN tenant_verified AND database_verified THEN 'DESTINATION_VERIFIED (Destino confirmado)'
-    WHEN NOT tenant_verified THEN 'DESTINATION_UNVERIFIED (Tenant objetivo no encontrado)'
-    ELSE 'DESTINATION_UNVERIFIED (Discrepancia en nombre de base de datos)'
+    WHEN NOT (tenant_param_provided AND database_param_provided AND project_ref_param_provided)
+      THEN 'DESTINATION_UNVERIFIED (Faltan parámetros obligatorios: defina app.expected_tenant_slug, app.expected_database_name y app.expected_project_ref)'
+    WHEN NOT tenant_verified
+      THEN 'DESTINATION_UNVERIFIED (Tenant objetivo no encontrado en public.tenants)'
+    WHEN NOT database_verified
+      THEN 'DESTINATION_UNVERIFIED (Discrepancia en nombre de base de datos actual vs esperada)'
+    ELSE 'DESTINATION_VERIFIED (Destino de sesión validado; contrastar externamente project_ref con endpoint autorizado)'
   END AS destination_verdict
 FROM target_eval;
 
@@ -269,15 +300,21 @@ SELECT
 -- ----------------------------------------------------------------------------
 WITH preflight_data AS (
   SELECT
-    -- Verificación de destino
-    EXISTS(
-      SELECT 1 FROM public.tenants
-      WHERE slug = COALESCE(NULLIF(current_setting('app.expected_tenant_slug', true), ''), 'eatclean')
+    -- Verificación estricta de destino (todos los parámetros son obligatorios y deben coincidir)
+    (
+      NULLIF(current_setting('app.expected_tenant_slug', true), '') IS NOT NULL
+      AND EXISTS(
+        SELECT 1 FROM public.tenants
+        WHERE slug = current_setting('app.expected_tenant_slug', true)
+      )
     ) AS tenant_verified,
     (
-      NULLIF(current_setting('app.expected_database_name', true), '') IS NULL
-      OR NULLIF(current_setting('app.expected_database_name', true), '') = current_database()
+      NULLIF(current_setting('app.expected_database_name', true), '') IS NOT NULL
+      AND current_setting('app.expected_database_name', true) = current_database()
     ) AS database_verified,
+    (
+      NULLIF(current_setting('app.expected_project_ref', true), '') IS NOT NULL
+    ) AS project_ref_declared,
 
     -- Permisos de cr_order_writer
     (
@@ -325,7 +362,7 @@ WITH preflight_data AS (
 ),
 state_eval AS (
   SELECT
-    tenant_verified AND database_verified AS destination_verified,
+    tenant_verified AND database_verified AND project_ref_declared AS destination_verified,
     auth_prereq_ok,
     migration_prereq_ok,
     base_tables_ok,
@@ -346,7 +383,7 @@ state_eval AS (
 )
 SELECT
   CASE
-    WHEN NOT destination_verified THEN 'BLOCKED: DESTINATION_UNVERIFIED (Verifique el tenant o la base de datos destino)'
+    WHEN NOT destination_verified THEN 'BLOCKED: DESTINATION_UNVERIFIED (Parámetros requeridos no definidos o destino no coincide)'
     WHEN NOT auth_prereq_ok THEN 'BLOCKED: MISSING_AUTH_PREREQUISITE (cr_order_writer requiere privilegios sobre auth.uid())'
     WHEN NOT migration_prereq_ok THEN 'BLOCKED: MISSING_MIGRATION_PREREQUISITE (Falta registro de migración 20261010155728)'
     WHEN NOT base_tables_ok THEN 'BLOCKED: MISSING_BASE_TABLES (Faltan tablas base del sistema)'
@@ -360,14 +397,14 @@ SELECT
   installation_state,
 
   CASE
-    WHEN NOT destination_verified THEN 'NO-GO: Ejecute SET LOCAL app.expected_tenant_slug = ... con el slug correcto antes de continuar.'
+    WHEN NOT destination_verified THEN 'NO-GO: Defina explícitamente SET LOCAL app.expected_tenant_slug, app.expected_database_name y app.expected_project_ref, y valide externamente la conexión.'
     WHEN NOT auth_prereq_ok THEN 'NO-GO: Aplique primero la migración 20261010155728_release_cr_order_writer_auth_usage.sql.'
     WHEN NOT migration_prereq_ok THEN 'NO-GO: Verifique el historial de supabase_migrations.schema_migrations.'
     WHEN NOT (base_tables_ok AND base_columns_ok) THEN 'NO-GO: El esquema base público presenta divergencias críticas.'
     WHEN installation_state = 'INCONSISTENT_STATE' THEN 'NO-GO: Audite manualmente los objetos huérfanos o registre las migraciones correspondientes antes de proceder.'
-    WHEN installation_state = 'CLEAN_PRE_INSTALL' THEN 'GO: Autorizado para aplicar secuencialmente ambas migraciones: 20261024180000 -> 20261024190000.'
-    WHEN installation_state = 'RECEIPT_ONLY_INSTALLED' THEN 'GO: Autorizado para aplicar la migración restante: 20261024190000_flow04_inventory_consumption_persistence.sql.'
-    WHEN installation_state = 'FULLY_INSTALLED' THEN 'GO: Sistema 1A completamente instalado. No ejecutar migraciones adicionales.'
+    WHEN installation_state = 'CLEAN_PRE_INSTALL' THEN 'TECHNICALLY_READY: HUMAN_AUTHORIZATION_REQUIRED (Prerrequisitos técnicos cumplidos para aplicar secuencialmente: 20261024180000 -> 20261024190000. Requiere autorización humana previa.)'
+    WHEN installation_state = 'RECEIPT_ONLY_INSTALLED' THEN 'TECHNICALLY_READY: HUMAN_AUTHORIZATION_REQUIRED (Prerrequisitos técnicos cumplidos para aplicar migración restante: 20261024190000_flow04_inventory_consumption_persistence.sql. Requiere autorización humana previa.)'
+    WHEN installation_state = 'FULLY_INSTALLED' THEN 'FULLY_INSTALLED: NO_MIGRATION_REQUIRED (Estructuras 1A completas y activas. No se requieren migraciones adicionales.)'
   END AS recommended_action,
 
   CASE
