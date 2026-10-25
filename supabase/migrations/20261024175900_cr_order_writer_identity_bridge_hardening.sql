@@ -9,8 +9,8 @@ SET LOCAL ROLE postgres;
 
 -- 1. Ensure schema cr_order_private exists with secure boundaries
 CREATE SCHEMA IF NOT EXISTS cr_order_private;
-REVOKE ALL ON SCHEMA cr_order_private FROM PUBLIC, anon, authenticated;
-GRANT USAGE ON SCHEMA cr_order_private TO cr_order_writer, service_role;
+REVOKE ALL ON SCHEMA cr_order_private FROM PUBLIC, anon;
+GRANT USAGE ON SCHEMA cr_order_private TO authenticated, cr_order_writer, service_role;
 
 -- 2. Define or replace the canonical session_uid_bridge() function
 -- Owned by postgres (which has USAGE on auth and EXECUTE on auth.uid())

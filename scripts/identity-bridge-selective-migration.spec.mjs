@@ -30,13 +30,13 @@ test("Identity Bridge Selective Executor: Static Verification & Safety Audit", a
     const hash = crypto.createHash("sha256").update(content).digest("hex");
     assert.equal(
       hash,
-      "59c8939289934af482af8f4b263bd253935a83fd178566f775eaedff1f4511a5",
+      "fb773e233a2ca6f89c16bccfc1aa7eb10da90d2d7cfe3b7498bd3d93bf2c8e30",
       "Migration SHA-256 must match exactly"
     );
 
     const scriptContent = fs.readFileSync(scriptPath, "utf8");
     assert.ok(
-      scriptContent.includes('EXPECTED_MIGRATION_SHA="59c8939289934af482af8f4b263bd253935a83fd178566f775eaedff1f4511a5"'),
+      scriptContent.includes('EXPECTED_MIGRATION_SHA="fb773e233a2ca6f89c16bccfc1aa7eb10da90d2d7cfe3b7498bd3d93bf2c8e30"'),
       "Script must pin exact migration SHA-256"
     );
   });
@@ -115,9 +115,20 @@ test("Identity Bridge Selective Executor: Static Verification & Safety Audit", a
       "Must validate canonical baseline source anchors"
     );
     assert.ok(
-      scriptContent.includes('offer_state has explicit anon/authenticated ACL grants') &&
-      scriptContent.includes('cr_order_private schema usage leak to anon/authenticated'),
-      "Must enforce private schema isolation and prohibit explicit grants to anon/authenticated on offer_state"
+      scriptContent.includes('offer_state has explicit anon/authenticated ACL grants'),
+      "Must prohibit explicit grants to anon/authenticated on offer_state"
+    );
+    assert.ok(
+      scriptContent.includes('authenticated missing USAGE on cr_order_private') &&
+      scriptContent.includes('anon has USAGE on cr_order_private') &&
+      scriptContent.includes('authenticated has CREATE on cr_order_private'),
+      "Must enforce schema policy: authenticated USAGE preserved, anon USAGE forbidden, CREATE forbidden"
+    );
+    assert.ok(
+      scriptContent.includes('lifecycle_v2 missing authenticated EXECUTE') &&
+      scriptContent.includes('lifecycle_context missing authenticated EXECUTE') &&
+      scriptContent.includes('custom_batch_transition missing authenticated EXECUTE'),
+      "Must ensure lifecycle and kitchen functions retain authenticated EXECUTE"
     );
   });
 
@@ -151,13 +162,15 @@ test("Identity Bridge Selective Executor: Static Verification & Safety Audit", a
       "Phase 2 must revalidate canonical function baselines inside transaction"
     ));
     assert.ok(
-      scriptContent.includes("BLOCKED: FUNCTION_DRIFT: cr_order_private schema usage leak to anon/authenticated") &&
+      scriptContent.includes("BLOCKED: SCHEMA_DRIFT: anon has USAGE on cr_order_private") &&
+      scriptContent.includes("BLOCKED: SCHEMA_DRIFT: authenticated has CREATE on cr_order_private") &&
+      scriptContent.includes("BLOCKED: SCHEMA_DRIFT: authenticated missing USAGE on cr_order_private") &&
       scriptContent.includes("BLOCKED: FUNCTION_DRIFT: offer_state has explicit anon/authenticated ACL grants"),
-      "Phase 2 must revalidate private schema isolation and lack of explicit ACL grants inside transaction"
+      "Phase 2 must revalidate schema USAGE/CREATE policy and lack of explicit ACL grants inside transaction"
     );
   });
 
-  await t.test("postcheck revalidates offer_state execution privileges are revoked from anon/authenticated and granted to service_role", () => {
+  await t.test("postcheck revalidates offer_state, schema permissions, and lifecycle functions", () => {
     const scriptContent = fs.readFileSync(scriptPath, "utf8");
     assert.ok(
       scriptContent.includes('POST_OFFER_ANON') &&
@@ -168,6 +181,18 @@ test("Identity Bridge Selective Executor: Static Verification & Safety Audit", a
     assert.ok(
       scriptContent.includes('permisos de offer_state no fueron endurecidos'),
       "Phase 3 must abort if offer_state permissions were not hardened"
+    );
+    assert.ok(
+      scriptContent.includes('POST_SCHEMA_ANON_USAGE') &&
+      scriptContent.includes('POST_SCHEMA_AUTH_USAGE') &&
+      scriptContent.includes('POST_SCHEMA_AUTH_CREATE'),
+      "Phase 3 must verify schema permissions after migration"
+    );
+    assert.ok(
+      scriptContent.includes('POST_LIFECYCLE_V2_AUTH') &&
+      scriptContent.includes('POST_LIFECYCLE_CTX_AUTH') &&
+      scriptContent.includes('POST_CUSTOM_BATCH_AUTH'),
+      "Phase 3 must verify lifecycle/kitchen authenticated execution after migration"
     );
   });
 });

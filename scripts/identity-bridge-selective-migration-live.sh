@@ -8,7 +8,7 @@
 # Database: postgres
 # User: postgres.nhirlpkuvonggctdzzad (pooler) / postgres (direct)
 # Migration: supabase/migrations/20261024175900_cr_order_writer_identity_bridge_hardening.sql
-# Migration SHA-256: 59c8939289934af482af8f4b263bd253935a83fd178566f775eaedff1f4511a5
+# Migration SHA-256: fb773e233a2ca6f89c16bccfc1aa7eb10da90d2d7cfe3b7498bd3d93bf2c8e30
 #
 # Security & Operational Guarantees:
 # 1. Enforces verify-full TLS with official CA certificate (/Users/alex/Downloads/prod-ca-2021.crt)
@@ -72,7 +72,7 @@ fi
 
 MIGRATION_VERSION="20261024175900"
 MIGRATION_FILE_REL="supabase/migrations/20261024175900_cr_order_writer_identity_bridge_hardening.sql"
-EXPECTED_MIGRATION_SHA="59c8939289934af482af8f4b263bd253935a83fd178566f775eaedff1f4511a5"
+EXPECTED_MIGRATION_SHA="fb773e233a2ca6f89c16bccfc1aa7eb10da90d2d7cfe3b7498bd3d93bf2c8e30"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MIGRATION_FILE="$ROOT_DIR/$MIGRATION_FILE_REL"
@@ -302,10 +302,21 @@ fi
 
 echo "  ✓ Historial pre-migración conforme: 20261024175900 pendiente, 20261010155728 omitida, 1A bloqueada."
 
-# 5. Auditoría Estricta de Drift de Funciones Afectadas (Fail-Closed)
+# 5. Auditoría Estricta de Drift de Funciones Afectadas y Esquema (Fail-Closed)
 FUNCTION_DRIFT_REPORT="$(run_readonly_sql "
 WITH checks AS (
   SELECT
+    -- 0. cr_order_private schema permissions (authenticated has USAGE, anon has none, CREATE forbidden)
+    CASE
+      WHEN NOT has_schema_privilege('cr_order_writer', 'cr_order_private', 'USAGE') THEN 'cr_order_writer missing USAGE on cr_order_private'
+      WHEN NOT has_schema_privilege('service_role', 'cr_order_private', 'USAGE') THEN 'service_role missing USAGE on cr_order_private'
+      WHEN NOT has_schema_privilege('authenticated', 'cr_order_private', 'USAGE') THEN 'authenticated missing USAGE on cr_order_private'
+      WHEN has_schema_privilege('anon', 'cr_order_private', 'USAGE') THEN 'anon has USAGE on cr_order_private'
+      WHEN has_schema_privilege('authenticated', 'cr_order_private', 'CREATE') THEN 'authenticated has CREATE on cr_order_private'
+      WHEN has_schema_privilege('anon', 'cr_order_private', 'CREATE') THEN 'anon has CREATE on cr_order_private'
+      ELSE NULL
+    END AS err_schema,
+
     -- 1. guard_legacy_offer
     CASE
       WHEN to_regprocedure('cr_order_private.guard_legacy_offer()') IS NULL THEN 'guard_legacy_offer missing'
@@ -342,7 +353,6 @@ WITH checks AS (
     -- Baseline histórico: 20261016203000 no revocó explícitamente permisos a PUBLIC,
     -- por lo que anon/authenticated heredan privilegio de ejecución a nivel de función antes de 20261024175900.
     -- Se valida rigurosamente: existencia, propietario cr_order_writer, SECURITY INVOKER,
-    -- aislamiento estricto del esquema privado (sin USAGE para anon ni authenticated),
     -- ausencia de concesiones ACL explícitas a anon o authenticated, y anclas canónicas del código fuente.
     -- El endurecimiento efectivo de la función se certifica en la Fase 3 tras aplicar la migración.
     CASE
@@ -351,9 +361,6 @@ WITH checks AS (
         THEN 'offer_state owner invalid (expected cr_order_writer)'
       WHEN (SELECT prosecdef FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)')) IS NOT FALSE
         THEN 'offer_state must be SECURITY INVOKER'
-      WHEN has_schema_privilege('anon', 'cr_order_private', 'USAGE')
-        OR has_schema_privilege('authenticated', 'cr_order_private', 'USAGE')
-        THEN 'cr_order_private schema usage leak to anon/authenticated'
       WHEN (SELECT coalesce(array_to_string(proacl, ','), '') FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)')) LIKE '%anon=%'
         OR (SELECT coalesce(array_to_string(proacl, ','), '') FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)')) LIKE '%authenticated=%'
         THEN 'offer_state has explicit anon/authenticated ACL grants'
@@ -412,9 +419,23 @@ WITH checks AS (
           ELSE NULL
         END
       ELSE NULL
-    END AS err_batch
+    END AS err_batch,
+
+    -- 7. lifecycle & kitchen functions (authenticated execution preserved)
+    CASE
+      WHEN to_regprocedure('cr_order_private.lifecycle_v2(uuid,uuid,jsonb)') IS NOT NULL
+        AND NOT has_function_privilege('authenticated', to_regprocedure('cr_order_private.lifecycle_v2(uuid,uuid,jsonb)'), 'EXECUTE')
+        THEN 'lifecycle_v2 missing authenticated EXECUTE'
+      WHEN to_regprocedure('cr_order_private.lifecycle_context(uuid,uuid)') IS NOT NULL
+        AND NOT has_function_privilege('authenticated', to_regprocedure('cr_order_private.lifecycle_context(uuid,uuid)'), 'EXECUTE')
+        THEN 'lifecycle_context missing authenticated EXECUTE'
+      WHEN to_regprocedure('cr_order_private.custom_batch_transition(uuid,uuid,date,text)') IS NOT NULL
+        AND NOT has_function_privilege('authenticated', to_regprocedure('cr_order_private.custom_batch_transition(uuid,uuid,date,text)'), 'EXECUTE')
+        THEN 'custom_batch_transition missing authenticated EXECUTE'
+      ELSE NULL
+    END AS err_lifecycle
 )
-SELECT concat_ws('; ', err_guard, err_write, err_offer, err_bridge, err_actor, err_batch) FROM checks;
+SELECT concat_ws('; ', err_schema, err_guard, err_write, err_offer, err_bridge, err_actor, err_batch, err_lifecycle) FROM checks;
 ")"
 
 if [ -n "$FUNCTION_DRIFT_REPORT" ]; then
@@ -581,15 +602,23 @@ BEGIN
     RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: write_dish_v2 source baseline drifted';
   END IF;
 
+  -- Revalidar esquema cr_order_private
+  IF has_schema_privilege('anon', 'cr_order_private', 'USAGE') THEN
+    RAISE EXCEPTION 'BLOCKED: SCHEMA_DRIFT: anon has USAGE on cr_order_private';
+  END IF;
+  IF has_schema_privilege('authenticated', 'cr_order_private', 'CREATE') THEN
+    RAISE EXCEPTION 'BLOCKED: SCHEMA_DRIFT: authenticated has CREATE on cr_order_private';
+  END IF;
+  IF NOT has_schema_privilege('authenticated', 'cr_order_private', 'USAGE') THEN
+    RAISE EXCEPTION 'BLOCKED: SCHEMA_DRIFT: authenticated missing USAGE on cr_order_private';
+  END IF;
+
   -- Revalidar baseline de offer_state
   SELECT pg_get_userbyid(p.proowner), p.prosecdef, p.prosrc
   INTO v_offer_owner, v_offer_secdef, v_prosrc
   FROM pg_proc p WHERE p.oid = to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)');
   IF v_offer_owner IS DISTINCT FROM 'cr_order_writer' OR v_offer_secdef IS NOT FALSE THEN
     RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: offer_state owner or secdef drifted';
-  END IF;
-  IF has_schema_privilege('anon', 'cr_order_private', 'USAGE') OR has_schema_privilege('authenticated', 'cr_order_private', 'USAGE') THEN
-    RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: cr_order_private schema usage leak to anon/authenticated';
   END IF;
   IF (SELECT coalesce(array_to_string(proacl, ','), '') FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)')) LIKE '%anon=%'
      OR (SELECT coalesce(array_to_string(proacl, ','), '') FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)')) LIKE '%authenticated=%' THEN
@@ -644,7 +673,13 @@ SELECT
   (SELECT count(*) FROM supabase_migrations.schema_migrations WHERE version IN ('20261024180000', '20261024190000'))::text || '|' ||
   has_function_privilege('anon', to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)'), 'EXECUTE')::text || '|' ||
   has_function_privilege('authenticated', to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)'), 'EXECUTE')::text || '|' ||
-  has_function_privilege('service_role', to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)'), 'EXECUTE')::text;
+  has_function_privilege('service_role', to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)'), 'EXECUTE')::text || '|' ||
+  has_schema_privilege('anon', 'cr_order_private', 'USAGE')::text || '|' ||
+  has_schema_privilege('authenticated', 'cr_order_private', 'USAGE')::text || '|' ||
+  has_schema_privilege('authenticated', 'cr_order_private', 'CREATE')::text || '|' ||
+  has_function_privilege('authenticated', to_regprocedure('cr_order_private.lifecycle_v2(uuid,uuid,jsonb)'), 'EXECUTE')::text || '|' ||
+  has_function_privilege('authenticated', to_regprocedure('cr_order_private.lifecycle_context(uuid,uuid)'), 'EXECUTE')::text || '|' ||
+  has_function_privilege('authenticated', to_regprocedure('cr_order_private.custom_batch_transition(uuid,uuid,date,text)'), 'EXECUTE')::text;
 ")"
 
 POST_BRIDGE_EXISTS="$(echo "$POSTCHECK_AUDIT" | cut -d'|' -f1)"
@@ -659,6 +694,12 @@ POST_FUTURE_1A="$(echo "$POSTCHECK_AUDIT" | cut -d'|' -f9)"
 POST_OFFER_ANON="$(echo "$POSTCHECK_AUDIT" | cut -d'|' -f10)"
 POST_OFFER_AUTH="$(echo "$POSTCHECK_AUDIT" | cut -d'|' -f11)"
 POST_OFFER_SERVICE="$(echo "$POSTCHECK_AUDIT" | cut -d'|' -f12)"
+POST_SCHEMA_ANON_USAGE="$(echo "$POSTCHECK_AUDIT" | cut -d'|' -f13)"
+POST_SCHEMA_AUTH_USAGE="$(echo "$POSTCHECK_AUDIT" | cut -d'|' -f14)"
+POST_SCHEMA_AUTH_CREATE="$(echo "$POSTCHECK_AUDIT" | cut -d'|' -f15)"
+POST_LIFECYCLE_V2_AUTH="$(echo "$POSTCHECK_AUDIT" | cut -d'|' -f16)"
+POST_LIFECYCLE_CTX_AUTH="$(echo "$POSTCHECK_AUDIT" | cut -d'|' -f17)"
+POST_CUSTOM_BATCH_AUTH="$(echo "$POSTCHECK_AUDIT" | cut -d'|' -f18)"
 
 if [ "$POST_BRIDGE_EXISTS" != "true" ] || [ "$POST_BRIDGE_SECDEF" != "true" ]; then
   echo "FATAL POSTCHECK: El puente no está correctamente instalado como postgres SECURITY DEFINER!" >&2
@@ -667,6 +708,16 @@ fi
 
 if [ "$POST_WRITER_EXEC" != "true" ] || [ "$POST_ANON_EXEC" != "false" ] || [ "$POST_AUTH_EXEC" != "false" ]; then
   echo "FATAL POSTCHECK: Los permisos ACL del puente son incorrectos (writer=$POST_WRITER_EXEC, anon=$POST_ANON_EXEC, auth=$POST_AUTH_EXEC)!" >&2
+  exit 1
+fi
+
+if [ "$POST_SCHEMA_ANON_USAGE" != "false" ] || [ "$POST_SCHEMA_AUTH_USAGE" != "true" ] || [ "$POST_SCHEMA_AUTH_CREATE" != "false" ]; then
+  echo "FATAL POSTCHECK: Permisos del esquema cr_order_private no son conformes (anon_usage=$POST_SCHEMA_ANON_USAGE, auth_usage=$POST_SCHEMA_AUTH_USAGE, auth_create=$POST_SCHEMA_AUTH_CREATE)!" >&2
+  exit 1
+fi
+
+if [ "$POST_LIFECYCLE_V2_AUTH" != "true" ] || [ "$POST_LIFECYCLE_CTX_AUTH" != "true" ] || [ "$POST_CUSTOM_BATCH_AUTH" != "true" ]; then
+  echo "FATAL POSTCHECK: Permisos de lifecycle/kitchen para authenticated se perdieron post-migración!" >&2
   exit 1
 fi
 
@@ -696,6 +747,8 @@ if [ "$POST_FUTURE_1A" -ne 0 ]; then
 fi
 
 echo "  ✓ Puente de identidad: instalado, SECDEF, propietario postgres, ACLs restringidas."
+echo "  ✓ Esquema cr_order_private: USAGE preservado para authenticated, cr_order_writer y service_role; anon revocado; CREATE bloqueado."
+echo "  ✓ Funciones de lifecycle y cocina: permisos de ejecución para authenticated 100% operativos."
 echo "  ✓ Permisos de offer_state: revocados para anon y authenticated, concedido exclusivamente a service_role."
 echo "  ✓ Funciones de cr_order_writer: 0 llamadas directas a auth.uid()."
 echo "  ✓ Ledger de migraciones: $MIGRATION_VERSION registrado (1), 20261010155728 ausente (0), 1A pendiente (0)."

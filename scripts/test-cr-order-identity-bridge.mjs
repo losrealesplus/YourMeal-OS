@@ -478,7 +478,13 @@ const selectiveAudit = sql(`
     (to_regprocedure('cr_order_private.guard_legacy_offer()') IS NOT NULL)::text || '|' ||
     (SELECT count(*) FROM supabase_migrations.schema_migrations WHERE version = '20261024175900')::text || '|' ||
     (SELECT count(*) FROM supabase_migrations.schema_migrations WHERE version = '20261010155728')::text || '|' ||
-    (SELECT count(*) FROM supabase_migrations.schema_migrations WHERE version IN ('20261024180000', '20261024190000'))::text;
+    (SELECT count(*) FROM supabase_migrations.schema_migrations WHERE version IN ('20261024180000', '20261024190000'))::text || '|' ||
+    has_schema_privilege('anon', 'cr_order_private', 'USAGE')::text || '|' ||
+    has_schema_privilege('authenticated', 'cr_order_private', 'USAGE')::text || '|' ||
+    has_schema_privilege('authenticated', 'cr_order_private', 'CREATE')::text || '|' ||
+    has_function_privilege('authenticated', to_regprocedure('cr_order_private.lifecycle_v2(uuid,uuid,jsonb)'), 'EXECUTE')::text || '|' ||
+    has_function_privilege('authenticated', to_regprocedure('cr_order_private.lifecycle_context(uuid,uuid)'), 'EXECUTE')::text || '|' ||
+    has_function_privilege('authenticated', to_regprocedure('cr_order_private.custom_batch_transition(uuid,uuid,date,text)'), 'EXECUTE')::text;
 `);
 
 const [
@@ -494,6 +500,12 @@ const [
   prereqVersionCount,
   historicalOmittedCount,
   future1ACount,
+  schemaAnonUsage,
+  schemaAuthUsage,
+  schemaAuthCreate,
+  lifecycleV2Auth,
+  lifecycleCtxAuth,
+  customBatchAuth,
 ] = selectiveAudit.split("|");
 
 assert.equal(bridgeExists, "true", "Bridge must exist in database");
@@ -508,6 +520,12 @@ assert.equal(guardLegacyOfferOk, "true", "guard_legacy_offer contract must be pr
 assert.equal(prereqVersionCount, "1", "20261024175900 must be recorded exactly once");
 assert.equal(historicalOmittedCount, "0", "HISTORICAL_MIGRATION_UNTOUCHED: 20261010155728 must remain unrecorded");
 assert.equal(future1ACount, "0", "INCREMENT_1A_NOT_APPLIED: 20261024180000/190000 must remain unrecorded");
+assert.equal(schemaAnonUsage, "false", "anon must NOT have USAGE on cr_order_private");
+assert.equal(schemaAuthUsage, "true", "authenticated MUST have USAGE on cr_order_private");
+assert.equal(schemaAuthCreate, "false", "authenticated must NOT have CREATE on cr_order_private");
+assert.equal(lifecycleV2Auth, "true", "lifecycle_v2 must remain executable by authenticated");
+assert.equal(lifecycleCtxAuth, "true", "lifecycle_context must remain executable by authenticated");
+assert.equal(customBatchAuth, "true", "custom_batch_transition must remain executable by authenticated");
 
 console.log("  ✓ [10B] SELECTIVE_MIGRATION_EXECUTION: PASS (full SQL applied, contracts preserved, ledger updated).");
 
@@ -708,15 +726,59 @@ try {
   cliSchemaLeakFailed = true;
   cliSchemaLeakOutput = (err.stdout || "") + (err.stderr || "");
 } finally {
-  sql(`REVOKE USAGE ON SCHEMA cr_order_private FROM anon;`);
+  sql(`REVOKE ALL ON SCHEMA cr_order_private FROM anon;`);
 }
 assert.ok(cliSchemaLeakFailed, "Schema USAGE leak to anon must abort with exit code 1");
 assert.ok(
-  cliSchemaLeakOutput.includes("cr_order_private schema usage leak to anon/authenticated"),
-  "CLI executor must report 'cr_order_private schema usage leak to anon/authenticated'"
+  cliSchemaLeakOutput.includes("anon has USAGE on cr_order_private"),
+  "CLI executor must report 'anon has USAGE on cr_order_private'"
 );
 
-console.log("  ✓ [Test 12] DRIFT_FAIL_CLOSED: PASS (historical baseline accepted; explicit grants, leaks, and drifted definitions abort fail-closed).");
+// Scenario 12F: Schema CREATE privilege granted to authenticated triggers BLOCKED: FUNCTION_DRIFT
+let cliAuthCreateFailed = false;
+let cliAuthCreateOutput = "";
+try {
+  sql(`GRANT CREATE ON SCHEMA cr_order_private TO authenticated;`);
+  execFileSync(path.join(ROOT_DIR, "scripts/identity-bridge-selective-migration-live.sh"), ["--dry-run"], {
+    env: { ...process.env, LAB_ISOLATED_PG17: "true" },
+    encoding: "utf8",
+    stdio: ["pipe", "pipe", "pipe"],
+  });
+} catch (err) {
+  cliAuthCreateFailed = true;
+  cliAuthCreateOutput = (err.stdout || "") + (err.stderr || "");
+} finally {
+  sql(`REVOKE CREATE ON SCHEMA cr_order_private FROM authenticated;`);
+}
+assert.ok(cliAuthCreateFailed, "CREATE privilege on cr_order_private for authenticated must abort with exit code 1");
+assert.ok(
+  cliAuthCreateOutput.includes("authenticated has CREATE on cr_order_private"),
+  "CLI executor must report 'authenticated has CREATE on cr_order_private'"
+);
+
+// Scenario 12G: Missing USAGE on cr_order_private for authenticated triggers BLOCKED: FUNCTION_DRIFT
+let cliAuthUsageMissingFailed = false;
+let cliAuthUsageMissingOutput = "";
+try {
+  sql(`REVOKE USAGE ON SCHEMA cr_order_private FROM authenticated;`);
+  execFileSync(path.join(ROOT_DIR, "scripts/identity-bridge-selective-migration-live.sh"), ["--dry-run"], {
+    env: { ...process.env, LAB_ISOLATED_PG17: "true" },
+    encoding: "utf8",
+    stdio: ["pipe", "pipe", "pipe"],
+  });
+} catch (err) {
+  cliAuthUsageMissingFailed = true;
+  cliAuthUsageMissingOutput = (err.stdout || "") + (err.stderr || "");
+} finally {
+  sql(`GRANT USAGE ON SCHEMA cr_order_private TO authenticated;`);
+}
+assert.ok(cliAuthUsageMissingFailed, "Missing USAGE on cr_order_private for authenticated must abort with exit code 1");
+assert.ok(
+  cliAuthUsageMissingOutput.includes("authenticated missing USAGE on cr_order_private"),
+  "CLI executor must report 'authenticated missing USAGE on cr_order_private'"
+);
+
+console.log("  ✓ [Test 12] DRIFT_FAIL_CLOSED: PASS (schema policies, historical baseline, and fail-closed guards verified).");
 
 // -----------------------------------------------------------------------------
 // CHECK 13: Negative Test: Unexpected Historical Migration (20261010155728) Present
