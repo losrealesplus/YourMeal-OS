@@ -648,7 +648,75 @@ assert.ok(
   cliDriftOutput.includes("BLOCKED: FUNCTION_DRIFT"),
   "CLI executor output must contain 'BLOCKED: FUNCTION_DRIFT'"
 );
-console.log("  ✓ [Test 12] DRIFT_FAIL_CLOSED: PASS (drifted function triggers BLOCKED: FUNCTION_DRIFT, exit 1, zero mutation).");
+
+// Scenario 12C: Historical initial baseline of offer_state (PUBLIC execute privilege inherited)
+// MUST pass the executor's prechecks cleanly
+try {
+  sql(`GRANT EXECUTE ON FUNCTION cr_order_private.offer_state(uuid,jsonb,text) TO PUBLIC;`);
+  const histOut = execFileSync(path.join(ROOT_DIR, "scripts/identity-bridge-selective-migration-live.sh"), ["--dry-run"], {
+    env: { ...process.env, LAB_ISOLATED_PG17: "true" },
+    encoding: "utf8",
+    stdio: ["pipe", "pipe", "pipe"],
+  });
+  assert.ok(
+    histOut.includes("MODO DRY-RUN COMPLETADO CON ÉXITO"),
+    "Historical baseline with inherited PUBLIC execute must pass dry-run prechecks"
+  );
+} finally {
+  sql(`
+    REVOKE ALL ON FUNCTION cr_order_private.offer_state(uuid,jsonb,text) FROM PUBLIC, anon, authenticated;
+    GRANT EXECUTE ON FUNCTION cr_order_private.offer_state(uuid,jsonb,text) TO service_role;
+  `);
+}
+
+// Scenario 12D: Explicit grant to anon on offer_state triggers BLOCKED: FUNCTION_DRIFT
+let cliExplicitGrantFailed = false;
+let cliExplicitGrantOutput = "";
+try {
+  sql(`GRANT EXECUTE ON FUNCTION cr_order_private.offer_state(uuid,jsonb,text) TO anon;`);
+  execFileSync(path.join(ROOT_DIR, "scripts/identity-bridge-selective-migration-live.sh"), ["--dry-run"], {
+    env: { ...process.env, LAB_ISOLATED_PG17: "true" },
+    encoding: "utf8",
+    stdio: ["pipe", "pipe", "pipe"],
+  });
+} catch (err) {
+  cliExplicitGrantFailed = true;
+  cliExplicitGrantOutput = (err.stdout || "") + (err.stderr || "");
+} finally {
+  sql(`
+    REVOKE ALL ON FUNCTION cr_order_private.offer_state(uuid,jsonb,text) FROM PUBLIC, anon, authenticated;
+    GRANT EXECUTE ON FUNCTION cr_order_private.offer_state(uuid,jsonb,text) TO service_role;
+  `);
+}
+assert.ok(cliExplicitGrantFailed, "Explicit grant to anon on offer_state must abort with exit code 1");
+assert.ok(
+  cliExplicitGrantOutput.includes("offer_state has explicit anon/authenticated ACL grants"),
+  "CLI executor must report 'offer_state has explicit anon/authenticated ACL grants'"
+);
+
+// Scenario 12E: Schema USAGE leak to anon triggers BLOCKED: FUNCTION_DRIFT
+let cliSchemaLeakFailed = false;
+let cliSchemaLeakOutput = "";
+try {
+  sql(`GRANT USAGE ON SCHEMA cr_order_private TO anon;`);
+  execFileSync(path.join(ROOT_DIR, "scripts/identity-bridge-selective-migration-live.sh"), ["--dry-run"], {
+    env: { ...process.env, LAB_ISOLATED_PG17: "true" },
+    encoding: "utf8",
+    stdio: ["pipe", "pipe", "pipe"],
+  });
+} catch (err) {
+  cliSchemaLeakFailed = true;
+  cliSchemaLeakOutput = (err.stdout || "") + (err.stderr || "");
+} finally {
+  sql(`REVOKE USAGE ON SCHEMA cr_order_private FROM anon;`);
+}
+assert.ok(cliSchemaLeakFailed, "Schema USAGE leak to anon must abort with exit code 1");
+assert.ok(
+  cliSchemaLeakOutput.includes("cr_order_private schema usage leak to anon/authenticated"),
+  "CLI executor must report 'cr_order_private schema usage leak to anon/authenticated'"
+);
+
+console.log("  ✓ [Test 12] DRIFT_FAIL_CLOSED: PASS (historical baseline accepted; explicit grants, leaks, and drifted definitions abort fail-closed).");
 
 // -----------------------------------------------------------------------------
 // CHECK 13: Negative Test: Unexpected Historical Migration (20261010155728) Present

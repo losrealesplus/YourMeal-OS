@@ -339,17 +339,27 @@ WITH checks AS (
     END AS err_write,
 
     -- 3. offer_state
+    -- Baseline histórico: 20261016203000 no revocó explícitamente permisos a PUBLIC,
+    -- por lo que anon/authenticated heredan privilegio de ejecución a nivel de función antes de 20261024175900.
+    -- Se valida rigurosamente: existencia, propietario cr_order_writer, SECURITY INVOKER,
+    -- aislamiento estricto del esquema privado (sin USAGE para anon ni authenticated),
+    -- ausencia de concesiones ACL explícitas a anon o authenticated, y anclas canónicas del código fuente.
+    -- El endurecimiento efectivo de la función se certifica en la Fase 3 tras aplicar la migración.
     CASE
       WHEN to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)') IS NULL THEN 'offer_state missing'
       WHEN (SELECT pg_get_userbyid(proowner) FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)')) IS DISTINCT FROM 'cr_order_writer'
         THEN 'offer_state owner invalid (expected cr_order_writer)'
       WHEN (SELECT prosecdef FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)')) IS NOT FALSE
         THEN 'offer_state must be SECURITY INVOKER'
-      WHEN has_function_privilege('anon', to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)'), 'EXECUTE')
-        OR has_function_privilege('authenticated', to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)'), 'EXECUTE')
-        THEN 'offer_state has public/anon execution privilege'
+      WHEN has_schema_privilege('anon', 'cr_order_private', 'USAGE')
+        OR has_schema_privilege('authenticated', 'cr_order_private', 'USAGE')
+        THEN 'cr_order_private schema usage leak to anon/authenticated'
+      WHEN (SELECT coalesce(array_to_string(proacl, ','), '') FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)')) LIKE '%anon=%'
+        OR (SELECT coalesce(array_to_string(proacl, ','), '') FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)')) LIKE '%authenticated=%'
+        THEN 'offer_state has explicit anon/authenticated ACL grants'
       WHEN (SELECT prosrc FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)')) NOT LIKE '%require_custom%'
         OR (SELECT prosrc FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)')) NOT LIKE '%OFFER_PRICING_COMMERCIAL_UNSUPPORTED%'
+        OR (SELECT prosrc FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)')) NOT LIKE '%require_off_menu%'
         THEN 'offer_state source baseline drift'
       ELSE NULL
     END AS err_offer,
@@ -578,7 +588,14 @@ BEGIN
   IF v_offer_owner IS DISTINCT FROM 'cr_order_writer' OR v_offer_secdef IS NOT FALSE THEN
     RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: offer_state owner or secdef drifted';
   END IF;
-  IF v_prosrc NOT LIKE '%require_custom%' OR v_prosrc NOT LIKE '%OFFER_PRICING_COMMERCIAL_UNSUPPORTED%' THEN
+  IF has_schema_privilege('anon', 'cr_order_private', 'USAGE') OR has_schema_privilege('authenticated', 'cr_order_private', 'USAGE') THEN
+    RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: cr_order_private schema usage leak to anon/authenticated';
+  END IF;
+  IF (SELECT coalesce(array_to_string(proacl, ','), '') FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)')) LIKE '%anon=%'
+     OR (SELECT coalesce(array_to_string(proacl, ','), '') FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)')) LIKE '%authenticated=%' THEN
+    RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: offer_state has explicit anon/authenticated ACL grants';
+  END IF;
+  IF v_prosrc NOT LIKE '%require_custom%' OR v_prosrc NOT LIKE '%OFFER_PRICING_COMMERCIAL_UNSUPPORTED%' OR v_prosrc NOT LIKE '%require_off_menu%' THEN
     RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: offer_state source baseline drifted';
   END IF;
 END $$;
@@ -624,7 +641,10 @@ SELECT
   (SELECT count(*) FROM pg_proc WHERE pg_get_userbyid(proowner) = 'cr_order_writer' AND prosrc ILIKE '%auth.uid%')::text || '|' ||
   (SELECT count(*) FROM supabase_migrations.schema_migrations WHERE version = '$MIGRATION_VERSION')::text || '|' ||
   (SELECT count(*) FROM supabase_migrations.schema_migrations WHERE version = '20261010155728')::text || '|' ||
-  (SELECT count(*) FROM supabase_migrations.schema_migrations WHERE version IN ('20261024180000', '20261024190000'))::text;
+  (SELECT count(*) FROM supabase_migrations.schema_migrations WHERE version IN ('20261024180000', '20261024190000'))::text || '|' ||
+  has_function_privilege('anon', to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)'), 'EXECUTE')::text || '|' ||
+  has_function_privilege('authenticated', to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)'), 'EXECUTE')::text || '|' ||
+  has_function_privilege('service_role', to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)'), 'EXECUTE')::text;
 ")"
 
 POST_BRIDGE_EXISTS="$(echo "$POSTCHECK_AUDIT" | cut -d'|' -f1)"
@@ -636,6 +656,9 @@ POST_DIRECT_CALLS="$(echo "$POSTCHECK_AUDIT" | cut -d'|' -f6)"
 POST_PREREQ_COUNT="$(echo "$POSTCHECK_AUDIT" | cut -d'|' -f7)"
 POST_HISTORICAL_28="$(echo "$POSTCHECK_AUDIT" | cut -d'|' -f8)"
 POST_FUTURE_1A="$(echo "$POSTCHECK_AUDIT" | cut -d'|' -f9)"
+POST_OFFER_ANON="$(echo "$POSTCHECK_AUDIT" | cut -d'|' -f10)"
+POST_OFFER_AUTH="$(echo "$POSTCHECK_AUDIT" | cut -d'|' -f11)"
+POST_OFFER_SERVICE="$(echo "$POSTCHECK_AUDIT" | cut -d'|' -f12)"
 
 if [ "$POST_BRIDGE_EXISTS" != "true" ] || [ "$POST_BRIDGE_SECDEF" != "true" ]; then
   echo "FATAL POSTCHECK: El puente no está correctamente instalado como postgres SECURITY DEFINER!" >&2
@@ -644,6 +667,11 @@ fi
 
 if [ "$POST_WRITER_EXEC" != "true" ] || [ "$POST_ANON_EXEC" != "false" ] || [ "$POST_AUTH_EXEC" != "false" ]; then
   echo "FATAL POSTCHECK: Los permisos ACL del puente son incorrectos (writer=$POST_WRITER_EXEC, anon=$POST_ANON_EXEC, auth=$POST_AUTH_EXEC)!" >&2
+  exit 1
+fi
+
+if [ "$POST_OFFER_ANON" != "false" ] || [ "$POST_OFFER_AUTH" != "false" ] || [ "$POST_OFFER_SERVICE" != "true" ]; then
+  echo "FATAL POSTCHECK: Los permisos de offer_state no fueron endurecidos (anon=$POST_OFFER_ANON, auth=$POST_OFFER_AUTH, service_role=$POST_OFFER_SERVICE)!" >&2
   exit 1
 fi
 
@@ -668,6 +696,7 @@ if [ "$POST_FUTURE_1A" -ne 0 ]; then
 fi
 
 echo "  ✓ Puente de identidad: instalado, SECDEF, propietario postgres, ACLs restringidas."
+echo "  ✓ Permisos de offer_state: revocados para anon y authenticated, concedido exclusivamente a service_role."
 echo "  ✓ Funciones de cr_order_writer: 0 llamadas directas a auth.uid()."
 echo "  ✓ Ledger de migraciones: $MIGRATION_VERSION registrado (1), 20261010155728 ausente (0), 1A pendiente (0)."
 echo ""

@@ -114,6 +114,11 @@ test("Identity Bridge Selective Executor: Static Verification & Safety Audit", a
       scriptContent.includes('offer_state source baseline drift'),
       "Must validate canonical baseline source anchors"
     );
+    assert.ok(
+      scriptContent.includes('offer_state has explicit anon/authenticated ACL grants') &&
+      scriptContent.includes('cr_order_private schema usage leak to anon/authenticated'),
+      "Must enforce private schema isolation and prohibit explicit grants to anon/authenticated on offer_state"
+    );
   });
 
   await t.test("unexpected historical migration 20261010155728 produces BLOCKED: UNEXPECTED_MIGRATION_HISTORY and aborts with code 1", () => {
@@ -145,5 +150,24 @@ test("Identity Bridge Selective Executor: Static Verification & Safety Audit", a
       scriptContent.includes("RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: offer_state owner or secdef drifted';",
       "Phase 2 must revalidate canonical function baselines inside transaction"
     ));
+    assert.ok(
+      scriptContent.includes("BLOCKED: FUNCTION_DRIFT: cr_order_private schema usage leak to anon/authenticated") &&
+      scriptContent.includes("BLOCKED: FUNCTION_DRIFT: offer_state has explicit anon/authenticated ACL grants"),
+      "Phase 2 must revalidate private schema isolation and lack of explicit ACL grants inside transaction"
+    );
+  });
+
+  await t.test("postcheck revalidates offer_state execution privileges are revoked from anon/authenticated and granted to service_role", () => {
+    const scriptContent = fs.readFileSync(scriptPath, "utf8");
+    assert.ok(
+      scriptContent.includes('POST_OFFER_ANON') &&
+      scriptContent.includes('POST_OFFER_AUTH') &&
+      scriptContent.includes('POST_OFFER_SERVICE'),
+      "Phase 3 must extract offer_state post-migration execution privileges"
+    );
+    assert.ok(
+      scriptContent.includes('permisos de offer_state no fueron endurecidos'),
+      "Phase 3 must abort if offer_state permissions were not hardened"
+    );
   });
 });
