@@ -16,7 +16,10 @@
  *    - Positive test: EatClean tenant (8bba00ba-331b-42c8-9283-4e3836ffb870) order_items mutation under cr_order_writer succeeds.
  *    - Negative test: Secondary tenant (00000000-0000-0000-0000-000000000099) order_items mutation by EatClean actor is rejected with PERMISSION_DENIED (zero schema auth errors).
  * 10. PostgREST cryptographically signed JWT authentication vs SQL simulated session.
- * 11. Selective atomic migration mechanism verification on production-mirrored ledger (20261010155728 absent).
+ * 11. Selective atomic migration execution & transactional rollback on production-mirrored ledger:
+ *    - Full DDL content of 20261024175900 executed via official atomic single-file transaction wrapper.
+ *    - TRANSACTIONAL_ROLLBACK: Failure before commit leaves 20261024175900 unrecorded (0 in schema_migrations).
+ *    - SELECTIVE_MIGRATION_EXECUTION: Applied cleanly; verifies bridge owner, ACLs, function contracts, 20261024175900 recorded, 20261010155728 untouched, 1A not applied.
  * 12. Preflight strict consistency & dual-state verification (separating BRIDGE_ACTIVE from MIGRATION_REGISTERED).
  */
 
@@ -372,46 +375,141 @@ try {
 }
 
 // -----------------------------------------------------------------------------
-// CHECK 10: Selective Atomic Migration Mechanism on Production-Mirrored Ledger
+// CHECK 10: Full Selective Atomic Migration Execution & Rollback Verification
 // -----------------------------------------------------------------------------
-console.log("\n[Test 10] Selective atomic migration execution on production-mirrored ledger...");
+console.log("\n[Test 10] Real selective atomic migration execution & rollback verification...");
 const migrationFilePath = path.join(
   ROOT_DIR,
   "supabase/migrations/20261024175900_cr_order_writer_identity_bridge_hardening.sql"
 );
-assert.ok(fs.existsSync(migrationFilePath), "Hardening migration file must exist");
+assert.ok(fs.existsSync(migrationFilePath), "Hardening migration file 20261024175900 must exist");
 
-const selectiveSimulationSql = `
-  BEGIN;
-  -- Mirror production ledger: delete 20261010155728 if present, ensure 20261010155729 is present
+const rawMigrationSql = fs.readFileSync(migrationFilePath, "utf8");
+const rawLines = rawMigrationSql.split("\n");
+let firstBeginIdx = -1;
+let lastCommitIdx = -1;
+
+for (let i = 0; i < rawLines.length; i++) {
+  if (/^\s*BEGIN\s*;/i.test(rawLines[i]) && firstBeginIdx === -1) firstBeginIdx = i;
+  if (/^\s*COMMIT\s*;/i.test(rawLines[i])) lastCommitIdx = i;
+}
+
+assert.ok(firstBeginIdx !== -1 && lastCommitIdx !== -1 && firstBeginIdx < lastCommitIdx, "Must locate outermost BEGIN/COMMIT");
+
+// Validate no intermediate COMMIT statements exist (atomicity check)
+for (let i = firstBeginIdx + 1; i < lastCommitIdx; i++) {
+  assert.ok(!/^\s*COMMIT\s*;/i.test(rawLines[i]), `Atomicity violation: intermediate COMMIT at line ${i + 1}`);
+}
+
+const strippedMigrationSql = rawLines.map((line, idx) => {
+  if (idx === firstBeginIdx) return "-- [SELECTIVE WRAPPER: Original BEGIN replaced]";
+  if (idx === lastCommitIdx) return "-- [SELECTIVE WRAPPER: Original COMMIT replaced]";
+  return line;
+}).join("\n");
+
+// Setup production-mirrored baseline
+sql(`
   DELETE FROM supabase_migrations.schema_migrations WHERE version IN ('20261010155728', '20261024175900', '20261024180000', '20261024190000');
   INSERT INTO supabase_migrations.schema_migrations (version) VALUES ('20261010155729') ON CONFLICT DO NOTHING;
+`);
 
-  -- Verify production-mirrored baseline
-  DO $$
-  BEGIN
-    IF EXISTS(SELECT 1 FROM supabase_migrations.schema_migrations WHERE version = '20261010155728') THEN
-      RAISE EXCEPTION 'MIGRATION_20261010155728_SHOULD_BE_ABSENT';
-    END IF;
-  END $$;
+// Sub-check 10A: Prove Transactional Rollback
+console.log("  [10A] Testing transactional rollback upon failure during selective execution...");
+const failingSelectiveTx = `
+  BEGIN;
+  SET LOCAL ROLE postgres;
+  SET LOCAL lock_timeout = '5s';
+  SET LOCAL statement_timeout = '60s';
 
-  -- Apply 20261024175900 selectively (simulating m74-production-migration-live.sh atomic cutover)
+  -- 1. Full migration DDL
+  ${strippedMigrationSql}
+
+  -- 2. Ledger registration
   INSERT INTO supabase_migrations.schema_migrations (version) VALUES ('20261024175900');
 
-  -- Verify results: 20261024175900 is recorded, 20261010155728 remains absent, 1A migrations remain unapplied
+  -- 3. Injected failure before commit
+  DO $$ BEGIN RAISE EXCEPTION 'SIMULATED_FAILURE_BEFORE_COMMIT'; END $$;
+
+  COMMIT;
+`;
+
+let rollbackObserved = false;
+try {
+  sql(failingSelectiveTx);
+} catch (err) {
+  rollbackObserved = (err.message && err.message.includes("SIMULATED_FAILURE_BEFORE_COMMIT")) ||
+                     (err.stderr && err.stderr.toString().includes("SIMULATED_FAILURE_BEFORE_COMMIT"));
+}
+assert.ok(rollbackObserved, "Simulated failure must trigger error in selective migration");
+
+const rollbackLedgerCount = sql(`SELECT count(*) FROM supabase_migrations.schema_migrations WHERE version = '20261024175900';`);
+assert.equal(rollbackLedgerCount, "0", "TRANSACTIONAL_ROLLBACK: version 20261024175900 must NOT be recorded on failure");
+console.log("  ✓ [10A] TRANSACTIONAL_ROLLBACK: PASS (aborts atomically, zero ledger changes recorded).");
+
+// Sub-check 10B: Real Selective Atomic Migration Execution
+console.log("  [10B] Applying full 20261024175900 migration SQL via official selective transaction wrapper...");
+const successfulSelectiveTx = `
+  BEGIN;
+  SET LOCAL ROLE postgres;
+  SET LOCAL lock_timeout = '5s';
+  SET LOCAL statement_timeout = '60s';
+
+  -- 1. Full migration DDL
+  ${strippedMigrationSql}
+
+  -- 2. Official Supabase Migrations Ledger Registration
+  INSERT INTO supabase_migrations.schema_migrations (version) VALUES ('20261024175900');
+
+  COMMIT;
+`;
+sql(successfulSelectiveTx);
+
+// Verify live engine state after selective execution
+const selectiveAudit = sql(`
   SELECT
+    (to_regprocedure('cr_order_private.session_uid_bridge()') IS NOT NULL)::text || '|' ||
+    (SELECT pg_get_userbyid(proowner) = 'postgres' AND prosecdef = true FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.session_uid_bridge()'))::text || '|' ||
+    has_function_privilege('cr_order_writer', to_regprocedure('cr_order_private.session_uid_bridge()'), 'EXECUTE')::text || '|' ||
+    has_function_privilege('anon', to_regprocedure('cr_order_private.session_uid_bridge()'), 'EXECUTE')::text || '|' ||
+    has_function_privilege('authenticated', to_regprocedure('cr_order_private.session_uid_bridge()'), 'EXECUTE')::text || '|' ||
+    (SELECT count(*) FROM pg_proc WHERE pg_get_userbyid(proowner) = 'cr_order_writer' AND prosrc ILIKE '%auth.uid%')::text || '|' ||
+    (to_regprocedure('cr_order_private.write_dish_v2(uuid,uuid,jsonb,uuid,jsonb)') IS NOT NULL)::text || '|' ||
+    (to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)') IS NOT NULL)::text || '|' ||
+    (to_regprocedure('cr_order_private.guard_legacy_offer()') IS NOT NULL)::text || '|' ||
     (SELECT count(*) FROM supabase_migrations.schema_migrations WHERE version = '20261024175900')::text || '|' ||
     (SELECT count(*) FROM supabase_migrations.schema_migrations WHERE version = '20261010155728')::text || '|' ||
     (SELECT count(*) FROM supabase_migrations.schema_migrations WHERE version IN ('20261024180000', '20261024190000'))::text;
-  ROLLBACK;
-`;
-const selectiveResult = sql(selectiveSimulationSql);
-assert.equal(
-  selectiveResult,
-  "1|0|0",
-  "Selective migration must record 20261024175900, leave 20261010155728 absent, and not trigger 1A"
-);
-console.log("  ✓ Selective atomic applicator verified: installs 20261024175900 in isolation with zero ledger side-effects.");
+`);
+
+const [
+  bridgeExists,
+  bridgeOwnerSecdef,
+  bridgeWriterExec,
+  bridgeAnonExec,
+  bridgeAuthExec,
+  directAuthCalls,
+  writeDishV2Ok,
+  offerStateOk,
+  guardLegacyOfferOk,
+  prereqVersionCount,
+  historicalOmittedCount,
+  future1ACount,
+] = selectiveAudit.split("|");
+
+assert.equal(bridgeExists, "true", "Bridge must exist in database");
+assert.equal(bridgeOwnerSecdef, "true", "Bridge must be owned by postgres with SECURITY DEFINER");
+assert.equal(bridgeWriterExec, "true", "EXECUTE on bridge must be granted to cr_order_writer");
+assert.equal(bridgeAnonExec, "false", "EXECUTE on bridge must be revoked from anon");
+assert.equal(bridgeAuthExec, "false", "EXECUTE on bridge must be revoked from authenticated");
+assert.equal(directAuthCalls, "0", "Functions owned by cr_order_writer must have 0 direct auth.uid calls");
+assert.equal(writeDishV2Ok, "true", "write_dish_v2 contract must be preserved and registered");
+assert.equal(offerStateOk, "true", "offer_state contract must be preserved and registered");
+assert.equal(guardLegacyOfferOk, "true", "guard_legacy_offer contract must be preserved and registered");
+assert.equal(prereqVersionCount, "1", "20261024175900 must be recorded exactly once");
+assert.equal(historicalOmittedCount, "0", "HISTORICAL_MIGRATION_UNTOUCHED: 20261010155728 must remain unrecorded");
+assert.equal(future1ACount, "0", "INCREMENT_1A_NOT_APPLIED: 20261024180000/190000 must remain unrecorded");
+
+console.log("  ✓ [10B] SELECTIVE_MIGRATION_EXECUTION: PASS (full SQL applied, contracts preserved, ledger updated).");
 
 // -----------------------------------------------------------------------------
 // CHECK 11: Preflight Strict Consistency & Dual-State Verification
@@ -440,17 +538,19 @@ const preflightStateASql = `
     END;
   COMMIT;
 `;
-const stateAOutput = sql(preflightStateASql);
-// If 20261024175900 is not registered in base docker schema_migrations:
-const [bridgeStatusA, prereqStatusA] = stateAOutput.split("|");
-assert.equal(bridgeStatusA, "BRIDGE_ACTIVE", "Identity bridge must be active in engine");
-console.log(`  ✓ Preflight State A (ledger pending): bridge=${bridgeStatusA}, migration_prereq=${prereqStatusA}`);
+// Right now, 20261024175900 was registered in Test 10B.
+const stateBOutput = sql(preflightStateASql);
+assert.equal(
+  stateBOutput,
+  "BRIDGE_ACTIVE|MIGRATION_REGISTERED",
+  "When registered, preflight must report both BRIDGE_ACTIVE and MIGRATION_REGISTERED"
+);
+console.log(`  ✓ Preflight State B (ledger registered): bridge=BRIDGE_ACTIVE, migration_prereq=MIGRATION_REGISTERED`);
 
-// State B: Both bridge active in engine AND 20261024175900 recorded in schema_migrations
-const preflightStateBSql = `
+// Verify State A (missing migration) in a temporary rollback transaction
+const preflightStateATest = sql(`
   BEGIN;
-  INSERT INTO supabase_migrations.schema_migrations (version) VALUES ('20261024175900') ON CONFLICT DO NOTHING;
-
+  DELETE FROM supabase_migrations.schema_migrations WHERE version = '20261024175900';
   SELECT
     CASE
       WHEN EXISTS(SELECT 1 FROM pg_roles WHERE rolname = 'cr_order_writer')
@@ -465,14 +565,13 @@ const preflightStateBSql = `
       ELSE 'MIGRATION_PENDING'
     END;
   ROLLBACK;
-`;
-const stateBOutput = sql(preflightStateBSql);
+`);
 assert.equal(
-  stateBOutput,
-  "BRIDGE_ACTIVE|MIGRATION_REGISTERED",
-  "When registered, preflight must report both BRIDGE_ACTIVE and MIGRATION_REGISTERED"
+  preflightStateATest,
+  "BRIDGE_ACTIVE|MIGRATION_PENDING",
+  "When unrecorded, preflight must report BRIDGE_ACTIVE and MIGRATION_PENDING"
 );
-console.log(`  ✓ Preflight State B (ledger registered): bridge=BRIDGE_ACTIVE, migration_prereq=MIGRATION_REGISTERED`);
+console.log(`  ✓ Preflight State A (ledger pending): bridge=BRIDGE_ACTIVE, migration_prereq=MIGRATION_PENDING`);
 
 console.log("\n=======================================================================");
 console.log("   ALL 12 SECURITY ASSERTIONS, PARITY & TRIGGER TESTS PASSED 100%      ");
