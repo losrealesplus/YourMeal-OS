@@ -144,7 +144,17 @@ SELECT
       AND bridge_writer_execute_granted
       AND bridge_public_access_revoked
       AND writer_functions_calling_auth_uid_directly = 0
-    THEN 'PASS (Puente de identidad privado verificado: cr_order_writer desacoplado de auth)'
+    THEN 'BRIDGE_ACTIVE'
+    ELSE 'BRIDGE_MISSING'
+  END AS identity_bridge_status,
+  CASE
+    WHEN has_writer_role
+      AND bridge_exists
+      AND bridge_is_postgres_secdef
+      AND bridge_writer_execute_granted
+      AND bridge_public_access_revoked
+      AND writer_functions_calling_auth_uid_directly = 0
+    THEN 'PASS (Puente de identidad privado verificado y activo en motor: cr_order_writer desacoplado de auth)'
     ELSE 'FAIL (Puente de identidad incompleto o funciones de cr_order_writer invocando auth.uid directamente)'
   END AS identity_bridge_verdict
 FROM bridge_check;
@@ -166,24 +176,28 @@ WHERE version IN ('20261024175900', '20261024180000', '20261024190000')
 ORDER BY version ASC;
 
 -- Comprobación de integridad del prerrequisito de migraciones
+WITH prereq_check AS (
+  SELECT
+    EXISTS(
+      SELECT 1 FROM information_schema.tables WHERE table_schema = 'supabase_migrations' AND table_name = 'schema_migrations'
+    ) AS schema_migrations_table_exists,
+    EXISTS(
+      SELECT 1 FROM supabase_migrations.schema_migrations WHERE version = '20261024175900'
+    ) AS prereq_migration_20261024175900_registered
+)
 SELECT
-  EXISTS(
-    SELECT 1 FROM supabase_migrations.schema_migrations WHERE version = '20261024175900'
-  ) AS prereq_migration_20261024175900_registered,
-  (
-    to_regprocedure('cr_order_private.session_uid_bridge()') IS NOT NULL
-    AND (SELECT count(*) FROM pg_proc WHERE pg_get_userbyid(proowner) = 'cr_order_writer' AND p.prosrc ILIKE '%auth.uid%') = 0
-  ) AS identity_bridge_active_in_engine,
+  schema_migrations_table_exists,
+  prereq_migration_20261024175900_registered,
   CASE
-    WHEN EXISTS(SELECT 1 FROM supabase_migrations.schema_migrations WHERE version = '20261024175900')
-      THEN 'PASS (Migración de hardening 20261024175900 registrada)'
-    WHEN (to_regprocedure('cr_order_private.session_uid_bridge()') IS NOT NULL
-          AND (SELECT count(*) FROM pg_proc WHERE pg_get_userbyid(proowner) = 'cr_order_writer' AND p.prosrc ILIKE '%auth.uid%') = 0)
-      THEN 'PASS (Puente de identidad activo en motor; registrar 20261024175900 para trazabilidad formal previa a 1A)'
-    ELSE 'FAIL (Puente de identidad no instalado: aplicar migración 20261024175900)'
+    WHEN prereq_migration_20261024175900_registered THEN 'MIGRATION_REGISTERED'
+    ELSE 'MIGRATION_PENDING'
+  END AS migration_prereq_status,
+  CASE
+    WHEN prereq_migration_20261024175900_registered
+      THEN 'PASS (Migración de hardening 20261024175900 debidamente aplicada y registrada en schema_migrations)'
+    ELSE 'FAIL (Migración 20261024175900 ausente del historial: debe aplicarse y registrarse antes de 1A)'
   END AS migration_prereq_verdict
-FROM pg_proc p
-LIMIT 1;
+FROM prereq_check;
 
 -- Últimas 10 migraciones aplicadas en la base de datos destino
 SELECT version, name
@@ -346,7 +360,7 @@ WITH preflight_data AS (
       NULLIF(current_setting('app.expected_project_ref', true), '') IS NOT NULL
     ) AS project_ref_declared,
 
-    -- Prerrequisito de Identidad de cr_order_writer (Puente privado desacoplado de auth)
+    -- Prerrequisito de Identidad en Motor (Puente privado desacoplado de auth)
     (
       EXISTS(SELECT 1 FROM pg_roles WHERE rolname = 'cr_order_writer')
       AND to_regprocedure('cr_order_private.session_uid_bridge()') IS NOT NULL
@@ -358,16 +372,12 @@ WITH preflight_data AS (
       AND (SELECT count(*) FROM pg_proc WHERE pg_get_userbyid(proowner) = 'cr_order_writer' AND prosrc ILIKE '%auth.uid%') = 0
     ) AS identity_bridge_prereq_ok,
 
-    -- Migración prerrequisito de identidad
+    -- Migración prerrequisito registrada en el historial (schema_migrations)
+    -- PRINCIPIO DE GOBERNANZA: No se declara conforme únicamente porque exista el puente
+    -- en el motor; la migración versionada 20261024175900 debe figurar formalmente registrada.
     (
       EXISTS(SELECT 1 FROM information_schema.tables WHERE table_schema = 'supabase_migrations' AND table_name = 'schema_migrations')
-      AND (
-        EXISTS(SELECT 1 FROM supabase_migrations.schema_migrations WHERE version = '20261024175900')
-        OR (
-          to_regprocedure('cr_order_private.session_uid_bridge()') IS NOT NULL
-          AND (SELECT count(*) FROM pg_proc WHERE pg_get_userbyid(proowner) = 'cr_order_writer' AND prosrc ILIKE '%auth.uid%') = 0
-        )
-      )
+      AND EXISTS(SELECT 1 FROM supabase_migrations.schema_migrations WHERE version = '20261024175900')
     ) AS migration_prereq_ok,
 
     -- Tablas base (11 tablas requeridas)
@@ -425,8 +435,8 @@ state_eval AS (
 SELECT
   CASE
     WHEN NOT destination_verified THEN 'BLOCKED: DESTINATION_UNVERIFIED (Parámetros requeridos no definidos o destino no coincide)'
-    WHEN NOT identity_bridge_prereq_ok THEN 'BLOCKED: MISSING_IDENTITY_BRIDGE_PREREQUISITE (cr_order_writer requiere puente session_uid_bridge() activo y 0 llamadas directas a auth.uid())'
-    WHEN NOT migration_prereq_ok THEN 'BLOCKED: MISSING_MIGRATION_PREREQUISITE (Falta migración o activación de 20261024175900)'
+    WHEN NOT identity_bridge_prereq_ok THEN 'BLOCKED: MISSING_IDENTITY_BRIDGE (El puente cr_order_private.session_uid_bridge() no está activo en el motor o persisten llamadas a auth.uid())'
+    WHEN NOT migration_prereq_ok THEN 'BLOCKED: MISSING_MIGRATION_PREREQUISITE (La migración 20261024175900 no está registrada en supabase_migrations.schema_migrations)'
     WHEN NOT base_tables_ok THEN 'BLOCKED: MISSING_BASE_TABLES (Faltan tablas base del sistema)'
     WHEN NOT base_columns_ok THEN 'BLOCKED: MISSING_BASE_COLUMNS (Faltan columnas requeridas en el esquema base)'
     WHEN installation_state = 'INCONSISTENT_STATE' THEN 'BLOCKED: INCONSISTENT_PARTIAL_STATE (Existe deriva de objetos o migraciones no registradas)'
@@ -439,8 +449,8 @@ SELECT
 
   CASE
     WHEN NOT destination_verified THEN 'NO-GO: Defina explícitamente SET LOCAL app.expected_tenant_slug, app.expected_database_name y app.expected_project_ref, y valide externamente la conexión.'
-    WHEN NOT identity_bridge_prereq_ok THEN 'NO-GO: Aplique primero la migración 20261024175900_cr_order_writer_identity_bridge_hardening.sql.'
-    WHEN NOT migration_prereq_ok THEN 'NO-GO: Verifique el historial de supabase_migrations.schema_migrations o aplique 20261024175900.'
+    WHEN NOT identity_bridge_prereq_ok THEN 'NO-GO: Active el puente de identidad instalando 20261024175900_cr_order_writer_identity_bridge_hardening.sql.'
+    WHEN NOT migration_prereq_ok THEN 'NO-GO: Aplique y registre formalmente la migración 20261024175900_cr_order_writer_identity_bridge_hardening.sql en schema_migrations antes de autorizar el Incremento 1A.'
     WHEN NOT (base_tables_ok AND base_columns_ok) THEN 'NO-GO: El esquema base público presenta divergencias críticas.'
     WHEN installation_state = 'INCONSISTENT_STATE' THEN 'NO-GO: Audite manualmente los objetos huérfanos o registre las migraciones correspondientes antes de proceder.'
     WHEN installation_state = 'CLEAN_PRE_INSTALL' THEN 'TECHNICALLY_READY: HUMAN_AUTHORIZATION_REQUIRED (Prerrequisitos técnicos cumplidos para aplicar secuencialmente 1A. Requiere autorización humana previa.)'
@@ -449,12 +459,7 @@ SELECT
   END AS recommended_action,
 
   CASE
-    WHEN installation_state = 'CLEAN_PRE_INSTALL' THEN
-      CASE
-        WHEN NOT EXISTS(SELECT 1 FROM supabase_migrations.schema_migrations WHERE version = '20261024175900')
-          THEN '20261024175900_cr_order_writer_identity_bridge_hardening.sql -> 20261024180000_cr_cost_1a_atomic_purchase_receipt.sql -> 20261024190000_flow04_inventory_consumption_persistence.sql'
-        ELSE '20261024180000_cr_cost_1a_atomic_purchase_receipt.sql -> 20261024190000_flow04_inventory_consumption_persistence.sql'
-      END
+    WHEN installation_state = 'CLEAN_PRE_INSTALL' THEN '20261024180000_cr_cost_1a_atomic_purchase_receipt.sql -> 20261024190000_flow04_inventory_consumption_persistence.sql'
     WHEN installation_state = 'RECEIPT_ONLY_INSTALLED' THEN '20261024190000_flow04_inventory_consumption_persistence.sql'
     ELSE 'NONE'
   END AS recommended_migration_order,
