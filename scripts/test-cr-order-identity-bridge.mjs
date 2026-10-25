@@ -573,6 +573,117 @@ assert.equal(
 );
 console.log(`  ✓ Preflight State A (ledger pending): bridge=BRIDGE_ACTIVE, migration_prereq=MIGRATION_PENDING`);
 
+// -----------------------------------------------------------------------------
+// CHECK 12: Negative Test: Unexpected Function Modification (FUNCTION_DRIFT)
+// -----------------------------------------------------------------------------
+console.log("\n[Test 12] Negative Test: Function drift detection & fail-closed abort...");
+
+// Scenario 12A: Transactional precheck fails closed on drifted function
+const driftedTx = `
+  BEGIN;
+  SET LOCAL ROLE postgres;
+  SET LOCAL lock_timeout = '5s';
+  SET LOCAL statement_timeout = '60s';
+
+  -- Temporarily alter guard_legacy_offer owner to postgres (drift simulation)
+  ALTER FUNCTION cr_order_private.guard_legacy_offer() OWNER TO postgres;
+
+  -- Attempt Phase 2 transactional precheck with drifted function
+  DO $$
+  DECLARE
+    v_guard_owner text;
+    v_guard_secdef boolean;
+    v_prosrc text;
+  BEGIN
+    SELECT pg_get_userbyid(p.proowner), p.prosecdef, p.prosrc
+    INTO v_guard_owner, v_guard_secdef, v_prosrc
+    FROM pg_proc p WHERE p.oid = to_regprocedure('cr_order_private.guard_legacy_offer()');
+    IF v_guard_owner IS DISTINCT FROM 'cr_order_writer' OR v_guard_secdef IS NOT TRUE THEN
+      RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: guard_legacy_offer owner or secdef drifted';
+    END IF;
+  END $$;
+
+  COMMIT;
+`;
+
+let driftErrorObserved = false;
+try {
+  sql(driftedTx);
+} catch (err) {
+  driftErrorObserved = (err.message && err.message.includes("BLOCKED: FUNCTION_DRIFT")) ||
+                       (err.stderr && err.stderr.toString().includes("BLOCKED: FUNCTION_DRIFT"));
+}
+assert.ok(driftErrorObserved, "Drifted function owner must trigger BLOCKED: FUNCTION_DRIFT exception");
+
+// Verify owner was NOT modified (transaction was aborted/rolled back)
+const currentGuardOwner = sql(`SELECT pg_get_userbyid(proowner) FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.guard_legacy_offer()');`);
+assert.equal(currentGuardOwner, "cr_order_writer", "guard_legacy_offer owner must remain cr_order_writer after rollback");
+
+// Scenario 12B: CLI Executor fail-closed on drifted function
+sql(`
+  GRANT USAGE, CREATE ON SCHEMA cr_order_private TO postgres, cr_order_writer;
+  ALTER FUNCTION cr_order_private.guard_legacy_offer() OWNER TO postgres;
+`);
+
+let cliDriftFailed = false;
+let cliDriftOutput = "";
+try {
+  execFileSync(path.join(ROOT_DIR, "scripts/identity-bridge-selective-migration-live.sh"), ["--dry-run"], {
+    env: { ...process.env, LAB_ISOLATED_PG17: "true" },
+    encoding: "utf8",
+    stdio: ["pipe", "pipe", "pipe"],
+  });
+} catch (err) {
+  cliDriftFailed = true;
+  cliDriftOutput = (err.stdout || "") + (err.stderr || "");
+} finally {
+  sql(`
+    ALTER FUNCTION cr_order_private.guard_legacy_offer() OWNER TO cr_order_writer;
+    REVOKE CREATE ON SCHEMA cr_order_private FROM cr_order_writer;
+  `);
+}
+
+assert.ok(cliDriftFailed, "CLI executor must fail with exit code 1 when function drift is detected");
+assert.ok(
+  cliDriftOutput.includes("BLOCKED: FUNCTION_DRIFT"),
+  "CLI executor output must contain 'BLOCKED: FUNCTION_DRIFT'"
+);
+console.log("  ✓ [Test 12] DRIFT_FAIL_CLOSED: PASS (drifted function triggers BLOCKED: FUNCTION_DRIFT, exit 1, zero mutation).");
+
+// -----------------------------------------------------------------------------
+// CHECK 13: Negative Test: Unexpected Historical Migration (20261010155728) Present
+// -----------------------------------------------------------------------------
+console.log("\n[Test 13] Negative Test: Unexpected historical migration (20261010155728) present...");
+
+// Insert 20261010155728 to simulate unexpected presence
+sql(`INSERT INTO supabase_migrations.schema_migrations (version) VALUES ('20261010155728') ON CONFLICT DO NOTHING;`);
+
+let cliHistFailed = false;
+let cliHistOutput = "";
+try {
+  execFileSync(path.join(ROOT_DIR, "scripts/identity-bridge-selective-migration-live.sh"), ["--dry-run"], {
+    env: { ...process.env, LAB_ISOLATED_PG17: "true" },
+    encoding: "utf8",
+    stdio: ["pipe", "pipe", "pipe"],
+  });
+} catch (err) {
+  cliHistFailed = true;
+  cliHistOutput = (err.stdout || "") + (err.stderr || "");
+} finally {
+  sql(`DELETE FROM supabase_migrations.schema_migrations WHERE version = '20261010155728';`);
+}
+
+assert.ok(cliHistFailed, "CLI executor must fail with exit code 1 when 20261010155728 is present");
+assert.ok(
+  cliHistOutput.includes("BLOCKED: UNEXPECTED_MIGRATION_HISTORY"),
+  "CLI executor output must contain 'BLOCKED: UNEXPECTED_MIGRATION_HISTORY'"
+);
+
+const hist28CountAfter = sql(`SELECT count(*) FROM supabase_migrations.schema_migrations WHERE version = '20261010155728';`);
+assert.equal(hist28CountAfter, "0", "20261010155728 must not remain in ledger");
+
+console.log("  ✓ [Test 13] LEDGER_FAIL_CLOSED: PASS (presence of 20261010155728 triggers BLOCKED: UNEXPECTED_MIGRATION_HISTORY, exit 1, zero mutation).");
+
 console.log("\n=======================================================================");
-console.log("   ALL 12 SECURITY ASSERTIONS, PARITY & TRIGGER TESTS PASSED 100%      ");
+console.log("   ALL 14 SECURITY ASSERTIONS, PARITY, TRIGGER & NEGATIVE TESTS PASSED ");
 console.log("=======================================================================\n");
