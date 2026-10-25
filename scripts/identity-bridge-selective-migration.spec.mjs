@@ -89,4 +89,61 @@ test("Identity Bridge Selective Executor: Static Verification & Safety Audit", a
       "Default mode without flags must fallback safely to --dry-run"
     );
   });
+
+  await t.test("drift detection is fail-closed and rejects unknown definitions, owners or ACL drift with BLOCKED: FUNCTION_DRIFT", () => {
+    const scriptContent = fs.readFileSync(scriptPath, "utf8");
+    assert.ok(
+      scriptContent.includes('BLOCKED: FUNCTION_DRIFT'),
+      "Script must explicitly abort with BLOCKED: FUNCTION_DRIFT"
+    );
+    assert.ok(
+      scriptContent.includes('guard_legacy_offer owner invalid') &&
+      scriptContent.includes('write_dish_v2 owner invalid') &&
+      scriptContent.includes('offer_state owner invalid'),
+      "Must validate exact function owners"
+    );
+    assert.ok(
+      scriptContent.includes('guard_legacy_offer must be SECURITY DEFINER') &&
+      scriptContent.includes('write_dish_v2 must be SECURITY DEFINER') &&
+      scriptContent.includes('offer_state must be SECURITY INVOKER'),
+      "Must validate exact prosecdef security flags"
+    );
+    assert.ok(
+      scriptContent.includes('guard_legacy_offer source baseline drift') &&
+      scriptContent.includes('write_dish_v2 source baseline drift') &&
+      scriptContent.includes('offer_state source baseline drift'),
+      "Must validate canonical baseline source anchors"
+    );
+  });
+
+  await t.test("unexpected historical migration 20261010155728 produces BLOCKED: UNEXPECTED_MIGRATION_HISTORY and aborts with code 1", () => {
+    const scriptContent = fs.readFileSync(scriptPath, "utf8");
+    assert.ok(
+      scriptContent.includes('BLOCKED: UNEXPECTED_MIGRATION_HISTORY'),
+      "Script must emit BLOCKED: UNEXPECTED_MIGRATION_HISTORY"
+    );
+    assert.ok(
+      scriptContent.includes('if [ "$HISTORICAL_28" -ne 0 ]; then') &&
+      scriptContent.includes('exit 1'),
+      "Script must abort with exit 1 if 20261010155728 is present in ledger"
+    );
+  });
+
+  await t.test("transactional revalidation guarantees fail-closed precheck inside Phase 2 transaction before any DDL", () => {
+    const scriptContent = fs.readFileSync(scriptPath, "utf8");
+    assert.ok(
+      scriptContent.includes('Revalidación transaccional estricta de precondiciones y baselines (fail-closed)'),
+      "Phase 2 must include transactional precheck DO block"
+    );
+    assert.ok(
+      scriptContent.includes("RAISE EXCEPTION 'BLOCKED: UNEXPECTED_MIGRATION_HISTORY: 20261010155728 detected in ledger';"),
+      "Phase 2 must revalidate absence of 20261010155728 inside transaction"
+    );
+    assert.ok(
+      scriptContent.includes("RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: guard_legacy_offer owner or secdef drifted';") &&
+      scriptContent.includes("RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: write_dish_v2 owner or secdef drifted';") &&
+      scriptContent.includes("RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: offer_state owner or secdef drifted';",
+      "Phase 2 must revalidate canonical function baselines inside transaction"
+    ));
+  });
 });

@@ -286,7 +286,8 @@ if [ "$PREREQ_APPLIED" -ne 0 ]; then
 fi
 
 if [ "$HISTORICAL_28" -ne 0 ]; then
-  echo "ALERTA DE HISTORIAL: 20261010155728 aparece registrada (inesperado según preflight de producción)."
+  echo "FATAL: BLOCKED: UNEXPECTED_MIGRATION_HISTORY: La migración 20261010155728 figura registrada en el ledger ($HISTORICAL_28 veces). Su ausencia es obligatoria según la especificación de producción." >&2
+  exit 1
 fi
 
 if [ "$HISTORICAL_29" -ne 1 ]; then
@@ -295,30 +296,124 @@ if [ "$HISTORICAL_29" -ne 1 ]; then
 fi
 
 if [ "$FUTURE_1A" -ne 0 ]; then
-  echo "FATAL DE GOBERNANZA: Se detectaron migraciones de 1A ($FUTURE_1A) aplicadas antes del prerrequisito de identidad!" >&2
+  echo "FATAL DE GOBERNANZA: BLOCKED: GOVERNANCE_VIOLATION: Se detectaron migraciones de 1A ($FUTURE_1A) aplicadas antes del prerrequisito de identidad!" >&2
   exit 1
 fi
 
 echo "  ✓ Historial pre-migración conforme: 20261024175900 pendiente, 20261010155728 omitida, 1A bloqueada."
 
-# 5. Auditoría de Drift de Funciones Afectadas
-DRIFT_AUDIT="$(run_readonly_sql "
-SELECT
-  (to_regprocedure('cr_order_private.session_uid_bridge()') IS NOT NULL)::text || '|' ||
-  (to_regprocedure('cr_order_private.write_dish_v2(uuid,uuid,jsonb,uuid,jsonb)') IS NOT NULL)::text || '|' ||
-  (to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)') IS NOT NULL)::text || '|' ||
-  (to_regprocedure('cr_order_private.guard_legacy_offer()') IS NOT NULL)::text || '|' ||
-  (SELECT count(*) FROM pg_proc WHERE pg_get_userbyid(proowner) = 'cr_order_writer' AND prosrc ILIKE '%auth.uid%')::text;
+# 5. Auditoría Estricta de Drift de Funciones Afectadas (Fail-Closed)
+FUNCTION_DRIFT_REPORT="$(run_readonly_sql "
+WITH checks AS (
+  SELECT
+    -- 1. guard_legacy_offer
+    CASE
+      WHEN to_regprocedure('cr_order_private.guard_legacy_offer()') IS NULL THEN 'guard_legacy_offer missing'
+      WHEN (SELECT pg_get_userbyid(proowner) FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.guard_legacy_offer()')) IS DISTINCT FROM 'cr_order_writer'
+        THEN 'guard_legacy_offer owner invalid (expected cr_order_writer)'
+      WHEN (SELECT prosecdef FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.guard_legacy_offer()')) IS NOT TRUE
+        THEN 'guard_legacy_offer must be SECURITY DEFINER'
+      WHEN has_function_privilege('anon', to_regprocedure('cr_order_private.guard_legacy_offer()'), 'EXECUTE')
+        OR has_function_privilege('authenticated', to_regprocedure('cr_order_private.guard_legacy_offer()'), 'EXECUTE')
+        THEN 'guard_legacy_offer has public/anon execution privilege'
+      WHEN (SELECT prosrc FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.guard_legacy_offer()')) NOT LIKE '%write_contract_version%'
+        OR (SELECT prosrc FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.guard_legacy_offer()')) NOT LIKE '%OFFER_PRICING_QUOTE_REQUIRED%'
+        THEN 'guard_legacy_offer source baseline drift'
+      ELSE NULL
+    END AS err_guard,
+
+    -- 2. write_dish_v2
+    CASE
+      WHEN to_regprocedure('cr_order_private.write_dish_v2(uuid,uuid,jsonb,uuid,jsonb)') IS NULL THEN 'write_dish_v2 missing'
+      WHEN (SELECT pg_get_userbyid(proowner) FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.write_dish_v2(uuid,uuid,jsonb,uuid,jsonb)')) IS DISTINCT FROM 'cr_order_writer'
+        THEN 'write_dish_v2 owner invalid (expected cr_order_writer)'
+      WHEN (SELECT prosecdef FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.write_dish_v2(uuid,uuid,jsonb,uuid,jsonb)')) IS NOT TRUE
+        THEN 'write_dish_v2 must be SECURITY DEFINER'
+      WHEN has_function_privilege('anon', to_regprocedure('cr_order_private.write_dish_v2(uuid,uuid,jsonb,uuid,jsonb)'), 'EXECUTE')
+        OR has_function_privilege('authenticated', to_regprocedure('cr_order_private.write_dish_v2(uuid,uuid,jsonb,uuid,jsonb)'), 'EXECUTE')
+        THEN 'write_dish_v2 has public/anon execution privilege'
+      WHEN (SELECT prosrc FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.write_dish_v2(uuid,uuid,jsonb,uuid,jsonb)')) NOT LIKE '%_verified_actor IS NOT NULL%'
+        OR (SELECT prosrc FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.write_dish_v2(uuid,uuid,jsonb,uuid,jsonb)')) NOT LIKE '%UNTRUSTED_AUTHORITY_FIELD%'
+        THEN 'write_dish_v2 source baseline drift'
+      ELSE NULL
+    END AS err_write,
+
+    -- 3. offer_state
+    CASE
+      WHEN to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)') IS NULL THEN 'offer_state missing'
+      WHEN (SELECT pg_get_userbyid(proowner) FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)')) IS DISTINCT FROM 'cr_order_writer'
+        THEN 'offer_state owner invalid (expected cr_order_writer)'
+      WHEN (SELECT prosecdef FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)')) IS NOT FALSE
+        THEN 'offer_state must be SECURITY INVOKER'
+      WHEN has_function_privilege('anon', to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)'), 'EXECUTE')
+        OR has_function_privilege('authenticated', to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)'), 'EXECUTE')
+        THEN 'offer_state has public/anon execution privilege'
+      WHEN (SELECT prosrc FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)')) NOT LIKE '%require_custom%'
+        OR (SELECT prosrc FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)')) NOT LIKE '%OFFER_PRICING_COMMERCIAL_UNSUPPORTED%'
+        THEN 'offer_state source baseline drift'
+      ELSE NULL
+    END AS err_offer,
+
+    -- 4. session_uid_bridge (optional before migration, but strict if present)
+    CASE
+      WHEN to_regprocedure('cr_order_private.session_uid_bridge()') IS NOT NULL THEN
+        CASE
+          WHEN (SELECT pg_get_userbyid(proowner) FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.session_uid_bridge()')) IS DISTINCT FROM 'postgres'
+            THEN 'session_uid_bridge owner invalid (expected postgres)'
+          WHEN (SELECT prosecdef FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.session_uid_bridge()')) IS NOT TRUE
+            THEN 'session_uid_bridge must be SECURITY DEFINER'
+          WHEN has_function_privilege('anon', to_regprocedure('cr_order_private.session_uid_bridge()'), 'EXECUTE')
+            OR has_function_privilege('authenticated', to_regprocedure('cr_order_private.session_uid_bridge()'), 'EXECUTE')
+            THEN 'session_uid_bridge has public/anon execution privilege'
+          WHEN (SELECT prosrc FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.session_uid_bridge()')) NOT LIKE '%auth.uid()%'
+            THEN 'session_uid_bridge source drift'
+          ELSE NULL
+        END
+      ELSE NULL
+    END AS err_bridge,
+
+    -- 5. actor() (optional before migration, but strict if present)
+    CASE
+      WHEN to_regprocedure('cr_order_private.actor()') IS NOT NULL THEN
+        CASE
+          WHEN (SELECT pg_get_userbyid(proowner) FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.actor()')) IS DISTINCT FROM 'postgres'
+            THEN 'actor owner invalid (expected postgres)'
+          WHEN (SELECT prosecdef FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.actor()')) IS NOT FALSE
+            THEN 'actor must be SECURITY INVOKER'
+          WHEN has_function_privilege('anon', to_regprocedure('cr_order_private.actor()'), 'EXECUTE')
+            OR has_function_privilege('authenticated', to_regprocedure('cr_order_private.actor()'), 'EXECUTE')
+            THEN 'actor has public/anon execution privilege'
+          ELSE NULL
+        END
+      ELSE NULL
+    END AS err_actor,
+
+    -- 6. can_operate_custom_batch(uuid) (optional before migration, but strict if present)
+    CASE
+      WHEN to_regprocedure('cr_order_private.can_operate_custom_batch(uuid)') IS NOT NULL THEN
+        CASE
+          WHEN (SELECT pg_get_userbyid(proowner) FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.can_operate_custom_batch(uuid)')) IS DISTINCT FROM 'postgres'
+            THEN 'can_operate_custom_batch owner invalid (expected postgres)'
+          WHEN (SELECT prosecdef FROM pg_proc WHERE oid = to_regprocedure('cr_order_private.can_operate_custom_batch(uuid)')) IS NOT FALSE
+            THEN 'can_operate_custom_batch must be SECURITY INVOKER'
+          WHEN has_function_privilege('anon', to_regprocedure('cr_order_private.can_operate_custom_batch(uuid)'), 'EXECUTE')
+            OR has_function_privilege('authenticated', to_regprocedure('cr_order_private.can_operate_custom_batch(uuid)'), 'EXECUTE')
+            THEN 'can_operate_custom_batch has public/anon execution privilege'
+          ELSE NULL
+        END
+      ELSE NULL
+    END AS err_batch
+)
+SELECT concat_ws('; ', err_guard, err_write, err_offer, err_bridge, err_actor, err_batch) FROM checks;
 ")"
 
-BRIDGE_CURRENT="$(echo "$DRIFT_AUDIT" | cut -d'|' -f1)"
-V2_CURRENT="$(echo "$DRIFT_AUDIT" | cut -d'|' -f2)"
-OFFER_CURRENT="$(echo "$DRIFT_AUDIT" | cut -d'|' -f3)"
-GUARD_CURRENT="$(echo "$DRIFT_AUDIT" | cut -d'|' -f4)"
-DIRECT_CALLS_CURRENT="$(echo "$DRIFT_AUDIT" | cut -d'|' -f5)"
+if [ -n "$FUNCTION_DRIFT_REPORT" ]; then
+  echo "FATAL: BLOCKED: FUNCTION_DRIFT: Se detectaron discrepancias en las funciones canónicas antes de aplicar:" >&2
+  echo "  $FUNCTION_DRIFT_REPORT" >&2
+  exit 1
+fi
 
-echo "  Línea base de funciones: write_dish_v2=$V2_CURRENT, offer_state=$OFFER_CURRENT, guard_legacy_offer=$GUARD_CURRENT"
-echo "  Estado del puente: presente=$BRIDGE_CURRENT, llamadas directas auth.uid en cr_order_writer=$DIRECT_CALLS_CURRENT"
+echo "  ✓ Verificación canónica de funciones: 6 funciones contrastadas con baselines canónicos (0 drift detectado)."
 echo "  ✓ FASE 1 PASS: Prechecks de identidad, ledger y esquema superados."
 echo ""
 
@@ -421,6 +516,72 @@ BEGIN;
 SET LOCAL ROLE postgres;
 SET LOCAL lock_timeout = \x275s\x27;
 SET LOCAL statement_timeout = \x2760s\x27;
+
+-- 0. Revalidación transaccional estricta de precondiciones y baselines (fail-closed)
+DO $$
+DECLARE
+  v_hist28 integer;
+  v_mig_done integer;
+  v_mig_1a integer;
+  v_guard_owner text;
+  v_guard_secdef boolean;
+  v_write_owner text;
+  v_write_secdef boolean;
+  v_offer_owner text;
+  v_offer_secdef boolean;
+  v_prosrc text;
+BEGIN
+  -- Revalidar ausencia de 20261010155728
+  SELECT count(*) INTO v_hist28 FROM supabase_migrations.schema_migrations WHERE version = '20261010155728';
+  IF v_hist28 > 0 THEN
+    RAISE EXCEPTION 'BLOCKED: UNEXPECTED_MIGRATION_HISTORY: 20261010155728 detected in ledger';
+  END IF;
+
+  -- Revalidar estado pendiente de 20261024175900
+  SELECT count(*) INTO v_mig_done FROM supabase_migrations.schema_migrations WHERE version = '${migrationVersion}';
+  IF v_mig_done > 0 THEN
+    RAISE EXCEPTION 'BLOCKED: ALREADY_APPLIED: ${migrationVersion} already recorded in schema_migrations';
+  END IF;
+
+  -- Revalidar ausencia de 1A
+  SELECT count(*) INTO v_mig_1a FROM supabase_migrations.schema_migrations WHERE version IN ('20261024180000', '20261024190000');
+  IF v_mig_1a > 0 THEN
+    RAISE EXCEPTION 'BLOCKED: GOVERNANCE_VIOLATION: 1A migrations already applied before identity bridge';
+  END IF;
+
+  -- Revalidar baseline de guard_legacy_offer
+  SELECT pg_get_userbyid(p.proowner), p.prosecdef, p.prosrc
+  INTO v_guard_owner, v_guard_secdef, v_prosrc
+  FROM pg_proc p WHERE p.oid = to_regprocedure('cr_order_private.guard_legacy_offer()');
+  IF v_guard_owner IS DISTINCT FROM 'cr_order_writer' OR v_guard_secdef IS NOT TRUE THEN
+    RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: guard_legacy_offer owner or secdef drifted';
+  END IF;
+  IF v_prosrc NOT LIKE '%write_contract_version%' OR v_prosrc NOT LIKE '%OFFER_PRICING_QUOTE_REQUIRED%' THEN
+    RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: guard_legacy_offer source baseline drifted';
+  END IF;
+
+  -- Revalidar baseline de write_dish_v2
+  SELECT pg_get_userbyid(p.proowner), p.prosecdef, p.prosrc
+  INTO v_write_owner, v_write_secdef, v_prosrc
+  FROM pg_proc p WHERE p.oid = to_regprocedure('cr_order_private.write_dish_v2(uuid,uuid,jsonb,uuid,jsonb)');
+  IF v_write_owner IS DISTINCT FROM 'cr_order_writer' OR v_write_secdef IS NOT TRUE THEN
+    RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: write_dish_v2 owner or secdef drifted';
+  END IF;
+  IF v_prosrc NOT LIKE '%_verified_actor IS NOT NULL%' OR v_prosrc NOT LIKE '%UNTRUSTED_AUTHORITY_FIELD%' THEN
+    RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: write_dish_v2 source baseline drifted';
+  END IF;
+
+  -- Revalidar baseline de offer_state
+  SELECT pg_get_userbyid(p.proowner), p.prosecdef, p.prosrc
+  INTO v_offer_owner, v_offer_secdef, v_prosrc
+  FROM pg_proc p WHERE p.oid = to_regprocedure('cr_order_private.offer_state(uuid,jsonb,text)');
+  IF v_offer_owner IS DISTINCT FROM 'cr_order_writer' OR v_offer_secdef IS NOT FALSE THEN
+    RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: offer_state owner or secdef drifted';
+  END IF;
+  IF v_prosrc NOT LIKE '%require_custom%' OR v_prosrc NOT LIKE '%OFFER_PRICING_COMMERCIAL_UNSUPPORTED%' THEN
+    RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: offer_state source baseline drifted';
+  END IF;
+END $$;
 
 -- 1. Contenido DDL completo de la migración de identidad
 ${strippedSql}
