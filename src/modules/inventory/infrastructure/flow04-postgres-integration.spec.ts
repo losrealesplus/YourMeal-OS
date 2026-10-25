@@ -1,18 +1,61 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { createHmac, randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { InventoryService } from "../application/inventory-service";
-import {
-  __resetInventoryStoreForTests,
-  createInventoryRepository,
-} from "./inventory-repository";
+import { __resetInventoryStoreForTests, createInventoryRepository } from "./inventory-repository";
 import { __resetFlow04EvidenceForTests } from "../application/flow04-evidence";
 import type { ServiceContext } from "@/services/types";
 
-const DB_CONTAINER = process.env.PG_CONTAINER || "supabase_db_djangucecsphnejplvic";
-const SUPABASE_URL = process.env.SUPABASE_LOCAL_URL || "http://127.0.0.1:54321";
-const JWT_SECRET = "super-secret-jwt-token-with-at-least-32-characters-long";
+// Only the owned, disposable laboratory from #553. Never fall back to shared/local projects.
+const DB_CONTAINER = "receipt553-test-db";
+const SUPABASE_URL = "http://receipt553-test-rest:3000";
+const JWT_SECRET = "p34-local-synthetic-signing-secret-not-for-production-2026";
+const labFetch: typeof fetch = async (input, init) => {
+  const url = String(input).replace("/rest/v1/", "/");
+  return new Promise((resolve, reject) => {
+    const child = spawn(
+      "docker",
+      [
+        "exec",
+        "-i",
+        "receipt553-test-transport",
+        "node",
+        "-e",
+        "let s='';process.stdin.on('data',b=>s+=b);process.stdin.on('end',async()=>{const x=JSON.parse(s);const r=await fetch(x.url,x.init);console.log(JSON.stringify({status:r.status,headers:Object.fromEntries(r.headers),body:await r.text()}))});",
+      ],
+      { stdio: ["pipe", "pipe", "pipe"] },
+    );
+    let out = "",
+      err = "";
+    child.stdout.on("data", (b) => (out += b));
+    child.stderr.on("data", (b) => (err += b));
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code) reject(new Error(err));
+      else {
+        try {
+          const x = JSON.parse(out);
+          resolve(new Response(x.body || null, { status: x.status, headers: x.headers }));
+        } catch (e) {
+          reject(e);
+        }
+      }
+    });
+    child.stdin.end(
+      JSON.stringify({
+        url,
+        init: { ...init, headers: Object.fromEntries(new Headers(init?.headers)) },
+      }),
+    );
+  });
+};
+const localClient = (token: string) =>
+  createClient(SUPABASE_URL, token, {
+    global: { fetch: labFetch },
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
 
 function makeJwt(role: string, sub?: string) {
   const h = Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).toString("base64url");
@@ -48,7 +91,7 @@ const sql = (query: string): string =>
 
 const scalar = <T = any>(query: string): T => JSON.parse(sql(query));
 
-describe("FLOW-04 PostgreSQL Integration: Canonical Production → Atomic Inventory Bridge", () => {
+describe.skipIf(process.env.RECEIPT553_LOCAL_LAB !== "1")("FLOW-04 PostgreSQL Integration: Canonical Production → Atomic Inventory Bridge", () => {
   const tenantId = randomUUID();
   const foreignTenantId = randomUUID();
   const staffUserId = randomUUID();
@@ -117,6 +160,9 @@ describe("FLOW-04 PostgreSQL Integration: Canonical Production → Atomic Invent
   }
 
   beforeAll(() => {
+    // Existing release prerequisite, excluded from ordinary empty-DB bootstrap.
+    // Apply only to the disposable DB; keep all canonical order guards enabled.
+    sql(readFileSync('supabase/migrations/20261010155728_release_cr_order_writer_auth_usage.sql', 'utf8'));
     // 1. Seed auth users, tenants, roles and base entities
     sql(`
       -- Staff user
@@ -175,40 +221,16 @@ describe("FLOW-04 PostgreSQL Integration: Canonical Production → Atomic Invent
     `);
 
     // 2. Setup clients
-    serviceClient = createClient(SUPABASE_URL, makeJwt("service_role"));
-    staffClient = createClient(SUPABASE_URL, makeJwt("authenticated", staffUserId));
-    foreignStaffClient = createClient(SUPABASE_URL, makeJwt("authenticated", foreignStaffId));
+    serviceClient = localClient(makeJwt("service_role"));
+    staffClient = localClient(makeJwt("authenticated", staffUserId));
+    foreignStaffClient = localClient(makeJwt("authenticated", foreignStaffId));
   });
 
   afterAll(() => {
     __resetInventoryStoreForTests();
     __resetFlow04EvidenceForTests();
 
-    // Clean up test fixtures
-    try {
-      sql(`
-        DELETE FROM public.inventory_consumption_lines WHERE tenant_id = '${tenantId}';
-        DELETE FROM public.inventory_consumptions WHERE tenant_id = '${tenantId}';
-        DELETE FROM public.order_items WHERE tenant_id = '${tenantId}';
-        DELETE FROM public.orders WHERE tenant_id = '${tenantId}';
-        DELETE FROM public.weekly_menu_slots WHERE tenant_id = '${tenantId}';
-        DELETE FROM public.weekly_menus WHERE tenant_id = '${tenantId}';
-        DELETE FROM public.dish_ingredients WHERE tenant_id = '${tenantId}';
-        DELETE FROM public.dishes WHERE tenant_id = '${tenantId}';
-        DELETE FROM public.purchase_invoice_items WHERE tenant_id = '${tenantId}';
-        DELETE FROM public.purchase_invoices WHERE tenant_id = '${tenantId}';
-        DELETE FROM public.purchase_receipt_executions WHERE tenant_id = '${tenantId}';
-        DELETE FROM public.stock_movements WHERE tenant_id = '${tenantId}';
-        DELETE FROM public.ingredients WHERE tenant_id = '${tenantId}';
-        DELETE FROM public.suppliers WHERE tenant_id = '${tenantId}';
-        DELETE FROM public.user_roles WHERE tenant_id IN ('${tenantId}', '${foreignTenantId}');
-        DELETE FROM public.tenant_members WHERE tenant_id IN ('${tenantId}', '${foreignTenantId}');
-        DELETE FROM public.tenants WHERE id IN ('${tenantId}', '${foreignTenantId}');
-        DELETE FROM auth.users WHERE id IN ('${staffUserId}', '${foreignStaffId}');
-      `);
-    } catch {
-      // ignore cleanup errors
-    }
+    // Owned laboratory teardown removes all synthetic rows, never shared fixtures.
   });
 
   it("Step 1 (Physical Receipt #553): receives goods atomically, increments stock and sets WAC", async () => {
@@ -368,7 +390,138 @@ describe("FLOW-04 PostgreSQL Integration: Canonical Production → Atomic Invent
     expect(Number(orphanCount)).toBe(0);
   });
 
-  it("Step 4 (Direct Write Protection & Actor Security): rejects direct mutations and actor spoofing from authenticated client", async () => {
+  it("T1 rejects arbitrary staff quantities, units, ingredients, duplicate lines and missing canonical source", async () => {
+      const date = "2026-10-28";
+      seedCanonicalOrder({ orderId: randomUUID(), customerId: randomUUID(), date, qty: 20 });
+      for (const lines of [
+        [{ ingredient_id: ingredientId, quantity: 999, unit: "kg" }],
+        [{ ingredient_id: ingredientId, quantity: 4, unit: "g" }],
+        [{ ingredient_id: ingredientId2, quantity: 4, unit: "kg" }],
+        [
+          { ingredient_id: ingredientId, quantity: 2, unit: "kg" },
+          { ingredient_id: ingredientId, quantity: 2, unit: "kg" },
+        ],
+        {},
+        [],
+        null,
+      ]) {
+        const r = await staffClient.rpc("create_inventory_consumption_plan_v1", {
+          p_tenant_id: tenantId,
+          p_delivery_date: date,
+          p_lines: lines,
+        });
+        expect(r.error).not.toBeNull();
+      }
+      const absent = await staffClient.rpc("create_inventory_consumption_plan_v1", {
+        p_tenant_id: tenantId,
+        p_delivery_date: "2026-12-24",
+        p_lines: [{ ingredient_id: ingredientId, quantity: 4, unit: "kg" }],
+      });
+      expect(absent.error).not.toBeNull();
+      expect(
+        Number(
+          sql(
+            `SELECT count(*) FROM inventory_consumptions WHERE tenant_id='${tenantId}' AND delivery_date='${date}'`,
+          ),
+        ),
+      ).toBe(0);
+    });
+
+    it("T1 rejects changed request and changed canonical production instead of hiding drift", async () => {
+      const date = "2026-10-29";
+      seedCanonicalOrder({ orderId: randomUUID(), customerId: randomUUID(), date, qty: 20 });
+      const payload = {
+        p_tenant_id: tenantId,
+        p_delivery_date: date,
+        p_lines: [{ ingredient_id: ingredientId, quantity: 4, unit: "kg" }],
+      };
+      expect(
+        (await staffClient.rpc("create_inventory_consumption_plan_v1", payload)).error,
+      ).toBeNull();
+      const altered = await staffClient.rpc("create_inventory_consumption_plan_v1", {
+        ...payload,
+        p_lines: [{ ingredient_id: ingredientId, quantity: 5, unit: "kg" }],
+      });
+      expect(altered.error?.message).toContain("differ");
+      seedCanonicalOrder({ orderId: randomUUID(), customerId: randomUUID(), date, qty: 5 });
+      const drift = await staffClient.rpc("create_inventory_consumption_plan_v1", {
+        ...payload,
+        p_lines: [{ ingredient_id: ingredientId, quantity: 5, unit: "kg" }],
+      });
+      expect(drift.error?.message).toContain("Existing consumption plan differs");
+      const ctx = {
+        supabase: staffClient,
+        tenantId,
+        userId: staffUserId,
+        roles: [],
+        capabilities: new Set(["inventory.operate"]),
+        localization: null,
+        ip: null,
+      } as ServiceContext;
+      await expect(
+        InventoryService.planConsumptionFromProduction(ctx, { deliveryDate: date }),
+      ).rejects.toThrow("Existing consumption plan differs");
+      expect(
+        Number(
+          sql(
+            `SELECT quantity FROM inventory_consumption_lines l JOIN inventory_consumptions c ON c.id=l.consumption_id WHERE c.tenant_id='${tenantId}' AND c.delivery_date='${date}'`,
+          ),
+        ),
+      ).toBe(4);
+    });
+
+    it("two simultaneous T1 creations yield one consistent header and line", async () => {
+      const date = "2026-10-31";
+      seedCanonicalOrder({ orderId: randomUUID(), customerId: randomUUID(), date, qty: 20 });
+      const payload = {
+        p_tenant_id: tenantId,
+        p_delivery_date: date,
+        p_lines: [{ ingredient_id: ingredientId, quantity: 4, unit: "kg" }],
+      };
+      const blocker = spawn(
+        "docker",
+        ["exec", "-i", DB_CONTAINER, "psql", "-XqAt", "-U", "supabase_admin", "-d", "postgres"],
+        { stdio: ["pipe", "pipe", "pipe"] },
+      );
+      blocker.stdin.end(
+        `BEGIN; SELECT pg_advisory_xact_lock(hashtextextended('${tenantId}:${date}',0)); SELECT 'LOCKED'; SELECT pg_sleep(2); COMMIT;`,
+      );
+      await new Promise<void>((resolve) => blocker.stdout.once("data", () => resolve()));
+      const pending = Promise.all([
+        staffClient.rpc("create_inventory_consumption_plan_v1", payload),
+        staffClient.rpc("create_inventory_consumption_plan_v1", payload),
+      ]);
+      await new Promise((r) => setTimeout(r, 300));
+      expect(
+        Number(
+          sql(
+            "SELECT count(*) FROM pg_stat_activity WHERE wait_event_type='Lock' AND query LIKE '%create_inventory_consumption_plan_v1%'",
+          ),
+        ),
+      ).toBeGreaterThanOrEqual(2);
+      const [a, b] = await pending;
+      expect(a.error).toBeNull();
+      expect(b.error).toBeNull();
+      expect(a.data.consumption_id).toBe(b.data.consumption_id);
+      expect([a.data.idempotent, b.data.idempotent].sort()).toEqual([false, true]);
+      expect(
+        Number(
+          sql(
+            `SELECT count(*) FROM inventory_consumptions WHERE tenant_id='${tenantId}' AND delivery_date='${date}'`,
+          ),
+        ),
+      ).toBe(1);
+      expect(
+        Number(
+          sql(
+            `SELECT count(*) FROM inventory_consumption_lines WHERE consumption_id='${a.data.consumption_id}'`,
+          ),
+        ),
+      ).toBe(1);
+      expect(Number(sql(`SELECT stock FROM ingredients WHERE id='${ingredientId}'`))).toBe(100);
+    });
+
+    it("Step 4 (Direct Write Protection & Actor Security): rejects direct mutations and actor spoofing from authenticated client", async () => {
     // 1. Direct INSERT into inventory_consumptions must fail (REVOKE ALL + SELECT only)
     const directConsInsert = await staffClient
       .from("inventory_consumptions")
@@ -431,6 +584,8 @@ describe("FLOW-04 PostgreSQL Integration: Canonical Production → Atomic Invent
       ip: null,
     };
 
+    // Restore the day's T1 evidence after negative tests used another pipeline.
+    await InventoryService.planConsumptionFromProduction(ctx, { deliveryDate });
     const applied = await InventoryService.applyConsumption(ctx, consumptionId);
     expect(applied.status).toBe("applied");
 
@@ -479,62 +634,60 @@ describe("FLOW-04 PostgreSQL Integration: Canonical Production → Atomic Invent
   });
 
   it("Step 6 (T2 Grouped Validation: Multiple Lines of Same Ingredient): validates aggregated demand preventing negative stock", async () => {
-    const multiLineDate = "2026-11-05";
-    // Set ingredient stock to exactly 10 kg
-    sql(`
+      const multiLineDate = "2026-11-05";
+      // Set ingredient stock to exactly 10 kg
+      sql(`
       UPDATE public.ingredients SET stock = 10 WHERE id = '${ingredientId}' AND tenant_id = '${tenantId}';
     `);
 
-    // Plan with 2 lines for the SAME ingredient: line 1 = 6 kg, line 2 = 6 kg (Total = 12 kg > 10 kg available)
-    const planResult = await staffClient.rpc("create_inventory_consumption_plan_v1", {
-      p_tenant_id: tenantId,
-      p_delivery_date: multiLineDate,
-      p_lines: [
-        { ingredient_id: ingredientId, ingredient_name: "Pechuga Línea 1", quantity: 6, unit: "kg" },
-        { ingredient_id: ingredientId, ingredient_name: "Pechuga Línea 2", quantity: 6, unit: "kg" },
-      ],
-      p_actor_id: staffUserId,
-    });
-    expect(planResult.error).toBeNull();
-    const multiPlanId = (planResult.data as any).consumption_id;
+      // Plan with 2 lines for the SAME ingredient: line 1 = 6 kg, line 2 = 6 kg (Total = 12 kg > 10 kg available)
+      const multiPlanId = randomUUID();
+      // Legacy/corrupt fixture, not an authorized T1 plan: retain T2 defense-in-depth test.
+      sql(`INSERT INTO inventory_consumptions(id,tenant_id,delivery_date,created_by)
+      VALUES('${multiPlanId}','${tenantId}','${multiLineDate}','${staffUserId}');
+      INSERT INTO inventory_consumption_lines(consumption_id,tenant_id,ingredient_id,ingredient_name,quantity,unit)
+      VALUES('${multiPlanId}','${tenantId}','${ingredientId}','Legacy A',6,'kg'),
+      ('${multiPlanId}','${tenantId}','${ingredientId}','Legacy B',6,'kg');`);
 
-    // Apply must fail with insufficient_stock because 6 + 6 = 12 > 10
-    const applyFail = await staffClient.rpc("apply_inventory_consumption_v1", {
-      p_tenant_id: tenantId,
-      p_consumption_id: multiPlanId,
-      p_actor_id: staffUserId,
-    });
-    expect(applyFail.error).not.toBeNull();
-    expect(applyFail.error?.message).toContain("insufficient_stock");
+      // Apply must fail with insufficient_stock because 6 + 6 = 12 > 10
+      const applyFail = await staffClient.rpc("apply_inventory_consumption_v1", {
+        p_tenant_id: tenantId,
+        p_consumption_id: multiPlanId,
+        p_actor_id: staffUserId,
+      });
+      expect(applyFail.error).not.toBeNull();
+      expect(applyFail.error?.message).toContain("insufficient_stock");
 
-    // Stock must remain unchanged at 10 (no partial decrement!)
-    const stockAfterFail = scalar<number>(`
+      // Stock must remain unchanged at 10 (no partial decrement!)
+      const stockAfterFail = scalar<number>(`
       SELECT stock FROM public.ingredients WHERE id = '${ingredientId}'
     `);
-    expect(Number(stockAfterFail)).toBe(10);
+      expect(Number(stockAfterFail)).toBe(10);
 
-    // Now adjust ingredient stock to 20 kg
-    sql(`
+      // Now adjust ingredient stock to 20 kg
+      sql(`
       UPDATE public.ingredients SET stock = 20 WHERE id = '${ingredientId}' AND tenant_id = '${tenantId}';
     `);
 
-    // Apply should now succeed
-    const applySuccess = await staffClient.rpc("apply_inventory_consumption_v1", {
-      p_tenant_id: tenantId,
-      p_consumption_id: multiPlanId,
-      p_actor_id: staffUserId,
-    });
-    expect(applySuccess.error).toBeNull();
-    expect((applySuccess.data as any).status).toBe("applied");
+      // Apply should now succeed
+      const applySuccess = await staffClient.rpc("apply_inventory_consumption_v1", {
+        p_tenant_id: tenantId,
+        p_consumption_id: multiPlanId,
+        p_actor_id: staffUserId,
+      });
+      expect(applySuccess.error).toBeNull();
+      expect((applySuccess.data as any).status).toBe("applied");
 
-    // Stock must be decremented: 20 - 12 = 8 kg
-    const stockAfterSuccess = scalar<number>(`
+      // Stock must be decremented: 20 - 12 = 8 kg
+      const stockAfterSuccess = scalar<number>(`
       SELECT stock FROM public.ingredients WHERE id = '${ingredientId}'
     `);
-    expect(Number(stockAfterSuccess)).toBe(8);
+      expect(Number(stockAfterSuccess)).toBe(8);
 
-    // Verify 2 stock_movements created with proper running stock
-    const movements = scalar<Array<{ quantity: number; previous_stock: number; new_stock: number }>>(`
+      // Verify 2 stock_movements created with proper running stock
+      const movements = scalar<
+        Array<{ quantity: number; previous_stock: number; new_stock: number }>
+      >(`
       SELECT json_agg(json_build_object(
         'quantity', quantity,
         'previous_stock', previous_stock,
@@ -543,74 +696,86 @@ describe("FLOW-04 PostgreSQL Integration: Canonical Production → Atomic Invent
       FROM public.stock_movements
       WHERE reference_document_id = '${multiPlanId}'
     `);
-    expect(movements).toHaveLength(2);
-    // Line 1: 20 -> 14
-    expect(Number(movements[0].previous_stock)).toBe(20);
-    expect(Number(movements[0].new_stock)).toBe(14);
-    // Line 2: 14 -> 8
-    expect(Number(movements[1].previous_stock)).toBe(14);
-    expect(Number(movements[1].new_stock)).toBe(8);
-  });
+      expect(movements).toHaveLength(2);
+      // Line 1: 20 -> 14
+      expect(Number(movements[0].previous_stock)).toBe(20);
+      expect(Number(movements[0].new_stock)).toBe(14);
+      // Line 2: 14 -> 8
+      expect(Number(movements[1].previous_stock)).toBe(14);
+      expect(Number(movements[1].new_stock)).toBe(8);
+    });
 
-  it("Step 7 (T2 Concurrency: Two Different Consumptions): serializes via row lock and prevents negative balance", async () => {
-    const datePlanA = "2026-11-06";
-    const datePlanB = "2026-11-07";
+    it("Step 7 (T2 Concurrency: Two Different Consumptions): serializes via row lock and prevents negative balance", async () => {
+      const datePlanA = "2026-11-06";
+      const datePlanB = "2026-11-07";
 
-    // Set stock to 10 kg
-    sql(`
+      // Set stock to 10 kg
+      sql(`
       UPDATE public.ingredients SET stock = 10 WHERE id = '${ingredientId}' AND tenant_id = '${tenantId}';
     `);
 
-    // Plan A needs 7 kg
-    const planARes = await staffClient.rpc("create_inventory_consumption_plan_v1", {
-      p_tenant_id: tenantId,
-      p_delivery_date: datePlanA,
-      p_lines: [{ ingredient_id: ingredientId, quantity: 7, unit: "kg" }],
-      p_actor_id: staffUserId,
-    });
-    const planAId = (planARes.data as any).consumption_id;
-
-    // Plan B needs 7 kg
-    const planBRes = await staffClient.rpc("create_inventory_consumption_plan_v1", {
-      p_tenant_id: tenantId,
-      p_delivery_date: datePlanB,
-      p_lines: [{ ingredient_id: ingredientId, quantity: 7, unit: "kg" }],
-      p_actor_id: staffUserId,
-    });
-    const planBId = (planBRes.data as any).consumption_id;
-
-    // Both attempt to apply concurrently
-    const [resA, resB] = await Promise.all([
-      staffClient.rpc("apply_inventory_consumption_v1", {
+      seedCanonicalOrder({
+        orderId: randomUUID(),
+        customerId: randomUUID(),
+        date: datePlanA,
+        qty: 35,
+      });
+      seedCanonicalOrder({
+        orderId: randomUUID(),
+        customerId: randomUUID(),
+        date: datePlanB,
+        qty: 35,
+      });
+      // Plan A needs 7 kg
+      const planARes = await staffClient.rpc("create_inventory_consumption_plan_v1", {
         p_tenant_id: tenantId,
-        p_consumption_id: planAId,
+        p_delivery_date: datePlanA,
+        p_lines: [{ ingredient_id: ingredientId, quantity: 7, unit: "kg" }],
         p_actor_id: staffUserId,
-      }),
-      staffClient.rpc("apply_inventory_consumption_v1", {
+      });
+      const planAId = (planARes.data as any).consumption_id;
+
+      // Plan B needs 7 kg
+      const planBRes = await staffClient.rpc("create_inventory_consumption_plan_v1", {
         p_tenant_id: tenantId,
-        p_consumption_id: planBId,
+        p_delivery_date: datePlanB,
+        p_lines: [{ ingredient_id: ingredientId, quantity: 7, unit: "kg" }],
         p_actor_id: staffUserId,
-      }),
-    ]);
+      });
+      const planBId = (planBRes.data as any).consumption_id;
 
-    // Exactly one should succeed and one should fail with insufficient_stock
-    const succeeded = (resA.error === null ? 1 : 0) + (resB.error === null ? 1 : 0);
-    const failed = (resA.error !== null ? 1 : 0) + (resB.error !== null ? 1 : 0);
+      // Both attempt to apply concurrently
+      const [resA, resB] = await Promise.all([
+        staffClient.rpc("apply_inventory_consumption_v1", {
+          p_tenant_id: tenantId,
+          p_consumption_id: planAId,
+          p_actor_id: staffUserId,
+        }),
+        staffClient.rpc("apply_inventory_consumption_v1", {
+          p_tenant_id: tenantId,
+          p_consumption_id: planBId,
+          p_actor_id: staffUserId,
+        }),
+      ]);
 
-    expect(succeeded).toBe(1);
-    expect(failed).toBe(1);
+      // Exactly one should succeed and one should fail with insufficient_stock
+      const succeeded = (resA.error === null ? 1 : 0) + (resB.error === null ? 1 : 0);
+      const failed = (resA.error !== null ? 1 : 0) + (resB.error !== null ? 1 : 0);
 
-    const errorMsg = (resA.error || resB.error)?.message;
-    expect(errorMsg).toContain("insufficient_stock");
+      expect(succeeded).toBe(1);
+      expect(failed).toBe(1);
 
-    // Stock must be exactly 10 - 7 = 3 kg (NEVER -4 kg!)
-    const stockFinal = scalar<number>(`
+      const errorMsg = (resA.error || resB.error)?.message;
+      expect(errorMsg).toContain("insufficient_stock");
+
+      // Stock must be exactly 10 - 7 = 3 kg (NEVER -4 kg!)
+      const stockFinal = scalar<number>(`
       SELECT stock FROM public.ingredients WHERE id = '${ingredientId}'
     `);
-    expect(Number(stockFinal)).toBe(3);
-  });
+      expect(Number(stockFinal)).toBe(3);
+    });
 
-  it("Step 8 (FLOW-04 T3 Seal & Idempotency): transitions to sealed without stock mutation and acknowledges retries", async () => {
+    it("Step 8 (FLOW-04 T3 Seal & Idempotency): transitions to sealed without stock mutation and acknowledges retries", async () => {
     const repo = createInventoryRepository(serviceClient, tenantId);
     const existing = await repo.findBySource(tenantId, deliveryDate);
     expect(existing).not.toBeNull();

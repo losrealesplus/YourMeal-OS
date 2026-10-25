@@ -291,7 +291,7 @@ function createPostgresInventoryRepository(client: any): InventoryRepository {
       const linesPayload = lines.map((l) => ({
         ingredient_id: l.ingredientId,
         ingredient_name: l.name,
-        quantity: l.qty,
+        quantity: Number(l.qty.toFixed(3)),
         unit: l.unit,
       }));
 
@@ -406,6 +406,16 @@ export function createInventoryRepository(
     },
 
     async createPlanned({ tenantId, deliveryDate, lines }) {
+      const previous = store.get(sourceKey(tenantId, deliveryDate));
+      if (previous) {
+        const canonical = (rows: ConsumptionLine[]) => JSON.stringify(rows
+          .map(({ ingredientId, qty, unit }) => ({ ingredientId, qty, unit }))
+          .sort((a, b) => a.ingredientId.localeCompare(b.ingredientId) || a.unit.localeCompare(b.unit)));
+        if (canonical(previous.lines) !== canonical(lines)) {
+          throw new Error("Existing consumption plan differs from canonical production");
+        }
+        return previous;
+      }
       const record: InventoryConsumption = {
         id: newId(),
         tenantId,

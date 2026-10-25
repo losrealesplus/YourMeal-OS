@@ -85,7 +85,9 @@ DECLARE
   v_ing_name text;
   v_qty numeric;
   v_unit text;
-  v_ing_count integer;
+  v_canonical jsonb;
+  v_requested jsonb;
+  v_stored jsonb;
 BEGIN
   -- 1. Identificación y Autorización
   v_actor := auth.uid();
@@ -108,45 +110,80 @@ BEGIN
     v_actor := COALESCE(p_actor_id, v_actor);
   END IF;
 
-  -- 2. Validación y Bloqueo de Idempotencia
-  SELECT * INTO v_cons
-  FROM public.inventory_consumptions
-  WHERE tenant_id = p_tenant_id AND delivery_date = p_delivery_date
-  FOR UPDATE;
+  IF p_delivery_date IS NULL THEN
+    RAISE EXCEPTION 'delivery date required' USING ERRCODE = '22023';
+  END IF;
+  -- Serializes the absent-row case as well as retries. No unique-key race.
+  PERFORM pg_advisory_xact_lock(hashtextextended(p_tenant_id::text || ':' || p_delivery_date::text, 0));
 
-  IF FOUND THEN
-    RETURN jsonb_build_object(
-      'success', true,
-      'consumption_id', v_cons.id,
-      'status', v_cons.status,
-      'delivery_date', v_cons.delivery_date,
-      'idempotent', true,
-      'created_at', v_cons.created_at
-    );
+  -- Same canonical production source used by loadProductionPlanInput; quantities
+  -- are derived in the database, never trusted merely because the caller is staff.
+  WITH portions AS (
+    SELECT oi.dish_id, sum(oi.qty) AS qty
+    FROM public.order_items oi
+    JOIN public.orders o ON o.id = oi.order_id AND o.tenant_id = oi.tenant_id
+    WHERE oi.tenant_id = p_tenant_id AND oi.day_date = p_delivery_date
+      AND oi.item_kind = 'dish' AND oi.deleted_at IS NULL AND oi.qty > 0
+      AND o.deleted_at IS NULL
+      AND o.status IN ('confirmed','in_production','prepared','ready_for_delivery','out_for_delivery','delivered')
+    GROUP BY oi.dish_id
+  ), requirements AS (
+    SELECT di.ingredient_id, di.unit, sum(p.qty * di.qty) AS quantity
+    FROM portions p
+    JOIN public.dish_ingredients di ON di.dish_id = p.dish_id AND di.tenant_id = p_tenant_id
+    JOIN public.ingredients i ON i.id = di.ingredient_id AND i.tenant_id = p_tenant_id AND i.deleted_at IS NULL
+    WHERE di.qty > 0
+    GROUP BY di.ingredient_id, di.unit
+  )
+  SELECT jsonb_agg(jsonb_build_object('ingredient_id', ingredient_id, 'quantity', quantity, 'unit', unit)
+    ORDER BY ingredient_id, unit) INTO v_canonical FROM requirements;
+  IF v_canonical IS NULL THEN
+    RAISE EXCEPTION 'No canonical production source for delivery date' USING ERRCODE = '22023';
+  END IF;
+  IF EXISTS (SELECT FROM jsonb_array_elements(v_canonical) e
+    WHERE (e->>'quantity')::numeric <> round((e->>'quantity')::numeric,3)) THEN
+    RAISE EXCEPTION 'Canonical quantity exceeds stock precision' USING ERRCODE = '22023';
   END IF;
 
-  IF p_lines IS NULL OR jsonb_typeof(p_lines) <> 'array' OR jsonb_array_length(p_lines) = 0 THEN
+  IF p_lines IS NULL OR jsonb_typeof(p_lines) IS DISTINCT FROM 'array' THEN
+    RAISE EXCEPTION 'Consumption plan requires a lines array' USING ERRCODE = '22023';
+  END IF;
+  IF jsonb_array_length(p_lines) = 0 THEN
     RAISE EXCEPTION 'Consumption plan requires at least one recipe line' USING ERRCODE = '22023';
   END IF;
-
-  -- 3. Validar todas las líneas antes de insertar
-  FOR v_line_elem IN SELECT * FROM jsonb_array_elements(p_lines)
-  LOOP
-    v_ing_id := (v_line_elem->>'ingredient_id')::uuid;
-    v_qty := (v_line_elem->>'quantity')::numeric;
-
-    IF v_qty IS NULL OR v_qty <= 0 THEN
-      RAISE EXCEPTION 'Invalid quantity % for ingredient %', v_qty, v_ing_id USING ERRCODE = '22023';
-    END IF;
-
-    SELECT count(*) INTO v_ing_count
-    FROM public.ingredients
-    WHERE id = v_ing_id AND tenant_id = p_tenant_id AND deleted_at IS NULL;
-
-    IF v_ing_count = 0 THEN
-      RAISE EXCEPTION 'Ingredient % not found or deleted for tenant %', v_ing_id, p_tenant_id USING ERRCODE = '22023';
+  FOR v_line_elem IN SELECT * FROM jsonb_array_elements(p_lines) LOOP
+    IF jsonb_typeof(v_line_elem) IS DISTINCT FROM 'object'
+      OR jsonb_typeof(v_line_elem->'ingredient_id') IS DISTINCT FROM 'string'
+      OR jsonb_typeof(v_line_elem->'quantity') IS DISTINCT FROM 'number'
+      OR jsonb_typeof(v_line_elem->'unit') IS DISTINCT FROM 'string' THEN
+      RAISE EXCEPTION 'Invalid consumption line' USING ERRCODE = '22023';
     END IF;
   END LOOP;
+  IF (SELECT count(*) <> count(DISTINCT ((e->>'ingredient_id')::uuid, e->>'unit'))
+    FROM jsonb_array_elements(p_lines) e) THEN
+    RAISE EXCEPTION 'Duplicate consumption line' USING ERRCODE = '22023';
+  END IF;
+  SELECT jsonb_agg(jsonb_build_object('ingredient_id',(e->>'ingredient_id')::uuid,
+    'quantity',(e->>'quantity')::numeric,'unit',e->>'unit')
+    ORDER BY (e->>'ingredient_id')::uuid,e->>'unit') INTO v_requested
+    FROM jsonb_array_elements(p_lines) e;
+  IF v_requested IS DISTINCT FROM v_canonical THEN
+    RAISE EXCEPTION 'Consumption quantities differ from canonical production' USING ERRCODE = '22023';
+  END IF;
+
+  SELECT * INTO v_cons FROM public.inventory_consumptions
+    WHERE tenant_id = p_tenant_id AND delivery_date = p_delivery_date FOR UPDATE;
+  IF FOUND THEN
+    SELECT jsonb_agg(jsonb_build_object('ingredient_id',ingredient_id,'quantity',quantity,'unit',unit)
+      ORDER BY ingredient_id,unit) INTO v_stored FROM public.inventory_consumption_lines
+      WHERE consumption_id = v_cons.id AND tenant_id = p_tenant_id;
+    IF v_stored IS DISTINCT FROM v_canonical THEN
+      RAISE EXCEPTION 'Existing consumption plan differs from canonical production; explicit reconciliation required'
+        USING ERRCODE = '22023';
+    END IF;
+    RETURN jsonb_build_object('success',true,'consumption_id',v_cons.id,'status',v_cons.status,
+      'delivery_date',v_cons.delivery_date,'idempotent',true,'created_at',v_cons.created_at);
+  END IF;
 
   -- 4. Inserción atómica de cabecera y líneas en la misma transacción
   INSERT INTO public.inventory_consumptions (
@@ -162,10 +199,10 @@ BEGIN
   )
   RETURNING * INTO v_cons;
 
-  FOR v_line_elem IN SELECT * FROM jsonb_array_elements(p_lines)
+  FOR v_line_elem IN SELECT * FROM jsonb_array_elements(v_canonical)
   LOOP
     v_ing_id := (v_line_elem->>'ingredient_id')::uuid;
-    v_ing_name := COALESCE(v_line_elem->>'ingredient_name', 'Ingrediente');
+    SELECT name INTO v_ing_name FROM public.ingredients WHERE id = v_ing_id AND tenant_id = p_tenant_id;
     v_qty := (v_line_elem->>'quantity')::numeric;
     v_unit := COALESCE(v_line_elem->>'unit', 'g');
 

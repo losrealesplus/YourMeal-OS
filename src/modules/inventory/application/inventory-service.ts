@@ -51,28 +51,6 @@ export const InventoryService = {
 
     const repo = createInventoryRepository(ctx.supabase, ctx.tenantId);
 
-    const existing = await repo.findBySource(ctx.tenantId, deliveryDate);
-    if (existing) {
-      // Idempotent plan: return existing (any status) — never create a second
-      beginFlow04Pipeline({
-        tenantId: ctx.tenantId,
-        deliveryDate,
-        reuse: existing.id,
-      });
-      logFlow04Step("FLOW04_T1_STARTED", {
-        tenantId: ctx.tenantId,
-        deliveryDate,
-        reuse: true,
-      });
-      logFlow04Step("FLOW04_T1_COMPLETED", {
-        consumptionId: existing.id,
-        status: existing.status,
-        lineCount: existing.lines.length,
-        reuse: true,
-      });
-      return existing;
-    }
-
     const production = await repo.loadProductionPlanInput(
       ctx.tenantId,
       deliveryDate,
@@ -113,10 +91,10 @@ export const InventoryService = {
         actorId: ctx.userId,
       });
 
-      if (consumption.status !== "planned") {
+      if (!["planned", "applied", "sealed"].includes(consumption.status)) {
         throw new DomainError(
           "INVALID_STATE",
-          "T1 must create status=planned",
+          "T1 returned an invalid consumption status",
           { status: consumption.status },
         );
       }
