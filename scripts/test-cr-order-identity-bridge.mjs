@@ -29,6 +29,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { buildUnifiedTransactionSql } from "./identity-bridge-selective-executor.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -413,25 +414,16 @@ sql(`
   INSERT INTO supabase_migrations.schema_migrations (version) VALUES ('20261010155729') ON CONFLICT DO NOTHING;
 `);
 
-// Sub-check 10A: Prove Transactional Rollback
-console.log("  [10A] Testing transactional rollback upon failure during selective execution...");
-const failingSelectiveTx = `
-  BEGIN;
-  SET LOCAL ROLE postgres;
-  SET LOCAL lock_timeout = '5s';
-  SET LOCAL statement_timeout = '60s';
+// Sub-check 10A: Prove Transactional Rollback using official SQL from identity-bridge-selective-executor.mjs
+console.log("  [10A] Testing transactional rollback upon failure during selective execution (module-built SQL)...");
+const officialUnifiedSql = buildUnifiedTransactionSql(migrationFilePath, "20261024175900");
+assert.ok(officialUnifiedSql.includes("INSERT INTO supabase_migrations.schema_migrations (version)"), "Official SQL must record migration");
 
-  -- 1. Full migration DDL
-  ${strippedMigrationSql}
-
-  -- 2. Ledger registration
-  INSERT INTO supabase_migrations.schema_migrations (version) VALUES ('20261024175900');
-
-  -- 3. Injected failure before commit
-  DO $$ BEGIN RAISE EXCEPTION 'SIMULATED_FAILURE_BEFORE_COMMIT'; END $$;
-
-  COMMIT;
-`;
+// Inyectar fallo simulado justo antes del COMMIT final de la transacción oficial construida por el módulo
+const failingSelectiveTx = officialUnifiedSql.replace(
+  /\n\s*COMMIT;\s*$/i,
+  () => "\nDO $$ BEGIN RAISE EXCEPTION 'SIMULATED_FAILURE_BEFORE_COMMIT'; END $$;\nCOMMIT;"
+);
 
 let rollbackObserved = false;
 try {
@@ -444,25 +436,11 @@ assert.ok(rollbackObserved, "Simulated failure must trigger error in selective m
 
 const rollbackLedgerCount = sql(`SELECT count(*) FROM supabase_migrations.schema_migrations WHERE version = '20261024175900';`);
 assert.equal(rollbackLedgerCount, "0", "TRANSACTIONAL_ROLLBACK: version 20261024175900 must NOT be recorded on failure");
-console.log("  ✓ [10A] TRANSACTIONAL_ROLLBACK: PASS (aborts atomically, zero ledger changes recorded).");
+console.log("  ✓ [10A] TRANSACTIONAL_ROLLBACK: PASS (aborts atomically using module-built SQL, zero ledger changes recorded).");
 
-// Sub-check 10B: Real Selective Atomic Migration Execution
+// Sub-check 10B: Real Selective Atomic Migration Execution using official module-built SQL
 console.log("  [10B] Applying full 20261024175900 migration SQL via official selective transaction wrapper...");
-const successfulSelectiveTx = `
-  BEGIN;
-  SET LOCAL ROLE postgres;
-  SET LOCAL lock_timeout = '5s';
-  SET LOCAL statement_timeout = '60s';
-
-  -- 1. Full migration DDL
-  ${strippedMigrationSql}
-
-  -- 2. Official Supabase Migrations Ledger Registration
-  INSERT INTO supabase_migrations.schema_migrations (version) VALUES ('20261024175900');
-
-  COMMIT;
-`;
-sql(successfulSelectiveTx);
+sql(officialUnifiedSql);
 
 // Verify live engine state after selective execution
 const selectiveAudit = sql(`
@@ -814,6 +792,139 @@ assert.equal(hist28CountAfter, "0", "20261010155728 must not remain in ledger");
 
 console.log("  ✓ [Test 13] LEDGER_FAIL_CLOSED: PASS (presence of 20261010155728 triggers BLOCKED: UNEXPECTED_MIGRATION_HISTORY, exit 1, zero mutation).");
 
+// -----------------------------------------------------------------------------
+// CHECK 14: Real CLI Executor Phase 2 (--apply) & Safety Controls Verification
+// -----------------------------------------------------------------------------
+console.log("\n[Test 14] Real CLI Executor Phase 2 (--apply) & Safety Controls Verification...");
+
+// Reset ledger so 20261024175900 is in clean pending state
+sql(`DELETE FROM supabase_migrations.schema_migrations WHERE version = '20261024175900';`);
+
+// 14A: Verify --apply without confirmation token fails with code 2
+let missingTokenFailed = false;
+let missingTokenCode = null;
+try {
+  execFileSync(path.join(ROOT_DIR, "scripts/identity-bridge-selective-migration-live.sh"), ["--apply"], {
+    env: { ...process.env, LAB_ISOLATED_PG17: "true", CONFIRM_LIVE_EXECUTION: "" },
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+} catch (err) {
+  missingTokenFailed = true;
+  missingTokenCode = err.status;
+}
+assert.ok(missingTokenFailed, "Applying without confirmation token must fail");
+assert.equal(missingTokenCode, 2, "Applying without confirmation token must exit with code 2");
+console.log("  ✓ [14A] Accidental execution guard: missing token exits 2.");
+
+// 14B: Verify --apply with invalid confirmation token fails with code 1
+let invalidTokenFailed = false;
+let invalidTokenCode = null;
+try {
+  execFileSync(path.join(ROOT_DIR, "scripts/identity-bridge-selective-migration-live.sh"), ["--apply"], {
+    env: { ...process.env, LAB_ISOLATED_PG17: "true", CONFIRM_LIVE_EXECUTION: "FORGED_TOKEN" },
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+} catch (err) {
+  invalidTokenFailed = true;
+  invalidTokenCode = err.status;
+}
+assert.ok(invalidTokenFailed, "Applying with forged token must fail");
+assert.equal(invalidTokenCode, 1, "Applying with forged token must exit with code 1");
+console.log("  ✓ [14B] Accidental execution guard: invalid token exits 1.");
+
+// 14C: Reset ledger and execute real selective live apply via CLI
+sql(`DELETE FROM supabase_migrations.schema_migrations WHERE version = '20261024175900';`);
+const applyOutput = execFileSync(
+  path.join(ROOT_DIR, "scripts/identity-bridge-selective-migration-live.sh"),
+  ["--apply"],
+  {
+    env: {
+      ...process.env,
+      LAB_ISOLATED_PG17: "true",
+      CONFIRM_LIVE_EXECUTION: "APPLY_20261024175900_TO_EATCLEAN_PROD",
+    },
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  }
+);
+
+assert.ok(applyOutput.includes("[FASE 1/3] VERIFICACIÓN PREVIA DE IDENTIDAD, HISTORIAL Y ESQUEMA"), "Phase 1 must run");
+assert.ok(applyOutput.includes("[FASE 2/3] APLICANDO MIGRACIÓN 20261024175900 DE FORMA ATÓMICA"), "Phase 2 must run");
+assert.ok(applyOutput.includes("✓ FASE 2 PASS: Transacción atómica ejecutada y confirmada en motor"), "Phase 2 must pass");
+assert.ok(applyOutput.includes("[FASE 3/3] VERIFICACIÓN POSTERIOR DE MOTOR Y LEDGER"), "Phase 3 must run");
+assert.ok(applyOutput.includes("CERTIFICACIÓN OPERATIVA EXITOSA"), "Must complete full operational certification");
+
+const finalLedgerCount = sql(`SELECT count(*) FROM supabase_migrations.schema_migrations WHERE version = '20261024175900';`);
+assert.equal(finalLedgerCount, "1", "20261024175900 must be recorded in schema_migrations after real apply");
+console.log("  ✓ [14C] Real CLI --apply execution: Phase 1, Phase 2, and Phase 3 completed successfully (ledger registered).");
+
+// 14D: Negative test: Direct invocation of identity-bridge-selective-executor.mjs without authorization
+console.log("  [14D] Testing direct invocation of identity-bridge-selective-executor.mjs without authorization...");
+let directMissingTokenFailed = false;
+let directMissingTokenOutput = "";
+try {
+  execFileSync("node", [
+    path.join(ROOT_DIR, "scripts/identity-bridge-selective-executor.mjs"),
+    ROOT_DIR,
+    "supabase/migrations/20261024175900_cr_order_writer_identity_bridge_hardening.sql",
+    "20261024175900",
+    "127.0.0.1",
+    "54322",
+    "postgres",
+    "postgres",
+    "psql"
+  ], {
+    env: { ...process.env, LAB_ISOLATED_PG17: "true", CONFIRM_LIVE_EXECUTION: "" },
+    stdio: ["ignore", "pipe", "pipe"],
+    encoding: "utf8"
+  });
+} catch (err) {
+  directMissingTokenFailed = true;
+  directMissingTokenOutput = (err.stderr || "") + (err.stdout || "");
+}
+assert.ok(directMissingTokenFailed, "Direct invocation without token must fail before executing SQL");
+assert.ok(
+  directMissingTokenOutput.includes("BLOCKED: DIRECT_EXECUTOR_UNAUTHORIZED"),
+  "Output must state 'BLOCKED: DIRECT_EXECUTOR_UNAUTHORIZED'"
+);
+console.log("  ✓ [14D] Negative test: Direct execution without CONFIRM_LIVE_EXECUTION blocked fail-closed.");
+
+// 14E: Negative test: Direct invocation in production mode without strict verify-full TLS & CA
+console.log("  [14E] Testing direct invocation in production mode without strict verify-full TLS & CA...");
+let directProdTlsFailed = false;
+let directProdTlsOutput = "";
+try {
+  execFileSync("node", [
+    path.join(ROOT_DIR, "scripts/identity-bridge-selective-executor.mjs"),
+    ROOT_DIR,
+    "supabase/migrations/20261024175900_cr_order_writer_identity_bridge_hardening.sql",
+    "20261024175900",
+    "aws-0-eu-central-1.pooler.supabase.com",
+    "5432",
+    "postgres.nhirlpkuvonggctdzzad",
+    "postgres",
+    "psql"
+  ], {
+    env: {
+      ...process.env,
+      LAB_ISOLATED_PG17: "false",
+      CONFIRM_LIVE_EXECUTION: "APPLY_20261024175900_TO_EATCLEAN_PROD",
+      PGSSLMODE: "disable" // Inválido en producción
+    },
+    stdio: ["ignore", "pipe", "pipe"],
+    encoding: "utf8"
+  });
+} catch (err) {
+  directProdTlsFailed = true;
+  directProdTlsOutput = (err.stderr || "") + (err.stdout || "");
+}
+assert.ok(directProdTlsFailed, "Direct invocation in production mode without verify-full TLS must fail");
+assert.ok(
+  directProdTlsOutput.includes("FATAL SECURITY_VIOLATION: En producción se exige PGSSLMODE='verify-full'"),
+  "Output must enforce verify-full TLS in production"
+);
+console.log("  ✓ [14E] Negative test: Direct execution without verify-full TLS in production blocked fail-closed.");
+
 console.log("\n=======================================================================");
-console.log("   ALL 14 SECURITY ASSERTIONS, PARITY, TRIGGER & NEGATIVE TESTS PASSED ");
+console.log("   ALL 15 SECURITY ASSERTIONS, PARITY, TRIGGER & CLI TESTS PASSED ");
 console.log("=======================================================================\n");
