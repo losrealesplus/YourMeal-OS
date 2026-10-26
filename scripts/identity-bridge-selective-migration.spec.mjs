@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
+import { buildUnifiedTransactionSql } from "./identity-bridge-selective-executor.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -11,6 +12,7 @@ const ROOT_DIR = path.resolve(__dirname, "..");
 
 test("Identity Bridge Selective Executor: Static Verification & Safety Audit", async (t) => {
   const scriptPath = path.join(ROOT_DIR, "scripts/identity-bridge-selective-migration-live.sh");
+  const executorPath = path.join(ROOT_DIR, "scripts/identity-bridge-selective-executor.mjs");
   const migrationPath = path.join(
     ROOT_DIR,
     "supabase/migrations/20261024175900_cr_order_writer_identity_bridge_hardening.sql"
@@ -22,6 +24,11 @@ test("Identity Bridge Selective Executor: Static Verification & Safety Audit", a
     // Check executable bits
     const isExecutable = !!(stat.mode & 0o111);
     assert.ok(isExecutable, "Script must have executable permissions");
+
+    assert.ok(fs.existsSync(executorPath), "Executor must exist at scripts/identity-bridge-selective-executor.mjs");
+    const execStat = fs.statSync(executorPath);
+    const isExecExecutable = !!(execStat.mode & 0o111);
+    assert.ok(isExecExecutable, "Executor must have executable permissions");
   });
 
   await t.test("migration file exists and checksum matches exact SHA-256", () => {
@@ -148,25 +155,31 @@ test("Identity Bridge Selective Executor: Static Verification & Safety Audit", a
   await t.test("transactional revalidation guarantees fail-closed precheck inside Phase 2 transaction before any DDL", () => {
     const scriptContent = fs.readFileSync(scriptPath, "utf8");
     assert.ok(
-      scriptContent.includes('Revalidación transaccional estricta de precondiciones y baselines (fail-closed)'),
-      "Phase 2 must include transactional precheck DO block"
+      scriptContent.includes('scripts/identity-bridge-selective-executor.mjs'),
+      "Bash script must delegate Phase 2 to identity-bridge-selective-executor.mjs"
+    );
+
+    const executorContent = fs.readFileSync(executorPath, "utf8");
+    assert.ok(
+      executorContent.includes('Revalidación transaccional estricta de precondiciones y baselines (fail-closed)'),
+      "Phase 2 executor must include transactional precheck DO block"
     );
     assert.ok(
-      scriptContent.includes("RAISE EXCEPTION 'BLOCKED: UNEXPECTED_MIGRATION_HISTORY: 20261010155728 detected in ledger';"),
-      "Phase 2 must revalidate absence of 20261010155728 inside transaction"
+      executorContent.includes("RAISE EXCEPTION 'BLOCKED: UNEXPECTED_MIGRATION_HISTORY: 20261010155728 detected in ledger';"),
+      "Phase 2 executor must revalidate absence of 20261010155728 inside transaction"
     );
     assert.ok(
-      scriptContent.includes("RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: guard_legacy_offer owner or secdef drifted';") &&
-      scriptContent.includes("RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: write_dish_v2 owner or secdef drifted';") &&
-      scriptContent.includes("RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: offer_state owner or secdef drifted';",
-      "Phase 2 must revalidate canonical function baselines inside transaction"
+      executorContent.includes("RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: guard_legacy_offer owner or secdef drifted';") &&
+      executorContent.includes("RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: write_dish_v2 owner or secdef drifted';") &&
+      executorContent.includes("RAISE EXCEPTION 'BLOCKED: FUNCTION_DRIFT: offer_state owner or secdef drifted';",
+      "Phase 2 executor must revalidate canonical function baselines inside transaction"
     ));
     assert.ok(
-      scriptContent.includes("BLOCKED: SCHEMA_DRIFT: anon has USAGE on cr_order_private") &&
-      scriptContent.includes("BLOCKED: SCHEMA_DRIFT: authenticated has CREATE on cr_order_private") &&
-      scriptContent.includes("BLOCKED: SCHEMA_DRIFT: authenticated missing USAGE on cr_order_private") &&
-      scriptContent.includes("BLOCKED: FUNCTION_DRIFT: offer_state has explicit anon/authenticated ACL grants"),
-      "Phase 2 must revalidate schema USAGE/CREATE policy and lack of explicit ACL grants inside transaction"
+      executorContent.includes("BLOCKED: SCHEMA_DRIFT: anon has USAGE on cr_order_private") &&
+      executorContent.includes("BLOCKED: SCHEMA_DRIFT: authenticated has CREATE on cr_order_private") &&
+      executorContent.includes("BLOCKED: SCHEMA_DRIFT: authenticated missing USAGE on cr_order_private") &&
+      executorContent.includes("BLOCKED: FUNCTION_DRIFT: offer_state has explicit anon/authenticated ACL grants"),
+      "Phase 2 executor must revalidate schema USAGE/CREATE policy and lack of explicit ACL grants inside transaction"
     );
   });
 
@@ -194,5 +207,15 @@ test("Identity Bridge Selective Executor: Static Verification & Safety Audit", a
       scriptContent.includes('POST_CUSTOM_BATCH_AUTH'),
       "Phase 3 must verify lifecycle/kitchen authenticated execution after migration"
     );
+  });
+
+  await t.test("buildUnifiedTransactionSql produces atomic transaction and detects atomicity violations", () => {
+    const sql = buildUnifiedTransactionSql(migrationPath, "20261024175900");
+    assert.ok(sql.startsWith("\nBEGIN;\n"), "Must start with BEGIN;");
+    assert.ok(sql.trim().endsWith("COMMIT;"), "Must end with COMMIT;");
+    assert.ok(sql.includes("INSERT INTO supabase_migrations.schema_migrations (version)"), "Must record migration in ledger");
+    assert.ok(sql.includes("VALUES ('20261024175900')"), "Must insert version 20261024175900");
+    assert.ok(sql.includes("-- [UNIFIED WRAPPER: Original BEGIN replaced]"), "Original BEGIN must be replaced");
+    assert.ok(sql.includes("-- [UNIFIED WRAPPER: Original COMMIT replaced]"), "Original COMMIT must be replaced");
   });
 });

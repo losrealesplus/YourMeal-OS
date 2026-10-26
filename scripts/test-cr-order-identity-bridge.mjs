@@ -814,6 +814,72 @@ assert.equal(hist28CountAfter, "0", "20261010155728 must not remain in ledger");
 
 console.log("  ✓ [Test 13] LEDGER_FAIL_CLOSED: PASS (presence of 20261010155728 triggers BLOCKED: UNEXPECTED_MIGRATION_HISTORY, exit 1, zero mutation).");
 
+// -----------------------------------------------------------------------------
+// CHECK 14: Real CLI Executor Phase 2 (--apply) & Safety Controls Verification
+// -----------------------------------------------------------------------------
+console.log("\n[Test 14] Real CLI Executor Phase 2 (--apply) & Safety Controls Verification...");
+
+// Reset ledger so 20261024175900 is in clean pending state
+sql(`DELETE FROM supabase_migrations.schema_migrations WHERE version = '20261024175900';`);
+
+// 14A: Verify --apply without confirmation token fails with code 2
+let missingTokenFailed = false;
+let missingTokenCode = null;
+try {
+  execFileSync(path.join(ROOT_DIR, "scripts/identity-bridge-selective-migration-live.sh"), ["--apply"], {
+    env: { ...process.env, LAB_ISOLATED_PG17: "true", CONFIRM_LIVE_EXECUTION: "" },
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+} catch (err) {
+  missingTokenFailed = true;
+  missingTokenCode = err.status;
+}
+assert.ok(missingTokenFailed, "Applying without confirmation token must fail");
+assert.equal(missingTokenCode, 2, "Applying without confirmation token must exit with code 2");
+console.log("  ✓ [14A] Accidental execution guard: missing token exits 2.");
+
+// 14B: Verify --apply with invalid confirmation token fails with code 1
+let invalidTokenFailed = false;
+let invalidTokenCode = null;
+try {
+  execFileSync(path.join(ROOT_DIR, "scripts/identity-bridge-selective-migration-live.sh"), ["--apply"], {
+    env: { ...process.env, LAB_ISOLATED_PG17: "true", CONFIRM_LIVE_EXECUTION: "FORGED_TOKEN" },
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+} catch (err) {
+  invalidTokenFailed = true;
+  invalidTokenCode = err.status;
+}
+assert.ok(invalidTokenFailed, "Applying with forged token must fail");
+assert.equal(invalidTokenCode, 1, "Applying with forged token must exit with code 1");
+console.log("  ✓ [14B] Accidental execution guard: invalid token exits 1.");
+
+// 14C: Reset ledger and execute real selective live apply via CLI
+sql(`DELETE FROM supabase_migrations.schema_migrations WHERE version = '20261024175900';`);
+const applyOutput = execFileSync(
+  path.join(ROOT_DIR, "scripts/identity-bridge-selective-migration-live.sh"),
+  ["--apply"],
+  {
+    env: {
+      ...process.env,
+      LAB_ISOLATED_PG17: "true",
+      CONFIRM_LIVE_EXECUTION: "APPLY_20261024175900_TO_EATCLEAN_PROD",
+    },
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  }
+);
+
+assert.ok(applyOutput.includes("[FASE 1/3] VERIFICACIÓN PREVIA DE IDENTIDAD, HISTORIAL Y ESQUEMA"), "Phase 1 must run");
+assert.ok(applyOutput.includes("[FASE 2/3] APLICANDO MIGRACIÓN 20261024175900 DE FORMA ATÓMICA"), "Phase 2 must run");
+assert.ok(applyOutput.includes("✓ FASE 2 PASS: Transacción atómica ejecutada y confirmada en motor"), "Phase 2 must pass");
+assert.ok(applyOutput.includes("[FASE 3/3] VERIFICACIÓN POSTERIOR DE MOTOR Y LEDGER"), "Phase 3 must run");
+assert.ok(applyOutput.includes("CERTIFICACIÓN OPERATIVA EXITOSA"), "Must complete full operational certification");
+
+const finalLedgerCount = sql(`SELECT count(*) FROM supabase_migrations.schema_migrations WHERE version = '20261024175900';`);
+assert.equal(finalLedgerCount, "1", "20261024175900 must be recorded in schema_migrations after real apply");
+console.log("  ✓ [14C] Real CLI --apply execution: Phase 1, Phase 2, and Phase 3 completed successfully (ledger registered).");
+
 console.log("\n=======================================================================");
-console.log("   ALL 14 SECURITY ASSERTIONS, PARITY, TRIGGER & NEGATIVE TESTS PASSED ");
+console.log("   ALL 15 SECURITY ASSERTIONS, PARITY, TRIGGER & CLI TESTS PASSED ");
 console.log("=======================================================================\n");
