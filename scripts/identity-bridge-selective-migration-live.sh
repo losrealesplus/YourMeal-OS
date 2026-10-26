@@ -491,6 +491,9 @@ fi
 echo "  ✓ Autorización humana de ejecución confirmada."
 echo ""
 
+# Pasar la confirmación humana ya verificada en el entorno del proceso (sin imprimirla ni guardarla en disco)
+export CONFIRM_LIVE_EXECUTION="$PROVIDED_TOKEN"
+
 # ------------------------------------------------------------------------------
 # FASE 2: APLICACIÓN ATÓMICA SELECTIVA (FORWARD-ONLY)
 # ------------------------------------------------------------------------------

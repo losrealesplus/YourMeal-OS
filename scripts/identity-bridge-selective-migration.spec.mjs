@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
-import { buildUnifiedTransactionSql } from "./identity-bridge-selective-executor.mjs";
+import { buildUnifiedTransactionSql, validateExecutorSafetyGuard, REQUIRED_CONFIRMATION_TOKEN } from "./identity-bridge-selective-executor.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -217,5 +217,73 @@ test("Identity Bridge Selective Executor: Static Verification & Safety Audit", a
     assert.ok(sql.includes("VALUES ('20261024175900')"), "Must insert version 20261024175900");
     assert.ok(sql.includes("-- [UNIFIED WRAPPER: Original BEGIN replaced]"), "Original BEGIN must be replaced");
     assert.ok(sql.includes("-- [UNIFIED WRAPPER: Original COMMIT replaced]"), "Original COMMIT must be replaced");
+  });
+
+  await t.test("validateExecutorSafetyGuard enforces direct entry authorization and destination checks", () => {
+    // 1. Missing token
+    assert.throws(
+      () =>
+        validateExecutorSafetyGuard({
+          rootDir: ROOT_DIR,
+          migrationFileRel: "supabase/migrations/20261024175900_cr_order_writer_identity_bridge_hardening.sql",
+          migrationVersion: "20261024175900",
+          host: "127.0.0.1",
+          port: "54322",
+          user: "postgres",
+          db: "postgres",
+          confirmationToken: "",
+          env: { LAB_ISOLATED_PG17: "true" },
+        }),
+      /BLOCKED: DIRECT_EXECUTOR_UNAUTHORIZED/
+    );
+
+    // 2. Demo project rejection
+    assert.throws(
+      () =>
+        validateExecutorSafetyGuard({
+          rootDir: ROOT_DIR,
+          migrationFileRel: "supabase/migrations/20261024175900_cr_order_writer_identity_bridge_hardening.sql",
+          migrationVersion: "20261024175900",
+          host: "db.djangucecsphnejplvic.supabase.co",
+          port: "5432",
+          user: "postgres",
+          db: "postgres",
+          confirmationToken: REQUIRED_CONFIRMATION_TOKEN,
+          env: { LAB_ISOLATED_PG17: "false" },
+        }),
+      /FATAL SECURITY_VIOLATION: EatClean identity bridge hardening cannot connect to Demo project/
+    );
+
+    // 3. Production TLS requirement
+    assert.throws(
+      () =>
+        validateExecutorSafetyGuard({
+          rootDir: ROOT_DIR,
+          migrationFileRel: "supabase/migrations/20261024175900_cr_order_writer_identity_bridge_hardening.sql",
+          migrationVersion: "20261024175900",
+          host: "aws-0-eu-central-1.pooler.supabase.com",
+          port: "5432",
+          user: "postgres.nhirlpkuvonggctdzzad",
+          db: "postgres",
+          confirmationToken: REQUIRED_CONFIRMATION_TOKEN,
+          env: { LAB_ISOLATED_PG17: "false", PGSSLMODE: "disable" },
+        }),
+      /FATAL SECURITY_VIOLATION: En producción se exige PGSSLMODE='verify-full'/
+    );
+
+    // 4. Lab mode valid invocation succeeds
+    const res = validateExecutorSafetyGuard({
+      rootDir: ROOT_DIR,
+      migrationFileRel: "supabase/migrations/20261024175900_cr_order_writer_identity_bridge_hardening.sql",
+      migrationVersion: "20261024175900",
+      host: "127.0.0.1",
+      port: "54322",
+      user: "postgres",
+      db: "postgres",
+      confirmationToken: REQUIRED_CONFIRMATION_TOKEN,
+      env: { LAB_ISOLATED_PG17: "true", PGPORT: "54322" },
+    });
+    assert.equal(res.isLab, true);
+    assert.ok(res.filePath.endsWith("20261024175900_cr_order_writer_identity_bridge_hardening.sql"));
   });
 });
