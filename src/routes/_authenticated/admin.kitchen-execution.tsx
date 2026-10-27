@@ -1,19 +1,18 @@
-import {
-  operationalItemIdentity,
-  isCustomOperationalItem,
-} from "@/production-experience/operational-item-identity";
-import {
-  CustomOperationalContext,
-  OperationalAllergenDeclaration,
-} from "@/production-experience/operational-item-presentation";
-/**
- * EP-002B.2 — Kitchen Execution workspace.
- * Same data as Hoja de Producción; lot-level status mutations via KitchenExecutionService.
- */
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
-import { useCallback, useEffect, useState } from "react";
-import { ArrowLeft, CheckCircle2, Clock, FileText, Play, RefreshCw, Wheat } from "lucide-react";
+import { useCallback, useEffect, useState, useRef, useMemo } from "react";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  Clock,
+  FileText,
+  Play,
+  RefreshCw,
+  Wheat,
+  Boxes,
+  AlertTriangle,
+  Lock,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { useCan } from "@/hooks/use-can";
@@ -30,6 +29,24 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { SectionTitle } from "@/components/admin";
 import {
   KitchenExecutionService,
@@ -41,6 +58,17 @@ import {
   type ProductionReportModel,
 } from "@/modules/operations";
 import { cn } from "@/lib/utils";
+import {
+  operationalItemIdentity,
+  isCustomOperationalItem,
+} from "@/production-experience/operational-item-identity";
+import {
+  CustomOperationalContext,
+  OperationalAllergenDeclaration,
+} from "@/production-experience/operational-item-presentation";
+import { InventoryService } from "@/modules/inventory/application/inventory-service";
+import type { InventoryConsumption } from "@/modules/inventory/domain/inventory-consumption";
+import type { InventoryStockItem } from "@/modules/inventory/domain/inventory-types";
 
 export const Route = createFileRoute("/_authenticated/admin/kitchen-execution")({
   validateSearch: (search: Record<string, unknown>): { date?: string } => ({
@@ -78,6 +106,39 @@ function batchTone(status: KitchenBatchStatus): string {
   }
 }
 
+function formatQty(qty: number): string {
+  return new Intl.NumberFormat("es-ES", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 3,
+  }).format(qty);
+}
+
+function consumptionStatusTone(status: string | null): string {
+  switch (status) {
+    case "planned":
+      return "bg-amber-500/15 text-amber-800 border-amber-300 dark:text-amber-300";
+    case "applied":
+      return "bg-sky-500/15 text-sky-800 border-sky-300 dark:text-sky-300";
+    case "sealed":
+      return "bg-emerald-500/15 text-emerald-800 border-emerald-300 dark:text-emerald-300";
+    default:
+      return "bg-secondary text-secondary-foreground border-border";
+  }
+}
+
+function consumptionStatusLabel(status: string | null): string {
+  switch (status) {
+    case "planned":
+      return "Planificado (T1)";
+    case "applied":
+      return "Aplicado en almacén (T2)";
+    case "sealed":
+      return "Sellado (T3 · Definitivo)";
+    default:
+      return "Pendiente de planificar";
+  }
+}
+
 function KitchenExecutionPage() {
   const { user, tenantId, roles } = useAuth();
   const { can } = useCan();
@@ -86,6 +147,32 @@ function KitchenExecutionPage() {
   const [board, setBoard] = useState<ProductionReportModel | null>(null);
   const [loading, setLoading] = useState(true);
   const [busyDishId, setBusyDishId] = useState<string | null>(null);
+
+  // FLOW-04 Inventory Consumption state
+  const [consumption, setConsumption] = useState<InventoryConsumption | null>(null);
+  const [consumptionLoading, setConsumptionLoading] = useState(true);
+  const [consumptionActionBusy, setConsumptionActionBusy] = useState(false);
+  const [stockMap, setStockMap] = useState<Map<string, number>>(new Map());
+  const [consumptionError, setConsumptionError] = useState<string | null>(null);
+  const [confirmApplyOpen, setConfirmApplyOpen] = useState(false);
+  const [confirmSealOpen, setConfirmSealOpen] = useState(false);
+
+  const canOperateInventory = can("inventory.operate");
+
+  const consumptionReqRef = useRef(0);
+  const tenantGenRef = useRef(0);
+  const activeTenantRef = useRef<string | null>(tenantId);
+  const activeDateRef = useRef<string>(date);
+
+  // Tenant / User / Date change: clear visual state immediately to prevent stale cross-context leaks
+  useEffect(() => {
+    tenantGenRef.current += 1;
+    activeTenantRef.current = tenantId;
+    activeDateRef.current = date;
+    setConsumption(null);
+    setStockMap(new Map());
+    setConsumptionError(null);
+  }, [tenantId, user?.id, date]);
 
   const load = useCallback(async () => {
     if (!user || !tenantId) return;
@@ -109,9 +196,173 @@ function KitchenExecutionPage() {
     }
   }, [user, tenantId, roles, date]);
 
+  const loadConsumption = useCallback(async () => {
+    if (!user || !tenantId) return;
+    const reqId = ++consumptionReqRef.current;
+    const curGen = tenantGenRef.current;
+    const curTenant = tenantId;
+    const curDate = date;
+
+    setConsumptionLoading(true);
+    setConsumptionError(null);
+
+    try {
+      const ctx = await createServiceContext({
+        supabase,
+        userId: user.id,
+        tenantId,
+        roles,
+      });
+
+      let cons: InventoryConsumption | null = null;
+      let stockList: InventoryStockItem[] = [];
+
+      if (ctx.capabilities.has("inventory.operate")) {
+        [cons, stockList] = await Promise.all([
+          InventoryService.getConsumptionByDate(ctx, curDate),
+          InventoryService.getInventoryStock(ctx).catch(() => []),
+        ]);
+      }
+
+      if (
+        tenantGenRef.current !== curGen ||
+        activeTenantRef.current !== curTenant ||
+        activeDateRef.current !== curDate ||
+        consumptionReqRef.current !== reqId
+      ) {
+        return;
+      }
+
+      const map = new Map<string, number>();
+      for (const item of stockList) {
+        map.set(item.id, item.stock);
+      }
+
+      setStockMap(map);
+      setConsumption(cons);
+      setConsumptionError(null);
+    } catch (e) {
+      if (
+        tenantGenRef.current !== curGen ||
+        activeTenantRef.current !== curTenant ||
+        activeDateRef.current !== curDate ||
+        consumptionReqRef.current !== reqId
+      ) {
+        return;
+      }
+      setConsumption(null);
+      setConsumptionError(
+        e instanceof Error ? e.message : "Error al cargar consumo de inventario",
+      );
+    } finally {
+      if (
+        tenantGenRef.current === curGen &&
+        activeTenantRef.current === curTenant &&
+        activeDateRef.current === curDate &&
+        consumptionReqRef.current === reqId
+      ) {
+        setConsumptionLoading(false);
+      }
+    }
+  }, [user, tenantId, roles, date]);
+
+  const refreshAll = useCallback(async () => {
+    await Promise.all([load(), loadConsumption()]);
+  }, [load, loadConsumption]);
+
   useEffect(() => {
     void load();
-  }, [load]);
+    void loadConsumption();
+  }, [load, loadConsumption]);
+
+  async function handlePlan() {
+    if (!user || !tenantId || consumptionActionBusy || !canOperateInventory) return;
+    setConsumptionActionBusy(true);
+    try {
+      const ctx = await createServiceContext({
+        supabase,
+        userId: user.id,
+        tenantId,
+        roles,
+      });
+      await InventoryService.planConsumptionFromProduction(ctx, {
+        deliveryDate: date,
+      });
+      toast.success("Plan de consumo generado correctamente (FLOW-04 · T1)");
+      await loadConsumption();
+    } catch (e) {
+      toast.error(
+        e instanceof Error ? e.message : "Error al planificar el consumo",
+      );
+    } finally {
+      setConsumptionActionBusy(false);
+    }
+  }
+
+  async function handleApply() {
+    if (
+      !user ||
+      !tenantId ||
+      !consumption ||
+      consumptionActionBusy ||
+      !canOperateInventory
+    )
+      return;
+    setConsumptionActionBusy(true);
+    setConfirmApplyOpen(false);
+    try {
+      const ctx = await createServiceContext({
+        supabase,
+        userId: user.id,
+        tenantId,
+        roles,
+      });
+      await InventoryService.applyConsumption(ctx, consumption.id, {
+        sessionRecovery: true,
+      });
+      toast.success("Consumo aplicado en existencias correctamente (FLOW-04 · T2)");
+      await loadConsumption();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      if (msg.includes("insufficient_stock")) {
+        toast.error("Stock insuficiente para aplicar el consumo planificado");
+      } else {
+        toast.error(`Error al aplicar consumo: ${msg}`);
+      }
+    } finally {
+      setConsumptionActionBusy(false);
+    }
+  }
+
+  async function handleSeal() {
+    if (
+      !user ||
+      !tenantId ||
+      !consumption ||
+      consumptionActionBusy ||
+      !canOperateInventory
+    )
+      return;
+    setConsumptionActionBusy(true);
+    setConfirmSealOpen(false);
+    try {
+      const ctx = await createServiceContext({
+        supabase,
+        userId: user.id,
+        tenantId,
+        roles,
+      });
+      await InventoryService.sealConsumption(ctx, consumption.id, {
+        sessionRecovery: true,
+      });
+      toast.success("Consumo sellado como definitivo (FLOW-04 · T3)");
+      await loadConsumption();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error al sellar consumo");
+    } finally {
+      setConsumptionActionBusy(false);
+    }
+  }
 
   async function transition(dish: ProductionDishBlock, to: KitchenBatchStatus) {
     if (!user || !tenantId || isCustomOperationalItem(dish) || !dish.dishId) return;
@@ -157,6 +408,17 @@ function KitchenExecutionPage() {
     customsByDish.set(operationalItemIdentity(c), list);
   }
 
+  const lines = consumption?.lines ?? [];
+  const totalPlannedQty = useMemo(
+    () => lines.reduce((acc, l) => acc + (l.qty || 0), 0),
+    [lines],
+  );
+  const insufficientLines = useMemo(() => {
+    if (!consumption || consumption.status !== "planned") return [];
+    return lines.filter((l) => (stockMap.get(l.ingredientId) ?? 0) < l.qty);
+  }, [consumption, lines, stockMap]);
+  const hasInsufficientStock = insufficientLines.length > 0;
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -180,8 +442,18 @@ function KitchenExecutionPage() {
               Hoja de Producción
             </Link>
           </Button>
-          <Button variant="outline" size="sm" onClick={() => void load()} disabled={loading}>
-            <RefreshCw className={cn("mr-2 h-4 w-4", loading && "animate-spin")} />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => void refreshAll()}
+            disabled={loading || consumptionLoading}
+          >
+            <RefreshCw
+              className={cn(
+                "mr-2 h-4 w-4",
+                (loading || consumptionLoading) && "animate-spin",
+              )}
+            />
             Actualizar
           </Button>
         </div>
@@ -204,6 +476,336 @@ function KitchenExecutionPage() {
             {board.totals.customizationCount} personalizados
           </p>
         ) : null}
+      </div>
+
+      {/* SECCIÓN FLOW-04 · CONSUMO DE INGREDIENTES */}
+      <section
+        data-testid="kitchen-consumption-section"
+        className="rounded-xl border border-border bg-card p-5 space-y-4 shadow-sm"
+      >
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <Boxes className="h-5 w-5 text-primary" />
+              <h2 className="text-lg font-semibold tracking-tight text-foreground">
+                Consumo de Ingredientes (FLOW-04)
+              </h2>
+              <Badge className={consumptionStatusTone(consumption?.status ?? null)}>
+                {consumptionStatusLabel(consumption?.status ?? null)}
+              </Badge>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Planificación (T1), aplicación en almacén (T2) y sellado definitivo (T3) para el día {date}.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Button asChild variant="outline" size="sm" data-testid="goto-inventory-button">
+              <Link to="/admin/inventory">
+                <Boxes className="mr-2 h-4 w-4" />
+                Ver en Kárdex
+              </Link>
+            </Button>
+          </div>
+        </div>
+
+        {!canOperateInventory ? (
+          <div
+            data-testid="consumption-rbac-notice"
+            className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 p-3 text-xs text-muted-foreground"
+          >
+            <Lock className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <span>
+              Modo sólo lectura. Se requiere el permiso{" "}
+              <code className="font-mono font-semibold text-foreground">inventory.operate</code>{" "}
+              para planificar, aplicar o sellar consumos de ingredientes.
+            </span>
+          </div>
+        ) : null}
+
+        {consumptionLoading ? (
+          <div className="space-y-2 py-4">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-20 w-full" />
+          </div>
+        ) : consumptionError ? (
+          <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
+            {consumptionError}
+          </div>
+        ) : !consumption ? (
+          <div className="rounded-lg border border-dashed p-6 text-center space-y-3">
+            <p className="text-sm text-muted-foreground">
+              No hay consumo de ingredientes planificado para esta fecha de entrega ({date}).
+            </p>
+            {canOperateInventory ? (
+              <Button
+                size="sm"
+                data-testid="plan-consumption-button"
+                onClick={() => void handlePlan()}
+                disabled={consumptionActionBusy}
+              >
+                {consumptionActionBusy ? (
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Play className="mr-2 h-4 w-4" />
+                )}
+                Planificar consumo (T1)
+              </Button>
+            ) : null}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {/* KPI Summary Strip */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+              <div className="rounded-lg border border-border bg-muted/20 p-3">
+                <p className="text-xs text-muted-foreground">Líneas previstas</p>
+                <p className="text-lg font-bold tabular-nums text-foreground" data-testid="kpi-lines-count">
+                  {lines.length}
+                </p>
+              </div>
+              <div className="rounded-lg border border-border bg-muted/20 p-3">
+                <p className="text-xs text-muted-foreground">Cantidad total</p>
+                <p className="text-lg font-bold tabular-nums text-foreground" data-testid="kpi-total-qty">
+                  {formatQty(totalPlannedQty)}
+                </p>
+              </div>
+              <div className="rounded-lg border border-border bg-muted/20 p-3">
+                <p className="text-xs text-muted-foreground">Estado del flujo</p>
+                <p className="text-sm font-semibold capitalize text-foreground" data-testid="kpi-consumption-status">
+                  {consumption.status}
+                </p>
+              </div>
+              <div className="rounded-lg border border-border bg-muted/20 p-3">
+                <p className="text-xs text-muted-foreground">Disponibilidad</p>
+                {consumption.status === "planned" ? (
+                  hasInsufficientStock ? (
+                    <span className="text-xs font-semibold text-destructive flex items-center gap-1 mt-1">
+                      <AlertTriangle className="h-3.5 w-3.5" /> Faltan {insufficientLines.length} ing.
+                    </span>
+                  ) : (
+                    <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1 mt-1">
+                      <CheckCircle2 className="h-3.5 w-3.5" /> Stock suficiente
+                    </span>
+                  )
+                ) : (
+                  <span className="text-xs font-medium text-muted-foreground mt-1 block">
+                    {consumption.status === "applied" ? "Stock descontado" : "Cerrado"}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Warning if insufficient stock */}
+            {hasInsufficientStock ? (
+              <div
+                data-testid="insufficient-stock-alert"
+                className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive"
+              >
+                <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
+                <span>
+                  Atención: Se han detectado ingredientes con existencias inferiores a la cantidad necesaria.
+                  La base de datos rechazará la aplicación de consumo si el stock fuese a quedar en negativo.
+                </span>
+              </div>
+            ) : null}
+
+            {/* Ingredients table */}
+            <div className="overflow-x-auto rounded-lg border border-border">
+              <Table data-testid="consumption-lines-table">
+                <TableHeader>
+                  <TableRow className="bg-muted/40 hover:bg-muted/40">
+                    <TableHead>Ingrediente</TableHead>
+                    <TableHead className="text-right">Cantidad Planificada</TableHead>
+                    <TableHead className="text-right">Stock en Almacén</TableHead>
+                    <TableHead className="text-right">Estado</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {lines.map((line) => {
+                    const available = stockMap.get(line.ingredientId) ?? 0;
+                    const isDeficit =
+                      consumption.status === "planned" && available < line.qty;
+
+                    return (
+                      <TableRow key={line.ingredientId} data-testid={`consumption-line-${line.ingredientId}`}>
+                        <TableCell className="font-medium text-foreground">
+                          {line.name}
+                        </TableCell>
+                        <TableCell className="text-right font-mono tabular-nums text-foreground">
+                          {formatQty(line.qty)} {line.unit}
+                        </TableCell>
+                        <TableCell
+                          className={cn(
+                            "text-right font-mono tabular-nums",
+                            isDeficit ? "text-destructive font-semibold" : "text-muted-foreground",
+                          )}
+                        >
+                          {formatQty(available)} {line.unit}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {consumption.status === "planned" ? (
+                            isDeficit ? (
+                              <Badge variant="destructive" className="text-xs">
+                                Faltan {formatQty(line.qty - available)} {line.unit}
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="border-emerald-500/40 text-emerald-700 bg-emerald-500/10 text-xs">
+                                En almacén
+                              </Badge>
+                            )
+                          ) : consumption.status === "applied" ? (
+                            <Badge variant="outline" className="border-sky-500/40 text-sky-700 bg-sky-500/10 text-xs">
+                              Descontado
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="border-emerald-500/40 text-emerald-700 bg-emerald-500/10 text-xs">
+                              Sellado
+                            </Badge>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Action Bar */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-border">
+              <p className="text-xs text-muted-foreground">
+                {consumption.status === "planned"
+                  ? "Consumo planificado. Al aplicar (T2), se registrarán salidas en kárdex descontando existencias."
+                  : consumption.status === "applied"
+                  ? "Consumo aplicado. Al sellar (T3), el lote quedará cerrado de forma definitiva."
+                  : "Consumo sellado de forma definitiva."}
+              </p>
+
+              <div className="flex items-center gap-2">
+                {canOperateInventory && consumption.status === "planned" ? (
+                  <Button
+                    size="sm"
+                    data-testid="apply-consumption-button"
+                    onClick={() => setConfirmApplyOpen(true)}
+                    disabled={consumptionActionBusy}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    {consumptionActionBusy ? (
+                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <CheckCircle2 className="mr-2 h-4 w-4" />
+                    )}
+                    Aplicar consumo (T2)
+                  </Button>
+                ) : null}
+
+                {canOperateInventory && consumption.status === "applied" ? (
+                  <Button
+                    size="sm"
+                    data-testid="seal-consumption-button"
+                    onClick={() => setConfirmSealOpen(true)}
+                    disabled={consumptionActionBusy}
+                    className="bg-emerald-600 text-white hover:bg-emerald-700"
+                  >
+                    {consumptionActionBusy ? (
+                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Lock className="mr-2 h-4 w-4" />
+                    )}
+                    Sellar consumo (T3)
+                  </Button>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* MODALES DE CONFIRMACIÓN */}
+      <AlertDialog open={confirmApplyOpen} onOpenChange={setConfirmApplyOpen}>
+        <AlertDialogContent data-testid="confirm-apply-dialog">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Boxes className="h-5 w-5 text-primary" />
+              ¿Confirmar aplicación de consumo de ingredientes?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3 pt-2">
+              <span>
+                Esta acción (T2) descontará formalmente las cantidades planificadas del stock del almacén
+                registrando movimientos de salida de inventario para la fecha{" "}
+                <strong className="text-foreground">{date}</strong>.
+              </span>
+              {hasInsufficientStock && (
+                <span className="block flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-2 text-xs text-destructive">
+                  <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+                  <span>
+                    Aviso: Se ha detectado stock insuficiente para algunos ingredientes. La base de datos
+                    rechazará la operación si algún stock resultante fuese negativo.
+                  </span>
+                </span>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={consumptionActionBusy}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              data-testid="confirm-apply-dialog-action"
+              disabled={consumptionActionBusy}
+              onClick={(e) => {
+                e.preventDefault();
+                void handleApply();
+              }}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              {consumptionActionBusy ? (
+                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <CheckCircle2 className="mr-2 h-4 w-4" />
+              )}
+              Confirmar y Aplicar en Almacén
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={confirmSealOpen} onOpenChange={setConfirmSealOpen}>
+        <AlertDialogContent data-testid="confirm-seal-dialog">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5 text-emerald-600" />
+              ¿Confirmar sellado definitivo del consumo?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="pt-2">
+              Esta acción (T3) marca el consumo de la fecha{" "}
+              <strong className="text-foreground">{date}</strong> como sellado y definitivo (estado
+              terminal). No alterará el stock del almacén ni se podrán realizar más cambios sobre este plan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={consumptionActionBusy}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              data-testid="confirm-seal-dialog-action"
+              disabled={consumptionActionBusy}
+              onClick={(e) => {
+                e.preventDefault();
+                void handleSeal();
+              }}
+              className="bg-emerald-600 text-white hover:bg-emerald-700"
+            >
+              {consumptionActionBusy ? (
+                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Lock className="mr-2 h-4 w-4" />
+              )}
+              Confirmar y Sellar (Terminal)
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <div className="flex items-center justify-between pt-2">
+        <h3 className="text-base font-semibold tracking-tight text-foreground">
+          Lotes de Producción
+        </h3>
       </div>
 
       {loading ? (

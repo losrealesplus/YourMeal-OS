@@ -23,7 +23,10 @@ import { createInventoryRepository } from "../infrastructure/inventory-repositor
 import {
   assertFlow04Prefix,
   beginFlow04Pipeline,
+  hasFlow04Step,
+  isFlow04PipelineActive,
   logFlow04Step,
+  resumeFlow04Pipeline,
   stopFlow04,
 } from "./flow04-evidence";
 
@@ -130,6 +133,7 @@ export const InventoryService = {
   async applyConsumption(
     ctx: ServiceContext,
     consumptionId: string,
+    options?: { sessionRecovery?: boolean },
   ): Promise<InventoryConsumption> {
     assertTenant(ctx);
     assertInventory(ctx);
@@ -138,6 +142,17 @@ export const InventoryService = {
     const current = await repo.findById(ctx.tenantId, consumptionId);
     if (!current) {
       throw new DomainError("NOT_FOUND", `Consumption ${consumptionId}`);
+    }
+
+    if (
+      options?.sessionRecovery &&
+      (!isFlow04PipelineActive() || !hasFlow04Step("FLOW04_T1_COMPLETED"))
+    ) {
+      resumeFlow04Pipeline(["FLOW04_T1_STARTED", "FLOW04_T1_COMPLETED"], {
+        tenantId: ctx.tenantId,
+        consumptionId,
+        source: "session_recovery",
+      });
     }
 
     // FLOW04-I2 · Single Apply — never double decrement
@@ -238,6 +253,7 @@ export const InventoryService = {
   async sealConsumption(
     ctx: ServiceContext,
     consumptionId: string,
+    options?: { sessionRecovery?: boolean },
   ): Promise<InventoryConsumption> {
     assertTenant(ctx);
     assertInventory(ctx);
@@ -257,6 +273,25 @@ export const InventoryService = {
       throw new DomainError(
         "INVALID_STATE",
         `FLOW04-003 requires status applied (got ${current.status})`,
+      );
+    }
+
+    if (
+      options?.sessionRecovery &&
+      (!isFlow04PipelineActive() || !hasFlow04Step("FLOW04_T2_COMPLETED"))
+    ) {
+      resumeFlow04Pipeline(
+        [
+          "FLOW04_T1_STARTED",
+          "FLOW04_T1_COMPLETED",
+          "FLOW04_T2_STARTED",
+          "FLOW04_T2_COMPLETED",
+        ],
+        {
+          tenantId: ctx.tenantId,
+          consumptionId,
+          source: "session_recovery",
+        },
       );
     }
 
@@ -336,6 +371,50 @@ export const InventoryService = {
       });
       throw e;
     }
+  },
+
+  /**
+   * Retrieve existing consumption for a production date if present.
+   * Resumes the FLOW-04 evidence pipeline from the verified persisted status
+   * so that actions after a page reload succeed without failing in-memory prefix checks.
+   */
+  async getConsumptionByDate(
+    ctx: ServiceContext,
+    deliveryDate: string,
+  ): Promise<InventoryConsumption | null> {
+    assertTenant(ctx);
+    assertInventory(ctx);
+    const date = deliveryDate?.trim();
+    if (!date) return null;
+
+    const repo = createInventoryRepository(ctx.supabase, ctx.tenantId);
+    const consumption = await repo.findBySource(ctx.tenantId, date);
+    if (consumption) {
+      if (consumption.status === "planned") {
+        resumeFlow04Pipeline(["FLOW04_T1_STARTED", "FLOW04_T1_COMPLETED"], {
+          tenantId: ctx.tenantId,
+          deliveryDate: date,
+          consumptionId: consumption.id,
+          source: "persisted_planned",
+        });
+      } else if (consumption.status === "applied") {
+        resumeFlow04Pipeline(
+          [
+            "FLOW04_T1_STARTED",
+            "FLOW04_T1_COMPLETED",
+            "FLOW04_T2_STARTED",
+            "FLOW04_T2_COMPLETED",
+          ],
+          {
+            tenantId: ctx.tenantId,
+            deliveryDate: date,
+            consumptionId: consumption.id,
+            source: "persisted_applied",
+          },
+        );
+      }
+    }
+    return consumption;
   },
 
   /**

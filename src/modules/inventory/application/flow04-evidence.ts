@@ -56,6 +56,33 @@ export function isFlow04PipelineActive(): boolean {
   return Boolean(active && !active.closed);
 }
 
+/**
+ * Resume a FLOW-04 pipeline from persisted state (e.g. after UI page reload or recovery).
+ * Re-populates prior verified steps so subsequent transitions can proceed safely.
+ */
+export function resumeFlow04Pipeline(
+  priorSteps: readonly Flow04EvidenceStep[],
+  detail?: Record<string, unknown>,
+): string {
+  if (!active || active.closed) {
+    active = { id: newPipelineId(), steps: [...priorSteps], closed: false };
+    if (typeof console !== "undefined" && typeof console.info === "function") {
+      console.info("[FLOW-04]", "PIPELINE_RESUMED", {
+        ...(detail ?? {}),
+        pipelineId: active.id,
+        resumedSteps: active.steps,
+      });
+    }
+  } else {
+    for (const step of priorSteps) {
+      if (!active.steps.includes(step)) {
+        active.steps.push(step);
+      }
+    }
+  }
+  return active.id;
+}
+
 /** Ensure prior tokens exist before emitting the next transition. */
 export function assertFlow04Prefix(
   required: readonly Flow04EvidenceStep[],
