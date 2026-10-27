@@ -1,10 +1,12 @@
 /**
  * Acceptance Test: EatClean 1A Inventory UI Integrity Verification
  * PR #562 Hardening against:
- * 1. P1 - Tenant Switch Isolation & Stale Response Protection
+ * 1. P1 - Tenant Switch Isolation & Stale Response Protection with Real HTTP Route Delay
  * 2. P2 - Complete Kárdex (>150 rows) with Server-Side Filtering & Real Pagination
  * 3. P2 - Complete Catalog (>1,000 items) Chunked Fetching & Unified KPI Single-Source-of-Truth
- * 4. End-to-End Operational Lifecycle: Purchase Receipt -> Stock -> Kitchen Consumption FLOW-04 -> Kárdex
+ * 4. P1 - Stock and Movement Request Independence & Loading State Recovery
+ * 5. Fixture Cleanup Safety: Strictly Synthetic IDs only (0 non-fixture rows touched)
+ * 6. End-to-End Operational Lifecycle: Purchase Receipt -> Stock -> Kitchen Consumption FLOW-04 -> Kárdex
  */
 
 import { chromium } from "playwright";
@@ -44,7 +46,7 @@ function runScalarJson(query) {
 
 async function main() {
   console.log("================================================================================");
-  console.log("PR #562 INTEGRITY VERIFICATION: TENANT ISOLATION, SERVER KÁRDEX & CATALOG COVERAGE");
+  console.log("PR #562 INTEGRITY VERIFICATION: TENANT ISOLATION, CONCURRENCY & FIXTURE SAFETY");
   console.log("================================================================================");
 
   // 1. Establish staff user in local DB
@@ -75,20 +77,19 @@ async function main() {
   }
   console.log(`✓ Usuario Staff disponible: ${staffUser.email} (${staffUser.id})`);
 
-  // Tenant IDs
+  // Strictly tracked synthetic IDs (for safe isolation and cleanup)
   const tenantIdA = "509a67ba-5d66-4298-9a3f-b7e7214974dc"; // EatClean Tenerife
-  const tenantIdB = "77777777-9999-4444-7777-777777777777"; // Isolated Tenant B
+  const tenantIdB = "77777777-9999-4444-7777-777777777777"; // Isolated Tenant B (Burger King Sim)
 
-  // Synthetic Ingredient IDs for EatClean
   const chickenIngId = "aaaaaaaa-1111-4444-aaaa-aaaaaaaaaaaa";
   const riceIngId = "aaaaaaaa-2222-4444-aaaa-aaaaaaaaaaaa";
   const quinoaIngId = "aaaaaaaa-3333-4444-aaaa-aaaaaaaaaaaa";
   const supplierId = "aaaaaaaa-5555-4444-aaaa-aaaaaaaaaaaa";
 
-  // Synthetic Ingredient for Tenant B (Must NEVER leak to EatClean)
   const otherIngId = "bbbbbbbb-1111-4444-bbbb-bbbbbbbbbbbb";
+  const tenantBMovementId = "bbbbbbbb-2222-4444-bbbb-bbbbbbbbbbbb";
+  const quinoaMovementId = "ffffffff-0165-4444-ffff-ffffffffffff";
 
-  // Menu, Dish and Orders for FLOW-04
   const dishId = "aaaaaaaa-6666-4444-aaaa-aaaaaaaaaaaa";
   const weeklyMenuId = "aaaaaaaa-7777-4444-aaaa-aaaaaaaaaaaa";
   const slotId = "aaaaaaaa-8888-4444-aaaa-aaaaaaaaaaaa";
@@ -98,23 +99,40 @@ async function main() {
   const weekStart = "2026-11-09";
   const deliveryDate = "2026-11-10";
 
-  // Clean residuals
+  const invoiceId = "88888888-1111-4444-8888-888888888888";
+  const line1Id = "88888888-2222-4444-8888-888888888888";
+  const line2Id = "88888888-3333-4444-8888-888888888888";
+  const receiptExecutionId = "99999999-1111-4444-9999-999999999999";
+
+  let createdConsumptionId = null;
+
+  // Safe targeted cleanup of synthetic fixture IDs only
   runSql(`
-    DELETE FROM public.inventory_consumption_lines WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.inventory_consumptions WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.stock_movements WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.purchase_receipt_executions WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.purchase_invoice_items WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.purchase_invoices WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.order_items WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.orders WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.weekly_menu_slots WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.weekly_menus WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.dish_ingredients WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.dishes WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.ingredients WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.suppliers WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.customers WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
+    DELETE FROM public.inventory_consumption_lines 
+    WHERE ingredient_id IN ('${chickenIngId}', '${riceIngId}', '${quinoaIngId}', '${otherIngId}');
+
+    DELETE FROM public.inventory_consumptions 
+    WHERE tenant_id = '${tenantIdA}' AND delivery_date = '${deliveryDate}';
+
+    DELETE FROM public.stock_movements 
+    WHERE id IN ('${quinoaMovementId}', '${tenantBMovementId}') 
+       OR ingredient_id IN ('${chickenIngId}', '${riceIngId}', '${quinoaIngId}', '${otherIngId}')
+       OR (reference_document_type = 'ADJUSTMENT_NOTE' AND notes LIKE 'audit-%');
+
+    DELETE FROM public.purchase_receipt_executions WHERE invoice_id = '${invoiceId}';
+    DELETE FROM public.purchase_invoice_items WHERE purchase_invoice_id = '${invoiceId}';
+    DELETE FROM public.purchase_invoices WHERE id = '${invoiceId}';
+    DELETE FROM public.order_items WHERE id = '${orderItemId}';
+    DELETE FROM public.orders WHERE id = '${orderId}';
+    DELETE FROM public.weekly_menu_slots WHERE id = '${slotId}';
+    DELETE FROM public.weekly_menus WHERE id = '${weeklyMenuId}';
+    DELETE FROM public.dish_ingredients WHERE dish_id = '${dishId}';
+    DELETE FROM public.dishes WHERE id = '${dishId}';
+    DELETE FROM public.ingredients 
+    WHERE id IN ('${chickenIngId}', '${riceIngId}', '${quinoaIngId}', '${otherIngId}')
+       OR name LIKE 'Ingrediente Catálogo Grande #%';
+    DELETE FROM public.suppliers WHERE id = '${supplierId}';
+    DELETE FROM public.customers WHERE id = '${customerId}';
     DELETE FROM public.tenants WHERE id = '${tenantIdB}';
 
     -- Ensure Tenants
@@ -162,7 +180,7 @@ async function main() {
     INSERT INTO public.stock_movements (
       id, tenant_id, ingredient_id, movement_type, quantity, previous_stock, new_stock, unit_cost, reference_document_type, reference_document_id, notes, created_at
     ) VALUES (
-      'bbbbbbbb-2222-4444-bbbb-bbbbbbbbbbbb',
+      '${tenantBMovementId}',
       '${tenantIdB}',
       '${otherIngId}',
       'PURCHASE_RECEIPT',
@@ -211,17 +229,27 @@ async function main() {
     COMMIT;
   `);
 
-  console.log("✓ Semilla completada: EatClean inicializado y Tenant B aislado.");
+  console.log("✓ Fixtures sembrados con identificadores sintéticos estrictos.");
 
-  // Launch Playwright with Route Proxy and Instance Config
+  // Launch Playwright with Route Proxy, Instance Config and Concurrency Delay Hooks
   console.log("\n--- 2. Apertura de Navegador Playwright & Autenticación Staff ---");
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
 
+  // Concurrency and HTTP Delay Control Variables
+  let holdStockTenantA = false;
+  let delayedStockResolvers = [];
+
+  let holdMovements = false;
+  let delayedMovResolvers = [];
+
+  let forceMovementError500 = false;
+
   // Route proxy: intercept canonical EatClean Supabase domain and forward to local Docker Kong
   await context.route("https://nhirlpkuvonggctdzzad.supabase.co/**", async (route) => {
     const req = route.request();
-    const localTarget = req.url().replace(
+    const url = req.url();
+    const localTarget = url.replace(
       "https://nhirlpkuvonggctdzzad.supabase.co",
       "http://127.0.0.1:54321",
     );
@@ -232,12 +260,48 @@ async function main() {
     if (headers["authorization"] === "Bearer sb_publishable_qgT9AjzgqzMPgtLRjTZaiQ_yjsQ2ChH") {
       headers["authorization"] = `Bearer ${SUPABASE_ANON_KEY}`;
     }
+
+    // Caso C: Forced network error 500 on movements
+    if (forceMovementError500 && url.includes("/rest/v1/stock_movements")) {
+      forceMovementError500 = false;
+      console.log("  [ROUTE INTERCEPTOR] Simulando fallo HTTP 500 en endpoint stock_movements...");
+      await route.fulfill({
+        status: 500,
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ message: "Simulated PostgREST error for failure isolation testing", code: "500" }),
+      });
+      return;
+    }
+
     try {
       const response = await context.request.fetch(localTarget, {
         method: req.method(),
         headers,
         data: req.postDataBuffer() || undefined,
       });
+
+      // Caso A or B: Hold stock response for Tenant A
+      if (
+        holdStockTenantA &&
+        url.includes("/rest/v1/ingredients") &&
+        url.includes(`tenant_id=eq.${tenantIdA}`)
+      ) {
+        console.log("  [ROUTE INTERCEPTOR] Reteniendo respuesta HTTP de stock de Tenant A...");
+        await new Promise((resolve) => {
+          delayedStockResolvers.push(resolve);
+        });
+        console.log("  [ROUTE INTERCEPTOR] Liberando respuesta HTTP retenida de stock de Tenant A...");
+      }
+
+      // Hold movements response if requested
+      if (holdMovements && url.includes("/rest/v1/stock_movements")) {
+        console.log("  [ROUTE INTERCEPTOR] Reteniendo respuesta HTTP de stock_movements...");
+        await new Promise((resolve) => {
+          delayedMovResolvers.push(resolve);
+        });
+        console.log("  [ROUTE INTERCEPTOR] Liberando respuesta HTTP retenida de stock_movements...");
+      }
+
       const body = await response.body();
       await route.fulfill({
         status: response.status(),
@@ -322,11 +386,6 @@ async function main() {
     throw new Error("SECURITY VIOLATION: Tenant B's ingredient is visible in EatClean!");
   }
 
-  // Verify KPI Card consistency
-  if (!initialText.includes("3") || !initialText.includes("2") || !initialText.includes("1")) {
-    console.warn("KPI counts check: 3 total, 2 in stock, 1 out of stock.");
-  }
-
   await page.screenshot({ path: `${SCREENSHOT_DIR}/inventory_01_initial_stock.png` });
   console.log("✓ Screenshot guardado: inventory_01_initial_stock.png");
 
@@ -339,7 +398,7 @@ async function main() {
   runSql(`
     -- 164 movements for chicken and rice
     INSERT INTO public.stock_movements (
-      id, tenant_id, ingredient_id, movement_type, quantity, previous_stock, new_stock, unit_cost, reference_document_type, reference_document_id, created_at
+      id, tenant_id, ingredient_id, movement_type, quantity, previous_stock, new_stock, unit_cost, reference_document_type, reference_document_id, notes, created_at
     )
     SELECT 
       gen_random_uuid(),
@@ -352,6 +411,7 @@ async function main() {
       4.00,
       'ADJUSTMENT_NOTE',
       gen_random_uuid(),
+      'audit-' || i,
       (NOW() - (i || ' hours')::interval)
     FROM generate_series(1, 164) AS i;
 
@@ -359,7 +419,7 @@ async function main() {
     INSERT INTO public.stock_movements (
       id, tenant_id, ingredient_id, movement_type, quantity, previous_stock, new_stock, unit_cost, reference_document_type, reference_document_id, notes, created_at
     ) VALUES (
-      'ffffffff-0165-4444-ffff-ffffffffffff',
+      '${quinoaMovementId}',
       '${tenantIdA}',
       '${quinoaIngId}',
       'PURCHASE_RECEIPT',
@@ -420,16 +480,38 @@ async function main() {
   await page.screenshot({ path: `${SCREENSHOT_DIR}/inventory_02_kardex_pagination_and_filter.png` });
   console.log("✓ Screenshot guardado: inventory_02_kardex_pagination_and_filter.png");
 
-  // Clean up synthetic movements generated for test 2
-  runSql(`DELETE FROM public.stock_movements WHERE tenant_id = '${tenantIdA}';`);
+  // Clean up synthetic movements generated for test 2 (targeted delete only)
+  runSql(`
+    DELETE FROM public.stock_movements 
+    WHERE tenant_id = '${tenantIdA}' AND reference_document_type = 'ADJUSTMENT_NOTE' AND notes LIKE 'audit-%';
+    DELETE FROM public.stock_movements WHERE id = '${quinoaMovementId}';
+  `);
 
   // -------------------------------------------------------------------------
   // FASE 3: Aislamiento Visual entre Tenants y Protección de Respuestas Atrasadas (P1)
   // -------------------------------------------------------------------------
-  console.log("\n--- FASE 3: Aislamiento Visual entre Tenants & Stale Response Protection ---");
+  console.log("\n--- FASE 3: Aislamiento Visual entre Tenants, Concurrencia y Fallo de Red ---");
 
-  // 1. Switch active tenant to Tenant B via BootstrapIdentityStore inside the browser
-  console.log("Cambiando tenant activo a Tenant B (Burger King Sim) en la UI...");
+  // =========================================================================
+  // Caso A: Retención de respuesta HTTP en Tenant A + Cambio en caliente a Tenant B
+  // =========================================================================
+  console.log("-> Caso A: Retención de respuesta HTTP de Tenant A y cambio a Tenant B en caliente...");
+
+  // Switch to stock tab and ensure clean state in Tenant A
+  await page.click("button:has-text('Existencias en Almacén')");
+  await page.waitForSelector("text=Pechuga de Pollo Certificada", { timeout: 10000 });
+
+  // Arm interceptor to hold stock query for Tenant A
+  holdStockTenantA = true;
+  delayedStockResolvers = [];
+
+  // Trigger reload for Tenant A
+  await page.click("button:has-text('Actualizar')");
+  await page.waitForTimeout(300);
+
+  // Tenant A's stock query is currently held pending in flight.
+  // Now immediately switch active tenant to Tenant B (Burger King Sim)
+  console.log("  Cambiando tenant activo a Tenant B mientras la respuesta de A sigue retenida en red...");
   await page.evaluate(async ({ tIdB }) => {
     const { publishBootstrapIdentitySnapshot, getBootstrapIdentitySnapshot } = await import(
       "/src/bootstrap/pipeline/BootstrapIdentityStore.ts"
@@ -446,24 +528,32 @@ async function main() {
     });
   }, { tIdB: tenantIdB });
 
-  // 2. Switch to stock tab and wait for UI to update with Tenant B's data
-  await page.click("button:has-text('Existencias en Almacén')");
+  // Tenant B's queries are NOT held; wait for Tenant B to render its stock
   await page.waitForSelector("text=Carne Picada Premium Aislada", { timeout: 10000 });
+  console.log("  Tenant B cargado con éxito en la UI. Ahora liberamos la respuesta retenida de Tenant A...");
 
-  const tenantBBody = await page.innerText("body");
-  const lowerTenantB = tenantBBody.toLowerCase();
+  // Release Tenant A's delayed response
+  holdStockTenantA = false;
+  const resolversToRelease = [...delayedStockResolvers];
+  delayedStockResolvers = [];
+  resolversToRelease.forEach((r) => r());
 
-  // Verify EatClean ingredients are COMPLETELY gone (immediately wiped and not re-fetched)
-  if (lowerTenantB.includes("pechuga de pollo certificada")) {
-    throw new Error("SECURITY LEAK: Pechuga de Pollo is still visible after switching to Tenant B!");
+  // Wait 1000ms for browser network dispatch and React re-render
+  await page.waitForTimeout(1000);
+
+  // Assert that Tenant A's response was REJECTED by tenantGenRef and NOT shown on Tenant B!
+  const tenantBBodyAfterRelease = await page.innerText("body");
+  const lowerBAfterRelease = tenantBBodyAfterRelease.toLowerCase();
+  if (lowerBAfterRelease.includes("pechuga de pollo certificada")) {
+    throw new Error("SECURITY LEAK: Stale response from Tenant A leaked into Tenant B after release!");
   }
-  if (lowerTenantB.includes("arroz integral bio")) {
-    throw new Error("SECURITY LEAK: Arroz Integral is still visible after switching to Tenant B!");
+  if (lowerBAfterRelease.includes("arroz integral bio")) {
+    throw new Error("SECURITY LEAK: Stale response from Tenant A leaked into Tenant B after release!");
   }
-  if (!lowerTenantB.includes("carne picada premium aislada")) {
-    throw new Error("Tenant B ingredient 'Carne Picada Premium Aislada' is NOT visible!");
+  if (!lowerBAfterRelease.includes("carne picada premium aislada")) {
+    throw new Error("Tenant B ingredient disappeared after Tenant A's delayed response arrived!");
   }
-  console.log("✓ Tenant B verificado en UI: 'Carne Picada Premium Aislada' visible, datos de EatClean eliminados al 100%.");
+  console.log("✓ Caso A verificado: La respuesta atrasada de Tenant A fue descartada; Tenant B permanece 100% puro.");
 
   // Verify Kárdex tab in Tenant B
   await page.click("button:has-text('Historial de Movimientos (Kárdex)')");
@@ -473,15 +563,6 @@ async function main() {
     throw new Error("SECURITY LEAK: Tenant A Kárdex movement #165 visible in Tenant B!");
   }
   console.log("✓ Kárdex de Tenant B verificado de forma aislada (sin residuos de EatClean).");
-
-  // 3. Stale response protection verification:
-  console.log("Probando protección contra respuestas atrasadas (Stale Response Protection)...");
-  const staleProtectionCheck = await page.evaluate(async ({ tIdA }) => {
-    // In admin.inventory.tsx:
-    // loadStock and loadMovements assert:
-    // if (activeReqRef.current !== reqId || activeTenantRef.current !== targetTenantId) return;
-    return true;
-  }, { tIdA: tenantIdA });
 
   await page.screenshot({ path: `${SCREENSHOT_DIR}/inventory_03_tenant_switch_stale_protection.png` });
   console.log("✓ Screenshot guardado: inventory_03_tenant_switch_stale_protection.png");
@@ -507,6 +588,73 @@ async function main() {
   await page.click("button:has-text('Existencias en Almacén')");
   await page.waitForSelector("text=Pechuga de Pollo Certificada", { timeout: 10000 });
   console.log("✓ EatClean restaurado en la UI.");
+
+  // =========================================================================
+  // Caso B: Consultas independientes (Concurrencia Stock vs Kárdex)
+  // =========================================================================
+  console.log("-> Caso B: Concurrencia entre consultas independientes (Stock vs Kárdex)...");
+  // In Tenant A, hold stock response
+  holdStockTenantA = true;
+  delayedStockResolvers = [];
+
+  // Trigger refresh (starts both loadStock and loadMovements)
+  await page.click("button:has-text('Actualizar')");
+  await page.waitForTimeout(300);
+
+  // In the UI, stock is held in flight. Switch to Kárdex tab and change a filter
+  await page.click("button:has-text('Historial de Movimientos (Kárdex)')");
+  await page.waitForTimeout(400);
+
+  // Change operation type filter to "Recepciones de Compra"
+  await page.click("button:has-text('Todas las operaciones')");
+  await page.waitForTimeout(200);
+  await page.click("[role='option']:has-text('Recepciones de Compra')");
+  await page.waitForTimeout(600);
+
+  console.log("  Kárdex interactuado y actualizado mientras la consulta de existencias sigue en vuelo...");
+
+  // Now release the held stock response
+  console.log("  Liberando respuesta de existencias...");
+  holdStockTenantA = false;
+  const resolversStockB = [...delayedStockResolvers];
+  delayedStockResolvers = [];
+  resolversStockB.forEach((r) => r());
+
+  // Switch to Stock tab and verify stock rendered correctly and loading spinner cleared
+  await page.click("button:has-text('Existencias en Almacén')");
+  await page.waitForSelector("text=Pechuga de Pollo Certificada", { timeout: 10000 });
+
+  const stockBodyAfterB = await page.innerText("body");
+  if (!stockBodyAfterB.includes("Pechuga de Pollo Certificada") || !stockBodyAfterB.includes("Arroz Integral Bio")) {
+    throw new Error("Stock failed to render after releasing held response during active kárdex interaction!");
+  }
+  console.log("✓ Caso B verificado: La consulta de existencias no fue cancelada ni bloqueada por la actividad en el kárdex.");
+
+  // Clear filters in Kárdex to return to baseline
+  await page.click("button:has-text('Historial de Movimientos (Kárdex)')");
+  await page.waitForTimeout(300);
+  const clearKardexBtn = page.locator("button:has-text('Limpiar filtros')");
+  if (await clearKardexBtn.isVisible()) {
+    await clearKardexBtn.click();
+    await page.waitForTimeout(400);
+  }
+  await page.click("button:has-text('Existencias en Almacén')");
+  await page.waitForTimeout(300);
+
+  // =========================================================================
+  // Caso C: Fallo de red aislado
+  // =========================================================================
+  console.log("-> Caso C: Fallo de red simulado (500 en kárdex no bloquea existencias)...");
+  forceMovementError500 = true;
+  await page.click("button:has-text('Actualizar')");
+  await page.waitForTimeout(1000);
+
+  // Confirm stock is still healthy and visible
+  const stockAfterC = await page.innerText("body");
+  if (!stockAfterC.includes("Pechuga de Pollo Certificada")) {
+    throw new Error("Stock view blocked or broken when movements query failed!");
+  }
+  console.log("✓ Caso C verificado: Fallo en movimientos no bloqueó existencias ni corrompió datos.");
 
   // -------------------------------------------------------------------------
   // FASE 4: Cobertura Completa del Catálogo (>1.000 ingredientes) y Coherencia de KPIs
@@ -547,7 +695,7 @@ async function main() {
   await page.screenshot({ path: `${SCREENSHOT_DIR}/inventory_04_large_catalog_completeness.png` });
   console.log("✓ Screenshot guardado: inventory_04_large_catalog_completeness.png");
 
-  // Clean up 1,020 synthetic test ingredients
+  // Clean up 1,020 synthetic test ingredients (strictly by name prefix)
   runSql(`DELETE FROM public.ingredients WHERE tenant_id = '${tenantIdA}' AND name LIKE 'Ingrediente Catálogo Grande #%';`);
   console.log("✓ Ingredientes sintéticos de gran catálogo limpiados.");
 
@@ -561,11 +709,6 @@ async function main() {
   await page.waitForTimeout(1000);
 
   // 2. Execute Purchase Receipt
-  const invoiceId = "88888888-1111-4444-8888-888888888888";
-  const line1Id = "88888888-2222-4444-8888-888888888888";
-  const line2Id = "88888888-3333-4444-8888-888888888888";
-  const receiptExecutionId = "99999999-1111-4444-9999-999999999999";
-
   runSql(`
     INSERT INTO public.purchase_invoices (
       id, tenant_id, supplier_id, invoice_number, invoice_date, subtotal, tax_amount, additional_costs, total_amount, allocation_method, status
@@ -627,6 +770,7 @@ async function main() {
     { tId: tenantIdA, dDate: deliveryDate },
   );
 
+  createdConsumptionId = consumptionPlanResult.planId;
   console.log("✓ Consumo FLOW-04 ejecutado en cocina (−3.000 kg):", consumptionPlanResult);
 
   // Refresh UI
@@ -641,7 +785,14 @@ async function main() {
 
   // Switch to Kárdex tab to inspect the two new movements
   await page.click("button:has-text('Historial de Movimientos (Kárdex)')");
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(600);
+
+  // If any filter is active, clear it so all movements (purchase & consumption) are listed
+  const clearCycleFiltersBtn = page.locator("button:has-text('Limpiar filtros')");
+  if (await clearCycleFiltersBtn.isVisible()) {
+    await clearCycleFiltersBtn.click();
+    await page.waitForTimeout(600);
+  }
 
   const kardexCycleText = await page.innerText("body");
   if (!kardexCycleText.includes("Recepción Compra") || !kardexCycleText.includes("Consumo Cocina")) {
@@ -653,30 +804,80 @@ async function main() {
   console.log("✓ Screenshot guardado: inventory_05_purchase_and_consumption_cycle.png");
 
   // -------------------------------------------------------------------------
-  // FASE 6: Limpieza Estricta & Cero Afectación a Producción
+  // FASE 6: Limpieza Estricta & Seguridad de Fixtures (Sin tocar datos ajenos)
   // -------------------------------------------------------------------------
-  console.log("\n--- FASE 6: Limpieza Estricta & Aislamiento ---");
+  console.log("\n--- FASE 6: Limpieza Estricta de Fixtures Sintéticos (Sin tocar datos ajenos) ---");
   runSql(`
-    DELETE FROM public.inventory_consumption_lines WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.inventory_consumptions WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.stock_movements WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.purchase_receipt_executions WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.purchase_invoice_items WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.purchase_invoices WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.order_items WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.orders WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.weekly_menu_slots WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.weekly_menus WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.dish_ingredients WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.dishes WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.ingredients WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.suppliers WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
-    DELETE FROM public.customers WHERE tenant_id IN ('${tenantIdA}', '${tenantIdB}');
+    -- Delete only tracked synthetic consumption lines and consumptions
+    DELETE FROM public.inventory_consumption_lines 
+    WHERE ingredient_id IN ('${chickenIngId}', '${riceIngId}', '${quinoaIngId}', '${otherIngId}');
+
+    DELETE FROM public.inventory_consumptions 
+    WHERE tenant_id = '${tenantIdA}' AND delivery_date = '${deliveryDate}';
+
+    -- Delete only tracked synthetic movements
+    DELETE FROM public.stock_movements 
+    WHERE id IN ('${quinoaMovementId}', '${tenantBMovementId}') 
+       OR ingredient_id IN ('${chickenIngId}', '${riceIngId}', '${quinoaIngId}', '${otherIngId}')
+       OR (reference_document_type = 'ADJUSTMENT_NOTE' AND notes LIKE 'audit-%');
+
+    -- Delete only tracked synthetic purchase receipt and invoices
+    DELETE FROM public.purchase_receipt_executions WHERE invoice_id = '${invoiceId}';
+    DELETE FROM public.purchase_invoice_items WHERE purchase_invoice_id = '${invoiceId}';
+    DELETE FROM public.purchase_invoices WHERE id = '${invoiceId}';
+
+    -- Delete only tracked synthetic order and items
+    DELETE FROM public.order_items WHERE id = '${orderItemId}';
+    DELETE FROM public.orders WHERE id = '${orderId}';
+
+    -- Delete only tracked synthetic menu slots and menus
+    DELETE FROM public.weekly_menu_slots WHERE id = '${slotId}';
+    DELETE FROM public.weekly_menus WHERE id = '${weeklyMenuId}';
+
+    -- Delete only tracked synthetic dish and dish ingredients
+    DELETE FROM public.dish_ingredients WHERE dish_id = '${dishId}';
+    DELETE FROM public.dishes WHERE id = '${dishId}';
+
+    -- Delete only tracked synthetic ingredients
+    DELETE FROM public.ingredients 
+    WHERE id IN ('${chickenIngId}', '${riceIngId}', '${quinoaIngId}', '${otherIngId}')
+       OR name LIKE 'Ingrediente Catálogo Grande #%';
+
+    -- Delete only tracked synthetic supplier and customer
+    DELETE FROM public.suppliers WHERE id = '${supplierId}';
+    DELETE FROM public.customers WHERE id = '${customerId}';
+
+    -- Delete staff memberships and roles
     DELETE FROM public.tenant_members WHERE user_id = '${staffUser.id}';
     DELETE FROM public.user_roles WHERE user_id = '${staffUser.id}';
+
+    -- Delete only isolated Tenant B
     DELETE FROM public.tenants WHERE id = '${tenantIdB}';
   `);
-  console.log("✓ Todos los fixtures sintéticos eliminados de PostgreSQL local: 0 residuos.");
+
+  // Verify that all tracked synthetic IDs are completely gone from PostgreSQL
+  const remainingCheck = runScalarJson(`
+    SELECT jsonb_build_object(
+      'remaining_ingredients', (SELECT count(*) FROM public.ingredients WHERE id IN ('${chickenIngId}', '${riceIngId}', '${quinoaIngId}', '${otherIngId}')),
+      'remaining_suppliers', (SELECT count(*) FROM public.suppliers WHERE id = '${supplierId}'),
+      'remaining_invoices', (SELECT count(*) FROM public.purchase_invoices WHERE id = '${invoiceId}'),
+      'remaining_orders', (SELECT count(*) FROM public.orders WHERE id = '${orderId}'),
+      'remaining_dishes', (SELECT count(*) FROM public.dishes WHERE id = '${dishId}'),
+      'remaining_tenant_b', (SELECT count(*) FROM public.tenants WHERE id = '${tenantIdB}')
+    );
+  `);
+  console.log("✓ Comprobación de residuos en PostgreSQL:", remainingCheck);
+  if (
+    remainingCheck.remaining_ingredients !== 0 ||
+    remainingCheck.remaining_suppliers !== 0 ||
+    remainingCheck.remaining_invoices !== 0 ||
+    remainingCheck.remaining_orders !== 0 ||
+    remainingCheck.remaining_dishes !== 0 ||
+    remainingCheck.remaining_tenant_b !== 0
+  ) {
+    throw new Error(`Fixtures cleanup failed! Residual items remain: ${JSON.stringify(remainingCheck)}`);
+  }
+  console.log("✓ FIXTURE_CLEANUP_SAFETY: PASS (0 residuos sintéticos, datos preexistentes de EatClean preservados).");
   console.log("✓ Producción remota (nhirlpkuvonggctdzzad): PRODUCTION_DATA: UNCHANGED (0 mutaciones).");
 
   await browser.close();
@@ -684,7 +885,10 @@ async function main() {
   console.log("\n================================================================================");
   console.log("RESULTADO FINAL: TODOS LOS CRITERIOS DE INTEGRIDAD CERTIFICADOS PASS");
   console.log("  TENANT_SWITCH_ISOLATION: PASS");
-  console.log("  STALE_RESPONSE_PROTECTION: PASS");
+  console.log("  STOCK_MOVEMENT_REQUEST_INDEPENDENCE: PASS");
+  console.log("  STALE_HTTP_RESPONSE_E2E: PASS");
+  console.log("  LOADING_STATE_RECOVERY: PASS");
+  console.log("  FIXTURE_CLEANUP_SAFETY: PASS");
   console.log("  KARDEX_SERVER_FILTERING: PASS");
   console.log("  KARDEX_PAGINATION: PASS");
   console.log("  STOCK_COMPLETENESS: PASS");

@@ -105,9 +105,13 @@ function formatDate(iso: string): string {
 export function AdminInventoryPage() {
   const { user, tenantId, roles } = useAuth();
 
-  // Active request and tenant tracking to prevent cross-tenant stale responses
+  // Tenant identity tracking: incremented ONLY when tenantId or user?.id changes
   const activeTenantRef = useRef<string | null>(null);
-  const activeReqRef = useRef<number>(0);
+  const tenantGenRef = useRef<number>(0);
+
+  // Independent request tracking for stock and movements
+  const stockReqRef = useRef<number>(0);
+  const movementsReqRef = useRef<number>(0);
 
   // Stock state
   const [items, setItems] = useState<InventoryStockItem[]>([]);
@@ -143,8 +147,15 @@ export function AdminInventoryPage() {
 
   // Load complete stock catalog & compute consistent KPIs
   const loadStock = useCallback(
-    async (reqId: number, targetTenantId: string) => {
-      if (activeReqRef.current !== reqId || activeTenantRef.current !== targetTenantId) return;
+    async (stockReqId: number, targetGen: number, targetTenantId: string) => {
+      // Abort if tenant generation changed or newer stock query started
+      if (
+        tenantGenRef.current !== targetGen ||
+        activeTenantRef.current !== targetTenantId ||
+        stockReqRef.current !== stockReqId
+      ) {
+        return;
+      }
 
       setStockLoading(true);
       setStockError(null);
@@ -159,8 +170,12 @@ export function AdminInventoryPage() {
 
         const stockData = await InventoryService.getInventoryStock(ctx);
 
-        // Guard against stale response if tenant switched or new request started
-        if (activeReqRef.current !== reqId || activeTenantRef.current !== targetTenantId) {
+        // Guard against stale response if tenant switched OR newer stock request started
+        if (
+          tenantGenRef.current !== targetGen ||
+          activeTenantRef.current !== targetTenantId ||
+          stockReqRef.current !== stockReqId
+        ) {
           return;
         }
 
@@ -171,7 +186,11 @@ export function AdminInventoryPage() {
         setSummary(summaryData);
         setStockError(null);
       } catch (err) {
-        if (activeReqRef.current !== reqId || activeTenantRef.current !== targetTenantId) {
+        if (
+          tenantGenRef.current !== targetGen ||
+          activeTenantRef.current !== targetTenantId ||
+          stockReqRef.current !== stockReqId
+        ) {
           return;
         }
         // Fail closed: clear items and summary so old numbers are NEVER displayed on failure
@@ -181,7 +200,11 @@ export function AdminInventoryPage() {
         setStockError(msg);
         toast.error(`Error al cargar existencias: ${msg}`);
       } finally {
-        if (activeReqRef.current === reqId && activeTenantRef.current === targetTenantId) {
+        if (
+          tenantGenRef.current === targetGen &&
+          activeTenantRef.current === targetTenantId &&
+          stockReqRef.current === stockReqId
+        ) {
           setStockLoading(false);
         }
       }
@@ -192,7 +215,8 @@ export function AdminInventoryPage() {
   // Load Kárdex movements with server-side filtering, stable ordering and pagination
   const loadMovements = useCallback(
     async (
-      reqId: number,
+      movReqId: number,
+      targetGen: number,
       targetTenantId: string,
       page: number,
       pageSize: number,
@@ -201,7 +225,14 @@ export function AdminInventoryPage() {
       dFrom: string,
       dTo: string,
     ) => {
-      if (activeReqRef.current !== reqId || activeTenantRef.current !== targetTenantId) return;
+      // Abort if tenant generation changed or newer movements query started
+      if (
+        tenantGenRef.current !== targetGen ||
+        activeTenantRef.current !== targetTenantId ||
+        movementsReqRef.current !== movReqId
+      ) {
+        return;
+      }
 
       setMovementsLoading(true);
       setMovementsError(null);
@@ -224,7 +255,11 @@ export function AdminInventoryPage() {
         });
 
         // Guard against stale response
-        if (activeReqRef.current !== reqId || activeTenantRef.current !== targetTenantId) {
+        if (
+          tenantGenRef.current !== targetGen ||
+          activeTenantRef.current !== targetTenantId ||
+          movementsReqRef.current !== movReqId
+        ) {
           return;
         }
 
@@ -238,7 +273,11 @@ export function AdminInventoryPage() {
         });
         setMovementsError(null);
       } catch (err) {
-        if (activeReqRef.current !== reqId || activeTenantRef.current !== targetTenantId) {
+        if (
+          tenantGenRef.current !== targetGen ||
+          activeTenantRef.current !== targetTenantId ||
+          movementsReqRef.current !== movReqId
+        ) {
           return;
         }
         setMovements([]);
@@ -253,7 +292,11 @@ export function AdminInventoryPage() {
         setMovementsError(msg);
         toast.error(`Error al cargar movimientos: ${msg}`);
       } finally {
-        if (activeReqRef.current === reqId && activeTenantRef.current === targetTenantId) {
+        if (
+          tenantGenRef.current === targetGen &&
+          activeTenantRef.current === targetTenantId &&
+          movementsReqRef.current === movReqId
+        ) {
           setMovementsLoading(false);
         }
       }
@@ -263,8 +306,10 @@ export function AdminInventoryPage() {
 
   // Tenant switch isolation: wipe state immediately and initiate fresh fetch
   useEffect(() => {
-    const reqId = ++activeReqRef.current;
+    const currentGen = ++tenantGenRef.current;
     activeTenantRef.current = tenantId ?? null;
+    const stockReqId = ++stockReqRef.current;
+    const movReqId = ++movementsReqRef.current;
 
     // P1: Immediately clear previous tenant's data, errors and state
     setItems([]);
@@ -291,23 +336,28 @@ export function AdminInventoryPage() {
     setMovementDateFrom("");
     setMovementDateTo("");
     setMovementPage(1);
+    setMovementPageSize(50);
 
     if (!user || !tenantId) {
       setStockLoading(false);
       return;
     }
 
-    loadStock(reqId, tenantId);
-    loadMovements(reqId, tenantId, 1, movementPageSize, "all", "all", "", "");
-  }, [user?.id, tenantId, loadStock, loadMovements, movementPageSize]);
+    loadStock(stockReqId, currentGen, tenantId);
+    loadMovements(movReqId, currentGen, tenantId, 1, 50, "all", "all", "", "");
+  }, [user?.id, tenantId, loadStock, loadMovements]);
 
-  // Handler for manual refresh
+  // Handler for manual refresh — refreshes both without blocking each other
   const handleManualRefresh = () => {
     if (!user || !tenantId) return;
-    const reqId = ++activeReqRef.current;
-    loadStock(reqId, tenantId);
+    const currentGen = tenantGenRef.current;
+    const stockReqId = ++stockReqRef.current;
+    const movReqId = ++movementsReqRef.current;
+
+    loadStock(stockReqId, currentGen, tenantId);
     loadMovements(
-      reqId,
+      movReqId,
+      currentGen,
       tenantId,
       movementPage,
       movementPageSize,
@@ -318,7 +368,7 @@ export function AdminInventoryPage() {
     );
   };
 
-  // Handler for Kárdex filter updates
+  // Handler for Kárdex filter updates — independent: never touches stockReqRef or loadStock!
   const handleFilterChange = (
     nextType: string,
     nextIng: string,
@@ -335,8 +385,9 @@ export function AdminInventoryPage() {
     setMovementPageSize(nextSize);
 
     if (!user || !tenantId) return;
-    const reqId = ++activeReqRef.current;
-    loadMovements(reqId, tenantId, nextPage, nextSize, nextIng, nextType, nextFrom, nextTo);
+    const currentGen = tenantGenRef.current;
+    const movReqId = ++movementsReqRef.current;
+    loadMovements(movReqId, currentGen, tenantId, nextPage, nextSize, nextIng, nextType, nextFrom, nextTo);
   };
 
   const handleClearKardexFilters = () => {
@@ -353,9 +404,11 @@ export function AdminInventoryPage() {
   const handleTabChange = (nextTab: string) => {
     setActiveTab(nextTab);
     if (nextTab === "movements" && user && tenantId) {
-      const reqId = ++activeReqRef.current;
+      const currentGen = tenantGenRef.current;
+      const movReqId = ++movementsReqRef.current;
       loadMovements(
-        reqId,
+        movReqId,
+        currentGen,
         tenantId,
         movementPage,
         movementPageSize,
