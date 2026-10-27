@@ -194,4 +194,90 @@ describe("SupabaseProcurementCostRepository", () => {
       "INVALID_INGREDIENT_ID",
     );
   });
+
+  it("8. Enforces strict 1-to-1 line matching without reusing existing lines for multiple requested lines", async () => {
+    const lineIdA = "aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa";
+    const lineIdB = "bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb";
+
+    // Existing invoice has 2 lines of the same ingredient with identical quantity/price, but different discounts
+    const multiLineInvoice: CalculatedPurchaseInvoice = {
+      ...completeInvoice,
+      items: [
+        {
+          ...completeInvoice.items[0],
+          id: lineIdA,
+          quantity: 10,
+          unitPrice: 5.0,
+          discountAmount: 0.0,
+          lineTotal: 50.0,
+        },
+        {
+          ...completeInvoice.items[0],
+          id: lineIdB,
+          quantity: 10,
+          unitPrice: 5.0,
+          discountAmount: 5.0, // Different discount!
+          lineTotal: 45.0,
+        },
+      ],
+    };
+
+    const repo = new SupabaseProcurementCostRepository({} as unknown as SupabaseClient);
+    repo.getInvoiceById = vi.fn().mockResolvedValue(multiLineInvoice);
+
+    // 8.1 Legitimate retry matching both lines 1-to-1 succeeds
+    const matched = await repo.createInvoice(multiLineInvoice);
+    expect(matched.items.length).toBe(2);
+
+    // 8.2 Discrepant retry where line 2 changes discount must NOT reuse line 1 and must reject
+    const conflictingMultiLine: CalculatedPurchaseInvoice = {
+      ...multiLineInvoice,
+      items: [
+        multiLineInvoice.items[0], // matches line A
+        {
+          ...multiLineInvoice.items[1],
+          discountAmount: 99.0, // altered discount!
+        },
+      ],
+    };
+
+    await expect(repo.createInvoice(conflictingMultiLine)).rejects.toThrow(
+      "INVOICE_CONFLICT",
+    );
+  });
+
+  it("9. Rejects retry with altered concept (itemName) or unit", async () => {
+    const repo = new SupabaseProcurementCostRepository({} as unknown as SupabaseClient);
+    repo.getInvoiceById = vi.fn().mockResolvedValue(completeInvoice);
+
+    // Alter concept
+    const alteredConceptInvoice: CalculatedPurchaseInvoice = {
+      ...completeInvoice,
+      items: [
+        {
+          ...completeInvoice.items[0],
+          itemName: "Concepto Totalmente Distinto",
+        },
+      ],
+    };
+
+    await expect(repo.createInvoice(alteredConceptInvoice)).rejects.toThrow(
+      "INVOICE_CONFLICT",
+    );
+
+    // Alter unit
+    const alteredUnitInvoice: CalculatedPurchaseInvoice = {
+      ...completeInvoice,
+      items: [
+        {
+          ...completeInvoice.items[0],
+          unit: "cajas",
+        },
+      ],
+    };
+
+    await expect(repo.createInvoice(alteredUnitInvoice)).rejects.toThrow(
+      "INVOICE_CONFLICT",
+    );
+  });
 });

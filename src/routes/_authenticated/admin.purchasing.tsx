@@ -88,6 +88,7 @@ type IngredientOption = {
 };
 
 type FormLineItem = {
+  lineId: string;
   itemId: string;
   itemName: string;
   itemNature: ItemNature;
@@ -98,16 +99,21 @@ type FormLineItem = {
   taxRate: string;
 };
 
-const emptyLineItem: FormLineItem = {
-  itemId: "",
-  itemName: "",
-  itemNature: "INVENTORYABLE",
-  quantity: "1",
-  unit: "kg",
-  unitPrice: "0.00",
-  discountAmount: "0.00",
-  taxRate: "10",
-};
+function createInitialLineItem(nature: ItemNature = "INVENTORYABLE"): FormLineItem {
+  const lineId = typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : "";
+  const itemId = nature === "EXPENSE_SERVICE" && typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : "";
+  return {
+    lineId,
+    itemId,
+    itemName: "",
+    itemNature: nature,
+    quantity: "1",
+    unit: nature === "EXPENSE_SERVICE" ? "ud" : "kg",
+    unitPrice: "0.00",
+    discountAmount: "0.00",
+    taxRate: nature === "EXPENSE_SERVICE" ? "21" : "10",
+  };
+}
 
 export function AdminPurchasingPage() {
   const { user, tenantId, roles } = useAuth();
@@ -136,7 +142,7 @@ export function AdminPurchasingPage() {
   const [allocationMethod, setAllocationMethod] = useState<ProrationMethod>("value");
   const [notes, setNotes] = useState("");
   const [lineItems, setLineItems] = useState<FormLineItem[]>([
-    { ...emptyLineItem },
+    createInitialLineItem(),
   ]);
 
   // View Invoice Detail Dialog
@@ -183,15 +189,7 @@ export function AdminPurchasingPage() {
 
   // Line item helpers
   const addLine = (nature: ItemNature = "INVENTORYABLE") => {
-    setLineItems((prev) => [
-      ...prev,
-      {
-        ...emptyLineItem,
-        itemNature: nature,
-        unit: nature === "EXPENSE_SERVICE" ? "ud" : "kg",
-        taxRate: nature === "EXPENSE_SERVICE" ? "21" : "10",
-      },
-    ]);
+    setLineItems((prev) => [...prev, createInitialLineItem(nature)]);
   };
 
   const removeLine = (idx: number) => {
@@ -303,12 +301,13 @@ export function AdminPurchasingPage() {
       const isService = l.itemNature === "EXPENSE_SERVICE";
       const parsedTax = Number(l.taxRate);
       const taxRate = isNaN(parsedTax) ? (isService ? 21 : 10) : Math.max(0, parsedTax);
+      const lineId = l.lineId || (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : undefined);
       const itemId = isService
         ? (l.itemId && isValidUuid(l.itemId) ? l.itemId : (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : ""))
         : l.itemId;
       const itemName = l.itemName || (isService ? "Servicio / Gasto Operativo" : "Ingrediente de Compra");
       return {
-        id: typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : undefined,
+        id: lineId,
         itemId,
         itemName,
         itemNature: l.itemNature || "INVENTORYABLE",
@@ -346,7 +345,7 @@ export function AdminPurchasingPage() {
       setIsCreateOpen(false);
       setInvoiceNumber("");
       setDraftInvoiceId(typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : "");
-      setLineItems([{ ...emptyLineItem }]);
+      setLineItems([createInitialLineItem()]);
       await reload();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
@@ -601,7 +600,18 @@ export function AdminPurchasingPage() {
           </button>
         </div>
 
-        <Button onClick={() => setIsCreateOpen(true)} className="gap-1.5">
+        <Button
+          onClick={() => {
+            setDraftInvoiceId(typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : "");
+            setLineItems([createInitialLineItem()]);
+            setInvoiceNumber("");
+            setSelectedSupplierId("");
+            setAdditionalCosts("0.00");
+            setNotes("");
+            setIsCreateOpen(true);
+          }}
+          className="gap-1.5"
+        >
           <Plus className="h-4 w-4" />
           Nueva Factura de Compra
         </Button>
@@ -750,14 +760,18 @@ export function AdminPurchasingPage() {
                     <div className="col-span-2 space-y-1">
                       <Select
                         value={line.itemNature}
-                        onValueChange={(val) =>
+                        onValueChange={(val) => {
+                          const nextNature = val as ItemNature;
+                          const nextItemId = nextNature === "EXPENSE_SERVICE"
+                            ? (isValidUuid(line.itemId) ? line.itemId : (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : ""))
+                            : "";
                           updateLine(idx, {
-                            itemNature: val as ItemNature,
-                            itemId: val === "EXPENSE_SERVICE" ? "" : line.itemId,
-                            unit: val === "EXPENSE_SERVICE" ? "ud" : "kg",
-                            taxRate: val === "EXPENSE_SERVICE" ? "21" : "10",
-                          })
-                        }
+                            itemNature: nextNature,
+                            itemId: nextItemId,
+                            unit: nextNature === "EXPENSE_SERVICE" ? "ud" : "kg",
+                            taxRate: nextNature === "EXPENSE_SERVICE" ? "21" : "10",
+                          });
+                        }}
                       >
                         <SelectTrigger className="h-8 text-xs">
                           <SelectValue />

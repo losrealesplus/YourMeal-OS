@@ -232,6 +232,14 @@ async function main() {
     });
 
     const page = await context.newPage();
+    page.on("console", (msg) => {
+      if (msg.type() === "error" || msg.text().includes("INVOICE")) {
+        console.log(`  [BROWSER CONSOLE ${msg.type()}]:`, msg.text());
+      }
+    });
+    page.on("pageerror", (err) => {
+      console.log("  [BROWSER PAGEERROR]:", err.message);
+    });
 
     console.log("Navegando a /auth...");
     await page.goto("http://127.0.0.1:5173/auth", { waitUntil: "networkidle" });
@@ -325,13 +333,68 @@ async function main() {
     await page.screenshot({ path: `${SCREENSHOT_DIR}/hotfix_02_invoice_form_with_service_line.png` });
     console.log("✓ Formulario completado con éxito (Screenshot: hotfix_02_invoice_form_with_service_line.png)");
 
-    // Click "Crear Factura Borrador"
-    console.log("  - Enviando formulario...");
+    // Monkeypatch window.fetch to simulate dropped response after successful Postgres commit on FIRST attempt
+    await page.evaluate(() => {
+      const originalFetch = window.fetch;
+      window.__simulatedNetworkDrop = true;
+      window.fetch = async function(...args) {
+        const url = typeof args[0] === "string" ? args[0] : (args[0] && args[0].url) || "";
+        const method = (args[1] && args[1].method) || (args[0] && args[0].method) || "GET";
+        const response = await originalFetch.apply(this, args);
+        if (window.__simulatedNetworkDrop && url.includes("/rest/v1/purchase_invoice_items") && method === "POST") {
+          window.__simulatedNetworkDrop = false;
+          console.log("  [SIMULACIÓN RED NAVEGADOR] PostgREST persistió las líneas en PostgreSQL. Ahora simulamos pérdida de conexión HTTP/TCP hacia la UI...");
+          throw new TypeError("Failed to fetch: Network connection lost after server persistence");
+        }
+        return response;
+      };
+    });
+
+    // Attempt 1: Click "Crear Factura Borrador"
+    console.log("  - Enviando formulario (intento 1 con pérdida de respuesta de red simulada)...");
     await page.click("button:has-text('Crear Factura Borrador')");
 
-    // Wait for dialog to close
-    await page.waitForSelector("text=Registrar Factura de Compra", { state: "hidden", timeout: 10000 });
-    console.log("✓ Modal cerrado tras guardado.");
+    // Wait for network drop to occur and toast error to appear
+    await page.waitForTimeout(1500);
+
+    // Verify modal remains open
+    const isModalStillOpen = await page.isVisible("text=Registrar Factura de Compra");
+    console.log(`✓ Formulario conservó el modal abierto tras pérdida de respuesta: ${isModalStillOpen}`);
+    if (!isModalStillOpen) {
+      throw new Error("Modal closed prematurely during network error!");
+    }
+
+    // Verify that invoice was already recorded in PostgreSQL
+    const midCheck = runScalarJson(`
+      SELECT count(*) FROM public.purchase_invoices WHERE tenant_id = '${tenantId}' AND invoice_number = '${invNum}';
+    `);
+    console.log(`✓ Factura ya registrada en PostgreSQL en intento 1: ${midCheck} registro(s)`);
+
+    // Verify items were also recorded in PostgreSQL
+    const midCheckItems = runScalarJson(`
+      SELECT count(*) FROM public.purchase_invoice_items pii
+      JOIN public.purchase_invoices pi ON pi.id = pii.purchase_invoice_id
+      WHERE pi.tenant_id = '${tenantId}' AND pi.invoice_number = '${invNum}';
+    `);
+    console.log(`✓ Líneas ya registradas en PostgreSQL en intento 1: ${midCheckItems} línea(s)`);
+
+    // Restore fetch inside browser for retry
+    await page.evaluate(() => {
+      window.__simulatedNetworkDrop = false;
+    });
+
+    // Attempt 2: Re-send directly from the exact same open form with stable identities
+    console.log("  - Reenviando desde el mismo formulario (reintento UI con identidades estables)...");
+    await page.click("button:has-text('Crear Factura Borrador')");
+
+    try {
+      await page.waitForSelector("text=Registrar Factura de Compra", { state: "hidden", timeout: 10000 });
+      console.log("✓ Modal cerrado tras reintento idempotente exitoso.");
+    } catch (e) {
+      const toastText = await page.locator("[data-sonner-toast]").allInnerTexts();
+      console.log("  [TOASTS PRESENT]:", toastText);
+      throw e;
+    }
 
     await page.waitForTimeout(1000);
     await page.screenshot({ path: `${SCREENSHOT_DIR}/hotfix_03_draft_invoice_in_table.png` });
@@ -501,6 +564,150 @@ async function main() {
       throw new Error("Failed to reject incomplete invoice retry with INVOICE_INTEGRITY_MISMATCH!");
     }
     console.log("✓ Simulación de fallo en inserción de líneas: reintento rechazado con INVOICE_INTEGRITY_MISMATCH (nunca devuelve falso éxito).");
+
+    // 6.4 Retry with altered line concept (itemName) or altered line discount: rejected with INVOICE_CONFLICT
+    let lineAlterRejected = false;
+    try {
+      await testRepo.createInvoice({
+        ...completeCalculatedPayload,
+        items: [
+          {
+            ...completeCalculatedPayload.items[0],
+            itemName: "Concepto de Pollo Alterado",
+          },
+          completeCalculatedPayload.items[1],
+        ],
+      });
+    } catch (err) {
+      if (err.message.includes("INVOICE_CONFLICT")) {
+        lineAlterRejected = true;
+      }
+    }
+    if (!lineAlterRejected) {
+      throw new Error("Failed to reject retry with altered line concept!");
+    }
+    console.log("✓ Reintento con concepto de línea alterado rechazado correctamente con INVOICE_CONFLICT.");
+
+    let discountAlterRejected = false;
+    try {
+      await testRepo.createInvoice({
+        ...completeCalculatedPayload,
+        items: [
+          {
+            ...completeCalculatedPayload.items[0],
+            discountAmount: 15.0, // Altered discount
+          },
+          completeCalculatedPayload.items[1],
+        ],
+      });
+    } catch (err) {
+      if (err.message.includes("INVOICE_CONFLICT")) {
+        discountAlterRejected = true;
+      }
+    }
+    if (!discountAlterRejected) {
+      throw new Error("Failed to reject retry with altered line discount!");
+    }
+    console.log("✓ Reintento con descuento de línea alterado rechazado correctamente con INVOICE_CONFLICT.");
+
+    // 6.5 Two similar lines of same item: verify strict 1-to-1 line matching (no reuse of existing lines)
+    const multiLineInvId = "cccccccc-4444-4444-cccc-cccccccccccc";
+    const lineIdA = "aaaaaaaa-1111-4aaa-aaaa-aaaaaaaaaaaa";
+    const lineIdB = "bbbbbbbb-2222-4bbb-bbbb-bbbbbbbbbbbb";
+    runSql(`
+      INSERT INTO purchase_invoices (id, tenant_id, supplier_id, invoice_number, invoice_date, subtotal, tax_amount, additional_costs, total_amount, allocation_method, status)
+      VALUES ('${multiLineInvId}', '${tenantId}', '${supplierId}', 'MULTI-SIMILAR-001', '2026-10-27', 100, 10, 0, 110, 'value', 'draft');
+      INSERT INTO purchase_invoice_items (id, tenant_id, purchase_invoice_id, item_id, item_name, item_nature, quantity, unit, unit_price, discount_amount, tax_rate, tax_amount, allocated_overhead, effective_unit_cost, line_total)
+      VALUES 
+        ('${lineIdA}', '${tenantId}', '${multiLineInvId}', '${ingredientId}', 'Pechuga de Pollo Certificada', 'INVENTORYABLE', 10, 'kg', 5.0, 0.0, 10, 5.0, 0.0, 5.0, 55.0),
+        ('${lineIdB}', '${tenantId}', '${multiLineInvId}', '${ingredientId}', 'Pechuga de Pollo Certificada', 'INVENTORYABLE', 10, 'kg', 5.0, 2.0, 10, 4.8, 0.0, 4.8, 52.8);
+    `);
+
+    // Matching multi-line retry should succeed
+    const validMultiPayload = {
+      id: multiLineInvId,
+      tenantId,
+      supplierId,
+      invoiceNumber: "MULTI-SIMILAR-001",
+      invoiceDate: "2026-10-27",
+      subtotal: 100,
+      taxAmount: 10,
+      additionalCosts: 0,
+      totalAmount: 110,
+      allocationMethod: "value",
+      status: "draft",
+      items: [
+        {
+          id: lineIdA,
+          purchaseInvoiceId: multiLineInvId,
+          tenantId,
+          itemId: ingredientId,
+          itemName: "Pechuga de Pollo Certificada",
+          itemNature: "INVENTORYABLE",
+          quantity: 10,
+          unit: "kg",
+          unitPrice: 5.0,
+          discountAmount: 0.0,
+          taxRate: 10,
+          taxAmount: 5.0,
+          allocatedOverhead: 0.0,
+          effectiveUnitCost: 5.0,
+          lineTotal: 55.0,
+        },
+        {
+          id: lineIdB,
+          purchaseInvoiceId: multiLineInvId,
+          tenantId,
+          itemId: ingredientId,
+          itemName: "Pechuga de Pollo Certificada",
+          itemNature: "INVENTORYABLE",
+          quantity: 10,
+          unit: "kg",
+          unitPrice: 5.0,
+          discountAmount: 2.0,
+          taxRate: 10,
+          taxAmount: 4.8,
+          allocatedOverhead: 0.0,
+          effectiveUnitCost: 4.8,
+          lineTotal: 52.8,
+        },
+      ],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    const multiMatched = await testRepo.createInvoice(validMultiPayload);
+    if (!multiMatched || multiMatched.items.length !== 2) {
+      throw new Error("Multi-line matching failed for identical similar lines!");
+    }
+    console.log("✓ Reintento con dos líneas similares del mismo ingrediente verificado con correspondencia 1 a 1.");
+
+    // Discrepant multi-line retry where line B tries to duplicate line A's terms must fail
+    let multiReuseRejected = false;
+    try {
+      await testRepo.createInvoice({
+        ...validMultiPayload,
+        items: [
+          validMultiPayload.items[0], // matches line A
+          {
+            ...validMultiPayload.items[1],
+            discountAmount: 99.0, // altered discount!
+          },
+        ],
+      });
+    } catch (err) {
+      if (err.message.includes("INVOICE_CONFLICT")) {
+        multiReuseRejected = true;
+      }
+    }
+
+    // Cleanup multi-line test
+    runSql(`DELETE FROM purchase_invoice_items WHERE purchase_invoice_id = '${multiLineInvId}'; DELETE FROM purchase_invoices WHERE id = '${multiLineInvId}';`);
+
+    if (!multiReuseRejected) {
+      throw new Error("Failed to reject multi-line conflict where lines could be improperly reused!");
+    }
+    console.log("✓ Verificado: la comparación rechaza la reutilización de líneas existentes y exige biyección 1 a 1 estricta.");
 
     // -------------------------------------------------------------------------
     // 7. Atomic Physical Reception via UI Modal

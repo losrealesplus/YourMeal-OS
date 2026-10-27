@@ -72,30 +72,80 @@ export class SupabaseProcurementCostRepository implements ProcurementCostReposit
         );
       }
 
-      // 3. Conflict check: verify lines match the retry payload
+      // 3. Conflict check: verify lines match 1-to-1 with the retry payload
+      const matchedExistingIndices = new Set<number>();
+
       for (let i = 0; i < invoice.items.length; i++) {
         const reqItem = invoice.items[i];
-        const existingItem = existing.items.find(
-          (ei) => (reqItem.id && ei.id === reqItem.id) || (ei.itemId === reqItem.itemId && Math.abs(ei.quantity - reqItem.quantity) < 0.0001)
-        );
+        const reqNature = reqItem.itemNature ?? "INVENTORYABLE";
+        const reqDiscount = reqItem.discountAmount ?? 0;
+        const reqTaxRate = reqItem.taxRate ?? 0;
+        const reqTaxAmount = reqItem.taxAmount ?? 0;
+        const reqLineTotal = reqItem.lineTotal ?? 0;
 
-        if (!existingItem) {
+        let matchIdx = -1;
+
+        // Preference A: Exact match by persistent line UUID (reqItem.id === existingItem.id)
+        if (reqItem.id && isValidUuid(reqItem.id)) {
+          const candidateIdx = existing.items.findIndex(
+            (ei, idx) => !matchedExistingIndices.has(idx) && ei.id === reqItem.id,
+          );
+          if (candidateIdx !== -1) {
+            matchIdx = candidateIdx;
+          }
+        }
+
+        // Preference B: If no ID or ID not matched yet, match by structural and financial identity
+        if (matchIdx === -1) {
+          matchIdx = existing.items.findIndex((ei, idx) => {
+            if (matchedExistingIndices.has(idx)) return false;
+            const natureMatch = ei.itemNature === reqNature;
+            const itemMatch = ei.itemId === reqItem.itemId;
+            const nameMatch = (ei.itemName || "").trim().toLowerCase() === (reqItem.itemName || "").trim().toLowerCase();
+            const unitMatch = (ei.unit || "").trim().toLowerCase() === (reqItem.unit || "").trim().toLowerCase();
+            const qtyMatch = Math.abs(ei.quantity - reqItem.quantity) < 0.0001;
+            const priceMatch = Math.abs(ei.unitPrice - reqItem.unitPrice) < 0.0001;
+            const discMatch = Math.abs((ei.discountAmount ?? 0) - reqDiscount) < 0.0001;
+            const taxRateMatch = Math.abs((ei.taxRate ?? 0) - reqTaxRate) < 0.0001;
+
+            return natureMatch && itemMatch && nameMatch && unitMatch && qtyMatch && priceMatch && discMatch && taxRateMatch;
+          });
+        }
+
+        if (matchIdx === -1) {
           throw new Error(
-            `INVOICE_CONFLICT: Existing invoice "${finalInvoiceId}" does not contain matching line for item "${reqItem.itemName}" (${reqItem.itemId}).`
+            `INVOICE_CONFLICT: Existing invoice "${finalInvoiceId}" does not contain a 1-to-1 matching line for item "${reqItem.itemName}" (${reqItem.itemId}).`,
           );
         }
 
+        const existingItem = existing.items[matchIdx];
+
+        // Comprehensive verification of all descriptor and financial fields
         const lineMatches =
-          existingItem.itemNature === (reqItem.itemNature ?? "INVENTORYABLE") &&
+          existingItem.itemNature === reqNature &&
+          existingItem.itemId === reqItem.itemId &&
+          (existingItem.itemName || "").trim().toLowerCase() === (reqItem.itemName || "").trim().toLowerCase() &&
+          (existingItem.unit || "").trim().toLowerCase() === (reqItem.unit || "").trim().toLowerCase() &&
           Math.abs(existingItem.quantity - reqItem.quantity) < 0.0001 &&
           Math.abs(existingItem.unitPrice - reqItem.unitPrice) < 0.0001 &&
-          Math.abs(existingItem.taxRate - (reqItem.taxRate ?? 0)) < 0.0001;
+          Math.abs((existingItem.discountAmount ?? 0) - reqDiscount) < 0.0001 &&
+          Math.abs((existingItem.taxRate ?? 0) - reqTaxRate) < 0.0001 &&
+          Math.abs((existingItem.taxAmount ?? 0) - reqTaxAmount) < 0.01 &&
+          Math.abs((existingItem.lineTotal ?? 0) - reqLineTotal) < 0.01;
 
         if (!lineMatches) {
           throw new Error(
-            `INVOICE_CONFLICT: Existing line for item "${reqItem.itemName}" does not match the retry payload.`
+            `INVOICE_CONFLICT: Existing line for item "${reqItem.itemName}" does not match the retry payload (fields or financials altered).`,
           );
         }
+
+        matchedExistingIndices.add(matchIdx);
+      }
+
+      if (matchedExistingIndices.size !== existing.items.length) {
+        throw new Error(
+          `INVOICE_CONFLICT: Existing invoice "${finalInvoiceId}" lines do not correspond 1-to-1 with the retry request.`,
+        );
       }
 
       // Safe idempotent return

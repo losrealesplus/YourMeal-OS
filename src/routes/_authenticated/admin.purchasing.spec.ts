@@ -23,6 +23,8 @@ describe("CR-COST-04 — Purchasing & Invoices Surface (admin.purchasing)", () =
     expect(src).toContain("allocationMethod");
     expect(src).toContain("+ Servicio");
     expect(src).toContain("draftInvoiceId");
+    expect(src).toContain("createInitialLineItem");
+    expect(src).toContain("lineId");
     expect(src).toContain("EXPENSE_SERVICE");
   });
 });
