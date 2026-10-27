@@ -4,7 +4,7 @@
  */
 
 import { SupabaseClient } from "@supabase/supabase-js";
-import { isValidUuid } from "../domain/purchase-invoice-calculator";
+import { isValidUuid, generateSecureUuid } from "../domain/purchase-invoice-calculator";
 import {
   CalculatedPurchaseInvoice,
   ItemCostHistoryEntry,
@@ -38,15 +38,116 @@ export class SupabaseProcurementCostRepository implements ProcurementCostReposit
   constructor(private readonly supabase: SupabaseClient) {}
 
   async createInvoice(invoice: CalculatedPurchaseInvoice): Promise<CalculatedPurchaseInvoice> {
-    const finalInvoiceId = isValidUuid(invoice.id)
-      ? invoice.id
-      : (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : invoice.id);
+    if (!isValidUuid(invoice.id)) {
+      throw new Error(`INVALID_UUID: invoice.id "${invoice.id}" is not a valid UUID.`);
+    }
+    const finalInvoiceId = invoice.id;
 
-    // Idempotent retry guard: if draft with same ID was already saved, return existing
+    // Idempotent retry guard: verify database state before returning or inserting
     const existing = await this.getInvoiceById(invoice.tenantId, finalInvoiceId);
     if (existing) {
+      // 1. Partial/incomplete check: if header exists but line items are incomplete/missing
+      if (!existing.items || existing.items.length === 0 || existing.items.length !== invoice.items.length) {
+        throw new Error(
+          `INVOICE_INTEGRITY_MISMATCH: Existing invoice "${finalInvoiceId}" in database is incomplete ` +
+          `(${existing.items ? existing.items.length : 0}/${invoice.items.length} lines persisted). ` +
+          `Refusing false success retry. Evidence preserved for reconciliation.`
+        );
+      }
+
+      // 2. Conflict check: verify header matches the retry payload
+      const headerMatches =
+        existing.tenantId === invoice.tenantId &&
+        existing.supplierId === invoice.supplierId &&
+        existing.invoiceNumber === invoice.invoiceNumber &&
+        existing.invoiceDate === invoice.invoiceDate &&
+        Math.abs(existing.subtotal - invoice.subtotal) < 0.01 &&
+        Math.abs(existing.totalAmount - invoice.totalAmount) < 0.01 &&
+        Math.abs(existing.taxAmount - invoice.taxAmount) < 0.01 &&
+        Math.abs(existing.additionalCosts - invoice.additionalCosts) < 0.01;
+
+      if (!headerMatches) {
+        throw new Error(
+          `INVOICE_CONFLICT: Existing invoice "${finalInvoiceId}" header fields do not match the retry payload.`
+        );
+      }
+
+      // 3. Conflict check: verify lines match the retry payload
+      for (let i = 0; i < invoice.items.length; i++) {
+        const reqItem = invoice.items[i];
+        const existingItem = existing.items.find(
+          (ei) => (reqItem.id && ei.id === reqItem.id) || (ei.itemId === reqItem.itemId && Math.abs(ei.quantity - reqItem.quantity) < 0.0001)
+        );
+
+        if (!existingItem) {
+          throw new Error(
+            `INVOICE_CONFLICT: Existing invoice "${finalInvoiceId}" does not contain matching line for item "${reqItem.itemName}" (${reqItem.itemId}).`
+          );
+        }
+
+        const lineMatches =
+          existingItem.itemNature === (reqItem.itemNature ?? "INVENTORYABLE") &&
+          Math.abs(existingItem.quantity - reqItem.quantity) < 0.0001 &&
+          Math.abs(existingItem.unitPrice - reqItem.unitPrice) < 0.0001 &&
+          Math.abs(existingItem.taxRate - (reqItem.taxRate ?? 0)) < 0.0001;
+
+        if (!lineMatches) {
+          throw new Error(
+            `INVOICE_CONFLICT: Existing line for item "${reqItem.itemName}" does not match the retry payload.`
+          );
+        }
+      }
+
+      // Safe idempotent return
       return existing;
     }
+
+    // Validate lines before attempting any write to prevent orphaned headers
+    const itemsToInsert = invoice.items.map((item) => {
+      if (item.id && !isValidUuid(item.id)) {
+        throw new Error(`INVALID_UUID: Line item.id "${item.id}" is not a valid UUID.`);
+      }
+      const lineId = item.id || generateSecureUuid();
+
+      const nature = item.itemNature ?? "INVENTORYABLE";
+      let itemId = item.itemId;
+
+      if (nature === "INVENTORYABLE") {
+        if (!itemId || !isValidUuid(itemId)) {
+          throw new Error(`INVALID_INGREDIENT_ID: Inventoryable line "${item.itemName}" requires a valid ingredient UUID.`);
+        }
+      } else {
+        // EXPENSE_SERVICE
+        if (itemId && !isValidUuid(itemId)) {
+          throw new Error(`INVALID_UUID: Expense service itemId "${itemId}" is not a valid UUID.`);
+        }
+        if (!itemId) {
+          itemId = generateSecureUuid();
+        }
+      }
+
+      return {
+        id: lineId,
+        tenant_id: invoice.tenantId,
+        purchase_invoice_id: finalInvoiceId,
+        item_id: itemId,
+        item_name: item.itemName,
+        item_nature: nature,
+        quantity: item.quantity,
+        received_quantity: item.receivedQuantity ?? 0,
+        unit: item.unit,
+        unit_price: item.unitPrice,
+        discount_amount: item.discountAmount ?? 0,
+        tax_rate: item.taxRate ?? 0,
+        tax_amount: item.taxAmount ?? 0,
+        weight_kg: item.weightKg,
+        volume_m3: item.volumeM3,
+        manual_overhead: item.manualOverhead,
+        allocated_overhead: item.allocatedOverhead,
+        effective_unit_cost: item.effectiveUnitCost,
+        line_total: item.lineTotal,
+      };
+    });
 
     const { data: invData, error: invError } = await this.supabase
       .from("purchase_invoices")
@@ -68,37 +169,6 @@ export class SupabaseProcurementCostRepository implements ProcurementCostReposit
       .single();
 
     if (invError) throw invError;
-
-    const itemsToInsert = invoice.items.map((item) => {
-      const lineId = isValidUuid(item.id)
-        ? item.id
-        : (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : undefined);
-      const itemId = isValidUuid(item.itemId)
-        ? item.itemId
-        : (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : undefined);
-
-      return {
-        id: lineId,
-        tenant_id: invoice.tenantId,
-        purchase_invoice_id: finalInvoiceId,
-        item_id: itemId,
-        item_name: item.itemName,
-        item_nature: item.itemNature ?? "INVENTORYABLE",
-        quantity: item.quantity,
-        received_quantity: item.receivedQuantity ?? 0,
-        unit: item.unit,
-        unit_price: item.unitPrice,
-        discount_amount: item.discountAmount,
-        tax_rate: item.taxRate,
-        tax_amount: item.taxAmount,
-        weight_kg: item.weightKg,
-        volume_m3: item.volumeM3,
-        manual_overhead: item.manualOverhead,
-        allocated_overhead: item.allocatedOverhead,
-        effective_unit_cost: item.effectiveUnitCost,
-        line_total: item.lineTotal,
-      };
-    });
 
     const { error: itemsError } = await this.supabase
       .from("purchase_invoice_items")

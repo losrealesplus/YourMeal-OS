@@ -251,24 +251,72 @@ export function AdminPurchasingPage() {
       return;
     }
 
+    if (!lineItems || lineItems.length === 0) {
+      toast.error("La factura debe tener al menos una línea.");
+      return;
+    }
+
+    // Explicit validation: Do not invent missing IDs or silently normalize invalid values
+    for (let i = 0; i < lineItems.length; i++) {
+      const line = lineItems[i];
+      const isService = line.itemNature === "EXPENSE_SERVICE";
+      if (!isService) {
+        if (!line.itemId || !isValidUuid(line.itemId)) {
+          toast.error(`La línea ${i + 1} (${line.itemName || "Ingrediente"}) requiere un ingrediente válido.`);
+          return;
+        }
+      } else {
+        if (!line.itemName || !line.itemName.trim()) {
+          toast.error(`La línea de servicio ${i + 1} requiere un concepto o descripción.`);
+          return;
+        }
+      }
+
+      const q = Number(line.quantity);
+      if (isNaN(q) || q <= 0) {
+        toast.error(`La línea ${i + 1} debe tener una cantidad mayor que cero.`);
+        return;
+      }
+
+      const p = Number(line.unitPrice);
+      if (isNaN(p) || p < 0) {
+        toast.error(`La línea ${i + 1} no puede tener un precio unitario negativo.`);
+        return;
+      }
+
+      const d = Number(line.discountAmount);
+      if (isNaN(d) || d < 0) {
+        toast.error(`La línea ${i + 1} no puede tener un descuento negativo.`);
+        return;
+      }
+
+      const parsedTax = Number(line.taxRate);
+      if (isNaN(parsedTax) || parsedTax < 0) {
+        toast.error(`La línea ${i + 1} no puede tener un IVA negativo.`);
+        return;
+      }
+    }
+
     const currentDraftId = draftInvoiceId || (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : undefined);
 
     const items = lineItems.map((l) => {
       const isService = l.itemNature === "EXPENSE_SERVICE";
-      const itemId = (l.itemId && isValidUuid(l.itemId))
-        ? l.itemId
-        : (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : "");
+      const parsedTax = Number(l.taxRate);
+      const taxRate = isNaN(parsedTax) ? (isService ? 21 : 10) : Math.max(0, parsedTax);
+      const itemId = isService
+        ? (l.itemId && isValidUuid(l.itemId) ? l.itemId : (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : ""))
+        : l.itemId;
       const itemName = l.itemName || (isService ? "Servicio / Gasto Operativo" : "Ingrediente de Compra");
       return {
         id: typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : undefined,
         itemId,
         itemName,
         itemNature: l.itemNature || "INVENTORYABLE",
-        quantity: Math.max(0.001, Number(l.quantity) || 1),
+        quantity: Number(l.quantity),
         unit: l.unit || (isService ? "ud" : "kg"),
-        unitPrice: Math.max(0, Number(l.unitPrice) || 0),
+        unitPrice: Number(l.unitPrice),
         discountAmount: Math.max(0, Number(l.discountAmount) || 0),
-        taxRate: Math.max(0, Number(l.taxRate) || (isService ? 21 : 10)),
+        taxRate,
       };
     });
 

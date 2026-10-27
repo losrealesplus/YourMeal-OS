@@ -142,9 +142,13 @@ describe("ProcurementCostService (CR-COST-01 Application Service)", () => {
     supabase: {} as any,
   };
 
+  const polloItemId = "33333333-3333-4333-8333-333333333333";
+  const invMakroId = "11111111-1111-4111-8111-111111111111";
+  const invTenantBId = "44444444-4444-4444-8444-444444444444";
+
   it("1. Creates a draft invoice and transitions to received, populating immutable cost history", async () => {
     const draft = await service.createDraftInvoice(ctxTenantA, {
-      id: "inv-makro-001",
+      id: invMakroId,
       tenantId: tenantA,
       supplierId: "SUPP-MAKRO",
       invoiceNumber: "MK-8899",
@@ -152,8 +156,8 @@ describe("ProcurementCostService (CR-COST-01 Application Service)", () => {
       additionalCosts: 20.0,
       items: [
         {
-          id: "item-p1",
-          itemId: "ING-POLLO",
+          id: "22222222-2222-4222-8222-222222222222",
+          itemId: polloItemId,
           itemName: "Pechuga de Pollo",
           quantity: 10,
           unit: "kg",
@@ -166,23 +170,23 @@ describe("ProcurementCostService (CR-COST-01 Application Service)", () => {
     expect(draft.items[0].effectiveUnitCost).toBe(7.0); // 5.0 base + 2.0 (20€ / 10kg)
 
     // Receive invoice
-    const received = await service.receiveInvoice(ctxTenantA, "inv-makro-001");
+    const received = await service.receiveInvoice(ctxTenantA, invMakroId);
     expect(received.status).toBe("received");
 
     // Verify immutable cost history entry created
-    const history = await service.getItemCostHistory(ctxTenantA, "ING-POLLO");
+    const history = await service.getItemCostHistory(ctxTenantA, polloItemId);
     expect(history.length).toBe(1);
     expect(history[0].effectiveUnitCost).toBe(7.0);
     expect(history[0].supplierId).toBe("SUPP-MAKRO");
 
-    const latestCost = await service.getLatestEffectiveCost(ctxTenantA, "ING-POLLO");
+    const latestCost = await service.getLatestEffectiveCost(ctxTenantA, polloItemId);
     expect(latestCost).toBe(7.0);
   });
 
   it("2. Adversarial Multi-Tenant Proof (Tenant A != Tenant B): Complete data and cost isolation", async () => {
     // Tenant B creates an invoice for the same item ID but different price
     await service.createDraftInvoice(ctxTenantB, {
-      id: "inv-tenantb-001",
+      id: invTenantBId,
       tenantId: tenantB,
       supplierId: "SUPP-OTHER",
       invoiceNumber: "TB-001",
@@ -190,8 +194,8 @@ describe("ProcurementCostService (CR-COST-01 Application Service)", () => {
       additionalCosts: 0,
       items: [
         {
-          id: "item-tb1",
-          itemId: "ING-POLLO",
+          id: "55555555-5555-4555-8555-555555555555",
+          itemId: polloItemId,
           itemName: "Pechuga de Pollo",
           quantity: 10,
           unit: "kg",
@@ -200,18 +204,18 @@ describe("ProcurementCostService (CR-COST-01 Application Service)", () => {
       ],
     });
 
-    await service.receiveInvoice(ctxTenantB, "inv-tenantb-001");
+    await service.receiveInvoice(ctxTenantB, invTenantBId);
 
     // Tenant A's cost remains 7.0€
-    const costA = await service.getLatestEffectiveCost(ctxTenantA, "ING-POLLO");
+    const costA = await service.getLatestEffectiveCost(ctxTenantA, polloItemId);
     expect(costA).toBe(7.0);
 
     // Tenant B's cost is 3.5€
-    const costB = await service.getLatestEffectiveCost(ctxTenantB, "ING-POLLO");
+    const costB = await service.getLatestEffectiveCost(ctxTenantB, polloItemId);
     expect(costB).toBe(3.5);
 
     // Tenant A cannot access Tenant B's invoice
-    await expect(service.receiveInvoice(ctxTenantA, "inv-tenantb-001")).rejects.toThrow();
+    await expect(service.receiveInvoice(ctxTenantA, invTenantBId)).rejects.toThrow();
   });
 
   it("3. Enforces RBAC permissions (Requires inventory.operate)", async () => {
@@ -229,7 +233,7 @@ describe("ProcurementCostService (CR-COST-01 Application Service)", () => {
         supplierId: "SUPP-MAKRO",
         invoiceNumber: "MK-002",
         invoiceDate: "2026-09-26",
-        items: [{ itemId: "ING-1", itemName: "Item 1", quantity: 1, unit: "kg", unitPrice: 1 }],
+        items: [{ itemId: polloItemId, itemName: "Item 1", quantity: 1, unit: "kg", unitPrice: 1 }],
       }),
     ).rejects.toThrow();
   });

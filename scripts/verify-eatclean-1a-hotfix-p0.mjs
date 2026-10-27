@@ -317,8 +317,10 @@ async function main() {
     await qtyInput2.fill("1");
     const priceInput2 = line2Locator.locator("input[placeholder='Precio €']");
     await priceInput2.fill("20.00");
+    const taxInput2 = line2Locator.locator("input[placeholder='IVA %']");
+    await taxInput2.fill("0");
 
-    console.log("  - Línea 2 configurada: Transporte Refrigerado Especial | 1 ud a 20.00 € (Servicio)");
+    console.log("  - Línea 2 configurada: Transporte Refrigerado Especial | 1 ud a 20.00 € (Servicio con IVA 0%)");
 
     await page.screenshot({ path: `${SCREENSHOT_DIR}/hotfix_02_invoice_form_with_service_line.png` });
     console.log("✓ Formulario completado con éxito (Screenshot: hotfix_02_invoice_form_with_service_line.png)");
@@ -355,7 +357,12 @@ async function main() {
             'item_name', pii.item_name,
             'item_nature', pii.item_nature,
             'quantity', pii.quantity,
+            'unit', pii.unit,
             'unit_price', pii.unit_price,
+            'discount_amount', pii.discount_amount,
+            'tax_rate', pii.tax_rate,
+            'tax_amount', pii.tax_amount,
+            'allocated_overhead', pii.allocated_overhead,
             'effective_unit_cost', pii.effective_unit_cost,
             'line_total', pii.line_total
           ))
@@ -387,6 +394,15 @@ async function main() {
     console.log(`  - Línea Stock: ${stockItem.item_name} (ID: ${stockItem.id}, ItemID: ${stockItem.item_id}, Nature: ${stockItem.item_nature})`);
     console.log(`  - Línea Servicio: ${serviceItem.item_name} (ID: ${serviceItem.id}, ItemID: ${serviceItem.item_id}, Nature: ${serviceItem.item_nature})`);
 
+    // Verify 0% VAT preservation
+    if (Number(serviceItem.tax_rate) !== 0) {
+      throw new Error(`Expected service line tax_rate to be 0%, got ${serviceItem.tax_rate}%`);
+    }
+    if (Number(serviceItem.tax_amount) !== 0) {
+      throw new Error(`Expected service line tax_amount to be 0.00€, got ${serviceItem.tax_amount}€`);
+    }
+    console.log("✓ IVA del 0% preservado en línea de servicio en PostgreSQL (sin conversión a 10% ni 21%)");
+
     // Verify UUID format (no temp-inv-id, no item-1)
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!uuidRegex.test(dbInvoice.id)) throw new Error(`Invoice ID is not a valid UUID: ${dbInvoice.id}`);
@@ -396,12 +412,13 @@ async function main() {
     console.log("✓ Todos los IDs son UUIDs estándar válidos (Cero residuos de temp-inv-id o item-*)");
 
     // -------------------------------------------------------------------------
-    // 6. Test Idempotency / Retry Guard on Repository
+    // 6. Test Idempotency, Integrity & Retry Guard on Repository
     // -------------------------------------------------------------------------
-    console.log("\n--- 6. Comprobación de Idempotencia / Reintentos de Borrador ---");
+    console.log("\n--- 6. Comprobación de Integridad y Reintentos en Repositorio ---");
     const { SupabaseProcurementCostRepository } = await import("../src/modules/cost-intelligence/infrastructure/procurement-cost-repository.ts");
     const testRepo = new SupabaseProcurementCostRepository(adminClient);
-    const retryResult = await testRepo.createInvoice({
+
+    const completeCalculatedPayload = {
       id: dbInvoice.id,
       tenantId,
       supplierId,
@@ -413,12 +430,77 @@ async function main() {
       totalAmount: Number(dbInvoice.total_amount),
       allocationMethod: "value",
       status: "draft",
-      items: [],
+      items: dbInvoice.items.map((i) => ({
+        id: i.id,
+        purchaseInvoiceId: dbInvoice.id,
+        tenantId,
+        itemId: i.item_id,
+        itemName: i.item_name,
+        itemNature: i.item_nature,
+        quantity: Number(i.quantity),
+        unit: i.unit,
+        unitPrice: Number(i.unit_price),
+        discountAmount: Number(i.discount_amount),
+        taxRate: Number(i.tax_rate),
+        taxAmount: Number(i.tax_amount),
+        allocatedOverhead: Number(i.allocated_overhead),
+        effectiveUnitCost: Number(i.effective_unit_cost),
+        lineTotal: Number(i.line_total),
+      })),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-    });
+    };
 
-    console.log(`✓ Reintento idempotente exitoso: factura devuelta sin duplicar registros (ID: ${retryResult.id})`);
+    // 6.1 Identical complete retry: returns existing without duplicates
+    const retryResult = await testRepo.createInvoice(completeCalculatedPayload);
+    console.log(`✓ Reintento idéntico exitoso: factura devuelta sin duplicar registros (ID: ${retryResult.id})`);
+
+    // 6.2 Retry with altered content: must reject with INVOICE_CONFLICT
+    let conflictRejected = false;
+    try {
+      await testRepo.createInvoice({
+        ...completeCalculatedPayload,
+        invoiceNumber: "ALTERED-NUMBER-999",
+      });
+    } catch (err) {
+      if (err.message.includes("INVOICE_CONFLICT")) {
+        conflictRejected = true;
+      }
+    }
+    if (!conflictRejected) {
+      throw new Error("Failed to reject conflicting retry payload with INVOICE_CONFLICT!");
+    }
+    console.log("✓ Reintento con contenido alterado rechazado correctamente con INVOICE_CONFLICT.");
+
+    // 6.3 Simulated partial/incomplete write: create a partial header with 0 lines, retry must refuse false success
+    const partialInvId = "bbbbbbbb-4444-4444-bbbb-bbbbbbbbbbbb";
+    runSql(`
+      INSERT INTO purchase_invoices (id, tenant_id, supplier_id, invoice_number, invoice_date, subtotal, tax_amount, additional_costs, total_amount, allocation_method, status)
+      VALUES ('${partialInvId}', '${tenantId}', '${supplierId}', 'PARTIAL-TEST-001', '2026-10-27', 50, 0, 0, 50, 'value', 'draft');
+    `);
+    let partialRejected = false;
+    try {
+      await testRepo.createInvoice({
+        ...completeCalculatedPayload,
+        id: partialInvId,
+        invoiceNumber: "PARTIAL-TEST-001",
+        subtotal: 50,
+        taxAmount: 0,
+        additionalCosts: 0,
+        totalAmount: 50,
+      });
+    } catch (err) {
+      if (err.message.includes("INVOICE_INTEGRITY_MISMATCH")) {
+        partialRejected = true;
+      }
+    }
+    // Cleanup the partial header
+    runSql(`DELETE FROM purchase_invoices WHERE id = '${partialInvId}';`);
+
+    if (!partialRejected) {
+      throw new Error("Failed to reject incomplete invoice retry with INVOICE_INTEGRITY_MISMATCH!");
+    }
+    console.log("✓ Simulación de fallo en inserción de líneas: reintento rechazado con INVOICE_INTEGRITY_MISMATCH (nunca devuelve falso éxito).");
 
     // -------------------------------------------------------------------------
     // 7. Atomic Physical Reception via UI Modal
