@@ -12,6 +12,12 @@ import type {
   InventoryConsumption,
   ProductionPlanInput,
 } from "../domain/inventory-consumption";
+import type {
+  InventoryStockItem,
+  StockMovementRecord,
+  StockMovementFilter,
+  PaginatedStockMovements,
+} from "../domain/inventory-types";
 
 export type InventoryRepository = {
   findBySource: (
@@ -49,6 +55,11 @@ export type InventoryRepository = {
     consumptionId: string;
     actorId?: string;
   }) => Promise<InventoryConsumption>;
+  listInventoryStock: (tenantId: string) => Promise<InventoryStockItem[]>;
+  listStockMovements: (
+    tenantId: string,
+    filter?: StockMovementFilter,
+  ) => Promise<PaginatedStockMovements>;
 };
 
 // ============================================================================
@@ -59,6 +70,8 @@ const byId = new Map<string, InventoryConsumption>();
 const productionInputs = new Map<string, ProductionPlanInput>();
 /** tenantId::ingredientId → stock */
 const stock = new Map<string, number>();
+const inMemoryIngredients = new Map<string, InventoryStockItem>();
+const inMemoryMovements: StockMovementRecord[] = [];
 
 function sourceKey(tenantId: string, deliveryDate: string): string {
   return `${tenantId}::${deliveryDate}`;
@@ -95,12 +108,33 @@ export function __seedStock(
   stock.set(stockKey(tenantId, ingredientId), qty);
 }
 
+/**
+ * Test / driver helper: seed ingredient for stock listing.
+ * @internal
+ */
+export function __seedIngredient(
+  tenantId: string,
+  item: InventoryStockItem,
+): void {
+  inMemoryIngredients.set(`${tenantId}::${item.id}`, { ...item, tenantId });
+}
+
+/**
+ * Test / driver helper: seed stock movement record.
+ * @internal
+ */
+export function __seedStockMovement(movement: StockMovementRecord): void {
+  inMemoryMovements.push(movement);
+}
+
 /** @internal vitest */
 export function __resetInventoryStoreForTests(): void {
   store.clear();
   byId.clear();
   productionInputs.clear();
   stock.clear();
+  inMemoryIngredients.clear();
+  inMemoryMovements.length = 0;
 }
 
 function isSupabaseClient(client: unknown): boolean {
@@ -376,6 +410,165 @@ function createPostgresInventoryRepository(client: any): InventoryRepository {
       }
       return updated;
     },
+
+    async listInventoryStock(tenantId: string): Promise<InventoryStockItem[]> {
+      const CHUNK_SIZE = 1000;
+      let from = 0;
+      let allRows: any[] = [];
+      let totalCount: number | null = null;
+
+      while (true) {
+        const { data, error, count } = await client
+          .from("ingredients")
+          .select("id, tenant_id, name, unit, cost, stock, min_stock, waste_percentage, supplier_id", { count: "exact" })
+          .eq("tenant_id", tenantId)
+          .is("deleted_at", null)
+          .order("id", { ascending: true })
+          .range(from, from + CHUNK_SIZE - 1);
+
+        if (error) {
+          throw new Error(`Error al recuperar catálogo de existencias: ${error.message}`);
+        }
+
+        if (totalCount === null && typeof count === "number") {
+          totalCount = count;
+        }
+
+        const chunk = data || [];
+        allRows.push(...chunk);
+
+        if (chunk.length < CHUNK_SIZE || (totalCount !== null && allRows.length >= totalCount)) {
+          break;
+        }
+        from += CHUNK_SIZE;
+      }
+
+      if (totalCount !== null && allRows.length !== totalCount) {
+        throw new Error(
+          `Inconsistencia en catálogo de inventario: se esperaban ${totalCount} registros y se obtuvieron ${allRows.length}.`,
+        );
+      }
+
+      // Sort alphabetically by name
+      allRows.sort((a, b) =>
+        (a.name || "").localeCompare(b.name || "", "es", { sensitivity: "base" }),
+      );
+
+      return allRows.map((row: any) => {
+        const stock = Number(row.stock || 0);
+        const cost = Number(row.cost || 0);
+        return {
+          id: row.id,
+          tenantId: row.tenant_id,
+          name: row.name,
+          unit: row.unit || "kg",
+          stock,
+          cost,
+          minStock: Number(row.min_stock || 0),
+          wastePercentage: Number(row.waste_percentage || 0),
+          supplierId: row.supplier_id,
+          totalValue: Math.round(stock * cost * 100) / 100,
+          status: stock > 0 ? "available" : "out_of_stock",
+        };
+      });
+    },
+
+    async listStockMovements(
+      tenantId: string,
+      filter?: StockMovementFilter,
+    ): Promise<PaginatedStockMovements> {
+      const page = Math.max(1, Math.floor(Number(filter?.page) || 1));
+      const pageSize = Math.max(1, Math.min(100, Math.floor(Number(filter?.pageSize) || 50)));
+      const offset = (page - 1) * pageSize;
+
+      let query = client
+        .from("stock_movements")
+        .select(`
+          id,
+          tenant_id,
+          ingredient_id,
+          movement_type,
+          quantity,
+          previous_stock,
+          new_stock,
+          unit_cost,
+          reference_document_type,
+          reference_document_id,
+          receipt_id,
+          notes,
+          created_at,
+          ingredient:ingredients(id, name, unit)
+        `, { count: "exact" })
+        .eq("tenant_id", tenantId);
+
+      if (filter?.ingredientId && filter.ingredientId !== "all") {
+        query = query.eq("ingredient_id", filter.ingredientId);
+      }
+      if (filter?.movementType && filter.movementType !== "all") {
+        query = query.eq("movement_type", filter.movementType);
+      }
+      if (filter?.dateFrom) {
+        const fromIso = filter.dateFrom.includes("T")
+          ? filter.dateFrom
+          : `${filter.dateFrom}T00:00:00.000Z`;
+        query = query.gte("created_at", fromIso);
+      }
+      if (filter?.dateTo) {
+        const toIso = filter.dateTo.includes("T")
+          ? filter.dateTo
+          : `${filter.dateTo}T23:59:59.999Z`;
+        query = query.lte("created_at", toIso);
+      }
+
+      // Order stably: created_at DESC, id DESC to prevent inter-page duplication
+      query = query
+        .order("created_at", { ascending: false })
+        .order("id", { ascending: false })
+        .range(offset, offset + pageSize - 1);
+
+      const { data, error, count } = await query;
+      if (error) throw new Error(error.message);
+
+      const totalCount = count ?? (data?.length || 0);
+      const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+      const hasMore = page < totalPages;
+
+      const items: StockMovementRecord[] = (data || []).map((row: any) => {
+        const ing = Array.isArray(row.ingredient) ? row.ingredient[0] : row.ingredient;
+        const qty = Number(row.quantity || 0);
+        const prev = Number(row.previous_stock || 0);
+        const next = Number(row.new_stock || 0);
+        const isEntry = row.movement_type === "PURCHASE_RECEIPT" || next > prev;
+
+        return {
+          id: row.id,
+          tenantId: row.tenant_id,
+          ingredientId: row.ingredient_id,
+          ingredientName: ing?.name || "Ingrediente Desconocido",
+          ingredientUnit: ing?.unit || "kg",
+          movementType: row.movement_type,
+          direction: isEntry ? "IN" : "OUT",
+          quantity: qty,
+          previousStock: prev,
+          newStock: next,
+          unitCost: Number(row.unit_cost || 0),
+          referenceDocumentType: row.reference_document_type,
+          referenceDocumentId: row.reference_document_id,
+          receiptId: row.receipt_id,
+          notes: row.notes,
+          createdAt: row.created_at,
+        };
+      });
+
+      return {
+        items,
+        totalCount,
+        page,
+        pageSize,
+        totalPages,
+        hasMore,
+      };
+    },
   };
 }
 
@@ -502,6 +695,55 @@ export function createInventoryRepository(
         store.set(sourceKey(tenantId, current.deliveryDate), sealed);
         byId.set(sealed.id, sealed);
         return sealed;
+      },
+
+      async listInventoryStock(tenantId) {
+        return Array.from(inMemoryIngredients.values())
+          .filter((item) => item.tenantId === tenantId)
+          .sort((a, b) =>
+            (a.name || "").localeCompare(b.name || "", "es", { sensitivity: "base" }),
+          );
+      },
+
+      async listStockMovements(tenantId, filter) {
+        const page = Math.max(1, Math.floor(Number(filter?.page) || 1));
+        const pageSize = Math.max(1, Math.min(100, Math.floor(Number(filter?.pageSize) || 50)));
+        const offset = (page - 1) * pageSize;
+
+        const filtered = inMemoryMovements
+          .filter((m) => {
+            if (m.tenantId !== tenantId) return false;
+            if (filter?.ingredientId && filter.ingredientId !== "all" && m.ingredientId !== filter.ingredientId) return false;
+            if (filter?.movementType && filter.movementType !== "all" && m.movementType !== filter.movementType) return false;
+            if (filter?.dateFrom) {
+              const fromIso = filter.dateFrom.includes("T") ? filter.dateFrom : `${filter.dateFrom}T00:00:00.000Z`;
+              if (m.createdAt < fromIso) return false;
+            }
+            if (filter?.dateTo) {
+              const toIso = filter.dateTo.includes("T") ? filter.dateTo : `${filter.dateTo}T23:59:59.999Z`;
+              if (m.createdAt > toIso) return false;
+            }
+            return true;
+          })
+          .sort((a, b) => {
+            const timeDiff = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            if (timeDiff !== 0) return timeDiff;
+            return b.id.localeCompare(a.id);
+          });
+
+        const totalCount = filtered.length;
+        const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+        const hasMore = page < totalPages;
+        const items = filtered.slice(offset, offset + pageSize);
+
+        return {
+          items,
+          totalCount,
+          page,
+          pageSize,
+          totalPages,
+          hasMore,
+        };
       },
     };
   }
