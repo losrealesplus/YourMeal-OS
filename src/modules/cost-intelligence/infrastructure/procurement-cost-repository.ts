@@ -4,6 +4,7 @@
  */
 
 import { SupabaseClient } from "@supabase/supabase-js";
+import { isValidUuid, generateSecureUuid } from "../domain/purchase-invoice-calculator";
 import {
   CalculatedPurchaseInvoice,
   ItemCostHistoryEntry,
@@ -37,10 +38,171 @@ export class SupabaseProcurementCostRepository implements ProcurementCostReposit
   constructor(private readonly supabase: SupabaseClient) {}
 
   async createInvoice(invoice: CalculatedPurchaseInvoice): Promise<CalculatedPurchaseInvoice> {
+    if (!isValidUuid(invoice.id)) {
+      throw new Error(`INVALID_UUID: invoice.id "${invoice.id}" is not a valid UUID.`);
+    }
+    const finalInvoiceId = invoice.id;
+
+    // Idempotent retry guard: verify database state before returning or inserting
+    const existing = await this.getInvoiceById(invoice.tenantId, finalInvoiceId);
+    if (existing) {
+      // 1. Partial/incomplete check: if header exists but line items are incomplete/missing
+      if (!existing.items || existing.items.length === 0 || existing.items.length !== invoice.items.length) {
+        throw new Error(
+          `INVOICE_INTEGRITY_MISMATCH: Existing invoice "${finalInvoiceId}" in database is incomplete ` +
+          `(${existing.items ? existing.items.length : 0}/${invoice.items.length} lines persisted). ` +
+          `Refusing false success retry. Evidence preserved for reconciliation.`
+        );
+      }
+
+      // 2. Conflict check: verify header matches the retry payload
+      const headerMatches =
+        existing.tenantId === invoice.tenantId &&
+        existing.supplierId === invoice.supplierId &&
+        existing.invoiceNumber === invoice.invoiceNumber &&
+        existing.invoiceDate === invoice.invoiceDate &&
+        Math.abs(existing.subtotal - invoice.subtotal) < 0.01 &&
+        Math.abs(existing.totalAmount - invoice.totalAmount) < 0.01 &&
+        Math.abs(existing.taxAmount - invoice.taxAmount) < 0.01 &&
+        Math.abs(existing.additionalCosts - invoice.additionalCosts) < 0.01;
+
+      if (!headerMatches) {
+        throw new Error(
+          `INVOICE_CONFLICT: Existing invoice "${finalInvoiceId}" header fields do not match the retry payload.`
+        );
+      }
+
+      // 3. Conflict check: verify lines match 1-to-1 with the retry payload
+      const matchedExistingIndices = new Set<number>();
+
+      for (let i = 0; i < invoice.items.length; i++) {
+        const reqItem = invoice.items[i];
+        const reqNature = reqItem.itemNature ?? "INVENTORYABLE";
+        const reqDiscount = reqItem.discountAmount ?? 0;
+        const reqTaxRate = reqItem.taxRate ?? 0;
+        const reqTaxAmount = reqItem.taxAmount ?? 0;
+        const reqLineTotal = reqItem.lineTotal ?? 0;
+
+        let matchIdx = -1;
+
+        // Preference A: Exact match by persistent line UUID (reqItem.id === existingItem.id)
+        if (reqItem.id && isValidUuid(reqItem.id)) {
+          const candidateIdx = existing.items.findIndex(
+            (ei, idx) => !matchedExistingIndices.has(idx) && ei.id === reqItem.id,
+          );
+          if (candidateIdx !== -1) {
+            matchIdx = candidateIdx;
+          }
+        }
+
+        // Preference B: If no ID or ID not matched yet, match by structural and financial identity
+        if (matchIdx === -1) {
+          matchIdx = existing.items.findIndex((ei, idx) => {
+            if (matchedExistingIndices.has(idx)) return false;
+            const natureMatch = ei.itemNature === reqNature;
+            const itemMatch = ei.itemId === reqItem.itemId;
+            const nameMatch = (ei.itemName || "").trim().toLowerCase() === (reqItem.itemName || "").trim().toLowerCase();
+            const unitMatch = (ei.unit || "").trim().toLowerCase() === (reqItem.unit || "").trim().toLowerCase();
+            const qtyMatch = Math.abs(ei.quantity - reqItem.quantity) < 0.0001;
+            const priceMatch = Math.abs(ei.unitPrice - reqItem.unitPrice) < 0.0001;
+            const discMatch = Math.abs((ei.discountAmount ?? 0) - reqDiscount) < 0.0001;
+            const taxRateMatch = Math.abs((ei.taxRate ?? 0) - reqTaxRate) < 0.0001;
+
+            return natureMatch && itemMatch && nameMatch && unitMatch && qtyMatch && priceMatch && discMatch && taxRateMatch;
+          });
+        }
+
+        if (matchIdx === -1) {
+          throw new Error(
+            `INVOICE_CONFLICT: Existing invoice "${finalInvoiceId}" does not contain a 1-to-1 matching line for item "${reqItem.itemName}" (${reqItem.itemId}).`,
+          );
+        }
+
+        const existingItem = existing.items[matchIdx];
+
+        // Comprehensive verification of all descriptor and financial fields
+        const lineMatches =
+          existingItem.itemNature === reqNature &&
+          existingItem.itemId === reqItem.itemId &&
+          (existingItem.itemName || "").trim().toLowerCase() === (reqItem.itemName || "").trim().toLowerCase() &&
+          (existingItem.unit || "").trim().toLowerCase() === (reqItem.unit || "").trim().toLowerCase() &&
+          Math.abs(existingItem.quantity - reqItem.quantity) < 0.0001 &&
+          Math.abs(existingItem.unitPrice - reqItem.unitPrice) < 0.0001 &&
+          Math.abs((existingItem.discountAmount ?? 0) - reqDiscount) < 0.0001 &&
+          Math.abs((existingItem.taxRate ?? 0) - reqTaxRate) < 0.0001 &&
+          Math.abs((existingItem.taxAmount ?? 0) - reqTaxAmount) < 0.01 &&
+          Math.abs((existingItem.lineTotal ?? 0) - reqLineTotal) < 0.01;
+
+        if (!lineMatches) {
+          throw new Error(
+            `INVOICE_CONFLICT: Existing line for item "${reqItem.itemName}" does not match the retry payload (fields or financials altered).`,
+          );
+        }
+
+        matchedExistingIndices.add(matchIdx);
+      }
+
+      if (matchedExistingIndices.size !== existing.items.length) {
+        throw new Error(
+          `INVOICE_CONFLICT: Existing invoice "${finalInvoiceId}" lines do not correspond 1-to-1 with the retry request.`,
+        );
+      }
+
+      // Safe idempotent return
+      return existing;
+    }
+
+    // Validate lines before attempting any write to prevent orphaned headers
+    const itemsToInsert = invoice.items.map((item) => {
+      if (item.id && !isValidUuid(item.id)) {
+        throw new Error(`INVALID_UUID: Line item.id "${item.id}" is not a valid UUID.`);
+      }
+      const lineId = item.id || generateSecureUuid();
+
+      const nature = item.itemNature ?? "INVENTORYABLE";
+      let itemId = item.itemId;
+
+      if (nature === "INVENTORYABLE") {
+        if (!itemId || !isValidUuid(itemId)) {
+          throw new Error(`INVALID_INGREDIENT_ID: Inventoryable line "${item.itemName}" requires a valid ingredient UUID.`);
+        }
+      } else {
+        // EXPENSE_SERVICE
+        if (itemId && !isValidUuid(itemId)) {
+          throw new Error(`INVALID_UUID: Expense service itemId "${itemId}" is not a valid UUID.`);
+        }
+        if (!itemId) {
+          itemId = generateSecureUuid();
+        }
+      }
+
+      return {
+        id: lineId,
+        tenant_id: invoice.tenantId,
+        purchase_invoice_id: finalInvoiceId,
+        item_id: itemId,
+        item_name: item.itemName,
+        item_nature: nature,
+        quantity: item.quantity,
+        received_quantity: item.receivedQuantity ?? 0,
+        unit: item.unit,
+        unit_price: item.unitPrice,
+        discount_amount: item.discountAmount ?? 0,
+        tax_rate: item.taxRate ?? 0,
+        tax_amount: item.taxAmount ?? 0,
+        weight_kg: item.weightKg,
+        volume_m3: item.volumeM3,
+        manual_overhead: item.manualOverhead,
+        allocated_overhead: item.allocatedOverhead,
+        effective_unit_cost: item.effectiveUnitCost,
+        line_total: item.lineTotal,
+      };
+    });
+
     const { data: invData, error: invError } = await this.supabase
       .from("purchase_invoices")
       .insert({
-        id: invoice.id,
+        id: finalInvoiceId,
         tenant_id: invoice.tenantId,
         supplier_id: invoice.supplierId,
         invoice_number: invoice.invoiceNumber,
@@ -58,35 +220,23 @@ export class SupabaseProcurementCostRepository implements ProcurementCostReposit
 
     if (invError) throw invError;
 
-    const itemsToInsert = invoice.items.map((item) => ({
-      id: item.id,
-      tenant_id: invoice.tenantId,
-      purchase_invoice_id: invoice.id,
-      item_id: item.itemId,
-      item_name: item.itemName,
-      item_nature: item.itemNature ?? "INVENTORYABLE",
-      quantity: item.quantity,
-      received_quantity: item.receivedQuantity ?? 0,
-      unit: item.unit,
-      unit_price: item.unitPrice,
-      discount_amount: item.discountAmount,
-      tax_rate: item.taxRate,
-      tax_amount: item.taxAmount,
-      weight_kg: item.weightKg,
-      volume_m3: item.volumeM3,
-      manual_overhead: item.manualOverhead,
-      allocated_overhead: item.allocatedOverhead,
-      effective_unit_cost: item.effectiveUnitCost,
-      line_total: item.lineTotal,
-    }));
-
     const { error: itemsError } = await this.supabase
       .from("purchase_invoice_items")
       .insert(itemsToInsert);
 
     if (itemsError) throw itemsError;
 
-    return invoice;
+    return {
+      ...invoice,
+      id: finalInvoiceId,
+      items: invoice.items.map((item, idx) => ({
+        ...item,
+        id: itemsToInsert[idx].id ?? item.id,
+        purchaseInvoiceId: finalInvoiceId,
+        itemId: itemsToInsert[idx].item_id ?? item.itemId,
+        itemNature: itemsToInsert[idx].item_nature as ItemNature,
+      })),
+    };
   }
 
   async getInvoiceById(tenantId: string, invoiceId: string): Promise<CalculatedPurchaseInvoice | null> {

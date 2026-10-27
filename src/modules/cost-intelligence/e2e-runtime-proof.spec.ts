@@ -281,7 +281,7 @@ describe("E2 → E9 End-to-End Economic Circuit & 9 Invariants Certification", (
       invoiceDate: "2026-09-26",
       items: [
         {
-          itemId: "item-1",
+          itemId: "11111111-1111-4111-8111-111111111111",
           itemName: "Premium Beef",
           quantity: 15.75,
           unit: "kg",
@@ -290,7 +290,7 @@ describe("E2 → E9 End-to-End Economic Circuit & 9 Invariants Certification", (
           taxRate: 10,
         },
         {
-          itemId: "item-2",
+          itemId: "22222222-2222-4222-8222-222222222222",
           itemName: "Organic Olive Oil",
           quantity: 8.25,
           unit: "L",

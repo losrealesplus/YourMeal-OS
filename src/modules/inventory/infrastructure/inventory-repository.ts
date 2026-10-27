@@ -104,14 +104,11 @@ export function __resetInventoryStoreForTests(): void {
 }
 
 function isSupabaseClient(client: unknown): boolean {
-  return (
-    typeof client === "object" &&
-    client !== null &&
-    "from" in client &&
-    typeof (client as Record<string, unknown>).from === "function" &&
-    "rpc" in client &&
-    typeof (client as Record<string, unknown>).rpc === "function"
-  );
+  if (typeof client !== "object" || client === null) return false;
+  const c = client as Record<string, unknown>;
+  const hasFrom = "from" in c || typeof c.from === "function";
+  const hasRpc = "rpc" in c || typeof c.rpc === "function";
+  return hasFrom && hasRpc && typeof c.from === "function" && typeof c.rpc === "function";
 }
 
 function createPostgresInventoryRepository(client: any): InventoryRepository {
@@ -390,112 +387,126 @@ export function createInventoryRepository(
     return createPostgresInventoryRepository(supabase);
   }
 
-  return {
-    async findBySource(tenantId, deliveryDate) {
-      return store.get(sourceKey(tenantId, deliveryDate)) ?? null;
-    },
+  // Pure unit-test double: permitted ONLY when supabase is null/undefined or an empty test double {}
+  const isUnitTestDouble =
+    supabase === null ||
+    supabase === undefined ||
+    (typeof supabase === "object" &&
+      Object.keys(supabase as object).length === 0 &&
+      !("from" in (supabase as object)));
 
-    async findById(tenantId, consumptionId) {
-      const row = byId.get(consumptionId) ?? null;
-      if (!row || row.tenantId !== tenantId) return null;
-      return row;
-    },
+  if (isUnitTestDouble) {
+    return {
+      async findBySource(tenantId, deliveryDate) {
+        return store.get(sourceKey(tenantId, deliveryDate)) ?? null;
+      },
 
-    async loadProductionPlanInput(tenantId, deliveryDate) {
-      return productionInputs.get(sourceKey(tenantId, deliveryDate)) ?? null;
-    },
+      async findById(tenantId, consumptionId) {
+        const row = byId.get(consumptionId) ?? null;
+        if (!row || row.tenantId !== tenantId) return null;
+        return row;
+      },
 
-    async createPlanned({ tenantId, deliveryDate, lines }) {
-      const previous = store.get(sourceKey(tenantId, deliveryDate));
-      if (previous) {
-        const canonical = (rows: ConsumptionLine[]) => JSON.stringify(rows
-          .map(({ ingredientId, qty, unit }) => ({ ingredientId, qty, unit }))
-          .sort((a, b) => a.ingredientId.localeCompare(b.ingredientId) || a.unit.localeCompare(b.unit)));
-        if (canonical(previous.lines) !== canonical(lines)) {
-          throw new Error("Existing consumption plan differs from canonical production");
+      async loadProductionPlanInput(tenantId, deliveryDate) {
+        return productionInputs.get(sourceKey(tenantId, deliveryDate)) ?? null;
+      },
+
+      async createPlanned({ tenantId, deliveryDate, lines }) {
+        const previous = store.get(sourceKey(tenantId, deliveryDate));
+        if (previous) {
+          const canonical = (rows: ConsumptionLine[]) => JSON.stringify(rows
+            .map(({ ingredientId, qty, unit }) => ({ ingredientId, qty, unit }))
+            .sort((a, b) => a.ingredientId.localeCompare(b.ingredientId) || a.unit.localeCompare(b.unit)));
+          if (canonical(previous.lines) !== canonical(lines)) {
+            throw new Error("Existing consumption plan differs from canonical production");
+          }
+          return previous;
         }
-        return previous;
-      }
-      const record: InventoryConsumption = {
-        id: newId(),
-        tenantId,
-        deliveryDate,
-        status: "planned",
-        lines: lines.map((l) => ({ ...l })),
-        createdAt: new Date().toISOString(),
-      };
-      store.set(sourceKey(tenantId, deliveryDate), record);
-      byId.set(record.id, record);
-      return record;
-    },
+        const record: InventoryConsumption = {
+          id: newId(),
+          tenantId,
+          deliveryDate,
+          status: "planned",
+          lines: lines.map((l) => ({ ...l })),
+          createdAt: new Date().toISOString(),
+        };
+        store.set(sourceKey(tenantId, deliveryDate), record);
+        byId.set(record.id, record);
+        return record;
+      },
 
-    async getStock(tenantId, ingredientId) {
-      return stock.get(stockKey(tenantId, ingredientId)) ?? 0;
-    },
+      async getStock(tenantId, ingredientId) {
+        return stock.get(stockKey(tenantId, ingredientId)) ?? 0;
+      },
 
-    async applyConsumption({ tenantId, consumptionId }) {
-      const current = byId.get(consumptionId);
-      if (!current || current.tenantId !== tenantId) {
-        throw new Error(`Consumption ${consumptionId} not found`);
-      }
-      if (current.status !== "planned") {
-        throw new Error(
-          `applyConsumption requires status=planned (got ${current.status})`,
-        );
-      }
-
-      // FLOW04-I3 · validate all lines before any mutation
-      for (const line of current.lines) {
-        const available = stock.get(stockKey(tenantId, line.ingredientId)) ?? 0;
-        if (available - line.qty < 0) {
-          const err = new Error("insufficient_stock");
-          (err as Error & { code: string }).code = "insufficient_stock";
-          (err as Error & { details: Record<string, unknown> }).details = {
-            ingredientId: line.ingredientId,
-            available,
-            required: line.qty,
-          };
-          throw err;
+      async applyConsumption({ tenantId, consumptionId }) {
+        const current = byId.get(consumptionId);
+        if (!current || current.tenantId !== tenantId) {
+          throw new Error(`Consumption ${consumptionId} not found`);
         }
-      }
+        if (current.status !== "planned") {
+          throw new Error(
+            `applyConsumption requires status=planned (got ${current.status})`,
+          );
+        }
 
-      for (const line of current.lines) {
-        const key = stockKey(tenantId, line.ingredientId);
-        const available = stock.get(key) ?? 0;
-        stock.set(key, available - line.qty);
-      }
+        // FLOW04-I3 · validate all lines before any mutation
+        for (const line of current.lines) {
+          const available = stock.get(stockKey(tenantId, line.ingredientId)) ?? 0;
+          if (available - line.qty < 0) {
+            const err = new Error("insufficient_stock");
+            (err as Error & { code: string }).code = "insufficient_stock";
+            (err as Error & { details: Record<string, unknown> }).details = {
+              ingredientId: line.ingredientId,
+              available,
+              required: line.qty,
+            };
+            throw err;
+          }
+        }
 
-      const applied: InventoryConsumption = {
-        ...current,
-        status: "applied",
-        lines: current.lines.map((l) => ({ ...l })),
-      };
-      store.set(sourceKey(tenantId, current.deliveryDate), applied);
-      byId.set(applied.id, applied);
-      return applied;
-    },
+        for (const line of current.lines) {
+          const key = stockKey(tenantId, line.ingredientId);
+          const available = stock.get(key) ?? 0;
+          stock.set(key, available - line.qty);
+        }
 
-    async sealConsumption({ tenantId, consumptionId }) {
-      const current = byId.get(consumptionId);
-      if (!current || current.tenantId !== tenantId) {
-        throw new Error(`Consumption ${consumptionId} not found`);
-      }
-      if (current.status === "sealed") {
-        return current;
-      }
-      if (current.status !== "applied") {
-        throw new Error(
-          `sealConsumption requires status=applied (got ${current.status})`,
-        );
-      }
-      const sealed: InventoryConsumption = {
-        ...current,
-        status: "sealed",
-        lines: current.lines.map((l) => ({ ...l })),
-      };
-      store.set(sourceKey(tenantId, current.deliveryDate), sealed);
-      byId.set(sealed.id, sealed);
-      return sealed;
-    },
-  };
+        const applied: InventoryConsumption = {
+          ...current,
+          status: "applied",
+          lines: current.lines.map((l) => ({ ...l })),
+        };
+        store.set(sourceKey(tenantId, current.deliveryDate), applied);
+        byId.set(applied.id, applied);
+        return applied;
+      },
+
+      async sealConsumption({ tenantId, consumptionId }) {
+        const current = byId.get(consumptionId);
+        if (!current || current.tenantId !== tenantId) {
+          throw new Error(`Consumption ${consumptionId} not found`);
+        }
+        if (current.status === "sealed") {
+          return current;
+        }
+        if (current.status !== "applied") {
+          throw new Error(
+            `sealConsumption requires status=applied (got ${current.status})`,
+          );
+        }
+        const sealed: InventoryConsumption = {
+          ...current,
+          status: "sealed",
+          lines: current.lines.map((l) => ({ ...l })),
+        };
+        store.set(sourceKey(tenantId, current.deliveryDate), sealed);
+        byId.set(sealed.id, sealed);
+        return sealed;
+      },
+    };
+  }
+
+  throw new Error(
+    "Invalid Supabase client provided to createInventoryRepository: expected valid Supabase client with from() and rpc(). Fallback to in-memory store is forbidden in non-test contexts.",
+  );
 }
