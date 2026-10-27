@@ -42,6 +42,12 @@ function assertInventory(ctx: ServiceContext): void {
   }
 }
 
+function assertCanReadConsumption(ctx: ServiceContext): void {
+  if (!ctx.capabilities.has("inventory.operate") && !ctx.capabilities.has("kitchen.operate")) {
+    throw permissionDenied("inventory.operate");
+  }
+}
+
 export const InventoryService = {
   /**
    * T1 · Plan consumption from production day.
@@ -439,7 +445,7 @@ export const InventoryService = {
     deliveryDate: string,
   ): Promise<InventoryConsumption | null> {
     assertTenant(ctx);
-    assertInventory(ctx);
+    assertCanReadConsumption(ctx);
     const date = deliveryDate?.trim();
     if (!date) return null;
 

@@ -19,9 +19,14 @@ import { chromium } from "playwright";
 import { execFileSync, execSync } from "node:child_process";
 import fs from "node:fs";
 import crypto from "node:crypto";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const REPO_ROOT = path.resolve(__dirname, "..");
 const SCREENSHOT_DIR =
-  "/Users/alex/.gemini/antigravity/brain/a4aaca4a-b90c-4155-af68-d75937ee0731/screenshots";
+  process.env.SCREENSHOT_DIR || path.join(REPO_ROOT, "artifacts", "screenshots", "kitchen-flow04");
 fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
 
 const DB_HOST = "127.0.0.1";
@@ -530,13 +535,19 @@ async function run() {
 
     runSql(`
       INSERT INTO public.tenant_members (user_id, tenant_id, status, membership_type)
-      VALUES ('${kitchenOnlyUser.id}', '${tenantIdA}', 'approved', 'employee');
+      VALUES 
+        ('${kitchenOnlyUser.id}', '${tenantIdA}', 'approved', 'employee'),
+        ('${kitchenOnlyUser.id}', '${tenantIdB}', 'approved', 'employee');
 
       INSERT INTO public.user_roles (user_id, tenant_id, role)
-      VALUES ('${kitchenOnlyUser.id}', '${tenantIdA}', 'kitchen');
+      VALUES 
+        ('${kitchenOnlyUser.id}', '${tenantIdA}', 'kitchen'),
+        ('${kitchenOnlyUser.id}', '${tenantIdB}', 'kitchen');
     `);
     tracker.registerTenantMember(kitchenOnlyUser.id, tenantIdA);
     tracker.registerUserRole(kitchenOnlyUser.id, tenantIdA, "kitchen");
+    tracker.registerTenantMember(kitchenOnlyUser.id, tenantIdB);
+    tracker.registerUserRole(kitchenOnlyUser.id, tenantIdB, "kitchen");
 
     // 5. Seed Dish, Ingredients, and Production Orders for deliveryDate
     const deliveryDate = "2026-11-15";
@@ -1321,6 +1332,16 @@ async function run() {
     }
     console.log("✓ Aviso de permisos (solo lectura) mostrado a usuario sin 'inventory.operate'.");
 
+    // Verify consumption lines table is visible and shows the plan to the kitchen user
+    await page.waitForSelector('[data-testid="consumption-lines-table"]', { timeout: 10000 });
+    const kitchenTableText = await page.innerText('[data-testid="consumption-lines-table"]');
+    if (!kitchenTableText.includes("Pechuga Pollo Certificada Flow04")) {
+      throw new Error("El usuario de cocina no puede ver el plan de consumo existente");
+    }
+    console.log(
+      "✓ Consulta para usuarios de cocina verificada: el plan existente se visualiza sin botones de mutación.",
+    );
+
     // Verify action buttons are not accessible
     const unauthorizedApply = await page.$('[data-testid="apply-consumption-button"]');
     const unauthorizedSeal = await page.$('[data-testid="seal-consumption-button"]');
@@ -1348,10 +1369,8 @@ async function run() {
       { tIdB: tenantIdB },
     );
 
-    await page.goto(`http://127.0.0.1:5173/admin/kitchen-execution?date=${deliveryDate}`, {
-      waitUntil: "networkidle",
-    });
-    await page.waitForTimeout(1000);
+    // Give SPA reactive state time to re-query under Tenant B
+    await page.waitForTimeout(1500);
     const tenantBText = await page.innerText('[data-testid="kitchen-consumption-section"]');
     if (
       tenantBText.includes("Plato Fit Pollo y Arroz FLOW04") ||
