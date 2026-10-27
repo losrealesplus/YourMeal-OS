@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { assertCapabilityFromContext } from "@/permissions/route-guards";
-import { useCallback, useEffect, useState, useRef, useMemo } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -152,7 +152,8 @@ function KitchenExecutionPage() {
   const [consumption, setConsumption] = useState<InventoryConsumption | null>(null);
   const [consumptionLoading, setConsumptionLoading] = useState(true);
   const [consumptionActionBusy, setConsumptionActionBusy] = useState(false);
-  const [stockMap, setStockMap] = useState<Map<string, number>>(new Map());
+  const [stockMap, setStockMap] = useState<Map<string, number> | null>(null);
+  const [stockError, setStockError] = useState<string | null>(null);
   const [consumptionError, setConsumptionError] = useState<string | null>(null);
   const [confirmApplyOpen, setConfirmApplyOpen] = useState(false);
   const [confirmSealOpen, setConfirmSealOpen] = useState(false);
@@ -170,7 +171,8 @@ function KitchenExecutionPage() {
     activeTenantRef.current = tenantId;
     activeDateRef.current = date;
     setConsumption(null);
-    setStockMap(new Map());
+    setStockMap(null);
+    setStockError(null);
     setConsumptionError(null);
   }, [tenantId, user?.id, date]);
 
@@ -215,13 +217,29 @@ function KitchenExecutionPage() {
       });
 
       let cons: InventoryConsumption | null = null;
-      let stockList: InventoryStockItem[] = [];
+      let stockList: InventoryStockItem[] | null = null;
+      let stockFetchError: string | null = null;
 
       if (ctx.capabilities.has("inventory.operate")) {
-        [cons, stockList] = await Promise.all([
+        const [consRes, stockRes] = await Promise.allSettled([
           InventoryService.getConsumptionByDate(ctx, curDate),
-          InventoryService.getInventoryStock(ctx).catch(() => []),
+          InventoryService.getInventoryStock(ctx),
         ]);
+
+        if (consRes.status === "fulfilled") {
+          cons = consRes.value;
+        } else {
+          throw consRes.reason;
+        }
+
+        if (stockRes.status === "fulfilled") {
+          stockList = stockRes.value;
+        } else {
+          stockFetchError =
+            stockRes.reason instanceof Error
+              ? stockRes.reason.message
+              : "Error al consultar existencias en almacén";
+        }
       }
 
       if (
@@ -233,12 +251,21 @@ function KitchenExecutionPage() {
         return;
       }
 
-      const map = new Map<string, number>();
-      for (const item of stockList) {
-        map.set(item.id, item.stock);
+      if (stockList !== null) {
+        const map = new Map<string, number>();
+        for (const item of stockList) {
+          map.set(item.id, item.stock);
+        }
+        setStockMap(map);
+        setStockError(null);
+      } else if (stockFetchError) {
+        setStockMap(null);
+        setStockError(stockFetchError);
+      } else {
+        setStockMap(new Map());
+        setStockError(null);
       }
 
-      setStockMap(map);
       setConsumption(cons);
       setConsumptionError(null);
     } catch (e) {
@@ -251,9 +278,7 @@ function KitchenExecutionPage() {
         return;
       }
       setConsumption(null);
-      setConsumptionError(
-        e instanceof Error ? e.message : "Error al cargar consumo de inventario",
-      );
+      setConsumptionError(e instanceof Error ? e.message : "Error al cargar consumo de inventario");
     } finally {
       if (
         tenantGenRef.current === curGen &&
@@ -291,23 +316,14 @@ function KitchenExecutionPage() {
       toast.success("Plan de consumo generado correctamente (FLOW-04 · T1)");
       await loadConsumption();
     } catch (e) {
-      toast.error(
-        e instanceof Error ? e.message : "Error al planificar el consumo",
-      );
+      toast.error(e instanceof Error ? e.message : "Error al planificar el consumo");
     } finally {
       setConsumptionActionBusy(false);
     }
   }
 
   async function handleApply() {
-    if (
-      !user ||
-      !tenantId ||
-      !consumption ||
-      consumptionActionBusy ||
-      !canOperateInventory
-    )
-      return;
+    if (!user || !tenantId || !consumption || consumptionActionBusy || !canOperateInventory) return;
     setConsumptionActionBusy(true);
     setConfirmApplyOpen(false);
     try {
@@ -335,14 +351,7 @@ function KitchenExecutionPage() {
   }
 
   async function handleSeal() {
-    if (
-      !user ||
-      !tenantId ||
-      !consumption ||
-      consumptionActionBusy ||
-      !canOperateInventory
-    )
-      return;
+    if (!user || !tenantId || !consumption || consumptionActionBusy || !canOperateInventory) return;
     setConsumptionActionBusy(true);
     setConfirmSealOpen(false);
     try {
@@ -409,14 +418,11 @@ function KitchenExecutionPage() {
   }
 
   const lines = consumption?.lines ?? [];
-  const totalPlannedQty = useMemo(
-    () => lines.reduce((acc, l) => acc + (l.qty || 0), 0),
-    [lines],
-  );
-  const insufficientLines = useMemo(() => {
-    if (!consumption || consumption.status !== "planned") return [];
-    return lines.filter((l) => (stockMap.get(l.ingredientId) ?? 0) < l.qty);
-  }, [consumption, lines, stockMap]);
+  const totalPlannedQty = lines.reduce((acc, l) => acc + (l.qty || 0), 0);
+  const insufficientLines =
+    consumption && consumption.status === "planned" && stockMap !== null
+      ? lines.filter((l) => (stockMap.get(l.ingredientId) ?? 0) < l.qty)
+      : [];
   const hasInsufficientStock = insufficientLines.length > 0;
 
   return (
@@ -449,10 +455,7 @@ function KitchenExecutionPage() {
             disabled={loading || consumptionLoading}
           >
             <RefreshCw
-              className={cn(
-                "mr-2 h-4 w-4",
-                (loading || consumptionLoading) && "animate-spin",
-              )}
+              className={cn("mr-2 h-4 w-4", (loading || consumptionLoading) && "animate-spin")}
             />
             Actualizar
           </Button>
@@ -495,7 +498,8 @@ function KitchenExecutionPage() {
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground">
-              Planificación (T1), aplicación en almacén (T2) y sellado definitivo (T3) para el día {date}.
+              Planificación (T1), aplicación en almacén (T2) y sellado definitivo (T3) para el día{" "}
+              {date}.
             </p>
           </div>
 
@@ -559,31 +563,59 @@ function KitchenExecutionPage() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
               <div className="rounded-lg border border-border bg-muted/20 p-3">
                 <p className="text-xs text-muted-foreground">Líneas previstas</p>
-                <p className="text-lg font-bold tabular-nums text-foreground" data-testid="kpi-lines-count">
+                <p
+                  className="text-lg font-bold tabular-nums text-foreground"
+                  data-testid="kpi-lines-count"
+                >
                   {lines.length}
                 </p>
               </div>
               <div className="rounded-lg border border-border bg-muted/20 p-3">
                 <p className="text-xs text-muted-foreground">Cantidad total</p>
-                <p className="text-lg font-bold tabular-nums text-foreground" data-testid="kpi-total-qty">
+                <p
+                  className="text-lg font-bold tabular-nums text-foreground"
+                  data-testid="kpi-total-qty"
+                >
                   {formatQty(totalPlannedQty)}
                 </p>
               </div>
               <div className="rounded-lg border border-border bg-muted/20 p-3">
                 <p className="text-xs text-muted-foreground">Estado del flujo</p>
-                <p className="text-sm font-semibold capitalize text-foreground" data-testid="kpi-consumption-status">
+                <p
+                  className="text-sm font-semibold capitalize text-foreground"
+                  data-testid="kpi-consumption-status"
+                >
                   {consumption.status}
                 </p>
               </div>
               <div className="rounded-lg border border-border bg-muted/20 p-3">
                 <p className="text-xs text-muted-foreground">Disponibilidad</p>
                 {consumption.status === "planned" ? (
-                  hasInsufficientStock ? (
+                  stockMap === null ? (
+                    <div className="flex items-center justify-between gap-1 mt-1">
+                      <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                        <AlertTriangle className="h-3.5 w-3.5" /> Stock no disponible
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-5 px-1 text-[10px] text-muted-foreground hover:text-foreground"
+                        onClick={() => void loadConsumption()}
+                        disabled={consumptionLoading}
+                        title="Reintentar comprobación de existencias"
+                      >
+                        <RefreshCw
+                          className={cn("h-3 w-3", consumptionLoading && "animate-spin")}
+                        />
+                      </Button>
+                    </div>
+                  ) : hasInsufficientStock ? (
                     <span className="text-xs font-semibold text-destructive flex items-center gap-1 mt-1">
-                      <AlertTriangle className="h-3.5 w-3.5" /> Faltan {insufficientLines.length} ing.
+                      <AlertTriangle className="h-3.5 w-3.5" /> Faltan {insufficientLines.length}{" "}
+                      ing.
                     </span>
                   ) : (
-                    <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1 mt-1">
+                    <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 mt-1">
                       <CheckCircle2 className="h-3.5 w-3.5" /> Stock suficiente
                     </span>
                   )
@@ -595,6 +627,32 @@ function KitchenExecutionPage() {
               </div>
             </div>
 
+            {/* Warning if stock fetch failed (Fail Closed) */}
+            {stockError ? (
+              <div
+                data-testid="stock-fetch-error-alert"
+                className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-900 dark:text-amber-200"
+              >
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                  <span>
+                    No se pudieron comprobar las existencias en almacén ({stockError}). La
+                    validación definitiva se ejecutará en PostgreSQL al intentar aplicar.
+                  </span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs border-amber-500/40 hover:bg-amber-500/20"
+                  onClick={() => void loadConsumption()}
+                  disabled={consumptionLoading}
+                >
+                  <RefreshCw className={cn("mr-1 h-3 w-3", consumptionLoading && "animate-spin")} />
+                  Reintentar existencias
+                </Button>
+              </div>
+            ) : null}
+
             {/* Warning if insufficient stock */}
             {hasInsufficientStock ? (
               <div
@@ -603,8 +661,9 @@ function KitchenExecutionPage() {
               >
                 <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
                 <span>
-                  Atención: Se han detectado ingredientes con existencias inferiores a la cantidad necesaria.
-                  La base de datos rechazará la aplicación de consumo si el stock fuese a quedar en negativo.
+                  Atención: Se han detectado ingredientes con existencias inferiores a la cantidad
+                  necesaria. La base de datos rechazará la aplicación de consumo si el stock fuese a
+                  quedar en negativo.
                 </span>
               </div>
             ) : null}
@@ -622,43 +681,65 @@ function KitchenExecutionPage() {
                 </TableHeader>
                 <TableBody>
                   {lines.map((line) => {
-                    const available = stockMap.get(line.ingredientId) ?? 0;
+                    const stockKnown = stockMap !== null;
+                    const available = stockMap?.get(line.ingredientId) ?? 0;
                     const isDeficit =
-                      consumption.status === "planned" && available < line.qty;
+                      consumption.status === "planned" && stockKnown && available < line.qty;
 
                     return (
-                      <TableRow key={line.ingredientId} data-testid={`consumption-line-${line.ingredientId}`}>
-                        <TableCell className="font-medium text-foreground">
-                          {line.name}
-                        </TableCell>
+                      <TableRow
+                        key={line.ingredientId}
+                        data-testid={`consumption-line-${line.ingredientId}`}
+                      >
+                        <TableCell className="font-medium text-foreground">{line.name}</TableCell>
                         <TableCell className="text-right font-mono tabular-nums text-foreground">
                           {formatQty(line.qty)} {line.unit}
                         </TableCell>
                         <TableCell
                           className={cn(
                             "text-right font-mono tabular-nums",
-                            isDeficit ? "text-destructive font-semibold" : "text-muted-foreground",
+                            !stockKnown
+                              ? "text-amber-600 dark:text-amber-400 italic text-xs"
+                              : isDeficit
+                                ? "text-destructive font-semibold"
+                                : "text-muted-foreground",
                           )}
                         >
-                          {formatQty(available)} {line.unit}
+                          {stockKnown ? `${formatQty(available)} ${line.unit}` : "Desconocido"}
                         </TableCell>
                         <TableCell className="text-right">
                           {consumption.status === "planned" ? (
-                            isDeficit ? (
+                            !stockKnown ? (
+                              <Badge
+                                variant="outline"
+                                className="border-amber-500/40 text-amber-700 bg-amber-500/10 text-xs"
+                              >
+                                Sin verificar
+                              </Badge>
+                            ) : isDeficit ? (
                               <Badge variant="destructive" className="text-xs">
                                 Faltan {formatQty(line.qty - available)} {line.unit}
                               </Badge>
                             ) : (
-                              <Badge variant="outline" className="border-emerald-500/40 text-emerald-700 bg-emerald-500/10 text-xs">
+                              <Badge
+                                variant="outline"
+                                className="border-emerald-500/40 text-emerald-700 bg-emerald-500/10 text-xs"
+                              >
                                 En almacén
                               </Badge>
                             )
                           ) : consumption.status === "applied" ? (
-                            <Badge variant="outline" className="border-sky-500/40 text-sky-700 bg-sky-500/10 text-xs">
+                            <Badge
+                              variant="outline"
+                              className="border-sky-500/40 text-sky-700 bg-sky-500/10 text-xs"
+                            >
                               Descontado
                             </Badge>
                           ) : (
-                            <Badge variant="outline" className="border-emerald-500/40 text-emerald-700 bg-emerald-500/10 text-xs">
+                            <Badge
+                              variant="outline"
+                              className="border-emerald-500/40 text-emerald-700 bg-emerald-500/10 text-xs"
+                            >
                               Sellado
                             </Badge>
                           )}
@@ -676,8 +757,8 @@ function KitchenExecutionPage() {
                 {consumption.status === "planned"
                   ? "Consumo planificado. Al aplicar (T2), se registrarán salidas en kárdex descontando existencias."
                   : consumption.status === "applied"
-                  ? "Consumo aplicado. Al sellar (T3), el lote quedará cerrado de forma definitiva."
-                  : "Consumo sellado de forma definitiva."}
+                    ? "Consumo aplicado. Al sellar (T3), el lote quedará cerrado de forma definitiva."
+                    : "Consumo sellado de forma definitiva."}
               </p>
 
               <div className="flex items-center gap-2">
@@ -730,16 +811,16 @@ function KitchenExecutionPage() {
             </AlertDialogTitle>
             <AlertDialogDescription className="space-y-3 pt-2">
               <span>
-                Esta acción (T2) descontará formalmente las cantidades planificadas del stock del almacén
-                registrando movimientos de salida de inventario para la fecha{" "}
+                Esta acción (T2) descontará formalmente las cantidades planificadas del stock del
+                almacén registrando movimientos de salida de inventario para la fecha{" "}
                 <strong className="text-foreground">{date}</strong>.
               </span>
               {hasInsufficientStock && (
                 <span className="block flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-2 text-xs text-destructive">
                   <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
                   <span>
-                    Aviso: Se ha detectado stock insuficiente para algunos ingredientes. La base de datos
-                    rechazará la operación si algún stock resultante fuese negativo.
+                    Aviso: Se ha detectado stock insuficiente para algunos ingredientes. La base de
+                    datos rechazará la operación si algún stock resultante fuese negativo.
                   </span>
                 </span>
               )}
@@ -777,7 +858,8 @@ function KitchenExecutionPage() {
             <AlertDialogDescription className="pt-2">
               Esta acción (T3) marca el consumo de la fecha{" "}
               <strong className="text-foreground">{date}</strong> como sellado y definitivo (estado
-              terminal). No alterará el stock del almacén ni se podrán realizar más cambios sobre este plan.
+              terminal). No alterará el stock del almacén ni se podrán realizar más cambios sobre
+              este plan.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

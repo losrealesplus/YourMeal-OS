@@ -35,10 +35,7 @@ describe("FLOW-04 UI V1 · Session Recovery & Safe Pipeline Persistence", () => 
   });
 
   it("getConsumptionByDate returns null when no plan exists", async () => {
-    const consumption = await InventoryService.getConsumptionByDate(
-      ctx(),
-      "2026-10-27",
-    );
+    const consumption = await InventoryService.getConsumptionByDate(ctx(), "2026-10-27");
     expect(consumption).toBeNull();
     expect(isFlow04PipelineActive()).toBe(false);
   });
@@ -71,21 +68,16 @@ describe("FLOW-04 UI V1 · Session Recovery & Safe Pipeline Persistence", () => 
     expect(isFlow04PipelineActive()).toBe(false);
 
     // Step 2: Page reloads, calls getConsumptionByDate
-    const recovered = await InventoryService.getConsumptionByDate(
-      ctx(),
-      "2026-10-27",
-    );
+    const recovered = await InventoryService.getConsumptionByDate(ctx(), "2026-10-27");
     expect(recovered).not.toBeNull();
     expect(recovered?.id).toBe(planned.id);
     expect(isFlow04PipelineActive()).toBe(true);
     expect(getObservedFlow04Steps()).toContain("FLOW04_T1_COMPLETED");
 
     // Step 3: User applies consumption (T2)
-    const applied = await InventoryService.applyConsumption(
-      ctx(),
-      planned.id,
-      { sessionRecovery: true },
-    );
+    const applied = await InventoryService.applyConsumption(ctx(), planned.id, {
+      sessionRecovery: true,
+    });
     expect(applied.status).toBe("applied");
 
     // Verify stock decremented
@@ -123,18 +115,13 @@ describe("FLOW-04 UI V1 · Session Recovery & Safe Pipeline Persistence", () => 
     expect(isFlow04PipelineActive()).toBe(false);
 
     // Page reloads, recovers state
-    const recovered = await InventoryService.getConsumptionByDate(
-      ctx(),
-      "2026-10-27",
-    );
+    const recovered = await InventoryService.getConsumptionByDate(ctx(), "2026-10-27");
     expect(recovered?.status).toBe("applied");
 
     // User seals consumption (T3)
-    const sealed = await InventoryService.sealConsumption(
-      ctx(),
-      planned.id,
-      { sessionRecovery: true },
-    );
+    const sealed = await InventoryService.sealConsumption(ctx(), planned.id, {
+      sessionRecovery: true,
+    });
     expect(sealed.status).toBe("sealed");
     expect(getObservedFlow04Steps()).toContain("FLOW04_T3_COMPLETED");
   });
@@ -164,11 +151,89 @@ describe("FLOW-04 UI V1 · Session Recovery & Safe Pipeline Persistence", () => 
     __resetFlow04EvidenceForTests();
 
     // Call apply with sessionRecovery: true directly (e.g. without getConsumptionByDate)
-    const applied = await InventoryService.applyConsumption(
-      ctx(),
-      planned.id,
-      { sessionRecovery: true },
-    );
+    const applied = await InventoryService.applyConsumption(ctx(), planned.id, {
+      sessionRecovery: true,
+    });
     expect(applied.status).toBe("applied");
+  });
+
+  it("enforces context binding: tenant A pipeline does not leak into tenant B", async () => {
+    vi.spyOn(console, "info").mockImplementation(() => {});
+    __seedProductionPlanInput("tenant-eatclean", {
+      deliveryDate: "2026-10-27",
+      dishes: [{ dishId: "dish-1", portions: 2 }],
+      recipes: [
+        {
+          dishId: "dish-1",
+          ingredientId: "ing-1",
+          ingredientName: "Pollo",
+          qty: 0.5,
+          unit: "kg",
+        },
+      ],
+    });
+    __seedStock("tenant-eatclean", "ing-1", 10);
+
+    const plannedA = await InventoryService.planConsumptionFromProduction(ctx(), {
+      deliveryDate: "2026-10-27",
+    });
+    expect(plannedA.status).toBe("planned");
+
+    // Foreign context (Tenant B)
+    const ctxB = ctx({ tenantId: "tenant-foreign-b" });
+    __seedProductionPlanInput("tenant-foreign-b", {
+      deliveryDate: "2026-10-27",
+      dishes: [{ dishId: "dish-b", portions: 1 }],
+      recipes: [
+        {
+          dishId: "dish-b",
+          ingredientId: "ing-b",
+          ingredientName: "Arroz",
+          qty: 1,
+          unit: "kg",
+        },
+      ],
+    });
+    __seedStock("tenant-foreign-b", "ing-b", 5);
+
+    // Switching to Tenant B where no consumption is planned for that date resets/clears active pipeline
+    const noConsB = await InventoryService.getConsumptionByDate(ctxB, "2026-10-27");
+    expect(noConsB).toBeNull();
+    expect(isFlow04PipelineActive({ tenantId: "tenant-foreign-b" })).toBe(false);
+
+    // Tenant B planning creates its own isolated pipeline bound to tenant B
+    const plannedB = await InventoryService.planConsumptionFromProduction(ctxB, {
+      deliveryDate: "2026-10-27",
+    });
+    expect(plannedB.status).toBe("planned");
+    expect(isFlow04PipelineActive({ tenantId: "tenant-foreign-b" })).toBe(true);
+    expect(isFlow04PipelineActive({ tenantId: "tenant-eatclean" })).toBe(false);
+  });
+
+  it("enforces date context binding: switching date isolates evidence", async () => {
+    vi.spyOn(console, "info").mockImplementation(() => {});
+    __seedProductionPlanInput("tenant-eatclean", {
+      deliveryDate: "2026-10-27",
+      dishes: [{ dishId: "dish-1", portions: 2 }],
+      recipes: [
+        {
+          dishId: "dish-1",
+          ingredientId: "ing-1",
+          ingredientName: "Pollo",
+          qty: 0.5,
+          unit: "kg",
+        },
+      ],
+    });
+    __seedStock("tenant-eatclean", "ing-1", 10);
+
+    await InventoryService.planConsumptionFromProduction(ctx(), {
+      deliveryDate: "2026-10-27",
+    });
+
+    // Query another date with no plan
+    const otherDate = await InventoryService.getConsumptionByDate(ctx(), "2026-10-28");
+    expect(otherDate).toBeNull();
+    expect(isFlow04PipelineActive({ deliveryDate: "2026-10-28" })).toBe(false);
   });
 });

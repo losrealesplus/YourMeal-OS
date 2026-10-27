@@ -20,7 +20,8 @@ import { execFileSync, execSync } from "node:child_process";
 import fs from "node:fs";
 import crypto from "node:crypto";
 
-const SCREENSHOT_DIR = "/Users/alex/.gemini/antigravity/brain/a4aaca4a-b90c-4155-af68-d75937ee0731/screenshots";
+const SCREENSHOT_DIR =
+  "/Users/alex/.gemini/antigravity/brain/a4aaca4a-b90c-4155-af68-d75937ee0731/screenshots";
 fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
 
 const DB_HOST = "127.0.0.1";
@@ -76,16 +77,46 @@ class FixtureTracker {
     };
   }
 
-  registerIngredient(id) { this.#validateUuid(id); this.registry.ingredientIds.add(id); }
-  registerMovement(id) { this.#validateUuid(id); this.registry.stockMovementIds.add(id); }
-  registerOrder(id) { this.#validateUuid(id); this.registry.orderIds.add(id); }
-  registerOrderItem(id) { this.#validateUuid(id); this.registry.orderItemIds.add(id); }
-  registerWeeklyMenu(id) { this.#validateUuid(id); this.registry.weeklyMenuIds.add(id); }
-  registerWeeklyMenuSlot(id) { this.#validateUuid(id); this.registry.slotIds.add(id); }
-  registerDish(id) { this.#validateUuid(id); this.registry.dishIds.add(id); }
-  registerCustomer(id) { this.#validateUuid(id); this.registry.customerIds.add(id); }
-  registerConsumption(id) { this.#validateUuid(id); this.registry.consumptionIds.add(id); }
-  registerConsumptionLine(id) { this.#validateUuid(id); this.registry.consumptionLineIds.add(id); }
+  registerIngredient(id) {
+    this.#validateUuid(id);
+    this.registry.ingredientIds.add(id);
+  }
+  registerMovement(id) {
+    this.#validateUuid(id);
+    this.registry.stockMovementIds.add(id);
+  }
+  registerOrder(id) {
+    this.#validateUuid(id);
+    this.registry.orderIds.add(id);
+  }
+  registerOrderItem(id) {
+    this.#validateUuid(id);
+    this.registry.orderItemIds.add(id);
+  }
+  registerWeeklyMenu(id) {
+    this.#validateUuid(id);
+    this.registry.weeklyMenuIds.add(id);
+  }
+  registerWeeklyMenuSlot(id) {
+    this.#validateUuid(id);
+    this.registry.slotIds.add(id);
+  }
+  registerDish(id) {
+    this.#validateUuid(id);
+    this.registry.dishIds.add(id);
+  }
+  registerCustomer(id) {
+    this.#validateUuid(id);
+    this.registry.customerIds.add(id);
+  }
+  registerConsumption(id) {
+    this.#validateUuid(id);
+    this.registry.consumptionIds.add(id);
+  }
+  registerConsumptionLine(id) {
+    this.#validateUuid(id);
+    this.registry.consumptionLineIds.add(id);
+  }
   registerTenantMember(userId, tenantId) {
     this.#validateUuid(userId);
     this.#validateUuid(tenantId);
@@ -96,8 +127,14 @@ class FixtureTracker {
     this.#validateUuid(tenantId);
     this.registry.userRoles.push({ userId, tenantId, role });
   }
-  registerTenant(id) { this.#validateUuid(id); this.registry.tenantIds.add(id); }
-  registerAuthUser(userId) { this.#validateUuid(userId); this.registry.authUsers.add(userId); }
+  registerTenant(id) {
+    this.#validateUuid(id);
+    this.registry.tenantIds.add(id);
+  }
+  registerAuthUser(userId) {
+    this.#validateUuid(userId);
+    this.registry.authUsers.add(userId);
+  }
 
   #validateUuid(id) {
     if (
@@ -110,7 +147,9 @@ class FixtureTracker {
   }
 
   async cleanup() {
-    console.log("  [FixtureTracker] Ejecutando purga quirúrgica estrictamente por IDs rastreados...");
+    console.log(
+      "  [FixtureTracker] Ejecutando purga quirúrgica estrictamente por IDs rastreados...",
+    );
 
     const toPgArray = (setOrArray) => {
       const arr = Array.isArray(setOrArray) ? setOrArray : Array.from(setOrArray);
@@ -139,22 +178,30 @@ class FixtureTracker {
     }
 
     if (this.registry.orderItemIds.size > 0) {
-      this.sqlRunner(`DELETE FROM public.order_items WHERE id = ANY(${toPgArray(this.registry.orderItemIds)});`);
+      this.sqlRunner(
+        `DELETE FROM public.order_items WHERE id = ANY(${toPgArray(this.registry.orderItemIds)});`,
+      );
       this.registry.orderItemIds.clear();
     }
 
     if (this.registry.orderIds.size > 0) {
-      this.sqlRunner(`DELETE FROM public.orders WHERE id = ANY(${toPgArray(this.registry.orderIds)});`);
+      this.sqlRunner(
+        `DELETE FROM public.orders WHERE id = ANY(${toPgArray(this.registry.orderIds)});`,
+      );
       this.registry.orderIds.clear();
     }
 
     if (this.registry.slotIds.size > 0) {
-      this.sqlRunner(`DELETE FROM public.weekly_menu_slots WHERE id = ANY(${toPgArray(this.registry.slotIds)});`);
+      this.sqlRunner(
+        `DELETE FROM public.weekly_menu_slots WHERE id = ANY(${toPgArray(this.registry.slotIds)});`,
+      );
       this.registry.slotIds.clear();
     }
 
     if (this.registry.weeklyMenuIds.size > 0) {
-      this.sqlRunner(`DELETE FROM public.weekly_menus WHERE id = ANY(${toPgArray(this.registry.weeklyMenuIds)});`);
+      this.sqlRunner(
+        `DELETE FROM public.weekly_menus WHERE id = ANY(${toPgArray(this.registry.weeklyMenuIds)});`,
+      );
       this.registry.weeklyMenuIds.clear();
     }
 
@@ -167,12 +214,16 @@ class FixtureTracker {
     }
 
     if (this.registry.ingredientIds.size > 0) {
-      this.sqlRunner(`DELETE FROM public.ingredients WHERE id = ANY(${toPgArray(this.registry.ingredientIds)});`);
+      this.sqlRunner(
+        `DELETE FROM public.ingredients WHERE id = ANY(${toPgArray(this.registry.ingredientIds)});`,
+      );
       this.registry.ingredientIds.clear();
     }
 
     if (this.registry.customerIds.size > 0) {
-      this.sqlRunner(`DELETE FROM public.customers WHERE id = ANY(${toPgArray(this.registry.customerIds)});`);
+      this.sqlRunner(
+        `DELETE FROM public.customers WHERE id = ANY(${toPgArray(this.registry.customerIds)});`,
+      );
       this.registry.customerIds.clear();
     }
 
@@ -195,7 +246,9 @@ class FixtureTracker {
     }
 
     if (this.registry.tenantIds.size > 0) {
-      this.sqlRunner(`DELETE FROM public.tenants WHERE id = ANY(${toPgArray(this.registry.tenantIds)});`);
+      this.sqlRunner(
+        `DELETE FROM public.tenants WHERE id = ANY(${toPgArray(this.registry.tenantIds)});`,
+      );
       this.registry.tenantIds.clear();
     }
 
@@ -343,13 +396,17 @@ class SentinelManager {
     `);
 
     if (Number(check.ingredient_stock) !== this.state.expected.stock) {
-      throw new Error(`SENTINEL BREACH: Ingredient stock mutated! Expected ${this.state.expected.stock}, got ${check.ingredient_stock}`);
+      throw new Error(
+        `SENTINEL BREACH: Ingredient stock mutated! Expected ${this.state.expected.stock}, got ${check.ingredient_stock}`,
+      );
     }
     if (check.movement_notes !== this.state.expected.movementNotes) {
       throw new Error(`SENTINEL BREACH: Movement mutated!`);
     }
     if (check.consumption_status !== this.state.expected.consumptionStatus) {
-      throw new Error(`SENTINEL BREACH: Consumption mutated! Expected ${this.state.expected.consumptionStatus}, got ${check.consumption_status}`);
+      throw new Error(
+        `SENTINEL BREACH: Consumption mutated! Expected ${this.state.expected.consumptionStatus}, got ${check.consumption_status}`,
+      );
     }
     if (Number(check.line_qty) !== this.state.expected.lineQuantity) {
       throw new Error(`SENTINEL BREACH: Consumption line mutated!`);
@@ -548,8 +605,12 @@ async function run() {
     tracker.registerOrderItem(orderItemId);
 
     console.log("✓ Ingredientes, plato y pedido sembrados con éxito:");
-    console.log("  - Pechuga de Pollo: stock inicial = 10.00 kg (necesario: 2.00 kg -> suficiente)");
-    console.log("  - Arroz Integral: stock inicial = 0.50 kg (necesario: 1.00 kg -> DÉFICIT de 0.50 kg)");
+    console.log(
+      "  - Pechuga de Pollo: stock inicial = 10.00 kg (necesario: 2.00 kg -> suficiente)",
+    );
+    console.log(
+      "  - Arroz Integral: stock inicial = 0.50 kg (necesario: 1.00 kg -> DÉFICIT de 0.50 kg)",
+    );
 
     // 6. Launch Browser & Authenticate
     console.log("\n--- Lanzando Navegador Chromium e Iniciando Sesión ---");
@@ -562,13 +623,13 @@ async function run() {
     await context.route("**/*supabase.co/**", async (route) => {
       const req = route.request();
       const url = req.url();
-      const localTarget = url.replace(
-        /https:\/\/[^/]+\.supabase\.co/,
-        "http://127.0.0.1:54321",
-      );
+      const localTarget = url.replace(/https:\/\/[^/]+\.supabase\.co/, "http://127.0.0.1:54321");
       const headers = { ...req.headers() };
       headers["apikey"] = SUPABASE_ANON_KEY;
-      if (!headers["authorization"] || headers["authorization"].startsWith("Bearer sb_publishable")) {
+      if (
+        !headers["authorization"] ||
+        headers["authorization"].startsWith("Bearer sb_publishable")
+      ) {
         headers["authorization"] = `Bearer ${SUPABASE_ANON_KEY}`;
       }
 
@@ -602,7 +663,11 @@ async function run() {
 
     const page = await context.newPage();
     page.on("console", (msg) => {
-      if (msg.type() === "error" || msg.text().includes("FLOW-04") || msg.text().includes("KITCHEN")) {
+      if (
+        msg.type() === "error" ||
+        msg.text().includes("FLOW-04") ||
+        msg.text().includes("KITCHEN")
+      ) {
         console.log(`  [BROWSER ${msg.type()}]:`, msg.text());
       }
     });
@@ -631,9 +696,8 @@ async function run() {
     // Publish active tenant
     await page.evaluate(
       async ({ tIdA }) => {
-        const { publishBootstrapIdentitySnapshot, getBootstrapIdentitySnapshot } = await import(
-          "/src/bootstrap/pipeline/BootstrapIdentityStore.ts"
-        );
+        const { publishBootstrapIdentitySnapshot, getBootstrapIdentitySnapshot } =
+          await import("/src/bootstrap/pipeline/BootstrapIdentityStore.ts");
         const snap = getBootstrapIdentitySnapshot();
         publishBootstrapIdentitySnapshot({
           ...snap,
@@ -651,7 +715,9 @@ async function run() {
     // =========================================================================
     // FASE 1: Estado Inicial Pendiente de Planificar (Workspace de Cocina)
     // =========================================================================
-    console.log("\n--- FASE 1: Verificación de Estado Inicial No Planificado en /admin/kitchen-execution ---");
+    console.log(
+      "\n--- FASE 1: Verificación de Estado Inicial No Planificado en /admin/kitchen-execution ---",
+    );
     await page.goto(`http://127.0.0.1:5173/admin/kitchen-execution?date=${deliveryDate}`, {
       waitUntil: "networkidle",
     });
@@ -687,7 +753,10 @@ async function run() {
     // Verify lines table
     await page.waitForSelector('[data-testid="consumption-lines-table"]', { timeout: 10000 });
     const tableText = await page.innerText('[data-testid="consumption-lines-table"]');
-    if (!tableText.includes("Pechuga Pollo Certificada Flow04") || !tableText.includes("Arroz Integral Bio Flow04")) {
+    if (
+      !tableText.includes("Pechuga Pollo Certificada Flow04") ||
+      !tableText.includes("Arroz Integral Bio Flow04")
+    ) {
       throw new Error("Los ingredientes planificados no aparecen en la tabla");
     }
 
@@ -702,10 +771,14 @@ async function run() {
         'rice', (SELECT stock FROM public.ingredients WHERE id = '${riceIngId}')
       );
     `);
-    if (Number(stockAfterT1.chicken) !== 10.00 || Number(stockAfterT1.rice) !== 0.50) {
-      throw new Error(`VIOLACIÓN FLOW-04: El stock no debe mutar en T1. Actual: ${JSON.stringify(stockAfterT1)}`);
+    if (Number(stockAfterT1.chicken) !== 10.0 || Number(stockAfterT1.rice) !== 0.5) {
+      throw new Error(
+        `VIOLACIÓN FLOW-04: El stock no debe mutar en T1. Actual: ${JSON.stringify(stockAfterT1)}`,
+      );
     }
-    console.log("✓ Invariante T1 preservado: Stock en PostgreSQL permanece inalterado (10.00 kg y 0.50 kg).");
+    console.log(
+      "✓ Invariante T1 preservado: Stock en PostgreSQL permanece inalterado (10.00 kg y 0.50 kg).",
+    );
 
     // Track generated consumption ID
     const consRow = runScalarJson(`
@@ -715,8 +788,12 @@ async function run() {
     `);
     if (consRow?.id) tracker.registerConsumption(consRow.id);
 
-    await page.screenshot({ path: `${SCREENSHOT_DIR}/kitchen_02_planned_with_insufficient_warning.png` });
-    console.log("✓ Fase 2 superada: Plan generado, advertencia de stock mostrada, existencias intactas.");
+    await page.screenshot({
+      path: `${SCREENSHOT_DIR}/kitchen_02_planned_with_insufficient_warning.png`,
+    });
+    console.log(
+      "✓ Fase 2 superada: Plan generado, advertencia de stock mostrada, existencias intactas.",
+    );
 
     // =========================================================================
     // FASE 3: Recuperación de Sesión tras Recarga del Navegador (Reload)
@@ -728,7 +805,9 @@ async function run() {
     await page.waitForSelector('[data-testid="kpi-consumption-status"]', { timeout: 10000 });
     const recoveredStatus = await page.innerText('[data-testid="kpi-consumption-status"]');
     if (recoveredStatus.trim().toLowerCase() !== "planned") {
-      throw new Error(`Tras recarga, el estado esperado era 'planned', obtenido: ${recoveredStatus}`);
+      throw new Error(
+        `Tras recarga, el estado esperado era 'planned', obtenido: ${recoveredStatus}`,
+      );
     }
     const linesAfterReload = await page.innerText('[data-testid="consumption-lines-table"]');
     if (!linesAfterReload.includes("Pechuga Pollo Certificada Flow04")) {
@@ -736,7 +815,9 @@ async function run() {
     }
 
     await page.screenshot({ path: `${SCREENSHOT_DIR}/kitchen_03_recovered_after_reload.png` });
-    console.log("✓ Fase 3 superada: Estado recuperado de forma transparente desde PostgreSQL tras recarga.");
+    console.log(
+      "✓ Fase 3 superada: Estado recuperado de forma transparente desde PostgreSQL tras recarga.",
+    );
 
     // =========================================================================
     // FASE 4: Intento de T2 con Stock Insuficiente -> Bloqueado Seguramente
@@ -763,7 +844,9 @@ async function run() {
       WHERE tenant_id = '${tenantIdA}' AND delivery_date = '${deliveryDate}';
     `);
     if (dbStatusAfterFailedApply !== "planned") {
-      throw new Error(`Consumo cambió indebidamente a ${dbStatusAfterFailedApply} pese a déficit de stock`);
+      throw new Error(
+        `Consumo cambió indebidamente a ${dbStatusAfterFailedApply} pese a déficit de stock`,
+      );
     }
 
     const stockAfterFailedApply = runScalarJson(`
@@ -772,11 +855,18 @@ async function run() {
         'rice', (SELECT stock FROM public.ingredients WHERE id = '${riceIngId}')
       );
     `);
-    if (Number(stockAfterFailedApply.chicken) !== 10.00 || Number(stockAfterFailedApply.rice) !== 0.50) {
-      throw new Error(`Stock mutó indebidamente durante rechazo de T2: ${JSON.stringify(stockAfterFailedApply)}`);
+    if (
+      Number(stockAfterFailedApply.chicken) !== 10.0 ||
+      Number(stockAfterFailedApply.rice) !== 0.5
+    ) {
+      throw new Error(
+        `Stock mutó indebidamente durante rechazo de T2: ${JSON.stringify(stockAfterFailedApply)}`,
+      );
     }
 
-    await page.screenshot({ path: `${SCREENSHOT_DIR}/kitchen_04_insufficient_stock_prevented.png` });
+    await page.screenshot({
+      path: `${SCREENSHOT_DIR}/kitchen_04_insufficient_stock_prevented.png`,
+    });
     console.log("✓ Fase 4 superada: Aplicación rechazada con aviso por existencias insuficientes.");
 
     // =========================================================================
@@ -814,7 +904,8 @@ async function run() {
     const deficitAlert = await page.$('[data-testid="insufficient-stock-alert"]');
     if (deficitAlert) {
       const isVisible = await deficitAlert.isVisible();
-      if (isVisible) throw new Error("La advertencia de déficit sigue visible tras reponer existencias");
+      if (isVisible)
+        throw new Error("La advertencia de déficit sigue visible tras reponer existencias");
     }
     console.log("✓ Advertencia de déficit retirada tras reposición de existencias.");
 
@@ -841,10 +932,14 @@ async function run() {
         'rice', (SELECT stock FROM public.ingredients WHERE id = '${riceIngId}')
       );
     `);
-    if (Number(stockAfterApply.chicken) !== 8.00 || Number(stockAfterApply.rice) !== 4.50) {
-      throw new Error(`Stock tras T2 incorrecto. Esperado 8.00 y 4.50, obtenido: ${JSON.stringify(stockAfterApply)}`);
+    if (Number(stockAfterApply.chicken) !== 8.0 || Number(stockAfterApply.rice) !== 4.5) {
+      throw new Error(
+        `Stock tras T2 incorrecto. Esperado 8.00 y 4.50, obtenido: ${JSON.stringify(stockAfterApply)}`,
+      );
     }
-    console.log(`✓ Stock descontado en PostgreSQL con éxito: Pollo = ${stockAfterApply.chicken} kg, Arroz = ${stockAfterApply.rice} kg.`);
+    console.log(
+      `✓ Stock descontado en PostgreSQL con éxito: Pollo = ${stockAfterApply.chicken} kg, Arroz = ${stockAfterApply.rice} kg.`,
+    );
 
     await page.screenshot({ path: `${SCREENSHOT_DIR}/kitchen_05_applied_stock_decremented.png` });
     console.log("✓ Fase 5 superada: Consumo aplicado en existencias con descuento exacto.");
@@ -853,23 +948,98 @@ async function run() {
     // FASE 6: Idempotencia FLOW04-I2 (Single Apply)
     // =========================================================================
     console.log("\n--- FASE 6: Verificación de Invariante FLOW04-I2 (No doble descuento) ---");
-    // Verify that "Aplicar consumo (T2)" button is no longer present
+    // 1. Verify that "Aplicar consumo (T2)" button is no longer present in UI (double-click protection)
     const applyBtnAfter = await page.$('[data-testid="apply-consumption-button"]');
     if (applyBtnAfter && (await applyBtnAfter.isVisible())) {
       throw new Error("El botón Aplicar (T2) no debe ser visible tras haberse aplicado");
     }
 
-    // Direct invocation check: re-running applyConsumption via backend context does not double-decrement
+    // 2. Real second execution via InventoryService in browser evaluate context
+    console.log(
+      "  Ejecutando re-aplicación explícita mediante InventoryService.applyConsumption...",
+    );
+    const reapplyServiceRes = await page.evaluate(
+      async ({ tId, cId, uId }) => {
+        try {
+          const { InventoryService } =
+            await import("/src/modules/inventory/application/inventory-service.ts");
+          const { createServiceContext } = await import("/src/services/types.ts");
+          const { supabase } = await import("/src/integrations/supabase/client.ts");
+          const ctx = await createServiceContext({
+            supabase,
+            userId: uId,
+            tenantId: tId,
+            roles: ["kitchen", "inventory"],
+          });
+          const res = await InventoryService.applyConsumption(ctx, cId, { sessionRecovery: true });
+          return { ok: true, status: res.status, id: res.id };
+        } catch (e) {
+          return { ok: false, error: e instanceof Error ? e.message : String(e) };
+        }
+      },
+      { tId: tenantIdA, cId: consRow.id, uId: staffUser.id },
+    );
+    if (!reapplyServiceRes.ok || reapplyServiceRes.status !== "applied") {
+      throw new Error(
+        `Re-aplicación vía servicio falló o alteró el estado: ${JSON.stringify(reapplyServiceRes)}`,
+      );
+    }
+
+    // 3. Real second execution via direct PostgreSQL transactional RPC (authenticated via Supabase client)
+    console.log(
+      "  Ejecutando re-aplicación explícita mediante apply_inventory_consumption_v1 RPC...",
+    );
+    const rpcReapply = await page.evaluate(
+      async ({ tId, cId, uId }) => {
+        try {
+          const { supabase } = await import("/src/integrations/supabase/client.ts");
+          const { data, error } = await supabase.rpc("apply_inventory_consumption_v1", {
+            p_tenant_id: tId,
+            p_consumption_id: cId,
+            p_actor_id: uId,
+          });
+          if (error) return { ok: false, error: error.message };
+          return { ok: true, data };
+        } catch (e) {
+          return { ok: false, error: e instanceof Error ? e.message : String(e) };
+        }
+      },
+      { tId: tenantIdA, cId: consRow.id, uId: staffUser.id },
+    );
+    if (
+      !rpcReapply.ok ||
+      rpcReapply.data?.idempotent !== true ||
+      rpcReapply.data?.status !== "applied"
+    ) {
+      throw new Error(
+        `RPC PostgreSQL no devolvió respuesta idempotente: ${JSON.stringify(rpcReapply)}`,
+      );
+    }
+
+    // 4. Assert stock in PostgreSQL remains strictly identical (Chicken: 8.00, Rice: 4.50)
     const stockCheckReapply = runScalarJson(`
       SELECT jsonb_build_object(
         'chicken', (SELECT stock FROM public.ingredients WHERE id = '${chickenIngId}'),
         'rice', (SELECT stock FROM public.ingredients WHERE id = '${riceIngId}')
       );
     `);
-    if (Number(stockCheckReapply.chicken) !== 8.00 || Number(stockCheckReapply.rice) !== 4.50) {
-      throw new Error("Doble descuento detectado");
+    if (Number(stockCheckReapply.chicken) !== 8.0 || Number(stockCheckReapply.rice) !== 4.5) {
+      throw new Error(
+        `Doble descuento detectado en existencias: ${JSON.stringify(stockCheckReapply)}`,
+      );
     }
-    console.log("✓ Invariante FLOW04-I2 preservado: Estado aplicado es idempotente.");
+
+    // 5. Assert exactly 2 movements in stock_movements for this consumption (no duplicate rows)
+    const movementCount = runSql(`
+      SELECT count(*) FROM public.stock_movements
+      WHERE tenant_id = '${tenantIdA}' AND reference_document_id = '${consRow.id}';
+    `);
+    if (Number(movementCount.trim()) !== 2) {
+      throw new Error(`Esperado exactamente 2 movimientos en kárdex, encontrado: ${movementCount}`);
+    }
+    console.log(
+      "✓ Invariante FLOW04-I2 preservado: Re-aplicación real probada sin doble descuento ni duplicación de asientos.",
+    );
 
     // =========================================================================
     // FASE 7: Acción T3 — Sellar Consumo (Terminal, Sin Mutación de Stock)
@@ -897,32 +1067,117 @@ async function run() {
         'rice', (SELECT stock FROM public.ingredients WHERE id = '${riceIngId}')
       );
     `);
-    if (Number(stockAfterSeal.chicken) !== 8.00 || Number(stockAfterSeal.rice) !== 4.50) {
-      throw new Error(`VIOLACIÓN FLOW-04: El stock no debe mutar en T3. Actual: ${JSON.stringify(stockAfterSeal)}`);
+    if (Number(stockAfterSeal.chicken) !== 8.0 || Number(stockAfterSeal.rice) !== 4.5) {
+      throw new Error(
+        `VIOLACIÓN FLOW-04: El stock no debe mutar en T3. Actual: ${JSON.stringify(stockAfterSeal)}`,
+      );
     }
-    console.log("✓ Invariante T3 preservado: Estado 'sealed' terminal sin alteración de existencias.");
+    console.log(
+      "✓ Invariante T3 preservado: Estado 'sealed' terminal sin alteración de existencias.",
+    );
 
     await page.screenshot({ path: `${SCREENSHOT_DIR}/kitchen_06_sealed_terminal.png` });
     console.log("✓ Fase 7 superada: Consumo sellado correctamente.");
 
     // =========================================================================
-    // FASE 8: Enlace Directo a Kárdex y Comprobación de Movimientos
+    // FASE 8: Enlace Directo a Kárdex y Comprobación Estricta de Movimientos
     // =========================================================================
-    console.log("\n--- FASE 8: Enlace Directo a Inventario y Verificación en Kárdex ---");
+    console.log("\n--- FASE 8: Enlace Directo a Inventario y Verificación Estricta en Kárdex ---");
+
+    // 1. Verify movement records exist in PostgreSQL for this consumption
+    const kardexDbMovements = runScalarJson(`
+      SELECT jsonb_agg(jsonb_build_object(
+        'id', id,
+        'ingredient_id', ingredient_id,
+        'movement_type', movement_type,
+        'quantity', quantity,
+        'previous_stock', previous_stock,
+        'new_stock', new_stock,
+        'reference_document_id', reference_document_id
+      ))
+      FROM public.stock_movements
+      WHERE tenant_id = '${tenantIdA}' AND reference_document_id = '${consRow.id}';
+    `);
+
+    if (!Array.isArray(kardexDbMovements) || kardexDbMovements.length !== 2) {
+      throw new Error(
+        `Fallo Kárdex DB: Se esperaban 2 movimientos para el consumo ${consRow.id}, encontrados: ${JSON.stringify(kardexDbMovements)}`,
+      );
+    }
+
+    for (const mov of kardexDbMovements) {
+      tracker.registerMovement(mov.id);
+      if (mov.movement_type !== "PRODUCTION_CONSUMPTION") {
+        throw new Error(`Tipo de movimiento inesperado en BD: ${mov.movement_type}`);
+      }
+      if (mov.reference_document_id !== consRow.id) {
+        throw new Error(`Referencia de documento incorrecta en BD: ${mov.reference_document_id}`);
+      }
+      if (mov.ingredient_id === chickenIngId) {
+        if (
+          Number(mov.quantity) !== 2.0 ||
+          Number(mov.previous_stock) !== 10.0 ||
+          Number(mov.new_stock) !== 8.0
+        ) {
+          throw new Error(
+            `Valores de movimiento de pollo incorrectos en BD: ${JSON.stringify(mov)}`,
+          );
+        }
+      } else if (mov.ingredient_id === riceIngId) {
+        if (
+          Number(mov.quantity) !== 1.0 ||
+          Number(mov.previous_stock) !== 5.5 ||
+          Number(mov.new_stock) !== 4.5
+        ) {
+          throw new Error(
+            `Valores de movimiento de arroz incorrectos en BD: ${JSON.stringify(mov)}`,
+          );
+        }
+      } else {
+        throw new Error(`Ingrediente desconocido en movimiento de consumo: ${mov.ingredient_id}`);
+      }
+    }
+    console.log(
+      "✓ PostgreSQL Kárdex verificado: 2 movimientos PRODUCTION_CONSUMPTION conformes con trazabilidad exacta.",
+    );
+
+    // 2. Navigate to Inventory & Kárdex UI
     await page.click('[data-testid="goto-inventory-button"]');
     await page.waitForURL("**/admin/inventory", { timeout: 10000 });
     await page.waitForSelector("text=Inventario & Kárdex", { timeout: 15000 });
 
     // Click on Kárdex tab
     await page.click('button[value="movements"], [role="tab"]:has-text("Kárdex")');
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(1500);
 
-    const kardexText = await page.innerText("body");
-    if (!kardexText.includes("Pechuga Pollo Certificada Flow04") && !kardexText.includes("KITCHEN_CONSUMPTION")) {
-      console.log("  [Aviso]: El kárdex muestra los movimientos generales del tenant.");
+    // Wait for the movements table to be populated
+    await page.waitForSelector("table", { timeout: 10000 });
+    const kardexDomText = await page.innerText("table");
+
+    // Strict assertions in UI DOM (fail if missing)
+    if (!kardexDomText.includes("Pechuga Pollo Certificada Flow04")) {
+      throw new Error(
+        "KÁRDEX UI FAIL: 'Pechuga Pollo Certificada Flow04' no aparece en la tabla de movimientos",
+      );
     }
+    if (!kardexDomText.includes("Arroz Integral Bio Flow04")) {
+      throw new Error(
+        "KÁRDEX UI FAIL: 'Arroz Integral Bio Flow04' no aparece en la tabla de movimientos",
+      );
+    }
+    if (
+      !kardexDomText.includes("Consumo Cocina") &&
+      !kardexDomText.includes("PRODUCTION_CONSUMPTION")
+    ) {
+      throw new Error(
+        "KÁRDEX UI FAIL: Etiqueta de 'Consumo Cocina' no encontrada en la tabla de movimientos",
+      );
+    }
+
     await page.screenshot({ path: `${SCREENSHOT_DIR}/kitchen_07_kardex_verified.png` });
-    console.log("✓ Fase 8 superada: Navegación y consulta de Kárdex completadas.");
+    console.log(
+      "✓ Fase 8 superada: Movimientos comprobados estrictamente en PostgreSQL y renderizados en la UI de Kárdex.",
+    );
 
     // =========================================================================
     // FASE 9: RBAC (Usuario sin inventory.operate) y Aislamiento Multi-tenant
@@ -969,9 +1224,8 @@ async function run() {
     // Switch to Tenant B to verify tenant isolation
     await page.evaluate(
       async ({ tIdB }) => {
-        const { publishBootstrapIdentitySnapshot, getBootstrapIdentitySnapshot } = await import(
-          "/src/bootstrap/pipeline/BootstrapIdentityStore.ts"
-        );
+        const { publishBootstrapIdentitySnapshot, getBootstrapIdentitySnapshot } =
+          await import("/src/bootstrap/pipeline/BootstrapIdentityStore.ts");
         const snap = getBootstrapIdentitySnapshot();
         publishBootstrapIdentitySnapshot({
           ...snap,
@@ -991,10 +1245,15 @@ async function run() {
     });
     await page.waitForTimeout(1000);
     const tenantBText = await page.innerText('[data-testid="kitchen-consumption-section"]');
-    if (tenantBText.includes("Plato Fit Pollo y Arroz FLOW04") || tenantBText.includes("Pechuga Pollo Certificada Flow04")) {
+    if (
+      tenantBText.includes("Plato Fit Pollo y Arroz FLOW04") ||
+      tenantBText.includes("Pechuga Pollo Certificada Flow04")
+    ) {
       throw new Error("FUGA ENTRE TENANTS: Datos de Tenant A visibles en Tenant B");
     }
-    console.log("✓ Aislamiento multitenant estricto verificado: Tenant B no tiene acceso a consumos de Tenant A.");
+    console.log(
+      "✓ Aislamiento multitenant estricto verificado: Tenant B no tiene acceso a consumos de Tenant A.",
+    );
 
     await page.screenshot({ path: `${SCREENSHOT_DIR}/kitchen_08_rbac_and_tenant_isolation.png` });
     console.log("✓ Fase 9 superada: RBAC y aislamiento multi-tenant comprobados.");

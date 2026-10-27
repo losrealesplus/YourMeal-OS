@@ -61,25 +61,18 @@ export const InventoryService = {
 
     const repo = createInventoryRepository(ctx.supabase, ctx.tenantId);
 
-    const production = await repo.loadProductionPlanInput(
-      ctx.tenantId,
-      deliveryDate,
-    );
+    const production = await repo.loadProductionPlanInput(ctx.tenantId, deliveryDate);
     if (!production) {
-      throw new DomainError(
-        "INVALID_STATE",
-        "No production source for deliveryDate",
-        { deliveryDate },
-      );
+      throw new DomainError("INVALID_STATE", "No production source for deliveryDate", {
+        deliveryDate,
+      });
     }
 
     const lines = buildConsumptionPlanLines(production);
     if (lines.length === 0) {
-      throw new DomainError(
-        "INVALID_STATE",
-        "Consumption plan requires at least one recipe line",
-        { deliveryDate },
-      );
+      throw new DomainError("INVALID_STATE", "Consumption plan requires at least one recipe line", {
+        deliveryDate,
+      });
     }
 
     beginFlow04Pipeline({
@@ -102,11 +95,9 @@ export const InventoryService = {
       });
 
       if (!["planned", "applied", "sealed"].includes(consumption.status)) {
-        throw new DomainError(
-          "INVALID_STATE",
-          "T1 returned an invalid consumption status",
-          { status: consumption.status },
-        );
+        throw new DomainError("INVALID_STATE", "T1 returned an invalid consumption status", {
+          status: consumption.status,
+        });
       }
 
       logFlow04Step("FLOW04_T1_COMPLETED", {
@@ -144,13 +135,18 @@ export const InventoryService = {
       throw new DomainError("NOT_FOUND", `Consumption ${consumptionId}`);
     }
 
+    const flowContext = {
+      tenantId: ctx.tenantId,
+      deliveryDate: current.deliveryDate,
+      consumptionId: current.id,
+    };
+
     if (
       options?.sessionRecovery &&
-      (!isFlow04PipelineActive() || !hasFlow04Step("FLOW04_T1_COMPLETED"))
+      (!isFlow04PipelineActive(flowContext) || !hasFlow04Step("FLOW04_T1_COMPLETED", flowContext))
     ) {
       resumeFlow04Pipeline(["FLOW04_T1_STARTED", "FLOW04_T1_COMPLETED"], {
-        tenantId: ctx.tenantId,
-        consumptionId,
+        ...flowContext,
         source: "session_recovery",
       });
     }
@@ -158,7 +154,7 @@ export const InventoryService = {
     // FLOW04-I2 · Single Apply — never double decrement
     if (current.status === "applied" || current.status === "sealed") {
       try {
-        assertFlow04Prefix(["FLOW04_T1_STARTED", "FLOW04_T1_COMPLETED"]);
+        assertFlow04Prefix(["FLOW04_T1_STARTED", "FLOW04_T1_COMPLETED"], flowContext);
       } catch {
         throw new DomainError(
           "INVALID_STATE",
@@ -166,12 +162,12 @@ export const InventoryService = {
         );
       }
       logFlow04Step("FLOW04_T2_STARTED", {
-        consumptionId,
+        ...flowContext,
         status: current.status,
         reuse: true,
       });
       logFlow04Step("FLOW04_T2_COMPLETED", {
-        consumptionId,
+        ...flowContext,
         status: current.status,
         reuse: true,
       });
@@ -186,7 +182,7 @@ export const InventoryService = {
     }
 
     try {
-      assertFlow04Prefix(["FLOW04_T1_STARTED", "FLOW04_T1_COMPLETED"]);
+      assertFlow04Prefix(["FLOW04_T1_STARTED", "FLOW04_T1_COMPLETED"], flowContext);
     } catch {
       throw new DomainError(
         "INVALID_STATE",
@@ -195,7 +191,7 @@ export const InventoryService = {
     }
 
     logFlow04Step("FLOW04_T2_STARTED", {
-      consumptionId,
+      ...flowContext,
       status: current.status,
       lineCount: current.lines.length,
     });
@@ -209,7 +205,7 @@ export const InventoryService = {
 
       if (applied.status !== "applied") {
         stopFlow04("T2_STATUS_DRIFT", {
-          consumptionId,
+          ...flowContext,
           status: applied.status,
         });
         throw new DomainError(
@@ -219,7 +215,7 @@ export const InventoryService = {
       }
 
       logFlow04Step("FLOW04_T2_COMPLETED", {
-        consumptionId: applied.id,
+        ...flowContext,
         status: applied.status,
         lineCount: applied.lines.length,
       });
@@ -230,7 +226,7 @@ export const InventoryService = {
       const msg = e instanceof Error ? e.message : String(e);
       if (msg === "insufficient_stock") {
         stopFlow04("T2_INSUFFICIENT_STOCK", {
-          consumptionId,
+          ...flowContext,
           ...(e instanceof Error &&
           "details" in e &&
           typeof (e as { details?: unknown }).details === "object"
@@ -241,7 +237,7 @@ export const InventoryService = {
           consumptionId,
         });
       }
-      stopFlow04("T2_FAILED", { consumptionId, error: msg });
+      stopFlow04("T2_FAILED", { ...flowContext, error: msg });
       throw e;
     }
   },
@@ -276,32 +272,30 @@ export const InventoryService = {
       );
     }
 
+    const flowContext = {
+      tenantId: ctx.tenantId,
+      deliveryDate: current.deliveryDate,
+      consumptionId: current.id,
+    };
+
     if (
       options?.sessionRecovery &&
-      (!isFlow04PipelineActive() || !hasFlow04Step("FLOW04_T2_COMPLETED"))
+      (!isFlow04PipelineActive(flowContext) || !hasFlow04Step("FLOW04_T2_COMPLETED", flowContext))
     ) {
       resumeFlow04Pipeline(
-        [
-          "FLOW04_T1_STARTED",
-          "FLOW04_T1_COMPLETED",
-          "FLOW04_T2_STARTED",
-          "FLOW04_T2_COMPLETED",
-        ],
+        ["FLOW04_T1_STARTED", "FLOW04_T1_COMPLETED", "FLOW04_T2_STARTED", "FLOW04_T2_COMPLETED"],
         {
-          tenantId: ctx.tenantId,
-          consumptionId,
+          ...flowContext,
           source: "session_recovery",
         },
       );
     }
 
     try {
-      assertFlow04Prefix([
-        "FLOW04_T1_STARTED",
-        "FLOW04_T1_COMPLETED",
-        "FLOW04_T2_STARTED",
-        "FLOW04_T2_COMPLETED",
-      ]);
+      assertFlow04Prefix(
+        ["FLOW04_T1_STARTED", "FLOW04_T1_COMPLETED", "FLOW04_T2_STARTED", "FLOW04_T2_COMPLETED"],
+        flowContext,
+      );
     } catch {
       throw new DomainError(
         "INVALID_STATE",
@@ -310,7 +304,7 @@ export const InventoryService = {
     }
 
     logFlow04Step("FLOW04_T3_STARTED", {
-      consumptionId,
+      ...flowContext,
       status: current.status,
     });
 
@@ -330,7 +324,7 @@ export const InventoryService = {
 
       if (sealed.status !== "sealed") {
         stopFlow04("T3_STATUS_DRIFT", {
-          consumptionId,
+          ...flowContext,
           status: sealed.status,
         });
         throw new DomainError(
@@ -344,20 +338,17 @@ export const InventoryService = {
         const after = await repo.getStock(ctx.tenantId, snap.ingredientId);
         if (after !== snap.stock) {
           stopFlow04("T3_STOCK_MUTATION", {
-            consumptionId,
+            ...flowContext,
             ingredientId: snap.ingredientId,
             before: snap.stock,
             after,
           });
-          throw new DomainError(
-            "INVALID_STATE",
-            "FLOW04-003 forbids stock mutation during seal",
-          );
+          throw new DomainError("INVALID_STATE", "FLOW04-003 forbids stock mutation during seal");
         }
       }
 
       logFlow04Step("FLOW04_T3_COMPLETED", {
-        consumptionId: sealed.id,
+        ...flowContext,
         status: sealed.status,
         lineCount: sealed.lines.length,
       });
@@ -366,7 +357,7 @@ export const InventoryService = {
     } catch (e) {
       if (e instanceof DomainError) throw e;
       stopFlow04("T3_FAILED", {
-        consumptionId,
+        ...flowContext,
         error: e instanceof Error ? e.message : String(e),
       });
       throw e;
@@ -390,28 +381,31 @@ export const InventoryService = {
     const repo = createInventoryRepository(ctx.supabase, ctx.tenantId);
     const consumption = await repo.findBySource(ctx.tenantId, date);
     if (consumption) {
+      const flowContext = {
+        tenantId: ctx.tenantId,
+        deliveryDate: date,
+        consumptionId: consumption.id,
+      };
       if (consumption.status === "planned") {
         resumeFlow04Pipeline(["FLOW04_T1_STARTED", "FLOW04_T1_COMPLETED"], {
-          tenantId: ctx.tenantId,
-          deliveryDate: date,
-          consumptionId: consumption.id,
+          ...flowContext,
           source: "persisted_planned",
         });
       } else if (consumption.status === "applied") {
         resumeFlow04Pipeline(
-          [
-            "FLOW04_T1_STARTED",
-            "FLOW04_T1_COMPLETED",
-            "FLOW04_T2_STARTED",
-            "FLOW04_T2_COMPLETED",
-          ],
+          ["FLOW04_T1_STARTED", "FLOW04_T1_COMPLETED", "FLOW04_T2_STARTED", "FLOW04_T2_COMPLETED"],
           {
-            tenantId: ctx.tenantId,
-            deliveryDate: date,
-            consumptionId: consumption.id,
+            ...flowContext,
             source: "persisted_applied",
           },
         );
+      }
+    } else {
+      if (
+        isFlow04PipelineActive() &&
+        !isFlow04PipelineActive({ tenantId: ctx.tenantId, deliveryDate: date })
+      ) {
+        stopFlow04("CONTEXT_SWITCH_NO_CONSUMPTION", { tenantId: ctx.tenantId, deliveryDate: date });
       }
     }
     return consumption;

@@ -5,6 +5,7 @@
  *
  * Spec: docs/00-status/FLOW_04_INVENTORY_CONSUMPTION_SPEC.md (FROZEN)
  * Tokens are immutable; once-only per active pipeline.
+ * Each pipeline is strictly bound to context: { tenantId, consumptionId, deliveryDate }.
  */
 
 export const FLOW04_EVIDENCE_STEPS = [
@@ -18,62 +19,127 @@ export const FLOW04_EVIDENCE_STEPS = [
 
 export type Flow04EvidenceStep = (typeof FLOW04_EVIDENCE_STEPS)[number];
 
+export type Flow04Context = {
+  tenantId?: string;
+  deliveryDate?: string;
+  consumptionId?: string;
+};
+
 type ActiveFlow04Pipeline = {
   id: string;
+  context: Flow04Context;
   steps: string[];
   closed: boolean;
 };
 
 let active: ActiveFlow04Pipeline | null = null;
 
+function contextsConflict(a: Flow04Context, b?: Flow04Context): boolean {
+  if (!b) return false;
+  if (a.tenantId && b.tenantId && a.tenantId !== b.tenantId) return true;
+  if (a.deliveryDate && b.deliveryDate && a.deliveryDate !== b.deliveryDate) return true;
+  if (a.consumptionId && b.consumptionId && a.consumptionId !== b.consumptionId) return true;
+  return false;
+}
+
 function newPipelineId(): string {
   return `flow04-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-/** Start a FLOW-04 evidence pipeline (inventory certification). */
-export function beginFlow04Pipeline(
-  detail?: Record<string, unknown>,
-): string {
-  active = { id: newPipelineId(), steps: [], closed: false };
+/** Start a FLOW-04 evidence pipeline bound to explicit context. */
+export function beginFlow04Pipeline(detail?: Flow04Context & Record<string, unknown>): string {
+  const context: Flow04Context = {
+    tenantId: detail?.tenantId,
+    deliveryDate: detail?.deliveryDate,
+    consumptionId: detail?.consumptionId,
+  };
+  active = {
+    id: newPipelineId(),
+    context,
+    steps: [],
+    closed: false,
+  };
   if (typeof console !== "undefined" && typeof console.info === "function") {
     console.info("[FLOW-04]", "PIPELINE_BEGIN", {
       ...(detail ?? {}),
       pipelineId: active.id,
+      context: active.context,
     });
   }
   return active.id;
 }
 
-export function getObservedFlow04Steps(): string[] {
-  return active ? [...active.steps] : [];
+export function getObservedFlow04Steps(context?: Flow04Context): string[] {
+  if (!active) return [];
+  if (context && contextsConflict(active.context, context)) return [];
+  return [...active.steps];
 }
 
-export function hasFlow04Step(step: Flow04EvidenceStep | string): boolean {
-  return Boolean(active && !active.closed && active.steps.includes(step));
+export function getActiveFlow04Context(): Flow04Context | null {
+  return active ? { ...active.context } : null;
 }
 
-export function isFlow04PipelineActive(): boolean {
-  return Boolean(active && !active.closed);
+export function hasFlow04Step(step: Flow04EvidenceStep | string, context?: Flow04Context): boolean {
+  if (!active || active.closed) return false;
+  if (context && contextsConflict(active.context, context)) return false;
+  return active.steps.includes(step);
+}
+
+export function isFlow04PipelineActive(context?: Flow04Context): boolean {
+  if (!active || active.closed) return false;
+  if (context && contextsConflict(active.context, context)) return false;
+  return true;
 }
 
 /**
  * Resume a FLOW-04 pipeline from persisted state (e.g. after UI page reload or recovery).
- * Re-populates prior verified steps so subsequent transitions can proceed safely.
+ * Re-populates prior verified steps for the specific context.
+ * If a pipeline is already active for a DIFFERENT context, it is cleanly reset.
  */
 export function resumeFlow04Pipeline(
   priorSteps: readonly Flow04EvidenceStep[],
-  detail?: Record<string, unknown>,
+  detail?: Flow04Context & Record<string, unknown>,
 ): string {
-  if (!active || active.closed) {
-    active = { id: newPipelineId(), steps: [...priorSteps], closed: false };
+  const incomingContext: Flow04Context = {
+    tenantId: detail?.tenantId,
+    deliveryDate: detail?.deliveryDate,
+    consumptionId: detail?.consumptionId,
+  };
+
+  if (!active || active.closed || contextsConflict(active.context, incomingContext)) {
+    if (active && !active.closed && contextsConflict(active.context, incomingContext)) {
+      if (typeof console !== "undefined" && typeof console.info === "function") {
+        console.info("[FLOW-04]", "PIPELINE_CONTEXT_RESET", {
+          previousContext: active.context,
+          newContext: incomingContext,
+        });
+      }
+    }
+    active = {
+      id: newPipelineId(),
+      context: incomingContext,
+      steps: [...priorSteps],
+      closed: false,
+    };
     if (typeof console !== "undefined" && typeof console.info === "function") {
       console.info("[FLOW-04]", "PIPELINE_RESUMED", {
         ...(detail ?? {}),
         pipelineId: active.id,
+        context: active.context,
         resumedSteps: active.steps,
       });
     }
   } else {
+    // Enrich existing context
+    if (!active.context.tenantId && incomingContext.tenantId) {
+      active.context.tenantId = incomingContext.tenantId;
+    }
+    if (!active.context.deliveryDate && incomingContext.deliveryDate) {
+      active.context.deliveryDate = incomingContext.deliveryDate;
+    }
+    if (!active.context.consumptionId && incomingContext.consumptionId) {
+      active.context.consumptionId = incomingContext.consumptionId;
+    }
     for (const step of priorSteps) {
       if (!active.steps.includes(step)) {
         active.steps.push(step);
@@ -83,12 +149,18 @@ export function resumeFlow04Pipeline(
   return active.id;
 }
 
-/** Ensure prior tokens exist before emitting the next transition. */
+/** Ensure prior tokens exist and match expected context before emitting the next transition. */
 export function assertFlow04Prefix(
   required: readonly Flow04EvidenceStep[],
+  expectedContext?: Flow04Context,
 ): void {
   if (!active || active.closed) {
     throw new Error("FLOW-04 pipeline not active");
+  }
+  if (expectedContext && contextsConflict(active.context, expectedContext)) {
+    throw new Error(
+      `FLOW-04 context mismatch: active pipeline (${JSON.stringify(active.context)}) does not match required context (${JSON.stringify(expectedContext)})`,
+    );
   }
   for (const step of required) {
     if (!active.steps.includes(step)) {
@@ -103,7 +175,7 @@ export function assertFlow04Prefix(
  */
 export function logFlow04Step(
   step: Flow04EvidenceStep | string,
-  detail?: Record<string, unknown>,
+  detail?: Flow04Context & Record<string, unknown>,
 ): void {
   if (!active || active.closed) {
     if (typeof console !== "undefined" && typeof console.info === "function") {
@@ -113,6 +185,33 @@ export function logFlow04Step(
       });
     }
     return;
+  }
+
+  if (detail) {
+    const incomingContext: Flow04Context = {
+      tenantId: detail.tenantId,
+      deliveryDate: detail.deliveryDate,
+      consumptionId: detail.consumptionId,
+    };
+    if (contextsConflict(active.context, incomingContext)) {
+      if (typeof console !== "undefined" && typeof console.info === "function") {
+        console.warn("[FLOW-04]", "STEP_CONTEXT_MISMATCH", {
+          step,
+          activeContext: active.context,
+          incomingContext,
+        });
+      }
+      return;
+    }
+    if (!active.context.tenantId && incomingContext.tenantId) {
+      active.context.tenantId = incomingContext.tenantId;
+    }
+    if (!active.context.deliveryDate && incomingContext.deliveryDate) {
+      active.context.deliveryDate = incomingContext.deliveryDate;
+    }
+    if (!active.context.consumptionId && incomingContext.consumptionId) {
+      active.context.consumptionId = incomingContext.consumptionId;
+    }
   }
 
   if (active.steps.includes(step)) {
@@ -131,6 +230,7 @@ export function logFlow04Step(
     console.info("[FLOW-04]", step, {
       ...(detail ?? {}),
       pipelineId: active.id,
+      context: active.context,
     });
   }
 
@@ -139,12 +239,12 @@ export function logFlow04Step(
   }
 }
 
-export function stopFlow04(reason: string, detail?: Record<string, unknown>): void {
+export function stopFlow04(reason: string, detail?: Flow04Context & Record<string, unknown>): void {
   if (typeof console !== "undefined" && typeof console.info === "function") {
     console.info("[FLOW-04]", "STOP", {
       reason,
       ...(detail ?? {}),
-      ...(active ? { pipelineId: active.id } : {}),
+      ...(active ? { pipelineId: active.id, context: active.context } : {}),
     });
   }
   if (active) active.closed = true;
