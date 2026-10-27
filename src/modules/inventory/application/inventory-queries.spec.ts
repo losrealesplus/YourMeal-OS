@@ -126,7 +126,8 @@ describe("Inventory Queries & Summary (INVENTORY UI V1)", () => {
     const stockList = await InventoryService.getInventoryStock(ctx);
 
     expect(stockList.length).toBe(2);
-    expect(stockList.map((s) => s.id)).toEqual(["ing-1", "ing-2"]);
+    // Alphabetical order: "Arroz Integral Bio" (ing-2) before "Pechuga de Pollo" (ing-1)
+    expect(stockList.map((s) => s.id)).toEqual(["ing-2", "ing-1"]);
     expect(stockList.find((s) => s.id === "ing-1")?.stock).toBe(12.0);
     expect(stockList.find((s) => s.id === "ing-1")?.cost).toBe(4.7037);
     expect(stockList.find((s) => s.id === "ing-2")?.status).toBe("out_of_stock");
@@ -145,34 +146,83 @@ describe("Inventory Queries & Summary (INVENTORY UI V1)", () => {
     expect(summary.totalValuation).toBe(56.44);
   });
 
-  it("3. Returns Kárdex stock movements with direction and filters", async () => {
+  it("3. Returns Kárdex stock movements with direction, pagination, and filters", async () => {
     __seedStockMovement(movementA);
     __seedStockMovement(movementB);
     __seedStockMovement(otherTenantMovement);
 
     const ctx = makeContext("tenant-eatclean");
 
-    // All movements for tenant
+    // All movements for tenant (sorted created_at DESC)
     const movements = await InventoryService.getStockMovements(ctx);
-    expect(movements.length).toBe(2);
-    expect(movements[0].direction).toBe("IN");
-    expect(movements[1].direction).toBe("OUT");
+    expect(movements.totalCount).toBe(2);
+    expect(movements.items.length).toBe(2);
+    expect(movements.items[0].direction).toBe("OUT"); // 02:00:00Z
+    expect(movements.items[1].direction).toBe("IN");  // 01:00:00Z
+    expect(movements.page).toBe(1);
+    expect(movements.hasMore).toBe(false);
 
     // Filter by movementType
     const purchasesOnly = await InventoryService.getStockMovements(ctx, {
       movementType: "PURCHASE_RECEIPT",
     });
-    expect(purchasesOnly.length).toBe(1);
-    expect(purchasesOnly[0].movementType).toBe("PURCHASE_RECEIPT");
+    expect(purchasesOnly.totalCount).toBe(1);
+    expect(purchasesOnly.items.length).toBe(1);
+    expect(purchasesOnly.items[0].movementType).toBe("PURCHASE_RECEIPT");
 
     // Filter by ingredientId
     const forChicken = await InventoryService.getStockMovements(ctx, {
       ingredientId: "ing-1",
     });
-    expect(forChicken.length).toBe(2);
+    expect(forChicken.totalCount).toBe(2);
+    expect(forChicken.items.length).toBe(2);
   });
 
-  it("4. Enforces RBAC capability inventory.operate", async () => {
+  it("4. Supports pagination and date filtering on Kárdex movements", async () => {
+    __seedStockMovement(movementA); // 2026-10-27T01:00:00Z
+    __seedStockMovement(movementB); // 2026-10-27T02:00:00Z
+
+    const ctx = makeContext("tenant-eatclean");
+
+    // Page size 1
+    const page1 = await InventoryService.getStockMovements(ctx, { page: 1, pageSize: 1 });
+    expect(page1.totalCount).toBe(2);
+    expect(page1.items.length).toBe(1);
+    expect(page1.page).toBe(1);
+    expect(page1.totalPages).toBe(2);
+    expect(page1.hasMore).toBe(true);
+
+    const page2 = await InventoryService.getStockMovements(ctx, { page: 2, pageSize: 1 });
+    expect(page2.totalCount).toBe(2);
+    expect(page2.items.length).toBe(1);
+    expect(page2.page).toBe(2);
+    expect(page2.hasMore).toBe(false);
+    expect(page2.items[0].id).not.toBe(page1.items[0].id);
+
+    // Date filtering
+    const dateFiltered = await InventoryService.getStockMovements(ctx, {
+      dateFrom: "2026-10-27T01:30:00Z",
+      dateTo: "2026-10-27T02:30:00Z",
+    });
+    expect(dateFiltered.totalCount).toBe(1);
+    expect(dateFiltered.items[0].id).toBe("mov-2");
+  });
+
+  it("5. Computes summary directly without duplicate network roundtrip", async () => {
+    __seedIngredient("tenant-eatclean", sampleIngredientA);
+    __seedIngredient("tenant-eatclean", sampleIngredientB);
+
+    const ctx = makeContext("tenant-eatclean");
+    const stock = await InventoryService.getInventoryStock(ctx);
+    const summary = await InventoryService.getInventorySummary(ctx, stock);
+
+    expect(summary.totalIngredients).toBe(2);
+    expect(summary.inStockCount).toBe(1);
+    expect(summary.outOfStockCount).toBe(1);
+    expect(summary.totalValuation).toBe(56.44);
+  });
+
+  it("6. Enforces RBAC capability inventory.operate", async () => {
     const ctxNoPerms = makeContext("tenant-eatclean", ["kitchen.view"]);
     await expect(InventoryService.getInventoryStock(ctxNoPerms)).rejects.toThrow(
       "Missing capability: inventory.operate",

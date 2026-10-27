@@ -16,6 +16,7 @@ import type {
   InventoryStockItem,
   StockMovementRecord,
   StockMovementFilter,
+  PaginatedStockMovements,
   InventorySummary,
 } from "../domain/inventory-types";
 import { createInventoryRepository } from "../infrastructure/inventory-repository";
@@ -338,7 +339,24 @@ export const InventoryService = {
   },
 
   /**
+   * Pure calculation of inventory summary KPIs from a list of items (single source of truth).
+   */
+  computeInventorySummary(items: InventoryStockItem[]): InventorySummary {
+    const totalIngredients = items.length;
+    const inStockCount = items.filter((i) => i.stock > 0).length;
+    const outOfStockCount = items.filter((i) => i.stock <= 0).length;
+    const totalValuation = items.reduce((sum, i) => sum + (i.totalValue || 0), 0);
+    return {
+      totalIngredients,
+      inStockCount,
+      outOfStockCount,
+      totalValuation: Math.round(totalValuation * 100) / 100,
+    };
+  },
+
+  /**
    * List all active inventory ingredients with current stock and WAC valuation.
+   * Employs chunked retrieval to guarantee complete catalog coverage without truncation.
    */
   async getInventoryStock(ctx: ServiceContext): Promise<InventoryStockItem[]> {
     assertTenant(ctx);
@@ -348,12 +366,12 @@ export const InventoryService = {
   },
 
   /**
-   * List stock movements (Kárdex) with filters and ordering.
+   * List stock movements (Kárdex) with server-side filters, stable ordering, and pagination.
    */
   async getStockMovements(
     ctx: ServiceContext,
     filter?: StockMovementFilter,
-  ): Promise<StockMovementRecord[]> {
+  ): Promise<PaginatedStockMovements> {
     assertTenant(ctx);
     assertInventory(ctx);
     const repo = createInventoryRepository(ctx.supabase, ctx.tenantId);
@@ -362,18 +380,13 @@ export const InventoryService = {
 
   /**
    * Compute inventory KPIs and aggregate valuation.
+   * If preloadedItems is provided, computes directly without issuing a redundant database query.
    */
-  async getInventorySummary(ctx: ServiceContext): Promise<InventorySummary> {
-    const items = await this.getInventoryStock(ctx);
-    const totalIngredients = items.length;
-    const inStockCount = items.filter((i) => i.stock > 0).length;
-    const outOfStockCount = items.filter((i) => i.stock <= 0).length;
-    const totalValuation = items.reduce((sum, i) => sum + i.totalValue, 0);
-    return {
-      totalIngredients,
-      inStockCount,
-      outOfStockCount,
-      totalValuation: Math.round(totalValuation * 100) / 100,
-    };
+  async getInventorySummary(
+    ctx: ServiceContext,
+    preloadedItems?: InventoryStockItem[],
+  ): Promise<InventorySummary> {
+    const items = preloadedItems ?? (await this.getInventoryStock(ctx));
+    return this.computeInventorySummary(items);
   },
 };

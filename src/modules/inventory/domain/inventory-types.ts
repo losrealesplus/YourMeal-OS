@@ -47,7 +47,19 @@ export interface StockMovementRecord {
 export interface StockMovementFilter {
   ingredientId?: string;
   movementType?: string;
-  limit?: number;
+  dateFrom?: string; // YYYY-MM-DD or ISO string
+  dateTo?: string;   // YYYY-MM-DD or ISO string
+  page?: number;     // 1-based index (default: 1)
+  pageSize?: number; // items per page (default: 50, max: 100)
+}
+
+export interface PaginatedStockMovements {
+  items: StockMovementRecord[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  hasMore: boolean;
 }
 
 export interface InventorySummary {

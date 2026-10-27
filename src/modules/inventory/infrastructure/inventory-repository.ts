@@ -16,6 +16,7 @@ import type {
   InventoryStockItem,
   StockMovementRecord,
   StockMovementFilter,
+  PaginatedStockMovements,
 } from "../domain/inventory-types";
 
 export type InventoryRepository = {
@@ -58,7 +59,7 @@ export type InventoryRepository = {
   listStockMovements: (
     tenantId: string,
     filter?: StockMovementFilter,
-  ) => Promise<StockMovementRecord[]>;
+  ) => Promise<PaginatedStockMovements>;
 };
 
 // ============================================================================
@@ -411,15 +412,49 @@ function createPostgresInventoryRepository(client: any): InventoryRepository {
     },
 
     async listInventoryStock(tenantId: string): Promise<InventoryStockItem[]> {
-      const { data, error } = await client
-        .from("ingredients")
-        .select("id, tenant_id, name, unit, cost, stock, min_stock, waste_percentage, supplier_id")
-        .eq("tenant_id", tenantId)
-        .is("deleted_at", null)
-        .order("name", { ascending: true });
+      const CHUNK_SIZE = 1000;
+      let from = 0;
+      let allRows: any[] = [];
+      let totalCount: number | null = null;
 
-      if (error) throw new Error(error.message);
-      return (data || []).map((row: any) => {
+      while (true) {
+        const { data, error, count } = await client
+          .from("ingredients")
+          .select("id, tenant_id, name, unit, cost, stock, min_stock, waste_percentage, supplier_id", { count: "exact" })
+          .eq("tenant_id", tenantId)
+          .is("deleted_at", null)
+          .order("id", { ascending: true })
+          .range(from, from + CHUNK_SIZE - 1);
+
+        if (error) {
+          throw new Error(`Error al recuperar catálogo de existencias: ${error.message}`);
+        }
+
+        if (totalCount === null && typeof count === "number") {
+          totalCount = count;
+        }
+
+        const chunk = data || [];
+        allRows.push(...chunk);
+
+        if (chunk.length < CHUNK_SIZE || (totalCount !== null && allRows.length >= totalCount)) {
+          break;
+        }
+        from += CHUNK_SIZE;
+      }
+
+      if (totalCount !== null && allRows.length !== totalCount) {
+        throw new Error(
+          `Inconsistencia en catálogo de inventario: se esperaban ${totalCount} registros y se obtuvieron ${allRows.length}.`,
+        );
+      }
+
+      // Sort alphabetically by name
+      allRows.sort((a, b) =>
+        (a.name || "").localeCompare(b.name || "", "es", { sensitivity: "base" }),
+      );
+
+      return allRows.map((row: any) => {
         const stock = Number(row.stock || 0);
         const cost = Number(row.cost || 0);
         return {
@@ -441,7 +476,11 @@ function createPostgresInventoryRepository(client: any): InventoryRepository {
     async listStockMovements(
       tenantId: string,
       filter?: StockMovementFilter,
-    ): Promise<StockMovementRecord[]> {
+    ): Promise<PaginatedStockMovements> {
+      const page = Math.max(1, Math.floor(Number(filter?.page) || 1));
+      const pageSize = Math.max(1, Math.min(100, Math.floor(Number(filter?.pageSize) || 50)));
+      const offset = (page - 1) * pageSize;
+
       let query = client
         .from("stock_movements")
         .select(`
@@ -459,26 +498,42 @@ function createPostgresInventoryRepository(client: any): InventoryRepository {
           notes,
           created_at,
           ingredient:ingredients(id, name, unit)
-        `)
-        .eq("tenant_id", tenantId)
-        .order("created_at", { ascending: false });
+        `, { count: "exact" })
+        .eq("tenant_id", tenantId);
 
-      if (filter?.ingredientId) {
+      if (filter?.ingredientId && filter.ingredientId !== "all") {
         query = query.eq("ingredient_id", filter.ingredientId);
       }
-      if (filter?.movementType) {
+      if (filter?.movementType && filter.movementType !== "all") {
         query = query.eq("movement_type", filter.movementType);
       }
-      if (filter?.limit) {
-        query = query.limit(filter.limit);
-      } else {
-        query = query.limit(100);
+      if (filter?.dateFrom) {
+        const fromIso = filter.dateFrom.includes("T")
+          ? filter.dateFrom
+          : `${filter.dateFrom}T00:00:00.000Z`;
+        query = query.gte("created_at", fromIso);
+      }
+      if (filter?.dateTo) {
+        const toIso = filter.dateTo.includes("T")
+          ? filter.dateTo
+          : `${filter.dateTo}T23:59:59.999Z`;
+        query = query.lte("created_at", toIso);
       }
 
-      const { data, error } = await query;
+      // Order stably: created_at DESC, id DESC to prevent inter-page duplication
+      query = query
+        .order("created_at", { ascending: false })
+        .order("id", { ascending: false })
+        .range(offset, offset + pageSize - 1);
+
+      const { data, error, count } = await query;
       if (error) throw new Error(error.message);
 
-      return (data || []).map((row: any) => {
+      const totalCount = count ?? (data?.length || 0);
+      const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+      const hasMore = page < totalPages;
+
+      const items: StockMovementRecord[] = (data || []).map((row: any) => {
         const ing = Array.isArray(row.ingredient) ? row.ingredient[0] : row.ingredient;
         const qty = Number(row.quantity || 0);
         const prev = Number(row.previous_stock || 0);
@@ -504,6 +559,15 @@ function createPostgresInventoryRepository(client: any): InventoryRepository {
           createdAt: row.created_at,
         };
       });
+
+      return {
+        items,
+        totalCount,
+        page,
+        pageSize,
+        totalPages,
+        hasMore,
+      };
     },
   };
 }
@@ -634,20 +698,52 @@ export function createInventoryRepository(
       },
 
       async listInventoryStock(tenantId) {
-        return Array.from(inMemoryIngredients.values()).filter(
-          (item) => item.tenantId === tenantId,
-        );
+        return Array.from(inMemoryIngredients.values())
+          .filter((item) => item.tenantId === tenantId)
+          .sort((a, b) =>
+            (a.name || "").localeCompare(b.name || "", "es", { sensitivity: "base" }),
+          );
       },
 
       async listStockMovements(tenantId, filter) {
-        return inMemoryMovements
+        const page = Math.max(1, Math.floor(Number(filter?.page) || 1));
+        const pageSize = Math.max(1, Math.min(100, Math.floor(Number(filter?.pageSize) || 50)));
+        const offset = (page - 1) * pageSize;
+
+        const filtered = inMemoryMovements
           .filter((m) => {
             if (m.tenantId !== tenantId) return false;
-            if (filter?.ingredientId && m.ingredientId !== filter.ingredientId) return false;
-            if (filter?.movementType && m.movementType !== filter.movementType) return false;
+            if (filter?.ingredientId && filter.ingredientId !== "all" && m.ingredientId !== filter.ingredientId) return false;
+            if (filter?.movementType && filter.movementType !== "all" && m.movementType !== filter.movementType) return false;
+            if (filter?.dateFrom) {
+              const fromIso = filter.dateFrom.includes("T") ? filter.dateFrom : `${filter.dateFrom}T00:00:00.000Z`;
+              if (m.createdAt < fromIso) return false;
+            }
+            if (filter?.dateTo) {
+              const toIso = filter.dateTo.includes("T") ? filter.dateTo : `${filter.dateTo}T23:59:59.999Z`;
+              if (m.createdAt > toIso) return false;
+            }
             return true;
           })
-          .slice(0, filter?.limit || 100);
+          .sort((a, b) => {
+            const timeDiff = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            if (timeDiff !== 0) return timeDiff;
+            return b.id.localeCompare(a.id);
+          });
+
+        const totalCount = filtered.length;
+        const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+        const hasMore = page < totalPages;
+        const items = filtered.slice(offset, offset + pageSize);
+
+        return {
+          items,
+          totalCount,
+          page,
+          pageSize,
+          totalPages,
+          hasMore,
+        };
       },
     };
   }
