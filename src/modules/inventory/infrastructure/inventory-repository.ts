@@ -12,6 +12,11 @@ import type {
   InventoryConsumption,
   ProductionPlanInput,
 } from "../domain/inventory-consumption";
+import type {
+  InventoryStockItem,
+  StockMovementRecord,
+  StockMovementFilter,
+} from "../domain/inventory-types";
 
 export type InventoryRepository = {
   findBySource: (
@@ -49,6 +54,11 @@ export type InventoryRepository = {
     consumptionId: string;
     actorId?: string;
   }) => Promise<InventoryConsumption>;
+  listInventoryStock: (tenantId: string) => Promise<InventoryStockItem[]>;
+  listStockMovements: (
+    tenantId: string,
+    filter?: StockMovementFilter,
+  ) => Promise<StockMovementRecord[]>;
 };
 
 // ============================================================================
@@ -59,6 +69,8 @@ const byId = new Map<string, InventoryConsumption>();
 const productionInputs = new Map<string, ProductionPlanInput>();
 /** tenantId::ingredientId → stock */
 const stock = new Map<string, number>();
+const inMemoryIngredients = new Map<string, InventoryStockItem>();
+const inMemoryMovements: StockMovementRecord[] = [];
 
 function sourceKey(tenantId: string, deliveryDate: string): string {
   return `${tenantId}::${deliveryDate}`;
@@ -95,12 +107,33 @@ export function __seedStock(
   stock.set(stockKey(tenantId, ingredientId), qty);
 }
 
+/**
+ * Test / driver helper: seed ingredient for stock listing.
+ * @internal
+ */
+export function __seedIngredient(
+  tenantId: string,
+  item: InventoryStockItem,
+): void {
+  inMemoryIngredients.set(`${tenantId}::${item.id}`, { ...item, tenantId });
+}
+
+/**
+ * Test / driver helper: seed stock movement record.
+ * @internal
+ */
+export function __seedStockMovement(movement: StockMovementRecord): void {
+  inMemoryMovements.push(movement);
+}
+
 /** @internal vitest */
 export function __resetInventoryStoreForTests(): void {
   store.clear();
   byId.clear();
   productionInputs.clear();
   stock.clear();
+  inMemoryIngredients.clear();
+  inMemoryMovements.length = 0;
 }
 
 function isSupabaseClient(client: unknown): boolean {
@@ -376,6 +409,102 @@ function createPostgresInventoryRepository(client: any): InventoryRepository {
       }
       return updated;
     },
+
+    async listInventoryStock(tenantId: string): Promise<InventoryStockItem[]> {
+      const { data, error } = await client
+        .from("ingredients")
+        .select("id, tenant_id, name, unit, cost, stock, min_stock, waste_percentage, supplier_id")
+        .eq("tenant_id", tenantId)
+        .is("deleted_at", null)
+        .order("name", { ascending: true });
+
+      if (error) throw new Error(error.message);
+      return (data || []).map((row: any) => {
+        const stock = Number(row.stock || 0);
+        const cost = Number(row.cost || 0);
+        return {
+          id: row.id,
+          tenantId: row.tenant_id,
+          name: row.name,
+          unit: row.unit || "kg",
+          stock,
+          cost,
+          minStock: Number(row.min_stock || 0),
+          wastePercentage: Number(row.waste_percentage || 0),
+          supplierId: row.supplier_id,
+          totalValue: Math.round(stock * cost * 100) / 100,
+          status: stock > 0 ? "available" : "out_of_stock",
+        };
+      });
+    },
+
+    async listStockMovements(
+      tenantId: string,
+      filter?: StockMovementFilter,
+    ): Promise<StockMovementRecord[]> {
+      let query = client
+        .from("stock_movements")
+        .select(`
+          id,
+          tenant_id,
+          ingredient_id,
+          movement_type,
+          quantity,
+          previous_stock,
+          new_stock,
+          unit_cost,
+          reference_document_type,
+          reference_document_id,
+          receipt_id,
+          notes,
+          created_at,
+          ingredient:ingredients(id, name, unit)
+        `)
+        .eq("tenant_id", tenantId)
+        .order("created_at", { ascending: false });
+
+      if (filter?.ingredientId) {
+        query = query.eq("ingredient_id", filter.ingredientId);
+      }
+      if (filter?.movementType) {
+        query = query.eq("movement_type", filter.movementType);
+      }
+      if (filter?.limit) {
+        query = query.limit(filter.limit);
+      } else {
+        query = query.limit(100);
+      }
+
+      const { data, error } = await query;
+      if (error) throw new Error(error.message);
+
+      return (data || []).map((row: any) => {
+        const ing = Array.isArray(row.ingredient) ? row.ingredient[0] : row.ingredient;
+        const qty = Number(row.quantity || 0);
+        const prev = Number(row.previous_stock || 0);
+        const next = Number(row.new_stock || 0);
+        const isEntry = row.movement_type === "PURCHASE_RECEIPT" || next > prev;
+
+        return {
+          id: row.id,
+          tenantId: row.tenant_id,
+          ingredientId: row.ingredient_id,
+          ingredientName: ing?.name || "Ingrediente Desconocido",
+          ingredientUnit: ing?.unit || "kg",
+          movementType: row.movement_type,
+          direction: isEntry ? "IN" : "OUT",
+          quantity: qty,
+          previousStock: prev,
+          newStock: next,
+          unitCost: Number(row.unit_cost || 0),
+          referenceDocumentType: row.reference_document_type,
+          referenceDocumentId: row.reference_document_id,
+          receiptId: row.receipt_id,
+          notes: row.notes,
+          createdAt: row.created_at,
+        };
+      });
+    },
   };
 }
 
@@ -502,6 +631,23 @@ export function createInventoryRepository(
         store.set(sourceKey(tenantId, current.deliveryDate), sealed);
         byId.set(sealed.id, sealed);
         return sealed;
+      },
+
+      async listInventoryStock(tenantId) {
+        return Array.from(inMemoryIngredients.values()).filter(
+          (item) => item.tenantId === tenantId,
+        );
+      },
+
+      async listStockMovements(tenantId, filter) {
+        return inMemoryMovements
+          .filter((m) => {
+            if (m.tenantId !== tenantId) return false;
+            if (filter?.ingredientId && m.ingredientId !== filter.ingredientId) return false;
+            if (filter?.movementType && m.movementType !== filter.movementType) return false;
+            return true;
+          })
+          .slice(0, filter?.limit || 100);
       },
     };
   }

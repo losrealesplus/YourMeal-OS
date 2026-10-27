@@ -12,6 +12,12 @@ import {
   buildConsumptionPlanLines,
   type InventoryConsumption,
 } from "../domain/inventory-consumption";
+import type {
+  InventoryStockItem,
+  StockMovementRecord,
+  StockMovementFilter,
+  InventorySummary,
+} from "../domain/inventory-types";
 import { createInventoryRepository } from "../infrastructure/inventory-repository";
 import {
   assertFlow04Prefix,
@@ -329,5 +335,45 @@ export const InventoryService = {
       });
       throw e;
     }
+  },
+
+  /**
+   * List all active inventory ingredients with current stock and WAC valuation.
+   */
+  async getInventoryStock(ctx: ServiceContext): Promise<InventoryStockItem[]> {
+    assertTenant(ctx);
+    assertInventory(ctx);
+    const repo = createInventoryRepository(ctx.supabase, ctx.tenantId);
+    return repo.listInventoryStock(ctx.tenantId);
+  },
+
+  /**
+   * List stock movements (Kárdex) with filters and ordering.
+   */
+  async getStockMovements(
+    ctx: ServiceContext,
+    filter?: StockMovementFilter,
+  ): Promise<StockMovementRecord[]> {
+    assertTenant(ctx);
+    assertInventory(ctx);
+    const repo = createInventoryRepository(ctx.supabase, ctx.tenantId);
+    return repo.listStockMovements(ctx.tenantId, filter);
+  },
+
+  /**
+   * Compute inventory KPIs and aggregate valuation.
+   */
+  async getInventorySummary(ctx: ServiceContext): Promise<InventorySummary> {
+    const items = await this.getInventoryStock(ctx);
+    const totalIngredients = items.length;
+    const inStockCount = items.filter((i) => i.stock > 0).length;
+    const outOfStockCount = items.filter((i) => i.stock <= 0).length;
+    const totalValuation = items.reduce((sum, i) => sum + i.totalValue, 0);
+    return {
+      totalIngredients,
+      inStockCount,
+      outOfStockCount,
+      totalValuation: Math.round(totalValuation * 100) / 100,
+    };
   },
 };
