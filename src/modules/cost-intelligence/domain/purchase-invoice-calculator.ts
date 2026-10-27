@@ -12,6 +12,19 @@ import {
   PurchaseInvoiceInput,
 } from "./procurement-types";
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export function isValidUuid(id: unknown): id is string {
+  return typeof id === "string" && UUID_REGEX.test(id);
+}
+
+function generateUuid(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return "00000000-0000-4000-8000-000000000000";
+}
+
 function round(val: number, decimals = 4): number {
   const factor = Math.pow(10, decimals);
   return Math.round((val + Number.EPSILON) * factor) / factor;
@@ -19,7 +32,9 @@ function round(val: number, decimals = 4): number {
 
 export function calculatePurchaseInvoiceTotals(
   input: PurchaseInvoiceInput,
-  invoiceId: string = input.id ?? "temp-inv-id",
+  invoiceId: string = (input.id && isValidUuid(input.id))
+    ? input.id
+    : (input.id ? input.id : generateUuid()),
 ): CalculatedPurchaseInvoice {
   if (!input.items || input.items.length === 0) {
     throw new Error("Purchase invoice must contain at least one line item.");
@@ -66,11 +81,12 @@ export function calculatePurchaseInvoiceTotals(
       taxAmount += lineTax;
 
       return {
-        id: item.id ?? `item-${idx + 1}`,
+        id: (item.id && isValidUuid(item.id)) ? item.id : (item.id ? item.id : generateUuid()),
         purchaseInvoiceId: invoiceId,
         tenantId: input.tenantId,
         itemId: item.itemId,
         itemName: item.itemName,
+        itemNature: item.itemNature ?? "INVENTORYABLE",
         quantity: item.quantity,
         unit: item.unit,
         unitPrice: item.unitPrice,

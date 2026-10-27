@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { calculatePurchaseInvoiceTotals } from "./purchase-invoice-calculator";
+import {
+  calculatePurchaseInvoiceTotals,
+  isValidUuid,
+} from "./purchase-invoice-calculator";
 import { PurchaseInvoiceInput } from "./procurement-types";
 
 describe("Purchase Invoice Calculator (CR-COST-01)", () => {
@@ -58,5 +61,58 @@ describe("Purchase Invoice Calculator (CR-COST-01)", () => {
         items: [],
       }),
     ).toThrow();
+  });
+
+  it("3. Generates valid UUIDs when id is omitted and never emits temp-inv-id", () => {
+    const calculated = calculatePurchaseInvoiceTotals({
+      ...sampleInput,
+      id: undefined,
+    });
+
+    expect(isValidUuid(calculated.id)).toBe(true);
+    expect(calculated.id).not.toBe("temp-inv-id");
+    expect(calculated.items.length).toBe(2);
+    calculated.items.forEach((item) => {
+      expect(isValidUuid(item.id)).toBe(true);
+      expect(item.id).not.toContain("item-");
+    });
+  });
+
+  it("4. Preserves provided valid UUIDs and itemNature for inventory and service lines", () => {
+    const customInvoiceUuid = "11111111-2222-4333-8444-555555555555";
+    const customLineUuid = "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee";
+    const calculated = calculatePurchaseInvoiceTotals(
+      {
+        ...sampleInput,
+        id: customInvoiceUuid,
+        items: [
+          {
+            id: customLineUuid,
+            itemId: "99999999-8888-4777-8666-555555555555",
+            itemName: "Transporte Refrigerado Especial",
+            itemNature: "EXPENSE_SERVICE",
+            quantity: 1,
+            unit: "serv",
+            unitPrice: 50.0,
+            taxRate: 21,
+          },
+          {
+            itemId: "88888888-7777-4666-8555-444444444444",
+            itemName: "Sal marina gruesa",
+            itemNature: "INVENTORYABLE",
+            quantity: 25,
+            unit: "kg",
+            unitPrice: 0.8,
+            taxRate: 10,
+          },
+        ],
+      },
+    );
+
+    expect(calculated.id).toBe(customInvoiceUuid);
+    expect(calculated.items[0].id).toBe(customLineUuid);
+    expect(calculated.items[0].itemNature).toBe("EXPENSE_SERVICE");
+    expect(calculated.items[1].itemNature).toBe("INVENTORYABLE");
+    expect(isValidUuid(calculated.items[1].id)).toBe(true);
   });
 });

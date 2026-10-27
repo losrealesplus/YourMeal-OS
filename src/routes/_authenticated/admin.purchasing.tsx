@@ -25,6 +25,7 @@ import { useCan } from "@/hooks/use-can";
 import { supabase } from "@/integrations/supabase/client";
 import { createServiceContext } from "@/services/types";
 import { ProcurementCostService } from "@/modules/cost-intelligence/application/procurement-cost-service";
+import { isValidUuid } from "@/modules/cost-intelligence/domain/purchase-invoice-calculator";
 import type {
   CalculatedPurchaseInvoice,
   ItemNature,
@@ -125,6 +126,9 @@ export function AdminPurchasingPage() {
 
   // Create Invoice Dialog State
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [draftInvoiceId, setDraftInvoiceId] = useState<string>(() =>
+    typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : "",
+  );
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [invoiceDate, setInvoiceDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [selectedSupplierId, setSelectedSupplierId] = useState("");
@@ -178,8 +182,16 @@ export function AdminPurchasingPage() {
   }, [suppliers]);
 
   // Line item helpers
-  const addLine = () => {
-    setLineItems((prev) => [...prev, { ...emptyLineItem }]);
+  const addLine = (nature: ItemNature = "INVENTORYABLE") => {
+    setLineItems((prev) => [
+      ...prev,
+      {
+        ...emptyLineItem,
+        itemNature: nature,
+        unit: nature === "EXPENSE_SERVICE" ? "ud" : "kg",
+        taxRate: nature === "EXPENSE_SERVICE" ? "21" : "10",
+      },
+    ]);
   };
 
   const removeLine = (idx: number) => {
@@ -239,18 +251,24 @@ export function AdminPurchasingPage() {
       return;
     }
 
+    const currentDraftId = draftInvoiceId || (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : undefined);
+
     const items = lineItems.map((l) => {
-      const itemId = l.itemId || `item-custom-${Date.now()}`;
-      const itemName = l.itemName || "Ingrediente de Compra";
+      const isService = l.itemNature === "EXPENSE_SERVICE";
+      const itemId = (l.itemId && isValidUuid(l.itemId))
+        ? l.itemId
+        : (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : "");
+      const itemName = l.itemName || (isService ? "Servicio / Gasto Operativo" : "Ingrediente de Compra");
       return {
+        id: typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : undefined,
         itemId,
         itemName,
         itemNature: l.itemNature || "INVENTORYABLE",
-        quantity: Number(l.quantity) || 1,
-        unit: l.unit || "kg",
-        unitPrice: Number(l.unitPrice) || 0,
-        discountAmount: Number(l.discountAmount) || 0,
-        taxRate: Number(l.taxRate) || 10,
+        quantity: Math.max(0.001, Number(l.quantity) || 1),
+        unit: l.unit || (isService ? "ud" : "kg"),
+        unitPrice: Math.max(0, Number(l.unitPrice) || 0),
+        discountAmount: Math.max(0, Number(l.discountAmount) || 0),
+        taxRate: Math.max(0, Number(l.taxRate) || (isService ? 21 : 10)),
       };
     });
 
@@ -265,6 +283,7 @@ export function AdminPurchasingPage() {
 
       const procurementService = new ProcurementCostService();
       await procurementService.createDraftInvoice(ctx, {
+        id: currentDraftId,
         tenantId,
         supplierId: selectedSupplierId,
         invoiceNumber: invoiceNumber.trim(),
@@ -278,6 +297,7 @@ export function AdminPurchasingPage() {
       toast.success(`Factura ${invoiceNumber} registrada como borrador.`);
       setIsCreateOpen(false);
       setInvoiceNumber("");
+      setDraftInvoiceId(typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : "");
       setLineItems([{ ...emptyLineItem }]);
       await reload();
     } catch (err) {
@@ -650,11 +670,27 @@ export function AdminPurchasingPage() {
             {/* Line Items Editor */}
             <div className="space-y-2 border-t pt-3">
               <div className="flex justify-between items-center">
-                <Label className="font-semibold text-sm">Líneas de Compra (Artículos)</Label>
-                <Button type="button" size="sm" variant="outline" onClick={addLine} className="h-7 text-xs gap-1">
-                  <Plus className="h-3.5 w-3.5" />
-                  Añadir Línea
-                </Button>
+                <Label className="font-semibold text-sm">Líneas de Compra (Artículos & Servicios)</Label>
+                <div className="flex items-center gap-1.5">
+                  <Button type="button" size="sm" variant="outline" onClick={() => addLine("INVENTORYABLE")} className="h-7 text-xs gap-1">
+                    <Plus className="h-3.5 w-3.5" />
+                    + Ingrediente
+                  </Button>
+                  <Button type="button" size="sm" variant="outline" onClick={() => addLine("EXPENSE_SERVICE")} className="h-7 text-xs gap-1">
+                    <Plus className="h-3.5 w-3.5" />
+                    + Servicio
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-12 gap-2 text-[10px] font-semibold text-muted-foreground px-2 pt-1">
+                <div className="col-span-2">Tipo</div>
+                <div className="col-span-3">Concepto</div>
+                <div className="col-span-2">Cantidad</div>
+                <div className="col-span-2">Precio (€)</div>
+                <div className="col-span-1">Dto (€)</div>
+                <div className="col-span-1">IVA %</div>
+                <div className="col-span-1 text-right">Borrar</div>
               </div>
 
               <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
@@ -663,14 +699,43 @@ export function AdminPurchasingPage() {
                     key={idx}
                     className="grid grid-cols-12 gap-2 items-center bg-muted/20 p-2 rounded-lg border text-xs"
                   >
-                    <div className="col-span-4 space-y-1">
-                      {ingredients.length > 0 ? (
+                    <div className="col-span-2 space-y-1">
+                      <Select
+                        value={line.itemNature}
+                        onValueChange={(val) =>
+                          updateLine(idx, {
+                            itemNature: val as ItemNature,
+                            itemId: val === "EXPENSE_SERVICE" ? "" : line.itemId,
+                            unit: val === "EXPENSE_SERVICE" ? "ud" : "kg",
+                            taxRate: val === "EXPENSE_SERVICE" ? "21" : "10",
+                          })
+                        }
+                      >
+                        <SelectTrigger className="h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="INVENTORYABLE">📦 Stock</SelectItem>
+                          <SelectItem value="EXPENSE_SERVICE">🛠️ Servicio</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="col-span-3 space-y-1">
+                      {line.itemNature === "EXPENSE_SERVICE" ? (
+                        <Input
+                          placeholder="Concepto de servicio"
+                          className="h-8 text-xs"
+                          value={line.itemName}
+                          onChange={(e) => updateLine(idx, { itemName: e.target.value })}
+                        />
+                      ) : ingredients.length > 0 ? (
                         <Select
                           value={line.itemId}
                           onValueChange={(val) => updateLine(idx, { itemId: val })}
                         >
                           <SelectTrigger className="h-8 text-xs">
-                            <SelectValue placeholder="Seleccionar ingrediente" />
+                            <SelectValue placeholder="Ingrediente..." />
                           </SelectTrigger>
                           <SelectContent>
                             {ingredients.map((ing) => (
@@ -682,7 +747,7 @@ export function AdminPurchasingPage() {
                         </Select>
                       ) : (
                         <Input
-                          placeholder="Nombre artículo"
+                          placeholder="Nombre ingrediente"
                           className="h-8 text-xs"
                           value={line.itemName}
                           onChange={(e) => updateLine(idx, { itemName: e.target.value })}
@@ -714,7 +779,7 @@ export function AdminPurchasingPage() {
                       />
                     </div>
 
-                    <div className="col-span-2 space-y-1">
+                    <div className="col-span-1 space-y-1">
                       <Input
                         type="number"
                         placeholder="Dto €"

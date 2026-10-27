@@ -112,7 +112,12 @@ export function validateInstanceRuntimeConfig(config: InstanceRuntimeConfig): vo
  */
 export function resolveInstanceRuntimeConfig(hostname?: string): InstanceRuntimeConfig {
   const host = (hostname || "").toLowerCase().trim();
-  const localBuild = import.meta.env.VITE_YOURMEAL_RUNTIME_ENV;
+  const localBuild =
+    typeof import.meta !== "undefined" && import.meta.env
+      ? import.meta.env.VITE_YOURMEAL_RUNTIME_ENV
+      : typeof process !== "undefined"
+      ? process.env.VITE_YOURMEAL_RUNTIME_ENV
+      : undefined;
   if (localBuild !== undefined && localBuild !== "staging_local") {
     throw new Error("SECURITY_VIOLATION: Unknown build runtime environment.");
   }

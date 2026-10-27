@@ -4,6 +4,7 @@
  */
 
 import { SupabaseClient } from "@supabase/supabase-js";
+import { isValidUuid } from "../domain/purchase-invoice-calculator";
 import {
   CalculatedPurchaseInvoice,
   ItemCostHistoryEntry,
@@ -37,10 +38,20 @@ export class SupabaseProcurementCostRepository implements ProcurementCostReposit
   constructor(private readonly supabase: SupabaseClient) {}
 
   async createInvoice(invoice: CalculatedPurchaseInvoice): Promise<CalculatedPurchaseInvoice> {
+    const finalInvoiceId = isValidUuid(invoice.id)
+      ? invoice.id
+      : (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : invoice.id);
+
+    // Idempotent retry guard: if draft with same ID was already saved, return existing
+    const existing = await this.getInvoiceById(invoice.tenantId, finalInvoiceId);
+    if (existing) {
+      return existing;
+    }
+
     const { data: invData, error: invError } = await this.supabase
       .from("purchase_invoices")
       .insert({
-        id: invoice.id,
+        id: finalInvoiceId,
         tenant_id: invoice.tenantId,
         supplier_id: invoice.supplierId,
         invoice_number: invoice.invoiceNumber,
@@ -58,27 +69,36 @@ export class SupabaseProcurementCostRepository implements ProcurementCostReposit
 
     if (invError) throw invError;
 
-    const itemsToInsert = invoice.items.map((item) => ({
-      id: item.id,
-      tenant_id: invoice.tenantId,
-      purchase_invoice_id: invoice.id,
-      item_id: item.itemId,
-      item_name: item.itemName,
-      item_nature: item.itemNature ?? "INVENTORYABLE",
-      quantity: item.quantity,
-      received_quantity: item.receivedQuantity ?? 0,
-      unit: item.unit,
-      unit_price: item.unitPrice,
-      discount_amount: item.discountAmount,
-      tax_rate: item.taxRate,
-      tax_amount: item.taxAmount,
-      weight_kg: item.weightKg,
-      volume_m3: item.volumeM3,
-      manual_overhead: item.manualOverhead,
-      allocated_overhead: item.allocatedOverhead,
-      effective_unit_cost: item.effectiveUnitCost,
-      line_total: item.lineTotal,
-    }));
+    const itemsToInsert = invoice.items.map((item) => {
+      const lineId = isValidUuid(item.id)
+        ? item.id
+        : (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : undefined);
+      const itemId = isValidUuid(item.itemId)
+        ? item.itemId
+        : (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : undefined);
+
+      return {
+        id: lineId,
+        tenant_id: invoice.tenantId,
+        purchase_invoice_id: finalInvoiceId,
+        item_id: itemId,
+        item_name: item.itemName,
+        item_nature: item.itemNature ?? "INVENTORYABLE",
+        quantity: item.quantity,
+        received_quantity: item.receivedQuantity ?? 0,
+        unit: item.unit,
+        unit_price: item.unitPrice,
+        discount_amount: item.discountAmount,
+        tax_rate: item.taxRate,
+        tax_amount: item.taxAmount,
+        weight_kg: item.weightKg,
+        volume_m3: item.volumeM3,
+        manual_overhead: item.manualOverhead,
+        allocated_overhead: item.allocatedOverhead,
+        effective_unit_cost: item.effectiveUnitCost,
+        line_total: item.lineTotal,
+      };
+    });
 
     const { error: itemsError } = await this.supabase
       .from("purchase_invoice_items")
@@ -86,7 +106,17 @@ export class SupabaseProcurementCostRepository implements ProcurementCostReposit
 
     if (itemsError) throw itemsError;
 
-    return invoice;
+    return {
+      ...invoice,
+      id: finalInvoiceId,
+      items: invoice.items.map((item, idx) => ({
+        ...item,
+        id: itemsToInsert[idx].id ?? item.id,
+        purchaseInvoiceId: finalInvoiceId,
+        itemId: itemsToInsert[idx].item_id ?? item.itemId,
+        itemNature: itemsToInsert[idx].item_nature as ItemNature,
+      })),
+    };
   }
 
   async getInvoiceById(tenantId: string, invoiceId: string): Promise<CalculatedPurchaseInvoice | null> {
