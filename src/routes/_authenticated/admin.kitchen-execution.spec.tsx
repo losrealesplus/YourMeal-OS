@@ -1,8 +1,15 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import React from "react";
 import { renderToString } from "react-dom/server";
-import { analyzeKitchenConsumptionLines, KitchenExecutionPage } from "./admin.kitchen-execution";
-import type { ConsumptionLine } from "@/modules/inventory/domain/inventory-consumption";
+import {
+  analyzeKitchenConsumptionLines,
+  KitchenExecutionPage,
+  KitchenConsumptionSection,
+} from "./admin.kitchen-execution";
+import type {
+  ConsumptionLine,
+  InventoryConsumption,
+} from "@/modules/inventory/domain/inventory-consumption";
 
 // Mock Radix dialogs & accordions for SSR rendering
 vi.mock("@/components/ui/alert-dialog", () => ({
@@ -212,6 +219,214 @@ describe("Kitchen FLOW-04 Presentation & Absence Contract", () => {
       expect(html).not.toContain('data-testid="plan-consumption-button"');
       expect(html).not.toContain('data-testid="apply-consumption-button"');
       expect(html).not.toContain('data-testid="seal-consumption-button"');
+    });
+  });
+
+  describe("KitchenConsumptionSection RBAC & Lifecycle Controls", () => {
+    const plannedConsumption: InventoryConsumption = {
+      id: "cons-plan-01",
+      tenantId: "tenant-eatclean",
+      deliveryDate: "2026-10-27",
+      status: "planned",
+      lines: sampleLines,
+      createdAt: "2026-10-27T10:00:00Z",
+    };
+
+    const appliedConsumption: InventoryConsumption = {
+      id: "cons-appl-01",
+      tenantId: "tenant-eatclean",
+      deliveryDate: "2026-10-27",
+      status: "applied",
+      lines: sampleLines,
+      createdAt: "2026-10-27T10:00:00Z",
+    };
+
+    const sealedConsumption: InventoryConsumption = {
+      id: "cons-seal-01",
+      tenantId: "tenant-eatclean",
+      deliveryDate: "2026-10-27",
+      status: "sealed",
+      lines: sampleLines,
+      createdAt: "2026-10-27T10:00:00Z",
+    };
+
+    const sampleStockMap = new Map<string, { stock: number; unit: string }>([
+      ["ing-chicken", { stock: 5.0, unit: "kg" }],
+      ["ing-rice", { stock: 5.0, unit: "kg" }],
+    ]);
+
+    describe("Unplanned state (consumption = null)", () => {
+      it("shows read-only notice and NO T1 plan button when canOperateInventory is false", () => {
+        const html = renderToString(
+          <KitchenConsumptionSection
+            date="2026-10-27"
+            tenantId="tenant-eatclean"
+            consumption={null}
+            consumptionLoading={false}
+            consumptionError={null}
+            stockMap={sampleStockMap}
+            stockError={null}
+            canOperateInventory={false}
+          />,
+        );
+
+        expect(html).toContain('data-testid="consumption-rbac-notice"');
+        expect(html).toContain("No hay consumo de ingredientes planificado");
+        expect(html).not.toContain('data-testid="plan-consumption-button"');
+        expect(html).not.toContain('data-testid="apply-consumption-button"');
+        expect(html).not.toContain('data-testid="seal-consumption-button"');
+      });
+
+      it("CONTROL: shows T1 plan button and NO rbac notice when canOperateInventory is true", () => {
+        const html = renderToString(
+          <KitchenConsumptionSection
+            date="2026-10-27"
+            tenantId="tenant-eatclean"
+            consumption={null}
+            consumptionLoading={false}
+            consumptionError={null}
+            stockMap={sampleStockMap}
+            stockError={null}
+            canOperateInventory={true}
+          />,
+        );
+
+        expect(html).not.toContain('data-testid="consumption-rbac-notice"');
+        expect(html).toContain('data-testid="plan-consumption-button"');
+        expect(html).not.toContain('data-testid="apply-consumption-button"');
+        expect(html).not.toContain('data-testid="seal-consumption-button"');
+      });
+    });
+
+    describe("Planned state (status = planned)", () => {
+      it("allows consulting consumption lines but hides T2 apply button when canOperateInventory is false", () => {
+        const html = renderToString(
+          <KitchenConsumptionSection
+            date="2026-10-27"
+            tenantId="tenant-eatclean"
+            consumption={plannedConsumption}
+            consumptionLoading={false}
+            consumptionError={null}
+            stockMap={sampleStockMap}
+            stockError={null}
+            canOperateInventory={false}
+          />,
+        );
+
+        // Read-only notice present
+        expect(html).toContain('data-testid="consumption-rbac-notice"');
+        // Ingredients table and data visible to kitchen
+        expect(html).toContain('data-testid="consumption-lines-table"');
+        expect(html).toContain("Pechuga de Pollo");
+        expect(html).toContain("Arroz Integral");
+        // No mutation buttons visible
+        expect(html).not.toContain('data-testid="apply-consumption-button"');
+        expect(html).not.toContain('data-testid="seal-consumption-button"');
+        expect(html).not.toContain('data-testid="plan-consumption-button"');
+      });
+
+      it("CONTROL: shows T2 apply button and lines when canOperateInventory is true", () => {
+        const html = renderToString(
+          <KitchenConsumptionSection
+            date="2026-10-27"
+            tenantId="tenant-eatclean"
+            consumption={plannedConsumption}
+            consumptionLoading={false}
+            consumptionError={null}
+            stockMap={sampleStockMap}
+            stockError={null}
+            canOperateInventory={true}
+          />,
+        );
+
+        expect(html).not.toContain('data-testid="consumption-rbac-notice"');
+        expect(html).toContain('data-testid="consumption-lines-table"');
+        expect(html).toContain('data-testid="apply-consumption-button"');
+        expect(html).not.toContain('data-testid="seal-consumption-button"');
+      });
+    });
+
+    describe("Applied state (status = applied)", () => {
+      it("allows consulting applied lines and status but hides T3 seal button when canOperateInventory is false", () => {
+        const html = renderToString(
+          <KitchenConsumptionSection
+            date="2026-10-27"
+            tenantId="tenant-eatclean"
+            consumption={appliedConsumption}
+            consumptionLoading={false}
+            consumptionError={null}
+            stockMap={sampleStockMap}
+            stockError={null}
+            canOperateInventory={false}
+          />,
+        );
+
+        // Read-only notice present
+        expect(html).toContain('data-testid="consumption-rbac-notice"');
+        // Ingredients table visible
+        expect(html).toContain('data-testid="consumption-lines-table"');
+        expect(html).toContain("Pechuga de Pollo");
+        // No mutation buttons
+        expect(html).not.toContain('data-testid="seal-consumption-button"');
+        expect(html).not.toContain('data-testid="apply-consumption-button"');
+        expect(html).not.toContain('data-testid="plan-consumption-button"');
+      });
+
+      it("CONTROL: shows T3 seal button when canOperateInventory is true", () => {
+        const html = renderToString(
+          <KitchenConsumptionSection
+            date="2026-10-27"
+            tenantId="tenant-eatclean"
+            consumption={appliedConsumption}
+            consumptionLoading={false}
+            consumptionError={null}
+            stockMap={sampleStockMap}
+            stockError={null}
+            canOperateInventory={true}
+          />,
+        );
+
+        expect(html).not.toContain('data-testid="consumption-rbac-notice"');
+        expect(html).toContain('data-testid="consumption-lines-table"');
+        expect(html).toContain('data-testid="seal-consumption-button"');
+        expect(html).not.toContain('data-testid="apply-consumption-button"');
+      });
+    });
+
+    describe("Sealed state (status = sealed - terminal)", () => {
+      it("allows consulting sealed consumption without mutation buttons regardless of permission", () => {
+        const htmlKitchen = renderToString(
+          <KitchenConsumptionSection
+            date="2026-10-27"
+            tenantId="tenant-eatclean"
+            consumption={sealedConsumption}
+            consumptionLoading={false}
+            consumptionError={null}
+            stockMap={sampleStockMap}
+            stockError={null}
+            canOperateInventory={false}
+          />,
+        );
+        expect(htmlKitchen).toContain('data-testid="consumption-lines-table"');
+        expect(htmlKitchen).not.toContain('data-testid="seal-consumption-button"');
+        expect(htmlKitchen).not.toContain('data-testid="apply-consumption-button"');
+
+        const htmlStaff = renderToString(
+          <KitchenConsumptionSection
+            date="2026-10-27"
+            tenantId="tenant-eatclean"
+            consumption={sealedConsumption}
+            consumptionLoading={false}
+            consumptionError={null}
+            stockMap={sampleStockMap}
+            stockError={null}
+            canOperateInventory={true}
+          />,
+        );
+        expect(htmlStaff).toContain('data-testid="consumption-lines-table"');
+        expect(htmlStaff).not.toContain('data-testid="seal-consumption-button"');
+        expect(htmlStaff).not.toContain('data-testid="apply-consumption-button"');
+      });
     });
   });
 });

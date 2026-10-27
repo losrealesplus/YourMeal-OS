@@ -226,6 +226,436 @@ export function analyzeKitchenConsumptionLines(
   });
 }
 
+export interface KitchenConsumptionSectionProps {
+  date: string;
+  tenantId: string | null;
+  consumption: InventoryConsumption | null;
+  consumptionLoading: boolean;
+  consumptionError: string | null;
+  consumptionActionBusy?: boolean;
+  stockMap: Map<string, { stock: number; unit: string }> | null;
+  stockError: string | null;
+  canOperateInventory: boolean;
+  onPlan?: () => void;
+  onApply?: () => void;
+  onSeal?: () => void;
+  onReloadStock?: () => void;
+}
+
+export function KitchenConsumptionSection({
+  date,
+  tenantId,
+  consumption,
+  consumptionLoading,
+  consumptionError,
+  consumptionActionBusy = false,
+  stockMap,
+  stockError,
+  canOperateInventory,
+  onPlan,
+  onApply,
+  onSeal,
+  onReloadStock,
+}: KitchenConsumptionSectionProps) {
+  const lines = consumption?.lines ?? [];
+  const totalPlannedQty = lines.reduce((acc, l) => acc + (l.qty || 0), 0);
+
+  const linesAnalysis = analyzeKitchenConsumptionLines(
+    lines,
+    stockMap,
+    consumption?.status ?? null,
+  );
+
+  const insufficientLines = linesAnalysis.filter((item) => item.isDeficit);
+  const incompatibleLines = linesAnalysis.filter((item) => item.isIncompatible);
+  const missingLines = linesAnalysis.filter((item) => item.isMissing);
+  const deficitOrMissingCount = linesAnalysis.filter(
+    (item) => item.isDeficit || item.isMissing,
+  ).length;
+  const hasInsufficientStock = insufficientLines.length > 0;
+  const hasIncompatibleUnits = incompatibleLines.length > 0;
+  const hasMissingIngredients = missingLines.length > 0;
+
+  return (
+    <section
+      data-testid="kitchen-consumption-section"
+      data-tenant-id={tenantId ?? ""}
+      data-consumption-loading={consumptionLoading ? "true" : "false"}
+      className="rounded-xl border border-border bg-card p-5 space-y-4 shadow-sm"
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="space-y-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <Boxes className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-semibold tracking-tight text-foreground">
+              Consumo de Ingredientes (FLOW-04)
+            </h2>
+            <Badge className={consumptionStatusTone(consumption?.status ?? null)}>
+              {consumptionStatusLabel(consumption?.status ?? null)}
+            </Badge>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Planificación (T1), aplicación en almacén (T2) y sellado definitivo (T3) para el día{" "}
+            {date}.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <Button asChild variant="outline" size="sm" data-testid="goto-inventory-button">
+            <Link to="/admin/inventory">
+              <Boxes className="mr-2 h-4 w-4" />
+              Ver en Kárdex
+            </Link>
+          </Button>
+        </div>
+      </div>
+
+      {!canOperateInventory ? (
+        <div
+          data-testid="consumption-rbac-notice"
+          className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 p-3 text-xs text-muted-foreground"
+        >
+          <Lock className="h-4 w-4 shrink-0 text-muted-foreground" />
+          <span>
+            Modo sólo lectura. Se requiere el permiso{" "}
+            <code className="font-mono font-semibold text-foreground">inventory.operate</code> para
+            planificar, aplicar o sellar consumos de ingredientes.
+          </span>
+        </div>
+      ) : null}
+
+      {consumptionLoading ? (
+        <div className="space-y-2 py-4">
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-20 w-full" />
+        </div>
+      ) : consumptionError ? (
+        <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
+          {consumptionError}
+        </div>
+      ) : !consumption ? (
+        <div className="rounded-lg border border-dashed p-6 text-center space-y-3">
+          <p className="text-sm text-muted-foreground">
+            No hay consumo de ingredientes planificado para esta fecha de entrega ({date}).
+          </p>
+          {canOperateInventory ? (
+            <Button
+              size="sm"
+              data-testid="plan-consumption-button"
+              onClick={onPlan}
+              disabled={consumptionActionBusy}
+            >
+              {consumptionActionBusy ? (
+                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Play className="mr-2 h-4 w-4" />
+              )}
+              Planificar consumo (T1)
+            </Button>
+          ) : null}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {/* KPI Summary Strip */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+            <div className="rounded-lg border border-border bg-muted/20 p-3">
+              <p className="text-xs text-muted-foreground">Líneas previstas</p>
+              <p
+                className="text-lg font-bold tabular-nums text-foreground"
+                data-testid="kpi-lines-count"
+              >
+                {lines.length}
+              </p>
+            </div>
+            <div className="rounded-lg border border-border bg-muted/20 p-3">
+              <p className="text-xs text-muted-foreground">Cantidad total</p>
+              <p
+                className="text-lg font-bold tabular-nums text-foreground"
+                data-testid="kpi-total-qty"
+              >
+                {formatQty(totalPlannedQty)}
+              </p>
+            </div>
+            <div className="rounded-lg border border-border bg-muted/20 p-3">
+              <p className="text-xs text-muted-foreground">Estado del flujo</p>
+              <p
+                className="text-sm font-semibold capitalize text-foreground"
+                data-testid="kpi-consumption-status"
+              >
+                {consumption.status}
+              </p>
+            </div>
+            <div className="rounded-lg border border-border bg-muted/20 p-3">
+              <p className="text-xs text-muted-foreground">Disponibilidad</p>
+              {consumption.status === "planned" ? (
+                stockMap === null ? (
+                  <div className="flex items-center justify-between gap-1 mt-1">
+                    <span
+                      data-testid="kpi-stock-not-verified"
+                      className="text-xs font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1"
+                    >
+                      <AlertTriangle className="h-3.5 w-3.5" /> Stock no disponible
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-5 px-1 text-[10px] text-muted-foreground hover:text-foreground"
+                      onClick={onReloadStock}
+                      disabled={consumptionLoading}
+                      title="Reintentar comprobación de existencias"
+                    >
+                      <RefreshCw className={cn("h-3 w-3", consumptionLoading && "animate-spin")} />
+                    </Button>
+                  </div>
+                ) : hasIncompatibleUnits ? (
+                  <span
+                    data-testid="kpi-unverifiable-units"
+                    className="text-xs font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1 mt-1"
+                  >
+                    <AlertTriangle className="h-3.5 w-3.5" /> Unidad no verificable
+                  </span>
+                ) : hasInsufficientStock || hasMissingIngredients ? (
+                  <span
+                    data-testid="kpi-insufficient-stock"
+                    className="text-xs font-semibold text-destructive flex items-center gap-1 mt-1"
+                  >
+                    <AlertTriangle className="h-3.5 w-3.5" /> Faltan {deficitOrMissingCount} ing.
+                  </span>
+                ) : (
+                  <span
+                    data-testid="kpi-sufficient-stock"
+                    className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 mt-1"
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5" /> Stock suficiente
+                  </span>
+                )
+              ) : (
+                <span className="text-xs font-medium text-muted-foreground mt-1 block">
+                  {consumption.status === "applied" ? "Stock descontado" : "Cerrado"}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Warning if stock fetch failed (Fail Closed) */}
+          {stockError ? (
+            <div
+              data-testid="stock-fetch-error-alert"
+              className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-900 dark:text-amber-200"
+            >
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                <span>
+                  No se pudieron comprobar las existencias en almacén ({stockError}). La validación
+                  definitiva se ejecutará en PostgreSQL al intentar aplicar.
+                </span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 text-xs border-amber-500/40 hover:bg-amber-500/20"
+                onClick={onReloadStock}
+                disabled={consumptionLoading}
+              >
+                <RefreshCw className={cn("mr-1 h-3 w-3", consumptionLoading && "animate-spin")} />
+                Reintentar existencias
+              </Button>
+            </div>
+          ) : null}
+
+          {/* Warning if incompatible units */}
+          {hasIncompatibleUnits ? (
+            <div
+              data-testid="incompatible-units-alert"
+              className="flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-900 dark:text-amber-200"
+            >
+              <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+              <span>
+                Atención: Se han detectado ingredientes con unidades no convertibles directamente
+                con el almacén (
+                {incompatibleLines
+                  .map(
+                    (i) => `${i.line.name}: receta ${i.line.unit} vs almacén ${i.stockItem?.unit}`,
+                  )
+                  .join(", ")}
+                ). La disponibilidad no es verificable automáticamente antes de aplicar.
+              </span>
+            </div>
+          ) : null}
+
+          {/* Warning if insufficient stock */}
+          {hasInsufficientStock ? (
+            <div
+              data-testid="insufficient-stock-alert"
+              className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive"
+            >
+              <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
+              <span>
+                Atención: Se han detectado ingredientes con existencias inferiores a la cantidad
+                necesaria. La base de datos rechazará la aplicación de consumo si el stock fuese a
+                quedar en negativo.
+              </span>
+            </div>
+          ) : null}
+
+          {/* Table of Consumption Lines */}
+          <div className="rounded-lg border border-border overflow-hidden">
+            <Table data-testid="consumption-lines-table">
+              <TableHeader>
+                <TableRow className="bg-muted/40">
+                  <TableHead className="font-semibold">Ingrediente</TableHead>
+                  <TableHead className="text-right font-semibold">Planificado</TableHead>
+                  <TableHead className="text-right font-semibold">Almacén</TableHead>
+                  <TableHead className="text-right font-semibold">Disponibilidad</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {linesAnalysis.map((item) => {
+                  const {
+                    line,
+                    stockKnown,
+                    isDeficit,
+                    isIncompatible,
+                    isMissing,
+                    displayText,
+                    availableInLineUnit,
+                  } = item;
+
+                  return (
+                    <TableRow
+                      key={line.ingredientId}
+                      data-testid={`consumption-line-${line.ingredientId}`}
+                    >
+                      <TableCell className="font-medium text-foreground">{line.name}</TableCell>
+                      <TableCell className="text-right font-mono tabular-nums text-foreground">
+                        {formatQty(line.qty)} {line.unit}
+                      </TableCell>
+                      <TableCell
+                        className={cn(
+                          "text-right font-mono tabular-nums",
+                          !stockKnown
+                            ? "text-amber-600 dark:text-amber-400 italic text-xs"
+                            : isIncompatible
+                              ? "text-amber-700 dark:text-amber-300 font-medium"
+                              : isDeficit || isMissing
+                                ? "text-destructive font-semibold"
+                                : "text-muted-foreground",
+                        )}
+                      >
+                        {displayText}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {consumption.status === "planned" ? (
+                          !stockKnown ? (
+                            <Badge
+                              variant="outline"
+                              className="border-amber-500/40 text-amber-700 bg-amber-500/10 text-xs"
+                            >
+                              Sin verificar
+                            </Badge>
+                          ) : isIncompatible ? (
+                            <Badge
+                              variant="outline"
+                              data-testid="badge-unit-incompatible"
+                              className="border-amber-500/40 text-amber-700 bg-amber-500/10 text-xs"
+                            >
+                              Unidad no convertible
+                            </Badge>
+                          ) : isDeficit || isMissing ? (
+                            <Badge
+                              variant="destructive"
+                              className="text-xs"
+                              data-testid={`badge-deficit-${line.ingredientId}`}
+                            >
+                              Faltan{" "}
+                              {availableInLineUnit !== null
+                                ? formatQty(line.qty - availableInLineUnit)
+                                : formatQty(line.qty)}{" "}
+                              {line.unit}
+                            </Badge>
+                          ) : (
+                            <Badge
+                              variant="outline"
+                              className="border-emerald-500/40 text-emerald-700 bg-emerald-500/10 text-xs"
+                            >
+                              En almacén
+                            </Badge>
+                          )
+                        ) : consumption.status === "applied" ? (
+                          <Badge
+                            variant="outline"
+                            className="border-sky-500/40 text-sky-700 bg-sky-500/10 text-xs"
+                          >
+                            Consumido
+                          </Badge>
+                        ) : (
+                          <Badge
+                            variant="outline"
+                            className="border-emerald-500/40 text-emerald-700 bg-emerald-500/10 text-xs"
+                          >
+                            Sellado
+                          </Badge>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Action Bar */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-border">
+            <p className="text-xs text-muted-foreground">
+              {consumption.status === "planned"
+                ? "Consumo planificado. Al aplicar (T2), se registrarán salidas en kárdex descontando existencias."
+                : consumption.status === "applied"
+                  ? "Consumo aplicado. Al sellar (T3), el lote quedará cerrado de forma definitiva."
+                  : "Consumo sellado de forma definitiva."}
+            </p>
+
+            <div className="flex items-center gap-2">
+              {canOperateInventory && consumption.status === "planned" ? (
+                <Button
+                  size="sm"
+                  data-testid="apply-consumption-button"
+                  onClick={onApply}
+                  disabled={consumptionActionBusy}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  {consumptionActionBusy ? (
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="mr-2 h-4 w-4" />
+                  )}
+                  Aplicar consumo (T2)
+                </Button>
+              ) : null}
+
+              {canOperateInventory && consumption.status === "applied" ? (
+                <Button
+                  size="sm"
+                  data-testid="seal-consumption-button"
+                  onClick={onSeal}
+                  disabled={consumptionActionBusy}
+                  className="bg-emerald-600 text-white hover:bg-emerald-700"
+                >
+                  {consumptionActionBusy ? (
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Lock className="mr-2 h-4 w-4" />
+                  )}
+                  Sellar consumo (T3)
+                </Button>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
 export function KitchenExecutionPage() {
   const { user, tenantId, roles } = useAuth();
   const { can } = useCan();
@@ -504,23 +934,13 @@ export function KitchenExecutionPage() {
   }
 
   const lines = consumption?.lines ?? [];
-  const totalPlannedQty = lines.reduce((acc, l) => acc + (l.qty || 0), 0);
-
   const linesAnalysis = analyzeKitchenConsumptionLines(
     lines,
     stockMap,
     consumption?.status ?? null,
   );
-
-  const insufficientLines = linesAnalysis.filter((item) => item.isDeficit);
-  const incompatibleLines = linesAnalysis.filter((item) => item.isIncompatible);
-  const missingLines = linesAnalysis.filter((item) => item.isMissing);
-  const deficitOrMissingCount = linesAnalysis.filter(
-    (item) => item.isDeficit || item.isMissing,
-  ).length;
-  const hasInsufficientStock = insufficientLines.length > 0;
-  const hasIncompatibleUnits = incompatibleLines.length > 0;
-  const hasMissingIngredients = missingLines.length > 0;
+  const hasInsufficientStock = linesAnalysis.some((item) => item.isDeficit);
+  const hasMissingIngredients = linesAnalysis.some((item) => item.isMissing);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -579,380 +999,21 @@ export function KitchenExecutionPage() {
       </div>
 
       {/* SECCIÓN FLOW-04 · CONSUMO DE INGREDIENTES */}
-      <section
-        data-testid="kitchen-consumption-section"
-        className="rounded-xl border border-border bg-card p-5 space-y-4 shadow-sm"
-      >
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="space-y-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <Boxes className="h-5 w-5 text-primary" />
-              <h2 className="text-lg font-semibold tracking-tight text-foreground">
-                Consumo de Ingredientes (FLOW-04)
-              </h2>
-              <Badge className={consumptionStatusTone(consumption?.status ?? null)}>
-                {consumptionStatusLabel(consumption?.status ?? null)}
-              </Badge>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Planificación (T1), aplicación en almacén (T2) y sellado definitivo (T3) para el día{" "}
-              {date}.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <Button asChild variant="outline" size="sm" data-testid="goto-inventory-button">
-              <Link to="/admin/inventory">
-                <Boxes className="mr-2 h-4 w-4" />
-                Ver en Kárdex
-              </Link>
-            </Button>
-          </div>
-        </div>
-
-        {!canOperateInventory ? (
-          <div
-            data-testid="consumption-rbac-notice"
-            className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 p-3 text-xs text-muted-foreground"
-          >
-            <Lock className="h-4 w-4 shrink-0 text-muted-foreground" />
-            <span>
-              Modo sólo lectura. Se requiere el permiso{" "}
-              <code className="font-mono font-semibold text-foreground">inventory.operate</code>{" "}
-              para planificar, aplicar o sellar consumos de ingredientes.
-            </span>
-          </div>
-        ) : null}
-
-        {consumptionLoading ? (
-          <div className="space-y-2 py-4">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-20 w-full" />
-          </div>
-        ) : consumptionError ? (
-          <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
-            {consumptionError}
-          </div>
-        ) : !consumption ? (
-          <div className="rounded-lg border border-dashed p-6 text-center space-y-3">
-            <p className="text-sm text-muted-foreground">
-              No hay consumo de ingredientes planificado para esta fecha de entrega ({date}).
-            </p>
-            {canOperateInventory ? (
-              <Button
-                size="sm"
-                data-testid="plan-consumption-button"
-                onClick={() => void handlePlan()}
-                disabled={consumptionActionBusy}
-              >
-                {consumptionActionBusy ? (
-                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Play className="mr-2 h-4 w-4" />
-                )}
-                Planificar consumo (T1)
-              </Button>
-            ) : null}
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {/* KPI Summary Strip */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
-              <div className="rounded-lg border border-border bg-muted/20 p-3">
-                <p className="text-xs text-muted-foreground">Líneas previstas</p>
-                <p
-                  className="text-lg font-bold tabular-nums text-foreground"
-                  data-testid="kpi-lines-count"
-                >
-                  {lines.length}
-                </p>
-              </div>
-              <div className="rounded-lg border border-border bg-muted/20 p-3">
-                <p className="text-xs text-muted-foreground">Cantidad total</p>
-                <p
-                  className="text-lg font-bold tabular-nums text-foreground"
-                  data-testid="kpi-total-qty"
-                >
-                  {formatQty(totalPlannedQty)}
-                </p>
-              </div>
-              <div className="rounded-lg border border-border bg-muted/20 p-3">
-                <p className="text-xs text-muted-foreground">Estado del flujo</p>
-                <p
-                  className="text-sm font-semibold capitalize text-foreground"
-                  data-testid="kpi-consumption-status"
-                >
-                  {consumption.status}
-                </p>
-              </div>
-              <div className="rounded-lg border border-border bg-muted/20 p-3">
-                <p className="text-xs text-muted-foreground">Disponibilidad</p>
-                {consumption.status === "planned" ? (
-                  stockMap === null ? (
-                    <div className="flex items-center justify-between gap-1 mt-1">
-                      <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1">
-                        <AlertTriangle className="h-3.5 w-3.5" /> Stock no disponible
-                      </span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-5 px-1 text-[10px] text-muted-foreground hover:text-foreground"
-                        onClick={() => void loadConsumption()}
-                        disabled={consumptionLoading}
-                        title="Reintentar comprobación de existencias"
-                      >
-                        <RefreshCw
-                          className={cn("h-3 w-3", consumptionLoading && "animate-spin")}
-                        />
-                      </Button>
-                    </div>
-                  ) : hasIncompatibleUnits ? (
-                    <span
-                      data-testid="kpi-unverifiable-units"
-                      className="text-xs font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1 mt-1"
-                    >
-                      <AlertTriangle className="h-3.5 w-3.5" /> Unidad no verificable
-                    </span>
-                  ) : hasInsufficientStock || hasMissingIngredients ? (
-                    <span
-                      data-testid="kpi-insufficient-stock"
-                      className="text-xs font-semibold text-destructive flex items-center gap-1 mt-1"
-                    >
-                      <AlertTriangle className="h-3.5 w-3.5" /> Faltan {deficitOrMissingCount} ing.
-                    </span>
-                  ) : (
-                    <span
-                      data-testid="kpi-sufficient-stock"
-                      className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 mt-1"
-                    >
-                      <CheckCircle2 className="h-3.5 w-3.5" /> Stock suficiente
-                    </span>
-                  )
-                ) : (
-                  <span className="text-xs font-medium text-muted-foreground mt-1 block">
-                    {consumption.status === "applied" ? "Stock descontado" : "Cerrado"}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Warning if stock fetch failed (Fail Closed) */}
-            {stockError ? (
-              <div
-                data-testid="stock-fetch-error-alert"
-                className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-900 dark:text-amber-200"
-              >
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
-                  <span>
-                    No se pudieron comprobar las existencias en almacén ({stockError}). La
-                    validación definitiva se ejecutará en PostgreSQL al intentar aplicar.
-                  </span>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 text-xs border-amber-500/40 hover:bg-amber-500/20"
-                  onClick={() => void loadConsumption()}
-                  disabled={consumptionLoading}
-                >
-                  <RefreshCw className={cn("mr-1 h-3 w-3", consumptionLoading && "animate-spin")} />
-                  Reintentar existencias
-                </Button>
-              </div>
-            ) : null}
-
-            {/* Warning if incompatible units */}
-            {hasIncompatibleUnits ? (
-              <div
-                data-testid="incompatible-units-alert"
-                className="flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-900 dark:text-amber-200"
-              >
-                <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
-                <span>
-                  Atención: Se han detectado ingredientes con unidades no convertibles directamente
-                  con el almacén (
-                  {incompatibleLines
-                    .map(
-                      (i) =>
-                        `${i.line.name}: receta ${i.line.unit} vs almacén ${i.stockItem?.unit}`,
-                    )
-                    .join(", ")}
-                  ). La disponibilidad no es verificable automáticamente antes de aplicar.
-                </span>
-              </div>
-            ) : null}
-
-            {/* Warning if insufficient stock */}
-            {hasInsufficientStock ? (
-              <div
-                data-testid="insufficient-stock-alert"
-                className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive"
-              >
-                <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
-                <span>
-                  Atención: Se han detectado ingredientes con existencias inferiores a la cantidad
-                  necesaria. La base de datos rechazará la aplicación de consumo si el stock fuese a
-                  quedar en negativo.
-                </span>
-              </div>
-            ) : null}
-
-            {/* Ingredients table */}
-            <div className="overflow-x-auto rounded-lg border border-border">
-              <Table data-testid="consumption-lines-table">
-                <TableHeader>
-                  <TableRow className="bg-muted/40 hover:bg-muted/40">
-                    <TableHead>Ingrediente</TableHead>
-                    <TableHead className="text-right">Cantidad Planificada</TableHead>
-                    <TableHead className="text-right">Stock en Almacén</TableHead>
-                    <TableHead className="text-right">Estado</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {linesAnalysis.map((item) => {
-                    const {
-                      line,
-                      stockKnown,
-                      isDeficit,
-                      isIncompatible,
-                      isMissing,
-                      displayText,
-                      availableInLineUnit,
-                    } = item;
-
-                    return (
-                      <TableRow
-                        key={line.ingredientId}
-                        data-testid={`consumption-line-${line.ingredientId}`}
-                      >
-                        <TableCell className="font-medium text-foreground">{line.name}</TableCell>
-                        <TableCell className="text-right font-mono tabular-nums text-foreground">
-                          {formatQty(line.qty)} {line.unit}
-                        </TableCell>
-                        <TableCell
-                          className={cn(
-                            "text-right font-mono tabular-nums",
-                            !stockKnown
-                              ? "text-amber-600 dark:text-amber-400 italic text-xs"
-                              : isIncompatible
-                                ? "text-amber-700 dark:text-amber-300 font-medium"
-                                : isDeficit || isMissing
-                                  ? "text-destructive font-semibold"
-                                  : "text-muted-foreground",
-                          )}
-                        >
-                          {displayText}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          {consumption.status === "planned" ? (
-                            !stockKnown ? (
-                              <Badge
-                                variant="outline"
-                                className="border-amber-500/40 text-amber-700 bg-amber-500/10 text-xs"
-                              >
-                                Sin verificar
-                              </Badge>
-                            ) : isIncompatible ? (
-                              <Badge
-                                variant="outline"
-                                data-testid="badge-unit-incompatible"
-                                className="border-amber-500/40 text-amber-700 bg-amber-500/10 text-xs"
-                              >
-                                Unidad no convertible
-                              </Badge>
-                            ) : isDeficit || isMissing ? (
-                              <Badge
-                                variant="destructive"
-                                className="text-xs"
-                                data-testid={`badge-deficit-${line.ingredientId}`}
-                              >
-                                Faltan{" "}
-                                {availableInLineUnit !== null
-                                  ? formatQty(line.qty - availableInLineUnit)
-                                  : formatQty(line.qty)}{" "}
-                                {line.unit}
-                              </Badge>
-                            ) : (
-                              <Badge
-                                variant="outline"
-                                className="border-emerald-500/40 text-emerald-700 bg-emerald-500/10 text-xs"
-                              >
-                                En almacén
-                              </Badge>
-                            )
-                          ) : consumption.status === "applied" ? (
-                            <Badge
-                              variant="outline"
-                              className="border-sky-500/40 text-sky-700 bg-sky-500/10 text-xs"
-                            >
-                              Descontado
-                            </Badge>
-                          ) : (
-                            <Badge
-                              variant="outline"
-                              className="border-emerald-500/40 text-emerald-700 bg-emerald-500/10 text-xs"
-                            >
-                              Sellado
-                            </Badge>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
-
-            {/* Action Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-border">
-              <p className="text-xs text-muted-foreground">
-                {consumption.status === "planned"
-                  ? "Consumo planificado. Al aplicar (T2), se registrarán salidas en kárdex descontando existencias."
-                  : consumption.status === "applied"
-                    ? "Consumo aplicado. Al sellar (T3), el lote quedará cerrado de forma definitiva."
-                    : "Consumo sellado de forma definitiva."}
-              </p>
-
-              <div className="flex items-center gap-2">
-                {canOperateInventory && consumption.status === "planned" ? (
-                  <Button
-                    size="sm"
-                    data-testid="apply-consumption-button"
-                    onClick={() => setConfirmApplyOpen(true)}
-                    disabled={consumptionActionBusy}
-                    className="bg-primary text-primary-foreground hover:bg-primary/90"
-                  >
-                    {consumptionActionBusy ? (
-                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <CheckCircle2 className="mr-2 h-4 w-4" />
-                    )}
-                    Aplicar consumo (T2)
-                  </Button>
-                ) : null}
-
-                {canOperateInventory && consumption.status === "applied" ? (
-                  <Button
-                    size="sm"
-                    data-testid="seal-consumption-button"
-                    onClick={() => setConfirmSealOpen(true)}
-                    disabled={consumptionActionBusy}
-                    className="bg-emerald-600 text-white hover:bg-emerald-700"
-                  >
-                    {consumptionActionBusy ? (
-                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <Lock className="mr-2 h-4 w-4" />
-                    )}
-                    Sellar consumo (T3)
-                  </Button>
-                ) : null}
-              </div>
-            </div>
-          </div>
-        )}
-      </section>
+      <KitchenConsumptionSection
+        date={date}
+        tenantId={tenantId}
+        consumption={consumption}
+        consumptionLoading={consumptionLoading}
+        consumptionError={consumptionError}
+        consumptionActionBusy={consumptionActionBusy}
+        stockMap={stockMap}
+        stockError={stockError}
+        canOperateInventory={canOperateInventory}
+        onPlan={() => void handlePlan()}
+        onApply={() => setConfirmApplyOpen(true)}
+        onSeal={() => setConfirmSealOpen(true)}
+        onReloadStock={() => void loadConsumption()}
+      />
 
       {/* MODALES DE CONFIRMACIÓN */}
       <AlertDialog open={confirmApplyOpen} onOpenChange={setConfirmApplyOpen}>

@@ -173,10 +173,11 @@ class FixtureTracker {
       this.registry.consumptionLineIds.clear();
     }
 
-    // Auto-discover any stock_movements created by consumption or test
+    // Auto-discover any stock_movements or consumption lines referencing tracked ingredients
     if (this.registry.ingredientIds.size > 0) {
       const ingArr = toPgArray(this.registry.ingredientIds);
       this.sqlRunner(`
+        DELETE FROM public.inventory_consumption_lines WHERE ingredient_id = ANY(${ingArr});
         DELETE FROM public.stock_movements WHERE ingredient_id = ANY(${ingArr});
       `);
       this.registry.stockMovementIds.clear();
@@ -622,6 +623,77 @@ async function run() {
     console.log(
       "  - Arroz Integral: stock inicial = 0.50 kg (necesario: 1.00 kg -> DÉFICIT de 0.50 kg)",
     );
+
+    // Seed additional dates for strict RBAC lifecycle testing (unplanned, planned, applied)
+    const deliveryDatePlanned = "2026-11-16";
+    const deliveryDateApplied = "2026-11-17";
+    const deliveryDateUnplanned = "2026-11-18";
+
+    const weeklyMenuId2 = crypto.randomUUID();
+    const orderId2 = crypto.randomUUID();
+    const orderItemPlannedId = crypto.randomUUID();
+    const orderItemAppliedId = crypto.randomUUID();
+    const orderItemUnplannedId = crypto.randomUUID();
+    const slotPlannedId = crypto.randomUUID();
+    const slotAppliedId = crypto.randomUUID();
+    const slotUnplannedId = crypto.randomUUID();
+
+    const plannedConsId = crypto.randomUUID();
+    const plannedLineChickenId = crypto.randomUUID();
+    const appliedConsId = crypto.randomUUID();
+    const appliedLineChickenId = crypto.randomUUID();
+
+    runSql(`
+      INSERT INTO public.weekly_menus (id, tenant_id, week_start, status)
+      VALUES ('${weeklyMenuId2}', '${tenantIdA}', '2026-11-16', 'published');
+
+      INSERT INTO public.weekly_menu_slots (id, tenant_id, weekly_menu_id, day_date, dish_id, sort_order)
+      VALUES 
+        ('${slotPlannedId}', '${tenantIdA}', '${weeklyMenuId2}', '${deliveryDatePlanned}', '${dishId}', 1),
+        ('${slotAppliedId}', '${tenantIdA}', '${weeklyMenuId2}', '${deliveryDateApplied}', '${dishId}', 1),
+        ('${slotUnplannedId}', '${tenantIdA}', '${weeklyMenuId2}', '${deliveryDateUnplanned}', '${dishId}', 1);
+
+      BEGIN;
+      SELECT set_config('request.jwt.claim.role', 'authenticated', false);
+      SELECT set_config('request.jwt.claim.sub', '${staffUser.id}', false);
+      SELECT set_config('request.jwt.claims', '{"sub":"${staffUser.id}","role":"authenticated"}', false);
+
+      INSERT INTO public.orders (id, tenant_id, customer_id, week_start, status, demand_channel)
+      VALUES ('${orderId2}', '${tenantIdA}', '${customerId}', '2026-11-16', 'confirmed', 'individual');
+
+      INSERT INTO public.order_items (
+        id, order_id, tenant_id, dish_id, day_date, qty, item_kind, unit_price, price_snapshot_status, allergen_state
+      ) VALUES 
+        ('${orderItemPlannedId}', '${orderId2}', '${tenantIdA}', '${dishId}', '${deliveryDatePlanned}', 10, 'dish', 9.50, 'captured', 'HISTORICAL_UNAVAILABLE'),
+        ('${orderItemAppliedId}', '${orderId2}', '${tenantIdA}', '${dishId}', '${deliveryDateApplied}', 10, 'dish', 9.50, 'captured', 'HISTORICAL_UNAVAILABLE'),
+        ('${orderItemUnplannedId}', '${orderId2}', '${tenantIdA}', '${dishId}', '${deliveryDateUnplanned}', 10, 'dish', 9.50, 'captured', 'HISTORICAL_UNAVAILABLE');
+      COMMIT;
+
+      INSERT INTO public.inventory_consumptions (id, tenant_id, delivery_date, status, created_at, created_by)
+      VALUES ('${plannedConsId}', '${tenantIdA}', '${deliveryDatePlanned}', 'planned', now(), '${staffUser.id}');
+
+      INSERT INTO public.inventory_consumption_lines (id, consumption_id, tenant_id, ingredient_id, ingredient_name, quantity, unit, created_at)
+      VALUES ('${plannedLineChickenId}', '${plannedConsId}', '${tenantIdA}', '${chickenIngId}', 'Pechuga Pollo Certificada Flow04', 2.000, 'kg', now());
+
+      INSERT INTO public.inventory_consumptions (id, tenant_id, delivery_date, status, created_at, created_by, applied_at, applied_by)
+      VALUES ('${appliedConsId}', '${tenantIdA}', '${deliveryDateApplied}', 'applied', now(), '${staffUser.id}', now(), '${staffUser.id}');
+
+      INSERT INTO public.inventory_consumption_lines (id, consumption_id, tenant_id, ingredient_id, ingredient_name, quantity, unit, created_at)
+      VALUES ('${appliedLineChickenId}', '${appliedConsId}', '${tenantIdA}', '${chickenIngId}', 'Pechuga Pollo Certificada Flow04', 2.000, 'kg', now());
+    `);
+
+    tracker.registerWeeklyMenu(weeklyMenuId2);
+    tracker.registerOrder(orderId2);
+    tracker.registerWeeklyMenuSlot(slotPlannedId);
+    tracker.registerWeeklyMenuSlot(slotAppliedId);
+    tracker.registerWeeklyMenuSlot(slotUnplannedId);
+    tracker.registerOrderItem(orderItemPlannedId);
+    tracker.registerOrderItem(orderItemAppliedId);
+    tracker.registerOrderItem(orderItemUnplannedId);
+    tracker.registerConsumption(plannedConsId);
+    tracker.registerConsumptionLine(plannedLineChickenId);
+    tracker.registerConsumption(appliedConsId);
+    tracker.registerConsumptionLine(appliedLineChickenId);
 
     // 6. Launch Browser & Authenticate
     console.log("\n--- Lanzando Navegador Chromium e Iniciando Sesión ---");
@@ -1299,12 +1371,45 @@ async function run() {
     );
 
     // =========================================================================
-    // FASE 9: RBAC (Usuario sin inventory.operate) y Aislamiento Multi-tenant
+    // FASE 9: RBAC Reforzado (Kitchen-only vs Staff Control) y Aislamiento por Tenant
     // =========================================================================
-    console.log("\n--- FASE 9: Verificación de RBAC (Kitchen-only) y Aislamiento por Tenant ---");
-    // Sign out and sign in as kitchen-only user
-    await page.goto("http://127.0.0.1:5173/auth", { waitUntil: "networkidle" });
-    const kitchenOnlyLoginRes = await page.evaluate(
+    console.log(
+      "\n--- FASE 9: Verificación de RBAC (Kitchen-only vs Control Staff) y Aislamiento por Tenant ---",
+    );
+
+    // Open dedicated context and page for kitchen-only user (keeps staff session active on `page` as positive control)
+    const kitchenContext = await browser.newContext({
+      viewport: { width: 1440, height: 900 },
+    });
+    await kitchenContext.route("**/*supabase.co/**", async (route) => {
+      const req = route.request();
+      const url = req.url();
+      const localTarget = url.replace(/https:\/\/[^/]+\.supabase\.co/, "http://127.0.0.1:54321");
+      const headers = { ...req.headers() };
+      headers["apikey"] = SUPABASE_ANON_KEY;
+      if (
+        !headers["authorization"] ||
+        headers["authorization"].startsWith("Bearer sb_publishable")
+      ) {
+        headers["authorization"] = `Bearer ${SUPABASE_ANON_KEY}`;
+      }
+      try {
+        const response = await kitchenContext.request.fetch(localTarget, {
+          method: req.method(),
+          headers,
+          data: req.postDataBuffer(),
+        });
+        await route.fulfill({ response });
+      } catch {
+        await route.abort();
+      }
+    });
+
+    const kitchenPage = await kitchenContext.newPage();
+
+    // Sign in as kitchen-only user in dedicated context
+    await kitchenPage.goto("http://127.0.0.1:5173/auth", { waitUntil: "networkidle" });
+    const kitchenOnlyLoginRes = await kitchenPage.evaluate(
       async ({ email, password }) => {
         try {
           const { supabase } = await import("/src/integrations/supabase/client.ts");
@@ -1320,38 +1425,178 @@ async function run() {
     );
     if (!kitchenOnlyLoginRes.ok) throw new Error("Login failed for kitchen-only user");
 
-    await page.goto(`http://127.0.0.1:5173/admin/kitchen-execution?date=${deliveryDate}`, {
-      waitUntil: "networkidle",
-    });
-    await page.waitForSelector('[data-testid="kitchen-consumption-section"]', { timeout: 15000 });
-
-    // Verify RBAC notice is shown
-    const rbacNotice = await page.$('[data-testid="consumption-rbac-notice"]');
-    if (!rbacNotice || !(await rbacNotice.isVisible())) {
-      throw new Error("Aviso de RBAC no mostrado a usuario sin inventory.operate");
-    }
-    console.log("✓ Aviso de permisos (solo lectura) mostrado a usuario sin 'inventory.operate'.");
-
-    // Verify consumption lines table is visible and shows the plan to the kitchen user
-    await page.waitForSelector('[data-testid="consumption-lines-table"]', { timeout: 10000 });
-    const kitchenTableText = await page.innerText('[data-testid="consumption-lines-table"]');
-    if (!kitchenTableText.includes("Pechuga Pollo Certificada Flow04")) {
-      throw new Error("El usuario de cocina no puede ver el plan de consumo existente");
-    }
-    console.log(
-      "✓ Consulta para usuarios de cocina verificada: el plan existente se visualiza sin botones de mutación.",
+    // --- Sub-fase 9.1: Estado Sin Plan (deliveryDateUnplanned) ---
+    console.log("  [9.1] Comprobando fecha sin consumo planificado (deliveryDateUnplanned)...");
+    await kitchenPage.goto(
+      `http://127.0.0.1:5173/admin/kitchen-execution?date=${deliveryDateUnplanned}`,
+      { waitUntil: "networkidle" },
+    );
+    await kitchenPage.waitForFunction(
+      () => {
+        const sec = document.querySelector('[data-testid="kitchen-consumption-section"]');
+        return sec && sec.getAttribute("data-consumption-loading") === "false";
+      },
+      null,
+      { timeout: 15000 },
     );
 
-    // Verify action buttons are not accessible
-    const unauthorizedApply = await page.$('[data-testid="apply-consumption-button"]');
-    const unauthorizedSeal = await page.$('[data-testid="seal-consumption-button"]');
-    const unauthorizedPlan = await page.$('[data-testid="plan-consumption-button"]');
-    if (unauthorizedApply || unauthorizedSeal || unauthorizedPlan) {
-      throw new Error("Botones de acción expuestos a usuario no autorizado");
+    const rbacNoticeUnplanned = await kitchenPage.$('[data-testid="consumption-rbac-notice"]');
+    if (!rbacNoticeUnplanned || !(await rbacNoticeUnplanned.isVisible())) {
+      throw new Error("Aviso de RBAC no mostrado en estado sin plan a usuario kitchen-only");
+    }
+    const kitchenUnplannedPlanBtn = await kitchenPage.$('[data-testid="plan-consumption-button"]');
+    if (kitchenUnplannedPlanBtn && (await kitchenUnplannedPlanBtn.isVisible())) {
+      throw new Error(
+        "Botón T1 (Planificar) expuesto indebidamente a usuario con sólo kitchen.operate",
+      );
     }
 
-    // Switch to Tenant B to verify tenant isolation
-    await page.evaluate(
+    // CONTROL POSITIVO: Usuario staff con inventory.operate SÍ ve el botón T1
+    await page.goto(`http://127.0.0.1:5173/admin/kitchen-execution?date=${deliveryDateUnplanned}`, {
+      waitUntil: "networkidle",
+    });
+    await page.waitForFunction(
+      () => {
+        const sec = document.querySelector('[data-testid="kitchen-consumption-section"]');
+        return sec && sec.getAttribute("data-consumption-loading") === "false";
+      },
+      null,
+      { timeout: 15000 },
+    );
+    const staffUnplannedPlanBtn = await page.$('[data-testid="plan-consumption-button"]');
+    if (!staffUnplannedPlanBtn || !(await staffUnplannedPlanBtn.isVisible())) {
+      throw new Error(
+        "CONTROL FALLIDO: Usuario autorizado con inventory.operate no dispone del botón T1 en estado sin plan",
+      );
+    }
+    const staffNoticeUnplanned = await page.$('[data-testid="consumption-rbac-notice"]');
+    if (staffNoticeUnplanned && (await staffNoticeUnplanned.isVisible())) {
+      throw new Error("Aviso de RBAC mostrado indebidamente a usuario con inventory.operate");
+    }
+    console.log(
+      "    ✓ Sin plan: kitchen-only ve aviso y carece de T1; control autorizado dispone de T1.",
+    );
+
+    // --- Sub-fase 9.2: Estado Planificado (deliveryDatePlanned) ---
+    console.log(
+      "  [9.2] Comprobando fecha con consumo en estado 'planned' (deliveryDatePlanned)...",
+    );
+    await kitchenPage.goto(
+      `http://127.0.0.1:5173/admin/kitchen-execution?date=${deliveryDatePlanned}`,
+      { waitUntil: "networkidle" },
+    );
+    await kitchenPage.waitForFunction(
+      () => {
+        const sec = document.querySelector('[data-testid="kitchen-consumption-section"]');
+        return sec && sec.getAttribute("data-consumption-loading") === "false";
+      },
+      null,
+      { timeout: 15000 },
+    );
+
+    await kitchenPage.waitForSelector('[data-testid="consumption-lines-table"]', {
+      timeout: 10000,
+    });
+    const kitchenPlannedTable = await kitchenPage.innerText(
+      '[data-testid="consumption-lines-table"]',
+    );
+    if (!kitchenPlannedTable.includes("Pechuga Pollo Certificada Flow04")) {
+      throw new Error(
+        "El usuario de cocina no puede consultar las líneas del consumo en estado planned",
+      );
+    }
+    const kitchenApplyBtn = await kitchenPage.$('[data-testid="apply-consumption-button"]');
+    const kitchenSealBtn = await kitchenPage.$('[data-testid="seal-consumption-button"]');
+    const kitchenPlanBtnPlanned = await kitchenPage.$('[data-testid="plan-consumption-button"]');
+    if (kitchenApplyBtn || kitchenSealBtn || kitchenPlanBtnPlanned) {
+      throw new Error(
+        "Botones de mutación T2/T3/T1 expuestos a usuario kitchen-only en estado planned",
+      );
+    }
+
+    // CONTROL POSITIVO: Usuario staff autorizado SÍ ve el botón T2 (Aplicar)
+    await page.goto(`http://127.0.0.1:5173/admin/kitchen-execution?date=${deliveryDatePlanned}`, {
+      waitUntil: "networkidle",
+    });
+    await page.waitForFunction(
+      () => {
+        const sec = document.querySelector('[data-testid="kitchen-consumption-section"]');
+        return sec && sec.getAttribute("data-consumption-loading") === "false";
+      },
+      null,
+      { timeout: 15000 },
+    );
+    const staffApplyBtn = await page.$('[data-testid="apply-consumption-button"]');
+    if (!staffApplyBtn || !(await staffApplyBtn.isVisible())) {
+      throw new Error(
+        "CONTROL FALLIDO: Usuario autorizado no dispone del botón T2 (Aplicar) en estado planned",
+      );
+    }
+    console.log(
+      "    ✓ Estado planned: kitchen-only consulta líneas sin botones T2/T3; control autorizado dispone de T2.",
+    );
+
+    // --- Sub-fase 9.3: Estado Aplicado (deliveryDateApplied) ---
+    console.log(
+      "  [9.3] Comprobando fecha con consumo en estado 'applied' (deliveryDateApplied)...",
+    );
+    await kitchenPage.goto(
+      `http://127.0.0.1:5173/admin/kitchen-execution?date=${deliveryDateApplied}`,
+      { waitUntil: "networkidle" },
+    );
+    await kitchenPage.waitForFunction(
+      () => {
+        const sec = document.querySelector('[data-testid="kitchen-consumption-section"]');
+        return sec && sec.getAttribute("data-consumption-loading") === "false";
+      },
+      null,
+      { timeout: 15000 },
+    );
+
+    await kitchenPage.waitForSelector('[data-testid="consumption-lines-table"]', {
+      timeout: 10000,
+    });
+    const kitchenAppliedTable = await kitchenPage.innerText(
+      '[data-testid="consumption-lines-table"]',
+    );
+    if (!kitchenAppliedTable.includes("Pechuga Pollo Certificada Flow04")) {
+      throw new Error(
+        "El usuario de cocina no puede consultar las líneas del consumo en estado applied",
+      );
+    }
+    const kitchenSealBtnApplied = await kitchenPage.$('[data-testid="seal-consumption-button"]');
+    const kitchenApplyBtnApplied = await kitchenPage.$('[data-testid="apply-consumption-button"]');
+    if (kitchenSealBtnApplied || kitchenApplyBtnApplied) {
+      throw new Error("Botones de mutación expuestos a usuario kitchen-only en estado applied");
+    }
+
+    // CONTROL POSITIVO: Usuario staff autorizado SÍ ve el botón T3 (Sellar)
+    await page.goto(`http://127.0.0.1:5173/admin/kitchen-execution?date=${deliveryDateApplied}`, {
+      waitUntil: "networkidle",
+    });
+    await page.waitForFunction(
+      () => {
+        const sec = document.querySelector('[data-testid="kitchen-consumption-section"]');
+        return sec && sec.getAttribute("data-consumption-loading") === "false";
+      },
+      null,
+      { timeout: 15000 },
+    );
+    const staffSealBtn = await page.$('[data-testid="seal-consumption-button"]');
+    if (!staffSealBtn || !(await staffSealBtn.isVisible())) {
+      throw new Error(
+        "CONTROL FALLIDO: Usuario autorizado no dispone del botón T3 (Sellar) en estado applied",
+      );
+    }
+    console.log(
+      "    ✓ Estado applied: kitchen-only consulta consumo sin botón T3; control autorizado dispone de T3.",
+    );
+
+    // --- Sub-fase 9.4: Aislamiento Multitenant Determinista (Sin waitForTimeout) ---
+    console.log(
+      "  [9.4] Verificando aislamiento multitenant mediante sincronización determinista de contexto...",
+    );
+    await kitchenPage.evaluate(
       async ({ tIdB }) => {
         const { publishBootstrapIdentitySnapshot, getBootstrapIdentitySnapshot } =
           await import("/src/bootstrap/pipeline/BootstrapIdentityStore.ts");
@@ -1369,21 +1614,40 @@ async function run() {
       { tIdB: tenantIdB },
     );
 
-    // Give SPA reactive state time to re-query under Tenant B
-    await page.waitForTimeout(1500);
-    const tenantBText = await page.innerText('[data-testid="kitchen-consumption-section"]');
+    // Sincronización determinista: esperar a que la sección adopte tenantIdB y la carga termine (data-consumption-loading="false")
+    await kitchenPage.waitForFunction(
+      (tId) => {
+        const sec = document.querySelector('[data-testid="kitchen-consumption-section"]');
+        return (
+          sec &&
+          sec.getAttribute("data-tenant-id") === tId &&
+          sec.getAttribute("data-consumption-loading") === "false"
+        );
+      },
+      tenantIdB,
+      { timeout: 15000 },
+    );
+
+    const tenantBText = await kitchenPage.innerText('[data-testid="kitchen-consumption-section"]');
     if (
       tenantBText.includes("Plato Fit Pollo y Arroz FLOW04") ||
       tenantBText.includes("Pechuga Pollo Certificada Flow04")
     ) {
-      throw new Error("FUGA ENTRE TENANTS: Datos de Tenant A visibles en Tenant B");
+      throw new Error(
+        "FUGA ENTRE TENANTS: Datos de Tenant A visibles en Tenant B tras cambio de contexto",
+      );
     }
     console.log(
-      "✓ Aislamiento multitenant estricto verificado: Tenant B no tiene acceso a consumos de Tenant A.",
+      "    ✓ Aislamiento multitenant comprobado deterministamente: sin esperas fijas, context sync verified.",
     );
 
-    await page.screenshot({ path: `${SCREENSHOT_DIR}/kitchen_08_rbac_and_tenant_isolation.png` });
-    console.log("✓ Fase 9 superada: RBAC y aislamiento multi-tenant comprobados.");
+    await kitchenPage.screenshot({
+      path: `${SCREENSHOT_DIR}/kitchen_08_rbac_and_tenant_isolation.png`,
+    });
+    await kitchenContext.close();
+    console.log(
+      "✓ Fase 9 superada: RBAC multidimensional (unplanned, planned, applied + controles) y aislamiento multi-tenant comprobados.",
+    );
 
     // =========================================================================
     // FASE 10: Verificación de Centinelas Inmutables y Limpieza Quirúrgica
@@ -1394,6 +1658,9 @@ async function run() {
     console.log("\n======================================================================");
     console.log("  TODAS LAS VERIFICACIONES (10/10) COMPLETADAS CON ÉXITO — GO TÉCNICO ");
     console.log("======================================================================\n");
+  } catch (err) {
+    console.error("\n❌ ERROR EN LA EJECUCIÓN DEL FLUJO E2E:", err);
+    throw err;
   } finally {
     if (browser) await browser.close();
     sentinels.cleanup();
@@ -1402,6 +1669,6 @@ async function run() {
 }
 
 run().catch((err) => {
-  console.error("\n❌ ERROR EN LA VERIFICACIÓN:", err);
+  console.error("\n❌ FALLO FATAL EN LA VERIFICACIÓN:", err);
   process.exit(1);
 });
