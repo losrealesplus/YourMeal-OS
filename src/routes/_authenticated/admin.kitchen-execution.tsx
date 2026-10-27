@@ -69,6 +69,7 @@ import {
 import { InventoryService } from "@/modules/inventory/application/inventory-service";
 import type { InventoryConsumption } from "@/modules/inventory/domain/inventory-consumption";
 import type { InventoryStockItem } from "@/modules/inventory/domain/inventory-types";
+import { convertUnits } from "@/modules/inventory/domain/unit-conversion";
 
 export const Route = createFileRoute("/_authenticated/admin/kitchen-execution")({
   validateSearch: (search: Record<string, unknown>): { date?: string } => ({
@@ -152,7 +153,9 @@ function KitchenExecutionPage() {
   const [consumption, setConsumption] = useState<InventoryConsumption | null>(null);
   const [consumptionLoading, setConsumptionLoading] = useState(true);
   const [consumptionActionBusy, setConsumptionActionBusy] = useState(false);
-  const [stockMap, setStockMap] = useState<Map<string, number> | null>(null);
+  const [stockMap, setStockMap] = useState<Map<string, { stock: number; unit: string }> | null>(
+    null,
+  );
   const [stockError, setStockError] = useState<string | null>(null);
   const [consumptionError, setConsumptionError] = useState<string | null>(null);
   const [confirmApplyOpen, setConfirmApplyOpen] = useState(false);
@@ -252,9 +255,9 @@ function KitchenExecutionPage() {
       }
 
       if (stockList !== null) {
-        const map = new Map<string, number>();
+        const map = new Map<string, { stock: number; unit: string }>();
         for (const item of stockList) {
-          map.set(item.id, item.stock);
+          map.set(item.id, { stock: item.stock, unit: item.unit });
         }
         setStockMap(map);
         setStockError(null);
@@ -419,11 +422,56 @@ function KitchenExecutionPage() {
 
   const lines = consumption?.lines ?? [];
   const totalPlannedQty = lines.reduce((acc, l) => acc + (l.qty || 0), 0);
-  const insufficientLines =
-    consumption && consumption.status === "planned" && stockMap !== null
-      ? lines.filter((l) => (stockMap.get(l.ingredientId) ?? 0) < l.qty)
-      : [];
+
+  const linesAnalysis = lines.map((line) => {
+    const stockKnown = stockMap !== null;
+    const stockItem = stockMap?.get(line.ingredientId);
+    if (!stockKnown || !stockItem) {
+      return {
+        line,
+        stockKnown,
+        stockItem: null,
+        conversion: null,
+        isDeficit: false,
+        isIncompatible: false,
+        availableInLineUnit: null as number | null,
+        displayText: !stockKnown ? "Desconocido" : `0 ${line.unit}`,
+      };
+    }
+
+    const conversion = convertUnits(stockItem.stock, stockItem.unit, line.qty, line.unit);
+    if (!conversion.compatible) {
+      return {
+        line,
+        stockKnown: true,
+        stockItem,
+        conversion,
+        isDeficit: false,
+        isIncompatible: true,
+        availableInLineUnit: null as number | null,
+        displayText: `${formatQty(stockItem.stock)} ${stockItem.unit}`,
+      };
+    }
+
+    const available = conversion.availableInLineUnit;
+    const isDeficit = consumption?.status === "planned" && available < line.qty;
+
+    return {
+      line,
+      stockKnown: true,
+      stockItem,
+      conversion,
+      isDeficit,
+      isIncompatible: false,
+      availableInLineUnit: available,
+      displayText: `${formatQty(available)} ${line.unit}`,
+    };
+  });
+
+  const insufficientLines = linesAnalysis.filter((item) => item.isDeficit);
+  const incompatibleLines = linesAnalysis.filter((item) => item.isIncompatible);
   const hasInsufficientStock = insufficientLines.length > 0;
+  const hasIncompatibleUnits = incompatibleLines.length > 0;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -609,13 +657,26 @@ function KitchenExecutionPage() {
                         />
                       </Button>
                     </div>
+                  ) : hasIncompatibleUnits ? (
+                    <span
+                      data-testid="kpi-unverifiable-units"
+                      className="text-xs font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1 mt-1"
+                    >
+                      <AlertTriangle className="h-3.5 w-3.5" /> Unidad no verificable
+                    </span>
                   ) : hasInsufficientStock ? (
-                    <span className="text-xs font-semibold text-destructive flex items-center gap-1 mt-1">
+                    <span
+                      data-testid="kpi-insufficient-stock"
+                      className="text-xs font-semibold text-destructive flex items-center gap-1 mt-1"
+                    >
                       <AlertTriangle className="h-3.5 w-3.5" /> Faltan {insufficientLines.length}{" "}
                       ing.
                     </span>
                   ) : (
-                    <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 mt-1">
+                    <span
+                      data-testid="kpi-sufficient-stock"
+                      className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 mt-1"
+                    >
                       <CheckCircle2 className="h-3.5 w-3.5" /> Stock suficiente
                     </span>
                   )
@@ -653,6 +714,27 @@ function KitchenExecutionPage() {
               </div>
             ) : null}
 
+            {/* Warning if incompatible units */}
+            {hasIncompatibleUnits ? (
+              <div
+                data-testid="incompatible-units-alert"
+                className="flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-900 dark:text-amber-200"
+              >
+                <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                <span>
+                  Atención: Se han detectado ingredientes con unidades no convertibles directamente
+                  con el almacén (
+                  {incompatibleLines
+                    .map(
+                      (i) =>
+                        `${i.line.name}: receta ${i.line.unit} vs almacén ${i.stockItem?.unit}`,
+                    )
+                    .join(", ")}
+                  ). La disponibilidad no es verificable automáticamente antes de aplicar.
+                </span>
+              </div>
+            ) : null}
+
             {/* Warning if insufficient stock */}
             {hasInsufficientStock ? (
               <div
@@ -680,11 +762,15 @@ function KitchenExecutionPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {lines.map((line) => {
-                    const stockKnown = stockMap !== null;
-                    const available = stockMap?.get(line.ingredientId) ?? 0;
-                    const isDeficit =
-                      consumption.status === "planned" && stockKnown && available < line.qty;
+                  {linesAnalysis.map((item) => {
+                    const {
+                      line,
+                      stockKnown,
+                      isDeficit,
+                      isIncompatible,
+                      displayText,
+                      availableInLineUnit,
+                    } = item;
 
                     return (
                       <TableRow
@@ -700,12 +786,14 @@ function KitchenExecutionPage() {
                             "text-right font-mono tabular-nums",
                             !stockKnown
                               ? "text-amber-600 dark:text-amber-400 italic text-xs"
-                              : isDeficit
-                                ? "text-destructive font-semibold"
-                                : "text-muted-foreground",
+                              : isIncompatible
+                                ? "text-amber-700 dark:text-amber-300 font-medium"
+                                : isDeficit
+                                  ? "text-destructive font-semibold"
+                                  : "text-muted-foreground",
                           )}
                         >
-                          {stockKnown ? `${formatQty(available)} ${line.unit}` : "Desconocido"}
+                          {displayText}
                         </TableCell>
                         <TableCell className="text-right">
                           {consumption.status === "planned" ? (
@@ -716,9 +804,21 @@ function KitchenExecutionPage() {
                               >
                                 Sin verificar
                               </Badge>
+                            ) : isIncompatible ? (
+                              <Badge
+                                variant="outline"
+                                data-testid="badge-unit-incompatible"
+                                className="border-amber-500/40 text-amber-700 bg-amber-500/10 text-xs"
+                              >
+                                Unidad no convertible
+                              </Badge>
                             ) : isDeficit ? (
                               <Badge variant="destructive" className="text-xs">
-                                Faltan {formatQty(line.qty - available)} {line.unit}
+                                Faltan{" "}
+                                {availableInLineUnit !== null
+                                  ? formatQty(line.qty - availableInLineUnit)
+                                  : ""}{" "}
+                                {line.unit}
                               </Badge>
                             ) : (
                               <Badge

@@ -796,6 +796,69 @@ async function run() {
     );
 
     // =========================================================================
+    // FASE 2B: Inyección de Fallo HTTP en Almacén (STOCK_FETCH_ERROR_E2E)
+    // =========================================================================
+    console.log("\n--- FASE 2B: Inyección de Fallo HTTP en Consulta de Almacén (Fail-Closed) ---");
+    const abortIngredientsRoute = async (route) => {
+      await route.fulfill({
+        status: 500,
+        contentType: "application/json",
+        body: JSON.stringify({
+          message: "Simulated warehouse service outage (500 Internal Error)",
+        }),
+      });
+    };
+    await context.route("**/rest/v1/ingredients*", abortIngredientsRoute);
+
+    // Refresh page data while route is returning 500
+    await page.click("text=Actualizar");
+    await page.waitForTimeout(1000);
+
+    // 1. Assert [data-testid="stock-fetch-error-alert"] is rendered
+    await page.waitForSelector('[data-testid="stock-fetch-error-alert"]', { timeout: 10000 });
+    const stockAlertText = await page.innerText('[data-testid="stock-fetch-error-alert"]');
+    if (!stockAlertText.includes("No se pudieron comprobar las existencias")) {
+      throw new Error(`Texto inesperado en alerta de error de stock: ${stockAlertText}`);
+    }
+    console.log("✓ Banner fail-closed detectado: [data-testid='stock-fetch-error-alert'] visible.");
+
+    // 2. Assert Availability KPI shows "Stock no disponible"
+    const kpiSection = await page.innerText('[data-testid="kitchen-consumption-section"]');
+    if (!kpiSection.includes("Stock no disponible")) {
+      throw new Error(`KPI de disponibilidad no muestra 'Stock no disponible': ${kpiSection}`);
+    }
+    console.log("✓ KPI de disponibilidad refleja 'Stock no disponible' durante corte de almacén.");
+
+    // 3. Assert badges in table show "Sin verificar"
+    const tableDuringOutage = await page.innerText('[data-testid="consumption-lines-table"]');
+    if (!tableDuringOutage.includes("Sin verificar")) {
+      throw new Error("Líneas no muestran badge 'Sin verificar' durante corte de almacén");
+    }
+    console.log("✓ Líneas de consumo presentan badges 'Sin verificar'.");
+
+    // Unroute and recover via "Reintentar existencias"
+    await context.unroute("**/rest/v1/ingredients*", abortIngredientsRoute);
+    const retryBtn = await page.$(
+      '[data-testid="stock-fetch-error-alert"] button:has-text("Reintentar existencias")',
+    );
+    if (retryBtn) {
+      await retryBtn.click();
+    } else {
+      await page.click("text=Actualizar");
+    }
+    await page.waitForTimeout(1500);
+
+    // Verify alert is gone and deficit warning returns
+    const alertStillVisible = await page.$('[data-testid="stock-fetch-error-alert"]');
+    if (alertStillVisible && (await alertStillVisible.isVisible())) {
+      throw new Error("El banner de error de existencias no desapareció tras reintentar");
+    }
+    await page.waitForSelector('[data-testid="insufficient-stock-alert"]', { timeout: 5000 });
+    console.log(
+      "✓ Recuperación exitosa: Almacén reconectado, alerta de error retirada y déficit recalculado.",
+    );
+
+    // =========================================================================
     // FASE 3: Recuperación de Sesión tras Recarga del Navegador (Reload)
     // =========================================================================
     console.log("\n--- FASE 3: Recarga Completa del Navegador y Recuperación de Estado ---");
@@ -1173,6 +1236,51 @@ async function run() {
         "KÁRDEX UI FAIL: Etiqueta de 'Consumo Cocina' no encontrada en la tabla de movimientos",
       );
     }
+
+    // 3. Strict Row-by-Row Correlation in Kárdex DOM (KARDEX_ROW_CORRELATION)
+    console.log("  Verificando correlación fila a fila en la tabla de Kárdex...");
+    const tableRows = await page.$$("table tbody tr");
+    let chickenConsumptionRows = 0;
+    let riceConsumptionRows = 0;
+
+    for (const row of tableRows) {
+      const text = await row.innerText();
+      const isConsumption =
+        text.includes("Consumo Cocina") || text.includes("PRODUCTION_CONSUMPTION");
+
+      if (isConsumption && text.includes("Pechuga Pollo Certificada Flow04")) {
+        chickenConsumptionRows++;
+        if (!text.includes("2,00") && !text.includes("2.00")) {
+          throw new Error(`Fila de Pollo sin cantidad 2,00: ${text}`);
+        }
+        if (!text.includes("−") && !text.includes("-")) {
+          throw new Error(`Fila de Pollo sin dirección de salida (−): ${text}`);
+        }
+      }
+      if (isConsumption && text.includes("Arroz Integral Bio Flow04")) {
+        riceConsumptionRows++;
+        if (!text.includes("1,00") && !text.includes("1.00")) {
+          throw new Error(`Fila de Arroz sin cantidad 1,00: ${text}`);
+        }
+        if (!text.includes("−") && !text.includes("-")) {
+          throw new Error(`Fila de Arroz sin dirección de salida (−): ${text}`);
+        }
+      }
+    }
+
+    if (chickenConsumptionRows !== 1) {
+      throw new Error(
+        `Esperada exactamente 1 fila de Consumo Cocina en Kárdex para Pollo, encontradas: ${chickenConsumptionRows}`,
+      );
+    }
+    if (riceConsumptionRows !== 1) {
+      throw new Error(
+        `Esperada exactamente 1 fila de Consumo Cocina en Kárdex para Arroz, encontradas: ${riceConsumptionRows}`,
+      );
+    }
+    console.log(
+      "✓ KARDEX_ROW_CORRELATION superado: Exactamente 1 fila de consumo por ingrediente, tipo Consumo Cocina, cantidades exactas (−2,00 kg y −1,00 kg) y dirección de salida.",
+    );
 
     await page.screenshot({ path: `${SCREENSHOT_DIR}/kitchen_07_kardex_verified.png` });
     console.log(

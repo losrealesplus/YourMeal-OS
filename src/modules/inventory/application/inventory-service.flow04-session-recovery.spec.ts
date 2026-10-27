@@ -207,7 +207,8 @@ describe("FLOW-04 UI V1 · Session Recovery & Safe Pipeline Persistence", () => 
     });
     expect(plannedB.status).toBe("planned");
     expect(isFlow04PipelineActive({ tenantId: "tenant-foreign-b" })).toBe(true);
-    expect(isFlow04PipelineActive({ tenantId: "tenant-eatclean" })).toBe(false);
+    // Tenant A pipeline remains active and isolated, not overwritten or destroyed by Tenant B
+    expect(isFlow04PipelineActive({ tenantId: "tenant-eatclean" })).toBe(true);
   });
 
   it("enforces date context binding: switching date isolates evidence", async () => {
