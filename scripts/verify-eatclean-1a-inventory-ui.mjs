@@ -269,126 +269,316 @@ class FixtureTracker {
 }
 
 // ============================================================================
-// SENTINEL SUITE: Non-Fixture Verification & Preservation
+// SENTINEL SUITE: Dynamic, Isolated Non-Fixture Verification & Preservation
 // ============================================================================
-const SENTINEL_ING_ID = "11111111-9999-4444-9999-111111111111";
-const SENTINEL_MOV_ID = "22222222-9999-4444-9999-222222222222";
-const SENTINEL_CONS_ID = "33333333-9999-4444-9999-333333333333";
-const SENTINEL_LINE_ID = "33333333-9999-4444-9999-444444444444";
-const SENTINEL_TENANT_ID = "ffffffff-9999-4444-ffff-ffffffffffff";
-const SENTINEL_USER_ID = "55555555-eeee-4444-eeee-555555555555";
-
-function seedSentinels(tenantIdA) {
-  console.log("\n--- Sembrando Registros Centinela Ajenos al Fixture ---");
-  runSql(`
-    -- 1. Sentinel Ingredient (matching 'Ingrediente Catálogo Grande #%' pattern)
-    INSERT INTO public.ingredients (id, tenant_id, name, unit, cost, stock, min_stock, waste_percentage)
-    VALUES ('${SENTINEL_ING_ID}', '${tenantIdA}', 'Ingrediente Catálogo Grande #9999', 'kg', 3.50, 7.00, 1.00, 0.00)
-    ON CONFLICT (id) DO UPDATE SET stock = 7.00;
-
-    -- 2. Sentinel Stock Movement (matching notes 'audit-%' pattern)
-    INSERT INTO public.stock_movements (
-      id, tenant_id, ingredient_id, movement_type, quantity, previous_stock, new_stock, unit_cost, reference_document_type, reference_document_id, notes, created_at
-    ) VALUES (
-      '${SENTINEL_MOV_ID}',
-      '${tenantIdA}',
-      '${SENTINEL_ING_ID}',
-      'MANUAL_ADJUSTMENT',
-      2.000,
-      5.000,
-      7.000,
-      3.50,
-      'ADJUSTMENT_NOTE',
-      gen_random_uuid(),
-      'audit-sentinel-external-do-not-delete',
-      NOW()
-    )
-    ON CONFLICT (id) DO NOTHING;
-
-    -- 3. Sentinel Consumption and Line
-    INSERT INTO public.inventory_consumptions (id, tenant_id, delivery_date, status, created_by)
-    VALUES ('${SENTINEL_CONS_ID}', '${tenantIdA}', '2026-11-28', 'planned', NULL)
-    ON CONFLICT (id) DO NOTHING;
-
-    INSERT INTO public.inventory_consumption_lines (id, consumption_id, tenant_id, ingredient_id, ingredient_name, quantity, unit)
-    VALUES ('${SENTINEL_LINE_ID}', '${SENTINEL_CONS_ID}', '${tenantIdA}', '${SENTINEL_ING_ID}', 'Ingrediente Catálogo Grande #9999', 1.500, 'kg')
-    ON CONFLICT (id) DO NOTHING;
-
-    -- 4. Sentinel User, Tenant, Memberships & Roles (non-fixture identities)
-    INSERT INTO public.tenants (id, name, slug)
-    VALUES ('${SENTINEL_TENANT_ID}', 'Sentinel Foreign Tenant', 'sentinel-foreign')
-    ON CONFLICT (id) DO NOTHING;
-
-    INSERT INTO public.tenant_members (user_id, tenant_id, status, membership_type)
-    VALUES 
-      ('${SENTINEL_USER_ID}', '${tenantIdA}', 'approved', 'employee'),
-      ('${SENTINEL_USER_ID}', '${SENTINEL_TENANT_ID}', 'approved', 'employee')
-    ON CONFLICT (tenant_id, user_id) DO NOTHING;
-
-    INSERT INTO public.user_roles (user_id, tenant_id, role)
-    VALUES 
-      ('${SENTINEL_USER_ID}', '${tenantIdA}', 'accounting'),
-      ('${SENTINEL_USER_ID}', '${SENTINEL_TENANT_ID}', 'company_admin')
-    ON CONFLICT DO NOTHING;
-  `);
-  console.log("✓ Registros centinela sembrados con éxito:");
-  console.log("  - Ingrediente similar: 'Ingrediente Catálogo Grande #9999'");
-  console.log("  - Movimiento similar: notes='audit-sentinel-external-do-not-delete'");
-  console.log("  - Consumo ajeno: delivery_date='2026-11-28'");
-  console.log("  - Membresía/Rol ajeno: usuario='Sentinel External Staff' en EatClean y Tenant Externo");
-}
-
-function verifySentinelsPreserved(tenantIdA) {
-  console.log("\n--- Verificación de Preservación Estricta de Centinelas (NON_FIXTURE_PRESERVATION) ---");
-  const check = runScalarJson(`
-    SELECT jsonb_build_object(
-      'sentinel_ingredient', (SELECT count(*) FROM public.ingredients WHERE id = '${SENTINEL_ING_ID}'),
-      'sentinel_movement', (SELECT count(*) FROM public.stock_movements WHERE id = '${SENTINEL_MOV_ID}'),
-      'sentinel_consumption', (SELECT count(*) FROM public.inventory_consumptions WHERE id = '${SENTINEL_CONS_ID}'),
-      'sentinel_consumption_line', (SELECT count(*) FROM public.inventory_consumption_lines WHERE id = '${SENTINEL_LINE_ID}'),
-      'sentinel_tenant_member_eatclean', (SELECT count(*) FROM public.tenant_members WHERE user_id = '${SENTINEL_USER_ID}' AND tenant_id = '${tenantIdA}'),
-      'sentinel_tenant_member_foreign', (SELECT count(*) FROM public.tenant_members WHERE user_id = '${SENTINEL_USER_ID}' AND tenant_id = '${SENTINEL_TENANT_ID}'),
-      'sentinel_user_role_eatclean', (SELECT count(*) FROM public.user_roles WHERE user_id = '${SENTINEL_USER_ID}' AND tenant_id = '${tenantIdA}' AND role = 'accounting'),
-      'sentinel_user_role_foreign', (SELECT count(*) FROM public.user_roles WHERE user_id = '${SENTINEL_USER_ID}' AND tenant_id = '${SENTINEL_TENANT_ID}' AND role = 'company_admin')
-    );
-  `);
-  console.log("  Comprobación de centinelas en PostgreSQL:", check);
-
-  if (
-    check.sentinel_ingredient !== 1 ||
-    check.sentinel_movement !== 1 ||
-    check.sentinel_consumption !== 1 ||
-    check.sentinel_consumption_line !== 1 ||
-    check.sentinel_tenant_member_eatclean !== 1 ||
-    check.sentinel_tenant_member_foreign !== 1 ||
-    check.sentinel_user_role_eatclean !== 1 ||
-    check.sentinel_user_role_foreign !== 1
-  ) {
-    throw new Error(
-      `CRITICAL FAILURE: Non-fixture sentinel records were corrupted or deleted! Details: ${JSON.stringify(check)}`,
-    );
+class SentinelManager {
+  constructor(sqlRunner, scalarJsonRunner) {
+    this.sqlRunner = sqlRunner;
+    this.scalarJsonRunner = scalarJsonRunner;
+    this.state = null;
   }
-  console.log("✓ NON_FIXTURE_PRESERVATION: PASS (Todos los registros centinela intactos y preservados al 100%).");
-}
 
-function cleanupSentinels() {
-  console.log("  Limpiando registros centinela de forma explícita...");
-  runSql(`
-    DELETE FROM public.inventory_consumption_lines WHERE id = '${SENTINEL_LINE_ID}';
-    DELETE FROM public.inventory_consumptions WHERE id = '${SENTINEL_CONS_ID}';
-    DELETE FROM public.stock_movements WHERE id = '${SENTINEL_MOV_ID}';
-    DELETE FROM public.ingredients WHERE id = '${SENTINEL_ING_ID}';
-    DELETE FROM public.user_roles WHERE user_id = '${SENTINEL_USER_ID}';
-    DELETE FROM public.tenant_members WHERE user_id = '${SENTINEL_USER_ID}';
-    DELETE FROM public.tenants WHERE id = '${SENTINEL_TENANT_ID}';
-  `);
-  console.log("✓ Teardown de centinelas completado.");
+  seed(tenantIdA) {
+    console.log("\n--- Sembrando Registros Centinela Dinámicos e Independientes ---");
+    const ingId = crypto.randomUUID();
+    const movId = crypto.randomUUID();
+    const consId = crypto.randomUUID();
+    const lineId = crypto.randomUUID();
+    const tenantId = `ffffffff-${crypto.randomBytes(2).toString("hex")}-4444-ffff-${crypto.randomBytes(6).toString("hex")}`;
+    const runToken = crypto.randomBytes(4).toString("hex");
+
+    // Create dynamic isolated sentinel user in auth.users to satisfy foreign keys
+    const sentinelEmail = `sentinel.audit.${runToken}@losrealesplus.com`;
+    const sentinelPassword = `SentinelPass${crypto.randomBytes(4).toString("hex")}!`;
+    const createRes = execSync(
+      `curl -s -X POST "${SUPABASE_URL}/auth/v1/admin/users" \
+        -H "apikey: ${SUPABASE_SERVICE_KEY}" \
+        -H "Authorization: Bearer ${SUPABASE_SERVICE_KEY}" \
+        -H "Content-Type: application/json" \
+        -d '{"email":"${sentinelEmail}","password":"${sentinelPassword}","email_confirm":true}'`,
+      { encoding: "utf8" },
+    );
+    const parsedUser = JSON.parse(createRes);
+    const userId = parsedUser.id;
+
+    this.state = {
+      tenantIdA,
+      ingId,
+      movId,
+      consId,
+      lineId,
+      tenantId,
+      userId,
+      expected: {
+        ingredientName: "Ingrediente Catálogo Grande #9999",
+        unit: "kg",
+        cost: 3.5,
+        stock: 7.0,
+        minStock: 1.0,
+        wastePercentage: 0.0,
+        movementNotes: "audit-sentinel-external-do-not-delete",
+        movementQuantity: 2.0,
+        previousStock: 5.0,
+        newStock: 7.0,
+        unitCost: 3.5,
+        movementType: "MANUAL_ADJUSTMENT",
+        consumptionDeliveryDate: "2026-11-28",
+        consumptionStatus: "planned",
+        lineQuantity: 1.5,
+        lineUnit: "kg",
+        tenantName: "Sentinel Foreign Tenant",
+        tenantSlug: `sentinel-foreign-${runToken}`,
+        roleEatclean: "accounting",
+        roleForeign: "company_admin",
+        memberStatus: "approved",
+        memberType: "employee",
+      },
+      created: {
+        ingredient: true,
+        movement: true,
+        consumption: true,
+        consumptionLine: true,
+        tenant: true,
+        tenantMembers: [
+          { userId, tenantId: tenantIdA },
+          { userId, tenantId },
+        ],
+        userRoles: [
+          { userId, tenantId: tenantIdA, role: "accounting" },
+          { userId, tenantId, role: "company_admin" },
+        ],
+      },
+    };
+
+    // Clean INSERT statements without ANY ON CONFLICT DO UPDATE
+    this.sqlRunner(`
+      -- 1. Sentinel Ingredient (matching 'Ingrediente Catálogo Grande #%' pattern)
+      INSERT INTO public.ingredients (id, tenant_id, name, unit, cost, stock, min_stock, waste_percentage)
+      VALUES ('${this.state.ingId}', '${tenantIdA}', '${this.state.expected.ingredientName}', '${this.state.expected.unit}', ${this.state.expected.cost}, ${this.state.expected.stock}, ${this.state.expected.minStock}, ${this.state.expected.wastePercentage});
+
+      -- 2. Sentinel Stock Movement (matching notes 'audit-%' pattern)
+      INSERT INTO public.stock_movements (
+        id, tenant_id, ingredient_id, movement_type, quantity, previous_stock, new_stock, unit_cost, reference_document_type, reference_document_id, notes, created_at
+      ) VALUES (
+        '${this.state.movId}',
+        '${tenantIdA}',
+        '${this.state.ingId}',
+        '${this.state.expected.movementType}',
+        ${this.state.expected.movementQuantity},
+        ${this.state.expected.previousStock},
+        ${this.state.expected.newStock},
+        ${this.state.expected.unitCost},
+        'ADJUSTMENT_NOTE',
+        gen_random_uuid(),
+        '${this.state.expected.movementNotes}',
+        NOW()
+      );
+
+      -- 3. Sentinel Consumption and Line
+      INSERT INTO public.inventory_consumptions (id, tenant_id, delivery_date, status, created_by)
+      VALUES ('${this.state.consId}', '${tenantIdA}', '${this.state.expected.consumptionDeliveryDate}', '${this.state.expected.consumptionStatus}', NULL);
+
+      INSERT INTO public.inventory_consumption_lines (id, consumption_id, tenant_id, ingredient_id, ingredient_name, quantity, unit)
+      VALUES ('${this.state.lineId}', '${this.state.consId}', '${tenantIdA}', '${this.state.ingId}', '${this.state.expected.ingredientName}', ${this.state.expected.lineQuantity}, '${this.state.expected.lineUnit}');
+
+      -- 4. Sentinel Tenant, Memberships & Roles (non-fixture identities)
+      INSERT INTO public.tenants (id, name, slug)
+      VALUES ('${this.state.tenantId}', '${this.state.expected.tenantName}', '${this.state.expected.tenantSlug}');
+
+      INSERT INTO public.tenant_members (user_id, tenant_id, status, membership_type)
+      VALUES 
+        ('${this.state.userId}', '${tenantIdA}', '${this.state.expected.memberStatus}', '${this.state.expected.memberType}'),
+        ('${this.state.userId}', '${this.state.tenantId}', '${this.state.expected.memberStatus}', '${this.state.expected.memberType}');
+
+      INSERT INTO public.user_roles (user_id, tenant_id, role)
+      VALUES 
+        ('${this.state.userId}', '${tenantIdA}', '${this.state.expected.roleEatclean}'),
+        ('${this.state.userId}', '${this.state.tenantId}', '${this.state.expected.roleForeign}');
+    `);
+
+    console.log("✓ Registros centinela sembrados con UUIDs únicos (sin colisiones ni ON CONFLICT DO UPDATE):");
+    console.log(`  - Ingrediente ID ${this.state.ingId}: '${this.state.expected.ingredientName}' (stock: ${this.state.expected.stock})`);
+    console.log(`  - Movimiento ID ${this.state.movId}: notes='${this.state.expected.movementNotes}' (new_stock: ${this.state.expected.newStock})`);
+    console.log(`  - Consumo ID ${this.state.consId}: delivery_date='${this.state.expected.consumptionDeliveryDate}', status='${this.state.expected.consumptionStatus}'`);
+    console.log(`  - Consumo Línea ID ${this.state.lineId}: qty=${this.state.expected.lineQuantity} ${this.state.expected.lineUnit}`);
+    console.log(`  - Tenant Centinela ID ${this.state.tenantId}`);
+    console.log(`  - Usuario Centinela ID ${this.state.userId} con roles/membresías en EatClean y Tenant Externo`);
+  }
+
+  verifyPreserved() {
+    if (!this.state) {
+      throw new Error("SentinelManager.verifyPreserved() called before seed()");
+    }
+    console.log("\n--- Verificación de Preservación Estricta de Centinelas (NON_FIXTURE_PRESERVATION) ---");
+    const check = this.scalarJsonRunner(`
+      SELECT jsonb_build_object(
+        'ingredient', (
+          SELECT jsonb_build_object(
+            'count', count(*),
+            'stock', round(coalesce(max(stock), 0)::numeric, 2),
+            'name', max(name),
+            'cost', round(coalesce(max(cost), 0)::numeric, 2)
+          ) FROM public.ingredients WHERE id = '${this.state.ingId}'
+        ),
+        'movement', (
+          SELECT jsonb_build_object(
+            'count', count(*),
+            'notes', max(notes),
+            'quantity', round(coalesce(max(quantity), 0)::numeric, 3),
+            'new_stock', round(coalesce(max(new_stock), 0)::numeric, 3),
+            'movement_type', max(movement_type)
+          ) FROM public.stock_movements WHERE id = '${this.state.movId}'
+        ),
+        'consumption', (
+          SELECT jsonb_build_object(
+            'count', count(*),
+            'delivery_date', max(delivery_date::text),
+            'status', max(status)
+          ) FROM public.inventory_consumptions WHERE id = '${this.state.consId}'
+        ),
+        'consumption_line', (
+          SELECT jsonb_build_object(
+            'count', count(*),
+            'quantity', round(coalesce(max(quantity), 0)::numeric, 3),
+            'unit', max(unit)
+          ) FROM public.inventory_consumption_lines WHERE id = '${this.state.lineId}'
+        ),
+        'tenant_member_eatclean', (
+          SELECT jsonb_build_object(
+            'count', count(*),
+            'status', max(status),
+            'membership_type', max(membership_type)
+          ) FROM public.tenant_members WHERE user_id = '${this.state.userId}' AND tenant_id = '${this.state.tenantIdA}'
+        ),
+        'tenant_member_foreign', (
+          SELECT jsonb_build_object(
+            'count', count(*),
+            'status', max(status),
+            'membership_type', max(membership_type)
+          ) FROM public.tenant_members WHERE user_id = '${this.state.userId}' AND tenant_id = '${this.state.tenantId}'
+        ),
+        'user_role_eatclean', (
+          SELECT count(*) FROM public.user_roles WHERE user_id = '${this.state.userId}' AND tenant_id = '${this.state.tenantIdA}' AND role = '${this.state.expected.roleEatclean}'
+        ),
+        'user_role_foreign', (
+          SELECT count(*) FROM public.user_roles WHERE user_id = '${this.state.userId}' AND tenant_id = '${this.state.tenantId}' AND role = '${this.state.expected.roleForeign}'
+        )
+      );
+    `);
+
+    console.log("  Auditoría de integridad de centinelas en PostgreSQL:", JSON.stringify(check, null, 2));
+
+    // 1. Existence assertions
+    if (
+      check.ingredient.count !== 1 ||
+      check.movement.count !== 1 ||
+      check.consumption.count !== 1 ||
+      check.consumption_line.count !== 1 ||
+      check.tenant_member_eatclean.count !== 1 ||
+      check.tenant_member_foreign.count !== 1 ||
+      check.user_role_eatclean !== 1 ||
+      check.user_role_foreign !== 1
+    ) {
+      throw new Error(
+        `CRITICAL NON_FIXTURE_PRESERVATION FAILURE: Missing sentinel records! ${JSON.stringify(check)}`,
+      );
+    }
+
+    // 2. Strict Column-Value Preservation Assertions
+    const exp = this.state.expected;
+    const valueErrors = [];
+
+    if (Number(check.ingredient.stock) !== exp.stock) {
+      valueErrors.push(`Ingredient stock mutated! Expected ${exp.stock}, got ${check.ingredient.stock}`);
+    }
+    if (check.ingredient.name !== exp.ingredientName) {
+      valueErrors.push(`Ingredient name mutated! Expected "${exp.ingredientName}", got "${check.ingredient.name}"`);
+    }
+    if (check.movement.notes !== exp.movementNotes) {
+      valueErrors.push(`Movement notes mutated! Expected "${exp.movementNotes}", got "${check.movement.notes}"`);
+    }
+    if (Number(check.movement.new_stock) !== exp.newStock) {
+      valueErrors.push(`Movement new_stock mutated! Expected ${exp.newStock}, got ${check.movement.new_stock}`);
+    }
+    if (check.consumption.delivery_date !== exp.consumptionDeliveryDate) {
+      valueErrors.push(`Consumption delivery_date mutated! Expected ${exp.consumptionDeliveryDate}, got ${check.consumption.delivery_date}`);
+    }
+    if (check.consumption.status !== exp.consumptionStatus) {
+      valueErrors.push(`Consumption status mutated! Expected ${exp.consumptionStatus}, got ${check.consumption.status}`);
+    }
+    if (Number(check.consumption_line.quantity) !== exp.lineQuantity) {
+      valueErrors.push(`Consumption line quantity mutated! Expected ${exp.lineQuantity}, got ${check.consumption_line.quantity}`);
+    }
+    if (check.tenant_member_eatclean.status !== exp.memberStatus) {
+      valueErrors.push(`Tenant member status mutated! Expected ${exp.memberStatus}, got ${check.tenant_member_eatclean.status}`);
+    }
+    if (check.tenant_member_foreign.status !== exp.memberStatus) {
+      valueErrors.push(`Foreign member status mutated! Expected ${exp.memberStatus}, got ${check.tenant_member_foreign.status}`);
+    }
+
+    if (valueErrors.length > 0) {
+      throw new Error(
+        `CRITICAL NON_FIXTURE_PRESERVATION FAILURE: Sentinel values were altered!\n` + valueErrors.join("\n"),
+      );
+    }
+
+    console.log("✓ NON_FIXTURE_PRESERVATION: PASS (100% de centinelas intactos: existencia Y valores de columna preservados byte a byte).");
+  }
+
+  cleanup() {
+    if (!this.state || !this.state.created) {
+      return;
+    }
+    console.log("  [SentinelManager] Limpiando registros centinela mediante claves compuestas estrictas...");
+
+    // Deletion strictly by exact ID and composite keys:
+    this.sqlRunner(`
+      DELETE FROM public.inventory_consumption_lines WHERE id = '${this.state.lineId}';
+      DELETE FROM public.inventory_consumptions WHERE id = '${this.state.consId}';
+      DELETE FROM public.stock_movements WHERE id = '${this.state.movId}';
+      DELETE FROM public.ingredients WHERE id = '${this.state.ingId}';
+    `);
+
+    // user_roles: STRICT COMPOSITE KEY ONLY
+    for (const ur of this.state.created.userRoles) {
+      this.sqlRunner(
+        `DELETE FROM public.user_roles WHERE user_id = '${ur.userId}' AND tenant_id = '${ur.tenantId}' AND role = '${ur.role}';`,
+      );
+    }
+
+    // tenant_members: STRICT COMPOSITE KEY ONLY
+    for (const tm of this.state.created.tenantMembers) {
+      this.sqlRunner(
+        `DELETE FROM public.tenant_members WHERE user_id = '${tm.userId}' AND tenant_id = '${tm.tenantId}';`,
+      );
+    }
+
+    // tenant: STRICT SINGLE ID
+    this.sqlRunner(`DELETE FROM public.tenants WHERE id = '${this.state.tenantId}';`);
+
+    // Dynamic sentinel auth user
+    if (this.state.userId) {
+      try {
+        execSync(
+          `curl -s -X DELETE "${SUPABASE_URL}/auth/v1/admin/users/${this.state.userId}" \
+            -H "apikey: ${SUPABASE_SERVICE_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_SERVICE_KEY}"`,
+          { encoding: "utf8" },
+        );
+      } catch (err) {
+        console.warn(`  [SentinelManager] Advertencia purgando usuario auth centinela: ${err.message}`);
+      }
+    }
+
+    this.state.created = null;
+    console.log("✓ [SentinelManager] Teardown de centinelas completado sin comodines ni cláusulas user_id genéricas.");
+  }
 }
 
 // ============================================================================
 // FAILURE CLEANUP SAFETY: Mid-Test Interruption Simulation
 // ============================================================================
-async function testFailureCleanupSafety(tenantIdA) {
+async function testFailureCleanupSafety(tenantIdA, sentinelManager) {
   console.log("\n================================================================================");
   console.log("TEST ADVERSARIAL: Simulación de Fallo a Mitad de Ejecución (FAILURE_CLEANUP_SAFETY)");
   console.log("================================================================================");
@@ -442,8 +632,8 @@ async function testFailureCleanupSafety(tenantIdA) {
     throw new Error(`FAILURE_CLEANUP_SAFETY FAILED: Residual rows left after aborted run: ${JSON.stringify(check)}`);
   }
 
-  // Also verify sentinels are completely untouched
-  verifySentinelsPreserved(tenantIdA);
+  // Also verify sentinels are completely untouched (existence AND exact values)
+  sentinelManager.verifyPreserved();
 
   console.log("✓ FAILURE_CLEANUP_SAFETY: PASS (Limpieza quirúrgica demostrada en caso de aborto sin limpiezas generales ni residuales).");
 }
@@ -488,61 +678,93 @@ async function main() {
   const tenantIdA = "509a67ba-5d66-4298-9a3f-b7e7214974dc"; // EatClean Tenerife
   const tenantIdB = "eeeeeeee-" + crypto.randomBytes(2).toString("hex") + "-4444-eeee-" + crypto.randomBytes(6).toString("hex");
 
-  // -------------------------------------------------------------------------
-  // STEP A: Seed Sentinels
-  // -------------------------------------------------------------------------
-  seedSentinels(tenantIdA);
-  verifySentinelsPreserved(tenantIdA);
-
-  // -------------------------------------------------------------------------
-  // STEP B: Adversarial Failure Cleanup Safety Simulation
-  // -------------------------------------------------------------------------
-  await testFailureCleanupSafety(tenantIdA);
-
-  // -------------------------------------------------------------------------
-  // STEP C: Full Browser E2E Lifecycle with FixtureTracker
-  // -------------------------------------------------------------------------
-  console.log("\n================================================================================");
-  console.log("INICIO DE EJECUCIÓN E2E EN NAVEGADOR (CHROMIUM + POSTGRESQL 17)");
-  console.log("================================================================================");
-
+  const sentinelManager = new SentinelManager(runSql, runScalarJson);
   const tracker = new FixtureTracker(runSql, runScalarJson);
-  const runToken = crypto.randomBytes(4).toString("hex");
-
-  // Fresh strictly-tracked UUIDs for this run
-  const chickenIngId = crypto.randomUUID();
-  const riceIngId = crypto.randomUUID();
-  const quinoaIngId = crypto.randomUUID();
-  const supplierId = crypto.randomUUID();
-
-  const otherIngId = crypto.randomUUID();
-  const tenantBMovementId = crypto.randomUUID();
-  const quinoaMovementId = crypto.randomUUID();
-
-  const dishId = crypto.randomUUID();
-  const weeklyMenuId = crypto.randomUUID();
-  const slotId = crypto.randomUUID();
-  const customerId = crypto.randomUUID();
-  const orderId = crypto.randomUUID();
-  const orderItemId = crypto.randomUUID();
-  const weekStart = "2026-11-09";
-  const deliveryDate = "2026-11-10";
-
-  const invoiceId = crypto.randomUUID();
-  const line1Id = crypto.randomUUID();
-  const line2Id = crypto.randomUUID();
-  const receiptExecutionId = crypto.randomUUID();
-
   let browser = null;
 
   try {
-    // Check pre-existing memberships for staffUser to avoid unneeded mutations or deletions
-    const hadMemberA = runScalarJson(
-      `SELECT count(*) FROM public.tenant_members WHERE user_id = '${staffUser.id}' AND tenant_id = '${tenantIdA}'`,
-    ) > 0;
-    const hadRoleA = runScalarJson(
-      `SELECT count(*) FROM public.user_roles WHERE user_id = '${staffUser.id}' AND tenant_id = '${tenantIdA}' AND role = 'company_admin'`,
-    ) > 0;
+    // -------------------------------------------------------------------------
+    // STEP A: Seed Sentinels
+    // -------------------------------------------------------------------------
+    sentinelManager.seed(tenantIdA);
+    sentinelManager.verifyPreserved();
+
+    // -------------------------------------------------------------------------
+    // STEP B: Adversarial Failure Cleanup Safety Simulation
+    // -------------------------------------------------------------------------
+    await testFailureCleanupSafety(tenantIdA, sentinelManager);
+
+    // -------------------------------------------------------------------------
+    // STEP C: Full Browser E2E Lifecycle with FixtureTracker
+    // -------------------------------------------------------------------------
+    console.log("\n================================================================================");
+    console.log("INICIO DE EJECUCIÓN E2E EN NAVEGADOR (CHROMIUM + POSTGRESQL 17)");
+    console.log("================================================================================");
+
+    const runToken = crypto.randomBytes(4).toString("hex");
+
+    // Fresh strictly-tracked UUIDs for this run
+    const chickenIngId = crypto.randomUUID();
+    const riceIngId = crypto.randomUUID();
+    const quinoaIngId = crypto.randomUUID();
+    const supplierId = crypto.randomUUID();
+
+    const otherIngId = crypto.randomUUID();
+    const tenantBMovementId = crypto.randomUUID();
+    const quinoaMovementId = crypto.randomUUID();
+
+    const dishId = crypto.randomUUID();
+    const weeklyMenuId = crypto.randomUUID();
+    const slotId = crypto.randomUUID();
+    const customerId = crypto.randomUUID();
+    const orderId = crypto.randomUUID();
+    const orderItemId = crypto.randomUUID();
+    const weekStart = "2026-11-09";
+    const deliveryDate = "2026-11-10";
+
+    const invoiceId = crypto.randomUUID();
+    const line1Id = crypto.randomUUID();
+    const line2Id = crypto.randomUUID();
+    const receiptExecutionId = crypto.randomUUID();
+
+    // Check pre-existing memberships and roles for staffUser to preserve external state
+    const preExistingMemberA = runScalarJson(
+      `SELECT status, membership_type FROM public.tenant_members WHERE user_id = '${staffUser.id}' AND tenant_id = '${tenantIdA}'`,
+    );
+    const preExistingRoleA = runScalarJson(
+      `SELECT role FROM public.user_roles WHERE user_id = '${staffUser.id}' AND tenant_id = '${tenantIdA}' AND role = 'company_admin'`,
+    );
+
+    console.log("  Comprobación de membresía/rol preexistente de Staff en EatClean:", {
+      hasPreExistingMemberA: !!preExistingMemberA,
+      hasPreExistingRoleA: !!preExistingRoleA,
+    });
+
+    // Build conditional SQL for staff membership and role without ON CONFLICT DO UPDATE
+    // Note: EatClean (tenantIdA) must be inserted before Tenant B so it occupies the primary slot
+    let staffMembershipSql = "";
+    if (!preExistingMemberA) {
+      staffMembershipSql += `
+        INSERT INTO public.tenant_members (user_id, tenant_id, status, membership_type)
+        VALUES ('${staffUser.id}', '${tenantIdA}', 'approved', 'employee');
+      `;
+    }
+    staffMembershipSql += `
+      INSERT INTO public.tenant_members (user_id, tenant_id, status, membership_type)
+      VALUES ('${staffUser.id}', '${tenantIdB}', 'approved', 'employee');
+    `;
+
+    let staffRoleSql = "";
+    if (!preExistingRoleA) {
+      staffRoleSql += `
+        INSERT INTO public.user_roles (user_id, tenant_id, role)
+        VALUES ('${staffUser.id}', '${tenantIdA}', 'company_admin');
+      `;
+    }
+    staffRoleSql += `
+      INSERT INTO public.user_roles (user_id, tenant_id, role)
+      VALUES ('${staffUser.id}', '${tenantIdB}', 'company_admin');
+    `;
 
     // Seed Main Fixtures
     runSql(`
@@ -560,19 +782,11 @@ async function main() {
       VALUES ('${staffUser.id}', 'Staff Sim Multitenant')
       ON CONFLICT (id) DO NOTHING;
 
-      -- Memberships
-      INSERT INTO public.tenant_members (user_id, tenant_id, status, membership_type)
-      VALUES 
-        ('${staffUser.id}', '${tenantIdA}', 'approved', 'employee'),
-        ('${staffUser.id}', '${tenantIdB}', 'approved', 'employee')
-      ON CONFLICT (tenant_id, user_id) DO UPDATE SET status = 'approved';
+      -- Memberships (strictly non-destructive)
+      ${staffMembershipSql}
 
-      -- Roles
-      INSERT INTO public.user_roles (user_id, tenant_id, role)
-      VALUES 
-        ('${staffUser.id}', '${tenantIdA}', 'company_admin'),
-        ('${staffUser.id}', '${tenantIdB}', 'company_admin')
-      ON CONFLICT DO NOTHING;
+      -- Roles (strictly non-destructive)
+      ${staffRoleSql}
 
       -- EatClean Supplier
       INSERT INTO public.suppliers (id, tenant_id, name, contact)
@@ -646,8 +860,8 @@ async function main() {
     tracker.registerTenant(tenantIdB);
     tracker.registerTenantMember(staffUser.id, tenantIdB);
     tracker.registerUserRole(staffUser.id, tenantIdB, "company_admin");
-    if (!hadMemberA) tracker.registerTenantMember(staffUser.id, tenantIdA);
-    if (!hadRoleA) tracker.registerUserRole(staffUser.id, tenantIdA, "company_admin");
+    if (!preExistingMemberA) tracker.registerTenantMember(staffUser.id, tenantIdA);
+    if (!preExistingRoleA) tracker.registerUserRole(staffUser.id, tenantIdA, "company_admin");
 
     tracker.registerSupplier(supplierId);
     tracker.registerIngredient(chickenIngId);
@@ -1315,10 +1529,53 @@ async function main() {
     ) {
       throw new Error(`Fixtures cleanup failed! Residual items remain: ${JSON.stringify(remainingCheck)}`);
     }
+    // Verify staff membership / role preservation
+    if (preExistingMemberA) {
+      const currentMemberA = runScalarJson(
+        `SELECT status, membership_type FROM public.tenant_members WHERE user_id = '${staffUser.id}' AND tenant_id = '${tenantIdA}'`,
+      );
+      if (
+        !currentMemberA ||
+        currentMemberA.status !== preExistingMemberA.status ||
+        currentMemberA.membership_type !== preExistingMemberA.membership_type
+      ) {
+        throw new Error(
+          `NON_FIXTURE_PRESERVATION: Pre-existing staff membership in EatClean was altered or deleted! Expected: ${JSON.stringify(preExistingMemberA)}, Got: ${JSON.stringify(currentMemberA)}`,
+        );
+      }
+      console.log("✓ Staff preexistente en EatClean verificado intacto (status y membership_type inalterados).");
+    } else {
+      const checkResidualMember = runScalarJson(
+        `SELECT count(*) FROM public.tenant_members WHERE user_id = '${staffUser.id}' AND tenant_id = '${tenantIdA}'`,
+      );
+      if (checkResidualMember !== 0) {
+        throw new Error(`Residual staff membership in EatClean remained after cleanup!`);
+      }
+      console.log("✓ Membresía efímera de Staff en EatClean purgada al 100% (0 residuos).");
+    }
+
+    if (preExistingRoleA) {
+      const checkRole = runScalarJson(
+        `SELECT count(*) FROM public.user_roles WHERE user_id = '${staffUser.id}' AND tenant_id = '${tenantIdA}' AND role = 'company_admin'`,
+      );
+      if (checkRole !== 1) {
+        throw new Error(`NON_FIXTURE_PRESERVATION: Pre-existing staff role in EatClean was altered or deleted!`);
+      }
+      console.log("✓ Rol preexistente de Staff en EatClean verificado intacto.");
+    } else {
+      const checkResidualRole = runScalarJson(
+        `SELECT count(*) FROM public.user_roles WHERE user_id = '${staffUser.id}' AND tenant_id = '${tenantIdA}' AND role = 'company_admin'`,
+      );
+      if (checkResidualRole !== 0) {
+        throw new Error(`Residual staff role in EatClean remained after cleanup!`);
+      }
+      console.log("✓ Rol efímero de Staff en EatClean purgado al 100% (0 residuos).");
+    }
+
     console.log("✓ FIXTURE_OWNERSHIP: PASS (0 residuos sintéticos, borrado exclusivamente por UUIDs rastreados).");
 
-    // Verify Sentinels are 100% intact after full run and cleanup
-    verifySentinelsPreserved(tenantIdA);
+    // Verify Sentinels are 100% intact after full run and cleanup (existence AND exact values)
+    sentinelManager.verifyPreserved();
   } finally {
     // Teardown browser
     if (browser) {
@@ -1330,8 +1587,8 @@ async function main() {
       console.error("  [EMERGENCY CLEANUP ERROR]:", err.message);
     });
 
-    // Final Sentinel teardown
-    cleanupSentinels();
+    // Final Sentinel teardown strictly by composite key
+    sentinelManager.cleanup();
   }
 
   console.log("\n================================================================================");
