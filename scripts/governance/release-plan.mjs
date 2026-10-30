@@ -1,3 +1,9 @@
+import {
+  EATCLEAN_1A_563,
+  eatclean1A563Payload,
+  eatclean1A563ScopeId,
+  authorizeEatClean1A563,
+} from "./release-eatclean-1a-flow04-563.mjs";
 import { ROLLBACK_V1, rollbackV1Payload, rollbackV1ScopeId, authorizeRollbackV1, rollbackBuildEnabled } from "./release-rollback-v1.mjs";
 import {
   OPERATIONS_545,
@@ -454,6 +460,48 @@ export function rollbackV1Snapshot(ctx, base, diff, prs, currentMainSha) {
   }
   return { ...s, diff };
 }
+export function eatclean1A563Snapshot(ctx, base, diff, prs, currentMainSha) {
+  const s = activationSnapshot(ctx, base, diff, prs, currentMainSha);
+  s.productPrs = [553, 554, 555, 556, 557, 558, 559, 560, 561, 562].map((n) => api(`pulls/${n}`));
+  s.candidatePr = api("pulls/563");
+  s.commits = s.commits.map((c) => {
+    let parent;
+    try {
+      parent = git("rev-parse", `${c.sha}^1`).trim();
+    } catch {
+      parent = null;
+    }
+    let headSha;
+    try {
+      headSha = git("rev-parse", `${c.sha}^2`).trim();
+    } catch {
+      try {
+        headSha = api(`pulls/${c.pr}`).head.sha;
+      } catch {
+        headSha = null;
+      }
+    }
+    return {
+      sha: c.sha,
+      parent,
+      headSha,
+      pr: c.pr,
+      files: c.paths.map((p) => {
+        const fileHash = (rev) => {
+          const entry = git("ls-tree", rev, "--", p);
+          if (!entry) return null;
+          const blob = /^100(?:644|755) blob ([a-f0-9]{40})\t/.exec(entry);
+          demand(blob, "EatClean 1A FLOW-04 #563 requires regular Git blobs");
+          return hash(
+            execFileSync("git", ["cat-file", "blob", blob[1]], { maxBuffer: 16 * 1024 * 1024 }),
+          );
+        };
+        return { path: p, before: fileHash(`${c.sha}^1`), after: fileHash(c.sha) };
+      }),
+    };
+  });
+  return { ...s, diff };
+}
 export function operations545Snapshot(ctx, base, diff, prs, currentMainSha) {
   const s = activationSnapshot(ctx, base, diff, prs, currentMainSha);
   s.productPr = api("pulls/545");
@@ -682,7 +730,15 @@ export function prepare(ctx, publishing = false) {
       "Exact interval cannot authorize a different classification",
     );
     reconciliation =
-      base.sha === ROLLBACK_V1.baseline.sha
+      base.sha === EATCLEAN_1A_563.baseline.sha
+        ? authorizeEatClean1A563(
+            eatclean1A563Snapshot(ctx, base, diff, prs, currentMain),
+            inputs,
+            ctx,
+            api(`actions/runs/${ctx.runId}`),
+            policy,
+          )
+        : base.sha === ROLLBACK_V1.baseline.sha
         ? authorizeRollbackV1(
             rollbackV1Snapshot(ctx, base, diff, prs, currentMain), inputs, ctx,
             api(`actions/runs/${ctx.runId}`), policy,
@@ -873,6 +929,27 @@ export function prepare(ctx, publishing = false) {
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
+    if (process.argv[2] === "--eatclean-1a-563-payload") {
+      const sha = api("git/ref/heads/main").object.sha;
+      const ctx = { repository: policy.repository, sha, runId: "" };
+      const base = baseline(ctx);
+      const diff = changedPaths(base.sha, sha);
+      const prs = diff.commits.map((c) => assertMergedCommit(pages(`commits/${c}/pulls`), c));
+      const payload = eatclean1A563Payload(eatclean1A563Snapshot(ctx, base, diff, prs, sha), policy);
+      fs.writeSync(
+        1,
+        JSON.stringify(
+          {
+            payload,
+            exactIntervalScope: JSON.stringify(canonical(payload)),
+            authorizationId: eatclean1A563ScopeId(payload),
+          },
+          null,
+          2,
+        ) + "\n",
+      );
+      process.exit(0); // Read-only proposal; never dispatch or production authority.
+    }
     if (process.argv[2] === "--rollback-v1-payload") {
       const sha = api("git/ref/heads/main").object.sha;
       const ctx = { repository: policy.repository, sha, runId: "" };
