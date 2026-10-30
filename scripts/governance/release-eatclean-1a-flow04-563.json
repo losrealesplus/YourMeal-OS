@@ -479,11 +479,13 @@
   ],
   "governanceBranch": "feat/gate7-eatclean-1a-flow04-reconciliation",
   "governancePaths": [
+    ".github/workflows/deploy-production.yml",
     "scripts/governance/release-eatclean-1a-flow04-563.json",
     "scripts/governance/release-eatclean-1a-flow04-563.mjs",
     "scripts/governance/release-eatclean-1a-flow04-563.spec.mjs",
     "scripts/governance/release-json.spec.mjs",
     "scripts/governance/release-plan.mjs",
+    "scripts/governance/release-reconciliation.mjs",
     "scripts/governance/release-rollback-v1.spec.mjs"
   ],
   "constraints": {

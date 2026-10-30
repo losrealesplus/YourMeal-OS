@@ -40,8 +40,8 @@ function humanPr(pr, c, policy) {
   );
 }
 
-export function eatclean1A563Payload(s, policy) {
-  const r = EATCLEAN_1A_563;
+export function eatclean1A563Payload(s, policy, releaseConfig = EATCLEAN_1A_563) {
+  const r = releaseConfig;
   demand(
     policy.repository === r.repository &&
       policy.environment === r.environment &&
@@ -78,7 +78,11 @@ export function eatclean1A563Payload(s, policy) {
       same(candidateCommit.files, r.candidatePr.files),
     "EatClean 1A FLOW-04 candidate PR 563 lineage/content mismatch",
   );
-  if (r.candidateSha) {
+  if (r.candidateSha !== null && r.candidateSha !== undefined) {
+    demand(
+      SHA.test(r.candidateSha),
+      "EatClean 1A FLOW-04 candidateSha format invalid",
+    );
     demand(
       candidateCommit.sha === r.candidateSha,
       "EatClean 1A FLOW-04 candidate commit SHA mismatch with pinned release",
@@ -164,7 +168,7 @@ export function eatclean1A563Payload(s, policy) {
   });
 }
 
-export function authorizeEatClean1A563(s, inputs, ctx, run, policy) {
+export function authorizeEatClean1A563(s, inputs, ctx, run, policy, releaseConfig = EATCLEAN_1A_563) {
   assertContext(ctx, policy);
   demand(
     inputs.mode === "exact_interval" && ctx.event === "workflow_dispatch",
@@ -181,7 +185,19 @@ export function authorizeEatClean1A563(s, inputs, ctx, run, policy) {
       run.triggering_actor?.id === policy.reviewerId,
     "EatClean 1A FLOW-04 dispatch authority mismatch",
   );
-  const payload = eatclean1A563Payload(s, policy);
+  demand(
+    releaseConfig.candidateSha !== null && releaseConfig.candidateSha !== undefined,
+    "EatClean 1A FLOW-04 release authorization rejected: candidateSha is unsealed/null; pending squash merge of PR #563",
+  );
+  demand(
+    SHA.test(releaseConfig.candidateSha ?? ""),
+    "EatClean 1A FLOW-04 release authorization rejected: candidateSha is not a valid 40-character SHA",
+  );
+  const payload = eatclean1A563Payload(s, policy, releaseConfig);
+  demand(
+    payload.candidateSha === releaseConfig.candidateSha,
+    "EatClean 1A FLOW-04 candidate commit SHA mismatch with pinned release",
+  );
   const prs = parseReleaseJson(
     inputs.authorized_prs,
     "EATCLEAN_1A_INPUT_INVALID",
@@ -198,9 +214,9 @@ export function authorizeEatClean1A563(s, inputs, ctx, run, policy) {
   );
   demand(
     payload.finalSourceSha === ctx.sha &&
-      inputs.expected_base_sha === EATCLEAN_1A_563.baseline.sha &&
+      inputs.expected_base_sha === releaseConfig.baseline.sha &&
       inputs.expected_target_sha === ctx.sha &&
-      same(prs, [...EATCLEAN_1A_563.productPrs, payload.governancePr]),
+      same(prs, [...releaseConfig.productPrs, payload.governancePr]),
     "EatClean 1A FLOW-04 dispatch anchors mismatch",
   );
   demand(
@@ -212,13 +228,25 @@ export function authorizeEatClean1A563(s, inputs, ctx, run, policy) {
   return { reconciled: true, reconciliationId: hash(JSON.stringify(payload)), payload };
 }
 
-export function assertEatClean1A563Manifest(manifest, fresh) {
+export function assertEatClean1A563Manifest(manifest, fresh, releaseConfig = EATCLEAN_1A_563) {
   if (fresh.reconciliation?.payload?.reconciliationType !== "FLOW04_INCREMENT_1A_PREPARATION")
     return;
   const { payload, reconciliationId } = fresh.reconciliation;
   demand(
+    releaseConfig.candidateSha !== null && releaseConfig.candidateSha !== undefined,
+    "EatClean 1A FLOW-04 publication rejected: candidateSha is unsealed/null; pending squash merge of PR #563",
+  );
+  demand(
+    SHA.test(releaseConfig.candidateSha ?? ""),
+    "EatClean 1A FLOW-04 publication rejected: candidateSha is not a valid 40-character SHA",
+  );
+  demand(
+    payload.candidateSha === releaseConfig.candidateSha,
+    "EatClean 1A FLOW-04 publication rejected: candidateCommit does not match sealed candidateSha",
+  );
+  demand(
     reconciliationId === hash(JSON.stringify(payload)) &&
-      same(payload.constraints, EATCLEAN_1A_563.constraints) &&
+      same(payload.constraints, releaseConfig.constraints) &&
       [manifest.reconciliation, manifest.plan?.reconciliation].every(
         (x) => x?.reconciliationId === reconciliationId && same(x.payload, payload),
       ) &&
