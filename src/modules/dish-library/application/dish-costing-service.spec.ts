@@ -65,4 +65,16 @@ describe("DishCostingService (CR-COST-02)", () => {
     // Gross margin %: (5.717 / 8.50) * 100 = ~67.26%
     expect(result.grossMarginPct).toBeCloseTo(67.26, 1);
   });
+
+  it("2. Returns null gross margin and sales price when dish price is null or zero (never fake 0%)", () => {
+    const unpricedDish: FoodDishRecord = {
+      ...dish,
+      price: null,
+    };
+    const result = service.evaluateDishCost(unpricedDish, recipes, ingredients);
+
+    expect(result.salesPrice).toBeNull();
+    expect(result.grossMarginAmount).toBeNull();
+    expect(result.grossMarginPct).toBeNull();
+  });
 });

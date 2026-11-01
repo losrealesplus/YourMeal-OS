@@ -128,13 +128,23 @@ export interface HypotheticalVariables {
   yieldLossAdjustments?: Record<string, number>; // e.g. { "ING-POLLO": -0.03 } (-3% merma)
 }
 
+export type CostProvenanceType =
+  | "recipe_catalog" // Calculado desde receta de catálogo
+  | "manual_catalog" // Coste manual registrado en dishes.cost
+  | "incomplete"; // Dato ausente o incompleto
+
 export interface BaselineProduct {
   productId: string;
   productName: string;
-  salesPrice: number;
+  salesPrice: number | null;
   monthlyVolume: number;
   bomComponents: BOMComponent[];
   overheads: ProductionOverheadsConfig;
+  costProvenance?: CostProvenanceType;
+  isCalculable?: boolean;
+  missingDataReasons?: string[];
+  rawMaterialsCost?: number | null;
+  grossMarginPct?: number | null; // D-003: Margen inicial (PVP - Materia Prima - Envases)
 }
 
 export interface CostBaselineSnapshot {
@@ -146,18 +156,23 @@ export interface CostBaselineSnapshot {
 export interface SimulatedProductImpact {
   productId: string;
   productName: string;
-  salesPrice: number;
+  salesPrice: number | null;
   monthlyVolume: number;
   currentCost: number;
   simulatedCost: number;
   costDelta: number;
   costDeltaPct: number;
-  currentMarginPct: number;
-  simulatedMarginPct: number;
-  marginDeltaPct: number;
+  currentMarginPct: number | null;
+  simulatedMarginPct: number | null;
+  marginDeltaPct: number | null;
   currentMonthlyCost: number;
   simulatedMonthlyCost: number;
   monthlyProfitImpact: number;
+  costProvenance: CostProvenanceType;
+  isCalculable: boolean;
+  missingDataReasons: string[];
+  rawMaterialsCost: number | null;
+  grossMarginPct: number | null;
 }
 
 export interface ScenarioResult {
@@ -175,6 +190,11 @@ export interface ScenarioResult {
     totalMonthlyProfitImpact: number;
     avgCostDeltaPct: number;
     avgMarginDeltaPct: number;
+    totalProductsCount: number;
+    calculableProductsCount: number;
+    excludedProductsCount: number;
+    coveragePct: number;
+    isFullyCalculable: boolean;
   };
 }
 
@@ -187,5 +207,10 @@ export interface ScenarioComparison {
     monthlyProfitImpact: number;
     avgMarginPct: number;
     costDeltaPct: number;
+    totalProductsCount: number;
+    calculableProductsCount: number;
+    excludedProductsCount: number;
+    coveragePct: number;
+    isFullyCalculable: boolean;
   }>;
 }

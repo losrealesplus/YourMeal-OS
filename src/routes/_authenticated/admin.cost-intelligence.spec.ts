@@ -18,7 +18,7 @@ describe("CR-COST-03 — Cost Intelligence Cockpit (admin.cost-intelligence)", (
     );
 
     expect(src).toContain("Simulador de Escenarios (E9)");
-    expect(src).toContain("Anatomía de Costes [REAL]");
+    expect(src).toContain("Anatomía de Costes (Ficha Técnica)");
     expect(src).toContain("Escenarios Guardados");
     expect(src).toContain("Histórico de Decisiones");
   });
@@ -48,5 +48,59 @@ describe("CR-COST-03 — Cost Intelligence Cockpit (admin.cost-intelligence)", (
     expect(src).toContain("adjust_menu_price");
     expect(src).toContain("reformulate_recipe");
     expect(src).toContain("accept_margin_compression");
+  });
+
+  it("D-010: Eliminates all synthetic cost fallbacks and invented overheads", () => {
+    const src = readFileSync(
+      resolve(ROOT, "src/routes/_authenticated/admin.cost-intelligence.tsx"),
+      "utf8",
+    );
+
+    // No hardcoded 3.50 fallback
+    expect(src).not.toContain("cost || 3.5");
+    // No hardcoded 5% waste injection
+    expect(src).not.toContain("wastePercentage: 5");
+    // No arbitrary + 2.50 addition
+    expect(src).not.toContain("+ 2.50");
+    expect(src).not.toContain("+ 2.5");
+    // No substring matching for annual volume
+    expect(src).not.toContain('.includes("pollo") ? 1200');
+    expect(src).not.toContain('.includes("aceite") ? 600');
+  });
+
+  it("D-010: Implements partial subtotal transparency and provenance distinction", () => {
+    const src = readFileSync(
+      resolve(ROOT, "src/routes/_authenticated/admin.cost-intelligence.tsx"),
+      "utf8",
+    );
+
+    // Displays D-010 Subtotal Simulado with dish counts
+    expect(src).toContain("Subtotal Simulado");
+    expect(src).toContain("simulationResult.summary.calculableProductsCount");
+    expect(src).toContain("simulationResult.summary.totalProductsCount");
+    expect(src).toContain("No disponible");
+    expect(src).toContain("Transparencia de Datos (D-010)");
+    expect(src).toContain("FICHA TÉCNICA (CATÁLOGO ACTUAL)");
+    expect(src).toContain("Escandallo");
+    expect(src).toContain("Coste Manual");
+    expect(src).toContain("Incompleto");
+    expect(src).toContain("Margen Bruto (D-003)");
+    expect(src).toContain("Completar Datos");
+  });
+
+  it("D-010: Reflects unpriced dishes as 'Sin PVP', identifies manual catalog provenance, and secures editing permissions", () => {
+    const src = readFileSync(
+      resolve(ROOT, "src/routes/_authenticated/admin.cost-intelligence.tsx"),
+      "utf8",
+    );
+
+    // Displays "Sin PVP" when price is absent/zero
+    expect(src).toContain("Sin PVP");
+    // Displays distinct manual catalog description without ingredients
+    expect(src).toContain("Coste manual de ficha (sin ingredientes desglosados)");
+    // Marks simulation volume as operational assumption
+    expect(src).toContain("Volumen Mensual (Supuesto Operativo)");
+    // Passes permission checks to editing components
+    expect(src).toContain('can("dishes.update") || can("dishes.write")');
   });
 });

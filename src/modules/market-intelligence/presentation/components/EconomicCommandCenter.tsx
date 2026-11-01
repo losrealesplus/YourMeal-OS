@@ -4,20 +4,20 @@
  * Replaces fragmented tabs with a single opportunity-centric canvas with in-situ simulation.
  */
 
-import React, { useState, useMemo } from 'react';
-import { PanelCard, SectionTitle } from '@/components/admin';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import React, { useState, useMemo } from "react";
+import { PanelCard, SectionTitle } from "@/components/admin";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   TrendingDown,
   TrendingUp,
@@ -39,15 +39,15 @@ import {
   DollarSign,
   PieChart,
   Scale,
-} from 'lucide-react';
-import { MarketBenchmarkBadge } from './MarketBenchmarkBadge';
-import { MarketSourceSpreadCard } from './MarketSourceSpreadCard';
-import { CatalogIngestionDrawer } from './CatalogIngestionDrawer';
-import { ProductMappingQueueDrawer } from './ProductMappingQueueDrawer';
-import { NegotiationBriefModal } from './NegotiationBriefModal';
-import { MarketInquiryExplorerModal } from './MarketInquiryExplorerModal';
-import { IndirectCostQuickEditModal } from './IndirectCostQuickEditModal';
-import { useMarketIntelligence } from '../hooks/use-market-intelligence';
+} from "lucide-react";
+import { MarketBenchmarkBadge } from "./MarketBenchmarkBadge";
+import { MarketSourceSpreadCard } from "./MarketSourceSpreadCard";
+import { CatalogIngestionDrawer } from "./CatalogIngestionDrawer";
+import { ProductMappingQueueDrawer } from "./ProductMappingQueueDrawer";
+import { NegotiationBriefModal } from "./NegotiationBriefModal";
+import { MarketInquiryExplorerModal } from "./MarketInquiryExplorerModal";
+import { IndirectCostQuickEditModal } from "./IndirectCostQuickEditModal";
+import { useMarketIntelligence } from "../hooks/use-market-intelligence";
 import {
   EconomicOpportunity,
   OpportunityLifecycleState,
@@ -55,10 +55,10 @@ import {
   BenchmarkCalculation,
   NegotiationBrief,
   MarketProduct,
-} from '../../domain/types';
-import { supabase } from '@/integrations/supabase/client';
-import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
+} from "../../domain/types";
+import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export interface EconomicCommandCenterProps {
   tenantId: string;
@@ -76,25 +76,28 @@ export interface EconomicCommandCenterProps {
   dishes: Array<{
     id: string;
     name: string;
-    price: number;
-    cost: number;
+    price: number | null;
+    cost: number | null;
     laborCost: number;
     energyCost: number;
     packagingCost: number;
     monthlyVolume?: number;
+    isCalculable?: boolean;
     recipeIngredients?: Array<{ ingredientId: string; amount: number }>;
   }>;
+  canEditDishes?: boolean;
   onRefreshData?: () => Promise<void>;
   onOpenMacroSimulator?: () => void;
 }
 
 export function EconomicCommandCenter({
   tenantId,
-  tenantName = 'Restaurante',
+  tenantName = "Restaurante",
   userId,
-  userName = 'Gerente',
+  userName = "Gerente",
   ingredients,
   dishes,
+  canEditDishes = true,
   onRefreshData,
   onOpenMacroSimulator,
 }: EconomicCommandCenterProps) {
@@ -117,29 +120,33 @@ export function EconomicCommandCenter({
   const [isInquiryOpen, setIsInquiryOpen] = useState(false);
   const [activeBrief, setActiveBrief] = useState<NegotiationBrief | null>(null);
   const [selectedSpreadCalc, setSelectedSpreadCalc] = useState<BenchmarkCalculation | null>(null);
-  const [editingDish, setEditingDish] = useState<any | null>(null);
+  const [editingDish, setEditingDish] = useState<
+    EconomicCommandCenterProps["dishes"][number] | null
+  >(null);
 
   // In-situ Opportunity Interactive States
   const [expandedOpportunityId, setExpandedOpportunityId] = useState<string | null>(null);
   const [simulatingOpportunityId, setSimulatingOpportunityId] = useState<string | null>(null);
   const [decidingOpportunityId, setDecidingOpportunityId] = useState<string | null>(null);
-  const [recordedDecisions, setRecordedDecisions] = useState<Record<string, any>>({});
+  const [recordedDecisions, setRecordedDecisions] = useState<
+    Record<string, EconomicOpportunity["recordedDecision"]>
+  >({});
 
   // Decision Intent Form State
-  const [intentType, setIntentType] = useState<string>('renegotiate_supplier');
-  const [targetPrice, setTargetPrice] = useState<string>('');
+  const [intentType, setIntentType] = useState<string>("renegotiate_supplier");
+  const [targetPrice, setTargetPrice] = useState<string>("");
   const [targetDate, setTargetDate] = useState<string>(() => {
     const d = new Date();
     d.setDate(d.getDate() + 15);
     return d.toISOString().slice(0, 10);
   });
-  const [intentRationale, setIntentRationale] = useState<string>('');
+  const [intentRationale, setIntentRationale] = useState<string>("");
   const [isSubmittingDecision, setIsSubmittingDecision] = useState(false);
 
   // Bottom Deepening Sections Toggles
   const [showAnatomySection, setShowAnatomySection] = useState(false);
   const [showHistorySection, setShowHistorySection] = useState(false);
-  const [savedIntentsList, setSavedIntentsList] = useState<any[]>([]);
+  const [savedIntentsList, setSavedIntentsList] = useState<Array<Record<string, unknown>>>([]);
 
   // ───────────────────────────────────────────────────────────────────────────
   // Construct Canonical Economic Opportunities Feed
@@ -148,7 +155,7 @@ export function EconomicCommandCenter({
     return ingredients.map((ing) => {
       const calc = benchmarksByIngredient.get(ing.id) || null;
       const mapping = mappings.find(
-        (m) => m.tenantIngredientId === ing.id && m.matchStatus === 'confirmed'
+        (m) => m.tenantIngredientId === ing.id && m.matchStatus === "confirmed",
       );
 
       const benchmarkExTax = calc ? calc.benchmarkPriceExTax : 0;
@@ -164,56 +171,71 @@ export function EconomicCommandCenter({
           : null;
 
       // Deterministic Actionability Grade
-      let actionabilityGrade: ActionabilityGrade = 'INSUFFICIENT';
+      let actionabilityGrade: ActionabilityGrade = "INSUFFICIENT";
       if (mapping && calc && calc.components.length > 0) {
         if (variancePct > 5 && ing.annualVolume && ing.annualVolume > 0) {
-          actionabilityGrade = 'DIRECT_ACTION';
+          actionabilityGrade = "DIRECT_ACTION";
         } else if (!ing.annualVolume || ing.annualVolume === 0) {
-          actionabilityGrade = 'REVIEW_DATA';
+          actionabilityGrade = "REVIEW_DATA";
         } else {
-          actionabilityGrade = 'INFORMATIONAL';
+          actionabilityGrade = "INFORMATIONAL";
         }
       }
 
       // Lifecycle State Machine
-      let lifecycleState: OpportunityLifecycleState = 'DETECTED';
+      let lifecycleState: OpportunityLifecycleState = "DETECTED";
       if (recordedDecisions[ing.id]) {
-        lifecycleState = 'DECISION_RECORDED';
+        lifecycleState = "DECISION_RECORDED";
       } else if (simulatingOpportunityId === ing.id) {
-        lifecycleState = 'SIMULATED';
+        lifecycleState = "SIMULATED";
       } else if (expandedOpportunityId === ing.id) {
-        lifecycleState = 'REVIEWED';
+        lifecycleState = "REVIEWED";
       }
 
       // Calculate affected dishes projection
       const affected = dishes.filter((d) =>
-        d.recipeIngredients?.some((r) => r.ingredientId === ing.id) ||
-        d.name.toLowerCase().includes(ing.name.toLowerCase().split(' ')[0])
+        d.recipeIngredients?.some((r) => r.ingredientId === ing.id),
       );
 
-      const affectedDishesSim = (affected.length > 0 ? affected : dishes.slice(0, 1)).map((d) => {
-        const dishUsageKg = 0.35; // standard recipe usage
-        const rawCostCurrent = d.cost || 4.20;
-        const rawSavings = benchmarkExTax > 0 && ing.cost > benchmarkExTax
-          ? (ing.cost - benchmarkExTax) * dishUsageKg
-          : 0.24;
-        const simulatedCost = Math.max(0.5, rawCostCurrent - rawSavings);
-        const currentMargin = d.price > 0 ? ((d.price - rawCostCurrent) / d.price) * 100 : 66.40;
-        const simulatedMargin = d.price > 0 ? ((d.price - simulatedCost) / d.price) * 100 : 68.32;
-        const monthlyUnits = d.monthlyVolume || 400;
-        const monthlyProfitImpact = rawSavings * monthlyUnits;
+      const affectedDishesSim = affected.map((d) => {
+        const recipeMatch = d.recipeIngredients?.find((r) => r.ingredientId === ing.id);
+        const dishUsageKg = recipeMatch ? recipeMatch.amount : 0;
+        const isCostKnown = d.cost != null && d.isCalculable !== false;
+        const rawCostCurrent = isCostKnown ? d.cost! : null;
+        const rawSavings =
+          benchmarkExTax > 0 && ing.cost > benchmarkExTax
+            ? (ing.cost - benchmarkExTax) * dishUsageKg
+            : 0;
+        const simulatedCost =
+          rawCostCurrent != null ? Math.max(0, rawCostCurrent - rawSavings) : null;
+        const currentMargin =
+          d.price != null && d.price > 0 && rawCostCurrent != null
+            ? ((d.price - rawCostCurrent) / d.price) * 100
+            : null;
+        const simulatedMargin =
+          d.price != null && d.price > 0 && simulatedCost != null
+            ? ((d.price - simulatedCost) / d.price) * 100
+            : null;
+        const monthlyUnits = d.monthlyVolume ?? 0;
+        const monthlyProfitImpact =
+          rawSavings > 0 && monthlyUnits > 0
+            ? rawSavings * monthlyUnits
+            : rawSavings > 0
+              ? 0
+              : null;
 
         return {
           dishId: d.id,
           dishName: d.name,
-          salesPrice: d.price || 12.50,
+          salesPrice: d.price,
           currentCost: rawCostCurrent,
           simulatedCost,
           currentMarginPct: currentMargin,
           simulatedMarginPct: simulatedMargin,
-          costDelta: rawSavings,
+          costDelta: rawCostCurrent != null ? rawSavings : null,
           monthlyVolumeUnits: monthlyUnits,
           monthlyProfitImpactEur: monthlyProfitImpact,
+          isCalculable: isCostKnown,
         };
       });
 
@@ -221,12 +243,12 @@ export function EconomicCommandCenter({
         id: `opp-${ing.id}`,
         ingredientId: ing.id,
         ingredientName: ing.name,
-        category: ing.category || 'Materia Prima',
+        category: ing.category || "Materia Prima",
         unit: ing.unit,
         effectiveWacExTax: ing.cost,
         benchmarkPriceExTax: benchmarkExTax,
         variancePct,
-        comparabilityGrade: (mapping?.comparabilityGrade as any) || 'HIGH',
+        comparabilityGrade: mapping?.comparabilityGrade || "HIGH",
         annualVolume: ing.annualVolume || null,
         potentialAnnualSavingsEur,
         actionabilityGrade,
@@ -235,10 +257,10 @@ export function EconomicCommandCenter({
           tenantIngredientId: ing.id,
           tenantIngredientName: ing.name,
           calculatedAt: new Date().toISOString(),
-          canonicalUnit: 'EUR_PER_KG',
-          benchmarkPriceExTax: 5.70,
+          canonicalUnit: "EUR_PER_KG",
+          benchmarkPriceExTax: 5.7,
           minPriceExTax: 5.534,
-          maxPriceExTax: 7.20,
+          maxPriceExTax: 7.2,
           dispersionSpreadPct: 30.1,
           observationsCount: 2,
           highComparabilityCount: 1,
@@ -248,14 +270,31 @@ export function EconomicCommandCenter({
         recordedDecision: recordedDecisions[ing.id],
       };
     });
-  }, [ingredients, dishes, benchmarksByIngredient, mappings, expandedOpportunityId, simulatingOpportunityId, recordedDecisions]);
+  }, [
+    ingredients,
+    dishes,
+    benchmarksByIngredient,
+    mappings,
+    expandedOpportunityId,
+    simulatingOpportunityId,
+    recordedDecisions,
+  ]);
 
   // Command Strip Attention Triage
   const triageSummary = useMemo(() => {
-    const directAction = opportunities.filter((o) => o.actionabilityGrade === 'DIRECT_ACTION' && o.lifecycleState !== 'DECISION_RECORDED');
-    const totalSavingsAtRisk = directAction.reduce((acc, o) => acc + (o.potentialAnnualSavingsEur || 0), 0);
-    const incompleteDishes = dishes.filter((d) => d.laborCost === 0 || d.energyCost === 0 || d.packagingCost === 0);
-    const unmappedIngredients = ingredients.filter((i) => !mappings.some((m) => m.tenantIngredientId === i.id));
+    const directAction = opportunities.filter(
+      (o) => o.actionabilityGrade === "DIRECT_ACTION" && o.lifecycleState !== "DECISION_RECORDED",
+    );
+    const totalSavingsAtRisk = directAction.reduce(
+      (acc, o) => acc + (o.potentialAnnualSavingsEur || 0),
+      0,
+    );
+    const incompleteDishes = dishes.filter(
+      (d) => d.laborCost === 0 || d.energyCost === 0 || d.packagingCost === 0,
+    );
+    const unmappedIngredients = ingredients.filter(
+      (i) => !mappings.some((m) => m.tenantIngredientId === i.id),
+    );
 
     return {
       directActionCount: directAction.length,
@@ -272,18 +311,22 @@ export function EconomicCommandCenter({
   const handleToggleSimulate = (op: EconomicOpportunity) => {
     if (simulatingOpportunityId === op.ingredientId) {
       setSimulatingOpportunityId(null);
-      toast.info('Simulación revertida a Costes Reales Auditados [REAL].');
+      toast.info("Simulación revertida a Costes Reales Auditados [REAL].");
     } else {
       setSimulatingOpportunityId(op.ingredientId);
       setExpandedOpportunityId(op.ingredientId);
-      toast.success(`Hipótesis inyectada in-situ: ${op.ingredientName} @ ${op.benchmarkPriceExTax.toFixed(2)} €/${op.unit}`);
+      toast.success(
+        `Hipótesis inyectada in-situ: ${op.ingredientName} @ ${op.benchmarkPriceExTax.toFixed(2)} €/${op.unit}`,
+      );
     }
   };
 
   const handleOpenDecisionForm = (op: EconomicOpportunity) => {
     setDecidingOpportunityId(op.ingredientId);
     setTargetPrice(op.benchmarkPriceExTax.toFixed(2));
-    setIntentRationale(`Brecha de +${op.variancePct.toFixed(1)}% identificada frente a benchmark mayorista observable. Negociación anclada en volumen anual consolidado.`);
+    setIntentRationale(
+      `Brecha de +${op.variancePct.toFixed(1)}% identificada frente a benchmark mayorista observable. Negociación anclada en volumen anual consolidado.`,
+    );
   };
 
   const handleSaveDecisionIntent = async (op: EconomicOpportunity) => {
@@ -303,7 +346,7 @@ export function EconomicCommandCenter({
         rationale: intentRationale,
         authorName: userName,
         createdAt: new Date().toISOString(),
-        status: 'pending_execution',
+        status: "pending_execution",
       };
 
       // Persist in local state for seamless immediate UI transition
@@ -314,23 +357,31 @@ export function EconomicCommandCenter({
 
       // Persist in Supabase cost_decision_intents table
       try {
-        await (supabase.from as any)('cost_decision_intents').insert({
+        const client = supabase as unknown as {
+          from: (table: string) => {
+            insert: (row: Record<string, unknown>) => Promise<unknown>;
+          };
+        };
+        await client.from("cost_decision_intents").insert({
           tenant_id: tenantId,
           intent_type: intentType,
           rationale: `[${op.ingredientName} @ ${targetNum.toFixed(2)} €/${op.unit}] ${intentRationale}`,
           planned_effective_date: targetDate,
-          status: 'pending_execution',
+          status: "pending_execution",
         });
-      } catch (e) {
+      } catch {
         // Fallback gracefully for local mock runtimes
       }
 
-      toast.success(`Decisión registrada auditada para ${op.ingredientName} (#${decisionRecord.id})`);
+      toast.success(
+        `Decisión registrada auditada para ${op.ingredientName} (#${decisionRecord.id})`,
+      );
       setDecidingOpportunityId(null);
       setSimulatingOpportunityId(null);
       if (onRefreshData) await onRefreshData();
-    } catch (err: any) {
-      toast.error(`Error guardando decisión: ${err.message || 'Error desconocido'}`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error desconocido";
+      toast.error(`Error guardando decisión: ${msg}`);
     } finally {
       setIsSubmittingDecision(false);
     }
@@ -342,14 +393,15 @@ export function EconomicCommandCenter({
         id: op.ingredientId,
         tenantId,
         name: op.ingredientName,
-        category: op.category || 'General',
-        unit: op.unit as any,
+        category: op.category || "General",
+        unit: (op.unit === "kg" || op.unit === "l" ? op.unit : "unit") as "kg" | "l" | "unit",
         effectiveWacExTax: op.effectiveWacExTax,
         annualVolume: op.annualVolume || 1200,
       });
       if (brief) setActiveBrief(brief);
-    } catch (err: any) {
-      toast.error(`Error generando informe: ${err.message}`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error desconocido";
+      toast.error(`Error generando informe: ${msg}`);
     }
   };
 
@@ -379,22 +431,23 @@ export function EconomicCommandCenter({
           </div>
           <div className="flex items-baseline gap-2 mt-2 flex-wrap">
             <span className="text-2xl font-bold font-mono text-slate-900">
-              {triageSummary.totalSavingsAtRiskEur > 0 ? (
-                `${triageSummary.totalSavingsAtRiskEur.toFixed(2)} €/año`
-              ) : (
-                '0,00 €/año'
-              )}
+              {triageSummary.totalSavingsAtRiskEur > 0
+                ? `${triageSummary.totalSavingsAtRiskEur.toFixed(2)} €/año`
+                : "0,00 €/año"}
             </span>
             {triageSummary.totalSavingsAtRiskEur > 0 && (
-              <Badge variant="outline" className="text-[9px] uppercase font-mono bg-rose-50 text-rose-700 border-rose-200 font-semibold">
+              <Badge
+                variant="outline"
+                className="text-[9px] uppercase font-mono bg-rose-50 text-rose-700 border-rose-200 font-semibold"
+              >
                 [SIMULADO · FIXTURE]
               </Badge>
             )}
           </div>
           <div className="text-xs text-rose-700/90 mt-1">
             {triageSummary.directActionCount > 0
-              ? 'Sobreprecio > +5% con volumen verificado listo para negociar'
-              : 'Sin sobreprecios críticos activos en catálogo auditado'}
+              ? "Sobreprecio > +5% con volumen verificado listo para negociar"
+              : "Sin sobreprecios críticos activos en catálogo auditado"}
           </div>
         </PanelCard>
 
@@ -404,7 +457,10 @@ export function EconomicCommandCenter({
               <span className="w-2 h-2 rounded-full bg-amber-500" />
               Escandallos Incompletos
             </span>
-            <Badge variant="outline" className="text-[10px] bg-white text-amber-800 border-amber-300 font-bold">
+            <Badge
+              variant="outline"
+              className="text-[10px] bg-white text-amber-800 border-amber-300 font-bold"
+            >
               {triageSummary.incompleteDishesCount} Platos
             </Badge>
           </div>
@@ -430,7 +486,10 @@ export function EconomicCommandCenter({
               <span className="w-2 h-2 rounded-full bg-indigo-500" />
               Cobertura de Mercado
             </span>
-            <Badge variant="outline" className="text-[10px] bg-white text-indigo-700 border-indigo-300 font-bold">
+            <Badge
+              variant="outline"
+              className="text-[10px] bg-white text-indigo-700 border-indigo-300 font-bold"
+            >
               {triageSummary.totalMarketSources} Fuentes
             </Badge>
           </div>
@@ -464,51 +523,50 @@ export function EconomicCommandCenter({
               Oportunidades de Decisión Económica
             </h2>
           </div>
-          <span className="text-xs text-slate-500">
-            Ordenado por impacto anual verificable
-          </span>
+          <span className="text-xs text-slate-500">Ordenado por impacto anual verificable</span>
         </div>
 
         {opportunities.map((op) => {
           const isSimulating = simulatingOpportunityId === op.ingredientId;
           const isDeciding = decidingOpportunityId === op.ingredientId;
-          const isRecorded = op.lifecycleState === 'DECISION_RECORDED';
+          const isRecorded = op.lifecycleState === "DECISION_RECORDED";
           const wholesaleFloor = op.calculation.minPriceExTax || 5.534;
-          const retailCeiling = op.calculation.maxPriceExTax || 7.20;
+          const retailCeiling = op.calculation.maxPriceExTax || 7.2;
 
           return (
             <PanelCard
               key={op.id}
               className={cn(
-                'p-5 transition-all border shadow-xs',
+                "p-5 transition-all border shadow-xs",
                 isRecorded
-                  ? 'bg-emerald-50/40 border-emerald-200'
+                  ? "bg-emerald-50/40 border-emerald-200"
                   : isSimulating
-                  ? 'bg-indigo-50/30 border-indigo-300 ring-2 ring-indigo-500/20'
-                  : op.actionabilityGrade === 'DIRECT_ACTION'
-                  ? 'bg-white border-rose-200/90 hover:border-rose-300'
-                  : 'bg-white border-slate-200'
+                    ? "bg-indigo-50/30 border-indigo-300 ring-2 ring-indigo-500/20"
+                    : op.actionabilityGrade === "DIRECT_ACTION"
+                      ? "bg-white border-rose-200/90 hover:border-rose-300"
+                      : "bg-white border-slate-200",
               )}
             >
               {/* Card Header & Status Strip */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b pb-3.5">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-bold text-base text-slate-900">
-                      {op.ingredientName}
-                    </span>
+                    <span className="font-bold text-base text-slate-900">{op.ingredientName}</span>
                     <Badge variant="outline" className="text-[10px] text-slate-600 font-mono">
                       {op.category}
                     </Badge>
 
                     {/* Actionability Badge */}
-                    {op.actionabilityGrade === 'DIRECT_ACTION' && (
+                    {op.actionabilityGrade === "DIRECT_ACTION" && (
                       <Badge className="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold">
                         🟢 ACCIÓN DIRECTA
                       </Badge>
                     )}
-                    {op.actionabilityGrade === 'REVIEW_DATA' && (
-                      <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-300 text-[10px] font-bold">
+                    {op.actionabilityGrade === "REVIEW_DATA" && (
+                      <Badge
+                        variant="outline"
+                        className="bg-amber-50 text-amber-800 border-amber-300 text-[10px] font-bold"
+                      >
                         🟡 REVISAR DATOS
                       </Badge>
                     )}
@@ -528,10 +586,25 @@ export function EconomicCommandCenter({
                   </div>
 
                   <div className="text-xs text-slate-500 font-mono flex flex-wrap items-center gap-1.5 sm:gap-2">
-                    <span>WAC Real [REAL — fixture/local]: <strong className="text-slate-800">{op.effectiveWacExTax.toFixed(2)} €/{op.unit}</strong></span>
+                    <span>
+                      WAC Real [REAL — fixture/local]:{" "}
+                      <strong className="text-slate-800">
+                        {op.effectiveWacExTax.toFixed(2)} €/{op.unit}
+                      </strong>
+                    </span>
                     <span>──►</span>
-                    <span>Benchmark [OBSERVADO — fixture/local]: <strong className="text-indigo-700">{op.benchmarkPriceExTax.toFixed(2)} €/{op.unit}</strong></span>
-                    <span className={cn('font-bold', op.variancePct > 0 ? 'text-rose-600' : 'text-emerald-600')}>
+                    <span>
+                      Benchmark [OBSERVADO — fixture/local]:{" "}
+                      <strong className="text-indigo-700">
+                        {op.benchmarkPriceExTax.toFixed(2)} €/{op.unit}
+                      </strong>
+                    </span>
+                    <span
+                      className={cn(
+                        "font-bold",
+                        op.variancePct > 0 ? "text-rose-600" : "text-emerald-600",
+                      )}
+                    >
                       (+{op.variancePct.toFixed(1)}% sobreprecio)
                     </span>
                   </div>
@@ -546,7 +619,10 @@ export function EconomicCommandCenter({
                     {op.potentialAnnualSavingsEur !== null && op.potentialAnnualSavingsEur > 0 ? (
                       <>
                         <span>{op.potentialAnnualSavingsEur.toFixed(2)} €/año</span>
-                        <Badge variant="outline" className="text-[8px] uppercase font-mono bg-emerald-50 text-emerald-700 border-emerald-300 font-semibold">
+                        <Badge
+                          variant="outline"
+                          className="text-[8px] uppercase font-mono bg-emerald-50 text-emerald-700 border-emerald-300 font-semibold"
+                        >
                           [SIMULADO · FIXTURE]
                         </Badge>
                       </>
@@ -557,7 +633,9 @@ export function EconomicCommandCenter({
                     )}
                   </div>
                   <div className="text-[10px] text-slate-500">
-                    {op.annualVolume ? `Volumen: ${op.annualVolume} ${op.unit}/año [FIXTURE]` : 'Volumen no registrado'}
+                    {op.annualVolume
+                      ? `Volumen: ${op.annualVolume} ${op.unit}/año [FIXTURE]`
+                      : "Volumen no registrado"}
                   </div>
                 </div>
               </div>
@@ -566,15 +644,28 @@ export function EconomicCommandCenter({
               <div className="py-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600 border-b border-slate-100">
                 <div className="flex items-center gap-3">
                   <span className="text-slate-400 font-medium">Evidencia Observable:</span>
-                  <span className="font-mono">Suelo Makro: <strong className="text-slate-800">{wholesaleFloor.toFixed(2)} €/{op.unit}</strong></span>
+                  <span className="font-mono">
+                    Suelo Makro:{" "}
+                    <strong className="text-slate-800">
+                      {wholesaleFloor.toFixed(2)} €/{op.unit}
+                    </strong>
+                  </span>
                   <span className="text-slate-300">|</span>
-                  <span className="font-mono">Techo Mercadona: <strong className="text-slate-800">{retailCeiling.toFixed(2)} €/{op.unit}</strong></span>
+                  <span className="font-mono">
+                    Techo Mercadona:{" "}
+                    <strong className="text-slate-800">
+                      {retailCeiling.toFixed(2)} €/{op.unit}
+                    </strong>
+                  </span>
                   <span className="text-slate-300">|</span>
-                  <span className="text-emerald-700 font-semibold">Comparabilidad: {op.comparabilityGrade}</span>
+                  <span className="text-emerald-700 font-semibold">
+                    Comparabilidad: {op.comparabilityGrade}
+                  </span>
                 </div>
 
                 <div className="text-[11px] text-slate-500">
-                  Platos afectados: <strong>{op.affectedDishes.map((d) => d.dishName).join(', ')}</strong>
+                  Platos afectados:{" "}
+                  <strong>{op.affectedDishes.map((d) => d.dishName).join(", ")}</strong>
                 </div>
               </div>
 
@@ -593,7 +684,8 @@ export function EconomicCommandCenter({
                           Proyección de Impacto In-Situ en Plato (Motor E9 en Memoria)
                         </h4>
                         <p className="text-xs text-indigo-700">
-                          Hipótesis determinista aplicando benchmark de mercado ({op.benchmarkPriceExTax.toFixed(2)} €/{op.unit}) sobre escandallo real.
+                          Hipótesis determinista aplicando benchmark de mercado (
+                          {op.benchmarkPriceExTax.toFixed(2)} €/{op.unit}) sobre escandallo real.
                         </p>
                       </div>
                     </div>
@@ -626,19 +718,82 @@ export function EconomicCommandCenter({
                       <tbody className="divide-y">
                         {op.affectedDishes.map((dish) => {
                           const fullDish = dishes.find((d) => d.id === dish.dishId);
-                          const hasZeroOverhead = !fullDish?.laborCost || !fullDish?.energyCost || !fullDish?.packagingCost;
+                          const hasZeroOverhead =
+                            !fullDish?.laborCost ||
+                            !fullDish?.energyCost ||
+                            !fullDish?.packagingCost;
                           return (
                             <tr key={dish.dishId} className="hover:bg-slate-50/50">
-                              <td className="py-2.5 px-3 font-bold text-slate-900">{dish.dishName}</td>
-                              <td className="py-2.5 px-3 text-right font-medium">{dish.salesPrice.toFixed(2)} €</td>
-                              <td className="py-2.5 px-3 text-right text-slate-600 font-mono">{dish.currentCost.toFixed(2)} €</td>
-                              <td className="py-2.5 px-3 text-right font-bold text-indigo-700 font-mono">{dish.simulatedCost.toFixed(2)} €</td>
-                              <td className="py-2.5 px-3 text-right text-slate-600 font-mono">{dish.currentMarginPct.toFixed(2)} %</td>
-                              <td className="py-2.5 px-3 text-right font-bold text-emerald-700 font-mono">
-                                {dish.simulatedMarginPct.toFixed(2)} % (+{(dish.simulatedMarginPct - dish.currentMarginPct).toFixed(2)}%)
+                              <td className="py-2.5 px-3 font-bold text-slate-900">
+                                {dish.dishName}
+                              </td>
+                              <td className="py-2.5 px-3 text-right font-medium">
+                                {dish.salesPrice != null && dish.salesPrice > 0 ? (
+                                  `${dish.salesPrice.toFixed(2)} €`
+                                ) : (
+                                  <span className="text-muted-foreground italic font-normal">
+                                    Sin PVP
+                                  </span>
+                                )}
+                              </td>
+                              <td className="py-2.5 px-3 text-right text-slate-600 font-mono">
+                                {dish.currentCost != null ? (
+                                  `${dish.currentCost.toFixed(2)} €`
+                                ) : (
+                                  <span className="text-amber-700 italic font-semibold">
+                                    No disponible
+                                  </span>
+                                )}
+                              </td>
+                              <td className="py-2.5 px-3 text-right font-bold text-indigo-700 font-mono">
+                                {dish.simulatedCost != null ? (
+                                  `${dish.simulatedCost.toFixed(2)} €`
+                                ) : (
+                                  <span className="text-muted-foreground/60 italic font-normal">
+                                    —
+                                  </span>
+                                )}
+                              </td>
+                              <td className="py-2.5 px-3 text-right text-slate-600 font-mono">
+                                {dish.currentMarginPct != null ? (
+                                  `${dish.currentMarginPct.toFixed(2)} %`
+                                ) : (
+                                  <span className="text-muted-foreground/60 italic font-normal">
+                                    —
+                                  </span>
+                                )}
                               </td>
                               <td className="py-2.5 px-3 text-right font-bold text-emerald-700 font-mono">
-                                +{dish.monthlyProfitImpactEur.toFixed(2)} €/mes
+                                {dish.simulatedMarginPct != null ? (
+                                  <>
+                                    {dish.simulatedMarginPct.toFixed(2)} %
+                                    {dish.currentMarginPct != null && (
+                                      <span className="text-[10px] ml-1 font-normal text-muted-foreground">
+                                        (+
+                                        {(dish.simulatedMarginPct - dish.currentMarginPct).toFixed(
+                                          2,
+                                        )}
+                                        %)
+                                      </span>
+                                    )}
+                                  </>
+                                ) : (
+                                  <span className="text-muted-foreground/60 italic font-normal">
+                                    —
+                                  </span>
+                                )}
+                              </td>
+                              <td className="py-2.5 px-3 text-right font-bold text-emerald-700 font-mono">
+                                {dish.monthlyProfitImpactEur != null &&
+                                dish.monthlyProfitImpactEur > 0 ? (
+                                  `+${dish.monthlyProfitImpactEur.toFixed(2)} €/mes`
+                                ) : dish.monthlyProfitImpactEur === 0 ? (
+                                  `0.00 €/mes`
+                                ) : (
+                                  <span className="text-muted-foreground/60 italic font-normal">
+                                    —
+                                  </span>
+                                )}
                               </td>
                               <td className="py-2.5 px-3 text-right">
                                 {hasZeroOverhead && fullDish ? (
@@ -652,7 +807,10 @@ export function EconomicCommandCenter({
                                     Imputar Costes [MANUAL]
                                   </Button>
                                 ) : (
-                                  <Badge variant="outline" className="text-[10px] text-emerald-700 bg-emerald-50 border-emerald-200">
+                                  <Badge
+                                    variant="outline"
+                                    className="text-[10px] text-emerald-700 bg-emerald-50 border-emerald-200"
+                                  >
                                     Completo
                                   </Badge>
                                 )}
@@ -705,11 +863,19 @@ export function EconomicCommandCenter({
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="renegotiate_supplier">🤝 Renegociar con Proveedor</SelectItem>
-                          <SelectItem value="reformulate_recipe">🥗 Reformular Receta / Gramaje</SelectItem>
+                          <SelectItem value="renegotiate_supplier">
+                            🤝 Renegociar con Proveedor
+                          </SelectItem>
+                          <SelectItem value="reformulate_recipe">
+                            🥗 Reformular Receta / Gramaje
+                          </SelectItem>
                           <SelectItem value="adjust_menu_price">🏷️ Ajustar PVP en Carta</SelectItem>
-                          <SelectItem value="accept_margin_compression">⏱️ Aceptar Compresión Temporal</SelectItem>
-                          <SelectItem value="investigate_further">🔍 Solicitar Cotizaciones Adicionales</SelectItem>
+                          <SelectItem value="accept_margin_compression">
+                            ⏱️ Aceptar Compresión Temporal
+                          </SelectItem>
+                          <SelectItem value="investigate_further">
+                            🔍 Solicitar Cotizaciones Adicionales
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -762,7 +928,7 @@ export function EconomicCommandCenter({
                       disabled={isSubmittingDecision}
                       className="h-7 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white"
                     >
-                      {isSubmittingDecision ? 'Guardando...' : 'Confirmar y Guardar Decisión'}
+                      {isSubmittingDecision ? "Guardando..." : "Confirmar y Guardar Decisión"}
                     </Button>
                   </div>
                 </div>
@@ -776,8 +942,15 @@ export function EconomicCommandCenter({
                   <div className="flex items-center gap-2">
                     <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
                     <div>
-                      <strong>Compromiso #{op.recordedDecision?.id}:</strong> {op.recordedDecision?.intentType === 'renegotiate_supplier' ? 'Renegociación de Proveedor' : op.recordedDecision?.intentType} objetivo a{' '}
-                      <strong>{op.recordedDecision?.targetPriceExTax?.toFixed(2)} €/{op.unit}</strong> prevista para {op.recordedDecision?.plannedEffectiveDate}.
+                      <strong>Compromiso #{op.recordedDecision?.id}:</strong>{" "}
+                      {op.recordedDecision?.intentType === "renegotiate_supplier"
+                        ? "Renegociación de Proveedor"
+                        : op.recordedDecision?.intentType}{" "}
+                      objetivo a{" "}
+                      <strong>
+                        {op.recordedDecision?.targetPriceExTax?.toFixed(2)} €/{op.unit}
+                      </strong>{" "}
+                      prevista para {op.recordedDecision?.plannedEffectiveDate}.
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
@@ -798,7 +971,7 @@ export function EconomicCommandCenter({
                           delete copy[op.ingredientId];
                           return copy;
                         });
-                        toast.info('Oportunidad reabierta para re-evaluación.');
+                        toast.info("Oportunidad reabierta para re-evaluación.");
                       }}
                       className="h-6 text-[11px] text-emerald-800 hover:text-emerald-900"
                     >
@@ -851,14 +1024,14 @@ export function EconomicCommandCenter({
                     size="sm"
                     onClick={() => handleToggleSimulate(op)}
                     className={cn(
-                      'h-7 text-xs font-semibold shadow-xs',
+                      "h-7 text-xs font-semibold shadow-xs",
                       isSimulating
-                        ? 'bg-slate-800 hover:bg-slate-700 text-white'
-                        : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                        ? "bg-slate-800 hover:bg-slate-700 text-white"
+                        : "bg-indigo-600 hover:bg-indigo-700 text-white",
                     )}
                   >
                     <Sliders className="w-3 h-3 mr-1" />
-                    {isSimulating ? 'Ocultar Simulación' : 'Simular en Carta E9'}
+                    {isSimulating ? "Ocultar Simulación" : "Simular en Carta E9"}
                   </Button>
                 </div>
               </div>
@@ -917,7 +1090,7 @@ export function EconomicCommandCenter({
             className="text-xs font-semibold bg-white border-slate-300 text-slate-700 hover:bg-slate-100"
           >
             <PieChart className="w-3.5 h-3.5 mr-1.5 text-amber-600" />
-            {showAnatomySection ? 'Ocultar Escandallos [MANUAL]' : 'Anatomía de Costes [MANUAL]'}
+            {showAnatomySection ? "Ocultar Escandallos [MANUAL]" : "Anatomía de Costes [MANUAL]"}
           </Button>
 
           {onOpenMacroSimulator && (
@@ -940,38 +1113,68 @@ export function EconomicCommandCenter({
               <h4 className="font-bold text-xs text-slate-900 uppercase tracking-wider">
                 Anatomía de Costes de Platos & Supuestos Operativos [MANUAL]
               </h4>
-              <Badge variant="outline" className="text-[9px] bg-amber-50 text-amber-800 border-amber-300 font-bold">
+              <Badge
+                variant="outline"
+                className="text-[9px] bg-amber-50 text-amber-800 border-amber-300 font-bold"
+              >
                 NO MUTACIÓN DE WAC
               </Badge>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {dishes.map((dish) => (
-                <div key={dish.id} className="p-3 bg-white rounded-lg border border-slate-200 text-xs space-y-1.5">
+                <div
+                  key={dish.id}
+                  className="p-3 bg-white rounded-lg border border-slate-200 text-xs space-y-1.5"
+                >
                   <div className="font-bold text-slate-900 flex justify-between">
                     <span>{dish.name}</span>
-                    <span className="font-mono font-semibold">{dish.price.toFixed(2)} €</span>
+                    <span className="font-mono font-semibold">
+                      {dish.price != null && dish.price > 0 ? (
+                        `${dish.price.toFixed(2)} €`
+                      ) : (
+                        <span className="text-muted-foreground italic font-normal">Sin PVP</span>
+                      )}
+                    </span>
                   </div>
                   <div className="flex justify-between text-slate-500">
                     <span>Materia Prima:</span>
-                    <span className="font-mono">{dish.cost.toFixed(2)} €</span>
+                    <span className="font-mono">
+                      {dish.cost != null && dish.isCalculable !== false ? (
+                        `${dish.cost.toFixed(2)} €`
+                      ) : (
+                        <span className="text-amber-700 italic font-semibold">No disponible</span>
+                      )}
+                    </span>
                   </div>
                   <div className="flex justify-between text-slate-500">
                     <span>Mano de Obra [MANUAL]:</span>
                     <span className="font-mono">
-                      {dish.laborCost > 0 ? `${dish.laborCost.toFixed(2)} €` : <em className="text-amber-700 font-semibold">— (Sin configurar)</em>}
+                      {dish.laborCost > 0 ? (
+                        `${dish.laborCost.toFixed(2)} €`
+                      ) : (
+                        <em className="text-amber-700 font-semibold">— (Sin configurar)</em>
+                      )}
                     </span>
                   </div>
                   <div className="flex justify-between text-slate-500">
                     <span>Energía [MANUAL]:</span>
                     <span className="font-mono">
-                      {dish.energyCost > 0 ? `${dish.energyCost.toFixed(2)} €` : <em className="text-amber-700 font-semibold">— (Sin configurar)</em>}
+                      {dish.energyCost > 0 ? (
+                        `${dish.energyCost.toFixed(2)} €`
+                      ) : (
+                        <em className="text-amber-700 font-semibold">— (Sin configurar)</em>
+                      )}
                     </span>
                   </div>
                   <div className="flex justify-between text-slate-500">
                     <span>Packaging [MANUAL]:</span>
                     <span className="font-mono">
-                      {dish.packagingCost > 0 ? `${dish.packagingCost.toFixed(2)} €` : <em className="text-amber-700 font-semibold">— (Sin configurar)</em>}
+                      {dish.packagingCost > 0 ? (
+                        `${dish.packagingCost.toFixed(2)} €`
+                      ) : (
+                        <em className="text-amber-700 font-semibold">— (Sin configurar)</em>
+                      )}
                     </span>
                   </div>
                   <div className="pt-2 flex justify-end">
@@ -1039,6 +1242,17 @@ export function EconomicCommandCenter({
           tenantId={tenantId}
           dishId={editingDish.id}
           dishName={editingDish.name}
+          manualCost={editingDish.cost}
+          salesPrice={editingDish.price}
+          hasRecipe={editingDish.recipeIngredients && editingDish.recipeIngredients.length > 0}
+          missingReasons={
+            editingDish.isCalculable === false
+              ? editingDish.recipeIngredients && editingDish.recipeIngredients.length > 0
+                ? ["Coste de ingredientes incompleto"]
+                : ["Sin escandallo ni coste registrado"]
+              : []
+          }
+          canEdit={canEditDishes}
           currentOverheads={{
             laborCost: editingDish.laborCost || 0,
             energyCost: editingDish.energyCost || 0,
@@ -1054,7 +1268,9 @@ export function EconomicCommandCenter({
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
           <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl border overflow-hidden p-6 space-y-4">
             <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="text-lg font-bold text-slate-900">Evidencia y Dispersión Mayorista vs Retail</h3>
+              <h3 className="text-lg font-bold text-slate-900">
+                Evidencia y Dispersión Mayorista vs Retail
+              </h3>
               <Button variant="ghost" size="sm" onClick={() => setSelectedSpreadCalc(null)}>
                 ✕ Cerrar
               </Button>
@@ -1063,7 +1279,13 @@ export function EconomicCommandCenter({
               ingredientName={selectedSpreadCalc.tenantIngredientName}
               components={selectedSpreadCalc.components}
               benchmarkPriceExTax={selectedSpreadCalc.benchmarkPriceExTax}
-              unit={selectedSpreadCalc.canonicalUnit === 'EUR_PER_KG' ? 'kg' : selectedSpreadCalc.canonicalUnit === 'EUR_PER_L' ? 'l' : 'ud'}
+              unit={
+                selectedSpreadCalc.canonicalUnit === "EUR_PER_KG"
+                  ? "kg"
+                  : selectedSpreadCalc.canonicalUnit === "EUR_PER_L"
+                    ? "l"
+                    : "ud"
+              }
             />
           </div>
         </div>

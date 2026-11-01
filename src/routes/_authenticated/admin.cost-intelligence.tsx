@@ -87,7 +87,8 @@ export const Route = createFileRoute("/_authenticated/admin/cost-intelligence")(
       { title: "YourMeal OS — Cost Intelligence Cockpit" },
       {
         name: "description",
-        content: "Simulación de escenarios económicos E9, análisis de costes y registro de decisiones.",
+        content:
+          "Simulación de escenarios económicos E9, análisis de costes y registro de decisiones.",
       },
     ],
   }),
@@ -109,7 +110,15 @@ function formatPercent(pct: number): string {
 export function CostIntelligenceCockpitPage() {
   const { user, tenantId, roles } = useAuth();
   const { can } = useCan();
-  const [activeTab, setActiveTab] = useState<"command_center" | "simulator" | "anatomy" | "anomalies" | "history" | "scenarios" | "market_intelligence">("command_center");
+  const [activeTab, setActiveTab] = useState<
+    | "command_center"
+    | "simulator"
+    | "anatomy"
+    | "anomalies"
+    | "history"
+    | "scenarios"
+    | "market_intelligence"
+  >("command_center");
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
 
@@ -137,6 +146,7 @@ export function CostIntelligenceCockpitPage() {
   const [preset, setPreset] = useState<ScenarioPresetType>("supplier_hike");
   const [targetMarginThreshold, setTargetMarginThreshold] = useState<number>(60.0);
   const [selectedProductDriver, setSelectedProductDriver] = useState<string | null>(null);
+  const [standardSimulationVolume, setStandardSimulationVolume] = useState<number>(400);
 
   // Simulation Variables State
   const [rawMaterialInflationPct, setRawMaterialInflationPct] = useState<number>(10);
@@ -170,36 +180,48 @@ export function CostIntelligenceCockpitPage() {
       const decisionService = new DecisionIntentService();
 
       const [dishesRes, ingRes, recipesRes, scenariosList, intentsList] = await Promise.all([
-        supabase.from("dishes").select("id, name, price, cost, labor_cost, energy_cost, packaging_cost, margin_pct").eq("tenant_id", tenantId).is("deleted_at", null),
-        supabase.from("ingredients").select("id, name, unit, cost, waste_percentage, supplier_id").eq("tenant_id", tenantId).is("deleted_at", null),
-        supabase.from("dish_ingredients").select("dish_id, ingredient_id, amount").eq("tenant_id", tenantId),
+        supabase
+          .from("dishes")
+          .select("id, name, price, cost, labor_cost, energy_cost, packaging_cost, margin_pct")
+          .eq("tenant_id", tenantId)
+          .is("deleted_at", null),
+        supabase
+          .from("ingredients")
+          .select("id, name, unit, cost, supplier_id")
+          .eq("tenant_id", tenantId)
+          .is("deleted_at", null),
+        supabase
+          .from("dish_ingredients")
+          .select("dish_id, ingredient_id, qty")
+          .eq("tenant_id", tenantId),
         scenarioService.listScenarios(ctx).catch(() => []),
         decisionService.listIntentsForTenant(ctx).catch(() => []),
       ]);
 
-      const dishes: FoodDishRecord[] = (dishesRes.data || []).map((d: any) => ({
+      const dishes: FoodDishRecord[] = (dishesRes.data || []).map((d) => ({
         id: d.id,
         name: d.name,
         price: Number(d.price || 0),
-        monthlyVolume: 400, // standard baseline monthly units
+        monthlyVolume: standardSimulationVolume,
+        cost: d.cost != null ? Number(d.cost) : null,
         laborCost: Number(d.labor_cost || 0),
         energyCost: Number(d.energy_cost || 0),
         packagingCost: Number(d.packaging_cost || 0),
       }));
 
-      const ingredients: FoodIngredientRecord[] = (ingRes.data || []).map((i: any) => ({
+      const ingredients: FoodIngredientRecord[] = (ingRes.data || []).map((i) => ({
         id: i.id,
         name: i.name,
         unit: i.unit || "kg",
-        cost: Number(i.cost || 0),
-        wastePercentage: Number(i.waste_percentage || 0),
+        cost: i.cost != null ? Number(i.cost) : null,
+        wastePercentage: 0,
         supplierId: i.supplier_id || undefined,
       }));
 
-      const recipes: FoodRecipeLineRecord[] = (recipesRes.data || []).map((r: any) => ({
+      const recipes: FoodRecipeLineRecord[] = (recipesRes.data || []).map((r) => ({
         dishId: r.dish_id,
         ingredientId: r.ingredient_id,
-        amount: Number(r.amount || 0),
+        amount: Number(r.qty || 0),
       }));
 
       setLiveDishes(dishes);
@@ -232,37 +254,18 @@ export function CostIntelligenceCockpitPage() {
     const ingredientsMap = new Map<string, FoodIngredientRecord>();
     liveIngredients.forEach((ing) => ingredientsMap.set(ing.id, ing));
 
-    // If dishes don't have recipe lines, create a synthetic BOM component matching dish.cost
-    const recipeLinesWithFallback = [...liveRecipes];
-    liveDishes.forEach((d) => {
-      const hasLines = recipeLinesWithFallback.some((r) => r.dishId === d.id);
-      if (!hasLines) {
-        // synthesize a primary food component representing the dish's raw cost
-        const syntheticIngId = `syn-${d.id}`;
-        if (!ingredientsMap.has(syntheticIngId)) {
-          ingredientsMap.set(syntheticIngId, {
-            id: syntheticIngId,
-            name: `Base Materia Prima (${d.name})`,
-            unit: "ración",
-            cost: (d as any).cost || 3.5,
-            wastePercentage: 5,
-          });
-        }
-        recipeLinesWithFallback.push({
-          dishId: d.id,
-          ingredientId: syntheticIngId,
-          amount: 1,
-        });
-      }
-    });
+    const dishesWithVolume = liveDishes.map((d) => ({
+      ...d,
+      monthlyVolume: standardSimulationVolume,
+    }));
 
     return buildFoodCostBaselineSnapshot(
       `snap-${tenantId}-${Date.now()}`,
-      liveDishes,
+      dishesWithVolume,
       ingredientsMap,
-      recipeLinesWithFallback,
+      liveRecipes,
     );
-  }, [liveDishes, liveIngredients, liveRecipes, tenantId]);
+  }, [liveDishes, liveIngredients, liveRecipes, standardSimulationVolume, tenantId]);
 
   // Build hypothetical simulation variables
   const hypotheticalVariables: HypotheticalVariables = useMemo(() => {
@@ -270,7 +273,7 @@ export function CostIntelligenceCockpitPage() {
     liveIngredients.forEach((ing) => {
       if (activeHypothesis && activeHypothesis.ingredientId === ing.id) {
         // Deterministic market intelligence benchmark hypothesis delta
-        itemDeltas[ing.id] = (activeHypothesis.simulatedPrice - ing.cost) / (ing.cost || 1);
+        itemDeltas[ing.id] = (activeHypothesis.simulatedPrice - (ing.cost || 0)) / (ing.cost || 1);
       } else {
         itemDeltas[ing.id] = rawMaterialInflationPct / 100;
       }
@@ -283,7 +286,13 @@ export function CostIntelligenceCockpitPage() {
         laborRateDeltaPct: laborInflationPct / 100,
       },
     };
-  }, [liveIngredients, rawMaterialInflationPct, energyInflationPct, laborInflationPct, activeHypothesis]);
+  }, [
+    liveIngredients,
+    rawMaterialInflationPct,
+    energyInflationPct,
+    laborInflationPct,
+    activeHypothesis,
+  ]);
 
   // Pure E9 Simulation Engine Execution (Zero operational mutations)
   const simulationResult: ScenarioResult = useMemo(() => {
@@ -301,6 +310,11 @@ export function CostIntelligenceCockpitPage() {
           totalMonthlyProfitImpact: 0,
           avgCostDeltaPct: 0,
           avgMarginDeltaPct: 0,
+          totalProductsCount: 0,
+          calculableProductsCount: 0,
+          excludedProductsCount: 0,
+          coveragePct: 0,
+          isFullyCalculable: true,
         },
         products: [],
       };
@@ -455,9 +469,12 @@ export function CostIntelligenceCockpitPage() {
       />
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Cockpit de Inteligencia de Costes</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+            Cockpit de Inteligencia de Costes
+          </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Simulación de escenarios económicos (E9), análisis de escandallos con WAC real y registro de decisiones de gestión.
+            Simulación de escenarios económicos (E9), análisis de escandallos con WAC real y
+            registro de decisiones de gestión.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -518,7 +535,7 @@ export function CostIntelligenceCockpitPage() {
           )}
         >
           <PieChart className="h-4 w-4" />
-          Anatomía de Costes [REAL] ({liveDishes.length} platos)
+          Anatomía de Costes (Ficha Técnica) ({liveDishes.length} platos)
         </button>
         <button
           onClick={() => setActiveTab("scenarios")}
@@ -565,29 +582,35 @@ export function CostIntelligenceCockpitPage() {
           tenantName={user?.user_metadata?.company_name || "Restaurante"}
           userId={user?.id}
           userName={user?.email || "Gerente"}
+          canEditDishes={can("dishes.update") || can("dishes.write")}
           ingredients={liveIngredients.map((ing) => ({
             id: ing.id,
             name: ing.name,
             unit: ing.unit,
             cost: Number(ing.cost || 0),
-            annualVolume:
-              ing.name.toLowerCase().includes("pollo") || ing.name.toLowerCase().includes("pechuga") || ing.name.toLowerCase().includes("harina") ? 1200 :
-              ing.name.toLowerCase().includes("aceite") ? 600 :
-              ing.name.toLowerCase().includes("arroz") ? 800 : undefined,
+            annualVolume: undefined,
           }))}
-          dishes={liveDishes.map((d) => ({
-            id: d.id,
-            name: d.name,
-            price: Number(d.price || 0),
-            cost: (d.laborCost || 0) + (d.energyCost || 0) + (d.packagingCost || 0) + 2.50,
-            laborCost: Number(d.laborCost || 0),
-            energyCost: Number(d.energyCost || 0),
-            packagingCost: Number(d.packagingCost || 0),
-            monthlyVolume: 400,
-            recipeIngredients: liveRecipes
-              .filter((r) => r.dishId === d.id)
-              .map((r) => ({ ingredientId: r.ingredientId, amount: r.amount })),
-          }))}
+          dishes={liveDishes.map((d) => {
+            const baselineProduct = liveBaselineSnapshot.products.find((p) => p.productId === d.id);
+            const isCalculable = baselineProduct ? baselineProduct.isCalculable : d.cost != null;
+            const rawCost =
+              baselineProduct?.rawMaterialsCost ?? (d.cost != null ? Number(d.cost) : null);
+            const salesPrice = d.price != null && Number(d.price) > 0 ? Number(d.price) : null;
+            return {
+              id: d.id,
+              name: d.name,
+              price: salesPrice,
+              cost: rawCost,
+              laborCost: Number(d.laborCost || 0),
+              energyCost: Number(d.energyCost || 0),
+              packagingCost: Number(d.packagingCost || 0),
+              monthlyVolume: standardSimulationVolume,
+              isCalculable,
+              recipeIngredients: liveRecipes
+                .filter((r) => r.dishId === d.id)
+                .map((r) => ({ ingredientId: r.ingredientId, amount: r.amount })),
+            };
+          })}
           onRefreshData={reloadData}
           onOpenMacroSimulator={() => setActiveTab("simulator")}
         />
@@ -605,13 +628,21 @@ export function CostIntelligenceCockpitPage() {
                 </span>
                 <div>
                   <div className="font-bold text-sm flex items-center gap-2">
-                    <span>Simulación con Benchmark de Mercado: {activeHypothesis.ingredientName}</span>
-                    <Badge variant="outline" className="text-[10px] bg-white text-indigo-700 border-indigo-300">
-                      {activeHypothesis.deltaPct > 0 ? "+" : ""}{activeHypothesis.deltaPct.toFixed(1)}% vs WAC
+                    <span>
+                      Simulación con Benchmark de Mercado: {activeHypothesis.ingredientName}
+                    </span>
+                    <Badge
+                      variant="outline"
+                      className="text-[10px] bg-white text-indigo-700 border-indigo-300"
+                    >
+                      {activeHypothesis.deltaPct > 0 ? "+" : ""}
+                      {activeHypothesis.deltaPct.toFixed(1)}% vs WAC
                     </Badge>
                   </div>
                   <p className="text-xs text-indigo-700/90 mt-0.5">
-                    Precio proyectado: {activeHypothesis.simulatedPrice.toFixed(2)} € (Base WAC: {activeHypothesis.baseCost.toFixed(2)} €). Hipótesis en memoria determinista; no altera costes reales de compra ni facturas.
+                    Precio proyectado: {activeHypothesis.simulatedPrice.toFixed(2)} € (Base WAC:{" "}
+                    {activeHypothesis.baseCost.toFixed(2)} €). Hipótesis en memoria determinista; no
+                    altera costes reales de compra ni facturas.
                   </p>
                 </div>
               </div>
@@ -634,51 +665,94 @@ export function CostIntelligenceCockpitPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <PanelCard className="p-4 bg-muted/30">
               <div className="flex items-center justify-between text-xs text-muted-foreground uppercase font-semibold tracking-wider">
-                <span>Coste Mensual Simulado</span>
-                <Badge variant="outline" className="text-[9px] uppercase font-mono bg-purple-50 text-purple-700 border-purple-200">
+                <span>
+                  Subtotal Simulado ({simulationResult.summary.calculableProductsCount} de{" "}
+                  {simulationResult.summary.totalProductsCount} platos)
+                </span>
+                <Badge
+                  variant="outline"
+                  className="text-[9px] uppercase font-mono bg-purple-50 text-purple-700 border-purple-200"
+                >
                   SIMULADO
                 </Badge>
               </div>
               <div className="text-2xl font-bold mt-1">
-                {formatCurrency(simulationResult.summary.totalSimulatedMonthlyCost)}
+                {simulationResult.summary.calculableProductsCount === 0
+                  ? "No disponible"
+                  : formatCurrency(simulationResult.summary.totalSimulatedMonthlyCost)}
               </div>
-              <div className="text-xs mt-1 text-muted-foreground flex items-center gap-1">
-                <span>Base [REAL]: {formatCurrency(simulationResult.summary.totalCurrentMonthlyCost)}</span>
-                <Badge
-                  variant={simulationResult.summary.totalMonthlyCostDelta > 0 ? "destructive" : "secondary"}
-                  className="text-[10px] ml-auto"
-                >
-                  {simulationResult.summary.totalMonthlyCostDelta > 0 ? "+" : ""}
-                  {formatCurrency(simulationResult.summary.totalMonthlyCostDelta)}
-                </Badge>
+              <div className="text-xs mt-1 text-muted-foreground flex flex-col gap-0.5">
+                <div className="flex items-center justify-between">
+                  <span>
+                    Base Catálogo:{" "}
+                    {simulationResult.summary.calculableProductsCount === 0
+                      ? "—"
+                      : formatCurrency(simulationResult.summary.totalCurrentMonthlyCost)}
+                  </span>
+                  {simulationResult.summary.calculableProductsCount > 0 && (
+                    <Badge
+                      variant={
+                        simulationResult.summary.totalMonthlyCostDelta > 0
+                          ? "destructive"
+                          : "secondary"
+                      }
+                      className="text-[10px]"
+                    >
+                      {simulationResult.summary.totalMonthlyCostDelta > 0 ? "+" : ""}
+                      {formatCurrency(simulationResult.summary.totalMonthlyCostDelta)}
+                    </Badge>
+                  )}
+                </div>
+                <div className="flex items-center justify-between text-[11px] text-muted-foreground/80">
+                  <span>Cobertura: {simulationResult.summary.coveragePct}%</span>
+                  {simulationResult.summary.excludedProductsCount > 0 && (
+                    <span className="text-amber-600 font-medium">
+                      {simulationResult.summary.excludedProductsCount}{" "}
+                      {simulationResult.summary.excludedProductsCount === 1
+                        ? "excluido"
+                        : "excluidos"}
+                    </span>
+                  )}
+                </div>
               </div>
             </PanelCard>
 
             <PanelCard className="p-4 bg-muted/30">
               <div className="flex items-center justify-between text-xs text-muted-foreground uppercase font-semibold tracking-wider">
                 <span>Margen Bruto Medio</span>
-                <Badge variant="outline" className="text-[9px] uppercase font-mono bg-purple-50 text-purple-700 border-purple-200">
+                <Badge
+                  variant="outline"
+                  className="text-[9px] uppercase font-mono bg-purple-50 text-purple-700 border-purple-200"
+                >
                   SIMULADO
                 </Badge>
               </div>
               <div className="text-2xl font-bold mt-1">
-                {simulationResult.products.length > 0
-                  ? (
-                      simulationResult.products.reduce((acc, p) => acc + p.simulatedMarginPct, 0) /
-                      simulationResult.products.length
-                    ).toFixed(2)
-                  : "0,00"}{" "}
-                %
+                {(() => {
+                  const calculableWithMargin = simulationResult.products.filter(
+                    (p) => p.isCalculable && p.simulatedMarginPct != null,
+                  );
+                  if (calculableWithMargin.length === 0) return "No disponible";
+                  const avg =
+                    calculableWithMargin.reduce((acc, p) => acc + p.simulatedMarginPct!, 0) /
+                    calculableWithMargin.length;
+                  return `${avg.toFixed(2)} %`;
+                })()}
               </div>
               <div className="text-xs mt-1 text-muted-foreground flex items-center gap-1">
                 <span>Variación de margen:</span>
                 <span
                   className={cn(
                     "font-semibold ml-auto",
-                    simulationResult.summary.avgMarginDeltaPct < 0 ? "text-destructive" : "text-primary",
+                    simulationResult.summary.avgMarginDeltaPct < 0
+                      ? "text-destructive"
+                      : "text-primary",
                   )}
                 >
-                  {formatPercent(simulationResult.summary.avgMarginDeltaPct)}
+                  {simulationResult.summary.calculableProductsCount > 0 &&
+                  simulationResult.products.some((p) => p.marginDeltaPct != null)
+                    ? formatPercent(simulationResult.summary.avgMarginDeltaPct)
+                    : "—"}
                 </span>
               </div>
             </PanelCard>
@@ -686,19 +760,32 @@ export function CostIntelligenceCockpitPage() {
             <PanelCard className="p-4 bg-muted/30">
               <div className="flex items-center justify-between text-xs text-muted-foreground uppercase font-semibold tracking-wider">
                 <span>Impacto en Beneficio</span>
-                <Badge variant="outline" className="text-[9px] uppercase font-mono bg-purple-50 text-purple-700 border-purple-200">
+                <Badge
+                  variant="outline"
+                  className="text-[9px] uppercase font-mono bg-purple-50 text-purple-700 border-purple-200"
+                >
                   SIMULADO
                 </Badge>
               </div>
               <div
                 className={cn(
                   "text-2xl font-bold mt-1",
-                  simulationResult.summary.totalMonthlyProfitImpact < 0 ? "text-destructive" : "text-primary",
+                  simulationResult.summary.calculableProductsCount === 0
+                    ? "text-muted-foreground"
+                    : simulationResult.summary.totalMonthlyProfitImpact < 0
+                      ? "text-destructive"
+                      : "text-primary",
                 )}
               >
-                {formatCurrency(simulationResult.summary.totalMonthlyProfitImpact)}
+                {simulationResult.summary.calculableProductsCount === 0
+                  ? "No disponible"
+                  : formatCurrency(simulationResult.summary.totalMonthlyProfitImpact)}
               </div>
-              <div className="text-xs mt-1 text-muted-foreground">Impacto mensual proyectado</div>
+              <div className="text-xs mt-1 text-muted-foreground">
+                {simulationResult.summary.calculableProductsCount === 0
+                  ? "Sin platos calculables"
+                  : `Impacto mensual proyectado (${simulationResult.summary.calculableProductsCount} platos)`}
+              </div>
             </PanelCard>
 
             <PanelCard className="p-4 bg-muted/30 flex flex-col justify-between">
@@ -721,6 +808,41 @@ export function CostIntelligenceCockpitPage() {
             </PanelCard>
           </div>
 
+          {/* D-010 Data Transparency Banner if any products excluded */}
+          {simulationResult.summary.excludedProductsCount > 0 && (
+            <div className="p-3.5 rounded-lg border border-amber-300 bg-amber-50/80 text-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="flex items-start sm:items-center gap-2.5">
+                <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5 sm:mt-0" />
+                <div>
+                  <span className="font-semibold">
+                    Transparencia de Datos (D-010): {simulationResult.summary.excludedProductsCount}{" "}
+                    de {simulationResult.summary.totalProductsCount} platos excluidos del subtotal (
+                    {simulationResult.summary.coveragePct}% cobertura).
+                  </span>
+                  <p className="text-amber-800/90 text-[11px] mt-0.5">
+                    No se inventan costes ni mermas fijas. Los platos sin escandallo completo o
+                    coste manual quedan marcados como «No disponible» para evitar falsas seguridades
+                    financieras.
+                  </p>
+                </div>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-xs font-medium border-amber-300 bg-white hover:bg-amber-100 text-amber-900 shrink-0 self-start sm:self-auto"
+                onClick={() => {
+                  const firstExcluded = simulationResult.products.find((p) => !p.isCalculable);
+                  if (firstExcluded) {
+                    const dish = liveDishes.find((d) => d.id === firstExcluded.productId);
+                    if (dish) setEditingDish(dish);
+                  }
+                }}
+              >
+                Completar Fichas Técnicas
+              </Button>
+            </div>
+          )}
+
           {/* Scenario Variables & Presets Controls */}
           <PanelCard className="p-5 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-3">
@@ -730,7 +852,10 @@ export function CostIntelligenceCockpitPage() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted-foreground">Plantilla rápida:</span>
-                <Select value={preset} onValueChange={(val) => handleApplyPreset(val as ScenarioPresetType)}>
+                <Select
+                  value={preset}
+                  onValueChange={(val) => handleApplyPreset(val as ScenarioPresetType)}
+                >
                   <SelectTrigger className="w-[220px] h-8 text-xs">
                     <SelectValue />
                   </SelectTrigger>
@@ -746,11 +871,14 @@ export function CostIntelligenceCockpitPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 pt-2">
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-medium">
                   <Label>Inflación Materias Primas</Label>
-                  <span className="text-primary font-bold">{rawMaterialInflationPct > 0 ? "+" : ""}{rawMaterialInflationPct}%</span>
+                  <span className="text-primary font-bold">
+                    {rawMaterialInflationPct > 0 ? "+" : ""}
+                    {rawMaterialInflationPct}%
+                  </span>
                 </div>
                 <input
                   type="range"
@@ -769,7 +897,10 @@ export function CostIntelligenceCockpitPage() {
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-medium">
                   <Label>Variación Tarifa Eléctrica</Label>
-                  <span className="text-primary font-bold">{energyInflationPct > 0 ? "+" : ""}{energyInflationPct}%</span>
+                  <span className="text-primary font-bold">
+                    {energyInflationPct > 0 ? "+" : ""}
+                    {energyInflationPct}%
+                  </span>
                 </div>
                 <input
                   type="range"
@@ -788,7 +919,10 @@ export function CostIntelligenceCockpitPage() {
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-medium">
                   <Label>Variación Coste Mano de Obra</Label>
-                  <span className="text-primary font-bold">{laborInflationPct > 0 ? "+" : ""}{laborInflationPct}%</span>
+                  <span className="text-primary font-bold">
+                    {laborInflationPct > 0 ? "+" : ""}
+                    {laborInflationPct}%
+                  </span>
                 </div>
                 <input
                   type="range"
@@ -803,6 +937,27 @@ export function CostIntelligenceCockpitPage() {
                   className="w-full accent-primary cursor-pointer"
                 />
               </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs font-medium">
+                  <Label htmlFor="std-volume">Volumen Mensual (Supuesto Operativo)</Label>
+                  <span className="text-primary font-bold">{standardSimulationVolume} uds</span>
+                </div>
+                <Input
+                  id="std-volume"
+                  type="number"
+                  min="1"
+                  step="50"
+                  value={standardSimulationVolume}
+                  onChange={(e) =>
+                    setStandardSimulationVolume(Math.max(1, Number(e.target.value) || 1))
+                  }
+                  className="h-8 text-xs font-mono"
+                />
+                <p className="text-[10px] text-muted-foreground">
+                  Supuesto de simulación configurable, independiente de ventas observadas.
+                </p>
+              </div>
             </div>
           </PanelCard>
 
@@ -812,7 +967,8 @@ export function CostIntelligenceCockpitPage() {
               <div>
                 <h3 className="font-semibold text-base">Matriz de Impacto en Catálogo Real</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Comparación side-by-side entre coste real auditado y simulación hipotética sobre platos activos.
+                  Comparación side-by-side entre coste real auditado y simulación hipotética sobre
+                  platos activos.
                 </p>
               </div>
 
@@ -846,41 +1002,139 @@ export function CostIntelligenceCockpitPage() {
                   <thead className="bg-muted/50 text-muted-foreground border-b uppercase font-medium">
                     <tr>
                       <th className="py-2.5 px-3">Plato / Producto</th>
-                      <th className="py-2.5 px-3 text-right">PVP [REAL]</th>
-                      <th className="py-2.5 px-3 text-right">Coste Real [REAL]</th>
-                      <th className="py-2.5 px-3 text-right">Coste Simulado [SIMULADO]</th>
+                      <th className="py-2.5 px-3">Procedencia</th>
+                      <th className="py-2.5 px-3 text-right">PVP</th>
+                      <th className="py-2.5 px-3 text-right">Coste Catálogo</th>
+                      <th className="py-2.5 px-3 text-right">Coste Simulado</th>
                       <th className="py-2.5 px-3 text-right">Δ Coste</th>
-                      <th className="py-2.5 px-3 text-right">Margen Real [REAL]</th>
-                      <th className="py-2.5 px-3 text-right">Margen Simulado [SIMULADO]</th>
+                      <th className="py-2.5 px-3 text-right">Margen Bruto (D-003)</th>
+                      <th className="py-2.5 px-3 text-right">Margen Simulado</th>
                       <th className="py-2.5 px-3 text-center">Estado Margen</th>
                       <th className="py-2.5 px-3 text-right">Acción</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
                     {simulationResult.products.map((prod) => {
-                      const isBelowThreshold = prod.simulatedMarginPct < targetMarginThreshold;
+                      const isBelowThreshold =
+                        prod.isCalculable &&
+                        prod.simulatedMarginPct != null &&
+                        prod.simulatedMarginPct < targetMarginThreshold;
+                      const dish = liveDishes.find((d) => d.id === prod.productId);
                       return (
                         <tr key={prod.productId} className="hover:bg-muted/20">
-                          <td className="py-3 px-3 font-semibold">{prod.productName}</td>
-                          <td className="py-3 px-3 text-right font-medium">{formatCurrency(prod.salesPrice)}</td>
-                          <td className="py-3 px-3 text-right text-muted-foreground">{formatCurrency(prod.currentCost)}</td>
-                          <td className="py-3 px-3 text-right font-bold">{formatCurrency(prod.simulatedCost)}</td>
-                          <td className="py-3 px-3 text-right font-semibold text-destructive">
-                            +{formatCurrency(prod.costDelta)}
+                          <td className="py-3 px-3">
+                            <div className="font-semibold">{prod.productName}</div>
+                            {prod.missingDataReasons.length > 0 && (
+                              <div className="text-[10px] text-amber-700 mt-0.5">
+                                {prod.missingDataReasons.join(" · ")}
+                              </div>
+                            )}
                           </td>
-                          <td className="py-3 px-3 text-right text-muted-foreground">{prod.currentMarginPct.toFixed(2)}%</td>
-                          <td className="py-3 px-3 text-right font-bold">
-                            <span className={cn(isBelowThreshold ? "text-destructive" : "text-primary")}>
-                              {prod.simulatedMarginPct.toFixed(2)}%
-                            </span>
+                          <td className="py-3 px-3">
+                            {prod.costProvenance === "recipe_catalog" ? (
+                              <Badge
+                                variant="outline"
+                                className="text-[10px] font-normal bg-emerald-50 text-emerald-700 border-emerald-200"
+                              >
+                                Escandallo
+                              </Badge>
+                            ) : prod.costProvenance === "manual_catalog" ? (
+                              <Badge
+                                variant="outline"
+                                className="text-[10px] font-normal bg-sky-50 text-sky-700 border-sky-200"
+                              >
+                                Coste Manual
+                              </Badge>
+                            ) : (
+                              <Badge
+                                variant="outline"
+                                className="text-[10px] font-normal bg-amber-50 text-amber-700 border-amber-300"
+                              >
+                                Incompleto
+                              </Badge>
+                            )}
+                          </td>
+                          <td className="py-3 px-3 text-right font-medium">
+                            {prod.salesPrice != null && prod.salesPrice > 0 ? (
+                              formatCurrency(prod.salesPrice)
+                            ) : (
+                              <span className="text-muted-foreground/60 italic font-normal">
+                                Sin PVP
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-3 px-3 text-right">
+                            {prod.isCalculable ? (
+                              <span className="text-muted-foreground font-mono">
+                                {formatCurrency(prod.currentCost)}
+                              </span>
+                            ) : (
+                              <span className="text-amber-700 italic font-mono">No disponible</span>
+                            )}
+                          </td>
+                          <td className="py-3 px-3 text-right">
+                            {prod.isCalculable ? (
+                              <span className="font-bold font-mono">
+                                {formatCurrency(prod.simulatedCost)}
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground/60 italic font-mono">—</span>
+                            )}
+                          </td>
+                          <td className="py-3 px-3 text-right">
+                            {prod.isCalculable ? (
+                              <span className="font-semibold text-destructive font-mono">
+                                +{formatCurrency(prod.costDelta)}
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground/60 font-mono">—</span>
+                            )}
+                          </td>
+                          <td className="py-3 px-3 text-right font-mono">
+                            {prod.grossMarginPct != null ? (
+                              <span className="text-primary font-medium">
+                                {prod.grossMarginPct.toFixed(1)} %
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground/60">—</span>
+                            )}
+                          </td>
+                          <td className="py-3 px-3 text-right font-mono">
+                            {prod.isCalculable && prod.simulatedMarginPct != null ? (
+                              <span
+                                className={cn(
+                                  isBelowThreshold
+                                    ? "text-destructive font-bold"
+                                    : "text-primary font-bold",
+                                )}
+                              >
+                                {prod.simulatedMarginPct.toFixed(2)} %
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground/60 italic font-normal">
+                                {prod.salesPrice == null || prod.salesPrice <= 0
+                                  ? "Sin PVP"
+                                  : "No disponible"}
+                              </span>
+                            )}
                           </td>
                           <td className="py-3 px-3 text-center">
-                            {isBelowThreshold ? (
+                            {!prod.isCalculable ? (
+                              <Badge
+                                variant="outline"
+                                className="text-[10px] text-amber-700 bg-amber-50 border-amber-300"
+                              >
+                                Incompleto
+                              </Badge>
+                            ) : isBelowThreshold ? (
                               <Badge variant="destructive" className="text-[10px]">
                                 Bajo Objetivo (&lt;{targetMarginThreshold}%)
                               </Badge>
                             ) : (
-                              <Badge variant="outline" className="text-[10px] text-primary border-primary">
+                              <Badge
+                                variant="outline"
+                                className="text-[10px] text-primary border-primary"
+                              >
                                 Óptimo
                               </Badge>
                             )}
@@ -888,16 +1142,18 @@ export function CostIntelligenceCockpitPage() {
                           <td className="py-3 px-3 text-right">
                             <Button
                               size="sm"
-                              variant="ghost"
-                              className="h-7 text-xs gap-1"
-                              onClick={() =>
-                                setSelectedProductDriver(
-                                  selectedProductDriver === prod.productId ? null : prod.productId,
-                                )
-                              }
+                              variant={!prod.isCalculable ? "outline" : "ghost"}
+                              className={cn(
+                                "h-7 text-xs gap-1",
+                                !prod.isCalculable &&
+                                  "text-amber-700 border-amber-300 bg-amber-50 hover:bg-amber-100",
+                              )}
+                              onClick={() => {
+                                if (dish) setEditingDish(dish);
+                              }}
                             >
-                              Ver Factores
-                              <ArrowRight className="h-3 w-3" />
+                              <Sliders className="h-3 w-3" />
+                              {!prod.isCalculable ? "Completar Datos" : "Editar Ficha"}
                             </Button>
                           </td>
                         </tr>
@@ -916,84 +1172,146 @@ export function CostIntelligenceCockpitPage() {
         <PanelCard className="p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <SectionTitle title="Anatomía de Costes Reales (WAC & Escandallos)" />
+              <SectionTitle title="Anatomía de Costes (Ficha Técnica y Escandallos)" />
               <p className="text-xs text-muted-foreground mt-0.5">
-                Desglose de costes operativos actuales derivados del catálogo real de platos e ingredientes en Supabase.
+                Desglose de costes operativos derivados del catálogo real de platos e ingredientes
+                en Supabase.
               </p>
             </div>
-            <Badge variant="outline" className="text-xs uppercase font-mono bg-emerald-50 text-emerald-700 border-emerald-200">
-              DATOS REALES AUDITADOS
+            <Badge
+              variant="outline"
+              className="text-xs uppercase font-mono bg-emerald-50 text-emerald-700 border-emerald-200"
+            >
+              FICHA TÉCNICA (CATÁLOGO ACTUAL)
             </Badge>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-            {liveBaselineSnapshot.products.map((p) => (
-              <div key={p.productId} className="p-4 bg-muted/20 border rounded-lg space-y-2 text-xs">
-                <div className="font-bold text-sm flex items-center justify-between">
-                  <span>{p.productName}</span>
-                  <Badge variant="outline" className="text-[9px] uppercase font-mono bg-emerald-50 text-emerald-700 border-emerald-200">
-                    REAL
-                  </Badge>
-                </div>
-                <div className="flex justify-between border-b pb-1">
-                  <span className="text-muted-foreground">PVP:</span>
-                  <span className="font-semibold">{formatCurrency(p.salesPrice)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Mano de Obra:</span>
-                  <span>
-                    {p.overheads.laborCost > 0 ? (
-                      formatCurrency(p.overheads.laborCost)
+            {liveBaselineSnapshot.products.map((p) => {
+              const dish = liveDishes.find((d) => d.id === p.productId);
+              return (
+                <div
+                  key={p.productId}
+                  className="p-4 bg-muted/20 border rounded-lg space-y-2 text-xs"
+                >
+                  <div className="font-bold text-sm flex items-center justify-between">
+                    <span>{p.productName}</span>
+                    {p.costProvenance === "recipe_catalog" ? (
+                      <Badge
+                        variant="outline"
+                        className="text-[9px] uppercase font-mono bg-emerald-50 text-emerald-700 border-emerald-200"
+                      >
+                        Escandallo
+                      </Badge>
+                    ) : p.costProvenance === "manual_catalog" ? (
+                      <Badge
+                        variant="outline"
+                        className="text-[9px] uppercase font-mono bg-sky-50 text-sky-700 border-sky-200"
+                      >
+                        Coste Manual
+                      </Badge>
                     ) : (
-                      <span className="text-muted-foreground/60 italic">— (Sin configurar)</span>
+                      <Badge
+                        variant="outline"
+                        className="text-[9px] uppercase font-mono bg-amber-50 text-amber-700 border-amber-300"
+                      >
+                        Incompleto
+                      </Badge>
                     )}
-                  </span>
+                  </div>
+                  <div className="flex justify-between border-b pb-1">
+                    <span className="text-muted-foreground">PVP:</span>
+                    <span className="font-semibold">
+                      {p.salesPrice != null && p.salesPrice > 0 ? (
+                        formatCurrency(p.salesPrice)
+                      ) : (
+                        <span className="text-muted-foreground/60 italic font-normal">Sin PVP</span>
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Materia Prima:</span>
+                    <span>
+                      {p.isCalculable && p.rawMaterialsCost != null ? (
+                        <span className="font-mono font-medium">
+                          {formatCurrency(p.rawMaterialsCost)}
+                        </span>
+                      ) : (
+                        <span className="text-amber-700 italic">No disponible</span>
+                      )}
+                    </span>
+                  </div>
+                  {p.grossMarginPct != null && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Margen Bruto (D-003):</span>
+                      <span className="font-mono font-semibold text-primary">
+                        {p.grossMarginPct.toFixed(1)} %
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Mano de Obra:</span>
+                    <span>
+                      {p.overheads.laborCost > 0 ? (
+                        formatCurrency(p.overheads.laborCost)
+                      ) : (
+                        <span className="text-muted-foreground/60 italic">—</span>
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Energía:</span>
+                    <span>
+                      {p.overheads.energyCost > 0 ? (
+                        formatCurrency(p.overheads.energyCost)
+                      ) : (
+                        <span className="text-muted-foreground/60 italic">—</span>
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Packaging:</span>
+                    <span>
+                      {p.overheads.packagingCost > 0 ? (
+                        formatCurrency(p.overheads.packagingCost)
+                      ) : (
+                        <span className="text-muted-foreground/60 italic">—</span>
+                      )}
+                    </span>
+                  </div>
+                  {p.missingDataReasons && p.missingDataReasons.length > 0 && (
+                    <div className="p-1.5 bg-amber-50/70 border border-amber-200 rounded text-[10px] text-amber-800">
+                      {p.missingDataReasons.join(" · ")}
+                    </div>
+                  )}
+                  <div className="pt-2 border-t font-semibold flex justify-between items-center">
+                    <span>Componentes ({p.bomComponents.length}):</span>
+                    <span className="text-[11px] font-normal text-muted-foreground">
+                      {p.costProvenance === "manual_catalog"
+                        ? "Coste manual de ficha (sin ingredientes desglosados)"
+                        : p.bomComponents.length > 0
+                          ? p.bomComponents
+                              .map((c) => c.componentName.split(" ")[0])
+                              .slice(0, 3)
+                              .join(", ") + (p.bomComponents.length > 3 ? "..." : "")
+                          : "Sin escandallo"}
+                    </span>
+                  </div>
+                  <div className="pt-2 flex justify-end">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-6 text-[11px] px-2 text-amber-700 bg-amber-50/50 border-amber-200 hover:bg-amber-100 font-medium"
+                      onClick={() => {
+                        if (dish) setEditingDish(dish);
+                      }}
+                    >
+                      <Sliders className="w-3 h-3 mr-1" />
+                      {p.isCalculable ? "Editar Costes de Ficha" : "Completar Coste / Ficha"}
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Energía:</span>
-                  <span>
-                    {p.overheads.energyCost > 0 ? (
-                      formatCurrency(p.overheads.energyCost)
-                    ) : (
-                      <span className="text-muted-foreground/60 italic">— (Sin configurar)</span>
-                    )}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Packaging:</span>
-                  <span>
-                    {p.overheads.packagingCost > 0 ? (
-                      formatCurrency(p.overheads.packagingCost)
-                    ) : (
-                      <span className="text-muted-foreground/60 italic">— (Sin configurar)</span>
-                    )}
-                  </span>
-                </div>
-                <div className="pt-2 border-t font-semibold flex justify-between items-center">
-                  <span>Ingredientes ({p.bomComponents.length}):</span>
-                  <span className="text-[11px] font-normal text-muted-foreground">
-                    {p.bomComponents
-                      .map((c) => c.componentName.split(" ")[0])
-                      .slice(0, 3)
-                      .join(", ")}
-                    {p.bomComponents.length > 3 ? "..." : ""}
-                  </span>
-                </div>
-                <div className="pt-2 flex justify-end">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-6 text-[11px] px-2 text-amber-700 bg-amber-50/50 border-amber-200 hover:bg-amber-100 font-medium"
-                    onClick={() => {
-                      const dish = liveDishes.find((d) => d.id === p.productId);
-                      if (dish) setEditingDish(dish);
-                    }}
-                  >
-                    <Sliders className="w-3 h-3 mr-1" />
-                    Imputar Costes Indirectos
-                  </Button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </PanelCard>
       )}
@@ -1025,7 +1343,8 @@ export function CostIntelligenceCockpitPage() {
                     </div>
                     {sc.description && <p className="text-muted-foreground">{sc.description}</p>}
                     <p className="text-[11px] text-muted-foreground">
-                      Creado: {new Date(sc.createdAt).toLocaleDateString("es-ES")} · Estado: {sc.status}
+                      Creado: {new Date(sc.createdAt).toLocaleDateString("es-ES")} · Estado:{" "}
+                      {sc.status}
                     </p>
                   </div>
                   <Button
@@ -1058,7 +1377,10 @@ export function CostIntelligenceCockpitPage() {
           ) : (
             <div className="space-y-3 pt-2">
               {savedIntents.map((intent) => (
-                <div key={intent.id} className="p-4 border rounded-lg bg-background text-xs space-y-2">
+                <div
+                  key={intent.id}
+                  className="p-4 border rounded-lg bg-background text-xs space-y-2"
+                >
                   <div className="flex justify-between items-center">
                     <div className="font-bold text-sm flex items-center gap-2">
                       <FileText className="h-4 w-4 text-primary" />
@@ -1090,10 +1412,7 @@ export function CostIntelligenceCockpitPage() {
             name: ing.name,
             unit: ing.unit,
             cost: Number(ing.cost || 0),
-            annualVolume:
-              ing.name.toLowerCase().includes("pollo") ? 1200 :
-              ing.name.toLowerCase().includes("aceite") ? 600 :
-              ing.name.toLowerCase().includes("arroz") ? 800 : undefined,
+            annualVolume: undefined,
           }))}
           onInjectSimulation={(ingredientId, simulatedPrice, deltaPct) => {
             const ing = liveIngredients.find((i) => i.id === ingredientId);
@@ -1105,12 +1424,14 @@ export function CostIntelligenceCockpitPage() {
               deltaPct,
             });
             setActiveTab("simulator");
-            toast.success(`Hipótesis de mercado inyectada: ${ing?.name || ingredientId} a ${simulatedPrice.toFixed(2)} €`);
+            toast.success(
+              `Hipótesis de mercado inyectada: ${ing?.name || ingredientId} a ${simulatedPrice.toFixed(2)} €`,
+            );
           }}
         />
       )}
 
-      {/* In-Situ Indirect Cost Imputation Modal */}
+      {/* In-Situ Cost & Overhead Quick Edit Modal */}
       {editingDish && tenantId && (
         <IndirectCostQuickEditModal
           open={Boolean(editingDish)}
@@ -1118,6 +1439,14 @@ export function CostIntelligenceCockpitPage() {
           tenantId={tenantId}
           dishId={editingDish.id}
           dishName={editingDish.name}
+          manualCost={editingDish.cost}
+          salesPrice={editingDish.price}
+          hasRecipe={liveRecipes.some((r) => r.dishId === editingDish.id)}
+          missingReasons={
+            simulationResult.products.find((p) => p.productId === editingDish.id)
+              ?.missingDataReasons || []
+          }
+          canEdit={can("dishes.update") || can("dishes.write")}
           currentOverheads={{
             laborCost: editingDish.laborCost || 0,
             energyCost: editingDish.energyCost || 0,
@@ -1137,7 +1466,8 @@ export function CostIntelligenceCockpitPage() {
                 Guardar Escenario de Simulación
               </DialogTitle>
               <DialogDescription className="text-xs">
-                Guarda este escenario con su snapshot determinista en Supabase para consultarlo o re-evaluarlo en el futuro.
+                Guarda este escenario con su snapshot determinista en Supabase para consultarlo o
+                re-evaluarlo en el futuro.
               </DialogDescription>
             </DialogHeader>
 
@@ -1187,23 +1517,30 @@ export function CostIntelligenceCockpitPage() {
                 Registrar Decisión de Gestión
               </DialogTitle>
               <DialogDescription className="text-xs">
-                Documenta la acción que tomará el equipo a raíz de esta simulación. Esta acción no modifica
-                automáticamente precios ni inventario.
+                Documenta la acción que tomará el equipo a raíz de esta simulación. Esta acción no
+                modifica automáticamente precios ni inventario.
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-3 py-1 text-xs">
               <div className="space-y-1.5">
                 <Label>Tipo de Acción Prevista *</Label>
-                <Select value={intentType} onValueChange={(v) => setIntentType(v as DecisionIntentType)}>
+                <Select
+                  value={intentType}
+                  onValueChange={(v) => setIntentType(v as DecisionIntentType)}
+                >
                   <SelectTrigger className="h-8 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="renegotiate_supplier">Renegociar con Proveedor</SelectItem>
                     <SelectItem value="adjust_menu_price">Ajustar PVP de Plato</SelectItem>
-                    <SelectItem value="reformulate_recipe">Reformular Receta / Ingredientes</SelectItem>
-                    <SelectItem value="accept_margin_compression">Asumir Compresión Temporal de Margen</SelectItem>
+                    <SelectItem value="reformulate_recipe">
+                      Reformular Receta / Ingredientes
+                    </SelectItem>
+                    <SelectItem value="accept_margin_compression">
+                      Asumir Compresión Temporal de Margen
+                    </SelectItem>
                     <SelectItem value="other">Otra Decisión Estratégica</SelectItem>
                   </SelectContent>
                 </Select>

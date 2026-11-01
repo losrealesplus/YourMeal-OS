@@ -253,14 +253,15 @@ export type ActionabilityGrade =
 export interface AffectedDishSim {
   dishId: string;
   dishName: string;
-  salesPrice: number;
-  currentCost: number;
-  simulatedCost: number;
-  currentMarginPct: number;
-  simulatedMarginPct: number;
-  costDelta: number;
+  salesPrice: number | null;
+  currentCost: number | null;
+  simulatedCost: number | null;
+  currentMarginPct: number | null;
+  simulatedMarginPct: number | null;
+  costDelta: number | null;
   monthlyVolumeUnits: number;
-  monthlyProfitImpactEur: number;
+  monthlyProfitImpactEur: number | null;
+  isCalculable?: boolean;
 }
 
 export interface EconomicOpportunity {
