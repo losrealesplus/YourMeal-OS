@@ -35,6 +35,36 @@ export function simulateScenario(
   const yieldAdjustments = variables.yieldLossAdjustments ?? {};
 
   const productImpacts: SimulatedProductImpact[] = baseline.products.map((prod) => {
+    const isCalculable = prod.isCalculable !== false;
+    const costProvenance =
+      prod.costProvenance ?? (prod.bomComponents.length > 0 ? "recipe_catalog" : "incomplete");
+    const missingDataReasons =
+      prod.missingDataReasons ?? (isCalculable ? [] : ["Faltan datos de escandallo o coste"]);
+
+    if (!isCalculable) {
+      return {
+        productId: prod.productId,
+        productName: prod.productName,
+        salesPrice: prod.salesPrice,
+        monthlyVolume: prod.monthlyVolume ?? 0,
+        currentCost: 0,
+        simulatedCost: 0,
+        costDelta: 0,
+        costDeltaPct: 0,
+        currentMarginPct: 0,
+        simulatedMarginPct: 0,
+        marginDeltaPct: 0,
+        currentMonthlyCost: 0,
+        simulatedMonthlyCost: 0,
+        monthlyProfitImpact: 0,
+        costProvenance,
+        isCalculable: false,
+        missingDataReasons,
+        rawMaterialsCost: null,
+        grossMarginPct: null,
+      };
+    }
+
     // 1. Calculate current baseline cost
     const currentBomCalc = calculateBOMCost(
       prod.productId,
@@ -106,9 +136,7 @@ export function simulateScenario(
     const costDeltaPct = currentCost > 0 ? round((costDelta / currentCost) * 100, 2) : 0;
 
     const currentMarginPct =
-      prod.salesPrice > 0
-        ? round(((prod.salesPrice - currentCost) / prod.salesPrice) * 100, 2)
-        : 0;
+      prod.salesPrice > 0 ? round(((prod.salesPrice - currentCost) / prod.salesPrice) * 100, 2) : 0;
 
     const simulatedMarginPct =
       prod.salesPrice > 0
@@ -139,32 +167,46 @@ export function simulateScenario(
       currentMonthlyCost,
       simulatedMonthlyCost,
       monthlyProfitImpact,
+      costProvenance,
+      isCalculable: true,
+      missingDataReasons: [],
+      rawMaterialsCost: prod.rawMaterialsCost ?? currentBomCalc.rawMaterialsCost,
+      grossMarginPct: prod.grossMarginPct ?? null,
     };
   });
 
+  const calculableImpacts = productImpacts.filter((p) => p.isCalculable !== false);
+  const totalProductsCount = productImpacts.length;
+  const calculableProductsCount = calculableImpacts.length;
+  const excludedProductsCount = totalProductsCount - calculableProductsCount;
+  const coveragePct =
+    totalProductsCount > 0 ? round((calculableProductsCount / totalProductsCount) * 100, 1) : 0;
+  const isFullyCalculable = excludedProductsCount === 0;
+
   const totalCurrentMonthlyCost = round(
-    productImpacts.reduce((acc, p) => acc + p.currentMonthlyCost, 0),
+    calculableImpacts.reduce((acc, p) => acc + p.currentMonthlyCost, 0),
   );
 
   const totalSimulatedMonthlyCost = round(
-    productImpacts.reduce((acc, p) => acc + p.simulatedMonthlyCost, 0),
+    calculableImpacts.reduce((acc, p) => acc + p.simulatedMonthlyCost, 0),
   );
 
   const totalMonthlyCostDelta = round(totalSimulatedMonthlyCost - totalCurrentMonthlyCost);
   const totalMonthlyProfitImpact = round(-totalMonthlyCostDelta);
 
   const avgCostDeltaPct =
-    productImpacts.length > 0
+    calculableImpacts.length > 0
       ? round(
-          productImpacts.reduce((acc, p) => acc + p.costDeltaPct, 0) / productImpacts.length,
+          calculableImpacts.reduce((acc, p) => acc + p.costDeltaPct, 0) / calculableImpacts.length,
           2,
         )
       : 0;
 
   const avgMarginDeltaPct =
-    productImpacts.length > 0
+    calculableImpacts.length > 0
       ? round(
-          productImpacts.reduce((acc, p) => acc + p.marginDeltaPct, 0) / productImpacts.length,
+          calculableImpacts.reduce((acc, p) => acc + p.marginDeltaPct, 0) /
+            calculableImpacts.length,
           2,
         )
       : 0;
@@ -184,6 +226,11 @@ export function simulateScenario(
       totalMonthlyProfitImpact,
       avgCostDeltaPct,
       avgMarginDeltaPct,
+      totalProductsCount,
+      calculableProductsCount,
+      excludedProductsCount,
+      coveragePct,
+      isFullyCalculable,
     },
   };
 }
@@ -195,10 +242,7 @@ export function compareScenarios(
   const compared = scenarios.map((s) => {
     const avgMarginPct =
       s.products.length > 0
-        ? round(
-            s.products.reduce((acc, p) => acc + p.simulatedMarginPct, 0) / s.products.length,
-            2,
-          )
+        ? round(s.products.reduce((acc, p) => acc + p.simulatedMarginPct, 0) / s.products.length, 2)
         : 0;
 
     return {

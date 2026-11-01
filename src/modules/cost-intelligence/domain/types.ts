@@ -128,6 +128,11 @@ export interface HypotheticalVariables {
   yieldLossAdjustments?: Record<string, number>; // e.g. { "ING-POLLO": -0.03 } (-3% merma)
 }
 
+export type CostProvenanceType =
+  | "recipe_catalog" // Calculado desde receta de catálogo
+  | "manual_catalog" // Coste manual registrado en dishes.cost
+  | "incomplete"; // Dato ausente o incompleto
+
 export interface BaselineProduct {
   productId: string;
   productName: string;
@@ -135,6 +140,11 @@ export interface BaselineProduct {
   monthlyVolume: number;
   bomComponents: BOMComponent[];
   overheads: ProductionOverheadsConfig;
+  costProvenance?: CostProvenanceType;
+  isCalculable?: boolean;
+  missingDataReasons?: string[];
+  rawMaterialsCost?: number | null;
+  grossMarginPct?: number | null; // D-003: Margen inicial (PVP - Materia Prima - Envases)
 }
 
 export interface CostBaselineSnapshot {
@@ -158,6 +168,11 @@ export interface SimulatedProductImpact {
   currentMonthlyCost: number;
   simulatedMonthlyCost: number;
   monthlyProfitImpact: number;
+  costProvenance: CostProvenanceType;
+  isCalculable: boolean;
+  missingDataReasons: string[];
+  rawMaterialsCost: number | null;
+  grossMarginPct: number | null;
 }
 
 export interface ScenarioResult {
@@ -175,6 +190,11 @@ export interface ScenarioResult {
     totalMonthlyProfitImpact: number;
     avgCostDeltaPct: number;
     avgMarginDeltaPct: number;
+    totalProductsCount: number;
+    calculableProductsCount: number;
+    excludedProductsCount: number;
+    coveragePct: number;
+    isFullyCalculable: boolean;
   };
 }
 
